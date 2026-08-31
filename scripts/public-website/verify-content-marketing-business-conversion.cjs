@@ -1,11 +1,69 @@
 /** Live copy/clipboard and two-step form QA; never sends a lead. --preview overrides WordPress response/runtime locally. */
-const fs=require('fs'),assert=require('assert/strict'),{chromium}=require('playwright'),{JSDOM}=require('jsdom'),patch=require('./content-marketing-business-conversion-copy.json');
+const fs = require('fs');
+const assert = require('assert/strict');
+
+const {chromium} = require('playwright');
+const {JSDOM} = require('jsdom');
+
+const patch = require('./content-marketing-business-conversion-copy.json');
+
+
+
+
+
+
+
+
+
+
 const balance=require('./content-marketing-conversion-balance-copy.json');
+
 for(const [type,m] of Object.entries(balance.modules))for(const [key,change] of Object.entries(m.fields)){patch.modules[type].fields[key].previous=change.before;patch.modules[type].fields[key].after=change.after;}
-const preview=process.argv.includes('--preview'),url='https://efeoncepro.com/servicio-marketing-de-contenidos/',dir='.captures/content-marketing/business-conversion'+(preview?'-preview':'');fs.mkdirSync(dir,{recursive:true});
-function override(html){const d=new JSDOM(html).window.document;for(const[type,m]of Object.entries(patch.modules)){const root=d.querySelector('[data-content-module='+type.replace('greenhouse_content_','')+']'),c=root.querySelector('[data-cm-config]'),data=JSON.parse(c.textContent);for(const change of Object.values(m.fields)){for(const k of Object.keys(data.values))if([change.before,change.previous].includes(data.values[k]))data.values[k]=change.after;const w=d.createTreeWalker(root.querySelector('section'),4);while(w.nextNode())if([change.before,change.previous].filter(Boolean).some(t=>w.currentNode.textContent.trim()===t.trim()))w.currentNode.textContent=change.after;}c.textContent=JSON.stringify(data);}return d.documentElement.outerHTML;}
-(async()=>{const b=await chromium.launch(),report={preview,widths:[],errors:[],submitRequests:0};try{for(const width of [1440,878,390]){const c=await b.newContext({viewport:{width,height:1000},permissions:['clipboard-read','clipboard-write']}),p=await c.newPage();p.on('pageerror',e=>report.errors.push(e.message));await p.route('**/api/public/growth/forms/**/submit',r=>{report.submitRequests++;r.abort()});if(preview){await p.route(url,async r=>{const response=await r.fetch();await r.fulfill({response,body:override(await response.text())})});await p.route('**/assets/js/content-marketing.js*',r=>r.fulfill({contentType:'text/javascript',body:fs.readFileSync('../efeonce-public-site-runtime/wp-content/plugins/eo-elementor-widgets/assets/js/content-marketing.js','utf8')}));}
-await p.goto(url,{waitUntil:'domcontentloaded'});await p.locator('[data-content-module=business][data-cm-ready=true]').waitFor();for(const[type,m]of Object.entries(patch.modules)){const root=p.locator('[data-content-module='+type.replace('greenhouse_content_','')+'] section'),txt=await root.textContent();for(const[k,v]of Object.entries(m.fields))if(k!=='content_049')assert(txt.includes(v.after),type+'/'+k);}
-const business=p.locator('#internal-case'),copy=business.getByRole('button');await copy.click();await p.waitForFunction(()=>document.querySelector('#internal-case button')?.textContent.includes('Correo copiado'));assert.equal((await copy.innerText()).trim(),'Correo copiado');const actual=await p.evaluate(()=>navigator.clipboard.readText());const f=patch.modules.greenhouse_content_business.fields;const expected=['Asunto:'+f.content_031.after,'Equipo:',...Array.from({length:8},(_,i)=>f['content_'+String(33+i).padStart(3,'0')].after)].join('\n\n');assert.equal(actual,expected);assert(!actual.includes('\\n'));await business.evaluate(e=>e.scrollIntoView({block:'start'}));await p.waitForTimeout(800);await business.screenshot({path:dir+'/business-'+width+'.png'});
-await p.locator('#operating-modes button').nth(2).click();const form=p.locator('greenhouse-form');await form.locator('input[name=fullName]').waitFor();await p.locator('#content-marketing-conversion').evaluate(e=>e.scrollIntoView({block:'start'}));await p.waitForTimeout(800);assert((await form.innerText()).includes('Tus datos de contacto'));assert((await form.innerText()).includes('Para responderte y conocer tu empresa.'));await p.evaluate(()=>document.fonts.ready);const columnHeights=await p.locator('#content-marketing-conversion').evaluate(e=>[...e.children[2].children].map(c=>c.getBoundingClientRect().height));if(width>760)assert(Math.abs(columnHeights[0]-columnHeights[1])<40,'Conversion columns differ by more than 40px');await p.locator('#content-marketing-conversion').screenshot({path:dir+'/conversion-'+width+'.png'});await form.locator('button[data-ghf-primary]').click();assert.equal(await form.locator('[aria-invalid=true]').count(),3);await form.locator('[name=fullName]').fill('Prueba sin envío');await form.locator('[name=email]').fill('qa@efeonce.org');await form.locator('[name=companyName]').fill('Efeonce');await form.locator('button[data-ghf-primary]').click();await p.waitForTimeout(400);assert((await form.innerText()).includes('Hablemos de tus contenidos'));assert((await form.innerText()).includes('La modalidad y el contexto son opcionales.'));assert.equal(await form.locator('[name=mode]').inputValue(),'Content Engine');assert.equal((await form.locator('button[data-ghf-primary]').innerText()).trim(),'Enviar mi consulta');assert.equal(await form.locator('[name=challenge]').getAttribute('placeholder'),'Por ejemplo: publicar con más frecuencia, coordinar las revisiones o adaptar el contenido a otros canales.');await form.locator('[name=challenge]').fill('Revisión local, sin envío.');await form.locator('[name=mode]').selectOption('Co-operado');await form.screenshot({path:dir+'/form-step2-'+width+'.png'});await form.locator('.ghf-btn--ghost').click();assert.equal(await form.locator('[name=fullName]').inputValue(),'Prueba sin envío');await form.locator('button[data-ghf-primary]').click();assert.equal(await form.locator('[name=mode]').inputValue(),'Co-operado');assert.equal(await form.locator('[name=challenge]').inputValue(),'Revisión local, sin envío.');await p.waitForTimeout(700);assert(await p.evaluate(()=>document.documentElement.scrollWidth===document.documentElement.clientWidth));report.widths.push({width,columnHeights,copyExact:true,formSteps:true,prefill:true,retention:true});await c.close();}
-const p=await b.newPage({javaScriptEnabled:false,viewport:{width:390,height:844}});if(preview)await p.route(url,async r=>{const response=await r.fetch();await r.fulfill({response,body:override(await response.text())})});await p.goto(url);assert((await p.locator('#internal-case').innerText()).includes(patch.modules.greenhouse_content_business.fields.content_040.after));assert.equal(await p.locator('greenhouse-form a').getAttribute('href'),'https://efeoncepro.com/agenda/');report.jsOff=true;assert.deepEqual(report.errors,[]);assert.equal(report.submitRequests,0);report.status='pass';fs.writeFileSync(dir+'/report.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report));}finally{await b.close()}})().catch(e=>{console.error(e);process.exit(1)});
+const preview=process.argv.includes('--preview'),url='https://efeoncepro.com/servicio-marketing-de-contenidos/',dir='.captures/content-marketing/business-conversion'+(preview?'-preview':'');
+
+fs.mkdirSync(dir,{recursive:true});
+
+function override(html){const d=new JSDOM(html).window.document;
+
+for(const[type,m]of Object.entries(patch.modules)){const root=d.querySelector('[data-content-module='+type.replace('greenhouse_content_','')+']'),c=root.querySelector('[data-cm-config]'),data=JSON.parse(c.textContent);
+
+for(const change of Object.values(m.fields)){for(const k of Object.keys(data.values))if([change.before,change.previous].includes(data.values[k]))data.values[k]=change.after;const w=d.createTreeWalker(root.querySelector('section'),4);
+
+while(w.nextNode())if([change.before,change.previous].filter(Boolean).some(t=>w.currentNode.textContent.trim()===t.trim()))w.currentNode.textContent=change.after;}
+
+c.textContent=JSON.stringify(data);}
+
+return d.documentElement.outerHTML;}
+
+(async()=>{const b=await chromium.launch(),report={preview,widths:[],errors:[],submitRequests:0};
+
+try{for(const width of [1440,878,390]){const c=await b.newContext({viewport:{width,height:1000},permissions:['clipboard-read','clipboard-write']}),p=await c.newPage();
+
+p.on('pageerror',e=>report.errors.push(e.message));await p.route('**/api/public/growth/forms/**/submit',r=>{report.submitRequests++;r.abort()});
+
+if(preview){await p.route(url,async r=>{const response=await r.fetch();
+
+await r.fulfill({response,body:override(await response.text())})});await p.route('**/assets/js/content-marketing.js*',r=>r.fulfill({contentType:'text/javascript',body:fs.readFileSync('../efeonce-public-site-runtime/wp-content/plugins/eo-elementor-widgets/assets/js/content-marketing.js','utf8')}));}
+
+await p.goto(url,{waitUntil:'domcontentloaded'});await p.locator('[data-content-module=business][data-cm-ready=true]').waitFor();
+
+for(const[type,m]of Object.entries(patch.modules)){const root=p.locator('[data-content-module='+type.replace('greenhouse_content_','')+'] section'),txt=await root.textContent();
+
+for(const[k,v]of Object.entries(m.fields))if(k!=='content_049')assert(txt.includes(v.after),type+'/'+k);}
+
+const business=p.locator('#internal-case'),copy=business.getByRole('button');
+
+await copy.click();await p.waitForFunction(()=>document.querySelector('#internal-case button')?.textContent.includes('Correo copiado'));assert.equal((await copy.innerText()).trim(),'Correo copiado');const actual=await p.evaluate(()=>navigator.clipboard.readText());const f=patch.modules.greenhouse_content_business.fields;const expected=['Asunto:'+f.content_031.after,'Equipo:',...Array.from({length:8},(_,i)=>f['content_'+String(33+i).padStart(3,'0')].after)].join('\n\n');
+
+assert.equal(actual,expected);assert(!actual.includes('\\n'));await business.evaluate(e=>e.scrollIntoView({block:'start'}));await p.waitForTimeout(800);await business.screenshot({path:dir+'/business-'+width+'.png'});
+await p.locator('#operating-modes button').nth(2).click();const form=p.locator('greenhouse-form');
+
+await form.locator('input[name=fullName]').waitFor();await p.locator('#content-marketing-conversion').evaluate(e=>e.scrollIntoView({block:'start'}));await p.waitForTimeout(800);assert((await form.innerText()).includes('Tus datos de contacto'));assert((await form.innerText()).includes('Para responderte y conocer tu empresa.'));await p.evaluate(()=>document.fonts.ready);const columnHeights=await p.locator('#content-marketing-conversion').evaluate(e=>[...e.children[2].children].map(c=>c.getBoundingClientRect().height));
+
+if(width>760)assert(Math.abs(columnHeights[0]-columnHeights[1])<40,'Conversion columns differ by more than 40px');await p.locator('#content-marketing-conversion').screenshot({path:dir+'/conversion-'+width+'.png'});await form.locator('button[data-ghf-primary]').click();assert.equal(await form.locator('[aria-invalid=true]').count(),3);await form.locator('[name=fullName]').fill('Prueba sin envío');await form.locator('[name=email]').fill('qa@efeonce.org');await form.locator('[name=companyName]').fill('Efeonce');await form.locator('button[data-ghf-primary]').click();await p.waitForTimeout(400);assert((await form.innerText()).includes('Hablemos de tus contenidos'));assert((await form.innerText()).includes('La modalidad y el contexto son opcionales.'));assert.equal(await form.locator('[name=mode]').inputValue(),'Content Engine');assert.equal((await form.locator('button[data-ghf-primary]').innerText()).trim(),'Enviar mi consulta');assert.equal(await form.locator('[name=challenge]').getAttribute('placeholder'),'Por ejemplo: publicar con más frecuencia, coordinar las revisiones o adaptar el contenido a otros canales.');await form.locator('[name=challenge]').fill('Revisión local, sin envío.');await form.locator('[name=mode]').selectOption('Co-operado');await form.screenshot({path:dir+'/form-step2-'+width+'.png'});await form.locator('.ghf-btn--ghost').click();assert.equal(await form.locator('[name=fullName]').inputValue(),'Prueba sin envío');await form.locator('button[data-ghf-primary]').click();assert.equal(await form.locator('[name=mode]').inputValue(),'Co-operado');assert.equal(await form.locator('[name=challenge]').inputValue(),'Revisión local, sin envío.');await p.waitForTimeout(700);assert(await p.evaluate(()=>document.documentElement.scrollWidth===document.documentElement.clientWidth));report.widths.push({width,columnHeights,copyExact:true,formSteps:true,prefill:true,retention:true});await c.close();}
+
+const p=await b.newPage({javaScriptEnabled:false,viewport:{width:390,height:844}});
+
+if(preview)await p.route(url,async r=>{const response=await r.fetch();
+
+await r.fulfill({response,body:override(await response.text())})});await p.goto(url);assert((await p.locator('#internal-case').innerText()).includes(patch.modules.greenhouse_content_business.fields.content_040.after));assert.equal(await p.locator('greenhouse-form a').getAttribute('href'),'https://efeoncepro.com/agenda/');report.jsOff=true;assert.deepEqual(report.errors,[]);assert.equal(report.submitRequests,0);report.status='pass';fs.writeFileSync(dir+'/report.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report));}finally{await b.close()}})().catch(e=>{console.error(e);process.exit(1)});

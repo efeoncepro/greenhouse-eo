@@ -1,8 +1,10 @@
 /** Source-preserving DOM enhancement runtime. Bundled with build-time compiled module render functions. */
 const fs = require('node:fs')
+
 const header = `(()=>{'use strict';
 class DCLogic { props={}; setState(update,done){this.state={...this.state,...(typeof update==='function'?update(this.state):update)};if(this.update)this.update();if(done)done();} }
 `
+
 const runtime = require('./content-marketing-cms-logos.cjs').clientSource + String.raw`
 if(window.__eoContentMarketing){window.__eoContentMarketing.refresh();return;}
 const live=new Map();
@@ -77,6 +79,7 @@ observer.observe(document.documentElement,{childList:true,subtree:true});
 window.addEventListener('pagehide',()=>{observer.disconnect();for(const c of live.values())c.dispose();},{once:true});
 })();
 `
+
 fs.writeFileSync(
   '/Users/jreye/Documents/efeonce-public-site-runtime/wp-content/plugins/eo-elementor-widgets/assets/js/content-marketing.js',
   header +

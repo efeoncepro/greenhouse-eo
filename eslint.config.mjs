@@ -252,6 +252,38 @@ export default [
   },
 
   /*
+    CommonJS-only override — la extensión `.cjs` ES el contrato de módulo.
+
+    El bloque general de arriba declara `sourceType: 'module'` para todo el repo, así que un
+    archivo `.cjs` —que Node ejecuta como CommonJS POR SU EXTENSIÓN— quedaba juzgado con las
+    reglas del sistema de módulos equivocado: `require()` se reportaba como error y
+    `module.exports` como asignación indebida a una variable de Next.
+
+    🔴 Esto es la causa raíz de un bug class recurrente, no una excepción de conveniencia. Cada vez
+    que apareció, se cerró agregando un directorio entero al `ignores` global —`ai-generations/**`
+    (2026-07), `generated/**` (2026-07-29, 43 errores de un WIP ajeno bloqueando el pre-push de
+    todos), `.captures/**`, `.tmp/**`—. Ignorar un directorio apaga TODAS las reglas ahí, incluidas
+    las que sí importan, y no escala: el siguiente `.cjs` en un directorio nuevo repite el bloqueo.
+    Declarar el sistema de módulos correcto lo cierra de raíz y para todo el repo.
+
+    NO afloja nada: `no-require-imports` existe para impedir `require()` en módulos ESM/TS, y sigue
+    activo ahí. Un `.cjs` no puede usar `import`.
+  */
+  {
+    files: ['**/*.cjs'],
+    // `sourceType: 'commonjs'` ya habilita el scope y los globals de CommonJS (`require`,
+    // `module`, `exports`, `__dirname`) sin agregar una dependencia nueva sólo para declararlos.
+    languageOptions: {
+      sourceType: 'commonjs'
+    },
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+      '@typescript-eslint/no-var-requires': 'off',
+      '@next/next/no-assign-module-variable': 'off'
+    }
+  },
+
+  /*
     TypeScript-only override: matchea el bloque overrides del .eslintrc.js
     legacy. Aplica solo a *.ts / *.tsx + iconify-bundle.
   */

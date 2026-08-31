@@ -1,19 +1,43 @@
 /** Approved Claude Design -> semantic Elementor widgets. Build-time only; no DC/React/eval in WordPress. */
-const fs = require('node:fs'),
-  path = require('node:path'),
-  vm = require('node:vm'),
-  crypto = require('node:crypto'),
-  cheerio = require('cheerio'),
-  postcss = require('postcss')
+const fs = require('node:fs')
+const path = require('node:path')
+const vm = require('node:vm')
+const crypto = require('node:crypto')
+
+const cheerio = require('cheerio')
+const postcss = require('postcss')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const sourceDir = path.resolve('tmp/content-marketing-source'),
   target = '/Users/jreye/Documents/efeonce-public-site-runtime/wp-content/plugins/eo-elementor-widgets'
+
 const source = fs.readFileSync(path.join(sourceDir, 'Landing Content Marketing v2.dc.html'), 'utf8')
 const sha = crypto.createHash('sha256').update(source).digest('hex')
+
 const $ = cheerio.load(
   source,
   { xml: { xmlMode: false, decodeEntities: true, lowerCaseTags: true, lowerCaseAttributeNames: true } },
   false
 )
+
 const names = {
   hero: 'Hero · Una idea',
   proof: 'Operación visible · Principios',
@@ -29,24 +53,31 @@ const names = {
   faq: 'Preguntas frecuentes',
   conversion: 'Conversación · Formulario'
 }
+
 const keys = Object.keys(names),
   output = []
+
 const emit = (p, v) => {
   const f = path.join(target, p)
+
   fs.mkdirSync(path.dirname(f), { recursive: true })
   fs.writeFileSync(f, v)
   output.push(p)
 }
+
 // Only replace the mock capture surface, never preserve mock-success code in production.
 const conv = $('#content-marketing-conversion')
 const formIf = conv.find('sc-if[value="{{ formOpen }}"]')
 const card = formIf.children().first()
+
 card.attr('data-cm-form-card', '').html('<div data-cm-form-host></div>')
 formIf.replaceWith(card)
 conv.find('sc-if[value="{{ formSent }}"],sc-if[value="{{ isScheduler }}"]').remove()
 const bodyNodes = $('main').children('section').toArray()
+
 if (bodyNodes.length !== 13) throw Error('Source section inventory drift: ' + bodyNodes.length)
 let logic = source.match(/<script type="text\/x-dc"[^>]*>([\s\S]*?)<\/script>/)[1]
+
 logic = logic
   .replace(/  submit\(ev\) \{[\s\S]*?\n  chapterBtn\(/, '  chapterBtn(')
   .replace(/  nextStep\(\) \{[\s\S]*?\n  copyMemo\(/, '  copyMemo(')
@@ -81,6 +112,7 @@ logic = logic.replace(
 )
 // No fake network success even as unreachable source methods.
 if (logic.includes('setTimeout(() => this.setState({ sending:false, sent:true })')) throw Error('Mock capture leaked')
+
 const context = vm.createContext({
   setTimeout: () => 0,
   clearTimeout() {},
@@ -90,6 +122,7 @@ const context = vm.createContext({
   window: { scrollTo() {}, scrollY: 0 },
   navigator: {}
 })
+
 vm.runInContext(
   'class DCLogic { props={}; setState(v,cb){this.state={...this.state,...(typeof v==="function"?v(this.state):v)};if(cb)cb();} }\n' +
     logic +
@@ -97,12 +130,14 @@ vm.runInContext(
   context
 )
 const component = context.component
+
 const esc = s =>
   String(s ?? '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
+
 const cssStyle = o =>
   typeof o === 'object'
     ? Object.entries(o)
@@ -118,6 +153,7 @@ const cssStyle = o =>
         )
         .join(';')
     : String(o || '')
+
 const routeMap = {
   '/servicios/seo/': '/servicios/posicionamiento-seo/',
   '/servicios/aeo/': '/aeo-2/',
@@ -125,53 +161,73 @@ const routeMap = {
   '/servicios/inbound-marketing/': '/agencia-inbound-marketing/',
   '/servicios/influencer-marketing/': '/servicios/agencia-de-influencers/'
 }
+
 const styleRules = []
 let styleSerial = 0
+
 function expr(s) {
   const parts = []
   let end = 0
+
   for (const m of String(s).matchAll(/{{\s*([\s\S]*?)\s*}}/g)) {
     if (m.index > end) parts.push(JSON.stringify(s.slice(end, m.index)))
     parts.push('(' + m[1] + ')')
     end = m.index + m[0].length
   }
+
   if (end < s.length) parts.push(JSON.stringify(s.slice(end)))
-  return parts.length ? parts.join('+') : JSON.stringify(s)
+  
+return parts.length ? parts.join('+') : JSON.stringify(s)
 }
+
 function compile(n) {
   if (n.type === 'text') return 'T(' + expr(n.data) + ')'
   if (n.type !== 'tag') return 'null'
+
   const a = { ...n.attribs },
     children = () => '[' + (n.children || []).map(compile).join(',') + ']'
+
   if (n.tagName === 'sc-for')
     return '(' + a.list.replace(/{{|}}/g, '') + ').map((' + a.as + ',$index)=>' + children() + ')'
   if (n.tagName === 'sc-if') return '(' + a.value.replace(/{{|}}/g, '') + ')?' + children() + ':null'
   if (n.tagName === 'x-import') throw Error('Design component not migrated: ' + a['component-from-global-scope'])
   const hover = a['style-hover']
+
   if (hover) {
     const cls = 'cm-hover-' + ++styleSerial
+
     a.class = (a.class || '') + ' ' + cls
     styleRules.push('.gh-content-module .' + cls + ':is(:hover,:focus-visible){' + hover + '}')
   }
+
   for (const k of Object.keys(a))
     if (k.startsWith('style-') || k.startsWith('hint-') || k === 'data-screen-label' || k === 'ref') delete a[k]
   if (n.tagName === 'a') a.class = (a.class || '') + ' -undash'
   const attrs = Object.entries(a).map(([k, v]) => JSON.stringify(k) + ':' + expr(v))
-  return 'H(' + JSON.stringify(n.tagName) + ',{' + attrs.join(',') + '},' + children() + ')'
+
+  
+return 'H(' + JSON.stringify(n.tagName) + ',{' + attrs.join(',') + '},' + children() + ')'
 }
+
 function flatten(a) {
   return a.flat(Infinity).filter(v => v !== null && v !== undefined && v !== false)
 }
+
 const h = (tag, attrs, children) => ({ tag, attrs, children: flatten(children) }),
   t = v => String(v ?? '')
+
 const voids = new Set(['img', 'br', 'hr', 'input', 'meta', 'link', 'source'])
 const modules = {}
+
 for (let index = 0; index < bodyNodes.length; index++) {
   const key = keys[index],
     node = bodyNodes[index]
+
   node.attribs['data-capture'] = 'cm-' + key
+
   const code = compile(node),
     render = Function('v', 'H', 'T', 'with(v){return ' + code + '}')
+
   const schema = {
     schema: 'contentMarketingModule.v1',
     module: key,
@@ -182,12 +238,16 @@ for (let index = 0; index < bodyNodes.length; index++) {
     defaults: {},
     repeaters: []
   }
+
   const map = new Map()
+
   function field(type, value, label) {
     if (!value || !String(value).trim()) return value
     const id = type + '|' + value
+
     if (!map.has(id)) {
       const key = 'content_' + String(map.size + 1).padStart(3, '0')
+
       map.set(id, key)
       schema.fields.push({
         key,
@@ -200,16 +260,24 @@ for (let index = 0; index < bodyNodes.length; index++) {
       })
       schema.defaults[key] = ['media', 'url'].includes(type) ? { url: value, id: 0 } : value
     }
-    return '%%' + map.get(id) + '%%'
+
+    
+return '%%' + map.get(id) + '%%'
   }
+
   const fixURL = v => routeMap[v] || v
+
   function serialize(tree, collect = true) {
     if (typeof tree === 'string') {
       const value = tree
-      return esc(collect ? field(value.trim().length > 110 ? 'textarea' : 'text', value) : value)
+
+      
+return esc(collect ? field(value.trim().length > 110 ? 'textarea' : 'text', value) : value)
     }
+
     if (!tree) return ''
     let attrs = ''
+
     for (let [k, v] of Object.entries(tree.attrs)) {
       if (/^on/.test(k) || k === 'ref' || v === false || v == null) continue
       if (k === 'style') {
@@ -222,7 +290,9 @@ for (let index = 0; index < bodyNodes.length; index++) {
       k = k.toLowerCase()
       attrs += ' ' + k + '="' + esc(v === true ? '' : v) + '"'
     }
-    return (
+
+    
+return (
       '<' +
       tree.tag +
       attrs +
@@ -230,8 +300,10 @@ for (let index = 0; index < bodyNodes.length; index++) {
       (voids.has(tree.tag) ? '' : tree.children.map(c => serialize(c, collect)).join('') + '</' + tree.tag + '>')
     )
   }
+
   const initial = component.state
   const variants = [{}]
+
   if (key === 'hero') for (let word = 0; word < 5; word++) variants.push({ word })
   if (key === 'system') for (let chapter = 0; chapter < 7; chapter++) variants.push({ chapter, pinned: true })
   if (key === 'atomization')
@@ -248,27 +320,33 @@ for (let index = 0; index < bodyNodes.length; index++) {
   if (key === 'modes') for (let mode = 0; mode < 3; mode++) variants.push({ mode, modeTouched: true })
   if (key === 'business') variants.push({ memoCopied: true })
   let initialHTML
+
   for (const state of variants) {
     component.state = { ...initial, ...state }
     const html = serialize(render(component.renderVals(), h, t))
+
     if (!initialHTML) initialHTML = html
   }
+
   component.state = initial
   if (key === 'editorial') initialHTML = require('./content-marketing-cms-logos.cjs').apply(schema, initialHTML)
   emit('includes/content-marketing/schemas/' + key + '.json', JSON.stringify(schema, null, 2) + '\n')
   emit('includes/content-marketing/templates/' + key + '.html', initialHTML)
   modules[key] = { code, schema }
 }
+
 const ds = path.join(sourceDir, '_ds', fs.readdirSync(path.join(sourceDir, '_ds'))[0], 'tokens')
 let css =
   ['fonts', 'colors', 'typography', 'spacing'].map(k => fs.readFileSync(path.join(ds, k + '.css'), 'utf8')).join('\n') +
   source.match(/<style>([\s\S]*?)<\/style>/)[1]
 const ast = postcss.parse(css)
+
 ast.walkAtRules('import', r => r.remove())
 ast.walkRules(r => {
   r.selectors = r.selectors.map(s => {
     s = s.replace(/:root|\bbody\b|\bhtml\b/g, '.gh-content-module')
-    return s.startsWith('.gh-content-module') ? s : '.gh-content-module ' + s
+    
+return s.startsWith('.gh-content-module') ? s : '.gh-content-module ' + s
   })
 })
 emit('assets/css/content-marketing.css', ast.toString() + '\n' + styleRules.join('\n'))
@@ -294,6 +372,7 @@ emit(
     2
   )
 )
+
 const rendererCode = Object.entries(modules)
   .map(
     ([k, m]) =>
@@ -305,6 +384,7 @@ const rendererCode = Object.entries(modules)
       '}'
   )
   .join(',\n')
+
 fs.mkdirSync('tmp/content-marketing-build', { recursive: true })
 fs.writeFileSync('tmp/content-marketing-build/logic.js', logic)
 fs.writeFileSync('tmp/content-marketing-build/renderers.js', 'const renderers={' + rendererCode + '};\n')

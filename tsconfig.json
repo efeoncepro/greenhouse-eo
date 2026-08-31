@@ -67,6 +67,8 @@
     "node_modules",
     "full-version",
     "demo-configs",
+    "tmp",
+    ".tmp",
     "**/* (1).ts",
     "**/* (1).tsx"
   ]

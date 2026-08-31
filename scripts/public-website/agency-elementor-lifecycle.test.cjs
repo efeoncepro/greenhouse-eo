@@ -1,12 +1,15 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const cp = require('node:child_process');
+
 const {JSDOM} = require('jsdom');
+
 const runtime = '/Users/jreye/Documents/efeonce-public-site-runtime';
 const html = cp.execFileSync('php',[runtime+'/tests/agency-modules.test.php','render'],{encoding:'utf8'});
 const source = fs.readFileSync(runtime+'/wp-content/plugins/eo-elementor-widgets/assets/js/agency-landing.js','utf8');
 const dom = new JSDOM(html,{url:'https://example.test/',runScripts:'outside-only',pretendToBeVisual:true});
 const w = dom.window;
+
 w.matchMedia = () => ({matches:true});
 w.elementorFrontend = {isEditMode:()=>true};
 Object.defineProperty(w.HTMLElement.prototype,'inert',{get(){return this.hasAttribute('inert');},set(v){this.toggleAttribute('inert',v);}});
@@ -15,22 +18,30 @@ w.HTMLDialogElement.prototype.showModal=function(){this.setAttribute('open','');
 w.HTMLDialogElement.prototype.close=function(){this.removeAttribute('open');this.dispatchEvent(new w.Event('close'));};
 w.eval(source);
 const settle=()=>new Promise(resolve=>setTimeout(resolve,20));
+
 (async()=>{
  await settle();
  assert.equal(w.EOAgencyModules.activeCount(),17);
  const hero=w.document.querySelector('[data-agency-module="hero"]');
- const copy=hero.cloneNode(true);hero.after(copy);await settle();
+ const copy=hero.cloneNode(true);
+
+hero.after(copy);await settle();
  assert.equal(w.EOAgencyModules.activeCount(),18,'new widget mounts in editor');
  copy.remove();await settle();
  assert.equal(w.EOAgencyModules.activeCount(),17,'removed widget releases listeners/observers');
- const replacement=hero.cloneNode(true);hero.replaceWith(replacement);await settle();
+ const replacement=hero.cloneNode(true);
+
+hero.replaceWith(replacement);await settle();
  assert.equal(w.EOAgencyModules.activeCount(),17,'server-rendered editor refresh replaces lifecycle');
- const before=w.EOAgencyModules;w.eval(source);assert.equal(w.EOAgencyModules,before,'asset reentry is idempotent');
+ const before=w.EOAgencyModules;
+
+w.eval(source);assert.equal(w.EOAgencyModules,before,'asset reentry is idempotent');
  w.document.querySelector('[data-svc-filter="tech"]').click();
  assert.equal(w.document.querySelectorAll('[data-svc-card][data-dim="1"]').length,6);
  assert.equal(w.document.querySelector('[data-svc-count]').textContent,'6 técnicas');
  const trigger=w.document.querySelector('[data-tour-open] button');
  const tour=w.document.querySelector('[data-tour]');
+
  tour.dataset.videoUrl='https://www.youtube.com/watch?v=yHUystNmtcQ';
  assert.equal(tour.querySelectorAll('iframe').length,0,'No player before intentional click');
  trigger.click();
@@ -44,6 +55,7 @@ const settle=()=>new Promise(resolve=>setTimeout(resolve,20));
  w.document.body.style.overflow='auto';
  trigger.click();
  const player=tour.querySelector('iframe');
+
  assert.equal(player.src,'https://www.youtube-nocookie.com/embed/yHUystNmtcQ?autoplay=1&playsinline=1&rel=0');
  assert.equal(player.referrerPolicy,'strict-origin-when-cross-origin');
  assert.equal(tour.querySelector('[data-video-fallback]').href,'https://www.youtube.com/watch?v=yHUystNmtcQ');
@@ -51,16 +63,21 @@ const settle=()=>new Promise(resolve=>setTimeout(resolve,20));
  tour.querySelector('[data-tour-close]').click();
  assert.equal(tour.querySelectorAll('iframe').length,0,'Closing destroys audio/video context');
  assert.equal(w.document.body.style.overflow,'auto');
+
  for(const value of ['https://youtu.be/yHUystNmtcQ','https://www.youtube.com/embed/yHUystNmtcQ','https://youtube.com/shorts/yHUystNmtcQ']){
    tour.dataset.videoUrl=value;trigger.click();assert.ok(tour.querySelector('iframe'),'Valid supported URL '+value);tour.click();
  }
+
  for(const value of ['', 'javascript:alert(1)','https://youtube.com.attacker.test/watch?v=yHUystNmtcQ','https://attacker.test/embed/yHUystNmtcQ','http://youtu.be/yHUystNmtcQ','https://user@youtu.be/yHUystNmtcQ','https://youtu.be/bad']){
    tour.dataset.videoUrl=value;trigger.click();assert.equal(tour.querySelector('iframe'),null,'Reject unsupported/unsafe URL');
    assert.equal(tour.querySelector('[data-video-fallback]').hasAttribute('href'),false);tour.click();
  }
+
  tour.dataset.videoUrl='https://www.youtube.com/watch?v=yHUystNmtcQ';trigger.click();
  tour.dispatchEvent(new w.Event('cancel',{cancelable:true}));assert.equal(tour.open,false,'Native Escape cancel cleans up');
- trigger.click();const experience=tour.closest('[data-agency-module]');experience.remove();await settle();
+ trigger.click();const experience=tour.closest('[data-agency-module]');
+
+experience.remove();await settle();
  assert.equal(w.document.body.style.overflow,'auto','Unmounting an open editor module restores scrolling');
  assert.equal(tour.querySelector('iframe'),null,'Detached module releases its player');
  assert.equal(w.document.activeElement,trigger);

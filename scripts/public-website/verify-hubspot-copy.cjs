@@ -1,16 +1,66 @@
 /** Copy-only preview/live readback with unchanged public shell, assets and form. */
-const fs=require('fs'),assert=require('assert/strict'),crypto=require('crypto'),{JSDOM}=require('jsdom'),{chromium}=require('playwright');
-const patch=require('./hubspot-editorial-copy.json'),preview=process.argv.includes('--preview'),url='https://efeoncepro.com/servicios-contratar-hubspot/',out='.captures/hubspot-copy-20260831';fs.mkdirSync(out,{recursive:true});
+const fs = require('fs');
+const assert = require('assert/strict');
+const crypto = require('crypto');
+
+const {JSDOM} = require('jsdom');
+const {chromium} = require('playwright');
+
+
+
+
+
+
+
+
+
+
+const patch=require('./hubspot-editorial-copy.json'),preview=process.argv.includes('--preview'),url='https://efeoncepro.com/servicios-contratar-hubspot/',out='.captures/hubspot-copy-20260831';
+
+fs.mkdirSync(out,{recursive:true});
 const baselinePath=process.argv.find(a=>a.startsWith('--baseline='))?.slice('--baseline='.length);
 const normalize=s=>s.replace(/\s+/g,' ').trim(),hash=s=>crypto.createHash('sha256').update(s.replace(/nav-menu-item-(\d+)-[a-f0-9]+/g,'nav-menu-item-$1').replace(/(name="_wpcf7_ak_js" value=")\d+/g,'$1runtime')).digest('hex');
+
 (async()=>{const html=await(await fetch(url)).text(),d=new JSDOM(html).window.document;let body=html;
-if(preview){fs.writeFileSync('tmp/hubspot-copy/before.html',html);const local=new JSDOM(fs.readFileSync('tmp/hubspot-copy/rendered.html','utf8')).window.document;for(const m of Object.keys(patch)){const target=d.querySelector(`[data-hubspot-module="${m}"]`),replacement=local.querySelector(`[data-hubspot-module="${m}"]`);if(m==='conversion')replacement.querySelector('.gh-hubspot-form-card').innerHTML=target.querySelector('.gh-hubspot-form-card').innerHTML;target.innerHTML=replacement.innerHTML.replaceAll('http://127.0.0.1:8768','https://efeoncepro.com/wp-content/plugins/eo-elementor-widgets');}body=d.documentElement.outerHTML;}
-const browser=await chromium.launch(),page=await browser.newPage({viewport:{width:1414,height:909}}),errors=[],states=[];page.on('pageerror',e=>errors.push(e.message));try{if(preview)await page.route(url,r=>r.fulfill({body,contentType:'text/html'}));assert.equal((await page.goto(url,{waitUntil:'domcontentloaded'})).status(),200);await page.evaluate(()=>document.fonts.ready);
-for(const [module,change] of Object.entries(patch)){const el=page.locator(`[data-hubspot-module="${module}"]`),text=normalize(await el.textContent());for(const [key,value]of Object.entries(change.defaults)){if(key==='f002_texto_alternativo'){assert.equal(await el.locator('img[src*="badge-orange-spp"]').getAttribute('alt'),value);continue;}assert(text.includes(normalize(value)),`${module}.${key} missing`);}for(const variants of Object.values(change.repeaters||{}))for(const values of Object.values(variants))for(const value of Object.values(values))assert(text.includes(normalize(value)),`${module} repeater missing`);}
+
+if(preview){fs.writeFileSync('tmp/hubspot-copy/before.html',html);const local=new JSDOM(fs.readFileSync('tmp/hubspot-copy/rendered.html','utf8')).window.document;
+
+for(const m of Object.keys(patch)){const target=d.querySelector(`[data-hubspot-module="${m}"]`),replacement=local.querySelector(`[data-hubspot-module="${m}"]`);
+
+if(m==='conversion')replacement.querySelector('.gh-hubspot-form-card').innerHTML=target.querySelector('.gh-hubspot-form-card').innerHTML;target.innerHTML=replacement.innerHTML.replaceAll('http://127.0.0.1:8768','https://efeoncepro.com/wp-content/plugins/eo-elementor-widgets');}
+
+body=d.documentElement.outerHTML;}
+
+const browser=await chromium.launch(),page=await browser.newPage({viewport:{width:1414,height:909}}),errors=[],states=[];
+
+page.on('pageerror',e=>errors.push(e.message));
+
+try{if(preview)await page.route(url,r=>r.fulfill({body,contentType:'text/html'}));assert.equal((await page.goto(url,{waitUntil:'domcontentloaded'})).status(),200);await page.evaluate(()=>document.fonts.ready);
+
+for(const [module,change] of Object.entries(patch)){const el=page.locator(`[data-hubspot-module="${module}"]`),text=normalize(await el.textContent());
+
+for(const [key,value]of Object.entries(change.defaults)){if(key==='f002_texto_alternativo'){assert.equal(await el.locator('img[src*="badge-orange-spp"]').getAttribute('alt'),value);continue;}assert(text.includes(normalize(value)),`${module}.${key} missing`);}for(const variants of Object.values(change.repeaters||{}))for(const values of Object.values(variants))for(const value of Object.values(values))assert(text.includes(normalize(value)),`${module} repeater missing`);}
+
 assert(!/práctica/i.test(await page.locator('.gh-hubspot-module').allTextContents().then(a=>a.join(' '))));assert.equal(await page.title(),'Implementación y operación de HubSpot | Efeonce');assert.equal(await page.locator('meta[name="description"]').getAttribute('content'),'Implementamos y migramos tu HubSpot, Hub por Hub, y lo operamos contigo. Trabaja con Efeonce, Solutions Partner Gold.');
-for(const width of [1414,878,390]){await page.setViewportSize({width,height:909});await page.mouse.move(16,890);await page.waitForFunction(()=>document.documentElement.scrollWidth===innerWidth);for(const module of ['licensing','proof-ledger','conversion','assessment']){const el=page.locator(`[data-hubspot-module="${module}"]`);await el.scrollIntoViewIfNeeded();await page.waitForFunction(()=>document.documentElement.scrollWidth===innerWidth,null,{timeout:8000});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth===innerWidth),true);const overflow=await el.evaluate(e=>[...e.querySelectorAll('h2,p,a,li')].filter(x=>x.getBoundingClientRect().width>0&&x.scrollWidth>x.clientWidth+2&&getComputedStyle(x).display!=='inline').map(x=>x.textContent.slice(0,80)));assert.deepEqual(overflow,[],`${module} at ${width}`);await el.screenshot({path:`${out}/${preview?'preview':'live'}-${module}-${width}.png`,animations:'disabled'});states.push({width,module,pass:true});}}
+
+for(const width of [1414,878,390]){await page.setViewportSize({width,height:909});await page.mouse.move(16,890);await page.waitForFunction(()=>document.documentElement.scrollWidth===innerWidth);
+
+for(const module of ['licensing','proof-ledger','conversion','assessment']){const el=page.locator(`[data-hubspot-module="${module}"]`);
+
+await el.scrollIntoViewIfNeeded();await page.waitForFunction(()=>document.documentElement.scrollWidth===innerWidth,null,{timeout:8000});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth===innerWidth),true);const overflow=await el.evaluate(e=>[...e.querySelectorAll('h2,p,a,li')].filter(x=>x.getBoundingClientRect().width>0&&x.scrollWidth>x.clientWidth+2&&getComputedStyle(x).display!=='inline').map(x=>x.textContent.slice(0,80)));
+
+assert.deepEqual(overflow,[],`${module} at ${width}`);await el.screenshot({path:`${out}/${preview?'preview':'live'}-${module}-${width}.png`,animations:'disabled'});states.push({width,module,pass:true});}}
+
 await page.locator('[data-hubspot-module="faq"] summary').first().click();assert(await page.getByText(patch.faq.repeaters.questions.layout_0.f004_descripcion,{exact:true}).isVisible());
-const hubs=page.locator('[data-hsx-tabs="hubs"]');await hubs.locator('[data-hsx-select="0"]').focus();await page.keyboard.press('ArrowRight');assert.equal(await hubs.locator('[data-hsx-select="1"]').getAttribute('aria-pressed'),'true');
+const hubs=page.locator('[data-hsx-tabs="hubs"]');
+
+await hubs.locator('[data-hsx-select="0"]').focus();await page.keyboard.press('ArrowRight');assert.equal(await hubs.locator('[data-hsx-select="1"]').getAttribute('aria-pressed'),'true');
 assert.equal(await page.locator('.hsx-hub-brand-icon').count(),8);assert.equal(await page.locator('.hsx-semantic-icon').count(),5);assert.equal(await page.locator('.gh-hubspot-form-card greenhouse-form').count(),1);assert.deepEqual(errors,[]);
-if(!preview&&baselinePath){const before=new JSDOM(fs.readFileSync(baselinePath,'utf8')).window.document,after=new JSDOM(html).window.document;for(const selector of ['header','footer','.gh-hubspot-form-card'])assert.equal(hash(after.querySelector(selector).outerHTML),hash(before.querySelector(selector).outerHTML),selector+' changed');}
-const result={status:'PASS',mode:preview?'preview':'live',states,errors,copyFields:Object.values(patch).reduce((n,p)=>n+Object.keys(p.defaults).length,0),checkedAt:new Date().toISOString(),faq:true,keyboard:true,formPresent:true,shellAndFormUnchanged:baselinePath?true:null,metadataUntouched:true};fs.writeFileSync(`${out}/${result.mode}.json`,JSON.stringify(result,null,2));console.log({...result,states:states.length});}finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1});
+
+if(!preview&&baselinePath){const before=new JSDOM(fs.readFileSync(baselinePath,'utf8')).window.document,after=new JSDOM(html).window.document;
+
+for(const selector of ['header','footer','.gh-hubspot-form-card'])assert.equal(hash(after.querySelector(selector).outerHTML),hash(before.querySelector(selector).outerHTML),selector+' changed');}
+
+const result={status:'PASS',mode:preview?'preview':'live',states,errors,copyFields:Object.values(patch).reduce((n,p)=>n+Object.keys(p.defaults).length,0),checkedAt:new Date().toISOString(),faq:true,keyboard:true,formPresent:true,shellAndFormUnchanged:baselinePath?true:null,metadataUntouched:true};
+
+fs.writeFileSync(`${out}/${result.mode}.json`,JSON.stringify(result,null,2));console.log({...result,states:states.length});}finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1});
