@@ -25,3 +25,27 @@ textos/estados del diseño; no se afirma conformidad WCAG AA ni se alteró la pa
 
 [Contrato técnico](../../architecture/public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md) ·
 [Edición y verificación](../../manual-de-uso/public-site/content-marketing.md).
+
+Las secciones iniciales explican dónde se dispersa el trabajo y cómo se conecta una campaña en siete etapas: investigación, estrategia, producción, revisión, adaptación, publicación y aprendizaje. [Revisión editorial publicada](../../audits/public-site/2026-08-31-content-marketing-editorial-copy.md).
+
+Publicación en el CMS del cliente: se nombran WordPress, Webflow, Drupal y Modyo como ejemplos,
+con sus logos, y se contempla trabajar en otras plataformas. Las modalidades distinguen delegación,
+trabajo compartido y publicación a cargo del cliente; todas conservan su aprobación final.
+
+La sección de servicios conectados explica el aporte de SEO, AEO, Redes Sociales, Influencer Marketing,
+Inbound y Agencia Creativa; cada tarjeta completa abre su landing. Ocho FAQ aclaran alcance, CMS,
+aprobación y medición, con respuestas coherentes con las modalidades de colaboración.
+[Revisión de ecosistema y FAQ](../../audits/public-site/2026-08-31-content-marketing-ecosystem-faq.md).
+
+El caso interno ofrece cinco puntos para evaluar la propuesta y un correo editable al copiarlo.
+El cierre explica qué ocurre después de contactar; el formulario distingue datos de contacto y
+contexto opcional. La acción final es «Enviar mi consulta» y la confirmación ofrece consultar la
+agenda. Enviar una consulta no confirma una reunión ni una contratación. El botón «Copiar correo»
+reproduce asunto y cuerpo visibles; no envía el mensaje por el visitante.
+
+El cierre mantiene tres pasos breves para equilibrar la columna editorial con el formulario,
+sin reducir el tamaño de letra; en móvil se apilan.
+
+La revisión visual y editorial del operador quedó terminada y publicada. Los límites de validación
+indicados arriba permanecen separados del alcance entregado; el estado formal de TASK-1799 sigue
+abierto por esas pruebas y por el research original.

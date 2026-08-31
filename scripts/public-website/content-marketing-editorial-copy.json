@@ -1,0 +1,489 @@
+{
+  "schema": "contentMarketingEditorial.v1",
+  "postId": 242603,
+  "expectedHash": "dd6275695aa878020d6471c91ab121ed36b175b16c417ccd3732797d8c86f020",
+  "modules": {
+    "greenhouse_content_problem": {
+      "id": "7ab093e",
+      "fields": {
+        "content_001": {
+          "before": "El punto de partida",
+          "after": "Cuando falta un proceso común"
+        },
+        "content_002": {
+          "before": "El problema no es que falten piezas. Es que cada pieza es un encargo aislado.",
+          "after": "Cada contenido exige volver a empezar."
+        },
+        "content_003": {
+          "before": "Cuando el trabajo vive en cadenas de correo y chats, el equipo de marketing termina coordinando proveedores en vez de operar contenidos. La consecuencia no es sólo lentitud: es una idea buena que se queda en una sola pieza.",
+          "after": "El brief llega por correo, los ajustes quedan en un chat y la aprobación se pierde entre versiones. Tu equipo dedica horas a reconstruir el contexto y coordinar entregas. Así, cuesta conectar las piezas, publicarlas a tiempo y aprovechar lo aprendido."
+        },
+        "content_004": {
+          "before": "Briefs dispersos.",
+          "after": "El contexto se dispersa."
+        },
+        "content_005": {
+          "before": " Cada pieza empieza explicando el contexto de nuevo.",
+          "after": " Cada encargo obliga a reunir otra vez objetivos, fuentes e indicaciones."
+        },
+        "content_006": {
+          "before": "Versiones por chat.",
+          "after": "La aprobación queda en duda."
+        },
+        "content_007": {
+          "before": " Nadie sabe cuál es la aprobada ni quién la aprobó.",
+          "after": " Circulan varias versiones sin un registro claro de cuál puede publicarse."
+        },
+        "content_008": {
+          "before": "Piezas sin adaptación.",
+          "after": "La adaptación se queda a medias."
+        },
+        "content_009": {
+          "before": " El mismo recorte en todos los canales, con el mismo rendimiento pobre.",
+          "after": " Cambia el tamaño de la pieza, pero el mensaje no responde a cada canal."
+        },
+        "content_010": {
+          "before": "El CMS como cuello de botella.",
+          "after": "La publicación se retrasa."
+        },
+        "content_011": {
+          "before": " El contenido está listo y la publicación espera.",
+          "after": " El contenido está aprobado, pero faltan la carga en el CMS y la revisión final."
+        },
+        "content_012": {
+          "before": "Reportes que no alimentan el siguiente ciclo.",
+          "after": "Los resultados no orientan el siguiente paso."
+        },
+        "content_013": {
+          "before": " Se informa el resultado, no se decide qué cambia.",
+          "after": " El reporte reúne cifras, pero deja pendiente qué repetir, ajustar o descartar."
+        }
+      }
+    },
+    "greenhouse_content_system": {
+      "id": "511822d",
+      "fields": {
+        "content_001": {
+          "before": "El sistema de contenidos",
+          "after": "Cómo conectamos tu operación de contenidos"
+        },
+        "content_002": {
+          "before": "Una idea no debería terminar en una pieza.",
+          "after": "De una idea a una campaña. Con cada paso conectado."
+        },
+        "content_003": {
+          "before": "Sigue una campaña completa —el lanzamiento de un smartphone— por los siete pasos, y mira en qué se convierte.",
+          "after": "Recorre los siete pasos de una campaña de ejemplo: el lanzamiento del smartphone Aro 7. Mira qué aporta cada etapa y cómo prepara la siguiente."
+        },
+        "content_005": {
+          "before": "Elige un paso para ver su artefacto",
+          "after": "Elige un paso para ver el trabajo y su resultado"
+        },
+        "content_006": {
+          "before": "Pasos del sistema de contenidos",
+          "after": "Etapas de la campaña de contenidos"
+        },
+        "content_008": {
+          "before": "Research — por qué crear",
+          "after": "Investigación — entender a tu audiencia"
+        },
+        "content_009": {
+          "before": "No empezamos escribiendo. Empezamos preguntando.",
+          "after": "Toda buena historia parte de una pregunta relevante."
+        },
+        "content_011": {
+          "before": "Ficha del producto que entrega la marca",
+          "after": "Ficha de producto entregada por la marca"
+        },
+        "content_012": {
+          "before": "Qué pregunta tu audiencia, qué ya está respondido en el mercado y qué fuentes sostienen el argumento. Cada afirmación queda trazable.",
+          "after": "Investigamos las dudas de tu audiencia, las respuestas que ya encuentra y las fuentes que podemos usar. Con esa base, elegimos una pregunta que el contenido ayude a resolver."
+        },
+        "content_013": {
+          "before": "Fuentes y preguntas:",
+          "after": "Base de investigación:"
+        },
+        "content_014": {
+          "before": " 6 fuentes con autor y fecha · 3 preguntas del comité",
+          "after": " 6 fuentes documentadas · 3 preguntas de compra"
+        },
+        "content_015": {
+          "before": "Si este paso falta:",
+          "after": "Sin este paso:"
+        },
+        "content_016": {
+          "before": " Contenido que suena bien y no le habla a nadie.",
+          "after": " Puedes dedicar tiempo a responder algo que tu audiencia no necesita saber."
+        },
+        "content_017": {
+          "before": "Decide:",
+          "after": "Responsables:"
+        },
+        "content_018": {
+          "before": " Efeonce propone, tu equipo valida el foco",
+          "after": " Efeonce investiga y propone; tu equipo valida el enfoque."
+        },
+        "content_020": {
+          "before": "Estrategia — qué debe mover",
+          "after": "Estrategia — definir el objetivo"
+        },
+        "content_021": {
+          "before": "Una idea sin objetivo escrito es un gasto.",
+          "after": "Un objetivo claro para orientar cada pieza."
+        },
+        "content_022": {
+          "before": "El brief fija el objetivo, el ángulo, los canales y la acción que buscamos. Si no se puede escribir qué debe cambiar, no se produce.",
+          "after": "Acordamos qué queremos lograr, a quién hablamos y qué acción esperamos. El brief reúne el enfoque, los canales y los criterios para evaluar el resultado antes de empezar a producir."
+        },
+        "content_023": {
+          "before": "Objetivo y canales:",
+          "after": "Plan de campaña:"
+        },
+        "content_024": {
+          "before": " Pedir una conversación · blog + LinkedIn + Instagram",
+          "after": " Impulsar la preventa · blog y redes sociales"
+        },
+        "content_025": {
+          "before": " Piezas que nadie sabe para qué sirvieron.",
+          "after": " Se producen piezas sin un criterio común para evaluar su aporte."
+        },
+        "content_026": {
+          "before": " Tu equipo aprueba el brief antes de producir",
+          "after": " Tu equipo aprueba el brief que prepara Efeonce."
+        },
+        "content_028": {
+          "before": "Producción — qué historia contar",
+          "after": "Producción — desarrollar la historia"
+        },
+        "content_029": {
+          "before": "Primero lo profundo. Después lo corto.",
+          "after": "Creamos una historia con material para seguir creciendo."
+        },
+        "content_031": {
+          "before": "Contenido madre · nota de lanzamiento",
+          "after": "Contenido principal · artículo de lanzamiento"
+        },
+        "content_032": {
+          "before": "Se produce el contenido madre completo, con dirección creativa y assets reutilizables. Es la pieza más honda del ciclo y la base de todo lo que viene después.",
+          "after": "Desarrollamos el contenido principal con investigación, redacción y dirección creativa. Sus argumentos, imágenes y recursos sirven de base para las adaptaciones de la campaña."
+        },
+        "content_033": {
+          "before": "Contenido madre:",
+          "after": "Contenido principal:"
+        },
+        "content_034": {
+          "before": " Artículo pilar de 1.400 palabras + dirección creativa",
+          "after": " Artículo de 1.400 palabras y dirección creativa"
+        },
+        "content_035": {
+          "before": " Cinco piezas cortas que no dicen nada.",
+          "after": " Cada formato parte de cero y el mensaje pierde consistencia."
+        },
+        "content_036": {
+          "before": " Efeonce produce, tu equipo revisa",
+          "after": " Efeonce produce; tu equipo aporta contexto y revisa."
+        },
+        "content_038": {
+          "before": "Revisión — quién decide",
+          "after": "Revisión — llegar a una versión aprobada"
+        },
+        "content_039": {
+          "before": "El feedback vive en el asset, no en el chat.",
+          "after": "Cada comentario en su lugar. Cada aprobación registrada."
+        },
+        "content_041": {
+          "before": "Reel · v2 en revisión",
+          "after": "Reel · segunda versión aprobada"
+        },
+        "content_042": {
+          "before": "Comentarios anclados al párrafo, al segundo del video o al área del banner. Cada versión queda registrada y la aprobación es explícita.",
+          "after": "Tu equipo comenta sobre el párrafo, el segundo del video o el área de la imagen que necesita un ajuste. Resolvemos las observaciones y conservamos el historial hasta llegar a una versión aprobada."
+        },
+        "content_044": {
+          "before": " v2 aprobada por tu equipo · 2 comentarios resueltos",
+          "after": " Segunda versión aprobada · 2 comentarios resueltos"
+        },
+        "content_045": {
+          "before": " Tres versiones circulando y ninguna aprobada.",
+          "after": " Los ajustes se dispersan y cuesta saber qué versión está lista."
+        },
+        "content_046": {
+          "before": " La aprobación es siempre de tu equipo",
+          "after": " Efeonce resuelve los ajustes; tu equipo da la aprobación final."
+        },
+        "content_048": {
+          "before": "Atomización — cómo amplificar sin copiar",
+          "after": "Adaptación — dar forma a cada canal"
+        },
+        "content_049": {
+          "before": "La misma idea. Cinco estructuras distintas.",
+          "after": "Una misma idea, contada como cada canal necesita."
+        },
+        "content_050": {
+          "before": "El equipo sobre un escritorio de madera con luz natural",
+          "after": "Smartphone sobre un escritorio de madera con luz natural"
+        },
+        "content_052": {
+          "before": "Una persona sostiene el equipo en una sala iluminada",
+          "after": "Una persona sostiene el smartphone en una sala iluminada"
+        },
+        "content_055": {
+          "before": "Macro del módulo de cámaras del equipo",
+          "after": "Detalle de las cámaras del smartphone"
+        },
+        "content_058": {
+          "before": "Detrás de cámara de la sesión de producto en estudio",
+          "after": "Sesión de fotografía de producto en estudio"
+        },
+        "content_061": {
+          "before": "Dos unidades del equipo sobre fondo degradado de estudio",
+          "after": "Dos smartphones sobre un fondo degradado de estudio"
+        },
+        "content_063": {
+          "before": "Cada canal recibe su propia estructura, ritmo y copy. Cambia la forma; no cambia el argumento ni la decisión que busca provocar.",
+          "after": "Adaptamos la historia al formato y al contexto de cada canal. Un artículo desarrolla el argumento; un reel lo muestra; un carrusel lo explica paso a paso. El mensaje mantiene su coherencia."
+        },
+        "content_064": {
+          "before": "Derivados:",
+          "after": "Piezas de campaña:"
+        },
+        "content_065": {
+          "before": " 5 formatos con copy y estructura propios",
+          "after": " 5 formatos con texto y estructura propios"
+        },
+        "content_066": {
+          "before": " El mismo recorte en todos los canales.",
+          "after": " La misma pieza se repite sin aprovechar lo que ofrece cada formato."
+        },
+        "content_067": {
+          "before": " Efeonce adapta, tu equipo aprueba los formatos",
+          "after": " Efeonce adapta las piezas; tu equipo las aprueba."
+        },
+        "content_069": {
+          "before": "Publicación — cómo llega bien",
+          "after": "Publicación — cuidar la salida"
+        },
+        "content_070": {
+          "before": "Publicado no es lo mismo que bien publicado.",
+          "after": "Cuidamos el contenido hasta que llega a tu audiencia."
+        },
+        "content_071": {
+          "before": "Carga en el CMS, metadata, enlazado, assets y QA en desktop y mobile. Según el modo, publicamos nosotros, lo hacemos contigo o te entregamos todo listo.",
+          "after": "Preparamos la carga en tu CMS, los metadatos, los enlaces y los archivos. Revisamos cómo se ve y funciona en computador y móvil. Podemos publicar, hacerlo contigo o dejar todo listo para tu equipo."
+        },
+        "content_072": {
+          "before": "En vivo:",
+          "after": "Listo para publicar:"
+        },
+        "content_073": {
+          "before": " CMS de tu equipo + 4 canales, con metadata y QA",
+          "after": " Artículo en tu CMS y 4 formatos revisados"
+        },
+        "content_074": {
+          "before": " Contenido listo esperando a que alguien lo suba.",
+          "after": " La pieza aprobada puede quedar detenida o salir con errores de presentación."
+        },
+        "content_075": {
+          "before": " Depende del modo de colaboración que elijas",
+          "after": " Acordamos quién publica según el modo de colaboración."
+        },
+        "content_077": {
+          "before": "Aprendizaje — qué cambia después",
+          "after": "Aprendizaje — decidir qué sigue"
+        },
+        "content_078": {
+          "before": "El ciclo cierra con una decisión, no con un reporte.",
+          "after": "Lo que aprendemos hoy orienta la próxima campaña."
+        },
+        "content_079": {
+          "before": "Leemos las señales que acordamos antes de producir y decidimos qué se mantiene, qué se ajusta y qué idea entra al próximo research.",
+          "after": "Revisamos los resultados frente al objetivo acordado. Junto a tu equipo decidimos qué mantener, qué mejorar y qué preguntas investigar en el siguiente ciclo de contenidos."
+        },
+        "content_080": {
+          "before": "Decisión del ciclo:",
+          "after": "Próxima decisión:"
+        },
+        "content_081": {
+          "before": " El carrusel movió la conversación: la próxima idea parte de ahí",
+          "after": " Profundizar en las dudas que generó el carrusel"
+        },
+        "content_082": {
+          "before": " Un reporte mensual que nadie usa.",
+          "after": " El siguiente ciclo repite decisiones sin aprovechar los resultados del anterior."
+        },
+        "content_083": {
+          "before": " Conjunta: tu equipo y Efeonce",
+          "after": " Tu equipo y Efeonce revisan los resultados y acuerdan los cambios."
+        },
+        "content_084": {
+          "before": "Avanza con el scroll o elige un paso",
+          "after": "Desplázate o elige una etapa para avanzar"
+        },
+        "content_085": {
+          "before": "Research",
+          "after": "Investigación"
+        },
+        "content_086": {
+          "before": "por qué crear",
+          "after": "entender a tu audiencia"
+        },
+        "content_088": {
+          "before": "qué debe mover",
+          "after": "definir el objetivo"
+        },
+        "content_090": {
+          "before": "qué historia contar",
+          "after": "desarrollar la historia"
+        },
+        "content_092": {
+          "before": "quién decide",
+          "after": "aprobar la versión"
+        },
+        "content_093": {
+          "before": "Atomización",
+          "after": "Adaptación"
+        },
+        "content_094": {
+          "before": "cómo amplificar sin copiar",
+          "after": "dar forma a cada canal"
+        },
+        "content_096": {
+          "before": "cómo llega bien",
+          "after": "cuidar la salida"
+        },
+        "content_098": {
+          "before": "qué cambia después",
+          "after": "decidir qué sigue"
+        },
+        "content_099": {
+          "before": "Campaña de ejemplo · lanzamiento del smartphone «Aro 7»",
+          "after": "Ejemplo de campaña · lanzamiento del smartphone Aro 7"
+        },
+        "content_100": {
+          "before": "Marca y materiales ficticios, creados para esta demostración",
+          "after": "Marca, materiales y resultados ficticios para mostrar el proceso."
+        },
+        "content_101": {
+          "before": "Fotografía oficial del equipo",
+          "after": "Imagen del smartphone para la ficha de producto"
+        },
+        "content_102": {
+          "before": "6 fuentes: reviews del modelo anterior, foros, preguntas a soporte",
+          "after": "6 fuentes: reseñas del modelo anterior, foros y consultas a soporte"
+        },
+        "content_103": {
+          "before": "La pregunta real de quien compra: «¿por qué cambiaría el mío?»",
+          "after": "Pregunta de compra: «¿Qué ganaría al cambiar mi teléfono?»"
+        },
+        "content_104": {
+          "before": "Aún no existe ninguna pieza. Sólo evidencia.",
+          "after": "La investigación define qué vale la pena contar."
+        },
+        "content_105": {
+          "before": "Lo que la idea lleva acumulado",
+          "after": "Lo que construimos en cada etapa"
+        },
+        "content_107": {
+          "before": "Fuentes y preguntas",
+          "after": "Base de investigación"
+        },
+        "content_108": {
+          "before": "6 fuentes con autor y fecha · 3 preguntas del comité",
+          "after": "6 fuentes documentadas · 3 preguntas de compra"
+        },
+        "content_110": {
+          "before": "Objetivo y canales",
+          "after": "Plan de campaña"
+        },
+        "content_112": {
+          "before": "Contenido madre",
+          "after": "Contenido principal"
+        },
+        "content_114": {
+          "before": "Derivados",
+          "after": "Piezas de campaña"
+        },
+        "content_115": {
+          "before": "En vivo",
+          "after": "Publicación"
+        },
+        "content_116": {
+          "before": "Decisión del ciclo",
+          "after": "Próxima decisión"
+        },
+        "content_118": {
+          "before": "Objetivo: preventa de las primeras dos semanas",
+          "after": "Objetivo: impulsar la preventa durante las primeras dos semanas"
+        },
+        "content_119": {
+          "before": "Ángulo: la cámara resuelve el día a día, no la ficha técnica",
+          "after": "Enfoque: mostrar cómo funciona la cámara en situaciones cotidianas"
+        },
+        "content_120": {
+          "before": "Canales: blog · reel · carrusel · historia · banner",
+          "after": "Formatos: artículo, reel, carrusel, historia y banner"
+        },
+        "content_122": {
+          "before": "Pedir una conversación · blog + LinkedIn + Instagram",
+          "after": "Impulsar la preventa · blog y redes sociales"
+        },
+        "content_124": {
+          "before": "El equipo sobre un escritorio, para la nota de lanzamiento",
+          "after": "Smartphone sobre un escritorio para el artículo de lanzamiento"
+        },
+        "content_125": {
+          "before": "Nota larga de 1.400 palabras con el equipo de producto",
+          "after": "Artículo de 1.400 palabras elaborado con el equipo de producto"
+        },
+        "content_126": {
+          "before": "Dirección creativa y fotografías aprobadas para toda la campaña",
+          "after": "Dirección creativa e imágenes de referencia para la campaña"
+        },
+        "content_127": {
+          "before": "Todo lo que viene después sale de acá",
+          "after": "Esta pieza reúne la base para desarrollar los demás formatos."
+        },
+        "content_128": {
+          "before": "Artículo pilar de 1.400 palabras + dirección creativa",
+          "after": "Artículo de 1.400 palabras y dirección creativa"
+        },
+        "content_130": {
+          "before": "Una persona sostiene el equipo",
+          "after": "Una persona sostiene el smartphone"
+        },
+        "content_132": {
+          "before": "Comentario anclado al segundo 4, no en un chat",
+          "after": "Comentario vinculado al segundo 4 del video"
+        },
+        "content_133": {
+          "before": "v1 archivada y consultable",
+          "after": "Primera versión disponible en el historial"
+        },
+        "content_134": {
+          "before": "Aprueba la marca, no el proveedor",
+          "after": "La marca confirma la versión final."
+        },
+        "content_135": {
+          "before": "v2 aprobada por tu equipo · 2 comentarios resueltos",
+          "after": "Segunda versión aprobada · 2 comentarios resueltos"
+        },
+        "content_137": {
+          "before": "5 formatos con copy y estructura propios",
+          "after": "5 formatos con texto y estructura propios"
+        },
+        "content_140": {
+          "before": "CMS de tu equipo + 4 canales, con metadata y QA",
+          "after": "Artículo en tu CMS y 4 formatos revisados"
+        },
+        "content_142": {
+          "before": "La que movió",
+          "after": "Qué aprendimos"
+        },
+        "content_143": {
+          "before": "El carrusel movió la conversación: la próxima idea parte de ahí",
+          "after": "Profundizar en las dudas que generó el carrusel"
+        }
+      }
+    }
+  }
+}

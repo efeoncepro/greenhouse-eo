@@ -10,7 +10,7 @@ $root = WP_PLUGIN_DIR . '/eo-elementor-widgets/';
 $files = array();
 foreach ( $manifest['files'] as $entry ) {
 	$path = $entry['path'];
-	if ( strpos( $path, '..' ) !== false || ! preg_match( '#^(includes/(content-marketing/(seo\.php|source-manifest\.json|(schemas|templates)/[a-z0-9_-]+\.(json|html))|widgets/class-eo-content-marketing-(base|widgets)\.php|class-eo-widgets-loader\.php)|assets/(css/content-marketing(-host)?\.css|js/content-marketing(-forms)?\.js|img/content-marketing/([a-z]+/)?[a-z0-9-]+\.(svg|jpg|mp4)))$#', $path ) ) { WP_CLI::error( 'Path outside release scope.' ); }
+	if ( strpos( $path, '..' ) !== false || ! preg_match( '#^(includes/(content-marketing/(seo\.php|source-manifest\.json|(schemas|templates)/[a-z0-9_-]+\.(json|html))|widgets/class-eo-content-marketing-(base|widgets)\.php|class-eo-widgets-loader\.php)|assets/(css/content-marketing(-host)?\.css|js/content-marketing(-forms)?\.js|img/content-marketing/([a-z]+/)?[a-z0-9-]+\.(svg|png|jpg|mp4)))$#', $path ) ) { WP_CLI::error( 'Path outside release scope.' ); }
 	$content = $zip->getFromName( $path );
 	if ( false === $content || ! hash_equals( $entry['sha256'], hash( 'sha256', $content ) ) ) { WP_CLI::error( 'Package hash mismatch: ' . $path ); }
 	$exists = file_exists( $root . $path );

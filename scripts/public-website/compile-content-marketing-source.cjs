@@ -254,6 +254,7 @@ for (let index = 0; index < bodyNodes.length; index++) {
     if (!initialHTML) initialHTML = html
   }
   component.state = initial
+  if (key === 'editorial') initialHTML = require('./content-marketing-cms-logos.cjs').apply(schema, initialHTML)
   emit('includes/content-marketing/schemas/' + key + '.json', JSON.stringify(schema, null, 2) + '\n')
   emit('includes/content-marketing/templates/' + key + '.html', initialHTML)
   modules[key] = { code, schema }

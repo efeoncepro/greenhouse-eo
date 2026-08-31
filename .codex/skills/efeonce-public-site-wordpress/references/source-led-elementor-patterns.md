@@ -40,6 +40,18 @@ and `references/landings/content-marketing.md`.
   itself can be replaced. Test that typed fields, validation and step state survive neighboring controls.
   Growth Forms owns the field contract; use `references/growth-forms-wordpress.md` for its gates.
 
+## Native editorial revisions
+
+- Keep approved page-instance overrides separate from source defaults. A copy pass uses registered
+  controls and a guarded `Document::save()` patch; it does not rebuild the source export. For a
+  source-keyed lookup such as Content Ops, preserve control keys, original types and `sourceValue`.
+- Inventory hidden states as well as visible text: tabs, annotations, statuses and copied/email drafts
+  must resolve the same edited values. Test the actual clipboard with real paragraph breaks and wait
+  for its asynchronous confirmation; visual text alone cannot certify copied output.
+- Before adding CSS to balance a text column against a form, consider concise copy at the existing
+  type scale. Check both form steps and intermediate width, not only the initial desktop column heights.
+  Keep field copy and success copy in the form's governed contract; preserve consent and routing.
+
 ## Pinned narrative navigation
 
 - A chapter click must select its destination directly and keep it selected during programmatic scroll.
@@ -77,6 +89,11 @@ and `references/landings/content-marketing.md`.
   misidentify the visible brand, and landscape thumbnails are not automatically suitable for lightboxes.
 - Preserve SVG geometry/provenance. Choose the negative mark on dark surfaces and use native Media
   controls with constrained dimensions and `object-fit:contain`; do not substitute a generic icon.
+- Compare inline wordmarks to adjacent text at desktop, tablet and mobile; painted size matters more
+  than the image box. Preserve aspect ratio, prevent flex shrink and permit wrapping in narrow table
+  headers when needed. Scope the correction to the owning module and verify SSR plus hydration.
+- CMS/provider logo groups need official provenance, local assets and editable Media/text controls.
+  Name the supported examples without implying partnership, certification or an exclusive platform list.
 - A monochrome brand mark that must inherit category/hover ink can use an alpha mask with
   `background-color:currentColor`. An external SVG `<img>` does not inherit the parent's text color;
   test both normal and sustained hover, and do not recolor multicolor marks this way.

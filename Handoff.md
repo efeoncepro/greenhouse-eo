@@ -40,13 +40,13 @@ Menú verificado: **Soluciones → Crecimiento Multicanal → Content Marketing*
 [Ecosistema y FAQ](docs/audits/public-site/2026-08-31-content-marketing-ecosystem-faq.md): 37 textos y seis URL publicados; tarjetas completas y ocho FAQ, sin cambios de diseño/SEO.
 [Marca en modalidades](docs/audits/public-site/2026-08-31-content-marketing-mode-logo.md): dos logos ampliados con CSS acotado, sin cambiar contenido ni SEO.
 [Indexabilidad del menú](docs/audits/public-site/2026-08-31-menu-indexability.md): 18/18 páginas habilitadas; sólo Redes Sociales requería quitar noindex. Canonical/sitemap verificados; indexación GSC no afirmada.
-[Cierre, caso interno y formulario](docs/audits/public-site/2026-08-31-content-marketing-business-conversion.md): 48 textos Elementor y copy de form v3 publicados; correo copiado coincide con lo visible, sin cambiar destino ni enviar leads.
+[Cierre, caso interno y formulario](docs/audits/public-site/2026-08-31-content-marketing-business-conversion.md): 48 textos Elementor y copy de form v3 publicados; correo copiado coincide con lo visible, sin cambiar destino ni enviar leads. Ajuste posterior: cinco textos condensados para equilibrar las columnas, sin cambiar el formulario.
 
 Landing `242603` publicada con trece widgets Elementor y chrome Ohio intacto. Formulario canónico, SEO y
 verificación pública 1440/1280/890/390; 78 tests del renderer PASS. No se enviaron leads ni correos.
 [Auditoría, snapshots y pendientes](docs/audits/public-site/2026-08-31-content-marketing-publication.md).
 TASK-1799 sigue in-progress por contraste del diseño, smoke de conversión/GA4, editor completo y CWV/research.
-Runtime versionado en `73493a8`; cierre local de Greenhouse asociado, sin push. No repetir el cutover inicial.
+Runtime inicial `73493a8`, refinamientos publicados versionados en `f12dd64`; ocho archivos cotejados con producción. Cierre de scripts/docs/skills en este commit, sin push. No repetir el cutover inicial.
 Revisión documental con tres subagentes: docs triples, índices, inventario, skills espejadas y task/UI
 reconciliados. Menú conserva secuencia visible; no se afirma igualdad de valores raw `menu_order`.
 Hallazgo confirmado: resize a 1440×651 activa pin aunque mount bajo 740 px no lo hace; pendiente de

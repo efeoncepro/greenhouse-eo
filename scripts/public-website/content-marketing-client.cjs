@@ -3,7 +3,7 @@ const fs = require('node:fs')
 const header = `(()=>{'use strict';
 class DCLogic { props={}; setState(update,done){this.state={...this.state,...(typeof update==='function'?update(this.state):update)};if(this.update)this.update();if(done)done();} }
 `
-const runtime = String.raw`
+const runtime = require('./content-marketing-cms-logos.cjs').clientSource + String.raw`
 if(window.__eoContentMarketing){window.__eoContentMarketing.refresh();return;}
 const live=new Map();
 const cssStyle=o=>typeof o==='object'?Object.entries(o).map(([k,v])=>k.replace(/[A-Z]/g,c=>'-'+c.toLowerCase())+':'+(typeof v==='number'&&v!==0&&!/^(opacity|zIndex|flex|flexGrow|flexShrink|fontWeight|lineHeight|order|scale)$/.test(k)?v+'px':v)).join(';'):String(o||'');
@@ -17,6 +17,13 @@ function mount(root){
  const formHost=root.querySelector('[data-cm-form-host]');
  const lookup=(type,value)=>config.values[type+'|'+String(value)]??String(value??'');
  const T=v=>lookup(String(v??'').trim().length>110?'textarea':'text',v);
+ // Copy the same native editorial values that render the memo, with real paragraph breaks.
+ if(module==='business')component.copyMemo=()=>{
+  const text=[T('Asunto:')+T(' Propuesta de operación de contenidos'),...component.renderVals().memoLines.map(line=>T(line.text))].join('\n\n');
+  const done=()=>{component.setState({memoCopied:true});clearTimeout(component._memoT);component._memoT=setTimeout(()=>component.setState({memoCopied:false}),2400);};
+  if(navigator.clipboard?.writeText)navigator.clipboard.writeText(text).then(done,()=>component.copyFallback(text,done));
+  else component.copyFallback(text,done);
+ };
  const H=(tag,attrs,children)=>({tag,attrs,children:flat(children)});
  const boolean=new Set(['autoplay','loop','muted','playsinline','controls','disabled','required','hidden','open']);
  function values(attrs){const out={};for(let [k,v]of Object.entries(attrs)){
@@ -52,7 +59,7 @@ function mount(root){
   root.querySelectorAll('video').forEach(v=>{v.muted=true;v.defaultMuted=true;v.playsInline=true;v.controls=true;v.preload='metadata';if(component.reduce||component.editor){v.autoplay=false;v.pause();}else if(v.hasAttribute('autoplay'))v.play().catch(()=>{});});
   if(module==='review')component._revVideo=root.querySelector('video');
  }
- component.update=()=>{const tree=renderers[module](component.renderVals(),H,T);patch(root,root.querySelector(':scope > section'),tree);accessibility();};
+ component.update=()=>{const tree=renderers[module](component.renderVals(),H,T);if(module==='editorial')injectCmsLogos(tree,H,T);patch(root,root.querySelector(':scope > section'),tree);accessibility();};
  component.update();component.componentDidMount();accessibility();if(module==='hero'){root.style.setProperty('--cm-header-offset',headerH()+'px');}
  root.dataset.cmReady='true';live.set(root,component);
  if(module==='modes'){

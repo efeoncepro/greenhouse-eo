@@ -1,0 +1,32 @@
+{
+  "schema": "contentMarketingEditorial.v1",
+  "postId": 242603,
+  "expectedHash": "76765b72cfeb0b7a86cf6f91008b30180cc3ff05e617f63fdbca6147f918a967",
+  "modules": {
+    "greenhouse_content_conversion": {
+      "id": "74994c5",
+      "fields": {
+        "content_002": {
+          "before": "¿Te falta capacidad para producir, coordinar revisiones o publicar a tiempo? Cuéntanos dónde necesitas apoyo y revisemos cómo trabajar juntos.",
+          "after": "Cuéntanos qué necesitas producir, revisar o publicar. Veamos cómo apoyar a tu equipo."
+        },
+        "content_006": {
+          "before": "Revisamos lo que nos compartes y conversamos sobre tus prioridades, tus canales y la capacidad de tu equipo.",
+          "after": "Revisamos tus prioridades, canales y capacidad actual."
+        },
+        "content_009": {
+          "before": "Evaluamos contigo la modalidad, los entregables y quién se encarga de cada etapa, incluida la publicación.",
+          "after": "Definimos entregables y quién produce, revisa y publica."
+        },
+        "content_012": {
+          "before": "Si la propuesta encaja, definimos el alcance y los responsables antes de empezar a producir.",
+          "after": "Si encaja, acordamos alcance y responsables para empezar."
+        },
+        "content_014": {
+          "before": "No necesitas llegar con un brief completo. Conocer tu situación es el primer paso para definir si podemos ayudarte.",
+          "after": "No necesitas un brief completo para empezar a conversar."
+        }
+      }
+    }
+  }
+}

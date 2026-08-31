@@ -1,0 +1,225 @@
+{
+  "schema": "contentMarketingEditorial.v1",
+  "postId": 242603,
+  "expectedHash": "8c19d40b1d21c95a01f8568df86aaee5150d91adc8409a5df10592a9d7789e7d",
+  "modules": {
+    "greenhouse_content_ecosystem": {
+      "id": "5c7a92c",
+      "fields": {
+        "content_001": {
+          "before": "Dónde termina Content Marketing y empieza otro servicio",
+          "after": "Conecta tu contenido con una estrategia más amplia."
+        },
+        "content_002": {
+          "before": "Cada capacidad tiene su propio equipo y su propia página. Esta operación las conecta; no las reemplaza.",
+          "after": "Tu contenido puede atraer búsquedas, abrir conversaciones y alimentar una campaña. Conectamos las especialidades de Efeonce que tu proyecto necesita, con un alcance claro para cada una."
+        },
+        "content_004": {
+          "before": "Lo que sí entra en esta operación",
+          "after": "El ciclo de Content Marketing"
+        },
+        "content_005": {
+          "before": "Research y fuentes",
+          "after": "Investigación y fuentes"
+        },
+        "content_006": {
+          "before": "Brief y ángulo",
+          "after": "Brief y enfoque editorial"
+        },
+        "content_007": {
+          "before": "Contenido madre",
+          "after": "Contenido principal"
+        },
+        "content_008": {
+          "before": "Atomización a cinco canales",
+          "after": "Adaptación por canal"
+        },
+        "content_009": {
+          "before": "Revisión con versiones",
+          "after": "Revisión y aprobación"
+        },
+        "content_010": {
+          "before": "Publicación con QA",
+          "after": "Publicación verificada"
+        },
+        "content_011": {
+          "before": "Mantenimiento a seis meses",
+          "after": "Actualización de contenidos"
+        },
+        "content_012": {
+          "before": "Todo lo que viste en esta página, de la primera pregunta al artículo que sigue vivo seis meses después.",
+          "after": "Conectamos la investigación, la producción y la publicación. Definimos contigo los canales, las responsabilidades y la continuidad editorial según el modo de trabajo que elijas."
+        },
+        "content_013": {
+          "before": "A partir de aquí, otro equipo",
+          "after": "Servicios que se complementan"
+        },
+        "content_018": {
+          "before": "En el Aro 7",
+          "after": "Explorar servicio"
+        },
+        "content_019": {
+          "before": "Que el artículo aparezca cuando alguien busca qué móvil tiene mejor cámara.",
+          "after": "Mejora la visibilidad de tus contenidos en buscadores con estrategia, optimización técnica y autoridad temática."
+        },
+        "content_023": {
+          "before": "Que un asistente lo cite cuando le preguntan cuál conviene comprar.",
+          "after": "Prepara tu contenido y las señales de tu marca para que los motores de respuesta con IA puedan interpretarlos y citarlos."
+        },
+        "content_027": {
+          "before": "Responder los comentarios del reel y sostener la comunidad todos los días.",
+          "after": "Da continuidad a tus publicaciones con gestión de canales, comunidad y conversaciones con tu audiencia."
+        },
+        "content_031": {
+          "before": "Mandarle el equipo a diez creadores para que lo prueben tres semanas.",
+          "after": "Conecta tu marca con creadores afines y coordina campañas, contenidos y medición."
+        },
+        "content_035": {
+          "before": "Convertir a quien leyó el artículo en una conversación comercial.",
+          "after": "Conecta el contenido con la captación de contactos, el seguimiento y las oportunidades comerciales."
+        },
+        "content_039": {
+          "before": "Filmar el spot de lanzamiento con set, actriz y equipo de rodaje.",
+          "after": "Lleva una idea a campaña con dirección creativa, diseño y producción audiovisual."
+        },
+        "content_014": {
+          "before": {
+            "url": "/servicios/posicionamiento-seo/",
+            "id": 0
+          },
+          "after": {
+            "url": "https://efeoncepro.com/servicios/posicionamiento-seo/",
+            "id": 0
+          }
+        },
+        "content_020": {
+          "before": {
+            "url": "/aeo-2/",
+            "id": 0
+          },
+          "after": {
+            "url": "https://efeoncepro.com/aeo-2/",
+            "id": 0
+          }
+        },
+        "content_024": {
+          "before": {
+            "url": "/servicios/redes-sociales/",
+            "id": 0
+          },
+          "after": {
+            "url": "https://efeoncepro.com/servicios/redes-sociales/",
+            "id": 0
+          }
+        },
+        "content_028": {
+          "before": {
+            "url": "/servicios/agencia-de-influencers/",
+            "id": 0
+          },
+          "after": {
+            "url": "https://efeoncepro.com/servicios/agencia-de-influencers/",
+            "id": 0
+          }
+        },
+        "content_032": {
+          "before": {
+            "url": "/agencia-inbound-marketing/",
+            "id": 0
+          },
+          "after": {
+            "url": "https://efeoncepro.com/agencia-inbound-marketing/",
+            "id": 0
+          }
+        },
+        "content_036": {
+          "before": {
+            "url": "/agencia-creativa-v2/",
+            "id": 0
+          },
+          "after": {
+            "url": "https://efeoncepro.com/agencia-creativa-v2/",
+            "id": 0
+          }
+        }
+      }
+    },
+    "greenhouse_content_faq": {
+      "id": "d42d7a5",
+      "fields": {
+        "content_001": {
+          "before": "Preguntas que hace un operador antes de agendar",
+          "after": "Resuelve tus dudas antes de dar el siguiente paso."
+        },
+        "content_002": {
+          "before": "Si tu pregunta no está acá, es una buena primera pregunta para la conversación.",
+          "after": "Qué puedes delegar, cómo trabajamos con tu equipo y qué ocurre antes de publicar. Aquí tienes las respuestas para evaluar si este servicio encaja contigo."
+        },
+        "content_003": {
+          "before": "Ya tenemos equipo de contenidos. ¿Igual tiene sentido?",
+          "after": "¿Cómo se integran con nuestro equipo de contenidos?"
+        },
+        "content_005": {
+          "before": "Sí, y suele ser el caso más frecuente. En el modo co-operado tu equipo mantiene la estrategia y la aprobación, y nosotros absorbemos producción, atomización y publicación. También podemos entregarte sólo el sistema para que lo operes.",
+          "after": "Partimos por lo que tu equipo ya hace bien y acordamos dónde necesita apoyo. En el modo co-operado, repartimos la producción, las adaptaciones y la publicación por pieza o canal. Si prefieres publicar internamente, Content Engine te entrega el contenido principal, sus adaptaciones y el calendario. Tu equipo conserva la aprobación final."
+        },
+        "content_006": {
+          "before": "Sólo necesito producción de piezas. ¿Puedo contratar eso?",
+          "after": "¿Puedo contratar solo la producción de contenidos?"
+        },
+        "content_007": {
+          "before": "Producimos piezas, pero siempre con research y brief detrás: es lo que hace que una pieza sirva más de una vez. Si el encargo es puramente de craft o de campaña, la Agencia Creativa es la puerta correcta.",
+          "after": "Sí. Podemos encargarnos de la producción a partir de una investigación y un brief acordados, con formatos y entregables definidos desde el inicio. Si necesitas dirección creativa, diseño o producción audiovisual para una campaña, lo conectamos con nuestro servicio de Agencia Creativa."
+        },
+        "content_008": {
+          "before": "No quiero que administren mis redes sociales.",
+          "after": "¿Incluye la administración de nuestras redes sociales?"
+        },
+        "content_009": {
+          "before": "No es parte de este servicio. Adaptamos el contenido a los formatos de cada canal y, si lo prefieres, te entregamos el asset y el copy listos para que publique tu equipo. La administración de presencia y comunidad vive en Redes Sociales.",
+          "after": "Este servicio cubre el contenido y sus adaptaciones para cada canal. La publicación puede quedar en nuestras manos o en las de tu equipo, según lo acordado. La gestión diaria de canales, comentarios y comunidad corresponde al servicio de Redes Sociales y se contrata por separado."
+        },
+        "content_010": {
+          "before": "Usamos un CMS específico. ¿Pueden trabajar ahí?",
+          "after": "¿Pueden publicar en el CMS que ya usamos?"
+        },
+        "content_011": {
+          "before": "Publicamos en el CMS de tu equipo con los accesos y el alcance que definas. En la conversación inicial confirmamos cuáles podemos operar con capacidad verificada y qué queda a cargo de tu equipo.",
+          "after": "Sí. Publicamos en WordPress, Webflow, Drupal y Modyo, entre otras plataformas. Antes de empezar revisamos los accesos, las plantillas y el flujo de aprobación de tu CMS. Si usas otro, evaluamos cómo integrarnos. Acordamos quién carga, quién revisa y quién publica, sin pedirte una migración."
+        },
+        "content_012": {
+          "before": "¿Cómo se aprueba el contenido?",
+          "after": "¿Quién revisa y aprueba cada contenido?"
+        },
+        "content_013": {
+          "before": "La aprobación siempre es de tu equipo. Los comentarios quedan anclados a la versión y al punto exacto del asset, y la versión aprobada es la única que avanza a publicación.",
+          "after": "Tu equipo tiene la aprobación final. Trabajamos con versiones identificadas y comentarios vinculados a la pieza o al momento exacto del video. Así puedes ver qué se pidió, qué cambió y qué sigue pendiente. Solo la versión aprobada pasa a publicación."
+        },
+        "content_014": {
+          "before": "¿Cómo se mide?",
+          "after": "¿Cómo sabremos si el contenido está funcionando?"
+        },
+        "content_015": {
+          "before": "Definimos contigo qué señales importan antes de producir, con la instrumentación que ya usas. Cada ciclo cierra con una decisión sobre qué se mantiene, se cambia o se retira; el reporte no es el objetivo.",
+          "after": "Antes de producir, acordamos el objetivo y las métricas que podemos medir con tus herramientas: tráfico, interacción, clics o consultas, según el caso. Revisamos los resultados de cada ciclo para decidir qué ampliar, actualizar o dejar de producir. La medición orienta el siguiente trabajo."
+        },
+        "content_016": {
+          "before": "¿Qué hace la IA y quién gobierna el resultado?",
+          "after": "¿Cómo usan la IA y quién revisa el resultado?"
+        },
+        "content_017": {
+          "before": "Usamos IA para acelerar research, variantes y tareas repetitivas. El criterio, las fuentes, la dirección creativa y la revisión son humanos, y toda publicación pasa por aprobación de tu equipo. No operamos en piloto automático.",
+          "after": "La IA apoya la investigación, la creación de variantes y las tareas repetitivas. Nuestro equipo verifica las fuentes, edita el contenido y cuida la voz de tu marca. La dirección y la revisión siguen a cargo de personas, y tu equipo aprueba antes de publicar."
+        },
+        "content_018": {
+          "before": "¿En qué se diferencia de Inbound?",
+          "after": "¿Cómo se complementa con Inbound Marketing?"
+        },
+        "content_019": {
+          "before": "Content Marketing diseña y opera el flujo que produce y distribuye el contenido. Inbound arma el journey, la captura y la nutrición que ese contenido alimenta. Funcionan juntos y no se reemplazan.",
+          "after": "Content Marketing investiga, produce, adapta y mantiene el contenido. Inbound conecta ese contenido con la captación de contactos, su seguimiento y el trabajo comercial. Podemos coordinarlos para que una misma idea acompañe a tu audiencia desde la primera lectura hasta una conversación con tu equipo."
+        }
+      }
+    }
+  }
+}

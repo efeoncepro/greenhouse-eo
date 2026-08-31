@@ -39,6 +39,16 @@ La landing está operativa. La task conserva `in-progress` por contraste del dis
 smoke de conversión/GA4, editor visual completo y research/CWV del alcance ampliado original.
 No confundir esos pendientes con una landing sin publicar; no repetir el cutover inicial.
 
+El operador dio por terminada la revisión visual/editorial de esta entrega. Quedan publicados el
+copy de problema/sistema, hub/revisión, CMS/modalidades, ecosistema/FAQ, caso interno y conversión;
+cuatro logos CMS, seis tarjetas enlazadas y dos wordmarks Efeonce legibles. El formulario usa v3 y
+«Copiar correo» refleja el texto visible. El último ajuste condensó cinco textos del cierre sin
+cambiar tipografía, layout ni formulario. [Mapa de evidencias por sección](../../architecture/public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md#autoridad-editorial-y-evidencia-por-sección).
+
+El cierre editorial no completa los criterios compuestos de esta task. La revisión final de
+1440/878/390 pasó para copy, clipboard, formulario de dos pasos y equilibrio de columnas; no produjo
+leads. [Cierre y snapshots](../../audits/public-site/2026-08-31-content-marketing-business-conversion.md).
+
 ## Summary
 
 Crear la landing pública de **Content Marketing** de Efeonce como una experiencia inmersiva que
@@ -572,6 +582,11 @@ probado, pero aceptación/restore/entrega completa aún no). Diseño aprobado no
   analytics, formulario y cache.
 - `pnpm qa:gates --changed` y `pnpm docs:closure-check` al cierre.
 
+Verificadores mantenidos complementarios: `verify-content-marketing-cms-modes.cjs`,
+`verify-content-marketing-ecosystem-faq.cjs` y `verify-content-marketing-business-conversion.cjs`.
+El último aplica también el patch de equilibrio y valida el clipboard y ambos pasos sin enviar.
+No confundir sus PASS con aceptación del backend, GA4, scorecard premium o CWV de campo.
+
 ## Closing Protocol
 
 - [x] `Lifecycle` del markdown quedó sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
@@ -595,7 +610,9 @@ probado, pero aceptación/restore/entrega completa aún no). Diseño aprobado no
   Una migración futura requiere evidencia propia de GSC/backlinks/SERP; no está autorizada por estética.
 - **Resuelto por export aprobado:** tercer modo **Content Engine** y demo conceptual «Aro 7» rotulada.
   No se presenta como campaña real ni autoriza mostrar datos de clientes.
-- **Pendiente del alcance original:** keyword map/regiones, CWV y ampliación verificable de claims de CMS.
+- **Pendiente del alcance original:** keyword map/regiones y CWV. WordPress, Webflow, Drupal y Modyo
+  ya están publicados por instrucción del operador con assets oficiales; no implican certificación
+  ni partnership. Una ampliación de claims requiere evidencia nueva.
 - **Pendiente QA:** solicitud aceptada + ledger/GA4, editor visual completo y contraste del diseño.
 - **Hallazgo de revisión documental:** mount del stage exige ancho 940 y alto 740 px, pero resize sólo
   comprueba ancho. No se corrigió ni desplegó un cambio por esta revisión; verificar ventanas bajas

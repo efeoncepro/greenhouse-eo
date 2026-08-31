@@ -1,0 +1,349 @@
+{
+  "schema": "contentMarketingEditorial.v1",
+  "postId": 242603,
+  "expectedHash": "cabf8dbfecef8f45fc9d5d9d17545b2d77fb13bc7780d6e8ff7ad286957d0e2f",
+  "modules": {
+    "greenhouse_content_hub": {
+      "id": "395b083",
+      "fields": {
+        "content_001": {
+          "before": "Operación visible",
+          "after": "Tu campaña, a la vista"
+        },
+        "content_002": {
+          "before": "Las cinco piezas no viven en tu bandeja de entrada.",
+          "after": "Cada pieza, con su estado y su próximo paso."
+        },
+        "content_003": {
+          "before": "Viven en un espacio de trabajo compartido en Notion, nuestro sistema de gestión. La misma campaña que acabas de ver, con su estado, sus fuentes y sus comentarios en el lugar donde se produce.",
+          "after": "Reunimos las piezas de la campaña en un espacio compartido de Notion. Tu equipo puede consultar qué está en producción, qué necesita revisión y qué ya se publicó, con las fuentes y los comentarios junto a cada contenido."
+        },
+        "content_005": {
+          "before": "Ves el estado sin preguntarlo",
+          "after": "Sabes qué necesita cada pieza para avanzar"
+        },
+        "content_006": {
+          "before": "Cada pieza tiene un estado real, no un «vamos avanzando» en una llamada de los jueves.",
+          "after": "Consulta el estado, la persona responsable y la fecha prevista. Así puedes identificar qué espera una decisión de tu equipo."
+        },
+        "content_008": {
+          "before": "Auditas de dónde salió cada afirmación",
+          "after": "Revisas las fuentes antes de aprobar"
+        },
+        "content_009": {
+          "before": "Las fuentes están adjuntas a la pieza. Puedes revisarlas antes de aprobar, no después de publicar.",
+          "after": "Cada contenido reúne las referencias que lo respaldan. Puedes comprobar los argumentos y resolver dudas antes de dar tu aprobación."
+        },
+        "content_011": {
+          "before": "Comentas donde corresponde",
+          "after": "Das contexto a cada ajuste"
+        },
+        "content_012": {
+          "before": "El comentario queda anclado a la pieza y al segundo exacto, con responsable y fecha.",
+          "after": "Los comentarios quedan vinculados a la pieza y a la versión correspondiente, con fecha y autor para seguir la revisión."
+        },
+        "content_013": {
+          "before": "Notion es nuestra herramienta de trabajo, no un producto que te vendamos ni una alianza comercial. Si tu equipo opera en otra, nos movemos a la tuya.",
+          "after": "Usamos Notion para organizar el trabajo. No lo comercializamos ni presentamos una alianza con la marca. Si tu equipo usa otra herramienta, acordamos contigo cómo trabajar en ella."
+        },
+        "content_017": {
+          "before": "Aro 7 · lanzamiento",
+          "after": "Aro 7 · campaña de lanzamiento"
+        },
+        "content_018": {
+          "before": "Ejemplo conceptual",
+          "after": "Demostración ficticia"
+        },
+        "content_019": {
+          "before": "Vistas del espacio de trabajo",
+          "after": "Vistas de la campaña"
+        },
+        "content_030": {
+          "before": "Artículo pilar · «Probamos la cámara del Aro 7»",
+          "after": "Artículo · «La cámara del Aro 7, a prueba»"
+        },
+        "content_031": {
+          "before": "1.400 palabras · contenido madre",
+          "after": "1.400 palabras · contenido principal"
+        },
+        "content_034": {
+          "before": "6 fuentes",
+          "after": "6 fuentes adjuntas"
+        },
+        "content_036": {
+          "before": "Reel 9:16 · corte 3",
+          "after": "Reel 9:16 · corte 1"
+        },
+        "content_037": {
+          "before": "30 s · sin audio obligatorio",
+          "after": "30 s · comprensible sin sonido"
+        },
+        "content_040": {
+          "before": "1 comentario",
+          "after": "Revisar subtítulos"
+        },
+        "content_043": {
+          "before": "una idea por lámina",
+          "after": "Una idea por lámina"
+        },
+        "content_047": {
+          "before": "con encuesta de 24 h",
+          "after": "Encuesta disponible durante 24 h"
+        },
+        "content_052": {
+          "before": "Banner display · 16:9 y 1:1",
+          "after": "Banner · versiones 16:9 y 1:1"
+        },
+        "content_053": {
+          "before": "dos proporciones recompuestas",
+          "after": "Composición adaptada a cada proporción"
+        },
+        "content_056": {
+          "before": "sin bloqueos",
+          "after": "Sin tareas bloqueadas"
+        },
+        "content_057": {
+          "before": "Derivado · versión 3",
+          "after": "Adaptación · primera versión"
+        },
+        "content_058": {
+          "before": "En revisión · vence el 9 sep",
+          "after": "En revisión · entrega de comentarios: 5 sep"
+        },
+        "content_060": {
+          "before": "Cliente",
+          "after": "Equipo de marca"
+        },
+        "content_062": {
+          "before": "v3 (v1 y v2 archivadas)",
+          "after": "Primera versión en revisión"
+        },
+        "content_063": {
+          "before": "Ancla",
+          "after": "Ubicación"
+        },
+        "content_064": {
+          "before": "00:04 · zona inferior",
+          "after": "00:04 · subtítulo inferior"
+        },
+        "content_067": {
+          "before": "El subtítulo queda bajo la zona segura del feed: sube el bloque y aumenta el contraste antes de aprobar.",
+          "after": "El subtítulo queda fuera de la zona segura. Sube el texto y aumenta el contraste para que se lea completo en el teléfono."
+        },
+        "content_068": {
+          "before": "Vista simplificada de un espacio real, sin datos de cliente. Toca una pieza para abrirla.",
+          "after": "Demostración con contenidos y fechas ficticios, sin datos de clientes. Selecciona una pieza para ver su detalle."
+        },
+        "content_069": {
+          "before": "Contenido madre de la campaña",
+          "after": "Contenido principal de la campaña"
+        },
+        "content_073": {
+          "before": "6 adjuntas y verificables",
+          "after": "6 referencias disponibles para consulta"
+        },
+        "content_074": {
+          "before": "Derivados",
+          "after": "Adaptaciones"
+        },
+        "content_078": {
+          "before": "Publicado con las 42 fotos sin editar al final. Las tres objeciones del comité quedaron resueltas en el cuerpo.",
+          "after": "El artículo incluye las fotografías de prueba y responde las tres preguntas de compra definidas en el brief."
+        },
+        "content_079": {
+          "before": "Derivado · versión 2",
+          "after": "Adaptación · segunda versión"
+        },
+        "content_081": {
+          "before": "6, con la última en llamada a la acción",
+          "after": "6 láminas; la última invita a leer el artículo"
+        },
+        "content_083": {
+          "before": "Secciones 2 a 5 del artículo",
+          "after": "Apartados 2 a 5 del artículo"
+        },
+        "content_085": {
+          "before": "«Procesamiento» necesita un ejemplo, no un adjetivo. Usen la foto del contraluz que ya está en el artículo.",
+          "after": "Muestra qué cambia con el procesamiento de imagen. Usa la foto a contraluz del artículo y explica el resultado en una frase."
+        },
+        "content_086": {
+          "before": "Derivado · aprobado",
+          "after": "Adaptación aprobada"
+        },
+        "content_088": {
+          "before": "Aprobó",
+          "after": "Aprobado por"
+        },
+        "content_091": {
+          "before": "Al artículo pilar",
+          "after": "Artículo de la campaña"
+        },
+        "content_093": {
+          "before": "Aprobado sin cambios. La encuesta alimenta el research del siguiente ciclo, no se descarta al vencer.",
+          "after": "Aprobado para publicar. Guardaremos las respuestas de la encuesta para elegir qué dudas abordar en el próximo ciclo."
+        },
+        "content_094": {
+          "before": "Derivado · en armado",
+          "after": "Adaptación en diseño"
+        },
+        "content_096": {
+          "before": "Entrega",
+          "after": "Fecha de entrega"
+        },
+        "content_098": {
+          "before": "Nota",
+          "after": "Criterio de diseño"
+        },
+        "content_099": {
+          "before": "El 1:1 se recompone, no se recorta",
+          "after": "Redistribuir texto y producto en la versión cuadrada"
+        },
+        "content_102": {
+          "before": "El 1:1 lleva la frase en dos líneas y el producto recolocado. No es el mismo archivo escalado.",
+          "after": "En la versión cuadrada, el texto ocupa dos líneas y el producto cambia de posición para mantener una lectura clara."
+        }
+      }
+    },
+    "greenhouse_content_review": {
+      "id": "6153e75",
+      "fields": {
+        "content_001": {
+          "before": "Revisión creativa",
+          "after": "De la revisión a la aprobación"
+        },
+        "content_002": {
+          "before": "Un comentario que no cambia la pieza no es feedback: es una opinión.",
+          "after": "Comentarios claros. Cambios que puedes comprobar."
+        },
+        "content_003": {
+          "before": "El reel del Aro 7 pasó por tres cortes. Camina las versiones y mira qué se dijo, dónde exactamente, y qué cambió por eso.",
+          "after": "Explora las tres versiones del reel de Aro 7. Selecciona un comentario para ver dónde aplica y compara qué se ajustó hasta llegar a la versión aprobada."
+        },
+        "content_005": {
+          "before": "Reel 9:16 · «Aro 7»",
+          "after": "Reel de Aro 7 · formato 9:16"
+        },
+        "content_006": {
+          "before": "Versiones del reel",
+          "after": "Seleccionar una versión del reel"
+        },
+        "content_010": {
+          "before": "Ejemplo conceptual",
+          "after": "Demostración ficticia"
+        },
+        "content_013": {
+          "before": "Corte del reel del Aro 7 en revisión",
+          "after": "Vista previa de la versión seleccionada del reel de Aro 7"
+        },
+        "content_014": {
+          "before": "00:01 · producto",
+          "after": "00:01 · posición del producto"
+        },
+        "content_015": {
+          "before": "Comentario en 00:01",
+          "after": "Ver comentario del segundo 1"
+        },
+        "content_016": {
+          "before": "Comentario en 00:03",
+          "after": "Ver comentario del segundo 3"
+        },
+        "content_017": {
+          "before": "Comentario en 00:04",
+          "after": "Ver comentario del segundo 4"
+        },
+        "content_020": {
+          "before": "Extracto de 5 s del corte de 30 s.",
+          "after": "Vista previa de 5 segundos de un reel de 30 segundos."
+        },
+        "content_022": {
+          "before": "3 comentarios abiertos · 2 sep",
+          "after": "3 comentarios pendientes · 2 sep"
+        },
+        "content_027": {
+          "before": "El equipo entra tarde y descentrado. Que aparezca antes y en el tercio inferior.",
+          "after": "El teléfono aparece demasiado tarde. Adelanta su entrada al segundo 1 y sitúalo en el tercio inferior del encuadre."
+        },
+        "content_031": {
+          "before": "El cierre dice «link en bio» y el artículo no está en bio. Cambiar por la frase que sí lleva al artículo.",
+          "after": "El cierre menciona la biografía, pero el artículo irá enlazado en la publicación. Ajusta la frase para indicar dónde encontrarlo."
+        },
+        "content_033": {
+          "before": "El subtítulo queda bajo la zona segura del feed: el pulgar lo tapa. Sube el bloque y aumenta el contraste.",
+          "after": "El subtítulo queda fuera de la zona segura. Súbelo y aumenta el contraste para que se lea sin interferencias de la interfaz."
+        },
+        "content_034": {
+          "before": "Quien aprueba es tu equipo, no el proveedor. Ninguna versión avanza sin aprobación explícita.",
+          "after": "Tu equipo da la aprobación final. Registramos los ajustes y las decisiones para que quede claro qué versión puede publicarse."
+        },
+        "content_035": {
+          "before": "Revisamos en herramientas como Frame.io cuando el formato lo pide. Esto no incluye administrar tus redes sociales: eso es un servicio distinto y lo enlazamos más abajo.",
+          "after": "Usamos herramientas como Frame.io para revisar videos y otros formatos. La demostración contiene comentarios, fechas y aprobaciones ficticios. La gestión de redes sociales se contrata por separado; encontrarás ese servicio más abajo."
+        },
+        "content_036": {
+          "before": "00:03 · cierre",
+          "after": "00:03 · llamada a la acción"
+        },
+        "content_037": {
+          "before": "00:04 · subtítulo",
+          "after": "00:04 · legibilidad del subtítulo"
+        },
+        "content_038": {
+          "before": "1 comentario abierto · 5 sep",
+          "after": "1 comentario pendiente · 5 sep"
+        },
+        "content_039": {
+          "before": "Sigue diciendo «link en bio». Es el único punto que bloquea la aprobación.",
+          "after": "Falta ajustar la llamada a la acción: debe indicar que el artículo está en el enlace de la publicación. Es el último cambio pendiente."
+        },
+        "content_041": {
+          "before": "Resuelto: el subtítulo ya está sobre la zona segura.",
+          "after": "El subtítulo ya queda dentro de la zona segura y se lee con claridad. Ajuste resuelto."
+        },
+        "content_042": {
+          "before": "Qué cambió desde el corte 1",
+          "after": "Cambios respecto al corte 1"
+        },
+        "content_044": {
+          "before": "Subtítulo subido 12% y contraste corregido.",
+          "after": "Subtítulo reubicado y contraste ajustado."
+        },
+        "content_045": {
+          "before": "El equipo entra en 00:01, en el tercio inferior.",
+          "after": "El teléfono aparece en el segundo 1, en el tercio inferior."
+        },
+        "content_046": {
+          "before": "Cada versión queda registrada. La anterior no se borra: se archiva con sus comentarios.",
+          "after": "Puedes consultar las versiones anteriores con sus comentarios y comprobar qué cambió en cada entrega."
+        },
+        "content_048": {
+          "before": "0 abiertos · aprobado el 6 sep",
+          "after": "Sin comentarios pendientes · aprobado el 6 sep"
+        },
+        "content_049": {
+          "before": "Resuelto: el cierre ya lleva al artículo. Aprobado.",
+          "after": "La llamada a la acción indica dónde leer el artículo. Cambio validado y versión aprobada."
+        },
+        "content_050": {
+          "before": "Qué cambió desde el corte 2",
+          "after": "Cambios respecto al corte 2"
+        },
+        "content_051": {
+          "before": "Cierre reescrito: «El resultado, sin editar, en el link».",
+          "after": "Cierre actualizado: «Mira las fotos de prueba en el enlace de esta publicación»."
+        },
+        "content_052": {
+          "before": "Subtítulos quemados para consumo sin sonido.",
+          "after": "Subtítulos incorporados al video para verlo sin sonido."
+        },
+        "content_053": {
+          "before": "Aprobado sin comentarios abiertos.",
+          "after": "Revisión cerrada, con todos los comentarios resueltos."
+        },
+        "content_054": {
+          "before": "Aprobó Marca el 6 de septiembre. Esta es la única versión que avanza a publicación.",
+          "after": "El equipo de marca aprobó el corte 3 el 6 de septiembre. Esta es la versión autorizada para publicar."
+        }
+      }
+    }
+  }
+}

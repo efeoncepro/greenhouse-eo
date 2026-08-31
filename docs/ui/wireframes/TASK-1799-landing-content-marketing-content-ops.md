@@ -17,6 +17,15 @@ sus dibujos: hero centrado con palabra dinámica y trece módulos Elementor `her
 `system`, `atomization`, `hub`, `review`, `editorial`, `modes`, `ecosystem`, `business`, `faq`, `conversion`.
 La raíz implementada es `.gh-content-module`, con `[data-content-module]` y markers `[data-capture]`.
 No renombrar selectors ni volver a la composición preliminar para hacer coincidir el dibujo histórico.
+La revisión visual/editorial del operador está terminada: las diferencias autorizadas posteriores al
+export son copy nativo, grupo de CMS, legibilidad de dos wordmarks y cierre con texto más breve.
+Los títulos candidatos y supuestos de las regiones inferiores son históricos, no texto para restaurar.
+
+El cierre vigente conserva dos columnas en desktop/tablet y apilado en 390 px. Se condensaron cinco
+textos sin reducir el tamaño de letra, estirar el formulario ni fijar alturas. El formulario real tiene
+dos pasos, copy v3 y contexto opcional; sus labels/confirmación pertenecen a Growth Forms.
+El caso interno ofrece cinco puntos y un correo que copia los valores visibles con párrafos reales.
+[Verificación de cierre y equilibrio](../../audits/public-site/2026-08-31-content-marketing-business-conversion.md).
 
 [Implementación canónica](../../architecture/public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md) ·
 [Auditoría y pendientes](../../audits/public-site/2026-08-31-content-marketing-publication.md).
@@ -187,7 +196,8 @@ atomización.
 
 - Blog: estrategia, calendario, briefs, redacción, edición, SEO/AEO, publicación y mantenimiento.
 - CMS: carga, formato, assets, metadata, enlaces, schema cuando aplica y QA.
-- CMS nombrados sólo tras verificación. `Modyo` permanece `[verificar]` hasta confirmar el naming.
+- Estado publicado: WordPress, Webflow, Drupal y Modyo, con fuentes oficiales de marca y apertura
+  a otros CMS. No son badges de certificación; ver ajuste autorizado al final de este documento.
 
 ### R9 — Tres modos de colaboración
 
@@ -270,7 +280,7 @@ de publish.
 | partial | Parte de la evidencia no está disponible | leer la metodología y continuar sin claim faltante |
 | error | No pudimos cargar este paso | reintentar o seguir con el contenido estático |
 | denied | Este material no es público | mostrar demo conceptual aprobada, nunca pedir acceso |
-| JS-off | Todos los capítulos y formatos aparecen estáticos | enlaces y formulario siguen operativos |
+| JS-off | Todos los capítulos y formatos aparecen estáticos | enlaces y fallback a agenda; no afirmar formulario sin JS |
 | reduced-motion | La transformación se presenta por estados finales | navegación ancla normal |
 | proof-unapproved | Ejemplo conceptual de la operación | no presentar como cliente/caso |
 | form-loading | Enviando tu solicitud | host canónico controla live region |
@@ -322,3 +332,12 @@ de publish.
 - Blogging choice: module by default; satellite only with distinct intent/demand.
 - Route choice: unresolved by design; evidence gate in Slice 1.
 - First-fold checkpoint: must be recorded as `ACCEPT FIRST FOLD` or `REVISE` before full build.
+
+## Ajuste autorizado: CMS del cliente
+
+Se extiende la sección editorial source-led con fila compacta de WordPress, Webflow, Drupal y Modyo,
+cuatro columnas en desktop/390, nombres visibles y logos contenidos sin recorte. Se descarta muro
+de logos y solapamiento que oculte wordmarks. Reuso del módulo editorial y tokens existentes,
+fondo blanco para marcas, sin motion nuevo. Media y nombres editables; leyenda contempla otros CMS.
+Estados: SSR, hidratación, sin JS y reduced motion conservan el grupo.
+[Copy, contrato y QA](../../audits/public-site/2026-08-31-content-marketing-cms-modes.md).

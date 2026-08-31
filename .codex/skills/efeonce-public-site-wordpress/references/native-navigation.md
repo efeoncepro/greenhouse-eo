@@ -43,3 +43,14 @@ positions, so it does **not** establish byte-for-byte preservation of all origin
 values. Do not describe this recovery as a universally required WordPress reorder or infer a hook cause.
 Landing state, public click evidence and scope: `landings/content-marketing.md` and
 `docs/audits/public-site/2026-08-31-content-marketing-publication.md`.
+
+## Indexing checks for menu pages
+
+Resolve assigned menus and compare rendered navigation; exclude `#` group labels and external social
+links. Audit each unique internal destination for robots meta/HTTP headers, robots.txt, canonical, status
+and sitemap before changing anything. An indexing request for the menu does not authorize unblocking
+backups or pilots outside it. 2026-08-31: 18 destinations verified, only Redes Sociales needed its native
+Yoast noindex flag changed. Use the native meta/Yoast path for that change; an Elementor save is not
+needed when no page content changes. Rebuild the affected indexable, invalidate sitemap/cache, and
+verify public robots, canonical and sitemap again. This establishes eligibility, not Google indexing
+or a GSC request. Evidence: `docs/audits/public-site/2026-08-31-menu-indexability.md`.

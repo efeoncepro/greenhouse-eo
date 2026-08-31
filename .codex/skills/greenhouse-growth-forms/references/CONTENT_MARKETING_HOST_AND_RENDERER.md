@@ -51,3 +51,25 @@ other consumers. Global promotion requires its own release path and regression v
 - Keep `docs/reference/measurement-gtm-ga4/TRACKING-PLAN.md` pending until the actual surface smoke
   confirms the accepted event and GA4 request. Reuse the generic event pipeline; do not mint a
   Content Marketing-specific conversion event merely because a new landing exists.
+
+## Revise copy without changing capture semantics
+
+The Content Marketing copy revision follows the same boundary: native Elementor fields for page
+text and clipboard, a new governed form version for field/step/confirmation copy. Preserve option
+values used by mode prefill and all consent/security/destination policies.
+
+- Clone with `preserveFormVersionFields`, compare the draft with the current published baseline,
+  then review, publish and read back identity, surface and destination configuration. Deprecate the
+  previous version only after that readback. Rollback is another governed version, never an edit
+  to a published version or a replay of a historical writer against a changed baseline.
+- Contract labels/help and shared renderer strings have different owners. Page copy changes must
+  not replace validation, consent, privacy or success behavior through host DOM manipulation.
+- Use `scripts/public-website/verify-content-marketing-business-conversion.cjs` for the published
+  copy, step navigation, prefill and retained values. Its blocked-submit check proves no request
+  was sent; it does not prove accepted submission, destination delivery or success rendering.
+  Confirmation copy can be checked in the published contract without manufacturing a lead.
+- Balance surrounding page text in its own native controls. A shorter host column does not require
+  another form version, smaller field typography or a rebuilt renderer bundle.
+
+Evidence and rollback:
+`docs/audits/public-site/2026-08-31-content-marketing-business-conversion.md`.

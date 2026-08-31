@@ -1,6 +1,6 @@
 # Content Marketing — módulos Elementor V1
 
-Corte de publicación y evidencia: 2026-08-31 en la página `242603`, conservando
+Corte de publicación, revisión editorial y evidencia: 2026-08-31 en la página `242603`, conservando
 `https://efeoncepro.com/servicio-marketing-de-contenidos/` y el header/footer Ohio.
 
 ## Fuente y decisión
@@ -9,7 +9,7 @@ La instrucción del operador autoriza implementar y publicar el diseño aprobado
 Fuente: `~/Documents/Landing Content Marketing/Content Ops.zip`, archivo
 `Landing Content Marketing v2.dc.html`, SHA256
 `27187938992c412cc4119432e0e5c3ec4d20a82ab6be0d572cf2d67d36b39f6d`.
-Se preservan composición, tokens, copy, imágenes, recorrido y estados. Se excluyen header/footer del
+El corte inicial preservó composición, tokens, copy, imágenes, recorrido y estados. Se excluyen header/footer del
 export y se reemplaza la simulación de formulario por captura real en Growth Forms.
 
 Se extiende el patrón existente de módulos semánticos del plugin `eo-elementor-widgets`; no hay
@@ -61,7 +61,10 @@ programática suprime temporalmente la sincronización con scroll para evitar ca
 
 - Form: `efeonce-content-marketing`; key `18b228e9-106a-402e-a6f2-a8c5469e73d7`.
 - Surface: `fhsf-efeonce-content-marketing`; orígenes de producción con/sin www.
-- Versión publicada en el corte: `fver-94c14bc6-6ba8-4b4b-82f9-24fe7470abea`; variante `content_marketing`.
+- Versión publicada vigente en este corte: v3 `fver-e96ca2e9-d2b2-4f72-ad50-33d2b2be9245`; variante
+  `content_marketing`, presentación `multi_step_light`. Sustituye a v2, deprecada después del readback.
+  Labels, ayudas, placeholders, CTA y confirmación pertenecen al contrato publicado de Growth Forms;
+  las opciones/valores, validadores, consentimiento, seguridad y destino no cambiaron.
 - Pasos: identidad y contexto; consentimiento y Turnstile del motor. Destino `greenhouse_only`.
 - Renderer compilado y fijado en `content-marketing-forms.js`; la variante nueva no implica despliegue
   del bundle genérico de otros consumidores. La presentación vive en el renderer; el host sólo pasa tokens.
@@ -77,7 +80,10 @@ programática suprime temporalmente la sincronización con scroll para evitar ca
 Publicación mediante `Document::save()`, sin escritura directa de `_elementor_data`.
 Rollback documental: opción `_gh_content_marketing_before_20260831_121810`; paquete inicial
 `/tmp/eo-content-marketing-before-20260831-120751.tar`. Se conservan backups incrementales posteriores.
-Hash Elementor publicado: `dd6275695aa878020d6471c91ab121ed36b175b16c417ccd3732797d8c86f020`.
+Hash Elementor inicial: `dd6275695aa878020d6471c91ab121ed36b175b16c417ccd3732797d8c86f020`.
+Hash al cierre editorial: `b8d379697673969a8add5ece01e0b41c12563907470555768febe8c79b14f753`;
+snapshot previo al ajuste final `_gh_content_marketing_copy_20260831_194706`.
+Este último snapshot revierte cinco campos de conversión, no toda la secuencia de publicación.
 Imagen social: attachment `251825`. Estos identificadores corresponden al corte de publicación y
 deben releerse antes de cualquier cambio. Restaurar requiere revisar deriva y usar el snapshot con
 `Document::save()` y metas anteriores; no restaurar todo el sitio ni archivos ajenos. No existe un
@@ -98,3 +104,40 @@ editor sin certificar. Registro de controles y readback CMS no equivalen a esa p
 [Funcional](../../documentation/public-site/content-marketing.md) ·
 [Manual](../../manual-de-uso/public-site/content-marketing.md) ·
 [Auditoría](../../audits/public-site/2026-08-31-content-marketing-publication.md).
+
+## Autoridad editorial y evidencia por sección
+
+Los defaults del export permanecen como referencia; la instancia Elementor conserva el copy revisado.
+`update-content-marketing-copy.php` admite uno o dos módulos declarados por patch y exige identidad,
+hash del documento, campos y valores anteriores antes de `Document::save()`. Los JSON publicados son
+históricos: no se encadenan contra la página actual ni se relajan sus guardas para repetirlos.
+
+| Alcance publicado | Evidencia y recuperación |
+| --- | --- |
+| Problema y siete etapas: 118 controles | [Revisión editorial](../../audits/public-site/2026-08-31-content-marketing-editorial-copy.md) |
+| Content Hub y revisión: 83 controles y refinamiento de cinco | [Operación y cortes](../../audits/public-site/2026-08-31-content-marketing-hub-review-copy.md) |
+| CMS y modalidades: 53 textos, ocho controles nuevos de marca | [CMS y modos](../../audits/public-site/2026-08-31-content-marketing-cms-modes.md) |
+| Ecosistema y FAQ: 37 textos, seis URL | [Servicios conectados](../../audits/public-site/2026-08-31-content-marketing-ecosystem-faq.md) |
+| Dos wordmarks Efeonce ampliados: sólo host CSS | [Legibilidad de marca](../../audits/public-site/2026-08-31-content-marketing-mode-logo.md) |
+| Caso interno y cierre: 48 textos; cinco condensados después; formulario v3 y clipboard | [Conversión y equilibrio](../../audits/public-site/2026-08-31-content-marketing-business-conversion.md) |
+
+El equilibrio final de conversión se resuelve con cinco textos más breves; no reduce tipografía ni
+estira el formulario. El ajuste deja intactos los otros doce módulos y no cambia CSS, JS o versión
+Growth Forms. Las dos columnas corresponden al primer paso; en móvil se apilan. La diferencia de
+altura al pasar al segundo paso es propia de su contenido y no justifica forzar alturas fijas.
+
+## Grupo de CMS — extensión editorial autorizada
+
+El módulo editorial añade ocho controles `cms_{wordpress,webflow,drupal,modyo}_{logo,name}`.
+Se extiende schema/template y árbol del cliente mediante `content-marketing-cms-logos.cjs`; no cambia
+la identidad de campos previos. Marcas estáticas con nombre visible y assets locales, sin alianza
+implícita. La oferta contempla otros CMS. [Fuentes, diseño, hashes y QA](../../audits/public-site/2026-08-31-content-marketing-cms-modes.md).
+
+Ecosistema y FAQ conservan sus widgets y controles existentes: textos/textarea y seis URL nativas.
+El writer editorial valida destinos internos concretos y preserva las demás propiedades del enlace;
+SSR e hidratación usan esos mismos controles. No introduce navegación por click handlers ni schema
+FAQ adicional. [Patch y evidencia](../../audits/public-site/2026-08-31-content-marketing-ecosystem-faq.md).
+
+El correo del caso interno se copia desde el lookup de los mismos controles Elementor que lo
+renderizan, con saltos reales. El formulario tiene copy versionado en Growth Forms, no en el host.
+[Revisión de business/conversion y formulario](../../audits/public-site/2026-08-31-content-marketing-business-conversion.md).

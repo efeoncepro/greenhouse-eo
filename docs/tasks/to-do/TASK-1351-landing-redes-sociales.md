@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-1351-landing-redes-sociales-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-019`
-- Status real: `Live noindex v1; cierre formal pendiente`
+- Status real: `Live indexable; cierre formal pendiente`
 - Rank: `TBD`
 - Domain: `public-site`
 - Blocked by: `none`
@@ -109,12 +109,14 @@ Reglas obligatorias:
 - Landings hermanas `/servicios/posicionamiento-seo` (TASK-1343) y `/desarrollo-sitios-web` (TASK-1345) como referencia de patrón spoke.
 - Hub `/servicios` como página mínima (ID `251077`).
 - Datos de keyword Semrush CL (en PDR-005).
-- Página WordPress `251300` live/noindex en `/servicios/redes-sociales/`, con native Efeonce/Ohio masthead/footer, widget modular `eo-elementor-widgets`, hero artístico `assets/video/social/art-macaws/v1/` y muro social con 8 WebP bajo `assets/img/social/wall/v1/`.
+- Página WordPress `251300` live/indexable en `/servicios/redes-sociales/`, con native Efeonce/Ohio masthead/footer, widget modular `eo-elementor-widgets`, hero artístico `assets/video/social/art-macaws/v1/` y muro social con 8 WebP bajo `assets/img/social/wall/v1/`.
 - Landing registry y landing ref creados para Codex/Claude; aprendizaje de assets documentado en `docs/operations/public-site-social-wall-media-production-20260708.md`.
+
+Indexación autorizada y habilitada el 2026-08-31; [robots/canonical/sitemap verificados](../../audits/public-site/2026-08-31-menu-indexability.md). No implica cierre formal ni confirmación de GSC.
 
 ### Gap
 
-- El lifecycle formal de TASK-1351 sigue sin cerrarse/moverse; el runtime está live/noindex, pero la task debe pasar por cierre gobernado antes de marcarse `complete`.
+- El lifecycle formal de TASK-1351 sigue sin cerrarse/moverse; el runtime está live/indexable, pero la task debe pasar por cierre gobernado antes de marcarse `complete`.
 - Copy final (los 5 bloques con su answer capsule, prueba/casos con números reales, FAQ) sin draftear; FAQ pendiente de poblar con `phrase_questions` Semrush CL (seed "gestión de redes sociales"/"community manager").
 - Dirección de arte del muro social vivo producida en v1; cualquier nueva iteración es polish/follow-up, no bloqueo de existencia.
 - JSON-LD (Service/Organization/FAQPage/BreadcrumbList) no implementado para esta ruta.

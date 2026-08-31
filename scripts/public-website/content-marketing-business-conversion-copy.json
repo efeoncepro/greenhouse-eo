@@ -1,0 +1,209 @@
+{
+  "schema": "contentMarketingEditorial.v1",
+  "postId": 242603,
+  "expectedHash": "88df573273e33edb84cc67fffda3f86fd0f4168d1bbccea92be6726e8e7f5488",
+  "modules": {
+    "greenhouse_content_business": {
+      "id": "34e6bc1",
+      "fields": {
+        "content_001": {
+          "before": "Para llevar a tu CMO",
+          "after": "Para presentar a tu equipo"
+        },
+        "content_002": {
+          "before": "Nadie aprueba un proveedor. Aprueban el correo que alguien escribió.",
+          "after": "Dale a tu equipo razones claras para avanzar."
+        },
+        "content_003": {
+          "before": "Este es el correo, ya escrito. Sin cifras inventadas: cinco cosas que tu equipo puede verificar antes de firmar nada.",
+          "after": "Resume qué cambiaría en tu operación, cómo se repartiría el trabajo y qué conviene validar con Efeonce. Usa este borrador para abrir la conversación interna."
+        },
+        "content_004": {
+          "before": "Lo verificable, y dónde se comprueba",
+          "after": "Cinco puntos para evaluar la propuesta"
+        },
+        "content_006": {
+          "before": "El estado no se pregunta, se consulta",
+          "after": "Avance visible para todo el equipo"
+        },
+        "content_007": {
+          "before": "Cada pieza tiene un estado real y una fecha, sin pedir reporte ni convocar una reunión.",
+          "after": "Estado, responsables y fechas por pieza en un espacio compartido para saber qué está listo y qué necesita atención."
+        },
+        "content_009": {
+          "before": "Compruébalo en el espacio de trabajo, más arriba.",
+          "after": "Míralo en el ejemplo del espacio de trabajo."
+        },
+        "content_011": {
+          "before": "El feedback queda anclado y firmado",
+          "after": "Revisiones con contexto"
+        },
+        "content_012": {
+          "before": "El comentario va pegado a la versión y al segundo exacto, con responsable y fecha de resolución.",
+          "after": "Cada comentario se vincula a una versión y, en video, al momento exacto. Puedes seguir el cambio hasta su aprobación."
+        },
+        "content_013": {
+          "before": "El comentario de 00:04 se resolvió en el corte 2 y se aprobó el 6 de septiembre.",
+          "after": "Recorre los tres cortes del reel y sus comentarios en la demo."
+        },
+        "content_015": {
+          "before": "Una idea, no cinco piezas sueltas",
+          "after": "Una idea adaptada a cada canal"
+        },
+        "content_016": {
+          "before": "El mismo argumento se adapta a cada canal en lugar de recortarse. La marca no se dispersa.",
+          "after": "El contenido principal se transforma en formatos pensados para la forma de consumir contenido en cada canal."
+        },
+        "content_017": {
+          "before": "Compara el recorte y la adaptación en la sección de atomización.",
+          "after": "Compara las adaptaciones de la campaña de ejemplo."
+        },
+        "content_019": {
+          "before": "Quién publica está escrito antes de empezar",
+          "after": "Responsabilidades claras desde el inicio"
+        },
+        "content_020": {
+          "before": "Los tres modos se diferencian en eso y solo en eso. La aprobación es siempre de tu equipo.",
+          "after": "Definimos qué asume Efeonce, qué conserva tu equipo y quién publica. La aprobación final sigue siendo tuya."
+        },
+        "content_021": {
+          "before": "La matriz de responsabilidades lo detalla fila por fila.",
+          "after": "Consulta la matriz de responsabilidades de las tres modalidades."
+        },
+        "content_023": {
+          "before": "Lo publicado se mantiene",
+          "after": "Continuidad después de publicar"
+        },
+        "content_024": {
+          "before": "El artículo se actualiza a los 30, 90 y 180 días. El tráfico no depende de producir más.",
+          "after": "Acordamos qué contenidos revisar y actualizar, con qué frecuencia y quién se encarga."
+        },
+        "content_025": {
+          "before": "La vida del artículo está trazada en la sección de publicación.",
+          "after": "Revisa el ejemplo de mantenimiento editorial y el alcance que necesitas."
+        },
+        "content_027": {
+          "before": "Borrador listo para enviar",
+          "after": "Un correo para abrir la conversación"
+        },
+        "content_029": {
+          "before": "Copiar",
+          "after": "Copiar correo"
+        },
+        "content_031": {
+          "before": " Propuesta de operación de contenidos",
+          "after": " Propuesta para organizar nuestra operación de contenidos"
+        },
+        "content_033": {
+          "before": "Revisé la operación de contenidos que propone Efeonce. El planteamiento no es producir más piezas, sino sostener un ciclo: una idea con fuentes verificables, un contenido madre y cinco derivados que devuelven al mismo lugar.",
+          "after": "Propongo evaluar a Efeonce como apoyo para nuestra operación de contenidos. Su propuesta conecta investigación, producción, revisión y adaptación por canal, con responsabilidades definidas según lo que queramos delegar."
+        },
+        "content_034": {
+          "before": "Lo que podemos verificar antes de firmar nada:",
+          "after": "Estos son los puntos que conviene revisar juntos:"
+        },
+        "content_035": {
+          "before": "· El estado de cada pieza es consultable sin pedir un reporte.",
+          "after": "· Un espacio compartido para consultar el estado, las fechas y los responsables de cada pieza."
+        },
+        "content_036": {
+          "before": "· El feedback queda anclado a la versión y al segundo, con responsable.",
+          "after": "· Comentarios vinculados a cada versión, con seguimiento de los cambios hasta su aprobación."
+        },
+        "content_037": {
+          "before": "· La aprobación es siempre nuestra, en los tres modos de colaboración.",
+          "after": "· Un contenido principal que se adapta a los formatos y necesidades de cada canal."
+        },
+        "content_038": {
+          "before": "· Quién publica y distribuye se define por escrito antes de empezar.",
+          "after": "· Un reparto claro de la producción y la publicación, conservando nuestra aprobación final."
+        },
+        "content_039": {
+          "before": "· Lo publicado se mantiene: se actualiza a los 30, 90 y 180 días.",
+          "after": "· Un alcance de revisión y actualización acordado para los contenidos publicados."
+        },
+        "content_040": {
+          "before": "Propongo una primera conversación para revisar nuestra operación actual y acordar el modo y el alcance.",
+          "after": "Sugiero una primera conversación para revisar nuestras prioridades, conocer cómo trabajan y evaluar la modalidad, los entregables y el presupuesto que necesitaríamos."
+        },
+        "content_041": {
+          "before": "Y si dicen que sí, así empieza",
+          "after": "Cómo pasar de la propuesta al trabajo"
+        },
+        "content_042": {
+          "before": "Primero",
+          "after": "Revisamos"
+        },
+        "content_043": {
+          "before": "Revisamos tu operación actual: quién define, quién produce y dónde se detiene el flujo.",
+          "after": "Identificamos tus prioridades, la capacidad de tu equipo y los puntos donde se demora el trabajo."
+        },
+        "content_044": {
+          "before": "Después",
+          "after": "Acordamos"
+        },
+        "content_045": {
+          "before": "Acordamos el modo, el alcance de publicación y qué artefactos quedan visibles.",
+          "after": "Definimos modalidad, entregables, responsabilidades y alcance antes de comenzar."
+        },
+        "content_046": {
+          "before": "Entonces",
+          "after": "Empezamos"
+        },
+        "content_047": {
+          "before": "Empezamos por una idea completa, del research a sus derivados, y evaluamos el ciclo juntos.",
+          "after": "Con el alcance aprobado, trabajamos una primera idea y revisamos juntos el proceso y sus entregables."
+        },
+        "content_049": {
+          "before": "Copiado",
+          "after": "Correo copiado"
+        }
+      }
+    },
+    "greenhouse_content_conversion": {
+      "id": "74994c5",
+      "fields": {
+        "content_001": {
+          "before": "Conversemos sobre tu operación de contenidos",
+          "after": "Cuéntanos qué necesita tu equipo de contenidos."
+        },
+        "content_002": {
+          "before": "Una conversación de trabajo, no un pitch. Revisamos cómo produces contenido hoy, dónde se detiene el flujo y qué modo tiene sentido para tu equipo.",
+          "after": "¿Te falta capacidad para producir, coordinar revisiones o publicar a tiempo? Cuéntanos dónde necesitas apoyo y revisemos cómo trabajar juntos."
+        },
+        "content_003": {
+          "before": "Qué pasa después de enviar",
+          "after": "Así damos el siguiente paso"
+        },
+        "content_005": {
+          "before": "Leemos tu operación, no tu presupuesto",
+          "after": "Entendemos tu punto de partida"
+        },
+        "content_006": {
+          "before": "Respondemos con una lectura de cómo produces contenido hoy y dónde se detiene el flujo.",
+          "after": "Revisamos lo que nos compartes y conversamos sobre tus prioridades, tus canales y la capacidad de tu equipo."
+        },
+        "content_008": {
+          "before": "Acordamos modo y alcance",
+          "after": "Definimos cómo ayudarte"
+        },
+        "content_009": {
+          "before": "Quién define, quién produce y quién publica queda por escrito antes de empezar.",
+          "after": "Evaluamos contigo la modalidad, los entregables y quién se encarga de cada etapa, incluida la publicación."
+        },
+        "content_011": {
+          "before": "Arrancamos por una idea completa",
+          "after": "Acordamos el primer ciclo"
+        },
+        "content_012": {
+          "before": "Del research a sus derivados, para evaluar el ciclo con algo real y no con una promesa.",
+          "after": "Si la propuesta encaja, definimos el alcance y los responsables antes de empezar a producir."
+        },
+        "content_014": {
+          "before": "Si no somos la opción correcta, te lo decimos y te orientamos. Sin brief de procurement antes de hablar.",
+          "after": "No necesitas llegar con un brief completo. Conocer tu situación es el primer paso para definir si podemos ayudarte."
+        }
+      }
+    }
+  }
+}

@@ -18,14 +18,20 @@ son evidencias distintas.
 | Landing WordPress | `/servicio-marketing-de-contenidos/`, página `242603` |
 | Slug / form key | `efeonce-content-marketing` / `18b228e9-106a-402e-a6f2-a8c5469e73d7` |
 | Surface | `fhsf-efeonce-content-marketing` |
-| Versión publicada | `fver-94c14bc6-6ba8-4b4b-82f9-24fe7470abea` |
+| Versión publicada | `fver-e96ca2e9-d2b2-4f72-ad50-33d2b2be9245` (v3, revisión de copy 2026-08-31) |
 | Presentación / composición | `content_marketing` / `multi_step_light` |
-| Destino | `greenhouse_only`; no habilita entrega directa a HubSpot ni correo |
+| Destino | `greenhouse_only`, cero destinos configurados en v3; no habilita entrega directa a HubSpot ni correo |
 
 El authoring reproducible vive en `scripts/growth/publish-content-marketing-form.ts` y usa
 `authorDraftForm → reviewForm → publishForm`. Los campos del primer paso son `fullName`, `email`
 y `companyName`; el segundo contiene `mode` y `challenge`. El email corporativo, consentimiento,
 Turnstile y success siguen en el contrato gobernado. No hay endpoint ni bridge de submit de WordPress.
+
+La revisión editorial v3 usa `scripts/growth/revise-content-marketing-form-copy.ts`: preserva
+campos funcionales, consentimiento, seguridad y policies; actualiza sólo copy de la versión.
+La v2 se deprecó después del readback de v3. Recuperar copy anterior requiere otra versión por
+commands; nunca editar una versión publicada en sitio ni reutilizar el writer con su baseline antiguo.
+[Publicación, readback y recuperación](../audits/public-site/2026-08-31-content-marketing-business-conversion.md).
 
 **Presentación canónica.** `renderer.ts` construye título del paso, ayuda opcional desde
 `copy["step.<key>.help"]`, progreso anunciado y puntos decorativos; `styles.ts` gobierna la columna
@@ -54,6 +60,9 @@ mismo custom element en una página.
 **Evidencia del rollout.** `.captures/content-marketing/browser.json` registra montaje, validación
 vacía, dos pasos, prefill de modo y regreso conservando valores, sin submission. No se ejecutó un lead
 aceptado ni un smoke GA4 de conversión; no afirmar entrega, `generate_lead` observado ni cierre E2E.
+El verificador `scripts/public-website/verify-content-marketing-business-conversion.cjs` añade la
+revisión pública del copy v3, ambos pasos y retención de valores en 1440/878/390, sin enviar datos.
+El ajuste posterior de cinco textos de la columna izquierda no cambia v3 ni el renderer.
 El estado de medición permanece pendiente en
 [TRACKING-PLAN.md](../reference/measurement-gtm-ga4/TRACKING-PLAN.md).
 La implementación y su alcance viven en

@@ -70,6 +70,9 @@ an old `/tmp` backup path is recovery evidence, not a guarantee that the archive
 - Purge Kinsta cache after live mutation.
 - Invalidate Elementor element/files caches as applicable as well as Kinsta; new plugin templates may
   otherwise coexist with stale rendered elements. Check the actual public bundle/render after reload.
+- If the first public request still serves old copy after purge, compare the normal URL, a cache-bypass
+  request and the saved document. Confirm eventual normal-URL readback before closing; do not repeat
+  a successful save merely to remedy stale HTML. A bypass-only pass is not the final public check.
 - Verify in browser at desktop and mobile 390px.
 
 ## Structural Rules
