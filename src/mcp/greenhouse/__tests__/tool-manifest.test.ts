@@ -11,6 +11,9 @@
  *   3. El cruce contra el censo de lente (`TASK-1785`) impide que el manifiesto nazca como una
  *      TERCERA lista, que es exactamente el modo de falla que esta task existe para cerrar.
  */
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
 import { describe, expect, it } from 'vitest'
 
 import { SEO_LENS_SURFACES } from '@/lib/growth/seo/lens-surface-manifest'
@@ -192,5 +195,56 @@ describe('el cartel del servidor se deriva del inventario (Slice 2)', () => {
     expect(instructions).toContain('fixed external scope from server configuration')
     expect(instructions).toContain('preserves Greenhouse request IDs')
     expect(instructions).toContain('tenancy inference from free text')
+  })
+})
+
+describe('el artefacto que consume el gateway (Slice 3)', () => {
+  const artifact = JSON.parse(
+    readFileSync(join(process.cwd(), 'src/mcp/greenhouse/tool-manifest.generated.json'), 'utf8')
+  ) as {
+    toolCount: number
+    tools: { name: string; writes: boolean; spendsProviderBudget: boolean; inputKeys: string[] }[]
+  }
+
+  it('declara exactamente las tools del manifiesto, en su orden', () => {
+    expect(artifact.tools.map(tool => tool.name)).toEqual(GREENHOUSE_MCP_TOOL_MANIFEST.map(entry => entry.name))
+    expect(artifact.toolCount).toBe(GREENHOUSE_MCP_TOOL_MANIFEST.length)
+  })
+
+  it('sus inputKeys salen del servidor real, no de una transcripción', () => {
+    const server = createGreenhouseMcpServer(
+      {
+        apiBaseUrl: 'https://example.invalid',
+        consumerToken: 'stub',
+        externalScopeType: 'other',
+        externalScopeId: 'stub',
+        apiVersion: '2026-04-25',
+        requestTimeoutMs: 1_000
+      },
+      { fetch: (async () => new Response('{}')) as unknown as typeof fetch }
+    )
+
+     
+    const registered = (server as any)._registeredTools as Record<
+      string,
+      { inputSchema?: { shape?: Record<string, unknown> } }
+    >
+
+    for (const tool of artifact.tools) {
+      expect(tool.inputKeys, `inputKeys de ${tool.name}`).toEqual(
+        Object.keys(registered[tool.name]?.inputSchema?.shape ?? {}).sort()
+      )
+    }
+  })
+
+  it('la clase de escritura viaja al artefacto sin fusionarse', () => {
+    // El gateway deriva su gate de scope de `writes || spendsProviderBudget`. Si el artefacto
+    // colapsara las dos banderas en una, la distinción se perdería justo en la frontera.
+    for (const entry of GREENHOUSE_MCP_TOOL_MANIFEST) {
+      const tool = artifact.tools.find(candidate => candidate.name === entry.name)
+
+      expect(tool?.writes).toBe(entry.writes)
+      expect(tool?.spendsProviderBudget).toBe(entry.spendsProviderBudget)
+    }
   })
 })

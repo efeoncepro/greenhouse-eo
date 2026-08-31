@@ -166,6 +166,14 @@ jobs:
         # contextos Cloud Build/Docker y path triggers de los cuatro workers.
         run: pnpm worker:build-contract-gate && pnpm worker:build-contract-gate:test
 
+      - name: MCP tool manifest artifact gate (TASK-1780)
+        # El inventario de tools MCP tiene DOS consumidores y uno vive en otro repo
+        # (el guard de paridad de efeonce-mcp), cuyo CI no puede leer greenhouse-eo.
+        # El gateway consume un artefacto generado; este gate falla si el artefacto
+        # committeado difiere del registro vivo del servidor, que es el unico modo de
+        # que el gateway quede con un inventario viejo sin que nada se ponga rojo.
+        run: pnpm mcp:manifest:check
+
       - name: Worker deploy-path coverage gate
         # Los filtros de deploy de los workers son listas de rutas mantenidas a mano y
         # derivaron del bundle real: un cambio a una ruta no listada NO redespliega, el

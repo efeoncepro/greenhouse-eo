@@ -1,0 +1,548 @@
+{
+  "$comment": "GENERADO por pnpm mcp:manifest:generate (TASK-1780). NO editar a mano: el hash y el gate de Greenhouse lo detectan. Greenhouse declara que EXISTE; el gateway decide que CRUZA.",
+  "source": "greenhouse-eo/src/mcp/greenhouse/tool-manifest.ts",
+  "generator": "pnpm mcp:manifest:generate",
+  "manifestHash": "292a313a1c91de64e737da10549553ceabb5d1a8dd00d34160ccb7817148c21d",
+  "toolCount": 43,
+  "tools": [
+    {
+      "name": "get_context",
+      "domain": "platform",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Consumer y binding efectivos del scope externo configurado.",
+      "inputKeys": []
+    },
+    {
+      "name": "list_organizations",
+      "domain": "platform",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Organizaciones accesibles desde el scope configurado.",
+      "inputKeys": [
+        "page",
+        "pageSize",
+        "search",
+        "status",
+        "type"
+      ]
+    },
+    {
+      "name": "get_organization",
+      "domain": "platform",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Una organización por identificador canónico o ID público.",
+      "inputKeys": [
+        "id"
+      ]
+    },
+    {
+      "name": "list_capabilities",
+      "domain": "platform",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Asignaciones de capacidad de cliente visibles desde el scope.",
+      "inputKeys": [
+        "page",
+        "pageSize",
+        "search"
+      ]
+    },
+    {
+      "name": "get_integration_readiness",
+      "domain": "platform",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Readiness operativa de una o más integraciones.",
+      "inputKeys": [
+        "keys"
+      ]
+    },
+    {
+      "name": "get_platform_health",
+      "domain": "platform",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Snapshot de salud de plataforma con safe modes y degradación honesta.",
+      "inputKeys": []
+    },
+    {
+      "name": "list_event_types",
+      "domain": "webhooks",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Tipos de evento del control plane de webhooks.",
+      "inputKeys": [
+        "aggregateType",
+        "namespace",
+        "search"
+      ]
+    },
+    {
+      "name": "list_webhook_subscriptions",
+      "domain": "webhooks",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Suscripciones del consumer y binding configurados.",
+      "inputKeys": [
+        "active",
+        "page",
+        "pageSize"
+      ]
+    },
+    {
+      "name": "get_webhook_subscription",
+      "domain": "webhooks",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Detalle de una suscripción por ID.",
+      "inputKeys": [
+        "id"
+      ]
+    },
+    {
+      "name": "list_webhook_deliveries",
+      "domain": "webhooks",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Entregas de webhook del consumer y binding configurados.",
+      "inputKeys": [
+        "eventType",
+        "page",
+        "pageSize",
+        "status"
+      ]
+    },
+    {
+      "name": "get_webhook_delivery",
+      "domain": "webhooks",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Detalle de una entrega por ID.",
+      "inputKeys": [
+        "id"
+      ]
+    },
+    {
+      "name": "search_knowledge",
+      "domain": "knowledge",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Busca el corpus gobernado y devuelve un paquete de citación con confianza declarada.",
+      "inputKeys": [
+        "limit",
+        "query"
+      ]
+    },
+    {
+      "name": "get_knowledge_document",
+      "domain": "knowledge",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Un documento publicado y agent-allowed, con sus secciones y anclas de cita.",
+      "inputKeys": [
+        "id"
+      ]
+    },
+    {
+      "name": "search_services",
+      "domain": "commercial",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Servicios vendibles disponibles para cotizar en el scope.",
+      "inputKeys": [
+        "limit",
+        "query"
+      ]
+    },
+    {
+      "name": "quote_price",
+      "domain": "commercial",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Estimación REFERENCIAL y no vinculante por SKU. No persiste nada.",
+      "inputKeys": [
+        "currency",
+        "serviceSku"
+      ]
+    },
+    {
+      "name": "get_seo_keyword_opportunities",
+      "domain": "seo",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Oportunidades striking-distance MEDIDAS por Search Console.",
+      "inputKeys": [
+        "limit",
+        "market",
+        "organizationId"
+      ]
+    },
+    {
+      "name": "get_seo_keyword_market_data",
+      "domain": "seo",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Dato de mercado ESTIMADO por keyword, de la captura mensual ya pagada.",
+      "inputKeys": [
+        "keywords",
+        "market",
+        "organizationId"
+      ]
+    },
+    {
+      "name": "get_seo_domain_overview",
+      "domain": "seo",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Foto de dominio y trayectoria mensual, del snapshot de mercado persistido.",
+      "inputKeys": [
+        "market",
+        "months",
+        "organizationId",
+        "subject"
+      ]
+    },
+    {
+      "name": "get_seo_url_visibility",
+      "domain": "seo",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Qué ranquea una URL, subcarpeta, subdominio o dominio en el snapshot de mercado.",
+      "inputKeys": [
+        "concentration",
+        "domain",
+        "kind",
+        "market",
+        "months",
+        "organizationId",
+        "subject"
+      ]
+    },
+    {
+      "name": "get_seo_backlink_detail",
+      "domain": "seo",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Detalle nominal de dominios referentes detrás del agregado semanal.",
+      "inputKeys": [
+        "captureDate",
+        "market",
+        "organizationId"
+      ]
+    },
+    {
+      "name": "get_seo_visibility_360",
+      "domain": "seo",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Cruce de los dos internets de búsqueda: rank medido vs citabilidad IA.",
+      "inputKeys": [
+        "market",
+        "organizationId"
+      ]
+    },
+    {
+      "name": "get_seo_dual_lens_visibility",
+      "domain": "seo",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Las dos series de posición SEPARADAS y etiquetadas: medida vs estimada.",
+      "inputKeys": [
+        "keywords",
+        "market",
+        "organizationId",
+        "rangeDays"
+      ]
+    },
+    {
+      "name": "get_seo_entitlement",
+      "domain": "seo",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Estado del entitlement del módulo SEO para una organización.",
+      "inputKeys": [
+        "organizationId"
+      ]
+    },
+    {
+      "name": "get_seo_rank_evolution",
+      "domain": "seo",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Serie temporal de posiciones exactas ya capturadas por el ciclo diario.",
+      "inputKeys": [
+        "device",
+        "engine",
+        "keywords",
+        "market",
+        "organizationId",
+        "rangeDays"
+      ]
+    },
+    {
+      "name": "get_seo_performance",
+      "domain": "seo",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Rendimiento en el tiempo de un conjunto elegido de keywords o URLs.",
+      "inputKeys": [
+        "device",
+        "engine",
+        "items",
+        "market",
+        "metric",
+        "mode",
+        "organizationId",
+        "rangeDays"
+      ]
+    },
+    {
+      "name": "get_seo_performance_catalog",
+      "domain": "seo",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Qué keywords o URLs se pueden comparar en el rendimiento.",
+      "inputKeys": [
+        "limit",
+        "market",
+        "mode",
+        "organizationId",
+        "windowDays"
+      ]
+    },
+    {
+      "name": "get_seo_overview_kpis",
+      "domain": "seo",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "KPIs norte del cockpit SEO, desde dato MEDIDO de Search Console.",
+      "inputKeys": [
+        "market",
+        "organizationId",
+        "rangeDays"
+      ]
+    },
+    {
+      "name": "get_seo_site_audit_report",
+      "domain": "seo",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Reporte del audit técnico ya ejecutado: salud y hallazgos por severidad.",
+      "inputKeys": [
+        "auditRunId",
+        "market",
+        "organizationId"
+      ]
+    },
+    {
+      "name": "get_seo_backlink_profile",
+      "domain": "seo",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Serie semanal del perfil de enlaces desde el snapshot persistido.",
+      "inputKeys": [
+        "market",
+        "organizationId",
+        "rangeDays"
+      ]
+    },
+    {
+      "name": "track_seo_keywords",
+      "domain": "seo",
+      "writes": true,
+      "spendsProviderBudget": true,
+      "purpose": "Suma keywords al set monitoreado. Compromete gasto RECURRENTE hasta que se retiren.",
+      "inputKeys": [
+        "intent",
+        "intentDeclaredBy",
+        "keywords",
+        "organizationId"
+      ]
+    },
+    {
+      "name": "untrack_seo_keywords",
+      "domain": "seo",
+      "writes": true,
+      "spendsProviderBudget": false,
+      "purpose": "Cierra la ventana de seguimiento y corta el gasto. No borra historia.",
+      "inputKeys": [
+        "keywords",
+        "organizationId"
+      ]
+    },
+    {
+      "name": "declare_seo_competitors",
+      "domain": "seo",
+      "writes": true,
+      "spendsProviderBudget": true,
+      "purpose": "Declara competidores con autoría humana. Compromete gasto RECURRENTE de cobertura.",
+      "inputKeys": [
+        "domains",
+        "organizationId",
+        "proposalRef"
+      ]
+    },
+    {
+      "name": "retire_seo_competitors",
+      "domain": "seo",
+      "writes": true,
+      "spendsProviderBudget": false,
+      "purpose": "Retira competidores declarados y corta el gasto del próximo ciclo.",
+      "inputKeys": [
+        "domains",
+        "organizationId",
+        "reason"
+      ]
+    },
+    {
+      "name": "get_seo_keyword_gap",
+      "domain": "seo",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Gap competitivo derivado al leer. No tiene orden propio.",
+      "inputKeys": [
+        "limit",
+        "market",
+        "organizationId",
+        "seoCompetitorId"
+      ]
+    },
+    {
+      "name": "get_seo_work_queue",
+      "domain": "seo",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "La cola priorizada: única autoridad de orden del módulo. Propone, no ejecuta.",
+      "inputKeys": [
+        "cursor",
+        "limit",
+        "market",
+        "organizationId",
+        "origin"
+      ]
+    },
+    {
+      "name": "get_seo_serp_top_results",
+      "domain": "seo",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Top-N del SERP ya persistido por la captura diaria. Costo marginal cero.",
+      "inputKeys": [
+        "from",
+        "keyword",
+        "limit",
+        "market",
+        "organizationId",
+        "to"
+      ]
+    },
+    {
+      "name": "get_seo_competitor_candidates",
+      "domain": "seo",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "La mitad PROPOSE del loop de competidores: candidatos por recurrencia medida.",
+      "inputKeys": [
+        "market",
+        "minDays",
+        "minKeywords",
+        "organizationId",
+        "windowDays"
+      ]
+    },
+    {
+      "name": "get_seo_keyword_discovery",
+      "domain": "seo",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Corridas de discovery y sus candidatos. Un candidato no es una keyword seguida.",
+      "inputKeys": [
+        "cursor",
+        "excludeTracked",
+        "includeUnknownBarrier",
+        "intent",
+        "limit",
+        "market",
+        "maxDifficulty",
+        "maxLinkBarrier",
+        "minSearchVolume",
+        "organizationId",
+        "query",
+        "runId",
+        "sourceEndpoint",
+        "status"
+      ]
+    },
+    {
+      "name": "discover_seo_keywords",
+      "domain": "seo",
+      "writes": true,
+      "spendsProviderBudget": true,
+      "purpose": "Encola una corrida de discovery. Gasta por llamada y por fila devuelta.",
+      "inputKeys": [
+        "idempotencyKey",
+        "manualSeeds",
+        "market",
+        "methods",
+        "mixedMeasuredSource",
+        "organizationId",
+        "preview",
+        "seedSource"
+      ]
+    },
+    {
+      "name": "get_seo_grounded_query_draft",
+      "domain": "seo",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Lee un BORRADOR de prompts AEO con su procedencia.",
+      "inputKeys": [
+        "market",
+        "organizationId",
+        "profileId",
+        "setId"
+      ]
+    },
+    {
+      "name": "prepare_seo_grounded_queries",
+      "domain": "seo",
+      "writes": true,
+      "spendsProviderBudget": false,
+      "purpose": "Crea un BORRADOR de prompts AEO. Nunca aprueba, activa ni corre el grader.",
+      "inputKeys": [
+        "candidateIds",
+        "discoveryRunId",
+        "market",
+        "organizationId",
+        "profileId",
+        "seoTargetId"
+      ]
+    },
+    {
+      "name": "get_seo_prospect_diagnostic",
+      "domain": "seo",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Lee diagnósticos de prospecto ya ejecutados.",
+      "inputKeys": [
+        "diagnosticId",
+        "limit",
+        "rootDomain"
+      ]
+    },
+    {
+      "name": "run_seo_prospect_diagnostic",
+      "domain": "seo",
+      "writes": true,
+      "spendsProviderBudget": true,
+      "purpose": "Corre un diagnóstico one-shot de un dominio prospecto. Gasta dinero real por corrida.",
+      "inputKeys": [
+        "competitorDomains",
+        "market",
+        "rootDomain"
+      ]
+    }
+  ]
+}
