@@ -118,7 +118,7 @@ La «Evidencia de cierre» del Slice 3 sigue debiendo usar el caso sintético de
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `none`
-- Status real: `En ejecucion — Slice 0 (recalibracion) en curso`
+- Status real: `code complete en Greenhouse (Slices 0-2 + artefacto y gate). Slice 3 implementado y verde en efeonce-mcp (73/73 + build) pero SIN commitear: el repo hermano tiene auto-deploy productivo y CLAUDE.md exige decision explicita del operador`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -424,20 +424,48 @@ toca Entra, ni Cloud Run, ni secretos.
 
 ## Acceptance Criteria
 
-- [ ] Existe un manifiesto declarativo con una entrada por tool registrada, y `server.ts` registra recorriéndolo.
-- [ ] Registrar una tool sin entrada en el manifiesto rompe el build.
-- [ ] Cada entrada declara `writes` y `spendsProviderBudget` como banderas separadas.
-- [ ] El manifiesto NO tiene campo de federación: qué cruza al público sigue siendo autoridad del gateway.
-- [ ] El `name` y las `instructions` se construyen desde el manifiesto y declaran las **siete** escrituras y las cuatro que gastan presupuesto del proveedor.
-- [ ] Las instructions conservan las afirmaciones verdaderas: downstream del lane, scope externo fijo, request id preservados, sin inferencia de tenancy.
-- [ ] El guardia del gateway compara contra el manifiesto y ya no contra una lista espejo.
-- [ ] 🔴 El poder de detección del guardia queda **ejercitado**, no afirmado: (a) la regresión sintética se pone roja nombrando la tool cuando una entrada del manifiesto no está ni federada ni excluida; (b) corrido contra el estado real, nombra `get_seo_provider_spend` como federada sin contraparte interna, o la declara con su clase. Sin una de las dos, la task no está hecha. (El criterio original —«detecta las tres tools invisibles»— murió cuando `TASK-1658` las federó: ver Delta 2026-08-31.)
-- [ ] El manifiesto cubre las **43** tools registradas, no sólo las SEO: las 15 no-SEO dejan de ser un punto ciego del censo.
-- [ ] El cruce manifiesto ↔ `SEO_LENS_SURFACES` (`TASK-1785`) falla en las dos direcciones, para que el manifiesto no nazca como tercera lista.
-- [ ] `GREENHOUSE_SEO_WRITE_TOOLS` derivado (`writes || spendsProviderBudget`) es **exactamente** el conjunto de 7 de hoy: el gate de scope del gateway no cambia de comportamiento.
-- [ ] El allowlist del gateway sobrevive con su razón por entrada, y la revisión humana por tool se conserva.
-- [ ] El manual ya no se contradice entre sus líneas 205 y 290, y su nombre no afirma read-only.
-- [ ] Ninguna tool cambió de nombre, schema, comportamiento ni estado de federación.
+- [x] Existe un manifiesto declarativo con una entrada por tool registrada, y `server.ts` registra recorriéndolo.
+- [x] Registrar una tool sin entrada en el manifiesto rompe el build.
+- [x] Cada entrada declara `writes` y `spendsProviderBudget` como banderas separadas.
+- [x] El manifiesto NO tiene campo de federación: qué cruza al público sigue siendo autoridad del gateway.
+- [x] El `name` y las `instructions` se construyen desde el manifiesto y declaran las **siete** escrituras y las cuatro que gastan presupuesto del proveedor.
+- [x] Las instructions conservan las afirmaciones verdaderas: downstream del lane, scope externo fijo, request id preservados, sin inferencia de tenancy.
+- [~] El guardia del gateway compara contra el manifiesto y ya no contra una lista espejo. **Implementado y verde localmente (73/73 + `pnpm check`), SIN commitear** — pendiente de autorización cross-repo.
+- [x] 🔴 El poder de detección del guardia queda **ejercitado**, no afirmado: (a) la regresión sintética se pone roja nombrando la tool cuando una entrada del manifiesto no está ni federada ni excluida; (b) corrido contra el estado real, nombra `get_seo_provider_spend` como federada sin contraparte interna, o la declara con su clase. Sin una de las dos, la task no está hecha. (El criterio original —«detecta las tres tools invisibles»— murió cuando `TASK-1658` las federó: ver Delta 2026-08-31.)
+- [x] El manifiesto cubre las **43** tools registradas, no sólo las SEO: las 15 no-SEO dejan de ser un punto ciego del censo.
+- [x] El cruce manifiesto ↔ `SEO_LENS_SURFACES` (`TASK-1785`) falla en las dos direcciones, para que el manifiesto no nazca como tercera lista.
+- [x] `GREENHOUSE_SEO_WRITE_TOOLS` derivado (`writes || spendsProviderBudget`) es **exactamente** el conjunto de 7 de hoy: el gate de scope del gateway no cambia de comportamiento.
+- [x] El allowlist del gateway sobrevive con su razón por entrada, y la revisión humana por tool se conserva.
+- [x] El manual ya no se contradice entre sus líneas 205 y 290, y su nombre no afirma read-only.
+- [x] Ninguna tool cambió de nombre, schema, comportamiento ni estado de federación.
+
+## Evidencia de ejecución (2026-08-31)
+
+**Deriva probada, no afirmada.** Snapshot del registro interno del SDK (`_registeredTools`) antes y
+después del refactor de `server.ts`: **idéntico byte a byte** — 43 tools, mismo orden, mismos
+`title`, `description`, `inputKeys` y `annotations`. Es la prueba del criterio «ninguna tool cambió».
+
+**El guard atrapó su primer caso real durante su propia implementación:** faltó
+`get_seo_grounded_query_draft` en el manifiesto y el servidor no construyó, nombrándola.
+
+**El artefacto reproduce el espejo a mano, tool por tool.** Comparación del artefacto generado
+contra `GREENHOUSE_SEO_TOOL_INVENTORY`: para las 28 tools SEO coinciden **exactamente** la clase de
+escritura y los `inputKeys`. Única divergencia, la esperada: `get_seo_provider_spend`, federada sin
+contraparte interna. Eso es lo que hace del reemplazo un cambio sin efecto de comportamiento.
+
+**Poder de detección ejercitado contra el estado REAL** (no sólo sintético): corriendo el guard con
+el inventario derivado y **sin** la declaración `GREENHOUSE_GATEWAY_NATIVE_TOOLS`, emite exactamente
+un finding —`expected_unknown_tool → get_seo_provider_spend`— con el mensaje que nombra la
+corrección. Con la declaración puesta, cero findings. Antes de esta task esa ausencia era
+estructuralmente invisible.
+
+**Gates.** Greenhouse: `pnpm test` completo **12.919 passed / 0 failed**; `pnpm mcp:manifest:check`
+verde; lint y `tsc` sin hallazgos en los archivos de esta task. Gateway: `pnpm check` completo
+(format + typecheck + **73/73 tests** + build) verde.
+
+⚠️ **Lint y `tsc` rotos ajenos en el árbol** (otra sesión, sin relación con esta task):
+657 errores de lint en `scripts/public-website/**` y `scripts/growth/**`, y un error de `tsc` en
+`tmp/inspect-hubspot-forms.ts`.
 
 ## Verification
 

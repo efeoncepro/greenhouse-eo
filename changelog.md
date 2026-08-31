@@ -7,6 +7,25 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-31 — TASK-1780: el inventario de tools MCP pasa a ser un manifiesto
+
+`src/mcp/greenhouse/tool-manifest.ts` es la fuente única del catálogo de tools MCP. `server.ts`
+registra recorriéndolo —definir una tool sin entrada rompe la construcción del servidor— y el `name`
+y las `instructions` que el cliente MCP lee se derivan de él, así que el servidor ya no puede
+anunciarse `greenhouse-read-only` mientras registra siete escrituras. Dos banderas ortogonales por
+tool: `writes` y `spendsProviderBudget`.
+
+El manual se renombró a `mcp-greenhouse-tool-inventory.md` y se corrigieron sus tres cifras en
+conflicto. Nuevo gate `pnpm mcp:manifest:check` en `ci.yml` sobre el artefacto generado que el
+gateway consumirá.
+
+Cambio de comportamiento verificado como nulo: el registro del SDK antes y después es idéntico byte a
+byte (43 tools, mismo orden y schemas), y el artefacto reproduce el espejo del gateway tool por tool.
+
+La mitad del gateway (`efeonce-mcp`) está implementada y verde localmente pero **sin commitear**:
+requiere decisión del operador por auto-deploy productivo. La task queda `code complete, rollout
+pendiente`.
+
 ## 2026-08-31 — Content Marketing: diseño aprobado publicado en Elementor
 
 Versionado local del runtime: `73493a8`; cambios Greenhouse acompañados en este cierre, sin push.
@@ -17,6 +36,13 @@ pendientes. Se precisan rollback, empaquetado, orden visible del menú y riesgo 
 Sin cambio de código ni nueva publicación durante esta revisión.
 
 Menú verificado: **Soluciones → Crecimiento Multicanal → Content Marketing**, item `242917`, sin duplicados ni cambio de orden.
+[Revisión editorial de ambas secciones](docs/audits/public-site/2026-08-31-content-marketing-editorial-copy.md): 118 campos publicados, siete pasos coherentes; diseño/SEO/shell intactos.
+[Segundo pase editorial](docs/audits/public-site/2026-08-31-content-marketing-hub-review-copy.md): hub y revisión creativa, 83 campos publicados; tres cortes y fichas de campaña revisados.
+[CMS y modos](docs/audits/public-site/2026-08-31-content-marketing-cms-modes.md): 53 textos y cuatro logos oficiales publicados; ocho controles nuevos, diseño general y SEO conservados.
+[Ecosistema y FAQ](docs/audits/public-site/2026-08-31-content-marketing-ecosystem-faq.md): 37 textos y seis URL publicados; tarjetas completas y ocho FAQ, sin cambios de diseño/SEO.
+[Marca en modalidades](docs/audits/public-site/2026-08-31-content-marketing-mode-logo.md): dos logos ampliados con CSS acotado, sin cambiar contenido ni SEO.
+[Indexabilidad del menú](docs/audits/public-site/2026-08-31-menu-indexability.md): 18/18 páginas habilitadas; sólo Redes Sociales requería quitar noindex. Canonical/sitemap verificados; indexación GSC no afirmada.
+[Cierre, caso interno y formulario](docs/audits/public-site/2026-08-31-content-marketing-business-conversion.md): 48 textos Elementor y copy de form v3 publicados; correo copiado coincide con lo visible, sin cambiar destino ni enviar leads.
 
 Trece widgets editables conservan composición, assets e interacciones de Content Ops; header/footer Ohio
 nativos. Captura canónica de dos pasos, select preseleccionado corregido, Yoast/meta/social/Service y URL
@@ -58,6 +84,11 @@ teclado, reduced motion, rechazo de captcha y guardado nativo de Elementor. Sin 
 [Audit](docs/audits/public-site/2026-08-30-hubspot-elementor-publication.md).
 
 ## 2026-08-30 — TASK-1358: Home modular Elementor promovida con respaldo
+
+Revisión SEO/AEO: título/descripción y OG/Twitter propios en Yoast, dos Media HTTP → HTTPS;
+grafo existente conservado sin duplicaciones. [Audit y límites](docs/audits/public-site/2026-08-30-home-seo-aeo.md).
+Aprendizajes consolidados en skills SEO/AEO y WordPress, espejadas Codex/Claude: metadatos sin forzar H1,
+dueño único de grafo, retiro de FAQ rich results, alcance llms.txt y pruebas CMS/HTML/GSC diferenciadas.
 
 Por instrucción posterior del operador, la página `251731` ya sirve `/`: menu Home y SEO/canonical/index
 actualizados, diseño/copy/header/footer intactos; antigua Home `2791` conservada noindex. Snapshot
@@ -1017,20 +1048,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
 - Y una deuda que se declara en vez de esconderse: el monitor de equidad medía su cubo terminal en una etapa
   que dejó de existir. En vez de devolver cero —que en una métrica de equidad se lee como «no hay impacto
   adverso»— ahora falla ruidoso, y no se prende hasta que se le apunte al eje correcto.
-
-## 2026-08-23 — El dominio de Hiring reparado llegó a producción, y el reloj de retención con él
-
-- Las cuatro correcciones del día estaban `code complete, rollout pendiente`: el eje de desenlace, el colapso de
-  trece etapas a seis, el filtro de procedencia del Banco de Talento y el callejón del ledger de asignación de
-  pruebas. Ninguna servía de nada mientras producción siguiera corriendo el código anterior. Ahora corren.
-- Viajó dentro el fix de una regresión con implicación legal: el reloj de retención de la Ley 21.719 no
-  arrancaba para `not_selected`, la población más grande del pipeline. No estaba viva porque producción todavía
-  no podía escribir ese desenlace — **se habría vuelto viva en el mismo instante en que este release lo
-  habilitó**. Por eso no podía quedar para el siguiente.
-- Quedan tres migraciones escritas y revisadas que **no** viajaron: viven fuera de `migrations/` a propósito,
-  porque una migración committeada y sin aplicar bloquea a cualquiera que corra `migrate:up`, incluido quien
-  esté reparando un incidente. Corren después del release, en cadena, y cada una espera que el código del
-  eslabón anterior esté desplegado.
-- La lección que ordena esa cadena, y que ya costó un incidente: **«cero filas» no es «nadie lo escribe»**. Lo
-  que decide si un valor es alcanzable es el contrato de la superficie desplegada, nunca el contenido de la
-  tabla.

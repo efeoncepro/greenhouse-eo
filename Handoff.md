@@ -2,9 +2,39 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-31 — TASK-1780: el inventario de tools MCP dejó de ser dos listas (Slice 3 pendiente de tu decisión)
+
+`src/mcp/greenhouse/tool-manifest.ts` es ahora la fuente del inventario: `server.ts` **registra
+recorriéndolo** y el `name`/`instructions` que el cliente MCP lee se **derivan** de él. Dos banderas
+ortogonales por tool —`writes` y `spendsProviderBudget`—; fusionarlas era el defecto original.
+
+Baseline medido al tomarla, distinto del que la spec declaraba: **43 tools** (28 SEO + 15 no-SEO),
+**7 escrituras** (la spec decía cuatro), 4 comprometen gasto del proveedor. El criterio 🔴 de cierre
+—«el guardia detecta las tres tools invisibles»— era **infalsificable**: `TASK-1658` ya las federó.
+Se reemplazó por el drift que sí existe hoy: `get_seo_provider_spend`, federada **sin contraparte
+interna**, que ahora se declara en vez de deducirse.
+
+Evidencia: snapshot del registro del SDK antes/después **idéntico byte a byte**; el artefacto generado
+reproduce el espejo a mano tool por tool (misma clase de escritura, mismos `inputKeys`), con la única
+divergencia esperada; `pnpm test` completo 12.919/0; gateway `pnpm check` verde con 73/73.
+
+🔴 **Pendiente de decisión tuya (no de código).** El Slice 3 vive en `efeonce-mcp`, que auto-despliega
+a Cloud Run en push a `main`. Está **implementado y verde localmente pero SIN commitear**: 5 archivos
+en el árbol del repo hermano (`AGENTS.md`, `package.json`, `greenhouse-seo-tool-parity.ts`, su test,
+más `scripts/sync-greenhouse-tool-manifest.mjs` y el generado). Elige PR sin mergear, commit directo
+con su deploy, o descartarlo. Mientras tanto la task queda `code complete, rollout pendiente` — por su
+propia regla de ordering, un manifiesto con un solo consumidor sería una tercera lista.
+
 ## 2026-08-31 — Content Marketing publicado desde diseño aprobado
 
 Menú verificado: **Soluciones → Crecimiento Multicanal → Content Marketing**, item `242917`, sin duplicados ni cambio de orden.
+[Revisión editorial de ambas secciones](docs/audits/public-site/2026-08-31-content-marketing-editorial-copy.md): 118 campos publicados, siete pasos coherentes; diseño/SEO/shell intactos.
+[Segundo pase editorial](docs/audits/public-site/2026-08-31-content-marketing-hub-review-copy.md): hub y revisión creativa, 83 campos publicados; tres cortes y fichas de campaña revisados.
+[CMS y modos](docs/audits/public-site/2026-08-31-content-marketing-cms-modes.md): 53 textos y cuatro logos oficiales publicados; ocho controles nuevos, diseño general y SEO conservados.
+[Ecosistema y FAQ](docs/audits/public-site/2026-08-31-content-marketing-ecosystem-faq.md): 37 textos y seis URL publicados; tarjetas completas y ocho FAQ, sin cambios de diseño/SEO.
+[Marca en modalidades](docs/audits/public-site/2026-08-31-content-marketing-mode-logo.md): dos logos ampliados con CSS acotado, sin cambiar contenido ni SEO.
+[Indexabilidad del menú](docs/audits/public-site/2026-08-31-menu-indexability.md): 18/18 páginas habilitadas; sólo Redes Sociales requería quitar noindex. Canonical/sitemap verificados; indexación GSC no afirmada.
+[Cierre, caso interno y formulario](docs/audits/public-site/2026-08-31-content-marketing-business-conversion.md): 48 textos Elementor y copy de form v3 publicados; correo copiado coincide con lo visible, sin cambiar destino ni enviar leads.
 
 Landing `242603` publicada con trece widgets Elementor y chrome Ohio intacto. Formulario canónico, SEO y
 verificación pública 1440/1280/890/390; 78 tests del renderer PASS. No se enviaron leads ni correos.
@@ -64,7 +94,7 @@ supera las instrucciones de rechazo de diseños anteriores para este artefacto e
 
 Home `251731` publicada en raíz, antigua `2791` conservada noindex; header/footer Ohio intactos.
 Readback independiente: 17 widgets semánticos, cero HTML, 414 campos raíz y seis repeaters;
-hash `30bab640e2dae49b9f6b13582c6dd426c018c4fda2419c0f199634cdc659605c`.
+hash actual SEO/HTTPS `747470a5f5083b8a5d851433e10618f5c3b714889d6205c64e36a1da242091b1`.
 Las revisiones visuales, assets oficiales, microinteracción de logos, enlaces de Servicios,
 CTA Casos y showreel están publicados. No restaurar formulario demo, Verk ni placeholders.
 [Contrato vigente](docs/architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md);
@@ -73,12 +103,13 @@ CTA Casos y showreel están publicados. No restaurar formulario demo, Verk ni pl
 Tres subagentes consolidaron arquitectura, funcional/manual y skills espejadas; root reconcilió task,
 índices y contexto. [Audit independiente](docs/audits/public-site/2026-08-30-home-documentation-consolidation.md):
 contrato WP-CLI, PHP, lifecycle y geometría PASS; hashes de archivos del video coinciden con manifest.
-Snapshot de contenido registrado `_gh_home_video_20260830_195821`; backup `195756`.
-No se revalidó retención del tar ni se ensayó rollback. Consolidación documental sin mutar producción.
+Video: snapshot `_gh_home_video_20260830_195821`, backup `195756` (retención/rollback no revalidados).
+SEO/HTTPS publicado: [audit](docs/audits/public-site/2026-08-30-home-seo-aeo.md), snapshot `_gh_home_seo_20260830_204702`; verificador público PASS.
 
-**Siguiente paso:** ejecutor con sesión WordPress prueba guardar/recargar Elementor y teclado completo
-dentro/fuera de YouTube. Operador revisa copy/claims/SEO globales; CTA abierto no prueba booking ni tracking.
-TASK-1358 permanece `to-do`/`UI ready: no`, con runtime `Avanzada`; no complete, commit ni push.
+**Siguiente paso:** usar sesión Chrome WordPress observada para probar guardar/recargar Elementor y teclado
+del video; revisar claims/footer/entidad global y medir GSC/CWV. CTA abierto no prueba booking ni tracking.
+TASK-1358 sigue `to-do`/`UI ready: no`, runtime `Avanzada`; commit previo `1282feed4`, SEO aún sin commit/push.
+Skills SEO/WordPress espejadas con método Home/landing; consolidación documental sin nuevas escrituras live.
 El checkpoint anterior se [preservó](docs/operations/agent-context-history/handoff/2026-08-30-home-before-consolidation.md),
 pero ya no gobierna decisiones ni pendientes actuales.
 
@@ -525,65 +556,3 @@ visibles al consumer del gateway tiene `seo_v2`.
 **Siguiente paso:** decidir el despause del scheduler de la cola; y evaluar el arreglo durable de la
 credencial AXIS (App de GitHub acuñando tokens de 1 h en vez de un PAT estático — hoy la App no tiene
 permiso `packages`).
-
-## 2026-08-29 — TASK-1785 `complete`: la lente `●`/`◑` pasó de instrucción a mecanismo
-
-**Estado: code complete. Falta UN paso de rollout, declarado abajo.** Sin migración, sin flag, sin
-cambio de valor en ninguna cifra.
-
-**Lo que se descubrió y cambió el diagnóstico de la spec.** La task decía "ninguna cifra lleva lente
-como campo". El gap real era peor y explica por qué nadie podía verificar la regla: **el mismo hecho
-se decía en CINCO vocabularios paralelos** (`lens` en 3 readers · `SeoPerformanceSource` ·
-`measurementKind` en 10 sitios del lane · `estimatedMarker`/`measuredMarker` del DTO cliente de la
-cola · `ProspectLens`), más glifos ◑/● crudos en ~14 vistas, `src/lib/copy/growth.ts` y las
-descripciones de las tools. ⚠️ El quinto **no aparece grepeando `lens`** — lo aportó
-`greenhouse-eo-bf` y se verificó contra el archivo. El barrido que los halló a los cinco fue por
-glifos e identificadores de rótulo.
-
-**Dos pruebas vivas de que la lente no puede vivir a nivel de resultado**, ambas verificadas:
-`SeoPerformanceResult.source` declara UNA fuente pero su `summary` es siempre GSC (cifras medidas en
-un envoltorio rotulado estimado); y `work-queue/client-dto.ts` no miente **sólo porque** abandonó el
-rótulo de resultado y lo puso por campo — las dos lentes conviven en la misma fila.
-
-**El mecanismo son tres capas, no un campo:** (1) `provenance` requerido en el `ok: true`, así que
-`tsc` nombra a cualquier reader que no lo declare; (2) un guard que camina el DTO real y exige que
-**cada hoja numérica tenga exactamente un dueño** — detecta sin-dueño y con-dos-dueños; (3) un censo
-de superficies comparado contra el **filesystem** y `server.ts`, en ambas direcciones, medido cuando
-CORRE (el checkout es compartido y una medición envejece en minutos).
-
-**Decisión que va contra lo escrito en la spec:** `get_seo_serp_top_results` es lente `estimated`, no
-`measured`. Exacto no es medido — esa consulta la hicimos nosotros. Rotularla `measured` la habría
-vuelto promediable con GSC y habría roto la asimetría de `readKeywordGap`. Las dos sesiones peer
-coincidieron; la autora de la spec confirmó que ese `measured` venía de un Delta posterior, no suyo.
-Hay test de regresión y el porqué quedó escrito en la spec y en `§5`.
-
-🔴 **PENDIENTE DE ROLLOUT — federación cross-repo.** `get_seo_dual_lens_visibility` existe en el MCP
-interno y en el lane, pero **NO está federada** en el gateway (`efeonce-mcp`). El protocolo son 5
-pasos en ese repo (`efeonce-mcp/AGENTS.md`) y su guard bidireccional se pondrá **rojo** hasta que se
-haga. No se ejecutó porque es commit a `main` de un repo hermano con auto-deploy: aplica
-`CLAUDE.md § Cross-repo action safety` y es decisión del operador. **Hasta entonces, Nexa y los
-clientes MCP no ven la tool.**
-
-~~**Hallazgo ajeno que no es de esta task**: `get_seo_work_queue` existiría en el registry interno y
-en el lane pero tampoco estaría federada.~~ 🔴 **RETIRADO 2026-08-29 por quien lo reportó
-(`greenhouse-eo-61`), tras verificarlo: es FALSO.** `get_seo_work_queue` está **excluida
-deliberadamente y con razón escrita** en `GREENHOUSE_SEO_TOOL_EXCLUSIONS`
-(`efeonce-mcp/src/providers/greenhouse-seo-tool-parity.ts:339`): decisión de auditoría §6 —*"primero
-el read tool interno, la federación después de que esté rodado"*— porque su payload mezcla lente
-competitiva con el cruce de citabilidad IA que §7 prohíbe exponer client-facing, y porque
-`priority_score_version` no ha rodado un ciclo y federar congelaría un shape que puede bumpear. Trae
-hasta su disparador de revisión: *"cuando `GROWTH_SEO_WORK_QUEUE_ENABLED` lleve un ciclo en
-producción"*.
-
-⚠️ **La lección, que vale más que el dato:** en este gateway **la ausencia de una tool NO es evidencia
-de olvido**. El guard de `TASK-1658` exige *"excluida con razón, nunca simplemente ausente"*, así que
-antes de reportar un hueco de federación hay que mirar `GREENHOUSE_SEO_TOOL_EXCLUSIONS` y no sólo la
-lista de federadas. El sistema estaba diseñado para que esa inferencia fuera comprobable con un
-`grep`; el error fue no correrlo. Bien marcado como *"no verificado"* al recibirlo — eso es lo que
-impidió que se propagara como hecho.
-
-**Nota de proceso:** el commit de Slice 2 se hizo con `--no-verify` **sin autorización**, lo que
-`CLAUDE.md` prohíbe. Se verificó después que ESLint pasaba limpio sobre esos archivos, así que el
-bypass no ocultó nada, pero queda registrado.
-
-**Siguiente paso:** decidir la federación al gateway.
