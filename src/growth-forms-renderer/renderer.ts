@@ -464,6 +464,20 @@ export class FormRenderer {
     const shell = el(this.doc, 'div', { class: 'ghf-progress-shell' })
     const currentLabel = steps[this.currentStep]?.label?.trim()
 
+    if (this.contract.styleVariant === 'hubspot_pillar') {
+      const heading = el(this.doc, 'div', { class: 'ghf-pillar-step-heading' })
+
+      heading.appendChild(el(this.doc, 'span', { class: 'ghf-pillar-step-title' }, currentLabel ?? ''))
+      heading.appendChild(el(this.doc, 'span', { class: 'ghf-progress', 'aria-live': 'polite', tabindex: '-1' }, this.copy.stepProgress(this.currentStep + 1, steps.length)))
+      shell.appendChild(heading)
+      const track = el(this.doc, 'div', { class: 'ghf-pillar-step-track', 'aria-hidden': 'true' })
+
+      steps.forEach((_, index) => track.appendChild(el(this.doc, 'span', { 'data-state': index < this.currentStep ? 'done' : index === this.currentStep ? 'current' : 'upcoming' })))
+      shell.appendChild(track)
+
+      return shell
+    }
+
     const progress = el(
       this.doc,
       'p',
@@ -619,7 +633,7 @@ export class FormRenderer {
       checkWrap.appendChild(control)
       checkWrap.appendChild(el(this.doc, 'span', {}, label))
       wrap.appendChild(checkWrap)
-    } else if (control.classList.contains('ghf-tag-input')) {
+    } else if (control.classList.contains('ghf-choice-group') || control.classList.contains('ghf-tag-input')) {
       wrap.appendChild(control)
     } else if (field.type === 'select' || field.type === 'multiselect') {
       const hasLeadingIcon = this.shouldRenderControlIcon(field)
@@ -736,6 +750,10 @@ export class FormRenderer {
 
     const current = this.values[field.key]
 
+    if (this.contract.styleVariant === 'hubspot_pillar' && ['radio', 'select', 'multiselect'].includes(field.type)) {
+      return this.renderChoiceGroup(field, fieldId, required, describedBy)
+    }
+
     switch (field.type) {
       case 'textarea': {
         const ta = el(this.doc, 'textarea', { ...common, class: 'ghf-textarea' })
@@ -819,6 +837,48 @@ export class FormRenderer {
         return input
       }
     }
+  }
+
+  /** Contract-owned choices: native inputs keep keyboard, validation and preserved step state. */
+  private renderChoiceGroup(field: RendererFieldDefinition, fieldId: string, required: boolean, describedBy: string): HTMLElement {
+    const multiple = field.type === 'multiselect'
+
+    const group = el(this.doc, 'div', {
+      id: fieldId,
+      class: `ghf-choice-group${field.type === 'radio' ? ' ghf-choice-group--cards' : ''}`,
+      role: multiple ? 'group' : 'radiogroup',
+      'aria-label': this.fieldLabel(field),
+      tabindex: '-1'
+    })
+
+    if (required && !multiple) group.setAttribute('aria-required', 'true')
+    if (describedBy) group.setAttribute('aria-describedby', describedBy)
+    if (this.errors[field.key]) group.setAttribute('aria-invalid', 'true')
+    const selected = this.values[field.key]
+
+    for (const [index, option] of (field.options ?? []).entries()) {
+      const label = el(this.doc, 'label', { class: 'ghf-choice' })
+      const input = el(this.doc, 'input', { id: `${fieldId}-${index}`, name: field.key, type: multiple ? 'checkbox' : 'radio', value: option.value })
+
+      input.checked = multiple ? Array.isArray(selected) && selected.includes(option.value) : selected === option.value
+      input.addEventListener('change', () => {
+        if (multiple) {
+          const values = Array.isArray(this.values[field.key]) ? this.values[field.key] as string[] : []
+
+          this.values[field.key] = input.checked ? [...new Set([...values, option.value])] : values.filter(value => value !== option.value)
+        } else {
+          this.values[field.key] = option.value
+        }
+
+        this.touched.add(field.key)
+        this.onValueChange(field)
+      })
+      label.appendChild(input)
+      label.appendChild(el(this.doc, 'span', {}, option.label ?? option.value))
+      group.appendChild(label)
+    }
+
+    return group
   }
 
   private usesPremiumSelect(): boolean {
@@ -2453,6 +2513,7 @@ export class FormRenderer {
     if (!this.isLastStep()) {
       this.currentStep += 1
       this.errors = {}
+      this.submitAttempted = false
       this.renderForm()
       this.focusStepHeading()
 

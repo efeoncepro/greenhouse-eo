@@ -1,0 +1,139 @@
+{
+  "browser": {
+    "status": "PASS",
+    "mode": "live",
+    "states": [
+      {
+        "width": 1414,
+        "module": "licensing",
+        "pass": true
+      },
+      {
+        "width": 1414,
+        "module": "proof-ledger",
+        "pass": true
+      },
+      {
+        "width": 1414,
+        "module": "conversion",
+        "pass": true
+      },
+      {
+        "width": 1414,
+        "module": "assessment",
+        "pass": true
+      },
+      {
+        "width": 878,
+        "module": "licensing",
+        "pass": true
+      },
+      {
+        "width": 878,
+        "module": "proof-ledger",
+        "pass": true
+      },
+      {
+        "width": 878,
+        "module": "conversion",
+        "pass": true
+      },
+      {
+        "width": 878,
+        "module": "assessment",
+        "pass": true
+      },
+      {
+        "width": 390,
+        "module": "licensing",
+        "pass": true
+      },
+      {
+        "width": 390,
+        "module": "proof-ledger",
+        "pass": true
+      },
+      {
+        "width": 390,
+        "module": "conversion",
+        "pass": true
+      },
+      {
+        "width": 390,
+        "module": "assessment",
+        "pass": true
+      }
+    ],
+    "errors": [],
+    "copyFields": 49,
+    "checkedAt": "2026-08-31T11:22:45.276Z",
+    "faq": true,
+    "keyboard": true,
+    "formUntouched": true,
+    "metadataUntouched": true
+  },
+  "native": {
+    "status": "PASS",
+    "hash": "be2dad7df7a986d037ce809c2150b05ffa33d92f4c3936f92c8b3ce5711bd1db",
+    "exactScopedTree": true,
+    "schemaFiles": 5,
+    "changedTextFields": 51
+  },
+  "seo": {
+    "status": "PASS",
+    "httpRedirect": "301 HTTPS, page-only, query parameters preserved",
+    "checkedAt": "2026-08-31T11:22:11.887Z",
+    "redirects": [
+      {
+        "url": "http://efeoncepro.com/servicios-contratar-hubspot/",
+        "status": 301,
+        "location": "https://efeoncepro.com/servicios-contratar-hubspot/"
+      },
+      {
+        "url": "http://efeoncepro.com/servicios-contratar-hubspot/?utm_source=qa",
+        "status": 301,
+        "location": "https://efeoncepro.com/servicios-contratar-hubspot/?utm_source=qa"
+      },
+      {
+        "url": "https://www.efeoncepro.com/servicios-contratar-hubspot/",
+        "status": 301,
+        "location": "https://efeoncepro.com/servicios-contratar-hubspot/"
+      },
+      {
+        "url": "https://efeoncepro.com/servicios-contratar-hubspot",
+        "status": 301,
+        "location": "https://efeoncepro.com/servicios-contratar-hubspot/"
+      }
+    ],
+    "sitemap": {
+      "entries": 1,
+      "lastmod": "2026-08-31T11:20:17+00:00"
+    },
+    "robots": {
+      "status": 200,
+      "body": "# START YOAST BLOCK\n# ---------------------------\nUser-agent: *\nDisallow:\n\nSitemap: https://efeoncepro.com/sitemap_index.xml\n# ---------------------------\n# END YOAST BLOCK"
+    },
+    "schema": {
+      "blocks": 1,
+      "types": [
+        "WebPage",
+        "ImageObject",
+        "BreadcrumbList",
+        "WebSite",
+        "Organization",
+        "Service"
+      ],
+      "connected": true
+    },
+    "protectedOtherPages": {
+      "https://efeoncepro.com/": {
+        "status": 200,
+        "hubspotService": false
+      },
+      "https://efeoncepro.com/agencia-creativa/": {
+        "status": 200,
+        "hubspotService": false
+      }
+    }
+  }
+}

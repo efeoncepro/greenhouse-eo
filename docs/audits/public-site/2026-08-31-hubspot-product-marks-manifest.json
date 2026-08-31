@@ -1,0 +1,91 @@
+{
+  "contract": "hubspot-elementor-release.v1",
+  "sourceSha256": "f95b6254c2434b58a4d6855dded40dd3a38acb19b881e090e1928674ab8bb812",
+  "files": [
+    {
+      "path": "assets/css/hubspot-elementor.css",
+      "sha256": "b6d68d793643b61f2d0b35b7ce62dd5b14ec4ce7e9f35f0db2c929736a2b921f",
+      "previousSha256": "bfd4d0c9b3c511d9e9d53e17a8c8a91a2b4484dd3b5fc3023a85f58bd17562dd"
+    },
+    {
+      "path": "includes/hubspot/templates/hubs.html",
+      "sha256": "affa8e8a4552a7a754d43d9c124ddc6443edf29af893447c851551cb4a14f33d",
+      "previousSha256": "eab230beaf3697fc25a4ad85e46f3ee9569c4eda6b31a000955a5ac06ad3f17b"
+    },
+    {
+      "path": "includes/hubspot/schemas/hubs.json",
+      "sha256": "da3be13dcd4f237f4ec45f9f0773c7c7be935bac498b7017a4a0345302817df6",
+      "previousSha256": "95289caedf66fec508d8e1001d35fa83fd0b8319ec6f8cfab3b57ebb44545e00"
+    },
+    {
+      "path": "includes/widgets/class-eo-hubspot-landing-base.php",
+      "sha256": "cab2dccd55266c1c507d5cfcc25d6762d284c7458eeea95e8098edb3c6261bf0",
+      "previousSha256": "1006fc426be261b00d831b6738431ff1511888b413a19927b3296efae79812e2"
+    },
+    {
+      "path": "includes/hubspot/templates/hubs--panels-0.html",
+      "sha256": "3374d2c4f475fb9d441d9103d261fd9cfc260cc87dd618251c8c2ce54b8d3d0b",
+      "previousSha256": "c9bef5d7d8a66003efeb4cf5feb8ddaf592156004bb4bacaf161fd2ac011f8ee"
+    },
+    {
+      "path": "includes/hubspot/templates/hubs--panels-1.html",
+      "sha256": "6b8283fddf5eb2688c473d373c6081e18599ac10dae83b7d70b7d0acea57f34c",
+      "previousSha256": "07106b82109ed049d956e8089d3dc6f43d8ee5839b18cfb77ba47fdf8384a8a2"
+    },
+    {
+      "path": "includes/hubspot/templates/hubs--panels-2.html",
+      "sha256": "ce7b77e704c8b19bf2a889c69881b115a407361eef85fccc3d0d3932020c2ec9",
+      "previousSha256": "effc3912dbb910dbfda4de6596b0db3ec8ac688c7828bc15b607d14c94b3ecda"
+    },
+    {
+      "path": "includes/hubspot/templates/hubs--panels-3.html",
+      "sha256": "813552846750af16b9cd04b63c69a94b3fdcfefb4cf774af2e477ad9f5fa2794",
+      "previousSha256": "928a93c86f83d4f050f6f198ca104fcf6bd8877c8d97df555b2e2b32a2268284"
+    },
+    {
+      "path": "includes/hubspot/templates/hubs--panels-4.html",
+      "sha256": "410ba249af207d178b8f9f6cd2ab535a5739f7041237cd8e4cf528c207cf1032",
+      "previousSha256": "9e1bdf8937fd677314d4e8ebed40a596e2dcb690015cd7f69d510e612aee4f7e"
+    },
+    {
+      "path": "includes/hubspot/templates/hubs--panels-5.html",
+      "sha256": "ad0cae0515edf9c8e45f054a040beb706ff1fe200101a2929ce653d1612729aa",
+      "previousSha256": "2a80fc227948dc6772d98e175e9a73bd1e5e74b6f1c4f1d1c8a64d71ee9326b3"
+    },
+    {
+      "path": "includes/hubspot/templates/hubs--panels-6.html",
+      "sha256": "339e14e1f3404f776a93ac5c60def16ebe231ace54267c5a624a31923a64c12e",
+      "previousSha256": "2671d5d47ce529073fa4ed5160f8af17df2b66e99a3f2fe4392cefc4a8d36824"
+    },
+    {
+      "path": "includes/hubspot/templates/hubs--panels-7.html",
+      "sha256": "3339a27da76c330c18dd60aa3907f26073bb558ad16fe71c7954f9b40a6c3aa2",
+      "previousSha256": "013ebbf9d3e83b03d789510f9ae5c63850af9a279757f2dfdab24e90142177c3"
+    },
+    {
+      "path": "includes/hubspot/templates/licensing.html",
+      "sha256": "a679862f583789bf9fafa8afb8577cc88aec2b641e86511a66d992e886e1c7e3",
+      "previousSha256": "f0745e6b3125b845e320ecdbe5991b35e39df746ada142fc80b57ad5c4c5f220"
+    },
+    {
+      "path": "includes/hubspot/schemas/licensing.json",
+      "sha256": "aa99016f47d6547f870fb4c1fd674fd3a96ae7b9a7fa7fe8c672501dde5f69fd",
+      "previousSha256": "995b544fc4cfd62a109d83f0c46084f360c77d60f32a4936722eb058b7afaedb"
+    },
+    {
+      "path": "assets/img/hubspot/smart-crm.svg",
+      "sha256": "296337f7067543086979a35f9882bee0cdf76af211badb0defb775d4fce243b6",
+      "previousSha256": ""
+    },
+    {
+      "path": "assets/img/hubspot/agent-hub.svg",
+      "sha256": "ddd5c9f1bb6ab4d62ef354b09c569fd15f2f033268b6a208eecf9a06d72c9cff",
+      "previousSha256": ""
+    },
+    {
+      "path": "assets/img/hubspot/hubspot-wordmark-light.svg",
+      "sha256": "390b83568008211fc6ba705603f9ed3facc9c8a0f77915cbd82b233399c3c427",
+      "previousSha256": ""
+    }
+  ]
+}

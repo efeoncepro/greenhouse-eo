@@ -1,0 +1,52 @@
+[
+  {
+    "key": "aeo",
+    "name": "AEO",
+    "icon": "world-search",
+    "index": 8,
+    "source": "https://raw.githubusercontent.com/tabler/tabler-icons/v3.24.0/icons/outline/world-search.svg",
+    "color": "#cddeeb",
+    "change": "Root color attribute only; original geometry and stroke preserved",
+    "sha256": "624af3e0e0d667580ccfb67981922525af8f56d9d7c6f9d4947bddf878961ccc"
+  },
+  {
+    "key": "sales_workspace",
+    "name": "Sales Workspace",
+    "icon": "briefcase",
+    "index": 9,
+    "source": "https://raw.githubusercontent.com/tabler/tabler-icons/v3.24.0/icons/outline/briefcase.svg",
+    "color": "#cddeeb",
+    "change": "Root color attribute only; original geometry and stroke preserved",
+    "sha256": "4a51ccd9b995d66ac550fda434bdc058992052577aa04732b58e33fcd15b5909"
+  },
+  {
+    "key": "customer_success",
+    "name": "Customer Success Workspace",
+    "icon": "heart-handshake",
+    "index": 10,
+    "source": "https://raw.githubusercontent.com/tabler/tabler-icons/v3.24.0/icons/outline/heart-handshake.svg",
+    "color": "#cddeeb",
+    "change": "Root color attribute only; original geometry and stroke preserved",
+    "sha256": "bc7a358b2639ca59f16ffc66e95a5d0e91ac44893deb303601ce8fd9581d6ba4"
+  },
+  {
+    "key": "marketing_studio",
+    "name": "Marketing Studio",
+    "icon": "palette",
+    "index": 11,
+    "source": "https://raw.githubusercontent.com/tabler/tabler-icons/v3.24.0/icons/outline/palette.svg",
+    "color": "#cddeeb",
+    "change": "Root color attribute only; original geometry and stroke preserved",
+    "sha256": "6f84a9bf0638aee9dba83c2b35a485bc7969f07896d43a78729312d5e5f9d375"
+  },
+  {
+    "key": "enablement",
+    "name": "Enablement conversacional",
+    "icon": "messages",
+    "index": 13,
+    "source": "https://raw.githubusercontent.com/tabler/tabler-icons/v3.24.0/icons/outline/messages.svg",
+    "color": "#cddeeb",
+    "change": "Root color attribute only; original geometry and stroke preserved",
+    "sha256": "2b54897c0b43aa72a973d25f53f5260da5cef0768d7c29a43724b512fb982aec"
+  }
+]

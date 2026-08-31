@@ -22,11 +22,28 @@
 - Visual direction: `docs/ui/visual-directions/TASK-1352-hubspot-immersive-pillar-direction.md`
 - Backend impact: `none`
 - Epic: `EPIC-019`
-- Status real: `Diseno`
+- Status real: `Avanzada`
 - Rank: `TBD`
 - Domain: `public-site`
 - Blocked by: `none`
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
+
+## Entrega incremental publicada · 2026-08-31
+
+Por instrucción posterior del operador se implementó su export Claude Design aprobado y se publicaron las
+revisiones visuales, SEO y copy en **`/servicios-contratar-hubspot/`**, página WordPress `244079`.
+Son once widgets Elementor, 23 paneles SSR y formulario canónico de tres pasos. El diseño rechazado descrito
+más abajo es un checkpoint anterior; no invalida la autorización posterior de este export concreto.
+
+[Contrato y estado vigente](../../architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md),
+[publicación](../../audits/public-site/2026-08-30-hubspot-elementor-publication.md),
+[última revisión](../../audits/public-site/2026-08-31-hubspot-industry-method-copy.md).
+
+La landing está publicada y la revisión visual/editorial del operador terminó. La task formal permanece
+`to-do` / `UI ready: no`: **no** se ejecutó la migración a `/servicios/hubspot/`, ni se certifican aquí todos
+los dossiers del plan anterior, una conversión aceptada con lead real o la observación de 4–8 semanas.
+Esos requisitos no autorizan nuevas mutaciones de producción por sí solos. El alcance siguiente necesita
+una decisión explícita; nunca presentar la página publicada como pendiente de implementación.
 
 ## Summary
 

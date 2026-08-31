@@ -1,0 +1,440 @@
+{
+  "browser": {
+    "status": "PASS",
+    "mode": "live",
+    "checkedAt": "2026-08-31T11:27:34.196Z",
+    "states": [
+      {
+        "width": 1414,
+        "motion": "no-preference",
+        "module": "sectors",
+        "panel": 0,
+        "pass": true
+      },
+      {
+        "width": 1414,
+        "motion": "no-preference",
+        "module": "sectors",
+        "panel": 1,
+        "pass": true
+      },
+      {
+        "width": 1414,
+        "motion": "no-preference",
+        "module": "sectors",
+        "panel": 2,
+        "pass": true
+      },
+      {
+        "width": 1414,
+        "motion": "no-preference",
+        "module": "sectors",
+        "panel": 3,
+        "pass": true
+      },
+      {
+        "width": 1414,
+        "motion": "no-preference",
+        "module": "delivery",
+        "panel": 0,
+        "pass": true
+      },
+      {
+        "width": 1414,
+        "motion": "no-preference",
+        "module": "delivery",
+        "panel": 1,
+        "pass": true
+      },
+      {
+        "width": 1414,
+        "motion": "no-preference",
+        "module": "delivery",
+        "panel": 2,
+        "pass": true
+      },
+      {
+        "width": 1414,
+        "motion": "no-preference",
+        "module": "delivery",
+        "panel": 3,
+        "pass": true
+      },
+      {
+        "width": 1414,
+        "motion": "no-preference",
+        "module": "delivery",
+        "panel": 4,
+        "pass": true
+      },
+      {
+        "width": 1414,
+        "motion": "no-preference",
+        "module": "assessment",
+        "panel": 0,
+        "pass": true
+      },
+      {
+        "width": 1414,
+        "motion": "reduce",
+        "module": "sectors",
+        "panel": 0,
+        "pass": true
+      },
+      {
+        "width": 1414,
+        "motion": "reduce",
+        "module": "sectors",
+        "panel": 1,
+        "pass": true
+      },
+      {
+        "width": 1414,
+        "motion": "reduce",
+        "module": "sectors",
+        "panel": 2,
+        "pass": true
+      },
+      {
+        "width": 1414,
+        "motion": "reduce",
+        "module": "sectors",
+        "panel": 3,
+        "pass": true
+      },
+      {
+        "width": 1414,
+        "motion": "reduce",
+        "module": "delivery",
+        "panel": 0,
+        "pass": true
+      },
+      {
+        "width": 1414,
+        "motion": "reduce",
+        "module": "delivery",
+        "panel": 1,
+        "pass": true
+      },
+      {
+        "width": 1414,
+        "motion": "reduce",
+        "module": "delivery",
+        "panel": 2,
+        "pass": true
+      },
+      {
+        "width": 1414,
+        "motion": "reduce",
+        "module": "delivery",
+        "panel": 3,
+        "pass": true
+      },
+      {
+        "width": 1414,
+        "motion": "reduce",
+        "module": "delivery",
+        "panel": 4,
+        "pass": true
+      },
+      {
+        "width": 1414,
+        "motion": "reduce",
+        "module": "assessment",
+        "panel": 0,
+        "pass": true
+      },
+      {
+        "width": 878,
+        "motion": "no-preference",
+        "module": "sectors",
+        "panel": 0,
+        "pass": true
+      },
+      {
+        "width": 878,
+        "motion": "no-preference",
+        "module": "sectors",
+        "panel": 1,
+        "pass": true
+      },
+      {
+        "width": 878,
+        "motion": "no-preference",
+        "module": "sectors",
+        "panel": 2,
+        "pass": true
+      },
+      {
+        "width": 878,
+        "motion": "no-preference",
+        "module": "sectors",
+        "panel": 3,
+        "pass": true
+      },
+      {
+        "width": 878,
+        "motion": "no-preference",
+        "module": "delivery",
+        "panel": 0,
+        "pass": true
+      },
+      {
+        "width": 878,
+        "motion": "no-preference",
+        "module": "delivery",
+        "panel": 1,
+        "pass": true
+      },
+      {
+        "width": 878,
+        "motion": "no-preference",
+        "module": "delivery",
+        "panel": 2,
+        "pass": true
+      },
+      {
+        "width": 878,
+        "motion": "no-preference",
+        "module": "delivery",
+        "panel": 3,
+        "pass": true
+      },
+      {
+        "width": 878,
+        "motion": "no-preference",
+        "module": "delivery",
+        "panel": 4,
+        "pass": true
+      },
+      {
+        "width": 878,
+        "motion": "no-preference",
+        "module": "assessment",
+        "panel": 0,
+        "pass": true
+      },
+      {
+        "width": 878,
+        "motion": "reduce",
+        "module": "sectors",
+        "panel": 0,
+        "pass": true
+      },
+      {
+        "width": 878,
+        "motion": "reduce",
+        "module": "sectors",
+        "panel": 1,
+        "pass": true
+      },
+      {
+        "width": 878,
+        "motion": "reduce",
+        "module": "sectors",
+        "panel": 2,
+        "pass": true
+      },
+      {
+        "width": 878,
+        "motion": "reduce",
+        "module": "sectors",
+        "panel": 3,
+        "pass": true
+      },
+      {
+        "width": 878,
+        "motion": "reduce",
+        "module": "delivery",
+        "panel": 0,
+        "pass": true
+      },
+      {
+        "width": 878,
+        "motion": "reduce",
+        "module": "delivery",
+        "panel": 1,
+        "pass": true
+      },
+      {
+        "width": 878,
+        "motion": "reduce",
+        "module": "delivery",
+        "panel": 2,
+        "pass": true
+      },
+      {
+        "width": 878,
+        "motion": "reduce",
+        "module": "delivery",
+        "panel": 3,
+        "pass": true
+      },
+      {
+        "width": 878,
+        "motion": "reduce",
+        "module": "delivery",
+        "panel": 4,
+        "pass": true
+      },
+      {
+        "width": 878,
+        "motion": "reduce",
+        "module": "assessment",
+        "panel": 0,
+        "pass": true
+      },
+      {
+        "width": 390,
+        "motion": "no-preference",
+        "module": "sectors",
+        "panel": 0,
+        "pass": true
+      },
+      {
+        "width": 390,
+        "motion": "no-preference",
+        "module": "sectors",
+        "panel": 1,
+        "pass": true
+      },
+      {
+        "width": 390,
+        "motion": "no-preference",
+        "module": "sectors",
+        "panel": 2,
+        "pass": true
+      },
+      {
+        "width": 390,
+        "motion": "no-preference",
+        "module": "sectors",
+        "panel": 3,
+        "pass": true
+      },
+      {
+        "width": 390,
+        "motion": "no-preference",
+        "module": "delivery",
+        "panel": 0,
+        "pass": true
+      },
+      {
+        "width": 390,
+        "motion": "no-preference",
+        "module": "delivery",
+        "panel": 1,
+        "pass": true
+      },
+      {
+        "width": 390,
+        "motion": "no-preference",
+        "module": "delivery",
+        "panel": 2,
+        "pass": true
+      },
+      {
+        "width": 390,
+        "motion": "no-preference",
+        "module": "delivery",
+        "panel": 3,
+        "pass": true
+      },
+      {
+        "width": 390,
+        "motion": "no-preference",
+        "module": "delivery",
+        "panel": 4,
+        "pass": true
+      },
+      {
+        "width": 390,
+        "motion": "no-preference",
+        "module": "assessment",
+        "panel": 0,
+        "pass": true
+      },
+      {
+        "width": 390,
+        "motion": "reduce",
+        "module": "sectors",
+        "panel": 0,
+        "pass": true
+      },
+      {
+        "width": 390,
+        "motion": "reduce",
+        "module": "sectors",
+        "panel": 1,
+        "pass": true
+      },
+      {
+        "width": 390,
+        "motion": "reduce",
+        "module": "sectors",
+        "panel": 2,
+        "pass": true
+      },
+      {
+        "width": 390,
+        "motion": "reduce",
+        "module": "sectors",
+        "panel": 3,
+        "pass": true
+      },
+      {
+        "width": 390,
+        "motion": "reduce",
+        "module": "delivery",
+        "panel": 0,
+        "pass": true
+      },
+      {
+        "width": 390,
+        "motion": "reduce",
+        "module": "delivery",
+        "panel": 1,
+        "pass": true
+      },
+      {
+        "width": 390,
+        "motion": "reduce",
+        "module": "delivery",
+        "panel": 2,
+        "pass": true
+      },
+      {
+        "width": 390,
+        "motion": "reduce",
+        "module": "delivery",
+        "panel": 3,
+        "pass": true
+      },
+      {
+        "width": 390,
+        "motion": "reduce",
+        "module": "delivery",
+        "panel": 4,
+        "pass": true
+      },
+      {
+        "width": 390,
+        "motion": "reduce",
+        "module": "assessment",
+        "panel": 0,
+        "pass": true
+      }
+    ],
+    "keyboard": true,
+    "errors": [],
+    "otherEightModulesUnchanged": true,
+    "metadataUnchanged": true
+  },
+  "native": {
+    "status": "PASS",
+    "hash": "cc9710c8adca07e54058c31e7edcecb0a80d78d2c95abf3e8042f3bddd2afe72",
+    "exactScopedTree": true,
+    "schemaFiles": 3,
+    "changedTextFields": 82
+  }
+}

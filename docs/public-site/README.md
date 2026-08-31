@@ -28,6 +28,10 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
 
 ## Índice
 
+- **[HubSpot vigente — Elementor](../architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md)** — página
+  `244079` en `/servicios-contratar-hubspot/`, once widgets nativos y Growth Forms. Diseño aprobado con
+  identidad visual y copy revisado en siete módulos; [última evidencia pública del 2026-08-31](../audits/public-site/2026-08-31-hubspot-industry-method-copy.md).
+  La migración pillar/cluster de PDR-013 no se ejecutó como parte de esta publicación.
 - **[Home vigente — Elementor](../architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md)** — portada
   `251731`, promovida desde Claude Design; contrato técnico de módulos, edición y evidencia. La antigua
   Home `2791` es respaldo noindex. Implementación publicada no equivale a aprobación global de copy/claims.

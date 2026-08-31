@@ -1,0 +1,481 @@
+{
+  "checkedAt": "2026-08-31T09:45:09.588Z",
+  "url": "https://efeoncepro.com/servicios-contratar-hubspot/",
+  "snapshot": "_gh_hubspot_seo_20260831_093553",
+  "runtimeBackups": [
+    "/tmp/eo-hubspot-before-20260831-093537.tar",
+    "/tmp/eo-hubspot-before-20260831-094025.tar",
+    "/tmp/eo-hubspot-before-20260831-094338.tar"
+  ],
+  "schemaOrgValidator": {
+    "date": "2026-08-31",
+    "method": "Public URL fetched in Schema.org Validator; expanded WebPage and connected Service inspected",
+    "errors": 0,
+    "warnings": 0,
+    "detectedTopLevel": [
+      "hentry",
+      "WebPage"
+    ],
+    "connectedService": true
+  },
+  "technical": {
+    "status": "PASS_WITH_GLOBAL_FINDINGS",
+    "httpRedirect": "301 HTTPS, page-only, query parameters preserved",
+    "checkedAt": "2026-08-31T09:44:14.536Z",
+    "redirects": [
+      {
+        "url": "http://efeoncepro.com/servicios-contratar-hubspot/",
+        "status": 301,
+        "location": "https://efeoncepro.com/servicios-contratar-hubspot/"
+      },
+      {
+        "url": "http://efeoncepro.com/servicios-contratar-hubspot/?utm_source=qa",
+        "status": 301,
+        "location": "https://efeoncepro.com/servicios-contratar-hubspot/"
+      },
+      {
+        "url": "https://www.efeoncepro.com/servicios-contratar-hubspot/",
+        "status": 301,
+        "location": "https://efeoncepro.com/servicios-contratar-hubspot/"
+      },
+      {
+        "url": "https://efeoncepro.com/servicios-contratar-hubspot",
+        "status": 301,
+        "location": "https://efeoncepro.com/servicios-contratar-hubspot/"
+      }
+    ],
+    "sitemap": {
+      "entries": 1,
+      "lastmod": "2026-08-31T09:35:53+00:00"
+    },
+    "robots": {
+      "status": 200,
+      "body": "# START YOAST BLOCK\n# ---------------------------\nUser-agent: *\nDisallow:\n\nSitemap: https://efeoncepro.com/sitemap_index.xml\n# ---------------------------\n# END YOAST BLOCK"
+    },
+    "schema": {
+      "blocks": 1,
+      "types": [
+        "WebPage",
+        "ImageObject",
+        "BreadcrumbList",
+        "WebSite",
+        "Organization",
+        "Service"
+      ],
+      "connected": true
+    },
+    "protectedOtherPages": {
+      "https://efeoncepro.com/": {
+        "status": 200,
+        "hubspotService": false
+      },
+      "https://efeoncepro.com/agencia-creativa/": {
+        "status": 200,
+        "hubspotService": false
+      }
+    }
+  },
+  "performance": {
+    "before": {
+      "lighthouseVersion": "12.8.2",
+      "fetchTime": "2026-08-31T09:30:27.065Z",
+      "formFactor": "mobile",
+      "throttlingMethod": "simulate",
+      "categories": {
+        "performance": 0.43,
+        "accessibility": 0.91,
+        "best-practices": 0.79,
+        "seo": 1
+      },
+      "metrics": {
+        "first-contentful-paint": {
+          "value": 9787.21,
+          "display": "9.8 s"
+        },
+        "largest-contentful-paint": {
+          "value": 16275.459999999997,
+          "display": "16.3 s"
+        },
+        "total-blocking-time": {
+          "value": 528,
+          "display": "530 ms"
+        },
+        "cumulative-layout-shift": {
+          "value": 0.004428424784626971,
+          "display": "0.004"
+        },
+        "total-byte-weight": {
+          "value": 2755239,
+          "display": "Total size was 2,691 KiB"
+        }
+      }
+    },
+    "finalMobile": {
+      "lighthouseVersion": "12.8.2",
+      "fetchTime": "2026-08-31T09:40:54.044Z",
+      "formFactor": "mobile",
+      "throttlingMethod": "simulate",
+      "categories": {
+        "performance": 0.59,
+        "accessibility": 0.91,
+        "best-practices": 0.79,
+        "seo": 1
+      },
+      "metrics": {
+        "first-contentful-paint": {
+          "value": 5194.045,
+          "display": "5.2 s"
+        },
+        "largest-contentful-paint": {
+          "value": 8599.045,
+          "display": "8.6 s"
+        },
+        "total-blocking-time": {
+          "value": 122,
+          "display": "120 ms"
+        },
+        "cumulative-layout-shift": {
+          "value": 0.004428424784626971,
+          "display": "0.004"
+        },
+        "total-byte-weight": {
+          "value": 1848203,
+          "display": "Total size was 1,805 KiB"
+        }
+      }
+    },
+    "finalDesktop": {
+      "lighthouseVersion": "12.8.2",
+      "fetchTime": "2026-08-31T09:41:30.765Z",
+      "formFactor": "desktop",
+      "throttlingMethod": "simulate",
+      "categories": {
+        "performance": 0.76,
+        "seo": 1
+      },
+      "metrics": {
+        "first-contentful-paint": {
+          "value": 1086.172,
+          "display": "1.1 s"
+        },
+        "largest-contentful-paint": {
+          "value": 3892.357,
+          "display": "3.9 s"
+        },
+        "total-blocking-time": {
+          "value": 5,
+          "display": "10 ms"
+        },
+        "cumulative-layout-shift": {
+          "value": 0.015314183193240521,
+          "display": "0.015"
+        },
+        "total-byte-weight": {
+          "value": 2123276,
+          "display": "Total size was 2,074 KiB"
+        }
+      }
+    },
+    "fieldCrux": "unverified; PSI API HTTP 429"
+  },
+  "gsc": {
+    "periods": [
+      {
+        "range": {
+          "startDate": "2026-08-01",
+          "endDate": "2026-08-28"
+        },
+        "ok": true,
+        "rows": [
+          {
+            "keys": [
+              "https://efeoncepro.com/servicios-contratar-hubspot/"
+            ],
+            "clicks": 0,
+            "impressions": 9,
+            "ctr": 0,
+            "position": 15
+          }
+        ],
+        "propertyRows": 96
+      },
+      {
+        "range": {
+          "startDate": "2026-07-04",
+          "endDate": "2026-07-31"
+        },
+        "ok": true,
+        "rows": [
+          {
+            "keys": [
+              "https://efeoncepro.com/servicios-contratar-hubspot/"
+            ],
+            "clicks": 0,
+            "impressions": 27,
+            "ctr": 0,
+            "position": 23.555555555555557
+          }
+        ],
+        "propertyRows": 96
+      }
+    ],
+    "inspection": {
+      "inspectionResult": {
+        "indexStatusResult": {
+          "verdict": "PASS",
+          "coverageState": "Enviada e indexada",
+          "robotsTxtState": "ALLOWED",
+          "indexingState": "INDEXING_ALLOWED",
+          "lastCrawlTime": "2026-08-27T03:16:28Z",
+          "pageFetchState": "SUCCESSFUL",
+          "googleCanonical": "https://efeoncepro.com/servicios-contratar-hubspot/",
+          "userCanonical": "https://efeoncepro.com/servicios-contratar-hubspot/",
+          "referringUrls": [
+            "https://efeonce.cl/category/diseno-web/",
+            "https://efeoncepro.com/category/hubspot/tutoriales/"
+          ],
+          "crawledAs": "MOBILE"
+        },
+        "mobileUsabilityResult": {
+          "verdict": "VERDICT_UNSPECIFIED"
+        },
+        "richResultsResult": {
+          "verdict": "PASS",
+          "detectedItems": [
+            {
+              "richResultType": "Rutas de exploración",
+              "items": [
+                {
+                  "name": "Elemento sin nombre"
+                },
+                {
+                  "name": "Elemento sin nombre"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "queries": {
+      "rows": [
+        {
+          "keys": [
+            "busco software con excelente servicio al cliente"
+          ],
+          "clicks": 0,
+          "impressions": 1,
+          "ctr": 0,
+          "position": 14
+        }
+      ],
+      "responseAggregationType": "byPage"
+    }
+  },
+  "entityPolicyUrls": [
+    {
+      "key": "publishingPrinciples",
+      "url": "https://efeoncepro.com/principios-editoriales-efeonce/",
+      "status": 200,
+      "title": "Política de Principios Editoriales de Efeonce - Efeonce",
+      "h1": "Política de Principios Editoriales de Efeonce"
+    },
+    {
+      "key": "ownershipFundingInfo",
+      "url": "https://efeoncepro.com/estructura-y-propiedad/",
+      "status": 200,
+      "title": "Política de Estructura, Propiedad y Financiamiento de Efeonce - Efeonce",
+      "h1": "Política de Estructura, Propiedad y Financiamiento de Efeonce"
+    },
+    {
+      "key": "actionableFeedbackPolicy",
+      "url": "https://efeoncepro.com/respuesta-y-compromiso/",
+      "status": 200,
+      "title": "Política de Respuesta Activa y Relación Comunitaria de Efeonce - Efeonce",
+      "h1": "Política de Respuesta Activa y Relación Comunitaria de Efeonce"
+    },
+    {
+      "key": "correctionsPolicy",
+      "url": "https://efeoncepro.com/politica-de-correcciones/",
+      "status": 200,
+      "title": "Política de Correcciones y Retractaciones de Efeonce - Efeonce",
+      "h1": "Política de Correcciones y Retractaciones de Efeonce"
+    },
+    {
+      "key": "ethicsPolicy",
+      "url": "https://efeoncepro.com/codigo-etico-efeonce/",
+      "status": 200,
+      "title": "Política Ética Editorial y Organizacional de Efeonce - Efeonce",
+      "h1": "Política Ética Editorial y Organizacional de Efeonce"
+    },
+    {
+      "key": "diversityPolicy",
+      "url": "https://efeoncepro.com/diversidad-editorial-y-equipo/",
+      "status": 200,
+      "title": "Política de Diversidad Editorial y del Equipo de Efeonce - Efeonce",
+      "h1": "Política de Diversidad Editorial y del Equipo de Efeonce"
+    },
+    {
+      "key": "diversityStaffingReport",
+      "url": "https://efeoncepro.com/diversidad-inclusion-equipo/",
+      "status": 200,
+      "title": "Política de Diversidad e Inclusión en el Equipo de Efeonce - Efeonce",
+      "h1": "Política de Diversidad e Inclusión en el Equipo de Efeonce"
+    }
+  ],
+  "iconFallback": {
+    "status": "PASS",
+    "fonts": [
+      {
+        "url": "https://efeoncepro.com/wp-content/plugins/eo-elementor-widgets/assets/fonts/hubspot/tabler-hubspot.woff2",
+        "status": 200
+      },
+      {
+        "url": "https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.24.0/dist/fonts/tabler-icons.woff2?v3.24.0",
+        "status": 200
+      }
+    ],
+    "unknownIconFallback": true,
+    "temporaryBrowserDomOnly": true
+  },
+  "manifest": [
+    {
+      "path": "assets/css/hubspot-elementor.css",
+      "sha256": "cdc52fbd7ebbdc552141e2d4a7b20b11858b945dafc9ff927587f3d0d6006058",
+      "previousSha256": "45eb7b1458dbc69bd35f9973e20022d57f404970e2ebcdd48e905ff952952da4"
+    },
+    {
+      "path": "assets/css/hubspot-landing.css",
+      "sha256": "68316922efb74e80342fc09eb8d01e03286e1d787aaa8c7e47b01d3de986a199",
+      "previousSha256": "e715bf8c1db9ae0bf28f5997514363717b6648df61002bb439b59b369fa54346"
+    },
+    {
+      "path": "includes/widgets/class-eo-hubspot-landing-widgets.php",
+      "sha256": "b623aad4556e2d2a1ab3c6fc18c465b37ce569e0180550788b23f820c868153e",
+      "previousSha256": "e93bb2a036ac2d35bc38a85524115c81e1fed0ef61a4db9943a5720b293f450a"
+    },
+    {
+      "path": "includes/hubspot/schemas/proof-ledger.json",
+      "sha256": "aede664a9c06434a429d00c498fa9d2a4f57f9161a84b4bdd5974b2cb6bcc9b3",
+      "previousSha256": "a1b7dee77df3dc2d5e64ae7b8ce61813f281189d07a238ac86b0470a6eb482e0"
+    },
+    {
+      "path": "includes/hubspot/templates/proof-ledger.html",
+      "sha256": "f98c52d0088400007113da1f48c217964431869be156d498799fdef32effb43f",
+      "previousSha256": "b127369a872b87a84768ae79726b4444bf1df8d60f922f026812b823db423a80"
+    },
+    {
+      "path": "includes/hubspot/seo.php",
+      "sha256": "62ae2ec269e23b295080dc51b5c82ea7053d5f5ffbeb84905cf50757db1a4fd1",
+      "previousSha256": null
+    },
+    {
+      "path": "assets/fonts/hubspot/tabler-hubspot.woff2",
+      "sha256": "9bb8d0afdeacd070ad5b6868aba66b8ff270483379c2902f0aa9181be04bc988",
+      "previousSha256": null
+    },
+    {
+      "path": "assets/fonts/hubspot/LICENSE.txt",
+      "sha256": "d5a3f948ae5cb95bfc4d2f767ef2bf6a778815b0ddb2d1c48037744cf636518e",
+      "previousSha256": null
+    },
+    {
+      "path": "assets/css/hubspot-icons.css",
+      "sha256": "8b751f29df77b3f9d7c8faace5cab4ccc7190f9eae03f47dbfa7b17a64152bba",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/class-eo-widgets-loader.php",
+      "sha256": "c1fd8223c69295326ad3b01e7d9f5dbcd120d97652ceacbd8e8326f09d23339b",
+      "previousSha256": "78b72c578df3743b1144d1e5ecb9a3b80f4beaa0e049b4c7a23fb769190ad813"
+    }
+  ],
+  "browser": {
+    "status": "PASS",
+    "checkedAt": "2026-08-31T09:44:14.723Z",
+    "viewports": [
+      {
+        "width": 1440,
+        "scrollWidth": 1440,
+        "heroX": 0,
+        "h1Size": "96px",
+        "motion": "no-preference"
+      },
+      {
+        "width": 1024,
+        "scrollWidth": 1024,
+        "heroX": 0,
+        "h1Size": "48px",
+        "motion": "no-preference"
+      },
+      {
+        "width": 768,
+        "scrollWidth": 768,
+        "heroX": 0,
+        "h1Size": "38px",
+        "motion": "no-preference"
+      },
+      {
+        "width": 390,
+        "scrollWidth": 390,
+        "heroX": 0,
+        "h1Size": "38px",
+        "motion": "no-preference"
+      },
+      {
+        "width": 1440,
+        "scrollWidth": 1440,
+        "heroX": 0,
+        "h1Size": "96px",
+        "motion": "reduce"
+      },
+      {
+        "width": 1024,
+        "scrollWidth": 1024,
+        "heroX": 0,
+        "h1Size": "48px",
+        "motion": "reduce"
+      },
+      {
+        "width": 768,
+        "scrollWidth": 768,
+        "heroX": 0,
+        "h1Size": "38px",
+        "motion": "reduce"
+      },
+      {
+        "width": 390,
+        "scrollWidth": 390,
+        "heroX": 0,
+        "h1Size": "38px",
+        "motion": "reduce"
+      }
+    ],
+    "panels": {
+      "1440-hubs": 14,
+      "1440-sectors": 4,
+      "1440-delivery": 5,
+      "390-hubs": 14,
+      "390-sectors": 4,
+      "390-delivery": 5
+    },
+    "keyboard": true,
+    "faq": true,
+    "form": {
+      "steps": 3,
+      "emptySubmitBlocked": true,
+      "backPreservesValues": true,
+      "noAcceptedLeadSent": true
+    },
+    "serverRendered": {
+      "sections": 11,
+      "panels": 23,
+      "h1": "\n        Habilitamos HubSpot Hub por Hub,y después lo operamos contigo.\n      "
+    },
+    "assets": {
+      "brokenImages": [],
+      "insecureModuleAssets": []
+    },
+    "pageErrorCount": 0
+  }
+}

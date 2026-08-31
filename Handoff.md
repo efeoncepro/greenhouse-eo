@@ -2,6 +2,50 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-30 — Landing HubSpot aprobada: publicada como once widgets Elementor
+
+Por nueva instrucción explícita del operador se implementó y publicó su ZIP Claude Design aprobado,
+SHA `f95b6254c2434b58a4d6855dded40dd3a38acb19b881e090e1928674ab8bb812`.
+Página `244079`, URL conservada `/servicios-contratar-hubspot/`; header/footer Ohio nativos.
+2026-08-31: item de menú `244116` renombrado a «Servicios HubSpot», sin moverlo ni cambiar destino.
+
+2026-08-31: [auditoría SEO/AEO completa](docs/audits/public-site/2026-08-31-hubspot-seo-aeo.md):
+OG/Twitter y breadcrumb corregidos, Service conectado al grafo Yoast, enlace oficial del partner y HTTP→HTTPS
+301 sólo en la landing. Iconos 878 KB→2,4 KB y fuentes adelantadas; móvil LCP 16,3→8,6 s (lab; aún mejorable).
+Schema.org 0 errores/advertencias; GSC indexada, último crawl 27-08 anterior al rediseño. Header/footer intactos;
+persisten defectos globales del footer y falta respaldo localizado de las cifras 56%/76%. Snapshot SEO
+`_gh_hubspot_seo_20260831_093553`; hash Elementor sin cambios. Sin commit/push.
+Aclaración del operador: no autoriza cambios estéticos por SEO. Se retira el subrayado del perfil público;
+se conservan apariencia, composición y tipografías aprobadas.
+Después se ajustó sólo la descripción SEO/social con `copywriting`; title y diseño intactos.
+Snapshot `_gh_hubspot_meta_copy_20260831_102004`; texto y rollback en la auditoría enlazada.
+Comentarios visuales posteriores: [timeline restaurado y partner reducido a dos columnas con badge mayor](docs/audits/public-site/2026-08-31-hubspot-timeline-partner-fix.md).
+Cinco archivos acotados; árbol Elementor y SEO intactos. Snapshot `_gh_hubspot_visual_fix_20260831_102751`.
+Nueva revisión: [seis iconos oficiales HubSpot y logo ANAM](docs/audits/public-site/2026-08-31-hubspot-brand-assets.md);
+Media nativos, nota del caso identificada, SEO y shell conservados.
+Revisión siguiente: [isotipos en paneles, Smart CRM/Agent Hub y wordmark de licencias](docs/audits/public-site/2026-08-31-hubspot-product-marks.md);
+autorización del logo confirmada por operador, AEO sin símbolo propio identificado, sin cambios de copy/SEO.
+MCP suma [ChatGPT, Claude y Gemini reutilizados desde AEO](docs/audits/public-site/2026-08-31-hubspot-mcp-logos.md),
+en tarjeta y panel, tres Media nativos; AEO y contenido Elementor protegidos.
+Las cinco capacidades restantes suman [iconos semánticos azul claro](docs/audits/public-site/2026-08-31-hubspot-semantic-icons.md),
+diferenciados de las marcas oficiales, compartidos tarjeta/panel y editables.
+[Revisión editorial](docs/audits/public-site/2026-08-31-hubspot-editorial-copy.md): licencias, ANAM, partner y reunión;
+51 textos, sin «práctica» en la landing, sin cambios de diseño/SEO ni de otras páginas.
+Continuación: [industrias, primer paso y cinco etapas](docs/audits/public-site/2026-08-31-hubspot-industry-method-copy.md), solo copy en tres widgets.
+[Cierre con tres subagentes](docs/audits/public-site/2026-08-31-hubspot-documentation-closure.md): docs/skills, lifecycle y commits acotados; WIP ajeno preservado.
+
+[Contrato y fuentes](docs/architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md),
+[audit y evidencia](docs/audits/public-site/2026-08-30-hubspot-elementor-publication.md),
+[manual/rollback](docs/manual-de-uso/public-site/hubspot-elementor.md).
+
+Once widgets editables, 23 paneles SSR, formulario Growth Forms `efeonce-hubspot-scope` publicado con
+variante portable `hubspot_pillar`, renderer canónico fijado en WordPress. Destino Greenhouse-only;
+no se activó entrega directa HubSpot ni se probó una conversión con lead real. QA anónima, validación,
+responsive/teclado/reduced motion y roundtrip nativo Elementor PASS. Home y Creative conservan hashes.
+Cierre Git acotado autorizado, sin push ni despliegue general Greenhouse. TASK-1352 no se movió a complete; migración de URL y
+sus dossiers adicionales no forman parte de este pedido de publicación. La aprobación del export
+supera las instrucciones de rechazo de diseños anteriores para este artefacto específico.
+
 ## 2026-08-30 — TASK-1358: Home Elementor consolidada; cierre editorial y QA pendientes
 
 Home `251731` publicada en raíz, antigua `2791` conservada noindex; header/footer Ohio intactos.
@@ -24,7 +68,7 @@ TASK-1358 permanece `to-do`/`UI ready: no`, con runtime `Avanzada`; no complete,
 El checkpoint anterior se [preservó](docs/operations/agent-context-history/handoff/2026-08-30-home-before-consolidation.md),
 pero ya no gobierna decisiones ni pendientes actuales.
 
-## 2026-08-30 — oferta HubSpot V2 y task de landing inmersiva documentadas; landing sigue pendiente
+## 2026-08-30 — oferta HubSpot V2 y planificación previa a la publicación del export aprobado
 
 La investigación actual de producto y el benchmark de 11 partners quedaron consolidados en un audit fechado y en
 el canon `docs/services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md`. La práctica usa seis familias por
@@ -47,7 +91,9 @@ idea antes del research ni separan agentes como oferta dominante: dirección, wi
 familias exactas, `COPY_SLOT` gobernado, pasajes SEO/AEO servidos, una única conversión, estados/fallas completos,
 tokens de motion exactos y score premium `average >= 4.5` con todas las dimensiones `>= 4`.
 
-**No se modificó ni publicó la landing viva**: `TASK-1352` sigue `to-do` y `UI ready: no`. Debe producir dossiers
+**Ese checkpoint documental fue superado por la publicación autorizada descrita arriba.** `TASK-1352`
+sigue `to-do` y `UI ready: no` como unidad formal; no usar este estado para afirmar que la página no está publicada.
+Su alcance adicional aún incluye dossiers
 VoC/CRO y SEO/AEO, claim/proof ledger, copy deck nuevo y reverificar producto, tier, assets, prueba, formulario y
 disponibilidad del portal antes de implementar.
 
@@ -527,59 +573,6 @@ impidió que se propagara como hecho.
 bypass no ocultó nada, pero queda registrado.
 
 **Siguiente paso:** decidir la federación al gateway.
-
-## 2026-08-29 — Se ejercitó lo que estaba ON pero nunca había corrido solo, y se cerró la ventana de ISSUE-164
-
-**Estado: verificación operativa, sin cambios de código.** Motivo: tres capacidades SEO llevaban dos
-días con el flag ON en el `ops-worker` y **el scheduler nunca las había disparado** —
-`ops-seo-domain-overview` (día 16) y `ops-seo-url-visibility` (día 17) con `lastAttemptTime` **vacío**,
-próxima corrida agendada el 16-17 de septiembre. Habían sido ejercitadas a mano en el rollout del 27,
-pero nunca por el camino desatendido.
-
-**Corridas por el camino que usa el scheduler** (POST con body `{}`, sin argumentos):
-
-| | Estimado | Real | Extra |
-|---|---|---|---|
-| `domain-overview` | USD 0,01212 | **USD 0,01212** | clavado al preview |
-| `url-visibility` | USD 0,02400 | **USD 0,02400** | **15 filas de mercado gratis** |
-
-Verificado en PostgreSQL, no en la respuesta del API: 1 snapshot de cada capacidad con `capture_date`
-de hoy, 15 filas nuevas en `seo_keyword_market_data`, gasto en el ledger (`labs` USD 0,0872 del día).
-**Re-corrida de ambas: `captured=0 skipped=2 costUsd=0`** — el pre-check de frescura funciona.
-
-**Dos cosas que sólo se pudieron probar hoy y no el 27:** (a) la frescura se sostiene **cruzando el
-límite de día** (foto del 27 vigente el 29; el smoke del mismo día no podía demostrarlo); (b) el
-beneficio lateral de `TASK-1776` es real y medible en producción — `marketRowsWritten` en la salida
-del batch, que es lo que permitirá argumentar con datos si conviene bajarle frecuencia al cron de
-`TASK-1661`.
-
-**Sospecha investigada y descartada:** que el segundo cobro fuera una re-compra. No lo era — el sujeto
-capturado hoy fue el **segundo** de Berel, un competidor declarado después del smoke. La ventana es
-`(CURRENT_DATE - capture_date) < 30` y se comportó bien.
-
-**Ventana de `ISSUE-164` cerrada, midiendo el EFECTO en vez del log.** Sin `sentry-cli` ni token, se
-consultó `grader_probe_results`: `error_code LIKE 'blocked%'` desde el 2026-08-27 → **0**. La guarda de
-red no recorta cobertura. 🔴 Salvedad que va en el cierre: **la muestra es UNA corrida de grader** — es
-consistente con "la guarda es correcta", no prueba fuerte. La consulta canónica queda registrada en el
-issue y no depende de Sentry, así que la puede correr cualquiera.
-
-**Dato de cartera:** son **2 targets**. `seot-efeonce-own-brand` se saltó en ambas capturas.
-
-🔴 **Corrección del mismo día, sobre una afirmación mía en la v1 de esta entrada.** Escribí que ese
-skip mostraba que *"Efeonce sigue sin medirse a sí misma — el hueco de GSC per-org"*. **Es falso en
-las dos mitades**, verificado contra PostgreSQL:
-
-- **GSC per-org de Efeonce está CONECTADA y activa**: `sc-domain:efeoncepro.com`, scope read-only,
-  `status=active`, con **1.573 filas** en `seo_gsc_daily` hasta el 2026-08-26. (Berel: 180.239.)
-- **Efeonce SÍ tiene foto de dominio**: snapshot de `efeoncepro.com` del 2026-08-27.
-
-El skip no era falta de dato: era **frescura**. La foto del 27 seguía vigente dentro de la ventana de
-30 días, así que el batch la saltó correctamente. Lo que capturó hoy fue el **segundo** sujeto de
-Berel: `comex.com.mx`, un competidor real declarado después del smoke.
-
-Leí `skipped` como "no se pudo medir" cuando significaba "no hacía falta medir". Es el mismo defecto
-del que se corrigió dos veces hoy en el hilo cross-sesión: **observación correcta, causa inventada**.
-Queda escrito acá en vez de reescrita la entrada.
 
 ## 2026-08-29 — cartera LicitaLAB/Wherex y contrato CRM común
 

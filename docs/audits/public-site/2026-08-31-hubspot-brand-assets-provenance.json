@@ -1,0 +1,38 @@
+[
+  {
+    "name": "marketing",
+    "asset": "https://brandfolder.com/hubspot/solutions-partner-hub/#!asset/kw26t9gg93cnpx3gqrs7ssbm",
+    "filename": "Marketing Hub Icon/ProductIcons_MarketingHub_Icon_Orange.svg",
+    "sha256": "89ead75d1c2fdd407ab6705fb2c50c88813f44dd2b5fa6e3a71ce8f4afacba80"
+  },
+  {
+    "name": "sales",
+    "asset": "https://brandfolder.com/hubspot/solutions-partner-hub/#!asset/g7b8xvrqpw2wb4fbgqvvf8rm",
+    "filename": "Sales Hub Icon/ProductIcons_SalesHub_Icon_Orange.svg",
+    "sha256": "c373016d44321fb46b33b5f588471716401f03f824bb0df022c6c6a1d7ff75bb"
+  },
+  {
+    "name": "service",
+    "asset": "https://brandfolder.com/hubspot/solutions-partner-hub/#!asset/fnxf338h5v7smp4jfjc387",
+    "filename": "Service Hub Icon/ProductIcons_ServiceHub_Icon_Orange.svg",
+    "sha256": "964925292dbd8777f63b478490ec358387403730577d1d6694b7e57aa92e3ac4"
+  },
+  {
+    "name": "content",
+    "asset": "https://brandfolder.com/hubspot/solutions-partner-hub/#!asset/bf77sq4bcn9pp6w8xb4bwxt",
+    "filename": "Content Hub Icon/ProductIcons_ContentHub_Icon_Orange.svg",
+    "sha256": "313f4f92526af389a7a13bcc5a8ae5ce9fa26e24461f962ec2b1bef682e9fd65"
+  },
+  {
+    "name": "data",
+    "asset": "https://brandfolder.com/hubspot/solutions-partner-hub/#!asset/69959g85579jhmx635fg8",
+    "filename": "Data Hub Icon/ProductIcons_DataHub_Icon_Orange.svg",
+    "sha256": "1618a4b400d1518e77cf51fbb84627aee5290a8b72612ec186b8aaca4fb8a594"
+  },
+  {
+    "name": "revenue",
+    "asset": "https://brandfolder.com/hubspot/solutions-partner-hub/#!asset/xc6rwggxp8q56m6sf4rhjj3",
+    "filename": "Revenue Hub - Icon Orange/ProductIcons_RevenueHub_Icon_Orange.svg",
+    "sha256": "5eaaaa84c1f24cf9a7911fa9d2df3ac8acf8ed5881eec34ea3499a85b716b542"
+  }
+]

@@ -1,0 +1,26 @@
+{
+  "contract": "hubspot-elementor-release.v1",
+  "sourceSha256": "f95b6254c2434b58a4d6855dded40dd3a38acb19b881e090e1928674ab8bb812",
+  "files": [
+    {
+      "path": "assets/css/hubspot-elementor.css",
+      "sha256": "7af4eda9d22ae19489eeff0674a3b0df928239f275c2f9b08f9a7b2459a6944b",
+      "previousSha256": "b6d68d793643b61f2d0b35b7ce62dd5b14ec4ce7e9f35f0db2c929736a2b921f"
+    },
+    {
+      "path": "includes/hubspot/templates/hubs.html",
+      "sha256": "393820bf99715eb57edc59329a2e149931909051af66f11a210f054bc914fc7d",
+      "previousSha256": "affa8e8a4552a7a754d43d9c124ddc6443edf29af893447c851551cb4a14f33d"
+    },
+    {
+      "path": "includes/hubspot/templates/hubs--panels-12.html",
+      "sha256": "c7bf10392bd4fdbaa510247397536c83c9057b160d32923e6366fbbc19557000",
+      "previousSha256": "fe7e5dcc77cdf480dfc123a00eaace012503992066427c296e4f4a2d4c1c723a"
+    },
+    {
+      "path": "includes/hubspot/schemas/hubs.json",
+      "sha256": "7cab3f80c51d32e8929f68ca1165a2d0c5ce48c7679a8280cb929619102126e0",
+      "previousSha256": "da3be13dcd4f237f4ec45f9f0773c7c7be935bac498b7017a4a0345302817df6"
+    }
+  ]
+}

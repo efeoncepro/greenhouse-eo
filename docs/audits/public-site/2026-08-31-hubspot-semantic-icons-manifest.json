@@ -1,0 +1,71 @@
+{
+  "contract": "hubspot-elementor-release.v1",
+  "sourceSha256": "f95b6254c2434b58a4d6855dded40dd3a38acb19b881e090e1928674ab8bb812",
+  "files": [
+    {
+      "path": "assets/css/hubspot-elementor.css",
+      "sha256": "6c98fd8a969ef69f8ed948081d322816bb1410067c7c3752ed720dfa4e23f636",
+      "previousSha256": "7af4eda9d22ae19489eeff0674a3b0df928239f275c2f9b08f9a7b2459a6944b"
+    },
+    {
+      "path": "includes/hubspot/templates/hubs.html",
+      "sha256": "2d412249ed2974b9a3d355641c680d9d3238609f67e3004be8ab2ee3a38e6385",
+      "previousSha256": "393820bf99715eb57edc59329a2e149931909051af66f11a210f054bc914fc7d"
+    },
+    {
+      "path": "includes/hubspot/schemas/hubs.json",
+      "sha256": "5f4a18e0ca9d45b9912fe861ec5c97adb19147fc98b1f7041a72055b329e0668",
+      "previousSha256": "7cab3f80c51d32e8929f68ca1165a2d0c5ce48c7679a8280cb929619102126e0"
+    },
+    {
+      "path": "includes/hubspot/templates/hubs--panels-8.html",
+      "sha256": "60d7dac91eb682bdb0af6fa4a12e5d3f6a50022245bb0705b4f893567c677f21",
+      "previousSha256": "0950fa51bed09fcf28d07fa22a8a3b163d7c3318700fb085fb6393ad62f6fd6f"
+    },
+    {
+      "path": "includes/hubspot/templates/hubs--panels-9.html",
+      "sha256": "0a9fdcbae9060b7fd89ca972e29a1eb8a15a5d675603bdb60b0a73b94d93941b",
+      "previousSha256": "bc5d21576424957ab5a1a6e0d677e704e34c5f59c5d17d79201d276aa85a9ad2"
+    },
+    {
+      "path": "includes/hubspot/templates/hubs--panels-10.html",
+      "sha256": "510988fe5de08711228470c9f80eaba402924b2f9d9367301f5c8eceb714133d",
+      "previousSha256": "74688f5a76666642116a84e9870c041917f273e39be7f02c98e1d74fe7c9b548"
+    },
+    {
+      "path": "includes/hubspot/templates/hubs--panels-11.html",
+      "sha256": "02a51579a3e11fa97c71d60117c2bf05226beb84a5b971971501c93ea4ae18c0",
+      "previousSha256": "7d9d3d50a03725a7494ac095ce26b090c4005264cc20eaf3cba013b72fdb844f"
+    },
+    {
+      "path": "includes/hubspot/templates/hubs--panels-13.html",
+      "sha256": "97082437ffab9da5df09ad2b98659aee7a8a49ac4c2cfaa1a3cf1a208754f668",
+      "previousSha256": "4f5b1e1bb2a29ddeb120fb7e725031972390086115b139778d0309ec53a009cb"
+    },
+    {
+      "path": "assets/img/hubspot/semantic-world-search.svg",
+      "sha256": "624af3e0e0d667580ccfb67981922525af8f56d9d7c6f9d4947bddf878961ccc",
+      "previousSha256": ""
+    },
+    {
+      "path": "assets/img/hubspot/semantic-briefcase.svg",
+      "sha256": "4a51ccd9b995d66ac550fda434bdc058992052577aa04732b58e33fcd15b5909",
+      "previousSha256": ""
+    },
+    {
+      "path": "assets/img/hubspot/semantic-heart-handshake.svg",
+      "sha256": "bc7a358b2639ca59f16ffc66e95a5d0e91ac44893deb303601ce8fd9581d6ba4",
+      "previousSha256": ""
+    },
+    {
+      "path": "assets/img/hubspot/semantic-palette.svg",
+      "sha256": "6f84a9bf0638aee9dba83c2b35a485bc7969f07896d43a78729312d5e5f9d375",
+      "previousSha256": ""
+    },
+    {
+      "path": "assets/img/hubspot/semantic-messages.svg",
+      "sha256": "2b54897c0b43aa72a973d25f53f5260da5cef0768d7c29a43724b512fb982aec",
+      "previousSha256": ""
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "mode": "live",
+  "status": "PASS",
+  "states": [
+    {
+      "width": 1414,
+      "passed": true
+    },
+    {
+      "width": 768,
+      "passed": true
+    },
+    {
+      "width": 390,
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "keyboard": true,
+  "checkedAt": "2026-08-31T10:48:24.286Z"
+}

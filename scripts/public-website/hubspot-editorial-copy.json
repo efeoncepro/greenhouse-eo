@@ -1,0 +1,203 @@
+{
+  "licensing": {
+    "defaults": {
+      "f003_descripcion": "Licencias y operación",
+      "f004_titulo": "Las licencias que necesitas. Un equipo para hacerlas funcionar.",
+      "f005_descripcion": "Antes de contratar HubSpot, revisamos qué herramientas y licencias necesita tu equipo y estimamos su consumo de IA. Te acompañamos en la compra, implementamos lo acordado y podemos seguir operando el CRM contigo.",
+      "f006_texto": "Elegir mis licencias",
+      "f007_descripcion": "Qué contratar, para quién y con qué presupuesto.",
+      "f008_descripcion": "Antes de contratar",
+      "f009_texto": "Un plan según tu operación",
+      "f010_texto": "Definimos qué Hubs, planes y tipos de licencia necesita cada persona según su trabajo. Así puedes decidir qué contratar ahora y qué dejar para después.",
+      "f011_texto": "Una estimación del consumo de IA",
+      "f012_texto": "Proyectamos los créditos que podrías necesitar según el volumen de uso previsto y te explicamos qué puede hacer variar ese consumo.",
+      "f013_texto": "Acompañamiento en la compra",
+      "f014_texto": "Gestionamos contigo la contratación de las licencias y revisamos el alcance y los costos antes de que firmes.",
+      "f015_descripcion": "Con HubSpot en marcha",
+      "f016_texto": "Operación continua del CRM",
+      "f017_texto": "Si necesitas apoyo después de implementar, acordamos un servicio de operación con revisiones periódicas, prioridades claras y mejoras documentadas."
+    }
+  },
+  "proof-ledger": {
+    "defaults": {
+      "f002_texto_alternativo": "HubSpot Solutions Partner Gold",
+      "f003_descripcion": "Caso ANAM · Customer Agent de HubSpot",
+      "f004_titulo": "ANAM: 56% menos carga en atención.",
+      "f005_descripcion": "Atención con IA, conocimiento actualizado y respaldo humano.",
+      "f007_descripcion": "de carga de trabajo en el equipo de atención",
+      "f008_descripcion": "Reducción promedio en los meses medidos en producción, respecto de la carga previa del mismo equipo.",
+      "f009_texto": "Antes de la implementación",
+      "f011_texto": "Después de la implementación",
+      "f014_texto": "en el mes con mayor reducción. El resultado promedio fue de 56%.",
+      "f015_descripcion": "ANAM incorporó Customer Agent de HubSpot a su atención. En Efeonce construimos y mantenemos la base de conocimiento que utiliza el agente, definimos qué consultas puede resolver y cuándo debe derivarlas a una persona. Cada responsabilidad y criterio de derivación quedó documentado antes de ponerlo en funcionamiento.",
+      "f016_descripcion": "Cómo lo implementamos",
+      "f018_descripcion": "Una base de conocimiento con control de versiones y responsables de mantenerla al día.",
+      "f020_descripcion": "Criterios claros para resolver consultas con IA o derivarlas al equipo de atención.",
+      "f022_descripcion": "Responsabilidades y pasos de derivación documentados antes de la puesta en marcha.",
+      "f023_descripcion": "Resultados del caso ANAM. El desempeño depende del alcance y de las condiciones de cada operación.",
+      "f024_descripcion": "HubSpot Solutions Partner Gold",
+      "f025_descripcion": "Somos parte del programa de partners de HubSpot con nivel Gold. Te acompañamos en la elección de licencias, la implementación y la operación de tu CRM.",
+      "f026_descripcion": "Conoce nuestro perfil en HubSpot",
+      "f027_descripcion": "Consulta el perfil de Efeonce en el directorio oficial de HubSpot y conoce los servicios que ofrecemos.",
+      "f028_descripcion": "Ver Efeonce en el directorio de HubSpot"
+    }
+  },
+  "conversion": {
+    "defaults": {
+      "f001_titulo": "Conversemos sobre tu proyecto HubSpot.",
+      "f002_descripcion": "Una hora sin costo con un especialista en HubSpot para revisar tu operación, aclarar prioridades y definir el próximo paso. Si detectamos que la plataforma no responde a lo que necesitas, te lo diremos.",
+      "f004_texto": "Nos cuentas qué necesitas resolver y cómo trabaja tu equipo. Si ya usas HubSpot, podemos acordar una revisión con acceso de lectura.",
+      "f006_texto": "Identificamos las herramientas que podrían ayudarte, el orden de implementación y lo que debemos revisar antes de avanzar.",
+      "f008_texto": "Acordamos los próximos pasos y la información necesaria para preparar una propuesta con fases, alcance y cotización.",
+      "f009_descripcion": "Usamos tus datos para revisar y responder esta solicitud."
+    }
+  },
+  "assessment": {
+    "defaults": {
+      "f009_descripcion": "El primer paso",
+      "f010_titulo": "Aclara qué necesitas antes de implementar.",
+      "f011_descripcion": "Empieza con una conversación sin costo. Revisamos tus prioridades y definimos juntos si conviene avanzar, qué falta evaluar y cómo preparar una propuesta.",
+      "f013_texto": "Sin costo",
+      "f014_subtitulo": "Reunión de alcance",
+      "f015_descripcion": "Una hora con un especialista en HubSpot para entender cómo trabaja tu equipo, qué quieres mejorar y cuál puede ser el punto de partida.",
+      "f016_descripcion": "Qué definimos contigo",
+      "f017_texto": "El problema que conviene resolver primero",
+      "f018_texto": "Las prioridades y los próximos pasos",
+      "f019_texto": "La información necesaria para cotizar",
+      "f020_texto": "Agendar mi reunión",
+      "f022_texto": "Opcional · De pago",
+      "f023_subtitulo": "Plan de implementación (Blueprint)",
+      "f024_descripcion": "Si necesitas un análisis técnico antes de decidir, preparamos un documento con el estado actual, la solución propuesta, las fases y los riesgos. Se cotiza por separado y puedes usarlo aunque otro equipo implemente.",
+      "f026_texto": "Según alcance",
+      "f027_subtitulo": "Implementación y operación",
+      "f028_descripcion": "Implementamos las fases que apruebes, con entregables y pruebas acordadas contigo. Si necesitas apoyo continuo, definimos también el servicio de operación del CRM.",
+      "f029_descripcion": "La reunión no te compromete a contratar ningún servicio.",
+      "f030_descripcion": "Tu empresa conserva la propiedad del portal y de sus datos.",
+      "f031_descripcion": "Si HubSpot no responde a tus necesidades, te explicamos sus límites."
+    }
+  },
+  "faq": {
+    "defaults": {},
+    "repeaters": {
+      "questions": {
+        "layout_0": {
+          "f004_descripcion": "Es una conversación de una hora, sin costo, con un especialista en HubSpot. Revisamos tu operación, identificamos prioridades y acordamos los próximos pasos. Si ya usas HubSpot, podemos coordinar una revisión con acceso de lectura. También definimos qué información necesitamos para preparar una propuesta con fases, alcance y cotización."
+        },
+        "layout_3": {
+          "f004_descripcion": "Evaluamos si HubSpot responde a lo que necesitas antes de proponer una implementación. Si detectamos limitaciones que afectan tu caso, te las explicamos para que puedas decidir con esa información."
+        }
+      }
+    }
+  },
+  "sectors": {
+    "defaults": {
+      "f003_titulo": "HubSpot, adaptado a cómo trabaja tu industria.",
+      "f004_descripcion": "Tu ciclo de venta, la relación con tus clientes y los sistemas que ya usas definen por dónde empezar. Explora las prioridades de cada sector.",
+      "f005_boton": "Todos los sectores",
+      "f006_boton": "Servicios profesionales y B2B",
+      "f007_boton": "SaaS y tecnología",
+      "f008_boton": "Manufactura y distribución"
+    },
+    "repeaters": {
+      "panels": {
+        "layout_0": {
+          "f004_descripcion": "El objetivo",
+          "f005_descripcion": "Conectar marketing, ventas y atención con información compartida de cada cliente.",
+          "f006_descripcion": "El desafío",
+          "f007_descripcion": "Cuando cada área registra y mide de forma distinta, cuesta seguir al cliente y saber qué necesita.",
+          "f008_descripcion": "Por dónde empezamos",
+          "f009_descripcion": "Acordamos qué datos necesita cada equipo y cómo mantenerlos conectados. Esa base permite ordenar las ventas, la atención y las automatizaciones.",
+          "f010_descripcion": "Áreas prioritarias",
+          "f011_descripcion": "Un punto de partida que ajustamos contigo según las necesidades de tu operación."
+        },
+        "layout_1": {
+          "f004_descripcion": "El objetivo",
+          "f005_descripcion": "Seguir cada proyecto desde la propuesta hasta la entrega y el cobro.",
+          "f006_descripcion": "El desafío",
+          "f007_descripcion": "La venta queda en el CRM, la entrega en otra herramienta y la facturación en una tercera. Sin conectar esa información, es difícil evaluar cada proyecto.",
+          "f008_descripcion": "Por dónde empezamos",
+          "f009_descripcion": "Revisamos el paso de ventas a entrega y cobro. Definimos qué información debe compartir el CRM con tus herramientas de gestión y finanzas.",
+          "f010_descripcion": "Áreas prioritarias",
+          "f011_descripcion": "Un punto de partida que ajustamos contigo según las necesidades de tu operación."
+        },
+        "layout_2": {
+          "f004_descripcion": "El objetivo",
+          "f005_descripcion": "Conectar adquisición, activación y renovación para dar seguimiento a cada cuenta.",
+          "f006_descripcion": "El desafío",
+          "f007_descripcion": "Marketing, ventas y producto pueden tener datos distintos sobre el uso, la actividad y el estado de un mismo cliente.",
+          "f008_descripcion": "Por dónde empezamos",
+          "f009_descripcion": "Acordamos qué significa una cuenta activa y conectamos los datos necesarios para seguir oportunidades, adopción y renovación.",
+          "f010_descripcion": "Áreas prioritarias",
+          "f011_descripcion": "Un punto de partida que ajustamos contigo según las necesidades de tu operación."
+        },
+        "layout_3": {
+          "f004_descripcion": "El objetivo",
+          "f005_descripcion": "Cotizar con información consistente y dar seguimiento a clientes, distribuidores y sucursales.",
+          "f006_descripcion": "El desafío",
+          "f007_descripcion": "Las cotizaciones en planillas, los precios desactualizados y los registros duplicados dificultan el seguimiento comercial.",
+          "f008_descripcion": "Por dónde empezamos",
+          "f009_descripcion": "Ordenamos el proceso de cotización y los datos de clientes y productos. Antes de conectar el ERP, evaluamos sus capacidades y el alcance de la integración.",
+          "f010_descripcion": "Áreas prioritarias",
+          "f011_descripcion": "Un punto de partida que ajustamos contigo según las necesidades de tu operación."
+        }
+      }
+    }
+  },
+  "delivery": {
+    "defaults": {
+      "f001_descripcion": "Cómo trabajamos",
+      "f002_titulo": "Tu implementación de HubSpot, paso a paso.",
+      "f003_descripcion": "Cinco etapas con entregables claros. Tu equipo revisa y aprueba cada avance antes de pasar al siguiente.",
+      "f004_texto": "Revisar",
+      "f005_texto": "Diseñar",
+      "f006_texto": "Implementar",
+      "f007_texto": "Adoptar",
+      "f008_texto": "Operar",
+      "f009_descripcion": "Tu equipo aprueba los cambios antes de ejecutarlos. Después, revisamos contigo los resultados y dejamos documentado lo que se hizo."
+    },
+    "repeaters": {
+      "panels": {
+        "layout_0": {
+          "f004_texto": "Entender tu operación",
+          "f005_descripcion": "Revisamos cómo trabaja tu equipo, qué necesita resolver y qué sistemas utiliza. Si ya tienes HubSpot, hacemos un inventario de la configuración y los datos, sin modificar el portal.",
+          "f006_descripcion": "Qué recibes",
+          "f007_descripcion": "Un diagnóstico del punto de partida, con prioridades y decisiones pendientes.",
+          "f008_descripcion": "Qué valida tu equipo",
+          "f009_descripcion": "Tu equipo confirma el diagnóstico y las prioridades antes de empezar el diseño."
+        },
+        "layout_1": {
+          "f004_texto": "Diseñar la solución",
+          "f005_descripcion": "Definimos cómo se organizarán los datos, los procesos y las integraciones, y quién será responsable de cada parte. Documentamos los cambios propuestos, su impacto y cómo revertirlos si fuera necesario.",
+          "f006_descripcion": "Qué recibes",
+          "f007_descripcion": "El diseño de la solución y un plan de cambios con responsables, riesgos y pruebas para validar el resultado.",
+          "f008_descripcion": "Qué valida tu equipo",
+          "f009_descripcion": "Tu equipo aprueba el diseño y el alcance por escrito antes de implementar."
+        },
+        "layout_2": {
+          "f004_texto": "Implementar por fases",
+          "f005_descripcion": "Configuramos e integramos lo acordado en fases. Respaldamos lo necesario antes de cada cambio y probamos el resultado para comprobar que funciona en tu operación.",
+          "f006_descripcion": "Qué recibes",
+          "f007_descripcion": "Cada fase implementada, sus pruebas y la documentación de los cambios realizados.",
+          "f008_descripcion": "Qué valida tu equipo",
+          "f009_descripcion": "Tu equipo revisa los resultados y acepta cada fase antes de avanzar."
+        },
+        "layout_3": {
+          "f004_texto": "Incorporar HubSpot al trabajo diario",
+          "f005_descripcion": "Preparamos a tu equipo para usar el CRM en sus tareas habituales. Definimos qué información registrar, cuándo hacerlo y quién se encarga de mantenerla actualizada.",
+          "f006_descripcion": "Qué recibes",
+          "f007_descripcion": "Capacitación, pautas de uso y tareas organizadas por responsable.",
+          "f008_descripcion": "Qué valida tu equipo",
+          "f009_descripcion": "Los responsables de cada área validan la forma de trabajo y las responsabilidades de su equipo."
+        },
+        "layout_4": {
+          "f004_texto": "Operar y mejorar",
+          "f005_descripcion": "Si contratas operación continua, revisamos el CRM periódicamente y priorizamos mejoras contigo. Definimos qué medir y comprobamos la calidad de los datos antes de usar los reportes para decidir.",
+          "f006_descripcion": "Qué incluye",
+          "f007_descripcion": "Un plan de trabajo recurrente, revisiones del portal y mejoras priorizadas y documentadas.",
+          "f008_descripcion": "Qué valida tu equipo",
+          "f009_descripcion": "Tu equipo acuerda las prioridades y aprueba los cambios de cada ciclo."
+        }
+      }
+    }
+  }
+}

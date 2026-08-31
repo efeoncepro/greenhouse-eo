@@ -1,0 +1,23 @@
+[
+  {
+    "name": "gpt",
+    "sourcePage": "https://efeoncepro.com/aeo-2/",
+    "url": "https://efeoncepro.com/wp-content/plugins/eo-elementor-widgets/assets/img/engines/engine-gpt.png",
+    "status": 200,
+    "sha256": "7a8beac70388ee6dbc0d70e882cdc1c077c84abafa0bedffefc909655aa8a7a6"
+  },
+  {
+    "name": "claude",
+    "sourcePage": "https://efeoncepro.com/aeo-2/",
+    "url": "https://efeoncepro.com/wp-content/plugins/eo-elementor-widgets/assets/img/engines/engine-claude.png",
+    "status": 200,
+    "sha256": "19c04b95bb260e9421d5ce647cad5db3cb29ebcf8b9bec7202b29f6a65052dfc"
+  },
+  {
+    "name": "gemini",
+    "sourcePage": "https://efeoncepro.com/aeo-2/",
+    "url": "https://efeoncepro.com/wp-content/plugins/eo-elementor-widgets/assets/img/engines/engine-gemini.png",
+    "status": 200,
+    "sha256": "b9f834cb7b3b3522d88311fb970446daf3f9dfa3d8cac7b593680d447e5df6a5"
+  }
+]

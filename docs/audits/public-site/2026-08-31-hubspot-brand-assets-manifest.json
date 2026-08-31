@@ -1,0 +1,61 @@
+{
+  "contract": "hubspot-elementor-release.v1",
+  "sourceSha256": "f95b6254c2434b58a4d6855dded40dd3a38acb19b881e090e1928674ab8bb812",
+  "files": [
+    {
+      "path": "assets/css/hubspot-elementor.css",
+      "sha256": "bfd4d0c9b3c511d9e9d53e17a8c8a91a2b4484dd3b5fc3023a85f58bd17562dd",
+      "previousSha256": "575173767c5f22bd4ddc67618d9e6b5775db4a2e0d609ae5d2e696f9aba8fb2f"
+    },
+    {
+      "path": "includes/hubspot/templates/hubs.html",
+      "sha256": "eab230beaf3697fc25a4ad85e46f3ee9569c4eda6b31a000955a5ac06ad3f17b",
+      "previousSha256": "9e04cf880fbb33a3024889c3a7b987aa39b95c6bc342a2afccf9b7ac3034c045"
+    },
+    {
+      "path": "includes/hubspot/schemas/hubs.json",
+      "sha256": "95289caedf66fec508d8e1001d35fa83fd0b8319ec6f8cfab3b57ebb44545e00",
+      "previousSha256": "b714f964cad35792dfa95e9af0058f3c5d4043451dec104aa28029ff0ae5ce90"
+    },
+    {
+      "path": "includes/hubspot/templates/proof-ledger.html",
+      "sha256": "d1ad14c7eb114b46867662d226e4f67e57698501521c8843ed61f4fa717e9557",
+      "previousSha256": "9fd405378a91d03e2b67c7ac87c1a7b66d75939965cc5007c610bb7af7e22296"
+    },
+    {
+      "path": "includes/hubspot/schemas/proof-ledger.json",
+      "sha256": "9b94ebe5f10ee06edb3f075178e101b51d00e4f737179982af0604b4617fb7d4",
+      "previousSha256": "a6d2f8f3afa148bb34ff7b7e9c53fab0ed9007485e8b6f057ed093e97d551c59"
+    },
+    {
+      "path": "assets/img/hubspot/marketing-hub.svg",
+      "sha256": "89ead75d1c2fdd407ab6705fb2c50c88813f44dd2b5fa6e3a71ce8f4afacba80",
+      "previousSha256": ""
+    },
+    {
+      "path": "assets/img/hubspot/sales-hub.svg",
+      "sha256": "c373016d44321fb46b33b5f588471716401f03f824bb0df022c6c6a1d7ff75bb",
+      "previousSha256": ""
+    },
+    {
+      "path": "assets/img/hubspot/service-hub.svg",
+      "sha256": "964925292dbd8777f63b478490ec358387403730577d1d6694b7e57aa92e3ac4",
+      "previousSha256": ""
+    },
+    {
+      "path": "assets/img/hubspot/content-hub.svg",
+      "sha256": "313f4f92526af389a7a13bcc5a8ae5ce9fa26e24461f962ec2b1bef682e9fd65",
+      "previousSha256": ""
+    },
+    {
+      "path": "assets/img/hubspot/data-hub.svg",
+      "sha256": "1618a4b400d1518e77cf51fbb84627aee5290a8b72612ec186b8aaca4fb8a594",
+      "previousSha256": ""
+    },
+    {
+      "path": "assets/img/hubspot/revenue-hub.svg",
+      "sha256": "5eaaaa84c1f24cf9a7911fa9d2df3ac8acf8ed5881eec34ea3499a85b716b542",
+      "previousSha256": ""
+    }
+  ]
+}
