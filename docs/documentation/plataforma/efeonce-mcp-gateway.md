@@ -15,8 +15,7 @@ La primera capacidad activa fue `globe.producer.fleet.list`. Permite consultar l
 Globe para el workspace interno autorizado. El gateway no recrea catálogo, routing ni reglas de Globe.
 
 Desde el 6 de agosto de 2026 hay una **segunda capacidad federada**: Search Visibility 360 de Greenhouse. Partió
-con tres consultas de solo lectura y creció hasta cubrir **el inventario SEO completo del MCP interno: 27 tools
-(20 lecturas + 7 escrituras gobernadas)**. Desde el 28 de agosto de 2026 esas 27 están **efectivamente
+con tres consultas de solo lectura y creció hasta federar **28 tools SEO** (al 2026-08-31). ⚠️ Federado e interno NO son el mismo conjunto por construcción —el gateway resuelve contra rutas HTTP del lane—: `get_seo_work_queue` existe adentro y está excluida con razón, y `get_seo_provider_spend` está federada sin contraparte interna. Desde el 28 de agosto de 2026 esas 27 están **efectivamente
 desplegadas** en la revisión productiva del gateway (`efeonce-mcp-gateway-00024-8b8`), que reemplazó a la del 27
 de agosto (servía 21). Ya no queda ninguna tool esperando despliegue. Igual que con Globe, el gateway no recrea
 lógica: transporta la pregunta y Greenhouse decide qué se puede ver. El inventario vigente y su estado de
@@ -77,5 +76,5 @@ aparte y no forma parte de lo comprobado en ese comportamiento.
 
 ## Relación con otros MCP
 
-Este gateway no reemplaza el MCP read-only local/remoto de Greenhouse. Ese MCP sirve al portal Greenhouse y sus
+Este gateway no reemplaza el MCP local/remoto de Greenhouse (que no es read-only: registra 7 escrituras). Ese MCP sirve al portal Greenhouse y sus
 contratos ecosystem; Efeonce MCP Gateway sirve como borde federado para productos hermanos y capacidades futuras.

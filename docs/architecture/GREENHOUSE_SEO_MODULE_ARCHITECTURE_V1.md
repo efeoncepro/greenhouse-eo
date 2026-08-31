@@ -361,25 +361,21 @@ chokepoint como lectura, SIN anti-oracle por diseño — visibilidad operativa).
 (criterio de aceptación en TASK-1303/1304/1311/1312/1313/1314/1317). La federación al gateway
 `mcp.efeonce.org` la abrió `TASK-1647` (adapter delgado del provider; canaries antes de discovery) y
 la completó `TASK-1658` (2026-08-27): las tools SEO del MCP interno están federadas con guard de
-paridad **bidireccional** en el gateway (espejo `GREENHOUSE_SEO_TOOL_INVENTORY` + paridad de schema
-+ `annotations` obligatorias; interino hasta que `TASK-1780` lo reemplace por el manifiesto canónico
-de Greenhouse).
+paridad **bidireccional** en el gateway (paridad de schema + `annotations` obligatorias). Desde
+`TASK-1780` (2026-08-31) ese guard **ya no compara contra un espejo a mano**: su inventario se deriva
+del manifiesto canónico `src/mcp/greenhouse/tool-manifest.ts`, que viaja como artefacto generado con
+hash verificado al cargar (`pnpm mcp:manifest:generate` acá → `pnpm greenhouse:manifest:sync` allá).
 
-⚠️ **El inventario interno y lo desplegado en el gateway son dos números distintos, y confundirlos
-es el error que este párrafo ya cometió una vez.** Inventario interno (as-of 2026-08-28): **27
-tools (20 lecturas + 7 escrituras)** — `TASK-1696` agregó `get_seo_provider_spend`, `TASK-1662`
-agregó `declare_seo_competitors` / `retire_seo_competitors` (writes) + `get_seo_keyword_gap`
-(read), y `TASK-1699` agregó `get_seo_serp_top_results` + `get_seo_competitor_candidates`
-(reads), las 27 federadas en el código de `efeonce-mcp`. Desplegado en la revisión productiva del
-gateway: **21** — la revisión activa `efeonce-mcp-gateway-00023-zt2` (2026-08-27) llevó el deploy
-de `TASK-1658`, así que la cifra de 13 que este doc declaraba quedó vencida por un deploy entero.
-El bloqueo que este párrafo declaraba —«sus lanes todavía no están en `main`»— **ya no aplica**:
-el release `c983be7f18e6` (2026-08-28) llevó los 6 lanes (`provider-spend`,
-`competitors/{declare,retire}`, `keyword-gap`, `serp-top-results`, `competitor-candidates`) a
-producción, y los 4 internal-only responden `ok` con `404` anti-oracle en el deny. Desplegar el
-gateway **antes** de ese release las habría dejado respondiendo 404 upstream con el guard de
-paridad en verde (precedente `TASK-1661`); el estado desplegado del gateway se rastrea en su propia
-doc (manual del MCP §8), no acá.
+⚠️ **El inventario interno y el conjunto federado son dos números distintos, y confundirlos es el
+error que este párrafo ya cometió dos veces.** No son iguales **por construcción**, no por
+desincronización: el gateway federa resolviendo contra **rutas HTTP del lane**, no contra nombres del
+MCP interno. Medido 2026-08-31: interno **28 tools SEO (21 lecturas + 7 escrituras)** de un total de
+43 registradas; federadas en el código del gateway **28**, con `get_seo_work_queue` excluida con razón
+y `get_seo_provider_spend` federada **sin contraparte interna** (declarada en
+`GREENHOUSE_GATEWAY_NATIVE_TOOLS`). 🔴 **Ninguna de estas cifras se mantiene a mano:** la fuente es
+`src/mcp/greenhouse/tool-manifest.ts` y el gate `pnpm mcp:manifest:check`. Si necesitas el número,
+léelo de ahí — un conteo escrito en una spec es exactamente lo que el manifiesto existe para
+desterrar.
 
 **Delta 2026-08-07 (TASK-1308) — el lane SEO deja de ser sólo lectura.** `keywords/track` y
 `keywords/untrack` son sus **dos primeros commands**: van por `runEcosystemCommandRoute`, no por el

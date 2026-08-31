@@ -13,12 +13,11 @@
 Este manual es para el operador que necesita **verificar, diagnosticar o apagar** el provider `greenhouse-seo`
 del gateway MCP de Efeonce — lo que un cliente MCP puede hacer contra `mcp.efeonce.org`.
 
-El allowlist federado tiene **27 tools — 20 de lectura y 7 de escritura** (fuente de verdad: el espejo `GREENHOUSE_SEO_TOOL_INVENTORY`
+El allowlist federado tiene **28 tools** (medido 2026-08-31; fuente de verdad: `src/mcp/greenhouse/tool-manifest.ts` en Greenhouse, del que el inventario del guard se deriva
 del guard de paridad `src/providers/greenhouse-seo-tool-parity.ts` del repo `efeonce-mcp` — desde
 TASK-1658 el guard es **bidireccional**: nombre + claves exactas del inputSchema interno + clase
 `writes` + paridad de schema + `annotations` obligatorias, con introspección runtime del server; el
-test rompe el CI si diverge en cualquiera de las dos direcciones. Interino hasta que TASK-1780 lo
-reemplace por el manifiesto canónico de Greenhouse):
+test rompe el CI si diverge en cualquiera de las dos direcciones. Ya reemplazado por el manifiesto canónico de Greenhouse (`TASK-1780`, 2026-08-31): el inventario del guard se deriva del artefacto generado con hash, no de una lista a mano):
 
 | Tool | Qué es |
 |---|---|
@@ -347,4 +346,4 @@ gateway, no el módulo SEO.
 - Lane de Greenhouse: [`src/lib/api-platform/resources/ecosystem-growth-seo.ts`](../../../src/lib/api-platform/resources/ecosystem-growth-seo.ts)
 - Adaptador del gateway: repo hermano `efeonce-mcp`, `src/providers/greenhouse-seo.ts`
 - Gateway completo: [Operar Efeonce MCP Gateway](operar-efeonce-mcp-gateway.md)
-- Mismas tools por el MCP interno: [MCP Greenhouse Read-Only](mcp-greenhouse-tool-inventory.md) §8
+- Mismas tools por el MCP interno: [MCP Greenhouse — Inventario de Tools](mcp-greenhouse-tool-inventory.md) §8

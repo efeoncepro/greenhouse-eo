@@ -150,7 +150,7 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   `globe.producer.fleet.list` y el write interno one-shot `globe.credits.funding.ensure`, ambos verificados por
   OAuth PKCE real. El write acepta únicamente una autoridad ya sellada y llama el command Greenhouse canónico.
   Clientes externos continúan bloqueados hasta separar entitlements/emisión de scopes
-  B2B y probar una identidad base-only. Greenhouse mantiene sólo ADRs, tasks y handoff de ecosistema.
+  B2B y probar una identidad base-only. Greenhouse mantiene ADRs, tasks, handoff y el inventario de tools MCP.
 - Para identidad cliente, separar runtimes no significa separar personas: Greenhouse, `auth.efeonce.org` y MCP
   mantienen cookies, sesiones y audiencias propias, pero resuelven un único `identity_profile` y la membresía de
   Account 360 mediante bindings auditados. La coexistencia inicial con el login cliente actual requiere una ruta

@@ -117,8 +117,11 @@ Reglas obligatorias:
 
 - Toda task futura que agregue una ruta al lane: si el gate aterriza, agregar ruta pasa a exigir
   declararla en el mismo PR.
-- `TASK-1780` (inventario canónico de tools MCP) comparte la tesis y el vocabulario; conviene que
-  el gate de rutas y el de tools no diverjan en forma.
+- `TASK-1780` (inventario canónico de tools MCP) quedó **`complete` el 2026-08-31**: deja de ser una task
+  futura con la que coordinar y pasa a ser el precedente a copiar. Vocabulario a espejar:
+  `src/mcp/greenhouse/tool-manifest.ts` + el gate `pnpm mcp:manifest:check`. 🔴 El precedente son **dos
+  piezas**, no una: manifiesto dueño en el PRODUCTO + guardia consumidor en el ADAPTADOR — que es justo la
+  separación que este gate necesita para el lane HTTP.
 
 ### Files owned
 

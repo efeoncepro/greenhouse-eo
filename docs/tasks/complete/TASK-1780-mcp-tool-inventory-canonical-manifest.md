@@ -105,7 +105,7 @@ La «Evidencia de cierre» del Slice 3 sigue debiendo usar el caso sintético de
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -118,7 +118,7 @@ La «Evidencia de cierre» del Slice 3 sigue debiendo usar el caso sintético de
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `none`
-- Status real: `code complete. Slices 0-2 + artefacto y gate en develop (6 commits, sin push). Slice 3 implementado, verde (pnpm check: 73/73 + build) y STAGED en efeonce-mcp; el commit quedo bloqueado por el clasificador de permisos del entorno, no por una decision ni por una regla del repo. Correccion de riesgo: el gateway NO tiene auto-deploy — deploy.yml es workflow_dispatch puro, el push a main solo corre ci.yml`
+- Status real: `complete 2026-08-31 — los 3 slices en produccion de codigo. Greenhouse: 7089d92de..d2b3c0639 en develop, 9 workflows en success. Gateway efeonce-mcp: f523960..e92961e en main, CI success. El deploy del gateway NO es automatico (workflow_dispatch): la revision productiva sigue en efeonce-mcp-gateway-00024-8b8 hasta que alguien lo dispare — la verificacion de esta task es de CI, no de runtime`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -430,7 +430,7 @@ toca Entra, ni Cloud Run, ni secretos.
 - [x] El manifiesto NO tiene campo de federación: qué cruza al público sigue siendo autoridad del gateway.
 - [x] El `name` y las `instructions` se construyen desde el manifiesto y declaran las **siete** escrituras y las cuatro que gastan presupuesto del proveedor.
 - [x] Las instructions conservan las afirmaciones verdaderas: downstream del lane, scope externo fijo, request id preservados, sin inferencia de tenancy.
-- [~] El guardia del gateway compara contra el manifiesto y ya no contra una lista espejo. **Implementado, verde (`pnpm check`: 73/73 + build) y STAGED en `efeonce-mcp`**; el commit quedó bloqueado por el clasificador de permisos del entorno. Es lo único que falta para cerrar.
+- [x] El guardia del gateway compara contra el manifiesto y ya no contra una lista espejo. **En `main` de `efeonce-mcp` (`e92961e`), CI `success`.**
 - [x] 🔴 El poder de detección del guardia queda **ejercitado**, no afirmado: (a) la regresión sintética se pone roja nombrando la tool cuando una entrada del manifiesto no está ni federada ni excluida; (b) corrido contra el estado real, nombra `get_seo_provider_spend` como federada sin contraparte interna, o la declara con su clase. Sin una de las dos, la task no está hecha. (El criterio original —«detecta las tres tools invisibles»— murió cuando `TASK-1658` las federó: ver Delta 2026-08-31.)
 - [x] El manifiesto cubre las **43** tools registradas, no sólo las SEO: las 15 no-SEO dejan de ser un punto ciego del censo.
 - [x] El cruce manifiesto ↔ `SEO_LENS_SURFACES` (`TASK-1785`) falla en las dos direcciones, para que el manifiesto no nazca como tercera lista.
@@ -475,15 +475,15 @@ verde; lint y `tsc` sin hallazgos en los archivos de esta task. Gateway: `pnpm c
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] `TASK-1658` quedó actualizada: sus slices consumen el manifiesto en vez de la lista espejo
-- [ ] el mandato del dominio quedó redirigido al manifiesto en la doc que lo declara
-- [ ] los enlaces entrantes al manual renombrado quedaron actualizados
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `TASK-1658` quedó actualizada: sus slices consumen el manifiesto en vez de la lista espejo
+- [x] el mandato del dominio quedó redirigido al manifiesto en la doc que lo declara
+- [x] los enlaces entrantes al manual renombrado quedaron actualizados
 
 ## Follow-ups
 

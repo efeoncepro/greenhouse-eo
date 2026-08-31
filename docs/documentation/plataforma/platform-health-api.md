@@ -177,7 +177,7 @@ Recomendacion de uso para agentes MCP y Teams bot:
 
 ## Tareas relacionadas
 
-- TASK-647 — MCP read-only adapter ya expone la tool `get_platform_health` que envuelve este contrato.
+- TASK-647 — el adapter MCP ya expone la tool `get_platform_health` (una lectura; el servidor como tal no es read-only) que envuelve este contrato.
 - TASK-657 — degraded modes / dependency health usa el mismo wrapper `withSourceTimeout` para sus probes.
 - TASK-658 — resource authorization bridge habilitara `platform.health.detail` en la ruta ecosystem.
 - TASK-660 — promueve este contrato a `stable` en la OpenAPI publica.

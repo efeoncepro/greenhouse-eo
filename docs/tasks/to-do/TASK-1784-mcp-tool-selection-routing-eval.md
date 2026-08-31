@@ -1,5 +1,30 @@
 # TASK-1784 — MCP: ruteo de selección entre tools que se parecen, con eval que lo pruebe
 
+## Delta 2026-08-31 — `TASK-1780` cerró: el censo dejó de ser un grep, y el hueco de esta task SUBIÓ de valor
+
+`TASK-1780` está `complete`. Tres consecuencias directas para esta task:
+
+🔴 **El baseline ya no se mide con una regex sobre `server.ts`.** El censo interno se lee de
+`GREENHOUSE_MCP_TOOL_MANIFEST` (`src/mcp/greenhouse/tool-manifest.ts`), que es una lista tipada: el
+riesgo de "total corto en silencio" que este archivo advertía **desaparece del lado interno**. La
+advertencia se reescribe como *anclar el censo en el manifiesto, nunca en un grep de `registerTool`*.
+
+⚠️ **Todas las cifras del cuerpo están vencidas.** Medido 2026-08-31 contra el manifiesto: **43 tools
+registradas (28 SEO + 15 no-SEO)**, 7 escrituras, 4 que comprometen gasto del proveedor. El gateway
+federa **28**. La progresión que esta task usa como argumento sigue: 16 → 20 → 21 → 26 → **28**, y
+refuerza su tesis otra vez. Relee del código, nunca de acá.
+
+✅ **El hueco que esta task ataca sigue ABIERTO, y ahora tiene dónde aterrizar.** El manifiesto lleva
+`name`, `domain`, `writes`, `spendsProviderBudget` y `purpose` — la `description` agent-facing sigue
+viviendo en `server.ts` y el guardia de paridad **no la compara**. O sea: el drift de descripciones no
+lo cerró `TASK-1780`. La diferencia es que ahora la extensión natural es el artefacto generado + su
+guardia consumidor, en vez de "editar el espejo".
+
+⚠️ `MCP_TOOL_SURFACE_INVARIANTS.md` ya no hay que crearlo (lo creó `TASK-1785`) y además fue ampliado
+por `TASK-1780` con el §0 del manifiesto. El invariante "el registry interno y el gateway NO son el
+mismo conjunto" está ahí escrito con su caso verificado (`get_seo_provider_spend`): cítalo en vez de
+reafirmarlo.
+
 ## Delta 2026-08-29 — `MCP_TOOL_SURFACE_INVARIANTS.md` ya existe (TASK-1785)
 
 El companion que esta task declara como compartido fue **creado** por `TASK-1785`:
@@ -74,7 +99,7 @@ Deben entrar al conjunto que recibe bloque de ruteo y al fixture del eval.
 
 ## Summary
 
-El módulo SEO expone **20 tools MCP**, y **seis contestan alguna versión de la misma pregunta**:
+El módulo SEO expone **28 tools MCP** (medido 2026-08-31 contra el manifiesto), y **seis contestan alguna versión de la misma pregunta**:
 `get_seo_visibility_360`, `get_seo_overview_kpis`, `get_seo_domain_overview`, `get_seo_performance`,
 `get_seo_rank_evolution` y `get_seo_url_visibility`. Cada descripción explica **qué devuelve**;
 ninguna dice **cuándo preferirla sobre la vecina**. Un modelo elige por semejanza semántica, y esas
@@ -177,11 +202,11 @@ Reglas obligatorias:
 
 ### Already exists
 
-- 20 tools SEO registradas en `src/mcp/greenhouse/server.ts`, con `title`, `description`,
+- 28 tools SEO declaradas en `src/mcp/greenhouse/tool-manifest.ts` (`server.ts` las registra recorriéndolo; ya no es el inventario), con `title`, `description`,
   `inputSchema` y `outputSchema` (`greenhouseMcpToolOutputSchema`).
 - Descripciones semánticamente ricas con el contrato de honestidad embebido, y las que gastan
   declarando el costo en mayúsculas.
-- 27 de 30 tools del gateway con `annotations` (`readOnlyHint`/`destructiveHint`/`idempotentHint`/`openWorldHint`).
+- 28 tools SEO federadas en el gateway con `annotations` (`readOnlyHint`/`destructiveHint`/`idempotentHint`/`openWorldHint`).
 - Guard de paridad de `TASK-1658`, que compara `inputSchema` entre gateway y MCP interno.
 
 ### Gap

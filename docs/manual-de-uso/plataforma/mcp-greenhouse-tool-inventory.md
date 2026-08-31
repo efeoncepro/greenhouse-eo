@@ -287,7 +287,8 @@ Reglas que el agente debe respetar:
 - **La intención de una keyword se declara, no se adivina** (TASK-1659). `track_seo_keywords` acepta `intent` opcional: `target` (compromiso acordado con el cliente — puede estar en la posición 60, y eso es la **distancia que falta**, no un fracaso) u `opportunity` (demanda medida que se está empujando). **Omítelo salvo que un humano lo haya declarado**: adivinarlo fabrica una clasificación que nadie hizo. Los dos **nunca se promedian** al reportar. Cambiar la intención de una keyword ya seguida devuelve `intent_changed` (no `already_tracked`: sí pasó algo), **no consume cupo** —cierra la membresía vigente y abre otra— y preserva desde cuándo es objetivo. `intentDeclaredBy` lleva la **autoría humana** cuando el agente actúa por encargo; el actor del write sigue siendo la máquina (`mcp:<consumer>`), que es la procedencia real del gasto, y una autoría sin intención se descarta. Las keywords seguidas antes del 2026-08-14 no tienen intención declarada: eso significa **"nadie la declaró"**, jamás "oportunidad".
 
 **Qué está federado al gateway público `mcp.efeonce.org`.** Desde TASK-1658 (2026-08-27) el
-inventario federado es **el completo — 27 tools al 2026-08-28** (20 lecturas bajo
+conjunto federado son **28 tools al 2026-08-31**, que NO es "el completo" del interno —los dos
+conjuntos son distintos por construcción, ver el aviso del §8— (21 lecturas bajo
 `efeonce.mcp.read` — `get_seo_provider_spend` la sumó TASK-1696, `get_seo_keyword_gap` TASK-1662 y
 `get_seo_serp_top_results`/`get_seo_competitor_candidates` TASK-1699; las 7 escrituras bajo
 `efeonce.mcp.seo.write`, scope NO cableado al cliente PKCE público — fail-closed
@@ -296,11 +297,9 @@ hasta TASK-1631). El guard de paridad del gateway
 committeado `GREENHOUSE_SEO_TOOL_INVENTORY` (nombre + claves exactas del inputSchema interno +
 clase `writes`) + paridad de schema (divergencia solo con razón declarada) + `annotations`
 obligatorias (`readOnlyHint: false` en toda tool que escriba o compre datos del proveedor), con
-introspección runtime del server. El espejo es interino: `TASK-1780` lo reemplaza por el manifiesto
-canónico de tools de Greenhouse. Es el mismo lane y el mismo entitlement: el gateway solo transporta.
+introspección runtime del server. El espejo **dejó de existir** (`TASK-1780`, 2026-08-31): el inventario del guard se deriva del manifiesto canónico `src/mcp/greenhouse/tool-manifest.ts`, que viaja como artefacto generado con `manifestHash` verificado al cargar. Es el mismo lane y el mismo entitlement: el gateway solo transporta.
 
-✅ **Estado de despliegue (2026-08-28): inventario interno = allowlist federado = desplegado, 27
-tools (20 lecturas + 7 escrituras).** Estos docs distinguían dos números que ya no divergen; el
+✅ **Estado de despliegue (2026-08-31): interno 28 tools SEO (21 lecturas + 7 escrituras); federadas 28.** 🔴 Los dos números **no son el mismo y no deben igualarse**: `get_seo_work_queue` existe adentro y está excluida con razón, y `get_seo_provider_spend` está federada sin contraparte interna. Esa divergencia es legítima y está declarada; el
 `rollout pendiente` que declaraban TASK-1658/1696/1662/1699 quedó cerrado.
 
 - **El deploy ya ocurrió.** `origin/main` de `efeonce-mcp` pasó de `8f1ae34` a `92e7197` (los dos

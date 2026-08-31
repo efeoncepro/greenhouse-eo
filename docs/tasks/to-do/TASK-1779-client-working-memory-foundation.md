@@ -283,7 +283,7 @@ Reglas obligatorias:
 - Rutas bajo `api/platform/ecosystem/client-memory/**` siguiendo el patrón vigente del lane.
 - Tools MCP registradas en el mismo PR, con `annotations` declarando su blast radius y descripción
   que obliga a consultar el registro antes de comprar investigación.
-- Entrada correspondiente en el manifiesto de paridad del gateway, o exclusión declarada con razón.
+- Entrada en el manifiesto canónico `src/mcp/greenhouse/tool-manifest.ts` + `pnpm mcp:manifest:generate` en el mismo PR; el gateway federa o excluye con razón sobre el artefacto generado (TASK-1780).
 
 ## Out of Scope
 
@@ -351,7 +351,7 @@ qué concluyó. Es el corazón de la regla anti-recompra y el motivo por el que 
 | Slice 1 | Migración inversa; las tablas nacen vacías y sin consumers | <10 min | si |
 | Slice 2 | Flag a `false`; los commands rechazan y no persisten | <5 min | si |
 | Slice 3 | Revert PR; los readers no tienen consumers productivos aún | <5 min | si |
-| Slice 4 | Retirar las tools del registro y del manifiesto de paridad; revert PR | <10 min | si |
+| Slice 4 | Retirar las tools del registro y del manifiesto canónico, y regenerar el artefacto (`pnpm mcp:manifest:generate`); revert PR | <10 min | si |
 
 ### Production verification sequence
 
@@ -379,7 +379,7 @@ N/A — repo-only change.
 - [ ] La capability nueva está en el catálogo TS, en `capabilities_registry` y con grant a un rol real, todo en el mismo PR.
 - [ ] La regla anti-recompra responde si una consulta ya se compró dentro de una ventana dada, con test en ambos bordes.
 - [ ] Existe lane ecosystem y tools MCP para leer y escribir la memoria, con `annotations` declarando su blast radius.
-- [ ] Las tools quedan en el manifiesto de paridad del gateway, o declaradas como exclusión con razón escrita.
+- [ ] Las tools quedan declaradas en el manifiesto canónico de Greenhouse (`src/mcp/greenhouse/tool-manifest.ts`, con `writes` y `spendsProviderBudget`); el gateway después federa o excluye con razón escrita (TASK-1780).
 - [ ] Esta task no crea, altera ni escribe `greenhouse_growth.seo_competitors`.
 - [ ] El flag está registrado en el ledger con su runtime declarado.
 

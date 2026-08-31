@@ -200,4 +200,4 @@ Sobre una organización **sin** el módulo, las dos consultas de datos responden
 - El [módulo SEO](modulo-seo-search-visibility-360.md) es el motor que produce los datos que estas consultas leen.
 - El [AI Visibility Grader](ai-visibility-grader.md) aporta el eje de citabilidad IA del cruce 360.
 - El [Efeonce MCP Gateway](../plataforma/efeonce-mcp-gateway.md) es el punto de acceso federado; Search Visibility 360 es su segunda capacidad, después del lector de flota de Globe.
-- El [MCP read-only de Greenhouse](../../manual-de-uso/plataforma/mcp-greenhouse-tool-inventory.md) expone estas mismas consultas para uso interno del portal, sin pasar por el gateway público.
+- El [MCP de Greenhouse](../../manual-de-uso/plataforma/mcp-greenhouse-tool-inventory.md) expone estas mismas consultas para uso interno del portal, sin pasar por el gateway público.

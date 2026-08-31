@@ -2,6 +2,24 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-31 — Content Marketing: pin/contraste publicados; E2E bloqueado por Turnstile
+
+Paquete focal de **dos assets** publicado en la página `242603`: JS
+`8d89cd4708de7892…` y host CSS `ce9eeaa3cb62472…`. Mount y resize comparten el gate
+`width >= 940 && height >= 740`; 1440×650 queda en flujo. Contrastes detectados corregidos sin
+cambiar copy/layout/tipografía. Backups Kinsta `/tmp/eo-content-marketing-before-20260831-211317.tar` y `…-211754.tar`.
+Documento/settings/thumbnail permanecen `b8d37969…` / `c99030e6…` / `251825`.
+
+Producción: pase ampliado de 38 estados de contraste verde; dos captions adicionales del fallback
+se corrigieron en un segundo paquete focal. Además, resize
+1000↔650, capítulos, tabs/cortes, 390, teclado, reduced motion y JS-off. Assets públicos coinciden
+por SHA. El formulario v3 está activo, sin destinos y con ledger vacío antes/después. El intento
+sintético normal fue rechazado por Turnstile antes del POST: no hubo submission ni lead. Rechazos
+API honeypot/missing-token correctos. El tag genérico sí produjo un `generate_lead` **sintético**
+`smoke-test` a `G-KYPPY57M14`, `/g/collect` 204; Admin API confirmó stream/property, pero Realtime
+aún no devolvía fila. Esto no cierra accepted→ledger→GA4. Evidencia y rollback:
+`docs/audits/public-site/2026-08-31-content-marketing-technical-closure.md`.
+
 ## 2026-08-31 — Contacto y cobertura institucional: fuentes corregidas, rollout pendiente
 
 El brief de reconstrucción de `/contacto/` quedó en `docs/public-site/CONTACT_PAGE_REBUILD_BRIEF_V1.md` con
@@ -27,18 +45,24 @@ Evidencia: snapshot del registro del SDK antes/después **idéntico byte a byte*
 reproduce el espejo a mano tool por tool (misma clase de escritura, mismos `inputKeys`), con la única
 divergencia esperada; `pnpm test` completo 12.919/0; gateway `pnpm check` verde con 73/73.
 
-🔴 **Falta un solo comando, y no es una decisión de riesgo.** El Slice 3 vive en `efeonce-mcp`,
-implementado, verde (`pnpm check`: 73/73 + build) y **staged** — 6 archivos, mensaje de commit listo en
-`.git/TASK-1780-commit-msg.txt`. El commit quedó **bloqueado por el clasificador de permisos del
-entorno**, no por una decisión ni por una regla del repo.
+✅ **Cerrada.** Greenhouse `7089d92de..d2b3c0639` en `develop` con los 9 workflows en `success`; gateway
+`efeonce-mcp` `f523960..e92961e` en `main` con CI `success`. El deploy del gateway **no es automático**
+(`deploy.yml` es `workflow_dispatch` puro): la revisión productiva sigue siendo
+`efeonce-mcp-gateway-00024-8b8` hasta que alguien lo dispare, y no corre prisa — la verificación de esta
+task es de CI, no de runtime.
 
-⚠️ **Corrección de riesgo:** ese repo **NO tiene auto-deploy**. `deploy.yml` es `workflow_dispatch`
-puro (los tres últimos deploys son manuales) y el push a `main` sólo corre `ci.yml`. Commitear ahí no
-despliega nada; la revisión productiva sigue siendo `efeonce-mcp-gateway-00024-8b8` hasta que alguien
-dispare el deploy a mano. La verificación de esta task es de CI, no de runtime.
+**Barrido documental con 4 subagentes** (docs funcionales/manuales · arquitectura y contexto · skills
+espejadas · lifecycle e impacto cruzado). Corregí 8 skills, 5 specs de arquitectura, 9 docs
+funcionales/manuales, 4 tasks vivas y el EPIC-022. Dos huecos sistémicos que encontró el barrido y
+valían más que los conteos: `.claude/rules/growth-seo.md` —la regla que más se auto-carga— instruía
+editar a mano justo el espejo retirado, y **ninguna rule cubría `src/mcp/**`**, así que los invariantes
+de la superficie no se auto-cargaban nunca (creada `.claude/rules/mcp-tool-surface.md`). Además
+`mcp:manifest:check` entró a `local:check`: bajo doctrina local-first, sin eso el drift del artefacto
+sólo aparecía en CI.
 
-Mientras ese commit no exista, la task queda `code complete, rollout pendiente`: por su propia regla de
-ordering, un manifiesto con un solo consumidor sería una tercera lista.
+⚠️ **Cifra a no repetir de memoria:** varios docs decían "27 tools federadas"; el array en runtime dice
+**28**. Interno son 28 SEO (21 lecturas + 7 escrituras) de 43 totales. Los dos conjuntos no son iguales
+**por construcción** y ahora está declarado, no deducido.
 
 ## 2026-08-31 — Content Marketing publicado desde diseño aprobado
 
@@ -60,6 +84,32 @@ Revisión documental con tres subagentes: docs triples, índices, inventario, sk
 reconciliados. Menú conserva secuencia visible; no se afirma igualdad de valores raw `menu_order`.
 Hallazgo confirmado: resize a 1440×651 activa pin aunque mount bajo 740 px no lo hace; pendiente de
 TASK-1799, sin cambio de código en este pase. Evidencia y comandos en la auditoría enlazada.
+
+## 2026-08-31 — TASK-1358: Home editorial aplicada; QA residual pendiente
+
+Home `251731` publicada en raíz, antigua `2791` conservada noindex; header/footer Ohio intactos.
+Readback remoto del cierre editorial: 17 widgets, cero HTML, 407 campos raíz y seis repeaters;
+hash `9aa8c770c0907edc5ad70f4489cccedb56cc03d0a7802e01eef0e2beee832562`.
+[Ocho revisiones y cierre con subagente](docs/audits/public-site/2026-08-31-home-editorial-closure.md):
+copy anotado, comparación cualitativa, FAQ jerárquica y Con + logo publicados; doce archivos iguales
+local/remoto. Docs/skills consolidados sin incluir runtime hermano ni WIP SEO previo en el commit.
+Las revisiones visuales, assets oficiales, microinteracción de logos, enlaces de Servicios,
+CTA Casos y showreel están publicados. No restaurar formulario demo, Verk ni placeholders.
+[Contrato vigente](docs/architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md);
+[historia/evidencia visual](docs/audits/public-site/2026-08-30-home-visual-review.md).
+
+Tres subagentes consolidaron arquitectura, funcional/manual y skills espejadas; root reconcilió task,
+índices y contexto. [Audit independiente](docs/audits/public-site/2026-08-30-home-documentation-consolidation.md):
+contrato WP-CLI, PHP, lifecycle y geometría PASS; hashes de archivos del video coinciden con manifest.
+Video: snapshot `_gh_home_video_20260830_195821`, backup `195756` (retención/rollback no revalidados).
+SEO/HTTPS publicado: [audit](docs/audits/public-site/2026-08-30-home-seo-aeo.md), snapshot `_gh_home_seo_20260830_204702`; verificador público PASS.
+
+**Siguiente paso:** usar sesión Chrome WordPress observada para probar guardar/recargar Elementor y teclado
+del video; certificar flechas en tabla y revisar atenuación de Servicios, claims/footer/entidad global y medir GSC/CWV. CTA abierto no prueba booking ni tracking.
+TASK-1358 sigue `to-do`/`UI ready: no`, runtime `Avanzada`; commit previo `1282feed4`, SEO aún sin commit/push.
+Skills SEO/WordPress espejadas con método Home/landing; consolidación documental sin nuevas escrituras live.
+El checkpoint anterior se [preservó](docs/operations/agent-context-history/handoff/2026-08-30-home-before-consolidation.md),
+pero ya no gobierna decisiones ni pendientes actuales.
 
 ## 2026-08-30 — Landing HubSpot aprobada: publicada como once widgets Elementor
 
@@ -104,32 +154,6 @@ responsive/teclado/reduced motion y roundtrip nativo Elementor PASS. Home y Crea
 Cierre Git acotado autorizado, sin push ni despliegue general Greenhouse. TASK-1352 no se movió a complete; migración de URL y
 sus dossiers adicionales no forman parte de este pedido de publicación. La aprobación del export
 supera las instrucciones de rechazo de diseños anteriores para este artefacto específico.
-
-## 2026-08-31 — TASK-1358: Home editorial aplicada; QA residual pendiente
-
-Home `251731` publicada en raíz, antigua `2791` conservada noindex; header/footer Ohio intactos.
-Readback remoto del cierre editorial: 17 widgets, cero HTML, 407 campos raíz y seis repeaters;
-hash `9aa8c770c0907edc5ad70f4489cccedb56cc03d0a7802e01eef0e2beee832562`.
-[Ocho revisiones y cierre con subagente](docs/audits/public-site/2026-08-31-home-editorial-closure.md):
-copy anotado, comparación cualitativa, FAQ jerárquica y Con + logo publicados; doce archivos iguales
-local/remoto. Docs/skills consolidados sin incluir runtime hermano ni WIP SEO previo en el commit.
-Las revisiones visuales, assets oficiales, microinteracción de logos, enlaces de Servicios,
-CTA Casos y showreel están publicados. No restaurar formulario demo, Verk ni placeholders.
-[Contrato vigente](docs/architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md);
-[historia/evidencia visual](docs/audits/public-site/2026-08-30-home-visual-review.md).
-
-Tres subagentes consolidaron arquitectura, funcional/manual y skills espejadas; root reconcilió task,
-índices y contexto. [Audit independiente](docs/audits/public-site/2026-08-30-home-documentation-consolidation.md):
-contrato WP-CLI, PHP, lifecycle y geometría PASS; hashes de archivos del video coinciden con manifest.
-Video: snapshot `_gh_home_video_20260830_195821`, backup `195756` (retención/rollback no revalidados).
-SEO/HTTPS publicado: [audit](docs/audits/public-site/2026-08-30-home-seo-aeo.md), snapshot `_gh_home_seo_20260830_204702`; verificador público PASS.
-
-**Siguiente paso:** usar sesión Chrome WordPress observada para probar guardar/recargar Elementor y teclado
-del video; certificar flechas en tabla y revisar atenuación de Servicios, claims/footer/entidad global y medir GSC/CWV. CTA abierto no prueba booking ni tracking.
-TASK-1358 sigue `to-do`/`UI ready: no`, runtime `Avanzada`; commit previo `1282feed4`, SEO aún sin commit/push.
-Skills SEO/WordPress espejadas con método Home/landing; consolidación documental sin nuevas escrituras live.
-El checkpoint anterior se [preservó](docs/operations/agent-context-history/handoff/2026-08-30-home-before-consolidation.md),
-pero ya no gobierna decisiones ni pendientes actuales.
 
 ## 2026-08-30 — oferta HubSpot V2 y planificación previa a la publicación del export aprobado
 
@@ -528,49 +552,3 @@ con el check de preflight como Slice 1 y los tokens de instalación de 1 h como 
 el permiso `packages` de la App, acción de owner de la organización). `TASK-1669` desbloqueada.
 
 **Siguiente paso:** mergear #211 para cerrar la ventana de re-pausa.
-
-## 2026-08-29 — Release `b7f74c95a2af` a producción: TASK-1785 + TASK-1700 + TASK-1792
-
-**Estado: `released`.** Orquestador `33258242470`, release_id
-`b7f74c95a2af-1c7bd2b3-4f50-4e94-b486-c6979e782a44`, un solo run sin retry. Watchdog
-`drift_count=0`. Los 4 workers Cloud Run `Ready=True`.
-
-**TASK-1785 quedó completa y en producción.** El invariante `●` medido / `◑` estimado dejó de ser
-prosa: `provenance` requerido en el `ok:true` de los readers (lo hace cumplir `tsc`), un guard que
-camina el DTO real y exige que **cada hoja numérica tenga exactamente un dueño**, y un censo de
-superficies medido contra el filesystem y `server.ts`. Tool `get_seo_dual_lens_visibility` federada
-al gateway (`efeonce-mcp` `f523960`), **sin campo combinado por contrato**. Triple documentación
-completa (técnica + funcional + manual) y skills actualizadas.
-
-**Flag `GROWTH_SEO_WORK_QUEUE_ENABLED` prendido en los DOS runtimes**, con autorización explícita del
-operador. Se prendió **por el SoT** (`deploy.sh` → `:-true` + Vercel antes del squash), no con
-`--update-env-vars`: eso evita que el próximo deploy lo borre en silencio Y **ordena el flip por
-construcción** — resolvió que `TASK-1792` (`ctr-curve.ts`) no estuviera aún en `main`, precondición
-que el ledger exigía. Verificado en la revisión activa `ops-worker-00613-qrh`.
-
-🔴 **PENDIENTE — despausar `ops-seo-work-queue-materialize`.** El flag habilita el materializador; NO
-lo agenda. El scheduler sigue PAUSADO y su contrato exige corrida shadow verificada + aviso al
-operador de SEO. **Hasta que se despause, la cola no se materializa y los lanes sirven vacío.**
-
-**Bloqueador dominante del release: una credencial, no el código.** El PAT `read:packages` de AXIS
-venció en silencio (creado 07-29, 30 días, muerto el 08-28) y tumbó 3 de los 4 workers; Vercel pasaba
-verde, que es lo que lo vuelve engañoso. ~2h de las ~4h05m se fueron ahí. Rotado por el operador
-(v2 del secreto, validada contra la API de GitHub antes de escribir). Documentado como anti-pattern
-#12 del playbook + sección en la skill de release.
-
-⚠️ **La versión 1 del secreto `axis-packages-read-token` sigue `enabled`** — no hace daño (los deploys
-usan `:latest`) pero conviene deshabilitarla como higiene.
-
-**Hallazgo lateral con impacto propio:** el audit de flags tenía un punto ciego que **anulaba su propio
-gate ISSUE-150** — sólo detectaba `process.env.FLAG` en notación de punto, y 91 callsites del repo leen
-por indirección. 39 de 43 «env vars muertas» eran falsos positivos y una clase entera de flags escapaba
-del gate que hace `exit 1`. Arreglado; destapó 3 flags sin registrar, ya registrados.
-
-**No validado, declarado:** el canary probó que `dual-lens-visibility` existe y **ejecuta** en
-producción (control negativo: ruta inexistente → HTML de Next; ruta nueva → envelope de API con error
-de dominio). **No** se ejercitó `ok:true` con las dos series reales: ninguna de las 120 organizaciones
-visibles al consumer del gateway tiene `seo_v2`.
-
-**Siguiente paso:** decidir el despause del scheduler de la cola; y evaluar el arreglo durable de la
-credencial AXIS (App de GitHub acuñando tokens de 1 h en vez de un PAT estático — hoy la App no tiene
-permiso `packages`).

@@ -39,7 +39,7 @@ Reglas estructurales:
 - **Una sola capability "quote" (read+write juntos).** Rechazada: conflaciona compute con mutación, impide sandboxear el público y arriesga filtrar el cost stack a un consumer anónimo.
 - **Integración Nexa-específica del cotizador.** Rechazada: viola Full API Parity #16 (un primitive, muchos consumers); produciría N implementaciones divergentes.
 - **Exponer el catálogo interno directo a cliente/público.** Rechazada: fuga de cost stack + datos competitivos; one-way door de gran blast radius.
-- **Permitir que MCP escriba directo.** Rechazada: el MCP server es read-only por diseño; los writes externos requieren el write lane gobernado (auth de agente, idempotencia, aprobación), no un tool downstream.
+- **Permitir que MCP escriba directo.** Rechazada: los writes por MCP pasan por el write lane gobernado (`propose → confirm → execute`), nunca por el LLM directo; los writes externos requieren el write lane gobernado (auth de agente, idempotencia, aprobación), no un tool downstream.
 - **Omitir el resolver y exigir `serviceSku` al caller.** Rechazada: deja el simulate tool a medias para agentes (no se puede simular lo que no se puede encontrar); las preguntas de precio en frío quedan sin respuesta.
 - **Recorte binario `stripCostStack` como única defensa.** Rechazada: no contempla consumer anónimo ni el recorte del catálogo; insuficiente para `public`.
 
@@ -58,7 +58,7 @@ Fuente de verdad que queda vigente:
 - **Capability A:** `simulateQuotePricing` + `outputProfile` (perfil derivado de auth context). Capability `commercial.quote.simulate` (convención fijada por TASK-1202).
 - **Capability B:** `submitQuoteFromBuilder` (atómico + idempotente); la UI y toda ruta delegan en él. Capability de write de la familia que acuña TASK-1202.
 - **Discovery:** `searchServiceCatalog(query)` como reader compartido.
-- **Write gobernado:** `NEXA_ACTION_REGISTRY` (autoría/emisión) + endpoint de confirmación; API Platform `quote_to_cash.v1` lane para externos; `src/mcp/greenhouse/server.ts` read-only.
+- **Write gobernado:** `NEXA_ACTION_REGISTRY` (autoría/emisión) + endpoint de confirmación; API Platform `quote_to_cash.v1` lane para externos; `src/mcp/greenhouse/server.ts` (su inventario vive en `tool-manifest.ts`; ninguna tool de quote lleva `writes: true`).
 - **Implementación:** TASK-1211 (frente + exposición), TASK-1202 (capability catalog/enforcement), TASK-1206 (close command). Spec de detalle: `GREENHOUSE_QUOTE_API_PARITY_MULTI_CONSUMER_V1.md`.
 
 ## Revisit When

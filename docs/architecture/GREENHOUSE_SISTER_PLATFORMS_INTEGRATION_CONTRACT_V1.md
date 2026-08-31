@@ -191,7 +191,7 @@ Todo contrato de integracion entre plataformas debe poder versionarse y evolucio
 | Carril | Permitido | Nota |
 | --- | --- | --- |
 | Read API | Si | Server-to-server, tenant-safe |
-| MCP read-only | Si | Para agentes y copilots |
+| MCP (naturaleza declarada por tool) | Si | Para agentes y copilots |
 | Deep links | Si | Con ownership visual local de cada app |
 | BigQuery cross-project reads | Si | Solo cuando agregue valor real y con IAM minimo |
 | Event bridge / PubSub | Si | Cuando haga falta asincronia o fan-out |
@@ -577,7 +577,7 @@ Antes de abrir una integracion nueva, confirmar:
 2. Runtime compartido no es el default.
 3. Shared institutional layer si; shared product logic no.
 4. Todo bridge cross-platform requiere tenancy explicita.
-5. MCP y agentes son read-only por defecto.
+5. MCP y agentes: la naturaleza de cada tool se **declara**, no se asume por defecto. Cada entrada del manifiesto (`src/mcp/greenhouse/tool-manifest.ts`) lleva `writes` y `spendsProviderBudget` como banderas ortogonales; un write existe sólo si está declarado y pasa su gate de scope.
 6. Cada plataforma activa del ecosistema debe tener anexo propio sobre este contrato marco.
 
 ---

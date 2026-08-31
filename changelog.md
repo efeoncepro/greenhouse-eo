@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-31 — Content Marketing: cierre técnico focal en producción
+
+El stage ya aplica el mismo gate de alto/ancho al cargar y redimensionar; 1440×650 conserva los
+siete capítulos en flujo. Se corrigieron contrastes de estados y badges con variantes de la paleta
+aprobada. Despliegue WordPress limitado a JS/CSS con backup, hashes y readback de documento intacto.
+Nuevo verificador recorre pin, capítulos, tabs/cortes, mobile/reduced-motion/JS-off y contraste;
+smoke seguro separa rechazos reales, ledger vacío y un evento GA4 explícitamente sintético.
+[Evidencia y límite Turnstile/Realtime](docs/audits/public-site/2026-08-31-content-marketing-technical-closure.md).
+
 ## 2026-08-31 — Cobertura Efeonce incorpora Estados Unidos y Contacto corrige su fuente institucional
 
 La cobertura vigente queda en Chile, Estados Unidos, Colombia, México y Perú, sin inferir oficina ni entidad
@@ -39,10 +48,16 @@ gateway consumirá.
 Cambio de comportamiento verificado como nulo: el registro del SDK antes y después es idéntico byte a
 byte (43 tools, mismo orden y schemas), y el artefacto reproduce el espejo del gateway tool por tool.
 
-La mitad del gateway (`efeonce-mcp`) está implementada, verde (`pnpm check`: 73/73 + build) y staged,
-pero **sin commitear**: el commit quedó bloqueado por el clasificador de permisos del entorno. Ese repo
-**no** tiene auto-deploy —`deploy.yml` es `workflow_dispatch` puro—, así que commitear no despliega
-nada. La task queda `code complete, rollout pendiente`.
+Cerrada y pusheada: Greenhouse `d2b3c0639` (9 workflows `success`) y gateway `efeonce-mcp` `e92961e`
+(CI `success`). El deploy del gateway es `workflow_dispatch` y sigue sin disparar, así que la revisión
+productiva no cambió — la verificación de esta task es de CI, no de runtime.
+
+Barrido documental con 4 subagentes: 8 skills, 5 specs de arquitectura, 9 docs funcionales/manuales,
+4 tasks vivas y un epic corregidos. Dos huecos sistémicos cerrados de paso: la rule auto-cargada de
+Growth/SEO instruía editar a mano el espejo retirado, y no existía ninguna rule para `src/mcp/**`
+(creada). `mcp:manifest:check` entró a `local:check` — antes el drift del artefacto sólo aparecía en CI.
+Fila nueva en `DECISIONS_INDEX.md`: la frontera "qué capacidades existen es conocimiento de producto,
+no de transporte" es la tercera arista del triángulo que ya fijaban las dos filas MCP existentes.
 
 ## 2026-08-31 — Content Marketing: diseño aprobado publicado en Elementor
 

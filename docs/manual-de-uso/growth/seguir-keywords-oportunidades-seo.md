@@ -254,7 +254,7 @@ keyword agregada. Subirlo requiere revisar el budget del tier de la organizacion
   solo desde bindings de scope `internal` · MCP tools `track_seo_keywords` y `untrack_seo_keywords`
   en el MCP interno (`src/mcp/greenhouse/server.ts`)
 - ⚠️ **Las dos tools MCP ya estan registradas en el gateway** (`efeonce-mcp`, allowlist de paridad
-  `EXPECTED_GREENHOUSE_SEO_TOOLS`), pero **siguen sin poder usarse desde un cliente externo**:
+  el allowlist de federación del gateway, cuyo inventario se deriva del manifiesto `src/mcp/greenhouse/tool-manifest.ts`), pero **siguen sin poder usarse desde un cliente externo**:
   comparten el scope de escritura `efeonce.mcp.seo.write`, que **[verificar]** no esta cableado a
   ningun cliente con grant controlable. Hasta entonces responden `insufficient_scope` — es
   fail-closed por diseño, no una falla. Seguir y dejar de seguir se operan desde el portal

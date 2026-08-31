@@ -58,7 +58,7 @@ NO invade:
   DataForSEO/ledger + TASK-1302 materializer GSC LIVE (`readKeywordOpportunities`) + TASK-1305
   `readSeoAeoGap`/quadrant SEO×AEO (primer quadrant real: Berel → `riesgo`); TASK-1645 lane ecosystem + las
   primeras 3 MCP tools, federadas al gateway por TASK-1647 y **live en producción desde 2026-08-06**. Delta
-  2026-08-07: inventario MCP del dominio SEO **10 lecturas + 2 escrituras** (verificado contra
+  2026-08-07: inventario MCP del dominio SEO **21 lecturas + 7 escrituras** (verificado contra
   `src/mcp/greenhouse/server.ts` el 2026-08-14; la 10.ª lectura es `get_seo_keyword_market_data`, TASK-1661)
   y cockpit operador en `/admin/growth/seo`
   (TASK-1306/1307/1308) — `track_seo_keywords`/`untrack_seo_keywords` son las primeras escrituras del dominio y

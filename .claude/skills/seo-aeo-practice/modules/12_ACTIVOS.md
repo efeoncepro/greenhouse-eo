@@ -84,7 +84,7 @@ y cruce SEO↔AEO real — pero para el cliente el portal sigue mostrando NADA d
 > **Delta 2026-08-07 — cockpit INTERNO + las 2 primeras escrituras.** TASK-1306/1307/1308 complete: el equipo
 > entra a `/admin/growth/seo` (overview · rank & URL performance · mapa de oportunidades de keyword) y puede
 > **seguir/dejar de seguir keywords** desde la pantalla. Inventario MCP del dominio SEO hoy (verificado contra
-> `src/mcp/greenhouse/server.ts` el 2026-08-14): **10 lecturas + 2 escrituras**
+> `src/mcp/greenhouse/tool-manifest.ts` el 2026-08-31; `server.ts` dejó de ser el inventario — lo recorre): **21 lecturas + 7 escrituras**
 > (`track_seo_keywords` / `untrack_seo_keywords`); la 10.ª lectura es `get_seo_keyword_market_data`
 > (TASK-1661, complete y en producción). 🔴 Seguir una keyword **compromete gasto recurrente del
 > proveedor** —el rank capture paga por cada keyword vigente en cada ciclo—, así que el command lleva techo por
