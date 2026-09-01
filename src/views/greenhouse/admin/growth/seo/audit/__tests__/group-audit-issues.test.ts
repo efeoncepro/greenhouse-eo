@@ -5,19 +5,36 @@ import type { SeoSiteAuditFindingSeverity, SeoSiteAuditFindingView } from '@/lib
 import { ONPAGE_CHECK_SEVERITY } from '@/lib/growth/seo/site-audit/findings-map'
 import { SITE_FINDING_SEVERITY } from '@/lib/growth/seo/site-audit/site-findings'
 
-import { STALE_CRAWL_DAYS, daysSinceCrawl, groupAuditIssues } from '../group-audit-issues'
+import {
+  STALE_CRAWL_DAYS,
+  daysSinceCrawl,
+  groupAuditIssues,
+  partitionAuditIssuesByScope
+} from '../group-audit-issues'
 
 const finding = (
   issueType: string,
   severity: SeoSiteAuditFindingSeverity,
-  url: string
-): SeoSiteAuditFindingView => ({ issueType, severity, url, detail: {}, findingScope: 'page' })
+  url: string,
+  findingScope: SeoSiteAuditFindingView['findingScope'] = 'page'
+): SeoSiteAuditFindingView => ({ issueType, severity, url, detail: {}, findingScope })
+
+/** TASK-1671 — hallazgo de DOMINIO: todos comparten la URL raíz del sujeto. */
+const siteFinding = (issueType: string, severity: SeoSiteAuditFindingSeverity): SeoSiteAuditFindingView =>
+  finding(issueType, severity, 'https://berel.com', 'site')
 
 const bucket = (items: SeoSiteAuditFindingView[]): Record<SeoSiteAuditFindingSeverity, SeoSiteAuditFindingView[]> => ({
   critical: items.filter(item => item.severity === 'critical'),
   warning: items.filter(item => item.severity === 'warning'),
   notice: items.filter(item => item.severity === 'notice')
 })
+
+/**
+ * Espejo de los pesos de `group-audit-issues.ts`. Se declara acá a propósito: el test verifica la
+ * FÓRMULA de orden de dominio, y leerla del módulo haría que un cambio de pesos pasara inadvertido.
+ */
+const VALUE_WEIGHT_MIRROR: Record<string, number> = { low: 0.5, medium: 2, high: 3 }
+const EFFORT_WEIGHT_MIRROR: Record<string, number> = { low: 1, medium: 2, high: 3 }
 
 describe('groupAuditIssues', () => {
   it('nunca entierra un crítico bajo un menor de alto volumen', () => {
@@ -96,6 +113,94 @@ describe('groupAuditIssues', () => {
     ])
 
     expect(groupAuditIssues(input).map(g => g.issueType)).toEqual(groupAuditIssues(input).map(g => g.issueType))
+  })
+
+  describe('alcance de dominio (TASK-1671)', () => {
+    it('el alcance sale del dato persistido, no de una heurística por issueType', () => {
+      const groups = groupAuditIssues(bucket([siteFinding('ai_retrieval_crawlers_blocked', 'critical')]))
+
+      expect(groups[0].scope).toBe('site')
+    })
+
+    it('🔴 el alcance queda FUERA del orden de dominio, aunque alguien lo puebla con un sintético', () => {
+      // El guardrail que la rama de `priorityScore` compra. Con `affectedPages = 1` la fórmula
+      // vieja y la nueva dan el mismo número, así que un test sobre el caso normal no probaría
+      // nada. Lo que sí se puede romper mañana es que alguien "arregle" el alcance de un grupo de
+      // dominio con un conteo sintético (el total de páginas crawleadas es la tentación). Acá se
+      // fuerza ese futuro y se exige que el orden entre hallazgos de dominio no se mueva.
+      const conAlcanceSintetico = groupAuditIssues(
+        bucket([
+          siteFinding('sitemap_missing', 'notice'),
+          siteFinding('ai_training_crawlers_blocked', 'notice')
+        ])
+      ).map(group => ({ ...group, affectedPages: group.issueType === 'ai_training_crawlers_blocked' ? 900 : 1 }))
+
+      const reordenado = [...conAlcanceSintetico].sort((left, right) => {
+        const byPriority =
+          VALUE_WEIGHT_MIRROR[right.value] / EFFORT_WEIGHT_MIRROR[right.effort] -
+          VALUE_WEIGHT_MIRROR[left.value] / EFFORT_WEIGHT_MIRROR[left.effort]
+
+        return byPriority !== 0 ? byPriority : left.issueType.localeCompare(right.issueType)
+      })
+
+      // 900 páginas sintéticas no mueven al hallazgo de postura por encima del de sitemap.
+      expect(reordenado.map(group => group.issueType)).toEqual([
+        'sitemap_missing',
+        'ai_training_crawlers_blocked'
+      ])
+    })
+
+    it('la severidad sigue siendo corte absoluto: un notice de dominio no supera a un crítico de página', () => {
+      const groups = groupAuditIssues(
+        bucket([
+          finding('is_broken', 'critical', 'https://berel.com/rota'),
+          siteFinding('ai_training_crawlers_blocked', 'notice')
+        ])
+      )
+
+      expect(groups[0].issueType).toBe('is_broken')
+      expect(groups[1].scope).toBe('site')
+    })
+
+    it('entre dos hallazgos de dominio ordena por valor y esfuerzo, no por páginas', () => {
+      const groups = groupAuditIssues(
+        bucket([
+          // `sitemap_missing`: notice, effort low, value medium.
+          siteFinding('sitemap_missing', 'notice'),
+          // `ai_training_crawlers_blocked`: notice, effort low, value low → debe ir después.
+          siteFinding('ai_training_crawlers_blocked', 'notice')
+        ])
+      )
+
+      expect(groups.map(group => group.issueType)).toEqual([
+        'sitemap_missing',
+        'ai_training_crawlers_blocked'
+      ])
+    })
+
+    it('particiona preservando el orden y sin volver a agrupar', () => {
+      const groups = groupAuditIssues(
+        bucket([
+          finding('is_broken', 'critical', 'https://berel.com/rota'),
+          siteFinding('ai_retrieval_crawlers_blocked', 'critical'),
+          finding('no_favicon', 'notice', 'https://berel.com/x')
+        ])
+      )
+
+      const { site, page } = partitionAuditIssuesByScope(groups)
+
+      expect(site.map(group => group.issueType)).toEqual(['ai_retrieval_crawlers_blocked'])
+      expect(page.map(group => group.issueType)).toEqual(['is_broken', 'no_favicon'])
+      expect(site.length + page.length).toBe(groups.length)
+    })
+
+    it('un run que no midió el dominio deja la partición de sitio VACÍA, no "sana"', () => {
+      // Run histórico o previo al flip: cero filas `scope='site'`. La región no se renderiza;
+      // decir "Verificado" acá sería el falso sano que TASK-1670 cerró en el motor.
+      const groups = groupAuditIssues(bucket([finding('is_broken', 'critical', 'https://berel.com/rota')]))
+
+      expect(partitionAuditIssuesByScope(groups).site).toEqual([])
+    })
   })
 
   it('un reporte sin findings no produce grupos', () => {
