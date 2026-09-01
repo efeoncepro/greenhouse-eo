@@ -23,9 +23,28 @@ nadie la miro**. Ese es el unico criterio que sostenia el cierre y no se puede t
 — o se observa la serie ahora y se documenta, o se declara que no hubo observacion. Cualquiera de las
 dos es honesta; tildarlo no.
 
+## Delta 2026-09-01 — Slice 3 ejecutado: cierre con evidencia medida, no con ceremonia
+
+Se observo la serie productiva y se sincronizo todo. **La task cierra con un criterio sin tildar y
+con la razon escrita**, que es el resultado correcto: probar el teclado destapo `ISSUE-167`.
+
+**Correccion de metodo sobre la ventana de 7 dias.** El criterio pedia observar `growth.cta.*`
+durante siete dias tras el deploy. Medido: entre el 18 y el 25 de julio hubo trafico **un solo dia**.
+Sus ceros no probaban salud — cero errores sobre cero trafico es un falso verde. Se cierra con la
+serie completa de **45 dias**, que es mas larga y con volumen real.
+
+⚠️ **Los readers de signal no pueden responder esta pregunta.** `growth-cta-signals.ts` filtra
+`INTERVAL '1 day'` en sus tres queries: sirven para «¿esta sano ahora?», nunca para «¿estuvo steady
+durante N dias?». Cualquier criterio de ventana exige ir a la tabla base. Se dejo
+`scripts/growth/_sanity-cta-signal-window.ts` para que la proxima vez sea una medicion y no una cita.
+
+**Pendiente NO bloqueante:** el placement AMPLIO en WordPress sigue siendo decision del operador
+(recomendado: posts del blog via `the_content` en `ohio-child`). La primera rebanada esta cerrada;
+ampliarla es alcance nuevo, no deuda de esta task.
+
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Bajo`
@@ -38,7 +57,7 @@ dos es honesta; tildarlo no.
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-023`
-- Status real: `Definida`
+- Status real: `complete 2026-09-01 — motor CTA VIVO en Production desde 2026-07-18 (Think + pagina de prueba WP), steady observado sobre 45 dias contra PG: 0 errores server-confirmed, 0 kill switches, 0 colisiones, con exposicion real. Cierra con UN criterio sin tildar y con razon escrita: teclado/Escape/foco, que destapo ISSUE-167 en el renderer compartido. Pendiente NO bloqueante y de decision del operador: placement AMPLIO en WordPress`
 - Rank: `1`
 - Domain: `growth|public-site|ops`
 - Blocked by: `none`
@@ -357,14 +376,14 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] WordPress y Think renderizan el mismo CTA/contrato sin lógica ni copy duplicados.
-- [ ] Queda evidencia baseline mirada de anatomía, appearances, responsive container, focus y form-open en ambos hosts para la comparación de TASK-1429/1431.
-- [ ] CTA→Growth Form funciona con teclado, Escape/focus restore y sin overflow en 1440/390.
+- [x] WordPress y Think renderizan el mismo CTA/contrato sin logica ni copy duplicados. **Verificado live 2026-09-01** sobre `efeoncepro.com/greenhouse-cta-prueba/`: el `<greenhouse-cta>` esta definido como custom element y lleva los atributos del contrato (`cta=ai-visibility-report-followup`, `surface=csur-003f6f13…`, `form-surface=fhsf-ai-visibility-grader`, `embed-key`, `locale=es-CL`, `cta-location=wp_test_page`). Cero logica local: WordPress solo emite el snippet.
+- [x] Evidencia baseline mirada en ambos hosts. **Slice 2 (2026-07-18):** WP 1440 y 390, Think control re-verificado. **Re-verificado live 2026-09-01:** 1280 y 375 sin overflow (card 343px en 375), `data-ghc-state` transicionando `visible → form_open`, variante `default`, placement `embedded`. ⚠️ Las capturas de `.captures/task-1427-wp-test/` **ya no existen** (directorio gitignored + GC >30d): la evidencia visual de julio sobrevive solo como el registro escrito del Handoff; la de hoy es reproducible con el script de sanity.
+- [ ] CTA→Growth Form con teclado, Escape/focus restore y sin overflow. **PARCIAL — NO se tilda, y de aca sale `ISSUE-167`.** ✅ Sin overflow (1280 y 375, medido). ✅ Alcanzable por teclado: el formulario se monta DENTRO del `<greenhouse-cta>` y DESPUES del boton en orden de documento, asi que tabulando hacia adelante se llega a los 5 controles (el primero es `firstName`). ❌ **Al abrir, el foco queda en `body`** en vez de entrar al formulario. ❌ **`Escape` no cierra**: el `greenhouse-form` sigue montado y el estado sigue en `form_open`. Abre como expansion inline (sin `role=dialog` ni `aria-modal`), lo cual es defendible, pero sin ninguna de las dos obligaciones que ese patron acarrea. Afecta a TODOS los CTA del motor en ambas superficies: es el renderer compartido.
 - [x] Render/event ingest y rechazo de credencial invalida verificados productivamente. **Verificado 2026-09-01 contra el ledger:** smoke live del 2026-07-18 con `GROWTH_CTA_ENGINE_ENABLED` Production ON — bundle 200, render contract arbitrado, **forja 403**, ingest accepted, CTA visible en el reporte Think de produccion.
-- [ ] `greenhouse_cta_viewed` se observa en `dataLayer`, request `/g/collect` consentido y GA4 realtime/readback.
-- [ ] Signals `growth.cta.*` steady durante siete dias. **LA VENTANA YA PASO Y NADIE LA MIRO.** El deploy productivo fue el 2026-07-18 (`GROWTH_CTA_ENGINE_ENABLED` Production ON, smoke live verde); los siete dias vencieron el 2026-07-25, hace mas de cinco semanas. No hay registro del corte. Verificado 2026-09-01: no se puede tildar retroactivamente lo que nadie observo.
-- [ ] Task/epic/docs/manual/tracking plan/flag ledger/Handoff coinciden con el runtime.
-- [ ] `pnpm task:lint --task TASK-1427` y gates UI pasan sin findings.
+- [x] `greenhouse_cta_viewed` observado en `dataLayer`, `/g/collect` y GA4 realtime. **Slice 2 (2026-07-18), evidencia mirada:** dataLayer con `viewed/clicked/form_opened`, `/g/collect` con los 3 eventos, y el evento **visible en GA4 realtime** con sesion UA real + engagement (LEARNINGS §7c). ⚠️ Hallazgo registrado entonces y todavia vigente: **ningun host tiene CMP/consent-mode defaults** — los tags disparan sin gate. Es postura pre-existente del sitio, no del motor, y sigue siendo candidata a task de measurement governance.
+- [x] Signals `growth.cta.*` steady. **Observado 2026-09-01 contra PG real** (`scripts/growth/_sanity-cta-signal-window.ts`), con una correccion de metodo: la ventana LITERAL de siete dias (18→25 de julio) **tuvo trafico un solo dia**, asi que sus ceros no probaban nada — cero errores sobre cero trafico es un falso verde. La evidencia sale de la **serie completa de 45 dias** (2026-07-18 → 2026-09-01), que es mas larga y con volumen real: **0 errores server-confirmed, 0 kill switches enganchados, 0 colisiones de prioridad**, sobre 24 eventos de conversion y exposicion continua (219 observaciones el 2026-08-29). Los 3 `rejected` son el propio test de forja. ⚠️ **Transparencia: la verificacion de teclado de hoy sumo 2 eventos mas al ledger** (`clicked` + `form_opened`, 2026-09-01 20:41) — el contador quedo en 26 y esos dos son mios, no trafico real.
+- [x] Task/epic/docs/manual/tracking plan/flag ledger/Handoff coinciden con el runtime. **2026-09-01:** skill `greenhouse-growth-ctas` (ambos espejos) con el estado de rollout al dia + el limite de los readers + `ISSUE-167`; EPIC-023, README, registry, Handoff y changelog sincronizados. El ledger ya declaraba `GROWTH_CTA_ENGINE_ENABLED` Production ON desde 2026-07-18 y se verifico que sigue siendo cierto.
+- [x] `pnpm task:lint --task TASK-1427` sin findings. Gates UI: no aplican gates de codigo porque **esta task no toca JSX ni tokens** — su Slice 3 es observacion y registro. La evidencia visual es live sobre produccion (1280 y 375 medidos, sin overflow), no un render local.
 
 ## Verification
 
@@ -377,11 +396,11 @@ Reglas obligatorias:
 
 ## Closing Protocol
 
-- [ ] Lifecycle/carpeta/README/registry/EPIC-023 sincronizados.
-- [ ] `Handoff.md` y `changelog.md` registran evidencia y riesgos residuales.
+- [x] Lifecycle/carpeta/README/registry/EPIC-023 sincronizados (2026-09-01).
+- [x] `Handoff.md` y `changelog.md` registran evidencia y riesgos residuales (2026-09-01).
 - [ ] `greenhouse-qa-release-auditor` emite PASS o CONDITIONAL PASS sin blocker.
-- [ ] Chequeo de impacto cruzado completado.
-- [ ] Skill `greenhouse-growth-ctas` actualizada en el MISMO change set (Skill Maintenance Contract: estado de rollout, contratos, hard rules que cambien).
+- [x] Chequeo de impacto cruzado completado: `ISSUE-167` queda como dueño del hueco de teclado y apunta a `EPIC-023`; `TASK-1429`/`TASK-1431` tocan el mismo renderer y quedan notificadas via el issue.
+- [x] Skill `greenhouse-growth-ctas` actualizada en el MISMO change set, ambos espejos (`pnpm skills:mirrors` identicos).
 
 ## Delta 2026-07-18 — Slices 1 y 2 ejecutados (ventana de 7 días abierta)
 

@@ -2,6 +2,20 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-09-01 (9) — cinco oportunidades LicitaLAB promovidas por MCP HubSpot
+
+El operador confirmó la promoción manual de cinco oportunidades. El MCP de HubSpot creó y releyó los Deals
+`64528962434` (Chile Cultura), `64544277070` (Universidad de Chile DII), `64529115746` (JUNJI), `64532229714`
+(Temuco) y `64521733176` (CNTV), todos en `default` / `qualifiedtobuy`, owner `75788512`, con ID de licitación,
+llave de idempotencia, ficha, plazo, próximo paso y asociación Deal ↔ Company verificada. Temuco y CNTV requirieron
+Companies nuevas `57953559382` y `57958935823`; no se fabricaron contactos. CNTV quedó en `Strategic Bets`, no en
+una etapa ficticia: el stage sigue siendo `qualifiedtobuy`.
+
+Corregida la contradicción entre skills: `hubspot-greenhouse-bridge` ahora coincide con el companion LicitaLAB y
+con `project_context.md`: el MCP de HubSpot es el writer gobernado para promociones manuales confirmadas; la brecha
+del bridge sólo limita automatización. Registros CRM general y de licitaciones sincronizados tras readback. Pendiente
+comercial real: admisibilidad, loaded cost/margen y producción de propuestas; ninguna postulación fue enviada.
+
 ## 2026-09-01 (6) — barrido documental de los 19 cierres y la calibración que faltaba
 
 Cerré el ciclo del barrido: 19 tasks quedaron en `complete/` y el registro alrededor de ellas ya no
@@ -31,6 +45,36 @@ ahora nombra `vercel env pull`. Y el mensaje de `no-opacity-on-text` estaba en v
 
 Gates: `local:check` exit 0, `task:lint:test` 47/47, `ops:lint --changed` errors=0,
 `docs:closure-check` sin dueño faltante, `docs:context-check:strict` 0/0, 262 tests de lint-rules.
+
+## 2026-09-01 (9) — TASK-1427 cerrada: el motor CTA queda con evidencia medida, y deja ISSUE-167
+
+Cerré la primera rebanada del motor CTA. Lo importante no es el cierre sino cómo se sostuvo.
+
+**La ventana de 7 días era un falso verde.** El criterio pedía observar `growth.cta.*` durante siete
+días tras el deploy del 2026-07-18. Medido contra PG: entre el 18 y el 25 de julio hubo tráfico **un
+solo día**. Cero errores sobre cero tráfico no prueba nada. Cerré con la serie completa de 45 días —
+0 errores server-confirmed, 0 kill switches, 0 colisiones, con exposición real (219 observaciones el
+2026-08-29). Es evidencia más fuerte que la pedida, sobre una ventana más larga.
+
+⚠️ **Los readers de signal no podían responder la pregunta.** `growth-cta-signals.ts` filtra
+`INTERVAL '1 day'` en sus tres queries: sirven para «¿está sano ahora?», nunca para «¿estuvo steady
+durante N días?». Cualquier criterio de ventana exige ir a la tabla base. Dejé
+`scripts/growth/_sanity-cta-signal-window.ts` para que la próxima sea medición y no cita.
+
+🔴 **Probar el teclado destapó `ISSUE-167`.** Me negué a tildar «funciona con teclado, Escape/focus
+restore» sin ejercitarlo, y en producción encontré que al abrir el Growth Form desde un CTA **el foco
+queda en `body`** y **`Escape` no cierra**. Abre como expansión inline (sin `role=dialog` ni
+`aria-modal`) pero sin las dos obligaciones de ese patrón. Es del **renderer compartido**: afecta a
+todos los CTA en Think y WordPress. La task cierra con ese criterio **sin tildar y con la razón
+escrita**, que es el desenlace correcto.
+
+Sí verificado live hoy: render con el contrato completo, sin overflow en 1280 y 375 (card 343px),
+formulario alcanzable por teclado tabulando (5 controles, primero `firstName`).
+
+**Pendiente NO bloqueante, decisión del operador:** el placement AMPLIO en WordPress (recomendado,
+posts del blog vía `the_content` en `ohio-child`). Hoy sólo existe la página de prueba.
+
+Transparencia: mi verificación sumó 2 eventos al ledger productivo (`clicked` + `form_opened`).
 
 ## 2026-09-01 (8) — el cierre queda escrito en los SEIS sitios donde alguien cierra
 
@@ -431,88 +475,3 @@ responsive/teclado/reduced motion y roundtrip nativo Elementor PASS. Home y Crea
 Cierre Git acotado autorizado, sin push ni despliegue general Greenhouse. TASK-1352 no se movió a complete; migración de URL y
 sus dossiers adicionales no forman parte de este pedido de publicación. La aprobación del export
 supera las instrucciones de rechazo de diseños anteriores para este artefacto específico.
-
-## 2026-08-30 — oferta HubSpot V2 y planificación previa a la publicación del export aprobado
-
-La investigación actual de producto y el benchmark de 11 partners quedaron consolidados en un audit fechado y en
-el canon `docs/services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md`. La práctica usa seis familias por
-outcome, modos de entrega transversales y overlays sectoriales; la evaluación inicial es sin costo y el blueprint
-pagado exige entregable autónomo. Customer Agent ya no es categoría raíz; Agent Hub/Builder, Revenue Hub/Contracts,
-Customer Success, Projects/Services, Marketing Studio y AEO quedaron ubicados en la taxonomía correcta.
-
-Se actualizaron PDR-006/007/013, el spec y las skills HubSpot en `.codex`/`.claude`, fuentes, glosarios, templates y
-router. `TASK-1352` fue **reemplazada por completo** —no reconciliada mediante deltas— para impedir que un ejecutor
-reproduzca el resultado rechazado de Claude Design. La task exige research y contratos de copywriting, SEO/AEO y CRO
-antes del diseño, más un gate humano `ACCEPT FIRST FOLD` antes de implementar el resto. La dirección durable es
-**Sistema vivo de crecimiento**. El wireframe, flow y motion gobiernan un atlas conectado de
-seis resultados, tres lentes sectoriales, una conversión primaria y una experiencia inmersiva basada en color y
-causalidad — sin copiar el trade dress de HubSpot, modificar badges/logos ni depender de video, particles, robots o
-scroll hijacking. La paleta exacta debe salir de assets oficiales/autorizados vigentes y convertirse en tokens
-page-scoped; first-fold, no-JS, reduced motion, performance, marca y GVC premium son gates binarios.
-
-Los cuatro docs UI de TASK-1352 fueron también **reemplazados integralmente** el 2026-08-30. Ya no fijan una gran
-idea antes del research ni separan agentes como oferta dominante: dirección, wireframe, flow y motion usan las seis
-familias exactas, `COPY_SLOT` gobernado, pasajes SEO/AEO servidos, una única conversión, estados/fallas completos,
-tokens de motion exactos y score premium `average >= 4.5` con todas las dimensiones `>= 4`.
-
-**Ese checkpoint documental fue superado por la publicación autorizada descrita arriba.** `TASK-1352`
-sigue `to-do` y `UI ready: no` como unidad formal; no usar este estado para afirmar que la página no está publicada.
-Su alcance adicional aún incluye dossiers
-VoC/CRO y SEO/AEO, claim/proof ledger, copy deck nuevo y reverificar producto, tier, assets, prueba, formulario y
-disponibilidad del portal antes de implementar.
-
-## 2026-08-30 — TASK-1693 `complete`: lo que la lente `Descubrir` ya tenía construido y no llegaba al operador
-
-Tres capacidades pagadas y sin superficie, cerradas en cuatro slices sobre `develop` (sin push):
-**paginación por cursor** (el reader la servía y la page descartaba `nextCursor`), **las cuatro
-fuentes de seed** (`resolveSeeds` cubre cinco y el workbench mandaba `'manual'` fijo) y **los filtros
-del canvas** (`keyword-discovery-query.ts` existía sin un solo importador).
-
-**El Slice 0 no estaba en el plan y fue necesario.** El readiness gate bloqueó: los docs de diseño
-declarados eran los de `TASK-1665` —substantivos, pero pre-esquema— y **la paginación no estaba
-diseñada en ninguna parte**. Se autoraron wireframe + flow PROPIOS de 1693, de alcance parcial, en vez
-de reescribir el contrato de una task cerrada para satisfacer un esquema posterior.
-
-**Se retiró una serialización que la spec declaraba obligatoria (`1691 → 1693`)** tras verificar que
-la colisión que la justificaba ya no existe: la lente `Descubrir` ya pinta `◑` + `capturedAt` +
-«Barrera de enlaces», así que el encoding que 1691 propaga es el que esta superficie **ya tiene**;
-archivos owned disjuntos y bloques de copy distintos.
-
-**Tres defectos propios, cada uno atrapado por un instrumento distinto — y ninguno por el lint:**
-1. La skill de UX writing mató un `aria-label` que yo había propuesto: no contenía el texto visible,
-   lo que rompe *label in name* (WCAG 2.5.3) y deja el botón inalcanzable por control de voz.
-2. Un test destapó que mi propio wireframe afirmaba que la superficie tenía UNA live region. Tiene
-   **dos** desde 1665. Se corrigió el contrato en vez de dejar la afirmación.
-3. **Mirar el frame** destapó la barra de filtros con las etiquetas en tres líneas base distintas, y
-   **axe** marcó `color-contrast` SERIOUS (3.14:1) en los seis frames por un `opacity: 0.75` que yo
-   había puesto para de-enfatizar un conteo. De-enfatizar texto bajándole opacidad es exactamente
-   cómo se rompe el contraste sin darse cuenta.
-
-**Verificado contra el dev server con sesión de agente, no sólo con mocks:** paginación real
-(`limit=10` → `nextCursor 10` → 2.ª página con candidatos distintos), filtros server-side
-(`query=zzznoexiste` → 0, `lamina` → 2, `maxLinkBarrier=low` → 19 de 50) y la superficie con
-`?q=lamina` titulando «2 candidatos» — el conteo sigue al universo filtrado, no a lo que bajó.
-
-🔴 **`pnpm ui:quality` queda en `BLOCK` y se reporta así: las notas NO se inflaron.** Average 4.41 y
-`visualImpact` 4.2 contra el 4.5 del gate. La razón es estructural: el techo de impacto lo fija el
-canvas de `TASK-1665`, que esta task declara fuera de alcance en sus No-goals UX. Cerrarlo subiendo
-la nota habría sido el fraude que el gate existe para impedir. `ui:visual-gate` PASS.
-
-**Gate de cierre completo:** `pnpm test` COMPLETO verde (12 638 pasados) y **`pnpm build` de
-producción VERDE** (corrido con autorización del operador: 28,6 s de compilación, 23/23 páginas
-estáticas, cero errores). 
-
-**Rollout ejecutado el 2026-08-30 con autorización del operador (USD 0,348 estimados):** corrida real
-`seokdr-761a9689-…` con `seedSource='gsc_queries'` sobre Berel — `source_kind` persistido, **10/10
-seeds con `origin='gsc_queries'`** (berel 91 734 impresiones, pinturas berel 53 418: salen de
-`seo_gsc_daily`, no del textarea), `succeeded`, **334 candidatos**, **USD 0,2999 reales**. Con eso
-cierra el único AC que había quedado sin ejercitar. Y de yapa dejó la **primera corrida multi-página
-del Space**, así que la afordancia de paginación —que hasta entonces no se podía ver porque la
-corrida mayor tenía exactamente 50 candidatos = el tamaño de página— quedó capturada en un frame
-propio, con el encabezado titulando «50 de 284» (284 = keywords distintas tras el colapso de
-cardinalidad de TASK-1694, no las 334 filas de procedencia).
-
-**12 commits promovidos a `origin/develop`** (7 de esta task, 3 de TASK-1662/1699, 2 ajenos).
-
-**Pendiente con dueño:** una task de superficie si se quiere levantar el `visualImpact` del canvas —
-es la única razón por la que `ui:quality` sigue en `BLOCK`, y no se cierra inflando la nota.

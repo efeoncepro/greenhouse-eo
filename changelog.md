@@ -7,6 +7,19 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-01 — cinco licitaciones nuevas entran a HubSpot por MCP
+
+Promoción manual confirmada y verificada de Chile Cultura, Universidad de Chile DII, JUNJI, Temuco y CNTV: cinco
+Deals nuevos en `Pipeline de ventas` / `Calificado para comprar`, con ambas llaves de deduplicación, fechas,
+modalidad, próximo paso y asociación a Company. Se reutilizaron tres Companies canónicas y se crearon únicamente
+las dos ausentes, Temuco y CNTV; no se inventaron contactos. CNTV quedó clasificada como `Strategic Bets`, propiedad
+de movimiento comercial separada del stage.
+
+Las skills HubSpot espejadas dejaron de contradecir el contrato ya vigente en el companion LicitaLAB y
+`project_context.md`: el MCP de HubSpot es un writer válido para cargas manuales bajo confirmación y readback; el
+bridge queda como carril de automatización y su cobertura incompleta no bloquea ese flujo. Los registros comercial
+y de licitaciones quedaron sincronizados con los IDs observados. No hubo postulación ni envío de propuesta.
+
 ## 2026-09-01 — el registro del avance entra a los checklists de cierre
 
 `stale-progress` existía pero ningún protocolo mandaba correrlo. Los checklists de cierre de
@@ -23,6 +36,19 @@ Barrido de coherencia sobre los 19 cierres del día: `Lifecycle` desincronizado,
 índices, 9 estados falsos en el README de tasks, conteos y prosa stale en cinco epics y en
 `AEO_PROGRAM_STATUS.md`, 10 archivos con rutas rotas y cuatro reglas duras apoyadas en hechos ya
 falsos.
+
+## 2026-09-01 — el motor CTA cierra su primera rebanada, y deja un hueco de accesibilidad nombrado
+
+`TASK-1427` complete. El steady-state se observó sobre **45 días** y no sobre los 7 que pedía el
+criterio: la ventana literal de julio tuvo tráfico un solo día, así que sus ceros eran un falso
+verde. Resultado sobre la serie real: 0 errores server-confirmed, 0 kill switches, 0 colisiones.
+
+Los readers de `growth.cta.*` filtran `INTERVAL '1 day'`: responden «¿está sano ahora?», nunca
+«¿estuvo steady durante N días?». Queda `scripts/growth/_sanity-cta-signal-window.ts` para esa
+pregunta.
+
+**`ISSUE-167` abierto:** al abrir el Growth Form desde un CTA el foco queda en `body` y `Escape` no
+cierra — renderer compartido, afecta a todos los CTA en Think y WordPress.
 
 ## 2026-09-01 — el paso de registrar el avance entra a los seis checklists de cierre
 
@@ -1023,21 +1049,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
 - **La captura premium se ejecutó, y justificó su costo: destapó cuatro defectos que ningún test veía.** El contador de caracteres tenía un contraste de 2.43:1 contra el 4.5:1 de AA — defecto pre-existente, `serious` en axe, sobre una superficie de candidato. Al ocultar el placeholder del campo congelado —porque un campo que no acepta texto no puede invitar a escribir— axe reveló que el textarea llevaba años **sin nombre accesible**: se apoyaba en el placeholder, que es precisamente el anti-patrón que la guía de UX writing prohíbe. La banda usaba un **avión de papel** para decir que no se puede enviar. Y la superficie no declaraba su recipe de composición.
 - **Un quinto hallazgo resultó ser del gate, no del código.** Marcaba los botones del stepper como fuera del viewport en 390px, pero su contenedor ya declara `overflow-x: auto`: es un scroller contenido, que es el patrón correcto. Se declaró la excepción en vez de romper el patrón para complacer al checker; el contrato real —que la página no scrollee— se verificó y se cumple.
 - Estado: **complete**. `pnpm test` completo verde (12.062), los cuatro gates de UI en PASS, scorecard 4.54 con el piso declarado y su `nextAction` escrito en vez de inflado. Seed ejecutado y limpiado, con residuo verificado en cero.
-
-## 2026-08-26 — La contabilidad de Hiring mentía: el dominio está más avanzado que sus documentos
-
-- **Auditoría con cinco verificadores en paralelo, cada hallazgo re-verificado a mano contra el runtime** (git, `vercel env ls`, `gcloud run services describe`) antes de escribirse. El patrón de fondo: casi nada de Hiring falta por construirse; faltaba por contabilizarse. Sin cambios de runtime en esta pasada.
-- **La regla que envenenaba a los agentes.** `.claude/rules/hiring.md` se auto-carga al tocar `src/lib/hiring/**` y afirmaba **en presente** que el `CHECK` del invariante `stage='closed'` ⟺ desenlace seguía parqueado en `docs/tasks/pending-migrations/`. Se aplicó el 2026-08-23 (`b270478f4`) y esa carpeta sólo tiene su `README`. Corregido, con las tres migraciones nombradas por ruta; además `HIRING_APPLICATION_STAGES` volvió a ser el espejo del `CHECK` desde que el Slice F de `TASK-1754` lo bajó de trece a seis. El `NUNCA` de fondo —no aplicar un contract antes del release que retira su escritor— **no se relaja**: cambió el hecho, no el invariante.
-- **Un flag encendido en producción que el ledger daba por apagado.** `HIRING_VACANCY_AI_ENABLED` lleva **41 días ON en Production** y está **ausente en staging**; el ledger decía "OFF en todos los environments". Y el orden de sus precondiciones quedó invertido: se declaró "flip staging + smoke, después prod", y ocurrió prod ON **sin que el smoke de staging ocurriera nunca**. Queda registrado como deuda abierta, no como diseño.
-- **La trampa que explicaba casi toda la confusión.** `main` promueve por **squash merge**, así que los SHAs de `develop` nunca son ancestros aunque su contenido esté desplegado. Leer `rev-list --count origin/main..origin/develop` como "trabajo sin desplegar" produjo el diagnóstico falso de que `TASK-1771` esperaba release: está en producción desde `709e15f66` (2026-08-23), verificado blob a blob. El gap real de código es `TASK-1762`, cuyas cuatro migraciones **ya se aplicaron** a la instancia Cloud SQL compartida — schema por delante del código, mitigado porque sus flags nacen OFF.
-- **Ocho entradas falsas en `docs/tasks/README.md`**, corregidas: `1771` y `1755` como "no están en main" (ambas desplegadas), `1748` y `1771` con migraciones "parqueadas" (las dos aplicadas), `1754` con el Slice F "no ejecutado" (`50b742341`), `1719` con "falta rollout" (ejecutado el 08-18), `1747` marcada `to-do` estando `in-progress` y en producción, y `1757` "apagado esperando sign-off" con el flag ON desde el 08-20. Seis líneas `Status real` de las specs quedaron alineadas con el runtime.
-- **Tres pendientes que ninguna línea declaraba.** `TASK-1718`: el fix H-10 sigue sin escribirse — el filtro `stage` entra como texto libre (`stage as never`) y ante un literal inexistente responde `200 {items:[]}`. `TASK-1746`: `purge_assessment_access_recovery` existe en DB con **cero callers**, o sea la retención de 12 meses y el purgado por retiro de consentimiento **nunca se ejecutan** — es el único hallazgo con filo legal. `TASK-1742`: el canary se declaró verde el 08-18 y al día siguiente entraron dos fixes correctivos al mismo carril, sin registro de re-verificación.
-- **Una task perdió la mitad de su premisa.** `TASK-1751` declaraba cuatro defectos en la rendición del candidato; **dos no son ciertos**: el reloj ya es `sticky` (`bc69e5a75`, arreglado 2h43m después de crearse la task) y los avisos de 5 y 1 minuto **nunca fueron sólo `srOnly`** — la insignia visible `.timerBadge` convive con el canal de lector de pantalla desde el ship original del 2026-07-13. Quedan los **dos del guardado**, que son el daño real del caso fuente: el borrador en vuelo se pierde al entrar en gracia (falta el _flush_, no "congelar mejor") y el error final manda a reintentar algo imposible. La spec lleva `NUNCA` explícito de no "arreglar" lo que funciona.
-- **Un fail-closed que parecía un olvido.** `HIRING_ASSESSMENT_AI_PROMOTION_EVIDENCE_DIGEST` está ausente en los tres runtimes **por diseño**: el digest _es_ la evidencia de promoción y sin él el modo degrada a `global_provisional`. Quedó anotado con su `NUNCA` — declararlo para "destrabar" la policy de excepciones vaciaría el gate.
-- **Aprendizaje transversal registrado:** un `Status real` es una afirmación con fecha de caducidad. Cinco de siete tasks `in-progress` del dominio lo tenían stale, y el `README` estaba peor que las specs. Existe precedente del mismo fix (`4a1011286`).
-
-## 2026-08-26 — Octubre de Berel queda convertido en un proyecto creativo trazable
-
-- El proyecto [`Produccion Creativa - Octubre 26`](https://app.notion.com/p/3c839c2fefe7813c9450e2f35cb4021e) quedó `En curso` con ocho artículos `N35–N42`, 32 banners, 32 paquetes sociales y 32 subítems en Content Hub: 72 tareas relacionadas al proyecto, conforme a la aceptación `9A` / `4A`.
-- Además de las seis reescrituras, se normalizaron los briefs y se redactaron los artículos nuevos N41 —paleta de la mesa mexicana— y N42 —pintura por superficie—, cada uno con cuatro banners y cuatro derivados completos. La segunda lectura confirmó las 18 filas nuevas y la igualdad exacta tarea ↔ subítem en los ocho sociales.
-- Se restauraron 54 fechas de N35–N40 que automatizaciones de Notion habían movido al `2026-09-04`; la consulta final devolvió 8 artículos al 7 de octubre, 32 banners al 14 y 32 sociales al 16. Las canónicas de N41–N42 siguen como soft-404 y permanecen bloqueadas para enlaces entrantes, CMS y redes hasta QA live. Evidencia: [`auditoría de producción de octubre`](docs/audits/seo/BEREL_OCTOBER_2026_CONTENT_PRODUCTION_2026-08-26.md).

@@ -26,9 +26,14 @@
 - Exit criteria del epic que ya se cumplen con esto: placement interruptivo shipped con evidencia,
   eventos two-tier (Tier B rollup fuera del ledger OLTP), kill switch live dentro del TTL del
   render contract, y visitor suppression consent-aware.
-- Lo que queda del epic (medido 2026-09-01: 7 hijas `complete`, 3 abiertas): cierre de `TASK-1427`
-  (ventana 7d + decisión de placement amplio WP) y la campaña interruptiva inaugural. `TASK-1430`
-  (cockpit) y `TASK-1431` (Action Registry) cerraron el 2026-09-01.
+- Lo que queda del epic (medido 2026-09-01: **8 hijas `complete`, 2 abiertas**): la campaña
+  interruptiva inaugural y el **placement AMPLIO en WordPress**, que es decisión del operador
+  (recomendado: posts del blog vía `the_content` en `ohio-child`), no deuda técnica. `TASK-1430`
+  (cockpit), `TASK-1431` (Action Registry) y `TASK-1427` (cierre de la primera rebanada) cerraron
+  el 2026-09-01.
+- 🔴 **`ISSUE-167` abierto y sin dueña**, salido del cierre de `TASK-1427`: al abrir el Growth Form
+  desde un CTA el foco queda en `body` y `Escape` no cierra. Es del **renderer compartido**, así que
+  afecta a todos los CTA en Think y WordPress. Candidata natural: task `ui-ux` de este epic.
 - Delta 2026-07-18 (cerrado 2026-09-01): `TASK-1430` — cockpit master-detail con autoría gobernada
   de 8 pasos, preview harness del renderer canónico, kill switches operables y métricas de marketing
   server-side (CTR/tasas con trust tags). El «rollout pendiente: push + smoke staging» que decía esta

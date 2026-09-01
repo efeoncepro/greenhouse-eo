@@ -175,10 +175,22 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
   bloque HTML con el snippet, cero cambios de tema — rollback = borrar la página). Evidencia:
   dataLayer + `/g/collect` (3 eventos) + ingest 202 + ledger `browser_reported/accepted` + forja
   403 (`surface_unauthorized`). ⚠️ Ningún host tiene CMP/consent-mode defaults — los tags disparan
-  sin gate (postura pre-existente del sitio; LEARNINGS 2026-07-18). Ventana steady-state 7d abierta
-  (hasta 2026-07-25). Pendiente: placement AMPLIO WP (decisión del operador post-validación;
-  recomendado posts del blog vía `the_content` en `ohio-child`), placement interruptivo, cockpit
-  de autoría, más acciones.
+  sin gate (postura pre-existente del sitio; LEARNINGS 2026-07-18). Pendiente: placement AMPLIO WP
+  (decisión del operador post-validación; recomendado posts del blog vía `the_content` en
+  `ohio-child`), placement interruptivo, más acciones.
+- **2026-09-01 (TASK-1427 CERRADA): steady-state observado sobre 45 días, no sobre 7.** 🔴 Método,
+  porque se repite: la ventana literal de 7 días (18→25 jul) **tuvo tráfico un solo día**, así que
+  sus ceros eran un falso verde — cero errores sobre cero tráfico no prueba nada. La evidencia sale
+  de la serie completa 2026-07-18 → 2026-09-01: **0 errores server-confirmed, 0 kill switches
+  enganchados, 0 colisiones**, con exposición real (219 observaciones el 2026-08-29).
+  ⚠️ **Los readers de `growth-cta-signals.ts` filtran `INTERVAL '1 day'` en sus tres queries**:
+  responden *«¿está sano ahora?»*, NUNCA *«¿estuvo steady durante N días?»*. Un criterio de ventana
+  no es verificable desde el dashboard — hay que ir a la tabla base. Herramienta:
+  `scripts/growth/_sanity-cta-signal-window.ts`.
+  🔴 **`ISSUE-167` abierto y es del renderer compartido, no del host:** al abrir el Growth Form desde
+  un CTA el foco queda en `body` y `Escape` no cierra. Abre como expansión inline (sin `role=dialog`
+  ni `aria-modal`) pero sin las dos obligaciones que ese patrón acarrea — mover el foco al contenido
+  revelado y ofrecer salida por teclado. Afecta a TODOS los CTA en Think y WordPress.
 - **2026-07-18 (release `d5db8b568`, PR #159+#160): TASK-1428 + TASK-1429 EN PRODUCCIÓN.**
   Enforcement de suppression **ON en staging y Production** (verificado E2E post-release:
   visitante dismissed → excluido; fresco → ve; `engineState: ok`). Kill switches operativos en
