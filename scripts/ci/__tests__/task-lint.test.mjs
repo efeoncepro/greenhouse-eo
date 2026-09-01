@@ -1756,6 +1756,37 @@ const cases = [
     }
   },
   {
+    // `none` seguido de la explicacion de POR QUE se desbloqueo — que normalmente NOMBRA a los
+    // blockers ya cerrados. Exigir que la nota omita los IDs para no disparar el guard destruiria
+    // justo el contexto util. El valor del campo es `none`: no esta bloqueada.
+    // Repo propio a proposito: el indice de lifecycle se resuelve por root, y reusar uno ya
+    // recorrido en el mismo caso deja fuera los archivos escritos despues — el test pasaria solo.
+    name: 'stale-blocker: `none` con explicacion que nombra al blocker cerrado no dispara',
+    run: () => {
+      const root = createRepo()
+
+      write(
+        join(root, 'docs', 'tasks', 'complete', 'TASK-801-closed.md'),
+        withModularPlacementContract(taskFixture({ id: 'TASK-801', lifecycle: 'complete', blockedBy: 'none' }))
+      )
+      write(
+        join(root, 'docs', 'tasks', 'to-do', 'TASK-998-explained.md'),
+        withModularPlacementContract(
+          taskFixture({ id: 'TASK-998', blockedBy: 'none` (2026-09-01: TASK-801 cerro y dejo de bloquear)`' })
+        )
+      )
+
+      const explained = lintTasks({ repoRoot: root, options: { task: 'TASK-998' } })
+
+      assert.equal(
+        [...explained.errors, ...explained.warnings].filter(item => item.rule === 'stale-blocker').length,
+        0
+      )
+
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
     // Una task en to-do/ que aparece en el diff sin ser el foco (le corrigieron una ruta stale,
     // un cross-link) no debe romper el gate por una deuda de flow que ya tenia. Con --task
     // apuntandola, si es error: ahi el flow es parte del trabajo declarado.

@@ -1163,7 +1163,12 @@ const parseBlockedByIds = task => {
   const raw = task.status?.fields?.['Blocked by'] ?? task.status?.fields?.['blocked by'] ?? ''
 
   if (!raw) return []
-  if (/^`?none`?$/i.test(raw.trim())) return []
+
+  // `none` es el VALOR del campo; lo que venga despues entre parentesis es prosa que explica por que
+  // se desbloqueo — y esa explicacion normalmente NOMBRA a los blockers que cerraron. Exigir que la
+  // nota omita los IDs para no disparar el guard destruye justo el contexto util, asi que basta con
+  // que `none` sea el primer token.
+  if (/^`?none`?\s*(?:$|[(.,;:—-])/i.test(raw.trim())) return []
 
   const ids = new Set()
 

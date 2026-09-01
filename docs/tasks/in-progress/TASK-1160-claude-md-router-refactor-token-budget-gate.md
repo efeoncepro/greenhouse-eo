@@ -1,5 +1,22 @@
 # TASK-1160 — CLAUDE.md Router Refactor + Token Budget Gate
 
+## Delta 2026-09-01 — el bloqueo del 2026-08-05 volvió a ocurrir, medido
+
+La predicción del Delta anterior se cumplió. Al agregar **una sola línea** al checklist de cierre de
+`CLAUDE.md` —una regla cross-cutting de ciclo de vida de tasks, exactamente el tipo de contenido que
+SÍ debe vivir inline— el gate rompió el push: **35.033 contra un techo de 35.000, 33 tokens de más**.
+
+Para desbloquear hubo que sacar espacio de otro lado (dos duplicaciones que además estaban stale) y
+registrar 5 líneas del baseline en el allowlist. Funcionó, pero es exactamente el sintoma que Slice 5
+existe para eliminar: **el contenido inline ya no se decide por relevancia sino por quién llegó
+primero al presupuesto**.
+
+Estado tras esta sesión: el archivo quedó en **35.000/35.000 clavado**. El próximo que necesite
+agregar una invariante inline se topa con lo mismo.
+
+Registro del avance (2026-09-01): 8 de 9 criterios de aceptación verificados y tildados con su
+evidencia. El que falta es el target de 30.000 y es el que sostiene la task abierta.
+
 ## Delta 2026-08-05 — el presupuesto se agotó y ya bloqueó una invariante real
 
 Medición: **34.998 / 35.000 tokens (100% usado)**, 1.290 líneas. Quedan ~2 tokens.
@@ -35,7 +52,7 @@ declarando la topología compartida del worker. Hoy no cabe.
 - UI impact: `none`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Slices 1-4 y 6 IMPLEMENTADOS y vivos (CLI `pnpm claude-md`, gate strict @35k en workflow propio, auditoria de dos tiers con 0 huerfanos, 17 companions + 17 reglas path-scoped, explore-lite). ABIERTA por Slice 5: el budget esta en 35.000/35.000 = 100%, no en el target de 30.000. Verificado 2026-09-01`
 - Rank: `TBD`
 - Domain: `ops|platform|agent-governance|quality`
 - Blocked by: `none`
@@ -242,15 +259,15 @@ N/A — repo-only change. Recomendado: validar el keep-list con el operador ante
 
 ## Acceptance Criteria
 
-- [ ] `CLAUDE.md` queda bajo el budget target (~25-40k tokens) — medido por el gate.
-- [ ] Existe `scripts/ci/claude-md-token-budget.mjs` wired en `ci.yml`, en modo `error` al cierre.
-- [ ] Cada bloque domain-specific movido es alcanzable en su skill/spec (spot-check por dominio).
-- [ ] Auditoría: cero reglas `NUNCA`/`SIEMPRE` del `CLAUDE.md` original quedan huérfanas (todas en el nuevo `CLAUDE.md` o en su destino).
-- [ ] Ningún invariante fue editado semánticamente (solo relocado/consolidado) — verificable por diff.
-- [ ] Existe la tabla-router "Dominio → skill/spec" al inicio de `CLAUDE.md`.
-- [ ] Los patrones repetidos están consolidados en un doc canónico + pointers.
-- [ ] `greenhouse-documentation-governor` (Claude + Codex) actualizado: invariantes de dominio → skill/spec + pointer.
-- [ ] Un subagente Explore con un prompt no-trivial spawnea sin superar el límite de contexto.
+- [ ] `CLAUDE.md` queda bajo el budget **target de 30.000** — medido por el gate. **NO cumplido, y es la razón por la que esta task sigue abierta.** Medición 2026-09-01: **35.000 / 35.000 (100%)**, es decir en el techo `--strict`, no en el target. El rango "~25-40k" del criterio original era ambiguo; el objetivo real lo fija Slice 5 en 30.000. Mientras siga en 100%, toda invariante nueva se degrada a load-on-demand por falta de espacio y no por diseño — que es el modo de falla que el gate existe para evitar.
+- [x] Existe `scripts/ci/claude-md-token-budget.mjs` wired en CI, en modo `error`. **Verificado 2026-09-01:** el script existe, se consolidó en el CLI `pnpm claude-md` y corre `budget --strict` en `.github/workflows/claude-md-governance.yml`. Rompió de verdad ese día (35.033 > 35.000) y bloqueó el push — no es un gate decorativo.
+- [x] Cada bloque domain-specific movido es alcanzable en su skill/spec. **Verificado 2026-09-01:** 17 companions en `docs/architecture/agent-invariants/` + 17 reglas path-scoped en `.claude/rules/`; el tier 2 de la auditoría (4.190 líneas de contenido) da 0 huérfanos.
+- [x] Cero reglas huérfanas. **Verificado 2026-09-01 con `pnpm claude-md audit`:** tier 1 (reglas) 1.152 líneas base → 0 huérfanas (+9 allowlist).
+- [x] Ningún invariante editado semánticamente. **Verificado 2026-09-01:** el gate de content-loss es line-based contra el baseline `27ce06a11`; toda reescritura legítima exige entrada en `claude-md-content-allowlist.txt` con razón. 0 huérfanos en ambos tiers.
+- [x] Existe la tabla-router "Dominio → skill/spec" al inicio de `CLAUDE.md`. **Verificado 2026-09-01.**
+- [x] Patrones consolidados en `docs/architecture/GREENHOUSE_CANONICAL_PATTERNS_V1.md` (9 patrones) con pointer desde `CLAUDE.md`. **Verificado 2026-09-01.**
+- [x] `greenhouse-documentation-governor` actualizado en los dos espejos. **Verificado 2026-09-01:** `pnpm skills:mirrors` los declara idénticos.
+- [x] Existe `explore-lite` (`.claude/agents/explore-lite.md`), sin MCP, y spawnea donde el Explore built-in revienta por heredar ~170k de tool defs. **Verificado 2026-09-01:** se usó en esta sesión.
 
 ## Verification
 
