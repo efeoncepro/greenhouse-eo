@@ -504,7 +504,7 @@ Todo agente que trabaje sobre una task del sistema debe gestionar su estado en e
 2. Mover el archivo de `in-progress/` a `complete/`
 3. Verificar que carpeta y `Lifecycle` digan lo mismo
 4. Actualizar `docs/tasks/README.md` — mover entrada a sección `Complete` con resumen de lo implementado
-5. **Registrar el avance donde se LEE:** tildar los acceptance criteria que la evidencia respalda (y dejar sin tildar, con razón, lo que no); poner `Status real` al día; correr `pnpm task:lint --task TASK-###`. Un `## Delta` es prosa — nadie la lee para decidir. Caso fuente: `TASK-1699`, re-ejecutada cinco veces.
+5. **Registrar el avance donde se LEE:** tildar los criterios que la evidencia respalda (sin tildar + razón lo que no), `Status real` al día, `pnpm task:lint --task TASK-###`. Un `## Delta` es prosa que nadie lee para decidir: por eso `TASK-1699` se re-ejecutó cinco veces.
 6. Documentar en `Handoff.md` y `changelog.md`
 7. Ejecutar el chequeo de impacto cruzado (ver abajo)
 
@@ -1089,7 +1089,7 @@ Los invariantes operativos de Finance ledger/bank — internal account number al
 
 - Tests unitarios: Vitest + Testing Library + jsdom
 - Helper de render para tests: `src/test/render.tsx`
-- Validar con: `pnpm build`, `pnpm lint`, `pnpm test`, `pnpm typecheck` (NO `npx tsc --noEmit` crudo — OOM bajo Node 20, ISSUE-104)
+- Validar con: `pnpm build`, `pnpm lint`, `pnpm test`, `pnpm typecheck` (ver Quick Reference)
 
 ### Charts — política canónica (decisión 2026-04-26 — prioridad: impacto visual)
 
@@ -1212,9 +1212,9 @@ automaticamente al `pnpm install`):
 - **`.husky/pre-commit`**: corre `pnpm exec lint-staged` → `eslint --fix` sobre
   archivos staged. Errores auto-fixable se aplican; errores no-fixable bloquean
   el commit. Latencia tipica < 5s (cache eslint en `node_modules/.cache/eslint-staged`).
-- **`.husky/pre-push`**: corre `pnpm local:check` (`pnpm lint` full repo + `pnpm exec tsc --noEmit`).
-  Bloquea push si hay 1+ error. Latencia tipica < 90s. Defense in depth sobre
-  pre-commit (cubre archivos NO staged que otro agente pudo dejar rotos).
+- **`.husky/pre-push`**: corre `pnpm local:check` (composicion arriba). Bloquea push
+  si hay 1+ error. Defense in depth sobre pre-commit (cubre archivos NO staged que
+  otro agente pudo dejar rotos).
 
 **Reglas duras**:
 

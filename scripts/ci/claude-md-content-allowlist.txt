@@ -180,3 +180,14 @@ Toda surface que renderice atajos top-level de navegación (header `<ShortcutsDr
 # CLAUDE.md §Business Context Pack contiene todo el contenido original + el
 # trigger nuevo. No hay pérdida.
 - Usarlo antes de proponer o construir features que toquen producto, UX/copy, naming, metricas, HubSpot/Account 360, onboarding/cliente, GTM, marca o estrategia comercial.
+
+# 2026-09-01 — descripciones stale de las compuertas locales, corregidas en sitio.
+# Las cuatro primeras afirmaban una composicion de `local:check` / `pre-push` que dejo de ser cierta
+# cuando el comando gano nul-byte-gate, skills:mirrors, mcp:manifest:check, design-contract:lint y
+# ui:code-lint. La quinta ("Latencia tipica < 90s") medía la composicion vieja. Reword deliberado:
+# la linea viva ahora apunta a la composicion canonica en vez de repetirla y quedar stale otra vez.
+pnpm local:check:ui # local:check + design:lint + build
+El pre-push hook canonical del repo corre `pnpm lint` + `pnpm tsc --noEmit` (~90s). Es **first filter**, NO gate final. Especificamente NO corre:
+- **`.husky/pre-push`**: corre `pnpm local:check` (`pnpm lint` full repo + `pnpm exec tsc --noEmit`).
+Bloquea push si hay 1+ error. Latencia tipica < 90s. Defense in depth sobre
+pre-commit (cubre archivos NO staged que otro agente pudo dejar rotos).
