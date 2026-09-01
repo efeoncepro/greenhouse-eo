@@ -3,6 +3,13 @@
 > **Tipo de documento:** Estado de programa + roadmap operativo (SSOT de "dónde estamos / qué sigue")
 > **Versión:** 1.3
 > **Creado:** 2026-07-16 por Claude (auditoría multi-agente del programa AEO)
+>
+> 🔴 **Delta 2026-09-01 — leer antes que el resto.** `TASK-1321` y `TASK-1330` cerraron: **la puerta
+> pública self-serve YA existe y funciona** (el grader corre desde `/aeo-2/`; 5 leads, los 5 con
+> `run_id`) y los short links están **ON en Production desde 2026-07-04**, verificados end-to-end.
+> Lo que falta no es ingeniería sino **demanda**: el último lead es del 2026-07-05. Las secciones de
+> abajo se escribieron antes de esos cierres y las que los tratan como pendientes están corregidas
+> en línea; los conteos de childs abiertas del cuerpo son de 2026-08-07 (hoy: 14, medido).
 > **Última actualización:** 2026-08-07 por Claude (fila EPIC-022 reconciliada contra el registry: 13 childs `complete`, cockpit operador en 3 de 4 tabs tras TASK-1306/1307/1308)
 > **Documentación técnica:** [`../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`](../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 > **Epics que agrupa:** EPIC-020, EPIC-021, EPIC-022, EPIC-023, EPIC-024
@@ -13,7 +20,7 @@ Este documento existe para no volver a perder visibilidad de un programa que est
 
 ## Veredicto en una línea
 
-**El motor está terminado y en producción. La cara pública también está encendida y el cockpit del operador ya está construido. Lo que falta es evidencia de que el loop cierra, y 10 childs abiertas que el registro del epic nunca contó.**
+**El motor está terminado y en producción. La cara pública también está encendida y el cockpit del operador ya está construido. Lo que falta es evidencia de que el loop cierra, y las childs abiertas del epic (14 al 2026-09-01, medido; el «10» era de 2026-08-07) abiertas que el registro del epic nunca contó.**
 
 > ⚠️ **Leer el Delta 2026-08-05 (b) al final ANTES de actuar sobre las §2, §4 y §5.** Ese delta corrige tres cosas que las secciones de abajo declaran mal: (1) `TASK-1276` está `complete`, no `to-do` — el "gap #1" ya no existe; (2) la entrada pública self-serve **está live** en `think.efeoncepro.com/brand-visibility`, verificada en runtime; (3) el conteo "12/13 childs" de EPIC-020 era una ficción contable — el alcance real declarado son **49 childs, 16 abiertas**. Las §2–§5 describen el snapshot del 2026-07-16 y se conservan como historia, no como estado.
 
@@ -53,7 +60,7 @@ Este documento existe para no volver a perder visibilidad de un programa que est
 
 ### C. Herramienta de VENTA (cara pública + loop comercial)
 
-- **No existe una entrada pública self-serve LIVE.** Un prospecto puede *ver* un informe si le mandas un token, pero **no hay puerta pública donde meta su dominio solo y reciba un score**. Las dos candidatas están code-complete sin encender: `/aeo-2/` auto-grader (`TASK-1321`, `in-progress`, el grader no está desplegado ahí) y la landing `think/brand-visibility` (`TASK-1327`, sin deploy). Hoy `/aeo-2/` promete diagnóstico y entrega lead comercial, no score automático → **0 tráfico self-serve real.**
+- **~~No existe una entrada pública self-serve LIVE.~~ Corregido 2026-09-01: sí existe** (`/aeo-2/` corre el grader al enviar). Lo que sigue describe el estado de 2026-08-07: Un prospecto puede *ver* un informe si le mandas un token, pero **no hay puerta pública donde meta su dominio solo y reciba un score**. Las dos candidatas están code-complete sin encender: `/aeo-2/` auto-grader (`TASK-1321`, `in-progress`, el grader no está desplegado ahí) y la landing `think/brand-visibility` (`TASK-1327`, sin deploy). Hoy `/aeo-2/` promete diagnóstico y entrega lead comercial, no score automático → **0 tráfico self-serve real.**
 - **Radiografía AEO: un solo caso (SKY) y payload 100% manual.** No hay pipeline Greenhouse→Radiografía; el JSON se escribe a mano en el repo `efeonce-think`. Por diseño no captura leads. Falta un segundo caso real y, si se quiere como activo de captación, una versión genérica indexable.
 - **Cero casos citables / un solo cliente.** Solo Grupo Berel está contratado; ningún trial PLG provisionado. Sin volumen no hay proof social.
 
@@ -91,12 +98,12 @@ Este documento existe para no volver a perder visibilidad de un programa que est
 | Task | Título | Faceta | Qué desbloquea / bloquea |
 |---|---|---|---|
 | `TASK-1246` | (H) Public Launch Readiness + Rollout | Venta pública | **Único freno formal de EPIC-020.** Legal consent + Turnstile + flags + smoke + release. |
-| `TASK-1321` | `/aeo-2/` submit auto-runs grader + emails report | Venta pública | Candidato #1 para cerrar la entrada self-serve. El grader aún no está desplegado en esa ruta. |
+| `TASK-1321` | `/aeo-2/` submit auto-runs grader + emails report | Venta pública | ✅ `complete` 2026-09-01 — **el grader SÍ corre desde esa ruta**: 5 leads, los 5 con `run_id`. La frase anterior («aún no está desplegado») era falsa. |
 | ~~`TASK-1327`~~ | Public lead magnet landing form embed (Think) | Venta pública | ✅ **`complete` 2026-08-05** — la landing está live y verificada en runtime. Su fila en §5 queda como historia. |
 | `TASK-1251` | Growth Forms ↔ Grader convergence | Venta pública | Converge el intake sobre el motor Growth Forms (wiring del self-serve). |
 | `TASK-1270` | Recurring SoV + scheduled re-grade | Operativa cliente | Cadencia recurrente. Staging aplicado; E2E cliente pendiente. |
 | `TASK-1269` | Fix-It Artifacts (JSON-LD / llms.txt / briefs) | Operativa cliente | Entregables accionables del diagnóstico. |
-| `TASK-1330` | AI Visibility report short links | Venta / distribución | Short links para compartir el reporte. |
+| `TASK-1330` | AI Visibility report short links | Venta / distribución | ✅ `complete` 2026-09-01 — Production ON desde 2026-07-04, verificado (5 links 200, código inexistente 404). Ya no es una task abierta. |
 
 ### `to-do`
 
@@ -124,7 +131,7 @@ Ordenado por ratio impacto/esfuerzo, minimizando código nuevo:
 
 **Ola 2 — Cara operativa interna (`TASK-1276`, UI pura sobre backend listo).** Cockpit operador + facet AEO en Account 360. Es el gap #1 y el de mejor ratio: convierte el AEO en herramienta operativa y de venta *desde donde el AM ya trabaja al cliente*.
 
-**Ola 3 — Puerta pública self-serve (decidir y rematar `TASK-1321` o `TASK-1327` + `TASK-1246`).** Una sola entrada donde el prospecto entre solo. Es lo que hoy da 0 tráfico y es el corazón del AEO-como-herramienta-de-venta.
+**Ola 3 — Puerta pública self-serve (`TASK-1321` ✅ cerrada 2026-09-01; queda `TASK-1246`).** Una sola entrada donde el prospecto entre solo. Es lo que hoy da 0 tráfico y es el corazón del AEO-como-herramienta-de-venta.
 
 **Ola 4 — Cara del cliente contratado.** Promover `/aeo` a item de nav, poblar `organization_id` + entitlement per-ORG, medir el costo del run self-serve (flags `PORTAL_RUN`/`TRIAL` ya ON — vigilar gasto), shippear tiering+trial fuera de mockup, activar re-grade recurrente (`TASK-1270`). En paralelo: segundo caso real de Radiografía + runbook del ciclo AEO recurrente (hoy inexistente; el conocimiento está disperso en 3 skills y 2 manuales).
 

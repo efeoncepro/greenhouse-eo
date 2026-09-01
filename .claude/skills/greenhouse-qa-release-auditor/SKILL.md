@@ -211,6 +211,24 @@ las tres se veían bien hasta que alguien miró el runtime. Búscalas en el paso
    una lista por si acaso; y cada entrada nueva declara por qué existe y qué trabajo
    la retira.
 
+4. 🔴 **El mensaje de un gate es una PROMESA verificable: ejercítala literal.** Un
+   gate puede estar **verde, elocuente y equivocado** — ofrece una salida en su
+   mensaje de error y otra rama del código la anula, o se rompe justo cuando el
+   autor hace lo que la plantilla PIDE. Es la falla más cara de detectar, porque
+   el operador obedece la instrucción, falla, y concluye que el problema es suyo.
+   Casos fuente, los tres del mismo día (2026-09-01, `task:lint`): (a)
+   `ui-wireframe-contract` decía *«o set UI impact to none with rationale»* y la
+   inferencia por `Domain` anulaba esa salida; (b) `normalizeStatusValue`
+   comparaba el valor crudo del campo y el parser dobla las líneas de
+   continuación dentro de él, así que declarar el valor **con su razón debajo**
+   —exactamente lo que la plantilla exige— rompía tres reglas distintas; (c) la
+   misma regla trataba como error a una task en `to-do` tocada de refilón,
+   cuando su propio mensaje dice *«before implementation»*. **Qué se hace:**
+   escribe la salida que el mensaje ofrece, tal cual la ofrece, y confirma que
+   el gate pasa. Si no pasa, el defecto es del MECANISMO, no del autor — y
+   arreglarlo vale más que el trabajo que estabas haciendo. ⚠️ Ninguno de los
+   tres rompía un test: los tests fijaban la intención, no la promesa del texto.
+
 ## CLI
 
 Use the repo helper. Running as Claude, always scope skill output with

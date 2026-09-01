@@ -84,7 +84,7 @@ Reglas obligatorias:
 - `src/lib/public-site/content-factory/`
 - `services/ops-worker/server.ts`
 - `services/ops-worker/deploy.sh`
-- `docs/tasks/in-progress/TASK-1282-growth-search-console-multitenant-connection.md`
+- `docs/tasks/complete/TASK-1282-growth-search-console-multitenant-connection.md`
 - `docs/tasks/to-do/TASK-1302-growth-seo-gsc-daily-snapshot-materializer.md`
 
 Fuentes primarias verificadas al autorar la task (revalidar al tomarla por ser feature nueva/gradual):

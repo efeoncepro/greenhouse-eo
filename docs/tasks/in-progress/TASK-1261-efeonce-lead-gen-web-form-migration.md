@@ -72,7 +72,7 @@ Reglas obligatorias:
 ### Depends on
 
 - `TASK-1229` (motor), `TASK-1230` (adapter HubSpot seguro), `TASK-1231` (renderer/surfaces) — todas complete.
-- `TASK-1253` (validator registry) — code-complete; este form es su vehículo de shadow.
+- `TASK-1253` (validator registry) — **`complete` 2026-09-01**; este form fue su vehículo de shadow.
 
 ### Blocks / Impacts
 
@@ -89,7 +89,7 @@ Reglas obligatorias:
 
 - Motor Growth Forms (TASK-1229): contracts, commands (`authorDraftForm`/`publishForm`/`submitForm`), policy-compiler, readers, dispatcher.
 - Adapter HubSpot seguro (TASK-1230, `hubspot_forms_secure_submit`), renderer portable + host surfaces (TASK-1231).
-- Validator registry + autoridad server (TASK-1253, flag OFF) — este form es su vehículo de shadow.
+- Validator registry + autoridad server (TASK-1253, **flag ON en Production, verificado 2026-09-01** — este doc decía OFF y estaba stale) — este form fue su vehículo de shadow.
 - Pipeline staging ON (`PUBLIC_API`/`DISPATCH`/`HUBSPOT_SECURE_SUBMIT`); faltaba un form real publicado.
 
 ### Gap

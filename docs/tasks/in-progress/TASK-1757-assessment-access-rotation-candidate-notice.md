@@ -112,7 +112,7 @@ Reglas obligatorias:
 ## Normative Docs
 
 - `docs/tasks/complete/TASK-1746-assessment-access-recovery-command.md`
-- `docs/tasks/in-progress/TASK-1747-application360-assessment-access-recovery-ui.md`
+- `docs/tasks/complete/TASK-1747-application360-assessment-access-recovery-ui.md`
 - `docs/manual-de-uso/hr/recuperar-acceso-a-test-de-candidato.md`
 
 ## Dependencies & Impact

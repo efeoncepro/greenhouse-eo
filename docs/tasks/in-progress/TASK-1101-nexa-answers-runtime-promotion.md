@@ -96,7 +96,7 @@ Sin esta task, el primitive enriquecido queda "listo pero desconectado": la expe
 
 **Coordinar (riesgo de colisión, NO duplicar):**
 - `TASK-1092` (in-progress, Codex) — Nexa Knowledge Production Readiness: **inline citations + coverage QA**. Codex está endureciendo la cita inline de las RESPUESTAS de Nexa en `/knowledge`. Esta task aporta el **primitive** (`NexaCitationMarker` + segmento `citation` + mapper packet→source); coordinar para que TASK-1092 consuma el mapper canónico de acá en vez de forkear. Definir el boundary antes de codear.
-- `TASK-1090` (in-progress, Codex) — reconcilia `/knowledge` + `/knowledge/mockup/answer-trace` en una ruta con lentes Humano/Nexa/MCP. La lente **Nexa** es el host runtime natural del `NexaAnswersCanvas`. Coordinar qué ruta monta el canvas runtime.
+- `TASK-1090` (`complete` 2026-09-01, Codex) — reconcilia `/knowledge` + `/knowledge/mockup/answer-trace` en una ruta con lentes Humano/Nexa/MCP. La lente **Nexa** es el host runtime natural del `NexaAnswersCanvas`. Coordinar qué ruta monta el canvas runtime.
 
 **Impacta a:**
 - `TASK-1096` — esta task es su promoción a runtime; al cerrar, marcar el gap "mockup→runtime" como resuelto en TASK-1096.

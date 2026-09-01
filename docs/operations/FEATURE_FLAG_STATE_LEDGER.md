@@ -1,5 +1,26 @@
 # Greenhouse — Feature Flag State Ledger (env-var flags)
 
+> ## 🔴 Delta 2026-09-01 — § Pendientes de acción es hoy un CEMENTERIO, medido
+>
+> `pnpm flags:audit` gana la capacidad de comparar **valor live vs lo que esta tabla declara**
+> (antes usaba `vercel env ls`, que lista PRESENCIA y nunca el VALOR — por eso este drift fue
+> invisible durante meses). Resultado de la primera pasada: **24 filas declaran `prod: OFF` con el
+> valor live en `true`**.
+>
+> Sólo **3 se corrigieron a mano** —`GROWTH_FORMS_SERVER_VALIDATION_ENABLED`,
+> `GROWTH_FORMS_EMAIL_VERIFICATION_ENABLED`, `GROWTH_FORMS_CATALOG_API_ENABLED`—, las que verifiqué
+> una por una. **Las otras 21 siguen mintiendo** y el auditor las nombra al correrlo.
+>
+> ⚠️ **Este doc se contradice a sí mismo.** `COMMERCIAL_Q2C_CANONICAL_CLOSE_ENABLED`: la línea de
+> § Pendientes dice `prod: OFF`, y la del snapshot dice ✅ prod desde 2026-06-29. Las dos en el mismo
+> archivo. `docs:closure-check` no ve eso.
+>
+> 🔴 **Por qué importa más que un dato viejo:** este ledger es el SoT humano que un agente lee para
+> decidir si algo está desplegado. Una fila que dice «rollout pendiente» sobre algo que lleva meses
+> vivo hace que **re-ejecute trabajo terminado** — es la misma causa que hizo repetir `TASK-1699`
+> cinco veces. **Una fila de esta tabla NO es evidencia de rollout pendiente sin leer el valor live.**
+
+
 ## Reconciliación 2026-07-27 — Think ya está publicado
 
 Las notas históricas de esta ledger que indicaban “0 tráfico self-serve” o “el grader no está embebido en ninguna
@@ -83,7 +104,7 @@ Este ledger gobierna los flags de **este repo**: los 5 runtimes de Greenhouse (V
 - **NUNCA prender un flag de Cloud Run sólo con `gcloud run services update --update-env-vars`.** Los `deploy.sh` de los workers usan **`--set-env-vars` (destructivo)**: reescriben el set completo, así que una var agregada out-of-band **desaparece en el siguiente deploy, en silencio**. El SoT es **`services/<worker>/deploy.sh`** (declarar el flag ahí) + aplicar en vivo para efecto inmediato. **Los dos pasos, siempre.** Caso fuente 2026-07-10: el flag del ebook se prendió en la revisión `00470`, la `00473` lo borró, y el consumer reactivo registró `skip: flag OFF` — el ledger decía ON y la realidad era OFF. Un flag "prendido" que no está declarado en `deploy.sh` es una bomba de tiempo, no un rollout.
 - **NUNCA prender un flag en Vercel "aprovechando" el deploy que disparó tu push.** Vercel **congela las env vars en el instante en que CREA el build**, no cuando lo termina. Si haces `git push` y después `vercel env add`, el deploy que está corriendo **NO tiene la var** — y va a quedar `● Ready`, verde, con el flag OFF. `vercel env ls` te va a decir que la var existe (es verdad: existe en la CONFIG del environment) mientras la **revisión que sirve el tráfico** no la tiene. El orden correcto es **`vercel env add` → DESPUÉS `git push`**; si ya empujaste, **redeploya** (`vercel redeploy <url-del-deploy> --scope efeonce-7670142f`) y confirma que los alias apunten a la revisión nueva. Caso fuente 2026-07-12: `NEXA_PROPOSAL_ACTIONS_ENABLED` — el deploy del push quedó Ready sin la var; sin el redeploy, el ledger habría dicho ON y Nexa habría seguido respondiendo "las acciones gobernadas no están habilitadas". **Mismo bug class que el email del ebook, distinta puerta.**
 - **SIEMPRE** que prendas/apagues un flag en un environment, actualiza la **§ Snapshot** (con fecha) y, si cerró un pendiente, saca la fila de **§ Pendientes de acción**.
-- **NUNCA** confíes en este doc como verdad live para una decisión crítica — la **verdad live es `vercel env ls`**. Este doc es el ledger humano (intención + pendientes + último snapshot conocido).
+- **NUNCA** confíes en este doc como verdad live para una decisión crítica — la **verdad live de un VALOR es `vercel env pull <env>`** (o `pnpm flags:audit`) — 🔴 `vercel env ls` sólo dice si la var EXISTE, nunca cuánto vale. Este doc es el ledger humano (intención + pendientes + último snapshot conocido).
 - 🔴 **El escaneo del audit cubre las DOS formas de nombrar un flag desde 2026-08-29** — acceso por punto (`process.env.FLAG`) **e indirección por literal** (`process.env['FLAG']`, o `env[FLAG_CONST]` con `const FLAG_CONST = 'FLAG'`). Antes sólo veía la notación de punto, y **91 callsites de este repo usan la indirección** (es el patrón de todo `src/lib/growth/seo/flags.ts`). Esos flags quedaban fuera de `codeFlags`, con dos consecuencias: se reportaban como «env var muerta en Vercel» teniendo lector real (**39 de 43 eran falsos positivos**), y —lo grave— **escapaban enteros del gate ISSUE-150**, que hace `exit 1` SIEMPRE cuando un flag está prendido en Production sin su código en `main`. El gate existía y el mecanismo lo hacía cumplir; una clase entera de flags pasaba por al lado sin que nada fallara. Se encontró prendiendo `GROWTH_SEO_WORK_QUEUE_ENABLED`: el audit lo clasificó como env var muerta. **NUNCA** angostar ese escaneo a una sola forma de acceso: sobre-incluir cuesta registrar un flag de más; sub-incluir cuesta un flag fail-closed vivo sobre código que producción no tiene.
 - Para flags `NEXT_PUBLIC_*`: se hornean en el bundle **en build time** → prenderlos requiere un **build fresco** (push o redeploy con build cache desmarcado), no un redeploy que reusa build.
 
@@ -504,7 +525,7 @@ Para los **PG rollout flags** (`home_rollout_flags`): se prenden vía admin endp
 **Mirrors `NEXT_PUBLIC_*` (client-readable)** — pares de un flag server que la UI necesita leer client-side: ~~`NEXT_PUBLIC_NEXA_FLOATING_EXPANDABLE_ENABLED`~~ (retirado 2026-08-05) · `NEXT_PUBLIC_NEXA_INTERACTION_LANE_ENABLED` · `NEXT_PUBLIC_NEXA_KNOWLEDGE_RETRIEVAL_ENABLED` · `NEXT_PUBLIC_NEXA_SUGGESTED_PROMPTS_DATA_AWARE_ENABLED` · `NEXT_PUBLIC_CLIENT_LIFECYCLE_ONBOARDING_ENABLED` · `NEXT_PUBLIC_AXIS_NEUTRALS_ENABLED` · `NEXT_PUBLIC_GREENHOUSE_SECONDARY_TEAL_ENABLED`. Recuerda: se hornean en build → prenderlos requiere build fresco.
 
 > Para regenerar/auditar el inventario desde código + cruzarlo contra Vercel y este ledger:
-> **`pnpm flags:audit`** (resalta: en código sin registrar · ON en staging pero no prod · OFF everywhere · en Vercel sin código). `--strict` falla si hay flags en código sin registrar acá. Script: `scripts/ci/feature-flags-audit.mjs`.
+> **`pnpm flags:audit`** (resalta: en código sin registrar · ON en staging pero no prod · OFF everywhere · en Vercel sin código · 🔴 **fila que declara `prod: OFF` con el valor live en `true`** — desde 2026-09-01, vía `vercel env pull`; warning a propósito, acotado a filas cuya PRIMERA celda es el flag, y la sección se apaga sola sin credenciales o red). `--strict` falla si hay flags en código sin registrar acá. Script: `scripts/ci/feature-flags-audit.mjs`.
 
 ---
 
@@ -515,6 +536,6 @@ Este ledger es **doc viva**. Al cerrar una task con flag:
 1. Agrega el flag al **§ Inventario** (dominio correcto) en el PR de la feature.
 2. Si queda code-complete sin prender → fila en **§ Pendientes de acción**.
 3. Al prender/apagar en cualquier env → actualiza **§ Snapshot** con fecha y, si cerraste un pendiente, remueve su fila.
-4. Refresca el snapshot completo periódicamente con `vercel env ls` (la verdad live).
+4. Refresca el snapshot completo periódicamente con `pnpm flags:audit` (que hace `vercel env pull` y lee VALORES; con `env ls` el snapshot vuelve a mentir sobre el valor).
 
-**Idea de follow-up (no implementada):** un `pnpm flags:audit` que cruce los flags de código vs `vercel env ls` y resalte "en staging pero no en prod" / "en código pero sin registrar acá" — automatizaría la detección de deuda. Si se materializa, este doc se vuelve el output humano de ese script.
+**YA IMPLEMENTADO** (era un follow-up y dejó de serlo): `pnpm flags:audit` cruza los flags de código vs Vercel y resalte "en staging pero no en prod" / "en código pero sin registrar acá" — automatizaría la detección de deuda. Si se materializa, este doc se vuelve el output humano de ese script.

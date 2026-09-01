@@ -2,6 +2,36 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-09-01 (6) — barrido documental de los 19 cierres y la calibración que faltaba
+
+Cerré el ciclo del barrido: 19 tasks quedaron en `complete/` y el registro alrededor de ellas ya no
+miente. Tres subagentes barrieron docs de proceso, ledger de flags y coherencia epic↔registro; lo que
+reportaron lo verifiqué yo antes de escribirlo — los conteos de hijas los medí por campo `Epic:`
+(`EPIC-022` 36/39, `EPIC-020` 38/14, `EPIC-040` 11/10, `EPIC-023` 7/3) y coincidieron.
+
+Corregido: `Lifecycle` desincronizado en `TASK-1090`; 5 rutas stale en `README`/`TASK_ID_REGISTRY`;
+9 estados falsos en el `README` (1036, 1040, 1253, 1321, 1330, 1335, 1113, 1430, 1431); conteos y
+prosa stale en cinco epics y en `AEO_PROGRAM_STATUS.md` —que decía «no existe entrada pública
+self-serve» cuando `/aeo-2/` ya corre el grader—; 10 archivos con rutas rotas a tasks cerradas; y
+las reglas duras de `TASK-1112`, `TASK-1246`, `TASK-1261` y `TASK-1336` que se apoyaban en un hecho
+ya falso.
+
+Lo estructural, que es el hallazgo de fondo: **el registro del avance no estaba en ningún checklist
+de cierre**. `stale-progress` avisaba en un comando que el protocolo no mandaba correr — un
+mecanismo apagado. Quedó agregado a los checklists de `CLAUDE.md` y `AGENTS.md`: tildar los
+criterios que la evidencia respalda, dejar sin tildar y con razón lo que no, poner `Status real` al
+día y correr `pnpm task:lint --task TASK-###` antes de mover a `complete/`.
+
+Además: `ui-flow-contract` recibió la misma calibración incidental-vs-focal que ya tenía
+`ui-wireframe-contract` —una task en `to-do/` a la que sólo le corrigen una ruta no debe romper el
+gate por deuda previa—, con test falsable (rojo sin la calibración, verde con ella; el fixture hace
+`git init` porque sin repo el modo `changed` no ve nada y el test sería teatro). El footer de
+`flags:audit` decía «verdad live = `vercel env ls`»; `ls` sólo dice que la variable existe, así que
+ahora nombra `vercel env pull`. Y el mensaje de `no-opacity-on-text` estaba en voseo.
+
+Gates: `local:check` exit 0, `task:lint:test` 47/47, `ops:lint --changed` errors=0,
+`docs:closure-check` sin dueño faltante, `docs:context-check:strict` 0/0, 262 tests de lint-rules.
+
 ## 2026-09-01 — DataForSEO Improved ETV: contrato documentado, cutover no autorizado
 
 Tres subagentes auditaron documentación oficial, siete consumers y drift de skills. El aviso de cuenta anuncia
@@ -10,10 +40,15 @@ no publica matriz de endpoints, retroactividad, pricing ni convivencia con click
 fórmula y las UNIQUE append-only de domain/URL/prospect no permiten shadow dual.
 
 Actualizadas las skills espejadas DataForSEO/SEO, dossier Labs, contrato interno, manuales y
-`docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md`. Sin code/schema/flag/scheduler/API pagada ni
-runtime mutation. Siguiente paso con owner SEO+Architecture: confirmar ocho preguntas con DataForSEO, proponer
-ADR/task para policy+schema+readers/API/MCP, autorizar gasto de shadow Sep-Oct y decidir rebaseline vs breakpoint
-antes del cutover. Estado: **documentación completa; implementación/rollout pendiente**.
+`docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md`. Quedaron además: correo de diez preguntas en
+**borrador/no enviado**, ADR aceptado con implementación/costo/cutover gated, runbook de evaluación y
+`TASK-1805` y `TASK-1806` registradas `to-do` bajo `EPIC-022`. La primera posee
+expand→writers→readers/API/MCP→signals/evaluator y cierra todavía en legacy; la segunda depende de su cierre y
+posee shadow→decisión histórica→cutover/rollback. Un A/B exacto puede requerir dos llamadas pagadas; un canary sin
+gasto incremental es sólo comparación temporal. Sin code/schema/flag/scheduler/API pagada ni runtime mutation.
+Siguiente paso: enviar el correo sólo con autorización, incorporar la respuesta contractual y, en otra instrucción,
+tomar `TASK-1805`; `TASK-1806` requiere además autorizaciones separadas de gasto y cutover. Estado:
+**diseño pre-implementación completo; implementación/rollout pendiente**.
 
 ## 2026-09-01 — Performance Report agosto comunicado por TeamBot
 
@@ -486,38 +521,3 @@ sin registrar.
 antes de subir `GROWTH_SEO_COMPETITORS_PER_TARGET` — el cron es mensual (día 18) y el 18-sep cae en
 ventana de frescura, así que el próximo gasto real es ~octubre; y **ejercitar el `proposalRef` de
 descubrimiento** con la primera declaración nacida de una propuesta (la serie necesita ≥5 días y lleva 1).
-
-## 2026-08-29 (8.º) — Release `e1718a359575`: el fix de banda 2 y el gate del worker están en producción, verificados por canary
-
-**Manifest `released`** (`e1718a359575-5f3d0c7e-859e-45ef-bd64-00c6bec606ea`, run `33279083461`, un
-solo run del orquestador, ambos gates `production` aprobados sin stall, 11m16s). Watchdog `ok` /
-`drift_count=0` / `data_missing=0`. PR #213 + forward-fix PR #214.
-
-**El desvío del release:** CI Deep se puso rojo sobre el primer squash (`dade7ce5f`, quedó SIN
-manifest a propósito — Deep rojo no se dispatcha) por `services/ops-worker/deploy-contract.test.ts`:
-sus tests exigían el contrato VIEJO del workflow (3 apariciones por ruta) que `146070ffc` rediseñó a
-cobertura por metafile. Forward-fix por el camino canónico (≈40 min). **Y la historia completa,
-medida en dos pasadas (la segunda corrigió a la primera por CORTA):** la racha fue de **5 corridas
-rojas/canceladas en ~70 minutos** sin que nadie abriera una — `146070ffc` CANCELADO por
-`cancel-in-progress` (el commit culpable nunca fue juzgado), `53e240d79` y `3e8149eaa` rojos
-(eo-64), `8cafe6b90` rojo ×2 (**mi propio push del merge canónico — tampoco lo miré**) y
-`dade7ce5f`, donde recién lo atrapó Deep. En ráfagas, el veredicto de CI es del ÚLTIMO push; una
-alarma sostenida se normaliza — que es literalmente cómo el detector de la credencial AXIS se
-volvió invisible.
-
-**El skip del `ops-worker` (44 s) fue LEGÍTIMO esta vez — y es la prueba de que el gate nuevo
-funciona.** Mismo síntoma que el incidente del 3.er release, causa opuesta: el `push:develop` ya
-había desplegado `380a20fa3`, cuyo árbol es IDÉNTICO al del squash (diff completo vacío, no sólo el
-de rutas). 3/4 workers en el target; residual de label documentado y clasificado por el watchdog.
-
-**Canary de contrato VERDE contra producción** (lane ecosystem, token de consumer del gateway),
-afirmando lo que sólo el contrato nuevo produce: `provenance` con `gsc` + `own_ctr_model` (lentes
-● y ◑ en el mismo DTO) y **rank monotónico 1..N con banda 2 poblada** (efeonce 105 items, 55 de
-banda 2 — antes 54/55 fuera de orden). Paginación completa de Berel por producción: 6 páginas,
-**501/501, secuencia == persistida**. Schedulers siguen `ENABLED` (el skip no ejecutó deploy.sh).
-
-**Post-release ejecutado:** índice keyset huérfano RETIRADO (migración `20260829225504734`,
-aplicada con guard doble: viejo ausente + nuevo presente) — contract-después-del-release cumplido.
-Sin flags gated a este release (ledger revisado: los pendientes tienen bloqueadores ajenos).
-
-Timing ledger actualizado (E2E ~1h15m; bloqueador dominante: el ciclo del forward-fix).

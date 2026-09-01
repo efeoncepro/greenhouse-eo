@@ -52,7 +52,7 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
 - `DESIGN.md` + `docs/architecture/ui-platform/` — primitives, tokens, Composition Shell, Adaptive Card.
 - `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md` — la UI es consumer del primitive de TASK-1282, no reimplementa lógica.
-- `docs/tasks/to-do/TASK-1282-growth-search-console-multitenant-connection.md` — el contrato backend que esta UI consume.
+- `docs/tasks/complete/TASK-1282-growth-search-console-multitenant-connection.md` — el contrato backend que esta UI consume.
 
 Reglas obligatorias:
 

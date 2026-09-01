@@ -2,7 +2,7 @@
 
 ## Status
 
-Lifecycle: in-progress
+Lifecycle: complete
 Priority: P1
 Effort: Medio
 Type: implementation

@@ -133,7 +133,7 @@ El eje de desenlace lo implementa `TASK-1765`; la superficie del kanban, `TASK-1
 `TASK-1747` (claves de la card de assessment), `TASK-1754` (claves de `stages`), `TASK-1763` (claves de capacity
 closure) y `TASK-1766` (claves nuevas de desenlace y causa). **Se particiona por CLAVE, no por archivo:** esta task
 es dueña únicamente de sus claves de capacity closure, **consume** las etiquetas de desenlace y causa que define
-`TASK-1766` en vez de duplicarlas, y no renombra ni borra claves ajenas. `TASK-1747` está `in-progress` con sesión
+`TASK-1766` en vez de duplicarlas, y no renombra ni borra claves ajenas. `TASK-1747` cerró el 2026-09-01; lo que sigue quedó como registro histórico. Antes estaba `in-progress` con sesión
 activa: cierra primero y esta task rebasa sobre ella.
 
 ## Current Repo State

@@ -79,7 +79,7 @@ Reglas obligatorias:
 - `.codex/skills/greenhouse-nexa-conversational/SKILL.md`
 - `docs/tasks/TASK_UI_UX_ADDENDUM.md`
 - `docs/tasks/TASK_BACKEND_DATA_ADDENDUM.md`
-- `docs/tasks/in-progress/TASK-1078-nexa-floating-chat-expandable-persisted.md`
+- `docs/tasks/complete/TASK-1078-nexa-floating-chat-expandable-persisted.md`
 - `docs/tasks/complete/TASK-1134-nexa-chat-auto-router-model-selection-truth.md`
 - `docs/tasks/complete/TASK-1129-nexa-prompt-turn-telemetry.md`
 

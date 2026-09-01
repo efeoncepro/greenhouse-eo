@@ -73,7 +73,7 @@ Trabajo del 2026-07-01 sobre "lo pendiente" de esta task. Resultado: la task est
 **Residuales (NO greenhouse-eo o NO esta task):**
 - ⚠️ **Rotar `TURNSTILE_SECRET`** (operador): el secret de prod quedó expuesto en chat. **Decisión operador 2026-07-01: NO se rotará por ahora** (riesgo aceptado). Runbook abajo por si se decide más adelante.
 - ~~**Definir + construir la superficie pública del grader self-serve**~~ — **resuelto por Think**; mantener evidencia de deploy y E2E como parte del cierre.
-- **Cierre formal de TASK-1253 (server validation) + TASK-1255 (PII hardening):** ambos code-complete + flags ON en prod, pero siguen `in-progress` por backfill de PII legacy + job de retención/purga (`GROWTH_FORMS_RETENTION_PURGE_ENABLED`, aún no declarado) + evidencia runtime. Son SUS tasks, no ésta.
+- **Cierre formal de TASK-1253 (server validation) + TASK-1255 (PII hardening):** ambos con flags ON en prod; **`TASK-1253` cerró el 2026-09-01** y sigue abierta sólo `TASK-1255`, por backfill de PII legacy + job de retención/purga (`GROWTH_FORMS_RETENTION_PURGE_ENABLED`, aún no declarado) + evidencia runtime. Son SUS tasks, no ésta.
 
 ### Runbook — rotación de `TURNSTILE_SECRET` (operador ejecuta)
 
@@ -107,7 +107,7 @@ Auditoría read-only del readiness al 2026-07-01. Tres correcciones que la task 
    - `PII_ENCRYPTION_ENABLED` (TASK-1255) → módulo `pii/` completo (encryption/mask/reveal/audit/boundary) + capability `growth.forms.lead_pii.reveal` sembrada+granteada + **migración `20260626172339251_task-1255-…` aplicada (columna `encrypted_fields_json`)**. Como **hay una sola instancia PG para todos los envs** (`greenhouse-pg-dev`/`greenhouse_app`, verificado en prod), la migración aplicada = aplicada en prod → el flag ON tiene su schema. El ítem "confirmar migración en prod" queda **RESUELTO**.
    - Lo que sí falta (finishing de las in-progress, NO peligro activo): **backfill de PII legacy** (national_id viejo en `normalized_fields_json` → cifrado), **job de retención/purga** (1255 Slice 4), y la **evidencia runtime de cierre** de 1253/1255. Más `TURNSTILE_SECRET` de prod expuesto en chat → rotación pendiente.
 
-**Estado real de blockers al 2026-07-01:** ✅ 1242/1244/1245/1250 complete · ⚠️ 1241 **superseded → 1280** (cerrada) · 🔶 1253 + 1255 **in-progress** (código central hecho; falta backfill+purga+verificación). **Conclusión:** la task no se puede "completar" hoy como está escrita, pero **no hay peligro prod abierto**; su valor remanente es (a) **reconciliar el ledger de flags a la realidad live** (los snapshots por-fila dicen prod OFF; están ON), (b) rescopear el "staging smoke E2E" al split headless (Greenhouse valida sus endpoints + modelo 1280; el smoke de la cara pública corre en efeonce-web), (c) esperar el cierre de 1253/1255 (backfill+purga). No arrancar el "rollout gobernado" clásico: ya no aplica tal cual.
+**Estado real de blockers al 2026-07-01:** ✅ 1242/1244/1245/1250 complete · ⚠️ 1241 **superseded → 1280** (cerrada) · 🔶 1255 **in-progress** (1253 cerró el 2026-09-01) (código central hecho; falta backfill+purga+verificación). **Conclusión:** la task no se puede "completar" hoy como está escrita, pero **no hay peligro prod abierto**; su valor remanente es (a) **reconciliar el ledger de flags a la realidad live** (los snapshots por-fila dicen prod OFF; están ON), (b) rescopear el "staging smoke E2E" al split headless (Greenhouse valida sus endpoints + modelo 1280; el smoke de la cara pública corre en efeonce-web), (c) esperar el cierre de 1253/1255 (backfill+purga). No arrancar el "rollout gobernado" clásico: ya no aplica tal cual.
 
 ## Delta 2026-06-29 — palanca de costo de prosa lista (TASK-1271, evidencia-first)
 
@@ -435,7 +435,7 @@ Slice 1 (checklist) -> Slice 2 (staging) -> Slice 3 (production). Produccion no 
 - **Bloqueo confirmado en runtime — NO arrancar rollout.** Verificación de los `Blocked by` al 2026-06-26:
   - ✅ complete: TASK-1242 (HubSpot handoff), TASK-1244 (review humano), TASK-1245 (status + token), TASK-1234 (worker async).
   - ❌ **to-do**: TASK-1241 (página pública), TASK-1250 (email + adjunto), TASK-1255 (PII hardening Ley 21.719).
-  - 🔶 **in-progress**: TASK-1253 (validación server-side / autoridad del submit).
+  - ✅ **`complete` 2026-09-01**: TASK-1253 (validación server-side / autoridad del submit).
 - **Evidencia de código, no solo lifecycle:**
   - No existe page route pública (`find src/app … *ai-visibility*page*` → vacío). El API de intake existe (`src/app/api/public/growth/ai-visibility/run/route.ts`) pero sin formulario público → el smoke e2e de Slice 2 (`form → run → status → report → email`) es inejecutable.
   - TASK-1253 documenta que `submitForm` server **no re-valida por tipo** hoy → encender intake público es el riesgo "leads basura desde día uno" del Delta 2026-06-25.

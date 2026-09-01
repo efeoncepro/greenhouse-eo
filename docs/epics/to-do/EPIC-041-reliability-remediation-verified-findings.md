@@ -112,7 +112,7 @@ A esto se suma la falta de señales para clases de fallo enteras: no existe señ
 - `TASK-1203` (`to-do`) — tasa PPM placeholder y flip del F29. Ya cita `finance.ppm.position_drift`.
 - `TASK-1186` (`in-progress`) — scope reactivo del IVA y filtro `is_annulled` faltante en el reader de retenciones.
 - `TASK-1205` (`to-do`) — payable vencido de 77 días.
-- `TASK-1210` (`in-progress`) — reconciliar el reader MXN/CLP con la arquitectura USD-pivot.
+- `TASK-1210` (`complete` 2026-09-01) — reconciliar el reader MXN/CLP con la arquitectura USD-pivot.
 
 ### Pendientes de crear — sin dueña viva
 

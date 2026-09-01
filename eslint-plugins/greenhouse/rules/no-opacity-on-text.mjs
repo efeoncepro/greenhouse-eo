@@ -122,7 +122,7 @@ export default {
     schema: [],
     messages: {
       opacityOnText:
-        'Bajarle `opacity` a un texto rompe el contraste en silencio: el token de color sigue siendo el correcto y el ratio real cae bajo 4.5:1 (caso fuente TASK-1693: 3.14:1, axe `color-contrast` serious en 6 frames). Usá un token de color con contraste verificado — `color: "text.secondary"` o `"text.disabled"`. Si la opacidad es de una transición y no de énfasis, declaralo con eslint-disable y la razón.'
+        'Bajarle `opacity` a un texto rompe el contraste en silencio: el token de color sigue siendo el correcto y el ratio real cae bajo 4.5:1 (caso fuente TASK-1693: 3.14:1, axe `color-contrast` serious en 6 frames). Usa un token de color con contraste verificado — `color: "text.secondary"` o `"text.disabled"`. Si la opacidad es de una transición y no de énfasis, decláralo con eslint-disable y la razón.'
     }
   },
   create(context) {

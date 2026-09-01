@@ -178,7 +178,15 @@ Use this matrix to choose the smallest complete update set.
   nothing can be archived, treat that as a rotator bug or a documented exception; fix the cause and re-run
   `pnpm docs:context-check:strict`.
 - Never move a task to `complete/` without acceptance evidence and proportional
-  verification.
+  verification. 🔴 **La evidencia se REGISTRA donde se lee, no sólo donde se narra:** tilda los
+  checkboxes de `## Acceptance Criteria` que la evidencia respalda y corrige `Status real` ANTES de
+  mover. Simétrico y no negociable: lo que no verificaste queda **sin tildar, con la razón escrita** —
+  tildar sin evidencia es peor que no tildar. Caso fuente `TASK-1699`: 46 checkboxes en cero y
+  `Status real: Diseno` con el trabajo desplegado hicieron que se re-ejecutara CINCO veces.
+- Never close an edit to a state ledger without checking that the row and the Deltas of that SAME doc
+  agree. Una contradicción interna del SoT humano vale menos que ningún dato, y `docs:closure-check`
+  no la ve: `FEATURE_FLAG_STATE_LEDGER.md` decía `prod: OFF` en una línea y ✅ `prod` en otra, para el
+  mismo flag.
 - Never update docs based only on stale audit/handoff memory; re-check code,
   runtime, or architecture when the conclusion matters.
 - Never overwrite unrelated user/agent edits while synchronizing docs.
@@ -186,7 +194,9 @@ Use this matrix to choose the smallest complete update set.
 
 ## Executable Helper
 
-Use `pnpm docs:closure-check` as the mechanical companion to this skill. It
+Use `pnpm docs:closure-check` as the mechanical companion to this skill. ⚠️ Encadena
+`feature-flags-audit --strict **--no-vercel**`, así que la detección de drift ledger↔live **NO corre
+ahí**: exige una pasada aparte con `pnpm flags:audit` (con red y credenciales). It
 inspects changed files and emits advisory findings for likely missing
 documentation owners.
 

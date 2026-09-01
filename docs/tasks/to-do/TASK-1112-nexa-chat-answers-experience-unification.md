@@ -91,7 +91,7 @@ Reglas obligatorias:
 
 - `docs/tasks/to-do/TASK-1095-conversational-experience-v2.md` (contrato cross-dominio — consumir, no reescribir)
 - `docs/tasks/in-progress/TASK-1101-nexa-answers-runtime-promotion.md` (streaming/abort provider-side para Knowledge Answers — coordinar, no duplicar)
-- `docs/tasks/in-progress/TASK-1078-nexa-floating-chat-expandable-persisted.md` (toca NexaThread/NexaFloatingPanel — resolver solape)
+- `docs/tasks/complete/TASK-1078-nexa-floating-chat-expandable-persisted.md` (toca NexaThread/NexaFloatingPanel — resolver solape)
 - `docs/tasks/to-do/TASK-1110-nexa-composition-runtime-wiring-knowledge-inplace.md` (consumer Knowledge in-place — coordinar)
 - `docs/tasks/to-do/TASK-1104-nexa-response-toolbar-primitive.md` (se desbloquea con esta task)
 - `docs/tasks/to-do/TASK-1105-nexa-streaming-text-primitive.md` (se desbloquea con esta task)
@@ -114,7 +114,7 @@ Reglas obligatorias:
 
 - **Desbloquea `TASK-1104`** (NexaResponseToolbar → primitive): esta task aporta el 2º consumer real (Chat).
 - **Desbloquea `TASK-1105`** (NexaStreamingText → primitive): idem.
-- **Coordina serial con `TASK-1078`** (in-progress): ambos tocan `NexaThread`/`NexaFloatingPanel`. NO concurrente.
+- **Coordinaba serial con `TASK-1078`** (`complete` 2026-09-01, así que ya no bloquea): ambos tocan `NexaThread`/`NexaFloatingPanel`. NO concurrente.
 - **Coordina serial con `TASK-1101`** (in-progress): ambos tocan `NexaChatProvider`/streaming. Reusar maquinaria, no duplicar.
 - **Coordina con `TASK-1110`** (composicion Knowledge in-place): mismo substrato de evidencia.
 - Informa a `TASK-1096` (experiencia cross-domain) y al futuro 2º consumidor de dominio: una vez cerrada la experiencia, comparar el render del turno en Chat (placement floating) vs Answers (placement embedded) da el insumo concreto para `TASK-1095` (extraer lo comun → contrato cross-dominio).
@@ -241,7 +241,7 @@ Backward compat: flag OFF → shape y comportamiento actuales bit-for-bit.
 
 - **Slice 0 (flags + reconciliacion) → Slice 1 (streaming) → Slice 2 (evidence packet) → Slice 3 (citation AST) → Slice 4 (toolbar) → Slice 5 (GVC/señal/a11y/cierre).**
 - Slice 1 puede shippear independiente de 2/3 (streaming es ortogonal al packet). 2 → 3 (el AST de citas depende de que el packet exista). 4 puede correr despues de 2 (la toolbar no depende del AST). 5 cierra al final.
-- **Hard rule de coordinacion (load-bearing):** `TASK-1078` y `TASK-1101` estan **in-progress** y tocan `NexaThread`/`NexaChatProvider`. NINGUN slice de esta task que toque esos archivos puede ejecutarse concurrentemente con ellas. Resolver en Slice 0: o se serializa (esta task espera/absorbe), o se reparte ownership explicito por archivo. Ejecutar fuera de esto = colision de WIP (riesgo de orphan/merge documentado en CLAUDE.md).
+- **Hard rule de coordinacion (load-bearing):** `TASK-1101` sigue **in-progress** (`TASK-1078` cerró el 2026-09-01) y tocan `NexaThread`/`NexaChatProvider`. NINGUN slice de esta task que toque esos archivos puede ejecutarse concurrentemente con ellas. Resolver en Slice 0: o se serializa (esta task espera/absorbe), o se reparte ownership explicito por archivo. Ejecutar fuera de esto = colision de WIP (riesgo de orphan/merge documentado en CLAUDE.md).
 
 ### Risk matrix
 
@@ -282,7 +282,7 @@ Backward compat: flag OFF → shape y comportamiento actuales bit-for-bit.
 
 ### Out-of-band coordination required
 
-- **Coordinacion humana con los owners de `TASK-1078` y `TASK-1101`** (ambas in-progress) antes de tocar `NexaThread`/`NexaChatProvider`. Es el unico bloqueo real. Resolver en Slice 0.
+- **Coordinacion humana con el owner de `TASK-1101`** (in-progress; `TASK-1078` cerró el 2026-09-01) antes de tocar `NexaThread`/`NexaChatProvider`. Es el unico bloqueo real. Resolver en Slice 0.
 - Resto: N/A — repo-only change.
 
 <!-- ═══════════════════════════════════════════════════════════

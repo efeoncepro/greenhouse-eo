@@ -139,8 +139,8 @@ Para reducir costo GitHub Actions/Vercel/GCP sin perder calidad, Claude/agents d
 Comandos canonicos:
 
 ```bash
-pnpm local:check       # lint + tsc
-pnpm local:check:ui    # local:check + design:lint + build
+pnpm local:check       # nul-byte-gate + skills:mirrors + mcp:manifest:check + lint + tsc
+pnpm local:check:ui    # local:check + design:lint + design-contract:lint + ui:code-lint + build
 pnpm local:check:full  # local:check + test + build
 ```
 
@@ -504,8 +504,9 @@ Todo agente que trabaje sobre una task del sistema debe gestionar su estado en e
 2. Mover el archivo de `in-progress/` a `complete/`
 3. Verificar que carpeta y `Lifecycle` digan lo mismo
 4. Actualizar `docs/tasks/README.md` — mover entrada a sección `Complete` con resumen de lo implementado
-5. Documentar en `Handoff.md` y `changelog.md`
-6. Ejecutar el chequeo de impacto cruzado (ver abajo)
+5. **Registrar el avance donde se LEE:** tildar los acceptance criteria que la evidencia respalda (y dejar sin tildar, con razón, lo que no); poner `Status real` al día; correr `pnpm task:lint --task TASK-###`. Un `## Delta` es prosa — nadie la lee para decidir. Caso fuente: `TASK-1699`, re-ejecutada cinco veces.
+6. Documentar en `Handoff.md` y `changelog.md`
+7. Ejecutar el chequeo de impacto cruzado (ver abajo)
 
 Regla dura:
 

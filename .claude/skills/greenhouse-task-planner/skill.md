@@ -121,7 +121,7 @@ Copy the structure from `docs/tasks/TASK_TEMPLATE.md`; never rebuild it from rem
 
 - Preserve the five full `<!-- ... ZONE N ... -->` blocks verbatim, including the deliberately empty Zone 2 block.
 - 🔴 **Los cinco markers `ZONE 0` … `ZONE 4` van SIEMPRE, incluido el de Zone 2 que queda vacío.** Omitirlo porque
-  "Zone 2 no se llena al crear la task" es el error fácil, y **falla en silencio**: `pnpm task:lint --task TASK-###`
+  "Zone 2 no se llena al crear la task" es el error fácil, y **falla en silencio**: `pnpm task:lint --task TASK-###` — ⚠️ desde 2026-09-01 existe la regla `stale-progress`: avisa cuando una task activa tiene commits `feat/fix/refactor/perf` citando su ID y **CERO checkboxes tildados** (nombra los SHAs), y cuando una en `complete/` no tiene ninguno. **El avance se registra donde se LEE** —`Status real` + checkboxes—, no en un `## Delta` de prosa: caso fuente `TASK-1699`, re-ejecutada cinco veces. Canon: `docs/tasks/TASK_PROCESS.md`. `pnpm task:lint --task TASK-###`
   reporta `template=0 legacy=1` con `errors=0 warnings=0` — cero hallazgos, sólo cambia el contador, y CLAUDE.md
   exige `template=1`. Caso fuente (2026-08-18): `TASK-1748` hubo que reescribirla completa para restaurar el bloque
   comentado `ZONE 2 — PLAN MODE`. Lee el contador `template=`, no sólo la línea de errores y warnings.

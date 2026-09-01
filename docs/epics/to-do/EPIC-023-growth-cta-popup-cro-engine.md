@@ -26,13 +26,15 @@
 - Exit criteria del epic que ya se cumplen con esto: placement interruptivo shipped con evidencia,
   eventos two-tier (Tier B rollup fuera del ledger OLTP), kill switch live dentro del TTL del
   render contract, y visitor suppression consent-aware.
-- Lo que queda del epic: `TASK-1431` (Action Registry + navegación gobernada), `TASK-1430`
-  (cockpit de autoría/reporting), cierre de `TASK-1427` (ventana 7d hasta 2026-07-25 + decisión de
-  placement amplio WP) y la campaña interruptiva inaugural.
-- Delta 2026-07-18: `TASK-1430` quedó **code complete local (sin push)** — cockpit master-detail
-  con autoría gobernada de 8 pasos, preview harness del renderer canónico, kill switches operables
-  y métricas de marketing server-side (CTR/tasas con trust tags). Rollout pendiente: push + smoke
-  staging. Con `TASK-1431` code-complete, el V1 operable del cockpit del epic está construido.
+- Lo que queda del epic (medido 2026-09-01: 7 hijas `complete`, 3 abiertas): cierre de `TASK-1427`
+  (ventana 7d + decisión de placement amplio WP) y la campaña interruptiva inaugural. `TASK-1430`
+  (cockpit) y `TASK-1431` (Action Registry) cerraron el 2026-09-01.
+- Delta 2026-07-18 (cerrado 2026-09-01): `TASK-1430` — cockpit master-detail con autoría gobernada
+  de 8 pasos, preview harness del renderer canónico, kill switches operables y métricas de marketing
+  server-side (CTR/tasas con trust tags). El «rollout pendiente: push + smoke staging» que decía esta
+  línea ya ocurrió: la ruta está verificada en el deployment activo y el acceso lo gobiernan
+  `viewCode` + capabilities, no un flag. `TASK-1431` cerró el mismo día con el bundle 1.2.0
+  verificado live.
 
 ## Delta 2026-07-18
 

@@ -99,7 +99,7 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`
 - `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`
 - `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
-- `docs/tasks/in-progress/TASK-1282-growth-search-console-multitenant-connection.md` (patrón a espejar)
+- `docs/tasks/complete/TASK-1282-growth-search-console-multitenant-connection.md` (patrón a espejar)
 
 Reglas obligatorias:
 

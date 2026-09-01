@@ -67,7 +67,7 @@ Implementado render-contract-driven, sin backend/tabla/handle nuevo (reusa `subm
 
 Gates verdes: `pnpm test` full (8794), `pnpm build`, `pnpm typecheck`, lint touched, `pnpm task:lint --task TASK-1336`, `pnpm docs:closure-check` (0 flags sin registrar). Sin tocar submit route/command, status reader/route, report-url helper, scoring, probes, normalizer ni `executeClaimedGraderRun`.
 
-**Rollout pendiente (por eso Lifecycle sigue `in-progress`):** `--apply` de la activación del handoff en el form del grader + renderer bundle en prod + TASK-1335 (CORS Think) para el smoke browser real submit→poll→ready→report.
+**Rollout pendiente (por eso Lifecycle sigue `in-progress`):** `--apply` de la activación del handoff en el form del grader + renderer bundle en prod. (`TASK-1335` ya NO es parte de este pendiente: cerró el 2026-09-01 — ver el Delta al inicio.) Antes se listaba para el smoke browser real submit→poll→ready→report.
 
 ## Program State — No Redescubrir
 
@@ -189,7 +189,7 @@ Reglas obligatorias:
 ## Normative Docs
 
 - `docs/tasks/to-do/TASK-1327-public-lead-magnet-landing-form-embed.md`
-- `docs/tasks/to-do/TASK-1335-growth-forms-public-cors-surface-allowlist-governance.md`
+- `docs/tasks/complete/TASK-1335-growth-forms-public-cors-surface-allowlist-governance.md`
 - `docs/tasks/complete/TASK-1319-growth-forms-success-card-capability.md`
 - `docs/tasks/in-progress/TASK-1320-growth-forms-success-card-renderer.md`
 - `docs/tasks/complete/TASK-1239-growth-ai-visibility-public-report-snapshot-token-reader.md`

@@ -48,7 +48,7 @@ Comandos canonicos agregados al repo:
 pnpm local:check
 ```
 
-Corre `pnpm lint` + `pnpm exec tsc --noEmit`. Es el minimo para cambios de codigo normales.
+Corre `pnpm local:check` = `nul-byte-gate` → `skills:mirrors` → `mcp:manifest:check` → `lint` → `tsc` (con `--max-old-space-size=8192`). Es el minimo para cambios de codigo normales.
 
 ```bash
 pnpm local:check:ui

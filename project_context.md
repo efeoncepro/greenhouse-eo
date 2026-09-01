@@ -97,29 +97,23 @@ sin segundo ledger y Globe Producer muestra un self-view read-only de effective/
 Cobertura parcial o stale nunca se representa como cero. Los IDs mutables del rollout viven en `Handoff.md` y
 `GLOBE_RUNTIME_HANDOFF.md`, no en este contrato durable.
 
-El módulo Growth SEO (`growth.seo`, EPIC-022) autoriza todo run por un único chokepoint,
-`enforceSeoRunEntitlement` (`src/lib/growth/seo/entitlement.ts`), con entitlement per-org vía el módulo `seo_v2`
-de `greenhouse_client_portal.modules` — **única clave leída** (`SEO_MODULE_KEYS_READ`); releer `seo_v1`
-reabriría una ventana ya cerrada por su expand/contract (TASK-1677). Contrato en
-[`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §9 (§17
-seam de extracción hacia Wave; §18 la cola). Sus reads son readers canónicos consumer-agnósticos
-—`readSeoAeoGap` cruza SEO↔AEO respetando §1.1— expuestos por el lane ecosystem
-`/api/platform/ecosystem/growth/seo/*` y sus MCP tools; **todo reader SEO nuevo expone su tool en el mismo PR**.
-El **orden de trabajo** tiene UNA autoridad (`TASK-1700`): el aggregate append-only
-`greenhouse_growth.seo_work_queue_*` con `priority_score` versionado en columna, servido por
-`readSeoWorkQueue` / `materializeSeoWorkQueue` (idempotente, ops-worker) / `recordSeoWorkQueueDecision`
-(append-only, propone y **no ejecuta**); ningún consumer reordena ni recompone orígenes, y **sin demanda medida
-no hay score** (`priority_score` NULL en su propia banda, jamás volumen estimado). La curva de CTR vive en
-`src/lib/growth/seo/ctr-curve.ts`, **declara** su usabilidad y nunca colapsa un `0` medido con «sin muestra»
-(`TASK-1792`). En discovery un candidato **es una keyword normalizada, no una fila del proveedor**, y toda
-decisión sobre él la escribe —en su misma transacción— el primitive que produce el hecho
-(`TASK-1694`/`TASK-1692`). Está **vivo en producción y federado en `mcp.efeonce.org`** (provider
-`greenhouse-seo`), con acceso per-org fail-closed. El flag `GROWTH_SEO_ENABLED` es **multi-runtime** — Vercel
-(lane) + `ops-worker`; prenderlo en uno solo deja el otro camino muerto. La serie
-`greenhouse_growth.seo_gsc_daily` se materializa a diario en el **ops-worker** — **servicio Cloud Run único
-compartido staging+prod**, así que una capacidad worker-only queda viva al mergear a `develop`, sin release
-control plane, y **no existe un flip "sólo staging"** (invariantes en
-[`OPS_RELIABILITY_AGENT_INVARIANTS.md`](docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md)).
+Growth SEO (`growth.seo`, EPIC-022) autoriza cada run en `enforceSeoRunEntitlement` y sólo lee `seo_v2` de
+`greenhouse_client_portal.modules` (TASK-1677). Sus readers canónicos se exponen por
+`/api/platform/ecosystem/growth/seo/*` y MCP en el mismo PR. El orden de trabajo tiene una sola autoridad
+append-only, `greenhouse_growth.seo_work_queue_*` (TASK-1700): ningún consumer recompone prioridad y sin demanda
+medida `priority_score` queda NULL. La curva CTR declara usabilidad y distingue cero de ausencia de muestra
+(TASK-1792); discovery identifica keywords normalizadas, no filas del proveedor. El módulo está vivo en producción
+y federado en `mcp.efeonce.org`, fail-closed por organización. `GROWTH_SEO_ENABLED` gobierna Vercel y `ops-worker`;
+el worker Cloud Run compartido materializa `seo_gsc_daily`, sin flip aislado de staging. Canon:
+[`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) e
+[`OPS_RELIABILITY_AGENT_INVARIANTS.md`](docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md).
+
+ETV de DataForSEO Labs se versiona por metodología. No se activa ni mezcla `use_improved_etv` antes de persistir
+su versión, separar idempotencia y medir un shadow contra GSC. Contrato y dudas pendientes:
+[auditoría ETV 2026-09-01](docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md). La decisión aceptada es
+[`GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md`](docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md)
+y su entrega futura se divide en `TASK-1805` (foundation formula-aware) y `TASK-1806` (evaluación/cutover), ambas
+`to-do`; no hay código, schema, gasto ni cutover activo.
 
 Berel: Notion live + skill `berel-content-production`. Contacto/cobertura:
 `docs/context/01_quienes-somos.md` y `docs/public-site/CONTACT_PAGE_REBUILD_BRIEF_V1.md`.
@@ -149,7 +143,8 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   `globe.producer.fleet.list` y el write interno one-shot `globe.credits.funding.ensure`, ambos verificados por
   OAuth PKCE real. El write acepta únicamente una autoridad ya sellada y llama el command Greenhouse canónico.
   Clientes externos continúan bloqueados hasta separar entitlements/emisión de scopes
-  B2B y probar una identidad base-only. Greenhouse mantiene ADRs, tasks, handoff y el inventario de tools MCP.
+  B2B y probar una identidad base-only. Greenhouse mantiene ADRs, tasks, handoff y el inventario de tools MCP —
+  cuyo SSOT es `src/mcp/greenhouse/tool-manifest.ts`, con gate `pnpm mcp:manifest:check` (TASK-1780).
 - Para identidad cliente, separar runtimes no significa separar personas: Greenhouse, `auth.efeonce.org` y MCP
   mantienen cookies, sesiones y audiencias propias, pero resuelven un único `identity_profile` y la membresía de
   Account 360 mediante bindings auditados. La coexistencia inicial con el login cliente actual requiere una ruta

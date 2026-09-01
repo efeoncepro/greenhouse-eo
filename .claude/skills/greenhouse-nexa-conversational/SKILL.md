@@ -146,7 +146,7 @@ Vive en `src/components/greenhouse/primitives/nexa-<x>/` + barrel + resolver `ki
 3. Scenario madre `nexa-answers-surface` (11 estados + portabilidad + toolbar + grounding + streaming).
 4. Para el chat flotante: ejercitar tool-use real (panel `/knowledge` o Home) — medir remounts del card de tool (anti-loop) + scroll-up durante el revelado.
 5. Backend: `pnpm vitest run src/lib/nexa src/lib/knowledge` + (voz/política) `pnpm qa:nexa-knowledge`.
-6. `local:check` (lint + tsc) + `pnpm nexa:doc-gate --changed` verde antes de cerrar.
+6. `local:check` (nul-byte-gate + skills:mirrors + mcp:manifest:check + lint + tsc) + `pnpm nexa:doc-gate --changed` verde antes de cerrar.
 
 ## Hard rules (anti-regresión)
 

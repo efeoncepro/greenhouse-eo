@@ -141,7 +141,7 @@ Reglas obligatorias:
 ## Normative Docs
 
 - `docs/tasks/to-do/TASK-1095-conversational-experience-v2.md`
-- `docs/tasks/in-progress/TASK-1090-answer-trace-promotion-spec.md`
+- `docs/tasks/complete/TASK-1090-answer-trace-promotion-spec.md`
 - `docs/tasks/in-progress/TASK-1089-nexa-knowledge-answer-surface.md`
 - `docs/tasks/complete/TASK-1093-greenhouse-conversational-experience-platform-v1.md`
 - `docs/tasks/complete/TASK-1085-nexa-knowledge-retrieval-citations.md`

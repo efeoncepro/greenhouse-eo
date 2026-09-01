@@ -134,7 +134,7 @@ Sin flag — additive (el adapter convive con los componentes no migrados). Roll
 
 - Task queda **in-progress**: foundation (adapter) + proof consumer entregados; migración de PDFs densos/legales remanente (Slice 3) requiere loop real-case.
 - [x] `docs/tasks/README.md` + registry sincronizados (in-progress).
-- [ ] cerrar TASK-1040 (su Slice 2 — familias 600/800 — ya tiene consumidor canónico vía `pdfFamilyName`; el cierre formal de TASK-1040 puede hacerse ahora).
+- [x] cerrar TASK-1040 — **hecho 2026-09-01**: su Slice 2 (familias 600/800) tiene consumidor canónico vía `pdfFamilyName` y la task quedó en `complete/`.
 - [x] `Handoff.md` / `changelog.md`.
 
 ## Follow-ups

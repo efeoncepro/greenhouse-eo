@@ -17,7 +17,7 @@ pnpm build         # produccion Turbopack (next build) — NO el dev server
 
 **Por que el pre-push hook NO basta** (canonizado live 2026-05-13 post 2 CI failures consecutivos en TASK-827):
 
-El pre-push hook canonical del repo corre `pnpm lint` + `pnpm tsc --noEmit` (~90s). Es **first filter**, NO gate final. Especificamente NO corre:
+El pre-push hook canonical del repo corre `pnpm local:check` (hoy 5 gates: `nul-byte-gate` → `skills:mirrors` → `mcp:manifest:check` → `lint` → `tsc` (con `--max-old-space-size=8192`)) (~90s). Es **first filter**, NO gate final. Especificamente NO corre:
 
 - `pnpm test` (full suite ~12 min con coverage) — atrapa test contracts cross-module que tu modulo focal no toca pero tu cambio invalida (ej. test pin-eando `VIEW_REGISTRY` length; lint rule cubriendo recurso compartido; column-parity test SQL)
 - `pnpm build` (Turbopack next build ~8 min) — atrapa boundary violations que tsc/lint NO enforcen: `import 'server-only'` transitivo a client bundle, dynamic imports rotos, hidden type errors solo en Turbopack pipeline, etc.

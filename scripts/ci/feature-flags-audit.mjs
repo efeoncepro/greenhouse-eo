@@ -402,7 +402,7 @@ if (vercelOk) {
   )
 }
 
-console.log(`\n${c('dim', 'Verdad live = `vercel env ls`. Ledger humano = docs/operations/FEATURE_FLAG_STATE_LEDGER.md')}\n`)
+console.log(`\n${c('dim', 'Verdad live = `vercel env pull` (VALORES; `vercel env ls` solo dice que la var EXISTE). Ledger humano = docs/operations/FEATURE_FLAG_STATE_LEDGER.md')}\n`)
 
 if (prodWithoutCodeOnMain.length > 0) {
   // Falla SIEMPRE, no sólo en --strict: esto no es higiene documental, es un

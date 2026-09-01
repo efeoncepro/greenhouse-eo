@@ -1754,6 +1754,55 @@ const cases = [
 
       rmSync(root, { recursive: true, force: true })
     }
+  },
+  {
+    // Una task en to-do/ que aparece en el diff sin ser el foco (le corrigieron una ruta stale,
+    // un cross-link) no debe romper el gate por una deuda de flow que ya tenia. Con --task
+    // apuntandola, si es error: ahi el flow es parte del trabajo declarado.
+    name: 'ui-flow-contract: incidental en el diff avisa, focal rompe',
+    run: () => {
+      const root = createRepo()
+
+      write(
+        join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'),
+        taskFixture({
+          domain: 'ui|platform',
+          executionProfile: 'ui-ux',
+          uiImpact: 'flow',
+          uiUxContract: ['## UI/UX Contract', '', '### Experience brief', '', '- UI rigor: `ui-standard`'].join('\n')
+        })
+      )
+
+      // `changed` se resuelve por git: sin repo, el modo no ve nada y el test seria teatro.
+      // Un `git init` basta: `ls-files --others` reporta el fixture como archivo nuevo.
+      execFileSync('git', ['init', '--quiet'], { cwd: root, stdio: 'ignore' })
+
+      const incidental = lintTasks({
+        repoRoot: root,
+        options: { format: 'json', strict: false, changed: true, active: false, task: null }
+      })
+
+      assert.equal(
+        incidental.errors.some(item => item.rule === 'ui-flow-contract'),
+        false
+      )
+      assert.equal(
+        incidental.warnings.some(item => item.rule === 'ui-flow-contract'),
+        true
+      )
+
+      const focal = lintTasks({
+        repoRoot: root,
+        options: { format: 'json', strict: false, changed: false, active: false, task: 'TASK-999' }
+      })
+
+      assert.equal(
+        focal.errors.some(item => item.rule === 'ui-flow-contract'),
+        true
+      )
+
+      rmSync(root, { recursive: true, force: true })
+    }
   }
 ]
 

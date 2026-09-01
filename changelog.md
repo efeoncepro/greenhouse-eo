@@ -7,6 +7,35 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-01 — el registro del avance entra a los checklists de cierre
+
+`stale-progress` existía pero ningún protocolo mandaba correrlo. Los checklists de cierre de
+`CLAUDE.md` y `AGENTS.md` ahora exigen tildar los acceptance criteria con evidencia, dejar sin
+tildar y con razón lo que no se verificó, poner `Status real` al día y correr
+`pnpm task:lint --task TASK-###` antes de mover a `complete/`.
+
+`ui-flow-contract` deja de romper el gate cuando una task de `to-do/` aparece en el diff sin ser el
+foco: misma calibración que `ui-wireframe-contract`, con test falsable. El footer de `flags:audit`
+deja de llamar «verdad live» a `vercel env ls` (que sólo dice que la variable existe) y nombra
+`vercel env pull`.
+
+Barrido de coherencia sobre los 19 cierres del día: `Lifecycle` desincronizado, 5 rutas stale en los
+índices, 9 estados falsos en el README de tasks, conteos y prosa stale en cinco epics y en
+`AEO_PROGRAM_STATUS.md`, 10 archivos con rutas rotas y cuatro reglas duras apoyadas en hechos ya
+falsos.
+
+## 2026-09-01 — DataForSEO ETV deja de ser una cifra sin versión
+
+El anuncio de ETV improved fue contrastado con la documentación pública y con siete consumers Greenhouse.
+Las skills DataForSEO/SEO, el dossier Labs, manuales y auditoría ahora distinguen legacy/improved,
+`use_improved_etv` de `include_clickstream_data`, y prohíben interpretar el cambio de modelo como performance.
+También se incorporó `dataforseo-operator` al gate de mirrors y se corrigieron sus pointers canónicos. No hubo
+cambio de runtime. Se registraron el ADR formula-aware, `TASK-1805` para la foundation, `TASK-1806` para
+evaluación/cutover, el runbook y un correo de diez preguntas en borrador/no enviado. El cutover queda bloqueado por
+aclaración del proveedor, foundation completa, shadow aprobado y decisión histórica antes del default anunciado
+para el 1-nov.
+[Auditoría](docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md).
+
 ## 2026-09-01 — TeamBot completa el ciclo mensual del Performance Report
 
 Nexa publicó el resumen de agosto en `EO Team` con cuatro menciones verificadas y envió cuatro lecturas personales 1:1, todas auditadas como `succeeded`. El runbook, la arquitectura, el manual y las skills espejadas ahora exigen separar cifras de interpretación: volumen no prueba sobrecarga, los atrasos heredados se contextualizan y una muestra de onboarding no se presenta como tendencia. También fijan la jerarquía de evidencia para menciones y el uso de Object ID Entra revalidado cuando un correo escrito contiene un typo. [Evidencia y límites](docs/audits/communications/2026-09-01-performance-report-teambot.md).
@@ -1019,18 +1048,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
 - **Dos antipatrones de criterio y cuatro de craft.** Si se cae la razón por la que existe una pieza, **la decisión vuelve a cero, no a otro ángulo** — buscarle un ángulo nuevo para salvarla es publicar por publicar; y un tema que le habla a otro comprador es decisión comercial, no de SEO. En titulación: poner el **concepto** en el lugar del título (el ángulo nombra, el titular promete), meter taxonomía interna en el nombre visible, repetir el mismo titular en las cuatro superficies, y desaprovechar el activo más citable que suele tener un catálogo — **un nombre propio con carga cultural que nadie contó**.
 - **Tres trampas más de herramienta, todas devolviendo éxito.** En Notion: **nunca editar el texto de un encabezado desplegable con search-replace** —destruye el toggle y orfana a todos los hijos; para renombrar se cambia la propiedad `Nombre` de la página— y el desplegable **no puede ser el primer bloque**. Leyendo un sitio Next.js: **no des-escapar el payload para buscar `@type`**, porque los objetos de la app aparecen como si fueran schema (se «encontró» un tipo inválido nueve veces por página que en el HTML crudo no existe); y los conteos de palabras sobre el payload salen **~3× inflados**.
 - **`copywriting` entra al manifiesto de espejos (12 skills) y traía deriva que no fallaba con error.** La copia de `.codex` tenía una `description` de una línea, sin `user-invocable` ni triggers: la skill simplemente **no se cargaba** cuando alguien pedía un headline o la voz del autor. Un agente entrando por Codex escribía copy firmado sin el sistema de voz, sin saber que existía.
-
-## 2026-08-24 — TeamBot deja de prometer una mención que Teams no soporta
-
-- Un anuncio real a `EO Team` demostró que usar el ID del chat como identidad de `@todos` no funciona: Teams aceptó el mensaje, pero mostró `todos` como texto común y no notificó colectivamente.
-- La capacidad oficial es más acotada: un bot puede mencionar personas explícitas en un chat grupal, pero no puede mencionar a todos. La causa no era idioma ni configuración del tenant.
-- Se corrigieron las skills, arquitectura, invariantes, runbook y `TASK-716`. El diseño futuro solo admite `none` o `explicit_users`; también conserva las Adaptive Cards sin `activity.text` para evitar la burbuja duplicada.
-- No se reintentó el envío. El soporte local especulativo de `--mention-all` fue retirado y no forma parte del runtime versionado.
-
-## 2026-08-24 — Queda registrado que nadie puede darse de baja de un correo, y quién lo va a arreglar
-
-- Se abrió el incidente que documenta el defecto: el enlace «Dejar de recibir estos correos» del pie **falla por los tres caminos posibles**, incluido el botón «Cancelar suscripción» que Gmail y Outlook muestran sobre el asunto. Ninguno da de baja a nadie.
-- **No es algo que se rompió después.** La capacidad se cerró así: la task que la construyó quedó marcada como terminada con su propio criterio sin cumplir y sin la página de preferencias que había planeado. El endpoint existe y no lo usa nadie.
-- Se creó la task que lo repara, con una decisión de diseño que vale nombrar: **hacer clic en el enlace no dará de baja de inmediato**, mostrará una confirmación. Los escáneres de seguridad de los correos corporativos abren los enlaces solos, así que un enlace que diera de baja al abrirse desuscribiría a gente que nunca lo tocó. El botón nativo del cliente de correo sí actúa directo, porque ahí la intención ya la expresó la persona.
-- También deja de guardar permisos de baja que nadie puede usar: hoy la liquidación de sueldo genera uno que dura un mes y no aparece en ninguna parte.
-- Tres tasks vecinas quedaron corregidas: los avisos de vacantes para el Banco de Talento —que serían la **primera suscripción voluntaria de verdad** del sistema— asumían que la baja funcionaba; el desalineamiento de la dirección de casa matriz dejó de ser deuda de una pantalla y pasó a bloquear todo el programa de correos; y el aviso de pagos a contractors quedó con una pregunta pendiente sobre a qué carril pertenece.

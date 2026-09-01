@@ -53,7 +53,7 @@ Canon: [`GREENHOUSE_OPERATING_LOOP_V1.md`](docs/operations/GREENHOUSE_OPERATING_
 - Codex + `ISSUE-###`: ejecutar `pnpm codex:issue-hook ISSUE-###` antes de código y decidir
   `issue-only fix | issue + TASK | blocked`.
 - Cambios en taxonomía operativa: `pnpm ops:lint --changed` como primera pasada.
-- No mover artefactos a complete sin evidencia proporcional y estado runtime honesto.
+- No mover artefactos a complete sin evidencia proporcional y estado runtime honesto, y sin **registrar el avance donde se lee**: `Status real` al día y los acceptance criteria tildados con su evidencia (lo no verificado queda sin tildar, con razón). Correr `pnpm task:lint --task TASK-###` antes del move — ahí avisan `stale-blocker` y `stale-progress`.
 
 ### Goal preflight TASK-\* para Codex
 

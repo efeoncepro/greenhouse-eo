@@ -210,12 +210,12 @@ Alternativas que el ADR debe evaluar y rechazar o acotar:
 ## Normative Docs
 
 - `docs/tasks/complete/TASK-1093-greenhouse-conversational-experience-platform-v1.md`
-- `docs/tasks/in-progress/TASK-1090-answer-trace-promotion-spec.md`
+- `docs/tasks/complete/TASK-1090-answer-trace-promotion-spec.md`
 - `docs/tasks/complete/TASK-947-nexa-insights-detail-page-canonical.md`
 - `docs/tasks/complete/TASK-950-nexa-insights-list-page-canonical.md`
 - `docs/tasks/in-progress/TASK-1089-nexa-knowledge-answer-surface.md`
 - `docs/tasks/complete/TASK-1085-nexa-knowledge-retrieval-citations.md`
-- `docs/tasks/in-progress/TASK-1078-nexa-floating-chat-expandable-persisted.md`
+- `docs/tasks/complete/TASK-1078-nexa-floating-chat-expandable-persisted.md`
 - `docs/tasks/to-do/TASK-1079-nexa-interaction-mode-sidecar-c-and-preference.md`
 - `docs/tasks/in-progress/TASK-1092-nexa-knowledge-production-readiness-inline-citations.md`
 - `docs/documentation/plataforma/knowledge-platform.md`

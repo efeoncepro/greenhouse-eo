@@ -968,7 +968,11 @@ const checkUiFlowContract = (task, context) => {
 
   const rawFlow = task.status.fields.Flow ?? task.status.fields.flow ?? ''
   const flow = rawFlow.replace(/^`(.+)`$/, '$1').trim()
-  const severity = context.changed || context.task ? 'error' : 'warning'
+  // Misma calibracion que ui-wireframe-contract: una task en to-do/ que aparece en el diff sin
+  // ser el foco (le corrigieron una ruta stale, un cross-link) no debe romper el gate por una
+  // deuda que ya tenia. Error solo cuando es el foco declarado, o cuando ya se esta implementando.
+  const incidental = context.changed && !context.task && task.folderLifecycle === 'to-do'
+  const severity = (context.changed || context.task) && !incidental ? 'error' : 'warning'
   const flowRequired = task.uiImpact === 'flow'
   const likelyNeedsFlow = FLOW_TRIGGER_RE.test(relevantFlowContent(task))
 

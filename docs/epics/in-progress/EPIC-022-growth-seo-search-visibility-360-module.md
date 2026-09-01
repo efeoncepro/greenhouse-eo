@@ -6,7 +6,7 @@
 - Priority: `P2`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `En producción — 27 hijas complete (conteo verificado 2026-08-28), 8 crons activos (ops-seo-competitor-coverage ENABLED con el release c983be7f18e6)`
+- Status real: `En producción — 36 hijas complete, 39 abiertas (1 in-progress + 38 to-do); conteo medido 2026-09-01 por campo `Epic:`, 8 crons activos (ops-seo-competitor-coverage ENABLED con el release c983be7f18e6)`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `Julio Reyes`
@@ -57,7 +57,8 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 > y `1651`, más cuatro rutas que apuntaban a `to-do/`/`in-progress/` de tasks ya movidas a
 > `complete/` (un link roto en Normative Docs deja al agente sin poder leer su referencia).
 >
-> Estado real: **de las 15 abiertas, 11 se pueden tomar ya**; las 4 restantes esperan sólo a otras
+> Estado real (nota fechada 2026-08-08 — **stale**: hoy son 39 abiertas, medido 2026-09-01):
+> **de las 15 abiertas de entonces, 11 se podían tomar ya**; las 4 restantes esperan sólo a otras
 > abiertas (`1313`←1311+1312 · `1314`←1312+1313 · `1316`←1315 · `1317`←1315+1316), más `1660`←1659
 > del carril de objetivos. `TASK-1310` (dashboard cliente) ya está **in-progress**.
 >
@@ -68,8 +69,8 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 > también queda `Blocked by: none`. Con eso el carril de objetivos ya no espera backend: sólo falta
 > su superficie.
 >
-> **Actualización 2026-08-28:** `TASK-1662` (keyword gap) quedó **implementada** (Slices 1–3 +
-> federación MCP) y sigue `in-progress` sólo por su Slice 4 (bloqueado por `TASK-1700`) y el cierre
+> **Actualización 2026-08-28 (corregida 2026-09-01: `TASK-1662` ya está `complete`):** `TASK-1662`
+> (keyword gap) quedó **implementada** (Slices 1–3 + federación MCP); cerró con su Slice 4 (bloqueado por `TASK-1700`) y el cierre
 > operativo post-release. El rollout está verificado con competidor real (Berel MX → `comex.com.mx`):
 > primera corrida de cobertura por USD 0,1076 con Δ exacto en el ledger (697 filas + 640 de mercado
 > gratis) y gap real medido — 357 `content_gap` / 54 `ranks_worse` / 269 excluidas por GSC. El flag
@@ -272,7 +273,7 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 > Detalle, evidencia y secuencia completa en el **Delta 2026-08-15** al final de este documento y en
 > `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md`.
 
-- `TASK-1696` — [creada 2026-08-15, **complete 2026-08-27**, backend-data] Ledger con dimensión de
+- `TASK-1696` — [creada 2026-08-15, **complete 2026-09-01**, backend-data] Ledger con dimensión de
   consumidor + gate USD per-org del grader. **P0.** Desbloquea todo lo que gaste.
   ✅ **Complete, `code complete, rollout pendiente`:** `seo_provider_spend_daily` ganó `consumer`
   (`seo` | `aeo`), `cost_basis` (`invoiced` | `estimated`) y `price_table_version` acoplado por
@@ -351,6 +352,15 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
   pesa 3× más que los backlinks. Amplía el allowlist a `content_analysis`; coordinar con `TASK-1651`.
 - `TASK-1789` — [creada 2026-08-27, backend-data] **Content decay.** El §3 de la arquitectura lo
   declara como capacidad y el runtime no lo tiene: cierra la brecha doc↔runtime con dato propio.
+- `TASK-1805` — [creada 2026-09-01, to-do, backend-critical/integration] **Foundation versionada
+  de DataForSEO Improved ETV.** La metodología pasa a ser parte de la identidad de la
+  medición; legacy/improved no comparten serie ni clave, y ningún request productivo depende del
+  default del provider. Cubre los siete consumers Labs, schema, freshness/readers, API/MCP,
+  configuración Vercel/worker, señales y evaluator dry-run; cierra todavía en legacy.
+- `TASK-1806` — [creada 2026-09-01, to-do, backend-critical/integration] **Evaluación y cutover de
+  DataForSEO Improved ETV.** Depende de 1805 y ejecuta shadow bounded, comparación contra GSC,
+  decisión rebaseline/breakpoint y activación reversible en los siete consumers compatibles.
+  Gasto, tratamiento histórico, deploy y cutover requieren autorizaciones separadas.
 - `TASK-1775` — [creada 2026-08-26, backend-data] **Foto de dominio + trayectoria competitiva.** El
   sujeto que el módulo no sabe describir: hoy los KPIs sólo cubren el recorte seguido. `labs`
   (`domain_rank_overview` mensual · `historical_rank_overview` una vez por sujeto, cuesta 10× ·
@@ -1073,7 +1083,16 @@ pausado —**no lo está**, `deploy.sh` lo declara `true` en ambos entornos— s
 command que inscribe perfiles: `recurring_regrade_enabled` no tiene writer), ni atribución de
 ingresos a citación en IA (no existe el modelo).
 
-## Delta 2026-09-01 — `TASK-1709` cerrada: el tier `prospect` y la línea de gasto de adquisición
+## Delta 2026-09-01 — `TASK-1699` y `TASK-1709` cerradas
+
+`TASK-1699` (SERP top-N + propose de competidores) cerró el mismo día. Su registro llevaba **cinco
+re-ejecuciones** porque el trabajo se narraba en prosa y nunca se escribía en los campos que una
+sesión lee para decidir: 46 checkboxes en cero y `Status real: Diseño` con el código ya en
+producción. De ahí salió el chequeo `stale-progress` de `pnpm task:lint`. El paso 9 —candidatos a
+competidor con ≥5 días de serie— quedó **medido, no deducido**: `readSerpCompetitorCandidates`
+devolvía `candidates: []` con la serie en 4 días; disponible desde el 2026-09-02 05:00 CLT.
+
+### `TASK-1709` — el tier `prospect` y la línea de gasto de adquisición
 
 El módulo gana un cuarto tier, `prospect`, que se resuelve **sin `module_assignments`**: el sujeto es
 un dominio que todavía no es cliente. Con eso el epic deja de ser sólo una herramienta para clientes

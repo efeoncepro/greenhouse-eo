@@ -164,7 +164,7 @@ Reglas obligatorias:
   que esta task define; su propio doc ya lo declara así. No las duplica.
 - **`TASK-1754`** — colapsa el enum de etapas y toca el mismo `PipelineDeskView.tsx` y el mismo diccionario.
   Ver el orden de merge más abajo: **1754 primero**.
-- `TASK-1747` — trabaja `hiringDesk.ts` con sesión activa; cierra antes que todas.
+- `TASK-1747` — trabajaba `hiringDesk.ts`; **cerró el 2026-09-01**, así que ya no impone orden.
 - **`TASK-1768`** (chip de avance de entrevista en la misma tarjeta) — hereda el slot de chips que esta task
   normaliza y el mapa de tono en fuente única. Va después.
 - `TASK-1767` — el embudo de equidad ramifica por desenlace **y causa**; consume el mismo vocabulario, no
@@ -198,7 +198,7 @@ Reglas obligatorias:
 **Coordinación de `hiringDesk.ts` — cinco escritores concurrentes.** El diccionario lo escriben a la vez
 `TASK-1747` (claves de la card de assessment), `TASK-1754` (claves de `stages`), `TASK-1763` (claves de
 capacity closure), `TASK-1768` (claves del avance de entrevista) y esta task (desenlace y causa). **Se
-particiona por CLAVE, no por archivo.** Orden de merge declarado: **`TASK-1747` (in-progress, sesión activa)
+particiona por CLAVE, no por archivo.** Orden de merge declarado: **`TASK-1747` (`complete` 2026-09-01)
 → `TASK-1754` → `TASK-1766` → `TASK-1763` → `TASK-1768`.** Esta task rebasa sobre las dos primeras y no
 renombra ni borra claves ajenas.
 
