@@ -28,6 +28,10 @@ restaurar `* * * * *`, plan honesto con `0 destroy`, apply y readback. El rollba
 development, budgets y quota project preservados: sólo update in-place, `0 add, 1 change, 0 destroy`; no se aplicó
 porque el runtime permanece sano.
 
+Preflight de Slice 2 listo, todavía sin apply: `media_derivatives_schedule="2-59/5 * * * *"` produce un único
+update in-place desde `*/2`, `0 add, 1 change, 0 destroy`, con development y budgets preservados. Los ticks
+2/7/12/.../57 quedan escalonados respecto de Producer; source/apply/readback esperan las 24 h completas.
+
 Guardrails FinOps aplicados después del corte: budgets alert-only Globe CLP 250.000 y consolidado CLP 370.000;
 umbrales current 50/75/90/100% y forecast 90/100%; plan posterior sin drift. Los recursos Globe recibieron
 `app`, `env`, `owner` y `cost_center` sin cambiar imágenes. Artifact Registry quedó con cleanup policy en dry-run,

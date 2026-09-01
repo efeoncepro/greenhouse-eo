@@ -384,6 +384,10 @@ mensuales si el patrón se mantiene. Asset Governance y rightsizing pueden lleva
   `*/5 * * * * -> * * * * *`, con `Plan: 0 to add, 1 to change, 0 to destroy`. El primer intento también probó
   dos guardas de operación: ADC requiere `GOOGLE_CLOUD_QUOTA_PROJECT=efeonce-globe` para refrescar budgets y
   `enable_budget=true` + billing account son inputs obligatorios para impedir que un plan de rollback los retire.
+- Cutover de Media preparado, no aplicado antes de la ventana: con los mismos inputs completos,
+  `media_derivatives_schedule="2-59/5 * * * *"` genera sólo el update in-place
+  `*/2 * * * * -> 2-59/5 * * * *`, `Plan: 0 to add, 1 to change, 0 to destroy`. Los minutos 2/7/12/.../57
+  quedan escalonados respecto de Producer 0/5/10/.../55; source/apply/readback esperan las 24 h estables.
 
 ## Rollout Plan & Risk Matrix
 
