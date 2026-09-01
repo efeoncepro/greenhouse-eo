@@ -1355,6 +1355,13 @@ const loadImplementationCommits = context => {
 
       if (!IMPLEMENTATION_SUBJECT_RE.test(subject)) continue
 
+      // Se acredita TODA task nombrada en el asunto, incluidas las que aparecen entre parentesis.
+      // Medido 2026-09-01 sobre los 31 asuntos del repo con 2+ referencias: filtrar los parentesis
+      // arreglaria 6 falsos positivos de contexto («precondicion TASK-1259», «herencia TASK-1675»)
+      // pero ROMPERIA 8 casos donde el parentesis SI declara trabajo propio («Slice 2 of TASK-642»,
+      // «TASK-587 Fase B», «cierra TASK-260»). Un falso negativo esconde trabajo real; un falso
+      // positivo solo cuesta una verificacion — y el mensaje de la regla pide exactamente eso
+      // («VERIFICA que esta hecho»), nunca afirma que el trabajo exista. Se deja asi a proposito.
       for (const match of subject.matchAll(TASK_REF_RE)) {
         const id = `TASK-${match[1]}`
 

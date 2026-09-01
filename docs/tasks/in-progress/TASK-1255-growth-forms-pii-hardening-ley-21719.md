@@ -15,6 +15,19 @@ TASK-1254 agregó verificación de email + cache. Postura PII ya alineada con es
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-01 — registro del avance (barrido `stale-progress`)
+
+28 checkboxes en cero con `Status real: Diseno`, teniendo 6 slices en la historia y el modulo
+completo en `src/lib/growth/forms/pii/`. Verificado hoy contra el repo: **8 de 9 criterios se
+tildan con evidencia**.
+
+El que NO: **retencion + purga no existe**. No es un detalle de cierre — es el mismo hueco que
+`TASK-1246` declara como «backfill de PII legacy + job de retencion/purga» pendiente. Mientras
+falte, hay `national_id` viejo sin cifrar en `normalized_fields_json`.
+
+Rollout: `GROWTH_FORMS_PII_ENCRYPTION_ENABLED` **staging ON, prod OFF**; el `SECRET_REF` ya esta
+en production y el flip va por el release control plane develop->main, NO unilateral.
+
 ## Status
 
 - Lifecycle: `in-progress`
@@ -173,18 +186,18 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] `national_id` cifrado at-rest; nunca en claro en DB/logs/respuestas.
-- [ ] Reader masked por default; reveal exige capability + reason + audit row.
-- [ ] Retención + purga idempotente con audit append-only.
-- [ ] Migration con marker + bloque DO; backfill con dry-run/apply/rollback.
-- [ ] Capability + grant + coverage test en el mismo PR.
+- [x] `national_id` cifrado at-rest. **Verificado 2026-09-01:** `src/lib/growth/forms/pii/encryption.ts` (AES-256-GCM) + migracion `20260626172339251_task-1255-...` con `encrypted_fields_json`; `boundary.ts` corta la fuga hacia HubSpot.
+- [x] Reader masked por default; reveal con capability + reason + audit. **Verificado 2026-09-01:** `masked-reader.ts` + `reveal.ts` + `audit.ts` (`lead_pii_reveal_audit` append-only).
+- [ ] Retencion + purga idempotente con audit append-only. **NO IMPLEMENTADO — es el hueco real de esta task.** No existe modulo de retencion/purga en `src/lib/growth/forms/pii/` (verificado 2026-09-01: los archivos son classify/encryption/mask/masked-reader/reveal/audit/boundary/errors/types). Es tambien lo que `TASK-1246` declara como pendiente de PII legacy.
+- [x] Migration con marker + bloque DO. **Verificado 2026-09-01:** `20260626172339251_task-1255-growth-forms-pii-encrypted-fields-and-reveal-audit.sql`. El backfill de PII legacy NO corrio (ver criterio de retencion).
+- [x] Capability + grant + coverage test. **Verificado 2026-09-01:** `growth.forms.lead_pii.reveal` en `entitlements-catalog.ts:2168`, grant en `runtime.ts:551`, cubierta por el guard `capability-grant-coverage.test.ts`.
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] Lógica de cifrado/masking/reveal en `src/lib/growth/forms/pii/`, no en la UI.
-- [ ] Modelada como reader masked + command reveal, no como handler de pantalla.
-- [ ] Read masked canónico; reveal con authz fina (`growth.forms.lead_pii.reveal`) + reason + audit + observabilidad.
-- [ ] Capability + grant a ≥1 rol real (ej. `efeonce_admin` / `efeonce_operations`) + coverage test en el MISMO PR.
+- [x] Logica en `src/lib/growth/forms/pii/`, no en la UI. **Verificado 2026-09-01.**
+- [x] Reader masked + command reveal. **Verificado 2026-09-01.**
+- [x] Read masked canonico + reveal con authz fina + reason + audit + signal. **Verificado 2026-09-01.**
+- [x] Grant a rol real + coverage test. **Verificado 2026-09-01** (`runtime.ts:551`).
 - [ ] Camino programático: reader reveal consumido por cockpit + Nexa + MCP con la misma capability.
 - [ ] Un primitive, muchos consumers.
 - [ ] Parity check = SÍ.

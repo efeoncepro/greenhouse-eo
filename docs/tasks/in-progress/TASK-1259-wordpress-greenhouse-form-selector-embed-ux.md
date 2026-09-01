@@ -13,6 +13,24 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-01 — falso positivo del barrido, y vale la pena que quede escrito
+
+`stale-progress` la marco como «tiene commits de implementacion y cero checkboxes». **Es un falso
+positivo y lo verifique**: el unico commit que la nombra es `5746e4908`, cuyo asunto es
+`feat(growth): TASK-1258 — catalogo externo gobernado + auth per-site (precondicion TASK-1259)`.
+La menciona como precondicion; no implementa nada suyo.
+
+**Estado real: no empezada.** No existe selector de formularios en WordPress, ni widget Elementor,
+ni el enqueue de handle unico. Los 16 checkboxes en cero son correctos.
+
+Se dejo la regla como esta a proposito: medido sobre los 31 asuntos del repo con 2+ referencias,
+filtrar los parentesis arreglaria 6 casos como este pero esconderia 8 donde el parentesis SI declara
+trabajo (`Slice 2 of TASK-642`, `TASK-587 Fase B`, `cierra TASK-260`). Un falso negativo esconde
+trabajo real; este falso positivo solo costo una verificacion.
+
+**Dependencia viva:** `TASK-1258` entrego el catalogo + auth per-site que esta task consume, pero NO
+su control plane de migracion.
+
 ## Status
 
 - Lifecycle: `in-progress`
@@ -24,7 +42,7 @@
 - UI impact: `flow`
 - Backend impact: `none`
 - Epic: `EPIC-040`
-- Status real: `Diseno`
+- Status real: `NO EMPEZADA (verificado 2026-09-01). El aviso de stale-progress es un FALSO POSITIVO: el unico commit que la nombra es 5746e4908, de TASK-1258, que la cita como precondicion. No hay selector WP, ni widget Elementor, ni enqueue de handle unico. Los checkboxes en cero son correctos; ver el Delta`
 - Rank: `TBD`
 - Domain: `growth|public-site|wordpress|ui`
 - Blocked by: `TASK-1258`
