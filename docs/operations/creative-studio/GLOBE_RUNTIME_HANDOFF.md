@@ -50,6 +50,11 @@ scan `clean`, rights verificadas y `eligibleForGeneration=true`. Se conserva `*/
 stages por tick, no espaciar un workflow cuya latencia depende de la cadencia. La imagen reporta ClamAV 1.4.3
 frente a 1.4.6 recomendada y el aviso no bloqueante de `clamd.conf`; es deuda de imagen separada.
 
+No se hizo rightsizing: el runtime conserva `2 vCPU / 2 GiB`. En la ventana del canary, Cloud Monitoring observó
+CPU utilization media muestreada de hasta 56,8% y memory usage media máxima de 586.080.256 bytes; bajar a
+1 vCPU no deja headroom y las muestras por minuto no prueban peak/P99 de memoria suficiente para bajar a 1 GiB.
+La siguiente evaluación requiere varias ejecuciones con trabajo real, percentiles y ausencia de backlog.
+
 ## Corte 2026-08-05 (b) — promoción end-to-end ejecutada; `ref/still/reference-v1` vuelve a estar viva
 
 `promotion_4265dd26-7eda-4918-bd7d-10318dd6cd5f` recorrió `start → stage → promote → activate → canary →

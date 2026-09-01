@@ -373,6 +373,12 @@ mensuales si el patrón se mantiene. Asset Governance y rightsizing pueden lleva
   `unverified` con `c2pa_manifest_absent`, rights `authorized` y estado terminal `eligible`. El lector gobernado
   `33565749181` devolvió HTTP 200, lifecycle `active`, scan `clean`, rights verificadas y
   `eligibleForGeneration=true` para el asset real.
+- Rightsizing de Asset Governance evaluado contra runtime y Cloud Monitoring, sin cambio: el job conserva
+  `2 vCPU / 2 GiB`, task count y parallelism en 1. Durante la ventana con trabajo real, CPU utilization alcanzó
+  56,8% de media muestreada y memory usage una media máxima de 586.080.256 bytes (memory utilization muestreada
+  hasta 27,3%). Reducir a 1 vCPU agotaría el margen con esa misma carga; la métrica de memoria combina muestras
+  por minuto y ejecuciones superpuestas, por lo que no prueba un peak/P99 apto para bajar a 1 GiB. Se cierra la
+  decisión conservadora: ningún rightsizing hasta reunir varias ejecuciones reales con percentiles y sin backlog.
 
 ## Rollout Plan & Risk Matrix
 
