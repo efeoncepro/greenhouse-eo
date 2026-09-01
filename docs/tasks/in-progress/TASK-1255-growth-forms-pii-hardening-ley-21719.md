@@ -21,9 +21,19 @@ TASK-1254 agregó verificación de email + cache. Postura PII ya alineada con es
 completo en `src/lib/growth/forms/pii/`. Verificado hoy contra el repo: **8 de 9 criterios se
 tildan con evidencia**.
 
-El que NO: **retencion + purga no existe**. No es un detalle de cierre — es el mismo hueco que
-`TASK-1246` declara como «backfill de PII legacy + job de retencion/purga» pendiente. Mientras
-falte, hay `national_id` viejo sin cifrar en `normalized_fields_json`.
+El que NO: **retencion + purga no existe**. Es el mismo hueco que `TASK-1246` declara como «backfill
+de PII legacy + job de retencion/purga» pendiente.
+
+🔴 **Corregido 2026-09-01 con una medicion contra PG real** (`scripts/growth/_sanity-pii-coverage.ts`):
+la frase «hay `national_id` viejo sin cifrar», que yo mismo escribi antes ese dia y que `TASK-1246`
+insinua, **no se sostiene hoy**. `greenhouse_growth.form_submission` tiene **98 filas, 0 cifradas**
+(el flag esta OFF en prod) pero **CERO claves de identificador** — ningun formulario vivo captura
+RUT/DNI/cedula. Un primer conteo mio dio «6 filas» y era un falso positivo: el patron matcheaba
+VALORES de texto libre que mencionan «documento», no campos de cedula.
+
+Lectura correcta del riesgo: el hueco es **latente, no una fuga activa**. El dia que un formulario
+publique un campo `national_id` con el flag OFF y sin purga, pasa a ser exposicion real. Eso es lo
+que hay que evitar, y por eso la task sigue abierta — pero no es una emergencia regulatoria hoy.
 
 Rollout: `GROWTH_FORMS_PII_ENCRYPTION_ENABLED` **staging ON, prod OFF**; el `SECRET_REF` ya esta
 en production y el flip va por el release control plane develop->main, NO unilateral.
