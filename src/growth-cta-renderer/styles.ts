@@ -84,6 +84,13 @@ greenhouse-cta, .ghc-scope {
     --gh-cta-border: light-dark(#dde3ea, #263140);
     /* Claro = el navy de marca sin cambios. Oscuro = su contraparte levantada:
        7.75:1 sobre el propio chip del eyebrow, 8.02:1 sobre la card. */
+    /* El RELLENO tambien pertenece al eje de esquema — no solo la tinta. Corregi esto
+       despues de afirmar lo contrario: el navy de marca como fondo de boton sobre la
+       card oscura daba 1.63:1 contra ella, y WCAG 1.4.11 pide 3:1 para que un control
+       exista como FORMA. El boton estaba ahi y no se veia. En oscuro sube al azul
+       brillante que ya es de la marca (--gh-cta-accent-2): 3.95:1 de forma y 4.59:1
+       para su texto blanco. */
+    --gh-cta-accent: light-dark(#023c70, #0375db);
     --gh-cta-accent-ink: light-dark(#023c70, #7fb0e8);
     --gh-cta-shadow: 0 1px 2px light-dark(rgba(15, 23, 42, 0.06), rgba(0, 0, 0, 0.4));
   }
@@ -104,6 +111,7 @@ greenhouse-cta, .ghc-scope {
     --gh-cta-bg: #10161f;
     --gh-cta-bg-soft: #171f2b;
     --gh-cta-border: #263140;
+    --gh-cta-accent: #0375db;
     --gh-cta-accent-ink: #7fb0e8;
     --gh-cta-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
   }
@@ -115,6 +123,7 @@ greenhouse-cta, .ghc-scope {
       --gh-cta-bg: #10161f;
       --gh-cta-bg-soft: #171f2b;
       --gh-cta-border: #263140;
+      --gh-cta-accent: #0375db;
       --gh-cta-accent-ink: #7fb0e8;
       --gh-cta-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
     }
