@@ -331,7 +331,7 @@ Baseline live del 2026-09-01:
 Modelo corregido, no promesa financiera: Producer `*/1 -> */5` reduce 80% de CLP 117.504 = CLP 94.003/mes;
 Media `*/2 -> 2-59/5` reduce 60% de CLP 58.756 = CLP 35.254/mes. Juntos modelan CLP 129.257/mes y un
 run-rate total de CLP 409.528. Si, después de las ventanas de Producer y Media, el rediseño multi-stage permite
-Asset Governance `*/1 -> */5`, suma 80% de CLP 109.964 = CLP 87.971/mes: ahorro modelado total CLP 217.228 y
+Asset Governance `*/1 -> 4-59/5`, suma 80% de CLP 109.964 = CLP 87.971/mes: ahorro modelado total CLP 217.228 y
 run-rate CLP 321.557. Rightsizing fue rechazado por telemetría y cleanup sigue dry-run, por lo que no se les
 atribuye ahorro. Sólo Billing Export posterior a cada corte convierte estas cifras en ahorro observado.
 
@@ -392,6 +392,10 @@ atribuye ahorro. Sólo Billing Export posterior a cada corte convierte estas cif
   `media_derivatives_schedule="2-59/5 * * * *"` genera sólo el update in-place
   `*/2 * * * * -> 2-59/5 * * * *`, `Plan: 0 to add, 1 to change, 0 to destroy`. Los minutos 2/7/12/.../57
   quedan escalonados respecto de Producer 0/5/10/.../55; source/apply/readback esperan las 24 h estables.
+- Cutover eventual de Asset Governance preparado, sin apply: `asset_governance_schedule="4-59/5 * * * *"`
+  genera sólo `*/1 -> 4-59/5`, `Plan: 0 to add, 1 to change, 0 to destroy`. Se descartó `*/5` porque colisiona
+  con Producer; los minutos 4/9/14/.../59 completan el stagger 0 Producer / 2 Media / 4 Governance. La aplicación
+  espera cerrar las ventanas de Producer y Media y conserva rollback inmediato a `*/1`.
 
 ## Rollout Plan & Risk Matrix
 
@@ -462,7 +466,7 @@ Terraform, un scheduler a la vez. El rollback restaura el schedule anterior.
 - [ ] Producer corre cada 5 minutos desde Terraform y mantiene queue age p99 < 900 s durante 24 h y 7 dias.
 - [ ] Media Derivatives corre escalonado cada 5 minutos y mantiene backlog/oldest age bajo guardrail.
 - [x] Asset Governance no se degrada por un cambio directo de cadence: permanece `*/1`; el runtime multi-stage convergió un canary real hasta `eligible`, con rights/provenance, malware, lector gobernado y cola verificados.
-- [ ] Después de cerrar Producer y Media, se evalúa Asset Governance `*/5` con plan/readback y rollback a `*/1`; sólo se aplica si la convergencia multi-stage mantiene cola < 900 s y cero fallos materiales.
+- [ ] Después de cerrar Producer y Media, se evalúa Asset Governance `4-59/5` con plan/readback y rollback a `*/1`; sólo se aplica si la convergencia multi-stage mantiene cola < 900 s y cero fallos materiales.
 - [ ] El costo diario observado de los jobs intervenidos baja al menos 50% sin aumento material de errores.
 - [ ] El rollback de cada scheduler esta documentado y verificado por readback.
 - [x] Existen budgets nativos con umbrales y forecast, sin apagado automatico.

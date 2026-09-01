@@ -54,7 +54,9 @@ El batch real cerró con `claimed=1`, `applied=1`, `retried=0`, `failed=0`, `pro
 `authorized` y terminal `eligible`. El lector gobernado `33565749181` devolvió HTTP 200, lifecycle `active`,
 scan `clean`, rights verificadas y `eligibleForGeneration=true`. Se conserva `*/1`; el objetivo era reducir
 la dependencia de múltiples ticks antes de espaciar el respaldo. Sólo después de cerrar las ventanas de Producer
-y Media se evaluará `*/5`, con guardrail de cola <900 s y rollback a `*/1`. La imagen reporta ClamAV 1.4.3 frente
+y Media se evaluará `4-59/5`, con guardrail de cola <900 s y rollback a `*/1`. El preflight ya probó un único
+update in-place, `0 add, 1 change, 0 destroy`; 4/9/14/.../59 evita colisión con Producer 0/... y Media 2/....
+La imagen reporta ClamAV 1.4.3 frente
 a 1.4.6 recomendada y el aviso no bloqueante de `clamd.conf`; es deuda de imagen separada.
 
 No se hizo rightsizing: el runtime conserva `2 vCPU / 2 GiB`. En la ventana del canary, Cloud Monitoring observó
