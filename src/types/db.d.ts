@@ -7801,6 +7801,10 @@ export interface GreenhouseGrowthSeoSiteAuditFindings {
   audit_run_id: string;
   created_at: Generated<Timestamp>;
   detail: Generated<Json>;
+  /**
+   * TASK-1670 — alcance del hallazgo: page (derivado del crawl OnPage, una URL real) | site (propiedad del dominio: robots.txt, borde/WAF, sitemap, JSON-LD de la home). Un hallazgo site NUNCA se cuenta como pagina afectada.
+   */
+  finding_scope: Generated<string>;
   issue_type: string;
   severity: string;
   url: string;
