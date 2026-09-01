@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `cron`
 - Epic: `none`
-- Status real: `Slices 1 y 5 aplicadas; labels y retention dry-run activos; Asset Governance multi-stage desplegado con smoke no-op; canary real y ventanas 24 h/7 d pendientes`
+- Status real: `Slices 1 y 5 aplicadas; labels y retention dry-run activos; Asset Governance multi-stage validado con canary real; ventanas Producer/Media 24 h, 7 d y cierre mensual pendientes`
 - Rank: `1`
 - Domain: `ops`
 - Blocked by: `none`
@@ -352,6 +352,27 @@ mensuales si el patrón se mantiene. Asset Governance y rightsizing pueden lleva
 - Advertencia operativa no bloqueante observada en el smoke: la imagen usa ClamAV 1.4.3 mientras upstream
   recomienda 1.4.6 y `freshclam` informa que no encuentra `clamd.conf`; el proceso termina `exit(0)` y el batch
   reporta cero fallos. Se conserva como deuda de imagen separada, sin presentarla como fallo del rollout.
+- Canary real sin gasto de modelo adicional: Globe `6ff899571c960ccfe6449ba839d80036414f8e22` corrigió la
+  reconciliación de governance cuando un ingest deduplica por contenido y agregó recuperación acotada por
+  sesión exacta. CI `33563636909`, deploy de API `33564129824` y recuperación de la sesión deduplicada
+  `33564436468` terminaron correctamente.
+- El ingest único `33564656669` reutilizó un output retenido y creó la sesión
+  `ing_544c68b33eb6ede2943545264ad1bf85`, asset
+  `asset_7578d730-ec05-45a7-a403-f1fcf290adb9` y job
+  `agj_78b7ed81b21ea34fb99d30f321b3ca44`. No generó un modelo nuevo ni duplicó el débito.
+- El canary reveló que el trigger de revisión de derechos de la migración 0041 referenciaba
+  `public.governed_assets` en vez del schema real. Globe `b34e90d574f3debe0ad94853c04fbd1306f52b7e`
+  agregó la migración forward-only 0051 usando `TG_TABLE_SCHEMA`; CI `33564987085`, plan de migración
+  `33565168932` y apply `33565516056` terminaron correctamente, sin migraciones inesperadas ni checksum drift.
+- El scheduler se pausó temporalmente con el job exactamente en `rights_reconcile`, intento 4/5, para impedir
+  un quinto fallo terminal mientras se corregía el trigger. La misma evidencia de rights se reintentó en
+  `33565602892`, quedó `verified/internal-owned/not-required`, y el scheduler fue restaurado a `ENABLED`,
+  `*/1 * * * *`, UTC.
+- El batch real registró `claimed=1`, `applied=1`, `retried=0`, `failed=0`, `promoted=1`, `deleted=0` y
+  `queueOldestAgeSeconds=678`. En la misma ejecución convergió inspection `accepted`, malware `clean`, C2PA
+  `unverified` con `c2pa_manifest_absent`, rights `authorized` y estado terminal `eligible`. El lector gobernado
+  `33565749181` devolvió HTTP 200, lifecycle `active`, scan `clean`, rights verificadas y
+  `eligibleForGeneration=true` para el asset real.
 
 ## Rollout Plan & Risk Matrix
 
@@ -421,7 +442,7 @@ Terraform, un scheduler a la vez. El rollback restaura el schedule anterior.
 
 - [ ] Producer corre cada 5 minutos desde Terraform y mantiene queue age p99 < 900 s durante 24 h y 7 dias.
 - [ ] Media Derivatives corre escalonado cada 5 minutos y mantiene backlog/oldest age bajo guardrail.
-- [x] Asset Governance no se degrada por un cambio directo de cadence: permanece `*/1`; el runtime multi-stage se desplegó por el workflow fenced y no se espaciará antes de un canary real.
+- [x] Asset Governance no se degrada por un cambio directo de cadence: permanece `*/1`; el runtime multi-stage convergió un canary real hasta `eligible`, con rights/provenance, malware, lector gobernado y cola verificados.
 - [ ] El costo diario observado de los jobs intervenidos baja al menos 50% sin aumento material de errores.
 - [ ] El rollback de cada scheduler esta documentado y verificado por readback.
 - [x] Existen budgets nativos con umbrales y forecast, sin apagado automatico.
@@ -495,6 +516,7 @@ Terraform, un scheduler a la vez. El rollback restaura el schedule anterior.
   del apply y permanecen iguales. Cloud Build ya elimina `staging/` a los 2 días; no se agregó lifecycle a assets
   de producto. Secret Manager tiene tres versiones deshabilitadas y no se eliminó ninguna.
 - Asset Governance puede procesar hasta cuatro stages durablemente fenced en una ejecución, con límite explícito
-  y 39/39 tests del paquete + 5/5 de infraestructura verdes. El cron permanece `*/1` y el digest live anterior;
-  el workflow canónico exige un SHA exacto en `origin/main`, por lo que deploy/canary espera promoción autorizada.
-- Commits locales: Greenhouse `aad71bf07`; Globe `5b01e99` y `0ccf485`. Ninguno fue publicado.
+  y 39/39 tests del paquete + 5/5 de infraestructura verdes. El cron permanece `*/1`; la promoción y el canary
+  real posteriores se documentan en la evidencia de ejecución de esta task.
+- Commits iniciales de esta delta: Greenhouse `aad71bf07`; Globe `5b01e99` y `0ccf485`. La promoción Globe
+  autorizada continuó después en `7eeb1da`, `6ff8995` y `b34e90d`; Greenhouse permanece sin publicar.

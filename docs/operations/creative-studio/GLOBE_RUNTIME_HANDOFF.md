@@ -31,14 +31,24 @@ umbrales current 50/75/90/100% y forecast 90/100%; plan posterior sin drift. Los
 `app`, `env`, `owner` y `cost_center` sin cambiar imágenes. Artifact Registry quedó con cleanup policy en dry-run,
 KEEP de 10 versiones por paquete y DELETE simulado sobre versiones >30 días; no se borró ningún artefacto.
 
-Asset Governance quedó publicado en Globe `7eeb1da` y desplegado por el workflow canónico `33561719287` sobre el
-digest `sha256:864a33c2ac30a9e10b4ab17c4b34c51cb149a4e1fc22889680875af322c69095`. El runtime reclama y avanza hasta
-cuatro stages durablemente fenced por ejecución (`GLOBE_ASSET_GOVERNANCE_MAX_STAGE_PASSES=4`); paquete 39/39 e
-infraestructura 5/5. Readback: scheduler `ENABLED`, cron `*/1`, target preservado y post-plan `No changes`.
-La reconciliación del deploy y los ticks siguientes terminaron bien, pero fueron no-op (`claimed=0`, `failed=0`,
-`queueOldestAgeSeconds=0`). No reducir `*/1` hasta un canary con asset real que verifique convergencia,
-rights/provenance, errores y edad de cola. La imagen reporta ClamAV 1.4.3 frente a 1.4.6 recomendada y el aviso
-no bloqueante de `clamd.conf`; el proceso termina `exit(0)`, por lo que se trata como deuda de imagen separada.
+Asset Governance quedó publicado inicialmente en Globe `7eeb1da` y desplegado por el workflow canónico
+`33561719287` sobre el digest `sha256:864a33c2ac30a9e10b4ab17c4b34c51cb149a4e1fc22889680875af322c69095`.
+El runtime reclama y avanza hasta cuatro stages durablemente fenced por ejecución
+(`GLOBE_ASSET_GOVERNANCE_MAX_STAGE_PASSES=4`); paquete 39/39 e infraestructura 5/5.
+
+El canary real reutilizó un output retenido, sin nueva generación ni débito duplicado. Globe `6ff8995` corrigió
+la reconciliación de ingest deduplicado y fue desplegado en la API por `33564129824`; el ingest único
+`33564656669` creó el asset `asset_7578d730-ec05-45a7-a403-f1fcf290adb9`. El primer submit de derechos reveló
+un trigger legado que apuntaba a `public.governed_assets`. Se cercó el scheduler en `rights_reconcile`, intento
+4/5; Globe `b34e90d` agregó la migración forward-only 0051, plan `33565168932` y apply `33565516056` verdes.
+El reintento `33565602892` verificó rights y se restauró el scheduler a `ENABLED`, `*/1`, UTC.
+
+El batch real cerró con `claimed=1`, `applied=1`, `retried=0`, `failed=0`, `promoted=1`, `deleted=0` y
+`queueOldestAgeSeconds=678`: inspection `accepted`, malware `clean`, C2PA `unverified/manifest_absent`, rights
+`authorized` y terminal `eligible`. El lector gobernado `33565749181` devolvió HTTP 200, lifecycle `active`,
+scan `clean`, rights verificadas y `eligibleForGeneration=true`. Se conserva `*/1`; el objetivo era reducir
+stages por tick, no espaciar un workflow cuya latencia depende de la cadencia. La imagen reporta ClamAV 1.4.3
+frente a 1.4.6 recomendada y el aviso no bloqueante de `clamd.conf`; es deuda de imagen separada.
 
 ## Corte 2026-08-05 (b) — promoción end-to-end ejecutada; `ref/still/reference-v1` vuelve a estar viva
 
