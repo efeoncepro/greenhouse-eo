@@ -149,7 +149,7 @@ de revisión humana—; y se retira el follow-up "extracción a `search-visibili
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Bajo`

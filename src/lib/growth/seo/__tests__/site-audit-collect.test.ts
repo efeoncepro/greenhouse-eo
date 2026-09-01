@@ -74,8 +74,21 @@ vi.mock('@/lib/sync/publish-event', () => ({
   publishOutboxEvent: (...args: unknown[]) => outboxMock(...args)
 }))
 
+/**
+ * TASK-1670 — el flag de hallazgos de sitio es mutable por test: su default es OFF y la
+ * mayoría de los casos verifica justamente que con OFF el collect se comporta igual que antes.
+ */
+const flagState = { siteFindings: false }
+
 vi.mock('../flags', () => ({
-  isSeoModuleEnabled: () => true
+  isSeoModuleEnabled: () => true,
+  isSeoSiteFindingsEnabled: () => flagState.siteFindings
+}))
+
+const siteFindingsMock = vi.fn()
+
+vi.mock('../site-audit/site-findings', () => ({
+  evaluateSiteFindings: (...args: unknown[]) => siteFindingsMock(...args)
 }))
 
 vi.mock('@/lib/observability/capture', () => ({
@@ -94,6 +107,7 @@ const claimedRun = (overrides: Record<string, unknown> = {}) => ({
   audit_run_id: 'seoar-1',
   seo_target_id: 'seot-1',
   organization_id: 'org-1',
+  root_domain: 'berel.com',
   capture_date: '2026-08-06',
   provider_task_id: 'task-1',
   gave_up: false,
@@ -147,6 +161,9 @@ beforeEach(() => {
   providerMock.mockReset()
   outboxMock.mockReset()
   outboxMock.mockResolvedValue('outbox-1')
+
+  flagState.siteFindings = false
+  siteFindingsMock.mockReset()
 })
 
 describe('parsers puros', () => {
@@ -294,8 +311,82 @@ describe('collectSiteAuditRuns', () => {
       'https://berel.cl/rota',
       'is_4xx_code',
       'critical',
-      expect.any(String)
+      expect.any(String),
+      // TASK-1670 — todo lo que deriva del crawl OnPage es alcance `page`, siempre.
+      'page'
     ])
+  })
+
+  describe('hallazgos de SITIO (TASK-1670)', () => {
+    it('con el flag OFF ni siquiera se evalúa el sitio: comportamiento idéntico al previo', async () => {
+      providerMock
+        .mockResolvedValueOnce(summaryResponse({ pagesCrawled: 8 }))
+        .mockResolvedValueOnce(pagesResponse([{ url: 'https://berel.cl/', checks: { is_https: true } }]))
+
+      const summary = await collectSiteAuditRuns()
+
+      expect(siteFindingsMock).not.toHaveBeenCalled()
+      expect(state.findingInserts).toHaveLength(0)
+      expect(summary.outcomes[0]).toMatchObject({ finalStatus: 'succeeded', findings: 0 })
+    })
+
+    it('con el flag ON materializa los hallazgos de sitio con alcance `site`', async () => {
+      flagState.siteFindings = true
+      siteFindingsMock.mockResolvedValue({
+        siteUrl: 'https://berel.com',
+        findings: [
+          {
+            issueType: 'ai_retrieval_crawlers_blocked',
+            severity: 'critical',
+            detail: { blocked: ['OAI-SearchBot'] }
+          }
+        ]
+      })
+
+      providerMock
+        .mockResolvedValueOnce(summaryResponse({ pagesCrawled: 8 }))
+        .mockResolvedValueOnce(pagesResponse([{ url: 'https://berel.cl/', checks: { is_https: true } }]))
+
+      const summary = await collectSiteAuditRuns()
+
+      expect(state.findingInserts).toHaveLength(1)
+      expect(state.findingInserts[0].params).toEqual([
+        'seoar-1',
+        // Todos los hallazgos de sitio comparten la URL canónica del sujeto: la columna de
+        // alcance es el discriminador, no la URL.
+        'https://berel.com',
+        'ai_retrieval_crawlers_blocked',
+        'critical',
+        expect.any(String),
+        'site'
+      ])
+      expect(summary.outcomes[0]).toMatchObject({ finalStatus: 'succeeded', findings: 1 })
+      expect(outboxMock.mock.calls[0][0]).toMatchObject({ payload: { findingsCount: 1 } })
+    })
+
+    it('un sitio que revienta la evaluación NO impide cerrar el run', async () => {
+      flagState.siteFindings = true
+      siteFindingsMock.mockRejectedValue(new Error('sitio caído'))
+
+      providerMock
+        .mockResolvedValueOnce(summaryResponse({ pagesCrawled: 8 }))
+        .mockResolvedValueOnce(pagesResponse([{ url: 'https://berel.cl/', checks: { is_https: true } }]))
+
+      const summary = await collectSiteAuditRuns()
+
+      // El crawl ya se pagó: un sitio del cliente no puede impedir que el audit se cierre.
+      expect(summary.outcomes[0]).toMatchObject({ finalStatus: 'succeeded' })
+      expect(state.updates).toHaveLength(1)
+    })
+
+    it('un run `failed` no gasta requests midiendo el sitio', async () => {
+      flagState.siteFindings = true
+      providerMock.mockResolvedValueOnce(summaryResponse({ pagesCrawled: 0, extended: 'site_unreachable' }))
+
+      await collectSiteAuditRuns()
+
+      expect(siteFindingsMock).not.toHaveBeenCalled()
+    })
   })
 
   it('crawl terminado con 0 páginas = failed sin leer pages', async () => {

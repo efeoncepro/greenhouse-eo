@@ -219,3 +219,36 @@ export const GROWTH_SEO_WORK_QUEUE_FLAG = 'GROWTH_SEO_WORK_QUEUE_ENABLED'
 /** Gate de la cola priorizada. Default OFF. No gasta: gatea orden y lectura. */
 export const isSeoWorkQueueEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
   isTrue(env[GROWTH_SEO_WORK_QUEUE_FLAG])
+
+/**
+ * TASK-1670 — Hallazgos de SITIO en el site audit (crawlers de IA, borde, JSON-LD, sitemap).
+ *
+ * ⚠️ **Runtime: `ops-worker` ÚNICAMENTE.** El único lector es el collect
+ * (`site-audit/collect.ts`), que corre en Cloud Run. El SoT es
+ * `services/ops-worker/deploy.sh`, cuyos `--set-env-vars` son DESTRUCTIVOS: aplicarlo sólo en
+ * vivo con `--update-env-vars` lo borra en el próximo deploy, en silencio. Declararlo en
+ * Vercel no sirve de nada — ahí no corre la materialización, y los hallazgos ya escritos se
+ * leen por el reader canónico sin consultar este flag.
+ *
+ * 🔴 **NO se prende hasta que `TASK-1671` esté desplegada, y por una razón concreta:** los
+ * hallazgos son del DOMINIO, no de una página. La superficie actual cuenta "páginas
+ * afectadas" y ordena por ese número, así que un hallazgo de sitio se rotularía "1 página
+ * afectada" —falso— y además se hundiría dentro de su propio tier. Prenderlo antes cambia un
+ * punto ciego por un dato mal contado.
+ *
+ * 🔴 **Consecuencia que hay que decir en voz alta: mergear esta task NO cierra el agujero.**
+ * Con el flag OFF el collect se comporta exactamente como antes y un sitio que bloquea a los
+ * crawlers de IA sigue puntuando 95/100. El hito de cierre es el FLIP verificado en
+ * producción, no el merge.
+ *
+ * NO compromete gasto de proveedor: son fetches propios al sitio del cliente (4-5 requests
+ * por run, con presupuesto de tiempo), cero llamadas a DataForSEO.
+ *
+ * Es SUBORDINADO a `GROWTH_SEO_ENABLED`: con el módulo apagado el collect no corre y este
+ * flag es irrelevante. Registrar en docs/operations/FEATURE_FLAG_STATE_LEDGER.md.
+ */
+export const GROWTH_SEO_SITE_FINDINGS_FLAG = 'GROWTH_SEO_SITE_FINDINGS_ENABLED'
+
+/** Gate de la materialización de hallazgos de sitio. Default OFF. */
+export const isSeoSiteFindingsEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  isTrue(env[GROWTH_SEO_SITE_FINDINGS_FLAG])

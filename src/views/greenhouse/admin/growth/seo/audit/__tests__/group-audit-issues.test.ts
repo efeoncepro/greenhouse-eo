@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { GH_GROWTH_SEO_AUDIT_ISSUES } from '@/lib/copy/growth'
 import type { SeoSiteAuditFindingSeverity, SeoSiteAuditFindingView } from '@/lib/growth/seo/contracts'
 import { ONPAGE_CHECK_SEVERITY } from '@/lib/growth/seo/site-audit/findings-map'
+import { SITE_FINDING_SEVERITY } from '@/lib/growth/seo/site-audit/site-findings'
 
 import { STALE_CRAWL_DAYS, daysSinceCrawl, groupAuditIssues } from '../group-audit-issues'
 
@@ -10,7 +11,7 @@ const finding = (
   issueType: string,
   severity: SeoSiteAuditFindingSeverity,
   url: string
-): SeoSiteAuditFindingView => ({ issueType, severity, url, detail: {} })
+): SeoSiteAuditFindingView => ({ issueType, severity, url, detail: {}, findingScope: 'page' })
 
 const bucket = (items: SeoSiteAuditFindingView[]): Record<SeoSiteAuditFindingSeverity, SeoSiteAuditFindingView[]> => ({
   critical: items.filter(item => item.severity === 'critical'),
@@ -102,18 +103,26 @@ describe('groupAuditIssues', () => {
   })
 })
 
+/**
+ * TASK-1670 — El drift bidireccional corre contra TODO lo que el backend materializa, que
+ * desde esta task son dos allowlists: los checks de PÁGINA del proveedor OnPage y los
+ * hallazgos de SITIO que Greenhouse evalúa por su cuenta. Chequear sólo el primero dejaría
+ * que un hallazgo de sitio llegara a la pantalla sin ficha es-CL, mostrando su id de máquina.
+ */
+const MATERIALIZABLE_ISSUES: Record<string, string> = { ...ONPAGE_CHECK_SEVERITY, ...SITE_FINDING_SEVERITY }
+
 describe('catálogo es-CL de issues', () => {
   // Drift guard: cuando el backend sume un check al allowlist, esta prueba obliga a
   // escribir su ficha. Sin ella el check nuevo caería al fallback "sin catalogar" en
   // silencio y el operador vería un id de máquina en la lista priorizada.
   it('cubre todo el allowlist de findings-map', () => {
-    const sinFicha = Object.keys(ONPAGE_CHECK_SEVERITY).filter(check => !GH_GROWTH_SEO_AUDIT_ISSUES[check])
+    const sinFicha = Object.keys(MATERIALIZABLE_ISSUES).filter(check => !GH_GROWTH_SEO_AUDIT_ISSUES[check])
 
     expect(sinFicha).toEqual([])
   })
 
   it('no cataloga checks que el backend no materializa', () => {
-    const huerfanas = Object.keys(GH_GROWTH_SEO_AUDIT_ISSUES).filter(check => !ONPAGE_CHECK_SEVERITY[check])
+    const huerfanas = Object.keys(GH_GROWTH_SEO_AUDIT_ISSUES).filter(check => !MATERIALIZABLE_ISSUES[check])
 
     expect(huerfanas).toEqual([])
   })

@@ -37,6 +37,8 @@ import {
 } from '@/lib/postgres/client'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
+import { createSiteFetcher, resolveSubjectSite } from '@/lib/growth/site-substrate'
+
 import {
   SEO_RANK_SNAPSHOT_AGGREGATE_TYPE,
   SEO_SITE_AUDIT_COMPLETED_EVENT,
@@ -44,8 +46,9 @@ import {
   type SeoSiteAuditCollectSummary,
   type SeoSiteAuditRunStatus
 } from '../contracts'
-import { isSeoModuleEnabled } from '../flags'
+import { isSeoModuleEnabled, isSeoSiteFindingsEnabled } from '../flags'
 import { mapOnPagePagesToFindings, type OnPageAuditFinding } from './findings-map'
+import { evaluateSiteFindings, type SiteAuditFinding } from './site-findings'
 
 /**
  * Endpoints de lectura post-crawl (POST, gratis 30 días post-task). AMBOS llevan el id
@@ -71,6 +74,8 @@ type ClaimedRunRow = {
   audit_run_id: string
   seo_target_id: string
   organization_id: string
+  /** Dominio del sujeto: insumo de los hallazgos de SITIO (TASK-1670). */
+  root_domain: string
   capture_date: string
   provider_task_id: string
   /** `true` cuando el run superó `SITE_AUDIT_GIVE_UP_HOURS` sin completar. */
@@ -147,15 +152,53 @@ const queryRows = async <T>(client: PoolClient, sql: string, params: unknown[]):
 const insertFindings = async (
   client: PoolClient,
   auditRunId: string,
-  findings: OnPageAuditFinding[]
+  findings: OnPageAuditFinding[],
+  scope: 'page' | 'site' = 'page'
 ): Promise<void> => {
   for (const finding of findings) {
     await client.query(
-      `INSERT INTO greenhouse_growth.seo_site_audit_findings (audit_run_id, url, issue_type, severity, detail)
-       VALUES ($1, $2, $3, $4, $5::jsonb)`,
-      [auditRunId, finding.url, finding.issueType, finding.severity, JSON.stringify(finding.detail)]
+      `INSERT INTO greenhouse_growth.seo_site_audit_findings (audit_run_id, url, issue_type, severity, detail, finding_scope)
+       VALUES ($1, $2, $3, $4, $5::jsonb, $6)`,
+      [auditRunId, finding.url, finding.issueType, finding.severity, JSON.stringify(finding.detail), scope]
     )
   }
+}
+
+/**
+ * TASK-1670 — Hallazgos de SITIO del run, detrás de flag.
+ *
+ * NUNCA LANZA y NUNCA bloquea el cierre del run: si el sitio está caído, es lento o el flag
+ * está apagado, el audit se materializa igual con sus hallazgos de página. Un sitio del
+ * cliente no puede impedir que se cierre un crawl que ya se pagó.
+ *
+ * ⚠️ Corre DENTRO de la transacción que sostiene el lock del run —el mismo lugar donde ya
+ * viven los dos POST a DataForSEO, y por la misma razón: ese lock ES el mecanismo de
+ * exactly-once y sacarlo de ahí obligaría a rediseñarlo—. Por eso el evaluador impone un
+ * presupuesto de tiempo duro (`SITE_FINDINGS_DEADLINE_MS`): la ventana que agrega es del
+ * mismo orden que la que la transacción ya tolera, y cruzarla degrada a "no verificado" en
+ * vez de estirar el lock.
+ */
+const collectSiteFindings = async (rootDomain: string): Promise<OnPageAuditFinding[]> => {
+  const site = resolveSubjectSite(rootDomain)
+
+  if (!site) {
+    // Dominio no resoluble a una URL pública: no hay sitio que medir. Se omite en silencio
+    // porque no es un hallazgo del SITIO sino un dato incompleto del target.
+    return []
+  }
+
+  const fetcher = createSiteFetcher(site.baseUrl)
+  const evaluation = await evaluateSiteFindings(site.baseUrl, fetcher)
+
+  return evaluation.findings.map((finding: SiteAuditFinding) => ({
+    // La tabla exige `url` NOT NULL. Todos los hallazgos de sitio comparten la URL canónica
+    // del sujeto: la columna `finding_scope` es el discriminador, y las URLs específicas
+    // (sitemap declarado, etc.) viajan en `detail`.
+    url: evaluation.siteUrl,
+    issueType: finding.issueType,
+    severity: finding.severity,
+    detail: finding.detail
+  }))
 }
 
 interface CollectRunResult {
@@ -179,6 +222,7 @@ const collectOneRun = async (auditRunId: string): Promise<CollectRunResult> =>
       `SELECT r.audit_run_id,
               r.seo_target_id,
               t.organization_id,
+              t.root_domain,
               r.capture_date::text AS capture_date,
               r.provider_task_id,
               (NOW() - COALESCE(r.started_at, r.created_at)) >= ($2::int * INTERVAL '1 hour') AS gave_up
@@ -292,6 +336,24 @@ const collectOneRun = async (auditRunId: string): Promise<CollectRunResult> =>
       }
     }
 
+    // TASK-1670 — Hallazgos de SITIO. Van detrás de su propio flag y NO cambian el estado
+    // final del run: un sitio inalcanzable no degrada un crawl que sí terminó. Con el flag
+    // OFF esta lista queda vacía y el comportamiento es idéntico al previo a esta task.
+    let siteFindings: OnPageAuditFinding[] = []
+
+    if (finalStatus !== 'failed' && isSeoSiteFindingsEnabled()) {
+      try {
+        siteFindings = await collectSiteFindings(run.root_domain)
+      } catch (error) {
+        // Defensa redundante: `evaluateSiteFindings` ya declara que nunca lanza. Si algún día
+        // deja de cumplirlo, el run se cierra igual — nunca al revés.
+        captureWithDomain(error, 'growth', {
+          tags: { source: 'seo_site_audit_collect', family: 'site_findings' },
+          extra: { auditRunId, rootDomain: run.root_domain }
+        })
+      }
+    }
+
     await client.query(
       `UPDATE greenhouse_growth.seo_site_audit_runs
           SET status = $2,
@@ -303,6 +365,7 @@ const collectOneRun = async (auditRunId: string): Promise<CollectRunResult> =>
     )
 
     await insertFindings(client, auditRunId, findings)
+    await insertFindings(client, auditRunId, siteFindings, 'site')
 
     await publishOutboxEvent(
       {
@@ -315,13 +378,18 @@ const collectOneRun = async (auditRunId: string): Promise<CollectRunResult> =>
           auditRunId,
           captureDate: run.capture_date,
           status: finalStatus,
-          findingsCount: findings.length
+          findingsCount: findings.length + siteFindings.length
         }
       },
       client
     )
 
-    return { outcome: 'materialized', finalStatus, findings: findings.length, seoTargetId: run.seo_target_id }
+    return {
+      outcome: 'materialized',
+      finalStatus,
+      findings: findings.length + siteFindings.length,
+      seoTargetId: run.seo_target_id
+    }
   })
 
 /**

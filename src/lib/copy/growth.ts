@@ -3056,7 +3056,29 @@ export const GH_GROWTH_SEO_AUDIT_ISSUES: Readonly<
   no_favicon: { label: 'Sin favicon', effort: 'low', value: 'low', hint: 'El sitio no declara su ícono de pestaña.' },
   no_doctype: { label: 'Sin doctype', effort: 'low', value: 'low', hint: 'El documento no declara su tipo y el navegador adivina cómo interpretarlo.' },
   no_encoding_meta_tag: { label: 'Sin meta de codificación', effort: 'low', value: 'low', hint: 'La página no declara su codificación de caracteres.' },
-  deprecated_html_tags: { label: 'Etiquetas HTML obsoletas', effort: 'medium', value: 'low', hint: 'El marcado usa etiquetas que el estándar ya retiró.' }
+  deprecated_html_tags: { label: 'Etiquetas HTML obsoletas', effort: 'medium', value: 'low', hint: 'El marcado usa etiquetas que el estándar ya retiró.' },
+
+  // ── Hallazgos de SITIO (TASK-1670) ──────────────────────────────────────────────────────
+  // No vienen del crawl del proveedor: son propiedades del dominio que OnPage no mira. Se
+  // materializan con `finding_scope='site'` y NUNCA se cuentan como páginas afectadas.
+  ai_retrieval_crawlers_blocked: { label: 'Los motores de IA no pueden leer el sitio', effort: 'medium', value: 'high', hint: 'El archivo robots.txt le niega el paso a los rastreadores que citan páginas en las respuestas de ChatGPT, Perplexity y Claude. Sin ese acceso el sitio no puede aparecer en esas respuestas.' },
+
+  // 🔴 Se redacta como POSTURA, no como defecto: bloquear el entrenamiento de modelos es una
+  // decisión de derechos sobre el contenido, legítima y frecuente. Un copy que suene a error
+  // acá le enseña al cliente a desconfiar del resto del informe.
+  ai_training_crawlers_blocked: { label: 'Entrenamiento de modelos de IA bloqueado', effort: 'low', value: 'low', hint: 'El sitio le niega el paso a los rastreadores que recolectan contenido para entrenar modelos de IA. Es una decisión sobre el uso del contenido, no una falla: se informa para dejarla registrada y no afecta que el sitio aparezca en las respuestas.' },
+
+  ai_crawler_edge_access_denied: { label: 'El servidor rechaza a los rastreadores', effort: 'medium', value: 'high', hint: 'El robots.txt permite el paso, pero el servidor o el CDN responde con un rechazo cuando quien pide la página es un rastreador. Se corrige en la configuración del CDN o del firewall, no en robots.txt.' },
+
+  structured_data_missing: { label: 'Sin datos estructurados en la portada', effort: 'medium', value: 'high', hint: 'La portada no publica el marcado que le dice a buscadores y motores de IA quién es la marca y a qué se dedica.' },
+
+  sitemap_missing: { label: 'Sin mapa del sitio', effort: 'low', value: 'medium', hint: 'No hay un mapa del sitio en la ruta habitual ni declarado en robots.txt. Sin él, los buscadores descubren las páginas sólo siguiendo enlaces.' },
+
+  sitemap_declared_broken: { label: 'El mapa del sitio declarado no responde', effort: 'low', value: 'high', hint: 'El robots.txt anuncia un mapa del sitio que no se puede leer. Los buscadores lo buscan justo ahí y no encuentran nada.' },
+
+  // Ni sano ni roto: un hueco declarado. El copy tiene que dejar clarísimo que no es un
+  // veredicto, porque leerlo como "está bien" es exactamente el falso sano que evitamos.
+  site_check_unverified: { label: 'Chequeo de sitio sin verificar', effort: 'low', value: 'low', hint: 'No pudimos completar esta revisión del sitio. No significa que esté bien ni que esté mal: quedó sin medir, y el detalle explica por qué.' }
 }
 
 /**
