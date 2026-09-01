@@ -1328,7 +1328,12 @@ const checkStaleBlocker = (task, context) => {
  * Dónde muerde: `pnpm task:lint --task TASK-###` es lo primero que corre el harness de ejecución,
  * así que el aviso llega ANTES de re-implementar, que es el único momento en que sirve.
  */
-const IMPLEMENTATION_SUBJECT_RE = /^(feat|fix|refactor|perf)\(/
+// Un commit de scope `docs` NO es implementacion aunque su tipo sea fix/feat: reconciliar el
+// backlog o corregir una atribucion no construye nada. Medido 2026-09-01: los 3 commits
+// `(docs)` del repo que nombran una task son puramente documentales, asi que excluirlos no
+// esconde trabajo real. Caso fuente TASK-1779, marcada como "tiene implementacion" por
+// `fix(docs): reconciliar el backlog Growth ... y TASK-1779 para la memoria del cliente`.
+const IMPLEMENTATION_SUBJECT_RE = /^(feat|fix|refactor|perf)\((?!docs?\))/
 const NOT_STARTED_STATUS_RE = /dise(ñ|n)o|sin empezar|no iniciad/i
 
 const implementationCommitCache = new Map()

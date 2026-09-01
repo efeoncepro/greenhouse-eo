@@ -6,6 +6,18 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-01 — registro del avance (barrido `stale-progress`)
+
+27 checkboxes en cero con `Status real: Avanzada`. Verificado hoy: los dos commits que la nombran
+(`868167729`, `111e341d8`) son **reescritura de la propia task y del PDR-006**, mas la skill de
+HubSpot Solutions Partner — no implementacion de la landing.
+
+**Ningun criterio se tilda.** Los suyos son de proceso editorial —dossiers VoC/CRO, SEO/AEO y
+claim/proof aprobados; awareness/sophistication/gran idea declaradas; 10-25 H1 evaluados; copy deck
+R0-R11 con seis pasadas y revision humana; cada claim con fuente vigente y autorizacion— y no hay
+registro de que ninguno se haya completado. `Avanzada` describe la definicion de la task, no su
+ejecucion.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -22,7 +34,7 @@
 - Visual direction: `docs/ui/visual-directions/TASK-1352-hubspot-immersive-pillar-direction.md`
 - Backend impact: `none`
 - Epic: `EPIC-019`
-- Status real: `Avanzada`
+- Status real: `Avanzada EN DEFINICION, NO en ejecucion (verificado 2026-09-01). Los dos commits que la nombran reescriben la task y el PDR-006; la landing no esta implementada y ningun dossier editorial (VoC/CRO, SEO/AEO, claim/proof) tiene registro de aprobacion. Ver el Delta`
 - Rank: `TBD`
 - Domain: `public-site`
 - Blocked by: `none`

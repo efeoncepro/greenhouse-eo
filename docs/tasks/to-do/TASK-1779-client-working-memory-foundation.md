@@ -34,6 +34,17 @@ sigue sin crear, alterar ni escribir `greenhouse_growth.seo_competitors`.
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-01 — auditada en el barrido `stale-progress`: no empezada, y correctamente
+
+`stale-progress` la marcaba por un commit `fix(docs): reconciliar el backlog Growth ... y TASK-1779
+para la memoria del cliente` — documentacion, no implementacion. Se corrigio el detector para que un
+commit de scope `docs` deje de contar como trabajo (medido: los 3 commits `(docs)` del repo que
+nombran una task son puramente documentales, asi que excluirlos no esconde nada real).
+
+**Estado verificado 2026-09-01: no empezada.** No existe `src/lib/client-memory/` ni migracion de las
+cuatro tablas bajo `greenhouse_core`. Los 17 checkboxes en cero son correctos — no hace falta
+re-auditarla.
+
 ## Status
 
 - Lifecycle: `to-do`

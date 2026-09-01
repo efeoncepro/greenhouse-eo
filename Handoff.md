@@ -32,6 +32,36 @@ ahora nombra `vercel env pull`. Y el mensaje de `no-opacity-on-text` estaba en v
 Gates: `local:check` exit 0, `task:lint:test` 47/47, `ops:lint --changed` errors=0,
 `docs:closure-check` sin dueño faltante, `docs:context-check:strict` 0/0, 262 tests de lint-rules.
 
+## 2026-09-01 (7) — barrido `stale-progress`: 16 tasks auditadas, 12 con el aviso resuelto
+
+Ninguna se cerró, y eso es el resultado, no una falla: **ninguna estaba realmente terminada**. Lo que
+faltaba era el registro. 319 checkboxes en cero repartidos entre las 16.
+
+Regla que me impuse y sostuve: tildar sin evidencia es peor que no tildar. Por eso 1258 y 1352
+quedaron en cero criterios con la razón escrita, y 927 se llevó 1 de 6 aunque tiene 5 slices
+construidos —el único criterio que el estado OFF satisface de verdad es «cero escrituras».
+
+Hallazgos que valen más que los checkboxes: **TASK-1160** predijo en agosto que al 100% del budget
+toda invariante nueva se degradaría por falta de espacio, y hoy me pasó a mí, medido. **TASK-1258**
+nunca construyó su control plane de migración, pero 1253 y 1254 difirieron su flip «al cutover de
+1258» y terminaron ON en prod por otra vía: el cutover ocurrió sin su gobierno. **TASK-1427** tenía
+una ventana de siete días de observación de signals que venció el 2026-07-25 y nadie miró.
+**TASK-1255** no tiene retención ni purga de PII —el mismo hueco que 1246 declara.
+
+Tres defectos propios corregidos en el detector, los tres con test falsable (verificado revirtiendo
+la regla): `stale-blocker` disparaba con `Blocked by: none (explicación que nombra al blocker)`;
+`ui-flow-contract` rompía el gate por deuda previa al tocar una task incidentalmente; y un commit
+`fix(docs):` contaba como implementación. NO filtré los `TASK-###` entre paréntesis: medido sobre
+los 31 asuntos con 2+ referencias, arreglaría 6 casos y escondería 8 reales.
+
+**Me equivoqué con TASK-1259 y lo corregí en la misma sesión.** Escribí «no empezada» porque no
+encontré el selector — buscándolo en el repo equivocado. Está construido en
+`efeonce-public-site-runtime` (`27c1468`), sin deploy. Le escribí wireframe y flow retroactivos
+—reales, desde el manual, no stubs— porque estaba `in-progress` con UI y sin contratos declarados.
+
+Quedan 4 con el aviso vivo (1112, 1258, 1259, 1352): son justo aquellas donde nada se puede tildar
+con verdad. Su `Status real` ahora responde el aviso en la primera línea que alguien lee.
+
 ## 2026-09-01 — DataForSEO Improved ETV: contrato documentado, cutover no autorizado
 
 Tres subagentes auditaron documentación oficial, siete consumers y drift de skills. El aviso de cuenta anuncia
@@ -489,35 +519,3 @@ umbral: la señal está diciendo la verdad sobre una pérdida real. Y el Paso 9 
 competidor contigo antes de declarar) necesita ≥5 días de serie → ≈**2026-09-02**.
 
 Estado honesto: **`día 1 verificado; señal converge el 31-ago; candidatos ≈2-sep`**.
-
-## 2026-08-29 (9.º) — TASK-1662 `complete`: el Slice 4 estaba verde en producción y el criterio de cierre documentado era falso
-
-El acople del gap competitivo con la cola priorizada **ya funcionaba** y nadie lo había medido. En el
-snapshot vigente de `seot-berel-mx` (501 items, `incremental-clicks-v2`) el origen `competitor_gap`
-sale `state: ok`, **200 items**, `asOf 2026-08-28`. Verificado fila por fila contra PG: `evidence_ref`
-opaca única (`seo:competitor_gap:seocr-5a4e6783-…`), **cero FK/JOIN** hacia las tablas de cobertura,
-200/200 en banda 3 con verbo `measure`, ranks 257–496 (5.ª precedencia) y **solape 0** con
-`gsc_striking_distance` — la exclusión GSC operando en vivo, no sólo en test.
-
-🔴 **Lo que corrigió esta sesión no es código sino una afirmación falsa en tres documentos.** El Delta
-del día anterior declaraba que el `degraded` de `seot-efeonce-own-brand` se resolvería *"por maduración
-de la serie del top-N"*. El `origin_health_json` real dice otra cosa: *"No hay competidores declarados
-para este sitio"*. Y ese sujeto **no tiene serie top-N en absoluto** (0 días capturados; la única viva
-es la de Berel, con 1 día). Aunque madurara, el descubrimiento **propone** y declarar es humano por
-diseño. Ese `degraded` es el colector diciendo la verdad, y **no madura solo** — un criterio de cierre
-basado en esperar habría esperado para siempre.
-
-**Ventana cerrada, también contra la creencia documentada:** `origin/main:services/ops-worker/deploy.sh`
-ya declara `"false"` (ENABLED) para `ops-seo-competitor-coverage` **y** `ops-seo-work-queue-materialize`
-— lo promovió el release `e1718a359575` (PR #213). El ledger de flags todavía declaraba la ventana
-abierta en tres lugares; retirada la fila de § Pendientes de acción y corregidas las dos filas de flags.
-
-Rollout verificado en vivo (no en el ledger): revisión activa `ops-worker-00621-bx7` con ambos flags
-`true`, los dos schedulers `ENABLED`, migraciones al día. Gates: `vitest src/lib/growth/seo` 764/764,
-sanity `_sanity-task-1662-keyword-gap.ts` **22/22 contra PG real**, `flags:audit --strict` sin flags
-sin registrar.
-
-**Pendiente con dueño (Follow-ups, no bloqueantes):** medir el costo del **segundo** ciclo de cobertura
-antes de subir `GROWTH_SEO_COMPETITORS_PER_TARGET` — el cron es mensual (día 18) y el 18-sep cae en
-ventana de frescura, así que el próximo gasto real es ~octubre; y **ejercitar el `proposalRef` de
-descubrimiento** con la primera declaración nacida de una propuesta (la serie necesita ≥5 días y lleva 1).

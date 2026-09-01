@@ -12,6 +12,17 @@
 
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
+## Delta 2026-09-01 — registro del avance (barrido `stale-progress`)
+
+13 checkboxes en cero con `Status real: Definida`, cuando el motor **esta ON en Production desde el
+2026-07-18** con smoke live verde (bundle 200, render contract arbitrado, forja 403, ingest accepted,
+CTA visible en el reporte Think de prod).
+
+El hallazgo del barrido: **la ventana de siete dias de observacion de signals vencio el 2026-07-25 y
+nadie la miro**. Ese es el unico criterio que sostenia el cierre y no se puede tildar en retrospectiva
+— o se observa la serie ahora y se documenta, o se declara que no hubo observacion. Cualquiera de las
+dos es honesta; tildarlo no.
+
 ## Status
 
 - Lifecycle: `in-progress`
@@ -349,9 +360,9 @@ Reglas obligatorias:
 - [ ] WordPress y Think renderizan el mismo CTA/contrato sin lógica ni copy duplicados.
 - [ ] Queda evidencia baseline mirada de anatomía, appearances, responsive container, focus y form-open en ambos hosts para la comparación de TASK-1429/1431.
 - [ ] CTA→Growth Form funciona con teclado, Escape/focus restore y sin overflow en 1440/390.
-- [ ] Render/event ingest y rechazo de credencial inválida se verifican productivamente.
+- [x] Render/event ingest y rechazo de credencial invalida verificados productivamente. **Verificado 2026-09-01 contra el ledger:** smoke live del 2026-07-18 con `GROWTH_CTA_ENGINE_ENABLED` Production ON — bundle 200, render contract arbitrado, **forja 403**, ingest accepted, CTA visible en el reporte Think de produccion.
 - [ ] `greenhouse_cta_viewed` se observa en `dataLayer`, request `/g/collect` consentido y GA4 realtime/readback.
-- [ ] Signals `growth.cta.*` permanecen steady o tienen findings resueltos/documentados durante siete días.
+- [ ] Signals `growth.cta.*` steady durante siete dias. **LA VENTANA YA PASO Y NADIE LA MIRO.** El deploy productivo fue el 2026-07-18 (`GROWTH_CTA_ENGINE_ENABLED` Production ON, smoke live verde); los siete dias vencieron el 2026-07-25, hace mas de cinco semanas. No hay registro del corte. Verificado 2026-09-01: no se puede tildar retroactivamente lo que nadie observo.
 - [ ] Task/epic/docs/manual/tracking plan/flag ledger/Handoff coinciden con el runtime.
 - [ ] `pnpm task:lint --task TASK-1427` y gates UI pasan sin findings.
 

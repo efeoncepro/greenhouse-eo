@@ -13,23 +13,26 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
-## Delta 2026-09-01 — falso positivo del barrido, y vale la pena que quede escrito
+## Delta 2026-09-01 — registro del avance (barrido `stale-progress`), con una correccion mia
 
-`stale-progress` la marco como «tiene commits de implementacion y cero checkboxes». **Es un falso
-positivo y lo verifique**: el unico commit que la nombra es `5746e4908`, cuyo asunto es
-`feat(growth): TASK-1258 — catalogo externo gobernado + auth per-site (precondicion TASK-1259)`.
-La menciona como precondicion; no implementa nada suyo.
+**Primera lectura EQUIVOCADA, corregida en la misma sesion.** Concluí «no empezada» porque no
+encontré selector ni widget Elementor en este repo. El error fue mio: **busqué en el repo
+equivocado**. El commit `66b6bacfa` («intake + selector WordPress construido») dice explicitamente
+que el **selector Elementor desde el catalogo de `TASK-1258` se construyo en el repo del runtime
+WordPress (commit `27c1468`), sin deploy**. Ausencia de codigo aca no es evidencia de que no exista.
 
-**Estado real: no empezada.** No existe selector de formularios en WordPress, ni widget Elementor,
-ni el enqueue de handle unico. Los 16 checkboxes en cero son correctos.
+Estado real verificado: el selector Elementor **existe** en el runtime repo y no esta desplegado. El
+manual `docs/manual-de-uso/growth/incrustar-formulario-wordpress-astro.md` ya documenta el flujo de
+seleccion + config de constantes. Pendiente: **deploy Kinsta + rollout prod del catalogo + Gutenberg
++ GVC**.
 
-Se dejo la regla como esta a proposito: medido sobre los 31 asuntos del repo con 2+ referencias,
-filtrar los parentesis arreglaria 6 casos como este pero esconderia 8 donde el parentesis SI declara
-trabajo (`Slice 2 of TASK-642`, `TASK-587 Fase B`, `cierra TASK-260`). Un falso negativo esconde
-trabajo real; este falso positivo solo costo una verificacion.
+Ningun criterio se tilda: los suyos piden comportamiento renderizado (mismo form/version entre
+shortcode/block y widget, enqueue de handle unico sin duplicar scripts, estados
+empty/error/unpublished, evidencia GVC desktop/mobile) y **nada esta desplegado**.
 
-**Dependencia viva:** `TASK-1258` entrego el catalogo + auth per-site que esta task consume, pero NO
-su control plane de migracion.
+Nota sobre el detector: `stale-progress` no ve el otro repo, asi que su aviso aca se apoyaba en un
+commit de `TASK-1258`. El aviso resulto util igual — me hizo mirar, y mirar destapo que el trabajo
+existe en otra parte.
 
 ## Status
 
@@ -40,9 +43,12 @@ su control plane de migracion.
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
+- UI ready: `no`
+- Wireframe: `docs/ui/wireframes/TASK-1259-wordpress-greenhouse-form-selector-embed-ux.md`
+- Flow: `docs/ui/flows/TASK-1259-wordpress-greenhouse-form-selector-embed-ux-flow.md`
 - Backend impact: `none`
 - Epic: `EPIC-040`
-- Status real: `NO EMPEZADA (verificado 2026-09-01). El aviso de stale-progress es un FALSO POSITIVO: el unico commit que la nombra es 5746e4908, de TASK-1258, que la cita como precondicion. No hay selector WP, ni widget Elementor, ni enqueue de handle unico. Los checkboxes en cero son correctos; ver el Delta`
+- Status real: `Selector Elementor CONSTRUIDO en el repo del runtime WordPress (commit 27c1468), SIN deploy — verificado 2026-09-01 via el commit 66b6bacfa. Pendiente: deploy Kinsta + rollout prod del catalogo + Gutenberg + GVC. Los checkboxes en cero son correctos: piden comportamiento renderizado y nada esta desplegado`
 - Rank: `TBD`
 - Domain: `growth|public-site|wordpress|ui`
 - Blocked by: `TASK-1258`

@@ -14,6 +14,17 @@ blocker vigente por `NexaChatProvider`/streaming.
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-01 — registro del avance (barrido `stale-progress`)
+
+21 checkboxes en cero con `Status real: Diseno`. Verificado hoy: el unico commit propio es
+`ab8f453f6` («turno de chat con procedencia compacta + answer limpio»), que aterriza **una parte**
+de la unificacion, no un criterio de aceptacion completo. **Ningun criterio se puede tildar todavia**:
+todos hablan de comportamiento con `NEXA_CHAT_STREAMING_ENABLED` ON, de paridad byte-for-byte con
+ambos flags OFF, o del `ConversationalEvidencePacket` — y ninguno de esos fue ejercitado.
+
+Lo que SI cambio hoy y estaba mal: esta task declaraba una regla dura de coordinacion serial con
+`TASK-1078` «(in-progress)». `TASK-1078` cerro el 2026-09-01, asi que ese bloqueo ya no existe.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -22,7 +33,7 @@ blocker vigente por `NexaChatProvider`/streaming.
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Diseno, con UNA pieza ya en codigo (commit ab8f453f6: turno de chat con procedencia compacta + answer limpio). Verificado 2026-09-01: ningun criterio de aceptacion se puede tildar todavia — todos piden comportamiento con NEXA_CHAT_STREAMING_ENABLED ON o paridad con ambos flags OFF, y no fueron ejercitados. Ver el Delta`
 - Rank: `TBD`
 - Domain: `ui|platform|nexa|ai|content`
 - Blocked by: `TASK-1101`

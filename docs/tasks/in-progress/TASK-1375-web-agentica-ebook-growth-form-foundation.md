@@ -4,6 +4,19 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-01 — registro del avance (barrido `stale-progress`)
+
+23 checkboxes en cero con `Status real: Diseno`, teniendo **6 slices** (A1-A3 + B1-B4) en la
+historia: `greenhouse_growth.form_asset`, ruta gated de descarga, handoff en el renderer, script de
+subida al bucket privado, publisher idempotente y email de respaldo.
+
+**Lo que falta NO es codigo: es un smoke humano.** El flag esta ON en el ops-worker de produccion,
+pero el flujo completo (submit real -> email con el link gated) nunca se ejercito despues del
+arreglo. Y esta task es el caso fuente de una leccion cara: el primer flip del 2026-07-09 se hizo
+solo con `--update-env-vars` y la revision `00473` lo BORRO (`deploy.sh` usa `--set-env-vars`
+destructivo); el consumer reactivo registro `skip: flag OFF` en la primera submission real y **el
+email nunca salio, mientras la success card se lo prometia al usuario**.
+
 ## Status
 
 - Lifecycle: `in-progress`
@@ -160,12 +173,12 @@ Reglas obligatorias:
 - [ ] Source of truth (`greenhouse_growth.*` + HubSpot), contract surface (`form_key`/render contract/submit/dispatch) y consumers (landing/Nexa/HubSpot) nombrados con paths reales.
 - [ ] Invariantes (leak boundary, no destination para el ebook, at-most-once HubSpot) y boundary de acceso (CORS por surface) explícitos.
 - [ ] Posture de migración/rollback explícito (seed additive; deprecate + quitar origin).
-- [ ] Evidencia runtime: render contract sin leak, submit fail-closed, entrega HubSpot + entrega del ebook probadas en vivo.
+- [ ] Evidencia runtime: entrega del ebook probada en vivo. **NO — el ledger declara `smoke humano pendiente` (submit real en `think.efeoncepro.com`). El flag `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED` esta ON en el ops-worker de produccion desde 2026-07-10 (rev `ops-worker-00474-jrf`, declarado en `deploy.sh`), pero nadie ejercito el flujo completo despues del arreglo.**
 - [ ] Sin leaks de PII/secrets; errores canónicos; fila en TRACKING-PLAN.
 
 ### Capability Definition of Done — Full API Parity gate
 
-- [ ] La lógica del form vive en el contrato gobernado (`greenhouse_growth.*` + `src/lib/growth/forms/**`), no en la landing.
+- [x] Logica en el contrato gobernado, no en la landing. **Verificado 2026-09-01:** migracion `20260709190000000_task-1375-growth-form-asset.sql` (`greenhouse_growth.form_asset`, asset server-only por form) + publisher config-driven idempotente.
 - [ ] Read = render contract canónico; write = `submitForm` gobernado (consent, captcha, rate-limit, PII, outbox).
 - [ ] Capabilities de autoría existentes; si nace un consumer reactivo o capability, grant a rol real en el mismo PR.
 - [ ] Camino programático: la landing, Nexa y cualquier host operan el form por el `form_key` (un primitive, muchos consumers).

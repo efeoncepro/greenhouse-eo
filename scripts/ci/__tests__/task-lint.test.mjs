@@ -1756,6 +1756,38 @@ const cases = [
     }
   },
   {
+    // Un commit de scope `docs` no construye nada: reconciliar el backlog o corregir una
+    // atribucion no es implementacion, aunque el tipo sea fix/feat. Caso fuente TASK-1779.
+    name: 'stale-progress: un commit fix(docs) no cuenta como implementacion',
+    run: () => {
+      const root = createRepo()
+
+      write(
+        join(root, 'docs', 'tasks', 'to-do', 'TASK-996-docs-only.md'),
+        withModularPlacementContract(taskFixture({ id: 'TASK-996' }))
+      )
+
+      execFileSync('git', ['init', '--quiet'], { cwd: root, stdio: 'ignore' })
+      execFileSync('git', ['config', 'user.email', 'a@b.c'], { cwd: root, stdio: 'ignore' })
+      execFileSync('git', ['config', 'user.name', 'test'], { cwd: root, stdio: 'ignore' })
+      execFileSync('git', ['add', '-A'], { cwd: root, stdio: 'ignore' })
+      execFileSync(
+        'git',
+        ['commit', '-q', '--no-verify', '-m', 'fix(docs): reconciliar el backlog y TASK-996 para la memoria'],
+        { cwd: root, stdio: 'ignore' }
+      )
+
+      const result = lintTasks({ repoRoot: root, options: { task: 'TASK-996' } })
+
+      assert.equal(
+        [...result.errors, ...result.warnings].filter(item => item.rule === 'stale-progress').length,
+        0
+      )
+
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
     // `none` seguido de la explicacion de POR QUE se desbloqueo — que normalmente NOMBRA a los
     // blockers ya cerrados. Exigir que la nota omita los IDs para no disparar el guard destruiria
     // justo el contexto util. El valor del campo es `none`: no esta bloqueada.

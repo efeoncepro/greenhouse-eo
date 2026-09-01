@@ -61,6 +61,15 @@ las DOS modalidades vigentes:
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-01 — registro del avance (barrido `stale-progress`)
+
+18 checkboxes en cero, aunque el `Status real` ya era honesto y detallado. Registrado donde se lee:
+**Slice 1 (backend `focusRef`) VIVO en produccion**, verificado contra el repo.
+
+**Slice 2 sigue ROTO** y no se tilda nada suyo: el listener del evento no lee `detail`, asi que
+`focusRef` y `seedPrompt` se pierden — regresion del retiro del panel dock (`e1662f3b3`), registrada
+como `ISSUE-166`.
+
 ## Status
 
 - Lifecycle: `in-progress`
@@ -377,7 +386,7 @@ N/A — repo-only change.
 
 ## Acceptance Criteria
 
-- [ ] `NexaRuntimeContext` tiene `focusRef?` opcional; `/api/home/nexa` lo acepta y lo setea.
+- [x] `NexaRuntimeContext` con `focusRef?` opcional; `/api/home/nexa` lo acepta. **Verificado 2026-09-01:** `src/lib/nexa/insight-focus.ts` + su test + `src/app/api/home/nexa/route.ts`. Slice 1 VIVO en produccion.
 - [ ] `NexaService` pre-resuelve el insight enfocado con el reader anti-oracle (subject del turno) y ancla la respuesta; no resoluble → procede sin ancla (honesto).
 - [ ] El CTA en `NexaInsightDetailView` abre el chat flotante enfocado vía `NEXA_FLOATING_OPEN_EVENT` con `seedPrompt` + `focusRef`.
 - [ ] `focusRef` NO amplía acceso (test multi-persona: client/colaborador ajeno → sin ancla).
