@@ -427,9 +427,11 @@ El rango de planificación queda CLP 194.503–217.228 hasta contar con Billing 
   La ejecución live de Producer a las 23:04Z leyó CLP 1.614,51 netos en la ventana previa, pero devolvió
   `status=awaiting_billing_export`, `confirmedSavings=null`: el export seguía en 13:00Z y no fabricó ahorro desde
   un after vacío.
-- Corte de observación Producer a las 22:50Z: 24 ejecuciones posteriores al cambio, 24 completadas y cero
+- Corte de observación Producer a las 23:05Z: 27 ejecuciones posteriores al cambio, 27 completadas y cero
   fallidas; `queueOldestAgeSeconds`, edad de promotion queue, retry storm, intentos terminales y divergencias
-  permanecieron en 0. La ventana lleva 1 h 55 min y por eso no autoriza todavía el apply de Media.
+  permanecieron en 0. Cloud Scheduler vive en `southamerica-east1` y el Cloud Run Job en
+  `southamerica-west1`; el readback debe consultar cada superficie en su región. La ventana lleva 2 h 10 min
+  y por eso no autoriza todavía el apply de Media.
 
 ## Rollout Plan & Risk Matrix
 
