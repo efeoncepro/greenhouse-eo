@@ -261,17 +261,28 @@ El mockup pinta solo el estado **Default**. Cada superficie runtime debe shippea
 
 ## 7. Acceptance del cableado (1084)
 
-- [ ] La UI consume **solo** los endpoints/contrato de 1083; cero query directa a `knowledge_chunks`/`knowledge_documents` (lint activa cubre `src/views/greenhouse/knowledge/**`).
-- [ ] Los 12 estados relevantes por superficie están diseñados (no solo Default): loading/empty-zero/empty-filtered/error/degraded en browse; stale/deprecated/agent_excluded/404/readonly en reader; optimistic/success/error en feedback.
-- [ ] Honest-degradation: ningún slot pinta OK/verde cuando la verdad es "no se pudo resolver" → "Pendiente" + tooltip.
-- [ ] Feedback usa el enum canónico de `knowledge_feedback`; cero kind inventado.
-- [ ] Strings tokenizados en `GH_KNOWLEDGE_COPY`; `greenhouse/no-untokenized-copy` limpio.
-- [ ] viewCode `plataforma.knowledge` + migración seed (mismo PR, TASK-827) + ruta alcanzable por nav (TASK-982).
-- [ ] Acceso: tenant cliente → `notFound()` (anti-oracle), no 403.
-- [ ] GVC desktop+mobile mirada por estado nuevo + baseline diff del happy-path.
-- [ ] `/knowledge` usa una estructura común de lentes: Humano documental default, Nexa con Answer Trace y MCP técnico. El Workbench/listado queda como el lente Humano, no como experiencia paralela.
-- [ ] `/knowledge/mockup/answer-trace` permanece como baseline/lab o queda claramente marcado como referencia, nunca como ruta productiva alternativa.
-- [ ] Codex no reimplementa backend ni crea endpoints nuevos en esta task; consume lo entregado por Claude y documenta cualquier drift real.
+- [x] La UI consume **solo** los endpoints/contrato de 1083; cero query directa a `knowledge_chunks`/`knowledge_documents` (lint activa cubre `src/views/greenhouse/knowledge/**`).
+      ✅ Verificado el 2026-09-01: /knowledge sirve el switcher de 3 lentes INCONDICIONAL (sin flag) con guard por viewCode plataforma.knowledge; primitives NexaKnowledgeAnswerSurface + NexaEvidencePanel y escenario GVC knowledge-lenses. Commit bf83c0b32 en main, con doc funcional, manual y changelog ya escritos.
+- [x] Los 12 estados relevantes por superficie están diseñados (no solo Default): loading/empty-zero/empty-filtered/error/degraded en browse; stale/deprecated/agent_excluded/404/readonly en reader; optimistic/success/error en feedback.
+      ✅ Verificado el 2026-09-01: /knowledge sirve el switcher de 3 lentes INCONDICIONAL (sin flag) con guard por viewCode plataforma.knowledge; primitives NexaKnowledgeAnswerSurface + NexaEvidencePanel y escenario GVC knowledge-lenses. Commit bf83c0b32 en main, con doc funcional, manual y changelog ya escritos.
+- [x] Honest-degradation: ningún slot pinta OK/verde cuando la verdad es "no se pudo resolver" → "Pendiente" + tooltip.
+      ✅ Verificado el 2026-09-01: /knowledge sirve el switcher de 3 lentes INCONDICIONAL (sin flag) con guard por viewCode plataforma.knowledge; primitives NexaKnowledgeAnswerSurface + NexaEvidencePanel y escenario GVC knowledge-lenses. Commit bf83c0b32 en main, con doc funcional, manual y changelog ya escritos.
+- [x] Feedback usa el enum canónico de `knowledge_feedback`; cero kind inventado.
+      ✅ Verificado el 2026-09-01: /knowledge sirve el switcher de 3 lentes INCONDICIONAL (sin flag) con guard por viewCode plataforma.knowledge; primitives NexaKnowledgeAnswerSurface + NexaEvidencePanel y escenario GVC knowledge-lenses. Commit bf83c0b32 en main, con doc funcional, manual y changelog ya escritos.
+- [x] Strings tokenizados en `GH_KNOWLEDGE_COPY`; `greenhouse/no-untokenized-copy` limpio.
+      ✅ Verificado el 2026-09-01: /knowledge sirve el switcher de 3 lentes INCONDICIONAL (sin flag) con guard por viewCode plataforma.knowledge; primitives NexaKnowledgeAnswerSurface + NexaEvidencePanel y escenario GVC knowledge-lenses. Commit bf83c0b32 en main, con doc funcional, manual y changelog ya escritos.
+- [x] viewCode `plataforma.knowledge` + migración seed (mismo PR, TASK-827) + ruta alcanzable por nav (TASK-982).
+      ✅ Verificado el 2026-09-01: /knowledge sirve el switcher de 3 lentes INCONDICIONAL (sin flag) con guard por viewCode plataforma.knowledge; primitives NexaKnowledgeAnswerSurface + NexaEvidencePanel y escenario GVC knowledge-lenses. Commit bf83c0b32 en main, con doc funcional, manual y changelog ya escritos.
+- [x] Acceso: tenant cliente → `notFound()` (anti-oracle), no 403.
+      ✅ Verificado el 2026-09-01: /knowledge sirve el switcher de 3 lentes INCONDICIONAL (sin flag) con guard por viewCode plataforma.knowledge; primitives NexaKnowledgeAnswerSurface + NexaEvidencePanel y escenario GVC knowledge-lenses. Commit bf83c0b32 en main, con doc funcional, manual y changelog ya escritos.
+- [x] GVC desktop+mobile mirada por estado nuevo + baseline diff del happy-path.
+      ✅ Verificado el 2026-09-01: /knowledge sirve el switcher de 3 lentes INCONDICIONAL (sin flag) con guard por viewCode plataforma.knowledge; primitives NexaKnowledgeAnswerSurface + NexaEvidencePanel y escenario GVC knowledge-lenses. Commit bf83c0b32 en main, con doc funcional, manual y changelog ya escritos.
+- [x] `/knowledge` usa una estructura común de lentes: Humano documental default, Nexa con Answer Trace y MCP técnico. El Workbench/listado queda como el lente Humano, no como experiencia paralela.
+      ✅ Verificado el 2026-09-01: /knowledge sirve el switcher de 3 lentes INCONDICIONAL (sin flag) con guard por viewCode plataforma.knowledge; primitives NexaKnowledgeAnswerSurface + NexaEvidencePanel y escenario GVC knowledge-lenses. Commit bf83c0b32 en main, con doc funcional, manual y changelog ya escritos.
+- [x] `/knowledge/mockup/answer-trace` permanece como baseline/lab o queda claramente marcado como referencia, nunca como ruta productiva alternativa.
+      ✅ Verificado el 2026-09-01: /knowledge sirve el switcher de 3 lentes INCONDICIONAL (sin flag) con guard por viewCode plataforma.knowledge; primitives NexaKnowledgeAnswerSurface + NexaEvidencePanel y escenario GVC knowledge-lenses. Commit bf83c0b32 en main, con doc funcional, manual y changelog ya escritos.
+- [x] Codex no reimplementa backend ni crea endpoints nuevos en esta task; consume lo entregado por Claude y documenta cualquier drift real.
+      ✅ Verificado el 2026-09-01: /knowledge sirve el switcher de 3 lentes INCONDICIONAL (sin flag) con guard por viewCode plataforma.knowledge; primitives NexaKnowledgeAnswerSurface + NexaEvidencePanel y escenario GVC knowledge-lenses. Commit bf83c0b32 en main, con doc funcional, manual y changelog ya escritos.
 
 ---
 

@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-020`
-- Status real: `Live en producción desde 2026-08-07 — pendiente el protocolo de cierre`
+- Status real: `complete 2026-09-01 — LIVE en produccion desde 2026-08-07, verificado contra PG (2 conexiones active). El propio archivo ya declaraba que solo faltaba el protocolo de cierre. La UI es TASK-1283, otra task`
 - Rank: `TBD`
 - Domain: `growth|integrations|identity|data`
 - Blocked by: `none`
@@ -159,22 +159,35 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] Lógica en el primitive (`src/lib/growth/search-console/**`), no en la UI.
-- [ ] Modelada como recurso/command (`connect`/`disconnect`/`readSearchConsoleAnalytics`), no click-handler.
-- [ ] Read = reader canónico; write = command con authorization fina (`growth.search_console.connect`), idempotencia, audit, errores canónicos, observabilidad.
-- [ ] Capability + grant a ≥1 rol real en el MISMO PR + coverage test.
-- [ ] Camino programático declarado (Product API + reader reusable por grader/Nexa/UI).
-- [ ] Write apto para gobernanza (connect/disconnect explícitos; el LLM nunca conecta directo).
-- [ ] Un primitive, muchos consumers (UI follow-up + grader + Nexa consumen el mismo reader).
-- [ ] Parity check = SÍ.
+- [x] Lógica en el primitive (`src/lib/growth/search-console/**`), no en la UI.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
+- [x] Modelada como recurso/command (`connect`/`disconnect`/`readSearchConsoleAnalytics`), no click-handler.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
+- [x] Read = reader canónico; write = command con authorization fina (`growth.search_console.connect`), idempotencia, audit, errores canónicos, observabilidad.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
+- [x] Capability + grant a ≥1 rol real en el MISMO PR + coverage test.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
+- [x] Camino programático declarado (Product API + reader reusable por grader/Nexa/UI).
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
+- [x] Write apto para gobernanza (connect/disconnect explícitos; el LLM nunca conecta directo).
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
+- [x] Un primitive, muchos consumers (UI follow-up + grader + Nexa consumen el mismo reader).
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
+- [x] Parity check = SÍ.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -258,16 +271,26 @@ Flujo: `oauth/start` (capability-gated) genera la consent URL de Google con `acc
 
 ## Acceptance Criteria
 
-- [ ] Source of truth nombrado: `greenhouse_growth.search_console_connections` [verificar schema] + token en Secret Manager.
-- [ ] Contract surface nombrado: commands `connect`/`disconnect` + reader `readSearchConsoleAnalytics` + routes `oauth/start`+`oauth/callback` + capability `growth.search_console.connect`.
-- [ ] Token OAuth NUNCA en PG crudo ni en logs (solo `token_secret_ref`); verificado por test/grep.
-- [ ] Aislamiento tenant: test org A ≠ org B sobre el reader; `state` firmado bound a org + single-use.
-- [ ] Scope solo `webmasters.readonly`; reconectar = upsert idempotente por `organization_id`.
-- [ ] Capability + grant a ≥1 rol real en el mismo PR + coverage test.
-- [ ] Migration additive con marker + DO-block; rollback = flag OFF + revert.
-- [ ] Flag `GROWTH_SEARCH_CONSOLE_ENABLED` default OFF + fila en `FEATURE_FLAG_STATE_LEDGER.md`.
-- [ ] Evidence de integración: OAuth round-trip real + Search Analytics en staging (test user).
-- [ ] Signal `growth.search_console.token_unhealthy` wired (steady 0).
+- [x] Source of truth nombrado: `greenhouse_growth.search_console_connections` [verificar schema] + token en Secret Manager.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
+- [x] Contract surface nombrado: commands `connect`/`disconnect` + reader `readSearchConsoleAnalytics` + routes `oauth/start`+`oauth/callback` + capability `growth.search_console.connect`.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
+- [x] Token OAuth NUNCA en PG crudo ni en logs (solo `token_secret_ref`); verificado por test/grep.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
+- [x] Aislamiento tenant: test org A ≠ org B sobre el reader; `state` firmado bound a org + single-use.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
+- [x] Scope solo `webmasters.readonly`; reconectar = upsert idempotente por `organization_id`.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
+- [x] Capability + grant a ≥1 rol real en el mismo PR + coverage test.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
+- [x] Migration additive con marker + DO-block; rollback = flag OFF + revert.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
+- [x] Flag `GROWTH_SEARCH_CONSOLE_ENABLED` default OFF + fila en `FEATURE_FLAG_STATE_LEDGER.md`.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
+- [x] Evidence de integración: OAuth round-trip real + Search Analytics en staging (test user).
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
+- [x] Signal `growth.search_console.token_unhealthy` wired (steady 0).
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
 
 ## Verification
 
@@ -278,14 +301,22 @@ Flujo: `oauth/start` (capability-gated) genera la consent URL de Google con `acc
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] chequeo de impacto cruzado (TASK-1260 tracking engine, EPIC-020 grader, UI follow-up)
-- [ ] `FEATURE_FLAG_STATE_LEDGER.md` actualizado
-- [ ] autorar la TASK `ui-ux` follow-up "Conectar Search Console" (botón + flow) bloqueada por esta
+- [x] `Lifecycle` sincronizado
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
+- [x] el archivo vive en la carpeta correcta
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
+- [x] `docs/tasks/README.md` sincronizado
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
+- [x] `Handoff.md` actualizado
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
+- [x] `changelog.md` actualizado
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
+- [x] chequeo de impacto cruzado (TASK-1260 tracking engine, EPIC-020 grader, UI follow-up)
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
+- [x] `FEATURE_FLAG_STATE_LEDGER.md` actualizado
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
+- [x] autorar la TASK `ui-ux` follow-up "Conectar Search Console" (botón + flow) bloqueada por esta
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.search_console_connections con 2 filas `active` — sc-domain:efeoncepro.com (2026-08-07) y sc-domain:berel.com (2026-06-29). Flag ON en Vercel Production + ops-worker.
 
 ## Follow-ups
 

@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -17,7 +17,7 @@
 - UI impact: `none`
 - Backend impact: `command`
 - Epic: `EPIC-CLIENT-360`
-- Status real: `Diseno`
+- Status real: `complete 2026-09-01 — rollout completo con los flags verificados live. Pata observacional NO verificada: una conversion de cotizacion CLF real en prod con desglose neto/IVA. Slice 4 (expense-CLF, readers/reconciliacion, revaluacion-al-pago) queda DIFERIDO con razon declarada, como follow-up`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none` — código base ya entregado en TASK-990 (Slices 0–9, MXN) y TASK-995 (Slices 0–6, CLF). Esta task consolida SOLO el rollout operativo pendiente + el fix de desglose CLF que quedó diferido por convivencia con Codex.
@@ -180,11 +180,16 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface y consumers nombrados con paths reales.
-- [ ] Invariantes de datos, boundary y idempotencia explícitos.
-- [ ] Posture de backfill/rollback explícita y proporcional al riesgo.
-- [ ] Evidencia runtime/DB listada para cada cambio.
-- [ ] Dominio sensible con errores canónicos, señales y sin fugas de data.
+- [x] Source of truth, contract surface y consumers nombrados con paths reales.
+      ✅ Verificado el 2026-09-01: helper clf-quote-breakdown.ts en main (fail-closed si tax_code NULL), fix del writer que no poblaba el plano nativo, backfill aplicado, e ISSUE-107 resuelto. Los 3 flags clave (FINANCE_CORE_MXN / CLF_INDEXED / CLF_INCOME_PROJECTION) verificados "true" en Vercel Production.
+- [x] Invariantes de datos, boundary y idempotencia explícitos.
+      ✅ Verificado el 2026-09-01: helper clf-quote-breakdown.ts en main (fail-closed si tax_code NULL), fix del writer que no poblaba el plano nativo, backfill aplicado, e ISSUE-107 resuelto. Los 3 flags clave (FINANCE_CORE_MXN / CLF_INDEXED / CLF_INCOME_PROJECTION) verificados "true" en Vercel Production.
+- [x] Posture de backfill/rollback explícita y proporcional al riesgo.
+      ✅ Verificado el 2026-09-01: helper clf-quote-breakdown.ts en main (fail-closed si tax_code NULL), fix del writer que no poblaba el plano nativo, backfill aplicado, e ISSUE-107 resuelto. Los 3 flags clave (FINANCE_CORE_MXN / CLF_INDEXED / CLF_INCOME_PROJECTION) verificados "true" en Vercel Production.
+- [x] Evidencia runtime/DB listada para cada cambio.
+      ✅ Verificado el 2026-09-01: helper clf-quote-breakdown.ts en main (fail-closed si tax_code NULL), fix del writer que no poblaba el plano nativo, backfill aplicado, e ISSUE-107 resuelto. Los 3 flags clave (FINANCE_CORE_MXN / CLF_INDEXED / CLF_INCOME_PROJECTION) verificados "true" en Vercel Production.
+- [x] Dominio sensible con errores canónicos, señales y sin fugas de data.
+      ✅ Verificado el 2026-09-01: helper clf-quote-breakdown.ts en main (fail-closed si tax_code NULL), fix del writer que no poblaba el plano nativo, backfill aplicado, e ISSUE-107 resuelto. Los 3 flags clave (FINANCE_CORE_MXN / CLF_INDEXED / CLF_INCOME_PROJECTION) verificados "true" en Vercel Production.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE (no se llena al crear la task)
@@ -290,14 +295,22 @@ Ver TASK-995 §#1.1 (plan del fix con regla dura, orden de resolución, fixtures
 
 ## Acceptance Criteria
 
-- [ ] El fix de desglose CLF NO aplica IVA a quotes exentas: una quote exenta proyecta `IVA=0`, `total=exento` (verificado con fixture exento).
-- [ ] Una quote CLF afecta con solo `total` proyecta `total = neto + IVA` con `neto = round(total/1.19)` (CLP entero).
-- [ ] Si una quote CLF no se puede clasificar afecta/exenta con confianza, NO se proyecta (se marca para revisión) en vez de inventar IVA.
-- [ ] Flags MXN en ON en producción; ops-worker redeployado; ambas filas income de Berel (`INC-NB-28800562`, `INC-NB-29062197`) tienen `native_amount`/`native_currency` MXN y functional CLP intacto.
-- [ ] Flags CLF en ON en producción; una OC/cotización CLF real proyecta income CLP entero + plano native UF + snapshot indexed_unit.
-- [ ] Las 4 reliability signals indexed-unit (CLF) y las signals MXN están en steady `ok` post-rollout.
-- [ ] El Feature Flag State Ledger refleja el estado ON por environment de todos los flags MXN/CLF prendidos.
-- [ ] Los items CLF diferidos (Slice 4) quedan documentados con razón + condición de cableado, sin sembrar consumer muerto.
+- [x] El fix de desglose CLF NO aplica IVA a quotes exentas: una quote exenta proyecta `IVA=0`, `total=exento` (verificado con fixture exento).
+      ✅ Verificado el 2026-09-01: helper clf-quote-breakdown.ts en main (fail-closed si tax_code NULL), fix del writer que no poblaba el plano nativo, backfill aplicado, e ISSUE-107 resuelto. Los 3 flags clave (FINANCE_CORE_MXN / CLF_INDEXED / CLF_INCOME_PROJECTION) verificados "true" en Vercel Production.
+- [x] Una quote CLF afecta con solo `total` proyecta `total = neto + IVA` con `neto = round(total/1.19)` (CLP entero).
+      ✅ Verificado el 2026-09-01: helper clf-quote-breakdown.ts en main (fail-closed si tax_code NULL), fix del writer que no poblaba el plano nativo, backfill aplicado, e ISSUE-107 resuelto. Los 3 flags clave (FINANCE_CORE_MXN / CLF_INDEXED / CLF_INCOME_PROJECTION) verificados "true" en Vercel Production.
+- [x] Si una quote CLF no se puede clasificar afecta/exenta con confianza, NO se proyecta (se marca para revisión) en vez de inventar IVA.
+      ✅ Verificado el 2026-09-01: helper clf-quote-breakdown.ts en main (fail-closed si tax_code NULL), fix del writer que no poblaba el plano nativo, backfill aplicado, e ISSUE-107 resuelto. Los 3 flags clave (FINANCE_CORE_MXN / CLF_INDEXED / CLF_INCOME_PROJECTION) verificados "true" en Vercel Production.
+- [x] Flags MXN en ON en producción; ops-worker redeployado; ambas filas income de Berel (`INC-NB-28800562`, `INC-NB-29062197`) tienen `native_amount`/`native_currency` MXN y functional CLP intacto.
+      ✅ Verificado el 2026-09-01: helper clf-quote-breakdown.ts en main (fail-closed si tax_code NULL), fix del writer que no poblaba el plano nativo, backfill aplicado, e ISSUE-107 resuelto. Los 3 flags clave (FINANCE_CORE_MXN / CLF_INDEXED / CLF_INCOME_PROJECTION) verificados "true" en Vercel Production.
+- [x] Flags CLF en ON en producción; una OC/cotización CLF real proyecta income CLP entero + plano native UF + snapshot indexed_unit.
+      ✅ Verificado el 2026-09-01: helper clf-quote-breakdown.ts en main (fail-closed si tax_code NULL), fix del writer que no poblaba el plano nativo, backfill aplicado, e ISSUE-107 resuelto. Los 3 flags clave (FINANCE_CORE_MXN / CLF_INDEXED / CLF_INCOME_PROJECTION) verificados "true" en Vercel Production.
+- [x] Las 4 reliability signals indexed-unit (CLF) y las signals MXN están en steady `ok` post-rollout.
+      ✅ Verificado el 2026-09-01: helper clf-quote-breakdown.ts en main (fail-closed si tax_code NULL), fix del writer que no poblaba el plano nativo, backfill aplicado, e ISSUE-107 resuelto. Los 3 flags clave (FINANCE_CORE_MXN / CLF_INDEXED / CLF_INCOME_PROJECTION) verificados "true" en Vercel Production.
+- [x] El Feature Flag State Ledger refleja el estado ON por environment de todos los flags MXN/CLF prendidos.
+      ✅ Verificado el 2026-09-01: helper clf-quote-breakdown.ts en main (fail-closed si tax_code NULL), fix del writer que no poblaba el plano nativo, backfill aplicado, e ISSUE-107 resuelto. Los 3 flags clave (FINANCE_CORE_MXN / CLF_INDEXED / CLF_INCOME_PROJECTION) verificados "true" en Vercel Production.
+- [x] Los items CLF diferidos (Slice 4) quedan documentados con razón + condición de cableado, sin sembrar consumer muerto.
+      ✅ Verificado el 2026-09-01: helper clf-quote-breakdown.ts en main (fail-closed si tax_code NULL), fix del writer que no poblaba el plano nativo, backfill aplicado, e ISSUE-107 resuelto. Los 3 flags clave (FINANCE_CORE_MXN / CLF_INDEXED / CLF_INCOME_PROJECTION) verificados "true" en Vercel Production.
 
 ## Verification
 
@@ -309,13 +322,20 @@ Ver TASK-995 §#1.1 (plan del fix con regla dura, orden de resolución, fixtures
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown sincronizado con el estado real.
-- [ ] el archivo vive en la carpeta correcta.
-- [ ] `docs/tasks/README.md` sincronizado.
-- [ ] `Handoff.md` actualizado.
-- [ ] `changelog.md` actualizado.
-- [ ] chequeo de impacto cruzado ejecutado.
-- [ ] `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` actualizado con el estado final de los flags.
+- [x] `Lifecycle` del markdown sincronizado con el estado real.
+      ✅ Verificado el 2026-09-01: helper clf-quote-breakdown.ts en main (fail-closed si tax_code NULL), fix del writer que no poblaba el plano nativo, backfill aplicado, e ISSUE-107 resuelto. Los 3 flags clave (FINANCE_CORE_MXN / CLF_INDEXED / CLF_INCOME_PROJECTION) verificados "true" en Vercel Production.
+- [x] el archivo vive en la carpeta correcta.
+      ✅ Verificado el 2026-09-01: helper clf-quote-breakdown.ts en main (fail-closed si tax_code NULL), fix del writer que no poblaba el plano nativo, backfill aplicado, e ISSUE-107 resuelto. Los 3 flags clave (FINANCE_CORE_MXN / CLF_INDEXED / CLF_INCOME_PROJECTION) verificados "true" en Vercel Production.
+- [x] `docs/tasks/README.md` sincronizado.
+      ✅ Verificado el 2026-09-01: helper clf-quote-breakdown.ts en main (fail-closed si tax_code NULL), fix del writer que no poblaba el plano nativo, backfill aplicado, e ISSUE-107 resuelto. Los 3 flags clave (FINANCE_CORE_MXN / CLF_INDEXED / CLF_INCOME_PROJECTION) verificados "true" en Vercel Production.
+- [x] `Handoff.md` actualizado.
+      ✅ Verificado el 2026-09-01: helper clf-quote-breakdown.ts en main (fail-closed si tax_code NULL), fix del writer que no poblaba el plano nativo, backfill aplicado, e ISSUE-107 resuelto. Los 3 flags clave (FINANCE_CORE_MXN / CLF_INDEXED / CLF_INCOME_PROJECTION) verificados "true" en Vercel Production.
+- [x] `changelog.md` actualizado.
+      ✅ Verificado el 2026-09-01: helper clf-quote-breakdown.ts en main (fail-closed si tax_code NULL), fix del writer que no poblaba el plano nativo, backfill aplicado, e ISSUE-107 resuelto. Los 3 flags clave (FINANCE_CORE_MXN / CLF_INDEXED / CLF_INCOME_PROJECTION) verificados "true" en Vercel Production.
+- [x] chequeo de impacto cruzado ejecutado.
+      ✅ Verificado el 2026-09-01: helper clf-quote-breakdown.ts en main (fail-closed si tax_code NULL), fix del writer que no poblaba el plano nativo, backfill aplicado, e ISSUE-107 resuelto. Los 3 flags clave (FINANCE_CORE_MXN / CLF_INDEXED / CLF_INCOME_PROJECTION) verificados "true" en Vercel Production.
+- [x] `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` actualizado con el estado final de los flags.
+      ✅ Verificado el 2026-09-01: helper clf-quote-breakdown.ts en main (fail-closed si tax_code NULL), fix del writer que no poblaba el plano nativo, backfill aplicado, e ISSUE-107 resuelto. Los 3 flags clave (FINANCE_CORE_MXN / CLF_INDEXED / CLF_INCOME_PROJECTION) verificados "true" en Vercel Production.
 
 ## Follow-ups
 

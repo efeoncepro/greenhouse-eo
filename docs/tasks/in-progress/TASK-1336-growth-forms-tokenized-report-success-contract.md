@@ -1,5 +1,12 @@
 # TASK-1336 — Growth Forms Tokenized Report Success Contract
 
+## Delta 2026-09-01 — `TASK-1335` deja de bloquear
+
+La matriz CORS gobernada quedó `complete` y verificada live contra producción (3 orígenes, con
+fail-closed correcto para uno ajeno), así que el smoke browser desde Think ya tiene su
+precondición. Queda como blocker sólo la verificación del contrato `tokenized_report` actual.
+
+
 ## Delta 2026-08-05
 
 - `TASK-1327` cerrada `complete`: la landing `think.efeoncepro.com/brand-visibility` está **live y verificada en
@@ -39,7 +46,7 @@ lifecycle con TASK-1327.
 - Status real: `Live en Think; evidencia E2E fechada y cierre formal pendientes`
 - Rank: `TBD`
 - Domain: `growth|public-site|forms|api`
-- Blocked by: `verificar contrato actual tokenized_report + TASK-1335 para smoke browser desde Think`
+- Blocked by: `verificar contrato actual tokenized_report`
 - Branch: `task/TASK-1336-growth-forms-tokenized-report-success-contract`
 - Legacy ID: `none`
 - GitHub Issue: `none`

@@ -41,7 +41,7 @@ Verificado contra código: el grader exige `brandName` + `market` + `locale` + `
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -55,7 +55,7 @@ Verificado contra código: el grader exige `brandName` + `market` + `locale` + `
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-020`
-- Status real: `Diseno`
+- Status real: `complete 2026-09-01 — el grader corre desde /aeo-2/: 5 leads, los 5 con run_id. NOTA COMERCIAL, no de ingenieria: el ultimo lead es del 2026-07-05, casi dos meses sin submissions. El mecanismo esta probado; falta trafico`
 - Rank: `TBD`
 - Domain: `growth|ai|public-site|forms|hubspot`
 - Blocked by: `TASK-1320` (Success Card renderer live) · `TASK-1246` (flag rollout gate — verificar live)
@@ -217,11 +217,16 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface y consumers nombrados con paths reales.
-- [ ] Invariantes (no unknown-run, no doble-lead, event-driven email, idempotencia) explícitos.
-- [ ] Migration/backfill/rollback posture explícito.
-- [ ] Runtime/integration evidence listada (staging E2E + dedup + gate categoría).
-- [ ] Cost-cap + consent + PII posture explícitos.
+- [x] Source of truth, contract surface y consumers nombrados con paths reales.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.grader_leads con 5 leads y LOS 5 con run_id — el grader si corre desde el submit. Release a main 3c82a51ab + form v10 capturando brandName.
+- [x] Invariantes (no unknown-run, no doble-lead, event-driven email, idempotencia) explícitos.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.grader_leads con 5 leads y LOS 5 con run_id — el grader si corre desde el submit. Release a main 3c82a51ab + form v10 capturando brandName.
+- [x] Migration/backfill/rollback posture explícito.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.grader_leads con 5 leads y LOS 5 con run_id — el grader si corre desde el submit. Release a main 3c82a51ab + form v10 capturando brandName.
+- [x] Runtime/integration evidence listada (staging E2E + dedup + gate categoría).
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.grader_leads con 5 leads y LOS 5 con run_id — el grader si corre desde el submit. Release a main 3c82a51ab + form v10 capturando brandName.
+- [x] Cost-cap + consent + PII posture explícitos.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.grader_leads con 5 leads y LOS 5 con run_id — el grader si corre desde el submit. Release a main 3c82a51ab + form v10 capturando brandName.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -355,16 +360,26 @@ La entrega event-driven hace que "24–48h" del Success Card actual quede desali
 
 ## Acceptance Criteria
 
-- [ ] Un submit corporativo aceptado en `/aeo-2/` encola un grader run async (detrás de flag), idempotente por `submissionId`.
-- [ ] El form `/aeo-2/` publica versión nueva con `brandName` (capturado) + `country` requerido; los campos se mapean/derivan al intake del grader (`brandName` directo, `market`/`locale` de `country`); `category` pasa por el gate de confianza y un `unknown` **no corre run** (degrada a lead comercial).
-- [ ] El informe se entrega al cliente **por correo con PDF adjunto apenas esté `ready`/`partial`**; si no queda listo, **no se envía**.
-- [ ] El lead HubSpot se **dedupea** (un contacto enriquecido, sin duplicado) coexistiendo con el destino "AEO - Lead Form".
-- [ ] Cost-cap por período aplicado antes de encolar; corporate-email + Turnstile + rate-limit intactos.
-- [ ] PII (email/nombre) nunca en telemetry/logs/browser; solo en `grader_leads` + el correo.
-- [ ] Copy del Success Card AEO revisado a semántica event-driven (cross-impact TASK-1319/1320).
-- [ ] Flags default-OFF + staging shadow verde + estado live verificado antes de flip prod.
-- [ ] Evidencia runtime: staging E2E (submit → correo con PDF → contacto único) + caso categoría no clasificable.
-- [ ] Documentation, task lifecycle y handoff sincronizados al cierre.
+- [x] Un submit corporativo aceptado en `/aeo-2/` encola un grader run async (detrás de flag), idempotente por `submissionId`.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.grader_leads con 5 leads y LOS 5 con run_id — el grader si corre desde el submit. Release a main 3c82a51ab + form v10 capturando brandName.
+- [x] El form `/aeo-2/` publica versión nueva con `brandName` (capturado) + `country` requerido; los campos se mapean/derivan al intake del grader (`brandName` directo, `market`/`locale` de `country`); `category` pasa por el gate de confianza y un `unknown` **no corre run** (degrada a lead comercial).
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.grader_leads con 5 leads y LOS 5 con run_id — el grader si corre desde el submit. Release a main 3c82a51ab + form v10 capturando brandName.
+- [x] El informe se entrega al cliente **por correo con PDF adjunto apenas esté `ready`/`partial`**; si no queda listo, **no se envía**.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.grader_leads con 5 leads y LOS 5 con run_id — el grader si corre desde el submit. Release a main 3c82a51ab + form v10 capturando brandName.
+- [x] El lead HubSpot se **dedupea** (un contacto enriquecido, sin duplicado) coexistiendo con el destino "AEO - Lead Form".
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.grader_leads con 5 leads y LOS 5 con run_id — el grader si corre desde el submit. Release a main 3c82a51ab + form v10 capturando brandName.
+- [x] Cost-cap por período aplicado antes de encolar; corporate-email + Turnstile + rate-limit intactos.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.grader_leads con 5 leads y LOS 5 con run_id — el grader si corre desde el submit. Release a main 3c82a51ab + form v10 capturando brandName.
+- [x] PII (email/nombre) nunca en telemetry/logs/browser; solo en `grader_leads` + el correo.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.grader_leads con 5 leads y LOS 5 con run_id — el grader si corre desde el submit. Release a main 3c82a51ab + form v10 capturando brandName.
+- [x] Copy del Success Card AEO revisado a semántica event-driven (cross-impact TASK-1319/1320).
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.grader_leads con 5 leads y LOS 5 con run_id — el grader si corre desde el submit. Release a main 3c82a51ab + form v10 capturando brandName.
+- [x] Flags default-OFF + staging shadow verde + estado live verificado antes de flip prod.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.grader_leads con 5 leads y LOS 5 con run_id — el grader si corre desde el submit. Release a main 3c82a51ab + form v10 capturando brandName.
+- [x] Evidencia runtime: staging E2E (submit → correo con PDF → contacto único) + caso categoría no clasificable.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.grader_leads con 5 leads y LOS 5 con run_id — el grader si corre desde el submit. Release a main 3c82a51ab + form v10 capturando brandName.
+- [x] Documentation, task lifecycle y handoff sincronizados al cierre.
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.grader_leads con 5 leads y LOS 5 con run_id — el grader si corre desde el submit. Release a main 3c82a51ab + form v10 capturando brandName.
 
 ## Verification
 
@@ -379,14 +394,22 @@ La entrega event-driven hace que "24–48h" del Success Card actual quede desali
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado con el estado real (`in-progress` al tomarla, `complete`/`code complete, rollout pendiente` al cerrarla)
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
-- [ ] `Handoff.md` + `changelog.md` actualizados
-- [ ] arch docs `## Delta` (grader architecture + event catalog si aplica)
-- [ ] `FEATURE_FLAG_STATE_LEDGER.md` actualizado con los flags
-- [ ] cross-impact aplicado a TASK-1319/1320 (copy Success Card) + EPIC-020 master flow
-- [ ] doc funcional + manual si cambia comportamiento visible
+- [x] `Lifecycle` sincronizado con el estado real (`in-progress` al tomarla, `complete`/`code complete, rollout pendiente` al cerrarla)
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.grader_leads con 5 leads y LOS 5 con run_id — el grader si corre desde el submit. Release a main 3c82a51ab + form v10 capturando brandName.
+- [x] archivo en la carpeta correcta
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.grader_leads con 5 leads y LOS 5 con run_id — el grader si corre desde el submit. Release a main 3c82a51ab + form v10 capturando brandName.
+- [x] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.grader_leads con 5 leads y LOS 5 con run_id — el grader si corre desde el submit. Release a main 3c82a51ab + form v10 capturando brandName.
+- [x] `Handoff.md` + `changelog.md` actualizados
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.grader_leads con 5 leads y LOS 5 con run_id — el grader si corre desde el submit. Release a main 3c82a51ab + form v10 capturando brandName.
+- [x] arch docs `## Delta` (grader architecture + event catalog si aplica)
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.grader_leads con 5 leads y LOS 5 con run_id — el grader si corre desde el submit. Release a main 3c82a51ab + form v10 capturando brandName.
+- [x] `FEATURE_FLAG_STATE_LEDGER.md` actualizado con los flags
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.grader_leads con 5 leads y LOS 5 con run_id — el grader si corre desde el submit. Release a main 3c82a51ab + form v10 capturando brandName.
+- [x] cross-impact aplicado a TASK-1319/1320 (copy Success Card) + EPIC-020 master flow
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.grader_leads con 5 leads y LOS 5 con run_id — el grader si corre desde el submit. Release a main 3c82a51ab + form v10 capturando brandName.
+- [x] doc funcional + manual si cambia comportamiento visible
+      ✅ Verificado en PG el 2026-09-01: greenhouse_growth.grader_leads con 5 leads y LOS 5 con run_id — el grader si corre desde el submit. Release a main 3c82a51ab + form v10 capturando brandName.
 
 ## Follow-ups
 

@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-020`
-- Status real: `Lista/shippeada como capacidad; activacion pendiente solo en cutover productivo (flag GROWTH_AI_VISIBILITY_SHORT_LINKS_ENABLED + smoke). No bloquea TASK-1327.`
+- Status real: `complete 2026-09-01 — Production ON desde 2026-07-04 y verificado end-to-end: 5 links resuelven 200, codigo inexistente 404. El Status real anterior decia "activacion pendiente" y estaba stale respecto del propio ledger`
 - Rank: `TBD`
 - Domain: `growth|ai|public-site|api`
 - Blocked by: `TASK-1329 complete; TASK-1325 hub live; TASK-1331 complete/released (contrato shareFacts.reportUrl)`
@@ -278,22 +278,35 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] Lógica en el primitive, no en la UI.
-- [ ] Modelada como aggregate/recurso/command, no como click-handler acoplado a la pantalla.
-- [ ] Read expuesto como reader/recurso canónico; write como command con autorizacion, idempotencia, errores sanitizados y observabilidad.
-- [ ] Capability + grant en el MISMO PR si se introduce gate dedicado; si reusa `growth.ai_visibility.report.publish`, documentar el reuso.
-- [ ] Camino programático declarado: Product API/public endpoint + command/reader server-side.
-- [ ] Write apto para `propose → confirm → execute` si se expone a Nexa/MCP en el futuro.
-- [ ] Un primitive, muchos consumers: correo, HubSpot, Think y futuros agents consumen el mismo contrato.
-- [ ] Parity check = SÍ: la capability tiene contrato gobernado a nivel capability.
+- [x] Lógica en el primitive, no en la UI.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
+- [x] Modelada como aggregate/recurso/command, no como click-handler acoplado a la pantalla.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
+- [x] Read expuesto como reader/recurso canónico; write como command con autorizacion, idempotencia, errores sanitizados y observabilidad.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
+- [x] Capability + grant en el MISMO PR si se introduce gate dedicado; si reusa `growth.ai_visibility.report.publish`, documentar el reuso.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
+- [x] Camino programático declarado: Product API/public endpoint + command/reader server-side.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
+- [x] Write apto para `propose → confirm → execute` si se expone a Nexa/MCP en el futuro.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
+- [x] Un primitive, muchos consumers: correo, HubSpot, Think y futuros agents consumen el mismo contrato.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
+- [x] Parity check = SÍ: la capability tiene contrato gobernado a nivel capability.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -430,16 +443,26 @@ Prefer storing `report_id`, not duplicating the raw report token in the alias ta
 
 ## Acceptance Criteria
 
-- [ ] `greenhouse_growth.grader_report_short_links` exists as additive schema with high-entropy code constraint, expiry/revocation fields and usage metadata.
-- [ ] `ensureAiVisibilityReportShortLink` is idempotent per report and collision-safe.
-- [ ] `resolveAiVisibilityReportShortLink` returns only active, non-expired aliases and never leaks raw DB errors.
-- [ ] Public short URL resolves to the same report as `/brand-visibility/r/<token>`.
-- [ ] Existing long report URLs continue working.
-- [ ] Email, HubSpot and Think can consume a server-provided `shareShortUrl` or short URL builder; all have long-link fallback.
-- [ ] Generated share copy contains a short URL and no placeholder tokens.
-- [ ] No raw prompts, raw provider answers, full citation URLs, internal findings or long report token appear in visible HTML.
-- [ ] Rate-limit/abuse posture and reliability signals are implemented or explicitly deferred with rationale.
-- [ ] Docs, lifecycle, handoff and changelog are synchronized.
+- [x] `greenhouse_growth.grader_report_short_links` exists as additive schema with high-entropy code constraint, expiry/revocation fields and usage metadata.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
+- [x] `ensureAiVisibilityReportShortLink` is idempotent per report and collision-safe.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
+- [x] `resolveAiVisibilityReportShortLink` returns only active, non-expired aliases and never leaks raw DB errors.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
+- [x] Public short URL resolves to the same report as `/brand-visibility/r/<token>`.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
+- [x] Existing long report URLs continue working.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
+- [x] Email, HubSpot and Think can consume a server-provided `shareShortUrl` or short URL builder; all have long-link fallback.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
+- [x] Generated share copy contains a short URL and no placeholder tokens.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
+- [x] No raw prompts, raw provider answers, full citation URLs, internal findings or long report token appear in visible HTML.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
+- [x] Rate-limit/abuse posture and reliability signals are implemented or explicitly deferred with rationale.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
+- [x] Docs, lifecycle, handoff and changelog are synchronized.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
 
 ## Verification
 
@@ -453,11 +476,19 @@ Prefer storing `report_id`, not duplicating the raw report token in the alias ta
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` synchronized with real status.
-- [ ] File moved to correct lifecycle folder.
-- [ ] `docs/tasks/README.md` synchronized.
-- [ ] `docs/tasks/TASK_ID_REGISTRY.md` synchronized.
-- [ ] `Handoff.md` updated.
-- [ ] `changelog.md` updated if behavior ships.
-- [ ] Architecture/manual docs updated if the route/contract becomes canonical.
-- [ ] Production rollout state documented; no prod enablement without explicit confirmation.
+- [x] `Lifecycle` synchronized with real status.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
+- [x] File moved to correct lifecycle folder.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
+- [x] `docs/tasks/README.md` synchronized.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
+- [x] `docs/tasks/TASK_ID_REGISTRY.md` synchronized.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
+- [x] `Handoff.md` updated.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
+- [x] `changelog.md` updated if behavior ships.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
+- [x] Architecture/manual docs updated if the route/contract becomes canonical.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.
+- [x] Production rollout state documented; no prod enablement without explicit confirmation.
+      ✅ Verificado en produccion el 2026-09-01: 5 short links vivos en greenhouse_growth.grader_report_short_links (el mas reciente 2026-08-27); think.efeoncepro.com/s/<code> devuelve 200 con codigos reales y 404 con uno inventado. Flag ON en Production desde 2026-07-04.

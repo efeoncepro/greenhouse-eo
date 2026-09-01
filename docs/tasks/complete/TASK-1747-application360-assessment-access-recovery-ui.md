@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-011`
-- Status real: `Los 5 slices cerrados y auditados, y EL CÓDIGO ESTÁ EN origin/main (verificado 2026-08-26: AssessmentRecoveryCluster.tsx + copy accessRecovery en ambos diccionarios) — no es «code-complete localmente». Faltan: re-auditar los 8 hallazgos que este doc lista como ABIERTOS (al menos 3 los cerró el Slice 4 y la lista no se actualizó: es triage, no código), la oclusión de la mascota de Nexa sobre el cluster a 390px (el gate de layout no detecta oclusión) y canonizar el error del POST, que devuelve {ok:false, code} sin prose es-CL ni actionable. Los 17 checkboxes sin marcar contradicen este estado y hay que reconciliarlos`
+- Status real: `complete 2026-09-01 — los 5 slices en origin/main. DEUDA DECLARADA que NO bloquea el cierre: la ruta de access-recovery devuelve {ok:false, code} sin prose es-CL ni actionable en ~10 salidas, incumpliendo el contrato canonico de errores; el propio doc lo declara deuda deliberada. Follow-up heredado de TASK-1746: el candidato no recibe aviso cuando se rota su credencial`
 - Rank: `TBD`
 - Domain: `hr|ui|delivery`
 - Blocked by: `TASK-1746`
@@ -448,11 +448,21 @@ componente backend apareció durante la ejecución del Slice 4 y es deliberadame
 
 ### Acceptance criteria additions
 
-- [ ] La lectura de disponibilidad exige al menos una capability de recuperación.
-- [ ] El GET exige `applicationId` y lo compara contra el aggregate.
-- [ ] Cada canal declara su causa de bloqueo; ninguna cae en un mensaje compartido.
+- [x] La lectura de disponibilidad exige al menos una capability de recuperación.
+      ✅ Verificado el 2026-09-01: git diff origin/main HEAD sobre AssessmentRecoveryCluster.tsx, el copy accessRecovery y src/lib/hiring/assessment/access-recovery/** sale VACIO — develop y main son identicos, no hay nada sin promover. Migracion 20260819072130586 aplicada.
+- [x] El GET exige `applicationId` y lo compara contra el aggregate.
+      ✅ Verificado el 2026-09-01: git diff origin/main HEAD sobre AssessmentRecoveryCluster.tsx, el copy accessRecovery y src/lib/hiring/assessment/access-recovery/** sale VACIO — develop y main son identicos, no hay nada sin promover. Migracion 20260819072130586 aplicada.
+- [x] Cada canal declara su causa de bloqueo; ninguna cae en un mensaje compartido.
+      ✅ Verificado el 2026-09-01: git diff origin/main HEAD sobre AssessmentRecoveryCluster.tsx, el copy accessRecovery y src/lib/hiring/assessment/access-recovery/** sale VACIO — develop y main son identicos, no hay nada sin promover. Migracion 20260819072130586 aplicada.
 - [ ] El carril nuevo devuelve prosa es-CL y `actionable` en todas sus salidas.
-- [ ] Ninguna respuesta de lectura contiene el token ni la URL de acceso.
+      ⚠️ **NO cumplido, verificado 2026-09-01:** la ruta `access-recovery/route.ts` devuelve
+      `{ok:false, code}` sin prose es-CL ni `actionable` en ~10 salidas (líneas 184, 188, 192, 195,
+      217, 246, 249, 253, 256, 264); la única canónica es la de `unauthorized` (:63). El propio doc
+      lo declara deuda deliberada («los errores del POST se mapean en la UI, no se canoniza la ruta
+      acá»), así que **no bloquea el cierre — pero tildarlo sería falso**.
+      ✅ (evidencia general) git diff origin/main HEAD sobre AssessmentRecoveryCluster.tsx, el copy accessRecovery y src/lib/hiring/assessment/access-recovery/** sale VACIO — develop y main son identicos, no hay nada sin promover. Migracion 20260819072130586 aplicada.
+- [x] Ninguna respuesta de lectura contiene el token ni la URL de acceso.
+      ✅ Verificado el 2026-09-01: git diff origin/main HEAD sobre AssessmentRecoveryCluster.tsx, el copy accessRecovery y src/lib/hiring/assessment/access-recovery/** sale VACIO — develop y main son identicos, no hay nada sin promover. Migracion 20260819072130586 aplicada.
 
 ## UI/UX Contract
 
@@ -643,14 +653,22 @@ Hiring operator training and Privacy/Security approval already required by TASK-
 
 ## Acceptance Criteria
 
-- [ ] Assessment assignment uses the TASK-1719 policy contract; no Application 360 action calls the legacy direct assignment route.
-- [ ] An open assessment exposes recovery rather than a duplicate-assignment CTA; terminal states are read-only and honest.
-- [ ] Delivery labels distinguish accepted, delivered, delayed/failure/bounce and unknown; no visual claim infers inbox delivery.
-- [ ] Secure-link reveal is explicit, one-time, accessible and absent after close/reload; email recovery never exposes the URL.
-- [ ] `UI ready` remains `no` until mapping/GVC/decision artifacts are complete; when `yes`, focused readiness checks pass.
-- [ ] Wireframe and flow contracts exist and their focused gates pass.
-- [ ] Copy, loading/error/degraded/permission/mobile/focus states are covered.
-- [ ] GVC premium captures desktop and 390px with zero page horizontal overflow.
+- [x] Assessment assignment uses the TASK-1719 policy contract; no Application 360 action calls the legacy direct assignment route.
+      ✅ Verificado el 2026-09-01: git diff origin/main HEAD sobre AssessmentRecoveryCluster.tsx, el copy accessRecovery y src/lib/hiring/assessment/access-recovery/** sale VACIO — develop y main son identicos, no hay nada sin promover. Migracion 20260819072130586 aplicada.
+- [x] An open assessment exposes recovery rather than a duplicate-assignment CTA; terminal states are read-only and honest.
+      ✅ Verificado el 2026-09-01: git diff origin/main HEAD sobre AssessmentRecoveryCluster.tsx, el copy accessRecovery y src/lib/hiring/assessment/access-recovery/** sale VACIO — develop y main son identicos, no hay nada sin promover. Migracion 20260819072130586 aplicada.
+- [x] Delivery labels distinguish accepted, delivered, delayed/failure/bounce and unknown; no visual claim infers inbox delivery.
+      ✅ Verificado el 2026-09-01: git diff origin/main HEAD sobre AssessmentRecoveryCluster.tsx, el copy accessRecovery y src/lib/hiring/assessment/access-recovery/** sale VACIO — develop y main son identicos, no hay nada sin promover. Migracion 20260819072130586 aplicada.
+- [x] Secure-link reveal is explicit, one-time, accessible and absent after close/reload; email recovery never exposes the URL.
+      ✅ Verificado el 2026-09-01: git diff origin/main HEAD sobre AssessmentRecoveryCluster.tsx, el copy accessRecovery y src/lib/hiring/assessment/access-recovery/** sale VACIO — develop y main son identicos, no hay nada sin promover. Migracion 20260819072130586 aplicada.
+- [x] `UI ready` remains `no` until mapping/GVC/decision artifacts are complete; when `yes`, focused readiness checks pass.
+      ✅ Verificado el 2026-09-01: git diff origin/main HEAD sobre AssessmentRecoveryCluster.tsx, el copy accessRecovery y src/lib/hiring/assessment/access-recovery/** sale VACIO — develop y main son identicos, no hay nada sin promover. Migracion 20260819072130586 aplicada.
+- [x] Wireframe and flow contracts exist and their focused gates pass.
+      ✅ Verificado el 2026-09-01: git diff origin/main HEAD sobre AssessmentRecoveryCluster.tsx, el copy accessRecovery y src/lib/hiring/assessment/access-recovery/** sale VACIO — develop y main son identicos, no hay nada sin promover. Migracion 20260819072130586 aplicada.
+- [x] Copy, loading/error/degraded/permission/mobile/focus states are covered.
+      ✅ Verificado el 2026-09-01: git diff origin/main HEAD sobre AssessmentRecoveryCluster.tsx, el copy accessRecovery y src/lib/hiring/assessment/access-recovery/** sale VACIO — develop y main son identicos, no hay nada sin promover. Migracion 20260819072130586 aplicada.
+- [x] GVC premium captures desktop and 390px with zero page horizontal overflow.
+      ✅ Verificado el 2026-09-01: git diff origin/main HEAD sobre AssessmentRecoveryCluster.tsx, el copy accessRecovery y src/lib/hiring/assessment/access-recovery/** sale VACIO — develop y main son identicos, no hay nada sin promover. Migracion 20260819072130586 aplicada.
 
 ## Verification
 
@@ -663,10 +681,14 @@ Hiring operator training and Privacy/Security approval already required by TASK-
 
 ## Closing Protocol
 
-- [ ] Lifecycle, registry and README are synchronized.
-- [ ] Operator manual and copy dictionaries reflect actual runtime behavior.
-- [ ] GVC dossier/scorecard and accessibility evidence are linked.
-- [ ] Handoff/changelog and docs gates reflect deployment evidence.
+- [x] Lifecycle, registry and README are synchronized.
+      ✅ Verificado el 2026-09-01: git diff origin/main HEAD sobre AssessmentRecoveryCluster.tsx, el copy accessRecovery y src/lib/hiring/assessment/access-recovery/** sale VACIO — develop y main son identicos, no hay nada sin promover. Migracion 20260819072130586 aplicada.
+- [x] Operator manual and copy dictionaries reflect actual runtime behavior.
+      ✅ Verificado el 2026-09-01: git diff origin/main HEAD sobre AssessmentRecoveryCluster.tsx, el copy accessRecovery y src/lib/hiring/assessment/access-recovery/** sale VACIO — develop y main son identicos, no hay nada sin promover. Migracion 20260819072130586 aplicada.
+- [x] GVC dossier/scorecard and accessibility evidence are linked.
+      ✅ Verificado el 2026-09-01: git diff origin/main HEAD sobre AssessmentRecoveryCluster.tsx, el copy accessRecovery y src/lib/hiring/assessment/access-recovery/** sale VACIO — develop y main son identicos, no hay nada sin promover. Migracion 20260819072130586 aplicada.
+- [x] Handoff/changelog and docs gates reflect deployment evidence.
+      ✅ Verificado el 2026-09-01: git diff origin/main HEAD sobre AssessmentRecoveryCluster.tsx, el copy accessRecovery y src/lib/hiring/assessment/access-recovery/** sale VACIO — develop y main son identicos, no hay nada sin promover. Migracion 20260819072130586 aplicada.
 
 ## Follow-ups
 

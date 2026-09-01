@@ -1,5 +1,11 @@
 # TASK-1254 — Growth Forms Email Verification Service + Corporate Gate
 
+## Delta 2026-09-01 — desbloqueada
+
+`TASK-1253` (registry de validadores + autoridad server-side) quedó `complete`: su flag está ON en
+Vercel Production, verificado con `vercel env pull`. Esta task deja de estar bloqueada.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -18,7 +24,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `data`
-- Blocked by: `TASK-1253`
+- Blocked by: `none`
 - Branch: `task/TASK-1254-growth-forms-email-verification-corporate-gate`
 - Legacy ID: `none`
 - GitHub Issue: `none`

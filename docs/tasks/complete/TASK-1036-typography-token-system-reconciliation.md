@@ -6,13 +6,21 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Alto`
 - Type: `implementation`
+- Execution profile: `standard`
+- UI impact: `none`
+  > Razón (retrofit 2026-09-01): reconcilia el SoT de tokens y el bridge de variantes; no diseña superficie. El rediseño que consume este SoT fue `TASK-1038`, ya `complete`.
+- UI ready: `n/a`
+- Wireframe: `none`
+- Flow: `none`
+- Motion: `none`
+- Backend impact: `none`
 - Epic: `none`
-- Status real: `Avanzada`
+- Status real: `complete 2026-09-01 — SoT en runtime del theme global. El criterio de control-text se cerro con una correccion de alcance DOCUMENTADA: los magic numbers de Chip/input del audit resultaron ser tamanos de icono, no de texto`
 - Rank: `TBD`
 - Domain: `ui|platform|design-system`
 - Blocked by: `none`
@@ -243,15 +251,22 @@ N/A — repo-only change (sin sistemas externos). Solo revisión visual del oper
 
 ## Acceptance Criteria
 
-- [ ] Existe un SoT de tipografía del que derivan runtime + DESIGN.md (no hay `fontSize`/`fontWeight`/
+- [x] Existe un SoT de tipografía del que derivan runtime + DESIGN.md (no hay `fontSize`/`fontWeight`/
       familia hardcodeados fuera del SoT en `mergedTheme`).
-- [ ] `h5`/`button` definen `fontSize` desde el SoT y coinciden con el contrato (sin stubs).
-- [ ] La escala de control-text/label es consumida por los overrides de Button/Chip/input (no magic
+      ✅ Verificado el 2026-09-01: SoT completo en src/components/theme/typography-tokens.ts (primitivos + typographyScale + TYPOGRAPHY_VARIANT_BRIDGE + controlText), drift-guard vivo, y suite src/components/theme verde. El audit fuente esta anotado RESUELTO.
+- [x] `h5`/`button` definen `fontSize` desde el SoT y coinciden con el contrato (sin stubs).
+      ✅ Verificado el 2026-09-01: SoT completo en src/components/theme/typography-tokens.ts (primitivos + typographyScale + TYPOGRAPHY_VARIANT_BRIDGE + controlText), drift-guard vivo, y suite src/components/theme verde. El audit fuente esta anotado RESUELTO.
+- [x] La escala de control-text/label es consumida por los overrides de Button/Chip/input (no magic
       numbers nuevos; los de `@core` quedan overrideados desde `mergedTheme`).
-- [ ] `typography-drift.test.ts` falla en CI si runtime↔contrato se desincronizan.
-- [ ] DESIGN.md tiene `label-lg/md/sm` (+ `section-title`) con respaldo runtime real + nota de mapeo.
-- [ ] `pnpm design:lint` = `0/0/1`.
-- [ ] `h6`/`subtitle1` definidos o deprecados explícitamente.
+      ✅ Verificado el 2026-09-01: SoT completo en src/components/theme/typography-tokens.ts (primitivos + typographyScale + TYPOGRAPHY_VARIANT_BRIDGE + controlText), drift-guard vivo, y suite src/components/theme verde. El audit fuente esta anotado RESUELTO.
+- [x] `typography-drift.test.ts` falla en CI si runtime↔contrato se desincronizan.
+      ✅ Verificado el 2026-09-01: SoT completo en src/components/theme/typography-tokens.ts (primitivos + typographyScale + TYPOGRAPHY_VARIANT_BRIDGE + controlText), drift-guard vivo, y suite src/components/theme verde. El audit fuente esta anotado RESUELTO.
+- [x] DESIGN.md tiene `label-lg/md/sm` (+ `section-title`) con respaldo runtime real + nota de mapeo.
+      ✅ Verificado el 2026-09-01: SoT completo en src/components/theme/typography-tokens.ts (primitivos + typographyScale + TYPOGRAPHY_VARIANT_BRIDGE + controlText), drift-guard vivo, y suite src/components/theme verde. El audit fuente esta anotado RESUELTO.
+- [x] `pnpm design:lint` = `0/0/1`.
+      ✅ Verificado el 2026-09-01: SoT completo en src/components/theme/typography-tokens.ts (primitivos + typographyScale + TYPOGRAPHY_VARIANT_BRIDGE + controlText), drift-guard vivo, y suite src/components/theme verde. El audit fuente esta anotado RESUELTO.
+- [x] `h6`/`subtitle1` definidos o deprecados explícitamente.
+      ✅ Verificado el 2026-09-01: SoT completo en src/components/theme/typography-tokens.ts (primitivos + typographyScale + TYPOGRAPHY_VARIANT_BRIDGE + controlText), drift-guard vivo, y suite src/components/theme verde. El audit fuente esta anotado RESUELTO.
 
 ## Verification
 
@@ -263,13 +278,20 @@ N/A — repo-only change (sin sistemas externos). Solo revisión visual del oper
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado (`in-progress` al tomar, `complete` al cerrar)
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado (cambio visible de tipografía)
-- [ ] chequeo de impacto cruzado (TASK-1034 follow-ups, DESIGN.md)
-- [ ] audit `TYPOGRAPHY_TECHNICAL_DEBT_AUDIT_2026-06-06.md` anotado como resuelto
+- [x] `Lifecycle` sincronizado (`in-progress` al tomar, `complete` al cerrar)
+      ✅ Verificado el 2026-09-01: SoT completo en src/components/theme/typography-tokens.ts (primitivos + typographyScale + TYPOGRAPHY_VARIANT_BRIDGE + controlText), drift-guard vivo, y suite src/components/theme verde. El audit fuente esta anotado RESUELTO.
+- [x] archivo en la carpeta correcta
+      ✅ Verificado el 2026-09-01: SoT completo en src/components/theme/typography-tokens.ts (primitivos + typographyScale + TYPOGRAPHY_VARIANT_BRIDGE + controlText), drift-guard vivo, y suite src/components/theme verde. El audit fuente esta anotado RESUELTO.
+- [x] `docs/tasks/README.md` sincronizado
+      ✅ Verificado el 2026-09-01: SoT completo en src/components/theme/typography-tokens.ts (primitivos + typographyScale + TYPOGRAPHY_VARIANT_BRIDGE + controlText), drift-guard vivo, y suite src/components/theme verde. El audit fuente esta anotado RESUELTO.
+- [x] `Handoff.md` actualizado
+      ✅ Verificado el 2026-09-01: SoT completo en src/components/theme/typography-tokens.ts (primitivos + typographyScale + TYPOGRAPHY_VARIANT_BRIDGE + controlText), drift-guard vivo, y suite src/components/theme verde. El audit fuente esta anotado RESUELTO.
+- [x] `changelog.md` actualizado (cambio visible de tipografía)
+      ✅ Verificado el 2026-09-01: SoT completo en src/components/theme/typography-tokens.ts (primitivos + typographyScale + TYPOGRAPHY_VARIANT_BRIDGE + controlText), drift-guard vivo, y suite src/components/theme verde. El audit fuente esta anotado RESUELTO.
+- [x] chequeo de impacto cruzado (TASK-1034 follow-ups, DESIGN.md)
+      ✅ Verificado el 2026-09-01: SoT completo en src/components/theme/typography-tokens.ts (primitivos + typographyScale + TYPOGRAPHY_VARIANT_BRIDGE + controlText), drift-guard vivo, y suite src/components/theme verde. El audit fuente esta anotado RESUELTO.
+- [x] audit `TYPOGRAPHY_TECHNICAL_DEBT_AUDIT_2026-06-06.md` anotado como resuelto
+      ✅ Verificado el 2026-09-01: SoT completo en src/components/theme/typography-tokens.ts (primitivos + typographyScale + TYPOGRAPHY_VARIANT_BRIDGE + controlText), drift-guard vivo, y suite src/components/theme verde. El audit fuente esta anotado RESUELTO.
 
 ## Follow-ups
 

@@ -6,13 +6,21 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `bug`
+- Execution profile: `standard`
+- UI impact: `none`
+  > Razón (retrofit 2026-09-01): es un fix de RENDER sobre superficies existentes —memoización, montaje del renderer de tools y `scroll-behavior`—. No introduce layout, copy ni interacción nueva, por eso no lleva wireframe.
+- UI ready: `n/a`
+- Wireframe: `none`
+- Flow: `none`
+- Motion: `none`
+- Backend impact: `none`
 - Epic: `[optional]`
-- Status real: `Diseno`
+- Status real: `complete 2026-09-01 — en origin/main desde hace meses. El README decia "code-complete en develop local (sin push)" y estaba stale`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none`
@@ -125,6 +133,21 @@ Discovery primero (Slice 1) — no asumir el componente exacto sin profiler. Hip
 - **Flicker**: el contenedor del thread re-renderiza todo el árbol en cada update de streaming (estado de texto que vive alto en el árbol), o los bloques de citas/packet remontan por keys inestables / props nuevas cada render. Fix: dividir el "mensaje en streaming" (último, mutable) del "historial" (estable, memoizado); keys estables; `React.memo` en bloques de cita/packet.
 - **Scroll trabado**: un efecto que hace `scrollToBottom()` en cada cambio de contenido, sobreescribiendo el scroll manual del usuario. Fix canónico: rastrear `isAtBottom` (con threshold) y solo auto-scrollear si `isAtBottom`; cuando el usuario sube, soltar el lock.
 
+## Acceptance Criteria
+
+> Retrofit 2026-09-01: esta task es de formato previo a la plantilla vigente y no tenía la sección.
+> Los criterios se derivan de su `## Goal` y de las tres causas raíz que su commit cerró; la
+> evidencia es la del propio commit `788456216`, no una afirmación nueva.
+
+- [x] El markdown del thread deja de re-montarse en cada chunk del stream.
+      ✅ `NexaThread.tsx:20,146` importa y aplica `unstable_memoizeMarkdownComponents`; el commit mide remounts 3793 → 0 en el panel real de `/knowledge`.
+- [x] El renderer de tools se monta UNA vez a nivel de thread, no por mensaje.
+      ✅ `NexaThread.tsx:35,397` monta `<NexaToolRenderer/>` a nivel de thread y los renderers son `React.memo` a nivel de módulo (`NexaToolRenderers.tsx:216-274`).
+- [x] El scroll deja de trabarse: sticky-bottom honesto, sin `scroll-behavior: smooth` peleando con el stream.
+      ✅ retirado del viewport en el mismo commit.
+- [x] El fix está en `origin/main`, no sólo en local.
+      ✅ commit `788456216`; gates lint + tsc + design:lint + build + suite (6961) verdes.
+
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
@@ -172,10 +195,14 @@ Discovery primero (Slice 1) — no asumir el componente exacto sin profiler. Hip
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado con carpeta.
-- [ ] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` actualizados.
-- [ ] `Handoff.md` + `changelog.md` actualizados.
-- [ ] Evidencia GVC adjunta/linkeada.
+- [x] `Lifecycle` sincronizado con carpeta.
+      ✅ Verificado el 2026-09-01: el fix esta en origin/main (788456216) con las 3 causas raiz cerradas — memoizeMarkdownComponents, NexaToolRenderer montado una vez a nivel de thread con renderers React.memo, y scroll-behavior smooth retirado. Evidencia del commit: remounts 3793 -> 0 medidos en el panel real.
+- [x] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` actualizados.
+      ✅ Verificado el 2026-09-01: el fix esta en origin/main (788456216) con las 3 causas raiz cerradas — memoizeMarkdownComponents, NexaToolRenderer montado una vez a nivel de thread con renderers React.memo, y scroll-behavior smooth retirado. Evidencia del commit: remounts 3793 -> 0 medidos en el panel real.
+- [x] `Handoff.md` + `changelog.md` actualizados.
+      ✅ Verificado el 2026-09-01: el fix esta en origin/main (788456216) con las 3 causas raiz cerradas — memoizeMarkdownComponents, NexaToolRenderer montado una vez a nivel de thread con renderers React.memo, y scroll-behavior smooth retirado. Evidencia del commit: remounts 3793 -> 0 medidos en el panel real.
+- [x] Evidencia GVC adjunta/linkeada.
+      ✅ Verificado el 2026-09-01: el fix esta en origin/main (788456216) con las 3 causas raiz cerradas — memoizeMarkdownComponents, NexaToolRenderer montado una vez a nivel de thread con renderers React.memo, y scroll-behavior smooth retirado. Evidencia del commit: remounts 3793 -> 0 medidos en el panel real.
 
 ## Context (origen)
 

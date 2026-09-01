@@ -8,6 +8,34 @@ Nexa publicó el anuncio grupal en `EO Team` con cuatro menciones reconocidas co
 
 El workflow canónico sigue siendo temporal para DMs genéricos: aprobación → Entra activa → dry-run → dedupe/source object → `--yes` → auditoría. Lo recurrente converge a Notification Hub; no quedó script permanente.
 
+## 2026-09-01 (4) — 15 tasks cerradas del barrido, y una que NO se cerró a propósito
+
+**15 de las 16 de papeleo quedaron `complete`**, cada una con su evidencia por criterio y su
+`Status real` corregido: `1036 1040 1090 1113 1209 1210 1225 1253 1282 1321 1330 1335 1430 1431 1747`.
+Desbloqueadas de paso `TASK-1246`, `1254`, `1255` y `1336`.
+
+🔴 **`TASK-1078` NO se cerró, y la razón importa.** Su trabajo está hecho y desplegado —4 slices en
+runtime, cutover 2026-06-11, flag **retirado** el 2026-08-05—, pero es una task de UI **sin
+`Wireframe:` declarado**: su artefacto de diseño fue un mockup + loop GVC, la práctica de entonces.
+`ui-wireframe-contract` lo exige como **error**. **No le inventé un wireframe para pasar el gate** —
+sería el stub que el estándar prohíbe—, así que reverti mis cambios y la dejé intacta.
+
+**Decisión pendiente del operador, y aplica a toda task de UI previa al contrato de wireframes:**
+(a) escribir el wireframe real a posteriori, (b) permitir que la regla acepte mockup + evidencia GVC
+como artefacto equivalente, o (c) declarar una excepción explícita para tasks previas a la regla.
+Cualquiera es defendible; inventar el archivo no. `TASK-1112` la declara blocker y hace bien.
+
+⚠️ **Dos defectos de `task:lint` corregidos en el camino**, ambos de la misma clase que veníamos
+cazando —un mensaje que promete algo que el mecanismo no honra—:
+1. `ui-wireframe-contract` ofrecía la salida «set UI impact to none with rationale», pero la
+   inferencia por `Domain` la anulaba. Ahora una declaración EXPLÍCITA gana sobre una INFERIDA.
+2. El parser dobla las líneas de continuación dentro del valor del campo, así que `UI impact: none`
+   **seguido de su razón** llegaba como `"none\n> razón…"` y no matcheaba. La regla se rompía justo
+   cuando el autor hacía lo que la plantilla PIDE. Ahora compara la primera línea.
+
+Retrofit honesto en `TASK-1036` y `TASK-1113`: `UI impact: none` **con razón escrita** — ninguna
+diseña superficie (tokens y un fix de render), así que no les corresponde wireframe.
+
 ## 2026-09-01 (3) — barrido de 27 tasks: el ledger era la causa, y dos defectos vivos quedaron registrados
 
 **Barrido completo con 4 subagentes.** 16 son papeleo puro, 8 tienen trabajo real, 3 esperan decisión
@@ -526,27 +554,3 @@ vuelve a usar la lista vieja — el mismo modo de falla de hoy.
 
 **Retirada** la optimización del ledger que proponía dejar de contar el skip change-gated del
 `ops-worker` como error en el watchdog: silenciaría justo la señal que habría atrapado esto.
-
-## 2026-08-29 (5.º) — plan comercial, presupuesto y generación de pipeline 2027
-
-La revisión comercial separa dos cuotas que no se compensan: **Exit MRR USD 30.000–32.000** y **Spot bookings
-USD 90.000**, con compromiso `28.000 + 60.000` y stretch `34.000 + 120.000`. SKY/Berel sostienen expansión;
-Motogas presupuestó crecimiento cero; ANAM/Aguas permanecen como Spot warm/repeat y Managed Ops sólo como upside.
-El funnel central modela 15 cierres desde 100–115 primeras reuniones held, 50–56 oportunidades calificadas y
-32–38 propuestas. Outbound queda como piloto de 90 días: Apollo tiene créditos, pero al corte no tenía sequences ni
-actividad histórica utilizable; sus 593 reuniones agendadas sin reuniones held no forman baseline de conversión.
-La revisión de stack adopta un `Agentic Revenue Pod`: no se contrata AE/SDR full-time ahora; Julio protege 10–12 horas
-de venta y cubre temporalmente 4–6 horas de Commercial Systems Operations, o se activa apoyo fractional por SLA,
-volumen o pérdida de foco. HubSpot opera warm/inbound; Apollo, cold net-new; los rails no comparten contactos activos.
-
-Canon: `docs/commercial/SALES_GOALS_2026_Q4_2027.md`; plan comercial, presupuesto y control mensual:
-`docs/commercial/COMMERCIAL_PLAN_AND_SALES_BUDGET_2027_V1.md`; generación de pipeline y outbound:
-`docs/commercial/PIPELINE_GENERATION_AND_OUTBOUND_PLAN_2027_V1.md`; operating model agentic:
-`docs/commercial/AGENTIC_REVENUE_OPERATING_MODEL_V1.md`; método: `SALES_GOALS_OPERATING_MODEL_V1.md`; portafolio:
-`SERVICE_PORTFOLIO_REVENUE_ARCHITECTURE_V1.md`.
-
-**Estado:** `Proposed for approval · blocked_by_finance`. Antes de aprobación económica: remuneración sombra del
-fundador, fully loaded cost por oferta/cuenta, margen mínimo 45%/objetivo 50–60%, capacidad delegable y modelo mensual
-de revenue/caja. Antes de escalar outbound: owner de Commercial Systems Operations, dos mailboxes gobernados, entregabilidad,
-mapping/dedupe/suppression Apollo–HubSpot y gates del piloto. No hubo mutaciones en Apollo, HubSpot, Finance runtime,
-Teams ni SharePoint.

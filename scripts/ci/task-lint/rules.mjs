@@ -278,6 +278,17 @@ const finding = ({ task, rule, severity, message, line }) => ({
 const blockingSeverity = context => (context.enforceErrors ? 'error' : 'warning')
 
 const isUiUxImpacted = task => {
+  // 🔴 Una declaración EXPLÍCITA gana sobre una INFERIDA. `ui-wireframe-contract` ofrece en su
+  // propio mensaje la salida «set UI impact to none with rationale», y sin este corto la inferencia
+  // por `Domain` la anulaba: el mensaje prometía un escape que el mecanismo no honraba. Detectado
+  // 2026-09-01 al cerrar TASK-1036 y TASK-1113 —dos tasks de dominio `ui` que NO diseñan superficie
+  // (tokens y un fix de render)— que quedaban obligadas a declarar un wireframe inexistente.
+  // El escape es auditable, no silencioso: la plantilla exige la razón junto al `none`.
+  // El parser dobla las líneas de continuación dentro del valor del campo, así que un
+  // `UI impact: \`none\`` seguido de su razón llega como "none\n> razón…". Comparar el valor crudo
+  // rompía justo cuando el autor hace lo que la plantilla PIDE (declarar el `none` CON razón).
+  if ((task.uiImpact ?? '').split('\n')[0].trim() === 'none') return false
+
   if (task.executionProfile === 'ui-ux') return true
   if (task.uiImpact && UI_IMPACTS.has(task.uiImpact)) return true
 

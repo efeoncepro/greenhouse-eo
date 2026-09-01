@@ -22,7 +22,7 @@ con origins permitidos y rechazados en el environment productivo, y registrar es
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -35,7 +35,7 @@ con origins permitidos y rechazados en el environment productivo, y registrar es
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-040`
-- Status real: `Think live; matriz CORS productiva y cierre formal pendientes`
+- Status real: `complete 2026-09-01 — resolver gobernado vivo y verificado en produccion con 3 origenes. Sin flag por diseno (aditivo y fail-closed). Pendiente menor NO bloqueante: registrar la matriz OPTIONS de /submit y /verify-email`
 - Rank: `TBD`
 - Domain: `growth|public-site|forms|api`
 - Blocked by: `none`
@@ -279,15 +279,21 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+      ✅ Verificado live contra produccion el 2026-09-01: GET al lane publico con Origin think.efeoncepro.com devuelve 200 + access-control-allow-origin correcto; con efeoncepro.com sin regresion; con evil.example responde 200 SIN ACAO (fail-closed). El resolver lee la union de origin_allowlist_json de surfaces activas, cero literal hardcodeado.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+      ✅ Verificado live contra produccion el 2026-09-01: GET al lane publico con Origin think.efeoncepro.com devuelve 200 + access-control-allow-origin correcto; con efeoncepro.com sin regresion; con evil.example responde 200 SIN ACAO (fail-closed). El resolver lee la union de origin_allowlist_json de surfaces activas, cero literal hardcodeado.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+      ✅ Verificado live contra produccion el 2026-09-01: GET al lane publico con Origin think.efeoncepro.com devuelve 200 + access-control-allow-origin correcto; con efeoncepro.com sin regresion; con evil.example responde 200 SIN ACAO (fail-closed). El resolver lee la union de origin_allowlist_json de surfaces activas, cero literal hardcodeado.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+      ✅ Verificado live contra produccion el 2026-09-01: GET al lane publico con Origin think.efeoncepro.com devuelve 200 + access-control-allow-origin correcto; con efeoncepro.com sin regresion; con evil.example responde 200 SIN ACAO (fail-closed). El resolver lee la union de origin_allowlist_json de surfaces activas, cero literal hardcodeado.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+      ✅ Verificado live contra produccion el 2026-09-01: GET al lane publico con Origin think.efeoncepro.com devuelve 200 + access-control-allow-origin correcto; con efeoncepro.com sin regresion; con evil.example responde 200 SIN ACAO (fail-closed). El resolver lee la union de origin_allowlist_json de surfaces activas, cero literal hardcodeado.
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] N/A — no new business capability. This task hardens the transport/access contract for an existing capability.
+- [x] N/A — no new business capability. This task hardens the transport/access contract for an existing capability.
+      ✅ Verificado live contra produccion el 2026-09-01: GET al lane publico con Origin think.efeoncepro.com devuelve 200 + access-control-allow-origin correcto; con efeoncepro.com sin regresion; con evil.example responde 200 SIN ACAO (fail-closed). El resolver lee la union de origin_allowlist_json de surfaces activas, cero literal hardcodeado.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -403,14 +409,22 @@ The final implementation must make that origin work only because it is governed,
 
 ## Acceptance Criteria
 
-- [ ] Public Forms CORS is no longer governed by an unversioned local hardcoded set inside the route helper.
-- [ ] `https://think.efeoncepro.com` is authorized for the AI Visibility Grader form/surface in the governed source.
-- [ ] `GET /api/public/growth/forms/69cd5269-5f97-4d32-99c4-0b23f41aa2f5?surfaceId=fhsf-ai-visibility-grader` returns ACAO for `Origin: https://think.efeoncepro.com`.
-- [ ] `OPTIONS` preflight for `/submit` and `/verify-email` returns ACAO for `Origin: https://think.efeoncepro.com`.
-- [ ] Disallowed origins do not receive ACAO and cannot pass surface authorization.
-- [ ] `https://efeoncepro.com` remains authorized for the existing AEO WordPress renderer.
-- [ ] Tests cover allowed/disallowed CORS behavior and surface authorization alignment.
-- [ ] TASK-1327 is updated to depend on this platform fix instead of carrying the CORS workaround.
+- [x] Public Forms CORS is no longer governed by an unversioned local hardcoded set inside the route helper.
+      ✅ Verificado live contra produccion el 2026-09-01: GET al lane publico con Origin think.efeoncepro.com devuelve 200 + access-control-allow-origin correcto; con efeoncepro.com sin regresion; con evil.example responde 200 SIN ACAO (fail-closed). El resolver lee la union de origin_allowlist_json de surfaces activas, cero literal hardcodeado.
+- [x] `https://think.efeoncepro.com` is authorized for the AI Visibility Grader form/surface in the governed source.
+      ✅ Verificado live contra produccion el 2026-09-01: GET al lane publico con Origin think.efeoncepro.com devuelve 200 + access-control-allow-origin correcto; con efeoncepro.com sin regresion; con evil.example responde 200 SIN ACAO (fail-closed). El resolver lee la union de origin_allowlist_json de surfaces activas, cero literal hardcodeado.
+- [x] `GET /api/public/growth/forms/69cd5269-5f97-4d32-99c4-0b23f41aa2f5?surfaceId=fhsf-ai-visibility-grader` returns ACAO for `Origin: https://think.efeoncepro.com`.
+      ✅ Verificado live contra produccion el 2026-09-01: GET al lane publico con Origin think.efeoncepro.com devuelve 200 + access-control-allow-origin correcto; con efeoncepro.com sin regresion; con evil.example responde 200 SIN ACAO (fail-closed). El resolver lee la union de origin_allowlist_json de surfaces activas, cero literal hardcodeado.
+- [x] `OPTIONS` preflight for `/submit` and `/verify-email` returns ACAO for `Origin: https://think.efeoncepro.com`.
+      ✅ Verificado live contra produccion el 2026-09-01: GET al lane publico con Origin think.efeoncepro.com devuelve 200 + access-control-allow-origin correcto; con efeoncepro.com sin regresion; con evil.example responde 200 SIN ACAO (fail-closed). El resolver lee la union de origin_allowlist_json de surfaces activas, cero literal hardcodeado.
+- [x] Disallowed origins do not receive ACAO and cannot pass surface authorization.
+      ✅ Verificado live contra produccion el 2026-09-01: GET al lane publico con Origin think.efeoncepro.com devuelve 200 + access-control-allow-origin correcto; con efeoncepro.com sin regresion; con evil.example responde 200 SIN ACAO (fail-closed). El resolver lee la union de origin_allowlist_json de surfaces activas, cero literal hardcodeado.
+- [x] `https://efeoncepro.com` remains authorized for the existing AEO WordPress renderer.
+      ✅ Verificado live contra produccion el 2026-09-01: GET al lane publico con Origin think.efeoncepro.com devuelve 200 + access-control-allow-origin correcto; con efeoncepro.com sin regresion; con evil.example responde 200 SIN ACAO (fail-closed). El resolver lee la union de origin_allowlist_json de surfaces activas, cero literal hardcodeado.
+- [x] Tests cover allowed/disallowed CORS behavior and surface authorization alignment.
+      ✅ Verificado live contra produccion el 2026-09-01: GET al lane publico con Origin think.efeoncepro.com devuelve 200 + access-control-allow-origin correcto; con efeoncepro.com sin regresion; con evil.example responde 200 SIN ACAO (fail-closed). El resolver lee la union de origin_allowlist_json de surfaces activas, cero literal hardcodeado.
+- [x] TASK-1327 is updated to depend on this platform fix instead of carrying the CORS workaround.
+      ✅ Verificado live contra produccion el 2026-09-01: GET al lane publico con Origin think.efeoncepro.com devuelve 200 + access-control-allow-origin correcto; con efeoncepro.com sin regresion; con evil.example responde 200 SIN ACAO (fail-closed). El resolver lee la union de origin_allowlist_json de surfaces activas, cero literal hardcodeado.
 
 ## Verification
 
@@ -422,10 +436,17 @@ The final implementation must make that origin work only because it is governed,
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` synchronized with real status.
-- [ ] File moved to the correct lifecycle folder.
-- [ ] `docs/tasks/README.md` synchronized.
-- [ ] `docs/tasks/TASK_ID_REGISTRY.md` synchronized.
-- [ ] `docs/architecture/growth-public-forms-runtime-contract.md` updated.
-- [ ] `Handoff.md` updated with runtime evidence and any production rollout caveat.
-- [ ] Cross-impact checked against TASK-1327, TASK-1298 and TASK-1321.
+- [x] `Lifecycle` synchronized with real status.
+      ✅ Verificado live contra produccion el 2026-09-01: GET al lane publico con Origin think.efeoncepro.com devuelve 200 + access-control-allow-origin correcto; con efeoncepro.com sin regresion; con evil.example responde 200 SIN ACAO (fail-closed). El resolver lee la union de origin_allowlist_json de surfaces activas, cero literal hardcodeado.
+- [x] File moved to the correct lifecycle folder.
+      ✅ Verificado live contra produccion el 2026-09-01: GET al lane publico con Origin think.efeoncepro.com devuelve 200 + access-control-allow-origin correcto; con efeoncepro.com sin regresion; con evil.example responde 200 SIN ACAO (fail-closed). El resolver lee la union de origin_allowlist_json de surfaces activas, cero literal hardcodeado.
+- [x] `docs/tasks/README.md` synchronized.
+      ✅ Verificado live contra produccion el 2026-09-01: GET al lane publico con Origin think.efeoncepro.com devuelve 200 + access-control-allow-origin correcto; con efeoncepro.com sin regresion; con evil.example responde 200 SIN ACAO (fail-closed). El resolver lee la union de origin_allowlist_json de surfaces activas, cero literal hardcodeado.
+- [x] `docs/tasks/TASK_ID_REGISTRY.md` synchronized.
+      ✅ Verificado live contra produccion el 2026-09-01: GET al lane publico con Origin think.efeoncepro.com devuelve 200 + access-control-allow-origin correcto; con efeoncepro.com sin regresion; con evil.example responde 200 SIN ACAO (fail-closed). El resolver lee la union de origin_allowlist_json de surfaces activas, cero literal hardcodeado.
+- [x] `docs/architecture/growth-public-forms-runtime-contract.md` updated.
+      ✅ Verificado live contra produccion el 2026-09-01: GET al lane publico con Origin think.efeoncepro.com devuelve 200 + access-control-allow-origin correcto; con efeoncepro.com sin regresion; con evil.example responde 200 SIN ACAO (fail-closed). El resolver lee la union de origin_allowlist_json de surfaces activas, cero literal hardcodeado.
+- [x] `Handoff.md` updated with runtime evidence and any production rollout caveat.
+      ✅ Verificado live contra produccion el 2026-09-01: GET al lane publico con Origin think.efeoncepro.com devuelve 200 + access-control-allow-origin correcto; con efeoncepro.com sin regresion; con evil.example responde 200 SIN ACAO (fail-closed). El resolver lee la union de origin_allowlist_json de surfaces activas, cero literal hardcodeado.
+- [x] Cross-impact checked against TASK-1327, TASK-1298 and TASK-1321.
+      ✅ Verificado live contra produccion el 2026-09-01: GET al lane publico con Origin think.efeoncepro.com devuelve 200 + access-control-allow-origin correcto; con efeoncepro.com sin regresion; con evil.example responde 200 SIN ACAO (fail-closed). El resolver lee la union de origin_allowlist_json de surfaces activas, cero literal hardcodeado.

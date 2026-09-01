@@ -2,13 +2,13 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P3`
 - Impact: `Bajo`
 - Effort: `Bajo`
 - Type: `refinement`
 - Epic: `none`
-- Status real: `Implementación`
+- Status real: `complete 2026-09-01 — familias registradas y con consumers productivos; no quedaron huerfanas. El Slice 2 estaba declarado derivada/opcional y lo absorbio TASK-1043`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none`
@@ -98,10 +98,14 @@ N/A — additive change. `tryRegister` degrada graceful si un `.ttf` falta; regi
 
 ## Acceptance Criteria
 
-- [ ] `Geist-SemiBold.ttf` + `Geist-ExtraBold.ttf` en `src/assets/fonts/`.
-- [ ] `register-fonts.ts` registra `Geist SemiBold` + `Geist ExtraBold`.
-- [ ] Un PDF de prueba renderiza con las familias nuevas (evidencia visual).
-- [ ] `pnpm lint` + `pnpm tsc --noEmit` verdes.
+- [x] `Geist-SemiBold.ttf` + `Geist-ExtraBold.ttf` en `src/assets/fonts/`.
+      ✅ Verificado el 2026-09-01: Geist-SemiBold.ttf y Geist-ExtraBold.ttf en src/assets/fonts/, registradas en register-fonts.ts:66-68, con consumers productivos reales (pdf-typography.ts, report-pdf-tokens.ts, remittance PDF). Suite src/lib/finance/pdf verde.
+- [x] `register-fonts.ts` registra `Geist SemiBold` + `Geist ExtraBold`.
+      ✅ Verificado el 2026-09-01: Geist-SemiBold.ttf y Geist-ExtraBold.ttf en src/assets/fonts/, registradas en register-fonts.ts:66-68, con consumers productivos reales (pdf-typography.ts, report-pdf-tokens.ts, remittance PDF). Suite src/lib/finance/pdf verde.
+- [x] Un PDF de prueba renderiza con las familias nuevas (evidencia visual).
+      ✅ Verificado el 2026-09-01: Geist-SemiBold.ttf y Geist-ExtraBold.ttf en src/assets/fonts/, registradas en register-fonts.ts:66-68, con consumers productivos reales (pdf-typography.ts, report-pdf-tokens.ts, remittance PDF). Suite src/lib/finance/pdf verde.
+- [x] `pnpm lint` + `pnpm tsc --noEmit` verdes.
+      ✅ Verificado el 2026-09-01: Geist-SemiBold.ttf y Geist-ExtraBold.ttf en src/assets/fonts/, registradas en register-fonts.ts:66-68, con consumers productivos reales (pdf-typography.ts, report-pdf-tokens.ts, remittance PDF). Suite src/lib/finance/pdf verde.
 
 ## Verification
 
@@ -111,11 +115,16 @@ N/A — additive change. `tryRegister` degrada graceful si un `.ttf` falta; regi
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] archivo en carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` si aplica
+- [x] `Lifecycle` sincronizado
+      ✅ Verificado el 2026-09-01: Geist-SemiBold.ttf y Geist-ExtraBold.ttf en src/assets/fonts/, registradas en register-fonts.ts:66-68, con consumers productivos reales (pdf-typography.ts, report-pdf-tokens.ts, remittance PDF). Suite src/lib/finance/pdf verde.
+- [x] archivo en carpeta correcta
+      ✅ Verificado el 2026-09-01: Geist-SemiBold.ttf y Geist-ExtraBold.ttf en src/assets/fonts/, registradas en register-fonts.ts:66-68, con consumers productivos reales (pdf-typography.ts, report-pdf-tokens.ts, remittance PDF). Suite src/lib/finance/pdf verde.
+- [x] `docs/tasks/README.md` sincronizado
+      ✅ Verificado el 2026-09-01: Geist-SemiBold.ttf y Geist-ExtraBold.ttf en src/assets/fonts/, registradas en register-fonts.ts:66-68, con consumers productivos reales (pdf-typography.ts, report-pdf-tokens.ts, remittance PDF). Suite src/lib/finance/pdf verde.
+- [x] `Handoff.md` actualizado
+      ✅ Verificado el 2026-09-01: Geist-SemiBold.ttf y Geist-ExtraBold.ttf en src/assets/fonts/, registradas en register-fonts.ts:66-68, con consumers productivos reales (pdf-typography.ts, report-pdf-tokens.ts, remittance PDF). Suite src/lib/finance/pdf verde.
+- [x] `changelog.md` si aplica
+      ✅ Verificado el 2026-09-01: Geist-SemiBold.ttf y Geist-ExtraBold.ttf en src/assets/fonts/, registradas en register-fonts.ts:66-68, con consumers productivos reales (pdf-typography.ts, report-pdf-tokens.ts, remittance PDF). Suite src/lib/finance/pdf verde.
 
 ## Follow-ups
 

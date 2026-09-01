@@ -1,5 +1,11 @@
 # TASK-1246 — Growth AI Visibility: Public Launch Readiness + Rollout
 
+## Delta 2026-09-01 — un blocker menos
+
+`TASK-1253` quedó `complete` (flag ON en Vercel Production, verificado con `vercel env pull`; el
+ledger decía `prod: OFF` y estaba stale). Sale del campo `Blocked by`. Los demás siguen vigentes.
+
+
 ## Delta 2026-08-27
 
 - Existe gate de presupuesto per-org para el grader y **nace en shadow**: con
@@ -137,7 +143,7 @@ TASK-1250 quedó **code complete** (sin push, sin prod): el lead recibe el infor
 - Status real: `Superficie pública live; cierre operativo y reconciliación documental pendientes`
 - Rank: `TBD`
 - Domain: `growth|ops|public-site|reliability`
-- Blocked by: `TASK-1241, TASK-1242, TASK-1244, TASK-1245, TASK-1250, TASK-1253, TASK-1255`
+- Blocked by: `TASK-1241, TASK-1242, TASK-1244, TASK-1245, TASK-1250, TASK-1255`
 - Branch: `task/TASK-1246-growth-ai-visibility-public-launch-readiness-rollout`
 - Legacy ID: `none`
 - GitHub Issue: `none`

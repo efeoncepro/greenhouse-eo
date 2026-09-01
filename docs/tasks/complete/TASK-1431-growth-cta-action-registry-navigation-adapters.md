@@ -4,7 +4,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -17,7 +17,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-023`
-- Status real: `Definida`
+- Status real: `complete 2026-09-01 — el unico pendiente que declaraba su Delta (bundle 1.2.0 en hosts publicos) esta verificado live. Las actions nuevas son inertes por diseno hasta que se publique una CTA que las use`
 - Rank: `2`
 - Domain: `growth|public-site|platform`
 - Blocked by: `none`
@@ -279,20 +279,31 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime evidence is listed for registry, public contract and host execution.
-- [ ] Errors are canonical and no raw URL policy, PII or secrets leak to telemetry/browser.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
+- [x] Runtime evidence is listed for registry, public contract and host execution.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
+- [x] Errors are canonical and no raw URL policy, PII or secrets leak to telemetry/browser.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
 
 ## Capability Definition of Done
 
-- [ ] Registry/resolvers live in the primitive, not in API/UI/renderer conditionals duplicated per consumer.
-- [ ] Each action has policy schema, resolved browser projection, failure reasons and execution family.
-- [ ] Publish and render fail closed for unregistered/invalid actions.
-- [ ] Cockpit/programmatic consumers can read supported action metadata without importing server-only resolvers.
-- [ ] Existing capabilities/grants and governed lifecycle remain the only write path.
-- [ ] Full API parity and propose→confirm→execute remain valid for author/publish.
+- [x] Registry/resolvers live in the primitive, not in API/UI/renderer conditionals duplicated per consumer.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
+- [x] Each action has policy schema, resolved browser projection, failure reasons and execution family.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
+- [x] Publish and render fail closed for unregistered/invalid actions.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
+- [x] Cockpit/programmatic consumers can read supported action metadata without importing server-only resolvers.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
+- [x] Existing capabilities/grants and governed lifecycle remain the only write path.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
+- [x] Full API parity and propose→confirm→execute remain valid for author/publish.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
 
 ## Hybrid Execution Justification
 
@@ -416,20 +427,34 @@ Mantener compatibilidad de `greenhouse-growth-cta-popup.v1` si las ramas son adi
 
 ## Acceptance Criteria
 
-- [ ] Registry único y exhaustivo gobierna schema, resolver, projection, metadata y failure reasons.
-- [ ] `open_growth_form` conserva compatibilidad y tests actuales.
-- [ ] `link_url`, `open_think_tool` y `book_meeting` funcionan end-to-end con destinos seguros.
-- [ ] Cada registry entry publica execution family, destination expectation, state/recovery metadata y authoring contract mínimos sin filtrar policy.
-- [ ] Ningún action kind selecciona appearance, placement, density, asset o copy por side effect.
-- [ ] Labels/footnotes pasan expectation-integrity: describen la acción real y no prometen descarga/reserva/resultado que el adapter no ejecuta.
-- [ ] Pending es single-dispatch y accesible; error restaura control/foco/contexto; Growth Form recibe foco solo cuando está ready.
-- [ ] `dismiss` sigue como control/suppression; no se convierte en destination artificial.
-- [ ] `download_asset`, `embed_growth_form` y `hubspot_handoff` no se implementan especulativamente.
-- [ ] Publish/render bloquean action inválida o bundle no compatible.
-- [ ] Browser/telemetry no reciben policy interna, URL credentials, PII ni secretos.
-- [ ] TASK-1430 puede consumir metadata del registry sin lista paralela.
-- [ ] Wireframe/flow/readiness y GVC assertions pasan en 1440/390.
-- [ ] `pnpm task:lint --task TASK-1431` reporta `template=1`, `errors=0`, `warnings=0`.
+- [x] Registry único y exhaustivo gobierna schema, resolver, projection, metadata y failure reasons.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
+- [x] `open_growth_form` conserva compatibilidad y tests actuales.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
+- [x] `link_url`, `open_think_tool` y `book_meeting` funcionan end-to-end con destinos seguros.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
+- [x] Cada registry entry publica execution family, destination expectation, state/recovery metadata y authoring contract mínimos sin filtrar policy.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
+- [x] Ningún action kind selecciona appearance, placement, density, asset o copy por side effect.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
+- [x] Labels/footnotes pasan expectation-integrity: describen la acción real y no prometen descarga/reserva/resultado que el adapter no ejecuta.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
+- [x] Pending es single-dispatch y accesible; error restaura control/foco/contexto; Growth Form recibe foco solo cuando está ready.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
+- [x] `dismiss` sigue como control/suppression; no se convierte en destination artificial.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
+- [x] `download_asset`, `embed_growth_form` y `hubspot_handoff` no se implementan especulativamente.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
+- [x] Publish/render bloquean action inválida o bundle no compatible.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
+- [x] Browser/telemetry no reciben policy interna, URL credentials, PII ni secretos.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
+- [x] TASK-1430 puede consumir metadata del registry sin lista paralela.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
+- [x] Wireframe/flow/readiness y GVC assertions pasan en 1440/390.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
+- [x] `pnpm task:lint --task TASK-1431` reporta `template=1`, `errors=0`, `warnings=0`.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
 
 ## Verification
 
@@ -443,11 +468,16 @@ Mantener compatibilidad de `greenhouse-growth-cta-popup.v1` si las ramas son adi
 
 ## Closing Protocol
 
-- [ ] Runtime/host parity audit includes every registered action family.
-- [ ] EPIC-023, architecture/ADR, functional/manual docs, Handoff and changelog reflect actual shipped actions.
-- [ ] TASK lifecycle, README and registry synchronized.
-- [ ] `pnpm docs:closure-check` and cross-impact check pass.
-- [ ] Skill `greenhouse-growth-ctas` actualizada en el MISMO change set (Skill Maintenance Contract: registry de acciones = flujo crítico).
+- [x] Runtime/host parity audit includes every registered action family.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
+- [x] EPIC-023, architecture/ADR, functional/manual docs, Handoff and changelog reflect actual shipped actions.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
+- [x] TASK lifecycle, README and registry synchronized.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
+- [x] `pnpm docs:closure-check` and cross-impact check pass.
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
+- [x] Skill `greenhouse-growth-ctas` actualizada en el MISMO change set (Skill Maintenance Contract: registry de acciones = flujo crítico).
+      ✅ Verificado en produccion el 2026-09-01: greenhouse.efeoncepro.com/growth-cta/renderer-latest.js sirve el bundle con 1.2.0-preview.1, identico al local. Slices 1-3 en main (23d921fc1, d13cb569d).
 
 ## Follow-ups
 

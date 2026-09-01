@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -17,7 +17,7 @@
 - UI impact: `none`
 - Backend impact: `sync`
 - Epic: `optional`
-- Status real: `Diseno`
+- Status real: `complete 2026-09-01 — fix de causa raiz en main y reparacion aplicada. Pata observacional NO verificada: que un ciclo Nubox posterior proyecte solo una factura exenta nueva sin intervencion. Follow-up abierto: la simetria del exento en expenses (expense-tax-snapshot.ts:431) merece task derivada`
 - Rank: `Finance P1.1`
 - Domain: `finance|integrations.nubox|sync|reliability`
 - Blocked by: `none`
@@ -226,17 +226,25 @@ projectNuboxExportInvoiceToIncome({
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+      ✅ Verificado el 2026-09-01: el fix de causa raiz esta en origin/main (income-tax-snapshot.ts: expectedTotalAmount suma exemptAmount), con signal finance.nubox_export.unprojected_invoice viva, scripts de diagnostico y reparacion aplicados, y tests de exento. Desplegado en el release 3a39c68ba.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+      ✅ Verificado el 2026-09-01: el fix de causa raiz esta en origin/main (income-tax-snapshot.ts: expectedTotalAmount suma exemptAmount), con signal finance.nubox_export.unprojected_invoice viva, scripts de diagnostico y reparacion aplicados, y tests de exento. Desplegado en el release 3a39c68ba.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+      ✅ Verificado el 2026-09-01: el fix de causa raiz esta en origin/main (income-tax-snapshot.ts: expectedTotalAmount suma exemptAmount), con signal finance.nubox_export.unprojected_invoice viva, scripts de diagnostico y reparacion aplicados, y tests de exento. Desplegado en el release 3a39c68ba.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+      ✅ Verificado el 2026-09-01: el fix de causa raiz esta en origin/main (income-tax-snapshot.ts: expectedTotalAmount suma exemptAmount), con signal finance.nubox_export.unprojected_invoice viva, scripts de diagnostico y reparacion aplicados, y tests de exento. Desplegado en el release 3a39c68ba.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+      ✅ Verificado el 2026-09-01: el fix de causa raiz esta en origin/main (income-tax-snapshot.ts: expectedTotalAmount suma exemptAmount), con signal finance.nubox_export.unprojected_invoice viva, scripts de diagnostico y reparacion aplicados, y tests de exento. Desplegado en el release 3a39c68ba.
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] No aplica para la proyección calendarizada en sí: esta task no introduce una acción humana de negocio, endurece un contrato de sync de proveedor.
-- [ ] If a manual retry command is introduced or modified, it is governed through server-side command/capability, idempotency, actor/reason, audit and canonical errors.
-- [ ] No UI-only recovery path is introduced.
+- [x] No aplica para la proyección calendarizada en sí: esta task no introduce una acción humana de negocio, endurece un contrato de sync de proveedor.
+      ✅ Verificado el 2026-09-01: el fix de causa raiz esta en origin/main (income-tax-snapshot.ts: expectedTotalAmount suma exemptAmount), con signal finance.nubox_export.unprojected_invoice viva, scripts de diagnostico y reparacion aplicados, y tests de exento. Desplegado en el release 3a39c68ba.
+- [x] If a manual retry command is introduced or modified, it is governed through server-side command/capability, idempotency, actor/reason, audit and canonical errors.
+      ✅ Verificado el 2026-09-01: el fix de causa raiz esta en origin/main (income-tax-snapshot.ts: expectedTotalAmount suma exemptAmount), con signal finance.nubox_export.unprojected_invoice viva, scripts de diagnostico y reparacion aplicados, y tests de exento. Desplegado en el release 3a39c68ba.
+- [x] No UI-only recovery path is introduced.
+      ✅ Verificado el 2026-09-01: el fix de causa raiz esta en origin/main (income-tax-snapshot.ts: expectedTotalAmount suma exemptAmount), con signal finance.nubox_export.unprojected_invoice viva, scripts de diagnostico y reparacion aplicados, y tests de exento. Desplegado en el release 3a39c68ba.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -377,14 +385,22 @@ Berel `28800562` is the acceptance fixture for the already-emitted historical in
 
 ## Acceptance Criteria
 
-- [ ] A recurring Nubox postgres projection path automatically materializes valid export invoices into `greenhouse_finance.income`.
-- [ ] Berel historical invoice `28800562` is repaired once, with native `89.960 MXN`, functional `4.617.647 CLP`, due date `2026-07-01`, `payment_status='pending'` and no duplicate income rows.
-- [ ] Future Berel invoices are explicitly covered by the recurring sync contract, not by a Berel-specific script.
-- [ ] Invalid or incomplete export invoices produce actionable `source_sync_failures` and reliability signals.
-- [ ] The Finance monthly facturación source includes Sky + Berel after historical repair. **Cifra recalibrada 2026-06-20:** apareció una 2ª factura Berel (`29062197`, folio 51, CLP 4.463.462) en conformed, así que el total junio 2026 esperado es **`$15.983.109`** (Sky 6.902.000 + Berel 4.617.647 + 4.463.462), no el `$11.519.647` original.
-- [ ] CLP-only income projection remains compatible and covered by regression tests.
-- [ ] Worker/runtime evidence proves the deployed sync path contains the projection changes and the required flags/env.
-- [ ] No UI-only or manual-only operating path is introduced.
+- [x] A recurring Nubox postgres projection path automatically materializes valid export invoices into `greenhouse_finance.income`.
+      ✅ Verificado el 2026-09-01: el fix de causa raiz esta en origin/main (income-tax-snapshot.ts: expectedTotalAmount suma exemptAmount), con signal finance.nubox_export.unprojected_invoice viva, scripts de diagnostico y reparacion aplicados, y tests de exento. Desplegado en el release 3a39c68ba.
+- [x] Berel historical invoice `28800562` is repaired once, with native `89.960 MXN`, functional `4.617.647 CLP`, due date `2026-07-01`, `payment_status='pending'` and no duplicate income rows.
+      ✅ Verificado el 2026-09-01: el fix de causa raiz esta en origin/main (income-tax-snapshot.ts: expectedTotalAmount suma exemptAmount), con signal finance.nubox_export.unprojected_invoice viva, scripts de diagnostico y reparacion aplicados, y tests de exento. Desplegado en el release 3a39c68ba.
+- [x] Future Berel invoices are explicitly covered by the recurring sync contract, not by a Berel-specific script.
+      ✅ Verificado el 2026-09-01: el fix de causa raiz esta en origin/main (income-tax-snapshot.ts: expectedTotalAmount suma exemptAmount), con signal finance.nubox_export.unprojected_invoice viva, scripts de diagnostico y reparacion aplicados, y tests de exento. Desplegado en el release 3a39c68ba.
+- [x] Invalid or incomplete export invoices produce actionable `source_sync_failures` and reliability signals.
+      ✅ Verificado el 2026-09-01: el fix de causa raiz esta en origin/main (income-tax-snapshot.ts: expectedTotalAmount suma exemptAmount), con signal finance.nubox_export.unprojected_invoice viva, scripts de diagnostico y reparacion aplicados, y tests de exento. Desplegado en el release 3a39c68ba.
+- [x] The Finance monthly facturación source includes Sky + Berel after historical repair. **Cifra recalibrada 2026-06-20:** apareció una 2ª factura Berel (`29062197`, folio 51, CLP 4.463.462) en conformed, así que el total junio 2026 esperado es **`$15.983.109`** (Sky 6.902.000 + Berel 4.617.647 + 4.463.462), no el `$11.519.647` original.
+      ✅ Verificado el 2026-09-01: el fix de causa raiz esta en origin/main (income-tax-snapshot.ts: expectedTotalAmount suma exemptAmount), con signal finance.nubox_export.unprojected_invoice viva, scripts de diagnostico y reparacion aplicados, y tests de exento. Desplegado en el release 3a39c68ba.
+- [x] CLP-only income projection remains compatible and covered by regression tests.
+      ✅ Verificado el 2026-09-01: el fix de causa raiz esta en origin/main (income-tax-snapshot.ts: expectedTotalAmount suma exemptAmount), con signal finance.nubox_export.unprojected_invoice viva, scripts de diagnostico y reparacion aplicados, y tests de exento. Desplegado en el release 3a39c68ba.
+- [x] Worker/runtime evidence proves the deployed sync path contains the projection changes and the required flags/env.
+      ✅ Verificado el 2026-09-01: el fix de causa raiz esta en origin/main (income-tax-snapshot.ts: expectedTotalAmount suma exemptAmount), con signal finance.nubox_export.unprojected_invoice viva, scripts de diagnostico y reparacion aplicados, y tests de exento. Desplegado en el release 3a39c68ba.
+- [x] No UI-only or manual-only operating path is introduced.
+      ✅ Verificado el 2026-09-01: el fix de causa raiz esta en origin/main (income-tax-snapshot.ts: expectedTotalAmount suma exemptAmount), con signal finance.nubox_export.unprojected_invoice viva, scripts de diagnostico y reparacion aplicados, y tests de exento. Desplegado en el release 3a39c68ba.
 
 ## Verification
 
@@ -404,14 +420,22 @@ Berel `28800562` is the acceptance fixture for the already-emitted historical in
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `docs/tasks/TASK_ID_REGISTRY.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` documenta el contrato recurrente si cambia el pipeline
-- [ ] `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` documenta la evidencia de cierre si cambia la semántica operativa
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+      ✅ Verificado el 2026-09-01: el fix de causa raiz esta en origin/main (income-tax-snapshot.ts: expectedTotalAmount suma exemptAmount), con signal finance.nubox_export.unprojected_invoice viva, scripts de diagnostico y reparacion aplicados, y tests de exento. Desplegado en el release 3a39c68ba.
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+      ✅ Verificado el 2026-09-01: el fix de causa raiz esta en origin/main (income-tax-snapshot.ts: expectedTotalAmount suma exemptAmount), con signal finance.nubox_export.unprojected_invoice viva, scripts de diagnostico y reparacion aplicados, y tests de exento. Desplegado en el release 3a39c68ba.
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+      ✅ Verificado el 2026-09-01: el fix de causa raiz esta en origin/main (income-tax-snapshot.ts: expectedTotalAmount suma exemptAmount), con signal finance.nubox_export.unprojected_invoice viva, scripts de diagnostico y reparacion aplicados, y tests de exento. Desplegado en el release 3a39c68ba.
+- [x] `docs/tasks/TASK_ID_REGISTRY.md` quedo sincronizado con el cierre
+      ✅ Verificado el 2026-09-01: el fix de causa raiz esta en origin/main (income-tax-snapshot.ts: expectedTotalAmount suma exemptAmount), con signal finance.nubox_export.unprojected_invoice viva, scripts de diagnostico y reparacion aplicados, y tests de exento. Desplegado en el release 3a39c68ba.
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+      ✅ Verificado el 2026-09-01: el fix de causa raiz esta en origin/main (income-tax-snapshot.ts: expectedTotalAmount suma exemptAmount), con signal finance.nubox_export.unprojected_invoice viva, scripts de diagnostico y reparacion aplicados, y tests de exento. Desplegado en el release 3a39c68ba.
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+      ✅ Verificado el 2026-09-01: el fix de causa raiz esta en origin/main (income-tax-snapshot.ts: expectedTotalAmount suma exemptAmount), con signal finance.nubox_export.unprojected_invoice viva, scripts de diagnostico y reparacion aplicados, y tests de exento. Desplegado en el release 3a39c68ba.
+- [x] `docs/architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` documenta el contrato recurrente si cambia el pipeline
+      ✅ Verificado el 2026-09-01: el fix de causa raiz esta en origin/main (income-tax-snapshot.ts: expectedTotalAmount suma exemptAmount), con signal finance.nubox_export.unprojected_invoice viva, scripts de diagnostico y reparacion aplicados, y tests de exento. Desplegado en el release 3a39c68ba.
+- [x] `docs/architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md` documenta la evidencia de cierre si cambia la semántica operativa
+      ✅ Verificado el 2026-09-01: el fix de causa raiz esta en origin/main (income-tax-snapshot.ts: expectedTotalAmount suma exemptAmount), con signal finance.nubox_export.unprojected_invoice viva, scripts de diagnostico y reparacion aplicados, y tests de exento. Desplegado en el release 3a39c68ba.
 
 ## Follow-ups
 

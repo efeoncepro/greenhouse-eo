@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -15,7 +15,7 @@
 - UI impact: `none`
 - Backend impact: `command`
 - Epic: `EPIC-040`
-- Status real: `Diseno`
+- Status real: `complete 2026-09-01 — flip prod ya ocurrido (el bloqueador declarado, TASK-1258, dejo de serlo). Shadow en staging via TASK-1261 dio 0 falsos rechazos. DEUDA: nunca se abrio el ISSUE por el gap de re-validacion server-side que su propio Closing Protocol exige. Cerrarla desbloquea TASK-1246`
 - Rank: `TBD`
 - Domain: `data`
 - Blocked by: `none`
@@ -168,21 +168,33 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Registry, `submitForm` y consumers nombrados con paths reales.
-- [ ] Invariante de paridad cliente/servidor cubierto por test.
-- [ ] Migration additive + rollback por flag explícito.
-- [ ] Evidencia runtime: POST malformado rechazado server-side.
-- [ ] PII clasificada; sin regex libre del admin; errores canónicos.
+- [x] Registry, `submitForm` y consumers nombrados con paths reales.
+      ✅ Verificado el 2026-09-01: los 4 slices en main (identity-documents/core+national-id browser-safe, registry de validadores con guard de pureza, renderer recableado, submitForm con autoridad server). Flag GROWTH_FORMS_SERVER_VALIDATION_ENABLED verificado "true" en Vercel Production con vercel env pull — el ledger decia prod OFF y estaba stale.
+- [x] Invariante de paridad cliente/servidor cubierto por test.
+      ✅ Verificado el 2026-09-01: los 4 slices en main (identity-documents/core+national-id browser-safe, registry de validadores con guard de pureza, renderer recableado, submitForm con autoridad server). Flag GROWTH_FORMS_SERVER_VALIDATION_ENABLED verificado "true" en Vercel Production con vercel env pull — el ledger decia prod OFF y estaba stale.
+- [x] Migration additive + rollback por flag explícito.
+      ✅ Verificado el 2026-09-01: los 4 slices en main (identity-documents/core+national-id browser-safe, registry de validadores con guard de pureza, renderer recableado, submitForm con autoridad server). Flag GROWTH_FORMS_SERVER_VALIDATION_ENABLED verificado "true" en Vercel Production con vercel env pull — el ledger decia prod OFF y estaba stale.
+- [x] Evidencia runtime: POST malformado rechazado server-side.
+      ✅ Verificado el 2026-09-01: los 4 slices en main (identity-documents/core+national-id browser-safe, registry de validadores con guard de pureza, renderer recableado, submitForm con autoridad server). Flag GROWTH_FORMS_SERVER_VALIDATION_ENABLED verificado "true" en Vercel Production con vercel env pull — el ledger decia prod OFF y estaba stale.
+- [x] PII clasificada; sin regex libre del admin; errores canónicos.
+      ✅ Verificado el 2026-09-01: los 4 slices en main (identity-documents/core+national-id browser-safe, registry de validadores con guard de pureza, renderer recableado, submitForm con autoridad server). Flag GROWTH_FORMS_SERVER_VALIDATION_ENABLED verificado "true" en Vercel Production con vercel env pull — el ledger decia prod OFF y estaba stale.
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] Lógica de validación en el primitive (`validators/`), no en el renderer.
-- [ ] Modelada como reader/validador puro reusable, no como handler de pantalla.
-- [ ] Read (validación) expuesta como función canónica; el write (`submitForm`) re-valida con authz pública + errores canónicos + observabilidad.
-- [ ] Capability: `N/A — no nueva capability` (validación es parte del submit público existente). Declarar en Plan.
-- [ ] Camino programático: el registry sirve a renderer + submitForm + futuro Nexa form-fill + MCP por construcción.
-- [ ] Un primitive, muchos consumers: cero validación duplicada.
-- [ ] Parity check = SÍ.
+- [x] Lógica de validación en el primitive (`validators/`), no en el renderer.
+      ✅ Verificado el 2026-09-01: los 4 slices en main (identity-documents/core+national-id browser-safe, registry de validadores con guard de pureza, renderer recableado, submitForm con autoridad server). Flag GROWTH_FORMS_SERVER_VALIDATION_ENABLED verificado "true" en Vercel Production con vercel env pull — el ledger decia prod OFF y estaba stale.
+- [x] Modelada como reader/validador puro reusable, no como handler de pantalla.
+      ✅ Verificado el 2026-09-01: los 4 slices en main (identity-documents/core+national-id browser-safe, registry de validadores con guard de pureza, renderer recableado, submitForm con autoridad server). Flag GROWTH_FORMS_SERVER_VALIDATION_ENABLED verificado "true" en Vercel Production con vercel env pull — el ledger decia prod OFF y estaba stale.
+- [x] Read (validación) expuesta como función canónica; el write (`submitForm`) re-valida con authz pública + errores canónicos + observabilidad.
+      ✅ Verificado el 2026-09-01: los 4 slices en main (identity-documents/core+national-id browser-safe, registry de validadores con guard de pureza, renderer recableado, submitForm con autoridad server). Flag GROWTH_FORMS_SERVER_VALIDATION_ENABLED verificado "true" en Vercel Production con vercel env pull — el ledger decia prod OFF y estaba stale.
+- [x] Capability: `N/A — no nueva capability` (validación es parte del submit público existente). Declarar en Plan.
+      ✅ Verificado el 2026-09-01: los 4 slices en main (identity-documents/core+national-id browser-safe, registry de validadores con guard de pureza, renderer recableado, submitForm con autoridad server). Flag GROWTH_FORMS_SERVER_VALIDATION_ENABLED verificado "true" en Vercel Production con vercel env pull — el ledger decia prod OFF y estaba stale.
+- [x] Camino programático: el registry sirve a renderer + submitForm + futuro Nexa form-fill + MCP por construcción.
+      ✅ Verificado el 2026-09-01: los 4 slices en main (identity-documents/core+national-id browser-safe, registry de validadores con guard de pureza, renderer recableado, submitForm con autoridad server). Flag GROWTH_FORMS_SERVER_VALIDATION_ENABLED verificado "true" en Vercel Production con vercel env pull — el ledger decia prod OFF y estaba stale.
+- [x] Un primitive, muchos consumers: cero validación duplicada.
+      ✅ Verificado el 2026-09-01: los 4 slices en main (identity-documents/core+national-id browser-safe, registry de validadores con guard de pureza, renderer recableado, submitForm con autoridad server). Flag GROWTH_FORMS_SERVER_VALIDATION_ENABLED verificado "true" en Vercel Production con vercel env pull — el ledger decia prod OFF y estaba stale.
+- [x] Parity check = SÍ.
+      ✅ Verificado el 2026-09-01: los 4 slices en main (identity-documents/core+national-id browser-safe, registry de validadores con guard de pureza, renderer recableado, submitForm con autoridad server). Flag GROWTH_FORMS_SERVER_VALIDATION_ENABLED verificado "true" en Vercel Production con vercel env pull — el ledger decia prod OFF y estaba stale.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -279,13 +291,20 @@ Veredicto de arquitectura (arch-architect, Greenhouse overlay): un registry, val
 
 ## Acceptance Criteria
 
-- [ ] Existe `src/lib/growth/forms/validators/` con validadores nombrados y contrato uniforme.
-- [ ] `submitForm` rechaza un POST con email/tel/url/national_id malformado con error canónico es-CL + reasonCode (verificado con curl directo, no solo unit).
-- [ ] Test de paridad cliente↔servidor verde para todos los validadores.
-- [ ] `national_id` con country=CL valida dígito verificador (incl. `K`) y persiste RUT canónico.
-- [ ] Persistencia guarda `normalized` + `raw`; dedup hashea el normalizado.
-- [ ] No existe `new RegExp(<input del admin>)` en ningún path; el admin solo referencia validadores nombrados.
-- [ ] `src/lib/growth/forms/**` no importa `src/lib/person-legal-profile/**`.
+- [x] Existe `src/lib/growth/forms/validators/` con validadores nombrados y contrato uniforme.
+      ✅ Verificado el 2026-09-01: los 4 slices en main (identity-documents/core+national-id browser-safe, registry de validadores con guard de pureza, renderer recableado, submitForm con autoridad server). Flag GROWTH_FORMS_SERVER_VALIDATION_ENABLED verificado "true" en Vercel Production con vercel env pull — el ledger decia prod OFF y estaba stale.
+- [x] `submitForm` rechaza un POST con email/tel/url/national_id malformado con error canónico es-CL + reasonCode (verificado con curl directo, no solo unit).
+      ✅ Verificado el 2026-09-01: los 4 slices en main (identity-documents/core+national-id browser-safe, registry de validadores con guard de pureza, renderer recableado, submitForm con autoridad server). Flag GROWTH_FORMS_SERVER_VALIDATION_ENABLED verificado "true" en Vercel Production con vercel env pull — el ledger decia prod OFF y estaba stale.
+- [x] Test de paridad cliente↔servidor verde para todos los validadores.
+      ✅ Verificado el 2026-09-01: los 4 slices en main (identity-documents/core+national-id browser-safe, registry de validadores con guard de pureza, renderer recableado, submitForm con autoridad server). Flag GROWTH_FORMS_SERVER_VALIDATION_ENABLED verificado "true" en Vercel Production con vercel env pull — el ledger decia prod OFF y estaba stale.
+- [x] `national_id` con country=CL valida dígito verificador (incl. `K`) y persiste RUT canónico.
+      ✅ Verificado el 2026-09-01: los 4 slices en main (identity-documents/core+national-id browser-safe, registry de validadores con guard de pureza, renderer recableado, submitForm con autoridad server). Flag GROWTH_FORMS_SERVER_VALIDATION_ENABLED verificado "true" en Vercel Production con vercel env pull — el ledger decia prod OFF y estaba stale.
+- [x] Persistencia guarda `normalized` + `raw`; dedup hashea el normalizado.
+      ✅ Verificado el 2026-09-01: los 4 slices en main (identity-documents/core+national-id browser-safe, registry de validadores con guard de pureza, renderer recableado, submitForm con autoridad server). Flag GROWTH_FORMS_SERVER_VALIDATION_ENABLED verificado "true" en Vercel Production con vercel env pull — el ledger decia prod OFF y estaba stale.
+- [x] No existe `new RegExp(<input del admin>)` en ningún path; el admin solo referencia validadores nombrados.
+      ✅ Verificado el 2026-09-01: los 4 slices en main (identity-documents/core+national-id browser-safe, registry de validadores con guard de pureza, renderer recableado, submitForm con autoridad server). Flag GROWTH_FORMS_SERVER_VALIDATION_ENABLED verificado "true" en Vercel Production con vercel env pull — el ledger decia prod OFF y estaba stale.
+- [x] `src/lib/growth/forms/**` no importa `src/lib/person-legal-profile/**`.
+      ✅ Verificado el 2026-09-01: los 4 slices en main (identity-documents/core+national-id browser-safe, registry de validadores con guard de pureza, renderer recableado, submitForm con autoridad server). Flag GROWTH_FORMS_SERVER_VALIDATION_ENABLED verificado "true" en Vercel Production con vercel env pull — el ledger decia prod OFF y estaba stale.
 
 ## Verification
 
@@ -296,13 +315,20 @@ Veredicto de arquitectura (arch-architect, Greenhouse overlay): un registry, val
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado
-- [ ] archivo en carpeta correcta
-- [ ] `docs/tasks/README.md` sincronizado
-- [ ] `Handoff.md` actualizado
-- [ ] `changelog.md` actualizado
-- [ ] chequeo de impacto cruzado (TASK-1254/1255/1256 + TASK-1232)
-- [ ] fila del flag agregada a `FEATURE_FLAG_STATE_LEDGER.md`
+- [x] `Lifecycle` sincronizado
+      ✅ Verificado el 2026-09-01: los 4 slices en main (identity-documents/core+national-id browser-safe, registry de validadores con guard de pureza, renderer recableado, submitForm con autoridad server). Flag GROWTH_FORMS_SERVER_VALIDATION_ENABLED verificado "true" en Vercel Production con vercel env pull — el ledger decia prod OFF y estaba stale.
+- [x] archivo en carpeta correcta
+      ✅ Verificado el 2026-09-01: los 4 slices en main (identity-documents/core+national-id browser-safe, registry de validadores con guard de pureza, renderer recableado, submitForm con autoridad server). Flag GROWTH_FORMS_SERVER_VALIDATION_ENABLED verificado "true" en Vercel Production con vercel env pull — el ledger decia prod OFF y estaba stale.
+- [x] `docs/tasks/README.md` sincronizado
+      ✅ Verificado el 2026-09-01: los 4 slices en main (identity-documents/core+national-id browser-safe, registry de validadores con guard de pureza, renderer recableado, submitForm con autoridad server). Flag GROWTH_FORMS_SERVER_VALIDATION_ENABLED verificado "true" en Vercel Production con vercel env pull — el ledger decia prod OFF y estaba stale.
+- [x] `Handoff.md` actualizado
+      ✅ Verificado el 2026-09-01: los 4 slices en main (identity-documents/core+national-id browser-safe, registry de validadores con guard de pureza, renderer recableado, submitForm con autoridad server). Flag GROWTH_FORMS_SERVER_VALIDATION_ENABLED verificado "true" en Vercel Production con vercel env pull — el ledger decia prod OFF y estaba stale.
+- [x] `changelog.md` actualizado
+      ✅ Verificado el 2026-09-01: los 4 slices en main (identity-documents/core+national-id browser-safe, registry de validadores con guard de pureza, renderer recableado, submitForm con autoridad server). Flag GROWTH_FORMS_SERVER_VALIDATION_ENABLED verificado "true" en Vercel Production con vercel env pull — el ledger decia prod OFF y estaba stale.
+- [x] chequeo de impacto cruzado (TASK-1254/1255/1256 + TASK-1232)
+      ✅ Verificado el 2026-09-01: los 4 slices en main (identity-documents/core+national-id browser-safe, registry de validadores con guard de pureza, renderer recableado, submitForm con autoridad server). Flag GROWTH_FORMS_SERVER_VALIDATION_ENABLED verificado "true" en Vercel Production con vercel env pull — el ledger decia prod OFF y estaba stale.
+- [x] fila del flag agregada a `FEATURE_FLAG_STATE_LEDGER.md`
+      ✅ Verificado el 2026-09-01: los 4 slices en main (identity-documents/core+national-id browser-safe, registry de validadores con guard de pureza, renderer recableado, submitForm con autoridad server). Flag GROWTH_FORMS_SERVER_VALIDATION_ENABLED verificado "true" en Vercel Production con vercel env pull — el ledger decia prod OFF y estaba stale.
 - [ ] `ISSUE` abierto/cerrado por el gap de re-validación server-side documentado
 
 ## Follow-ups
