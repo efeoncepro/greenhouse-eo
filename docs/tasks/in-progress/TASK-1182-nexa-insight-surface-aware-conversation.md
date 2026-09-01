@@ -1,5 +1,20 @@
 # TASK-1182 — Nexa Insight Surface-Aware Conversation (Bridge Slice 2)
 
+## Delta 2026-09-01 — el Slice 2 no está pendiente: está ROTO en producción, con issue propio
+
+El Slice 1 (backend) está vivo y el CTA está vivo. Lo que se perdió es el puente: el productor
+despacha `focusRef` + `seedPrompt` en el `NEXA_FLOATING_OPEN_EVENT` y el listener
+(`NexaFloatingButton.tsx:91`) **no declara el parámetro del evento**, así que no puede leer `detail`.
+Verificado por grep: `focusRef` vive en 7 archivos —contrato, resolver, servicio, ruta y los dos
+productores— y en **cero** consumers del panel.
+
+Efecto user-facing: el botón «Pregúntale a Nexa» abre el chat **sin anclar el insight y sin enviar la
+pregunta semilla**. No falla nada visible; simplemente no cumple lo que promete.
+
+Registrado como **`ISSUE-166`**. Es una regresión del retiro del panel `dock` (`e1662f3b3`), no un
+diseño incompleto.
+
+
 ## Delta 2026-08-05 — el Slice 2 se quedó sin consumer: el `focusRef` vivía SOLO en el panel legacy
 
 **Qué pasó.** Al retirar el modo de interacción `dock` ("Compacto") — el panel flotante efímero previo a
@@ -59,7 +74,7 @@ las DOS modalidades vigentes:
 - Wireframe: `docs/ui/wireframes/TASK-1182-nexa-insight-surface-aware-conversation.md`
 - Backend impact: `api`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Slice 1 (backend focusRef) VIVO en produccion + CTA vivo en 2 superficies. Slice 2 ROTO: el listener del evento no lee detail, asi que focusRef y seedPrompt se pierden — regresion del retiro del panel dock (e1662f3b3), registrada como ISSUE-166. NO es diseno: es un puente que se corto`
 - Rank: `TBD`
 - Domain: `delivery`
 - Blocked by: `none`

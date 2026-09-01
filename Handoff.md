@@ -8,6 +8,35 @@ Nexa publicó el anuncio grupal en `EO Team` con cuatro menciones reconocidas co
 
 El workflow canónico sigue siendo temporal para DMs genéricos: aprobación → Entra activa → dry-run → dedupe/source object → `--yes` → auditoría. Lo recurrente converge a Notification Hub; no quedó script permanente.
 
+## 2026-09-01 (3) — barrido de 27 tasks: el ledger era la causa, y dos defectos vivos quedaron registrados
+
+**Barrido completo con 4 subagentes.** 16 son papeleo puro, 8 tienen trabajo real, 3 esperan decisión
+tuya. Pero el hallazgo que importa no fue ninguna task: **el `FEATURE_FLAG_STATE_LEDGER` declara
+`prod: OFF` en 24 filas cuyo valor live es `true`**. Es el SoT humano que un agente lee para decidir
+si algo está desplegado — la misma clase de defecto que hizo repetir `TASK-1699` cinco veces, en otra
+tabla.
+
+`pnpm flags:audit` era **estructuralmente ciego** a eso: `vercel env ls` lista presencia, nunca valor.
+Ahora hace `vercel env pull` y compara. Detección ejercitada: la 1.ª versión dio 32 con falsos
+positivos (escaneaba párrafos narrativos); acotada a filas de tabla, 24; verificado uno de punta a
+punta —`COMMERCIAL_Q2C_CANONICAL_CLOSE_ENABLED`, donde el ledger **se contradice a sí mismo** entre su
+línea 174 y su 266—. Sin credenciales la sección se apaga sola. Corregí a mano las 3 que verifiqué;
+quedan **21 filas** señaladas, cada una a confirmar antes de tocar.
+
+**Dos defectos vivos registrados** (se pierden si no tienen dueño):
+- **`ISSUE-165`** — `/api/admin/spaces:122` crea organizaciones con `INSERT` crudo, sin
+  `organization_type`/`origin`/`lifecycle_stage`, violando la regla dura de `CLAUDE.md`. Es la puerta
+  que `TASK-991` existe para matar. ⚠️ Impacto **latente**: 0 filas corruptas hoy. Y el CHECK que 991
+  da por entregado **no existe en la base** (su aplicación está despejada: 0 violadores).
+- **`ISSUE-166`** — el CTA «Pregúntale a Nexa» despacha `focusRef` + `seedPrompt` y el listener **no
+  declara el parámetro del evento**: abre el chat sin anclar ni preguntar. Regresión del retiro del
+  panel `dock` (`e1662f3b3`). Dueña del fix: `TASK-1182`.
+
+⚠️ **`TASK-927` no está esperando una decisión: su gate está en ROJO.** 10 tareas terminales
+(Aprobado/Archivado) con bucket `overdue`/`carry_over`. Prender el flag hoy escribiría "no entregada"
+sobre trabajo aprobado, en una columna **visible al cliente**. El remedio previo es el script de
+recompute, no el flip.
+
 ## 2026-09-01 (2) — TASK-1709 `complete`: llevaba 5 días desplegada y la doc decía OFF
 
 Mismo defecto de registro que `TASK-1699`, detectado por la regla `stale-progress` **a los dos
@@ -521,48 +550,3 @@ fundador, fully loaded cost por oferta/cuenta, margen mínimo 45%/objetivo 50–
 de revenue/caja. Antes de escalar outbound: owner de Commercial Systems Operations, dos mailboxes gobernados, entregabilidad,
 mapping/dedupe/suppression Apollo–HubSpot y gates del piloto. No hubo mutaciones en Apollo, HubSpot, Finance runtime,
 Teams ni SharePoint.
-
-## 2026-08-29 (4.º) — `incremental-clicks-v2`: el detector de canibalización de la cola medía marca
-
-Auditando la implementación de `TASK-1700` con subagentes de SEO y arquitectura apareció el defecto
-de fondo, y era mío: `COUNT(DISTINCT page) > 1` no mide canibalización. Medido contra berel.com,
-28 días, piso 100 impresiones — no-marca **80,7 %** de share medio en la página principal, marca
-**34,2 %**. El predicado seleccionaba marca. `pinturas`, la query de mayor demanda del sitio: 41
-páginas, **99,3 %** en una, y la cola diciendo "fusiona 41 URLs" sobre el ítem #1.
-
-**Lo más grave no era el verbo.** El striking-distance excluía todo lo multi-página: **216 de 269**
-filas fuera de su ventana, y la lente del operador en **92** contra las **269** del reader legacy. Al
-validar el cutover medí la dirección que AGREGABA filas y nunca la que las QUITABA. Con el flag
-prendido hoy era alcanzable desde el portal; no puedo afirmar que nadie la vio.
-
-**v2** — predicado ÚNICO en `work-queue/cannibalization.ts` importado por los dos colectores (v1 lo
-tenía escrito dos veces): no-marca ∧ concentración de la principal ≤ 0,7 ∧ ≥2 páginas fusionables.
-Concentración sobre TODAS las páginas y conteo sólo sobre fusionables — mezclarlas invierte el
-veredicto, y lo destapó medir: al excluir la home también del denominador, `pinturas` cayó a 13,2 % y
-volvió a salir canibalizada. Marca con tolerancia a un tipeo (`bereñ` con 38 páginas, `verel`, `berol`,
-`berrl`, `betel`, `berem`, `bere` — 16 queries de marca entraban sin ella). Techo por posición anulado
-cuando ya se está en la objetivo o mejor, con el techo de CTR como **evidencia** (`snippetCeilingClicks`)
-y nunca como score: mezclar "clics por subir" con "clics por mejor snippet" en una columna reintroduce
-el orden incomparable que este agregado cerró.
-
-**Medido:** de 400 candidatas, v1 → 400, v2 → 11. Población real 29, de las cuales ~5 son sub-marcas
-propias (`kover` = 19 fichas de una línea). Lente del operador de vuelta en 261 vs 269 del legacy.
-
-**Dos defectos latentes que sólo existen con más de una versión:** el piso de recomputación reusaba
-snapshots de otra versión y devolvía la ACTIVA sobre ellos (campo que miente, bump sin efecto 60 min por
-target) — ahora filtra por versión, con gate; y la huella de parámetros no ve un cambio de fórmula — de
-ahí los **vectores dorados por versión**, que congelan la salida. La huella de v1 se movió una vez, al
-declarar explícitas dos reglas implícitas; no se dio por equivalente leyéndolo: se ejecutó la
-implementación anterior contra la nueva sobre seis casos, salidas idénticas campo por campo.
-
-**Verificado:** 12.620 tests verdes · typecheck 0 · las dos consultas nuevas ejercitadas contra
-PostgreSQL real (los unit tests mockean la base y no las ven) · gates de source comprobados EN ROJO
-antes de darlos por buenos.
-
-🔴 **Pendiente de rollout, NO hacer antes del deploy:** rematerializar con `force`. Los snapshots
-vigentes son v1 y `growth.seo.work_queue.score_version_drift` alerta **legítimamente** hasta que corra.
-Rematerializar antes del deploy escribiría snapshots v2 que el código en producción no conoce.
-
-**Límite declarado, no diferido en silencio:** las sub-marcas no se detectan desde el dominio y **NO**
-se cierran colgando el score de `grader_profiles.brand_name` — es captura de leads del grader público,
-mayoría sin `organization_id` y con filas de smoke, no un SSOT de marca por organización.

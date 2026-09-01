@@ -11,6 +11,16 @@
 
 Nexa publicó el resumen de agosto en `EO Team` con cuatro menciones verificadas y envió cuatro lecturas personales 1:1, todas auditadas como `succeeded`. El runbook, la arquitectura, el manual y las skills espejadas ahora exigen separar cifras de interpretación: volumen no prueba sobrecarga, los atrasos heredados se contextualizan y una muestra de onboarding no se presenta como tendencia. También fijan la jerarquía de evidencia para menciones y el uso de Object ID Entra revalidado cuando un correo escrito contiene un typo. [Evidencia y límites](docs/audits/communications/2026-09-01-performance-report-teambot.md).
 
+## 2026-09-01 — El auditor de flags detecta el drift ledger↔live, y dos defectos quedan registrados
+
+`pnpm flags:audit` era ciego al drift más caro del ledger porque `vercel env ls` lista presencia, no
+valor. Ahora hace `vercel env pull` y compara: 24 filas declaran `prod: OFF` con el valor live en
+`true`. Ese drift es lo que hace que un agente lea "rollout pendiente" y re-ejecute trabajo hecho.
+
+Del barrido de 27 tasks salen `ISSUE-165` (writer de organizaciones fuera del SSOT en
+`/api/admin/spaces`, impacto latente) e `ISSUE-166` (el CTA de Nexa abre el chat sin anclar el insight
+ni enviar la pregunta).
+
 ## 2026-09-01 — TASK-1709 cerrada y la doc que la daba por apagada
 
 El carril de diagnóstico de prospecto llevaba **5 días desplegado** (flag ON en Vercel Production
@@ -1021,11 +1031,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
 - **Los correos salen de dos lugares, no de uno.** Veinte tipos salen del servicio en la nube, seis salen del portal —los que uno espera en pantalla al apretar el botón— y tres salen de ambos. Para esos tres, actualizar un solo lado haría que el mismo documento llegue con dos pies distintos según si fue automático o reenviado a mano.
 - **Los datos legales del pie todavía no tienen camino ni política de respaldo.** Se adoptó la conducta que ya usan los PDF: si la base no responde, se usa el dato de respaldo y queda registrado; el RUT se omite antes que inventarse. Y la dirección de casa matriz tiene tres versiones distintas en el sistema, con una decisión pendiente que bloquea a todo el programa.
 - Se confirmó que el gobierno de la migración estaba bien: nada se cambia por herencia, cada tanda migra pocos tipos y cada una puede revertirse sola. También se corrigieron dos supuestos previos: el encabezado ya usa el logotipo de Efeonce en las treinta plantillas, y el pie sí tenía red de pruebas.
-
-## 2026-08-24 — Revisar postulaciones ya no obliga a entrar y salir del Pipeline
-
-- Application 360 permite pasar a la postulación anterior o siguiente de la **misma vacante y etapa**. La cola excluye archivadas y usa orden cronológico estable; no es un ranking y no consulta score, afinidad ni recomendaciones IA.
-- Si hay una decisión, corrección o nota sin guardar, Greenhouse pregunta antes de cambiar de postulación. En móvil el contador se compacta y la pestaña padre activa se mantiene visible.
-- Al volver por la pestaña `Pipeline`, Greenhouse recupera la postulación exacta incluso si quedó fuera del límite habitual, consume el foco temporal de la URL y deja la tarjeta enfocada. Si ya no existe, muestra una recuperación honesta en vez de seleccionar otra.
-- El recorrido `1 de 2 → 2 de 2 → Pipeline` pasó Playwright/GVC en 1440 y 390 px, con View Transition compartida y cero errores de consola, página, hidratación o red.
-- El contrato quedó incorporado en arquitectura y en las skills de Talent, Motion y GVC. La auditoría documental detectó que el snapshot del board aún puede incluir postulaciones archivadas; el delta no está listo para rollout hasta cerrar esa brecha.
