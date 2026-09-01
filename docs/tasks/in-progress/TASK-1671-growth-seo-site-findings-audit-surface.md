@@ -27,20 +27,20 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `layout`
-- UI ready: `no`
-- Wireframe: `docs/ui/wireframes/TASK-1672-growth-seo-audit-report-artifact.md`
+- UI ready: `yes`
+- Wireframe: `docs/ui/wireframes/TASK-1671-growth-seo-site-findings-audit-surface.md`
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `Diseno aprobado; implementacion pendiente`
 - Rank: `TBD`
 - Domain: `growth|ui`
 - Blocked by: `none`
