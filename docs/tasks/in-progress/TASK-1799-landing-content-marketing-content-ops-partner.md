@@ -35,8 +35,9 @@ Por instrucción explícita del operador se publicó su export Claude Design apr
 Elementor, header/footer nativos, Growth Forms y SEO. URL y page ID preservados.
 [Auditoría y límites](../../audits/public-site/2026-08-31-content-marketing-publication.md) ·
 [Arquitectura](../../architecture/public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md).
-La landing está operativa. La task conserva `in-progress` por contraste del diseño aprobado,
-smoke de conversión/GA4, editor visual completo y research/CWV del alcance ampliado original.
+La landing está operativa. La task conserva `in-progress` por aceptación E2E del formulario/ledger, confirmación GA4 Realtime,
+editor visual completo y research/CWV del alcance ampliado original. Pin corto y contrastes
+detectados fueron corregidos y publicados; el smoke GA4 sintético llegó al colector con 204.
 No confundir esos pendientes con una landing sin publicar; no repetir el cutover inicial.
 
 El operador dio por terminada la revisión visual/editorial de esta entrega. Quedan publicados el
@@ -613,7 +614,8 @@ No confundir sus PASS con aceptación del backend, GA4, scorecard premium o CWV 
 - **Pendiente del alcance original:** keyword map/regiones y CWV. WordPress, Webflow, Drupal y Modyo
   ya están publicados por instrucción del operador con assets oficiales; no implican certificación
   ni partnership. Una ampliación de claims requiere evidencia nueva.
-- **Pendiente QA:** solicitud aceptada + ledger/GA4, editor visual completo y contraste del diseño.
-- **Hallazgo de revisión documental:** mount del stage exige ancho 940 y alto 740 px, pero resize sólo
-  comprueba ancho. No se corrigió ni desplegó un cambio por esta revisión; verificar ventanas bajas
-  antes del cierre premium.
+- **Cierre técnico publicado:** mount y resize comparten ancho 940/alto 740; corregidos los contrastes
+  detectados. [Producción y rollback](../../audits/public-site/2026-08-31-content-marketing-technical-closure.md).
+- **Pendiente QA:** aceptación E2E y ledger (Turnstile bloqueó el intento sintético antes del POST),
+  Realtime y editor integral. El evento GA4 sintético/204 no sustituye una solicitud aceptada.
+  La revisión no certifica todos los casos de contraste que axe clasifica como incompletos.

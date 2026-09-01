@@ -12,6 +12,15 @@ las pruebas del renderer y del frontend con certificación del editor autenticad
 
 ## Edición habitual
 
+Para SEO, edita título/descripción y presentación social en **Yoast de la página 251731**, no en
+un widget HTML. Mantén el grafo de Yoast y canonical raíz; no cambies Organization/global al ajustar
+esta Home. Tras guardar y purgar, ejecuta `node scripts/public-website/verify-agency-home-seo.cjs`.
+Media debe usar HTTPS. [Valores y recuperación SEO](../../audits/public-site/2026-08-30-home-seo-aeo.md).
+El verificador comprueba el contrato actual de esta Home, no indexación efectiva ni todas las landings.
+Si cambias metadatos aprobados, actualiza su expectativa y conserva evidencia antes/después.
+[Método SEO reutilizable](../../../.codex/skills/seo-aeo/references/home-landing-metadata-schema.md):
+no duplicar entidades, no transformar cifras ilustrativas en ratings y distinguir pruebas CMS/HTML/GSC.
+
 1. Abre `wp-admin/post.php?post=251731&action=elementor`.
 2. En el navegador de estructura selecciona el contenedor de la sección y su widget Agencia.
 3. Usa Textos, Enlaces, Imágenes e iconos y Datos y señales. En listas repetibles, edita cada fila o

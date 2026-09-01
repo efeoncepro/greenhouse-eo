@@ -52,8 +52,9 @@ puede requerir rollback. El digest de fuente queda registrado, pero el compilado
 solo un export distinto; corresponde verificarlo antes de compilar. [Procedimiento](../../manual-de-uso/public-site/content-marketing.md).
 
 CSS del host aislado: neutraliza la compensación de gutters de Ohio sólo en esta página y despeja
-el hero bajo el masthead; no cambia estilos globales. Al montar, el pin requiere ancho ≥940 y alto ≥740; el handler de resize sólo exige ancho ≥940.
-Esta asimetría permite activarlo tras un resize con poca altura y queda como riesgo de verificación.
+el hero bajo el masthead; no cambia estilos globales. Mount y resize requieren ambos ancho ≥940 y alto ≥740. El cierre técnico del 2026-08-31
+corrigió la sustitución parcial del compilador; 1440×650 conserva los siete capítulos en flujo
+incluso al regresar desde un viewport alto. El pin normal y su duración no cambian.
 Móvil bajo ese ancho, reduced motion y sin JS muestran los siete capítulos en flujo normal. El estado de navegación
 programática suprime temporalmente la sincronización con scroll para evitar capítulos intermedios.
 
@@ -97,9 +98,11 @@ por lo que esa evidencia no acredita igualdad de valores raw de la base.
 
 La evidencia de navegador en `.captures/content-marketing/` cubre responsive, estados interactivos,
 validación local y prefill/back del formulario. La igualdad de ancho del documento no certifica
-que todo descendiente quepa: las tablas/contenedores tienen su propio comportamiento. Persisten
-contraste señalado por axe, envío aceptado/ledger, conversión GA4, CWV y save/reload completo del
-editor sin certificar. Registro de controles y readback CMS no equivalen a esa prueba del editor.
+que todo descendiente quepa: las tablas/contenedores tienen su propio comportamiento. El cierre técnico corrigió los contrastes detectados en los estados recorridos y verificó
+el tag GA4 mediante un evento sintético (colector 204). Persisten aceptación E2E/ledger,
+confirmación Realtime, CWV y save/reload completo del editor sin certificar. Turnstile bloqueó
+el intento sintético antes del POST; el ledger quedó vacío. Axe conserva casos incompletos sobre
+gradientes, por lo que no se afirma certificación WCAG AA. Registro de controles y readback CMS no equivalen a esa prueba del editor.
 
 [Funcional](../../documentation/public-site/content-marketing.md) ·
 [Manual](../../manual-de-uso/public-site/content-marketing.md) ·
@@ -141,3 +144,6 @@ FAQ adicional. [Patch y evidencia](../../audits/public-site/2026-08-31-content-m
 El correo del caso interno se copia desde el lookup de los mismos controles Elementor que lo
 renderizan, con saltos reales. El formulario tiene copy versionado en Growth Forms, no en el host.
 [Revisión de business/conversion y formulario](../../audits/public-site/2026-08-31-content-marketing-business-conversion.md).
+
+Cierre técnico, paquete focal de dos assets, hashes, rollback y separación entre smoke negativo y
+medición sintética: [auditoría](../../audits/public-site/2026-08-31-content-marketing-technical-closure.md).

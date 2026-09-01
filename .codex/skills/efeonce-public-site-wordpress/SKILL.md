@@ -41,6 +41,7 @@ Read the minimal set:
 | Home copy, comparison, FAQ emphasis or final editorial review | `references/home-editorial-maintenance.md` + `references/landings/home-claude-design-preview.md`; compose with `copywriting` and the typography skill |
 | Elementor mutation / page-scoped CSS | `references/elementor-mutation.md` |
 | Native Ohio navigation, menu label/link or hierarchy | `references/native-navigation.md` + the destination landing reference |
+| Home/landing SEO, Yoast metadata, social previews or schema ownership | `../seo-aeo/references/home-landing-metadata-schema.md` + the landing reference; add `references/elementor-mutation.md` only for Elementor writes |
 | Growth Forms or public form embed | `references/growth-forms-wordpress.md` |
 | Measurement/tagging (GTM containers, dataLayer, GA4 events on the site) | `docs/reference/measurement-gtm-ga4/` (start with `04-greenhouse-gh-event-convention.md`; live container `GTM-NGHPGRLZ`) |
 | AI Content Factory, Gutenberg posts, draft/private clones | `references/content-factory-gutenberg.md` |

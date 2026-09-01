@@ -1,9 +1,9 @@
 # Operar WordPress Blog, Content Hub y Busqueda
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-07-09 por Codex
-> **Ultima actualizacion:** 2026-08-22 por Codex
+> **Ultima actualizacion:** 2026-08-31 por Codex
 > **Modulo:** Public Site / WordPress / Ohio / Content Hub
 > **Documentacion relacionada:** `docs/documentation/public-site/wordpress-blog-content-hub-search.md`
 
@@ -87,6 +87,29 @@ Procedimiento técnico canónico:
 Este manual funciona como checklist del operador; no sustituye los guards y
 readbacks de esa referencia.
 
+Baseline canónico vigente:
+
+```text
+AEO
+Diseño > Diseño Web
+Glitch
+Growth
+HubSpot
+Inbound Marketing
+Inteligencia Artificial
+Loop Marketing
+Marketing Digital > Redes Sociales
+Novedades Efeonce
+SEO
+```
+
+AEO y SEO son raíces; SEO no va debajo de Inbound Marketing. `Diseño Web` y
+`Redes Sociales` son las únicas hijas en este corte. La jerarquía completa y la
+exposición recomendada están en
+`docs/public-site/decisions/PDR-019-taxonomia-editorial-canonica-blog-wordpress.md`.
+No confundas una raíz con un bloque destacado de la home: eso se cura en los
+widgets/queries. Marketing Digital (`17`) es la categoría por defecto.
+
 Las categorias son visibles y la categoría primaria Yoast puede formar parte de
 la URL. Antes de mover un post o cambiar la jerarquía de una categoría:
 
@@ -167,13 +190,17 @@ card se ve mal, revisa primero:
 ## Revisar o Preparar el Layout Demo 35
 
 El layout elegido como referencia visual para la home del blog es
-`Demo 35: Blog Magazine`:
+`Demo 35: Blog Magazine`. La fuente permanece protegida y ya existe una copia
+de trabajo publicada con `noindex`:
 
 ```text
 page_id=225984
 url=https://efeoncepro.com/homedemo35-elementor/
+work_page_id=251875
+work_url=https://efeoncepro.com/demo35-blog-magazine-copia-trabajo/
 auditoria=docs/audits/public-site/2026-07-09-demo35-blog-magazine-layout-review.md
 contrato=docs/audits/public-site/2026-08-22-demo35-elementor-runtime-contract.md
+estado=docs/audits/public-site/2026-08-31-blog-taxonomy-demo35-work-copy.md
 ```
 
 Antes de pedir o aplicar cambios sobre ese layout:
@@ -205,21 +232,23 @@ pnpm public-website:bridge-inspect -- --page-id 225984 --no-catalog
 | Don't Miss It | `5` | grilla + rail final |
 | Suscripcion | `6`, `ohio_contact_form#7740c26` | CF7 `Subscribe Form 1` |
 
-4. No edites directo el documento publicado para probar ideas. Primero crear una
-   copia/draft gobernada o acordar la mutacion explicita con snapshot.
+4. No edites la fuente `225984`. Trabaja sobre `251875` y confirma antes del
+   write sus marcadores `source=225984`, `purpose=demo35-blog-home-work-copy-v1`
+   y `noindex=1`.
 
-   Incluye en el snapshot la fuente `225984`, la página actual `/blog/` `18456`,
-   document settings, metas Ohio `page_*`, `_thumbnail_id`, Yoast, slug y menú.
-   Los IDs de elementos cambiarán al clonar: ubica cada pieza por path, tipo y
+   Incluye en el snapshot la copia `251875`, la fuente `225984`, la página
+   actual `/blog/` `18456`, document settings, metas Ohio `page_*`,
+   `_thumbnail_id`, Yoast, slug y menú. Ubica cada pieza por path, tipo y
    fingerprint, no únicamente por ID.
 
 5. Mantén `page_for_posts=0`. No asignes Demo 35 ni su copia como página de
    entradas: WordPress omite el contenido Elementor y renderiza el archivo Ohio.
 
-6. Antes de borrar posts o media demo, clasifica cada `ohio_recent_posts` como
-   `manual`, `query` o `remove`. Catorce usan IDs fijos, cinco referencias son
-   attachments, cuatro widgets ya renderizan vacíos y dos listas pierden un
-   slot. Vaciar `posts` tampoco es neutro: puede activar una query fallback.
+6. Los 20 posts demo ya están en papelera. Clasifica cada
+   `ohio_recent_posts` de la copia como `manual`, `query` o `remove` antes de
+   tocarlo. Catorce usan IDs fijos y cinco referencias son attachments; varios
+   bloques quedan vacíos o incompletos. Vaciar `posts` tampoco es neutro: puede
+   activar una query fallback.
 
 7. Si el cambio toca Elementor, no escribir `_elementor_data` directo. Usar el
    protocolo Elementor document save de la skill `efeonce-public-site-wordpress`.
@@ -227,8 +256,9 @@ pnpm public-website:bridge-inspect -- --page-id 225984 --no-catalog
    árbol se preservan o actualizan explícitamente.
 
 8. Antes de promoverlo como hub, resolver deudas minimas:
-   - reemplazar posts demo y IDs de attachments;
-   - corregir banners `/demo35/category/...`;
+   - conectar posts reales y las categorías de PDR-019;
+   - reemplazar IDs de posts demo y attachments;
+   - corregir banners `/demo35/category/...` con archivos canónicos;
    - reemplazar `See More` `href="#"`;
    - cambiar `Read More` externos a `ohio.clbthemes.com`;
    - conectar suscripcion a Growth Forms/HubSpot/Greenhouse si se espera
@@ -278,10 +308,15 @@ Elementor sin aislar `#wpadminbar` y el menú fuera de lienzo.
 
 ## Trabajo Recomendado Para Refresh del Hub
 
-Crear tareas separadas para:
+La taxonomía de categorías, la reclasificación de posts reales y la retirada de
+posts/categorías demo están terminadas. Sigue en este orden:
 
-- taxonomia editorial canonica;
-- limpieza de demo posts/categorias/tags/sidebar;
-- buscador editorial post-only;
-- pagina hub canonica o cutover Think/Astro;
-- medicion de clicks internos, newsletter/grader y search queries.
+1. adaptar `251875`: mapear sus 15 widgets a `manual | query | remove` y
+   reemplazar copy, assets y enlaces Ohio;
+2. definir qué categorías y posts ocupan hero, bloques principales y rails
+   según PDR-019;
+3. reemplazar la suscripción demo por un contrato medible;
+4. corregir sidebar/chrome de archivos y limpiar tags;
+5. implementar buscador editorial restringido a `post`;
+6. ejecutar QA visual, responsive, teclado, SEO, enlaces y medición;
+7. pedir aprobación para el cutover manteniendo una sola canónica `/blog/`.

@@ -234,6 +234,34 @@ forma, declarar la procedencia, y decirlo.
 - Métricas norte: visibilidad orgánica, nº de keywords en top-3/top-10, tráfico
   orgánico estimado, share of voice vs. competidores.
 
+### Cambios metodológicos en estimaciones de terceros — contrato de serie
+
+`etv`, tráfico estimado, traffic value y share of voice modelado son **proxies del proveedor**. El mismo campo
+puede cambiar de fórmula sin cambiar nombre, tipo ni status HTTP. Un parser verde no demuestra continuidad
+estadística.
+
+Caso vigente: el aviso de cuenta DataForSEO del 2026-09-01 anuncia una fórmula ETV mejorada —CTR dinámico
+según layout/features/intención y volumen normalizado con clickstream—, opt-in con `use_improved_etv: true`,
+legacy por default hasta 2026-11-01 y después cambio de default. La documentación pública seguía describiendo
+el modelo legacy al cierre de la revisión. Detalle técnico en la skill `dataforseo-operator` y
+`docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md`.
+
+Reglas de medición:
+
+1. **Versión junto a la cifra.** Guarda proveedor, fórmula/metodología, mercado, fecha de captura y fecha de
+   observación. No infieras versión por fecha ni por nombre del campo.
+2. **Shadow separado.** Compara legacy e improved sobre la misma cohorte sin escribir ambos modelos en una
+   serie productiva cuya clave no distingue metodología.
+3. **GSC es el benchmark first-party, no un número para promediar.** Compara error, correlación y dirección en
+   períodos/geografías equivalentes; no declares que la promesa de alineación del proveedor convierte el proxy
+   en clicks medidos.
+4. **Cutover legible.** Elige rebaseline homogéneo o breakpoint visible. Un salto de fórmula no es crecimiento,
+   caída, recovery ni impacto AEO.
+5. **Derivados también cambian.** Recalibra traffic cost, thresholds, rankings, top-N y narratives construidas
+   sobre el proxy; si el proveedor ordena antes de responder, puede cambiar la membresía de la muestra.
+6. **Reporte honesto.** Toda comparación que cruce metodologías se segmenta o se marca no comparable. Una fila
+   sin versión queda `unknown_methodology`, nunca «legacy» o «improved» por su fecha.
+
 ### Medición no nativa: cuando el canal lo opera otro
 
 Si el canal existe pero **lo opera un tercero** (otra agencia, el equipo interno del

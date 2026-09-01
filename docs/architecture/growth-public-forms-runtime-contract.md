@@ -58,12 +58,14 @@ comprueba URL/hash servidos y compatibilidad; evita cargar dos bundles que compi
 mismo custom element en una página.
 
 **Evidencia del rollout.** `.captures/content-marketing/browser.json` registra montaje, validación
-vacía, dos pasos, prefill de modo y regreso conservando valores, sin submission. No se ejecutó un lead
-aceptado ni un smoke GA4 de conversión; no afirmar entrega, `generate_lead` observado ni cierre E2E.
+vacía, dos pasos, prefill de modo y regreso conservando valores, sin submission. El cierre técnico posterior intentó una submission sintética sin destinos externos: Turnstile
+la bloqueó antes del POST y el ledger permaneció vacío. El tag GA4 sí se ejercitó separadamente
+con `form_slug=smoke-test`: colector 204 en `G-KYPPY57M14`. No afirmar aceptación, entrega,
+confirmación Realtime ni cierre E2E a partir de ese evento sintético.
 El verificador `scripts/public-website/verify-content-marketing-business-conversion.cjs` añade la
 revisión pública del copy v3, ambos pasos y retención de valores en 1440/878/390, sin enviar datos.
 El ajuste posterior de cinco textos de la columna izquierda no cambia v3 ni el renderer.
-El estado de medición permanece pendiente en
+La aceptación E2E y confirmación Realtime permanecen pendientes en
 [TRACKING-PLAN.md](../reference/measurement-gtm-ga4/TRACKING-PLAN.md).
 La implementación y su alcance viven en
 [CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md](public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md).

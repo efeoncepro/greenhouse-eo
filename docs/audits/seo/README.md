@@ -17,6 +17,11 @@ Auditorías de búsqueda orgánica y AEO — de Efeonce y de clientes a los que 
 
 ## Auditorías
 
+- [DataForSEO Improved ETV — impacto en Greenhouse SEO — 2026-09-01](2026-09-01-dataforseo-improved-etv-impact.md) —
+  el proveedor anunció un cambio de fórmula con cutover de default el 1 de noviembre. Inventaría siete
+  consumers, demuestra que las claves append-only no permiten shadow legacy/improved y define el trabajo
+  previo: confirmación contractual, ADR/schema formula-aware, shadow, decisión histórica y cutover controlado.
+
 - [Berel — producción editorial de noviembre y diciembre 2026 — 2026-08-26](BEREL_NOVEMBER_DECEMBER_2026_CONTENT_PRODUCTION_2026-08-26.md) —
   cierre observado de ocho reescrituras `N43–N50`: 72 tareas entre ambos proyectos, 32 subítems sociales y
   paridad exacta en los 32 pares tarea/subítem. Conserva gates de archivo y derechos para N48, tratamiento

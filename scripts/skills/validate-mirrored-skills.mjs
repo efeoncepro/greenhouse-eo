@@ -116,6 +116,30 @@ const mirroredSkills = [
   },
   {
     /*
+     * DataForSEO comparte el SKILL entre agentes, pero conserva los dossiers del proveedor en un solo
+     * árbol canónico `.claude/references` para evitar duplicarlos. Hasta 2026-09-01 esa paridad era sólo
+     * prosa: los dos SKILL podían divergir y Codex además recibía pointers relativos que no resolvían.
+     * `shared-files` protege el cuerpo común y hace nominales —no por patrón— las excepciones one-sided.
+     */
+    id: 'dataforseo-operator',
+    mode: 'shared-files',
+    agentLocal: [
+      'agents/openai.yaml',
+      'references/00-fundamentos.md',
+      'references/01-serp.md',
+      'references/02-labs.md',
+      'references/03-backlinks.md',
+      'references/04-onpage.md',
+      'references/05-keywords-domain-analytics.md',
+      'references/06-resto-catalogo.md',
+      'references/07-contrato-greenhouse.md',
+      'references/08-ai-optimization.md',
+    ],
+    codex: '.codex/skills/dataforseo-operator',
+    claude: '.claude/skills/dataforseo-operator',
+  },
+  {
+    /*
      * Entra el 2026-08-25: los dos bundles existian desde julio y NADIE los validaba, asi que ya
      * habian divergido en cuatro archivos sin que ningun gate lo delatara. La copia `.claude`
      * mandaba a una skill de Claude a leer `.codex/skills/seo-aeo/references/...` (el arbol del

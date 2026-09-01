@@ -74,6 +74,7 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
 - [PDR-016 — Landing de influencer marketing, creators y UGC](decisions/PDR-016-landing-influencer-marketing-creators-ugc-posicionamiento.md)
 - [PDR-017 — Content Engineering como territorio editorial y doctrina de experiencia](decisions/PDR-017-content-engineering-territorio-editorial.md)
 - [PDR-018 — Pillar + Cluster Experience federada: arquitectura editorial, social search, conversión y runtime](decisions/PDR-018-pillar-experience-arquitectura-editorial-y-runtime.md)
+- [PDR-019 — Taxonomía editorial canónica del blog WordPress](decisions/PDR-019-taxonomia-editorial-canonica-blog-wordpress.md)
 - **[Content Engineering Pillar Brief V1](CONTENT_ENGINEERING_PILLAR_BRIEF_V1.md)** — foundation brief de la futura masterpiece: tesis, audiencia, arco, primitives de comprensión/decisión, SEO/AEO, medición, distribución y gates de publicación.
 - **[Creative Workflows Pillar + Cluster Brief V1](CREATIVE_WORKFLOWS_PILLAR_CLUSTER_BRIEF_V1.md)** — brief maestro de audiencia, tesis, arquitectura editorial, prioridades, enlaces, medición y atomización.
 - **[Web agéntica Pillar + Cluster Brief V1](WEB_AGENTICA_PILLAR_CLUSTER_BRIEF_V1.md)** — contrato editorial de la pillar que soporta `/desarrollo-sitios-web/`: definición citable, recorrido, cluster, enlaces, visuales, medición y gate de publicación.
@@ -113,8 +114,10 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
   [`docs/documentation/public-site/wordpress-blog-content-hub-search.md`](../documentation/public-site/wordpress-blog-content-hub-search.md)
   y auditoria base
   [`docs/audits/public-site/2026-07-09-wordpress-blog-content-hub-search.md`](../audits/public-site/2026-07-09-wordpress-blog-content-hub-search.md).
-  Layout candidato elegido: `Demo 35: Blog Magazine`, documentado en
-  [`docs/audits/public-site/2026-07-09-demo35-blog-magazine-layout-review.md`](../audits/public-site/2026-07-09-demo35-blog-magazine-layout-review.md).
+  La taxonomía canónica y la copia de trabajo `251875` de `Demo 35: Blog
+  Magazine` están documentadas en
+  [`docs/audits/public-site/2026-08-31-blog-taxonomy-demo35-work-copy.md`](../audits/public-site/2026-08-31-blog-taxonomy-demo35-work-copy.md);
+  la fuente `225984` permanece protegida y `/blog/` aún no fue reemplazado.
 - **Grader / dominio growth:** `architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`.
 
 ## Convención de PDR

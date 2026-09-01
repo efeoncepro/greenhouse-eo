@@ -105,7 +105,9 @@ Readback independiente del 2026-08-30:
 Home `251731`, publicada/canonical raíz, 17 contenedores + 17 widgets semánticos, cero HTML,
 414 campos raíz y seis repeaters. Home anterior `2791` conservada noindex en `/home-2/`.
 Hash Elementor:
-`30bab640e2dae49b9f6b13582c6dd426c018c4fda2419c0f199634cdc659605c`.
+`747470a5f5083b8a5d851433e10618f5c3b714889d6205c64e36a1da242091b1` tras revisión SEO/HTTPS.
+Metas Yoast search/social ajustadas, dos Media HTTPS, grafo único preservado y smoke público PASS:
+[audit SEO/AEO](../../audits/public-site/2026-08-30-home-seo-aeo.md). No cierra claims globales ni GSC/CWV.
 
 Inventario y evidencia detallados, sin duplicar los contratos:
 [audit de implementación](../../audits/public-site/2026-08-30-home-visual-review.md) y

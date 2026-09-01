@@ -64,14 +64,20 @@ teclado y Escape dentro del iframe no está certificada.
 
 ## Límites de aprobación
 
+La presentación en búsqueda y al compartir usa campos Yoast propios de la Home: título SEO de agencia
+de marketing digital y tecnología, descripción del equipo conectado y título social sin «Home» genérico.
+El H1 visual no cambia. El grafo existente identifica página, sitio y organización; no convierte cifras
+ilustrativas en reseñas/resultados. [Revisión SEO/AEO](../../audits/public-site/2026-08-30-home-seo-aeo.md).
+
 La Home está publicada, con canonical raíz y habilitada para indexación; eso no demuestra indexación
 efectiva en buscadores. Los ajustes narrativos puntuales eliminan notas del wireframe y reducen una
-afirmación maximalista. **Siguen pendientes claims residuales fuera de las secciones revisadas,
+afirmación maximalista. La revisión SEO de esta Home está documentada; **siguen pendientes claims residuales fuera de las secciones revisadas,
 SEO global del sitio, CRO y medición GSC/CWV**. Ni la publicación ni las cifras del diseño constituyen
 por sí solas validación comercial de esos claims.
 
 El registro de widgets, contenido persistido y frontend están verificados en los checkpoints del audit.
-La prueba de editar/guardar/recargar desde la interfaz Elementor sigue pendiente; este cierre documental no certifica ese flujo del editor.
+La prueba de editar/guardar/recargar desde la interfaz Elementor sigue pendiente; hay sesión Chrome
+autenticada observada el 2026-08-30, pero esta revisión SEO no certifica ese flujo del editor.
 
 [Contrato técnico](../../architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md) ·
 [Manual de edición](../../manual-de-uso/public-site/agency-elementor-preview.md) ·

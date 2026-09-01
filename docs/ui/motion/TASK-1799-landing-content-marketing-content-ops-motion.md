@@ -13,9 +13,9 @@
 El export aprobado usa palabra dinámica en hero (2400 ms), reveals y stage de siete capítulos.
 Click de capítulo suspende la sincronización con scroll durante el movimiento programático;
 los tabs admiten flechas/Home/End. Editor, motion apagada y reduced motion detienen enhancements.
-JS-off mantiene SSR y siete capítulos. Fuente actual: mount habilita pin con ancho ≥940 y alto ≥740;
-resize sólo reevalúa ancho ≥940. Esa diferencia es un riesgo pendiente, no un contrato intencional
-ni una corrección desplegada. El inventario/timings inferior sigue siendo planificación;
+JS-off mantiene SSR y siete capítulos. Mount y resize habilitan pin sólo con ancho ≥940 y alto ≥740. La asimetría
+fue corregida y publicada el 2026-08-31: 1440×650 conserva siete capítulos en flujo tras resize
+y recarga, sin cambiar duración ni navegación programática. El inventario/timings inferior sigue siendo planificación;
 el detalle real vive en el cliente compilado y en la evidencia pública.
 
 [Implementación canónica](../../architecture/public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md) ·

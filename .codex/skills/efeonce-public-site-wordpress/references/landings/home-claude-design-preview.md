@@ -79,6 +79,12 @@ and recovery index: `docs/audits/public-site/2026-08-31-home-editorial-closure.m
   Hero audit `docs/audits/public-site/2026-08-31-home-hero-copy.md` covers its two extra native controls and underline correction.
   Other Home claims and authenticated editor save/reload remain outside this copy revision.
 
+- Home SEO/HTTPS: six native Yoast title/description/social fields, two Media URLs normalized through
+  Document::save. Existing Yoast WebPage/WebSite/Organization graph retained, no duplicate JSON-LD.
+  Snapshot `_gh_home_seo_20260830_204702`; anonymous verifier `node scripts/public-website/verify-agency-home-seo.cjs`.
+  Audit: `docs/audits/public-site/2026-08-30-home-seo-aeo.md`. Global theme/entity claims and GSC/CWV remain separate.
+  Reusable method: `seo-aeo/references/home-landing-metadata-schema.md`; page-specific metadata is not a global identity rewrite.
+
 - Hero video: Experience native `video_url` (`https://www.youtube.com/watch?v=yHUystNmtcQ`) opens the supplied Efeonce showreel in a navy native dialog.
   No iframe before click or in editor; close/unmount destroys playback. Snapshot `_gh_home_video_20260830_195821`, four-file
   backup `/tmp/eo-agency-before-20260830-195756.tar`. Recorded live playback/close/return-focus/1280/890/390/reduced verified; full keyboard traversal

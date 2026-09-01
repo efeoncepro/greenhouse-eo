@@ -124,6 +124,7 @@ decláralo. Ramifica la recomendación según las respuestas.
 | Backlinks, digital PR, brand SERP, menciones, **Reddit/UGC**, y **capilaridad del grafo interno** (medir sólo enlaces editoriales: descartar lo que aparece en >50% de las páginas) | `modules/05_OFFPAGE_AUTHORITY.md` |
 | Google Business Profile / local pack, multirregión, hreflang, localización | `modules/06_LOCAL_INTERNATIONAL.md` |
 | Medir resultados: GSC/GA4/BigQuery + **Share of Voice IA** + tráfico IA + exactitud | `modules/07_MEASUREMENT.md` |
+| **Cambio de fórmula de una métrica de terceros** (ETV/DataForSEO, Semrush Traffic u otro proxy): versionar metodología, shadow, rebaseline/breakpoint y no atribuir el salto a performance | `modules/07_MEASUREMENT.md` + skill dueña del proveedor (`dataforseo-operator` para ETV) |
 | **Priorizar sólo con datos propios de GSC**: striking distance 8–20, curva de CTR del propio sitio, canibalización como consolidación; y **frescura real de GSC** (no hay D-1) + posición ponderada por impresiones | `modules/02_SEO_CONTENT.md` + `modules/07_MEASUREMENT.md` (**medido** as-of 2026-08-05) |
 | **Los dos carriles** (empujar página existente con GSC vs. cubrir demanda nueva con volumen de terceros — no se sustituyen) + **trampas de lectura de GSC**: piso mínimo de impresiones, doble conteo por sitelinks, curva de CTR propia deprimida, largo de la serie | `modules/02_SEO_CONTENT.md` + `modules/07_MEASUREMENT.md` (**medido** as-of 2026-08) |
 | Auditoría completa, migración, recuperación de penalización/caída, lanzamiento | `modules/08_PLAYBOOKS.md` |
@@ -297,8 +298,9 @@ una estimación como medición.
    páginas. Answer-first, autocontenido, con datos y fuentes (`04_AEO_GEO.md`).
 3. **Las menciones de marca pesan ~3× más que los backlinks** para visibilidad
    IA (data 2026). Off-page moderno ≠ solo links (`05_OFFPAGE_AUTHORITY.md`).
-4. **Frescura es ranking factor IA.** Contenido actualizado <2 meses gana ~28%
-   más citas. El contenido no se publica y se olvida; se mantiene.
+4. **La frescura es una señal que se prueba por motor, query set y vertical.** El contenido no se
+   publica y se olvida; se mantiene, pero no uses el claim retirado «<2 meses → +28% citas»:
+   `SOURCES.md` no pudo localizar una fuente reproducible para esa cifra.
 5. **Cada motor es un canal distinto.** Optimizar "para IA" en abstracto no
    existe; optimizas para AI Overviews, o Perplexity, o ChatGPT — fuentes y
    mecánicas difieren.

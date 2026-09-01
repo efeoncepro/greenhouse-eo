@@ -105,7 +105,8 @@ logic = logic.replace(
   "document.getElementById('content-system-stage')",
   "this.root.querySelector('#content-system-stage')"
 )
-logic = logic.replace('window.innerWidth >= 940', 'window.innerWidth >= 940 && window.innerHeight >= 740')
+// Mount and resize must share the same viewport gate; short desktops retain all chapters in flow.
+logic = logic.replaceAll('window.innerWidth >= 940', 'window.innerWidth >= 940 && window.innerHeight >= 740')
 logic = logic.replace(
   'if (this._io) this._io.disconnect();',
   'if (this._io) this._io.disconnect();\n    if (this._revVideo) this._revVideo.pause();'

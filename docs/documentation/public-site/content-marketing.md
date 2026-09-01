@@ -13,15 +13,19 @@ borra sus datos. Sin JavaScript queda disponible el contenido y un enlace a la a
 
 La captura está configurada con destino Greenhouse; esta publicación no activa entregas directas a HubSpot
 ni nuevos correos automáticos. Carga, validación, preselección y conservación de datos se verificaron;
-no se generó una solicitud aceptada de prueba. El tagging genérico existe, pero el smoke de conversión
-GA4 de esta surface permanece pendiente.
+no se generó una solicitud aceptada de prueba. El tag genérico se ejercitó desde esta landing con un evento sintético y respuesta 204 de GA4;
+es una prueba de transporte, no una solicitud comercial ni confirmación en Realtime. Turnstile
+bloqueó el intento sintético antes del POST; el ledger permaneció vacío.
 
 El contenido es editable por módulos en Elementor; los campos y políticas del formulario se
 administran desde Growth Forms, y los metadatos de búsqueda/social desde Yoast. Cambiar un texto
 no requiere reconstruir el diseño. Cambiar su estructura requiere implementación y nueva verificación.
 
-Se conserva la estética aprobada. La auditoría automática detectó contraste insuficiente en algunos
-textos/estados del diseño; no se afirma conformidad WCAG AA ni se alteró la paleta por iniciativa propia.
+Se conserva la estética aprobada. Por instrucción del operador se corrigieron contrastes de textos
+y estados mediante tonos de la misma paleta, sin cambiar layout ni tipografía. El pin usa el mismo
+criterio de ancho/altura al cargar y redimensionar; a 1440×650 el recorrido queda en flujo normal.
+No se afirma conformidad total WCAG AA: la auditoría automática conserva casos incompletos.
+[Evidencia de producción y límites](../../audits/public-site/2026-08-31-content-marketing-technical-closure.md).
 
 [Contrato técnico](../../architecture/public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md) ·
 [Edición y verificación](../../manual-de-uso/public-site/content-marketing.md).

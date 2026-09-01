@@ -1,12 +1,18 @@
 # Demo 35 Blog Magazine
 
-Operational reference for the future WordPress blog home candidate. Canonical
-evidence: `docs/audits/public-site/2026-08-22-demo35-elementor-runtime-contract.md`.
+Operational reference for the WordPress blog home work surface. Structural
+baseline: `docs/audits/public-site/2026-08-22-demo35-elementor-runtime-contract.md`.
+Applied taxonomy/work-copy evidence:
+`docs/audits/public-site/2026-08-31-blog-taxonomy-demo35-work-copy.md`.
 
 ## Identity and role
 
 - Source page: `225984`, `Demo 35: Blog Magazine`, publish.
 - URL: `https://efeoncepro.com/homedemo35-elementor/`.
+- Governed work copy: `251875`, `Demo 35: Blog Magazine — copia de trabajo`,
+  publish + Yoast `noindex`.
+- Work URL: `https://efeoncepro.com/demo35-blog-magazine-copia-trabajo/`.
+- Work markers: source `225984`, purpose `demo35-blog-home-work-copy-v1`.
 - It is a normal Elementor `page`, not the WordPress posts archive.
 - Current blog page: `18456`, canonical `https://efeoncepro.com/blog/`.
 - Runtime observed 2026-08-22: WordPress `7.1`, Ohio `3.7.0`, Elementor
@@ -24,6 +30,23 @@ elementor_settings_sha256=36761a168eb691d20edf88ace3d06fb63ec9112f257ac2f20fce1a
 
 Treat IDs and hashes as source diagnostics. A legitimate clone will produce
 new IDs/hashes; address it by path + element type + fingerprint.
+
+At the 2026-08-31 cut, the work copy intentionally retained the same source
+tree hash and all Ohio document metas. Its rollback marker is
+`_gh_backup_before_demo35_work_copy_publish_20260831_231614`. Re-read these
+guards before each mutation; do not assume the hash remains current.
+
+## Editorial taxonomy baseline
+
+The live canonical category decision is
+`docs/public-site/decisions/PDR-019-taxonomia-editorial-canonica-blog-wordpress.md`.
+AEO and SEO are roots; SEO is not under Inbound Marketing. Diseño Web is under
+Diseño, and Redes Sociales is under Marketing Digital. Root hierarchy does not
+select home prominence or Yoast primary category.
+
+Twenty Ohio demo posts were already trashed and eleven real posts were
+reclassified. Never restore or reuse the old fixed IDs merely to fill the
+layout; reconnect widgets to real editorial sources.
 
 ## Seven-root composition
 
@@ -73,12 +96,15 @@ Snapshot and deliberately preserve or set:
 - Ohio `page_*` metas, template and featured image;
 - page identity, slug, Yoast metadata, menu references and redirects.
 
-## Future mutation sequence
+## Current mutation sequence
 
-1. Run SSH preflight and inspect source `225984` plus destination `18456`.
-2. Keep source published and create a governed draft/clone for adaptation.
+1. Run SSH preflight and inspect source `225984`, work copy `251875`, and
+   current `/blog/` page `18456`.
+2. Mutate only `251875`; keep source `225984` protected and verify work markers,
+   `noindex`, snapshot and rollback before every write.
 3. Never set it as `page_for_posts`; preserve one canonical `/blog/` URL.
-4. Resolve recent-post sources before deleting Ohio demo posts/attachments.
+4. Classify all 15 recent-post widgets as `manual`, `query`, or `remove`, then
+   reconnect them to real posts/categories from PDR-019. Demo IDs are gone.
 5. Replace demo copy/assets, category links, five `#` links, Ohio external
    feature links and the subscription contract.
 6. Save through Elementor `Document::save([elements, settings])`; never write
@@ -87,6 +113,7 @@ Snapshot and deliberately preserve or set:
 8. Verify anonymous 1440/390 render, roots/sections/cards, header/footer,
    internal 404s, console, reduced motion, form and horizontal overflow.
 
-No source page, blog page, option, form or cache was changed during the
-2026-08-22 discovery.
-
+The 2026-08-31 cleanup and clone publication changed live taxonomy, demo-post
+status, redirects and the work copy, but did not cut over `/blog/`. Do not use
+the closing sentence of the older 2026-08-22 discovery as current runtime
+evidence.

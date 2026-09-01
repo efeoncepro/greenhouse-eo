@@ -218,6 +218,11 @@ sin dato responde "sin datos de mercado", nunca un cero; y nada de esta tabla se
 series medidas de Search Console. La **autoridad** de dominio para superficies sigue siendo una
 sola: el `domain_rank` del snapshot de enlaces (esta capa no crea una segunda).
 
+Desde el aviso DataForSEO del 2026-09-01, "◑ estimada" exige además **metodología**: legacy e improved
+no son puntos comparables sólo porque ambos se llamen `etv`. El runtime todavía no versiona fórmula; el
+cutover anunciado para 2026-11-01 requiere ADR, shadow y schema/provenance antes de activarse. Ver la
+[auditoría Improved ETV](../../audits/seo/2026-09-01-dataforseo-improved-etv-impact.md).
+
 Se consume por el reader canónico (`readDomainOverview`), el lane ecosystem
 (`/api/platform/ecosystem/growth/seo/domain-overview`) y la tool MCP `get_seo_domain_overview`.
 Operación paso a paso: [Operar la foto de dominio SEO](../../manual-de-uso/growth/operar-foto-de-dominio-seo.md).
@@ -244,6 +249,10 @@ mercado" en vez de ceros, y la posición de mercado jamás se promedia con la po
 Search Console. Se consume por `readUrlVisibility`/`readVisibilityConcentration`, el lane ecosystem
 (`/growth/seo/url-visibility`) y la tool MCP `get_seo_url_visibility`.
 Operación: [Operar la visibilidad por URL](../../manual-de-uso/growth/operar-visibilidad-por-url-seo.md).
+
+La misma alerta metodológica aplica a esta superficie: el ETV improved puede cambiar valores, sumas y el top-N
+de concentración. Hasta que la fórmula viaje en snapshot/readers/API/MCP, una variación cruzando el cutover no
+se presenta como performance SEO.
 
 > Detalle técnico: [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md §4.2 y §15](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md).
 

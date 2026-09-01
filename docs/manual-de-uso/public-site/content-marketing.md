@@ -112,10 +112,11 @@ viven en `/tmp` del servidor y pueden desaparecer. Restaura sólo los elementos/
 No reviertas el loader completo, menú global ni páginas ajenas sin comparar los cambios posteriores.
 Después regenera cachés y repite readback público. El snapshot de menú es independiente del de página.
 
-Persisten contraste del diseño, smoke aceptado/ledger/GA4, CWV y prueba integral del editor. Además,
-el pin exige altura 740 al montar, pero su handler de resize sólo comprueba ancho 940: prueba también
-redimensionar un viewport desktop de poca altura antes de certificar ese comportamiento. No corrijas
-estética ni código como efecto lateral de una actualización documental.
+El pin ya comprueba ancho ≥940 y alto ≥740 tanto al cargar como al redimensionar. Los contrastes
+detectados se corrigieron con CSS de módulo. El smoke seguro prueba rechazo del API y transporte
+GA4 sintético; no prueba una aceptación. Turnstile bloqueó el intento UI antes del POST.
+Aceptación/ledger, Realtime, CWV y editor integral permanecen separados.
+[Evidencia y comandos de repetición](../../audits/public-site/2026-08-31-content-marketing-technical-closure.md).
 
 [Contrato técnico](../../architecture/public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md) ·
 [Auditoría y pendientes](../../audits/public-site/2026-08-31-content-marketing-publication.md).

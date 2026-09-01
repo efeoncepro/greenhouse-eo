@@ -98,6 +98,10 @@ contrafactual, el número describe un patrón — no prueba un lift.** Decláral
   odia, intersticiales agresivos. Google premia experiencia real.
 - **Presentar estimaciones como mediciones** — si no hay GSC/herramienta, dilo;
   marca como estimado (SKILL.md §5).
+- **Mezclar metodologías bajo el mismo nombre de métrica** — si un proveedor cambia ETV, traffic value,
+  volumen o share of voice, no unas puntos legacy/improved ni llames al salto «caída» o «crecimiento SEO».
+  Versiona la fórmula, ejecuta el shadow fuera de la serie servida y declara rebaseline o breakpoint. Inferir
+  la metodología desde la fecha también es incorrecto: los defaults y los históricos pueden cambiar.
 - **Prometer rankings/timelines garantizados** — el SEO/AEO no se garantiza;
   quien lo promete miente. Comunica rangos y probabilidades.
 - **Ignorar el costo de bloquear bots IA** — bloquear retrieval bots = salir de

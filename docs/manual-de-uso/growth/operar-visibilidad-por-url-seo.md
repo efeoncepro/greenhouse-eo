@@ -1,9 +1,9 @@
 # Operar la visibilidad por URL, subdominio y subcarpeta (TASK-1776)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-08-27 por Claude (TASK-1776)
-> **Ultima actualizacion:** 2026-08-27 por Claude
+> **Ultima actualizacion:** 2026-09-01 por Codex
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §4.2 y §15
 
 ## Para qué sirve
@@ -18,6 +18,12 @@ preguntarle al proveedor.
 Toda cifra es **◑ estimada** (DataForSEO Labs, ciclo mensual). La posición de acá es la posición
 exacta en una SERP concreta; la de Search Console es un promedio ponderado por impresiones —
 **jamás se promedian ni se mezclan**.
+
+> **Alerta metodológica 2026-09-01:** DataForSEO anunció ETV improved y cambio de default para
+> 2026-11-01. No agregues `use_improved_etv` a una primitive o al cron actual: las claves append-only no
+> distinguen fórmula y `relevant_pages`/`subdomains` ordenan provider-side por ETV, por lo que puede cambiar
+> incluso la membresía del top-N. Trata cualquier salto como no comparable hasta el cutover gobernado.
+> [Auditoría y plan](../../audits/seo/2026-09-01-dataforseo-improved-etv-impact.md).
 
 ## Antes de empezar
 

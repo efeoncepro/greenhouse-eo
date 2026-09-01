@@ -297,20 +297,18 @@ Runtime observations from the 2026-07-09 read-only audit:
 - Current sidebar still contains Ohio/demo debt: external Colabrio promo banner,
   `Staff Picks`, `Recent Comments`, tag cloud and `Search` button. Do not treat
   it as final content hub UX.
-- Current categories/tags include real editorial lines plus demo/duplicate/typo
-  debt. Do not use tags as public navigation until cleanup.
+- Categories were normalized on 2026-08-31 under PDR-019; tags still include
+  demo/duplicate/typo debt. Do not use tags as public navigation until cleanup.
 - `eo-vibe-coding-api` has a `blog-hub` scaffold, but it is not a finished hub.
-- `Demo 35: Blog Magazine` (`page_id=225984`, `/homedemo35-elementor/`) is the
-  operator-selected visual layout candidate for the blog home. It is an
-  Elementor/Ohio page, not native `page_for_posts`: 55 containers, 58 widgets,
-  15 `ohio_recent_posts`, no horizontal overflow in desktop 1440/mobile 390.
-  Treat it as layout reference only until demo posts/attachments, `href="#"`,
-  external Ohio links, `/demo35/category/...` 404s and CF7 subscription wiring
-  are cleaned up.
+- `Demo 35: Blog Magazine` source `225984` is protected. Governed work copy
+  `251875`, `/demo35-blog-magazine-copia-trabajo/`, is publish + noindex and is
+  not native `page_for_posts`: 55 containers, 58 widgets and 15
+  `ohio_recent_posts`. Twenty demo posts were already trashed, so reconnect the
+  widgets to real sources before cleaning `href="#"`, Ohio links,
+  `/demo35/category/...` routes and CF7 subscription wiring.
 
-Recommended next steps for a content hub refresh: separate tasks for editorial
-taxonomy, demo content/sidebar cleanup, post-only/editorial search, canonical hub
-URL, and measurement/CTA wiring.
+Recommended next steps: adapt work copy `251875`, clean tags/sidebar, implement
+post-only/editorial search, then decide canonical hub cutover and measurement.
 
 ## Runtime Repo Binding
 

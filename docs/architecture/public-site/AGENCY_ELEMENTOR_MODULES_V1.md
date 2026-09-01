@@ -4,7 +4,8 @@
 
 Por instrucción explícita del operador, `page_on_front=251731`: esta página sirve ahora
 `https://efeoncepro.com/`, con `index, follow` y canonical raíz. El antiguo slug de preview navega a `/`.
-Se conservaron el título SEO, descripción e imagen social de la Home anterior; no se reescribió el cuerpo.
+El cutover conservó el SEO anterior; la revisión posterior ajustó título/descripción y social en Yoast,
+manteniendo imagen y cuerpo. [Contrato/evidencia SEO](../../audits/public-site/2026-08-30-home-seo-aeo.md).
 El menú Home `247118` apunta a `251731`. La página anterior `2791` conserva su diseño en `/home-2/`,
 publicada con `noindex` para recuperación; no se borró ninguna página ni se modificaron header/footer.
 
@@ -21,6 +22,11 @@ El checkpoint más reciente es el copy de Problema del 2026-08-31: 17 módulos, 
 La revisión editorial abarca hero, Problema/Reencuadre, capacidades, servicios, integraciones,
 seguimiento, productos, método, comparación, FAQ y Agenda. El [cierre editorial](../../audits/public-site/2026-08-31-home-editorial-closure.md)
 indexa las ocho revisiones, sus snapshots y límites; no sustituye el readback antes de mutar.
+Yoast es dueño único de `WebPage`/`WebSite`/`Organization`; no duplicar JSON-LD desde los widgets.
+El método de mantenimiento SEO vive en [la referencia compartida](../../../.codex/skills/seo-aeo/references/home-landing-metadata-schema.md),
+espejada para Claude: separar metadatos de página de identidad global, validar HTML y no inventar schema.
+`configure-agency-home-seo.php` guarda seis metas nativas y normaliza dos Media a HTTPS;
+snapshot `_gh_home_seo_20260830_204702`. Verificar con `node scripts/public-website/verify-agency-home-seo.cjs`.
 Es una referencia de drift fechada, no autorización para escribir ni sustituto de leer el runtime actual.
 Evidencia por revisión, snapshots y límites: [audit visual](../../audits/public-site/2026-08-30-home-visual-review.md).
 **Pendientes:** claims residuales, teclado del video y prueba de edición/guardado desde la interfaz Elementor.

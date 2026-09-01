@@ -28,6 +28,12 @@ no exige schema especial de IA. Método aplicado a Home/landings:
 | 🟡 **Semi-estable** | cambia en ~1 año | umbrales CWV, tipos de schema con rich result, mecánica general de fan-out, qué bots IA existen | cada ~trimestre o antes de un entregable importante |
 | 🔴 **Volátil** | cambia en semanas/meses; cifras y features | cobertura % de AI Overviews, cuotas de citación por motor, líder de herramientas SoV, precios, qué features tiene AI Mode hoy, últimos Google updates | **siempre** antes de afirmarlo como hecho |
 
+**Proveedor/metodología también es 🔴.** Fórmulas de tráfico estimado, flags de transición, defaults, pricing,
+retroactividad y matrices de endpoints se reverifican en la fuente oficial y, si el anuncio adelanta a la doc,
+se etiquetan `provider_notice` con las preguntas abiertas. Caso vigente: DataForSEO ETV improved,
+`use_improved_etv` y cutover anunciado para 2026-11-01; ver la skill `dataforseo-operator` y
+`docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md`.
+
 **Regla:** todo dato 🔴 va con WebSearch + fecha. Nunca cites una cifra 🔴 de
 memoria en un entregable.
 

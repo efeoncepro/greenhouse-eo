@@ -180,20 +180,18 @@ capability dentro del sistema, no presentarse como agencia suelta.
  + [brief maestro](CREATIVE_WORKFLOWS_PILLAR_CLUSTER_BRIEF_V1.md) +
  [Knowledge-to-Product Ladder](CREATIVE_WORKFLOWS_KNOWLEDGE_TO_PRODUCT_LADDER_V1.md).
 
-- **Refresh del content hub WordPress/Think**: la auditoria read-only del
- 2026-07-09 confirma que el blog vive hoy en WordPress nativo con Gutenberg,
- permalinks `/%category%/%postname%/`, archivos Ohio por categoria y busqueda
- nativa `noindex, follow` que mezcla posts/paginas/portfolio. Antes de
- redisenar el hub, ejecutar tareas separadas para taxonomia editorial canonica,
- limpieza de demo posts/tags/sidebar, buscador editorial `post` only y decision
- de hub canonico WP vs Think/Astro. El layout visual elegido como candidato es
- `Demo 35: Blog Magazine` (`page_id=225984`), pero debe tratarse como base de
- layout y no como contenido final: requiere reemplazar posts demo/attachments,
- corregir CTAs/rutas `/demo35/category/..`, conectar suscripcion y validar
- desktop/mobile. Ver
+- **Refresh del content hub WordPress/Think**: el blog sigue en WordPress nativo
+ con Gutenberg, permalinks `/%category%/%postname%/`, archivos Ohio por
+ categoría y búsqueda nativa `noindex, follow` que mezcla tipos de contenido.
+ La taxonomía canónica y la limpieza de posts/categorías demo se aplicaron el
+ 2026-08-31; quedan tags/sidebar, buscador editorial `post` only y la decisión
+ de hub canónico WP vs Think/Astro. `Demo 35: Blog Magazine` conserva su fuente
+ protegida `225984` y ya tiene copia de trabajo `251875`, publicada con
+ `noindex`. Esa copia requiere reconectar sus 15 widgets a contenido real,
+ corregir copy/assets/CTAs/rutas, conectar suscripción y validar desktop/mobile
+ antes de cualquier cutover. Ver
  [`wordpress-blog-content-hub-search.md`](../documentation/public-site/wordpress-blog-content-hub-search.md)
- y la auditoria
- [`2026-07-09-demo35-blog-magazine-layout-review.md`](../audits/public-site/2026-07-09-demo35-blog-magazine-layout-review.md).
+ y el [estado aplicado](../audits/public-site/2026-08-31-blog-taxonomy-demo35-work-copy.md).
 
 - **Guía pillar "community manager" en Think** (PDR-005 §Consecuencias): captura el
  término de alto volumen e intención job/how-to (Semrush CL 4.400/mes) como autoridad

@@ -1,0 +1,452 @@
+# TASK-1805 — Growth SEO: foundation versionada para DataForSEO Improved ETV
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 0 — IDENTITY & TRIAGE
+     "Que task es y puedo tomarla?"
+     Un agente lee esto primero. Si Lifecycle = complete, STOP.
+     ═══════════════════════════════════════════════════════════ -->
+
+## Status
+
+- Lifecycle: `to-do`
+- Priority: `P0`
+- Impact: `Muy alto`
+- Effort: `Alto`
+- Type: `implementation`
+- Execution profile: `backend-data`
+- UI impact: `none`
+- UI ready: `n/a`
+- Wireframe: `none`
+- Flow: `none`
+- Motion: `none`
+- Backend impact: `integration`
+- Epic: `EPIC-022`
+- Status real: `Diseno aprobado; foundation no implementada`
+- Rank: `1`
+- Domain: `growth|seo|data|integration`
+- Blocked by: `external DataForSEO endpoint, pricing and historical-semantics clarification`
+- Branch: `Greenhouse develop; sin worktrees`
+- Legacy ID: `none`
+- GitHub Issue: `none`
+
+## Summary
+
+Versiona la metodología detrás de ETV en los siete consumers DataForSEO Labs, permite coexistencia
+legacy/improved y evita que readers, API o MCP mezclen fórmulas en una trayectoria. Entrega la foundation
+expand-contract, la policy explícita, el evaluador interno seguro y la observabilidad cross-runtime manteniendo
+legacy como selección productiva. `TASK-1806` ejecuta después el shadow, la decisión histórica y el cutover.
+
+La task está registrada para ejecución futura. Su creación no autoriza código, migraciones, llamadas pagadas,
+flags, schedulers, deploy ni cutover.
+
+## Why This Task Exists
+
+DataForSEO cambia el cálculo bajo el mismo campo `etv`. Greenhouse hoy omite `use_improved_etv`, guarda valores
+sin versión y usa claves que impiden dos metodologías en un mismo día. El cambio puede pasar parsing y tests
+mientras convierte una revisión del modelo en una aparente variación de performance SEO.
+
+`TASK-1775`, `TASK-1776` y `TASK-1709` están completas y poseen sus capacidades originales. Reabrirlas repartiría
+una transición transversal entre tres lifecycles cerrados. `TASK-1805` es la unidad dueña de policy, identidad
+metodológica y compatibilidad de todos esos consumers. `TASK-1806` es la unidad dependiente de evaluación y
+activación, porque gasto, tratamiento histórico y cutover requieren autorizaciones y evidencia distintas.
+
+## Goal
+
+- Hacer imposible que una escritura ETV productiva dependa del default del proveedor.
+- Persistir y servir ETV con metodología explícita, sin mezclar series ni perder append-only.
+- Entregar un evaluador interno reproducible, con fixtures/replay y dry-run, sin ejecutar gasto.
+- Dejar `TASK-1806` desbloqueada para medir y activar Improved ETV sin reabrir esta foundation.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 1 — CONTEXT & CONSTRAINTS
+     "Que necesito entender antes de planificar?"
+     El agente lee cada doc referenciado aqui. Si un doc no
+     existe en el repo, reporta antes de continuar.
+     ═══════════════════════════════════════════════════════════ -->
+
+## Architecture Alignment
+
+Revisar y respetar:
+
+- `docs/architecture/GREENHOUSE_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md`
+- `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_SEO_SEARCH_VISIBILITY_360_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md`
+- `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md`
+- `docs/architecture/agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md`
+- `docs/architecture/GREENHOUSE_DATABASE_TOOLING_V1.md`
+- `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md`
+
+Reglas obligatorias:
+
+- Metodología es parte de la identidad del hecho; `lens=estimated` no la sustituye.
+- Nuevas escrituras nunca dependen de `provider_default` ni infieren método por fecha.
+- El transporte DataForSEO permanece genérico; la policy es endpoint-aware y fail-closed.
+- Expand se verifica antes de writers; writers antes de contract; shadow después de coexistencia real.
+- Un reader sirve una metodología o falla/degrada con etiqueta; nunca construye una serie mixta.
+- GSC es benchmark first-party separado; no se promedia con ETV.
+- Todo gasto requiere forecast, tope USD y aprobación humana explícita.
+- Código, config y deploy no son readback del método servido.
+
+## Normative Docs
+
+- `docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md`
+- `docs/audits/communications/2026-09-01-dataforseo-improved-etv-provider-questions.md`
+- `docs/manual-de-uso/growth/evaluar-transicion-dataforseo-improved-etv.md`
+- `.codex/skills/dataforseo-operator/SKILL.md`
+- `.claude/skills/dataforseo-operator/references/02-labs.md`
+- `.claude/skills/dataforseo-operator/references/07-contrato-greenhouse.md`
+- `.codex/skills/seo-aeo/SKILL.md`
+- `.codex/skills/seo-aeo/modules/07_MEASUREMENT.md`
+
+## Dependencies & Impact
+
+### Depends on
+
+- Respuesta contractual de DataForSEO para `use_improved_etv` o documentación oficial equivalente.
+- `TASK-1775`, `TASK-1776`, `TASK-1709`, `TASK-1780` y `TASK-1785` completas como foundations.
+- `greenhouse_growth.seo_domain_overview_snapshots`.
+- `greenhouse_growth.seo_url_visibility_snapshots`.
+- `greenhouse_growth.seo_prospect_diagnostics` y sus facts.
+- `src/lib/ai/dataforseo.ts` como transporte neutral.
+
+### Blocks / Impacts
+
+- `TASK-1806` — evaluación, decisión histórica y cutover productivo de Improved ETV.
+- Continuidad de las series ETV después del 2026-11-01.
+- Fotos/trayectoria de dominio, bulk/historical, visibilidad URL, relevant pages, subdomains y prospect diagnostic.
+- Readers Growth SEO, API ecosystem/app, Nexa y MCP.
+- Schedulers mensuales, ops-worker, Vercel y Platform Health.
+
+### Files owned
+
+- `src/lib/growth/seo/etv-methodology/**` o placement final aprobado en Plan Mode.
+- `src/lib/growth/seo/domain-overview/**`
+- `src/lib/growth/seo/url-visibility/**`
+- `src/lib/growth/seo/prospect/**`
+- `src/lib/growth/seo/lens.ts`
+- `src/lib/api-platform/resources/ecosystem-growth-seo.ts`
+- `src/mcp/greenhouse/tool-manifest.ts`
+- `src/mcp/greenhouse/tool-manifest.generated.json`
+- `src/mcp/greenhouse/server.ts`
+- `src/mcp/greenhouse/tools.ts`
+- `services/ops-worker/server.ts`
+- `src/types/db.d.ts` sólo mediante generación canónica.
+- `migrations/*_task-1805-*.sql`
+- `docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md`
+- `docs/manual-de-uso/growth/evaluar-transicion-dataforseo-improved-etv.md`
+- `docs/audits/seo/*improved-etv*`
+
+## Current Repo State
+
+### Already exists
+
+- Transporte DataForSEO con allowlist/breaker/spend ledger por familia.
+- Snapshots append-only de dominio y visibilidad, más diagnóstico de prospecto.
+- Parsers/builders para los siete consumers Labs afectados.
+- Readers y proyecciones API/MCP con `lens`, source y captura, pero sin metodología.
+- GSC per-org para benchmark de dominios propios.
+
+### Gap
+
+- No hay policy canónica ni booleano explícito en los requests ETV.
+- No hay columna, constraint, uniqueness, freshness ni provenance por metodología.
+- Readers pueden mezclar valores o elegir la fila incorrecta si se agrega shadow sin rediseño.
+- Relevant pages/subdomains pueden cambiar membresía top-N sin que el contrato lo explique.
+- Prospectos guardan `basis: etv_sum_organic`, pero no metodología ni cobertura/truncamiento suficiente.
+- No hay señal cross-runtime ni runbook de cutover implementado.
+
+## Modular Placement Contract
+
+- Topology impact: `cross-runtime`
+- Current home: `src/lib/growth/seo/**` compartido por Next/Vercel y ops-worker, con API/MCP como consumers.
+- Future candidate home: `domain-package`
+- Boundary: resolver `EtvMethodologyVersion` y readers del dominio `growth.seo`; sólo adapters DataForSEO
+  ETV-capable pueden solicitar método;
+  UI/API/MCP consumen provenance y nunca eligen qué fórmula comprar.
+- Server/browser split: provider, DB, policy y configuración son server-only; el browser recibe DTO etiquetado.
+- Build impact: sin SDK nuevo; ops-worker y Vercel deben compilar el mismo contrato puro.
+- Extraction blocker: schema PostgreSQL compartido, spend ledger, schedules y verificación de provider cross-runtime.
+
+## Backend/Data Contract
+
+### Backend/data brief
+
+- Backend rigor: `backend-critical`
+- Impacto principal: `integration`
+- Source of truth afectado: policy ETV, snapshots/facts de `greenhouse_growth`, readers SEO y contrato DataForSEO Labs.
+- Consumidores afectados: `API|MCP|Nexa|cron|worker|Vercel|reporting`
+- Runtime target: `local|staging|production|worker|cron|external`
+
+### Contract surface
+
+- Contrato existente a respetar: `src/lib/ai/dataforseo.ts`, arquitectura SEO, schemas TASK-1775/1776/1709 y
+  MCP manifest canónico.
+- Contrato nuevo o modificado: `EtvMethodologyVersion`, resolver endpoint-aware, columnas/constraints, readers y
+  DTO provenance formula-aware.
+- Backward compatibility: `gated`; legacy permanece seleccionable y el read default no cambia durante expand.
+- Full API parity: un reader/projection canónico sirve metodología a API, Nexa y MCP; compare interno es read-only
+  y no dispara provider calls.
+
+### Data model and invariants
+
+- Entidades/tablas/views afectadas: `seo_domain_overview_snapshots`, `seo_url_visibility_snapshots`,
+  `seo_prospect_diagnostics`/facts y tipos derivados.
+- Invariantes que no se pueden romper:
+  - append-only continúa rechazando `UPDATE` y `DELETE`;
+  - mismo sujeto/mercado/fecha admite dos métodos y rechaza duplicado del mismo método;
+  - source endpoint no entra a la identidad si ya existe colisión intencional entre productores del mismo método;
+  - metodología del `top_keywords` es la del snapshot padre;
+  - idempotencia comercial de prospecto sigue siendo una corrida por sujeto/día.
+- Write-target allowlist: declarar cualquier tabla experimental nueva en el boundary del dominio, con razón; si se
+  amplían tablas existentes, mantener la cobertura vigente.
+- Tenant/space boundary: organization/target se resuelve por readers/entitlements vigentes; metodología no cambia
+  autorización ni expone `captured_by_organization_id`.
+- Idempotency/concurrency: claves incluyen método donde coexistir es válido; prospecto conserva su lock diario y
+  shadow corre en evaluator interno separado.
+- Audit/outbox/history: snapshots/facts append-only + señal de configured/requested/served; sin outbox nuevo salvo
+  que Plan Mode demuestre un consumer reactivo real.
+
+### Migration, backfill and rollout
+
+- Migration posture: `additive expand -> writer/read transition -> contract`.
+- Default state: selector legacy explícito, shadow y improved productivo deshabilitados.
+- Backfill plan: sólo atribuir legacy cuando la evidencia lo garantice. Si ya existe ventana ambigua, usar estado
+  desconocido o reconstrucción desde evidencia; nunca inferir por `capture_date`.
+- Rollback path: selector a legacy mientras el provider lo soporte; si no, pausar captures y servir última serie
+  comparable etiquetada. Nunca borrar filas improved.
+- External coordination: respuesta DataForSEO y configuración coherente Vercel/worker. El presupuesto de shadow,
+  la pausa/reanudación de schedulers y la aprobación de cutover pertenecen a `TASK-1806`.
+
+### Security and access
+
+- Auth/access gate: gates/entitlements SEO vigentes; compare y shadow sólo operador interno.
+- Sensitive data posture: sin PII nueva; subjects y GSC permanecen bajo scopes existentes.
+- Error contract: `unsupported_etv_methodology`, `methodology_not_available`, `mixed_etv_methodology`,
+  `etv_methodology_drift`; sanitizados mediante el patrón de error de dominio.
+- Abuse/rate-limit posture: spend gate existente, allowlist de subjects, máximo de requests, dry-run obligatorio y
+  circuit breaker de familia Labs.
+
+### Runtime evidence
+
+- Local checks: Vitest dirigidos para policy/builders/parsers/readers/prospect/lens y fixtures en las dos fórmulas.
+- DB/runtime checks: migración y sanity PG mediante tooling canónico; old rows, coexistencia, duplicate rejection,
+  append-only y freshness por método.
+- Integration checks: Sandbox gratuito cuando el contrato lo permita, fixtures/replay y dry-run; ninguna llamada
+  pagada ni canary productivo pertenece a esta task.
+- Reliability signals/logs: `configured`, `requested`, `served`, filas sin método, mixed-series, drift cross-runtime,
+  legacy posterior a cutoff y costo por consumer/familia.
+- Production verification sequence: expand staging -> deploy legacy explícito -> readers formula-aware -> readback
+  DB/API/MCP y configured/requested/served -> handoff verificable a `TASK-1806` sin cambiar el canonical method.
+
+### Acceptance criteria additions
+
+- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
+- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [ ] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio.
+- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [ ] Errores son canónicos y el evaluador no debilita presupuesto, entitlements ni datos sensibles.
+
+## Capability Definition of Done — Full API Parity gate
+
+- [ ] La policy y selección viven en primitives server-side, no en UI ni callsites duplicados.
+- [ ] Readers/projections exponen método a API, Nexa y MCP desde un solo contrato.
+- [ ] Compare es lectura de evidencia persistida; no es un parámetro público que dispara gasto.
+- [ ] MCP manifest source/generated y gateway consumidor quedan sincronizados cuando cambie el output.
+- [ ] Parity check = SÍ: toda superficie devuelve metodología desde el mismo reader.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 2 — PLAN MODE
+     El agente que toma esta task ejecuta Discovery y produce
+     plan.md segun TASK_PROCESS.md. No llenar al crear la task.
+     ═══════════════════════════════════════════════════════════ -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 3 — EXECUTION SPEC
+     "Que construyo exactamente, slice por slice?"
+     El agente solo lee esta zona DESPUES de que el plan este
+     aprobado. Ejecuta un slice, verifica, commitea, y avanza.
+     ═══════════════════════════════════════════════════════════ -->
+
+## Scope
+
+### Slice 0 — Contrato oficial y baseline congelado
+
+- Incorporar la respuesta oficial a la matriz endpoint/campo/boolean/default/precio/histórico.
+- Resolver si filas recientes son atribuibles a legacy; declarar cualquier ventana ambigua.
+- Definir la matriz de compatibilidad que `TASK-1806` usará; no ejecutar llamadas pagadas.
+
+### Slice 1 — Policy y configuración sin activar
+
+- Crear enum/resolver endpoint-aware con legacy explícito y fail-closed.
+- Garantizar que endpoints no ETV no reciben el flag y que transporte genérico no cambia.
+- Cablear lectura idéntica en Vercel/worker y dry-run, manteniendo improved deshabilitado.
+
+### Slice 2 — Expand de schema y provenance
+
+- Agregar identidad metodológica, constraints/indexes y convivencia por método.
+- Clasificar filas existentes sólo con evidencia segura; conservar unknown donde corresponda.
+- Regenerar tipos de DB y verificar append-only/idempotencia.
+
+### Slice 3 — Writers y freshness
+
+- Propagar método solicitado/servido por domain, historical, bulk, URL, relevant pages, subdomains y prospect.
+- Hacer freshness/pre-check/idempotency formula-aware sin duplicar diagnósticos comerciales.
+- Declarar metodología de traffic cost, top keywords y truncamiento del prospecto.
+
+### Slice 4 — Readers, API y MCP
+
+- Filtrar por método antes de fecha/source/dedupe/orden y rechazar mixed-series.
+- Servir provenance, available methodologies y breakpoint por el contrato canónico.
+- Sincronizar MCP manifest/descripciones y consumidor gateway sin permitir selección pagada desde el caller.
+
+### Slice 5 — Señales y contract phase
+
+- Exponer drift Vercel/worker y configured/requested/served en health/logs.
+- Quitar defaults transitorios y constraints antiguas sólo cuando todos los writers/readers estén verificados.
+- Mantener selector productivo en legacy explícito.
+
+### Slice 6 — Evaluador seguro y handoff
+
+- Entregar fixtures/replay, dry-run, forecast y allowlist del evaluador sin llamadas pagadas.
+- Producir outputs comparables por método para GSC, top-N, traffic cost, prospecto, latencia y costo por celda.
+- Verificar que `TASK-1806` puede ejecutar el shadow sin modificar readers, schema ni selección canónica.
+
+## Out of Scope
+
+- Implementación durante la creación de esta task.
+- Enviar el correo al proveedor sin autorización explícita de envío.
+- Llamadas Sandbox/live o gasto sin monto máximo aprobado.
+- Ejecutar el shadow pagado, decidir rebaseline/breakpoint o activar Improved ETV; pertenece a `TASK-1806`.
+- Cambiar `clickstream_etv` por `etv`, combinar ambos o construir una fórmula propia.
+- Reabrir `TASK-1775`, `TASK-1776`, `TASK-1709`, `TASK-1300` o `TASK-1785`.
+- UI nueva; una representación visual futura requiere task `ui-ux` separada si no cabe como copy aditivo.
+- Backfill histórico completo o recompra de historia.
+
+## Detailed Spec
+
+Vocabulario canónico y forma exacta del expand-contract están en el ADR. La traducción del adapter entre versión
+interna y booleano sólo se congela cuando el proveedor confirme que `false` conserva legacy y que omisión no es
+necesaria. Plan Mode debe inventariar constraints por nombre y confirmar si el default transitorio puede atribuir
+filas existentes sin violar append-only.
+
+Para prospectos, la metodología pertenece al diagnóstico/fact derivado, pero la idempotencia humana diaria no se
+amplía. El shadow del prospecto usa evaluator interno y nunca crea una segunda corrida comercial.
+
+## Rollout Plan & Risk Matrix
+
+### Slice ordering hard rule
+
+- Slice 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6.
+- Slice 2 MUST ship before cualquier writer improved.
+- Readers formula-aware MUST ship before retirar uniqueness legacy y antes de shadow persistido.
+- Contract phase MUST wait hasta que Vercel y worker escriban método explícito.
+- `TASK-1806` MUST wait hasta que Slice 6 cierre y esta foundation tenga evidencia DB/API/MCP cross-runtime.
+
+### Risk matrix
+
+| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
+|---|---|---|---|---|
+| Default del provider cambia en silencio | integration/data | high | booleano explícito + served readback | `etv_methodology_drift` |
+| Filas recientes se etiquetan legacy sin certeza | migration | medium | evidencia por request/captured_at o unknown | filas en ventana ambigua |
+| Dos métodos colisionan | PostgreSQL | high | unique formula-aware antes de shadow | duplicate/conflict |
+| Reader mezcla meses | reader/API/MCP | high | filtro previo + mixed-series fail | `mixed_etv_methodology` |
+| Top-N cambia sin explicación | relevant pages/subdomains | high | Jaccard + membership diff | salto de membresía |
+| Vercel y worker divergen | cross-runtime | medium | config/parser común + health | configured/served mismatch |
+| Evaluador podría gastar por accidente | provider spend | medium | fixture/replay + dry-run fail-closed | ledger/cap breach |
+| Foundation se confunde con activación | rollout | medium | selector legacy + task dependiente explícita | served method improved |
+
+### Feature flags / cutover
+
+- Nombre propuesto para Plan Mode: `GROWTH_SEO_ETV_METHODOLOGY_VERSION`, parser cerrado y valor inicial legacy.
+- El evaluador usa un gate separado, default `false`, sujeto a allowlist y presupuesto. El nombre final debe seguir
+  el ledger/gate vigente y no se crea hasta Slice 1; `TASK-1806` gobierna su activación.
+- Configurar una env no constituye activación ni readback; ambos runtimes deben reportar valor efectivo.
+
+### Rollback plan per slice
+
+| Slice | Rollback | Tiempo | Reversible? |
+|---|---|---|---|
+| 0 | documentación solamente; corregir matriz con nueva evidencia | inmediato | sí |
+| 1 | flag/config permanece legacy; revert focused changes | minutos | sí |
+| 2 | no borrar columnas; revert readers/writers y mantener expand inerte | minutos | sí |
+| 3 | selector a legacy y detener writers con drift | minutos | sí |
+| 4 | seleccionar reader legacy explícito; conservar campos aditivos | minutos | sí |
+| 5 | reponer contract compatible sólo si migration policy lo permite | variable | parcial |
+| 6 | mantener evaluator OFF; conservar fixtures y foundation | inmediato | sí |
+
+### Production verification sequence
+
+1. Verificar contrato y precio actualizados.
+2. Ejecutar tests/fixtures y dry-run de cero llamadas.
+3. Aplicar expand en staging y verificar constraints/old rows/append-only.
+4. Desplegar ambos runtimes aún en legacy y leer configured/requested/served.
+5. Verificar writers/readers, DB, API y MCP con legacy.
+6. Ejecutar fixtures/replay y dry-run del evaluador; verificar que el ledger no registra gasto.
+7. Entregar a `TASK-1806` la matriz, el forecast y el readback de foundation todavía en legacy.
+
+### Out-of-band coordination required
+
+- Respuesta o ticket de DataForSEO.
+- Confirmación de que la foundation puede cerrarse sin autorización de gasto ni cutover.
+- `TASK-1806` obtiene por separado aprobación del monto USD, sujetos, tratamiento histórico y cutover.
+
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 4 — VERIFICATION & CLOSING
+     "Como compruebo que termine y que actualizo?"
+     El agente ejecuta estos checks al cerrar cada slice y
+     al cerrar la task completa.
+     ═══════════════════════════════════════════════════════════ -->
+
+## Acceptance Criteria
+
+- [ ] Contrato oficial cubre siete endpoints, semántica del booleano, pricing, históricos y rollback.
+- [ ] Cero request productivo ETV depende de default u omisión.
+- [ ] Endpoint no compatible/config inválida falla cerrado y no recibe el flag.
+- [ ] Mismo sujeto/mercado/fecha admite ambos métodos y rechaza duplicados del mismo método.
+- [ ] Filas existentes y ambiguas se clasifican con evidencia, nunca sólo por fecha.
+- [ ] Append-only e idempotencia diaria de prospecto permanecen intactos.
+- [ ] Freshness, backfill, source priority, concentración y readers son formula-aware.
+- [ ] Ningún reader/API/MCP devuelve una trayectoria mixta o fallback silencioso.
+- [ ] API, Nexa y MCP exponen metodología junto con lens/source/capturedAt.
+- [ ] Traffic cost y prospect traffic declaran metodología; prospect también cobertura/truncamiento.
+- [ ] Evaluador entrega fixture/replay, dry-run, forecast y allowlist sin registrar gasto.
+- [ ] Vercel y ops-worker demuestran el mismo método servido mediante readback.
+- [ ] La selección productiva permanece legacy explícita y `TASK-1806` puede activar improved sin rediseñar la foundation.
+- [ ] Documentación funcional/técnica/manual, task/epic/registry y handoff quedan sincronizados.
+
+## Verification
+
+- `pnpm task:lint --task TASK-1805`
+- Vitest dirigido a policy, siete builders/parsers, writers, freshness, readers, prospect y lens.
+- Sanity PG mediante el runner seguro: old rows, coexistencia, duplicado, append-only y mixed read.
+- `pnpm db:generate-types` y diff generado revisado.
+- API/ecosystem contract tests y MCP output snapshots.
+- `pnpm mcp:manifest:generate && pnpm mcp:manifest:check`
+- `pnpm test:live` sólo para evidencia DB autorizada y sin provider spend; confirmar `passed`, no sólo ausencia de rojo.
+- `pnpm qa:gates --changed`
+- `pnpm docs:closure-check`
+- `pnpm docs:context-check:strict` como último gate.
+
+## Closing Protocol
+
+- [ ] `Lifecycle` y `Status real` coinciden con código, rollout y evidencia runtime.
+- [ ] El archivo está en la carpeta de lifecycle correcta.
+- [ ] `docs/tasks/TASK_ID_REGISTRY.md`, `docs/tasks/README.md` y `EPIC-022` están sincronizados.
+- [ ] El ADR y la matriz contractual incorporan la respuesta vigente del proveedor.
+- [ ] Las tasks completas `1775`, `1776`, `1709`, `1780` y `1785` reciben sólo deltas históricos si cambió
+  su baseline; no se reabren ni pierden ownership.
+- [ ] Skills `.codex`/`.claude` quedan byte-idénticas y pasan sus validators.
+- [ ] El consumidor del manifest MCP queda sincronizado si el contrato servido cambió.
+- [ ] `Handoff.md` y `changelog.md` reflejan por separado código, migration, deploy, gasto y live readback.
+- [ ] El cierre declara `complete`, `code complete, rollout pendiente` u `operativamente bloqueado` sin presentar
+  una env, un deploy o una respuesta HTTP verde como prueba de metodología servida.
+
+## Follow-ups
+
+- Ejecutar `TASK-1806` para shadow, decisión histórica, cutover y rollback productivo.
+- Crear task `ui-ux` sólo si la visualización de breakpoint/metodología requiere más que copy/metadata aditiva.
+- Revisar una metodología v3 sólo ante nueva fórmula o identificador oficial; no ampliar el enum preventivamente.

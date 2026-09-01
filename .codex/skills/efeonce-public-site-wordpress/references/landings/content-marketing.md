@@ -70,6 +70,11 @@ Auditorías en `docs/audits/public-site/`:
 - `2026-08-31-content-marketing-business-conversion.md`: caso interno, clipboard, form v3 y equilibrio final.
 - `2026-08-31-menu-indexability.md`: 18 destinos del menú indexables; sólo Redes Sociales requirió cambio.
 
-Copy/clipboard/formulario y responsive verificados sin enviar leads. Contraste global, pinning en
-resize a viewport corto, editor GUI edit/save/reload, smoke aceptado/GA4, GSC y CWV conservan sus
-límites documentados; no convertir estos checks en certificación de esas capas.
+Cierre técnico 2026-08-31: pin con ancho ≥940/alto ≥740 tanto al cargar como al redimensionar,
+y contrastes detectados corregidos con tonos de módulo. Dos assets publicados; documento/settings
+intactos. `verify-content-marketing-technical.cjs` verifica resize real, capítulos y estados de
+contraste. `smoke-content-marketing-safe.cjs` prueba rechazos reales y tag GA4 sintético/204; el
+reader `scripts/growth/verify-content-marketing-ledger.ts` confirma cero filas antes/después.
+Turnstile bloqueó el intento UI antes del POST. No confundir transporte sintético con aceptación
+E2E ni Realtime. Editor integral, GSC/CWV y casos axe incompletos mantienen límites separados.
+Evidencia/rollback: `docs/audits/public-site/2026-08-31-content-marketing-technical-closure.md`.
