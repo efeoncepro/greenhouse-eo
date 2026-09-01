@@ -120,6 +120,10 @@ const SiteAuditSiteFindings = ({ groups }: Props) => {
   const findings = groups.filter(group => group.issueType !== UNVERIFIED_ISSUE_TYPE)
   const unverified = groups.filter(group => group.issueType === UNVERIFIED_ISSUE_TYPE)
 
+  // 🔴 "Verificado" exige que NO haya huecos: con un chequeo sin medir, declarar el sitio sano
+  // es exactamente el falso sano que TASK-1670 cerró en el motor, reintroducido acá. Detectado
+  // por su test — la primera versión mostraba "Verificado" y "No pudimos verificar" a la vez.
+
   const row = (group: SeoAuditIssueGroup, index: number) => {
     const severity = SEVERITY_PRESENTATION[group.severity]
     const isPosture = group.issueType === POSTURE_ISSUE_TYPE
@@ -204,7 +208,7 @@ const SiteAuditSiteFindings = ({ groups }: Props) => {
           <Box component='ul' sx={{ m: 0, p: 0 }} aria-label={GH_GROWTH_SEO_AUDIT.site.regionAria}>
             {findings.map((group, index) => row(group, index))}
           </Box>
-        ) : (
+        ) : unverified.length > 0 ? null : (
           // Densidad confirmación. NO es un empty state: es un resultado positivo MEDIDO, y
           // decirlo es el entregable — hasta esta task el silencio significaba "no lo miramos".
           <Stack direction='row' spacing={3} alignItems='flex-start' sx={{ py: 2 }}>
