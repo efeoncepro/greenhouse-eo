@@ -98,7 +98,7 @@ Checklist mensual:
 1. Pedir al operador el link del informe de Notion del mes cerrado.
 2. Leer el informe completo en modo solo lectura.
 3. Redactar el mensaje con voz Nexa: consultora experta, empática, directa, con dato primero y siguiente acción clara.
-4. Incluir el scorecard de cada integrante relevante del equipo con **On-Time** y **RpA**; si se pide arrobar, resolver cada identidad con Microsoft Graph y usar `--mention`.
+4. Incluir el scorecard de cada integrante relevante con los KPIs personales realmente disponibles (**On-Time**, volumen, FTR o RpA según su alcance); si se pide arrobar, resolver cada identidad con Microsoft Graph y usar `--mention`.
 5. Usar el link de Notion como CTA `Abrir informe`; no pegar URLs largas dentro del cuerpo si el CTA basta.
 6. Ejecutar `pnpm teams:announce ... --dry-run`, revisar destino, menciones, CTA y fingerprint.
 7. Enviar solo con aprobación del operador y el mismo payload usando `--yes`.
@@ -125,6 +125,8 @@ Reglas de redacción:
 - Usar emojis como marcadores semánticos ligeros (`📊`, `👥`, `⚠️`, `🔎`, `🎯`), no como decoración.
 - Usar **negritas** para el título del reporte, KPIs, tesis, alertas y metas.
 - Mantener un tono honesto y empático: nombrar riesgos y responsabilidades operativas sin convertir el reporte en exposición personal.
+- No completar una métrica ausente: usar RpA/FTR sólo cuando el informe la entregue con una base comparable. Si el dato existe sólo por espacio o sobre una muestra parcial, decirlo.
+- No inferir capacidad personal desde volumen o un umbral histórico. **Más tareas no equivale por sí solo a sobrecarga**; esa lectura requiere contexto operativo confirmado por el responsable.
 - Si un nombre aparece más de una vez y se pasa como `--mention`, el helper convertirá todas las apariciones en `<at>...</at>`; evitar menciones duplicadas usando el nombre solo en el scorecard cuando sea posible.
 
 ### Legibilidad visual del card en Teams
@@ -202,7 +204,21 @@ Reglas para los 1:1:
 - No usar menciones dentro del 1:1: ya es un mensaje directo.
 - Usar emojis con moderación (`📊`, `✨`, `🎯`, `⚠️` cuando aplique) y **negritas** para KPIs, fortalezas y oportunidades.
 - La crítica debe ser operativa, no personal: separar calidad, plazos, capacidad y sistema de trabajo.
+- Contextualizar dependencias anteriores: si un atraso nace en editorial, aprobación o insumos, distinguir el tiempo heredado del tiempo de ejecución de la persona.
+- Tratar muestras pequeñas de onboarding como línea base, no como tendencia estable ni evaluación definitiva.
+- No llamar a alguien "sobrecargado" sólo por el conteo de tareas. Si el operador corrige esa interpretación, conservar las cifras y mover la oportunidad a la señal verificable correspondiente (por ejemplo FTR, cierre o coordinación).
 - Para casos sensibles, nombrar el problema con honestidad y empatía; evitar exposición innecesaria y cerrar con una acción concreta.
+
+### Evidencia operativa — agosto 2026
+
+El 2026-09-01 se ejecutó el ciclo completo de agosto: anuncio grupal en `EO Team` y cuatro lecturas 1:1 para Daniela, Andrés, Melkin y Valentina. El grupo usó seis bloques, CTA al mismo informe y cuatro menciones explícitas; el readback de Teams devolvió las cuatro como `aadUser`. Después, cada 1:1 revalidó `accountEnabled=true`, confirmó ausencia de duplicado, hizo dry-run y registró un outcome `succeeded` independiente.
+
+Aprendizajes verificables:
+
+- La cuenta canónica observada de Valentina es `valentina.hoyos@efeonce.org`; `valenta.hoyos@efeonce.org` no resolvió en Entra. No depender del alias escrito: resolver y enviar con el Object ID activo.
+- `get_chat_members` puede quedar incompleto o desfasado respecto del render de una mención. Usarlo como preflight, pero verificar el mensaje publicado: `mentions[].mentioned_user_identity_type='aadUser'` es evidencia más directa de que Teams reconoció la identidad.
+- Un `succeeded` 1:1 prueba aceptación del transporte y auditoría, no lectura. No reportar `delivered` o leído sin una señal distinta.
+- La evidencia exacta de esta corrida vive en [`2026-09-01-performance-report-teambot.md`](../audits/communications/2026-09-01-performance-report-teambot.md); los IDs históricos no se convierten en roster permanente.
 
 ### Mensajes individuales HR/People fuera de pagos
 

@@ -1,7 +1,7 @@
 # Operar Comunicaciones y Notificaciones
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-06-15 por Codex
 > **Modulo:** Comunicaciones / Email / Notificaciones / Teams
 > **Rutas:** `/notifications`, `/notifications/preferences`, `/admin/email-delivery`, `/admin/emails/preview`, `/admin/notifications`
@@ -80,8 +80,19 @@ pauses tipos de correo y no cambies `sendEmail`; los despachos deben continuar a
 2. Confirma que `teams_notification_channels` esta listo.
 3. Si usas `pnpm teams:announce`, prepara mensaje, CTA y menciones.
 4. Para menciones, usa Entra Object ID/UPN validado por helper.
-5. Ejecuta envio.
-6. Revisa run log o resultado del script.
+5. Ejecuta primero `--dry-run`; para el envío real usa el mismo payload con `--yes` después de aprobar el texto.
+6. Revisa `source_sync_runs` y, para un grupo, el mensaje publicado: una mención reconocida vuelve como identidad `aadUser`.
+7. Si necesitas un 1:1 genérico y no existe CLI de dominio, usa sólo el puente temporal descrito en `docs/operations/manual-teams-announcements.md`: identidad Entra activa, card-only, dedupe, source object determinístico y auditoría por persona.
+
+### Performance Report mensual
+
+1. Lee el informe completo y redacta el anuncio desde Nexa con máximo seis bloques y CTA `Abrir informe`.
+2. Separa datos, interpretación y acción. No concluyas que alguien está sobrecargado sólo por su volumen.
+3. Contextualiza dependencias: un atraso heredado no se atribuye como tiempo propio de ejecución.
+4. En onboarding o muestras pequeñas, presenta la cifra como línea base y evita una evaluación definitiva.
+5. Envía el anuncio grupal sólo después del dry-run y la aprobación del texto exacto.
+6. Envía después una card 1:1 a cada persona evaluada, sin menciones internas, con una fortaleza, una oportunidad concreta y el mismo CTA.
+7. Revalida cada cuenta en Entra inmediatamente antes de los 1:1. Un correo escrito puede tener errores; el Object ID activo es la identidad operativa.
 
 ## Que significan los estados
 

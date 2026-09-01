@@ -7,6 +7,10 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-01 — TeamBot completa el ciclo mensual del Performance Report
+
+Nexa publicó el resumen de agosto en `EO Team` con cuatro menciones verificadas y envió cuatro lecturas personales 1:1, todas auditadas como `succeeded`. El runbook, la arquitectura, el manual y las skills espejadas ahora exigen separar cifras de interpretación: volumen no prueba sobrecarga, los atrasos heredados se contextualizan y una muestra de onboarding no se presenta como tendencia. También fijan la jerarquía de evidencia para menciones y el uso de Object ID Entra revalidado cuando un correo escrito contiene un typo. [Evidencia y límites](docs/audits/communications/2026-09-01-performance-report-teambot.md).
+
 ## 2026-08-31 — Las páginas misceláneas dejan de ser “una 404” y ganan ownership
 
 Discovery live confirmó que Ohio padre gobierna 404, búsqueda/no-results y archivos; Elementor Theme Builder
@@ -1001,13 +1005,6 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
 - Si el resumen cambió desde que se miró, el sistema **no deja confirmar**: estarías cerrando un grupo distinto del que aprobaste.
 - El correo tiene su propio texto y su propio interruptor, así que se puede pausar un cierre masivo **sin silenciar** los correos de decisión individual. La frase «mantendremos tu perfil» aparece **sólo** si esa persona lo autorizó, verificado en el momento de enviar.
 - Nada de esto está encendido todavía: el cierre y el correo nacen apagados, a la espera del sign-off de Talent y Privacidad.
-
-## 2026-08-23 — Los follow-ups de Hiring quedaron vivos en producción
-
-- El eje de desenlace, el vocabulario de seis etapas, el filtro de procedencia del archivo sintético, el callejón de intentos del assessment y el predicado único de «proceso activo» pasaron a producción en el release `709e15f6688e` (PR #206, 140 archivos, 5 migraciones).
-- El monitor de equidad **sigue apagado a propósito**: su etapa por defecto quedó retirada por el contract nuevo, así que prenderlo hoy devolvería cero en silencio — y un cero silencioso en una métrica de equidad se lee como «no hay impacto adverso», que es lo contrario de lo que sabemos.
-- Producción quedó verificada más allá del health check: cero errores nuevos en Sentry, 321 eventos de outbox publicados desde el despliegue sin ninguno atascado, y las seis etapas renderizando en el pipeline con sesión real.
-- De paso se corrigieron dos instrucciones equivocadas de la propia documentación de release: la que verifica el worker de operaciones miraba una lista de rutas que ya no existe, y la receta del merge podía duplicar texto en los manuales sin que ninguna verificación lo notara.
 
 ## 2026-08-23 — Application 360 vuelve al pipeline de la vacante que corresponde
 

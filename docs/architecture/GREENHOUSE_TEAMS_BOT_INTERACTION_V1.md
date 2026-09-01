@@ -1,11 +1,20 @@
 # GREENHOUSE_TEAMS_BOT_INTERACTION_V1
 
 > **Tipo de documento:** Spec arquitectura canónica
-> **Versión:** 1.6
+> **Versión:** 1.7
 > **Creado:** 2026-04-26 por TASK-671 (Claude)
-> **Última actualización:** 2026-08-25 por Codex — bump a v1.6; delimita mensajes manuales 1:1 genéricos
+> **Última actualización:** 2026-09-01 por Codex — bump a v1.7; evidencia Performance Report grupal + 1:1
 > **Estado:** vigente
 > **Specs relacionadas:** `GREENHOUSE_TEAMS_NOTIFICATIONS_V1.md` v1.2 (transport), `GREENHOUSE_NOTIFICATION_HUB_V1.md` (orquestador upstream — TASK-690)
+
+## Delta v1.7 (2026-09-01 — Performance Report grupal + lecturas personales)
+
+- **Ciclo real verificado:** un anuncio de agosto se publicó en `EO Team` con cuatro menciones y CTA al informe; el readback de Teams devolvió las cuatro identidades como `aadUser`. Luego se enviaron cuatro cards 1:1 con outcomes `succeeded` separados y auditados.
+- **Jerarquía de evidencia para menciones:** `get_chat_members` es preflight útil, pero puede no reflejar el reconocimiento final. Después del envío, prevalece el readback del mensaje publicado (`mentions[].mentioned_user_id` + `mentioned_user_identity_type='aadUser'`). Esto todavía no prueba que la persona leyó el card.
+- **Identidad exacta:** un correo aportado por el operador puede contener un typo. La resolución canónica es `Graph user → accountEnabled=true → Object ID`; nunca inventar un alias ni persistir el string fallido como identidad.
+- **Copy de desempeño:** volumen alto no demuestra sobrecarga. Nexa debe separar cifras, calidad, plazos, dependencias y muestra; contextualizar atrasos heredados; y tratar onboarding con muestra pequeña como línea base, no sentencia.
+- **Puente 1:1:** sigue siendo temporal y acotado. La ejecución de agosto no crea un CLI general ni sustituye Notification Hub; conserva `dry-run | --yes`, source object determinístico, dedupe y `source_sync_runs` por destinatario.
+- Evidencia: [`docs/audits/communications/2026-09-01-performance-report-teambot.md`](../audits/communications/2026-09-01-performance-report-teambot.md).
 
 ## Delta v1.6 (2026-08-25 — boundary de mensajes manuales 1:1 genéricos)
 

@@ -2,6 +2,12 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-09-01 — Performance Report agosto comunicado por TeamBot
+
+Nexa publicó el anuncio grupal en `EO Team` con cuatro menciones reconocidas como `aadUser` y CTA al informe; después envió cuatro lecturas 1:1 a Daniela, Andrés, Melkin y Valentina. Los cinco audit runs quedaron `succeeded`. El copy personal conserva contexto: volumen alto no implica sobrecarga, los atrasos heredados se separan del tiempo de ejecución y onboarding se trata como muestra pequeña. Evidencia: `docs/audits/communications/2026-09-01-performance-report-teambot.md`.
+
+El workflow canónico sigue siendo temporal para DMs genéricos: aprobación → Entra activa → dry-run → dedupe/source object → `--yes` → auditoría. Lo recurrente converge a Notification Hub; no quedó script permanente.
+
 ## 2026-08-31 — Superficies misceláneas WordPress: discovery y canon, sin rollout
 
 Se documentó el ownership live de 404, búsqueda/no-results, categorías, tags, autor, fecha y archivos:
