@@ -1,5 +1,16 @@
 # TASK-1672 — Growth SEO: artefacto de la auditoría técnica (web + print)
 
+## Delta 2026-09-01 — `TASK-1670` cerró, pero el gate de esta task NO se movió
+
+`TASK-1670` está en `complete`: el motor de hallazgos de sitio existe y está verificado. **El gate de
+esta task sigue exactamente donde estaba**, y por eso se retira del `Blocked by` sin aflojar la
+condición: lo que bloquea al artefacto no es que ese código exista, es que el flag
+`GROWTH_SEO_SITE_FINDINGS_ENABLED` esté en `ON` con una corrida verificada — y esa llave la tiene
+`TASK-1671`. Publicar el artefacto con el detector apagado produciría exactamente lo que esta task
+existe para evitar: un documento con nuestro nombre declarando sano un sitio invisible para la IA,
+reenviado a una agencia.
+
+
 ## Delta 2026-08-15 (2) — decisión de secuencia verificada: el candado estaba mal escrito
 
 El gate de esta task se podía cumplir **con el audit todavía ciego**, y hay que arreglarlo.
@@ -97,7 +108,7 @@ Grupo Berel**, no es supuesto.
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|ui`
-- Blocked by: `TASK-1670` (**el gate es su flag en `ON` con corrida verificada, no su merge**) + `TASK-1671` (condición del flip) — ver Delta 2026-08-15 (2)
+- Blocked by: `TASK-1671` (**condición del flip; el gate real sigue siendo el flag `GROWTH_SEO_SITE_FINDINGS_ENABLED` en `ON` con corrida verificada, no un merge**) — ver Delta 2026-09-01
 - Branch: `Greenhouse develop; local-first, sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

@@ -1,5 +1,24 @@
 # TASK-1671 — Growth SEO: superficie de los hallazgos de sitio en la auditoría
 
+## Delta 2026-09-01 — DESBLOQUEADA: `TASK-1670` cerró, y esta task es ahora el gate del agujero
+
+`TASK-1670` está en `complete` con su motor verificado contra red real. Lo que hereda esta task:
+
+1. 🔴 **El punto ciego lo cierra ESTA task, no aquélla.** El flag `GROWTH_SEO_SITE_FINDINGS_ENABLED`
+   está OFF y su condición de encendido es que esta superficie esté desplegada. Hasta entonces un
+   sitio que bloquea a los crawlers de IA **sigue** puntuando 95/100.
+2. **El discriminador ya existe en el dato, no hay que inferirlo:** columna
+   `seo_site_audit_findings.finding_scope` (`page` | `site`) y `SeoSiteAuditFindingView.findingScope`
+   en el reader canónico. No hace falta heurística por `issue_type` ni por URL.
+3. **Los 7 `issue_type` ya tienen ficha es-CL** en `GH_GROWTH_SEO_AUDIT_ISSUES`, con el test de drift
+   corriendo contra la unión de ambos allowlists. La de `ai_training_crawlers_blocked` está redactada
+   como POSTURA a propósito: no la conviertas en un defecto al renderizarla.
+4. **La taxonomía de familias quedó fijada en código** (`AI_CRAWLER_FAMILIES`), con `ChatGPT-User`
+   resuelto como retrieval — coincide con lo que el registry de esta task ya declaraba.
+5. Existe `site_check_unverified`: es un estado, no un problema. La superficie tiene que poder
+   mostrarlo como "no pudimos verificar" sin que se lea como hallazgo ni como sitio sano.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -24,7 +43,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|ui`
-- Blocked by: `TASK-1670`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; local-first, sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

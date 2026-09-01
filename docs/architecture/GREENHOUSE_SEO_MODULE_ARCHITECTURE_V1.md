@@ -944,12 +944,62 @@ salud, no fabrica snapshots y no toca DataForSEO en el render.
 > módulo que se vende como Search Visibility 360 —SEO **y** AEO— el primero es el punto ciego más
 > caro: bloquear retrieval saca al cliente de las respuestas de IA (−23,1% de tráfico medido,
 > Rutgers/Wharton dic-2025) y hoy esta pantalla lo declararía sano con 95/100. **Dueño: `TASK-1670`**
-> (`to-do`, `backend-data`), que expone los tres probes ya probados del grader AEO como superficie
-> pública aditiva y los consume como hallazgos **de sitio** detrás de flag. El flag existe porque un
-> hallazgo de sitio en esta lista mostraría "1 página afectada", que es falso: la UI necesita
-> tratamiento propio (`TASK-1671`, por crear). Y el entregable descargable de la auditoría **no debe
-> nacer sin esta cobertura** — un artefacto con nuestro nombre que declara sano un sitio invisible
-> para la IA es peor que no tener artefacto.
+> (`backend-data`), cuyo estado exacto se declara en el delta siguiente. Y el entregable descargable
+> de la auditoría **no debe nacer sin esta cobertura** — un artefacto con nuestro nombre que declara
+> sano un sitio invisible para la IA es peor que no tener artefacto.
+
+> **Delta 2026-09-01 (TASK-1670) — el motor de los hallazgos de SITIO existe; el detector sigue apagado.**
+>
+> 🔴 **Distinción que esta sección tiene que sostener: código mergeado ≠ punto ciego cerrado.** El
+> evaluador está en `develop` y verificado, pero el flag `GROWTH_SEO_SITE_FINDINGS_ENABLED` nace
+> **OFF** y no se prende hasta que `TASK-1671` renderice el alcance correcto. Hasta ese flip, un
+> sitio invisible para los motores de IA **sigue** puntuando 95/100 en esta pantalla. El agujero lo
+> cierra el flip verificado en producción, no el merge.
+>
+> 1. **El juicio vive en `growth/seo`, la evidencia viene del sustrato.** `site-audit/site-findings.ts`
+>    consume `@/lib/growth/site-substrate` (fetcher SSRF-guarded + parseo HTML/robots de `TASK-1697`)
+>    y no importa un solo símbolo de `ai-visibility/probes/**` — la lint rule
+>    `greenhouse/growth-substrate-boundary` lo verifica en CI. Se descartó la idea previa de exponer
+>    una "superficie pública" DENTRO del motor AEO: el vocabulario `Probe`/`ProbeOutcome` arrastra el
+>    contrato de ejecución del grader y su `score_version`, y compartirlo haría que recalibrar SEO
+>    invalidara reportes AEO ya entregados a clientes. Puerta de una sola dirección.
+> 2. 🔴 **Retrieval y training NO comparten severidad.** Bloquear el rastreo que te cita
+>    (`OAI-SearchBot`, `PerplexityBot`, `ClaudeBot`, `Claude-SearchBot`, `ChatGPT-User`) es
+>    `critical`; bloquear el de entrenamiento (`GPTBot`, `Google-Extended`, `CCBot`, `anthropic-ai`,
+>    `Applebot-Extended`) es `notice` **con lectura de postura y jamás `critical`** — es una decisión
+>    de derechos sobre el contenido, y pintarla en rojo entrena al cliente a ignorar la severidad más
+>    alta del informe. Los bots de familia ambigua (`Bytespider`, `Amazonbot`) viajan como evidencia
+>    en `detail.otherBlocked` y **nunca** fabrican hallazgo propio. `ChatGPT-User` se resolvió como
+>    retrieval con su razón escrita: bloquearlo no protege un corpus, le niega el contenido a un
+>    usuario que lo pidió.
+> 3. 🔴 **El bloqueo más común no está en `robots.txt`, está en el borde.** Medido: 2 de 3 casos con
+>    problema en una muestra de 12 dominios LatAm/CL tenían el `robots.txt` impecable y devolvían 403.
+>    El chequeo compara el status de nuestro crawler identificado contra el de una **variante de
+>    nuestro propio token**, con `issue_type` propio (`ai_crawler_edge_access_denied`), porque la
+>    remediación es otra (CDN/WAF, no un archivo de texto). **Nunca se suplanta a un bot de terceros:**
+>    los WAF lo validan por DNS inverso y el costo reputacional lo paga el dominio que audita. Límite
+>    declarado: prueba que el borde filtra rastreadores identificados, no CUÁL bot ajeno está
+>    bloqueado — eso exige leer las reglas del WAF con el cliente.
+> 4. **El sitemap declarado en `robots.txt` manda sobre `/sitemap.xml`.** 3 de esos 12 dominios
+>    devuelven 404 en la ruta convencional y declaran su índice en robots: están **bien**, y un
+>    `warning` sobre ellos sería ruido. Ausencia es `notice`; `warning` se reserva al sitemap que el
+>    propio sitio declara y está roto.
+> 5. 🔴 **`unverified` es un estado de primera clase, y una prohibición de `robots.txt` cae ahí.**
+>    Encontrado ejercitando el evaluador con red real contra `reuters.com`: su robots nos prohíbe la
+>    ruta del sitemap que él mismo declara, y la primera implementación lo reportaba como
+>    `sitemap_declared_broken`. Inventarle un defecto al cliente sobre un archivo que no miramos es el
+>    mismo modo de falla que esta task combate, con el signo cambiado.
+> 6. **El alcance es una COLUMNA, no una convención en `detail`.** `seo_site_audit_findings.finding_scope`
+>    (`page` | `site`, aditiva con default `page`) y `SeoSiteAuditFindingView.findingScope` en el
+>    reader canónico — así el lane ecosystem, MCP y Nexa lo reciben por construcción. Un hallazgo
+>    `site` **NUNCA** se cuenta como página afectada: ése es exactamente el motivo del flag.
+> 7. **Fuera de alcance y por qué:** `core_web_vitals` (Lighthouse es laboratorio, igual que lo que
+>    OnPage ya da; la señal de campo del módulo viene de GSC) y `llms.txt` (ROI marginal, Google no lo
+>    usa).
+>
+> Los `issue_type` nuevos entran al mismo contrato del punto 5 de arriba: el test de drift
+> bidireccional pasa a correr contra la **unión** del allowlist OnPage y el de hallazgos de sitio, así
+> que uno sin ficha es-CL rompe el build en vez de llegar a pantalla mostrando su id de máquina.
 
 ### 10.7 Cutover `seo_v1 → seo_v2` — expand/contract (TASK-1310 · contract: TASK-1677)
 

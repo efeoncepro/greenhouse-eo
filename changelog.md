@@ -7,6 +7,34 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-01 — El audit SEO aprende a mirar el sitio, no sólo sus páginas (TASK-1670)
+
+La auditoría técnica pasa a evaluar cuatro cosas que el crawl de páginas no ve: si el `robots.txt`
+le niega el paso a los rastreadores de IA, si el servidor o el CDN los rechaza aunque el `robots.txt`
+los permita, si la portada publica datos estructurados y si el mapa del sitio está sano.
+
+La distinción que hace creíble al informe: bloquear el rastreo que **cita** el sitio en una respuesta
+de IA es crítico, mientras que bloquear el que **entrena** modelos es una decisión de derechos sobre
+el contenido y se reporta como información, nunca como falla. Meterlos en la misma bolsa haría que un
+sitio perfectamente accesible saliera en rojo, y eso enseña a ignorar la alerta más importante.
+
+🔴 **Todavía no está encendido.** La capacidad viaja apagada detrás de un flag, porque estos
+hallazgos son del dominio completo y la pantalla actual los contaría como "1 página afectada". Hasta
+que esa superficie exista (`TASK-1671`), un sitio invisible para los motores de IA **sigue** saliendo
+con 95 de salud. El estado real es `code complete, rollout pendiente`.
+
+## 2026-09-01 — Brand Visibility Grader queda disponible en Recursos
+
+El menú principal de `efeoncepro.com` ahora incluye **Brand Visibility Grader** dentro de
+`Recursos`, enlazado a `https://think.efeoncepro.com/brand-visibility`. La actualización reutiliza la
+navegación nativa de Ohio; no crea una segunda cabecera ni modifica Elementor. Los 26 ítems previos
+conservaron membresía, jerarquía y orden persistido, y el nuevo ítem quedó respaldado con snapshot
+recuperable.
+
+Después de purgar WordPress/Kinsta, el submenú y el clic se verificaron en producción a 1440 px y
+390 px. El destino respondió 200 y ambas vistas quedaron sin overflow horizontal ni errores de
+consola.
+
 ## 2026-09-01 — TASK-1807 instala los primeros controles FinOps de GCP
 
 Producer corre cada cinco minutos mediante Terraform y permanece bajo observación antes de tocar Media. Dos
@@ -16,8 +44,9 @@ por incidente estable; su prueba dry-run no consulta persistencia ni envía mens
 
 Globe agregó cuatro labels de atribución a 33 recursos. Artifact Registry, con 418 versiones y 10,4 GB, tiene una
 cleanup policy en dry-run que conserva 10 versiones por paquete y sólo simula borrar versiones de más de 30 días;
-no hubo eliminación. Asset Governance quedó code-complete para converger cuatro stages fenced en una ejecución,
-pero conserva cron minutely y digest live anterior hasta el canary canónico.
+no hubo eliminación. Asset Governance fue publicado y desplegado por digest inmutable para converger hasta cuatro
+stages fenced en una ejecución. El smoke live quedó sano pero no-op, así que conserva cron minutely hasta un canary
+con asset real. El post-plan no presenta drift y Greenhouse sigue local, sin publicación.
 
 ## 2026-09-01 — cinco licitaciones nuevas entran a HubSpot por MCP
 
@@ -1043,19 +1072,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
 - Cada skill separa `operate` de `sell`, incluye discovery, fit, arquitectura, propuesta/SOW, operación administrada y gates explícitos para claims, licencias, partnership, consentimiento y mutaciones.
 - Marketing Cloud Engagement se documenta como producto vigente y coexistente; Marketing Cloud Next como producto nativo de Salesforce Platform/Data 360. No se promete migración automática, paridad ni reemplazo universal.
 - La práctica comercial quedó bajo **Revenue Operations & CRM** con catálogo de ofertas, mapa de productos y evidencia fechada. No hubo acceso a tenants, cambios de configuración, ventas, cotizaciones oficiales, claims públicos ni runtime.
-
-## 2026-08-27 — RevOps & CRM deja de confundirse con un único provider
-
-- Se verificó la posición Gartner por mercado y año: HubSpot es Leader en B2B Marketing Automation 2025 por quinto año, y Challenger en CRM Sales Platforms 2026 después de avanzar desde Niche Player en 2025. Zoho también es Challenger en CRM Sales 2026. Ya no se usa un supuesto cuadrante único de “CRM”.
-- La señal enterprise chilena de Salesforce quedó sustentada con casos públicos de Enel Chile, Abastible y Colbún, pero se clasificó con confianza media: demuestra presencia, no market share ni desplazamiento general de HubSpot.
-- La práctica se normalizó como **Revenue Operations & CRM**, con diagnóstico provider-neutral y tres carriles: HubSpot-first, Salesforce-first e híbrido gobernado. La inversión futura debe decidirse con 24 meses de pipeline, win/loss, margen, demanda y capacidad, no con un badge de analista.
-- La declaración del CEO de que Efeonce es partner de HubSpot y Salesforce quedó en el registry como evidencia interna pendiente de readback primario. No autoriza claims externos, tier, certificación ni co-sell.
-- Se actualizaron contexto GTM, modelo de negocio, beachheads, catálogo HubSpot, tasks/wireframes activos y las skills espejadas `hubspot-solutions-partner` y `efeonce-agency`. Sin cambios de runtime, clientes, licencias, programas de partner ni sitio público. Evidencia: [`CRM Platform Positioning — Gartner + señal enterprise Chile`](docs/audits/commercial/CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md).
-
-## 2026-08-26 — Noviembre y diciembre de Berel quedan listos para revisión y producción creativa
-
-- Se reescribieron los ocho artículos N43–N50 con rescate del contenido vivo, análisis SEO/AEO y editorial, voz es-MX, enlaces reales de `berel.com` y cuatro especificaciones de imagen por pieza.
-- Los proyectos mensuales quedaron relacionados con 72 tareas: 8 artículos, 32 banners y 32 derivados; el Content Hub ganó 32 subítems sociales, cuatro por artículo.
-- Los 32 pares tarea/subítem pasaron comparación exacta de cuerpo. El playbook espejo ahora exige escritura social en dos fases y gates visibles para archivo histórico, sensibilidad institucional, consolidación y soft-404.
-- La relectura encontró un drift no corregido: las 40 tareas preexistentes de artículo/banner aparecen al 11 de septiembre, fuera de sus proyectos de noviembre/diciembre. Quedó declarado para confirmación del calendario antes de una nueva mutación en Notion.
-- N48, N49 y N50 no están habilitados para distribución automática: esperan derechos/vigencia, revisión institucional y consolidación canónica, respectivamente. No hubo publicación CMS ni programación social. Evidencia: [`auditoría de noviembre/diciembre`](docs/audits/seo/BEREL_NOVEMBER_DECEMBER_2026_CONTENT_PRODUCTION_2026-08-26.md).

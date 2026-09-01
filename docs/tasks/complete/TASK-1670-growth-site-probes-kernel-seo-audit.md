@@ -147,9 +147,30 @@ de revisión humana—; y se retira el follow-up "extracción a `search-visibili
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-01 (cierre) — ejecutada; el flag queda OFF y el agujero SIGUE ABIERTO
+
+Los 3 slices están en `develop`. Lo que hay que leer antes de asumir que esto cerró algo:
+
+1. 🔴 **El punto ciego NO está cerrado.** `GROWTH_SEO_SITE_FINDINGS_ENABLED` nace OFF y no se prende
+   hasta que `TASK-1671` renderice el alcance correcto. Hasta ese flip, un sitio que bloquea a los
+   crawlers de IA **sigue** puntuando 95/100. Estado correcto: `code complete, rollout pendiente`.
+2. **Dos decisiones se apartaron de la letra de la spec, ambas con razón escrita:**
+   - El chequeo de borde usa **nuestro token variado**, no el de un bot de retrieval. El criterio de
+     aceptación que pedía lo segundo contradecía la postura declarada del sustrato y fue corregido
+     acá (el Delta 2026-08-26 ya lo había resuelto; la línea del criterio quedó stale).
+   - `ChatGPT-User` entra como **retrieval**, resolviendo la Open Question 4 y alineando con la
+     taxonomía que `TASK-1671` ya declara. La tabla del Delta 2026-08-15 lo omitía.
+3. **La verificación runtime encontró un bug que los tests no podían ver:** contra `reuters.com`, un
+   `robots.txt` que nos prohíbe la ruta del sitemap se reportaba como `sitemap_declared_broken`. Le
+   inventábamos un defecto a un archivo que nunca miramos. Corregido a "no verificado" + test de
+   regresión. Es la razón por la que el Slice 3 existe y no es papeleo.
+4. **La Open Question 1 se resolvió partiendo por la frontera real**, no duplicando ni compartiendo
+   entero: el PARSEO viene del sustrato (`parseRobotsPolicy`), el JUICIO (familias + severidad) se
+   escribe en `growth/seo`.
+
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Bajo`
@@ -162,7 +183,7 @@ de revisión humana—; y se retira el follow-up "extracción a `search-visibili
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `Code complete, rollout pendiente — flag OFF; el punto ciego SIGUE ABIERTO hasta el flip con TASK-1671`
 - Rank: `TBD`
 - Domain: `growth|data`
 - Blocked by: `none`
@@ -582,37 +603,56 @@ eso el consumidor UI es prerequisito del flip del flag.
 
 ## Acceptance Criteria
 
-- [ ] Se declaró `Execution profile: backend-data` y `Backend impact: integration`.
-- [ ] `git diff --stat -- src/lib/growth/ai-visibility` sale **vacío**: cero archivos agregados o
-      editados en el motor AEO.
-- [ ] La suite del motor AEO sigue verde (643 tests) **sin tocar ninguno de sus archivos**.
-- [ ] `growth/seo/**` no importa nada de `ai-visibility/probes/**`: el consumo es de
-      `@/lib/growth/site-substrate`, y la lint rule de `TASK-1697` lo verifica en CI.
-- [ ] El código nuevo usa vocabulario de sustrato (`SiteFetcher`, `analyzeDomSemantics`) y **no**
+- [x] Se declaró `Execution profile: backend-data` y `Backend impact: integration`.
+- [x] `git diff --stat -- src/lib/growth/ai-visibility` sale **vacío** (verificado 2026-09-01, working
+      tree e índice).
+- [x] La suite del motor AEO sigue verde **sin tocar ninguno de sus archivos**: 716/716 en 92 archivos (creció desde los 643 declarados).
+- [x] `growth/seo/**` no importa nada de `ai-visibility/probes/**`: el consumo es de
+      `@/lib/growth/site-substrate` y `pnpm lint` pasa con la rule `growth-substrate-boundary` en `error`.
+- [x] El código nuevo usa vocabulario de sustrato (`SiteFetcher`, `SiteFetchResult`) y **no**
       `Probe`/`ProbeContext`/`ProbeOutcome`.
-- [ ] El sustrato no persiste nada, no importa nada de `growth/*` y no recibe tablas propias.
-- [ ] El collect materializa los hallazgos de sitio detrás de flag; con el flag OFF el
-      comportamiento es idéntico al actual.
-- [ ] `robots.txt` que bloquea **retrieval** se materializa como **`critical`**.
-- [ ] Un sitio que bloquea **sólo training** con retrieval abierto se materializa como **`notice`**
-      con lectura de postura, y **jamás** como `critical` — verificado con un caso real.
-- [ ] Existe el chequeo de **acceso en el borde**: `GET` del home con UA de bot de retrieval
-      comparado contra el fetch normal, con `issue_type` propio, distinto del de `robots.txt`.
-- [ ] Un dominio con `robots.txt` limpio que devuelve 403/429 al UA de un bot de retrieval **no**
-      se declara sano — verificado contra un caso real de la muestra.
-- [ ] Sitemap ausente en `/sitemap.xml` es **`notice`**; sólo el sitemap declarado en `robots.txt` y
-      roto es `warning`.
-- [ ] Un fetch `skipped`/`failed` se materializa como "no verificado" con razón, distinguible de
-      "verificado y sano" — verificado contra un dominio inalcanzable.
-- [ ] Los `issue_type` nuevos tienen ficha es-CL en `GH_GROWTH_SEO_AUDIT_ISSUES` y el test de
-      drift bidireccional de TASK-1309 pasa.
-- [ ] Los hallazgos de sitio NO se cuentan como "páginas afectadas".
-- [ ] Evidencia runtime contra Berel y efeoncepro.com, comparada con el `robots.txt` real.
-- [ ] Fila del flag en `FEATURE_FLAG_STATE_LEDGER.md` con el runtime que lo lee declarado.
+- [x] El sustrato no se tocó: cero ediciones en `src/lib/growth/site-substrate/**`.
+- [x] El collect materializa los hallazgos de sitio detrás de flag; con el flag OFF el comportamiento
+      es idéntico al actual — test dedicado: con OFF el evaluador ni siquiera se invoca.
+- [x] `robots.txt` que bloquea **retrieval** se materializa como **`critical`** — verificado contra `nytimes.com` (coincidencia 1:1 bot por bot con su robots real).
+- [x] Un sitio que bloquea **sólo training** con retrieval abierto se materializa como **`notice`**
+      con lectura de postura, y **jamás** como `critical` — verificado con caso real: `axios.com`
+      (`retrievalOpen: true`, `blocked: ["CCBot"]` → `notice`).
+- [x] Existe el chequeo de **acceso en el borde**, con `issue_type` propio
+      (`ai_crawler_edge_access_denied`) distinto del de `robots.txt`.
+      🔴 **Criterio CORREGIDO el 2026-09-01**: decía "`GET` del home con UA de bot de retrieval", y eso
+      contradice la postura declarada en el contrato del sustrato (`contracts.ts:68-73`: suplantar
+      `GPTBot`/`OAI-SearchBot` es evasión verificable por DNS inverso). El Delta 2026-08-26 ya lo había
+      corregido a "nuestro token variado" y esta línea quedó stale. Implementado: status de nuestro
+      crawler identificado vs. una variante de nuestro propio token, con `differsByUserAgent` como
+      evidencia. Límite declarado en el código: prueba que el borde filtra rastreadores identificados,
+      NO cuál bot ajeno está bloqueado.
+- [x] Un dominio con `robots.txt` limpio que devuelve 403/429 **no** se declara sano — verificado
+      contra un caso real: `axios.com` (robots.txt 200 con retrieval abierto, home 403) produjo
+      `ai_crawler_edge_access_denied` `critical`. Se agregó 401 al conjunto de denegación tras
+      observarlo en `reuters.com`.
+- [x] Sitemap ausente en `/sitemap.xml` es **`notice`**; sólo el sitemap declarado en `robots.txt` y
+      roto es `warning`. Además: una prohibición de `robots.txt` NO es "roto" → degrada a no verificado
+      (falso positivo encontrado en runtime contra `reuters.com` y corregido).
+- [x] Un fetch fallido se materializa como "no verificado" con razón, distinguible de "verificado y
+      sano" — verificado contra un dominio inexistente: 4 hallazgos `site_check_unverified`, cero
+      falsos sanos.
+- [x] Los 7 `issue_type` nuevos tienen ficha es-CL en `GH_GROWTH_SEO_AUDIT_ISSUES` (escritas bajo
+      `greenhouse-ux-writing`; la de training bloqueado redactada como POSTURA, no como defecto) y el
+      test de drift pasa a correr contra la **unión** de los dos allowlists.
+- [ ] Los hallazgos de sitio NO se cuentan como "páginas afectadas". **Entregado a nivel de DATO**
+      (columna `finding_scope` + `findingScope` en el reader canónico, con default defensivo `page`);
+      el RENDER es de `TASK-1671` y por eso el flag queda OFF. No se tilda hasta que la superficie lo
+      respete de verdad.
+- [x] Evidencia runtime contra `berel.com` y `efeoncepro.com` con red real (2026-09-01): 0 hallazgos
+      en ambos, contrastado 1:1 contra su `robots.txt` real (berel permite explícitamente a los 8 bots
+      de IA; efeonce declara `Disallow:` vacío), su JSON-LD (2 y 1 bloques) y su sitemap (ambos 200).
+      El cero es un sano VERIFICADO, no un sano por omisión.
+- [x] Fila del flag en `FEATURE_FLAG_STATE_LEDGER.md` (§ Snapshot + § Pendientes de acción) con runtime `ops-worker` declarado; `pnpm flags:audit --strict` pasa.
 - [ ] El cierre distingue **merge** de **flip**: mientras el flag esté OFF, el estado declarado es
       `code complete, rollout pendiente` y el punto ciego **sigue abierto**. El agujero se declara
       cerrado sólo con `TASK-1671` desplegada y el flip verificado en producción.
-- [ ] `core_web_vitals` y `llms-txt` NO entran al alcance.
+- [x] `core_web_vitals` y `llms-txt` NO entran al alcance.
 
 ## Verification
 
@@ -624,13 +664,13 @@ eso el consumidor UI es prerequisito del flip del flag.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado (`in-progress`/`complete`)
-- [ ] archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
-- [ ] `Handoff.md` + `changelog.md` actualizados
-- [ ] `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §10.6 actualizado (la cobertura declarada como
-      faltante pasa a existir)
-- [ ] `FEATURE_FLAG_STATE_LEDGER.md` con el flag y su runtime
+- [x] `Lifecycle` sincronizado (`complete`)
+- [x] archivo en la carpeta correcta
+- [x] `docs/tasks/README.md` + `TASK_ID_REGISTRY.md` sincronizados
+- [x] `Handoff.md` + `changelog.md` actualizados
+- [x] `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §10.6 actualizado (Delta 2026-09-01: la cobertura
+      declarada como faltante pasa a existir en código, con el flip declarado como pendiente)
+- [x] `FEATURE_FLAG_STATE_LEDGER.md` con el flag y su runtime
 
 ## Delta 2026-08-26 — el chequeo de borde, como está escrito, no es implementable y además contradice una postura declarada
 

@@ -2,6 +2,54 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-09-01 (12) — TASK-1670 cerrada, y el punto ciego del audit SEO SIGUE ABIERTO
+
+`TASK-1670` quedó `complete` como **`code complete, rollout pendiente`**. La distinción importa más
+que el resumen: el motor de hallazgos de sitio existe y está verificado, pero
+`GROWTH_SEO_SITE_FINDINGS_ENABLED` nace **OFF** y no se prende hasta que `TASK-1671` esté desplegada.
+Hasta ese flip, **un sitio que bloquea a los crawlers de IA sigue puntuando 95/100 y presentándose
+como sano**. El merge no cerró el agujero.
+
+Qué quedó en `develop`: migración aditiva `finding_scope` (`page`|`site`) sobre
+`seo_site_audit_findings` — aplicada, 4.977 filas históricas clasificadas sin backfill —;
+`growth/seo/site-audit/site-findings.ts` con los cuatro chequeos (crawlers de IA en `robots.txt`,
+acceso en el borde/WAF, JSON-LD ausente, salud de sitemap); materialización en el collect detrás del
+flag; `findingScope` aditivo en el reader canónico; y 7 fichas es-CL con el drift test corriendo
+contra la unión de los dos allowlists.
+
+Tres cosas que el próximo agente debe saber antes de tocar esto:
+
+1. **Retrieval y training no comparten severidad.** Bloquear el rastreo que te cita es `critical`;
+   bloquear el de entrenamiento es `notice` con lectura de postura y **nunca** `critical` — es una
+   decisión de derechos, y pintarla en rojo enseña al cliente a ignorar la severidad más alta.
+2. **El chequeo de borde usa NUESTRO token variado, jamás el de un bot ajeno.** Suplantar `GPTBot` o
+   `OAI-SearchBot` es evasión verificable por DNS inverso. El criterio de aceptación que pedía lo
+   contrario quedó corregido en la spec.
+3. **La verificación con red real encontró un bug que ningún test con mocks podía ver**: contra
+   `reuters.com`, un `robots.txt` que nos prohíbe la ruta se reportaba como sitemap roto — le
+   inventábamos un defecto a un archivo que nunca miramos. Corregido a "no verificado" + regresión.
+
+Próximo paso: `TASK-1671` (desbloqueada, `Blocked by: none`). Es dueña del flip y por lo tanto del
+cierre real del agujero. `TASK-1672` conserva su gate: el flag en `ON` con corrida verificada, no un
+merge.
+
+Sin push. Cinco commits locales en `develop`.
+
+## 2026-09-01 (11) — Brand Visibility Grader entra al menú público
+
+El menú primario de WordPress (`Menu 1`, ID 61) suma el ítem custom `251916`, **Brand Visibility
+Grader**, bajo `Recursos` (`242524`) y con destino
+`https://think.efeoncepro.com/brand-visibility`. La escritura se hizo por la API nativa de menús con
+el usuario operativo de WP-CLI, luego de confirmar que el enlace no existía y que los 26 ítems
+anteriores tenían `menu_order` persistido igual al orden visible.
+
+Snapshot recuperable: `_gh_backup_before_brand_visibility_menu_20260901T212219Z`. La verificación
+post-write confirmó 27 ítems, el nuevo en posición 27 y los 26 previos sin cambios. Se purgaron el
+object cache de WordPress y el cache de Kinsta. Playwright anónimo live verificó el submenú y el clic
+en 1440 px y 390 px: destino HTTP 200, título correcto, `scrollWidth === clientWidth` en origen y
+destino, y cero errores de consola. No hubo cambio de código, deploy, Elementor ni contenido del
+Grader.
+
 ## 2026-09-01 (10) — TASK-1807 tomada: reducción GCP con guardrails por workload
 
 El operador aprobó ejecutar la reducción urgente de gasto GCP. `TASK-1807` quedó `in-progress`, con baseline live
@@ -25,9 +73,12 @@ y estabiliza el cooldown; 5 pruebas focales pasan y el dry-run no envía notific
 CLP 350.442 brutos, CLP -2.218 en créditos y CLP 348.224 netos.
 
 Globe `5b01e99` agregó labels a 33 recursos y retention de Artifact Registry en dry-run: 418 versiones / 10,4 GB,
-KEEP 10 por paquete y DELETE simulado >30 días; cero eliminaciones. Globe `0ccf485` implementa convergencia de
-cuatro stages de Asset Governance en una ejecución fenced (39/39 + 5/5 tests), pero el digest live sigue siendo
-el anterior y el cron sigue `*/1`. El deploy canónico requiere SHA exacto publicado en `origin/main`; no hubo push.
+KEEP 10 por paquete y DELETE simulado >30 días; cero eliminaciones. Con autorización del operador, Globe fue
+publicado hasta `7eeb1da`. Asset Governance quedó desplegado por el workflow canónico `33561719287` sobre el digest
+`sha256:864a33c2ac30a9e10b4ab17c4b34c51cb149a4e1fc22889680875af322c69095`, con cuatro stages máximos por
+ejecución, scheduler restaurado `ENABLED`, cron `*/1` y post-plan sin drift. La reconciliación fue sana pero no-op
+(`claimed=0`, `failed=0`, cola 0), así que no sustituye el canary con asset real y no habilita espaciar el cron.
+Greenhouse sigue local y no fue publicado.
 
 ## 2026-09-01 (10) — ISSUE-167 resuelto: el foco no era del form, era del eje de modelado
 
@@ -409,59 +460,3 @@ la contraportada canónica: Dr. Manuel Barros Borgoño 71, oficina 1105; +56 9 3
 Estados Unidos ya forma parte de la cobertura operativa junto a Chile, Colombia, México y Perú; fuentes de
 contexto, posicionamiento, primitives y skills espejadas fueron conciliadas sin ampliar métricas históricas.
 `TASK-1801` quedó registrada en `to-do` con visual direction, wireframe, flow y motion; task lint `template=1`, `legacy=0`, 0/0. No hubo mutación WordPress: la página pública todavía requiere implementación, rollout y readback.
-
-## 2026-08-31 — TASK-1780: el inventario de tools MCP dejó de ser dos listas (Slice 3 pendiente de tu decisión)
-
-`src/mcp/greenhouse/tool-manifest.ts` es ahora la fuente del inventario: `server.ts` **registra
-recorriéndolo** y el `name`/`instructions` que el cliente MCP lee se **derivan** de él. Dos banderas
-ortogonales por tool —`writes` y `spendsProviderBudget`—; fusionarlas era el defecto original.
-
-Baseline medido al tomarla, distinto del que la spec declaraba: **43 tools** (28 SEO + 15 no-SEO),
-**7 escrituras** (la spec decía cuatro), 4 comprometen gasto del proveedor. El criterio 🔴 de cierre
-—«el guardia detecta las tres tools invisibles»— era **infalsificable**: `TASK-1658` ya las federó.
-Se reemplazó por el drift que sí existe hoy: `get_seo_provider_spend`, federada **sin contraparte
-interna**, que ahora se declara en vez de deducirse.
-
-Evidencia: snapshot del registro del SDK antes/después **idéntico byte a byte**; el artefacto generado
-reproduce el espejo a mano tool por tool (misma clase de escritura, mismos `inputKeys`), con la única
-divergencia esperada; `pnpm test` completo 12.919/0; gateway `pnpm check` verde con 73/73.
-
-✅ **Cerrada.** Greenhouse `7089d92de..d2b3c0639` en `develop` con los 9 workflows en `success`; gateway
-`efeonce-mcp` `f523960..e92961e` en `main` con CI `success`. El deploy del gateway **no es automático**
-(`deploy.yml` es `workflow_dispatch` puro): la revisión productiva sigue siendo
-`efeonce-mcp-gateway-00024-8b8` hasta que alguien lo dispare, y no corre prisa — la verificación de esta
-task es de CI, no de runtime.
-
-**Barrido documental con 4 subagentes** (docs funcionales/manuales · arquitectura y contexto · skills
-espejadas · lifecycle e impacto cruzado). Corregí 8 skills, 5 specs de arquitectura, 9 docs
-funcionales/manuales, 4 tasks vivas y el EPIC-022. Dos huecos sistémicos que encontró el barrido y
-valían más que los conteos: `.claude/rules/growth-seo.md` —la regla que más se auto-carga— instruía
-editar a mano justo el espejo retirado, y **ninguna rule cubría `src/mcp/**`**, así que los invariantes
-de la superficie no se auto-cargaban nunca (creada `.claude/rules/mcp-tool-surface.md`). Además
-`mcp:manifest:check` entró a `local:check`: bajo doctrina local-first, sin eso el drift del artefacto
-sólo aparecía en CI.
-
-⚠️ **Cifra a no repetir de memoria:** varios docs decían "27 tools federadas"; el array en runtime dice
-**28**. Interno son 28 SEO (21 lecturas + 7 escrituras) de 43 totales. Los dos conjuntos no son iguales
-**por construcción** y ahora está declarado, no deducido.
-
-## 2026-08-31 — Content Marketing publicado desde diseño aprobado
-
-Menú verificado: **Soluciones → Crecimiento Multicanal → Content Marketing**, item `242917`, sin duplicados ni cambio de orden.
-[Revisión editorial de ambas secciones](docs/audits/public-site/2026-08-31-content-marketing-editorial-copy.md): 118 campos publicados, siete pasos coherentes; diseño/SEO/shell intactos.
-[Segundo pase editorial](docs/audits/public-site/2026-08-31-content-marketing-hub-review-copy.md): hub y revisión creativa, 83 campos publicados; tres cortes y fichas de campaña revisados.
-[CMS y modos](docs/audits/public-site/2026-08-31-content-marketing-cms-modes.md): 53 textos y cuatro logos oficiales publicados; ocho controles nuevos, diseño general y SEO conservados.
-[Ecosistema y FAQ](docs/audits/public-site/2026-08-31-content-marketing-ecosystem-faq.md): 37 textos y seis URL publicados; tarjetas completas y ocho FAQ, sin cambios de diseño/SEO.
-[Marca en modalidades](docs/audits/public-site/2026-08-31-content-marketing-mode-logo.md): dos logos ampliados con CSS acotado, sin cambiar contenido ni SEO.
-[Indexabilidad del menú](docs/audits/public-site/2026-08-31-menu-indexability.md): 18/18 páginas habilitadas; sólo Redes Sociales requería quitar noindex. Canonical/sitemap verificados; indexación GSC no afirmada.
-[Cierre, caso interno y formulario](docs/audits/public-site/2026-08-31-content-marketing-business-conversion.md): 48 textos Elementor y copy de form v3 publicados; correo copiado coincide con lo visible, sin cambiar destino ni enviar leads. Ajuste posterior: cinco textos condensados para equilibrar las columnas, sin cambiar el formulario.
-
-Landing `242603` publicada con trece widgets Elementor y chrome Ohio intacto. Formulario canónico, SEO y
-verificación pública 1440/1280/890/390; 78 tests del renderer PASS. No se enviaron leads ni correos.
-[Auditoría, snapshots y pendientes](docs/audits/public-site/2026-08-31-content-marketing-publication.md).
-TASK-1799 sigue in-progress por contraste del diseño, smoke de conversión/GA4, editor completo y CWV/research.
-Runtime inicial `73493a8`, refinamientos publicados versionados en `f12dd64`; ocho archivos cotejados con producción. Cierre de scripts/docs/skills en este commit, sin push. No repetir el cutover inicial.
-Revisión documental con tres subagentes: docs triples, índices, inventario, skills espejadas y task/UI
-reconciliados. Menú conserva secuencia visible; no se afirma igualdad de valores raw `menu_order`.
-Hallazgo confirmado: resize a 1440×651 activa pin aunque mount bajo 740 px no lo hace; pendiente de
-TASK-1799, sin cambio de código en este pase. Evidencia y comandos en la auditoría enlazada.
