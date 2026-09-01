@@ -24,6 +24,18 @@ Barrido de coherencia sobre los 19 cierres del día: `Lifecycle` desincronizado,
 `AEO_PROGRAM_STATUS.md`, 10 archivos con rutas rotas y cuatro reglas duras apoyadas en hechos ya
 falsos.
 
+## 2026-09-01 — el paso de registrar el avance entra a los seis checklists de cierre
+
+Un mecanismo que avisa en un comando que ningún protocolo manda ejecutar está apagado. La regla
+—tildar con evidencia, dejar sin tildar con razón, `Status real` al día, `pnpm task:lint --task`—
+quedó en `CLAUDE.md`, `AGENTS.md`, el harness `implement-task`, `GREENHOUSE_OPERATING_LOOP_V1.md`,
+`TASK_PROCESS.md` y el `greenhouse-documentation-governor`.
+
+`TASK_PROCESS.md` documenta las calibraciones medidas de `stale-progress`/`stale-blocker`.
+`TASK_UI_UX_ADDENDUM.md` documenta la severidad foco-vs-incidental de los gates de UI y el protocolo
+de contrato retroactivo. El `greenhouse-qa-release-auditor` suma tres defectos de gate nuevos y la
+regla de falsificar todo test contra su propio arreglo.
+
 ## 2026-09-01 — barrido `stale-progress`: el registro se pone al día en 16 tasks
 
 12 de 16 dejaron de reportar el aviso. Ninguna cerró: ninguna estaba terminada. Se tildó solo lo que
@@ -1029,10 +1041,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
 - El proyecto [`Produccion Creativa - Octubre 26`](https://app.notion.com/p/3c839c2fefe7813c9450e2f35cb4021e) quedó `En curso` con ocho artículos `N35–N42`, 32 banners, 32 paquetes sociales y 32 subítems en Content Hub: 72 tareas relacionadas al proyecto, conforme a la aceptación `9A` / `4A`.
 - Además de las seis reescrituras, se normalizaron los briefs y se redactaron los artículos nuevos N41 —paleta de la mesa mexicana— y N42 —pintura por superficie—, cada uno con cuatro banners y cuatro derivados completos. La segunda lectura confirmó las 18 filas nuevas y la igualdad exacta tarea ↔ subítem en los ocho sociales.
 - Se restauraron 54 fechas de N35–N40 que automatizaciones de Notion habían movido al `2026-09-04`; la consulta final devolvió 8 artículos al 7 de octubre, 32 banners al 14 y 32 sociales al 16. Las canónicas de N41–N42 siguen como soft-404 y permanecen bloqueadas para enlaces entrantes, CMS y redes hasta QA live. Evidencia: [`auditoría de producción de octubre`](docs/audits/seo/BEREL_OCTOBER_2026_CONTENT_PRODUCTION_2026-08-26.md).
-
-## 2026-08-25 — El caso de vacaciones por aniversario no se convierte en política global
-
-- Se documentaron las fechas de ingreso verificadas de Melkin Hernandez (`2025-07-15`) y Andrés Carlosama (`2025-11-11`), junto con la comunicación individual aprobada que vinculó 15 días remunerados al primer aniversario.
-- La auditoría deja explícito el drift: el runtime actual muestra 15 días a ambos, la carta global describe base anual prorrateada más progresión y la instrucción individual usa otro hito. People, Payroll y Legal deben decidir el contrato antes de cambiar cálculos o saldos.
-- El aprendizaje operativo de TeamBot quedó en arquitectura, runbook, invariantes y skills: `pnpm teams:announce` no crea DMs; un one-off genérico solo puede usar el dispatcher y audit writers canónicos con identidad Entra revalidada, confirmación, idempotencia y auditoría. Los mensajes recurrentes pertenecen a Notification Hub.
-- Se aclaró en el manual de ficha laboral que `hire_date` no se infiere desde compensación/creación y que guardarla no recalcula automáticamente Leave.

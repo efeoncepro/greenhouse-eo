@@ -32,6 +32,31 @@ ahora nombra `vercel env pull`. Y el mensaje de `no-opacity-on-text` estaba en v
 Gates: `local:check` exit 0, `task:lint:test` 47/47, `ops:lint --changed` errors=0,
 `docs:closure-check` sin dueño faltante, `docs:context-check:strict` 0/0, 262 tests de lint-rules.
 
+## 2026-09-01 (8) — el cierre queda escrito en los SEIS sitios donde alguien cierra
+
+El hallazgo estructural del día era que `stale-progress` avisaba en un comando que ningún protocolo
+mandaba correr. Quedó cerrado: la regla de registrar el avance donde se LEE está ahora en `CLAUDE.md`,
+`AGENTS.md`, `.claude/commands/implement-task.md`, `GREENHOUSE_OPERATING_LOOP_V1.md`, `TASK_PROCESS.md`
+y el `greenhouse-documentation-governor` (ambos espejos). Verificado sitio por sitio, no asumido.
+
+`TASK_PROCESS.md` ganó las calibraciones medidas del barrido —qué cuenta como commit de
+implementación, por qué NO se filtran los `TASK-###` entre paréntesis, y los tres desenlaces
+legítimos cuando la regla avisa— más la advertencia que me costó un error real: **ausencia de código
+en este repo no es evidencia de que no exista** (`TASK-1259` estaba construida en otro repositorio).
+
+`TASK_UI_UX_ADDENDUM.md` documenta dos cosas que no estaban en ningún lado: la severidad
+foco-vs-incidental de los gates de wireframe/flow, y el protocolo de **contrato retroactivo** para
+UI ya construida que nunca declaró contrato (etiquetarlo, derivarlo de fuente verificable, enumerar
+lo que NO cubre). Precedentes `TASK-1078` y `TASK-1259`.
+
+El `greenhouse-qa-release-auditor` suma los tres defectos nuevos de gate —con la lección de
+propagación: al corregir una regla, revisa sus hermanas; (c) y (e) eran el mismo bug en dos reglas
+gemelas— y una regla nueva que vale para cualquier fix: **un test que pasa sin el arreglo es teatro**.
+Falsifícalo revirtiendo la corrección.
+
+Reparado además un empalme que yo mismo introduje antes: la nota de `stale-progress` se había
+insertado en medio de la regla de los markers ZONE del `greenhouse-task-planner` y la había partido.
+
 ## 2026-09-01 (7) — barrido `stale-progress`: 16 tasks auditadas, 12 con el aviso resuelto
 
 Ninguna se cerró, y eso es el resultado, no una falla: **ninguna estaba realmente terminada**. Lo que
@@ -491,31 +516,3 @@ cardinalidad de TASK-1694, no las 334 filas de procedencia).
 
 **Pendiente con dueño:** una task de superficie si se quiere levantar el `visualImpact` del canvas —
 es la única razón por la que `ui:quality` sigue en `BLOCK`, y no se cierra inflando la nota.
-
-## 2026-08-29 (10.º) — TASK-1699: día 1 verificado y costo marginal CERO comprobado; dos criterios de la spec estaban mal enunciados
-
-El cron del 29-ago escribió el día 1 de la serie del top-N (766 filas, `seot-berel-mx`, 31 keywords) y
-con eso los **Pasos 5 y 6** quedan cerrados. Verificación reproducible y sin gasto:
-`scripts/growth/_verify-task-1699-day-one.ts` → **4/4**.
-
-🔴 **La promesa central de la task quedó comprobada con el ledger, no con un argumento:** el día 1 costó
-**USD 0,1225 con 31 llamadas**, *idéntico* a los días 26, 27 y 28 (0,1225 / 31 cada uno), que son
-anteriores a la serie. Persistir ~19 de cada 20 filas que antes se botaban no agregó un centavo.
-
-**Dos de los tres criterios del Paso 5 estaban mal enunciados**, porque la spec se escribió antes de ver
-un SERP real. Se afinaron contra los datos, no se relajaron: (1) «~20 filas por keyword» hay que contarlas
-sobre `item_type='organic'` —el writer persiste todos los item_types a propósito, así que el total por
-keyword da 19–28 y no dice nada del top-N—; (2) «exactamente una fila `is_own_domain`» es **falso** como
-invariante: un dominio aparece varias veces en un SERP real (subdominios, múltiples orgánicos,
-`local_pack`), y en la keyword diagnóstica `site:berel.com` aparece en las 20. El invariante verdadero,
-que es el que el snapshot mide, es que el **`rank_group` mínimo entre las filas propias orgánicas** iguale
-`seo_rank_snapshots.position` — 21/21 coinciden, 0 discrepan. Mi primera pasada reportó 4 fallas; dos eran
-bugs de mi propio script de verificación y dos eran estas aserciones ingenuas.
-
-**Por qué NO cierra todavía:** `seo.serp_top_results.coverage` está en `warning` (2 de 3 día-target sin
-top-N) y **es correcto que lo esté** — esos dos días son el 27 y 28, anteriores al deploy, historia que por
-diseño no es backfilleable. Con ventana de 3 días converge sola a `steady=0` el **31-ago**. No se toca el
-umbral: la señal está diciendo la verdad sobre una pérdida real. Y el Paso 9 (revisar candidatos de
-competidor contigo antes de declarar) necesita ≥5 días de serie → ≈**2026-09-02**.
-
-Estado honesto: **`día 1 verificado; señal converge el 31-ago; candidatos ≈2-sep`**.

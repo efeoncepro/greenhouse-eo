@@ -229,6 +229,29 @@ las tres se veían bien hasta que alguien miró el runtime. Búscalas en el paso
    arreglarlo vale más que el trabajo que estabas haciendo. ⚠️ Ninguno de los
    tres rompía un test: los tests fijaban la intención, no la promesa del texto.
 
+   **Delta 2026-09-01 (barrido `stale-progress`) — tres más de la misma familia,
+   todas destapadas al USAR el gate en volumen, no al leerlo:** (d) `stale-blocker`
+   disparaba con `Blocked by: \`none\` (razón que nombra al blocker cerrado)` — el
+   campo decía `none` y la prosa que explica POR QUÉ se desbloqueó activaba el
+   guard, castigando justo el contexto útil; (e) `ui-flow-contract` no tenía la
+   calibración incidental-vs-focal que su gemela `ui-wireframe-contract` ya
+   había recibido — el mismo defecto (c), sin propagar; (f) un commit
+   `fix(docs):` contaba como implementación, así que una task sin una línea de
+   código aparecía como «ya trabajada». ⚠️ **Lección de propagación: al corregir
+   una regla, revisa sus hermanas.** (c) y (e) son literalmente el mismo bug en
+   dos reglas que comparten forma.
+
+5. 🔴 **Un test que pasa SIN el arreglo no está midiendo nada — falsifícalo
+   siempre.** Escribe el test, revierte la corrección, y **confirma que se pone
+   rojo**. Si sigue verde es teatro, y peor que no tenerlo: da confianza falsa y
+   protege a la siguiente regresión. Caso fuente 2026-09-01: un test del
+   `stale-blocker` pasaba con y sin el arreglo porque reusaba el repo temporal
+   del caso anterior — el índice de lifecycle se resuelve por root y ya estaba
+   recorrido, así que **no veía los archivos escritos después**. Aislado en su
+   propio repo, pasó a 47/48 sin el arreglo y 48/48 con él. El mismo protocolo
+   destapó que otro test necesitaba `git init` para siquiera ejercitar el modo
+   que decía probar.
+
 ## CLI
 
 Use the repo helper. Running as Codex, always scope skill output with

@@ -57,6 +57,41 @@ dirty-state confirmation ni una secuencia GVC. Si el texto de la task menciona
 esas piezas y deja `Flow: none`, `task-lint` emite warning para forzar decisión
 explícita.
 
+## Severidad: foco vs incidental (calibrado 2026-09-01)
+
+Los gates de wireframe y flow distinguen **por qué** la task apareció en el diff:
+
+| Situación | Severidad |
+|---|---|
+| La task es el foco (`--task TASK-###`) | **error** — el contrato es parte del trabajo declarado |
+| La task está en `in-progress/` y aparece en el diff | **error** — ya se está implementando |
+| La task está en `to-do/` y sólo aparece **incidentalmente** (le corrigieron una ruta stale, un cross-link) | warning |
+
+La razón: un barrido documental que toca 30 tasks para arreglarles referencias rotas no debe romper
+el gate por deuda de contratos que esas tasks ya arrastraban. Sin esta distinción, la penalidad cae
+sobre quien ordena el registro, no sobre quien contrajo la deuda — y el efecto práctico es que nadie
+ordena el registro.
+
+## Contratos retroactivos: cuando la UI ya existe y nunca declaró su contrato
+
+Una task en `in-progress/` con UI construida y sin `Wireframe:`/`Flow:` declarados es un hueco real,
+no un tecnicismo. Se cierra **documentando lo construido**, nunca con un stub ni bajando
+`UI impact` a `none`.
+
+Reglas del contrato retroactivo:
+
+1. **Etiquetarlo como retroactivo en la primera línea**, con la fecha y por qué existe. Quien lo lea
+   debe saber que describe algo que ya se implementó, no una propuesta.
+2. **Derivarlo de una fuente verificable** — el manual del runtime, la spec, el código desplegado —
+   y nombrarla. No se inventa un diseño para llenar el gate.
+3. **Enumerar explícitamente lo que NO cubre.** Es la parte que evita que el documento se lea como
+   evidencia de algo que nadie verificó (paridad entre superficies, evidencia GVC, recorrido con
+   teclado).
+
+Precedentes: `TASK-1078` (wireframe retroactivo del chat flotante de Nexa, 2026-09-01) y `TASK-1259`
+(wireframe + flow del selector de formularios en WordPress, construido en
+`efeonce-public-site-runtime` y sin desplegar).
+
 ## Motion Gate
 
 Toda task con `UI impact: motion` debe declarar en `## Status`:

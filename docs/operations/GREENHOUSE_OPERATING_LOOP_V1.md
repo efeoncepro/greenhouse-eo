@@ -102,6 +102,11 @@ No declarar completo un cambio si falta runtime, rollout, docs o verificacion.
 
 El cierre debe sincronizar:
 
+- **el avance registrado DONDE SE LEE** — los checkboxes de `## Acceptance Criteria` que la
+  evidencia respalda (tildados, con la evidencia anotada) y `Status real` al dia; lo no verificado
+  queda **sin tildar y con la razon escrita**, porque tildar sin evidencia es peor que no tildar.
+  Un `## Delta` es prosa: nadie la lee para decidir si tomar el trabajo. Verificado por
+  `pnpm task:lint --task TASK-###` (reglas `stale-progress` y `stale-blocker`);
 - lifecycle del artefacto;
 - indices y registries;
 - `Handoff.md`;

@@ -560,6 +560,41 @@ Tildar **uno solo** apaga la señal: lo que se persigue es el cero absoluto, que
 indistinguible "no empezada" de "hecha y sin registrar". Y sin `git` disponible la regla se apaga
 sola — nunca inventa una contradicción que no puede medir.
 
+#### Qué cuenta como "commit de implementación" (calibrado 2026-09-01)
+
+- **Un commit de scope `docs` NO cuenta**, aunque su tipo sea `fix`/`feat`. Reconciliar el backlog o
+  corregir una atribución no construye nada. Medido: los 3 commits `(docs)` del repo que nombran una
+  task son puramente documentales, así que excluirlos no esconde trabajo. Caso fuente `TASK-1779`,
+  marcada por `fix(docs): reconciliar el backlog Growth … y TASK-1779 para la memoria del cliente`.
+- **Sí cuenta toda task nombrada en el asunto, incluidas las que van entre paréntesis** — y es una
+  decisión medida, no un descuido. Sobre los 31 asuntos del repo con 2+ referencias, filtrar los
+  paréntesis arreglaría 6 falsos positivos de contexto (`precondición TASK-1259`, `herencia
+  TASK-1675`) pero **rompería 8 casos donde el paréntesis SÍ declara trabajo propio** (`Slice 2 of
+  TASK-642`, `TASK-587 Fase B`, `cierra TASK-260`). Un falso negativo esconde trabajo real; un falso
+  positivo sólo cuesta una verificación — y el mensaje pide exactamente eso, nunca afirma que el
+  trabajo exista.
+
+#### Qué hacer cuando la regla avisa
+
+Verificar contra el runtime y **registrar el resultado, sea cual sea**. Los tres desenlaces son
+legítimos y ninguno es "tildar para callar la alarma":
+
+1. **Hay trabajo hecho** → tilda los criterios que la evidencia respalda, con la evidencia anotada.
+2. **Hay trabajo hecho pero el criterio pide comportamiento que no ocurrió** → déjalo sin tildar
+   **con la razón escrita**. Ejemplo real: `TASK-927` tiene 5 slices construidos y sólo 1 de 6
+   criterios tildable, porque los otros cinco piden comportamiento post-escritura y el flag está OFF.
+3. **No hay trabajo** → deja los checkboxes en cero y escribe la verdad en `Status real`, para que
+   el siguiente no repita la auditoría.
+
+🔴 **Ausencia de código en este repo no es evidencia de que no exista.** En el barrido del
+2026-09-01 concluí que `TASK-1259` no estaba empezada porque no encontré el selector — lo busqué en
+el repo equivocado. Estaba construido en `efeonce-public-site-runtime`. Antes de escribir "no
+empezada", revisa el historial de commits de la propia task: suele nombrar dónde aterrizó.
+
+**Resultado del primer barrido completo (2026-09-01):** de 16 tasks activas señaladas, 12 dejaron de
+reportar. **Ninguna cerró: ninguna estaba terminada.** Las 4 restantes son aquellas donde nada se
+puede tildar con verdad, y su `Status real` responde el aviso en la primera línea que se lee.
+
 ---
 
 ### Desbloquear a quien te citaba (regla `stale-blocker`, desde 2026-08-08)
@@ -585,6 +620,11 @@ campos de sus dependientes. Si era el único blocker, el campo queda en `none`.
 
 ⚠️ La verdad del lifecycle se lee de la **carpeta**, no del registry ni del campo `Lifecycle`: la
 carpeta es lo que el humano ve, y `docs:closure-check` ya exige que coincidan.
+
+⚠️ **`none` seguido de una explicación NO dispara la regla (desde 2026-09-01).** El valor del campo
+es `none`; lo que va después entre paréntesis es prosa que dice por qué se desbloqueó — y esa prosa
+normalmente **nombra a los blockers que cerraron**, que es justo el contexto útil. Escribir
+`Blocked by: \`none\` (2026-09-01: TASK-922 y TASK-923 cerraron)` es correcto y no genera hallazgo.
 
 ---
 
