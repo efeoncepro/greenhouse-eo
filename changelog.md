@@ -51,6 +51,11 @@ falsos.
 
 ## 2026-09-01 — el CTA gana foco y salida por teclado, y `Escape` deja de mentirle al ledger
 
+Bundle del renderer CTA **`1.2.0-preview.1` → `1.3.0`**. Minor y no patch: cambia comportamiento
+observable, y `dismissed` deja de emitirse al cerrar por teclado — quien mida la tasa de rechazo
+verá la serie cambiar de sentido en esta versión. `renderer_version` viaja en la telemetría, así que
+el bump es lo único que después permite distinguir qué host corre el arreglo.
+
 `ISSUE-167` resuelto (code complete, rollout pendiente). Primitive `attachDisclosureFocus`
 (`src/growth-cta-renderer/disclosure-focus.ts`): al abrir el Growth Form desde un CTA el foco entra
 al contenido y `Escape` cierra. Es disclosure, no modal, y `Escape` se escucha en el contenedor —
@@ -1054,12 +1059,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
 - Los 32 pares tarea/subítem pasaron comparación exacta de cuerpo. El playbook espejo ahora exige escritura social en dos fases y gates visibles para archivo histórico, sensibilidad institucional, consolidación y soft-404.
 - La relectura encontró un drift no corregido: las 40 tareas preexistentes de artículo/banner aparecen al 11 de septiembre, fuera de sus proyectos de noviembre/diciembre. Quedó declarado para confirmación del calendario antes de una nueva mutación en Notion.
 - N48, N49 y N50 no están habilitados para distribución automática: esperan derechos/vigencia, revisión institucional y consolidación canónica, respectivamente. No hubo publicación CMS ni programación social. Evidencia: [`auditoría de noviembre/diciembre`](docs/audits/seo/BEREL_NOVEMBER_DECEMBER_2026_CONTENT_PRODUCTION_2026-08-26.md).
-
-## 2026-08-26 — El eje de desenlace del pipeline deja de operarse sólo desde el portal
-
-- **El hueco no era una ruta faltante: era una pregunta que nadie hizo.** Cerrar una postulación se podía hacer desde el portal y desde ningún otro lado — ni por `api/platform/app/**`, ni por MCP, ni por Nexa, que no mencionaba hiring ni una vez. Violación directa de Full API Parity, y el agravante es que **ninguna de las cuatro tasks del eje lo declaró como pendiente**, ni la auditoría que las revisó.
-- **La spec pedía copiar el Banco de Talento y ese patrón no calzaba.** Talent-pool persiste sus invitaciones en una tabla y compara contra esa fila al confirmar; para decisiones no existe tabla, el command no acepta `proposalRef`, y la spec declaraba `Migration: none`. La salida no fue crear la tabla: una invitación **es** una entidad con ciclo de vida propio, una propuesta de decisión nace y muere dentro de un gesto humano. El guard quedó como un **digest del estado actual** que `propose` calcula y `confirm` revalida — si alguien decidió entre medio, falla en vez de pisar una decisión ajena.
-- **Nexa quedó con autoridad deliberadamente MÁS ANGOSTA que el portal: cierra una postulación abierta, nunca re-decide una cerrada.** El motivo es mecánico: su contrato de acciones no puede cargar estado del preview al execute, así que la huella no sobrevive el viaje. Había dos salidas malas —debilitar el guard, o extender un contrato compartido por otras seis acciones— y una buena: acotar lo que el agente puede hacer.
-- **El guard de parity es lo que impide que la clase vuelva.** Un manifiesto obliga a declarar cada capability `hiring.*` como federada, deliberadamente interna o pendiente. No obliga a federar: obliga a **decidir y escribir el porqué**. Cuatro de las decisiones ya escritas dicen que no, y valen más que las que dicen que sí. Quedan 18 pendientes — no es deuda nueva, es la que ya existía, ahora con nombre.
-- **Dos defectos propios los encontró la pasada documental, no los tests.** El adaptador aplanaba los tres conflictos distintos del command en un solo código —exactamente la clase que se corrigió el mismo día del lado del candidato— y no reenviaba el destino de selección, con lo que dos de los seis desenlaces eran inalcanzables por la ruta que existe para alcanzarlos. Ambos corregidos y congelados con test.
-- Estado: `code complete, rollout pendiente`. El flag de Nexa nace OFF —bajo el AI Act la selección es alto riesgo con supervisión humana obligatoria— y falta ejercitar el loop contra staging. La escritura por MCP queda diferida: su registro vive en el repo hermano y su scope está bloqueado hasta `TASK-1631`.

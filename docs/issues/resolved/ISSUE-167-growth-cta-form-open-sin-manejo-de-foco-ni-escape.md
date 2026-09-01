@@ -90,6 +90,11 @@ Decisiones del contrato, todas deliberadas:
 5. **Sin foco robado en el reveal pasivo.** `slide-in` NO adopta la primitive en su apertura: su
    contrato de no robar atención sigue siendo correcto para contenido que aparece solo.
 
+6. **Bundle `1.2.0-preview.1` → `1.3.0`.** `renderer_version` viaja en la telemetría, así que el
+   bump es lo único que después permite distinguir qué host corre el arreglo. Minor y no patch
+   porque cambia comportamiento observable y porque `dismissed` deja de emitirse al cerrar por
+   teclado: quien mida la tasa de rechazo verá la serie cambiar de sentido en esta versión.
+
 `meeting-action.ts` conserva su gestión propia: funciona, no tenía defecto medido, y refactorizarla
 sin necesidad era riesgo sin retorno. Queda como consumidor candidato de la primitive.
 

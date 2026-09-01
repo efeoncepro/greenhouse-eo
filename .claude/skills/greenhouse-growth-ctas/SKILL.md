@@ -188,7 +188,12 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
   no es verificable desde el dashboard — hay que ir a la tabla base. Herramienta:
   `scripts/growth/_sanity-cta-signal-window.ts`.
   ✅ **`ISSUE-167` RESUELTO el mismo día (code complete, rollout pendiente).** Ver la regla dura de
-  disclosure abajo.
+  disclosure abajo. **Bundle `1.2.0-preview.1` → `1.3.0`**: minor y no patch porque cambia
+  comportamiento observable y porque **`dismissed` deja de emitirse al cerrar por teclado** — quien
+  mida la tasa de rechazo verá la serie cambiar de sentido en esta versión. `renderer_version` viaja
+  en la telemetría, así que el bump es lo único que permite separar el antes del después.
+  🔴 Regla que se deriva: **un cambio de comportamiento del bundle público SIEMPRE sube la versión.**
+  Sin bump, el ledger no puede distinguir qué host corre qué.
 - **2026-07-18 (release `d5db8b568`, PR #159+#160): TASK-1428 + TASK-1429 EN PRODUCCIÓN.**
   Enforcement de suppression **ON en staging y Production** (verificado E2E post-release:
   visitante dismissed → excluido; fresco → ve; `engineState: ok`). Kill switches operativos en
