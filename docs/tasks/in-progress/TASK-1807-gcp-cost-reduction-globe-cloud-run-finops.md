@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `cron`
 - Epic: `none`
-- Status real: `Slices 1 y 5 aplicadas; labels y retention dry-run activos; Asset Governance multi-stage validado con canary real; ventanas Producer/Media 24 h, 7 d y cierre mensual pendientes`
+- Status real: `Slices 1 y 5 aplicadas; labels y retention dry-run activos; Asset Governance multi-stage validado con canary real; ventanas Producer/Media y evaluación posterior de cadence Governance pendientes`
 - Rank: `1`
 - Domain: `ops`
 - Blocked by: `none`
@@ -60,8 +60,9 @@ mezcla con el cutover urgente de los schedulers.
   edad de cola por encima de 15 minutos ni degradar ejecuciones con trabajo real.
 - Rediseñar Asset Governance para desacoplar costo de su tick minutely antes de espaciarlo.
 - Instalar budgets, alertas, atribucion y calculo neto de billing para detectar y sostener el ahorro.
-- Alcanzar un run-rate objetivo inicial de CLP 330.000–370.000 y un objetivo posterior de CLP 290.000–320.000,
-  sujetos a readback real a 24 horas y 7 dias.
+- Alcanzar un run-rate modelado de CLP 409.528 tras Producer + Media y cercano a CLP 321.557 si Asset Governance
+  puede espaciarse de forma segura después de ambas ventanas; cualquier objetivo CLP 290.000–320.000 requiere
+  ahorro residual adicional probado, sujeto siempre a readback real a 24 horas, 7 dias y cierre mensual.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -327,9 +328,12 @@ Baseline live del 2026-09-01:
 | Media Derivatives | CLP 58.756 |
 | No-op observado | >99,9% |
 
-Modelo inicial, no promesa financiera: espaciar Producer y Media reduce aproximadamente CLP 160.000–170.000
-mensuales si el patrón se mantiene. Asset Governance y rightsizing pueden llevar el ahorro total hacia CLP
-230.000–250.000, pero solo se contabilizan con Billing Export real.
+Modelo corregido, no promesa financiera: Producer `*/1 -> */5` reduce 80% de CLP 117.504 = CLP 94.003/mes;
+Media `*/2 -> 2-59/5` reduce 60% de CLP 58.756 = CLP 35.254/mes. Juntos modelan CLP 129.257/mes y un
+run-rate total de CLP 409.528. Si, después de las ventanas de Producer y Media, el rediseño multi-stage permite
+Asset Governance `*/1 -> */5`, suma 80% de CLP 109.964 = CLP 87.971/mes: ahorro modelado total CLP 217.228 y
+run-rate CLP 321.557. Rightsizing fue rechazado por telemetría y cleanup sigue dry-run, por lo que no se les
+atribuye ahorro. Sólo Billing Export posterior a cada corte convierte estas cifras en ahorro observado.
 
 ### Evidencia de ejecución — 2026-09-01
 
@@ -458,6 +462,7 @@ Terraform, un scheduler a la vez. El rollback restaura el schedule anterior.
 - [ ] Producer corre cada 5 minutos desde Terraform y mantiene queue age p99 < 900 s durante 24 h y 7 dias.
 - [ ] Media Derivatives corre escalonado cada 5 minutos y mantiene backlog/oldest age bajo guardrail.
 - [x] Asset Governance no se degrada por un cambio directo de cadence: permanece `*/1`; el runtime multi-stage convergió un canary real hasta `eligible`, con rights/provenance, malware, lector gobernado y cola verificados.
+- [ ] Después de cerrar Producer y Media, se evalúa Asset Governance `*/5` con plan/readback y rollback a `*/1`; sólo se aplica si la convergencia multi-stage mantiene cola < 900 s y cero fallos materiales.
 - [ ] El costo diario observado de los jobs intervenidos baja al menos 50% sin aumento material de errores.
 - [ ] El rollback de cada scheduler esta documentado y verificado por readback.
 - [x] Existen budgets nativos con umbrales y forecast, sin apagado automatico.

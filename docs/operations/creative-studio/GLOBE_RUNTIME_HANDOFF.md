@@ -53,8 +53,9 @@ El batch real cerró con `claimed=1`, `applied=1`, `retried=0`, `failed=0`, `pro
 `queueOldestAgeSeconds=678`: inspection `accepted`, malware `clean`, C2PA `unverified/manifest_absent`, rights
 `authorized` y terminal `eligible`. El lector gobernado `33565749181` devolvió HTTP 200, lifecycle `active`,
 scan `clean`, rights verificadas y `eligibleForGeneration=true`. Se conserva `*/1`; el objetivo era reducir
-stages por tick, no espaciar un workflow cuya latencia depende de la cadencia. La imagen reporta ClamAV 1.4.3
-frente a 1.4.6 recomendada y el aviso no bloqueante de `clamd.conf`; es deuda de imagen separada.
+la dependencia de múltiples ticks antes de espaciar el respaldo. Sólo después de cerrar las ventanas de Producer
+y Media se evaluará `*/5`, con guardrail de cola <900 s y rollback a `*/1`. La imagen reporta ClamAV 1.4.3 frente
+a 1.4.6 recomendada y el aviso no bloqueante de `clamd.conf`; es deuda de imagen separada.
 
 No se hizo rightsizing: el runtime conserva `2 vCPU / 2 GiB`. En la ventana del canary, Cloud Monitoring observó
 CPU utilization media muestreada de hasta 56,8% y memory usage media máxima de 586.080.256 bytes; bajar a
