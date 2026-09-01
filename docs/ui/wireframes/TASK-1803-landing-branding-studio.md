@@ -120,6 +120,7 @@ pinning, carrusel obligatorio ni scroll horizontal. Las CTAs mantienen target t�
 | `branding.moments.title` | R5 | `Intervenimos cuando el negocio cambia más rápido que la marca.` | situación de compra |
 | `branding.offers.title` | R6 | `La intervención correcta depende de la decisión pendiente.` | productización, no menú |
 | `branding.artifacts.title` | R7 | `No entregamos archivos aislados. Dejamos decisiones que tu equipo puede usar.` | alinear con Why sin humo |
+| `branding.delivery.bridge` | R7 | `No dejamos la estrategia guardada en un brand book. La conectamos con activación y producción para que entre en uso.` | hipótesis diferencial; publicar sólo con capability proof |
 | `branding.ecosystem.title` | R8 | `La marca no termina cuando se aprueba. Empieza cuando entra en uso.` | puente a hermanas |
 | `branding.ecosystem.branding` | R8 | `Branding define el sistema.` | ruta actual |
 | `branding.ecosystem.agency` | R8 | `Agencia Creativa lo convierte en una idea movilizadora.` | link contextual |
@@ -164,6 +165,25 @@ Los cinco niveles no producen un score agregado ni suponen una secuencia comerci
 - Brand System / Activation Sprints: portfolio, launch, verbal/visual system, enablement o expansión.
 - Brand Governance Partner: 3–6 meses mínimos orientativos; responsabilidad, cadencia y decisiones, no producción ilimitada.
 - El pricing, gratuidad, disponibilidad y SLA no se publican sin aprobación de Commercial/Finance.
+
+### R6/R7 — delivery credibility
+
+La escalera comercial explica **cómo contratar**; la cadena `Diagnóstico → Estrategia → Sistema → Activación →
+Gobernanza` explica **cómo entrega Efeonce**. No deben colapsarse en un mismo conjunto de cards.
+
+R7 presenta cada etapa como una unidad verificable:
+
+- pregunta que resuelve;
+- output que recibe/utiliza el cliente;
+- decisión o aprobación requerida;
+- responsable y handoff a Agencia Creativa, Producción Creativa o equipo cliente;
+- ejemplo real autorizado, artefacto sanitizado o metodología explícitamente identificada como tal;
+- límite: qué no incluye y cuándo requiere otra especialidad.
+
+«Ayuda a decidir» se refiere a posicionamiento, arquitectura, naming, mensajes, identidad, experiencia, campañas,
+touchpoints y gobernanza de marca. No implica estrategia corporativa, pricing, cultura, diseño organizacional ni
+transformación operacional completa. Si falta owner, experiencia demostrable o prueba para una etapa, se elimina o se
+presenta como capacidad por desarrollar, nunca como servicio disponible.
 
 ### R8/R13 — page synergy
 
@@ -240,6 +260,8 @@ casos sin inventar logos, métricas o testimonios.
 ## Acceptance Checklist
 
 - [ ] All visible strings are in the copy ledger or explicitly delegated to an existing governed host.
+- [ ] R6 separa packaging comercial de R7/cadena de entrega y cada etapa visible tiene owner, output, handoff, límite y prueba.
+- [ ] Ningún copy convierte capacidad adyacente o futura en experiencia entregada por Efeonce.
 - [ ] Dynamic values are named and bounded.
 - [ ] Partial/degraded states are explicit.
 - [ ] No copy implies a guarantee when data is estimated.

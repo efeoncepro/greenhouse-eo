@@ -61,6 +61,8 @@ pertenecen a Agencia o Producción.
   tensión, el resultado y el mecanismo `decisión + expresión + operación`.
 - Convertir branding en una escalera productizada —Brand Diagnostic, Strategy Sprint, Brand System/Activation y
   Governance Partner— sin prometer gratuidad, pricing, producción ilimitada ni resultados sin evidencia.
+- Demostrar capacidad de entrega real mediante responsables, etapas, entregables, tiempos orientativos, handoffs y
+  prueba autorizada; la promesa nunca puede ser más amplia que la capacidad verificable de Efeonce.
 - Crear una experiencia premium y responsive cuyo wireframe, UI flow, copy y motion expliquen causalidad y ayuden a
   elegir `Define · Activa · Escala`.
 - Establecer fronteras y enlaces contextuales con Agencia Creativa y Producción Creativa, incluida la corrección de
@@ -337,6 +339,8 @@ exclusivo. Preservar WIP y contratos activos de TASK-1350/TASK-1358/TASK-1799.
 - Confirmar line architecture `Efeonce → Creative Services → Branding Studio` y aprobar nombre/descriptor visible.
 - Ejecutar VoC real: ventas, briefs, win/loss, testimonios y lenguaje BP3/BP6; separar hecho, inferencia e hipótesis.
 - Crear claim/proof/case-rights ledger con owner, evidencia, período, denominador y autorización.
+- Crear un capability ledger de Branding con responsables, experiencia demostrable, dependencias, capacidad disponible,
+  artefactos de muestra y brechas; una etapa sin owner y prueba no se presenta como capacidad instalada.
 - Decidir oferta de entrada y CTA: Diagnostic pagado, evaluación inicial o reunión; declarar anti-ICP y no-fit.
 - Investigar intent/keywords/canibalización y cerrar slug, H1/SEO title/OG/canonical y páginas legacy.
 - Confirmar work page/postId, Elementor/runtime plugin, hashes/guards, backup plan y módulos/primitives reusables.
@@ -355,6 +359,8 @@ exclusivo. Preservar WIP y contratos activos de TASK-1350/TASK-1358/TASK-1799.
 - Implementar R2–R14 como módulos Elementor separados/adaptables; no monolithic HTML widget.
 - Materializar `decisión + expresión + operación`, madurez, momentos, offer ladder, artefactos, semantic identity,
   governance y measurement con alternativas textuales accesibles.
+- Hacer tangible la cadena de entrega `Diagnóstico → Estrategia → Sistema → Activación → Gobernanza`, distinguiéndola
+  del packaging comercial y mostrando para cada etapa pregunta, output, aprobación, handoff y prueba.
 - Implementar casos sólo desde evidencia/autorización; ocultar/recomponer módulos faltantes sin placeholders públicos.
 - Crear el navegador compartido `Define · Activa · Escala` y enlaces contextuales hacia páginas hermanas.
 - Verificar long copy, localization, media degradation, HTML/JS-off, keyboard y mobile 390.
@@ -419,6 +425,39 @@ Mechanism: Brand Diagnostic → Strategy → System/Activation → Governance/Re
 Expansion: Agencia Creativa activa; Producción Creativa escala.
 No-claims: memorable/líder/innovador/360; “optimiza ChatGPT”; revenue atribuible sin método.
 ```
+
+### Delivery credibility and scope boundary contract
+
+La idea «la marca ayuda a decidir» se limita a **decisiones de marca y de su activación**. La landing puede prometer
+criterios para posicionamiento, arquitectura de portafolio, naming, mensajes, identidad, experiencia, campañas,
+touchpoints y gobernanza. No presenta Branding Studio como consultoría integral de estrategia corporativa.
+
+Fuera de alcance por defecto: redefinir modelo de negocio, pricing, estructura organizacional, cultura, estrategia
+financiera o transformación operacional completa. Si un encargo necesita una de esas capacidades, se declara como
+dependencia o alcance profesional separado, con owner y propuesta propios; nunca se absorbe mediante copy ambiguo.
+
+La **cadena de entrega** y la **escalera comercial** son conceptos distintos: las cinco etapas explican cómo se hace el
+trabajo; Diagnostic, Sprint, Activation y Partner explican cómo puede contratarse. Una oferta puede agrupar etapas,
+pero no omitir sus entregables, aprobaciones ni límites.
+
+| Etapa de entrega | Pregunta que resuelve | Outputs mínimos posibles | Handoff natural | Prueba necesaria para publicarla |
+|---|---|---|---|---|
+| Diagnóstico | ¿Qué cambió y dónde dejó de servir la marca? | hallazgos, tensiones, riesgos, madurez y roadmap priorizado | decisión de alcance y Strategy Sprint | método, owner y ejemplo sanitizado/autorizado |
+| Estrategia | ¿Qué debe representar la marca y frente a quién? | categoría, audiencia, posicionamiento, arquitectura, promesa, message house y criterios | brief aprobado para sistema/activación | artefacto, decisión aprobada y responsable |
+| Sistema | ¿Cómo se reconoce, expresa e interpreta esa estrategia? | sistema verbal, visual y semántico; claims, principios, guidelines y componentes | Agencia Creativa o equipo del cliente | specimens reales, derechos y trazabilidad a estrategia |
+| Activación | ¿Cómo entra la marca en uso? | concepto, campaña, lanzamiento, canales, enablement y prioridades de producción | Producción Creativa y operación del cliente | caso/output autorizado y alcance atribuible |
+| Gobernanza | ¿Cómo se mantiene consistente y evoluciona? | owners, approval matrix, excepciones, formación, scorecard y revisiones | cadencia recurrente/Quarterly Brand Review | ejemplo de governance, owner, frecuencia y evidencia de adopción |
+
+Gates de credibilidad:
+
+- Cada etapa visible declara `owner + inputs + outputs + aprobación + exclusiones + handoff + prueba`.
+- La disponibilidad de un servicio no se infiere de que la agencia pueda diseñar o producir una pieza relacionada.
+- Si una capacidad depende de un especialista o partner, la relación se explica con honestidad antes de venderla.
+- Casos, logos, métricas y artefactos sólo aparecen con derechos y contexto; la metodología sustituye al caso cuando
+  no existe prueba publicable, pero nunca simula experiencia ejecutada.
+- La promesa diferencial puede explorarse como hipótesis: «No dejamos la estrategia guardada en un brand book;
+  podemos convertirla en campañas, contenidos, experiencias y producción continua». Antes de publicarla, el capability
+  ledger debe demostrar cada tramo y el copy debe evitar implicar producción ilimitada.
 
 ### Page architecture contract
 
@@ -489,6 +528,7 @@ pregunta dominante; cualquier cambio registra decisión y actualiza wireframe/fl
 |---|---|---|---|---|
 | Branding compite con Agencia/Producción | content/SEO | high | intent/boundary map + cross-links + copy audit | queries/CTAs indistinguibles |
 | Nueva línea de servicio parece submarca/proveedor | brand | medium | Efeonce masterbrand + descriptor + schema owner | logo/naming independiente |
+| La promesa excede la capacidad demostrable de la agencia | commercial/brand | high | capability ledger + owner/output/handoff/proof gate | etapa sin responsable, muestra o límite |
 | Copy genérico o sin evidencia | content/commercial | high | VoC + headline/claim/case gates | claim sin source/owner |
 | Work page se indexa antes de tiempo | SEO | medium | noindex + canonical gate + head verifier | robots/canonical drift |
 | Elementor mutación afecta Ohio/global | WordPress UI | medium | Document::save + page scope + snapshot/hash | header/footer/other page diff |
@@ -549,6 +589,9 @@ pregunta dominante; cualquier cambio registra decisión y actualiza wireframe/fl
 - [ ] `UI ready` permanece `no` hasta cerrar implementation mapping, GVC plan, design log, VoC, claims/cases, CTA, slug y work page; si cambia a `yes`, pasa `pnpm ui:readiness-check --task TASK-1803`.
 - [ ] Discovery confirma postId/slug/status/hash/Ohio metas/runtime owners y registra landing ref/registry antes de la segunda mutación.
 - [ ] Brand architecture presenta Efeonce como masterbrand, Branding Studio como línea de servicio y Globe como habilitador, no proveedor/agencia separada.
+- [ ] El capability ledger demuestra responsables, experiencia, dependencias, capacidad, artefactos y brechas; ninguna etapa sin owner/prueba se publica como capacidad instalada.
+- [ ] La landing limita «ayuda a decidir» a decisiones de marca/activación y no promete estrategia corporativa, pricing, cultura o transformación operacional salvo alcance separado y verificable.
+- [ ] Diagnóstico, Estrategia, Sistema, Activación y Gobernanza muestran pregunta, outputs, aprobación, handoff, límites y prueba; la cadena de entrega no se confunde con el packaging comercial.
 - [ ] VoC dossier, one thing, awareness/framework map, 15–25 headlines, objection map, claim ledger y case-rights ledger existen y tienen revisión humana.
 - [ ] H1, SEO title, OG title y slug cumplen funciones distintas; ningún claim/caso/cifra sin evidencia/autorización se publica.
 - [ ] En 10 segundos el first fold comunica cambio, resultado, mecanismo y acción; el operador emite `ACCEPT FIRST FOLD` antes de implementar below-fold completo.
