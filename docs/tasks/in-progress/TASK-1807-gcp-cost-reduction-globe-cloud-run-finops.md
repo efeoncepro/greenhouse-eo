@@ -411,6 +411,11 @@ El rango de planificación queda CLP 194.503–217.228 hasta contar con Billing 
   genera sólo `*/1 -> 4-59/5`, `Plan: 0 to add, 1 to change, 0 to destroy`. Se descartó `*/5` porque colisiona
   con Producer; los minutos 4/9/14/.../59 completan el stagger 0 Producer / 2 Media / 4 Governance. La aplicación
   espera cerrar las ventanas de Producer y Media y conserva rollback inmediato a `*/1`.
+- Baseline live de Governance listo para comparar el futuro cutover: 1.438 batches completados en las 24 horas
+  terminadas a las 22:52Z, cero batches fallidos, 12 items claimed, 8 applied, 4 retried y 2 promoted. La edad
+  máxima observada fue 678 s, bajo el guardrail de 900 s. Las tres alertas gestionadas están `ENABLED` con canal:
+  failures y firmas ClamAV por cualquier evento, y queue age P99 > 900 s durante cinco minutos. Esta evidencia
+  no adelanta el apply: Governance sigue `*/1` hasta cerrar Producer y después Media.
 - Señal temprana de costo de Producer: dos ventanas comparables de 105 minutos, inmediatamente antes y después
   del corte, contienen 105 puntos cada una. `billable_instance_time` cayó 71,65%; CPU allocation y memory
   allocation, 71,63%. Es evidencia de consumo facturable reducido, pero no reemplaza Billing Export: su último
