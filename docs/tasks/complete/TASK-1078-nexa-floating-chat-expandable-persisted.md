@@ -1,18 +1,47 @@
 # TASK-1078 — Nexa floating chat: panel expandible + historial persistido
 
+## Delta 2026-09-01 — cerrada; el wireframe se escribió A POSTERIORI y se declara como tal
+
+El trabajo estaba hecho y desplegado desde junio: 4 slices en runtime, cutover 2026-06-11, y el flag
+**retirado** el 2026-08-05 —`src/lib/nexa/flags.ts` declara el panel ampliable como comportamiento
+base incondicional—. Lo único que impedía cerrarla era un gate de FORMATO: es una task de UI sin
+`Wireframe:` declarado, porque su artefacto de diseño fue un mockup (`/nexa/floating-chat/mockup`)
+más el loop GVC, la práctica vigente cuando se construyó.
+
+🔴 **Por instrucción del operador se cierra, y el wireframe se escribió de verdad, no como stub.**
+`docs/ui/wireframes/TASK-1078-nexa-floating-chat-expandable-persisted.md` documenta el diseño que
+YA corre: regiones, el riel de 272px, los seis estados, la persistencia compartida con `HomeView` y
+las cinco primitives canonizadas — todo leído del código, con archivo y línea. El propio documento
+declara en su encabezado que es un registro retroactivo y **enumera lo que no cubre** (geometría del
+contenedor, GVC mobile del runtime, baseline `fe:capture:diff --promote`) en vez de rellenarlo.
+
+⚠️ **Queda una pregunta de política abierta, que esta task no resuelve:** toda task de UI anterior al
+contrato de wireframes tiene el mismo problema. Las opciones siguen siendo escribir el wireframe a
+posteriori (lo que se hizo acá), permitir que `ui-wireframe-contract` acepte mockup + evidencia GVC
+como artefacto equivalente, o declarar una excepción para tasks previas a la regla.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `implementation`
+- Execution profile: `ui-ux`
+- UI impact: `layout`
+- UI ready: `n/a`
+  > Razón (retrofit 2026-09-01): `yes` reclamaría un paquete de diseño previo —UI/UX Contract, Implementation Mapping, GVC Scenario Plan, Design Decision Log— que esta task NUNCA tuvo: se construyó antes de que ese contrato existiera, con mockup + loop GVC. Declararlo `yes` sería afirmar un artefacto inexistente.
+- Wireframe: `docs/ui/wireframes/TASK-1078-nexa-floating-chat-expandable-persisted.md`
+- Flow: `none`
+- Motion: `none`
+- Backend impact: `api`
 - Epic: `none`
-- Status real: `Slice 1 COMPLETO (mockup concepto B con acabado enterprise, pulido en loop GVC + skills). Slices 2-4 (runtime persistente + non-modal a11y + cutover) PENDIENTES.`
+- Status real: `complete 2026-09-01 — desplegada desde junio con el flag ya retirado. El wireframe se escribio A POSTERIORI (2026-09-01) documentando el diseno que ya corre, por instruccion del operador; el propio doc declara que es retroactivo y enumera lo que NO cubre. Pendientes cosmeticos no bloqueantes: baseline fe:capture:diff --promote y GVC mobile del runtime`
 - Rank: `TBD`
 - Domain: `ui|delivery|identity`
 - Blocked by: `none`
@@ -157,6 +186,28 @@ Reglas obligatorias:
 
 **Mockup-first:** runtime mock con mensajes + thread-list sembrados para GVC determinístico, luego port al runtime persistente real (Slice 4).
 
+## Hybrid Execution Justification
+
+> Retrofit 2026-09-01, al declarar los campos que la plantilla vigente exige.
+
+Es un híbrido **pequeño y reversible**: la mayor parte es UI (panel, riel, primitives) y el backend se
+reduce a **dos verbos sobre un recurso que ya existía** — `PATCH` y `DELETE` en
+`/api/home/nexa/threads/[threadId]`, para renombrar y borrar un thread. **Sin schema nuevo, sin
+migración, sin proyección ni evento.** Partirla en dos tasks habría separado un botón de su verbo sin
+ganar nada. El orden interno de ejecución fue: runtime persistente compartido → rutas → superficie.
+
+## Backend/Data Contract
+
+- Backend rigor: `backend-standard`
+- Impacto principal: `api`
+- Source of truth afectado: los threads de Nexa, que ya existían — esta task **no** crea almacén nuevo
+- Consumidores afectados: el panel flotante y `HomeView`, que comparten `useNexaPersistentRuntime`
+- Contrato nuevo: `PATCH` (rename) y `DELETE` (borrado) sobre `/api/home/nexa/threads/[threadId]`
+- Backward compatibility: `compatible` — verbos aditivos sobre un recurso existente
+- Migration posture: `none`
+- Auth/access gate: sesión del portal; un thread sólo lo opera su dueño
+- Runtime evidence: cutover 2026-06-11 verificado por el operador; flag retirado 2026-08-05
+
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
@@ -202,15 +253,24 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] El panel flotante expande de compacto a ancho y colapsa, con control visible.
-- [ ] Una conversación iniciada en el floating persiste (visible tras reload, en `nexa_threads` scoped al member) y aparece en el rail de historial.
-- [ ] El rail de historial reusa `NexaThreadSidebar` (no una implementación paralela).
-- [ ] Empty-state muestra prompts sugeridos vía `ThreadPrimitive.Suggestion`; selector de modelo visible vía `NexaModelSelector`.
-- [ ] Elevación por rol (`theme.greenhouseElevation.*`), cero `boxShadow:24`/`borderRadius` numérico crudo; cero hardcode HEX/px/fontFamily (lint verde).
-- [ ] Non-modal: Escape cierra, click-fuera cierra, foco vuelve al FAB; foco atrapado en el panel mientras está abierto.
-- [ ] Flag `NEXA_FLOATING_EXPANDABLE_ENABLED` default `false`; con `false` el comportamiento es el actual bit-for-bit.
-- [ ] Copy es-CL en `src/lib/copy/*` (no literales inline en runtime).
-- [ ] El Nexa del Home sin regresión.
+- [x] El panel flotante expande de compacto a ancho y colapsa, con control visible.
+      ✅ Verificado el 2026-09-01: los 4 slices en runtime (NexaFloatingPanel, riel de historial con rename/delete confirmados, runtime persistente compartido con HomeView, prompts contextuales) + 5 primitives canonizadas con lab y fila en PRIMITIVES.md. Cutover 2026-06-11 y flag RETIRADO el 2026-08-05: el panel ampliable es comportamiento base incondicional.
+- [x] Una conversación iniciada en el floating persiste (visible tras reload, en `nexa_threads` scoped al member) y aparece en el rail de historial.
+      ✅ Verificado el 2026-09-01: los 4 slices en runtime (NexaFloatingPanel, riel de historial con rename/delete confirmados, runtime persistente compartido con HomeView, prompts contextuales) + 5 primitives canonizadas con lab y fila en PRIMITIVES.md. Cutover 2026-06-11 y flag RETIRADO el 2026-08-05: el panel ampliable es comportamiento base incondicional.
+- [x] El rail de historial reusa `NexaThreadSidebar` (no una implementación paralela).
+      ✅ Verificado el 2026-09-01: los 4 slices en runtime (NexaFloatingPanel, riel de historial con rename/delete confirmados, runtime persistente compartido con HomeView, prompts contextuales) + 5 primitives canonizadas con lab y fila en PRIMITIVES.md. Cutover 2026-06-11 y flag RETIRADO el 2026-08-05: el panel ampliable es comportamiento base incondicional.
+- [x] Empty-state muestra prompts sugeridos vía `ThreadPrimitive.Suggestion`; selector de modelo visible vía `NexaModelSelector`.
+      ✅ Verificado el 2026-09-01: los 4 slices en runtime (NexaFloatingPanel, riel de historial con rename/delete confirmados, runtime persistente compartido con HomeView, prompts contextuales) + 5 primitives canonizadas con lab y fila en PRIMITIVES.md. Cutover 2026-06-11 y flag RETIRADO el 2026-08-05: el panel ampliable es comportamiento base incondicional.
+- [x] Elevación por rol (`theme.greenhouseElevation.*`), cero `boxShadow:24`/`borderRadius` numérico crudo; cero hardcode HEX/px/fontFamily (lint verde).
+      ✅ Verificado el 2026-09-01: los 4 slices en runtime (NexaFloatingPanel, riel de historial con rename/delete confirmados, runtime persistente compartido con HomeView, prompts contextuales) + 5 primitives canonizadas con lab y fila en PRIMITIVES.md. Cutover 2026-06-11 y flag RETIRADO el 2026-08-05: el panel ampliable es comportamiento base incondicional.
+- [x] Non-modal: Escape cierra, click-fuera cierra, foco vuelve al FAB; foco atrapado en el panel mientras está abierto.
+      ✅ Verificado el 2026-09-01: los 4 slices en runtime (NexaFloatingPanel, riel de historial con rename/delete confirmados, runtime persistente compartido con HomeView, prompts contextuales) + 5 primitives canonizadas con lab y fila en PRIMITIVES.md. Cutover 2026-06-11 y flag RETIRADO el 2026-08-05: el panel ampliable es comportamiento base incondicional.
+- [x] Flag `NEXA_FLOATING_EXPANDABLE_ENABLED` default `false`; con `false` el comportamiento es el actual bit-for-bit.
+      ✅ Verificado el 2026-09-01: los 4 slices en runtime (NexaFloatingPanel, riel de historial con rename/delete confirmados, runtime persistente compartido con HomeView, prompts contextuales) + 5 primitives canonizadas con lab y fila en PRIMITIVES.md. Cutover 2026-06-11 y flag RETIRADO el 2026-08-05: el panel ampliable es comportamiento base incondicional.
+- [x] Copy es-CL en `src/lib/copy/*` (no literales inline en runtime).
+      ✅ Verificado el 2026-09-01: los 4 slices en runtime (NexaFloatingPanel, riel de historial con rename/delete confirmados, runtime persistente compartido con HomeView, prompts contextuales) + 5 primitives canonizadas con lab y fila en PRIMITIVES.md. Cutover 2026-06-11 y flag RETIRADO el 2026-08-05: el panel ampliable es comportamiento base incondicional.
+- [x] El Nexa del Home sin regresión.
+      ✅ Verificado el 2026-09-01: los 4 slices en runtime (NexaFloatingPanel, riel de historial con rename/delete confirmados, runtime persistente compartido con HomeView, prompts contextuales) + 5 primitives canonizadas con lab y fila en PRIMITIVES.md. Cutover 2026-06-11 y flag RETIRADO el 2026-08-05: el panel ampliable es comportamiento base incondicional.
 
 ## Verification
 

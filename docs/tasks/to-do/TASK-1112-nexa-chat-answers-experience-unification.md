@@ -1,5 +1,13 @@
 # TASK-1112 — Nexa Chat ↔ Answers Experience Unification (cerrar la experiencia conversacional)
 
+## Delta 2026-09-01 — `TASK-1078` deja de bloquear
+
+`TASK-1078` quedó `complete`: su trabajo llevaba desplegado desde junio (cutover 2026-06-11, flag
+retirado el 2026-08-05) y lo único que faltaba era su wireframe, escrito a posteriori. La
+coordinación serial sobre `NexaThread`/`NexaFloatingPanel` ya no aplica. Queda `TASK-1101` como
+blocker vigente por `NexaChatProvider`/streaming.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -17,7 +25,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `ui|platform|nexa|ai|content`
-- Blocked by: `TASK-1078 (in-progress, toca NexaThread/NexaFloatingPanel) + TASK-1101 (in-progress, toca NexaChatProvider/streaming) — coordinacion serial, NO concurrente en esos archivos`
+- Blocked by: `TASK-1101`
 - Branch: `task/TASK-1112-nexa-chat-answers-experience-unification`
 - Legacy ID: `none`
 - GitHub Issue: `none`

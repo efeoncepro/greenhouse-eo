@@ -134,7 +134,12 @@ const sectionContent = (task, section) => task.sections.get(section)?.content ??
 
 const stripStatusValue = value => value.replace(/^`(.+)`$/, '$1').trim()
 
-const normalizeStatusValue = value => stripStatusValue(value).toLowerCase()
+// 🔴 El parser dobla las líneas de continuación DENTRO del valor del campo, así que un
+// `UI ready: \`n/a\`` seguido de su razón llega como "n/a\n> razón…". Normalizar sobre el valor
+// crudo rompía justo cuando el autor hace lo que la plantilla PIDE: declarar el valor CON su razón.
+// Se toma la primera línea, que es el valor; el resto es prosa de respaldo. Corregido 2026-09-01
+// tras verlo romper tres reglas distintas (UI impact, UI ready) en el mismo cierre.
+const normalizeStatusValue = value => stripStatusValue(String(value ?? '').split('\n')[0]).toLowerCase()
 
 const hasMarkdownHeading = (source, heading) => {
   const escaped = heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -908,7 +913,15 @@ const checkUiWireframeContract = (task, context) => {
 
   const rawWireframe = task.status.fields.Wireframe ?? task.status.fields.wireframe ?? ''
   const wireframe = rawWireframe.replace(/^`(.+)`$/, '$1').trim()
-  const severity = context.changed || context.task ? 'error' : 'warning'
+
+  // Modo FOCAL (`--task`) = alguien va a trabajar esa task: el wireframe es exigible y el error es
+  // correcto (hay test que lo fija). Modo `--changed` sobre una task en `to-do` es otra cosa: quien
+  // pasó por el archivo puede estar sólo limpiando un `Blocked by` obsoleto, y el mensaje de la
+  // propia regla dice "before implementation" — una task que no empezó no está violando nada
+  // todavía. Ahí queda warning: sigue visible, y se vuelve bloqueante en cuanto alguien la enfoque
+  // o la mueva a `in-progress`. Calibrado 2026-09-01 al cerrar TASK-1078.
+  const incidental = context.changed && !context.task && task.folderLifecycle === 'to-do'
+  const severity = (context.changed || context.task) && !incidental ? 'error' : 'warning'
 
   if (!wireframe || wireframe === 'none' || wireframe === 'n/a') {
     return [

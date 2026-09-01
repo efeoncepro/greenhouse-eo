@@ -14,24 +14,30 @@ El workflow canónico sigue siendo temporal para DMs genéricos: aprobación →
 `Status real` corregido: `1036 1040 1090 1113 1209 1210 1225 1253 1282 1321 1330 1335 1430 1431 1747`.
 Desbloqueadas de paso `TASK-1246`, `1254`, `1255` y `1336`.
 
-🔴 **`TASK-1078` NO se cerró, y la razón importa.** Su trabajo está hecho y desplegado —4 slices en
-runtime, cutover 2026-06-11, flag **retirado** el 2026-08-05—, pero es una task de UI **sin
-`Wireframe:` declarado**: su artefacto de diseño fue un mockup + loop GVC, la práctica de entonces.
-`ui-wireframe-contract` lo exige como **error**. **No le inventé un wireframe para pasar el gate** —
-sería el stub que el estándar prohíbe—, así que reverti mis cambios y la dejé intacta.
+✅ **`TASK-1078` cerrada por instrucción del operador, y el wireframe se escribió DE VERDAD.**
+`docs/ui/wireframes/TASK-1078-nexa-floating-chat-expandable-persisted.md` documenta el diseño que ya
+corre —regiones, riel de 272px, los seis estados, la persistencia compartida con `HomeView`, las
+cinco primitives— todo leído del código con archivo y línea. El propio documento declara en su
+encabezado que es **retroactivo** y **enumera lo que NO cubre** (geometría del contenedor, GVC mobile
+del runtime, baseline `fe:capture:diff --promote`) en vez de rellenarlo.
 
-**Decisión pendiente del operador, y aplica a toda task de UI previa al contrato de wireframes:**
-(a) escribir el wireframe real a posteriori, (b) permitir que la regla acepte mockup + evidencia GVC
-como artefacto equivalente, o (c) declarar una excepción explícita para tasks previas a la regla.
-Cualquiera es defendible; inventar el archivo no. `TASK-1112` la declara blocker y hace bien.
+`UI ready` quedó en **`n/a`, no `yes`**: `yes` reclamaría un paquete de diseño previo —UI/UX Contract,
+Implementation Mapping, GVC Scenario Plan, Design Decision Log— que esta task nunca tuvo.
+Desbloqueada `TASK-1112`.
 
 ⚠️ **Dos defectos de `task:lint` corregidos en el camino**, ambos de la misma clase que veníamos
 cazando —un mensaje que promete algo que el mecanismo no honra—:
 1. `ui-wireframe-contract` ofrecía la salida «set UI impact to none with rationale», pero la
    inferencia por `Domain` la anulaba. Ahora una declaración EXPLÍCITA gana sobre una INFERIDA.
-2. El parser dobla las líneas de continuación dentro del valor del campo, así que `UI impact: none`
-   **seguido de su razón** llegaba como `"none\n> razón…"` y no matcheaba. La regla se rompía justo
-   cuando el autor hacía lo que la plantilla PIDE. Ahora compara la primera línea.
+2. `normalizeStatusValue` comparaba el valor crudo del campo, y el parser dobla las líneas de
+   continuación DENTRO de él: `UI impact: none` **seguido de su razón** llegaba como `"none\n> razón…"`.
+   La regla se rompía justo cuando el autor hacía lo que la plantilla PIDE. Rompió TRES reglas
+   distintas en el mismo cierre antes de que lo viera. Ahora compara la primera línea.
+3. `ui-wireframe-contract` trataba como **error** a una task en `to-do` tocada de refilón —limpiar un
+   `Blocked by` obsoleto bastaba—, cuando su propio mensaje dice *"before implementation"*. En modo
+   FOCAL sigue siendo error, porque ahí alguien va a trabajarla y hay test que lo fija; en modo
+   `--changed` sobre `to-do` queda warning. ⚠️ Mi primer intento rompió ese test: la calibración
+   correcta distingue focal de incidental, no afloja el gate.
 
 Retrofit honesto en `TASK-1036` y `TASK-1113`: `UI impact: none` **con razón escrita** — ninguna
 diseña superficie (tokens y un fix de render), así que no les corresponde wireframe.
