@@ -24,7 +24,9 @@ Readback: Scheduler `ENABLED`; primer tick de la nueva cadence `globe-producer-w
 con `queueOldestAgeSeconds=0`, `outboxRetryStorm=0`, `outboxTerminalAttempts=0`, cero divergencias y cero fallos.
 La ventana de observación de 24 h sigue abierta. Media Derivatives permanece `*/2`; Asset Governance permanece
 `*/1` porque una etapa por tick hace que `*/5` degrade la convergencia a ~20–25 minutos. Rollback Producer:
-restaurar `* * * * *`, plan honesto con `0 destroy`, apply y readback.
+restaurar `* * * * *`, plan honesto con `0 destroy`, apply y readback. El rollback fue verificado en dry-run con
+development, budgets y quota project preservados: sólo update in-place, `0 add, 1 change, 0 destroy`; no se aplicó
+porque el runtime permanece sano.
 
 Guardrails FinOps aplicados después del corte: budgets alert-only Globe CLP 250.000 y consolidado CLP 370.000;
 umbrales current 50/75/90/100% y forecast 90/100%; plan posterior sin drift. Los recursos Globe recibieron

@@ -379,6 +379,11 @@ mensuales si el patrón se mantiene. Asset Governance y rightsizing pueden lleva
   hasta 27,3%). Reducir a 1 vCPU agotaría el margen con esa misma carga; la métrica de memoria combina muestras
   por minuto y ejecuciones superpuestas, por lo que no prueba un peak/P99 apto para bajar a 1 GiB. Se cierra la
   decisión conservadora: ningún rightsizing hasta reunir varias ejecuciones reales con percentiles y sin backlog.
+- Rollback de Producer verificado por plan, sin aplicarlo sobre un runtime sano: con development y budgets
+  preservados explícitamente, `producer_worker_schedule="* * * * *"` produce sólo el update in-place
+  `*/5 * * * * -> * * * * *`, con `Plan: 0 to add, 1 to change, 0 to destroy`. El primer intento también probó
+  dos guardas de operación: ADC requiere `GOOGLE_CLOUD_QUOTA_PROJECT=efeonce-globe` para refrescar budgets y
+  `enable_budget=true` + billing account son inputs obligatorios para impedir que un plan de rollback los retire.
 
 ## Rollout Plan & Risk Matrix
 
@@ -503,6 +508,8 @@ Terraform, un scheduler a la vez. El rollback restaura el schedule anterior.
 - Primer tick: ejecución `globe-producer-worker-2lq2v`, completada a las 21:00:07Z con
   `queueOldestAgeSeconds=0`, `outboxRetryStorm=0`, `outboxTerminalAttempts=0`, cero divergencias y cero fallos.
 - Post-apply: `tofu plan` honesto en `No changes`.
+- Rollback dry-run: plan honesto con development, budgets y quota project preservados propone únicamente volver
+  a `* * * * *`, `0 add, 1 change, 0 destroy`; no se aplicó porque los guardrails siguen verdes.
 - Estado: no se marca aceptación de 24 h/7 d todavía; monitoring activo antes de Slice 2.
 
 ## Delta 2026-09-01 — Budgets, costo neto, atribución y retention dry-run
