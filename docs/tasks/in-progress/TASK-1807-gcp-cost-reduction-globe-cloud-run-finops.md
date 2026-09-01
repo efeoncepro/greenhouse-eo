@@ -420,6 +420,13 @@ El rango de planificación queda CLP 194.503–217.228 hasta contar con Billing 
   del corte, contienen 105 puntos cada una. `billable_instance_time` cayó 71,65%; CPU allocation y memory
   allocation, 71,63%. Es evidencia de consumo facturable reducido, pero no reemplaza Billing Export: su último
   `usage_end_time` seguía en 13:00Z, anterior al cutover de 20:55Z.
+- Globe `6b6dff6` publica el readback parametrizado
+  `pnpm finops:job-cost-readback -- --job=<allowlisted> --cutover=<ISO> --window=24h|7d|30d`. La consulta es
+  SELECT-only, limita jobs a Producer/Media/Governance y devuelve ahorro confirmado sólo si el
+  `latest_usage_end_time` del mismo job cubre el final completo de la ventana posterior. Sus cuatro pruebas pasan.
+  La ejecución live de Producer a las 23:04Z leyó CLP 1.614,51 netos en la ventana previa, pero devolvió
+  `status=awaiting_billing_export`, `confirmedSavings=null`: el export seguía en 13:00Z y no fabricó ahorro desde
+  un after vacío.
 - Corte de observación Producer a las 22:50Z: 24 ejecuciones posteriores al cambio, 24 completadas y cero
   fallidas; `queueOldestAgeSeconds`, edad de promotion queue, retry storm, intentos terminales y divergencias
   permanecieron en 0. La ventana lleva 1 h 55 min y por eso no autoriza todavía el apply de Media.
@@ -515,6 +522,7 @@ Terraform, un scheduler a la vez. El rollback restaura el schedule anterior.
 - `tofu -chdir=/Users/jreye/Documents/efeonce-globe/infra/terraform plan`
 - `gcloud --configuration=globe scheduler jobs describe ... --project=efeonce-globe`
 - queries read-only de Cloud Logging/Monitoring y Billing Export
+- `pnpm finops:job-cost-readback -- --job=globe-producer-worker --cutover=2026-09-01T20:55:00Z --window=24h`
 - `pnpm qa:gates --changed`
 - `pnpm docs:closure-check`
 - `pnpm docs:context-check:strict` como ultimo gate documental
