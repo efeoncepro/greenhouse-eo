@@ -6,18 +6,23 @@
 
 ## A. Técnico (`01`)
 
-> ⚠️ Esta sección **no se tilda desde el reporte de un crawler**. Cuatro filas
-> (robots IA · JSON-LD ausente · sitemap limpio · CWV de campo) no las cubre el
-> catálogo de checks de un site audit passthrough: su silencio no es aprobación.
-> Ver `modules/01_SEO_TECHNICAL.md` §8.
+> ⚠️ Esta sección **no se tilda desde el reporte de un crawler**. Las filas de
+> acceso IA (robots + borde), JSON-LD ausente, sitemap y CWV de campo no las
+> cubre el catálogo de un site audit passthrough: su silencio no es aprobación.
+> Ver `modules/01_SEO_TECHNICAL.md` §8 (d.1–d.7) para cómo verificarlas sin
+> fabricar el diagnóstico.
 
 - [ ] Indexación sana (GSC Pages: sin "crawled not indexed" masivo)
 - [ ] Contenido crítico en HTML inicial (no depende de JS client-side)
 - [ ] CWV de campo OK (CrUX): LCP ≤2.5s · INP ≤200ms · CLS ≤0.1
-- [ ] robots.txt no bloquea recursos críticos; permite retrieval bots IA
+- [ ] robots.txt no bloquea recursos críticos
+- [ ] robots.txt permite **retrieval** IA (`OAI-SearchBot` · `PerplexityBot` · `ClaudeBot` · `Claude-SearchBot` · `ChatGPT-User`) — bloquearlos es **crítico**
+- [ ] Bloqueo de **training** (`GPTBot` · `Google-Extended` · `CCBot` · `anthropic-ai` · `Applebot-Extended`) leído como **postura de derechos**, nunca reportado como defecto crítico
+- [ ] Acceso real verificado en el **borde**: el home no responde 403/429 al rastreador identificado teniendo robots.txt limpio (si lo hace, el arreglo es WAF/CDN — hallazgo aparte)
 - [ ] Canonicals correctos (sin cadenas, sin apuntar a noindex)
-- [ ] Sitemap XML limpio (solo 200 indexables) y enviado a GSC
+- [ ] Sitemap XML limpio (solo 200 indexables) y enviado a GSC — **404 en `/sitemap.xml` NO es defecto si el índice está declarado en la directiva `Sitemap:` del robots.txt**
 - [ ] HTTPS sin mixed content; mobile parity
+- [ ] La portada publica JSON-LD (auditar la **ausencia**, no sólo la validez)
 - [ ] JSON-LD Organization + Article/Person válido (Rich Results Test)
 - [ ] JSON-LD serializado una vez: sin entidades HTML/doble escape; valores extraídos = contenido visible
 - [ ] Internal linking a páginas dinero (≤3 clicks del home)

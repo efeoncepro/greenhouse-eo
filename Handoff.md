@@ -35,6 +35,16 @@ merge.
 
 Sin push. Cinco commits locales en `develop`.
 
+**Capa documental completada el mismo día (tres agentes en paralelo).** El cierre anterior sólo tenía
+la capa técnica (§10.6 de la arquitectura); el protocolo pide tres. Ahora existen: doc funcional
+(`docs/documentation/growth/hallazgos-de-sitio-audit-seo.md`), manual + runbook del flip
+(`docs/manual-de-uso/growth/operar-hallazgos-de-sitio-seo.md` y la actualización de
+`usar-auditoria-sitio-seo.md`), y las skills de oficio corregidas: `seo-aeo/modules/01_SEO_TECHNICAL.md`
+§8 pasó de cuatro viñetas descriptivas a siete reglas accionables con su razón, y
+`dataforseo-operator/references/04-onpage.md` dejó de implicar que nadie resuelve lo que OnPage no ve.
+Los cinco documentos declaran el flag OFF y el punto ciego abierto — ninguno promete la capacidad. La
+skill agrega la consecuencia operativa de hoy: al auditar, estas verificaciones se hacen a mano.
+
 ## 2026-09-01 (11) — Brand Visibility Grader entra al menú público
 
 El menú primario de WordPress (`Menu 1`, ID 61) suma el ítem custom `251916`, **Brand Visibility

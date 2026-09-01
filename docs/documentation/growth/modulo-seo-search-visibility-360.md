@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.16
+> **Version:** 1.17
 > **Creado:** 2026-08-05 por Claude (TASK-1299 + TASK-1301)
-> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1792: el techo de clics de una oportunidad declara de dónde salió, y cuando la curva del sitio no alcanza la lista se ordena por demanda medida en vez de fingir un orden por ganancia; delta previo TASK-1692: el candidato recuerda qué se decidió sobre él — el estado se mueve solo, lo resuelto deja de encabezar la bandeja y un descartado se puede volver a elegir; delta previo TASK-1694: en el descubrimiento, un candidato es una keyword —no una fila por método—, el filtro de dificultad del proveedor deja de decidir y aparece el aviso de canibalización; delta previo 2026-08-28 TASK-1699 + TASK-1662 + TASK-1696 vivos en producción con el release `c983be7f18e6`: el módulo ya guarda quién más aparece en tu SERP, compara contra un competidor declarado y anota quién consumió cada dólar del proveedor; delta previo 2026-08-14 por Claude (TASK-1661 + follow-ups: las columnas de mercado se llenan solas, la captura es mensual y acotada con simulacro de costo previo, "Dificultad" pasa a ser **Barrera de enlaces** en niveles con "Sin dato" como estado propio, todo dato de mercado viaja con su fecha, y cada respuesta declara el país que muestra — incluida la corrección del caso Berel (ISSUE-152/153); delta previo 2026-08-09 TASK-1677 Slice 1: la clave del módulo es `seo_v2` y es la única que el runtime lee))
+> **Ultima actualizacion:** 2026-09-01 por Claude (TASK-1670: el punto ciego de la auditoría —rastreadores de IA, borde/CDN, datos estructurados y mapa del sitio— ya tiene motor, documentado aparte en [hallazgos-de-sitio-audit-seo.md](hallazgos-de-sitio-audit-seo.md); sigue **APAGADO** hasta TASK-1671, así que un sitio invisible para la IA todavía puntúa 95/100 acá; delta previo TASK-1792: el techo de clics de una oportunidad declara de dónde salió, y cuando la curva del sitio no alcanza la lista se ordena por demanda medida en vez de fingir un orden por ganancia; delta previo TASK-1692: el candidato recuerda qué se decidió sobre él — el estado se mueve solo, lo resuelto deja de encabezar la bandeja y un descartado se puede volver a elegir; delta previo TASK-1694: en el descubrimiento, un candidato es una keyword —no una fila por método—, el filtro de dificultad del proveedor deja de decidir y aparece el aviso de canibalización; delta previo 2026-08-28 TASK-1699 + TASK-1662 + TASK-1696 vivos en producción con el release `c983be7f18e6`: el módulo ya guarda quién más aparece en tu SERP, compara contra un competidor declarado y anota quién consumió cada dólar del proveedor; delta previo 2026-08-14 por Claude (TASK-1661 + follow-ups: las columnas de mercado se llenan solas, la captura es mensual y acotada con simulacro de costo previo, "Dificultad" pasa a ser **Barrera de enlaces** en niveles con "Sin dato" como estado propio, todo dato de mercado viaja con su fecha, y cada respuesta declara el país que muestra — incluida la corrección del caso Berel (ISSUE-152/153); delta previo 2026-08-09 TASK-1677 Slice 1: la clave del módulo es `seo_v2` y es la única que el runtime lee))
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 
 # Modulo SEO — Search Visibility 360 (Growth)
@@ -685,11 +685,25 @@ lo dice en vez de gastar dos veces por lo mismo.
 
 **Lo que esta auditoría todavía NO revisa** (y por eso no alcanza para declarar un sitio listo para
 la IA): si el `robots.txt` **bloquea a los rastreadores de IA**, si al sitio le **falta** el marcado
-de datos estructurados (hoy sólo detecta errores en el marcado que ya existe), si hay conflicto entre
-`noindex` y el bloqueo de robots, y la salud del mapa del sitio. Es el punto ciego más caro del módulo:
-un sitio que le cierra la puerta a los rastreadores de IA queda fuera de las respuestas de ChatGPT,
-Perplexity y compañía, y hoy esta pantalla lo declararía sano con 95 de 100. Lo cierra **TASK-1670**,
-que reutiliza las verificaciones ya probadas del motor AEO en vez de escribirlas de nuevo.
+de datos estructurados (hoy sólo detecta errores en el marcado que ya existe), si el borde/CDN rechaza
+a los rastreadores pese a un robots limpio, y la salud del mapa del sitio. Es el punto ciego más caro
+del módulo: un sitio que le cierra la puerta a los rastreadores de IA queda fuera de las respuestas de
+ChatGPT, Perplexity y compañía, y hoy esta pantalla lo declararía sano con 95 de 100.
+
+> ⚠️ **Estado al 2026-09-01: el motor que cierra ese punto ciego existe, pero está APAGADO.**
+> `TASK-1670` construyó las cuatro revisiones de dominio —los **[hallazgos de
+> sitio](hallazgos-de-sitio-audit-seo.md)**— y las verificó contra sitios reales, pero el interruptor
+> nace apagado y no se prende hasta que se despliegue la superficie que sabe renderizar el alcance
+> correcto (**TASK-1671**). La razón es concreta: esta pantalla cuenta "páginas afectadas" y **ordena
+> por ese número**, así que un hallazgo del dominio se rotularía "1 página afectada" —falso— y se
+> hundiría debajo de 400 imágenes sin texto alternativo.
+>
+> 🔴 **Hasta ese encendido, lo descrito arriba sigue siendo cierto tal cual**: un sitio que bloquea a
+> los rastreadores de IA sigue puntuando 95 de 100 en esta pantalla y sigue presentándose como sano.
+> El agujero lo cierra el flip verificado en producción, no el merge.
+>
+> Qué revisa, las tres familias de rastreadores y por qué bloquear el entrenamiento **nunca** es
+> crítico: [Hallazgos de sitio en la Auditoría SEO](hallazgos-de-sitio-audit-seo.md).
 
 > Paso a paso para operarla: [Auditoria del sitio — leer la salud tecnica y priorizar](../../manual-de-uso/growth/usar-auditoria-sitio-seo.md).
 >

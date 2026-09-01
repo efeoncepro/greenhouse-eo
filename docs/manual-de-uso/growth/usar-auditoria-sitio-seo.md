@@ -1,7 +1,7 @@
 > **Tipo de documento:** Manual de uso (operador del portal)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-08-08 por Claude (TASK-1309)
-> **Ultima actualizacion:** 2026-08-10 por Claude (TASK-1388 — Growth vive como seccion del dominio Comercial)
+> **Ultima actualizacion:** 2026-09-01 por Claude (TASK-1670 — hallazgos de sitio, hoy apagados)
 > **Documentacion funcional:** [Modulo SEO — Search Visibility 360](../../documentation/growth/modulo-seo-search-visibility-360.md)
 
 # Auditoria del sitio — leer la salud tecnica y priorizar
@@ -155,6 +155,58 @@ siendo un issue.
 | La auditoria fallo | El crawl no se pudo completar | Reintentar |
 | No pudimos cargar la auditoria | Fallo la lectura, no el crawl | Reintentar; si persiste, es un problema de plataforma |
 
+## Los hallazgos de sitio (todavía apagados)
+
+🔴 **Hoy esta pantalla no los muestra.** El motor existe y está verificado, pero el interruptor
+(`GROWTH_SEO_SITE_FINDINGS_ENABLED`) está en **OFF** y no se prende hasta que la pantalla sepa
+renderizarlos con su alcance correcto (`TASK-1671`). **Mientras tanto el punto ciego sigue abierto**:
+un sitio que le cierra la puerta a los rastreadores de ChatGPT, Perplexity o Claude **puntúa 95/100
+acá y se presenta como sano**. No le prometas esta cobertura a nadie todavía; la operación del
+encendido vive en [Operar los hallazgos de sitio](operar-hallazgos-de-sitio-seo.md).
+
+Esto es lo que vas a ver cuando se prenda, y cómo se lee.
+
+Todo lo demás en esta pantalla es de **página**: un título duplicado, una imagen sin texto
+alternativo. Estos cuatro chequeos son del **dominio entero** — un `robots.txt` no pertenece a
+ninguna página. Por eso, cuando aparezcan, no van a decir "N páginas afectadas".
+
+| Lo que vas a ver | Gravedad | Que significa |
+|---|---|---|
+| **Los motores de IA no pueden leer el sitio** | Crítico | El `robots.txt` le niega el paso a los rastreadores que **citan** páginas en las respuestas de ChatGPT, Perplexity y Claude. Sin ese acceso, el sitio no puede aparecer en esas respuestas |
+| **El servidor rechaza a los rastreadores** | Crítico | El `robots.txt` está limpio, pero el servidor o el CDN los rechaza igual. **Se arregla en el CDN o el firewall, no en `robots.txt`** — si le pides al cliente que edite el `robots.txt`, no va a pasar nada |
+| **Entrenamiento de modelos de IA bloqueado** | Aviso | El sitio bloquea a los rastreadores que recolectan contenido para **entrenar** modelos. **No es una falla.** Ver abajo |
+| **Sin datos estructurados en la portada** | Atención | La portada no publica el marcado que le dice a buscadores y motores de IA quién es la marca |
+| **Sin mapa del sitio** | Aviso | No hay sitemap en la ruta habitual ni declarado en `robots.txt` |
+| **El mapa del sitio declarado no responde** | Atención | El `robots.txt` anuncia un sitemap que no se puede leer. Los buscadores lo buscan justo ahí |
+| **Chequeo de sitio sin verificar** | Aviso | **No se pudo medir. Ni sano ni roto.** Ver abajo |
+
+### Retrieval y entrenamiento no se cuentan igual — y esa frase te la va a pedir el cliente
+
+Son dos permisos distintos que se ven parecidos, y confundirlos hace que le reportes una alarma a
+alguien que tomó una decisión a propósito.
+
+- **Los rastreadores de *retrieval*** leen el sitio **para citarlo en una respuesta**
+  (`OAI-SearchBot`, `PerplexityBot`, `ClaudeBot`, `Claude-SearchBot`, `ChatGPT-User`). Bloquearlos
+  es **crítico**, y el efecto es directo y verificable: el sitio no puede aparecer.
+- **Los rastreadores de *entrenamiento*** recolectan contenido **para entrenar modelos** (`GPTBot`,
+  `Google-Extended`, `CCBot`, `anthropic-ai`, `Applebot-Extended`). Bloquearlos es una **decisión
+  sobre el uso del contenido**, legítima y frecuentísima —muchos medios lo hacen a propósito— y por
+  eso sale como **aviso, nunca como crítico**.
+
+Un sitio puede tener el retrieval completamente abierto y bloquear sólo entrenamiento: eso es un
+sitio **sano con una postura declarada**, y así hay que decirlo. Si se lo pintas en rojo al cliente,
+le enseñas a desconfiar del resto del informe — y la próxima vez que aparezca un crítico de verdad,
+no lo va a mirar.
+
+### "Sin verificar" no es "está bien"
+
+Cuando la revisión no se pudo completar —el sitio no respondió, se agotó el tiempo, el `robots.txt`
+no se pudo leer— el hallazgo dice **"Chequeo de sitio sin verificar"** y trae la razón.
+
+**No es un veredicto.** No significa que esté bien ni que esté mal: quedó sin medir. Si aparece, lo
+que se reporta es "no lo pudimos medir", nunca "está correcto". Declarar sano algo que no miramos es
+exactamente el error que estos chequeos existen para evitar.
+
 ## Que no hacer
 
 - **No reportes "Pendiente" como salud 0.** Son cosas distintas y llevan a conclusiones opuestas.
@@ -173,11 +225,17 @@ siendo un issue.
   laboratorio; el ranking se mueve con datos de campo que están en Search Console, no acá.
 - **No expliques "95 de salud con 519 issues" como un error del sistema.** Son dos mediciones con
   alcances distintos, y la pantalla lo dice debajo del puntaje. Léelo antes de responder.
-- **No declares un sitio "listo para la IA" con esta pantalla.** La auditoría todavía **no revisa** si
-  el `robots.txt` bloquea a los rastreadores de IA, si falta el marcado de datos estructurados, si hay
-  conflicto entre `noindex` y el bloqueo de robots, ni la salud del mapa del sitio. Un sitio que le
-  cierra la puerta a los rastreadores de IA puede puntuar 95 acá y estar fuera de las respuestas de
-  ChatGPT o Perplexity. Lo cierra TASK-1670; hasta entonces, esa verificación se hace aparte.
+- **No declares un sitio "listo para la IA" con esta pantalla.** Hoy la auditoría todavía **no
+  muestra** si el `robots.txt` bloquea a los rastreadores de IA, si el CDN los rechaza, si falta el
+  marcado de datos estructurados ni la salud del mapa del sitio: el motor existe (`TASK-1670`) pero
+  está **apagado** hasta que la pantalla sepa renderizarlo (`TASK-1671`). Un sitio que le cierra la
+  puerta a los rastreadores de IA **puede puntuar 95 acá** y estar fuera de las respuestas de ChatGPT
+  o Perplexity. Hasta el encendido, esa verificación se hace aparte.
+- **No presentes el bloqueo de entrenamiento de modelos como un defecto** cuando estos hallazgos se
+  prendan. Es una decisión de derechos sobre el contenido, no una falla, y por eso sale como aviso y
+  nunca como crítico.
+- **No leas "Chequeo de sitio sin verificar" como "está bien".** Es un hueco declarado: no se pudo
+  medir. Reportarlo como sano es afirmar algo que nadie verificó.
 
 ## Problemas comunes
 
@@ -212,8 +270,12 @@ siendo un issue.
   español, el esfuerzo estimado y el valor de búsqueda: `GH_GROWTH_SEO_AUDIT_ISSUES` en
   `src/lib/copy/growth.ts`. El techo de páginas del crawl: `SITE_AUDIT_MAX_CRAWL_PAGES` en
   `src/lib/growth/seo/site-audit/queue-audit.ts`.
-- Lo que la auditoría todavía no revisa (rastreadores de IA, datos estructurados, sitemap):
-  `docs/tasks/to-do/TASK-1670-growth-site-probes-kernel-seo-audit.md`.
+- Los hallazgos de sitio (rastreadores de IA, borde/WAF, datos estructurados, sitemap): el motor está
+  en `src/lib/growth/seo/site-audit/site-findings.ts` con sus fichas es-CL en
+  `GH_GROWTH_SEO_AUDIT_ISSUES`, y hoy está **apagado** detrás de `GROWTH_SEO_SITE_FINDINGS_ENABLED`.
+  Operación del encendido: [Operar los hallazgos de sitio](operar-hallazgos-de-sitio-seo.md). Spec:
+  `docs/tasks/complete/TASK-1670-growth-site-probes-kernel-seo-audit.md`; la superficie que habilita
+  el flip: `docs/tasks/to-do/TASK-1671-growth-seo-site-findings-audit-surface.md`.
 - Pantallas hermanas: [cockpit Overview](usar-cockpit-seo-overview.md) ·
   [Rendimiento](usar-pantalla-rendimiento-seo.md) ·
   [Oportunidades de keywords](seguir-keywords-oportunidades-seo.md).
