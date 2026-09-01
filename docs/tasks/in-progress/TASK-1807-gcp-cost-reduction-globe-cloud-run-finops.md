@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `cron`
 - Epic: `none`
-- Status real: `Slices 1 y 5 aplicadas; watcher neto live en ops-worker y Vercel staging; Artifact Registry dry-run activo; Cloud Build lifecycle pendiente sin borrar; Asset Governance multi-stage validado con canary real; ventanas Producer/Media, dedupe runtime natural y evaluación posterior de cadence Governance pendientes`
+- Status real: `Slices 1 y 5 aplicadas; watcher neto live en ops-worker y Vercel staging; Artifact Registry y Cloud Build cleanup dry-run activos sin borrar; Asset Governance multi-stage validado con canary real; ventanas Producer/Media, dedupe runtime natural y evaluación posterior de cadence Governance pendientes`
 - Rank: `1`
 - Domain: `ops`
 - Blocked by: `none`
@@ -498,8 +498,9 @@ Terraform, un scheduler a la vez. El rollback restaura el schedule anterior.
 - [ ] El rollback de cada scheduler esta documentado y verificado por readback.
 - [x] Existen budgets nativos con umbrales y forecast, sin apagado automatico.
 - [ ] Greenhouse reporta neto, gross y creditos, y el watcher deduplica el mismo incidente.
-- [ ] Cleanup policies nacen con dry-run, exclusiones de artefactos activos y ventana de recuperacion. Artifact
-  Registry cumple; el bucket source de Cloud Build no admite dry-run nativo y sigue sin lifecycle aplicado.
+- [x] Cleanup policies nacen con dry-run, exclusiones de artefactos activos y ventana de recuperacion. Artifact
+  Registry usa dry-run nativo; Cloud Build tiene inventario dry-run-only sin opción de apply/delete y conserva
+  soft-delete de siete días. No se aplicó lifecycle destructivo.
 - [x] Labels cubren al menos 90% del costo o queda follow-up con owner y brecha medida. El histórico de 30 días mide 0%; Globe ya etiqueta cuatro dimensiones y `efeonce-platform` posee la convergencia del export y la brecha de proyectos restantes.
 - [ ] El ahorro a 24 h, 7 dias y cierre mensual queda registrado; forecast no se presenta como ahorro realizado.
 - [x] CUD permanece fuera hasta decision financiera sobre baseline estable.
@@ -568,10 +569,12 @@ Terraform, un scheduler a la vez. El rollback restaura el schedule anterior.
 - Artifact Registry contiene 418 versiones y 10,4 GB. La policy activa está en `dry-run`: KEEP de las 10 más
   recientes por paquete y simulación DELETE para versiones >30 días. Los tres digests activos fueron leídos antes
   del apply y permanecen iguales. La regla de dos días existente pertenece a `private-assets/staging/`, no a
-  Cloud Build: `efeonce-globe_cloudbuild` no tiene lifecycle, contiene 435 source archives por 631.024.414 bytes
-  y el dry-run por prefijo `source/` + edad 30 días clasifica 364 objetos/491.098.500 bytes como elegibles. No se
-  aplicó una regla de borrado porque Cloud Storage no ofrece modo dry-run y la ejecución excluye limpieza
-  destructiva. Secret Manager tiene 17 versiones enabled y tres disabled: las antiguas de Fal voice map
+  Cloud Build: `efeonce-globe_cloudbuild` no tiene lifecycle aplicado, contiene 435 source archives por
+  631.024.414 bytes y el dry-run por prefijo `source/` + edad 30 días clasifica 364 objetos/491.098.500 bytes
+  como elegibles. Globe `f479dd1` versiona la policy `dry-run-only` y el comando
+  `pnpm finops:cloud-build-cleanup-dry-run`; el mecanismo sólo usa `gcloud storage ls`, reporta `mutations=0` y
+  no expone opción update/delete. Sus tres pruebas y la suite completa pasaron. Secret Manager tiene 17
+  versiones enabled y tres disabled: las antiguas de Fal voice map
   (consumer API/Producer), UI CSRF (web) y UI delegation (API/web); todas conservan su versión activa y ninguna
   fue destruida.
 - Asset Governance puede procesar hasta cuatro stages durablemente fenced en una ejecución, con límite explícito

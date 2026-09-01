@@ -40,6 +40,10 @@ Guardrails FinOps aplicados después del corte: budgets alert-only Globe CLP 250
 umbrales current 50/75/90/100% y forecast 90/100%; plan posterior sin drift. Los recursos Globe recibieron
 `app`, `env`, `owner` y `cost_center` sin cambiar imágenes. Artifact Registry quedó con cleanup policy en dry-run,
 KEEP de 10 versiones por paquete y DELETE simulado sobre versiones >30 días; no se borró ningún artefacto.
+Cloud Build quedó separado: Globe `f479dd1` publica una policy `dry-run-only` y el comando
+`pnpm finops:cloud-build-cleanup-dry-run`, sin opción apply/delete. El inventario live reporta 435 source archives,
+631.024.414 bytes totales y 364/491.098.500 bytes elegibles por prefijo `source/` + 30 días, con `mutations=0`;
+el bucket conserva soft-delete de siete días y no recibió lifecycle destructivo.
 
 Asset Governance quedó publicado inicialmente en Globe `7eeb1da` y desplegado por el workflow canónico
 `33561719287` sobre el digest `sha256:864a33c2ac30a9e10b4ab17c4b34c51cb149a4e1fc22889680875af322c69095`.
