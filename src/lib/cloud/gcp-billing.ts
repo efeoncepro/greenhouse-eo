@@ -92,6 +92,8 @@ const buildEmpty = (
   generatedAt: new Date().toISOString(),
   period: buildPeriod(days),
   totalCost: 0,
+  grossCost: 0,
+  credits: 0,
   currency: DEFAULT_CURRENCY,
   costByDay: [],
   costByService: [],
@@ -326,7 +328,10 @@ const detectNotionBqSyncCost = async (
     const [rows] = await bigQuery.query({
       query: `
         SELECT
-          COALESCE(SUM(cost), 0) AS notion_cost
+          COALESCE(
+            SUM(cost + COALESCE((SELECT SUM(credit.amount) FROM UNNEST(credits) AS credit), 0)),
+            0
+          ) AS notion_cost
         FROM \`${projectId}.${BILLING_DATASET}.${tableName}\`,
           UNNEST(labels) AS label
         WHERE _PARTITIONTIME >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL @days DAY)
@@ -364,7 +369,10 @@ const detectNotionBqSyncCost = async (
     const [rows] = await bigQuery.query({
       query: `
         SELECT
-          COALESCE(SUM(cost), 0) AS approx_cost
+          COALESCE(
+            SUM(cost + COALESCE((SELECT SUM(credit.amount) FROM UNNEST(credits) AS credit), 0)),
+            0
+          ) AS approx_cost
         FROM \`${projectId}.${BILLING_DATASET}.${tableName}\`
         WHERE _PARTITIONTIME >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL @days DAY)
           AND service.description IN UNNEST(@services)
@@ -406,6 +414,8 @@ interface BillingRow {
   service_description?: unknown
   service_id?: unknown
   cost?: unknown
+  gross_cost?: unknown
+  credits_amount?: unknown
   usage_date?: unknown
   currency?: unknown
 }
@@ -418,6 +428,8 @@ interface ResourceRow {
   project_id?: unknown
   resource_name?: unknown
   cost?: unknown
+  gross_cost?: unknown
+  credits_amount?: unknown
   first_usage_date?: unknown
   last_usage_date?: unknown
 }
@@ -429,6 +441,8 @@ const buildResourceCosts = (rows: ResourceRow[], totalCost: number): GcpResource
     projectId: safeString(row.project_id) || null,
     resourceName: safeString(row.resource_name) || 'Recurso sin nombre',
     cost: roundMoney(safeNumber(row.cost)),
+    grossCost: roundMoney(safeNumber(row.gross_cost)),
+    credits: roundMoney(safeNumber(row.credits_amount)),
     share: computeShare(safeNumber(row.cost), totalCost),
     firstUsageDate: toDateString(row.first_usage_date) || null,
     lastUsageDate: toDateString(row.last_usage_date) || null
@@ -665,15 +679,16 @@ export const getGcpBillingOverview = async ({
         SELECT
           service.id AS service_id,
           service.description AS service_description,
-          SUM(cost) AS cost,
+          SUM(cost) AS gross_cost,
+          SUM(COALESCE((SELECT SUM(credit.amount) FROM UNNEST(credits) AS credit), 0)) AS credits_amount,
+          SUM(cost + COALESCE((SELECT SUM(credit.amount) FROM UNNEST(credits) AS credit), 0)) AS cost,
           ANY_VALUE(currency) AS currency
         FROM \`${projectId}.${BILLING_DATASET}.${tableName}\`
         WHERE _PARTITIONTIME >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL @days DAY)
           AND cost IS NOT NULL
         GROUP BY service_id, service_description
-        HAVING cost > 0
+        HAVING gross_cost != 0 OR credits_amount != 0
         ORDER BY cost DESC
-        LIMIT 25
       `,
       params: { days },
       ...getBigQueryQueryOptions()
@@ -683,7 +698,9 @@ export const getGcpBillingOverview = async ({
       query: `
         SELECT
           DATE(usage_start_time) AS usage_date,
-          SUM(cost) AS cost,
+          SUM(cost) AS gross_cost,
+          SUM(COALESCE((SELECT SUM(credit.amount) FROM UNNEST(credits) AS credit), 0)) AS credits_amount,
+          SUM(cost + COALESCE((SELECT SUM(credit.amount) FROM UNNEST(credits) AS credit), 0)) AS cost,
           ANY_VALUE(currency) AS currency
         FROM \`${projectId}.${BILLING_DATASET}.${tableName}\`
         WHERE _PARTITIONTIME >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL @days DAY)
@@ -701,7 +718,9 @@ export const getGcpBillingOverview = async ({
           DATE(usage_start_time) AS usage_date,
           service.id AS service_id,
           service.description AS service_description,
-          SUM(cost) AS cost,
+          SUM(cost) AS gross_cost,
+          SUM(COALESCE((SELECT SUM(credit.amount) FROM UNNEST(credits) AS credit), 0)) AS credits_amount,
+          SUM(cost + COALESCE((SELECT SUM(credit.amount) FROM UNNEST(credits) AS credit), 0)) AS cost,
           ANY_VALUE(currency) AS currency
         FROM \`${projectId}.${BILLING_DATASET}.${tableName}\`
         WHERE _PARTITIONTIME >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL @analysisDays DAY)
@@ -722,14 +741,16 @@ export const getGcpBillingOverview = async ({
                 sku.description AS sku_description,
                 project.id AS project_id,
                 COALESCE(resource.name, resource.global_name, '') AS resource_name,
-                SUM(cost) AS cost,
+                SUM(cost) AS gross_cost,
+                SUM(COALESCE((SELECT SUM(credit.amount) FROM UNNEST(credits) AS credit), 0)) AS credits_amount,
+                SUM(cost + COALESCE((SELECT SUM(credit.amount) FROM UNNEST(credits) AS credit), 0)) AS cost,
                 MIN(DATE(usage_start_time)) AS first_usage_date,
                 MAX(DATE(usage_start_time)) AS last_usage_date
               FROM \`${projectId}.${BILLING_DATASET}.${resourceTableName}\`
               WHERE _PARTITIONTIME >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL @days DAY)
                 AND cost IS NOT NULL
               GROUP BY service_description, sku_description, project_id, resource_name
-              HAVING cost > 0
+              HAVING gross_cost != 0 OR credits_amount != 0
               ORDER BY cost DESC
               LIMIT 30
             `,
@@ -742,15 +763,21 @@ export const getGcpBillingOverview = async ({
     const baseServices = (serviceRows as BillingRow[]).map<GcpServiceCost>(row => ({
       serviceId: safeString(row.service_id),
       serviceDescription: safeString(row.service_description) || 'Servicio sin nombre',
-      cost: safeNumber(row.cost)
+      cost: safeNumber(row.cost),
+      grossCost: safeNumber(row.gross_cost),
+      credits: safeNumber(row.credits_amount)
     }))
 
     const dailies = (dailyRows as BillingRow[]).map<GcpDailyCost>(row => ({
       date: toDateString(row.usage_date),
-      totalCost: roundMoney(safeNumber(row.cost))
+      totalCost: roundMoney(safeNumber(row.cost)),
+      grossCost: roundMoney(safeNumber(row.gross_cost)),
+      credits: roundMoney(safeNumber(row.credits_amount))
     }))
 
     const totalCost = roundMoney(baseServices.reduce((sum, item) => sum + item.cost, 0))
+    const grossCost = roundMoney(baseServices.reduce((sum, item) => sum + item.grossCost, 0))
+    const credits = roundMoney(baseServices.reduce((sum, item) => sum + item.credits, 0))
 
     const currency = safeString(
       (serviceRows as BillingRow[])[0]?.currency
@@ -788,6 +815,8 @@ export const getGcpBillingOverview = async ({
       generatedAt: new Date().toISOString(),
       period: buildPeriod(days),
       totalCost,
+      grossCost,
+      credits,
       currency,
       costByDay: dailies,
       costByService: services,
@@ -831,6 +860,7 @@ export const getGcpBillingOverview = async ({
       },
       notes: [
         `Período: ${days} días terminando hoy.`,
+        `Costo neto ${formatCost(totalCost, currency)} = bruto ${formatCost(grossCost, currency)} + créditos ${formatCost(credits, currency)}.`,
         'Billing Export tiene latencia natural ~24h. El dato más reciente puede no incluir el día actual.',
         resourceTableName
           ? 'Resource-level Billing Export disponible: se identifican recursos/SKUs que explican el gasto.'
