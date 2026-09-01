@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `cron`
 - Epic: `none`
-- Status real: `Slices 1 y 5 aplicadas; labels y retention dry-run activos; Asset Governance multi-stage validado con canary real; ventanas Producer/Media y evaluación posterior de cadence Governance pendientes`
+- Status real: `Slices 1 y 5 aplicadas; watcher neto live en ops-worker y Vercel staging; labels y retention dry-run activos; Asset Governance multi-stage validado con canary real; ventanas Producer/Media, dedupe runtime natural y evaluación posterior de cadence Governance pendientes`
 - Rank: `1`
 - Domain: `ops`
 - Blocked by: `none`
@@ -557,4 +557,12 @@ Terraform, un scheduler a la vez. El rollback restaura el schedule anterior.
   y 39/39 tests del paquete + 5/5 de infraestructura verdes. El cron permanece `*/1`; la promoción y el canary
   real posteriores se documentan en la evidencia de ejecución de esta task.
 - Commits iniciales de esta delta: Greenhouse `aad71bf07`; Globe `5b01e99` y `0ccf485`. La promoción Globe
-  autorizada continuó después en `7eeb1da`, `6ff8995` y `b34e90d`; Greenhouse permanece sin publicar.
+  autorizada continuó después en `7eeb1da`, `6ff8995` y `b34e90d`.
+- Greenhouse se publicó por los pipelines existentes después del commit, sin promoción manual de esta ejecución:
+  `aad71bf07` es ancestro de `60133d98`, que sirve el worker compartido como revisión
+  `ops-worker-00625-5qj` desde las 21:31Z, y de `a5f064656`, que sirve Vercel Staging `Ready` en
+  `greenhouse-rci8f9map-efeonce-7670142f.vercel.app`, alias `dev-greenhouse.efeoncepro.com`.
+  El Scheduler `ops-cloud-cost-ai-watch` permanece `ENABLED`, `15 */6 * * *`, y ejecutó esa revisión a las
+  22:15Z con HTTP 200: `alerts=1/4`, AI desactivada por su kill-switch. Esto prueba que el watcher live consumió
+  el reader corregido; la deduplicación de un segundo ciclo productivo queda pendiente de observar en la cadencia
+  natural para no arriesgar una notificación externa sólo con fines de prueba.
