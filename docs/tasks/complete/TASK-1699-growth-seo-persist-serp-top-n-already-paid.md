@@ -182,7 +182,7 @@ reader proponedor.
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-022`
-- Status real: `complete 2026-09-01 — VIVO en produccion desde el release c983be7f18e6. Serie del top-N corriendo: 766/775/762/778 filas los dias 29,30,31-ago y 1-sep. Senal seo.serp_top_results.coverage convergio a ok/uncovered=0 el 2026-09-01, sin tocar el umbral. Pendiente NO bloqueante: el Paso 9 (revision de candidatos con el operador) exige >=5 dias de serie y cae el 2026-09-02; la propia Verification lo declara diferido. Gate no corrido: pnpm build (~30GB, requiere autorizacion explicita del operador)`
+- Status real: `complete 2026-09-01 — VIVO en produccion desde el release c983be7f18e6. Serie del top-N corriendo: 766/775/762/778 filas los dias 29,30,31-ago y 1-sep. Senal seo.serp_top_results.coverage convergio a ok/uncovered=0 el 2026-09-01, sin tocar el umbral. Pendiente NO bloqueante: el Paso 9 (revision de candidatos con el operador) exige >=5 dias de serie y cae el 2026-09-02; la propia Verification lo declara diferido. Gate pnpm build: CUBIERTO por Vercel, no corrido localmente — ci.yml salta el build en develop por diseno ("Vercel already builds every develop push") y el deployment dpl_4NczaZbQoWkpoHTG53V8hso7zfsW quedo Ready sirviendo dev-greenhouse.efeoncepro.com, creado 2026-08-31 20:42:59Z, timestamp exacto del run de CI del push`
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`
