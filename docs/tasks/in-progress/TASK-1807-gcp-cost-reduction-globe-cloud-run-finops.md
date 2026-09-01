@@ -328,12 +328,20 @@ Baseline live del 2026-09-01:
 | Media Derivatives | CLP 58.756 |
 | No-op observado | >99,9% |
 
-Modelo corregido, no promesa financiera: Producer `*/1 -> */5` reduce 80% de CLP 117.504 = CLP 94.003/mes;
+Modelo por frecuencia, no promesa financiera: Producer `*/1 -> */5` reduce como techo lineal 80% de
+CLP 117.504 = CLP 94.003/mes;
 Media `*/2 -> 2-59/5` reduce 60% de CLP 58.756 = CLP 35.254/mes. Juntos modelan CLP 129.257/mes y un
 run-rate total de CLP 409.528. Si, después de las ventanas de Producer y Media, el rediseño multi-stage permite
 Asset Governance `*/1 -> 4-59/5`, suma 80% de CLP 109.964 = CLP 87.971/mes: ahorro modelado total CLP 217.228 y
 run-rate CLP 321.557. Rightsizing fue rechazado por telemetría y cleanup sigue dry-run, por lo que no se les
 atribuye ahorro. Sólo Billing Export posterior a cada corte convierte estas cifras en ahorro observado.
+
+Sensibilidad temprana: en ventanas iguales de 105 minutos antes/después de Producer, Cloud Monitoring midió
+billable instance time `429,409 -> 121,749 s` (-71,65%), CPU allocation `858,818 -> 243,639 vCPU-s` (-71,63%)
+y memory allocation `858,818 -> 243,639 GiB-s` (-71,63%). El proxy de Producer pasa así a CLP 84.169/mes,
+porque el costo fijo por ejecución impide asumir 80% exacto. Si Media y Governance repitieran el mismo factor
+de eficiencia —escenario, no evidencia de esos jobs— el ahorro total sería CLP 194.503 y el run-rate CLP 344.282.
+El rango de planificación queda CLP 194.503–217.228 hasta contar con Billing Export y ventanas propias.
 
 ### Evidencia de ejecución — 2026-09-01
 
@@ -396,6 +404,10 @@ atribuye ahorro. Sólo Billing Export posterior a cada corte convierte estas cif
   genera sólo `*/1 -> 4-59/5`, `Plan: 0 to add, 1 to change, 0 to destroy`. Se descartó `*/5` porque colisiona
   con Producer; los minutos 4/9/14/.../59 completan el stagger 0 Producer / 2 Media / 4 Governance. La aplicación
   espera cerrar las ventanas de Producer y Media y conserva rollback inmediato a `*/1`.
+- Señal temprana de costo de Producer: dos ventanas comparables de 105 minutos, inmediatamente antes y después
+  del corte, contienen 105 puntos cada una. `billable_instance_time` cayó 71,65%; CPU allocation y memory
+  allocation, 71,63%. Es evidencia de consumo facturable reducido, pero no reemplaza Billing Export: su último
+  `usage_end_time` seguía en 13:00Z, anterior al cutover de 20:55Z.
 
 ## Rollout Plan & Risk Matrix
 

@@ -28,6 +28,10 @@ restaurar `* * * * *`, plan honesto con `0 destroy`, apply y readback. El rollba
 development, budgets y quota project preservados: sólo update in-place, `0 add, 1 change, 0 destroy`; no se aplicó
 porque el runtime permanece sano.
 
+Señal temprana en ventanas iguales de 105 minutos: Producer redujo `billable_instance_time` 71,65% y tanto
+CPU allocation como memory allocation 71,63%. El proxy sobre su baseline es CLP 84.169/mes; el techo por conteo
+de ticks era CLP 94.003. No se presenta como ahorro facturado hasta que Billing Export alcance el corte.
+
 Preflight de Slice 2 listo, todavía sin apply: `media_derivatives_schedule="2-59/5 * * * *"` produce un único
 update in-place desde `*/2`, `0 add, 1 change, 0 destroy`, con development y budgets preservados. Los ticks
 2/7/12/.../57 quedan escalonados respecto de Producer; source/apply/readback esperan las 24 h completas.
