@@ -31,11 +31,14 @@ umbrales current 50/75/90/100% y forecast 90/100%; plan posterior sin drift. Los
 `app`, `env`, `owner` y `cost_center` sin cambiar imágenes. Artifact Registry quedó con cleanup policy en dry-run,
 KEEP de 10 versiones por paquete y DELETE simulado sobre versiones >30 días; no se borró ningún artefacto.
 
-Asset Governance quedó code-complete en Globe `0ccf485` para reclamar y avanzar hasta cuatro stages durablemente
-fenced por ejecución. Tests: paquete 39/39 e infraestructura 5/5. La configuración live ya expone
-`GLOBE_ASSET_GOVERNANCE_MAX_STAGE_PASSES=4`, pero el digest live sigue siendo el anterior; por tanto el runtime
-todavía procesa una etapa por tick. No reducir `*/1` hasta publicar el SHA por el workflow canónico, ejecutar un
-canary real y verificar convergencia, rights/provenance, errores y edad de cola.
+Asset Governance quedó publicado en Globe `7eeb1da` y desplegado por el workflow canónico `33561719287` sobre el
+digest `sha256:864a33c2ac30a9e10b4ab17c4b34c51cb149a4e1fc22889680875af322c69095`. El runtime reclama y avanza hasta
+cuatro stages durablemente fenced por ejecución (`GLOBE_ASSET_GOVERNANCE_MAX_STAGE_PASSES=4`); paquete 39/39 e
+infraestructura 5/5. Readback: scheduler `ENABLED`, cron `*/1`, target preservado y post-plan `No changes`.
+La reconciliación del deploy y los ticks siguientes terminaron bien, pero fueron no-op (`claimed=0`, `failed=0`,
+`queueOldestAgeSeconds=0`). No reducir `*/1` hasta un canary con asset real que verifique convergencia,
+rights/provenance, errores y edad de cola. La imagen reporta ClamAV 1.4.3 frente a 1.4.6 recomendada y el aviso
+no bloqueante de `clamd.conf`; el proceso termina `exit(0)`, por lo que se trata como deuda de imagen separada.
 
 ## Corte 2026-08-05 (b) — promoción end-to-end ejecutada; `ref/still/reference-v1` vuelve a estar viva
 

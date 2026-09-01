@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `cron`
 - Epic: `none`
-- Status real: `Slices 1 y 5 aplicadas; labels y retention dry-run activos; Asset Governance multi-stage code-complete, rollout y ventanas 24 h/7 d pendientes`
+- Status real: `Slices 1 y 5 aplicadas; labels y retention dry-run activos; Asset Governance multi-stage desplegado con smoke no-op; canary real y ventanas 24 h/7 d pendientes`
 - Rank: `1`
 - Domain: `ops`
 - Blocked by: `none`
@@ -331,6 +331,28 @@ Modelo inicial, no promesa financiera: espaciar Producer y Media reduce aproxima
 mensuales si el patrón se mantiene. Asset Governance y rightsizing pueden llevar el ahorro total hacia CLP
 230.000–250.000, pero solo se contabilizan con Billing Export real.
 
+### Evidencia de ejecución — 2026-09-01
+
+- Globe `main@7eeb1dacaf2f1921bb10ad292ebe3ae00598c4b9` quedó publicado. El workflow canónico de Asset Governance
+  construyó y desplegó el digest
+  `sha256:864a33c2ac30a9e10b4ab17c4b34c51cb149a4e1fc22889680875af322c69095`; el primer intento de deploy se
+  detuvo antes de mutar runtime por falta de autenticación al paquete privado AXIS, y el commit `7eeb1da`
+  corrigió el permiso `packages: read` y el token efímero de instalación.
+- Run canónico `33561719287`: grants y migración verificados, scheduler cercado, digest exacto desplegado,
+  reconciliación única exitosa y scheduler restaurado. Readback directo: `ENABLED`, `*/1 * * * *`, target del
+  mismo Cloud Run Job y `GLOBE_ASSET_GOVERNANCE_MAX_STAGE_PASSES=4`.
+- Ejecuciones `globe-asset-governance-sh84q`, `pvd79`, `5rwfh` y `n4q4q` terminaron correctamente. El evento
+  `asset_governance_batch_completed` registró `claimed=0`, `applied=0`, `failed=0` y
+  `queueOldestAgeSeconds=0`: es un smoke sano de reconciliación no-op, no evidencia de convergencia multi-stage
+  sobre un asset real. Por eso el scheduler conserva `*/1` hasta el canary real.
+- El post-plan de OpenTofu con los inputs canónicos terminó `No changes`.
+- Baseline de rightsizing: agosto no contiene ejecuciones con trabajo real para Producer, Media ni Governance;
+  la señal de 30 días corresponde mayoritariamente a no-op. No se reduce CPU/memoria desde esa muestra. Slice 4
+  espera un canary real y compara duración, throttling, memoria, errores y backlog antes de promover recursos.
+- Advertencia operativa no bloqueante observada en el smoke: la imagen usa ClamAV 1.4.3 mientras upstream
+  recomienda 1.4.6 y `freshclam` informa que no encuentra `clamd.conf`; el proceso termina `exit(0)` y el batch
+  reporta cero fallos. Se conserva como deuda de imagen separada, sin presentarla como fallo del rollout.
+
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
@@ -399,7 +421,7 @@ Terraform, un scheduler a la vez. El rollback restaura el schedule anterior.
 
 - [ ] Producer corre cada 5 minutos desde Terraform y mantiene queue age p99 < 900 s durante 24 h y 7 dias.
 - [ ] Media Derivatives corre escalonado cada 5 minutos y mantiene backlog/oldest age bajo guardrail.
-- [x] Asset Governance no se degrada por un cambio directo de cadence; permanece `*/1` y el cambio multi-stage no se despliega antes de canary.
+- [x] Asset Governance no se degrada por un cambio directo de cadence: permanece `*/1`; el runtime multi-stage se desplegó por el workflow fenced y no se espaciará antes de un canary real.
 - [ ] El costo diario observado de los jobs intervenidos baja al menos 50% sin aumento material de errores.
 - [ ] El rollback de cada scheduler esta documentado y verificado por readback.
 - [x] Existen budgets nativos con umbrales y forecast, sin apagado automatico.
