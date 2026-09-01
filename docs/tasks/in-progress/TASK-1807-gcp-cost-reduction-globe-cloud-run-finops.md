@@ -400,6 +400,13 @@ El rango de planificación queda CLP 194.503–217.228 hasta contar con Billing 
   `media_derivatives_schedule="2-59/5 * * * *"` genera sólo el update in-place
   `*/2 * * * * -> 2-59/5 * * * *`, `Plan: 0 to add, 1 to change, 0 to destroy`. Los minutos 2/7/12/.../57
   quedan escalonados respecto de Producer 0/5/10/.../55; source/apply/readback esperan las 24 h estables.
+- Guardrails de Media verificados live antes del cutover: las 24 horas terminadas a las 22:50Z contienen
+  722 batches `globe_media_worker_completed`, cero eventos de fallo, cero items claimed/retried/failed/conflict
+  y `queueOldestAgeSeconds` máximo 0. La métrica de distribución
+  `globe_media_derivative_queue_oldest_age_seconds` extrae esa edad y la alerta `ENABLED` evalúa P99 cada cinco
+  minutos contra 900 s; la alerta de fallos también está `ENABLED`, agrega por suma y dispara sobre cualquier
+  evento. Ambas conservan el canal de notificación gestionado. No falta telemetría para ejecutar Slice 2 una vez
+  que Producer complete su propia ventana.
 - Cutover eventual de Asset Governance preparado, sin apply: `asset_governance_schedule="4-59/5 * * * *"`
   genera sólo `*/1 -> 4-59/5`, `Plan: 0 to add, 1 to change, 0 to destroy`. Se descartó `*/5` porque colisiona
   con Producer; los minutos 4/9/14/.../59 completan el stagger 0 Producer / 2 Media / 4 Governance. La aplicación
@@ -408,6 +415,9 @@ El rango de planificación queda CLP 194.503–217.228 hasta contar con Billing 
   del corte, contienen 105 puntos cada una. `billable_instance_time` cayó 71,65%; CPU allocation y memory
   allocation, 71,63%. Es evidencia de consumo facturable reducido, pero no reemplaza Billing Export: su último
   `usage_end_time` seguía en 13:00Z, anterior al cutover de 20:55Z.
+- Corte de observación Producer a las 22:50Z: 24 ejecuciones posteriores al cambio, 24 completadas y cero
+  fallidas; `queueOldestAgeSeconds`, edad de promotion queue, retry storm, intentos terminales y divergencias
+  permanecieron en 0. La ventana lleva 1 h 55 min y por eso no autoriza todavía el apply de Media.
 
 ## Rollout Plan & Risk Matrix
 
