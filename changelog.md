@@ -37,6 +37,21 @@ Barrido de coherencia sobre los 19 cierres del día: `Lifecycle` desincronizado,
 `AEO_PROGRAM_STATUS.md`, 10 archivos con rutas rotas y cuatro reglas duras apoyadas en hechos ya
 falsos.
 
+## 2026-09-01 — el CTA gana foco y salida por teclado, y `Escape` deja de mentirle al ledger
+
+`ISSUE-167` resuelto (code complete, rollout pendiente). Primitive `attachDisclosureFocus`
+(`src/growth-cta-renderer/disclosure-focus.ts`): al abrir el Growth Form desde un CTA el foco entra
+al contenido y `Escape` cierra. Es disclosure, no modal, y `Escape` se escucha en el contenedor —
+nunca en el documento, para no secuestrárselo a la página del host.
+
+🔴 Cambio de comportamiento que importa al dato: **`Escape` COLAPSA el form al card y NO emite
+`dismissed`**. `dismissed` significa «el visitante rechazó la oferta» y viaja al ledger de
+conversión; cerrar un formulario abierto por curiosidad no es rechazar. El botón «✕ Ahora no» sigue
+siendo el único rechazo.
+
+Causa raíz: el foco y la salida por teclado estaban modelados por **placement** (`slide-in`) en vez
+de por «superficie revelada», así que `embedded` no los heredaba.
+
 ## 2026-09-01 — el motor CTA cierra su primera rebanada, y deja un hueco de accesibilidad nombrado
 
 `TASK-1427` complete. El steady-state se observó sobre **45 días** y no sobre los 7 que pedía el
@@ -1036,16 +1051,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
 - **El guard de parity es lo que impide que la clase vuelva.** Un manifiesto obliga a declarar cada capability `hiring.*` como federada, deliberadamente interna o pendiente. No obliga a federar: obliga a **decidir y escribir el porqué**. Cuatro de las decisiones ya escritas dicen que no, y valen más que las que dicen que sí. Quedan 18 pendientes — no es deuda nueva, es la que ya existía, ahora con nombre.
 - **Dos defectos propios los encontró la pasada documental, no los tests.** El adaptador aplanaba los tres conflictos distintos del command en un solo código —exactamente la clase que se corrigió el mismo día del lado del candidato— y no reenviaba el destino de selección, con lo que dos de los seis desenlaces eran inalcanzables por la ruta que existe para alcanzarlos. Ambos corregidos y congelados con test.
 - Estado: `code complete, rollout pendiente`. El flag de Nexa nace OFF —bajo el AI Act la selección es alto riesgo con supervisión humana obligatoria— y falta ejercitar el loop contra staging. La escritura por MCP queda diferida: su registro vive en el repo hermano y su scope está bloqueado hasta `TASK-1631`.
-
-## 2026-08-26 — La rendición del assessment deja de perder respuestas y de mentir sobre por qué
-
-- **El caso fuente, resuelto en su causa.** El 2026-08-19 una candidata real perdió una respuesta escrita y quedó sin poder enviar, teniendo 26 minutos de gracia disponibles. La causa no era el plazo: el autosave es un debounce que **se reinicia con cada tecla**, así que quien escribe de corrido sin pausar 450 ms **no guarda nada** — no pierde los últimos milisegundos, puede perder la respuesta entera. Ahora, dentro de una ventana de 30 s antes del plazo, el guardado se fuerza cada 5 s ignorando el debounce. No extiende ningún plazo: guarda antes.
-- **La mitad de la premisa de la task era falsa, y quedó escrita como tal.** De los cuatro defectos declarados, dos no existían: el reloj es `sticky` desde el 2026-08-19 —arreglado 2h43m después de crearse la task, sin que nadie actualizara la spec— y los avisos de 5 y 1 minuto **nunca** fueron sólo `srOnly`. Quien la tomara iba a cazar un bug inexistente o, peor, a «arreglar» lo que funciona.
-- **Tres defectos que ninguna línea declaraba.** El paso entre preguntas sobreescribía el borrador con el valor del servidor —vacío— en silencio, rompiendo la promesa central del propio wireframe; `errorBody` se usaba en DOS catches, así que arreglar el submit dejaba el autosave igual de deshonesto; y el diálogo de envío se abría durante la gracia sin verificar completitud, que es exactamente cómo se llegaba al error imposible de resolver.
-- **El hallazgo que corrigió el contrato de diseño.** El wireframe proponía la copy «puedes enviar lo que alcanzaste a guardar». Es falso: el servidor **exige la evaluación completa** y rechaza cualquier envío con respuestas faltantes. Prometerlo habría repetido, más sutil, la misma mentira que la task venía a arreglar. La banda pasó a ser condicional, y con faltantes **el CTA de envío no se renderiza**: una acción que no puede tener efecto no se ofrece.
-- **`readOnly` sobre `disabled` es accesibilidad, no estilo.** `disabled` saca el campo del tab order y su contenido del árbol de accesibilidad: durante la gracia significaba que quien usa lector de pantalla no podía releer lo que escribió. La asimetría con radio y checkbox —que conservan `disabled` porque `readonly` no les aplica por spec— quedó declarada en el contract test con su razón, no bajada en silencio. Y como el módulo nunca tuvo `.textArea:disabled`, el gris lo ponía el navegador: se agregó la regla explícita para que el campo congelado no parezca editable.
-- **El servidor no se tocó, y esa fue la decisión.** Devuelve un mensaje genérico a propósito —es un endpoint público sin autenticación, fijado por un test anti-leak— así que la verdad se construye en el cliente desde el `code`. Cuatro mensajes agrupados por lo que la persona puede hacer, no siete por código.
-- **Aprendizaje de gobernanza:** declarar `UI ready: yes` disparó 21 errores de un gate premium que **no tiene válvula de proporcionalidad** — se aplica igual a UI nueva que a un fix de defecto, y exige `Quality profile: premium`, lo que descarta el modo `--contract-only`. Las doce secciones se autoraron con contenido verificado, no de relleno; la más útil terminó siendo declarar **por qué no hay dirección visual nueva que explorar**.
-- **La captura premium se ejecutó, y justificó su costo: destapó cuatro defectos que ningún test veía.** El contador de caracteres tenía un contraste de 2.43:1 contra el 4.5:1 de AA — defecto pre-existente, `serious` en axe, sobre una superficie de candidato. Al ocultar el placeholder del campo congelado —porque un campo que no acepta texto no puede invitar a escribir— axe reveló que el textarea llevaba años **sin nombre accesible**: se apoyaba en el placeholder, que es precisamente el anti-patrón que la guía de UX writing prohíbe. La banda usaba un **avión de papel** para decir que no se puede enviar. Y la superficie no declaraba su recipe de composición.
-- **Un quinto hallazgo resultó ser del gate, no del código.** Marcaba los botones del stepper como fuera del viewport en 390px, pero su contenedor ya declara `overflow-x: auto`: es un scroller contenido, que es el patrón correcto. Se declaró la excepción en vez de romper el patrón para complacer al checker; el contrato real —que la página no scrollee— se verificó y se cumple.
-- Estado: **complete**. `pnpm test` completo verde (12.062), los cuatro gates de UI en PASS, scorecard 4.54 con el piso declarado y su `nextAction` escrito en vez de inflado. Seed ejecutado y limpiado, con residuo verificado en cero.

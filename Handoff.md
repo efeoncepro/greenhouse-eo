@@ -19,6 +19,39 @@ Primer tick de la nueva cadence: `globe-producer-worker-2lq2v` a las 21:00:07Z, 
 `queueOldestAgeSeconds=0`, retry storm/terminal attempts/divergencias/fallos en 0. La ventana de 24 h sigue abierta;
 Media no cambia antes de cerrarla.
 
+## 2026-09-01 (10) — ISSUE-167 resuelto: el foco no era del form, era del eje de modelado
+
+Resuelto el mismo día que lo abrí. **Code complete, rollout pendiente**: el bundle desplegado sigue
+siendo el anterior, así que en producción el defecto continúa hasta el próximo release.
+
+La primera lectura culpaba al path del form. Al abrir el código apareció lo real: el comportamiento
+existía **dos veces y distinto** —`slide-in` con foco-return y `Escape` a nivel de shell,
+`meeting-action` con el suyo propio— y faltaba una tercera. El foco y la salida por teclado se
+habían modelado como propiedad del **placement**, no de «hay una superficie revelada por activación
+del usuario». Por eso `embedded` no las heredaba.
+
+Primitive canónica `src/growth-cta-renderer/disclosure-focus.ts`. Es disclosure y no modal (sin
+focus trap ni `aria-modal`), y **`Escape` se escucha en el contenedor, jamás en el documento**: un
+CTA incrustado no puede secuestrarle el `Escape` a la página del cliente.
+
+🔴 **El hallazgo que vale más que el arreglo de accesibilidad salió del test:** `Escape` estaba por
+emitir `dismissed`, que es una **señal de negocio** —«el visitante rechazó la oferta»— que viaja al
+ledger de conversión. Cerrar un formulario abierto por curiosidad no es rechazar el CTA. Ahora
+`Escape` **colapsa** al card sin telemetría, y el botón «✕ Ahora no» sigue siendo el único rechazo.
+El colapso queda deliberadamente sin evento: el vocabulario de `cta_conversion_event` no tiene
+`form_closed` y agregarlo es cambio de contrato server-side.
+
+Verificación: 8 tests de la primitive + 3 del cableado, **falsificados** revirtiendo el arreglo (2
+rojos de 22; 47/47 con él). Y un riesgo que jsdom no habría atrapado, cerrado con medición contra el
+DOM real de producción: si `<greenhouse-form>` montara en shadow DOM el selector no lo vería y el
+arreglo sería inerte — verificado que no usa shadow DOM y expone 5 controles al selector exacto.
+
+`meeting-action.ts` conserva su gestión propia: funciona, no tenía defecto medido, y refactorizarla
+sin necesidad era riesgo sin retorno. Queda como consumidor candidato.
+
+Próximo paso: release develop→main + rebuild del renderer, y repetir el recorrido con teclado en
+vivo en ambos hosts antes de dar el issue por cerrado operativamente.
+
 ## 2026-09-01 (9) — cinco oportunidades LicitaLAB promovidas por MCP HubSpot
 
 El operador confirmó la promoción manual de cinco oportunidades. El MCP de HubSpot creó y releyó los Deals
@@ -422,73 +455,3 @@ Revisión documental con tres subagentes: docs triples, índices, inventario, sk
 reconciliados. Menú conserva secuencia visible; no se afirma igualdad de valores raw `menu_order`.
 Hallazgo confirmado: resize a 1440×651 activa pin aunque mount bajo 740 px no lo hace; pendiente de
 TASK-1799, sin cambio de código en este pase. Evidencia y comandos en la auditoría enlazada.
-
-## 2026-08-31 — TASK-1358: Home editorial aplicada; QA residual pendiente
-
-Home `251731` publicada en raíz, antigua `2791` conservada noindex; header/footer Ohio intactos.
-Readback remoto del cierre editorial: 17 widgets, cero HTML, 407 campos raíz y seis repeaters;
-hash `9aa8c770c0907edc5ad70f4489cccedb56cc03d0a7802e01eef0e2beee832562`.
-[Ocho revisiones y cierre con subagente](docs/audits/public-site/2026-08-31-home-editorial-closure.md):
-copy anotado, comparación cualitativa, FAQ jerárquica y Con + logo publicados; doce archivos iguales
-local/remoto. Docs/skills consolidados sin incluir runtime hermano ni WIP SEO previo en el commit.
-Las revisiones visuales, assets oficiales, microinteracción de logos, enlaces de Servicios,
-CTA Casos y showreel están publicados. No restaurar formulario demo, Verk ni placeholders.
-[Contrato vigente](docs/architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md);
-[historia/evidencia visual](docs/audits/public-site/2026-08-30-home-visual-review.md).
-
-Tres subagentes consolidaron arquitectura, funcional/manual y skills espejadas; root reconcilió task,
-índices y contexto. [Audit independiente](docs/audits/public-site/2026-08-30-home-documentation-consolidation.md):
-contrato WP-CLI, PHP, lifecycle y geometría PASS; hashes de archivos del video coinciden con manifest.
-Video: snapshot `_gh_home_video_20260830_195821`, backup `195756` (retención/rollback no revalidados).
-SEO/HTTPS publicado: [audit](docs/audits/public-site/2026-08-30-home-seo-aeo.md), snapshot `_gh_home_seo_20260830_204702`; verificador público PASS.
-
-**Siguiente paso:** usar sesión Chrome WordPress observada para probar guardar/recargar Elementor y teclado
-del video; certificar flechas en tabla y revisar atenuación de Servicios, claims/footer/entidad global y medir GSC/CWV. CTA abierto no prueba booking ni tracking.
-TASK-1358 sigue `to-do`/`UI ready: no`, runtime `Avanzada`; commit previo `1282feed4`, SEO aún sin commit/push.
-Skills SEO/WordPress espejadas con método Home/landing; consolidación documental sin nuevas escrituras live.
-El checkpoint anterior se [preservó](docs/operations/agent-context-history/handoff/2026-08-30-home-before-consolidation.md),
-pero ya no gobierna decisiones ni pendientes actuales.
-
-## 2026-08-30 — Landing HubSpot aprobada: publicada como once widgets Elementor
-
-Por nueva instrucción explícita del operador se implementó y publicó su ZIP Claude Design aprobado,
-SHA `f95b6254c2434b58a4d6855dded40dd3a38acb19b881e090e1928674ab8bb812`.
-Página `244079`, URL conservada `/servicios-contratar-hubspot/`; header/footer Ohio nativos.
-2026-08-31: item de menú `244116` renombrado a «Servicios HubSpot», sin moverlo ni cambiar destino.
-
-2026-08-31: [auditoría SEO/AEO completa](docs/audits/public-site/2026-08-31-hubspot-seo-aeo.md):
-OG/Twitter y breadcrumb corregidos, Service conectado al grafo Yoast, enlace oficial del partner y HTTP→HTTPS
-301 sólo en la landing. Iconos 878 KB→2,4 KB y fuentes adelantadas; móvil LCP 16,3→8,6 s (lab; aún mejorable).
-Schema.org 0 errores/advertencias; GSC indexada, último crawl 27-08 anterior al rediseño. Header/footer intactos;
-persisten defectos globales del footer y falta respaldo localizado de las cifras 56%/76%. Snapshot SEO
-`_gh_hubspot_seo_20260831_093553`; hash Elementor sin cambios. Sin commit/push.
-Aclaración del operador: no autoriza cambios estéticos por SEO. Se retira el subrayado del perfil público;
-se conservan apariencia, composición y tipografías aprobadas.
-Después se ajustó sólo la descripción SEO/social con `copywriting`; title y diseño intactos.
-Snapshot `_gh_hubspot_meta_copy_20260831_102004`; texto y rollback en la auditoría enlazada.
-Comentarios visuales posteriores: [timeline restaurado y partner reducido a dos columnas con badge mayor](docs/audits/public-site/2026-08-31-hubspot-timeline-partner-fix.md).
-Cinco archivos acotados; árbol Elementor y SEO intactos. Snapshot `_gh_hubspot_visual_fix_20260831_102751`.
-Nueva revisión: [seis iconos oficiales HubSpot y logo ANAM](docs/audits/public-site/2026-08-31-hubspot-brand-assets.md);
-Media nativos, nota del caso identificada, SEO y shell conservados.
-Revisión siguiente: [isotipos en paneles, Smart CRM/Agent Hub y wordmark de licencias](docs/audits/public-site/2026-08-31-hubspot-product-marks.md);
-autorización del logo confirmada por operador, AEO sin símbolo propio identificado, sin cambios de copy/SEO.
-MCP suma [ChatGPT, Claude y Gemini reutilizados desde AEO](docs/audits/public-site/2026-08-31-hubspot-mcp-logos.md),
-en tarjeta y panel, tres Media nativos; AEO y contenido Elementor protegidos.
-Las cinco capacidades restantes suman [iconos semánticos azul claro](docs/audits/public-site/2026-08-31-hubspot-semantic-icons.md),
-diferenciados de las marcas oficiales, compartidos tarjeta/panel y editables.
-[Revisión editorial](docs/audits/public-site/2026-08-31-hubspot-editorial-copy.md): licencias, ANAM, partner y reunión;
-51 textos, sin «práctica» en la landing, sin cambios de diseño/SEO ni de otras páginas.
-Continuación: [industrias, primer paso y cinco etapas](docs/audits/public-site/2026-08-31-hubspot-industry-method-copy.md), solo copy en tres widgets.
-[Cierre con tres subagentes](docs/audits/public-site/2026-08-31-hubspot-documentation-closure.md): docs/skills, lifecycle y commits acotados; WIP ajeno preservado.
-
-[Contrato y fuentes](docs/architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md),
-[audit y evidencia](docs/audits/public-site/2026-08-30-hubspot-elementor-publication.md),
-[manual/rollback](docs/manual-de-uso/public-site/hubspot-elementor.md).
-
-Once widgets editables, 23 paneles SSR, formulario Growth Forms `efeonce-hubspot-scope` publicado con
-variante portable `hubspot_pillar`, renderer canónico fijado en WordPress. Destino Greenhouse-only;
-no se activó entrega directa HubSpot ni se probó una conversión con lead real. QA anónima, validación,
-responsive/teclado/reduced motion y roundtrip nativo Elementor PASS. Home y Creative conservan hashes.
-Cierre Git acotado autorizado, sin push ni despliegue general Greenhouse. TASK-1352 no se movió a complete; migración de URL y
-sus dossiers adicionales no forman parte de este pedido de publicación. La aprobación del export
-supera las instrucciones de rechazo de diseños anteriores para este artefacto específico.

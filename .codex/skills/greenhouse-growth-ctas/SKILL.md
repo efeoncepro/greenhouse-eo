@@ -187,10 +187,8 @@ ledger); `eligible/suppressed` los observa el server en el render path. El dataL
   responden *«¿está sano ahora?»*, NUNCA *«¿estuvo steady durante N días?»*. Un criterio de ventana
   no es verificable desde el dashboard — hay que ir a la tabla base. Herramienta:
   `scripts/growth/_sanity-cta-signal-window.ts`.
-  🔴 **`ISSUE-167` abierto y es del renderer compartido, no del host:** al abrir el Growth Form desde
-  un CTA el foco queda en `body` y `Escape` no cierra. Abre como expansión inline (sin `role=dialog`
-  ni `aria-modal`) pero sin las dos obligaciones que ese patrón acarrea — mover el foco al contenido
-  revelado y ofrecer salida por teclado. Afecta a TODOS los CTA en Think y WordPress.
+  ✅ **`ISSUE-167` RESUELTO el mismo día (code complete, rollout pendiente).** Ver la regla dura de
+  disclosure abajo.
 - **2026-07-18 (release `d5db8b568`, PR #159+#160): TASK-1428 + TASK-1429 EN PRODUCCIÓN.**
   Enforcement de suppression **ON en staging y Production** (verificado E2E post-release:
   visitante dismissed → excluido; fresco → ve; `engineState: ok`). Kill switches operativos en
@@ -351,6 +349,30 @@ npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/_sanity-cta-
 - familia de eventos/allowlist de telemetría, tags GTM, o custom dimensions;
 - rutas API públicas/admin, capabilities `growth.cta.*`, flags, o signals;
 - nuevas acciones del router, placements (interruptivo), Tier B, kill switch global, o el cockpit;
+## Regla dura — toda superficie revelada in-place usa `attachDisclosureFocus` (ISSUE-167)
+
+🔴 **NUNCA implementes foco ni salida por teclado dentro de una acción del renderer.** Usa
+`attachDisclosureFocus` (`src/growth-cta-renderer/disclosure-focus.ts`). Existe porque el
+comportamiento estaba TRES veces y distinto —`slide-in` lo tenía, `meeting-action` tenía el suyo, y
+el path del form **no tenía ninguno**: el foco quedaba en `body` y `Escape` no cerraba, medido en
+producción el 2026-09-01. La causa no era el form: era haber modelado el foco como propiedad del
+**placement** en vez de de **«hay una superficie revelada por activación del usuario»**, así que
+`embedded` no lo heredaba.
+
+- **Es disclosure, NO modal**: sin focus trap, sin `aria-modal`, sin oscurecer. Tab sigue al host.
+- 🔴 **`Escape` se escucha en el CONTENEDOR, jamás en el documento.** Un CTA incrustado no le
+  secuestra el `Escape` a la página del cliente. Funciona porque `enter()` mete el foco adentro.
+- 🔴 **`Escape` COLAPSA, no descarta: NUNCA emitas `dismissed` al cerrar por teclado.** `dismissed`
+  es una **señal de negocio** («el visitante rechazó la oferta») que viaja al ledger de conversión;
+  cerrar un form abierto por curiosidad no es rechazar, y emitirlo contaminaría la tasa de rechazo.
+  El botón «✕ Ahora no» sí es rechazo. El colapso queda sin telemetría a propósito: el vocabulario
+  de `cta_conversion_event` no tiene `form_closed` y agregarlo es cambio de contrato server-side.
+- **El reveal PASIVO no adopta la primitive en su apertura**: `slide-in` aparece solo, sin
+  activación del usuario, y robarle el foco al visitante sería incorrecto. Su contrato sigue.
+- ⚠️ Al escribir una acción nueva que revele contenido, verifica que el contenido **no viva en
+  shadow DOM**: el selector de la primitive no lo atravesaría. Medido para `<greenhouse-form>`
+  (no usa shadow DOM, 5 controles visibles al selector).
+
 - cambios del estado de rollout (§Estado de rollout — mantener la fecha y lo pendiente al día).
 
 Si un agente cierra una task del motor sin tocar esta skill, el cierre está incompleto

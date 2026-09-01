@@ -15,6 +15,7 @@ import type { CtaSystemCopy } from './copy'
 import type { TelemetryEmitter } from './telemetry'
 import { RENDERER_GTM_EVENTS } from './telemetry'
 import { RENDERER_CONTRACT_VERSION, RENDERER_VERSION } from './version'
+import { attachDisclosureFocus, type DisclosureFocusHandle } from './disclosure-focus'
 
 /**
  * TASK-1431 — recovery acotado de una navegación same-context que no descargó la
@@ -83,6 +84,9 @@ export class CtaRenderer {
    * instancias sobre el mismo root — p.ej. StrictMode double-effect en el preview —
    * jamás se borran el contenido entre sí). */
   private card: HTMLElement | null = null
+
+  /** ISSUE-167: foco + salida por teclado de la superficie revelada (form). */
+  private disclosure: DisclosureFocusHandle | null = null
 
   constructor(options: CtaRendererOptions) {
     this.options = options
@@ -507,11 +511,50 @@ export class CtaRenderer {
       applyFormOpen()
     }
 
+    // ISSUE-167 — el form se revela por ACTIVACION del usuario, asi que mover el foco
+    // adentro es lo correcto (a diferencia del reveal pasivo del slide-in, que a
+    // proposito no lo roba). `Escape` queda escuchado en el slot, nunca en el
+    // documento: un CTA incrustado no le secuestra el Escape a la pagina del host.
+    this.disclosure = attachDisclosureFocus({
+      doc: this.doc,
+      container: slot,
+      returnTo: primary,
+      onExit: () => this.collapseForm(slot, primary),
+    })
+    this.disclosure.enter()
+
     this.options.telemetry.emit(RENDERER_GTM_EVENTS.formOpened, {
       ...this.basePayload(),
       form_slug: this.formAction()?.formSlug ?? '',
     })
     this.options.onIngest('form_opened')
+  }
+
+  /**
+   * ISSUE-167 — `Escape` COLAPSA el form de vuelta al card. No es lo mismo que
+   * `dismiss()`, y la diferencia importa más allá de la accesibilidad:
+   *
+   * 🔴 **`dismissed` es una señal de NEGOCIO** — significa «el visitante rechazó esta
+   * oferta» y viaja al ledger de conversión. Cerrar un formulario que abriste por
+   * curiosidad no es rechazar el CTA; emitirlo acá contaminaría la tasa de rechazo
+   * con gente que sólo quiso volver atrás. El botón «✕ Ahora no» sí es rechazo y
+   * sigue llamando a `dismiss()`.
+   *
+   * No se emite evento propio: el vocabulario del ledger (`cta_conversion_event`)
+   * no tiene un `form_closed`, y agregarlo es un cambio de contrato server-side
+   * (allowlist de ingest + CHECK en DB) que no pertenece a esta corrección. El
+   * colapso queda deliberadamente sin telemetría hasta que ese contrato exista.
+   */
+  private collapseForm(slot: HTMLElement, primary: HTMLButtonElement): void {
+    if (this.destroyed) return
+
+    // El foco vuelve al botón ANTES de re-habilitarlo no sirve: un botón `disabled`
+    // no puede recibir foco. Primero se restaura el control, después el foco.
+    primary.disabled = false
+    this.disclosure?.release()
+    this.disclosure = null
+    slot.remove()
+    this.options.root.dataset.ghcState = 'visible'
   }
 
   /** El módulo element/action llama esto cuando el form acepta la submission. */
@@ -531,6 +574,11 @@ export class CtaRenderer {
    */
   dismiss(): void {
     if (this.destroyed) return
+
+    // Devuelve el foco al boton que abrio ANTES de tocar el DOM: si el card se
+    // remueve primero, el `returnTo` deja de estar conectado y el foco cae al body.
+    this.disclosure?.release()
+    this.disclosure = null
 
     this.options.telemetry.emit(RENDERER_GTM_EVENTS.dismissed, this.basePayload())
     this.options.onIngest('dismissed')
@@ -554,6 +602,8 @@ export class CtaRenderer {
 
   destroy(): void {
     this.destroyed = true
+    this.disclosure?.release()
+    this.disclosure = null
 
     if (this.navigateRestoreTimer !== null) {
       clearTimeout(this.navigateRestoreTimer)
