@@ -16,7 +16,7 @@ Globe para el workspace interno autorizado. El gateway no recrea catálogo, rout
 
 Desde el 6 de agosto de 2026 hay una **segunda capacidad federada**: Search Visibility 360 de Greenhouse. Partió
 con tres consultas de solo lectura y creció hasta federar **28 tools SEO** (al 2026-08-31). ⚠️ Federado e interno NO son el mismo conjunto por construcción —el gateway resuelve contra rutas HTTP del lane—: `get_seo_work_queue` existe adentro y está excluida con razón, y `get_seo_provider_spend` está federada sin contraparte interna. Desde el 28 de agosto de 2026 esas 27 están **efectivamente
-desplegadas** en la revisión productiva del gateway (`efeonce-mcp-gateway-00024-8b8`), que reemplazó a la del 27
+desplegadas** en la revisión productiva del gateway (`efeonce-mcp-gateway-00026-ctp`, desde el 2026-09-01; antes `efeonce-mcp-gateway-00024-8b8`), que reemplazó a la del 27
 de agosto (servía 21). Ya no queda ninguna tool esperando despliegue. Igual que con Globe, el gateway no recrea
 lógica: transporta la pregunta y Greenhouse decide qué se puede ver. El inventario vigente y su estado de
 despliegue viven en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-tool-inventory.md) §8; detalle

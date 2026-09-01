@@ -2,11 +2,48 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-09-01 — DataForSEO Improved ETV: contrato documentado, cutover no autorizado
+
+Tres subagentes auditaron documentación oficial, siete consumers y drift de skills. El aviso de cuenta anuncia
+`use_improved_etv: true`, legacy por default hasta 2026-11-01 y después improved; la documentación pública aún
+no publica matriz de endpoints, retroactividad, pricing ni convivencia con clickstream. Greenhouse no declara
+fórmula y las UNIQUE append-only de domain/URL/prospect no permiten shadow dual.
+
+Actualizadas las skills espejadas DataForSEO/SEO, dossier Labs, contrato interno, manuales y
+`docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md`. Sin code/schema/flag/scheduler/API pagada ni
+runtime mutation. Siguiente paso con owner SEO+Architecture: confirmar ocho preguntas con DataForSEO, proponer
+ADR/task para policy+schema+readers/API/MCP, autorizar gasto de shadow Sep-Oct y decidir rebaseline vs breakpoint
+antes del cutover. Estado: **documentación completa; implementación/rollout pendiente**.
+
 ## 2026-09-01 — Performance Report agosto comunicado por TeamBot
 
 Nexa publicó el anuncio grupal en `EO Team` con cuatro menciones reconocidas como `aadUser` y CTA al informe; después envió cuatro lecturas 1:1 a Daniela, Andrés, Melkin y Valentina. Los cinco audit runs quedaron `succeeded`. El copy personal conserva contexto: volumen alto no implica sobrecarga, los atrasos heredados se separan del tiempo de ejecución y onboarding se trata como muestra pequeña. Evidencia: `docs/audits/communications/2026-09-01-performance-report-teambot.md`.
 
 El workflow canónico sigue siendo temporal para DMs genéricos: aprobación → Entra activa → dry-run → dedupe/source object → `--yes` → auditoría. Lo recurrente converge a Notification Hub; no quedó script permanente.
+
+## 2026-09-01 (5) — gateway MCP desplegado: `TASK-1780` operativamente completa
+
+El deploy del gateway (`workflow_dispatch`, no se dispara solo) se ejecutó. Revisión
+**`efeonce-mcp-gateway-00026-ctp`**, 100% del tráfico, `Ready=True`, `headSha` del run = `e92961e`.
+La revisión anterior (`00024-8b8`) era del 28-ago y **no llevaba el cambio**: lo verifiqué por
+timestamp antes de disparar, en vez de asumirlo.
+
+Antes del deploy re-verifiqué lo único capaz de romper runtime: `GREENHOUSE_SEO_WRITE_TOOLS` —que
+gatea el 403 de scope en `app.ts`— deriva ahora de `writes || spendsProviderBudget` y da **el mismo
+conjunto de 7**. Sin efecto de comportamiento, comprobado antes y no después.
+
+**Canary verde de punta a punta contra producción.** `serp-top-results` con filas reales
+(`captureDate: 2026-09-01`), deny `404` anti-oracle en todas, escrituras honestas en su gate.
+
+⏳ **Paso 9 de `TASK-1699` NO se puede cerrar hoy, y lo medí en vez de deducirlo:**
+`readSerpCompetitorCandidates` devuelve `candidates: []` con `minDays: 5` y la serie en **4 días**
+(29, 30, 31-ago y 1-sep). La lista vacía es el resultado **esperado** con serie joven, no un error.
+La quinta captura entra el **2026-09-02 a las 05:00 CLT**; recién ahí la revisión de candidatos con
+el operador tiene sustrato.
+
+Corregidas de paso las referencias a la revisión productiva en el runbook, la doc del gateway y la
+skill (los dos espejos) — decían `00024-8b8`. Y el runbook declaraba un commit `807fb76` «local sin
+push» que **hoy es ancestro de `origin/main`**: drift cerrado.
 
 ## 2026-09-01 (4) — 15 tasks cerradas del barrido, y una que NO se cerró a propósito
 
@@ -484,79 +521,3 @@ aplicada con guard doble: viejo ausente + nuevo presente) — contract-después-
 Sin flags gated a este release (ledger revisado: los pendientes tienen bloqueadores ajenos).
 
 Timing ledger actualizado (E2E ~1h15m; bloqueador dominante: el ciclo del forward-fix).
-
-## 2026-08-29 (7.º) — auditoría independiente de la cola: el orden servido contradecía el rank persistido en banda 2 (fix aplicado + deuda de procedencia quemada)
-
-Auditoría independiente de TASK-1700/1785 pedida por el operador tras 3 releases con dolor.
-**Veredicto:** el núcleo de v2 estaba bien (predicado único ✅, piso por versión ✅, adapter sin
-`null→0` ✅, schedulers/flags/deploy.sh de main verificados en vivo ✅, snapshots vigentes v2 ✅) —
-pero apareció un defecto real que ningún test veía: **54 de 55 items de banda 2** de
-`seot-efeonce-own-brand` servidos fuera de su `rank_in_snapshot` (Berel 0/501 — invisible donde
-domina banda 1). Reproducido de forma independiente por las dos sesiones peer antes de aceptarse.
-
-Causa: el comparador desempata banda 2 por `tieBreakImpressions` DESC — **no es columna** — y el
-reader reconstruía el orden en SQL con tres llaves; con score NULL en toda la banda colapsaba a
-alfabético. El test de paridad comparaba el **string** del SQL: guarda que afirma, no que verifica.
-
-**Fix (asignado a esta sesión por el operador; las peers quedaron fuera por contexto saturado):**
-el reader sirve y pagina `rank_in_snapshot ASC` (keyset `rank > cursor`; cursor viejo reinicia
-página 1, jamás saltea). Comparador = única autoridad de orden; coincidencia servido↔persistido
-**por construcción**. UNIQUE index nuevo `seo_work_queue_items_rank_unique_idx` (migración
-`20260829213303021`, **aplicada**; ranks verificados contiguos 1..N en los 12 snapshots).
-**Re-medido live paginando de punta a punta:** efeonce 105/105 y Berel 501/501 con **0**
-discrepancias de secuencia; bandas 1 y 3 sin regresión (estaban en 0 y siguen).
-
-En el mismo tren se **quemó la deuda de procedencia de `work-queue`** (su condición de salida era
-este fix): DTO emite `provenance` en lista, fuente nueva `own_ctr_model` (◑, «insumos medidos,
-resultado estimado») para score/techo/CTR esperado, censo en `emitted`, cobertura hoja por hoja en
-`provenance-coverage.test.ts`. Quedan 7 deudas declaradas en el censo.
-
-Docs: Delta (3) en TASK-1700 + Delta en TASK-1785, §18.8 de la arquitectura SEO reescrito (el
-orden canónico vive en el comparador; el reader lo LEE), `SQL_DATE_MATH_AGENT_INVARIANTS`
-§"Orden y paginación" ahora con TRES bug classes + protocolo "dataset que exhibe cada estado",
-`.claude/rules/growth-seo.md` actualizado.
-
-**Pendiente con dueño:** retirar `seo_work_queue_items_keyset_idx` (huérfano del reader nuevo) en
-migración aditiva **DESPUÉS** del release que promueva este fix — el reader desplegado hoy en
-producción todavía lo usa. Verificación post-promoción: repetir la paginación live de punta a punta
-contra `seot-efeonce-own-brand` (debe seguir 0 discrepancias con el código promovido).
-
-## 2026-08-29 (6.º) — el release cerró verde con el worker sirviendo código viejo
-
-Tercer paso a producción del día (`64bdd105c737`, orquestador `33272258036`). Manifest `released`,
-Vercel READY, watchdog sin drift — y el `ops-worker` en `8adf8c2d3`, o sea `incremental-clicks-v1`.
-El change-gate se saltó el deploy y el job cerró `success` en 46 s.
-
-Causa raíz cerrada, no parchada: la decisión se tomaba contra una lista de rutas a mano que cubría
-24 prefijos de los 1449 archivos que el worker bundlea. Nuevo gate `pnpm worker:deploy-path-gate`
-(en CI, junto a `worker:runtime-deps-gate`) deriva la cobertura del metafile de esbuild. Commits
-`146070ffc` y `53e240d79` en develop.
-
-Deploy break-glass del `ops-worker` autorizado por el operador → `ops-worker-00617-mtc`,
-`GIT_SHA=64bdd105c737`, flag ON, `Ready=True`. Los cuatro workers verificados.
-
-**Revisión vigente al cierre: `ops-worker-00618-lz2`, `GIT_SHA=53e240d79c31` — NO el SHA del
-release.** Lo causó el push del propio fix del comentario de `deploy.sh`: `services/ops-worker/**`
-es disparador, así que movió al worker fuera del SHA promovido. Verificado por CONTENIDO, que es
-lo que decide: el único archivo del bundle que difiere vs `64bdd105c` es `deploy.sh` y **sólo en
-comentarios**; `cannibalization.ts` tiene blob `6ceb87e4…` idéntico a `origin/main` y el código que
-corre declara `incremental-clicks-v2`. La ancestría NO sirve como prueba acá —`main` promueve por
-squash, así que `merge-base --is-ancestor 64bdd105c 53e240d79` falla aunque el contenido sea el
-mismo—; una sesión peer la usó y concluía de más.
-
-🔴 **El manifest es incompleto para el worker.** Dice que producción está en `64bdd105c`, y hay UN
-solo `ops-worker` compartido entre staging y producción que hoy corre código de develop no promovido
-por el control plane. Hoy es benigno (delta = comentarios), pero quien lea sólo el manifest concluye
-algo falso sobre qué código materializa la cola. La promoción de `146070ffc`/`53e240d79`/`d7b5e1ed2`
-cierra las dos cosas: alinea el worker y activa el gate de cobertura para releases futuros.
-
-Rematerialización hecha **sin** `force` (`materialized=2, reused=0`), lo que además probó
-empíricamente que el piso filtrado por versión funciona como red de seguridad. Berel MX:
-`consolidation` 200→11 con `gsc_striking_distance` 168→200.
-
-**Pendiente:** `146070ffc` y `53e240d79` están en develop y NO en `main`. El gate de cobertura sólo
-protege releases futuros una vez promovido. Hasta entonces, un release que corra el árbol de `main`
-vuelve a usar la lista vieja — el mismo modo de falla de hoy.
-
-**Retirada** la optimización del ledger que proponía dejar de contar el skip change-gated del
-`ops-worker` como error en el watchdog: silenciaría justo la señal que habría atrapado esto.

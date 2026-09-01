@@ -738,10 +738,15 @@ guard contra el estado real sin esa declaración, emite exactamente un finding �
 
 ### Drift de rollout detectado 2026-08-28
 
-La revisión productiva es `efeonce-mcp-gateway-00024-8b8` (SHA `92e7197`). El repo `efeonce-mcp` tiene **un commit
-local sin push**: `807fb76` *"TASK-1694 — federa el contrato corregido de `get_seo_keyword_discovery`"*. En
-Greenhouse, `TASK-1694` ya está en `complete/`. Mientras `807fb76` no se pushee, el contrato corregido **no está en
-producción** y la task está `code complete, rollout pendiente` en su mitad de gateway.
+La revisión productiva es `efeonce-mcp-gateway-00026-ctp` (SHA `e92961e`, desplegada el 2026-09-01
+con el manifiesto canónico de `TASK-1780`; la anterior era `efeonce-mcp-gateway-00024-8b8`, SHA
+`92e7197`). Canary del provider Greenhouse-SEO **verde de punta a punta contra producción** tras ese
+deploy: lecturas OK, deny `404` anti-oracle en todas, escrituras respondiendo honestamente en su
+gate sin escribir.
+
+✅ **El drift de rollout que esta sección declaraba quedó cerrado.** Decía que `807fb76`
+(`TASK-1694`) estaba local sin push; **hoy es ancestro de `origin/main`**, verificado con
+`git merge-base --is-ancestor`. No queda commit sin desplegar en el gateway.
 
 Verificar antes de asumir despliegue — la cuenta de commits no lo mide:
 

@@ -1,5 +1,26 @@
 # TASK-1780 — El inventario de tools MCP es un manifiesto, no dos listas
 
+## Delta 2026-09-01 (2) — el gateway ya sirve el manifiesto: rollout cerrado
+
+El único pendiente que quedaba —el deploy del gateway, que es `workflow_dispatch` y no se dispara
+solo— se ejecutó hoy. Revisión productiva **`efeonce-mcp-gateway-00026-ctp`**, 100% del tráfico,
+`Ready=True`, con `headSha` del run = `e92961e`, exactamente el commit del manifiesto.
+
+Antes de disparar se re-verificó lo único que podía romper runtime: `GREENHOUSE_SEO_WRITE_TOOLS`
+—que gatea el desafío de scope 403 en `app.ts`— se deriva ahora de `writes || spendsProviderBudget`,
+y el conjunto resultante es **idéntico** al anterior: los mismos 7 tools. Cambio sin efecto de
+comportamiento, comprobado antes y no después.
+
+**Canary del provider Greenhouse-SEO verde de punta a punta contra producción:** lecturas OK,
+`404` anti-oracle en todos los deny, escrituras respondiendo honestamente en su gate sin escribir.
+`serp-top-results` devolvió filas reales con `captureDate: 2026-09-01`, y `competitor-candidates`
+devolvió `candidates: []` con `minDays: 5` — consistente con la serie de 4 días.
+
+Front door: `/.well-known/oauth-protected-resource` 200 y `POST /mcp` sin token 401 (fail-closed).
+
+Con esto la task queda **operativamente completa**, no sólo code-complete.
+
+
 ## Delta 2026-08-31 — baseline medido al tomarla: el criterio de cierre de Slice 3 estaba muerto
 
 Medido contra el código, no contra este archivo:
