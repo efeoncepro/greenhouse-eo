@@ -1,5 +1,17 @@
 # TASK-1655 — Growth SEO: Historical Data Platform (backfill GSC→BQ + split OLTP/OLAP + semilla rank)
 
+## Delta 2026-09-01 — el top-N del SERP YA tiene almacén propio: no abrir un segundo
+
+`TASK-1699` está vivo en producción con `greenhouse_growth.seo_serp_top_results` (append-only por
+trigger, ranura `(seo_target_id, keyword, engine, device, capture_date, rank_absolute)`), y la serie
+corre desde el 2026-08-29: 766 · 775 · 762 · 778 filas en sus primeros 4 días.
+
+🔴 **La plataforma histórica NO debe abrir un segundo almacén del mismo hecho.** Si necesita el
+contexto del SERP por fecha, lo lee de esa tabla o la archiva con el patrón dual-store canónico; el
+follow-up de retención de `1699` ya nombra su disparador (5M de filas o 500 ms en la query de
+recurrencia) y su decisión probable: archivar, **nunca** borrar.
+
+
 ## Delta 2026-08-28 — el top-N del SERP ya tiene almacén propio (TASK-1699)
 
 `greenhouse_growth.seo_serp_top_results` (migración `20260828124352232`) persiste el SERP completo

@@ -1,5 +1,11 @@
 # TASK-1708 — Estacionalidad: persistir la serie de 12 meses que ya viene en `keyword_info`
 
+## Delta 2026-09-01 — desbloqueada
+
+`TASK-1699` quedó `complete`: la serie del top-N del SERP corre en producción desde el 2026-08-29
+(766 · 775 · 762 · 778 filas en sus primeros 4 días). Su bloqueo sobre esta task queda levantado.
+
+
 ## Delta 2026-08-28 (release a producción) — el contrato de referencia ya está desplegado
 
 El release `develop→main` `c983be7f18e68602404567a19ac8e7e0f157f742` (PR #208, run `33178544139`,
@@ -54,7 +60,7 @@ ese deploy ocurrió. Lo que sigue abierto en 1699 es la verificación del día 1
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|seo`
-- Blocked by: `TASK-1699`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

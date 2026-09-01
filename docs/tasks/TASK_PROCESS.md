@@ -534,6 +534,34 @@ ediciones (Handoff/changelog/docs) → pnpm docs:closure-check
 Correr el context gate antes de escribir el Handoff da un verde que ya no describe el árbol que vas a
 commitear. Dueño del contrato: `docs/operations/CONTEXT_HANDOFF_OPERATING_MODEL_V1.md`.
 
+### El avance se registra donde se LEE (regla `stale-progress`, desde 2026-09-01)
+
+🔴 **Un `## Delta` no es un registro de estado.** Los campos que una sesión lee para decidir si toma
+una task son `Status real` y los checkboxes; el cuerpo es prosa que nadie consulta para eso. Si el
+trabajo se registra sólo en prosa, la task queda diciendo que no empezó — y se vuelve a ejecutar.
+
+Caso fuente: `TASK-1699` se re-ejecutó **cinco veces sin cerrar nunca**. Tenía 46 checkboxes sin
+tildar y `Status real: Diseno`, contra siete commits `feat(growth): TASK-1699 Slice N`, un release a
+producción y una serie de datos corriendo hacía cuatro días. Cada sesión leía *"diseño, 46
+pendientes"*, concluía que no estaba empezada, la re-implementaba, escribía otro `## Delta` y no
+tocaba ninguno de los dos campos. El bucle se sostiene solo.
+
+| Dirección | Cuándo | Severidad | Por qué |
+|---|---|---|---|
+| **Contradicción** | task activa con commits `feat/fix/refactor/perf` que citan su ID y **cero** checkboxes tildados | warning | avisa ANTES de re-implementar, que es el único momento en que sirve |
+| **Cierre mudo** | task en `complete/` con checkboxes y **ninguno** tildado | warning | no se puede distinguir "cerrada bien" de "cerrada por cansancio" |
+
+⚠️ **Warning y no error, medido y a propósito:** 414 de 975 tasks en `complete/` y 59 de 121 en
+`in-progress/` tienen checkboxes sin tildar. Un error sería ruido histórico que nadie lee —
+exactamente el modo de falla que la regla combate. Acotada a las que tienen commits de
+implementación, la señal cae a **28 tasks**: rara, específica y accionable.
+
+Tildar **uno solo** apaga la señal: lo que se persigue es el cero absoluto, que es lo que hace
+indistinguible "no empezada" de "hecha y sin registrar". Y sin `git` disponible la regla se apaga
+sola — nunca inventa una contradicción que no puede medir.
+
+---
+
 ### Desbloquear a quien te citaba (regla `stale-blocker`, desde 2026-08-08)
 
 🔴 **Cerrar una task incluye quitarla del `Blocked by` de quienes la declaraban.** No es cortesía: un

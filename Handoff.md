@@ -8,6 +8,50 @@ Nexa publicó el anuncio grupal en `EO Team` con cuatro menciones reconocidas co
 
 El workflow canónico sigue siendo temporal para DMs genéricos: aprobación → Entra activa → dry-run → dedupe/source object → `--yes` → auditoría. Lo recurrente converge a Notification Hub; no quedó script permanente.
 
+## 2026-09-01 — TASK-1699 `complete`, y el defecto de REGISTRO que la re-ejecutaba en bucle
+
+**La task estaba hecha desde el 28-ago; lo que nunca pasó es que el archivo lo registrara.** Tenía
+**46 checkboxes y cero tildados** más `Status real: Diseno`, que son los dos campos de ZONE 0 que una
+sesión lee para decidir si tomarla. Cada sesión leía *"diseño, 46 pendientes"*, la re-implementaba,
+escribía un `## Delta` y no tocaba ninguno de los dos. Pasó **cinco veces**: `cc80968c1`…`c5b609d12`
+(6 slices), `fdfdedbe5`, release `c983be7f1`, `bb6eb8d11`, `7e918c84d`.
+
+Cerrada con evidencia medida hoy, no heredada de los docs: señal `seo.serp_top_results.coverage` →
+`ok`, `uncovered: 0` (convergió sola, **sin tocar el umbral**, en la fecha que el Delta del 29-ago
+predijo); serie viva **766 · 775 · 762 · 778** filas los días 29, 30, 31-ago y 1-sep; UNIQUE de 6
+columnas, trigger append-only y GRANTs sin UPDATE/DELETE verificados contra `pg_constraint`. Los 46
+quedaron tildados **uno por uno con su evidencia**.
+
+🔴 **Un criterio nombraba `discovery_evidence_json`, columna que nunca existió** — la evidencia se
+resolvió con `proposal_ref` opaca. Corregido contra `information_schema` en vez de tildado a ciegas.
+
+**Pendiente NO bloqueante:** el Paso 9 exige ≥5 días de serie y cae el **2026-09-02**; la propia
+`## Verification` lo declara diferido. **Gate no corrido:** `pnpm build` (~30 GB, requiere tu
+autorización explícita). Desbloqueadas `TASK-1704` y `TASK-1708`, que la citaban.
+
+**Guardrail nuevo `stale-progress` en `task:lint`** para que no se repita: avisa cuando una task
+activa tiene commits `feat/fix/refactor/perf` con su ID y **cero** checkboxes tildados, y cuando una
+se cierra sin tildar ninguno. Warning y no error, medido: 414 de 975 en `complete/` y 59 de 121 en
+`in-progress/` están así, y un error sería ruido histórico; acotada a las que tienen commits de
+implementación, la señal cae a **28**. Muerde en `pnpm task:lint --task TASK-###`, que es lo primero
+que corre el harness — o sea, antes de re-implementar.
+
+## 2026-08-31 — Blog WordPress: taxonomía canónica y copia Demo 35 listas para adaptación
+
+La limpieza live dejó 13 categorías canónicas, 20 posts Ohio demo en papelera,
+11 posts reales reclasificados y 15 categorías descartadas eliminadas. AEO y
+SEO son raíces; Diseño Web depende de Diseño y Redes Sociales de Marketing
+Digital. PDR-019 separa jerarquía, primaria Yoast y prominencia en portada.
+Redirects de archivos/permalinks y `410` demo quedaron aplicados y verificados.
+
+La copia de trabajo `251875`, publicada con `noindex` en
+`/demo35-blog-magazine-copia-trabajo/`, conserva el árbol y metas Ohio de la
+fuente protegida `225984`. `/blog/` no cambió. Siguiente slice: mapear sus 15
+`ohio_recent_posts` a `manual | query | remove`, reemplazar copy/assets/enlaces
+Ohio y suscripción, y ejecutar QA antes de pedir aprobación de cutover. Canon:
+`docs/public-site/decisions/PDR-019-taxonomia-editorial-canonica-blog-wordpress.md`
+y `docs/audits/public-site/2026-08-31-blog-taxonomy-demo35-work-copy.md`.
+
 ## 2026-08-31 — Superficies misceláneas WordPress: discovery y canon, sin rollout
 
 Se documentó el ownership live de 404, búsqueda/no-results, categorías, tags, autor, fecha y archivos:
@@ -532,44 +576,3 @@ camino es el `GITHUB_TOKEN` efímero de Actions pasado a Cloud Build por substit
 secreto que custodiar**. Requiere dar acceso de lectura a `greenhouse-eo` en los tres paquetes
 `@efeoncepro/axis-*` (son de `axis-design-system`). Hallazgo lateral a corregir ahí mismo: el
 `.npmrc` que genera `deploy.sh` tiene 2 líneas y el del secreto tiene 3 (falta `@jsr`).
-
-## 2026-08-29 (2.º) — La cola SEO quedó operativa, y el aprendizaje del release cambió al verificarlo
-
-**Estado: los dos schedulers del módulo despausados y documentados.** PR de release #211 en vuelo
-para llevar ambos al SoT de `main`.
-
-**`ops-seo-work-queue-materialize`: `ENABLED`, `0 10 * * *`.** Despausado tras corrida shadow con la
-MISMA identidad OIDC del scheduler: `succeeded`, `eligible=2`, `materialized=1`, `reused=1`,
-`failed=0`. Inspección fila por fila de `seot-efeonce-own-brand` (105 items): `staleness=fresh`, 5/6
-orígenes `ok`, `competitor_gap` `degraded` sin arrastrar a los demás, y **todas las filas en banda 2
-con `priority_score` NULL** — degradación honesta, no falla.
-
-**`ops-seo-competitor-coverage`: `ENABLED`, `0 9 18 * *`.** Su condición pendiente era confirmar el
-endpoint en la revisión activa: `dryRun` → HTTP 200, `providerCostUsd: 0`. Costo ~USD 0,11/mes.
-⚠️ Su primera corrida desatendida es el **18 de septiembre**; queda pendiente decidir si se ejercita
-antes por el camino desatendido.
-
-🔴 **VENTANA ABIERTA hasta que #211 mergee:** `origin/main` aún declara AMBOS schedulers `PAUSADO`, y
-`upsert_scheduler_job` hace `pause`/`resume` EXPLÍCITO en cada deploy. Un deploy desde el árbol de
-`main` los re-pausa **en silencio**. Hay UN solo `ops-worker` y UN solo juego de jobs compartidos.
-
-**🔴 CORRECCIÓN a lo que reporté antes, y es la lección que vale.** Escribí que la credencial AXIS
-venció «sin señal, sin alerta». **Falso.** El detector `axis-credential-expiry.yml` avisó el
-2026-08-25 (run `32856176785`) con tres días de anticipación y predijo el modo de falla exacto
-(*«GitHub Actions sigue verde y solo fallan los builds de worker»*). Falló el **ENRUTAMIENTO**: su
-único canal de salida era el color de su corrida, y ese color ya venía rojo desde el 08-04 y el 08-11
-por una causa ajena (bug de orden `setup-node`/`pnpm`). **Un gate cuyo único canal de salida es su
-propio color es un registro, no una alerta**, y **un detector con rojo crónico deja de ser un
-detector**. Playbook y skill corregidos. Consecuencia: el check de preflight pasa a ser el arreglo
-PRIORITARIO sobre anotar la expiración, porque pone la medición donde alguien está obligado a mirar.
-
-**Deuda documental encontrada y corregida:** la arquitectura afirmaba en **4 lugares** que
-`ops-seo-competitor-coverage` estaba `ENABLED` desde el 28 — falso en las cuatro (estaba `PAUSED`,
-`lastAttemptTime` vacío). El runbook de AXIS documentaba el `.npmrc` con 2 líneas cuando tiene 3
-(falta `@jsr`): seguirlo produce un secreto válido y muerto que falla con el mismo 401 que el vencido.
-
-**Tasks:** `TASK-1700` cerrada (`complete`). `TASK-1794` creada — el arreglo durable de la credencial,
-con el check de preflight como Slice 1 y los tokens de instalación de 1 h como Slice 2 (bloqueado por
-el permiso `packages` de la App, acción de owner de la organización). `TASK-1669` desbloqueada.
-
-**Siguiente paso:** mergear #211 para cerrar la ventana de re-pausa.

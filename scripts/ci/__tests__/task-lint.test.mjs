@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { execFileSync } from 'node:child_process'
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -1621,6 +1622,72 @@ const cases = [
         result.errors.some(item => item.rule === 'ui-premium-readiness' && item.message.includes('denied')),
         true
       )
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'stale-progress: el estado declarado no puede contradecir la historia de commits',
+    run: () => {
+      const root = createRepo()
+
+      // Repo git real: la regla mide la HISTORIA, así que sin commits no puede probarse.
+      const git = args => execFileSync('git', args, { cwd: root, stdio: 'ignore' })
+
+      git(['init', '-q'])
+      git(['config', 'user.email', 'test@example.invalid'])
+      git(['config', 'user.name', 'test'])
+      git(['commit', '--allow-empty', '-q', '-m', 'feat(ops): TASK-999 Slice 1 — implementado'])
+      git(['commit', '--allow-empty', '-q', '-m', 'feat(ops): TASK-999 Slice 2 — cableado'])
+
+      // Activa, con commits de implementación y CERO checkboxes tildados: es el bucle que
+      // TASK-1699 vivió cinco veces.
+      write(
+        join(root, 'docs', 'tasks', 'in-progress', 'TASK-999-fixture.md'),
+        withModularPlacementContract(taskFixture({ lifecycle: 'in-progress' }))
+      )
+
+      const active = lintTasks({ repoRoot: root, options: { task: 'TASK-999' } })
+      const stale = active.warnings.filter(item => item.rule === 'stale-progress')
+
+      assert.equal(stale.length, 1)
+      assert.match(stale[0].message, /2 commit\(s\) de implementación/)
+
+      // Tildar aunque sea uno apaga la señal: lo que la regla persigue es el CERO absoluto,
+      // que es lo que hace indistinguible "no empezada" de "hecha y sin registrar".
+      const source = withModularPlacementContract(taskFixture({ lifecycle: 'in-progress' })).replace(
+        '- [ ]',
+        '- [x]'
+      )
+
+      write(join(root, 'docs', 'tasks', 'in-progress', 'TASK-999-fixture.md'), source)
+
+      const registered = lintTasks({ repoRoot: root, options: { task: 'TASK-999' } })
+
+      assert.equal(registered.warnings.filter(item => item.rule === 'stale-progress').length, 0)
+
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'stale-progress: cerrar sin tildar una sola evidencia también avisa',
+    run: () => {
+      const root = createRepo()
+
+      write(
+        join(root, 'docs', 'tasks', 'complete', 'TASK-800-blocker.md'),
+        withModularPlacementContract(taskFixture({ id: 'TASK-800', lifecycle: 'complete', blockedBy: 'none' }))
+      )
+
+      const closed = lintTasks({ repoRoot: root, options: { task: 'TASK-800' } })
+      const stale = closed.warnings.filter(item => item.rule === 'stale-progress')
+
+      assert.equal(stale.length, 1)
+      assert.match(stale[0].message, /NINGUNO tildado/)
+
+      // Warning y no error a propósito: 414 tasks históricas en complete/ están así, y un error
+      // sería ruido que nadie lee — el modo de falla que esta regla combate.
+      assert.equal(closed.errors.filter(item => item.rule === 'stale-progress').length, 0)
+
       rmSync(root, { recursive: true, force: true })
     }
   },

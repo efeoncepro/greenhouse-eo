@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -1271,7 +1272,134 @@ const checkStaleBlocker = (task, context) => {
   return findings
 }
 
+
+/**
+ * TASK-1699 — `stale-progress`
+ *
+ * 🔴 Cierra el defecto que hizo que una task se re-ejecutara CINCO veces sin cerrar nunca, y que
+ * ningún gate detectaba: el trabajo se registra en PROSA (deltas, mensajes de commit) mientras los
+ * campos que una sesión lee para DECIDIR —`Status real` y los checkboxes de ZONE 0/4— siguen
+ * diciendo que no empezó.
+ *
+ * Caso fuente (`TASK-1699`, 2026-09-01): 46 checkboxes sin tildar y `Status real: Diseno`, contra
+ * SIETE commits `feat(growth): TASK-1699 Slice N`, un release a producción y una serie de datos
+ * corriendo hacía cuatro días. Cada sesión abría el archivo, leía "diseño, 46 pendientes",
+ * concluía que no estaba empezada, la volvía a ejecutar, escribía otro `## Delta` y no tocaba
+ * ninguno de los dos campos. El bucle se sostiene solo.
+ *
+ * ⚠️ **Warning y no error, a propósito y medido:** 414 de 975 tasks en `complete/` y 59 de 121 en
+ * `in-progress/` tienen checkboxes sin tildar. Un error aquí sería ruido histórico que nadie lee —
+ * exactamente el modo de falla que esta regla combate. Acotada a las que tienen commits de
+ * implementación, la señal cae a 28 tasks: rara, específica y accionable.
+ *
+ * Dónde muerde: `pnpm task:lint --task TASK-###` es lo primero que corre el harness de ejecución,
+ * así que el aviso llega ANTES de re-implementar, que es el único momento en que sirve.
+ */
+const IMPLEMENTATION_SUBJECT_RE = /^(feat|fix|refactor|perf)\(/
+const NOT_STARTED_STATUS_RE = /dise(ñ|n)o|sin empezar|no iniciad/i
+
+const implementationCommitCache = new Map()
+
+const loadImplementationCommits = context => {
+  if (implementationCommitCache.has(context.repoRoot)) return implementationCommitCache.get(context.repoRoot)
+
+  const byTask = new Map()
+
+  try {
+    const out = execFileSync('git', ['log', '--no-merges', '--format=%h%x09%s'], {
+      cwd: context.repoRoot,
+      encoding: 'utf8',
+      maxBuffer: 64 * 1024 * 1024
+    })
+
+    for (const line of out.split('\n')) {
+      const tab = line.indexOf('\t')
+
+      if (tab < 0) continue
+
+      const sha = line.slice(0, tab)
+      const subject = line.slice(tab + 1)
+
+      if (!IMPLEMENTATION_SUBJECT_RE.test(subject)) continue
+
+      for (const match of subject.matchAll(TASK_REF_RE)) {
+        const id = `TASK-${match[1]}`
+
+        if (!byTask.has(id)) byTask.set(id, [])
+        byTask.get(id).push(sha)
+      }
+    }
+  } catch {
+    // Sin git disponible la regla se apaga sola: nunca inventa una contradicción que no puede medir.
+  }
+
+  implementationCommitCache.set(context.repoRoot, byTask)
+
+  return byTask
+}
+
+const countTaskCheckboxes = source => {
+  const done = (source.match(/^- \[[xX]\]/gm) ?? []).length
+  const open = (source.match(/^- \[ \]/gm) ?? []).length
+
+  return { done, total: done + open }
+}
+
+const checkStaleProgress = (task, context) => {
+  if (!task.id) return []
+
+  const { done, total } = countTaskCheckboxes(task.source ?? '')
+
+  if (total === 0 || done > 0) return []
+
+  if (task.folderLifecycle === 'complete') {
+    return [
+      finding({
+        task,
+        rule: 'stale-progress',
+        severity: 'warning',
+        message:
+          `${task.id} está en complete/ con ${total} checkbox(es) y NINGUNO tildado. Cerrar sin ` +
+          'registrar una sola evidencia deja el archivo diciendo que no se hizo nada: la próxima ' +
+          'sesión que lo abra no puede distinguir "cerrada bien" de "cerrada por cansancio".'
+      })
+    ]
+  }
+
+  if (!ACTIVE_TASK_LIFECYCLES.has(task.folderLifecycle)) return []
+
+  const commits = loadImplementationCommits(context).get(task.id) ?? []
+
+  if (commits.length === 0) return []
+
+  const statusReal = task.status?.fields?.['Status real'] ?? task.status?.fields?.['status real'] ?? ''
+  const contradictsStatus = NOT_STARTED_STATUS_RE.test(statusReal)
+  const shown = commits.slice(0, 3).join(', ')
+  const more = commits.length > 3 ? ` (+${commits.length - 3} más)` : ''
+
+  return [
+    finding({
+      task,
+      rule: 'stale-progress',
+      severity: 'warning',
+      ...(task.status?.fieldLines?.['Status real'] ? { line: task.status.fieldLines['Status real'] } : {}),
+      message:
+        `${task.id} tiene ${commits.length} commit(s) de implementación en la historia ` +
+        `(${shown}${more}) y ${total} checkbox(es) con NINGUNO tildado` +
+        (contradictsStatus ? `, mientras "Status real" declara «${statusReal.trim()}»` : '') +
+        '. El estado declarado contradice la historia: VERIFICA qué está hecho antes de ' +
+        're-implementar, y registra la evidencia en los checkboxes — no sólo en un `## Delta`, ' +
+        'que es prosa que nadie lee para decidir si tomar la task.'
+    })
+  ]
+}
+
 export const RULES = [
+  {
+    id: 'stale-progress',
+    appliesTo: task => task.kind === 'template',
+    check: checkStaleProgress
+  },
   {
     id: 'stale-blocker',
     appliesTo: task => task.kind === 'template',

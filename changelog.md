@@ -11,6 +11,35 @@
 
 Nexa publicó el resumen de agosto en `EO Team` con cuatro menciones verificadas y envió cuatro lecturas personales 1:1, todas auditadas como `succeeded`. El runbook, la arquitectura, el manual y las skills espejadas ahora exigen separar cifras de interpretación: volumen no prueba sobrecarga, los atrasos heredados se contextualizan y una muestra de onboarding no se presenta como tendencia. También fijan la jerarquía de evidencia para menciones y el uso de Object ID Entra revalidado cuando un correo escrito contiene un typo. [Evidencia y límites](docs/audits/communications/2026-09-01-performance-report-teambot.md).
 
+## 2026-09-01 — TASK-1699 cerrada, y `task:lint` gana la regla `stale-progress`
+
+El top-N del SERP quedó `complete`: serie viva desde el 2026-08-29 (766 · 775 · 762 · 778 filas en
+4 días) con costo marginal CERO medido, y su señal de cobertura convergió sola a `ok`/`uncovered=0`
+sin tocar el umbral.
+
+Se re-ejecutó cinco veces sin cerrar por un defecto de **registro**, no técnico: 46 checkboxes sin
+tildar y `Status real: Diseno` hacían que cada sesión la leyera como no empezada, mientras el trabajo
+quedaba anotado sólo en prosa.
+
+Regla nueva `stale-progress` en `task:lint`: avisa cuando el estado declarado contradice la historia
+de commits, y cuando una task se cierra sin tildar una sola evidencia. Warning por diseño y por
+medición (414 de 975 completas están así); acotada a las que tienen commits de implementación, la
+señal cae a 28 tasks.
+
+## 2026-08-31 — Blog WordPress sanea categorías y abre una copia gobernada de Demo 35
+
+La taxonomía live quedó reducida a 13 categorías reales: AEO y SEO son raíces;
+Diseño Web depende de Diseño y Redes Sociales de Marketing Digital. Se
+reclasificaron 11 posts reales, se enviaron 20 posts Ohio demo a papelera, se
+retiraron 15 categorías descartadas y Marketing Digital quedó como default.
+Los cambios de URL tienen redirects explícitos y los demo retirados, `410`.
+
+La copia `251875` de Demo 35 está publicada con `noindex` como superficie de
+trabajo; la fuente `225984` y `/blog/` permanecen sin cutover. PDR, contrato,
+manual y skills WordPress Codex/Claude fijan que jerarquía no equivale a
+prominencia y que los 15 widgets deben reconectarse a contenido real antes de
+publicar. [Estado y pendientes](docs/audits/public-site/2026-08-31-blog-taxonomy-demo35-work-copy.md).
+
 ## 2026-08-31 — Las páginas misceláneas dejan de ser “una 404” y ganan ownership
 
 Discovery live confirmó que Ohio padre gobierna 404, búsqueda/no-results y archivos; Elementor Theme Builder
@@ -997,17 +1026,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
 - Cada archivo de test usa **su propio candidato de prueba** en vez de tomarlo de una bolsa común de tres, que era la causa de que tres archivos se estorbaran entre sí.
 - Hay un comando nuevo para correrlos (`pnpm test:live`) que **sólo entrega credenciales de base**. Antes, la forma habitual de dárselas volcaba toda la configuración local al proceso y rompía quince tests de otros equipos que no tenían nada que ver.
 - Dos fallas que engañaban ahora se declaran: un test saltado ya no se puede confundir con uno exitoso, y si falta el túnel a la base el comando lo dice de entrada en vez de fallar al final.
-
-## 2026-08-23 — Quien no queda porque el cupo lo tomó otro ya no figura como rechazado
-
-- El cierre de una vacante llena registra ahora **«sin selección»** con la causa «vacante completada», no un descarte. La diferencia no es de palabras: un descarte es un juicio sobre la persona, la deja fuera del Banco de Talento por defecto y **cuenta como rechazo en el análisis que mide si un proceso discrimina**.
-- El operador ve **exactamente a cuántas personas afectaría** antes de confirmar, agrupadas por cómo entrarían. Quien está en pausa o es respaldo **no entra** salvo que se pida: una la dejó esperando alguien a propósito, y con la otra hay un compromiso abierto.
-- Si el resumen cambió desde que se miró, el sistema **no deja confirmar**: estarías cerrando un grupo distinto del que aprobaste.
-- El correo tiene su propio texto y su propio interruptor, así que se puede pausar un cierre masivo **sin silenciar** los correos de decisión individual. La frase «mantendremos tu perfil» aparece **sólo** si esa persona lo autorizó, verificado en el momento de enviar.
-- Nada de esto está encendido todavía: el cierre y el correo nacen apagados, a la espera del sign-off de Talent y Privacidad.
-
-## 2026-08-23 — Application 360 vuelve al pipeline de la vacante que corresponde
-
-- La pestaña `Pipeline` ahora funciona como retorno contextual desde cualquier postulación: deriva la vacante desde `application.openingId`, en vez de caer en la vacante más reciente.
-- La URL conserva el scope de vacante y, al regresar, el Kanban enfoca la tarjeta de origen sin aplicar filtros que oculten a otros postulantes.
-- La tarjeta y el hero comparten una View Transition breve; reduced motion conserva el mismo destino y foco sin animación. La validación local pasó en 1440 y 390 px, sin errores de consola, página, hidratación ni red.

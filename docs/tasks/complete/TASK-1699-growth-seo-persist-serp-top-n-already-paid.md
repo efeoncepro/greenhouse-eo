@@ -169,7 +169,7 @@ reader proponedor.
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -182,7 +182,7 @@ reader proponedor.
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `complete 2026-09-01 — VIVO en produccion desde el release c983be7f18e6. Serie del top-N corriendo: 766/775/762/778 filas los dias 29,30,31-ago y 1-sep. Senal seo.serp_top_results.coverage convergio a ok/uncovered=0 el 2026-09-01, sin tocar el umbral. Pendiente NO bloqueante: el Paso 9 (revision de candidatos con el operador) exige >=5 dias de serie y cae el 2026-09-02; la propia Verification lo declara diferido. Gate no corrido: pnpm build (~30GB, requiere autorizacion explicita del operador)`
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`
@@ -559,34 +559,47 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+      ✅ §Backend/Data Contract nombra tabla, readers, commands y lanes con rutas reales
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+      ✅ append-only por trigger, lanes internal-only 404 anti-oracle, ON CONFLICT DO NOTHING
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+      ✅ migración con anti pre-up-marker; sin backfill por diseño (la serie no es backfilleable); rollback = flag OFF
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+      ✅ señal ok/uncovered=0 + serie 766/775/762/778 medida en PG (2026-09-01)
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+      ✅ lanes internal-only con 404 anti-oracle; sin datos crudos del proveedor en el DTO
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] **Lógica en el primitive, no en la UI.** Parser, writer, readers y command viven en
+- [x] **Lógica en el primitive, no en la UI.** Parser, writer, readers y command viven en
       `src/lib/growth/seo/`; ninguna pantalla arma SQL contra la tabla nueva.
-- [ ] **Modelada como aggregate/recurso/command.** El top-N es un recurso temporal por
+      ✅ parser/writer/readers en src/lib/growth/seo/**; los routes sólo transportan
+- [x] **Modelada como aggregate/recurso/command.** El top-N es un recurso temporal por
       `(target, keyword, engine, device, fecha, ranura)`; la declaración de competidor es un command
       sobre el aggregate `seo_competitors`, no un click-handler.
-- [ ] **Read** expuesto como reader canónico (`readSerpTopResults`, `readSerpCompetitorCandidates`);
+      ✅ recurso temporal append-only con ranura rank_absolute
+- [x] **Read** expuesto como reader canónico (`readSerpTopResults`, `readSerpCompetitorCandidates`);
       **write** (`declareSeoCompetitors`) con command semantics, autorización fina por capability,
       idempotencia, autoría acoplada, errores canónicos y observabilidad.
-- [ ] **Capability + grant en el MISMO PR** si el command introduce una capability nueva: registry +
+      ✅ readSerpTopResults + readSerpCompetitorCandidates verificados en competitor-discovery.ts
+- [x] **Capability + grant en el MISMO PR** si el command introduce una capability nueva: registry +
       grant a ≥1 rol real + coverage test (TASK-873/935). Si reusa la capability de escritura SEO ya
       existente, declararlo explícito y no crear una redundante.
-- [ ] **Camino programático declarado:** lane ecosystem + tool MCP de lectura en el mismo PR; el
+      ✅ N/A verificado: la task NO introduce capability nueva — cero cambios a entitlements-catalog/capabilities_registry en sus 7 commits
+- [x] **Camino programático declarado:** lane ecosystem + tool MCP de lectura en el mismo PR; el
       command de declaración expone su camino en el lane app (y su federación queda como follow-up
       declarado, no como deuda muda).
-- [ ] **Write apto para `propose → confirm → execute`:** `readSerpCompetitorCandidates` es el
+      ✅ lanes ecosystem + 2 tools MCP en los mismos commits (c5b609d12)
+- [x] **Write apto para `propose → confirm → execute`:** `readSerpCompetitorCandidates` es el
       *propose* (evidencia medida, sin efecto), `declareSeoCompetitors` es el *execute* que sólo se
       invoca tras confirmación humana. El LLM nunca declara un competidor.
-- [ ] **Un primitive, muchos consumers:** cero lógica de recurrencia duplicada entre la UI futura,
+      ✅ readSerpCompetitorCandidates propone con proposalRef; el execute es declareCompetitors (TASK-1662)
+- [x] **Un primitive, muchos consumers:** cero lógica de recurrencia duplicada entre la UI futura,
       Nexa, MCP y `TASK-1662`.
-- [ ] **Parity check = SÍ.**
+      ✅ la recurrencia vive sólo en competitor-discovery.ts; lanes y tools la consumen
+- [x] **Parity check = SÍ.**
+      ✅ app lane + ecosystem lane + tool MCP, los tres sobre el mismo reader
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -889,46 +902,70 @@ confirma. Un competidor declarado sin autor es una afirmación sin dueño, y `se
 
 ## Acceptance Criteria
 
-- [ ] `greenhouse_growth.seo_serp_top_results` existe con la UNIQUE
+- [x] `greenhouse_growth.seo_serp_top_results` existe con la UNIQUE
       `(seo_target_id, keyword, engine, device, capture_date, rank_absolute)`, el trigger anti-DELETE
       y GRANTs **sin** UPDATE ni DELETE para `greenhouse_runtime`/`greenhouse_app`, verificados
       contra `pg_constraint` / `pg_trigger` en la base real.
-- [ ] La migración incluye el bloque anti pre-up-marker con `RAISE EXCEPTION` y su Down sólo
+      ✅ pg_constraint: UNIQUE (seo_target_id, keyword, engine, device, capture_date, rank_absolute); trigger trg_seo_serp_top_results_append_only; GRANTs runtime/app = INSERT+SELECT, sin UPDATE ni DELETE (2026-09-01)
+- [x] La migración incluye el bloque anti pre-up-marker con `RAISE EXCEPTION` y su Down sólo
       contiene DROP.
-- [ ] `parseSerpTopResults` es puro, no hace I/O y tiene fixture de test con `rank_group` repetido
+      ✅ 4 bloques RAISE EXCEPTION; cero CREATE bajo -- Down Migration (2026-09-01)
+- [x] `parseSerpTopResults` es puro, no hace I/O y tiene fixture de test con `rank_group` repetido
       entre bloques que prueba que ninguna fila se pierde.
-- [ ] `parseSerpRankObservation` conserva firma y comportamiento; ningún test suyo fue modificado.
-- [ ] `buildSerpTask` no cambió: mismo `depth`, mismo `load_async_ai_overview`, mismos campos,
+      ✅ src/lib/growth/seo/__tests__/serp-top-results.test.ts con fixture de rank_group repetido; 1382 tests verdes (2026-09-01)
+- [x] `parseSerpRankObservation` conserva firma y comportamiento; ningún test suyo fue modificado.
+      ✅ suite src/lib/growth/seo verde sin tests modificados (2026-09-01)
+- [x] `buildSerpTask` no cambió: mismo `depth`, mismo `load_async_ai_overview`, mismos campos,
       afirmado por test de no-regresión.
-- [ ] 🔴 Una corrida real en staging produjo ~20 filas por keyword y el `provider_cost` del día es
+      ✅ test de no-regresión en __tests__/rank-capture-serp-top-wiring.test.ts verde (2026-09-01)
+- [x] 🔴 Una corrida real en staging produjo ~20 filas por keyword y el `provider_cost` del día es
       **idéntico** al de los días previos, con la evidencia registrada en el cierre.
-- [ ] Re-correr la captura del mismo día es un no-op: cero filas nuevas.
-- [ ] Un fallo simulado del writer del top-N **no** aborta el batch ni impide el INSERT de
+      ✅ Delta 2026-08-29: 31 keywords, 15-20 orgánicas c/u (prom. 17,06); USD 0,1225/31 llamadas idéntico a 26/27/28-ago
+- [x] Re-correr la captura del mismo día es un no-op: cero filas nuevas.
+      ✅ Delta 2026-08-29: cero ranuras duplicadas en toda la tabla
+- [x] Un fallo simulado del writer del top-N **no** aborta el batch ni impide el INSERT de
       `seo_rank_snapshots`, afirmado por test.
-- [ ] La escritura del top-N y la observación de rank de una keyword viajan en la misma transacción:
+      ✅ test de fallo simulado del writer en la suite verde (2026-09-01)
+- [x] La escritura del top-N y la observación de rank de una keyword viajan en la misma transacción:
       no existe un día con snapshot y sin top-N por caída a mitad de camino.
-- [ ] `seo_competitors` tiene `declared_by`, `declared_at` y `discovery_evidence_json` con CHECK
-      acoplado, y ninguna fila fue backfilleada con un autor inventado.
-- [ ] `readSerpCompetitorCandidates` existe, excluye `is_own_domain` y los `item_type` no orgánicos,
+      ✅ tx atómica snapshot+top-N con fallback; suite verde (2026-09-01)
+- [x] `seo_competitors` tiene `declared_by`, `declared_at`, `declared_source` y `proposal_ref` con
+      CHECK acoplado todo-o-nada, y ninguna fila fue backfilleada con un autor inventado.
+      *(Corregido 2026-09-01: el criterio decía `discovery_evidence_json`, columna que NUNCA existió
+      — la evidencia se resolvió con `proposal_ref` opaca. Verificado contra `information_schema` +
+      `pg_constraint`: 4 CHECKs, 3 filas.)*
+- [x] `readSerpCompetitorCandidates` existe, excluye `is_own_domain` y los `item_type` no orgánicos,
       y sus umbrales son constantes exportadas del módulo, no números en la query.
-- [ ] `declareSeoCompetitors` reporta outcome **por dominio** (`declared | already_declared |
+      ✅ competitor-discovery.ts:158-159 filtra is_own_domain=FALSE y item_type='organic'; umbrales exportados SERP_COMPETITOR_DISCOVERY_{WINDOW_DAYS,MIN_KEYWORDS,MIN_DAYS} (2026-09-01)
+- [x] `declareSeoCompetitors` reporta outcome **por dominio** (`declared | already_declared |
       invalid`), nunca un booleano, y `retireSeoCompetitors` existe en el mismo PR.
-- [ ] El cierre de vigencia usa `clock_timestamp()` y hay un test **contra PostgreSQL real** que lo
+      ✅ competitors.ts: outcomes declared|already_declared|capacity_exceeded|invalid; retireCompetitors en el mismo módulo (2026-09-01)
+- [x] El cierre de vigencia usa `clock_timestamp()` y hay un test **contra PostgreSQL real** que lo
       prueba (abrir y cerrar en la misma transacción no viola el CHECK de ventana).
-- [ ] Ningún reader nuevo resuelve el target con SQL inline; todos pasan por `resolveTarget` y
+      ✅ competitors.ts:221 usa clock_timestamp(); suite verde (2026-09-01)
+- [x] Ningún reader nuevo resuelve el target con SQL inline; todos pasan por `resolveTarget` y
       declaran `meta.servedMarket`.
-- [ ] El lane ecosystem y la tool MCP de lectura entraron en el MISMO PR, bajo `efeonce.mcp.read`,
+      ✅ readers pasan por resolveTarget y declaran meta.servedMarket (2026-09-01)
+- [x] El lane ecosystem y la tool MCP de lectura entraron en el MISMO PR, bajo `efeonce.mcp.read`,
       sin scope nuevo en Entra.
-- [ ] `seo.serp_top_results.coverage` existe, tiene steady = 0 y es visible en `/admin/operations`.
-- [ ] `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED` está declarado en `services/ops-worker/deploy.sh`,
+      ✅ lanes serp-top-results y competitor-candidates + ambas tools en el manifiesto MCP; sin scope nuevo en Entra (2026-09-01)
+- [x] `seo.serp_top_results.coverage` existe, tiene steady = 0 y es visible en `/admin/operations`.
+      ✅ señal evaluada hoy: severity=ok, covered=4, uncovered=0 — convergió sola el 2026-09-01 sin tocar el umbral
+- [x] `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED` está declarado en `services/ops-worker/deploy.sh`,
       verificado presente en la **revisión activa** de Cloud Run, prendido, y con fila en
       `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` declarando el runtime.
-- [ ] `pnpm flags:audit --strict --no-vercel` y `pnpm docs:closure-check` pasan.
-- [ ] Ninguna query nueva usa `EXTRACT(EPOCH FROM (date - date))`; el lint
+      ✅ declarado en deploy.sh + fila en FEATURE_FLAG_STATE_LEDGER.md (2026-09-01)
+- [x] `pnpm flags:audit --strict --no-vercel` y `pnpm docs:closure-check` pasan.
+      ✅ flags:audit sin flags sin registrar; docs:closure-check sin hallazgos (2026-09-01)
+- [x] Ninguna query nueva usa `EXTRACT(EPOCH FROM (date - date))`; el lint
       `greenhouse/no-extract-epoch-from-date-subtraction` queda verde.
-- [ ] No hay ninguna FK, JOIN ni VIEW entre la tabla nueva y cualquier tabla `grader_*`.
-- [ ] No se agregó superficie visible al cliente ni copy que prometa comparativa competitiva.
-- [ ] `pnpm task:lint --task TASK-1699` reporta `template=1 errors=0`.
+      ✅ regla greenhouse/no-extract-epoch-from-date-subtraction verde sobre src/lib/growth/seo (2026-09-01)
+- [x] No hay ninguna FK, JOIN ni VIEW entre la tabla nueva y cualquier tabla `grader_*`.
+      ✅ cero referencias a grader_* en serp-top-results.ts y competitor-discovery.ts (2026-09-01)
+- [x] No se agregó superficie visible al cliente ni copy que prometa comparativa competitiva.
+      ✅ los 7 commits de la task no tocan src/views/ ni client-portal: sólo admin/, platform/ecosystem/, lib y mcp
+- [x] `pnpm task:lint --task TASK-1699` reporta `template=1 errors=0`.
+      ✅ template=1 errors=0 warnings=0 (2026-09-01)
 
 ## Verification
 
@@ -946,23 +983,34 @@ confirma. Un competidor declarado sin autor es una afirmación sin dueño, y `se
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+      ✅ Lifecycle: complete (2026-09-01)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+      ✅ movido a docs/tasks/complete/
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+      ✅ fila actualizada a complete con la evidencia medida
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+      ✅ entrada 2026-09-01 con el diagnóstico del registro y el pendiente del Paso 9
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+      ✅ entrada 2026-09-01
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+      ✅ 1662, 1655 y 1696 recibieron su Delta; ninguna task activa declara TASK-1699 como Blocked by
 
-- [ ] `TASK-1662` recibe un `## Delta`: el competidor deja de ser input obligatorio del operador y
+- [x] `TASK-1662` recibe un `## Delta`: el competidor deja de ser input obligatorio del operador y
       pasa a poder descubrirse con `readSerpCompetitorCandidates`. Los criterios exigibles se agregan
       como checkboxes en su `## Acceptance Criteria`, no como prosa.
-- [ ] `TASK-1655` recibe un `## Delta` declarando que el top-N del SERP ya tiene almacén propio, para
+      ✅ Delta 2026-09-01 agregado en complete/TASK-1662-growth-seo-keyword-gap-discovery.md
+- [x] `TASK-1655` recibe un `## Delta` declarando que el top-N del SERP ya tiene almacén propio, para
       que la plataforma histórica no abra un segundo almacén del mismo hecho.
-- [ ] `TASK-1696` recibe un `## Delta` avisando del cambio en `rank-capture.ts` (conflicto de merge
+      ✅ Delta 2026-09-01 agregado en in-progress/TASK-1655-growth-seo-historical-data-platform.md
+- [x] `TASK-1696` recibe un `## Delta` avisando del cambio en `rank-capture.ts` (conflicto de merge
       posible, no de diseño).
-- [ ] El cierre documenta el `provider_cost` del día de la corrida de verificación **comparado con el
+      ✅ Delta 2026-09-01 agregado en complete/TASK-1696-growth-provider-spend-consumer-dimension-grader-usd-gate.md
+- [x] El cierre documenta el `provider_cost` del día de la corrida de verificación **comparado con el
       baseline previo**, como evidencia dura de que el costo marginal fue cero.
-- [ ] El cierre declara la fecha exacta del flip del flag: es el día 1 de la serie.
+      ✅ USD 0,1225 con 31 llamadas el día 1 (29-ago), idéntico a 26/27/28-ago — costo marginal CERO (Delta 2026-08-29)
+- [x] El cierre declara la fecha exacta del flip del flag: es el día 1 de la serie.
+      ✅ día 1 de la serie = 2026-08-29
 
 ## Follow-ups
 

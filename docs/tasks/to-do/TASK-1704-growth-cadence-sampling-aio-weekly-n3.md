@@ -1,5 +1,11 @@
 # TASK-1704 — Cadencia y muestreo declarados: AIO no diario, N≥3 donde la calibración lo exige
 
+## Delta 2026-09-01 — desbloqueada
+
+`TASK-1699` quedó `complete`: la serie del top-N del SERP corre en producción desde el 2026-08-29
+(766 · 775 · 762 · 778 filas en sus primeros 4 días). Su bloqueo sobre esta task queda levantado.
+
+
 ## Delta 2026-08-28 (release a producción) — el bloqueante TASK-1699 ya corre en el runtime real
 
 El release `develop→main` `c983be7f18e68602404567a19ac8e7e0f157f742` (PR #208, run `33178544139`,
@@ -57,7 +63,7 @@ Lo único que queda madurando es la **serie**, no el código: el día 1 es el **
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth`
-- Blocked by: `TASK-1699, TASK-1703`
+- Blocked by: `TASK-1703`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

@@ -1,5 +1,20 @@
 # TASK-1662 — Growth SEO: keyword gap — qué rankea la competencia y el cliente no
 
+## Delta 2026-09-01 — el competidor ya no es input obligatorio del operador
+
+`TASK-1699` dejó vivo `readSerpCompetitorCandidates`: propone competidores por **recurrencia
+medida** en el top-N del SERP ya pagado (umbrales versionados 30d / 3 keywords / 5 días), con
+evidencia y un `proposalRef` opaco `serp_top:v1:*`.
+
+🔴 **El loop no cambia de dueño: sigue siendo `propose → confirm → execute`.** El propose es de
+`1699`; el **execute sigue siendo `declareCompetitors` de esta task**, y sólo con confirmación
+humana que porte ese `proposalRef` verbatim. Un agente NUNCA declara directo desde candidatos.
+
+Estado de la serie al 2026-09-01: 4 días (29, 30, 31-ago y 1-sep). Los candidatos empiezan a
+proponerse con ≥5 días, es decir el **2026-09-02**; una lista vacía con serie joven es el resultado
+esperado, no un error.
+
+
 ## Delta 2026-08-29 (2) — Slice 4 VERIFICADO en producción: el acople entrega 200 items; y el criterio de cierre del Delta anterior era FALSO
 
 El Slice 4 se cierra con evidencia medida, no con espera. En el snapshot vigente de **`seot-berel-mx`**
