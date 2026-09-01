@@ -45,7 +45,7 @@ test rompe el CI si diverge en cualquiera de las dos direcciones. Ya reemplazado
 | `untrack_seo_keywords` ✍️ | **Escribe**: el reverso, cierra la ventana sin borrar historia |
 | `discover_seo_keywords` ✍️ | **Escribe y GASTA por corrida** (Labs Live factura por llamada y por fila); preview + confirmación humana antes de encolar; async (TASK-1664) |
 | `prepare_seo_grounded_queries` ✍️ | **Escribe** un DRAFT AEO (no gasta proveedor, jamás aprueba/activa); con la identidad máquina compartida responde `aeo_forbidden` fail-closed hasta TASK-1631 (TASK-1666) |
-| `run_seo_prospect_diagnostic` ✍️ | **Escribe y GASTA por corrida**: diagnóstico único sobre un prospecto, con confirmación humana previa; flag `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` OFF = estado legítimo (TASK-1709; federada por TASK-1658) |
+| `run_seo_prospect_diagnostic` ✍️ | **Escribe y GASTA por corrida**: diagnóstico único sobre un prospecto, con confirmación humana previa; flag `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` **ON en Production desde 2026-08-27** — un `disabled` hoy es regresión (TASK-1709; federada por TASK-1658) |
 | `declare_seo_competitors` ✍️ | **Escribe y COMPROMETE GASTO DIFERIDO**: la cobertura mensual factura ~USD 0,11 por competidor cada ciclo hasta que alguien lo retire. Techo gobernado por target (default 5), resultados **por dominio** (`declared`/`already_declared`/`capacity_exceeded`/`invalid`), autoría humana obligatoria + `proposalRef` opaco (TASK-1662) |
 | `retire_seo_competitors` ✍️ | **Escribe**: el reverso append-only — cierra `effective_to` con su propia autoría de retiro y corta el gasto del ciclo siguiente. Nunca borra (TASK-1662) |
 

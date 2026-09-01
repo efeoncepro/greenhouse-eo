@@ -196,21 +196,20 @@ conversacional, más largo, más contexto). Disciplina nueva:
   inmutable. La matriz de `../templates/fan-out-matrix.md` es la herramienta de
   diseño de esos packs. Detalle → `../efeonce/AI_VISIBILITY_GRADER.md`.
 
-## llms.txt — qué es y por qué es ROI marginal (as-of 2026-06)
+## llms.txt — objetivo y consumidor antes que archivo (verificado 2026-08-30)
 
-`llms.txt` es un archivo markdown propuesto en la raíz que "resume" el sitio para
-LLMs. **Realidad 2026, sin endulzar:**
-- **Google NO lo usa ni lo endorsa.** John Mueller lo comparó con la difunta meta
-  keywords ("lo que el dueño *dice* que es su sitio"); Gary Illyes confirmó que
-  Google no lo soporta ni planea hacerlo. OpenAI, Anthropic, Meta, Mistral
-  tampoco lo consumen para ranking/recomendación.
-- **Adopción/uso real:** análisis Ahrefs de 137k dominios → **97%** de los
-  `llms.txt` recibieron **cero requests** en mayo 2026; solo ~28% de dominios lo
-  publican.
-- **Veredicto:** es barato de poner y no hace daño, pero **no esperes impacto**.
-  **No lo priorices** sobre estructura de contenido, entidad o frescura. Si el
-  operador lo pide, ponlo (`templates/llms-txt.md`) y sé honesto sobre el ROI.
-  El juego real es el contenido recuperable, no un archivo declarativo.
+`llms.txt` es un archivo Markdown propuesto para orientar a consumidores del sitio.
+[Google aclaró el 15 de junio de 2026](https://developers.google.com/search/updates)
+que no es necesario para Search ni mejora o perjudica visibilidad/ranking, y que
+puede mantenerse para otros sistemas que lo utilicen. No extrapoles esta afirmación
+a OpenAI, Anthropic u otros consumidores sin verificar sus contratos.
+
+Google tampoco exige schema especial de IA: los fundamentos SEO y el contenido útil
+siguen siendo la base ([AI features](https://developers.google.com/search/docs/appearance/ai-features)).
+No agregues archivos o marcado para aprobar un checklist genérico. Si existe un consumidor
+real o el operador pide el archivo, usa `templates/llms-txt.md`, define su mantenimiento
+y distingue utilidad operativa de un impacto SEO no demostrado. No uses estadísticas de
+adopción/requests sin fuente, muestra y fecha verificadas.
 
 ## Tácticas POR MOTOR (cada uno es un canal distinto)
 

@@ -351,8 +351,9 @@ excluida (la dirección que antes era invisible).
 > **live-but-fail-closed** hasta `TASK-1631` igual que las demás escrituras — el scope no está cableado al cliente
 > PKCE público compartido, y eso es deliberado. `prepare_seo_grounded_queries` responde además
 > `aeo_forbidden` fail-closed para la identidad máquina compartida hasta TASK-1631, y el par de
-> prospecto queda detrás de `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` (hoy OFF en todos los ambientes —
-> el canary trata esa respuesta honesta como estado, no como fallo).
+> prospecto queda detrás de `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED`, **ON en Vercel
+> Production desde el 2026-08-27** (verificado con `vercel env ls`). 🔴 El canary ya NO debe
+> normalizar un `disabled`: hoy sería una regresión real, no una respuesta honesta.
 
 **Granularidad del scope: un scope por CLASE DE BLAST-RADIUS, nunca uno por capability.** `efeonce.mcp.seo.write`
 es del DOMINIO (`…seo.write`), no de la capability (`…seo.keywords.track`): un scope por capability convertiría

@@ -148,7 +148,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/tasks/in-progress/TASK-1709-growth-seo-prospect-diagnostic-lane.md` — `Detailed Spec §5`,
+- `docs/tasks/complete/TASK-1709-growth-seo-prospect-diagnostic-lane.md` — `Detailed Spec §5`,
   donde `ProspectFact` define el shape canónico que esta task generaliza.
 - `docs/issues/open/ISSUE-154-seo-keywords-lente-sin-declarar-cuando-hay-dato.md` — el mismo
   invariante roto en la superficie visible; contexto de por qué duele.

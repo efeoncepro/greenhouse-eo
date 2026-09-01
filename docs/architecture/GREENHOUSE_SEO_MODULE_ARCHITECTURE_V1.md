@@ -1940,3 +1940,17 @@ legítimamente. Cuando esa señal exista entra como **factor** del item con su p
 multiplicador del score.
 
 Task dueña: `TASK-1700` (EPIC-022, cierra la brecha S1 de la auditoría 2026-08-15).
+
+## Delta 2026-09-01 — tier `prospect` y la línea de gasto de adquisición (TASK-1709)
+
+`SeoTier` incorpora **`prospect`** como cuarto tier (`entitlement.ts:81`): `resolveSeoEntitlement` lo
+resuelve **sin exigir `module_assignments`**, porque el sujeto del diagnóstico es un dominio que aún
+no es cliente. Es la excepción declarada al modelo per-ORG, no un agujero.
+
+🔴 **Su gasto NO es costo de cliente: es presupuesto de ADQUISICIÓN de Efeonce.** Cada diagnóstico se
+atribuye server-side a la organización canónica de Efeonce en `seo_provider_spend_daily` — verificado
+el 2026-08-27 con la corrida real sobre `skyairline.com`: filas a nombre de «Efeonce Group SpA»,
+separadas de las del cliente medido ese mismo día. Tope duro por diagnóstico (`cost_ceiling_usd`,
+default USD 1,00) validado contra el costo del conjunto ANTES de la primera llamada; previsto USD
+0,2050 vs medido USD 0,1991. **No hay captura recurrente sobre un prospecto** y la migración aborta
+si alguien intenta agregarla.

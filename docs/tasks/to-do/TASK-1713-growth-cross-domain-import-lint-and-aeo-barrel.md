@@ -1,5 +1,11 @@
 # TASK-1713 — Growth: lint rule universal cross-dominio y barrel de dominio AEO
 
+## Delta 2026-09-01 — el campo `Blocked by` queda sólo con el blocker vivo
+
+`TASK-1697` (el sustrato) cerró el 2026-08-27 y esta task heredó su molde. El único blocker vigente
+es `TASK-1695`. La mención a 1697 sale del campo para que el guard no la lea como bloqueo vigente.
+
+
 > ⚠️ **ID reasignado al crear la task.** El brief la nombró `TASK-1710`, pero ese ID ya está tomado
 > por el umbrella P0 de remediación de confiabilidad
 > (`docs/tasks/to-do/TASK-1710-reliability-remediation-control-plane-delivery-data.md`, commit
@@ -37,7 +43,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth`
-- Blocked by: `TASK-1695` — su otra dependencia (`TASK-1697`, el sustrato) cerró 2026-08-27: `site-substrate` existe con carta + rule angosta; esta task hereda el molde
+- Blocked by: `TASK-1695`
 - Branch: `Greenhouse develop; local-first, sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

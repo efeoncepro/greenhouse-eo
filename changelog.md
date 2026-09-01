@@ -11,6 +11,16 @@
 
 Nexa publicó el resumen de agosto en `EO Team` con cuatro menciones verificadas y envió cuatro lecturas personales 1:1, todas auditadas como `succeeded`. El runbook, la arquitectura, el manual y las skills espejadas ahora exigen separar cifras de interpretación: volumen no prueba sobrecarga, los atrasos heredados se contextualizan y una muestra de onboarding no se presenta como tendencia. También fijan la jerarquía de evidencia para menciones y el uso de Object ID Entra revalidado cuando un correo escrito contiene un typo. [Evidencia y límites](docs/audits/communications/2026-09-01-performance-report-teambot.md).
 
+## 2026-09-01 — TASK-1709 cerrada y la doc que la daba por apagada
+
+El carril de diagnóstico de prospecto llevaba **5 días desplegado** (flag ON en Vercel Production
+desde el 27-ago, corrida real sobre `skyairline.com`) mientras cuatro skills, el runbook del gateway
+MCP, dos manuales y la doc funcional decían "flag OFF en todos los ambientes". El runbook incluso
+instruía al canary a normalizar un `disabled` — que hoy sería una regresión. Corregido en 9 archivos.
+
+Tier `prospect` documentado: se resuelve sin `module_assignments` y su gasto es presupuesto de
+adquisición de Efeonce, nunca costo de cliente.
+
 ## 2026-09-01 — TASK-1699 cerrada, y `task:lint` gana la regla `stale-progress`
 
 El top-N del SERP quedó `complete`: serie viva desde el 2026-08-29 (766 · 775 · 762 · 778 filas en
@@ -1019,10 +1029,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
 - Al volver por la pestaña `Pipeline`, Greenhouse recupera la postulación exacta incluso si quedó fuera del límite habitual, consume el foco temporal de la URL y deja la tarjeta enfocada. Si ya no existe, muestra una recuperación honesta en vez de seleccionar otra.
 - El recorrido `1 de 2 → 2 de 2 → Pipeline` pasó Playwright/GVC en 1440 y 390 px, con View Transition compartida y cero errores de consola, página, hidratación o red.
 - El contrato quedó incorporado en arquitectura y en las skills de Talent, Motion y GVC. La auditoría documental detectó que el snapshot del board aún puede incluir postulaciones archivadas; el delta no está listo para rollout hasta cerrar esa brecha.
-
-## 2026-08-23 — Los tests contra base real dejan de fallar por pisarse entre ellos
-
-- Los tests que corren contra la base de verdad ahora se ejecutan **de a uno**, no en paralelo: comparten una sola base con producción, así que correrlos a la vez hacía que se pisaran y fallaran sin motivo real.
-- Cada archivo de test usa **su propio candidato de prueba** en vez de tomarlo de una bolsa común de tres, que era la causa de que tres archivos se estorbaran entre sí.
-- Hay un comando nuevo para correrlos (`pnpm test:live`) que **sólo entrega credenciales de base**. Antes, la forma habitual de dárselas volcaba toda la configuración local al proceso y rompía quince tests de otros equipos que no tenían nada que ver.
-- Dos fallas que engañaban ahora se declaran: un test saltado ya no se puede confundir con uno exitoso, y si falta el túnel a la base el comando lo dice de entrada en vez de fallar al final.

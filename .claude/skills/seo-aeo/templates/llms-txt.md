@@ -1,10 +1,10 @@
 # Plantilla `llms.txt`
 
-> ⚠️ **Contexto de ROI (as-of 2026-06):** Google NO usa ni endorsa `llms.txt`
-> (Mueller/Illyes); el 97% de los archivos recibieron cero requests en may-2026.
-> Es barato y no daña, pero **no lo priorices** sobre estructura de contenido,
-> entidad y frescura (ver `modules/04_AEO_GEO.md`). Inclúyelo solo como
-> complemento, siendo honesto con el operador sobre su impacto marginal.
+> **Uso condicionado, verificado 2026-08-30:** Google no requiere `llms.txt` ni le
+> atribuye efecto positivo/negativo en visibilidad o ranking
+> ([aclaración oficial](https://developers.google.com/search/updates)).
+> Úsalo para un consumidor identificado o por petición explícita, con mantenimiento;
+> no como requisito SEO/AEO. No extrapoles el contrato Google a todos los motores.
 
 El archivo va en la raíz: `https://EXAMPLE.com/llms.txt`. Formato markdown.
 

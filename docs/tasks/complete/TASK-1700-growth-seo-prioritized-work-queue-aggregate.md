@@ -313,7 +313,7 @@ esta task debe respetar al consumirlo:
 
 ## Delta 2026-08-28 — TASK-1699 quedó code complete: el origen `competitor_gap` tiene TODA su cadena de productores en código
 
-`TASK-1699` quedó **code complete, rollout pendiente** (`in-progress/`, en develop `fdfdedbe5`):
+`TASK-1699` quedó **`complete` el 2026-09-01**: desplegada en el release `c983be7f18e6` y con su serie corriendo (766·775·762·778 filas los días 29, 30, 31-ago y 1-sep) (antes decía `in-progress/`, en develop `fdfdedbe5`):
 tabla `seo_serp_top_results` append-only, parser hermano `parseSerpTopResults` con costo marginal
 cero, cableado en el rank capture tras `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED` (ON declarativo), y
 `readSerpCompetitorCandidates` — el **PROPOSE** del loop de competidores (recurrencia medida,
@@ -323,7 +323,7 @@ tiene toda su cadena de productores en código: descubrimiento (1699) → declar
 cobertura (1662) → `readKeywordGap`. La **activación** del origen sigue gated por el rollout: la
 serie del top-N arranca con el primer deploy del worker post-release y los candidatos necesitan
 ≥5 días de serie; la cobertura del gap sigue tras su propio flag. El bloqueo de `Blocked by` por
-`TASK-1699` puede considerarse **satisfecho en código** — lo que falta es rollout, no task.
+`TASK-1699` quedó `complete` el 2026-09-01: código y rollout, ambos hechos.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE

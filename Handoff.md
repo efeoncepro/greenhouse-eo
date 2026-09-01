@@ -8,6 +8,28 @@ Nexa publicó el anuncio grupal en `EO Team` con cuatro menciones reconocidas co
 
 El workflow canónico sigue siendo temporal para DMs genéricos: aprobación → Entra activa → dry-run → dedupe/source object → `--yes` → auditoría. Lo recurrente converge a Notification Hub; no quedó script permanente.
 
+## 2026-09-01 (2) — TASK-1709 `complete`: llevaba 5 días desplegada y la doc decía OFF
+
+Mismo defecto de registro que `TASK-1699`, detectado por la regla `stale-progress` **a los dos
+minutos de existir**: 4 commits de implementación, 33 checkboxes sin tildar, `Status real: Diseno`.
+
+🔴 **Lo peor no era la task: era la doc.** Cuatro skills (×2 espejos), el runbook del gateway MCP,
+dos manuales y la doc funcional decían *"flag OFF en todos los ambientes"*. Verificado con
+`vercel env ls`: **`GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` está ON en Production desde el
+2026-08-27**. El runbook llegaba a instruir al canary a tratar un `disabled` como *"respuesta honesta,
+no fallo"* — hoy eso **enmascararía una regresión real**. Corregido en los 9 archivos.
+
+Evidencia medida: 2 diagnósticos y 11 hechos sobre `skyairline.com`; previsto USD 0,2050 vs medido
+USD 0,1991 bajo tope duro de USD 1,00; gasto atribuido a «Efeonce Group SpA» en el ledger —
+presupuesto de **adquisición**, no costo de cliente. Tier `prospect` documentado en la arquitectura §9.
+
+⚠️ **Debilidad detectada en el guard `stale-blocker`** (no la arreglé, la registro): lee la línea
+completa del campo `Blocked by`, así que una explicación entre paréntesis que **nombre** al blocker
+ya cerrado se reporta como bloqueo vigente. Me pasó dos veces hoy (1704/1708 y 1670/1695/1713). La
+salida fue mover la razón a un `## Delta` y dejar el campo limpio. El arreglo de fondo sería que la
+dirección reversa use `parseBlockedByIds` —que ya existe— en vez de un `matchAll` sobre la línea
+cruda. De paso quedaron desbloqueadas `TASK-1670`, `1695` y `1713`.
+
 ## 2026-09-01 — TASK-1699 `complete`, y el defecto de REGISTRO que la re-ejecutaba en bucle
 
 **La task estaba hecha desde el 28-ago; lo que nunca pasó es que el archivo lo registrara.** Tenía
@@ -544,35 +566,3 @@ Rematerializar antes del deploy escribiría snapshots v2 que el código en produ
 **Límite declarado, no diferido en silencio:** las sub-marcas no se detectan desde el dominio y **NO**
 se cierran colgando el score de `grader_profiles.brand_name` — es captura de leads del grader público,
 mayoría sin `organization_id` y con filas de smoke, no un SSOT de marca por organización.
-
-## 2026-08-29 (3.º) — Release `88e1f652f1c2`: la ventana de re-pausa quedó cerrada
-
-**Manifest `released`** (run `33263788245`, un solo run, los dos gates aprobados sin stall). Watchdog
-`drift_count=0`. `main` y el runtime ahora coinciden: los dos schedulers del módulo SEO declarados
-`"false"` en el SoT y `ENABLED` en vivo. **Ningún deploy puede volver a pausarlos en silencio.**
-
-- `ops-seo-work-queue-materialize` — `ENABLED 0 10 * * *`
-- `ops-seo-competitor-coverage` — `ENABLED 0 9 18 * *`; ejercitado por el camino desatendido con
-  costo **USD 0** (`eligible: 0` porque el competidor del 28 está dentro de su ventana de frescura de
-  30 días; verificado en el SQL del colector, no inferido del summary).
-
-Residual del `ops-worker` en `c2e9e3a50a44`: change-gate legítimo en su caso más fuerte — el sanity
-**sin** `--` devuelve 0 archivos, o sea árboles idénticos, no sólo «rutas runtime sin cambios».
-
-**Corrección propagada:** la cola de `seot-efeonce-own-brand` es **55 banda 2 + 50 banda 3**, no
-«todas banda 2» como escribí. La lectura era de 8 filas y la reporté como total. Corregido en
-`deploy.sh`, arquitectura §18, ledger de flags y `rules/growth-seo.md`. La distinción importa: banda 3
-es «nadie llega todavía, el verbo honesto es medir», que es justo la banda creada para no fabricar un
-score.
-
-**Pendiente en otra sesión (ya resuelto por ella):** las 5 decisiones `dismissed` de un script de
-sanity que retiraban las mayores oportunidades de Berel se revirtieron con `deferred` que supersede
-—append-only, sin DELETE—, y la rematerialización devolvió `reused: true` por hash, probando que
-restauró el plan previo y no inventó uno nuevo.
-
-**Siguiente paso:** `TASK-1794`. Su Slice 2 cambia de diseño — en vez de darle `packages: read` a la
-App del watchdog (acoplaría al observador de releases con la emisión de credenciales de build), el
-camino es el `GITHUB_TOKEN` efímero de Actions pasado a Cloud Build por substitución, que **no deja
-secreto que custodiar**. Requiere dar acceso de lectura a `greenhouse-eo` en los tres paquetes
-`@efeoncepro/axis-*` (son de `axis-design-system`). Hallazgo lateral a corregir ahí mismo: el
-`.npmrc` que genera `deploy.sh` tiene 2 líneas y el del secreto tiene 3 (falta `@jsr`).

@@ -77,8 +77,8 @@ contrafactual, el número describe un patrón — no prueba un lift.** Decláral
 
 - **Tratar "AEO" como canal único** — optimizar genérico "para IA" sin distinguir
   motor. Cada motor cita fuentes distintas (`04_AEO_GEO.md`).
-- **Sobre-invertir en `llms.txt`** — Google no lo usa, 97% reciben cero requests.
-  Ponerlo si quieres, pero no a costa de estructura/frescura/entidad.
+- **Sobre-invertir en `llms.txt`** — Google no lo requiere ni le atribuye efecto en ranking.
+  Otros consumidores necesitan evidencia propia; ver `modules/04_AEO_GEO.md`.
 - **Spam en Reddit/comunidades** — autopromoción descarada. Reddit y los modelos
   castigan el spam; quema la marca. Participación = valor genuino o nada.
 - **Fabricar reseñas / señales falsas** — reseñas compradas, menciones falsas.

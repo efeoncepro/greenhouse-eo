@@ -249,8 +249,8 @@ interna**. Una ausencia en un lado nunca es, por sí sola, evidencia de olvido.
 - `run_seo_prospect_diagnostic` (TASK-1709) — corre un diagnóstico ÚNICO sobre el dominio de un
   **prospecto** (sin contrato, sin acceso del cliente): **compromete gasto real del proveedor por
   corrida**, así que exige confirmación humana previa del dominio/mercado y su costo estimado.
-  El flag `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` en OFF es un estado legítimo (el carril aún no
-  está prendido), no un fallo
+  🔴 El flag `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` está **ON en Vercel Production desde el
+  2026-08-27**: un `disabled` hoy es una REGRESIÓN, no un estado legítimo.
 
 Qué entregan:
 

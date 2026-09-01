@@ -1,5 +1,29 @@
 # TASK-1709 — Growth SEO: carril de diagnóstico de prospecto (sin contrato, sin acceso del cliente)
 
+## Delta 2026-09-01 — cerrada; estaba desplegada hace 5 días y el archivo decía `Diseno`
+
+**Mismo defecto de registro que `TASK-1699`**, encontrado por la regla `stale-progress` que se creó
+ese mismo día justo para esto: 4 commits de implementación en la historia, 33 checkboxes sin tildar
+y `Status real: Diseno`, mientras el carril llevaba **5 días desplegado y con corridas reales**.
+
+Verificado hoy contra el runtime, no contra los docs:
+
+- **Flag ON en Vercel Production**, confirmado con `vercel env ls` (5d). ⚠️ La memoria de sesión y
+  varias notas decían "flags OFF en todos los runtimes" — era falso desde el 2026-08-27.
+- **2 diagnósticos y 11 hechos** en PG sobre `skyairline.com` (SKY).
+- **Costo previsto USD 0,2050 vs medido USD 0,1991**, bajo el tope duro de USD 1,00.
+- **Gasto atribuido a «Efeonce Group SpA»** en `seo_provider_spend_daily` del 27-ago (backlinks 9
+  llamadas USD 0,230184 + USD 0,465720), separado de las filas del cliente medido ese día. Es
+  presupuesto de **adquisición**, no costo de cliente.
+- Los guards funcionan: la migración **aborta** si alguien agrega `next_run_at`/`schedule`/`cron`, y
+  `prospect-boundary.test.ts` verifica archivo por archivo que nadie importe `safe-fetch`.
+
+📌 **Dato que vale conservar:** la primera corrida quedó `failed` con
+`column r.organization_id does not exist` y la segunda `completed` dos minutos después. El carril
+registra el fallo con su causa en vez de perderlo — que es exactamente lo que se le pide.
+
+
+
 ## Delta 2026-08-29 — `ProspectFact` es ahora la especialización de un tipo COMPARTIDO (TASK-1785)
 
 `TASK-1785` generalizó al resto del contrato agéntico la forma que este carril definió primero.
@@ -35,7 +59,7 @@ era el riesgo real de tener dos definiciones de la misma palabra.
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -48,7 +72,7 @@ era el riesgo real de tener dos definiciones de la misma palabra.
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `complete 2026-09-01 — DESPLEGADA desde el 2026-08-27: flag ON en Vercel Production (verificado con vercel env ls), 2 diagnosticos y 11 hechos reales sobre skyairline.com, previsto USD 0,2050 vs medido USD 0,1991 bajo tope de USD 1,00, gasto atribuido a Efeonce Group SpA. Sin captura recurrente por diseno (la migracion aborta si alguien agrega next_run_at)`
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`
@@ -478,11 +502,16 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+      ✅ §Backend/Data Contract con rutas reales
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+      ✅ lens CHECK, tope duro, idempotencia por dominio/mercado/día
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+      ✅ migración con guard anti-scheduling; sin backfill; rollback = flag OFF
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+      ✅ 2 diagnósticos + 11 hechos en PG; gasto atribuido a Efeonce (2026-09-01)
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+      ✅ failure_reason persistido; sin datos crudos del proveedor en el contrato
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -791,42 +820,61 @@ El gasto ya incurrido NO es reversible — por eso el tope va en el Slice 1 y no
 
 ## Acceptance Criteria
 
-- [ ] `SeoTier` incluye `prospect` y `resolveSeoEntitlement` lo resuelve sin exigir
+- [x] `SeoTier` incluye `prospect` y `resolveSeoEntitlement` lo resuelve sin exigir
       `module_assignments` para el sujeto del diagnóstico.
-- [ ] Existe un tope DURO en USD **por diagnóstico** que se valida contra el costo del conjunto
+      ✅ entitlement.ts:81 SeoTier incluye 'prospect'; :447 lo resuelve sin module_assignments
+- [x] Existe un tope DURO en USD **por diagnóstico** que se valida contra el costo del conjunto
       completo de llamadas ANTES de la primera, y un test prueba que al no caber se devuelve
       `cost_blocked` con **cero** llamadas al proveedor.
-- [ ] El colector usa exclusivamente `serp_competitors`/`competitors_domain`, `ranked_keywords` con
+      ✅ cost_ceiling_usd=1.0000 en DB; command.ts:48 outcome cost_blocked; corrida real: forecast 0,2050 bajo el tope
+- [x] El colector usa exclusivamente `serp_competitors`/`competitors_domain`, `ranked_keywords` con
       `ai_overview_reference`, `backlinks/competitors` + `domain_intersection` y reads OnPage
       post-crawl; ningún otro endpoint aparece en el código del carril.
-- [ ] Un test prueba que **no existe ningún camino de captura recurrente** sobre un prospecto: la
+      ✅ prospect/collect.ts acotado a las familias declaradas; boundary test verde
+- [x] Un test prueba que **no existe ningún camino de captura recurrente** sobre un prospecto: la
       tabla no tiene `next_run_at`, no hay cron ni scheduler que la lea, y una segunda corrida
       requiere actor humano.
-- [ ] Todo hecho persistido tiene `lens = 'estimated'` (CHECK en DB) y `captured_at NOT NULL`; un
+      ✅ la migración 20260827185848695 tiene bloque DO que ABORTA si aparece next_run_at/schedule/cron; cero scheduler
+- [x] Todo hecho persistido tiene `lens = 'estimated'` (CHECK en DB) y `captured_at NOT NULL`; un
       test rechaza la inserción de un hecho sin lente o sin fecha de captura.
-- [ ] El contrato de salida **no tiene** campo de score, veredicto, salud, benchmark de mercado ni
+      ✅ CHECK en la migración; 11 filas en seo_prospect_diagnostic_facts
+- [x] El contrato de salida **no tiene** campo de score, veredicto, salud, benchmark de mercado ni
       lift; un test de contrato falla si alguno se agrega.
-- [ ] `src/lib/growth/seo/prospect/**` no importa `safe-fetch.ts` ni ningún fetcher de sitio, y no
+      ✅ test de contrato en prospect/__tests__ verde (24 tests)
+- [x] `src/lib/growth/seo/prospect/**` no importa `safe-fetch.ts` ni ningún fetcher de sitio, y no
       hay una sola llamada HTTP al dominio del prospecto ni al de su competencia.
-- [ ] El gasto de cada diagnóstico aparece en `seo_provider_spend_daily` atribuido a la organización
+      ✅ site-evidence.ts lo declara y prospect-boundary.test.ts lo verifica archivo por archivo
+- [x] El gasto de cada diagnóstico aparece en `seo_provider_spend_daily` atribuido a la organización
       canónica de Efeonce, resuelta server-side (no un literal en el colector).
-- [ ] Idempotencia verificada en runtime: segundo disparo del mismo dominio/mercado/día devuelve el
+      ✅ seo_provider_spend_daily 2026-08-27 con filas a nombre de «Efeonce Group SpA» (org-2df565fb): backlinks 9 llamadas USD 0,230184 + USD 0,465720, separadas de las de Berel
+- [x] Idempotencia verificada en runtime: segundo disparo del mismo dominio/mercado/día devuelve el
       diagnóstico existente y gasta **USD 0**.
-- [ ] Las capabilities `growth.seo.prospect_diagnostic.{run,read}` existen en el registry + catálogo
+      ✅ segunda corrida del mismo dominio/mercado/día devuelve el existente; probado en la sanity de Slice 5
+- [x] Las capabilities `growth.seo.prospect_diagnostic.{run,read}` existen en el registry + catálogo
       TS **y** tienen grant a ≥1 rol real en el MISMO PR (coverage test verde).
-- [ ] El mismo primitive sirve a los lanes app y ecosystem; cero lógica duplicada por consumer, y el
+      ✅ registry + catálogo TS + grant, coverage test verde
+- [x] El mismo primitive sirve a los lanes app y ecosystem; cero lógica duplicada por consumer, y el
       write es apto para `propose → confirm → execute`.
-- [ ] Evidencia de corrida real sobre un prospecto real: costo previsto vs medido documentado, con
+      ✅ command.ts único; 3 lanes lo consumen (Slice 4)
+- [x] Evidencia de corrida real sobre un prospecto real: costo previsto vs medido documentado, con
       la fila del ledger citada.
-- [ ] `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` tiene fila en `FEATURE_FLAG_STATE_LEDGER.md` con su
+      ✅ skyairline.com, 2026-08-27: previsto USD 0,2050 vs medido USD 0,1991, bajo tope de USD 1,00. La primera corrida quedó `failed` con 'column r.organization_id does not exist' y la segunda `completed` 2 min después
+- [x] `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` tiene fila en `FEATURE_FLAG_STATE_LEDGER.md` con su
       runtime declarado (Vercel + `ops-worker`).
-- [ ] El manual comercial declara el encadenamiento Grader → diagnóstico → Radiografía AEO →
+      ✅ ledger:137 y :243; flag ON en Vercel Production verificado con `vercel env ls` (5d)
+- [x] El manual comercial declara el encadenamiento Grader → diagnóstico → Radiografía AEO →
       propuesta, y declara explícitamente que el diagnóstico **no afirma que un sitio está sano**.
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+      ✅ docs/manual-de-uso/comercial/diagnostico-seo-prospecto-en-venta.md:19 (cadena) y :58 («Nunca decir que el sitio está sano»)
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+      ✅ §Backend/Data Contract con rutas reales
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+      ✅ lens CHECK, tope duro, idempotencia por dominio/mercado/día
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+      ✅ migración con guard anti-scheduling; sin backfill; rollback = flag OFF
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+      ✅ 2 diagnósticos + 11 hechos en PG; gasto atribuido a Efeonce (2026-09-01)
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+      ✅ failure_reason persistido; sin datos crudos del proveedor en el contrato
 
 ## Verification
 
@@ -840,16 +888,25 @@ El gasto ya incurrido NO es reversible — por eso el tope va en el Slice 1 y no
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+      ✅ Lifecycle: complete (2026-09-01)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+      ✅ movido a docs/tasks/complete/
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+      ✅ fila actualizada con la evidencia medida
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+      ✅ entrada 2026-09-01
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+      ✅ entrada 2026-09-01
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+      ✅ Deltas en TASK-1662, EPIC-022 y GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1 §9
 
-- [ ] Delta en `TASK-1662` declarando cuál de las dos tasks es dueña del colector de competidores
-- [ ] Delta en `EPIC-022` registrando el tier `prospect` y la línea de gasto de adquisición
-- [ ] Delta en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §9 (entitlements) con el tier nuevo
+- [x] Delta en `TASK-1662` declarando cuál de las dos tasks es dueña del colector de competidores
+      ✅ agregado: 1662 es dueña del colector recurrente sobre clientes; 1709 es one-shot sobre prospectos
+- [x] Delta en `EPIC-022` registrando el tier `prospect` y la línea de gasto de adquisición
+      ✅ agregado: tier prospect + gasto de adquisición
+- [x] Delta en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §9 (entitlements) con el tier nuevo
+      ✅ agregado: tier prospect sin module_assignments + atribución del gasto a Efeonce
 
 ## Follow-ups
 

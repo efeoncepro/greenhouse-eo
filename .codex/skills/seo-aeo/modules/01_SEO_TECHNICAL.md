@@ -4,7 +4,7 @@
 > sitemaps, canonicalización, datos estructurados (JSON-LD), arquitectura de
 > sitio, y **gestión de crawlers de IA** (robots para GPTBot/ClaudeBot/etc.).
 > Sello base: as-of 2026-06; delta GSC/API verificado 2026-07-18; cambio de
-> extracción JSON-LD de Google verificado 2026-08-21. Reverifica umbrales CWV,
+> extracción JSON-LD de Google verificado 2026-08-21; FAQ y Home metadata 2026-08-30. Reverifica umbrales CWV,
 > lista de bots, parsers y features de Search Console con WebSearch.
 
 ## Mapa mental: la técnica habilita las 3 capas
@@ -127,10 +127,9 @@ del renderer real.
 
 - **Formato:** JSON-LD en `<head>` o `<body>` (preferido por Google sobre
   microdata/RDFa). Plantillas listas en `templates/jsonld/`.
-- **Doble propósito 2026:** (a) *rich results* en SERP clásica (estrellas, FAQ,
-  breadcrumb, sitelinks); (b) **hechos legibles por máquina** que ayudan a los
-  motores IA a *entender y citar* la entidad. El schema es de los pocos puentes
-  donde ganas en SEO y AEO con el mismo trabajo.
+- **Dos usos distintos:** describir hechos legibles por máquina y habilitar experiencias
+  de búsqueda que admitan ese tipo. Ninguno garantiza ranking o citas de IA.
+  Inspecciona el grafo existente y su dueño antes de añadir marcado.
 - **Tipos de mayor valor:** `Organization` (+ `sameAs`, logo, founder),
   `WebSite`, `Article`/`BlogPosting` (+ `author` con
   ⚠️ **`SearchAction` está MUERTO en Google:** el cuadro de búsqueda de sitelinks que alimentaba
@@ -145,9 +144,13 @@ del renderer real.
 - **Reglas:** marca solo contenido **visible** en la página (marcar contenido
   oculto = violación). Mantén el schema sincronizado con el contenido real.
   Valida con Rich Results Test + Schema.org validator.
-- **Nota de volatilidad:** Google ha recortado qué rich results muestra (p.ej.
-  FAQ/HowTo se restringieron en 2023). Marca igual por la capa de entidad/IA,
-  pero no prometas el rich snippet sin verificar elegibilidad vigente.
+- **FAQ, verificado 2026-08-30:** Google retiró FAQ rich results el 7 de mayo de 2026
+  y la documentación el 15 de junio ([fuente oficial](https://developers.google.com/search/updates)).
+  FAQPage sigue en Schema.org; no lo añadas automáticamente ni prometas un rich result.
+  Las preguntas y respuestas útiles, visibles y accesibles conservan su valor.
+
+Para Home/landings carga `../references/home-landing-metadata-schema.md`: title/H1/social,
+propiedad del grafo, alcance local/global, escrituras CMS y límites de verificación.
 
 ### Cambio de parser 2026-08-21: un solo HTML unescape
 
@@ -347,7 +350,7 @@ reporte del crawler**. Cuatro de sus filas exigen verificación manual.
 1. ¿Indexación rota? (GSC Pages) → arreglar primero, bloquea todo lo demás.
 2. ¿Contenido crítico requiere JS? → SSR/SSG.
 3. ¿CWV en rojo en campo (CrUX)? → INP y LCP primero.
-4. ¿JSON-LD de `Organization`/`Article`/`Person` presente y válido? → agregar.
+4. ¿El grafo existente representa la página y sus entidades? → corregir o completar sólo tipos pertinentes, sin duplicar dueño.
 5. ¿robots permite retrieval IA? → revisar.
 6. ¿Internal linking a páginas dinero? → reforzar.
 7. ¿Logs muestran desperdicio de rastreo? → solo si sitio grande.

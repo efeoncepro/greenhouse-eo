@@ -1,5 +1,13 @@
 # TASK-1670 — Growth: hallazgos de sitio (crawlers IA, JSON-LD, sitemap) en el audit SEO
 
+## Delta 2026-09-01 — desbloqueada
+
+El blocker eran los Slices 1+2 de `TASK-1697` (el `git mv` del sustrato + su test de frontera).
+Esa task cerró el 2026-08-27: `src/lib/growth/site-substrate/` existe con su carta y su rule angosta.
+El campo queda en `none`; la razón vive acá y no en el campo, porque el guard `stale-blocker` lee la
+línea completa y una explicación que nombre al blocker cerrado se reporta como bloqueo vigente.
+
+
 ## Delta 2026-08-27 (2) — DESBLOQUEADA: TASK-1697 cerró (Slices 1+2 y también 3+4)
 
 El sustrato existe en `@/lib/growth/site-substrate` (barrel: `createSiteFetcher`,
@@ -157,7 +165,7 @@ de revisión humana—; y se retira el follow-up "extracción a `search-visibili
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|data`
-- Blocked by: `TASK-1697` (**sólo sus Slices 1+2**: el `git mv` del sustrato + su test de frontera; el resto de 1697 corre en paralelo — ver Delta 2026-08-15 (2))
+- Blocked by: `none`
 - Branch: `Greenhouse develop; local-first, sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

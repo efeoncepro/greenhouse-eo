@@ -980,7 +980,7 @@ abarata por cadencia y muestreo (`TASK-1704`).
 - `TASK-1706` — el alta de keyword es un compromiso de gasto.
 - `TASK-1707` — rollout del re-grade recurrente multi-runtime.
 - `TASK-1708` — estacionalidad: la serie de 12 meses que ya viene en `keyword_info`.
-- `TASK-1709` — carril de diagnóstico de prospecto SEO. *100 diagnósticos ≈ USD 50.*
+- `TASK-1709` — carril de diagnóstico de prospecto SEO. *100 diagnósticos ≈ USD 50.* ✅ **complete 2026-09-01, VIVO en producción** (flag ON en Vercel desde el 27-ago; corrida real sobre `skyairline.com`: previsto USD 0,2050 vs medido USD 0,1991).
 - `TASK-1797` — el umbral de impresiones del striking-distance no discrimina: se declara relativo (`max(piso, p75)`) y el percentil cae sobre el piso en las dos orgs medidas (Berel p75=10, Efeonce p75=12, piso 10). Obliga a medir las tres etapas del embudo —1748 elegibles → 600 pedidos → 200 del cap— antes de mover la constante, porque el cap manda sobre el umbral y subirlo no cambiaría lo que el operador ve.
 
 ### Tasks congeladas, con disparador nombrado (ninguna se mata)
@@ -1072,3 +1072,19 @@ No autoriza fusionar scores SEO y AEO en un número único: **la ortogonalidad e
 pausado —**no lo está**, `deploy.sh` lo declara `true` en ambos entornos— sino porque falta el
 command que inscribe perfiles: `recurring_regrade_enabled` no tiene writer), ni atribución de
 ingresos a citación en IA (no existe el modelo).
+
+## Delta 2026-09-01 — `TASK-1709` cerrada: el tier `prospect` y la línea de gasto de adquisición
+
+El módulo gana un cuarto tier, `prospect`, que se resuelve **sin `module_assignments`**: el sujeto es
+un dominio que todavía no es cliente. Con eso el epic deja de ser sólo una herramienta para clientes
+contratados y pasa a ser también herramienta de **venta**.
+
+Su gasto es **presupuesto de adquisición de Efeonce**, atribuido server-side a la org canónica de
+Efeonce, nunca al prospecto ni a un cliente. Corrida real verificada el 2026-08-27 sobre
+`skyairline.com`: previsto USD 0,2050 vs medido USD 0,1991, bajo tope duro de USD 1,00. Flag ON en
+Vercel Production desde el 2026-08-27 (verificado con `vercel env ls`). Sin captura recurrente por
+diseño.
+
+⚠️ **Se cerró con el mismo defecto de registro que `TASK-1699`**: 33 checkboxes sin tildar y
+`Status real: Diseno` mientras el carril estaba desplegado y con corridas reales en la base. Lo
+detectó la regla `stale-progress` de `task:lint`, creada el mismo día justo para esto.

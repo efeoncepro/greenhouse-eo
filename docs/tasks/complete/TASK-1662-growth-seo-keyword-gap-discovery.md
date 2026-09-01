@@ -1,5 +1,17 @@
 # TASK-1662 — Growth SEO: keyword gap — qué rankea la competencia y el cliente no
 
+## Delta 2026-09-01 — quién es dueño del colector de competidores
+
+Dos carriles proponen competidores y **no compiten**: `readSerpCompetitorCandidates` (`TASK-1699`)
+propone por recurrencia medida en el top-N ya pagado, y el diagnóstico de prospecto (`TASK-1709`)
+los trae de `serp_competitors`/`backlinks` para un dominio **sin acceso de cliente**.
+
+🔴 **El dueño del colector recurrente sobre clientes es ESTA task** (`domain_intersection`, ciclo
+mensual, ledger anti-fuga). `1709` es one-shot sobre prospectos, sin captura recurrente por diseño —
+su migración tiene un guard que aborta si alguien le agrega `next_run_at`. El execute sigue siendo
+`declareCompetitors`, de esta task.
+
+
 ## Delta 2026-09-01 — el competidor ya no es input obligatorio del operador
 
 `TASK-1699` dejó vivo `readSerpCompetitorCandidates`: propone competidores por **recurrencia
@@ -438,7 +450,7 @@ Reglas obligatorias:
   primitive de mercado completo, y en particular **`deriveLinkBarrier()`**, que dice si el gap es
   recuperable. El volumen solo es ◑ estimado, agrupado en *broad* y redondeado a buckets del
   proveedor; ordenar por él pone arriba justo lo que no se puede ganar (ver Delta 2026-08-15)
-- **`TASK-1699`** `[por crear]` — descubrimiento de competidores desde el top-N que el rank capture
+- **`TASK-1699`** `[complete 2026-09-01]` — descubrimiento de competidores desde el top-N que el rank capture
   **ya paga** (`depth 20`) más `competitors_domain`/`serp_competitors`/`bulk_traffic_estimation`
   (~USD 0,03/corrida). Sin esto, esta task asume conocido al competidor, que es su supuesto más
   frágil

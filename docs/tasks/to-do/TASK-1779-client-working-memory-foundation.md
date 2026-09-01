@@ -13,7 +13,7 @@ sigue sin crear, alterar ni escribir `greenhouse_growth.seo_competitors`.
 
 ## Delta 2026-08-28
 
-- `TASK-1699` quedó **code complete, rollout pendiente** (`in-progress/`, en develop `fdfdedbe5`) y
+- `TASK-1699` quedó **`complete` el 2026-09-01**: desplegada en el release `c983be7f18e6` y con su serie corriendo (766·775·762·778 filas los días 29, 30, 31-ago y 1-sep) y
   la coordinación de orden anticipada acá quedó resuelta: su modelo aterrizó con **cero ALTER a
   `seo_competitors`** (la autoría del ALTER quedó en `TASK-1662`, ya implementada); 1699 aporta la
   tabla nueva `seo_serp_top_results` y el descubrimiento `readSerpCompetitorCandidates` (propose;

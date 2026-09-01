@@ -113,6 +113,7 @@ decláralo. Ramifica la recomendación según las respuestas.
 | Si el problema es… | Carga |
 |---|---|
 | Rastreo, indexación, velocidad (CWV), JSON-LD, sitemaps, render JS, **crawlers IA** | `modules/01_SEO_TECHNICAL.md` |
+| Home/landing: title, metadescripción, OG/Twitter, grafo existente, scope página/global y cierre con evidencia | `references/home-landing-metadata-schema.md` + `modules/01_SEO_TECHNICAL.md`; WordPress se ejecuta con su skill dueña |
 | 404, búsqueda interna, categorías/tags/autor/fecha, paginación imposible y archivos vacíos | `modules/01_SEO_TECHNICAL.md` §Superficies especiales; en WordPress carga `../efeonce-public-site-wordpress/references/miscellaneous-surfaces.md` |
 | Intent, topical authority, pillar/cluster, programmatic, decay, canibalización | `modules/02_SEO_CONTENT.md` |
 | Confianza/autoridad de marca y autor, **entidad/Knowledge Graph**, YMYL | `modules/03_EEAT_ENTITY.md` |

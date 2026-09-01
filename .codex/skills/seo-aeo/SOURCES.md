@@ -15,6 +15,13 @@
 
 ## 1. Niveles de volatilidad (qué reverificar y cada cuánto)
 
+**Verificado 2026-08-30:** [Search Central updates](https://developers.google.com/search/updates):
+FAQ rich results retirados el 7 de mayo; documentación retirada el 15 de junio. La aclaración
+de llms.txt del 15 de junio no invalida su uso por otros sistemas. [AI features](https://developers.google.com/search/docs/appearance/ai-features)
+no exige schema especial de IA. Método aplicado a Home/landings:
+`references/home-landing-metadata-schema.md`; evidencia del caso en
+`docs/audits/public-site/2026-08-30-home-seo-aeo.md`.
+
 | Nivel | Significado | Ejemplos | Reverificar |
 |---|---|---|---|
 | 🟢 **Estable** | cambia en años; principios de fondo | intención de búsqueda, topical authority, qué es E-E-A-T, RAG/embeddings, valor de calidad/enlaces relevantes | rara vez |
@@ -126,8 +133,9 @@ memoria en un entregable.
 - **Preferencias de cita:** ChatGPT ↦ Wikipedia (**47.9%**); Perplexity ↦ Reddit
   (**~46.7%**); Reddit #1 across engines; **YouTube superó a Reddit** como social
   más citada (inicios 2026).
-- **llms.txt:** Google no lo usa/endorsa (Mueller/Illyes); **97%** recibieron 0
-  requests (Ahrefs, may-2026); ~28% de dominios lo publican.
+- **llms.txt (actualizado 2026-08-30):** no requerido ni señal de ranking en Google,
+  según su aclaración del 15 de junio enlazada arriba. No extrapolar a otros sistemas
+  ni reutilizar cifras de adopción/requests sin verificar fuente y muestra.
 - **AI crawlers:** training (GPTBot/ClaudeBot/Google-Extended/CCBot) vs retrieval
   (OAI-SearchBot/ChatGPT-User/PerplexityBot); bloquear bots IA → **−23.1%**
   tráfico sin reducir citas de forma fiable (Rutgers/Wharton, dic-2025).
