@@ -427,11 +427,16 @@ El rango de planificación queda CLP 194.503–217.228 hasta contar con Billing 
   La ejecución live de Producer a las 23:04Z leyó CLP 1.614,51 netos en la ventana previa, pero devolvió
   `status=awaiting_billing_export`, `confirmedSavings=null`: el export seguía en 13:00Z y no fabricó ahorro desde
   un after vacío.
-- Corte de observación Producer a las 23:05Z: 27 ejecuciones posteriores al cambio, 27 completadas y cero
-  fallidas; `queueOldestAgeSeconds`, edad de promotion queue, retry storm, intentos terminales y divergencias
-  permanecieron en 0. Cloud Scheduler vive en `southamerica-east1` y el Cloud Run Job en
-  `southamerica-west1`; el readback debe consultar cada superficie en su región. La ventana lleva 2 h 10 min
-  y por eso no autoriza todavía el apply de Media.
+- Globe `e290a8a` publica un segundo readback fail-closed para la observación operativa. La allowlist fija los
+  tres jobs, sus schedules admitidos y sus eventos de completitud; sólo ejecuta `scheduler jobs describe`,
+  `run jobs executions list` y `logging read`. Cuenta los ticks exactos, separa Cloud Scheduler
+  `southamerica-east1` de Cloud Run `southamerica-west1` y mantiene `readyForNextCutover=false` hasta que la
+  ventana esté completa y cadence, target, cola, fallos, retry storm, intentos terminales y divergencias estén
+  sanos. El test focal pasa 4/4 y quedó incorporado a `pnpm test`; la suite completa terminó con exit 0.
+- Su ejecución live de Producer a las 23:10Z observó 28 ticks esperados, 28 completados, cero ausentes, último
+  execution exitoso, colas máximas 0 y cero fallos/retries/terminales/divergencias. Devolvió
+  `status=observing`, `windowComplete=false` y `readyForNextCutover=false`, por lo que no autoriza todavía el
+  apply de Media.
 
 ## Rollout Plan & Risk Matrix
 
@@ -524,6 +529,7 @@ Terraform, un scheduler a la vez. El rollback restaura el schedule anterior.
 - `tofu -chdir=/Users/jreye/Documents/efeonce-globe/infra/terraform plan`
 - `gcloud --configuration=globe scheduler jobs describe ... --project=efeonce-globe`
 - queries read-only de Cloud Logging/Monitoring y Billing Export
+- `pnpm finops:job-observation-readback -- --job=globe-producer-worker --cutover=2026-09-01T20:55:00Z --window=24h '--expected-schedule=*/5 * * * *'`
 - `pnpm finops:job-cost-readback -- --job=globe-producer-worker --cutover=2026-09-01T20:55:00Z --window=24h`
 - `pnpm qa:gates --changed`
 - `pnpm docs:closure-check`
