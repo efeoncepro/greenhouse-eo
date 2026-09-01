@@ -85,6 +85,25 @@ Para infografías complejas, usar ALT breve + descripción larga equivalente. Ca
 - Evita: contenido inyectado tras interacción, lazy-load sin fallback, hash
   routing (`#`) para contenido único.
 
+### Superficies especiales: 404, búsqueda y archivos
+
+No apliques una política global de robots, canonical o schema a todas las
+superficies misceláneas. Clasifica primero la intención y el estado HTTP:
+
+| Superficie | Contrato SEO técnico por defecto |
+| --- | --- |
+| 404 real o paginación imposible | Respuesta HTTP `404`, `noindex`, sin canonical y sin redirect genérico a Home. |
+| Búsqueda interna | Respuesta `200`, `noindex, follow`; `SearchResultsPage` solo si describe contenido visible y no duplica otro grafo. La query vacía no debe convertirse en inventario público. |
+| Categoría o autor editorial indexable | `200`, canonical propio, paginación coherente, enlaces internos y schema proporcional al contenido visible. |
+| Tag, fecha o taxonomía custom | Decisión explícita basada en utilidad y calidad; no heredar indexabilidad por accidente. |
+| Archivo vacío o delgado | Conservar, consolidar o retirar de forma explícita; el volumen por sí solo no justifica indexación. |
+
+Para Efeonce WordPress, carga
+`../../efeonce-public-site-wordpress/references/miscellaneous-surfaces.md`.
+La auditoría live confirmó que Ohio, no Elementor Theme Builder, posee hoy 404,
+búsqueda y archivos. Cualquier cambio de ownership necesita spike y evidencia
+del renderer real.
+
 ## 4. Experiencia de página — Core Web Vitals (umbrales as-of 2026-06)
 
 | Métrica | "Good" | Qué mide | Palancas |

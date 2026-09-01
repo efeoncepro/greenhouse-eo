@@ -66,6 +66,39 @@ mutate the footer during discovery.
   social accessible labels, newsletter/legal mixed-language copy, and
   inconsistent link targets.
 
+## Miscellaneous Surface Facts
+
+Use `miscellaneous-surfaces.md` for the complete decision and verification
+matrix. The live discovery on 2026-08-31 established this baseline:
+
+- 404 renders from parent `ohio/404.php`.
+- Search renders from parent `ohio/search.php`; no-results delegates to parent
+  `ohio/parts/content-none.php`; the native search form comes from parent
+  `ohio/searchform.php`.
+- Category, tag, author, date, custom-taxonomy and ordinary archive requests
+  fall through parent `ohio/index.php`.
+- The child theme owns `parts/elements/page_headline.php`, so it can participate
+  in the shared chrome without becoming the content owner for every surface.
+- The Elementor library exposed 68 documents but no verified Theme Builder
+  template/condition owning 404, search, or archive. Ohio's observed Theme
+  Builder integration covers header/footer only. Treat broader support as an
+  unproven spike, not as the implementation default.
+- HTTP/SEO semantics are intentionally different by surface: 404 and impossible
+  pagination stay real 404 responses; search stays `200` + `noindex`; indexable
+  archives require their own canonical/pagination decision; empty or thin
+  taxonomies require an explicit keep/consolidate/retire decision.
+- Live QA found demo/global-chrome debt, a published searchable title carrying
+  `(Borrador)`, an empty search returning the complete inventory, missing
+  `<main>` landmarks, and horizontal overflow. These are separate owned slices;
+  a new 404 template must not silently absorb them.
+
+Canonical evidence:
+
+- `docs/audits/public-site/2026-08-31-wordpress-miscellaneous-surfaces-discovery.md`
+- `docs/architecture/public-site/PUBLIC_MISCELLANEOUS_SURFACES_V1.md`
+- `docs/documentation/public-site/public-miscellaneous-surfaces.md`
+- `docs/manual-de-uso/public-site/operar-paginas-miscelaneas.md`
+
 ## Classic Navigation Menu Facts
 
 Use this when the user asks how to add a URL to the public-site menu. Do not

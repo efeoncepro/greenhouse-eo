@@ -53,6 +53,7 @@ Read the minimal set:
 | Claude Design → modular Elementor, Home, brand marks, rails, linked cards, or video dialog | `references/source-led-elementor-patterns.md` + the landing reference; add mutation/custom-widget references when writing |
 | Historical layout incident or older public page | `references/layout-incidents.md` |
 | Runtime discovery, bridge inspection, repo binding, Kinsta/WP inventory | `references/runtime-and-discovery.md` |
+| 404, search/no-results, category/tag/author/date archives, impossible pagination or empty taxonomy | `references/miscellaneous-surfaces.md` + `references/runtime-and-discovery.md`; add the SEO technical module when robots, canonical, schema, or indexability changes |
 | Demo 35 / future blog home | `references/landing-workflow.md` + `references/elementor-mutation.md` + `references/landings/demo35-blog-magazine.md` |
 | AEO `/aeo-2/` | `references/landings/aeo.md` |
 | Agencia Creativa `/agencia-creativa/` | `references/landings/agencia-creativa.md` |
@@ -70,6 +71,10 @@ Use repo docs as source of truth for long-lived contracts:
 - `docs/operations/discovery-public-website-elementor-20260614.md`
 - `docs/documentation/public-site/wordpress-ohio-elementor-layout.md`
 - `docs/documentation/public-site/wordpress-blog-content-hub-search.md`
+- `docs/architecture/public-site/PUBLIC_MISCELLANEOUS_SURFACES_V1.md`
+- `docs/audits/public-site/2026-08-31-wordpress-miscellaneous-surfaces-discovery.md`
+- `docs/documentation/public-site/public-miscellaneous-surfaces.md`
+- `docs/manual-de-uso/public-site/operar-paginas-miscelaneas.md`
 - `docs/audits/public-site/2026-07-09-demo35-blog-magazine-layout-review.md`
 - `docs/audits/public-site/2026-08-22-demo35-elementor-runtime-contract.md`
 - `docs/manual-de-uso/public-site/operar-wordpress-blog-content-hub-search.md`

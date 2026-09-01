@@ -2,6 +2,21 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-08-31 — Superficies misceláneas WordPress: discovery y canon, sin rollout
+
+Se documentó el ownership live de 404, búsqueda/no-results, categorías, tags, autor, fecha y archivos:
+Ohio padre sigue resolviendo `404.php`, `search.php`, `content-none.php`, `searchform.php` e `index.php`; la
+librería Elementor no tiene templates/conditions especiales y la integración Ohio observada sólo cubre
+header/footer. El diseño objetivo queda `child-theme-first`, con `PublicUtilityRecoverySurface`, búsqueda y
+archivos como slices separadas y reglas HTTP/SEO por query type. No hubo mutación WordPress, caché ni deploy.
+
+Riesgos P0 observados: una página pública/indexable con `(Borrador)` en título/slug y chrome global con enlaces
+demo/rotos; search vacío expone 154 resultados. El runtime repo continúa con WIP ajeno y
+`fullRepoDeploySafe=false`, por lo que una futura publicación exige artefacto acotado de `ohio-child`, snapshot,
+rollback y aprobación. Canon:
+`docs/architecture/public-site/PUBLIC_MISCELLANEOUS_SURFACES_V1.md` y
+`docs/audits/public-site/2026-08-31-wordpress-miscellaneous-surfaces-discovery.md`.
+
 ## 2026-08-31 — Content Marketing: pin/contraste publicados; E2E bloqueado por Turnstile
 
 Paquete focal de **dos assets** publicado en la página `242603`: JS

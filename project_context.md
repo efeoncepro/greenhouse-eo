@@ -121,13 +121,12 @@ compartido staging+prod**, así que una capacidad worker-only queda viva al merg
 control plane, y **no existe un flip "sólo staging"** (invariantes en
 [`OPS_RELIABILITY_AGENT_INVARIANTS.md`](docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md)).
 
-Berel se opera desde Notion con `berel-content-production`: decide por contenido público vivo, relee relaciones y
-conteos al cerrar, y mantiene gates visibles para piezas históricas, sensibles, soft-404 o aún no validadas.
+Berel: Notion live + skill `berel-content-production`. Contacto/cobertura:
+`docs/context/01_quienes-somos.md` y `docs/public-site/CONTACT_PAGE_REBUILD_BRIEF_V1.md`.
 
-Contacto institucional y cobertura: `docs/context/01_quienes-somos.md`; brief pendiente: `docs/public-site/CONTACT_PAGE_REBUILD_BRIEF_V1.md`.
-
-WordPress/Ohio: skill `efeonce-public-site-wordpress`; mantenimiento Home en su referencia
-`home-editorial-maintenance.md`; Elementor modular: [Home](docs/architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md) · [HubSpot](docs/architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md). `Index eligible` no prueba indexación.
+WordPress/Ohio: skill `efeonce-public-site-wordpress`; contratos [Home](docs/architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md),
+[HubSpot](docs/architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md) y [misceláneas](docs/architecture/public-site/PUBLIC_MISCELLANEOUS_SURFACES_V1.md).
+Este último sigue propuesto: Ohio padre es live y Theme Builder no está probado. `Index eligible` no prueba indexación.
 
 ### Lectura mínima obligatoria
 

@@ -125,7 +125,9 @@ Verifica:
 
 - status 200;
 - `noindex, follow`;
+- query vacía no devuelve el inventario completo;
 - resultados no mezclen contenido indeseado si estas evaluando hub editorial;
+- títulos públicos no contengan marcadores editoriales como `(Borrador)`;
 - texto visible del headline;
 - sidebar;
 - sin errores de layout.
@@ -133,13 +135,21 @@ Verifica:
 La busqueda nativa mezcla `post`, `page`, attachments, landings y portfolio. Para
 un buscador del content hub, planifica una query restringida a `post`.
 
+Para 404, no-results, archivos vacíos y paginación imposible, sigue
+`docs/manual-de-uso/public-site/operar-paginas-miscelaneas.md`. No apliques una
+misma política robots/canonical a todos los archivos y no asumas que Elementor
+Theme Builder controla estas superficies sin una condición live verificable.
+
 ## Revisar Render Ohio
 
 El blog usa parent Ohio. No busques `category.php` o `archive.php` en el child:
 las superficies principales son:
 
 - `ohio/index.php` para categorias/tags/archivos;
+- `ohio/404.php` para 404;
 - `ohio/search.php` para resultados;
+- `ohio/parts/content-none.php` para no-results;
+- `ohio/searchform.php` para el formulario nativo;
 - `ohio/single.php` para entradas;
 - `ohio/parts/blog_grid/layout_type*.php` para cards.
 

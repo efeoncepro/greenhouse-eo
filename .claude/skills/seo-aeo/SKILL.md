@@ -113,6 +113,7 @@ decláralo. Ramifica la recomendación según las respuestas.
 | Si el problema es… | Carga |
 |---|---|
 | Rastreo, indexación, velocidad (CWV), JSON-LD, sitemaps, render JS, **crawlers IA** | `modules/01_SEO_TECHNICAL.md` |
+| 404, búsqueda interna, categorías/tags/autor/fecha, paginación imposible y archivos vacíos | `modules/01_SEO_TECHNICAL.md` §Superficies especiales; en WordPress carga `../efeonce-public-site-wordpress/references/miscellaneous-surfaces.md` |
 | Intent, topical authority, pillar/cluster, programmatic, decay, canibalización | `modules/02_SEO_CONTENT.md` |
 | Confianza/autoridad de marca y autor, **entidad/Knowledge Graph**, YMYL | `modules/03_EEAT_ENTITY.md` |
 | **Pieza-hito anual** (color del año, informe, ranking, premio): cadencia propia + de mercado, ventana de publicación y **claim perecedero** con tarea de retiro; **canibalización interna** (leyendo contenido, no slugs), **estacionalidad vinculante** y **pre-emptor de tesis** antes de fijar el ángulo | `modules/02_SEO_CONTENT.md` (+ `modules/04_AEO_GEO.md` si otra marca publicó el mismo concepto: **atribución equivocada**) |

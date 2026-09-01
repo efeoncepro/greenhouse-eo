@@ -140,6 +140,8 @@ Indice maestro de la documentacion no operativa del repo.
 ### Public Site (producto)
 
 - [Public Site — Producto (índice)](public-site/README.md)
+- [Public Site — Arquitectura](architecture/public-site/README.md)
+- [404, búsqueda y archivos — contrato propuesto](architecture/public-site/PUBLIC_MISCELLANEOUS_SURFACES_V1.md)
 - [Product Roadmap del sitio público](public-site/PRODUCT_ROADMAP.md)
 - [Decisiones de producto (PDR)](public-site/decisions/)
 

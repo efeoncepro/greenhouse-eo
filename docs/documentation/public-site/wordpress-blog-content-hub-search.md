@@ -132,8 +132,11 @@ Ohio es dueño del render de archivos, busqueda y single posts:
 
 | Superficie | Template |
 | --- | --- |
+| 404 | parent `ohio/404.php` |
 | Categorias/tags/archivos | parent `ohio/index.php` |
 | Resultados de busqueda | parent `ohio/search.php` |
+| Estado sin resultados | parent `ohio/parts/content-none.php` |
+| Formulario de busqueda | parent `ohio/searchform.php` |
 | Single post | parent `ohio/single.php` |
 | Cards | parent `ohio/parts/blog_grid/layout_type*.php` |
 | Single layouts | parent `ohio/parts/blog/layout_type*.php` |
@@ -180,6 +183,9 @@ La busqueda viva usa WordPress search:
 - Orden: match en titulo primero, luego fecha descendente.
 - URLs: `/?s=query` y `/search/query/`.
 - Robots: Yoast sirve search results como `noindex, follow`.
+- Una query vacía devuelve actualmente el inventario completo (154 resultados
+  en el corte 2026-08-31), por lo que debe tratarse como defecto funcional y no
+  como estado válido de descubrimiento.
 
 Por defecto, search incluye tipos publicos como:
 
@@ -200,6 +206,12 @@ hub debe ser distinta de la busqueda global del sitio:
 
 Mantener `noindex, follow` en resultados de busqueda salvo PDR/SEO task que
 demuestre lo contrario.
+
+La auditoría también encontró un resultado publicado cuyo título visible
+incluye `(Borrador)`. La corrección editorial y el endurecimiento de la query
+son deuda P0 separada del rediseño visual. El contrato completo de 404,
+búsqueda, no-results y archivos vive en
+`docs/documentation/public-site/public-miscellaneous-surfaces.md`.
 
 ## Sidebar y Navegacion Editorial
 
@@ -298,13 +310,21 @@ no duplicar contenido indexado.
 - Cambiar categoria cambia URL por estructura permalink.
 - Tags demo contaminan related posts y tag cloud.
 - Search actual devuelve paginas comerciales y portfolios, no solo contenido.
+- Una búsqueda vacía expone el inventario completo y existe al menos un título
+  público con marcador `(Borrador)`.
 - Sidebar actual expone material demo y copy mixto.
 - Posts demo siguen publicados y pueden aparecer en busqueda/archivos.
 - `eo-vibe-coding-api` tiene scaffold de `blog-hub`, pero no es hub final.
+- Categoría, tag, autor y fecha no comparten una política SEO única: cada
+  superficie necesita decisión explícita de indexabilidad, canonical y
+  paginación.
 
 ## Documentacion Relacionada
 
 - `docs/audits/public-site/2026-07-09-wordpress-blog-content-hub-search.md`
+- `docs/audits/public-site/2026-08-31-wordpress-miscellaneous-surfaces-discovery.md`
+- `docs/architecture/public-site/PUBLIC_MISCELLANEOUS_SURFACES_V1.md`
+- `docs/documentation/public-site/public-miscellaneous-surfaces.md`
 - `docs/audits/public-site/2026-07-09-demo35-blog-magazine-layout-review.md`
 - `docs/documentation/public-site/gutenberg-post-authoring-recipes.md`
 - `docs/documentation/public-site/public-site-content-factory-end-to-end.md`

@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-08-31 — Las páginas misceláneas dejan de ser “una 404” y ganan ownership
+
+Discovery live confirmó que Ohio padre gobierna 404, búsqueda/no-results y archivos; Elementor Theme Builder
+no tiene templates/conditions especiales activos. Se creó el contrato child-theme-first, el comportamiento
+funcional, el runbook, el registro de primitive propuesto y las rutas en skills WordPress/SEO. La política separa
+recovery, búsqueda, archivos editoriales y chrome global, con HTTP/robots/canonical por query type. No hubo
+mutación ni publicación. Persisten P0: contenido público `(Borrador)`, search vacío con 154 resultados y enlaces
+demo/rotos globales. [Discovery y límites](docs/audits/public-site/2026-08-31-wordpress-miscellaneous-surfaces-discovery.md).
+
 ## 2026-08-31 — Content Marketing: cierre técnico focal en producción
 
 El stage ya aplica el mismo gate de alto/ancho al cargar y redimensionar; 1440×650 conserva los
@@ -1005,24 +1014,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
 - La pestaña `Pipeline` ahora funciona como retorno contextual desde cualquier postulación: deriva la vacante desde `application.openingId`, en vez de caer en la vacante más reciente.
 - La URL conserva el scope de vacante y, al regresar, el Kanban enfoca la tarjeta de origen sin aplicar filtros que oculten a otros postulantes.
 - La tarjeta y el hero comparten una View Transition breve; reduced motion conserva el mismo destino y foco sin animación. La validación local pasó en 1440 y 390 px, sin errores de consola, página, hidratación ni red.
-
-## 2026-08-23 — Cinco personas reales eran buscables en el Banco de Talento por una postulación que alguien había retirado
-
-- «Postulación en proceso activo» pasó a tener **una sola definición** en toda la plataforma, y son **tres
-  ejes, no uno**: el proceso no terminó (`decision`) **y** el registro no fue retirado de la vista
-  (`archived_at`). Antes, once lugares distintos respondían esa pregunta mirando la **etapa**, cada uno con su
-  propia lista escrita a mano.
-- Preguntar por etapa fallaba por una razón concreta: **archivar devuelve la postulación a su etapa anterior**.
-  Una postulación archivada volvía a verse «en Preseleccionado», así que seguía contando como viva. Medido: **5
-  personas reales** figuraban como «en proceso activo» en el Banco de Talento —y por lo tanto buscables e
-  invitables— únicamente por una postulación que alguien había archivado a propósito. Pasan a
-  `needs_reconsent`.
-- La señal de salud de la asignación de pruebas dejó de vivir en amarillo por datos de humo (`ISSUE-162`):
-  contaba **13** postulaciones esperando, de las cuales **10 eran de prueba, archivadas**. Ahora cuenta **3**,
-  que son las reales, y **reporta aparte** las 10 que excluyó — un filtro que no dice cuánto dejó fuera es
-  indistinguible de un tope silencioso.
-- Si ves un conteo de activas más bajo que ayer, es esto y no se perdió ningún dato: las postulaciones
-  archivadas siguen completas, sólo dejaron de contarse como procesos vivos. Cuántas son se lee en
-  `/admin/operations`.
-- Un gate de CI rechaza que alguien vuelva a escribir la lista a mano, y una señal de confiabilidad detecta en
-  runtime lo que el gate no alcanza a ver.
