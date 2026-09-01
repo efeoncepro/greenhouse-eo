@@ -47,7 +47,13 @@ import type { SeoSpaceOption } from '@/lib/growth/seo/overview/list-seo-spaces'
 
 import SeoHealthGauge from '../shared/SeoHealthGauge'
 import SeoSearchVisibilityTabs from '../overview/SeoSearchVisibilityTabs'
-import { STALE_CRAWL_DAYS, daysSinceCrawl, groupAuditIssues } from './group-audit-issues'
+import SiteAuditSiteFindings from './SiteAuditSiteFindings'
+import {
+  STALE_CRAWL_DAYS,
+  daysSinceCrawl,
+  groupAuditIssues,
+  partitionAuditIssuesByScope
+} from './group-audit-issues'
 import type { SeoAuditIssueGroup } from './group-audit-issues'
 
 /**
@@ -161,10 +167,21 @@ const SiteAuditView = ({
     [router, selectedSpaceId, openIssueGroup, severityFilter]
   )
 
-  const allGroups = useMemo(() => (report?.ok ? groupAuditIssues(report.findings) : []), [report])
+  const groupedFindings = useMemo(() => (report?.ok ? groupAuditIssues(report.findings) : []), [report])
+
+  // TASK-1671 — Los hallazgos de DOMINIO salen de la lista priorizada y van a su propia
+  // región. Una sola pasada de agrupación alimenta las dos: no hay un segundo comparador.
+  const { site: siteGroups, page: allGroups } = useMemo(
+    () => partitionAuditIssuesByScope(groupedFindings),
+    [groupedFindings]
+  )
 
   // El filtro acota lo que se LISTA, nunca lo que se cuenta: la banda de salud sigue
   // diciendo el total del crawl. Si acotara ambos, filtrar parecería que el sitio mejoró.
+  //
+  // TASK-1671 — y NO alcanza a la región de dominio: `?severity=critical` no puede esconder
+  // un hallazgo de sitio `notice`, porque esa región no es una lista explorable sino un
+  // veredicto, y ocultar la mitad de un veredicto lo convierte en otro veredicto.
   const groups = useMemo(
     () => (severityFilter ? allGroups.filter(group => group.severity === severityFilter) : allGroups),
     [allGroups, severityFilter]
@@ -937,6 +954,12 @@ const SiteAuditView = ({
         ) : null}
 
         {healthStrip()}
+
+        {/* TASK-1671 — Entre la salud y la lista. La región NO se renderiza cuando el run no
+            trae filas de dominio: ese caso es "no se midió" (run histórico o previo al flip del
+            flag), y mostrar "Verificado" ahí sería el falso sano que TASK-1670 cerró en el
+            motor, reintroducido en la UI. La distinción se lee del DATO, nunca del flag. */}
+        {siteGroups.length > 0 ? <SiteAuditSiteFindings groups={siteGroups} /> : null}
 
         {hasFindings ? (
           issuesList()

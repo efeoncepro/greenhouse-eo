@@ -2871,7 +2871,10 @@ export const GH_GROWTH_SEO_AUDIT = {
     title: 'Issues priorizados',
     // Se nombra EXACTAMENTE lo que ordena la lista. Prometer un criterio que los datos no
     // sostienen es la misma clase de mentira que pintar un cero donde no hubo medición.
-    subtitle: 'Primero lo crítico; dentro de cada nivel, lo que más mueve la aguja en búsqueda por lo que menos cuesta resolver',
+    // TASK-1671 — declara además el ALCANCE de esta lista. Con la región de dominio arriba, un
+    // subtítulo que no diga "por página" deja al operador sin saber por qué hay dos bloques.
+    subtitle:
+      'Problemas por página. Primero lo crítico; dentro de cada nivel, lo que más mueve la aguja en búsqueda por lo que menos cuesta resolver',
     affected: (pages: number) => (pages === 1 ? '1 página afectada' : `${pages} páginas afectadas`),
     view: 'Ver',
     viewAria: (issueName: string) => `Ver las páginas afectadas por ${issueName}`,
@@ -2928,8 +2931,11 @@ export const GH_GROWTH_SEO_AUDIT = {
     runningDescription: (domain: string) => `Estamos revisando ${domain}. Esto puede tardar unos minutos.`,
     runningDescriptionNoDomain: 'Estamos revisando el sitio. Esto puede tardar unos minutos.',
 
-    cleanTitle: 'Sin issues detectados',
-    cleanDescription: 'El crawl terminó y no encontró problemas de los que revisamos.',
+    cleanTitle: 'Sin problemas de página',
+    // TASK-1671 — acotado a PÁGINA a propósito. Con la región de dominio arriba, un "no
+    // encontró problemas" sin alcance se contradice con un hallazgo de sitio crítico
+    // renderizado tres centímetros más arriba, y el operador no sabe a cuál creerle.
+    cleanDescription: 'El crawl terminó y no encontró problemas de página de los que revisamos.',
 
     degradedTitle: 'El crawl terminó parcialmente',
     degradedDescription:
@@ -2961,6 +2967,46 @@ export const GH_GROWTH_SEO_AUDIT = {
     budgetExhausted: 'Este Space agotó su presupuesto de proveedor del mes.',
     notEntitled: 'Este Space no tiene el módulo SEO habilitado para correr auditorías.',
     generic: 'No pudimos encolar la auditoría. Intenta de nuevo.'
+  },
+
+  /**
+   * TASK-1671 — Región de hallazgos de SITIO (dominio), arriba de la lista priorizada.
+   *
+   * Este copy viaja al artefacto descargable de TASK-1672 y de ahí a una agencia externa, así que
+   * cada frase tiene que sostenerse fuera de la pantalla. Dos reglas que lo gobiernan:
+   *  - el lugar de detección es OBLIGATORIO (es lo que impide que el cliente abra su robots.txt
+   *    limpio y concluya que el informe miente);
+   *  - `postureLabel` reemplaza a "Info" SÓLO en el bloqueo de entrenamiento: `notice` describe
+   *    prioridad y acá hace falta describir naturaleza.
+   */
+  site: {
+    title: 'Acceso y presentación del sitio',
+    subtitle: 'Lo que vale para todo el dominio, no para una página',
+    /** Ocupa el lugar donde una fila de página dice "N páginas afectadas". */
+    scopeLabel: 'Todo el sitio',
+    /** Reemplaza la etiqueta de severidad genérica en hallazgos que son postura, no defecto. */
+    postureLabel: 'Decisión declarada',
+    verified: 'Verificado',
+    /** "Verificado" sin objeto no es información: se declara QUÉ se revisó. */
+    verifiedHint:
+      'Revisamos el acceso de los motores de IA, los datos estructurados y el mapa del sitio.',
+    whereRobots: 'En robots.txt',
+    whereEdge: 'En el borde (CDN o firewall)',
+    whereHome: 'En la portada',
+    whereSitemap: 'En el mapa del sitio',
+    /** Acompaña al hallazgo de borde: es la mitad que lo vuelve creíble. */
+    edgeCleanRobots: 'el robots.txt está limpio',
+    /** ≤2 agentes se nombran completos; más, se acotan. Cinco tokens crudos no se leen. */
+    blockedAgentsAll: (agents: string) => agents,
+    blockedAgents: (first: string, rest: number) => `${first} y ${rest} más`,
+    unverifiedTitle: 'No pudimos verificar',
+    unverifiedItem: (check: string, reason: string) => `${check} — ${reason}`,
+    checkAiAccess: 'Acceso de los motores de IA',
+    checkEdge: 'Acceso en el servidor',
+    checkStructuredData: 'Datos estructurados',
+    checkSitemap: 'Mapa del sitio',
+    /** aria de la región: nombra el alcance, que es lo que la distingue de la lista de abajo. */
+    regionAria: 'Hallazgos que aplican a todo el dominio'
   }
 } as const
 
