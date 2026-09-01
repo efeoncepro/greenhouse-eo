@@ -13,6 +13,19 @@
 > `d3fe90e`, digest `sha256:d8295862dc12c14427e90e0bb413577802916c37ca6bf32c202680492ca7bae9`,
 > deploy `30717266572` y baseline IaC `e369ef8` sin drift.
 
+## Corte 2026-09-01 — TASK-1807: Producer reduce no-op ticks a cada cinco minutos
+
+`globe-producer-worker` cambió su Scheduler de `* * * * *` a `*/5 * * * *` mediante Terraform, sin cambiar
+imagen, CPU/memoria, IAM, target, timezone ni retries. El plan canónico incluyó
+`development_environment_enabled=true` y el principal de desarrollo para preservar los 20 recursos cuyo estado
+vivo depende de ese input: `0 add, 1 change, 0 destroy`; apply `0/1/0`; post-plan `No changes`.
+
+Readback: Scheduler `ENABLED`; primer tick de la nueva cadence `globe-producer-worker-2lq2v` a las 21:00:07Z,
+con `queueOldestAgeSeconds=0`, `outboxRetryStorm=0`, `outboxTerminalAttempts=0`, cero divergencias y cero fallos.
+La ventana de observación de 24 h sigue abierta. Media Derivatives permanece `*/2`; Asset Governance permanece
+`*/1` porque una etapa por tick hace que `*/5` degrade la convergencia a ~20–25 minutos. Rollback Producer:
+restaurar `* * * * *`, plan honesto con `0 destroy`, apply y readback.
+
 ## Corte 2026-08-05 (b) — promoción end-to-end ejecutada; `ref/still/reference-v1` vuelve a estar viva
 
 `promotion_4265dd26-7eda-4918-bd7d-10318dd6cd5f` recorrió `start → stage → promote → activate → canary →

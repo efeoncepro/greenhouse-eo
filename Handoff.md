@@ -2,6 +2,23 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-09-01 (10) — TASK-1807 tomada: reducción GCP con guardrails por workload
+
+El operador aprobó ejecutar la reducción urgente de gasto GCP. `TASK-1807` quedó `in-progress`, con baseline live
+de CLP 538.785 netos en agosto y ~CLP 540.383 de run-rate. Los tres Cloud Run Jobs de Globe explican ~CLP
+286.196, pero la ejecución no aplica el mismo cron a los tres: la skill y el contrato runtime de Globe registran
+que Asset Governance avanza una etapa por tick y que `*/5` elevaba la convergencia en frío a ~20–25 minutos.
+
+Orden vigente: Producer `* * * * * -> */5` con Terraform/readback/rollback; observar 24 h; Media `*/2 ->
+2-59/5` con señal de backlog; Asset Governance conserva `*/1` hasta un rediseño multi-stage o event-driven con
+ADR y canary. No hay autorización para CUDs, eliminación de artefactos/secretos ni cancelación de suscripciones.
+Plan: `docs/tasks/plans/TASK-1807-plan.md`.
+
+Slice 1 quedó aplicada a las 20:55Z: plan `0 add/1 change/0 destroy`, apply `0/1/0`, post-plan `No changes`.
+Primer tick de la nueva cadence: `globe-producer-worker-2lq2v` a las 21:00:07Z, sano y no-op:
+`queueOldestAgeSeconds=0`, retry storm/terminal attempts/divergencias/fallos en 0. La ventana de 24 h sigue abierta;
+Media no cambia antes de cerrarla.
+
 ## 2026-09-01 (9) — cinco oportunidades LicitaLAB promovidas por MCP HubSpot
 
 El operador confirmó la promoción manual de cinco oportunidades. El MCP de HubSpot creó y releyó los Deals
