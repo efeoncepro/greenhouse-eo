@@ -427,16 +427,26 @@ El rango de planificación queda CLP 194.503–217.228 hasta contar con Billing 
   La ejecución live de Producer a las 23:04Z leyó CLP 1.614,51 netos en la ventana previa, pero devolvió
   `status=awaiting_billing_export`, `confirmedSavings=null`: el export seguía en 13:00Z y no fabricó ahorro desde
   un after vacío.
-- Globe `e290a8a` publica un segundo readback fail-closed para la observación operativa. La allowlist fija los
+- Globe `e290a8a`, corregido por `72e57ed` y `f1b2955`, publica un segundo readback fail-closed para la
+  observación operativa. La allowlist fija los
   tres jobs, sus schedules admitidos y sus eventos de completitud; sólo ejecuta `scheduler jobs describe`,
   `run jobs executions list` y `logging read`. Cuenta los ticks exactos, separa Cloud Scheduler
   `southamerica-east1` de Cloud Run `southamerica-west1` y mantiene `readyForNextCutover=false` hasta que la
   ventana esté completa y cadence, target, cola, fallos, retry storm, intentos terminales y divergencias estén
-  sanos. El test focal pasa 4/4 y quedó incorporado a `pnpm test`; la suite completa terminó con exit 0.
-- Su ejecución live de Producer a las 23:10Z observó 28 ticks esperados, 28 completados, cero ausentes, último
+  sanos. El final de ventana es exclusivo y la cadence usa buckets programados distintos: una ejecución manual
+  o duplicada no puede ocultar un tick ausente. Los nueve tests FinOps focales pasan; el test quedó incorporado
+  a `pnpm test`, cuya suite completa terminó con exit 0 antes de las dos correcciones focales.
+- Su ejecución live de Producer a las 23:17Z observó 29 ticks esperados, 29 programados y 29 completados, cero
+  ausentes, último
   execution exitoso, colas máximas 0 y cero fallos/retries/terminales/divergencias. Devolvió
   `status=observing`, `windowComplete=false` y `readyForNextCutover=false`, por lo que no autoriza todavía el
   apply de Media.
+- El mismo lector cerró el baseline actual de Media `*/2`: 720 ticks esperados/programados, 721 completados por
+  una ejecución adicional, ninguna ausencia, colas/fallos en 0 y `readyForNextCutover=true`. Governance `*/1`
+  conserva guardrails sanos y cola máxima 678 s, pero el baseline que incluye el canary detecta siete buckets
+  sin intento programado (`21:38Z` y la pausa `22:13Z–22:18Z`), 1.433/1.440 ticks y por eso
+  `readyForNextCutover=false`. Esta señal histórica no adelanta ni cancela su futuro cambio: se volverá a exigir
+  una ventana limpia después de Producer y Media.
 
 ## Rollout Plan & Risk Matrix
 
