@@ -269,7 +269,11 @@ export const evaluateEdgeAccess = (
   // El robots.txt nos prohíbe la raíz: el hallazgo es de robots, no del borde. No se duplica.
   if (!robotsAllowsOurCrawler || home.errorCode === 'blocked_robots') return []
 
-  const denied = (result: SiteFetchResult): boolean => result.status === 403 || result.status === 429
+  // 401 entra junto a 403/429: en la home PÚBLICA de un sitio auditado, exigir credenciales es
+  // la misma clase de falla —el borde niega el paso a quien no es un navegador conocido— y se
+  // remedia en el mismo lugar. Observado en reuters.com durante la verificación de esta task.
+  const denied = (result: SiteFetchResult): boolean =>
+    result.status === 401 || result.status === 403 || result.status === 429
 
   if (denied(home) || denied(variant)) {
     return [
@@ -360,6 +364,20 @@ export const evaluateSitemap = (
   declared: { url: string; result: SiteFetchResult } | null
 ): SiteAuditFinding[] => {
   if (declared) {
+    // 🔴 `blocked_robots` NO es un sitemap roto: es el propio robots.txt prohibiéndonos la
+    // ruta a NOSOTROS. Reportarlo como defecto sería inventarle un problema al cliente sobre
+    // un archivo que probablemente esté perfecto — detectado contra reuters.com en la
+    // verificación runtime de esta task, que reportaba `sitemap_declared_broken` sin haber
+    // llegado a mirar el archivo.
+    if (declared.result.errorCode === 'blocked_robots') {
+      return [
+        unverified('sitemap', 'El robots.txt del sitio nos prohíbe leer el mapa del sitio que él mismo declara.', {
+          declaredUrl: declared.url,
+          errorCode: declared.result.errorCode
+        })
+      ]
+    }
+
     if (!declared.result.ok) {
       return [
         {

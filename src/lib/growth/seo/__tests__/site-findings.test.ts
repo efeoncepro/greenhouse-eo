@@ -146,6 +146,12 @@ describe('evaluateEdgeAccess', () => {
     expect(findings[0]?.detail.differsByUserAgent).toBe(true)
   })
 
+  it('401 en la home pública también es denegación del borde', () => {
+    const findings = evaluateEdgeAccess(ok({ ok: false, status: 401 }), ok({ ok: false, status: 401 }), true)
+
+    expect(issueTypes(findings)).toEqual(['ai_crawler_edge_access_denied'])
+  })
+
   it('429 también cuenta como denegación en el borde', () => {
     const findings = evaluateEdgeAccess(ok({ ok: false, status: 429 }), ok({ status: 200 }), true)
 
@@ -257,6 +263,20 @@ describe('evaluateSitemap', () => {
 
   it('sitemap válido en la ruta convencional no produce hallazgo', () => {
     expect(evaluateSitemap(ok({ body: '<urlset><url><loc>https://ejemplo.cl/</loc></url></urlset>' }), null)).toEqual([])
+  })
+
+  it('el robots que nos prohíbe la ruta NO convierte al sitemap en roto', () => {
+    // Caso real: reuters.com declara su sitemap y su robots.txt nos prohíbe leerlo. No haber
+    // mirado el archivo no autoriza a decir que está roto.
+    const declared = {
+      url: 'https://ejemplo.cl/sitemap.xml',
+      result: failed({ errorCode: 'blocked_robots' })
+    }
+
+    const findings = evaluateSitemap(null, declared)
+
+    expect(issueTypes(findings)).toEqual(['site_check_unverified'])
+    expect(findings[0]?.detail.check).toBe('sitemap')
   })
 
   it('sitemap inalcanzable por red no se declara ausente', () => {
