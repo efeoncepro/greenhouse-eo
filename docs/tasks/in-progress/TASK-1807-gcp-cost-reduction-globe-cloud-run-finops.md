@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `cron`
 - Epic: `none`
-- Status real: `Slice 1 aplicada: Producer */5, Terraform sin drift y primer tick sano; observacion 24 h en curso`
+- Status real: `Slices 1 y 5 aplicadas; labels y retention dry-run activos; Asset Governance multi-stage code-complete, rollout y ventanas 24 h/7 d pendientes`
 - Rank: `1`
 - Domain: `ops`
 - Blocked by: `none`
@@ -219,12 +219,12 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (N/A: no hay tabla nueva).
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio (N/A: no hay tabla nueva).
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
 ## Capability Definition of Done — Full API Parity gate
 
@@ -399,15 +399,15 @@ Terraform, un scheduler a la vez. El rollback restaura el schedule anterior.
 
 - [ ] Producer corre cada 5 minutos desde Terraform y mantiene queue age p99 < 900 s durante 24 h y 7 dias.
 - [ ] Media Derivatives corre escalonado cada 5 minutos y mantiene backlog/oldest age bajo guardrail.
-- [ ] Asset Governance no se degrada por un cambio directo de cadence; cualquier reduccion tiene canary multi-etapa/event-driven.
+- [x] Asset Governance no se degrada por un cambio directo de cadence; permanece `*/1` y el cambio multi-stage no se despliega antes de canary.
 - [ ] El costo diario observado de los jobs intervenidos baja al menos 50% sin aumento material de errores.
 - [ ] El rollback de cada scheduler esta documentado y verificado por readback.
-- [ ] Existen budgets nativos con umbrales y forecast, sin apagado automatico.
+- [x] Existen budgets nativos con umbrales y forecast, sin apagado automatico.
 - [ ] Greenhouse reporta neto, gross y creditos, y el watcher deduplica el mismo incidente.
-- [ ] Cleanup policies nacen con dry-run, exclusiones de artefactos activos y ventana de recuperacion.
-- [ ] Labels cubren al menos 90% del costo o queda follow-up con owner y brecha medida.
+- [x] Cleanup policies nacen con dry-run, exclusiones de artefactos activos y ventana de recuperacion.
+- [x] Labels cubren al menos 90% del costo o queda follow-up con owner y brecha medida. El histórico de 30 días mide 0%; Globe ya etiqueta cuatro dimensiones y `efeonce-platform` posee la convergencia del export y la brecha de proyectos restantes.
 - [ ] El ahorro a 24 h, 7 dias y cierre mensual queda registrado; forecast no se presenta como ahorro realizado.
-- [ ] CUD permanece fuera hasta decision financiera sobre baseline estable.
+- [x] CUD permanece fuera hasta decision financiera sobre baseline estable.
 
 ## Verification
 
@@ -455,3 +455,24 @@ Terraform, un scheduler a la vez. El rollback restaura el schedule anterior.
   `queueOldestAgeSeconds=0`, `outboxRetryStorm=0`, `outboxTerminalAttempts=0`, cero divergencias y cero fallos.
 - Post-apply: `tofu plan` honesto en `No changes`.
 - Estado: no se marca aceptación de 24 h/7 d todavía; monitoring activo antes de Slice 2.
+
+## Delta 2026-09-01 — Budgets, costo neto, atribución y retention dry-run
+
+- Billing Export real de 30 días reconcilió Globe en CLP 350.442,05 brutos + CLP -2.218,16 de créditos =
+  CLP 348.223,90 netos. Greenhouse calcula ahora neto en total, días, servicios, recursos, spotlight, forecast y
+  drivers; conserva `grossCost` y `credits` por separado.
+- El fingerprint del watcher representa severidad + conjunto ordenado de drivers, no montos ni fechas mutables.
+  Cinco pruebas focales cubren estabilidad, cambio de incidente y un dry-run que no consulta DB ni notifica.
+- Budgets nativos activos y alert-only: Globe CLP 250.000 y consolidado CLP 370.000; current spend
+  50/75/90/100% y forecast 90/100%. API, recursos y post-plan quedaron gestionados por Terraform, sin drift.
+- `default_labels` aplicó `app=efeonce-globe`, `env=internal`, `owner=efeonce-platform` y
+  `cost_center=creative-studio` a 33 recursos, sin reemplazos ni cambio de digest. La cobertura histórica sigue en
+  0% hasta que Billing Export ingiera uso nuevo; la brecha residual consolidada queda bajo ese owner.
+- Artifact Registry contiene 418 versiones y 10,4 GB. La policy activa está en `dry-run`: KEEP de las 10 más
+  recientes por paquete y simulación DELETE para versiones >30 días. Los tres digests activos fueron leídos antes
+  del apply y permanecen iguales. Cloud Build ya elimina `staging/` a los 2 días; no se agregó lifecycle a assets
+  de producto. Secret Manager tiene tres versiones deshabilitadas y no se eliminó ninguna.
+- Asset Governance puede procesar hasta cuatro stages durablemente fenced en una ejecución, con límite explícito
+  y 39/39 tests del paquete + 5/5 de infraestructura verdes. El cron permanece `*/1` y el digest live anterior;
+  el workflow canónico exige un SHA exacto en `origin/main`, por lo que deploy/canary espera promoción autorizada.
+- Commits locales: Greenhouse `aad71bf07`; Globe `5b01e99` y `0ccf485`. Ninguno fue publicado.

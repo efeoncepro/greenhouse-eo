@@ -26,6 +26,17 @@ La ventana de observación de 24 h sigue abierta. Media Derivatives permanece `*
 `*/1` porque una etapa por tick hace que `*/5` degrade la convergencia a ~20–25 minutos. Rollback Producer:
 restaurar `* * * * *`, plan honesto con `0 destroy`, apply y readback.
 
+Guardrails FinOps aplicados después del corte: budgets alert-only Globe CLP 250.000 y consolidado CLP 370.000;
+umbrales current 50/75/90/100% y forecast 90/100%; plan posterior sin drift. Los recursos Globe recibieron
+`app`, `env`, `owner` y `cost_center` sin cambiar imágenes. Artifact Registry quedó con cleanup policy en dry-run,
+KEEP de 10 versiones por paquete y DELETE simulado sobre versiones >30 días; no se borró ningún artefacto.
+
+Asset Governance quedó code-complete en Globe `0ccf485` para reclamar y avanzar hasta cuatro stages durablemente
+fenced por ejecución. Tests: paquete 39/39 e infraestructura 5/5. La configuración live ya expone
+`GLOBE_ASSET_GOVERNANCE_MAX_STAGE_PASSES=4`, pero el digest live sigue siendo el anterior; por tanto el runtime
+todavía procesa una etapa por tick. No reducir `*/1` hasta publicar el SHA por el workflow canónico, ejecutar un
+canary real y verificar convergencia, rights/provenance, errores y edad de cola.
+
 ## Corte 2026-08-05 (b) — promoción end-to-end ejecutada; `ref/still/reference-v1` vuelve a estar viva
 
 `promotion_4265dd26-7eda-4918-bd7d-10318dd6cd5f` recorrió `start → stage → promote → activate → canary →

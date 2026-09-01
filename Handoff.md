@@ -19,6 +19,16 @@ Primer tick de la nueva cadence: `globe-producer-worker-2lq2v` a las 21:00:07Z, 
 `queueOldestAgeSeconds=0`, retry storm/terminal attempts/divergencias/fallos en 0. La ventana de 24 h sigue abierta;
 Media no cambia antes de cerrarla.
 
+Slice 5 quedó operativo: dos budgets alert-only en CLP (Globe 250.000; consolidado 370.000), umbrales actuales
+50/75/90/100% y forecast 90/100%, post-plan sin drift. Greenhouse `aad71bf07` reconcilia neto = bruto + créditos
+y estabiliza el cooldown; 5 pruebas focales pasan y el dry-run no envía notificaciones. En 30 días Globe midió
+CLP 350.442 brutos, CLP -2.218 en créditos y CLP 348.224 netos.
+
+Globe `5b01e99` agregó labels a 33 recursos y retention de Artifact Registry en dry-run: 418 versiones / 10,4 GB,
+KEEP 10 por paquete y DELETE simulado >30 días; cero eliminaciones. Globe `0ccf485` implementa convergencia de
+cuatro stages de Asset Governance en una ejecución fenced (39/39 + 5/5 tests), pero el digest live sigue siendo
+el anterior y el cron sigue `*/1`. El deploy canónico requiere SHA exacto publicado en `origin/main`; no hubo push.
+
 ## 2026-09-01 (10) — ISSUE-167 resuelto: el foco no era del form, era del eje de modelado
 
 Resuelto el mismo día que lo abrí. **Code complete, rollout pendiente**: el bundle desplegado sigue

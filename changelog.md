@@ -7,6 +7,18 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-01 — TASK-1807 instala los primeros controles FinOps de GCP
+
+Producer corre cada cinco minutos mediante Terraform y permanece bajo observación antes de tocar Media. Dos
+budgets nativos alert-only quedaron activos en CLP: 250.000 para Globe y 370.000 consolidados, con cuatro umbrales
+de gasto actual y dos de forecast. El lector Greenhouse usa costo neto después de créditos y el watcher deduplica
+por incidente estable; su prueba dry-run no consulta persistencia ni envía mensajes.
+
+Globe agregó cuatro labels de atribución a 33 recursos. Artifact Registry, con 418 versiones y 10,4 GB, tiene una
+cleanup policy en dry-run que conserva 10 versiones por paquete y sólo simula borrar versiones de más de 30 días;
+no hubo eliminación. Asset Governance quedó code-complete para converger cuatro stages fenced en una ejecución,
+pero conserva cron minutely y digest live anterior hasta el canary canónico.
+
 ## 2026-09-01 — cinco licitaciones nuevas entran a HubSpot por MCP
 
 Promoción manual confirmada y verificada de Chile Cultura, Universidad de Chile DII, JUNJI, Temuco y CNTV: cinco
