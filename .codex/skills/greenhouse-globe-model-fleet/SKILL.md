@@ -41,6 +41,19 @@ No mezcles estas capas:
 La skill o una route card nunca pueden promover una ruta ni sustituir el reader live. Una divergencia entre reader y
 ledger es un hallazgo que se documenta, no una invitación a elegir el estado más conveniente.
 
+## Compuerta de hibernación
+
+Antes de evaluar, canariar o promover una ruta, lee
+`docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`. Si Globe está `hibernated`, la
+flota conserva su evidencia de integración, evaluación y promoción, pero **ninguna ruta es ejecutable**. Puedes
+investigar proveedores, mantener route cards, revisar código y correr validaciones estáticas; no ejecutes canarios
+facturables, promociones ni generación real, y no despiertes Globe sólo para refrescar un ledger.
+
+Una autorización de gasto no elimina esta compuerta. Primero sigue
+`docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md`, completa
+`hibernated → draining → active` con sus readbacks y después
+aplica el spend fence propio de la ruta. Si el trabajo es sólo documental o de discovery, conserva la hibernación.
+
 ## Flujo de trabajo
 
 ### 1. Fijar identidad y superficie

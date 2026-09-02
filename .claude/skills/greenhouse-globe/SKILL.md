@@ -1660,6 +1660,34 @@ cumplía por vacío. Un guard de autoría nunca sustituye a uno de ejecución, n
   por el **mismo helper sin branch por ruta** —o sea que el contrato es un motor, no la descripción de la ruta #1—,
   pero **las traducciones distintas dentro de adapters no existen** porque la compilación aún no vive ahí.
 
+## Lifecycle operativo y hibernación profunda
+
+Antes de cualquier deploy, migración, generación, canary, promoción, ejecución de Job o cambio de scheduler,
+lee el estado mutable en `docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md`. Si el estado es
+`hibernated`, carga y sigue completo
+`docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md`.
+
+La máquina de estados gobernada es `active → draining → hibernated`, y la reactivación recorre el camino
+inverso. Nunca saltes directamente entre `active` y `hibernated`. `draining` mantiene Cloud SQL disponible
+mientras se despliegan y verifican revisiones fail-closed; sólo después se detiene la base. En sentido inverso,
+primero se recupera la dependencia durable, luego se verifica la aplicación cerrada y sólo al final se habilitan
+las vías productivas y los schedulers autorizados.
+
+Mientras Globe esté hibernado:
+
+- puedes investigar, editar código o documentación, validar estáticamente y ejecutar dry-runs que no requieran
+  el runtime ni llamadas facturables;
+- no despiertes Cloud SQL sólo para inspeccionar documentación ni interpretes una ruta `available` o
+  `canary_passed` como ejecutable;
+- bloquea provider canaries, generaciones, promociones, migraciones, schedulers y deploys que dependan de la
+  base hasta que exista autorización explícita para reactivar y gastar;
+- cada plan OpenTofu lleva explícitos el estado operativo y los inputs de preservación, y debe demostrar cero
+  deletes/replacements antes de aplicar.
+
+La hibernación conserva datos, backups/PITR, buckets, secretos, imágenes, IAM, red y state; no autoriza borrar ni
+recrear. Distingue siempre ahorro modelado de ahorro realizado: el segundo sólo se afirma con Billing Export a
+24 horas, 7 días y cierre mensual.
+
 ## Provider boundary
 
 - **El primer provider call *billable* entra por el mismo seam que las surfaces posteriores:** API/SDK o conformance harness → command/reader canónico → provider adapter (`packages/provider-contract`) → runner (`apps/creative-runner`). **NUNCA** un provider SDK directo desde UI/MCP/CLI/scripts/tests.

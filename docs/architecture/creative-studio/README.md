@@ -3,6 +3,14 @@
 > **Este es el hogar canónico de la documentación de arquitectura de Efeonce Globe / Creative Studio.**
 > La documentación de Globe vive en **`greenhouse-eo`**, no en el repo hermano `efeonce-globe`.
 
+> 💤 **Lifecycle operativo vigente:** Globe está gobernado por `active → draining → hibernated` y puede
+> permanecer profundamente hibernado sin eliminar datos ni infraestructura. Antes de cualquier deploy,
+> canary, promoción o prueba facturable, lee el
+> [`GLOBE_RUNTIME_HANDOFF.md`](../../operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md) y sigue el
+> [`GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md`](../../operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md).
+> La arquitectura descrita aquí sigue existiendo durante la hibernación; disponibilidad diseñada o histórica
+> no equivale a runtime ejecutable.
+
 > 🛰️ **Ledger de la flota de modelos (leer PRIMERO antes de asumir que un modelo no está integrado):**
 > [`../../operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md`](../../operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md)
 > — qué modelo/proveedor está integrado, en qué carril (Model Lab vs producción gobernada), validado cuándo y qué

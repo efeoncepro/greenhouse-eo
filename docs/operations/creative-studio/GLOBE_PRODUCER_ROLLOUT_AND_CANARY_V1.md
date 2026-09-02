@@ -3,6 +3,12 @@
 Este runbook promueve el Creative Producer interno sin abrir acceso comercial. La evidencia vive en Greenhouse; el
 código, workflows e imágenes viven en `efeonce-globe`.
 
+> **Gate de lifecycle:** mientras `globe_operating_state=hibernated`, este procedimiento no se ejecuta:
+> no despierta Cloud SQL, no reanuda schedulers y no dispara canarios facturables. Primero sigue
+> [`GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md`](GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md), transita
+> `hibernated → draining → active`, verifica cada readback y confirma autorización explícita de gasto.
+> La documentación y los dry-runs que no requieren runtime pueden continuar sin reactivar Globe.
+
 ## Precondiciones
 
 - SHA exacto revisado en `main`; `pnpm check`, `pnpm build`, OpenTofu validate y contratos IaC verdes.

@@ -19,6 +19,8 @@ Globe (`../efeonce-globe`) usa Tailwind v4 como único pipeline activo; el rende
 fallback hasta `TASK-1560`. Su lifecycle Terraform es `active -> draining -> hibernated`; `draining` es la
 frontera obligatoria de apagado/encendido. Estado y recuperación: [`GLOBE_RUNTIME_HANDOFF.md`](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md)
 y [`GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md`](docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md).
+Las skills espejo `greenhouse-globe` y `greenhouse-globe-model-fleet` aplican esta compuerta: discovery y
+validación estática pueden continuar, pero ningún canary, promoción o trabajo facturable despierta Globe.
 
 La dirección móvil de Globe es native-first con React Native + Expo; web/PWA queda como fallback. ADR, vertical
 slice y gates: [ADR-018](docs/architecture/creative-studio/EFEONCE_GLOBE_MOBILE_CONTINUITY_APPLICATION_DECISION_V1.md).

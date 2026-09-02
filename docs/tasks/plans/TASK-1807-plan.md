@@ -1,5 +1,13 @@
 # TASK-1807 — Plan de reducción GCP
 
+> **Delta de decisión 2026-09-02:** el operador reemplazó el rollout de simple reducción de cadencia por
+> **hibernación profunda reversible** porque Globe todavía no produce ingresos. El estado aplicado es
+> `hibernated`; este plan conserva abajo el diagnóstico y las slices originales como historia de decisión.
+> La ejecución vigente y la futura reactivación se gobiernan por
+> [`GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md`](../../operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md)
+> y el estado mutable de [`GLOBE_RUNTIME_HANDOFF.md`](../../operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md).
+> Las ventanas de 24 h, 7 días y cierre mensual siguen pendientes antes de llamar “realizado” al ahorro.
+
 ## Approval
 
 - Checkpoint: `human-required` por P0 + Effort Alto.
@@ -47,7 +55,7 @@ no cambia de cadence hasta eliminar su dependencia de una etapa por tick.
 - leases/fencing/idempotencia existentes de cada worker.
 - `src/lib/cloud/gcp-billing.ts` y Cost Intelligence V2.
 
-### Runtime real
+### Runtime real al iniciar el plan (snapshot histórico 2026-09-01)
 
 - Schedulers `globe-producer-worker`, `globe-media-derivatives`, `globe-asset-governance` están `ENABLED` en
   `southamerica-east1`, UTC, con schedules `* * * * *`, `*/2 * * * *`, `*/1 * * * *`.

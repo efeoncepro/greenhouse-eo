@@ -6,6 +6,19 @@
 
 # Changelog
 
+## 2026-09-02 — hibernación profunda reversible y lifecycle gobernado (TASK-1807)
+
+- Globe quedó en `hibernated`: Cloud SQL `globe-pg` detenido con `activationPolicy=NEVER`, los tres
+  schedulers pausados, vías productivas fail-closed y servicios Cloud Run en scale-to-zero. No se eliminaron
+  datos, buckets, secretos, imágenes, IAM, red ni state.
+- OpenTofu ahora posee la máquina `active → draining → hibernated`; la reactivación usa el camino inverso y
+  prohíbe saltos directos. El plan posterior al apply quedó en `No changes` y con cero deletes/replacements.
+- Runbook canónico: [`GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md`](../../operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md).
+  Estado mutable: [`GLOBE_RUNTIME_HANDOFF.md`](../../operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md).
+- Baseline previo modelado: ~CLP 348.152/30 días; residual esperado: CLP 20.000–30.000/mes; reducción
+  modelada: CLP 318.000–328.000/mes (91–94%). No es ahorro realizado hasta medir Billing Export a 24 h,
+  7 días y cierre mensual.
+
 ## 2026-08-05 (b) — promoción end-to-end por el runbook; la ruta que murió +2 s tarde vuelve a estar viva
 
 - **`ref/still/reference-v1` promovida de punta a punta** (`promotion_4265dd26…`): `start → stage →

@@ -7,7 +7,13 @@
 > sustenta en `globe.production-routing` + `globe.model-readiness.*`. Este documento es el mapa
 > legible que reconcilia ambas autoridades.
 >
-> **Creado:** 2026-07-24 (TASK-1553). **Última actualización:** 2026-08-21.
+> **Disponibilidad operativa global (2026-09-02):** Globe está `hibernated`. Las marcas `available`,
+> `promoted` y `canary_passed` de este ledger conservan la evidencia de integración y promoción por ruta,
+> pero ninguna ruta es ejecutable mientras el producto permanezca hibernado. Para volver a operar, sigue
+> [`GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md`](GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md) y verifica después el reader
+> live; no despiertes Globe sólo para refrescar este documento.
+>
+> **Creado:** 2026-07-24 (TASK-1553). **Última actualización:** 2026-09-02.
 > **Contrato técnico:** `docs/architecture/creative-studio/EFEONCE_GLOBE_MODEL_LAB_V1.md`,
 > `EFEONCE_GLOBE_CREATIVE_PRODUCER_ARCHITECTURE_V1.md`, `EFEONCE_GLOBE_ROUTE_BASED_MODEL_RESOLUTION_DECISION_V1.md` (ADR-013).
 
