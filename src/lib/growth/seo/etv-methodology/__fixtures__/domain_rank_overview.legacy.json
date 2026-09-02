@@ -1,0 +1,22 @@
+{
+  "_note": "TASK-1805 — respuesta SINTÉTICA versionada (shape doc as-of 2026-08-27) para replay sin gasto. No es evidencia de exactitud de la fórmula.",
+  "methodology": "legacy_static_v1",
+  "capturedAt": "2026-10-15",
+  "tasks": [
+    {
+      "status_code": 20000,
+      "result": [
+        {
+          "items": [
+            {
+              "metrics": {
+                "organic": { "pos_1": 12, "pos_2_3": 44, "pos_4_10": 310, "pos_11_20": 200, "count": 4120, "etv": 8210.44, "estimated_paid_traffic_cost": 15300.2, "is_new": 30, "is_up": 120, "is_down": 80, "is_lost": 12 },
+                "paid": { "count": 3, "etv": 12.5, "estimated_paid_traffic_cost": 40.1 }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

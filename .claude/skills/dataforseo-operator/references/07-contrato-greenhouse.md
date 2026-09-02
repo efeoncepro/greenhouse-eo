@@ -206,8 +206,18 @@ Contrato obligatorio para una implementación futura:
    sumas, thresholds y membresía de relevant pages/subdomains. AIO reparte estimación entre dominios únicos
    citados: nunca rotularlo como tráfico observado por cita.
 
-El contrato externo está confirmado; Sandbox y OpenAPI/changelog siguen pendientes no bloqueantes. El estado
-correcto permanece **foundation/cutover no implementados ni autorizados**.
+El contrato externo está confirmado; Sandbox y OpenAPI/changelog siguen pendientes no bloqueantes.
+
+**Implementado el 2026-09-02 por `TASK-1805` (code complete, rollout pendiente).** Los ocho puntos de arriba tienen
+mecanismo: policy pura `src/lib/growth/seo/etv-methodology/**` (`buildEtvMethodologyRequest`, matriz de 14 familias,
+selectores `GROWTH_SEO_ETV_METHODOLOGY_VERSION`/`_READ_`), expand aplicado (columnas `etv_methodology_*`, UNIQUE
+formula-aware junto a la legacy, guard de corte en la base; filas previas `legacy_static_v1` con evidencia
+`contract_default_pre_cutoff`), siete writers explícitos, readers/API/MCP con `etvMethodology` y
+`not_available_for_method`, señal `seo.etv_methodology.drift`, `/health` del worker con readback, evaluador dry-run
+(`scripts/growth/_sanity-task-1805-etv-evaluator.ts`, `providerCalls=0`) y sanity del schema con rollback
+(`_sanity-task-1805-etv-schema.ts`). El **contract** (retirar UNIQUE legacy + defaults) está parqueado en
+`docs/tasks/pending-migrations/` hasta el release; la coexistencia real por sujeto/día llega con él. Lo que sigue
+**no autorizado**: shadow pagado, rebaseline/breakpoint y cutover (`TASK-1806`).
 
 ## §6 Secretos / env
 

@@ -361,7 +361,7 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
   pesa 3× más que los backlinks. Amplía el allowlist a `content_analysis`; coordinar con `TASK-1651`.
 - `TASK-1789` — [creada 2026-08-27, backend-data] **Content decay.** El §3 de la arquitectura lo
   declara como capacidad y el runtime no lo tiene: cierra la brecha doc↔runtime con dato propio.
-- `TASK-1805` — [creada 2026-09-01, to-do, backend-critical/integration] **Foundation versionada
+- `TASK-1805` — [creada 2026-09-01, in-progress, **code complete rollout pendiente 2026-09-02**, backend-critical/integration] **Foundation versionada
   de DataForSEO Improved ETV.** La metodología pasa a ser parte de la identidad de la
   medición; legacy/improved no comparten serie ni clave, y ningún request productivo depende del
   default del provider. Clasifica 14 familias ETV-capable y migra seis familias/siete caminos consumidores,
@@ -1140,3 +1140,14 @@ La secuencia dura es `TASK-1805` → método/cutover gobernado por `TASK-1806` �
 incorpora reader/API/MCP, provenance, gasto y rollout propios. Ninguna llamada, migración, deploy ni compra queda
 autorizada por registrar el backlog. `TASK-1312` mantiene el source of truth de topic clusters y `TASK-1314`
 mantiene su regla «compone, no captura».
+
+## Delta 2026-09-02 (3) — la foundation ETV versionada está implementada, todavía en legacy
+
+`TASK-1805` entregó policy pura endpoint-aware (14 familias; `use_improved_etv` siempre explícito; fail-closed),
+expand de schema aplicado (identidad metodológica + evidencia + guard de corte en la base; UNIQUE formula-aware
+junto a la legacy; contract parqueado hasta el release), siete writers explícitos, readers/API/MCP con
+`etvMethodology` y `not_available_for_method`, señal `seo.etv_methodology.drift`, readback en `/health` del
+worker y un evaluador dry-run/replay sin gasto. Selección productiva `legacy_static_v1`. Estado honesto: **code
+complete, rollout pendiente** (release + selector explícito en Vercel + readback cross-runtime + contract). El
+shadow pagado, la decisión histórica y el cutover siguen siendo de `TASK-1806`; `TASK-1808`–`TASK-1811` nacen
+sobre esta foundation.

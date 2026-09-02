@@ -20,6 +20,13 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import { type SeoProvenance, seoProvenance } from '../lens'
 import {
+  assertSingleEtvMethodology,
+  buildEtvMethodologyProvenance,
+  resolveEtvReadMethodology,
+  type EtvMethodologyProvenance,
+  type EtvMethodologyVersion
+} from '../etv-methodology'
+import {
   normalizeOverviewDomain,
   type SeoDomainOverviewSourceEndpoint,
   type SeoDomainPositionDistribution
@@ -43,6 +50,16 @@ export interface SeoDomainOverviewHistoryPoint {
 
 export type ReadDomainOverviewResult =
   | { ok: false; reason: 'no_market_data' }
+  /**
+   * TASK-1805 — hay evidencia del sujeto, pero NO con la metodología pedida. Degradación
+   * etiquetada, nunca un fallback silencioso a la otra fórmula.
+   */
+  | {
+      ok: false
+      reason: 'not_available_for_method'
+      requestedMethodology: EtvMethodologyVersion
+      availableMethodologies: EtvMethodologyVersion[]
+    }
   | {
       ok: true
       subject: string
@@ -58,6 +75,11 @@ export type ReadDomainOverviewResult =
       capturedAt: string
       /** TASK-1785 — la forma canónica; `lens`/`capturedAt` de arriba son su proyección. */
       provenance: SeoProvenance[]
+      /**
+       * TASK-1805 — fórmula ETV detrás de TODA cifra de este DTO (foto + trayectoria). Un reader
+       * sirve UNA metodología: la serie jamás mezcla legacy e improved.
+       */
+      etvMethodology: EtvMethodologyProvenance
       source: SeoDomainOverviewSourceEndpoint
       locationCode: string
       languageCode: string
@@ -101,6 +123,9 @@ type SnapshotRow = {
   organic_is_lost: number | null
   paid_count: number | null
   paid_etv: string | null
+  etv_methodology_version: string
+  etv_methodology_evidence: string
+  etv_policy_version: string | null
 }
 
 const asNumber = (value: string | null): number | null => {
@@ -137,10 +162,17 @@ export const readDomainOverview = async (input: {
   locationCode: string
   languageCode: string
   historyMonths?: number
+  /**
+   * TASK-1805 — método a servir. Default: el selector de LECTURA canónico (legacy explícito).
+   * Sólo el compare interno lo pasa; API/MCP/Nexa NUNCA eligen fórmula desde el caller.
+   */
+  etvMethodology?: EtvMethodologyVersion
 }): Promise<ReadDomainOverviewResult> => {
   const normalized = normalizeOverviewDomain(input.subject)
 
   if (!normalized) return { ok: false, reason: 'no_market_data' }
+
+  const served = input.etvMethodology ?? resolveEtvReadMethodology().version
 
   const historyMonths = Math.min(
     Math.max(1, input.historyMonths ?? DOMAIN_OVERVIEW_DEFAULT_HISTORY_MONTHS),
@@ -155,19 +187,44 @@ export const readDomainOverview = async (input: {
             organic_pos_61_70, organic_pos_71_80, organic_pos_81_90, organic_pos_91_100,
             organic_count, organic_etv, organic_estimated_paid_traffic_cost,
             organic_is_new, organic_is_up, organic_is_down, organic_is_lost,
-            paid_count, paid_etv
+            paid_count, paid_etv,
+            etv_methodology_version, etv_methodology_evidence, etv_policy_version
        FROM greenhouse_growth.seo_domain_overview_snapshots
       WHERE normalized_domain = $1
         AND location_code = $2
         AND language_code = $3
+        AND etv_methodology_version = $5
       ORDER BY capture_date DESC
       LIMIT $4`,
-    [normalized, input.locationCode, input.languageCode, DOMAIN_OVERVIEW_MAX_HISTORY_MONTHS * 2]
+    [normalized, input.locationCode, input.languageCode, DOMAIN_OVERVIEW_MAX_HISTORY_MONTHS * 2, served]
   )
 
-  const withData = rows.filter(hasAnyData)
+  // TASK-1805 — qué fórmulas existen para el sujeto (para degradar con etiqueta y para el compare
+  // interno sin gasto). Consulta aparte, sin el filtro de método.
+  const availableRows = await runGreenhousePostgresQuery<{ etv_methodology_version: string }>(
+    `SELECT DISTINCT etv_methodology_version
+       FROM greenhouse_growth.seo_domain_overview_snapshots
+      WHERE normalized_domain = $1
+        AND location_code = $2
+        AND language_code = $3
+        AND (organic_count IS NOT NULL OR organic_etv IS NOT NULL OR paid_count IS NOT NULL OR paid_etv IS NOT NULL)`,
+    [normalized, input.locationCode, input.languageCode]
+  )
 
-  if (withData.length === 0) return { ok: false, reason: 'no_market_data' }
+  const available = availableRows.map(row => row.etv_methodology_version)
+
+  // Defensa en profundidad: el filtro SQL ya lo garantiza; una serie mixta jamás se sirve.
+  const withData = assertSingleEtvMethodology(rows.filter(hasAnyData), served)
+
+  if (withData.length === 0) {
+    const others = available.filter((version): version is EtvMethodologyVersion => version !== served && (version === 'legacy_static_v1' || version === 'improved_layout_clickstream_v2'))
+
+    if (others.length > 0) {
+      return { ok: false, reason: 'not_available_for_method', requestedMethodology: served, availableMethodologies: others }
+    }
+
+    return { ok: false, reason: 'no_market_data' }
+  }
 
   // Foto: la más reciente; a igual fecha (o mismo mes con más de una fuente) gana la más rica.
   const photo = [...withData].sort((a, b) => {
@@ -214,6 +271,13 @@ export const readDomainOverview = async (input: {
     provenance: [
       seoProvenance({ section: '*', source: 'dataforseo_labs', capturedAt: toIsoDate(photo.capture_date) })
     ],
+    etvMethodology: buildEtvMethodologyProvenance({
+      served,
+      rowVersion: photo.etv_methodology_version,
+      rowEvidence: photo.etv_methodology_evidence,
+      rowPolicyVersion: photo.etv_policy_version,
+      available
+    }),
     source: photo.source_endpoint,
     locationCode: input.locationCode,
     languageCode: input.languageCode,
@@ -258,7 +322,7 @@ export const readDomainOverview = async (input: {
  */
 export const readDomainOverviewForTarget = async (
   seoTargetId: string,
-  options: { subject?: string; historyMonths?: number } = {}
+  options: { subject?: string; historyMonths?: number; etvMethodology?: EtvMethodologyVersion } = {}
 ): Promise<(ReadDomainOverviewResult & { locationCode?: string; languageCode?: string }) | null> => {
   const rows = await runGreenhousePostgresQuery<{
     root_domain: string
@@ -280,6 +344,7 @@ export const readDomainOverviewForTarget = async (
     subject: options.subject ?? target.root_domain,
     locationCode: target.location_code,
     languageCode: target.language_code,
-    historyMonths: options.historyMonths
+    historyMonths: options.historyMonths,
+    etvMethodology: options.etvMethodology
   })
 }

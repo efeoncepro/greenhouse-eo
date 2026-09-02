@@ -1,0 +1,20 @@
+{
+  "_note": "TASK-1805 — respuesta SINTÉTICA versionada: bajo improved una página informational con AIO pierde ETV (sale del top-4) y una local pack entra. Ilustra el efecto doble valor+membresía; no es evidencia del proveedor.",
+  "methodology": "improved_layout_clickstream_v2",
+  "capturedAt": "2026-10-15",
+  "tasks": [
+    {
+      "status_code": 20000,
+      "result": [
+        {
+          "items": [
+            { "page_address": "https://cliente.cl/productos", "metrics": { "organic": { "count": 900, "etv": 4310.0 }, "paid": { "count": 0, "etv": 0 } } },
+            { "page_address": "https://cliente.cl/tiendas", "metrics": { "organic": { "count": 40, "etv": 1120.0 }, "paid": { "count": 0, "etv": 0 } } },
+            { "page_address": "https://cliente.cl/guia", "metrics": { "organic": { "count": 300, "etv": 980.0 }, "paid": { "count": 0, "etv": 0 } } },
+            { "page_address": "https://cliente.cl/ubica-tienda", "metrics": { "organic": { "count": 25, "etv": 540.0 }, "paid": { "count": 0, "etv": 0 } } }
+          ]
+        }
+      ]
+    }
+  ]
+}

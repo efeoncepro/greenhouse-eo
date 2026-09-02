@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Tomada 2026-09-02; foundation en implementación local-first, selector legacy explícito, cero gasto`
+- Status real: `code complete, rollout pendiente (2026-09-02): Slices 0-6 implementados y verificados contra PG real; expand aplicado; contract parqueado; falta release con Slices 4-6, selector explícito en Vercel y readback cross-runtime`
 - Rank: `1`
 - Domain: `growth|seo|data|integration`
 - External deadline: `2026-11-01T00:00:00Z; legacy deja de estar disponible como opt-out`
@@ -255,20 +255,20 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Errores son canónicos y el evaluador no debilita presupuesto, entitlements ni datos sensibles.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects. — `src/lib/growth/seo/etv-methodology/**`, tres tablas `greenhouse_growth`, readers/lane/MCP nombrados en el ADR §Runtime Contract.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit. — CHECKs cerrados + consistencia evidencia↔request + UNIQUE formula-aware + guard de corte (migración `20260902221432772`); sanity 17/17 con rollback.
+- [x] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio. — cero tablas nuevas: se amplían las tres existentes; el dominio no tiene allowlist de tablas (sólo familias + GRANTs), declarado en el audit de esta task.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk. — expand aplicado (compatible con código viejo por DEFAULT transitorio + evidencia contractual), contract en `docs/tasks/pending-migrations/` con condición de release (ISSUE-161), Down documentado.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling. — `_sanity-task-1805-etv-schema.ts` 17/17, sanity 1775/1776 (writers+frescura+readers) verdes, readers contra PG real (berel MX legacy servido / improved → `not_available_for_method`), señal `awaiting_data`, evaluador 8/8 con ledger intacto.
+- [x] Errores son canónicos y el evaluador no debilita presupuesto, entitlements ni datos sensibles. — `EtvMethodologyPolicyError` (6 códigos), `seo_etv_methodology_rejected` canónico es-CL; el evaluador es puro (sin camino al proveedor) y fail-closed por gate/allowlist/caps.
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] La policy y selección viven en primitives server-side, no en UI ni callsites duplicados.
-- [ ] Readers/projections exponen método a API, Nexa y MCP desde un solo contrato.
-- [ ] Compare es lectura de evidencia persistida; no es un parámetro público que dispara gasto.
-- [ ] MCP manifest source/generated y gateway consumidor quedan sincronizados cuando cambie el output.
-- [ ] Parity check = SÍ: toda superficie devuelve metodología desde el mismo reader.
+- [x] La policy y selección viven en primitives server-side, no en UI ni callsites duplicados. — `buildEtvMethodologyRequest` único; los siete callers sólo lo invocan.
+- [x] Readers/projections exponen método a API, Nexa y MCP desde un solo contrato. — `etvMethodology` nace en los readers; lane y tools son passthrough.
+- [x] Compare es lectura de evidencia persistida; no es un parámetro público que dispara gasto. — `etvMethodology` como input opcional del reader (compare interno); ningún lane/tool lo acepta.
+- [x] MCP manifest source/generated y gateway consumidor quedan sincronizados cuando cambie el output. — manifest `8969c8d39c1f` regenerado + `efeonce-mcp` `58517f0` (commit local; deploy del gateway post-release).
+- [x] Parity check = SÍ: toda superficie devuelve metodología desde el mismo reader.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -421,49 +421,49 @@ amplía. El shadow del prospecto usa evaluator interno y nunca crea una segunda 
 Esta task incluye como entregable obligatorio la capa de uso por agentes; no se considera completa con el
 primitive, reader, API o documentación humana solamente.
 
-- [ ] Crear o actualizar las tools MCP necesarias para operar/leer esta capacidad desde el mismo primitive
+- [x] Crear o actualizar las tools MCP necesarias para operar/leer esta capacidad desde el mismo primitive
   canónico. Si una tool existente cubre el caso, actualizarla sin duplicarla; si no corresponde una tool nueva,
   declarar las tools afectadas y la razón de exclusión explícita en el gateway.
-- [ ] Crear o actualizar la guía de uso en las skills dueñas `.codex/skills/dataforseo-operator/**` y
+- [x] Crear o actualizar la guía de uso en las skills dueñas `.codex/skills/dataforseo-operator/**` y
   `.codex/skills/seo-aeo/**`, junto con sus espejos `.claude/**`, incluyendo selección de tool, inputs,
   interpretación, metodología/provenance, costos, límites, errores y acciones prohibidas.
-- [ ] Mantener las copias Codex/Claude byte-idénticas y, cuando el registro de skills servidas de `TASK-1804`
+- [x] Mantener las copias Codex/Claude byte-idénticas y, cuando el registro de skills servidas de `TASK-1804`
   esté disponible, crear o actualizar también el recurso/manual agent-facing que el MCP entrega bajo demanda.
   No crear una skill por endpoint si la skill de dominio vigente puede ampliarse de forma clara.
-- [ ] Actualizar en el mismo PR el lane ecosystem, `src/mcp/greenhouse/tool-manifest.ts`, su artefacto generado,
+- [x] Actualizar en el mismo PR el lane ecosystem, `src/mcp/greenhouse/tool-manifest.ts`, su artefacto generado,
   schema/annotations/descripción y la federación del gateway; toda tool interna queda federada o excluida con una
   razón sustantiva, nunca simplemente ausente.
-- [ ] Las tools read sólo leen evidencia persistida y no disparan llamadas pagadas on-read. Toda tool que escriba,
+- [x] Las tools read sólo leen evidencia persistida y no disparan llamadas pagadas on-read. Toda tool que escriba,
   compre o comprometa gasto usa capability fina, presupuesto, idempotencia, audit y
   `propose → confirm → execute`; nunca se agrega un write scope al cliente PKCE público compartido.
-- [ ] Verificar `pnpm mcp:manifest:generate && pnpm mcp:manifest:check`, `pnpm skills:mirrors`, paridad
+- [ ] Verificar `pnpm mcp:manifest:generate && pnpm mcp:manifest:check`, `pnpm skills:mirrors`, paridad (manifest y mirrors verdes en local; **la paridad bidireccional del gateway y los canaries allow/deny/fault sólo se leen contra el gateway desplegado, post-release**)
   bidireccional del gateway y canaries allow/deny/fault. Registro o compilación sin readback de la lane y del
   gateway no constituye cierre operativo.
 
 
 ## Acceptance Criteria
 
-- [ ] Contrato oficial está reflejado como 14 familias; seis familias/siete caminos consumen ETV, tres callers lo
+- [x] Contrato oficial está reflejado como 14 familias; seis familias/siete caminos consumen ETV, tres callers lo
   ignoran y cinco familias no se habilitan preventivamente.
-- [ ] Las cinco familias sin caller están nombradas y cada una sólo puede pasar a `etv_consumed` por su task
+- [x] Las cinco familias sin caller están nombradas y cada una sólo puede pasar a `etv_consumed` por su task
   dueña (`TASK-1808`–`TASK-1811`), nunca por ampliar esta foundation transversal.
-- [ ] Cero request productivo ETV depende de default u omisión.
-- [ ] Endpoint no compatible/config inválida falla cerrado y no recibe el flag.
-- [ ] Mismo sujeto/mercado/fecha admite ambos métodos y rechaza duplicados del mismo método.
-- [ ] Filas existentes y ambiguas se clasifican con evidencia, nunca sólo por fecha.
-- [ ] Append-only e idempotencia diaria de prospecto permanecen intactos.
-- [ ] Freshness, backfill, source priority, concentración y readers son formula-aware.
-- [ ] Ningún reader/API/MCP devuelve una trayectoria mixta o fallback silencioso.
-- [ ] API, Nexa y MCP exponen metodología junto con lens/source/capturedAt.
-- [ ] Traffic cost y prospect traffic declaran metodología; prospect también cobertura/truncamiento.
-- [ ] AIO ETV se rotula como reparto modelado entre dominios citados, nunca tráfico observado por cita.
-- [ ] `clickstream_etv` permanece carril independiente y no se activa implícitamente con improved.
-- [ ] Evaluador entrega fixture/replay, dry-run, forecast y allowlist sin registrar gasto.
-- [ ] Vercel y ops-worker demuestran el mismo método efectivo mediante request explícito, instante UTC y policy.
-- [ ] Histórico improved distingue `fully_recomputed` desde julio de 2026 y `calibrated_approximation` antes.
-- [ ] Cero request legacy sale al proveedor desde 2026-11-01T00:00:00Z.
-- [ ] La selección productiva permanece legacy explícita y `TASK-1806` puede activar improved sin rediseñar la foundation.
-- [ ] Documentación funcional/técnica/manual, task/epic/registry y handoff quedan sincronizados.
+- [x] Cero request productivo ETV depende de default u omisión. — siete builders con `use_improved_etv` explícito (tests de payload real).
+- [x] Endpoint no compatible/config inválida falla cerrado y no recibe el flag. — `unsupported_etv_methodology` / `invalid_etv_methodology_config`; guards en `competitor-coverage` y `prospect-collect`.
+- [ ] Mismo sujeto/mercado/fecha admite ambos métodos y rechaza duplicados del mismo método. — **probado en transacción con el contract aplicado (sanity 17/17) pero la coexistencia real queda cerrada hasta aplicar el contract post-release** (UNIQUE legacy conservada a propósito para el código viejo en producción).
+- [x] Filas existentes y ambiguas se clasifican con evidencia, nunca sólo por fecha. — 5+8+2 filas `legacy_static_v1` + `contract_default_pre_cutoff` (cuenta pre-2026-09-01, código sin flag, capturas pre-corte); sin ventana ambigua.
+- [x] Append-only e idempotencia diaria de prospecto permanecen intactos. — trigger `block_seo_row_mutation` intacto (sanity); índice diario del prospecto sin cambios.
+- [x] Freshness, backfill, source priority, concentración y readers son formula-aware.
+- [x] Ningún reader/API/MCP devuelve una trayectoria mixta o fallback silencioso. — filtro SQL + `assertSingleEtvMethodology` + `not_available_for_method`.
+- [x] API, Nexa y MCP exponen metodología junto con lens/source/capturedAt.
+- [x] Traffic cost y prospect traffic declaran metodología; prospect también cobertura/truncamiento. — traffic cost hereda la fila; `estimated_monthly_traffic.detail` con `etvMethodologyVersion/sampleRows/rowLimit/truncated`.
+- [x] AIO ETV se rotula como reparto modelado entre dominios citados, nunca tráfico observado por cita. — `AI_OVERVIEW_ETV_ATTRIBUTION` en el hecho `ai_overview_citations` (`etvSummed:false`).
+- [x] `clickstream_etv` permanece carril independiente y no se activa implícitamente con improved. — `include_clickstream_data:false` conservado en el histórico; ningún parser lo consume.
+- [x] Evaluador entrega fixture/replay, dry-run, forecast y allowlist sin registrar gasto. — `_sanity-task-1805-etv-evaluator.ts` 8/8, ledger antes=después.
+- [ ] Vercel y ops-worker demuestran el mismo método efectivo mediante request explícito, instante UTC y policy. — **mecanismo listo (señal `seo.etv_methodology.drift` + `/health` + columnas), pero el readback real exige el release desplegado en ambos runtimes: hoy la señal reporta `awaiting_data`.**
+- [x] Histórico improved distingue `fully_recomputed` desde julio de 2026 y `calibrated_approximation` antes. — `etv_historical_basis` por mes en el backfill + CHECK sólo improved.
+- [x] Cero request legacy sale al proveedor desde 2026-11-01T00:00:00Z. — policy lanza antes de la request (test con el instante exacto) + guard en la base para runtimes viejos.
+- [x] La selección productiva permanece legacy explícita y `TASK-1806` puede activar improved sin rediseñar la foundation. — selector cerrado + evaluador con override; sin cambios de schema previstos salvo el contract ya parqueado.
+- [x] Documentación funcional/técnica/manual, task/epic/registry y handoff quedan sincronizados. — ADR §Runtime Contract, manual, skills espejadas, manuales MCP, reliability doc, ledger, epic, registry, handoff, changelog.
 
 ## Verification
 
@@ -480,16 +480,16 @@ primitive, reader, API o documentación humana solamente.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` y `Status real` coinciden con código, rollout y evidencia runtime.
-- [ ] El archivo está en la carpeta de lifecycle correcta.
-- [ ] `docs/tasks/TASK_ID_REGISTRY.md`, `docs/tasks/README.md` y `EPIC-022` están sincronizados.
-- [ ] El ADR y la matriz contractual incorporan la respuesta vigente del proveedor.
-- [ ] Las tasks completas `1775`, `1776`, `1709`, `1780` y `1785` reciben sólo deltas históricos si cambió
+- [x] `Lifecycle` y `Status real` coinciden con código, rollout y evidencia runtime. — `in-progress` + `code complete, rollout pendiente`.
+- [x] El archivo está en la carpeta de lifecycle correcta.
+- [x] `docs/tasks/TASK_ID_REGISTRY.md`, `docs/tasks/README.md` y `EPIC-022` están sincronizados.
+- [x] El ADR y la matriz contractual incorporan la respuesta vigente del proveedor.
+- [x] Las tasks completas `1775`, `1776`, `1709`, `1780` y `1785` reciben sólo deltas históricos si cambió
   su baseline; no se reabren ni pierden ownership.
-- [ ] Skills `.codex`/`.claude` quedan byte-idénticas y pasan sus validators.
-- [ ] El consumidor del manifest MCP queda sincronizado si el contrato servido cambió.
-- [ ] `Handoff.md` y `changelog.md` reflejan por separado código, migration, deploy, gasto y live readback.
-- [ ] El cierre declara `complete`, `code complete, rollout pendiente` u `operativamente bloqueado` sin presentar
+- [x] Skills `.codex`/`.claude` quedan byte-idénticas y pasan sus validators.
+- [x] El consumidor del manifest MCP queda sincronizado si el contrato servido cambió. — `efeonce-mcp` commit local `58517f0`; deploy post-release.
+- [x] `Handoff.md` y `changelog.md` reflejan por separado código, migration, deploy, gasto y live readback.
+- [x] El cierre declara `complete`, `code complete, rollout pendiente` u `operativamente bloqueado` sin presentar
   una env, un deploy o una respuesta HTTP verde como prueba de metodología servida.
 
 ## Follow-ups
@@ -506,3 +506,20 @@ El operador confirmó que quiere convertir las cinco familias `provider_supporte
 reales. Se registran cuatro unidades backend-data: categorías (`TASK-1808`, dos endpoints cohesionados), mercado
 competitivo (`TASK-1809`), comparación de páginas (`TASK-1810`) e historia bulk (`TASK-1811`). Esta task conserva
 ownership exclusivo de policy/schema/readers formula-aware; no compra, habilita ni opera los productos nuevos.
+
+## Delta 2026-09-02 (2) — foundation implementada: code complete, rollout pendiente
+
+Seis slices en `develop` (commits `7adf5ffc7` → `9477b83e7`): policy pura + matriz de 14 familias; expand
+aplicado a la instancia (contract parqueado en `docs/tasks/pending-migrations/`); siete writers explícitos;
+readers/lane/MCP con `etvMethodology` y `not_available_for_method`; señal `seo.etv_methodology.drift` +
+`/health` + selector en `deploy.sh`; evaluador dry-run/replay/forecast/allowlist con gate OFF. Gateway
+`efeonce-mcp` sincronizado en local (`58517f0`). Slice 3 salió en el release develop→main que otra sesión llevó
+el mismo día (`origin/develop = e5d7675d8`); **Slices 4–6 y estos docs están sólo en local** (sin push por el
+incidente de `main` en curso).
+
+**Rollout pendiente (bloquea `complete`):** (1) release con Slices 4–6; (2) `GROWTH_SEO_ETV_METHODOLOGY_VERSION`
+y `_READ_` explícitos en Vercel `Production`+`staging` (hoy ausentes = legacy explícito por policy);
+(3) readback `configured=requested=provider-effective` en ambos runtimes (`/health` del worker + señal en `ok`,
+no `awaiting_data`); (4) aplicar el contract post-release con sus tres condiciones; (5) deploy del gateway +
+paridad/canaries. Gate local no ejecutado: `pnpm build` de producción (cuelga el equipo; correrlo antes de mover a
+`complete/`). Nada de esto autoriza gasto ni cutover: `TASK-1806`.

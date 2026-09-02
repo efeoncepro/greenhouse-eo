@@ -22,7 +22,15 @@ average, sum, interpolate or merge them into a single number.** A combined numbe
 presented with the confidence of a measurement and mean nothing.
 
 Every figure travels with its provenance and a capture date. Always report which lens a number
-comes from and its as-of date. When a payload lists several provenances, the lens is a property
+comes from and its as-of date.
+
+Estimated traffic (`etv`) carries one more dimension, the formula version: `etvMethodology.version`
+(`legacy_static_v1` today; `improved_layout_clickstream_v2` becomes mandatory at the provider on
+2026-11-01T00:00:00Z). The provider changes the formula behind the same field, so two etv figures
+are comparable only when their versions match. Report the version next to any etv figure, never
+compute a delta across versions, and read `errorCode: not_available_for_method` as "evidence
+exists under another formula", not as zero. The served formula is chosen server-side; no tool
+argument selects it. When a payload lists several provenances, the lens is a property
 of each figure, not of the whole response.
 
 ## What absence means

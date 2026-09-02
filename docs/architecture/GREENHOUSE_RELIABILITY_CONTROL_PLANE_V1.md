@@ -2,10 +2,27 @@
 
 > Spec canónica del `Reliability Control Plane` de Greenhouse EO. Define el registry por módulo, el modelo unificado de señales, el contrato de evidencia y cómo `Admin Center`, `Ops Health` y `Cloud & Integrations` consumen la lectura consolidada sin duplicar fuentes.
 >
-> Versión: `1.16`
+> Versión: `1.17`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-08-29` por TASK-1700 (3 signals de la cola priorizada de trabajo SEO bajo el módulo `growth`)
+> Última actualización: `2026-09-02` por TASK-1805 (signal de drift de metodología ETV cross-runtime bajo el módulo `growth`)
+
+## Delta 2026-09-02 — TASK-1805: `seo.etv_methodology.drift` (configurado vs. solicitado, Vercel + ops-worker)
+
+Una señal nueva bajo el rollup `growth` (`kind='drift'`, **steady = 0**), reader
+`src/lib/reliability/queries/seo-etv-methodology-drift.ts` (en `filesOwned`). Cubre un plano que ninguna
+señal veía: DataForSEO cambia la fórmula detrás del mismo campo `etv` y **no devuelve la versión aplicada**, así
+que la única evidencia de qué se pidió es lo que cada runtime persistió (`etv_methodology_version` +
+`etv_requested_at` + `etv_policy_version`).
+
+| `signalId` | `kind` | Qué mide | Steady |
+| --- | --- | --- | --- |
+| `seo.etv_methodology.drift` | `drift` | Lo configurado en este runtime (`GROWTH_SEO_ETV_METHODOLOGY_VERSION`, con `source` env/default) vs. la última request explícita persistida por el **ops-worker** (fotos/visibilidad) y por **Vercel** (prospecto); legacy configurado desde el corte `2026-11-01T00:00:00Z` (safe mode); legacy solicitado post-corte; evidencia contractual reciente junto a explícita (runtime viejo) | **0** divergencias |
+
+Decisiones no obvias: `awaiting_data` mientras no exista evidencia explícita (foundation sin rollout no es
+drift); las filas de sanity (`*.invalid`) se excluyen; configuración fuera del vocabulario es `error` sin tocar
+la base (la policy ya falla cerrado — acá se ve). El readback complementario vive en `GET /health` del
+ops-worker (`etvMethodology`).
 
 ## Delta 2026-08-29 — TASK-1700: 3 signals de la cola priorizada de trabajo SEO
 

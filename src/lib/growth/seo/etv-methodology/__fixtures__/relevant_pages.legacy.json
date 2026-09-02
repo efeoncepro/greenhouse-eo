@@ -1,0 +1,20 @@
+{
+  "_note": "TASK-1805 — respuesta SINTÉTICA versionada de relevant_pages (order_by metrics.organic.etv desc, limit 4). La fórmula cambia el VALOR y la MEMBRESÍA del top-N.",
+  "methodology": "legacy_static_v1",
+  "capturedAt": "2026-10-15",
+  "tasks": [
+    {
+      "status_code": 20000,
+      "result": [
+        {
+          "items": [
+            { "page_address": "https://cliente.cl/productos", "metrics": { "organic": { "count": 900, "etv": 5200.0 }, "paid": { "count": 0, "etv": 0 } } },
+            { "page_address": "https://cliente.cl/guia", "metrics": { "organic": { "count": 300, "etv": 1800.0 }, "paid": { "count": 0, "etv": 0 } } },
+            { "page_address": "https://cliente.cl/blog/colores", "metrics": { "organic": { "count": 120, "etv": 950.0 }, "paid": { "count": 0, "etv": 0 } } },
+            { "page_address": "https://cliente.cl/tiendas", "metrics": { "organic": { "count": 40, "etv": 610.0 }, "paid": { "count": 0, "etv": 0 } } }
+          ]
+        }
+      ]
+    }
+  ]
+}

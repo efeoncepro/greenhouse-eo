@@ -141,6 +141,13 @@ import { runUrlVisibilityBatch } from '@/lib/growth/seo/url-visibility/capture'
 import { runCompetitorCoverageBatch } from '@/lib/growth/seo/competitor-coverage'
 import { drainKeywordDiscoveryRuns } from '@/lib/growth/seo/keyword-discovery/runner'
 import { runSeoWorkQueueMaterializeBatch } from '@/lib/growth/seo/work-queue/materialize-batch'
+import {
+  ETV_PROVIDER_CUTOFF_ISO,
+  EtvMethodologyPolicyError,
+  isAfterEtvProviderCutoff,
+  resolveConfiguredEtvMethodology,
+  resolveEtvReadMethodology
+} from '@/lib/growth/seo/etv-methodology'
 import { isSeoModuleEnabled } from '@/lib/growth/seo/flags'
 import { drainAssessmentAiScoringRuns } from '@/lib/hiring/assessment/ai/scoring-run/execute'
 import { isHiringAssessmentAiRunEnqueueEnabled } from '@/lib/hiring/assessment/ai/scoring-run/config'
@@ -235,8 +242,36 @@ const parseFxDriftPolicy = (value: unknown): FxDriftRemediationPolicy | undefine
 
 // ─── Route Handlers ─────────────────────────────────────────────────────────
 
+/**
+ * TASK-1805 — readback del selector de metodología ETV tal como lo ve ESTE runtime. Configurar una
+ * env no es evidencia: el operador lee acá qué fórmula pediría el worker (y con qué policy) y lo
+ * contrasta con Vercel. Un valor inválido se reporta, no se enmascara.
+ */
+const readEtvMethodologyHealth = () => {
+  try {
+    const write = resolveConfiguredEtvMethodology()
+    const read = resolveEtvReadMethodology()
+
+    return {
+      configuredWriteMethod: write.version,
+      configuredWriteSource: write.source,
+      configuredReadMethod: read.version,
+      policyVersion: write.policyVersion,
+      providerCutoffAt: ETV_PROVIDER_CUTOFF_ISO,
+      afterCutoff: isAfterEtvProviderCutoff(new Date()),
+      valid: true
+    }
+  } catch (error) {
+    return {
+      valid: false,
+      policyError: error instanceof EtvMethodologyPolicyError ? error.code : 'unknown',
+      providerCutoffAt: ETV_PROVIDER_CUTOFF_ISO
+    }
+  }
+}
+
 const handleHealth = (_req: IncomingMessage, res: ServerResponse) => {
-  json(res, 200, { status: 'ok', service: 'ops-worker', timestamp: now() })
+  json(res, 200, { status: 'ok', service: 'ops-worker', timestamp: now(), etvMethodology: readEtvMethodologyHealth() })
 }
 
 /**

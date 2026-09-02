@@ -7,6 +7,18 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-02 — TASK-1805: la fórmula detrás de `etv` pasa a ser identidad del hecho (foundation, todavía legacy)
+
+DataForSEO cambia el cálculo de `etv` bajo el mismo campo y corta legacy el `2026-11-01T00:00:00Z` sin exponer
+versión. Greenhouse deja de depender del default: una policy pura endpoint-aware construye `use_improved_etv`
+explícito por request (falla cerrado ante familia ignorada/no habilitada, config inválida o legacy desde el
+corte), las tres tablas ETV ganan versión + evidencia + instante UTC + policy (expand aplicado; filas previas
+`legacy_static_v1` por contrato, nunca por fecha; guard de corte en la base), los siete caminos consumidores la
+persisten, readers/API/MCP sirven UNA fórmula con `etvMethodology` y `not_available_for_method`, la señal
+`seo.etv_methodology.drift` compara configurado vs solicitado en Vercel y ops-worker, y un evaluador
+dry-run/replay compara valor, membresía del top-N, traffic cost y prospecto sin gastar. Contract de schema
+parqueado hasta el release. Estado: code complete, rollout pendiente; Improved ETV NO activado (`TASK-1806`).
+
 ## 2026-09-02 — DCR deprecado en MCP `2026-07-28`: el shim del gateway se queda, pero deja de ser el futuro
 
 La revisión Current del protocolo marcó Dynamic Client Registration como `Deprecated` (PR #2858),
@@ -1159,17 +1171,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
   Ops Worker Deploy corre en cada push a develop; revisión `ops-worker-00610-kc8` verificada) —
   **día 1 de la serie: 2026-08-29**; el scheduler de cobertura de competidores quedó ENABLED tras
   verificar el endpoint con dry-run real. Sanity 9/9 contra PG real con rollback sin residuo.
-
-## 2026-08-28 — TASK-1662: keyword gap competitivo (code complete, rollout pendiente)
-
-- El módulo SEO gana la fundación de su tercera pregunta ("¿qué me estoy perdiendo entero?"):
-  competidores DECLARADOS con autoría acoplada por CHECK (`declareCompetitors`/`retireCompetitors`,
-  techo por target, outbox `growth.seo.competitor.*`, 3 lanes + tools MCP federadas en local),
-  captura de cobertura vía `labs/domain_intersection` (flag `GROWTH_SEO_COMPETITOR_GAP_ENABLED`
-  OFF + scheduler `ops-seo-competitor-coverage` pausado; run ledger anti fuga de re-compra;
-  mercado compartido productor #4 a costo 0) y `readKeywordGap` que DERIVA el gap al leer:
-  exclusión por GSC medido, contenido vs optimización vs objetivos declarados, factores con
-  `sin_dato` y **sin orden propio** (la cola de TASK-1700 es la autoridad de orden). Migración
-  `20260828113457119` aplicada; sanity 22/22 contra PG real. Slice 4 (emisión a la cola)
-  bloqueado por TASK-1700; rollout con autorización del operador
-  (`docs/manual-de-uso/growth/operar-gap-competitivo-seo.md`).

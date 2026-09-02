@@ -207,6 +207,7 @@ import {
 } from './queries/seo-keyword-discovery-health'
 import { getSeoMarketDataFreshnessSignal } from './queries/seo-market-data-freshness'
 import { getSeoDomainOverviewStalenessSignal } from './queries/seo-domain-overview-staleness'
+import { getSeoEtvMethodologyDriftSignal } from './queries/seo-etv-methodology-drift'
 import { getSeoUrlVisibilityStalenessSignal } from './queries/seo-url-visibility-staleness'
 import { getSeoCompetitorCoverageStalenessSignal } from './queries/seo-competitor-coverage-staleness'
 import { getSeoSerpTopResultsCoverageSignal } from './queries/seo-serp-top-results-coverage'
@@ -711,6 +712,7 @@ interface ReliabilityOverviewSources {
   seoRankCaptureLag?: ReliabilitySignal | null
   seoMarketDataFreshness?: ReliabilitySignal | null
   seoDomainOverviewStaleness?: ReliabilitySignal | null
+  seoEtvMethodologyDrift?: ReliabilitySignal | null
   seoUrlVisibilityStaleness?: ReliabilitySignal | null
   seoCompetitorCoverageStaleness?: ReliabilitySignal | null
   seoSerpTopResultsCoverage?: ReliabilitySignal | null
@@ -1185,6 +1187,7 @@ export const buildReliabilityOverview = (
     ...(sources.seoRankCaptureLag ? [sources.seoRankCaptureLag] : []),
     ...(sources.seoMarketDataFreshness ? [sources.seoMarketDataFreshness] : []),
     ...(sources.seoDomainOverviewStaleness ? [sources.seoDomainOverviewStaleness] : []),
+    ...(sources.seoEtvMethodologyDrift ? [sources.seoEtvMethodologyDrift] : []),
     ...(sources.seoUrlVisibilityStaleness ? [sources.seoUrlVisibilityStaleness] : []),
     ...(sources.seoCompetitorCoverageStaleness ? [sources.seoCompetitorCoverageStaleness] : []),
     ...(sources.seoSerpTopResultsCoverage ? [sources.seoSerpTopResultsCoverage] : []),
@@ -1737,6 +1740,11 @@ export const getReliabilityOverview = async (
     preloadedSources.seoDomainOverviewStaleness !== undefined
       ? preloadedSources.seoDomainOverviewStaleness
       : await getSeoDomainOverviewStalenessSignal().catch(() => null)
+
+  const seoEtvMethodologyDrift =
+    preloadedSources.seoEtvMethodologyDrift !== undefined
+      ? preloadedSources.seoEtvMethodologyDrift
+      : await getSeoEtvMethodologyDriftSignal().catch(() => null)
 
   const seoUrlVisibilityStaleness =
     preloadedSources.seoUrlVisibilityStaleness !== undefined
@@ -2900,6 +2908,7 @@ export const getReliabilityOverview = async (
     seoRankCaptureLag,
     seoMarketDataFreshness,
     seoDomainOverviewStaleness,
+    seoEtvMethodologyDrift,
     seoUrlVisibilityStaleness,
     seoCompetitorCoverageStaleness,
     seoSerpTopResultsCoverage,

@@ -1,0 +1,22 @@
+{
+  "_note": "TASK-1805 — respuesta SINTÉTICA versionada: mismo shape, mismo count/posiciones, ETV y traffic cost recalculados (CTR por layout/intención + normalización clickstream). Sin evidencia real del proveedor todavía.",
+  "methodology": "improved_layout_clickstream_v2",
+  "capturedAt": "2026-10-15",
+  "tasks": [
+    {
+      "status_code": 20000,
+      "result": [
+        {
+          "items": [
+            {
+              "metrics": {
+                "organic": { "pos_1": 12, "pos_2_3": 44, "pos_4_10": 310, "pos_11_20": 200, "count": 4120, "etv": 6377.9, "estimated_paid_traffic_cost": 11885.6, "is_new": 30, "is_up": 120, "is_down": 80, "is_lost": 12 },
+                "paid": { "count": 3, "etv": 9.8, "estimated_paid_traffic_cost": 31.4 }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

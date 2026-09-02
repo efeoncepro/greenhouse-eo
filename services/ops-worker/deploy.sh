@@ -855,6 +855,24 @@ ENV_VARS="${ENV_VARS},GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED=${GROWTH_SEO_DOMAIN_OVE
 GROWTH_SEO_URL_VISIBILITY_ENABLED="${GROWTH_SEO_URL_VISIBILITY_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},GROWTH_SEO_URL_VISIBILITY_ENABLED=${GROWTH_SEO_URL_VISIBILITY_ENABLED}"
 
+# TASK-1805 — Selector de metodología ETV de DataForSEO (NO es un flag booleano: vocabulario
+# cerrado `legacy_static_v1|improved_layout_clickstream_v2`). Gobierna QUÉ fórmula piden las
+# siete requests Labs que consumen ETV (foto de dominio, histórico, bulk, ranked_keywords,
+# relevant_pages, subdomains y el prospecto en Vercel) y se persiste por fila como provenance.
+#
+# 🔴 Debe valer LO MISMO en Vercel y en el ops-worker: la señal `seo.etv_methodology.drift`
+# compara lo configurado con lo que cada runtime pidió de verdad. Un valor fuera del vocabulario
+# hace fallar CERRADO toda captura ETV (mejor que comprar la fórmula equivocada en silencio).
+# Desde 2026-11-01T00:00:00Z `legacy_static_v1` también falla cerrado: el proveedor ya no lo
+# sirve, y el cutover a improved lo gobierna TASK-1806 (nunca "se prende" desde acá).
+GROWTH_SEO_ETV_METHODOLOGY_VERSION="${GROWTH_SEO_ETV_METHODOLOGY_VERSION:-legacy_static_v1}"
+ENV_VARS="${ENV_VARS},GROWTH_SEO_ETV_METHODOLOGY_VERSION=${GROWTH_SEO_ETV_METHODOLOGY_VERSION}"
+
+# Selector de LECTURA (readers/API/MCP): separado porque el cutover es writer-primero,
+# reader-después. El worker no sirve lecturas, pero declararlo acá mantiene un solo contrato.
+GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION="${GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION:-legacy_static_v1}"
+ENV_VARS="${ENV_VARS},GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION=${GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION}"
+
 # TASK-1662 — Cobertura de keywords de competidores declarados (keyword gap competitivo,
 # DataForSEO Labs `domain_intersection`, 2 llamadas por competidor por ciclo mensual).
 #

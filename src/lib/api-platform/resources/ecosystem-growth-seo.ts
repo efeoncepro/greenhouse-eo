@@ -387,7 +387,7 @@ export type EcosystemSeoDomainOverviewPayload =
       source: 'dataforseo_labs'
       overview: ReadDomainOverviewResult & { ok: true }
     }
-  | { ok: false; errorCode: 'disabled' | 'no_market_data'; status: null }
+  | { ok: false; errorCode: 'disabled' | 'no_market_data' | 'not_available_for_method'; status: null }
   | SeoTargetNotConfiguredPayload
 
 /**
@@ -435,9 +435,10 @@ export const getEcosystemSeoDomainOverviewPayload = async ({
   }
 
   if (!result.ok) {
-    // Degradación honesta: sujeto sin snapshot = no_market_data, jamás ceros fantasma.
+    // Degradación honesta: sujeto sin snapshot = no_market_data; con snapshot de OTRA fórmula =
+    // not_available_for_method (TASK-1805). Jamás ceros fantasma ni fallback silencioso.
     return {
-      data: { ok: false, errorCode: 'no_market_data', status: null },
+      data: { ok: false, errorCode: result.reason, status: null },
       meta: { module: 'growth.seo', tier: subject.tier, organizationId: subject.organizationId, servedMarket: subject.servedMarket }
     }
   }
@@ -468,7 +469,11 @@ export type EcosystemSeoUrlVisibilityPayload =
       mode: 'concentration'
       concentration: ReadVisibilityConcentrationResult & { ok: true }
     }
-  | { ok: false; errorCode: 'disabled' | 'no_market_data' | 'invalid_subject' | 'invalid_kind'; status: null }
+  | {
+      ok: false
+      errorCode: 'disabled' | 'no_market_data' | 'invalid_subject' | 'invalid_kind' | 'not_available_for_method'
+      status: null
+    }
   | SeoTargetNotConfiguredPayload
 
 /**
