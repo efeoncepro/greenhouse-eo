@@ -1,7 +1,7 @@
 # ANAM HubSpot Managed Service end-to-end
 
 > **Tipo:** Documentación funcional
-> **Versión:** 1.9
+> **Versión:** 2.0
 > **Actualizado:** 2026-09-02
 > **Cliente/portal:** ANAM / `19893546`
 > **Canon técnico:** [`../../architecture/kortex/hubspot-as-a-service/README.md`](../../architecture/kortex/hubspot-as-a-service/README.md)
@@ -77,6 +77,23 @@ puede reasignar manualmente el ticket en Help Desk para que otra persona contin�
 el chat impide reabrirlo. La matriz actual no convierte nombres escritos libremente en usuarios: una petición por
 Pablo, Marco o María Paz activa la necesidad de atención humana, pero el nombre sólo puede confirmarse tras una
 condición gobernada o una reasignación manual que pruebe el owner efectivo.
+
+## Entrega documental y soporte
+
+El cierre de Emma y su handoff se entrega en dos PDF brandeados —uno técnico y uno funcional— con Efeonce como
+marca dominante, HubSpot como partnership y ANAM como cliente. Sus HTML/CSS son la fuente editable y los PDF el
+master visual. Cada uno fue revisado en cinco páginas rasterizadas, con Poppins/Geist embebidas y sin overflow.
+El [correo de entrega](anam-entrega-documentacion-y-soporte-2026-09-02.md) registra destinatarios, adjuntos y el
+estado no enviado del borrador.
+
+El soporte del proyecto Customer Agent y del proyecto KPI tiene una duración explícita de **tres meses**, desde
+el **13 de agosto hasta el 12 de noviembre de 2026, inclusive**. Cubre soporte del alcance construido: diagnóstico
+y corrección de incidentes, consultas operativas, revisión de comportamientos inesperados, restauración de la
+configuración entregada y ajustes documentales derivados de una corrección. No cubre innovación ni evolución:
+nuevas funcionalidades, KPI, workflows, automatizaciones, integraciones o rediseños requieren un alcance aparte.
+
+Efeonce se comprometió a compartir durante la semana del 2 de septiembre un SharePoint con la documentación
+consolidada. Esa comunicación es un compromiso futuro y no debe marcarse como completada hasta verificar el enlace.
 
 ## Estado por fase
 
@@ -204,6 +221,9 @@ Customer Agent, facturación y Tickets/SLA. Ningún ítem documentado equivale p
 
 ## Referencias
 
+- [Entrega documental y soporte](anam-entrega-documentacion-y-soporte-2026-09-02.md)
+- [PDF técnico de Emma](../../architecture/kortex/hubspot-as-a-service/reports/ANAM_Emma_Handoff_Especificacion_Tecnica_2026-09-02.pdf)
+- [PDF funcional de Emma](../../architecture/kortex/hubspot-as-a-service/reports/ANAM_Emma_Handoff_Documentacion_Funcional_2026-09-02.pdf)
 - [Catálogo HubSpot as a Service](../../services/hubspot-as-a-service/README.md)
 - [Landing CMS React de Emma](../../architecture/kortex/hubspot-cms/anam-chat-landing.md)
 - [Runbook de landing HubSpot CMS](../../architecture/kortex/hubspot-cms/landing-page-runbook.md)

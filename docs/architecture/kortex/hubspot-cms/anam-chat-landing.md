@@ -318,3 +318,11 @@ Project deployedBuildId: 28
 Estado: live
 Pendiente: configurar chatflow target rules/branches en HubSpot para `anam_intent`.
 ```
+
+## Evidencia incluida en la entrega al cliente
+
+La captura final seleccionada para el correo de cierre está versionada en
+[`../hubspot-as-a-service/reports/assets/ANAM_Emma_Landing_2026-09-02.png`](../hubspot-as-a-service/reports/assets/ANAM_Emma_Landing_2026-09-02.png).
+Muestra el wordmark horizontal, la presentación `Hola, soy Emma`, el personaje femenino, el bordado correcto
+`ANÁLISIS AMBIENTALES S.A.`, el selector único y el CTA `Conversar con Emma`. La captura comunica la experiencia;
+la evidencia runtime continúa siendo el readback público de build `#28` descrito arriba.

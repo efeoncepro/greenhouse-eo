@@ -165,3 +165,6 @@ Test at least:
 - analytics that distinguish visitor-triggered handoff, workflow assignment and manual reassignment.
 
 For each case record prompt, expected behavior, observed behavior, sources used, transfer status, verdict and follow-up.
+Keep QA labels, branch names and administrative markers outside the substantive visitor message. Prefixes such as
+`QA`, `PRUEBA`, `test` or an expected category can contaminate an AI classifier and create a false routing result;
+store them in the evidence record instead.

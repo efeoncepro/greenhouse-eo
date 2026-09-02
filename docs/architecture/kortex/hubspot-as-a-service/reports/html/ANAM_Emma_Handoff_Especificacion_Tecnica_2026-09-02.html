@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ANAM · Handoff de Emma · Especificación técnica</title>
+  <link rel="stylesheet" href="anam-handoff-report.css">
+</head>
+<body>
+  <section class="page cover">
+    <div class="brandbar">
+      <div class="co-brand">
+        <img class="efeonce" src="../../../../../../public/branding/logo-negative.svg" alt="Efeonce">
+        <span class="client-divider"></span>
+        <img class="anam" src="../../../../../../docs/assets/public-site/aeo-brand-logos/anam.svg" alt="ANAM">
+      </div>
+      <img class="partner" src="../../../../../../public/branding/partners/hubspot/solution-partner/badge-light-spp-hubspot.svg" alt="HubSpot Solutions Partner">
+    </div>
+    <div class="cover-grid">
+      <div class="cover-copy">
+        <div>
+          <p class="eyebrow">Especificación técnica · v1.1</p>
+          <h1>El sistema detrás del <span>handoff de Emma</span></h1>
+          <p class="cover-deck">Cómo HubSpot conserva el contexto, clasifica la intención y asigna cada ticket al equipo ANAM según disponibilidad.</p>
+        </div>
+        <div class="cover-meta">
+          <div><span>Portal</span><strong>ANAM · 19893546</strong></div>
+          <div><span>Workflow</span><strong>1876744588</strong></div>
+          <div><span>Estado verificado</span><strong>ACTIVADA</strong></div>
+          <div><span>Readback</span><strong>2 septiembre 2026</strong></div>
+        </div>
+      </div>
+      <div class="cover-visual" aria-label="Resumen visual del flujo de handoff">
+        <div class="rail"></div>
+        <div class="route-stop"><b>Conversación</b><small>Emma comprende y conserva el contexto.</small></div>
+        <div class="route-stop"><b>Decisión</b><small>HubSpot resume y clasifica la necesidad.</small></div>
+        <div class="route-stop"><b>Distribución</b><small>El workflow consulta intención y disponibilidad.</small></div>
+        <div class="route-stop"><b>Continuidad</b><small>Una persona sigue en el mismo chat abierto.</small></div>
+        <div class="promise-chip">Una conversación.<br>Un ticket.<br>Un owner verificable.</div>
+      </div>
+    </div>
+    <div class="footer"><span><strong>efeoncepro.com</strong> · sales@efeoncepro.com · +56 9 3732 3064</span><span>Dr. Manuel Barros Borgoño 71, oficina 1105 · Providencia, Chile</span></div>
+  </section>
+
+  <section class="page">
+    <div class="running-head"><img src="../../../../../../public/branding/logo-full.svg" alt="Efeonce"><span class="doc-id">ANAM · Handoff de Emma · Arquitectura</span></div>
+    <div class="page-title-row"><div class="chapter-no">1</div><div><div class="section-label">Arquitectura del servicio</div><h2>Del mensaje al owner efectivo</h2><p class="lead">Emma decide cuándo hace falta una persona. El workflow decide quién recibe el ticket. Son dos responsabilidades separadas y verificables.</p></div></div>
+    <div class="system-map">
+      <div class="system-node"><span class="node-index">1</span><h3>Visitante + Emma</h3><p>La conversación reúne intención, antecedentes y solicitud de atención humana.</p></div>
+      <div class="map-arrow">›</div>
+      <div class="system-node hero-node"><span class="node-index">2</span><h3>Live handoff</h3><p>HubSpot mantiene el chat abierto y crea un ticket en Help Desk con el historial asociado.</p></div>
+      <div class="map-arrow">›</div>
+      <div class="system-node"><span class="node-index">3</span><h3>Workflow 1876744588</h3><p>Resume, clasifica, limpia el owner técnico y ejecuta el routing humano.</p></div>
+    </div>
+    <div class="transformation-band four">
+      <div class="transform-item"><b>1 · Resumir registro</b><span>Sintetiza el ticket y la conversación asociada.</span></div>
+      <div class="transform-item"><b>2 · Enviar a la IA</b><span>Devuelve una categoría semántica controlada.</span></div>
+      <div class="transform-item"><b>3 · Editar registro</b><span>Borra a Emma como propietaria técnica.</span></div>
+      <div class="transform-item"><b>4 · Ramificación</b><span>Abre cotización, seguimiento, Calidad/otros o contingencia.</span></div>
+    </div>
+    <div class="fact-grid">
+      <div class="fact"><b>Entrada</b><span>Activación manual desde el Customer Agent.</span></div>
+      <div class="fact"><b>Modalidad</b><span>Live handoff; conserva el hilo abierto.</span></div>
+      <div class="fact"><b>Objeto</b><span>Ticket de Help Desk, no conversación.</span></div>
+      <div class="fact"><b>Reinscripción</b><span>Desactivada para el mismo ticket.</span></div>
+    </div>
+    <div class="proof-band">
+      <div><span class="micro-label">Límite de responsabilidad</span><div class="big-proof">2 capas</div><p>Customer Agent para decidir el handoff; workflow para distribuir el ticket.</p></div>
+      <div><h3>Qué no es este flujo</h3><p>No es una acción externa de Emma ni un agente ejecutado dentro del workflow. La configuración de handoff selecciona este workflow de tickets como mecanismo de distribución.</p></div>
+    </div>
+    <div class="footer"><span><strong>efeoncepro.com</strong> · sales@efeoncepro.com · +56 9 3732 3064 · Dr. Manuel Barros Borgoño 71, of. 1105 · Providencia, Chile</span><span class="page-no">02 / 05</span></div>
+  </section>
+
+  <section class="page routing-page">
+    <div class="running-head"><img src="../../../../../../public/branding/logo-full.svg" alt="Efeonce"><span class="doc-id">ANAM · Handoff de Emma · Routing</span></div>
+    <div class="page-title-row"><div class="chapter-no">2</div><div><div class="section-label">Matriz de distribución</div><h2>Intención primero. Disponibilidad después.</h2><p class="lead">Cada rama intenta una persona principal. El reemplazo sólo actúa si el ticket continúa sin propietario.</p></div></div>
+    <div class="routing-board">
+      <div class="routing-head">Necesidad detectada</div><div class="routing-head">Responsable principal</div><div class="routing-head">Reemplazo</div>
+      <div class="route-cell category"><b>Cotización / nuevo negocio</b><span>Precio, propuesta, alcance o servicio nuevo.</span></div>
+      <div class="route-cell"><div class="person"><span class="avatar">PP</span><div><b>Pablo Puga</b><small>Paso 5</small></div></div></div>
+      <div class="route-cell"><div class="person backup"><span class="avatar">MP</span><div><b>María Paz Haeger</b><small>Paso 9</small></div></div></div>
+      <div class="route-cell category"><b>Seguimiento de servicio</b><span>Resultados, programación, estado o facturación en curso.</span></div>
+      <div class="route-cell"><div class="person"><span class="avatar">MJ</span><div><b>Marco Jiménez</b><small>Paso 6</small></div></div></div>
+      <div class="route-cell"><div class="person backup"><span class="avatar">PP</span><div><b>Pablo Puga</b><small>Paso 10</small></div></div></div>
+      <div class="route-cell category quality"><b>Calidad, facturación u otros</b><span>Quejas, apelaciones, incidencias y otras solicitudes.</span></div>
+      <div class="route-cell"><div class="person"><span class="avatar">MP</span><div><b>María Paz Haeger</b><small>Paso 7</small></div></div></div>
+      <div class="route-cell"><div class="person backup"><span class="avatar">MJ</span><div><b>Marco Jiménez</b><small>Paso 11</small></div></div></div>
+      <div class="route-cell category unknown"><b>Sin clasificación</b><span>Contingencia cuando la salida no coincide con una etiqueta.</span></div>
+      <div class="route-cell"><div class="person"><span class="avatar">MP</span><div><b>María Paz Haeger</b><small>Paso 8</small></div></div></div>
+      <div class="route-cell"><div class="person backup"><span class="avatar">MJ</span><div><b>Marco Jiménez</b><small>Paso 12</small></div></div></div>
+    </div>
+    <div class="logic-strip">
+      <div><b>Disponible</b><span>La primera acción asigna y la segunda conserva ese owner.</span></div>
+      <div><b>Principal ausente</b><span>El ticket sigue libre y el reemplazo puede recibirlo.</span></div>
+      <div><b>Ambos ausentes</b><span>Permanece sin owner y visible en la cola; el chat sigue abierto.</span></div>
+    </div>
+    <div class="proof-band">
+      <div><span class="micro-label">Regla compartida</span><div class="big-proof">No overwrite</div></div>
+      <div><p><strong>Asignar sólo a usuarios disponibles:</strong> activado.<br><strong>Sobrescribir owner existente:</strong> desactivado.</p><p class="small">El reemplazo es una composición de dos acciones, no una función nativa llamada “backup”.</p></div>
+    </div>
+    <div class="footer"><span><strong>efeoncepro.com</strong> · sales@efeoncepro.com · +56 9 3732 3064 · Dr. Manuel Barros Borgoño 71, of. 1105 · Providencia, Chile</span><span class="page-no">03 / 05</span></div>
+  </section>
+
+  <section class="page diagnostic-page">
+    <div class="running-head"><img src="../../../../../../public/branding/logo-full.svg" alt="Efeonce"><span class="doc-id">ANAM · Handoff de Emma · Control operativo</span></div>
+    <div class="page-title-row"><div class="chapter-no">3</div><div><div class="section-label">Comprensión, decisión y diagnóstico</div><h2>Ocho verificaciones para no confundir ejecución con éxito</h2><p class="lead">El workflow puede terminar y aun así dejar un owner incorrecto. El control concluyente es el propietario efectivo del ticket.</p></div></div>
+    <div class="diagnostic-layout">
+      <div class="control-stack">
+        <div class="control"><span class="control-no">1</span><div><b>Handoff</b><span>Confirmar que la conversación cumplió las directrices de Emma.</span></div></div>
+        <div class="control"><span class="control-no">2</span><div><b>Ticket</b><span>Verificar creación e inscripción en el workflow 1876744588.</span></div></div>
+        <div class="control"><span class="control-no">3</span><div><b>Resumen y categoría</b><span>Leer la síntesis y la etiqueta semántica obtenida.</span></div></div>
+        <div class="control"><span class="control-no">4</span><div><b>Limpieza de owner</b><span>Confirmar que Emma dejó de figurar como propietaria técnica.</span></div></div>
+        <div class="control"><span class="control-no">5</span><div><b>Rama</b><span>Revisar el camino y las dos acciones de asignación.</span></div></div>
+        <div class="control"><span class="control-no">6</span><div><b>Disponibilidad</b><span>Comprobar el estado live del principal y el reemplazo.</span></div></div>
+        <div class="control"><span class="control-no">7</span><div><b>Readback</b><span>Leer el owner efectivo y el estado visible en el widget.</span></div></div>
+        <div class="control"><span class="control-no">8</span><div><b>Capacidad</b><span>Revisar créditos, límite mensual y errores de acciones.</span></div></div>
+      </div>
+      <div class="risk-panel">
+        <span class="micro-label">Controles críticos</span>
+        <h3>Las fallas que requieren observación</h3>
+        <div class="risk-item"><b>Clasificación no reconocida</b><span>Activa la ruta de contención: María Paz y luego Marco.</span></div>
+        <div class="risk-item"><b>Emma conserva el owner</b><span>Las acciones humanas pueden omitirse porque no sobrescriben.</span></div>
+        <div class="risk-item"><b>Resumen agotado</b><span>La acción declara un máximo de 3.000 ejecuciones mensuales.</span></div>
+        <div class="risk-item"><b>Créditos insuficientes</b><span>La acción inteligente de clasificación puede fallar.</span></div>
+        <div class="risk-item"><b>Chat terminado</b><span>No es posible reabrir esa misma conversación.</span></div>
+        <div class="risk-item"><b>Solicitud por nombre</b><span>“Quiero hablar con Pablo” activa handoff; no garantiza owner nominal.</span></div>
+      </div>
+    </div>
+    <div class="logic-strip">
+      <div><b>Clasificación semántica</b><span>Los marcadores “QA”, “PRUEBA” o “test” no alteran por sí solos la necesidad real.</span></div>
+      <div><b>Prioridad sustantiva</b><span>Si hay varias intenciones, se elige la necesidad operativa principal.</span></div>
+      <div><b>Continuidad manual</b><span>Help Desk permite reasignar mientras el chat permanezca abierto.</span></div>
+    </div>
+    <div class="footer"><span><strong>efeoncepro.com</strong> · sales@efeoncepro.com · +56 9 3732 3064 · Dr. Manuel Barros Borgoño 71, of. 1105 · Providencia, Chile</span><span class="page-no">04 / 05</span></div>
+  </section>
+
+  <section class="page">
+    <div class="running-head"><img src="../../../../../../public/branding/logo-full.svg" alt="Efeonce"><span class="doc-id">ANAM · Handoff de Emma · Evidencia</span></div>
+    <div class="page-title-row"><div class="chapter-no">4</div><div><div class="section-label">Evidencia y gobierno</div><h2>Lo probado, lo abierto y el estándar de cambio</h2><p class="lead">La evidencia disponible confirma routing y owner efectivo en tres escenarios públicos de punta a punta.</p></div></div>
+    <div class="evidence-grid">
+      <div class="evidence-card"><span class="ticket">Ticket 48103069613</span><h3>Cotización</h3><p>Clasificación correcta y asignación efectiva a Pablo Puga.</p></div>
+      <div class="evidence-card"><span class="ticket">Ticket 48105602378</span><h3>Seguimiento</h3><p>Marco ausente; reemplazo efectivo a Pablo Puga.</p></div>
+      <div class="evidence-card"><span class="ticket">Ticket 48094218332</span><h3>Calidad</h3><p>Clasificación correcta y asignación efectiva a María Paz Haeger.</p></div>
+    </div>
+    <div class="proof-band">
+      <div><span class="micro-label">Sonda de diagnóstico</span><div class="big-proof">48103382175</div><p>Detectó owner Emma y sesgo por texto administrativo. Ambas causas fueron corregidas antes de repetir la matriz.</p></div>
+      <div><h3>Evidencia observada</h3><p>Creación del ticket, clasificación, término del workflow, propietario efectivo y actualización visible en el widget.</p><p class="small">No se infiere éxito por el estado “finalizado”; se lee el resultado operativo.</p></div>
+    </div>
+    <div class="status-row">
+      <div class="status-panel proven"><h3 class="mint">Confirmado</h3><ul><li>Workflow activo y seleccionado por Emma.</li><li>Tres categorías con owner efectivo verificado.</li><li>Fallback comprobado con principal ausente.</li><li>Chat conservado durante el handoff.</li></ul></div>
+      <div class="status-panel"><h3 class="orange">Prueba acompañada pendiente</h3><ul><li>Respuesta humana real desde Help Desk.</li><li>Segunda reasignación dentro del mismo chat.</li><li>Principal y reemplazo ausentes simultáneamente.</li><li>Atención operativa de la cola sin owner.</li></ul></div>
+    </div>
+    <div class="meeting-script"><span class="quote-mark">“</span><p><strong>Soporte por tres meses:</strong> del 13 de agosto al 12 de noviembre de 2026, inclusive, para incidentes y correcciones del alcance construido de Customer Agent y KPI. Nuevas funcionalidades, KPI, automatizaciones, integraciones o rediseños se evalúan como evolución separada.</p></div>
+    <div class="footer"><span><strong>efeoncepro.com</strong> · sales@efeoncepro.com · +56 9 3732 3064 · Dr. Manuel Barros Borgoño 71, of. 1105 · Providencia, Chile</span><span class="page-no">05 / 05</span></div>
+  </section>
+</body>
+</html>

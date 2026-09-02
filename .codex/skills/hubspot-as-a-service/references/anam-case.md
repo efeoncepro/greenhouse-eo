@@ -13,6 +13,10 @@ ANAM is an Efeonce client, not a Greenhouse product initiative, internal dashboa
 - Public chat landing: `https://anam-2.hubspotpagebuilder.com/agente-anam`
 - CMS project: `kortex-cms-react`, project `103589049`
 - CLI account/profile: `anam-19893546` / `anam`; never replace the Kortex/Efeonce default.
+- Delivered-scope support: three months, 2026-08-13 through 2026-11-12 inclusive, for both Customer Agent and
+  KPI. It covers incidents, corrections, operating questions, configuration recovery and correction-driven
+  documentation. New functionality, KPI, workflows, automation, integrations, redesign or innovation require a
+  separately approved scope.
 
 ## Canonical documentation
 
@@ -45,6 +49,9 @@ ANAM is an Efeonce client, not a Greenhouse product initiative, internal dashboa
 - `docs/architecture/kortex/hubspot-as-a-service/anam-follow-up-change-set-2026-07-24.md`
 - `docs/audits/ANAM_COMMERCIAL_BACKLOG_DASHBOARD_QA_2026-07-24.md`
 - `docs/audits/ANAM_HUBSPOT_GOALS_EXECUTION_QA_2026-07-24.md`
+- `docs/documentation/hubspot-as-a-service/anam-entrega-documentacion-y-soporte-2026-09-02.md`
+- `docs/architecture/kortex/hubspot-as-a-service/reports/ANAM_Emma_Handoff_Especificacion_Tecnica_2026-09-02.pdf`
+- `docs/architecture/kortex/hubspot-as-a-service/reports/ANAM_Emma_Handoff_Documentacion_Funcional_2026-09-02.pdf`
 
 ## RevOps object model
 

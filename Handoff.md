@@ -2,6 +2,26 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-09-02 (6) — ANAM recibe un cierre documental premium y un soporte acotado a tres meses
+
+El cierre de Emma quedó consolidado en dos entregables externos de cinco páginas: especificación técnica y guía
+funcional. El sistema visual usa Poppins para display y Geist para lectura; Efeonce predomina como proveedor,
+HubSpot aparece como partnership y ANAM como cliente. Los PDF son el master de envío, los HTML/CSS la fuente
+editable y diez capturas rasterizadas la evidencia de revisión. Todos los pies incluyen sitio, correo, teléfono y
+dirección de Efeonce. Las versiones Word supersedidas quedaron fuera del paquete versionado.
+
+El correo para Óscar, María Paz, Pablo y Marco quedó listo, pero **no enviado**. Explica el rediseño de la landing,
+la corrección generativa del bordado `ANÁLISIS AMBIENTALES S.A.`, la identidad live de Emma, la matriz de handoff,
+las tres pruebas E2E y las validaciones humanas todavía pendientes. La captura final de la landing también quedó
+versionada como adjunto. El SharePoint consolidado es un compromiso para esta semana y permanece pendiente hasta
+verificar el enlace compartido.
+
+El soporte quedó explícito para Customer Agent y KPI: **tres meses, del 2026-08-13 al 2026-11-12 inclusive**.
+Cubre incidentes, correcciones, dudas operativas, comportamientos inesperados, recuperación de configuración y
+documentación derivada de una corrección. No cubre nuevas funcionalidades, KPI, workflows, automatizaciones,
+integraciones, rediseños ni innovación; toda evolución requiere alcance y aprobación separados. Este cierre sólo
+actualiza documentación y entregables; no mutó HubSpot, no envió correo, no creó SharePoint y no hizo push.
+
 ## 2026-09-02 (5) — TASK-1784: el eval de selección MCP refutó su propia hipótesis, y eso es el entregable
 
 Se midió la selección de tools SEO antes de tocar una descripción: **tool 94.5% / mercado 98.2% / gasto 100%**
@@ -470,21 +490,3 @@ encontré el selector — buscándolo en el repo equivocado. Está construido en
 
 Quedan 4 con el aviso vivo (1112, 1258, 1259, 1352): son justo aquellas donde nada se puede tildar
 con verdad. Su `Status real` ahora responde el aviso en la primera línea que alguien lee.
-
-## 2026-09-01 — DataForSEO Improved ETV: contrato documentado, cutover no autorizado
-
-Tres subagentes auditaron documentación oficial, siete consumers y drift de skills. El aviso de cuenta anuncia
-`use_improved_etv: true`, legacy por default hasta 2026-11-01 y después improved; la documentación pública aún
-no publica matriz de endpoints, retroactividad, pricing ni convivencia con clickstream. Greenhouse no declara
-fórmula y las UNIQUE append-only de domain/URL/prospect no permiten shadow dual.
-
-Actualizadas las skills espejadas DataForSEO/SEO, dossier Labs, contrato interno, manuales y
-`docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md`. Quedaron además: correo de diez preguntas en
-**borrador/no enviado**, ADR aceptado con implementación/costo/cutover gated, runbook de evaluación y
-`TASK-1805` y `TASK-1806` registradas `to-do` bajo `EPIC-022`. La primera posee
-expand→writers→readers/API/MCP→signals/evaluator y cierra todavía en legacy; la segunda depende de su cierre y
-posee shadow→decisión histórica→cutover/rollback. Un A/B exacto puede requerir dos llamadas pagadas; un canary sin
-gasto incremental es sólo comparación temporal. Sin code/schema/flag/scheduler/API pagada ni runtime mutation.
-Siguiente paso: enviar el correo sólo con autorización, incorporar la respuesta contractual y, en otra instrucción,
-tomar `TASK-1805`; `TASK-1806` requiere además autorizaciones separadas de gasto y cutover. Estado:
-**diseño pre-implementación completo; implementación/rollout pendiente**.

@@ -1,7 +1,7 @@
 # Operar ANAM HubSpot Managed Service
 
 > **Tipo:** Manual de uso / runbook
-> **Versión:** 1.9
+> **Versión:** 2.0
 > **Actualizado:** 2026-09-02
 > **Portal obligatorio:** ANAM `19893546`
 > **Funcional:** [`../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md`](../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md)
@@ -193,6 +193,23 @@ aprobación humana precede cualquier write y el target está ligado a `19893546`
 
 Escala a ANAM/Maria Paz si falta definición/ratificación; a Efeonce si falta diseño, acceso, rollback o evidencia;
 y a plataforma sólo con evidencia runtime de defecto. Incluye IDs, período, esperado/observado y riesgo.
+
+## Clasificar solicitudes durante el soporte
+
+La ventana de soporte para Customer Agent y KPI va del **13 de agosto al 12 de noviembre de 2026, inclusive**.
+Antes de aceptar una solicitud, clasifícala así:
+
+| Tipo | Tratamiento |
+|---|---|
+| Incidente o diferencia frente al alcance entregado | Diagnosticar, corregir y leer de vuelta dentro del soporte. |
+| Duda de uso, operación o comportamiento inesperado | Orientar y registrar evidencia dentro del soporte. |
+| Recuperación de configuración o documento afectado por una corrección | Restaurar o actualizar dentro del soporte. |
+| Nueva funcionalidad, KPI, workflow, automatización, integración o rediseño | Registrar como evolución; requiere alcance, estimación y aprobación separados. |
+
+No describas el soporte como desarrollo continuo ni como una bolsa abierta de innovación. Para el cierre documental,
+usa los PDF como entregables, conserva HTML/CSS como fuente editable y verifica el SharePoint sólo cuando exista un
+enlace compartido. El borrador de correo y su lista de adjuntos están en
+[`../../documentation/hubspot-as-a-service/anam-entrega-documentacion-y-soporte-2026-09-02.md`](../../documentation/hubspot-as-a-service/anam-entrega-documentacion-y-soporte-2026-09-02.md).
 
 ## Referencias
 

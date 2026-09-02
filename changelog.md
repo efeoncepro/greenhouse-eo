@@ -7,6 +7,23 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-02 — ANAM: entrega premium de Emma y soporte explícito de tres meses
+
+Se consolidó el cierre de la landing, identidad y handoff de Emma en dos PDF de cinco páginas: una especificación
+técnica y una guía funcional. Los HTML/CSS son la fuente editable; los PDF, el master para cliente. Se revisaron
+diez páginas rasterizadas, fuentes Poppins/Geist embebidas, composición, overflow y pies con sitio, correo,
+teléfono y dirección. La captura final de la landing quedó versionada y los borradores Word supersedidos fueron
+excluidos del paquete.
+
+El borrador de correo para Óscar, María Paz, Pablo y Marco explica los cambios de landing e identidad, la matriz
+de routing y el límite de las pruebas E2E. Quedó listo, no enviado. También registra el SharePoint consolidado
+como compromiso pendiente para esta semana.
+
+La documentación y las skills espejo ahora fijan el soporte de Customer Agent y KPI en tres meses, del
+2026-08-13 al 2026-11-12 inclusive. Soporte cubre el alcance construido; nuevas funcionalidades, KPI, workflows,
+automatizaciones, integraciones, rediseños e innovación requieren un alcance separado. No se cambió runtime
+HubSpot, no se envió correo, no se creó SharePoint y no se hizo push.
+
 ## 2026-09-02 — La superficie MCP del módulo SEO pasa a tener eval de selección
 
 TASK-1784 agregó un fixture de 55 preguntas de operador en los cinco mercados productivos y un runner que mide
@@ -1127,10 +1144,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
 - Federación en producción: revisión `efeonce-mcp-gateway-00023-zt2`, `tools/list` autenticado observado en **21 tools SEO** (antes 13), con las 8 recién federadas presentes. Canary del provider verde contra producción para Efeonce y Berel.
 - **El `oauth:canary` tenía un punto ciego de inventario y se cerró**: ejercitaba `tools/call` sobre tools puntuales y nunca `tools/list`, así que una tool que quedara fuera del server pasaba invisible mientras las probadas siguieran verdes. Ahora asserta el inventario (`efeonce-mcp` commit `4058a07`). El charset del nombre incluye el punto a propósito — las tools no-SEO son punteadas (`hiring.talent_pool.search`) y sin él el total excluía Globe y Hiring en silencio, reportando el conteo SEO como si fuera el total.
 - `TASK-1658`, `TASK-1775` y `TASK-1776` pasan a `complete` con `task:lint` 0/0. Queda un residual declarado en 1775 (sujeto desconocido → fila NULL: cubierto por unit test, no observado en runtime) y la verificación del lunes 2026-08-31 para `TASK-1777`.
-
-## 2026-08-27 — Release a producción del carril Growth SEO (TASK-1652/1658/1709/1775/1776/1777)
-
-- Promovido `develop`→`main` como **un solo release**: PR #207, 632 archivos, 10 migraciones, target `cc73c74789ce`, release_id `cc73c74789ce-dbce65f2-303b-4528-bef3-f4edd022a880`, orquestador `33123977671`, manifest **`released`** en 9 min 40 s sin retry ni gate colgado. Llegan a producción los lanes ecosystem de la tríada SEO, el lane de diagnóstico de prospecto, la corrección del request AI Mode del grader y la federación MCP; más el cierre de hiring que quedaba en develop.
-- **Flags prendidos con el release** (ambos requerían que su lector estuviera en `main`, regla ISSUE-150 — verificado x0 antes y x1/x2/x3 después): `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` (Vercel, sign-off comercial del operador) y `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (Vercel Production; en ops-worker ya estaba ON). Redeploy `greenhouse-if2u2c8ys` porque Vercel congela env vars al build; `pnpm flags:audit --strict` cierra en 0/0.
-- **Los 3 gotchas del squash-merge se pre-emptaron, no se sufrieron**: merge canónico `-s ours` con ambas verificaciones vacías; el push a develop se bundleó con una edición del `FEATURE_FLAG_STATE_LEDGER` (está en `deployControlDocs` y fuerza el build de staging, evitando el `vercel_readiness` en exit 1); el Playwright smoke sobre `main` se produjo en 3 min en vez de taparlo con bypass. El `bypass_preflight_reason` quedó reservado para `db_migrations`, único dominio irreversible real, con razón auditable (migraciones ya aplicadas en la instancia única Cloud SQL).
-- ⚠️ **El watchdog post-release recomendó una regresión.** Reportó DRIFT en 3 workers comparando contra `gh=6f7e246ea888` (commit del 2026-07-30, ancestro del target) y propuso redeployar `hubspot-greenhouse-integration` con ese `expected_sha` — pisar código correcto con código de un mes atrás. No se ejecutó: `pnpm release:workers` (lee Cloud Run, fuente autoritativa) mostró 3/4 workers exactamente en el target y el `ops-worker` en change-gate legítimo, verificado con las **28 rutas reales** leídas del workflow y diff vacío. Es la clase de falso positivo abierta hasta TASK-920.

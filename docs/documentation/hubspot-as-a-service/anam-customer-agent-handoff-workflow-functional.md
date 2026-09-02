@@ -1,7 +1,7 @@
 # Cómo Emma deriva cada solicitud al equipo ANAM
 
 > **Tipo:** Documentación funcional para cliente
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Actualizado:** 2026-09-02
 > **Cliente:** ANAM
 > **Alcance:** Customer Agent `Emma`, chat web y distribución humana
@@ -145,6 +145,21 @@ Para cerrar también la experiencia humana, conviene ejecutar una ventana coordi
 
 Lo anterior no impide el funcionamiento probado del routing; son evidencias adicionales de continuidad operativa.
 
+## Entrega y período de soporte
+
+ANAM recibe dos documentos finales: una especificación técnica y esta explicación funcional, ambas en PDF. Los
+archivos editables se conservan en HTML/CSS para mantener tipografía, composición y marca sin depender de Word.
+
+El soporte para el proyecto Customer Agent y el proyecto KPI es de **tres meses: del 13 de agosto al 12 de
+noviembre de 2026, ambas fechas incluidas**. Durante ese período Efeonce cubre incidentes y correcciones sobre lo
+construido, dudas de uso u operación, revisión de comportamientos inesperados, recuperación de la configuración
+entregada y actualización documental cuando una corrección lo requiera.
+
+El soporte no incorpora nuevas funcionalidades, KPI adicionales, nuevos workflows o automatizaciones,
+integraciones, rediseños ni innovaciones. Esas necesidades se evalúan y cotizan como evolución independiente.
+Efeonce comunicará durante la semana del 2 de septiembre el SharePoint que consolidará la documentación; hasta
+que el enlace sea enviado, esa entrega permanece pendiente.
+
 ## Guion breve para presentarlo en reunión
 
 > Emma resuelve primero las consultas que están dentro de su conocimiento. Cuando hace falta una persona, mantiene
@@ -156,6 +171,9 @@ Lo anterior no impide el funcionamiento probado del routing; son evidencias adic
 
 ## Documentos relacionados
 
+- [PDF funcional para ANAM](../../architecture/kortex/hubspot-as-a-service/reports/ANAM_Emma_Handoff_Documentacion_Funcional_2026-09-02.pdf)
+- [PDF técnico para ANAM](../../architecture/kortex/hubspot-as-a-service/reports/ANAM_Emma_Handoff_Especificacion_Tecnica_2026-09-02.pdf)
+- [Correo de entrega y contrato de soporte](anam-entrega-documentacion-y-soporte-2026-09-02.md)
 - [Servicio ANAM HubSpot de punta a punta](anam-hubspot-managed-service-end-to-end.md)
 - [QA E2E del handoff](../../audits/ANAM_CUSTOMER_AGENT_HANDOFF_E2E_QA_2026-09-01.md)
 - [Manual de operación](../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md)

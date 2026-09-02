@@ -153,8 +153,16 @@ Paz con Marco como reemplazo. Tres chats públicos probaron el owner primario y 
 prueba asignación y cambio de owner; no prueba todavía una respuesta humana ni una segunda transferencia humana
 en el mismo chat.
 
+La entrega de cierre incluye una especificación técnica y una guía funcional en PDF, ambas derivadas de fuentes
+HTML/CSS y revisadas página por página. El soporte acordado para Customer Agent y KPI es de tres meses,
+**2026-08-13 a 2026-11-12 inclusive**. Cubre incidentes, correcciones y operación del alcance construido; no
+incluye nuevas funcionalidades, KPI, workflows, automatizaciones, integraciones, rediseños ni innovación.
+
 ## Fuentes y evidencia
 
+- [PDF técnico de Emma](../../architecture/kortex/hubspot-as-a-service/reports/ANAM_Emma_Handoff_Especificacion_Tecnica_2026-09-02.pdf)
+- [PDF funcional de Emma](../../architecture/kortex/hubspot-as-a-service/reports/ANAM_Emma_Handoff_Documentacion_Funcional_2026-09-02.pdf)
+- [Correo de entrega y soporte](../../documentation/hubspot-as-a-service/anam-entrega-documentacion-y-soporte-2026-09-02.md)
 - [Informe Word detallado](../../architecture/kortex/hubspot-as-a-service/reports/ANAM_Informe_Detallado_Customer_Agent_2026-07-17.docx)
 - [Source pack live reconciliado](../../architecture/kortex/hubspot-as-a-service/anam-customer-agent-source-pack/README.md)
 - [QA Customer Agent](../../audits/ANAM_CUSTOMER_AGENT_QA_REPORT_2026-07-16.md)

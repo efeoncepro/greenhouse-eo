@@ -196,6 +196,25 @@ change set, aprobación, readback y una matriz E2E proporcional. Durante una int
 restaurarse temporalmente un handoff directo a una persona responsable, pero esa operación cambia el runtime y no
 forma parte de esta actualización documental.
 
+## Entrega y soporte
+
+Los entregables externos vigentes son la
+[especificación técnica en PDF](reports/ANAM_Emma_Handoff_Especificacion_Tecnica_2026-09-02.pdf) y la
+[guía funcional en PDF](reports/ANAM_Emma_Handoff_Documentacion_Funcional_2026-09-02.pdf). Los HTML/CSS bajo
+[`reports/html/`](reports/html/) son la fuente editable; los PDF son el master visual para envío. Las diez
+capturas de página bajo [`reports/previews/`](reports/previews/) son evidencia de revisión, no piezas separadas
+para el cliente.
+
+El soporte del proyecto Customer Agent y del proyecto KPI dura **tres meses**, desde el **13 de agosto de 2026**
+hasta el **12 de noviembre de 2026**, ambas fechas incluidas. Dentro de esta ventana Efeonce atiende incidentes
+del alcance construido, diferencias frente al comportamiento entregado, dudas de operación, restauración de la
+configuración aprobada y documentación que deba corregirse como consecuencia.
+
+No son soporte las nuevas funcionalidades, nuevos KPI, nuevos workflows o automatizaciones, integraciones,
+rediseños ni innovaciones. Cada solicitud de evolución requiere evaluación y alcance separado. La consolidación
+en SharePoint anunciada para la semana del 2 de septiembre permanece pendiente hasta contar con evidencia del
+enlace compartido.
+
 ## Referencias
 
 - [Configurar y personalizar el handoff de Customer Agent](https://knowledge.hubspot.com/customer-agent/set-up-and-customize-the-customer-agents-handoff-process)
