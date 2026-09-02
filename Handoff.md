@@ -2,6 +2,42 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-09-02 (8) — El release `375f56e24187` quedó huérfano y se recuperó; `main` vuelve a tener manifest
+
+La promoción `develop→main` del 2026-09-02 entró a `main` por el PR #215 a las `20:51:04Z` (726 archivos,
+1490 commits, 2 migraciones) y quedó **sin manifest de release**: la sesión que la promovía fue archivada por
+accidente antes de dispatchar el orquestador. Un commit en `main` sin manifest es exactamente la condición que
+la regla dura del control plane prohíbe dejar abierta, así que otra sesión lo retomó con autorización directa
+del operador y cerró el ciclo.
+
+Cierre: run `33683893124` **completed/success** en 11m50s, `release_id`
+`375f56e24187-546f452b-c60f-4617-9974-9c87760c3ab9`, máquina de estados completa
+`preflight → ready → deploying → verifying → released`. Los DOS gates `production` se aprobaron con 34 s de
+diferencia (sin el stall del gotcha #6). Único bypass: `release_batch_policy`, inevitable por las 2 migraciones
+—dominio irreversible por precedencia del clasificador, donde el marker `[release-coupled: …]` no aplica—, con
+razón citando un hecho verificado y no un adjetivo: `migrate:status` en dry-run reporta cero migraciones
+pendientes contra la única instancia Cloud SQL.
+
+Verificación runtime, con la trampa del día atajada: el `ops-worker` cerró con un **skip de 51 s** y sirve
+`c4c838dea9d1`, no el target. Se verificó con el **diff de árbol completo** (43 archivos, 5 de código, tres bajo
+`src/mcp/**`) y con `pnpm worker:deploy-path-gate`, que confirma que los 1451 archivos del bundle caen bajo
+prefijos declarados y que `src/mcp` no es uno: ese código lo sirve Vercel, que sí desplegó el target. Skip
+legítimo. El watchdog reportó `data_missing=4`, que **no es drift**; la lectura autoritativa fue
+`pnpm release:workers`: 3/4 workers en el target, `Ready=True`. Canary de contrato del lane MCP `skills` verde
+**después** del `released`.
+
+Flags: se prendió `GROWTH_SEO_SITE_FINDINGS_ENABLED` en el ops-worker con los dos pasos (revisión activa
+`ops-worker-00631-jfw`), tras probar por blob que el evaluador desplegado es idéntico al de `main`. Quedan
+pendientes sus verificaciones post-flip (3) y (4). La cadencia `ops-seo-keyword-discovery-drain` quedó
+reconciliada: `main` ya declara `*/2`. **No** se prendió `HIRING_FAIRNESS_MONITOR_ENABLED`: su condición de
+retiro sigue vigente hasta `TASK-1365` y prod carece de la policy row de privacidad, así que daría cero en
+silencio en una métrica de equidad.
+
+Aprendizaje operativo del día: **dos sesiones recibieron el mismo mandato y ninguna verificó peers vivos antes
+de arrancar.** La colisión se detectó porque `origin/main` ganó un commit entre dos comandos consecutivos. Nadie
+tocó el control plane durante el solapamiento. Regla que queda: anunciar no es coordinar — hay que preguntar con
+`ListAgents` y esperar respuesta antes de tocar el árbol.
+
 ## 2026-09-02 (7) — Salesforce ya tiene oferta canónica y task de landing, sin implementación
 
 La práctica Salesforce quedó canonizada por outcomes y lifecycle en cuatro fases: `Diagnose & Architect`,
@@ -483,33 +519,3 @@ ahora nombra `vercel env pull`. Y el mensaje de `no-opacity-on-text` estaba en v
 
 Gates: `local:check` exit 0, `task:lint:test` 47/47, `ops:lint --changed` errors=0,
 `docs:closure-check` sin dueño faltante, `docs:context-check:strict` 0/0, 262 tests de lint-rules.
-
-## 2026-09-01 (9) — TASK-1427 cerrada: el motor CTA queda con evidencia medida, y deja ISSUE-167
-
-Cerré la primera rebanada del motor CTA. Lo importante no es el cierre sino cómo se sostuvo.
-
-**La ventana de 7 días era un falso verde.** El criterio pedía observar `growth.cta.*` durante siete
-días tras el deploy del 2026-07-18. Medido contra PG: entre el 18 y el 25 de julio hubo tráfico **un
-solo día**. Cero errores sobre cero tráfico no prueba nada. Cerré con la serie completa de 45 días —
-0 errores server-confirmed, 0 kill switches, 0 colisiones, con exposición real (219 observaciones el
-2026-08-29). Es evidencia más fuerte que la pedida, sobre una ventana más larga.
-
-⚠️ **Los readers de signal no podían responder la pregunta.** `growth-cta-signals.ts` filtra
-`INTERVAL '1 day'` en sus tres queries: sirven para «¿está sano ahora?», nunca para «¿estuvo steady
-durante N días?». Cualquier criterio de ventana exige ir a la tabla base. Dejé
-`scripts/growth/_sanity-cta-signal-window.ts` para que la próxima sea medición y no cita.
-
-🔴 **Probar el teclado destapó `ISSUE-167`.** Me negué a tildar «funciona con teclado, Escape/focus
-restore» sin ejercitarlo, y en producción encontré que al abrir el Growth Form desde un CTA **el foco
-queda en `body`** y **`Escape` no cierra**. Abre como expansión inline (sin `role=dialog` ni
-`aria-modal`) pero sin las dos obligaciones de ese patrón. Es del **renderer compartido**: afecta a
-todos los CTA en Think y WordPress. La task cierra con ese criterio **sin tildar y con la razón
-escrita**, que es el desenlace correcto.
-
-Sí verificado live hoy: render con el contrato completo, sin overflow en 1280 y 375 (card 343px),
-formulario alcanzable por teclado tabulando (5 controles, primero `firstName`).
-
-**Pendiente NO bloqueante, decisión del operador:** el placement AMPLIO en WordPress (recomendado,
-posts del blog vía `the_content` en `ohio-child`). Hoy sólo existe la página de prueba.
-
-Transparencia: mi verificación sumó 2 eventos al ledger productivo (`clicked` + `form_opened`).

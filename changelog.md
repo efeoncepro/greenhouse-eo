@@ -7,6 +7,25 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-02 — un release quedó huérfano en `main` y se recuperó sin ensuciar el control plane
+
+La promoción `develop→main` (PR #215, 726 archivos, 1490 commits, 2 migraciones) entró a `main` a las
+`20:51:04Z` y quedó **sin manifest**: la sesión que la promovía fue archivada por accidente antes de dispatchar
+el orquestador. Otra sesión la retomó con autorización directa del operador y cerró el ciclo: run `33683893124`
+completed/success en 11m50s, `release_id` `375f56e24187-546f452b-c60f-4617-9974-9c87760c3ab9`, estado final
+`released`, con los dos gates `production` aprobados en 34 s y post-release health verde.
+
+Tres verificaciones que no se dieron por hechas. El skip del `ops-worker` (51 s, step `Deploy` en `skipped`) se
+validó con el **diff de árbol completo** y con `pnpm worker:deploy-path-gate` —1451 archivos del bundle, todos
+cubiertos; `src/mcp` no entra, lo sirve Vercel—, no con la lista del change-gate. El `data_missing=4` del
+watchdog se trató como falta de evidencia y no como drift: la lectura autoritativa fue `pnpm release:workers`,
+3/4 workers en el target. Y el canary de contrato del lane MCP `skills` se corrió **después** del `released`,
+con asserts que sólo el contrato nuevo puede producir.
+
+Flags: `GROWTH_SEO_SITE_FINDINGS_ENABLED` prendido en el ops-worker con los dos pasos, tras probar **por blob**
+que el evaluador desplegado es idéntico al de `main`. `HIRING_FAIRNESS_MONITOR_ENABLED` NO se prendió: daría
+cero en silencio en una métrica de equidad hasta que cierre `TASK-1365`.
+
 ## 2026-09-02 — la práctica Salesforce se canoniza como oferta por outcomes y lifecycle
 
 La práctica Revenue Operations & CRM incorpora una arquitectura comercial Salesforce en cuatro fases:
@@ -1135,22 +1154,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
   `ai-partnerships@magnific.com`. La ruta oficial queda verificada, pero el estado comercial no cambia a partnership
   activo hasta recibir aceptación y términos. El outreach especializado quedó enviado desde Outlook Web, con Susana
   en copia y la firma configurada de Julio.
-
-## 2026-08-27 — TASK-1696: el ledger de gasto aprende quién gastó y de qué tipo es el dólar
-
-- `greenhouse_growth.seo_provider_spend_daily` gana `consumer` (`seo`|`aeo`), `cost_basis`
-  (`invoiced`|`estimated`) y `price_table_version` acoplado por CHECK. Clave única de seis columnas
-  con `NULLS NOT DISTINCT`. **Un solo ledger**: lo que se separa es el resolver de presupuesto.
-- El grader AEO deja de comprar fuera del ledger: `postDataForSeoTask` exige `consumer`, el adapter
-  de AI Mode migró del wrapper congelado al transporte canónico y `ProviderAdapterContext` lleva la
-  organización derivada del perfil, server-side.
-- `resolveAeoBudget` da presupuesto en dólares per-org al grader, con las dos monedas separadas y
-  restando la porción DataForSEO del estimado para no contarla dos veces. Gate **en shadow**: dos
-  flags, ambos OFF.
-- Tres señales nuevas en `/admin/operations`: `growth.dataforseo.spend_ledger_drift`,
-  `growth.ai_visibility.observation_yield` y `seo.provider.cost_over_budget` — esta última la
-  citaban nueve tasks como mitigación y no existía en código.
-- Documentación sincronizada: arquitectura (módulo SEO §1.1/§6/§9/§13.1, grader, control plane de
-  reliability), doc funcional + manual nuevos en `docs/{documentation,manual-de-uso}/growth/`, la
-  rule de auto-load `.claude/rules/growth-seo.md` y la skill `dataforseo-operator` con su espejo
-  Codex (cuerpo idéntico, verificado a mano: el validador de espejos NO cubre esta skill).
