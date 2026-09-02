@@ -1,249 +1,145 @@
 ---
 name: berel-content-production
 description: >-
-  Producción editorial del cliente Berel (Pinturas Berel, México) de punta a punta: el ciclo mensual
-  completo en su Notion —identificar los artículos del mes, rescatar el contenido publicado, analizar
-  SEO/AEO contra la URL en vivo, reescribir o escribir de cero, montar el proyecto con tareas,
-  banners y derivados sociales— más la voz de marca es-MX, la spec de banners y la carga al CMS
-  Drupal. Es la continuación operativa del research y del brief: el repo cubre `research → brief`,
-  esta skill cubre `brief → artículo publicado → átomos sociales`. Encadena craft a `copywriting`,
-  descubribilidad a `seo-aeo`, doctrina de motor de contenidos a `content-marketing-studio`, redes a
-  `social-media-studio`, operación de Notion a `notion-platform` y métricas `[GH]` a `greenhouse-ico`.
-  Usar para producción mensual de Berel, artículos del blog de berel.com, reescrituras, análisis
-  SEO/AEO de artículos Berel, fichas de banner, copy de derivados sociales, voz y tono Berel, y carga
-  al CMS Drupal de Berel.
+  Producción editorial de Pinturas Berel (México) de punta a punta: ciclo mensual en Notion,
+  reescrituras y artículos nuevos, formato Tutorial híbrido, auditoría SEO/AEO contra URL viva,
+  voz de marca es-MX, banners, derivados sociales y handoff/carga en Drupal. Continúa el flujo
+  research → brief y ejecuta brief → pieza publicada → átomos sociales. Invoca copywriting,
+  seo-aeo, content-marketing-studio, social-media-studio, notion-platform y greenhouse-ico cuando
+  corresponde. Usar para cualquier producción mensual, artículo, tutorial, banner, derivado social,
+  QA o publicación de Berel.
 type: skill
 user-invocable: true
-argument-hint: '[fase del ciclo, artículo o pregunta concreta]'
+argument-hint: '[fase del ciclo, artículo, tutorial o pregunta concreta]'
 ---
 
 # Berel — Producción de contenidos
 
-> **Skill de cliente, no de oficio.** Aquí no se decide _cómo se hace content marketing_: se ejecuta
-> **el proceso que Berel y Efeonce ya acordaron**, tal como vive en la wiki de Notion del cliente.
-> El oficio general vive en `content-marketing-studio`, `copywriting`, `seo-aeo` y
-> `social-media-studio`, y esta skill los **invoca**; no los reemplaza ni los contradice.
+> **Skill de cliente, no de oficio.** Ejecuta el proceso acordado por Berel + Efeonce. La fuente de
+> verdad viva es la **Wiki de Berel en Notion**; esta skill es su copia operativa para agentes.
 
-**Berel es Pinturas Berel, cliente de Efeonce.** Marca mexicana de pinturas con más de 85 años.
-**Opera solo en México.** El blog vive en `berel.com` (sección _Inspiración_), sobre **Drupal**.
+**Berel = Pinturas Berel, México.** El contenido vive en `berel.com`, sección **Inspiración**, sobre
+Drupal. La voz pública es español de México y habla como la marca, no como Efeonce.
 
-## Dónde encaja en la cadena
+## Precedencia documental
 
-```
-research + priorización  →  brief editorial  →  ESTA SKILL  →  publicado + atomizado
-docs/operations/            docs/operations/     ciclo mensual
-SEO_EDITORIAL_...           SEO_CONTENT_          en el Notion
-PRIORITIZATION_             BRIEF_STRUCTURE_      del cliente
-OPERATING_MODEL_V1.md       V1.md
-```
+Cuando dos fuentes difieren, aplicar este orden:
 
-Lo que precede a esta skill ya está documentado en el repo. Lo que esta skill aporta **solo existía
-en Notion**: el playbook de producción, la spec de imágenes, el playbook de derivados sociales, la
-guía de voz y tono, y la guía de carga al CMS.
+1. **Petición fechada del cliente** (`Recomendaciones Cliente`).
+2. **Spec específica del artefacto**: p. ej. `Spec para imágenes`, `Ficha Tutoriales`, formatos de infografía.
+3. **Playbook Producción vivo** en Notion.
+4. Guías generales (`6. Voz y Tono`, manuales, módulos de oficio).
+5. Esta copia del repo.
 
-## Cómo se usa (router)
+Si Notion contiene una regla vieja que contradice una decisión posterior del cliente o una spec más
+específica, **no degradar la skill**: mantener la regla más reciente/específica y registrar el drift.
 
-1. **Determina la modalidad** antes de cualquier otra cosa: ¿la fila del Content Hub tiene `Enlace`
-   **y la ruta contiene un artículo vivo**? Sí → **A · Reescritura**. Sin enlace, o con una canónica
-   planificada que todavía devuelve el shell vacío de soft-404 → **B · Artículo nuevo**. El campo y
-   el HTTP 200 no bastan; deben existir `title`, H1 y cuerpo editorial. Cambia todo lo anterior a la Fase 6.
-2. Carga **solo** el módulo de la fase en la que estás.
-3. Aplica las **reglas duras** de abajo — son las que se rompen en la práctica.
-4. Cierra con el **artefacto** (`templates/`) y deja el estado movido en Notion.
+## Cómo se usa
 
-### Árbol de decisión
+1. **Consultar `Formato` en Content Hub antes de escribir.**
+   - `Artículo` → modalidades A/B normales.
+   - `Tutorial` → modalidad A/B normal + `modules/13_FORMATO_TUTORIAL_HIBRIDO.md`.
+   - vacío → no asumir; reportar el gap.
+2. **Determinar modalidad por contenido vivo, no por el campo ni por HTTP 200.**
+   - A · Reescritura: la URL tiene `title`, H1 y cuerpo editorial real.
+   - B · Artículo nuevo: no hay URL viva o la canónica planificada devuelve el shell soft-404.
+3. Cargar solo los módulos de la fase solicitada.
+4. Aplicar las reglas duras.
+5. Cerrar con artefacto/tarea/estado verificado en una lectura fresca de Notion.
 
-```
-¿En qué estás?
-├─ Montar o entender el mes completo, las 10 fases, las dos modalidades ....... modules/01_CICLO_MENSUAL
-├─ Rescatar lo publicado y auditar SEO/AEO contra la URL en vivo (F3-F4) ...... modules/02_ANALISIS_AUDITORIA
-├─ Escribir la reescritura o el artículo nuevo (F5 / B5) ...................... modules/03_REDACCION_ARTICULO
-├─ Cómo suena Berel: voz, arco, léxico mexicano, palabras vetadas, auditoría .. modules/04_VOZ_Y_TONO_BEREL
-├─ Especificar los 4 banners y sus fichas; la pieza con reciclaje social ...... modules/05_BANNERS_IMAGENES
-├─ Redactar el copy social por canal y volcar los subítems .................... modules/06_DERIVADOS_SOCIALES
-├─ Propiedades exactas, jerarquías, formato Notion, qué NO tocar .............. modules/07_SISTEMA_NOTION
-├─ Subir o reescribir el artículo en el CMS Drupal ............................ modules/08_PUBLICACION_CMS_DRUPAL
-├─ Lo que el cliente pidió explícitamente (y dónde corrige la guía de voz) .... modules/09_RECOMENDACIONES_DEL_CLIENTE
-├─ Qué FORMATO usa una infografía (los 5 del equipo de diseño + la paleta) .... modules/10_FORMATOS_DE_INFOGRAFIA
-├─ Cómo se llena la FICHA de la infografía (orden de producción para diseño) .. modules/11_FICHA_DE_PRODUCCION_INFOGRAFIA
-├─ Datos de ficha ya verificados (rendimiento, COV, costos) — NO reinvestigar . modules/12_DATOS_VERIFICADOS_DEL_CATALOGO
-├─ Qué NO hacer (errores ya cometidos en este cliente) ....................... ANTIPATTERNS
-├─ Vocabulario del cliente y de su sistema ................................... GLOSSARY
-├─ De dónde salió cada regla, con page id y fecha de extracción .............. SOURCES
-└─ Artefacto de salida ....................................................... templates/
+## Router
+
+```text
+Mes completo, modalidades, tareas y estados ........................ modules/01_CICLO_MENSUAL.md
+Auditoría de URL viva y análisis SEO/AEO ........................... modules/02_ANALISIS_AUDITORIA.md
+Redacción de reescritura o artículo nuevo .......................... modules/03_REDACCION_ARTICULO.md
+Voz y tono Berel es-MX ............................................. modules/04_VOZ_Y_TONO_BEREL.md
+Banners, imágenes y ficha visual ................................... modules/05_BANNERS_IMAGENES.md
+Derivados sociales ................................................. modules/06_DERIVADOS_SOCIALES.md
+Sistema Notion, propiedades y relaciones ........................... modules/07_SISTEMA_NOTION.md
+CMS Drupal ........................................................ modules/08_PUBLICACION_CMS_DRUPAL.md
+Correcciones y pedidos fechados del cliente ........................ modules/09_RECOMENDACIONES_DEL_CLIENTE.md
+Formatos de infografía ............................................. modules/10_FORMATOS_DE_INFOGRAFIA.md
+Ficha de producción de infografía ................................. modules/11_FICHA_DE_PRODUCCION_INFOGRAFIA.md
+Datos verificados de catálogo ...................................... modules/12_DATOS_VERIFICADOS_DEL_CATALOGO.md
+Formato Tutorial híbrido + Paso a Paso ............................. modules/13_FORMATO_TUTORIAL_HIBRIDO.md
+Errores ya cometidos ............................................... ANTIPATTERNS.md
+Vocabulario ........................................................ GLOSSARY.md
+Fuentes y fecha de sincronización .................................. SOURCES.md
+Plantillas ......................................................... templates/
 ```
 
 ## Reglas duras
 
-1. 🔴 **El orden es artículo escrito → banners → derivados sociales.** Nunca al revés. Un banner
-   creado antes del artículo es un **placeholder, no un brief**; un copy social sin texto escrito se
-   inventa el gancho. (`01`, `05`, `06`)
-2. 🔴 **Ningún hallazgo técnico se afirma sin haber abierto la URL en vivo.** El texto rescatado en
-   la Fase 2 es plano: **la ausencia en la extracción no es ausencia en la página**. Ya produjo un
-   error real —afirmar que un artículo no tenía enlaces de color cuando sí los tenía—. (`02`)
-3. 🔴 **No borrar nunca contenido existente en Notion.** Todo se **agrega** como sección desplegable
-   nueva. (`07`)
-4. 🔴 **Nada se promete sin respaldo documental del cliente.** Ahorros, porcentajes de eficiencia,
-   garantías y ciclos de lavado **solo con ficha técnica detrás**. Si dos fuentes se contradicen,
-   **ninguna entra**: van al callout de discrepancia y se reportan. (`01`, `04`)
-5. 🔴 **Nunca RGB ni HEX en el cuerpo publicable.** Los colores se nombran **nombre + código
-   alfanumérico**. El Catálogo RGB es de consumo interno para diseño — es lineamiento del cliente.
-   (`03`, `04`)
-6. 🔴 **NUNCA enlaces a la búsqueda del sitio.** El `robots.txt` de berel.com trae
-   `Disallow: /search` y `Disallow: /*?q=` (verificado en vivo el 2026-08-25): ese enlace manda al
-   lector y al crawler a una ruta bloqueada. **Productos → su ficha real; colores → `/colores/<familia>`**,
-   que sí existe y está en el sitemap. (`04`)
-7. 🔴 **El sitio NUNCA devuelve 404.** Una ruta inexistente responde 200 con un shell vacío, así que
-   **el código de estado no prueba nada**: un enlace roto se ve como página cargada. Para verificar,
-   compara contra una ruta de control inventada — si el `<title>` falta y el peso coincide con el
-   control, la ruta no existe. (`03`)
-8. 🔴 **La voz es la de Berel, en español de México.** El default es-CL del repositorio **no aplica**
-   y el "nosotros" es del cliente, no de Efeonce. La mexicanidad **se muestra en los objetos, no se
-   anuncia** — salvo en las fichas de banner, que son instrucción para diseño. (`04`)
-9. 🔴 **Ningún texto se cierra sin la auditoría de voz.** "Suena bien" no es criterio: se revisa
-   contra la lista de fallas típicas, que son de **detalle**, no de tono general. (`04`)
-10. 🔴 **ALT, nombre de archivo y posición se declaran UNA vez** —en la reescritura— y la ficha del
-    banner los **copia**. No se reinventan. Las notas para Dev listan solo imágenes que existen.
-    (`03`, `05`)
-11. 🔴 **La Spec para imágenes manda sobre cualquier otro documento**, incluido el Playbook de
-    Producción, si difieren. Y hay que corregir el que divergió. (`05`)
-12. 🔴 **Distinguir verificado de estimado, siempre.** Volúmenes de búsqueda y comparaciones de
-    competencia sin herramienta van marcados como **estimación**. (`02`)
-13. 🔴 **Los pendientes se declaran.** _Un pendiente declarado es gestionable; uno omitido se publica
-    como error._ Callout de pendientes obligatorio al cierre de cada reescritura. (`03`)
-14. 🔴 **No declarar que algo no existe solo porque no se encontró.** Un listado paginado de catálogo
-    **no es un índice completo**: probar el patrón de URL, buscar en el sitio y, si sigue sin
-    aparecer, **preguntarle al cliente**. (`01`)
-15. 🔴 **Al reportar avance, tres grupos:** listos · faltantes **con el motivo del bloqueo** · fuera
-    de alcance. _Un conteo sin el motivo no sirve para decidir nada._ (`01`)
-16. 🔴 **Navegar el sitio de a una llamada por vez.** Lanzar búsqueda y extracción en paralelo hace
-    que una de las dos se caiga y se pierda el resultado. (`01`, `02`)
-17. 🔴 **La petición fechada del cliente le gana a la guía general.** `Recomendaciones Cliente`
-    recoge revisiones explícitas —varias de agosto 2026, algunas marcadas como reincidentes— que
-    **refinan y en dos puntos corrigen** `6. Voz y Tono`. Ante conflicto, manda lo que pidió el
-    cliente, y hay que corregir la guía vieja. (`09`)
-18. 🔴 **La marca habla en primera persona del plural.** _Creamos_, _nuestra paleta_, _nuestro blog_
-    — **nunca "Berel ofrece…"**. Única excepción: ALT y schema, donde la marca va en tercera persona
-    por SEO/AEO. (`09`)
-19. 🔴 **Sin series de producto en el cuerpo** (_Serie 800_, _Serie 2300_): son nomenclatura de
-    catálogo técnico y solo viven en fichas y notas para Dev — **también en tablas, listas de
-    materiales y CTA**. Confirmado por el cliente en agosto 2026. (`09`)
-20. 🔴 **Ningún CTA apunta al Home**, y **el texto visible de un enlace nunca es la URL**. Regla
-    reincidente: el cliente ya la marcó dos veces. (`09`)
-21. 🔴 **Toda infografía se produce con uno de los cinco formatos del equipo de diseño** —Pasos ·
-    Señalización · Tipos de Color · Técnica-Foto · Técnica-Gráfica— y **la ficha nombra el formato Y
-    la variante**. Son los que diseño ya tiene resueltos; sin declararlo, improvisan. Aplica **solo a
-    infografías**: el hero y el cierre se rigen por la otra base, `Formatos de Diseño`. (`10`)
-22. 🔴 **La ficha la decide QUÉ ES la pieza, no su número.** Cualquier banner que sea **infografía**
-    —típicamente el N2, y **con frecuencia también el N3**, cuyo rol de "comparativa / didáctico /
-    paso a paso" es la definición misma de los formatos _Pasos_ y _Técnica – Gráfica_— lleva la
-    **ficha de 9 secciones + tabla de contenido por módulo**; el resto lleva los 13 campos. Es
-    una **orden de producción**, no un resumen: todo texto va **literal**, cada módulo con su
-    producto/dato/ícono/asset asignados, y lo no confirmado se escribe
-    `PENDIENTE DE CONFIRMACIÓN — NO INCLUIR EN ARTE`. Prueba de aceptación: **un diseñador que no
-    leyó el artículo puede producirla sin reinterpretar**. (`11`)
-23. 🔴 **En infografía, el rojo es `#B3153A` (Rojo Editorial), no el rojo corporativo.** El
-    corporativo se reserva a branding institucional. Y ojo: el HEX de la **paleta de acento** SÍ va
-    en la ficha —es instrucción de diseño—; lo que nunca sale al público es el HEX de un **color de
-    pintura**. Son cosas distintas. (`10`, `09`)
-24. 🔴 **No convertir etiquetas comerciales en una taxonomía química excluyente.** `Vinílica`,
-    `acrílica`, `esmalte`, `base agua` y `base solvente` pueden describir capas distintas del mismo
-    producto: existen pinturas vinil-acrílicas y esmaltes acrílicos. Para comparar o recomendar,
-    ordenar por **superficie → exposición → función → ficha específica**; nunca deducir el uso a
-    partir de una sola palabra del nombre. (`03`, `12`)
-25. 🔴 **La paridad social se escribe en dos fases y se prueba en una lectura fresca.** Primero se
-    crea la tarea para obtener su URL; luego se crea el subítem con el cuerpo final que enlaza
-    artículo + tarea; por último se reemplaza el cuerpo de la tarea con **esa misma cadena**. Un
-    conteo correcto no prueba paridad: hay que comparar los 4 pares por artículo. (`06`, `07`)
-26. 🔴 **Una pieza histórica nunca se presenta como actualidad.** Si el artículo conserva un
-    aniversario, cifra o edición pasada, cada derivado declara `Archivo YYYY` y queda bloqueado para
-    programación hasta que Editorial valide vigencia y derechos. (`06`)
-27. 🔴 **Sensibilidad y consolidación cambian el CTA.** Conmemoraciones institucionales no llevan
-    venta ni apropiación de símbolos; una reescritura destinada a consolidarse no activa derivados
-    hasta confirmar la canónica. Ambos casos llevan gate visible en tarea y subítem. (`06`)
+1. 🔴 **Orden canónico:** artículo escrito → banners → derivados sociales. En `Tutorial`, el híbrido
+   debe estar escrito antes de crear la tarea de fotos del Paso a Paso.
+2. 🔴 **Nada técnico se afirma sin abrir la URL viva.** La extracción de texto plano no prueba
+   enlaces, ALT, `title`, jerarquías ni schema.
+3. 🔴 **No borrar contenido existente en Notion.** Agregar nuevos desplegables al final.
+4. 🔴 **Nada se promete sin respaldo documental.** Claims, garantías, rendimientos y cifras deben
+   existir en ficha/fuente del cliente. Si dos fuentes contradicen, ninguna entra al cuerpo.
+5. 🔴 **Nunca RGB/HEX de colores de pintura en texto público.** Nombre + código alfanumérico. HEX de
+   paleta de acento sí puede vivir en una ficha de diseño.
+6. 🔴 **Nunca enlazar a `/search` ni `?q=`.** `robots.txt` los bloquea. Producto → ficha real o
+   categoría; color → paleta/artículo válido o `/colores/<familia>`.
+7. 🔴 **berel.com usa soft-404.** HTTP 200 no significa que la página exista. Verificar sitemap +
+   control inventado + `title`/H1/cuerpo.
+8. 🔴 **Links para CMS se entregan como rutas relativas** desde el primer `/` posterior a `.com`
+   cuando el handoff lo requiera; el anchor visible siempre es descriptivo, nunca la URL cruda.
+9. 🔴 **Voz Berel en es-MX y primera persona plural:** `creamos`, `nuestra paleta`, `nuestro blog`.
+   ALT y schema pueden usar tercera persona.
+10. 🔴 **Mexicanidad por objetos y contexto, no por etiquetas ni modismos cerrados.**
+11. 🔴 **Auditoría de voz obligatoria antes de cerrar.** Revisar detalles, no solo “sensación de tono”.
+12. 🔴 **Sin series de producto en cuerpo público**, incluidas tablas, materiales y CTA. Las series
+    quedan en fichas técnicas/notas para Dev.
+13. 🔴 **CTA nunca al Home.** Siempre al destino específico de la intención.
+14. 🔴 **ALT, archivo y posición se declaran una vez y se copian.** No reinventarlos entre artículo,
+    ficha, híbrido y notas para Dev.
+15. 🔴 **Spec para imágenes manda sobre el Playbook** si difieren.
+16. 🔴 **Verificado ≠ estimado.** Volumen, competencia o cifras sin herramienta se etiquetan como
+    estimación.
+17. 🔴 **Pendientes visibles:** todo dato, URL, asset o capacidad CMS no confirmada queda en callout
+    `⚠️`; un pendiente omitido se convierte en error de publicación.
+18. 🔴 **No declarar inexistencia por ausencia en un listado paginado.** Probar sitemap/patrón,
+    búsqueda de navegación y luego preguntar al cliente.
+19. 🔴 **Avance en tres grupos:** listos · bloqueados con motivo · fuera de alcance.
+20. 🔴 **Navegar el sitio de a una llamada por vez** cuando la extracción completa sea necesaria.
+21. 🔴 **La petición fechada del cliente le gana a una guía general.**
+22. 🔴 **Infografías solo con formatos aprobados:** Pasos · Señalización · Tipos de Color ·
+    Técnica-Foto · Técnica-Gráfica; la ficha nombra formato + variante.
+23. 🔴 **La ficha depende de qué es la pieza, no de su número.** Una infografía usa su ficha de
+    producción completa aunque sea N3 o N4.
+24. 🔴 **Rojo de infografía = `#B3153A` (Rojo Editorial)**; no confundir con color de pintura.
+25. 🔴 **No convertir etiquetas químicas/comerciales en taxonomías excluyentes.** Recomendar por
+    superficie → exposición → función → ficha específica.
+26. 🔴 **Instagram = Story, no post estático.** Decisión posterior del cliente: secuencia 9:16; la
+    mención vieja a “Instagram Post estático” del Playbook no gobierna.
+27. 🔴 **Paridad social:** tarea + subítem deben terminar con la misma cadena de contenido/enlaces;
+    verificar los cuatro pares por artículo en lectura fresca.
+28. 🔴 **Pieza histórica = `Archivo YYYY`** y sin programación hasta validar vigencia/derechos.
+29. 🔴 **Sensibilidad y consolidación cambian el CTA** y pueden bloquear derivados hasta confirmar
+    canónica.
+30. 🔴 **`Formato` decide estructura, no la modalidad.** `Tutorial` no reemplaza A/B: agrega una
+    versión híbrida para CMS.
+31. 🔴 **Una intención = una URL.** Nunca publicar artículo y tutorial duplicados para la misma
+    keyword. El híbrido reestructura el V1 y conserva aproximadamente 90% de su cobertura útil.
+32. 🔴 **Tutorial Paso a Paso = 4 pasos canónicos** salvo instrucción expresa del cliente/template;
+    cada paso lleva foto 📸, y esas fotos no son los banners horizontales.
+33. 🔴 **Fotos de tutorial:** una sola tarea de diseño por secuencia, 1:1 de 500 px, sin texto/logo,
+    coherencia de espacio/luz/muro. La tarea nace solo cuando el híbrido ya existe.
+34. 🔴 **Banners heredados viajan completos al híbrido.** No poner un simple puntero al V1.
+35. 🔴 **Canónica planificada soft-404 puede vivir como metadata**, pero no activa enlaces entrantes
+    ni derivados hasta QA live de `title`, H1, cuerpo, canonical y schema.
 
-## Lo que NO se toca
+## Lo que no se toca
 
-| Zona                                                            | Por qué                                                                                                                              |
-| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| Las **22 propiedades fórmula** de `Tareas` y el bloque Frame.io | Son calculadas o las alimenta una Cloud Function (`07`)                                                                              |
-| La propiedad **`[GH] RpA v2`**                                  | Writeback de Greenhouse; en Notion es read-only. **Notion es el OS del cliente, Greenhouse el motor de métricas** → `greenhouse-ico` |
-| Las **credenciales del CMS** (página `Accesos CMS`)             | Están en texto plano en Notion. **Nunca copiarlas al repo, a un log, a un commit ni a un prompt** (`08`)                             |
-| El **alias de URL** de un artículo existente                    | Cambiarlo rompe enlaces entrantes e histórico (`08`)                                                                                 |
-| La **plantilla de Ebook** del Content Hub                       | Conserva el título de un caso ajeno a Berel; es herencia del template de Notion, **no doctrina** (`07`)                              |
+- Fórmulas y automatizaciones de `Tareas`, incluido `[GH] RpA v2`.
+- Credenciales de `Accesos CMS`: nunca se copian a repo, log, commit ni prompt.
+- Alias de URL de artículos existentes salvo instrucción explícita y plan de redirección.
+- Contenido previo de páginas del Content Hub.
 
-## ⚠️ Conflictos abiertos en el origen — no los resuelvas en silencio
+## Criterio de cierre
 
-Dos divergencias **reales entre documentos del cliente**, verificadas el 2026-08-25. No están
-resueltas y **no te toca resolverlas por tu cuenta**: pregunta cuál rige y luego corrige el
-documento desactualizado.
-
-| Tema                       | Fuente A                                                 | Fuente B                                                                                                  |
-| -------------------------- | -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| **Esqueleto del artículo** | Playbook: 4 desplegables (modalidad A) o 2 (modalidad B) | El artículo real observado: **3 desplegables** (`Research` · `Plan Editorial SEO/AEO` · `✍️ Artículo V1`) |
-| **Longitud objetivo**      | Guía editorial: **900-1.200+** palabras                  | Artículo de referencia: declara **1.400-1.800**, entregó ~1.500                                           |
-
-✅ **El conflicto de Instagram quedó resuelto el 2026-08-25:** Berel decidió que **no publica posts
-estáticos en Instagram, solo historias**. Rige el Playbook de Derivados (secuencia de 3-4 stories
-9:16). 🔴 **La Fase 8 del Playbook Producción en Notion sigue desactualizada** y hay que corregirla:
-es la que crea las tareas. Detalle y consecuencia sobre el master 🔁 en `06`.
-
-Y dos más donde **sí hay resolución**, porque el cliente habló después (detalle en `09`): las
-**series de producto** (Voz y Tono las quiere en el nombre completo; el cliente las prohíbe en el
-cuerpo → **gana el cliente**) y la **densidad metafórica** (Voz y Tono pide sostener la metáfora; el
-cliente pidió lenguaje más plano → **ante la duda, escribe más plano**).
-
-## ⚠️ Fuentes que el proceso cita y que están VACÍAS
-
-Verificado el 2026-08-25 en la wiki. **No busques ahí la metodología: no está.**
-
-`Keywords / Intención de Búsqueda` · `Redacción` · `Recomendaciones SEO Adicionales` ·
-`Programacion` · `Product Placement en Imagenes` · `Color de año` · `Copy` → **las siete, vacías**.
-⚠️ `Color de año` importa: el Color del Año es tema vivo, y quien la abra buscando doctrina no
-encuentra nada.
-`Sobre la marca` → **plantilla por defecto de Notion**, cero contenido Berel.
-`Brief/Estructura` → ~380 caracteres: es **un prompt suelto** cuyos bloques de referencia están
-vacíos.
-
-**Toda la doctrina real vive en tres páginas:** `Playbook Producción`, `6. Voz y Tono` y
-`Cómo subir un artículo (CMS Drupal)`.
-
-Y la regla del propio playbook para este caso: si una fuente de la wiki está **vacía o sin permisos
-de lectura**, **decirlo explícitamente en el entregable** en lugar de rellenar el hueco con
-supuestos.
-
-## Tabla de sinergias
-
-| Terreno                                                                                                 | Esta skill                                                               | Hand-off a                                                                     |
-| ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
-| **Craft de las palabras** (headline, lead, narrativa, edición)                                          | define la pieza y aplica la voz de Berel                                 | **`copywriting`** — usa su craft, **no** su router de voz: Berel no está en él |
-| **Descubribilidad y citabilidad** (schema, chunking, entidad, E-E-A-T, AEO)                             | aplica los estándares on-page del cliente                                | **`seo-aeo`**                                                                  |
-| **Doctrina del motor de contenidos** (pillar/cluster, atomización, degradación de convención, medición) | ejecuta el ciclo del cliente                                             | **`content-marketing-studio`**                                                 |
-| **Oficio por red social + programación**                                                                | entrega el copy y las specs del átomo                                    | **`social-media-studio`**                                                      |
-| **Operar Notion** (API, límites, sync, writeback)                                                       | dice qué se llena y dónde                                                | **`notion-platform`**                                                          |
-| **Métricas `[GH]`, RpA, ICO**                                                                           | no las toca                                                              | **`greenhouse-ico`**                                                           |
-| **Dirección de arte y generación de imagen**                                                            | escribe la ficha del banner **con formato y variante declarados** (`10`) | `design-studio` · `greenhouse-ai-image-generator`                              |
-| **Research y priorización editorial que precede al ciclo**                                              | consume su salida                                                        | `docs/operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md`           |
-| **Estructura del brief**                                                                                | consume su salida                                                        | `docs/operations/SEO_CONTENT_BRIEF_STRUCTURE_V1.md`                            |
-| **Derechos de uso de la licencia Frida Kahlo en gráficos**                                              | exige el logo oficial en toda pieza                                      | `legal-privacy-ip-operator` si aparece cualquier duda de alcance               |
-
-## Herramientas
-
-- **Notion (MCP)** — leer y escribir en el Content Hub, Tareas y Proyectos. Reglas de formato y qué
-  no tocar en `07`.
-- **Navegación del sitio** — extracción **completa**, **una URL a la vez**. El modo rápido devuelve
-  solo la navegación.
-- **Teams** — canal compartido con el cliente: plan mensual, enlaces faltantes, referencias de
-  ángulo y producto.
-- **SharePoint** — fichas técnicas en PDF, presentaciones, catálogos. **La ficha técnica es la fuente
-  de los datos duros.**
-- **OneDrive** — carpeta de imágenes del mes; la portada es la que dice "portada" en el nombre.
-
-Si una herramienta no está disponible, **decláralo**: no rellenes el hueco con supuestos.
-
-## Entrega
-
-- **Español de México**, voz de Berel, no la de Efeonce.
-- Entrega **con el porqué**: qué fase se corrió, qué se verificó en vivo, qué quedó pendiente y con
-  qué bloqueo.
-- **Estados movidos en el momento**, no al final del mes.
+Una ejecución no termina porque una API respondió `success`. Termina cuando una **segunda lectura
+fresca** confirma contenido, relaciones, responsables, fechas, formato y estados guardados. En
+lotes: reportar listos, bloqueados con motivo y fuera de alcance.
