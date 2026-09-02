@@ -34,8 +34,13 @@
  * obtiene las claves del inputSchema por INTROSPECCIÓN del server real, nunca copiándolas.
  */
 
+import { GREENHOUSE_MCP_SKILL_MANIFEST, type GreenhouseMcpSkillManifestEntry } from './skill-manifest'
+
 /** Dominio dueño de la capacidad. No es routing: es a quién le pertenece el contrato. */
 export type GreenhouseMcpToolDomain = 'platform' | 'webhooks' | 'knowledge' | 'commercial' | 'seo'
+
+/** La tool que sirve los manuales (TASK-1804). Las `instructions` rutean a ella sólo si está en el inventario. */
+export const GREENHOUSE_MCP_SKILL_TOOL_NAME = 'get_greenhouse_skill'
 
 export interface GreenhouseMcpToolManifestEntry {
   /** Nombre exacto con el que la tool se registra. Es la clave de todo lo demás. */
@@ -452,11 +457,21 @@ export const computeGreenhouseMcpToolCoverage = (input: {
  * libre.
  */
 export const buildGreenhouseMcpServerIdentity = (
-  manifest: readonly GreenhouseMcpToolManifestEntry[] = GREENHOUSE_MCP_TOOL_MANIFEST
+  manifest: readonly GreenhouseMcpToolManifestEntry[] = GREENHOUSE_MCP_TOOL_MANIFEST,
+  skills: readonly GreenhouseMcpSkillManifestEntry[] = GREENHOUSE_MCP_SKILL_MANIFEST
 ): { name: string; version: string; instructions: string } => {
   const writers = manifest.filter(entry => entry.writes).map(entry => entry.name)
   const spenders = manifest.filter(entry => entry.spendsProviderBudget).map(entry => entry.name)
   const readOnly = manifest.filter(greenhouseMcpToolIsReadOnly)
+
+  // TASK-1804 — el ruteo al manual también se DERIVA: sólo se anuncia si la tool que lo sirve
+  // existe en este inventario, y el manual de gasto sólo si de verdad gobierna a TODAS las tools
+  // que gastan. Si no, las instructions conservan el procedimiento inline (no hay a dónde rutear).
+  const skillToolExposed = manifest.some(entry => entry.name === GREENHOUSE_MCP_SKILL_TOOL_NAME)
+
+  const spendManual = skillToolExposed
+    ? skills.find(skill => spenders.every(tool => skill.appliesTo.includes(tool)))
+    : undefined
 
   const surface =
     writers.length === 0
@@ -464,18 +479,28 @@ export const buildGreenhouseMcpServerIdentity = (
       : `Greenhouse MCP exposes ${manifest.length} tools: ${readOnly.length} read-only and ` +
         `${writers.length} that WRITE (${writers.join(', ')}).`
 
+  const spendGuidance = spendManual
+    ? `load the ${spendManual.name} manual with ${GREENHOUSE_MCP_SKILL_TOOL_NAME} and get human ` +
+      'confirmation of the exact call before calling any of them.'
+    : 'propose the exact call to a human and get confirmation before calling them.'
+
   const spend =
     spenders.length === 0
       ? ''
       : ` ${spenders.length} of them COMMIT PROVIDER BUDGET, some of it recurring ` +
-        `(${spenders.join(', ')}): propose the exact call to a human and get confirmation before ` +
-        'calling them. Spending money is a side effect, never a read.'
+        `(${spenders.join(', ')}): ${spendGuidance} Spending money is a side effect, never a read.`
+
+  const manuals =
+    skillToolExposed && skills.length > 0
+      ? ` Operating manuals are served on demand by ${GREENHOUSE_MCP_SKILL_TOOL_NAME} ` +
+        `(${skills.map(skill => skill.name).join(', ')}); load the one that governs a tool before operating it.`
+      : ''
 
   return {
     name: writers.length === 0 ? 'greenhouse-read-only' : 'greenhouse',
     version: '1.0.0',
     instructions:
-      `${surface}${spend} It is downstream of api/platform/ecosystem/*, uses a fixed external ` +
+      `${surface}${spend}${manuals} It is downstream of api/platform/ecosystem/*, uses a fixed external ` +
       'scope from server configuration, preserves Greenhouse request IDs, and must not be used ' +
       'for SQL access or tenancy inference from free text.'
   }

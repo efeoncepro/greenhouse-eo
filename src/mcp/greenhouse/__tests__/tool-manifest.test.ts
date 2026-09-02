@@ -24,6 +24,7 @@ import {
   GREENHOUSE_MCP_TOOL_MANIFEST,
   greenhouseMcpToolIsReadOnly
 } from '../tool-manifest'
+import { GREENHOUSE_MCP_SKILL_MANIFEST } from '../skill-manifest'
 
 const registeredToolNames = (): string[] => {
   const server = createGreenhouseMcpServer(
@@ -195,6 +196,64 @@ describe('el cartel del servidor se deriva del inventario (Slice 2)', () => {
     expect(instructions).toContain('fixed external scope from server configuration')
     expect(instructions).toContain('preserves Greenhouse request IDs')
     expect(instructions).toContain('tenancy inference from free text')
+  })
+
+  // TASK-1804 — las instructions RUTEAN al manual en vez de contener el procedimiento.
+  it('rutea el gasto al manual de disciplina en vez de enseñar el procedimiento inline', () => {
+    const instructions = buildGreenhouseMcpServerIdentity().instructions
+
+    expect(instructions).toContain('seo-spend-discipline')
+    expect(instructions).toContain('get_greenhouse_skill')
+    // El procedimiento vive en el manual; la nota del handshake no lo repite.
+    expect(instructions).not.toContain('propose the exact call to a human')
+  })
+
+  it('nombra cada manual del catálogo, derivado del manifiesto de manuales', () => {
+    const instructions = buildGreenhouseMcpServerIdentity().instructions
+
+    for (const skill of GREENHOUSE_MCP_SKILL_MANIFEST) {
+      expect(instructions).toContain(skill.name)
+    }
+  })
+
+  it('sin la tool que sirve manuales en el inventario, conserva el procedimiento inline (la derivación es real)', () => {
+    const identity = buildGreenhouseMcpServerIdentity(
+      [
+        {
+          name: 'buy_seo_synthetic_data',
+          domain: 'seo',
+          writes: true,
+          spendsProviderBudget: true,
+          purpose: 'sintética'
+        }
+      ],
+      GREENHOUSE_MCP_SKILL_MANIFEST
+    )
+
+    expect(identity.instructions).toContain('propose the exact call to a human')
+    expect(identity.instructions).not.toContain('Operating manuals')
+    expect(identity.instructions).not.toContain('seo-spend-discipline')
+  })
+
+  it('con la tool presente pero un gastador que ningún manual gobierna, NO rutea a un manual que no lo cubre', () => {
+    const identity = buildGreenhouseMcpServerIdentity(
+      [
+        ...GREENHOUSE_MCP_TOOL_MANIFEST,
+        {
+          name: 'buy_seo_synthetic_data',
+          domain: 'seo',
+          writes: true,
+          spendsProviderBudget: true,
+          purpose: 'sintética — gasta y ningún manual la gobierna'
+        }
+      ],
+      GREENHOUSE_MCP_SKILL_MANIFEST
+    )
+
+    expect(identity.instructions).toContain('buy_seo_synthetic_data')
+    expect(identity.instructions).toContain('propose the exact call to a human')
+    // Los manuales siguen anunciados: existen aunque el de gasto no cubra al recién llegado.
+    expect(identity.instructions).toContain('Operating manuals')
   })
 })
 
