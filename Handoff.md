@@ -2,6 +2,24 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-09-02 (10) — TASK-1805 tomada: la metodología ETV pasa a ser identidad del hecho, todavía en legacy
+
+Sesión `greenhouse-eo-fe` implementa `TASK-1805` local-first sobre `develop`, **sin push** mientras dure la
+promoción a producción anunciada por `Task-1804`. Alcance: policy endpoint-aware fail-closed
+(`src/lib/growth/seo/etv-methodology/**`), expand aditivo del schema de `seo_domain_overview_snapshots`,
+`seo_url_visibility_snapshots` y `seo_prospect_diagnostics` (identidad metodológica + evidencia + guard de
+corte), writers/readers/API/MCP formula-aware, señal de drift cross-runtime y evaluador dry-run sin gasto.
+Estado del árbol al arrancar: diez docs sucios ajenos (EPIC-022 + nueve tasks SEO); ninguno se acopla a los
+commits de esta sesión salvo el propio `TASK-1805`, cuya sección «MCP Tools & Skills Contract» ya estaba en
+el working tree y se conserva.
+
+**Decisiones de foundation que `TASK-1806` hereda:** las filas existentes (5 fotos de dominio, 8 de
+visibilidad, 1 hecho de tráfico de prospecto; todas capturadas 2026-08-27/29 por código que nunca envió
+`use_improved_etv`, sobre una cuenta registrada antes del 2026-09-01) se atribuyen a `legacy_static_v1` con
+evidencia `contract_default_pre_cutoff`, nunca por fecha; la selección productiva permanece legacy explícita;
+el contract phase (retirar uniqueness legacy y defaults transitorios) queda en `docs/tasks/pending-migrations/`
+hasta que ambos runtimes escriban método explícito (regla ISSUE-161, una sola instancia Cloud SQL).
+
 ## 2026-09-02 (9) — DCR quedó deprecado en MCP `2026-07-28`: el shim de `mcp.efeonce.org` se mantiene, con dos hallazgos que la evaluación no buscaba
 
 Evaluación de impacto pedida por el operador, **sin migración**. Verificada contra la spec en vivo.
@@ -535,17 +553,3 @@ sin necesidad era riesgo sin retorno. Queda como consumidor candidato.
 
 Próximo paso: release develop→main + rebuild del renderer, y repetir el recorrido con teclado en
 vivo en ambos hosts antes de dar el issue por cerrado operativamente.
-
-## 2026-09-01 (9) — cinco oportunidades LicitaLAB promovidas por MCP HubSpot
-
-El operador confirmó la promoción manual de cinco oportunidades. El MCP de HubSpot creó y releyó los Deals
-`64528962434` (Chile Cultura), `64544277070` (Universidad de Chile DII), `64529115746` (JUNJI), `64532229714`
-(Temuco) y `64521733176` (CNTV), todos en `default` / `qualifiedtobuy`, owner `75788512`, con ID de licitación,
-llave de idempotencia, ficha, plazo, próximo paso y asociación Deal ↔ Company verificada. Temuco y CNTV requirieron
-Companies nuevas `57953559382` y `57958935823`; no se fabricaron contactos. CNTV quedó en `Strategic Bets`, no en
-una etapa ficticia: el stage sigue siendo `qualifiedtobuy`.
-
-Corregida la contradicción entre skills: `hubspot-greenhouse-bridge` ahora coincide con el companion LicitaLAB y
-con `project_context.md`: el MCP de HubSpot es el writer gobernado para promociones manuales confirmadas; la brecha
-del bridge sólo limita automatización. Registros CRM general y de licitaciones sincronizados tras readback. Pendiente
-comercial real: admisibilidad, loaded cost/margen y producción de propuestas; ninguna postulación fue enviada.
