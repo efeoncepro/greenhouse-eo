@@ -1,9 +1,9 @@
 # Manuales MCP servidos por el protocolo
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-09-02 por Claude (TASK-1804)
-> **Ultima actualizacion:** 2026-09-02 por Claude (TASK-1804)
+> **Ultima actualizacion:** 2026-09-02 por Claude (TASK-1804 follow-up: seis manuales)
 > **Documentacion tecnica:** [GREENHOUSE_MCP_ARCHITECTURE_V1.md §23](../../architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md) · [MCP_TOOL_SURFACE_INVARIANTS.md §8](../../architecture/agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md)
 
 ## Qué es
@@ -24,13 +24,16 @@ cuando los necesita, con la herramienta `get_greenhouse_skill`. Sin nombre devue
 | `seo-spend-discipline` | Qué herramientas comprometen gasto con el proveedor de datos, cuáles lo hacen de forma recurrente, y el protocolo de proponer, confirmar con una persona y leer el resultado por ítem | Antes de seguir keywords, declarar competidores, lanzar un discovery o un diagnóstico de prospecto |
 | `seo-visibility-reading` | Las dos lentes (medida y estimada) que nunca se promedian, qué significa cada ausencia de dato, en qué orden se leen las herramientas y cuál es la única que ordena prioridades | Antes de describir cómo está posicionado un cliente |
 | `competitor-loop` | El ciclo observar, proponer, confirmar, declarar, cubrir, leer, retirar; y por qué una lista vacía puede ser el resultado correcto | Antes de proponer, declarar o retirar un competidor |
+| `seo-discovery-to-tracking` | El camino de una idea de keyword a una keyword seguida: previsualizar el costo, encolar, esperar, leer candidatos (uno por keyword), resolver canibalización y seguir sólo lo que una persona aprobó | Antes de lanzar un discovery, leer sus candidatos o seguir keywords |
+| `seo-technical-health` | Cómo leer el audit técnico, el perfil semanal de enlaces y el detalle de enlaces con sus tres estados; qué ausencias son hallazgos positivos y qué nunca se certifica | Antes de describir la salud técnica o de enlaces de un sitio |
+| `seo-prospect-diagnostic` | Cómo correr y reportar el diagnóstico de un prospecto: gasta por corrida, todo es estimado, nunca certifica salud y es idempotente por dominio, mercado y día | Antes de correr o leer un diagnóstico de prospecto |
 
 Los manuales son texto estático, igual para todos los consumidores, y viven versionados en el
 repositorio. Cambian sólo con un despliegue.
 
 ## Quién puede verlos
 
-Los tres manuales son de audiencia interna. Un consumidor conectado con un binding interno los ve
+Los seis manuales son de audiencia interna. Un consumidor conectado con un binding interno los ve
 todos. Un consumidor conectado con el binding de un cliente **no ve que existen**: el catálogo le
 llega vacío y pedir uno por nombre responde "no encontrado", igual que un manual que no existe.
 No hay un "no autorizado" que confirme su existencia.

@@ -731,8 +731,9 @@ un archivo, en vez de deducirlo de una ausencia.
 ### Manuales de uso servidos por el protocolo (TASK-1804)
 
 `get_greenhouse_skill` entrega bajo demanda el catálogo y el cuerpo de los manuales declarados en
-`src/mcp/greenhouse/skill-manifest.ts` (hoy tres, todos `internal`: `seo-spend-discipline`,
-`seo-visibility-reading`, `competitor-loop`). El gateway delega en la lane
+`src/mcp/greenhouse/skill-manifest.ts` (hoy seis, todos `internal`: `seo-spend-discipline`,
+`seo-visibility-reading`, `competitor-loop`, `seo-discovery-to-tracking`, `seo-technical-health`,
+`seo-prospect-diagnostic`; la cifra vigente se lee del manifiesto, nunca de acá). El gateway delega en la lane
 `/api/platform/ecosystem/mcp/skills[/{name}]` y no embebe contenido.
 
 Smoke (lane, con el consumer del gateway; también incorporado a `scripts/greenhouse-seo-canary.mjs`):

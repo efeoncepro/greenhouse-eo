@@ -56,7 +56,7 @@ describe('manifiesto de manuales MCP — el repo real (TASK-1804)', () => {
 
   it('construye el catálogo con exactamente los manuales del manifiesto, en su orden', () => {
     expect(catalog.skills.map(skill => skill.name)).toEqual(GREENHOUSE_MCP_SKILL_MANIFEST.map(entry => entry.name))
-    expect(catalog.skills).toHaveLength(3)
+    expect(catalog.skills).toHaveLength(GREENHOUSE_MCP_SKILL_MANIFEST.length)
   })
 
   it('name y description salen del frontmatter, no de una transcripción', () => {
@@ -92,7 +92,7 @@ describe('manifiesto de manuales MCP — el repo real (TASK-1804)', () => {
   it('el catálogo anuncia resúmenes, nunca cuerpos', () => {
     const summaries = listGreenhouseMcpSkills(catalog, resolveGreenhouseMcpSkillAudiences('internal'))
 
-    expect(summaries).toHaveLength(3)
+    expect(summaries).toHaveLength(GREENHOUSE_MCP_SKILL_MANIFEST.length)
 
     for (const summary of summaries) {
       expect(Object.keys(summary).sort()).toEqual(['appliesTo', 'audience', 'description', 'name', 'uri'])
@@ -110,7 +110,11 @@ describe('manifiesto de manuales MCP — el repo real (TASK-1804)', () => {
     expect(readGreenhouseMcpSkill(catalog, 'no-such-manual', resolveGreenhouseMcpSkillAudiences('internal'))).toBeNull()
   })
 
-  it('la description de get_greenhouse_skill nombra cada manual: es la única palanca en contexto', () => {
+  it('la description de get_greenhouse_skill nombra el manual que gobierna TODO el gasto: es la única palanca en contexto', () => {
+    // La description es el único texto garantizado en contexto, y alargarla degrada la selección
+    // de las tools vecinas (TASK-1784, medido). Por eso NO enumera el catálogo entero —eso es
+    // trabajo del catálogo, a una llamada— sino el prerrequisito que no puede fallar: el manual
+    // que cubre a TODAS las tools que comprometen presupuesto.
     const server = createGreenhouseMcpServer(stubConfig, {
       fetch: (async () => new Response('{}')) as unknown as typeof fetch
     })
@@ -119,10 +123,16 @@ describe('manifiesto de manuales MCP — el repo real (TASK-1804)', () => {
       ._registeredTools
 
     const description = registered.get_greenhouse_skill?.description ?? ''
+    const spenders = GREENHOUSE_MCP_TOOL_MANIFEST.filter(entry => entry.spendsProviderBudget).map(entry => entry.name)
+    const spendManuals = GREENHOUSE_MCP_SKILL_MANIFEST.filter(entry => spenders.every(tool => entry.appliesTo.includes(tool)))
 
-    for (const entry of GREENHOUSE_MCP_SKILL_MANIFEST) {
+    expect(spendManuals.length).toBeGreaterThan(0)
+
+    for (const entry of spendManuals) {
       expect(description).toContain(entry.name)
     }
+
+    expect(description.toLowerCase()).toContain('catalog')
   })
 
   it('get_greenhouse_skill es lectura pura en el manifiesto de tools', () => {

@@ -76,7 +76,9 @@ servidor), un binding de cliente no sabe que los manuales existen (404 anti-orá
 interno la controla un test. Las `instructions` del handshake rutean al manual en vez de contener el
 procedimiento de gasto. El gateway federa la tool con su propio guard de paridad no-SEO (desplegado,
 `efeonce-mcp-gateway-00028-pmx`) y la lane salió a producción en el release `375f56e24` del mismo día, con canary de
-contrato verde contra producción. Sin Entra, flag ni persistencia nuevos.
+contrato verde contra producción. Sin Entra, flag ni persistencia nuevos. Follow-up del mismo día: un agente Claude Code
+real cargó el manual por el front door OAuth, y el catálogo creció a seis manuales (discovery→tracking, salud técnica,
+diagnóstico de prospecto) sin tocar la tool ni el gateway.
 
 ## 2026-09-02 — ANAM: entrega premium de Emma y soporte explícito de tres meses
 

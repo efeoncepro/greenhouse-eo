@@ -176,6 +176,15 @@ Entra interactivo) y la negación con binding de cliente (sin consumer de client
 "Efeonce MCP Public Client (Claude Code, claude.ai, Claude Desktop)"; sólo `displayName`, readback con redirect
 URIs y scopes intactos. Queda abierta la revisión del loopback `http://localhost` sin puerto (ADR del gateway).
 
+**Follow-up (22:10Z):** (a) evidencia por el front door: `claude mcp login efeonce-mcp` → `✔ Connected` y un
+agente `claude -p` en sesión nueva llamó `get_greenhouse_skill` por `mcp.efeonce.org` con token Entra real, listó
+el catálogo y resumió bien el manual de gasto — cerrado el único hueco de evidencia. (b) El catálogo pasa de 3 a 6
+manuales, todos SEO federado (`seo-discovery-to-tracking`, `seo-technical-health`, `seo-prospect-diagnostic`); la
+`description` de la tool no cambia (nombra el manual de gasto y remite al catálogo), así que el gateway no se
+redespliega: los nuevos aparecen tras el release. Hiring/Globe quedan fuera: sus tools no están en el manifiesto de
+Greenhouse y el contrato de manuales sólo gobierna ése. Techo "revisar al pasar de 6" alcanzado: la próxima adición
+particiona por dominio.
+
 ## 2026-09-02 (5) — TASK-1784: el eval de selección MCP refutó su propia hipótesis, y eso es el entregable
 
 Se midió la selección de tools SEO antes de tocar una descripción: **tool 94.5% / mercado 98.2% / gasto 100%**

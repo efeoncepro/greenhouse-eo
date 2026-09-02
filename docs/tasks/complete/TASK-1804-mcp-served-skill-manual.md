@@ -1,5 +1,16 @@
 # TASK-1804 — MCP: el manual de uso viaja por el protocolo, no en la nota del handshake
 
+## Delta 2026-09-02 (follow-up) — el catálogo pasa de 3 a 6 manuales
+
+Por instrucción del operador ("haz la 3 end-to-end") se agregaron tres manuales dentro del contrato
+existente: `seo-discovery-to-tracking`, `seo-technical-health` y `seo-prospect-diagnostic`. Los
+manuales sólo pueden gobernar tools del manifiesto de Greenhouse, así que hiring/Globe (nativas del
+gateway) quedan fuera hasta que exista un contrato para tools externas. La `description` de
+`get_greenhouse_skill` NO cambió (nombra el manual que cubre todo el gasto y remite al catálogo;
+enumerar seis inflaría el contexto, lección de `TASK-1784`), por lo que el artefacto de tools y el
+gateway no cambian: los manuales nuevos aparecen por el catálogo tras el siguiente release. El techo
+"se revisa al pasar de 6" queda alcanzado exactamente: la próxima adición particiona por dominio.
+
 ## Delta 2026-09-02 (cierre) — released a producción
 
 - Release `develop→main` llevado por otra sesión (`greenhouse-eo-ac`): PR #215 squash `375f56e24`,
@@ -542,7 +553,7 @@ secretos nuevos, sin variables de entorno nuevas, sin coordinación con operador
 - [x] (2026-09-02 21:27Z contra producción: `count=3` exacto y los tres nombres; provider del gateway 5/5) El smoke de producción compara la **cuenta exacta** del catálogo contra el manifiesto, no `≥ 1`.
 - [x] El gateway federa la tool con `readOnlyHint: true`, tiene su entrada `EXPECTED_*` con razón, y
       el guard de paridad pasa.
-- [ ] (PARCIAL — verificado a nivel del provider del gateway contra producción: los tres `contentHash` y tamaños coinciden con el artefacto que sirve la tool interna; NO se ejercitó `tools/call` por el front door OAuth de `mcp.efeonce.org`, que exige login Entra interactivo no automatizable) Un manual recuperado por `mcp.efeonce.org` es byte-idéntico al que devuelve la tool interna.
+- [x] (2026-09-02 ~22:05Z: `claude mcp login efeonce-mcp` bajo pty con la sesión Entra del operador → `✔ Connected`; un agente Claude Code en sesión nueva (`claude -p`, sólo `mcp__efeonce-mcp__get_greenhouse_skill` permitida) llamó `tools/call` por el front door OAuth de `mcp.efeonce.org`: catálogo de 3 manuales con sus nombres y el manual `seo-spend-discipline` completo, del que resumió correctamente las tres reglas y la semántica de `data.ok`. Los hashes que sirve el provider contra producción coinciden con el artefacto de la tool interna) Un manual recuperado por `mcp.efeonce.org` es byte-idéntico al que devuelve la tool interna.
 - [x] `MCP_TOOL_SURFACE_INVARIANTS.md` documenta el contrato del manifiesto de manuales y la regla de
       no publicar contenido interno.
 - [x] Cero cambios en Entra, cero scopes nuevos, cero escrituras.

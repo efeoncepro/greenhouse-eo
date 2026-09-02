@@ -174,8 +174,9 @@ If a source conflicts with remembered behavior, the verified runtime and its can
   bindings get an empty catalog and 404 anti-oracle on detail, never 403. A manual that leaks a UUID, `org-` id,
   repo path, task id, secret name or GCP project breaks the build (leak test); NEVER serve `.claude/skills/**` by
   MCP. The SEO parity guard is domain-anchored, so non-SEO federated tools are declared in
-  `EXPECTED_GREENHOUSE_PLATFORM_TOOLS` (+ `computeFederatedNonSeoToolFindings`). Manuals today:
-  `seo-spend-discipline`, `seo-visibility-reading`, `competitor-loop` (all internal). **Gateway deployed 2026-09-02**
+  `EXPECTED_GREENHOUSE_PLATFORM_TOOLS` (+ `computeFederatedNonSeoToolFindings`). Manuals today (read the
+  count from the manifest, never from here): `seo-spend-discipline`, `seo-visibility-reading`, `competitor-loop`,
+  `seo-discovery-to-tracking`, `seo-technical-health`, `seo-prospect-diagnostic` (all internal). **Gateway deployed 2026-09-02**
   (`efeonce-mcp` `c588a1b`, revision `efeonce-mcp-gateway-00028-pmx`, front door 200/200/401); the Greenhouse lane was
   released to production the same day (release `375f56e24187-546f452b-…`, target `375f56e24`) and the post-release
   contract canary was green (count=3 exact, bodies byte-identical to the artifact, 404/401, gateway provider 5/5). Runtime lesson: the catalog ships as a
