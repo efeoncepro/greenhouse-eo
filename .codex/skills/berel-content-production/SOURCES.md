@@ -1,150 +1,97 @@
 # Fuentes — de dónde salió cada regla
 
-> **Todo el contenido de esta skill se extrajo de la wiki de Notion de Berel el 2026-08-25**
-> (workspace `efeonce`). Notion es la **fuente de verdad viva**; esta skill es una copia operativa.
-> Si una regla de acá contradice a Notion hoy, **manda Notion** — y hay que actualizar esta skill.
+> **Última sincronización:** **2026-09-02** contra la Wiki viva de Berel en Notion.
+> Notion sigue siendo la fuente de verdad viva; el repo es una copia operativa. Cuando una petición
+> fechada del cliente o una spec específica contradice una regla más vieja, manda la fuente más
+> reciente/específica y se registra el drift.
 
-## La wiki: cómo está organizada
+## Fuentes principales
 
-La "Wiki de Berel" **no es una página**: es una **base de datos tipo wiki** —
-**📕 Wiki de Berel** (`00639c2fefe78278b5608147aeb0cabd`, título interno "Sales Wiki"),
-**43 páginas** colgando de cuatro hubs sin título.
-
-⚠️ El Playbook de Producción cita como "Wiki de Berel" el id `35f39c2fefe780f4a5f4000cf6d0e9f4`,
-que **devuelve 404**: enlace obsoleto o fuera del alcance de la integración. La wiki viva es la de
-arriba.
-
-| Hub | Qué agrupa |
-|---|---|
-| **A** `36539c2fefe780d38acbcb06818dcaa4` | Recursos de marca: Voz y Tono, Modulación por canal, colores y paletas, Catálogo RGB |
-| **B** `36439c2fefe7807586c5e5bb104f5997` | Blog + SEO + CMS: recomendaciones del cliente, manuales de Drupal, technical SEO |
-| **C** `3b239c2fefe78082af84dcbceaa8ba6e` | Skills/Playbooks: Producción, Spec de imágenes, Derivados Sociales |
-| **D** `37b39c2fefe781f2ad1af11a227a42f4` | 📣 Contenidos Sociales Berel: embudo y fases, cascadas, mapa de CTAs, UTMs/GA4, calendario |
-
-## Páginas que sostienen esta skill
-
-| Página | Page ID | Módulo que la usa | Estado |
-|---|---|---|---|
-| 📘 **Playbook Producción** | `3b239c2fefe780ceb71dff4f5bed4646` | `01` `02` `03` `05` | ~39.500 car. — **es la doctrina del ciclo** |
-| 🗣️ **6. Voz y Tono** | `33139c2fefe781ff9ae6f0b2cb8f0933` | `04` `03` | ~14.900 car. — estándar editorial maestro |
-| 5️⃣ **Recomendaciones Cliente** | `38239c2fefe780e0aeeae0ada3170d81` | `09` | ~9.400 car. — **peticiones fechadas del cliente** |
-| 📋 **Spec para imagenes** | `38f39c2fefe780aba8e3de74983a23d6` | `05` | ~5.700 car. — **manda sobre el Playbook** si difieren |
-| ➡️ **Modulación por canal** | `38139c2fefe7805683c8eea4586b1587` | `06` | ~9.700 car. — norma del registro por red |
-| 📣 **Playbook Derivados Sociales** | `f58f34efd1e04043b9982b932a034464` | `06` | ~6.600 car. |
-| 📤 **Cómo subir un artículo (CMS Drupal)** | `4ed619156c0e4f6a89fb83b78ea6c0ad` | `08` | ~5.500 car. — de la capacitación del 21-08-2026 |
-| 🔍 **Enlaces `search?q=` — impacto en SEO y AEO** | `38739c2fefe780b3aa6bde8f422fc748` | `04` | el respaldo del *porqué* de la regla de enlazado |
-| 📝 **Fichas para Gráficos** | `3c739c2fefe7803d9958cd74648cb036` | `11` | Base `Flujos de Trabajo`. **Cómo se llena la ficha de una infografía** |
-| 🖼️ **Formatos: Tipos de Infografías** (base) | `collection://06d39c2f-efe7-82be-99f6-87b9e8e34745` | `10` | **6 filas, extraídas completas el 2026-08-25** |
-| 📆 **Content Hub** (base) | `35f39c2fefe7808186efc6ec63475640` | `07` | 123 filas · 18 propiedades |
-| **Tareas** (base) | `35c39c2fefe780c9bc37e811a7b95a7c` | `07` | 283 filas · 69 propiedades |
-
-## 🔴 Páginas que el proceso cita y que están VACÍAS
-
-Verificado el 2026-08-25. **Dos de ellas —`Keywords` y `Recomendaciones SEO Adicionales`— son
-insumo declarado del Playbook**, y son justo las que un agente abriría primero. No busques ahí la
-metodología: no está.
-
-| Página | Page ID | Estado |
+| Fuente | ID / ubicación | Qué gobierna |
 |---|---|---|
-| Keywords / Intención de Búsqueda | `36539c2fefe78079a2edd04167c007bd` | **vacía** — el Playbook la cita como fuente |
-| Recomendaciones SEO Adicionales | `36539c2fefe7803cb174f59015a16ff2` | **vacía** — el Playbook la cita como fuente |
-| Redacción | `36539c2fefe780239d43ddad75526edc` | **vacía** |
-| Programacion | `36539c2fefe78065bedde36ea4bb64a6` | **vacía** |
-| Product Placement en Imagenes | `36539c2fefe7803c902ae94864055045` | **vacía** |
-| Color de año | `36539c2fefe780c4a211fd5854f66855` | **vacía** |
-| Copy | `37b39c2fefe780a49d88e32f383f1fa5` | **vacía** |
-| Sobre la marca | `fae39c2fefe78363aa1c814668d25607` | **plantilla por defecto de Notion**, cero contenido Berel |
-| Brief/Estructura | `38239c2fefe780bb9c52da6db7becc21` | ~380 car.: **un prompt a medio escribir** que corta en "Básate en este artículo:" |
-| Biblioteca de hooks y copys | `37b39c2fefe7818ea960e7640d88e36e` | stub autodeclarado "Sección por desarrollar" |
+| 📘 **Playbook Producción** | `3b239c2fefe780ceb71dff4f5bed4646` | ciclo mensual, modalidades, `Formato`, estructura de artículo y Tutorial híbrido |
+| 5️⃣ **Recomendaciones Cliente** | `38239c2fefe780e0aeeae0ada3170d81` | peticiones fechadas, voz en primera persona, series, CTA, anchors, CMS |
+| 🗣️ **6. Voz y Tono** | `33139c2fefe781ff9ae6f0b2cb8f0933` | estándar editorial general es-MX |
+| 📋 **Spec para imágenes** | `38f39c2fefe780aba8e3de74983a23d6` | campos, tamaños, ALT, peso y permanencia de banners |
+| 📣 **Playbook Derivados Sociales** | `f58f34efd1e04043b9982b932a034464` | atomización social por canal |
+| ➡️ **Modulación por canal** | `38139c2fefe7805683c8eea4586b1587` | registro por red |
+| 📤 **Cómo subir un artículo (Drupal)** | `4ed619156c0e4f6a89fb83b78ea6c0ad` | carga CMS y handoff |
+| 📝 **Ficha Tutoriales** | `3cf39c2fefe780f29a2ec7fae06cff67` | tarea/ficha de fotos Paso a Paso del formato Tutorial |
+| 📝 **Fichas para Gráficos** | `3c739c2fefe7803d9958cd74648cb036` | ficha de producción de infografías |
+| 🖼️ **Formatos de infografía** | `collection://06d39c2f-efe7-82be-99f6-87b9e8e34745` | 5 formatos aprobados + paleta de acento |
+| 📆 **Content Hub** | `35f39c2fefe7808186efc6ec63475640` | planificación y propiedad `Formato` |
+| **Tareas** | `35c39c2fefe780c9bc37e811a7b95a7c` | ejecución, relaciones, estados e íconos |
 
-**En la práctica, lo que el Playbook promete que sale de "Keywords" y "Recomendaciones SEO" sale de
-`6. Voz y Tono` §6 y de `Recomendaciones Cliente`.**
+## Cambios promovidos en la sincronización 2026-09-02
 
-## Los formatos de infografía, uno por uno
+1. **`Formato` es obligatorio antes de escribir.**
+   - `Artículo` → Modalidad A/B normal.
+   - `Tutorial` → Modalidad A/B + versión híbrida para CMS.
+2. **Tutorial híbrido formalizado.**
+   - vive en la misma página del Content Hub;
+   - una intención = una URL;
+   - conserva aproximadamente 90% de la cobertura útil del V1;
+   - estructura canónica de 4 pasos;
+   - productos/materiales/colores se preparan para el bloque CMS `Tutorial Contenido`.
+3. **Fotos del Paso a Paso separadas de banners.**
+   - una sola tarea de diseño por secuencia;
+   - 1:1 de 500 px para diseño;
+   - sin texto/logo;
+   - coherencia visual entre pasos.
+4. **Banners del V1 viajan completos al híbrido.** No basta un puntero.
+5. **Links del handoff CMS en ruta relativa** cuando corresponde; anchor siempre descriptivo.
+6. **La modalidad sigue determinándose por contenido vivo**, no por `Enlace` ni HTTP 200.
+7. **Instagram = Story**, decisión posterior del cliente; la mención antigua a post estático queda
+   explícitamente superada.
+8. **Nunca `/search?q=`**: aunque una línea vieja del Playbook todavía lo mencione, `robots.txt` lo
+   bloquea y la regla vigente es paleta/artículo válido → `/colores/<familia>`.
 
-Todos extraídos verbatim el 2026-08-25 y transcritos en el módulo `10`:
+## Precedencia cuando hay contradicción
 
-| Formato | Page ID |
-|---|---|
-| 🔢 Infografía: Pasos | `37639c2fefe780d69508d9285dde2b01` |
-| ↗️ Señalizacion | `3c339c2fefe78000bcdcd43f2711a44d` |
-| 🌈 Tipos de Color | `3c339c2fefe780f68582d6927e0ef018` |
-| 📚 Técnica - Foto | `3c339c2fefe780baac4dfc02b132dc1f` |
-| ℹ️ Técnica - Gráfica | `3c639c2fefe780e6abf0fe9eeeecbff4` |
-| 🎨 Paleta de acento para infografías | `3c639c2fefe7807fbc9df1e6d9855fe5` |
+1. petición fechada del cliente;
+2. spec específica del artefacto;
+3. Playbook Producción vivo;
+4. guía general;
+5. copia del repo.
 
-**Base hermana `Formatos de Diseño`** (`collection://36439c2f-efe7-817e-ae29-000b1ca94687`) — **NO
-son infografías**; gobiernan hero, cierre y piezas de producto. Solo se leyó una de las cuatro:
+Ejemplos conocidos:
 
-| Formato | Page ID | Estado |
-|---|---|---|
-| 🎨 Muestrario de Paletas | `37639c2fefe780989444e04daa7bacc9` | **leído**, resumido en `10` |
-| Product Placement | `36439c2fefe78159bd79c02a5bc3302e` | no extraído |
-| Antes y después | `37639c2fefe780488bbcf7ebb7738dad` | no extraído |
-| Residenciales / Inspiracional | `37639c2fefe78054a5f9dfbebde656c6` | no extraído |
+- `Instagram Post estático` en una versión vieja del Playbook → **no gobierna**; se usa Story.
+- `/search?q=<color>` en una línea vieja de Fase 5 → **no gobierna**; se usa `/colores/<familia>` o
+  una pieza editorial válida.
+- `Enlace` presente → no prueba Modalidad A si la URL sigue siendo soft-404.
 
-## Material que existe y esta skill todavía no cubre
+## Verificaciones externas promovidas al repo
 
-Territorio mapeado pero **no incorporado**. Si el trabajo entra ahí, **abrir la página en Notion**:
+Verificadas en vivo el 2026-08-25:
 
-| Tema | Page ID |
-|---|---|
-| 🎯 Fundamentos: embudo y fases (social) | `37b39c2fefe7810da179eb2fe8b8c706` |
-| 🧭 Mapa de CTAs por fase | `37b39c2fefe781d68066cb1dad8530f5` |
-| 🗣️ Voz y tono en redes (por canal, incluye X) | `37b39c2fefe7810eb1b4c87667c8a4be` |
-| Cascada Estática · Mega-Cascada Hub & Spoke | `37b39c2fefe781949503de41119246a1` · `37b39c2fefe781138cadd6842bfff48c` |
-| Playbook por plataforma · Matriz mensual de artes · Calendario | `37b39c2fefe78179b654dee0cab9015e` · `37b39c2fefe7813e8c1ef5e0a7486215` · `37b39c2fefe7818d8905ceea00acfd8f` |
-| UTMs y GA4 · Pendientes técnicos | `37b39c2fefe7818e962cc396674505af` · `37b39c2fefe781e58ce9d762088d16e5` |
-| 📘 Manual de Usuario · Berel Web CMS | `37339c2fefe7800e91b2e65ae96e93e2` |
-| 🎨 Berel Web — Guía de estilos (sistema visual del sitio) | `37339c2fefe780a0bc2dcffd579a1ed1` |
-| Technical SEO: desindexar el subdominio backend · robots/sitemap | `39139c2fefe780128300eafae5323d7c` · `39139c2fefe780a4a415ced916d383dd` |
-| Colores y paletas: Color del Año 2026 · Paleta Frida Kahlo · Colores Berel | `36439c2fefe780c8a442fdec1df84eec` · `36539c2fefe780859467d558022986b1` · `37439c2fefe783849a280151bad186a7` |
-| Colores Berel — Catálogo RGB (base, 1.553 filas) | `59840d545a6b41ccb2f45ceea2ce2151` |
+- `robots.txt` bloquea `/search` y `?q=`;
+- `berel.com` puede devolver shell 200 para rutas inexistentes;
+- sitemaps autoritativos:
+  - `/sitemap-productos.xml`
+  - `/sitemap-articulos.xml`
+  - `/sitemap-colores.xml`
+- una URL real debe confirmar `title`, H1 y cuerpo editorial frente a una ruta de control.
 
-## 🔴 Página que NO se abre ni se copia
+## Material sensible
 
-**Accesos CMS** (`37339c2fefe780cd8335f9d55d9f9230`) contiene **usuario y contraseña del Drupal de
-Berel en texto plano**. Se usa desde Notion cuando toca publicar y **nunca se copia a este repo, a un
-log, a un commit ni a un prompt**.
+**Accesos CMS** contiene credenciales en texto plano. Nunca se copia a skill, repo, log, commit ni
+prompt. Solo se usa desde el workspace autorizado cuando toca publicar.
 
-## Artículo de referencia
+## Regla de mantenimiento
 
-**"Impermeabilizante para azotea: cómo elegir el correcto (guía Berel)"**
-(`3a639c2fefe78087a9f6fd5eae3a8e5e` · `berel.com/articulos/impermeabilizante-para-azotea-como-elegir`)
-es el artículo más completo de la base y el mejor modelo vivo de estructura, tono y fichas de banner.
-⚠️ Es también de donde salen dos de las divergencias declaradas en `SKILL.md`: usa **3 desplegables**
-y declara **1.400-1.800 palabras**.
+Cada vez que cambie el Playbook Producción, revisar como mínimo:
 
-## Decisiones del cliente posteriores a la extracción
+- `SKILL.md`
+- `01_CICLO_MENSUAL.md`
+- `03_REDACCION_ARTICULO.md`
+- `05_BANNERS_IMAGENES.md`
+- `06_DERIVADOS_SOCIALES.md`
+- `07_SISTEMA_NOTION.md`
+- `08_PUBLICACION_CMS_DRUPAL.md`
+- `09_RECOMENDACIONES_DEL_CLIENTE.md`
+- `13_FORMATO_TUTORIAL_HIBRIDO.md`
+- `GLOSSARY.md`
+- este `SOURCES.md`
 
-| Fecha | Decisión | Qué invalida |
-|---|---|---|
-| **2026-08-25** | **Instagram: solo historias, sin posts estáticos** | La Fase 8 del `Playbook Producción` (`3b239c2fefe780ceb71dff4f5bed4646`), que sigue nombrando la tarea como "Instagram Post estático". **Pendiente de corregir en Notion.** |
-
-## Verificación en vivo del catálogo público (2026-08-25)
-
-Aparte de la wiki de Notion, el **2026-08-25** se verificó **en vivo el catálogo público de Berel**
-para fijar los datos técnicos que cada artículo del cluster vuelve a necesitar. El resultado está
-transcrito en el módulo [`12_DATOS_VERIFICADOS_DEL_CATALOGO.md`](modules/12_DATOS_VERIFICADOS_DEL_CATALOGO.md).
-
-**Método:** recorrido del **sitemap oficial** más una **ruta de control** para confirmar que lo
-servido coincidía con el payload del CMS (de ahí salen los campos vacíos de la §3 del módulo `12`).
-
-| Qué se cubrió | Alcance |
-|---|---|
-| Fichas de producto | **8** — Berelinte, Berelinte-0, Kalos Tone, Multitono Pro, Insignia, Sellador, y las variantes de Esmalte Summa |
-| Artículos de sala | **3** |
-| Rutas de navegación | **3** |
-
-🔴 **Lo que caduca antes:** las cifras de **costo de pintar en México** (§5 del módulo `12`) son de
-**agosto de 2026** y hay que **reverificarlas si la publicación se corre más de ~60 días**. Los datos
-de ficha (rendimiento, lavabilidad, COV, colores) caducan solo si Berel cambia la ficha.
-
-## Método de extracción
-
-Extraído vía el conector MCP de Notion, verbatim, el **2026-08-25**. Los snapshots que reportó el
-conector: Playbook Producción `2026-08-04` · Modulación por canal `2026-08-18` · Voz y Tono
-`2026-08-11` · Spec para imágenes `2026-06-30`.
-
-**Solo se abrió un artículo publicado completo**: no está verificado que los otros ~20 sigan la misma
-estructura.
+Los espejos `.claude` y `.codex` deben quedar **byte-identical**.
