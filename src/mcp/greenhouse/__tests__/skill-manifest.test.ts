@@ -28,12 +28,11 @@ import {
   listGreenhouseMcpSkills,
   buildGreenhouseMcpSkillCatalogArtifact,
   buildGreenhouseMcpSkillCatalogFromArtifact,
-  loadGreenhouseMcpSkillCatalogFromFilesystem,
-  observeGreenhouseMcpSkillFiles,
   parseGreenhouseMcpSkillFrontmatter,
   readGreenhouseMcpSkill,
   resolveGreenhouseMcpSkillAudiences
 } from '../skill-catalog'
+import { loadGreenhouseMcpSkillCatalogFromFilesystem, observeGreenhouseMcpSkillFiles } from '../skill-catalog-fs'
 import {
   buildGreenhouseMcpSkillUri,
   computeGreenhouseMcpSkillCoverage,

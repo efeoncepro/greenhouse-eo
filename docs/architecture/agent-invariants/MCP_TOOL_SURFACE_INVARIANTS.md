@@ -263,7 +263,10 @@ vez de vigilarse: `pnpm mcp:skills:generate` produce `src/mcp/greenhouse/skill-c
 `pnpm mcp:skills:check` —en `local:check` y en CI— falla si difiere del filesystem. El runtime
 re-verifica hashes y coincidencia con el manifiesto al cargar: un artefacto viejo o editado a mano
 LANZA. **NUNCA** editar `skill-catalog.generated.json` a mano; **NUNCA** reintroducir `fs` ni
-`outputFileTracingIncludes` para los manuales. El smoke del runbook MCP sigue comparando la
+`outputFileTracingIncludes` para los manuales. La lectura de filesystem vive SÓLO en
+`skill-catalog-fs.ts` (generador + tests): Turbopack analiza estáticamente las lecturas de `fs` con
+rutas dinámicas y, al no resolverlas, incluye el proyecto ENTERO en la función aunque el código no
+corra en runtime — **NUNCA** importar ese módulo desde nada alcanzable por una ruta. El smoke del runbook MCP sigue comparando la
 **cuenta EXACTA** del catálogo, nunca `≥ 1`.
 
 **SIEMPRE** que una tool nueva comprometa presupuesto, entra al `appliesTo` de

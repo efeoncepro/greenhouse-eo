@@ -12,6 +12,18 @@ entitlements, providers and their canonical readers/commands.
 🔴 **La ausencia de una tool en el gateway NO es evidencia de olvido — búscala en las exclusiones antes de reportar un hueco.**
 El guard de paridad (`efeonce-mcp/src/providers/greenhouse-seo-tool-parity.ts`, `TASK-1653`/`TASK-1658`) es **bidireccional** y su regla es explícita: *«si una tool interna NO debe federarse, va en `EXCLUSIONS` con razón — nunca simplemente ausente»*. Así que "está en el registry interno y no en el gateway" tiene **dos** explicaciones —olvido de federación, o exclusión deliberada— y el sistema está construido para que las distingas con un `grep` a `GREENHOUSE_SEO_TOOL_EXCLUSIONS`. Caso fuente (2026-08-29): se reportó `get_seo_work_queue` como hueco de federación; estaba excluida a propósito, con razón sustantiva (§7 prohíbe exponer su cruce de citabilidad client-facing, y su `priority_score_version` no ha rodado un ciclo) y hasta con disparador de revisión declarado. ✅ **Desde `TASK-1780` el espejo a mano ya no existe.** El inventario del guard se **deriva** del manifiesto canónico `src/mcp/greenhouse/tool-manifest.ts`, que viaja al gateway como artefacto generado (`pnpm mcp:manifest:generate` acá → `pnpm greenhouse:manifest:sync` allá) con `manifestHash` verificado al cargar: editarlo a mano lanza. El CI del repo hermano sigue leyendo un archivo, nunca una URL, porque un gate de merge no debe depender de un deployment vivo. **NUNCA** edites `greenhouse-tool-manifest.generated.ts`: el paso 1 del protocolo de federación ahora es agregar la entrada al manifiesto en Greenhouse. Y una capacidad federada **sin contraparte interna** (el gateway resuelve contra rutas del lane) se declara en `GREENHOUSE_GATEWAY_NATIVE_TOOLS` con razón — caso vivo `get_seo_provider_spend`—, nunca ausente.
 
+## Load `mcp-craft` alongside this skill
+
+`mcp-craft` is the **domain-free craft**: tool granularity, context budget, naming, description
+writing, response shaping, error design, deprecation, drift gates, surface evaluation, and a
+**dated protocol radar**. This skill is its **consumer** — it owns our gateway, its scopes, its
+federation and its runtime; it does not restate the craft.
+
+🔴 **Never assert what the MCP spec says from memory.** The `2026-07-28` revision removed
+`initialize` and sessions, and deprecated Roots, Sampling, Logging and DCR on a clock — but no
+client implements it yet, so the handshake lane is correct TODAY. Read
+`mcp-craft/protocol-radar.md`, and verify against the source when the decision is expensive.
+
 ## First reads
 
 Read, in order:

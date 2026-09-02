@@ -27,12 +27,13 @@
  * CI) falla si difiere del filesystem. Al cargar, el runtime re-verifica el hash y la coincidencia
  * con el manifiesto: un artefacto viejo o editado a mano LANZA, nunca sirve texto viejo en verde.
  *
- * La lectura de filesystem (`loadGreenhouseMcpSkillCatalogFromFilesystem`) queda para el
- * generador y los tests; ningún consumidor de runtime la llama.
+ * 🔴 Este módulo NO importa `node:fs`. La lectura de filesystem vive en `skill-catalog-fs.ts`
+ * (generador + tests): Turbopack analiza estáticamente las lecturas de `fs` con rutas dinámicas
+ * (`readdirSync`/`readFileSync` sobre `process.cwd()`) y, al no poder resolverlas, incluyó el
+ * proyecto ENTERO en la función — 397 MB — aunque el código no se ejecutara en runtime. Un `fs`
+ * en un módulo alcanzable desde una ruta es una regresión de esta clase.
  */
 import { createHash } from 'node:crypto'
-import { readdirSync, readFileSync, statSync } from 'node:fs'
-import { join, relative, sep } from 'node:path'
 
 import { parse as parseYaml } from 'yaml'
 
@@ -120,100 +121,10 @@ export const parseGreenhouseMcpSkillFrontmatter = (
   return { name, description }
 }
 
-const walkMarkdownFiles = (dir: string): string[] => {
-  let entries: string[]
+/** SHA-256 del cuerpo de un manual: `contentHash` del catálogo y ETag de la lane. */
+export const hashGreenhouseMcpSkillBody = (value: string): string => createHash('sha256').update(value).digest('hex')
 
-  try {
-    entries = readdirSync(dir)
-  } catch {
-    return []
-  }
-
-  const files: string[] = []
-
-  for (const entry of entries.sort()) {
-    const full = join(dir, entry)
-    const stats = statSync(full)
-
-    if (stats.isDirectory()) {
-      files.push(...walkMarkdownFiles(full))
-    } else if (stats.isFile() && entry.toLowerCase().endsWith('.md')) {
-      files.push(full)
-    }
-  }
-
-  return files
-}
-
-/**
- * Observa el filesystem: todo `.md` bajo `docs/mcp/skills/` con lo que su frontmatter dice.
- * Es la mitad "realidad" de la cobertura; la otra mitad es el manifiesto.
- */
-export const observeGreenhouseMcpSkillFiles = (root: string = process.cwd()): GreenhouseMcpSkillFileObservation[] => {
-  const skillsRoot = join(root, GREENHOUSE_MCP_SKILLS_ROOT)
-
-  return walkMarkdownFiles(skillsRoot).map(file => {
-    const markdown = readFileSync(file, 'utf8')
-    const frontmatter = parseGreenhouseMcpSkillFrontmatter(markdown)
-
-    return {
-      sourcePath: relative(root, file).split(sep).join('/'),
-      frontmatterName: frontmatter.name,
-      frontmatterDescription: frontmatter.description
-    }
-  })
-}
-
-const sha256 = (value: string): string => createHash('sha256').update(value).digest('hex')
-
-/**
- * Construye el catálogo validado DESDE EL FILESYSTEM. LANZA `GreenhouseMcpSkillCatalogError` con
- * todos los findings si el manifiesto y los archivos no coinciden en las dos direcciones.
- *
- * Es la fuente del generador del artefacto y de los tests (parametrizado en root/manifest/tools
- * para ejercitar estados sintéticos sobre un directorio temporal). El runtime NO la usa.
- */
-export const loadGreenhouseMcpSkillCatalogFromFilesystem = (
-  options: {
-    root?: string
-    manifest?: readonly GreenhouseMcpSkillManifestEntry[]
-    tools?: readonly Pick<GreenhouseMcpToolManifestEntry, 'name'>[]
-  } = {}
-): GreenhouseMcpSkillCatalog => {
-  const root = options.root ?? process.cwd()
-  const manifest = options.manifest ?? GREENHOUSE_MCP_SKILL_MANIFEST
-  const tools = options.tools ?? GREENHOUSE_MCP_TOOL_MANIFEST
-
-  const files = observeGreenhouseMcpSkillFiles(root)
-  const findings = computeGreenhouseMcpSkillCoverage({ manifest, files, tools })
-
-  if (findings.length > 0) {
-    throw new GreenhouseMcpSkillCatalogError(findings)
-  }
-
-  const skills: GreenhouseMcpSkill[] = manifest.map(entry => {
-    const body = readFileSync(join(root, entry.sourcePath), 'utf8')
-    const frontmatter = parseGreenhouseMcpSkillFrontmatter(body)
-
-    return {
-      name: entry.name,
-      // La cobertura ya garantizó que existe: si no, no llegamos acá.
-      description: frontmatter.description ?? '',
-      audience: entry.audience,
-      appliesTo: entry.appliesTo,
-      uri: buildGreenhouseMcpSkillUri(entry.name),
-      sourcePath: entry.sourcePath,
-      body,
-      contentHash: sha256(body)
-    }
-  })
-
-  return {
-    skills,
-    byName: new Map(skills.map(skill => [skill.name, skill])),
-    catalogHash: sha256(skills.map(skill => skill.contentHash).join('\n'))
-  }
-}
+const sha256 = hashGreenhouseMcpSkillBody
 
 /** Ruta del artefacto generado, relativa a la raíz del repo. */
 export const GREENHOUSE_MCP_SKILL_CATALOG_ARTIFACT_PATH = 'src/mcp/greenhouse/skill-catalog.generated.json'

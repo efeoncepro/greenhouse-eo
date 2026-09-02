@@ -39,6 +39,18 @@ const mirroredSkills = [
     claude: '.claude/skills/google-data-studio',
   },
   {
+    /*
+     * `mcp-craft` entra el 2026-09-02 junto con la skill. Es el OFICIO domain-free del que
+     * `efeonce-mcp-platform` es consumer: si los dos bundles divergen, Codex y Claude diseñan
+     * superficies MCP con reglas distintas y el drift aparece en el contrato publicado, no en el
+     * repo. Va byte-identical porque no tiene archivos locales por agente.
+     */
+    id: 'mcp-craft',
+    mode: 'byte-identical',
+    codex: '.codex/skills/mcp-craft',
+    claude: '.claude/skills/mcp-craft',
+  },
+  {
     id: 'efeonce-mcp-platform',
     mode: 'byte-identical',
     codex: '.codex/skills/efeonce-mcp-platform',

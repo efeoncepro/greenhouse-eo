@@ -26,6 +26,12 @@
   `pnpm mcp:skills:check` en `local:check` y CI; hashes re-verificados al cargar), cero `fs` en
   runtime, `outputFileTracingIncludes` retirado. El spec pedía «declarar el riesgo del bundling»;
   el riesgo se midió y se eliminó.
+- **Slice 5b (2026-09-02 15:29Z):** el segundo build (`c4c838dea`, ya sin tracing) FALLÓ IGUAL
+  (397,35 MB). Descartado nft (repro con la forma transpilada: 1 archivo); la causa que queda es el
+  análisis estático de `fs` de Turbopack: `skill-catalog.ts` conservaba `readdirSync`/`readFileSync`
+  sobre rutas derivadas de `process.cwd()` aunque el runtime ya no las ejecutara, y el módulo era
+  alcanzable desde tres rutas. Todo `node:fs` se movió a `skill-catalog-fs.ts` (sólo generador y
+  tests). Tres builds de staging fallidos en total; el operador recibió los correos de Vercel.
 - **Gateway desplegado (decisión del operador: sólo `mcp.efeonce.org`, sin release a `main`):**
   `efeonce-mcp` `c588a1b` en `origin/main`, CI `33646464475` success, Deploy Cloud Run
   `33646625344` success, revisión `efeonce-mcp-gateway-00028-pmx`, front door

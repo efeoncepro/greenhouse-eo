@@ -92,7 +92,7 @@ incluye estos tres chequeos (cuenta exacta, cuerpo completo, 404 de inexistente)
 
 ## Referencias técnicas
 
-- `src/mcp/greenhouse/skill-manifest.ts`, `src/mcp/greenhouse/skill-catalog.ts`, `scripts/ci/mcp-skill-catalog-artifact.ts`
+- `src/mcp/greenhouse/skill-manifest.ts`, `src/mcp/greenhouse/skill-catalog.ts` (runtime, sin `fs`), `src/mcp/greenhouse/skill-catalog-fs.ts` (sólo generador y tests), `scripts/ci/mcp-skill-catalog-artifact.ts`
 - `src/lib/api-platform/resources/ecosystem-mcp-skills.ts`
 - `docs/architecture/agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md` §8
 - `docs/operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md`

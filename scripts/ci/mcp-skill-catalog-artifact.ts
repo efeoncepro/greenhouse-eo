@@ -25,11 +25,8 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-import {
-  buildGreenhouseMcpSkillCatalogArtifact,
-  loadGreenhouseMcpSkillCatalogFromFilesystem,
-  GREENHOUSE_MCP_SKILL_CATALOG_ARTIFACT_PATH
-} from '@/mcp/greenhouse/skill-catalog'
+import { buildGreenhouseMcpSkillCatalogArtifact, GREENHOUSE_MCP_SKILL_CATALOG_ARTIFACT_PATH } from '@/mcp/greenhouse/skill-catalog'
+import { loadGreenhouseMcpSkillCatalogFromFilesystem } from '@/mcp/greenhouse/skill-catalog-fs'
 
 const ARTIFACT_PATH = join(process.cwd(), GREENHOUSE_MCP_SKILL_CATALOG_ARTIFACT_PATH)
 

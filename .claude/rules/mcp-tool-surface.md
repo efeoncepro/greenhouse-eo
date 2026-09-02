@@ -5,7 +5,11 @@ paths:
 
 # Superficie de tools MCP — invariantes (auto-load por path)
 
-**Canon completo:** `docs/architecture/agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md` + `docs/architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md` §22. **Skill:** `efeonce-mcp-platform`.
+**Canon completo:** `docs/architecture/agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md` + `docs/architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md` §22. **Skills:** `mcp-craft` (el OFICIO domain-free) + `efeonce-mcp-platform` (nuestro gateway).
+
+🔴 **NUNCA afirmes qué dice el spec MCP de memoria.** La revisión `2026-07-28` eliminó `initialize` y las sesiones, y dejó Roots, Sampling, Logging y DCR deprecados con retiro no antes de 2027-07-28 — pero **ningún cliente la implementa todavía**, así que el carril handshake es lo correcto HOY. El estado fechado vive en `mcp-craft/protocol-radar.md`, que manda verificar contra la fuente cuando la decisión es cara.
+
+🔴 **Declara las CUATRO `annotations` explícitamente** (`readOnlyHint`, `destructiveHint`, `idempotentHint`, `openWorldHint`), jamás ausentes. Sus defaults en el spec son **pesimistas** (`destructiveHint: true`, `openWorldHint: true`): callarlas no es neutro, declara lo peor, y el cliente trata cada lectura pura como destructiva y de mundo abierto. Derivarlas de `writes` y `spendsProviderBudget` es el camino: ya están declaradas.
 
 🔴 **El inventario de tools es `src/mcp/greenhouse/tool-manifest.ts`, y sólo ése.** `server.ts` **registra recorriéndolo**: definir una tool sin entrada —o declarar una entrada sin definición— hace fallar la construcción del servidor nombrándola. **NUNCA** agregues un `registerTool` sin su entrada en el manifiesto; no vas a poder, y ese es el punto.
 
