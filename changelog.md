@@ -90,7 +90,8 @@ procedimiento de gasto. El gateway federa la tool con su propio guard de paridad
 `efeonce-mcp-gateway-00028-pmx`) y la lane salió a producción en el release `375f56e24` del mismo día, con canary de
 contrato verde contra producción. Sin Entra, flag ni persistencia nuevos. Follow-up del mismo día: un agente Claude Code
 real cargó el manual por el front door OAuth, y el catálogo creció a seis manuales (discovery→tracking, salud técnica,
-diagnóstico de prospecto) sin tocar la tool ni el gateway.
+diagnóstico de prospecto) sin tocar la tool ni el gateway; los seis salieron a producción en el segundo release del día
+(`4379c495013f`) con canary de contrato verde.
 
 ## 2026-09-02 — ANAM: entrega premium de Emma y soporte explícito de tres meses
 

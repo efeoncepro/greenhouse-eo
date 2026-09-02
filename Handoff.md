@@ -2,6 +2,13 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+Seguimiento OAuth (2026-09-02): [TASK-1813](docs/tasks/to-do/TASK-1813-efeonce-mcp-oauth-client-interoperability.md)
+creada `to-do`, sin implementar. Codex 0.152.0 rechazó discovery; metadata pública revalidada a las 22:51Z.
+La [auditoría](docs/audits/EFEONCE_MCP_CODEX_OAUTH_INTEROPERABILITY_2026-09-02.md) identifica scopes sin cualificar
+al apagar shim, fallback de deploy que lo reactiva y canary directo que no prueba discovery. El plan B histórico
+de abajo no basta sin esos gates. Próximo paso: plan humano aprobado y coordinación con dueños de archivos;
+no push/deploy ni mutación de Entra autorizados por esta creación. Incidente Git/Berel separado.
+
 ## 2026-09-02 (10) — TASK-1805 foundation ETV implementada: code complete, rollout pendiente, todavía legacy
 
 Sesión `greenhouse-eo-fe` sobre `develop`, **sin push** (incidente de `main` en curso; `origin/develop` quedó en
@@ -210,6 +217,13 @@ manuales, todos SEO federado (`seo-discovery-to-tracking`, `seo-technical-health
 redespliega: los nuevos aparecen tras el release. Hiring/Globe quedan fuera: sus tools no están en el manifiesto de
 Greenhouse y el contrato de manuales sólo gobierna ése. Techo "revisar al pasar de 6" alcanzado: la próxima adición
 particiona por dominio.
+
+**Segundo release del día (23:19Z), llevado por esta sesión:** PR #216 → `4379c495013f`, run `33693657365`
+success, release_id `4379c495013f-2493cf4b-…`, manifest `released`; canary post-released: catálogo `count=6`,
+cuerpos byte-idénticos, 304/404/401, provider del gateway 6/6; watchdog ok, 4/4 workers (ops-worker
+change-gated con diff de árbol vacío). Incluyó TASK-1805 Slices 1–3 (sin flag; migración expand ya aplicada,
+único bypass) y la reconciliación de **10 commits que `cesargrowth11` empujó directo a `main`** (skill Berel,
+22:06–22:10Z) por cherry-pick + `-s ours`. Playbook gana el anti-patrón #15. Ledger de tiempos actualizado.
 
 ## 2026-09-02 (5) — TASK-1784: el eval de selección MCP refutó su propia hipótesis, y eso es el entregable
 
