@@ -30,7 +30,16 @@ Guardarlas acá conserva la revisión y el contexto sin poner una mina en el cam
 
 ## Lote pendiente
 
-**VACÍO.** No hay ninguna migración parqueada esperando su condición.
+### TASK-1805 — `TASK-1805-etv-methodology-contract.sql.pending` — CONTRACT de metodología ETV
+
+Retira los DEFAULT transitorios de `etv_methodology_version`/`etv_methodology_evidence` en las tres
+tablas ETV, retira la UNIQUE legacy de `seo_domain_overview_snapshots` y `seo_url_visibility_snapshots`
+(habilita la coexistencia legacy/improved que el shadow de `TASK-1806` necesita) y agrega el CHECK
+`NOT VALID` del hecho `estimated_monthly_traffic`. **Condición:** release con los writers formula-aware
+en `origin/main` + ambos runtimes sirviendo ese SHA + readback de 7 días sin filas con evidencia
+`contract_default_pre_cutoff` en las tres tablas + `GROWTH_SEO_ETV_METHODOLOGY_VERSION` explícito en
+Vercel y ops-worker. Detalle y readbacks en el encabezado del archivo. Probada en transacción con
+rollback por `scripts/growth/_sanity-task-1805-etv-schema.ts` (coexistencia, duplicado, NOT NULL).
 
 ### TASK-1771 — `COMMENT` de `superseded_at` — APLICADA 2026-08-23
 

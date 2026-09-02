@@ -1,0 +1,99 @@
+-- ═══════════════════════════════════════════════════════════════════════════════════════════
+-- TASK-1805 — CONTRACT de la metodología ETV. Parqueada aquí DELIBERADAMENTE (ver README.md).
+--
+-- CONDICIÓN DE EJECUCIÓN (verificar las TRES antes de `pnpm migrate:create`):
+--   1. El release con los writers formula-aware de TASK-1805 está en `origin/main` (Vercel Production
+--      sirve ese SHA y el ops-worker corre una revisión con ese SHA: `pnpm release:workers`).
+--   2. Readback: en los últimos 7 días NO hay filas nuevas con evidencia contractual —
+--        SELECT count(*) FROM greenhouse_growth.seo_domain_overview_snapshots
+--         WHERE etv_methodology_evidence = 'contract_default_pre_cutoff' AND created_at > now() - interval '7 days';
+--      (repetir para seo_url_visibility_snapshots y seo_prospect_diagnostics) → 0 en las tres.
+--      Si el cron mensual (16/17) o un diagnóstico de prospecto aún escribió sin flag, el código viejo
+--      sigue vivo en algún runtime: NO aplicar.
+--   3. Ambos runtimes reportan `GROWTH_SEO_ETV_METHODOLOGY_VERSION` explícito (readback del
+--      ops-worker por `gcloud run services describe` + Vercel `vercel env ls`), aunque el valor sea
+--      `legacy_static_v1`.
+--
+-- Qué hace: retira los DEFAULT transitorios (una escritura nueva DEBE declarar método y evidencia),
+-- retira la UNIQUE legacy (habilita la coexistencia real legacy/improved por sujeto/mercado/fecha,
+-- precondición del shadow de TASK-1806) y exige metodología en el hecho ETV del prospecto.
+--
+-- Qué NO hace: no borra filas, no reetiqueta nada por fecha, no toca append-only.
+--
+-- Down: reponer sólo lo compatible. La UNIQUE legacy NO se repone si ya coexisten dos métodos para
+-- un mismo sujeto/día (fallaría); en ese caso el rollback es de código (selector a legacy), no de schema.
+-- ═══════════════════════════════════════════════════════════════════════════════════════════
+
+-- Up Migration
+
+ALTER TABLE greenhouse_growth.seo_domain_overview_snapshots
+  ALTER COLUMN etv_methodology_version DROP DEFAULT,
+  ALTER COLUMN etv_methodology_evidence DROP DEFAULT,
+  DROP CONSTRAINT IF EXISTS seo_domain_overview_capture_unique;
+
+ALTER TABLE greenhouse_growth.seo_url_visibility_snapshots
+  ALTER COLUMN etv_methodology_version DROP DEFAULT,
+  ALTER COLUMN etv_methodology_evidence DROP DEFAULT,
+  DROP CONSTRAINT IF EXISTS seo_url_visibility_capture_unique;
+
+ALTER TABLE greenhouse_growth.seo_prospect_diagnostics
+  ALTER COLUMN etv_methodology_version DROP DEFAULT,
+  ALTER COLUMN etv_methodology_evidence DROP DEFAULT;
+
+-- El hecho de tráfico estimado declara su metodología. NOT VALID: las filas anteriores al expand
+-- heredan el método de su cabecera (seo_prospect_diagnostics.etv_methodology_version) y no se
+-- reescriben (append-only); toda fila NUEVA queda sujeta al CHECK.
+ALTER TABLE greenhouse_growth.seo_prospect_diagnostic_facts
+  DROP CONSTRAINT IF EXISTS seo_prospect_facts_etv_methodology_check,
+  ADD CONSTRAINT seo_prospect_facts_etv_methodology_check
+    CHECK (
+      kind <> 'estimated_monthly_traffic'
+      OR (detail_json ? 'etvMethodologyVersion'
+          AND detail_json ->> 'etvMethodologyVersion' IN ('legacy_static_v1', 'improved_layout_clickstream_v2'))
+    ) NOT VALID;
+
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_constraint WHERE conname IN ('seo_domain_overview_capture_unique', 'seo_url_visibility_capture_unique')) THEN
+    RAISE EXCEPTION 'TASK-1805 contract: la UNIQUE legacy sigue existiendo.';
+  END IF;
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+     WHERE table_schema = 'greenhouse_growth'
+       AND table_name IN ('seo_domain_overview_snapshots', 'seo_url_visibility_snapshots', 'seo_prospect_diagnostics')
+       AND column_name IN ('etv_methodology_version', 'etv_methodology_evidence')
+       AND column_default IS NOT NULL
+  ) THEN
+    RAISE EXCEPTION 'TASK-1805 contract: quedan DEFAULT transitorios.';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'seo_prospect_facts_etv_methodology_check') THEN
+    RAISE EXCEPTION 'TASK-1805 contract: falta el CHECK del hecho ETV del prospecto.';
+  END IF;
+END
+$$;
+
+-- Down Migration
+
+ALTER TABLE greenhouse_growth.seo_prospect_diagnostic_facts
+  DROP CONSTRAINT IF EXISTS seo_prospect_facts_etv_methodology_check;
+
+ALTER TABLE greenhouse_growth.seo_prospect_diagnostics
+  ALTER COLUMN etv_methodology_version SET DEFAULT 'legacy_static_v1',
+  ALTER COLUMN etv_methodology_evidence SET DEFAULT 'contract_default_pre_cutoff';
+
+ALTER TABLE greenhouse_growth.seo_url_visibility_snapshots
+  ALTER COLUMN etv_methodology_version SET DEFAULT 'legacy_static_v1',
+  ALTER COLUMN etv_methodology_evidence SET DEFAULT 'contract_default_pre_cutoff';
+
+ALTER TABLE greenhouse_growth.seo_domain_overview_snapshots
+  ALTER COLUMN etv_methodology_version SET DEFAULT 'legacy_static_v1',
+  ALTER COLUMN etv_methodology_evidence SET DEFAULT 'contract_default_pre_cutoff';
+
+-- Reponer la UNIQUE legacy sólo si NO hay coexistencia (falla explícita si la hay: no se borran filas).
+ALTER TABLE greenhouse_growth.seo_url_visibility_snapshots
+  ADD CONSTRAINT seo_url_visibility_capture_unique
+    UNIQUE (subject_kind, normalized_subject, location_code, language_code, capture_date);
+
+ALTER TABLE greenhouse_growth.seo_domain_overview_snapshots
+  ADD CONSTRAINT seo_domain_overview_capture_unique
+    UNIQUE (normalized_domain, location_code, language_code, capture_date);
