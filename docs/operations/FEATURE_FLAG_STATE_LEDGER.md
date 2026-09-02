@@ -21,6 +21,29 @@
 > cinco veces. **Una fila de esta tabla NO es evidencia de rollout pendiente sin leer el valor live.**
 
 
+> ## Delta 2026-09-02 — auditoría live previa al release `develop→main`
+>
+> Corrida de `pnpm flags:audit` **antes** de promover (161 flags en código), como paso 10 del
+> playbook. Estado medido contra el valor live de Production (`vercel env pull`), no contra
+> las filas de este documento:
+>
+> - **`ISSUE-150` limpio: 0 flags ON en Production sin su código lector en `origin/main`.**
+> - **6 flags ON en Production cuyo lector DIFIERE de `main`** — los seis leen
+>   `src/lib/growth/seo/flags.ts` (`GROWTH_SEO_ENABLED`, `GROWTH_SEARCH_CONSOLE_ENABLED`,
+>   `GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED`, `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED`,
+>   `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED`, `GROWTH_SEO_WORK_QUEUE_ENABLED`). Es exactamente lo que
+>   esta promoción viene a cerrar: producción ejecuta la versión del release anterior.
+> - **24 filas siguen declarando `prod: OFF` con el valor live en `true`** (las 21 que quedaron del
+>   2026-09-01 más las que se sumaron). El auditor las nombra una por una al correrlo.
+> - **1 candidato staging→prod:** `HIRING_FAIRNESS_MONITOR_ENABLED` (ON en staging, ausente en
+>   Production). Su bloqueador es de datos, no de despliegue: prod no tiene la policy row de
+>   privacidad equivalente a la sintética de staging, y sin ella el capture es fail-closed.
+> - **43 flags sin setear en NINGÚN environment** (OFF por default en todas partes).
+>
+> Regla que esto vuelve a confirmar: **una fila de § Pendientes NO es evidencia de rollout
+> pendiente sin leer el valor live.**
+
+
 ## Reconciliación 2026-07-27 — Think ya está publicado
 
 Las notas históricas de esta ledger que indicaban “0 tráfico self-serve” o “el grader no está embebido en ninguna
