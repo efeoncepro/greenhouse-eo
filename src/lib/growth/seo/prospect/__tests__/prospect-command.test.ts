@@ -43,6 +43,13 @@ vi.mock('../collect', () => ({
     providerCalls.push({ endpoint: 'market' })
 
     return {
+      etvMethodology: {
+        version: 'legacy_static_v1',
+        evidence: 'explicit_request',
+        requestedAt: '2026-10-15T12:00:00.000Z',
+        policyVersion: 'etv-policy.v1',
+        historicalBasis: null
+      },
       rankedKeywords: {
         source: 'labs_ranked_keywords',
         ok: true,

@@ -93,6 +93,15 @@ describe('contrato de salida — sin score, sin veredicto, sin cifras de mercado
         completedAt: '2026-08-27T00:01:00.000Z',
         createdBy: 'operator',
         sources: ['labs_ranked_keywords']
+      },
+      etvMethodology: {
+        version: 'legacy_static_v1',
+        policyVersion: 'etv-policy.v1',
+        evidence: 'explicit_request',
+        availableMethodologies: ['legacy_static_v1'],
+        comparability: 'single_methodology',
+        breakpointDate: null,
+        providerCutoffAt: '2026-11-01T00:00:00.000Z'
       }
     }
 

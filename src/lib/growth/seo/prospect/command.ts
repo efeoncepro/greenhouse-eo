@@ -27,6 +27,9 @@ import {
 import { isSeoProspectDiagnosticEnabled } from '../flags'
 import { collectProspectMarketEvidence } from './collect'
 import type { ProspectDiagnostic } from './contracts'
+import { EtvMethodologyPolicyError, buildEtvMethodologyRequest } from '../etv-methodology'
+import { toPersistedEtvMethodology } from '../etv-methodology/persisted'
+import { PROSPECT_RANKED_KEYWORDS_ENDPOINT } from './contracts'
 import { forecastProspectDiagnosticCostUsd, resolveProspectSubject } from './contracts'
 import { deriveProspectMarketFacts } from './derive'
 import { collectProspectOnPageEvidence, collectProspectSiteEvidence } from './site-evidence'
@@ -48,6 +51,8 @@ export type ProspectDiagnosticErrorCode =
   | 'cost_blocked'
   | 'claim_conflict'
   | 'collect_failed'
+  /** TASK-1805 — la policy ETV rechazó la corrida antes de gastar (legacy desde el corte / config inválida). */
+  | 'etv_methodology_rejected'
 
 export interface RunProspectDiagnosticInput {
   rootDomain: string
@@ -97,12 +102,32 @@ export const runProspectDiagnostic = async (
     }
   }
 
+  // TASK-1805 — la fórmula se fija ANTES del claim: si la policy falla cerrado, no se ocupa el
+  // slot del día ni se toca al proveedor.
+  let etvRequest
+
+  try {
+    etvRequest = buildEtvMethodologyRequest({ endpoint: PROSPECT_RANKED_KEYWORDS_ENDPOINT, env })
+  } catch (error) {
+    if (error instanceof EtvMethodologyPolicyError) {
+      captureWithDomain(error, 'growth', {
+        tags: { source: 'growth_seo_prospect_command', etvPolicyCode: error.code },
+        extra: { rootDomain: subject.rootDomain, market: subject.market }
+      })
+
+      return { ok: false, errorCode: 'etv_methodology_rejected' }
+    }
+
+    throw error
+  }
+
   const claim = await claimProspectDiagnostic({
     subject,
     actor: input.actor,
     ceilingUsd: resolveProspectDiagnosticCeilingUsd(env),
     forecastUsd: forecast.totalUsd,
-    competitorDomains: input.competitorDomains ?? []
+    competitorDomains: input.competitorDomains ?? [],
+    etvMethodology: toPersistedEtvMethodology(etvRequest)
   }).catch(() => null)
 
   if (!claim) {
@@ -120,7 +145,9 @@ export const runProspectDiagnostic = async (
     const market = await collectProspectMarketEvidence({
       subject,
       acquisitionOrganizationId: gate.acquisitionOrganizationId,
-      competitorDomains: input.competitorDomains
+      competitorDomains: input.competitorDomains,
+      etvMethodologyVersion: etvRequest.requested,
+      env
     })
 
     const siteFacts = await collectProspectSiteEvidence(subject)
@@ -144,7 +171,8 @@ export const runProspectDiagnostic = async (
       subject,
       actor: input.actor,
       facts,
-      actualCostUsd: market.actualCostUsd
+      actualCostUsd: market.actualCostUsd,
+      etvRequestedAt: market.etvMethodology.requestedAt
     })
 
     if (market.actualCostUsd > forecast.totalUsd) {

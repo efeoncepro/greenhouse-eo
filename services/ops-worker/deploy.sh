@@ -921,7 +921,7 @@ ENV_VARS="${ENV_VARS},GROWTH_SEO_WORK_QUEUE_ENABLED=${GROWTH_SEO_WORK_QUEUE_ENAB
 #
 # Es SUBORDINADO a `GROWTH_SEO_ENABLED`. Rollback (<10 min): `false` acá + `--update-env-vars`.
 # Los hallazgos ya escritos quedan: la tabla es append-only por diseño.
-GROWTH_SEO_SITE_FINDINGS_ENABLED="${GROWTH_SEO_SITE_FINDINGS_ENABLED:-false}"
+GROWTH_SEO_SITE_FINDINGS_ENABLED="${GROWTH_SEO_SITE_FINDINGS_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},GROWTH_SEO_SITE_FINDINGS_ENABLED=${GROWTH_SEO_SITE_FINDINGS_ENABLED}"
 
 # TASK-1699 — Persistencia del top-N del SERP que el rank capture YA paga (costo marginal

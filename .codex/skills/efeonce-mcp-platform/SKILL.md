@@ -112,7 +112,10 @@ If a source conflicts with remembered behavior, the verified runtime and its can
   🚩 **And the name lies, which is what makes the above dangerous:** that app's Entra `displayName` is
   **"Efeonce MCP Local Canary Client"**, yet it IS the tenant-wide shared production client the shim hands to every
   standard MCP client. The real canary is `66985833-14e9-438e-add4-b740e84e9a64` ("Base-Only Canary Client", 2
-  scopes), which the shim never returns. Verified with `az ad app show` 2026-09-02. Compound failure mode: whoever
+  scopes), which the shim never returns. Verified with `az ad app show` 2026-09-02. ✅ **Renamed the same day**
+  (TASK-1804) to "Efeonce MCP Public Client (Claude Code, claude.ai, Claude Desktop)" via `az ad app update
+  --display-name`; readback: appId, 3 redirect URIs and 3 read scopes intact, no write scope. The loopback finding
+  above stays under review — never close it by narrowing `http://localhost`. Compound failure mode: whoever
   opens Entra, reads "Local Canary" and assumes a toy blast radius is exactly whoever will not audit its redirect
   URIs. **NEVER reason about this client's blast radius from its name — read `requiredResourceAccess` and
   `publicClient.redirectUris`.** Renaming is cheap and touches neither `appId` nor consents.
@@ -171,11 +174,12 @@ If a source conflicts with remembered behavior, the verified runtime and its can
   bindings get an empty catalog and 404 anti-oracle on detail, never 403. A manual that leaks a UUID, `org-` id,
   repo path, task id, secret name or GCP project breaks the build (leak test); NEVER serve `.claude/skills/**` by
   MCP. The SEO parity guard is domain-anchored, so non-SEO federated tools are declared in
-  `EXPECTED_GREENHOUSE_PLATFORM_TOOLS` (+ `computeFederatedNonSeoToolFindings`). Manuals today:
-  `seo-spend-discipline`, `seo-visibility-reading`, `competitor-loop` (all internal). **Gateway deployed 2026-09-02**
-  (`efeonce-mcp` `c588a1b`, revision `efeonce-mcp-gateway-00028-pmx`, front door 200/200/401); the Greenhouse lane is
-  verified on STAGING and lives in `develop` — from production the tool answers `not_found` until the next
-  `develop→main` release (operator decision: no release in that window). Runtime lesson: the catalog ships as a
+  `EXPECTED_GREENHOUSE_PLATFORM_TOOLS` (+ `computeFederatedNonSeoToolFindings`). Manuals today (read the
+  count from the manifest, never from here): `seo-spend-discipline`, `seo-visibility-reading`, `competitor-loop`,
+  `seo-discovery-to-tracking`, `seo-technical-health`, `seo-prospect-diagnostic` (all internal). **Gateway deployed 2026-09-02**
+  (`efeonce-mcp` `c588a1b`, revision `efeonce-mcp-gateway-00028-pmx`, front door 200/200/401); the Greenhouse lane was
+  released to production the same day (release `375f56e24187-546f452b-…`, target `375f56e24`) and the post-release
+  contract canary was green (count=3 exact, bodies byte-identical to the artifact, 404/401, gateway provider 5/5). Runtime lesson: the catalog ships as a
   generated artifact (`pnpm mcp:skills:generate` / `mcp:skills:check`); reading `docs/mcp/skills/**` with `node:fs`
   from any route-reachable module made Turbopack include the whole project (397 MB function, 3 failed staging builds).
 - Treat writes, approvals, spending, rights-sensitive creative work, webhooks and new public auth surfaces as new

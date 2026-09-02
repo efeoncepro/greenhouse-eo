@@ -153,6 +153,15 @@ jobs:
         # Verifica que el parser del gate sigue funcionando (7 cases).
         run: pnpm migration-marker-gate:test
 
+      - name: AXIS credential expiry gate self-tests
+        # El detector de expiración del credencial AXIS quedó ciego el 2026-09-01
+        # porque la rotación cambió la FORMA del secreto (de PAT pelado a `.npmrc`
+        # completo) y el gate mandaba el blob multilínea como header Authorization.
+        # Nadie se enteró: su único canal de salida era el color de su propia corrida
+        # semanal, y ese color ya venía rojo por una causa ajena. Estos self-tests
+        # corren acá — donde alguien está obligado a mirarlos — y no en el schedule.
+        run: pnpm axis-credential-gate:test
+
       - name: Worker runtime-deps gate (ISSUE-090)
         # Bloquea el silent-startup-crash de los workers Cloud Run Node: un módulo
         # worker-bundled de src/lib/** que importa un paquete npm clasificado como

@@ -33,6 +33,13 @@ const rankedItem = (type: string, rankGroup: number, keyword: string, etv?: numb
 const CAPTURED_AT = '2026-08-27T12:00:00.000Z'
 
 const evidence = (overrides: Partial<ProspectMarketEvidence>): ProspectMarketEvidence => ({
+  etvMethodology: {
+    version: 'legacy_static_v1',
+    evidence: 'explicit_request',
+    requestedAt: CAPTURED_AT,
+    policyVersion: 'etv-policy.v1',
+    historicalBasis: null
+  },
   rankedKeywords: failedOutcome('labs_ranked_keywords'),
   competitorsDomain: failedOutcome('labs_competitors_domain'),
   backlinksCompetitors: failedOutcome('backlinks_competitors'),

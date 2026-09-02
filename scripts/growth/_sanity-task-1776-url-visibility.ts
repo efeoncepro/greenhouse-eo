@@ -22,6 +22,8 @@ import {
   loadFreshVisibilitySubjects,
   persistUrlVisibilitySnapshots
 } from '../../src/lib/growth/seo/url-visibility/persist'
+import { buildEtvMethodologyRequest } from '../../src/lib/growth/seo/etv-methodology'
+import { toPersistedEtvMethodology } from '../../src/lib/growth/seo/etv-methodology/persisted'
 import { readUrlVisibility, readVisibilityConcentration } from '../../src/lib/growth/seo/url-visibility/reader'
 import { getSeoUrlVisibilityStalenessSignal } from '../../src/lib/reliability/queries/seo-url-visibility-staleness'
 
@@ -33,6 +35,9 @@ const fail = (message: string): never => {
   console.error(`[sanity] FALLÓ: ${message}`)
   process.exit(1)
 }
+
+// TASK-1805 — todo writer exige la identidad metodológica; la sanity usa la de la policy (legacy explícito).
+const ETV_STAMP = toPersistedEtvMethodology(buildEtvMethodologyRequest({ endpoint: '/v3/dataforseo_labs/google/ranked_keywords/live', env: {} as NodeJS.ProcessEnv }))
 
 const main = async () => {
   const orgs = await runGreenhousePostgresQuery<{ organization_id: string }>(
@@ -50,7 +55,8 @@ const main = async () => {
     rawSubject: `https://${DOMAIN}/guia`,
     locationCode: LOCATION,
     languageCode: LANGUAGE,
-    sourceEndpoint: 'ranked_keywords'
+    sourceEndpoint: 'ranked_keywords',
+    etvMethodology: ETV_STAMP
   })
 
   const { rowsWritten } = await persistUrlVisibilitySnapshots({
@@ -73,7 +79,8 @@ const main = async () => {
         rawSubject: DOMAIN,
         locationCode: LOCATION,
         languageCode: LANGUAGE,
-        sourceEndpoint: 'relevant_pages'
+        sourceEndpoint: 'relevant_pages',
+        etvMethodology: ETV_STAMP
       })
     ],
     capturedByOrganizationId: organizationId,
@@ -90,7 +97,8 @@ const main = async () => {
     ],
     locationCode: LOCATION,
     languageCode: LANGUAGE,
-    sourceEndpoints: ['ranked_keywords']
+    sourceEndpoints: ['ranked_keywords'],
+    etvMethodologyVersion: ETV_STAMP.version
   })
 
   if (!fresh.has(`url:${DOMAIN}/guia`)) return fail('el pre-check no ve la fila url recién escrita')

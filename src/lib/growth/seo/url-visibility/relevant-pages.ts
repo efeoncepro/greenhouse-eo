@@ -20,6 +20,8 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import { parseDomainOverviewSide, type DomainRankOverviewSideRaw } from '../domain-overview/capture'
 import { normalizeOverviewDomain } from '../domain-overview/persist'
+import { buildEtvMethodologyRequest, resolveConfiguredEtvMethodology, type EtvMethodologyVersion } from '../etv-methodology'
+import { toPersistedEtvMethodology } from '../etv-methodology/persisted'
 import { enforceSeoRunEntitlement } from '../entitlement'
 import { isSeoModuleEnabled, isSeoUrlVisibilityEnabled } from '../flags'
 import { LABS_RESULT_ROW_USD, LABS_TASK_SETUP_USD } from '../provider-pricing'
@@ -97,6 +99,8 @@ const hasFreshRunForDomain = async (input: {
   locationCode: string
   languageCode: string
   sourceEndpoint: SeoUrlVisibilitySourceEndpoint
+  /** TASK-1805 — la corrida es fresca POR MÉTODO: la fórmula cambia valor Y membresía del top-N. */
+  etvMethodologyVersion: EtvMethodologyVersion
 }): Promise<boolean> => {
   const rows = await runGreenhousePostgresQuery<{ found: number }>(
     `SELECT 1 AS found
@@ -110,8 +114,16 @@ const hasFreshRunForDomain = async (input: {
            OR normalized_subject LIKE '%.' || $4
             )
         AND (CURRENT_DATE - capture_date) < $5
+        AND etv_methodology_version = $6
       LIMIT 1`,
-    [input.sourceEndpoint, input.locationCode, input.languageCode, input.normalizedDomain, URL_VISIBILITY_FRESHNESS_DAYS]
+    [
+      input.sourceEndpoint,
+      input.locationCode,
+      input.languageCode,
+      input.normalizedDomain,
+      URL_VISIBILITY_FRESHNESS_DAYS,
+      input.etvMethodologyVersion
+    ]
   )
 
   return rows.length > 0
@@ -173,7 +185,8 @@ const runConcentrationCapture = async (input: {
     normalizedDomain,
     locationCode: input.locationCode,
     languageCode: input.languageCode,
-    sourceEndpoint: input.sourceEndpoint
+    sourceEndpoint: input.sourceEndpoint,
+    etvMethodologyVersion: resolveConfiguredEtvMethodology().version
   })
 
   if (freshRun) {
@@ -212,6 +225,12 @@ const runConcentrationCapture = async (input: {
   }
 
   try {
+    // TASK-1805 — fórmula explícita por request. Este colector ordena provider-side por
+    // `metrics.organic.etv`: la fórmula cambia el valor Y qué páginas/subdominios entran al
+    // top-N, por eso la frescura y la identidad de la fila llevan el método.
+    const etv = buildEtvMethodologyRequest({ endpoint: input.endpoint })
+    const etvMethodology = toPersistedEtvMethodology(etv)
+
     const response = await postDataForSeoTask({
       family: 'labs',
       consumer: 'seo',
@@ -224,7 +243,8 @@ const runConcentrationCapture = async (input: {
           language_code: input.languageCode,
           item_types: ['organic', 'paid'],
           limit: rowLimit,
-          order_by: ['metrics.organic.etv,desc']
+          order_by: ['metrics.organic.etv,desc'],
+          ...etv.requestParams
         }
       ]
     })
@@ -278,7 +298,8 @@ const runConcentrationCapture = async (input: {
         organic: metrics.organic,
         paid: metrics.paid,
         totalRankedKeywords: metrics.totalRankedKeywords,
-        topKeywords: null
+        topKeywords: null,
+        etvMethodology
       })
 
       resultItems.push({
@@ -298,7 +319,8 @@ const runConcentrationCapture = async (input: {
             rawSubject: input.domain,
             locationCode: input.locationCode,
             languageCode: input.languageCode,
-            sourceEndpoint: input.sourceEndpoint
+            sourceEndpoint: input.sourceEndpoint,
+            etvMethodology
           })
         ],
         capturedByOrganizationId: input.organizationId,

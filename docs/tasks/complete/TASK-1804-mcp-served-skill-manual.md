@@ -1,5 +1,33 @@
 # TASK-1804 — MCP: el manual de uso viaja por el protocolo, no en la nota del handshake
 
+## Delta 2026-09-02 (follow-up) — el catálogo pasa de 3 a 6 manuales
+
+Por instrucción del operador ("haz la 3 end-to-end") se agregaron tres manuales dentro del contrato
+existente: `seo-discovery-to-tracking`, `seo-technical-health` y `seo-prospect-diagnostic`. Los
+manuales sólo pueden gobernar tools del manifiesto de Greenhouse, así que hiring/Globe (nativas del
+gateway) quedan fuera hasta que exista un contrato para tools externas. La `description` de
+`get_greenhouse_skill` NO cambió (nombra el manual que cubre todo el gasto y remite al catálogo;
+enumerar seis inflaría el contexto, lección de `TASK-1784`), por lo que el artefacto de tools y el
+gateway no cambian: los manuales nuevos aparecen por el catálogo tras el siguiente release. El techo
+"se revisa al pasar de 6" queda alcanzado exactamente: la próxima adición particiona por dominio.
+
+## Delta 2026-09-02 (cierre) — released a producción
+
+- Release `develop→main` llevado por otra sesión (`greenhouse-eo-ac`): PR #215 squash `375f56e24`,
+  orquestador run `33683893124` completed/success (21:13Z→21:25Z), release_id
+  `375f56e24187-546f452b-c60f-4617-9974-9c87760c3ab9`, manifest `released`, Vercel Production
+  `greenhouse-j48cdjs2t`. El cuerpo del squash declaró esta lane + `get_greenhouse_skill` como canary
+  de contrato obligatorio del release.
+- **Canary de contrato contra producción (21:27:08Z→21:27:16Z, post-`released`):** lane con binding
+  interno → catálogo 200 `count=3` exacto, ETag `"f2f570536e2abca50c37c88aa33a03a8"` + `If-None-Match`
+  → 304; `seo-spend-discipline` 7352 B `73c4b40d2f3a…`, `seo-visibility-reading` 8400 B
+  `e2a591c534b9…`, `competitor-loop` 6784 B `8921bc6ca7c2…` (iguales al artefacto); inexistente 404;
+  sin token 401. Provider del gateway contra producción 5/5. Front door 200/200/401. Cero escrituras.
+- El `ops-worker` cerró change-gated en `c4c838dea` (skip legítimo: `src/mcp/**` no está en el bundle
+  del worker; el diff de árbol completo lo confirmó la sesión del release).
+- Lo no ejercitado en runtime: `tools/call` por el front door OAuth (login Entra interactivo) y la
+  negación con binding de cliente (sin consumer de cliente con token). Ambos cubiertos por tests.
+
 ## Delta 2026-09-02 — code complete, rollout pendiente
 
 - **Slices 1–4 en código y tests verdes.** Greenhouse: `ec89014e4` (manifiesto + 3 manuales + tool +
@@ -56,7 +84,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -69,7 +97,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `none`
-- Status real: `code complete, rollout pendiente — slices 1–4 en código y tests verdes en los dos repos (2026-09-02); falta ejercitar la lane en staging/producción con binding real y desplegar el gateway (commit local en efeonce-mcp)`
+- Status real: `complete — released a producción 2026-09-02 (release 375f56e24187-546f452b-c60f-4617-9974-9c87760c3ab9, target 375f56e24, run 33683893124); canary de contrato contra producción verde 21:27Z; gateway 00028-pmx sirviendo los manuales`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -519,13 +547,13 @@ secretos nuevos, sin variables de entorno nuevas, sin coordinación con operador
 - [x] Los recursos `skill://efeonce/<name>/SKILL.md` resuelven y devuelven el mismo cuerpo que la tool.
 - [x] Las `instructions` del servidor nombran el manual y ya no contienen el procedimiento de gasto;
       la enumeración de tools que comprometen presupuesto sigue derivada del inventario.
-- [ ] (PARCIAL — **staging verificado** 2026-09-02 con binding interno real: catálogo exacto, 404 inexistente, 401 sin token; falta PRODUCCIÓN, que exige el release `develop→main` que el operador decidió no hacer en esta ventana, y el camino de negación con binding de cliente en runtime) La lane responde en **staging** y en **producción** con binding real: catálogo completo con
+- [x] (staging 2026-09-02 ~15:45Z y PRODUCCIÓN 2026-09-02 21:27Z con el binding interno real del consumer del gateway: catálogo exacto, ETag/304, cuerpos byte-idénticos, 404 inexistente, 401 sin token. El camino de negación con binding de CLIENTE quedó cubierto por tests de la lane, no en runtime: no existe consumer de cliente con token disponible) La lane responde en **staging** y en **producción** con binding real: catálogo completo con
       binding `internal`, catálogo sin `internal` con binding de cliente, `404` en el detalle desde
       binding de cliente, `401` sin token.
-- [ ] (PENDIENTE — el assert existe en el canary del gateway y en el runbook; falta correrlo contra producción) El smoke de producción compara la **cuenta exacta** del catálogo contra el manifiesto, no `≥ 1`.
+- [x] (2026-09-02 21:27Z contra producción: `count=3` exacto y los tres nombres; provider del gateway 5/5) El smoke de producción compara la **cuenta exacta** del catálogo contra el manifiesto, no `≥ 1`.
 - [x] El gateway federa la tool con `readOnlyHint: true`, tiene su entrada `EXPECTED_*` con razón, y
       el guard de paridad pasa.
-- [ ] (PENDIENTE — el gateway YA está desplegado (`00028-pmx`) pero la lane no existe en producción hasta el próximo release; la byte-identidad está probada en tests con el mismo reader) Un manual recuperado por `mcp.efeonce.org` es byte-idéntico al que devuelve la tool interna.
+- [x] (2026-09-02 ~22:05Z: `claude mcp login efeonce-mcp` bajo pty con la sesión Entra del operador → `✔ Connected`; un agente Claude Code en sesión nueva (`claude -p`, sólo `mcp__efeonce-mcp__get_greenhouse_skill` permitida) llamó `tools/call` por el front door OAuth de `mcp.efeonce.org`: catálogo de 3 manuales con sus nombres y el manual `seo-spend-discipline` completo, del que resumió correctamente las tres reglas y la semántica de `data.ok`. Los hashes que sirve el provider contra producción coinciden con el artefacto de la tool interna) Un manual recuperado por `mcp.efeonce.org` es byte-idéntico al que devuelve la tool interna.
 - [x] `MCP_TOOL_SURFACE_INVARIANTS.md` documenta el contrato del manifiesto de manuales y la regla de
       no publicar contenido interno.
 - [x] Cero cambios en Entra, cero scopes nuevos, cero escrituras.

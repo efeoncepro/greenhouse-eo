@@ -513,6 +513,25 @@ HEAD actual **Y** los rojos/cancelados recientes de la ráfaga, no sólo el colo
 
 ---
 
+### 15. Dos sesiones anunciando el MISMO release sobre el mismo checkout compartido
+
+**Caso real (2026-09-02, release `375f56e24187`).** Con varias sesiones de agente vivas sobre el mismo
+árbol, DOS anunciaron por mensaje cruzado que "arrancaban ahora" la promoción develop→main con
+auto-aprobación de gates, con minutos de diferencia y targets distintos (`ab36f4944` vs el squash que
+la primera ya había hecho). Se detectó porque una tercera sesión recibió ambos anuncios y levantó la
+bandera; la colisión quedó en el anuncio y no llegó al control plane (cero runs duplicados del
+orquestador), pero por suerte, no por diseño. Después el operador archivó sin querer a la sesión que
+llevaba el release, y la otra tuvo que retomarlo leyendo el estado real (`origin/main`, runs del
+orquestador) en vez de asumirlo.
+
+**Regla:** antes de tocar el árbol para un release, mirar `ListAgents` y `gh run list
+--workflow=production-release.yml --limit 2`; anunciar el release a las sesiones vivas y esperar
+acuse; y si dos lo anuncian, **una sola lo lleva** — la otra se retira ANTES del merge canónico, nunca
+después. Un release no es idempotente: dos merges `-s ours` + dos dispatches producen manifests
+duplicados y gates cruzados. Corolario del mismo día: `git log origin/develop..HEAD` antes de cada
+push, porque un commit huérfano de otra sesión delante de `origin/develop` viaja en el push de quien
+sea, y su autoría se atribuye mal.
+
 ## Caso positivo 2026-08-06 — el release que no generó incidente
 
 Hasta esta versión, este playbook sólo documentaba incidentes. Eso deja un sesgo:

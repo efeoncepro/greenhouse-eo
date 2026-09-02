@@ -159,6 +159,7 @@ export type CanonicalErrorCode =
   // Growth SEO — diagnóstico de prospecto (TASK-1709).
   | 'seo_prospect_invalid_input'
   | 'seo_prospect_cost_blocked'
+  | 'seo_etv_methodology_rejected'
   | 'seo_prospect_diagnostic_not_found'
   | 'seo_work_queue_invalid_input'
   | 'seo_work_queue_item_not_found'
@@ -748,6 +749,15 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   seo_prospect_diagnostic_not_found: {
     status: 404,
     message: 'El diagnóstico de prospecto no existe.',
+    actionable: false
+  },
+  // TASK-1805 — la policy de metodología ETV rechazó la corrida antes de tocar al proveedor
+  // (legacy solicitado desde el corte 2026-11-01, configuración fuera del vocabulario). Es
+  // configuración, no un blip: reintentar no cambia nada.
+  seo_etv_methodology_rejected: {
+    status: 409,
+    message:
+      'La metodología de tráfico estimado configurada no es válida para esta fecha. No se realizó ninguna consulta al proveedor; revisa la configuración ETV.',
     actionable: false
   },
   // TASK-1666 — anti-oracle del puente grounded: perfil, candidato o draft ajeno "no existe".

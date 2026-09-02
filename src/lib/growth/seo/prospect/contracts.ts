@@ -18,6 +18,7 @@
  */
 
 import type { SeoFigureShape, SeoLens } from '../lens'
+import type { EtvMethodologyProvenance } from '../etv-methodology/contracts'
 import {
   BACKLINKS_RESULT_ROW_USD,
   BACKLINKS_TASK_SETUP_USD,
@@ -229,6 +230,11 @@ export interface ProspectDiagnostic {
     /** Fuentes que efectivamente aportaron evidencia (las que fallaron no aparecen). */
     sources: ProspectSource[]
   }
+  /**
+   * TASK-1805 — fórmula ETV solicitada para este diagnóstico. El hecho `estimated_monthly_traffic`
+   * la hereda (y la repite en su `detail` junto a cobertura/truncamiento de la muestra).
+   */
+  etvMethodology: EtvMethodologyProvenance
   // NO HAY: score, verdict, healthy, benchmark, lift, industryAverage. A propósito.
 }
 

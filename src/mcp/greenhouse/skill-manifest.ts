@@ -68,9 +68,10 @@ export const buildGreenhouseMcpSkillUri = (name: string): string =>
   `${GREENHOUSE_MCP_SKILL_URI_PREFIX}${name}/SKILL.md`
 
 /**
- * El inventario de manuales. Tres, elegidos porque los tres ya existían como conocimiento y
- * estaban mal alojados: en las `instructions`, repartidos entre descripciones, o dentro de la
- * `description` de una sola tool pagando contexto en cada request.
+ * El inventario de manuales. Los tres primeros ya existían como conocimiento mal alojado (en las
+ * `instructions`, repartidos entre descripciones, o dentro de la `description` de una sola tool); los
+ * tres siguientes cubren los caminos SEO federados que quedaban sin manual: discovery→tracking,
+ * salud técnica/off-page y diagnóstico de prospecto.
  *
  * Techo declarado: si el catálogo pasa de ~12 manuales se particiona por dominio antes de seguir
  * agregando (estimación, no medición — se revisa al pasar de 6).
@@ -120,6 +121,24 @@ export const GREENHOUSE_MCP_SKILL_MANIFEST: readonly GreenhouseMcpSkillManifestE
       'get_seo_keyword_gap',
       'get_seo_serp_top_results'
     ]
+  },
+  {
+    name: 'seo-discovery-to-tracking',
+    audience: 'internal',
+    sourcePath: `${GREENHOUSE_MCP_SKILLS_ROOT}/seo-discovery-to-tracking/SKILL.md`,
+    appliesTo: ['discover_seo_keywords', 'get_seo_keyword_discovery', 'track_seo_keywords', 'get_seo_performance_catalog']
+  },
+  {
+    name: 'seo-technical-health',
+    audience: 'internal',
+    sourcePath: `${GREENHOUSE_MCP_SKILLS_ROOT}/seo-technical-health/SKILL.md`,
+    appliesTo: ['get_seo_site_audit_report', 'get_seo_backlink_profile', 'get_seo_backlink_detail', 'get_seo_entitlement']
+  },
+  {
+    name: 'seo-prospect-diagnostic',
+    audience: 'internal',
+    sourcePath: `${GREENHOUSE_MCP_SKILLS_ROOT}/seo-prospect-diagnostic/SKILL.md`,
+    appliesTo: ['run_seo_prospect_diagnostic', 'get_seo_prospect_diagnostic']
   }
 ] as const
 

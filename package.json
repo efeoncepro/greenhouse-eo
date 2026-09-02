@@ -125,6 +125,7 @@
     "nul-byte-gate": "node scripts/ci/nul-byte-source-gate.mjs",
     "nul-byte-gate:test": "node --test scripts/ci/__tests__/nul-byte-source-gate.test.mjs",
     "migration-marker-gate": "node scripts/ci/migration-marker-gate.mjs",
+    "axis-credential-gate:test": "node scripts/ci/__tests__/axis-package-credential-expiry-gate.test.mjs",
     "migration-marker-gate:test": "node scripts/ci/__tests__/migration-marker-gate.test.mjs",
     "worker:runtime-deps-gate": "node scripts/ci/worker-runtime-deps-gate.mjs",
     "worker:build-contract-gate": "node scripts/ci/worker-build-contract-gate.mjs",

@@ -2,6 +2,107 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-09-02 (10) — TASK-1805 tomada: la metodología ETV pasa a ser identidad del hecho, todavía en legacy
+
+Sesión `greenhouse-eo-fe` implementa `TASK-1805` local-first sobre `develop`, **sin push** mientras dure la
+promoción a producción anunciada por `Task-1804`. Alcance: policy endpoint-aware fail-closed
+(`src/lib/growth/seo/etv-methodology/**`), expand aditivo del schema de `seo_domain_overview_snapshots`,
+`seo_url_visibility_snapshots` y `seo_prospect_diagnostics` (identidad metodológica + evidencia + guard de
+corte), writers/readers/API/MCP formula-aware, señal de drift cross-runtime y evaluador dry-run sin gasto.
+Estado del árbol al arrancar: diez docs sucios ajenos (EPIC-022 + nueve tasks SEO); ninguno se acopla a los
+commits de esta sesión salvo el propio `TASK-1805`, cuya sección «MCP Tools & Skills Contract» ya estaba en
+el working tree y se conserva.
+
+**Decisiones de foundation que `TASK-1806` hereda:** las filas existentes (5 fotos de dominio, 8 de
+visibilidad, 1 hecho de tráfico de prospecto; todas capturadas 2026-08-27/29 por código que nunca envió
+`use_improved_etv`, sobre una cuenta registrada antes del 2026-09-01) se atribuyen a `legacy_static_v1` con
+evidencia `contract_default_pre_cutoff`, nunca por fecha; la selección productiva permanece legacy explícita;
+el contract phase (retirar uniqueness legacy y defaults transitorios) queda en `docs/tasks/pending-migrations/`
+hasta que ambos runtimes escriban método explícito (regla ISSUE-161, una sola instancia Cloud SQL).
+
+## 2026-09-02 (9) — DCR quedó deprecado en MCP `2026-07-28`: el shim de `mcp.efeonce.org` se mantiene, con dos hallazgos que la evaluación no buscaba
+
+Evaluación de impacto pedida por el operador, **sin migración**. Verificada contra la spec en vivo.
+Ya en producción vía release `375f56e24187` (commits `7788c8626` + `b4135f287`, verificados por blob
+contra `origin/main`). **Cero cambios de código.**
+
+**Veredicto:** el shim DCR sigue siendo correcto y no por inercia. La spec retiene DCR *"for backwards
+compatibility with authorization servers that do not support Client ID Metadata Documents"* — que es
+literalmente Entra, que no soporta **ni CIMD ni RFC 7591**. El shim es pre-registro (prioridad 1 de la
+spec) por el único canal que los clientes MCP estándar consumen sin configuración manual. Earliest
+removal de DCR: primera revisión publicada en o después de **2027-07-28**.
+
+**Hallazgo estructural:** *"migrar el gateway a CIMD" no existe como trabajo.* CIMD es capacidad del
+**authorization server**; el nuestro es Entra y el gateway **espeja** `authorize`/`token` en vez de
+proxearlos. Soportarlo exige emitir los tokens = el broker de `TASK-1631`, cuyos invariantes **ya** lo
+exigían al proveedor. No se abrió task paralela; esta evaluación es insumo de esa task.
+
+**🔴 Riesgo más cercano que la deprecación, en la misma revisión:** la página nueva *Authorization
+Server Discovery* (no existía en `2025-11-25`) exige `issuer` **idéntico** al identificador usado para
+construir la well-known URL. **Los nuestros difieren** desde que el shim existe. Funciona sólo porque
+los clientes todavía no lo aplican — empírico, no garantizado. **No se parchea** reclamando issuer
+propio: rompería la validación `iss` de RFC 9207, que hoy pasamos *porque* espejamos el de Entra.
+
+**Dos hallazgos que salieron de coordinar con otras sesiones, no de la evaluación:**
+
+1. *Confused deputy* (aporte de `greenhouse-eo-1e`, adoptado a medias tras verificar): la letra del
+   `MUST` no ata —no reenviamos— y el modo de la cookie de consentimiento quedó **refutado** leyendo
+   `src/app.ts`. Pero el riesgo está por construcción: `client_id` estático compartido +
+   `http://localhost` **sin puerto** + consentimiento cacheado por Entra = un proceso local toma un
+   código en silencio. Acotado a lectura porque ese cliente **no lleva scopes de escritura**.
+2. *La etiqueta miente:* `32617b87-…` se llama **"Efeonce MCP Local Canary Client"** siendo el cliente
+   compartido de producción; el canary real es `66985833-…`. Quien lee "Local Canary" y asume radio de
+   juguete es quien no auditará las redirect URIs.
+
+**Plan B declarado, sin ejecutar:** si un cliente endurece cualquiera de las dos validaciones antes del
+broker → pre-registro puro (apuntar `authorization_servers` a Entra, apagar `OAUTH_PUBLIC_CLIENT_ID`
+—el shim ya está gateado por esa env— y `client_id` manual por usuario).
+
+**Pendiente con dueño:** renombrar el cliente en Entra y decidir sobre las redirect URIs — **NO**
+angostando `http://localhost` a secas, que es el loopback que Claude Code necesita. Opcional para quien
+formalice `TASK-1654`: publicar `client_id_metadata_document_supported: false` explícito.
+
+**Deuda de proceso, ajena a la task:** el worktree de esta sesión nació de `origin/main` (1490 commits
+detrás de `develop`) porque `origin/HEAD` apunta a `main`. Le pasó igual al worktree
+`busy-shirley-80edbf` del 2026-08-27. Fix propuesto y **no aplicado** (decisión del operador):
+`git remote set-head origin develop` + borrar ambos worktrees.
+
+## 2026-09-02 (8) — El release `375f56e24187` quedó huérfano y se recuperó; `main` vuelve a tener manifest
+
+La promoción `develop→main` del 2026-09-02 entró a `main` por el PR #215 a las `20:51:04Z` (726 archivos,
+1490 commits, 2 migraciones) y quedó **sin manifest de release**: la sesión que la promovía fue archivada por
+accidente antes de dispatchar el orquestador. Un commit en `main` sin manifest es exactamente la condición que
+la regla dura del control plane prohíbe dejar abierta, así que otra sesión lo retomó con autorización directa
+del operador y cerró el ciclo.
+
+Cierre: run `33683893124` **completed/success** en 11m50s, `release_id`
+`375f56e24187-546f452b-c60f-4617-9974-9c87760c3ab9`, máquina de estados completa
+`preflight → ready → deploying → verifying → released`. Los DOS gates `production` se aprobaron con 34 s de
+diferencia (sin el stall del gotcha #6). Único bypass: `release_batch_policy`, inevitable por las 2 migraciones
+—dominio irreversible por precedencia del clasificador, donde el marker `[release-coupled: …]` no aplica—, con
+razón citando un hecho verificado y no un adjetivo: `migrate:status` en dry-run reporta cero migraciones
+pendientes contra la única instancia Cloud SQL.
+
+Verificación runtime, con la trampa del día atajada: el `ops-worker` cerró con un **skip de 51 s** y sirve
+`c4c838dea9d1`, no el target. Se verificó con el **diff de árbol completo** (43 archivos, 5 de código, tres bajo
+`src/mcp/**`) y con `pnpm worker:deploy-path-gate`, que confirma que los 1451 archivos del bundle caen bajo
+prefijos declarados y que `src/mcp` no es uno: ese código lo sirve Vercel, que sí desplegó el target. Skip
+legítimo. El watchdog reportó `data_missing=4`, que **no es drift**; la lectura autoritativa fue
+`pnpm release:workers`: 3/4 workers en el target, `Ready=True`. Canary de contrato del lane MCP `skills` verde
+**después** del `released`.
+
+Flags: se prendió `GROWTH_SEO_SITE_FINDINGS_ENABLED` en el ops-worker con los dos pasos (revisión activa
+`ops-worker-00631-jfw`), tras probar por blob que el evaluador desplegado es idéntico al de `main`. Quedan
+pendientes sus verificaciones post-flip (3) y (4). La cadencia `ops-seo-keyword-discovery-drain` quedó
+reconciliada: `main` ya declara `*/2`. **No** se prendió `HIRING_FAIRNESS_MONITOR_ENABLED`: su condición de
+retiro sigue vigente hasta `TASK-1365` y prod carece de la policy row de privacidad, así que daría cero en
+silencio en una métrica de equidad.
+
+Aprendizaje operativo del día: **dos sesiones recibieron el mismo mandato y ninguna verificó peers vivos antes
+de arrancar.** La colisión se detectó porque `origin/main` ganó un commit entre dos comandos consecutivos. Nadie
+tocó el control plane durante el solapamiento. Regla que queda: anunciar no es coordinar — hay que preguntar con
+`ListAgents` y esperar respuesta antes de tocar el árbol.
+
 ## 2026-09-02 (7) — Salesforce ya tiene oferta canónica y task de landing, sin implementación
 
 La práctica Salesforce quedó canonizada por outcomes y lifecycle en cuatro fases: `Diagnose & Architect`,
@@ -82,6 +183,25 @@ contra staging 5/5. Contra producción el gateway responde `not_found` (la lane 
 reales: release `develop→main` (decisión del operador) y el camino de negación con binding de cliente en
 runtime. ⚠️ `4620875eb` arrastró archivos que otra sesión tenía en el índice compartido (`mcp-craft/**`,
 `.claude/rules/mcp-tool-surface.md`); esa sesión lo registró en `bd112e66a`.
+
+**Cierre definitivo (21:27Z):** la lane salió a producción en el release `375f56e24` (release_id
+`375f56e24187-546f452b-…`, run `33683893124`, llevado por `greenhouse-eo-ac`); canary de contrato contra
+producción post-`released` verde (count=3 exacto, cuerpos byte-idénticos, ETag/304, 404/401, provider del
+gateway 5/5). TASK-1804 → `complete`. Sin evidencia runtime: `tools/call` por el front door OAuth (login
+Entra interactivo) y la negación con binding de cliente (sin consumer de cliente con token).
+
+**Higiene Entra (21:40Z):** el cliente PKCE público `32617b87…` dejó de llamarse "Local Canary Client" y ahora es
+"Efeonce MCP Public Client (Claude Code, claude.ai, Claude Desktop)"; sólo `displayName`, readback con redirect
+URIs y scopes intactos. Queda abierta la revisión del loopback `http://localhost` sin puerto (ADR del gateway).
+
+**Follow-up (22:10Z):** (a) evidencia por el front door: `claude mcp login efeonce-mcp` → `✔ Connected` y un
+agente `claude -p` en sesión nueva llamó `get_greenhouse_skill` por `mcp.efeonce.org` con token Entra real, listó
+el catálogo y resumió bien el manual de gasto — cerrado el único hueco de evidencia. (b) El catálogo pasa de 3 a 6
+manuales, todos SEO federado (`seo-discovery-to-tracking`, `seo-technical-health`, `seo-prospect-diagnostic`); la
+`description` de la tool no cambia (nombra el manual de gasto y remite al catálogo), así que el gateway no se
+redespliega: los nuevos aparecen tras el release. Hiring/Globe quedan fuera: sus tools no están en el manifiesto de
+Greenhouse y el contrato de manuales sólo gobierna ése. Techo "revisar al pasar de 6" alcanzado: la próxima adición
+particiona por dominio.
 
 ## 2026-09-02 (5) — TASK-1784: el eval de selección MCP refutó su propia hipótesis, y eso es el entregable
 
@@ -433,77 +553,3 @@ sin necesidad era riesgo sin retorno. Queda como consumidor candidato.
 
 Próximo paso: release develop→main + rebuild del renderer, y repetir el recorrido con teclado en
 vivo en ambos hosts antes de dar el issue por cerrado operativamente.
-
-## 2026-09-01 (9) — cinco oportunidades LicitaLAB promovidas por MCP HubSpot
-
-El operador confirmó la promoción manual de cinco oportunidades. El MCP de HubSpot creó y releyó los Deals
-`64528962434` (Chile Cultura), `64544277070` (Universidad de Chile DII), `64529115746` (JUNJI), `64532229714`
-(Temuco) y `64521733176` (CNTV), todos en `default` / `qualifiedtobuy`, owner `75788512`, con ID de licitación,
-llave de idempotencia, ficha, plazo, próximo paso y asociación Deal ↔ Company verificada. Temuco y CNTV requirieron
-Companies nuevas `57953559382` y `57958935823`; no se fabricaron contactos. CNTV quedó en `Strategic Bets`, no en
-una etapa ficticia: el stage sigue siendo `qualifiedtobuy`.
-
-Corregida la contradicción entre skills: `hubspot-greenhouse-bridge` ahora coincide con el companion LicitaLAB y
-con `project_context.md`: el MCP de HubSpot es el writer gobernado para promociones manuales confirmadas; la brecha
-del bridge sólo limita automatización. Registros CRM general y de licitaciones sincronizados tras readback. Pendiente
-comercial real: admisibilidad, loaded cost/margen y producción de propuestas; ninguna postulación fue enviada.
-
-## 2026-09-01 (6) — barrido documental de los 19 cierres y la calibración que faltaba
-
-Cerré el ciclo del barrido: 19 tasks quedaron en `complete/` y el registro alrededor de ellas ya no
-miente. Tres subagentes barrieron docs de proceso, ledger de flags y coherencia epic↔registro; lo que
-reportaron lo verifiqué yo antes de escribirlo — los conteos de hijas los medí por campo `Epic:`
-(`EPIC-022` 36/39, `EPIC-020` 38/14, `EPIC-040` 11/10, `EPIC-023` 7/3) y coincidieron.
-
-Corregido: `Lifecycle` desincronizado en `TASK-1090`; 5 rutas stale en `README`/`TASK_ID_REGISTRY`;
-9 estados falsos en el `README` (1036, 1040, 1253, 1321, 1330, 1335, 1113, 1430, 1431); conteos y
-prosa stale en cinco epics y en `AEO_PROGRAM_STATUS.md` —que decía «no existe entrada pública
-self-serve» cuando `/aeo-2/` ya corre el grader—; 10 archivos con rutas rotas a tasks cerradas; y
-las reglas duras de `TASK-1112`, `TASK-1246`, `TASK-1261` y `TASK-1336` que se apoyaban en un hecho
-ya falso.
-
-Lo estructural, que es el hallazgo de fondo: **el registro del avance no estaba en ningún checklist
-de cierre**. `stale-progress` avisaba en un comando que el protocolo no mandaba correr — un
-mecanismo apagado. Quedó agregado a los checklists de `CLAUDE.md` y `AGENTS.md`: tildar los
-criterios que la evidencia respalda, dejar sin tildar y con razón lo que no, poner `Status real` al
-día y correr `pnpm task:lint --task TASK-###` antes de mover a `complete/`.
-
-Además: `ui-flow-contract` recibió la misma calibración incidental-vs-focal que ya tenía
-`ui-wireframe-contract` —una task en `to-do/` a la que sólo le corrigen una ruta no debe romper el
-gate por deuda previa—, con test falsable (rojo sin la calibración, verde con ella; el fixture hace
-`git init` porque sin repo el modo `changed` no ve nada y el test sería teatro). El footer de
-`flags:audit` decía «verdad live = `vercel env ls`»; `ls` sólo dice que la variable existe, así que
-ahora nombra `vercel env pull`. Y el mensaje de `no-opacity-on-text` estaba en voseo.
-
-Gates: `local:check` exit 0, `task:lint:test` 47/47, `ops:lint --changed` errors=0,
-`docs:closure-check` sin dueño faltante, `docs:context-check:strict` 0/0, 262 tests de lint-rules.
-
-## 2026-09-01 (9) — TASK-1427 cerrada: el motor CTA queda con evidencia medida, y deja ISSUE-167
-
-Cerré la primera rebanada del motor CTA. Lo importante no es el cierre sino cómo se sostuvo.
-
-**La ventana de 7 días era un falso verde.** El criterio pedía observar `growth.cta.*` durante siete
-días tras el deploy del 2026-07-18. Medido contra PG: entre el 18 y el 25 de julio hubo tráfico **un
-solo día**. Cero errores sobre cero tráfico no prueba nada. Cerré con la serie completa de 45 días —
-0 errores server-confirmed, 0 kill switches, 0 colisiones, con exposición real (219 observaciones el
-2026-08-29). Es evidencia más fuerte que la pedida, sobre una ventana más larga.
-
-⚠️ **Los readers de signal no podían responder la pregunta.** `growth-cta-signals.ts` filtra
-`INTERVAL '1 day'` en sus tres queries: sirven para «¿está sano ahora?», nunca para «¿estuvo steady
-durante N días?». Cualquier criterio de ventana exige ir a la tabla base. Dejé
-`scripts/growth/_sanity-cta-signal-window.ts` para que la próxima sea medición y no cita.
-
-🔴 **Probar el teclado destapó `ISSUE-167`.** Me negué a tildar «funciona con teclado, Escape/focus
-restore» sin ejercitarlo, y en producción encontré que al abrir el Growth Form desde un CTA **el foco
-queda en `body`** y **`Escape` no cierra**. Abre como expansión inline (sin `role=dialog` ni
-`aria-modal`) pero sin las dos obligaciones de ese patrón. Es del **renderer compartido**: afecta a
-todos los CTA en Think y WordPress. La task cierra con ese criterio **sin tildar y con la razón
-escrita**, que es el desenlace correcto.
-
-Sí verificado live hoy: render con el contrato completo, sin overflow en 1280 y 375 (card 343px),
-formulario alcanzable por teclado tabulando (5 controles, primero `firstName`).
-
-**Pendiente NO bloqueante, decisión del operador:** el placement AMPLIO en WordPress (recomendado,
-posts del blog vía `the_content` en `ohio-child`). Hoy sólo existe la página de prueba.
-
-Transparencia: mi verificación sumó 2 eventos al ledger productivo (`clicked` + `form_opened`).

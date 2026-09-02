@@ -7557,6 +7557,26 @@ export interface GreenhouseGrowthSeoDomainOverviewSnapshots {
   created_at: Generated<Timestamp>;
   domain: string;
   domain_overview_id: Generated<string>;
+  /**
+   * TASK-1805: sólo improved histórico. fully_recomputed desde 2026-07; calibrated_approximation antes (ratio de julio por dominio, no recomputación keyword por keyword).
+   */
+  etv_historical_basis: string | null;
+  /**
+   * TASK-1805: explicit_request (la request llevó use_improved_etv + requested_at + policy) o contract_default_pre_cutoff (atribuido por contrato: cuenta pre-2026-09-01 y código sin flag, siempre antes del corte). Nunca por fecha.
+   */
+  etv_methodology_evidence: Generated<string>;
+  /**
+   * TASK-1805: fórmula ETV detrás de la fila (legacy_static_v1|improved_layout_clickstream_v2). Parte de la identidad: dos métodos pueden coexistir el mismo día; el mismo método no se duplica.
+   */
+  etv_methodology_version: Generated<string>;
+  /**
+   * TASK-1805: versión de la policy con la que se tradujo configuración → parámetro → método efectivo.
+   */
+  etv_policy_version: string | null;
+  /**
+   * TASK-1805: instante UTC de la request explícita. Junto a la policy permite derivar el método efectivo; el proveedor no expone versión.
+   */
+  etv_requested_at: Timestamp | null;
   language_code: string;
   location_code: string;
   normalized_domain: string;
@@ -7737,6 +7757,22 @@ export interface GreenhouseGrowthSeoProspectDiagnostics {
   created_at: Generated<Timestamp>;
   created_by: string;
   diagnostic_id: Generated<string>;
+  /**
+   * TASK-1805: explicit_request o contract_default_pre_cutoff.
+   */
+  etv_methodology_evidence: Generated<string>;
+  /**
+   * TASK-1805: fórmula ETV solicitada al proveedor para este diagnóstico; el hecho estimated_monthly_traffic la hereda.
+   */
+  etv_methodology_version: Generated<string>;
+  /**
+   * TASK-1805: versión de la policy ETV aplicada.
+   */
+  etv_policy_version: string | null;
+  /**
+   * TASK-1805: instante UTC de la request explícita.
+   */
+  etv_requested_at: Timestamp | null;
   failure_reason: string | null;
   forecast_cost_usd: Numeric;
   language_code: string;
@@ -7842,6 +7878,22 @@ export interface GreenhouseGrowthSeoUrlVisibilitySnapshots {
   captured_at: Generated<Timestamp>;
   captured_by_organization_id: string;
   created_at: Generated<Timestamp>;
+  /**
+   * TASK-1805: explicit_request o contract_default_pre_cutoff (ver seo_domain_overview_snapshots).
+   */
+  etv_methodology_evidence: Generated<string>;
+  /**
+   * TASK-1805: fórmula ETV de la fila y de sus top_keywords (heredan del padre). Parte de la identidad por método.
+   */
+  etv_methodology_version: Generated<string>;
+  /**
+   * TASK-1805: versión de la policy ETV aplicada.
+   */
+  etv_policy_version: string | null;
+  /**
+   * TASK-1805: instante UTC de la request explícita.
+   */
+  etv_requested_at: Timestamp | null;
   language_code: string;
   location_code: string;
   normalized_subject: string;

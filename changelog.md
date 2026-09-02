@@ -7,6 +7,53 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-02 — DCR deprecado en MCP `2026-07-28`: el shim del gateway se queda, pero deja de ser el futuro
+
+La revisión Current del protocolo marcó Dynamic Client Registration como `Deprecated` (PR #2858),
+migración a Client ID Metadata Documents, retiro más temprano en la primera revisión publicada en o
+después de 2027-07-28. El shim se mantiene porque la excepción está redactada para nuestro caso exacto:
+DCR se retiene *"for backwards compatibility with authorization servers that do not support Client ID
+Metadata Documents"*, y Entra no soporta ninguno de los dos — su única vía oficial es el pre-registro,
+que es justo lo que `POST /register` devuelve.
+
+Lo que cierra la pregunta de fondo: **CIMD no es implementable en la capa del shim.** Es capacidad del
+authorization server, el AS es Entra, y el gateway espeja `authorize`/`token` en lugar de proxearlos;
+soportarlo exige emitir los tokens, o sea el broker que `TASK-1631` ya está eligiendo con CIMD entre sus
+requisitos. No hay task paralela que abrir.
+
+En el camino aparecieron tres cosas que la evaluación no buscaba. La misma revisión agregó texto que no
+existía en `2025-11-25` —el `issuer` de la metadata debe ser idéntico al identificador con que se
+construyó la well-known URL— y los nuestros difieren desde que el shim existe; funciona sólo porque los
+clientes todavía no lo aplican. El `client_id` estático compartido, con `http://localhost` sin puerto
+entre sus redirect URIs y el consentimiento cacheado por Entra, reproduce la forma del confused deputy
+aunque la letra del `MUST` no ate: lo acota que ese cliente no lleve scopes de escritura, una regla
+escrita por otra razón que resulta ser la que limita el daño a lectura. Y esa misma aplicación se llama
+"Local Canary Client" cuando es el cliente compartido de producción, de modo que quien la audite por el
+nombre concluirá lo contrario de lo que debe.
+
+El horizonte del shim no lo fija el calendario de la spec sino el día que un cliente endurezca
+cualquiera de las dos validaciones. Para ese día queda declarado un plan B de pre-registro puro que no
+toca Entra ni el modelo de tokens.
+
+## 2026-09-02 — un release quedó huérfano en `main` y se recuperó sin ensuciar el control plane
+
+La promoción `develop→main` (PR #215, 726 archivos, 1490 commits, 2 migraciones) entró a `main` a las
+`20:51:04Z` y quedó **sin manifest**: la sesión que la promovía fue archivada por accidente antes de dispatchar
+el orquestador. Otra sesión la retomó con autorización directa del operador y cerró el ciclo: run `33683893124`
+completed/success en 11m50s, `release_id` `375f56e24187-546f452b-c60f-4617-9974-9c87760c3ab9`, estado final
+`released`, con los dos gates `production` aprobados en 34 s y post-release health verde.
+
+Tres verificaciones que no se dieron por hechas. El skip del `ops-worker` (51 s, step `Deploy` en `skipped`) se
+validó con el **diff de árbol completo** y con `pnpm worker:deploy-path-gate` —1451 archivos del bundle, todos
+cubiertos; `src/mcp` no entra, lo sirve Vercel—, no con la lista del change-gate. El `data_missing=4` del
+watchdog se trató como falta de evidencia y no como drift: la lectura autoritativa fue `pnpm release:workers`,
+3/4 workers en el target. Y el canary de contrato del lane MCP `skills` se corrió **después** del `released`,
+con asserts que sólo el contrato nuevo puede producir.
+
+Flags: `GROWTH_SEO_SITE_FINDINGS_ENABLED` prendido en el ops-worker con los dos pasos, tras probar **por blob**
+que el evaluador desplegado es idéntico al de `main`. `HIRING_FAIRNESS_MONITOR_ENABLED` NO se prendió: daría
+cero en silencio en una métrica de equidad hasta que cierre `TASK-1365`.
+
 ## 2026-09-02 — la práctica Salesforce se canoniza como oferta por outcomes y lifecycle
 
 La práctica Revenue Operations & CRM incorpora una arquitectura comercial Salesforce en cuatro fases:
@@ -16,7 +63,7 @@ group, delivery, métricas, límites de claims y gates de madurez. El estado que
 autoriza todavía partnership, badge, certificaciones, reventa, pricing, casos ni Product Service comercialmente
 aprobado sin evidencia y sign-offs propios.
 
-## 2026-09-02 — MCP: el manual de uso viaja por el protocolo (TASK-1804, code complete)
+## 2026-09-02 — MCP: el manual de uso viaja por el protocolo (TASK-1804, released)
 
 La superficie MCP gana un segundo canal de conocimiento de uso: un manifiesto de manuales
 (`skill-manifest.ts`) hermano del de tools, tres `SKILL.md` publicables en `docs/mcp/skills/`
@@ -27,8 +74,11 @@ todos sobre el mismo reader. Los cuerpos viajan en el bundle como artefacto gene
 de 397 MB). Publicar es un acto explícito (drift manifiesto↔filesystem no construye el
 servidor), un binding de cliente no sabe que los manuales existen (404 anti-oráculo) y la fuga de contenido
 interno la controla un test. Las `instructions` del handshake rutean al manual en vez de contener el
-procedimiento de gasto. El gateway federa la tool con su propio guard de paridad no-SEO (commit local en
-`efeonce-mcp`, deploy pendiente). Sin Entra, flag ni persistencia nuevos.
+procedimiento de gasto. El gateway federa la tool con su propio guard de paridad no-SEO (desplegado,
+`efeonce-mcp-gateway-00028-pmx`) y la lane salió a producción en el release `375f56e24` del mismo día, con canary de
+contrato verde contra producción. Sin Entra, flag ni persistencia nuevos. Follow-up del mismo día: un agente Claude Code
+real cargó el manual por el front door OAuth, y el catálogo creció a seis manuales (discovery→tracking, salud técnica,
+diagnóstico de prospecto) sin tocar la tool ni el gateway.
 
 ## 2026-09-02 — ANAM: entrega premium de Emma y soporte explícito de tres meses
 
@@ -1123,33 +1173,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
   `20260828113457119` aplicada; sanity 22/22 contra PG real. Slice 4 (emisión a la cola)
   bloqueado por TASK-1700; rollout con autorización del operador
   (`docs/manual-de-uso/growth/operar-gap-competitivo-seo.md`).
-
-## 2026-08-28 — Outreach de partnership para agencias con Higgsfield y Magnific
-
-- Investigación vigente y formularios enterprise enviados a ambos providers para explorar un partnership de agencia
-  orientado a clientes enterprise en LATAM. Las dos páginas confirmaron recepción; el registry mantiene el estado
-  `Postulación enviada`, sin inferir reseller, co-selling, certificación ni economics hasta recibir evidencia
-  contractual. Constancia: `docs/audits/commercial/HIGGSFIELD_MAGNIFIC_AGENCY_PARTNERSHIP_OUTREACH_2026-08-28.md`.
-- Magnific respondió mediante su Enterprise BDR EMEA & LATAM y derivó la conversación a
-  `ai-partnerships@magnific.com`. La ruta oficial queda verificada, pero el estado comercial no cambia a partnership
-  activo hasta recibir aceptación y términos. El outreach especializado quedó enviado desde Outlook Web, con Susana
-  en copia y la firma configurada de Julio.
-
-## 2026-08-27 — TASK-1696: el ledger de gasto aprende quién gastó y de qué tipo es el dólar
-
-- `greenhouse_growth.seo_provider_spend_daily` gana `consumer` (`seo`|`aeo`), `cost_basis`
-  (`invoiced`|`estimated`) y `price_table_version` acoplado por CHECK. Clave única de seis columnas
-  con `NULLS NOT DISTINCT`. **Un solo ledger**: lo que se separa es el resolver de presupuesto.
-- El grader AEO deja de comprar fuera del ledger: `postDataForSeoTask` exige `consumer`, el adapter
-  de AI Mode migró del wrapper congelado al transporte canónico y `ProviderAdapterContext` lleva la
-  organización derivada del perfil, server-side.
-- `resolveAeoBudget` da presupuesto en dólares per-org al grader, con las dos monedas separadas y
-  restando la porción DataForSEO del estimado para no contarla dos veces. Gate **en shadow**: dos
-  flags, ambos OFF.
-- Tres señales nuevas en `/admin/operations`: `growth.dataforseo.spend_ledger_drift`,
-  `growth.ai_visibility.observation_yield` y `seo.provider.cost_over_budget` — esta última la
-  citaban nueve tasks como mitigación y no existía en código.
-- Documentación sincronizada: arquitectura (módulo SEO §1.1/§6/§9/§13.1, grader, control plane de
-  reliability), doc funcional + manual nuevos en `docs/{documentation,manual-de-uso}/growth/`, la
-  rule de auto-load `.claude/rules/growth-seo.md` y la skill `dataforseo-operator` con su espejo
-  Codex (cuerpo idéntico, verificado a mano: el validador de espejos NO cubre esta skill).

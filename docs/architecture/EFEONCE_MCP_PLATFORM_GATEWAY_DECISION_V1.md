@@ -338,7 +338,10 @@ pero el riesgo que la norma previene sí está presente por construcción.**
   compartido de producción que el shim entrega a **todo** cliente MCP estándar del tenant. El canary real es otro
   (`66985833-14e9-438e-add4-b740e84e9a64`, "Efeonce MCP Base-Only Canary Client", 2 scopes), y el shim no lo
   devuelve. Verificado con `az ad app show` el 2026-09-02. No es una vulnerabilidad: es una etiqueta que miente
-  sobre lo que la cosa es. Y el modo de falla es compuesto — quien abre Entra, lee "Local Canary" y asume radio de
+  sobre lo que la cosa es. ✅ **Cerrado el mismo día (TASK-1804, 2026-09-02 ~21:40Z):** renombrado con
+  `az ad app update --display-name` a **"Efeonce MCP Public Client (Claude Code, claude.ai, Claude Desktop)"**;
+  readback confirma `appId`, los 3 redirect URIs y los 3 scopes de lectura intactos (sin scope de escritura). El
+  hallazgo anterior (loopback sin puerto) sigue en revisión: no se cierra angostando `http://localhost`. Y el modo de falla es compuesto — quien abre Entra, lee "Local Canary" y asume radio de
   daño de juguete es **exactamente** quien no va a auditar sus redirect URIs. Renombrarlo es barato y no toca
   `appId` ni consentimientos; hacerlo va junto con la revisión pendiente, no después.
 - *Radio de explosión, honestamente acotado:* exige atacante con ejecución local, el tenant es único
@@ -413,7 +416,8 @@ Rollback: quitar tráfico a la revisión defectuosa o deshabilitar el provider/s
 
 `efeonce.mcp.seo.write` **existe** en la app de Entra `Efeonce MCP Resource` (`type: Admin`,
 `isEnabled: true`), pero **deliberadamente NO está en el `requiredResourceAccess` del cliente
-PKCE compartido** `32617b87-e7ef-493a-838f-1ff3f0213b93` ("Efeonce MCP Local Canary Client"),
+PKCE compartido** `32617b87-e7ef-493a-838f-1ff3f0213b93` (hoy "Efeonce MCP Public Client (Claude Code,
+claude.ai, Claude Desktop)"; hasta el 2026-09-02 se llamaba "Efeonce MCP Local Canary Client"),
 que es el que el shim DCR entrega a Claude Code / claude.ai / Claude Desktop. Misma postura
 que `efeonce.mcp.globe.credits.funding.ensure`, que tampoco está.
 

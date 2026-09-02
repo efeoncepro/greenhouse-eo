@@ -694,12 +694,12 @@ Tres cosas que cuestan una sesión si no se saben:
 Las tools **no aparecen en la sesión que autenticó** — los MCP se cargan al iniciar sesión. `✔ Connected` en el health
 check es la evidencia válida; la ausencia de tools en esa sesión no es un fallo.
 
-### Inventario federado — 36 tools (código; 35 en la revisión productiva hasta el deploy de TASK-1804)
+### Inventario federado — 36 tools
 
 | Grupo | Nº | Tools |
 | --- | --- | --- |
 | Gateway | 1 | `efeonce.gateway.status` |
-| Plataforma Greenhouse | 1 | `get_greenhouse_skill` (TASK-1804 — manuales de uso bajo demanda; provider `greenhouse-skills`, commit local en `efeonce-mcp` pendiente de deploy) |
+| Plataforma Greenhouse | 1 | `get_greenhouse_skill` (TASK-1804 — manuales de uso bajo demanda; provider `greenhouse-skills`, desplegado en `00028-pmx`) |
 | Globe | 3 | `globe.capabilities.list`, `globe.producer.fleet.list`, `globe.credits.funding.ensure` (write) |
 | Hiring | 4 | `hiring.talent_pool.search`, `hiring.talent_pool.profile.get`, `hiring.applications.review.list`, `hiring.application.review_packet.get` |
 | SEO / Search Visibility 360 | 27 | 20 reads + 7 writes (detalle en §Provider Greenhouse-SEO) |
@@ -731,8 +731,9 @@ un archivo, en vez de deducirlo de una ausencia.
 ### Manuales de uso servidos por el protocolo (TASK-1804)
 
 `get_greenhouse_skill` entrega bajo demanda el catálogo y el cuerpo de los manuales declarados en
-`src/mcp/greenhouse/skill-manifest.ts` (hoy tres, todos `internal`: `seo-spend-discipline`,
-`seo-visibility-reading`, `competitor-loop`). El gateway delega en la lane
+`src/mcp/greenhouse/skill-manifest.ts` (hoy seis, todos `internal`: `seo-spend-discipline`,
+`seo-visibility-reading`, `competitor-loop`, `seo-discovery-to-tracking`, `seo-technical-health`,
+`seo-prospect-diagnostic`; la cifra vigente se lee del manifiesto, nunca de acá). El gateway delega en la lane
 `/api/platform/ecosystem/mcp/skills[/{name}]` y no embebe contenido.
 
 Smoke (lane, con el consumer del gateway; también incorporado a `scripts/greenhouse-seo-canary.mjs`):
@@ -749,10 +750,11 @@ hace que el reader lance, nunca un catálogo corto en verde); cada `body` empiez
 `---\nname: <nombre>`; un nombre inexistente responde `404`; sin token `401`; con un binding de
 cliente el catálogo es `[]` y cualquier detalle `404` (anti-oráculo, nunca `403`).
 
-Estado as-of 2026-09-02: el gateway ya sirve `get_greenhouse_skill` (revisión
-`efeonce-mcp-gateway-00028-pmx`, commit `c588a1b`, front door 200/200/401); la lane vive en `develop`
-y **responde `not_found` desde producción hasta el próximo release `develop→main`** (decisión del
-operador: sin release en esta ventana). No hay Entra, flag ni secreto nuevos.
+Estado as-of 2026-09-02 21:27Z: **vivo en producción**. Gateway `efeonce-mcp-gateway-00028-pmx`
+(commit `c588a1b`, front door 200/200/401) + lane released con `375f56e24` (release
+`375f56e24187-546f452b-…`, run `33683893124`). Canary de contrato contra producción verde: `count=3`
+exacto, cuerpos byte-idénticos al artefacto, 404/401, provider del gateway 5/5. No hay Entra, flag ni
+secreto nuevos.
 
 ### `get_seo_provider_spend` — federada sin tool interna, por diseño
 
