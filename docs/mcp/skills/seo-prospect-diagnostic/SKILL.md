@@ -71,7 +71,7 @@ run. Report the state; do not retry blindly.
 - Never schedule or repeat diagnostics to build a series: there is no recurring capture on
   prospects, by design.
 
-## Estimated traffic and its formula (TASK-1805)
+## Estimated traffic and its formula
 
 The `estimated_monthly_traffic` fact is the sum of the organic `etv` of the purchased sample, and its
 `detail` declares the formula and the coverage: `etvMethodologyVersion` (also on the diagnostic as

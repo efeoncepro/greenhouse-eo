@@ -24,7 +24,7 @@ presented with the confidence of a measurement and mean nothing.
 Every figure travels with its provenance and a capture date. Always report which lens a number
 comes from and its as-of date.
 
-Estimated traffic (`etv`) carries one more dimension since TASK-1805: `etvMethodology.version`
+Estimated traffic (`etv`) carries one more dimension, the formula version: `etvMethodology.version`
 (`legacy_static_v1` today; `improved_layout_clickstream_v2` becomes mandatory at the provider on
 2026-11-01T00:00:00Z). The provider changes the formula behind the same field, so two etv figures
 are comparable only when their versions match. Report the version next to any etv figure, never
