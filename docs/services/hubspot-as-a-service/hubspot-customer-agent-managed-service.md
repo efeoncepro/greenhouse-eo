@@ -61,6 +61,21 @@ medición como contratos independientes.
 - configuración del chatflow y su entry point desde landing o sitio;
 - QA de comportamiento nativo de HubSpot cuando la transferencia antecede una respuesta entrenada.
 
+El servicio separa cuatro decisiones que no deben colapsarse: el trigger que hace que Customer Agent deje de
+responder, la modalidad live/asíncrona, la asignación del ticket o conversación y una eventual reasignación entre
+personas. Para un único destino puede usarse routing directo; cuando el destino depende de intención u otra
+condición gobernada se selecciona un workflow de tickets en Help Desk o de conversaciones en Inbox.
+
+Cuando se requiere una secuencia principal → reemplazo, se implementa como una composición verificable: limpiar
+al Customer Agent como owner, intentar el principal disponible y luego el reemplazo disponible sin sobrescribir
+una asignación exitosa. No se vende como una modalidad nativa denominada “fallback”. Si nadie está disponible,
+el caso queda sin owner y el live chat debe conservarse abierto cuando se espera continuidad humana.
+
+El handoff live mantiene el mismo hilo y contexto. Después de que la primera persona toma el caso, una segunda
+persona continúa mediante reasignación manual del owner; terminar el chat impide reabrir ese chat. Una petición
+libre por nombre activa la necesidad de una persona, pero no garantiza que HubSpot resuelva el nombre al usuario
+correcto: la asignación nominal requiere una condición estructurada o una reasignación humana comprobada.
+
 ### 5. QA y aceptación
 
 - información técnica con y sin norma;
@@ -69,6 +84,8 @@ medición como contratos independientes.
 - orientación administrativa versus acción real de facturación;
 - seguimiento, reclamos, intención mixta y solicitud humana;
 - memoria multi-turno, repetición de datos, transferencia disponible/no disponible y entrada con privacidad;
+- continuidad con respuesta humana, reasignación a una segunda persona en el mismo hilo, petición nominal y chat
+  terminado;
 - registro por escenario de esperado, observado, fuentes, transferencia, veredicto y acción.
 
 ### 6. Operación gestionada
@@ -118,18 +135,23 @@ Cada métrica debe declarar período, baseline, denominador y definición. Segú
 - unresolved intents y cobertura documental;
 - exactitud/QA por escenario y regresiones;
 - tiempo hasta transferencia y contexto preservado;
+- casos sin owner, reasignaciones humanas y continuidad en el mismo chat;
 - créditos consumidos y costo por outcome.
 
-La tasa de resolución de herramienta no sustituye el outcome de negocio. El nombre ANAM o resultados de su caso
+El trigger de handoff, la asignación por workflow y la reasignación manual se miden por separado. Una mera
+asignación no prueba un handoff calificable para la métrica de resolución, y deflection no equivale a una necesidad
+resuelta. La tasa de resolución de herramienta no sustituye el outcome de negocio. El nombre ANAM o resultados de su caso
 no se usan externamente sin autorización y reconciliación del período.
 
 ## Caso de referencia ANAM
 
 La implementación ANAM dejó 23 fuentes activas —seis archivos y 17 respuestas cortas—, un catálogo técnico de
-356 registros, identidad/directrices, cinco rutas principales, handoff a Maria Paz Haeger, chatflow y QA. El
-readback del 17 de julio de 2026 mostró 33.000 créditos mensuales, pero Customer Agent pausado por cuenta vencida
-y factura atrasada. Dos activaciones confirmadas fallaron; el toggle permaneció desactivado. Esto demuestra una
-regla del servicio: configuración completa y capacidad nominal no equivalen a canal operativo.
+356 registros, identidad/directrices, cinco rutas principales, chatflow y QA. El agente volvió a operar y el
+2026-09-01 se verificó el handoff por intención y disponibilidad mediante workflow de tickets: cotización a Pablo
+con María Paz como reemplazo; seguimiento a Marco con Pablo como reemplazo; y Calidad/facturación/otros a María
+Paz con Marco como reemplazo. Tres chats públicos probaron el owner primario y un reemplazo real. Esa evidencia
+prueba asignación y cambio de owner; no prueba todavía una respuesta humana ni una segunda transferencia humana
+en el mismo chat.
 
 ## Fuentes y evidencia
 
@@ -139,3 +161,6 @@ regla del servicio: configuración completa y capacidad nominal no equivalen a c
 - [Documentación funcional](../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md)
 - [Manual operativo](../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md)
 - [Canon técnico](../../architecture/kortex/hubspot-as-a-service/README.md)
+- [Configurar el handoff de Customer Agent](https://knowledge.hubspot.com/customer-agent/set-up-and-customize-the-customer-agents-handoff-process)
+- [Asignar tickets mediante workflows](https://knowledge.hubspot.com/workflows/assign-tickets-using-workflows)
+- [Gestionar tickets y chats en Help Desk](https://knowledge.hubspot.com/help-desk/manage-tickets-in-help-desk)

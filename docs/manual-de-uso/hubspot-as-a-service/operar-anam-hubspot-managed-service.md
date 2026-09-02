@@ -1,7 +1,7 @@
 # Operar ANAM HubSpot Managed Service
 
 > **Tipo:** Manual de uso / runbook
-> **Versión:** 1.5
+> **Versión:** 1.8
 > **Actualizado:** 2026-09-01
 > **Portal obligatorio:** ANAM `19893546`
 > **Funcional:** [`../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md`](../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md)
@@ -104,16 +104,38 @@ aditivo por selección.
 ## Monitorear Customer Agent
 
 - Abre el [source pack live](../../architecture/kortex/hubspot-as-a-service/anam-customer-agent-source-pack/README.md) y compara inventario, fecha de sincronización y directrices publicadas contra HubSpot.
+- Verifica que la identidad visible sea `Emma`, que el saludo publicado diga `Soy Emma, de ANAM` y que el preview
+  responda `Hola, soy Emma.`. El nombre de la landing, el perfil y las directrices deben converger.
 - Prueba lenguaje natural, memoria multi-turno, exactitud, administración/facturación, reclamos y mixed intent.
 - Distingue limitación nativa de transferencia de defecto de configuración.
 - Antes de cambiar knowledge, reconcilia el source pack; no lo reconstruyas desde memoria o adjuntos no clasificados.
 - Publicación, permisos, acciones y handoff requieren aprobación explícita.
+- Un cambio de nombre no autoriza modificar personalidad, conocimiento, permisos, acciones, handoff, routing ni
+  canales. Confirma cada capa por separado y registra `Borrador (0)` después de publicar.
 - El readback del 2026-07-24 confirmó que el agente está operativo. Verifica canal activo, conversación nueva,
   respuesta y consumo antes de declarar disponibilidad; la presencia del chatflow por sí sola no basta.
 - Mantén el copy de transferencia independiente del assignee: `una persona del equipo` o `el ejecutivo asignado`.
   El nombre del responsable vive sólo en la configuración interna.
 - Para Seguimiento, no redirijas a cotización ni a residuos/aguas/lodos: limita el flujo a resultados,
   programación y facturación. Para Calidad, confirma nombre, empresa, correo y detalle antes de transferir.
+- Confirma que Emma use el workflow `1876744588` y que esté `ACTIVADA` / `sin problemas`. La matriz vigente es:
+  cotización Pablo → María Paz; seguimiento Marco → Pablo; Calidad/facturación/otros María Paz → Marco.
+- El workflow debe borrar `Propietario del ticket` antes de la ramificación. Cada primaria usa sólo usuarios
+  disponibles; el reemplazo conserva `Sobrescribir` desactivado para no desplazar una primaria exitosa.
+- Prueba desde el chat público y registra que es QA fuera del mensaje sustantivo, por ejemplo en la bitácora o
+  evidencia del escenario. En los registros de acciones confirma clasificación, borrado de Emma, propietario
+  primario o reemplazo y `Workflow terminado`. No antepongas `QA`, `PRUEBA` ni nombres de ramas al texto que
+  clasifica la IA porque pueden sesgar la intención. No borres el ticket: conserva evidencia auditable.
+- Si debes probar sólo el routing automático, termina el chat después de capturar la evidencia. Si debes probar
+  continuidad humana, mantenlo abierto: un chat terminado no se puede reabrir.
+- Para transferir desde una primera persona a otra en el mismo chat: abre el ticket en Help Desk, confirma que la
+  conversación siga abierta, cambia `Propietario del ticket`, deja una nota interna si hace falta y pide que el
+  nuevo owner responda en el mismo hilo. No vuelvas a invocar a Emma ni abras una conversación nueva.
+- Una petición libre por Pablo, Marco o María Paz activa atención humana, pero el workflow vigente no resuelve el
+  nombre. Confirma un destinatario nominal sólo después de que una condición gobernada o la reasignación manual
+  demuestre el owner efectivo.
+- Si el preflight vuelve a marcar `Registraré tu consulta`, trátalo como una deuda conversacional independiente:
+  corrige la promesa sólo con aprobación y repite la regresión; no la mezcles con una edición de identidad.
 
 ## Operar y validar la landing de Emma
 

@@ -14,7 +14,7 @@
 | Quality intake | Published; draft QA passed | Requests name, company, email and the specific result/detail before handoff |
 | Handoff copy | Published, neutral | Says `una persona del equipo`; no customer-facing executive name |
 | Short response: invoice/PO review | Updated and synchronized | Active source now says `una persona del equipo` |
-| Handoff assignment | Existing internal routing retained | Currently points to Maria Paz Haeger; change only after ANAM supplies the owner/fallback matrix |
+| Handoff assignment | Snapshot del 2026-07-24; superado | En esa fecha apuntaba a Maria Paz Haeger. El estado vigente es el workflow `1876744588`; consultar source pack 07 y la QA E2E del 2026-09-01. |
 | Pipeline `Paso siguiente` | Live required property | Operator guidance exists; task automation remains unpublished |
 | Licenses | Current inventory read back | See seat and product inventory below |
 | Outlook web tutorial | Documented | Ready to deliver; a screen recording remains a separate production step |

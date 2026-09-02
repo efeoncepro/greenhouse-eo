@@ -7,6 +7,26 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-01 — Emma enruta cotización, seguimiento y Calidad al equipo correcto
+
+El handoff del Customer Agent ANAM dejó de depender de una única propietaria. El workflow activo `1876744588`
+clasifica el ticket, elimina a Emma como owner y aplica la matriz Pablo → María Paz para cotización, Marco → Pablo
+para seguimiento y María Paz → Marco para Calidad/facturación/otros, respetando disponibilidad. Tres chats públicos
+E2E aprobaron las rutas de cotización y Calidad y el fallback real de seguimiento; el primer probe fallido permitió
+corregir el owner previo y el sesgo de marcadores QA antes de dejar el flujo conectado.
+
+El canon reusable distingue el trigger del Customer Agent, la asignación por workflow y la reasignación manual
+entre personas. También registra el límite de evidencia: el owner visible quedó probado, pero la respuesta humana
+y una segunda transferencia en el mismo chat abierto requieren una prueba operativa separada.
+
+## 2026-09-01 — El Customer Agent de ANAM ya sabe que se llama Emma
+
+El perfil y las directrices publicadas del Customer Agent en el portal ANAM `19893546` quedaron alineados con la
+landing: nombre `Emma`, preview `Hola, soy Emma.` y saludo `Soy Emma, de ANAM`. El readback confirmó cero
+borradores. No cambiaron personalidad, conocimiento, permisos, acciones, routing, handoff, canales ni datos CRM,
+y no se envió una conversación real. Dos advertencias anteriores sobre `Registraré tu consulta` quedaron
+documentadas para un cambio conversacional separado.
+
 ## 2026-09-01 — Emma convierte la landing ANAM en un concierge digital
 
 La landing de atención de ANAM reemplazó al personaje masculino por Emma y reconstruyó la primera pantalla como

@@ -2,6 +2,47 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-09-01 (16) — Emma distribuye handoffs por intención y disponibilidad
+
+El Customer Agent `Emma` del portal ANAM `19893546` quedó conectado al workflow activo `1876744588`. La matriz
+publicada es cotización/nuevo negocio: Pablo Puga → Maria Paz Haeger; seguimiento: Marco Jiménez Venegas → Pablo
+Puga; Calidad, facturación y otros: Maria Paz Haeger → Marco Jiménez Venegas. El copy al visitante permanece
+neutral.
+
+La primera prueba pública (`48103382175`) encontró dos defectos: Emma ya era propietaria del ticket y bloqueaba
+las asignaciones sin sobrescritura; además `PRUEBA QA INTERNA` sesgó el clasificador hacia Calidad. Se restauró
+temporalmente el handoff directo a María Paz, se agregó el borrado de owner antes de la ramificación y se reforzó
+el prompt para ignorar metadatos de prueba. Después se reactivó y reconectó el workflow.
+
+La regresión E2E pasó con tickets reales de QA: `48103069613` cotización → Pablo; `48105602378` seguimiento →
+Marco no disponible → Pablo; `48094218332` Calidad → María Paz. Los widgets mostraron los propietarios finales,
+los action logs terminaron correctamente y los chats de prueba quedaron cerrados. Readback final: workflow activo,
+sin problemas y seleccionado por Emma. Evidencia: `docs/audits/ANAM_CUSTOMER_AGENT_HANDOFF_E2E_QA_2026-09-01.md`.
+
+La documentación separa ahora trigger, asignación y continuidad. La QA demostró routing y owner visible, pero no
+una respuesta humana ni una segunda reasignación en el mismo chat. En live handoff, el owner humano puede
+reasignar manualmente el ticket mientras el chat siga abierto; el workflow vigente no resuelve nombres escritos
+libremente. No se requirió ADR: se documentó el comportamiento existente sin modificar runtime, ownership ni
+arquitectura.
+
+## 2026-09-01 (15) — Customer Agent ANAM adopta la identidad Emma
+
+El Customer Agent del portal ANAM `19893546` quedó alineado con la landing: el nombre visible cambió de
+`Agente de clientes de ANAM` a `Emma` y el saludo guionizado de `Soy ANA, de ANAM` a `Soy Emma, de ANAM`.
+HubSpot confirmó `Perfil actualizado` y `Cambios publicados`; el readback mostró `Agente de clientes, Emma`,
+preview `Hola, soy Emma.`, saludo exacto y `Borrador (0)`.
+
+El cambio no tocó personalidad (`Amigable`), idioma, conocimiento, permisos, acciones, handoff, routing,
+canales, chatflow ni datos CRM. Tampoco abrió o envió una conversación real. El preflight dejó dos advertencias
+preexistentes sobre `Registraré tu consulta`; se documentaron como deuda separada porque corregirlas requiere
+aprobación y regresión conversacional propia.
+
+La evidencia y el contrato vigente están en
+`docs/audits/ANAM_CUSTOMER_AGENT_EMMA_IDENTITY_QA_2026-09-01.md` y en el source pack. Se actualizaron además la
+documentación funcional, el manual, el changelog client-facing y las referencias espejadas de la skill
+`hubspot-as-a-service`. No se requirió ADR: fue una edición reversible de identidad, sin cambio de autonomía,
+ownership, permisos ni arquitectura.
+
 ## 2026-09-01 (14) — La landing ANAM pasa a una experiencia editorial centrada en Emma
 
 La landing pública `https://anam-2.hubspotpagebuilder.com/agente-anam` sirve el build `#28` del proyecto

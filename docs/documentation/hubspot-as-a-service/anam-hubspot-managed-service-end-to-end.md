@@ -1,7 +1,7 @@
 # ANAM HubSpot Managed Service end-to-end
 
 > **Tipo:** Documentación funcional
-> **Versión:** 1.5
+> **Versión:** 1.8
 > **Actualizado:** 2026-09-01
 > **Cliente/portal:** ANAM / `19893546`
 > **Canon técnico:** [`../../architecture/kortex/hubspot-as-a-service/README.md`](../../architecture/kortex/hubspot-as-a-service/README.md)
@@ -47,16 +47,37 @@ falta una acción humana. El nombre del assignee se mantiene como routing intern
 El source pack independiente y reconciliado versiona las 23 fuentes en uso, las 17 respuestas cortas, el catálogo
 de 356 registros y el contrato de identidad/directrices/handoff/canales.
 
+La identidad live del Customer Agent también es `Emma`: el nombre del perfil, el saludo guionizado y el preview
+convergen en el mismo nombre. La actualización fue publicada el 2026-09-01 sin cambiar la personalidad
+`Amigable`, idioma, fuentes de conocimiento, permisos, acciones, routing, handoff ni canales. La landing y el
+agente ya no presentan identidades distintas.
+
 El readback del 24 de julio confirmó que Customer Agent volvió a operar, con live chat activo y cobertura de todas
 las horas. El bloqueo administrativo observado el 17 de julio queda como antecedente histórico, no como estado
-vigente. Los ajustes posteriores de Seguimiento, Calidad y copy neutral fueron publicados tras una comprobación
-previa sin problemas. El simulador live no respondió en la regresión posterior y esa prueba debe repetirse.
+vigente. Los ajustes posteriores de Seguimiento, Calidad y copy neutral fueron publicados. El cambio a Emma dejó
+cero borradores; el preflight conservó dos advertencias anteriores sobre `Registraré tu consulta`, por lo que la
+regresión conversacional y la corrección de esa promesa siguen pendientes como trabajo separado.
+
+El handoff ya no usa una única propietaria. Emma invoca el workflow de tickets `1876744588`, que clasifica la
+necesidad y distribuye con disponibilidad: cotización/nuevo negocio a Pablo Puga con María Paz Haeger como
+reemplazo; seguimiento a Marco Jiménez Venegas con Pablo como reemplazo; y Calidad, facturación u otros a María
+Paz con Marco como reemplazo. Antes de asignar, el workflow elimina a Emma como propietaria del ticket; luego la
+acción de reemplazo sólo actúa cuando la primaria no dejó propietario. Tres conversaciones públicas verificaron
+la ruta primaria de cotización, el reemplazo real de seguimiento y la ruta primaria de Calidad. La evidencia
+demuestra clasificación, asignación y owner visible; todavía no demuestra una respuesta humana ni una segunda
+reasignación humana en el mismo chat.
+
+La modalidad live conserva el hilo mientras el chat siga abierto. Después del primer handoff, el owner humano
+puede reasignar manualmente el ticket en Help Desk para que otra persona continúe con el mismo contexto. Terminar
+el chat impide reabrirlo. La matriz actual no convierte nombres escritos libremente en usuarios: una petición por
+Pablo, Marco o María Paz activa la necesidad de atención humana, pero el nombre sólo puede confirmarse tras una
+condición gobernada o una reasignación manual que pruebe el owner efectivo.
 
 ## Estado por fase
 
 | Fase | Estado | Resultado vigente |
 |---|---|---|
-| Customer Agent y landing | Operativo; rediseño build `#28` publicado | Emma, selector de tres intenciones, CTA único, 23 fuentes y canal activo. QA pública desktop/mobile aprobada; la regresión conversacional complementaria sigue pendiente. |
+| Customer Agent y landing | Operativo; rediseño build `#28` y routing `1876744588` activos | Emma, selector de tres intenciones, CTA único, 23 fuentes y canal activo. QA pública desktop/mobile y E2E de cotización, seguimiento/fallback y Calidad aprobadas. |
 | Growth y calidad | Cerrada | Data Quality `21144697`, Growth `19708354`, siete assets y outcome exacto. |
 | Catálogo | Suficiente | 505/506 líneas tienen Product; 220/220 líneas ganadas resuelven a Product. |
 | Service y contrato | Piloto live | Grupo, diez propiedades, asociaciones, cinco Services y workflow `1852406585`. |
