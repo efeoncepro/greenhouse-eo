@@ -44,6 +44,11 @@ operations, consumo de datos/IA/mensajes e IP propia. Un precio público no es u
 
 ## Ofertas de entrada y expansión
 
+La arquitectura comercial completa —promesa, customer model, fases comprables, carriles de solución, delivery,
+gates, métricas y madurez— vive en
+[`Efeonce Salesforce Service Offer Architecture V1`](EFEONCE_SALESFORCE_SERVICE_OFFER_ARCHITECTURE_V1.md).
+La tabla siguiente es el router resumido y no debe evolucionar como un catálogo paralelo.
+
 | Superficie                 | Oferta de entrada                            | Core                                                                               | Expansión recurrente                                                      |
 | -------------------------- | -------------------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
 | Salesforce CRM             | Salesforce CRM Fit & Architecture Diagnostic | Sales/Service Foundation, Integration/Migration o Agentforce Use Case              | Managed Salesforce Operations, Adoption, Data 360/Agentforce optimization |
@@ -78,6 +83,7 @@ y ADRs dueños.
 
 ## Canon y evidencia
 
+- [Efeonce Salesforce Service Offer Architecture V1](EFEONCE_SALESFORCE_SERVICE_OFFER_ARCHITECTURE_V1.md)
 - [Salesforce Product & Offering Map V1](SALESFORCE_PRODUCT_AND_OFFERING_MAP_V1.md)
 - [CRM Platform Positioning — Gartner + señal enterprise Chile](../../audits/commercial/CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md)
 - [Efeonce Partnership Registry](../../operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md)

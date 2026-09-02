@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-02 — la práctica Salesforce se canoniza como oferta por outcomes y lifecycle
+
+La práctica Revenue Operations & CRM incorpora una arquitectura comercial Salesforce en cuatro fases:
+Diagnose & Architect, Implement & Integrate, Activate & Adopt y Operate & Evolve. El contrato separa CRM core,
+Marketing Cloud Engagement y Marketing Cloud Next; define carriles de solución, ICP/anti-ICP, operator y buying
+group, delivery, métricas, límites de claims y gates de madurez. El estado queda `Approved for validation`: no
+autoriza todavía partnership, badge, certificaciones, reventa, pricing, casos ni Product Service comercialmente
+aprobado sin evidencia y sign-offs propios.
+
 ## 2026-09-02 — MCP: el manual de uso viaja por el protocolo (TASK-1804, code complete)
 
 La superficie MCP gana un segundo canal de conocimiento de uso: un manifiesto de manuales
@@ -1144,11 +1153,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
   reliability), doc funcional + manual nuevos en `docs/{documentation,manual-de-uso}/growth/`, la
   rule de auto-load `.claude/rules/growth-seo.md` y la skill `dataforseo-operator` con su espejo
   Codex (cuerpo idéntico, verificado a mano: el validador de espejos NO cubre esta skill).
-
-## 2026-08-27 — TASK-1777 complete: la tríada anti-Semrush queda cerrada entera
-
-- El operador decidió cerrar TASK-1777 con su rollout ya ejecutado (flag ON, lane en producción,
-  `get_seo_backlink_detail` entre las 21 tools del gateway) y el único criterio no observado —
-  predicado de movimiento a USD 0 — convertido en follow-up F1 con fecha y dueño (lunes
-  2026-08-31, receta SQL en el Delta (3) del task file). Con esto 1775/1776/1777 + 1658 están
-  `complete`; gasto total del rollout de la tríada: USD 0.2958.

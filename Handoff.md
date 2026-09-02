@@ -2,6 +2,23 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-09-02 (7) — Salesforce ya tiene oferta canónica y task de landing, sin implementación
+
+La práctica Salesforce quedó canonizada por outcomes y lifecycle en cuatro fases: `Diagnose & Architect`,
+`Implement & Integrate`, `Activate & Adopt` y `Operate & Evolve`; seis solution lanes cubren Revenue/Sales,
+Service, Marketing/Lifecycle, Data/Identity/Consent, Agentforce/Automation y Experience/Integration/Analytics.
+El mapa previo conserva el routing de producto y separa CRM, Marketing Cloud Engagement y Marketing Cloud Next.
+
+Se registró `TASK-1812` para convertir esa oferta en una landing pública `Universo conectado`. Ya existen dirección
+visual, wireframe 1440/390, flujo installed-base/evaluation y motion contract. Efeonce lidera; Salesforce aporta
+reconocimiento referencial. Nubes/agentes son originales y cualquier logo, badge, screenshot, mascota o claim de
+partnership queda bloqueado hasta rights y readback contractual. `TASK-1404` sigue dueña de la comparación HubSpot
+vs Salesforce.
+
+Estado honesto: documentación y contrato UI listos; no hay implementación, WordPress postId, CMS save, publicación,
+cache purge, indexación, conversión ni live readback. La ejecución empieza con Discovery/VoC/SEO/rights/runtime,
+continúa con un first fold `noindex` y se detiene para `ACCEPT FIRST FOLD` antes del below-fold.
+
 ## 2026-09-02 (6) — ANAM recibe un cierre documental premium y un soporte acotado a tres meses
 
 El cierre de Emma quedó consolidado en dos entregables externos de cinco páginas: especificación técnica y guía
@@ -490,28 +507,3 @@ formulario alcanzable por teclado tabulando (5 controles, primero `firstName`).
 posts del blog vía `the_content` en `ohio-child`). Hoy sólo existe la página de prueba.
 
 Transparencia: mi verificación sumó 2 eventos al ledger productivo (`clicked` + `form_opened`).
-
-## 2026-09-01 (8) — el cierre queda escrito en los SEIS sitios donde alguien cierra
-
-El hallazgo estructural del día era que `stale-progress` avisaba en un comando que ningún protocolo
-mandaba correr. Quedó cerrado: la regla de registrar el avance donde se LEE está ahora en `CLAUDE.md`,
-`AGENTS.md`, `.claude/commands/implement-task.md`, `GREENHOUSE_OPERATING_LOOP_V1.md`, `TASK_PROCESS.md`
-y el `greenhouse-documentation-governor` (ambos espejos). Verificado sitio por sitio, no asumido.
-
-`TASK_PROCESS.md` ganó las calibraciones medidas del barrido —qué cuenta como commit de
-implementación, por qué NO se filtran los `TASK-###` entre paréntesis, y los tres desenlaces
-legítimos cuando la regla avisa— más la advertencia que me costó un error real: **ausencia de código
-en este repo no es evidencia de que no exista** (`TASK-1259` estaba construida en otro repositorio).
-
-`TASK_UI_UX_ADDENDUM.md` documenta dos cosas que no estaban en ningún lado: la severidad
-foco-vs-incidental de los gates de wireframe/flow, y el protocolo de **contrato retroactivo** para
-UI ya construida que nunca declaró contrato (etiquetarlo, derivarlo de fuente verificable, enumerar
-lo que NO cubre). Precedentes `TASK-1078` y `TASK-1259`.
-
-El `greenhouse-qa-release-auditor` suma los tres defectos nuevos de gate —con la lección de
-propagación: al corregir una regla, revisa sus hermanas; (c) y (e) eran el mismo bug en dos reglas
-gemelas— y una regla nueva que vale para cualquier fix: **un test que pasa sin el arreglo es teatro**.
-Falsifícalo revirtiendo la corrección.
-
-Reparado además un empalme que yo mismo introduje antes: la nota de `stale-progress` se había
-insertado en medio de la regla de los markers ZONE del `greenhouse-task-planner` y la había partido.

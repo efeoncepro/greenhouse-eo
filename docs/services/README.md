@@ -50,8 +50,8 @@ Cada servicio debe declarar como mínimo:
 ## Familias disponibles
 
 - [HubSpot as a Service](hubspot-as-a-service/README.md)
-- [Salesforce Practice](salesforce/README.md) — CRM core, Marketing Cloud Engagement y Marketing Cloud Next con
-  modos separados de operación, venta y coexistencia.
+- [Salesforce Practice](salesforce/README.md) — arquitectura de oferta por outcomes y lifecycle para CRM core,
+  Marketing Cloud Engagement y Marketing Cloud Next, con operación, venta y coexistencia separadas.
 - [Creative Services](creative-services/README.md) — incluye Social Media, su operación recurrente y la capability
   **Efeonce Run & Gun Studio**, que se comercializa mediante **Efeonce Run & Gun Production** con alcance propio.
 - [Media & Distribution](media-distribution/README.md)
