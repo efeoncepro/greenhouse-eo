@@ -4,7 +4,7 @@
 > **Date:** 2026-09-01 · **Owner:** Growth SEO / EPIC-022  
 > **Scope:** Growth / SEO / DataForSEO Labs / PostgreSQL / API Platform / MCP / ops-worker  
 > **Reversibility:** two-way-until-provider-cutoff; freeze-only-after-cutoff · **Confidence:** high
-> **Validated as of:** 2026-09-02 (repo vigente + respuesta contractual directa de DataForSEO)
+> **Validated as of:** 2026-09-02 (repo vigente + respuesta contractual directa de DataForSEO; foundation implementada local-first el mismo día)
 > **Epic:** `EPIC-022` · **Execution owners:** `TASK-1805` foundation · `TASK-1806` evaluation/cutover  
 > **Evidence:** [impact audit](../audits/seo/2026-09-01-dataforseo-improved-etv-impact.md) ·
 > [provider questions](../audits/communications/2026-09-01-dataforseo-improved-etv-provider-questions.md)
@@ -200,11 +200,52 @@ Fuentes oficiales consultadas:
 
 ## Runtime Contract
 
-Cuando `TASK-1805` se implemente y cierre, la fuente de verdad será la policy tipada del dominio
-`src/lib/growth/seo/**`, las columnas/constraints de `greenhouse_growth`, sus readers canónicos y la proyección
-aditiva servida por API/MCP, todavía seleccionando legacy. `TASK-1806` sólo puede activar improved después de
-medir y aprobar la transición. Hasta entonces, **el runtime vigente no implementa esta decisión** y continúa sin
-una dimensión metodológica; el audit enlazado es la evidencia del riesgo, no prueba de rollout.
+**Estado 2026-09-02: foundation IMPLEMENTADA (`TASK-1805`, code complete, rollout pendiente); selección
+productiva `legacy_static_v1` explícita; Improved ETV NO activado.** Lo que la decisión prescribía ya tiene
+mecanismo, y lo que todavía no está desplegado se declara aparte.
+
+Fuente de verdad implementada:
+
+- **Policy pura** `src/lib/growth/seo/etv-methodology/**` (sin `server-only`; la comparten Vercel y ops-worker):
+  vocabulario cerrado, matriz de 14 familias con clasificación y task dueña, `buildEtvMethodologyRequest`
+  (endpoint-aware; construye `use_improved_etv` SIEMPRE explícito; lanza ante endpoint ignorado/no
+  habilitado/desconocido, configuración inválida o legacy desde `2026-11-01T00:00:00Z`), derivación de
+  `providerEffective` por instante, base histórica por mes, `assertSingleEtvMethodology` y provenance para DTOs.
+  Selectores: `GROWTH_SEO_ETV_METHODOLOGY_VERSION` (escritura) y `GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION`
+  (lectura); ausentes = legacy explícito con `source: default`, visible en el readback.
+- **Schema (expand aplicado a la instancia, migración `20260902221432772_task-1805-etv-methodology-expand`):**
+  `seo_domain_overview_snapshots`, `seo_url_visibility_snapshots` y `seo_prospect_diagnostics` ganan
+  `etv_methodology_version` (CHECK cerrado), `etv_methodology_evidence` (`explicit_request` ⇔
+  `etv_requested_at` + `etv_policy_version`, o `contract_default_pre_cutoff`), `etv_requested_at`,
+  `etv_policy_version` y —sólo la foto de dominio— `etv_historical_basis`. UNIQUE formula-aware
+  `seo_domain_overview_capture_method_unique` / `seo_url_visibility_capture_method_unique` al lado de la legacy.
+  Guard `BEFORE INSERT` `guard_seo_etv_methodology_cutoff()`: rechaza evidencia contractual desde el corte y
+  legacy con `etv_requested_at` desde el corte, para cualquier runtime. Las filas preexistentes (5+8+2) quedaron
+  `legacy_static_v1` + `contract_default_pre_cutoff` por contrato (cuenta pre-2026-09-01, código sin flag, capturas
+  pre-corte), nunca por fecha. Append-only intacto.
+- **Contract (parqueado, NO aplicado):** `docs/tasks/pending-migrations/TASK-1805-etv-methodology-contract.sql.pending`
+  retira los DEFAULT transitorios y la UNIQUE legacy y exige metodología en el hecho ETV del prospecto. Condición:
+  release con los writers explícitos en ambos runtimes + 7 días sin evidencia contractual nueva. Hasta entonces la
+  coexistencia legacy/improved por sujeto/día está cerrada a propósito (probada en transacción con rollback).
+- **Writers:** los siete caminos (`domain_rank_overview`, `historical_rank_overview`, `bulk_traffic_estimation`,
+  `ranked_keywords` ×2, `relevant_pages`, `subdomains`) piden fórmula por request y persisten la identidad completa;
+  frescura/pre-check/meses existentes filtran por método; el prospecto fija el método ANTES del claim y el hecho
+  `estimated_monthly_traffic` declara `etvMethodologyVersion`, `sampleRows`, `rowLimit` y `truncated`; la cita AIO
+  declara reparto modelado. `competitors_domain` y `domain_intersection` no reciben el flag (guards conductuales).
+- **Readers/API/MCP:** `readDomainOverview`, `readUrlVisibility` y `readVisibilityConcentration` filtran por método
+  en SQL antes de deduplicar, rechazan series mixtas y exponen `etvMethodology`; evidencia sólo bajo otra fórmula →
+  `not_available_for_method`. El lane ecosystem lo transporta y las tools `get_seo_domain_overview`,
+  `get_seo_url_visibility` y `get_seo_prospect_diagnostic` lo declaran (manifest `8969c8d39c1f`; gateway sincronizado).
+- **Observabilidad:** señal `seo.etv_methodology.drift` (módulo `growth`, kind `drift`, steady 0) + readback
+  `etvMethodology` en `/health` del ops-worker + selector declarado en `services/ops-worker/deploy.sh`.
+- **Evaluador seguro:** `etv-methodology/evaluator.ts` + `replay.ts` + fixtures sintéticos versionados +
+  `scripts/growth/_sanity-task-1805-etv-evaluator.ts` (plan, forecast, dry-run `providerCalls=0`, comparación de
+  valor/membresía/traffic cost/prospecto y benchmark GSC sin promediar). Gate `GROWTH_SEO_ETV_EVALUATOR_ENABLED`
+  default OFF con allowlist, máximo de requests y tope USD; `TASK-1806` lo activa.
+
+Rollout pendiente (declarado en `TASK-1805` y en el ledger de flags): release con Slices 4–6, selector explícito
+en Vercel, readback `configured=requested=provider-effective` en ambos runtimes, y el contract post-release.
+`TASK-1806` sigue siendo la única unidad que puede seleccionar `improved_layout_clickstream_v2`.
 
 ## Revisit When
 

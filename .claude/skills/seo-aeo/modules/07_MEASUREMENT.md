@@ -266,6 +266,12 @@ Reglas de medición:
 8. **Rollback acotado.** Preserva baseline legacy antes del corte. Después, el safe mode congela capturas y sirve
    la última serie coherente; no existe rollback legacy por flag.
 
+Estado Greenhouse (2026-09-02, `TASK-1805`): las reglas 1, 2, 5, 6 y 7 ya están cableadas —cada fila ETV lleva
+`etv_methodology_version` + evidencia + instante UTC + policy; readers/API/MCP sirven UNA fórmula y exponen
+`etvMethodology`; el evaluador compara sin promediar y declara `temporal_canary` ≠ A/B—. La selección productiva
+sigue `legacy_static_v1`; el shadow pagado y el cutover son de `TASK-1806`. Al leer una cifra ETV de Greenhouse,
+reporta `etvMethodology.version` junto al as-of y nunca compares versiones distintas.
+
 ### Medición no nativa: cuando el canal lo opera otro
 
 Si el canal existe pero **lo opera un tercero** (otra agencia, el equipo interno del

@@ -2,10 +2,24 @@
 
 ## Estado y alcance
 
-Este runbook describe una evaluación futura. **No autoriza ni ejecuta llamadas a DataForSEO, migraciones, flags,
-deploys o cutover.** La foundation pertenece a `TASK-1805`; la evaluación pagada, decisión histórica y activación
-pertenecen a `TASK-1806`. Ambas deben respetar
-`GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md`.
+Este runbook describe la evaluación que ejecuta `TASK-1806`. **No autoriza ni ejecuta llamadas a DataForSEO,
+flags, deploys o cutover.** La foundation (`TASK-1805`) está **implementada** al 2026-09-02 —policy, expand de
+schema, writers/readers/API/MCP formula-aware, señal de drift y evaluador dry-run— con selección productiva
+`legacy_static_v1` explícita y rollout pendiente (release + selector explícito en Vercel + contract post-release).
+Ambas deben respetar `GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md`.
+
+Comandos de la foundation que este runbook usa:
+
+```bash
+# Dry-run del evaluador: plan + forecast + replay de fixtures + ledger intacto (cero llamadas)
+npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/_sanity-task-1805-etv-evaluator.ts
+# Sanity del schema formula-aware (transacción con rollback; incluye el contract parqueado)
+npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/_sanity-task-1805-etv-schema.ts
+```
+
+Readback del método por runtime: `GET /health` del ops-worker (`etvMethodology.configuredWriteMethod`,
+`configuredWriteSource`, `policyVersion`) y la señal `seo.etv_methodology.drift` en `/admin/operations`, que
+compara lo configurado con la última request explícita persistida por el worker y por Vercel.
 
 ## Objetivo
 
@@ -18,10 +32,15 @@ No iniciar una prueba con proveedor hasta que todas estén satisfechas:
 
 1. La respuesta DataForSEO del 2026-09-02 está incorporada; Sandbox/OpenAPI pendientes son no bloqueantes.
 2. `TASK-1805` está completa y verificada; `TASK-1806` fue tomada mediante el operating loop y su plan fue aprobado.
-3. Policy y allowlist fallan cerrado; el transporte genérico sigue neutral.
-4. El expand de schema permite coexistir ambas metodologías y fue verificado antes de cualquier writer improved.
-5. Readers productivos siguen fijados a legacy y rechazan series mixtas.
-6. Vercel y ops-worker reportan la misma configuración; dry-run muestra método y llamadas previstas.
+3. Policy y allowlist fallan cerrado (`buildEtvMethodologyRequest`, `resolveEtvEvaluatorConfig`); el
+   transporte genérico sigue neutral.
+4. El expand de schema está aplicado y el **contract** (`docs/tasks/pending-migrations/TASK-1805-etv-methodology-contract.sql.pending`)
+   fue ejecutado tras el release: sin él la coexistencia legacy/improved por sujeto/día sigue cerrada y el
+   shadow persistido choca con la UNIQUE legacy.
+5. Readers productivos siguen fijados a legacy (`GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION` ausente o
+   `legacy_static_v1`) y rechazan series mixtas.
+6. `/health` del ops-worker y la señal `seo.etv_methodology.drift` reportan la misma configuración
+   (`source: env`, no `default`); el dry-run muestra método, requests previstas y `providerCalls=0`.
 7. Existe un presupuesto máximo en USD aprobado por el operador. Sin monto aprobado, sólo fixtures/replay.
 8. Se definieron ventana, propiedades GSC, países, dispositivos y tratamiento de datos faltantes antes de mirar
    resultados.

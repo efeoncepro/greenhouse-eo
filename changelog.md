@@ -7,6 +7,18 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-02 — TASK-1805: la fórmula detrás de `etv` pasa a ser identidad del hecho (foundation, todavía legacy)
+
+DataForSEO cambia el cálculo de `etv` bajo el mismo campo y corta legacy el `2026-11-01T00:00:00Z` sin exponer
+versión. Greenhouse deja de depender del default: una policy pura endpoint-aware construye `use_improved_etv`
+explícito por request (falla cerrado ante familia ignorada/no habilitada, config inválida o legacy desde el
+corte), las tres tablas ETV ganan versión + evidencia + instante UTC + policy (expand aplicado; filas previas
+`legacy_static_v1` por contrato, nunca por fecha; guard de corte en la base), los siete caminos consumidores la
+persisten, readers/API/MCP sirven UNA fórmula con `etvMethodology` y `not_available_for_method`, la señal
+`seo.etv_methodology.drift` compara configurado vs solicitado en Vercel y ops-worker, y un evaluador
+dry-run/replay compara valor, membresía del top-N, traffic cost y prospecto sin gastar. Contract de schema
+parqueado hasta el release. Estado: code complete, rollout pendiente; Improved ETV NO activado (`TASK-1806`).
+
 ## 2026-09-02 — DCR deprecado en MCP `2026-07-28`: el shim del gateway se queda, pero deja de ser el futuro
 
 La revisión Current del protocolo marcó Dynamic Client Registration como `Deprecated` (PR #2858),

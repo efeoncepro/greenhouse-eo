@@ -7,6 +7,14 @@ TypeScript. Este archivo contiene solo contratos durables y rutas de descubrimie
 rollout o bloqueo vive en [Handoff.md](Handoff.md); la historia pre-2026-07-19 quedó preservada en
 [`docs/operations/agent-context-history/2026-07-19/project_context.legacy.md`](docs/operations/agent-context-history/2026-07-19/project_context.legacy.md).
 
+La **metodología detrás de `etv`** (DataForSEO Labs) es identidad del hecho desde `TASK-1805` (2026-09-02): la policy
+pura `src/lib/growth/seo/etv-methodology/**` construye `use_improved_etv` explícito por request (fail-closed) y
+cada fila ETV persiste `etv_methodology_version` + evidencia + instante UTC + policy; readers/API/MCP sirven UNA
+fórmula (`etvMethodology` en el DTO, `not_available_for_method` como degradación). Selectores
+`GROWTH_SEO_ETV_METHODOLOGY_VERSION`/`_READ_` (ausentes = `legacy_static_v1` explícito). El corte del proveedor
+es `2026-11-01T00:00:00Z`: legacy falla cerrado desde entonces y el flip a improved es de `TASK-1806`. ADR:
+[`GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md`](docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md).
+
 TeamBot usa `pnpm teams:announce` para grupos: menciones explícitas, no `@todos` ni DMs. Un 1:1 manual aprobado exige dispatcher/audit canónicos, Entra revalidada e idempotencia; lo recurrente converge a Notification Hub. En Performance Reports, volumen no prueba sobrecarga y el mensaje publicado verifica la mención. Contrato: [`manual-teams-announcements.md`](docs/operations/manual-teams-announcements.md).
 
 La migración de consumo privado de AXIS está cerrada para la operación interna/producción: el secreto activo

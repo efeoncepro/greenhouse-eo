@@ -2,23 +2,31 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
-## 2026-09-02 (10) — TASK-1805 tomada: la metodología ETV pasa a ser identidad del hecho, todavía en legacy
+## 2026-09-02 (10) — TASK-1805 foundation ETV implementada: code complete, rollout pendiente, todavía legacy
 
-Sesión `greenhouse-eo-fe` implementa `TASK-1805` local-first sobre `develop`, **sin push** mientras dure la
-promoción a producción anunciada por `Task-1804`. Alcance: policy endpoint-aware fail-closed
-(`src/lib/growth/seo/etv-methodology/**`), expand aditivo del schema de `seo_domain_overview_snapshots`,
-`seo_url_visibility_snapshots` y `seo_prospect_diagnostics` (identidad metodológica + evidencia + guard de
-corte), writers/readers/API/MCP formula-aware, señal de drift cross-runtime y evaluador dry-run sin gasto.
-Estado del árbol al arrancar: diez docs sucios ajenos (EPIC-022 + nueve tasks SEO); ninguno se acopla a los
-commits de esta sesión salvo el propio `TASK-1805`, cuya sección «MCP Tools & Skills Contract» ya estaba en
-el working tree y se conserva.
+Sesión `greenhouse-eo-fe` sobre `develop`, **sin push** (incidente de `main` en curso; `origin/develop` quedó en
+`e5d7675d8` = Slice 3, empujado por `Task-1804` dentro de su release). Seis slices locales (`7adf5ffc7`…`9477b83e7`)
++ gateway `efeonce-mcp` `58517f0` local. Cero gasto de proveedor; selección productiva `legacy_static_v1`
+explícita; `use_improved_etv:false` en cada request.
 
-**Decisiones de foundation que `TASK-1806` hereda:** las filas existentes (5 fotos de dominio, 8 de
-visibilidad, 1 hecho de tráfico de prospecto; todas capturadas 2026-08-27/29 por código que nunca envió
-`use_improved_etv`, sobre una cuenta registrada antes del 2026-09-01) se atribuyen a `legacy_static_v1` con
-evidencia `contract_default_pre_cutoff`, nunca por fecha; la selección productiva permanece legacy explícita;
-el contract phase (retirar uniqueness legacy y defaults transitorios) queda en `docs/tasks/pending-migrations/`
-hasta que ambos runtimes escriban método explícito (regla ISSUE-161, una sola instancia Cloud SQL).
+**Qué existe ya:** policy pura `src/lib/growth/seo/etv-methodology/**` (14 familias, `buildEtvMethodologyRequest`
+fail-closed, selectores `GROWTH_SEO_ETV_METHODOLOGY_VERSION`/`_READ_`); expand APLICADO a la instancia compartida
+(`20260902221432772`; filas previas 5+8+2 atribuidas legacy por contrato, guard de corte en la base, UNIQUE
+formula-aware junto a la legacy); siete writers explícitos; readers/lane/MCP con `etvMethodology` y
+`not_available_for_method`; señal `seo.etv_methodology.drift` (`awaiting_data` hoy); `/health` del worker con
+readback; evaluador dry-run/replay (8/8, ledger intacto). Sanity del schema 17/17 en transacción con rollback,
+incluido el contract.
+
+**Riesgos abiertos:** el **contract** (`docs/tasks/pending-migrations/TASK-1805-etv-methodology-contract.sql.pending`)
+NO está aplicado a propósito — hasta entonces la coexistencia legacy/improved por sujeto/día está cerrada y el
+código viejo sigue escribiendo con evidencia contractual; aplicarlo antes del release rompería los crons del 16/17
+y el prospecto en Vercel. `pnpm build` de producción no se corrió (cuelga el equipo): correrlo antes de `complete/`.
+
+**Pendientes inmediatos:** (1) push/release de Slices 4–6 cuando el operador cierre el incidente de `main`;
+(2) `vercel env add GROWTH_SEO_ETV_METHODOLOGY_VERSION legacy_static_v1` (+ `_READ_`) en Production+staging con
+redeploy; (3) readback: `/health` del worker + señal en `ok`; (4) contract post-release (3 condiciones en el
+archivo); (5) deploy del gateway + paridad/canaries; (6) mover `TASK-1805` a `complete/`. Improved, shadow pagado
+y cutover: **sólo `TASK-1806`**.
 
 ## 2026-09-02 (9) — DCR quedó deprecado en MCP `2026-07-28`: el shim de `mcp.efeonce.org` se mantiene, con dos hallazgos que la evaluación no buscaba
 

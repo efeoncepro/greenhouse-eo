@@ -70,3 +70,12 @@ run. Report the state; do not retry blindly.
 - Never quote industry figures or lifts around the diagnostic; only this domain's facts.
 - Never schedule or repeat diagnostics to build a series: there is no recurring capture on
   prospects, by design.
+
+## Estimated traffic and its formula (TASK-1805)
+
+The `estimated_monthly_traffic` fact is the sum of the organic `etv` of the purchased sample, and its
+`detail` declares the formula and the coverage: `etvMethodologyVersion` (also on the diagnostic as
+`etvMethodology`), `sampleRows`, `rowLimit` and `truncated`. When `truncated` is true the sum is a
+FLOOR of the real surface, not the total. The `ai_overview_citations` fact counts citations and does
+not add their etv (`etvSummed: false`): AI Overview etv is a modeled share among cited domains, never
+observed clicks. Never compare traffic figures across different methodology versions.
