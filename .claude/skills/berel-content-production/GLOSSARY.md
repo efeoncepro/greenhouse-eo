@@ -1,70 +1,86 @@
 # Glosario — Berel
 
-## El cliente y su sitio
+## Cliente y sitio
 
 | Término | Qué es |
 |---|---|
-| **Berel / Pinturas Berel** | Marca mexicana de pinturas con más de 85 años, cliente de Efeonce. **Opera solo en México.** Se capitaliza siempre |
-| **berel.com** | Dominio, **sin www**. Es el que debe unificarse entre canónica y `@id` del schema |
-| **Inspiración** | **El blog de Berel.** Se le nombra así: *"Inspiración, el blog de Berel"*. Los artículos derivan de `berel.com/articulos` y los tutoriales de `berel.com/tutoriales` |
-| **Don Bere** | Personaje de marca del registro técnico/tutorial. Da el consejo de oficio con cercanía y autoridad. Su muletilla: *"Palabra de pintor."* |
-| **BerelTip** | La sección donde entra el consejo práctico de oficio. Es lo que convierte un paso a paso en voz propia de la marca |
-| **Tienda de Pintura Berel** | Nombre oficial del punto de venta — **no** "Centro de Color". CTA a `berel.com/ubica-tienda` |
+| **Berel / Pinturas Berel** | Marca mexicana de pinturas, cliente de Efeonce. Opera en México. Se capitaliza siempre |
+| **berel.com** | Dominio canónico sin `www`; unificarlo entre canonical y `@id` del schema |
+| **Inspiración** | El blog de Berel. Artículos bajo `/articulos/`, tutoriales bajo `/tutoriales/` |
+| **Don Bere** | Personaje de marca del registro técnico/tutorial |
+| **BerelTip** | Consejo práctico de oficio dentro del contenido |
+| **Tienda de Pintura Berel** | Nombre oficial del punto de venta. CTA a `/ubica-tienda` |
 | **App Color Berel** | Nombre exacto de la app |
-| **Color del Año** | Entidad anual de marca. **2026 = Pitaya 2-3605D · 2025 = Maíz 2-1403T**. No es una pieza de calendario cualquiera |
-| **Catálogo RGB** | Base interna de 1.553 colores con familia, código, R/G/B y HEX. 🔴 **Consumo interno de diseño**: sus valores nunca salen al cuerpo publicable |
-| **Código alfanumérico** | El identificador del color (`2-3605D`). El formato público es **familia + color + código**: *el rosa Pitaya 2-3605D* |
+| **Color del Año** | 2026 = Pitaya 2-3605D; 2025 = Maíz 2-1403T |
+| **Catálogo RGB** | Base interna para diseño. RGB/HEX no salen al cuerpo publicable |
+| **Código alfanumérico** | Identificador público del color; se usa junto al nombre |
 
-## El ciclo de producción
-
-| Término | Qué es |
-|---|---|
-| **Modalidad A · Reescritura** | El artículo ya existe publicado y su fila tiene `Enlace`. La arquitectura SEO **se audita** |
-| **Modalidad B · Artículo nuevo** | El tema no existe en el sitio. La arquitectura SEO **se decide** antes de escribir |
-| **`N##`** | Número del artículo en la parrilla. **Continuo entre meses**, nunca reinicia. Es lo que hoy sostiene la trazabilidad artículo→arte |
-| **`N1…N4`** | Los cuatro banners **dentro** de un artículo: portada/hero · infografía · comparativa/didáctico · cierre |
-| **🔁** | Marca de la **imagen base de adaptación social**. **Una sola por artículo**, casi siempre la infografía N2. De ella salen las cuatro variantes sociales |
-| **Ficha de contenido** | La tabla de **13 campos** que describe un banner **fotográfico** (hero, cierre). Vive en el cuerpo de la subtarea y **se escribe al crearla** |
-| **Ficha de producción de infografía** | La otra ficha: **9 secciones + tabla por módulo**, con todo el copy literal. La usa **cualquier banner que sea infografía**, no solo el N2 |
-| **Derivado social** | Pieza atomizada del artículo para una red. El set son 4 canales. Existe **dos veces**: como fila hija en Content Hub y como subtarea en Tareas |
-| **Callout de procedencia** | Encabezado del bloque de reescritura: de qué análisis y qué fuentes sale, y la convención de niveles usada |
-| **Callout de pendientes ⚠️** | Cierre obligatorio de toda reescritura: lo que quedó sin verificar |
-| **Verificación en la URL publicada** | Sección fechada al final del análisis SEO/AEO donde consta lo comprobado contra el HTML real |
-
-## El sistema en Notion
+## Ciclo de producción
 
 | Término | Qué es |
 |---|---|
-| **📆 Content Hub** | Base de artículos (123 filas, 18 propiedades). ⚠️ Su título **lleva un espacio al final**. Es la unidad de planificación |
-| **Tareas** | Base de ejecución (283 filas, 69 propiedades, 22 de ellas fórmulas). Título de fila: `Nombre de tarea` |
-| **Proyectos** | Base donde vive el proyecto mensual `Produccion Creativa - [Mes] [AA]` |
-| **`ítem principal` / `Subítem`** | Jerarquía **dentro de Content Hub**: artículo padre, derivados como filas hijas |
-| **`Tarea principal` / `Subtareas`** | Jerarquía **dentro de Tareas**: sub-task nativo de Notion. Banners y derivados cuelgan de la tarea del artículo |
-| **`Artículo (Content Hub)`** | La relación que une las dos bases. Hoy **poblada a medias** (96 de 283) |
-| **`[GH] RpA v2`** | Writeback de Greenhouse. **Read-only del lado de Notion** |
-| **Encabezado desplegable** | `# Título {toggle="true"}` con su contenido indentado un tabulador. Es como se estructura la página del artículo |
-| **Canonización** | Notion normaliza tablas, escapes y negritas al guardar. Cosmético para el lector, **no para el editor**: el texto guardado deja de coincidir con el enviado, así que toda edición anclada se relee antes |
+| **`Formato`** | Propiedad del Content Hub que decide estructura CMS: `Artículo` o `Tutorial`. No decide modalidad A/B |
+| **Modalidad A · Reescritura** | La URL contiene artículo vivo (`title` + H1 + cuerpo). La arquitectura SEO se audita |
+| **Modalidad B · Artículo nuevo** | No existe contenido vivo; incluye canónica planificada que todavía responde soft-404. La arquitectura SEO se decide antes de escribir |
+| **Soft-404 Berel** | Ruta inexistente que responde HTTP 200 con shell vacío. Por eso HTTP 200 no prueba existencia |
+| **`N##`** | Número continuo del artículo entre meses |
+| **`N1…N4`** | Numeración de los cuatro banners dentro de un artículo; reinicia en cada pieza |
+| **🔁** | Imagen base de adaptación social. Una sola por artículo |
+| **Ficha de contenido** | Ficha de 13 campos para banner fotográfico |
+| **Ficha de producción de infografía** | Ficha de 9 secciones + tabla modular para cualquier pieza que sea infografía |
+| **Derivado social** | Pieza atomizada por canal; vive como subítem en Content Hub y subtarea en Tareas |
+| **Callout de procedencia** | Explica fuentes, análisis y convenciones que originan el V1/híbrido |
+| **Callout de pendientes ⚠️** | Cierre obligatorio con todo dato/URL/asset/capacidad CMS no confirmada |
+| **Verificación en la URL publicada** | Sección fechada que documenta lo comprobado contra HTML real |
+
+## Formato Tutorial híbrido
+
+| Término | Qué es |
+|---|---|
+| **Tutorial híbrido** | Versión de carga CMS que reestructura el V1 cuando `Formato = Tutorial`; no crea una segunda URL |
+| **Una intención = una URL** | Regla anti-canibalización: no publicar artículo y tutorial separados para la misma keyword |
+| **`🔁 Reescritura en formato Tutorial (híbrido)`** | Toggle final dentro de la misma página del Content Hub |
+| **Paso a Paso** | Estructura canónica de 4 pasos del template Tutorial actual |
+| **Foto 📸 de paso** | Imagen 1:1 asociada a un paso. No es banner |
+| **Secuencia Paso a Paso** | Una sola tarea de diseño que agrupa las fotos del tutorial |
+| **`N##_PASO-X`** | Nomenclatura de archivo de diseño para fotos de pasos |
+| **`Tutorial Contenido`** | Bloque Drupal donde se montan Productos Berel, Materiales/Herramientas y Colores sugeridos |
+| **Banners heredados** | Banners N1–N4 del V1 que se copian completos al híbrido, no como puntero |
+
+## Sistema en Notion
+
+| Término | Qué es |
+|---|---|
+| **📆 Content Hub** | Base de planificación editorial; contiene `Formato`, estado, enlace y relaciones |
+| **Tareas** | Base de ejecución de artículos, banners, sociales y secuencia Tutorial |
+| **Proyectos** | Contenedor mensual `Produccion Creativa - [Mes] [AA]` |
+| **ítem principal / Subítem** | Jerarquía dentro de Content Hub |
+| **Tarea principal / Subtareas** | Jerarquía dentro de Tareas |
+| **`Artículo (Content Hub)`** | Relación que une ejecución con planificación |
+| **`[GH] RpA v2`** | Writeback de Greenhouse; read-only desde Notion |
+| **Encabezado desplegable** | Toggle usado para estructurar la página del artículo |
+| **Canonización** | Normalización de formato que Notion aplica al guardar; obliga a releer antes de editar por texto |
 
 ## Voz y estructura editorial
 
 | Término | Qué es |
 |---|---|
-| **Arco de cinco tiempos** | Gancho con micro-escena → respuesta directa → hilo conductor → desarrollo en crescendo → cierre que cierra el círculo |
-| **Micro-escena** | Apertura sensorial y reconocible, nunca una definición. Nombra el miedo o el deseo del lector **una sola vez** |
-| **Respuesta directa (TL;DR)** | Párrafo de **40-55 palabras** justo después del gancho. Es lo que cita un motor de respuesta |
-| **Definición extractable** | Frase de apertura de sección que se puede citar sola. Formato "X es Y" |
-| **Hilo conductor / eje de decisión** | El criterio que ordena la pieza de principio a fin. Si el título instala una metáfora, no se abandona |
-| **Escalera de sutileza** | Los cuatro grados de integración de producto, de más sutil a más directo. El producto **no se inserta: se vuelve el siguiente paso natural** |
-| **Dosis del producto** | El nombre completo va **una sola vez** por pieza; después, genérico. Se cuenta antes de cerrar, incluido el CTA |
-| **CTA triple** | Las tres acciones del cierre: calcular o explorar · dónde comprar · lectura relacionada |
-| **Dos registros** | **Inspiracional/editorial** (color, paletas, tendencias) y **técnico/tutorial** (guías, producto, Don Bere). La mayoría de los artículos combinan ambos |
-| **Hub & spoke** | Pillar atemporal que acumula ("Colores de Temporada") + páginas hijas por paleta/año. El hub captura genéricas; las hijas, específicas |
+| **Arco de cinco tiempos** | Gancho → respuesta directa → hilo conductor → desarrollo → cierre |
+| **Micro-escena** | Apertura sensorial reconocible, sin dramatización excesiva |
+| **Respuesta directa** | Cápsula extractable que responde la pregunta sin depender del resto |
+| **Definición extractable** | Primera frase de sección que puede citarse sola |
+| **Hilo conductor** | Criterio que ordena la pieza de principio a fin |
+| **Dosis del producto** | Control de cuánto y dónde aparece el producto |
+| **CTA triple** | Explorar/calcular · comprar/ubicar · seguir leyendo |
+| **Dos registros** | Inspiracional/editorial y técnico/tutorial |
+| **Hub & spoke** | Pillar atemporal + páginas hijas específicas, con enlazado bidireccional |
 
-## Modulación social
+## Enlaces y distribución
 
 | Término | Qué es |
 |---|---|
-| **ADN Berel** | Lo que **no cambia** en ningún canal: acompañante experto, tuteo, el color como agente activo, mexicanidad real |
-| **Líneas rojas** | Sin superlativos vacíos, sin competencia, sin urgencia falsa, nombre de producto una sola vez |
-| **Canales propios en posesivo** | "nuestro blog", "nuestra guía", "nuestro canal" — **nunca "el blog" a secas** |
-| **Cortinilla / CTA de blog** | En piezas sociales refiere al blog completo como **Inspiración**, con `berel.com/inspiracion` en negrita |
+| **Ruta relativa CMS** | En handoff, enlace interno desde el primer `/` posterior a `.com`, con anchor descriptivo |
+| **`/search?q=`** | Ruta bloqueada por robots; nunca se usa como destino editorial |
+| **Familia de color** | Destino `/colores/<familia>` cuando no hay paleta/artículo más específico |
+| **Instagram Story** | Formato vigente de Instagram para derivados Berel; no post estático |
+| **Paridad social** | Tarea y subítem deben terminar con el mismo contenido/enlaces finales |
