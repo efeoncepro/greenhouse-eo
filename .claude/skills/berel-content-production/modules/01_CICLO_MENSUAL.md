@@ -1,346 +1,275 @@
 # 01 · El ciclo mensual de producción
 
-> **Fuente de verdad:** **📘 Playbook Producción** (`3b239c2fefe780ceb71dff4f5bed4646`).
-> Se ejecuta **una vez por cada mes de producción**. Cubre el ciclo completo: identificar los
-> artículos del mes → rescatar su contenido publicado → análisis SEO/AEO y de contenido →
-> reescritura → montaje del proyecto mensual con tareas, subtareas e íconos.
+> **Fuente de verdad viva:** `📘 Playbook Producción` en Notion (`3b239c2fefe780ceb71dff4f5bed4646`).
+> Sincronizado el **2026-09-02**. Si una petición fechada del cliente o una spec específica contradice
+> este módulo, manda la fuente más reciente/específica.
 
-Es agnóstico al mes, al proyecto y a los artículos: donde veas `[Mes]`, `N##` o `[Artículo]`,
-sustituye por los valores del ciclo en curso.
+## 0 · Resolver estructura y modalidad antes de producir
 
-**Las fases son independientes**: se pueden ejecutar todas en secuencia o solo la que se pida.
-**Única excepción:** la Fase 8 (banners y derivados) depende de la Fase 5 — sin artículo escrito no
-se define ninguna imagen.
+### Paso 0A — Leer `Formato` en Content Hub
 
-## Las dos modalidades
+La propiedad `Formato` decide **la estructura CMS**, no si la pieza es nueva o reescritura:
 
-Identificar con cuál se trabaja **antes de empezar**. Cambian las primeras fases; el montaje del
-proyecto (Fases 6 a 10) es idéntico en ambas.
+| `Formato` | Qué hacer |
+|---|---|
+| `Artículo` | Ejecutar Modalidad A o B normal |
+| `Tutorial` | Ejecutar Modalidad A o B normal **y después** `13_FORMATO_TUTORIAL_HIBRIDO.md` |
+| vacío | No asumir. Reportar el gap antes de escribir |
 
-| Modalidad | Cuándo aplica | Ruta |
+### Paso 0B — Determinar modalidad por contenido vivo
+
+| Modalidad | Condición real | Ruta |
 |---|---|---|
-| **A · Reescritura** | El artículo ya existe publicado y su fila tiene `Enlace` | Fases 1 a 5, luego 6 a 10 |
-| **B · Artículo nuevo** | El tema no existe en el sitio: producto por lanzar, tema nuevo del plan del cliente, fila sin `Enlace` | Fases B1 a B5, luego 6 a 10 |
+| **A · Reescritura** | La URL contiene `title`, H1 y cuerpo editorial vivo | F1–F5 → F6–F10 |
+| **B · Artículo nuevo** | No hay URL viva, o la canónica planificada sirve shell soft-404 | B1–B5 → F6–F10 |
 
-**La diferencia de fondo:** en la reescritura la arquitectura SEO ya está tomada y lo que se hace es
-**auditarla**; en el artículo nuevo no existe y hay que **decidirla** —title, slug, metadescripción,
-H1 y mapa de encabezados— **antes de escribir una sola línea**.
+🔴 **No basta `Enlace`, ni HTTP 200.** `berel.com` puede devolver 200 para rutas inexistentes.
 
-## Orden canónico de las secciones dentro del artículo
+## 1 · Orden canónico dentro de la página del Content Hub
 
-Cada artículo del Content Hub termina el ciclo con **cuatro encabezados desplegables 1**, siempre en
-este orden y siempre agregados **al final** de lo que ya exista:
+### Modalidad A
 
 1. `Contenido anterior del artículo`
 2. `Análisis SEO/AEO`
 3. `Análisis de contenido`
 4. `✍️ Reescritura V1`
+5. Si `Formato = Tutorial`: `🔁 Reescritura en formato Tutorial (híbrido) — [Artículo]`
 
-Mantener el mismo orden en todo el lote: es lo que permite revisar los artículos en serie sin
-perderse. Si un artículo quedó con el orden alterado, no hace falta reordenarlo —no se pierde
-nada—, pero sí unificar de ahí en adelante.
+### Modalidad B
 
-En **Modalidad B** no hay contenido anterior que rescatar ni página publicada que auditar, así que
-la página lleva solo **dos desplegables**: `🧭 Plan editorial y SEO` y `✍️ Artículo V1`.
+Si la pieza se investiga desde cero:
 
-🔴 **El primer desplegable de la Modalidad B a veces ya viene escrito, y entonces no se duplica.**
-Cuando la pieza nace de un **brief editorial** producido aguas arriba, la página del Content Hub ya
-llega con un desplegable `📋 Brief SEO/AEO — [tema]`. **Ese brief ES el primer desplegable: no se
-crea un `🧭 Plan editorial y SEO` aparte ni se resume el brief dentro de él.** El artículo cuelga
-debajo como `✍️ Artículo V1` y su callout de procedencia cita las secciones del brief que usó
-(`§4 fan-out`, `§5 estructura`, `§7 producto`, `§8 enlazado`, `§9 on-page`).
+1. `🧭 Plan editorial y SEO`
+2. `✍️ Artículo V1`
+3. Si `Formato = Tutorial`: híbrido al final
 
-Lo que cambia el número de desplegables **es el origen de la pieza**, no una preferencia de formato:
+Si ya llega con brief aguas arriba:
 
-| Cómo nació la pieza | Desplegables | Primero |
-|---|---|---|
-| **A** · reescritura de una URL publicada | **4** | `Contenido anterior del artículo` |
-| **B** · pieza nueva que investigamos nosotros | **2** | `🧭 Plan editorial y SEO` (lo escribimos) |
-| **B** · pieza nueva que llega con brief | **2** | `📋 Brief SEO/AEO` (ya está escrito) |
+1. `📋 Brief SEO/AEO — [tema]`
+2. `✍️ Artículo V1`
+3. Si `Formato = Tutorial`: híbrido al final
 
-Verificado en el lote de septiembre 2026 (N31, N32, N33): los tres llegaron con brief y ninguno
-necesitó plan editorial propio.
+🔴 No duplicar `Plan editorial y SEO` si ya existe `📋 Brief SEO/AEO`.
 
----
+## 2 · Fase 1 — Identificar el lote
 
-## Fase 1 · Identificar los artículos del mes
+1. Filtrar Content Hub por `Fecha de publicación` del mes objetivo.
+2. Separar por alcance pedido: reescrituras · artículos nuevos · ya publicados fuera del ciclo.
+3. Leer `Formato` en cada fila.
+4. Para cualquier fila con `Enlace`, abrir la URL antes de asignar modalidad.
+5. Si falta un enlace esperado de reescritura, buscar en Teams; si sigue faltando, reportar bloqueo y continuar.
+6. Tema `por definir` → crear contenedor/tarea solo si corresponde al alcance, **sin subtareas**.
 
-1. Consultar el Content Hub filtrando por `Fecha de publicación` dentro del mes objetivo.
-2. Separar primero por **alcance pedido**: reescrituras · artículos nuevos · ya publicados fuera del
-   ciclo. Una fila `Idea` que pertenece al bloque de artículos nuevos **no entra por arrastre en una
-   ejecución limitada a reescrituras**; se conserva intacta para la Modalidad B.
-3. Dentro del alcance, usar `Enlace` para decidir la modalidad, **no para decidir si la fila existe**:
-   con `Enlace` → A · Reescritura; sin `Enlace` → B · Artículo nuevo. Si una fila anunciada como
-   reescritura no tiene el enlace esperado:
-   - Buscar en **Teams** los mensajes de quien planifica el contenido (suele compartir el plan
-     mensual con los enlaces).
-   - Si tampoco aparece ahí, **reportar al usuario qué filas quedaron sin enlace y continuar con el
-     resto**.
-4. Los artículos con tema "por definir" se registran igual, pero **sin subtareas** hasta que el tema
-   exista.
+## 3 · Fase 2 — Rescatar contenido anterior (solo A)
 
-## Fase 2 · Rescatar el contenido anterior
+- Abrir una URL a la vez con extracción completa.
+- Agregar `Contenido anterior del artículo` sin borrar ni modificar lo previo.
+- Esa copia es texto plano: no sirve para afirmar enlaces, ALT, `title`, jerarquías o schema.
 
-Para cada artículo con `Enlace`:
+## 4 · Fases 3 y 4 — Análisis
 
-1. Abrir la URL publicada en **modo de extracción completa** (el modo rápido del sitio devuelve solo
-   la navegación, no el cuerpo). **Una URL a la vez**: la extracción completa es lenta.
-2. En la página del artículo dentro del Content Hub, agregar un encabezado desplegable 1 titulado
-   `Contenido anterior del artículo` con el contenido íntegro traído del sitio (títulos, párrafos,
-   listas, tablas).
-3. **No modificar ni borrar nada** del contenido que ya exista en la página.
-4. 🔴 **Tener presente su límite:** lo rescatado es una extracción de **texto plano**. Conserva las
-   palabras, pero **pierde los enlaces, los ALT, el `title` real, el nivel de los encabezados y el
-   marcado**. Sirve para auditar **contenido**; no sirve para auditar la **capa técnica**.
+→ `02_ANALISIS_AUDITORIA.md`
 
-## Fases 3 y 4 · Análisis
+Regla central: todo hallazgo técnico se verifica contra HTML/URL viva y termina con sección fechada
+`Verificación en la URL publicada`.
 
-→ [`02_ANALISIS_AUDITORIA.md`](02_ANALISIS_AUDITORIA.md)
+## 5 · Fase 5 / B5 — Escritura
 
-## Fase 5 · Reescritura del artículo
+→ `03_REDACCION_ARTICULO.md`
 
-→ [`03_REDACCION_ARTICULO.md`](03_REDACCION_ARTICULO.md)
+Al terminar el V1:
 
-Al terminar, mover el `Estado` del artículo en el Content Hub a **`En revisión`** (Fase 10).
+- mover Content Hub a `En revisión`;
+- si `Formato = Artículo`, continuar a producción visual;
+- si `Formato = Tutorial`, **todavía no crear la tarea de fotos de pasos**: primero producir el
+  híbrido con `13_FORMATO_TUTORIAL_HIBRIDO.md`.
 
----
+## 6 · Modalidad B — Artículo nuevo
 
-## Modalidad B · Artículo nuevo
+### B1 · Brief de origen
 
-Aplica cuando **no hay URL publicada que auditar**. **Reemplaza a las Fases 2 a 5**; al terminar se
-continúa con la Fase 6 igual que en una reescritura. Todo el trabajo previo a la escritura vive en un
-único desplegable `🧭 Plan editorial y SEO`, dentro de la misma página del Content Hub.
+Antes de idear:
 
-> No es burocracia: es lo que evita escribir mil cuatrocientas palabras alrededor de un ángulo
-> equivocado.
+- buscar qué pidió el cliente en Teams;
+- buscar fichas/material oficial en SharePoint;
+- registrar literalmente el pedido y los assets pendientes;
+- no declarar que algo “no existe” solo porque no apareció en un listado paginado.
 
-### Fase B1 · Brief de origen
+### B2 · Decidir el ángulo
 
-Antes de proponer nada, **buscar qué pidió el cliente**. Casi siempre existe y casi siempre es más
-específico de lo que parece.
+Responder por escrito: **¿por qué esto es un artículo y no una ficha de producto?**
 
-1. Buscar en **Teams**, en el canal compartido con el cliente, los mensajes de quien planifica el
-   contenido. El plan mensual suele traer el tema marcado como "nuevo a desarrollar" y, en el mismo
-   hilo, la **referencia exacta** del producto o del ángulo, además del formato que pide el CMS.
-2. Buscar en **SharePoint** el material del tema: fichas técnicas en PDF, presentaciones, catálogos.
-   **La ficha técnica es la fuente de los datos duros.**
-3. Anotar en el plan qué pidió el cliente **con sus palabras**: no es lo mismo "una ficha" que "un
-   artículo explicativo". Anotar también qué material prometió y todavía no entrega.
-4. Si el usuario menciona que alguien compartió una referencia, **buscarla antes de proponer
-   ángulos**. Proponer ideas propias cuando el cliente ya dijo qué quiere es trabajo perdido.
+- entrar por el problema del lector, no por un nombre de producto desconocido;
+- explicar el problema antes de introducir marca/producto;
+- no esconder limitaciones reales del producto.
 
-> 🔴 **No declarar que algo no existe solo porque no se encontró.**
-> *Caso real:* se dio por hecho que un producto no tenía ficha pública porque no aparecía en el
-> listado del catálogo. Sí existía, y el cliente tenía la URL a mano.
-> El listado paginado de un catálogo **no** es un índice completo. Antes de escribir "no hay página
-> pública": probar el patrón de URL del sitio (`/productos/familia/subfamilia/slug`), buscar el
-> nombre exacto en el buscador del sitio y, si sigue sin aparecer, **preguntarle al cliente** en
-> lugar de afirmarlo.
+### B3 · Arquitectura SEO antes de escribir
 
-### Fase B2 · Decidir el ángulo
+Dejar decidido:
 
-La pregunta que abre esta fase: **¿por qué esto es un artículo y no una ficha de producto?** Si no
-hay respuesta, todavía no hay artículo.
+- keyword principal + 3–4 secundarias con rol;
+- title, slug, meta y H1 con conteos;
+- mapa de H2/H3;
+- longitud objetivo;
+- dosis/entrada del producto;
+- validación de colisión del slug.
 
-- Un producto nuevo casi nunca tiene demanda de búsqueda por su nombre: **nadie busca lo que no sabe
-  que existe**. Buscar el **problema del lector** que ese producto resuelve y escribir sobre eso.
-- Regla del texto: **el lector tiene que entender el problema antes de que aparezca la marca**.
-- Dejar escrito en el plan **por qué se descartó el enfoque de ficha**. Es lo que sostiene la
-  decisión frente al cliente.
-- Si el producto tiene una limitación evidente (un solo color, un solo uso), **no esconderla**:
-  explicarla como consecuencia del mecanismo y ofrecerle al lector la alternativa donde sí obtiene
-  lo que buscaba.
+Jerarquías sin herramienta = **estimación**, no dato medido.
 
-### Fase B3 · Arquitectura SEO antes de escribir
+### B4 · Datos verificados
 
-En la reescritura esto se audita; aquí se **decide**, y todo queda en el plan antes del texto:
+Crear tabla de claims permitidos a partir de ficha técnica + ficha pública viva.
 
-- **Keywords:** una principal y tres o cuatro secundarias, cada una con su intención y con **el rol
-  exacto que cumple en el artículo** (title, un H2 concreto, una FAQ, los ALT). Marcar la jerarquía
-  como **estimación** mientras no haya herramienta de datos.
-- **Title, slug, metadescripción y H1**, cada uno con su conteo de caracteres y **en viñetas, no en
-  tabla**. **El H1 no repite el title.**
-- **Verificar que el slug no colisione** con ningún artículo ya publicado.
-- **Mapa de encabezados** completo, con una línea por H2 explicando qué resuelve. Es el esqueleto
-  que después se rellena.
-- **Longitud objetivo**, coherente con la guía editorial.
-- **Dosis del producto:** en qué punto del texto entra, **expresado en porcentaje**, y cuánto ocupa
-  del total. La **categoría** se nombra primero y el **producto** después. **Nunca al revés.**
+- lo que no esté verificado no entra;
+- si dos fuentes contradicen, ambas quedan como discrepancia y ninguna se publica;
+- una canónica planificada puede vivir en metadata, pero no activa distribución mientras siga soft-404.
 
-### Fase B4 · Datos verificados
+### B5 · Escribir
 
-- Volcar al plan una tabla con **todos los datos duros** que pueden afirmarse en el cuerpo, tomados
-  de la ficha técnica y de la ficha pública. **Lo que no esté en esa tabla no entra al artículo.**
-- Abrir la ficha pública del producto **en vivo** (extracción completa, una URL a la vez) para
-  confirmar serie, acabado, presentaciones, productos complementarios y la URL de la calculadora si
-  existe.
-- 🔴 **Si dos fuentes se contradicen, no elegir una:** dejar ambas en un callout de discrepancia y
-  reportárselo al cliente. **Ningún dato en disputa entra al texto.**
-- Lo que el cliente no ha respaldado con un documento **no se promete**, aunque suene bien: ahorros
-  en dinero, porcentajes de eficiencia o garantías se escriben **solo con respaldo**.
+Usar la misma estructura del módulo `03`.
 
-### Fase B5 · Escribir el artículo
+Además:
 
-Se escribe en un desplegable `✍️ Artículo V1` **debajo** del plan, con la misma estructura interna
-que la reescritura (→ [`03_REDACCION_ARTICULO.md`](03_REDACCION_ARTICULO.md)) y las mismas reglas
-editoriales. Además, propio de esta modalidad:
+- plan de enlaces **salientes + entrantes**;
+- handoff explícito a CMS;
+- renombrar fila si traía marcador `por desarrollar`;
+- estado `En revisión`.
 
-- 🔴 **Plan de enlazado en dos direcciones.** Los salientes son los de siempre. Los **entrantes** son
-  el paso que se olvida: **un artículo nuevo nace huérfano**, así que hay que listar desde qué
-  artículos ya publicados va a recibir enlaces y **en qué sección de cada uno**.
-- **Handoff al CMS:** dejar explícito el formato que pide el cliente y recordar que el CMS antepone
-  el nombre de la marca al title, lo que puede truncarlo.
-- Al terminar, `Estado` a `En revisión` y **renombrar la fila** del Content Hub si traía un marcador
-  del tipo "(por desarrollar)".
+## 7 · Fase 6 — Proyecto mensual
 
----
-
-## Fase 6 · Crear el proyecto del mes
-
-En la base **Proyectos**. El proyecto mensual es el **contenedor obligatorio** del ciclo, no una
-tarjeta decorativa: antes de crear tareas, buscar si ya existe el proyecto del mismo mes para no
-duplicarlo; luego relacionar con él la tarea principal y las ocho subtareas de cada artículo.
+Buscar primero si ya existe. No duplicar.
 
 | Campo | Valor |
 |---|---|
-| Nombre del proyecto | `Produccion Creativa - [Mes] [AA]` |
+| Nombre | `Produccion Creativa - [Mes] [AA]` |
 | Ícono | 🎨 |
-| Estado | `Planificación` |
-| Propietario | Responsable del ciclo |
-| Fechas | Primer día → último día del mes |
+| Estado inicial | `Planificación` |
+| Estado con producción real | `En curso` |
+| Fechas | primer → último día del mes |
 
-El estado inicial es `Planificación`. En cuanto exista producción real —por ejemplo, artículos ya
-escritos o tareas listas para revisión— se mueve a `En curso`; dejarlo en `Planificación` con trabajo
-activo comunica un estado falso.
+## 8 · Fase 7 — Tarea principal por pieza
 
-## Fase 7 · Tareas principales (una por artículo)
+Naming: `Artículo N## - [Título]`.
 
-En la base `Tareas`, una tarea por artículo **por producir**:
+`N##` es continuo entre meses.
 
-- **Naming:** `Artículo N## - [Título del artículo]`. 🔴 La numeración `N##` es **continua entre
-  meses**: continúa desde el último número del proyecto anterior, **nunca reinicia en N1**.
-- **Propiedades:** `Responsables` = redactor del ciclo · `Tipo de entregable` = `Contenido` ·
-  `Fecha límite` = primera semana del mes (los banners y sociales dependen de esto) · `Proyecto` =
-  el proyecto del mes (relación) · `Artículo (Content Hub)` = la fila del artículo (relación) ·
-  `Estado` = `Sin empezar` (o el estado real si ya avanzó).
-- Los artículos con tema por definir llevan tarea principal pero **sin subtareas**.
+Propiedades mínimas:
 
-## Fase 8 · Subtareas (4 banners + 4 derivados sociales)
+- Responsable del ciclo
+- `Tipo de entregable = Contenido`
+- primera semana como fecha objetivo
+- relación al proyecto
+- relación `Artículo (Content Hub)`
+- estado real
 
-Todas con `Proyecto` = proyecto del mes, `Tarea principal` = tarea del artículo, `Responsables` =
-diseñador, `Estado` = `Sin empezar`.
+## 9 · Fase 8 — Producción derivada
 
-| Subtarea | `Tipo de entregable` | `Fecha límite` |
-|---|---|---|
-| **Banners N1–N4** | `Diseño gráfico` | ~2.ª semana del mes |
-| Social **Facebook** · **Instagram Story** · **Pinterest Pin** | `Diseño gráfico` | banners + ~2 días |
-| Social **Reel/TikTok/Short** | `Video` • `Motion graphics` | banners + ~2 días |
+### Para `Formato = Artículo`
 
-🔴 **`Artículo (Content Hub)` se puebla en TODAS, también en los banners** — no solo en los
-derivados. Hoy 187 de 283 tareas no lo tienen y la trazabilidad artículo→arte cuelga del `N##` del
-nombre: si alguien renombra, se pierde (→ [`07_SISTEMA_NOTION.md`](07_SISTEMA_NOTION.md)).
+Por artículo escrito:
 
-🔴 **Dos numeraciones distintas que no se mezclan:** el **banner numera la PIEZA** (`Banner N1`…
-`Banner N4`, reinicia en cada artículo) y el **artículo y el social numeran el ARTÍCULO** (`Artículo
-N30`, `Social N30`, continuo entre meses). Nunca `Banner N30-1`.
+- 4 banners
+- 4 derivados sociales
 
-**`Responsables` = el diseñador del ciclo.** No lo inventes: **míralo en las subtareas del artículo
-anterior** y usa el mismo, salvo que el operador diga otra cosa.
+Canales sociales vigentes:
 
-Detalle de fichas por pieza → [`05_BANNERS_IMAGENES.md`](05_BANNERS_IMAGENES.md) ·
-[`11_FICHA_DE_PRODUCCION_INFOGRAFIA.md`](11_FICHA_DE_PRODUCCION_INFOGRAFIA.md) · copy social →
-[`06_DERIVADOS_SOCIALES.md`](06_DERIVADOS_SOCIALES.md)
+1. Facebook
+2. **Instagram Story** — no post estático
+3. Pinterest Pin
+4. Reel/TikTok/Short
 
-### Aritmética de aceptación del lote
+### Para `Formato = Tutorial`
 
-Para `A` artículos ya escritos dentro del alcance, el proyecto debe terminar con:
+Además del set anterior, cuando el híbrido ya esté escrito:
 
-- `A` tareas principales;
-- `4A` tareas de banner;
-- `4A` tareas de derivados sociales;
-- `4A` subítems sociales en el Content Hub;
-- `9A` tareas totales relacionadas al proyecto.
+- **1 tarea adicional** `Tutorial N## - Secuencia Paso a Paso (X fotos) — [Artículo]`
+- normalmente X = 4 fotos, una por paso
+- seguir `13_FORMATO_TUTORIAL_HIBRIDO.md`
 
-**Fixture verificado, octubre 2026:** `A = 8`, artículos `N35–N42` → **72 tareas** en el proyecto:
-8 principales + 32 banners + 32 sociales, más 32 subítems sociales en el Content Hub. El lote se
-produjo en dos pasadas: seis reescrituras `N35–N40` y, después de validar sus briefs y canónicas
-planificadas, dos artículos nuevos `N41–N42` por Modalidad B. Calendario interno del fixture:
-artículos **7 de octubre**, banners **14 de octubre**, sociales **16 de octubre**.
+🔴 Las fotos de pasos **no sustituyen** los banners N1–N4.
 
-## Fase 9 · Íconos
+### Numeraciones
 
-Aplicar a **todas** las tareas creadas:
+- artículo/social → `N##` continuo mensual;
+- banner → `N1…N4`, reinicia por artículo;
+- fotos de tutorial → archivos de diseño `N##_PASO-1`, etc.
 
-| Tipo de página | Ícono |
+### Relaciones
+
+Toda subtarea debe llevar:
+
+- Proyecto
+- Tarea principal
+- `Artículo (Content Hub)`
+- Responsable real tomado del ciclo anterior o instrucción explícita
+- Estado real
+
+## 10 · Aritmética de aceptación
+
+Para `A` piezas formato Artículo escritas:
+
+- `A` tareas principales
+- `4A` banners
+- `4A` sociales
+- `4A` subítems sociales
+- **`9A` tareas** en proyecto
+
+Para `T` piezas formato Tutorial, sumar además:
+
+- `T` tareas de secuencia Paso a Paso
+
+Total de tareas del proyecto = **`9A + 10T`** si todas las piezas del lote están escritas y cada
+Tutorial mantiene los 4 banners + 4 sociales + 1 secuencia de fotos.
+
+## 11 · Fase 9 — Íconos
+
+| Tipo | Ícono |
 |---|---|
-| Proyecto mensual | 🎨 |
-| Tarea de artículo | ▶️ |
+| Proyecto | 🎨 |
+| Artículo | ▶️ |
 | Banner | 🖼️ |
-| Social Instagram | 📱 |
-| Social Facebook | 🔲 |
-| Social Pinterest | 📍 ⚠️ el de la **tarea**; el **subítem** del Content Hub lleva 📌 (`06`) |
-| Social Reel/TikTok/Short | ▶️ |
+| Tutorial secuencia | 📸 |
+| Instagram Story | 📱 |
+| Facebook | 🔲 |
+| Pinterest tarea | 📍 |
+| Reel/TikTok/Short | ▶️ |
 
-## Fase 10 · Estados y cierre del ciclo
+## 12 · Fase 10 — Estados y cierre
 
-Los estados son la señal de avance que ve el resto del equipo: **se mueven en el momento, no al
-final del mes**.
+- V1 terminado → Content Hub `En revisión`.
+- Aprobado → `Aprobado`; live → `Publicado`.
+- Sin tema → `Idea`, no tocar.
+- Proyecto con trabajo activo → `En curso`.
 
-| Dónde | Cuándo | A qué estado |
-|---|---|---|
-| Artículo en el Content Hub | Reescritura V1 terminada | `En revisión` |
-| Artículo en el Content Hub | Aprobado por el cliente | `Aprobado`, y `Publicado` cuando salga al sitio |
-| Artículo en el Content Hub | Sin enlace ni tema definido | Se queda en `Idea`: **no se toca** |
-| Proyecto del mes | Empieza la producción real | `En curso` |
+🔴 Hacer **segunda lectura fresca** tras automatizaciones de Notion: fechas, estados, relaciones,
+responsables, `Formato` y contenido guardado.
 
-Mover el estado **solo** donde se cumple la condición: los artículos ya publicados de ciclos
-anteriores y los que siguen sin tema **no se tocan**.
+## 13 · Reporte de avance
 
-🔴 **El éxito de una escritura no cierra la verificación.** Algunas automatizaciones de Notion pueden
-reescribir `Fecha límite` o `Estado` después de crear la página. Hacer una primera lectura de control
-al terminar cada nivel y una **segunda lectura fresca al cerrar el lote**; verificar proyecto,
-relaciones, responsables, tipo de entregable, fecha y estado contra el calendario interno. El valor
-guardado en esa segunda lectura es la evidencia, no el payload enviado.
+Siempre tres grupos:
 
-🔴 **Al reportar avance, separar siempre en tres grupos:** **listos** · **faltantes con el motivo del
-bloqueo** · **fuera de alcance** (ya publicados). *Un conteo sin el motivo del bloqueo no sirve para
-decidir nada.*
+1. **Listos**
+2. **Bloqueados**, con motivo explícito
+3. **Fuera de alcance**
 
-## Checklist de cierre del mes
+## Checklist de cierre
 
-- [ ] Todos los artículos del mes identificados, modalidad asignada y enlaces faltantes de reescrituras reportados
-- [ ] `Contenido anterior del artículo` rescatado en cada página
-- [ ] `Análisis SEO/AEO` y `Análisis de contenido` completos
-- [ ] Cada análisis verificado contra el HTML de la URL publicada, con su sección de verificación fechada
-- [ ] Errores de producción detectados en el sitio reportados al usuario por separado
-- [ ] Reescritura agregada sin borrar el contenido previo, con enlaces verificados y sin RGB en el cuerpo
-- [ ] Proyecto mensual creado (🎨, fechas del mes y estado real: `Planificación` o `En curso`)
-- [ ] Una tarea principal por artículo, numeración continua, relacionada al Content Hub
-- [ ] 4 banners + 4 derivados **solo** en artículos ya escritos (el resto sin subtareas o en `Bloqueado`)
-- [ ] Cada subtarea de banner tiene su Ficha de contenido completa, derivada del artículo final
-- [ ] ALT, nombre de archivo y posición de cada banner coinciden con lo especificado en la reescritura
-- [ ] Cada ficha cumple la Spec para imágenes (campos, 1408 × 768, menos de 200 KB, ALT, permanencia)
-- [ ] Una sola pieza por artículo marcada 🔁, con sus cuatro variantes sociales
-- [ ] Banners creados antes de la reescritura: fichas revisadas contra el texto final
-- [ ] Íconos aplicados a todas las tareas según la convención
-- [ ] Artículos con tema por definir: tarea creada, subtareas pendientes
-- [ ] Reescritura con callout de procedencia, metadatos en viñetas, banners en posición y callout ⚠️
-- [ ] Texto releído: sin erratas en nombres de producto ni de color
-- [ ] `Estado` de cada artículo reescrito movido a `En revisión`
-- [ ] `Estado` del proyecto del mes actualizado
-- [ ] Segunda lectura del lote confirma fechas y estados después de las automatizaciones de Notion
-- [ ] Conteo de aceptación: `9A` tareas en el proyecto y `4A` subítems sociales para `A` artículos escritos
-- [ ] Avance reportado en tres grupos
-- [ ] Texto auditado contra la guía de Voz y Tono, con la lista de fallas típicas
-
-### Adicional para artículos nuevos (Modalidad B)
-
-- [ ] Brief buscado en Teams y material en SharePoint **antes** de proponer nada
-- [ ] Justificado por escrito por qué es artículo y no ficha de producto
-- [ ] Title, slug, metadescripción, H1 y mapa de encabezados decididos antes de escribir, con conteo
-- [ ] Slug verificado contra los artículos ya publicados
-- [ ] Tabla de datos verificados cerrada, con las discrepancias anotadas y reportadas
-- [ ] Ningún claim sin respaldo documental del cliente
-- [ ] Plan de enlaces **entrantes** desde artículos existentes
-- [ ] Fila del Content Hub renombrada si traía un marcador de "por desarrollar"
-- [ ] Canónica planificada marcada como destino futuro si todavía es soft-404; ningún enlace entrante ni derivado se activa antes del QA live
+- [ ] `Formato` leído en cada fila
+- [ ] Modalidad asignada por contenido vivo, no por `Enlace`/HTTP 200
+- [ ] Contenido anterior rescatado solo donde corresponde
+- [ ] Auditoría SEO/AEO verificada contra URL viva
+- [ ] Artículo/rewrite escrito sin borrar contenido previo
+- [ ] Enlaces sin `/search?q=` y verificados
+- [ ] Sin RGB/HEX de pintura en cuerpo
+- [ ] Voz Berel es-MX auditada
+- [ ] Proyecto mensual único y en estado real
+- [ ] Tareas principales relacionadas al Content Hub
+- [ ] 4 banners solo después de texto escrito
+- [ ] Instagram = Story
+- [ ] 4 derivados sociales con paridad tarea ↔ subítem
+- [ ] Tutoriales llevan híbrido antes de fotos
+- [ ] Tutoriales llevan 1 tarea adicional de secuencia Paso a Paso
+- [ ] ALT/archivo/posición conservan una sola fuente de verdad
+- [ ] Segunda lectura fresca confirma propiedades guardadas
+- [ ] Conteo `9A + 10T` cuadra para el lote terminado
+- [ ] Reporte final separa listos · bloqueados · fuera de alcance
