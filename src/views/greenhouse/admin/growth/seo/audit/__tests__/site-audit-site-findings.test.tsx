@@ -81,7 +81,9 @@ describe('SiteAuditSiteFindings', () => {
     )
 
     expect(container.textContent).not.toMatch(/página[s]? afectada/i)
-    expect(screen.getByText('Todo el sitio')).toBeInTheDocument()
+    // El alcance abre la línea de contexto, junto al lugar de detección: es el mismo renglón
+    // donde una fila de página declara "N páginas afectadas".
+    expect(screen.getByText(/^Todo el sitio · En robots\.txt/)).toBeInTheDocument()
   })
 
   it('🔴 siempre dice DÓNDE se detectó', () => {

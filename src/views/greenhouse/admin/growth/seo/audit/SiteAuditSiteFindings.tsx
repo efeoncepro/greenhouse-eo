@@ -134,7 +134,14 @@ const SiteAuditSiteFindings = ({ groups }: Props) => {
     // El hallazgo de borde nombra que el robots está limpio: sin esa mitad, el cliente lo
     // confunde con el hallazgo de robots y busca el problema en el archivo equivocado.
     const edgeNote = detail.robotsAllowsCrawlers === true ? GH_GROWTH_SEO_AUDIT.site.edgeCleanRobots : null
-    const context = [place, agents, edgeNote].filter(Boolean).join(' · ')
+
+    // El alcance ABRE la línea de contexto, en el mismo renglón donde una fila de página dice
+    // "N páginas afectadas". Como hijo flex suelto quedaba flotando a la derecha en desktop —con
+    // un vacío entre chip y título— y huérfano al final de la fila en 390px, después del hint:
+    // en los dos casos dejaba de leerse como declaración de alcance (visto en GVC).
+    const context = [GH_GROWTH_SEO_AUDIT.site.scopeLabel, place, agents, edgeNote]
+      .filter(Boolean)
+      .join(' · ')
 
     return (
       <Box component='li' key={group.issueType} sx={{ listStyle: 'none' }}>
@@ -162,11 +169,9 @@ const SiteAuditSiteFindings = ({ groups }: Props) => {
             <Typography variant='body1' fontWeight={600}>
               {group.label}
             </Typography>
-            {context ? (
-              <Typography variant='caption' color='text.secondary'>
-                {context}
-              </Typography>
-            ) : null}
+            <Typography variant='caption' color='text.secondary'>
+              {context}
+            </Typography>
             {group.hint ? (
               // Inline, nunca tooltip: en el hallazgo de postura este texto ES lo que impide
               // leerlo como falla, y además viaja al artefacto descargable.
@@ -176,17 +181,8 @@ const SiteAuditSiteFindings = ({ groups }: Props) => {
             ) : null}
           </Stack>
 
-          {/* Ocupa el lugar donde una fila de página dice "N páginas afectadas". Misma
-              posición, misma función: declarar alcance. Sin `[Ver →]`: un hallazgo de
-              dominio no tiene URLs que abrir, y un botón que no lleva a ninguna parte es
-              una promesa rota. */}
-          <Typography
-            variant='caption'
-            color='text.secondary'
-            sx={{ flexShrink: 0, alignSelf: { xs: 'flex-start', sm: 'flex-start' }, pt: { sm: 1 } }}
-          >
-            {GH_GROWTH_SEO_AUDIT.site.scopeLabel}
-          </Typography>
+          {/* Sin `[Ver →]`: un hallazgo de dominio no tiene URLs que abrir, y un botón que no
+              lleva a ninguna parte es una promesa rota. */}
         </Stack>
       </Box>
     )

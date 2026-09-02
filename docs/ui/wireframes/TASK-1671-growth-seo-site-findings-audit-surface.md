@@ -96,16 +96,24 @@ enseñaría al operador a no confiar en que estaba mirando lo mismo ayer.
 ### Anatomía de una fila de hallazgo de sitio
 
 ```
-⛔ Crítico   Los motores de IA no pueden leer el sitio          Todo el sitio
-             En robots.txt · OAI-SearchBot, PerplexityBot y 3 más
+⛔ Crítico   Los motores de IA no pueden leer el sitio
+             Todo el sitio · En robots.txt · OAI-SearchBot y 4 más
              El archivo robots.txt le niega el paso a los rastreadores que citan
              páginas en las respuestas de ChatGPT, Perplexity y Claude.
 ```
 
+> **Corregido el 2026-09-01 contra la implementación.** Este bloque decía que "Todo el sitio" iba
+> en una columna a la derecha, "misma posición que N páginas afectadas". Al mirar el GVC quedó
+> claro que esa posición real **no** es una columna: en la lista de página el conteo es un
+> `caption` BAJO el título. Como hijo flex suelto, el alcance flotaba a la derecha con un vacío
+> en desktop y caía huérfano al final de la fila en 390px, después del hint. Ahora **abre la
+> línea de contexto**, que sí es la misma posición y la misma función.
+
 Tres decisiones dentro de esa fila:
 
-1. **"Todo el sitio"** ocupa el lugar donde una fila de página dice "N páginas afectadas". Misma
-   posición, misma función —declarar alcance— y por eso no hace falta explicarla.
+1. **"Todo el sitio"** abre la línea de contexto, el mismo renglón donde una fila de página dice
+   "N páginas afectadas". Misma posición, misma función —declarar alcance— y por eso no hace
+   falta explicarla.
 2. **"En robots.txt" / "En el borde (CDN/WAF)"** es obligatorio y es la línea que sostiene la
    credibilidad del informe: un cliente que lee "bloqueas crawlers de IA", abre su `robots.txt`,
    lo ve limpio y concluye que el informe está equivocado — y con él, el resto del reporte.
