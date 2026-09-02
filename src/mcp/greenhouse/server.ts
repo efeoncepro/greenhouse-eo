@@ -4,6 +4,8 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 
 import { GreenhouseApiPlatformClient } from './http-client'
 import { resolveGreenhouseMcpConfig } from './config'
+import { getGreenhouseMcpSkillCatalog } from './skill-catalog'
+import { GREENHOUSE_MCP_SKILL_MANIFEST, GREENHOUSE_MCP_SKILL_URI_PREFIX } from './skill-manifest'
 import { createGreenhouseMcpHandlers, greenhouseMcpToolOutputSchema } from './tools'
 import {
   buildGreenhouseMcpServerIdentity,
@@ -132,6 +134,23 @@ export const createGreenhouseMcpServer = (
       outputSchema: greenhouseMcpToolOutputSchema
     },
     async () => handlers.getPlatformHealth()
+  )
+
+  // TASK-1804 — el manual de uso viaja por el protocolo, no en la nota del handshake. La
+  // descripción nombra el prerrequisito ANTES de la tool que gobierna (el único texto garantizado
+  // en contexto); el procedimiento vive en el manual y se paga sólo cuando se carga.
+  collector.registerTool(
+    'get_greenhouse_skill',
+    {
+      title: 'Get Greenhouse Skill',
+      description:
+        'Load an operating manual for this MCP surface on demand. Without name: the catalog (name, description, the tools each manual governs). With name: the full manual as markdown. Load seo-spend-discipline BEFORE calling any tool that commits provider budget, competitor-loop before proposing or declaring competitors, and seo-visibility-reading before describing where a client ranks. Manuals are static and identical for every consumer; a manual the current scope cannot read does not exist.',
+      inputSchema: {
+        name: z.string().trim().min(1).max(64).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getGreenhouseSkill(args)
   )
 
   collector.registerTool(
@@ -826,6 +845,56 @@ export const createGreenhouseMcpServer = (
     // `coverage` ya garantizó que existe: si no, el servidor no llegó hasta acá.
     collected.get(entry.name)?.()
   }
+
+  // TASK-1804 — el manifiesto de manuales es fuente sólo si algo falla cuando deja de serlo:
+  // manual declarado sin archivo, archivo sin declarar, frontmatter que no coincide o tool
+  // gobernada que no existe hacen fallar la construcción del servidor (lanza con los findings).
+  // Se verifica ACÁ, con el filesystem de este checkout; el cuerpo servido sale del lane.
+  getGreenhouseMcpSkillCatalog()
+
+  // Resource addressable: el mismo manual por URI estable, en el esquema de SEP-2640 (`skill://`).
+  // Mismo cuerpo que la tool, porque los dos lo piden al lane: byte-idénticos por construcción.
+  server.registerResource(
+    'greenhouse_skill',
+    new ResourceTemplate(`${GREENHOUSE_MCP_SKILL_URI_PREFIX}{name}/SKILL.md`, {
+      list: async () => {
+        const result = await client.getMcpSkills()
+        const data = result.data as { skills?: Array<{ name: string; description: string; uri: string }> }
+        const skills = Array.isArray(data.skills) ? data.skills : []
+
+        return {
+          resources: skills.map(skill => ({
+            uri: skill.uri,
+            name: skill.name,
+            description: skill.description,
+            mimeType: 'text/markdown'
+          }))
+        }
+      }
+    }),
+    {
+      title: 'Greenhouse Operating Manual',
+      description:
+        `An operating manual for this MCP surface (read-only, markdown with Agent Skills frontmatter). ` +
+        `Manuals: ${GREENHOUSE_MCP_SKILL_MANIFEST.map(entry => entry.name).join(', ')}.`,
+      mimeType: 'text/markdown'
+    },
+    async (uri, variables) => {
+      const name = Array.isArray(variables.name) ? variables.name[0] : variables.name
+      const result = await client.getMcpSkill({ name: String(name) })
+      const data = result.data as { body?: string }
+
+      return {
+        contents: [
+          {
+            uri: uri.href,
+            mimeType: 'text/markdown',
+            text: typeof data.body === 'string' ? data.body : ''
+          }
+        ]
+      }
+    }
+  )
 
   // Resource addressable: el mismo documento read-only por URI estable.
   server.registerResource(

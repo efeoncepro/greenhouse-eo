@@ -109,6 +109,13 @@ export const GREENHOUSE_MCP_TOOL_MANIFEST: readonly GreenhouseMcpToolManifestEnt
     spendsProviderBudget: false,
     purpose: 'Snapshot de salud de plataforma con safe modes y degradación honesta.'
   },
+  {
+    name: 'get_greenhouse_skill',
+    domain: 'platform',
+    writes: false,
+    spendsProviderBudget: false,
+    purpose: 'Manual de uso de la superficie MCP, bajo demanda: catálogo sin nombre, cuerpo con nombre.'
+  },
 
   // ── Webhooks: catálogo de eventos, suscripciones y entregas ────────────────
   {

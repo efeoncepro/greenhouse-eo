@@ -2,8 +2,8 @@
   "$comment": "GENERADO por pnpm mcp:manifest:generate (TASK-1780). NO editar a mano: el hash y el gate de Greenhouse lo detectan. Greenhouse declara que EXISTE; el gateway decide que CRUZA.",
   "source": "greenhouse-eo/src/mcp/greenhouse/tool-manifest.ts",
   "generator": "pnpm mcp:manifest:generate",
-  "manifestHash": "3bc9589ee038de401d0df6597cf39f9fb4e6771dca3aac43ebf000d0bc26fa27",
-  "toolCount": 43,
+  "manifestHash": "094b121f0dcc73ef6f4fa2b5b25552f7afd24bee94ecdfa27ee92deab83a0c44",
+  "toolCount": 44,
   "tools": [
     {
       "name": "get_context",
@@ -78,6 +78,18 @@
       "inputKeys": [],
       "description": "Read the ecosystem-facing platform health snapshot for the configured scope, including overall status, safe modes, degraded sources and recommended checks.",
       "descriptionHash": "28bcd7688d80d9a42b87842d8869151b7857803feb9b2d3c88af02860e1e53dc"
+    },
+    {
+      "name": "get_greenhouse_skill",
+      "domain": "platform",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Manual de uso de la superficie MCP, bajo demanda: catálogo sin nombre, cuerpo con nombre.",
+      "inputKeys": [
+        "name"
+      ],
+      "description": "Load an operating manual for this MCP surface on demand. Without name: the catalog (name, description, the tools each manual governs). With name: the full manual as markdown. Load seo-spend-discipline BEFORE calling any tool that commits provider budget, competitor-loop before proposing or declaring competitors, and seo-visibility-reading before describing where a client ranks. Manuals are static and identical for every consumer; a manual the current scope cannot read does not exist.",
+      "descriptionHash": "9d7652b4432dbc2658623fac563df80e1727fa863fb23002a07e35916a063f36"
     },
     {
       "name": "list_event_types",

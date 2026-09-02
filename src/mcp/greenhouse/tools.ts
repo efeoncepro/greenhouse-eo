@@ -207,7 +207,55 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'prepareSeoGroundedQueries'
   | 'getSeoProspectDiagnostic'
   | 'runSeoProspectDiagnostic'
+  | 'getMcpSkills'
+  | 'getMcpSkill'
 >) => ({
+  /**
+   * TASK-1804 — el manual de uso viaja por el protocolo. Sin `name` devuelve el catálogo
+   * (resúmenes, nunca cuerpos); con `name`, el manual completo. El TEXTO del content es el manual
+   * mismo: el agente lo carga para operar, no para leer un resumen de que existe.
+   */
+  async getGreenhouseSkill(input: { name?: string }) {
+    if (input.name) {
+      const name = input.name
+
+      return callTool(
+        result => {
+          const data = result.data as { body?: string; name?: string }
+
+          return typeof data.body === 'string' && data.body.length > 0
+            ? data.body
+            : `Loaded Greenhouse manual ${String(data.name ?? name)} (${result.requestId}).`
+        },
+        () => client.getMcpSkill({ name })
+      )
+    }
+
+    return callTool(
+      result => {
+        const data = result.data as {
+          skills?: Array<{ name?: string; description?: string; appliesTo?: string[] }>
+        }
+
+        const skills = Array.isArray(data.skills) ? data.skills : []
+
+        if (skills.length === 0) {
+          return `No Greenhouse manuals are available for this scope (${result.requestId}).`
+        }
+
+        const lines = skills.map(
+          skill =>
+            `- ${String(skill.name)} — ${String(skill.description ?? '')}` +
+            (Array.isArray(skill.appliesTo) && skill.appliesTo.length > 0
+              ? ` (governs: ${skill.appliesTo.join(', ')})`
+              : '')
+        )
+
+        return `Greenhouse manuals available (${skills.length}). Load one with get_greenhouse_skill({ name }):\n${lines.join('\n')}`
+      },
+      () => client.getMcpSkills()
+    )
+  },
   async getContext() {
     return callTool(
       result =>
