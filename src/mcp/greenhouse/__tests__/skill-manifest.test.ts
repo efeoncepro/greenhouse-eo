@@ -15,7 +15,7 @@
  * Y la paridad entre consumidores: la tool y el recurso `skill://` devuelven el MISMO cuerpo que el
  * catálogo, byte a byte, porque los dos lo piden al mismo lane.
  */
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -26,7 +26,9 @@ import {
   GreenhouseMcpSkillCatalogError,
   getGreenhouseMcpSkillCatalog,
   listGreenhouseMcpSkills,
-  loadGreenhouseMcpSkillCatalog,
+  buildGreenhouseMcpSkillCatalogArtifact,
+  buildGreenhouseMcpSkillCatalogFromArtifact,
+  loadGreenhouseMcpSkillCatalogFromFilesystem,
   observeGreenhouseMcpSkillFiles,
   parseGreenhouseMcpSkillFrontmatter,
   readGreenhouseMcpSkill,
@@ -263,7 +265,7 @@ describe('poder de detección de la cobertura (filesystem sintético)', () => {
 
     writeSkill(root, 'alpha')
 
-    const catalog = loadGreenhouseMcpSkillCatalog({ root, manifest: manifestFor('alpha'), tools: [{ name: 'get_context' }] })
+    const catalog = loadGreenhouseMcpSkillCatalogFromFilesystem({ root, manifest: manifestFor('alpha'), tools: [{ name: 'get_context' }] })
 
     expect(catalog.skills).toHaveLength(1)
     expect(catalog.skills[0].body.startsWith('---\nname: alpha')).toBe(true)
@@ -276,7 +278,7 @@ describe('poder de detección de la cobertura (filesystem sintético)', () => {
     writeSkill(root, 'alpha')
 
     expect(() =>
-      loadGreenhouseMcpSkillCatalog({ root, manifest: manifestFor('alpha', 'beta'), tools: [{ name: 'get_context' }] })
+      loadGreenhouseMcpSkillCatalogFromFilesystem({ root, manifest: manifestFor('alpha', 'beta'), tools: [{ name: 'get_context' }] })
     ).toThrow(/beta/)
   })
 
@@ -289,7 +291,7 @@ describe('poder de detección de la cobertura (filesystem sintético)', () => {
     let caught: unknown
 
     try {
-      loadGreenhouseMcpSkillCatalog({ root, manifest: manifestFor('alpha'), tools: [{ name: 'get_context' }] })
+      loadGreenhouseMcpSkillCatalogFromFilesystem({ root, manifest: manifestFor('alpha'), tools: [{ name: 'get_context' }] })
     } catch (error) {
       caught = error
     }
@@ -305,7 +307,7 @@ describe('poder de detección de la cobertura (filesystem sintético)', () => {
 
     expect(observeGreenhouseMcpSkillFiles(root)).toEqual([])
     expect(() =>
-      loadGreenhouseMcpSkillCatalog({ root, manifest: manifestFor('alpha'), tools: [{ name: 'get_context' }] })
+      loadGreenhouseMcpSkillCatalogFromFilesystem({ root, manifest: manifestFor('alpha'), tools: [{ name: 'get_context' }] })
     ).toThrow(/declara "alpha"/)
   })
 
@@ -315,8 +317,65 @@ describe('poder de detección de la cobertura (filesystem sintético)', () => {
     writeSkill(root, 'alpha', '# Sin frontmatter\n')
 
     expect(() =>
-      loadGreenhouseMcpSkillCatalog({ root, manifest: manifestFor('alpha'), tools: [{ name: 'get_context' }] })
+      loadGreenhouseMcpSkillCatalogFromFilesystem({ root, manifest: manifestFor('alpha'), tools: [{ name: 'get_context' }] })
     ).toThrow(/frontmatter|name=/)
+  })
+})
+
+describe('el artefacto generado es el runtime, y coincide con el filesystem (TASK-1804)', () => {
+  // El verificador REAL es `pnpm mcp:skills:check` (local:check + CI): compara bytes del artefacto
+  // committeado contra el filesystem. Este test lo replica en proceso para que un manual editado
+  // sin regenerar se ponga rojo también en `pnpm test`.
+  it('el catálogo de runtime (artefacto) es byte-idéntico al del filesystem', () => {
+    const fromFs = loadGreenhouseMcpSkillCatalogFromFilesystem()
+    const runtime = getGreenhouseMcpSkillCatalog()
+
+    expect(runtime.catalogHash).toBe(fromFs.catalogHash)
+    expect(runtime.skills.map(skill => [skill.name, skill.contentHash, skill.body])).toEqual(
+      fromFs.skills.map(skill => [skill.name, skill.contentHash, skill.body])
+    )
+  })
+
+  it('el artefacto es determinista: regenerarlo desde el filesystem produce los mismos bytes', () => {
+    const fromFs = loadGreenhouseMcpSkillCatalogFromFilesystem()
+
+    const artifactOnDisk = JSON.parse(
+      readFileSync(join(process.cwd(), 'src/mcp/greenhouse/skill-catalog.generated.json'), 'utf8')
+    )
+
+    expect(buildGreenhouseMcpSkillCatalogArtifact(fromFs)).toEqual(artifactOnDisk)
+  })
+
+  it('un artefacto editado a mano (cuerpo cambiado) LANZA por contentHash', () => {
+    const artifact = buildGreenhouseMcpSkillCatalogArtifact(loadGreenhouseMcpSkillCatalogFromFilesystem())
+
+    artifact.skills[0].body = `${artifact.skills[0].body}\n<!-- edición a mano -->\n`
+
+    expect(() => buildGreenhouseMcpSkillCatalogFromArtifact(artifact)).toThrow(/contentHash/)
+  })
+
+  it('un artefacto viejo (manifiesto con un manual más) LANZA nombrando el manual', () => {
+    const artifact = buildGreenhouseMcpSkillCatalogArtifact(loadGreenhouseMcpSkillCatalogFromFilesystem())
+
+    const manifest = [
+      ...GREENHOUSE_MCP_SKILL_MANIFEST,
+      {
+        name: 'brand-new-manual',
+        audience: 'internal' as const,
+        sourcePath: `${GREENHOUSE_MCP_SKILLS_ROOT}/brand-new-manual/SKILL.md`,
+        appliesTo: ['get_context']
+      }
+    ]
+
+    expect(() => buildGreenhouseMcpSkillCatalogFromArtifact(artifact, manifest)).toThrow(/brand-new-manual/)
+  })
+
+  it('un artefacto cuyo appliesTo divergió del manifiesto LANZA', () => {
+    const artifact = buildGreenhouseMcpSkillCatalogArtifact(loadGreenhouseMcpSkillCatalogFromFilesystem())
+
+    artifact.skills[0].appliesTo = [...artifact.skills[0].appliesTo, 'get_context']
+
+    expect(() => buildGreenhouseMcpSkillCatalogFromArtifact(artifact)).toThrow(/no coincide con el manifiesto/)
   })
 })
 

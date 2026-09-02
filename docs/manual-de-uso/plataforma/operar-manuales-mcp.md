@@ -27,19 +27,26 @@ el gateway es el que el repositorio declara.
    `sourcePath` y `appliesTo` con las herramientas que el manual gobierna.
 3. Si el manual gobierna una herramienta que compromete gasto, esa herramienta debe estar en
    `appliesTo` de `seo-spend-discipline`; la prueba lo exige.
-4. Corre las pruebas del dominio:
+4. Regenera el artefacto que viaja en el bundle (los manuales no se leen del filesystem en
+   runtime) y verifica que quedó al día:
+
+```bash
+pnpm mcp:skills:generate && pnpm mcp:skills:check
+```
+
+5. Corre las pruebas del dominio:
 
 ```bash
 pnpm vitest run src/mcp src/lib/api-platform/resources/ecosystem-mcp-skills.test.ts
 ```
 
-5. Corre el gate local:
+6. Corre el gate local:
 
 ```bash
 pnpm local:check
 ```
 
-6. Si agregaste una herramienta nueva al manifiesto de tools, regenera el artefacto con
+7. Si agregaste una herramienta nueva al manifiesto de tools, regenera el artefacto con
    `pnpm mcp:manifest:generate` y sincronízalo en el gateway con `pnpm greenhouse:manifest:sync`.
 
 ## Qué significan las señales
@@ -48,7 +55,8 @@ pnpm local:check
 | --- | --- | --- |
 | El servidor no construye y nombra un manual | Drift entre manifiesto y archivos: declarado sin archivo, archivo sin declarar, `name` distinto, o herramienta gobernada inexistente | Corregir lo que el mensaje nombra; nunca relajar la prueba |
 | La prueba de fuga falla | Un manual contiene un dato interno (UUID, `org-…`, ruta `src/`, id de task, secreto) | Reescribir el pasaje sin el dato; no agregar excepciones |
-| La lane responde 500 en producción con verde en local | Los `.md` no entraron al bundle de Vercel | Verificar `outputFileTracingIncludes` en `next.config.ts` |
+| `pnpm mcp:skills:check` falla | Editaste un manual o el manifiesto sin regenerar el artefacto | `pnpm mcp:skills:generate` y commitear el JSON junto al cambio |
+| El servidor o la lane lanzan "artefacto ... no coincide" | El JSON generado quedó viejo o se editó a mano | Regenerar; nunca editar `skill-catalog.generated.json` a mano |
 | Catálogo con menos manuales que el manifiesto | Nunca debería ocurrir: el reader falla antes | Tratar como incidente |
 | 404 al pedir un manual desde un binding de cliente | Comportamiento esperado: los manuales internos no existen para ese binding | Nada |
 
@@ -84,7 +92,7 @@ incluye estos tres chequeos (cuenta exacta, cuerpo completo, 404 de inexistente)
 
 ## Referencias técnicas
 
-- `src/mcp/greenhouse/skill-manifest.ts`, `src/mcp/greenhouse/skill-catalog.ts`
+- `src/mcp/greenhouse/skill-manifest.ts`, `src/mcp/greenhouse/skill-catalog.ts`, `scripts/ci/mcp-skill-catalog-artifact.ts`
 - `src/lib/api-platform/resources/ecosystem-mcp-skills.ts`
 - `docs/architecture/agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md` §8
 - `docs/operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md`

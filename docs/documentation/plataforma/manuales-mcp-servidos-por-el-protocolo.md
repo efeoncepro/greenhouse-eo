@@ -59,5 +59,8 @@ byte.
   lectura humana.
 - Si una herramienta que un manual enseña desaparece o cambia de nombre, el servidor no arranca:
   un manual que enseña un procedimiento muerto es peor que ninguno.
+- Los manuales viajan dentro del paquete desplegado como un archivo generado a partir de los
+  originales, con una verificación automática que impide desplegar un texto distinto al del
+  repositorio.
 
 > Detalle técnico: `src/mcp/greenhouse/skill-manifest.ts` (manifiesto), `src/mcp/greenhouse/skill-catalog.ts` (reader canónico), `docs/mcp/skills/**` (contenido), `src/lib/api-platform/resources/ecosystem-mcp-skills.ts` (lane), `efeonce-mcp/src/providers/greenhouse-skills.ts` (gateway).

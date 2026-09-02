@@ -253,10 +253,18 @@ que no se puede leer). Inexistente, no visible y nombre malformado devuelven el 
 `audience: client` está reservado hasta que existan grants por tenant (`TASK-1631`): ningún manual
 nace con ese valor.
 
-⚠️ **Los `.md` son FILESYSTEM INPUT del runtime de Vercel.** `next.config.ts` los declara en
-`outputFileTracingIncludes` para las tres rutas que los sirven. Sin eso, el reader lanza
-`declared_without_file` en producción con verde en local. El smoke del runbook MCP compara la
-**cuenta EXACTA** del catálogo contra el manifiesto, nunca `≥ 1`.
+🔴 **Los manuales viajan en el bundle como ARTEFACTO GENERADO, nunca se leen del filesystem en
+runtime.** La primera versión los leía con `readFileSync` y los declaraba en
+`outputFileTracingIncludes`; Vercel rechazó el build (deploy `greenhouse-oib3ykjp0`, 2026-09-02):
+una ruta con includes propios deja de agruparse con las demás y la función sola pesó **397 MB**
+contra un techo de 250 MB. La clase de problema es "filesystem input del runtime" y se cerró en
+vez de vigilarse: `pnpm mcp:skills:generate` produce `src/mcp/greenhouse/skill-catalog.generated.json`
+(mismo reader que valida la cobertura; `catalogHash` + `contentHash` por manual) y
+`pnpm mcp:skills:check` —en `local:check` y en CI— falla si difiere del filesystem. El runtime
+re-verifica hashes y coincidencia con el manifiesto al cargar: un artefacto viejo o editado a mano
+LANZA. **NUNCA** editar `skill-catalog.generated.json` a mano; **NUNCA** reintroducir `fs` ni
+`outputFileTracingIncludes` para los manuales. El smoke del runbook MCP sigue comparando la
+**cuenta EXACTA** del catálogo, nunca `≥ 1`.
 
 **SIEMPRE** que una tool nueva comprometa presupuesto, entra al `appliesTo` de
 `seo-spend-discipline` en el mismo PR: el test lo exige, y la línea de gasto de las

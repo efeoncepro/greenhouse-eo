@@ -733,8 +733,11 @@ en el manifiesto, lleva `annotations` coherentes, no diverge en schema y deriva 
 Las 15 tools de plataforma fuera del alcance federado siguen siendo una decisión de frontera, no
 drift.
 
-**Runtime.** Los `.md` son filesystem input de Vercel: `next.config.ts` los declara en
-`outputFileTracingIncludes` para las tres rutas que los sirven; el smoke compara la cuenta EXACTA
-del catálogo. Sin flag (aditivo, lectura pura), sin Entra (scope base), sin persistencia.
+**Runtime.** Los manuales viajan en el bundle como artefacto generado
+(`src/mcp/greenhouse/skill-catalog.generated.json`, `pnpm mcp:skills:generate` / `pnpm mcp:skills:check`
+en `local:check` y CI), no como filesystem input: la primera versión usó `outputFileTracingIncludes` y
+Vercel rechazó el build (la ruta dejó de agruparse y la función sola pesó 397 MB). El runtime re-verifica
+hashes y manifiesto al cargar. El smoke compara la cuenta EXACTA del catálogo. Sin flag (aditivo,
+lectura pura), sin Entra (scope base), sin persistencia.
 
 Invariantes operativos: `agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md` §8.

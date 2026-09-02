@@ -743,15 +743,16 @@ curl -s -H "Authorization: Bearer $TOK" "$BASE/api/platform/ecosystem/mcp/skills
 curl -s -H "Authorization: Bearer $TOK" "$BASE/api/platform/ecosystem/mcp/skills/seo-spend-discipline?externalScopeType=other&externalScopeId=efeonce-mcp-gateway" | jq -r '.data.body' | head -3
 ```
 
-Asserts, en este orden y sin atajos: `count` **igual** a la cuenta del manifiesto (no `≥ 1` — un
-catálogo corto con manifiesto no vacío es el síntoma de que los `.md` no entraron al bundle de
-Vercel; el reader lanza y la lane responde 500, nunca vacío); cada `body` empieza con
+Asserts, en este orden y sin atajos: `count` **igual** a la cuenta del manifiesto (no `≥ 1`; los
+manuales viajan como artefacto generado en el bundle —`pnpm mcp:skills:check`— y un artefacto viejo
+hace que el reader lance, nunca un catálogo corto en verde); cada `body` empieza con
 `---\nname: <nombre>`; un nombre inexistente responde `404`; sin token `401`; con un binding de
 cliente el catálogo es `[]` y cualquier detalle `404` (anti-oráculo, nunca `403`).
 
-Estado as-of 2026-09-02: código y tests verdes en los dos repos; **rollout pendiente** — la lane
-espera el deploy de Greenhouse (staging → release) y el gateway espera el deploy de Cloud Run del
-commit local de `efeonce-mcp`. No hay Entra, flag ni secreto nuevos.
+Estado as-of 2026-09-02: el gateway ya sirve `get_greenhouse_skill` (revisión
+`efeonce-mcp-gateway-00028-pmx`, commit `c588a1b`, front door 200/200/401); la lane vive en `develop`
+y **responde `not_found` desde producción hasta el próximo release `develop→main`** (decisión del
+operador: sin release en esta ventana). No hay Entra, flag ni secreto nuevos.
 
 ### `get_seo_provider_spend` — federada sin tool interna, por diseño
 

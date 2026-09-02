@@ -13,7 +13,9 @@ La superficie MCP gana un segundo canal de conocimiento de uso: un manifiesto de
 (`skill-manifest.ts`) hermano del de tools, tres `SKILL.md` publicables en `docs/mcp/skills/`
 (`seo-spend-discipline`, `seo-visibility-reading`, `competitor-loop`), la tool `get_greenhouse_skill`,
 el recurso `skill://efeonce/<name>/SKILL.md` y la lane ecosystem `GET /api/platform/ecosystem/mcp/skills[/{name}]`,
-todos sobre el mismo reader. Publicar es un acto explícito (drift manifiesto↔filesystem no construye el
+todos sobre el mismo reader. Los cuerpos viajan en el bundle como artefacto generado (`pnpm mcp:skills:generate`
+/ `mcp:skills:check`): leerlos del filesystem exigía `outputFileTracingIncludes` y Vercel rechazó el build (función sola
+de 397 MB). Publicar es un acto explícito (drift manifiesto↔filesystem no construye el
 servidor), un binding de cliente no sabe que los manuales existen (404 anti-oráculo) y la fuga de contenido
 interno la controla un test. Las `instructions` del handshake rutean al manual en vez de contener el
 procedimiento de gasto. El gateway federa la tool con su propio guard de paridad no-SEO (commit local en

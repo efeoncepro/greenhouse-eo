@@ -43,6 +43,18 @@ local (cuelga la máquina): lo prueba Vercel o se corre con autorización.
 ⚠️ El guard de paridad del gateway está anclado al dominio SEO y no veía una tool `platform`: nació
 `EXPECTED_GREENHOUSE_PLATFORM_TOOLS` + `computeFederatedNonSeoToolFindings` (test con regresiones).
 
+**Actualización (misma task, más tarde ese día):** el SHA `eed9992d5` rompió el build de staging —
+*"api/mcp/greenhouse is 397.29mb (limit 250mb)"*. No era el tamaño de los manuales (el glob resuelve 3
+archivos; `@vercel/nft` traza la ruta en 2,6 MB): una ruta con `outputFileTracingIncludes` propio deja de
+agruparse y su función sola supera el techo. Se cerró la clase: `skill-catalog.generated.json` generado desde
+`docs/mcp/skills/**` con `pnpm mcp:skills:generate`, gate `pnpm mcp:skills:check` en `local:check` y CI,
+hashes re-verificados al cargar, cero `fs` en runtime, tracing retirado de `next.config.ts`.
+🔴 **Decisión del operador: sin release a `main` en esta ventana; sólo el gateway.** `efeonce-mcp`
+`c588a1b` desplegado (revisión `efeonce-mcp-gateway-00028-pmx`, CI + Deploy Cloud Run success, front door
+200/200/401). Consecuencia declarada: `get_greenhouse_skill` responde `not_found` desde producción hasta que la
+lane llegue a `main`. Pendiente: lane verificada en staging con el SHA nuevo de `develop` + canary del gateway
+contra staging.
+
 ## 2026-09-02 (5) — TASK-1784: el eval de selección MCP refutó su propia hipótesis, y eso es el entregable
 
 Se midió la selección de tools SEO antes de tocar una descripción: **tool 94.5% / mercado 98.2% / gasto 100%**

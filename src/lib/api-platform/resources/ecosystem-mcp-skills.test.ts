@@ -158,21 +158,23 @@ describe('detalle de un manual MCP — lane ecosystem', () => {
   })
 })
 
-describe('los .md son filesystem input del runtime de Vercel', () => {
+describe('el runtime no depende del filesystem (TASK-1804, lección del build de Vercel)', () => {
   /**
-   * Guarda TEXTUAL que SEÑALA al verificador real, no lo reemplaza (`.claude/rules/test-guards.md`):
-   * el mecanismo que sostiene el invariante es (a) el reader, que LANZA `declared_without_file` si
-   * los archivos no llegaron al bundle —la lane responde 500, no un catálogo vacío—, y (b) el smoke
-   * de staging/producción del runbook MCP, que compara la CUENTA EXACTA del catálogo contra el
-   * manifiesto. Esta aserción sólo impide que alguien retire la declaración de tracing sin ver
-   * este comentario.
+   * La primera versión leía `docs/mcp/skills/**` en runtime y declaraba los `.md` en
+   * `outputFileTracingIncludes`; Vercel rechazó el build (función sola de 397 MB). El contrato
+   * vigente: el catálogo viaja como artefacto generado en el bundle y `pnpm mcp:skills:check` lo
+   * mantiene sincronizado. Esta guarda textual SEÑALA a ese verificador: impide reintroducir el
+   * tracing sin leer este comentario.
    */
-  it('next.config.ts declara docs/mcp/skills/** en outputFileTracingIncludes para las rutas que los sirven', () => {
+  it('next.config.ts no declara outputFileTracingIncludes para los manuales', () => {
     const nextConfig = readFileSync(join(process.cwd(), 'next.config.ts'), 'utf8')
 
-    expect(nextConfig).toContain('outputFileTracingIncludes')
-    expect(nextConfig).toContain(`${GREENHOUSE_MCP_SKILLS_ROOT}/**`)
-    expect(nextConfig).toContain('/api/platform/ecosystem/mcp/skills')
-    expect(nextConfig).toContain('/api/mcp/greenhouse')
+    expect(nextConfig).not.toContain(GREENHOUSE_MCP_SKILLS_ROOT)
+  })
+
+  it('la lane sirve la cuenta EXACTA del manifiesto desde el artefacto en bundle', async () => {
+    const result = await getEcosystemMcpSkillCatalogPayload({ context: internalCtx, request: request() })
+
+    expect(result.data.count).toBe(GREENHOUSE_MCP_SKILL_MANIFEST.length)
   })
 })

@@ -16,12 +16,19 @@
  * - `name` y `description` del catálogo vienen del frontmatter; el manifiesto sólo aporta
  *   `audience` y `appliesTo`.
  *
- * ═══ Runtime ═══
+ * ═══ Runtime: artefacto generado, NUNCA filesystem ═══
  *
- * Los `.md` son FILESYSTEM INPUT del runtime de Vercel: `next.config.ts` los incluye en el bundle
- * de las rutas que los sirven (`outputFileTracingIncludes`). Si el bundling no los incluye, este
- * reader lanza `declared_without_file` — la lane responde 500 y no un catálogo vacío en verde. Un
- * catálogo vacío con manifiesto no vacío es imposible por construcción.
+ * La primera versión leía `docs/mcp/skills/**` en runtime y declaraba los `.md` en
+ * `outputFileTracingIncludes`. Vercel rechazó el build: una ruta con includes propios deja de
+ * agruparse con las demás y la función sola pesó 397 MB (techo 250 MB). La clase de problema es
+ * "filesystem input del runtime", y se cierra en vez de vigilarse: el catálogo viaja como
+ * `skill-catalog.generated.json` importado en el bundle. Se GENERA con este mismo reader
+ * (`pnpm mcp:skills:generate`), lleva `catalogHash`, y `pnpm mcp:skills:check` (en `local:check` y
+ * CI) falla si difiere del filesystem. Al cargar, el runtime re-verifica el hash y la coincidencia
+ * con el manifiesto: un artefacto viejo o editado a mano LANZA, nunca sirve texto viejo en verde.
+ *
+ * La lectura de filesystem (`loadGreenhouseMcpSkillCatalogFromFilesystem`) queda para el
+ * generador y los tests; ningún consumidor de runtime la llama.
  */
 import { createHash } from 'node:crypto'
 import { readdirSync, readFileSync, statSync } from 'node:fs'
@@ -38,6 +45,7 @@ import {
   type GreenhouseMcpSkillFileObservation,
   type GreenhouseMcpSkillManifestEntry
 } from './skill-manifest'
+import generatedSkillCatalog from './skill-catalog.generated.json'
 import { GREENHOUSE_MCP_TOOL_MANIFEST, type GreenhouseMcpToolManifestEntry } from './tool-manifest'
 
 export interface GreenhouseMcpSkill {
@@ -159,13 +167,13 @@ export const observeGreenhouseMcpSkillFiles = (root: string = process.cwd()): Gr
 const sha256 = (value: string): string => createHash('sha256').update(value).digest('hex')
 
 /**
- * Construye el catálogo validado. LANZA `GreenhouseMcpSkillCatalogError` con todos los findings si
- * el manifiesto y el filesystem no coinciden en las dos direcciones.
+ * Construye el catálogo validado DESDE EL FILESYSTEM. LANZA `GreenhouseMcpSkillCatalogError` con
+ * todos los findings si el manifiesto y los archivos no coinciden en las dos direcciones.
  *
- * Parametrizado (root/manifest/tools) para que el test pueda ejercitar estados sintéticos sobre un
- * directorio temporal sin tocar el repo.
+ * Es la fuente del generador del artefacto y de los tests (parametrizado en root/manifest/tools
+ * para ejercitar estados sintéticos sobre un directorio temporal). El runtime NO la usa.
  */
-export const loadGreenhouseMcpSkillCatalog = (
+export const loadGreenhouseMcpSkillCatalogFromFilesystem = (
   options: {
     root?: string
     manifest?: readonly GreenhouseMcpSkillManifestEntry[]
@@ -207,16 +215,142 @@ export const loadGreenhouseMcpSkillCatalog = (
   }
 }
 
+/** Ruta del artefacto generado, relativa a la raíz del repo. */
+export const GREENHOUSE_MCP_SKILL_CATALOG_ARTIFACT_PATH = 'src/mcp/greenhouse/skill-catalog.generated.json'
+
+export interface GreenhouseMcpSkillCatalogArtifact {
+  $comment: string
+  source: string
+  generator: string
+  catalogHash: string
+  skillCount: number
+  skills: Array<{
+    name: string
+    description: string
+    audience: GreenhouseMcpSkillAudience
+    appliesTo: string[]
+    uri: string
+    sourcePath: string
+    body: string
+    contentHash: string
+  }>
+}
+
+/** La forma exacta que `pnpm mcp:skills:generate` escribe. Determinista: mismo catálogo ⇒ mismos bytes. */
+export const buildGreenhouseMcpSkillCatalogArtifact = (
+  catalog: GreenhouseMcpSkillCatalog
+): GreenhouseMcpSkillCatalogArtifact => ({
+  $comment:
+    'GENERADO por pnpm mcp:skills:generate (TASK-1804). NO editar a mano: el hash y el gate de ' +
+    'Greenhouse lo detectan. La fuente es docs/mcp/skills/**/SKILL.md + skill-manifest.ts.',
+  source: `greenhouse-eo/${GREENHOUSE_MCP_SKILLS_ROOT}`,
+  generator: 'pnpm mcp:skills:generate',
+  catalogHash: catalog.catalogHash,
+  skillCount: catalog.skills.length,
+  skills: catalog.skills.map(skill => ({
+    name: skill.name,
+    description: skill.description,
+    audience: skill.audience,
+    appliesTo: [...skill.appliesTo],
+    uri: skill.uri,
+    sourcePath: skill.sourcePath,
+    body: skill.body,
+    contentHash: skill.contentHash
+  }))
+})
+
+/**
+ * Reconstruye el catálogo desde el artefacto y lo RE-VERIFICA: hash por manual y del catálogo,
+ * coincidencia exacta con el manifiesto (nombres, orden, audiencia, appliesTo, sourcePath) y
+ * frontmatter presente. Un artefacto viejo, truncado o editado a mano LANZA nombrando el manual.
+ */
+export const buildGreenhouseMcpSkillCatalogFromArtifact = (
+  artifact: GreenhouseMcpSkillCatalogArtifact,
+  manifest: readonly GreenhouseMcpSkillManifestEntry[] = GREENHOUSE_MCP_SKILL_MANIFEST,
+  tools: readonly Pick<GreenhouseMcpToolManifestEntry, 'name'>[] = GREENHOUSE_MCP_TOOL_MANIFEST
+): GreenhouseMcpSkillCatalog => {
+  const files: GreenhouseMcpSkillFileObservation[] = artifact.skills.map(skill => {
+    const frontmatter = parseGreenhouseMcpSkillFrontmatter(skill.body)
+
+    return {
+      sourcePath: skill.sourcePath,
+      frontmatterName: frontmatter.name,
+      frontmatterDescription: frontmatter.description
+    }
+  })
+
+  const findings = computeGreenhouseMcpSkillCoverage({ manifest, files, tools })
+
+  if (findings.length > 0) {
+    throw new GreenhouseMcpSkillCatalogError(findings)
+  }
+
+  const byName = new Map(artifact.skills.map(skill => [skill.name, skill]))
+
+  const skills: GreenhouseMcpSkill[] = manifest.map(entry => {
+    const skill = byName.get(entry.name)
+
+    // La cobertura ya cruzó rutas y frontmatter; acá se cruza lo que el artefacto AFIRMA del
+    // manifiesto y del cuerpo, porque un JSON no se valida solo.
+    if (!skill) {
+      throw new Error(`Greenhouse MCP skills: el artefacto no contiene "${entry.name}". Regenera con pnpm mcp:skills:generate.`)
+    }
+
+    if (
+      skill.audience !== entry.audience ||
+      skill.sourcePath !== entry.sourcePath ||
+      skill.uri !== buildGreenhouseMcpSkillUri(entry.name) ||
+      skill.appliesTo.length !== entry.appliesTo.length ||
+      skill.appliesTo.some((tool, index) => tool !== entry.appliesTo[index])
+    ) {
+      throw new Error(
+        `Greenhouse MCP skills: el artefacto de "${entry.name}" no coincide con el manifiesto ` +
+          '(audience/sourcePath/uri/appliesTo). Regenera con pnpm mcp:skills:generate.'
+      )
+    }
+
+    if (sha256(skill.body) !== skill.contentHash) {
+      throw new Error(`Greenhouse MCP skills: el cuerpo de "${entry.name}" no coincide con su contentHash — artefacto editado a mano o corrupto.`)
+    }
+
+    return {
+      name: entry.name,
+      description: parseGreenhouseMcpSkillFrontmatter(skill.body).description ?? '',
+      audience: entry.audience,
+      appliesTo: entry.appliesTo,
+      uri: skill.uri,
+      sourcePath: skill.sourcePath,
+      body: skill.body,
+      contentHash: skill.contentHash
+    }
+  })
+
+  const catalogHash = sha256(skills.map(skill => skill.contentHash).join('\n'))
+
+  if (catalogHash !== artifact.catalogHash) {
+    throw new Error('Greenhouse MCP skills: el catalogHash del artefacto no coincide con su contenido — editado a mano o corrupto.')
+  }
+
+  return {
+    skills,
+    byName: new Map(skills.map(skill => [skill.name, skill])),
+    catalogHash
+  }
+}
+
 let cachedCatalog: GreenhouseMcpSkillCatalog | null = null
 
 /**
- * Catálogo memoizado por proceso sobre el repo real. El contenido es estático y versionado en git:
- * releerlo por request sería gasto sin información nueva. Los tests con estados sintéticos usan
- * `loadGreenhouseMcpSkillCatalog({ root })` y no pasan por acá.
+ * Catálogo de RUNTIME, memoizado por proceso: se construye desde el artefacto generado que viaja
+ * en el bundle (cero filesystem, cero tracing). Un artefacto que no coincide con el manifiesto
+ * LANZA al primer uso — la construcción del servidor MCP y la lane fallan loud, nunca sirven un
+ * catálogo vacío ni texto viejo en verde.
  */
 export const getGreenhouseMcpSkillCatalog = (): GreenhouseMcpSkillCatalog => {
   if (!cachedCatalog) {
-    cachedCatalog = loadGreenhouseMcpSkillCatalog()
+    cachedCatalog = buildGreenhouseMcpSkillCatalogFromArtifact(
+      generatedSkillCatalog as unknown as GreenhouseMcpSkillCatalogArtifact
+    )
   }
 
   return cachedCatalog

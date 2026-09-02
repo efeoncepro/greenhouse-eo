@@ -16,8 +16,21 @@
 - **Runtime pendiente:** lane en staging/producción con binding real (cuenta exacta, negación,
   401) y deploy de Cloud Run del gateway + smoke en `mcp.efeonce.org`. `pnpm build` de producción
   no se corrió en local (cuelga la máquina; correr con autorización o dejar que lo pruebe Vercel).
-- `next.config.ts` ganó `outputFileTracingIncludes` para `docs/mcp/skills/**` en las tres rutas
-  que los sirven: primer uso de esa clave en el repo.
+- **Slice 5 (build fix, 2026-09-02 15:11Z):** el build de staging del SHA `eed9992d5` FALLÓ —
+  *"The Vercel Function api/mcp/greenhouse is 397.29mb uncompressed (limit 250mb)"*. Causa
+  verificada por descarte: el glob de `outputFileTracingIncludes` resuelve exactamente 3 archivos
+  y `@vercel/nft` traza el bundle de la ruta en 2,6 MB; lo que rompe es que una ruta con includes
+  propios deja de agruparse con las demás y la función sola (runtime de Next + deps) supera el
+  techo. Cierre de la clase, no del caso: los manuales viajan como artefacto generado
+  `src/mcp/greenhouse/skill-catalog.generated.json` (`pnpm mcp:skills:generate` /
+  `pnpm mcp:skills:check` en `local:check` y CI; hashes re-verificados al cargar), cero `fs` en
+  runtime, `outputFileTracingIncludes` retirado. El spec pedía «declarar el riesgo del bundling»;
+  el riesgo se midió y se eliminó.
+- **Gateway desplegado (decisión del operador: sólo `mcp.efeonce.org`, sin release a `main`):**
+  `efeonce-mcp` `c588a1b` en `origin/main`, CI `33646464475` success, Deploy Cloud Run
+  `33646625344` success, revisión `efeonce-mcp-gateway-00028-pmx`, front door
+  `/.well-known/oauth-protected-resource` 200 · `/health` 200 · `POST /mcp` sin token 401. La tool
+  queda registrada respondiendo `not_found` honesto hasta que la lane llegue a producción.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -496,7 +509,7 @@ secretos nuevos, sin variables de entorno nuevas, sin coordinación con operador
 - [ ] (PENDIENTE — el assert existe en el canary del gateway y en el runbook; falta correrlo contra producción) El smoke de producción compara la **cuenta exacta** del catálogo contra el manifiesto, no `≥ 1`.
 - [x] El gateway federa la tool con `readOnlyHint: true`, tiene su entrada `EXPECTED_*` con razón, y
       el guard de paridad pasa.
-- [ ] (PENDIENTE — exige el deploy de Cloud Run del commit local de `efeonce-mcp`; la byte-identidad está probada en tests con el mismo reader) Un manual recuperado por `mcp.efeonce.org` es byte-idéntico al que devuelve la tool interna.
+- [ ] (PENDIENTE — el gateway YA está desplegado (`00028-pmx`) pero la lane no existe en producción hasta el próximo release; la byte-identidad está probada en tests con el mismo reader) Un manual recuperado por `mcp.efeonce.org` es byte-idéntico al que devuelve la tool interna.
 - [x] `MCP_TOOL_SURFACE_INVARIANTS.md` documenta el contrato del manifiesto de manuales y la regla de
       no publicar contenido interno.
 - [x] Cero cambios en Entra, cero scopes nuevos, cero escrituras.
