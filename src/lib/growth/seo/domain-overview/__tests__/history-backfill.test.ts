@@ -91,6 +91,8 @@ import {
   projectHistoryItems
 } from '../history-backfill'
 
+const ETV_FIXTURE = { version: 'legacy_static_v1', evidence: 'explicit_request', requestedAt: '2026-10-15T12:00:00.000Z', policyVersion: 'etv-policy.v1', historicalBasis: null } as const
+
 const historyItem = (year: number, month: number, etv: number) => ({
   se_type: 'google',
   year,
@@ -144,7 +146,8 @@ describe('projectHistoryItems', () => {
         domain: 'cliente.cl',
         locationCode: '2152',
         languageCode: 'es',
-        requestedMonths: ['2025-12', '2026-01', '2026-02']
+        requestedMonths: ['2025-12', '2026-01', '2026-02'],
+        etvMethodology: ETV_FIXTURE
       }
     )
 

@@ -80,6 +80,13 @@ export const ETV_PROVIDER_CUTOFF_MS = Date.parse(ETV_PROVIDER_CUTOFF_ISO)
  */
 export const ETV_METHODOLOGY_POLICY_VERSION = 'etv-policy.v1'
 
+/**
+ * Cómo se reparte el ETV de una referencia de AI Overview según el proveedor: uniformemente entre
+ * los dominios únicos citados. Es atribución MODELADA, nunca clics observados por cita: los
+ * consumers lo rotulan así y no lo suman al tráfico orgánico.
+ */
+export const AI_OVERVIEW_ETV_ATTRIBUTION = 'modeled_uniform_share_among_cited_domains'
+
 /** Parámetro EXACTO del contrato del proveedor. Sólo lo construye la policy; ningún caller lo escribe. */
 export const ETV_PROVIDER_REQUEST_PARAM = 'use_improved_etv'
 

@@ -70,6 +70,8 @@ vi.mock('@/lib/sync/publish-event', () => ({
 
 import { estimateBulkTrafficCost, estimateDomainTraffic, parseBulkTrafficItem } from '../traffic-estimation'
 
+const ETV_FIXTURE = { version: 'legacy_static_v1', evidence: 'explicit_request', requestedAt: '2026-10-15T12:00:00.000Z', policyVersion: 'etv-policy.v1', historicalBasis: null } as const
+
 const bulkResponse = (items: Array<Record<string, unknown>>, cost = 0.0124) => ({
   ok: true,
   httpStatus: 200,
@@ -100,7 +102,7 @@ describe('parseBulkTrafficItem', () => {
   it('sólo etv + count; posiciones y momentum quedan NULL (el screening no es la foto)', () => {
     const parsed = parseBulkTrafficItem(
       { target: 'competidor.cl', metrics: { organic: { etv: 812.4, count: 940 }, paid: { etv: 0, count: 0 } } },
-      { locationCode: '2152', languageCode: 'es' }
+      { locationCode: '2152', languageCode: 'es', etvMethodology: ETV_FIXTURE }
     )
 
     expect(parsed?.sourceEndpoint).toBe('bulk_traffic_estimation')

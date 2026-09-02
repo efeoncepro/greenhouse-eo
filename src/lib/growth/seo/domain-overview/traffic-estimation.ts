@@ -20,6 +20,9 @@ import 'server-only'
 import { postDataForSeoTask } from '@/lib/ai/dataforseo'
 import { captureWithDomain } from '@/lib/observability/capture'
 
+import { buildEtvMethodologyRequest, resolveConfiguredEtvMethodology } from '../etv-methodology'
+import { toPersistedEtvMethodology, type PersistedEtvMethodology } from '../etv-methodology/persisted'
+
 import { enforceSeoRunEntitlement } from '../entitlement'
 import { isSeoModuleEnabled } from '../flags'
 import { LABS_RESULT_ROW_USD, LABS_TASK_SETUP_USD } from '../provider-pricing'
@@ -59,9 +62,11 @@ const asNonNegativeNumber = (value: unknown): number | null => {
  * Proyecta un item de bulk al hecho persistible: sólo `etv`+`count`; el resto NULL — el
  * screening NUNCA finge ser la foto completa. Pura y exportada para probarse sin red.
  */
+export const BULK_TRAFFIC_ESTIMATION_ENDPOINT = '/v3/dataforseo_labs/google/bulk_traffic_estimation/live'
+
 export const parseBulkTrafficItem = (
   item: BulkTrafficItemRaw,
-  context: { locationCode: string; languageCode: string }
+  context: { locationCode: string; languageCode: string; etvMethodology: PersistedEtvMethodology }
 ): SeoDomainOverviewSnapshotInput | null => {
   const target = typeof item.target === 'string' ? item.target.trim() : ''
 
@@ -72,7 +77,8 @@ export const parseBulkTrafficItem = (
     locationCode: context.locationCode,
     languageCode: context.languageCode,
     captureDate: null,
-    sourceEndpoint: 'bulk_traffic_estimation'
+    sourceEndpoint: 'bulk_traffic_estimation',
+    etvMethodology: context.etvMethodology
   })
 
   return {
@@ -186,7 +192,8 @@ export const estimateDomainTraffic = async (input: {
     normalizedDomains: subjects.map(([normalized]) => normalized),
     locationCode: input.locationCode,
     languageCode: input.languageCode,
-    sourceEndpoints: ['domain_rank_overview', 'historical_rank_overview', 'bulk_traffic_estimation']
+    sourceEndpoints: ['domain_rank_overview', 'historical_rank_overview', 'bulk_traffic_estimation'],
+    etvMethodologyVersion: resolveConfiguredEtvMethodology().version
   })
 
   const pending = subjects.filter(([normalized]) => !fresh.has(normalized))
@@ -246,10 +253,14 @@ export const estimateDomainTraffic = async (input: {
 
   for (const chunk of chunks) {
     try {
+      // TASK-1805 — fórmula explícita por request (fail-closed antes de tocar al proveedor).
+      const etv = buildEtvMethodologyRequest({ endpoint: BULK_TRAFFIC_ESTIMATION_ENDPOINT })
+      const etvMethodology = toPersistedEtvMethodology(etv)
+
       const response = await postDataForSeoTask({
         family: 'labs',
         consumer: 'seo',
-        endpoint: '/v3/dataforseo_labs/google/bulk_traffic_estimation/live',
+        endpoint: BULK_TRAFFIC_ESTIMATION_ENDPOINT,
         organizationId: input.organizationId,
         tasks: [
           {
@@ -257,7 +268,8 @@ export const estimateDomainTraffic = async (input: {
             location_code: Number(input.locationCode),
             language_code: input.languageCode,
             // Sólo los canales que la tabla modela; cada item devuelto se cobra.
-            item_types: ['organic', 'paid']
+            item_types: ['organic', 'paid'],
+            ...etv.requestParams
           }
         ]
       })
@@ -294,7 +306,8 @@ export const estimateDomainTraffic = async (input: {
       for (const item of items) {
         const parsed = parseBulkTrafficItem(item, {
           locationCode: input.locationCode,
-          languageCode: input.languageCode
+          languageCode: input.languageCode,
+          etvMethodology
         })
 
         if (parsed) parsedByNormalized.set(parsed.normalizedDomain, parsed)
@@ -314,7 +327,8 @@ export const estimateDomainTraffic = async (input: {
               locationCode: input.locationCode,
               languageCode: input.languageCode,
               captureDate: null,
-              sourceEndpoint: 'bulk_traffic_estimation'
+              sourceEndpoint: 'bulk_traffic_estimation',
+              etvMethodology
             })
         )
 

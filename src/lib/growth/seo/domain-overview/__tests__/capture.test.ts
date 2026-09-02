@@ -99,6 +99,8 @@ import {
 } from '../capture'
 import { buildNullSnapshot, normalizeOverviewDomain } from '../persist'
 
+const ETV_FIXTURE = { version: 'legacy_static_v1', evidence: 'explicit_request', requestedAt: '2026-10-15T12:00:00.000Z', policyVersion: 'etv-policy.v1', historicalBasis: null } as const
+
 const providerOkResponse = (item: Record<string, unknown> | null, cost = 0.0121) => ({
   ok: true,
   httpStatus: 200,
@@ -182,7 +184,8 @@ describe('parseDomainOverviewSide / parseDomainRankOverviewItem', () => {
     const snapshot = parseDomainRankOverviewItem(sampleItem, {
       domain: 'Competidor.cl',
       locationCode: '2152',
-      languageCode: 'es'
+      languageCode: 'es',
+      etvMethodology: ETV_FIXTURE
     })
 
     expect(snapshot.normalizedDomain).toBe('competidor.cl')
@@ -201,6 +204,38 @@ describe('parseDomainOverviewSide / parseDomainRankOverviewItem', () => {
   })
 })
 
+describe('TASK-1805 — policy ETV en la foto mensual', () => {
+  it('cada request lleva use_improved_etv explícito (legacy → false) y el snapshot persiste método + evidencia + policy', async () => {
+    state.target = { seo_target_id: 'seot-1', organization_id: 'org-1', root_domain: 'cliente.cl', location_code: '2152', language_code: 'es', status: 'active' }
+    state.competitors = []
+    state.freshDomains = []
+    state.inserts = []
+    state.freshQueries = []
+    gateMock.mockResolvedValue({ allowed: true, blockedReason: null })
+    providerMock.mockResolvedValue(providerOkResponse({ metrics: { organic: { etv: 10, count: 1 }, paid: null } }))
+
+    const result = await captureDomainOverview('seot-1')
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) throw new Error('unreachable')
+    expect(result.etvMethodologyVersion).toBe('legacy_static_v1')
+
+    const call = providerMock.mock.calls[0][0] as { tasks: Array<Record<string, unknown>> }
+
+    expect(call.tasks[0]).toMatchObject({ use_improved_etv: false })
+
+    // La frescura se consulta POR MÉTODO.
+    expect(state.freshQueries[0].sql).toContain('etv_methodology_version = $6')
+    expect(state.freshQueries[0].params[5]).toBe('legacy_static_v1')
+
+    // El INSERT lleva la identidad metodológica completa y usa la UNIQUE formula-aware.
+    const insert = state.inserts[0]
+
+    expect(insert.sql).toContain('seo_domain_overview_capture_method_unique')
+    expect(insert.params.slice(30, 35)).toEqual(['legacy_static_v1', 'explicit_request', expect.any(String), 'etv-policy.v1', null])
+  })
+})
+
 describe('buildNullSnapshot', () => {
   it('todas las métricas NULL: el hecho "preguntamos y no hay dato"', () => {
     const snapshot = buildNullSnapshot({
@@ -208,7 +243,8 @@ describe('buildNullSnapshot', () => {
       locationCode: '2152',
       languageCode: 'es',
       captureDate: null,
-      sourceEndpoint: 'domain_rank_overview'
+      sourceEndpoint: 'domain_rank_overview',
+      etvMethodology: ETV_FIXTURE
     })
 
     expect(snapshot.organic.count).toBeNull()

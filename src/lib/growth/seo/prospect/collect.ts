@@ -23,6 +23,9 @@ import { postDataForSeoTask } from '@/lib/ai/dataforseo'
 import type { DataForSeoFamily } from '@/lib/ai/dataforseo-families'
 import { captureWithDomain } from '@/lib/observability/capture'
 
+import { buildEtvMethodologyRequest, type EtvMethodologyVersion } from '../etv-methodology'
+import { toPersistedEtvMethodology, type PersistedEtvMethodology } from '../etv-methodology/persisted'
+
 import type { ProspectSource, ProspectSubject } from './contracts'
 import {
   PROSPECT_BACKLINKS_COMPETITORS_ENDPOINT,
@@ -45,6 +48,11 @@ export interface ProspectSourceOutcome {
 }
 
 export interface ProspectMarketEvidence {
+  /**
+   * TASK-1805 — fórmula ETV solicitada en `ranked_keywords` (la ÚNICA fuente ETV de este carril;
+   * `competitors_domain` es `etv_ignored` y NO recibe el flag).
+   */
+  etvMethodology: PersistedEtvMethodology
   rankedKeywords: ProspectSourceOutcome
   competitorsDomain: ProspectSourceOutcome
   backlinksCompetitors: ProspectSourceOutcome
@@ -115,6 +123,12 @@ export interface CollectProspectMarketEvidenceInput {
   acquisitionOrganizationId: string
   /** Competidores declarados por el operador; si faltan, salen de `backlinks/competitors`. */
   competitorDomains?: string[]
+  /**
+   * TASK-1805 — método fijado al reclamar el slot del día; se reusa aquí para que cabecera y
+   * request coincidan aunque la configuración cambie entre ambos instantes.
+   */
+  etvMethodologyVersion?: EtvMethodologyVersion
+  env?: NodeJS.ProcessEnv
 }
 
 /**
@@ -128,6 +142,14 @@ export const collectProspectMarketEvidence = async (
 ): Promise<ProspectMarketEvidence> => {
   const { subject, acquisitionOrganizationId } = input
 
+  // TASK-1805 — fórmula explícita para la única request ETV del carril; falla cerrado antes de
+  // gastar (legacy desde el corte, config inválida). El resto de las fuentes no la reciben.
+  const etv = buildEtvMethodologyRequest({
+    endpoint: PROSPECT_RANKED_KEYWORDS_ENDPOINT,
+    env: input.env,
+    methodologyOverride: input.etvMethodologyVersion
+  })
+
   const rankedKeywords = await runCall({
     family: 'labs',
     endpoint: PROSPECT_RANKED_KEYWORDS_ENDPOINT,
@@ -139,7 +161,8 @@ export const collectProspectMarketEvidence = async (
       language_code: subject.languageCode,
       limit: PROSPECT_RANKED_KEYWORDS_LIMIT,
       item_types: ['organic', 'ai_overview_reference'],
-      load_rank_absolute: true
+      load_rank_absolute: true,
+      ...etv.requestParams
     }
   })
 
@@ -208,5 +231,12 @@ export const collectProspectMarketEvidence = async (
       .toFixed(6)
   )
 
-  return { rankedKeywords, competitorsDomain, backlinksCompetitors, domainIntersection, actualCostUsd }
+  return {
+    etvMethodology: toPersistedEtvMethodology(etv),
+    rankedKeywords,
+    competitorsDomain,
+    backlinksCompetitors,
+    domainIntersection,
+    actualCostUsd
+  }
 }

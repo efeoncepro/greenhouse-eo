@@ -28,6 +28,8 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 import { SEO_URL_VISIBILITY_SNAPSHOT_CAPTURED_EVENT } from '../contracts'
+import { buildEtvMethodologyRequest, resolveConfiguredEtvMethodology } from '../etv-methodology'
+import { toPersistedEtvMethodology, type PersistedEtvMethodology } from '../etv-methodology/persisted'
 import { parseDomainOverviewSide, type DomainRankOverviewSideRaw } from '../domain-overview/capture'
 import { enforceSeoRunEntitlement, SEO_MODULE_KEYS_READ } from '../entitlement'
 import { isSeoModuleEnabled, isSeoUrlVisibilityEnabled } from '../flags'
@@ -133,12 +135,16 @@ const asNonNegativeNumber = (value: unknown): number | null => {
  * Proyecta el `result[0]` de `ranked_keywords` al snapshot persistible + el detalle top-N +
  * los datums de mercado inline. Pura y exportada: se prueba sin base ni red.
  */
+export const RANKED_KEYWORDS_ENDPOINT = '/v3/dataforseo_labs/google/ranked_keywords/live'
+
 export const projectRankedKeywordsResult = (
   result: RankedKeywordsResultRaw,
   context: {
     subject: ResolvedVisibilitySubject
     locationCode: string
     languageCode: string
+    /** TASK-1805 — método de la request; el agregado, los top-N y el traffic cost lo heredan. */
+    etvMethodology: PersistedEtvMethodology
   }
 ): {
   snapshot: SeoUrlVisibilitySnapshotInput
@@ -193,7 +199,8 @@ export const projectRankedKeywordsResult = (
       organic,
       paid: { count: paid.count, etv: paid.etv },
       totalRankedKeywords: asNonNegativeInt(result.total_count),
-      topKeywords: topKeywords.length > 0 ? topKeywords : null
+      topKeywords: topKeywords.length > 0 ? topKeywords : null,
+      etvMethodology: context.etvMethodology
     },
     marketData
   }
@@ -319,7 +326,8 @@ export const captureUrlVisibility = async (input: {
     languageCode: input.languageCode,
     // La captura directa exige una fila de ranked_keywords: una de relevant_pages (sin
     // detalle de keywords) no la sustituye.
-    sourceEndpoints: ['ranked_keywords']
+    sourceEndpoints: ['ranked_keywords'],
+    etvMethodologyVersion: resolveConfiguredEtvMethodology().version
   })
 
   const pending: ResolvedVisibilitySubject[] = []
@@ -412,6 +420,10 @@ export const captureUrlVisibility = async (input: {
     }
 
     try {
+      // TASK-1805 — fórmula explícita por request; falla cerrado antes de tocar al proveedor.
+      const etv = buildEtvMethodologyRequest({ endpoint: RANKED_KEYWORDS_ENDPOINT })
+      const etvMethodology = toPersistedEtvMethodology(etv)
+
       const task: Record<string, unknown> = {
         target: subject.providerTarget,
         location_code: Number(input.locationCode),
@@ -419,7 +431,8 @@ export const captureUrlVisibility = async (input: {
         // Sólo lo que el snapshot modela; cada fila devuelta se cobra.
         item_types: ['organic', 'paid'],
         limit: rowLimit,
-        order_by: ['keyword_data.keyword_info.search_volume,desc']
+        order_by: ['keyword_data.keyword_info.search_volume,desc'],
+        ...etv.requestParams
       }
 
       // Filtros del resolver (subcarpeta): server-side y GRATIS — la palanca que evita
@@ -436,7 +449,7 @@ export const captureUrlVisibility = async (input: {
       const response = await postDataForSeoTask({
         family: 'labs',
         consumer: 'seo',
-        endpoint: '/v3/dataforseo_labs/google/ranked_keywords/live',
+        endpoint: RANKED_KEYWORDS_ENDPOINT,
         organizationId: input.organizationId,
         tasks: [task]
       })
@@ -479,7 +492,8 @@ export const captureUrlVisibility = async (input: {
               rawSubject: subject.raw,
               locationCode: input.locationCode,
               languageCode: input.languageCode,
-              sourceEndpoint: 'ranked_keywords'
+              sourceEndpoint: 'ranked_keywords',
+              etvMethodology
             })
           ],
           capturedByOrganizationId: input.organizationId,
@@ -502,7 +516,8 @@ export const captureUrlVisibility = async (input: {
       const { snapshot, marketData } = projectRankedKeywordsResult(result, {
         subject,
         locationCode: input.locationCode,
-        languageCode: input.languageCode
+        languageCode: input.languageCode,
+        etvMethodology
       })
 
       await persistUrlVisibilitySnapshots({
@@ -706,7 +721,8 @@ export const runUrlVisibilityBatch = async (
           subjects: resolvedSubjects.map(subject => ({ kind: subject.kind, normalized: subject.normalized })),
           locationCode: target.location_code,
           languageCode: target.language_code,
-          sourceEndpoints: ['ranked_keywords']
+          sourceEndpoints: ['ranked_keywords'],
+          etvMethodologyVersion: resolveConfiguredEtvMethodology().version
         })
 
         const pendingCount = resolvedSubjects.filter(

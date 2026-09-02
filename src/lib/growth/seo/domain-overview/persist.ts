@@ -21,6 +21,9 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
+import type { EtvMethodologyVersion } from '../etv-methodology/contracts'
+import type { PersistedEtvMethodology } from '../etv-methodology/persisted'
+
 /** Endpoints autorizados a escribir esta tabla (espeja el CHECK de la migración). */
 export type SeoDomainOverviewSourceEndpoint =
   | 'domain_rank_overview'
@@ -104,6 +107,11 @@ export interface SeoDomainOverviewSnapshotInput {
   sourceEndpoint: SeoDomainOverviewSourceEndpoint
   organic: SeoDomainSideMetrics
   paid: Pick<SeoDomainSideMetrics, 'count' | 'etv' | 'estimatedPaidTrafficCostUsd'>
+  /**
+   * TASK-1805 — fórmula ETV solicitada al proveedor para ESTA fila. Requerido: un productor sin
+   * metodología no compila. `estimated_paid_traffic_cost` hereda la misma (ETV × CPC).
+   */
+  etvMethodology: PersistedEtvMethodology
 }
 
 /**
@@ -127,6 +135,7 @@ export const buildNullSnapshot = (input: {
   languageCode: string
   captureDate: string | null
   sourceEndpoint: SeoDomainOverviewSourceEndpoint
+  etvMethodology: PersistedEtvMethodology
 }): SeoDomainOverviewSnapshotInput => ({
   normalizedDomain: normalizeOverviewDomain(input.domain),
   domain: input.domain,
@@ -135,7 +144,8 @@ export const buildNullSnapshot = (input: {
   captureDate: input.captureDate,
   sourceEndpoint: input.sourceEndpoint,
   organic: EMPTY_SIDE_METRICS,
-  paid: { count: null, etv: null, estimatedPaidTrafficCostUsd: null }
+  paid: { count: null, etv: null, estimatedPaidTrafficCostUsd: null },
+  etvMethodology: input.etvMethodology
 })
 
 /**
@@ -162,7 +172,8 @@ export const persistDomainOverviewSnapshots = async (input: {
           organic_count, organic_etv, organic_estimated_paid_traffic_cost,
           organic_is_new, organic_is_up, organic_is_down, organic_is_lost,
           paid_count, paid_etv, paid_estimated_paid_traffic_cost,
-          captured_by_organization_id, provider_cost)
+          captured_by_organization_id, provider_cost,
+          etv_methodology_version, etv_methodology_evidence, etv_requested_at, etv_policy_version, etv_historical_basis)
        VALUES ($1, $2, $3, $4, COALESCE($5::date, CURRENT_DATE), $6,
                $7, $8, $9, $10, $11,
                $12, $13, $14, $15,
@@ -170,8 +181,9 @@ export const persistDomainOverviewSnapshots = async (input: {
                $19, $20, $21,
                $22, $23, $24, $25,
                $26, $27, $28,
-               $29, $30)
-       ON CONFLICT ON CONSTRAINT seo_domain_overview_capture_unique DO NOTHING`,
+               $29, $30,
+               $31, $32, $33::timestamptz, $34, $35)
+       ON CONFLICT ON CONSTRAINT seo_domain_overview_capture_method_unique DO NOTHING`,
       [
         snapshot.normalizedDomain,
         snapshot.domain,
@@ -202,7 +214,12 @@ export const persistDomainOverviewSnapshots = async (input: {
         snapshot.paid.etv,
         snapshot.paid.estimatedPaidTrafficCostUsd,
         input.capturedByOrganizationId,
-        rowCost
+        rowCost,
+        snapshot.etvMethodology.version,
+        snapshot.etvMethodology.evidence,
+        snapshot.etvMethodology.requestedAt,
+        snapshot.etvMethodology.policyVersion,
+        snapshot.etvMethodology.historicalBasis
       ]
     )
 
@@ -227,6 +244,8 @@ export const loadFreshOverviewDomains = async (input: {
   locationCode: string
   languageCode: string
   sourceEndpoints: readonly SeoDomainOverviewSourceEndpoint[]
+  /** TASK-1805 — la frescura es POR MÉTODO: una foto legacy no satisface una corrida improved ni viceversa. */
+  etvMethodologyVersion: EtvMethodologyVersion
 }): Promise<Set<string>> => {
   if (input.normalizedDomains.length === 0) return new Set()
 
@@ -237,13 +256,15 @@ export const loadFreshOverviewDomains = async (input: {
         AND location_code = $2
         AND language_code = $3
         AND source_endpoint = ANY($4::text[])
-        AND (CURRENT_DATE - capture_date) < $5`,
+        AND (CURRENT_DATE - capture_date) < $5
+        AND etv_methodology_version = $6`,
     [
       input.normalizedDomains,
       input.locationCode,
       input.languageCode,
       [...input.sourceEndpoints],
-      DOMAIN_OVERVIEW_FRESHNESS_DAYS
+      DOMAIN_OVERVIEW_FRESHNESS_DAYS,
+      input.etvMethodologyVersion
     ]
   )
 

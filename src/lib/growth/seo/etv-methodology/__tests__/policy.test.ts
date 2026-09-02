@@ -94,17 +94,17 @@ describe('TASK-1805 — configuración cerrada', () => {
 
   it('valor válido → env; se normaliza espacios/mayúsculas', () => {
     expect(
-      resolveConfiguredEtvMethodology({ GROWTH_SEO_ETV_METHODOLOGY_VERSION: ' Improved_Layout_Clickstream_V2 ' } as NodeJS.ProcessEnv)
+      resolveConfiguredEtvMethodology({ GROWTH_SEO_ETV_METHODOLOGY_VERSION: ' Improved_Layout_Clickstream_V2 ' } as unknown as NodeJS.ProcessEnv)
     ).toMatchObject({ version: 'improved_layout_clickstream_v2', source: 'env' })
   })
 
   it('valor fuera del vocabulario → falla cerrado (invalid_etv_methodology_config)', () => {
     expectPolicyError(
-      () => resolveConfiguredEtvMethodology({ GROWTH_SEO_ETV_METHODOLOGY_VERSION: 'improved' } as NodeJS.ProcessEnv),
+      () => resolveConfiguredEtvMethodology({ GROWTH_SEO_ETV_METHODOLOGY_VERSION: 'improved' } as unknown as NodeJS.ProcessEnv),
       'invalid_etv_methodology_config'
     )
     expectPolicyError(
-      () => resolveEtvReadMethodology({ GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION: 'unknown_methodology' } as NodeJS.ProcessEnv),
+      () => resolveEtvReadMethodology({ GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION: 'unknown_methodology' } as unknown as NodeJS.ProcessEnv),
       'invalid_etv_methodology_config'
     )
   })
@@ -129,7 +129,7 @@ describe('TASK-1805 — buildEtvMethodologyRequest (fail-closed, endpoint-aware)
   })
 
   it('improved configurado → use_improved_etv:true en todos los endpoints consumidos', () => {
-    const env = { GROWTH_SEO_ETV_METHODOLOGY_VERSION: 'improved_layout_clickstream_v2' } as NodeJS.ProcessEnv
+    const env = { GROWTH_SEO_ETV_METHODOLOGY_VERSION: 'improved_layout_clickstream_v2' } as unknown as NodeJS.ProcessEnv
 
     for (const family of listEtvLabsFamilies('etv_consumed')) {
       const request = buildEtvMethodologyRequest({ endpoint: family.googleEndpoint, env, now: BEFORE_CUTOFF })
@@ -154,7 +154,7 @@ describe('TASK-1805 — buildEtvMethodologyRequest (fail-closed, endpoint-aware)
   it('improved después del corte sigue siendo válido', () => {
     const request = buildEtvMethodologyRequest({
       endpoint: DOMAIN_RANK_OVERVIEW,
-      env: { GROWTH_SEO_ETV_METHODOLOGY_VERSION: 'improved_layout_clickstream_v2' } as NodeJS.ProcessEnv,
+      env: { GROWTH_SEO_ETV_METHODOLOGY_VERSION: 'improved_layout_clickstream_v2' } as unknown as NodeJS.ProcessEnv,
       now: AT_CUTOFF
     })
 
@@ -200,7 +200,7 @@ describe('TASK-1805 — buildEtvMethodologyRequest (fail-closed, endpoint-aware)
       () =>
         buildEtvMethodologyRequest({
           endpoint: DOMAIN_RANK_OVERVIEW,
-          env: { GROWTH_SEO_ETV_METHODOLOGY_VERSION: 'true' } as NodeJS.ProcessEnv,
+          env: { GROWTH_SEO_ETV_METHODOLOGY_VERSION: 'true' } as unknown as NodeJS.ProcessEnv,
           now: BEFORE_CUTOFF
         }),
       'invalid_etv_methodology_config'

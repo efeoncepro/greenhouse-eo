@@ -19,6 +19,9 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
+import type { EtvMethodologyVersion } from '../etv-methodology/contracts'
+import type { PersistedEtvMethodology } from '../etv-methodology/persisted'
+
 import type { VisibilitySubjectKind } from './resolve-subject'
 
 /** Ventana de frescura: las bases Labs se refrescan por ciclo ~mensual (mismo contrato 1775). */
@@ -69,6 +72,8 @@ export interface SeoUrlVisibilitySnapshotInput {
   paid: { count: number | null; etv: number | null }
   totalRankedKeywords: number | null
   topKeywords: SeoUrlVisibilityTopKeyword[] | null
+  /** TASK-1805 — fórmula ETV de la fila; los `topKeywords` heredan la del padre. Requerido. */
+  etvMethodology: PersistedEtvMethodology
 }
 
 export const buildNullVisibilitySnapshot = (input: {
@@ -78,6 +83,7 @@ export const buildNullVisibilitySnapshot = (input: {
   locationCode: string
   languageCode: string
   sourceEndpoint: SeoUrlVisibilitySourceEndpoint
+  etvMethodology: PersistedEtvMethodology
 }): SeoUrlVisibilitySnapshotInput => ({
   ...input,
   organic: {
@@ -129,7 +135,8 @@ export const persistUrlVisibilitySnapshots = async (input: {
           organic_count, organic_etv, organic_estimated_paid_traffic_cost,
           organic_is_new, organic_is_up, organic_is_down, organic_is_lost,
           paid_count, paid_etv, total_ranked_keywords, top_keywords,
-          captured_by_organization_id, provider_cost)
+          captured_by_organization_id, provider_cost,
+          etv_methodology_version, etv_methodology_evidence, etv_requested_at, etv_policy_version)
        VALUES ($1, $2, $3, $4, $5,
                CURRENT_DATE, $6,
                $7, $8, $9, $10, $11,
@@ -138,8 +145,9 @@ export const persistUrlVisibilitySnapshots = async (input: {
                $19, $20, $21,
                $22, $23, $24, $25,
                $26, $27, $28, $29,
-               $30, $31)
-       ON CONFLICT ON CONSTRAINT seo_url_visibility_capture_unique DO NOTHING`,
+               $30, $31,
+               $32, $33, $34::timestamptz, $35)
+       ON CONFLICT ON CONSTRAINT seo_url_visibility_capture_method_unique DO NOTHING`,
       [
         snapshot.subjectKind,
         snapshot.normalizedSubject,
@@ -171,7 +179,11 @@ export const persistUrlVisibilitySnapshots = async (input: {
         snapshot.totalRankedKeywords,
         snapshot.topKeywords ? JSON.stringify(snapshot.topKeywords) : null,
         input.capturedByOrganizationId,
-        rowCost
+        rowCost,
+        snapshot.etvMethodology.version,
+        snapshot.etvMethodology.evidence,
+        snapshot.etvMethodology.requestedAt,
+        snapshot.etvMethodology.policyVersion
       ]
     )
 
@@ -194,6 +206,8 @@ export const loadFreshVisibilitySubjects = async (input: {
   locationCode: string
   languageCode: string
   sourceEndpoints: readonly SeoUrlVisibilitySourceEndpoint[]
+  /** TASK-1805 — frescura POR MÉTODO. */
+  etvMethodologyVersion: EtvMethodologyVersion
 }): Promise<Set<string>> => {
   if (input.subjects.length === 0) return new Set()
 
@@ -206,14 +220,16 @@ export const loadFreshVisibilitySubjects = async (input: {
         AND location_code = $3
         AND language_code = $4
         AND source_endpoint = ANY($5::text[])
-        AND (CURRENT_DATE - capture_date) < $6`,
+        AND (CURRENT_DATE - capture_date) < $6
+        AND etv_methodology_version = $7`,
     [
       input.subjects.map(subject => subject.kind),
       input.subjects.map(subject => subject.normalized),
       input.locationCode,
       input.languageCode,
       [...input.sourceEndpoints],
-      URL_VISIBILITY_FRESHNESS_DAYS
+      URL_VISIBILITY_FRESHNESS_DAYS,
+      input.etvMethodologyVersion
     ]
   )
 

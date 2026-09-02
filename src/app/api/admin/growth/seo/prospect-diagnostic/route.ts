@@ -32,7 +32,8 @@ const ERROR_CODE_MAP: Record<ProspectDiagnosticErrorCode, CanonicalErrorCode> = 
   budget_exhausted: 'seo_budget_exhausted',
   cost_blocked: 'seo_prospect_cost_blocked',
   claim_conflict: 'seo_prospect_invalid_input',
-  collect_failed: 'internal_error'
+  collect_failed: 'internal_error',
+  etv_methodology_rejected: 'seo_etv_methodology_rejected'
 }
 
 export async function POST(request: Request) {

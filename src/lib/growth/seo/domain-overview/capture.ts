@@ -25,6 +25,9 @@ import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
+import { buildEtvMethodologyRequest, resolveConfiguredEtvMethodology, type EtvMethodologyVersion } from '../etv-methodology'
+import { toPersistedEtvMethodology, type PersistedEtvMethodology } from '../etv-methodology/persisted'
+
 import {
   SEO_DOMAIN_OVERVIEW_AGGREGATE_TYPE,
   SEO_DOMAIN_OVERVIEW_SNAPSHOT_CAPTURED_EVENT
@@ -127,7 +130,7 @@ export const parseDomainOverviewSide = (side: DomainRankOverviewSideRaw | null |
 /** Proyecta el item completo al hecho persistible de la foto mensual. */
 export const parseDomainRankOverviewItem = (
   item: DomainRankOverviewItemRaw,
-  context: { domain: string; locationCode: string; languageCode: string }
+  context: { domain: string; locationCode: string; languageCode: string; etvMethodology: PersistedEtvMethodology }
 ): SeoDomainOverviewSnapshotInput => {
   const organic = parseDomainOverviewSide(item.metrics?.organic)
   const paid = parseDomainOverviewSide(item.metrics?.paid)
@@ -144,9 +147,13 @@ export const parseDomainRankOverviewItem = (
       count: paid.count,
       etv: paid.etv,
       estimatedPaidTrafficCostUsd: paid.estimatedPaidTrafficCostUsd
-    }
+    },
+    etvMethodology: context.etvMethodology
   }
 }
+
+/** Endpoint de la foto mensual; la policy ETV lo resuelve por path exacto (TASK-1805). */
+export const DOMAIN_RANK_OVERVIEW_ENDPOINT = '/v3/dataforseo_labs/google/domain_rank_overview/live'
 
 /**
  * Costo determinista de una corrida: un request por sujeto (el endpoint recibe UN target), y
@@ -200,6 +207,8 @@ export type CaptureDomainOverviewResult =
       providerErrors: number
       providerCalls: number
       costUsd: number
+      /** TASK-1805 — fórmula ETV solicitada en esta corrida (legacy explícito hasta que TASK-1806 la cambie). */
+      etvMethodologyVersion: EtvMethodologyVersion
       outcomes: DomainOverviewSubjectOutcome[]
     }
   | {
@@ -226,6 +235,8 @@ export type PreviewDomainOverviewResult =
       budgetRemainingUsd: number | null
       wouldBeAllowed: boolean
       blockedReason: string | null
+      /** TASK-1805 — el dry-run declara el método que se compraría, no sólo el costo. */
+      etvMethodologyVersion: EtvMethodologyVersion
     }
   | {
       ok: false
@@ -301,7 +312,8 @@ const resolveFreshness = async (target: ResolvedTarget, subjects: string[]) => {
     normalizedDomains: normalized,
     locationCode: target.location_code,
     languageCode: target.language_code,
-    sourceEndpoints: ['domain_rank_overview']
+    sourceEndpoints: ['domain_rank_overview'],
+    etvMethodologyVersion: resolveConfiguredEtvMethodology().version
   })
 
   return {
@@ -334,6 +346,7 @@ export const previewDomainOverviewCapture = async (seoTargetId: string): Promise
 
   return {
     ok: true,
+    etvMethodologyVersion: resolveConfiguredEtvMethodology().version,
     seoTargetId,
     organizationId: target.organization_id,
     locationCode: target.location_code,
@@ -387,6 +400,7 @@ export const captureDomainOverview = async (seoTargetId: string): Promise<Captur
     providerErrors: counters.providerErrors,
     providerCalls: counters.providerCalls,
     costUsd: Number(counters.costUsd.toFixed(6)),
+    etvMethodologyVersion: resolveConfiguredEtvMethodology().version,
     outcomes
   })
 
@@ -434,10 +448,14 @@ export const captureDomainOverview = async (seoTargetId: string): Promise<Captur
     }
 
     try {
+      // TASK-1805 — la fórmula se fija POR REQUEST y falla cerrado antes de tocar al proveedor
+      // (endpoint fuera de matriz, config inválida o legacy desde el corte).
+      const etv = buildEtvMethodologyRequest({ endpoint: DOMAIN_RANK_OVERVIEW_ENDPOINT })
+
       const response = await postDataForSeoTask({
         family: 'labs',
         consumer: 'seo',
-        endpoint: '/v3/dataforseo_labs/google/domain_rank_overview/live',
+        endpoint: DOMAIN_RANK_OVERVIEW_ENDPOINT,
         organizationId: target.organization_id,
         tasks: [
           {
@@ -446,7 +464,8 @@ export const captureDomainOverview = async (seoTargetId: string): Promise<Captur
             language_code: target.language_code,
             // Con mercado fijo el proveedor devuelve UNA fila; el limit acota el peor caso
             // porque cada fila devuelta se cobra.
-            limit: 1
+            limit: 1,
+            ...etv.requestParams
           }
         ]
       })
@@ -480,7 +499,8 @@ export const captureDomainOverview = async (seoTargetId: string): Promise<Captur
         ? parseDomainRankOverviewItem(item, {
             domain,
             locationCode: target.location_code,
-            languageCode: target.language_code
+            languageCode: target.language_code,
+            etvMethodology: toPersistedEtvMethodology(etv)
           })
         : // 🔴 El proveedor respondió bien pero no conoce el dominio: fila con NULLs, con
           // fecha. Sin ella el sujeto nunca queda "fresco" y se re-compra en cada corrida,
@@ -490,7 +510,8 @@ export const captureDomainOverview = async (seoTargetId: string): Promise<Captur
             locationCode: target.location_code,
             languageCode: target.language_code,
             captureDate: null,
-            sourceEndpoint: 'domain_rank_overview'
+            sourceEndpoint: 'domain_rank_overview',
+            etvMethodology: toPersistedEtvMethodology(etv)
           })
 
       await persistDomainOverviewSnapshots({

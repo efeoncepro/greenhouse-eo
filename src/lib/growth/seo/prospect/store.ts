@@ -18,6 +18,9 @@ import { withTransaction } from '@/lib/db'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
+import { buildEtvMethodologyProvenance, isEtvMethodologyVersion, ETV_LEGACY_METHODOLOGY } from '../etv-methodology'
+import type { PersistedEtvMethodology } from '../etv-methodology/persisted'
+
 import type { ProspectDiagnostic, ProspectFact, ProspectSource, ProspectSubject } from './contracts'
 import {
   SEO_PROSPECT_DIAGNOSTIC_AGGREGATE_TYPE,
@@ -38,6 +41,10 @@ interface DiagnosticRow extends Record<string, unknown> {
   created_by: string
   created_at: string
   completed_at: string | null
+  etv_methodology_version: string
+  etv_methodology_evidence: string
+  etv_requested_at: string | null
+  etv_policy_version: string | null
 }
 
 interface FactRow extends Record<string, unknown> {
@@ -76,7 +83,15 @@ const toDiagnostic = (row: DiagnosticRow, facts: ProspectFact[]): ProspectDiagno
     completedAt: row.completed_at ? new Date(row.completed_at).toISOString() : null,
     createdBy: row.created_by,
     sources: [...new Set(facts.map(fact => fact.source))]
-  }
+  },
+  // TASK-1805 — un diagnóstico = una request = una fórmula; el reader la sirve tal cual.
+  etvMethodology: buildEtvMethodologyProvenance({
+    served: isEtvMethodologyVersion(row.etv_methodology_version) ? row.etv_methodology_version : ETV_LEGACY_METHODOLOGY,
+    rowVersion: row.etv_methodology_version,
+    rowEvidence: row.etv_methodology_evidence,
+    rowPolicyVersion: row.etv_policy_version,
+    available: [row.etv_methodology_version]
+  })
 })
 
 const toFact = (row: FactRow): ProspectFact => ({
@@ -94,6 +109,8 @@ export interface ClaimProspectDiagnosticInput {
   ceilingUsd: number
   forecastUsd: number
   competitorDomains: string[]
+  /** TASK-1805 — método fijado ANTES de gastar; la cabecera es la identidad de la request. */
+  etvMethodology: PersistedEtvMethodology
 }
 
 export type ClaimProspectDiagnosticResult =
@@ -110,8 +127,9 @@ export const claimProspectDiagnostic = async (
   const inserted = await runGreenhousePostgresQuery<{ diagnostic_id: string }>(
     `INSERT INTO greenhouse_growth.seo_prospect_diagnostics
        (root_domain, market, location_code, language_code, status, cost_ceiling_usd,
-        forecast_cost_usd, competitor_domains, created_by)
-     VALUES ($1, $2, $3, $4, 'running', $5, $6, $7, $8)
+        forecast_cost_usd, competitor_domains, created_by,
+        etv_methodology_version, etv_methodology_evidence, etv_requested_at, etv_policy_version)
+     VALUES ($1, $2, $3, $4, 'running', $5, $6, $7, $8, $9, $10, $11::timestamptz, $12)
      ON CONFLICT (root_domain, location_code, language_code, run_date)
        WHERE status IN ('running', 'completed')
        DO NOTHING
@@ -124,7 +142,11 @@ export const claimProspectDiagnostic = async (
       input.ceilingUsd,
       input.forecastUsd,
       input.competitorDomains,
-      input.actor
+      input.actor,
+      input.etvMethodology.version,
+      input.etvMethodology.evidence,
+      input.etvMethodology.requestedAt,
+      input.etvMethodology.policyVersion
     ]
   )
 
@@ -178,6 +200,8 @@ export const finalizeProspectDiagnostic = async (input: {
   actor: string
   facts: ProspectFact[]
   actualCostUsd: number
+  /** TASK-1805 — instante UTC de la request ETV real (la cabecera nació con el del claim). */
+  etvRequestedAt: string
 }): Promise<void> => {
   for (const fact of input.facts) {
     // ISSUE-154: un hecho sin lente o sin fecha de captura no entra a la base — punto.
@@ -206,9 +230,10 @@ export const finalizeProspectDiagnostic = async (input: {
 
     await client.query(
       `UPDATE greenhouse_growth.seo_prospect_diagnostics
-          SET status = 'completed', provider_cost_usd = $2, completed_at = clock_timestamp()
+          SET status = 'completed', provider_cost_usd = $2, completed_at = clock_timestamp(),
+              etv_requested_at = $3::timestamptz
         WHERE diagnostic_id = $1 AND status = 'running'`,
-      [input.diagnosticId, input.actualCostUsd]
+      [input.diagnosticId, input.actualCostUsd, input.etvRequestedAt]
     )
 
     await publishOutboxEvent(

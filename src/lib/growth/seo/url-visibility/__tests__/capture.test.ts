@@ -97,6 +97,9 @@ import {
   projectRankedKeywordsResult,
   resolveRowLimit
 } from '../capture'
+
+const ETV_FIXTURE = { version: 'legacy_static_v1', evidence: 'explicit_request', requestedAt: '2026-10-15T12:00:00.000Z', policyVersion: 'etv-policy.v1', historicalBasis: null } as const
+
 import { resolveVisibilitySubject } from '../resolve-subject'
 
 const rankedItem = (keyword: string, volume: number, rank: number) => ({
@@ -175,7 +178,7 @@ describe('projectRankedKeywordsResult', () => {
   it('la foto sale del agregado metrics (set completo), el detalle de items', () => {
     const { snapshot } = projectRankedKeywordsResult(
       (providerResponse().tasks[0].result as Array<Record<string, unknown>>)[0] as never,
-      { subject, locationCode: '2152', languageCode: 'es' }
+      { subject, locationCode: '2152', languageCode: 'es', etvMethodology: ETV_FIXTURE }
     )
 
     expect(snapshot.totalRankedKeywords).toBe(4120)
@@ -189,7 +192,7 @@ describe('projectRankedKeywordsResult', () => {
   it('los datums de mercado salen del parser canónico de keyword_overview (cero derivación paralela)', () => {
     const { marketData } = projectRankedKeywordsResult(
       (providerResponse().tasks[0].result as Array<Record<string, unknown>>)[0] as never,
-      { subject, locationCode: '2152', languageCode: 'es' }
+      { subject, locationCode: '2152', languageCode: 'es', etvMethodology: ETV_FIXTURE }
     )
 
     expect(marketData).toHaveLength(2)

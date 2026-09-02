@@ -25,6 +25,14 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 import {
+  buildEtvMethodologyRequest,
+  resolveConfiguredEtvMethodology,
+  resolveEtvHistoricalCalculationBasis,
+  type EtvMethodologyVersion
+} from '../etv-methodology'
+import { toPersistedEtvMethodology, type PersistedEtvMethodology } from '../etv-methodology/persisted'
+
+import {
   SEO_DOMAIN_OVERVIEW_AGGREGATE_TYPE,
   SEO_DOMAIN_OVERVIEW_SNAPSHOT_CAPTURED_EVENT
 } from '../contracts'
@@ -100,9 +108,18 @@ export interface HistoricalRankOverviewItemRaw extends DomainRankOverviewItemRaw
  * y completa con filas NULL los meses del rango pedido que el proveedor no devolvió.
  * Pura y exportada: se prueba sin base ni red.
  */
+export const HISTORICAL_RANK_OVERVIEW_ENDPOINT = '/v3/dataforseo_labs/google/historical_rank_overview/live'
+
 export const projectHistoryItems = (
   items: readonly HistoricalRankOverviewItemRaw[],
-  context: { domain: string; locationCode: string; languageCode: string; requestedMonths: readonly string[] }
+  context: {
+    domain: string
+    locationCode: string
+    languageCode: string
+    requestedMonths: readonly string[]
+    /** TASK-1805 — método de la request; la base histórica (recomputado/aproximación) se deriva POR MES. */
+    etvMethodology: PersistedEtvMethodology
+  }
 ): { snapshots: SeoDomainOverviewSnapshotInput[]; monthsWithData: number; monthsWithoutData: number } => {
   const byMonth = new Map<string, HistoricalRankOverviewItemRaw>()
 
@@ -120,6 +137,11 @@ export const projectHistoryItems = (
     const item = byMonth.get(monthKey)
     const captureDate = `${monthKey}-01`
 
+    const etvMethodology: PersistedEtvMethodology = {
+      ...context.etvMethodology,
+      historicalBasis: resolveEtvHistoricalCalculationBasis(context.etvMethodology.version, monthKey)
+    }
+
     if (!item) {
       monthsWithoutData += 1
       snapshots.push(
@@ -128,7 +150,8 @@ export const projectHistoryItems = (
           locationCode: context.locationCode,
           languageCode: context.languageCode,
           captureDate,
-          sourceEndpoint: 'historical_rank_overview'
+          sourceEndpoint: 'historical_rank_overview',
+          etvMethodology
         })
       )
       continue
@@ -146,7 +169,8 @@ export const projectHistoryItems = (
       captureDate,
       sourceEndpoint: 'historical_rank_overview',
       organic,
-      paid: { count: paid.count, etv: paid.etv, estimatedPaidTrafficCostUsd: paid.estimatedPaidTrafficCostUsd }
+      paid: { count: paid.count, etv: paid.etv, estimatedPaidTrafficCostUsd: paid.estimatedPaidTrafficCostUsd },
+      etvMethodology
     })
   }
 
@@ -268,6 +292,8 @@ const loadExistingMonths = async (input: {
   languageCode: string
   fromDate: string
   toDate: string
+  /** TASK-1805 — un mes legacy NO cuenta como sembrado para una corrida improved (ni viceversa). */
+  etvMethodologyVersion: EtvMethodologyVersion
 }): Promise<Set<string>> => {
   const rows = await runGreenhousePostgresQuery<{ capture_date: Date | string }>(
     `SELECT capture_date
@@ -276,8 +302,9 @@ const loadExistingMonths = async (input: {
         AND location_code = $2
         AND language_code = $3
         AND source_endpoint = 'historical_rank_overview'
-        AND capture_date BETWEEN $4::date AND $5::date`,
-    [input.normalizedDomain, input.locationCode, input.languageCode, input.fromDate, input.toDate]
+        AND capture_date BETWEEN $4::date AND $5::date
+        AND etv_methodology_version = $6`,
+    [input.normalizedDomain, input.locationCode, input.languageCode, input.fromDate, input.toDate, input.etvMethodologyVersion]
   )
 
   return new Set(
@@ -345,7 +372,8 @@ const buildPlanSubjects = async (
       locationCode: target.location_code,
       languageCode: target.language_code,
       fromDate: `${range.fromMonth}-01`,
-      toDate: `${range.toMonth}-01`
+      toDate: `${range.toMonth}-01`,
+      etvMethodologyVersion: resolveConfiguredEtvMethodology().version
     })
 
     const pendingMonths = monthsBetween(range.fromMonth, range.toMonth).filter(month => !existing.has(month))
@@ -507,10 +535,13 @@ export const backfillDomainRankHistory = async (input: HistoryRangeInput): Promi
     const requestedMonths = monthsBetween(fromMonth, toMonth)
 
     try {
+      // TASK-1805 — fórmula explícita por request; falla cerrado antes de gastar 10× el Labs normal.
+      const etv = buildEtvMethodologyRequest({ endpoint: HISTORICAL_RANK_OVERVIEW_ENDPOINT })
+
       const response = await postDataForSeoTask({
         family: 'labs',
         consumer: 'seo',
-        endpoint: '/v3/dataforseo_labs/google/historical_rank_overview/live',
+        endpoint: HISTORICAL_RANK_OVERVIEW_ENDPOINT,
         organizationId: plan.organizationId,
         tasks: [
           {
@@ -520,8 +551,10 @@ export const backfillDomainRankHistory = async (input: HistoryRangeInput): Promi
             date_from: `${fromMonth}-01`,
             date_to: `${toMonth}-01`,
             // `correlate` correlaciona con datasets previos del proveedor; el default true
-            // está bien para una serie continua. Clickstream DUPLICA el costo y no aporta.
-            include_clickstream_data: false
+            // está bien para una serie continua. Clickstream DUPLICA el costo y no aporta:
+            // es un carril independiente y NO se activa implícitamente con improved.
+            include_clickstream_data: false,
+            ...etv.requestParams
           }
         ]
       })
@@ -554,7 +587,8 @@ export const backfillDomainRankHistory = async (input: HistoryRangeInput): Promi
         domain: subject.domain,
         locationCode: plan.locationCode,
         languageCode: plan.languageCode,
-        requestedMonths
+        requestedMonths,
+        etvMethodology: toPersistedEtvMethodology(etv)
       })
 
       const { rowsWritten } = await persistDomainOverviewSnapshots({

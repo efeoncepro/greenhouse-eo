@@ -22,6 +22,8 @@ import {
   loadFreshOverviewDomains,
   persistDomainOverviewSnapshots
 } from '../../src/lib/growth/seo/domain-overview/persist'
+import { buildEtvMethodologyRequest } from '../../src/lib/growth/seo/etv-methodology'
+import { toPersistedEtvMethodology } from '../../src/lib/growth/seo/etv-methodology/persisted'
 import { readDomainOverview } from '../../src/lib/growth/seo/domain-overview/reader'
 import { getSeoDomainOverviewStalenessSignal } from '../../src/lib/reliability/queries/seo-domain-overview-staleness'
 
@@ -33,6 +35,9 @@ const fail = (message: string): never => {
   console.error(`[sanity] FALLÓ: ${message}`)
   process.exit(1)
 }
+
+// TASK-1805 — todo writer exige la identidad metodológica; la sanity usa la de la policy (legacy explícito).
+const ETV_STAMP = toPersistedEtvMethodology(buildEtvMethodologyRequest({ endpoint: '/v3/dataforseo_labs/google/domain_rank_overview/live', env: {} as NodeJS.ProcessEnv }))
 
 const main = async () => {
   const orgs = await runGreenhousePostgresQuery<{ organization_id: string }>(
@@ -52,7 +57,8 @@ const main = async () => {
           locationCode: LOCATION,
           languageCode: LANGUAGE,
           captureDate: null,
-          sourceEndpoint: 'domain_rank_overview'
+          sourceEndpoint: 'domain_rank_overview',
+          etvMethodology: ETV_STAMP
         }),
         organic: {
           positions: {
@@ -83,7 +89,8 @@ const main = async () => {
         locationCode: LOCATION,
         languageCode: LANGUAGE,
         captureDate: '2024-03-01',
-        sourceEndpoint: 'historical_rank_overview'
+        sourceEndpoint: 'historical_rank_overview',
+        etvMethodology: ETV_STAMP
       })
     ],
     capturedByOrganizationId: organizationId,
@@ -97,7 +104,8 @@ const main = async () => {
     normalizedDomains: [SANITY_DOMAIN],
     locationCode: LOCATION,
     languageCode: LANGUAGE,
-    sourceEndpoints: ['domain_rank_overview']
+    sourceEndpoints: ['domain_rank_overview'],
+    etvMethodologyVersion: ETV_STAMP.version
   })
 
   if (!fresh.has(SANITY_DOMAIN)) return fail('el pre-check de frescura no ve la fila recién escrita')
@@ -106,7 +114,8 @@ const main = async () => {
     normalizedDomains: [SANITY_DOMAIN],
     locationCode: LOCATION,
     languageCode: LANGUAGE,
-    sourceEndpoints: ['bulk_traffic_estimation']
+    sourceEndpoints: ['bulk_traffic_estimation'],
+    etvMethodologyVersion: ETV_STAMP.version
   })
 
   if (freshHistoricalOnly.has(SANITY_DOMAIN)) {

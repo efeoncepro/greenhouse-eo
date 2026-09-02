@@ -11,6 +11,7 @@
  */
 
 import type { ProspectFact } from './contracts'
+import { AI_OVERVIEW_ETV_ATTRIBUTION } from '../etv-methodology/contracts'
 import { PROSPECT_RANKED_KEYWORDS_LIMIT } from './contracts'
 import type { ProspectMarketEvidence } from './collect'
 
@@ -97,14 +98,29 @@ export const deriveProspectMarketFacts = (
         kind: 'ai_overview_citations',
         magnitude: aiOverviewCitations.length,
         source: 'labs_ranked_keywords',
-        detail: { sample: aiOverviewCitations.slice(0, SAMPLE_LIMIT).map(item => item.keyword).filter(Boolean) }
+        detail: {
+          sample: aiOverviewCitations.slice(0, SAMPLE_LIMIT).map(item => item.keyword).filter(Boolean),
+          // TASK-1805 — el ETV de una cita AIO es reparto MODELADO entre dominios citados, nunca
+          // clics observados por cita: se cuenta la cita, no se suma su ETV al tráfico.
+          etvAttribution: AI_OVERVIEW_ETV_ATTRIBUTION,
+          etvSummed: false
+        }
       }),
       make({
         kind: 'estimated_monthly_traffic',
         // null = el proveedor no trajo ETV, que NO es "tráfico cero".
         magnitude: totalEtv,
         source: 'labs_ranked_keywords',
-        detail: { basis: 'etv_sum_organic' }
+        detail: {
+          basis: 'etv_sum_organic',
+          // TASK-1805 — el hecho declara su fórmula y la cobertura de la muestra que sumó: el
+          // limit del colector es una COTA; si la respuesta llegó llena, la suma es un PISO.
+          etvMethodologyVersion: evidence.etvMethodology.version,
+          sampleRows: organic.length,
+          rowsWithEtv: etvValues.length,
+          rowLimit: PROSPECT_RANKED_KEYWORDS_LIMIT,
+          truncated: evidence.rankedKeywords.items.length >= PROSPECT_RANKED_KEYWORDS_LIMIT
+        }
       })
     )
   }

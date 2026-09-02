@@ -260,6 +260,11 @@ describe('captureCompetitorCoverage', () => {
     expect(first.tasks[0]).toMatchObject({ target1: 'rival.cl', target2: 'cliente.cl', intersections: false })
     expect(second.tasks[0]).toMatchObject({ intersections: true })
 
+    // TASK-1805 — domain_intersection es `etv_ignored`: el parser no lee ETV, así que el flag de
+    // metodología NO viaja. Reclasificar antes de proyectar ETV desde acá.
+    expect(first.tasks[0]).not.toHaveProperty('use_improved_etv')
+    expect(second.tasks[0]).not.toHaveProperty('use_improved_etv')
+
     const coverageInserts = state.calls.filter(c => c.sql.includes('seo_competitor_keyword_coverage'))
 
     expect(coverageInserts).toHaveLength(3)
