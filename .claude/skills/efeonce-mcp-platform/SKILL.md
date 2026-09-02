@@ -109,6 +109,13 @@ If a source conflicts with remembered behavior, the verified runtime and its can
   screen to the gateway** (that would make it an authorization authority) and **NEVER by narrowing `http://localhost`
   alone** (it is what Claude Code's loopback needs). Per-client consent requires per-client identities with revocable
   grants — `TASK-1631`. Tracked as pending review, not an incident: no observed exploitation.
+  🚩 **And the name lies, which is what makes the above dangerous:** that app's Entra `displayName` is
+  **"Efeonce MCP Local Canary Client"**, yet it IS the tenant-wide shared production client the shim hands to every
+  standard MCP client. The real canary is `66985833-14e9-438e-add4-b740e84e9a64` ("Base-Only Canary Client", 2
+  scopes), which the shim never returns. Verified with `az ad app show` 2026-09-02. Compound failure mode: whoever
+  opens Entra, reads "Local Canary" and assumes a toy blast radius is exactly whoever will not audit its redirect
+  URIs. **NEVER reason about this client's blast radius from its name — read `requiredResourceAccess` and
+  `publicClient.redirectUris`.** Renaming is cheap and touches neither `appId` nor consents.
 - Derive tenant/workspace from verified identity and provider policy. Never accept a free-form tenant boundary.
 - Treat `auth.efeonce.org` as session/runtime-isolated, not identity-isolated. Greenhouse, auth and MCP keep separate
   cookies, session secrets and token audiences, but an existing customer must resolve to one canonical

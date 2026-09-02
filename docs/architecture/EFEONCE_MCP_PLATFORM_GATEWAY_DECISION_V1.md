@@ -333,6 +333,14 @@ pero el riesgo que la norma previene sí está presente por construcción.**
   el primer consentimiento **no vuelve a haber pantalla**. Consecuencia: un proceso malicioso corriendo en la
   máquina del usuario puede iniciar una autorización con nuestro `client_id`, escuchar en cualquier puerto de
   loopback y recibir el código con su propio PKCE, en silencio.
+- *🚩 Y el nombre miente, que es lo que hace peligroso al hallazgo anterior:* el `displayName` de
+  `32617b87-e7ef-493a-838f-1ff3f0213b93` en Entra es **"Efeonce MCP Local Canary Client"**, pero ese ES el cliente
+  compartido de producción que el shim entrega a **todo** cliente MCP estándar del tenant. El canary real es otro
+  (`66985833-14e9-438e-add4-b740e84e9a64`, "Efeonce MCP Base-Only Canary Client", 2 scopes), y el shim no lo
+  devuelve. Verificado con `az ad app show` el 2026-09-02. No es una vulnerabilidad: es una etiqueta que miente
+  sobre lo que la cosa es. Y el modo de falla es compuesto — quien abre Entra, lee "Local Canary" y asume radio de
+  daño de juguete es **exactamente** quien no va a auditar sus redirect URIs. Renombrarlo es barato y no toca
+  `appId` ni consentimientos; hacerlo va junto con la revisión pendiente, no después.
 - *Radio de explosión, honestamente acotado:* exige atacante con ejecución local, el tenant es único
   (`signInAudience: AzureADMyOrg`) y —lo importante— el cliente público **no carga ningún scope de escritura**, por
   la regla dura de §"El scope de escritura NO se cablea al cliente público compartido". El token robado es de
