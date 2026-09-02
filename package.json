@@ -330,7 +330,8 @@
     "hubspot:glossary:render": "tsx scripts/documents/render-hubspot-glossary.ts",
     "branding:favicon": "node scripts/branding/build-favicon.mjs",
     "mcp:manifest:generate": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ci/mcp-tool-manifest-artifact.ts --write",
-    "mcp:manifest:check": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ci/mcp-tool-manifest-artifact.ts"
+    "mcp:manifest:check": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ci/mcp-tool-manifest-artifact.ts",
+    "mcp:selection-eval": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/mcp/tool-selection-eval.ts"
   },
   "lint-staged": {
     "*.{ts,tsx,mjs,mts,js,jsx}": [

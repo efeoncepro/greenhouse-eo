@@ -76,7 +76,7 @@ Deben entrar al conjunto que recibe bloque de ruteo y al fixture del eval.
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`

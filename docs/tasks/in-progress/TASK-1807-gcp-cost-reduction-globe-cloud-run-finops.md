@@ -614,7 +614,7 @@ Terraform, un scheduler a la vez. El rollback restaura el schedule anterior.
   `docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md`.
 - Source publicado: Globe `main@a33031621a8678c1848d71f1a98413e9763b41d5`; CI remoto
   `33620423241` completó `pnpm check` y build en verde (5m36s). Documentación Greenhouse:
-  `develop@5074fcc55`, commit local no publicado para no inferir autorización sobre Greenhouse.
+  este mismo commit local de `develop`, no publicado para no inferir autorización sobre Greenhouse.
 - Estado honesto: hibernación aplicada; ahorro observado pendiente de Billing Export a 24 h, 7 días y cierre
   mensual. La task permanece `in-progress` por esas ventanas y por el cierre del watcher neto.
 

@@ -137,3 +137,6 @@ public/growth-cta/BUILDINFO.json
 *.synthetic-purge-allowlist.json
 # TASK-1746 — allowlists de purga de auditoría de recuperación de acceso (ids de postulación; no se commitean)
 *.access-recovery-purge-allowlist.json
+
+# TASK-1784 — corridas del eval de selección MCP (artefacto de medición, no fuente)
+/.evals/
