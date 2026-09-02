@@ -19,6 +19,12 @@ describe('ops-worker deploy Nubox contract', () => {
     expect(script).toContain('ENV_VARS="${ENV_VARS},NUBOX_API_BASE_URL=${NUBOX_API_BASE_URL}"')
     expect(script).toContain('ENV_VARS="${ENV_VARS},NUBOX_BEARER_TOKEN_SECRET_REF=${NUBOX_BEARER_TOKEN_SECRET_REF}"')
     expect(script).toContain('ENV_VARS="${ENV_VARS},NUBOX_X_API_KEY_SECRET_REF=${NUBOX_X_API_KEY_SECRET_REF}"')
+
+    // TASK-1805 — el selector de metodología ETV es dual-runtime; si desaparece de acá, el
+    // próximo deploy lo borra en silencio y la señal de drift lo reporta como "default".
+    expect(script).toContain('GROWTH_SEO_ETV_METHODOLOGY_VERSION="${GROWTH_SEO_ETV_METHODOLOGY_VERSION:-legacy_static_v1}"')
+    expect(script).toContain('ENV_VARS="${ENV_VARS},GROWTH_SEO_ETV_METHODOLOGY_VERSION=${GROWTH_SEO_ETV_METHODOLOGY_VERSION}"')
+    expect(script).toContain('ENV_VARS="${ENV_VARS},GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION=${GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION}"')
   })
 
   it('grants Secret Manager access to Nubox secret refs without mounting token values', () => {
