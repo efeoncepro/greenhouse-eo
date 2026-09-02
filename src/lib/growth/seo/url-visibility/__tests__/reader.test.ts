@@ -52,6 +52,9 @@ const snapshotRow = (overrides: Record<string, unknown> = {}): Record<string, un
   paid_etv: '0',
   total_ranked_keywords: 83,
   top_keywords: JSON.stringify([{ keyword: 'guia pintura', position: 4, url: 'https://cliente.cl/guia', searchVolume: 900, etv: 90 }]),
+  etv_methodology_version: 'legacy_static_v1',
+  etv_methodology_evidence: 'explicit_request',
+  etv_policy_version: 'etv-policy.v1',
   ...overrides
 })
 
@@ -153,8 +156,8 @@ describe('readUrlVisibility', () => {
 describe('readVisibilityConcentration', () => {
   it('ordena por ETV descendente y expone el capturedAt más reciente', async () => {
     state.rows = [
-      { normalized_subject: 'cliente.cl/a', capture_date: '2026-08-10', total_ranked_keywords: 10, organic_count: 10, organic_etv: '50.00', paid_etv: null },
-      { normalized_subject: 'cliente.cl/b', capture_date: '2026-08-12', total_ranked_keywords: 90, organic_count: 90, organic_etv: '700.00', paid_etv: null }
+      { normalized_subject: 'cliente.cl/a', capture_date: '2026-08-10', total_ranked_keywords: 10, organic_count: 10, organic_etv: '50.00', paid_etv: null, etv_methodology_version: 'legacy_static_v1', etv_methodology_evidence: 'explicit_request', etv_policy_version: 'etv-policy.v1' },
+      { normalized_subject: 'cliente.cl/b', capture_date: '2026-08-12', total_ranked_keywords: 90, organic_count: 90, organic_etv: '700.00', paid_etv: null, etv_methodology_version: 'legacy_static_v1', etv_methodology_evidence: 'explicit_request', etv_policy_version: 'etv-policy.v1' }
     ]
 
     const result = await readVisibilityConcentration({
@@ -179,5 +182,32 @@ describe('readVisibilityConcentration', () => {
     expect(
       await readVisibilityConcentration({ domain: 'cliente.cl', kind: 'subdomain', locationCode: '2152', languageCode: 'es' })
     ).toEqual({ ok: false, reason: 'no_market_data' })
+  })
+})
+
+describe('TASK-1805 — readUrlVisibility / concentración sirven UNA metodología', () => {
+  it('filtra por método en el SQL y expone etvMethodology (los top-N heredan del padre)', async () => {
+    state.rows = [snapshotRow()]
+
+    const result = await readUrlVisibility({ subject: 'cliente.cl/guia', kind: 'url', locationCode: '2152', languageCode: 'es' })
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) throw new Error('unreachable')
+    expect(state.queries[0].sql).toContain('etv_methodology_version = $6')
+    expect(state.queries[0].params[5]).toBe('legacy_static_v1')
+    expect(result.etvMethodology).toMatchObject({ version: 'legacy_static_v1', comparability: 'single_methodology' })
+  })
+
+  it('la concentración filtra por método y rotula el top-N con su fórmula', async () => {
+    state.rows = [
+      { normalized_subject: 'cliente.cl/a', capture_date: '2026-08-17', total_ranked_keywords: 10, organic_count: 10, organic_etv: '50', paid_etv: null, etv_methodology_version: 'legacy_static_v1', etv_methodology_evidence: 'explicit_request', etv_policy_version: 'etv-policy.v1' }
+    ]
+
+    const result = await readVisibilityConcentration({ domain: 'cliente.cl', kind: 'url', locationCode: '2152', languageCode: 'es' })
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) throw new Error('unreachable')
+    expect(state.queries[0].sql).toContain('etv_methodology_version = $6')
+    expect(result.etvMethodology.version).toBe('legacy_static_v1')
   })
 })

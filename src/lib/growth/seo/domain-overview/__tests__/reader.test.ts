@@ -56,6 +56,9 @@ const snapshotRow = (overrides: Record<string, unknown> = {}): Record<string, un
   organic_is_lost: 12,
   paid_count: 3,
   paid_etv: '12.50',
+  etv_methodology_version: 'legacy_static_v1',
+  etv_methodology_evidence: 'explicit_request',
+  etv_policy_version: 'etv-policy.v1',
   ...overrides
 })
 
@@ -216,5 +219,53 @@ describe('readDomainOverviewForTarget', () => {
     const result = await readDomainOverviewForTarget('seot-x')
 
     expect(result).toBeNull()
+  })
+})
+
+describe('TASK-1805 — readDomainOverview sirve UNA metodología', () => {
+  it('filtra por el selector de lectura (legacy explícito) ANTES de deduplicar y expone etvMethodology', async () => {
+    state.rows = [snapshotRow()]
+
+    const result = await readDomainOverview({ subject: 'cliente.cl', locationCode: '2152', languageCode: 'es' })
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) throw new Error('unreachable')
+
+    const main = state.queries.find(query => query.sql.includes('ORDER BY capture_date DESC'))
+
+    expect(main?.sql).toContain('etv_methodology_version = $5')
+    expect(main?.params[4]).toBe('legacy_static_v1')
+    expect(result.etvMethodology).toMatchObject({
+      version: 'legacy_static_v1',
+      evidence: 'explicit_request',
+      policyVersion: 'etv-policy.v1',
+      availableMethodologies: ['legacy_static_v1'],
+      comparability: 'single_methodology',
+      breakpointDate: null
+    })
+  })
+
+  it('el compare interno puede pedir improved: viaja al SQL, nunca se infiere', async () => {
+    state.rows = [snapshotRow({ etv_methodology_version: 'improved_layout_clickstream_v2' })]
+
+    const result = await readDomainOverview({
+      subject: 'cliente.cl',
+      locationCode: '2152',
+      languageCode: 'es',
+      etvMethodology: 'improved_layout_clickstream_v2'
+    })
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) throw new Error('unreachable')
+    expect(state.queries[0].params[4]).toBe('improved_layout_clickstream_v2')
+    expect(result.etvMethodology.version).toBe('improved_layout_clickstream_v2')
+  })
+
+  it('una serie mixta se RECHAZA en vez de servirse (defensa en profundidad tras el filtro SQL)', async () => {
+    state.rows = [snapshotRow(), snapshotRow({ capture_date: '2026-07-16', etv_methodology_version: 'improved_layout_clickstream_v2' })]
+
+    await expect(readDomainOverview({ subject: 'cliente.cl', locationCode: '2152', languageCode: 'es' })).rejects.toMatchObject({
+      code: 'mixed_etv_methodology'
+    })
   })
 })

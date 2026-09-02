@@ -13,6 +13,14 @@ import 'server-only'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import type { SeoDomainPositionDistribution } from '../domain-overview/persist'
+import {
+  assertSingleEtvMethodology,
+  buildEtvMethodologyProvenance,
+  isEtvMethodologyVersion,
+  resolveEtvReadMethodology,
+  type EtvMethodologyProvenance,
+  type EtvMethodologyVersion
+} from '../etv-methodology'
 import { type SeoProvenance, seoProvenance } from '../lens'
 import { normalizeOverviewDomain } from '../domain-overview/persist'
 import type { SeoUrlVisibilitySourceEndpoint, SeoUrlVisibilityTopKeyword } from './persist'
@@ -31,6 +39,13 @@ export interface UrlVisibilityHistoryPoint {
 
 export type ReadUrlVisibilityResult =
   | { ok: false; reason: 'no_market_data' | 'invalid_subject' }
+  /** TASK-1805 — hay evidencia del sujeto pero no con la fórmula pedida: degradación etiquetada. */
+  | {
+      ok: false
+      reason: 'not_available_for_method'
+      requestedMethodology: EtvMethodologyVersion
+      availableMethodologies: EtvMethodologyVersion[]
+    }
   | {
       ok: true
       subject: string
@@ -45,6 +60,8 @@ export type ReadUrlVisibilityResult =
       capturedAt: string
       /** TASK-1785 — la forma canónica; `lens`/`capturedAt` de arriba son su proyección. */
       provenance: SeoProvenance[]
+      /** TASK-1805 — fórmula ETV de toda cifra del DTO, incluidos los top-N (heredan del padre). */
+      etvMethodology: EtvMethodologyProvenance
       source: SeoUrlVisibilitySourceEndpoint
       locationCode: string
       languageCode: string
@@ -89,6 +106,9 @@ type SnapshotRow = {
   paid_etv: string | null
   total_ranked_keywords: number | null
   top_keywords: unknown
+  etv_methodology_version: string
+  etv_methodology_evidence: string
+  etv_policy_version: string | null
 }
 
 const asNumber = (value: string | null): number | null => {
@@ -135,7 +155,11 @@ export const readUrlVisibility = async (input: {
   locationCode: string
   languageCode: string
   historyMonths?: number
+  /** TASK-1805 — método a servir; default = selector de lectura canónico. Sólo compare interno lo pasa. */
+  etvMethodology?: EtvMethodologyVersion
 }): Promise<ReadUrlVisibilityResult> => {
+  const served = input.etvMethodology ?? resolveEtvReadMethodology().version
+
   const resolution = resolveVisibilitySubject({
     subject: input.subject,
     kind: input.kind,
@@ -157,12 +181,14 @@ export const readUrlVisibility = async (input: {
             organic_pos_61_70, organic_pos_71_80, organic_pos_81_90, organic_pos_91_100,
             organic_count, organic_etv, organic_estimated_paid_traffic_cost,
             organic_is_new, organic_is_up, organic_is_down, organic_is_lost,
-            paid_count, paid_etv, total_ranked_keywords, top_keywords
+            paid_count, paid_etv, total_ranked_keywords, top_keywords,
+            etv_methodology_version, etv_methodology_evidence, etv_policy_version
        FROM greenhouse_growth.seo_url_visibility_snapshots
       WHERE subject_kind = $1
         AND normalized_subject = $2
         AND location_code = $3
         AND language_code = $4
+        AND etv_methodology_version = $6
       ORDER BY capture_date DESC
       LIMIT $5`,
     [
@@ -170,13 +196,35 @@ export const readUrlVisibility = async (input: {
       resolution.subject.normalized,
       input.locationCode,
       input.languageCode,
-      URL_VISIBILITY_MAX_HISTORY_MONTHS * 2
+      URL_VISIBILITY_MAX_HISTORY_MONTHS * 2,
+      served
     ]
   )
 
-  const withData = rows.filter(hasAnyData)
+  // TASK-1805 — fórmulas disponibles para el sujeto (sin el filtro de método).
+  const availableRows = await runGreenhousePostgresQuery<{ etv_methodology_version: string }>(
+    `SELECT DISTINCT etv_methodology_version
+       FROM greenhouse_growth.seo_url_visibility_snapshots
+      WHERE subject_kind = $1
+        AND normalized_subject = $2
+        AND location_code = $3
+        AND language_code = $4
+        AND (organic_count IS NOT NULL OR organic_etv IS NOT NULL OR total_ranked_keywords IS NOT NULL OR paid_etv IS NOT NULL)`,
+    [resolution.subject.kind, resolution.subject.normalized, input.locationCode, input.languageCode]
+  )
 
-  if (withData.length === 0) return { ok: false, reason: 'no_market_data' }
+  const available = availableRows.map(row => row.etv_methodology_version)
+  const withData = assertSingleEtvMethodology(rows.filter(hasAnyData), served)
+
+  if (withData.length === 0) {
+    const others = available.filter((version): version is EtvMethodologyVersion => isEtvMethodologyVersion(version) && version !== served)
+
+    if (others.length > 0) {
+      return { ok: false, reason: 'not_available_for_method', requestedMethodology: served, availableMethodologies: others }
+    }
+
+    return { ok: false, reason: 'no_market_data' }
+  }
 
   const photo = [...withData].sort((a, b) => {
     const dateDiff = toIsoDate(b.capture_date).localeCompare(toIsoDate(a.capture_date))
@@ -218,6 +266,13 @@ export const readUrlVisibility = async (input: {
     provenance: [
       seoProvenance({ section: '*', source: 'dataforseo_labs', capturedAt: toIsoDate(photo.capture_date) })
     ],
+    etvMethodology: buildEtvMethodologyProvenance({
+      served,
+      rowVersion: photo.etv_methodology_version,
+      rowEvidence: photo.etv_methodology_evidence,
+      rowPolicyVersion: photo.etv_policy_version,
+      available
+    }),
     source: photo.source_endpoint,
     locationCode: input.locationCode,
     languageCode: input.languageCode,
@@ -275,6 +330,8 @@ export type ReadVisibilityConcentrationResult =
       kind: 'url' | 'subdomain'
       lens: 'estimated'
       capturedAt: string
+      /** TASK-1805 — fórmula de todas las cifras (y de la MEMBRESÍA del top-N, que también depende de ella). */
+      etvMethodology: EtvMethodologyProvenance
       items: VisibilityConcentrationItem[]
     }
 
@@ -289,7 +346,11 @@ export const readVisibilityConcentration = async (input: {
   locationCode: string
   languageCode: string
   limit?: number
+  /** TASK-1805 — método a servir; default = selector de lectura canónico. */
+  etvMethodology?: EtvMethodologyVersion
 }): Promise<ReadVisibilityConcentrationResult> => {
+  const served = input.etvMethodology ?? resolveEtvReadMethodology().version
+
   // Mismo guard que el colector: el path se valida sobre el CRUDO (la normalización lo recorta).
   const rawWithoutScheme = input.domain.trim().replace(/^[a-z][a-z0-9+.-]*:\/\//i, '')
 
@@ -308,23 +369,30 @@ export const readVisibilityConcentration = async (input: {
     organic_count: number | null
     organic_etv: string | null
     paid_etv: string | null
+    etv_methodology_version: string
+    etv_methodology_evidence: string
+    etv_policy_version: string | null
   }>(
     `SELECT DISTINCT ON (normalized_subject)
             normalized_subject, capture_date, total_ranked_keywords,
-            organic_count, organic_etv, paid_etv
+            organic_count, organic_etv, paid_etv,
+            etv_methodology_version, etv_methodology_evidence, etv_policy_version
        FROM greenhouse_growth.seo_url_visibility_snapshots
       WHERE subject_kind = $1
         AND (normalized_subject = $2 OR normalized_subject LIKE $2 || $3 OR normalized_subject LIKE '%.' || $2)
         AND location_code = $4
         AND language_code = $5
+        AND etv_methodology_version = $6
         AND (organic_etv IS NOT NULL OR organic_count IS NOT NULL OR total_ranked_keywords IS NOT NULL)
       ORDER BY normalized_subject, capture_date DESC`,
-    [input.kind, normalizedDomain, input.kind === 'url' ? '/%' : null, input.locationCode, input.languageCode]
+    [input.kind, normalizedDomain, input.kind === 'url' ? '/%' : null, input.locationCode, input.languageCode, served]
   )
 
   if (rows.length === 0) return { ok: false, reason: 'no_market_data' }
 
-  const items: VisibilityConcentrationItem[] = rows
+  const homogeneous = assertSingleEtvMethodology(rows, served)
+
+  const items: VisibilityConcentrationItem[] = homogeneous
     .map(row => ({
       subject: row.normalized_subject,
       kind: input.kind,
@@ -342,5 +410,19 @@ export const readVisibilityConcentration = async (input: {
     items[0].capturedAt
   )
 
-  return { ok: true, domain: normalizedDomain, kind: input.kind, lens: 'estimated', capturedAt, items }
+  return {
+    ok: true,
+    domain: normalizedDomain,
+    kind: input.kind,
+    lens: 'estimated',
+    capturedAt,
+    etvMethodology: buildEtvMethodologyProvenance({
+      served,
+      rowVersion: homogeneous[0].etv_methodology_version,
+      rowEvidence: homogeneous[0].etv_methodology_evidence,
+      rowPolicyVersion: homogeneous[0].etv_policy_version,
+      available: [served]
+    }),
+    items
+  }
 }
