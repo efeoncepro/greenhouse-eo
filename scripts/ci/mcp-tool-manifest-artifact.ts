@@ -20,6 +20,31 @@
  * `inputKeys` sale de la introspección, NO del manifiesto: duplicar los schemas a mano es
  * exactamente el problema que esta task cierra.
  *
+ * ═══ TASK-1784 — `descriptionHash`: por qué el texto también viaja ═══
+ *
+ * Hasta esta task el artefacto llevaba nombre, dominio, banderas y claves de schema, pero NO la
+ * descripción. Mientras la descripción era sólo documentación eso alcanzaba. Dejó de alcanzar
+ * cuando el RUTEO —qué tool preferir sobre cuál vecina, y por qué NUNCA elegir un mercado en
+ * silencio— pasó a vivir dentro de ella: una descripción vieja en el gateway sirve un mapa
+ * desactualizado, y eso era estructuralmente invisible.
+ *
+ * Está medido, no supuesto: al aplicar el ruteo a siete descripciones, `pnpm mcp:manifest:check`
+ * respondió «artefacto al día». El gate no mentía — es que no miraba ahí.
+ *
+ * 🔴 Viaja el TEXTO COMPLETO, no sólo su hash. La primera versión de esta task transportaba sólo
+ * el hash —diffs más chicos, misma capacidad de DETECTAR la divergencia— y al conectarlo el guard
+ * del gateway encontró 21 de 27 descripciones federadas ya divergentes. Con hash solo, cerrar eso
+ * habría sido copiar 21 textos a mano y volver a copiarlos en cada edición futura: un espejo
+ * manual, que es exactamente lo que `TASK-1780` eliminó para el inventario.
+ *
+ * Detectar la deriva es más débil que hacerla imposible. Con el texto acá, el gateway DERIVA su
+ * descripción igual que deriva `writes` y `inputKeys`, y la clase de defecto deja de existir en
+ * vez de quedar vigilada. El `descriptionHash` se conserva para comparar barato y para que una
+ * edición a mano del artefacto se note.
+ *
+ * Lo que costó: el artefacto pasa a pesar decenas de KB. Es un archivo generado que nadie lee
+ * línea por línea, y el precio compra la eliminación de una clase de drift.
+ *
  * Uso:
  *   pnpm mcp:manifest:check      # gate
  *   pnpm mcp:manifest:generate   # regenera
@@ -40,7 +65,20 @@ type GeneratedTool = {
   spendsProviderBudget: boolean
   purpose: string
   inputKeys: string[]
+  /**
+   * La `description` agent-facing EXACTA, introspectada del servidor real. El gateway la deriva
+   * de acá en vez de mantener su propia copia: el ruteo tiene un solo dueño.
+   */
+  description: string
+  /**
+   * SHA-256 de la `description` agent-facing registrada, introspectada del servidor real.
+   * El guard del gateway lo compara con el hash de la descripción que él registra: un drift de
+   * texto pasa a ser un finding en vez de una diferencia silenciosa (TASK-1784).
+   */
+  descriptionHash: string
 }
+
+const sha256 = (value: string): string => createHash('sha256').update(value).digest('hex')
 
 const buildArtifact = () => {
   const server = createGreenhouseMcpServer(
@@ -58,7 +96,7 @@ const buildArtifact = () => {
    
   const registered = (server as any)._registeredTools as Record<
     string,
-    { inputSchema?: { shape?: Record<string, unknown> } }
+    { description?: string; inputSchema?: { shape?: Record<string, unknown> } }
   >
 
   const tools: GeneratedTool[] = GREENHOUSE_MCP_TOOL_MANIFEST.map(entry => ({
@@ -67,7 +105,9 @@ const buildArtifact = () => {
     writes: entry.writes,
     spendsProviderBudget: entry.spendsProviderBudget,
     purpose: entry.purpose,
-    inputKeys: Object.keys(registered[entry.name]?.inputSchema?.shape ?? {}).sort()
+    inputKeys: Object.keys(registered[entry.name]?.inputSchema?.shape ?? {}).sort(),
+    description: registered[entry.name]?.description ?? '',
+    descriptionHash: sha256(registered[entry.name]?.description ?? '')
   }))
 
   const manifestHash = createHash('sha256').update(JSON.stringify(tools)).digest('hex')
