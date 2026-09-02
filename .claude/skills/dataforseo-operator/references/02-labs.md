@@ -128,53 +128,54 @@ Conteo de resultados, tipos de elementos del SERP (organic, paid, featured_snipp
 - **Flags de movimiento** — `is_new`, `is_up`, `is_down`, `is_lost` por elemento ranqueado (vs snapshot anterior de la base).
 - **`clickstream_data`** (con `include_clickstream_data: true`, costo ×2) — volumen normalizado con clickstream + demografía por género y grupos etarios.
 
-### 3.1 Transición ETV legacy → improved — aviso de cuenta 2026-09-01
+### 3.1 Transición ETV legacy → improved — contrato confirmado 2026-09-02
 
-**Estado de la evidencia.** DataForSEO comunicó directamente a la cuenta que rediseñó ETV y abrió una ventana
-de transición de dos meses. Al 2026-09-01, las páginas públicas revisadas de Ranked Keywords, Domain Rank
-Overview, Bulk Traffic Estimation y Historical Rank Overview **todavía no contienen**
-`use_improved_etv` y el Help Center sigue describiendo la fórmula legacy. Por tanto, el aviso confirma la
-existencia, el flag y el calendario; la documentación pública aún no confirma la matriz completa de endpoints,
-la retroactividad, la interacción de flags ni el pricing. No rellenar esos huecos por inferencia.
+**Estado de la evidencia.** DataForSEO confirmó por respuesta directa el contrato operativo. Las páginas públicas
+y OpenAPI seguían en preparación; la correspondencia oficial resuelve la matriz, semántica, históricos y precio.
 
-| Aspecto | Legacy documentado | Improved anunciado |
+| Aspecto | Legacy | Improved |
 |---|---|---|
-| CTR | Coeficiente fijo por `rank_group`, con ajuste limitado por ads tradicionales | CTR dinámico según layout/features exactas de la SERP y la intención principal de la query |
+| CTR | Coeficiente fijo por `rank_group` | Curvas por posición, intención y composición exacta del SERP |
 | Volumen | `keyword_info.search_volume` | Benchmark normalizado con datasets clickstream multi-fuente |
-| Selección durante transición | Default de la cuenta hasta 2026-11-01 | Opt-in inmediato con `use_improved_etv: true` |
-| Después de 2026-11-01 | No se confirmó si `false` conservará legacy | El aviso dice que improved pasa a ser default; hora/zona y política de rollback no publicadas |
-| Objetivo declarado | Estimación por posición | Acercarse mejor a GSC en SERPs con AIO, snippets, local packs y zero-click |
+| Cuentas anteriores al 2026-09-01 | Default durante transición; `false` lo solicita | `true` lo solicita |
+| Cuentas desde 2026-09-01T00:00:00Z | No es default | Default desde registro |
+| Desde 2026-11-01T00:00:00Z | No disponible: `false` se ignora | Obligatorio para todas las cuentas |
+| Precio | Request normal | Sin premium; A/B exacto requiere dos requests normales |
+
+**Matriz ETV-capable confirmada.** Variantes Google/Bing donde existen, incluidas rutas legacy: Ranked Keywords,
+SERP Competitors, Relevant Pages, Subdomains, Competitors by Domain, Categories for Domain, Domain Intersection,
+Page Intersection, Domain Rank Overview, Historical Rank Overview, Historical SERPs, Bulk Traffic Estimation,
+Historical Bulk Traffic Estimation y Domain Metrics by Categories. Keyword Suggestions/Ideas no devuelven ETV.
+
+La fórmula afecta todo `etv`, los ETV por item —incluido `ranked_serp_element.serp_item.etv`—, SERP Competitors y
+`estimated_paid_traffic_cost` en bloques organic, paid, featured snippet, local pack y AI Overview reference. Los
+elementos no orgánicos con URL comparten los clics residuales según posición absoluta. En AI Overview, el cálculo
+se reparte uniformemente entre dominios únicos citados: es atribución modelada, nunca clics observados por cita.
 
 **No confundir dos contratos:**
 
-- `use_improved_etv` selecciona, según el aviso, la metodología del campo estándar `etv`.
-- `include_clickstream_data: true` solicita campos adicionales (`clickstream_etv`,
-  `clickstream_keyword_info`, distribuciones y volúmenes normalizados), permanece documentado como default
-  `false` y **duplica el precio**. Que improved use clickstream como insumo no demuestra que active esos
-  campos, que duplique el costo ni que sustituya `clickstream_etv`.
+- `use_improved_etv` selecciona la metodología del campo estándar `etv` sin recargo.
+- `include_clickstream_data: true` es independiente y combinable, solicita `clickstream_etv` y campos adicionales,
+  y **duplica el precio de ese request**. `clickstream_etv` no forma parte de improved y no cambia con el flag.
+- El nombre interno `improved_layout_clickstream_v2` describe sus insumos, pero no implica activar clickstream data.
 
-**Derivados y ordenamientos.** El proveedor documenta
-`estimated_paid_traffic_cost = organic etv × paid cpc`; si el ETV cambia y conserva esa identidad, el costo
-equivalente también cambia. Es una inferencia fuerte, no una garantía de rollout sincronizado. Cualquier filtro,
-`order_by`, top-N, score o narrativa que use `etv` puede cambiar de valor y también de membresía aunque rankings,
-demanda y GSC permanezcan iguales.
+**Históricos.** Julio de 2026 en adelante se recomputa completamente. Los meses anteriores se convierten con un
+factor derivado del ratio legacy/improved de julio por dominio: son aproximaciones, no recomputación keyword por
+keyword. Hasta el corte, el mismo mes puede variar según flag. Toda persistencia improved histórica debe declarar
+`fully_recomputed` o `calibrated_approximation`; no usar pre-julio para YoY sin disclosure/no-comparable.
 
-**Preguntas abiertas load-bearing antes de implementar:**
+**Provenance.** La respuesta no expone versión de fórmula. Greenhouse registra método solicitado, instante UTC y
+policy version, y deriva `provider_effective_method` según el contrato. Desde el corte, una configuración legacy
+debe fallar antes del request; nunca atribuir legacy porque se envió un `false` que el proveedor ignora.
 
-1. Lista exacta de endpoints/objetos que acepta el flag y comportamiento ante endpoints no compatibles.
-2. Alcance: `organic.etv` solamente o también paid, featured snippet, local pack, AIO reference y costos derivados.
-3. Pricing de `use_improved_etv` y compatibilidad/facturación junto a `include_clickstream_data`.
-4. Retroactividad: si un histórico 2024 se recalcula al leerlo, si el dataset base se reescribe o si sólo cambia
-   la captura hacia adelante. `correlate: true` no equivale a versionado metodológico.
-5. Política posterior al cutover: disponibilidad de legacy, hora/zona y mecanismo de rollback.
-6. Qué significa "alineación con GSC": validación agregada del proveedor no equivale a consumir la propiedad
-   privada de cada cliente ni convierte ETV en primera parte.
+Sandbox y las URLs finales de OpenAPI/changelog permanecen pendientes no bloqueantes. GSC sigue siendo benchmark
+first-party separado; la promesa agregada del proveedor no convierte ETV en dato medido.
 
 **Contrato de uso Greenhouse:** nunca activar el flag dispersándolo entre callsites ni escribir el shadow en las
 tablas productivas actuales. La fórmula debe seleccionarse mediante policy/helper Labs canónico, persistirse como
 provenance y formar parte de idempotencia/lectura. Un shadow compara ambos modelos fuera de la serie servida; el
-cutover elige rebaseline versionado o breakpoint visible, nunca una línea que mezcla fórmulas. Auditoría de los
-siete consumers y claves actuales:
+cutover elige rebaseline versionado o breakpoint visible, nunca una línea que mezcla fórmulas. Auditoría de las
+14 familias y de los seis endpoints/siete caminos consumidores actuales:
 `docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md`.
 
 ---
@@ -334,4 +335,4 @@ Regla práctica: **Labs para orgánico y análisis; Keywords Data para presupues
 - Clickstream ETV: https://dataforseo.com/help-center/whats-clickstream-estimated-traffic-volume-and-how-is-it-calculated
 - Traffic cost: https://dataforseo.com/help-center/how-is-traffic-cost-calculated
 - Historical Rank Overview: https://docs.dataforseo.com/v3/dataforseo_labs/google/historical_rank_overview/live/
-- **Aviso ETV improved:** correo de cuenta DataForSEO recibido 2026-09-01. Sin URL pública equivalente al cierre de esta actualización; usarlo como aviso primario de rollout, no como sustituto de la matriz contractual pendiente.
+- **Improved ETV:** aviso de cuenta recibido 2026-09-01 y respuesta contractual de DataForSEO recibida 2026-09-02. La respuesta confirmó alcance, corte, histórico, precio, independencia de Clickstream y ausencia de versión de fórmula en el payload. Sandbox, OpenAPI y changelog públicos siguen pendientes; no inventar esas garantías ni sustituir el contrato confirmado por inferencias desde el default.

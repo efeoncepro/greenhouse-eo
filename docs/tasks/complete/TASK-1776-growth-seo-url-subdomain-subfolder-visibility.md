@@ -570,7 +570,8 @@ keyword discovery.
 
 ## Follow-ups
 
-- `page_intersection` para comparar dos pillar pages, como extensión de `TASK-1314`.
+- `TASK-1810` posee `page_intersection` para comparar páginas y entrega su reader a `TASK-1314`; esta task no lo
+  implementó ni lo contó como caller operativo.
 - Task `ui-ux` que dibuje la vista de página y su comparación contra la página del competidor.
 - Evaluar si el enriquecimiento de mercado desde esta fuente permite bajar la frecuencia del cron mensual de `TASK-1661`, ya que parte de la cartera quedaría fresca por efecto lateral.
 
@@ -579,3 +580,9 @@ keyword discovery.
 - ¿Cuál es el `limit` por defecto por sujeto? Fija el costo por corrida y requiere decisión del operador.
 - ¿La regla de desambiguación entre `subfolder` y `url` la declara el operador al pedir la corrida, o se infiere del trailing slash? La propuesta es declararla explícitamente y no inferirla.
 - ¿`subdomains` debe correr por separado o dispararse automáticamente cuando el sujeto es `domain`? Correrlo siempre añade costo fijo por corrida.
+
+## Delta 2026-09-02 — `page_intersection` tiene follow-up dueño
+
+El runtime y el scope ejecutado confirman que esta task cerró `ranked_keywords`, `relevant_pages` y `subdomains`,
+no `page_intersection`. La frase histórica que agrupaba cuatro endpoints no es evidencia de caller. `TASK-1810`
+formaliza la captura faltante y preserva a `TASK-1314` como consumer compositivo sin llamadas on-read.

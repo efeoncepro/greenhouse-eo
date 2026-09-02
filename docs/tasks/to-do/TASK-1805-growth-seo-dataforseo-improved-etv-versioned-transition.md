@@ -24,15 +24,18 @@
 - Status real: `Diseno aprobado; foundation no implementada`
 - Rank: `1`
 - Domain: `growth|seo|data|integration`
-- Blocked by: `external DataForSEO endpoint, pricing and historical-semantics clarification`
+- External deadline: `2026-11-01T00:00:00Z; legacy deja de estar disponible como opt-out`
+- Internal target: `foundation legacy-ready by 2026-10-15`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-Versiona la metodología detrás de ETV en los siete consumers DataForSEO Labs, permite coexistencia
-legacy/improved y evita que readers, API o MCP mezclen fórmulas en una trayectoria. Entrega la foundation
+Versiona la metodología detrás de ETV en los siete caminos que hoy consumen ETV y gobierna las 14 familias de
+endpoint confirmadas por DataForSEO. Permite coexistencia legacy/improved y evita que readers, API o MCP mezclen
+fórmulas en una trayectoria. Entrega la foundation
 expand-contract, la policy explícita, el evaluador interno seguro y la observabilidad cross-runtime manteniendo
 legacy como selección productiva. `TASK-1806` ejecuta después el shadow, la decisión histórica y el cutover.
 
@@ -88,7 +91,8 @@ Reglas obligatorias:
 - Un reader sirve una metodología o falla/degrada con etiqueta; nunca construye una serie mixta.
 - GSC es benchmark first-party separado; no se promedia con ETV.
 - Todo gasto requiere forecast, tope USD y aprobación humana explícita.
-- Código, config y deploy no son readback del método servido.
+- DataForSEO no devuelve la versión aplicada: código, config y deploy no son evidencia del método efectivo.
+- Desde 2026-11-01T00:00:00Z, una configuración legacy falla antes de llamar al proveedor; `false` no es rollback.
 
 ## Normative Docs
 
@@ -105,7 +109,7 @@ Reglas obligatorias:
 
 ### Depends on
 
-- Respuesta contractual de DataForSEO para `use_improved_etv` o documentación oficial equivalente.
+- Respuesta contractual de DataForSEO para `use_improved_etv` — recibida el 2026-09-02.
 - `TASK-1775`, `TASK-1776`, `TASK-1709`, `TASK-1780` y `TASK-1785` completas como foundations.
 - `greenhouse_growth.seo_domain_overview_snapshots`.
 - `greenhouse_growth.seo_url_visibility_snapshots`.
@@ -115,6 +119,10 @@ Reglas obligatorias:
 ### Blocks / Impacts
 
 - `TASK-1806` — evaluación, decisión histórica y cutover productivo de Improved ETV.
+- `TASK-1808` — categorías por dominio y mercado temático.
+- `TASK-1809` — competidores SERP y share of voice por set de keywords.
+- `TASK-1810` — intersección competitiva entre páginas.
+- `TASK-1811` — benchmarking histórico masivo de tráfico.
 - Continuidad de las series ETV después del 2026-11-01.
 - Fotos/trayectoria de dominio, bulk/historical, visibilidad URL, relevant pages, subdomains y prospect diagnostic.
 - Readers Growth SEO, API ecosystem/app, Nexa y MCP.
@@ -145,7 +153,7 @@ Reglas obligatorias:
 
 - Transporte DataForSEO con allowlist/breaker/spend ledger por familia.
 - Snapshots append-only de dominio y visibilidad, más diagnóstico de prospecto.
-- Parsers/builders para los siete consumers Labs afectados.
+- Nueve familias Labs con caller: seis familias/siete caminos consumen ETV y tres lo ignoran explícitamente.
 - Readers y proyecciones API/MCP con `lens`, source y captura, pero sin metodología.
 - GSC per-org para benchmark de dominios propios.
 
@@ -157,6 +165,10 @@ Reglas obligatorias:
 - Relevant pages/subdomains pueden cambiar membresía top-N sin que el contrato lo explique.
 - Prospectos guardan `basis: etv_sum_organic`, pero no metodología ni cobertura/truncamiento suficiente.
 - No hay señal cross-runtime ni runbook de cutover implementado.
+- Cinco familias ETV-capable confirmadas no tienen caller: `categories_for_domain`,
+  `domain_metrics_by_categories`, `serp_competitors`, `page_intersection` y
+  `historical_bulk_traffic_estimation`. Permanecen `provider_supported_not_enabled` hasta que
+  `TASK-1808`–`TASK-1811` habiliten únicamente su familia con consumer, costo y rollout propios.
 
 ## Modular Placement Contract
 
@@ -206,7 +218,7 @@ Reglas obligatorias:
   autorización ni expone `captured_by_organization_id`.
 - Idempotency/concurrency: claves incluyen método donde coexistir es válido; prospecto conserva su lock diario y
   shadow corre en evaluator interno separado.
-- Audit/outbox/history: snapshots/facts append-only + señal de configured/requested/served; sin outbox nuevo salvo
+- Audit/outbox/history: snapshots/facts append-only + señal de configured/requested/provider-effective; sin outbox nuevo salvo
   que Plan Mode demuestre un consumer reactivo real.
 
 ### Migration, backfill and rollout
@@ -215,8 +227,8 @@ Reglas obligatorias:
 - Default state: selector legacy explícito, shadow y improved productivo deshabilitados.
 - Backfill plan: sólo atribuir legacy cuando la evidencia lo garantice. Si ya existe ventana ambigua, usar estado
   desconocido o reconstrucción desde evidencia; nunca inferir por `capture_date`.
-- Rollback path: selector a legacy mientras el provider lo soporte; si no, pausar captures y servir última serie
-  comparable etiquetada. Nunca borrar filas improved.
+- Rollback path: selector a legacy sólo antes del 2026-11-01T00:00:00Z. Después, pausar capturas y servir la última
+  serie comparable etiquetada; nunca presentar `false` como rollback ni borrar filas improved.
 - External coordination: respuesta DataForSEO y configuración coherente Vercel/worker. El presupuesto de shadow,
   la pausa/reanudación de schedulers y la aprobación de cutover pertenecen a `TASK-1806`.
 
@@ -236,10 +248,10 @@ Reglas obligatorias:
   append-only y freshness por método.
 - Integration checks: Sandbox gratuito cuando el contrato lo permita, fixtures/replay y dry-run; ninguna llamada
   pagada ni canary productivo pertenece a esta task.
-- Reliability signals/logs: `configured`, `requested`, `served`, filas sin método, mixed-series, drift cross-runtime,
-  legacy posterior a cutoff y costo por consumer/familia.
+- Reliability signals/logs: `configured`, `requested`, `provider_effective`, `requested_at`, `policy_version`, filas
+  sin método, mixed-series, drift cross-runtime, solicitud legacy posterior al corte y costo por consumer/familia.
 - Production verification sequence: expand staging -> deploy legacy explícito -> readers formula-aware -> readback
-  DB/API/MCP y configured/requested/served -> handoff verificable a `TASK-1806` sin cambiar el canonical method.
+  DB/API/MCP y configured/requested/provider-effective -> handoff verificable a `TASK-1806` sin cambiar el canonical method.
 
 ### Acceptance criteria additions
 
@@ -277,7 +289,9 @@ Reglas obligatorias:
 
 - Incorporar la respuesta oficial a la matriz endpoint/campo/boolean/default/precio/histórico.
 - Resolver si filas recientes son atribuibles a legacy; declarar cualquier ventana ambigua.
-- Definir la matriz de compatibilidad que `TASK-1806` usará; no ejecutar llamadas pagadas.
+- Definir la matriz de 14 familias: seis `etv_consumed`, tres `etv_ignored` y cinco
+  `provider_supported_not_enabled`; no ejecutar llamadas pagadas.
+- Definir cómo preservar un baseline legacy representativo antes del corte; su captura pertenece a `TASK-1806`.
 
 ### Slice 1 — Policy y configuración sin activar
 
@@ -293,7 +307,7 @@ Reglas obligatorias:
 
 ### Slice 3 — Writers y freshness
 
-- Propagar método solicitado/servido por domain, historical, bulk, URL, relevant pages, subdomains y prospect.
+- Propagar método solicitado/efectivo por domain, historical, bulk, URL, relevant pages, subdomains y prospect.
 - Hacer freshness/pre-check/idempotency formula-aware sin duplicar diagnósticos comerciales.
 - Declarar metodología de traffic cost, top keywords y truncamiento del prospecto.
 
@@ -305,7 +319,7 @@ Reglas obligatorias:
 
 ### Slice 5 — Señales y contract phase
 
-- Exponer drift Vercel/worker y configured/requested/served en health/logs.
+- Exponer drift Vercel/worker y configured/requested/provider-effective en health/logs.
 - Quitar defaults transitorios y constraints antiguas sólo cuando todos los writers/readers estén verificados.
 - Mantener selector productivo en legacy explícito.
 
@@ -329,9 +343,9 @@ Reglas obligatorias:
 ## Detailed Spec
 
 Vocabulario canónico y forma exacta del expand-contract están en el ADR. La traducción del adapter entre versión
-interna y booleano sólo se congela cuando el proveedor confirme que `false` conserva legacy y que omisión no es
-necesaria. Plan Mode debe inventariar constraints por nombre y confirmar si el default transitorio puede atribuir
-filas existentes sin violar append-only.
+interna y booleano queda definida por el contrato: `false` selecciona legacy sólo antes del corte y se ignora
+después. Plan Mode debe inventariar constraints por nombre, rechazar legacy post-corte antes del request y confirmar
+si el default transitorio permite atribuir filas existentes sin violar append-only.
 
 Para prospectos, la metodología pertenece al diagnóstico/fact derivado, pero la idempotencia humana diaria no se
 amplía. El shadow del prospecto usa evaluator interno y nunca crea una segunda corrida comercial.
@@ -350,14 +364,15 @@ amplía. El shadow del prospecto usa evaluator interno y nunca crea una segunda 
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
-| Default del provider cambia en silencio | integration/data | high | booleano explícito + served readback | `etv_methodology_drift` |
+| Default del provider cambia en silencio | integration/data | high | booleano explícito + effective derivado | `etv_methodology_drift` |
 | Filas recientes se etiquetan legacy sin certeza | migration | medium | evidencia por request/captured_at o unknown | filas en ventana ambigua |
 | Dos métodos colisionan | PostgreSQL | high | unique formula-aware antes de shadow | duplicate/conflict |
 | Reader mezcla meses | reader/API/MCP | high | filtro previo + mixed-series fail | `mixed_etv_methodology` |
 | Top-N cambia sin explicación | relevant pages/subdomains | high | Jaccard + membership diff | salto de membresía |
-| Vercel y worker divergen | cross-runtime | medium | config/parser común + health | configured/served mismatch |
+| Vercel y worker divergen | cross-runtime | medium | config/parser común + health | configured/effective mismatch |
 | Evaluador podría gastar por accidente | provider spend | medium | fixture/replay + dry-run fail-closed | ledger/cap breach |
-| Foundation se confunde con activación | rollout | medium | selector legacy + task dependiente explícita | served method improved |
+| Foundation se confunde con activación | rollout | medium | selector legacy + task dependiente explícita | effective method improved |
+| Config legacy cruza el corte | external contract | high | hard-stop UTC antes del request | legacy requested post-cutoff |
 
 ### Feature flags / cutover
 
@@ -383,14 +398,14 @@ amplía. El shadow del prospecto usa evaluator interno y nunca crea una segunda 
 1. Verificar contrato y precio actualizados.
 2. Ejecutar tests/fixtures y dry-run de cero llamadas.
 3. Aplicar expand en staging y verificar constraints/old rows/append-only.
-4. Desplegar ambos runtimes aún en legacy y leer configured/requested/served.
+4. Desplegar ambos runtimes aún en legacy y leer configured/requested/provider-effective con evidence basis.
 5. Verificar writers/readers, DB, API y MCP con legacy.
 6. Ejecutar fixtures/replay y dry-run del evaluador; verificar que el ledger no registra gasto.
 7. Entregar a `TASK-1806` la matriz, el forecast y el readback de foundation todavía en legacy.
 
 ### Out-of-band coordination required
 
-- Respuesta o ticket de DataForSEO.
+- Respuesta DataForSEO incorporada; Sandbox/OpenAPI quedan como seguimiento no bloqueante.
 - Confirmación de que la foundation puede cerrarse sin autorización de gasto ni cutover.
 - `TASK-1806` obtiene por separado aprobación del monto USD, sujetos, tratamiento histórico y cutover.
 
@@ -403,7 +418,10 @@ amplía. El shadow del prospecto usa evaluator interno y nunca crea una segunda 
 
 ## Acceptance Criteria
 
-- [ ] Contrato oficial cubre siete endpoints, semántica del booleano, pricing, históricos y rollback.
+- [ ] Contrato oficial está reflejado como 14 familias; seis familias/siete caminos consumen ETV, tres callers lo
+  ignoran y cinco familias no se habilitan preventivamente.
+- [ ] Las cinco familias sin caller están nombradas y cada una sólo puede pasar a `etv_consumed` por su task
+  dueña (`TASK-1808`–`TASK-1811`), nunca por ampliar esta foundation transversal.
 - [ ] Cero request productivo ETV depende de default u omisión.
 - [ ] Endpoint no compatible/config inválida falla cerrado y no recibe el flag.
 - [ ] Mismo sujeto/mercado/fecha admite ambos métodos y rechaza duplicados del mismo método.
@@ -413,8 +431,12 @@ amplía. El shadow del prospecto usa evaluator interno y nunca crea una segunda 
 - [ ] Ningún reader/API/MCP devuelve una trayectoria mixta o fallback silencioso.
 - [ ] API, Nexa y MCP exponen metodología junto con lens/source/capturedAt.
 - [ ] Traffic cost y prospect traffic declaran metodología; prospect también cobertura/truncamiento.
+- [ ] AIO ETV se rotula como reparto modelado entre dominios citados, nunca tráfico observado por cita.
+- [ ] `clickstream_etv` permanece carril independiente y no se activa implícitamente con improved.
 - [ ] Evaluador entrega fixture/replay, dry-run, forecast y allowlist sin registrar gasto.
-- [ ] Vercel y ops-worker demuestran el mismo método servido mediante readback.
+- [ ] Vercel y ops-worker demuestran el mismo método efectivo mediante request explícito, instante UTC y policy.
+- [ ] Histórico improved distingue `fully_recomputed` desde julio de 2026 y `calibrated_approximation` antes.
+- [ ] Cero request legacy sale al proveedor desde 2026-11-01T00:00:00Z.
 - [ ] La selección productiva permanece legacy explícita y `TASK-1806` puede activar improved sin rediseñar la foundation.
 - [ ] Documentación funcional/técnica/manual, task/epic/registry y handoff quedan sincronizados.
 
@@ -447,6 +469,15 @@ amplía. El shadow del prospecto usa evaluator interno y nunca crea una segunda 
 
 ## Follow-ups
 
-- Ejecutar `TASK-1806` para shadow, decisión histórica, cutover y rollback productivo.
+- Ejecutar `TASK-1806` para shadow, decisión histórica, cutover y rollback pre-corte/safe mode post-corte.
+- Ejecutar `TASK-1808`–`TASK-1811` después de la foundation y del método productivo gobernado; cada task nace
+  formula-aware y no amplía el shadow de los siete caminos actuales por defecto.
 - Crear task `ui-ux` sólo si la visualización de breakpoint/metodología requiere más que copy/metadata aditiva.
 - Revisar una metodología v3 sólo ante nueva fórmula o identificador oficial; no ampliar el enum preventivamente.
+
+## Delta 2026-09-02 — ownership de las cinco familias sin caller
+
+El operador confirmó que quiere convertir las cinco familias `provider_supported_not_enabled` en capacidades
+reales. Se registran cuatro unidades backend-data: categorías (`TASK-1808`, dos endpoints cohesionados), mercado
+competitivo (`TASK-1809`), comparación de páginas (`TASK-1810`) e historia bulk (`TASK-1811`). Esta task conserva
+ownership exclusivo de policy/schema/readers formula-aware; no compra, habilita ni opera los productos nuevos.

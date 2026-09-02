@@ -108,12 +108,13 @@ el worker Cloud Run compartido materializa `seo_gsc_daily`, sin flip aislado de 
 [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) e
 [`OPS_RELIABILITY_AGENT_INVARIANTS.md`](docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md).
 
-ETV de DataForSEO Labs se versiona por metodología. No se activa ni mezcla `use_improved_etv` antes de persistir
-su versión, separar idempotencia y medir un shadow contra GSC. Contrato y dudas pendientes:
-[auditoría ETV 2026-09-01](docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md). La decisión aceptada es
+ETV de DataForSEO Labs se versiona por metodología. DataForSEO confirmó 14 familias y corte obligatorio
+`2026-11-01T00:00:00Z` sin fallback legacy; la versión no viene en la respuesta. No se activa ni mezcla improved
+antes de persistir provenance, separar idempotencia y medir shadow contra GSC. Contrato confirmado:
+[auditoría ETV 2026-09-01/02](docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md). La decisión aceptada es
 [`GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md`](docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md)
 y su entrega futura se divide en `TASK-1805` (foundation formula-aware) y `TASK-1806` (evaluación/cutover), ambas
-`to-do`; no hay código, schema, gasto ni cutover activo.
+`to-do` P0; no hay código, schema, gasto ni cutover activo.
 
 Berel: Notion live + skill `berel-content-production`. Contacto/cobertura:
 `docs/context/01_quienes-somos.md` y `docs/public-site/CONTACT_PAGE_REBUILD_BRIEF_V1.md`.

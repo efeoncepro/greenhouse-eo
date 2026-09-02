@@ -16,8 +16,9 @@ cliente **y de sus competidores declarados**, más la trayectoria histórica men
 Toda cifra es **◑ estimada** (DataForSEO Labs, ciclo mensual). Nunca se compara, promedia ni
 grafica junto a datos ● medidos de Search Console.
 
-> **Alerta metodológica 2026-09-01:** DataForSEO anunció ETV improved y cambio de default para
-> 2026-11-01. El runtime actual no envía fórmula ni la persiste; no ejecutes un backfill, shadow o cutover
+> **Alerta metodológica actualizada 2026-09-02:** DataForSEO confirmó Improved ETV y el corte global
+> `2026-11-01T00:00:00Z`; desde ese instante `false` se ignora y no existe fallback legacy. La respuesta no
+> expone una versión de fórmula, y el runtime actual no persiste un método efectivo derivado; no ejecutes un backfill, shadow o cutover
 > manual agregando el flag a esta corrida. Hasta implementar provenance formula-aware, cualquier salto de ETV
 > se trata como posible cambio de modelo, no como crecimiento/caída. Auditoría y plan:
 > [DataForSEO Improved ETV](../../audits/seo/2026-09-01-dataforseo-improved-etv-impact.md).

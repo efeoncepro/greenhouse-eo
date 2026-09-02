@@ -66,6 +66,8 @@ Requests from client emails or Notion tasks are intake, not executable schema. B
 
 ## Current ANAM artifacts
 
+- Technical workflow specification — Emma handoff and availability routing: [`anam-customer-agent-handoff-workflow-1876744588.md`](anam-customer-agent-handoff-workflow-1876744588.md)
+- Client-facing functional walkthrough — every handoff step: [`../../../documentation/hubspot-as-a-service/anam-customer-agent-handoff-workflow-functional.md`](../../../documentation/hubspot-as-a-service/anam-customer-agent-handoff-workflow-functional.md)
 - Service catalog — Customer Agent managed service: [`../../../services/hubspot-as-a-service/hubspot-customer-agent-managed-service.md`](../../../services/hubspot-as-a-service/hubspot-customer-agent-managed-service.md)
 - Service catalog — RevOps architecture, automation and dashboards: [`../../../services/hubspot-as-a-service/hubspot-revops-architecture-automation-and-dashboards.md`](../../../services/hubspot-as-a-service/hubspot-revops-architecture-automation-and-dashboards.md)
 - Detailed Word report — Customer Agent implementation and operation: [`reports/ANAM_Informe_Detallado_Customer_Agent_2026-07-17.docx`](reports/ANAM_Informe_Detallado_Customer_Agent_2026-07-17.docx)

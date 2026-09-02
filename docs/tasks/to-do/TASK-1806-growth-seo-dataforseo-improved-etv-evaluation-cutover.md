@@ -9,7 +9,7 @@
 ## Status
 
 - Lifecycle: `to-do`
-- Priority: `P1`
+- Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Medio`
 - Type: `implementation`
@@ -21,10 +21,12 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Registrada; bloqueada por foundation y autorizaciones separadas`
+- Status real: `Registrada; deadline externo confirmado; bloqueada por foundation y autorizaciones separadas`
 - Rank: `2`
 - Domain: `growth|seo|data|integration|ops`
-- Blocked by: `TASK-1805 complete; DataForSEO contract; explicit spend approval; explicit cutover approval`
+- External deadline: `2026-11-01T00:00:00Z; no existe fallback legacy posterior`
+- Internal targets: `shadow/decision 2026-10-23; cutover 2026-10-28T00:00:00Z`
+- Blocked by: `TASK-1805 complete; explicit spend approval; explicit historical-treatment and cutover approval`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -33,7 +35,8 @@
 
 Ejecuta la evaluación controlada de Improved ETV sobre la foundation versionada de `TASK-1805`, compara legacy
 e improved contra GSC y entre sí, decide el tratamiento de la historia y activa la nueva metodología en todos los
-consumers DataForSEO Labs compatibles. El cutover es explícito, observable y reversible; esta task no rediseña
+los siete caminos consumidores DataForSEO Labs. El cutover es explícito y observable; sólo es reversible a legacy
+antes del corte del proveedor. Esta task no rediseña
 schema, readers ni API/MCP.
 
 La task queda registrada para ejecución futura. Su creación no autoriza llamadas pagadas, gasto, cambios de
@@ -48,14 +51,16 @@ dos runtimes. Mantener esos actos dentro de la foundation impediría un cierre h
 adopción.
 
 Esta task garantiza que el split no recorte alcance: termina con Improved ETV efectivamente servido en los siete
-consumers compatibles, o con una decisión explícita de no-go respaldada por evidencia y sin degradar legacy.
+caminos consumidores antes del corte. Un no-go posterior obliga a congelar capturas ETV; ya no puede preservar
+legacy mediante `false`.
 
 ## Goal
 
 - Medir legacy e improved sobre una cohorte preregistrada y un presupuesto máximo aprobado.
 - Determinar si improved mejora la calibración contra GSC y cómo altera valor, orden y membresía top-N.
 - Adoptar rebaseline o breakpoint histórico explícito sin conectar metodologías en una misma serie.
-- Ejecutar cutover y rollback verificados en staging y producción para Vercel y ops-worker.
+- Ejecutar cutover y rollback pre-corte verificados en staging; en producción, verificar cutover y el safe mode de
+  congelación que queda disponible después del corte.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -86,7 +91,9 @@ Reglas obligatorias:
 - La task no modifica schema/readers para acomodar resultados: cualquier gap estructural vuelve a `TASK-1805`.
 - Ningún caller público, UI o MCP selecciona fórmula ni dispara gasto.
 - Cutover y rebaseline requieren aprobaciones distintas del permiso para ejecutar el shadow.
-- Código, env y deploy no prueban el método servido; se exige readback DB/API/MCP por runtime.
+- Código, env y deploy no prueban el método efectivo; se exige readback DB/API/MCP por runtime.
+- El provider no devuelve versión: la evidencia combina request, timestamp UTC, policy version y resultado, sin
+  inventar un método reportado por la respuesta.
 
 ## Normative Docs
 
@@ -105,8 +112,7 @@ Reglas obligatorias:
 ### Depends on
 
 - `TASK-1805` completa, con foundation desplegada y legacy verificado en Vercel y ops-worker.
-- Respuesta contractual de DataForSEO o documentación oficial equivalente para endpoints, campos, pricing,
-  históricos, semántica de `false` y convivencia con `include_clickstream_data`.
+- Respuesta contractual DataForSEO incorporada. Sandbox y URLs públicas pendientes no bloquean fixtures/shadow.
 - Aprobación explícita del presupuesto, máximo de requests, sujetos y ventana del shadow.
 - Aprobación explícita posterior del tratamiento histórico y del cutover.
 - Propiedades GSC con período/mercado comparables para los dominios propios incluidos.
@@ -141,7 +147,7 @@ Reglas obligatorias:
 
 - No existe evidencia comparable legacy/improved obtenida con inputs equivalentes.
 - No hay aprobación de presupuesto, cohorte, umbrales, rebaseline ni cutover.
-- No se ha verificado qué endpoints/campos aceptan la fórmula improved ni su costo real.
+- La matriz contractual está confirmada; falta evidencia de nuestros payloads y resultados sobre cohorte aprobada.
 - Improved ETV no está activado ni servido por Vercel, ops-worker, API o MCP.
 - No existe decisión aplicada sobre rebaseline histórico versus breakpoint visible.
 
@@ -173,7 +179,7 @@ Reglas obligatorias:
   `src/lib/ai/dataforseo.ts` y spend ledger SEO.
 - Contrato nuevo o modificado: configuración canónica cambia de legacy a improved sólo después de los gates;
   artefacto de decisión registra fórmula, evidencia y breakpoint/rebaseline.
-- Backward compatibility: `gated`; legacy permanece disponible para rollback mientras el proveedor lo soporte.
+- Backward compatibility: `windowed`; legacy sólo permanece disponible hasta 2026-11-01T00:00:00Z.
 - Full API parity: API, Nexa y MCP continúan consumiendo el reader canónico; esta task cambia policy/configuración,
   no crea un camino paralelo.
 
@@ -198,10 +204,10 @@ Reglas obligatorias:
 
 - Migration posture: `none`; consume el expand-contract ya verificado de `TASK-1805`.
 - Default state: evaluator OFF y canonical method legacy explícito.
-- Backfill plan: muestra histórica acotada sólo si contrato, presupuesto y retroactividad están confirmados;
-  rebaseline amplio exige aprobación separada.
-- Rollback path: volver policy/config a legacy en ambos runtimes y leer la última serie coherente; si legacy deja
-  de estar disponible para nuevas capturas, pausar writes y servir estado degradado sin borrar improved.
+- Backfill plan: distinguir recomputación completa desde julio de 2026 y aproximación calibrada antes; cualquier
+  rebaseline amplio exige aprobación separada y etiqueta de `calculation_basis`.
+- Rollback path: volver policy/config a legacy sólo antes del corte. Después, pausar writes y servir estado
+  degradado desde la última serie coherente sin borrar improved ni afirmar que `false` restauró legacy.
 - External coordination: DataForSEO, presupuesto, pausa/reanudación de schedulers, deploy Vercel/ops-worker y
   sign-off del operador.
 
@@ -218,8 +224,8 @@ Reglas obligatorias:
 - Local checks: fixtures/replay, dry-run determinista, forecast y tests de equivalencia de inputs.
 - DB/runtime checks: readback separado por metodología, costo, append-only, mixed-series fail y canonical selection.
 - Integration checks: Sandbox gratuito cuando aplique; shadow/canary pagado sólo después de aprobación registrada.
-- Reliability signals/logs: configured/requested/served, cross-runtime drift, mixed-series, legacy after cutoff,
-  cost cap, provider failure y rollback state.
+- Reliability signals/logs: configured/requested/provider-effective, request timestamp/policy, cross-runtime drift,
+  mixed-series, solicitud legacy after cutoff, cost cap, provider failure y safe-mode state.
 - Production verification sequence: readiness -> shadow -> decisión -> staging cutover/rollback -> producción
   cutover/readback -> observación -> rollback drill o evidencia equivalente aprobada.
 
@@ -257,7 +263,7 @@ Reglas obligatorias:
 
 ### Slice 0 — Readiness y preregistro
 
-- Verificar `TASK-1805` completa mediante DB/API/MCP y configured/requested/served en ambos runtimes.
+- Verificar `TASK-1805` completa mediante DB/API/MCP y configured/requested/provider-effective en ambos runtimes.
 - Incorporar respuesta DataForSEO y congelar endpoint matrix, cohorte, período, inputs, métricas y umbrales.
 - Generar dry-run con número de requests y costo máximo; obtener aprobación explícita antes de ejecutar.
 
@@ -272,12 +278,13 @@ Reglas obligatorias:
 - Comparar ETV contra GSC con error, sesgo y correlación definidos antes de observar resultados.
 - Medir delta de valores, orden, Jaccard top-N, traffic cost, prospect traffic, nulls, latencia y costo.
 - Documentar go/no-go y elegir rebaseline acotado o breakpoint explícito; obtener aprobación separada.
+- Preservar baseline legacy representativo antes del corte y etiquetar historia pre-julio como aproximación.
 
 ### Slice 3 — Cutover staging y rollback
 
 - Pausar schedulers afectados y activar improved en Vercel/worker de staging de forma coordinada.
-- Ejecutar un canary por endpoint, leer DB/API/MCP y comprobar configured=requested=served.
-- Ejercitar rollback a legacy o pausa degradada, según contrato vigente, antes de producción.
+- Ejecutar un canary por camino consumidor, leer DB/API/MCP y comprobar configured=requested=provider-effective.
+- Ejercitar rollback a legacy antes del corte y safe mode de pausa degradada para el escenario post-corte.
 
 ### Slice 4 — Cutover productivo y observación
 
@@ -297,8 +304,10 @@ Reglas obligatorias:
 
 ## Detailed Spec
 
-La unidad mínima comparable es `subject × market × language × endpoint × period × methodology`. Todos los campos
-de input deben ser idénticos salvo la selección de fórmula. Si DataForSEO no permite obtener legacy e improved
+La unidad mínima comparable es `subject × market × language × endpoint × period × methodology`. El A/B cubre las
+seis familias/siete caminos que consumen ETV; tres callers `etv_ignored` se validan por guard y cinco familias sin
+caller permanecen `provider_supported_not_enabled`. Todos los campos de input deben ser idénticos salvo la selección
+de fórmula. Si DataForSEO no permite obtener legacy e improved
 para la misma celda, el resultado se clasifica como comparación temporal y no como A/B exacto.
 
 El informe de decisión separa tres preguntas: calibración contra GSC, estabilidad competitiva entre métodos y
@@ -323,10 +332,10 @@ de reevaluación.
 | Cohorte favorece artificialmente improved | evaluación | medium | preregistro + mercados/intenciones/features diversos | cobertura insuficiente |
 | Inputs no equivalentes simulan mejora | provider | medium | hash de celda e inputs salvo método | comparison mismatch |
 | Shadow excede gasto | provider spend | medium | dry-run + request/USD cap + breaker | ledger/cap breach |
-| Reader productivo ve shadow | API/MCP | low | canonical legacy hasta aprobación | served method changed |
+| Reader productivo ve shadow | API/MCP | low | canonical legacy hasta aprobación | effective method changed |
 | Rebaseline reescribe historia | data | low | append-only + artefacto de decisión | update/delete rejected |
-| Vercel y worker divergen | cross-runtime | medium | pausa + deploy coordinado + readback | configured/served drift |
-| Legacy deja de estar disponible | rollback | medium | pausa degradada + última serie coherente | provider rejects false |
+| Vercel y worker divergen | cross-runtime | medium | pausa + deploy coordinado + readback | configured/effective drift |
+| Legacy deja de estar disponible en el corte confirmado | rollback | certain | pausa degradada + última serie coherente | legacy requested post-cutoff |
 | Mejora GSC pero cambia top-N | reporting | high | Jaccard/order diff + breakpoint | membership discontinuity |
 
 ### Feature flags / cutover
@@ -334,7 +343,8 @@ de reevaluación.
 - Reusar la policy y gates creados por `TASK-1805`; esta task no introduce un segundo selector.
 - Evaluator permanece OFF excepto durante la ventana aprobada.
 - Canonical method comienza en legacy explícito; staging y producción cambian por actos separados.
-- Configuración debe coincidir en Vercel y ops-worker, pero el readback de `served` es la evidencia final.
+- Configuración debe coincidir en Vercel y ops-worker; la evidencia final combina payload explícito, fecha UTC,
+  policy version y readback de la serie. El proveedor no devuelve `served`.
 
 ### Rollback plan per slice
 
@@ -343,8 +353,8 @@ de reevaluación.
 | 0 | corregir preregistro antes de llamadas; ninguna mutación runtime | inmediato | sí |
 | 1 | apagar evaluator/cerrar allowlist; conservar evidencia y costo | inmediato | sí |
 | 2 | decisión no-go y canonical legacy sin borrar resultados | inmediato | sí |
-| 3 | selector legacy en staging o pausa degradada; readback completo | minutos | parcial si legacy se retiró |
-| 4 | selector legacy en ambos runtimes o pausa de captures; servir última serie coherente | minutos | parcial si legacy se retiró |
+| 3 | selector legacy pre-corte o pausa degradada; readback completo | minutos | sólo pre-corte |
+| 4 | pausa de capturas; servir última serie coherente | minutos | no revierte proveedor post-corte |
 
 ### Production verification sequence
 
@@ -352,7 +362,7 @@ de reevaluación.
 2. Revisar dry-run/forecast y registrar aprobación de shadow.
 3. Ejecutar cohorte bounded y reconciliar costo real contra ledger.
 4. Aprobar go/no-go y tratamiento histórico en un acto separado.
-5. Pausar schedules; cutover y rollback en staging con canary por endpoint.
+5. Pausar schedules; cutover y rollback pre-corte en staging con canary por camino consumidor.
 6. Cutover productivo coordinado y readback DB/API/MCP de ambos runtimes.
 7. Reanudar schedules, observar cooldown y verificar que no existen series mixtas.
 
@@ -373,16 +383,19 @@ de reevaluación.
 ## Acceptance Criteria
 
 - [ ] `TASK-1805` está completa y legacy explícito está verificado en DB/API/MCP, Vercel y ops-worker.
-- [ ] Contrato oficial cubre endpoints, campos, booleano, pricing, históricos, clickstream y rollback.
+- [ ] Matriz oficial de 14 familias, campos, booleano, pricing, históricos y clickstream está incorporada; Sandbox y
+  docs públicas pendientes están declaradas sin convertirlas en bloqueo ficticio.
 - [ ] Cohorte, inputs, métricas, umbrales, request cap y USD cap quedaron congelados antes del shadow.
 - [ ] Ninguna llamada pagada ocurrió antes de la aprobación explícita registrada.
 - [ ] Cada endpoint compatible fue evaluado con inputs equivalentes o marcado honestamente como no comparable.
 - [ ] GSC se evaluó como benchmark separado, sin promedio ni sustitución de ETV.
 - [ ] Se midieron valores, orden, membresía top-N, traffic cost, prospect traffic, nulls, latencia y costo.
+- [ ] AIO ETV se interpreta como atribución modelada y clickstream permanece separado del experimento improved.
 - [ ] La decisión go/no-go y el tratamiento histórico están respaldados por un artefacto reproducible.
 - [ ] Ningún reader/API/MCP sirvió shadow ni una serie mixta antes del cutover aprobado.
-- [ ] Cutover staging y rollback fueron verificados antes de producción.
-- [ ] Vercel y ops-worker demuestran el mismo método configured/requested/served mediante readback.
+- [ ] Cutover staging, rollback pre-corte y safe mode post-corte fueron verificados antes de producción.
+- [ ] Vercel y ops-worker demuestran el mismo método configured/requested/provider-effective mediante evidencia.
+- [ ] Cero request legacy se envía desde el corte y todo punto improved pre-julio declara aproximación calibrada.
 - [ ] Todos los consumers DataForSEO Labs compatibles sirven improved o tienen una excepción contractual explícita.
 - [ ] DB, API, Nexa, MCP y reporting declaran método y breakpoint/rebaseline aplicados.
 - [ ] Rollback conserva evidencia append-only y no fabrica continuidad histórica.
@@ -397,7 +410,7 @@ de reevaluación.
 - Contract tests de API/ecosystem y snapshots MCP.
 - `pnpm mcp:manifest:check`
 - `pnpm test:live` sólo con acceso base y autorización correspondiente; confirmar `passed`.
-- Readback de configuración y método servido en Vercel y ops-worker.
+- Readback de configuración y método efectivo derivado en Vercel y ops-worker.
 - `pnpm qa:gates --changed`
 - `pnpm docs:closure-check`
 - `pnpm docs:context-check:strict` como último gate documental.
@@ -410,7 +423,7 @@ de reevaluación.
 - [ ] Runbook y auditoría distinguen shadow, staging, producción y rollback.
 - [ ] Skills espejadas reflejan la respuesta contractual y el comportamiento verificado del proveedor.
 - [ ] Handoff/changelog separan código, gasto, configuración, deploy y readback.
-- [ ] El cierre no se basa en un flag, deploy o HTTP verde: demuestra el método servido en todos los consumers.
+- [ ] El cierre no se basa en un flag, deploy o HTTP verde: demuestra el método efectivo derivado en todos los consumers.
 
 ## Follow-ups
 

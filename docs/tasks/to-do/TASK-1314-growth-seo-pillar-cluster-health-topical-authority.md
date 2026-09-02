@@ -340,6 +340,10 @@ Ver el contrato en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` **§15.1** (pillar
 
 ## Acceptance Criteria
 
+- [ ] La señal de cobertura temática puede consumir el reader de categorías de `TASK-1808` y la comparación de
+  páginas de `TASK-1810`, pero esta task mantiene cero provider calls y cero persistencia propia.
+- [ ] Ausencia de evidencia de `TASK-1808`/`TASK-1810` degrada la señal con estado explícito; nunca dispara captura
+  on-read ni se convierte en `0`.
 - [ ] **MCP tool en el mismo PR (mandato del operador 2026-08-05, patrón TASK-1645):** cada reader/lectura canónica que esta task cree queda expuesto como MCP tool read-only (handler en `src/mcp/greenhouse/tools.ts` + registro en `server.ts` + método en `http-client.ts` + ruta del lane ecosystem si aplica) EN EL MISMO PR. La task NO se cierra con el reader UI-only.
 
 - [ ] `readPillarClusterHealth({ organizationId, clusterId, range })` existe en `src/lib/growth/seo/**`, gateado por `growth.seo.observation.read` + el gate existente de lectura AEO, con shape `{ ok: true, clusterId, range, coverage, structure, performance, aeoAuthority, topicalAuthorityScore, gaps } | { ok: false, errorCode, status }`.
@@ -376,6 +380,8 @@ Ver el contrato en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` **§15.1** (pillar
 
 ## Follow-ups
 
+- `TASK-1808` — reader de evidencia de mercado por categoría para contextualizar cobertura temática.
+- `TASK-1810` — reader de intersección entre páginas para pillar/supporting y comparación competitiva.
 - UI de topical authority / pillar health por cluster (ui-ux) — consume `readPillarClusterHealth` (§15.1 del doc maestro).
 - Recommendation layer: convertir los huecos accionables en CTAs cruzados (p. ej. "crea supporting para X" / "enlaza supporting Y a la pillar" / "añade answer capsule para que la IA cite la pillar") — posible task derivada.
 - Evaluar exponer el reader como recurso `api/platform/app` explícito para Nexa/MCP si el consumo lo justifica.
@@ -388,3 +394,9 @@ Ver el contrato en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` **§15.1** (pillar
 3. ¿La "cobertura" (huecos temáticos vs keyword gap) sale de DataForSEO Labs `keyword_gap` (§3) vía `readSiteAuditReport`/otro reader, o requiere un reader de keyword gap propio? Confirmar la fuente en Discovery; si no existe reader, degradar la señal + follow-up (NO capturar acá).
 4. ¿Los umbrales de topical authority (supporting mínimos por cluster, head-term rank objetivo de la pillar, citation share objetivo de la pillar) son fijos documentados o configurables por-org? Propuesta: fijos documentados por defecto para no fragmentar la semántica; revisar con datos reales.
 5. ¿Una señal faltante degrada solo esa señal (payload parcial con `ok:true` + señal `unavailable`) o retorna `ok:false` con el errorCode de la señal? Propuesta: `no_pillar` es `ok:false` (sin pillar no hay qué evaluar); audit/rank/AEO faltantes degradan la señal individual manteniendo `ok:true`. Resolver al tomar la task.
+
+## Delta 2026-09-02 — nuevos readers de evidencia, mismo boundary compositivo
+
+`TASK-1808` y `TASK-1810` pasan a ser fuentes opcionales de evidencia para cobertura temática y gap entre páginas.
+No cambian la regla central: `readPillarClusterHealth` compone readers en memoria y jamás llama DataForSEO,
+materializa un score ni crea una taxonomía paralela.

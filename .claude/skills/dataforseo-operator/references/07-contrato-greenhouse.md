@@ -170,43 +170,44 @@ Reglas del carril (detalle en el delta canónico, no acá):
 
 Delta canónico completo: `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` → "## Delta 2026-08-27 — tier `prospect`".
 
-## §5e Delta 2026-09-01 — ETV es metodología versionada, no default de proveedor
+## §5e Delta 2026-09-02 — ETV es metodología versionada, no default de proveedor
 
-Semántica y evidencia del anuncio: `02-labs.md` §3.1. Impacto focal completo:
+Semántica y evidencia contractual: `02-labs.md` §3.1. Impacto focal completo:
 `docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md`.
 
-El aviso de cuenta DataForSEO introduce `use_improved_etv: true`, deja legacy como default hasta
-2026-11-01 y después anuncia improved como default. Greenhouse tiene siete integraciones Labs que consumen
-ETV y ninguna declara fórmula. Tres superficies activas —foto de dominio, visibilidad por sujeto y diagnóstico
-de prospecto— quedan expuestas a un cambio sintácticamente compatible: el parser seguirá verde aunque cambie
-la metodología.
+DataForSEO confirmó 14 familias ETV-capable, corte global `2026-11-01T00:00:00Z`, ausencia de fallback legacy y
+cero premium por improved. El repo llama nueve familias: seis familias/siete caminos consumen ETV, tres callers
+lo ignoran y cinco familias no tienen caller. Ninguna escritura actual declara fórmula.
 
 Contrato obligatorio para una implementación futura:
 
-1. **Policy única, nunca flags dispersos.** Un módulo dueño de adquisición Labs resuelve una versión cerrada
-   (`legacy_v1|improved_v2`, o la taxonomía aceptada por ADR) y construye sólo los payloads de endpoints cuya
-   compatibilidad esté confirmada. No inyectar `use_improved_etv` en `postDataForSeoTask`: ese transporte es
-   genérico para cinco familias y no gobierna la semántica Labs.
-2. **Provenance persistida.** La fórmula viaja junto a ETV, `estimated_paid_traffic_cost`, cada punto histórico,
-   cada elemento top-N y el hecho de prospecto. Fecha de captura no basta: no inferir versión por calendario,
-   porque el proveedor puede cambiar defaults, reescribir históricos o mantener opt-outs.
+1. **Policy única, nunca flags dispersos.** Un módulo dueño de adquisición Labs resuelve
+   `legacy_static_v1|improved_layout_clickstream_v2`, inventaría las 14 familias y sólo habilita las nueve con
+   caller. Cada una queda `etv_consumed`, `etv_ignored` o `provider_supported_not_enabled`; un ignored no puede
+   comenzar a proyectar ETV sin pasar a formula-aware. No inyectar el flag en el transporte genérico.
+2. **Provenance persistida.** La fórmula viaja junto a ETV, traffic cost, cada punto histórico, top-N y prospecto.
+   Como la respuesta no expone versión, guardar requested method, request UTC, policy version y effective method
+   derivado. Para historia improved agregar `fully_recomputed` desde julio de 2026 o
+   `calibrated_approximation` antes; para evidencia antigua sin request suficiente, `unknown_methodology`.
 3. **Idempotencia formula-aware.** Las UNIQUE actuales de `seo_domain_overview_snapshots`,
    `seo_url_visibility_snapshots` y el diagnóstico diario omiten metodología. Antes de shadow/rebaseline, el
    ADR debe decidir si la versión entra a la clave/tabla productiva o si el experimento vive en un almacén
    separado. Un `ON CONFLICT DO NOTHING` que descarta una de las dos fórmulas invalida la comparación.
-4. **Shadow fuera de la serie servida.** Legacy e improved se comparan sobre la misma cohorte/mercado sin que
-   readers, lanes o MCP mezclen puntos. El gasto pasa por entitlement/ledger y requiere autorización y tope.
-5. **Cutover explícito.** Elegir una serie rebaselined improved o un breakpoint visible. Nunca unir legacy e
-   improved como si fueran variación orgánica; nunca recomputar el pasado y llamarlo observación histórica.
+4. **Shadow fuera de la serie servida.** Legacy e improved se comparan con dos requests normales sobre la misma
+   cohorte/mercado; improved no tiene premium, pero duplicar calls requiere autorización y tope. Clickstream data
+   es independiente, combinable y conserva su multiplicador; no se activa para evaluar improved por defecto.
+5. **Cutover explícito y deadline-bound.** Elegir rebaseline/breakpoint antes del corte. Después, `false` se ignora:
+   legacy configurado falla antes del request y el safe mode congela capturas/serve la última serie coherente.
 6. **Readers fail-honest.** Una fila sin versión queda `unknown_methodology`; una serie mixta se segmenta o se
    rechaza. Toda respuesta/API/MCP expone metodología y fecha de corte suficientes para explicar la cifra.
 7. **GSC conserva autoridad.** El shadow mide error/correlación/dirección contra clicks first-party comparables,
    pero no promedia ETV con GSC ni convierte la promesa de "alineación" del proveedor en dato medido.
-8. **Derivados se recalibran.** Revisar `estimated_paid_traffic_cost`, sumas de ETV, thresholds y membresía de
-   `relevant_pages`/`subdomains`, que se ordenan provider-side por ETV y pueden devolver otro top-N.
+8. **Derivados se recalibran.** Traffic cost se recalcula como improved ETV × CPC por item y agregado. Revisar
+   sumas, thresholds y membresía de relevant pages/subdomains. AIO reparte estimación entre dominios únicos
+   citados: nunca rotularlo como tráfico observado por cita.
 
-Hasta cerrar la matriz oficial de endpoints, retroactividad, convivencia con `include_clickstream_data`,
-pricing y política post-2026-11-01, el estado correcto es **contrato documentado; cutover no autorizado**.
+El contrato externo está confirmado; Sandbox y OpenAPI/changelog siguen pendientes no bloqueantes. El estado
+correcto permanece **foundation/cutover no implementados ni autorizados**.
 
 ## §6 Secretos / env
 

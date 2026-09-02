@@ -340,6 +340,9 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
   colapsa y el `.sort()` es un no-op. Medido contra PG: Efeonce 24/24 filas en cero. El disparador
   es cualquier org con ≥10 impresiones y 0 clics en el bucket objetivo — todo target nuevo. Adopta
   el umbral de dos dimensiones que `TASK-1700` ya construyó y reduce las dos curvas a una.
+- `TASK-1798` — [creada 2026-08-30, to-do, ui-ux] **Dirección visual del canvas de candidatos.**
+  Convierte volumen y barrera de enlaces en comparaciones visuales escaneables sin bajar la densidad
+  ni ocultar la jerarquía de gasto; no cambia contratos ni captura.
 - `TASK-1784` — [creada 2026-08-27, backend-data] **Ruteo de selección en la superficie MCP.** Seis de
   las 20 tools contestan la misma pregunta; el eval de selección va primero y puede cerrar la task.
 - `TASK-1785` — [creada 2026-08-27, backend-data] **La lente como campo del contrato, no como
@@ -355,12 +358,24 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1805` — [creada 2026-09-01, to-do, backend-critical/integration] **Foundation versionada
   de DataForSEO Improved ETV.** La metodología pasa a ser parte de la identidad de la
   medición; legacy/improved no comparten serie ni clave, y ningún request productivo depende del
-  default del provider. Cubre los siete consumers Labs, schema, freshness/readers, API/MCP,
-  configuración Vercel/worker, señales y evaluator dry-run; cierra todavía en legacy.
+  default del provider. Clasifica 14 familias ETV-capable y migra seis familias/siete caminos consumidores,
+  schema, freshness/readers, API/MCP, configuración Vercel/worker, señales y evaluator dry-run; cierra en legacy.
 - `TASK-1806` — [creada 2026-09-01, to-do, backend-critical/integration] **Evaluación y cutover de
   DataForSEO Improved ETV.** Depende de 1805 y ejecuta shadow bounded, comparación contra GSC,
-  decisión rebaseline/breakpoint y activación reversible en los siete consumers compatibles.
-  Gasto, tratamiento histórico, deploy y cutover requieren autorizaciones separadas.
+  decisión rebaseline/breakpoint y activación en los siete caminos consumidores antes del corte
+  2026-11-01T00:00:00Z. P0 deadline-bound; rollback legacy sólo pre-corte y safe mode después.
+- `TASK-1808` — [creada 2026-09-02, to-do, backend-critical/integration] **Inteligencia de categorías
+  y mercado temático.** Une `categories_for_domain` con `domain_metrics_by_categories`; la taxonomía
+  DataForSEO es evidencia externa y sólo se vincula a topic clusters mediante autoría gobernada.
+- `TASK-1809` — [creada 2026-09-02, to-do, backend-critical/integration] **Competidores SERP y
+  share of voice por keyword set.** Amplía el universo competitivo fuera del top-N diario sin
+  auto-declarar competidores ni reemplazar `TASK-1699`/`TASK-1662`.
+- `TASK-1810` — [creada 2026-09-02, to-do, backend-critical/integration] **Comparación de cobertura
+  entre páginas.** Captura `page_intersection` fuera del reader compositivo de `TASK-1314` y le
+  entrega evidencia formula-aware sin provider call on-read.
+- `TASK-1811` — [creada 2026-09-02, to-do, backend-critical/integration] **Benchmarking histórico
+  masivo de tráfico.** Usa `historical_bulk_traffic_estimation` para cohortes allowlisted y escribe
+  mediante el source of truth de domain overview, con dry-run y tope USD.
 - `TASK-1775` — [creada 2026-08-26, backend-data] **Foto de dominio + trayectoria competitiva.** El
   sujeto que el módulo no sabe describir: hoy los KPIs sólo cubren el recorte seguido. `labs`
   (`domain_rank_overview` mensual · `historical_rank_overview` una vez por sujeto, cuesta 10× ·
@@ -1107,3 +1122,15 @@ diseño.
 ⚠️ **Se cerró con el mismo defecto de registro que `TASK-1699`**: 33 checkboxes sin tildar y
 `Status real: Diseno` mientras el carril estaba desplegado y con corridas reales en la base. Lo
 detectó la regla `stale-progress` de `task:lint`, creada el mismo día justo para esto.
+
+## Delta 2026-09-02 — las cinco familias Labs sin caller ganan ownership de producto
+
+El operador decidió usar las cinco familias ETV-capable que `TASK-1805` había clasificado como
+`provider_supported_not_enabled`. Se agrupan por capacidad y grano en cuatro tasks, no en cinco endpoints ni en
+un umbrella nuevo: `TASK-1808` posee las dos direcciones de inteligencia por categoría; `TASK-1809` el mercado
+competitivo por keyword set; `TASK-1810` el gap entre páginas; `TASK-1811` la historia bulk de cohortes.
+
+La secuencia dura es `TASK-1805` → método/cutover gobernado por `TASK-1806` → habilitación individual. Cada task
+incorpora reader/API/MCP, provenance, gasto y rollout propios. Ninguna llamada, migración, deploy ni compra queda
+autorizada por registrar el backlog. `TASK-1312` mantiene el source of truth de topic clusters y `TASK-1314`
+mantiene su regla «compone, no captura».

@@ -812,3 +812,11 @@ Ninguna en Entra: la escritura usa el scope de dominio ya existente. Sí en `ops
 - Curva de CTR propia por posición: se deriva de impresiones/clics reales del GSC del cliente y la
   consumen tanto el gap como la superficie de oportunidades. Si `TASK-1700` no la trae, crear task
   aparte — pero **nunca** sustituirla por una curva publicada de un blog.
+
+## Delta 2026-09-02 — corrección de baseline de `serp_competitors`
+
+El barrido del runtime confirmó cero callers de Labs `serp_competitors`: el carril de prospecto implementado usa
+`competitors_domain`, mientras esta task conserva `domain_intersection`, declaración y cobertura recurrente.
+Las menciones históricas que agrupaban ambos endpoints describían una alternativa de diseño, no una capacidad
+operativa. `TASK-1809` es la dueña nueva del producto distinto: market share/SoV sobre sets de keywords; alimenta
+propuestas pero no declara competidores ni reemplaza el top-N de `TASK-1699`.

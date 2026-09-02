@@ -5,9 +5,9 @@
 ## Alcance y corte
 
 - Inicio del registro operativo: **2026-08-28**.
-- Última actualización documentada: **2026-08-29, America/Santiago**.
-- Universo documentado: 30 oportunidades revisadas (18 públicas y 12 privadas); 24 cuentan con Deal HubSpot verificado: 23 abiertos y uno `closedlost`.
-- El readback live del 2026-08-29 encontró 24 Deals de licitación abiertos: 23 pertenecen a esta admisión y uno corresponde al RFI CRM Mineduc `1588-33-RFI26`, anterior al corte de este registro.
+- Última actualización documentada: **2026-09-01, America/Santiago**.
+- Universo documentado: 35 oportunidades revisadas (23 públicas y 12 privadas); 29 cuentan con Deal HubSpot verificado: 28 abiertos y uno `closedlost`.
+- El readback live del 2026-09-01 encontró 29 Deals de licitación abiertos: 28 pertenecen a esta admisión y uno corresponde al RFI CRM Mineduc `1588-33-RFI26`, anterior al corte de este registro.
 - Screening comparativo: [`LICITALAB_SCREENING_2026-08-28.md`](LICITALAB_SCREENING_2026-08-28.md).
 - El snapshot histórico previo identificó 99 deals vinculados a LicitaLAB en HubSpot. Esos registros **no fueron migrados ni enumerados aquí**; siguen consultándose en HubSpot.
 - Una fila en este archivo no demuestra que la oferta fue enviada. `Postulada` requiere comprobante, fecha/hora y fuente verificable.
@@ -84,6 +84,19 @@ Esta prioridad es un snapshot operativo, no una propiedad permanente: debe recal
 | `918434-14-LP26`    | Campaña Nacional VCM 2026 / Ministerio de la Mujer y la Equidad de Género                       | Licitación pública LP | CLP 350.000.000 | 2026-09-28 20:00 CLT | `Preparación`    | GO para preparar; acreditar campañas de gran escala   | No verificada                                     | [Deal 64466272830](https://app.hubspot.com/contacts/48713323/record/0-3/64466272830) · [Company 31163122599](https://app.hubspot.com/contacts/48713323/record/0-2/31163122599) |
 | `2427-73-LE26`      | Marketing digital para redes sociales / Municipalidad de Valparaíso                             | Licitación pública LE |  CLP 14.000.000 | 2026-09-03 16:00 CLT | `Preparación`    | GO para preparar; acreditar contratos y margen        | No verificada                                     | [Deal 64469214508](https://app.hubspot.com/contacts/48713323/record/0-3/64469214508) · [Company 32039105348](https://app.hubspot.com/contacts/48713323/record/0-2/32039105348) |
 | `1595-19-RFI26`     | RFI Software Gestión de Tickets / JUNJI                                                         | Consulta al mercado   |    No informado | 2026-09-09 12:00 CLT | `Preparación`    | GO para responder RFI; definir plataforma/alianza     | No verificada                                     | [Deal 64469523247](https://app.hubspot.com/contacts/48713323/record/0-3/64469523247) · [Company 57892355617](https://app.hubspot.com/contacts/48713323/record/0-2/57892355617) |
+
+## Promociones verificadas — 2026-09-01
+
+| ID | Oportunidad / organismo | Modalidad | Monto | Cierre oficial | Estado operativo | Decisión | Postulación | HubSpot |
+| --- | --- | --- | ---: | --- | --- | --- | --- | --- |
+| `1725-196-LE26` | Difusión plataforma Chile Cultura / Subsecretaría de las Culturas y las Artes | Licitación pública LE | CLP 50.000.000 | `2026-09-17T14:59:00Z` | `Preparación` | GO para preparar; validar margen, cashflow, medios y admisibilidad | No verificada | [Deal `64528962434`](https://app.hubspot.com/contacts/48713323/record/0-3/64528962434) · [Company `31209274438`](https://app.hubspot.com/contacts/48713323/record/0-2/31209274438) |
+| `5531-4-B226` | Servicios de publicidad digital DII / Universidad de Chile | Licitación pública | No informado | `2026-09-21T19:00:00Z` | `Preparación` | GO para preparar; validar volumen económico, equipo y presentación presencial | No verificada | [Deal `64544277070`](https://app.hubspot.com/contacts/48713323/record/0-3/64544277070) · [Company `31779716469`](https://app.hubspot.com/contacts/48713323/record/0-2/31779716469) |
+| `599-35-LE26` | Plan de medios Campaña de Asistencia 2026 / JUNJI | Licitación pública LE | CLP 13.500.000 | `2026-09-10T21:00:00Z` | `Preparación` | GO para preparar; costear medios, comisión, cashflow y margen | No verificada | [Deal `64529115746`](https://app.hubspot.com/contacts/48713323/record/0-3/64529115746) · [Company `57892355617`](https://app.hubspot.com/contacts/48713323/record/0-2/57892355617) |
+| `1658-203-LE26` | Campaña Temuco 150 años / Municipalidad de Temuco | Licitación pública LE | CLP 15.000.000 | `2026-09-10T21:00:00Z` | `Preparación` | GO para preparar; confirmar certificados de conformidad y margen | No verificada | [Deal `64532229714`](https://app.hubspot.com/contacts/48713323/record/0-3/64532229714) · [Company `57953559382`](https://app.hubspot.com/contacts/48713323/record/0-2/57953559382) |
+| `1016414-50-COT26` | Diseño digital de material CNTV Infantil / Consejo Nacional de Televisión | Compra Ágil | CLP 4.300.000 | `2026-09-10T18:00:00Z` | `Preparación` | GO para preparar; confirmar equipo, admisibilidad y margen | No verificada | [Deal `64521733176`](https://app.hubspot.com/contacts/48713323/record/0-3/64521733176) · [Company `57958935823`](https://app.hubspot.com/contacts/48713323/record/0-2/57958935823) |
+
+Los cinco Deals quedaron en `default` / `qualifiedtobuy`, con owner `75788512`, llave de idempotencia y asociación
+Deal ↔ Company verificadas mediante readback. No se crearon contactos sin identidad comprobada.
 
 ## Fichas activas
 

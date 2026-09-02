@@ -1,8 +1,8 @@
 # ANAM HubSpot Managed Service end-to-end
 
 > **Tipo:** Documentación funcional
-> **Versión:** 1.8
-> **Actualizado:** 2026-09-01
+> **Versión:** 1.9
+> **Actualizado:** 2026-09-02
 > **Cliente/portal:** ANAM / `19893546`
 > **Canon técnico:** [`../../architecture/kortex/hubspot-as-a-service/README.md`](../../architecture/kortex/hubspot-as-a-service/README.md)
 > **Manual:** [`../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md`](../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md)
@@ -66,6 +66,11 @@ acción de reemplazo sólo actúa cuando la primaria no dejó propietario. Tres 
 la ruta primaria de cotización, el reemplazo real de seguimiento y la ruta primaria de Calidad. La evidencia
 demuestra clasificación, asignación y owner visible; todavía no demuestra una respuesta humana ni una segunda
 reasignación humana en el mismo chat.
+
+La explicación paso a paso para presentar a ANAM está en
+[`anam-customer-agent-handoff-workflow-functional.md`](anam-customer-agent-handoff-workflow-functional.md), y la
+configuración de cada acción, contingencia y evidencia técnica está en
+[`../../architecture/kortex/hubspot-as-a-service/anam-customer-agent-handoff-workflow-1876744588.md`](../../architecture/kortex/hubspot-as-a-service/anam-customer-agent-handoff-workflow-1876744588.md).
 
 La modalidad live conserva el hilo mientras el chat siga abierto. Después del primer handoff, el owner humano
 puede reasignar manualmente el ticket en Help Desk para que otra persona continúe con el mismo contexto. Terminar

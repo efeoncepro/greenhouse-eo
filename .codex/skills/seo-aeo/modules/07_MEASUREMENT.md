@@ -240,10 +240,10 @@ forma, declarar la procedencia, y decirlo.
 puede cambiar de fórmula sin cambiar nombre, tipo ni status HTTP. Un parser verde no demuestra continuidad
 estadística.
 
-Caso vigente: el aviso de cuenta DataForSEO del 2026-09-01 anuncia una fórmula ETV mejorada —CTR dinámico
-según layout/features/intención y volumen normalizado con clickstream—, opt-in con `use_improved_etv: true`,
-legacy por default hasta 2026-11-01 y después cambio de default. La documentación pública seguía describiendo
-el modelo legacy al cierre de la revisión. Detalle técnico en la skill `dataforseo-operator` y
+Caso vigente: DataForSEO confirmó una fórmula ETV mejorada —CTR por posición/intención/composición SERP y
+volumen normalizado—, 14 familias compatibles y corte global `2026-11-01T00:00:00Z`. Desde ese instante
+`false` se ignora y no existe legacy fallback. La respuesta no expone versión; la procedencia se deriva del
+request explícito, su instante UTC y la policy. Detalle técnico en la skill `dataforseo-operator` y
 `docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md`.
 
 Reglas de medición:
@@ -261,6 +261,10 @@ Reglas de medición:
    sobre el proxy; si el proveedor ordena antes de responder, puede cambiar la membresía de la muestra.
 6. **Reporte honesto.** Toda comparación que cruce metodologías se segmenta o se marca no comparable. Una fila
    sin versión queda `unknown_methodology`, nunca «legacy» o «improved» por su fecha.
+7. **Historia con base declarada.** Improved desde julio de 2026 es recomputación completa; antes es aproximación
+   calibrada por el ratio de julio del dominio. No la uses como recomputación keyword-level ni YoY silencioso.
+8. **Rollback acotado.** Preserva baseline legacy antes del corte. Después, el safe mode congela capturas y sirve
+   la última serie coherente; no existe rollback legacy por flag.
 
 ### Medición no nativa: cuando el canal lo opera otro
 

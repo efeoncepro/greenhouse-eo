@@ -24,6 +24,10 @@ tarde el mismo 1 de septiembre, la matriz de handoff autorizada se publicó por 
 tickets `1876744588` y se verificó con tres conversaciones públicas E2E. El contrato y la evidencia viven en
 `07-identidad-directrices-handoff-y-canales.md` y
 `docs/audits/ANAM_CUSTOMER_AGENT_HANDOFF_E2E_QA_2026-09-01.md`.
+La secuencia técnica exacta del workflow vive en
+[`../anam-customer-agent-handoff-workflow-1876744588.md`](../anam-customer-agent-handoff-workflow-1876744588.md),
+y su explicación funcional para ANAM en
+[`../../../../documentation/hubspot-as-a-service/anam-customer-agent-handoff-workflow-functional.md`](../../../../documentation/hubspot-as-a-service/anam-customer-agent-handoff-workflow-functional.md).
 
 El preflight de publicación conservó dos advertencias preexistentes sobre la promesa `Registraré tu consulta`;
 deben resolverse en un cambio separado y con regresión conversacional, no dentro de la actualización de identidad

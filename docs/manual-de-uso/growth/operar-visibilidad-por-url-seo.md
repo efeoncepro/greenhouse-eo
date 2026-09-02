@@ -19,8 +19,9 @@ Toda cifra es **◑ estimada** (DataForSEO Labs, ciclo mensual). La posición de
 exacta en una SERP concreta; la de Search Console es un promedio ponderado por impresiones —
 **jamás se promedian ni se mezclan**.
 
-> **Alerta metodológica 2026-09-01:** DataForSEO anunció ETV improved y cambio de default para
-> 2026-11-01. No agregues `use_improved_etv` a una primitive o al cron actual: las claves append-only no
+> **Alerta metodológica actualizada 2026-09-02:** DataForSEO confirmó Improved ETV y el corte global
+> `2026-11-01T00:00:00Z`; desde ese instante `false` se ignora y no existe fallback legacy. No agregues
+> `use_improved_etv` a una primitive o al cron actual: las claves append-only no
 > distinguen fórmula y `relevant_pages`/`subdomains` ordenan provider-side por ETV, por lo que puede cambiar
 > incluso la membresía del top-N. Trata cualquier salto como no comparable hasta el cutover gobernado.
 > [Auditoría y plan](../../audits/seo/2026-09-01-dataforseo-improved-etv-impact.md).

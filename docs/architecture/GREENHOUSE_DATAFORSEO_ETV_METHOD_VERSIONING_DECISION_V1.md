@@ -3,8 +3,8 @@
 > **Status:** Accepted — implementation, provider spend and cutover gated  
 > **Date:** 2026-09-01 · **Owner:** Growth SEO / EPIC-022  
 > **Scope:** Growth / SEO / DataForSEO Labs / PostgreSQL / API Platform / MCP / ops-worker  
-> **Reversibility:** two-way-but-slow · **Confidence:** medium  
-> **Validated as of:** 2026-09-01 (repo vigente + aviso de cuenta; contrato público del flag todavía incompleto)  
+> **Reversibility:** two-way-until-provider-cutoff; freeze-only-after-cutoff · **Confidence:** high
+> **Validated as of:** 2026-09-02 (repo vigente + respuesta contractual directa de DataForSEO)
 > **Epic:** `EPIC-022` · **Execution owners:** `TASK-1805` foundation · `TASK-1806` evaluation/cutover  
 > **Evidence:** [impact audit](../audits/seo/2026-09-01-dataforseo-improved-etv-impact.md) ·
 > [provider questions](../audits/communications/2026-09-01-dataforseo-improved-etv-provider-questions.md)
@@ -15,15 +15,17 @@ DataForSEO anunció una fórmula mejorada para el campo existente `etv`. La resp
 pero cambia la estimación mediante CTR sensible al layout/intención y normalización clickstream. El aviso indica
 acceso temprano mediante `use_improved_etv: true` y un cambio de default el 2026-11-01.
 
-Greenhouse consume ETV en siete workflows Labs, persiste los números sin versión metodológica y construye series,
-rankings top-N, costos estimados y diagnósticos comerciales. Las claves actuales tampoco permiten conservar dos
+Greenhouse consume ETV en siete workflows Labs. De las 14 familias ETV-capable confirmadas, nueve tienen caller:
+seis familias/siete caminos consumen ETV, tres lo ignoran y cinco no están habilitadas. Los caminos consumidores
+persisten números sin versión metodológica y construyen series, rankings top-N, costos estimados y diagnósticos
+comerciales. Las claves actuales tampoco permiten conservar dos
 fórmulas para el mismo sujeto, mercado y fecha. Depender del default del proveedor convertiría una revisión de
 modelo en una aparente variación de performance SEO sin que readers, API, MCP ni operadores puedan distinguirla.
 
-La documentación pública revisada todavía no describe `use_improved_etv`. Cobertura por endpoint, semántica de
-`false` frente a omisión, pricing, retroactividad histórica y disponibilidad del legado después del corte siguen
-siendo preguntas contractuales. Por eso esta decisión fija la forma interna y la secuencia segura, pero no
-autoriza implementación, gasto, migración, deploy ni cutover.
+DataForSEO confirmó que el flag cubre 14 familias Labs de Google y Bing y todos los campos ETV, que no cambia el
+precio y que el corte global ocurre el **2026-11-01T00:00:00Z**. Desde ese instante `false` se ignora y no existe
+fallback legacy. La respuesta tampoco expone una versión de fórmula. Por eso esta decisión fija la forma interna,
+la evidencia derivable y la secuencia segura, pero no autoriza implementación, gasto, migración, deploy ni cutover.
 
 ## Decisión
 
@@ -36,6 +38,9 @@ Toda cifra ETV capturada o derivada deberá llevar una identidad metodológica c
 - `unknown_methodology`: estado de lectura/degradación para evidencia que no puede atribuirse con certeza; no es
   una opción válida para nuevas escrituras una vez desplegado el contrato.
 
+La metodología se acompaña de `historicalCalculationBasis`: `fully_recomputed` desde julio de 2026 o
+`calibrated_approximation` antes, cuando improved histórico se deriva del ratio de julio por dominio.
+
 Los nombres internos son estables aunque DataForSEO cambie el nombre comercial. No se inferirá la fórmula por
 fecha de captura. Las filas preexistentes sólo se marcarán legacy cuando la evidencia contractual permita
 demostrarlo; las filas ambiguas permanecerán explícitamente desconocidas.
@@ -46,9 +51,10 @@ demostrarlo; las filas ambiguas permanecerán explícitamente desconocidas.
 
 - resuelve el método configurado;
 - mantiene una allowlist cerrada de endpoints Labs compatibles;
+- clasifica cada familia como `etv_consumed`, `etv_ignored` o `provider_supported_not_enabled`;
 - construye el parámetro exacto sólo cuando el contrato oficial lo confirma;
 - falla cerrado ante método o endpoint desconocido;
-- devuelve la metodología solicitada y la observada para persistencia, logs y señales.
+- devuelve la metodología configurada, solicitada y efectiva derivada para persistencia, logs y señales.
 
 Está prohibido inyectar `use_improved_etv` globalmente o copiar la decisión en siete callsites. Omitir el campo no
 será una tercera policy silenciosa: sólo podrá usarse en una prueba controlada que mida el default del proveedor.
@@ -79,7 +85,10 @@ Si el método solicitado no existe, el reader elige una de estas respuestas gobe
 2. fallback legacy etiquetado, sólo durante el período de transición;
 3. dos series separadas para comparación autorizada.
 
-API Platform, MCP, resúmenes operativos y provenance transportan la misma identidad. `methodologyVersion` es
+API Platform, MCP, resúmenes operativos y provenance transportan la misma identidad. DataForSEO no devuelve una
+versión observada: `providerEffectiveMethod` se deriva de `requestedMethod`, `requestedAt`, la fecha de corte y la
+versión de policy. Desde el corte, una solicitud legacy es drift/fallo, no evidencia de legacy servido.
+`methodologyVersion` es
 provenance de una métrica; no es una `lens` ni una nueva fuente de verdad.
 
 ### 5. GSC es benchmark first-party, no fórmula a combinar
@@ -105,26 +114,28 @@ El plan nunca describe una comparación temporal como paridad simultánea.
 
 Después de la evaluación se elige una opción por serie:
 
-- **rebaseline versionado**, sólo si DataForSEO confirma retroactividad, el costo queda aprobado y el histórico
-  puede recomprarse sin mezclar metodologías; o
+- **rebaseline versionado**, usando improved recomputado completamente desde julio de 2026 y etiquetando los meses
+  anteriores como `calibrated_approximation`, porque el proveedor los convierte con el ratio de julio por dominio; o
 - **breakpoint visible**, conservando legacy antes de una fecha y improved después, sin calcular variaciones a
   través del quiebre.
 
-Los históricos no se reetiquetan por fecha de consulta y una recompra no sobreescribe filas append-only.
+Los históricos no se reetiquetan por fecha de consulta y una recompra no sobreescribe filas append-only. Ninguna
+comparación interanual puede tratar los meses anteriores a julio de 2026 como recomputación keyword por keyword.
 
 ### 8. Configuración cross-runtime y rollback
 
 La selección vive en una configuración canónica con el mismo valor en Vercel y ops-worker. El runtime reporta
-`configured_method`, `requested_method` y `served_method`; cualquier divergencia abre señal y safe mode. El
-cutover se hace explícito antes del cambio de default del proveedor.
+`configured_method`, `requested_method`, `provider_effective_method`, `requested_at` y `policy_version`; cualquier
+divergencia abre señal y safe mode. `provider_effective_method` es una derivación contractual, no un campo leído
+de la respuesta. El cutover se hace explícito antes del cambio obligatorio del proveedor.
 
-Rollback significa volver el selector de lectura y los writers a `legacy_static_v1` mientras el proveedor lo
-soporte. No borra ni reescribe evidencia improved. Si DataForSEO retira legacy, rollback significa congelar nuevas
-capturas ETV, servir la última serie comparable etiquetada y escalar; nunca aceptar el nuevo default en silencio.
+Antes del 2026-11-01T00:00:00Z, rollback puede volver el selector de lectura y los writers a `legacy_static_v1`.
+Después del corte, `false` se ignora: rollback significa congelar nuevas capturas ETV, servir la última serie
+comparable etiquetada y escalar. Nunca se presenta una solicitud `false` como rollback efectivo post-corte.
 
 ## Secuencia vinculante de entrega futura
 
-1. Obtener matriz oficial de endpoints, semántica, pricing e históricos; verificar Sandbox si está disponible.
+1. Incorporar la matriz contractual confirmada y verificar Sandbox cuando la documentación esté disponible.
 2. Implementar policy pura/allowlist/config con default legacy explícito y tests, sin activarla.
 3. Aplicar expand aditivo, atribución segura de filas existentes y tipos regenerados.
 4. Propagar metodología por writers, freshness, parsers y hechos derivados.
@@ -132,15 +143,15 @@ capturas ETV, servir la última serie comparable etiquetada y escalar; nunca ace
 6. Propagar el contrato por API/MCP/provenance y señales cross-runtime.
 7. Validar fixtures/replay; luego ejecutar canary o A/B sólo con gasto aprobado.
 8. Registrar la decisión histórica, hacer cutover controlado y observar.
-9. Retirar legacy sólo cuando el período de rollback y la evidencia lo permitan.
+9. Conservar el baseline legacy como evidencia; no existe captura legacy nueva después del corte del proveedor.
 
 `TASK-1805` posee los pasos 1–6 y entrega el evaluador seguro todavía en legacy. `TASK-1806` depende de su cierre y
-posee los pasos 7–9: shadow autorizado, decisión histórica, cutover y rollback. Ambas pueden refinar slices y
+posee los pasos 7–9: shadow autorizado, decisión histórica, cutover y rollback pre-corte/safe mode post-corte. Ambas pueden refinar slices y
 nombres de símbolos durante Plan Mode, pero no invertir este orden ni trasladar gasto a la foundation.
 
 ## Invariantes verificables
 
-- Cambiar el default de DataForSEO no cambia el método servido por Greenhouse.
+- Cambiar el default de DataForSEO antes del corte no cambia el método efectivo de Greenhouse.
 - Dos métodos pueden coexistir para el mismo sujeto/mercado/fecha sin colisión ni overwrite.
 - Una lectura devuelve una metodología o falla/degrada con etiqueta; nunca mezcla.
 - Freshness de legacy no satisface una solicitud improved ni viceversa.
@@ -148,7 +159,8 @@ nombres de símbolos durante Plan Mode, pero no invertir este orden ni trasladar
 - Un hecho de tráfico estimado de prospecto no se escribe sin metodología.
 - El costo pagado estimado comparte método con su ETV.
 - Dry-run y logs declaran el método y el número de llamadas previstas.
-- Ningún flag, deploy o documento se considera evidencia de la fórmula servida: el readback debe observarla.
+- Ningún flag, deploy o documento se considera evidencia suficiente: antes del corte se verifica el request
+  explícito; después se deriva el método efectivo con el contrato temporal y se rechaza configuración legacy.
 
 ## Alternativas rechazadas
 
@@ -168,17 +180,15 @@ nombres de símbolos durante Plan Mode, pero no invertir este orden ni trasladar
 - El modelo y los DTO ganan una dimensión, y algunas claves/queries deben cambiar.
 - La comparabilidad pasa a ser explícita; ciertos gráficos podrán mostrar un breakpoint en vez de una variación.
 - La evaluación exacta puede tener costo adicional y requiere aprobación humana separada.
-- La transición es reversible mientras el proveedor conserve legacy; si no, la degradación segura es congelar,
-  no fingir continuidad.
+- La transición sólo es reversible hasta el corte fijo del proveedor; después la degradación segura es congelar,
+  no fingir continuidad ni un rollback que el proveedor ignora.
 - Este ADR por sí solo no autoriza código, migraciones, llamadas al proveedor, flags, deploys ni cambios de runtime.
 
-## Preguntas que bloquean la implementación
+## Estado del contrato externo
 
-1. Endpoints y campos exactos que aceptan `use_improved_etv`.
-2. Semántica de `false`, omisión y default antes/después del 2026-11-01.
-3. Precio y convivencia con `include_clickstream_data`.
-4. Comportamiento de históricos, retroactividad y versión observada en respuesta.
-5. Hora/zona de corte y ventana garantizada de rollback legacy.
+La respuesta directa de DataForSEO resolvió endpoints/campos, booleano, precio, clickstream, históricos, corte y
+rollback. Sandbox y las URLs finales de OpenAPI/changelog siguen pendientes, pero no bloquean la foundation basada
+en fixtures. Una llamada real continúa requiriendo autorización y presupuesto.
 
 Fuentes oficiales consultadas:
 

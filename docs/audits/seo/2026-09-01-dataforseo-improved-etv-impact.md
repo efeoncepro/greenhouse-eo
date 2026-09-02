@@ -1,9 +1,10 @@
 # Auditoría DataForSEO Improved ETV — impacto en Greenhouse SEO
 
 - Fecha: 2026-09-01
-- Alcance: anuncio de fórmula ETV, siete consumers Labs, persistencia, readers, API/MCP, reporting y transición
+- Alcance: 14 familias ETV-capable, nueve con caller y seis familias/siete caminos consumidores; persistencia,
+  readers, API/MCP, reporting y transición
 - Tipo: discovery/documentación; sin cambio de código, schema, flags, scheduler, proveedor ni runtime
-- Evidencia externa: aviso de cuenta DataForSEO recibido en Outlook + documentación pública oficial consultada
+- Evidencia externa: aviso de cuenta + respuesta contractual de DataForSEO recibidos en Outlook + documentación pública
 - Evidencia interna: código, migraciones, arquitectura, tests y ledger declarativo del checkout compartido
 - Estado: contrato documentado; cutover no autorizado
 
@@ -13,7 +14,7 @@ DataForSEO anunció una nueva metodología para el campo existente `etv`. El cam
 semántica detrás del mismo número. Greenhouse no envía `use_improved_etv`, no persiste versión de fórmula y sus
 claves append-only no permiten guardar legacy e improved para el mismo sujeto/mercado/fecha.
 
-El riesgo P0 es una discontinuidad silenciosa: después del cutover anunciado para 2026-11-01, una captura puede
+El riesgo P0 es una discontinuidad silenciosa: después del corte confirmado para 2026-11-01T00:00:00Z, una captura puede
 seguir pasando parsing/tests y entrar a la trayectoria como si fuera performance orgánica. El mismo peligro
 existe hacia atrás si Historical Rank Overview recalcula períodos pasados.
 
@@ -23,6 +24,19 @@ primitives manuales sin caller productivo adicional observado. Esta auditoría n
 llamadas pagadas: el estado de activación viene del ledger/código vigente y debe reverificarse al ejecutar.
 
 ## 2. Qué confirmó DataForSEO y qué sigue abierto
+
+### Confirmado por respuesta directa del proveedor el 2026-09-02
+
+- El flag está activo en producción para Google y Bing en 14 familias Labs; la matriz completa vive en el
+  [registro del hilo](../communications/2026-09-01-dataforseo-improved-etv-provider-questions.md).
+- Afecta todo campo ETV y `estimated_paid_traffic_cost`, incluidos organic, paid, featured snippet, local pack,
+  AI Overview reference, items y SERP Competitors.
+- El corte exacto es 2026-11-01T00:00:00Z. Después, `false` se ignora y no existe legacy fallback.
+- No se expone una versión de fórmula en la respuesta; el cliente debe registrar flag y fecha.
+- Julio de 2026 en adelante se recomputa completamente. Antes de julio se aplica una calibración por dominio
+  derivada del ratio legacy/improved de julio; esos puntos son aproximaciones.
+- `use_improved_etv` no tiene recargo. `include_clickstream_data` es independiente, combinable y conserva su
+  precio doble; `clickstream_etv` no cambia con improved.
 
 ### Confirmado por el aviso de cuenta
 
@@ -48,32 +62,29 @@ Fuentes:
 - https://docs.dataforseo.com/v3/dataforseo_labs/google/ranked_keywords/live/
 - https://docs.dataforseo.com/v3/dataforseo_labs/google/historical_rank_overview/live/
 
-### Brecha contractual pública al 2026-09-01
+### Brecha documental pública y pendientes al 2026-09-02
 
-Las páginas revisadas no contienen `use_improved_etv` y todavía explican la fórmula legacy. No existe una matriz
-pública confirmada de endpoints/objetos, pricing, retroactividad, convivencia con `include_clickstream_data`,
-hora/zona de corte o disponibilidad de legacy después del 1 de noviembre.
-
-Preguntas que deben responder DataForSEO o una prueba acotada antes de implementar:
-
-1. ¿Qué endpoints aceptan el flag y qué hacen si no lo soportan: error o ignore silencioso?
-2. ¿Cambia sólo `organic.etv` o también paid, featured snippet, local pack, AIO reference y derivados?
-3. ¿Tiene recargo y cómo factura junto a `include_clickstream_data`?
-4. ¿Los históricos se recalculan al leerlos o el cambio aplica sólo hacia adelante?
-5. ¿Una fecha histórica puede devolver valores distintos según flag o fecha de consulta?
-6. ¿`estimated_paid_traffic_cost` se actualiza sincrónicamente con el nuevo ETV?
-7. ¿`use_improved_etv: false` conserva legacy después del cutover y por cuánto tiempo?
-8. ¿Cuál es la hora/zona exacta y existe rollback?
-
-El borrador completo de diez preguntas, con destinatario y fallback de soporte, quedó en
-`docs/audits/communications/2026-09-01-dataforseo-improved-etv-provider-questions.md`. No fue enviado.
+Las páginas revisadas todavía explicaban la fórmula legacy y DataForSEO indicó que OpenAPI/changelog estaban en
+preparación. Sólo queda confirmar Sandbox y enlazar la documentación final. Esto no bloquea diseño/fixtures, pero
+ninguna llamada pagada queda autorizada por la respuesta.
 
 ## 3. Inventario de impacto Greenhouse
+
+La matriz del proveedor contiene 14 familias. El repo llama nueve: seis familias/siete caminos consumen ETV y
+tres lo ignoran. Las cinco restantes no tienen caller y no se habilitan preventivamente.
+
+| Clasificación | Familias | Tratamiento |
+| --- | --- | --- |
+| `etv_consumed` | Ranked Keywords (URL visibility + prospect), Relevant Pages, Subdomains, Domain Rank Overview, Historical Rank Overview, Bulk Traffic Estimation | Policy, provenance, persistencia y A/B formula-aware |
+| `etv_ignored` | Competitors by Domain, Domain Intersection, Historical SERPs | Guard conductual: no proyectar ETV sin reclasificar y versionar |
+| `provider_supported_not_enabled` | SERP Competitors, Categories for Domain, Page Intersection, Historical Bulk Traffic Estimation, Domain Metrics by Categories | Sin caller ni habilitación preventiva |
+
+Keyword Suggestions e Ideas quedan fuera: el proveedor confirmó que no devuelven ETV.
 
 | #   | Consumer                         | Campos/derivados                | Estado observado               | Impacto                                                            |
 | --- | -------------------------------- | ------------------------------- | ------------------------------ | ------------------------------------------------------------------ |
 | 1   | `domain_rank_overview`           | ETV organic/paid + traffic cost | cron mensual declarado         | Valor y trayectoria cambian; parser no detecta metodología         |
-| 2   | `historical_rank_overview`       | ETV/traffic cost por mes        | runner manual                  | Backfill legacy bloquea rebaseline; retroactividad desconocida     |
+| 2   | `historical_rank_overview`       | ETV/traffic cost por mes        | runner manual                  | Desde julio recomputa; antes aproxima por ratio de julio           |
 | 3   | `bulk_traffic_estimation`        | ETV organic/paid                | primitive sin caller adicional | Screening y comparaciones de mercado cambian                       |
 | 4   | `ranked_keywords` URL visibility | ETV agregado + ETV por keyword  | cron mensual declarado         | Snapshot, top keywords y comparaciones target/competidor cambian   |
 | 5   | `relevant_pages`                 | ETV por página                  | primitive on-demand            | Cambia valor y membresía top-N porque ordena provider-side por ETV |
@@ -176,12 +187,13 @@ La idempotencia diaria no distingue fórmula (`20260827185848695_task-1709-seo-p
 Si se agregan dos modelos sin resolver el reader, una línea puede mezclar meses y no podrá explicar el salto.
 API/MCP/provenance deben transportar la versión; no basta con conservarla sólo en PG.
 
-## 6. Superficies sin impacto actual
+## 6. Superficies sin consumo ETV actual
 
 - No existe consumo/persistencia de `clickstream_etv`.
 - `keyword_overview` y discovery usan volumen/CPC/KD, no ETV.
-- `domain_intersection` recibe posibles campos ETV, pero el parser actual usa posiciones, URL, features y
-  keyword market data; no los consume.
+- `domain_intersection` y otros endpoints de la matriz pueden devolver ETV, pero el parser actual usa posiciones,
+  URL, features y keyword market data; no los consume. La policy futura debe clasificarlos como `etv_ignored`
+  explícito o volverlos formula-aware antes de leer cualquier ETV.
 - `competitors_domain` del prospect deriva dominio, posición e intersecciones, no ETV.
 - `historical_serps` persiste `estimated_traffic = NULL`.
 - SERP rank diario/top-N, GSC, Backlinks, OnPage y AEO no dependen del ETV Labs.
@@ -208,8 +220,8 @@ Las pruebas futuras deben ejercer builders/readers y constraints reales. Un grep
 
 ### P0 — antes de experimentar
 
-1. **Obtener aclaración del proveedor.** Responder el correo con las ocho preguntas de §2 o esperar la matriz
-   pública; una prueba sandbox/live acotada complementa, no sustituye, la definición de históricos/pricing.
+1. **Incorporar la respuesta contractual.** La matriz y semántica ya están confirmadas; Sandbox/OpenAPI son
+   seguimiento no bloqueante. Una prueba live sigue requiriendo aprobación y presupuesto.
 2. **Abrir ADR + task propia.** Cambian API externa, schema append-only, proyecciones y metodología compartida.
 3. **Definir policy canónica** `legacy_v1|improved_v2`; no inyectar el flag en el transporte genérico ni copiarlo
    en siete callsites.
@@ -218,7 +230,7 @@ Las pruebas futuras deben ejercer builders/readers y constraints reales. Un grep
 5. **Elegir dónde vive el shadow.** Tabla experimental separada o clave productiva que incluya versión; jamás las
    tablas actuales sin migración.
 
-### P1 — septiembre/octubre, con autorización de gasto
+### P0 — antes del corte, con autorización de gasto
 
 6. Ejecutar legacy/improved sobre cohorte representativa: Efeonce CL, Berel MX, competidores, dominios grandes y
    pequeños, intención informational/commercial/local y SERPs con/sin AIO.
@@ -226,15 +238,17 @@ Las pruebas futuras deben ejercer builders/readers y constraints reales. Un grep
    estabilidad. No promediar fuentes.
 8. Probar valores y **membresía** de relevant pages/subdomains; revisar traffic cost y suma truncada de prospect.
 9. Decidir con evidencia entre:
-   - rebaseline versionado de histórico, si costo/retroactividad lo permiten; o
+   - rebaseline versionado, distinguiendo recomputación completa desde julio de 2026 y aproximación calibrada antes; o
    - breakpoint visible desde una fecha explícita, conservando legacy sin comparar el salto.
 
 ### P2 — hardening y cutover
 
 10. Tests conductuales de policy, payload, schema, reader, API/MCP y mixed-series failure.
-11. Señales: filas sin versión, mezcla de versiones, configured ≠ served y legacy posterior al cutover.
+11. Señales: filas sin versión, mezcla de versiones, configured/requested/effective drift y legacy solicitado
+    después del corte.
 12. Runbook/copy: toda cifra muestra lente estimada, versión/cutover y comparabilidad.
-13. Cutover controlado antes del default del proveedor, con rollback y readback; no esperar al 1 de noviembre.
+13. Cutover controlado antes del corte obligatorio. Después del 1 de noviembre no existe rollback legacy: el
+    procedimiento seguro es congelar capturas y servir la última serie coherente.
 
 ## 9. Criterio de cierre futuro
 

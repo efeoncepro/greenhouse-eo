@@ -1,8 +1,8 @@
 # Operar ANAM HubSpot Managed Service
 
 > **Tipo:** Manual de uso / runbook
-> **Versión:** 1.8
-> **Actualizado:** 2026-09-01
+> **Versión:** 1.9
+> **Actualizado:** 2026-09-02
 > **Portal obligatorio:** ANAM `19893546`
 > **Funcional:** [`../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md`](../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md)
 > **Servicios:** [Customer Agent gestionado](../../services/hubspot-as-a-service/hubspot-customer-agent-managed-service.md) · [RevOps, automatización y paneles](../../services/hubspot-as-a-service/hubspot-revops-architecture-automation-and-dashboards.md)
@@ -24,6 +24,9 @@ acción y cadencia; no un score cosmético ni una atribución automática de cul
 ### Diaria
 
 - Revisa disponibilidad, créditos, conversaciones no resueltas y transferencias de Customer Agent.
+- Para diagnosticar el routing de Emma, sigue la
+  [secuencia técnica de `1876744588`](../../architecture/kortex/hubspot-as-a-service/anam-customer-agent-handoff-workflow-1876744588.md):
+  inscripción, resumen, clasificación, borrado del owner, rama, principal, reemplazo y owner efectivo.
 - Revisa tareas de `1852406585`: una tarea solicita validar; no vuelve al Service activo ni apto para KPI.
 - Atiende excepciones urgentes de Data Quality por owner, corrigiendo en el punto de captura.
 

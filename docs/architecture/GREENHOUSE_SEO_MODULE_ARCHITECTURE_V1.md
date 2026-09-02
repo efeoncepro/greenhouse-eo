@@ -2018,3 +2018,22 @@ separadas de las del cliente medido ese mismo día. Tope duro por diagnóstico (
 default USD 1,00) validado contra el costo del conjunto ANTES de la primera llamada; previsto USD
 0,2050 vs medido USD 0,1991. **No hay captura recurrente sobre un prospecto** y la migración aborta
 si alguien intenta agregarla.
+
+## Delta 2026-09-02 — expansión gobernada de Labs más allá de los consumers ETV actuales
+
+Las cinco familias Labs sin caller dejan de ser backlog anónimo y se particionan por capacidad:
+
+- `TASK-1808`: `categories_for_domain` + `domain_metrics_by_categories`, una relación bidireccional
+  dominio↔categoría. La taxonomía comercial del proveedor es evidencia versionada; jamás reemplaza
+  `seo_topic_clusters`. Cualquier binding externo→interno conserva provenance y usa
+  `propose → confirm → execute`.
+- `TASK-1809`: `serp_competitors` agrega evidencia de mercado por keyword set. Complementa el top-N observado
+  de `TASK-1699`; no declara competidores, no sustituye `domain_intersection` y no ordena la work queue.
+- `TASK-1810`: `page_intersection` captura overlap/gap entre páginas mediante command; `TASK-1314` sólo consume
+  su reader y conserva cero provider calls on-read.
+- `TASK-1811`: `historical_bulk_traffic_estimation` es un carril de escala sobre el source of truth de domain
+  overview, no una segunda serie. Sus cohorts son allowlisted, one-shot y con calidad histórica explícita.
+
+Las cuatro capacidades dependen de la identidad metodológica de `TASK-1805` y se habilitan individualmente tras
+el método productivo gobernado por `TASK-1806`. Cada una nace con Improved ETV explícito, series mono-metodología,
+persistencia append-only, costo acotado, API parity y MCP; no existe activación global de «todos los endpoints».

@@ -16,7 +16,7 @@ series históricas, cambiar silenciosamente el conjunto top-N ni exceder el gast
 
 No iniciar una prueba con proveedor hasta que todas estén satisfechas:
 
-1. DataForSEO confirmó endpoints, campos, `true`/`false`/omisión, pricing, históricos y ventana legacy.
+1. La respuesta DataForSEO del 2026-09-02 está incorporada; Sandbox/OpenAPI pendientes son no bloqueantes.
 2. `TASK-1805` está completa y verificada; `TASK-1806` fue tomada mediante el operating loop y su plan fue aprobado.
 3. Policy y allowlist fallan cerrado; el transporte genérico sigue neutral.
 4. El expand de schema permite coexistir ambas metodologías y fue verificado antes de cualquier writer improved.
@@ -25,12 +25,16 @@ No iniciar una prueba con proveedor hasta que todas estén satisfechas:
 7. Existe un presupuesto máximo en USD aprobado por el operador. Sin monto aprobado, sólo fixtures/replay.
 8. Se definieron ventana, propiedades GSC, países, dispositivos y tratamiento de datos faltantes antes de mirar
    resultados.
+9. El calendario interno preserva margen: foundation objetivo 2026-10-15, shadow/decisión 2026-10-23 y cutover
+   objetivo 2026-10-28T00:00:00Z. El corte externo final es 2026-11-01T00:00:00Z.
 
 ## Nivel 0 — validación sin gasto
 
 Usar fixtures oficiales o respuestas sintéticas versionadas para probar:
 
-- payload exacto para cada endpoint compatible;
+- inventario de 14 familias y payload exacto para los nueve callers actuales;
+- guard de clasificación: seis familias/siete caminos `etv_consumed`, tres callers `etv_ignored` y cinco
+  `provider_supported_not_enabled`;
 - rechazo de endpoint/método inválido;
 - convivencia legacy/improved para mismo sujeto/mercado/fecha;
 - freshness e idempotencia por método;
@@ -76,12 +80,12 @@ temporal. Debe registrarse como `temporal_canary`, no como A/B.
 
 ### A/B exacto con gasto autorizado
 
-Ejecuta el mismo request lógico para ambos métodos dentro de la misma ventana. Sólo procede si DataForSEO confirma
-que ambas solicitudes son válidas y el dry-run muestra un costo total bajo el tope aprobado. Si el proveedor
-entrega ambas fórmulas en una respuesta, se prefiere esa vía y se conserva la respuesta como evidencia gobernada.
+Ejecuta dos requests normales con el mismo input lógico, uno por método, dentro de la misma ventana. Improved no
+tiene premium, pero el A/B duplica llamadas. `include_clickstream_data` no se activa para esta evaluación salvo
+objetivo y presupuesto separados: es independiente y conserva precio ×2.
 
-Detener antes de la primera llamada si el costo no puede estimarse, el default no puede fijarse explícitamente o
-el histórico no revela qué método sirvió.
+Detener antes de la primera llamada si el costo no puede estimarse, el método no puede fijarse explícitamente o el
+request legacy ocurriría desde el corte. El provider no devuelve formula version: guardar request UTC y policy.
 
 ## Comparación
 
@@ -106,6 +110,7 @@ Comparar además:
 - top keywords;
 - relevant pages/subdomains: intersección, entradas, salidas y cambios de posición;
 - histórico del mismo período, si el provider permite ambas fórmulas;
+- `calculation_basis`: `fully_recomputed` desde julio de 2026 o `calibrated_approximation` antes;
 - suma del prospecto, número de filas y señal de truncamiento.
 
 Un cambio de membresía es un resultado de primera clase; no se reduce a porcentaje de variación del ETV.
@@ -127,7 +132,8 @@ material no aceptada en un cliente ancla. Si la evidencia es inconclusa, el resu
 
 ## Decisión histórica
 
-- Elegir **rebaseline** sólo con retroactividad confirmada, costo aprobado y almacenamiento separado por método.
+- Elegir **rebaseline** sólo con costo aprobado, almacenamiento separado y disclosure de que pre-julio es una
+  aproximación calibrada, no recomputación keyword-level.
 - En otro caso, declarar **breakpoint** con fecha/hora, mantener segmentos separados y deshabilitar deltas que
   crucen el quiebre.
 - Nunca reetiquetar filas por fecha ni sobrescribir evidencia append-only.
@@ -139,12 +145,13 @@ material no aceptada en un cliente ancla. Si la evidencia es inconclusa, el resu
 3. Deploy con selector legacy explícito y señales de drift.
 4. Canary/A-B bajo presupuesto y write path separado.
 5. Decisión documentada y aprobación humana.
-6. Cutover de writer, luego reader, en staging; verificar método servido.
+6. Cutover de writer, luego reader, en staging; verificar método efectivo derivado y serie persistida.
 7. Repetir en producción con observación y stop conditions.
 
 Stop conditions:
 
-- `configured_method != requested_method != served_method`;
+- `configured_method != requested_method != provider_effective_method`;
+- request legacy en o después de 2026-11-01T00:00:00Z;
 - filas nuevas sin metodología o una serie mixta;
 - costo proyectado/real supera el tope;
 - default del proveedor no verificable;
@@ -153,9 +160,9 @@ Stop conditions:
 
 ## Rollback
 
-Mientras legacy exista, volver writers/readers a `legacy_static_v1`, conservar ambas series y verificar readback.
-Si legacy fue retirado, detener nuevas capturas ETV y servir la última serie comparable con estado degradado. No
-borrar improved, no recomputar legacy localmente y no aceptar el default nuevo sin provenance.
+Antes de 2026-11-01T00:00:00Z, volver writers/readers a `legacy_static_v1`, conservar ambas series y verificar el
+request explícito. Desde el corte no existe rollback legacy: activar safe mode, detener nuevas capturas ETV y
+servir la última serie comparable con estado degradado. No borrar improved ni recomputar legacy localmente.
 
 ## Registro de evidencia
 
@@ -168,4 +175,4 @@ El cierre debe enlazar:
 - resultados por celda, no sólo promedio;
 - decisión rebaseline/breakpoint;
 - readback de staging y producción;
-- rollback ejercitado o evidencia equivalente.
+- rollback pre-corte ejercitado y safe mode post-corte verificado.
