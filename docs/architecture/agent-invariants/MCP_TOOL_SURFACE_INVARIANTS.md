@@ -279,6 +279,18 @@ Figma: nombrar el prerrequisito ANTES de la tool que gobierna).
 **El catálogo devuelve resúmenes, nunca cuerpos.** Techo declarado: ~12 manuales antes de
 particionar por dominio (estimación; se revisa al pasar de 6).
 
+**Por qué es tool + recurso + lane y NO los métodos `skills/*` de SEP-2640 — y por qué no
+"corregirlo" hacia el SEP.** Verificado 2026-09-02 contra GitHub: SEP-2640 sigue **abierto, sin
+mergear** (creado 2026-04-23, último movimiento 2026-08-29) y su wire format se reescribió dos veces
+en el año; ningún SDK nuestro lo implementa. Lo estable es el **formato del contenido** (frontmatter
+`name`/`description` de Agent Skills), no el transporte: por eso el manual ya nace en ese formato y
+se sirve por las primitivas que sí existen. **NUNCA** implementar `skills/list`/`skills/get` a mano
+sobre un borrador: cuando el SEP se publique, el cambio es agregar el transporte, no reescribir el
+contenido. ⚠️ De los consumidores conocidos del SEP, los tres toman **snapshot al instalar** y
+ninguno relee el manual en runtime: **NUNCA** prometer que "actualizo el manual y los agentes lo
+recogen"; hoy eso sólo es cierto para `get_greenhouse_skill`, que lo pide en cada llamada. Detalle:
+`.claude/skills/mcp-craft/protocol-radar.md`.
+
 **Fuente:** `docs/architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md` §23 ·
 `docs/tasks/in-progress/TASK-1804-mcp-served-skill-manual.md`
 
