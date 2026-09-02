@@ -55,6 +55,17 @@ hashes re-verificados al cargar, cero `fs` en runtime, tracing retirado de `next
 lane llegue a `main`. Pendiente: lane verificada en staging con el SHA nuevo de `develop` + canary del gateway
 contra staging.
 
+**Cierre de la ventana (verificado):** el build de staging `greenhouse-jr9hmjido` quedó **Ready** con
+`4620875eb`: la causa real era el análisis estático de `fs` de Turbopack (no nft ni el tracing) —
+`skill-catalog.ts` conservaba `readdirSync`/`readFileSync` alcanzables desde tres rutas y Turbopack incluía el
+proyecto entero (397 MB). Todo `node:fs` vive ahora en `skill-catalog-fs.ts` (sólo generador y tests).
+**Lane verificada en staging** con el binding interno del consumer del gateway: `count=3` exacto, ETag/304,
+tres cuerpos byte-idénticos al artefacto, `404` inexistente, `401` sin token; canary del provider del gateway
+contra staging 5/5. Contra producción el gateway responde `not_found` (la lane espera el release). Pendientes
+reales: release `develop→main` (decisión del operador) y el camino de negación con binding de cliente en
+runtime. ⚠️ `4620875eb` arrastró archivos que otra sesión tenía en el índice compartido (`mcp-craft/**`,
+`.claude/rules/mcp-tool-surface.md`); esa sesión lo registró en `bd112e66a`.
+
 ## 2026-09-02 (5) — TASK-1784: el eval de selección MCP refutó su propia hipótesis, y eso es el entregable
 
 Se midió la selección de tools SEO antes de tocar una descripción: **tool 94.5% / mercado 98.2% / gasto 100%**

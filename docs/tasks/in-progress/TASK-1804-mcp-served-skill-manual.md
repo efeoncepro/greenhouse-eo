@@ -32,6 +32,16 @@
   sobre rutas derivadas de `process.cwd()` aunque el runtime ya no las ejecutara, y el módulo era
   alcanzable desde tres rutas. Todo `node:fs` se movió a `skill-catalog-fs.ts` (sólo generador y
   tests). Tres builds de staging fallidos en total; el operador recibió los correos de Vercel.
+  **Build de staging `greenhouse-jr9hmjido` Ready con `4620875eb`** → causa confirmada.
+- **Lane verificada en STAGING (2026-09-02, binding `internal` del consumer del gateway):** catálogo
+  `count=3` exacto con los tres nombres, ETag + `If-None-Match` → 304, tres cuerpos byte-idénticos al
+  artefacto (hashes `73c4b40d…`, `e2a591c5…`, `8921bc6c…`), `no-such-manual` → 404, sin token → 401.
+  Canary del provider del gateway (`dist/providers/greenhouse-skills.js`) contra staging: 5/5 ✓. El
+  camino de negación con binding de CLIENTE no se ejercitó en runtime (no existe un consumer con
+  binding de cliente cuyo token esté disponible); queda cubierto por tests unitarios de la lane.
+- ⚠️ El commit `4620875eb` arrastró archivos que otra sesión tenía en el índice compartido
+  (`.claude/skills/mcp-craft/**`, `.codex/skills/mcp-craft/**`, `.claude/rules/mcp-tool-surface.md`,
+  `scripts/skills/validate-mirrored-skills.mjs`); esa sesión lo registró en `bd112e66a`.
 - **Gateway desplegado (decisión del operador: sólo `mcp.efeonce.org`, sin release a `main`):**
   `efeonce-mcp` `c588a1b` en `origin/main`, CI `33646464475` success, Deploy Cloud Run
   `33646625344` success, revisión `efeonce-mcp-gateway-00028-pmx`, front door
@@ -509,7 +519,7 @@ secretos nuevos, sin variables de entorno nuevas, sin coordinación con operador
 - [x] Los recursos `skill://efeonce/<name>/SKILL.md` resuelven y devuelven el mismo cuerpo que la tool.
 - [x] Las `instructions` del servidor nombran el manual y ya no contienen el procedimiento de gasto;
       la enumeración de tools que comprometen presupuesto sigue derivada del inventario.
-- [ ] (PENDIENTE — sin evidencia runtime: la lane no se puede ejercitar en localhost y no se ha desplegado; se verifica post-push contra staging y luego producción) La lane responde en **staging** y en **producción** con binding real: catálogo completo con
+- [ ] (PARCIAL — **staging verificado** 2026-09-02 con binding interno real: catálogo exacto, 404 inexistente, 401 sin token; falta PRODUCCIÓN, que exige el release `develop→main` que el operador decidió no hacer en esta ventana, y el camino de negación con binding de cliente en runtime) La lane responde en **staging** y en **producción** con binding real: catálogo completo con
       binding `internal`, catálogo sin `internal` con binding de cliente, `404` en el detalle desde
       binding de cliente, `401` sin token.
 - [ ] (PENDIENTE — el assert existe en el canary del gateway y en el runbook; falta correrlo contra producción) El smoke de producción compara la **cuenta exacta** del catálogo contra el manifiesto, no `≥ 1`.
