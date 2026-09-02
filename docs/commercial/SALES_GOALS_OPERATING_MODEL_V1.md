@@ -11,6 +11,12 @@
 Definir metas de ventas alcanzables y auditables sin confundir aspiración, forecast, capacidad de entrega ni
 contabilidad. Este contrato gobierna cómo Efeonce fija, mide, revisa y cambia sus metas comerciales; las cifras del
 periodo viven en [`SALES_GOALS_2026_Q4_2027.md`](SALES_GOALS_2026_Q4_2027.md).
+El presupuesto que traduce esas metas a pacing, bridge, pipeline, revenue, caja y control vive en
+[`COMMERCIAL_PLAN_AND_SALES_BUDGET_2027_V1.md`](COMMERCIAL_PLAN_AND_SALES_BUDGET_2027_V1.md). El funnel, los
+canales y la actividad necesaria para construir esa cobertura viven en
+[`PIPELINE_GENERATION_AND_OUTBOUND_PLAN_2027_V1.md`](PIPELINE_GENERATION_AND_OUTBOUND_PLAN_2027_V1.md).
+La mezcla de servicios y su papel económico viven en
+[`SERVICE_PORTFOLIO_REVENUE_ARCHITECTURE_V1.md`](SERVICE_PORTFOLIO_REVENUE_ARCHITECTURE_V1.md).
 
 ## 2. Principios
 
@@ -26,6 +32,16 @@ periodo viven en [`SALES_GOALS_2026_Q4_2027.md`](SALES_GOALS_2026_Q4_2027.md).
    semana, horas del fundador no disponibles o contratación todavía no autorizada.
 6. **Una cifra perecedera lleva fecha.** FX, pipeline, etapa, actividad, monto y probabilidad deben declarar corte y
    fuente.
+7. **La cuota recurrente es bruta y se asigna por motion.** El Exit MRR es el resultado neto; la venta debe cubrir
+   además el downside aprobado de churn y contracción.
+8. **Cuota y forecast no comparten categorías.** `commit` describe evidencia de Deals, no un nivel aspiracional de la
+   meta.
+9. **Segmento y servicio son ejes distintos.** Enterprise, mid-market o PYME describen la cuenta; Search, Social,
+   Creative, RevOps u otra familia describen lo vendido. Ningún servicio pertenece automáticamente a un segmento.
+10. **El portafolio tiene tres papeles económicos.** Recurrencia, caja y validación estratégica se gobiernan con
+    métricas distintas; una hipótesis de validación no financia el caso base.
+11. **MRR y Spot son bandas independientes.** El sobrecumplimiento de una no compensa automáticamente el
+    incumplimiento de la otra; el resultado corporativo se evalúa además por revenue reconocido, gross profit y caja.
 
 ## 3. Fuentes de verdad
 
@@ -74,6 +90,24 @@ NRR = (Baseline MRR - Contracción MRR - Churn MRR + Expansión MRR) / Baseline 
 
 Cada cálculo declara periodo, población, moneda, fuente y fecha de corte.
 
+### 4.4 Partnership y comisión
+
+- El MRR de licencia del cliente y la comisión recurrente de Efeonce son métricas distintas.
+- La comisión se registra como `partner commission MRR` sólo mientras exista derecho contractual vigente y evidencia
+  del Deal sourced/assisted.
+- Implementación, Managed Ops, licencia, pass-through y comisión se reportan por separado para evitar doble conteo.
+- Una oportunidad partner exige deal registration y Proof of Involvement cuando el programa aplicable lo requiera.
+
+### 4.5 Campos económicos del Deal
+
+- `Deal.amount` conserva el monto comercial informado en el registro; no demuestra por sí solo MRR, TCV, revenue ni
+  caja.
+- `contracted_mrr` exige fee recurrente neto, term y versión contractual/propuesta reconciliada.
+- `tcv` exige término y componentes incluidos; no se deriva automáticamente de `amount` cuando la semántica es
+  desconocida.
+- fee de servicio, inversión de medios, provider/pass-through, comisión partner e impuestos se registran por separado.
+- Deals de servicios diferentes no se agregan bajo una sola familia sólo porque pertenezcan a la misma cuenta.
+
 ## 5. Moneda y FX
 
 - La moneda principal de metas es USD, consistente con la moneda de compañía de HubSpot.
@@ -86,12 +120,12 @@ Cada cálculo declara periodo, población, moneda, fuente y fecha de corte.
 
 ## 6. Categorías de forecast
 
-| Categoría   | Significado                                                             | Condición mínima                                                  |
-| ----------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| `commit`    | Existe evidencia suficiente para esperar el cierre en el periodo        | Todos los gates de §7 pasan                                       |
-| `best_case` | Puede cerrar en el periodo, pero conserva uno o más riesgos materiales  | Próximo paso bilateral y proceso activos; gate faltante explícito |
-| `upside`    | Oportunidad real, todavía temprana o con bajo control                   | No financia la meta base                                          |
-| `excluded`  | Stale, administrativa, no-fit, sin autoridad o sin evidencia suficiente | No entra al forecast                                              |
+| Categoría interna | Mapeo HubSpot    | Significado                                                            | Condición mínima                                                  |
+| ----------------- | ---------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `commit`          | `Commit`         | Existe evidencia suficiente para esperar el cierre en el periodo       | Todos los gates de §7 pasan                                       |
+| `best_case`       | `Best case`      | Puede cerrar en el periodo, pero conserva uno o más riesgos materiales | Próximo paso bilateral y proceso activos; gate faltante explícito |
+| `upside`          | `Pipeline`       | Oportunidad real, todavía temprana o con bajo control                  | No financia la meta base                                          |
+| `excluded`        | `Not forecasted` | Stale, administrativa, no-fit o sin evidencia suficiente               | No entra al forecast                                              |
 
 La probabilidad de etapa de HubSpot es una señal mecánica; nunca sustituye esta clasificación.
 
@@ -110,6 +144,17 @@ Una oportunidad puede entrar a `commit` sólo si existe evidencia de:
 9. capacidad de entrega y economics no bloqueados;
 10. admisibilidad verificada para licitaciones/RFP.
 
+Además, el gate se especializa por motion:
+
+| Motion                       | Evidencia adicional obligatoria                                                                     |
+| ---------------------------- | --------------------------------------------------------------------------------------------------- |
+| Expansión                    | Adopción/valor observado, sponsor, scope incremental, term y trigger de expansión                   |
+| Nuevo recurrente             | ICP de oportunidad y delivery, champion, economic buyer, camino al primer valor y capacidad mensual |
+| Implementación → Managed Ops | Implementación aceptada, backlog recurrente, cadencia/SOW mensual y owner de adopción               |
+| HubSpot partner              | Provider-fit, deal registration, POI, producto/term y clasificación sourced/assisted                |
+| On-Demand directo            | Brief, presupuesto, aceptación, slot de delivery y ruta contractual                                 |
+| Licitación/RFP               | Admisibilidad, economics, propuesta enviada, decisión fechada y capacidad reservable                |
+
 Un campo desconocido es `unknown`, no `true`. Una propuesta preparada pero no enviada no prueba intención de compra.
 
 ## 8. Core, Strategic Bets y cobertura
@@ -119,9 +164,68 @@ Un campo desconocido es `unknown`, no `true`. Una propuesta preparada pero no en
 - **Opportunistic/Administrative:** no financia cuota.
 - La cobertura se calcula por motion y modalidad; no se mezclan grandes licitaciones tempranas con expansión directa.
 
-La cobertura mínima inicial de planificación es `3×` el gap, pero debe recalibrarse con win rate real por cohorte.
+La cobertura se calcula contra el **gap restante del periodo**, nunca contra la cuota original completa después de un
+cierre:
 
-## 9. Capacidad y sostenibilidad
+```text
+pipeline coverage = pipeline calificado abierto / gap restante de cuota
+```
+
+Bandas iniciales mientras se construye una muestra más robusta:
+
+| Motion                      |                     Cobertura mínima | Tratamiento                                 |
+| --------------------------- | -----------------------------------: | ------------------------------------------- |
+| Expansión/Core con relación |                                 `3×` | Puede alimentar base si pasa §7             |
+| Trato directo warm/new logo |                                 `4×` | Base sólo con buying group y siguiente paso |
+| On-Demand directo           |                                 `4×` | Bookings y capacidad, no MRR                |
+| Licitación/RFP              |                                `10×` | Upside hasta pasar el gate completo         |
+| Partner/licencia            | `3×` o 2–3 oportunidades comparables | Separado de service MRR                     |
+
+La banda oficial general de HubSpot es una referencia de `3×–6×`; Efeonce usa ratios por motion porque sus cohortes
+tienen control y win rates distintos. Strategic Bets no compensan una brecha de Core por su valor nominal.
+
+## 9. Arquitectura de cuota
+
+La cuota recurrente se construye desde el bridge y no desde un Exit MRR aislado:
+
+```text
+gross quota = Exit MRR objetivo - Opening MRR + downside de churn/contracción
+```
+
+Debe asignarse, como mínimo, entre:
+
+1. expansión recurrente de cuentas existentes;
+2. nuevo recurrente o conversión de implementación a operación gestionada;
+3. new logo recurrente cuando aplique;
+4. partnership/licencia como línea separada;
+5. On-Demand bookings como segunda cuota independiente.
+
+La asignación también declara `service_family`, `account_segment` y papel `recurrence | cash | validation`. La cuota
+puede combinar varias familias, pero no puede duplicar un mismo Deal entre ellas ni convertir el valor nominal de una
+Strategic Bet en cobertura Core.
+
+Una cuota no se considera aprobable sin ICP/anti-ICP, buying group, oferta de entrada, ticket o value metric,
+coverage por motion, capacidad y gate de margen. On-Demand no rescata incumplimiento de MRR y MRR no rescata
+incumplimiento de bookings.
+
+### 9.1 Presupuesto de ventas
+
+El presupuesto anual es el instrumento de planificación y control que traduce la meta aprobada sin reemplazarla.
+Debe contener, como mínimo:
+
+1. `commit | target | stretch` para Exit MRR y Spot bookings;
+2. bridge de MRR por retención, expansión, new logo, contracción y churn;
+3. composición Spot por cuenta/familia sin doble conteo;
+4. pacing trimestral acumulado;
+5. coverage y volumen de oportunidades por motion;
+6. revenue reconocido, gross profit y cash como capas reconciliadas por Finance;
+7. founder hours, capacidad delegable, backlog y triggers de contratación;
+8. `budget | actual | forecast | variance` con explicación y acción mensual.
+
+La métrica `Exit MRR × 12 + Spot anual repetible` puede usarse como **potencia comercial de salida** para comparar
+escenarios. Nunca se presenta como ARR ni como revenue reconocido del periodo.
+
+## 10. Capacidad y sostenibilidad
 
 La meta final es:
 
@@ -133,7 +237,36 @@ Para trabajo técnico dependiente del fundador se usa el consumo medido, incluye
 aunque Codex, Claude o Playwright reduzcan horas mecánicas. Una contratación no aprobada no puede sostener el caso
 base; se modela sólo en un escenario condicionado.
 
-## 10. Cadencia
+Cada recurrente nuevo declara `founder_hours_per_month`, horas delegables, ramp-up y accountable owner. La capacidad
+se valida sobre 46 semanas operativas y no cuenta fines de semana como suministro estructural.
+
+## 11. Indicadores
+
+### Adelantados
+
+- coverage y gap restante por motion;
+- buying-group coverage: operador, champion, sponsor/economic buyer, líder técnico y procurement;
+- siguiente paso bilateral con owner y fecha;
+- cero Deals `commit` con `closedate` vencido;
+- renovación cubierta a 120/90/60 días;
+- conversión diagnóstico → implementación → operación recurrente a 90/180 días;
+- horas de delivery vendidas, comprometidas y disponibles;
+- cost-to-serve y margen aprobados antes de propuesta;
+- horas comerciales protegidas y realmente ejecutadas.
+
+Llamadas, reuniones y propuestas son diagnósticos de actividad, no cuotas primarias.
+
+### De resultado
+
+- gross new MRR y expansion MRR;
+- churn, contracción, Exit MRR, GRR y NRR;
+- On-Demand bookings netos y proyectos ganados;
+- partner commission MRR, separado de license MRR y service MRR;
+- win rate y ciclo por motion;
+- margen bruto/contribución y desviación de horas;
+- facturación, cobro y DSO, reconciliados por Finance.
+
+## 12. Cadencia
 
 ### Semanal
 
@@ -158,7 +291,7 @@ base; se modela sólo en un escenario condicionado.
 - documentar cambios de capacidad;
 - versionar cualquier cambio material de meta.
 
-## 11. Protocolo de cambio
+## 13. Protocolo de cambio
 
 1. Actualiza primero los hechos en HubSpot y verifica el readback.
 2. Actualiza [`CRM_DEAL_REGISTER.md`](CRM_DEAL_REGISTER.md) cuando cambie el estado operativo.
@@ -166,11 +299,15 @@ base; se modela sólo en un escenario condicionado.
 4. No cambies una meta aprobada para hacer coincidir el actual. Registra `reforecast` o crea una nueva versión.
 5. Toda modificación de meta conserva: valor anterior, valor nuevo, motivo, aprobador y fecha efectiva.
 
-## 12. Límites
+## 14. Límites
 
 - HubSpot Professional permite operar revenue goals nativos según la
   [documentación oficial de Goals](https://knowledge.hubspot.com/reports/create-sales-goals) verificada el
   2026-08-29, pero el Exit MRR se mantiene como métrica gobernada y dashboard separado mientras la plantilla nativa
   no represente exactamente su contrato.
+- Las categorías de forecast se alinean con la
+  [documentación oficial de Forecast](https://knowledge.hubspot.com/forecast/set-up-the-forecast-tool), y las bandas
+  iniciales consideran la referencia oficial de
+  [pipeline coverage](https://www.hubspot.com/glossary/sales-pipeline-coverage), ambas verificadas el 2026-08-29.
 - No desarrollar una superficie de metas en Greenhouse durante esta fase.
 - Codex y Claude preparan análisis y detectan drift; no reemplazan HubSpot, Finance ni la aprobación de Leadership.

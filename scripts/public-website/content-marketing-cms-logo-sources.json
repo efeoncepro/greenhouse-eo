@@ -1,0 +1,28 @@
+[
+  {
+    "name": "wordpress",
+    "url": "https://s.w.org/style/images/about/WordPress-logotype-wmark.png?0",
+    "file": "wordpress.png",
+    "sha256": "06049b810ea5605edc375f6208fb788efaa5a95ee40d6ee0d84b9d2e2639ecb3"
+  },
+  {
+    "name": "webflow",
+    "url": "https://dhygzobemt712.cloudfront.net/Logo/Full_Logo_Blue_Black.svg",
+    "file": "webflow.svg",
+    "sha256": "3ca5a9ab75e2bb019a9ed1896c70eaa5697e9c0746bfa833fa0c43c004678f2f"
+  },
+  {
+    "name": "drupal",
+    "url": "https://www.drupal.org/",
+    "file": "drupal.svg",
+    "source": "Official header SVG; source CSS navy fill inlined, geometry unchanged",
+    "sha256": "362377a5e9290638e5719e4ff3af36d1f021a217dc63d2aebbaad72296f27bbc"
+  },
+  {
+    "name": "modyo",
+    "url": "https://www.modyo.com/",
+    "file": "modyo.svg",
+    "source": "Header inline SVG, unchanged",
+    "sha256": "bf5bdd767fc9e4658a92638828fbb8f8061051aaf98334beedf73cfca9026e91"
+  }
+]

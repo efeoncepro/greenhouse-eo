@@ -7,6 +7,594 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-02 — la práctica Salesforce se canoniza como oferta por outcomes y lifecycle
+
+La práctica Revenue Operations & CRM incorpora una arquitectura comercial Salesforce en cuatro fases:
+Diagnose & Architect, Implement & Integrate, Activate & Adopt y Operate & Evolve. El contrato separa CRM core,
+Marketing Cloud Engagement y Marketing Cloud Next; define carriles de solución, ICP/anti-ICP, operator y buying
+group, delivery, métricas, límites de claims y gates de madurez. El estado queda `Approved for validation`: no
+autoriza todavía partnership, badge, certificaciones, reventa, pricing, casos ni Product Service comercialmente
+aprobado sin evidencia y sign-offs propios.
+
+## 2026-09-02 — MCP: el manual de uso viaja por el protocolo (TASK-1804, code complete)
+
+La superficie MCP gana un segundo canal de conocimiento de uso: un manifiesto de manuales
+(`skill-manifest.ts`) hermano del de tools, tres `SKILL.md` publicables en `docs/mcp/skills/`
+(`seo-spend-discipline`, `seo-visibility-reading`, `competitor-loop`), la tool `get_greenhouse_skill`,
+el recurso `skill://efeonce/<name>/SKILL.md` y la lane ecosystem `GET /api/platform/ecosystem/mcp/skills[/{name}]`,
+todos sobre el mismo reader. Los cuerpos viajan en el bundle como artefacto generado (`pnpm mcp:skills:generate`
+/ `mcp:skills:check`): leerlos del filesystem exigía `outputFileTracingIncludes` y Vercel rechazó el build (función sola
+de 397 MB). Publicar es un acto explícito (drift manifiesto↔filesystem no construye el
+servidor), un binding de cliente no sabe que los manuales existen (404 anti-oráculo) y la fuga de contenido
+interno la controla un test. Las `instructions` del handshake rutean al manual en vez de contener el
+procedimiento de gasto. El gateway federa la tool con su propio guard de paridad no-SEO (commit local en
+`efeonce-mcp`, deploy pendiente). Sin Entra, flag ni persistencia nuevos.
+
+## 2026-09-02 — ANAM: entrega premium de Emma y soporte explícito de tres meses
+
+Se consolidó el cierre de la landing, identidad y handoff de Emma en dos PDF de cinco páginas: una especificación
+técnica y una guía funcional. Los HTML/CSS son la fuente editable; los PDF, el master para cliente. Se revisaron
+diez páginas rasterizadas, fuentes Poppins/Geist embebidas, composición, overflow y pies con sitio, correo,
+teléfono y dirección. La captura final de la landing quedó versionada y los borradores Word supersedidos fueron
+excluidos del paquete.
+
+El borrador de correo para Óscar, María Paz, Pablo y Marco explica los cambios de landing e identidad, la matriz
+de routing y el límite de las pruebas E2E. Quedó listo, no enviado. También registra el SharePoint consolidado
+como compromiso pendiente para esta semana.
+
+La documentación y las skills espejo ahora fijan el soporte de Customer Agent y KPI en tres meses, del
+2026-08-13 al 2026-11-12 inclusive. Soporte cubre el alcance construido; nuevas funcionalidades, KPI, workflows,
+automatizaciones, integraciones, rediseños e innovación requieren un alcance separado. No se cambió runtime
+HubSpot, no se envió correo, no se creó SharePoint y no se hizo push.
+
+## 2026-09-02 — La superficie MCP del módulo SEO pasa a tener eval de selección
+
+TASK-1784 agregó un fixture de 55 preguntas de operador en los cinco mercados productivos y un runner que mide
+tres precisiones que nunca se promedian: qué tool se elige, qué mercado se pasa y si se llamó a una tool que
+gasta cuando no correspondía. Baseline registrado antes de tocar una descripción: tool 94.5%, mercado 98.2%,
+gasto 100%.
+
+El resultado contradijo la hipótesis con la que se escribió la task: agregar bloques de ruteo a las
+descripciones NO mejoró la selección de tool, y en una variante degradó una tool que nadie había tocado. Lo que
+sí funcionó fue corregir dos afirmaciones falsas — la cláusula de mercado ordenaba elegir un país en vez de
+preguntar, y la lente dual reclamaba prioridad sin acotarla. La precisión de mercado llegó a 100%, cerrando la
+elección silenciosa que costó un año de mediciones contra el país equivocado en ISSUE-152; la de tool bajó a
+92.7% y se reporta sin declarar mejora.
+
+El gate de CI mide cobertura del fixture, no precisión: una tool SEO nueva sin caso rompe el build. El guard de
+paridad del gateway ahora compara la descripción, y al conectarlo encontró 21 de 27 tools federadas divergentes;
+se cerró haciendo que el gateway derive el texto del artefacto en vez de mantener una copia. El redeploy de
+`mcp.efeonce.org` queda pendiente.
+
+## 2026-09-02 — Globe entra en hibernación profunda reversible
+
+TASK-1807 incorporó una state machine Terraform `active | draining | hibernated`. Globe quedó en
+`hibernated`: tres schedulers pausados, vías productivas cerradas, Cloud Run en scale-to-zero y Cloud SQL
+`STOPPED/NEVER`; datos, backups/PITR, buckets, secretos, imágenes, identidades, front door, budgets y
+observabilidad permanecen intactos. Los applies finales tuvieron cero deletes/replacements y el post-plan quedó
+sin drift.
+
+El runbook nuevo documenta el gate anti-borrado, todos los inputs de preservación, la secuencia segura de apagado
+y encendido, los readbacks, rollback, monitoreo y medición de costo. El baseline era ~CLP 348.152/30 días y la
+reducción modelada es CLP 318.000–328.000; el ahorro realizado queda pendiente de Billing Export a 24 horas,
+7 días y cierre mensual.
+
+Se sincronizaron los índices, arquitectura de persistencia, runbooks IaC/rollout/promoción, ledger de modelos,
+plan TASK-1807 y prompt de sesiones nuevas. Las skills `greenhouse-globe` y `greenhouse-globe-model-fleet`
+quedaron espejadas Codex/Claude con una compuerta que impide gasto o reactivación implícita.
+
+## 2026-09-02 — tools y skills MCP pasan a ser Definition of Done de toda la secuencia ETV
+
+TASK-1805/1806, TASK-1312/1313/1314 y TASK-1808–1811 exigen ahora crear o actualizar su tool MCP, lane,
+manifiesto, federación y skill operativa en el mismo PR. Una tool existente se amplía en vez de duplicarse y toda
+ausencia del gateway debe ser una exclusión razonada. Las lecturas no compran al proveedor durante el read; writes
+y gasto conservan confirmación, capability fina y scope fail-closed. No cambió runtime: son criterios de ejecución
+y cierre para trabajo futuro.
+
+## 2026-09-02 — las cinco familias Labs restantes ya tienen ownership ejecutable
+
+El backlog de Growth SEO incorpora `TASK-1808`–`TASK-1811`: categorías y mercado temático, competidores SERP por
+keyword set, comparación entre páginas e historia bulk de cohortes. Las dos direcciones de categorías viven en
+una task porque forman una sola capacidad dominio↔categoría; los demás endpoints conservan grano, costo y lifecycle
+propios. Las cuatro tasks dependen de `TASK-1805/1806` y no habilitan llamadas por estar registradas.
+
+Los contratos existentes ahora aclaran que DataForSEO sólo aporta evidencia para topic clusters, que
+`TASK-1314` compone sin capturar y que las menciones históricas de `serp_competitors`/`page_intersection` no eran
+callers reales. No cambió runtime, schema, gasto, flags ni deploy.
+
+## 2026-09-02 — Improved ETV pasa de anuncio a contrato operativo
+
+DataForSEO confirmó 14 familias ETV-capable, alcance sobre todos los ETV/traffic cost, precio sin premium,
+históricos fully recomputed desde julio de 2026 y calibrados antes, y corte irreversible
+`2026-11-01T00:00:00Z`. La arquitectura, auditoría, runbook, tasks y skills ahora distinguen 14 familias del
+proveedor, nueve callers y seis familias/siete caminos consumidores; reemplazan el método «servido» no observable
+por método efectivo derivado. `TASK-1806` pasa a P0 deadline-bound. No cambió runtime.
+
+## 2026-09-01 — Emma enruta cotización, seguimiento y Calidad al equipo correcto
+
+El handoff del Customer Agent ANAM dejó de depender de una única propietaria. El workflow activo `1876744588`
+clasifica el ticket, elimina a Emma como owner y aplica la matriz Pablo → María Paz para cotización, Marco → Pablo
+para seguimiento y María Paz → Marco para Calidad/facturación/otros, respetando disponibilidad. Tres chats públicos
+E2E aprobaron las rutas de cotización y Calidad y el fallback real de seguimiento; el primer probe fallido permitió
+corregir el owner previo y el sesgo de marcadores QA antes de dejar el flujo conectado.
+
+El canon reusable distingue el trigger del Customer Agent, la asignación por workflow y la reasignación manual
+entre personas. También registra el límite de evidencia: el owner visible quedó probado, pero la respuesta humana
+y una segunda transferencia en el mismo chat abierto requieren una prueba operativa separada.
+
+## 2026-09-01 — El Customer Agent de ANAM ya sabe que se llama Emma
+
+El perfil y las directrices publicadas del Customer Agent en el portal ANAM `19893546` quedaron alineados con la
+landing: nombre `Emma`, preview `Hola, soy Emma.` y saludo `Soy Emma, de ANAM`. El readback confirmó cero
+borradores. No cambiaron personalidad, conocimiento, permisos, acciones, routing, handoff, canales ni datos CRM,
+y no se envió una conversación real. Dos advertencias anteriores sobre `Registraré tu consulta` quedaron
+documentadas para un cambio conversacional separado.
+
+## 2026-09-01 — Emma convierte la landing ANAM en un concierge digital
+
+La landing de atención de ANAM reemplazó al personaje masculino por Emma y reconstruyó la primera pantalla como
+una experiencia editorial premium: narrativa clara, selector unificado de tres intenciones, un único CTA y un
+panel de confianza integrado con la asistente. La selección prepara el contexto y no abre el chat hasta que la
+persona pulsa `Conversar con Emma`.
+
+El build HubSpot CMS React `#28` está desplegado en el portal ANAM `19893546`. El header usa el logo horizontal
+del catálogo del repo, sin el círculo superior, y el recurso decorativo queda recortado dentro del hero para no
+dejar espacio blanco bajo el footer. La verificación desktop y móvil confirmó HTTP 200, margen del body en cero,
+ausencia de overflow, selección por clic y teclado, transferencia del intent al CTA y cero errores de consola,
+página o red. Emma usa ahora un asset generativo versionado cuyo bordado dice correctamente
+`ANÁLISIS AMBIENTALES S.A.`; se descartó el montaje tipográfico plano y se conservó el asset anterior para
+rollback. No se abrió ni se envió una conversación real; tampoco cambiaron el Customer Agent ni datos CRM.
+
+El cierre documental quedó reflejado en el canon y runbook CMS, documentación funcional, manual operativo,
+dirección visual, changelog de cliente, `project_context.md` y las dos copias espejadas de la skill
+`hubspot-as-a-service`. No se modificaron el router global ni la arquitectura comercial porque no cambió ningún
+contrato transversal.
+
+## 2026-09-01 — La auditoría gana una sección para lo que vale en todo el sitio (TASK-1671)
+
+La pantalla de auditoría separa dos preguntas que antes mezclaba. Arriba, una sección nueva
+—"Acceso y presentación del sitio"— responde si los motores de IA pueden leer el sitio, si la
+portada se presenta y si el mapa del sitio está sano. Abajo, la lista de siempre, ahora rotulada
+como lo que es: problemas **por página**.
+
+La distinción importa porque cada hallazgo de la sección nueva vale para el dominio entero. En la
+lista se habrían rotulado como "1 página afectada" —falso— y habrían quedado hundidos debajo de
+cualquier problema menor que toque muchas páginas. Ahora dicen "Todo el sitio" y nombran dónde se
+detectó el problema, para que el cliente pueda verificarlo en vez de concluir que el informe miente.
+
+Y el bloqueo de entrenamiento de modelos de IA no se pinta como una falla: lleva la etiqueta
+"Decisión declarada", porque es una decisión legítima sobre el uso del contenido.
+
+🔴 **Sigue apagado.** El código existe pero no está desplegado, y el interruptor tampoco está
+encendido. Hasta que las dos cosas pasen, un sitio invisible para los motores de IA **sigue**
+saliendo con 95 de salud.
+
+## 2026-09-01 — El audit SEO aprende a mirar el sitio, no sólo sus páginas (TASK-1670)
+
+La auditoría técnica pasa a evaluar cuatro cosas que el crawl de páginas no ve: si el `robots.txt`
+le niega el paso a los rastreadores de IA, si el servidor o el CDN los rechaza aunque el `robots.txt`
+los permita, si la portada publica datos estructurados y si el mapa del sitio está sano.
+
+La distinción que hace creíble al informe: bloquear el rastreo que **cita** el sitio en una respuesta
+de IA es crítico, mientras que bloquear el que **entrena** modelos es una decisión de derechos sobre
+el contenido y se reporta como información, nunca como falla. Meterlos en la misma bolsa haría que un
+sitio perfectamente accesible saliera en rojo, y eso enseña a ignorar la alerta más importante.
+
+🔴 **Todavía no está encendido.** La capacidad viaja apagada detrás de un flag, porque estos
+hallazgos son del dominio completo y la pantalla actual los contaría como "1 página afectada". Hasta
+que esa superficie exista (`TASK-1671`), un sitio invisible para los motores de IA **sigue** saliendo
+con 95 de salud. El estado real es `code complete, rollout pendiente`.
+
+## 2026-09-01 — Brand Visibility Grader queda disponible en Recursos
+
+El menú principal de `efeoncepro.com` ahora incluye **Brand Visibility Grader** dentro de
+`Recursos`, enlazado a `https://think.efeoncepro.com/brand-visibility`. La actualización reutiliza la
+navegación nativa de Ohio; no crea una segunda cabecera ni modifica Elementor. Los 26 ítems previos
+conservaron membresía, jerarquía y orden persistido, y el nuevo ítem quedó respaldado con snapshot
+recuperable.
+
+Después de purgar WordPress/Kinsta, el submenú y el clic se verificaron en producción a 1440 px y
+390 px. El destino respondió 200 y ambas vistas quedaron sin overflow horizontal ni errores de
+consola.
+
+## 2026-09-01 — TASK-1807 instala los primeros controles FinOps de GCP
+
+Producer corre cada cinco minutos mediante Terraform y permanece bajo observación antes de tocar Media. Dos
+budgets nativos alert-only quedaron activos en CLP: 250.000 para Globe y 370.000 consolidados, con cuatro umbrales
+de gasto actual y dos de forecast. El lector Greenhouse usa costo neto después de créditos y el watcher deduplica
+por incidente estable; su prueba dry-run no consulta persistencia ni envía mensajes.
+
+Globe agregó cuatro labels de atribución a 33 recursos. Artifact Registry, con 418 versiones y 10,4 GB, tiene una
+cleanup policy en dry-run que conserva 10 versiones por paquete y sólo simula borrar versiones de más de 30 días;
+no hubo eliminación. Asset Governance fue publicado y desplegado por digest inmutable para converger hasta cuatro
+stages fenced en una ejecución. El smoke live quedó sano pero no-op, así que conserva cron minutely hasta un canary
+con asset real. El post-plan no presenta drift y Greenhouse sigue local, sin publicación.
+
+## 2026-09-01 — cinco licitaciones nuevas entran a HubSpot por MCP
+
+Promoción manual confirmada y verificada de Chile Cultura, Universidad de Chile DII, JUNJI, Temuco y CNTV: cinco
+Deals nuevos en `Pipeline de ventas` / `Calificado para comprar`, con ambas llaves de deduplicación, fechas,
+modalidad, próximo paso y asociación a Company. Se reutilizaron tres Companies canónicas y se crearon únicamente
+las dos ausentes, Temuco y CNTV; no se inventaron contactos. CNTV quedó clasificada como `Strategic Bets`, propiedad
+de movimiento comercial separada del stage.
+
+Las skills HubSpot espejadas dejaron de contradecir el contrato ya vigente en el companion LicitaLAB y
+`project_context.md`: el MCP de HubSpot es un writer válido para cargas manuales bajo confirmación y readback; el
+bridge queda como carril de automatización y su cobertura incompleta no bloquea ese flujo. Los registros comercial
+y de licitaciones quedaron sincronizados con los IDs observados. No hubo postulación ni envío de propuesta.
+
+## 2026-09-01 — el registro del avance entra a los checklists de cierre
+
+`stale-progress` existía pero ningún protocolo mandaba correrlo. Los checklists de cierre de
+`CLAUDE.md` y `AGENTS.md` ahora exigen tildar los acceptance criteria con evidencia, dejar sin
+tildar y con razón lo que no se verificó, poner `Status real` al día y correr
+`pnpm task:lint --task TASK-###` antes de mover a `complete/`.
+
+`ui-flow-contract` deja de romper el gate cuando una task de `to-do/` aparece en el diff sin ser el
+foco: misma calibración que `ui-wireframe-contract`, con test falsable. El footer de `flags:audit`
+deja de llamar «verdad live» a `vercel env ls` (que sólo dice que la variable existe) y nombra
+`vercel env pull`.
+
+Barrido de coherencia sobre los 19 cierres del día: `Lifecycle` desincronizado, 5 rutas stale en los
+índices, 9 estados falsos en el README de tasks, conteos y prosa stale en cinco epics y en
+`AEO_PROGRAM_STATUS.md`, 10 archivos con rutas rotas y cuatro reglas duras apoyadas en hechos ya
+falsos.
+
+## 2026-09-01 — el CTA gana foco y salida por teclado, y `Escape` deja de mentirle al ledger
+
+Bundle del renderer CTA **`1.2.0-preview.1` → `1.3.0`**. Minor y no patch: cambia comportamiento
+observable, y `dismissed` deja de emitirse al cerrar por teclado — quien mida la tasa de rechazo
+verá la serie cambiar de sentido en esta versión. `renderer_version` viaja en la telemetría, así que
+el bump es lo único que después permite distinguir qué host corre el arreglo.
+
+`ISSUE-167` resuelto (code complete, rollout pendiente). Primitive `attachDisclosureFocus`
+(`src/growth-cta-renderer/disclosure-focus.ts`): al abrir el Growth Form desde un CTA el foco entra
+al contenido y `Escape` cierra. Es disclosure, no modal, y `Escape` se escucha en el contenedor —
+nunca en el documento, para no secuestrárselo a la página del host.
+
+🔴 Cambio de comportamiento que importa al dato: **`Escape` COLAPSA el form al card y NO emite
+`dismissed`**. `dismissed` significa «el visitante rechazó la oferta» y viaja al ledger de
+conversión; cerrar un formulario abierto por curiosidad no es rechazar. El botón «✕ Ahora no» sigue
+siendo el único rechazo.
+
+Causa raíz: el foco y la salida por teclado estaban modelados por **placement** (`slide-in`) en vez
+de por «superficie revelada», así que `embedded` no los heredaba.
+
+## 2026-09-01 — el motor CTA cierra su primera rebanada, y deja un hueco de accesibilidad nombrado
+
+`TASK-1427` complete. El steady-state se observó sobre **45 días** y no sobre los 7 que pedía el
+criterio: la ventana literal de julio tuvo tráfico un solo día, así que sus ceros eran un falso
+verde. Resultado sobre la serie real: 0 errores server-confirmed, 0 kill switches, 0 colisiones.
+
+Los readers de `growth.cta.*` filtran `INTERVAL '1 day'`: responden «¿está sano ahora?», nunca
+«¿estuvo steady durante N días?». Queda `scripts/growth/_sanity-cta-signal-window.ts` para esa
+pregunta.
+
+**`ISSUE-167` abierto:** al abrir el Growth Form desde un CTA el foco queda en `body` y `Escape` no
+cierra — renderer compartido, afecta a todos los CTA en Think y WordPress.
+
+## 2026-09-01 — el paso de registrar el avance entra a los seis checklists de cierre
+
+Un mecanismo que avisa en un comando que ningún protocolo manda ejecutar está apagado. La regla
+—tildar con evidencia, dejar sin tildar con razón, `Status real` al día, `pnpm task:lint --task`—
+quedó en `CLAUDE.md`, `AGENTS.md`, el harness `implement-task`, `GREENHOUSE_OPERATING_LOOP_V1.md`,
+`TASK_PROCESS.md` y el `greenhouse-documentation-governor`.
+
+`TASK_PROCESS.md` documenta las calibraciones medidas de `stale-progress`/`stale-blocker`.
+`TASK_UI_UX_ADDENDUM.md` documenta la severidad foco-vs-incidental de los gates de UI y el protocolo
+de contrato retroactivo. El `greenhouse-qa-release-auditor` suma tres defectos de gate nuevos y la
+regla de falsificar todo test contra su propio arreglo.
+
+## 2026-09-01 — barrido `stale-progress`: el registro se pone al día en 16 tasks
+
+12 de 16 dejaron de reportar el aviso. Ninguna cerró: ninguna estaba terminada. Se tildó solo lo que
+la evidencia respalda y se dejó por escrito la razón de cada criterio sin tildar.
+
+Tres defectos del propio detector, corregidos con test falsable: `stale-blocker` disparaba cuando el
+campo decía `none` seguido de la explicación que nombra al blocker cerrado; `ui-flow-contract` rompía
+el gate por deuda previa al tocar una task de `to-do` incidentalmente; y un commit de scope `docs`
+contaba como implementación. Se documentó por qué NO se filtran los `TASK-###` entre paréntesis.
+
+`TASK-1259` recibió wireframe y flow retroactivos, construidos desde el manual del runtime: estaba
+`in-progress` con UI ya implementada en el repo de WordPress y sin contratos declarados.
+
+## 2026-09-01 — DataForSEO ETV deja de ser una cifra sin versión
+
+El anuncio de ETV improved fue contrastado con la documentación pública y con siete consumers Greenhouse.
+Las skills DataForSEO/SEO, el dossier Labs, manuales y auditoría ahora distinguen legacy/improved,
+`use_improved_etv` de `include_clickstream_data`, y prohíben interpretar el cambio de modelo como performance.
+También se incorporó `dataforseo-operator` al gate de mirrors y se corrigieron sus pointers canónicos. No hubo
+cambio de runtime. Se registraron el ADR formula-aware, `TASK-1805` para la foundation, `TASK-1806` para
+evaluación/cutover, el runbook y un correo de diez preguntas en borrador/no enviado. El cutover queda bloqueado por
+aclaración del proveedor, foundation completa, shadow aprobado y decisión histórica antes del default anunciado
+para el 1-nov.
+[Auditoría](docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md).
+
+## 2026-09-01 — TeamBot completa el ciclo mensual del Performance Report
+
+Nexa publicó el resumen de agosto en `EO Team` con cuatro menciones verificadas y envió cuatro lecturas personales 1:1, todas auditadas como `succeeded`. El runbook, la arquitectura, el manual y las skills espejadas ahora exigen separar cifras de interpretación: volumen no prueba sobrecarga, los atrasos heredados se contextualizan y una muestra de onboarding no se presenta como tendencia. También fijan la jerarquía de evidencia para menciones y el uso de Object ID Entra revalidado cuando un correo escrito contiene un typo. [Evidencia y límites](docs/audits/communications/2026-09-01-performance-report-teambot.md).
+
+## 2026-09-01 — 15 cierres del barrido y dos defectos de task:lint corregidos
+
+Quedaron `complete` con evidencia por criterio: 1036, 1040, 1090, 1113, 1209, 1210, 1225, 1253, 1282,
+1321, 1330, 1335, 1430, 1431 y 1747. Desbloqueadas 1246, 1254, 1255 y 1336.
+
+`TASK-1078` NO se cerró pese a estar desplegada: es UI sin `Wireframe:` declarado y no se le inventa
+uno para pasar el gate. Queda como decisión de política para las tasks de UI previas a esa regla.
+
+Dos defectos de `task:lint`, ambos de mensajes que prometían lo que el mecanismo no honraba:
+`ui-wireframe-contract` ignoraba el `UI impact: none` explícito por inferir desde `Domain`, y se
+rompía cuando el autor agregaba la razón que la plantilla exige.
+
+## 2026-09-01 — El auditor de flags detecta el drift ledger↔live, y dos defectos quedan registrados
+
+`pnpm flags:audit` era ciego al drift más caro del ledger porque `vercel env ls` lista presencia, no
+valor. Ahora hace `vercel env pull` y compara: 24 filas declaran `prod: OFF` con el valor live en
+`true`. Ese drift es lo que hace que un agente lea "rollout pendiente" y re-ejecute trabajo hecho.
+
+Del barrido de 27 tasks salen `ISSUE-165` (writer de organizaciones fuera del SSOT en
+`/api/admin/spaces`, impacto latente) e `ISSUE-166` (el CTA de Nexa abre el chat sin anclar el insight
+ni enviar la pregunta).
+
+## 2026-09-01 — TASK-1709 cerrada y la doc que la daba por apagada
+
+El carril de diagnóstico de prospecto llevaba **5 días desplegado** (flag ON en Vercel Production
+desde el 27-ago, corrida real sobre `skyairline.com`) mientras cuatro skills, el runbook del gateway
+MCP, dos manuales y la doc funcional decían "flag OFF en todos los ambientes". El runbook incluso
+instruía al canary a normalizar un `disabled` — que hoy sería una regresión. Corregido en 9 archivos.
+
+Tier `prospect` documentado: se resuelve sin `module_assignments` y su gasto es presupuesto de
+adquisición de Efeonce, nunca costo de cliente.
+
+## 2026-09-01 — TASK-1699 cerrada, y `task:lint` gana la regla `stale-progress`
+
+El top-N del SERP quedó `complete`: serie viva desde el 2026-08-29 (766 · 775 · 762 · 778 filas en
+4 días) con costo marginal CERO medido, y su señal de cobertura convergió sola a `ok`/`uncovered=0`
+sin tocar el umbral.
+
+Se re-ejecutó cinco veces sin cerrar por un defecto de **registro**, no técnico: 46 checkboxes sin
+tildar y `Status real: Diseno` hacían que cada sesión la leyera como no empezada, mientras el trabajo
+quedaba anotado sólo en prosa.
+
+Regla nueva `stale-progress` en `task:lint`: avisa cuando el estado declarado contradice la historia
+de commits, y cuando una task se cierra sin tildar una sola evidencia. Warning por diseño y por
+medición (414 de 975 completas están así); acotada a las que tienen commits de implementación, la
+señal cae a 28 tasks.
+
+## 2026-08-31 — Blog WordPress sanea categorías y abre una copia gobernada de Demo 35
+
+La taxonomía live quedó reducida a 13 categorías reales: AEO y SEO son raíces;
+Diseño Web depende de Diseño y Redes Sociales de Marketing Digital. Se
+reclasificaron 11 posts reales, se enviaron 20 posts Ohio demo a papelera, se
+retiraron 15 categorías descartadas y Marketing Digital quedó como default.
+Los cambios de URL tienen redirects explícitos y los demo retirados, `410`.
+
+La copia `251875` de Demo 35 está publicada con `noindex` como superficie de
+trabajo; la fuente `225984` y `/blog/` permanecen sin cutover. PDR, contrato,
+manual y skills WordPress Codex/Claude fijan que jerarquía no equivale a
+prominencia y que los 15 widgets deben reconectarse a contenido real antes de
+publicar. [Estado y pendientes](docs/audits/public-site/2026-08-31-blog-taxonomy-demo35-work-copy.md).
+
+## 2026-08-31 — Las páginas misceláneas dejan de ser “una 404” y ganan ownership
+
+Discovery live confirmó que Ohio padre gobierna 404, búsqueda/no-results y archivos; Elementor Theme Builder
+no tiene templates/conditions especiales activos. Se creó el contrato child-theme-first, el comportamiento
+funcional, el runbook, el registro de primitive propuesto y las rutas en skills WordPress/SEO. La política separa
+recovery, búsqueda, archivos editoriales y chrome global, con HTTP/robots/canonical por query type. No hubo
+mutación ni publicación. Persisten P0: contenido público `(Borrador)`, search vacío con 154 resultados y enlaces
+demo/rotos globales. [Discovery y límites](docs/audits/public-site/2026-08-31-wordpress-miscellaneous-surfaces-discovery.md).
+
+## 2026-08-31 — Content Marketing: cierre técnico focal en producción
+
+El stage ya aplica el mismo gate de alto/ancho al cargar y redimensionar; 1440×650 conserva los
+siete capítulos en flujo. Se corrigieron contrastes de estados y badges con variantes de la paleta
+aprobada. Despliegue WordPress limitado a JS/CSS con backup, hashes y readback de documento intacto.
+Nuevo verificador recorre pin, capítulos, tabs/cortes, mobile/reduced-motion/JS-off y contraste;
+smoke seguro separa rechazos reales, ledger vacío y un evento GA4 explícitamente sintético.
+[Evidencia y límite Turnstile/Realtime](docs/audits/public-site/2026-08-31-content-marketing-technical-closure.md).
+
+## 2026-08-31 — Cobertura Efeonce incorpora Estados Unidos y Contacto corrige su fuente institucional
+
+La cobertura vigente queda en Chile, Estados Unidos, Colombia, México y Perú, sin inferir oficina ni entidad
+legal por mercado. Contexto de negocio, posicionamiento público, primitives y skills espejadas apuntan al
+mismo estado. El brief de Contacto usa la dirección y los dos teléfonos de la contraportada canónica y marca
+como desactualizados Las Bellotas, el teléfono público anterior y las listas de cuatro mercados. `TASK-1801` quedó registrada con contratos visual/flow/motion, routing, privacidad, Meetings y rollout; esta edición no publicó WordPress ni amplió métricas históricas de clientes.
+[Brief y límites](docs/public-site/CONTACT_PAGE_REBUILD_BRIEF_V1.md).
+
+## 2026-08-31 — Home: cierre editorial y mantenimiento nativo
+
+Ocho revisiones publicadas: hero desafiante, beneficios concretos, comparación cualitativa, FAQ
+con jerarquía tipográfica y encabezado Con + logo. Readback 17 widgets/407 campos/seis repeaters;
+doce archivos coinciden local/remoto. Subagente concilió planes, snapshots y evidencia.
+Contratos técnico/funcional/manual y skills WordPress/copywriting espejadas actualizados;
+commit documental, sin runtime hermano ni WIP SEO previo. QA residual y TASK-1358 siguen abiertos.
+[Cierre y límites](docs/audits/public-site/2026-08-31-home-editorial-closure.md).
+
+## 2026-08-31 — TASK-1780: el inventario de tools MCP pasa a ser un manifiesto
+
+`src/mcp/greenhouse/tool-manifest.ts` es la fuente única del catálogo de tools MCP. `server.ts`
+registra recorriéndolo —definir una tool sin entrada rompe la construcción del servidor— y el `name`
+y las `instructions` que el cliente MCP lee se derivan de él, así que el servidor ya no puede
+anunciarse `greenhouse-read-only` mientras registra siete escrituras. Dos banderas ortogonales por
+tool: `writes` y `spendsProviderBudget`.
+
+El manual se renombró a `mcp-greenhouse-tool-inventory.md` y se corrigieron sus tres cifras en
+conflicto. Nuevo gate `pnpm mcp:manifest:check` en `ci.yml` sobre el artefacto generado que el
+gateway consumirá.
+
+Cambio de comportamiento verificado como nulo: el registro del SDK antes y después es idéntico byte a
+byte (43 tools, mismo orden y schemas), y el artefacto reproduce el espejo del gateway tool por tool.
+
+Cerrada y pusheada: Greenhouse `d2b3c0639` (9 workflows `success`) y gateway `efeonce-mcp` `e92961e`
+(CI `success`). El deploy del gateway es `workflow_dispatch` y sigue sin disparar, así que la revisión
+productiva no cambió — la verificación de esta task es de CI, no de runtime.
+
+Barrido documental con 4 subagentes: 8 skills, 5 specs de arquitectura, 9 docs funcionales/manuales,
+4 tasks vivas y un epic corregidos. Dos huecos sistémicos cerrados de paso: la rule auto-cargada de
+Growth/SEO instruía editar a mano el espejo retirado, y no existía ninguna rule para `src/mcp/**`
+(creada). `mcp:manifest:check` entró a `local:check` — antes el drift del artefacto sólo aparecía en CI.
+Fila nueva en `DECISIONS_INDEX.md`: la frontera "qué capacidades existen es conocimiento de producto,
+no de transporte" es la tercera arista del triángulo que ya fijaban las dos filas MCP existentes.
+
+## 2026-08-31 — Content Marketing: diseño aprobado publicado en Elementor
+
+Versionado local del runtime: `73493a8`; cambios Greenhouse acompañados en este cierre, sin push.
+
+Revisión documental delegada: arquitectura/funcional/manual, skills WordPress/Growth Forms e índices
+sincronizados con la entrega. Contratos UI distinguen plan de export publicado; task conserva sus
+pendientes. Se precisan rollback, empaquetado, orden visible del menú y riesgo del pin tras resize.
+Sin cambio de código ni nueva publicación durante esta revisión.
+
+Menú verificado: **Soluciones → Crecimiento Multicanal → Content Marketing**, item `242917`, sin duplicados ni cambio de orden.
+[Revisión editorial de ambas secciones](docs/audits/public-site/2026-08-31-content-marketing-editorial-copy.md): 118 campos publicados, siete pasos coherentes; diseño/SEO/shell intactos.
+[Segundo pase editorial](docs/audits/public-site/2026-08-31-content-marketing-hub-review-copy.md): hub y revisión creativa, 83 campos publicados; tres cortes y fichas de campaña revisados.
+[CMS y modos](docs/audits/public-site/2026-08-31-content-marketing-cms-modes.md): 53 textos y cuatro logos oficiales publicados; ocho controles nuevos, diseño general y SEO conservados.
+[Ecosistema y FAQ](docs/audits/public-site/2026-08-31-content-marketing-ecosystem-faq.md): 37 textos y seis URL publicados; tarjetas completas y ocho FAQ, sin cambios de diseño/SEO.
+[Marca en modalidades](docs/audits/public-site/2026-08-31-content-marketing-mode-logo.md): dos logos ampliados con CSS acotado, sin cambiar contenido ni SEO.
+[Indexabilidad del menú](docs/audits/public-site/2026-08-31-menu-indexability.md): 18/18 páginas habilitadas; sólo Redes Sociales requería quitar noindex. Canonical/sitemap verificados; indexación GSC no afirmada.
+[Cierre, caso interno y formulario](docs/audits/public-site/2026-08-31-content-marketing-business-conversion.md): 48 textos Elementor y copy de form v3 publicados; correo copiado coincide con lo visible, sin cambiar destino ni enviar leads. Ajuste posterior: cinco textos condensados para equilibrar las columnas, sin cambiar el formulario. Cierre documental con tres subagentes; runtime `f12dd64`, ocho archivos idénticos a producción, sin push.
+
+Trece widgets editables conservan composición, assets e interacciones de Content Ops; header/footer Ohio
+nativos. Captura canónica de dos pasos, select preseleccionado corregido, Yoast/meta/social/Service y URL
+original preservada. [QA y límites](docs/audits/public-site/2026-08-31-content-marketing-publication.md).
+
+## 2026-08-30 — Landing HubSpot: export aprobado publicado en Elementor
+
+2026-08-31: etiqueta del enlace de menú cambiada a «Servicios HubSpot» por pedido del operador; URL y jerarquía conservadas.
+
+2026-08-31: [auditoría SEO/AEO completa](docs/audits/public-site/2026-08-31-hubspot-seo-aeo.md):
+OG/Twitter y breadcrumb corregidos, Service conectado al grafo Yoast, enlace oficial del partner y HTTP→HTTPS
+301 sólo en la landing. Iconos 878 KB→2,4 KB y fuentes adelantadas; móvil LCP 16,3→8,6 s (lab; aún mejorable).
+Schema.org 0 errores/advertencias; GSC indexada, último crawl 27-08 anterior al rediseño. Header/footer intactos;
+persisten defectos globales del footer y falta respaldo localizado de las cifras 56%/76%. Snapshot SEO
+`_gh_hubspot_seo_20260831_093553`; hash Elementor sin cambios. Sin commit/push.
+Después se afinó la descripción SEO/social con `copywriting`, eliminando redundancia, sin cambiar title ni diseño.
+Por comentarios posteriores se restauró el timeline del diseño y se dejaron dos columnas de partner con badge mayor;
+[audit y rollback](docs/audits/public-site/2026-08-31-hubspot-timeline-partner-fix.md). SEO y datos Elementor intactos.
+Nueva revisión: [seis iconos oficiales HubSpot y logo ANAM](docs/audits/public-site/2026-08-31-hubspot-brand-assets.md);
+Media nativos, nota del caso identificada, SEO y shell conservados.
+Revisión siguiente: [isotipos en paneles, Smart CRM/Agent Hub y wordmark de licencias](docs/audits/public-site/2026-08-31-hubspot-product-marks.md);
+autorización del logo confirmada por operador, AEO sin símbolo propio identificado, sin cambios de copy/SEO.
+MCP suma [ChatGPT, Claude y Gemini reutilizados desde AEO](docs/audits/public-site/2026-08-31-hubspot-mcp-logos.md),
+en tarjeta y panel, tres Media nativos; AEO y contenido Elementor protegidos.
+Las cinco capacidades restantes suman [iconos semánticos azul claro](docs/audits/public-site/2026-08-31-hubspot-semantic-icons.md),
+diferenciados de las marcas oficiales, compartidos tarjeta/panel y editables.
+[Revisión editorial](docs/audits/public-site/2026-08-31-hubspot-editorial-copy.md): licencias, ANAM, partner y reunión;
+51 textos, sin «práctica» en la landing, sin cambios de diseño/SEO ni de otras páginas.
+Continuación: [industrias, primer paso y cinco etapas](docs/audits/public-site/2026-08-31-hubspot-industry-method-copy.md), solo copy en tres widgets.
+[Cierre documental delegado](docs/audits/public-site/2026-08-31-hubspot-documentation-closure.md): contratos, manual, skills y task reflejan publicación/alcance pendiente; Git acotado, sin push.
+
+
+Se reemplazó el cuerpo de `244079` por once widgets Elementor editables, con 23 paneles servidos por PHP,
+interacciones progresivas, CSS del diseño y header/footer nativos. URL e imagen destacada conservadas.
+Formulario real de tres pasos por Growth Forms, variante portable `hubspot_pillar`; desaparece el éxito
+simulado del export. Despliegue acotado por hashes, respaldo durable y verificación anónima responsive,
+teclado, reduced motion, rechazo de captcha y guardado nativo de Elementor. Sin commit/push.
+[Contrato](docs/architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md) ·
+[Audit](docs/audits/public-site/2026-08-30-hubspot-elementor-publication.md).
+
+## 2026-08-30 — TASK-1358: Home modular Elementor promovida con respaldo
+
+Revisión SEO/AEO: título/descripción y OG/Twitter propios en Yoast, dos Media HTTP → HTTPS;
+grafo existente conservado sin duplicaciones. [Audit y límites](docs/audits/public-site/2026-08-30-home-seo-aeo.md).
+Aprendizajes consolidados en skills SEO/AEO y WordPress, espejadas Codex/Claude: metadatos sin forzar H1,
+dueño único de grafo, retiro de FAQ rich results, alcance llms.txt y pruebas CMS/HTML/GSC diferenciadas.
+
+Por instrucción posterior del operador, la página `251731` ya sirve `/`: menu Home y SEO/canonical/index
+actualizados, diseño/copy/header/footer intactos; antigua Home `2791` conservada noindex. Snapshot
+`_gh_home_cutover_20260830_162109`. Se aplicaron después los seis comentarios visuales: contraste corregido,
+10 piezas recuperadas, isotipo HubSpot de Simple Icons, Logo Marquee compartido y agenda horizontal sin
+formulario, enlazada al calendario vigente. QA 1280/890/390; copy/claims/editor UI siguen pendientes.
+[Evidencia](docs/audits/public-site/2026-08-30-home-visual-review.md).
+Segunda revisión: contraste de Ecosistema, CTA teal editable, FAQ con CTA integrado y layout tablet
+sin sticky, e isotipo correcto también en Respaldo oficial. Sin reescribir documento ni header/footer.
+Tercera revisión: hover nativo Ohio sin cubrir el CTA, FAQ sin mail, cierre de tabla moderado, sprocket CRM,
+halos sin cortes e isotipo hero proporcional. Cambios de contenido guardados vía Elementor; QA responsive/hover PASS.
+Cuarta revisión: HubSpot CRM teal con hover blanco; isotipos oficiales negativos de Greenhouse/Globe mediante
+Media nativo. Tres comentarios publicados y comprobados en 390/890/1280; copys y header/footer sin cambios.
+Quinta revisión: Kortex/Wave oficiales, Verk retirado y aviso oculto; logos reales del hero con microinteracción
+original restaurada, y bucle de trabajos con cobertura por viewport. Snapshot `190751`; 415 campos/7 repeaters.
+Rótulos narrativos: «El costo de trabajar por separado» y «Un equipo. Una misma dirección.» sustituyen notas
+del wireframe en dos controles Elementor; snapshot `192130`, resto del contenido y estilo intactos.
+Servicios enlaza cuatro landings verificadas mediante URL nativa por fila; ocho tarjetas siguen estáticas.
+Snapshot `192809`; reparación del default URL, pruebas de renderer y navegación real documentadas en audit.
+Casos se convierte en CTA navy compacto → `/portafolio/`, cinco campos nativos; tarjetas/cifras retiradas.
+Snapshot `194253`, backup runtime `194241`; 415 campos/6 repeaters; hover, móvil y clic verificados.
+Hero «Mira cómo operamos» abre showreel YouTube en dialog navy responsive; URL nativa, carga sólo al clic,
+destrucción del player al cerrar, alternativa YouTube. Snapshot `195821`, backup `195756`; 414 campos.
+Reproducción live, cierre X/exterior, foco de retorno y reduced motion verificados; teclado del iframe no certificado.
+
+Consolidación documental con tres subagentes: contrato técnico, funcional, manual y skills espejadas;
+task/índices/contexto reconciliados con PDR-010 y la Home actual. Plan y handoff previos preservados como
+historia, no instrucciones vigentes. Readback independiente 17 widgets/414 campos raíz/6 repeaters,
+tests PHP/lifecycle/geometría PASS; QA del editor, teclado del player y claims globales siguen abiertos.
+Sin cambios live en esta consolidación. [Audit](docs/audits/public-site/2026-08-30-home-documentation-consolidation.md).
+
+Checkpoint de construcción anterior a la promoción:
+
+Se auditó el ZIP y se portó el cuerpo de Claude Design a `https://efeoncepro.com/home-claude-design-preview/` (`251731`, noindex), preservando el header/footer Ohio y Home `2791`. Tras la corrección solicitada por el operador, usa 17 widgets semánticos Elementor con controles editables y siete repeaters, **cero widgets HTML**. Assets condicionales y ciclo de vida idempotente; adaptación móvil del motor sin superposiciones. Tests PHP/JS y frontend 1440/390, reduced motion, filtros/FAQ/modal/foco pasan. Editor visual save/reload pendiente de login; media de 12 slots, copy/claims, captación y cutover siguen pendientes. [Contrato y manuales](docs/architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md).
+
+## 2026-08-30 — HubSpot as a Service y su futura landing adoptan arquitectura moderna e inmersiva
+
+La práctica dejó de reducirse a RevOps + Customer Agent y ahora se gobierna mediante seis familias: Marketing,
+Content & AEO; Sales & AI Pipeline; Revenue Lifecycle; Service, Customer Success & Delivery; Data, Integration &
+CRM Intelligence; y Agent Hub & Agentic Operations. La evaluación inicial para fit/cotización es sin costo; un
+blueprint pagado requiere un artefacto autónomo. Customer Agent queda como caso de uso, mientras Contracts,
+Projects y Services se clasifican correctamente como objetos/capabilities dentro de sus workflows.
+
+El benchmark de 11 partners, la oferta V2, tres fichas sectoriales, el pillar público, las skills HubSpot espejadas y
+el router de agentes quedaron reconciliados. `TASK-1352` fue **reemplazada integralmente**, sin conservar deltas,
+copy, claims ni composición del resultado rechazado de Claude Design. La nueva task impone research-first,
+copywriting completo, SEO/AEO por intención y motor, CRO medible, proof ledger y un gate humano del primer fold antes
+de la implementación total. Su dirección visual durable es **Sistema vivo de crecimiento**: atlas de seis resultados, tres lentes
+sectoriales, color HubSpot usado como señal dentro de Efeonce masterbrand, motion causal/interrumpible, frontera
+gratis-vs-blueprint y GVC premium. Los activos exactos de marca deben venir del Partner Brandfolder/guía vigente;
+no se autoriza copiar la UI/trade dress, modificar logos, inventar HEX ni usar inmersión ornamental que perjudique
+accesibilidad o CWV. No hubo cambio de runtime ni publicación web; la task permanece `to-do` y `UI ready: no`.
+
+Dirección visual, wireframe, flow y motion de TASK-1352 se reautoraron desde cero contra la task nueva. Eliminan la
+gran idea prefijada, normalizan las seis familias canónicas, subordinan agentes/capabilities a outcomes, incorporan
+copy slots research-dependent, restricciones SEO/AEO en HTML, flujo de conversión y no-fit, fallas honestas,
+transformación desktop/tablet/mobile y un motion system causal con tokens exactos, reduced-motion y budgets CWV.
+
+## 2026-08-30 — Growth SEO · la lente `Descubrir` entrega lo que ya tenía construido (TASK-1693)
+
+**Qué cambia para quien opera el módulo SEO.** Tres capacidades que estaban construidas y pagadas
+pero no llegaban a la pantalla:
+
+- **Se puede recorrer la corrida completa.** Una corrida materializa hasta 500 candidatos y la
+  pantalla servía 50 sin salida. Ahora hay «Ver N candidatos más» al pie. Recorrer **no cuesta**: lee
+  lo ya comprado, no llama al proveedor y por eso se ve distinto del botón que sí gasta.
+- **Se elige de dónde salen las seeds.** Cuatro fuentes, con Search Console a la cabeza — seeds con
+  demanda medida y resolución sin costo de proveedor. Cada una declara cuántas seeds aportaría. Una
+  fuente sin insumo se bloquea con su razón y **nunca** cae en silencio a «seeds escritas».
+- **Se puede filtrar el canvas**, y el filtro se aplica en el servidor: el conteo del encabezado
+  sigue al universo filtrado, no a la página que bajó. No hay filtro por «dificultad» a propósito;
+  el control correcto es «Barrera máxima», derivada del perfil real de enlaces.
+
+Manual actualizado: `docs/manual-de-uso/growth/descubrir-keywords-seo.md` v1.3.
+
+## 2026-08-29 — release `e1718a359575`: dos guardas textuales fallaron el mismo día con signos opuestos
+
+El 4.º paso a producción del día promovió el fix de banda 2, el gate de cobertura del worker y la
+quema de la deuda de procedencia. Manifest `released` en un solo run del orquestador; canary de
+contrato verde por el lane de producción (provenance + rank monotónico — sólo el código nuevo lo
+produce) y Berel paginada entera: 501/501, secuencia == persistida. El índice keyset huérfano se
+retiró después del release (migración `20260829225504734`), como el contrato manda.
+
+El desvío enseñó el patrón del día: CI Deep rojo sobre el primer squash porque el test del contrato
+del deploy del worker contaba ocurrencias de string en el YAML — el proxy textual de un mecanismo
+que 146070ffc había reemplazado por cobertura de metafile. La misma clase que el string-match del
+ORDER BY del reader, con signo opuesto: aquél pasaba verde con banda 2 rota; éste se puso rojo con
+la cobertura mejorada. Una guarda textual debe señalar al verificador real, no reemplazarlo. Y la
+parte que no era del pipeline: la racha completa fue de **5 corridas rojas/canceladas en ~70
+minutos** — el run del commit culpable cancelado por `cancel-in-progress` (nunca juzgado), dos
+rojos de una sesión y uno del push del merge canónico de otra, sin que nadie abriera ninguno — en
+ráfagas el veredicto es del último push, y una alarma sostenida se normaliza hasta volverse
+invisible. El skip de 44 s del ops-worker esta vez fue legítimo (árboles
+idénticos, diff completo vacío): mismo síntoma que el incidente anterior, causa opuesta — los
+distingue el diff, no el cronómetro.
+
 ## 2026-08-29 — la cuarta llave invisible: el orden servido de la cola contradecía el rank persistido en banda 2
 
 Auditoría independiente post-release sobre el snapshot vigente: 54 de 55 items de banda 2 de
@@ -565,404 +1153,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
   reliability), doc funcional + manual nuevos en `docs/{documentation,manual-de-uso}/growth/`, la
   rule de auto-load `.claude/rules/growth-seo.md` y la skill `dataforseo-operator` con su espejo
   Codex (cuerpo idéntico, verificado a mano: el validador de espejos NO cubre esta skill).
-
-## 2026-08-27 — TASK-1777 complete: la tríada anti-Semrush queda cerrada entera
-
-- El operador decidió cerrar TASK-1777 con su rollout ya ejecutado (flag ON, lane en producción,
-  `get_seo_backlink_detail` entre las 21 tools del gateway) y el único criterio no observado —
-  predicado de movimiento a USD 0 — convertido en follow-up F1 con fecha y dueño (lunes
-  2026-08-31, receta SQL en el Delta (3) del task file). Con esto 1775/1776/1777 + 1658 están
-  `complete`; gasto total del rollout de la tríada: USD 0.2958.
-
-## 2026-08-27 — Gateway MCP desplegado y cierre de la tríada SEO (TASK-1658/1775/1776)
-
-- Federación en producción: revisión `efeonce-mcp-gateway-00023-zt2`, `tools/list` autenticado observado en **21 tools SEO** (antes 13), con las 8 recién federadas presentes. Canary del provider verde contra producción para Efeonce y Berel.
-- **El `oauth:canary` tenía un punto ciego de inventario y se cerró**: ejercitaba `tools/call` sobre tools puntuales y nunca `tools/list`, así que una tool que quedara fuera del server pasaba invisible mientras las probadas siguieran verdes. Ahora asserta el inventario (`efeonce-mcp` commit `4058a07`). El charset del nombre incluye el punto a propósito — las tools no-SEO son punteadas (`hiring.talent_pool.search`) y sin él el total excluía Globe y Hiring en silencio, reportando el conteo SEO como si fuera el total.
-- `TASK-1658`, `TASK-1775` y `TASK-1776` pasan a `complete` con `task:lint` 0/0. Queda un residual declarado en 1775 (sujeto desconocido → fila NULL: cubierto por unit test, no observado en runtime) y la verificación del lunes 2026-08-31 para `TASK-1777`.
-
-## 2026-08-27 — Release a producción del carril Growth SEO (TASK-1652/1658/1709/1775/1776/1777)
-
-- Promovido `develop`→`main` como **un solo release**: PR #207, 632 archivos, 10 migraciones, target `cc73c74789ce`, release_id `cc73c74789ce-dbce65f2-303b-4528-bef3-f4edd022a880`, orquestador `33123977671`, manifest **`released`** en 9 min 40 s sin retry ni gate colgado. Llegan a producción los lanes ecosystem de la tríada SEO, el lane de diagnóstico de prospecto, la corrección del request AI Mode del grader y la federación MCP; más el cierre de hiring que quedaba en develop.
-- **Flags prendidos con el release** (ambos requerían que su lector estuviera en `main`, regla ISSUE-150 — verificado x0 antes y x1/x2/x3 después): `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` (Vercel, sign-off comercial del operador) y `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (Vercel Production; en ops-worker ya estaba ON). Redeploy `greenhouse-if2u2c8ys` porque Vercel congela env vars al build; `pnpm flags:audit --strict` cierra en 0/0.
-- **Los 3 gotchas del squash-merge se pre-emptaron, no se sufrieron**: merge canónico `-s ours` con ambas verificaciones vacías; el push a develop se bundleó con una edición del `FEATURE_FLAG_STATE_LEDGER` (está en `deployControlDocs` y fuerza el build de staging, evitando el `vercel_readiness` en exit 1); el Playwright smoke sobre `main` se produjo en 3 min en vez de taparlo con bypass. El `bypass_preflight_reason` quedó reservado para `db_migrations`, único dominio irreversible real, con razón auditable (migraciones ya aplicadas en la instancia única Cloud SQL).
-- ⚠️ **El watchdog post-release recomendó una regresión.** Reportó DRIFT en 3 workers comparando contra `gh=6f7e246ea888` (commit del 2026-07-30, ancestro del target) y propuso redeployar `hubspot-greenhouse-integration` con ese `expected_sha` — pisar código correcto con código de un mes atrás. No se ejecutó: `pnpm release:workers` (lee Cloud Run, fuente autoritativa) mostró 3/4 workers exactamente en el target y el `ops-worker` en change-gate legítimo, verificado con las **28 rutas reales** leídas del workflow y diff vacío. Es la clase de falso positivo abierta hasta TASK-920.
-
-## 2026-08-27 — El provider Google AI Mode del AEO grader deja de mentir "sin bloque AI" (TASK-1652)
-
-- Los runs productivos del grader (market ISO-2) fallaban per-task en DataForSEO por `location_name` inválido y el fallo se clasificaba `skipped:no_ai_overview_block` — 60 observaciones históricas eran ese falso negativo (54 con el error exacto `40501`). Fix: mapa cerrado market→`location_code` verificado en vivo (CL=2152, MX=2484, CO=2170, PE=2604, US=2840) + gate per-task por `status_code` (el skip honesto queda reservado para tasks `20000` realmente ejecutadas). Regrade descartado con evidencia: los tasks fallidos nunca se ejecutaron y río abajo skip/failed pesan igual.
-- El parser ahora desciende a las `references[]` anidadas de los `ai_overview_element` (dedupe por URL), y el smoke live destapó que Google envuelve TODA reference en redirects propios (`domain: google.com` + `goto?url=<token>`): la atribución ahora deriva el dominio real desde `source` cuando es domain-shaped y descarta honesto (contado en `usage.dataforseo_citations_unattributable`) lo no atribuible — antes todo el SoV de citabilidad se atribuía a google.com. Herencia declarada en `TASK-1311`. AIO producción sigue OFF (TASK-1341).
-
-## 2026-08-27 — El módulo SEO gana el tier `prospect`: diagnóstico sin contrato y sin acceso del cliente (TASK-1709)
-
-- Nuevo carril de adquisición `src/lib/growth/seo/prospect/**`: una corrida ÚNICA por dominio con tope duro POR DIAGNÓSTICO (min(USD 1,00, restante mensual de Efeonce), validado contra el forecast del conjunto ANTES de la primera llamada), idempotencia por dominio/mercado/día (repetir = USD 0), y gasto de adquisición atribuido a `EO-ORG-0007` en el ledger único. Estrena 4 endpoints de familias ya permitidas (`ranked_keywords` +`ai_overview_reference`, `competitors_domain`, `backlinks/competitors`, `domain_intersection`) — el colector de competidores que `TASK-1662` consumirá.
-- Todo hecho nace con lente `estimated` + `captured_at` (CHECK de un solo valor) y el contrato de salida no tiene score/veredicto/benchmark/lift; la evidencia de sitio se delega al sustrato (`site-substrate`, USD 0) y un bloqueo del sitio es un hallazgo, no un obstáculo. Cero captura recurrente sobre prospectos (sin cron/scheduler; test fuente + DO guard).
-- Full API Parity mismo PR: lane app + lane ecosystem (`internal`-only) + MCP `get/run_seo_prospect_diagnostic`; capabilities `growth.seo.prospect_diagnostic.{run,read}` seedeadas + granteadas; señal `growth.seo.prospect_diagnostic.cost_overrun` (steady 0); evento `growth.seo.prospect_diagnostic.completed`.
-- Corrida real verificada (skyairline.com CL): forecast USD 0,205 vs real 0,1991, ledger Δ exacto, idempotencia USD 0, cost_blocked con cero llamadas. Flag `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` default OFF (Vercel V1); ON sólo con decisión del operador.
-
-## 2026-08-27 — Gemini Omni 1.1 entra al gobierno de la flota, no al runtime
-
-- Investigación oficial de Gemini Omni 1.1 Flash: se separan Developer API (`gemini-omni-1.1-flash`, modelo listado Stable) y Google Cloud (`gemini-omni-1.1-flash-preview`, Pre-GA), ambas sobre Interactions `v1beta`; se documentan capacidades, precios, cuotas, residencia, retención, C2PA, restricciones regionales y contradicciones del proveedor.
-- `TASK-1781` queda creada como P0 para migrar antes del shutdown anunciado de `gemini-omni-flash-preview` el 2026-09-30 y expandir capacidades por rutas/output shapes independientes, sin heredar evidencia del modelo anterior.
-- Nueva route card candidata y actualización espejada de `greenhouse-globe-model-fleet` y las referencias Omni de `motion-design-studio`. Sin cambio de binding, deploy, gasto, canary ni promoción: 1.1 sigue `gated` hasta readback live.
-
-## 2026-08-27 — El perfil de enlaces gana nombres propios, con el gasto condicionado al movimiento
-
-- `TASK-1777` (code complete, rollout pendiente): el snapshot semanal de enlaces decía "perdiste 12 dominios" sin decir CUÁLES. Nacen las tablas hijas del snapshot con el detalle accionable: qué dominio enlazó/se cayó (con muestra del enlace y anchor — suficiente para el correo de recuperación) y el perfil de anchors con una lectura de **sobre-optimización** nueva y separada de `toxic_share` (miden cosas distintas; ninguna reemplaza a la otra).
-- El corazón no es el endpoint sino la **condición de disparo**: el drill-down corre como paso del cron semanal existente (sin scheduler nuevo) y SOLO donde el `new_lost_delta` ya persistido muestra movimiento — un target estable registra su veredicto a USD 0, y ese veredicto persistido (`seo_backlink_drilldowns`) es lo que permite al reader distinguir "el perfil estuvo estable" (hallazgo positivo) de "no sabemos qué pasó" (drill-down fallido, señal en rojo).
-- `rank` siempre en escala 0-100; el movimiento nominal se pide sólo en la dirección que el delta indica; el shape de `readBacklinkProfile` queda intacto (test de regresión). Lane ecosystem `/growth/seo/backlink-detail` + tool MCP `get_seo_backlink_detail` + señal `seo.backlink.detail_drilldown_failed`.
-- Flag `GROWTH_SEO_BACKLINK_DETAIL_ENABLED` nace OFF (sólo ops-worker); el encendido es checkpoint del operador. Runbook `docs/manual-de-uso/growth/operar-perfil-de-enlaces-seo.md`. Con esto, las tres capacidades por las que hoy se paga Semrush (dominio · página · enlaces) quedan code-complete en Greenhouse.
-
-## 2026-08-27 — El módulo SEO aprende a hablar de páginas, no sólo de dominios
-
-- `TASK-1776` (code complete, rollout pendiente): nace `greenhouse_growth.seo_url_visibility_snapshots` — qué ranquea una URL, subcarpeta o subdominio de CUALQUIER dominio, y qué páginas/subdominios concentran su tráfico. La tríada que Semrush vende como tres reportes es acá UNA capacidad con resolver de sujeto **declarado** (la clase jamás se infiere).
-- La foto sale del agregado del proveedor (set completo); el `limit` (knob, default 100) sólo acota el detalle comprado y es la palanca de costo. Gotchas verificados contra la doc: URL como target va CON esquema (sin él el proveedor devuelve y cobra el dominio entero); subcarpeta = host + filtro server-side gratis.
-- **Tercer productor del mercado compartido**: el `keyword_info` que viene ya pagado en cada fila se deposita en `seo_keyword_market_data` vía el writer canónico con costo 0 (la migración expandió su CHECK) — una corrida sobre un cliente deja fresco mercado para toda la cartera.
-- Cron `ops-seo-url-visibility` (día 17) **nace pausado** con flag `GROWTH_SEO_URL_VISIBILITY_ENABLED` OFF (sólo ops-worker); reader + lane ecosystem + tool MCP `get_seo_url_visibility`; señal `seo.url_visibility.stale_subjects`. El encendido queda como checkpoint del operador; runbook `docs/manual-de-uso/growth/operar-visibilidad-por-url-seo.md`.
-
-## 2026-08-27 — El módulo SEO aprende a describir un dominio completo
-
-- `TASK-1775` (code complete, rollout pendiente): nace `greenhouse_growth.seo_domain_overview_snapshots` — la foto de dominio (keywords ranqueadas totales, tráfico estimado, distribución top-100, momentum) del target Y de sus competidores, con trayectoria mensual desde 2020-10. Multi-productor con clave sin organización (patrón `seo_keyword_market_data`): lo que pagó una org sirve a toda la cartera.
-- Tres colectores sobre el mismo writer: la foto mensual (`domain_rank_overview`, cron `ops-seo-domain-overview` día 16 — **nace pausado**, flag `GROWTH_SEO_DOMAIN_OVERVIEW_ENABLED` default OFF sólo ops-worker), el backfill histórico de una sola vez por sujeto (10× el costo; runner `--dry-run` default + tope duro USD) y el screening de cartera (1.000 dominios ~USD 0.13).
-- Reader `readDomainOverview` con `lens: 'estimated'` + `capturedAt` en toda cifra y `no_market_data` sin ceros fantasma; lane ecosystem `/growth/seo/domain-overview` + tool MCP `get_seo_domain_overview`; señal `seo.domain_overview.stale_subjects` (steady 0, con estado "sin rollout" honesto).
-- Decisión registrada en arch §4.2: `domain_rank_overview` NO devuelve authority score — la autoridad canónica de superficie sigue siendo `seo_backlink_snapshots.domain_rank`, sin segunda cifra que compita.
-- El encendido queda como checkpoint del operador (smoke live que gasta + flag multi-runtime + despausar); runbook `docs/manual-de-uso/growth/operar-foto-de-dominio-seo.md`.
-
-## 2026-08-27 — El sustrato de sitio gana dueño propio y frontera con detector
-
-- `TASK-1697` (mitad A, complete): el fetcher SSRF-guarded + parseo HTML/robots sale de las tripas del grader a `src/lib/growth/site-substrate/` (git mv, diff puro, shims — cero dependientes modificados) con carta verificable por test de allowlist: no importa `growth/*`, no persiste, dice cómo se OBTIENE la evidencia y nunca cómo se JUZGA.
-- Lint rule nueva `greenhouse/growth-substrate-boundary` en `error` desde commit-1 sin exenciones: `ai-visibility/probes/**` pasa a ser privado del dominio AEO (la puerta externa es el sustrato) — el deep import que TASK-1670/1701 podían escribir mañana hoy rompe el build. La rule universal de fronteras `growth/*` queda declarada de `TASK-1713` (30 deep imports vivos la harían nacer sucia).
-- Desbloquea a `TASK-1670`, `TASK-1701` y `TASK-1709` (el carril comercial de diagnóstico de prospectos ya tiene de dónde consumir la evidencia de sitio).
-
-## 2026-08-27 — El fetcher de sitios de terceros deja de prometer garantías que no implementa
-
-- `TASK-1778` (Slices 1–4b, code complete): el único fetcher con el que Greenhouse lee sitios de terceros (grader AEO público + brand intelligence + diagnóstico de prospectos) gana mecanismo para sus cuatro garantías: contención de redirects por salto acotada a la familia del sujeto (`apex↔www`, upgrade `http→https`), guarda DNS pre-conexión contra rangos no públicos, tope de memoria real por stream con truncado rastreable, y obediencia de `robots.txt` matcheando nuestro token — jamás los bots de IA que auditamos.
-- Un probe de presencia ya no puede afirmar «no tiene datos estructurados» sobre un cuerpo truncado o un shell de render JS: degrada a `skipped` con razón explícita (`truncated_body`/`not_observable`), el mismo invariante `null ≠ 0` un nivel más abajo.
-- El endurecimiento de red queda tras `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (dual-location Vercel + ops-worker) como kill switch de cobertura; el resto viaja sin flag.
-- **Cutover aplicado el mismo día:** flag ON en el ops-worker compartido staging+prod (la cadena viva del intake público) + declarativo en `deploy.sh` + Vercel staging; la regla de saltos se extendió a subdominios descendientes del sujeto con evidencia real de cartera (bancochile). Corrida real `EO-GRUN-00048` verde con cero bloqueos falsos → `ISSUE-164` resuelto. Residuales en el ledger: revisión Sentry 48 h (2026-08-29) y env var en Vercel Production con el release que lleve el código a `main`.
-
-## 2026-08-27 — Nace la práctica Salesforce operable y vendible
-
-- Se crearon tres skills espejadas y gateadas: `salesforce-crm-practice`, `salesforce-marketing-cloud-engagement` y `salesforce-marketing-cloud-next`.
-- Cada skill separa `operate` de `sell`, incluye discovery, fit, arquitectura, propuesta/SOW, operación administrada y gates explícitos para claims, licencias, partnership, consentimiento y mutaciones.
-- Marketing Cloud Engagement se documenta como producto vigente y coexistente; Marketing Cloud Next como producto nativo de Salesforce Platform/Data 360. No se promete migración automática, paridad ni reemplazo universal.
-- La práctica comercial quedó bajo **Revenue Operations & CRM** con catálogo de ofertas, mapa de productos y evidencia fechada. No hubo acceso a tenants, cambios de configuración, ventas, cotizaciones oficiales, claims públicos ni runtime.
-
-## 2026-08-27 — RevOps & CRM deja de confundirse con un único provider
-
-- Se verificó la posición Gartner por mercado y año: HubSpot es Leader en B2B Marketing Automation 2025 por quinto año, y Challenger en CRM Sales Platforms 2026 después de avanzar desde Niche Player en 2025. Zoho también es Challenger en CRM Sales 2026. Ya no se usa un supuesto cuadrante único de “CRM”.
-- La señal enterprise chilena de Salesforce quedó sustentada con casos públicos de Enel Chile, Abastible y Colbún, pero se clasificó con confianza media: demuestra presencia, no market share ni desplazamiento general de HubSpot.
-- La práctica se normalizó como **Revenue Operations & CRM**, con diagnóstico provider-neutral y tres carriles: HubSpot-first, Salesforce-first e híbrido gobernado. La inversión futura debe decidirse con 24 meses de pipeline, win/loss, margen, demanda y capacidad, no con un badge de analista.
-- La declaración del CEO de que Efeonce es partner de HubSpot y Salesforce quedó en el registry como evidencia interna pendiente de readback primario. No autoriza claims externos, tier, certificación ni co-sell.
-- Se actualizaron contexto GTM, modelo de negocio, beachheads, catálogo HubSpot, tasks/wireframes activos y las skills espejadas `hubspot-solutions-partner` y `efeonce-agency`. Sin cambios de runtime, clientes, licencias, programas de partner ni sitio público. Evidencia: [`CRM Platform Positioning — Gartner + señal enterprise Chile`](docs/audits/commercial/CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md).
-
-## 2026-08-26 — Noviembre y diciembre de Berel quedan listos para revisión y producción creativa
-
-- Se reescribieron los ocho artículos N43–N50 con rescate del contenido vivo, análisis SEO/AEO y editorial, voz es-MX, enlaces reales de `berel.com` y cuatro especificaciones de imagen por pieza.
-- Los proyectos mensuales quedaron relacionados con 72 tareas: 8 artículos, 32 banners y 32 derivados; el Content Hub ganó 32 subítems sociales, cuatro por artículo.
-- Los 32 pares tarea/subítem pasaron comparación exacta de cuerpo. El playbook espejo ahora exige escritura social en dos fases y gates visibles para archivo histórico, sensibilidad institucional, consolidación y soft-404.
-- La relectura encontró un drift no corregido: las 40 tareas preexistentes de artículo/banner aparecen al 11 de septiembre, fuera de sus proyectos de noviembre/diciembre. Quedó declarado para confirmación del calendario antes de una nueva mutación en Notion.
-- N48, N49 y N50 no están habilitados para distribución automática: esperan derechos/vigencia, revisión institucional y consolidación canónica, respectivamente. No hubo publicación CMS ni programación social. Evidencia: [`auditoría de noviembre/diciembre`](docs/audits/seo/BEREL_NOVEMBER_DECEMBER_2026_CONTENT_PRODUCTION_2026-08-26.md).
-
-## 2026-08-26 — El eje de desenlace del pipeline deja de operarse sólo desde el portal
-
-- **El hueco no era una ruta faltante: era una pregunta que nadie hizo.** Cerrar una postulación se podía hacer desde el portal y desde ningún otro lado — ni por `api/platform/app/**`, ni por MCP, ni por Nexa, que no mencionaba hiring ni una vez. Violación directa de Full API Parity, y el agravante es que **ninguna de las cuatro tasks del eje lo declaró como pendiente**, ni la auditoría que las revisó.
-- **La spec pedía copiar el Banco de Talento y ese patrón no calzaba.** Talent-pool persiste sus invitaciones en una tabla y compara contra esa fila al confirmar; para decisiones no existe tabla, el command no acepta `proposalRef`, y la spec declaraba `Migration: none`. La salida no fue crear la tabla: una invitación **es** una entidad con ciclo de vida propio, una propuesta de decisión nace y muere dentro de un gesto humano. El guard quedó como un **digest del estado actual** que `propose` calcula y `confirm` revalida — si alguien decidió entre medio, falla en vez de pisar una decisión ajena.
-- **Nexa quedó con autoridad deliberadamente MÁS ANGOSTA que el portal: cierra una postulación abierta, nunca re-decide una cerrada.** El motivo es mecánico: su contrato de acciones no puede cargar estado del preview al execute, así que la huella no sobrevive el viaje. Había dos salidas malas —debilitar el guard, o extender un contrato compartido por otras seis acciones— y una buena: acotar lo que el agente puede hacer.
-- **El guard de parity es lo que impide que la clase vuelva.** Un manifiesto obliga a declarar cada capability `hiring.*` como federada, deliberadamente interna o pendiente. No obliga a federar: obliga a **decidir y escribir el porqué**. Cuatro de las decisiones ya escritas dicen que no, y valen más que las que dicen que sí. Quedan 18 pendientes — no es deuda nueva, es la que ya existía, ahora con nombre.
-- **Dos defectos propios los encontró la pasada documental, no los tests.** El adaptador aplanaba los tres conflictos distintos del command en un solo código —exactamente la clase que se corrigió el mismo día del lado del candidato— y no reenviaba el destino de selección, con lo que dos de los seis desenlaces eran inalcanzables por la ruta que existe para alcanzarlos. Ambos corregidos y congelados con test.
-- Estado: `code complete, rollout pendiente`. El flag de Nexa nace OFF —bajo el AI Act la selección es alto riesgo con supervisión humana obligatoria— y falta ejercitar el loop contra staging. La escritura por MCP queda diferida: su registro vive en el repo hermano y su scope está bloqueado hasta `TASK-1631`.
-
-## 2026-08-26 — La rendición del assessment deja de perder respuestas y de mentir sobre por qué
-
-- **El caso fuente, resuelto en su causa.** El 2026-08-19 una candidata real perdió una respuesta escrita y quedó sin poder enviar, teniendo 26 minutos de gracia disponibles. La causa no era el plazo: el autosave es un debounce que **se reinicia con cada tecla**, así que quien escribe de corrido sin pausar 450 ms **no guarda nada** — no pierde los últimos milisegundos, puede perder la respuesta entera. Ahora, dentro de una ventana de 30 s antes del plazo, el guardado se fuerza cada 5 s ignorando el debounce. No extiende ningún plazo: guarda antes.
-- **La mitad de la premisa de la task era falsa, y quedó escrita como tal.** De los cuatro defectos declarados, dos no existían: el reloj es `sticky` desde el 2026-08-19 —arreglado 2h43m después de crearse la task, sin que nadie actualizara la spec— y los avisos de 5 y 1 minuto **nunca** fueron sólo `srOnly`. Quien la tomara iba a cazar un bug inexistente o, peor, a «arreglar» lo que funciona.
-- **Tres defectos que ninguna línea declaraba.** El paso entre preguntas sobreescribía el borrador con el valor del servidor —vacío— en silencio, rompiendo la promesa central del propio wireframe; `errorBody` se usaba en DOS catches, así que arreglar el submit dejaba el autosave igual de deshonesto; y el diálogo de envío se abría durante la gracia sin verificar completitud, que es exactamente cómo se llegaba al error imposible de resolver.
-- **El hallazgo que corrigió el contrato de diseño.** El wireframe proponía la copy «puedes enviar lo que alcanzaste a guardar». Es falso: el servidor **exige la evaluación completa** y rechaza cualquier envío con respuestas faltantes. Prometerlo habría repetido, más sutil, la misma mentira que la task venía a arreglar. La banda pasó a ser condicional, y con faltantes **el CTA de envío no se renderiza**: una acción que no puede tener efecto no se ofrece.
-- **`readOnly` sobre `disabled` es accesibilidad, no estilo.** `disabled` saca el campo del tab order y su contenido del árbol de accesibilidad: durante la gracia significaba que quien usa lector de pantalla no podía releer lo que escribió. La asimetría con radio y checkbox —que conservan `disabled` porque `readonly` no les aplica por spec— quedó declarada en el contract test con su razón, no bajada en silencio. Y como el módulo nunca tuvo `.textArea:disabled`, el gris lo ponía el navegador: se agregó la regla explícita para que el campo congelado no parezca editable.
-- **El servidor no se tocó, y esa fue la decisión.** Devuelve un mensaje genérico a propósito —es un endpoint público sin autenticación, fijado por un test anti-leak— así que la verdad se construye en el cliente desde el `code`. Cuatro mensajes agrupados por lo que la persona puede hacer, no siete por código.
-- **Aprendizaje de gobernanza:** declarar `UI ready: yes` disparó 21 errores de un gate premium que **no tiene válvula de proporcionalidad** — se aplica igual a UI nueva que a un fix de defecto, y exige `Quality profile: premium`, lo que descarta el modo `--contract-only`. Las doce secciones se autoraron con contenido verificado, no de relleno; la más útil terminó siendo declarar **por qué no hay dirección visual nueva que explorar**.
-- **La captura premium se ejecutó, y justificó su costo: destapó cuatro defectos que ningún test veía.** El contador de caracteres tenía un contraste de 2.43:1 contra el 4.5:1 de AA — defecto pre-existente, `serious` en axe, sobre una superficie de candidato. Al ocultar el placeholder del campo congelado —porque un campo que no acepta texto no puede invitar a escribir— axe reveló que el textarea llevaba años **sin nombre accesible**: se apoyaba en el placeholder, que es precisamente el anti-patrón que la guía de UX writing prohíbe. La banda usaba un **avión de papel** para decir que no se puede enviar. Y la superficie no declaraba su recipe de composición.
-- **Un quinto hallazgo resultó ser del gate, no del código.** Marcaba los botones del stepper como fuera del viewport en 390px, pero su contenedor ya declara `overflow-x: auto`: es un scroller contenido, que es el patrón correcto. Se declaró la excepción en vez de romper el patrón para complacer al checker; el contrato real —que la página no scrollee— se verificó y se cumple.
-- Estado: **complete**. `pnpm test` completo verde (12.062), los cuatro gates de UI en PASS, scorecard 4.54 con el piso declarado y su `nextAction` escrito en vez de inflado. Seed ejecutado y limpiado, con residuo verificado en cero.
-
-## 2026-08-26 — La contabilidad de Hiring mentía: el dominio está más avanzado que sus documentos
-
-- **Auditoría con cinco verificadores en paralelo, cada hallazgo re-verificado a mano contra el runtime** (git, `vercel env ls`, `gcloud run services describe`) antes de escribirse. El patrón de fondo: casi nada de Hiring falta por construirse; faltaba por contabilizarse. Sin cambios de runtime en esta pasada.
-- **La regla que envenenaba a los agentes.** `.claude/rules/hiring.md` se auto-carga al tocar `src/lib/hiring/**` y afirmaba **en presente** que el `CHECK` del invariante `stage='closed'` ⟺ desenlace seguía parqueado en `docs/tasks/pending-migrations/`. Se aplicó el 2026-08-23 (`b270478f4`) y esa carpeta sólo tiene su `README`. Corregido, con las tres migraciones nombradas por ruta; además `HIRING_APPLICATION_STAGES` volvió a ser el espejo del `CHECK` desde que el Slice F de `TASK-1754` lo bajó de trece a seis. El `NUNCA` de fondo —no aplicar un contract antes del release que retira su escritor— **no se relaja**: cambió el hecho, no el invariante.
-- **Un flag encendido en producción que el ledger daba por apagado.** `HIRING_VACANCY_AI_ENABLED` lleva **41 días ON en Production** y está **ausente en staging**; el ledger decía "OFF en todos los environments". Y el orden de sus precondiciones quedó invertido: se declaró "flip staging + smoke, después prod", y ocurrió prod ON **sin que el smoke de staging ocurriera nunca**. Queda registrado como deuda abierta, no como diseño.
-- **La trampa que explicaba casi toda la confusión.** `main` promueve por **squash merge**, así que los SHAs de `develop` nunca son ancestros aunque su contenido esté desplegado. Leer `rev-list --count origin/main..origin/develop` como "trabajo sin desplegar" produjo el diagnóstico falso de que `TASK-1771` esperaba release: está en producción desde `709e15f66` (2026-08-23), verificado blob a blob. El gap real de código es `TASK-1762`, cuyas cuatro migraciones **ya se aplicaron** a la instancia Cloud SQL compartida — schema por delante del código, mitigado porque sus flags nacen OFF.
-- **Ocho entradas falsas en `docs/tasks/README.md`**, corregidas: `1771` y `1755` como "no están en main" (ambas desplegadas), `1748` y `1771` con migraciones "parqueadas" (las dos aplicadas), `1754` con el Slice F "no ejecutado" (`50b742341`), `1719` con "falta rollout" (ejecutado el 08-18), `1747` marcada `to-do` estando `in-progress` y en producción, y `1757` "apagado esperando sign-off" con el flag ON desde el 08-20. Seis líneas `Status real` de las specs quedaron alineadas con el runtime.
-- **Tres pendientes que ninguna línea declaraba.** `TASK-1718`: el fix H-10 sigue sin escribirse — el filtro `stage` entra como texto libre (`stage as never`) y ante un literal inexistente responde `200 {items:[]}`. `TASK-1746`: `purge_assessment_access_recovery` existe en DB con **cero callers**, o sea la retención de 12 meses y el purgado por retiro de consentimiento **nunca se ejecutan** — es el único hallazgo con filo legal. `TASK-1742`: el canary se declaró verde el 08-18 y al día siguiente entraron dos fixes correctivos al mismo carril, sin registro de re-verificación.
-- **Una task perdió la mitad de su premisa.** `TASK-1751` declaraba cuatro defectos en la rendición del candidato; **dos no son ciertos**: el reloj ya es `sticky` (`bc69e5a75`, arreglado 2h43m después de crearse la task) y los avisos de 5 y 1 minuto **nunca fueron sólo `srOnly`** — la insignia visible `.timerBadge` convive con el canal de lector de pantalla desde el ship original del 2026-07-13. Quedan los **dos del guardado**, que son el daño real del caso fuente: el borrador en vuelo se pierde al entrar en gracia (falta el _flush_, no "congelar mejor") y el error final manda a reintentar algo imposible. La spec lleva `NUNCA` explícito de no "arreglar" lo que funciona.
-- **Un fail-closed que parecía un olvido.** `HIRING_ASSESSMENT_AI_PROMOTION_EVIDENCE_DIGEST` está ausente en los tres runtimes **por diseño**: el digest _es_ la evidencia de promoción y sin él el modo degrada a `global_provisional`. Quedó anotado con su `NUNCA` — declararlo para "destrabar" la policy de excepciones vaciaría el gate.
-- **Aprendizaje transversal registrado:** un `Status real` es una afirmación con fecha de caducidad. Cinco de siete tasks `in-progress` del dominio lo tenían stale, y el `README` estaba peor que las specs. Existe precedente del mismo fix (`4a1011286`).
-
-## 2026-08-26 — Octubre de Berel queda convertido en un proyecto creativo trazable
-
-- El proyecto [`Produccion Creativa - Octubre 26`](https://app.notion.com/p/3c839c2fefe7813c9450e2f35cb4021e) quedó `En curso` con ocho artículos `N35–N42`, 32 banners, 32 paquetes sociales y 32 subítems en Content Hub: 72 tareas relacionadas al proyecto, conforme a la aceptación `9A` / `4A`.
-- Además de las seis reescrituras, se normalizaron los briefs y se redactaron los artículos nuevos N41 —paleta de la mesa mexicana— y N42 —pintura por superficie—, cada uno con cuatro banners y cuatro derivados completos. La segunda lectura confirmó las 18 filas nuevas y la igualdad exacta tarea ↔ subítem en los ocho sociales.
-- Se restauraron 54 fechas de N35–N40 que automatizaciones de Notion habían movido al `2026-09-04`; la consulta final devolvió 8 artículos al 7 de octubre, 32 banners al 14 y 32 sociales al 16. Las canónicas de N41–N42 siguen como soft-404 y permanecen bloqueadas para enlaces entrantes, CMS y redes hasta QA live. Evidencia: [`auditoría de producción de octubre`](docs/audits/seo/BEREL_OCTOBER_2026_CONTENT_PRODUCTION_2026-08-26.md).
-
-## 2026-08-25 — El caso de vacaciones por aniversario no se convierte en política global
-
-- Se documentaron las fechas de ingreso verificadas de Melkin Hernandez (`2025-07-15`) y Andrés Carlosama (`2025-11-11`), junto con la comunicación individual aprobada que vinculó 15 días remunerados al primer aniversario.
-- La auditoría deja explícito el drift: el runtime actual muestra 15 días a ambos, la carta global describe base anual prorrateada más progresión y la instrucción individual usa otro hito. People, Payroll y Legal deben decidir el contrato antes de cambiar cálculos o saldos.
-- El aprendizaje operativo de TeamBot quedó en arquitectura, runbook, invariantes y skills: `pnpm teams:announce` no crea DMs; un one-off genérico solo puede usar el dispatcher y audit writers canónicos con identidad Entra revalidada, confirmación, idempotencia y auditoría. Los mensajes recurrentes pertenecen a Notification Hub.
-- Se aclaró en el manual de ficha laboral que `hire_date` no se infiere desde compensación/creación y que guardarla no recalcula automáticamente Leave.
-
-## 2026-08-25 — La metodología de priorización editorial SEO queda escrita, y aparece un motor que ya existía sin usarse
-
-- **La lección más cara: Greenhouse ya calculaba lo que se reconstruyó a mano.** `/admin/growth/seo/keywords` (`TASK-1308`) expone el mismo score de striking distance que el reader canónico `keyword-opportunities-reader.ts` (`TASK-1302`) — clics incrementales contra la curva de CTR de la propia organización, con la canibalización ya separada como consolidación y no como optimización. La capacidad estaba construida, la conexión de Search Console del cliente llevaba semanas acumulando, y nadie la había corrido para esa cuenta. Quedó como antipatrón: verificar no solo que la capacidad exista, sino que esté **habilitada para la organización** — la página está gateada por flag y por entitlement, así que «existe» y «está encendida para este cliente» son dos hechos distintos.
-- **Se separaron dos carriles que se venían mezclando.** Striking distance contesta _qué página existente empujo_; el volumen de una herramienta externa contesta _dónde hay demanda que no capturo_. Usar impresiones de Search Console para descartar contenido nuevo es razonamiento circular: un tema sin contenido no puede aparecer en un filtro que exige estar rankeando. La regla previa de «no priorices por volumen de terceros teniendo GSC propio» quedó acotada a la priorización de páginas existentes, que es donde aplica.
-- **Tres trampas de lectura de Search Console quedaron documentadas con medición.** La posición promedio no es interpretable sin un piso mínimo de impresiones, y el diagnóstico real es la brecha entre volumen estimado e impresiones entregadas. Con dimensiones consulta+página los sitelinks inflan los agregados: una query de marca sumaba 86.282 impresiones repartidas en 300 páginas. Y la curva de CTR se deriva del propio sitio, porque el benchmark de industria no describe un vertical donde la posición 1 rinde 4,25%.
-- **Nuevo modelo operativo y nuevo runbook.** `SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md` cubre el proceso de punta a punta —intake del sistema editorial del cliente, los dos carriles, respaldo de producto, producción con subagentes, entrega y medición— con el camino primario apuntando al producto y el proceso manual declarado como fallback. `producir-serie-de-briefs-seo.md` es el paso a paso de producir y depositar una serie de briefs en el sistema editorial de un cliente, incluida la sintaxis de encabezado desplegable y la regla de concurrencia.
-- **El caso del cliente quedó en `docs/audits/seo/`** con su línea base medida, el backlog de los dos carriles y los defectos de arquitectura de su sitio ordenados por impacto. La recomendación de mayor retorno no requiere construir nada ni que el cliente toque su sitio: correr la superficie que ya existe.
-- **La skill `seo-aeo` entró al repo por el lado de Claude.** Estaba versionada solo como `.codex/skills/seo-aeo` porque una sesión de Codex commiteó su copia; la de Claude vivía a nivel de usuario, fuera de git, y se habría perdido al cambiar de máquina. Ahora están las dos, con 24 de 27 archivos idénticos. Tres siguen divergiendo y necesitan fusión con criterio, no copia.
-- **La deriva de skills espejadas queda cerrada de forma estructural.** `seo-aeo` y `seo-aeo-practice` entran al manifiesto de `pnpm skills:mirrors`, que ya corre dentro de `local:check` y por tanto en el pre-push: de ahora en adelante cualquier divergencia rompe el push, verificado con un test negativo. Antes de registrarlas hubo que reconciliarlas a mano, y las dos estaban peor de lo que se veía. En `seo-aeo`, la copia que cargaba Claude estaba **más vieja** que la versionada por Codex: había perdido un sello de frescura y varias secciones enteras. En `seo-aeo-practice`, la copia de Codex afirmaba que el AEO de un cliente real iba regalado cuando está contratado y pagado desde el día uno, y proponía desagregarlo como oportunidad de revenue — es decir, cobrar de nuevo algo ya cobrado.
-- **El modelo operativo gana el toolkit del research y el camino a la herramienta interna.** Queda escrito qué reportes se corren y para qué —once reportes agrupados por las siete preguntas que contestan— y una tabla de correspondencia contra la capacidad interna DataForSEO de `src/lib/growth/seo/`: cinco preguntas ya cubiertas internamente (una de ellas **mejor** que con el tercero, porque es medida y no estimada), dos parcialmente y cuatro sin cobertura. La regla queda explícita: cuando la interna cubre, se usa la interna; cada uso del tercero es señal de backlog de producto. Con una trampa de nombre declarada: `src/lib/growth/seo/gap/` **no** es el gap competitivo de keywords —es el cruce SEO×AEO del quadrant— y el gap competitivo (`domain_intersection`, `TASK-1662`) sigue pendiente.
-- **Segunda pasada del mismo día: la pieza-hito anual entra al método.** Un cliente puede tener una pieza que es hito anual de marca (color del año, informe, ranking). Exige cuatro análisis que un artículo normal no: cadencia propia, cadencia del mercado con fuente primaria, la ventana, y el **contrato del claim perecedero** — «primera marca en anunciar X» se documenta con su condición de caducidad y una **tarea de retiro con fecha**, en la pieza, en el PR y en los assets ya distribuidos. Un claim que caduca sin retirarse es un pasivo. Y quedó una advertencia medida: la cadencia propia se lee del `datePublished` del JSON-LD, pero **dos fechas separadas por dos meses no son un patrón**, y una ruta que devuelve 200 sin `<title>` no aporta una fecha, aporta un soft 404.
-- **El competidor más peligroso suele ser una pieza propia reciente.** El reflejo es barrer competidores; el chequeo que faltaba es barrer los artículos del propio cliente de los últimos tres meses comparando **conceptos, no keywords**. Es un chequeo distinto del de canibalización por GSC que ya existía: ése consolida URLs vivas, éste previene escribir encima de trabajo propio. Y hay un tercer actor que no está en ningún mapa competitivo: el **pre-emptor de tesis** —alguien fuera de la categoría que publicó el mismo concepto con el mismo mecanismo antes—, con la distinción operativa de que **ganar la tesis no es ganar el SERP**, y un riesgo nuevo que se mide: que un motor de respuesta atribuya el concepto a la marca equivocada.
-- **La distribución deja de ser una parrilla cuando el canal lo opera otro.** Si el canal existe pero lo publica un tercero, el entregable es un **paquete de insumo**, no un calendario: tabla campo por campo, la fecha marcada _sugerida_ y no comprometida, el objetivo en unidad de cobertura de insumo entregado, la medición declarada de antemano (pedir el reporte a quien publica o inferir por tráfico de referencia) y el retiro del claim perecedero comunicado a quien publica **como entregable**, porque tiene copy vivo. Además: la convención de atomización **se deriva del inventario del cliente, nunca se inventa**, con cuatro señales de degradación; y una red social que ocupa varias posiciones de la primera página del vertical deja de ser un canal y pasa a ser **una segunda superficie de búsqueda**, lo que cambia el copy (el título lleva la consulta, no el nombre de la campaña).
-- **Cuatro antipatrones nuevos, todos con caso propio.** Un grep de patrón de nombre no es un inventario —un regex anclado a la convención vieja devolvió cero para el mes que usaba otra y se concluyó que los entregables no existían—; el peso en caracteres no mide la calidad de una sección —se llamó «flaca» a una capa que era checklist y tabla, el formato más denso que hay—; una keyword con dificultad sospechosamente baja se verifica en SERP antes de fijarse como objetivo; y un hallazgo de inventario local no es una acusación de proceso: puede ser sincronización de almacenamiento y se reverifica con el equipo dueño antes de reportarlo al cliente.
-- **La trampa de Notion que rompe un entregable devolviendo éxito.** Al depositar un brief dentro de un encabezado desplegable, se escribe la tabla en markdown de tuberías y Notion la guarda como HTML **cuyo envoltorio no hereda el tabulador** — desde ahí, todo lo que sigue queda fuera del desplegable, y la escritura reporta éxito. Tampoco se puede prefijar con tabulador una línea que empiece con sintaxis de lista numerada: Notion la reparsea, descarta el tabulador y arrastra la cola. El cierre es un conteo mecánico, y el fetch devuelve los saltos de línea escapados, así que un patrón ingenuo reporta cero secciones y parece que la página está vacía.
-- **`content-marketing-studio` entra al manifiesto de espejos y traía deriva ya committeada.** Cuatro archivos divergían entre las dos copias, uno con un puntero que resolvía a una ruta inexistente. Reconciliado y registrado: el gate de pre-push cubre ahora 11 skills.
-- **Tercera pasada del día: la entidad de marca recurrente entra al método, y con ella la autoridad temática.** Si un cliente tiene una entidad propia que se repite cada año —color del año, informe anual, ranking, premio, índice—, **no es contenido estacional: es un clúster que compone autoridad anualmente** y que ningún competidor puede disputar. Quedó escrito el **kit reutilizable con cadencia relativa al anuncio** (`D-30` reservar el destino · `D+0` ficha ancla · `D+2` aplicación profesional · **`D+30` satélite de espíritu anclado a estacionalidad**, el eslabón que produce la capilaridad · `D+75` desarrollo mayor · `D+150` tendencia · `D+240` segundo desarrollo), con bidireccionalidad obligatoria incluida **ficha del año N ↔ año N−1**. El error que lo originó también quedó nombrado: clasificar el territorio de la entidad como «masa de calendario» y descartarlo.
-- **La estacionalidad sirve solo si es vinculante.** Test de cuatro pasos: ¿el ritual **es** el concepto? ¿su materia es la del producto? ¿hay demanda con SERP verificado? ¿queda hueco leyendo el contenido propio? Y preferir el **marco reutilizable** sobre la efeméride puntual: una pieza atada a una fecha caduca, un marco de temporada se recicla cada año. Volumen alto con vínculo débil es trampa — un ritual muy buscado puede tener SERP de receta, gobierno o retail.
-- **🔴 Medir el grafo de enlaces internos exige separar lo editorial del chrome.** Un módulo global (pie, carrusel de relacionados) inyecta los mismos destinos en **todas** las páginas: eso infla el conteo y **fabrica hubs que no existen**. El método es filtrar los enlaces presentes en más del 50% de las páginas. La consecuencia operativa se invierte: a un destino cableado **no se le dan salidas, se le quitan entradas**, reemplazando la terna fija por un módulo contextual dirigido por el mapa de clúster. Y hay que medir **qué porcentaje del enlazado interno apunta a soft 404**. ⚠️ Con una advertencia que quedó documentada: en el caso fuente **la cifra filtrada no fue reproducible** desde el dataset intermedio, así que el criterio de «cuerpo editorial» hay que declararlo explícitamente antes de darle un número a nadie.
-- **🔴 Brief ≠ dossier de research, y la plantilla canónica ya existía sin usarse.** Se entregaron briefs de 27.000 a 70.000 caracteres cuando `content-marketing-studio/templates/content-brief.md` son 35 líneas. Nuevo estándar en `SEO_CONTENT_BRIEF_STRUCTURE_V1.md`: **techo duro de 12.000 caracteres**, once bloques de máximo diez líneas, bloqueantes arriba, y la regla de fondo — **el brief cita la conclusión y enlaza la evidencia, no la transcribe**. Verificado en la práctica: el brief siguiente salió en **10.035 caracteres sin recortar al final**.
-- **El `unbrand test` puede fallar legítimamente, y eso cambia la métrica, no el objeto.** Cuando el objeto citable **es** la entidad de marca —un léxico propietario, una nomenclatura—, quitarle la marca lo vacía y el gate falla por construcción. La lectura correcta no es arreglarlo ni marcarlo verde: es que la pieza **construye entidad en vez de utilidad neutra**, y por tanto **se mide por menciones y citas, no por backlinks al objeto**.
-- **Dos antipatrones de criterio y cuatro de craft.** Si se cae la razón por la que existe una pieza, **la decisión vuelve a cero, no a otro ángulo** — buscarle un ángulo nuevo para salvarla es publicar por publicar; y un tema que le habla a otro comprador es decisión comercial, no de SEO. En titulación: poner el **concepto** en el lugar del título (el ángulo nombra, el titular promete), meter taxonomía interna en el nombre visible, repetir el mismo titular en las cuatro superficies, y desaprovechar el activo más citable que suele tener un catálogo — **un nombre propio con carga cultural que nadie contó**.
-- **Tres trampas más de herramienta, todas devolviendo éxito.** En Notion: **nunca editar el texto de un encabezado desplegable con search-replace** —destruye el toggle y orfana a todos los hijos; para renombrar se cambia la propiedad `Nombre` de la página— y el desplegable **no puede ser el primer bloque**. Leyendo un sitio Next.js: **no des-escapar el payload para buscar `@type`**, porque los objetos de la app aparecen como si fueran schema (se «encontró» un tipo inválido nueve veces por página que en el HTML crudo no existe); y los conteos de palabras sobre el payload salen **~3× inflados**.
-- **`copywriting` entra al manifiesto de espejos (12 skills) y traía deriva que no fallaba con error.** La copia de `.codex` tenía una `description` de una línea, sin `user-invocable` ni triggers: la skill simplemente **no se cargaba** cuando alguien pedía un headline o la voz del autor. Un agente entrando por Codex escribía copy firmado sin el sistema de voz, sin saber que existía.
-
-## 2026-08-24 — TeamBot deja de prometer una mención que Teams no soporta
-
-- Un anuncio real a `EO Team` demostró que usar el ID del chat como identidad de `@todos` no funciona: Teams aceptó el mensaje, pero mostró `todos` como texto común y no notificó colectivamente.
-- La capacidad oficial es más acotada: un bot puede mencionar personas explícitas en un chat grupal, pero no puede mencionar a todos. La causa no era idioma ni configuración del tenant.
-- Se corrigieron las skills, arquitectura, invariantes, runbook y `TASK-716`. El diseño futuro solo admite `none` o `explicit_users`; también conserva las Adaptive Cards sin `activity.text` para evitar la burbuja duplicada.
-- No se reintentó el envío. El soporte local especulativo de `--mention-all` fue retirado y no forma parte del runtime versionado.
-
-## 2026-08-24 — Queda registrado que nadie puede darse de baja de un correo, y quién lo va a arreglar
-
-- Se abrió el incidente que documenta el defecto: el enlace «Dejar de recibir estos correos» del pie **falla por los tres caminos posibles**, incluido el botón «Cancelar suscripción» que Gmail y Outlook muestran sobre el asunto. Ninguno da de baja a nadie.
-- **No es algo que se rompió después.** La capacidad se cerró así: la task que la construyó quedó marcada como terminada con su propio criterio sin cumplir y sin la página de preferencias que había planeado. El endpoint existe y no lo usa nadie.
-- Se creó la task que lo repara, con una decisión de diseño que vale nombrar: **hacer clic en el enlace no dará de baja de inmediato**, mostrará una confirmación. Los escáneres de seguridad de los correos corporativos abren los enlaces solos, así que un enlace que diera de baja al abrirse desuscribiría a gente que nunca lo tocó. El botón nativo del cliente de correo sí actúa directo, porque ahí la intención ya la expresó la persona.
-- También deja de guardar permisos de baja que nadie puede usar: hoy la liquidación de sueldo genera uno que dura un mes y no aparece en ninguna parte.
-- Tres tasks vecinas quedaron corregidas: los avisos de vacantes para el Banco de Talento —que serían la **primera suscripción voluntaria de verdad** del sistema— asumían que la baja funcionaba; el desalineamiento de la dirección de casa matriz dejó de ser deuda de una pantalla y pasó a bloquear todo el programa de correos; y el aviso de pagos a contractors quedó con una pregunta pendiente sobre a qué carril pertenece.
-
-## 2026-08-24 — El rediseño de los pies de correo se revisó contra el sistema real, no contra su diseño
-
-- **El botón de "darse de baja" no funciona hoy.** El enlace del pie lleva a una dirección que el servidor no atiende, y el botón propio que Gmail muestra arriba del correo tampoco: los dos fallan. Además el sistema agrega ese enlace **solo, por accidente**, a cualquier correo enviado a más de una persona. La liquidación de sueldo llega a generar un permiso de baja de 30 días que nadie ve nunca. Arreglarlo pasa a ser condición previa del programa.
-- **La marca queda cerrada, no en discusión.** "Efeonce Greenhouse" no existe: Efeonce es la marca que lidera y Greenhouse es la plataforma, dos capas de la misma jerarquía y no dos opciones a elegir. Se corrigió el planteo excluyente que traía la task de marca, que ahora ejecuta la arquitectura ya aprobada en vez de reabrirla. Son cinco textos, ningún logo: el remitente, el tagline del pie, el texto alternativo del logo y los dos cuerpos de la invitación.
-- **Los correos en inglés muestran parte del pie en castellano.** El diccionario en inglés no tiene sección de correos: apunta al español por atajo, y ni el compilador ni las pruebas lo notan. Ya se ve en toda liquidación a colaboradores fuera de Chile.
-- **Los correos salen de dos lugares, no de uno.** Veinte tipos salen del servicio en la nube, seis salen del portal —los que uno espera en pantalla al apretar el botón— y tres salen de ambos. Para esos tres, actualizar un solo lado haría que el mismo documento llegue con dos pies distintos según si fue automático o reenviado a mano.
-- **Los datos legales del pie todavía no tienen camino ni política de respaldo.** Se adoptó la conducta que ya usan los PDF: si la base no responde, se usa el dato de respaldo y queda registrado; el RUT se omite antes que inventarse. Y la dirección de casa matriz tiene tres versiones distintas en el sistema, con una decisión pendiente que bloquea a todo el programa.
-- Se confirmó que el gobierno de la migración estaba bien: nada se cambia por herencia, cada tanda migra pocos tipos y cada una puede revertirse sola. También se corrigieron dos supuestos previos: el encabezado ya usa el logotipo de Efeonce en las treinta plantillas, y el pie sí tenía red de pruebas.
-
-## 2026-08-24 — Revisar postulaciones ya no obliga a entrar y salir del Pipeline
-
-- Application 360 permite pasar a la postulación anterior o siguiente de la **misma vacante y etapa**. La cola excluye archivadas y usa orden cronológico estable; no es un ranking y no consulta score, afinidad ni recomendaciones IA.
-- Si hay una decisión, corrección o nota sin guardar, Greenhouse pregunta antes de cambiar de postulación. En móvil el contador se compacta y la pestaña padre activa se mantiene visible.
-- Al volver por la pestaña `Pipeline`, Greenhouse recupera la postulación exacta incluso si quedó fuera del límite habitual, consume el foco temporal de la URL y deja la tarjeta enfocada. Si ya no existe, muestra una recuperación honesta en vez de seleccionar otra.
-- El recorrido `1 de 2 → 2 de 2 → Pipeline` pasó Playwright/GVC en 1440 y 390 px, con View Transition compartida y cero errores de consola, página, hidratación o red.
-- El contrato quedó incorporado en arquitectura y en las skills de Talent, Motion y GVC. La auditoría documental detectó que el snapshot del board aún puede incluir postulaciones archivadas; el delta no está listo para rollout hasta cerrar esa brecha.
-
-## 2026-08-23 — Los tests contra base real dejan de fallar por pisarse entre ellos
-
-- Los tests que corren contra la base de verdad ahora se ejecutan **de a uno**, no en paralelo: comparten una sola base con producción, así que correrlos a la vez hacía que se pisaran y fallaran sin motivo real.
-- Cada archivo de test usa **su propio candidato de prueba** en vez de tomarlo de una bolsa común de tres, que era la causa de que tres archivos se estorbaran entre sí.
-- Hay un comando nuevo para correrlos (`pnpm test:live`) que **sólo entrega credenciales de base**. Antes, la forma habitual de dárselas volcaba toda la configuración local al proceso y rompía quince tests de otros equipos que no tenían nada que ver.
-- Dos fallas que engañaban ahora se declaran: un test saltado ya no se puede confundir con uno exitoso, y si falta el túnel a la base el comando lo dice de entrada en vez de fallar al final.
-
-## 2026-08-23 — Quien no queda porque el cupo lo tomó otro ya no figura como rechazado
-
-- El cierre de una vacante llena registra ahora **«sin selección»** con la causa «vacante completada», no un descarte. La diferencia no es de palabras: un descarte es un juicio sobre la persona, la deja fuera del Banco de Talento por defecto y **cuenta como rechazo en el análisis que mide si un proceso discrimina**.
-- El operador ve **exactamente a cuántas personas afectaría** antes de confirmar, agrupadas por cómo entrarían. Quien está en pausa o es respaldo **no entra** salvo que se pida: una la dejó esperando alguien a propósito, y con la otra hay un compromiso abierto.
-- Si el resumen cambió desde que se miró, el sistema **no deja confirmar**: estarías cerrando un grupo distinto del que aprobaste.
-- El correo tiene su propio texto y su propio interruptor, así que se puede pausar un cierre masivo **sin silenciar** los correos de decisión individual. La frase «mantendremos tu perfil» aparece **sólo** si esa persona lo autorizó, verificado en el momento de enviar.
-- Nada de esto está encendido todavía: el cierre y el correo nacen apagados, a la espera del sign-off de Talent y Privacidad.
-
-## 2026-08-23 — Los follow-ups de Hiring quedaron vivos en producción
-
-- El eje de desenlace, el vocabulario de seis etapas, el filtro de procedencia del archivo sintético, el callejón de intentos del assessment y el predicado único de «proceso activo» pasaron a producción en el release `709e15f6688e` (PR #206, 140 archivos, 5 migraciones).
-- El monitor de equidad **sigue apagado a propósito**: su etapa por defecto quedó retirada por el contract nuevo, así que prenderlo hoy devolvería cero en silencio — y un cero silencioso en una métrica de equidad se lee como «no hay impacto adverso», que es lo contrario de lo que sabemos.
-- Producción quedó verificada más allá del health check: cero errores nuevos en Sentry, 321 eventos de outbox publicados desde el despliegue sin ninguno atascado, y las seis etapas renderizando en el pipeline con sesión real.
-- De paso se corrigieron dos instrucciones equivocadas de la propia documentación de release: la que verifica el worker de operaciones miraba una lista de rutas que ya no existe, y la receta del merge podía duplicar texto en los manuales sin que ninguna verificación lo notara.
-
-## 2026-08-23 — Application 360 vuelve al pipeline de la vacante que corresponde
-
-- La pestaña `Pipeline` ahora funciona como retorno contextual desde cualquier postulación: deriva la vacante desde `application.openingId`, en vez de caer en la vacante más reciente.
-- La URL conserva el scope de vacante y, al regresar, el Kanban enfoca la tarjeta de origen sin aplicar filtros que oculten a otros postulantes.
-- La tarjeta y el hero comparten una View Transition breve; reduced motion conserva el mismo destino y foco sin animación. La validación local pasó en 1440 y 390 px, sin errores de consola, página, hidratación ni red.
-
-## 2026-08-23 — Cinco personas reales eran buscables en el Banco de Talento por una postulación que alguien había retirado
-
-- «Postulación en proceso activo» pasó a tener **una sola definición** en toda la plataforma, y son **tres
-  ejes, no uno**: el proceso no terminó (`decision`) **y** el registro no fue retirado de la vista
-  (`archived_at`). Antes, once lugares distintos respondían esa pregunta mirando la **etapa**, cada uno con su
-  propia lista escrita a mano.
-- Preguntar por etapa fallaba por una razón concreta: **archivar devuelve la postulación a su etapa anterior**.
-  Una postulación archivada volvía a verse «en Preseleccionado», así que seguía contando como viva. Medido: **5
-  personas reales** figuraban como «en proceso activo» en el Banco de Talento —y por lo tanto buscables e
-  invitables— únicamente por una postulación que alguien había archivado a propósito. Pasan a
-  `needs_reconsent`.
-- La señal de salud de la asignación de pruebas dejó de vivir en amarillo por datos de humo (`ISSUE-162`):
-  contaba **13** postulaciones esperando, de las cuales **10 eran de prueba, archivadas**. Ahora cuenta **3**,
-  que son las reales, y **reporta aparte** las 10 que excluyó — un filtro que no dice cuánto dejó fuera es
-  indistinguible de un tope silencioso.
-- Si ves un conteo de activas más bajo que ayer, es esto y no se perdió ningún dato: las postulaciones
-  archivadas siguen completas, sólo dejaron de contarse como procesos vivos. Cuántas son se lee en
-  `/admin/operations`.
-- Un gate de CI rechaza que alguien vuelva a escribir la lista a mano, y una señal de confiabilidad detecta en
-  runtime lo que el gate no alcanza a ver.
-
-## 2026-08-23 — Los footers aprobados dejaron de depender de la imaginación del siguiente agente
-
-- El mockup aprobado ahora es el punto de partida obligatorio para implementar footers: conserva jerarquía,
-  espaciado, contraste, wordmark Efeonce, identidad legal, iconos sociales y reglas responsive.
-- Los cinco perfiles visuales no borran la semántica: representan siete propósitos, y suscripción opcional no se
-  confunde con marketing aunque compartan anatomía.
-- La skill de email ya no infiere baja desde `broadcast`: unsubscribe y RRSS dependen de propósito y consentimiento.
-- La revisión final endureció tipografía, jerarquía semántica, listas, tabla de policy, targets, foco y contraste en
-  los cinco perfiles; los diez estados desktop/mobile quedaron sin overflow y GVC no registró errores runtime.
-- Cada cohorte deberá probar Outlook Desktop Windows, Outlook Web, Gmail, un cliente WebKit e imágenes bloqueadas.
-  El mockup sigue siendo diseño aprobado, no evidencia de envío, deploy o runtime.
-
-## 2026-08-23 — Cuando el sistema intentaba mandar la prueba solo y se trababa, esa persona quedaba en un limbo que nadie veía
-
-- Si la prueba la asignaba una persona y se bloqueaba, corregir la causa y volver a proponer alcanzaba. Si la
-  iba a mandar el sistema solo, el intento quedaba registrado **reservando el lugar de esa persona en esa
-  vacante** — a propósito, para que un error de configuración no le mande tres veces la misma prueba a alguien.
-  Pero ese lugar reservado no tenía forma de liberarse, y mientras siguiera ahí la postulación **desaparecía de
-  las listas de recuperación**: no porque estuviera resuelta, sino porque el sistema ya había anotado que lo
-  intentó.
-- Lo grave no era que fuera irreversible: era que **las tres superficies que debían delatarlo callaban a la
-  vez**. La cola la excluía, la señal del panel era su espejo exacto, y la métrica que sí la contaba no movía
-  la alarma y además caducaba a las 24 horas. A las 24 h el caso salía hasta de la evidencia mientras la
-  persona seguía trabada.
-- Ahora esas postulaciones aparecen en una lista propia y quien gobierna la prueba de la vacante puede liberar
-  el lugar. Con dos condiciones que la plataforma verifica sola: **sólo se libera si hoy la prueba SÍ se
-  mandaría** —liberar con la causa viva vuelve a bloquear en el acto y gasta uno de los tres intentos de
-  recuperación de esa persona— y **tres recuperaciones por persona y vacante**, tras las cuales el caso pide
-  revisión humana.
-- Liberar **no manda ningún correo**, no borra el motivo del bloqueo y no devuelve cupo al tope de envíos de la
-  vacante: ese tope cuenta correos que ya salieron, y liberar no des-envía nada.
-- El panel distingue dos cosas que no son lo mismo: la que ya se puede destrabar **alarma**, y la que sigue
-  bloqueada por una causa vigente **no** — avisar de algo que nadie puede arreglar todavía es la forma más
-  rápida de que el equipo deje de mirar el tablero.
-- **Todavía no está en producción.** El código está completo y verificado contra la base real; falta el
-  release. Y de paso quedó abierto `ISSUE-162`: la señal de salud vive en amarillo por diez postulaciones de
-  prueba archivadas, no por un defecto real.
-
-## 2026-08-23 — Las trece etapas del pipeline quedaron en seis, y las que sobran ya no son etapas
-
-- El recorrido de una postulación se describía con trece etapas, y cinco de ellas no decían _dónde está_ la
-  persona sino _cómo terminó_: «seleccionado», «rechazado», «retirado». Dos preguntas distintas contestadas
-  con el mismo campo. Ahora el recorrido tiene seis etapas y el desenlace vive en su propio eje.
-- Otras dos, «calificado» y «revisión de cliente», se habían absorbido en «Evaluación» pero seguían existiendo
-  por debajo: era el origen del bug que dejó quince vacantes con su política de pruebas bien configurada y
-  ninguna disparando.
-- El contract que retira los siete literales de la base **está escrito y revisado, y todavía no aplicado**:
-  espera autorización. Hasta entonces el candado de seis vive en la aplicación y la base sigue aceptando trece.
-- Un detalle que parecía poda y era corrección: el mapa de «etapas posteriores al gatillo» listaba «revisión de
-  cliente» como posterior a «Evaluación», cuando el colapso la había metido **dentro**. Mandaba a revisión
-  humana postulaciones que la reconciliación automática sí sabe recuperar.
-- Y una deuda que se declara en vez de esconderse: el monitor de equidad medía su cubo terminal en una etapa
-  que dejó de existir. En vez de devolver cero —que en una métrica de equidad se lee como «no hay impacto
-  adverso»— ahora falla ruidoso, y no se prende hasta que se le apunte al eje correcto.
-
-## 2026-08-23 — El dominio de Hiring reparado llegó a producción, y el reloj de retención con él
-
-- Las cuatro correcciones del día estaban `code complete, rollout pendiente`: el eje de desenlace, el colapso de
-  trece etapas a seis, el filtro de procedencia del Banco de Talento y el callejón del ledger de asignación de
-  pruebas. Ninguna servía de nada mientras producción siguiera corriendo el código anterior. Ahora corren.
-- Viajó dentro el fix de una regresión con implicación legal: el reloj de retención de la Ley 21.719 no
-  arrancaba para `not_selected`, la población más grande del pipeline. No estaba viva porque producción todavía
-  no podía escribir ese desenlace — **se habría vuelto viva en el mismo instante en que este release lo
-  habilitó**. Por eso no podía quedar para el siguiente.
-- Quedan tres migraciones escritas y revisadas que **no** viajaron: viven fuera de `migrations/` a propósito,
-  porque una migración committeada y sin aplicar bloquea a cualquiera que corra `migrate:up`, incluido quien
-  esté reparando un incidente. Corren después del release, en cadena, y cada una espera que el código del
-  eslabón anterior esté desplegado.
-- La lección que ordena esa cadena, y que ya costó un incidente: **«cero filas» no es «nadie lo escribe»**. Lo
-  que decide si un valor es alcanzable es el contrato de la superficie desplegada, nunca el contenido de la
-  tabla.
-
-## 2026-08-22 — Mover a «Evaluación» ya no guarda una etapa distinta de la que muestra
-
-- El tablero mostraba seis columnas sobre trece etapas del dominio, y tres de ellas se veían todas como
-  «Evaluación». Soltar una tarjeta ahí guardaba `qualified`, mientras la automatización de pruebas vigilaba
-  `shortlisted`: **quince vacantes tenían su política bien configurada y ninguna disparaba**, sin que en pantalla
-  se viera nada raro. Dos candidatas reales cruzaron esa columna el 2026-08-19 y no recibieron su prueba.
-- Ahora hay una etapa por columna. `qualified` y `client_review` se absorbieron en `shortlisted`, y el carril del
-  tablero declara **una sola** etapa: la que lo titula es la que se escribe, así que ese error dejó de poder
-  cometerse. Siete postulaciones reales se movieron con el cambio y quedan visibles en la cola de reconciliación
-  de su vacante para que una persona decida si corresponde asignarles la prueba.
-- El desk leído en inglés mostraba las seis columnas en castellano: heredaba los nombres del diccionario es-CL sin
-  sobreescribirlos. Ya no.
-- **«Preselección» en el correo al candidato y «Evaluación» en el tablero se conservan distintos a propósito.**
-  Hacia afuera el registro es más suave, y decirle «Evaluación» chocaría con el correo del test, que ya dice
-  «tienes una evaluación pendiente». Queda escrito con su razón para que nadie lo lea como error.
-- Nada de esto está en producción todavía: allí mover a «Evaluación» sigue guardando la etapa vieja.
-
-## 2026-08-22 — Archivar un dato de prueba dejó de marcarlo como «Cerrado»
-
-- Archivar y cerrar eran la misma escritura, y no son la misma cosa. Cerrar significa que el proceso de una
-  persona terminó **con un desenlace que alguien declaró**; archivar sólo saca un registro de la vista. Al
-  mezclarlos quedaron 32 postulaciones de prueba marcadas como cerradas sin que nadie hubiera decidido nada.
-- Archivar ahora tiene su propia marca y **nunca** toca la etapa, y cubre las tres piezas de un candidato de
-  prueba: su postulación, su ficha y la vacante inventada. Una vacante que alguien ya cerró o llenó no se
-  reescribe.
-- El **Banco de Talento** dejó de mostrar personas de prueba **por su procedencia declarada**. Antes tampoco
-  aparecían, pero por casualidad: bastaba con que su estado en el ciclo de vida cambiara para que reaparecieran.
-- Nada de esto está en producción todavía: el cambio de las 32 filas ya escritas espera al despliegue.
-
-## 2026-08-22 — Demo 35 queda documentada antes de tocar la home del blog
-
-- La página candidata se revalidó read-only: siete raíces, 113 nodos y 15 widgets de posts; cuatro ya están
-  vacíos porque apuntan a attachments y otros dos pierden un slot. La estructura no falla por Elementor: falla el
-  contenido fijo si se borra antes de recablear cada bloque.
-- El contrato operativo deja explícito que Demo 35 debe seguir como página Elementor normal, nunca como
-  `page_for_posts`, y que el futuro corte debe conservar una sola canónica `/blog/`, sus metas Ohio y rollback.
-- La skill del sitio público ahora registra la landing, sus parámetros, guards y secuencia de adaptación. No se
-  modificó WordPress, Kinsta, formularios ni caché.
-
-## 2026-08-22 — Cerrar una postulación ahora obliga a decir cómo terminó
-
-- El proceso de una persona ya no se cierra arrastrando su tarjeta a «Cerrado». Cerrar es **decidir**, y la
-  decisión pide el desenlace. Ese camino silencioso, además de no avisarle a nadie, **congelaba el borrado de los
-  documentos de esa persona en todas sus postulaciones** — una obligación legal bloqueada sin que se notara.
-- Aparecen dos desenlaces que faltaban. **«Sin selección»** para quien llegó al final y no quedó: antes había que
-  marcarla como descarte, un juicio que nadie emitió, que la sacaba del Banco de Talento y que distorsionaba el
-  análisis de equidad de su cohorte. Y **«Sin respuesta»** para quien deja de responder: antes había que
-  inventarle un retiro que no declaró o un juicio que no hubo.
-- «Sin selección» **exige decir por qué**: el cupo lo tomó otra persona, se cerró la búsqueda o se canceló el
-  proceso. Es una lista cerrada, no texto libre, porque el embudo de equidad y el correo cambian según cuál sea.
-- **Una pausa deja de ser un cierre.** «Dejar en espera» desaparece: para pausar, la tarjeta se queda en la
-  columna «Decisión». Su proceso no terminó, así que no tiene desenlace.
-- Ningún desenlace nuevo manda correo todavía. Es deliberado: preferible no escribir a mandarle un correo de
-  rechazo a quien nadie rechazó. El correo de «Sin selección» llega con su propia entrega.
-
-## 2026-08-22 — Un test bloqueado ya no deja a esa persona sin segunda oportunidad
-
-- Corregir la causa de un bloqueo —registrar el correo, activar la plantilla, habilitar la política— y volver a
-  proponer ahora **sí asigna la prueba**. Antes el intento bloqueado ocupaba el cupo de esa persona de forma
-  permanente y no había forma de destrabarlo desde el portal.
-- El intento bloqueado no se borra: queda como intento 1 y el nuevo entra como intento 2, así que el historial
-  sigue diciendo qué pasó y en qué orden.
-- Lo que no cambió: una prueba ya asignada sigue sin reintentarse (para eso está cancelar), y un bloqueo del
-  carril automático —al mover de etapa— todavía no se destraba solo; hay que asignar a mano.
-- Sin migración ni flags. Verificado contra PostgreSQL real, no sólo con tests.
-
-## 2026-08-21 — El correo de selección celebra sin adelantar la incorporación
-
-- El asunto identifica nombre y vacante; el título visible evita duplicar el saludo y el cuerpo explica la
-  secuencia real: selección, carta oferta, aceptación y firma del contrato.
-- Las tres primeras rutas fueron rechazadas por resultar tecnológicas, genéricas o demasiado abstractas. Diseño +
-  Talent convergen en una V4 concreta: icono 3D de sobre abierto, tarjeta sin texto, check de confirmación y un único
-  destello naranja. El PNG transparente pesa 63.972 bytes y su URL respondió `200 image/png`.
-- HTML y texto plano conservan la misma verdad; la variante de rechazo no carga el hero. Código completo con
-  captura local revisada. La decisión, la carta oferta y el contrato reciben negritas visibles sobre frases
-  completas; las dos variantes de decisión firman `Equipo de Talento · Efeonce`, sin atribuir el mensaje a una
-  persona inexistente.
-  Rollout del template pendiente y ningún correo real enviado.

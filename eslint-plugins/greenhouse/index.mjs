@@ -38,6 +38,7 @@ import noExtractEpochFromDateSubtraction from './rules/no-extract-epoch-from-dat
 import noInlineFtrCalculation from './rules/no-inline-ftr-calculation.mjs'
 import noBqStructStringTimestamp from './rules/no-bq-struct-string-timestamp.mjs'
 import noFontsizeInlineTypography from './rules/no-fontsize-inline-typography.mjs'
+import noOpacityOnText from './rules/no-opacity-on-text.mjs'
 import noDirectFloatingUiInViews from './rules/no-direct-floating-ui-in-views.mjs'
 import noDirectGsapInViews from './rules/no-direct-gsap-in-views.mjs'
 import noHardcodedHexColor from './rules/no-hardcoded-hex-color.mjs'
@@ -70,6 +71,7 @@ const plugin = {
     'no-inline-ftr-calculation': noInlineFtrCalculation,
     'no-bq-struct-string-timestamp': noBqStructStringTimestamp,
     'no-fontsize-inline-typography': noFontsizeInlineTypography,
+    'no-opacity-on-text': noOpacityOnText,
     'no-direct-floating-ui-in-views': noDirectFloatingUiInViews,
     'no-direct-gsap-in-views': noDirectGsapInViews,
     'no-hardcoded-hex-color': noHardcodedHexColor,

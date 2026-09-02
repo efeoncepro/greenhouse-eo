@@ -87,7 +87,8 @@ calidad de datos 18%. **Más del 75% de los fracasos son de personas y proceso, 
 
 **Lo que NO puedes prometer:**
 - ❌ Un ranking en un LLM.
-- ❌ Una flota de agentes de IA (**solo tres Breeze Agents están en GA** ✅).
+- ❌ Una flota genérica de agentes o SLA sobre una superficie beta. Se cotiza agente/workflow por caso de uso,
+  elegibilidad, consumo, gobierno, evaluación y readback.
 - ❌ Paridad de features con lo que dejaron atrás (**no la va a haber, y está bien** — dilo).
 
 ---

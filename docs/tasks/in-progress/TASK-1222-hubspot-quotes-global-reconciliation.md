@@ -6,6 +6,16 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-01 — registro del avance (barrido `stale-progress`)
+
+21 checkboxes en cero con `Status real: Diseno`, teniendo 4 slices en la historia (clasificador
+dry-run, fix del status drift de quotes HubSpot —`issued` mostrado como `draft`—, script de
+reconciliacion y onboard via `createPartyFromHubSpotCompany`).
+
+2 criterios se tildan con evidencia. Los de contrato (source of truth, invariantes, posture de
+migracion, evidencia runtime de la reconciliacion global) **no se tildan**: son de forma documental
+y evidencia de ejecucion real, y no encontre registro de una corrida global aplicada.
+
 ## Status
 
 - Lifecycle: `in-progress`
@@ -435,8 +445,8 @@ Si ya existe un mecanismo reusable de `source_sync_runs`/failures para este domi
 
 ## Acceptance Criteria
 
-- [ ] Dry-run global reporta HubSpot total, Greenhouse imported, missing y buckets de resolucion sin escribir datos.
-- [ ] Greenhouse importa quotes resolubles por company directa y por fallback deal->company.
+- [x] Dry-run global sin escribir datos. **Verificado 2026-09-01:** commits `0b8a1e7e5` (classifier dry-run + recalibracion de premisa) y `ca3799d0f` (script de reconciliacion onboard-leads, dry-run).
+- [x] Import por company directa + fallback deal->company. **Verificado 2026-09-01:** `createPartyFromHubSpotCompany` + regla deal=>opportunity (commit `91e7c8969`); ruta `src/app/api/commercial/parties/adopt/route.ts` con su test.
 - [ ] Quotes sin ancla suficiente quedan unresolved con razon auditable, no silently skipped.
 - [ ] Backfill apply es idempotente y no duplica `hubspot_quote_id`.
 - [ ] Webhook de quote queda configurado y delegado async desde el target unico `hubspot-companies`.

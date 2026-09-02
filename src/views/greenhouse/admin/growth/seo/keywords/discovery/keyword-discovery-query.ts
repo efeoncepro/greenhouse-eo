@@ -14,10 +14,14 @@
 
 import type { SeoDiscoveryMethod, SeoDiscoveryRunStatus } from '@/lib/growth/seo/keyword-discovery/contracts'
 import { SEO_DISCOVERY_METHODS, SEO_DISCOVERY_RUN_STATUSES } from '@/lib/growth/seo/keyword-discovery/contracts'
+import type { SeoDiscoveryLinkBarrierFilterLevel } from '@/lib/growth/seo/keyword-discovery/contracts'
 import type { SeoSearchIntent } from '@/lib/growth/seo/keyword-market-data'
 
 /** Estado del candidato que la lente puede filtrar HOY, limitado a lo que el reader sostiene. */
 export type KeywordDiscoveryStateFilter = 'all' | 'untracked'
+
+/** Vocabulario cerrado de la barrera de enlaces filtrable (TASK-1694). */
+const LINK_BARRIERS: readonly SeoDiscoveryLinkBarrierFilterLevel[] = ['low', 'medium', 'high']
 
 export interface KeywordDiscoveryQuery {
   /** Corrida en foco. Sin ella el reader sólo devuelve el historial de corridas. */
@@ -30,6 +34,17 @@ export interface KeywordDiscoveryQuery {
   state: KeywordDiscoveryStateFilter
   status: SeoDiscoveryRunStatus | 'all'
   minVolume: number | null
+  /**
+   * Barrera de enlaces máxima (TASK-1694) — el filtro canónico de dificultad.
+   *
+   * 🔴 `maxDifficulty` NO entra al contrato y su ausencia es la MISMA decisión de siempre, ahora
+   * con el reemplazo disponible: el reader lo declara no-op y lo reporta en `ignoredFilters`
+   * porque `keyword_difficulty` colapsa a 0 en SERPs es-LATAM (ISSUE-152). Ofrecerlo como
+   * control visible sería devolverle al operador exactamente la decisión errada.
+   */
+  maxLinkBarrier: SeoDiscoveryLinkBarrierFilterLevel | 'all'
+  /** «Sin dato» no es «Baja»: por omisión un filtro de barrera NO deja pasar lo no medido. */
+  includeUnknownBarrier: boolean
 }
 
 const MAX_QUERY_CHARS = 120
@@ -57,6 +72,7 @@ export const parseKeywordDiscoveryQuery = (
   const rawState = readParam(params, 'state')
   const rawStatus = readParam(params, 'status')
   const rawMinVolume = Number.parseInt(readParam(params, 'minVolume'), 10)
+  const rawBarrier = readParam(params, 'maxLinkBarrier')
 
   return {
     discoveryRun: readParam(params, 'discoveryRun').trim() || null,
@@ -70,9 +86,24 @@ export const parseKeywordDiscoveryQuery = (
       ? (rawStatus as SeoDiscoveryRunStatus)
       : 'all',
     // Un volumen negativo o NaN no es "cero": es que no se pidió filtro.
-    minVolume: Number.isFinite(rawMinVolume) && rawMinVolume > 0 ? rawMinVolume : null
+    minVolume: Number.isFinite(rawMinVolume) && rawMinVolume > 0 ? rawMinVolume : null,
+    maxLinkBarrier: (LINK_BARRIERS as readonly string[]).includes(rawBarrier)
+      ? (rawBarrier as SeoDiscoveryLinkBarrierFilterLevel)
+      : 'all',
+    includeUnknownBarrier: readParam(params, 'includeUnknownBarrier') === 'true'
   }
 }
+
+/** ¿Cuántos filtros hay activos? Lo usa el botón `Filtros (N)` de 390px. */
+export const countActiveKeywordDiscoveryFilters = (query: KeywordDiscoveryQuery): number =>
+  [
+    query.q !== '',
+    query.source !== 'all',
+    query.intent !== 'all',
+    query.state !== 'all',
+    query.minVolume !== null,
+    query.maxLinkBarrier !== 'all'
+  ].filter(Boolean).length
 
 /**
  * Serializa de vuelta a query string, omitiendo defaults.
@@ -98,6 +129,8 @@ export const serializeKeywordDiscoveryQuery = (
   if (query.state && query.state !== 'all') params.set('state', query.state)
   if (query.status && query.status !== 'all') params.set('status', query.status)
   if (query.minVolume) params.set('minVolume', String(query.minVolume))
+  if (query.maxLinkBarrier && query.maxLinkBarrier !== 'all') params.set('maxLinkBarrier', query.maxLinkBarrier)
+  if (query.includeUnknownBarrier) params.set('includeUnknownBarrier', 'true')
 
   return params.toString()
 }

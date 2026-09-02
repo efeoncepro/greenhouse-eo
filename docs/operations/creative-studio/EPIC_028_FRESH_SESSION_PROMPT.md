@@ -22,6 +22,12 @@ Efeonce Globe es un PRODUCTO COMERCIAL de Efeonce (ADR-010), no un lab interno n
 estadio de rollout vigente es internal-only, runtime en `internal_smoke`, sin clientes externos
 (gate `TASK-1480`). NO confundas el estadio de rollout con la naturaleza del producto: el estadio
 dice hasta dónde llegó el despliegue, no qué es el producto ni cuál es su techo.
+Estado operativo al 2026-09-02: Globe está profundamente `hibernated` para detener gasto mientras no
+produce ingresos. Antes de cualquier deploy, migración, generación, canary, promoción o scheduler, relee
+`docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md` y sigue
+`docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md`. No despiertes recursos para hacer
+discovery o actualizar documentación; una autorización de gasto tampoco permite saltarse
+`hibernated -> draining -> active`.
 
 Antes de ejecutar una task:
 1. Lee `/Users/jreye/Documents/greenhouse-eo/AGENTS.md`, `project_context.md` y `Handoff.md`.
@@ -38,7 +44,7 @@ Antes de ejecutar una task:
 
 Estado que no debes rehacer:
 - `TASK-1454` y `TASK-1455` están completas: identity/SDK bridge keyless y brand/session shell internal-only
-  están live en Cloud Run, entorno internal-only (no es un despliegue desechable: hay Cloud SQL con
+  están preservados en Cloud Run, entorno internal-only (no es un despliegue desechable: hay Cloud SQL con
   PITR y deletion protection, front door propio con dominio y gasto real gobernado).
 - Existe un único proyecto GCP `efeonce-globe`, repo privado y monorepo Node 24.
 - Las specs `TASK-1456…1481` se gobiernan en Greenhouse; ver arriba las que ya cerraron.
@@ -57,7 +63,8 @@ Estado que no debes rehacer:
 
 Contrato parallel-first:
 - Model Lab/craft, plataforma gobernada y validación comercial avanzan en paralelo.
-- Probar modelos no espera Cloud SQL, wallet ni workbench si pasó el Lab execution gate.
+- La arquitectura permite probar modelos sin esperar wallet o workbench si pasó el Lab execution gate, pero
+  con Globe `hibernated` ninguna prueba facturable se ejecuta hasta completar la reactivación gobernada.
 - Lab gate: credential path keyless/Secret Manager, hard spend cap por run/día, input autorizado, private ingest,
   manifest inmutable, correlation, aprobación humana y kill switch.
 - Promoción a UI/MCP exige además tenancy, idempotencia, estimate/reservation, approval token, rights policy,

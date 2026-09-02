@@ -8,3 +8,14 @@ It is separate from the private Greenhouse app UI platform:
 - Public-site primitives: [PRIMITIVES.md](./PRIMITIVES.md), backed by WordPress/Elementor runtime code in `/Users/jreye/Documents/efeonce-public-site-runtime`.
 
 Use this folder when a reusable public landing component, Elementor widget, host adapter, or page pattern needs a long-lived contract.
+
+## Landing contracts
+
+- [Content Marketing / Content Ops](CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md) — trece widgets
+  semánticos, captura Growth Forms y SEO sobre la página existente; incluye límites y evidencia.
+
+## Shared surfaces
+
+- [Public Site Miscellaneous Surfaces V1](PUBLIC_MISCELLANEOUS_SURFACES_V1.md) — ownership propuesto para
+  404, búsqueda, no-results y archivos; separa recovery, search, editorial archives y chrome global sin
+  confundir composición visual con HTTP/SEO. Aún no implementado.

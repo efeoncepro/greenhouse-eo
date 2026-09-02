@@ -23,20 +23,24 @@
 | **Growth Specialist (GS)** | El rep de HubSpot que gestiona una cuenta existente. Con él se coordina el *shared deal* de un cross-sell |
 | **Membership** | **USD 400/mes** desde el 2026-07-15. **Se exonera si tu suscripción neta post-discount supera USD 400/mes** |
 
-## Producto HubSpot (as-of 2026-07)
+## Producto HubSpot (as-of 2026-08-30)
 
 | Término | Qué es |
 |---|---|
-| **Smart CRM** | El sistema de registro base. Se vende también standalone |
-| **Customer Platform** | El bundle: Marketing + Sales + Service + Content + Data |
+| **Smart CRM** | El fundamento compartido de contexto y registro; no es un séptimo Hub |
+| **Customer Platform** | Seis Hubs conectados a Smart CRM: Marketing, Sales, Service, Content, Data y Revenue |
 | **Data Hub** | ⚠️ **Ex-Operations Hub.** No coexisten. Data sync, calidad de datos, **Data Studio**, conectores a Snowflake/BigQuery (Enterprise) |
 | **Revenue Hub** | ⚠️ **Ex-Commerce Hub.** Ahora es **quote-to-cash completo**: CPQ, contratos, subscription billing, e-signature, pagos |
 | **Content Hub** | CMS, blog, landing pages, memberships, multisite |
 | **HubSpot AEO** | 🆕 *Answer Engine Optimization*. Mide visibilidad de marca en ChatGPT/Gemini/Perplexity. **USD 50/mo standalone; incluido en Marketing Pro/Enterprise** |
 | **Breeze** | La capa de IA transversal |
 | **Breeze Assistant** | ⚠️ Ex-*Breeze Copilot*. La interfaz conversacional. **GA**, incluido en todos los planes |
-| **Breeze Agents** | Automatización de tareas. 🔴 **"Mostly Beta"** — solo **tres en GA**: Customer, Prospecting, Data |
-| **Breeze Studio** | Donde se construyen y configuran assistants y agents |
+| **Agent Hub** | Workspace beta que centraliza agentes preconstruidos, custom y agentic workflows; no es un Hub de producto |
+| **Agent Builder** | Superficie para configurar agentes custom, inputs, instructions, tools, knowledge y automation |
+| **Breeze Agents** | Agentes de HubSpot cuyo roster, estado y elegibilidad deben verificarse por capacidad y portal |
+| **Projects** | Objeto CRM para organizar trabajo; distinto de developer projects y no equivalente a un PSA completo |
+| **Services** | Objeto CRM para representar ofertas entregadas; distinto de Service Hub y de un servicio Efeonce |
+| **Contracts** | Objeto de Revenue Hub que centraliza revenue comprometido y habilita change/renewal quotes según elegibilidad |
 | **Custom Assistants** | 🔴 **Sunset.** Read-only desde el **2026-07-13**; migran a "Breeze projects" |
 | **HubSpot Credits** | La moneda de Breeze. **USD 0,010/crédito.** 🔴 **NO se suman entre hubs** (manda el tier más alto) y **no hay rollover** |
 | **Outcome-based pricing** | Desde el **2026-04-14**: Customer Agent cobra **USD 0,50 por conversación RESUELTA**; Prospecting Agent **USD 1,00 por lead recomendado**. Las que no resuelven no cuestan |

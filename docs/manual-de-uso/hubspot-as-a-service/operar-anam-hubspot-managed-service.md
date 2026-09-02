@@ -1,8 +1,8 @@
 # Operar ANAM HubSpot Managed Service
 
 > **Tipo:** Manual de uso / runbook
-> **Versión:** 1.4
-> **Actualizado:** 2026-07-24
+> **Versión:** 2.0
+> **Actualizado:** 2026-09-02
 > **Portal obligatorio:** ANAM `19893546`
 > **Funcional:** [`../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md`](../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md)
 > **Servicios:** [Customer Agent gestionado](../../services/hubspot-as-a-service/hubspot-customer-agent-managed-service.md) · [RevOps, automatización y paneles](../../services/hubspot-as-a-service/hubspot-revops-architecture-automation-and-dashboards.md)
@@ -24,6 +24,9 @@ acción y cadencia; no un score cosmético ni una atribución automática de cul
 ### Diaria
 
 - Revisa disponibilidad, créditos, conversaciones no resueltas y transferencias de Customer Agent.
+- Para diagnosticar el routing de Emma, sigue la
+  [secuencia técnica de `1876744588`](../../architecture/kortex/hubspot-as-a-service/anam-customer-agent-handoff-workflow-1876744588.md):
+  inscripción, resumen, clasificación, borrado del owner, rama, principal, reemplazo y owner efectivo.
 - Revisa tareas de `1852406585`: una tarea solicita validar; no vuelve al Service activo ni apto para KPI.
 - Atiende excepciones urgentes de Data Quality por owner, corrigiendo en el punto de captura.
 
@@ -104,16 +107,74 @@ aditivo por selección.
 ## Monitorear Customer Agent
 
 - Abre el [source pack live](../../architecture/kortex/hubspot-as-a-service/anam-customer-agent-source-pack/README.md) y compara inventario, fecha de sincronización y directrices publicadas contra HubSpot.
+- Verifica que la identidad visible sea `Emma`, que el saludo publicado diga `Soy Emma, de ANAM` y que el preview
+  responda `Hola, soy Emma.`. El nombre de la landing, el perfil y las directrices deben converger.
 - Prueba lenguaje natural, memoria multi-turno, exactitud, administración/facturación, reclamos y mixed intent.
 - Distingue limitación nativa de transferencia de defecto de configuración.
 - Antes de cambiar knowledge, reconcilia el source pack; no lo reconstruyas desde memoria o adjuntos no clasificados.
 - Publicación, permisos, acciones y handoff requieren aprobación explícita.
+- Un cambio de nombre no autoriza modificar personalidad, conocimiento, permisos, acciones, handoff, routing ni
+  canales. Confirma cada capa por separado y registra `Borrador (0)` después de publicar.
 - El readback del 2026-07-24 confirmó que el agente está operativo. Verifica canal activo, conversación nueva,
   respuesta y consumo antes de declarar disponibilidad; la presencia del chatflow por sí sola no basta.
 - Mantén el copy de transferencia independiente del assignee: `una persona del equipo` o `el ejecutivo asignado`.
   El nombre del responsable vive sólo en la configuración interna.
 - Para Seguimiento, no redirijas a cotización ni a residuos/aguas/lodos: limita el flujo a resultados,
   programación y facturación. Para Calidad, confirma nombre, empresa, correo y detalle antes de transferir.
+- Confirma que Emma use el workflow `1876744588` y que esté `ACTIVADA` / `sin problemas`. La matriz vigente es:
+  cotización Pablo → María Paz; seguimiento Marco → Pablo; Calidad/facturación/otros María Paz → Marco.
+- El workflow debe borrar `Propietario del ticket` antes de la ramificación. Cada primaria usa sólo usuarios
+  disponibles; el reemplazo conserva `Sobrescribir` desactivado para no desplazar una primaria exitosa.
+- Prueba desde el chat público y registra que es QA fuera del mensaje sustantivo, por ejemplo en la bitácora o
+  evidencia del escenario. En los registros de acciones confirma clasificación, borrado de Emma, propietario
+  primario o reemplazo y `Workflow terminado`. No antepongas `QA`, `PRUEBA` ni nombres de ramas al texto que
+  clasifica la IA porque pueden sesgar la intención. No borres el ticket: conserva evidencia auditable.
+- Si debes probar sólo el routing automático, termina el chat después de capturar la evidencia. Si debes probar
+  continuidad humana, mantenlo abierto: un chat terminado no se puede reabrir.
+- Para transferir desde una primera persona a otra en el mismo chat: abre el ticket en Help Desk, confirma que la
+  conversación siga abierta, cambia `Propietario del ticket`, deja una nota interna si hace falta y pide que el
+  nuevo owner responda en el mismo hilo. No vuelvas a invocar a Emma ni abras una conversación nueva.
+- Una petición libre por Pablo, Marco o María Paz activa atención humana, pero el workflow vigente no resuelve el
+  nombre. Confirma un destinatario nominal sólo después de que una condición gobernada o la reasignación manual
+  demuestre el owner efectivo.
+- Si el preflight vuelve a marcar `Registraré tu consulta`, trátalo como una deuda conversacional independiente:
+  corrige la promesa sólo con aprobación y repite la regresión; no la mezcles con una edición de identidad.
+
+## Operar y validar la landing de Emma
+
+La landing pública es `https://anam-2.hubspotpagebuilder.com/agente-anam`; su fuente vive fuera de Greenhouse en
+`/Users/jreye/Documents/dev/kortex/hubspot-cms-react-project`. Opera siempre el perfil `anam` y el portal
+`19893546`; no cambies la cuenta default de Kortex/Efeonce.
+
+Antes de subir:
+
+1. Revisa el diff local y preserva cambios ajenos.
+2. Ejecuta `hs project validate --profile anam`.
+3. Confirma que el selector conserva tres opciones con `aria-pressed` y que sólo `Conversar con Emma` tiene
+   `data-chat-intent`.
+4. Verifica que el header use `anam-logo-horizontal.svg`, sin el círculo superior, y que la camisa de Emma diga
+   exactamente `ANÁLISIS AMBIENTALES S.A.`.
+5. Si se corrige texto integrado en el personaje o la ropa, usa edición generativa, guarda un asset versionado y
+   conserva el anterior como rollback. No superpongas texto determinista: el operador descartó ese tratamiento.
+
+Para desplegar y leer de vuelta:
+
+```bash
+hs project upload --profile anam
+hs project info --account 19893546 --json
+curl -s -L https://anam-2.hubspotpagebuilder.com/agente-anam | rg -o "kortex-cms-react/[0-9]+" | sort -u
+```
+
+No declares la publicación por el estado del build: espera a que la URL pública sirva el mismo número de asset.
+Después valida 1440 x 1100 y 390 x 1000, `scrollWidth === clientWidth`, margen exterior en cero, selección por
+clic y teclado, transferencia del intent al CTA y ausencia de errores de consola, página y red. El smoke no debe
+abrir ni enviar una conversación real.
+
+El cierre 2026-09-01 corresponde al build `#28`; su evidencia está en
+`.captures/anam-emma-corporate-name-build28-2026-09-01/`. Consulta el contrato técnico completo en
+[`../../architecture/kortex/hubspot-cms/anam-chat-landing.md`](../../architecture/kortex/hubspot-cms/anam-chat-landing.md)
+y el runbook de CMS en
+[`../../architecture/kortex/hubspot-cms/landing-page-runbook.md`](../../architecture/kortex/hubspot-cms/landing-page-runbook.md).
 
 ## Facturación prevista
 
@@ -133,9 +194,28 @@ aprobación humana precede cualquier write y el target está ligado a `19893546`
 Escala a ANAM/Maria Paz si falta definición/ratificación; a Efeonce si falta diseño, acceso, rollback o evidencia;
 y a plataforma sólo con evidencia runtime de defecto. Incluye IDs, período, esperado/observado y riesgo.
 
+## Clasificar solicitudes durante el soporte
+
+La ventana de soporte para Customer Agent y KPI va del **13 de agosto al 12 de noviembre de 2026, inclusive**.
+Antes de aceptar una solicitud, clasifícala así:
+
+| Tipo | Tratamiento |
+|---|---|
+| Incidente o diferencia frente al alcance entregado | Diagnosticar, corregir y leer de vuelta dentro del soporte. |
+| Duda de uso, operación o comportamiento inesperado | Orientar y registrar evidencia dentro del soporte. |
+| Recuperación de configuración o documento afectado por una corrección | Restaurar o actualizar dentro del soporte. |
+| Nueva funcionalidad, KPI, workflow, automatización, integración o rediseño | Registrar como evolución; requiere alcance, estimación y aprobación separados. |
+
+No describas el soporte como desarrollo continuo ni como una bolsa abierta de innovación. Para el cierre documental,
+usa los PDF como entregables, conserva HTML/CSS como fuente editable y verifica el SharePoint sólo cuando exista un
+enlace compartido. El borrador de correo y su lista de adjuntos están en
+[`../../documentation/hubspot-as-a-service/anam-entrega-documentacion-y-soporte-2026-09-02.md`](../../documentation/hubspot-as-a-service/anam-entrega-documentacion-y-soporte-2026-09-02.md).
+
 ## Referencias
 
 - [Catálogo HubSpot as a Service](../../services/hubspot-as-a-service/README.md)
+- [Landing CMS React de Emma](../../architecture/kortex/hubspot-cms/anam-chat-landing.md)
+- [Runbook de landing HubSpot CMS](../../architecture/kortex/hubspot-cms/landing-page-runbook.md)
 - [Modelo vivo](../../architecture/kortex/hubspot-as-a-service/anam-revops-data-model-and-object-synergies-v1.md)
 - [Roadmap](../../architecture/kortex/hubspot-as-a-service/anam-revops-implementation-roadmap-phases-2026-07-16.md)
 - [Sector/geografía](../../architecture/kortex/hubspot-as-a-service/anam-sector-geography-kpi-slice-change-set-2026-07-16.md)

@@ -7,12 +7,16 @@ ANAM is an Efeonce client, not a Greenhouse product initiative, internal dashboa
 ## Stable identifiers
 
 - HubSpot portal: `19893546`
-- Customer Agent: `Agente de clientes de ANAM`
-- Internal human handoff owner: Maria Paz Haeger; customer-facing copy must remain role-neutral because the
-  assignee can change.
+- Customer Agent: `Emma` (renamed live from `Agente de clientes de ANAM` on 2026-09-01)
+- Human handoff: ticket workflow `1876744588`; customer-facing copy remains role-neutral because the assignee
+  depends on intent and availability.
 - Public chat landing: `https://anam-2.hubspotpagebuilder.com/agente-anam`
 - CMS project: `kortex-cms-react`, project `103589049`
 - CLI account/profile: `anam-19893546` / `anam`; never replace the Kortex/Efeonce default.
+- Delivered-scope support: three months, 2026-08-13 through 2026-11-12 inclusive, for both Customer Agent and
+  KPI. It covers incidents, corrections, operating questions, configuration recovery and correction-driven
+  documentation. New functionality, KPI, workflows, automation, integrations, redesign or innovation require a
+  separately approved scope.
 
 ## Canonical documentation
 
@@ -40,9 +44,14 @@ ANAM is an Efeonce client, not a Greenhouse product initiative, internal dashboa
 - `docs/architecture/kortex/hubspot-as-a-service/anam-phase-3-panel-first-service-readiness-2026-07-16.md`
 - `docs/architecture/kortex/hubspot-as-a-service/anam-phase-3-forward-service-capture-contract-2026-07-16.md`
 - `docs/audits/ANAM_CUSTOMER_AGENT_QA_REPORT_2026-07-16.md`
+- `docs/audits/ANAM_CUSTOMER_AGENT_EMMA_IDENTITY_QA_2026-09-01.md`
+- `docs/audits/ANAM_CUSTOMER_AGENT_HANDOFF_E2E_QA_2026-09-01.md`
 - `docs/architecture/kortex/hubspot-as-a-service/anam-follow-up-change-set-2026-07-24.md`
 - `docs/audits/ANAM_COMMERCIAL_BACKLOG_DASHBOARD_QA_2026-07-24.md`
 - `docs/audits/ANAM_HUBSPOT_GOALS_EXECUTION_QA_2026-07-24.md`
+- `docs/documentation/hubspot-as-a-service/anam-entrega-documentacion-y-soporte-2026-09-02.md`
+- `docs/architecture/kortex/hubspot-as-a-service/reports/ANAM_Emma_Handoff_Especificacion_Tecnica_2026-09-02.pdf`
+- `docs/architecture/kortex/hubspot-as-a-service/reports/ANAM_Emma_Handoff_Documentacion_Funcional_2026-09-02.pdf`
 
 ## RevOps object model
 
@@ -107,7 +116,29 @@ When resuming ANAM from a handoff or deciding whether to advance a phase, first 
 
 ## Landing and agent seam
 
-Landing intents are `cotizar`, `seguimiento_servicio` and `requerimiento_calidad`. The supported seam is URL intent + `HubSpotConversations.widget.refresh({ openToNewThread: true })` and chatflow targeting. Composer prefill is not reliable in the current widget, especially before privacy consent.
+As of 2026-09-01, the public landing `https://anam-2.hubspotpagebuilder.com/agente-anam` serves build `#28` of
+HubSpot Developer Project `kortex-cms-react` (`103589049`) in portal `19893546`. Its source lives at
+`/Users/jreye/Documents/dev/kortex/hubspot-cms-react-project`; the Greenhouse canon is
+`docs/architecture/kortex/hubspot-cms/anam-chat-landing.md`.
+
+The live experience presents Emma as a named concierge, with one intent selector and one final CTA. Landing
+intents are `cotizar`, `seguimiento_servicio` and `requerimiento_calidad`. Selecting an option changes
+`aria-pressed` and prepares context without opening chat; only the final CTA carries `data-chat-intent`. The
+supported seam is URL intent + `HubSpotConversations.widget.refresh({ openToNewThread: true })` and chatflow
+targeting. Composer prefill is not reliable in the current widget, especially before privacy consent.
+
+Do not assume React client state is active on this CMS surface: the module is server-rendered, so runtime
+selection is controlled in `base.hubl.html`. The public deploy is not verified until the page itself serves
+`kortex-cms-react/<deployedBuildId>`, even if Developer Projects already reports the new build.
+
+Brand and asset contract:
+
+- use the horizontal ANAM wordmark from the repository without the circle above it;
+- Emma is a female assistant and her shirt must read exactly `ANÁLISIS AMBIENTALES S.A.`;
+- correct text integrated into the character or garment through a generative edit, save a versioned asset and
+  keep the previous version for rollback; do not add a deterministic text overlay;
+- verify desktop and 390 px, overflow, keyboard/click selection, `aria-pressed`, CTA context and console/page/
+  network errors without opening or submitting a real conversation.
 
 `Deployment > Workflows and bots` is the governed seam for routing only selected ANAM conversations to the Customer Agent. A candidate design is a short rule-based pre-flow that identifies one of the three landing intents, captures the minimum identifying/service context and then sends documented, repeatable needs to the agent while preserving explicit-person requests, commercial commitments, investigations, complaints/appeals and sensitive actions for human handling. This is a design pattern, not evidence of a live deployment: inventory the authenticated portal before proposing it, publish only with separate approval and verify positive, excluded, human-fallback and unavailable paths after activation.
 
@@ -118,10 +149,29 @@ alone never proves handling; use the 2026-07-24 operational readback and real-co
 ## Customer Agent capability backlog
 
 The 2026-07-24 readback shows the Customer Agent operational with 23 active sources, live chat configured all
-hours/100%, published Follow-up and Quality instructions and role-neutral customer-facing handoff copy. Internal
-Help Desk routing still targets Maria Paz Haeger until ANAM supplies the owner/fallback matrix. The
-post-publication live simulator accepted a prompt but did not answer within 45 seconds, so real-conversation
-regression and credit-behavior monitoring remain pending. There is still no documented runtime proof for CRM
+hours/100%, published Follow-up and Quality instructions and role-neutral customer-facing handoff copy. On
+2026-09-01 the visible profile and scripted greeting were published as `Emma`. Later that day the handoff matrix
+was implemented through active ticket workflow `1876744588`: quotation/new business routes to Pablo Puga with
+Maria Paz Haeger as availability fallback; service follow-up routes to Marco Jiménez Venegas with Pablo Puga as
+fallback; Quality, billing and other requests route to Maria Paz Haeger with Marco Jiménez Venegas as fallback.
+The workflow first summarizes and classifies the ticket, clears Emma as ticket owner, then applies the primary
+and fallback assignments with availability checks and without overwriting a successful primary assignment.
+
+Three public-chat E2E cases created tickets `48103069613`, `48105602378` and `48094218332`. The quotation case
+reached Pablo; the follow-up case classified correctly and used Pablo because Marco was unavailable; the Quality
+case reached Maria Paz. The original failed probe `48103382175` exposed and drove the owner-clear/classifier fix;
+the test chats were ended after verification. This proves routing, ticket ownership and the customer-facing owner
+label; it does not prove that a human replied or that a second human accepted a reassignment in the same chat.
+
+The configured mode is live handoff. While the chat remains open, the first human may manually reassign its ticket
+owner in Help Desk and the second human can continue in the same thread. Do not end a chat that needs this
+continuity because an ended chat cannot be reopened. The current workflow routes by intent and availability; it
+does not resolve arbitrary free-text names to Pablo, Marco or Maria Paz. A named-person request triggers human
+handoff, but the exact person requires a governed condition or manual reassignment and runtime proof before the
+public copy confirms the name.
+
+Credit-behavior monitoring remains open. There is still no
+documented runtime proof for CRM
 permissions, reply recommendations, contact/segment-aware testing, analytics/coaching, lead qualification or
 additional channels.
 

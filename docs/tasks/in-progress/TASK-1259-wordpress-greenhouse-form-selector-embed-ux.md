@@ -13,6 +13,27 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-01 — registro del avance (barrido `stale-progress`), con una correccion mia
+
+**Primera lectura EQUIVOCADA, corregida en la misma sesion.** Concluí «no empezada» porque no
+encontré selector ni widget Elementor en este repo. El error fue mio: **busqué en el repo
+equivocado**. El commit `66b6bacfa` («intake + selector WordPress construido») dice explicitamente
+que el **selector Elementor desde el catalogo de `TASK-1258` se construyo en el repo del runtime
+WordPress (commit `27c1468`), sin deploy**. Ausencia de codigo aca no es evidencia de que no exista.
+
+Estado real verificado: el selector Elementor **existe** en el runtime repo y no esta desplegado. El
+manual `docs/manual-de-uso/growth/incrustar-formulario-wordpress-astro.md` ya documenta el flujo de
+seleccion + config de constantes. Pendiente: **deploy Kinsta + rollout prod del catalogo + Gutenberg
++ GVC**.
+
+Ningun criterio se tilda: los suyos piden comportamiento renderizado (mismo form/version entre
+shortcode/block y widget, enqueue de handle unico sin duplicar scripts, estados
+empty/error/unpublished, evidencia GVC desktop/mobile) y **nada esta desplegado**.
+
+Nota sobre el detector: `stale-progress` no ve el otro repo, asi que su aviso aca se apoyaba en un
+commit de `TASK-1258`. El aviso resulto util igual — me hizo mirar, y mirar destapo que el trabajo
+existe en otra parte.
+
 ## Status
 
 - Lifecycle: `in-progress`
@@ -22,9 +43,12 @@
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
+- UI ready: `no`
+- Wireframe: `docs/ui/wireframes/TASK-1259-wordpress-greenhouse-form-selector-embed-ux.md`
+- Flow: `docs/ui/flows/TASK-1259-wordpress-greenhouse-form-selector-embed-ux-flow.md`
 - Backend impact: `none`
 - Epic: `EPIC-040`
-- Status real: `Diseno`
+- Status real: `Selector Elementor CONSTRUIDO en el repo del runtime WordPress (commit 27c1468), SIN deploy — verificado 2026-09-01 via el commit 66b6bacfa. Pendiente: deploy Kinsta + rollout prod del catalogo + Gutenberg + GVC. Los checkboxes en cero son correctos: piden comportamiento renderizado y nada esta desplegado`
 - Rank: `TBD`
 - Domain: `growth|public-site|wordpress|ui`
 - Blocked by: `TASK-1258`

@@ -35,6 +35,12 @@ greenhouse-cta, .ghc-scope {
   --gh-cta-accent: #023c70;
   --gh-cta-accent-2: #0375db;
   --gh-cta-accent-contrast: #ffffff;
+  /* ISSUE-168 — El acento tiene DOS roles y un solo valor no sirve para ambos:
+     como RELLENO (fondo del boton) el color de marca crudo es correcto; como TINTA
+     sobre una superficie tiene que ser scheme-aware. Mezclarlos dejo el eyebrow a
+     1.57:1 sobre la card oscura — el navy de marca pintaba el texto Y su propio chip,
+     asi que los dos se hundian juntos. Este token es la lectura ON-SURFACE del acento. */
+  --gh-cta-accent-ink: #023c70;
   --gh-cta-fg: #1f2937;
   --gh-cta-fg-muted: #55606e;
   --gh-cta-bg: #ffffff;
@@ -76,14 +82,40 @@ greenhouse-cta, .ghc-scope {
     --gh-cta-bg: light-dark(#ffffff, #10161f);
     --gh-cta-bg-soft: light-dark(#f5f7fa, #171f2b);
     --gh-cta-border: light-dark(#dde3ea, #263140);
+    /* Claro = el navy de marca sin cambios. Oscuro = su contraparte levantada:
+       7.75:1 sobre el propio chip del eyebrow, 8.02:1 sobre la card. */
+    /* El RELLENO tambien pertenece al eje de esquema — no solo la tinta. Corregi esto
+       despues de afirmar lo contrario: el navy de marca como fondo de boton sobre la
+       card oscura daba 1.63:1 contra ella, y WCAG 1.4.11 pide 3:1 para que un control
+       exista como FORMA. El boton estaba ahi y no se veia. En oscuro sube al azul
+       brillante que ya es de la marca (--gh-cta-accent-2): 3.95:1 de forma y 4.59:1
+       para su texto blanco. */
+    --gh-cta-accent: light-dark(#023c70, #0375db);
+    --gh-cta-accent-ink: light-dark(#023c70, #7fb0e8);
     --gh-cta-shadow: 0 1px 2px light-dark(rgba(15, 23, 42, 0.06), rgba(0, 0, 0, 0.4));
   }
 
   greenhouse-cta[data-color-scheme='light'], .ghc-scope[data-color-scheme='light'] { color-scheme: light; }
+  /* ISSUE-168 — Contraparte explicita. Sin ella, heredar 'dark' del anfitrion no hacia
+     nada: el CTA seguia mirando prefers-color-scheme y un host oscuro con el sistema en
+     claro se pintaba claro. Forzar solo una de las dos direcciones es medio contrato. */
+  greenhouse-cta[data-color-scheme='dark'], .ghc-scope[data-color-scheme='dark'] { color-scheme: dark; }
 }
 
 /* Fallback legacy (sin light-dark): dark por media query, igual que TASK-1340. */
 @supports not (color: light-dark(red, blue)) {
+  /* Sin light-dark(): el atributo explicito no puede depender de la media query. */
+  greenhouse-cta[data-color-scheme='dark'], .ghc-scope[data-color-scheme='dark'] {
+    --gh-cta-fg: #e6eaf0;
+    --gh-cta-fg-muted: #9aa6b5;
+    --gh-cta-bg: #10161f;
+    --gh-cta-bg-soft: #171f2b;
+    --gh-cta-border: #263140;
+    --gh-cta-accent: #0375db;
+    --gh-cta-accent-ink: #7fb0e8;
+    --gh-cta-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  }
+
   @media (prefers-color-scheme: dark) {
     greenhouse-cta:not([data-color-scheme='light']), .ghc-scope:not([data-color-scheme='light']) {
       --gh-cta-fg: #e6eaf0;
@@ -91,6 +123,8 @@ greenhouse-cta, .ghc-scope {
       --gh-cta-bg: #10161f;
       --gh-cta-bg-soft: #171f2b;
       --gh-cta-border: #263140;
+      --gh-cta-accent: #0375db;
+      --gh-cta-accent-ink: #7fb0e8;
       --gh-cta-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
     }
   }
@@ -130,8 +164,8 @@ greenhouse-cta, .ghc-scope {
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--gh-cta-accent);
-  background: color-mix(in srgb, var(--gh-cta-accent) 10%, transparent);
+  color: var(--gh-cta-accent-ink);
+  background: color-mix(in srgb, var(--gh-cta-accent-ink) 10%, transparent);
   border-radius: 999px;
   padding: 4px 10px;
 }
@@ -299,7 +333,8 @@ greenhouse-cta, .ghc-scope {
 :is(greenhouse-cta, .ghc-scope)[data-ghc-variant='minimal'] .ghc-card { background: transparent; border: 0; box-shadow: none; padding: 8px 0; }
 :is(greenhouse-cta, .ghc-scope)[data-ghc-variant='minimal'] .ghc-primary {
   background: transparent;
-  color: var(--gh-cta-accent);
+  /* Tinta, no relleno: el boton de minimal es texto sobre la card. */
+  color: var(--gh-cta-accent-ink);
   padding: 8px 4px;
   min-height: 44px;
   width: auto;

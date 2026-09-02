@@ -392,7 +392,7 @@ Privacy/Security/Product approval recorded in the accepted ADR. A consented cand
   conserva aun si issuance/action falla, mientras un savepoint revierte writes parciales antes del commit. La
   task no se cierra: migración, índice, flags/capabilities, deploy/readbacks y smokes staging/producción siguen
   pendientes; la documentación funcional/manual está preparada como pre-rollout y deberá recibir evidencia live.
-  TASK-1747 continúa to-do.
+  TASK-1747 cerró el 2026-09-01.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING

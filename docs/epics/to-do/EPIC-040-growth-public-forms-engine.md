@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Motor en producción sirviendo formularios reales (AEO, careers, ebooks) con 9 childs complete; 12 abiertas. Epic fundado 2026-08-05 para darle dueño a un motor que llevaba 21 tasks sin registro`
+- Status real: `Motor en producción sirviendo formularios reales (AEO, careers, ebooks) con 11 childs complete; 10 abiertas (medido 2026-09-01). Epic fundado 2026-08-05 para darle dueño a un motor que llevaba 21 tasks sin registro`
 - Rank: `TBD`
 - Domain: `growth`
 - Owner: `unassigned`
@@ -62,14 +62,14 @@ El motor existe, está en producción y tiene arquitectura + ADR propios — per
 - `TASK-1297` ✅ — **Identidad estable + contrato de render/copy.** `form_key` UUID opaco e inmutable en `form_definition`.
 - `TASK-1318` ✅ — **Captura de nombre completo + destination split.**
 - `TASK-1319` ✅ — **Success card: contrato & compiler** (`success_behavior_json`).
+- `TASK-1253` ✅ `complete` 2026-09-01 — **Validator registry + autoridad server-side + `national_id` multi-país.** El cliente no valida; el servidor manda.
+- `TASK-1335` ✅ `complete` 2026-09-01 — **CORS público + surface allowlist governance.** Elimina el allowlist hardcodeado y alinea el transporte browser con el registry gobernado. *(Movida desde EPIC-020, donde colgaba por ser el AEO su primer consumer.)*
 
 ### Abiertas — capacidades del motor
 
 - `TASK-1320` 🚧 `in-progress` — **Success card: renderer** (ui-ux). Cierra el loop visible del submit.
-- `TASK-1253` 🚧 `in-progress` — **Validator registry + autoridad server-side + `national_id` multi-país.** El cliente no valida; el servidor manda.
 - `TASK-1254` 🚧 `in-progress` — **Servicio de verificación de email + gate corporativo.** Transversal: cualquier formulario puede exigir correo corporativo verificado.
 - `TASK-1255` 🚧 `in-progress` — **PII hardening (Ley 21.719).** Postura PII tiered del motor. **Riesgo regulatorio: es la task de mayor consecuencia del epic.**
-- `TASK-1335` 🚧 `in-progress` — **CORS público + surface allowlist governance.** Elimina el allowlist hardcodeado y alinea el transporte browser con el registry gobernado. *(Movida desde EPIC-020, donde colgaba por ser el AEO su primer consumer.)*
 - `TASK-1342` 📋 `to-do` — **WebMCP agent tools.** Cada `<greenhouse-form>` publicado como tools browser-side: parity para agentes.
 - `TASK-1359` 📋 `to-do` — **Instrumentación de funnel multi-step** (eventos step-level → GA4). Hoy sólo se emite el submit final. *(Movida desde EPIC-020.)*
 

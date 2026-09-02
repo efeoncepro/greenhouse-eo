@@ -311,7 +311,7 @@ Reglas obligatorias:
   resolver DNS; ese fix ya vive en el archivo, así que esta task mueve el sustrato **ya endurecido**
   (incluido `probes/robots-policy.ts`) sin mezclar fix y movimiento. El valor entero de esta task
   sigue siendo un `git mv` verificable donde **ningún dependiente cambia una línea**.
-- **`TASK-1709`** (`to-do`, diagnóstico de prospecto) — **cuarto consumidor externo, agregado
+- **`TASK-1709`** (`complete` 2026-09-01, diagnóstico de prospecto) — **cuarto consumidor externo, agregado
   2026-08-26.** Su `Delta 2026-08-26` levantó la prohibición de fetch sobre el sitio del prospecto y
   la reemplazó por delegación: su `Slice 2b` consume `@/lib/growth/site-substrate` y **declara esta
   task como su único blocker externo** (`Blocked by: TASK-1697`). Refuerza la prioridad `P0`: sin la

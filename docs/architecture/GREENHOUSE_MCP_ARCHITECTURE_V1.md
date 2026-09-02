@@ -657,3 +657,87 @@ Reglas nuevas:
 - `TASK-659` sigue siendo la dueña de OAuth, hosted auth multiusuario, refresh/revocation y user-delegated scopes
 - si falta `GREENHOUSE_MCP_REMOTE_GATEWAY_TOKEN`, el endpoint remoto queda deshabilitado
 - el body máximo del gateway remoto se controla con `GREENHOUSE_MCP_REMOTE_MAX_BODY_BYTES` para evitar payloads no acotados
+
+## 22. Delta 2026-08-31 — El inventario de tools es un manifiesto (TASK-1780)
+
+Hasta acá el catálogo de tools existía dos veces: los `registerTool` de `src/mcp/greenhouse/server.ts`
+y una copia a mano en el repo del gateway. Ninguna estaba declarada dueña, y el resultado medible fue
+que el espejo se editó a mano dos veces en dos semanas mientras el servidor se anunciaba
+`greenhouse-read-only` registrando **siete** tools que escriben, cuatro de ellas comprometiendo gasto
+del proveedor.
+
+**Fuente única.** `src/mcp/greenhouse/tool-manifest.ts` declara las 43 tools con dos banderas
+**ortogonales** —`writes` y `spendsProviderBudget`—. Fusionarlas en un solo `readOnly` es el error que
+este delta cierra: hoy todo lo que gasta también escribe, pero una tool futura podría comprar datos sin
+mutar estado propio y el cliente MCP necesita saberlo igual.
+
+**Consumidores.** (1) `server.ts` registra **recorriendo el manifiesto**: una tool definida sin entrada,
+o una entrada sin definición, hace fallar la construcción del servidor nombrándola. (2) El `name` y las
+`instructions` se **derivan** del manifiesto, así que el cartel no puede volver a contradecir lo que el
+servidor hace. (3) El guard de paridad del gateway, vía artefacto generado.
+
+**Cómo viaja al gateway.** `pnpm mcp:manifest:generate` emite
+`src/mcp/greenhouse/tool-manifest.generated.json` —manifiesto ⨝ `inputKeys` obtenidos por
+**introspección** del servidor real, más `manifestHash`—; el gateway lo trae con
+`pnpm greenhouse:manifest:sync`. Es una copia, pero **generada**: el hash se verifica en los dos lados y
+`pnpm mcp:manifest:check` (gate en `ci.yml`) falla si el artefacto committeado difiere del registro vivo.
+La restricción que decidió la forma: el CI del gateway **no debe depender de un deployment vivo** para un
+gate de merge, lo que descartó publicar el inventario por HTTP.
+
+**Frontera intacta.** El manifiesto **no tiene campo de federación**: Greenhouse declara qué EXISTE, el
+gateway sigue decidiendo qué CRUZA con revisión humana por tool. Y como el gateway federa resolviendo
+contra rutas HTTP del lane, una capacidad puede estar federada **sin existir** como tool interna: ese caso
+se declara (`GREENHOUSE_GATEWAY_NATIVE_TOOLS`), nunca queda ausente en silencio. Caso vivo:
+`get_seo_provider_spend`.
+
+## 23. Delta 2026-09-02 — El manual de uso viaja por el protocolo (TASK-1804)
+
+§14 fijó la separación: MCP = capability layer, skills = behavior layer. Lo que faltaba era un
+**canal** para que la capa de comportamiento llegara al consumidor MCP sin pagar contexto en cada
+request. Hasta acá todo lo que un agente sabía sobre cómo operar las 43 tools cabía en las
+`instructions` del handshake (viajan en cada request) o se metía dentro de la `description` de una
+tool (caso vivo: el contrato del `proposalRef` dentro de `get_seo_competitor_candidates`), y
+`.claude/skills/**` no es publicable.
+
+**Manifiesto de manuales.** `src/mcp/greenhouse/skill-manifest.ts` declara los manuales (`name`,
+`audience`, `sourcePath`, `appliesTo` validado contra el manifiesto de tools). Es puro; el reader
+canónico `skill-catalog.ts` construye el catálogo desde `docs/mcp/skills/**`, toma `name` +
+`description` del frontmatter de cada `SKILL.md` (formato Agent Skills / SEP-2640, para no
+reescribir el día que el SDK implemente `skills/list`) y **falla la construcción del servidor** ante
+cualquier drift manifiesto↔filesystem, en las dos direcciones. Publicar es un acto explícito.
+
+**Un primitive, tres consumidores.** La tool `get_greenhouse_skill` (domain `platform`, lectura
+pura; sin `name` devuelve el catálogo, con `name` el manual como TEXTO), el recurso
+`skill://efeonce/<name>/SKILL.md` y la lane `GET /api/platform/ecosystem/mcp/skills[/{name}]`. La
+tool y el recurso del MCP interno piden el cuerpo a la lane —el servidor sigue siendo downstream
+de `api/platform/ecosystem/*`— y el gateway federado (`efeonce-mcp`, provider `greenhouse-skills`)
+también delega en la lane: cero contenido embebido, byte-idéntico en todos.
+
+**Gating por binding, anti-oráculo.** `audience: internal` sólo para bindings de scope `internal`;
+para cualquier otro, el manual no aparece en el catálogo y su detalle es `404` (nunca `403`).
+`audience: client` queda reservado hasta `TASK-1631`. Ningún manual publica contenido interno: lo
+controla un test de fuga sobre `docs/mcp/skills/**`, no una revisión.
+
+**Las `instructions` rutean en vez de contener.** `buildGreenhouseMcpServerIdentity` recibe
+también el manifiesto de manuales: el párrafo de gasto conserva la afirmación y la enumeración
+derivada de las tools que comprometen presupuesto, pero el procedimiento vive en
+`seo-spend-discipline` y sólo se rutea a él si ese manual gobierna a TODAS las que gastan (la
+derivación es real: sin la tool en el inventario o con un gastador sin cobertura, el texto inline
+se conserva).
+
+**Federación.** `get_greenhouse_skill` viaja en el artefacto (44 tools) y el gateway la deriva
+igual que las SEO. Como el guard de paridad está anclado al dominio SEO, el gateway gana
+`EXPECTED_GREENHOUSE_PLATFORM_TOOLS` + `computeFederatedNonSeoToolFindings`: toda tool no-SEO de
+Greenhouse que el gateway registre se declara con razón, y toda declarada está registrada, existe
+en el manifiesto, lleva `annotations` coherentes, no diverge en schema y deriva su descripción.
+Las 15 tools de plataforma fuera del alcance federado siguen siendo una decisión de frontera, no
+drift.
+
+**Runtime.** Los manuales viajan en el bundle como artefacto generado
+(`src/mcp/greenhouse/skill-catalog.generated.json`, `pnpm mcp:skills:generate` / `pnpm mcp:skills:check`
+en `local:check` y CI), no como filesystem input: la primera versión usó `outputFileTracingIncludes` y
+Vercel rechazó el build (la ruta dejó de agruparse y la función sola pesó 397 MB). El runtime re-verifica
+hashes y manifiesto al cargar. El smoke compara la cuenta EXACTA del catálogo. Sin flag (aditivo,
+lectura pura), sin Entra (scope base), sin persistencia.
+
+Invariantes operativos: `agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md` §8.

@@ -22,6 +22,7 @@ import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
 import type {
+  SeoSiteAuditFindingScope,
   SeoSiteAuditFindingSeverity,
   SeoSiteAuditFindingView,
   SeoSiteAuditRunStatus,
@@ -45,6 +46,7 @@ type FindingRow = {
   issue_type: string
   severity: SeoSiteAuditFindingSeverity
   detail: Record<string, unknown> | null
+  finding_scope: SeoSiteAuditFindingScope
 }
 
 type PreviousRunRow = {
@@ -126,7 +128,7 @@ export const readSiteAuditReport = async (
     }
 
     const findingRows = await runGreenhousePostgresQuery<FindingRow>(
-      `SELECT url, issue_type, severity, detail
+      `SELECT url, issue_type, severity, detail, finding_scope
          FROM greenhouse_growth.seo_site_audit_findings
         WHERE audit_run_id = $1
         ORDER BY CASE severity WHEN 'critical' THEN 0 WHEN 'warning' THEN 1 ELSE 2 END,
@@ -145,7 +147,10 @@ export const readSiteAuditReport = async (
         url: row.url,
         issueType: row.issue_type,
         severity: row.severity,
-        detail: row.detail ?? {}
+        detail: row.detail ?? {},
+        // Default defensivo: una fila sin alcance legible es de página (todo lo anterior a
+        // TASK-1670 lo es). Nunca al revés — inventar `site` inflaría el alcance del problema.
+        findingScope: row.finding_scope === 'site' ? 'site' : 'page'
       })
     }
 

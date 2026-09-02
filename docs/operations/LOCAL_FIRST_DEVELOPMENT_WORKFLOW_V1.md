@@ -48,7 +48,7 @@ Comandos canonicos agregados al repo:
 pnpm local:check
 ```
 
-Corre `pnpm lint` + `pnpm exec tsc --noEmit`. Es el minimo para cambios de codigo normales.
+Corre `pnpm local:check` = `nul-byte-gate` → `skills:mirrors` → `mcp:manifest:check` → `lint` → `tsc` (con `--max-old-space-size=8192`). Es el minimo para cambios de codigo normales.
 
 ```bash
 pnpm local:check:ui
@@ -159,6 +159,63 @@ TASK-931 optimiza el plano remoto: split CI, path filters, budgets y workflow/jo
 
 Este operating model optimiza el plano humano/agente: menos pushes innecesarios y mejor evidencia local antes de gastar compute remoto.
 
-## Delta YYYY-MM-DD
+## Delta 2026-08-29 — el push no termina hasta leer el veredicto
 
-N/A.
+Local-first mueve la iteracion barata al entorno local, pero no releva de leer CI cuando finalmente se
+empuja. El 2026-08-29 un agente empujo cuatro veces al hilo a `develop` sin abrir ningun resultado de
+`ci.yml`: dos runs quedaron en `failure` y nadie los miro; el rojo lo encontro una auditoria ajena horas
+despues, cuando reventó en CI Deep durante un release.
+
+Dos mecanismos vigentes de `ci.yml` hacen que la señal se vea intermitente en una rafaga, y ninguno es
+un bug: `cancel-in-progress` esta activo para `develop` (el veredicto es del ULTIMO push de la rafaga,
+no de cada commit) y `paths-ignore` deja sin run a los commits docs-only.
+
+Por eso la regla de la tabla de push policy —"push solo con validacion local y confirmacion humana"—
+se completa asi: despues de CADA push a `develop`, resolver el veredicto del SHA empujado.
+
+```bash
+gh run list --workflow=ci.yml --limit=100 --json headSha,conclusion \
+  -q ".[] | select(.headSha==\"$(git rev-parse HEAD)\") | .conclusion"
+```
+
+Vacio o `cancelled` significa **sin veredicto**, que no es lo mismo que verde. El cierre exige que el
+ultimo SHA de la rafaga salga `success`. Detalle completo del caso y sus reglas duras:
+`docs/operations/TASK_CLOSING_QUALITY_GATE_V1.md`.
+
+## Delta 2026-08-31 — `local:check` es un gate compartido: dos causas raíz cerradas
+
+El pre-push corre `pnpm local:check` sobre **todo el repo**, no sobre tu diff. Eso es correcto —es
+defensa en profundidad— pero convierte cualquier error ajeno en un bloqueo para todos. Dos causas
+raíz venían produciendo ese bloqueo de forma recurrente, y las dos se cerraron de raíz en vez de
+seguir tapándolas caso por caso.
+
+### 1. La extensión `.cjs` ES el contrato de módulo
+
+El bloque general de `eslint.config.mjs` declara `sourceType: 'module'` para todo el repo, así que un
+archivo `.cjs` —que Node ejecuta como CommonJS **por su extensión**— quedaba juzgado con las reglas
+del sistema de módulos equivocado: `require()` se reportaba como `@typescript-eslint/no-require-imports`
+y `module.exports` como `@next/next/no-assign-module-variable`.
+
+Cada vez que esto apareció se cerró **agregando un directorio entero al `ignores` global**:
+`ai-generations/**`, `generated/**` (2026-07-29, «43 errores de un WIP ajeno bloqueaban el pre-push
+de todos»), `.captures/**`, `.tmp/**`. Ignorar un directorio apaga **todas** las reglas ahí —incluidas
+las que sí importan— y no escala: el siguiente `.cjs` en un directorio nuevo repite el bloqueo.
+
+**Regla vigente:** existe un bloque `files: ['**/*.cjs']` con `sourceType: 'commonjs'` que apaga
+exactamente las tres reglas que contradicen el sistema de módulos. **NUNCA** agregar un directorio al
+`ignores` global para silenciar `require()` en un `.cjs`: eso ya está resuelto para todo el repo.
+**NUNCA** confundirlo con aflojar la regla — `no-require-imports` sigue activa en ESM/TS, que es
+donde existe para servir.
+
+### 2. Un directorio scratch gitignoreado no entra al programa tipado
+
+`tmp/` y `.tmp/` están en `.gitignore` y en el `ignores` de ESLint —son scratch donde los agentes
+dejan scripts desechables—, pero `tsconfig.json` incluía `**/*.ts` sin excluirlos. Un `.ts` de
+diagnóstico tirado ahí rompía `pnpm typecheck` y, con él, el pre-push de cualquiera. Caso fuente:
+`tmp/inspect-hubspot-forms.ts` (2026-08-31).
+
+**Regla vigente:** `tmp` y `.tmp` están en el `exclude` de `tsconfig.json`. **SIEMPRE** que se declare
+un directorio scratch gitignoreado, excluirlo en los **tres** planos —`.gitignore`, `ignores` de
+ESLint y `exclude` de tsconfig—; declararlo en dos de tres deja el gate roto por el tercero.
+⚠️ `tsconfig.json` se lee con `require()` en varios scripts, así que es JSON estricto: **no** admite
+comentarios. La razón se documenta acá, no en el archivo.

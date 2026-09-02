@@ -14,7 +14,7 @@
     ]
   },
   "scripts": {
-    "local:check": "pnpm nul-byte-gate && pnpm skills:mirrors && pnpm lint && NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit",
+    "local:check": "pnpm nul-byte-gate && pnpm skills:mirrors && pnpm mcp:manifest:check && pnpm mcp:skills:check && pnpm lint && NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit",
     "typecheck": "NODE_OPTIONS=--max-old-space-size=8192 pnpm exec tsc --noEmit",
     "local:check:full": "pnpm local:check && pnpm test && pnpm build",
     "local:check:ui": "pnpm local:check && pnpm design:lint && pnpm design-contract:lint && pnpm ui:code-lint --changed && pnpm build",
@@ -328,7 +328,12 @@
     "prepare": "husky",
     "tender:render": "tsx scripts/commercial/render-tender-doc.ts",
     "hubspot:glossary:render": "tsx scripts/documents/render-hubspot-glossary.ts",
-    "branding:favicon": "node scripts/branding/build-favicon.mjs"
+    "branding:favicon": "node scripts/branding/build-favicon.mjs",
+    "mcp:manifest:generate": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ci/mcp-tool-manifest-artifact.ts --write",
+    "mcp:manifest:check": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ci/mcp-tool-manifest-artifact.ts",
+    "mcp:skills:generate": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ci/mcp-skill-catalog-artifact.ts --write",
+    "mcp:skills:check": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ci/mcp-skill-catalog-artifact.ts",
+    "mcp:selection-eval": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/mcp/tool-selection-eval.ts"
   },
   "lint-staged": {
     "*.{ts,tsx,mjs,mts,js,jsx}": [

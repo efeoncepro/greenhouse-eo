@@ -17,6 +17,14 @@
 > `plan` posterior en "No changes". Herramienta **de ese apply**: OpenTofu v1.12.4, provider
 > `hashicorp/google` 6.50.0 — el pin vigente del carril es **`~> 7.0`**, ver el Delta de TASK-1508.
 > **Validado:** 2026-07-21. Sigue siendo internal-only: no habilita Producción, HA ni clientes externos.
+
+> **Delta 2026-09-02 (TASK-1807):** el IaC incorpora `globe_operating_state = active | draining |
+> hibernated`, con default fail-closed `hibernated`. La hibernación profunda detiene Cloud SQL
+> (`activation_policy = NEVER`), pausa los tres schedulers, cierra las vías productivas y conserva servicios
+> en scale-to-zero, datos, buckets, secretos, imágenes, IAM, red y state. El procedimiento completo de apagado,
+> reactivación, rollback, inventario y verificación vive en
+> [`GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md`](GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md). No saltes directamente
+> entre `active` y `hibernated`: usa `draining` y exige siempre cero deletes/replacements en el plan.
 >
 > **Delta 2026-07-21 (TASK-1508):** los **dos servicios Cloud Run** entraron a Terraform por import
 > brownfield (`2 imported, 2 changed, 0 destroyed`), junto con el invoker binding de la api
@@ -82,6 +90,11 @@ identidad de TASK-1454, el piloto interno y el SSO. Si el HCL no matchea la real
 `terraform apply` podría **destruir+recrear** una identidad viva y romper todo eso. Por
 eso el protocolo es: **import → plan → leer el plan → sólo aplicar si NO hay
 destroy/replace.**
+
+Esta regla también aplica a todo cambio de lifecycle. Los inputs de preservación y el estado operativo deben
+viajar explícitos en cada `plan`; un default local, un `terraform.tfvars` ignorado o una ejecución de deploy no
+pueden decidir por accidente si Globe despierta. La autoridad de procedimiento para esas transiciones es el
+runbook de hibernación profunda.
 
 ## Paso 0 — Bootstrap del state bucket (una vez, fuera de Terraform)
 

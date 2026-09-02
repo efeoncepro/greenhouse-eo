@@ -36,21 +36,43 @@ Capture:
 - any landing-specific widget hashes;
 - relevant Yoast/schema/meta if the change can affect SEO.
 
+For a guarded production writer, also check the ownership marker, current `page_on_front`,
+expected status and full document hash before snapshot/save. Register the affected widgets before
+validating their control keys: Elementor can initialize registration lazily. Refuse unknown controls
+or source drift before writing. Keep a durable snapshot option and exact runtime-file manifest;
+an old `/tmp` backup path is recovery evidence, not a guarantee that the archive still exists.
+
 ## After Save
 
+- Treat save, metadata updates, index rebuilding, cache invalidation and verification as separate stages.
+  A nonzero script exit after a write is not a rollback. Read the document and metas before retrying,
+  identify which stages completed, and finish only the missing work with fresh guards. In particular,
+  do not rerun an initial publication writer whose expected hash describes the replaced page.
 - Re-check the protected metas and hashes.
+- Compare decoded intended/readback trees and unchanged sibling widgets, page settings and protected
+  reference-page hashes. If Elementor drops a protected meta such as `_thumbnail_id`, restore its
+  captured value before reporting success and verify again. Do not restore unrelated concurrent edits.
 - Read `_elementor_data` back as decoded JSON and inspect the intended widget or
   semantic value. Raw string searches can fail because WordPress/Elementor may
   persist URLs as escaped `\/`; normalize only for diagnostics or traverse the
   decoded tree. A failed raw-string assertion after `Document::save()` does not
   prove the write failed. Inspect semantic readback and the live DOM before
   retrying, or a retry can duplicate the mutation.
+- Compare normalized metadata semantics when the owning plugin normalizes storage. Content Ops exposed
+  Yoast storing a requested robots-nofollow `0` as an empty value; verify the effective public robots
+  directives and headers as well as storage before declaring failure. This does not justify ignoring
+  arbitrary mismatches. SEO ownership/gates: `../seo-aeo/references/home-landing-metadata-schema.md`.
 - Expect `Document::save()` to synchronize `post_content` on some documents.
   Snapshot it, but do not require its pre-save hash to remain unchanged unless
   the current document contract proves it should. Protect semantic content and
   unrelated metas instead.
 - Do not treat missing `wp-content/uploads/elementor/css/post-<id>.css` immediately after save as failure. Elementor may delete generated CSS/cache; render the public page to regenerate.
 - Purge Kinsta cache after live mutation.
+- Invalidate Elementor element/files caches as applicable as well as Kinsta; new plugin templates may
+  otherwise coexist with stale rendered elements. Check the actual public bundle/render after reload.
+- If the first public request still serves old copy after purge, compare the normal URL, a cache-bypass
+  request and the saved document. Confirm eventual normal-URL readback before closing; do not repeat
+  a successful save merely to remedy stale HTML. A bypass-only pass is not the final public check.
 - Verify in browser at desktop and mobile 390px.
 
 ## Structural Rules
@@ -80,8 +102,9 @@ Useful Ohio controls to check before CSS:
 
 Visual guardrails:
 
-- Blue brand should dominate; green/teal is an accent, not a new base theme.
-- Keep runtime typography: Inter body, DM Sans headings/buttons.
+- For legacy native-Ohio compositions, preserve the existing blue base/green-teal accents and Inter
+  body/DM Sans headings. For an explicitly approved source-led landing, use its documented tokens and
+  typography inside the owned modules; do not silently restyle the approved export or shared chrome.
 - Fix hover/active states in widget controls first.
 - Motion must be subtle, enterprise-grade, and reduced-motion aware.
 
@@ -98,4 +121,7 @@ Visual guardrails:
 - Elementor post CSS can load after plugin or child-theme CSS. For typography/rhythm fixes, verify computed styles in the browser at desktop and mobile, especially `letter-spacing` on nested spans.
 - Absolute Ohio header elements such as inactive wide submenus can create false horizontal `scrollWidth` during visual captures. Identify off-screen offenders before blaming the section under test; scope any guard to the page and preserve hover/focus behavior.
 - Marquee/logo bugs are often composition bugs, not keyframe bugs: check set width versus viewport, number of duplicated sets, `translate()` fraction, animation duration, effective item widths, visible asset pixels, internal whitespace in the files, mask/fades, and empty wrappers.
+- Ohio `links-underline` can paint a `currentColor` background gradient over a filled CTA only after
+  sustained hover. Check computed `background-image` and the completed transition, not just the first
+  hover frame; use Ohio's native `-undash` exclusion on the affected link rather than patching all links.
 - Do not globally patch `#masthead`, footer, sidebar, or hero layers to hide a section seam.

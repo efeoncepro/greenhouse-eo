@@ -1,5 +1,11 @@
 # TASK-1704 — Cadencia y muestreo declarados: AIO no diario, N≥3 donde la calibración lo exige
 
+## Delta 2026-09-01 — desbloqueada
+
+`TASK-1699` quedó `complete`: la serie del top-N del SERP corre en producción desde el 2026-08-29
+(766 · 775 · 762 · 778 filas en sus primeros 4 días). Su bloqueo sobre esta task queda levantado.
+
+
 ## Delta 2026-08-28 (release a producción) — el bloqueante TASK-1699 ya corre en el runtime real
 
 El release `develop→main` `c983be7f18e68602404567a19ac8e7e0f157f742` (PR #208, run `33178544139`,
@@ -10,18 +16,17 @@ que esta task debe respetar ya no es sólo código en `develop`: es lo que corre
 `ops-seo-rank-capture` todos los días.
 
 Lo único que queda madurando es la **serie**, no el código: el día 1 es el **2026-08-29** (cron
-05:00 CLT). `TASK-1699` sigue `in-progress` sólo por esa verificación, no por implementación.
+05:00 CLT). `TASK-1699` quedó **`complete` el 2026-09-01**: desplegada en el release `c983be7f18e6`, con su serie corriendo (766·775·762·778 filas los días 29-ago a 1-sep) y su señal en `ok`.
 
 ## Delta 2026-08-28
 
-- El bloqueante `TASK-1699` quedó **code complete, rollout pendiente** (`in-progress/`, en develop
-  `fdfdedbe5`): el parseo del top-N ya no vive en `parseSerpRankObservation` sino en el parser
+- El bloqueante `TASK-1699` quedó **`complete` el 2026-09-01**: desplegada en el release `c983be7f18e6`, con su serie corriendo (766·775·762·778 filas los días 29-ago a 1-sep) y su señal en `ok` (este delta decía `code complete, rollout pendiente`; el release ocurrió el 2026-08-28): el parseo del top-N ya no vive en `parseSerpRankObservation` sino en el parser
   hermano `parseSerpTopResults`, cableado en el rank capture tras `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED`
   con tx atómica + fallback. La colisión de writer anticipada en §Risk map queda resuelta: 1699
   llegó primero, así que esta task adapta su slice de writer a esa forma ya declarada — cerrado por
   TASK-1699.
 - Las rutas `docs/tasks/to-do/TASK-1699-...` citadas en este archivo quedaron stale: la spec vive
-  en `docs/tasks/in-progress/`.
+  en `docs/tasks/complete/`.
 
 ## Delta 2026-08-27
 
@@ -57,7 +62,7 @@ Lo único que queda madurando es la **serie**, no el código: el día 1 es el **
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth`
-- Blocked by: `TASK-1699, TASK-1703`
+- Blocked by: `TASK-1703`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -248,8 +253,8 @@ Reglas obligatorias:
   (a) y el gasto extra del lado (b) no son comparables en una misma moneda, y el cambio de cadencia
   mueve el gasto sin dejarlo ver.
 - **`TASK-1699` — persistir el top-N del SERP que ya se paga**
-  (`docs/tasks/to-do/TASK-1699-growth-seo-persist-serp-top-n-already-paid.md`). Bloqueante para la
-  mitad (a): 1699 toca exactamente el mismo parseo (`parseSerpRankObservation`) y el mismo writer de
+  (`docs/tasks/complete/TASK-1699-growth-seo-persist-serp-top-n-already-paid.md`). Ya NO bloquea —cerrada
+  el 2026-09-01—, pero su forma sigue mandando para la mitad (a): 1699 toca exactamente el mismo parseo (`parseSerpRankObservation`) y el mismo writer de
   snapshot donde esta task inserta el registro de las señales **pedidas**. Si esta task llega
   primero, 1699 reescribe el writer sobre un contrato a medio hacer; si llega 1699 primero, el
   tri-estado se apoya en un payload de SERP ya persistido y el trabajo se reduce.

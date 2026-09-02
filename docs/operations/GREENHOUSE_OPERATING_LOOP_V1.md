@@ -82,12 +82,31 @@ Validar proporcionalmente:
 - GVC para UI visible;
 - smokes/runtime checks cuando el cambio depende de integraciones, flags, env vars, DB, workers o deploy.
 
+La verificacion no termina en el commit local. Si el trabajo se empujo, **leer el veredicto de CI del SHA
+empujado** es parte de esta fase, no de la siguiente:
+
+```bash
+gh run list --workflow=ci.yml --limit=100 --json headSha,conclusion \
+  -q ".[] | select(.headSha==\"$(git rev-parse HEAD)\") | .conclusion"
+```
+
+Vacio o `cancelled` significa **sin veredicto**, que no es lo mismo que verde: `ci.yml` cancela runs
+superseded en `develop` (`cancel-in-progress`) y omite los commits docs-only (`paths-ignore`). En una
+rafaga de pushes, el unico run que juzga el arbol que quedo es el del ultimo SHA, y tiene que salir
+`success`. Un rojo que nadie mira es funcionalmente igual a no tener el test. Caso fuente y reglas duras:
+`docs/operations/TASK_CLOSING_QUALITY_GATE_V1.md` (delta 2026-08-29).
+
 ### 6. Closure
 
 No declarar completo un cambio si falta runtime, rollout, docs o verificacion.
 
 El cierre debe sincronizar:
 
+- **el avance registrado DONDE SE LEE** — los checkboxes de `## Acceptance Criteria` que la
+  evidencia respalda (tildados, con la evidencia anotada) y `Status real` al dia; lo no verificado
+  queda **sin tildar y con la razon escrita**, porque tildar sin evidencia es peor que no tildar.
+  Un `## Delta` es prosa: nadie la lee para decidir si tomar el trabajo. Verificado por
+  `pnpm task:lint --task TASK-###` (reglas `stale-progress` y `stale-blocker`);
 - lifecycle del artefacto;
 - indices y registries;
 - `Handoff.md`;

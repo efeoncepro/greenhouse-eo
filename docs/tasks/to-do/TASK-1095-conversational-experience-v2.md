@@ -6,6 +6,16 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-01 — registro del avance (barrido `stale-progress`)
+
+32 checkboxes en cero con `Status real: Diseno`, cuando el commit `b258ac41f` ya bendijo
+`NexaAnswersSurfaceContext` como SSOT con guard de transversalidad. Ese criterio se tilda.
+
+El resto **no**: son entregables de DISENO (taxonomia de Nexa Moments, mapa de dominios, boundary
+documentado context/rendering/action) que no existen como documento. Para esta task el
+`Status real: Diseno` es casi correcto — lo que estaba mal es que un pedazo YA aterrizo en codigo y
+nadie lo registro.
+
 ## Status
 
 - Lifecycle: `to-do`
@@ -210,12 +220,12 @@ Alternativas que el ADR debe evaluar y rechazar o acotar:
 ## Normative Docs
 
 - `docs/tasks/complete/TASK-1093-greenhouse-conversational-experience-platform-v1.md`
-- `docs/tasks/in-progress/TASK-1090-answer-trace-promotion-spec.md`
+- `docs/tasks/complete/TASK-1090-answer-trace-promotion-spec.md`
 - `docs/tasks/complete/TASK-947-nexa-insights-detail-page-canonical.md`
 - `docs/tasks/complete/TASK-950-nexa-insights-list-page-canonical.md`
 - `docs/tasks/in-progress/TASK-1089-nexa-knowledge-answer-surface.md`
 - `docs/tasks/complete/TASK-1085-nexa-knowledge-retrieval-citations.md`
-- `docs/tasks/in-progress/TASK-1078-nexa-floating-chat-expandable-persisted.md`
+- `docs/tasks/complete/TASK-1078-nexa-floating-chat-expandable-persisted.md`
 - `docs/tasks/to-do/TASK-1079-nexa-interaction-mode-sidecar-c-and-preference.md`
 - `docs/tasks/in-progress/TASK-1092-nexa-knowledge-production-readiness-inline-citations.md`
 - `docs/documentation/plataforma/knowledge-platform.md`
@@ -691,7 +701,7 @@ Follow-up turns must carry prior conversational context and provenance reference
 - [ ] TASK-1095 consume `GREENHOUSE_NEXA_CORE_AGENTIC_PLATFORM_DECISION_V1.md` y declara a Nexa como capability core agentica de Greenhouse, no como feature local de Knowledge.
 - [ ] Existe una taxonomia inicial de `Nexa Moments` / `Conversational Moments` / `AI Moments` que distingue direct chat, embedded answer, promoted insight, operational recommendation, workflow copilot, technical/MCP moment y client self-service moment.
 - [ ] El mapa de dominios cubre Knowledge, Finance, Agency/Account 360, People, Commercial, Delivery/ICO, Client Portal y Admin/Ops con contexto, sensitivity, provenance y acciones potenciales.
-- [ ] `NexaAnswersSurfaceContext` queda bendecido como contrato canonico vigente o movido/promovido con compatibilidad clara.
+- [x] `NexaAnswersSurfaceContext` bendecido como contrato canonico. **Verificado 2026-09-01:** commit `b258ac41f` (bless como SSOT + guard de transversalidad); vive en `src/components/greenhouse/primitives/nexa-answers-canvas/`.
 - [ ] El boundary `context` vs `rendering` vs `action` queda documentado y no permite inferir permisos desde UI.
 - [ ] Las actions ejecutables declaran command/API/capability/audit/idempotencia cuando corresponda; V1 queda explain/suggest/recommend por defecto.
 - [ ] Reliability/evals minimos quedan definidos para context invalid, unsupported domain, proof unavailable, action unavailable y stale/partial data.

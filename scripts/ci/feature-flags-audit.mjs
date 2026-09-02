@@ -21,7 +21,7 @@
  */
 
 import { execSync } from 'node:child_process'
-import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { readdirSync, readFileSync, rmSync, statSync } from 'node:fs'
 import { join, extname } from 'node:path'
 
 const ROOT = process.cwd()
@@ -200,6 +200,74 @@ if (vercelOk) {
 
 const orphanEnv = vercelOk ? [...vercelFlags.keys()].filter(f => !codeFlags.has(f)).sort() : []
 
+// ── 4a. TASK-1699 follow-up — el ledger DECLARA un estado y el valor live es otro ────
+//
+// 🔴 `vercel env ls` sólo lista PRESENCIA (nombre + environments), nunca el VALOR. Por eso este
+// auditor era estructuralmente ciego a la contradicción más cara del ledger: una fila que dice
+// `prod: OFF` mientras el valor live es `"true"`.
+//
+// Medido el 2026-09-01: TRES filas en ese estado (`GROWTH_FORMS_SERVER_VALIDATION_ENABLED`,
+// `GROWTH_FORMS_EMAIL_VERIFICATION_ENABLED`, `GROWTH_FORMS_CATALOG_API_ENABLED`). El daño no es
+// cosmético: el ledger es el SoT humano que un agente lee para decidir si algo está desplegado.
+// Si dice "rollout pendiente" sobre algo que lleva meses vivo, el agente RE-EJECUTA trabajo
+// terminado — la misma clase de defecto que hizo repetir TASK-1699 cinco veces.
+//
+// Se compara sólo el caso inequívoco (ledger dice `prod: OFF`, live dice `true`) para que la
+// señal sea de alta precisión y no ruido sobre prosa libre. Si no se pueden leer los valores
+// (sin auth, sin red, CI), la sección se apaga sola: nunca inventa una contradicción.
+
+const ledgerDeclaresProdOff = flag => {
+  for (const line of ledgerText.split('\n')) {
+    // Sólo FILAS DE TABLA cuya PRIMERA celda es el flag. Escanear cualquier línea que lo
+    // mencione da falsos positivos contra los párrafos narrativos del ledger, que nombran varios
+    // flags y las palabras "prod"/"OFF" en cláusulas ajenas — medido: 32 reportados vs 3 reales.
+    if (!/^\|\s*`/.test(line)) continue
+
+    const firstCell = line.split('|')[1] ?? ''
+
+    if (firstCell.trim().replace(/`/g, '').split(/\s/)[0] !== flag) continue
+    if (/prod(?:ucción|uction)?\s*:\s*OFF/i.test(line)) return true
+  }
+
+  return false
+}
+
+const ledgerContradictsLive = []
+let liveValuesOk = false
+
+if (!NO_VERCEL) {
+  const tmp = join(ROOT, '.flags-audit-prod.env')
+
+  try {
+    execSync(`vercel env pull ${tmp} --environment=production --scope ${VERCEL_SCOPE}`, {
+      encoding: 'utf8',
+      stdio: 'pipe'
+    })
+
+    const pulled = readFileSync(tmp, 'utf8')
+
+    liveValuesOk = true
+
+    for (const flag of sortedCode) {
+      const match = pulled.match(new RegExp(`^${flag}="?([^"\n]*)"?$`, 'm'))
+
+      if (!match) continue
+      if (match[1] !== 'true') continue
+      if (!ledgerDeclaresProdOff(flag)) continue
+
+      ledgerContradictsLive.push(flag)
+    }
+  } catch {
+    // Sin credenciales/red: la sección se apaga. Un auditor que no puede medir no afirma.
+  } finally {
+    try {
+      rmSync(tmp, { force: true })
+    } catch {
+      /* nada que limpiar */
+    }
+  }
+}
+
 // ── 4b. ISSUE-150 — flags ON en Production sin su código en `main` ───────────
 //
 // Producción sirve `main`. Si el código que lee el flag sólo existe en
@@ -299,6 +367,16 @@ return
   for (const it of items) console.log('   ' + render(it))
 }
 
+if (liveValuesOk) {
+  section(
+    '🔴',
+    'El ledger DECLARA `prod: OFF` y el valor LIVE es `true` (drift que hace re-ejecutar trabajo hecho)',
+    ledgerContradictsLive,
+    f =>
+      `   ${c('red', f)} — corrige su fila en ${LEDGER_PATH}: alguien va a leer «rollout pendiente» sobre algo vivo`
+  )
+}
+
 section('📒', 'En código pero SIN registrar en el ledger', unregistered, f =>
   `${c('red', f)} ${c('dim', '→ agregar fila al § Inventario de FEATURE_FLAG_STATE_LEDGER.md')}`
 )
@@ -324,7 +402,7 @@ if (vercelOk) {
   )
 }
 
-console.log(`\n${c('dim', 'Verdad live = `vercel env ls`. Ledger humano = docs/operations/FEATURE_FLAG_STATE_LEDGER.md')}\n`)
+console.log(`\n${c('dim', 'Verdad live = `vercel env pull` (VALORES; `vercel env ls` solo dice que la var EXISTE). Ledger humano = docs/operations/FEATURE_FLAG_STATE_LEDGER.md')}\n`)
 
 if (prodWithoutCodeOnMain.length > 0) {
   // Falla SIEMPRE, no sólo en --strict: esto no es higiene documental, es un

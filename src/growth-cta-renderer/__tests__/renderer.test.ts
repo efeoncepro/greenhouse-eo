@@ -91,6 +91,78 @@ describe('CtaRenderer', () => {
     expect(root.querySelector('.ghc-form-slot')).not.toBeNull()
   })
 
+  // ─── ISSUE-167 — foco y salida por teclado del form revelado ────────────────
+
+  it('al abrir el form, el foco entra al contenido revelado y NO queda en el body', async () => {
+    const { root, renderer } = makeRenderer({
+      onPrimary: async slot => {
+        slot.innerHTML = '<input name="firstName" />'
+
+        return true
+      },
+    })
+
+    renderer.render()
+    ;(root.querySelector('.ghc-primary') as HTMLButtonElement).click()
+    await vi.waitFor(() => expect(root.dataset.ghcState).toBe('form_open'))
+
+    expect(document.activeElement).toBe(root.querySelector('input[name="firstName"]'))
+    expect(document.activeElement).not.toBe(document.body)
+  })
+
+  it('Escape COLAPSA el form al card, devuelve el foco y NO emite `dismissed`', async () => {
+    const { root, renderer, ingested } = makeRenderer({
+      onPrimary: async slot => {
+        slot.innerHTML = '<input name="firstName" />'
+
+        return true
+      },
+    })
+
+    renderer.render()
+
+    const primary = root.querySelector('.ghc-primary') as HTMLButtonElement
+
+    primary.click()
+    await vi.waitFor(() => expect(root.dataset.ghcState).toBe('form_open'))
+
+    const field = root.querySelector('input[name="firstName"]') as HTMLInputElement
+
+    field.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+
+    // Vuelve al card operable, no al CTA rechazado.
+    expect(root.dataset.ghcState).toBe('visible')
+    expect(root.querySelector('.ghc-form-slot')).toBeNull()
+    expect(primary.disabled).toBe(false)
+    expect(document.activeElement).toBe(primary)
+
+    // 🔴 `dismissed` es señal de NEGOCIO (el visitante rechazó la oferta). Cerrar un
+    // form abierto por curiosidad no es rechazar: emitirlo contaminaría la tasa.
+    expect(ingested.map(i => i.eventKind)).not.toContain('dismissed')
+  })
+
+  it('el boton «Ahora no» SI es rechazo y sigue emitiendo `dismissed`', () => {
+    const { root, renderer, ingested } = makeRenderer()
+
+    renderer.render()
+    ;(root.querySelector('.ghc-dismiss') as HTMLButtonElement).click()
+
+    expect(ingested.map(i => i.eventKind)).toContain('dismissed')
+    expect(root.dataset.ghcState).toBe('dismissed')
+  })
+
+  it('el handoff roto NO deja cableado el Escape (no hay superficie que cerrar)', async () => {
+    const { root, renderer, ingested } = makeRenderer({ onPrimary: async () => false })
+
+    renderer.render()
+    ;(root.querySelector('.ghc-primary') as HTMLButtonElement).click()
+    await vi.waitFor(() => expect(ingested.map(i => i.eventKind)).toContain('error'))
+
+    root.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+
+    expect(ingested.map(i => i.eventKind)).not.toContain('dismissed')
+  })
+
   it('handoff roto (onPrimary false) → restaura el CTA + error fail-closed', async () => {
     const { root, renderer, emitted, ingested } = makeRenderer({ onPrimary: async () => false })
 

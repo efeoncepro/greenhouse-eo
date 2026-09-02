@@ -375,9 +375,14 @@ servido contra el orden persistido**:
    salteo silencioso—, y (b) la secuencia servida == la secuencia persistida por rank —lo que atrapa
    el alias homónimo y la llave invisible—. Una sola de las dos deja pasar la otra.
 4. 🔴 **Correrlo sobre el dataset que EXHIBE cada estado, no sobre el más grande.** La #3 era
-   invisible en el snapshot de 501 filas (todo banda 1, donde el score sí ordena) y total en el de
-   105 (todo banda 2/3). Un verde sobre el dataset equivocado no prueba nada: elegir el dataset es
-   parte del protocolo.
+   invisible en el snapshot de 501 filas y total en el de 105 (55 filas de banda 2). Y el punto es
+   más fuerte de lo que parece: medidas las bandas del snapshot grande, tenía **CERO filas de
+   banda 2** (256 banda 1 / 245 banda 3) — no era un control débil por proporción, era un control
+   **estructuralmente imposible**: no podía mostrar el defecto ni con el bug puesto. Antes de dar
+   un dataset por control, mide que el estado que persigues EXISTE en él; un verde sobre un
+   dataset sin el estado no prueba nada. Elegir el dataset es parte del protocolo. Verificador
+   ejecutable del protocolo (reader real, paginación completa, cuenta+secuencia, sólo lectura):
+   `scripts/growth/_verify-work-queue-served-order.ts`.
 
 Un `LIMIT 10` de la primera página se ve perfecto en los tres bugs. Es el recorrido completo el que
 habla.
@@ -386,8 +391,9 @@ habla.
 `src/lib/growth/seo/work-queue/reader.ts` (docstring + keyset por rank),
 `src/lib/growth/seo/work-queue/materialize.ts` (el comparador, única autoridad de orden),
 `migrations/20260829213303021_task-1700-work-queue-rank-unique.sql` (unicidad estructural del rank)
-y `migrations/20260829000423538_task-1700-work-queue-keyset-collation.sql` (el índice del keyset
-reconstruido, huérfano tras el fix; retiro post-release). El detalle del dominio vive en
+y `migrations/20260829225504734_task-1700-retire-orphan-keyset-index.sql` (retiro del índice del
+keyset reconstruido, ejecutado DESPUÉS del release `e1718a359575` que promovió el fix — la
+secuencia contract-después-del-release en acción). El detalle del dominio vive en
 `.claude/rules/growth-seo.md`.
 
 ---
@@ -416,3 +422,27 @@ Cuál usar se decide por una sola pregunta — *¿la tabla se puede limpiar con 
 - **SIEMPRE** evaluar el veredicto **después** del bloque de limpieza: un `process.exit()` dentro del `try` se salta el `finally` y deja residuo justo cuando algo salió mal.
 
 **Mitigación de plataforma (medida, no asumida)**: `idle_in_transaction_session_timeout = 5min` está seteado **por rol** vía `ALTER ROLE` en `greenhouse_app` y `greenhouse_ops` — no como database flag de la instancia, así que no aparece en `gcloud sql instances describe`. Acota el lock leak de una transacción huérfana, pero **no protege del riesgo real**: los datos que se confirmaron en otra conexión ya están escritos y ningún timeout los revierte. `greenhouse_migrator_user` **no tiene ese override**.
+
+#### Delta 2026-08-29 — un bloque que escribe FUERA de la transacción que aborta deja residuo PERMANENTE (caso berel)
+
+La tabla de arriba supone que cada sanity elige **una** estrategia. El caso medido es el híbrido: el
+sanity de la cola SEO (`scripts/growth/_sanity-seo-work-queue-materialize.ts`) corría sus INSERT de
+snapshot dentro de la transacción que aborta (cero residuo), pero su bloque de DECISIONES escribía
+contra el pool **a propósito**, para demostrar que una decisión sobrevive al snapshot siguiente. Lo
+demostró: **en producción, para siempre** — 5 `dismissed` firmados por el sanity suprimieron las 3
+mayores oportunidades de la cola de un cliente real (berel: pinturas 72,14 clics incrementales,
+sellador 58,53, removedor 43,99) en cada snapshot futuro, porque `dismissed` es terminal.
+
+Se corrigió **sin borrar** (la tabla es append-only con trigger): decisión nueva que **supersede vía
+el command canónico**, apuntando al MISMO `item_id` del descarte original para que el par se lea
+junto, idempotente y cediendo ante decisiones humanas posteriores
+(`scripts/growth/_revert-sanity-work-queue-decisions.ts`).
+
+**Reglas**:
+
+- Un bloque de sanity que escribe **fuera** de la transacción que aborta hereda TODAS las
+  obligaciones de la fila "limpieza explícita" de la tabla — no las esquiva por convivir en el mismo
+  script con un bloque transaccional. La estrategia de limpieza se decide **ANTES de la primera
+  fila**, no al descubrir el residuo.
+- En una tabla append-only la limpieza es **supersede por el command canónico**, jamás `DELETE` —
+  y el supersede apunta al item del residuo original para que el par se lea junto.

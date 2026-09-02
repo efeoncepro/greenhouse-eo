@@ -17,14 +17,25 @@ import SurfaceRecipe from '@/components/greenhouse/primitives/surface-system/Sur
 import { isCanonicalApiError, throwIfNotOk } from '@/lib/api/parse-error-response'
 import { GH_GROWTH_SEO_KEYWORDS } from '@/lib/copy/growth'
 import { isDiscoveryRunStale } from '@/lib/growth/seo/keyword-discovery/contracts'
-import type { SeoDiscoveryMethod } from '@/lib/growth/seo/keyword-discovery/contracts'
+import type {
+  SeoDiscoveryMethod,
+  SeoDiscoveryRunStatus,
+  SeoDiscoverySourceKind
+} from '@/lib/growth/seo/keyword-discovery/contracts'
+import type { SeoDiscoverySeedSourceAvailability } from '@/lib/growth/seo/keyword-discovery/queue'
 import type { SeoDiscoveryCandidateView, SeoDiscoveryRunView } from '@/lib/growth/seo/keyword-discovery/reader'
 
 import KeywordsSurfaceHeader from '../KeywordsSurfaceHeader'
 import KeywordDiscoveryBuilder from './KeywordDiscoveryBuilder'
 import KeywordDiscoveryCandidateDrawer from './KeywordDiscoveryCandidateDrawer'
+import KeywordDiscoveryFilters from './KeywordDiscoveryFilters'
 import KeywordDiscoveryResults, { DISCOVERY_DRAWER_ID, resolveState } from './KeywordDiscoveryResults'
 import KeywordDiscoveryRunStatus from './KeywordDiscoveryRunStatus'
+import {
+  countActiveKeywordDiscoveryFilters,
+  serializeKeywordDiscoveryQuery,
+  type KeywordDiscoveryQuery
+} from './keyword-discovery-query'
 import {
   DISCOVERY_ENDPOINT,
   buildKeywordDiscoveryActionRequest,
@@ -54,6 +65,16 @@ import {
  * mentiría sobre una factura que crece todos los días.
  */
 
+/**
+ * ¿La corrida terminó de materializar candidatos?
+ *
+ * Sólo sobre una corrida asentada tiene sentido paginar: el cursor es un offset y en
+ * `pending`/`running` la lista sigue creciendo. `partial` SÍ es asentada — terminó, aunque
+ * incompleta, y lo que materializó no se mueve más.
+ */
+const runStatusIsSettled = (status: SeoDiscoveryRunStatus | null): boolean =>
+  status !== null && status !== 'pending' && status !== 'running'
+
 export interface KeywordDiscoveryWorkbenchProps {
   organizationId: string | null
   seoTargetId: string | null
@@ -69,6 +90,14 @@ export interface KeywordDiscoveryWorkbenchProps {
   run: SeoDiscoveryRunView | null
   candidates: SeoDiscoveryCandidateView[]
   totalCandidates: number
+  /** Cursor de la página siguiente que devolvió el reader; `null` = no queda nada por recorrer. */
+  nextCursor: string | null
+  /** Tamaño de página con el que el server pidió la primera; el cliente usa el mismo. */
+  pageSize: number
+  /** Insumo real de cada fuente de seed, resuelto server-side; `null` = no se pudo preguntar. */
+  seedSourceAvailability: SeoDiscoverySeedSourceAvailability | null
+  /** Estado de filtros ya parseado por el server; la UI lo edita y lo devuelve a la URL. */
+  discoveryQuery: KeywordDiscoveryQuery
 }
 
 const KeywordDiscoveryWorkbench = ({
@@ -83,7 +112,11 @@ const KeywordDiscoveryWorkbench = ({
   groundedDisabledReason,
   run,
   candidates,
-  totalCandidates
+  totalCandidates,
+  nextCursor,
+  pageSize,
+  seedSourceAvailability,
+  discoveryQuery
 }: KeywordDiscoveryWorkbenchProps) => {
   const copy = GH_GROWTH_SEO_KEYWORDS.discovery
   const router = useRouter()
@@ -113,9 +146,151 @@ const KeywordDiscoveryWorkbench = ({
    */
   const [pendingAction, setPendingAction] = useState<KeywordDiscoveryActionKind | null>(null)
 
+  /**
+   * ── TASK-1693 — páginas acumuladas ────────────────────────────────────────────────────
+   *
+   * Sólo vive acá lo que el server NO trajo: la primera página llega por props y las siguientes
+   * se acumulan en `extraPages`. Copiar también la primera al estado la congelaría — tras un
+   * `router.refresh()` (track, encolado, polling) las props se reproyectan y el estado local
+   * seguiría mostrando la foto vieja, que es el mismo defecto que el drawer evita guardando el
+   * id y no el objeto.
+   *
+   * El cursor vivo es el del server mientras nadie paginó, y el último que devolvió la ruta
+   * después. **Nunca se compone a mano**: es un offset serializado sobre un orden en memoria del
+   * reader, y fabricarlo acá acoplaría la vista a un detalle que el reader puede cambiar.
+   */
+  const [extraPages, setExtraPages] = useState<SeoDiscoveryCandidateView[]>([])
+  const [clientCursor, setClientCursor] = useState<string | null>(null)
+  const [pagingState, setPagingState] = useState<GreenhouseAsyncActionState>('idle')
+
+  const runId = run?.runId ?? null
+
+  /*
+   * Cambió la corrida o el server reproyectó: lo acumulado deja de pertenecer a esta lista y se
+   * descarta. Sin esto, encolar una corrida nueva dejaría pegadas abajo las páginas de la
+   * anterior, mezcladas y sin ninguna señal de que son de otra pregunta.
+   */
+  useEffect(() => {
+    setExtraPages([])
+    setClientCursor(null)
+    setPagingState('idle')
+  }, [runId, candidates])
+
+  const visibleCandidates = useMemo(() => [...candidates, ...extraPages], [candidates, extraPages])
+
+  const activeCursor = extraPages.length > 0 ? clientCursor : nextCursor
+
+  /*
+   * 🔴 Sobre una corrida VIVA no se pagina.
+   *
+   * El universo crece bajo los pies —el drain sigue materializando— y el polling de 20 s
+   * reproyecta la primera página cada rato. Paginar ahí devuelve filas duplicadas o saltadas sin
+   * que nadie lo note, porque el cursor es un offset sobre una lista que cambió de largo. La
+   * afordancia no se deshabilita: no se renderiza.
+   */
+  const runSettled = runStatusIsSettled(run?.status ?? null)
+  const canLoadMore = Boolean(activeCursor) && runSettled && Boolean(organizationId) && Boolean(runId)
+
+  /**
+   * Un filtro cambia la URL y el server vuelve a proyectar.
+   *
+   * 🔴 `router.replace` y no estado local: filtrar en cliente sobre una página mentiría sobre el
+   * universo filtrado. Además la URL queda compartible con los filtros puestos, que es lo que un
+   * operador hace cuando le pasa un hallazgo a alguien.
+   */
+  const applyFilters = (next: Partial<KeywordDiscoveryQuery>) => {
+    const merged = { ...discoveryQuery, ...next }
+
+    // Cambiar un filtro cambia el universo: el cursor viejo apunta a un offset de otra lista.
+    setExtraPages([])
+    setClientCursor(null)
+
+    router.replace(
+      `${window.location.pathname}?${serializeKeywordDiscoveryQuery(merged, { space: selectedSpaceId })}`,
+      { scroll: false }
+    )
+  }
+
+  const hasActiveFilters = countActiveKeywordDiscoveryFilters(discoveryQuery) > 0
+
+  const clearFilters = () =>
+    applyFilters({
+      q: '',
+      source: 'all',
+      intent: 'all',
+      state: 'all',
+      minVolume: null,
+      maxLinkBarrier: 'all',
+      includeUnknownBarrier: false
+    })
+
+  const handleLoadMore = async () => {
+    if (!organizationId || !runId || !activeCursor || pagingState === 'loading') return
+
+    setPagingState('loading')
+    setFeedback(null)
+
+    try {
+      const url = new URL(DISCOVERY_ENDPOINT, window.location.origin)
+
+      url.searchParams.set('organizationId', organizationId)
+      url.searchParams.set('runId', runId)
+      url.searchParams.set('cursor', activeCursor)
+      url.searchParams.set('limit', String(pageSize))
+
+      /*
+       * 🔴 Los filtros viajan también en la página siguiente. Sin ellos el server pagina sobre el
+       * universo COMPLETO mientras la primera página vino del filtrado: las filas nuevas no
+       * pertenecerían a la lista que el operador está mirando, y el offset apuntaría a otra
+       * cosa. Es el modo de falla más silencioso de todo este slice.
+       */
+      if (discoveryQuery.q) url.searchParams.set('query', discoveryQuery.q)
+      if (discoveryQuery.source !== 'all') url.searchParams.set('sourceEndpoint', discoveryQuery.source)
+      if (discoveryQuery.intent !== 'all') url.searchParams.set('intent', discoveryQuery.intent)
+      if (discoveryQuery.minVolume !== null) url.searchParams.set('minSearchVolume', String(discoveryQuery.minVolume))
+      if (discoveryQuery.maxLinkBarrier !== 'all') url.searchParams.set('maxLinkBarrier', discoveryQuery.maxLinkBarrier)
+      if (discoveryQuery.includeUnknownBarrier) url.searchParams.set('includeUnknownBarrier', 'true')
+      if (discoveryQuery.state === 'untracked') url.searchParams.set('excludeTracked', 'true')
+
+      const response = await fetch(url.toString(), { method: 'GET' })
+
+      await throwIfNotOk(response, copy.results.loadMoreError)
+
+      const payload = (await response.json()) as {
+        candidates?: SeoDiscoveryCandidateView[]
+        nextCursor?: string | null
+      }
+
+      const incoming = payload.candidates ?? []
+
+      /*
+       * Dedup por `candidateId` contra lo YA visible. El cursor es un offset: si entre dos
+       * páginas algo cambió el largo de la lista, el mismo candidato puede volver. Repetirlo en
+       * un canvas de comparación es peor que perderlo — el operador lo contaría dos veces.
+       */
+      setExtraPages(current => {
+        const seen = new Set([...candidates, ...current].map(candidate => candidate.candidateId))
+
+        return [...current, ...incoming.filter(candidate => !seen.has(candidate.candidateId))]
+      })
+
+      setClientCursor(payload.nextCursor ?? null)
+      setPagingState('success')
+    } catch (error) {
+      const canonical = isCanonicalApiError(error) ? error : null
+
+      setFeedback({
+        severity: 'error',
+        message: canonical?.message ?? copy.results.loadMoreError,
+        tracked: false
+      })
+      setPagingState('error')
+    }
+  }
+
   const selectedCandidate = useMemo(
-    () => candidates.find(candidate => candidate.candidateId === selectedCandidateId) ?? null,
-    [candidates, selectedCandidateId]
+    () => visibleCandidates.find(candidate => candidate.candidateId === selectedCandidateId) ?? null,
+    [visibleCandidates, selectedCandidateId]
   )
 
   // El trigger que abrió el drawer: `AdaptiveSidecarLayout` le devuelve el foco al cerrar, para
@@ -132,10 +307,12 @@ const KeywordDiscoveryWorkbench = ({
   )
 
   const handleSubmit = async ({
+    seedSource,
     seeds,
     methods,
     resultsPerCall
   }: {
+    seedSource: SeoDiscoverySourceKind
     seeds: string[]
     methods: SeoDiscoveryMethod[]
     resultsPerCall: number
@@ -152,7 +329,9 @@ const KeywordDiscoveryWorkbench = ({
           intent: 'queue',
           organizationId,
           seoTargetId,
-          seedSource: 'manual',
+          // TASK-1693 — la fuente ELEGIDA, no un literal. Hasta acá el workbench mandaba
+          // `'manual'` fijo y las otras cuatro que `resolveSeeds` cubre eran inalcanzables.
+          seedSource,
           manualSeeds: seeds,
           methods: methods.map(method => ({ method, resultsPerCall }))
         })
@@ -327,6 +506,7 @@ const KeywordDiscoveryWorkbench = ({
             canExecute={canExecute}
             disabledReason={disabledReason}
             budgetRemainingUsd={budgetRemainingUsd}
+            seedSourceAvailability={seedSourceAvailability}
             onSubmit={handleSubmit}
           />
         </CardContent>
@@ -344,15 +524,32 @@ const KeywordDiscoveryWorkbench = ({
 
       {/* Sin corrida se dice la verdad —todavía no hay ninguna— en vez de mostrar una tabla
           vacía, que se leería como "buscamos y no encontramos nada". */}
-      <Card data-capture={candidates.length > 0 ? undefined : 'seo-keyword-discovery-results'}>
+      <Card data-capture={visibleCandidates.length > 0 ? undefined : 'seo-keyword-discovery-results'}>
         <CardContent>
-          {candidates.length > 0 ? (
+          {/* Los filtros viven DENTRO de la superficie del canvas, no flotando sobre el lienzo
+              gris: son parte de la pregunta que la tabla responde. Se muestran sólo cuando hay
+              una corrida — sin candidatos no hay nada que filtrar y el estado del run manda. */}
+          {run ? (
+            <Box sx={{ marginBlockEnd: 5 }}>
+              <KeywordDiscoveryFilters query={discoveryQuery} onChange={applyFilters} onClear={clearFilters} />
+            </Box>
+          ) : null}
+
+          {visibleCandidates.length > 0 ? (
             <KeywordDiscoveryResults
-              candidates={candidates}
+              candidates={visibleCandidates}
               totalCandidates={totalCandidates}
               openCandidateId={selectedCandidate?.candidateId ?? null}
               onOpenCandidate={handleOpenCandidate}
+              canLoadMore={canLoadMore}
+              nextPageSize={Math.min(pageSize, Math.max(0, totalCandidates - visibleCandidates.length))}
+              loadMoreState={pagingState}
+              onLoadMore={handleLoadMore}
             />
+          ) : hasActiveFilters ? (
+            /* Con filtros puestos, «no hay candidatos» sería falso: los hay, ninguno coincide.
+               Decir lo primero mandaría al operador a encolar una corrida que ya tiene. */
+            <EmptyState icon='tabler-filter-off' title={copy.results.emptyFiltered} description={copy.results.clearFilters} />
           ) : (
             <EmptyState
               icon='tabler-radar-2'

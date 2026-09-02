@@ -1,5 +1,14 @@
 # TASK-1696 — Growth: gasto de proveedor con dimensión de consumidor y gate de dinero per-org del grader
 
+## Delta 2026-09-01 — aviso de cambio en `rank-capture.ts` (conflicto de merge posible, no de diseño)
+
+`TASK-1699` cableó la escritura del top-N del SERP dentro de `src/lib/growth/seo/rank-capture.ts`,
+en la misma transacción que el snapshot de rank. No toca el ledger de gasto ni la dimensión de
+consumidor de esta task: el costo marginal medido fue **CERO** (USD 0,1225 con 31 llamadas el día 1,
+idéntico a los tres días previos). Si un rebase de esta task toca ese archivo, el conflicto es
+textual, no de contrato.
+
+
 ## Delta 2026-08-28 (release a producción) — el código está en el runtime real; el gate de dinero sigue OFF por diseño
 
 El paso a producción `develop→main` `c983be7f18e68602404567a19ac8e7e0f157f742` (PR #208,

@@ -2426,7 +2426,6 @@ export const GH_GROWTH_SEO_KEYWORDS = {
     disabledReason: {
       flag: 'El descubrimiento todavía no está habilitado para esta organización.',
       permission: 'Puedes revisar las corridas, pero no iniciar una nueva. Pídele acceso a Growth.',
-      noSeeds: 'Agrega al menos una seed para estimar el costo.',
       noMethods: 'Elige al menos un método de expansión.',
       noTarget: 'Este Space todavía no tiene un sitio configurado.',
       budget: 'El cupo del período no alcanza para esta corrida.'
@@ -2441,7 +2440,6 @@ export const GH_GROWTH_SEO_KEYWORDS = {
       queuedAnnounce: 'La corrida quedó en cola.',
       runningTitle: 'Investigando seeds',
       runningDetail: 'Procesando la corrida.',
-      runningDetailStage: 'Procesando {stage}.',
       runningAnnounce: 'La corrida está procesando.',
       runningIndicatorAria: 'La corrida sigue en curso',
       succeededTitle: 'Corrida completada',
@@ -2461,14 +2459,9 @@ export const GH_GROWTH_SEO_KEYWORDS = {
       providerErrorTitle: 'No pudimos completar la corrida',
       providerErrorDetail: 'El proveedor no respondió. Puedes iniciar una corrida nueva.',
       providerErrorAnnounce: 'No pudimos completar la corrida.',
-      staleTitle: 'Datos anteriores',
       staleDetail: 'Capturados el {date}. Inicia una corrida nueva para actualizarlos.',
       retry: 'Nueva corrida',
       refresh: 'Actualizar estado',
-      viewResults: 'Ver candidatos',
-      methodDone: '{method} ✓',
-      methodFailed: '{method} — no terminó',
-      methodSkipped: '{method} — sin ejecutar'
     },
 
     empty: {
@@ -2493,15 +2486,30 @@ export const GH_GROWTH_SEO_KEYWORDS = {
       count: '{count} candidatos',
 
       /*
-       * ⚠️ El conteo afirma el universo; la tabla sirve una página. Cuando no coinciden hay que
-       * DECIRLO: «Candidatos (312)» sobre 50 filas, sin aviso, es mentira por omisión justo en el
-       * canvas donde se decide. El orden gobernado del reader pone primero lo que más importa,
-       * así que la página servida es la buena — pero no es todo, y eso se nombra.
-       * La paginación real (consumir `nextCursor`) es de TASK-1693.
+       * ⚠️ El conteo afirma el universo; la tabla sirve las páginas que se han recorrido. Cuando
+       * no coinciden hay que DECIRLO: «Candidatos (312)» sobre 50 filas, sin aviso, es mentira por
+       * omisión justo en el canvas donde se decide.
+       *
+       * TASK-1693: el aviso ya NO promete paginación futura —la promesa se cumplió—. Ahora explica
+       * las dos cosas que el operador necesita saber para seguir recorriendo: por qué estos primero
+       * (el orden gobernado del reader) y que recorrer NO vuelve a gastar. En una superficie donde
+       * la otra acción cuesta dinero, esa segunda mitad no es un detalle.
        */
       countTruncated: '{shown} de {count} candidatos',
       truncatedNotice:
-        'Se muestran los {shown} candidatos de mayor prioridad de {count}. El resto queda en la corrida y se podrá recorrer cuando la lente tenga paginación.',
+        'Primero se muestran los candidatos de mayor prioridad. Puedes recorrer el resto sin volver a gastar.',
+
+      /*
+       * Verbo de RECORRER, no de buscar: no dispara una corrida y el copy no puede sugerirlo.
+       * «Ver» y no «Cargar» porque «cargar» es voz del sistema, y porque el botón convive con
+       * «Descubrir», que sí gasta — dos verbos que no se puedan confundir.
+       *
+       * ⚠️ SIN `aria-label` propio a propósito: el texto visible ya lleva el conteo, así que es su
+       * nombre accesible. Un `aria-label` distinto rompería «label in name» (WCAG 2.5.3) y dejaría
+       * el botón inalcanzable por control de voz.
+       */
+      loadMore: 'Ver {count} candidatos más',
+      loadMoreError: 'No pudimos cargar más candidatos. Los que ya ves siguen disponibles.',
 
       colKeyword: 'Keyword',
       colSource: 'Procedencia',
@@ -2559,10 +2567,43 @@ export const GH_GROWTH_SEO_KEYWORDS = {
       stateTracked: 'Ya seguido',
       stateDismissed: 'Descartado',
       statePreparingAeo: 'Preparando AEO',
-      stateSelectedForTarget: 'Marcado como objetivo',
 
       seedTrace: 'Seed: {seed}',
       emptyFiltered: 'Ningún candidato coincide con los filtros.',
+
+      /*
+       * TASK-1693 Slice 3 — filtros del canvas, aplicados SERVER-SIDE.
+       *
+       * Filtrar en cliente sobre una página mentiría sobre el universo: diría «3 candidatos»
+       * mirando 50 filas cuando el universo filtrado tiene 40 repartidos en páginas que nadie
+       * trajo. El conteo sigue a los filtros sobre el TOTAL, no sobre lo que alcanzó a bajar.
+       */
+      /*
+       * ⚠️ Barrido TASK-1693 Slice 3 — se retiraron 10 claves sin consumidor de esta lente:
+       * `disabledReason.noSeeds` (lo reemplazó `builder.seedsErrorEmpty`, más específico),
+       * `results.stateSelectedForTarget` (el estado `selected_for_target` se retiró del
+       * vocabulario en TASK-1692 y nunca tuvo writer), `run.{staleTitle, viewResults,
+       * runningDetailStage, methodDone, methodFailed, methodSkipped}` (la banda de estado no
+       * renderiza métodos ni CTA, y expandirla es de otra task) y `actions.capacityNotice`.
+       * Un contrato sin consumer no es una feature pendiente: es una afirmación falsa sobre lo
+       * que la pantalla hace. El gate `keyword-discovery-copy-consumers.test.ts` impide que el
+       * bloque vuelva a acumularlas.
+       */
+      filtersLabel: 'Filtros',
+      filtersOpen: 'Filtros ({count})',
+      filtersOpenNone: 'Filtros',
+      filterSearch: 'Buscar keyword',
+      filterSource: 'Procedencia',
+      filterIntent: 'Intención',
+      filterStateUntracked: 'Sólo no seguidas',
+      filterBarrier: 'Barrera máxima',
+      filterBarrierHelper: 'Deja fuera lo que exige más enlaces de los que el sitio puede conseguir.',
+      filterIncludeUnknownBarrier: 'Incluir sin dato de barrera',
+      filterMinVolume: 'Volumen mínimo',
+      filterAll: 'Todas',
+      clearFilters: 'Limpiar filtros',
+      filtersClose: 'Aplicar',
+
 
       colActions: 'Detalle',
       openDetail: 'Detalles',
@@ -2656,7 +2697,6 @@ export const GH_GROWTH_SEO_KEYWORDS = {
       confirmTitle: 'Confirma la decisión',
       pendingLabel: 'Procesando…',
 
-      capacityNotice: 'Cupo del seguimiento: {used} de {capacity} términos.',
 
       /**
        * 🔴 El feedback es POR keyword, jamás un «Listo» agregado.
@@ -2831,7 +2871,10 @@ export const GH_GROWTH_SEO_AUDIT = {
     title: 'Issues priorizados',
     // Se nombra EXACTAMENTE lo que ordena la lista. Prometer un criterio que los datos no
     // sostienen es la misma clase de mentira que pintar un cero donde no hubo medición.
-    subtitle: 'Primero lo crítico; dentro de cada nivel, lo que más mueve la aguja en búsqueda por lo que menos cuesta resolver',
+    // TASK-1671 — declara además el ALCANCE de esta lista. Con la región de dominio arriba, un
+    // subtítulo que no diga "por página" deja al operador sin saber por qué hay dos bloques.
+    subtitle:
+      'Problemas por página. Primero lo crítico; dentro de cada nivel, lo que más mueve la aguja en búsqueda por lo que menos cuesta resolver',
     affected: (pages: number) => (pages === 1 ? '1 página afectada' : `${pages} páginas afectadas`),
     view: 'Ver',
     viewAria: (issueName: string) => `Ver las páginas afectadas por ${issueName}`,
@@ -2888,8 +2931,11 @@ export const GH_GROWTH_SEO_AUDIT = {
     runningDescription: (domain: string) => `Estamos revisando ${domain}. Esto puede tardar unos minutos.`,
     runningDescriptionNoDomain: 'Estamos revisando el sitio. Esto puede tardar unos minutos.',
 
-    cleanTitle: 'Sin issues detectados',
-    cleanDescription: 'El crawl terminó y no encontró problemas de los que revisamos.',
+    cleanTitle: 'Sin problemas de página',
+    // TASK-1671 — acotado a PÁGINA a propósito. Con la región de dominio arriba, un "no
+    // encontró problemas" sin alcance se contradice con un hallazgo de sitio crítico
+    // renderizado tres centímetros más arriba, y el operador no sabe a cuál creerle.
+    cleanDescription: 'El crawl terminó y no encontró problemas de página de los que revisamos.',
 
     degradedTitle: 'El crawl terminó parcialmente',
     degradedDescription:
@@ -2921,6 +2967,46 @@ export const GH_GROWTH_SEO_AUDIT = {
     budgetExhausted: 'Este Space agotó su presupuesto de proveedor del mes.',
     notEntitled: 'Este Space no tiene el módulo SEO habilitado para correr auditorías.',
     generic: 'No pudimos encolar la auditoría. Intenta de nuevo.'
+  },
+
+  /**
+   * TASK-1671 — Región de hallazgos de SITIO (dominio), arriba de la lista priorizada.
+   *
+   * Este copy viaja al artefacto descargable de TASK-1672 y de ahí a una agencia externa, así que
+   * cada frase tiene que sostenerse fuera de la pantalla. Dos reglas que lo gobiernan:
+   *  - el lugar de detección es OBLIGATORIO (es lo que impide que el cliente abra su robots.txt
+   *    limpio y concluya que el informe miente);
+   *  - `postureLabel` reemplaza a "Info" SÓLO en el bloqueo de entrenamiento: `notice` describe
+   *    prioridad y acá hace falta describir naturaleza.
+   */
+  site: {
+    title: 'Acceso y presentación del sitio',
+    subtitle: 'Lo que vale para todo el dominio, no para una página',
+    /** Ocupa el lugar donde una fila de página dice "N páginas afectadas". */
+    scopeLabel: 'Todo el sitio',
+    /** Reemplaza la etiqueta de severidad genérica en hallazgos que son postura, no defecto. */
+    postureLabel: 'Decisión declarada',
+    verified: 'Verificado',
+    /** "Verificado" sin objeto no es información: se declara QUÉ se revisó. */
+    verifiedHint:
+      'Revisamos el acceso de los motores de IA, los datos estructurados y el mapa del sitio.',
+    whereRobots: 'En robots.txt',
+    whereEdge: 'En el borde (CDN o firewall)',
+    whereHome: 'En la portada',
+    whereSitemap: 'En el mapa del sitio',
+    /** Acompaña al hallazgo de borde: es la mitad que lo vuelve creíble. */
+    edgeCleanRobots: 'el robots.txt está limpio',
+    /** ≤2 agentes se nombran completos; más, se acotan. Cinco tokens crudos no se leen. */
+    blockedAgentsAll: (agents: string) => agents,
+    blockedAgents: (first: string, rest: number) => `${first} y ${rest} más`,
+    unverifiedTitle: 'No pudimos verificar',
+    unverifiedItem: (check: string, reason: string) => `${check} — ${reason}`,
+    checkAiAccess: 'Acceso de los motores de IA',
+    checkEdge: 'Acceso en el servidor',
+    checkStructuredData: 'Datos estructurados',
+    checkSitemap: 'Mapa del sitio',
+    /** aria de la región: nombra el alcance, que es lo que la distingue de la lista de abajo. */
+    regionAria: 'Hallazgos que aplican a todo el dominio'
   }
 } as const
 
@@ -3016,7 +3102,29 @@ export const GH_GROWTH_SEO_AUDIT_ISSUES: Readonly<
   no_favicon: { label: 'Sin favicon', effort: 'low', value: 'low', hint: 'El sitio no declara su ícono de pestaña.' },
   no_doctype: { label: 'Sin doctype', effort: 'low', value: 'low', hint: 'El documento no declara su tipo y el navegador adivina cómo interpretarlo.' },
   no_encoding_meta_tag: { label: 'Sin meta de codificación', effort: 'low', value: 'low', hint: 'La página no declara su codificación de caracteres.' },
-  deprecated_html_tags: { label: 'Etiquetas HTML obsoletas', effort: 'medium', value: 'low', hint: 'El marcado usa etiquetas que el estándar ya retiró.' }
+  deprecated_html_tags: { label: 'Etiquetas HTML obsoletas', effort: 'medium', value: 'low', hint: 'El marcado usa etiquetas que el estándar ya retiró.' },
+
+  // ── Hallazgos de SITIO (TASK-1670) ──────────────────────────────────────────────────────
+  // No vienen del crawl del proveedor: son propiedades del dominio que OnPage no mira. Se
+  // materializan con `finding_scope='site'` y NUNCA se cuentan como páginas afectadas.
+  ai_retrieval_crawlers_blocked: { label: 'Los motores de IA no pueden leer el sitio', effort: 'medium', value: 'high', hint: 'El archivo robots.txt le niega el paso a los rastreadores que citan páginas en las respuestas de ChatGPT, Perplexity y Claude. Sin ese acceso el sitio no puede aparecer en esas respuestas.' },
+
+  // 🔴 Se redacta como POSTURA, no como defecto: bloquear el entrenamiento de modelos es una
+  // decisión de derechos sobre el contenido, legítima y frecuente. Un copy que suene a error
+  // acá le enseña al cliente a desconfiar del resto del informe.
+  ai_training_crawlers_blocked: { label: 'Entrenamiento de modelos de IA bloqueado', effort: 'low', value: 'low', hint: 'El sitio le niega el paso a los rastreadores que recolectan contenido para entrenar modelos de IA. Es una decisión sobre el uso del contenido, no una falla: se informa para dejarla registrada y no afecta que el sitio aparezca en las respuestas.' },
+
+  ai_crawler_edge_access_denied: { label: 'El servidor rechaza a los rastreadores', effort: 'medium', value: 'high', hint: 'El robots.txt permite el paso, pero el servidor o el CDN responde con un rechazo cuando quien pide la página es un rastreador. Se corrige en la configuración del CDN o del firewall, no en robots.txt.' },
+
+  structured_data_missing: { label: 'Sin datos estructurados en la portada', effort: 'medium', value: 'high', hint: 'La portada no publica el marcado que le dice a buscadores y motores de IA quién es la marca y a qué se dedica.' },
+
+  sitemap_missing: { label: 'Sin mapa del sitio', effort: 'low', value: 'medium', hint: 'No hay un mapa del sitio en la ruta habitual ni declarado en robots.txt. Sin él, los buscadores descubren las páginas sólo siguiendo enlaces.' },
+
+  sitemap_declared_broken: { label: 'El mapa del sitio declarado no responde', effort: 'low', value: 'high', hint: 'El robots.txt anuncia un mapa del sitio que no se puede leer. Los buscadores lo buscan justo ahí y no encuentran nada.' },
+
+  // Ni sano ni roto: un hueco declarado. El copy tiene que dejar clarísimo que no es un
+  // veredicto, porque leerlo como "está bien" es exactamente el falso sano que evitamos.
+  site_check_unverified: { label: 'Chequeo de sitio sin verificar', effort: 'low', value: 'low', hint: 'No pudimos completar esta revisión del sitio. No significa que esté bien ni que esté mal: quedó sin medir, y el detalle explica por qué.' }
 }
 
 /**

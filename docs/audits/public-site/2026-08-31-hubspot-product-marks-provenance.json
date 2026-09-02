@@ -1,0 +1,22 @@
+[
+  {
+    "name": "smart-crm",
+    "asset": "https://brandfolder.com/hubspot/solutions-partner-hub/#!asset/28xk25p6rhfz93crnq24xxxn",
+    "filename": "Smart CRM Icon/ProductIcons_SmartCRM_Icon_Orange.svg",
+    "sha256": "296337f7067543086979a35f9882bee0cdf76af211badb0defb775d4fce243b6"
+  },
+  {
+    "name": "agent-hub",
+    "asset": "https://brandfolder.com/hubspot/solutions-partner-hub/#!asset/j92394w3fwmc33w3zvvrv3j",
+    "filename": "Agent Hub - Icon Orange/ProductIcons_AgentHub_Icon_Orange.svg",
+    "sha256": "ddd5c9f1bb6ab4d62ef354b09c569fd15f2f033268b6a208eecf9a06d72c9cff"
+  },
+  {
+    "name": "hubspot-wordmark-light",
+    "source": "https://www.hubspot.com/solutions-partners-tiers-and-benefits-2026",
+    "location": "Official footer img alt=HubSpot, cream SVG embedded as data URI",
+    "sha256": "390b83568008211fc6ba705603f9ed3facc9c8a0f77915cbd82b233399c3c427",
+    "authorization": "Operator confirmed: Somos solutions partner tenemos autorización",
+    "unchanged": true
+  }
+]

@@ -51,7 +51,7 @@ Regla para agentes: si el comprador ya vio un score o un informe y pregunta *"¿
 > El producto Greenhouse que operacionaliza esta skill ganó un segundo eslabón: el
 > **diagnóstico SEO de prospecto** (dominio `growth`, capability
 > `growth.seo.prospect_diagnostic.run`, solo admin/account; flag
-> `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED`, hoy OFF en todos los ambientes).
+> `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED`, **ON en Vercel Production desde 2026-08-27** (verificado con `vercel env ls`; corrida real sobre `skyairline.com`: previsto USD 0,2050 vs medido USD 0,1991). 🔴 Un `disabled` hoy es una REGRESION, no un estado legitimo).
 > Encadenamiento comercial vigente: (1) el Grader mide si la IA lo menciona →
 > (2) el diagnóstico cuantifica la pérdida orgánica del dominio con dato del
 > proveedor, sin pedirle acceso al prospecto (~USD 0,25/corrida, tope duro;

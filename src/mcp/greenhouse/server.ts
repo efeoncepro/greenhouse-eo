@@ -4,28 +4,58 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 
 import { GreenhouseApiPlatformClient } from './http-client'
 import { resolveGreenhouseMcpConfig } from './config'
+import { getGreenhouseMcpSkillCatalog } from './skill-catalog'
+import { GREENHOUSE_MCP_SKILL_MANIFEST, GREENHOUSE_MCP_SKILL_URI_PREFIX } from './skill-manifest'
 import { createGreenhouseMcpHandlers, greenhouseMcpToolOutputSchema } from './tools'
+import {
+  buildGreenhouseMcpServerIdentity,
+  computeGreenhouseMcpToolCoverage,
+  GREENHOUSE_MCP_TOOL_MANIFEST
+} from './tool-manifest'
 import type { GreenhouseMcpConfig } from './types'
 
 export const createGreenhouseMcpServer = (
   config: GreenhouseMcpConfig,
   deps?: { fetch?: typeof fetch }
 ) => {
+  // TASK-1780 — El cartel se DERIVA del inventario: no se puede volver a anunciar read-only
+  // mientras se registran escrituras.
+  const identity = buildGreenhouseMcpServerIdentity()
+
   const server = new McpServer(
-    {
-      name: 'greenhouse-read-only',
-      version: '1.0.0'
-    },
-    {
-      instructions:
-        'Greenhouse MCP V1 is read-only. It is downstream of api/platform/ecosystem/*, uses a fixed external scope from server configuration, preserves Greenhouse request IDs, and must not be used for writes, SQL access, or tenancy inference from free text.'
-    }
+    { name: identity.name, version: identity.version },
+    { instructions: identity.instructions }
   )
 
   const client = new GreenhouseApiPlatformClient(config, deps?.fetch)
   const handlers = createGreenhouseMcpHandlers(client)
 
-  server.registerTool(
+  /**
+   * TASK-1780 — Las definiciones se RECOGEN acá y se registran recorriendo el manifiesto.
+   *
+   * El colector conserva la firma exacta de `registerTool`, así que cada definición de abajo
+   * sigue type-checkeada igual que antes (el handler contra su propio inputSchema). Lo único que
+   * cambia es CUÁNDO se registra: después, en el orden del manifiesto, y sólo si el manifiesto la
+   * declara. Registrar una tool sin entrada —o declarar una entrada sin definición— hace fallar la
+   * construcción del servidor, que es lo que convierte el inventario en fuente y no en comentario.
+   */
+  const collected = new Map<string, () => void>()
+
+  const collector: Pick<McpServer, 'registerTool'> = {
+    registerTool: ((name: string, ...rest: unknown[]) => {
+      if (collected.has(name)) {
+        throw new Error(`Greenhouse MCP: la tool "${name}" se define dos veces en server.ts.`)
+      }
+
+      collected.set(name, () => {
+        ;(server.registerTool as (...args: unknown[]) => unknown)(name, ...rest)
+      })
+
+      return undefined
+    }) as unknown as McpServer['registerTool']
+  }
+
+  collector.registerTool(
     'get_context',
     {
       title: 'Get Context',
@@ -36,7 +66,7 @@ export const createGreenhouseMcpServer = (
     async () => handlers.getContext()
   )
 
-  server.registerTool(
+  collector.registerTool(
     'list_organizations',
     {
       title: 'List Organizations',
@@ -53,7 +83,7 @@ export const createGreenhouseMcpServer = (
     async args => handlers.listOrganizations(args)
   )
 
-  server.registerTool(
+  collector.registerTool(
     'get_organization',
     {
       title: 'Get Organization',
@@ -66,7 +96,7 @@ export const createGreenhouseMcpServer = (
     async args => handlers.getOrganization(args)
   )
 
-  server.registerTool(
+  collector.registerTool(
     'list_capabilities',
     {
       title: 'List Capabilities',
@@ -81,7 +111,7 @@ export const createGreenhouseMcpServer = (
     async args => handlers.listCapabilities(args)
   )
 
-  server.registerTool(
+  collector.registerTool(
     'get_integration_readiness',
     {
       title: 'Get Integration Readiness',
@@ -94,7 +124,7 @@ export const createGreenhouseMcpServer = (
     async args => handlers.getIntegrationReadiness(args)
   )
 
-  server.registerTool(
+  collector.registerTool(
     'get_platform_health',
     {
       title: 'Get Platform Health',
@@ -106,7 +136,24 @@ export const createGreenhouseMcpServer = (
     async () => handlers.getPlatformHealth()
   )
 
-  server.registerTool(
+  // TASK-1804 — el manual de uso viaja por el protocolo, no en la nota del handshake. La
+  // descripción nombra el prerrequisito ANTES de la tool que gobierna (el único texto garantizado
+  // en contexto); el procedimiento vive en el manual y se paga sólo cuando se carga.
+  collector.registerTool(
+    'get_greenhouse_skill',
+    {
+      title: 'Get Greenhouse Skill',
+      description:
+        'Load an operating manual for this MCP surface on demand. Without name: the catalog (name, description, the tools each manual governs). With name: the full manual as markdown. Load seo-spend-discipline BEFORE calling any tool that commits provider budget, competitor-loop before proposing or declaring competitors, and seo-visibility-reading before describing where a client ranks. Manuals are static and identical for every consumer; a manual the current scope cannot read does not exist.',
+      inputSchema: {
+        name: z.string().trim().min(1).max(64).optional()
+      },
+      outputSchema: greenhouseMcpToolOutputSchema
+    },
+    async args => handlers.getGreenhouseSkill(args)
+  )
+
+  collector.registerTool(
     'list_event_types',
     {
       title: 'List Event Types',
@@ -121,7 +168,7 @@ export const createGreenhouseMcpServer = (
     async args => handlers.listEventTypes(args)
   )
 
-  server.registerTool(
+  collector.registerTool(
     'list_webhook_subscriptions',
     {
       title: 'List Webhook Subscriptions',
@@ -136,7 +183,7 @@ export const createGreenhouseMcpServer = (
     async args => handlers.listWebhookSubscriptions(args)
   )
 
-  server.registerTool(
+  collector.registerTool(
     'get_webhook_subscription',
     {
       title: 'Get Webhook Subscription',
@@ -149,7 +196,7 @@ export const createGreenhouseMcpServer = (
     async args => handlers.getWebhookSubscription(args)
   )
 
-  server.registerTool(
+  collector.registerTool(
     'list_webhook_deliveries',
     {
       title: 'List Webhook Deliveries',
@@ -165,7 +212,7 @@ export const createGreenhouseMcpServer = (
     async args => handlers.listWebhookDeliveries(args)
   )
 
-  server.registerTool(
+  collector.registerTool(
     'get_webhook_delivery',
     {
       title: 'Get Webhook Delivery',
@@ -180,7 +227,7 @@ export const createGreenhouseMcpServer = (
 
   // TASK-1086 — Knowledge (read-only). El reader agéntico ya filtra a `agent_allowed`
   // interno y excluye sensibles/cuarentena; si confidence='none' el agente NO debe inventar.
-  server.registerTool(
+  collector.registerTool(
     'search_knowledge',
     {
       title: 'Search Knowledge',
@@ -195,7 +242,7 @@ export const createGreenhouseMcpServer = (
     async args => handlers.searchKnowledge(args)
   )
 
-  server.registerTool(
+  collector.registerTool(
     'get_knowledge_document',
     {
       title: 'Get Knowledge Document',
@@ -212,7 +259,7 @@ export const createGreenhouseMcpServer = (
   // TASK-1211 — Cotizador (read-only, consultar-first). Resolver de servicios +
   // simulación de precio. El estimate es referencial, NO vinculante; el cost
   // stack/margen no cruza a un scope cliente (redacción server-side en el lane).
-  server.registerTool(
+  collector.registerTool(
     'search_services',
     {
       title: 'Search Services',
@@ -227,7 +274,7 @@ export const createGreenhouseMcpServer = (
     async args => handlers.searchServices(args)
   )
 
-  server.registerTool(
+  collector.registerTool(
     'quote_price',
     {
       title: 'Quote Price',
@@ -246,7 +293,7 @@ export const createGreenhouseMcpServer = (
   // Los tres tools delegan en el lane ecosystem: entitlement per-org `seo_v2` +
   // anti-oracle + resolución de org por binding se aplican SERVER-SIDE. Para bindings
   // internos, `organizationId` es requerido; para bindings org-scoped se omite.
-  server.registerTool(
+  collector.registerTool(
     'get_seo_keyword_opportunities',
     {
       title: 'Get SEO Keyword Opportunities',
@@ -265,7 +312,7 @@ export const createGreenhouseMcpServer = (
   // TASK-1661 — lente ◑ ESTIMADA de mercado (Labs), complementaria a la demanda MEDIDA ● de
   // GSC. La description es parte del contrato: le dice al agente que un dato ausente NO es cero
   // y que la cifra siempre viaja con su as-of.
-  server.registerTool(
+  collector.registerTool(
     'get_seo_keyword_market_data',
     {
       title: 'Get SEO Keyword Market Data',
@@ -283,12 +330,12 @@ export const createGreenhouseMcpServer = (
 
   // TASK-1775 — foto de dominio ◑: la pregunta que abre toda reunión de SEO ("¿cómo estamos
   // contra ellos?" / "¿venimos subiendo o bajando?"), del target O de un competidor.
-  server.registerTool(
+  collector.registerTool(
     'get_seo_domain_overview',
     {
       title: 'Get SEO Domain Overview',
       description:
-        'Get the domain-level photo + monthly trajectory of the organization SEO target domain (default) or one of its declared competitors (pass subject=<domain>): total ranked keywords in the top-100, estimated monthly organic traffic volume (etv), estimated USD cost of buying that traffic in Ads, top-100 position distribution, rank momentum, and up to 72 months of history. All figures are market ESTIMATES from the DataForSEO Labs snapshot (lens=estimated, refreshed monthly), NOT measured Search Console data: never average or mix them with GSC series. etv is estimated traffic VOLUME, not dollars and not measured visits. Every figure carries capturedAt — always report the as-of date. When data.ok is false report the errorCode honestly (no_market_data means the subject has no snapshot yet — a state, not a zero). The market (country+language) comes from the organization SEO target; pass market=<ISO-2|location_code> when the organization has more than one.',
+        'Get the domain-level photo + monthly trajectory of the organization SEO target domain (default) or one of its declared competitors (pass subject=<domain>): total ranked keywords in the top-100, estimated monthly organic traffic volume (etv), estimated USD cost of buying that traffic in Ads, top-100 position distribution, rank momentum, and up to 72 months of history. All figures are market ESTIMATES from the DataForSEO Labs snapshot (lens=estimated, refreshed monthly), NOT measured Search Console data: never average or mix them with GSC series. etv is estimated traffic VOLUME, not dollars and not measured visits. Every figure carries capturedAt — always report the as-of date. When data.ok is false report the errorCode honestly (no_market_data means the subject has no snapshot yet — a state, not a zero). MARKET — The market (country+language) comes from the organization SEO target. If the organization has SEVERAL active markets and the question does not name one, ASK which one instead of passing a market. Where the operator is based, where the brand comes from, what language they write in and which target was created first are all CORRELATED with the market and none of them DECLARES it: treating any of them as a declaration is how a client ends up measured against the wrong country for a year. Pass market=<ISO-2|location_code> only when the operator named it or there is a single active target.',
       inputSchema: {
         organizationId: z.string().trim().min(1).optional(),
         market: z.string().trim().min(2).max(12).optional(),
@@ -302,12 +349,12 @@ export const createGreenhouseMcpServer = (
 
   // TASK-1776 — el sujeto PÁGINA: qué ranquea una URL/subcarpeta/subdominio (propio o de un
   // competidor) y qué páginas concentran el tráfico de un host.
-  server.registerTool(
+  collector.registerTool(
     'get_seo_url_visibility',
     {
       title: 'Get SEO URL Visibility',
       description:
-        'Get what a specific page, subfolder, subdomain or domain ranks for in the market snapshot (DataForSEO Labs ranked_keywords): total ranked keywords, top-100 position distribution, estimated traffic volume (etv), momentum, and the purchased top-N keyword detail. Pass subject=<value> plus kind=domain|subdomain|subfolder|url (the kind is DECLARED, never inferred; defaults to the organization SEO target domain). Alternative mode: concentration=url|subdomain (optional domain=<host>) returns which pages or subdomains concentrate the estimated traffic of a host. All figures are market ESTIMATES (lens=estimated, monthly refresh) with capturedAt — always report the as-of date, never mix or average with measured GSC data, and a no_market_data answer means the subject has no snapshot yet (a state, not a zero). The market comes from the organization SEO target; pass market=<ISO-2|location_code> when the organization has more than one.',
+        'Get what a specific page, subfolder, subdomain or domain ranks for in the market snapshot (DataForSEO Labs ranked_keywords): total ranked keywords, top-100 position distribution, estimated traffic volume (etv), momentum, and the purchased top-N keyword detail. Pass subject=<value> plus kind=domain|subdomain|subfolder|url (the kind is DECLARED, never inferred; defaults to the organization SEO target domain). Alternative mode: concentration=url|subdomain (optional domain=<host>) returns which pages or subdomains concentrate the estimated traffic of a host. All figures are market ESTIMATES (lens=estimated, monthly refresh) with capturedAt — always report the as-of date, never mix or average with measured GSC data, and a no_market_data answer means the subject has no snapshot yet (a state, not a zero). MARKET — The market (country+language) comes from the organization SEO target. If the organization has SEVERAL active markets and the question does not name one, ASK which one instead of passing a market. Where the operator is based, where the brand comes from, what language they write in and which target was created first are all CORRELATED with the market and none of them DECLARES it: treating any of them as a declaration is how a client ends up measured against the wrong country for a year. Pass market=<ISO-2|location_code> only when the operator named it or there is a single active target.',
       inputSchema: {
         organizationId: z.string().trim().min(1).optional(),
         market: z.string().trim().min(2).max(12).optional(),
@@ -323,7 +370,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1777 — el detalle que hace accionable el snapshot de enlaces: nombres, no conteos.
-  server.registerTool(
+  collector.registerTool(
     'get_seo_backlink_detail',
     {
       title: 'Get SEO Backlink Detail',
@@ -339,12 +386,12 @@ export const createGreenhouseMcpServer = (
     async args => handlers.getSeoBacklinkDetail(args)
   )
 
-  server.registerTool(
+  collector.registerTool(
     'get_seo_visibility_360',
     {
       title: 'Get Search Visibility 360',
       description:
-        'Cross the two search internets for an organization: measured organic rank (GSC) vs AI citability (AEO grader score). Returns a 2x2 quadrant per keyword and for the domain — dominante (ranks + cited), riesgo (ranks but NOT cited by AI: organic authority without citability, cross-sell AEO), oportunidad (cited but not ranking), invisible (neither). The two axes are orthogonal and never averaged. When data.ok is false, report the errorCode (no_seo_data, no_aeo_data, target_not_configured, disabled) honestly — a missing lens is a state, not a zero.',
+        'Cross the two search internets for an organization: measured organic rank (GSC) vs AI citability (AEO grader score). Returns a 2x2 quadrant per keyword and for the domain — dominante (ranks + cited), riesgo (ranks but NOT cited by AI: organic authority without citability, cross-sell AEO), oportunidad (cited but not ranking), invisible (neither). The two axes are orthogonal and never averaged. When data.ok is false, report the errorCode (no_seo_data, no_aeo_data, target_not_configured, disabled) honestly — a missing lens is a state, not a zero. MARKET — The market (country+language) comes from the organization SEO target. If the organization has SEVERAL active markets and the question does not name one, ASK which one instead of passing a market. Where the operator is based, where the brand comes from, what language they write in and which target was created first are all CORRELATED with the market and none of them DECLARES it: treating any of them as a declaration is how a client ends up measured against the wrong country for a year. Pass market=<ISO-2|location_code> only when the operator named it or there is a single active target.',
       inputSchema: {
         organizationId: z.string().trim().min(1).optional(),
         market: z.string().trim().min(2).max(12).optional()
@@ -356,12 +403,12 @@ export const createGreenhouseMcpServer = (
 
   // TASK-1785 — la lectura compuesta. CONVIVE con get_seo_visibility_360: aquella cruza SEO×AEO
   // (dos ejes ortogonales de motores distintos), ésta cruza medido×estimado DENTRO de SEO.
-  server.registerTool(
+  collector.registerTool(
     'get_seo_dual_lens_visibility',
     {
       title: 'Get SEO Dual-Lens Visibility',
       description:
-        'Return BOTH position series for the same set of keywords, SEPARATED and labelled: the MEASURED one from Google Search Console and the ESTIMATED one from the purchased SERP. Use this instead of calling get_seo_performance and get_seo_rank_evolution separately whenever you are about to describe "where this client ranks" — it exists precisely so that presenting both lenses correctly is cheaper than merging them by mistake. 🔴 THE TWO SERIES ARE NOT COMPARABLE POINT TO POINT AND MUST NEVER BE AVERAGED, SUMMED, INTERPOLATED OR MERGED INTO A SINGLE NUMBER. They do not share a referent: the measured series is an impressions-weighted average over REAL users of this domain, while the estimated one is an exact position for a synthetic query issued by us from a location we chose. A number produced by combining them has no referent at all and would be presented with the confidence of a measurement — which is worse than having no number. There is deliberately NO combined field in the response, and that is not an omission to be filled in. Report them side by side, each with its own lens, source and capturedAt as-of date, and note that each lens declares its OWN window (range) because they can differ — the purchased series often starts later than the measured history. keywordsWithoutData names the requested keywords with no data in that lens: name them instead of dropping them silently. A lens can come back unavailable with a reason (for example target_not_resolved when the organization has several active markets and none was selected): that is a STATE, never a zero, and it does not invalidate the other lens. position=null means no measurement that day — a gap, never a zero, because position zero does not exist.',
+        'Return BOTH position series for the same set of keywords, SEPARATED and labelled: the MEASURED one from Google Search Console and the ESTIMATED one from the purchased SERP. Use this instead of calling get_seo_performance and get_seo_rank_evolution separately whenever you are about to describe "where this client ranks" FOR A KNOWN LIST OF KEYWORDS AND BOTH LENSES HAVE TO BE SHOWN — if the question compares a set on one metric, or asks how items are trending, that is get_seo_performance and this tool is the wrong answer — it exists precisely so that presenting both lenses correctly is cheaper than merging them by mistake. 🔴 THE TWO SERIES ARE NOT COMPARABLE POINT TO POINT AND MUST NEVER BE AVERAGED, SUMMED, INTERPOLATED OR MERGED INTO A SINGLE NUMBER. They do not share a referent: the measured series is an impressions-weighted average over REAL users of this domain, while the estimated one is an exact position for a synthetic query issued by us from a location we chose. A number produced by combining them has no referent at all and would be presented with the confidence of a measurement — which is worse than having no number. There is deliberately NO combined field in the response, and that is not an omission to be filled in. Report them side by side, each with its own lens, source and capturedAt as-of date, and note that each lens declares its OWN window (range) because they can differ — the purchased series often starts later than the measured history. keywordsWithoutData names the requested keywords with no data in that lens: name them instead of dropping them silently. A lens can come back unavailable with a reason (for example target_not_resolved when the organization has several active markets and none was selected): that is a STATE, never a zero, and it does not invalidate the other lens. position=null means no measurement that day — a gap, never a zero, because position zero does not exist. MARKET — The market (country+language) comes from the organization SEO target. If the organization has SEVERAL active markets and the question does not name one, ASK which one instead of passing a market. Where the operator is based, where the brand comes from, what language they write in and which target was created first are all CORRELATED with the market and none of them DECLARES it: treating any of them as a declaration is how a client ends up measured against the wrong country for a year. Pass market=<ISO-2|location_code> only when the operator named it or there is a single active target.',
       inputSchema: {
         organizationId: z.string().trim().min(1).optional(),
         market: z.string().trim().min(1).optional(),
@@ -373,7 +420,7 @@ export const createGreenhouseMcpServer = (
     async args => handlers.getSeoDualLensVisibility(args)
   )
 
-  server.registerTool(
+  collector.registerTool(
     'get_seo_entitlement',
     {
       title: 'Get SEO Entitlement',
@@ -388,12 +435,12 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1303 — rank evolution: la película de posiciones en el tiempo (pantalla ancla).
-  server.registerTool(
+  collector.registerTool(
     'get_seo_rank_evolution',
     {
       title: 'Get SEO Rank Evolution',
       description:
-        'Time series of exact organic positions (DataForSEO SERP, market truth: includes SERP features like AI Overview presence) for the tracked keywords of an organization. Returns { series: [{ keyword, points: [{date, position, url}] }] }; position=null on a date means the domain did not rank that day (a valid measurement, not an error). Served from the hot window (~180 days, Postgres) or long history (BigQuery) depending on rangeDays. This series is NEVER averaged with GSC data — they are different sources. When data.ok is false, report the errorCode (disabled, target_not_configured, no_data, query_failed) honestly.',
+        'Time series of exact organic positions (DataForSEO SERP, market truth: includes SERP features like AI Overview presence) for the tracked keywords of an organization. Returns { series: [{ keyword, points: [{date, position, url}] }] }; position=null on a date means the domain did not rank that day (a valid measurement, not an error). Served from the hot window (~180 days, Postgres) or long history (BigQuery) depending on rangeDays. This series is NEVER averaged with GSC data — they are different sources. When data.ok is false, report the errorCode (disabled, target_not_configured, no_data, query_failed) honestly. MARKET — The market (country+language) comes from the organization SEO target. If the organization has SEVERAL active markets and the question does not name one, ASK which one instead of passing a market. Where the operator is based, where the brand comes from, what language they write in and which target was created first are all CORRELATED with the market and none of them DECLARES it: treating any of them as a declaration is how a client ends up measured against the wrong country for a year. Pass market=<ISO-2|location_code> only when the operator named it or there is a single active target.',
       inputSchema: {
         organizationId: z.string().trim().min(1).optional(),
         market: z.string().trim().min(2).max(12).optional(),
@@ -408,12 +455,12 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1307 — rendimiento en el tiempo de un SET elegido (la pantalla ancla, por MCP).
-  server.registerTool(
+  collector.registerTool(
     'get_seo_performance',
     {
       title: 'Get SEO Performance Over Time',
       description:
-        'Performance over time of a CHOSEN SET of keywords or URLs for an organization: the daily series for the chart plus the standings for the table (current position, 30-day position delta, clicks, impressions, CTR) in a single read. Pass items as the exact keywords (mode=keyword) or page URLs (mode=url) to compare; use get_seo_performance_catalog to discover valid items. SOURCE RULE (never mixed, never averaged): mode=keyword with metric=position is INTENDED to be served from DataForSEO (exact market position, "estimated"), but the reader FALLS BACK to the measured Google Search Console position series when the exact-rank series is younger than the measured one (rank capture recently started); every other combination is served from Search Console ("measured"). The resolved source is returned in data.source and MUST be stated when reporting numbers. POSITION IS INVERTED: a lower number is better, so a NEGATIVE positionDelta30d is an IMPROVEMENT (8 to 3 is -5). A point with value=null means no measurement that day — report it as a gap, NEVER as zero (position zero does not exist and zero clicks would claim "you appeared and nobody clicked"). ctr=null means there were no impressions, which is "not measured", not 0%. positionDelta30d=null means there is nothing to compare against — never invent a change. itemsWithoutData lists requested items with no data at all in the window: name them instead of silently dropping them. When data.ok is false, report the errorCode (disabled, not_connected, no_items, no_data, query_failed) honestly.',
+        'Performance over time of a CHOSEN SET of keywords or URLs for an organization: the daily series for the chart plus the standings for the table (current position, 30-day position delta, clicks, impressions, CTR) in a single read. `items` is REQUIRED and is never inferred: a question that names no keyword or URL is not this tool — that is get_seo_rank_evolution, which defaults to every tracked keyword. Pass items as the exact keywords (mode=keyword) or page URLs (mode=url) to compare; use get_seo_performance_catalog to discover valid items. SOURCE RULE (never mixed, never averaged): mode=keyword with metric=position is INTENDED to be served from DataForSEO (exact market position, "estimated"), but the reader FALLS BACK to the measured Google Search Console position series when the exact-rank series is younger than the measured one (rank capture recently started); every other combination is served from Search Console ("measured"). The resolved source is returned in data.source and MUST be stated when reporting numbers. POSITION IS INVERTED: a lower number is better, so a NEGATIVE positionDelta30d is an IMPROVEMENT (8 to 3 is -5). A point with value=null means no measurement that day — report it as a gap, NEVER as zero (position zero does not exist and zero clicks would claim "you appeared and nobody clicked"). ctr=null means there were no impressions, which is "not measured", not 0%. positionDelta30d=null means there is nothing to compare against — never invent a change. itemsWithoutData lists requested items with no data at all in the window: name them instead of silently dropping them. When data.ok is false, report the errorCode (disabled, not_connected, no_items, no_data, query_failed) honestly. MARKET — The market (country+language) comes from the organization SEO target. If the organization has SEVERAL active markets and the question does not name one, ASK which one instead of passing a market. Where the operator is based, where the brand comes from, what language they write in and which target was created first are all CORRELATED with the market and none of them DECLARES it: treating any of them as a declaration is how a client ends up measured against the wrong country for a year. Pass market=<ISO-2|location_code> only when the operator named it or there is a single active target.',
       inputSchema: {
         organizationId: z.string().trim().min(1).optional(),
         market: z.string().trim().min(2).max(12).optional(),
@@ -430,7 +477,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1307 — catálogo de ítems elegibles (qué se le puede pedir a get_seo_performance).
-  server.registerTool(
+  collector.registerTool(
     'get_seo_performance_catalog',
     {
       title: 'Get SEO Performance Catalog',
@@ -449,12 +496,12 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1306 — KPIs norte del cockpit Overview (la foto medida del período).
-  server.registerTool(
+  collector.registerTool(
     'get_seo_overview_kpis',
     {
       title: 'Get SEO Overview KPIs',
       description:
-        'North-star KPIs of the SEO Overview cockpit for an organization, from MEASURED Google Search Console data (first-party truth, never estimated): clicks, impressions, average position and CTR aggregated over the period, plus the daily series and the equivalent previous window for comparison. Average position is weighted BY IMPRESSIONS (never a flat average of daily positions) and CTR is total clicks over total impressions (never an average of daily ratios). Position semantics are INVERTED: a lower number is better, so a negative delta is an improvement. previous=null means there is no comparable previous window — report it as "no comparison available", never as a 100% change. position/ctr are null when there were no impressions; that is "not measured", never zero. When data.ok is false, report the errorCode (disabled, target_not_configured) honestly.',
+        'North-star KPIs of the SEO Overview cockpit for an organization, from MEASURED Google Search Console data (first-party truth, never estimated): clicks, impressions, average position and CTR aggregated over the period, plus the daily series and the equivalent previous window for comparison. Average position is weighted BY IMPRESSIONS (never a flat average of daily positions) and CTR is total clicks over total impressions (never an average of daily ratios). Position semantics are INVERTED: a lower number is better, so a negative delta is an improvement. previous=null means there is no comparable previous window — report it as "no comparison available", never as a 100% change. position/ctr are null when there were no impressions; that is "not measured", never zero. When data.ok is false, report the errorCode (disabled, target_not_configured) honestly. MARKET — The market (country+language) comes from the organization SEO target. If the organization has SEVERAL active markets and the question does not name one, ASK which one instead of passing a market. Where the operator is based, where the brand comes from, what language they write in and which target was created first are all CORRELATED with the market and none of them DECLARES it: treating any of them as a declaration is how a client ends up measured against the wrong country for a year. Pass market=<ISO-2|location_code> only when the operator named it or there is a single active target.',
       inputSchema: {
         organizationId: z.string().trim().min(1).optional(),
         market: z.string().trim().min(2).max(12).optional(),
@@ -466,7 +513,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1304 — site audit report: salud técnica del sitio (OnPage async queue+poll).
-  server.registerTool(
+  collector.registerTool(
     'get_seo_site_audit_report',
     {
       title: 'Get SEO Site Audit Report',
@@ -483,7 +530,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1304 — backlink profile: la serie semanal del perfil de enlaces.
-  server.registerTool(
+  collector.registerTool(
     'get_seo_backlink_profile',
     {
       title: 'Get SEO Backlink Profile',
@@ -502,7 +549,7 @@ export const createGreenhouseMcpServer = (
   // TASK-1308 — el PRIMER tool SEO que ESCRIBE. Los 9 anteriores son lecturas; éste
   // compromete gasto recurrente del proveedor, así que el lane lo acepta sólo desde
   // bindings de scope `internal` y el command aplica techo + entitlement + idempotencia.
-  server.registerTool(
+  collector.registerTool(
     'track_seo_keywords',
     {
       title: 'Track SEO Keywords',
@@ -520,7 +567,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1308 — el reverso del write: lo que hace reversible el compromiso de gasto.
-  server.registerTool(
+  collector.registerTool(
     'untrack_seo_keywords',
     {
       title: 'Untrack SEO Keywords',
@@ -536,7 +583,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1662 — competidores declarados: el gap competitivo parte de acá.
-  server.registerTool(
+  collector.registerTool(
     'declare_seo_competitors',
     {
       title: 'Declare SEO Competitors',
@@ -553,7 +600,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1662 — el reverso del write: lo que hace reversible el gasto de cobertura.
-  server.registerTool(
+  collector.registerTool(
     'retire_seo_competitors',
     {
       title: 'Retire SEO Competitors',
@@ -570,7 +617,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1662 — lectura del gap competitivo derivado.
-  server.registerTool(
+  collector.registerTool(
     'get_seo_keyword_gap',
     {
       title: 'Get SEO Keyword Gap',
@@ -588,7 +635,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1700 — la cola priorizada de trabajo: la ÚNICA autoridad de orden del módulo.
-  server.registerTool(
+  collector.registerTool(
     'get_seo_work_queue',
     {
       title: 'Get SEO Work Queue',
@@ -607,7 +654,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1699 — el top-N del SERP ya pagado + descubrimiento de competidores (lecturas).
-  server.registerTool(
+  collector.registerTool(
     'get_seo_serp_top_results',
     {
       title: 'Get SEO SERP Top Results',
@@ -626,7 +673,7 @@ export const createGreenhouseMcpServer = (
     async args => handlers.getSeoSerpTopResults(args)
   )
 
-  server.registerTool(
+  collector.registerTool(
     'get_seo_competitor_candidates',
     {
       title: 'Get SEO Competitor Candidates',
@@ -645,7 +692,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1664 — keyword discovery: lectura de corridas/candidatos.
-  server.registerTool(
+  collector.registerTool(
     'get_seo_keyword_discovery',
     {
       title: 'Get SEO Keyword Discovery',
@@ -689,7 +736,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1664 — el write de discovery: encolar una corrida que GASTA presupuesto DataForSEO.
-  server.registerTool(
+  collector.registerTool(
     'discover_seo_keywords',
     {
       title: 'Discover SEO Keywords',
@@ -714,7 +761,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1666 — lectura del draft grounded (prompts AEO con provenance SEO).
-  server.registerTool(
+  collector.registerTool(
     'get_seo_grounded_query_draft',
     {
       title: 'Get SEO Grounded Query Draft',
@@ -732,7 +779,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1666 — el write del puente SEO → AEO: crea un DRAFT, jamás activa ni ejecuta.
-  server.registerTool(
+  collector.registerTool(
     'prepare_seo_grounded_queries',
     {
       title: 'Prepare SEO Grounded Queries',
@@ -752,7 +799,7 @@ export const createGreenhouseMcpServer = (
   )
 
   // TASK-1709 — diagnóstico de prospecto (lectura + disparo). Sólo bindings `internal`.
-  server.registerTool(
+  collector.registerTool(
     'get_seo_prospect_diagnostic',
     {
       title: 'Get SEO Prospect Diagnostic',
@@ -768,7 +815,7 @@ export const createGreenhouseMcpServer = (
     async args => handlers.getSeoProspectDiagnostic(args)
   )
 
-  server.registerTool(
+  collector.registerTool(
     'run_seo_prospect_diagnostic',
     {
       title: 'Run SEO Prospect Diagnostic',
@@ -782,6 +829,71 @@ export const createGreenhouseMcpServer = (
       outputSchema: greenhouseMcpToolOutputSchema
     },
     async args => handlers.runSeoProspectDiagnostic(args)
+  )
+
+  // ── El registro: una pasada por el manifiesto, en su orden ────────────────
+  const coverage = computeGreenhouseMcpToolCoverage({
+    manifest: GREENHOUSE_MCP_TOOL_MANIFEST,
+    definedNames: [...collected.keys()]
+  })
+
+  if (coverage.length > 0) {
+    throw new Error(coverage.map(finding => finding.message).join(' '))
+  }
+
+  for (const entry of GREENHOUSE_MCP_TOOL_MANIFEST) {
+    // `coverage` ya garantizó que existe: si no, el servidor no llegó hasta acá.
+    collected.get(entry.name)?.()
+  }
+
+  // TASK-1804 — el manifiesto de manuales es fuente sólo si algo falla cuando deja de serlo:
+  // manual declarado sin archivo, archivo sin declarar, frontmatter que no coincide o tool
+  // gobernada que no existe hacen fallar la construcción del servidor (lanza con los findings).
+  // Se verifica ACÁ, con el filesystem de este checkout; el cuerpo servido sale del lane.
+  getGreenhouseMcpSkillCatalog()
+
+  // Resource addressable: el mismo manual por URI estable, en el esquema de SEP-2640 (`skill://`).
+  // Mismo cuerpo que la tool, porque los dos lo piden al lane: byte-idénticos por construcción.
+  server.registerResource(
+    'greenhouse_skill',
+    new ResourceTemplate(`${GREENHOUSE_MCP_SKILL_URI_PREFIX}{name}/SKILL.md`, {
+      list: async () => {
+        const result = await client.getMcpSkills()
+        const data = result.data as { skills?: Array<{ name: string; description: string; uri: string }> }
+        const skills = Array.isArray(data.skills) ? data.skills : []
+
+        return {
+          resources: skills.map(skill => ({
+            uri: skill.uri,
+            name: skill.name,
+            description: skill.description,
+            mimeType: 'text/markdown'
+          }))
+        }
+      }
+    }),
+    {
+      title: 'Greenhouse Operating Manual',
+      description:
+        `An operating manual for this MCP surface (read-only, markdown with Agent Skills frontmatter). ` +
+        `Manuals: ${GREENHOUSE_MCP_SKILL_MANIFEST.map(entry => entry.name).join(', ')}.`,
+      mimeType: 'text/markdown'
+    },
+    async (uri, variables) => {
+      const name = Array.isArray(variables.name) ? variables.name[0] : variables.name
+      const result = await client.getMcpSkill({ name: String(name) })
+      const data = result.data as { body?: string }
+
+      return {
+        contents: [
+          {
+            uri: uri.href,
+            mimeType: 'text/markdown',
+            text: typeof data.body === 'string' ? data.body : ''
+          }
+        ]
+      }
+    }
   )
 
   // Resource addressable: el mismo documento read-only por URI estable.

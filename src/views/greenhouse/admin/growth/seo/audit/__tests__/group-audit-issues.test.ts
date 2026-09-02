@@ -3,20 +3,38 @@ import { describe, expect, it } from 'vitest'
 import { GH_GROWTH_SEO_AUDIT_ISSUES } from '@/lib/copy/growth'
 import type { SeoSiteAuditFindingSeverity, SeoSiteAuditFindingView } from '@/lib/growth/seo/contracts'
 import { ONPAGE_CHECK_SEVERITY } from '@/lib/growth/seo/site-audit/findings-map'
+import { SITE_FINDING_SEVERITY } from '@/lib/growth/seo/site-audit/site-findings'
 
-import { STALE_CRAWL_DAYS, daysSinceCrawl, groupAuditIssues } from '../group-audit-issues'
+import {
+  STALE_CRAWL_DAYS,
+  daysSinceCrawl,
+  groupAuditIssues,
+  partitionAuditIssuesByScope
+} from '../group-audit-issues'
 
 const finding = (
   issueType: string,
   severity: SeoSiteAuditFindingSeverity,
-  url: string
-): SeoSiteAuditFindingView => ({ issueType, severity, url, detail: {} })
+  url: string,
+  findingScope: SeoSiteAuditFindingView['findingScope'] = 'page'
+): SeoSiteAuditFindingView => ({ issueType, severity, url, detail: {}, findingScope })
+
+/** TASK-1671 — hallazgo de DOMINIO: todos comparten la URL raíz del sujeto. */
+const siteFinding = (issueType: string, severity: SeoSiteAuditFindingSeverity): SeoSiteAuditFindingView =>
+  finding(issueType, severity, 'https://berel.com', 'site')
 
 const bucket = (items: SeoSiteAuditFindingView[]): Record<SeoSiteAuditFindingSeverity, SeoSiteAuditFindingView[]> => ({
   critical: items.filter(item => item.severity === 'critical'),
   warning: items.filter(item => item.severity === 'warning'),
   notice: items.filter(item => item.severity === 'notice')
 })
+
+/**
+ * Espejo de los pesos de `group-audit-issues.ts`. Se declara acá a propósito: el test verifica la
+ * FÓRMULA de orden de dominio, y leerla del módulo haría que un cambio de pesos pasara inadvertido.
+ */
+const VALUE_WEIGHT_MIRROR: Record<string, number> = { low: 0.5, medium: 2, high: 3 }
+const EFFORT_WEIGHT_MIRROR: Record<string, number> = { low: 1, medium: 2, high: 3 }
 
 describe('groupAuditIssues', () => {
   it('nunca entierra un crítico bajo un menor de alto volumen', () => {
@@ -97,23 +115,119 @@ describe('groupAuditIssues', () => {
     expect(groupAuditIssues(input).map(g => g.issueType)).toEqual(groupAuditIssues(input).map(g => g.issueType))
   })
 
+  describe('alcance de dominio (TASK-1671)', () => {
+    it('el alcance sale del dato persistido, no de una heurística por issueType', () => {
+      const groups = groupAuditIssues(bucket([siteFinding('ai_retrieval_crawlers_blocked', 'critical')]))
+
+      expect(groups[0].scope).toBe('site')
+    })
+
+    it('🔴 el alcance queda FUERA del orden de dominio, aunque alguien lo puebla con un sintético', () => {
+      // El guardrail que la rama de `priorityScore` compra. Con `affectedPages = 1` la fórmula
+      // vieja y la nueva dan el mismo número, así que un test sobre el caso normal no probaría
+      // nada. Lo que sí se puede romper mañana es que alguien "arregle" el alcance de un grupo de
+      // dominio con un conteo sintético (el total de páginas crawleadas es la tentación). Acá se
+      // fuerza ese futuro y se exige que el orden entre hallazgos de dominio no se mueva.
+      const conAlcanceSintetico = groupAuditIssues(
+        bucket([
+          siteFinding('sitemap_missing', 'notice'),
+          siteFinding('ai_training_crawlers_blocked', 'notice')
+        ])
+      ).map(group => ({ ...group, affectedPages: group.issueType === 'ai_training_crawlers_blocked' ? 900 : 1 }))
+
+      const reordenado = [...conAlcanceSintetico].sort((left, right) => {
+        const byPriority =
+          VALUE_WEIGHT_MIRROR[right.value] / EFFORT_WEIGHT_MIRROR[right.effort] -
+          VALUE_WEIGHT_MIRROR[left.value] / EFFORT_WEIGHT_MIRROR[left.effort]
+
+        return byPriority !== 0 ? byPriority : left.issueType.localeCompare(right.issueType)
+      })
+
+      // 900 páginas sintéticas no mueven al hallazgo de postura por encima del de sitemap.
+      expect(reordenado.map(group => group.issueType)).toEqual([
+        'sitemap_missing',
+        'ai_training_crawlers_blocked'
+      ])
+    })
+
+    it('la severidad sigue siendo corte absoluto: un notice de dominio no supera a un crítico de página', () => {
+      const groups = groupAuditIssues(
+        bucket([
+          finding('is_broken', 'critical', 'https://berel.com/rota'),
+          siteFinding('ai_training_crawlers_blocked', 'notice')
+        ])
+      )
+
+      expect(groups[0].issueType).toBe('is_broken')
+      expect(groups[1].scope).toBe('site')
+    })
+
+    it('entre dos hallazgos de dominio ordena por valor y esfuerzo, no por páginas', () => {
+      const groups = groupAuditIssues(
+        bucket([
+          // `sitemap_missing`: notice, effort low, value medium.
+          siteFinding('sitemap_missing', 'notice'),
+          // `ai_training_crawlers_blocked`: notice, effort low, value low → debe ir después.
+          siteFinding('ai_training_crawlers_blocked', 'notice')
+        ])
+      )
+
+      expect(groups.map(group => group.issueType)).toEqual([
+        'sitemap_missing',
+        'ai_training_crawlers_blocked'
+      ])
+    })
+
+    it('particiona preservando el orden y sin volver a agrupar', () => {
+      const groups = groupAuditIssues(
+        bucket([
+          finding('is_broken', 'critical', 'https://berel.com/rota'),
+          siteFinding('ai_retrieval_crawlers_blocked', 'critical'),
+          finding('no_favicon', 'notice', 'https://berel.com/x')
+        ])
+      )
+
+      const { site, page } = partitionAuditIssuesByScope(groups)
+
+      expect(site.map(group => group.issueType)).toEqual(['ai_retrieval_crawlers_blocked'])
+      expect(page.map(group => group.issueType)).toEqual(['is_broken', 'no_favicon'])
+      expect(site.length + page.length).toBe(groups.length)
+    })
+
+    it('un run que no midió el dominio deja la partición de sitio VACÍA, no "sana"', () => {
+      // Run histórico o previo al flip: cero filas `scope='site'`. La región no se renderiza;
+      // decir "Verificado" acá sería el falso sano que TASK-1670 cerró en el motor.
+      const groups = groupAuditIssues(bucket([finding('is_broken', 'critical', 'https://berel.com/rota')]))
+
+      expect(partitionAuditIssuesByScope(groups).site).toEqual([])
+    })
+  })
+
   it('un reporte sin findings no produce grupos', () => {
     expect(groupAuditIssues(bucket([]))).toEqual([])
   })
 })
+
+/**
+ * TASK-1670 — El drift bidireccional corre contra TODO lo que el backend materializa, que
+ * desde esta task son dos allowlists: los checks de PÁGINA del proveedor OnPage y los
+ * hallazgos de SITIO que Greenhouse evalúa por su cuenta. Chequear sólo el primero dejaría
+ * que un hallazgo de sitio llegara a la pantalla sin ficha es-CL, mostrando su id de máquina.
+ */
+const MATERIALIZABLE_ISSUES: Record<string, string> = { ...ONPAGE_CHECK_SEVERITY, ...SITE_FINDING_SEVERITY }
 
 describe('catálogo es-CL de issues', () => {
   // Drift guard: cuando el backend sume un check al allowlist, esta prueba obliga a
   // escribir su ficha. Sin ella el check nuevo caería al fallback "sin catalogar" en
   // silencio y el operador vería un id de máquina en la lista priorizada.
   it('cubre todo el allowlist de findings-map', () => {
-    const sinFicha = Object.keys(ONPAGE_CHECK_SEVERITY).filter(check => !GH_GROWTH_SEO_AUDIT_ISSUES[check])
+    const sinFicha = Object.keys(MATERIALIZABLE_ISSUES).filter(check => !GH_GROWTH_SEO_AUDIT_ISSUES[check])
 
     expect(sinFicha).toEqual([])
   })
 
   it('no cataloga checks que el backend no materializa', () => {
-    const huerfanas = Object.keys(GH_GROWTH_SEO_AUDIT_ISSUES).filter(check => !ONPAGE_CHECK_SEVERITY[check])
+    const huerfanas = Object.keys(GH_GROWTH_SEO_AUDIT_ISSUES).filter(check => !MATERIALIZABLE_ISSUES[check])
 
     expect(huerfanas).toEqual([])
   })

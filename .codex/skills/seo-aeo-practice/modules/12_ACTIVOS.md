@@ -64,7 +64,7 @@ producto con mejor ROI de la práctica.**
 > veredicto). Capability `growth.seo.prospect_diagnostic.run` (admin/account) · lane
 > `POST /api/admin/growth/seo/prospect-diagnostic` · MCP `get_seo_prospect_diagnostic` /
 > `run_seo_prospect_diagnostic` (confirmación humana previa). Flag `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED`
-> hoy OFF en todos los ambientes (code-complete). Cómo usarlo en venta: `SKILL.md` §4c + manual
+> **ON en Vercel Production desde 2026-08-27** (verificado con `vercel env ls`; corrida real sobre `skyairline.com`: previsto USD 0,2050 vs medido USD 0,1991). 🔴 Un `disabled` hoy es una REGRESION, no un estado legitimo. Cómo usarlo en venta: `SKILL.md` §4c + manual
 > `docs/manual-de-uso/comercial/diagnostico-seo-prospecto-en-venta.md`.
 
 **EPIC-022 "Search Visibility 360" pasó de fundación a motor en un día (delta 2026-08-05, fin de jornada):
@@ -84,7 +84,7 @@ y cruce SEO↔AEO real — pero para el cliente el portal sigue mostrando NADA d
 > **Delta 2026-08-07 — cockpit INTERNO + las 2 primeras escrituras.** TASK-1306/1307/1308 complete: el equipo
 > entra a `/admin/growth/seo` (overview · rank & URL performance · mapa de oportunidades de keyword) y puede
 > **seguir/dejar de seguir keywords** desde la pantalla. Inventario MCP del dominio SEO hoy (verificado contra
-> `src/mcp/greenhouse/server.ts` el 2026-08-14): **10 lecturas + 2 escrituras**
+> `src/mcp/greenhouse/tool-manifest.ts` el 2026-08-31; `server.ts` dejó de ser el inventario — lo recorre): **21 lecturas + 7 escrituras**
 > (`track_seo_keywords` / `untrack_seo_keywords`); la 10.ª lectura es `get_seo_keyword_market_data`
 > (TASK-1661, complete y en producción). 🔴 Seguir una keyword **compromete gasto recurrente del
 > proveedor** —el rank capture paga por cada keyword vigente en cada ciclo—, así que el command lleva techo por

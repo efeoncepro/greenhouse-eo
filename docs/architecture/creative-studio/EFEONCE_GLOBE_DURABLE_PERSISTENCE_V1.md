@@ -8,6 +8,12 @@
 - Owners: Efeonce Globe platform (datastore, role model, stores) + Greenhouse control plane (governance)
 - Related: `PLATFORM_FOUNDATION_V1.md`, `GREENHOUSE_CONNECTIVITY_V1.md` (ADR-001), `EFEONCE_GLOBE_FRONTEND_HOSTING_FRONT_DOOR_DECISION_V1.md` (ADR-004 — the HA gate this unblocks), `EFEONCE_GLOBE_MODEL_LAB_V1.md` (spend fence + experiment aggregate), `EFEONCE_GLOBE_EVALUATION_HARNESS_V1.md` (evaluation reports), `docs/operations/creative-studio/EFEONCE_GLOBE_IAC_RUNBOOK_V1.md` (the IaC that provisions the instance), `TASK-1465`, `TASK-1468` (deferred commercial ledger), `TASK-1508` (Cloud Run services into Terraform + `maxScale` persistence)
 
+> **Operational lifecycle note (2026-09-02):** `globe-pg` is intentionally stopped under the governed
+> `hibernated` state (`activationPolicy=NEVER`). This preserves the instance, schema, backups, PITR and
+> deletion protection; it does not reverse this architecture decision or authorize an in-memory fallback.
+> Reactivation is governed by
+> [`GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md`](../../operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md).
+
 ## Delta 2026-07-21 — the reported `maxScale=3` was the REVISION ceiling (corrected by TASK-1508)
 
 Every `maxScale=3` claim in this spec (the Decision below, § Deploy topology, § 4-pillar scoring) read the **revision** ceiling (`template.scaling.maxInstanceCount`). A Cloud Run service also carries a **service-level** ceiling (`Service.scaling.maxInstanceCount`) and **Cloud Run applies the lower of the two**; both services were still at service=1, so the **effective ceiling was 1**. The cause: `--max-instances` writes a different field depending on the subcommand (`gcloud run deploy` → service; `gcloud run services update` → revision), which is why the "restore it after a deploy" workaround this spec implied was **ineffective**.

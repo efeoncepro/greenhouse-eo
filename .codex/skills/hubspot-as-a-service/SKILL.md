@@ -1,6 +1,6 @@
 ---
 name: hubspot-as-a-service
-description: "Deliver and operate HubSpot as a managed client service: portal discovery, RevOps design, CRM properties and pipelines, marketing/sales email and sequence API routing, Customer Agent configuration, Markdown knowledge, landing/chat integration, conversational QA, human handoff, rollout, measurement, and client reporting. Use for client HubSpot implementation or managed operations, especially ANAM; do not use for generic HubSpot selling, the Greenhouse write bridge, or CMS-only implementation."
+description: "Deliver and operate HubSpot as a managed client service across Smart CRM, Marketing/Content/AEO, Sales, Revenue lifecycle, Service/Customer Success/Delivery, Data/Integration, and Agent Hub/agentic operations. Use for client HubSpot implementation or managed operations, especially ANAM; do not use for generic HubSpot selling, the Greenhouse write bridge, or CMS-only implementation."
 ---
 
 # HubSpot as a Service
@@ -10,8 +10,11 @@ Operate HubSpot as an accountable managed service, not as a collection of portal
 ## Commercial context
 
 The canonical commercial structure is **Efeonce → RevOps & CRM → Kortex (when applicable) → HubSpot as
-platform/provider**. Use the service catalog in `docs/services/hubspot-as-a-service/README.md` to compose Diagnostic,
-Architecture, Implementation, Data/Automation/Lifecycle, Managed CRM Operations and Customer Agent / AI Operations.
+platform/provider**. Use the service catalog in `docs/services/hubspot-as-a-service/README.md` and its
+`HUBSPOT_OFFER_ARCHITECTURE_V2.md` to compose the six outcome families, delivery modes and sector overlays. The
+default commercial entry is a limited evaluation without cost; use a paid blueprint only when it produces an
+independent technical artifact. Customer Agent is a component of Service/Customer Success and Agentic Operations,
+not the root of the AI offer.
 Treat brochures as historical commercial input only; the review and quarantine rules live in
 `docs/audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md`. Do not import brochure claims, pricing, bundles or
 feature availability without current primary-source verification and an `as-of` date.
@@ -26,7 +29,11 @@ feature availability without current primary-source verification and an `as-of` 
    - Property types, calculations, sync, rollups, scores or smart properties: [property-types.md](references/property-types.md)
    - Reports, dashboards, native Goals and Goal reports: [report-design.md](references/report-design.md)
    - Marketing/sales email or sequence automation by API: [email-api-routing.md](references/email-api-routing.md)
-   - ANAM: [anam-case.md](references/anam-case.md)
+   - ANAM: [anam-case.md](references/anam-case.md). Para la landing pública y su seam con Customer Agent,
+     carga además `docs/architecture/kortex/hubspot-cms/anam-chat-landing.md` y
+     `docs/architecture/kortex/hubspot-cms/landing-page-runbook.md`; la implementación CMS sigue bajo ownership
+     de esos documentos.
+   - Offer/sector qualification: `docs/services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md`
 4. When the work derives from a sold implementation, read `../hubspot-solutions-partner/modules/12_IMPLEMENTACION.md`; for agents, also read `../hubspot-solutions-partner/modules/13_AGENTES.md`. Product claims and prices remain owned by that skill's `hubspot-solutions-partner` → `SOURCES.md`.
 
 ## Boundary router
@@ -60,8 +67,16 @@ Run `intake -> inventory -> design -> propose -> approve -> dry-run/draft -> exe
 
 - Never create a property because an email names a field. Confirm object, internal name, type, options, source, owner, requiredness, backfill and downstream consumers.
 - Never treat Customer Agent persona, knowledge, actions and handoff as one prompt. They are separate contracts.
-- Never conflate Customer Agent `Deployment > Workflows and bots` with agent knowledge, Customer Agent actions, or the workflow action that runs a Breeze Studio agent. It is a selective conversation-assignment layer; inventory and test its routing separately.
+- Never conflate Customer Agent `Deployment > Workflows and bots` with agent knowledge, Customer Agent actions, or
+  a workflow action that invokes an agent managed through Agent Hub/Agent Builder. Names and eligibility can change;
+  inventory the actual portal action and test routing separately.
 - Never present a Customer Agent feature as available because HubSpot documents it. Classify it as vendor-documented, portal-eligible, configured/draft, published, and runtime-verified; keep betas, credits, seats, permissions and account state explicit.
+- Apply the same availability ladder to Agent Hub, every prebuilt/custom agent, agentic workflow, Revenue Hub,
+  Contracts, Customer Success Workspace, Projects and Services. A marketing page or beta label is not portal evidence.
+- Never treat Projects or Services as Efeonce service names. They are CRM objects. Never imply that they replace a
+  PSA, ERP, billing engine or vertical system of record without a verified architecture.
+- For Revenue Hub in Chile, verify seats, territory, payments, tax/e-invoicing, SII, ERP, Finance and Legal before
+  claiming an end-to-end quote-to-cash implementation.
 - Keep Customer Agent knowledge sources in Markdown when this service owns the content.
 - Do not promise API parity. Verify whether a setting is available through CRM APIs, Customer Agent APIs, Agent CLI, CMS APIs or only the authenticated UI.
 - Do not publish, activate workflows, change licenses/permissions, or perform destructive writes without explicit approval.

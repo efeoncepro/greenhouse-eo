@@ -1,4 +1,11 @@
-# TASK-1358 / `/agencia` — Landing "Agencia" (pillar de categoría · growth partner)
+# TASK-1358 — Wireframe histórico de Agencia (no ejecutable)
+
+> **Supersedido para implementación, 2026-08-30.** Este borrador se conserva como historia:
+> no crear `/agencia/`, rail HTML, formulario demo ni restaurar cards retiradas.
+> Home actual y mapa de módulos: [contrato as-built](../../architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md).
+> Recorrido vigente: [funcional](../../documentation/public-site/agency-elementor-preview.md).
+> Motion vigente: [contrato as-built](../motion/TASK-1358-home-agency-motion.md).
+> El resto del documento describe hipótesis anteriores, no copy aprobado ni pendientes actuales.
 
 ## Meta
 

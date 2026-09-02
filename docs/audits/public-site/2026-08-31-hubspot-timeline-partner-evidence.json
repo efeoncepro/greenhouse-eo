@@ -1,0 +1,503 @@
+{
+  "preview": {
+    "mode": "preview",
+    "url": "https://efeoncepro.com/servicios-contratar-hubspot/",
+    "checkedAt": "2026-08-31T10:30:58.862Z",
+    "states": [
+      {
+        "width": 1414,
+        "motion": "no-preference",
+        "index": 0,
+        "passed": true
+      },
+      {
+        "width": 1414,
+        "motion": "no-preference",
+        "index": 1,
+        "passed": true
+      },
+      {
+        "width": 1414,
+        "motion": "no-preference",
+        "index": 2,
+        "passed": true
+      },
+      {
+        "width": 1414,
+        "motion": "no-preference",
+        "index": 3,
+        "passed": true
+      },
+      {
+        "width": 1414,
+        "motion": "no-preference",
+        "index": 4,
+        "passed": true
+      },
+      {
+        "width": 768,
+        "motion": "no-preference",
+        "index": 0,
+        "passed": true
+      },
+      {
+        "width": 768,
+        "motion": "no-preference",
+        "index": 1,
+        "passed": true
+      },
+      {
+        "width": 768,
+        "motion": "no-preference",
+        "index": 2,
+        "passed": true
+      },
+      {
+        "width": 768,
+        "motion": "no-preference",
+        "index": 3,
+        "passed": true
+      },
+      {
+        "width": 768,
+        "motion": "no-preference",
+        "index": 4,
+        "passed": true
+      },
+      {
+        "width": 390,
+        "motion": "no-preference",
+        "index": 0,
+        "passed": true
+      },
+      {
+        "width": 390,
+        "motion": "no-preference",
+        "index": 1,
+        "passed": true
+      },
+      {
+        "width": 390,
+        "motion": "no-preference",
+        "index": 2,
+        "passed": true
+      },
+      {
+        "width": 390,
+        "motion": "no-preference",
+        "index": 3,
+        "passed": true
+      },
+      {
+        "width": 390,
+        "motion": "no-preference",
+        "index": 4,
+        "passed": true
+      },
+      {
+        "width": 1414,
+        "motion": "reduce",
+        "index": 0,
+        "passed": true
+      },
+      {
+        "width": 1414,
+        "motion": "reduce",
+        "index": 1,
+        "passed": true
+      },
+      {
+        "width": 1414,
+        "motion": "reduce",
+        "index": 2,
+        "passed": true
+      },
+      {
+        "width": 1414,
+        "motion": "reduce",
+        "index": 3,
+        "passed": true
+      },
+      {
+        "width": 1414,
+        "motion": "reduce",
+        "index": 4,
+        "passed": true
+      },
+      {
+        "width": 768,
+        "motion": "reduce",
+        "index": 0,
+        "passed": true
+      },
+      {
+        "width": 768,
+        "motion": "reduce",
+        "index": 1,
+        "passed": true
+      },
+      {
+        "width": 768,
+        "motion": "reduce",
+        "index": 2,
+        "passed": true
+      },
+      {
+        "width": 768,
+        "motion": "reduce",
+        "index": 3,
+        "passed": true
+      },
+      {
+        "width": 768,
+        "motion": "reduce",
+        "index": 4,
+        "passed": true
+      },
+      {
+        "width": 390,
+        "motion": "reduce",
+        "index": 0,
+        "passed": true
+      },
+      {
+        "width": 390,
+        "motion": "reduce",
+        "index": 1,
+        "passed": true
+      },
+      {
+        "width": 390,
+        "motion": "reduce",
+        "index": 2,
+        "passed": true
+      },
+      {
+        "width": 390,
+        "motion": "reduce",
+        "index": 3,
+        "passed": true
+      },
+      {
+        "width": 390,
+        "motion": "reduce",
+        "index": 4,
+        "passed": true
+      }
+    ],
+    "pageErrors": [],
+    "keyboard": true,
+    "status": "PASS"
+  },
+  "live": {
+    "mode": "live",
+    "url": "https://efeoncepro.com/servicios-contratar-hubspot/",
+    "checkedAt": "2026-08-31T10:33:33.531Z",
+    "states": [
+      {
+        "width": 1414,
+        "motion": "no-preference",
+        "index": 0,
+        "passed": true
+      },
+      {
+        "width": 1414,
+        "motion": "no-preference",
+        "index": 1,
+        "passed": true
+      },
+      {
+        "width": 1414,
+        "motion": "no-preference",
+        "index": 2,
+        "passed": true
+      },
+      {
+        "width": 1414,
+        "motion": "no-preference",
+        "index": 3,
+        "passed": true
+      },
+      {
+        "width": 1414,
+        "motion": "no-preference",
+        "index": 4,
+        "passed": true
+      },
+      {
+        "width": 768,
+        "motion": "no-preference",
+        "index": 0,
+        "passed": true
+      },
+      {
+        "width": 768,
+        "motion": "no-preference",
+        "index": 1,
+        "passed": true
+      },
+      {
+        "width": 768,
+        "motion": "no-preference",
+        "index": 2,
+        "passed": true
+      },
+      {
+        "width": 768,
+        "motion": "no-preference",
+        "index": 3,
+        "passed": true
+      },
+      {
+        "width": 768,
+        "motion": "no-preference",
+        "index": 4,
+        "passed": true
+      },
+      {
+        "width": 390,
+        "motion": "no-preference",
+        "index": 0,
+        "passed": true
+      },
+      {
+        "width": 390,
+        "motion": "no-preference",
+        "index": 1,
+        "passed": true
+      },
+      {
+        "width": 390,
+        "motion": "no-preference",
+        "index": 2,
+        "passed": true
+      },
+      {
+        "width": 390,
+        "motion": "no-preference",
+        "index": 3,
+        "passed": true
+      },
+      {
+        "width": 390,
+        "motion": "no-preference",
+        "index": 4,
+        "passed": true
+      },
+      {
+        "width": 1414,
+        "motion": "reduce",
+        "index": 0,
+        "passed": true
+      },
+      {
+        "width": 1414,
+        "motion": "reduce",
+        "index": 1,
+        "passed": true
+      },
+      {
+        "width": 1414,
+        "motion": "reduce",
+        "index": 2,
+        "passed": true
+      },
+      {
+        "width": 1414,
+        "motion": "reduce",
+        "index": 3,
+        "passed": true
+      },
+      {
+        "width": 1414,
+        "motion": "reduce",
+        "index": 4,
+        "passed": true
+      },
+      {
+        "width": 768,
+        "motion": "reduce",
+        "index": 0,
+        "passed": true
+      },
+      {
+        "width": 768,
+        "motion": "reduce",
+        "index": 1,
+        "passed": true
+      },
+      {
+        "width": 768,
+        "motion": "reduce",
+        "index": 2,
+        "passed": true
+      },
+      {
+        "width": 768,
+        "motion": "reduce",
+        "index": 3,
+        "passed": true
+      },
+      {
+        "width": 768,
+        "motion": "reduce",
+        "index": 4,
+        "passed": true
+      },
+      {
+        "width": 390,
+        "motion": "reduce",
+        "index": 0,
+        "passed": true
+      },
+      {
+        "width": 390,
+        "motion": "reduce",
+        "index": 1,
+        "passed": true
+      },
+      {
+        "width": 390,
+        "motion": "reduce",
+        "index": 2,
+        "passed": true
+      },
+      {
+        "width": 390,
+        "motion": "reduce",
+        "index": 3,
+        "passed": true
+      },
+      {
+        "width": 390,
+        "motion": "reduce",
+        "index": 4,
+        "passed": true
+      }
+    ],
+    "pageErrors": [],
+    "keyboard": true,
+    "status": "PASS",
+    "noJs": true
+  },
+  "manifest": {
+    "contract": "hubspot-elementor-release.v1",
+    "sourceSha256": "f95b6254c2434b58a4d6855dded40dd3a38acb19b881e090e1928674ab8bb812",
+    "files": [
+      {
+        "path": "assets/css/hubspot-elementor.css",
+        "sha256": "575173767c5f22bd4ddc67618d9e6b5775db4a2e0d609ae5d2e696f9aba8fb2f",
+        "previousSha256": "31e34f13b127538686cc6ba941b76ab2ab73056afd6d15d276fb4892fd0e3923"
+      },
+      {
+        "path": "assets/js/hubspot-landing.js",
+        "sha256": "93caf8f33dd8b0bef83556c061d381b30b824c136f0075a8af937540a838a5a1",
+        "previousSha256": "a6ea2e68b85565d21740d30e99c57f28c147a8ee16e90c2878984ce4d677b677"
+      },
+      {
+        "path": "includes/hubspot/templates/delivery.html",
+        "sha256": "1c17d81961a9d4ad7294c9cc18bfa1afa785cb87fd3ac1050572cf119db43376",
+        "previousSha256": "284619f000217944977759d23420f46f22670c3b0b40a1b56e0ecbff208b1070"
+      },
+      {
+        "path": "includes/hubspot/templates/proof-ledger.html",
+        "sha256": "9fd405378a91d03e2b67c7ac87c1a7b66d75939965cc5007c610bb7af7e22296",
+        "previousSha256": "f98c52d0088400007113da1f48c217964431869be156d498799fdef32effb43f"
+      },
+      {
+        "path": "includes/hubspot/schemas/proof-ledger.json",
+        "sha256": "a6d2f8f3afa148bb34ff7b7e9c53fab0ed9007485e8b6f057ed093e97d551c59",
+        "previousSha256": "aede664a9c06434a429d00c498fa9d2a4f57f9161a84b4bdd5974b2cb6bcc9b3"
+      }
+    ]
+  },
+  "readback": {
+    "drift": [
+      {
+        "key": "_elementor_page_assets",
+        "beforeExists": true,
+        "afterExists": false
+      },
+      {
+        "key": "_elementor_css",
+        "beforeExists": true,
+        "afterExists": false
+      },
+      {
+        "key": "_elementor_element_cache",
+        "beforeExists": true,
+        "afterExists": false
+      }
+    ],
+    "postUnchanged": true,
+    "elementorUnchanged": true,
+    "files": {
+      "assets/css/hubspot-elementor.css": "575173767c5f22bd4ddc67618d9e6b5775db4a2e0d609ae5d2e696f9aba8fb2f",
+      "assets/js/hubspot-landing.js": "93caf8f33dd8b0bef83556c061d381b30b824c136f0075a8af937540a838a5a1",
+      "includes/hubspot/templates/delivery.html": "1c17d81961a9d4ad7294c9cc18bfa1afa785cb87fd3ac1050572cf119db43376",
+      "includes/hubspot/templates/proof-ledger.html": "9fd405378a91d03e2b67c7ac87c1a7b66d75939965cc5007c610bb7af7e22296",
+      "includes/hubspot/schemas/proof-ledger.json": "a6d2f8f3afa148bb34ff7b7e9c53fab0ed9007485e8b6f057ed093e97d551c59"
+    },
+    "other": {
+      "251279": true,
+      "251731": true
+    }
+  },
+  "seo": {
+    "status": "PASS",
+    "httpRedirect": "301 HTTPS, page-only, query parameters preserved",
+    "checkedAt": "2026-08-31T10:33:01.350Z",
+    "redirects": [
+      {
+        "url": "http://efeoncepro.com/servicios-contratar-hubspot/",
+        "status": 301,
+        "location": "https://efeoncepro.com/servicios-contratar-hubspot/"
+      },
+      {
+        "url": "http://efeoncepro.com/servicios-contratar-hubspot/?utm_source=qa",
+        "status": 301,
+        "location": "https://efeoncepro.com/servicios-contratar-hubspot/?utm_source=qa"
+      },
+      {
+        "url": "https://www.efeoncepro.com/servicios-contratar-hubspot/",
+        "status": 301,
+        "location": "https://efeoncepro.com/servicios-contratar-hubspot/"
+      },
+      {
+        "url": "https://efeoncepro.com/servicios-contratar-hubspot",
+        "status": 301,
+        "location": "https://efeoncepro.com/servicios-contratar-hubspot/"
+      }
+    ],
+    "sitemap": {
+      "entries": 1,
+      "lastmod": "2026-08-31T09:35:53+00:00"
+    },
+    "robots": {
+      "status": 200,
+      "body": "# START YOAST BLOCK\n# ---------------------------\nUser-agent: *\nDisallow:\n\nSitemap: https://efeoncepro.com/sitemap_index.xml\n# ---------------------------\n# END YOAST BLOCK"
+    },
+    "schema": {
+      "blocks": 1,
+      "types": [
+        "WebPage",
+        "ImageObject",
+        "BreadcrumbList",
+        "WebSite",
+        "Organization",
+        "Service"
+      ],
+      "connected": true
+    },
+    "protectedOtherPages": {
+      "https://efeoncepro.com/": {
+        "status": 200,
+        "hubspotService": false
+      },
+      "https://efeoncepro.com/agencia-creativa/": {
+        "status": 200,
+        "hubspotService": false
+      }
+    }
+  }
+}

@@ -23,8 +23,7 @@ No uses la URL `run.app`: el acceso público pasa por el front door y el hostnam
 5. Confirma que la respuesta contiene rutas, disponibilidad y correlation ID, pero no house, provider slug,
    costo de vendor ni margen.
 6. Para el provider Greenhouse-SEO, sigue su manual dedicado:
-   [Operar el provider Greenhouse-SEO del MCP](operar-provider-greenhouse-seo-mcp.md). Sus tres tools viven en el
-   permiso base, se verifican con dos canaries distintos y tienen su propio interruptor de rollback.
+   [Operar el provider Greenhouse-SEO del MCP](operar-provider-greenhouse-seo-mcp.md). Sus tools de lectura viven en el permiso base `efeonce.mcp.read` y las 7 de escritura bajo `efeonce.mcp.seo.write`; el permiso base, se verifican con dos canaries distintos y tienen su propio interruptor de rollback.
 
 Para una prueba release-controlada desde el repo `efeonce-mcp`, usa `pnpm oauth:canary`. En macOS abre Google
 Chrome y debe ejecutarse con el perfil autenticado autorizado. Al terminar, cierra sólo la ventana de prueba; no
@@ -32,7 +31,7 @@ cierres la sesión compartida del perfil.
 
 ## Operación segura
 
-- La capacidad actual es lectura interna. No habilites tools de runs, assets, review, delivery, créditos o writes
+- La capacidad actual es lectura interna más 7 escrituras federadas y fail-closed por scope. No habilites tools de runs, assets, review, delivery, créditos o writes
   como parte de una prueba de acceso.
 - Mantén Cloud Run en `concurrency=80` y `maxScale=5` mientras no haya una decisión explícita de capacidad.
 - Ante una falla de un provider, conserva OAuth y el gateway; deshabilita sólo ese provider y redespliega

@@ -1,4 +1,4 @@
-# DataForSEO Labs API — Dossier (as-of 2026-08-06)
+# DataForSEO Labs API — Dossier (as-of 2026-09-01)
 
 > Fuente: documentación oficial `docs.dataforseo.com` + help center / pricing oficial de `dataforseo.com`.
 > Todo lo afirmado abajo fue verificado contra las páginas citadas en cada sección el 2026-08-06.
@@ -123,11 +123,60 @@ Promedios de los **top-10 orgánicos** para esa keyword: backlinks, dofollow, re
 Conteo de resultados, tipos de elementos del SERP (organic, paid, featured_snippet, local_pack, ai_overview_reference…), `last_updated_time` del SERP en la base.
 
 ### Métricas de dominio/tráfico (ranked_keywords, bulk_traffic_estimation, etc.)
-- **`etv` (estimated traffic volume)** — "calculated as the product of CTR (click-through-rate) and search volume values of all keywords" por las que ranquea el dominio/página. Tráfico orgánico mensual estimado; es la métrica reina del análisis competitivo.
-- **`impressions_etv` / impressions** — variante basada en datos de impresiones (modelo Google Ads) — expuesta en los bloques `metrics` de ranked/competitors.
+- **`etv` (estimated traffic volume)** — visitas mensuales **estimadas** que el set de keywords puede llevar al dominio/página. El Help Center público todavía documenta la fórmula legacy `search volume × coeficiente CTR por rank_group`; el aviso de cuenta del 2026-09-01 anuncia una fórmula mejorada (§3.1). El nombre y tipo del campo permanecen, pero su metodología deja de ser estable: es una lente competitiva ◑, nunca tráfico medido.
 - **`estimated_paid_traffic_cost`** — "estimated monthly cost of running ads for all keywords that a domain or webpage ranks for": lo que costaría comprar ese tráfico en Ads (USD). Proxy del valor monetario del ranking orgánico.
 - **Flags de movimiento** — `is_new`, `is_up`, `is_down`, `is_lost` por elemento ranqueado (vs snapshot anterior de la base).
 - **`clickstream_data`** (con `include_clickstream_data: true`, costo ×2) — volumen normalizado con clickstream + demografía por género y grupos etarios.
+
+### 3.1 Transición ETV legacy → improved — contrato confirmado 2026-09-02
+
+**Estado de la evidencia.** DataForSEO confirmó por respuesta directa el contrato operativo. Las páginas públicas
+y OpenAPI seguían en preparación; la correspondencia oficial resuelve la matriz, semántica, históricos y precio.
+
+| Aspecto | Legacy | Improved |
+|---|---|---|
+| CTR | Coeficiente fijo por `rank_group` | Curvas por posición, intención y composición exacta del SERP |
+| Volumen | `keyword_info.search_volume` | Benchmark normalizado con datasets clickstream multi-fuente |
+| Cuentas anteriores al 2026-09-01 | Default durante transición; `false` lo solicita | `true` lo solicita |
+| Cuentas desde 2026-09-01T00:00:00Z | No es default | Default desde registro |
+| Desde 2026-11-01T00:00:00Z | No disponible: `false` se ignora | Obligatorio para todas las cuentas |
+| Precio | Request normal | Sin premium; A/B exacto requiere dos requests normales |
+
+**Matriz ETV-capable confirmada.** Variantes Google/Bing donde existen, incluidas rutas legacy: Ranked Keywords,
+SERP Competitors, Relevant Pages, Subdomains, Competitors by Domain, Categories for Domain, Domain Intersection,
+Page Intersection, Domain Rank Overview, Historical Rank Overview, Historical SERPs, Bulk Traffic Estimation,
+Historical Bulk Traffic Estimation y Domain Metrics by Categories. Keyword Suggestions/Ideas no devuelven ETV.
+
+La fórmula afecta todo `etv`, los ETV por item —incluido `ranked_serp_element.serp_item.etv`—, SERP Competitors y
+`estimated_paid_traffic_cost` en bloques organic, paid, featured snippet, local pack y AI Overview reference. Los
+elementos no orgánicos con URL comparten los clics residuales según posición absoluta. En AI Overview, el cálculo
+se reparte uniformemente entre dominios únicos citados: es atribución modelada, nunca clics observados por cita.
+
+**No confundir dos contratos:**
+
+- `use_improved_etv` selecciona la metodología del campo estándar `etv` sin recargo.
+- `include_clickstream_data: true` es independiente y combinable, solicita `clickstream_etv` y campos adicionales,
+  y **duplica el precio de ese request**. `clickstream_etv` no forma parte de improved y no cambia con el flag.
+- El nombre interno `improved_layout_clickstream_v2` describe sus insumos, pero no implica activar clickstream data.
+
+**Históricos.** Julio de 2026 en adelante se recomputa completamente. Los meses anteriores se convierten con un
+factor derivado del ratio legacy/improved de julio por dominio: son aproximaciones, no recomputación keyword por
+keyword. Hasta el corte, el mismo mes puede variar según flag. Toda persistencia improved histórica debe declarar
+`fully_recomputed` o `calibrated_approximation`; no usar pre-julio para YoY sin disclosure/no-comparable.
+
+**Provenance.** La respuesta no expone versión de fórmula. Greenhouse registra método solicitado, instante UTC y
+policy version, y deriva `provider_effective_method` según el contrato. Desde el corte, una configuración legacy
+debe fallar antes del request; nunca atribuir legacy porque se envió un `false` que el proveedor ignora.
+
+Sandbox y las URLs finales de OpenAPI/changelog permanecen pendientes no bloqueantes. GSC sigue siendo benchmark
+first-party separado; la promesa agregada del proveedor no convierte ETV en dato medido.
+
+**Contrato de uso Greenhouse:** nunca activar el flag dispersándolo entre callsites ni escribir el shadow en las
+tablas productivas actuales. La fórmula debe seleccionarse mediante policy/helper Labs canónico, persistirse como
+provenance y formar parte de idempotencia/lectura. Un shadow compara ambos modelos fuera de la serie servida; el
+cutover elige rebaseline versionado o breakpoint visible, nunca una línea que mezcla fórmulas. Auditoría de las
+14 familias y de los seis endpoints/siete caminos consumidores actuales:
+`docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md`.
 
 ---
 
@@ -246,6 +295,7 @@ Regla práctica: **Labs para orgánico y análisis; Keywords Data para presupues
 8. **`keyword_difficulty` es una métrica PURA de enlaces — preséntala como "barrera de enlaces" en niveles, NUNCA como "dificultad" cruda.** Fórmula oficial (verificada 2026-08-13 reproduciendo los valores del API con `avg_backlinks_info`): por cada top-10, `(domain_rank×0.1 + page_rank×0.9)/500`; KD = `(max(mediana, promedio) − 0.2)/0.8 × 100`, **clampeada a 0**. El 90% del peso es el backlink rank de la URL específica, y en SERPs es-LATAM el top-10 casi no tiene backlinks a nivel URL → una porción enorme de keywords da **0 exacto** (`pintura` MX: KD 0 con 135.000 búsquedas/mes). Hay DOS escuelas de KD y no son comparables: la link-based (DataForSEO, Ahrefs) y la blended (Semrush, que mezcla más factores). Contraste medido (mismas keywords, MX, 2026-08-13): `pintura` DataForSEO **0** / Semrush **50** · `comex` **18** / **67** · `berel` **8** / **34**. El 0 link-based es un dato REAL — significa *"la entrada no está bloqueada por enlaces: se compite con contenido y autoridad de dominio"*, una **oportunidad** para un dominio fuerte — pero mostrado como "Dificultad: 0" se lee "trivial", que es falso. Es country-specific (doc oficial; `berel` da `null` en CL y `8` en MX): siempre con el mercado correcto. 🔴 **En Greenhouse la barrera YA NO se deriva de la KD (delta 2026-08-14).** La primera versión la clasificaba desde `keyword_difficulty` — y heredaba su defecto: `pintura` y `pintura para piso` caían las dos en "Baja" pese a tener perfiles de top-10 opuestos. La derivación canónica es **`deriveLinkBarrier()`** (`src/lib/growth/seo/keyword-market-data.ts`), que usa el `avg_backlinks_info` persistido y pondera la **DIVERSIDAD de dominios referentes + page rank, NUNCA el conteo de enlaces**: medido en MX, `berel` tiene 5.125 backlinks contra 232 de `pintura` pero MENOS dominios (30,4 vs 52,6), así que ordenar por conteo invierte el ranking. Verificado contra el proveedor: donde la KD daba 0 a ambas, la barrera separa `pintura` HIGH de `pintura para piso` LOW. `unknown` es un estado propio ("no capturado") y se pinta "Sin dato", jamás "Baja". **NUNCA** reintroducir una clasificación desde `difficulty`: sería una segunda fuente de la misma regla, y la vieja es la que engaña. Fuente: https://dataforseo.com/help-center/what-is-keyword-difficulty-and-how-is-it-calculated
 9. **Keywords normalizadas**: se convierten a lowercase; límites por endpoint (keyword_overview: 700 kw, 80 chars, 10 palabras; search_intent/bulk: 1,000 kw; keyword_ideas: 200 seeds).
 10. **El target de `ranked_keywords` acepta dominio/subdominio/URL — pero una URL SIN esquema devuelve el dominio entero (y lo cobra).** Verificado contra doc oficial 2026-08-27 (TASK-1776): para medir una página exacta el target debe ir CON esquema (`https://dominio.com/pagina`); sin él, el proveedor lo interpreta como dominio y facturas el set completo del sitio sin darte cuenta. La **subcarpeta no tiene target nativo**: se manda el host como target + filtro server-side sobre `ranked_serp_element.serp_item.relative_url` (los filtros son gratis, ver §4) — es exactamente lo que Semrush vende como subfolder_research. Y el agregado `metrics` de la respuesta cubre el **SET COMPLETO** de keywords del sujeto independiente del `limit` comprado: la foto agregada no depende del detalle que pagaste, así que un `limit` bajo sigue dando la visión total.
+11. **El default de ETV cambia sin cambiar el campo ni romper el parser.** Esa compatibilidad sintáctica es el peligro: una captura posterior a 2026-11-01 puede entrar verde, persistirse y parecer caída/crecimiento real. Declara fórmula, cutover y comparabilidad; si falta versión, el estado es `unknown_methodology`, no asumir improved por fecha.
 
 ---
 
@@ -262,7 +312,7 @@ Regla práctica: **Labs para orgánico y análisis; Keywords Data para presupues
 
 ---
 
-## 9. Fuentes (todas consultadas 2026-08-06)
+## 9. Fuentes (base consultada 2026-08-06; ETV reverificado 2026-09-01)
 
 - Índice general: https://docs.dataforseo.com/v3/dataforseo_labs-overview/
 - Google overview: https://docs.dataforseo.com/v3/dataforseo_labs-google-overview/
@@ -281,3 +331,8 @@ Regla práctica: **Labs para orgánico y análisis; Keywords Data para presupues
 - Frescura de bases: https://dataforseo.com/help-center/how-often-are-dataforseo-databases-updated · https://dataforseo.com/help-center/dataforseo-labs-api-update-time
 - Discrepancia de volumen / DataForSEO Search Volume: https://dataforseo.com/blog/dataforseo-search-volume-precision-in-our-apis · https://dataforseo.com/help-center/how-to-get-precise-search-volume-for-keywords-with-the-dataforseo-search-volume-endpoint
 - **404 declarado**: https://docs.dataforseo.com/v3/dataforseo_labs/ (usar el overview con guiones)
+- ETV legacy: https://dataforseo.com/help-center/how-is-etv-calculated
+- Clickstream ETV: https://dataforseo.com/help-center/whats-clickstream-estimated-traffic-volume-and-how-is-it-calculated
+- Traffic cost: https://dataforseo.com/help-center/how-is-traffic-cost-calculated
+- Historical Rank Overview: https://docs.dataforseo.com/v3/dataforseo_labs/google/historical_rank_overview/live/
+- **Improved ETV:** aviso de cuenta recibido 2026-09-01 y respuesta contractual de DataForSEO recibida 2026-09-02. La respuesta confirmó alcance, corte, histórico, precio, independencia de Clickstream y ausencia de versión de fórmula en el payload. Sandbox, OpenAPI y changelog públicos siguen pendientes; no inventar esas garantías ni sustituir el contrato confirmado por inferencias desde el default.

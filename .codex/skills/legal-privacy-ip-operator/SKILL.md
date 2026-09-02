@@ -17,7 +17,7 @@ description: Orienta, sin sustituir asesoría legal, sobre privacidad, contratos
 
 ## Jurisdicciones cubiertas
 
-Efeonce opera en **Chile, Colombia, México, Perú** y está **abriendo Estados Unidos**. Regla: **la jurisdicción importa** — no exportar el derecho de un país a otro; identificar siempre **ley aplicable + foro** antes de opinar. Clientes internacionales (Globe) pueden arrastrar **GDPR** (UE) → ver `04`.
+Efeonce opera en **Chile, Estados Unidos, Colombia, México y Perú** (confirmación del operador del 2026-08-31; `docs/context/01_quienes-somos.md`). La operación comercial en Estados Unidos no acredita por sí sola entidad legal, oficina ni cumplimiento jurídico local. Regla: **la jurisdicción importa** — no exportar el derecho de un país a otro; identificar siempre **ley aplicable + foro** antes de opinar. Clientes internacionales (Globe) pueden arrastrar **GDPR** (UE) → ver `04`.
 
 ### Creator Influence & Content — overlay regional obligatorio
 

@@ -26,6 +26,7 @@ import { ensureStylesInjected } from './styles'
 import { createTelemetryEmitter, RENDERER_GTM_EVENTS } from './telemetry'
 import { RENDERER_CONTRACT_VERSION, RENDERER_VERSION } from './version'
 import { parseConsentState, resolveVisitorIdentity, type CtaVisitorIdentity } from './visitor'
+import { resolveHostSurfaceScheme } from './host-surface'
 
 export const ELEMENT_TAG = 'greenhouse-cta'
 
@@ -73,7 +74,15 @@ export class GreenhouseCtaElement extends HTMLElement {
 
     this.applyRegionSemantics(copy.ctaRegionAria)
 
-    if (this.getAttribute('color-scheme') === 'light') this.dataset.colorScheme = 'light'
+    // ISSUE-168 — El CTA es un INVITADO: hereda la superficie de la pagina donde vive,
+    // no la preferencia del sistema operativo del visitante. Sin esto, un visitante con
+    // el Mac en modo oscuro veia una tarjeta navy pegada sobre una pagina blanca.
+    // Una declaracion explicita del host siempre manda sobre la medicion.
+    const hostScheme = resolveHostSurfaceScheme(this, this.getAttribute('color-scheme'))
+
+    // Si no se pudo medir, no se fuerza nada: decide `prefers-color-scheme`, que es el
+    // comportamiento historico.
+    if (hostScheme) this.dataset.colorScheme = hostScheme
     if (this.getAttribute('appearance') === 'bare') this.dataset.appearance = 'bare'
 
     void this.load()
@@ -201,7 +210,8 @@ export class GreenhouseCtaElement extends HTMLElement {
       action,
       baseUrl: config.baseUrl,
       locale: this.getAttribute('locale'),
-      colorScheme: this.getAttribute('color-scheme'),
+      // El esquema DERIVADO del anfitrion, no el atributo crudo (ISSUE-168).
+      colorScheme: this.dataset.colorScheme ?? this.getAttribute('color-scheme'),
       placement: `growth_cta_${contract.placement}`,
       copy: resolveCtaSystemCopy(this.getAttribute('locale') ?? undefined),
     })
@@ -247,7 +257,8 @@ export class GreenhouseCtaElement extends HTMLElement {
         baseUrl: config.baseUrl,
         formSurfaceId: this.getAttribute('form-surface'),
         locale: this.getAttribute('locale'),
-        colorScheme: this.getAttribute('color-scheme'),
+        // El esquema DERIVADO del anfitrion, no el atributo crudo (ISSUE-168).
+      colorScheme: this.dataset.colorScheme ?? this.getAttribute('color-scheme'),
         onSubmitted: formSubmissionId => getRenderer()?.notifyFormSubmitted(formSubmissionId),
       })
     }

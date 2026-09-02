@@ -1,0 +1,150 @@
+{
+  "optEscenario": [
+    {
+      "value": "Todavía no tenemos HubSpot",
+      "label": "Todavía no tenemos HubSpot"
+    },
+    {
+      "value": "Lo tenemos y no está rindiendo",
+      "label": "Lo tenemos y no está rindiendo"
+    },
+    {
+      "value": "Funciona y queremos escalarlo",
+      "label": "Funciona y queremos escalarlo"
+    }
+  ],
+  "chipsHoy": [
+    {
+      "value": "Marketing Hub",
+      "label": "Marketing Hub"
+    },
+    {
+      "value": "Sales Hub",
+      "label": "Sales Hub"
+    },
+    {
+      "value": "Service Hub",
+      "label": "Service Hub"
+    },
+    {
+      "value": "Content Hub",
+      "label": "Content Hub"
+    },
+    {
+      "value": "Data Hub",
+      "label": "Data Hub"
+    },
+    {
+      "value": "Revenue Hub",
+      "label": "Revenue Hub"
+    },
+    {
+      "value": "Breeze y agentes",
+      "label": "Breeze y agentes"
+    }
+  ],
+  "chipsInteres": [
+    {
+      "value": "Smart CRM",
+      "label": "Smart CRM"
+    },
+    {
+      "value": "Marketing Hub",
+      "label": "Marketing Hub"
+    },
+    {
+      "value": "Sales Hub",
+      "label": "Sales Hub"
+    },
+    {
+      "value": "Service Hub",
+      "label": "Service Hub"
+    },
+    {
+      "value": "Content Hub",
+      "label": "Content Hub"
+    },
+    {
+      "value": "Data Hub",
+      "label": "Data Hub"
+    },
+    {
+      "value": "Revenue Hub",
+      "label": "Revenue Hub"
+    },
+    {
+      "value": "Breeze y agentes de IA",
+      "label": "Breeze y agentes de IA"
+    },
+    {
+      "value": "HubSpot AEO",
+      "label": "HubSpot AEO"
+    },
+    {
+      "value": "Sales Workspace",
+      "label": "Sales Workspace"
+    },
+    {
+      "value": "Customer Success Workspace",
+      "label": "Customer Success Workspace"
+    },
+    {
+      "value": "Marketing Studio",
+      "label": "Marketing Studio"
+    },
+    {
+      "value": "MCP: habla con tu CRM",
+      "label": "MCP: habla con tu CRM"
+    },
+    {
+      "value": "Enablement conversacional",
+      "label": "Enablement conversacional"
+    }
+  ],
+  "optEquipo": [
+    {
+      "value": "1 a 10",
+      "label": "1 a 10"
+    },
+    {
+      "value": "11 a 50",
+      "label": "11 a 50"
+    },
+    {
+      "value": "51 a 200",
+      "label": "51 a 200"
+    },
+    {
+      "value": "Más de 200",
+      "label": "Más de 200"
+    }
+  ],
+  "optPlazo": [
+    {
+      "value": "Este mes",
+      "label": "Este mes"
+    },
+    {
+      "value": "Este trimestre",
+      "label": "Este trimestre"
+    },
+    {
+      "value": "Explorando",
+      "label": "Explorando"
+    }
+  ],
+  "optPresupuesto": [
+    {
+      "value": "Asignado",
+      "label": "Asignado"
+    },
+    {
+      "value": "En definición",
+      "label": "En definición"
+    },
+    {
+      "value": "Aún no",
+      "label": "Aún no"
+    }
+  ]
+}

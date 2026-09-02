@@ -133,7 +133,7 @@ La landing `https://anam-2.hubspotpagebuilder.com/agente-anam` quedo publicada d
 projectName: kortex-cms-react
 projectId: 103589049
 component UID: kortex-anam-cms-react-theme
-deployedBuildId: 22
+deployedBuildId: 28
 ```
 
 Documentacion especifica: [`anam-chat-landing.md`](anam-chat-landing.md).
@@ -141,8 +141,19 @@ Documentacion especifica: [`anam-chat-landing.md`](anam-chat-landing.md).
 Lecciones operativas:
 
 - HubSpot puede mostrar `deployedBuildId` nuevo antes de que la pagina publica sirva los assets nuevos; verificar la URL publica buscando `kortex-cms-react/<build>`.
+- En este proyecto, el módulo CMS React se renderiza en servidor y no hidrata automáticamente estado de
+  `useState`. La selección de intención que debe sobrevivir en runtime vive en el controlador de
+  `base.hubl.html`: las opciones usan `data-intent-option` y `aria-pressed`; sólo el CTA final conserva
+  `data-chat-intent`.
 - La copy visible no debe mencionar `widget de HubSpot`; usar lenguaje de accion del usuario final.
 - Para abrir chatflows especificos desde botones, usar query params + `HubSpotConversations.widget.refresh({ openToNewThread: true })`; en ANAM el contrato vigente es `anam_intent=cotizar|seguimiento_servicio|requerimiento_calidad`.
+- El header usa el wordmark horizontal ANAM del catálogo del repo, sin el círculo superior. Emma es la asistente
+  femenina y el bordado de su uniforme debe decir exactamente `ANÁLISIS AMBIENTALES S.A.`.
+- Las correcciones integradas en el personaje o la tela se resuelven mediante edición generativa del asset,
+  guardando una versión nueva y conservando la anterior para rollback. El operador descartó el texto
+  determinista superpuesto porque rompe el acabado visual.
+- Verificar desktop y 390 px, click y teclado, `aria-pressed`, contexto del CTA, overflow, consola/red y margen
+  exterior. El smoke no debe abrir ni enviar una conversación real.
 - El endpoint `draft/push-live` de Pages API requiere scopes `content` y `content.landing_pages.write`; si faltan, el refresh/publicacion debe hacerse desde editor o con un token nuevo autorizado para ese scope.
 
 ## Evidencia esperada de cierre

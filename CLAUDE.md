@@ -19,7 +19,8 @@ Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del mode
 | Payroll/Workforce participation/exit/leave/contract-type/approval | `greenhouse-payroll-auditor` | `architecture/agent-invariants/PAYROLL_WORKFORCE_AGENT_INVARIANTS.md` |
 | Payroll receipts + Legal docs/Finiquito | `greenhouse-payroll-auditor` | `architecture/agent-invariants/PAYROLL_LEGAL_DOCS_AGENT_INVARIANTS.md` |
 | Notion sync / integrations | `notion-platform` | `architecture/GREENHOUSE_SOURCE_SYNC_PIPELINES_V1.md` |
-| HubSpot bridge / services intake | `hubspot-greenhouse-bridge` | `architecture/GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md` |
+| HubSpot bridge / services intake | `hubspot-greenhouse-bridge` + `hubspot-as-a-service` | `architecture/GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md` |
+| HubSpot portfolio / Solutions Partner / agents / public offer / sectors | `hubspot-solutions-partner` + `hubspot-as-a-service` | `services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md` + skill `SOURCES.md` |
 | Salesforce (CRM · MC Engagement · MC Next) · operar o vender | `salesforce-crm-practice` / `salesforce-marketing-cloud-engagement` / `salesforce-marketing-cloud-next` | `services/salesforce/README.md` + `SALESFORCE_PRODUCT_AND_OFFERING_MAP_V1.md` + `operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md`; Consulting Partner ≠ Cloud Reseller; Engagement ≠ Next |
 | Business model, customer model, packaging, pricing, unit economics | `efeonce-business-model-operator` + `efeonce-customer-model-operator` + `efeonce-pricing-operator` + práctica dueña | `business-models/README.md` + modelo vigente + Finance/Legal/Product según corresponda; customer model gobierna ICP/JTBD/buying group; `creative-practice` conserva Creative Studio |
 | Capital, inversión y fundraising | `efeonce-investor-readiness` + `efeonce-agency` + Finance/Legal | `strategy/EFEONCE_CAPITAL_AND_INVESTMENT_STRATEGY_V1.md` + `strategy/ASAAS_MANIFESTO_V1.md`; no emitir, endeudar, transferir IP ni crear spinout sin aprobación proporcional |
@@ -32,7 +33,7 @@ Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del mode
 | Ops/Reliability/Platform (Teams Bot/ops-worker/Vercel cron/reliability/platform-health) | `greenhouse-cron-sync-ops` `teams-bot-platform` | `architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md` |
 | EPIC-027 / trabajo nuevo durante desacople build-runtime · cualquier decisión de arquitectura (dominio/schema/agentes/frontera) | `arch-architect` (skill canónica de arquitectura; overlay greenhouse-pinned) | `architecture/GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md` + `operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md` |
 | Efeonce Globe / Creative Studio (repo `efeonce-globe`) · EPIC-028 · capability/command/reader/provider adapter · trusted context/dispatch/SDK · boundary Globe↔Greenhouse | `greenhouse-globe` + `greenhouse-globe-model-fleet` para rutas de modelos/proveedores (+ `arch-architect` para forma/decisiones) | **Globe es un PRODUCTO COMERCIAL de Efeonce (ADR-010: *"now a commercial product, not an internal lab"*), NUNCA un lab/piloto interno; su ESTADIO DE ROLLOUT hoy es internal-only + runtime `internal_smoke` + externos gated por TASK-1480 — estadio ≠ naturaleza, y NUNCA dimensiones infra/UX/calidad "porque es interno".** · `architecture/EFEONCE_CREATIVE_STUDIO_AGENTIC_PLATFORM_{DECISION,ARCHITECTURE}_V1.md` + `epics/in-progress/EPIC-028-*.md` + `architecture/creative-studio/` (índice; la doc gobernante de Globe vive en Greenhouse, NUNCA en `efeonce-globe/docs/**`; TASK-1492) + `architecture/creative-studio/EFEONCE_GLOBE_CLIENT_STYLING_ENGINE_DECISION_V1.md` (**ADR-016 `Accepted` 2026-07-27, motor YA implementado: el payload cliente usa Tailwind v4 con `tokens.ts` como theme; NUNCA un valor de diseño literal en `className` — `text-[#hex]`/`p-[13px]` — todo sale del theme, que sale del SSOT; lo único arbitrario permitido es una REFERENCIA a token, `duration-(--duration-short)`. **NUNCA aliasear el theme con `@theme inline { --text-xs: var(--text-xs) }`: cuando el nombre coincide a ambos lados es una referencia circular que rinde `text-xs` a 16px y `rounded-sm` a 0 CON EL BUILD VERDE** — el theme se GENERA desde el SSOT (`pnpm theme:generate`). **NUNCA documentar un anti-patrón dentro del árbol que Tailwind escanea**: lee los `.ts` como texto plano y materializa el ejemplo como clase real. Dueño `TASK-1485`**) + `docs/ui/GLOBE_PRODUCER_COMPOSER_STYLE_REFERENCE_V1.md` (valores exactos del composer) + `architecture/creative-studio/GLOBE_CLIENT_MOTION_CONTRACT_V1.md` (**SSOT del motion del payload cliente**; `TASK-1523`) + `operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md` (ledger de la flota — leer PRIMERO antes de asumir que un modelo no está integrado) |
-| MCP | `efeonce-mcp-platform` | Gateway; Globe fleet interno; B2B gated. |
+| MCP · superficie de tools (`src/mcp/**`) | `efeonce-mcp-platform` | `agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md` + `GREENHOUSE_MCP_ARCHITECTURE_V1.md` §22. Gateway; Globe fleet interno; B2B gated. **El inventario de tools es `src/mcp/greenhouse/tool-manifest.ts`** —`server.ts` lo RECORRE— con `writes` ⊥ `spendsProviderBudget`; NUNCA fusionarlas ni agregarle campo de federación (Greenhouse declara qué EXISTE, el gateway qué CRUZA). Gate: `pnpm mcp:manifest:check`. |
 | Task nueva en un EPIC grande (>20 hijas), en especial `EPIC-028` | `greenhouse-task-planner` | **Barrer el registry por DOMINIO y SUPERFICIE antes de reservar un ID, NUNCA por el título del trabajo** — dos tasks de la misma superficie con nombres distintos no se cruzan por nombre; caso fuente: 5 duplicadas en una sesión (`docs/tasks/TASK_PROCESS.md` §Barrido por dominio) |
 | Entitlements governance + capability grants + ROLE_CODES | — | `architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md` · `architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md` |
 | Typography + Efeonce brand | `typography-design` | `architecture/agent-invariants/DESIGN_TOKENS_BRAND_AGENT_INVARIANTS.md` |
@@ -138,8 +139,8 @@ Para reducir costo GitHub Actions/Vercel/GCP sin perder calidad, Claude/agents d
 Comandos canonicos:
 
 ```bash
-pnpm local:check       # lint + tsc
-pnpm local:check:ui    # local:check + design:lint + build
+pnpm local:check       # nul-byte-gate + skills:mirrors + mcp:manifest:check + lint + tsc
+pnpm local:check:ui    # local:check + design:lint + design-contract:lint + ui:code-lint + build
 pnpm local:check:full  # local:check + test + build
 ```
 
@@ -503,8 +504,9 @@ Todo agente que trabaje sobre una task del sistema debe gestionar su estado en e
 2. Mover el archivo de `in-progress/` a `complete/`
 3. Verificar que carpeta y `Lifecycle` digan lo mismo
 4. Actualizar `docs/tasks/README.md` — mover entrada a sección `Complete` con resumen de lo implementado
-5. Documentar en `Handoff.md` y `changelog.md`
-6. Ejecutar el chequeo de impacto cruzado (ver abajo)
+5. **Registrar el avance donde se LEE:** tildar los criterios que la evidencia respalda (sin tildar + razón lo que no), `Status real` al día, `pnpm task:lint --task TASK-###`. Un `## Delta` es prosa que nadie lee para decidir: por eso `TASK-1699` se re-ejecutó cinco veces.
+6. Documentar en `Handoff.md` y `changelog.md`
+7. Ejecutar el chequeo de impacto cruzado (ver abajo)
 
 Regla dura:
 
@@ -1087,7 +1089,7 @@ Los invariantes operativos de Finance ledger/bank — internal account number al
 
 - Tests unitarios: Vitest + Testing Library + jsdom
 - Helper de render para tests: `src/test/render.tsx`
-- Validar con: `pnpm build`, `pnpm lint`, `pnpm test`, `pnpm typecheck` (NO `npx tsc --noEmit` crudo — OOM bajo Node 20, ISSUE-104)
+- Validar con: `pnpm build`, `pnpm lint`, `pnpm test`, `pnpm typecheck` (ver Quick Reference)
 
 ### Charts — política canónica (decisión 2026-04-26 — prioridad: impacto visual)
 
@@ -1210,9 +1212,9 @@ automaticamente al `pnpm install`):
 - **`.husky/pre-commit`**: corre `pnpm exec lint-staged` → `eslint --fix` sobre
   archivos staged. Errores auto-fixable se aplican; errores no-fixable bloquean
   el commit. Latencia tipica < 5s (cache eslint en `node_modules/.cache/eslint-staged`).
-- **`.husky/pre-push`**: corre `pnpm local:check` (`pnpm lint` full repo + `pnpm exec tsc --noEmit`).
-  Bloquea push si hay 1+ error. Latencia tipica < 90s. Defense in depth sobre
-  pre-commit (cubre archivos NO staged que otro agente pudo dejar rotos).
+- **`.husky/pre-push`**: corre `pnpm local:check` (composicion arriba). Bloquea push
+  si hay 1+ error. Defense in depth sobre pre-commit (cubre archivos NO staged que
+  otro agente pudo dejar rotos).
 
 **Reglas duras**:
 

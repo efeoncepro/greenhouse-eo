@@ -585,6 +585,18 @@ export class GreenhouseApiPlatformClient {
     })
   }
 
+  // TASK-1804 — manuales de uso de la superficie MCP (lectura pura, estática). El lane filtra el
+  // catálogo por binding: un manual que el binding no puede ver NO EXISTE (404 anti-oracle).
+  async getMcpSkills() {
+    return this.request('/api/platform/ecosystem/mcp/skills')
+  }
+
+  async getMcpSkill(input: { name: string }) {
+    const encodedName = encodeURIComponent(input.name)
+
+    return this.request(`/api/platform/ecosystem/mcp/skills/${encodedName}`)
+  }
+
   /**
    * TASK-1709 — disparar un diagnóstico de prospecto (COMMAND: compromete gasto real con
    * tope duro por diagnóstico). Sólo bindings `internal`.

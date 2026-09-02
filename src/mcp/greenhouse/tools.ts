@@ -143,7 +143,7 @@ const validatePlatformHealthResult = (
   }
 }
 
-const callReadTool = async <TData>(
+const callTool = async <TData>(
   summary: (result: GreenhouseMcpSuccessResult<TData>) => string,
   action: () => Promise<GreenhouseMcpSuccessResult<TData>>
 ) => {
@@ -207,9 +207,57 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   | 'prepareSeoGroundedQueries'
   | 'getSeoProspectDiagnostic'
   | 'runSeoProspectDiagnostic'
+  | 'getMcpSkills'
+  | 'getMcpSkill'
 >) => ({
+  /**
+   * TASK-1804 — el manual de uso viaja por el protocolo. Sin `name` devuelve el catálogo
+   * (resúmenes, nunca cuerpos); con `name`, el manual completo. El TEXTO del content es el manual
+   * mismo: el agente lo carga para operar, no para leer un resumen de que existe.
+   */
+  async getGreenhouseSkill(input: { name?: string }) {
+    if (input.name) {
+      const name = input.name
+
+      return callTool(
+        result => {
+          const data = result.data as { body?: string; name?: string }
+
+          return typeof data.body === 'string' && data.body.length > 0
+            ? data.body
+            : `Loaded Greenhouse manual ${String(data.name ?? name)} (${result.requestId}).`
+        },
+        () => client.getMcpSkill({ name })
+      )
+    }
+
+    return callTool(
+      result => {
+        const data = result.data as {
+          skills?: Array<{ name?: string; description?: string; appliesTo?: string[] }>
+        }
+
+        const skills = Array.isArray(data.skills) ? data.skills : []
+
+        if (skills.length === 0) {
+          return `No Greenhouse manuals are available for this scope (${result.requestId}).`
+        }
+
+        const lines = skills.map(
+          skill =>
+            `- ${String(skill.name)} — ${String(skill.description ?? '')}` +
+            (Array.isArray(skill.appliesTo) && skill.appliesTo.length > 0
+              ? ` (governs: ${skill.appliesTo.join(', ')})`
+              : '')
+        )
+
+        return `Greenhouse manuals available (${skills.length}). Load one with get_greenhouse_skill({ name }):\n${lines.join('\n')}`
+      },
+      () => client.getMcpSkills()
+    )
+  },
   async getContext() {
-    return callReadTool(
+    return callTool(
       result =>
         `Resolved Greenhouse context for scope ${String((result.meta.scope as { scopeType?: string } | undefined)?.scopeType ?? 'unknown')} (${result.requestId}).`,
       () => client.getContext()
@@ -222,7 +270,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     status?: string
     type?: string
   }) {
-    return callReadTool(
+    return callTool(
       result => {
         const count = Number((result.data as { count?: number }).count ?? 0)
 
@@ -232,7 +280,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     )
   },
   async getOrganization(input: { id: string }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as { organizationName?: string; publicId?: string; organizationId?: string }
         const label = data.organizationName ?? data.publicId ?? data.organizationId ?? input.id
@@ -247,7 +295,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     pageSize?: number
     search?: string
   }) {
-    return callReadTool(
+    return callTool(
       result => {
         const count = Number((result.data as { count?: number }).count ?? 0)
 
@@ -257,7 +305,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     )
   },
   async getIntegrationReadiness(input: { keys?: string[] }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as { requestedKeys?: string[]; allReady?: boolean }
         const count = Array.isArray(data.requestedKeys) ? data.requestedKeys.length : 0
@@ -268,7 +316,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     )
   },
   async getPlatformHealth() {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as { overallStatus?: string; confidence?: string; degradedSources?: unknown[] }
         const degradedSourceCount = Array.isArray(data.degradedSources) ? data.degradedSources.length : 0
@@ -283,7 +331,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     namespace?: string
     aggregateType?: string
   }) {
-    return callReadTool(
+    return callTool(
       result => {
         const count = Number((result.data as { count?: number }).count ?? 0)
 
@@ -297,7 +345,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     pageSize?: number
     active?: boolean
   }) {
-    return callReadTool(
+    return callTool(
       result => {
         const count = Number((result.data as { count?: number }).count ?? 0)
 
@@ -307,7 +355,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     )
   },
   async getWebhookSubscription(input: { id: string }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as { subscriberCode?: string; subscriptionId?: string }
         const label = data.subscriberCode ?? data.subscriptionId ?? input.id
@@ -323,7 +371,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     status?: string
     eventType?: string
   }) {
-    return callReadTool(
+    return callTool(
       result => {
         const count = Number((result.data as { count?: number }).count ?? 0)
 
@@ -333,7 +381,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     )
   },
   async getWebhookDelivery(input: { id: string }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as { deliveryId?: string; eventType?: string; status?: string }
         const label = data.deliveryId ?? input.id
@@ -346,7 +394,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   // TASK-1086 — Knowledge (read-only). El packet `knowledge-search.v1` ya trae citas +
   // confidence + freshness; si confidence='none' el agente NO debe inventar un documento.
   async searchKnowledge(input: { query: string; limit?: number }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as { confidence?: string; chunks?: unknown[] }
         const chunkCount = Array.isArray(data.chunks) ? data.chunks.length : 0
@@ -357,7 +405,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     )
   },
   async getKnowledgeDocument(input: { id: string }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as {
           document?: { title?: string; publicationStatus?: string }
@@ -377,7 +425,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   // TASK-1211 — Cotizador read-only. Estima precio por nombre de servicio. El
   // estimate es referencial, NO vinculante; el cost stack/margen no cruza a scope cliente.
   async searchServices(input: { query?: string; limit?: number }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as { total?: number }
 
@@ -387,7 +435,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     )
   },
   async quotePrice(input: Record<string, unknown>) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as { service?: { name?: string }; estimate?: { currency?: string } }
 
@@ -403,7 +451,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   // dominio acá. Las degradaciones honestas del reader (disabled / target_not_configured /
   // no_seo_data / no_aeo_data) llegan en data.ok=false — el agente NO debe inventar datos.
   async getSeoKeywordOpportunities(input: { organizationId?: string; market?: string; limit?: number }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as { ok?: boolean; opportunities?: unknown[]; errorCode?: string }
 
@@ -419,7 +467,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     )
   },
   async getSeoKeywordMarketData(input: { organizationId?: string; market?: string; keywords: string[] }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as {
           ok?: boolean
@@ -443,7 +491,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     )
   },
   async getSeoDomainOverview(input: { organizationId?: string; market?: string; subject?: string; months?: number }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as {
           ok?: boolean
@@ -484,7 +532,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     concentration?: string
     domain?: string
   }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as {
           ok?: boolean
@@ -517,7 +565,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     )
   },
   async getSeoBacklinkDetail(input: { organizationId?: string; market?: string; captureDate?: string }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as {
           ok?: boolean
@@ -555,7 +603,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     )
   },
   async getSeoVisibility360(input: { organizationId?: string; market?: string }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as {
           ok?: boolean
@@ -579,7 +627,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     )
   },
   async getSeoEntitlement(input: { organizationId?: string }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as {
           hasModule?: boolean
@@ -606,7 +654,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     device?: string
     keywords?: string[]
   }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as {
           ok?: boolean
@@ -640,7 +688,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     device?: string
     engine?: string
   }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as {
           ok?: boolean
@@ -675,7 +723,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     windowDays?: number
     limit?: number
   }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as { ok?: boolean; errorCode?: string; items?: unknown[] }
 
@@ -692,7 +740,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   },
   // TASK-1306 — KPIs norte del cockpit Overview (Search Console medido).
   async getSeoOverviewKpis(input: { organizationId?: string; market?: string; rangeDays?: number }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as {
           ok?: boolean
@@ -722,7 +770,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   },
   // TASK-1304 — reporte del site audit técnico (OnPage: health + findings por severidad).
   async getSeoSiteAuditReport(input: { organizationId?: string; market?: string; auditRunId?: string }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as {
           ok?: boolean
@@ -752,7 +800,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   },
   // TASK-1304 — serie semanal del perfil de enlaces.
   async getSeoBacklinkProfile(input: { organizationId?: string; market?: string; rangeDays?: number }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as {
           ok?: boolean
@@ -787,7 +835,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     intent?: 'target' | 'opportunity'
     intentDeclaredBy?: string
   }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as {
           ok?: boolean
@@ -831,7 +879,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
    * que no ocurrió.
    */
   async untrackSeoKeywords(input: { organizationId?: string; keywords: string[] }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as {
           ok?: boolean
@@ -864,7 +912,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
    * outcome POR dominio para que un rebote por techo llegue al usuario con esas palabras.
    */
   async declareSeoCompetitors(input: { organizationId?: string; domains: string[]; proposalRef?: string }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as {
           ok?: boolean
@@ -895,7 +943,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   },
   /** TASK-1662 — el reverso: retirar competidores (cierra vigencia, corta gasto futuro). */
   async retireSeoCompetitors(input: { organizationId?: string; domains: string[]; reason?: string }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as {
           ok?: boolean
@@ -939,7 +987,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     keywords: string[]
     rangeDays?: number
   }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as {
           ok?: boolean
@@ -969,7 +1017,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     )
   },
   async getSeoKeywordGap(input: { organizationId: string; market?: string; seoCompetitorId?: string; limit?: number }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as {
           ok?: boolean
@@ -1033,7 +1081,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     limit?: number
     cursor?: string
   }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as {
           ok?: boolean
@@ -1085,7 +1133,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     to?: string
     limit?: number
   }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as {
           ok?: boolean
@@ -1120,7 +1168,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     minKeywords?: number
     minDays?: number
   }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as {
           ok?: boolean
@@ -1176,7 +1224,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     limit?: number
     cursor?: string
   }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as {
           ok?: boolean
@@ -1234,7 +1282,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     idempotencyKey?: string
     preview?: boolean
   }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as {
           ok?: boolean
@@ -1278,7 +1326,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
    * baseline fallback JAMÁS se reporta como grounded en los candidates.
    */
   async getSeoGroundedQueryDraft(input: { organizationId?: string; market?: string; profileId: string; setId: string }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as {
           ok?: boolean
@@ -1319,7 +1367,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
     discoveryRunId: string
     candidateIds: string[]
   }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as {
           ok?: boolean
@@ -1355,7 +1403,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
 
   // TASK-1709 — diagnóstico de prospecto: lectura + disparo (gasto real, tope duro).
   async getSeoProspectDiagnostic(input: { diagnosticId?: string; rootDomain?: string; limit?: number }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as {
           ok?: boolean
@@ -1381,7 +1429,7 @@ export const createGreenhouseMcpHandlers = (client: Pick<
   },
 
   async runSeoProspectDiagnostic(input: { rootDomain: string; market: string; competitorDomains?: string[] }) {
-    return callReadTool(
+    return callTool(
       result => {
         const data = result.data as {
           ok?: boolean

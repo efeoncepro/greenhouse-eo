@@ -12,6 +12,20 @@ Esta task escribe el bucket/“días de retraso” por-tarea leyendo el M2 shado
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-01 — registro del avance (barrido `stale-progress`)
+
+La task tenia 13 checkboxes en cero con `Status real` diciendo "code complete, rollout pendiente" —
+correcto en la prosa, invisible en los campos que una sesion lee para decidir si tomarla.
+
+Verificado hoy contra el repo: existen la migracion (`20260620001951669_task-927-otd-writeback-snapshots.sql`),
+las constantes + mapping bucket->select, el batch helper con tests, el endpoint `POST /otd/writeback`
+del ops-worker y los dos reliability signals cableados. **1 de 6 criterios de aceptacion se puede
+tildar** (el flag default OFF); los otros 5 dependen de una escritura real que no ocurrio, y cada uno
+quedo con la razon escrita en vez de tildado a la ligera. Tildarlos seria peor que dejarlos vacios.
+
+El bloqueo no es tecnico: es crear la propiedad `[GH] OTD` en los Notion de Efeonce y Sky, que es
+client-facing y necesita decision del operador.
+
 ## Status
 
 - Lifecycle: `in-progress`
@@ -23,7 +37,7 @@ Esta task escribe el bucket/“días de retraso” por-tarea leyendo el M2 shado
 - Status real: `code complete, rollout pendiente (2026-06-20). 5 slices construidos + testeados + gates verdes. Pendiente de rollout gateado al operador (client-facing): crear la propiedad [GH] OTD en Notion Efeonce+Sky + redeploy ops-worker + flip flag NOTION_OTD_WRITEBACK_ENABLED per-cliente con el gate shadow_terminal_open en steady=0. Flag default OFF → cero writes hasta activar. NO se mueve a complete/ hasta que la propiedad exista + el flip esté hecho + verificado en vivo (acceptance criteria #1 depende de la propiedad Notion).`
 - Rank: `TBD`
 - Domain: `delivery|ico|integrations|reliability`
-- Blocked by: `TASK-922 (M2 — bucket_attributable freeze-aware en task_attributable_lateness_shadow) ✅ SHIPPED 2026-05-24, shadow compute ACTIVO en prod (ATTRIBUTABLE_LATENESS_OTD_ENABLED=true). TASK-923 (M1) ✅ SHIPPED es el clasificador base que M2 reusa. Soft-dep: TASK-912 captura de transiciones ACTIVA en prod (alimenta el shadow event-driven); el batch recomputa los buckets now()-dependientes.`
+- Blocked by: `none` (2026-09-01: TASK-922 M2 y TASK-923 M1 cerraron; ambas shipped y con shadow compute activo en prod. Lo que queda NO es una task: es crear la propiedad `[GH] OTD` en los Notion de Efeonce y Sky, decision del operador)
 - Branch: `task/TASK-927-otd-bucket-notion-writeback`
 - Legacy ID: `none`
 - GitHub Issue: `optional`
@@ -201,12 +215,12 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Propiedad `[GH] OTD` existe en Efeonce + Sky, read-only para operadores.
-- [ ] Daily batch escribe el bucket GH-owned per-tarea del período activo, idempotente, vía Cloud Tasks throttled.
-- [ ] Flag global + per-cliente, default OFF → cero escrituras hasta activación.
-- [ ] `otd_pct` + bono + fórmula legacy `Indicador de Performance` INTACTOS (verificado).
-- [ ] 2 reliability signals visibles en `/admin/operations`, steady = 0.
-- [ ] Echo-loop verificado: escribir `[GH] OTD` no dispara recompute de transición.
+- [ ] Propiedad `[GH] OTD` existe en Efeonce + Sky, read-only para operadores. **NO — es el paso de rollout gateado al operador (client-facing), no trabajo de codigo. Sin esto no hay nada que escribir.**
+- [ ] Daily batch escribe el bucket GH-owned per-tarea del periodo activo, idempotente, via Cloud Tasks throttled. **CONSTRUIDO pero NUNCA EJECUTADO: `runOtdWritebackBatch` (`src/lib/notion-metrics/otd-writeback-batch.ts`) + endpoint `POST /otd/writeback` (`services/ops-worker/server.ts:3360`) + Cloud Scheduler, con tests. Cero escrituras reales porque el flag esta OFF. El criterio habla de comportamiento, no de codigo: no se tilda.**
+- [x] Flag global + per-cliente, default OFF -> cero escrituras hasta activacion. **Verificado 2026-09-01:** `isOtdWritebackEnabled(workspaceId)` en `otd-writeback-constants.ts:51` con su test dedicado (`default OFF`); ledger confirma `NOTION_OTD_WRITEBACK_ENABLED` + `_EFEONCE` / `_SKY` OFF en todos los environments. Es el unico criterio que el estado OFF satisface de verdad.
+- [ ] `otd_pct` + bono + formula legacy `Indicador de Performance` INTACTOS (verificado). **NO SE PUEDE VERIFICAR TODAVIA: sin escrituras reales, que sigan intactos es trivialmente cierto y no prueba nada. La verificacion que pide el criterio es POST-writeback.**
+- [ ] 2 reliability signals visibles en `/admin/operations`, steady = 0. **PARCIAL, no se tilda:** los dos existen y estan cableados (`reliability_signal_otd_writeback_dead_letter` y `_lag`, importados en `get-reliability-overview.ts:122-124`). Lo que NO observe es la pagina live; y con el flag OFF un `steady = 0` no distingue "sano" de "nunca corrio".
+- [ ] Echo-loop verificado: escribir `[GH] OTD` no dispara recompute de transicion. **NO — exige una escritura real. Es el riesgo mas serio del rollout y no hay forma de cerrarlo sin ejecutar.**
 
 ## Verification
 

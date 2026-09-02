@@ -11,7 +11,8 @@ import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
 import DataTableShell from '@/components/greenhouse/data-table/DataTableShell'
-import { GreenhouseButton, GreenhouseChip } from '@/components/greenhouse/primitives'
+import { GreenhouseAsyncActionButton, GreenhouseButton, GreenhouseChip } from '@/components/greenhouse/primitives'
+import type { GreenhouseAsyncActionState } from '@/components/greenhouse/primitives'
 import { GH_GROWTH_SEO_KEYWORDS } from '@/lib/copy/growth'
 import { formatDate, formatNumber } from '@/lib/format'
 import type { SeoDiscoveryMethod } from '@/lib/growth/seo/keyword-discovery/contracts'
@@ -40,6 +41,12 @@ import type { SeoDiscoveryCandidateView } from '@/lib/growth/seo/keyword-discove
 interface Props {
   candidates: SeoDiscoveryCandidateView[]
   totalCandidates: number
+  /** ¿Queda cursor Y la corrida está asentada? Con `false` la afordancia NO se renderiza. */
+  canLoadMore: boolean
+  /** Cuántos candidatos trae la página siguiente; el botón lo dice en su propio texto. */
+  nextPageSize: number
+  loadMoreState: GreenhouseAsyncActionState
+  onLoadMore: () => void
   /** Id del candidato abierto en el drawer; alimenta `aria-expanded` del trigger. */
   openCandidateId: string | null
   /** El botón que abrió el drawer se registra para poder devolverle el foco al cerrar. */
@@ -234,17 +241,26 @@ const DetailTrigger = ({
   )
 }
 
-const KeywordDiscoveryResults = ({ candidates, totalCandidates, openCandidateId, onOpenCandidate }: Props) => {
+const KeywordDiscoveryResults = ({
+  candidates,
+  totalCandidates,
+  openCandidateId,
+  onOpenCandidate,
+  canLoadMore,
+  nextPageSize,
+  loadMoreState,
+  onLoadMore
+}: Props) => {
   const copy = GH_GROWTH_SEO_KEYWORDS.discovery.results
 
   /*
-   * 🔴 El conteo afirma el universo; la tabla sirve UNA página (el reader pagina en 50, techo
-   * 200). Pintar «Candidatos (312)» sobre 50 filas sin decir nada es mentira por omisión, y en el
-   * canvas donde se decide el gasto eso pesa: el operador cree que revisó todo.
+   * 🔴 El conteo afirma el universo; la tabla sirve lo recorrido hasta ahora. Pintar
+   * «Candidatos (312)» sobre 50 filas sin decir nada es mentira por omisión, y en el canvas donde
+   * se decide el gasto eso pesa: el operador cree que revisó todo.
    *
-   * El orden gobernado del reader pone primero lo que más importa (● medido y no seguido), así
-   * que los servidos son los buenos — pero no son todos, y se nombra. La paginación real
-   * (consumir `nextCursor`) es de TASK-1693.
+   * TASK-1693: ahora el corte tiene salida. `truncated` sigue gobernando el conteo honesto y el
+   * aviso, y ambos desaparecen solos cuando ya se recorrió todo — sin ningún estado extra que
+   * mantener en sincronía.
    */
   const truncated = totalCandidates > candidates.length
 
@@ -266,9 +282,7 @@ const KeywordDiscoveryResults = ({ candidates, totalCandidates, openCandidateId,
 
         {truncated ? (
           <Typography variant='caption' color='text.secondary'>
-            {copy.truncatedNotice
-              .replace('{shown}', String(candidates.length))
-              .replace('{count}', String(totalCandidates))}
+            {copy.truncatedNotice}
           </Typography>
         ) : null}
 
@@ -442,6 +456,31 @@ const KeywordDiscoveryResults = ({ candidates, totalCandidates, openCandidateId,
             )
           })}
         </Stack>
+
+        {/*
+          ── TASK-1693 · afordancia de página siguiente ──────────────────────────────────────
+          Se monta UNA sola vez, fuera de la tabla densa y de la card list, así que existe en las
+          dos presentaciones sin duplicar el control (dos botones con el mismo nombre accesible
+          confundirían al lector de pantalla y al control por voz).
+
+          `variant='outlined'` y ancho contenido a propósito: esta acción LEE y no gasta, mientras
+          «Descubrir» —arriba, `contained`, pegado a la cifra de costo— sí. Dos botones llenos en
+          la misma pantalla, uno que cuesta dinero y otro que no, es como alguien confirma un
+          gasto creyendo que está paginando.
+        */}
+        {canLoadMore && nextPageSize > 0 ? (
+          <Box data-capture='seo-keyword-discovery-pagination' sx={{ display: 'flex', justifyContent: 'center' }}>
+            <GreenhouseAsyncActionButton
+              variant='outlined'
+              color='primary'
+              state={loadMoreState}
+              onClick={onLoadMore}
+              reserveWidth
+            >
+              {copy.loadMore.replace('{count}', String(nextPageSize))}
+            </GreenhouseAsyncActionButton>
+          </Box>
+        ) : null}
 
         {/* La divulgación del gasto viaja con los candidatos, no sólo en la confirmación: quien
             está eligiendo a cuáles seguir tiene que leerla ANTES de decidir. */}

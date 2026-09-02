@@ -1,0 +1,377 @@
+{
+  "contract": "hubspot-elementor-release.v1",
+  "sourceSha256": "f95b6254c2434b58a4d6855dded40dd3a38acb19b881e090e1928674ab8bb812",
+  "rendererSourceHashes": {
+    "src/growth-forms-renderer/api-client.ts": "a511a70ca08fde610603f1488576e93daa3639152b423034ba8ea036d7acd185",
+    "src/growth-forms-renderer/conditions.ts": "4299a663886d99d71b7ba3b7f9eef81e002f86a4484454384f24ccea4cda0b6d",
+    "src/growth-forms-renderer/contract.ts": "e3b55404cc2f8cec7792a22afd5b9b48579afa0685cca4688d7d400be6162137",
+    "src/growth-forms-renderer/copy.ts": "4ca6e163af548fb1b5e5a833e00c41a4f750734e7379d5bc716834a38ff668d0",
+    "src/growth-forms-renderer/element.ts": "7b0bebe4c63ac586315169cffed5d014f3a6fe79515328fcc757e2b1aca233d7",
+    "src/growth-forms-renderer/fixtures.ts": "74b2a8a6eac08eb0863d9f18c9e571beb26e2d7b60965da683ef589ab9463ebb",
+    "src/growth-forms-renderer/index.ts": "7215f4c25d5fbe189ba00491c1f94ab8b5e47a6fe4a21cac4fbc46385b0de199",
+    "src/growth-forms-renderer/mask.ts": "65582800f11fe58fe6cd1fb8eba36b1374b920e66adc83b8843798151a93e53f",
+    "src/growth-forms-renderer/renderer.ts": "1045e5fc9f5534ebac135fdd7e7f90850daa24041bb8aa8dc648cd7c29d0e071",
+    "src/growth-forms-renderer/styles.ts": "5d769b2b73c434294f905de891e9eaf8d7cd94c0d5a29bedf912c5134ab44e7c",
+    "src/growth-forms-renderer/telemetry.ts": "0ec2c87e3b7f37cf1c6fe7410f449f70e54dd75cf812606517199edbc9f73fb2",
+    "src/growth-forms-renderer/turnstile.ts": "f0a1b60a864bedb858817c77cc48e092499f503a915466127fd918055957fb94",
+    "src/growth-forms-renderer/validation.ts": "331d80360e78c056eeb758f802f0e8729e0e66273d6f560c1eec942b940a720f",
+    "src/growth-forms-renderer/version.ts": "87a0646cf7fe9318471318612af1ecb1aec37f7541facd31df7498869dc5cfb2"
+  },
+  "files": [
+    {
+      "path": "includes/hubspot/schemas/assessment.json",
+      "sha256": "5b2db8624324d312f0ae6321beace2eab2896ae9aedf57501058ac3db2209959",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/schemas/atlas.json",
+      "sha256": "c0b3e1d7aee9cfb630168bc2a4cb66497bb18133681ac4aed393d1a1c9a98912",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/schemas/conversion.json",
+      "sha256": "18f3047e9078fbc05c1aa424a84c22c638485ce16f8027a0a1c825852e4e1082",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/schemas/delivery.json",
+      "sha256": "1d02e6c5c9a7e93ffd0f0fde9970c3b5b06323af90eadfcd86241977ef5c355d",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/schemas/faq.json",
+      "sha256": "eb09071c4aefed367d0bb578a9114a664112699b80c76ce2fc376d1e88bbbfbc",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/schemas/hero.json",
+      "sha256": "a4016f365b9be561d8245ee4d4382d41b044ba4f13666cbb2cf0d022c4987c67",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/schemas/hubs.json",
+      "sha256": "b714f964cad35792dfa95e9af0058f3c5d4043451dec104aa28029ff0ae5ce90",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/schemas/licensing.json",
+      "sha256": "995b544fc4cfd62a109d83f0c46084f360c77d60f32a4936722eb058b7afaedb",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/schemas/proof-ledger.json",
+      "sha256": "a1b7dee77df3dc2d5e64ae7b8ce61813f281189d07a238ac86b0470a6eb482e0",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/schemas/proof.json",
+      "sha256": "215669c95d17c8b595675862eba6f80631e1c63cf4aa3af39a8c0c22a093f4af",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/schemas/sectors.json",
+      "sha256": "34a0764cbc690f554ea1eb5664ed73999bdbae8ee6063e1c5f49ee879577c8c9",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/assessment.html",
+      "sha256": "2e08875388ec13a51d54ac49867618b796a4249b962c2e561ac440f3a1362cc1",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/atlas--families-0.html",
+      "sha256": "924ff75064b6337dee19d8746045044be25df6388096678989740fcbfaed8752",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/atlas--families-1.html",
+      "sha256": "cd071f03205bda269032f5595f5e7cea4a8b493537bc8865d5ed6e5577f9ece1",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/atlas--families-2.html",
+      "sha256": "72a3a7866f6d2271b3edb0eac30393718047e6b24cdf003c3b6b2c1cc784a47f",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/atlas--families-3.html",
+      "sha256": "6da54a22116971203cd0bd5a8f1b46e8df241d7989548e8da703171cda7ed850",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/atlas--families-4.html",
+      "sha256": "1e8d548406bcefaaaee194f29608b932c68c8ebf60e9fc428733142d269824e7",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/atlas--families-5.html",
+      "sha256": "96b0a7da433324931d98102bfc591783bd70a2af196e47af9a78dbb74a8aa6ae",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/atlas.html",
+      "sha256": "6efef26a26fb141faef3f046b01f108e3a0324c6b72721726b17ad2fdeb6f1ad",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/conversion.html",
+      "sha256": "d3ab2cdb114a17f6d441a628cc689622aabbb0cd137b2e872db988de609a702e",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/delivery--panels-0.html",
+      "sha256": "4324fafdc581a1df8a6ec27313a2ebd729074dcf977d335441ead5b7685f2c6e",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/delivery--panels-1.html",
+      "sha256": "c587cdc88aecd9dfe8309caa0bfd2c7f078957c12d6c0bafbd7d45ed3db521d8",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/delivery--panels-2.html",
+      "sha256": "0c95d9b71760290d98b469e5b8ca92c8521cb266bbf609717e5124d2bfe0f44f",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/delivery--panels-3.html",
+      "sha256": "9263a7d0387c72e268d922a1eb1d162a304ffa68cad3b42359789d16a9fd9596",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/delivery--panels-4.html",
+      "sha256": "5acb6ef839a99d2493bdaf9b2a6ed0cd837fd3cd13e2476bc1bddd1e40b5a2f6",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/delivery.html",
+      "sha256": "284619f000217944977759d23420f46f22670c3b0b40a1b56e0ecbff208b1070",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/faq--questions-0.html",
+      "sha256": "482de2ab8894938be48435d447786424879cf1c540fab4067d7d292b7ef66b69",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/faq--questions-1.html",
+      "sha256": "482de2ab8894938be48435d447786424879cf1c540fab4067d7d292b7ef66b69",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/faq--questions-2.html",
+      "sha256": "482de2ab8894938be48435d447786424879cf1c540fab4067d7d292b7ef66b69",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/faq--questions-3.html",
+      "sha256": "482de2ab8894938be48435d447786424879cf1c540fab4067d7d292b7ef66b69",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/faq--questions-4.html",
+      "sha256": "482de2ab8894938be48435d447786424879cf1c540fab4067d7d292b7ef66b69",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/faq--questions-5.html",
+      "sha256": "482de2ab8894938be48435d447786424879cf1c540fab4067d7d292b7ef66b69",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/faq.html",
+      "sha256": "944bb76346bba6065e661992d8e9335c7ef137d03fcebc3299ceb996734654bb",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/hero.html",
+      "sha256": "da1d865ffa84fadf18397238c940cf9dad8af0af4a1512d672e93ab1573f360c",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/hubs--panels-0.html",
+      "sha256": "c9bef5d7d8a66003efeb4cf5feb8ddaf592156004bb4bacaf161fd2ac011f8ee",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/hubs--panels-1.html",
+      "sha256": "07106b82109ed049d956e8089d3dc6f43d8ee5839b18cfb77ba47fdf8384a8a2",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/hubs--panels-10.html",
+      "sha256": "74688f5a76666642116a84e9870c041917f273e39be7f02c98e1d74fe7c9b548",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/hubs--panels-11.html",
+      "sha256": "7d9d3d50a03725a7494ac095ce26b090c4005264cc20eaf3cba013b72fdb844f",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/hubs--panels-12.html",
+      "sha256": "fe7e5dcc77cdf480dfc123a00eaace012503992066427c296e4f4a2d4c1c723a",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/hubs--panels-13.html",
+      "sha256": "4f5b1e1bb2a29ddeb120fb7e725031972390086115b139778d0309ec53a009cb",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/hubs--panels-2.html",
+      "sha256": "effc3912dbb910dbfda4de6596b0db3ec8ac688c7828bc15b607d14c94b3ecda",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/hubs--panels-3.html",
+      "sha256": "928a93c86f83d4f050f6f198ca104fcf6bd8877c8d97df555b2e2b32a2268284",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/hubs--panels-4.html",
+      "sha256": "9e1bdf8937fd677314d4e8ebed40a596e2dcb690015cd7f69d510e612aee4f7e",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/hubs--panels-5.html",
+      "sha256": "2a80fc227948dc6772d98e175e9a73bd1e5e74b6f1c4f1d1c8a64d71ee9326b3",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/hubs--panels-6.html",
+      "sha256": "2671d5d47ce529073fa4ed5160f8af17df2b66e99a3f2fe4392cefc4a8d36824",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/hubs--panels-7.html",
+      "sha256": "013ebbf9d3e83b03d789510f9ae5c63850af9a279757f2dfdab24e90142177c3",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/hubs--panels-8.html",
+      "sha256": "0950fa51bed09fcf28d07fa22a8a3b163d7c3318700fb085fb6393ad62f6fd6f",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/hubs--panels-9.html",
+      "sha256": "bc5d21576424957ab5a1a6e0d677e704e34c5f59c5d17d79201d276aa85a9ad2",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/hubs.html",
+      "sha256": "9e04cf880fbb33a3024889c3a7b987aa39b95c6bc342a2afccf9b7ac3034c045",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/licensing.html",
+      "sha256": "f0745e6b3125b845e320ecdbe5991b35e39df746ada142fc80b57ad5c4c5f220",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/proof--scenarios-0.html",
+      "sha256": "e6a772fb9ddc94c77f3a6551f3d4dafffdb3d8a450db037d242884c7c6451f33",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/proof--scenarios-1.html",
+      "sha256": "87bc8da6966725c35a7bc607aeb0bc28d423ffcb08c2e69b36843d4d749900fd",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/proof--scenarios-2.html",
+      "sha256": "06a4b0020de0c12bf69a4f333fd8b72da415ae308d80d28db99e21e94bdffa0e",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/proof-ledger.html",
+      "sha256": "b127369a872b87a84768ae79726b4444bf1df8d60f922f026812b823db423a80",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/proof.html",
+      "sha256": "7595af7fd8e153a8b8ba23badec0590dbb31c652637c1236c6eef90169a6402e",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/sectors--panels-0.html",
+      "sha256": "2820f50fe10ed36e689b5f3460e2cd5f731411a9f1c2d194e2ca2deeb0dac0ad",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/sectors--panels-1.html",
+      "sha256": "d44f1fd35745445ed49b06d6273b7bc00bc41b7d4a388ea6fb998c6dbee387cc",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/sectors--panels-2.html",
+      "sha256": "5eb31e1bf60b59e49ad6b3bd5c9b262a8d8fa49b6cd34d8928dfb1931798075b",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/sectors--panels-3.html",
+      "sha256": "99c1a7f6cf2d4f8c43b31a8b5663ea8da57017d1c4595478038f00efc0bbea96",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/hubspot/templates/sectors.html",
+      "sha256": "871255eec65c5ba3f9a54e58f7dc24831e01358ecb569f2384fc5b6a49685166",
+      "previousSha256": null
+    },
+    {
+      "path": "assets/img/hubspot/badge-dark-spp-hubspot.svg",
+      "sha256": "fe097dd42f4b7411386e31256c00ec6fb36f01f8ede9d6b5b3bd0e43801c4646",
+      "previousSha256": null
+    },
+    {
+      "path": "assets/img/hubspot/badge-light-spp-hubspot.svg",
+      "sha256": "05e7cf5b067826aaff344aa83a890e8cfffa0b68db90064156b4fcaf26dd1194",
+      "previousSha256": null
+    },
+    {
+      "path": "assets/img/hubspot/badge-orange-spp-hubspot.svg",
+      "sha256": "12a6b110e76aaa4ba676ffa49de8d0f7b432eabe6271d4268ab0669497384cac",
+      "previousSha256": null
+    },
+    {
+      "path": "assets/img/hubspot/hubspot.svg",
+      "sha256": "f619e07e64f3a17fea819dafc15916359998781708e9fde6bd105dd5e85102f6",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/widgets/class-eo-hubspot-landing-base.php",
+      "sha256": "1006fc426be261b00d831b6738431ff1511888b413a19927b3296efae79812e2",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/widgets/class-eo-hubspot-landing-widgets.php",
+      "sha256": "e93bb2a036ac2d35bc38a85524115c81e1fed0ef61a4db9943a5720b293f450a",
+      "previousSha256": null
+    },
+    {
+      "path": "includes/class-eo-widgets-loader.php",
+      "sha256": "78b72c578df3743b1144d1e5ecb9a3b80f4beaa0e049b4c7a23fb769190ad813",
+      "previousSha256": "d0b6192581d6c8dbb15029a49b247d910f83da0c591332a0834c8f56be91637a"
+    },
+    {
+      "path": "assets/css/hubspot-landing.css",
+      "sha256": "e715bf8c1db9ae0bf28f5997514363717b6648df61002bb439b59b369fa54346",
+      "previousSha256": null
+    },
+    {
+      "path": "assets/css/hubspot-elementor.css",
+      "sha256": "45eb7b1458dbc69bd35f9973e20022d57f404970e2ebcdd48e905ff952952da4",
+      "previousSha256": null
+    },
+    {
+      "path": "assets/js/hubspot-landing.js",
+      "sha256": "a6ea2e68b85565d21740d30e99c57f28c147a8ee16e90c2878984ce4d677b677",
+      "previousSha256": null
+    },
+    {
+      "path": "assets/js/hubspot-forms.js",
+      "sha256": "6acc0ab033f34ab83717f7a8bd068734765b1db27c171cfe69b990192644cf16",
+      "previousSha256": null
+    }
+  ]
+}

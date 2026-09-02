@@ -1,9 +1,9 @@
 # WordPress Blog, Content Hub and Search Contract
 
 > **Tipo de documento:** Documentacion funcional
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-07-09 por Codex
-> **Ultima actualizacion:** 2026-08-22 por Codex
+> **Ultima actualizacion:** 2026-08-31 por Codex
 > **Modulo:** Public Site / WordPress / Ohio / Content Hub
 > **Runtime vigente:** `efeoncepro.com` en WordPress/Kinsta, tema activo
 > `ohio-child`, parent `ohio`
@@ -63,31 +63,44 @@ WordPress expone estas taxonomias relevantes:
 - `post_format`: formato del post.
 - `ohio_portfolio_category` y `ohio_portfolio_tags`: solo para portfolio Ohio.
 
-Categorias reales que pueden sostener el content hub:
+La taxonomía canónica aplicada el 2026-08-31 tiene trece términos:
 
-- `glitch`
-- `loop-marketing`
-- `aeo` (categoría raíz desde 2026-07-18; término `156`)
-- `inbound/seo`
-- `hubspot`
-- `hubspot/crm`
-- `social`
-- `creative`
-- `growth`
-- `tendencias`
+```text
+AEO
+Diseño
+└── Diseño Web
+Glitch
+Growth
+HubSpot
+Inbound Marketing
+Inteligencia Artificial
+Loop Marketing
+Marketing Digital
+└── Redes Sociales
+Novedades Efeonce
+SEO
+```
 
-Deuda a limpiar antes de usar taxonomias como navegacion publica:
+AEO y SEO son raíces hermanas; SEO no depende de Inbound Marketing. El display
+`Inteligencia Artificial` conserva el slug `ai`. Una categoría raíz no define
+por sí sola prominencia en la portada ni cambia la primaria Yoast de un post.
+La decisión editorial completa y los criterios de exposición viven en
+`docs/public-site/decisions/PDR-019-taxonomia-editorial-canonica-blog-wordpress.md`.
 
-- categorias demo o ambiguas: `goal-setting`, `life-lessons`, `podcasts`,
-  `food`, `science`, `tech`, `design` cuando no tenga ownership editorial;
-- `Uncategorized` como default category;
-- tags demo de Ohio: `programming`, `data-science`, `machine-learning`,
-  `technology`, `theme`, `wordpress`;
-- duplicados/variantes: `AI`/`ai`, `Marketing Digital`/`marketing`,
-  `how to`/`how-to`;
-- typos: `inboun`, `produc-market-fit`.
+El saneamiento retiró 20 posts demo, reclasificó 11 posts reales, eliminó 15
+categorías descartadas y dejó Marketing Digital (`17`) como categoría por
+defecto. Redes Sociales está vacía y no debe promoverse como destino principal
+hasta tener contenido. La evidencia live y los redirects están en
+`docs/audits/public-site/2026-08-31-blog-taxonomy-demo35-work-copy.md`.
 
-Contrato recomendado para el refresh:
+Deuda todavía separada de la taxonomía de categorías:
+
+- tags demo, duplicados y typos antes de exponer facetas o tag cloud;
+- sidebar Ohio y archivos con chrome/copy demo;
+- política explícita de indexabilidad para categorías vacías, tags, autor y
+  fecha.
+
+Contrato vigente:
 
 - Usar `category` como taxonomia editorial primaria solo si se define una
   jerarquia canonica y slugs estables.
@@ -132,8 +145,11 @@ Ohio es dueño del render de archivos, busqueda y single posts:
 
 | Superficie | Template |
 | --- | --- |
+| 404 | parent `ohio/404.php` |
 | Categorias/tags/archivos | parent `ohio/index.php` |
 | Resultados de busqueda | parent `ohio/search.php` |
+| Estado sin resultados | parent `ohio/parts/content-none.php` |
+| Formulario de busqueda | parent `ohio/searchform.php` |
 | Single post | parent `ohio/single.php` |
 | Cards | parent `ohio/parts/blog_grid/layout_type*.php` |
 | Single layouts | parent `ohio/parts/blog/layout_type*.php` |
@@ -180,6 +196,9 @@ La busqueda viva usa WordPress search:
 - Orden: match en titulo primero, luego fecha descendente.
 - URLs: `/?s=query` y `/search/query/`.
 - Robots: Yoast sirve search results como `noindex, follow`.
+- Una query vacía devuelve actualmente el inventario completo (154 resultados
+  en el corte 2026-08-31), por lo que debe tratarse como defecto funcional y no
+  como estado válido de descubrimiento.
 
 Por defecto, search incluye tipos publicos como:
 
@@ -200,6 +219,12 @@ hub debe ser distinta de la busqueda global del sitio:
 
 Mantener `noindex, follow` en resultados de busqueda salvo PDR/SEO task que
 demuestre lo contrario.
+
+La auditoría también encontró un resultado publicado cuyo título visible
+incluye `(Borrador)`. La corrección editorial y el endurecimiento de la query
+son deuda P0 separada del rediseño visual. El contrato completo de 404,
+búsqueda, no-results y archivos vive en
+`docs/documentation/public-site/public-miscellaneous-surfaces.md`.
 
 ## Sidebar y Navegacion Editorial
 
@@ -222,12 +247,16 @@ No es apto como experiencia final del content hub. Opciones recomendadas:
 ## Layout Candidato: Demo 35 Blog Magazine
 
 El operador eligio `Demo 35: Blog Magazine` (`page_id=225984`,
-`/homedemo35-elementor/`) como referencia visual para la futura pagina principal
-del blog/content hub. La auditoria histórica vive en
+`/homedemo35-elementor/`) como fuente visual protegida para la futura página
+principal del blog/content hub. La copia de trabajo publicada y no indexable es
+`page_id=251875`, `/demo35-blog-magazine-copia-trabajo/`; no es `/blog/` ni una
+`page_for_posts`. La auditoria histórica vive en
 `docs/audits/public-site/2026-07-09-demo35-blog-magazine-layout-review.md`; el
 baseline técnico revalidado, los parámetros por widget y la secuencia segura de
 adaptación viven en
-`docs/audits/public-site/2026-08-22-demo35-elementor-runtime-contract.md`.
+`docs/audits/public-site/2026-08-22-demo35-elementor-runtime-contract.md`. El
+estado aplicado de copia y taxonomía vive en
+`docs/audits/public-site/2026-08-31-blog-taxonomy-demo35-work-copy.md`.
 
 Contrato funcional:
 
@@ -242,14 +271,14 @@ Contrato funcional:
   usarlo como hub, cada widget debe decidir explicitamente si sera curado manual,
   query dinamica por categoria/serie o bloque eliminado.
 - Catorce de quince widgets tienen `posts` fijos; cinco referencias son
-  attachments. Cuatro widgets ya tienen altura cero y dos listas mixtas pierden
-  un slot. Borrar primero el contenido demo hace que la retícula parezca rota.
+  attachments. Como los 20 posts demo ya fueron enviados a papelera, varios
+  bloques están vacíos o incompletos y deben reconectarse deliberadamente.
 - La pagina renderizo sin overflow horizontal en desktop `1440` ni mobile
   `390`, pero mobile supera 13k px de scroll y debe priorizar secciones.
 
 Deudas que impiden usarla como hub final sin trabajo:
 
-- posts demo Ohio/ThemeForest como contenido principal;
+- widgets fijos que aún apuntan a posts demo Ohio ya retirados;
 - algunos widgets de posts referencian attachments y quedan vacios;
 - CTAs `See More` usan `href="#"` y `target="_blank"`;
 - features `Read More` enlazan a `ohio.clbthemes.com`;
@@ -257,10 +286,10 @@ Deudas que impiden usarla como hub final sin trabajo:
 - el bloque de suscripcion renderiza Contact Form 7 `Subscribe Form 1`
   (`wpcf7` ID `242255`), con HubSpot mapping desactivado y mensajes en ingles.
 
-Regla para el refresh: usar `Demo 35` como referencia de layout, no como
-contenido final. Si se adopta, hacerlo sobre copia/draft gobernada, reemplazar
-IDs demo/attachments, corregir enlaces, conectar suscripcion a un contrato
-medible y validar desktop/mobile con `scrollWidth == clientWidth`.
+Regla para el refresh: usar la fuente `225984` solo como referencia y modificar
+únicamente la copia gobernada `251875`. Reemplazar IDs demo/attachments,
+corregir enlaces, conectar suscripcion a un contrato medible y validar
+desktop/mobile con `scrollWidth == clientWidth`.
 
 Regla de corte: mantener `page_for_posts=0`. WordPress ignora el contenido
 Elementor de una página cuando se la asigna como página de entradas y entrega el
@@ -298,16 +327,27 @@ no duplicar contenido indexado.
 - Cambiar categoria cambia URL por estructura permalink.
 - Tags demo contaminan related posts y tag cloud.
 - Search actual devuelve paginas comerciales y portfolios, no solo contenido.
+- Una búsqueda vacía expone el inventario completo y existe al menos un título
+  público con marcador `(Borrador)`.
 - Sidebar actual expone material demo y copy mixto.
-- Posts demo siguen publicados y pueden aparecer en busqueda/archivos.
+- La copia Demo 35 conserva widgets, copy, assets y enlaces demo aunque los
+  posts demo ya no estén publicados.
 - `eo-vibe-coding-api` tiene scaffold de `blog-hub`, pero no es hub final.
+- Categoría, tag, autor y fecha no comparten una política SEO única: cada
+  superficie necesita decisión explícita de indexabilidad, canonical y
+  paginación.
 
 ## Documentacion Relacionada
 
 - `docs/audits/public-site/2026-07-09-wordpress-blog-content-hub-search.md`
+- `docs/audits/public-site/2026-08-31-wordpress-miscellaneous-surfaces-discovery.md`
+- `docs/architecture/public-site/PUBLIC_MISCELLANEOUS_SURFACES_V1.md`
+- `docs/documentation/public-site/public-miscellaneous-surfaces.md`
 - `docs/audits/public-site/2026-07-09-demo35-blog-magazine-layout-review.md`
+- `docs/audits/public-site/2026-08-31-blog-taxonomy-demo35-work-copy.md`
 - `docs/documentation/public-site/gutenberg-post-authoring-recipes.md`
 - `docs/documentation/public-site/public-site-content-factory-end-to-end.md`
 - `docs/documentation/public-site/glitch-drop-gutenberg-block.md`
 - `docs/manual-de-uso/public-site/operar-wordpress-blog-content-hub-search.md`
 - `docs/public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md`
+- `docs/public-site/decisions/PDR-019-taxonomia-editorial-canonica-blog-wordpress.md`

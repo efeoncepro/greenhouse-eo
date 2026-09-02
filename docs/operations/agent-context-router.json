@@ -157,11 +157,12 @@
     },
     {
       "id": "hubspot",
-      "triggers": ["HubSpot", "CRM", "services intake", "deal", "company"],
-      "skills": ["hubspot-greenhouse-bridge", "hubspot-as-a-service"],
+      "triggers": ["HubSpot", "CRM", "services intake", "deal", "company", "Solutions Partner", "Agent Hub", "Revenue Hub", "HubSpot sector", "HubSpot landing"],
+      "skills": ["hubspot-greenhouse-bridge", "hubspot-as-a-service", "hubspot-solutions-partner"],
       "sources": [
         "docs/architecture/GREENHOUSE_HUBSPOT_SERVICES_INTAKE_V1.md",
-        "docs/architecture/agent-invariants/INTEGRATIONS_INFRA_AGENT_INVARIANTS.md"
+        "docs/architecture/agent-invariants/INTEGRATIONS_INFRA_AGENT_INVARIANTS.md",
+        "docs/services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md"
       ]
     },
     {

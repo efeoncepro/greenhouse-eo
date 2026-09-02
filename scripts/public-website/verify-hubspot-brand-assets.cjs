@@ -1,0 +1,52 @@
+const fs = require('fs');
+const path = require('path');
+const assert = require('assert/strict');
+
+const {chromium} = require('playwright');
+const {JSDOM} = require('jsdom');
+
+
+
+
+
+
+
+
+
+
+const preview=process.argv.includes('--preview'),url='https://efeoncepro.com/servicios-contratar-hubspot/',root=path.resolve('../efeonce-public-site-runtime/wp-content/plugins/eo-elementor-widgets'),out='.captures/hubspot-official-assets-20260831';
+
+fs.mkdirSync(out,{recursive:true});
+(async()=>{const browser=await chromium.launch(),page=await browser.newPage({viewport:{width:1414,height:909}}),errors=[],states=[];
+
+page.on('pageerror',e=>errors.push(e.message));
+
+try{if(preview){const doc=new JSDOM(await(await fetch(url)).text()).window.document,local=new JSDOM(fs.readFileSync('tmp/hubspot-official-assets/rendered.html','utf8')).window.document;
+
+for(const n of ['hubs','proof-ledger']){const target=doc.querySelector(`[data-hubspot-module="${n}"]`);
+
+target.innerHTML=local.querySelector(`[data-hubspot-module="${n}"]`).innerHTML.replaceAll('http://127.0.0.1:8768','https://efeoncepro.com/wp-content/plugins/eo-elementor-widgets');}
+
+await page.route(url,r=>r.fulfill({contentType:'text/html',body:doc.documentElement.outerHTML}));await page.route('**/assets/css/hubspot-elementor.css*',r=>r.fulfill({path:root+'/assets/css/hubspot-elementor.css',contentType:'text/css'}));await page.route('**/assets/img/hubspot/*-hub.svg',r=>r.fulfill({path:root+'/assets/img/hubspot/'+r.request().url().split('/').pop(),contentType:'image/svg+xml'}));}
+
+assert.equal((await page.goto(url,{waitUntil:'domcontentloaded'})).status(),200);await page.evaluate(()=>document.fonts.ready);assert.equal(await page.locator('.hsx-hub-brand-icon').count(),8);assert.equal(await page.title(),'Implementación y operación de HubSpot | Efeonce');
+
+for(const width of [1414,768,390]){await page.setViewportSize({width,height:909});const hubs=page.locator('[data-hsx-tabs="hubs"]');
+
+for(let i=1;i<=6;i++){const tile=hubs.locator(`[data-hsx-select="${i}"]`);
+
+await tile.click();await page.waitForTimeout(250);assert.equal(await tile.getAttribute('aria-pressed'),'true');assert.equal(await hubs.locator(`[data-hsx-panel="${i}"]`).isVisible(),true);await tile.locator('img').evaluate(img=>img.decode());
+
+const g=await tile.evaluate(el=>{const img=el.querySelector('img').getBoundingClientRect(),label=el.children[2].getBoundingClientRect();
+
+return {bottom:img.bottom,labelTop:label.top,natural:el.querySelector('img').naturalWidth}});
+
+assert(g.natural>0);assert(g.bottom<=g.labelTop+1);}
+
+await hubs.locator('.hsx-band-grid').nth(1).screenshot({path:`${out}/${preview?'preview':'live'}-hubs-${width}.png`});const heading=page.locator('.hsx-case-heading');
+
+await heading.scrollIntoViewIfNeeded();await heading.locator('img').evaluate(img=>new Promise((resolve,reject)=>{if(img.complete&&img.naturalWidth)return resolve();img.addEventListener('load',resolve,{once:true});img.addEventListener('error',()=>reject(Error(img.outerHTML)),{once:true});}));assert.equal(await heading.locator('img').getAttribute('alt'),'ANAM');assert.equal(await page.getByText(require('./hubspot-editorial-copy.json')['proof-ledger'].defaults.f023_descripcion,{exact:true}).count(),1);assert.equal(await page.getByText(/Caso anonimizado/).count(),0);await page.waitForFunction(()=>document.documentElement.scrollWidth===innerWidth);await heading.screenshot({path:`${out}/${preview?'preview':'live'}-anam-${width}.png`});states.push({width,passed:true});}
+
+await page.locator('[data-hsx-tabs="hubs"] [data-hsx-select="1"]').focus();await page.keyboard.press('ArrowRight');assert.equal(await page.locator('[data-hsx-tabs="hubs"] [data-hsx-select="2"]').getAttribute('aria-pressed'),'true');assert.deepEqual(errors,[]);const result={mode:preview?'preview':'live',status:'PASS',states,errors,keyboard:true,checkedAt:new Date().toISOString()};
+
+fs.writeFileSync(`${out}/${result.mode}.json`,JSON.stringify(result,null,2));console.log(result);}finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1});

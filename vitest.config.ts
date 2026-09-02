@@ -48,6 +48,30 @@ export default defineConfig({
         }
       },
       {
+        /*
+         * ⚠️ Los tests de las reglas ESLint propias (`RuleTester`) necesitan proyecto propio.
+         *
+         * Quedaban fuera por PARTIDA DOBLE: ni la ruta `eslint-plugins/` ni la extensión `.mjs`
+         * entraban en ningún `include`, así que los 23 archivos existentes NUNCA se ejecutaron —
+         * escritos, commiteados y decorativos. Eso vaciaba en silencio el contrato del repo para
+         * reglas nuevas («rule + RuleTester»): la guarda de la guarda no corría.
+         *
+         * Además necesitan su propio `setupFiles`: `RuleTester` corre sus aserciones al importar y
+         * no registra suite salvo que se le cableen los hooks de vitest. Sin eso, un archivo válido
+         * igual falla con «No test suite found».
+         *
+         * Cableado el 2026-08-30, a raíz de TASK-1693: tres defectos reales en una sesión y el
+         * lint verde en los tres.
+         */
+        extends: true,
+        test: {
+          name: 'lint-rules',
+          include: ['eslint-plugins/**/*.test.mjs'],
+          exclude: ['**/node_modules/**'],
+          setupFiles: ['eslint-plugins/vitest-setup.mjs']
+        }
+      },
+      {
         extends: true,
         test: {
           name: 'live',

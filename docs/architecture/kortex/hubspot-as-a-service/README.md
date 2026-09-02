@@ -66,6 +66,13 @@ Requests from client emails or Notion tasks are intake, not executable schema. B
 
 ## Current ANAM artifacts
 
+- Client delivery package — technical PDF: [`reports/ANAM_Emma_Handoff_Especificacion_Tecnica_2026-09-02.pdf`](reports/ANAM_Emma_Handoff_Especificacion_Tecnica_2026-09-02.pdf)
+- Client delivery package — functional PDF: [`reports/ANAM_Emma_Handoff_Documentacion_Funcional_2026-09-02.pdf`](reports/ANAM_Emma_Handoff_Documentacion_Funcional_2026-09-02.pdf)
+- Editable premium sources — HTML/CSS and ten page previews: [`reports/html/`](reports/html/) · [`reports/previews/`](reports/previews/)
+- Visual direction and page-by-page QA: [`reports/ANAM_EMMA_HANDOFF_REPORT_VISUAL_DIRECTION_2026-09-02.md`](reports/ANAM_EMMA_HANDOFF_REPORT_VISUAL_DIRECTION_2026-09-02.md) · [`reports/ANAM_EMMA_HANDOFF_REPORT_VISUAL_REVIEW_2026-09-02.md`](reports/ANAM_EMMA_HANDOFF_REPORT_VISUAL_REVIEW_2026-09-02.md)
+- Client delivery email, attachments and support contract: [`../../../documentation/hubspot-as-a-service/anam-entrega-documentacion-y-soporte-2026-09-02.md`](../../../documentation/hubspot-as-a-service/anam-entrega-documentacion-y-soporte-2026-09-02.md)
+- Technical workflow specification — Emma handoff and availability routing: [`anam-customer-agent-handoff-workflow-1876744588.md`](anam-customer-agent-handoff-workflow-1876744588.md)
+- Client-facing functional walkthrough — every handoff step: [`../../../documentation/hubspot-as-a-service/anam-customer-agent-handoff-workflow-functional.md`](../../../documentation/hubspot-as-a-service/anam-customer-agent-handoff-workflow-functional.md)
 - Service catalog — Customer Agent managed service: [`../../../services/hubspot-as-a-service/hubspot-customer-agent-managed-service.md`](../../../services/hubspot-as-a-service/hubspot-customer-agent-managed-service.md)
 - Service catalog — RevOps architecture, automation and dashboards: [`../../../services/hubspot-as-a-service/hubspot-revops-architecture-automation-and-dashboards.md`](../../../services/hubspot-as-a-service/hubspot-revops-architecture-automation-and-dashboards.md)
 - Detailed Word report — Customer Agent implementation and operation: [`reports/ANAM_Informe_Detallado_Customer_Agent_2026-07-17.docx`](reports/ANAM_Informe_Detallado_Customer_Agent_2026-07-17.docx)
@@ -131,3 +138,15 @@ administrative billing blocker observed on 2026-07-17 is no longer the current s
 presence alone does not prove availability. The Follow-up, Quality and neutral handoff improvements were
 published on 2026-07-24 after HubSpot's preflight reported no issues. The post-publication live simulator received
 the test prompt but did not answer within 45 seconds, so that complementary regression remains pending.
+
+## Support window for the delivered scope
+
+The support period for both the Customer Agent project and the KPI project is **three months**, from
+**2026-08-13 through 2026-11-12, inclusive**. It covers diagnosis and correction of incidents in the delivered
+scope, operational questions, unexpected-behavior review, restoration of the approved configuration and
+documentation updates resulting from a correction.
+
+It does not include new functionality, new KPI, new workflows or automation, new integrations, redesigns or
+innovation/evolution requests. Those are separate changes that require scope, estimate and approval. The client
+communication also states that Efeonce will provide a SharePoint with the consolidated documentation during the
+week of 2026-09-02; that SharePoint is a pending delivery commitment, not a completed runtime fact.

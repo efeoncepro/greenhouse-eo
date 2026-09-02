@@ -24,7 +24,10 @@ export interface BillingExportPeriod {
 export interface GcpServiceCost {
   serviceId: string
   serviceDescription: string
+  /** Net cost after credits. Canonical amount for forecast, shares and alerts. */
   cost: number
+  grossCost: number
+  credits: number
   share?: number
   baselineDailyCost?: number
   recentDailyCost?: number
@@ -34,7 +37,10 @@ export interface GcpServiceCost {
 
 export interface GcpDailyCost {
   date: string
+  /** Net cost after credits. */
   totalCost: number
+  grossCost: number
+  credits: number
 }
 
 export interface GcpResourceCost {
@@ -42,7 +48,10 @@ export interface GcpResourceCost {
   skuDescription: string
   projectId: string | null
   resourceName: string
+  /** Net cost after credits. */
   cost: number
+  grossCost: number
+  credits: number
   share: number
   firstUsageDate: string | null
   lastUsageDate: string | null
@@ -103,7 +112,10 @@ export interface GcpBillingOverview {
   availability: BillingExportAvailability
   generatedAt: string
   period: BillingExportPeriod
+  /** Net cost after credits. This is the decision-useful canonical total. */
   totalCost: number
+  grossCost: number
+  credits: number
   currency: string
   costByDay: GcpDailyCost[]
   costByService: GcpServiceCost[]

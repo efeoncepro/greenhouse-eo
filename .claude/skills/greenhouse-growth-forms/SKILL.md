@@ -34,6 +34,8 @@ hold business logic, mapping, secrets or PII.
 - Embedding a form on a host (WordPress/Elementor, Astro), theming a form into a host card.
 - The **Success Card / thank-you card** (`success_behavior_json`, `presentation='success_card'`) or the
   **AEO grader-on-submit** capability of `/aeo-2/` → companion `references/SUCCESS_CARD_AND_GRADER_ON_SUBMIT.md`.
+- A host with its own DOM patcher, a consumer-pinned bundle, `initial-values` or the
+  `content_marketing` presentation → `references/CONTENT_MARKETING_HOST_AND_RENDERER.md`.
 - Feature flags / rollout of the engine across environments.
 
 ---
@@ -140,7 +142,8 @@ Light-DOM custom element; classes prefixed `.ghf-*`; theme via `--ghf-*` CSS cus
 
 **Attributes** (`observedAttributes`): `form` (slug), `form-key` (UUID, preferred), `surface`,
 `locale` (`es-CL`/`en-US`), `color-scheme` (`light` forces light; no force-dark), `appearance`
-(`surface` default | `bare` chromeless).
+(`surface` default | `bare` chromeless), `initial-values` (JSON prefill restricted to declared fields;
+never put PII into host markup or overwrite edits by repeatedly changing this attribute).
 
 **What it provides by construction** (don't reimplement in a host): loading skeleton (never blank),
 inline field errors (`role="alert"`, `aria-invalid`, `aria-describedby`), debounced email-gate +
@@ -274,6 +277,15 @@ CTA motion and field-level copy in the contract.
   mutate WordPress.
 - AEO is live on this premium renderer. Do not restore the temporary bridge unless explicitly
   rolling back from the Elementor backup.
+
+### Editorial Premium Brief host composition (TASK-1598)
+
+For high-intent public campaign briefs, the approved reference combines the governed
+`diagnostic_premium` renderer with an editorial host card. Read
+`references/EDITORIAL_PREMIUM_BRIEF_STYLE.md` before reproducing the treatment. It defines the
+renderer/host boundary, hierarchy, semantic icons, country flags, responsive behavior and live
+evidence requirements. This is a host composition recipe, not a new form `styleVariant`: never copy
+its page-scoped CSS as form behavior or create a parallel select/value store.
 
 ---
 
@@ -521,6 +533,7 @@ pnpm release:watchdog --json                                      # worker GIT_S
 ## Reference docs
 
 - **Companion — Success Card + AEO grader-on-submit: `references/SUCCESS_CARD_AND_GRADER_ON_SUBMIT.md`**
+- **Editorial Premium Brief host recipe: `references/EDITORIAL_PREMIUM_BRIEF_STYLE.md`**
 - Architecture: `docs/architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md`
 - Runtime contract: `docs/architecture/growth-public-forms-runtime-contract.md`
 - Functional: `docs/documentation/growth/motor-formularios-publicos.md`

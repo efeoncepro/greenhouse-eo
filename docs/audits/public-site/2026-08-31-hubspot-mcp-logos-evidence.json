@@ -1,0 +1,39 @@
+{
+  "status": "PASS",
+  "mode": "live",
+  "states": [
+    {
+      "width": 1414,
+      "motion": "no-preference",
+      "passed": true
+    },
+    {
+      "width": 1414,
+      "motion": "reduce",
+      "passed": true
+    },
+    {
+      "width": 878,
+      "motion": "no-preference",
+      "passed": true
+    },
+    {
+      "width": 878,
+      "motion": "reduce",
+      "passed": true
+    },
+    {
+      "width": 390,
+      "motion": "no-preference",
+      "passed": true
+    },
+    {
+      "width": 390,
+      "motion": "reduce",
+      "passed": true
+    }
+  ],
+  "keyboard": true,
+  "errors": [],
+  "checkedAt": "2026-08-31T11:03:00.388Z"
+}

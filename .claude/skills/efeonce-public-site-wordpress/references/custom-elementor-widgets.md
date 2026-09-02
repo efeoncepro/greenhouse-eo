@@ -29,7 +29,12 @@ docs/architecture/public-site/PRIMITIVES.md
 
 Use that registry before creating page-local Elementor HTML/CSS for a repeated pattern. It is the public-site counterpart to the private Greenhouse UI Platform primitives; do not treat `docs/architecture/ui-platform/PRIMITIVES.md` or `src/components/greenhouse/primitives/**` as the runtime source for WordPress components.
 
-The current registry includes `ComparisonTable`, `GrowthFormEmbed`, `LogoMarquee`, and the `BrandProofAvatarGroup` pattern. `BrandProofAvatarGroup` now has two consumers (AEO `/aeo-2/` and About `/about-us-efeonce/` hero). If it is reused again or needs editor controls, graduate it to a widget or governed `LogoMarquee` option and update the registry.
+The registry includes `ComparisonTable`, `GrowthFormEmbed`, `LogoMarquee`, `BrandProofAvatarGroup`, and the source-led Agency modules. `BrandProofAvatarGroup` has AEO, About and Home consumers. Home uses the governed `LogoMarquee` `proofOnly` / `brandProof.v1` option with native Media repeater controls; AEO/About retain their compatible existing markup. Reuse that renderer and semantic selectors instead of copying a landing's whole runtime.
+
+For source-led modular pages, native control contracts, motion/asset regressions and the click-loaded video dialog, load `references/source-led-elementor-patterns.md`. Canonical module architecture: `docs/architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md`.
+Content Ops adds the approved-export compiler and opaque embedded-renderer host pattern; its owner is
+`docs/architecture/public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md`. A compiler is a build tool,
+not a new arbitrary-code control or a replacement for the native widget editing surface.
 
 ## Widget Types
 
@@ -68,3 +73,4 @@ For plugin code:
 - Avoid table-row/cell transforms; animate child spans/icons instead.
 - Use `filemtime()` or another cache-busting version for local widget assets.
 - If a widget exposes agent-governed settings, define a single `theme_schema()`/manifest contract and keep Greenhouse schema in parity.
+- Elementor URL controls require array defaults, including empty repeater fields: `array( 'url' => '' )`. Normalize at the shared control boundary, then exercise real widget registration; an HTML renderer-only test cannot catch a registration failure.

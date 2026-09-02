@@ -21,6 +21,7 @@ es auditable en el git log del repo hermano):
 
 - [EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md](EFEONCE_GLOBE_API_CONTRACT_SPINE_RUNBOOK_V1.md) — cómo extender/llamar/verificar el spine.
 - [EFEONCE_GLOBE_IAC_RUNBOOK_V1.md](EFEONCE_GLOBE_IAC_RUNBOOK_V1.md) — Terraform/OpenTofu, deploy keyless, protocolo de import.
+- [GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md](GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md) — estado `active | draining | hibernated`, apagado profundo reversible, inventario preservado, reactivación por etapas y evidencia de costo.
 - [LOCAL_AUTHENTICATION.md](LOCAL_AUTHENTICATION.md) — autenticación local contra Globe (web/api mode).
 - [TASK_1454_INTERNAL_SMOKE_RUNBOOK.md](TASK_1454_INTERNAL_SMOKE_RUNBOOK.md) — smoke internal-only.
 - [EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md](EPIC_028_PARALLEL_EXECUTION_PLAN_V1.md) — plan de ejecución paralela del EPIC-028.
@@ -38,7 +39,7 @@ es auditable en el git log del repo hermano):
 
 ## Continuidad + cronología del runtime de Globe (repatriado — TASK-1492)
 
-- Continuidad activa del runtime (deploys, rollout, verificación en vivo, hardening): [GLOBE_RUNTIME_HANDOFF.md](GLOBE_RUNTIME_HANDOFF.md). El `Handoff.md` principal de Greenhouse referencia este archivo para el detalle de runtime de Globe.
+- Estado mutable y continuidad del runtime (incluida la hibernación vigente): [GLOBE_RUNTIME_HANDOFF.md](GLOBE_RUNTIME_HANDOFF.md). El `Handoff.md` principal de Greenhouse referencia este archivo para el detalle de runtime de Globe.
 - Historia / changelog del runtime de Globe: [`docs/changelog/internal/creative-studio-globe.md`](../../changelog/internal/creative-studio-globe.md).
 
 ## Relacionados en Greenhouse

@@ -1,0 +1,97 @@
+{
+  "url": "https://efeoncepro.com/servicios-contratar-hubspot/",
+  "checkedAt": "2026-08-31T01:51:09.510Z",
+  "pageErrors": [],
+  "failedResponses": [],
+  "viewports": [
+    {
+      "width": 1440,
+      "scrollWidth": 1440,
+      "heroX": 0,
+      "h1Size": "96px",
+      "motion": "no-preference"
+    },
+    {
+      "width": 1024,
+      "scrollWidth": 1024,
+      "heroX": 0,
+      "h1Size": "48px",
+      "motion": "no-preference"
+    },
+    {
+      "width": 768,
+      "scrollWidth": 768,
+      "heroX": 0,
+      "h1Size": "38px",
+      "motion": "no-preference"
+    },
+    {
+      "width": 390,
+      "scrollWidth": 390,
+      "heroX": 0,
+      "h1Size": "38px",
+      "motion": "no-preference"
+    },
+    {
+      "width": 1440,
+      "scrollWidth": 1440,
+      "heroX": 0,
+      "h1Size": "96px",
+      "motion": "reduce"
+    },
+    {
+      "width": 1024,
+      "scrollWidth": 1024,
+      "heroX": 0,
+      "h1Size": "48px",
+      "motion": "reduce"
+    },
+    {
+      "width": 768,
+      "scrollWidth": 768,
+      "heroX": 0,
+      "h1Size": "38px",
+      "motion": "reduce"
+    },
+    {
+      "width": 390,
+      "scrollWidth": 390,
+      "heroX": 0,
+      "h1Size": "38px",
+      "motion": "reduce"
+    }
+  ],
+  "panels": {
+    "1440-hubs": 14,
+    "1440-sectors": 4,
+    "1440-delivery": 5,
+    "390-hubs": 14,
+    "390-sectors": 4,
+    "390-delivery": 5
+  },
+  "keyboard": true,
+  "faq": true,
+  "form": {
+    "steps": 3,
+    "emptySubmitBlocked": true,
+    "backPreservesValues": true,
+    "noAcceptedLeadSent": true
+  },
+  "assets": {
+    "brokenImages": [],
+    "insecureModuleAssets": []
+  },
+  "serverRendered": {
+    "sections": 11,
+    "panels": 23,
+    "h1": "\n        Habilitamos HubSpot Hub por Hub,y después lo operamos contigo.\n      "
+  },
+  "rejectedRequest": {
+    "status": 403,
+    "body": {
+      "outcome": "captcha_failed",
+      "message": "missing_token"
+    }
+  },
+  "status": "PASS"
+}

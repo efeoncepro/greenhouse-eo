@@ -278,7 +278,7 @@ Su uso correcto en este momento es:
 
 - health operativo de la plataforma
 - diagnostico downstream para agentes y consolas
-- extension inmediata del MCP read-only, no requisito de la surface minima base
+- extension inmediata del MCP, no requisito de la surface minima base
 
 No debe confundirse con:
 
@@ -433,10 +433,10 @@ En términos concretos, lo siguiente debería ser:
 ### 4. Eventing y downstream
 
 - webhooks o delivery contracts donde tenga sentido
-- MCP read-only encima de esta lane, no directo sobre rutas legacy o readers ad hoc
+- MCP encima de esta lane, no directo sobre rutas legacy o readers ad hoc
 - extension corta con `platform health` sobre el mismo cliente downstream antes de abrir writes o tools más libres
 
-## Registro local MCP read-only V1
+## Registro local MCP V1
 
 Para desarrollo local, el repo ya puede registrar un server MCP Greenhouse apuntando al entrypoint esperado `pnpm mcp:greenhouse`.
 
@@ -455,7 +455,7 @@ Reglas operativas:
 - no inventar consumers nuevos a ciegas solo para probar el MCP
 - si el target es `staging` o `preview`, respetar el flujo operativo de bypass SSO ya documentado para requests programaticos
 
-La V1 read-only esperada del MCP debe exponer un set chico de tools:
+La V1 del MCP arrancó con un set chico de tools (histórico; hoy el inventario vigente son 43 tools declaradas en `src/mcp/greenhouse/tool-manifest.ts`, 7 de ellas de escritura):
 
 - `get_context`
 - `list_organizations`

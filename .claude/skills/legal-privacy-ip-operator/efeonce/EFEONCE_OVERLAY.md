@@ -5,7 +5,7 @@ La skill es genérica y reutilizable, pero Efeonce tiene una realidad legal conc
 ## Entidad y mercados
 
 - **Entidad contratante: Efeonce Group SpA** (Chile). Es quien firma como parte en los contratos salvo que se cree una entidad local por mercado.
-- **Opera en Chile, Colombia, México, Perú**; **abriendo Estados Unidos** (`03`/`03b` cobran urgencia). La apertura de US puede requerir **entidad US** (LLC/Inc.) para contratar/facturar allá — decisión legal/fiscal (coordina con `greenhouse-finance-accounting-operator` + abogado US).
+- **Opera en Chile, Estados Unidos, Colombia, México y Perú** (confirmación del operador del 2026-08-31; `docs/context/01_quienes-somos.md`); Estados Unidos ya está operativo comercialmente (`03`/`03b` aplican según jurisdicción). La apertura de US puede requerir **entidad US** (LLC/Inc.) para contratar/facturar allá — decisión legal/fiscal (coordina con `greenhouse-finance-accounting-operator` + abogado US).
 - **Clientes Globe internacionales** → posible alcance **GDPR** (`04`).
 
 ## El doble rol legal de Efeonce (interiorízalo)

@@ -3,7 +3,7 @@
 > **Propietario:** Efeonce Group SpA — RUT 77.357.182-1
 > **Sitio:** <https://efeoncepro.com>
 > **Estado:** categoría documental activa
-> **Última actualización:** 2026-07-17
+> **Última actualización:** 2026-08-30
 
 ## Propósito
 
@@ -50,14 +50,19 @@ Cada servicio debe declarar como mínimo:
 ## Familias disponibles
 
 - [HubSpot as a Service](hubspot-as-a-service/README.md)
-- [Salesforce Practice](salesforce/README.md) — CRM core, Marketing Cloud Engagement y Marketing Cloud Next con
-  modos separados de operación, venta y coexistencia.
+- [Salesforce Practice](salesforce/README.md) — arquitectura de oferta por outcomes y lifecycle para CRM core,
+  Marketing Cloud Engagement y Marketing Cloud Next, con operación, venta y coexistencia separadas.
 - [Creative Services](creative-services/README.md) — incluye Social Media, su operación recurrente y la capability
   **Efeonce Run & Gun Studio**, que se comercializa mediante **Efeonce Run & Gun Production** con alcance propio.
 - [Media & Distribution](media-distribution/README.md)
 
-HubSpot as a Service pertenece a la línea de negocio **RevOps & CRM**. Su arquitectura comercial y la revisión de los
-brochures históricos están documentadas en su ficha y en [`docs/audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md`](../audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md).
+HubSpot as a Service pertenece a **RevOps & CRM**. Su arquitectura vigente usa seis familias por outcome, modos de
+entrega transversales y overlays sectoriales; la evaluación inicial para fit/cotización es sin costo y un blueprint
+pagado requiere entregable autónomo. Canon:
+[`HUBSPOT_OFFER_ARCHITECTURE_V2.md`](hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md). Evidencia:
+[`HUBSPOT_SERVICES_MARKET_BENCHMARK_2026-08-30.md`](../audits/commercial/HUBSPOT_SERVICES_MARKET_BENCHMARK_2026-08-30.md).
+Los brochures históricos siguen gobernados por
+[`HUBSPOT_BROCHURE_REVIEW_2026-07-26.md`](../audits/commercial/HUBSPOT_BROCHURE_REVIEW_2026-07-26.md).
 
 Media & Distribution se vende mediante tres soluciones principales y una capa operativa: Distribution Strategy &
 Media Architecture; Performance & Commerce Distribution; Influence, Earned & Partnership Distribution; y Managed

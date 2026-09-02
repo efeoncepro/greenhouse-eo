@@ -316,8 +316,9 @@ Reglas obligatorias:
 - `TASK-1665` — puede mostrar un panel/sidecar de plan diario y acciones sugeridas, siempre con estados
   disabled si una dependency o flag está OFF.
 - Nexa conversation — agrega `get_seo_daily_plan` como tool contextual, con scope y disclosure.
-- MCP Greenhouse/gateway — agrega un read tool después de pasar parity/allowlist; no se auto-federan
-  writes.
+- MCP Greenhouse/gateway — entrada en `src/mcp/greenhouse/tool-manifest.ts` + `registerTool` en `server.ts`
+  en el MISMO PR (sin entrada el servidor no construye, `TASK-1780`); después parity/allowlist del gateway,
+  que conserva su revisión humana. No se auto-federan writes.
 - EPIC-022 — convierte el camino diario en un sistema asistido y auditable, no en una UI de listados.
 - Futura task de agent action execution — sólo si el operador decide autorizarla; esta task deja el
   boundary listo pero no la implementa.

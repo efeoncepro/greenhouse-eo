@@ -4,6 +4,11 @@
 > El código, los workflows y las imágenes viven en `efeonce-globe`; la evidencia y este runbook viven en
 > Greenhouse.
 
+> **Gate de lifecycle:** una ruta puede conservar evidencia histórica `canary_passed` o un binding promovido
+> mientras el producto completo está `hibernated`; eso no la vuelve ejecutable hoy. No inicies la saga ni un
+> canary facturable hasta completar `hibernated → draining → active` mediante
+> [`GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md`](GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md) y verificar el estado live.
+
 Este runbook existe porque **el procedimiento estaba incompleto y eso costó 10 de 12 promociones**. Medido el
 2026-08-04 sobre `production_promotion_operations`: 10 `rolled_back`, 2 `canary_passed`. Cuatro de las
 revertidas **ya estaban `activated`** y murieron **+2 s, +18 s, +26 s y +40 s** después de su `deadline_at`

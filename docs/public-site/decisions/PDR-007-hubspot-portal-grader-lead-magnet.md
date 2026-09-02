@@ -14,6 +14,13 @@ La diferencia estructural con el AI Visibility Grader (que ancla el modelo de do
 
 ## Decisión — cuatro capas que se refuerzan
 
+### Frontera comercial: evaluación gratuita versus blueprint pagado
+
+La puerta pública y la primera evaluación comercial son **sin costo**: entregan un score/hallazgo acotado,
+fit/no-fit, riesgos visibles y el siguiente alcance. La auditoría conectada o blueprint puede ser **pagada** cuando
+incluye acceso, inventario verificable, arquitectura objetivo, roadmap y riesgos reutilizables aunque Efeonce no
+ejecute. No se cobra por decir si el prospecto califica ni se regala consultoría técnica profunda para cotizar.
+
 ### 1. Ángulo: un diagnóstico honesto, no un "test de marketing"
 
 Registro sobrio (validado con `copywriting`, coherente con PDR-006): el lead magnet entrega **un diagnóstico de madurez de tu operación en HubSpot** con hallazgos accionables — no un puntaje vanidoso ni un pretexto para pedir el correo.
@@ -24,7 +31,9 @@ Registro sobrio (validado con `copywriting`, coherente con PDR-006): el lead mag
 ### 2. Dos puertas sobre un motor (la puerta pública es el gancho; la conectada es la conversión)
 
 - **Puerta pública — self-assessment de madurez (sin OAuth).** Cuestionario corto; el motor Kortex puntúa contra un modelo de madurez. Reporte público estilo grader en Think. Es el lead magnet self-serve — **fricción baja, sin tocar el portal del prospecto**.
-- **Puerta conectada — auditoría real (OAuth).** El Portal Audit de Kortex sobre el HubSpot del prospecto, tras puerta **trial/contratada**. Es el entregable profundo que convierte: del "esto es lo que tu self-assessment sugiere" al "esto es lo que tu portal realmente muestra".
+- **Puerta conectada — auditoría real (OAuth).** El Portal Audit de Kortex sobre el HubSpot del prospecto, tras
+  puerta **trial/contratada** y alcance explícito. Es el entregable profundo que convierte: del "esto es lo que tu
+  self-assessment sugiere" al "esto es lo que tu portal realmente muestra".
 - El puente entre puertas es el argumento de venta: el self-assessment abre la conversación; la auditoría conectada la cierra.
 
 ### 3. Ejecución: superficie en Think, captura gobernada, sin motor nuevo

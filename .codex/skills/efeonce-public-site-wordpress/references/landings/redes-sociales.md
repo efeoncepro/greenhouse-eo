@@ -6,7 +6,7 @@
 - WordPress `postId`: `251300`
 - Parent page: `/servicios/`, `postId=251077`
 - Title: `Redes Sociales`
-- Status: `publish`, `noindex, follow` until operator approves indexing/cutover.
+- Status: `publish`, index eligible. Operator explicitly approved indexing on 2026-08-31; public robots/canonical/sitemap verified.
 - Owning task context: `TASK-1351` / direct public-site execution.
 - Runtime rail: WordPress/Kinsta, Elementor document saved with `Document::save()`.
 - Source of truth: approved final Claude Design HTML at `/Users/jreye/Documents/social/Task 1351 execution/Redes Sociales.dc.html`.
@@ -94,8 +94,8 @@
 - Yoast title: `Agencia de redes sociales para marcas en crecimiento | Efeonce` (`62` chars).
 - Yoast meta description: `Operamos tus redes como motor de marca y demanda: contenido, creadores, social care y reporting en Greenhouse. Agenda una reunión o auditoría gratis.` (`149` chars).
 - Focus keyphrase: `agencia de redes sociales`.
-- Canonical is stored in Yoast as `https://efeoncepro.com/servicios/redes-sociales/`. Yoast intentionally does not print a canonical link while `_yoast_wpseo_meta-robots-noindex=1`; do not force a manual canonical until the operator approves indexing/cutover.
-- Robots remain `noindex, follow`; do not remove noindex without explicit operator approval.
+- Canonical stored and emitted by Yoast: `https://efeoncepro.com/servicios/redes-sociales/`. On 2026-08-31 the operator approved indexing; changing native noindex meta from `1` to `2` restored canonical output without a manual duplicate.
+- Robots now allow `index, follow`; URL is present in the page sitemap. Snapshot `_gh_menu_indexability_20260831_163136`. Evidence: `docs/audits/public-site/2026-08-31-menu-indexability.md`. Earlier noindex probes below are historical.
 - OG/Twitter:
   - title matches the Yoast title.
   - description: `Redes que construyen marca y demanda, no solo feed: contenido, creadores, social care, reporting y una capa operativa en Greenhouse.`
@@ -386,6 +386,6 @@
 
 ## Follow-Ups
 
-- Decide indexing/cutover: remove noindex and validate canonical/search metadata only after operator approval.
+- Indexing permission resolved 2026-08-31: robots, canonical and sitemap verified after explicit operator approval. GSC indexing observation remains separate.
 - Decide HubSpot direct delivery cutover for `efeonce-social-audit`; current delivery mode is intentionally `disabled`.
 - If visual polish continues, compare against the final HTML source sections, not against iteration captures.

@@ -1,4 +1,4 @@
-# 13 · Agentes — implementarlos, operar con ellos, construirlos
+# 13 · Agent Hub y Agentic Operations — diseñar, implementar, gobernar y operar
 
 > **Este módulo nació el 2026-07-13** porque los agentes dejaron de ser una nota al pie del producto y pasaron
 > a ser **una capa de servicio con caso propio**. Es la oferta más diferenciada que Efeonce tiene hoy en LATAM.
@@ -10,13 +10,13 @@
 ✅ HubSpot se autodenomina **"Agentic Customer Platform"**. Objetivo declarado a inversionistas: ser
 **"la #1 agentic customer platform para empresas en crecimiento"**. **No es marketing: cambiaron de categoría.**
 
-**Su arquitectura oficial, en tres capas:**
+**Arquitectura operativa vigente:**
 
 | Capa | Qué dice HubSpot | Qué significa para ti |
 |---|---|---|
 | **1 · Smart CRM** *(contexto)* | Fuente única de verdad: datos estructurados **y no estructurados** | **Sin datos limpios no hay outcome de IA.** Eso es **implementación** |
-| **2 · Breeze Agents** | *"AI teammates que hacen trabajo real"* | **Tú los implementas.** Solo 3 en GA → § 2 |
-| **3 · Agent Coordination** | 🎯 *"**Decidir qué tareas manejan los agentes solos y cuáles quedan con humanos**"* | 🔴 **ESTA CAPA ES TU SERVICIO. HubSpot la nombra y NO la llena.** |
+| **2 · Agentes y agentic workflows** | Agentes preconstruidos o custom que ejecutan jobs sobre el contexto | **Tú calificas, configuras, conectas y evalúas cada caso.** |
+| **3 · Agent Hub / coordinación** | Inventario, configuración, outcomes, contexto y gobierno de agentes/workflows | 🔴 **Esta capa requiere diseño operativo, permisos, handoff y observabilidad.** |
 
 > 🎯 **Tu doctrina de gobierno (`propose → confirmación humana → execute`) no es un invento tuyo:
 > es la capa que la arquitectura oficial de HubSpot dice que necesitas — y que la plataforma no trae.**
@@ -33,29 +33,34 @@
 
 ---
 
-## 1. Las tres capas del SERVICIO (y las tres son reales)
+## 1. Las cuatro capas del servicio
 
 | Capa | Qué es | Estado en Efeonce |
 |---|---|---|
-| **1 · Implementamos los agentes de HubSpot** | Los **3 en GA**: Customer, Prospecting, Data. Configuración, gobierno y modelado de costo | ✅ **CASO REAL** — Customer Agent en ANAM |
-| **2 · Operamos HubSpot *con* agentes** | La **HubSpot Agent CLI** — Claude Code / Codex operan el CRM directamente | ✅ **Ya se trabaja así** |
-| **3 · Construimos agentes propios** | **Agent Tools** — empaquetas lógica de negocio + IA como herramienta que un agente de HubSpot puede llamar | ⚠️ Capability. **Confirmar si ya se hizo uno** |
-
-**Casi ningún partner de LATAM está en la capa 2. Prácticamente ninguno en la 3.**
+| **1 · Readiness y contexto** | Datos, knowledge, procesos, permisos, outcomes, costos y human handoff | ✅ Método reusable; profundidad probada en ANAM |
+| **2 · Agentes preconstruidos** | Calificar e implementar el agente elegible para un job; el roster y release state se verifican al cotizar | ✅ Customer Agent probado; el resto se califica por portal |
+| **3 · Agentes custom y herramientas** | Agent Builder para agentes custom; APIs, MCP, workflow actions y Agent Tools para capacidades | ⚠️ Capability; exige arquitectura y piloto |
+| **4 · Managed Agentic Operations** | Evaluación, consumo, observabilidad, incidentes, cambios, optimización y retiro | ⚠️ Oferta condicionada a backlog, owner y economics |
 
 ---
 
-## 2. Capa 1 — Implementar los agentes de HubSpot
+## 2. Inventario y elegibilidad por caso de uso
 
-### 🔴 Solo TRES están en GA ✅
-**Customer Agent · Prospecting Agent · Data Agent.** El KB clasifica el resto como **"Mostly Beta"**
-(ABM Landing Page, Blog Research, Closing, Company Research, Cross-sell/Upsell, Customer Health, Deal Loss,
-RFP, Sales-to-Marketing Feedback).
+No memorices ni publiques un número fijo de agentes. Agent Hub reúne agentes preconstruidos, custom y agentic
+workflows, pero continúa beta al corte 2026-08-30. Para cada caso crea una ficha:
 
-> 🎯 **Decir en público cuáles NO están listos es el contenido más citable del mercado**, porque nadie más lo
-> hace. Todo el mundo está prometiendo "flota de agentes de IA". **Tú serías el único diciendo que hay tres.**
+| Campo | Pregunta obligatoria |
+| --- | --- |
+| Job/outcome | ¿Qué trabajo termina y cómo se mide? |
+| Release/elegibilidad | ¿GA, beta o preview? ¿En este portal, tier y seat? |
+| Contexto | ¿Qué datos y knowledge usa, con qué freshness y owner? |
+| Tools/permisos | ¿Qué lee, propone o escribe? ¿Qué acción es irreversible? |
+| Autonomía/handoff | ¿Qué puede hacer solo y cuándo escala a humano? |
+| Consumo | ¿Qué créditos, límites y costo por outcome aplica? |
+| Evaluación | ¿Qué dataset, escenarios, umbrales y fallos se prueban? |
+| Operación | ¿Quién monitorea, corrige, versiona y retira? |
 
-🔴 **NUNCA firmes un SLA sobre un agente en beta.**
+🔴 **NUNCA firmes un SLA sobre un agente en beta ni sobre Agent Hub como categoría genérica.**
 
 ### Prospecting Agent — contrato reusable
 

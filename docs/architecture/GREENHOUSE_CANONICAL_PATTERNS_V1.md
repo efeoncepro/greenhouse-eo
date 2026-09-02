@@ -200,6 +200,54 @@ un instrumento que se ve como cobertura y no cubre nada.
   (patrón 4 — degradación honesta). Meterlo en un allowlist para que nazca en verde es volver al
   snapshot.
 
+### La tercera pregunta, cuando el instrumento ya es un test: ¿la aserción EJERCITA el comportamiento o DESCRIBE su forma?
+
+Elegir bien el instrumento (preguntas 1 y 2) todavía deja una forma de fallar: escribir la
+aserción sobre el **texto del código** —el string de un `ORDER BY`, un conteo de ocurrencias en un
+YAML, una línea de `deploy.sh`— en vez de sobre lo que ese código **hace**. Una guarda así no
+verifica: **afirma**. Y falla en las dos direcciones opuestas, las dos silenciosas para quien la
+escribió.
+
+- **Verde con el defecto puesto.** `src/lib/growth/seo/work-queue/__tests__/reader.test.ts`
+  comparaba el string del `ORDER BY` del reader contra una constante, «porque es la única forma de
+  comprobar que las TRES llaves y el NULLS LAST siguen ahí» —su propio comentario—. El comparador
+  canónico (`compareWorkQueueItems`) tenía **cuatro**: desempata banda 2 por `tieBreakImpressions`
+  DESC, un valor que **no es columna** de la tabla, así que un `ORDER BY` reconstruido no podía
+  reproducirlo ni en principio. El test consagró un modelo de tres llaves que el comparador no
+  seguía, y pasó verde mientras producción servía **54 de 55 items de banda 2 fuera de su
+  `rank_in_snapshot`** persistido (invisible donde domina banda 1: 0 de 501 en otro tenant). Lo
+  destapó una auditoría independiente del snapshot vigente, no la suite.
+- **Rojo con la mejora puesta.** `services/ops-worker/deploy-contract.test.ts` exigía
+  `expect(workflow.match(/src\/lib\/hiring\/notifications/g)).toHaveLength(3)` como proxy de «la
+  ruta está cubierta en las tres decisiones del deploy». Cuando la cobertura pasó a declararse de
+  forma **gruesa** (`src/lib/**`) respaldada por un gate real (`pnpm worker:deploy-path-gate`, que
+  la deriva del metafile de esbuild), el conteo bajó a 1 y el test se puso rojo **aunque la
+  cobertura real había mejorado**. Agravante: ese archivo no corre en el CI regular, así que el
+  rojo apareció recién en CI Deep sobre el squash a `main`.
+
+**La forma canónica: una guarda textual SEÑALA al verificador real, no lo reemplaza.** El
+forward-fix de `deploy-contract.test.ts` la muestra completa — exige la declaración gruesa vigente
+(`- 'src/lib/**'`), exige la ruta explícita **1×** donde de verdad se nombra (la resolución de
+latest-SHA), y exige que el workflow **referencie el gate** que sostiene la cobertura verdadera
+(`worker:deploy-path-gate`). El de `reader.test.ts` muestra la otra mitad: dejó de afirmar el orden
+reconstruido y pasó a exigir el contrato —servir `ORDER BY rank_in_snapshot ASC`— más los dos
+anti-patrones **nombrados** (`ORDER BY score_band`, alias homónimo `AS priority_score`) por lo que
+son, regresiones prohibidas, y no por ser la definición del orden.
+
+- **NUNCA** aceptar «mirar el string es la única forma de comprobarlo» como cierre. Si de verdad lo
+  es, el instrumento está mal elegido: la salida es mover la autoridad a un lugar ejercitable —el
+  comparador queda como única autoridad de orden; el gate deriva la cobertura del bundle— y dejar
+  la aserción textual como prohibición acotada.
+- **NUNCA** dejar que una guarda textual codifique un **modelo** del comportamiento (las N llaves
+  del orden, las N apariciones de una ruta). Ese modelo envejece contra el código sin que nada lo
+  avise: si el código mejora, la guarda miente en rojo; si el código diverge, miente en verde. Y en
+  los dos finales la salida fácil —ajustar la constante— borra la pregunta en vez de responderla.
+- **SIEMPRE** que un test lea un archivo fuente (`readFileSync` de un `.yml` o de un `deploy.sh`, el
+  SQL capturado de un mock), escribir en el propio test **qué verificador real** sostiene el
+  invariante y por qué la aserción textual no lo sustituye. Los dos forward-fix lo dejan en
+  comentario; sin eso, el siguiente lector no puede distinguir una prohibición deliberada de un
+  contrato congelado.
+
 **Fuente:** señal → TASK-1679 follow-up (`client-portal-assigned-view-without-route`), TASK-877
 follow-up (`identity-notion-bridge-coverage`), TASK-878/CLAUDE.md (`workforce-unlinked-internal-users`),
 TASK-991 (`commercial-organization-type-lifecycle-drift`), TASK-929 (ledger drift).
@@ -207,6 +255,13 @@ Expectativa derivada → TASK-1679 Slice 7 (client portal page access check), TA
 (`capability-grant-coverage.test.ts` parsea los `can()` reales en vez de listar capabilities),
 TASK-982 (`route-reachability-gate` deriva del filesystem, no de una lista de rutas),
 feature-flags-audit (deriva de los `*_ENABLED` en código contra el ledger).
+
+**Fuente de la tercera pregunta (2026-08-29, dos casos el mismo día):** falso verde →
+`cf8729771` (`fix(growth-seo): el orden servido de la cola contradecía el rank persistido en banda
+2`, TASK-1700); falso rojo → `380a20fa3` (`fix(ci): el contrato del deploy del worker afirmaba la
+forma vieja del workflow`), forward-fix del rediseño `146070ffc` + gate
+`scripts/ci/worker-deploy-path-coverage-gate.mjs`. El mismo defecto que `TASK-1785` persigue en la
+prosa —una afirmación que ocupa el lugar de un mecanismo— reaparecido en los tests de sus vecinos.
 
 ---
 

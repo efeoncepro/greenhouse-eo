@@ -23,7 +23,7 @@ Hay tres piezas y cada una tiene un dueño distinto:
 2. **El adaptador de SEO** dentro de ese punto de acceso no sabe nada de SEO. Solo transporta la pregunta hasta Greenhouse con la identidad de servicio del gateway.
 3. **Greenhouse decide y responde.** Ahí vive todo: si la organización tiene el módulo contratado, cuánto cupo le queda, qué datos existen y cuáles no.
 
-Desde ese mismo 6 de agosto, conectarse ya no exige una identidad de servicio ni un script especial: **cualquier persona del tenant Entra de Efeonce puede conectar su propio cliente MCP estándar** (Claude Code, claude.ai o Claude Desktop) al punto de acceso, iniciar sesión con su cuenta corporativa y operar las cuatro consultas conversacionalmente. Los pasos exactos están en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md).
+Desde ese mismo 6 de agosto, conectarse ya no exige una identidad de servicio ni un script especial: **cualquier persona del tenant Entra de Efeonce puede conectar su propio cliente MCP estándar** (Claude Code, claude.ai o Claude Desktop) al punto de acceso, iniciar sesión con su cuenta corporativa y operar las cuatro consultas conversacionalmente. Los pasos exactos están en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-tool-inventory.md).
 
 La consecuencia práctica: **conectar un asistente de IA no otorga ningún permiso nuevo**. Las mismas reglas que aplican a la UI aplican a la consulta por MCP, porque es literalmente la misma puerta. Si un dato no se puede ver en el portal, tampoco se puede ver desde un asistente.
 
@@ -31,7 +31,7 @@ La consecuencia práctica: **conectar un asistente de IA no otorga ningún permi
 
 Las **cuatro consultas** que se explican abajo son el núcleo de lectura del módulo: ninguna dispara una medición nueva ni gasta presupuesto de proveedor, y las cuatro están federadas en el punto de acceso público (la cuarta se federó el mismo 6 de agosto, `TASK-1653`).
 
-No son lo único que hay. El inventario creció desde entonces —hay más lecturas y, desde el 7 de agosto, **un grupo acotado de escrituras gobernadas** (ver [Seguir keywords: la escritura gobernada](#seguir-keywords-la-escritura-gobernada)); desde el 14 de agosto se sumaron **descubrir keywords nuevas** y **preparar borradores de preguntas para el grader AEO** (ver [Descubrir keywords y prepararlas para la IA](#descubrir-keywords-y-prepararlas-para-la-ia))—. El inventario exacto de lo que está federado en cada momento vive en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md), que se verifica contra el allowlist de paridad del gateway; este documento explica el sentido de las piezas, no lleva la cuenta.
+No son lo único que hay. El inventario creció desde entonces —hay más lecturas y, desde el 7 de agosto, **un grupo acotado de escrituras gobernadas** (ver [Seguir keywords: la escritura gobernada](#seguir-keywords-la-escritura-gobernada)); desde el 14 de agosto se sumaron **descubrir keywords nuevas** y **preparar borradores de preguntas para el grader AEO** (ver [Descubrir keywords y prepararlas para la IA](#descubrir-keywords-y-prepararlas-para-la-ia))—. El inventario exacto de lo que está federado en cada momento vive en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-tool-inventory.md), que se verifica contra el allowlist de paridad del gateway; este documento explica el sentido de las piezas, no lleva la cuenta.
 
 ### 1. Estado del módulo (`get_seo_entitlement`)
 
@@ -200,4 +200,4 @@ Sobre una organización **sin** el módulo, las dos consultas de datos responden
 - El [módulo SEO](modulo-seo-search-visibility-360.md) es el motor que produce los datos que estas consultas leen.
 - El [AI Visibility Grader](ai-visibility-grader.md) aporta el eje de citabilidad IA del cruce 360.
 - El [Efeonce MCP Gateway](../plataforma/efeonce-mcp-gateway.md) es el punto de acceso federado; Search Visibility 360 es su segunda capacidad, después del lector de flota de Globe.
-- El [MCP read-only de Greenhouse](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) expone estas mismas consultas para uso interno del portal, sin pasar por el gateway público.
+- El [MCP de Greenhouse](../../manual-de-uso/plataforma/mcp-greenhouse-tool-inventory.md) expone estas mismas consultas para uso interno del portal, sin pasar por el gateway público.

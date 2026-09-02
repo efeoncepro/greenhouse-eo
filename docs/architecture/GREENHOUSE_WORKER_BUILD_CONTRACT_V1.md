@@ -4,6 +4,7 @@
 > Scope: Cloud Run build units in `services/**`
 > Canonical gate: `pnpm worker:build-contract-gate`
 > Runtime dependency gate: `pnpm worker:runtime-deps-gate`
+> Deploy-path coverage gate: `pnpm worker:deploy-path-gate` (added 2026-08-29)
 
 ## Purpose
 
@@ -62,6 +63,71 @@ The current root manifest remains a transitional shared dependency surface. A wo
 closure may only be introduced through the authorized build-unit decomposition program; this contract does not
 create a workspace or deployable opportunistically.
 
+## Deploy-path coverage
+
+A worker workflow decides **twice** whether to deploy, and both decisions read a path list that used to be
+maintained by hand:
+
+1. `on.push.paths` — whether the workflow runs at all.
+2. `WORKER_RUNTIME_PATHS` — the drift check. If `git diff --quiet EXPECTED..CURRENT -- <paths>` sees nothing,
+   the deploy step is **skipped** and the job closes `success`.
+
+When the worker bundles a file the list does not mention, the change lands on `main`, the release manifest
+reaches `released`, every deploy job is green — and the worker keeps serving the previous image. The symptom
+surfaces later and elsewhere (stale data, a consumer that never reacts) and points at the domain, never at the
+deploy. Release `64bdd105c737` closed green with the `ops-worker` still serving `8adf8c2d3`: exactly the code
+that release existed to correct. Its job ran 46 seconds and reported
+`worker runtime paths are unchanged since EXPECTED_SHA=64bdd105c737…; skipping build/deploy.`
+
+Measured on 2026-08-29 with the esbuild metafile (the same bundle the Dockerfile produces): the `ops-worker`
+packs **1449** local files, the declared list covered **24** prefixes, and **696** files were invisible to it —
+including `src/lib/postgres`, most of `src/lib/finance` and all of `src/lib/growth/seo`. Since **1385 of the
+1449** come from `src/lib`, enumerating subdirectories is structurally unsustainable. It had already failed five
+times, each one closed by appending one more path: TASK-1210 (nubox), TASK-742 (auth/secrets), TASK-1723
+(talent-pool), TASK-1746 (hiring/notifications), TASK-1279 (transitive deps of the grader).
+
+**The declaration is therefore coarse and honest** — `src/lib/**`, `src/emails/**`, `src/types/**`,
+`src/config/**`, `src/components/**`, `src/i18n/**`, `src/@core/**` plus the worker's own `services/` inputs, in
+both lists. It keeps the selectivity that actually matters: `src/app/**`, `docs/**` and `tests/**` do not
+redeploy a worker.
+
+`pnpm worker:deploy-path-gate` (`scripts/ci/worker-deploy-path-coverage-gate.mjs`, wired in `ci.yml` next to the
+other two worker gates) keeps that declaration true. It replicates the Dockerfile `esbuild --bundle` and derives
+coverage from `metafile.inputs` — the real tree with transitive imports included, which is precisely what escapes
+review by eye. It reports two failure kinds:
+
+| Failure | Consequence | Remediation |
+| --- | --- | --- |
+| Bundle file under no declared prefix | The workflow never runs on that change | Add the prefix to **both** lists |
+| File in `on.push.paths` but not in `WORKER_RUNTIME_PATHS` | Workflow runs, drift check skips deploy, job closes `success` | Add the prefix to `WORKER_RUNTIME_PATHS` |
+
+The second check only applies where the mechanism exists: a workflow with no `WORKER_RUNTIME_PATHS` block has no
+drift check to skip. Remediation always declares a **directory**, never a single file.
+
+Scope: the three esbuild-bundled Node workers registered in the script — `ops-worker`, `commercial-cost-worker`,
+`ico-batch`. `artifact-worker` runs from source through `tsx` rather than an esbuild bundle and is not registered
+in this gate; its path list remains under manual review.
+
+Verified coverage on 2026-08-29: `ops-worker` 1449 files, `commercial-cost-worker` 107, `ico-batch` 55. The first
+run surfaced two gaps nobody was looking for: `commercial-cost-worker` and `ico-batch` did not cover
+`services/_shared/sentry-init.ts`, which both bundle.
+
+### Reading a skipped deploy
+
+A skip from the change gate does **not** prove the runtime diff is empty. It proves the **declared paths** did
+not change. To tell a legitimate no-op from a false one, diff the **whole tree**, with no `--`:
+
+```bash
+git diff --name-only <deployed_sha> <target_sha>   # empty ⇒ identical trees ⇒ legitimate skip
+```
+
+Both cases are on record. Release `e1718a359575`: `git diff --name-only 380a20fa3 e1718a359575` came back empty
+and the 44-second skip was correct — `push:develop` had already deployed identical content. Release
+`64bdd105c737`: the trees did differ, and the same-looking skip left the worker stale.
+
+Operator runbook: `docs/manual-de-uso/plataforma/verificar-cobertura-de-deploy-de-workers.md`. Agent invariants:
+`docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md` (§Cobertura de rutas de deploy).
+
 ## Distribution target and retirement
 
 The vendored Globe tarballs are an explicit temporary bridge from `TASK-1454`. Their definitive distribution
@@ -81,6 +147,7 @@ Run before committing a worker/build-input change:
 pnpm worker:build-contract-gate:test
 pnpm worker:build-contract-gate
 pnpm worker:runtime-deps-gate
+pnpm worker:deploy-path-gate
 gcloud meta list-files-for-upload | rg '^vendor/'
 ```
 

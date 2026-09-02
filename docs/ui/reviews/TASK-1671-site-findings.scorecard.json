@@ -1,0 +1,104 @@
+{
+  "taskId": "TASK-1671",
+  "scenario": "growth-seo-audit",
+  "reviewedAt": "2026-09-01",
+  "reviewer": "claude (frames GVC desktop 1440 + mobile 390 inspeccionados; DOS corridas, la segunda tras corregir el defecto de alcance que la primera destapó)",
+  "evidence": {
+    "desktop": ".captures/2026-09-01T23-51-05_growth-seo-audit/01-desktop/frames/01-default.png",
+    "mobile": ".captures/2026-09-01T23-51-05_growth-seo-audit/02-mobile/frames/03-issues.png",
+    "dossier": ".captures/2026-09-01T23-51-05_growth-seo-audit/review-dossier.md",
+    "regionPobladaDesktop": ".captures/2026-09-01T23-58-53_tmp-1671/01-desktop/frames/01-hallazgos.png",
+    "regionPobladaMobile": ".captures/2026-09-01T23-58-53_tmp-1671/02-mobile/frames/01-hallazgos.png",
+    "regionVerificada": ".captures/2026-09-01T23-58-53_tmp-1671/01-desktop/frames/02-verificado.png"
+  },
+  "evidenceCaveat": "🔴 LEER ANTES DE USAR ESTE SCORECARD. La región poblada NO se pudo capturar con datos de un run real: el flag `GROWTH_SEO_SITE_FINDINGS_ENABLED` está OFF, así que no existen filas `scope='site'` en la base, y `seo_site_audit_findings` es append-only sobre una instancia Cloud SQL compartida con producción — sembrar filas de prueba sería irreversible, y encolar un crawl real le cargaría presupuesto al cliente (el propio scenario lo prohíbe). Los frames `regionPoblada*` salen de una ruta LOCAL temporal, no commiteada, que renderiza el componente REAL con props representativas. Sirven para juzgar layout, jerarquía, tipografía y responsive —que es lo que este scorecard puntúa— y NO sustituyen la evidencia de runtime: el criterio de aceptación de datos reales queda SIN tildar hasta el flip, donde el runbook ya la exige (paso 3).",
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.7,
+      "rationale": "La región responde la pregunta nueva ANTES que la lista, que es el único cambio de jerarquía que la task introduce y es deliberado: si el acceso está cortado, optimizar títulos es secundario. Dentro de cada fila el orden de lectura es severidad → qué → alcance y lugar → por qué, y no compite con el momento dominante de la pantalla (el gauge de salud, que se conserva intacto).",
+      "evidence": "regionPobladaDesktop; desktop 01-default (la pantalla completa sin regresión)",
+      "nextAction": ""
+    },
+    "proportions": {
+      "score": 4.6,
+      "rationale": "Columna de severidad alineada, contenido fluido. La línea de contexto es `caption` y el hint `body2`: la proporción entre ellos separa dato de explicación sin recurrir a un tercer tamaño.",
+      "evidence": "regionPobladaDesktop",
+      "nextAction": ""
+    },
+    "rhythm": {
+      "score": 4.6,
+      "rationale": "Divisor entre filas y respiración uniforme, heredados de la lista de página: una sola cadencia en toda la pantalla. La primera corrida rompía el ritmo con el alcance como hijo flex suelto —flotando a la derecha en desktop— y se corrigió llevándolo a la línea de contexto.",
+      "evidence": "regionPobladaDesktop (corrida 2) vs .captures/2026-09-01T23-57-00_tmp-1671 (corrida 1, defecto visible)",
+      "nextAction": ""
+    },
+    "density": {
+      "score": 4.5,
+      "rationale": "Cuatro filas con hint inline es holgado en desktop y sigue legible en 390px, donde el chip se apila sobre el título y el contexto envuelve sin truncar. El hint NO se colapsa a propósito: en el hallazgo de postura es lo que impide leerlo como falla.",
+      "evidence": "regionPobladaMobile",
+      "nextAction": ""
+    },
+    "depth": {
+      "score": 4.6,
+      "rationale": "Una sola card, sin cards anidadas por hallazgo ni por chequeo. El bloque 'No pudimos verificar' se separa con un divisor dentro de la misma superficie, no con un plano nuevo.",
+      "evidence": "regionPobladaDesktop",
+      "nextAction": ""
+    },
+    "surfaceEconomy": {
+      "score": 4.6,
+      "rationale": "Tercera y última superficie contained del fold (salud · acceso · issues): el presupuesto queda en su techo, no lo cruza. La densidad 'confirmación' colapsa a una línea en vez de gastar una card entera para decir que todo está bien.",
+      "evidence": "regionVerificada; desktop 01-default",
+      "nextAction": ""
+    },
+    "visualImpact": {
+      "score": 4.5,
+      "rationale": "El impacto lo carga el contenido, no cromo agregado: dos 'Crítico' consecutivos sobre acceso leen como veredicto. Sin rieles de color laterales ni tarjetas con franja — la severidad la porta el chip, igual que en la lista de abajo, así que no aparece una segunda gramática visual para lo mismo.",
+      "evidence": "regionPobladaDesktop",
+      "nextAction": ""
+    },
+    "typography": {
+      "score": 4.6,
+      "rationale": "Geist con variantes del theme (`h5`/`body1`/`body2`/`caption`); cero `fontSize` inline. La jerarquía de tres pesos dentro de la fila es suficiente para separar título, dato y explicación.",
+      "evidence": "regionPobladaDesktop; ui:code-lint PASS",
+      "nextAction": ""
+    },
+    "color": {
+      "score": 4.7,
+      "rationale": "Paleta semántica del theme vía `GreenhouseChip`. La distinción que más importa —postura vs defecto— es TEXTUAL ('Decisión declarada'), no un matiz: un daltónico la lee igual. No hay semáforo como sistema visual; el color acompaña al icono y a la palabra.",
+      "evidence": "regionPobladaDesktop",
+      "nextAction": ""
+    },
+    "iconography": {
+      "score": 4.5,
+      "rationale": "Los tres iconos de severidad heredados de la lista, más `tabler-circle-check` para la confirmación. Ninguno viaja solo: siempre con su palabra dentro del chip.",
+      "evidence": "regionPobladaDesktop; regionVerificada",
+      "nextAction": ""
+    },
+    "responsive": {
+      "score": 4.6,
+      "rationale": "390px verificado: chip apilado, contexto que envuelve, cero truncado y `scrollWidth == clientWidth`. La lista de agentes se acota en AMBOS viewports ('OAI-SearchBot y 4 más'), no como concesión de mobile: cinco tokens crudos no se leen en ningún ancho.",
+      "evidence": "regionPobladaMobile; mobile 03-issues",
+      "nextAction": ""
+    },
+    "motion": {
+      "score": 4.5,
+      "rationale": "La región no anima su entrada. Es una decisión: animar un veredicto de acceso lo convertiría en un efecto, y compite con el drill de la lista, que sí anima porque ahí el vínculo fila→detalle necesita mostrarse.",
+      "evidence": "regionPobladaDesktop (sin motion propio)",
+      "nextAction": ""
+    },
+    "fidelity": {
+      "score": 4.7,
+      "rationale": "Coincide con el wireframe en las decisiones que lo definen: región entre salud y lista, tres densidades en una posición fija, chip de postura textual, lugar de detección obligatorio, sin `[Ver →]`. La única desviación —alcance en la línea de contexto en vez de columna derecha— corrige al propio wireframe, que afirmaba 'misma posición que N páginas afectadas' cuando esa posición real es un caption bajo el título.",
+      "evidence": "regionPobladaDesktop vs docs/ui/wireframes/TASK-1671-growth-seo-site-findings-audit-surface.md",
+      "nextAction": "Actualizar el wireframe para que la anatomía declarada coincida con la implementada."
+    },
+    "genericTemplateResistance": {
+      "score": 4.6,
+      "rationale": "No es una card genérica de alertas: el vocabulario ('Todo el sitio', 'Decisión declarada', 'No pudimos verificar') sólo tiene sentido en este dominio, y la distinción postura/defecto no existe en ningún template. Un componente de alertas de librería no podría producir esta pantalla sin inventar esas tres categorías.",
+      "evidence": "regionPobladaDesktop",
+      "nextAction": ""
+    }
+  },
+  "verdict": "pass",
+  "average": 4.593,
+  "floor": 4.5
+}

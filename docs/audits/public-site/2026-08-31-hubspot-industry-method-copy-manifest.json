@@ -1,0 +1,21 @@
+{
+  "contract": "hubspot-elementor-release.v1",
+  "sourceSha256": "f95b6254c2434b58a4d6855dded40dd3a38acb19b881e090e1928674ab8bb812",
+  "files": [
+    {
+      "path": "includes/hubspot/schemas/sectors.json",
+      "sha256": "1cd4f103fe427f20f649f7765f7ee4b4a57aab3fcedb800655499ee3872e5357",
+      "previousSha256": "34a0764cbc690f554ea1eb5664ed73999bdbae8ee6063e1c5f49ee879577c8c9"
+    },
+    {
+      "path": "includes/hubspot/schemas/assessment.json",
+      "sha256": "6b21704ee840e9ae804c08af78b55b3b74f15b06a02175d2ae0bb9305097c427",
+      "previousSha256": "de99e137b63bc7c83879f08c85c1fea543a96401190d4f805592f4a36802b87e"
+    },
+    {
+      "path": "includes/hubspot/schemas/delivery.json",
+      "sha256": "5c2c61b7bf6ac7162ae3f27060c7c5beab2dbdbd3b2f058758d37c799d425754",
+      "previousSha256": "1d02e6c5c9a7e93ffd0f0fde9970c3b5b06323af90eadfcd86241977ef5c355d"
+    }
+  ]
+}

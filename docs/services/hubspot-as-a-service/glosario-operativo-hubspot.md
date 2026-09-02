@@ -123,6 +123,10 @@ Una oportunidad puede tener varios Line items. Por eso, no guardes en el Deal un
 
 Registro de un servicio adjudicado o contratado, con su duración, recurrencia y renovación.
 
+En HubSpot, `Service` (`0-162`) es un objeto CRM activable para representar ofertas entregadas. Es distinto de
+**Service Hub** —el producto de atención/Customer Success— y de una familia comercial de servicios de Efeonce.
+Tampoco implica por sí solo un PSA completo.
+
 Un servicio representa lo contratado. Una fila de factura representa un hecho de facturación. Son granos distintos y no deben mezclarse.
 
 ### Renewal · Renovación

@@ -306,6 +306,33 @@ When designing in this repo, the 3-most-relevant-patterns step (from the global 
 - **SIEMPRE** scoring 4-pilar explícito.
 - **SIEMPRE** citar 3 patrones canonizados existentes que el diseño extiende o de los que diverge.
 
+## Guardas textuales (2026-08-29)
+
+Variante para **guardas de contrato** del principio global "el gate es el test de regresión del
+primer cliente" / "si un cambio legítimo obliga a editar el gate, está mal el gate". Dos guardas
+TEXTUALES fallaron el mismo día, en el mismo dominio, con **signos opuestos**:
+
+- **Verde con el defecto puesto**: el test de paridad del reader de la cola SEO (`reader.test.ts`)
+  comparaba el STRING del ORDER BY contra una constante ("las tres llaves"). Pasó verde un ciclo
+  completo mientras el comparador real tenía una CUARTA llave (desempate de banda 2 por impresiones,
+  que no es columna) y producción sirvió 54/55 items de banda 2 fuera de su rank. La forma no cambió;
+  la semántica divergió.
+- **Rojo cuando la cobertura MEJORÓ**: el test del contrato de deploy del worker
+  (`services/ops-worker/deploy-contract.test.ts`) contaba ocurrencias de string en el YAML
+  (`match(/ruta/g)).toHaveLength(3)`) como proxy de "la ruta está cubierta en 3 lugares". Se puso
+  rojo con `146070ffc` (cobertura gruesa derivada del metafile de esbuild → las rutas pasaron a
+  aparecer 1 vez) — rompió el release por hacer lo correcto.
+
+**Síntesis**: una guarda que fija una FORMA TEXTUAL (string-match de SQL, conteo de ocurrencias en
+YAML, un literal esperado) es el test de regresión del snapshot con que se escribió: pasa verde
+cuando la semántica se rompe sin mover la forma, y se pone roja cuando la forma cambia
+legítimamente. La resolución en ambos casos fue la misma: la guarda pasa a verificar el
+**COMPORTAMIENTO** o a señalar al **VERIFICADOR REAL** — el reader ahora sirve el rank persistido
+(paridad por construcción; ver `SQL_DATE_MATH_AGENT_INVARIANTS.md` §Orden y paginación #3), y el
+test del workflow ahora exige que el YAML referencie `worker:deploy-path-gate`, el gate que verifica
+la cobertura de verdad contra el metafile. **Regla**: si la expectativa de una guarda es una forma
+textual, la guarda vale solo si además apunta al mecanismo que verifica la semántica.
+
 ## Synergies with other skills
 
 - `greenhouse-postgres` — when designing Postgres schemas, this skill decides the shape; `greenhouse-postgres` validates the migration mechanics.

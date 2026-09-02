@@ -211,6 +211,47 @@ las tres se veían bien hasta que alguien miró el runtime. Búscalas en el paso
    una lista por si acaso; y cada entrada nueva declara por qué existe y qué trabajo
    la retira.
 
+4. 🔴 **El mensaje de un gate es una PROMESA verificable: ejercítala literal.** Un
+   gate puede estar **verde, elocuente y equivocado** — ofrece una salida en su
+   mensaje de error y otra rama del código la anula, o se rompe justo cuando el
+   autor hace lo que la plantilla PIDE. Es la falla más cara de detectar, porque
+   el operador obedece la instrucción, falla, y concluye que el problema es suyo.
+   Casos fuente, los tres del mismo día (2026-09-01, `task:lint`): (a)
+   `ui-wireframe-contract` decía *«o set UI impact to none with rationale»* y la
+   inferencia por `Domain` anulaba esa salida; (b) `normalizeStatusValue`
+   comparaba el valor crudo del campo y el parser dobla las líneas de
+   continuación dentro de él, así que declarar el valor **con su razón debajo**
+   —exactamente lo que la plantilla exige— rompía tres reglas distintas; (c) la
+   misma regla trataba como error a una task en `to-do` tocada de refilón,
+   cuando su propio mensaje dice *«before implementation»*. **Qué se hace:**
+   escribe la salida que el mensaje ofrece, tal cual la ofrece, y confirma que
+   el gate pasa. Si no pasa, el defecto es del MECANISMO, no del autor — y
+   arreglarlo vale más que el trabajo que estabas haciendo. ⚠️ Ninguno de los
+   tres rompía un test: los tests fijaban la intención, no la promesa del texto.
+
+   **Delta 2026-09-01 (barrido `stale-progress`) — tres más de la misma familia,
+   todas destapadas al USAR el gate en volumen, no al leerlo:** (d) `stale-blocker`
+   disparaba con `Blocked by: \`none\` (razón que nombra al blocker cerrado)` — el
+   campo decía `none` y la prosa que explica POR QUÉ se desbloqueó activaba el
+   guard, castigando justo el contexto útil; (e) `ui-flow-contract` no tenía la
+   calibración incidental-vs-focal que su gemela `ui-wireframe-contract` ya
+   había recibido — el mismo defecto (c), sin propagar; (f) un commit
+   `fix(docs):` contaba como implementación, así que una task sin una línea de
+   código aparecía como «ya trabajada». ⚠️ **Lección de propagación: al corregir
+   una regla, revisa sus hermanas.** (c) y (e) son literalmente el mismo bug en
+   dos reglas que comparten forma.
+
+5. 🔴 **Un test que pasa SIN el arreglo no está midiendo nada — falsifícalo
+   siempre.** Escribe el test, revierte la corrección, y **confirma que se pone
+   rojo**. Si sigue verde es teatro, y peor que no tenerlo: da confianza falsa y
+   protege a la siguiente regresión. Caso fuente 2026-09-01: un test del
+   `stale-blocker` pasaba con y sin el arreglo porque reusaba el repo temporal
+   del caso anterior — el índice de lifecycle se resuelve por root y ya estaba
+   recorrido, así que **no veía los archivos escritos después**. Aislado en su
+   propio repo, pasó a 47/48 sin el arreglo y 48/48 con él. El mismo protocolo
+   destapó que otro test necesitaba `git init` para siquiera ejercitar el modo
+   que decía probar.
+
 ## CLI
 
 Use the repo helper. Running as Codex, always scope skill output with

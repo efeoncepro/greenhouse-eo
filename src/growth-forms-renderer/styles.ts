@@ -1680,12 +1680,70 @@ export const RENDERER_CSS = `
   }
 `
 
+/** Source-led presentation remains portable; hosts only provide tokens and the outer card. */
+const PILLAR_CSS = `
+[data-ghf-style-variant="hubspot_pillar"] .ghf-form{gap:0}
+[data-ghf-style-variant="hubspot_pillar"] .ghf-progress-shell{margin:0 0 32px;padding:0;border:0;background:none;box-shadow:none}
+[data-ghf-style-variant="hubspot_pillar"] .ghf-pillar-step-heading{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:16px}
+[data-ghf-style-variant="hubspot_pillar"] .ghf-pillar-step-title{font-family:var(--ghf-heading-font,var(--ghf-font));font-size:24px;font-weight:700;letter-spacing:-.025em;line-height:1.2}
+[data-ghf-style-variant="hubspot_pillar"] .ghf-progress{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;color:var(--ghf-muted);margin:0}
+[data-ghf-style-variant="hubspot_pillar"] .ghf-pillar-step-track{display:flex;gap:6px}
+[data-ghf-style-variant="hubspot_pillar"] .ghf-pillar-step-track>span{flex:1;height:3px;border-radius:2px;background:var(--ghf-border)}
+[data-ghf-style-variant="hubspot_pillar"] .ghf-pillar-step-track>[data-state="current"],[data-ghf-style-variant="hubspot_pillar"] .ghf-pillar-step-track>[data-state="done"]{background:var(--ghf-accent)}
+[data-ghf-style-variant="hubspot_pillar"] .ghf-pillar-step-track>[data-state="done"]{opacity:.45}
+[data-ghf-style-variant="hubspot_pillar"] .ghf-fields{display:grid;grid-template-columns:1fr 1fr;gap:24px 16px}
+[data-ghf-style-variant="hubspot_pillar"] .ghf-field:has(.ghf-choice-group),[data-ghf-style-variant="hubspot_pillar"] [data-ghf-field-key="email"],[data-ghf-style-variant="hubspot_pillar"] [data-ghf-field-key="context"]{grid-column:1/-1}
+[data-ghf-style-variant="hubspot_pillar"] .ghf-field:has(.ghf-choice-group){display:flex;flex-direction:column;gap:0}
+[data-ghf-style-variant="hubspot_pillar"] .ghf-label{font-size:13px;font-weight:600;line-height:1.5;margin-bottom:7px}
+[data-ghf-style-variant="hubspot_pillar"] .ghf-help{font-size:12.5px;color:var(--ghf-muted);margin:0 0 14px}
+[data-ghf-style-variant="hubspot_pillar"] .ghf-field:has(.ghf-choice-group) .ghf-label{order:0}
+[data-ghf-style-variant="hubspot_pillar"] .ghf-field:has(.ghf-choice-group) .ghf-help{order:1}
+[data-ghf-style-variant="hubspot_pillar"] .ghf-choice-group{order:2;display:flex;flex-wrap:wrap;gap:7px}
+[data-ghf-style-variant="hubspot_pillar"] .ghf-choice-group--cards{display:grid;gap:8px}
+[data-ghf-style-variant="hubspot_pillar"] label.ghf-choice{position:relative;display:flex;align-items:center;gap:14px;cursor:pointer;margin:0;padding:10px 14px;border:1px solid var(--ghf-border);border-radius:9999px;color:var(--ghf-fg);background:var(--ghf-field-bg);font-family:var(--ghf-font);font-size:13.5px;font-weight:600;line-height:1.3;transition:background 200ms,border-color 200ms,color 200ms}
+[data-ghf-style-variant="hubspot_pillar"] .ghf-choice-group--cards label.ghf-choice{padding:16px 18px;border-radius:8px;font-size:14.5px;line-height:1.35}
+[data-ghf-style-variant="hubspot_pillar"] label.ghf-choice input{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;margin:0!important;pointer-events:none}
+[data-ghf-style-variant="hubspot_pillar"] label.ghf-choice:has(input:focus-visible){outline:3px solid var(--ghf-focus);outline-offset:3px}
+[data-ghf-style-variant="hubspot_pillar"] label.ghf-choice:has(input:checked){background:var(--ghf-accent);border-color:var(--ghf-accent);color:var(--ghf-accent-contrast)}
+[data-ghf-style-variant="hubspot_pillar"] .ghf-choice-group--cards label.ghf-choice::before{content:'';width:18px;height:18px;flex:none;box-sizing:border-box;border:2px solid var(--ghf-border-strong);border-radius:50%}
+[data-ghf-style-variant="hubspot_pillar"] .ghf-choice-group--cards label.ghf-choice:has(input:checked){background:color-mix(in srgb,var(--ghf-accent) 6%,var(--ghf-field-bg));color:var(--ghf-fg)}
+[data-ghf-style-variant="hubspot_pillar"] .ghf-choice-group--cards label.ghf-choice:has(input:checked)::before{border:5px solid var(--ghf-accent)}
+[data-ghf-style-variant="hubspot_pillar"] .ghf-intake-summary{display:none}
+[data-ghf-style-variant="hubspot_pillar"] .ghf-actions{display:flex;gap:14px;margin-top:32px}
+[data-ghf-style-variant="hubspot_pillar"] .ghf-actions .ghf-btn{flex:1;font-size:16px!important;font-weight:600!important;padding:16px 24px!important;border-radius:6px!important;min-height:56px!important}
+[data-ghf-style-variant="hubspot_pillar"] .ghf-actions .ghf-btn--ghost{flex:0 0 auto}
+@media(max-width:480px){[data-ghf-style-variant="hubspot_pillar"] .ghf-pillar-step-heading{flex-wrap:wrap;gap:8px}[data-ghf-style-variant="hubspot_pillar"] .ghf-fields{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){[data-ghf-style-variant="hubspot_pillar"] label.ghf-choice{transition:none}}
+`
+
 /** Inyecta el CSS una sola vez en el documento host (idempotente). */
 export const ensureStylesInjected = (doc: Document = document): void => {
   if (doc.getElementById(RENDERER_STYLE_ID)) return
   const style = doc.createElement('style')
 
   style.id = RENDERER_STYLE_ID
-  style.textContent = RENDERER_CSS
+  style.textContent = RENDERER_CSS + PILLAR_CSS + CONTENT_MARKETING_CSS
   doc.head.appendChild(style)
 }
+
+/** Approved Content Ops form: the portable renderer owns layout, the host supplies only theme tokens. */
+const CONTENT_MARKETING_CSS = `
+[data-ghf-style-variant="content_marketing"] .ghf-form{gap:0}
+[data-ghf-style-variant="content_marketing"] .ghf-progress-shell{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:0;padding:16px clamp(20px,2.6vw,30px);border:0;border-bottom:1px solid var(--ghf-border);border-radius:0;background:var(--ghf-step-bg,var(--ghf-field-bg));box-shadow:none}
+[data-ghf-style-variant="content_marketing"] .ghf-content-step-heading{display:grid;gap:2px}
+[data-ghf-style-variant="content_marketing"] .ghf-content-step-title{font-family:var(--ghf-heading-font,var(--ghf-font));font-weight:700;font-size:1.05rem;line-height:1.2;color:var(--ghf-fg)}
+[data-ghf-style-variant="content_marketing"] .ghf-content-step-hint{font-size:.75rem;color:var(--ghf-muted)}
+[data-ghf-style-variant="content_marketing"] .ghf-content-step-progress{margin-left:auto;display:flex;align-items:center;gap:8px}
+[data-ghf-style-variant="content_marketing"] .ghf-progress{margin:0;font-size:.75rem;font-weight:600;letter-spacing:normal;text-transform:none;color:var(--ghf-muted)}
+[data-ghf-style-variant="content_marketing"] .ghf-content-step-dots{display:flex;gap:5px}
+[data-ghf-style-variant="content_marketing"] .ghf-content-step-dots>span{display:block;width:8px;height:8px;border-radius:9999px;background:var(--ghf-border-strong)}
+[data-ghf-style-variant="content_marketing"] .ghf-content-step-dots>[data-state="current"]{width:20px;background:var(--ghf-accent)}
+[data-ghf-style-variant="content_marketing"] .ghf-content-step-dots>[data-state="done"]{background:var(--ghf-accent)}
+[data-ghf-style-variant="content_marketing"] .ghf-fields{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;padding:clamp(20px,2.6vw,30px)}
+[data-ghf-style-variant="content_marketing"] .ghf-actions{display:flex;gap:12px;margin:0;padding:0 clamp(20px,2.6vw,30px) clamp(20px,2.6vw,30px)}
+[data-ghf-style-variant="content_marketing"] .ghf-actions .ghf-btn{flex:1;min-height:46px!important;font-size:.875rem!important}
+[data-ghf-style-variant="content_marketing"] .ghf-actions .ghf-btn--ghost{flex:0 0 auto}
+[data-ghf-style-variant="content_marketing"] .ghf-consent{padding:0 clamp(20px,2.6vw,30px) 20px}
+[data-ghf-style-variant="content_marketing"] .ghf-intake-summary{display:none}
+[data-ghf-style-variant="content_marketing"] [data-ghf-error-summary]{margin:16px clamp(20px,2.6vw,30px)}
+`

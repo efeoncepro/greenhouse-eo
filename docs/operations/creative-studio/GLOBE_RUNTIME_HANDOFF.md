@@ -13,6 +13,99 @@
 > `d3fe90e`, digest `sha256:d8295862dc12c14427e90e0bb413577802916c37ca6bf32c202680492ca7bae9`,
 > deploy `30717266572` y baseline IaC `e369ef8` sin drift.
 
+## Corte 2026-09-02 — TASK-1807: Globe en hibernación profunda
+
+El operador decidió detener Globe mientras el producto todavía no produce ingresos. La hibernación está aplicada
+en producción y reconciliada en el Terraform del repo hermano; no es una eliminación ni un retiro del producto.
+
+Estado vivo verificado a `2026-09-02T10:30:38Z`:
+
+- `globe_operating_state=hibernated` y plan posterior `No changes`;
+- Cloud SQL `globe-pg` `STOPPED`, `activationPolicy=NEVER`, disco SSD 10 GB, deletion protection, backups y PITR
+  preservados;
+- schedulers `globe-producer-worker`, `globe-media-derivatives` y `globe-asset-governance` en `PAUSED`;
+- cero Cloud Run Job executions activas; las últimas ejecuciones de cada workload terminaron correctamente antes
+  de la pausa;
+- API `globe-api-internal-00216-wmm` y Studio `globe-studio-internal-00150-m2m` tienen revisión creada = revisión
+  lista, `minInstances=0` y `GLOBE_PRODUCTIVE_LANES_ENABLED=false`;
+- 10 buckets, 17 secretos, servicios/jobs, IAM, front door, Artifact Registry, budgets, observabilidad y estado
+  Terraform permanecen existentes;
+- ningún apply destruyó o reemplazó recursos.
+
+El lifecycle versionado es `active -> draining -> hibernated`. `draining` mantiene SQL encendido, pausa los tres
+schedulers y cierra todas las vías productivas; es obligatorio en ambos sentidos porque API y Studio necesitan
+PostgreSQL durante el startup de una revisión. Un primer apply mostró precisamente ese riesgo: SQL se detuvo antes
+del startup API, la revisión nueva falló y la anterior retuvo tráfico. Se restauró SQL, se introdujo `draining`,
+se publicaron revisiones fail-closed listas y sólo entonces se volvió a detener SQL. No hubo pérdida de datos.
+
+Baseline previo aproximado: CLP 348.152 netos/30 días. Residual hibernado esperado: CLP 20.000–30.000/30 días;
+reducción modelada: CLP 318.000–328.000. No reportar esa cifra como ahorro realizado hasta observar Billing
+Export a 24 h, 7 días y cierre mensual.
+
+Reactivación: requiere autorización explícita de gasto y seguir, sin saltos, el runbook
+[`GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md`](GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md): primero source/apply/readback en
+`draining`; luego integridad no facturable; finalmente source/apply/readback en `active`. Ante falla, volver a
+`draining`; nunca prender schedulers con SQL detenido ni probar el encendido generando gasto de proveedor.
+
+## Corte 2026-09-01 — TASK-1807: Producer reduce no-op ticks a cada cinco minutos
+
+`globe-producer-worker` cambió su Scheduler de `* * * * *` a `*/5 * * * *` mediante Terraform, sin cambiar
+imagen, CPU/memoria, IAM, target, timezone ni retries. El plan canónico incluyó
+`development_environment_enabled=true` y el principal de desarrollo para preservar los 20 recursos cuyo estado
+vivo depende de ese input: `0 add, 1 change, 0 destroy`; apply `0/1/0`; post-plan `No changes`.
+
+Readback: Scheduler `ENABLED`; primer tick de la nueva cadence `globe-producer-worker-2lq2v` a las 21:00:07Z,
+con `queueOldestAgeSeconds=0`, `outboxRetryStorm=0`, `outboxTerminalAttempts=0`, cero divergencias y cero fallos.
+La ventana de observación de 24 h sigue abierta. Media Derivatives permanece `*/2`; Asset Governance permanece
+`*/1` porque una etapa por tick hace que `*/5` degrade la convergencia a ~20–25 minutos. Rollback Producer:
+restaurar `* * * * *`, plan honesto con `0 destroy`, apply y readback. El rollback fue verificado en dry-run con
+development, budgets y quota project preservados: sólo update in-place, `0 add, 1 change, 0 destroy`; no se aplicó
+porque el runtime permanece sano.
+
+Señal temprana en ventanas iguales de 105 minutos: Producer redujo `billable_instance_time` 71,65% y tanto
+CPU allocation como memory allocation 71,63%. El proxy sobre su baseline es CLP 84.169/mes; el techo por conteo
+de ticks era CLP 94.003. No se presenta como ahorro facturado hasta que Billing Export alcance el corte.
+
+Preflight de Slice 2 listo, todavía sin apply: `media_derivatives_schedule="2-59/5 * * * *"` produce un único
+update in-place desde `*/2`, `0 add, 1 change, 0 destroy`, con development y budgets preservados. Los ticks
+2/7/12/.../57 quedan escalonados respecto de Producer; source/apply/readback esperan las 24 h completas.
+
+Guardrails FinOps aplicados después del corte: budgets alert-only Globe CLP 250.000 y consolidado CLP 370.000;
+umbrales current 50/75/90/100% y forecast 90/100%; plan posterior sin drift. Los recursos Globe recibieron
+`app`, `env`, `owner` y `cost_center` sin cambiar imágenes. Artifact Registry quedó con cleanup policy en dry-run,
+KEEP de 10 versiones por paquete y DELETE simulado sobre versiones >30 días; no se borró ningún artefacto.
+Cloud Build quedó separado: Globe `f479dd1` publica una policy `dry-run-only` y el comando
+`pnpm finops:cloud-build-cleanup-dry-run`, sin opción apply/delete. El inventario live reporta 435 source archives,
+631.024.414 bytes totales y 364/491.098.500 bytes elegibles por prefijo `source/` + 30 días, con `mutations=0`;
+el bucket conserva soft-delete de siete días y no recibió lifecycle destructivo.
+
+Asset Governance quedó publicado inicialmente en Globe `7eeb1da` y desplegado por el workflow canónico
+`33561719287` sobre el digest `sha256:864a33c2ac30a9e10b4ab17c4b34c51cb149a4e1fc22889680875af322c69095`.
+El runtime reclama y avanza hasta cuatro stages durablemente fenced por ejecución
+(`GLOBE_ASSET_GOVERNANCE_MAX_STAGE_PASSES=4`); paquete 39/39 e infraestructura 5/5.
+
+El canary real reutilizó un output retenido, sin nueva generación ni débito duplicado. Globe `6ff8995` corrigió
+la reconciliación de ingest deduplicado y fue desplegado en la API por `33564129824`; el ingest único
+`33564656669` creó el asset `asset_7578d730-ec05-45a7-a403-f1fcf290adb9`. El primer submit de derechos reveló
+un trigger legado que apuntaba a `public.governed_assets`. Se cercó el scheduler en `rights_reconcile`, intento
+4/5; Globe `b34e90d` agregó la migración forward-only 0051, plan `33565168932` y apply `33565516056` verdes.
+El reintento `33565602892` verificó rights y se restauró el scheduler a `ENABLED`, `*/1`, UTC.
+
+El batch real cerró con `claimed=1`, `applied=1`, `retried=0`, `failed=0`, `promoted=1`, `deleted=0` y
+`queueOldestAgeSeconds=678`: inspection `accepted`, malware `clean`, C2PA `unverified/manifest_absent`, rights
+`authorized` y terminal `eligible`. El lector gobernado `33565749181` devolvió HTTP 200, lifecycle `active`,
+scan `clean`, rights verificadas y `eligibleForGeneration=true`. Se conserva `*/1`; el objetivo era reducir
+la dependencia de múltiples ticks antes de espaciar el respaldo. Sólo después de cerrar las ventanas de Producer
+y Media se evaluará `4-59/5`, con guardrail de cola <900 s y rollback a `*/1`. El preflight ya probó un único
+update in-place, `0 add, 1 change, 0 destroy`; 4/9/14/.../59 evita colisión con Producer 0/... y Media 2/....
+La imagen reporta ClamAV 1.4.3 frente
+a 1.4.6 recomendada y el aviso no bloqueante de `clamd.conf`; es deuda de imagen separada.
+
+No se hizo rightsizing: el runtime conserva `2 vCPU / 2 GiB`. En la ventana del canary, Cloud Monitoring observó
+CPU utilization media muestreada de hasta 56,8% y memory usage media máxima de 586.080.256 bytes; bajar a
+1 vCPU no deja headroom y las muestras por minuto no prueban peak/P99 de memoria suficiente para bajar a 1 GiB.
+La siguiente evaluación requiere varias ejecuciones con trabajo real, percentiles y ausencia de backlog.
+
 ## Corte 2026-08-05 (b) — promoción end-to-end ejecutada; `ref/still/reference-v1` vuelve a estar viva
 
 `promotion_4265dd26-7eda-4918-bd7d-10318dd6cd5f` recorrió `start → stage → promote → activate → canary →

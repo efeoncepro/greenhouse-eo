@@ -276,6 +276,10 @@ Ver el modelo en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §15 (topic cluster 
 
 ## Acceptance Criteria
 
+- [ ] Las categorías externas de DataForSEO consumidas desde `TASK-1808` son evidencia versionada y proponible,
+  nunca source of truth ni creadoras/renombradoras automáticas de `seo_topic_clusters`.
+- [ ] Cualquier binding categoría externa → topic cluster usa un command gobernado `propose → confirm → execute`,
+  conserva provenance y deja la autoría/membership interna append-only.
 - [ ] **MCP tool en el mismo PR (mandato del operador 2026-08-05, patrón TASK-1645):** cada reader/lectura canónica que esta task cree queda expuesto como MCP tool read-only (handler en `src/mcp/greenhouse/tools.ts` + registro en `server.ts` + método en `http-client.ts` + ruta del lane ecosystem si aplica) EN EL MISMO PR. La task NO se cierra con el reader UI-only.
 
 - [ ] `seo_topic_clusters` + `seo_topic_cluster_members` creadas en `greenhouse_growth`, ancladas per-target (`seo_target_id` FK a `seo_targets`), con `public_id` sequence + `status` CHECK + `touch_updated_at`.
@@ -311,6 +315,8 @@ Ver el modelo en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §15 (topic cluster 
 
 ## Follow-ups
 
+- `TASK-1808` — evidencia externa de categorías y mercado temático; puede capturar antes de esta task, pero el
+  binding gobernado contra clusters depende de que exista la entidad canónica.
 - `TASK-1313` — Unified Page/Cluster Visibility 360 read (`readClusterVisibility360(clusterId)` consume la entidad cluster, el rollup SEO y el `aeoHook`).
 - Command de autoría del cluster (crear/editar/cerrar membership) bajo `growth.seo.target.configure` — ubicar en TASK-1301 (config authoring) o task derivada explícita si no cabe allí.
 - Evaluar materializar el rollup por-cluster (`seo_topic_cluster_rollup_snapshots` + BQ mirror) si el on-read no rinde a escala — task derivada de performance.
@@ -323,3 +329,9 @@ Ver el modelo en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §15 (topic cluster 
 3. ¿El command de autoría del cluster vive en TASK-1301 (config authoring, junto a targets/keywords/competitors) o es un follow-up explícito? Resolver el ownership del write antes de cerrar (NO dejar INSERT inline).
 4. ¿Un miembro del cluster puede ser a la vez URL y keyword_set, o son filas separadas (una por URL, una por keyword_set)? Propuesta: filas separadas con CHECK `url IS NOT NULL OR keyword_set_id IS NOT NULL`; confirmar en Discovery.
 5. ¿El rollup GSC (clicks/impresiones) sale de `seo_gsc_daily` (TASK-1302) o de un reader GSC? Confirmar la fuente del eje GSC del rollup en Discovery.
+
+## Delta 2026-09-02 — categorías externas como evidencia, no taxonomía canónica
+
+`TASK-1808` agrega la huella temática que DataForSEO deriva de su taxonomía comercial. Esta task sigue siendo la
+única dueña de la entidad y membership de topic clusters. El proveedor puede originar propuestas con provenance;
+ninguna respuesta externa muta clusters sin confirmación gobernada.

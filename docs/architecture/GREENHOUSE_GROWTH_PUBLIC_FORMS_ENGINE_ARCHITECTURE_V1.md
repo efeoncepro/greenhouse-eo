@@ -9,6 +9,17 @@
 > Domain: `growth` (`GREENHOUSE_GROWTH_DOMAIN_ARCHITECTURE_V1.md`)
 > Runtime contract: `greenhouse-growth-public-forms.v1` (planned)
 
+## Presentación Content Marketing — 2026-08-31
+
+La variante `content_marketing` conserva la composición `multi_step_light` y agrega encabezado,
+texto de ayuda `copy[step.<key>.help]` e indicadores de progreso dentro del renderer canónico.
+No crea lógica de captura en WordPress. Los selects nativos restauran `initialValues`/valores previos
+al crear sus options; la regresión se verifica avanzando y retrocediendo pasos.
+Consumo publicado únicamente mediante bundle fijado de la landing; no implica despliegue del bundle
+estable global. La definición, identidad pública, versión del rollout, lifecycle del host opaco y límites
+de evidencia se mantienen en el [contrato runtime](growth-public-forms-runtime-contract.md#content-marketing-presentación-host-y-distribución-del-renderer).
+[Contrato de la landing](public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md).
+
 ## Delta 2026-08-12 — TASK-1688/1689: variant careers en el renderer, placeholder del select premium y paridad contrato↔script de publicación (§19)
 
 Cambios de runtime del renderer (`src/growth-forms-renderer/renderer.ts`) y regla operativa del lifecycle de publicación, con el republish v4 de `efeonce-careers-application` como caso fuente:

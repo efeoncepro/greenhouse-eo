@@ -170,6 +170,45 @@ Reglas del carril (detalle en el delta canónico, no acá):
 
 Delta canónico completo: `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` → "## Delta 2026-08-27 — tier `prospect`".
 
+## §5e Delta 2026-09-02 — ETV es metodología versionada, no default de proveedor
+
+Semántica y evidencia contractual: `02-labs.md` §3.1. Impacto focal completo:
+`docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md`.
+
+DataForSEO confirmó 14 familias ETV-capable, corte global `2026-11-01T00:00:00Z`, ausencia de fallback legacy y
+cero premium por improved. El repo llama nueve familias: seis familias/siete caminos consumen ETV, tres callers
+lo ignoran y cinco familias no tienen caller. Ninguna escritura actual declara fórmula.
+
+Contrato obligatorio para una implementación futura:
+
+1. **Policy única, nunca flags dispersos.** Un módulo dueño de adquisición Labs resuelve
+   `legacy_static_v1|improved_layout_clickstream_v2`, inventaría las 14 familias y sólo habilita las nueve con
+   caller. Cada una queda `etv_consumed`, `etv_ignored` o `provider_supported_not_enabled`; un ignored no puede
+   comenzar a proyectar ETV sin pasar a formula-aware. No inyectar el flag en el transporte genérico.
+2. **Provenance persistida.** La fórmula viaja junto a ETV, traffic cost, cada punto histórico, top-N y prospecto.
+   Como la respuesta no expone versión, guardar requested method, request UTC, policy version y effective method
+   derivado. Para historia improved agregar `fully_recomputed` desde julio de 2026 o
+   `calibrated_approximation` antes; para evidencia antigua sin request suficiente, `unknown_methodology`.
+3. **Idempotencia formula-aware.** Las UNIQUE actuales de `seo_domain_overview_snapshots`,
+   `seo_url_visibility_snapshots` y el diagnóstico diario omiten metodología. Antes de shadow/rebaseline, el
+   ADR debe decidir si la versión entra a la clave/tabla productiva o si el experimento vive en un almacén
+   separado. Un `ON CONFLICT DO NOTHING` que descarta una de las dos fórmulas invalida la comparación.
+4. **Shadow fuera de la serie servida.** Legacy e improved se comparan con dos requests normales sobre la misma
+   cohorte/mercado; improved no tiene premium, pero duplicar calls requiere autorización y tope. Clickstream data
+   es independiente, combinable y conserva su multiplicador; no se activa para evaluar improved por defecto.
+5. **Cutover explícito y deadline-bound.** Elegir rebaseline/breakpoint antes del corte. Después, `false` se ignora:
+   legacy configurado falla antes del request y el safe mode congela capturas/serve la última serie coherente.
+6. **Readers fail-honest.** Una fila sin versión queda `unknown_methodology`; una serie mixta se segmenta o se
+   rechaza. Toda respuesta/API/MCP expone metodología y fecha de corte suficientes para explicar la cifra.
+7. **GSC conserva autoridad.** El shadow mide error/correlación/dirección contra clicks first-party comparables,
+   pero no promedia ETV con GSC ni convierte la promesa de "alineación" del proveedor en dato medido.
+8. **Derivados se recalibran.** Traffic cost se recalcula como improved ETV × CPC por item y agregado. Revisar
+   sumas, thresholds y membresía de relevant pages/subdomains. AIO reparte estimación entre dominios únicos
+   citados: nunca rotularlo como tráfico observado por cita.
+
+El contrato externo está confirmado; Sandbox y OpenAPI/changelog siguen pendientes no bloqueantes. El estado
+correcto permanece **foundation/cutover no implementados ni autorizados**.
+
 ## §6 Secretos / env
 
 - `DATAFORSEO_API_LOGIN` — env var plana (login Basic auth). En Vercel staging+production; en ops-worker viene del **GitHub Actions secret** `DATAFORSEO_API_LOGIN` inyectado por `.github/workflows/ops-worker-deploy.yml:333` y solo se appendea al deploy si viene poblado (`services/ops-worker/deploy.sh:572-574`).
@@ -199,13 +238,13 @@ Docs funcionales: `docs/documentation/growth/modulo-seo-search-visibility-360.md
 
 EPIC-022 (SEO) + EPIC-020 (grader). ⚠️ Esta sección se escribió as-of 2026-08-06 y quedó desactualizada en un día — **verifica la carpeta real (`docs/tasks/{to-do,in-progress,complete}/`) antes de citar un estado**, no esta lista.
 
-**Complete:** `TASK-1265` (provider `google_ai_overview` sobre DataForSEO AI Mode, activado en staging; EPIC-020) · `TASK-1299` (schema `greenhouse_growth` time-series foundation) · `TASK-1300` (**family registry DataForSEO**: allowlist 5 familias + breaker + spend ledger) · `TASK-1301` (capabilities `growth.seo.*` + entitlement per-org + `enforceSeoRunEntitlement`) · `TASK-1302` (GSC daily snapshot materializer + keyword opportunities) · `TASK-1305` (SEO↔AEO gap derived read) · `TASK-1645` (ecosystem lane + MCP tools, LIVE prod 2026-08-06) · **`TASK-1303`** (rank capture `labs`/`serp` por target×keyword, cron `ops-seo-rank-capture` 05:00 CLT en ops-worker — cerró el spend fence y el import de `register-provider-spend`) · **`TASK-1304`** (site audit OnPage queue+poll) · **`TASK-1306`** (cockpit SEO: shell, tabs, viewCode `administracion.growth_seo`, Space picker) · **`TASK-1307`** (rank/URL performance) · **`TASK-1308`** (keyword opportunities UI + **el primer write del dominio**: `trackKeywords`/`untrackKeywords`, ver §5b) · **`TASK-1659`** (intención declarada de la membresía — `intent` `target|opportunity` con autoría acoplada, sin backfill ni default, cambio = cerrar+abrir sin consumir cupo; ver §5b) · **`TASK-1661`** (keyword market data vía Labs `keyword_overview`; segundo consumer productivo de `labs`, cron mensual + tool MCP `get_seo_keyword_market_data` — ver §5c) · **`TASK-1677`** (cutover del entitlement `seo_v1 → seo_v2`; la ventana de lectura de `seo_v1` quedó CERRADA en código el 2026-08-09 — ver §4).
+**Complete:** `TASK-1265` (provider `google_ai_overview` sobre DataForSEO AI Mode, activado en staging; EPIC-020) · `TASK-1299` (schema `greenhouse_growth` time-series foundation) · `TASK-1300` (**family registry DataForSEO**: allowlist 5 familias + breaker + spend ledger) · `TASK-1301` (capabilities `growth.seo.*` + entitlement per-org + `enforceSeoRunEntitlement`) · `TASK-1302` (GSC daily snapshot materializer + keyword opportunities) · `TASK-1305` (SEO↔AEO gap derived read) · `TASK-1645` (ecosystem lane + MCP tools, LIVE prod 2026-08-06) · **`TASK-1303`** (rank capture `labs`/`serp` por target×keyword, cron `ops-seo-rank-capture` 05:00 CLT en ops-worker — cerró el spend fence y el import de `register-provider-spend`) · **`TASK-1304`** (site audit OnPage queue+poll) · **`TASK-1306`** (cockpit SEO: shell, tabs, viewCode `administracion.growth_seo`, Space picker) · **`TASK-1307`** (rank/URL performance) · **`TASK-1308`** (keyword opportunities UI + **el primer write del dominio**: `trackKeywords`/`untrackKeywords`, ver §5b) · **`TASK-1659`** (intención declarada de la membresía — `intent` `target|opportunity` con autoría acoplada, sin backfill ni default, cambio = cerrar+abrir sin consumir cupo; ver §5b) · **`TASK-1661`** (keyword market data vía Labs `keyword_overview`; segundo consumer productivo de `labs`, cron mensual + tool MCP `get_seo_keyword_market_data` — ver §5c) · **`TASK-1670`** (hallazgos de **SITIO** en el site audit: acceso de crawlers IA por familia —retrieval `critical` ⊥ training `notice`—, bloqueo de **borde/WAF** con tipo propio, JSON-LD ausente y salud de sitemap; evaluados con el fetcher propio `@/lib/growth/site-substrate`, **cero gasto de proveedor**. 🔴 `code complete, rollout pendiente`: `GROWTH_SEO_SITE_FINDINGS_ENABLED` **OFF** en ops-worker hasta que `TASK-1671` despliegue la superficie — **el punto ciego sigue abierto hasta ese flip**) · **`TASK-1677`** (cutover del entitlement `seo_v1 → seo_v2`; la ventana de lectura de `seo_v1` quedó CERRADA en código el 2026-08-09 — ver §4).
 
 **Follow-ups directos de TASK-1661** (escriben la MISMA tabla `seo_keyword_market_data`, con el `keyword_info` que ya viene pagado inline en sus respuestas — no abrir almacén nuevo) — **ambos ya aterrizaron**: `TASK-1664` (keyword discovery / seed expansion, productor vivo) · `TASK-1662` (keyword gap vía `domain_intersection`, productor #4 vivo desde 2026-08-28; rollout con el deploy del worker post-release — ver el estado de runtime del SKILL.md). `ISSUE-153` (mercado explícito) quedó cerrado con `resolve-target.ts`.
 
 **In-progress:** `TASK-1631` (cliente OAuth con grant revocable por tenant y capability — **es lo que desbloquea el uso real de las tools de escritura**, hoy federadas y fail-closed).
 
-**To-do:** `TASK-1311` (AEO citation attribution URL-level) · `TASK-1312` (topic clusters) · `TASK-1313` (page/cluster visibility 360 read) · `TASK-1314` (pillar-cluster health, keyword gap Labs) · `TASK-1317` (E-E-A-T scorecard) · `TASK-1341` (**guard runtime DataForSEO/AIO en ops-worker** — no desplegar AIO ON sin login+secret ref; EPIC-020) · `TASK-1411` (Shutterstock — cita `dataforseo.ts` como "el precedente exacto" de adapter de tercero) · `TASK-1657` (causa raíz de los dos defectos de plataforma que TASK-1308 parcheó local: mismatch de hidratación por `useId` en surfaces adaptativas + findings de `ui:code-lint` en charts a canvas).
+**To-do:** **`TASK-1671`** (superficie de los hallazgos de sitio de `TASK-1670` en `/admin/growth/seo/audit` — **es el flip que cierra el punto ciego**, no el merge de 1670) · `TASK-1311` (AEO citation attribution URL-level) · `TASK-1312` (topic clusters) · `TASK-1313` (page/cluster visibility 360 read) · `TASK-1314` (pillar-cluster health, keyword gap Labs) · `TASK-1317` (E-E-A-T scorecard) · `TASK-1341` (**guard runtime DataForSEO/AIO en ops-worker** — no desplegar AIO ON sin login+secret ref; EPIC-020) · `TASK-1411` (Shutterstock — cita `dataforseo.ts` como "el precedente exacto" de adapter de tercero) · `TASK-1657` (causa raíz de los dos defectos de plataforma que TASK-1308 parcheó local: mismatch de hidratación por `useId` en surfaces adaptativas + findings de `ui:code-lint` en charts a canvas).
 
 ## §9 Convenciones de skill dual Claude/Codex
 

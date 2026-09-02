@@ -7,6 +7,69 @@
 
 Este documento captura contratos runtime vigentes que no deben crecer como deltas dentro del monolito de arquitectura base.
 
+## Content Marketing: presentación, host y distribución del renderer
+
+Registro del rollout del 2026-08-31; para operar después, relee el contrato público y el ledger
+canónico. La publicación de una definición, el bundle servido por su consumer y un submit aceptado
+son evidencias distintas.
+
+| Identidad | Valor del rollout |
+|---|---|
+| Landing WordPress | `/servicio-marketing-de-contenidos/`, página `242603` |
+| Slug / form key | `efeonce-content-marketing` / `18b228e9-106a-402e-a6f2-a8c5469e73d7` |
+| Surface | `fhsf-efeonce-content-marketing` |
+| Versión publicada | `fver-e96ca2e9-d2b2-4f72-ad50-33d2b2be9245` (v3, revisión de copy 2026-08-31) |
+| Presentación / composición | `content_marketing` / `multi_step_light` |
+| Destino | `greenhouse_only`, cero destinos configurados en v3; no habilita entrega directa a HubSpot ni correo |
+
+El authoring reproducible vive en `scripts/growth/publish-content-marketing-form.ts` y usa
+`authorDraftForm → reviewForm → publishForm`. Los campos del primer paso son `fullName`, `email`
+y `companyName`; el segundo contiene `mode` y `challenge`. El email corporativo, consentimiento,
+Turnstile y success siguen en el contrato gobernado. No hay endpoint ni bridge de submit de WordPress.
+
+La revisión editorial v3 usa `scripts/growth/revise-content-marketing-form-copy.ts`: preserva
+campos funcionales, consentimiento, seguridad y policies; actualiza sólo copy de la versión.
+La v2 se deprecó después del readback de v3. Recuperar copy anterior requiere otra versión por
+commands; nunca editar una versión publicada en sitio ni reutilizar el writer con su baseline antiguo.
+[Publicación, readback y recuperación](../audits/public-site/2026-08-31-content-marketing-business-conversion.md).
+
+**Presentación canónica.** `renderer.ts` construye título del paso, ayuda opcional desde
+`copy["step.<key>.help"]`, progreso anunciado y puntos decorativos; `styles.ts` gobierna la columna
+única, espaciado y acciones de la variante. El host aporta la card y tokens `--ghf-*`, incluido
+`--ghf-step-bg`; no copia campos, validación ni CSS de controles de otra landing. El ajuste no exige
+schema, contrato de API o flag nuevo. El select nativo restaura su valor **después** de insertar
+las opciones: tanto `initialValues` como volver a un paso deben reflejar el valor conservado.
+La prueba de comportamiento es `src/growth-forms-renderer/__tests__/content-marketing.test.ts`;
+no sustituirla por una comprobación textual de `select.value`.
+
+**Host opaco.** El patcher de `scripts/public-website/content-marketing-client.cjs` conserva el nodo
+`[data-cm-form-host]` y su `<greenhouse-form>` durante cada actualización de la landing. Nunca debe
+reconstruir sus descendientes, perder foco/datos o reiniciar el custom element. El evento de modo puede
+prellenar `initial-values` antes de que la persona escriba; después del primer `input`, el host deja
+de cambiarlo. La captura real y las selecciones posteriores pertenecen al renderer.
+
+**Distribución por consumer.** El widget carga `eo-content-forms` desde
+`eo-elementor-widgets/assets/js/content-marketing-forms.js`, compilado de
+`src/growth-forms-renderer/index.ts` por el build del paquete Content Marketing. Es un artefacto fijado
+del mismo renderer, no una segunda implementación. La surface declara canal `stable`, pero eso no
+prueba que `https://greenhouse.efeoncepro.com/growth-forms/renderer-latest.js` tenga esta versión.
+La publicación WordPress de este bundle no es un release global de Greenhouse. En cualquier promoción,
+comprueba URL/hash servidos y compatibilidad; evita cargar dos bundles que compitan por registrar el
+mismo custom element en una página.
+
+**Evidencia del rollout.** `.captures/content-marketing/browser.json` registra montaje, validación
+vacía, dos pasos, prefill de modo y regreso conservando valores, sin submission. El cierre técnico posterior intentó una submission sintética sin destinos externos: Turnstile
+la bloqueó antes del POST y el ledger permaneció vacío. El tag GA4 sí se ejercitó separadamente
+con `form_slug=smoke-test`: colector 204 en `G-KYPPY57M14`. No afirmar aceptación, entrega,
+confirmación Realtime ni cierre E2E a partir de ese evento sintético.
+El verificador `scripts/public-website/verify-content-marketing-business-conversion.cjs` añade la
+revisión pública del copy v3, ambos pasos y retención de valores en 1440/878/390, sin enviar datos.
+El ajuste posterior de cinco textos de la columna izquierda no cambia v3 ni el renderer.
+La aceptación E2E y confirmación Realtime permanecen pendientes en
+[TRACKING-PLAN.md](../reference/measurement-gtm-ga4/TRACKING-PLAN.md).
+La implementación y su alcance viven en
+[CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md](public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md).
+
 ## Public Host CORS
 
 La autorizacion de surface por `origin_allowlist_json` no reemplaza el contrato CORS del navegador. Para hosts browser cross-origin, el motor debe cumplir ambas capas:
@@ -169,6 +232,18 @@ Reglas de contrato:
 - el gate visual de cualquier host real debe abrir al menos un dropdown y comprobar que la opcion
   superior sea el elemento bajo el punto de prueba (`elementFromPoint`), que no haya overflow
   horizontal y que reduced-motion siga degradando honestamente.
+
+### Editorial Premium Brief host composition (TASK-1598)
+
+The Influencer brief establishes the approved **Editorial Premium Brief** public-site composition. Its canonical
+visual contract is [GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md](../ui/GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md).
+It is not a new renderer variant: `diagnostic_premium` continues to own controls, values, listbox state, keyboard,
+ARIA, validation, submit, Turnstile and success. The host owns one exterior paper surface, editorial header, trust
+rail, responsive placement and surface-scoped semantic tokens.
+
+The market/activation pictograms on the first surface are page-scoped decoration. They must not be copied to a
+second landing through label matching, `MutationObserver` or parallel value state. Reuse is the graduation trigger
+for browser-safe semantic option metadata in the form/render contract and renderer.
 
 No responsabilidad de la capa:
 

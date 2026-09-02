@@ -116,6 +116,7 @@ Start by copying the template file's structure; do not reconstruct its headings 
   comentado `ZONE 2 — PLAN MODE`. Lee el contador `template=`, no sólo la línea de errores y warnings.
 - populate Zones 0, 1, 3, and 4 only; do not write a plan inside Zone 2
 - run `pnpm task:lint --task TASK-###` immediately after writing the task file and before changing the registry, README, Handoff, or committing
+- ⚠️ Desde 2026-09-01 `task:lint` incluye `stale-progress`: avisa cuando una task activa tiene commits `feat/fix/refactor/perf` citando su ID y **CERO checkboxes tildados** (nombra los SHAs), y cuando una en `complete/` no tiene ninguno. **El avance se registra donde se LEE** —`Status real` + checkboxes—, no en un `## Delta` de prosa. Caso fuente `TASK-1699`, re-ejecutada cinco veces. Canon: `docs/tasks/TASK_PROCESS.md`. Un commit de scope `docs` NO cuenta como implementación (calibrado 2026-09-01).
 - registration is permitted only when the summary reports `scanned=1 template=1 legacy=0` and `errors=0 warnings=0`
 - `legacy=1` is a blocking template failure even if `errors=0`: restore the literal Zone markers from `docs/tasks/TASK_TEMPLATE.md` and rerun the command; never describe this as a harmless lint result
 

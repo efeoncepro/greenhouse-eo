@@ -180,7 +180,8 @@ disfrazado de renuncia** — y funciona porque **la renuncia es real**.
 
 - 🎯 **Los 8 límites, ya verificados**, en `hubspot-solutions-partner/SOURCES.md` +
   `modules/10_DISCOVERY_SCOPING.md`. **El contenido ya está hecho.**
-- **La categoría `hubspot` ya existe** en el blog (junto a `hubspot/crm`).
+- **La categoría raíz `hubspot` ya existe** en el blog; la antigua hija
+  `hubspot/crm` fue retirada en la limpieza canónica de PDR-019.
 - **El write path de Content Factory** (`references/content-factory-gutenberg.md`) — publica posts Gutenberg.
 - El pillar en diseño (TASK-1352).
 

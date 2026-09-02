@@ -6,6 +6,17 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-01 — registro del avance (barrido `stale-progress`)
+
+23 checkboxes en cero con `Status real: Diseno`, teniendo 4 slices en la historia y DOS migraciones
+aplicadas (`task-1251-grader-forms-engine-convergence` + el UNIQUE parcial sobre
+`grader_leads(submission_id)`).
+
+Rollout: `GROWTH_GRADER_INTAKE_ON_FORMS_ENGINE_ENABLED` **staging ON** (redeploy
+`greenhouse-h26jgk4dc` + smoke E2E verde) · **prod OFF**. Los criterios que hablan del contrato
+publico byte-compatible y del shadow side-effect-free **no se tildan**: piden comportamiento en
+produccion y el flag esta OFF ahi.
+
 ## Status
 
 - Lifecycle: `in-progress`
@@ -296,8 +307,8 @@ La convergencia tiene dos pilares independientes en riesgo: (1) **extracción de
 
 ## Acceptance Criteria
 
-- [ ] Abuse-guard + captcha viven en una capa compartida `src/lib/growth/**` consumida por el motor y el grader; tests de paridad verdes (cero cambio observable de accept/reject).
-- [ ] Un submission gobernado del motor dispara el run del grader vía outbox + reactive (no inline); el grader es un `host_surface`/form del motor.
+- [x] Abuse-guard + captcha en capa compartida `src/lib/growth/**`. **Verificado 2026-09-01:** `decideAbuse` compartido (commit `fe6627556`), consumido por motor y grader. Tests de paridad verdes (cero cambio observable de accept/reject).
+- [x] Submission gobernado -> run via outbox + reactive (no inline); grader como form gobernado. **Verificado 2026-09-01:** migracion `20260625115608144_task-1251-grader-forms-engine-convergence.sql` (seed `fdef-ai-visibility-grader`) + `035a2c790`. El grader es un `host_surface`/form del motor.
 - [ ] El contrato público `POST /run` + poll + `reportToken` permanece byte-compatible; smoke público sin regresión; el binding `runPublicId`↔submission preserva el status reader de TASK-1245.
 - [ ] El shadow es side-effect-free: comparó shape/decisión sin encolar run, email, HubSpot ni lead visible (cero doble gasto/lead durante la sombra).
 - [ ] El consent migrado preserva la copy/versión original aceptada por el lead (no re-atribuida a la versión actual del form).

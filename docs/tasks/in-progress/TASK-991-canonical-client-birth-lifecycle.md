@@ -1,5 +1,24 @@
 # TASK-991 — Canonical Organization Write SSOT + Birth Completeness
 
+## Delta 2026-09-01 — dos criterios están sin cumplir, y uno tiene issue propio
+
+Verificado contra la base y el árbol durante el barrido de tasks:
+
+🔴 **El CHECK `organizations_type_lifecycle_consistent` NO existe.** `pg_constraint` sobre
+`greenhouse_core.organizations` no lo devuelve, y su migración no está ni en `migrations/` ni en
+`docs/tasks/pending-migrations/`. Dos comentarios del código (`organization-type.ts:13` y `:104`)
+afirman que está activo: es una guarda que sólo existe como prosa. **Su aplicación está despejada** —
+violadores sobre todas las filas = 0—, así que puede nacer `VALID`, sin `NOT VALID`.
+
+🔴 **Sobrevive un writer directo fuera del SSOT**: `src/app/api/admin/spaces/route.ts:122` hace
+`INSERT INTO greenhouse_core.organizations` sin `organization_type`, sin `origin` y sin
+`lifecycle_stage`. Es la puerta fragmentada que esta task existe para matar. Registrado como
+**`ISSUE-165`**. Impacto latente: 0 organizaciones corruptas hoy.
+
+Lo que sí está entregado y verificado: `deriveOrganizationType`, `upsertCanonicalOrganization`, el
+kill-switch default-ON, las 3 señales cableadas y los scripts de inventario/remediación.
+
+
 ## Delta 2026-08-06 — la precondición del CHECK diferido YA se cumple
 
 El paso 2 del rollout (aplicar el CHECK `organizations_type_lifecycle_consistent` **sólo después**
@@ -50,7 +69,7 @@ operadora) de `organization_type='client'` a `'other'` con
 - Effort: `Medio`
 - Type: `implementation`
 - Epic: `EPIC-CLIENT-360`
-- Status real: `En ejecucion` (develop directo, sin branch — instrucción operador 2026-06-02)
+- Status real: `Slices 0-3 en produccion (deriveOrganizationType, upsertCanonicalOrganization, kill-switch default-ON, 3 senales, scripts de inventario/remediacion). FALTAN dos criterios verificados contra la base el 2026-09-01: el CHECK organizations_type_lifecycle_consistent NO existe (su aplicacion esta despejada: 0 violadores) y sobrevive un writer directo en /api/admin/spaces (ISSUE-165, impacto latente: 0 filas corruptas hoy)`
 - Rank: `TBD`
 - Domain: `commercial` (owner) — touches `identity` (organizations canonical), `integrations` (HubSpot/Nubox doors), `finance` (lectura del filtro client), `reliability` (drift signals), `data`.
 - Blocked by: `none`. **Es el FOUNDATION/prerequisito.** Va PRIMERO en la secuencia `991 → 990 → 992`.

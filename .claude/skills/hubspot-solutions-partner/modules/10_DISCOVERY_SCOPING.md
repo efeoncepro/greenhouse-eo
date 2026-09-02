@@ -3,6 +3,16 @@
 > El **método** de discovery (MEDDIC y sus primos, calificación, deal review) es de **`commercial-expert`**.
 > Este módulo aporta lo que **solo** aplica a HubSpot: qué preguntar para no sub-cotizar, y **cuándo no vender**.
 
+## Frontera comercial del discovery
+
+La evaluación inicial para fit y cotización es normalmente **sin costo**. Entrega problema priorizado,
+`fit | fit_with_conditions | hybrid | no_fit`, riesgos visibles y siguiente alcance; no entrega arquitectura
+detallada ni backlog explotable. Ofrece un blueprint/audit **pagado** solo cuando el cliente compra un artefacto
+independiente: inventario verificable, target design, roadmap, estimación, riesgos y criterios de aceptación.
+
+El discovery selecciona primero familia de outcome y sector; recién después mapea Hubs, workspaces, agentes y objetos.
+Un interés en Customer Agent, Contracts o Projects no constituye por sí solo un scope.
+
 ---
 
 ## 0. 🔴 La pregunta que va ANTES de las otras tres: ¿quién es el champion?

@@ -210,6 +210,30 @@ Until a governed generic 1:1 CLI exists, an explicitly approved one-off may use 
 
 For HR/People copy, verify every date, balance, entitlement, and policy claim against the owning data/contract before sending. A `succeeded` audit row proves transport acceptance, not read receipt or rendered confirmation. Recurring messages must converge to Notification Hub with `dynamic_user`.
 
+## Monthly Performance Report Pattern
+
+For the monthly Efeonce Performance Report, read the operator-provided Notion report in full, then use two separate surfaces:
+
+1. Group announcement in `EO Team`: at most six short paragraphs, semantic emojis, explicit user mentions, and CTA `Abrir informe`.
+2. Personal follow-ups: one card-only `chat_1on1` per evaluated person, no mention entity, with personal KPIs, one evidence-backed strength, one concrete opportunity, and the same CTA.
+
+Performance copy rules:
+
+- Never infer overload from task count or an old threshold alone. High volume is not proof of overcapacity; require confirmed operational context.
+- Separate quality, deadlines, capacity, dependencies, and system effects. If an upstream editorial/input delay caused downstream lateness, distinguish inherited delay from the person's execution time.
+- Treat small onboarding samples as a baseline, not a stable trend or definitive evaluation.
+- Do not invent RpA/FTR when the report only provides a partial or space-level sample; state the scope.
+- If the operator corrects an interpretation, preserve the measured figures and rewrite the diagnosis/opportunity around the confirmed context.
+
+Identity and verification lessons from the verified 2026-09-01 run:
+
+- Resolve the current Entra user and require `accountEnabled=true`; a typed email can contain a typo, so the raw Object ID is the operational identity.
+- `get_chat_members` is preflight evidence, not final mention proof. After a group send, inspect the published message: `mentioned_user_identity_type='aadUser'` plus the expected Object ID proves Teams recognized the mention.
+- Per-person 1:1 sends require deterministic `sourceObjectId`, duplicate lookup, independent `source_sync_runs` outcomes, `--dry-run`, and then `--yes` using the approved copy.
+- Transport `succeeded` is not a read receipt.
+
+Canonical runbook and evidence: `docs/operations/manual-teams-announcements.md` and `docs/audits/communications/2026-09-01-performance-report-teambot.md`.
+
 ## Payment Announcements 1:1 (nómina / honorarios)
 
 There is a **dedicated CLI** for 1:1 "payment done" cards to the team via the TeamBot — separate from `teams:announce` (which only targets group/channel destinations `eo-team` / release channel and CANNOT DM). Use this for "avísale al equipo que su nómina/honorarios ya se depositó".
@@ -275,7 +299,7 @@ Excluded / not reachable at that time: **Valentina Hoyos** (operator excluded), 
 
 - **Card duplicated with a text bubble above it:** `activity.text` was sent along with the card. Remove `activity.text`.
 - **Name appears as plain text instead of mention:** for Adaptive Cards, use Entra Object ID or UPN, not `29:<aadObjectId>`; ensure `<at>Visible Text</at>` exactly matches `msteams.entities[].text`.
-- **Mention still plain text:** user may not be in the chat/team, or Teams client rendered fallback. Test in 1:1, then validate membership before public send.
+- **Mention still plain text:** user may not be in the chat/team, or Teams client rendered fallback. Treat membership as preflight; after sending, inspect the published message and require the expected Object ID with `mentioned_user_identity_type='aadUser'` before claiming Teams recognized it.
 - **CLI rejects mention:** the visible text must appear exactly in the title or body; `29:` IDs are intentionally blocked for Adaptive Cards.
 - **`todos` / `everyone` appears as plain text:** this is the expected failure mode of an unsupported group-chat collective mention, not a tenant toggle. Do not retry with another label or use the chat id as a mention target.
 - **Need platform auth/RSC/manifest fixes:** switch to `teams-bot-platform`.

@@ -20,6 +20,13 @@ La operación integral del portal cliente, RevOps y Customer Agent vive en [`../
 - [`anam-portal-access.md`](anam-portal-access.md): estado de acceso OAuth del portal ANAM y capacidades observadas.
 - [`anam-chat-landing.md`](anam-chat-landing.md): landing de contacto ANAM en CMS React, builds, copy, diseno, comandos CLI, verificacion y guardrails.
 
+La landing ANAM está operativa en el build `#28`. El contrato funcional se explica en
+[`../../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md`](../../../documentation/hubspot-as-a-service/anam-hubspot-managed-service-end-to-end.md),
+la operación diaria en
+[`../../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md`](../../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md)
+y la dirección visual en
+[`../../../ui/visual-directions/anam-emma-premium-direction-v1.md`](../../../ui/visual-directions/anam-emma-premium-direction-v1.md).
+
 ## Decision operativa
 
 Hay dos carriles distintos:

@@ -80,6 +80,6 @@ adjuntar la Radiografía) es trabajo posterior — hoy los conecta el operador.
 - Command/reader: `src/lib/growth/seo/prospect/{command,reader}.ts`
 - Lane app: `POST/GET /api/admin/growth/seo/prospect-diagnostic`
 - MCP: `get_seo_prospect_diagnostic` · `run_seo_prospect_diagnostic` — federadas también al
-  gateway público `mcp.efeonce.org` (TASK-1658, deploy pendiente post-release); `run_` requiere
+  gateway público `mcp.efeonce.org` (TASK-1658; **deploy ejecutado el 2026-08-28**, revisión `efeonce-mcp-gateway-00024-8b8`); `run_` requiere
   el scope `efeonce.mcp.seo.write`, fail-closed en el cliente público hasta TASK-1631
 - Señal de sobrecosto: `growth.seo.prospect_diagnostic.cost_overrun` (steady 0)

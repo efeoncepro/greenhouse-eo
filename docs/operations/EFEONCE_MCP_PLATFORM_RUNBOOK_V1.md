@@ -351,8 +351,9 @@ excluida (la dirección que antes era invisible).
 > **live-but-fail-closed** hasta `TASK-1631` igual que las demás escrituras — el scope no está cableado al cliente
 > PKCE público compartido, y eso es deliberado. `prepare_seo_grounded_queries` responde además
 > `aeo_forbidden` fail-closed para la identidad máquina compartida hasta TASK-1631, y el par de
-> prospecto queda detrás de `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` (hoy OFF en todos los ambientes —
-> el canary trata esa respuesta honesta como estado, no como fallo).
+> prospecto queda detrás de `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED`, **ON en Vercel
+> Production desde el 2026-08-27** (verificado con `vercel env ls`). 🔴 El canary ya NO debe
+> normalizar un `disabled`: hoy sería una regresión real, no una respuesta honesta.
 
 **Granularidad del scope: un scope por CLASE DE BLAST-RADIUS, nunca uno por capability.** `efeonce.mcp.seo.write`
 es del DOMINIO (`…seo.write`), no de la capability (`…seo.keywords.track`): un scope por capability convertiría
@@ -693,11 +694,12 @@ Tres cosas que cuestan una sesión si no se saben:
 Las tools **no aparecen en la sesión que autenticó** — los MCP se cargan al iniciar sesión. `✔ Connected` en el health
 check es la evidencia válida; la ausencia de tools en esa sesión no es un fallo.
 
-### Inventario federado — 35 tools
+### Inventario federado — 36 tools (código; 35 en la revisión productiva hasta el deploy de TASK-1804)
 
 | Grupo | Nº | Tools |
 | --- | --- | --- |
 | Gateway | 1 | `efeonce.gateway.status` |
+| Plataforma Greenhouse | 1 | `get_greenhouse_skill` (TASK-1804 — manuales de uso bajo demanda; provider `greenhouse-skills`, commit local en `efeonce-mcp` pendiente de deploy) |
 | Globe | 3 | `globe.capabilities.list`, `globe.producer.fleet.list`, `globe.credits.funding.ensure` (write) |
 | Hiring | 4 | `hiring.talent_pool.search`, `hiring.talent_pool.profile.get`, `hiring.applications.review.list`, `hiring.application.review_packet.get` |
 | SEO / Search Visibility 360 | 27 | 20 reads + 7 writes (detalle en §Provider Greenhouse-SEO) |
@@ -708,33 +710,71 @@ verificables, sin token que los abra, hasta `TASK-1631`.
 
 ### Cobertura de federación vs el MCP interno de Greenhouse
 
-`src/mcp/greenhouse/server.ts` declara **41 tools**; el gateway federa 35. El delta no es homogéneo:
+`src/mcp/greenhouse/tool-manifest.ts` declara **44 tools** (as-of 2026-09-02; la cifra se lee del manifiesto, nunca de acá); el gateway federa 36 en código. El delta no es homogéneo:
 
 - **Dominio SEO: paridad completa.** Las 26 SEO internas están federadas, con el guard bidireccional de `TASK-1658`
   vigilándolo y `GREENHOUSE_SEO_TOOL_EXCLUSIONS` vacío (ninguna exclusión declarada).
+- **`get_greenhouse_skill` (plataforma) federada por TASK-1804** con su entrada en `EXPECTED_GREENHOUSE_PLATFORM_TOOLS` — el guard SEO está anclado al dominio, así que las tools no-SEO federadas tienen su propia lista con razón.
 - **15 tools NO-SEO fuera del alcance federado, y sin declarar**: `get_context`, `get_organization`,
   `list_organizations`, `get_platform_health`, `get_integration_readiness`, `list_capabilities`, `list_event_types`,
   `search_knowledge`, `get_knowledge_document`, `search_services`, `quote_price`, `get_webhook_subscription`,
   `list_webhook_subscriptions`, `get_webhook_delivery`, `list_webhook_deliveries`.
 
-⚠️ **Esas 15 no están marcadas como drift ni como exclusión: el guard de paridad es SEO-only y no las mira.** No es
-un bug detectado — es **alcance no declarado**, que es peor de razonar porque nada falla. Un operador que conecta el
-MCP esperando "el 360 de Greenhouse" encuentra sólo SEO, y ningún gate se lo advierte. Declararlas (federar o excluir
-con razón) es trabajo de [`TASK-1780`](../tasks/to-do/TASK-1780-mcp-tool-inventory-canonical-manifest.md), que
-reemplaza el espejo committeado por el manifiesto canónico de Greenhouse como fuente del guard.
+⚠️ **Esas 15 siguen fuera del alcance federado, pero ya no son invisibles.** Desde
+[`TASK-1780`](../tasks/complete/TASK-1780-mcp-tool-inventory-canonical-manifest.md) **existen declaradas**: el
+manifiesto canónico `src/mcp/greenhouse/tool-manifest.ts` censa las 43 tools con su dominio, y el artefacto generado
+que consume el guard viaja con todas. Lo que sigue siendo SEO-only es el **allowlist de federación** del gateway, que
+es una decisión de frontera con revisión humana por tool y no cambia con esta task. La diferencia práctica: un
+operador que conecta el MCP esperando "el 360 de Greenhouse" y encuentra sólo SEO ahora puede leer el alcance real en
+un archivo, en vez de deducirlo de una ausencia.
+
+### Manuales de uso servidos por el protocolo (TASK-1804)
+
+`get_greenhouse_skill` entrega bajo demanda el catálogo y el cuerpo de los manuales declarados en
+`src/mcp/greenhouse/skill-manifest.ts` (hoy tres, todos `internal`: `seo-spend-discipline`,
+`seo-visibility-reading`, `competitor-loop`). El gateway delega en la lane
+`/api/platform/ecosystem/mcp/skills[/{name}]` y no embebe contenido.
+
+Smoke (lane, con el consumer del gateway; también incorporado a `scripts/greenhouse-seo-canary.mjs`):
+
+```bash
+BASE=https://greenhouse.efeoncepro.com   # o el .vercel.app de staging + bypass
+curl -s -H "Authorization: Bearer $TOK" "$BASE/api/platform/ecosystem/mcp/skills?externalScopeType=other&externalScopeId=efeonce-mcp-gateway" | jq '.data.count, [.data.skills[].name]'
+curl -s -H "Authorization: Bearer $TOK" "$BASE/api/platform/ecosystem/mcp/skills/seo-spend-discipline?externalScopeType=other&externalScopeId=efeonce-mcp-gateway" | jq -r '.data.body' | head -3
+```
+
+Asserts, en este orden y sin atajos: `count` **igual** a la cuenta del manifiesto (no `≥ 1`; los
+manuales viajan como artefacto generado en el bundle —`pnpm mcp:skills:check`— y un artefacto viejo
+hace que el reader lance, nunca un catálogo corto en verde); cada `body` empieza con
+`---\nname: <nombre>`; un nombre inexistente responde `404`; sin token `401`; con un binding de
+cliente el catálogo es `[]` y cualquier detalle `404` (anti-oráculo, nunca `403`).
+
+Estado as-of 2026-09-02: el gateway ya sirve `get_greenhouse_skill` (revisión
+`efeonce-mcp-gateway-00028-pmx`, commit `c588a1b`, front door 200/200/401); la lane vive en `develop`
+y **responde `not_found` desde producción hasta el próximo release `develop→main`** (decisión del
+operador: sin release en esta ventana). No hay Entra, flag ni secreto nuevos.
 
 ### `get_seo_provider_spend` — federada sin tool interna, por diseño
 
-Está registrada en el gateway y **no** en `src/mcp/greenhouse/server.ts`, a diferencia de las otras 26 SEO. No es
-drift del espejo: consume el lane ecosystem directo. Documentado en el delta 2026-08-28 de `TASK-1780`. Por eso el
-conteo correcto es 26 internas / 27 federadas, y cualquier cifra que iguale ambos lados está mal.
+Está registrada en el gateway y **no** en `src/mcp/greenhouse/server.ts`, a diferencia de las otras SEO. No es
+drift: consume el lane ecosystem directo. Cualquier cifra que iguale ambos lados está mal.
+
+✅ **Desde `TASK-1780` el caso está DECLARADO, no deducido**: vive en `GREENHOUSE_GATEWAY_NATIVE_TOOLS` con su razón
+escrita, y el guard lo reporta nombrándolo si alguien lo quita. Evidencia de que el mecanismo funciona: corriendo el
+guard contra el estado real sin esa declaración, emite exactamente un finding —
+`expected_unknown_tool → get_seo_provider_spend`. Antes, esa misma ausencia era estructuralmente invisible.
 
 ### Drift de rollout detectado 2026-08-28
 
-La revisión productiva es `efeonce-mcp-gateway-00024-8b8` (SHA `92e7197`). El repo `efeonce-mcp` tiene **un commit
-local sin push**: `807fb76` *"TASK-1694 — federa el contrato corregido de `get_seo_keyword_discovery`"*. En
-Greenhouse, `TASK-1694` ya está en `complete/`. Mientras `807fb76` no se pushee, el contrato corregido **no está en
-producción** y la task está `code complete, rollout pendiente` en su mitad de gateway.
+La revisión productiva es `efeonce-mcp-gateway-00026-ctp` (SHA `e92961e`, desplegada el 2026-09-01
+con el manifiesto canónico de `TASK-1780`; la anterior era `efeonce-mcp-gateway-00024-8b8`, SHA
+`92e7197`). Canary del provider Greenhouse-SEO **verde de punta a punta contra producción** tras ese
+deploy: lecturas OK, deny `404` anti-oracle en todas, escrituras respondiendo honestamente en su
+gate sin escribir.
+
+✅ **El drift de rollout que esta sección declaraba quedó cerrado.** Decía que `807fb76`
+(`TASK-1694`) estaba local sin push; **hoy es ancestro de `origin/main`**, verificado con
+`git merge-base --is-ancestor`. No queda commit sin desplegar en el gateway.
 
 Verificar antes de asumir despliegue — la cuenta de commits no lo mide:
 

@@ -108,6 +108,8 @@ pricing sin scope y motion que oculte evidencia.
 
 ### Dirección del Growth Form · review premium 2026-08-28
 
+Canon reusable: [Growth Form — Editorial Premium Brief Style V1](../GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md).
+
 Rigor: `ui-standard`, `source-led`. La tarjeta conserva la composición aprobada y adopta una dirección **editorial
 premium**: una sola superficie blanca sobre el plano Midnight, encabezado compacto, controles suaves, iconografía
 lineal funcional y profundidad contenida. Se rechazaron (a) glassmorphism/glow, por competir con confianza y
@@ -128,3 +130,71 @@ placeholder como label, por accesibilidad y peor escaneo.
   validación al salir/enviar, errores locales, resumen enfocable, tap targets ≥48 px y reduced-motion equivalente.
 - GVC/live evidence: `.captures/task1598-influencer-fidelity-2026-08-29T02-03-15-736Z/` y
   `.captures/task1598-form-premium-live-2026-08-29T0206Z/` en 1440/890/390.
+
+### Refinamiento editorial · 2026-08-29
+
+Rigor: `ui-standard`, `source-led`. El benchmark de Redes Sociales y Desarrollo Web favoreció superficies continuas,
+ritmo editorial y contraste por sección. Se rechazó sumar más cards o copiar literalmente sus layouts.
+
+- Recipe: `reuse | extend` de la composición Elementor page-scoped; no aparece un primitive ni runtime compartido.
+- Confianza: tres pruebas en una sola franja con divisores y cuatro marcas de altura visual normalizada; tres columnas
+  en desktop, una en mobile.
+- Mecanismo: plano Midnight con retícula de 48 px, luz radial y anillos discretos; mantiene legibilidad y evita otro
+  glow azul plano.
+- Distribución: marcas sociales reales monocromas cuando existe identidad de canal; bolsa/correo cuando el destino es
+  funcional. Todos son inline, sin círculo, pill o color oficial que compita con el asset.
+- Form: megáfono para tipo de activación; helper y contador comparten la fila inmediata al textarea con separación de
+  8 px. La iconografía explica la función y nunca reemplaza el label.
+- Evidencia live: `.captures/task1598-influencer-fidelity-2026-08-29T11-00-28-401Z/` en 1536/1440/890/390 y reduced
+  motion.
+
+### Trust marquee compartido
+
+- Dirección elegida: conservar las tres señales regionales como contexto de servicio y sustituir únicamente el rail
+  de logos por `greenhouse_social_trust`, el mismo primitive vivo de la landing de Redes Sociales.
+- Recipe/primitive: `reuse`; el widget conserva su label, marquee `logoMarquee.v2`, sets duplicados para movimiento
+  continuo, assets monocromáticos y reduced motion. La landing sólo aporta el shell full-width ya existente.
+- Alternativas rechazadas: copiar el HTML/CSS del marquee —creaba drift—; mantener cuatro logos estáticos —menor
+  prueba y ritmo—; reemplazar también las señales regionales —el comentario del owner seleccionaba sólo el rail de
+  marcas y esas señales siguen cumpliendo una función distinta.
+- Evidencia: `.captures/task1598-influencer-fidelity-2026-08-29T11-29-33-710Z/trust-marquee-890.png` y
+  `trust-marquee-390.png`; cero overflow en 1536/1440/890/390.
+
+### Dock de conversión
+
+- Dirección elegida: superficie Midnight flotante y contenida, con borde fino, sombra controlada y acento superior;
+  preserva contexto visual sin convertirse en una segunda barra de navegación.
+- Jerarquía: reunión es el único botón sólido verde; brief es transparente con contorno e icono diagonal. En móvil el
+  dock prioriza las dos acciones y reduce el copy auxiliar.
+- Alternativas rechazadas: dos botones sólidos —competían por la misma prioridad—; glass excesivo —bajaba contraste—;
+  franja full-width —pesaba demasiado y parecía parte del chrome global—.
+- Evidencia: `.captures/task1598-influencer-fidelity-2026-08-29T11-08-21-257Z/dock-890.png` y `dock-390.png`.
+
+### Selects premium semánticos
+
+- Dirección elegida: `reuse` del combobox/listbox `diagnostic_premium` de Growth Forms; Elementor sólo decora las
+  opciones existentes, sin asumir su valor, eventos o validación.
+- Mercado: banderas SVG circulares locales para CL/CO/MX/PE y símbolos de región/ubicación. La bandera también
+  acompaña el valor seleccionado; se centra con `top: 50%` + traslado vertical, sin blur, a 28 px en lista y 26 px
+  en trigger. Activación: creator, video UGC, partnership, pauta y brújula de estrategia. El
+  check verde queda reservado al estado seleccionado.
+- Alternativas rechazadas: decorar `<option>` nativo —inconsistente entre navegadores—; emojis de bandera —familia
+  visual no controlada—; segundo select JavaScript —duplicaba estado, teclado y accesibilidad—. El host sólo
+  sincroniza el adorno del valor ya elegido por el renderer.
+- Desktop y 390 px: lista blanca elevada, targets ≥46 px, scroll acotado, selected/active distinguibles y trigger sin
+  truncamiento. Evidencia: `.captures/task1598-influencer-fidelity-2026-08-29T11-19-13-501Z/`.
+
+### Jerarquía tipográfica y semántica de derechos
+
+- Dirección elegida: documento como icono de brief; Poppins reservado al título del host y Geist para overline,
+  explicación, trust, labels, controles, ayudas y submit. El peso 650 se elimina: 600 comunica función y 400 lectura.
+- La franja de divulgación IA es full-bleed, pero su texto conserva la misma retícula de contenido.
+- En los assets se separa plazo de contexto: `12 meses` + `Publicación del creator`; `90 días` + `Pauta autorizada`;
+  `6 meses` + `Canales de la marca`. Fechas absolutas de demo se rechazan porque caducan sin aportar decisión.
+- Kicker y chips usan superficie tonal neutra sobre Midnight; el verde queda como señal iconográfica, no como relleno.
+- El CTA `Cuéntanos tu campaña` en ofertas reutiliza la jerarquía secundaria del dock adaptada a blanco: contorno navy,
+  superficie blanca e icono `arrow-up-right`.
+- El submit del brief usa azul Efeonce `primary` con texto blanco; teal se rechaza porque no pertenece a la paleta de
+  esta landing y diluye la continuidad entre formulario, links y CTA secundarios.
+- Evidencia live: `.captures/task1598-influencer-fidelity-2026-08-29T12-26-32-586Z/` en
+  1536/1440/1414/890/390 y reduced motion.

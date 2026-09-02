@@ -17,6 +17,16 @@ Canonical docs:
 - `docs/documentation/growth/motor-formularios-publicos.md`
 - `docs/manual-de-uso/growth/operar-motor-formularios.md`
 - `docs/manual-de-uso/growth/incrustar-formulario-wordpress-astro.md`
+- `docs/ui/GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md`
+
+## Editorial Premium Brief host
+
+TASK-1598 establishes a reusable public-site composition around the canonical `GrowthFormEmbed`: one editorial
+paper surface, clear document hierarchy, trust rail, semantic line icons, surface-mapped primary submit and a
+separate meeting alternative. `diagnostic_premium` still owns every interactive behavior and value. The
+landing-specific market/activation pictograms are not a renderer API; a second use must promote browser-safe
+semantic option metadata instead of copying selectors or observers. Instance details and live evidence stay in
+`references/landings/influencer-marketing.md`.
 
 ## Public API / CORS
 

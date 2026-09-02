@@ -23,7 +23,7 @@ publica piezas ni cambia indexación.
 
 | Route / Concern | Current owner | Target owner | Transition posture | SEO / operational rule |
 |---|---|---|---|---|
-| `/` | WordPress/Kinsta | Astro/Vercel | Cut over only with core-page parity | No placeholder/scaffold; canonical apex only |
+| `/` | WordPress/Kinsta, Elementor page `251731` since operator-approved 2026-08-30 Home cutover | Astro/Vercel (future runtime migration only) | Current cutover stays on WordPress; old page `2791` retained noindex at `/home-2/` | Canonical apex, index eligible; real media and no demo form, Agenda links to `/agenda/`; editorial/editor/player QA remains explicit in `AGENCY_ELEMENTOR_MODULES_V1.md`; no separate `/agencia/` per PDR-010 |
 | `/servicio-*`, `/servicios-*`, service pages | WordPress/Elementor | Astro/Vercel | First coded landing pilot after SEO foundation | Same-domain only; no indexable subdomain |
 | `/servicios/` | WordPress/Elementor | Astro/Vercel | Live as minimal parent page for nested service URLs | Expand into editorial services hub before heavy internal linking |
 | `/servicios/posicionamiento-seo/` | WordPress/Elementor | Astro/Vercel | Live SEO service landing (TASK-1343) | Canonical same-domain; CTA to Think Brand Visibility; preserve Ohio widgets until redesign decision |

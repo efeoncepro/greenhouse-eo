@@ -20,6 +20,20 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-01 — registro del avance (barrido `stale-progress`)
+
+⚠️ **Lo construido NO es el alcance de esta task, es su precondicion.** El commit `5746e4908`
+(«catalogo externo gobernado + auth per-site») entrego `src/app/api/public/growth/forms/catalog/route.ts`
++ `scripts/growth/mint-surface-embed-key.ts`, con `GROWTH_FORMS_CATALOG_API_ENABLED` **staging ON y
+prod ON (verificado live 2026-09-01)**.
+
+El **control plane de migracion** —inventario de embeds HubSpot, mapping, dry-run con rollback
+artifact, apply por allowlist— **no existe**. Verificado hoy: no hay script de inventario.
+
+Esto importa mas alla de esta task: `TASK-1253` difirio su flip de prod «al cutover de TASK-1258»,
+y `TASK-1254` arrastraba la misma clausula. Ambos flags terminaron ON en prod por otra via, asi que
+el cutover que esta task iba a gobernar **ocurrio sin ella**.
+
 ## Status
 
 - Lifecycle: `in-progress`
@@ -31,7 +45,7 @@
 - UI impact: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-040`
-- Status real: `Diseno`
+- Status real: `NO EMPEZADA en su alcance propio (verificado 2026-09-01). Lo unico construido es su PRECONDICION —catalogo externo gobernado + auth per-site, flag GROWTH_FORMS_CATALOG_API_ENABLED prod ON—. El control plane de migracion (inventario de embeds HubSpot, mapping, dry-run con rollback, apply por allowlist) NO existe. Los checkboxes en cero son correctos; ver el Delta`
 - Rank: `TBD`
 - Domain: `growth|public-site|hubspot|wordpress`
 - Blocked by: `TASK-1232`
@@ -191,9 +205,9 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Inventario detecta shortcodes/bloques/widgets/script embeds HubSpot sin falsos positivos obvios.
-- [ ] Mapping propone `formSlug`, destination HubSpot y surface para cada embed conocido.
-- [ ] Dry-run produce diff revisable y rollback artifact antes de cualquier apply.
+- [ ] Inventario detecta shortcodes/bloques/widgets/script embeds HubSpot. **NO EXISTE — verificado 2026-09-01: no hay script de inventario en `scripts/growth/`.** Lo unico construido de esta task es el catalogo externo gobernado + auth per-site, que era su PRECONDICION, no su alcance.
+- [ ] Mapping propone `formSlug`/destination/surface por embed. **NO EXISTE (verificado 2026-09-01).**
+- [ ] Dry-run con diff + rollback artifact. **NO EXISTE (verificado 2026-09-01).**
 - [ ] Apply allowlist modifica solo paginas aprobadas y preserva submission path via Greenhouse.
 - [ ] El plugin HubSpot puede permanecer instalado durante coexistencia sin doble submit/doble embed.
 

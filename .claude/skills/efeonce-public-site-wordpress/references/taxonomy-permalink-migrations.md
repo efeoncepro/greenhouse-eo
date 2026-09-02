@@ -8,6 +8,14 @@ The Efeonce public site currently uses `/%category%/%postname%/`. A category
 reparent can therefore change every affected post URL as well as its archive,
 canonical, breadcrumb and social/schema graph.
 
+For Efeonce's current category names and hierarchy, use
+`docs/public-site/decisions/PDR-019-taxonomia-editorial-canonica-blog-wordpress.md`;
+for the 2026-08-31 applied migration and redirects, use
+`docs/audits/public-site/2026-08-31-blog-taxonomy-demo35-work-copy.md`. Category
+hierarchy is an editorial/URL relation, not a home-page ranking: a root term is
+not automatically featured and does not automatically become a post's Yoast
+primary category.
+
 ## Contents
 
 1. Non-negotiable rules

@@ -59,7 +59,7 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_GROWTH_CTA_POPUP_ENGINE_DECISION_V1.md`
 - `docs/public-site/decisions/PDR-009-hubspot-scheduler-native-booking.md`
 - `docs/tasks/in-progress/TASK-1509-growth-meetings-scheduler-server-adapter.md`
-- `docs/tasks/in-progress/TASK-1431-growth-cta-action-registry-navigation-adapters.md`
+- `docs/tasks/complete/TASK-1431-growth-cta-action-registry-navigation-adapters.md`
 - `docs/tasks/to-do/TASK-1518-growth-cta-embed-runtime-fleet-closure.md`
 
 Reglas obligatorias:

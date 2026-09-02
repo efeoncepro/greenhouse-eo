@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.16
+> **Version:** 1.17
 > **Creado:** 2026-08-05 por Claude (TASK-1299 + TASK-1301)
-> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1792: el techo de clics de una oportunidad declara de dónde salió, y cuando la curva del sitio no alcanza la lista se ordena por demanda medida en vez de fingir un orden por ganancia; delta previo TASK-1692: el candidato recuerda qué se decidió sobre él — el estado se mueve solo, lo resuelto deja de encabezar la bandeja y un descartado se puede volver a elegir; delta previo TASK-1694: en el descubrimiento, un candidato es una keyword —no una fila por método—, el filtro de dificultad del proveedor deja de decidir y aparece el aviso de canibalización; delta previo 2026-08-28 TASK-1699 + TASK-1662 + TASK-1696 vivos en producción con el release `c983be7f18e6`: el módulo ya guarda quién más aparece en tu SERP, compara contra un competidor declarado y anota quién consumió cada dólar del proveedor; delta previo 2026-08-14 por Claude (TASK-1661 + follow-ups: las columnas de mercado se llenan solas, la captura es mensual y acotada con simulacro de costo previo, "Dificultad" pasa a ser **Barrera de enlaces** en niveles con "Sin dato" como estado propio, todo dato de mercado viaja con su fecha, y cada respuesta declara el país que muestra — incluida la corrección del caso Berel (ISSUE-152/153); delta previo 2026-08-09 TASK-1677 Slice 1: la clave del módulo es `seo_v2` y es la única que el runtime lee))
+> **Ultima actualizacion:** 2026-09-01 por Claude (TASK-1670: el punto ciego de la auditoría —rastreadores de IA, borde/CDN, datos estructurados y mapa del sitio— ya tiene motor, documentado aparte en [hallazgos-de-sitio-audit-seo.md](hallazgos-de-sitio-audit-seo.md); sigue **APAGADO** hasta TASK-1671, así que un sitio invisible para la IA todavía puntúa 95/100 acá; delta previo TASK-1792: el techo de clics de una oportunidad declara de dónde salió, y cuando la curva del sitio no alcanza la lista se ordena por demanda medida en vez de fingir un orden por ganancia; delta previo TASK-1692: el candidato recuerda qué se decidió sobre él — el estado se mueve solo, lo resuelto deja de encabezar la bandeja y un descartado se puede volver a elegir; delta previo TASK-1694: en el descubrimiento, un candidato es una keyword —no una fila por método—, el filtro de dificultad del proveedor deja de decidir y aparece el aviso de canibalización; delta previo 2026-08-28 TASK-1699 + TASK-1662 + TASK-1696 vivos en producción con el release `c983be7f18e6`: el módulo ya guarda quién más aparece en tu SERP, compara contra un competidor declarado y anota quién consumió cada dólar del proveedor; delta previo 2026-08-14 por Claude (TASK-1661 + follow-ups: las columnas de mercado se llenan solas, la captura es mensual y acotada con simulacro de costo previo, "Dificultad" pasa a ser **Barrera de enlaces** en niveles con "Sin dato" como estado propio, todo dato de mercado viaja con su fecha, y cada respuesta declara el país que muestra — incluida la corrección del caso Berel (ISSUE-152/153); delta previo 2026-08-09 TASK-1677 Slice 1: la clave del módulo es `seo_v2` y es la única que el runtime lee))
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 
 # Modulo SEO — Search Visibility 360 (Growth)
@@ -218,6 +218,11 @@ sin dato responde "sin datos de mercado", nunca un cero; y nada de esta tabla se
 series medidas de Search Console. La **autoridad** de dominio para superficies sigue siendo una
 sola: el `domain_rank` del snapshot de enlaces (esta capa no crea una segunda).
 
+Desde el aviso DataForSEO del 2026-09-01, "◑ estimada" exige además **metodología**: legacy e improved
+no son puntos comparables sólo porque ambos se llamen `etv`. El runtime todavía no versiona fórmula; el
+cutover anunciado para 2026-11-01 requiere ADR, shadow y schema/provenance antes de activarse. Ver la
+[auditoría Improved ETV](../../audits/seo/2026-09-01-dataforseo-improved-etv-impact.md).
+
 Se consume por el reader canónico (`readDomainOverview`), el lane ecosystem
 (`/api/platform/ecosystem/growth/seo/domain-overview`) y la tool MCP `get_seo_domain_overview`.
 Operación paso a paso: [Operar la foto de dominio SEO](../../manual-de-uso/growth/operar-foto-de-dominio-seo.md).
@@ -244,6 +249,10 @@ mercado" en vez de ceros, y la posición de mercado jamás se promedia con la po
 Search Console. Se consume por `readUrlVisibility`/`readVisibilityConcentration`, el lane ecosystem
 (`/growth/seo/url-visibility`) y la tool MCP `get_seo_url_visibility`.
 Operación: [Operar la visibilidad por URL](../../manual-de-uso/growth/operar-visibilidad-por-url-seo.md).
+
+La misma alerta metodológica aplica a esta superficie: el ETV improved puede cambiar valores, sumas y el top-N
+de concentración. Hasta que la fórmula viaje en snapshot/readers/API/MCP, una variación cruzando el cutover no
+se presenta como performance SEO.
 
 > Detalle técnico: [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md §4.2 y §15](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md).
 
@@ -313,7 +322,7 @@ dólares del motor de IA quedó **en observación, sin bloquear**: mide y avisa,
 
 ## Que NO existe todavia
 
-Lo siguiente aún no está construido (las series que ya se llenan: Search Console live; rankings live desde el 2026-08-06). **Sí existen ya** — además del schema y el modelo de acceso — el cruce SEO ↔ AEO (`readSeoAeoGap` + matriz quadrant 360, TASK-1305) y la **operación por MCP live en producción desde el 2026-08-06** (TASK-1645, que partió con 3 tools read-only): hoy el MCP interno de Greenhouse sirve **27 tools SEO (20 lecturas + 7 escrituras)** as-of 2026-08-28 (TASK-1647 abrió la federación al gateway público `mcp.efeonce.org`; TASK-1658 la completó con guard de paridad bidireccional; TASK-1696 sumó `get_seo_provider_spend`; TASK-1662 sumó `declare_seo_competitors` / `retire_seo_competitors` + `get_seo_keyword_gap`; TASK-1699 sumó `get_seo_serp_top_results` + `get_seo_competitor_candidates`). Sus lanes están en producción desde el release `c983be7f18e6` (2026-08-28). ⚠️ **El inventario interno y lo que sirve la revisión desplegada del gateway son dos números distintos**: el estado de despliegue vigente vive en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-read-only.md) §8, no acá. La lectura funcional completa de esa capacidad está en [Search Visibility 360 por MCP](search-visibility-360-por-mcp.md). Pendiente:
+Lo siguiente aún no está construido (las series que ya se llenan: Search Console live; rankings live desde el 2026-08-06). **Sí existen ya** — además del schema y el modelo de acceso — el cruce SEO ↔ AEO (`readSeoAeoGap` + matriz quadrant 360, TASK-1305) y la **operación por MCP live en producción desde el 2026-08-06** (TASK-1645, que partió con 3 tools read-only): hoy el MCP interno de Greenhouse sirve **28 tools SEO (21 lecturas + 7 escrituras)** as-of 2026-08-31 — cifra derivada de `src/mcp/greenhouse/tool-manifest.ts`, que es la fuente; el conjunto federado en el gateway NO es el mismo por construcción (TASK-1647 abrió la federación al gateway público `mcp.efeonce.org`; TASK-1658 la completó con guard de paridad bidireccional; TASK-1696 sumó `get_seo_provider_spend`; TASK-1662 sumó `declare_seo_competitors` / `retire_seo_competitors` + `get_seo_keyword_gap`; TASK-1699 sumó `get_seo_serp_top_results` + `get_seo_competitor_candidates`). Sus lanes están en producción desde el release `c983be7f18e6` (2026-08-28). ⚠️ **El inventario interno y lo que sirve la revisión desplegada del gateway son dos números distintos**: el estado de despliegue vigente vive en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-tool-inventory.md) §8, no acá. La lectura funcional completa de esa capacidad está en [Search Visibility 360 por MCP](search-visibility-360-por-mcp.md). Pendiente:
 
 | Falta | Task que lo trae |
 |---|---|
@@ -592,7 +601,7 @@ superficie es follow-up de la task dueña del render.
 
 ### El país deja de estar implícito: cada respuesta declara qué mercado muestra (2026-08-13)
 
-Efeonce opera en Chile, México, Colombia y Perú, y **el volumen de una keyword en Chile no es el de
+Efeonce opera en Chile, Estados Unidos, Colombia, México y Perú (ver `docs/context/01_quienes-somos.md`), y **el volumen de una keyword en Chile no es el de
 México**. Hasta ahora eso era un supuesto silencioso: si una organización tenía más de un mercado
 configurado, el sistema mostraba uno **sin decir cuál**.
 
@@ -676,11 +685,25 @@ lo dice en vez de gastar dos veces por lo mismo.
 
 **Lo que esta auditoría todavía NO revisa** (y por eso no alcanza para declarar un sitio listo para
 la IA): si el `robots.txt` **bloquea a los rastreadores de IA**, si al sitio le **falta** el marcado
-de datos estructurados (hoy sólo detecta errores en el marcado que ya existe), si hay conflicto entre
-`noindex` y el bloqueo de robots, y la salud del mapa del sitio. Es el punto ciego más caro del módulo:
-un sitio que le cierra la puerta a los rastreadores de IA queda fuera de las respuestas de ChatGPT,
-Perplexity y compañía, y hoy esta pantalla lo declararía sano con 95 de 100. Lo cierra **TASK-1670**,
-que reutiliza las verificaciones ya probadas del motor AEO en vez de escribirlas de nuevo.
+de datos estructurados (hoy sólo detecta errores en el marcado que ya existe), si el borde/CDN rechaza
+a los rastreadores pese a un robots limpio, y la salud del mapa del sitio. Es el punto ciego más caro
+del módulo: un sitio que le cierra la puerta a los rastreadores de IA queda fuera de las respuestas de
+ChatGPT, Perplexity y compañía, y hoy esta pantalla lo declararía sano con 95 de 100.
+
+> ⚠️ **Estado al 2026-09-01: el motor que cierra ese punto ciego existe, pero está APAGADO.**
+> `TASK-1670` construyó las cuatro revisiones de dominio —los **[hallazgos de
+> sitio](hallazgos-de-sitio-audit-seo.md)**— y las verificó contra sitios reales, pero el interruptor
+> nace apagado y no se prende hasta que se despliegue la superficie que sabe renderizar el alcance
+> correcto (**TASK-1671**). La razón es concreta: esta pantalla cuenta "páginas afectadas" y **ordena
+> por ese número**, así que un hallazgo del dominio se rotularía "1 página afectada" —falso— y se
+> hundiría debajo de 400 imágenes sin texto alternativo.
+>
+> 🔴 **Hasta ese encendido, lo descrito arriba sigue siendo cierto tal cual**: un sitio que bloquea a
+> los rastreadores de IA sigue puntuando 95 de 100 en esta pantalla y sigue presentándose como sano.
+> El agujero lo cierra el flip verificado en producción, no el merge.
+>
+> Qué revisa, las tres familias de rastreadores y por qué bloquear el entrenamiento **nunca** es
+> crítico: [Hallazgos de sitio en la Auditoría SEO](hallazgos-de-sitio-audit-seo.md).
 
 > Paso a paso para operarla: [Auditoria del sitio — leer la salud tecnica y priorizar](../../manual-de-uso/growth/usar-auditoria-sitio-seo.md).
 >

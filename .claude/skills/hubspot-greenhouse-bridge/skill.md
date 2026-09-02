@@ -200,13 +200,18 @@ For public tenders that pass human selection, GO, and basic admissibility, creat
 `decisionmakerboughtin` for completed pricing and terms, `contractsent` after award while formalization is pending,
 then `closedwon` or `closedlost` from verified outcome evidence. Raw radar candidates remain outside HubSpot.
 
-Writes follow `propose → confirm → write → readback`. Discovery and ranking remain read-only. The current
-`POST /deals` bridge is insufficient for this flow: it accepts only `origin='greenhouse_quote_builder'`, expects an
-existing Company, supports at most one optional Contact, and does not carry the tender fields or ensure
-Contact↔Company. A governed implementation must extend `app.py`, `contract.py`, tests, and
-`src/lib/integrations/hubspot-greenhouse-service.ts` together; add Company/Contact resolution and all three
-association paths; and obtain the required ADR/external-API approval. Do not bypass the bridge with direct CRM
-writes.
+Writes follow `propose → confirm → write → readback`. Discovery and ranking remain read-only. For a
+manual promotion explicitly confirmed by the operator, the HubSpot MCP is a governed writer: it may create or
+update the canonical Company and Deal, add the verified associations and perform the required readback. Preserve
+both duplicate keys (`id_de_licitacion` and `gh_idempotency_key`), never fabricate a Contact and do not populate
+`gh_deal_origin` with `greenhouse_quote_builder` for a tender.
+
+The current `POST /deals` bridge remains insufficient for automated tender intake: it accepts only
+`origin='greenhouse_quote_builder'`, expects an existing Company, supports at most one optional Contact, and does
+not carry the tender fields or ensure Contact↔Company. Extending that automated lane requires coordinated changes
+to `app.py`, `contract.py`, tests and `src/lib/integrations/hubspot-greenhouse-service.ts`, plus the applicable
+ADR/external-API approval. This automation gap does not block a confirmed manual promotion through the HubSpot
+MCP.
 
 Historical snapshot, useful only as migration evidence: 99 LicitaLAB deals were found; 97 had a different tender
 deadline and commercial close date, 86 had no associated Contact, and their buckets were 94 Opportunistic, 4 Core,

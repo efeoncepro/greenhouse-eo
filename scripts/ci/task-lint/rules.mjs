@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -133,7 +134,12 @@ const sectionContent = (task, section) => task.sections.get(section)?.content ??
 
 const stripStatusValue = value => value.replace(/^`(.+)`$/, '$1').trim()
 
-const normalizeStatusValue = value => stripStatusValue(value).toLowerCase()
+// 🔴 El parser dobla las líneas de continuación DENTRO del valor del campo, así que un
+// `UI ready: \`n/a\`` seguido de su razón llega como "n/a\n> razón…". Normalizar sobre el valor
+// crudo rompía justo cuando el autor hace lo que la plantilla PIDE: declarar el valor CON su razón.
+// Se toma la primera línea, que es el valor; el resto es prosa de respaldo. Corregido 2026-09-01
+// tras verlo romper tres reglas distintas (UI impact, UI ready) en el mismo cierre.
+const normalizeStatusValue = value => stripStatusValue(String(value ?? '').split('\n')[0]).toLowerCase()
 
 const hasMarkdownHeading = (source, heading) => {
   const escaped = heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -277,6 +283,17 @@ const finding = ({ task, rule, severity, message, line }) => ({
 const blockingSeverity = context => (context.enforceErrors ? 'error' : 'warning')
 
 const isUiUxImpacted = task => {
+  // 🔴 Una declaración EXPLÍCITA gana sobre una INFERIDA. `ui-wireframe-contract` ofrece en su
+  // propio mensaje la salida «set UI impact to none with rationale», y sin este corto la inferencia
+  // por `Domain` la anulaba: el mensaje prometía un escape que el mecanismo no honraba. Detectado
+  // 2026-09-01 al cerrar TASK-1036 y TASK-1113 —dos tasks de dominio `ui` que NO diseñan superficie
+  // (tokens y un fix de render)— que quedaban obligadas a declarar un wireframe inexistente.
+  // El escape es auditable, no silencioso: la plantilla exige la razón junto al `none`.
+  // El parser dobla las líneas de continuación dentro del valor del campo, así que un
+  // `UI impact: \`none\`` seguido de su razón llega como "none\n> razón…". Comparar el valor crudo
+  // rompía justo cuando el autor hace lo que la plantilla PIDE (declarar el `none` CON razón).
+  if ((task.uiImpact ?? '').split('\n')[0].trim() === 'none') return false
+
   if (task.executionProfile === 'ui-ux') return true
   if (task.uiImpact && UI_IMPACTS.has(task.uiImpact)) return true
 
@@ -896,7 +913,15 @@ const checkUiWireframeContract = (task, context) => {
 
   const rawWireframe = task.status.fields.Wireframe ?? task.status.fields.wireframe ?? ''
   const wireframe = rawWireframe.replace(/^`(.+)`$/, '$1').trim()
-  const severity = context.changed || context.task ? 'error' : 'warning'
+
+  // Modo FOCAL (`--task`) = alguien va a trabajar esa task: el wireframe es exigible y el error es
+  // correcto (hay test que lo fija). Modo `--changed` sobre una task en `to-do` es otra cosa: quien
+  // pasó por el archivo puede estar sólo limpiando un `Blocked by` obsoleto, y el mensaje de la
+  // propia regla dice "before implementation" — una task que no empezó no está violando nada
+  // todavía. Ahí queda warning: sigue visible, y se vuelve bloqueante en cuanto alguien la enfoque
+  // o la mueva a `in-progress`. Calibrado 2026-09-01 al cerrar TASK-1078.
+  const incidental = context.changed && !context.task && task.folderLifecycle === 'to-do'
+  const severity = (context.changed || context.task) && !incidental ? 'error' : 'warning'
 
   if (!wireframe || wireframe === 'none' || wireframe === 'n/a') {
     return [
@@ -943,7 +968,11 @@ const checkUiFlowContract = (task, context) => {
 
   const rawFlow = task.status.fields.Flow ?? task.status.fields.flow ?? ''
   const flow = rawFlow.replace(/^`(.+)`$/, '$1').trim()
-  const severity = context.changed || context.task ? 'error' : 'warning'
+  // Misma calibracion que ui-wireframe-contract: una task en to-do/ que aparece en el diff sin
+  // ser el foco (le corrigieron una ruta stale, un cross-link) no debe romper el gate por una
+  // deuda que ya tenia. Error solo cuando es el foco declarado, o cuando ya se esta implementando.
+  const incidental = context.changed && !context.task && task.folderLifecycle === 'to-do'
+  const severity = (context.changed || context.task) && !incidental ? 'error' : 'warning'
   const flowRequired = task.uiImpact === 'flow'
   const likelyNeedsFlow = FLOW_TRIGGER_RE.test(relevantFlowContent(task))
 
@@ -1134,7 +1163,12 @@ const parseBlockedByIds = task => {
   const raw = task.status?.fields?.['Blocked by'] ?? task.status?.fields?.['blocked by'] ?? ''
 
   if (!raw) return []
-  if (/^`?none`?$/i.test(raw.trim())) return []
+
+  // `none` es el VALOR del campo; lo que venga despues entre parentesis es prosa que explica por que
+  // se desbloqueo — y esa explicacion normalmente NOMBRA a los blockers que cerraron. Exigir que la
+  // nota omita los IDs para no disparar el guard destruye justo el contexto util, asi que basta con
+  // que `none` sea el primer token.
+  if (/^`?none`?\s*(?:$|[(.,;:—-])/i.test(raw.trim())) return []
 
   const ids = new Set()
 
@@ -1271,7 +1305,146 @@ const checkStaleBlocker = (task, context) => {
   return findings
 }
 
+
+/**
+ * TASK-1699 — `stale-progress`
+ *
+ * 🔴 Cierra el defecto que hizo que una task se re-ejecutara CINCO veces sin cerrar nunca, y que
+ * ningún gate detectaba: el trabajo se registra en PROSA (deltas, mensajes de commit) mientras los
+ * campos que una sesión lee para DECIDIR —`Status real` y los checkboxes de ZONE 0/4— siguen
+ * diciendo que no empezó.
+ *
+ * Caso fuente (`TASK-1699`, 2026-09-01): 46 checkboxes sin tildar y `Status real: Diseno`, contra
+ * SIETE commits `feat(growth): TASK-1699 Slice N`, un release a producción y una serie de datos
+ * corriendo hacía cuatro días. Cada sesión abría el archivo, leía "diseño, 46 pendientes",
+ * concluía que no estaba empezada, la volvía a ejecutar, escribía otro `## Delta` y no tocaba
+ * ninguno de los dos campos. El bucle se sostiene solo.
+ *
+ * ⚠️ **Warning y no error, a propósito y medido:** 414 de 975 tasks en `complete/` y 59 de 121 en
+ * `in-progress/` tienen checkboxes sin tildar. Un error aquí sería ruido histórico que nadie lee —
+ * exactamente el modo de falla que esta regla combate. Acotada a las que tienen commits de
+ * implementación, la señal cae a 28 tasks: rara, específica y accionable.
+ *
+ * Dónde muerde: `pnpm task:lint --task TASK-###` es lo primero que corre el harness de ejecución,
+ * así que el aviso llega ANTES de re-implementar, que es el único momento en que sirve.
+ */
+// Un commit de scope `docs` NO es implementacion aunque su tipo sea fix/feat: reconciliar el
+// backlog o corregir una atribucion no construye nada. Medido 2026-09-01: los 3 commits
+// `(docs)` del repo que nombran una task son puramente documentales, asi que excluirlos no
+// esconde trabajo real. Caso fuente TASK-1779, marcada como "tiene implementacion" por
+// `fix(docs): reconciliar el backlog Growth ... y TASK-1779 para la memoria del cliente`.
+const IMPLEMENTATION_SUBJECT_RE = /^(feat|fix|refactor|perf)\((?!docs?\))/
+const NOT_STARTED_STATUS_RE = /dise(ñ|n)o|sin empezar|no iniciad/i
+
+const implementationCommitCache = new Map()
+
+const loadImplementationCommits = context => {
+  if (implementationCommitCache.has(context.repoRoot)) return implementationCommitCache.get(context.repoRoot)
+
+  const byTask = new Map()
+
+  try {
+    const out = execFileSync('git', ['log', '--no-merges', '--format=%h%x09%s'], {
+      cwd: context.repoRoot,
+      encoding: 'utf8',
+      maxBuffer: 64 * 1024 * 1024
+    })
+
+    for (const line of out.split('\n')) {
+      const tab = line.indexOf('\t')
+
+      if (tab < 0) continue
+
+      const sha = line.slice(0, tab)
+      const subject = line.slice(tab + 1)
+
+      if (!IMPLEMENTATION_SUBJECT_RE.test(subject)) continue
+
+      // Se acredita TODA task nombrada en el asunto, incluidas las que aparecen entre parentesis.
+      // Medido 2026-09-01 sobre los 31 asuntos del repo con 2+ referencias: filtrar los parentesis
+      // arreglaria 6 falsos positivos de contexto («precondicion TASK-1259», «herencia TASK-1675»)
+      // pero ROMPERIA 8 casos donde el parentesis SI declara trabajo propio («Slice 2 of TASK-642»,
+      // «TASK-587 Fase B», «cierra TASK-260»). Un falso negativo esconde trabajo real; un falso
+      // positivo solo cuesta una verificacion — y el mensaje de la regla pide exactamente eso
+      // («VERIFICA que esta hecho»), nunca afirma que el trabajo exista. Se deja asi a proposito.
+      for (const match of subject.matchAll(TASK_REF_RE)) {
+        const id = `TASK-${match[1]}`
+
+        if (!byTask.has(id)) byTask.set(id, [])
+        byTask.get(id).push(sha)
+      }
+    }
+  } catch {
+    // Sin git disponible la regla se apaga sola: nunca inventa una contradicción que no puede medir.
+  }
+
+  implementationCommitCache.set(context.repoRoot, byTask)
+
+  return byTask
+}
+
+const countTaskCheckboxes = source => {
+  const done = (source.match(/^- \[[xX]\]/gm) ?? []).length
+  const open = (source.match(/^- \[ \]/gm) ?? []).length
+
+  return { done, total: done + open }
+}
+
+const checkStaleProgress = (task, context) => {
+  if (!task.id) return []
+
+  const { done, total } = countTaskCheckboxes(task.source ?? '')
+
+  if (total === 0 || done > 0) return []
+
+  if (task.folderLifecycle === 'complete') {
+    return [
+      finding({
+        task,
+        rule: 'stale-progress',
+        severity: 'warning',
+        message:
+          `${task.id} está en complete/ con ${total} checkbox(es) y NINGUNO tildado. Cerrar sin ` +
+          'registrar una sola evidencia deja el archivo diciendo que no se hizo nada: la próxima ' +
+          'sesión que lo abra no puede distinguir "cerrada bien" de "cerrada por cansancio".'
+      })
+    ]
+  }
+
+  if (!ACTIVE_TASK_LIFECYCLES.has(task.folderLifecycle)) return []
+
+  const commits = loadImplementationCommits(context).get(task.id) ?? []
+
+  if (commits.length === 0) return []
+
+  const statusReal = task.status?.fields?.['Status real'] ?? task.status?.fields?.['status real'] ?? ''
+  const contradictsStatus = NOT_STARTED_STATUS_RE.test(statusReal)
+  const shown = commits.slice(0, 3).join(', ')
+  const more = commits.length > 3 ? ` (+${commits.length - 3} más)` : ''
+
+  return [
+    finding({
+      task,
+      rule: 'stale-progress',
+      severity: 'warning',
+      ...(task.status?.fieldLines?.['Status real'] ? { line: task.status.fieldLines['Status real'] } : {}),
+      message:
+        `${task.id} tiene ${commits.length} commit(s) de implementación en la historia ` +
+        `(${shown}${more}) y ${total} checkbox(es) con NINGUNO tildado` +
+        (contradictsStatus ? `, mientras "Status real" declara «${statusReal.trim()}»` : '') +
+        '. El estado declarado contradice la historia: VERIFICA qué está hecho antes de ' +
+        're-implementar, y registra la evidencia en los checkboxes — no sólo en un `## Delta`, ' +
+        'que es prosa que nadie lee para decidir si tomar la task.'
+    })
+  ]
+}
+
 export const RULES = [
+  {
+    id: 'stale-progress',
+    appliesTo: task => task.kind === 'template',
+    check: checkStaleProgress
+  },
   {
     id: 'stale-blocker',
     appliesTo: task => task.kind === 'template',

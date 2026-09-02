@@ -1,0 +1,229 @@
+{
+  "schema": "contentMarketingEditorial.v1",
+  "postId": 242603,
+  "expectedHash": "4fcdb402a2e509a6fa6a103e02ae136309a7b42a83f2817426e28729a81764fd",
+  "modules": {
+    "greenhouse_content_editorial": {
+      "id": "ea157f3",
+      "fields": {
+        "content_001": {
+          "before": "Publicación y operación editorial",
+          "after": "Publicación en tu CMS"
+        },
+        "content_002": {
+          "before": "Aprobar no es publicar. Y publicar no es terminar.",
+          "after": "Del contenido aprobado a tu sitio, listo para tu audiencia."
+        },
+        "content_003": {
+          "before": "El corte 3 quedó aprobado. Falta cargarlo bien y, sobre todo, que siga vivo seis meses después. Ahí es donde la mayoría de los blogs pierde tracción.",
+          "after": "Nos encargamos de cargar, dar formato y publicar los contenidos en el CMS de tu empresa. Trabajamos con tus plantillas, permisos y flujo de aprobación, sin pedirte que cambies de plataforma."
+        },
+        "content_005": {
+          "before": "Publicación",
+          "after": "En tu plataforma"
+        },
+        "content_006": {
+          "before": "Publicamos en el CMS de tu equipo, con control de salida.",
+          "after": "Publicamos donde tu equipo ya trabaja."
+        },
+        "content_007": {
+          "before": "Trabajamos dentro de tu stack y según el alcance acordado. No pedimos migrar de CMS y no presentamos a ningún proveedor como partner nuestro.",
+          "after": "WordPress, Webflow, Drupal y Modyo son parte de los CMS con los que podemos trabajar. Preparamos cada publicación según la estructura de tu sitio y coordinamos contigo los accesos y la salida."
+        },
+        "content_008": {
+          "before": "Los CMS que podemos nombrar como capacidad verificada se confirman en la conversación inicial. Mientras tanto hablamos de «el CMS de tu equipo».",
+          "after": "¿Usas otro CMS? Revisamos sus requisitos y acordamos cómo operar en él. El alcance se adapta a tu plataforma y a tu equipo."
+        },
+        "content_010": {
+          "before": "Control de salida · artículo «Aro 7»",
+          "after": "Antes de publicar · ejemplo Aro 7"
+        },
+        "content_012": {
+          "before": "6 de 6",
+          "after": "6 revisiones"
+        },
+        "content_014": {
+          "before": "Carga, formato y jerarquía del contenido en el CMS.",
+          "after": "Contenido cargado, con títulos, jerarquía y formato revisados."
+        },
+        "content_015": {
+          "before": "Assets optimizados y enlazado interno a las cinco piezas.",
+          "after": "Imágenes optimizadas y enlaces internos a los contenidos relacionados."
+        },
+        "content_016": {
+          "before": "Metadata y títulos revisados contra el brief, no improvisados.",
+          "after": "Título SEO y metadescripción alineados con el contenido."
+        },
+        "content_017": {
+          "before": "Schema cuando corresponde al contenido visible.",
+          "after": "Datos estructurados cuando corresponden al contenido visible."
+        },
+        "content_018": {
+          "before": "QA de publicación en escritorio y móvil, con capturas.",
+          "after": "Presentación y funcionamiento comprobados en computador y móvil."
+        },
+        "content_019": {
+          "before": "Enlaces y tiempos de carga verificados antes de anunciar.",
+          "after": "Enlaces, archivos y carga de la página revisados."
+        },
+        "content_020": {
+          "before": "Publicado el 4 de septiembre. Sin este control, la pieza sale y nadie revisa cómo salió.",
+          "after": "Ejemplo ficticio: el artículo se publica después de completar la revisión y recibir la aprobación de la marca."
+        },
+        "content_022": {
+          "before": "Operación editorial",
+          "after": "Mantenimiento editorial"
+        },
+        "content_023": {
+          "before": "Qué le pasa al artículo los seis meses siguientes.",
+          "after": "El contenido publicado también necesita atención."
+        },
+        "content_024": {
+          "before": "Un blog no pierde tracción por falta de artículos nuevos. La pierde porque los viejos envejecen y nadie vuelve a ellos.",
+          "after": "Revisamos qué sigue vigente, qué dudas nuevas aparecen y qué conviene actualizar. Así tu biblioteca de contenidos acompaña los cambios de tu negocio y de tu audiencia."
+        },
+        "content_026": {
+          "before": "Publicado",
+          "after": "Publicación inicial"
+        },
+        "content_027": {
+          "before": "El artículo sale con las 42 fotos sin editar y enlaza a las cinco piezas derivadas.",
+          "after": "El artículo reúne las fotografías de prueba y enlaza a las adaptaciones de la campaña."
+        },
+        "content_029": {
+          "before": "Actualizado",
+          "after": "Nuevas respuestas"
+        },
+        "content_030": {
+          "before": "Dos preguntas nuevas que llegaron a soporte entran al cuerpo. El reel se reedita con el corte que mejor retuvo.",
+          "after": "Incorporamos dos preguntas recibidas por soporte y ajustamos las explicaciones del artículo."
+        },
+        "content_032": {
+          "before": "Reescrito el arranque",
+          "after": "Información vigente"
+        },
+        "content_033": {
+          "before": "Sale el modelo siguiente. La comparación se actualiza para que el artículo no quede desfasado.",
+          "after": "Actualizamos la comparación cuando aparece un nuevo modelo, para que el artículo siga siendo útil."
+        },
+        "content_035": {
+          "before": "Recirculado",
+          "after": "Nueva distribución"
+        },
+        "content_036": {
+          "before": "El carrusel vuelve a publicarse con la lámina de batería corregida. Cero producción nueva.",
+          "after": "Adaptamos el carrusel con la información actualizada y programamos su próxima publicación."
+        },
+        "content_037": {
+          "before": "Seis meses después el artículo sigue recibiendo tráfico y ninguna pieza nueva tuvo que producirse para lograrlo. Eso es lo que compra el mantenimiento.",
+          "after": "Ejemplo de seguimiento durante seis meses. La frecuencia y las tareas se acuerdan según tus contenidos, sus resultados y las prioridades de tu equipo."
+        }
+      }
+    },
+    "greenhouse_content_modes": {
+      "id": "772f75f",
+      "fields": {
+        "content_001": {
+          "before": "Modos de colaboración",
+          "after": "Cómo trabajamos contigo"
+        },
+        "content_002": {
+          "before": "La pregunta no es cuánto cuesta. Es quién aprieta publicar.",
+          "after": "Elige cuánto de la operación quieres delegar."
+        },
+        "content_003": {
+          "before": "Los tres modos hacen el mismo trabajo con el mismo estándar. Lo que cambia es cuánto de la operación queda de nuestro lado. Se escribe antes de empezar y no se renegocia en cada entrega.",
+          "after": "Podemos encargarnos de la operación, compartirla con tu equipo o entregar los contenidos y el método para que los publiques. Antes de empezar, acordamos responsabilidades, entregables y criterios de aprobación."
+        },
+        "content_004": {
+          "before": "Operamos nosotros",
+          "after": "Delegas la operación"
+        },
+        "content_005": {
+          "before": "Operan ustedes",
+          "after": "Tu equipo opera"
+        },
+        "content_006": {
+          "before": "Elegir modo de colaboración",
+          "after": "Seleccionar un modo de colaboración"
+        },
+        "content_010": {
+          "before": "Elige este si tu equipo no tiene capacidad y necesita el ciclo completo funcionando el lunes que viene.",
+          "after": "Para equipos que necesitan delegar la producción y la publicación. Coordinamos el ciclo de contenidos y tu equipo define prioridades y aprueba."
+        },
+        "content_012": {
+          "before": "Publica: Efeonce, según alcance",
+          "after": "Publica Efeonce, según el alcance"
+        },
+        "content_013": {
+          "before": "A medias",
+          "after": "Operación compartida"
+        },
+        "content_015": {
+          "before": "Elige este si ya tienes un equipo que produce y necesita método, capacidad extra y un estándar que se sostenga.",
+          "after": "Para equipos que ya producen y necesitan apoyo especializado. Repartimos las piezas y los canales, con un brief y un proceso de revisión comunes."
+        },
+        "content_016": {
+          "before": "Publica: Compartido, por canal",
+          "after": "Publicación repartida por canal"
+        },
+        "content_018": {
+          "before": "Elige este si tu equipo quiere operar por su cuenta y lo que necesita es el sistema, no las manos.",
+          "after": "Para equipos que gestionan sus canales y necesitan contenidos listos, recursos y un método común para sostener la operación."
+        },
+        "content_019": {
+          "before": "Publica: Tu equipo",
+          "after": "Publica tu equipo"
+        },
+        "content_021": {
+          "before": "En la campaña del Aro 7, este modo habría sido",
+          "after": "Así se repartiría el trabajo en la campaña Aro 7"
+        },
+        "content_022": {
+          "before": "Nosotros hicimos el research, escribimos el artículo, produjimos las cinco piezas y publicamos. Tu equipo definió la prioridad del trimestre y aprobó los tres cortes del reel.",
+          "after": "Efeonce investiga, desarrolla el artículo, adapta los formatos y publica en los canales acordados. Tu equipo define las prioridades, aporta contexto y aprueba los contenidos."
+        },
+        "content_024": {
+          "before": "Research y estrategia",
+          "after": "Investigación y estrategia"
+        },
+        "content_025": {
+          "before": "Efeonce con tu equipo",
+          "after": "Efeonce junto a tu equipo"
+        },
+        "content_026": {
+          "before": "Conjunta",
+          "after": "Responsabilidad conjunta"
+        },
+        "content_027": {
+          "before": "Efeonce entrega el sistema",
+          "after": "Efeonce prepara el plan y el método"
+        },
+        "content_030": {
+          "before": "Efeonce entrega assets y copy",
+          "after": "Efeonce entrega contenidos y recursos"
+        },
+        "content_034": {
+          "before": "Efeonce según alcance",
+          "after": "Efeonce, en los canales acordados"
+        },
+        "content_036": {
+          "before": "Handoff o revisión pactada",
+          "after": "Tu equipo, con revisión acordada"
+        },
+        "content_037": {
+          "before": "Matriz de responsabilidades por modo. Los nombres públicos de los modos están en validación con operadores. La aprobación es siempre de tu equipo, en los tres.",
+          "after": "En los tres modos, la aprobación final corresponde a tu equipo. Esta matriz orienta la conversación; el alcance y los responsables quedan definidos antes de empezar."
+        },
+        "content_038": {
+          "before": "Nosotros el artículo pilar y el reel; tu equipo el carrusel y las historias, con el mismo brief y el mismo contenido madre. La publicación se reparte por canal.",
+          "after": "Efeonce produce el artículo y el reel; tu equipo desarrolla el carrusel y las historias. Compartimos el brief y los recursos, y asignamos quién publica en cada canal."
+        },
+        "content_039": {
+          "before": "Te entregamos el contenido madre, las cinco piezas terminadas y el calendario. Tu equipo publica, mide y decide el siguiente ciclo con nosotros al lado.",
+          "after": "Efeonce entrega el contenido principal, sus adaptaciones y el calendario. Tu equipo publica y mide los resultados; acordamos las revisiones y el apoyo que necesite para el siguiente ciclo."
+        }
+      }
+    }
+  }
+}

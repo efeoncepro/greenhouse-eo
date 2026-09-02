@@ -128,6 +128,11 @@ Copy the structure from `docs/tasks/TASK_TEMPLATE.md`; never rebuild it from rem
 - Populate only Zones 0, 1, 3, and 4; do not write a plan inside Zone 2.
 - Immediately after writing the task file — and before registry, README, Handoff, or commit — run `pnpm task:lint --task TASK-###`.
 - Register the task only when the summary is exactly compatible with `scanned=1 template=1 legacy=0 errors=0 warnings=0`.
+- ⚠️ **Regla `stale-progress` (desde 2026-09-01).** Avisa cuando una task activa tiene commits
+  `feat/fix/refactor/perf` citando su ID y **CERO checkboxes tildados** (nombra los SHAs), y cuando
+  una en `complete/` no tiene ninguno. **El avance se registra donde se LEE** —`Status real` +
+  checkboxes—, nunca en un `## Delta` de prosa: caso fuente `TASK-1699`, re-ejecutada cinco veces.
+  Un commit de scope `docs` NO cuenta como implementación. Canon: `docs/tasks/TASK_PROCESS.md`.
 - `legacy=1` blocks registration even when errors are zero. Restore the literal markers from the template, then rerun the lint; never normalize this as a harmless outcome.
 
 **Execution profile, UI impact, UI ready, and Backend impact are always written in Status.**

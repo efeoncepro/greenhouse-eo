@@ -18,6 +18,7 @@ import { GreenhouseAsyncActionButton } from '@/components/greenhouse/primitives'
 import type { GreenhouseAsyncActionState } from '@/components/greenhouse/primitives/GreenhouseAsyncActionButton'
 import { GH_GROWTH_SEO_KEYWORDS } from '@/lib/copy/growth'
 import { formatNumber } from '@/lib/format'
+import type { SeoDiscoverySeedSourceAvailability } from '@/lib/growth/seo/keyword-discovery/queue'
 import {
   DEFAULT_DISCOVERY_RESULTS_PER_CALL,
   estimateDiscoveryCost,
@@ -27,7 +28,7 @@ import {
   MAX_SEED_WORDS,
   validateSeedKeyword
 } from '@/lib/growth/seo/keyword-discovery/contracts'
-import type { SeoDiscoveryMethod } from '@/lib/growth/seo/keyword-discovery/contracts'
+import type { SeoDiscoveryMethod, SeoDiscoverySourceKind } from '@/lib/growth/seo/keyword-discovery/contracts'
 
 /**
  * TASK-1665 — Builder de la corrida de descubrimiento.
@@ -58,6 +59,7 @@ const SCOPE_FULL = DEFAULT_DISCOVERY_RESULTS_PER_CALL
  */
 const SEEDS_FIELD_ID = 'seo-discovery-seeds'
 const METHODS_GROUP_ID = 'seo-discovery-methods'
+const SOURCES_GROUP_ID = 'seo-discovery-sources'
 const SCOPE_GROUP_ID = 'seo-discovery-scope'
 
 /** Los tres métodos de EXPANSIÓN que esta lente ofrece. `keywords_for_site` no es uno de ellos. */
@@ -88,8 +90,67 @@ export interface KeywordDiscoveryBuilderProps {
   disabledReason: string | null
   /** Cupo restante del período; `null` = no se pudo resolver. */
   budgetRemainingUsd: number | null
-  onSubmit?: (input: { seeds: string[]; methods: SeoDiscoveryMethod[]; resultsPerCall: number }) => Promise<void>
+  /** Conteos reales de los MISMOS resolvers del encolado; `null` = no se pudo preguntar. */
+  seedSourceAvailability: SeoDiscoverySeedSourceAvailability | null
+  onSubmit?: (input: {
+    seedSource: SeoDiscoverySourceKind
+    seeds: string[]
+    methods: SeoDiscoveryMethod[]
+    resultsPerCall: number
+  }) => Promise<void>
 }
+
+/**
+ * Las cuatro fuentes que el operador puede elegir (TASK-1693).
+ *
+ * `mixed` NO se ofrece: combina manual con una medida y en V1 duplicaría el árbol de decisión
+ * (¿cuál medida?, ¿qué pasa si esa no tiene insumo?) sin resolver ningún caso que las cuatro
+ * simples no cubran. El primitive lo soporta y la ruta lo acepta; la superficie lo deja para
+ * cuando exista la pregunta que lo pide.
+ */
+type DiscoveryCopy = typeof GH_GROWTH_SEO_KEYWORDS.discovery
+
+/** Label y ayuda por fuente, desde el copy ya escrito y hasta hoy sin consumidor. */
+const SOURCE_LABEL: Record<SeoDiscoverySourceKind, (copy: DiscoveryCopy) => string> = {
+  gsc_queries: copy => copy.builder.sourceGsc,
+  tracked_keywords: copy => copy.builder.sourceTracked,
+  manual: copy => copy.builder.sourceManual,
+  target_domain: copy => copy.builder.sourceDomain,
+  mixed: copy => copy.builder.sourceManual
+}
+
+const SOURCE_HELPER: Record<SeoDiscoverySourceKind, (copy: DiscoveryCopy) => string> = {
+  gsc_queries: copy => copy.builder.sourceGscHelper,
+  tracked_keywords: copy => copy.builder.sourceTrackedHelper,
+  manual: copy => copy.builder.sourceManualHelper,
+  target_domain: copy => copy.builder.sourceDomainHelper,
+  mixed: copy => copy.builder.sourceManualHelper
+}
+
+/**
+ * Cuántas seeds aportaría cada fuente HOY. `null` = no aplica o no se pudo preguntar, y entonces
+ * la etiqueta va sin número en vez de mostrar un `0` que se leería como «no hay».
+ */
+const SOURCE_AVAILABLE_COUNT: Record<
+  SeoDiscoverySourceKind,
+  (availability: SeoDiscoverySeedSourceAvailability | null) => number | null
+> = {
+  gsc_queries: availability => availability?.gscQueries ?? null,
+  tracked_keywords: availability => availability?.trackedKeywords ?? null,
+  manual: () => null,
+  target_domain: () => null,
+  mixed: () => null
+}
+
+const SEED_SOURCE_OPTIONS: readonly SeoDiscoverySourceKind[] = [
+  'gsc_queries',
+  'tracked_keywords',
+  'manual',
+  'target_domain'
+]
+
+/** ¿La fuente saca sus seeds del textarea? Sólo `manual`. */
+const usesManualSeeds = (source: SeoDiscoverySourceKind) => source === 'manual' || source === 'mixed'
 
 /**
  * Costos de proveedor: hasta 4 decimales, sin ceros de relleno.
@@ -148,9 +209,11 @@ const KeywordDiscoveryBuilder = ({
   canExecute,
   disabledReason,
   budgetRemainingUsd,
+  seedSourceAvailability,
   onSubmit
 }: KeywordDiscoveryBuilderProps) => {
   const copy = GH_GROWTH_SEO_KEYWORDS.discovery
+  const [seedSource, setSeedSource] = useState<SeoDiscoverySourceKind>('manual')
   const [seedsText, setSeedsText] = useState('')
   const [methods, setMethods] = useState<SeoDiscoveryMethod[]>(['keyword_suggestions', 'related_keywords'])
   const [resultsPerCall, setResultsPerCall] = useState<number>(SCOPE_QUICK)
@@ -191,14 +254,70 @@ const KeywordDiscoveryBuilder = ({
 
   const overSeedLimit = parsed.seeds.length > MAX_DISCOVERY_SEEDS
 
+  /**
+   * Disponibilidad y conteo de seeds POR FUENTE.
+   *
+   * `null` en `seedCount` = no se pudo preguntar (sin permiso de encolar, o la page no resolvió).
+   * `target_domain` no tiene seeds por diseño: el «seed» es el dominio y el único método válido
+   * es `keywords_for_site`.
+   */
+  const sourceSeedCount = useMemo<number | null>(() => {
+    switch (seedSource) {
+      case 'manual':
+      case 'mixed':
+        return Math.min(parsed.seeds.length, MAX_DISCOVERY_SEEDS)
+      case 'gsc_queries':
+        return seedSourceAvailability?.gscQueries ?? null
+      case 'tracked_keywords':
+        return seedSourceAvailability?.trackedKeywords ?? null
+      case 'target_domain':
+        return 0
+      default:
+        return null
+    }
+  }, [seedSource, parsed.seeds.length, seedSourceAvailability])
+
+  const sourceUnavailableReason = useMemo(() => {
+    if (seedSource === 'gsc_queries' && seedSourceAvailability && seedSourceAvailability.gscQueries === 0) {
+      return copy.builder.sourceGscUnavailable
+    }
+
+    if (seedSource === 'tracked_keywords' && seedSourceAvailability && seedSourceAvailability.trackedKeywords === 0) {
+      return copy.builder.sourceTrackedUnavailable
+    }
+
+    return null
+  }, [seedSource, seedSourceAvailability, copy.builder])
+
+  /**
+   * 🔴 `target_domain` fuerza `keywords_for_site` y excluye la expansión.
+   *
+   * Sin keywords seed los métodos por-seed no tienen insumo, y el primitive lo rechaza con
+   * `target_domain_requires_keywords_for_site`. Se restringe ANTES del envío: dejar armar una
+   * combinación que el command va a rebotar convierte un error de diseño de la UI en un rebote
+   * que el operador lee como falla del sistema.
+   */
+  const effectiveMethods = useMemo<SeoDiscoveryMethod[]>(
+    () => (seedSource === 'target_domain' ? ['keywords_for_site'] : methods),
+    [seedSource, methods]
+  )
+
+  /*
+   * ⚠️ El estimador ya NO exige seeds escritas.
+   *
+   * Devolvía `null` con el textarea vacío, así que en `gsc_queries`, `tracked_keywords` y
+   * `target_domain` la banda de costo habría quedado muda — justo en los modos donde el operador
+   * no escribe nada y más necesita saber qué va a pagar antes de confirmar.
+   */
   const estimate = useMemo(() => {
-    if (parsed.seeds.length === 0 || methods.length === 0) return null
+    if (sourceSeedCount === null || effectiveMethods.length === 0) return null
+    if (sourceSeedCount === 0 && seedSource !== 'target_domain') return null
 
     return estimateDiscoveryCost({
-      seedCount: Math.min(parsed.seeds.length, MAX_DISCOVERY_SEEDS),
-      methods: methods.map(method => ({ method, resultsPerCall }))
+      seedCount: sourceSeedCount,
+      methods: effectiveMethods.map(method => ({ method, resultsPerCall }))
     })
-  }, [parsed.seeds.length, methods, resultsPerCall])
+  }, [sourceSeedCount, effectiveMethods, resultsPerCall, seedSource])
 
   // El costo se anuncia por `role='status'` sólo cuando el operador cambió algo, y con debounce:
   // anunciar por cada tecla convertiría al lector de pantalla en ruido continuo.
@@ -236,11 +355,25 @@ const KeywordDiscoveryBuilder = ({
 
   const blockingReason = useMemo(() => {
     if (!canExecute) return disabledReason
-    if (parsed.seeds.length === 0) return copy.disabledReason.noSeeds
-    if (methods.length === 0) return copy.disabledReason.noMethods
+
+    // Una fuente sin insumo NO degrada a `manual` en silencio: se bloquea con su razón. Degradar
+    // dejaría al operador leyendo resultados de otra pregunta creyendo que corrió la suya.
+    if (sourceUnavailableReason) return sourceUnavailableReason
+
+    if (usesManualSeeds(seedSource) && parsed.seeds.length === 0) return copy.builder.seedsErrorEmpty
+    if (effectiveMethods.length === 0) return copy.disabledReason.noMethods
 
     return null
-  }, [canExecute, disabledReason, parsed.seeds.length, methods.length, copy.disabledReason])
+  }, [
+    canExecute,
+    disabledReason,
+    sourceUnavailableReason,
+    seedSource,
+    parsed.seeds.length,
+    effectiveMethods.length,
+    copy.disabledReason,
+    copy.builder.seedsErrorEmpty
+  ])
 
   const handleSubmit = async () => {
     if (!onSubmit || blockingReason) return
@@ -248,7 +381,14 @@ const KeywordDiscoveryBuilder = ({
     setSubmitState('loading')
 
     try {
-      await onSubmit({ seeds: parsed.seeds.slice(0, MAX_DISCOVERY_SEEDS), methods, resultsPerCall })
+      await onSubmit({
+        seedSource,
+        // Las seeds del textarea viajan SÓLO cuando la fuente las usa: mandarlas en `gsc_queries`
+        // haría creer al lector del payload que la corrida partió de ellas.
+        seeds: usesManualSeeds(seedSource) ? parsed.seeds.slice(0, MAX_DISCOVERY_SEEDS) : [],
+        methods: effectiveMethods,
+        resultsPerCall
+      })
       setSubmitState('idle')
     } catch {
       /*
@@ -336,8 +476,76 @@ const KeywordDiscoveryBuilder = ({
             ))}
           </Box>
 
-          {/* ── Métodos + alcance + mercado ── */}
+          {/* ── Fuentes + métodos + alcance + mercado ── */}
           <Stack spacing={4} sx={{ flex: { md: 2 }, minInlineSize: 0 }}>
+            {/* ── Fuente de seed (TASK-1693) ──────────────────────────────────────────────
+                Las cuatro caben como toggles y cada una necesita su ayuda VISIBLE: la
+                diferencia entre ellas es de costo y de calidad de dato, no de preferencia.
+                Un `Select` escondería justo eso detrás de un click. */}
+            <Box>
+              <Typography variant='body2' component='label' id={SOURCES_GROUP_ID} sx={{ fontWeight: 500 }}>
+                {copy.builder.sourcesLabel}
+              </Typography>
+
+              <ToggleButtonGroup
+                exclusive
+                value={seedSource}
+                onChange={(_, next: SeoDiscoverySourceKind | null) => {
+                  if (next) setSeedSource(next)
+                }}
+                aria-labelledby={SOURCES_GROUP_ID}
+                size='small'
+                sx={selectionGroupSx}
+              >
+                {SEED_SOURCE_OPTIONS.map(option => {
+                  /*
+                   * El conteo de insumo viaja en la propia etiqueta.
+                   *
+                   * Sin él, elegir entre «Consultas medidas» y «Keywords seguidas» es a ciegas: las
+                   * dos resuelven sin costo, pero una puede aportar 12 seeds y la otra 2, y eso
+                   * cambia cuánto va a costar la EXPANSIÓN — que es lo que sí se paga. El dato ya
+                   * está resuelto server-side por los mismos resolvers del encolado, así que
+                   * mostrarlo no cuesta una lectura más.
+                   */
+                  const available = SOURCE_AVAILABLE_COUNT[option](seedSourceAvailability)
+
+                  return (
+                    <ToggleButton key={option} value={option} title={SOURCE_HELPER[option](copy)}>
+                      {SOURCE_LABEL[option](copy)}
+                      {available === null ? null : (
+                        /*
+                         * ⚠️ SIN `opacity` para de-enfatizar.
+                         *
+                         * La primera versión usaba `opacity: 0.75` y axe la marcó `color-contrast`
+                         * serious en los seis frames: 3.14:1 contra el 4.5 exigido. Bajarle opacidad
+                         * a un texto es exactamente cómo se rompe el contraste sin darse cuenta —
+                         * el color heredado ya distingue al conteo por su posición y el separador.
+                         */
+                        <Box component='span' sx={{ marginInlineStart: 2, fontVariantNumeric: 'tabular-nums' }}>
+                          · {available}
+                        </Box>
+                      )}
+                    </ToggleButton>
+                  )
+                })}
+              </ToggleButtonGroup>
+
+              {/* La ayuda de la fuente ELEGIDA, siempre visible: es donde se dice si resolver
+                  cuesta y de dónde sale el dato. En el `title` sola no la lee nadie en móvil. */}
+              <Typography variant='caption' color='text.secondary' sx={{ display: 'block', marginBlockStart: 1 }}>
+                {SOURCE_HELPER[seedSource](copy)}
+              </Typography>
+
+              {/* Una fuente sin insumo se dice con su razón y bloquea el envío. NUNCA se degrada
+                  a `manual` en silencio ni se esconde la opción: esconderla impide entender por
+                  qué no está disponible. */}
+              {sourceUnavailableReason ? (
+                <Typography variant='caption' color='error.main' sx={{ display: 'block', marginBlockStart: 1 }}>
+                  {sourceUnavailableReason}
+                </Typography>
+              ) : null}
+            </Box>
+
             <Box>
               <Typography variant='body2' component='label' id={METHODS_GROUP_ID} sx={{ fontWeight: 500 }}>
                 {copy.builder.methodsLabel}

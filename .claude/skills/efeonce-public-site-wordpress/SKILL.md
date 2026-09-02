@@ -38,7 +38,10 @@ Read the minimal set:
 | --- | --- |
 | Any public landing visual/content work | `references/landing-workflow.md` + `references/landing-registry.md` + the landing file under `references/landings/` |
 | New or unregistered landing | `references/landing-workflow.md` + `references/landing-registry.md` |
+| Home copy, comparison, FAQ emphasis or final editorial review | `references/home-editorial-maintenance.md` + `references/landings/home-claude-design-preview.md`; compose with `copywriting` and the typography skill |
 | Elementor mutation / page-scoped CSS | `references/elementor-mutation.md` |
+| Native Ohio navigation, menu label/link or hierarchy | `references/native-navigation.md` + the destination landing reference |
+| Home/landing SEO, Yoast metadata, social previews or schema ownership | `../seo-aeo/references/home-landing-metadata-schema.md` + the landing reference; add `references/elementor-mutation.md` only for Elementor writes |
 | Growth Forms or public form embed | `references/growth-forms-wordpress.md` |
 | Measurement/tagging (GTM containers, dataLayer, GA4 events on the site) | `docs/reference/measurement-gtm-ga4/` (start with `04-greenhouse-gh-event-convention.md`; live container `GTM-NGHPGRLZ`) |
 | AI Content Factory, Gutenberg posts, draft/private clones | `references/content-factory-gutenberg.md` |
@@ -48,12 +51,16 @@ Read the minimal set:
 | Post-publication sitemap, GSC observation, indexing request or Platform Properties | `references/agentic-blogpost-end-to-end.md` + `.codex/skills/seo-aeo/references/google-search-console-api-indexing.md` |
 | Direct SVG infographics, `<picture>`, Media Library, ALT/long description, featured/OG raster | `references/content-factory-gutenberg.md` + `.codex/skills/seo-aeo/references/editorial-image-seo.md` |
 | Custom Elementor widget/plugin work | `references/custom-elementor-widgets.md` |
+| Claude Design → modular Elementor, Home, brand marks, rails, linked cards, or video dialog | `references/source-led-elementor-patterns.md` + the landing reference; add mutation/custom-widget references when writing |
 | Historical layout incident or older public page | `references/layout-incidents.md` |
 | Runtime discovery, bridge inspection, repo binding, Kinsta/WP inventory | `references/runtime-and-discovery.md` |
+| 404, search/no-results, category/tag/author/date archives, impossible pagination or empty taxonomy | `references/miscellaneous-surfaces.md` + `references/runtime-and-discovery.md`; add the SEO technical module when robots, canonical, schema, or indexability changes |
 | Demo 35 / future blog home | `references/landing-workflow.md` + `references/elementor-mutation.md` + `references/landings/demo35-blog-magazine.md` |
 | AEO `/aeo-2/` | `references/landings/aeo.md` |
 | Agencia Creativa `/agencia-creativa/` | `references/landings/agencia-creativa.md` |
 | HubSpot services `/servicios-contratar-hubspot/` | `references/landings/hubspot-services.md` |
+| Home `/` (former Claude Design preview) | `references/landings/home-claude-design-preview.md`; verify current CMS identity/hash before writes |
+| Content Marketing / Content Ops `/servicio-marketing-de-contenidos/` | `references/landings/content-marketing.md` + `references/source-led-elementor-patterns.md` |
 
 If several domains apply, load the smallest union. Do not preload every reference.
 
@@ -65,6 +72,10 @@ Use repo docs as source of truth for long-lived contracts:
 - `docs/operations/discovery-public-website-elementor-20260614.md`
 - `docs/documentation/public-site/wordpress-ohio-elementor-layout.md`
 - `docs/documentation/public-site/wordpress-blog-content-hub-search.md`
+- `docs/architecture/public-site/PUBLIC_MISCELLANEOUS_SURFACES_V1.md`
+- `docs/audits/public-site/2026-08-31-wordpress-miscellaneous-surfaces-discovery.md`
+- `docs/documentation/public-site/public-miscellaneous-surfaces.md`
+- `docs/manual-de-uso/public-site/operar-paginas-miscelaneas.md`
 - `docs/audits/public-site/2026-07-09-demo35-blog-magazine-layout-review.md`
 - `docs/audits/public-site/2026-08-22-demo35-elementor-runtime-contract.md`
 - `docs/manual-de-uso/public-site/operar-wordpress-blog-content-hub-search.md`

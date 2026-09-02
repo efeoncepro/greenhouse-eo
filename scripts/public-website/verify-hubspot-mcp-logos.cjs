@@ -1,0 +1,52 @@
+/** Public-renderer check for the AEO assets reused on MCP. --preview replaces only local HubSpot assets. */
+const fs = require('fs');
+const path = require('path');
+const assert = require('assert/strict');
+
+const {chromium} = require('playwright');
+const {JSDOM} = require('jsdom');
+
+
+
+
+
+
+
+
+
+
+const preview=process.argv.includes('--preview'),url='https://efeoncepro.com/servicios-contratar-hubspot/',root=path.resolve('../efeonce-public-site-runtime/wp-content/plugins/eo-elementor-widgets'),out='.captures/hubspot-mcp-logos-20260831';
+
+fs.mkdirSync(out,{recursive:true});
+(async()=>{const b=await chromium.launch(),p=await b.newPage({viewport:{width:1414,height:909}}),errors=[],states=[];
+
+p.on('pageerror',e=>errors.push(e.message));
+
+try{if(preview){const d=new JSDOM(await(await fetch(url)).text()).window.document,l=new JSDOM(fs.readFileSync('tmp/hubspot-mcp-logos/rendered.html','utf8')).window.document;
+
+d.querySelector('[data-hubspot-module="hubs"]').innerHTML=l.querySelector('[data-hubspot-module="hubs"]').innerHTML.replaceAll('http://127.0.0.1:8768','https://efeoncepro.com/wp-content/plugins/eo-elementor-widgets');await p.route(url,r=>r.fulfill({contentType:'text/html',body:d.documentElement.outerHTML}));await p.route('**/assets/css/hubspot-elementor.css*',r=>r.fulfill({path:root+'/assets/css/hubspot-elementor.css',contentType:'text/css'}));}
+
+assert.equal((await p.goto(url,{waitUntil:'domcontentloaded'})).status(),200);await p.evaluate(()=>document.fonts.ready);assert.equal(await p.title(),'Implementación y operación de HubSpot | Efeonce');const tile=p.locator('[data-hsx-tabs="hubs"] [data-hsx-select="12"]'),panel=p.locator('[data-hsx-tabs="hubs"] [data-hsx-panel="12"]');
+
+for(const width of [1414,878,390]){await p.setViewportSize({width,height:909});await p.mouse.move(16,890);await p.waitForFunction(()=>document.documentElement.scrollWidth===innerWidth,null,{timeout:8000});
+
+for(const motion of ['no-preference','reduce']){await p.emulateMedia({reducedMotion:motion});await tile.click();await p.waitForTimeout(350);assert.equal(await panel.isVisible(),true);assert.equal(await tile.getAttribute('aria-pressed'),'true');for(const target of [tile,panel]){assert.deepEqual(await target.locator('.hsx-mcp-brands img').evaluateAll(es=>es.map(e=>e.alt)),['ChatGPT','Claude','Gemini']);await target.scrollIntoViewIfNeeded();await target.locator('.hsx-mcp-brands img').evaluateAll(es=>Promise.all(es.map(img=>new Promise((resolve,reject)=>{if(img.complete&&img.naturalWidth)return resolve();img.addEventListener('load',resolve,{once:true});img.addEventListener('error',reject,{once:true});}))));}
+
+const g=await tile.evaluate(e=>{const logos=e.querySelector('.hsx-mcp-brands').getBoundingClientRect(),number=e.firstElementChild.getBoundingClientRect(),text=e.children[2].getBoundingClientRect();
+
+return {labelOverlap:logos.bottom>text.top,numberOverlap:logos.left<number.left+24,rightOverflow:logos.right>e.getBoundingClientRect().right}});
+
+assert.deepEqual(g,{labelOverlap:false,numberOverlap:false,rightOverflow:false});assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth===innerWidth),true);const a=await tile.locator('.hsx-mcp-brands img').evaluateAll(es=>es.map(e=>e.src)),z=await panel.locator('.hsx-mcp-brands img').evaluateAll(es=>es.map(e=>e.src));
+
+assert.deepEqual(a,z);states.push({width,motion,passed:true});if(motion==='no-preference'){await tile.screenshot({path:`${out}/${preview?'preview':'live'}-tile-${width}.png`});await panel.screenshot({path:`${out}/${preview?'preview':'live'}-panel-${width}.png`});}}
+}
+
+await tile.focus();await p.keyboard.press('ArrowRight');assert.equal(await panel.isVisible(),false);await p.keyboard.press('ArrowLeft');assert.equal(await panel.isVisible(),true);assert.deepEqual(errors,[]);
+
+if(!preview){const n=await b.newPage({javaScriptEnabled:false});
+
+await n.goto(url);assert.equal(await n.locator('[data-hsx-panel="12"] .hsx-mcp-brands img:visible').count(),3);await n.close();}
+
+const r={status:'PASS',mode:preview?'preview':'live',states,keyboard:true,errors,checkedAt:new Date().toISOString()};
+
+fs.writeFileSync(`${out}/${r.mode}.json`,JSON.stringify(r,null,2));console.log(r);}finally{await b.close();}})().catch(e=>{console.error(e);process.exitCode=1});

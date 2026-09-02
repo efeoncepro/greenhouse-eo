@@ -2,9 +2,9 @@
 
 Snapshot documental independiente del conocimiento y del contrato conversacional observado en el Customer Agent de ANAM, portal HubSpot `19893546`.
 
-- Agente: `Agente de clientes de ANAM`
-- Fecha de verificación live: `2026-07-17`
-- Última publicación de directrices observada: `2026-07-16 03:56 GMT-4`
+- Agente: `Emma` (nombre anterior: `Agente de clientes de ANAM`)
+- Fecha de verificación live: `2026-09-01`
+- Última publicación de directrices observada: `2026-09-01`
 - Alcance de fuentes en uso: `23` (`6` archivos privados + `17` respuestas cortas)
 - Landing pages en uso: `0`
 - URL importadas en uso: `0`
@@ -13,13 +13,25 @@ Snapshot documental independiente del conocimiento y del contrato conversacional
 
 ## Estado runtime observado
 
-La configuración, las 23 fuentes y el canal continúan presentes, pero HubSpot mostró el 17 de julio de 2026:
+El bloqueo administrativo observado el 17 de julio de 2026 es histórico. El readback autenticado del 24 de julio
+confirmó el agente operativo, con 23 fuentes, live chat activo y 33.000 créditos por ciclo. El 1 de septiembre se
+guardó y publicó la identidad `Emma`: la vista de identidad mostró `Agente de clientes, Emma`, el preview respondió
+`Hola, soy Emma.` y la pantalla de directrices quedó en `Borrador (0)` con el saludo publicado
+`¡Hola! 👋 Soy Emma, de ANAM. ¿En qué te puedo orientar?`.
 
-> El acceso gratuito terminó. Agente de clientes está en pausa.
+La edición de identidad no modificó personalidad (`Amigable`), idioma, conocimiento, permisos ni acciones. Más
+tarde el mismo 1 de septiembre, la matriz de handoff autorizada se publicó por separado mediante el workflow de
+tickets `1876744588` y se verificó con tres conversaciones públicas E2E. El contrato y la evidencia viven en
+`07-identidad-directrices-handoff-y-canales.md` y
+`docs/audits/ANAM_CUSTOMER_AGENT_HANDOFF_E2E_QA_2026-09-01.md`.
+La secuencia técnica exacta del workflow vive en
+[`../anam-customer-agent-handoff-workflow-1876744588.md`](../anam-customer-agent-handoff-workflow-1876744588.md),
+y su explicación funcional para ANAM en
+[`../../../../documentation/hubspot-as-a-service/anam-customer-agent-handoff-workflow-functional.md`](../../../../documentation/hubspot-as-a-service/anam-customer-agent-handoff-workflow-functional.md).
 
-También mostró `Las nuevas conversaciones están en pausa` y el botón `Reanudar` deshabilitado. La revisión de Cuenta y facturación confirmó `33.000` créditos mensuales contratados, pero también una cuenta vencida y la factura `#760627868`, emitida el `2026-05-08`, vencida desde el `2026-06-07`. El usuario operador tiene acceso restringido a facturación. Dos intentos aprobados de activar `Uso de créditos` llegaron a la confirmación de HubSpot y ambos fueron rechazados por el backend con `No se pudo reanudar el uso de Agente de clientes`.
-
-Por tanto, el bloqueo no es ausencia de knowledge ni falta nominal de créditos: es un bloqueo administrativo de cuenta/facturación. Mientras persista, el agente no atiende conversaciones nuevas. Un administrador de facturación de ANAM debe regularizar la factura y luego reactivar `Uso de créditos`; el operador de Efeonce debe leer de vuelta el toggle `ACTIVADA`, reanudar el agente y verificar el canal. Este pack no autoriza pagar ni modificar suscripciones.
+El preflight de publicación conservó dos advertencias preexistentes sobre la promesa `Registraré tu consulta`;
+deben resolverse en un cambio separado y con regresión conversacional, no dentro de la actualización de identidad
+o routing.
 
 ## Contenido
 

@@ -6,7 +6,7 @@
 - Priority: `P2`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `En producción — 27 hijas complete (conteo verificado 2026-08-28), 8 crons activos (ops-seo-competitor-coverage ENABLED con el release c983be7f18e6)`
+- Status real: `En producción — 36 hijas complete, 39 abiertas (1 in-progress + 38 to-do); conteo medido 2026-09-01 por campo `Epic:`, 8 crons activos (ops-seo-competitor-coverage ENABLED con el release c983be7f18e6)`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `Julio Reyes`
@@ -57,7 +57,8 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 > y `1651`, más cuatro rutas que apuntaban a `to-do/`/`in-progress/` de tasks ya movidas a
 > `complete/` (un link roto en Normative Docs deja al agente sin poder leer su referencia).
 >
-> Estado real: **de las 15 abiertas, 11 se pueden tomar ya**; las 4 restantes esperan sólo a otras
+> Estado real (nota fechada 2026-08-08 — **stale**: hoy son 39 abiertas, medido 2026-09-01):
+> **de las 15 abiertas de entonces, 11 se podían tomar ya**; las 4 restantes esperan sólo a otras
 > abiertas (`1313`←1311+1312 · `1314`←1312+1313 · `1316`←1315 · `1317`←1315+1316), más `1660`←1659
 > del carril de objetivos. `TASK-1310` (dashboard cliente) ya está **in-progress**.
 >
@@ -68,8 +69,8 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 > también queda `Blocked by: none`. Con eso el carril de objetivos ya no espera backend: sólo falta
 > su superficie.
 >
-> **Actualización 2026-08-28:** `TASK-1662` (keyword gap) quedó **implementada** (Slices 1–3 +
-> federación MCP) y sigue `in-progress` sólo por su Slice 4 (bloqueado por `TASK-1700`) y el cierre
+> **Actualización 2026-08-28 (corregida 2026-09-01: `TASK-1662` ya está `complete`):** `TASK-1662`
+> (keyword gap) quedó **implementada** (Slices 1–3 + federación MCP); cerró con su Slice 4 (bloqueado por `TASK-1700`) y el cierre
 > operativo post-release. El rollout está verificado con competidor real (Berel MX → `comex.com.mx`):
 > primera corrida de cobertura por USD 0,1076 con Δ exacto en el ledger (697 filas + 640 de mercado
 > gratis) y gap real medido — 357 `content_gap` / 54 `ranks_worse` / 269 excluidas por GSC. El flag
@@ -129,6 +130,7 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1299` — schema `growth.seo` (targets, keyword_sets, competitors, snapshots append-only) — bloqueador fundacional.
 - `TASK-1300` — DataForSEO family registry (ampliar allowlist + breaker + cost por familia) — bloquea todo lo provider-facing.
 - `TASK-1301` — capabilities `growth.seo.*` + entitlement per-org + chokepoint `enforceSeoRunEntitlement`.
+- `TASK-1797` — política del umbral de impresiones del striking-distance: se declara relativa (`max(piso, p75)`) y el percentil cae sobre el piso en las dos orgs medidas. Detalle en el carril de instrumentación y autoridad de orden, más abajo.
 - `TASK-1302` — [planificada] GSC daily snapshot materializer + `readKeywordOpportunities` (quick win, reusa TASK-1282).
 - `TASK-1303` — [**complete 2026-08-06**, en producción] rank capture command + `readRankEvolution` + Cloud Scheduler + reactive BQ mirror. Release `fcee5ab9f7ce` (manifest released); scheduler `ops-seo-rank-capture` diario 05:00 CLT ACTIVO; serie día-1 de Berel con 31 keywords; señal `seo.rank.capture_lag` en Growth Health; 4.ª MCP tool `get_seo_rank_evolution` viva en el MCP interno de producción (federación al gateway = TASK-1653).
 - `TASK-1304` — [planificada] site audit (queue+poll OnPage) + backlink snapshot.
@@ -141,7 +143,7 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 > |---|---|---|
 > | ¿Qué empujo de lo que ya tengo? | GSC medido | **construida** (TASK-1308) |
 > | ¿Dónde quiere estar el cliente? | **declarado por humano** | `TASK-1659` (**complete 2026-08-14**, el eje ya existe en el command) + `TASK-1660` (superficie) |
-> | ¿Qué me pierdo entero? | competencia + Labs | `TASK-1661` + `TASK-1662` (**en producción 2026-08-28**, release `c983be7f18e6`; Slice 4 pendiente) |
+> | ¿Qué me pierdo entero? | competencia + Labs | `TASK-1661` + `TASK-1662` (**`complete` 2026-08-29**; Slice 4 —acople con la cola— verificado con 200 items reales en el snapshot de `seot-berel-mx`) |
 >
 > La segunda es la que ancla comercialmente a las otras dos, porque es el compromiso con el cliente
 > y el material del QBR. Y **Search Console es estructuralmente ciego** a las dos últimas: sin top
@@ -153,7 +155,7 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1659` — [**complete 2026-08-14**, backend-data] modelo de **intención** en el set monitoreado: objetivo declarado vs oportunidad detectada, con autoría. `source` (TASK-1308) es procedencia, no intención. Append-only: cambiar la intención cierra y abre, nunca `UPDATE` — outcome propio `intent_changed`, que **no consume cupo** del techo. `intent` (`target` | `opportunity`) **sin default**: quien no declara escribe `NULL` y no existe un tercer valor "desconocido"; `intentDeclaredBy` separa a quien asumió el compromiso de quien ejecutó el INSERT. Migración `20260814221022082`. Parity en las 3 lanes (app · ecosystem · MCP `track_seo_keywords`) con vocabulario validado en cada frontera; **sin capability, scope ni flags nuevos**. **Desbloquea `1660`.**
 - `TASK-1660` — [planificada, ui-ux] lente **Objetivos** sobre `/admin/growth/seo/keywords` — extiende el **nodo S3** del master UI flow. Full API Parity al revés: `trackKeywords` **ya** acepta keywords que el cliente no rankea y no tiene botón, y desde `TASK-1659` acepta además la **intención declarada**. **`Blocked by: none`** desde el cierre de `TASK-1659` (2026-08-14).
 - `TASK-1661` — [**complete 2026-08-13**, backend-data] volumen y **barrera de enlaces** por keyword. Trae el dato de mercado desde DataForSEO Labs (`keyword_overview`) a la tabla append-only `seo_keyword_market_data`, con país, idioma y `captured_at` en la clave; `readKeywordOpportunities` deja de cablear `market: 'unavailable'` y la tabla de `TASK-1308` muestra las columnas **sin cambio de código en la UI**. Captura **mensual** (el proveedor refresca una vez al mes), acotada al set monitoreado, con dry-run de costo previo. Costo real medido: **USD ~0.02/org/mes**. Tool MCP `get_seo_keyword_market_data` + federación al gateway en el mismo cierre. **Desbloquea `1660`/`1662`/`1664`.**
-- `TASK-1662` — [**en producción 2026-08-28** (release `c983be7f18e6`), backend-data; `in-progress` sólo por Slice 4 —bloqueado por `TASK-1700`—] **keyword gap**: qué gana la competencia donde el cliente es invisible. La superficie va aparte. Competidores **declarados con autoría** (`seo_competitors`, migración `20260828113457119`), commands `declareCompetitors`/`retireCompetitors` en 3 lanes + tools MCP `declare/retire_seo_competitors` y `get_seo_keyword_gap`, cobertura `domain_intersection` con run ledger y gap **derivado al leer** (`readKeywordGap`, sin orden propio). Rollout verificado con competidor real (Berel MX → `comex.com.mx`): primera corrida USD 0,1076, 697 filas + 640 de mercado gratis, gap 357 `content_gap` / 54 `ranks_worse` / 269 excluidas por GSC medido. Flag `GROWTH_SEO_COMPETITOR_GAP_ENABLED` ON declarativo en `deploy.sh` (efectivo con el primer deploy del worker post-release; scheduler `ops-seo-competitor-coverage` pausado hasta entonces). Escribe en la **misma** tabla de mercado — es multi-productor por diseño, nunca un segundo almacén (productor #4).
+- `TASK-1662` — [**`complete` 2026-08-29** (Slices 1–3 en producción desde `c983be7f18e6`; Slice 4 verificado: el origen `competitor_gap` entrega 200 items `ok` en la cola), backend-data] **keyword gap**: qué gana la competencia donde el cliente es invisible. La superficie va aparte. Competidores **declarados con autoría** (`seo_competitors`, migración `20260828113457119`), commands `declareCompetitors`/`retireCompetitors` en 3 lanes + tools MCP `declare/retire_seo_competitors` y `get_seo_keyword_gap`, cobertura `domain_intersection` con run ledger y gap **derivado al leer** (`readKeywordGap`, sin orden propio). Rollout verificado con competidor real (Berel MX → `comex.com.mx`): primera corrida USD 0,1076, 697 filas + 640 de mercado gratis, gap 357 `content_gap` / 54 `ranks_worse` / 269 excluidas por GSC medido. Flag `GROWTH_SEO_COMPETITOR_GAP_ENABLED` ON declarativo en `deploy.sh` (efectivo con el primer deploy del worker post-release; scheduler `ops-seo-competitor-coverage` pausado hasta entonces). Escribe en la **misma** tabla de mercado — es multi-productor por diseño, nunca un segundo almacén (productor #4).
 
 ### Carril de discovery y acción diaria (creado 2026-08-08)
 
@@ -204,14 +206,14 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1677` — [**complete**, backend-data] Cierre de la fase **contract** del cutover `seo_v1 → seo_v2`; la ventana expand/contract dejó de estar abierta. Se lista acá para cerrar el denominador del epic (lo declaraba en su campo `Epic:` y no figuraba en esta lista).
 - `TASK-1690` — [creada 2026-08-13, backend-data] **La superficie cliente sirve a la POBLACIÓN, no al tenant con historia.** La página decide si hay datos con GSC y calcula el KPI principal con rank snapshots: una organización con Search Console conectado y captura de rank sin correr —el día 1 de todo cliente nuevo— ve el KPI en "sin dato" con el Quadrant poblado debajo. Invisible hasta hoy porque la superficie tiene UNA organización cliente y tiene ambas fuentes. Expone la cobertura por fuente en el contrato + familia de fixtures por estado + guard anti-reincidencia. Sin migración. Sale del cierre de `TASK-1310`.
 - `TASK-1691` — [creada 2026-08-13, ui-ux] **Declarar la lente estimada y su fecha de captura en la tabla de oportunidades.** Cierra `ISSUE-154`: cuando `market === 'available'` la pantalla renderiza Volumen y Barrera de enlaces **sin leyenda de origen y sin `capturedAt`** — la nota `● Medido · Search Console` sólo aparece en el caso `'unavailable'`. El §8 del master flow pide leyenda persistente y as-of explícito para lo estimado; el as-of ya viaja en el contrato programático, sólo falta la superficie.
-- `TASK-1658` — [**code complete 2026-08-27, rollout pendiente**, backend-data] drift de federación MCP + punto ciego del guard de paridad: el drift había crecido de 3 a 8 tools mientras esperaba. Ejecutada: guard de paridad **bidireccional** en el gateway (espejo `GREENHOUSE_SEO_TOOL_INVENTORY` + paridad de schema + annotations, probado ROJO contra el drift real: 29 findings) + federación de las 8 (inventario 21 = 16 lecturas + 5 escrituras; `run_seo_prospect_diagnostic` como 4.º write bajo `efeonce.mcp.seo.write`, fail-closed hasta TASK-1631) + cierre de 9 divergencias de schema vivas (`intent` de TASK-1659 y `market` en 5 lecturas, entre otras) + canary de las 21. 4 commits locales en `efeonce-mcp` sin push; deploy del gateway post-release develop→main (`tools/list` 13→21). El espejo es interino hasta `TASK-1780`.
+- `TASK-1658` — [**code complete 2026-08-27, rollout pendiente**, backend-data] drift de federación MCP + punto ciego del guard de paridad: el drift había crecido de 3 a 8 tools mientras esperaba. Ejecutada: guard de paridad **bidireccional** en el gateway (espejo `GREENHOUSE_SEO_TOOL_INVENTORY` + paridad de schema + annotations, probado ROJO contra el drift real: 29 findings) + federación de las 8 (inventario 21 = 16 lecturas + 5 escrituras; `run_seo_prospect_diagnostic` como 4.º write bajo `efeonce.mcp.seo.write`, fail-closed hasta TASK-1631) + cierre de 9 divergencias de schema vivas (`intent` de TASK-1659 y `market` en 5 lecturas, entre otras) + canary de las 21. 4 commits locales en `efeonce-mcp` sin push; deploy del gateway post-release develop→main (`tools/list` 13→21). El espejo **dejó de existir**: `TASK-1780` (complete 2026-08-31) hizo que el guardia derive su inventario del manifiesto canónico de Greenhouse, que viaja como artefacto generado con hash.
 
 - `TASK-1305` — [planificada] `readSeoAeoGap` derived read cross-módulo (report layer).
 - `TASK-1306` — [**complete 2026-08-06**, ui-ux] SEO Overview operador `/admin/growth/seo` — **la primera superficie visible del módulo (nodo S1 del master UI flow)**. Guard de 3 puertas (viewCode `administracion.growth_seo` + capability `growth.seo.observation.read` + `module_assignment` per-org), sección local "Search Visibility" con el conmutador a las hermanas, 4 KPIs norte (posición con semántica invertida), curva de visibilidad en 2 charts apilados y sidebar salud/movers/cruce AEO que degrada por región. MCP tool `get_seo_overview_kpis` + lane `/api/platform/ecosystem/growth/seo/overview-kpis` en el mismo PR. **Code complete en `develop`; promoción a `main` pendiente** (mientras viva sólo en `develop`, `syncViewRegistry` de producción vuelve a apagar el viewCode recién sembrado).
 - `TASK-1307` — [**complete 2026-08-07**, ui-ux] ★ Rank & URL performance over time `/admin/growth/seo/performance` — nodo S2, la pantalla ancla. Comparación de hasta 8 URLs o keywords con eje de posición invertido declarado en palabras, cobertura explícita ("N de M días con medición"), huecos que cortan la línea en vez de rellenarse con cero, y la fuente nombrada (◑ exacta de mercado vs ● medida de Search Console, nunca promediadas). Primer consumer de **ECharts** del repo — la decisión de librería del módulo. Su tab quedó habilitada; la spec vive en `docs/tasks/complete/`.
 - `TASK-1308` — [**complete 2026-08-07**, ui-ux + command] Keyword opportunities `/admin/growth/seo/keywords` — **nodo S3 del master UI flow**. Nació declarada `Backend impact: none` y terminó construyendo el command que la spec daba por hecho: **`trackKeywords` no existía** (`seo_keyword_sets`/`_members` sólo las escribían dos scripts de seed), y su reverso `untrackKeywords` tampoco. Seguir una keyword es un **compromiso de gasto diferido** —el rank capture diario paga al proveedor por cada keyword vigente, todos los días— así que el command nace con techo gobernado por target (`capacity_exceeded` explícito, nunca silencio), entitlement per-org y **outcome por keyword**, que es lo único que distingue "agregué 3" de "rebotaron 40 contra el techo". La UI: banda de veredicto que es leyenda y filtro a la vez, mapa **medido** (posición × impresiones; el encoding del wireframe —dificultad × volumen × intención— no tiene fuente y no la tendrá: el dato de mercado será columna y filtro, nunca eje), tabla con `DataTableShell` + transformación a cards en 390px, export CSV del subconjunto filtrado, filtros en la URL y drill a Rendimiento. Lane `app` + lane `ecosystem` + 2 tools MCP (`track_seo_keywords`/`untrack_seo_keywords`) en el mismo PR con **scope propio de escritura** `efeonce.mcp.seo.write` — un binding cliente lee sus oportunidades pero no hace crecer su propia factura. **Pendiente de rollout, no de código:** el scope existe en Entra pero no está cableado a ningún cliente y el commit de federación del gateway sigue sin publicar → las 2 tools responden `insufficient_scope` (fail-closed por diseño).
 - `TASK-1309` — [**COMPLETE 2026-08-08**, ui-ux] Site audit `/admin/growth/seo/audit` — **nodo S4**, la cuarta tab: con ella el conmutador de "Search Visibility" queda completo. Salud con frescura explícita, issues como **lista priorizada** (no tabla plana) ordenada por severidad ▸ alcance × valor de búsqueda ÷ esfuerzo, drill `?issueGroup=` con las URLs, y "Correr auditoría" gobernada. Tres correcciones de honestidad que salieron de mirar la pantalla: el conteo de páginas declara cuándo es **el techo del crawl** y no el sitio; los checks de performance declaran que son **laboratorio** (Google rankea con campo); y el puntaje explica su alcance, porque "95 de salud" junto a "519 issues" se lee como contradicción cuando en realidad no miden lo mismo (el puntaje es del proveedor, el conteo es de nuestro catálogo). **Cerrada 2026-08-08**: el gap de viewCodes de TASK-1310 lo cerró su migración de catálogo, y el gate completo quedó verde — `pnpm test` 10377/0, `pnpm build` de producción, `ui:quality` PASS 4.63, reachability 0 huérfanas. **Con ella el conmutador de Search Visibility queda completo: las 4 tabs del operador navegan.**
-- `TASK-1670` — [creada 2026-08-08, backend-data/integration] **Hallazgos de sitio en el audit: crawlers de IA, JSON-LD y sitemap.** El audit es passthrough de OnPage y no ve tres cosas de Capa 1. Los tres probes ya existen probados en el grader (`TASK-1266`), pero **no se mueven**: la primera versión de la task proponía extraer el sustrato y la medición la desmintió — `contracts`/`safe-fetch`/`html` los consumen **23 archivos** del probe layer, así que mover era re-apuntar la fundación de un motor con 643 tests a cambio de ubicación. En su lugar AEO declara una **superficie pública** (un archivo nuevo, cero ediciones) y el collect la consume como hallazgos de **sitio**, detrás de flag. Cierra el punto ciego más caro: hoy un sitio que bloquea `OAI-SearchBot`/`PerplexityBot`/`ClaudeBot` puntúa 95/100 y se presenta como sano (−23,1% de tráfico medido, Rutgers/Wharton dic-2025). Prerequisito del entregable descargable de la auditoría: un artefacto con nuestro nombre no debe declarar sano un sitio invisible para la IA. Fuera de alcance `core_web_vitals` (Lighthouse = laboratorio) y `llms-txt` (ROI marginal). Follow-up sin fecha y sin task: si algún día se reorganiza, el hogar del sustrato compartido es el paraguas **`search-visibility/`** —SEO y AEO como sus dos motores— no un genérico; merece su propio ADR. *(Superado por `TASK-1697`, 2026-08-27: el sustrato SÍ se extrajo — `git mv` de `safe-fetch`/`html`/`contracts` a `src/lib/growth/site-substrate/` con re-export shims, ningún consumer AEO cambió y `probes/**` quedó privado tras la rule `greenhouse/growth-substrate-boundary`. Esta task quedó desbloqueada y consume el barrel `@/lib/growth/site-substrate` — ver los Deltas 2026-08-15/27 en su spec.)*
+- `TASK-1670` — [creada 2026-08-08, backend-data/integration] **Hallazgos de sitio en el audit: crawlers de IA, JSON-LD y sitemap.** El audit es passthrough de OnPage y no ve tres cosas de Capa 1. Los tres probes ya existen probados en el grader (`TASK-1266`), pero **no se mueven**: la primera versión de la task proponía extraer el sustrato y la medición la desmintió — `contracts`/`safe-fetch`/`html` los consumen **23 archivos** del probe layer, así que mover era re-apuntar la fundación de un motor con 643 tests a cambio de ubicación. En su lugar AEO declara una **superficie pública** (un archivo nuevo, cero ediciones) y el collect la consume como hallazgos de **sitio**, detrás de flag. Cierra el punto ciego más caro: hoy un sitio que bloquea `OAI-SearchBot`/`PerplexityBot`/`ClaudeBot` puntúa 95/100 y se presenta como sano (−23,1% de tráfico medido, Rutgers/Wharton dic-2025). Prerequisito del entregable descargable de la auditoría: un artefacto con nuestro nombre no debe declarar sano un sitio invisible para la IA. Fuera de alcance `core_web_vitals` (Lighthouse = laboratorio) y `llms-txt` (ROI marginal). Follow-up sin fecha y sin task: si algún día se reorganiza, el hogar del sustrato compartido es el paraguas **`search-visibility/`** —SEO y AEO como sus dos motores— no un genérico; merece su propio ADR. *(Superado por `TASK-1697`, 2026-08-27: el sustrato SÍ se extrajo — `git mv` de `safe-fetch`/`html`/`contracts` a `src/lib/growth/site-substrate/` con re-export shims, ningún consumer AEO cambió y `probes/**` quedó privado tras la rule `greenhouse/growth-substrate-boundary`. Esta task quedó desbloqueada y consume el barrel `@/lib/growth/site-substrate` — ver los Deltas 2026-08-15/27 en su spec.) **✅ EJECUTADA 2026-09-01, y cerrada como `code complete, rollout pendiente`: el flag `GROWTH_SEO_SITE_FINDINGS_ENABLED` queda OFF, así que el punto ciego que esta task describe SIGUE ABIERTO hasta el flip con `TASK-1671` — el merge no lo cerró.** El juicio vive en `growth/seo/site-audit/site-findings.ts` (cero archivos tocados en `ai-visibility/**`; motor AEO 716/716 verde) y separa retrieval (`critical`) de training (`notice` con lectura de postura, nunca `critical`), agrega el chequeo de borde/WAF con nuestro propio token variado, y marca el alcance con una columna `finding_scope`. La verificación con red real contra 6 dominios encontró un falso positivo invisible para los tests con mocks: un `robots.txt` que nos prohíbe la ruta se reportaba como sitemap roto.*
 - `TASK-1672` — [creada 2026-08-08, ui-ux/layout] **Artefacto de la auditoría técnica (web + print).** El diagnóstico deja de morir en la pantalla. El escenario real no es que el cliente arregle: **reenvía a una agencia**, seamos nosotros u otra — y eso define dos lectores, quien DECIDE (magnitud y urgencia) y quien EJECUTA (la lista y el orden). Se resuelve con **un documento de dos densidades**, no con dos documentos que se desincronizan: portada ejecutiva de una plana + detalle completo, reusando `ReportArtifactModel` de TASK-1310 con su `variant`. Los hallazgos de SITIO van antes que la lista porque la invalidan. Y la procedencia viaja CON el dato: en pantalla es contexto, en un PDF reenviado es lo único que impide que atribuyan a nuestro juicio lo que mide el proveedor. Client-safe por construcción. Blocked by `TASK-1670`.
 - `TASK-1673` — [creada 2026-08-08, backend-data/command] **Compartir y enviar el informe.** Enlace con código corto, caducidad, **revocación** y tracking de apertura, más envío por correo del operador. **Enlace por defecto, adjunto como opción declarada**: el repo ya divide adjunto para registros inmutables (cotización, comprobante) y enlace para diagnósticos vivos (informe AEO), y el audit tiene contrato de frescura que un PDF congela — queda vigente para siempre en un inbox ajeno. 🔴 El cliente NO envía desde nuestro dominio: genera y reenvía desde su inbox, que llega mejor a su agencia y no arriesga la reputación de envío con la que mandamos facturas. Enviar ≠ ver. Blocked by `TASK-1672`.
 - **`TASK-1674` [RESERVADA, sin escribir] — la 4.ª sección del portal cliente.** El cliente ya tiene su navegador de 3 secciones (`Resumen · Evolución · Quadrant`, TASK-1310) y la auditoría entra ahí como **cuarta**, espejando las 4 tabs del operador: la misma estructura mental de los dos lados, con distinta profundidad. Se descartó una ruta cliente paralela (`/growth/seo/audit-report`) — sería fragmentar su portal para reflejar nuestro organigrama. Y se descartó **fusionar** la auditoría dentro del informe de 1310, por dos costos concretos: las frescuras no coinciden (el audit corre semanal, la serie de Search Console diaria, y un documento con dos as-of deshace justo lo que 1309 corrigió) y reenviar la lista técnica a una agencia obligaría a compartir de paso la posición competitiva del cliente, que ese trabajo no necesita. **NO se agrega a TASK-1310**: a esa task le queda rollout (migración + staging), no construcción, y una sección nueva le reinicia la verificación en la última milla. Se escribe cuando `TASK-1672` esté en ejecución y la forma del documento esté decidida.
@@ -271,7 +273,7 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 > Detalle, evidencia y secuencia completa en el **Delta 2026-08-15** al final de este documento y en
 > `docs/audits/platform/2026-08-15-growth-seo-aeo-module-opportunity-audit.md`.
 
-- `TASK-1696` — [creada 2026-08-15, **complete 2026-08-27**, backend-data] Ledger con dimensión de
+- `TASK-1696` — [creada 2026-08-15, **complete 2026-09-01**, backend-data] Ledger con dimensión de
   consumidor + gate USD per-org del grader. **P0.** Desbloquea todo lo que gaste.
   ✅ **Complete, `code complete, rollout pendiente`:** `seo_provider_spend_daily` ganó `consumer`
   (`seo` | `aeo`), `cost_basis` (`invoiced` | `estimated`) y `price_table_version` acoplado por
@@ -338,8 +340,17 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
   colapsa y el `.sort()` es un no-op. Medido contra PG: Efeonce 24/24 filas en cero. El disparador
   es cualquier org con ≥10 impresiones y 0 clics en el bucket objetivo — todo target nuevo. Adopta
   el umbral de dos dimensiones que `TASK-1700` ya construyó y reduce las dos curvas a una.
-- `TASK-1784` — [creada 2026-08-27, backend-data] **Ruteo de selección en la superficie MCP.** Seis de
-  las 20 tools contestan la misma pregunta; el eval de selección va primero y puede cerrar la task.
+- `TASK-1798` — [creada 2026-08-30, to-do, ui-ux] **Dirección visual del canvas de candidatos.**
+  Convierte volumen y barrera de enlaces en comparaciones visuales escaneables sin bajar la densidad
+  ni ocultar la jerarquía de gasto; no cambia contratos ni captura.
+- `TASK-1784` — [✅ complete 2026-09-02, backend-data] **Ruteo de selección en la superficie MCP.**
+  El eval fue primero y **refutó la hipótesis**: los bloques de ruteo NO mejoraron la selección de
+  tool (92.7–96.4% sin dirección; una variante degradó una tool que nadie tocó). Lo que movió el
+  número fue corregir dos afirmaciones falsas — la cláusula de mercado ordenaba ELEGIR país, y el
+  modelo la obedecía con *"the operator is in Santiago"*. Mercado 98.2% → **100%**; tool 94.5% →
+  92.7%, reportado sin declarar mejora. Destapó **21 de 27 descripciones federadas divergentes**,
+  cerradas haciendo que el gateway DERIVE el texto. Gate de CI de **cobertura**, no de precisión.
+  Rollout del gateway pendiente.
 - `TASK-1785` — [creada 2026-08-27, backend-data] **La lente como campo del contrato, no como
   instrucción.** El invariante ●/◑ opera ENTRE tools, donde ninguna puede defenderlo sola.
 - `TASK-1786` — [creada 2026-08-27, backend-data] **Consistencia internacional (hreflang).** Cinco
@@ -350,6 +361,27 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
   pesa 3× más que los backlinks. Amplía el allowlist a `content_analysis`; coordinar con `TASK-1651`.
 - `TASK-1789` — [creada 2026-08-27, backend-data] **Content decay.** El §3 de la arquitectura lo
   declara como capacidad y el runtime no lo tiene: cierra la brecha doc↔runtime con dato propio.
+- `TASK-1805` — [creada 2026-09-01, to-do, backend-critical/integration] **Foundation versionada
+  de DataForSEO Improved ETV.** La metodología pasa a ser parte de la identidad de la
+  medición; legacy/improved no comparten serie ni clave, y ningún request productivo depende del
+  default del provider. Clasifica 14 familias ETV-capable y migra seis familias/siete caminos consumidores,
+  schema, freshness/readers, API/MCP, configuración Vercel/worker, señales y evaluator dry-run; cierra en legacy.
+- `TASK-1806` — [creada 2026-09-01, to-do, backend-critical/integration] **Evaluación y cutover de
+  DataForSEO Improved ETV.** Depende de 1805 y ejecuta shadow bounded, comparación contra GSC,
+  decisión rebaseline/breakpoint y activación en los siete caminos consumidores antes del corte
+  2026-11-01T00:00:00Z. P0 deadline-bound; rollback legacy sólo pre-corte y safe mode después.
+- `TASK-1808` — [creada 2026-09-02, to-do, backend-critical/integration] **Inteligencia de categorías
+  y mercado temático.** Une `categories_for_domain` con `domain_metrics_by_categories`; la taxonomía
+  DataForSEO es evidencia externa y sólo se vincula a topic clusters mediante autoría gobernada.
+- `TASK-1809` — [creada 2026-09-02, to-do, backend-critical/integration] **Competidores SERP y
+  share of voice por keyword set.** Amplía el universo competitivo fuera del top-N diario sin
+  auto-declarar competidores ni reemplazar `TASK-1699`/`TASK-1662`.
+- `TASK-1810` — [creada 2026-09-02, to-do, backend-critical/integration] **Comparación de cobertura
+  entre páginas.** Captura `page_intersection` fuera del reader compositivo de `TASK-1314` y le
+  entrega evidencia formula-aware sin provider call on-read.
+- `TASK-1811` — [creada 2026-09-02, to-do, backend-critical/integration] **Benchmarking histórico
+  masivo de tráfico.** Usa `historical_bulk_traffic_estimation` para cohortes allowlisted y escribe
+  mediante el source of truth de domain overview, con dry-run y tope USD.
 - `TASK-1775` — [creada 2026-08-26, backend-data] **Foto de dominio + trayectoria competitiva.** El
   sujeto que el módulo no sabe describir: hoy los KPIs sólo cubren el recorte seguido. `labs`
   (`domain_rank_overview` mensual · `historical_rank_overview` una vez por sujeto, cuesta 10× ·
@@ -979,7 +1011,8 @@ abarata por cadencia y muestreo (`TASK-1704`).
 - `TASK-1706` — el alta de keyword es un compromiso de gasto.
 - `TASK-1707` — rollout del re-grade recurrente multi-runtime.
 - `TASK-1708` — estacionalidad: la serie de 12 meses que ya viene en `keyword_info`.
-- `TASK-1709` — carril de diagnóstico de prospecto SEO. *100 diagnósticos ≈ USD 50.*
+- `TASK-1709` — carril de diagnóstico de prospecto SEO. *100 diagnósticos ≈ USD 50.* ✅ **complete 2026-09-01, VIVO en producción** (flag ON en Vercel desde el 27-ago; corrida real sobre `skyairline.com`: previsto USD 0,2050 vs medido USD 0,1991).
+- `TASK-1797` — el umbral de impresiones del striking-distance no discrimina: se declara relativo (`max(piso, p75)`) y el percentil cae sobre el piso en las dos orgs medidas (Berel p75=10, Efeonce p75=12, piso 10). Obliga a medir las tres etapas del embudo —1748 elegibles → 600 pedidos → 200 del cap— antes de mover la constante, porque el cap manda sobre el umbral y subirlo no cambiaría lo que el operador ve.
 
 ### Tasks congeladas, con disparador nombrado (ninguna se mata)
 
@@ -1070,3 +1103,40 @@ No autoriza fusionar scores SEO y AEO en un número único: **la ortogonalidad e
 pausado —**no lo está**, `deploy.sh` lo declara `true` en ambos entornos— sino porque falta el
 command que inscribe perfiles: `recurring_regrade_enabled` no tiene writer), ni atribución de
 ingresos a citación en IA (no existe el modelo).
+
+## Delta 2026-09-01 — `TASK-1699` y `TASK-1709` cerradas
+
+`TASK-1699` (SERP top-N + propose de competidores) cerró el mismo día. Su registro llevaba **cinco
+re-ejecuciones** porque el trabajo se narraba en prosa y nunca se escribía en los campos que una
+sesión lee para decidir: 46 checkboxes en cero y `Status real: Diseño` con el código ya en
+producción. De ahí salió el chequeo `stale-progress` de `pnpm task:lint`. El paso 9 —candidatos a
+competidor con ≥5 días de serie— quedó **medido, no deducido**: `readSerpCompetitorCandidates`
+devolvía `candidates: []` con la serie en 4 días; disponible desde el 2026-09-02 05:00 CLT.
+
+### `TASK-1709` — el tier `prospect` y la línea de gasto de adquisición
+
+El módulo gana un cuarto tier, `prospect`, que se resuelve **sin `module_assignments`**: el sujeto es
+un dominio que todavía no es cliente. Con eso el epic deja de ser sólo una herramienta para clientes
+contratados y pasa a ser también herramienta de **venta**.
+
+Su gasto es **presupuesto de adquisición de Efeonce**, atribuido server-side a la org canónica de
+Efeonce, nunca al prospecto ni a un cliente. Corrida real verificada el 2026-08-27 sobre
+`skyairline.com`: previsto USD 0,2050 vs medido USD 0,1991, bajo tope duro de USD 1,00. Flag ON en
+Vercel Production desde el 2026-08-27 (verificado con `vercel env ls`). Sin captura recurrente por
+diseño.
+
+⚠️ **Se cerró con el mismo defecto de registro que `TASK-1699`**: 33 checkboxes sin tildar y
+`Status real: Diseno` mientras el carril estaba desplegado y con corridas reales en la base. Lo
+detectó la regla `stale-progress` de `task:lint`, creada el mismo día justo para esto.
+
+## Delta 2026-09-02 — las cinco familias Labs sin caller ganan ownership de producto
+
+El operador decidió usar las cinco familias ETV-capable que `TASK-1805` había clasificado como
+`provider_supported_not_enabled`. Se agrupan por capacidad y grano en cuatro tasks, no en cinco endpoints ni en
+un umbrella nuevo: `TASK-1808` posee las dos direcciones de inteligencia por categoría; `TASK-1809` el mercado
+competitivo por keyword set; `TASK-1810` el gap entre páginas; `TASK-1811` la historia bulk de cohortes.
+
+La secuencia dura es `TASK-1805` → método/cutover gobernado por `TASK-1806` → habilitación individual. Cada task
+incorpora reader/API/MCP, provenance, gasto y rollout propios. Ninguna llamada, migración, deploy ni compra queda
+autorizada por registrar el backlog. `TASK-1312` mantiene el source of truth de topic clusters y `TASK-1314`
+mantiene su regla «compone, no captura».

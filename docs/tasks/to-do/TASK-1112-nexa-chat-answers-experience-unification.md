@@ -1,10 +1,29 @@
 # TASK-1112 — Nexa Chat ↔ Answers Experience Unification (cerrar la experiencia conversacional)
 
+## Delta 2026-09-01 — `TASK-1078` deja de bloquear
+
+`TASK-1078` quedó `complete`: su trabajo llevaba desplegado desde junio (cutover 2026-06-11, flag
+retirado el 2026-08-05) y lo único que faltaba era su wireframe, escrito a posteriori. La
+coordinación serial sobre `NexaThread`/`NexaFloatingPanel` ya no aplica. Queda `TASK-1101` como
+blocker vigente por `NexaChatProvider`/streaming.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
+
+## Delta 2026-09-01 — registro del avance (barrido `stale-progress`)
+
+21 checkboxes en cero con `Status real: Diseno`. Verificado hoy: el unico commit propio es
+`ab8f453f6` («turno de chat con procedencia compacta + answer limpio»), que aterriza **una parte**
+de la unificacion, no un criterio de aceptacion completo. **Ningun criterio se puede tildar todavia**:
+todos hablan de comportamiento con `NEXA_CHAT_STREAMING_ENABLED` ON, de paridad byte-for-byte con
+ambos flags OFF, o del `ConversationalEvidencePacket` — y ninguno de esos fue ejercitado.
+
+Lo que SI cambio hoy y estaba mal: esta task declaraba una regla dura de coordinacion serial con
+`TASK-1078` «(in-progress)». `TASK-1078` cerro el 2026-09-01, asi que ese bloqueo ya no existe.
 
 ## Status
 
@@ -14,10 +33,10 @@
 - Effort: `Alto`
 - Type: `implementation`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Diseno, con UNA pieza ya en codigo (commit ab8f453f6: turno de chat con procedencia compacta + answer limpio). Verificado 2026-09-01: ningun criterio de aceptacion se puede tildar todavia — todos piden comportamiento con NEXA_CHAT_STREAMING_ENABLED ON o paridad con ambos flags OFF, y no fueron ejercitados. Ver el Delta`
 - Rank: `TBD`
 - Domain: `ui|platform|nexa|ai|content`
-- Blocked by: `TASK-1078 (in-progress, toca NexaThread/NexaFloatingPanel) + TASK-1101 (in-progress, toca NexaChatProvider/streaming) — coordinacion serial, NO concurrente en esos archivos`
+- Blocked by: `TASK-1101`
 - Branch: `task/TASK-1112-nexa-chat-answers-experience-unification`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -83,7 +102,7 @@ Reglas obligatorias:
 
 - `docs/tasks/to-do/TASK-1095-conversational-experience-v2.md` (contrato cross-dominio — consumir, no reescribir)
 - `docs/tasks/in-progress/TASK-1101-nexa-answers-runtime-promotion.md` (streaming/abort provider-side para Knowledge Answers — coordinar, no duplicar)
-- `docs/tasks/in-progress/TASK-1078-nexa-floating-chat-expandable-persisted.md` (toca NexaThread/NexaFloatingPanel — resolver solape)
+- `docs/tasks/complete/TASK-1078-nexa-floating-chat-expandable-persisted.md` (toca NexaThread/NexaFloatingPanel — resolver solape)
 - `docs/tasks/to-do/TASK-1110-nexa-composition-runtime-wiring-knowledge-inplace.md` (consumer Knowledge in-place — coordinar)
 - `docs/tasks/to-do/TASK-1104-nexa-response-toolbar-primitive.md` (se desbloquea con esta task)
 - `docs/tasks/to-do/TASK-1105-nexa-streaming-text-primitive.md` (se desbloquea con esta task)
@@ -106,7 +125,7 @@ Reglas obligatorias:
 
 - **Desbloquea `TASK-1104`** (NexaResponseToolbar → primitive): esta task aporta el 2º consumer real (Chat).
 - **Desbloquea `TASK-1105`** (NexaStreamingText → primitive): idem.
-- **Coordina serial con `TASK-1078`** (in-progress): ambos tocan `NexaThread`/`NexaFloatingPanel`. NO concurrente.
+- **Coordinaba serial con `TASK-1078`** (`complete` 2026-09-01, así que ya no bloquea): ambos tocan `NexaThread`/`NexaFloatingPanel`. NO concurrente.
 - **Coordina serial con `TASK-1101`** (in-progress): ambos tocan `NexaChatProvider`/streaming. Reusar maquinaria, no duplicar.
 - **Coordina con `TASK-1110`** (composicion Knowledge in-place): mismo substrato de evidencia.
 - Informa a `TASK-1096` (experiencia cross-domain) y al futuro 2º consumidor de dominio: una vez cerrada la experiencia, comparar el render del turno en Chat (placement floating) vs Answers (placement embedded) da el insumo concreto para `TASK-1095` (extraer lo comun → contrato cross-dominio).
@@ -233,7 +252,7 @@ Backward compat: flag OFF → shape y comportamiento actuales bit-for-bit.
 
 - **Slice 0 (flags + reconciliacion) → Slice 1 (streaming) → Slice 2 (evidence packet) → Slice 3 (citation AST) → Slice 4 (toolbar) → Slice 5 (GVC/señal/a11y/cierre).**
 - Slice 1 puede shippear independiente de 2/3 (streaming es ortogonal al packet). 2 → 3 (el AST de citas depende de que el packet exista). 4 puede correr despues de 2 (la toolbar no depende del AST). 5 cierra al final.
-- **Hard rule de coordinacion (load-bearing):** `TASK-1078` y `TASK-1101` estan **in-progress** y tocan `NexaThread`/`NexaChatProvider`. NINGUN slice de esta task que toque esos archivos puede ejecutarse concurrentemente con ellas. Resolver en Slice 0: o se serializa (esta task espera/absorbe), o se reparte ownership explicito por archivo. Ejecutar fuera de esto = colision de WIP (riesgo de orphan/merge documentado en CLAUDE.md).
+- **Hard rule de coordinacion (load-bearing):** `TASK-1101` sigue **in-progress** (`TASK-1078` cerró el 2026-09-01) y tocan `NexaThread`/`NexaChatProvider`. NINGUN slice de esta task que toque esos archivos puede ejecutarse concurrentemente con ellas. Resolver en Slice 0: o se serializa (esta task espera/absorbe), o se reparte ownership explicito por archivo. Ejecutar fuera de esto = colision de WIP (riesgo de orphan/merge documentado en CLAUDE.md).
 
 ### Risk matrix
 
@@ -274,7 +293,7 @@ Backward compat: flag OFF → shape y comportamiento actuales bit-for-bit.
 
 ### Out-of-band coordination required
 
-- **Coordinacion humana con los owners de `TASK-1078` y `TASK-1101`** (ambas in-progress) antes de tocar `NexaThread`/`NexaChatProvider`. Es el unico bloqueo real. Resolver en Slice 0.
+- **Coordinacion humana con el owner de `TASK-1101`** (in-progress; `TASK-1078` cerró el 2026-09-01) antes de tocar `NexaThread`/`NexaChatProvider`. Es el unico bloqueo real. Resolver en Slice 0.
 - Resto: N/A — repo-only change.
 
 <!-- ═══════════════════════════════════════════════════════════

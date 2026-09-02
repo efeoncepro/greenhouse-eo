@@ -13,12 +13,11 @@
 Este manual es para el operador que necesita **verificar, diagnosticar o apagar** el provider `greenhouse-seo`
 del gateway MCP de Efeonce — lo que un cliente MCP puede hacer contra `mcp.efeonce.org`.
 
-El allowlist federado tiene **27 tools — 20 de lectura y 7 de escritura** (fuente de verdad: el espejo `GREENHOUSE_SEO_TOOL_INVENTORY`
+El allowlist federado tiene **28 tools** (medido 2026-08-31; fuente de verdad: `src/mcp/greenhouse/tool-manifest.ts` en Greenhouse, del que el inventario del guard se deriva
 del guard de paridad `src/providers/greenhouse-seo-tool-parity.ts` del repo `efeonce-mcp` — desde
 TASK-1658 el guard es **bidireccional**: nombre + claves exactas del inputSchema interno + clase
 `writes` + paridad de schema + `annotations` obligatorias, con introspección runtime del server; el
-test rompe el CI si diverge en cualquiera de las dos direcciones. Interino hasta que TASK-1780 lo
-reemplace por el manifiesto canónico de Greenhouse):
+test rompe el CI si diverge en cualquiera de las dos direcciones. Ya reemplazado por el manifiesto canónico de Greenhouse (`TASK-1780`, 2026-08-31): el inventario del guard se deriva del artefacto generado con hash, no de una lista a mano):
 
 | Tool | Qué es |
 |---|---|
@@ -46,7 +45,7 @@ reemplace por el manifiesto canónico de Greenhouse):
 | `untrack_seo_keywords` ✍️ | **Escribe**: el reverso, cierra la ventana sin borrar historia |
 | `discover_seo_keywords` ✍️ | **Escribe y GASTA por corrida** (Labs Live factura por llamada y por fila); preview + confirmación humana antes de encolar; async (TASK-1664) |
 | `prepare_seo_grounded_queries` ✍️ | **Escribe** un DRAFT AEO (no gasta proveedor, jamás aprueba/activa); con la identidad máquina compartida responde `aeo_forbidden` fail-closed hasta TASK-1631 (TASK-1666) |
-| `run_seo_prospect_diagnostic` ✍️ | **Escribe y GASTA por corrida**: diagnóstico único sobre un prospecto, con confirmación humana previa; flag `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` OFF = estado legítimo (TASK-1709; federada por TASK-1658) |
+| `run_seo_prospect_diagnostic` ✍️ | **Escribe y GASTA por corrida**: diagnóstico único sobre un prospecto, con confirmación humana previa; flag `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` **ON en Production desde 2026-08-27** — un `disabled` hoy es regresión (TASK-1709; federada por TASK-1658) |
 | `declare_seo_competitors` ✍️ | **Escribe y COMPROMETE GASTO DIFERIDO**: la cobertura mensual factura ~USD 0,11 por competidor cada ciclo hasta que alguien lo retire. Techo gobernado por target (default 5), resultados **por dominio** (`declared`/`already_declared`/`capacity_exceeded`/`invalid`), autoría humana obligatoria + `proposalRef` opaco (TASK-1662) |
 | `retire_seo_competitors` ✍️ | **Escribe**: el reverso append-only — cierra `effective_to` con su propia autoría de retiro y corta el gasto del ciclo siguiente. Nunca borra (TASK-1662) |
 
@@ -347,4 +346,4 @@ gateway, no el módulo SEO.
 - Lane de Greenhouse: [`src/lib/api-platform/resources/ecosystem-growth-seo.ts`](../../../src/lib/api-platform/resources/ecosystem-growth-seo.ts)
 - Adaptador del gateway: repo hermano `efeonce-mcp`, `src/providers/greenhouse-seo.ts`
 - Gateway completo: [Operar Efeonce MCP Gateway](operar-efeonce-mcp-gateway.md)
-- Mismas tools por el MCP interno: [MCP Greenhouse Read-Only](mcp-greenhouse-read-only.md) §8
+- Mismas tools por el MCP interno: [MCP Greenhouse — Inventario de Tools](mcp-greenhouse-tool-inventory.md) §8

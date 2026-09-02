@@ -1,5 +1,11 @@
 # TASK-1695 — Grounded author: cobertura de candidatos y registro del cerebro AEO
 
+## Delta 2026-09-01 — `Blocked by` limpio
+
+Se retiró `TASK-1697` del campo (cerró el 2026-08-27). El orden se invirtió: `TASK-1713`, el barrel
+AEO, entra después de ésta. La razón vive acá y no en el campo.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -93,7 +99,7 @@ Esto **no cambia el alcance** de esta task: cambia el orden y el punto de cierre
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|seo|aeo|data`
-- Blocked by: `none` (se retiró `TASK-1697` — ver Delta 2026-08-15 (2); el orden se invirtió y `TASK-1713` del barrel AEO entra después de ésta)
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

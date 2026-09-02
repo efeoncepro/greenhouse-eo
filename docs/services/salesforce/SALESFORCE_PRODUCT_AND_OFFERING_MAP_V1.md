@@ -5,6 +5,11 @@
 > **As-of:** 2026-08-27
 > **Uso:** routing de discovery, skills, scope y propuestas; no reemplaza contrato ni entitlement live.
 
+La arquitectura comercial de la práctica —incluidos customer model, lifecycle, ofertas, delivery y gates de
+madurez— vive en
+[`Efeonce Salesforce Service Offer Architecture V1`](EFEONCE_SALESFORCE_SERVICE_OFFER_ARCHITECTURE_V1.md). Este
+documento conserva únicamente el mapa de productos, boundaries y routing por problema.
+
 ## Mapa de productos
 
 | Producto                           | Base / identidad operativa                  | Capabilities principales                                                                       | Skill dueña                                        |

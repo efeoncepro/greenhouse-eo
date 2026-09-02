@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { execFileSync } from 'node:child_process'
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -1625,6 +1626,72 @@ const cases = [
     }
   },
   {
+    name: 'stale-progress: el estado declarado no puede contradecir la historia de commits',
+    run: () => {
+      const root = createRepo()
+
+      // Repo git real: la regla mide la HISTORIA, así que sin commits no puede probarse.
+      const git = args => execFileSync('git', args, { cwd: root, stdio: 'ignore' })
+
+      git(['init', '-q'])
+      git(['config', 'user.email', 'test@example.invalid'])
+      git(['config', 'user.name', 'test'])
+      git(['commit', '--allow-empty', '-q', '-m', 'feat(ops): TASK-999 Slice 1 — implementado'])
+      git(['commit', '--allow-empty', '-q', '-m', 'feat(ops): TASK-999 Slice 2 — cableado'])
+
+      // Activa, con commits de implementación y CERO checkboxes tildados: es el bucle que
+      // TASK-1699 vivió cinco veces.
+      write(
+        join(root, 'docs', 'tasks', 'in-progress', 'TASK-999-fixture.md'),
+        withModularPlacementContract(taskFixture({ lifecycle: 'in-progress' }))
+      )
+
+      const active = lintTasks({ repoRoot: root, options: { task: 'TASK-999' } })
+      const stale = active.warnings.filter(item => item.rule === 'stale-progress')
+
+      assert.equal(stale.length, 1)
+      assert.match(stale[0].message, /2 commit\(s\) de implementación/)
+
+      // Tildar aunque sea uno apaga la señal: lo que la regla persigue es el CERO absoluto,
+      // que es lo que hace indistinguible "no empezada" de "hecha y sin registrar".
+      const source = withModularPlacementContract(taskFixture({ lifecycle: 'in-progress' })).replace(
+        '- [ ]',
+        '- [x]'
+      )
+
+      write(join(root, 'docs', 'tasks', 'in-progress', 'TASK-999-fixture.md'), source)
+
+      const registered = lintTasks({ repoRoot: root, options: { task: 'TASK-999' } })
+
+      assert.equal(registered.warnings.filter(item => item.rule === 'stale-progress').length, 0)
+
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    name: 'stale-progress: cerrar sin tildar una sola evidencia también avisa',
+    run: () => {
+      const root = createRepo()
+
+      write(
+        join(root, 'docs', 'tasks', 'complete', 'TASK-800-blocker.md'),
+        withModularPlacementContract(taskFixture({ id: 'TASK-800', lifecycle: 'complete', blockedBy: 'none' }))
+      )
+
+      const closed = lintTasks({ repoRoot: root, options: { task: 'TASK-800' } })
+      const stale = closed.warnings.filter(item => item.rule === 'stale-progress')
+
+      assert.equal(stale.length, 1)
+      assert.match(stale[0].message, /NINGUNO tildado/)
+
+      // Warning y no error a propósito: 414 tasks históricas en complete/ están así, y un error
+      // sería ruido que nadie lee — el modo de falla que esta regla combate.
+      assert.equal(closed.errors.filter(item => item.rule === 'stale-progress').length, 0)
+
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
     name: 'stale-blocker: cerrar una task obliga a desbloquear a quien la citaba',
     run: () => {
       const root = createRepo()
@@ -1683,6 +1750,118 @@ const cases = [
       assert.equal(
         [...noneField.errors, ...noneField.warnings].filter(item => item.rule === 'stale-blocker').length,
         0
+      )
+
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    // Un commit de scope `docs` no construye nada: reconciliar el backlog o corregir una
+    // atribucion no es implementacion, aunque el tipo sea fix/feat. Caso fuente TASK-1779.
+    name: 'stale-progress: un commit fix(docs) no cuenta como implementacion',
+    run: () => {
+      const root = createRepo()
+
+      write(
+        join(root, 'docs', 'tasks', 'to-do', 'TASK-996-docs-only.md'),
+        withModularPlacementContract(taskFixture({ id: 'TASK-996' }))
+      )
+
+      execFileSync('git', ['init', '--quiet'], { cwd: root, stdio: 'ignore' })
+      execFileSync('git', ['config', 'user.email', 'a@b.c'], { cwd: root, stdio: 'ignore' })
+      execFileSync('git', ['config', 'user.name', 'test'], { cwd: root, stdio: 'ignore' })
+      execFileSync('git', ['add', '-A'], { cwd: root, stdio: 'ignore' })
+      execFileSync(
+        'git',
+        ['commit', '-q', '--no-verify', '-m', 'fix(docs): reconciliar el backlog y TASK-996 para la memoria'],
+        { cwd: root, stdio: 'ignore' }
+      )
+
+      const result = lintTasks({ repoRoot: root, options: { task: 'TASK-996' } })
+
+      assert.equal(
+        [...result.errors, ...result.warnings].filter(item => item.rule === 'stale-progress').length,
+        0
+      )
+
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    // `none` seguido de la explicacion de POR QUE se desbloqueo — que normalmente NOMBRA a los
+    // blockers ya cerrados. Exigir que la nota omita los IDs para no disparar el guard destruiria
+    // justo el contexto util. El valor del campo es `none`: no esta bloqueada.
+    // Repo propio a proposito: el indice de lifecycle se resuelve por root, y reusar uno ya
+    // recorrido en el mismo caso deja fuera los archivos escritos despues — el test pasaria solo.
+    name: 'stale-blocker: `none` con explicacion que nombra al blocker cerrado no dispara',
+    run: () => {
+      const root = createRepo()
+
+      write(
+        join(root, 'docs', 'tasks', 'complete', 'TASK-801-closed.md'),
+        withModularPlacementContract(taskFixture({ id: 'TASK-801', lifecycle: 'complete', blockedBy: 'none' }))
+      )
+      write(
+        join(root, 'docs', 'tasks', 'to-do', 'TASK-998-explained.md'),
+        withModularPlacementContract(
+          taskFixture({ id: 'TASK-998', blockedBy: 'none` (2026-09-01: TASK-801 cerro y dejo de bloquear)`' })
+        )
+      )
+
+      const explained = lintTasks({ repoRoot: root, options: { task: 'TASK-998' } })
+
+      assert.equal(
+        [...explained.errors, ...explained.warnings].filter(item => item.rule === 'stale-blocker').length,
+        0
+      )
+
+      rmSync(root, { recursive: true, force: true })
+    }
+  },
+  {
+    // Una task en to-do/ que aparece en el diff sin ser el foco (le corrigieron una ruta stale,
+    // un cross-link) no debe romper el gate por una deuda de flow que ya tenia. Con --task
+    // apuntandola, si es error: ahi el flow es parte del trabajo declarado.
+    name: 'ui-flow-contract: incidental en el diff avisa, focal rompe',
+    run: () => {
+      const root = createRepo()
+
+      write(
+        join(root, 'docs', 'tasks', 'to-do', 'TASK-999-fixture.md'),
+        taskFixture({
+          domain: 'ui|platform',
+          executionProfile: 'ui-ux',
+          uiImpact: 'flow',
+          uiUxContract: ['## UI/UX Contract', '', '### Experience brief', '', '- UI rigor: `ui-standard`'].join('\n')
+        })
+      )
+
+      // `changed` se resuelve por git: sin repo, el modo no ve nada y el test seria teatro.
+      // Un `git init` basta: `ls-files --others` reporta el fixture como archivo nuevo.
+      execFileSync('git', ['init', '--quiet'], { cwd: root, stdio: 'ignore' })
+
+      const incidental = lintTasks({
+        repoRoot: root,
+        options: { format: 'json', strict: false, changed: true, active: false, task: null }
+      })
+
+      assert.equal(
+        incidental.errors.some(item => item.rule === 'ui-flow-contract'),
+        false
+      )
+      assert.equal(
+        incidental.warnings.some(item => item.rule === 'ui-flow-contract'),
+        true
+      )
+
+      const focal = lintTasks({
+        repoRoot: root,
+        options: { format: 'json', strict: false, changed: false, active: false, task: 'TASK-999' }
+      })
+
+      assert.equal(
+        focal.errors.some(item => item.rule === 'ui-flow-contract'),
+        true
       )
 
       rmSync(root, { recursive: true, force: true })

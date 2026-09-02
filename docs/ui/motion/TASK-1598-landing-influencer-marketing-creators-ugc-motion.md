@@ -21,6 +21,8 @@ entender la transición `fit → contenido → derechos → distribución → ap
 | Ofertas | stagger corto | stack estático |
 | Sección firma | versiones/rights/asset flow con movimiento acotado | storyboard estático |
 | CTAs | hover/focus micro-lift | color + focus |
+| Dock | aparece al salir del hero y desaparece antes de conversion/footer | flujo sin dock; CTA inline equivalente |
+| Premium listbox | feedback breve de apertura/cierre; selected es tonal + check | estado selected completo sin motion |
 | FAQ | disclosure nativo | `<details>` operable |
 
 ## Guardrails
@@ -31,6 +33,7 @@ entender la transición `fit → contenido → derechos → distribución → ap
 - En 390px reducir densidad y peso; preferir imágenes/posters si video afecta CWV.
 - `prefers-reduced-motion` elimina reveals, drift y smooth scroll sin quitar significado.
 - Focus, error y estado del form no dependen de motion.
+- La seleccion, bandera/icono y check llegan al mismo estado con reduced motion.
 
 ## Evidence
 

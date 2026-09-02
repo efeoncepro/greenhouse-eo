@@ -1,5 +1,7 @@
 # TASK-1598 — Growth Form premium review — 2026-08-28
 
+Canonical reusable pattern: [Growth Form — Editorial Premium Brief Style V1](../GROWTH_FORM_EDITORIAL_PREMIUM_BRIEF_STYLE_V1.md).
+
 ## Verdict
 
 `PASS` — average `4.68/5`; every dimension ≥4, critical dimensions ≥4.5. Runtime reviewed after the governed
@@ -39,7 +41,8 @@ six local errors and an accessible focused summary without a POST to the Growth 
 - Inputs are 56 px high with 16 px text; keyboard focus has a 3 px outline plus border/shadow change.
 - Empty submit creates six inline errors and focuses the accessible summary; no Growth Forms submission occurs.
 - Consent remains an actual checkbox with visible text and the human-readable privacy link `Consulta nuestra Política de privacidad`.
-- Native-looking selects keep real `<select>` semantics, a tonal action edge and a visible custom chevron.
+- Los selects usan combobox/listbox renderer-owned con `aria-expanded`, `aria-controls`, teclado completo y overlay;
+  no dependen del popup nativo del sistema operativo.
 - Growth CTA opens the native `discovery` scheduler dialog; no HubSpot URL is exposed and no booking was created.
 - `scrollWidth === clientWidth` at every gated viewport; reduced-motion reaches the same final state.
 
@@ -47,3 +50,37 @@ six local errors and an accessible focused summary without a POST to the Growth 
 
 The form remains intentionally long because the published contract collects the minimum operational brief. Further
 shortening requires a new governed form version and commercial validation, not a visual-only WordPress change.
+
+## Refinement addendum · 2026-08-29
+
+El icono de `activationType` pasó de sparkle decorativo a megáfono semántico. El campo `objective` conserva label y
+textarea a ancho completo, pero ubica helper y contador en una sola fila inmediatamente posterior: 8 px de separación,
+alineación superior compartida y contador anclado al borde derecho. El gate live verifica ambas decisiones en
+1536/1440/890/390; no se alteraron campos, validación, consentimiento, destino o tracking. Evidencia:
+`.captures/task1598-influencer-fidelity-2026-08-29T11-00-28-401Z/`.
+
+## Dock addendum · 2026-08-29
+
+El dock fija la jerarquía de conversión sin repetir el peso de la barra global: superficie Midnight contenida, borde
+fino, safe-area y targets de 48 px. Reunión conserva fill verde; brief usa contorno e icono `arrow-up-right`. La
+captura live confirma clipping cero y composición compacta en escritorio y móvil:
+`.captures/task1598-influencer-fidelity-2026-08-29T11-08-21-257Z/`.
+
+## Semantic select addendum · 2026-08-29
+
+`market` y `activationType` usan el variant `diagnostic_premium` publicado como Growth Form v2. Las opciones
+incorporan 11 marcas semánticas coherentes, check separado y targets ≥46 px. CL/CO/MX/PE evolucionaron de siglas a
+SVG circulares locales de `circle-flags`, visibles en la lista y en el valor seleccionado, con centrado vertical
+explícito, outline nítido y sin sombra difusa; región/ubicación y los
+tipos de activación conservan pictogramas tonales. El renderer mantiene valor, teclado, ARIA, overlay y submit; la
+landing sólo aporta piel iconográfica. El submit usa `primary` azul Efeonce con blanco, sin introducir teal. El gate
+live abre y selecciona ambos listbox en 1536/1440/1414/890/390, verifica flags, stacking, contraste, clipping y
+reduced motion. Evidencia: `.captures/task1598-influencer-fidelity-2026-08-29T12-26-32-586Z/`.
+
+## Typography hierarchy addendum · 2026-08-29
+
+El encabezado reemplaza sparkle por documento y normaliza el sistema tipográfico completo: overline Geist 600/12 px,
+título Poppins 700 con line-height 1.2, explicación/trust Geist 400 con line-height ≥1.5, labels y submit Geist 600,
+ayudas/contador Geist 400 e inputs de 16 px. Se retiró el peso 650. El gate mide familias, tamaños, pesos, alturas de
+línea e icono en cinco viewports, incluida la medida reportada de 1414 px. Evidencia:
+`.captures/task1598-influencer-fidelity-2026-08-29T11-40-22-681Z/`.

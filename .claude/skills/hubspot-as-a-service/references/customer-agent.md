@@ -20,7 +20,9 @@ HubSpot's `Deployment > Workflows and bots` surface is a **selective conversatio
 - A rule-based chatbot runs a deterministic pre-flow—questions, branches, property capture, ticket creation or meeting routing—and uses `Send to Customer Agent` when its path should continue with the agent.
 - Channel deployment is the separate option for sending all incoming conversations from a connected channel to the Customer Agent. Prefer workflows/bots when assignment must vary by client tier, issue type, intent or another governed criterion.
 - Customer Agent **actions** are a different layer: they call approved apps or APIs to retrieve data or perform a task.
-- Workflow **Run Agent** is also different: it invokes a Breeze Studio agent as an automation step and exposes its output to later workflow actions or branches.
+- A workflow action that runs an agent is also different: it invokes an eligible agent managed through Agent
+  Hub/Agent Builder as an automation step and can expose output to later actions or branches. Verify the action's
+  current name, beta state and portal eligibility before designing around it.
 
 Before activation, document a routing matrix with entry source, positive criteria, exclusions, required captured context, Customer Agent path, human fallback, unavailable-hours behavior, owner, credit implication and expected resolution. Require approval for workflow/chatflow activation, then test at least one positive assignment, one negative/excluded path, one human fallback and one unavailable path. A saved or enabled definition is not proof that the conversation reached the intended owner.
 
@@ -104,12 +106,42 @@ Official capability references:
 
 Immediate handoff is valid when the visitor explicitly asks for a person. Otherwise collect the minimum context required for the human action. Keep the message empathetic, state that context is preserved and identify the assigned owner only when routing proves it.
 
+Treat the handoff trigger and the downstream assignment as separate contracts:
+
+- Customer Agent system rules or approved custom guidelines decide **when** the agent stops responding. A visitor request for a person is a trigger, not a destination.
+- Direct routing is appropriate when every case has the same destination. When the destination varies by intent, segment or another governed condition, select a workflow in the handoff configuration.
+- Help Desk requires a ticket-based workflow; Inbox requires a conversation-based workflow. Do not substitute one object for the other.
+- Workflow or manual assignment alone is not proof of a qualifying Customer Agent handoff for resolution analytics. Preserve the visitor/guideline trigger and measure trigger, assignment and reassignment separately.
+
+For an ordered primary-to-backup route, document it as a composed workflow pattern rather than a native HubSpot
+"backup" mode: clear the Customer Agent owner, assign the primary only when available, then assign the backup only
+when available with overwrite disabled. If neither is available, the record remains unassigned. Keep a live chat
+open when a person is expected to continue there, and monitor the unassigned queue.
+
+`Live handoff` preserves the same open chat and its prior context. After the first human takes ownership, a second
+human continues in that same thread through manual owner reassignment in Help Desk or Inbox; Customer Agent no
+longer governs that human-to-human transfer. Do not end the chat when continuity is required: an ended chat cannot
+be reopened, although its ticket can remain open for offline follow-up.
+
+A free-text request such as “quiero hablar con Pablo” is an explicit request for a person, but it is not evidence
+that HubSpot resolved the name to the correct user. Promise a named recipient only after an explicit governed
+condition or manual reassignment proves the effective owner. Ambiguous, unavailable or ineligible names follow the
+documented fallback.
+
 HubSpot may trigger a native transfer before a trained short answer. When observed:
 
 1. verify the published transfer rules;
 2. improve online and unavailable transfer messages;
 3. retest the exact phrase;
 4. document the native limitation instead of claiming the short answer controls it.
+
+Official references:
+
+- [Set up and customize Customer Agent handoff](https://knowledge.hubspot.com/customer-agent/set-up-and-customize-the-customer-agents-handoff-process)
+- [Assign tickets using workflows](https://knowledge.hubspot.com/workflows/assign-tickets-using-workflows)
+- [Route tickets in Help Desk](https://knowledge.hubspot.com/help-desk/route-tickets-in-help-desk)
+- [Manage tickets and chats in Help Desk](https://knowledge.hubspot.com/help-desk/manage-tickets-in-help-desk)
+- [Understand Customer Agent resolution](https://knowledge.hubspot.com/customer-agent/understand-the-customer-agent)
 
 ## Minimum QA matrix
 
@@ -126,5 +158,13 @@ Test at least:
 - multi-turn memory and repeated-data avoidance;
 - privacy-consent/landing entry behavior;
 - transfer when the owner is available and unavailable.
+- primary available, primary unavailable with backup, and both unavailable with an open unassigned chat;
+- a valid, ambiguous and ineligible named-person request;
+- first-human to second-human reassignment in the same open thread and an actual human reply;
+- the irreversible ended-chat boundary;
+- analytics that distinguish visitor-triggered handoff, workflow assignment and manual reassignment.
 
 For each case record prompt, expected behavior, observed behavior, sources used, transfer status, verdict and follow-up.
+Keep QA labels, branch names and administrative markers outside the substantive visitor message. Prefixes such as
+`QA`, `PRUEBA`, `test` or an expected category can contaminate an AI classifier and create a false routing result;
+store them in the evidence record instead.

@@ -1,8 +1,28 @@
 # TASK-1254 — Growth Forms Email Verification Service + Corporate Gate
 
+## Delta 2026-09-01 — desbloqueada
+
+`TASK-1253` (registry de validadores + autoridad server-side) quedó `complete`: su flag está ON en
+Vercel Production, verificado con `vercel env pull`. Esta task deja de estar bloqueada.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
+
+## Delta 2026-09-01 — registro del avance (barrido `stale-progress`)
+
+27 checkboxes en cero con `Status real: Diseno`, teniendo 6 commits de implementacion y el modulo
+entero en `src/lib/growth/forms/email-verification/` (tier1, provider, orchestrator con circuit
+breaker, cache por hash con TTL, rate-limit, gate, lista de 4.462 dominios publicos server-side).
+
+**El flag esta ON en Production**, verificado live el 2026-09-01 con `vercel env pull`. Ojo: la fila
+del ledger arrastra una clausula vieja que dice «prod: OFF — diferido al cutover de forms»; esa
+clausula quedo superada por la medicion.
+
+Lo que sigue sin verificarse es el criterio de comportamiento del gate en produccion (POST directo
+con gmail a un form block-corporativo -> rechazo canonico): existe el codigo y el smoke live de
+staging, pero no un ejercicio equivalente contra prod.
 
 ## Status
 
@@ -18,7 +38,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `data`
-- Blocked by: `TASK-1253`
+- Blocked by: `none`
 - Branch: `task/TASK-1254-growth-forms-email-verification-corporate-gate`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -168,16 +188,16 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Provider abstraído tras puerto; secreto server-only; cliente nunca lo toca.
-- [ ] Tier 2 solo tras Tier 1; cache por hash con TTL; rate-limit.
+- [x] Provider tras puerto; secreto server-only. **Verificado 2026-09-01:** `src/lib/growth/forms/email-verification/provider.ts`.
+- [x] Tier 2 solo tras Tier 1; cache por hash con TTL; rate-limit. **Verificado 2026-09-01:** `orchestrator.ts` (Tier 2 pago solo si Tier 1 no decide), `cache-store.ts` (clave = hash del email, NUNCA el crudo; TTL via `expires_at`), `rate-limit.ts` (ventana deslizante por IP).
 - [ ] `submitForm` es la autoridad del gate; POST directo con gmail a un form block-corporativo → rechazo canónico.
-- [ ] Circuit breaker: provider caído degrada a Tier 1, no rompe el form.
-- [ ] Signals de provider error / rejection / cache-hit registradas.
+- [x] Circuit breaker: provider caido degrada a Tier 1. **Verificado 2026-09-01:** `orchestrator.ts:50` breaker en memoria + timeout; el form no se rompe.
+- [x] Signals registradas. **Verificado 2026-09-01:** `src/lib/reliability/queries/growth-forms-email-signals.ts`.
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] Lógica de verificación en `src/lib/growth/forms/email-verification/`, no en el handler ni en el cliente.
-- [ ] Modelada como servicio/recurso (`verifyEmail`), no como click-handler.
+- [x] Logica en `src/lib/growth/forms/email-verification/`. **Verificado 2026-09-01.**
+- [x] Modelada como servicio (`verifyEmail`), no click-handler. **Verificado 2026-09-01.**
 - [ ] Read (verify) como recurso canónico; el gate (write decision) en `submitForm` con authz pública + errores canónicos + observabilidad.
 - [ ] Capability: la **política de email por form** es configuración gobernada (parte del form definition capability, TASK-1232/1256). Declarar en Plan.
 - [ ] Camino programático: endpoint público + submitForm + dispatcher + futuro Nexa; un primitive.

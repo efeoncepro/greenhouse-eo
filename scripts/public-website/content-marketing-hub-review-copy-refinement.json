@@ -1,0 +1,37 @@
+{
+  "schema": "contentMarketingEditorial.v1",
+  "postId": 242603,
+  "expectedHash": "0396480870fe897452704a696be50ae2c64e3eea68232fb56c397bca85439d29",
+  "modules": {
+    "greenhouse_content_hub": {
+      "id": "395b083",
+      "fields": {
+        "content_034": {
+          "before": "6 fuentes adjuntas",
+          "after": "6 fuentes"
+        },
+        "content_040": {
+          "before": "Revisar subtítulos",
+          "after": "1 comentario"
+        },
+        "content_053": {
+          "before": "Composición adaptada a cada proporción",
+          "after": "Dos formatos adaptados"
+        },
+        "content_056": {
+          "before": "Sin tareas bloqueadas",
+          "after": "Sin bloqueos"
+        }
+      }
+    },
+    "greenhouse_content_review": {
+      "id": "6153e75",
+      "fields": {
+        "content_020": {
+          "before": "Vista previa de 5 segundos de un reel de 30 segundos.",
+          "after": "Vista previa: 5 s de un reel de 30 s."
+        }
+      }
+    }
+  }
+}

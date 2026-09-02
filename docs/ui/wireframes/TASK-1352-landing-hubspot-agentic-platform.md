@@ -1,199 +1,362 @@
-# TASK-1352 / `efeoncepro.com/servicios/hubspot/` — **Pillar del hub HubSpot**: evidencia antes que promesa
-
-> **Reescrito desde cero el 2026-07-13.** No es un delta: la tesis cambió de eje.
-> Fuente: **[PDR-006](../../public-site/decisions/PDR-006-landing-hubspot-agentic-platform-posicionamiento.md)
-> reescrito** + skill `hubspot-solutions-partner` + auditoría de la página viva (REST + Playwright).
->
-> 🔴 **URL: `/servicios/hubspot/`** — **301 desde `/servicios-contratar-hubspot/`**
-> ([PDR-013](../../public-site/decisions/PDR-013-hub-hubspot-pillar-cluster-arquitectura.md)). La URL vieja tiene
-> **0 rankings y 0 backlinks** (medido): la migración **no cuesta nada**.
-> Es el **pillar** de un hub de 5 páginas; los 4 clusters son **TASK-1401** (`/precios/`), **TASK-1402**
-> (`/cuando-no-usar-hubspot/`), **TASK-1403** (`/agentes/`), **TASK-1404** (`/hubspot-vs-salesforce/`).
-> **SSOT de contenido:** [`HUBSPOT_HUB_LANDINGS_SPEC.md`](../../public-site/HUBSPOT_HUB_LANDINGS_SPEC.md).
+# TASK-1352 — Wireframe: landing HubSpot Sistema vivo de crecimiento
 
 ## Meta
 
-- Status: `draft`
-- Owner task: `TASK-1352`
-- **Product Design asset:** ✅ **desbloqueado.** La sección firma **ya no es el "stack agéntico" abstracto**
-  (cuya dirección de arte bloqueaba `UI ready`), sino **el mapa dolor → Hub** (R3): un artefacto **funcional**,
-  no ilustrativo. Se art-dirige con el sistema de marca, sin generación de assets abstractos.
-- Intended consumers: sitio público (WordPress/Ohio, marketing lane `modern-ui`). **NO** el portal Greenhouse.
-- Copy source: contenido de página pública (**NO** `src/lib/copy`), validado con `greenhouse-ux-writing` +
-  `docs/context/05_voz-tono-estilo.md`. **es-LATAM neutro, tuteo, sin voseo ni chilenismos** (pan-hispano).
-- Primitive decision: `reuse` — patrones marketing `modern-ui` + `<greenhouse-form>` embebido.
-- UI ready target: `yes` una vez cerrado el copy final (ya no hay bloqueo de art direction).
+- Status: `draft; research and first-fold acceptance required`.
+- Owner task: `TASK-1352`.
+- Product Design asset: [`TASK-1352-hubspot-immersive-pillar-direction.md`](../visual-directions/TASK-1352-hubspot-immersive-pillar-direction.md).
+- Visual direction mode: `repo-native-benchmark`.
+- Intended consumers: WordPress/Ohio public surface, GVC, copy, SEO/AEO, CRO and implementation agents.
+- Copy source: copy deck created in TASK-1352 Slice 2; no inherited landing copy.
+- Primitive decision: `extend` local sobre bloques públicos + `<greenhouse-form>` y Meetings gobernados.
+- UI ready target: `no` hasta research, claims/assets, copy deck y `ACCEPT FIRST FOLD`.
+- Canonical route: `/servicios/hubspot/`; legacy route redirects once.
 
 ## Brief
 
-- **Primary user:** quien decide o influye la compra de HubSpot en una empresa mid-market/enterprise hispana.
-  🔴 **NO es solo el CMO** — son **siete perfiles con siete dolores distintos** (R3).
-- **User moment:** *"todos los partners suenan igual"* + *"cambiar de CRM da miedo, y si sale mal me hacen
-  responsable a mí"*. Llega por co-sell del PDM, Solutions Directory, directo/marca, outbound o cross-sell.
-- **Job to be done:** **decidir sin miedo.** Entender si HubSpot le sirve — *y si no le sirve, saberlo antes de gastar*.
-- **Primary decision signal:** 🎯 **que le regalen la evidencia antes de cobrarle.** El diagnóstico gratis (R4),
-  la lista de cuándo HubSpot **NO** le sirve (R5) y el número del waiver (R6). **Esos tres — no el software.**
-- **Fricción que reduce:** el **miedo a elegir mal** (JOLT) y el *"todos prometen lo mismo"*.
-- **Non-goals:** no es pricing; no es self-serve; no reconstruye el form ni el agendador; no expone el portal.
+- Primary user: buying group mid-market/enterprise que evalúa plataforma, implementación, migración u operación
+  HubSpot.
+- User moment: reconoce fragmentación o una oportunidad de IA, pero aún necesita probar fit, alcance y riesgo.
+- Job to be done: identificar la familia de resultado relevante, comprender cómo se conecta con el sistema completo
+  y decidir si solicitar una evaluación inicial.
+- Primary decision signal: “esta oferta comprende mi resultado y explica un siguiente paso proporcionado”.
+- Primary conversion: solicitud aceptada de evaluación inicial sin costo.
+- Secondary action: Meetings, siempre subordinado.
+- Non-goals: catálogo, price list, grader autónomo, universo de agentes, dashboard ficticio, clon de HubSpot o
+  refinamiento del diseño rechazado.
 
-## 🔴 Reglas duras del contenido (de PDR-006)
+## Dependencias de contenido antes de maquetar
 
-1. **Vende la plataforma completa** — Smart CRM + los 6 Hubs + Breeze. **NUNCA se estrecha a un Hub.**
-   Una página que orbita AEO **es una landing de AEO con logo de HubSpot**.
-2. **Ningún claim que HubSpot no haga:** ❌ *"Líder en CRM según Gartner"* (es **Challenger** en el MQ de
-   *CRM Sales Platforms* 2026; avanzó desde Niche Player en 2025) · ❌ Forrester Wave · ❌ **ISO 27001**
-   (HubSpot no la reclama; solo su infra AWS) ·
-   ❌ residencia de datos en LATAM · ❌ *"flota de agentes de IA"* (**solo 3 Breeze Agents en GA**).
-   ✅ Sí: **"Leader en B2B Marketing Automation (Gartner, 5.º año)"** · **SOC 2 Type II + SOC 3**.
-3. **"HubSpot Solutions Partner Gold"** ✅ es cierto — 🔴 **revisar el 2027-01-15** (si baja de tier, sale).
-4. **Kortex: describir el mecanismo, NUNCA implicar escala** (n=1).
-5. **Nomenclatura 2026:** **Revenue Hub** (ex-Commerce) · **Data Hub** (ex-Operations) · **UNBOUND** (ex-INBOUND).
-6. **Casos:** métrica verificable + relación en buenos términos + autorización. **SSilva solo anonimizado**
-   ("una inmobiliaria del Cono Sur"); **nunca con nombre ni testimonio firmado**. Berel **no** como co-sell.
-7. 🔴 **Todo número citable va en el HTML servido** — los contadores JS renderizan `00 %` y **los crawlers de
-   IA no ejecutan JavaScript**.
-8. **Auditar todos los `href` antes de mutar** — la página viva tiene *"Más testimonios"* → `themeforest.net`.
+| Artefacto | Debe resolver | Gate |
+|---|---|---|
+| VoC/CRO dossier | pains, desired outcomes, triggers, objections, alternatives, literal language | required before copy |
+| SEO/AEO dossier | intents, SERP, fan-out, clusters, passages, entity/schema | required before heading lock |
+| Claim/proof ledger | source, date, authorization, volatility, placement | required before proof UI |
+| Asset/token ledger | official asset, value, role, contrast, review date | required before visual polish |
+| Copy deck | awareness, sophistication, big idea, framework, H1 bank, R0–R11 copy | required before first fold |
 
----
+`COPY_SLOT` significa función pendiente de copywriting, no permiso para que el implementador invente texto.
+
+## Desktop Target — 1440×1100
+
+```text
+┌────────────────────────────────────────────────────────────────────────────┐
+│ R0 HEADER PÚBLICO EFEONCE                                                  │
+├───────────────────────────────────┬────────────────────────────────────────┤
+│ R1 HERO / DECISIÓN               │ SYSTEM STAGE                           │
+│ COPY_SLOT eyebrow factual        │ seis trayectorias, un sistema          │
+│ COPY_SLOT H1 ganador             │ señal activa sin UI falsa              │
+│ COPY_SLOT subhead                │ labels visibles y HTML fuera del SVG   │
+│ [CTA evaluación]  Meetings       │                                        │
+│ proof inmediata validada         │                                        │
+├───────────────────────────────────┴────────────────────────────────────────┤
+│ inicio visible del atlas / continuidad de scroll                           │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
+- First fold contiene un único stage dominante; no más de tres superficies contained.
+- La acción y explicación aparecen antes de que el arte termine de componerse.
+- El atlas asoma para conectar hero con exploración, sin convertir el hero en diagrama denso.
+- El header no recibe takeover ni lockup conjunto inventado.
+
+## Mobile Target — 390×844
+
+```text
+R0 header compacto existente
+R1 eyebrow
+H1
+subhead
+[CTA evaluación]
+Meetings
+proof factual
+visual compacta del sistema
+inicio de estación 01
+```
+
+- El arte nunca desplaza CTA/proof fuera del primer viewport sólo por dramatismo.
+- Layout de una columna; el orden visual coincide con DOM y lector de pantalla.
+- No sticky CTA permanente, carrusel, canvas horizontal ni texto sobre trayectorias ilegibles.
+- `scrollWidth === clientWidth`; targets ≥44 px; inputs ≥16 px; foco no queda bajo header.
+
+## Action Hierarchy
+
+- Primary: `COPY_SLOT assessment_cta` → `#evaluacion`.
+- Secondary: `COPY_SLOT meetings_cta` → Meetings con contexto permitido.
+- Contextual selection: familia o sector; cambia énfasis, no ejecuta negocio.
+- Editorial: cluster publicado y verificable.
+- Destructive: none.
+- Pending/disabled: sólo submit; mantiene label, estado y prevención de doble envío.
 
 ## Layout Skeleton
 
-| R | Slot | Propósito | Componente | Fuente |
+| Región | Slot | Propósito | Patrón candidato | Fuente |
 |---|---|---|---|---|
-| **0** | Header | Nav Ohio nativo (claro, sin override, sin sticky custom) | Ohio native header | Tema |
-| **1** | **Hero — la postura** | 🎯 *"Antes de venderte HubSpot, te mostramos si te sirve."* El reencuadre Challenger + CTA dual + proof row (Solutions Partner **Gold** · Kortex en el Marketplace) | `modern-ui` hero | Estático |
-| **2** | Stakes | **Por qué decidir mal ahora cuesta más caro.** HubSpot dejó de ser un CRM: incorpora agentes que ejecutan trabajo. Y ⚠️ **el 38% de los fracasos de CRM son por adopción**, no por tecnología | Two-card contrast band | Estático |
-| **3** | 🎯 **EL MAPA: dolor → Hub** *(SIGNATURE)* | **La región que hace que esto sea una landing de HubSpot y no de AEO.** Siete dolores **en el lenguaje del comprador** → el Hub que lo resuelve. **Interactivo:** eliges tu dolor, se revela la respuesta. Es un **mini-diagnóstico**, no una lista de features | Sección firma page-scoped (CSS/JS ligero, **progressive enhancement**) | PDR-006 §2 |
-| **4** | **La prueba gratis** | Las **dos puertas**: *¿ya tienes HubSpot?* → **Portal Grader** · *¿no te encuentran?* → **AI Visibility Grader**. Gratis, sin reunión. Y para los otros dolores: **la reunión — donde lo primero es decirte si NO te sirve** | Two-door band + `<greenhouse-form>` | PDR-006 §3 |
-| **5** | 🎯 **Cuándo HubSpot NO es para ti** | **El movimiento que nadie hace.** RevOps decide por **miedo a migrar dos veces**: el que dice el límite **antes** se gana el deal. Límites documentados: **10 custom objects · 1 sandbox (200K registros; sync inicial de 5.000 contactos) · sin residencia de datos en LATAM · sin jerarquía de roles ni territory management** | Honest-limits band (texto, sin adorno) | `hubspot-solutions-partner/modules/10` |
-| **6** | 🎯 **El waiver del onboarding** | **El número.** HubSpot cobra un onboarding **obligatorio**; un partner **certificado** lo entrega en su lugar y **el cargo desaparece del contrato**. En Marketing Hub Pro: **USD 3.000 de USD 9.600 = 31% del año 1**. Y el suyo es *coaching*; el nuestro es *implementación*. **El HubSpot directo no puede igualarlo** | Offer band — cifra en **texto servido**, no contador JS | PDR-006 §1 |
-| **7** | Las 4 capas | Qué hacemos, como recorrido: **Licencia → Implementación → Operación continua → Inteligencia**. Flywheel, no menú | Feature grid / stepper | `02_gtm.md:45-54` |
-| **8** | Cómo lo hacemos **sin romperte nada** | 🔵 **Aquí entra Kortex — antídoto del miedo, no héroe.** *"No configuramos a mano: desplegamos con configuración versionada, trazable y reversible. Si mañana nos cambias, te llevas la configuración documentada — no un misterio."* 🔴 **Mecanismo, nunca escala** | Mechanism band | PDR-006 §6 |
-| **9** | Prueba | **Solutions Partner Gold** + **Kortex publicado en el HubSpot Marketplace** (link) + casos citables **de CRM** (regla 6) | Proof shell + ledger | Casos reales + listing |
-| **10** | Puente / cross-sell | Servicios hermanos (**AEO ↔ bidireccional**, SEO, Agencia Creativa, desarrollo) + pillar CRM en Think | Card-on-section links | Estático |
-| **11** | FAQ | Objeciones reales: migración · gobierno de agentes · **"¿qué tier son?" → Gold** · **"¿tengo que pagar el onboarding?" → no, si trabajas con nosotros** · tiempos y costo · integraciones · **"¿y si me quiero ir?"** | `<details>/<summary>` | Objeciones de venta |
-| **12** | CTA final + diagnóstico | **"Agenda una reunión"** (HubSpot Meetings + UTM) + la puerta de diagnóstico que corresponda | CTA band + `<greenhouse-form>` | Growth Forms (reuso) |
+| R0 | Header | identidad y navegación | Ohio header existente | WordPress |
+| R1 | Hero | categoría, thesis, CTA, proof | editorial split + system stage | copy/claim/asset ledgers |
+| R2 | Tensión | reconocer situación actual | open editorial contrast | VoC/CRO dossier |
+| R3 | Atlas | explorar seis outcomes | connected rail + editorial panel | offer V2 |
+| R4 | Sectores | aplicar una lente | segmented buttons/list + adjacent content | sector docs + VoC |
+| R5 | Fit/no-fit | criterio y límites | quiet editorial band | eligibility + sources |
+| R6 | Oferta | gratis vs blueprint | comparison threshold | offer V2 |
+| R7 | Delivery | entender intervención | operating sequence | service architecture |
+| R8 | Elegibilidad | producto/IA sin promesa absoluta | requirements matrix/editorial list | verified product sources |
+| R9 | Proof | verificar relación y resultados | evidence ledger | claim ledger |
+| R10 | Clusters/FAQ | profundizar y responder fan-out | editorial links + native details | SEO/AEO dossier |
+| R11 | Conversion | enviar evaluación | conversion chamber + governed form | Growth Forms/Meetings |
 
-> 🎯 **El arco emocional de la página:** te digo **qué te duele** (R3) → te lo **pruebo gratis** (R4) → te digo
-> **cuándo NO comprarme** (R5) → te **quito USD 3.000** del costo (R6) → te digo **qué hago** (R7) → y **cómo,
-> sin encerrarte** (R8).
-> **Cada región le quita un poco de riesgo al comprador. Esa es la página.**
+## Regiones detalladas
 
----
+### R0 — Header público
 
-## Copy Ledger
+- Reusar header/footer vigentes; no alterar navegación global salvo actualizar la URL canónica.
+- Breadcrumb `Servicios / HubSpot` sólo si el patrón público existente lo permite sin ruido.
+- Efeonce conserva ownership; HubSpot no reemplaza el logo maestro.
 
-> Dirección, no copy final — lo pule `greenhouse-ux-writing` sobre `docs/context/05_voz-tono-estilo.md`.
-> Ids de documentación (sitio público, **no** `src/lib/copy`). es-LATAM neutro, tuteo, sin voseo.
-> **Sujeto a las 8 reglas duras de arriba.**
+### R1 — Hero y sistema vivo
 
-| Copy id | R | Texto | Notas |
+Orden obligatorio:
+
+1. eyebrow factual de categoría/relación, condicionado por ledger;
+2. H1 ganador del banco de 10–25 variantes;
+3. subhead con mecanismo y límite, una idea principal;
+4. CTA primaria y Meetings subordinado;
+5. proof inmediata de máximo tres señales;
+6. system stage con las seis trayectorias visibles.
+
+No se aprueba el first fold si el H1 podría pertenecer a cualquier partner, si la visual domina la acción, si el
+proof es un logo wall o si la categoría sólo se entiende leyendo módulos posteriores.
+
+### R2 — Tensión derivada de VoC
+
+- Entre dos y cuatro tensiones, sólo después de encontrar recurrencia en VoC.
+- Patrón: lenguaje literal/observado → consecuencia operacional → transición a sistema conectado.
+- No usar fear marketing, cifras sin base, icon cards ni problemas inventados para llenar columnas.
+- Cada tensión se vincula a una o más familias sin mostrar el nombre del Hub como respuesta automática.
+
+### R3 — Atlas de seis outcomes
+
+| # | Familia canónica | Pregunta del comprador que debe resolver | Capabilities subordinadas posibles |
 |---|---|---|---|
-| `hubspot.hero.h1` | 1 | **"Antes de venderte HubSpot, te mostramos si te sirve."** | La postura. **No** lidera con "somos partner" ni con features |
-| `hubspot.hero.sub` | 1 | "Todos los partners te van a prometer que HubSpot va a funcionar. Nosotros te vamos a mostrar, con evidencia y sin cobrarte, si te sirve o no. **Y si no te sirve, también te lo decimos.**" | Reencuadre Challenger, registro sobrio |
-| `hubspot.hero.cta_1` | 1 | "Agenda una reunión" | → HubSpot Meetings + UTM |
-| `hubspot.hero.cta_2` | 1 | "Ver mi diagnóstico gratis" | → ancla `#diagnostico` |
-| `hubspot.hero.proof` | 1 | "HubSpot Solutions Partner **Gold** · Kortex, nuestra app en el HubSpot Marketplace" | ✅ El tier es afirmable. 🔴 Revisar 2027-01-15 |
-| `hubspot.stakes.title` | 2 | "HubSpot dejó de ser un CRM. Y decidir mal ahora cuesta más caro." | Stakes, **no** propuesta de valor |
-| 🎯 `hubspot.mapa.title` | **3** | **"¿Qué te duele?"** | **La región que sostiene la plataforma completa.** El título es el **dolor**, nunca el nombre del Hub |
-| `hubspot.mapa.items` | 3 | Los **siete dolores** de PDR-006 §2, en el lenguaje del comprador → el Hub como **respuesta**: Sales · Marketing+Sales · Marketing+Content · Service · Data · Revenue · Breeze | 🔴 Los 7, completos, **en el HTML servido** |
-| 🎯 `hubspot.prueba.title` | 4 | **"Te lo probamos gratis."** | Las dos puertas |
-| 🎯 `hubspot.limites.title` | **5** | **"Cuándo HubSpot *no* es para ti."** | **El movimiento que nadie hace** |
-| `hubspot.limites.body` | 5 | "Si modelas más de diez entidades propias, si necesitas un sandbox espejo de producción para tu gobierno de cambios, o si tu marco regulatorio exige que los datos vivan en tu país: **HubSpot no te da el ancho** — y preferimos decírtelo ahora, no en el mes ocho." | Límites **documentados**, no opinión |
-| 🎯 `hubspot.waiver.title` | **6** | **"El onboarding obligatorio de HubSpot, te lo ahorras."** | **El número** |
-| `hubspot.waiver.body` | 6 | "HubSpot cobra un onboarding obligatorio —**USD 3.000** en Marketing Hub Professional— y es **coaching**: te enseñan a configurarlo y lo configuras tú. Como Solutions Partner **certificado**, ese cargo **desaparece de tu contrato**: la implementación la hacemos nosotros. Y no te enseñamos a armarlo — **te lo construimos**." | 🔴 Cifra en **HTML servido**. **Reverificar el fee el día de publicación** |
-| `hubspot.kortex.title` | 8 | "Lo desplegamos como software. Y es reversible." | 🔴 **Mecanismo, NUNCA escala** |
-| `hubspot.kortex.body` | 8 | "No configuramos a mano: definimos tu operación como configuración versionada y la desplegamos con trazabilidad. Cada cambio queda registrado y se puede deshacer. **Si mañana nos cambias, te llevas la configuración documentada — no un misterio.**" | El antídoto del miedo |
-| `hubspot.faq.tier` | 11 | "¿Qué tier de partner son?" → **"Gold."** | ✅ Ya se responde |
-| `hubspot.faq.onboarding` | 11 | "¿Tengo que pagar el onboarding de HubSpot?" → "No, si trabajas con nosotros." | Refuerza R6 |
-| `hubspot.faq.salida` | 11 | "¿Y si un día quiero irme?" → "Te llevas tu configuración documentada y versionada." | JOLT: mata el miedo al lock-in |
-| `hubspot.cta_final.title` | 12 | "Empieza por saber si te sirve." | Cierre coherente con la postura |
+| 01 | Marketing, Content & AEO | ¿Cómo crear demanda, contenido y visibilidad que llegue a revenue? | Marketing Hub, Content Hub, AEO, AI marketing |
+| 02 | Sales & AI Pipeline | ¿Cómo priorizar, vender y mantener consistencia en el pipeline? | Sales Hub, prospecting/workspace, AI sales |
+| 03 | Revenue Lifecycle | ¿Cómo pasar de oportunidad a contrato, cobro y expansión con continuidad? | Revenue Hub, Contracts, quotes/CPQ eligible |
+| 04 | Service, Customer Success & Delivery | ¿Cómo atender, adoptar, retener y entregar sin handoffs ciegos? | Service Hub, Customer Success, Customer Agent case, Projects, Services |
+| 05 | Data, Integration & CRM Intelligence | ¿Cómo unificar datos, modelo e integraciones con gobierno? | Smart CRM, Data Hub, objects, sync, intelligence |
+| 06 | Agent Hub & Agentic Operations | ¿Cómo diseñar, habilitar y gobernar agentes sobre datos confiables? | Agent Hub/Builder, eligible agents, integrations |
+
+Cada panel contiene:
+
+- outcome en lenguaje comprador;
+- señales de fit y no-fit;
+- preguntas de discovery;
+- intervención Efeonce y modo de entrega;
+- mecanismos HubSpot elegibles, nunca garantía;
+- proof/límite asociado;
+- CTA contextual que conduce a la misma evaluación.
+
+Desktop enfatiza una familia sin ocultar las demás. Mobile/no-JS presenta las seis completas en secuencia o
+`details` semánticos. No existe un R8 “Agentes” que compita con el atlas: agentes viven en familia 06 y capacidades
+IA de dominio permanecen en su familia respectiva.
+
+### R4 — Lentes sectoriales
+
+Orden canónico:
+
+1. Servicios profesionales y B2B.
+2. SaaS y tecnología.
+3. Manufactura y distribución.
+
+Cada lente sólo puede cambiar:
+
+- JTBD y vocabulario observado;
+- señales de fricción/fit;
+- ejemplos autorizados;
+- preguntas de evaluación;
+- orden de énfasis de familias.
+
+No cambia claims estructurales, precio, eligibility ni la conversión. Estado inicial: `Todos los sectores`. Sin
+prueba/owner, la lente se mantiene general y no genera una URL propia.
+
+### R5 — Fit y no-fit
+
+- Quiet zone sin reveal ornamental.
+- Responde una pregunta real: “¿Cuándo HubSpot no es la mejor decisión?”.
+- Cada límite usa `condición → impacto → qué verificar → alternativa/siguiente paso`.
+- No hardcodear límites volátiles. Cluster `cuando-no-usar` sólo si está live.
+- No-fit informado es un resultado válido y no activa captura forzada.
+
+### R6 — Evaluación gratuita y blueprint pagado
+
+| Dimensión | Evaluación inicial sin costo | Blueprint pagado |
+|---|---|---|
+| Propósito | fit, contexto, orientación y cotización | investigación y decisión estructurada |
+| Input | conversación e información inicial | acceso/entrevistas/datos según alcance |
+| Output | siguiente paso y propuesta si aplica | artefacto autónomo reutilizable |
+| Compromiso | no obliga a implementar | puede contratarse separado |
+| No promete | score, auditoría o informe automático | resultado de implementación |
+
+La tabla se valida con copy y oferta. Debajo: `qué necesitamos`, `qué ocurre después`, privacidad y tiempo sólo si
+está confirmado. No usar waiver/descuento como promesa universal.
+
+### R7 — Delivery
+
+Secuencia estable, adaptada por alcance:
+
+1. intake y baseline;
+2. blueprint/arquitectura cuando corresponde;
+3. implementación o migración;
+4. adopción/enablement y lanzamiento;
+5. operación gestionada;
+6. medición, optimización y governance.
+
+Cada etapa muestra outcome, aceptación, owner y modalidad (`advisory`, `project`, `implementation`, `managed
+operation`, `continuous optimization`). “Services” producto y “servicios Efeonce” se distinguen por contexto.
+
+### R8 — Elegibilidad y límites de capabilities
+
+- Matriz o lista editorial transversal, no showcase de agentes.
+- Gates: release, portal/tier, seats, créditos, región/idioma, permisos, data readiness, integración y readback.
+- Distingue `sellable/evidence`, `discovery-qualified` y `pilot-first` cuando la oferta V2 lo exija.
+- Todo elemento volátil tiene fecha de verificación; no se presenta roster fijo.
+
+### R9 — Proof ledger visible
+
+- No exponer el ledger interno completo; traducirlo a evidencia comprensible con fuente/alcance/fecha cuando aplique.
+- Tipos: relación/partner, certificaciones reales, Marketplace, caso autorizado, método, seguridad factual.
+- Prueba se ubica junto al claim sostenido y puede repetirse como referencia, no como slogan.
+- Sin autorización o vigencia: anonimizar si está permitido o remover. Layout tolera ausencia sin huecos.
+
+### R10 — Clusters y FAQ AEO
+
+- Clusters sólo si responden 200, tienen canonical propio, son indexables y contienen valor mínimo.
+- Links descriptivos: precios, cuándo no usar, agentes y HubSpot vs Salesforce según rutas confirmadas.
+- FAQ nace de SERP, fan-out, sales questions y VoC; no de una lista genérica.
+- Cada `h2/h3` formula pregunta literal o afirmación clara; respuesta inicial autocontenida y visible.
+- `details/summary` nativo; contenido disponible en HTML servido.
+
+### R11 — Conversion chamber
+
+- Ancla `#evaluacion`; heading + expectativa + frontera + privacidad antes del primer campo.
+- `<greenhouse-form>` gobernado, no form ad hoc.
+- Hidden context sólo con allowlist: page/family/sector/UTM; nunca texto libre o PII en analytics.
+- Success explica recepción y siguiente paso real; Meetings opcional, nunca autoabierto.
+- Si el renderer no monta: fallback visible y factual.
+
+## Content and Copy Ledger
+
+| Copy id | Región | Función | Estado | Restricción |
+|---|---|---|---|---|
+| `hubspot.hero.eyebrow` | R1 | relación/categoría | research-dependent | factual, ledger-backed |
+| `hubspot.hero.h1` | R1 | big idea + outcome | unresolved | elegir entre 10–25 variantes |
+| `hubspot.hero.subhead` | R1 | mecanismo + límite | unresolved | una idea, sin feature list |
+| `hubspot.cta.assessment` | R1/R3/R11 | primary action | function locked | verbo + valor, wording consistente |
+| `hubspot.cta.meetings` | R1/R11 | secondary path | function locked | subordinada |
+| `hubspot.tension.*` | R2 | relevancia | VoC-dependent | no fear/hype |
+| `hubspot.family.<id>.*` | R3 | outcome/fit/mechanism | offer locked, wording open | exact family names |
+| `hubspot.sector.<id>.*` | R4 | contextual lens | evidence-dependent | no vertical claim invented |
+| `hubspot.fit.*` | R5 | qualify/disqualify | source-dependent | condition + impact + alternative |
+| `hubspot.assessment.*` | R6/R11 | commercial boundary | concept locked | free ≠ autonomous diagnosis |
+| `hubspot.delivery.*` | R7 | process | architecture-backed | distinguish product Services |
+| `hubspot.eligibility.*` | R8 | constraints | volatile | verify at publish |
+| `hubspot.proof.*` | R9 | credibility | ledger-dependent | source/date/authorization |
+| `hubspot.faq.*` | R10 | retrieval/objection | SEO/VoC-dependent | answer-first |
+| `hubspot.form.*` | R11 | expectation/recovery | renderer contract | no false SLA |
+
+El copy deck final completa texto, dynamic values, source y approval. Este wireframe no aprueba frases provisionales.
 
 ## State Copy
 
-| Estado | Comportamiento |
-|---|---|
-| ready | Página renderizada; el **mapa (R3)** interactivo; CTAs activos |
-| loading | Sin loading de página (estático). El form tiene el suyo (renderer) |
-| 🔴 **sin JS** | **El mapa (R3) funciona sin JavaScript** — progressive enhancement: se ve como **lista completa** de los 7 dolores + su Hub. **Los crawlers de IA deben poder leerlo entero** |
-| partial (form) | El embed no carga (CORS) → **fallback link** a agendamiento/mailto con UTM. **El CTA nunca muere** |
-| error | Error del form → Success/Error Card del renderer (TASK-1320) |
-| reduced-motion | El mapa se muestra **expandido y estático**; sin reveals |
+| Estado | Título funcional | Body requirement | CTA/recovery |
+|---|---|---|---|
+| ready | evaluación disponible | qué recibirá y qué se solicita | CTA de evaluación |
+| validating | revisar información | resumen + errores locales | corregir primer campo |
+| submitting | enviando solicitud | no cerrar ni reenviar | disabled con estado |
+| accepted | solicitud recibida | expectativa real, sin SLA inventado | Meetings opcional/volver |
+| rejected | no pudimos aceptar | motivo seguro/no sensible | revisar o canal alternativo |
+| rate-limited | demasiados intentos | cuándo reintentar si se conoce | canal alternativo |
+| transport error | no se pudo enviar | datos preservados y causa genérica | reintentar/fallback |
+| embed unavailable | formulario no disponible | alternativa y privacidad | Meetings/contacto |
+| claim unavailable | evidencia retirada | eliminar bloque, no mostrar error | n/a |
+
+El wording exacto se produce en el copy deck; causa, recuperación y semántica no son opcionales.
 
 ## Accessibility Contract
 
-- Un solo `<h1>` (R1). `<h2>` por región. `<h3>` para los 7 dolores y los ítems de FAQ.
-- 🔴 **El mapa (R3) es semántico**: lista de pares dolor→Hub navegable por teclado, **no un widget opaco**.
-  Sin JS, **todo el contenido visible**. Con JS, se puede colapsar/revelar.
-- Los límites (R5) son **texto semántico**, no imagen.
-- Focus ring AA en CTAs, `<summary>` y campos del form. Contraste AA en hero y bandas oscuras.
-- Estados del form con **texto + ícono**, no solo color.
+- Heading order: un `h1`; `h2` por región; `h3` por familia/pregunta subordinada.
+- Atlas: control semántico elegido después de prototype; no inventar tabs si no cumple roving focus/ARIA.
+- Aria labels: describen acción/estado, no color o icono.
+- Focus: CTA in-page mueve foco al heading de R11; form error al resumen/primer campo; close restaura al trigger.
+- Color-independent: número, label, icon/shape y ARIA acompañan cualquier señal cromática.
+- No-JS: seis familias, sectores, FAQ y oferta siguen disponibles.
+- Reduced motion: mismo orden, significado, CTA y estado final.
+- Forms: labels explícitos, error association, summary cuando aplique, valores preservados y zoom móvil evitado.
+- SVG/canvas: decorativo `aria-hidden`; todo texto crítico vive en HTML.
+
+## Visual Fidelity Mapping
+
+| Cue | Token/patrón | Intent preserved | Literal rejected |
+|---|---|---|---|
+| energía HubSpot | `--hsx-signal-primary` verified | reconocimiento/acción | HEX recordado |
+| base Efeonce | public brand tokens | ownership/confianza | copiar background HubSpot |
+| seis conexiones | atlas page-scoped | integración causal | network/particle visual |
+| profundidad | 3 planos + surface roles | jerarquía | glass cards repetidas |
+| editorial rhythm | open bands/quiet zones | decisión y lectura | bento/card soup |
+| CTA | primary public button pattern | acción única | varios botones sólidos |
+| mobile | vertical stations | relación/orden | desktop comprimido |
 
 ## Implementation Mapping
 
-- Route: `efeoncepro.com/servicios-contratar-hubspot/` — **reposición in-place** de la id `244079`
-  (`template default`, header nativo, **sin** `elementor_canvas`, misma URL/canonical).
-- Primitives: patrones marketing `modern-ui` (**no** el Design System del portal) + `<greenhouse-form>`.
-- Componentes: secciones Elementor/Ohio (evolucionar el Partner Proof Module) + CSS page-scoped +
-  **el mapa (R3)** page-scoped + el form embebido.
-- Data/command: **ninguno nuevo.** Reusa el submit gobernado de Growth Forms + HubSpot Meetings.
-  **Full API Parity por reuso** — la landing es cliente. `efeonce-hubspot-portal-audit` = config de form
-  instance del contrato existente; HubSpot delivery `disabled` hasta cutover.
-- GVC markers: `hero`, `stakes`, **`mapa`**, `prueba`, **`limites`**, **`waiver`**, `capas`, `kortex`,
-  `proof`, `puente`, `faq`, `cta-final`, `diagnostico`.
+- Route/surface: WordPress page id registrado; cutover a `/servicios/hubspot/`.
+- Primitives: Ohio public blocks, semantic HTML, `<greenhouse-form>`, Meetings link/embed existente.
+- Variants/kinds: page-scoped atlas/lens patterns; no primitive global nueva.
+- Component candidates: hero stage, outcome atlas, sector lens, fit band, offer threshold, delivery sequence,
+  eligibility list, proof evidence, FAQ and conversion chamber.
+- Copy source: approved TASK-1352 copy deck; reusable renderer strings remain canonical.
+- Data reader/command: none new; reuse existing server-side form/Meetings contracts.
+- API parity: UI is client; no CRM write in page JS.
+- Access: public; consent/cookies/tracking contracts apply.
+- Runtime consumers: WordPress renderer, search/answer crawlers, assistive technology and GVC.
+- GVC markers: `hubspot-hero`, `hubspot-proof`, `hubspot-atlas`, `hubspot-sectors`, `hubspot-fit`,
+  `hubspot-assessment`, `hubspot-delivery`, `hubspot-eligibility`, `hubspot-faq`, `hubspot-conversion`.
 
 ## GVC Scenario Plan
 
-- Scenario: `scripts/frontend/scenarios/public-servicios-contratar-hubspot.capture.txt` `[crear]`
-- Viewports: **1440 + 390**. Route: preview de WordPress.
-- Pasos: **before-capture** (versión previa) → cargar → scroll por regiones → **interactuar con el mapa (R3)**
-  → abrir 1 FAQ → click "Ver mi diagnóstico" → scroll + focus al form.
-- Capturas: full-page desktop+mobile · frame por región · **el mapa en 2+ estados** · FAQ abierto ·
-  form montado · **reduced-motion** · **before/after**.
-- **Assertions:**
-  - Sin scroll horizontal (1440 y 390). Un solo `<h1>`. Canonical preservado.
-  - 🔴 **Citabilidad sin JS:** `fetch` **sin ejecutar JavaScript** → **los 7 dolores del mapa (R3), la cifra
-    del waiver (R6) y los límites (R5) aparecen en el HTML servido.** *(Los contadores Ohio renderizan `00 %`
-    sin JS; los crawlers de IA no lo ejecutan.)*
-  - 🔴 **Sin leftovers del template:** ningún `href` sale del dominio salvo los intencionales (HubSpot
-    Meetings, listing de Kortex). *(La página viva tiene "Más testimonios" → `themeforest.net`.)*
-  - 🔴 **Ningún claim prohibido en el DOM:** `grep` de `ISO 27001` · `Forrester` · `Líder en CRM` ·
-    `Commerce Hub` · `Operations Hub` · `INBOUND`.
-  - El mapa (R3) se despliega en default y queda **expandido/estático** bajo `prefers-reduced-motion`.
+- Scenario: `public-servicios-hubspot`.
+- Scenario file: `docs/ui/gvc-scenarios/TASK-1352-hubspot-landing.yaml` if supported by current runner.
+- Route: stable preview, then canonical live URL.
+- Viewports: 1440×1100, 1024×900, 390×844.
+- Quality profile: `premium`.
+- Steps: cold load; first fold; atlas family 01/03/06; sector change/reset; fit; threshold; FAQ; form empty/error/
+  accepted fixture; embed failure; keyboard; no-JS; reduced motion; legacy redirect.
+- Captures: every marker plus first fold default/focus/reduced and form error/success.
+- Assertions: exact six families/order; three sectors/order; one H1; one primary conversion; claim/asset ledger;
+  canonical/schema/links; no hidden critical copy; no PII telemetry; no duplicate lead.
+- Scroll-width: equality at all viewports after every interactive state.
+- Accessibility: axe, heading tree, tab order, focus restore, errors, 44 px targets and contrast base/intermediate.
+- Review dossier: `docs/ui/reviews/TASK-1352-hubspot-landing/`.
+- Baseline: promote only after `ACCEPT FIRST FOLD`; rejected Claude output is never baseline.
 
 ## Design Decision Log
 
-- **Decisión:** landing de **la plataforma HubSpot completa**, posicionada en **"evidencia antes que promesa"**
-  (PDR-006 reescrito). Arco: dolor → prueba gratis → descalificación honesta → waiver → qué hacemos → cómo, sin
-  encerrarte. Sección firma = **el mapa dolor→Hub**.
-- **Alternativas descartadas:**
-  - *Liderar con Kortex / "RevOps programático"* (tesis v1) — **n=1**; afirma una escala inexistente y **pelea
-    contra JOLT** (software propietario = miedo al lock-in).
-  - *Sección firma = "stack agéntico" abstracto* — ilustrativa, no funcional; su art direction **bloqueaba
-    `UI ready`**; y no vendía la plataforma. **El mapa hace el mismo show-don't-tell y además sirve.**
-  - *Orbitar AEO* — estrecha la página a Marketing y **pierde seis de los siete compradores**.
-  - *Liderar con "Somos Solutions Partner"* — commodity, y **Gold no gana contra los Elite** de la región.
-  - *Catálogo de agentes Breeze* — es la historia de HubSpot; **solo 3 en GA**; pricing volátil.
-- **Por qué este patrón:** `modern-ui` marketing lane + **Challenger** (reencuadre) + **Command of the Message**
-  (dolor → capacidad → outcome, nunca features) + **JOLT** (el miedo a elegir mal se combate **quitando
-  riesgo**, no prometiendo más).
-- **Reuse / new:** reuse (marketing + Growth Forms + HubSpot Meetings). Única pieza nueva: **el mapa (R3)**,
-  page-scoped, progressive-enhancement.
-- **Open risks:** CORS del form para `/servicios-contratar-hubspot/*` (probable gap vs `/servicios/*`) ·
-  URL del listing de Kortex en el Marketplace · **casos de CRM citables (hoy cero)** · reverificar el
-  onboarding fee y el estado de Breeze el día de publicación.
+- Decision: one connected atlas of exact canonical outcome families; sector and eligibility are lenses/constraints.
+- Alternatives: Hub catalog, pain→Hub map, agent showcase, dashboard, refinement of old design.
+- Why: keeps buyer intention before product, makes platform breadth understandable and supports SEO/CRO without
+  sacrificing immersive identity.
+- Reuse/extend/new: extend locally; no platform primitive yet.
+- Open risks: research may change hierarchy/copy; asset authorization; proof availability; exact form identity;
+  cluster readiness; mobile density; performance.
+- Follow-up: resolve risks in TASK-1352 Slice 1–4, not during final polish.
 
 ## Acceptance Checklist
 
-- [ ] Todo string visible está en el copy ledger y validado con `greenhouse-ux-writing`.
-- [ ] 🔴 **La página vende la plataforma completa** — el mapa (R3) cubre los **7 dolores**. **No orbita AEO.**
-- [ ] 🔴 **Ningún claim prohibido** (ISO 27001 · "Líder en CRM según Gartner" · Forrester · residencia LATAM ·
-      flota de agentes). ✅ Sí *"Leader en B2B Marketing Automation (Gartner, 5.º año)"*.
-- [ ] 🔴 **Nomenclatura 2026** (Revenue Hub · Data Hub · UNBOUND).
-- [ ] **Las regiones 5 (límites) y 6 (waiver) existen** y están arriba del pliegue de decisión.
-- [ ] 🔴 **Kortex describe el mecanismo y NO implica escala.**
-- [ ] 🔴 **Citabilidad sin JS** verificada (mapa + waiver + límites en el HTML servido).
-- [ ] Casos: métrica verificable + relación en buenos términos + autorización. **SSilva solo anonimizado.**
-- [ ] Sin leftovers del template (`themeforest.net` u otros `href` foráneos).
-- [ ] GVC 1440 + 390 + reduced-motion + before/after capturado **y mirado**. Sin scroll horizontal.
-- [ ] URL/canonical preservados (reposición in-place, sin 301). Snapshot antes de mutar.
+- [ ] Reset prevents reuse of old composition/copy.
+- [ ] All visible strings map to the copy deck/ledger; no fake final copy.
+- [ ] Six families and three sectors exactly match offer V2.
+- [ ] Customer Agent and Agent Hub do not dominate outside their proper family.
+- [ ] Desktop and mobile are distinct compositions with identical semantic order.
+- [ ] One primary conversion and factual free/paid boundary appear before the form.
+- [ ] SEO/AEO headings/passages remain visible in served HTML.
+- [ ] Claim/asset absence degrades cleanly.
+- [ ] State, focus, error, no-JS and reduced-motion contracts are complete.
+- [ ] Implementation mapping, GVC markers and decision log are executable.
+- [ ] First fold earns human `ACCEPT` and premium score before full build.

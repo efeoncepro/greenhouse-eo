@@ -28,6 +28,30 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
 
 ## Índice
 
+- **[Contacto — brief aprobado y datos institucionales](CONTACT_PAGE_REBUILD_BRIEF_V1.md)** — reconstrucción
+  con motivos condicionales, reuniones, dirección y teléfonos verificados en las contraportadas; Estados Unidos
+  incluido como mercado operativo. `TASK-1801` registrada; implementación, publicación y validación de consumidores pendientes.
+
+- **[Content Marketing vigente — Elementor](../architecture/public-site/CONTENT_MARKETING_ELEMENTOR_MODULES_V1.md)** —
+  página `242603`, `/servicio-marketing-de-contenidos/`, trece módulos del diseño aprobado y captura
+  Growth Forms. [Funcionamiento](../documentation/public-site/content-marketing.md),
+  [edición y verificación](../manual-de-uso/public-site/content-marketing.md) y
+  [evidencia del corte de publicación](../audits/public-site/2026-08-31-content-marketing-publication.md).
+
+- **[HubSpot vigente — Elementor](../architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md)** — página
+  `244079` en `/servicios-contratar-hubspot/`, once widgets nativos y Growth Forms. Diseño aprobado con
+  identidad visual y copy revisado en siete módulos; [última evidencia pública del 2026-08-31](../audits/public-site/2026-08-31-hubspot-industry-method-copy.md).
+  La migración pillar/cluster de PDR-013 no se ejecutó como parte de esta publicación.
+- **[Home vigente — Elementor](../architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md)** — portada
+  `251731`, promovida desde Claude Design; contrato técnico de módulos, edición y evidencia. La antigua
+  Home `2791` es respaldo noindex. [Cierre editorial y QA residual](../audits/public-site/2026-08-31-home-editorial-closure.md):
+  ocho revisiones aplicadas; no equivale a aprobación global de claims ni cierre del editor.
+- **[Indexabilidad del menú — 2026-08-31](../audits/public-site/2026-08-31-menu-indexability.md)** — 18 páginas verificadas; Redes Sociales habilitada tras autorización expresa, sin cambios de contenido o menú.
+- **[Páginas misceláneas — arquitectura propuesta](../architecture/public-site/PUBLIC_MISCELLANEOUS_SURFACES_V1.md)** —
+  404, búsqueda/no-results y archivos siguen bajo Ohio padre; se propone un sistema child-theme-first con
+  recovery compartido y políticas HTTP/SEO por query type. [Discovery live](../audits/public-site/2026-08-31-wordpress-miscellaneous-surfaces-discovery.md),
+  [funcionamiento](../documentation/public-site/public-miscellaneous-surfaces.md) y
+  [manual](../manual-de-uso/public-site/operar-paginas-miscelaneas.md). No implementado ni publicado.
 - **[PRODUCT_ROADMAP.md](PRODUCT_ROADMAP.md)** — roadmap del sitio público
   (now / next / later) con enlaces a los EPICs y PDRs que lo sostienen.
 - **[decisions/](decisions/)** — Product Decision Records (PDR). Log de
@@ -50,6 +74,7 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
 - [PDR-016 — Landing de influencer marketing, creators y UGC](decisions/PDR-016-landing-influencer-marketing-creators-ugc-posicionamiento.md)
 - [PDR-017 — Content Engineering como territorio editorial y doctrina de experiencia](decisions/PDR-017-content-engineering-territorio-editorial.md)
 - [PDR-018 — Pillar + Cluster Experience federada: arquitectura editorial, social search, conversión y runtime](decisions/PDR-018-pillar-experience-arquitectura-editorial-y-runtime.md)
+- [PDR-019 — Taxonomía editorial canónica del blog WordPress](decisions/PDR-019-taxonomia-editorial-canonica-blog-wordpress.md)
 - **[Content Engineering Pillar Brief V1](CONTENT_ENGINEERING_PILLAR_BRIEF_V1.md)** — foundation brief de la futura masterpiece: tesis, audiencia, arco, primitives de comprensión/decisión, SEO/AEO, medición, distribución y gates de publicación.
 - **[Creative Workflows Pillar + Cluster Brief V1](CREATIVE_WORKFLOWS_PILLAR_CLUSTER_BRIEF_V1.md)** — brief maestro de audiencia, tesis, arquitectura editorial, prioridades, enlaces, medición y atomización.
 - **[Web agéntica Pillar + Cluster Brief V1](WEB_AGENTICA_PILLAR_CLUSTER_BRIEF_V1.md)** — contrato editorial de la pillar que soporta `/desarrollo-sitios-web/`: definición citable, recorrido, cluster, enlaces, visuales, medición y gate de publicación.
@@ -89,8 +114,10 @@ de `DECISIONS_INDEX.md`; no copia su contenido. Cuando un PDR se baja a trabajo,
   [`docs/documentation/public-site/wordpress-blog-content-hub-search.md`](../documentation/public-site/wordpress-blog-content-hub-search.md)
   y auditoria base
   [`docs/audits/public-site/2026-07-09-wordpress-blog-content-hub-search.md`](../audits/public-site/2026-07-09-wordpress-blog-content-hub-search.md).
-  Layout candidato elegido: `Demo 35: Blog Magazine`, documentado en
-  [`docs/audits/public-site/2026-07-09-demo35-blog-magazine-layout-review.md`](../audits/public-site/2026-07-09-demo35-blog-magazine-layout-review.md).
+  La taxonomía canónica y la copia de trabajo `251875` de `Demo 35: Blog
+  Magazine` están documentadas en
+  [`docs/audits/public-site/2026-08-31-blog-taxonomy-demo35-work-copy.md`](../audits/public-site/2026-08-31-blog-taxonomy-demo35-work-copy.md);
+  la fuente `225984` permanece protegida y `/blog/` aún no fue reemplazado.
 - **Grader / dominio growth:** `architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md`.
 
 ## Convención de PDR

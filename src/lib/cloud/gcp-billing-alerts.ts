@@ -2,6 +2,7 @@ import 'server-only'
 
 import { sendSlackAlert } from '@/lib/alerts/slack-notify'
 import { getGcpBillingOverview } from '@/lib/cloud/gcp-billing'
+import { buildCloudCostAlertIncident } from '@/lib/cloud/finops-alert-fingerprint'
 import { postTeamsCard } from '@/lib/integrations/teams/sender'
 import type { TeamsAdaptiveCard } from '@/lib/integrations/teams/types'
 
@@ -132,17 +133,7 @@ export const runCloudCostAlertSweep = async ({
 
   const severity = eligible.some(driver => driver.severity === 'error') ? 'error' : 'warning'
 
-  const fingerprint = stableFingerprint({
-    severity,
-    latestUsageDate: overview.source.latestUsageDate,
-    drivers: eligible.map(driver => ({
-      driverId: driver.driverId,
-      severity: driver.severity,
-      currentCost: driver.currentCost,
-      deltaPercent: driver.deltaPercent,
-      share: driver.share
-    }))
-  })
+  const fingerprint = stableFingerprint(buildCloudCostAlertIncident({ severity, drivers: eligible }))
 
   const title = eligible[0]?.summary ?? 'Costo cloud requiere revisión'
 

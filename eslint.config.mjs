@@ -252,6 +252,38 @@ export default [
   },
 
   /*
+    CommonJS-only override — la extensión `.cjs` ES el contrato de módulo.
+
+    El bloque general de arriba declara `sourceType: 'module'` para todo el repo, así que un
+    archivo `.cjs` —que Node ejecuta como CommonJS POR SU EXTENSIÓN— quedaba juzgado con las
+    reglas del sistema de módulos equivocado: `require()` se reportaba como error y
+    `module.exports` como asignación indebida a una variable de Next.
+
+    🔴 Esto es la causa raíz de un bug class recurrente, no una excepción de conveniencia. Cada vez
+    que apareció, se cerró agregando un directorio entero al `ignores` global —`ai-generations/**`
+    (2026-07), `generated/**` (2026-07-29, 43 errores de un WIP ajeno bloqueando el pre-push de
+    todos), `.captures/**`, `.tmp/**`—. Ignorar un directorio apaga TODAS las reglas ahí, incluidas
+    las que sí importan, y no escala: el siguiente `.cjs` en un directorio nuevo repite el bloqueo.
+    Declarar el sistema de módulos correcto lo cierra de raíz y para todo el repo.
+
+    NO afloja nada: `no-require-imports` existe para impedir `require()` en módulos ESM/TS, y sigue
+    activo ahí. Un `.cjs` no puede usar `import`.
+  */
+  {
+    files: ['**/*.cjs'],
+    // `sourceType: 'commonjs'` ya habilita el scope y los globals de CommonJS (`require`,
+    // `module`, `exports`, `__dirname`) sin agregar una dependencia nueva sólo para declararlos.
+    languageOptions: {
+      sourceType: 'commonjs'
+    },
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+      '@typescript-eslint/no-var-requires': 'off',
+      '@next/next/no-assign-module-variable': 'off'
+    }
+  },
+
+  /*
     TypeScript-only override: matchea el bloque overrides del .eslintrc.js
     legacy. Aplica solo a *.ts / *.tsx + iconify-bundle.
   */
@@ -305,6 +337,26 @@ export default [
       // inline. Modo warn (76 archivos legacy); promover a 'error' tras el
       // sweep. Scopeado a Typography → cero falsos positivos de íconos.
       'greenhouse/no-fontsize-inline-typography': 'warn',
+
+      /*
+       * TASK-1693 follow-up — `opacity` literal < 1 sobre texto rompe el contraste en silencio.
+       *
+       * Modo `warn`, por DOS razones y ninguna es comodidad:
+       *
+       * 1. **Hay legacy real: 26 ocurrencias en `src/` al introducirla**, y muestreadas son el
+       *    mismo anti-patrón, no falsos positivos (`opacity: 0.75` sobre `common.white` en
+       *    `NexaGreetingsCard`, `0.82` en `NotAuthorized`, `0.68` en un caption de `PreviewStage`).
+       *    Mismo patrón que `no-untokenized-copy` y `no-fontsize-inline-typography`: `warn` hasta
+       *    el barrido, después `error`.
+       * 2. **La regla marca una PRÁCTICA, no un ratio medido.** `opacity: 0.9` sobre texto ya
+       *    oscuro puede seguir pasando 4.5:1. Quien mide el contraste real es axe en el gate de
+       *    accesibilidad del GVC; esta regla adelanta la señal al momento de escribir y ofrece la
+       *    alternativa canónica (`color: 'text.secondary'`). Poner en `error` algo que no mide el
+       *    ratio bloquearía casos legítimos.
+       *
+       * Caso fuente: 3.14:1, axe `color-contrast` serious en los 6 frames, con el lint verde.
+       */
+      'greenhouse/no-opacity-on-text': 'warn',
       // Figma Implementation Contract — color HEX hardcodeado prohibido en UI
       // de producto; mapear a theme.palette.*/theme.axis.*/var(--mui-palette-*).
       // TASK-1048: promovida a 'error' con baseline 0 (sweep + tokens success-ink/

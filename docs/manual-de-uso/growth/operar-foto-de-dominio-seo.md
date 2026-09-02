@@ -1,9 +1,9 @@
 # Operar la foto de dominio SEO (TASK-1775)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-08-27 por Claude (TASK-1775)
-> **Ultima actualizacion:** 2026-08-27 por Claude
+> **Ultima actualizacion:** 2026-09-01 por Codex
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §3 y §4.2
 
 ## Para qué sirve
@@ -15,6 +15,13 @@ cliente **y de sus competidores declarados**, más la trayectoria histórica men
 
 Toda cifra es **◑ estimada** (DataForSEO Labs, ciclo mensual). Nunca se compara, promedia ni
 grafica junto a datos ● medidos de Search Console.
+
+> **Alerta metodológica actualizada 2026-09-02:** DataForSEO confirmó Improved ETV y el corte global
+> `2026-11-01T00:00:00Z`; desde ese instante `false` se ignora y no existe fallback legacy. La respuesta no
+> expone una versión de fórmula, y el runtime actual no persiste un método efectivo derivado; no ejecutes un backfill, shadow o cutover
+> manual agregando el flag a esta corrida. Hasta implementar provenance formula-aware, cualquier salto de ETV
+> se trata como posible cambio de modelo, no como crecimiento/caída. Auditoría y plan:
+> [DataForSEO Improved ETV](../../audits/seo/2026-09-01-dataforseo-improved-etv-impact.md).
 
 ## Antes de empezar
 

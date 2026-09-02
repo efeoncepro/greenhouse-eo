@@ -454,11 +454,23 @@ export interface SeoSiteAuditCollectSummary {
   }>
 }
 
+/**
+ * TASK-1670 — Alcance del hallazgo. `page` viene del crawl OnPage y su `url` es una página
+ * real; `site` es una propiedad del dominio (robots.txt, borde/WAF, sitemap, JSON-LD de la
+ * home) y su `url` es la raíz del sujeto, compartida por todos los hallazgos de sitio.
+ *
+ * 🔴 Un hallazgo `site` NUNCA se cuenta como "página afectada": contarlo sería afirmar que el
+ * problema toca una sola página cuando toca el dominio entero.
+ */
+export type SeoSiteAuditFindingScope = 'page' | 'site'
+
 export interface SeoSiteAuditFindingView {
   url: string
   issueType: string
   severity: SeoSiteAuditFindingSeverity
   detail: Record<string, unknown>
+  /** TASK-1670 — aditivo. Los hallazgos previos a esta task son todos `page`. */
+  findingScope: SeoSiteAuditFindingScope
 }
 
 export interface SeoSiteAuditRunView {

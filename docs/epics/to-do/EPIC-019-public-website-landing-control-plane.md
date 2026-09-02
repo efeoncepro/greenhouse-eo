@@ -70,6 +70,9 @@ Sin un epic, el trabajo tenderia a partir con un script o endpoint aislado que p
 | `TASK-TBD` | `5` | `planned` | Attribution and reporting: HubSpot campaign/form/meeting linkage, landing performance snapshot and Pulse/Account 360 hooks. |
 | `TASK-TBD` | `6` | `planned` | Nexa advisory layer: draft copy/SEO suggestions and opportunity detection after deterministic publishing is stable. |
 | `TASK-1326` | `4` | `to-do` | **Control plane Astro multi-repo**: generaliza el binding + GitHub Control Plane de public-site Astro de single-repo (hoy pineado a `efeonce-web`) a un registro multi-repo, para gobernar `efeonce-think` desde Greenhouse. *(Reconciliada 2026-08-05: declaraba `Epic: EPIC-020`, pero es control plane del sitio público, no AEO.)* |
+| `TASK-1799` | `4` | `in-progress / landing publicada` | Content Marketing / Content Ops: trece widgets Elementor desde diseño aprobado, Growth Forms, Yoast/Service y menú. Pendientes de QA ampliado en su [task](../../tasks/in-progress/TASK-1799-landing-content-marketing-content-ops-partner.md); no implica cierre del control plane completo. |
+| `TASK-1802` | `4` | `to-do` | Content Hub Efeonce: reconstruye `/blog` con widgets Elementor query-driven sobre posts WordPress publicados, archivo/paginación navegable y formatos federados (Artículos, Glitch, Tools, Videos y Webinars). Demo 35 deja de ser dirección final; cualquier schema/reader reusable faltante se separa antes como foundation backend. |
+| `TASK-1803` | `4` | `to-do` | Landing Branding Studio: articula la marca como sistema de decisión —definición, expresión y operación— y coordina su continuidad con Agencia Creativa y Producción Creativa. Incluye investigación/copy, wireframe, flow y motion; Discovery debe cerrar identidad de URL, casos, CTA y bindings antes de implementación. |
 
 ## Existing Related Work
 

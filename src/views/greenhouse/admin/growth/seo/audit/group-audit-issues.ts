@@ -1,5 +1,9 @@
 import { GH_GROWTH_SEO_AUDIT, GH_GROWTH_SEO_AUDIT_ISSUES } from '@/lib/copy/growth'
-import type { SeoSiteAuditFindingSeverity, SeoSiteAuditFindingView } from '@/lib/growth/seo/contracts'
+import type {
+  SeoSiteAuditFindingScope,
+  SeoSiteAuditFindingSeverity,
+  SeoSiteAuditFindingView
+} from '@/lib/growth/seo/contracts'
 
 /**
  * TASK-1309 — Agrupación y priorización de los findings del site audit.
@@ -28,7 +32,20 @@ export interface SeoAuditIssueGroup {
   severity: SeoSiteAuditFindingSeverity
   effort: SeoAuditIssueEffort
   value: SeoAuditIssueValue
-  /** URLs distintas afectadas por este check. */
+  /**
+   * TASK-1671 — alcance del grupo. `page` viene del crawl OnPage; `site` es una propiedad del
+   * dominio (robots.txt, borde/WAF, sitemap, JSON-LD de la portada). El consumer decide con esto
+   * si rotula "N páginas afectadas" o "Todo el sitio": un hallazgo de dominio rotulado como una
+   * página es falso.
+   */
+  scope: SeoSiteAuditFindingScope
+  /**
+   * URLs distintas afectadas por este check.
+   *
+   * ⚠️ Sólo tiene sentido cuando `scope === 'page'`. En un grupo de sitio vale 1 —todos los
+   * hallazgos de dominio comparten la URL raíz del sujeto— y ese 1 NO significa "afecta una
+   * página": significa "no aplica". No se renderiza para grupos de sitio.
+   */
   affectedPages: number
   findings: readonly SeoSiteAuditFindingView[]
   /** `true` si el check aún no tiene ficha es-CL (el allowlist del backend creció). */
@@ -65,8 +82,21 @@ const DEFAULT_VALUE: SeoAuditIssueValue = 'medium'
  * distingue un problema aislado de uno sistémico, sin valor la trivia de sitio gana por
  * volumen, y sin esfuerzo se recomienda primero lo más caro de arreglar.
  */
-const priorityScore = (group: SeoAuditIssueGroup): number =>
-  (group.affectedPages * VALUE_WEIGHT[group.value]) / EFFORT_WEIGHT[group.effort]
+const priorityScore = (group: SeoAuditIssueGroup): number => {
+  // TASK-1671 — un grupo de SITIO no multiplica por alcance.
+  //
+  // ⚠️ Con `affectedPages = 1` esto NO cambia el número (1 × v ÷ e ≡ v ÷ e): quien separa los
+  // hallazgos de dominio de la lista de página es la PARTICIÓN, no este score. Lo que la rama
+  // compra es otra cosa, y por eso existe: deja el alcance fuera del orden de dominio **por
+  // contrato**, de modo que si mañana alguien puebla `affectedPages` de un grupo de sitio con un
+  // conteo sintético —el total de páginas crawleadas es la tentación— el orden no se distorsione.
+  // Es un guardrail contra un cambio futuro, no un arreglo de un síntoma de hoy.
+  if (group.scope === 'site') {
+    return VALUE_WEIGHT[group.value] / EFFORT_WEIGHT[group.effort]
+  }
+
+  return (group.affectedPages * VALUE_WEIGHT[group.value]) / EFFORT_WEIGHT[group.effort]
+}
 
 /**
  * Agrupa los findings por `issueType` y los ordena por severidad ▸ (páginas × valor ÷ esfuerzo).
@@ -102,6 +132,9 @@ export const groupAuditIssues = (
       // La severidad la manda el backend por finding (CHECK de TASK-1299), no la ficha de
       // copy: si algún día difieren, gana el dato persistido, no el texto.
       severity: items[0].severity,
+      // Mismo criterio que la severidad: el alcance lo manda el dato persistido (columna
+      // `finding_scope`, TASK-1670), nunca una heurística por `issueType` o por URL.
+      scope: items[0].findingScope,
       effort: entry?.effort ?? DEFAULT_EFFORT,
       value: entry?.value ?? DEFAULT_VALUE,
       // URLs DISTINTAS: el mismo check puede venir repetido por página y contar filas
@@ -130,6 +163,22 @@ export const groupAuditIssues = (
     return left.issueType.localeCompare(right.issueType)
   })
 }
+
+/**
+ * TASK-1671 — Particiona los grupos por alcance PRESERVANDO el orden que ya trae.
+ *
+ * La vista renderiza dos regiones desde UNA sola pasada de agrupación: no se agrupa dos veces ni
+ * se ordena con dos comparadores. Si `site` sale vacío, la región de dominio no se renderiza —
+ * y eso NO es lo mismo que "el sitio está sano": significa que ese run no midió el dominio (run
+ * histórico, o previo al flip del flag). La distinción vive acá, en el dato, y jamás se resuelve
+ * consultando el feature flag desde el cliente.
+ */
+export const partitionAuditIssuesByScope = (
+  groups: readonly SeoAuditIssueGroup[]
+): { site: SeoAuditIssueGroup[]; page: SeoAuditIssueGroup[] } => ({
+  site: groups.filter(group => group.scope === 'site'),
+  page: groups.filter(group => group.scope !== 'site')
+})
 
 /** Días completos entre el último crawl y hoy. `null` si no hay fecha utilizable. */
 export const daysSinceCrawl = (isoDate: string | null, now: Date = new Date()): number | null => {

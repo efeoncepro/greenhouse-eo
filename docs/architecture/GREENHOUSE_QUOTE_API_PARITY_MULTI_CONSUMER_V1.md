@@ -63,7 +63,7 @@ Un primitive por capability; todos los consumers son **clientes del mismo primit
 |---|---|---|---|---|
 | UI interna (cotizador) | `simulateQuotePricing` perfil `internal` | `submitQuoteFromBuilder` | delegación thin desde el shell | TASK-1211 |
 | Nexa Agent | Nexa read tool → `simulateQuotePricing` | Nexa governed action → `submitQuoteFromBuilder` vía `propose→confirm→execute` | `NEXA_TOOLS` + `NEXA_ACTION_REGISTRY` | TASK-1211 Slice 4 |
-| MCP / agente downstream | MCP read tool → `simulateQuotePricing` (perfil por auth) | **NO** (MCP es read-only por diseño) | `src/mcp/greenhouse/server.ts` | TASK-1211 (read) / **gap** (write) |
+| MCP / agente downstream | MCP read tool → `simulateQuotePricing` (perfil por auth) | **NO** (el gap es de *quote*, no del transporte: ninguna tool de quote lleva `writes: true` en el manifiesto) | `src/mcp/greenhouse/server.ts` | TASK-1211 (read) / **gap** (write) |
 | Cliente self-service | `simulateQuotePricing` perfil `client` | (decisión de producto: solo simular vs pedir cotización real) | API Platform `app` + UI | **follow-up** |
 | Simulador público | `simulateQuotePricing` perfil `public` sobre catálogo publicado | — | endpoint anónimo + rate-limit + circuit breaker | **follow-up (STOP quadrant, ADR propio)** |
 | API Platform `app`/`ecosystem` | lane `quotation.v1` | write lane `quote_to_cash.v1` (externo, auth + idempotencia) | versionado | TASK-1211 Slice 4 (absorbe follow-up de TASK-1206) |
@@ -87,7 +87,7 @@ Humano confirma → POST /api/nexa/actions/author_quote/confirm
   → submitQuoteFromBuilder(...)  ← única mutación, behind capability + audit + outbox
 ```
 
-Para agentes externos vía API Platform write lane: mismo command server-side, con auth de agente + idempotencyKey + rate-limit + (si aplica) gate de aprobación. **El MCP downstream surface permanece read-only**; "operar" una cotización desde un agente externo va por el write lane, no por los MCP tools.
+Para agentes externos vía API Platform write lane: mismo command server-side, con auth de agente + idempotencyKey + rate-limit + (si aplica) gate de aprobación. **Ninguna tool de quote lleva `writes: true` en el manifiesto MCP**; "operar" una cotización desde un agente externo va por el write lane, no por los MCP tools.
 
 ## 8. Escenario norte (worked example)
 
@@ -119,7 +119,7 @@ Traza end-to-end y qué pieza la sirve:
 
 ### Safety
 - **Qué puede salir mal:** fuga de cost stack / role rates / margin a cliente o público.
-- **Gates:** perfiles de output server-side por auth context; capabilities finas A/B; governed write loop (LLM nunca muta); MCP read-only.
+- **Gates:** perfiles de output server-side por auth context; capabilities finas A/B; governed write loop (LLM nunca muta); ninguna tool de quote declara `writes` en el manifiesto MCP.
 - **Blast radius:** GRANDE si se filtra el modelo de margen (competitivo). Acotado por perfil + redacción server-side + defense-in-depth.
 - **Verificado por:** tests de redacción por perfil (ningún campo sensible cruza en client/public), review del action registry.
 - **Riesgo residual:** el perfil `public` depende de la curaduría del catálogo publicado; una entrada mal curada filtra. Mitigación en el follow-up del simulador público.
@@ -143,7 +143,7 @@ Traza end-to-end y qué pieza la sirve:
 - **NUNCA** exponer cost stack / role rate cards / `marginPct`/`classification` a un perfil `client` o `public`. La redacción es server-side; el perfil se deriva del auth context, NUNCA default a `internal`.
 - **NUNCA** dejar lógica de autoría/emisión en un componente UI. La UI delega en `submitQuoteFromBuilder`.
 - **NUNCA** implementar una integración "Nexa-específica" del cotizador. Un primitive, muchos consumers.
-- **NUNCA** mutar una cotización desde el LLM directo. Writes vía `propose → confirm → execute` (Nexa) o write lane gobernado (externo). El MCP downstream surface es read-only.
+- **NUNCA** mutar una cotización desde el LLM directo. Writes vía `propose → confirm → execute` (Nexa) o write lane gobernado (externo). Verificable, no asumido: ninguna tool de quote lleva `writes: true` en `src/mcp/greenhouse/tool-manifest.ts` — el servidor MCP como tal NO es read-only (registra 7 escrituras), así que la guarda se apoya en la bandera declarada, no en una propiedad del transporte.
 - **NUNCA** re-acuñar capabilities de quote fuera del catálogo de TASK-1202 (SSOT). El perfil de simulate sigue su convención de nombres.
 - **NUNCA** el perfil `public` computa sobre el catálogo interno o `pricing/lookup` interno; usa la proyección publicada curada.
 - **SIEMPRE** que un consumer nuevo necesite cotizar, conectarlo al primitive existente (simulate/author), no crear lógica paralela.

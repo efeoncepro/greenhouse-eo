@@ -902,6 +902,28 @@ ENV_VARS="${ENV_VARS},GROWTH_SEO_COMPETITOR_GAP_ENABLED=${GROWTH_SEO_COMPETITOR_
 GROWTH_SEO_WORK_QUEUE_ENABLED="${GROWTH_SEO_WORK_QUEUE_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},GROWTH_SEO_WORK_QUEUE_ENABLED=${GROWTH_SEO_WORK_QUEUE_ENABLED}"
 
+# TASK-1670 — Hallazgos de SITIO en el site audit (crawlers de IA, borde/WAF, JSON-LD, sitemap).
+#
+# 🔴 **OFF, y NO se prende hasta que `TASK-1671` esté desplegada.** No es cautela genérica: los
+# hallazgos son del DOMINIO (un robots.txt no pertenece a ninguna página) y la superficie actual
+# cuenta "páginas afectadas" y ORDENA por ese número. Con el flag ON antes de 1671, un bloqueo de
+# crawlers de IA se rotularía "1 página afectada" —falso— y además se hundiría dentro de su propio
+# tier, debajo de 400 imágenes sin alt. Se cambiaría un punto ciego por un dato mal contado.
+#
+# ⚠️ **Runtime ÚNICO: este worker.** El único lector es el collect del site audit; en Vercel es
+# inerte (los hallazgos ya escritos se sirven por el reader canónico sin consultar el flag). Este
+# archivo es su SoT declarativo — `--set-env-vars` es DESTRUCTIVO, así que prenderlo sólo con un
+# `gcloud run services update --update-env-vars` suelto lo borraría en el próximo deploy, en
+# silencio (modo de falla del caso `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED`).
+#
+# NO compromete gasto de proveedor: son 4-5 fetches propios al sitio del cliente por run, con
+# presupuesto de tiempo duro. Cero llamadas a DataForSEO.
+#
+# Es SUBORDINADO a `GROWTH_SEO_ENABLED`. Rollback (<10 min): `false` acá + `--update-env-vars`.
+# Los hallazgos ya escritos quedan: la tabla es append-only por diseño.
+GROWTH_SEO_SITE_FINDINGS_ENABLED="${GROWTH_SEO_SITE_FINDINGS_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},GROWTH_SEO_SITE_FINDINGS_ENABLED=${GROWTH_SEO_SITE_FINDINGS_ENABLED}"
+
 # TASK-1699 — Persistencia del top-N del SERP que el rank capture YA paga (costo marginal
 # CERO: cero llamadas nuevas, cero cambio de depth/flags). Gatea la ESCRITURA dentro del
 # batch diario `ops-seo-rank-capture` — sin scheduler nuevo.

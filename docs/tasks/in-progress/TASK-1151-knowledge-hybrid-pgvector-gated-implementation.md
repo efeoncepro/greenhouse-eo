@@ -4,6 +4,16 @@
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-01 — registro del avance (barrido `stale-progress`)
+
+14 checkboxes en cero con `Status real: Diseno`, teniendo la migracion pgvector aplicada y el brazo
+hibrido construido y gateado. 2 criterios se tildan con evidencia de repo.
+
+Los criterios de **calidad medida** —no-answer honesto 100%, wrong-source 0, recall de parafrasis
+>= 7/8 sin degradar el golden set 45/45, MRR >= 0.904, p95 <= 400ms— **no se tildan**: son numeros de
+una corrida de eval con el hibrido ON, y el flag esta OFF por default. Sin esa corrida no hay nada
+que registrar.
+
 ## Status
 
 - Lifecycle: `in-progress`
@@ -267,9 +277,9 @@ Ver `GREENHOUSE_KNOWLEDGE_HYBRID_RETRIEVAL_DECISION_V1.md` (§6 thresholds, §8 
 
 ## Acceptance Criteria
 
-- [ ] pgvector instalado + columna `embedding` + índice HNSW (migración additive verificada post-DDL).
+- [x] pgvector + columna `embedding` + indice. **Verificado 2026-09-01:** migracion `20260616105246838_knowledge-chunk-embedding-pgvector.sql`.
 - [ ] Ingesta de embeddings idempotente por checksum, fuera del request path; CLI dry-run/apply.
-- [ ] Brazo vector gateado dentro de `searchKnowledge` detrás de `KNOWLEDGE_SEARCH_HYBRID_ENABLED` (default OFF byte-equivalente).
+- [x] Brazo vector gateado detras de `KNOWLEDGE_SEARCH_HYBRID_ENABLED`, default OFF. **Verificado 2026-09-01:** `src/lib/knowledge/search/flags.ts:22` (`=== 'true'`, o sea OFF salvo opt-in explicito) + `retrieval-fusion.ts` con su test.
 - [ ] No-answer honesto = 100% y wrong-source = 0 con el híbrido ON (FTS-signal-gate).
 - [ ] Recall de paráfrasis ≥ 7/8 sin degradar el golden set (45/45), MRR ≥ 0.904, p95 ≤ ~400ms.
 - [ ] `searchKnowledge` permanece SSOT; `knowledge-search.v1` sin cambio de shape; sin reader paralelo.

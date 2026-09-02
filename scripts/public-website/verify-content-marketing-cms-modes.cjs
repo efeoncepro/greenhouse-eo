@@ -1,0 +1,40 @@
+const fs = require('fs');
+
+const assert = require('assert/strict');
+
+const {chromium} = require('playwright');
+
+
+
+
+
+
+
+
+
+
+(async()=>{const b=await chromium.launch(),patch=require('./content-marketing-editorial-modes-copy.json'),dir='.captures/content-marketing/cms-modes';
+
+fs.mkdirSync(dir,{recursive:true});const report={widths:[],errors:[],modes:[]};
+
+for(const width of [1440,878,390]){const p=await b.newPage({viewport:{width,height:1000}});
+
+p.on('pageerror',e=>report.errors.push(e.message));await p.goto('https://efeoncepro.com/servicio-marketing-de-contenidos/',{waitUntil:'networkidle'});
+
+for(const[type,edit]of Object.entries(patch.modules)){const module=type.replace('greenhouse_content_',''),c=JSON.parse(await p.locator('[data-content-module='+module+'] [data-cm-config]').textContent());
+
+for(const[k,v]of Object.entries(edit.fields))assert(Object.values(c.values).includes(v.after),module+'/'+k);}
+
+await p.locator('#editorial-cms').evaluate(e=>e.scrollIntoView({block:'start'}));await p.waitForTimeout(1000);const logos=p.locator('.cm-cms-logos');
+
+assert.equal(await logos.count(),1);assert.equal(await logos.locator('li').count(),4);assert.deepEqual(await logos.locator('li>span:last-child').allTextContents(),['WordPress','Webflow','Drupal','Modyo']);assert(await logos.locator('img').evaluateAll(a=>a.every(x=>x.complete&&x.naturalWidth>0)));await p.locator('#editorial-cms').screenshot({path:dir+'/editorial-'+width+'.png'});
+const modes=p.locator('#operating-modes');
+
+for(let i=0;i<3;i++){await modes.locator('button').nth(i).click();await p.waitForTimeout(300);assert.equal(await modes.locator('button').nth(i).getAttribute('aria-pressed'),'true');report.modes.push({width,index:i,text:await modes.innerText()});await modes.evaluate(e=>e.scrollIntoView({block:'start'}));await p.waitForTimeout(500);await modes.screenshot({path:dir+'/modes-'+width+'-'+i+'.png'});}
+await p.waitForTimeout(1000);const g=await p.evaluate(()=>({width:innerWidth,client:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth}));
+
+assert.equal(g.client,g.scroll);report.widths.push(g);await p.close();}
+
+const p=await b.newPage({javaScriptEnabled:false,viewport:{width:390,height:844}});
+
+await p.goto('https://efeoncepro.com/servicio-marketing-de-contenidos/');assert.equal(await p.locator('.cm-cms-logos img').count(),4);assert.match(await p.locator('#editorial-cms').innerText(),/¿Usas otro CMS/);await p.close();assert.deepEqual(report.errors,[]);fs.writeFileSync(dir+'/report.json',JSON.stringify(report,null,2));console.log(JSON.stringify({status:'pass',copyFields:53,logos:4,widths:report.widths,modes:report.modes.length,jsOff:true,errors:report.errors}));await b.close()})().catch(error => { console.error(error); process.exit(1) });

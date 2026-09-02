@@ -1,8 +1,8 @@
 # ANAM HubSpot Managed Service end-to-end
 
 > **Tipo:** Documentación funcional
-> **Versión:** 1.4
-> **Actualizado:** 2026-07-24
+> **Versión:** 2.0
+> **Actualizado:** 2026-09-02
 > **Cliente/portal:** ANAM / `19893546`
 > **Canon técnico:** [`../../architecture/kortex/hubspot-as-a-service/README.md`](../../architecture/kortex/hubspot-as-a-service/README.md)
 > **Manual:** [`../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md`](../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md)
@@ -28,22 +28,78 @@ un ítem fuente de facturación. No se deben aplanar estos hechos en Company o D
 
 ## Customer Agent y landing
 
-La landing live abre el chat oficial con tres intenciones: cotizar, seguimiento del servicio y requerimientos de
-calidad. Customer Agent responde conocimiento documentado, reúne contexto y deriva a una persona del equipo cuando
-hace falta una acción humana. El nombre del assignee se mantiene como routing interno y no forma parte del copy
-visible. El source pack independiente y reconciliado versiona las 23 fuentes en uso, las
-17 respuestas cortas, el catálogo de 356 registros y el contrato de identidad/directrices/handoff/canales.
+La landing live presenta a Emma como concierge digital de ANAM. En lugar de tres tarjetas y varios llamados a la
+acción, usa una sola superficie para elegir entre cotización, seguimiento del servicio o requerimientos de calidad,
+y un único CTA `Conversar con Emma`. Elegir una intención sólo prepara el contexto; el chat se abre cuando la
+persona activa el CTA. La pantalla incluye señales breves de orientación, protección de datos y derivación humana,
+y mantiene el lenguaje de implementación fuera del copy visible.
+
+La experiencia premium quedó publicada en el build `#28` del proyecto CMS React `kortex-cms-react`. El header usa
+el wordmark horizontal ANAM sin el círculo superior y la imagen final de Emma lleva el nombre corporativo exacto
+`ANÁLISIS AMBIENTALES S.A.` integrado en la camisa mediante edición generativa. No se usó texto superpuesto. El
+contrato técnico y el readback público viven en
+[`../../architecture/kortex/hubspot-cms/anam-chat-landing.md`](../../architecture/kortex/hubspot-cms/anam-chat-landing.md),
+y la dirección visual en
+[`../../ui/visual-directions/anam-emma-premium-direction-v1.md`](../../ui/visual-directions/anam-emma-premium-direction-v1.md).
+
+Customer Agent responde conocimiento documentado, reúne contexto y deriva a una persona del equipo cuando hace
+falta una acción humana. El nombre del assignee se mantiene como routing interno y no forma parte del copy visible.
+El source pack independiente y reconciliado versiona las 23 fuentes en uso, las 17 respuestas cortas, el catálogo
+de 356 registros y el contrato de identidad/directrices/handoff/canales.
+
+La identidad live del Customer Agent también es `Emma`: el nombre del perfil, el saludo guionizado y el preview
+convergen en el mismo nombre. La actualización fue publicada el 2026-09-01 sin cambiar la personalidad
+`Amigable`, idioma, fuentes de conocimiento, permisos, acciones, routing, handoff ni canales. La landing y el
+agente ya no presentan identidades distintas.
 
 El readback del 24 de julio confirmó que Customer Agent volvió a operar, con live chat activo y cobertura de todas
 las horas. El bloqueo administrativo observado el 17 de julio queda como antecedente histórico, no como estado
-vigente. Los ajustes posteriores de Seguimiento, Calidad y copy neutral fueron publicados tras una comprobación
-previa sin problemas. El simulador live no respondió en la regresión posterior y esa prueba debe repetirse.
+vigente. Los ajustes posteriores de Seguimiento, Calidad y copy neutral fueron publicados. El cambio a Emma dejó
+cero borradores; el preflight conservó dos advertencias anteriores sobre `Registraré tu consulta`, por lo que la
+regresión conversacional y la corrección de esa promesa siguen pendientes como trabajo separado.
+
+El handoff ya no usa una única propietaria. Emma invoca el workflow de tickets `1876744588`, que clasifica la
+necesidad y distribuye con disponibilidad: cotización/nuevo negocio a Pablo Puga con María Paz Haeger como
+reemplazo; seguimiento a Marco Jiménez Venegas con Pablo como reemplazo; y Calidad, facturación u otros a María
+Paz con Marco como reemplazo. Antes de asignar, el workflow elimina a Emma como propietaria del ticket; luego la
+acción de reemplazo sólo actúa cuando la primaria no dejó propietario. Tres conversaciones públicas verificaron
+la ruta primaria de cotización, el reemplazo real de seguimiento y la ruta primaria de Calidad. La evidencia
+demuestra clasificación, asignación y owner visible; todavía no demuestra una respuesta humana ni una segunda
+reasignación humana en el mismo chat.
+
+La explicación paso a paso para presentar a ANAM está en
+[`anam-customer-agent-handoff-workflow-functional.md`](anam-customer-agent-handoff-workflow-functional.md), y la
+configuración de cada acción, contingencia y evidencia técnica está en
+[`../../architecture/kortex/hubspot-as-a-service/anam-customer-agent-handoff-workflow-1876744588.md`](../../architecture/kortex/hubspot-as-a-service/anam-customer-agent-handoff-workflow-1876744588.md).
+
+La modalidad live conserva el hilo mientras el chat siga abierto. Después del primer handoff, el owner humano
+puede reasignar manualmente el ticket en Help Desk para que otra persona continúe con el mismo contexto. Terminar
+el chat impide reabrirlo. La matriz actual no convierte nombres escritos libremente en usuarios: una petición por
+Pablo, Marco o María Paz activa la necesidad de atención humana, pero el nombre sólo puede confirmarse tras una
+condición gobernada o una reasignación manual que pruebe el owner efectivo.
+
+## Entrega documental y soporte
+
+El cierre de Emma y su handoff se entrega en dos PDF brandeados —uno técnico y uno funcional— con Efeonce como
+marca dominante, HubSpot como partnership y ANAM como cliente. Sus HTML/CSS son la fuente editable y los PDF el
+master visual. Cada uno fue revisado en cinco páginas rasterizadas, con Poppins/Geist embebidas y sin overflow.
+El [correo de entrega](anam-entrega-documentacion-y-soporte-2026-09-02.md) registra destinatarios, adjuntos y el
+estado no enviado del borrador.
+
+El soporte del proyecto Customer Agent y del proyecto KPI tiene una duración explícita de **tres meses**, desde
+el **13 de agosto hasta el 12 de noviembre de 2026, inclusive**. Cubre soporte del alcance construido: diagnóstico
+y corrección de incidentes, consultas operativas, revisión de comportamientos inesperados, restauración de la
+configuración entregada y ajustes documentales derivados de una corrección. No cubre innovación ni evolución:
+nuevas funcionalidades, KPI, workflows, automatizaciones, integraciones o rediseños requieren un alcance aparte.
+
+Efeonce se comprometió a compartir durante la semana del 2 de septiembre un SharePoint con la documentación
+consolidada. Esa comunicación es un compromiso futuro y no debe marcarse como completada hasta verificar el enlace.
 
 ## Estado por fase
 
 | Fase | Estado | Resultado vigente |
 |---|---|---|
-| Customer Agent y landing | Operativo; mejora publicada | Landing, tres intents, 23 fuentes y canal activo. Ajustes de Seguimiento, Calidad y handoff neutral publicados; regresión live complementaria pendiente. |
+| Customer Agent y landing | Operativo; rediseño build `#28` y routing `1876744588` activos | Emma, selector de tres intenciones, CTA único, 23 fuentes y canal activo. QA pública desktop/mobile y E2E de cotización, seguimiento/fallback y Calidad aprobadas. |
 | Growth y calidad | Cerrada | Data Quality `21144697`, Growth `19708354`, siete assets y outcome exacto. |
 | Catálogo | Suficiente | 505/506 líneas tienen Product; 220/220 líneas ganadas resuelven a Product. |
 | Service y contrato | Piloto live | Grupo, diez propiedades, asociaciones, cinco Services y workflow `1852406585`. |
@@ -165,7 +221,13 @@ Customer Agent, facturación y Tickets/SLA. Ningún ítem documentado equivale p
 
 ## Referencias
 
+- [Entrega documental y soporte](anam-entrega-documentacion-y-soporte-2026-09-02.md)
+- [PDF técnico de Emma](../../architecture/kortex/hubspot-as-a-service/reports/ANAM_Emma_Handoff_Especificacion_Tecnica_2026-09-02.pdf)
+- [PDF funcional de Emma](../../architecture/kortex/hubspot-as-a-service/reports/ANAM_Emma_Handoff_Documentacion_Funcional_2026-09-02.pdf)
 - [Catálogo HubSpot as a Service](../../services/hubspot-as-a-service/README.md)
+- [Landing CMS React de Emma](../../architecture/kortex/hubspot-cms/anam-chat-landing.md)
+- [Runbook de landing HubSpot CMS](../../architecture/kortex/hubspot-cms/landing-page-runbook.md)
+- [Dirección visual premium de Emma](../../ui/visual-directions/anam-emma-premium-direction-v1.md)
 - [Roadmap](../../architecture/kortex/hubspot-as-a-service/anam-revops-implementation-roadmap-phases-2026-07-16.md)
 - [Modelo vivo](../../architecture/kortex/hubspot-as-a-service/anam-revops-data-model-and-object-synergies-v1.md)
 - [Handoff](../../architecture/kortex/hubspot-as-a-service/anam-next-session-handoff-2026-07-16.md)

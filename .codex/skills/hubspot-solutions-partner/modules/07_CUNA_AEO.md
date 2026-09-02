@@ -26,7 +26,7 @@
 | *"Mi postventa es invisible: se me van clientes y me entero tarde."* | **COO / CS** | **Service Hub** (+ Customer Agent, USD 0,50/resolución ✅) | USD 90/asiento (Pro) |
 | *"Mis datos están sucios y repartidos en cinco sistemas."* | **RevOps / IT** | **Data Hub** *(ex-Operations Hub)* | USD 720/mo (Pro) = **72 pts** |
 | *"Cotizo en Word y pierdo margen en descuentos que nadie aprueba."* | **CFO / CRO** | **Revenue Hub** *(ex-Commerce — CPQ, contratos, e-signature)* | desde USD 95/mo |
-| *"El directorio pidió IA y nadie sabe qué significa."* | **CEO** | **Breeze** — ⚠️ **y la respuesta honesta: solo 3 agentes en GA** | outcome-based |
+| *"El directorio pidió IA y nadie sabe qué significa."* | **CEO** | **Agent Hub & Agentic Operations** — inventario, readiness, agentes, gobierno y evaluación | outcome-based |
 
 **Cada dolor es un deal por sí solo.** Y el que entra por uno **expande a los otros** — ese es el flywheel
 (→ `modules/03_MOTOR_LIBRO.md` § 5: la matriz señal→oferta del QBR es este mismo mapa, visto desde adentro
