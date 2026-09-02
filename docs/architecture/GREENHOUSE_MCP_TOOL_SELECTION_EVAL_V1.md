@@ -276,10 +276,16 @@ interactivo por el front door y no es automatizable. La cadena de procedencia es
 sustituye leer el texto servido; el smoke autenticado está documentado en
 `docs/manual-de-uso/plataforma/operar-provider-greenhouse-seo-mcp.md`.
 
-⏳ **La ruta `/api/mcp/greenhouse` (Vercel) sigue con el texto viejo.** Es la OTRA superficie MCP:
-mismo servidor, distinto transporte. Los commits de Greenhouse no están empujados, así que hasta el
-próximo release conviven dos textos. No hay inconsistencia funcional —el runtime descrito no cambió—
-pero sí una brecha de texto que este mismo guard reportaría si midiera esa ruta.
+⚠️ **Corrección medida el 2026-09-02, después del deploy.** Este documento afirmó antes que la
+ruta `/api/mcp/greenhouse` (Vercel) «seguía sirviendo las descripciones viejas». **Es falso.** Esa
+ruta es fail-closed y su token `GREENHOUSE_MCP_REMOTE_GATEWAY_TOKEN` **no existe en ningún
+environment de Vercel** (verificado con `vercel env ls`): responde `404 — "Greenhouse MCP remote
+gateway is not configured."`, comprobado en vivo contra staging. No sirve texto viejo porque no
+sirve nada.
+
+La consecuencia importa: **el gateway era la ÚNICA superficie MCP viva**, y ya está desplegada con
+el texto corregido. No conviven dos textos. El servidor interno (`server.ts`) se consume hoy por
+stdio (`pnpm mcp:greenhouse`) y como fuente del artefacto que el gateway deriva — no por HTTP.
 
 `get_seo_provider_spend` conserva su literal en el gateway: es nativa —se resuelve contra la ruta
 HTTP del lane sin existir como tool interna— y ya está declarada como tal.

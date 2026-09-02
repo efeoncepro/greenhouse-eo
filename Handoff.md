@@ -48,12 +48,16 @@ léxica y ninguna descripción le gana al nombre de su propia tool.
 leer el `tools/list` servido exige login Entra interactivo y no es automatizable — la cadena
 commit→imagen→revisión es fuerte, pero no reemplaza leer el texto servido.
 
-⏳ **Queda la OTRA superficie MCP.** Los commits de Greenhouse siguen en `develop` **local, sin push**, así que
-la ruta `/api/mcp/greenhouse` (Vercel) todavía sirve las descripciones viejas. Mismo servidor, distinto
-transporte: hasta el próximo release conviven dos textos. No hay inconsistencia funcional —el runtime descrito
-no cambió— pero la brecha existe. Próximos pasos: push de `develop` + release a producción; después, revisar
-`seo_provider_spend_daily` a 7 días (la disciplina de gasto dio 100% en el eval, pero eso se confirma en la
-factura, no en la medición).
+⚠️ **Corrección: la "otra superficie" NO existe.** Se afirmó acá que la ruta `/api/mcp/greenhouse`
+(Vercel) seguía sirviendo las descripciones viejas. Es **falso**: su token
+`GREENHOUSE_MCP_REMOTE_GATEWAY_TOKEN` no existe en ningún environment (`vercel env ls`) y la ruta responde
+`404 — "Greenhouse MCP remote gateway is not configured."`, comprobado en vivo contra staging. No sirve
+texto viejo porque no sirve nada. **El gateway era la única superficie MCP viva y ya está corregida.**
+
+`develop` empujado (`0a68d92c`) con los 9 workflows en `success` — CI, Playwright E2E smoke y los cuatro
+deploys de workers Cloud Run incluidos. Producción queda pendiente del release `develop→main`, que no
+cambia nada servido por MCP. Único seguimiento real: `seo_provider_spend_daily` a 7 días — la disciplina de
+gasto dio 100% en el eval, pero eso se confirma en la factura, no en la medición.
 
 ## 2026-09-02 (4) — Globe queda en hibernación profunda, reversible y documentada
 

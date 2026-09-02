@@ -107,11 +107,15 @@ vuelve a divergir, uno derivado no puede.
 `efeonce-mcp-gateway-00027-6pj` desde el commit `3d09e152`. Es la superficie pública, la que consumen
 los clientes MCP externos, y la que servía la instrucción defectuosa: ya no.
 
-⏳ **Ruta `/api/mcp/greenhouse` (Vercel, este repo): PENDIENTE.** Los commits de Greenhouse están en
-`develop` **local, sin push**, así que esa ruta sigue sirviendo las descripciones viejas hasta que se
-empuje y se promueva. No hay inconsistencia funcional —el cambio es de texto y el runtime que describe
-(`resolveSeoTargetForMarket`, que ya se niega a elegir mercado callado) no se tocó— pero sí quedan dos
-superficies con textos distintos hasta el próximo release.
+✅ **Ruta `/api/mcp/greenhouse` (Vercel): NO APLICA — está deshabilitada.** Se afirmó antes que
+«seguía sirviendo el texto viejo» y es **falso**: su token `GREENHOUSE_MCP_REMOTE_GATEWAY_TOKEN` no
+existe en ningún environment de Vercel (`vercel env ls`) y la ruta responde `404 — "Greenhouse MCP
+remote gateway is not configured."` (comprobado en vivo contra staging). El gateway era la ÚNICA
+superficie MCP viva; no conviven dos textos.
+
+`develop` empujado el 2026-09-02 (`0a68d92c`) con los 9 workflows en `success`, incluidos CI,
+Playwright E2E smoke y los cuatro deploys de workers Cloud Run. Producción sigue pendiente del
+release `develop→main`, que no cambia nada servido por MCP.
 
 Detalle: `docs/architecture/GREENHOUSE_MCP_TOOL_SELECTION_EVAL_V1.md`.
 
