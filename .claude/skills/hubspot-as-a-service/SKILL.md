@@ -29,7 +29,10 @@ feature availability without current primary-source verification and an `as-of` 
    - Property types, calculations, sync, rollups, scores or smart properties: [property-types.md](references/property-types.md)
    - Reports, dashboards, native Goals and Goal reports: [report-design.md](references/report-design.md)
    - Marketing/sales email or sequence automation by API: [email-api-routing.md](references/email-api-routing.md)
-   - ANAM: [anam-case.md](references/anam-case.md)
+   - ANAM: [anam-case.md](references/anam-case.md). Para la landing pública y su seam con Customer Agent,
+     carga además `docs/architecture/kortex/hubspot-cms/anam-chat-landing.md` y
+     `docs/architecture/kortex/hubspot-cms/landing-page-runbook.md`; la implementación CMS sigue bajo ownership
+     de esos documentos.
    - Offer/sector qualification: `docs/services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md`
 4. When the work derives from a sold implementation, read `../hubspot-solutions-partner/modules/12_IMPLEMENTACION.md`; for agents, also read `../hubspot-solutions-partner/modules/13_AGENTES.md`. Product claims and prices remain owned by that skill's `hubspot-solutions-partner` → `SOURCES.md`.
 

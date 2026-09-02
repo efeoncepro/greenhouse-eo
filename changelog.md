@@ -7,6 +7,26 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-01 — Emma convierte la landing ANAM en un concierge digital
+
+La landing de atención de ANAM reemplazó al personaje masculino por Emma y reconstruyó la primera pantalla como
+una experiencia editorial premium: narrativa clara, selector unificado de tres intenciones, un único CTA y un
+panel de confianza integrado con la asistente. La selección prepara el contexto y no abre el chat hasta que la
+persona pulsa `Conversar con Emma`.
+
+El build HubSpot CMS React `#28` está desplegado en el portal ANAM `19893546`. El header usa el logo horizontal
+del catálogo del repo, sin el círculo superior, y el recurso decorativo queda recortado dentro del hero para no
+dejar espacio blanco bajo el footer. La verificación desktop y móvil confirmó HTTP 200, margen del body en cero,
+ausencia de overflow, selección por clic y teclado, transferencia del intent al CTA y cero errores de consola,
+página o red. Emma usa ahora un asset generativo versionado cuyo bordado dice correctamente
+`ANÁLISIS AMBIENTALES S.A.`; se descartó el montaje tipográfico plano y se conservó el asset anterior para
+rollback. No se abrió ni se envió una conversación real; tampoco cambiaron el Customer Agent ni datos CRM.
+
+El cierre documental quedó reflejado en el canon y runbook CMS, documentación funcional, manual operativo,
+dirección visual, changelog de cliente, `project_context.md` y las dos copias espejadas de la skill
+`hubspot-as-a-service`. No se modificaron el router global ni la arquitectura comercial porque no cambió ningún
+contrato transversal.
+
 ## 2026-09-01 — El audit SEO aprende a mirar el sitio, no sólo sus páginas (TASK-1670)
 
 La auditoría técnica pasa a evaluar cuatro cosas que el crawl de páginas no ve: si el `robots.txt`
@@ -1065,10 +1085,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
 - Un probe de presencia ya no puede afirmar «no tiene datos estructurados» sobre un cuerpo truncado o un shell de render JS: degrada a `skipped` con razón explícita (`truncated_body`/`not_observable`), el mismo invariante `null ≠ 0` un nivel más abajo.
 - El endurecimiento de red queda tras `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (dual-location Vercel + ops-worker) como kill switch de cobertura; el resto viaja sin flag.
 - **Cutover aplicado el mismo día:** flag ON en el ops-worker compartido staging+prod (la cadena viva del intake público) + declarativo en `deploy.sh` + Vercel staging; la regla de saltos se extendió a subdominios descendientes del sujeto con evidencia real de cartera (bancochile). Corrida real `EO-GRUN-00048` verde con cero bloqueos falsos → `ISSUE-164` resuelto. Residuales en el ledger: revisión Sentry 48 h (2026-08-29) y env var en Vercel Production con el release que lleve el código a `main`.
-
-## 2026-08-27 — Nace la práctica Salesforce operable y vendible
-
-- Se crearon tres skills espejadas y gateadas: `salesforce-crm-practice`, `salesforce-marketing-cloud-engagement` y `salesforce-marketing-cloud-next`.
-- Cada skill separa `operate` de `sell`, incluye discovery, fit, arquitectura, propuesta/SOW, operación administrada y gates explícitos para claims, licencias, partnership, consentimiento y mutaciones.
-- Marketing Cloud Engagement se documenta como producto vigente y coexistente; Marketing Cloud Next como producto nativo de Salesforce Platform/Data 360. No se promete migración automática, paridad ni reemplazo universal.
-- La práctica comercial quedó bajo **Revenue Operations & CRM** con catálogo de ofertas, mapa de productos y evidencia fechada. No hubo acceso a tenants, cambios de configuración, ventas, cotizaciones oficiales, claims públicos ni runtime.

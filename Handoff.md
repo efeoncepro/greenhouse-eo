@@ -2,6 +2,58 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-09-01 (14) — La landing ANAM pasa a una experiencia editorial centrada en Emma
+
+La landing pública `https://anam-2.hubspotpagebuilder.com/agente-anam` sirve el build `#28` del proyecto
+`kortex-cms-react` en el portal ANAM `19893546`. La pantalla dejó el layout institucional de tarjetas y ahora
+presenta a Emma como concierge: hero asimétrico, una superficie única para seleccionar intención, un solo CTA
+`Conversar con Emma` y un panel navy con disponibilidad, orientación, protección de datos y derivación humana.
+
+HubSpot renderiza el módulo React en servidor, por lo que la selección se implementó en el controlador Hubl
+existente: los tres botones usan `aria-pressed` y sólo preparan el contexto; el CTA final es el único nodo que
+abre el chat. El smoke confirmó selección por clic y teclado y transferencia de
+`requerimiento_calidad` al CTA, sin abrir ni enviar una conversación real.
+
+El feedback visual del operador quedó incorporado antes del cierre: se eliminó el espacio blanco inferior
+recortando la decoración dentro del hero y reseteando el margen del body; el header usa ahora
+`anam-logo-horizontal.svg`, copiado del catálogo canónico del repo y sin el círculo superior, a `199x54` en
+desktop y `166x45` en mobile. Playwright live en `1440x1100` y `390x1000` confirmó HTTP 200,
+`scrollWidth === clientWidth`, `bodyMargin=0px`, tres opciones íntegras, interacción por teclado y cero errores
+de consola, página o red. Evidencia: `.captures/anam-emma-premium-build27-2026-09-01/`.
+
+El uniforme de Emma quedó corregido en `anam-virtual-executive-v2.png` mediante edición generativa: el bordado
+ya no dice `AUTORIDAD NACIONAL DEL AMBIENTE`, sino `ANÁLISIS AMBIENTALES S.A.`. Se descartó explícitamente
+un montaje tipográfico determinista y se mantuvo el asset anterior como rollback. El readback #28 confirmó el
+nuevo archivo tanto en desktop como en mobile sin alterar layout, interacción ni overflow.
+
+La fuente sigue en `/Users/jreye/Documents/dev/kortex/hubspot-cms-react-project`; el cambio quedó en el commit
+`2ae3b42`. `hs project validate --profile anam` pasó y `hs project upload --profile anam` construyó y
+auto-desplegó #28.
+
+La continuidad quedó sincronizada en las capas técnica, funcional y operativa: canon y runbook CMS, documento
+end-to-end, manual ANAM, dirección visual, changelog client-facing y referencias espejadas de la skill
+`hubspot-as-a-service` para Codex y Claude. `project_context.md` ahora enruta explícitamente este seam; `AGENTS.md`
+y la arquitectura de la oferta no cambiaron porque el trabajo no alteró ownership, schema, permisos ni el modelo
+de servicio.
+
+## 2026-09-01 (13) — Emma reemplaza al personaje masculino en la landing ANAM
+
+La landing pública `https://anam-2.hubspotpagebuilder.com/agente-anam` sirve ahora el build `#23` del
+Developer Project `kortex-cms-react` en el portal ANAM `19893546`. El único cambio funcional fue reemplazar
+`anam-virtual-executive.png` por una asistente virtual femenina coherente con el nombre Emma y corregir el ALT
+a `Emma, asistente virtual de ANAM, sonriendo`; las dimensiones intrínsecas quedaron sincronizadas en `900x675`.
+
+La fuente vive en el checkout externo
+`/Users/jreye/Documents/dev/kortex/hubspot-cms-react-project` y conserva dos cambios locales sin commit: el PNG
+y `KortexLandingHero/index.jsx`. `hs project validate --profile anam` pasó; `hs project upload --profile anam`
+construyó y auto-desplegó `#23`; el readback público convergió desde el bundle cacheado `#22` a
+`kortex-cms-react/23`.
+
+Playwright anónimo sobre `1440x1100` y `390x1000` confirmó HTTP 200, Emma visible, ALT y asset del build 23,
+`scrollWidth === clientWidth`, cero errores de consola, cero page errors y cero requests fallidas. Evidencia:
+`.captures/anam-emma-build23-2026-09-01/`. No se modificaron el Customer Agent, los intents, el chatflow, CRM,
+copy visible ni el portal Greenhouse `48713323`.
+
 ## 2026-09-01 (12) — TASK-1670 cerrada, y el punto ciego del audit SEO SIGUE ABIERTO
 
 `TASK-1670` quedó `complete` como **`code complete, rollout pendiente`**. La distinción importa más
@@ -443,30 +495,3 @@ demo/rotos; search vacío expone 154 resultados. El runtime repo continúa con W
 rollback y aprobación. Canon:
 `docs/architecture/public-site/PUBLIC_MISCELLANEOUS_SURFACES_V1.md` y
 `docs/audits/public-site/2026-08-31-wordpress-miscellaneous-surfaces-discovery.md`.
-
-## 2026-08-31 — Content Marketing: pin/contraste publicados; E2E bloqueado por Turnstile
-
-Paquete focal de **dos assets** publicado en la página `242603`: JS
-`8d89cd4708de7892…` y host CSS `ce9eeaa3cb62472…`. Mount y resize comparten el gate
-`width >= 940 && height >= 740`; 1440×650 queda en flujo. Contrastes detectados corregidos sin
-cambiar copy/layout/tipografía. Backups Kinsta `/tmp/eo-content-marketing-before-20260831-211317.tar` y `…-211754.tar`.
-Documento/settings/thumbnail permanecen `b8d37969…` / `c99030e6…` / `251825`.
-
-Producción: pase ampliado de 38 estados de contraste verde; dos captions adicionales del fallback
-se corrigieron en un segundo paquete focal. Además, resize
-1000↔650, capítulos, tabs/cortes, 390, teclado, reduced motion y JS-off. Assets públicos coinciden
-por SHA. El formulario v3 está activo, sin destinos y con ledger vacío antes/después. El intento
-sintético normal fue rechazado por Turnstile antes del POST: no hubo submission ni lead. Rechazos
-API honeypot/missing-token correctos. El tag genérico sí produjo un `generate_lead` **sintético**
-`smoke-test` a `G-KYPPY57M14`, `/g/collect` 204; Admin API confirmó stream/property, pero Realtime
-aún no devolvía fila. Esto no cierra accepted→ledger→GA4. Evidencia y rollback:
-`docs/audits/public-site/2026-08-31-content-marketing-technical-closure.md`.
-
-## 2026-08-31 — Contacto y cobertura institucional: fuentes corregidas, rollout pendiente
-
-El brief de reconstrucción de `/contacto/` quedó en `docs/public-site/CONTACT_PAGE_REBUILD_BRIEF_V1.md` con
-formulario por motivo, reclamos/sugerencias, Meetings y routing. La dirección y teléfonos se verificaron contra
-la contraportada canónica: Dr. Manuel Barros Borgoño 71, oficina 1105; +56 9 3732 3064; +1 (239) 235-2073.
-Estados Unidos ya forma parte de la cobertura operativa junto a Chile, Colombia, México y Perú; fuentes de
-contexto, posicionamiento, primitives y skills espejadas fueron conciliadas sin ampliar métricas históricas.
-`TASK-1801` quedó registrada en `to-do` con visual direction, wireframe, flow y motion; task lint `template=1`, `legacy=0`, 0/0. No hubo mutación WordPress: la página pública todavía requiere implementación, rollout y readback.

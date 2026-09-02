@@ -1,8 +1,8 @@
 # ANAM HubSpot Managed Service end-to-end
 
 > **Tipo:** Documentación funcional
-> **Versión:** 1.4
-> **Actualizado:** 2026-07-24
+> **Versión:** 1.5
+> **Actualizado:** 2026-09-01
 > **Cliente/portal:** ANAM / `19893546`
 > **Canon técnico:** [`../../architecture/kortex/hubspot-as-a-service/README.md`](../../architecture/kortex/hubspot-as-a-service/README.md)
 > **Manual:** [`../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md`](../../manual-de-uso/hubspot-as-a-service/operar-anam-hubspot-managed-service.md)
@@ -28,11 +28,24 @@ un ítem fuente de facturación. No se deben aplanar estos hechos en Company o D
 
 ## Customer Agent y landing
 
-La landing live abre el chat oficial con tres intenciones: cotizar, seguimiento del servicio y requerimientos de
-calidad. Customer Agent responde conocimiento documentado, reúne contexto y deriva a una persona del equipo cuando
-hace falta una acción humana. El nombre del assignee se mantiene como routing interno y no forma parte del copy
-visible. El source pack independiente y reconciliado versiona las 23 fuentes en uso, las
-17 respuestas cortas, el catálogo de 356 registros y el contrato de identidad/directrices/handoff/canales.
+La landing live presenta a Emma como concierge digital de ANAM. En lugar de tres tarjetas y varios llamados a la
+acción, usa una sola superficie para elegir entre cotización, seguimiento del servicio o requerimientos de calidad,
+y un único CTA `Conversar con Emma`. Elegir una intención sólo prepara el contexto; el chat se abre cuando la
+persona activa el CTA. La pantalla incluye señales breves de orientación, protección de datos y derivación humana,
+y mantiene el lenguaje de implementación fuera del copy visible.
+
+La experiencia premium quedó publicada en el build `#28` del proyecto CMS React `kortex-cms-react`. El header usa
+el wordmark horizontal ANAM sin el círculo superior y la imagen final de Emma lleva el nombre corporativo exacto
+`ANÁLISIS AMBIENTALES S.A.` integrado en la camisa mediante edición generativa. No se usó texto superpuesto. El
+contrato técnico y el readback público viven en
+[`../../architecture/kortex/hubspot-cms/anam-chat-landing.md`](../../architecture/kortex/hubspot-cms/anam-chat-landing.md),
+y la dirección visual en
+[`../../ui/visual-directions/anam-emma-premium-direction-v1.md`](../../ui/visual-directions/anam-emma-premium-direction-v1.md).
+
+Customer Agent responde conocimiento documentado, reúne contexto y deriva a una persona del equipo cuando hace
+falta una acción humana. El nombre del assignee se mantiene como routing interno y no forma parte del copy visible.
+El source pack independiente y reconciliado versiona las 23 fuentes en uso, las 17 respuestas cortas, el catálogo
+de 356 registros y el contrato de identidad/directrices/handoff/canales.
 
 El readback del 24 de julio confirmó que Customer Agent volvió a operar, con live chat activo y cobertura de todas
 las horas. El bloqueo administrativo observado el 17 de julio queda como antecedente histórico, no como estado
@@ -43,7 +56,7 @@ previa sin problemas. El simulador live no respondió en la regresión posterior
 
 | Fase | Estado | Resultado vigente |
 |---|---|---|
-| Customer Agent y landing | Operativo; mejora publicada | Landing, tres intents, 23 fuentes y canal activo. Ajustes de Seguimiento, Calidad y handoff neutral publicados; regresión live complementaria pendiente. |
+| Customer Agent y landing | Operativo; rediseño build `#28` publicado | Emma, selector de tres intenciones, CTA único, 23 fuentes y canal activo. QA pública desktop/mobile aprobada; la regresión conversacional complementaria sigue pendiente. |
 | Growth y calidad | Cerrada | Data Quality `21144697`, Growth `19708354`, siete assets y outcome exacto. |
 | Catálogo | Suficiente | 505/506 líneas tienen Product; 220/220 líneas ganadas resuelven a Product. |
 | Service y contrato | Piloto live | Grupo, diez propiedades, asociaciones, cinco Services y workflow `1852406585`. |
@@ -166,6 +179,9 @@ Customer Agent, facturación y Tickets/SLA. Ningún ítem documentado equivale p
 ## Referencias
 
 - [Catálogo HubSpot as a Service](../../services/hubspot-as-a-service/README.md)
+- [Landing CMS React de Emma](../../architecture/kortex/hubspot-cms/anam-chat-landing.md)
+- [Runbook de landing HubSpot CMS](../../architecture/kortex/hubspot-cms/landing-page-runbook.md)
+- [Dirección visual premium de Emma](../../ui/visual-directions/anam-emma-premium-direction-v1.md)
 - [Roadmap](../../architecture/kortex/hubspot-as-a-service/anam-revops-implementation-roadmap-phases-2026-07-16.md)
 - [Modelo vivo](../../architecture/kortex/hubspot-as-a-service/anam-revops-data-model-and-object-synergies-v1.md)
 - [Handoff](../../architecture/kortex/hubspot-as-a-service/anam-next-session-handoff-2026-07-16.md)

@@ -107,7 +107,29 @@ When resuming ANAM from a handoff or deciding whether to advance a phase, first 
 
 ## Landing and agent seam
 
-Landing intents are `cotizar`, `seguimiento_servicio` and `requerimiento_calidad`. The supported seam is URL intent + `HubSpotConversations.widget.refresh({ openToNewThread: true })` and chatflow targeting. Composer prefill is not reliable in the current widget, especially before privacy consent.
+As of 2026-09-01, the public landing `https://anam-2.hubspotpagebuilder.com/agente-anam` serves build `#28` of
+HubSpot Developer Project `kortex-cms-react` (`103589049`) in portal `19893546`. Its source lives at
+`/Users/jreye/Documents/dev/kortex/hubspot-cms-react-project`; the Greenhouse canon is
+`docs/architecture/kortex/hubspot-cms/anam-chat-landing.md`.
+
+The live experience presents Emma as a named concierge, with one intent selector and one final CTA. Landing
+intents are `cotizar`, `seguimiento_servicio` and `requerimiento_calidad`. Selecting an option changes
+`aria-pressed` and prepares context without opening chat; only the final CTA carries `data-chat-intent`. The
+supported seam is URL intent + `HubSpotConversations.widget.refresh({ openToNewThread: true })` and chatflow
+targeting. Composer prefill is not reliable in the current widget, especially before privacy consent.
+
+Do not assume React client state is active on this CMS surface: the module is server-rendered, so runtime
+selection is controlled in `base.hubl.html`. The public deploy is not verified until the page itself serves
+`kortex-cms-react/<deployedBuildId>`, even if Developer Projects already reports the new build.
+
+Brand and asset contract:
+
+- use the horizontal ANAM wordmark from the repository without the circle above it;
+- Emma is a female assistant and her shirt must read exactly `ANÁLISIS AMBIENTALES S.A.`;
+- correct text integrated into the character or garment through a generative edit, save a versioned asset and
+  keep the previous version for rollback; do not add a deterministic text overlay;
+- verify desktop and 390 px, overflow, keyboard/click selection, `aria-pressed`, CTA context and console/page/
+  network errors without opening or submitting a real conversation.
 
 `Deployment > Workflows and bots` is the governed seam for routing only selected ANAM conversations to the Customer Agent. A candidate design is a short rule-based pre-flow that identifies one of the three landing intents, captures the minimum identifying/service context and then sends documented, repeatable needs to the agent while preserving explicit-person requests, commercial commitments, investigations, complaints/appeals and sensitive actions for human handling. This is a design pattern, not evidence of a live deployment: inventory the authenticated portal before proposing it, publish only with separate approval and verify positive, excluded, human-fallback and unavailable paths after activation.
 

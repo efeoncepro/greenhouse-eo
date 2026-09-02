@@ -7,7 +7,7 @@
 > **Project ID:** `103589049`
 > **Theme component UID:** `kortex-anam-cms-react-theme`
 > **Plataforma:** HubSpot Developer Projects / CMS React `2026.03`
-> **Estado:** live en build `#22`
+> **Estado:** live en build `#28`
 
 ## Resumen
 
@@ -35,6 +35,8 @@ src/theme/kortex-anam-theme/components/modules/KortexLandingHero/index.jsx
 src/theme/kortex-anam-theme/styles/kortex-landing-hero.module.css
 src/theme/kortex-anam-theme/templates/layouts/base.hubl.html
 src/theme/kortex-anam-theme/assets/anam-virtual-executive.png
+src/theme/kortex-anam-theme/assets/anam-virtual-executive-v2.png
+src/theme/kortex-anam-theme/assets/anam-logo-horizontal.svg
 ```
 
 Nota operativa: ese proyecto vive fuera del repo `greenhouse-eo`; esta documentacion es el source of truth operativo dentro de Greenhouse para que otros agentes sepan que existe, como se sube y que estado tiene.
@@ -75,6 +77,12 @@ Builds relevantes:
 #20  Ajuste solicitado por Maria Paz Haeger: titulo "Agente Virtual ANAM" y tres categorias operativas.
 #21  Compactacion mobile de las tarjetas de categoria para evitar solapamiento con el globo fijo de chat.
 #22  Routing por query param `anam_intent` + `widget.refresh({ openToNewThread: true })`; logo reducido/subido.
+#23  Personaje visual corregido a Emma, asistente virtual femenina; ALT y dimensiones intrínsecas sincronizados.
+#24  Rediseño editorial premium centrado en Emma: composición asimétrica, selector unificado y CTA único.
+#25  Primer controlador de selección de intención en el layout Hubl, necesario porque el módulo se renderiza en servidor.
+#26  Corrección del feedback del selector para preservar íntegros los tres ítems al cambiar la intención.
+#27  Logo horizontal ANAM del catálogo canónico, mayor presencia de marca y cierre del espacio inferior.
+#28  Bordado de Emma corregido mediante edición generativa a `ANÁLISIS AMBIENTALES S.A.`.
 ```
 
 Estado final verificado:
@@ -84,7 +92,7 @@ Estado final verificado:
   "projectName": "kortex-cms-react",
   "platformVersion": "2026.03",
   "projectId": 103589049,
-  "deployedBuildId": 22,
+  "deployedBuildId": 28,
   "autoDeployEnabled": true,
   "components": [
     {
@@ -98,36 +106,37 @@ Estado final verificado:
 La URL publica fue verificada sirviendo assets:
 
 ```text
-kortex-cms-react/22
+kortex-cms-react/28
 ```
 
 ## Direccion de producto y UX
 
 Decision de experiencia:
 
-- primera pantalla funcional, no landing de marketing;
+- primera pantalla funcional con dirección editorial de concierge;
+- Emma se presenta como personaje y asistente, no como una imagen decorativa;
 - copy orientada a tarea y confianza;
-- CTA principal unico: `Iniciar chat`;
+- selector de intención que no abre el chat de forma inesperada;
+- CTA principal único: `Conversar con Emma`;
 - categorias de entrada segun operacion ANAM:
-  - `Cotizar`;
-  - `Seguimiento del Servicio`;
-  - `Requerimientos de Calidad`;
+  - `Solicitar una cotización`;
+  - `Revisar un servicio`;
+  - `Gestionar calidad`;
 - evitar lenguaje de implementacion como `widget`, `HubSpot`, `boton flotante` o explicaciones tecnicas.
 
 Copy final clave:
 
 ```text
-Canal seguro · Respuesta asistida
-Atencion digital
-Agente Virtual ANAM
-Cuéntanos qué necesitas y te orientamos para cotizar, hacer seguimiento de un servicio o enviar un requerimiento de calidad.
-Elige una categoría para iniciar con el contexto correcto.
-Te conectamos con el canal de atención
-¿Qué necesitas resolver?
-Canal listo para atender
-Atención guiada
+Canal seguro y asistido
+Tu asistente virtual ANAM
+Hola, soy Emma. ¿En qué puedo ayudarte?
+Te ayudo a cotizar, revisar el avance de un servicio o canalizar un requerimiento de calidad con el equipo indicado.
+¿Qué quieres resolver hoy?
+Conversar con Emma
+Emma está disponible
+Orientación con contexto
 Datos protegidos
-Inicia una conversación
+Derivación humana
 ```
 
 El texto visible no debe decir:
@@ -144,29 +153,34 @@ Sistema visual final:
 
 - ANAM navy como color primario de titulos y acciones principales;
 - teal como color secundario/acento para disponibilidad, estados, iconos y hover;
-- Poppins como tipografia de la landing;
-- footer simple para cerrar el espacio inferior;
-- header con logo ANAM visible y jerarquia institucional;
-- logo reducido/subido desde build #22 para no montarse sobre la linea inferior del header;
-- panel derecho con ejecutivo virtual 3D y estado de canal.
+- Poppins para display y DM Sans para cuerpo;
+- una sola superficie de selección con divisores, en lugar de una colección de tarjetas;
+- footer simple y decoración recortada dentro del hero, sin margen o espacio blanco exterior;
+- header con el logo ANAM horizontal del catálogo del repo, sin isotipo circular superior;
+- logo renderizado en `199x54` desktop y `166x45` mobile;
+- panel navy integrado con Emma, identidad, disponibilidad y tres señales de confianza.
 
 Asset generado:
 
 ```text
 src/theme/kortex-anam-theme/assets/anam-virtual-executive.png
+src/theme/kortex-anam-theme/assets/anam-virtual-executive-v2.png
+src/theme/kortex-anam-theme/assets/anam-logo-horizontal.svg
 ```
 
 Origen local de la generacion nativa Codex:
 
 ```text
-/Users/jreye/.codex/generated_images/019f24da-f870-7691-aa14-cc04be3976ab/ig_0fb5a992d119b18a016a46f7c2c8ec8191befaec6ea28ffa59.png
+/Users/jreye/.codex/generated_images/01a05f48-1615-7590-befa-b814f5abafe8/exec-07e833ac-d048-4ced-9e56-e216efe33c31.png
 ```
 
-No regenerar el avatar salvo pedido explicito; si se regenera, conservar torso superior, expresion amable y logo ANAM visible en camisa.
+El reemplazo de build #23 fue solicitado explicitamente para alinear el personaje con el nombre Emma. Conservar torso superior, presentacion femenina adulta, expresion amable, headset, fondo claro y logo ANAM visible en camisa. No regenerar el avatar sin un nuevo pedido explicito.
+
+El build #28 usa `anam-virtual-executive-v2.png`. La corrección se hizo con edición generativa, no con un parche tipográfico plano: el bordado inferior dice exactamente `ANÁLISIS AMBIENTALES S.A.` y el asset anterior queda disponible para rollback. Éste es también el contrato para futuras correcciones integradas en el personaje o su ropa: generar una nueva versión, revisar el resultado completo y evitar overlays deterministas.
 
 ## Interaccion del chat
 
-Los botones usan `data-chat-intent` para guardar la intencion seleccionada y `data-chat-intent-key` para enrutar el chatflow por URL:
+Los tres selectores usan `data-intent-option` y `aria-pressed`; elegir uno actualiza el contexto sin abrir el chat. El CTA final es el único nodo con `data-chat-intent` y `data-chat-intent-key`, y enruta el chatflow por URL:
 
 ```text
 general -> sin query param
@@ -219,41 +233,24 @@ Verificacion browser con Playwright desde el runtime local de Codex:
 
 ```text
 desktop:
-  h1: Agente Virtual ANAM
-  hasQuote: true
-  hasFollowUp: true
-  hasQuality: true
-  hasOldTitle: false
+  h1: Hola, soy Emma. ¿En qué puedo ayudarte?
   scrollWidth: 1440
   clientWidth: 1440
+  scrollHeight: 1100
+  bodyMargin: 0px
+  logoBox: 199x54
 mobile:
-  h1: Agente Virtual ANAM
-  hasQuote: true
-  hasFollowUp: true
-  hasQuality: true
-  hasOldTitle: false
+  h1: Hola, soy Emma. ¿En qué puedo ayudarte?
   scrollWidth: 390
   clientWidth: 390
+  scrollHeight: 1544
+  bodyMargin: 0px
+  logoBox: 166x45
 intent routing:
-  cotizar:
-    urlParam: cotizar
-    refresh: { openToNewThread: true }
-  seguimiento_servicio:
-    urlParam: seguimiento_servicio
-    refresh: { openToNewThread: true }
-  requerimiento_calidad:
-    urlParam: requerimiento_calidad
-    refresh: { openToNewThread: true }
-  general:
-    urlParam: null
-    refreshCalls: []
-logo:
-  desktop:
-    logoBottom: 116
-    headerBottom: 125
-  mobile:
-    logoBottom: 90
-    headerBottom: 135
+  click selection: pass
+  keyboard selection: pass
+  CTA context update: pass
+  chat opened during smoke: false
 ```
 
 Captura visual temporal revisada:
@@ -263,9 +260,20 @@ Captura visual temporal revisada:
 /tmp/anam-build21-mobile.png
 /tmp/anam-build22-desktop.png
 /tmp/anam-build22-mobile.png
+.captures/anam-emma-build23-2026-09-01/desktop.png
+.captures/anam-emma-build23-2026-09-01/mobile.png
+.captures/anam-emma-build23-2026-09-01/report.json
+.captures/anam-emma-premium-build27-2026-09-01/desktop.png
+.captures/anam-emma-premium-build27-2026-09-01/mobile.png
+.captures/anam-emma-premium-build27-2026-09-01/report.json
+.captures/anam-emma-corporate-name-build28-2026-09-01/desktop.png
+.captures/anam-emma-corporate-name-build28-2026-09-01/mobile.png
+.captures/anam-emma-corporate-name-build28-2026-09-01/report.json
 ```
 
 Las capturas confirmaron la copy solicitada, las tres categorias y ausencia de overflow horizontal. En mobile, el globo fijo de HubSpot queda fuera de las tarjetas de categoria; puede superponerse al bloque visual del agente por ser un iframe fijo externo.
+
+El readback de build #28 confirmó en `1440x1100` y `390x1000`: HTTP `200`, assets `kortex-cms-react/28`, imagen `anam-virtual-executive-v2`, ALT `Emma, asistente virtual de ANAM, sonriendo`, imagen natural `900x675`, `scrollWidth === clientWidth`, margen del body `0px`, selector funcional por clic y teclado, contexto transferido al CTA, cero errores de consola, cero page errors y cero requests fallidas. El smoke no abrió ni envió una conversación real.
 
 ## Publish API y scopes
 
@@ -305,8 +313,8 @@ Estado final al cierre de la sesion:
 
 ```text
 URL publica: https://anam-2.hubspotpagebuilder.com/agente-anam
-Build publico: kortex-cms-react/22
-Project deployedBuildId: 22
+Build publico: kortex-cms-react/28
+Project deployedBuildId: 28
 Estado: live
 Pendiente: configurar chatflow target rules/branches en HubSpot para `anam_intent`.
 ```

@@ -42,6 +42,30 @@ No reemplaza `changelog.md` del repo, que sigue siendo el registro interno técn
 
 ---
 
+## 2026.09-stable.1
+
+**Canal:** Stable
+**Fecha:** 2026-09-01
+**Disponible para:** selected_tenants
+**Módulos:** ANAM / Atención digital / Customer Agent
+
+### Mejoras
+
+- La landing de atención de ANAM presenta ahora a Emma como concierge digital, con una experiencia más clara y
+  premium: una sola selección de motivo y un único acceso final a la conversación.
+- Se reforzó la identidad ANAM con el logotipo horizontal correcto y una composición optimizada para escritorio y
+  móvil, sin espacio blanco inferior ni desbordamiento horizontal.
+
+### Correcciones
+
+- La imagen de Emma muestra correctamente el nombre corporativo `ANÁLISIS AMBIENTALES S.A.` integrado en su
+  uniforme.
+
+### Notas
+
+- La verificación no abrió ni envió conversaciones reales y no modificó conocimiento, routing ni datos CRM del
+  Customer Agent.
+
 ## 2026.08-stable.1
 
 **Canal:** Stable
