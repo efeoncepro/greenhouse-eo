@@ -54,6 +54,43 @@ Playwright anónimo sobre `1440x1100` y `390x1000` confirmó HTTP 200, Emma visi
 `.captures/anam-emma-build23-2026-09-01/`. No se modificaron el Customer Agent, los intents, el chatflow, CRM,
 copy visible ni el portal Greenhouse `48713323`.
 
+## 2026-09-01 (13) — TASK-1671 cerrada: la pantalla existe, pero nada está desplegado
+
+`TASK-1671` quedó `complete`. Con eso **ninguna task bloquea el flip**, pero el flip sigue sin poder
+hacerse, y por una razón distinta de la de ayer: ya no falta código, falta **despliegue**.
+
+Verificado en vivo el 2026-09-01, no leído de un doc:
+
+- `origin/develop` y `origin/main` **no tienen** `site-findings.ts` ni `SiteAuditSiteFindings.tsx`.
+- La revisión activa del ops-worker (`ops-worker-00625-5qj`) **no tiene la env var**
+  `GROWTH_SEO_SITE_FINDINGS_ENABLED`. Está OFF por AUSENCIA. Prenderla hoy con `--update-env-vars`
+  no haría nada: esa revisión no tiene el evaluador.
+- La migración `finding_scope` **sí** está aplicada: es la única pieza que ya cruzó a la base
+  compartida (aditiva, default `page`, 4.977 filas históricas clasificadas; nadie la lee todavía).
+
+Qué se construyó: región propia "Acceso y presentación del sitio" entre la salud y la lista,
+alimentada por `partitionAuditIssuesByScope` desde UNA sola pasada de agrupación — no hay una
+segunda lista con su propio orden. El bloqueo de entrenamiento lleva etiqueta textual propia
+("Decisión declarada"); el filtro `?severity=` no alcanza a la región; el empty de la lista pasó a
+decir "Sin problemas de PÁGINA" porque sin ese alcance se contradecía con un crítico de dominio.
+
+Dos cosas que la revisión visual corrigió, y que ningún gate habría atrapado:
+
+1. El alcance flotaba a la derecha en desktop y caía huérfano al final de la fila en 390px. **El
+   wireframe que yo mismo escribí estaba mal**: decía "misma posición que N páginas afectadas"
+   cuando esa posición real es un caption bajo el título. Corregido el código y el wireframe.
+2. Con un único chequeo sin verificar, la región decía "Verificado" y "No pudimos verificar" a la
+   vez — el falso sano de TASK-1670 reintroducido en la UI. Lo cazó su propio test.
+
+⚠️ **Deuda declarada:** la región poblada no tiene evidencia de runtime. El flag está OFF, la tabla
+es append-only sobre una instancia compartida con producción, y encolar un crawl le cargaría
+presupuesto al cliente. Los frames del scorecard salen de una ruta local temporal (no commiteada)
+con el componente real y props representativas: sirven para layout y responsive, no para runtime.
+Esa evidencia se produce en el paso 3 del runbook del flip.
+
+Próximo paso: desplegar (`TASK-1670` + `TASK-1671`) y recién entonces el flip.
+Sin push. Runbook: `docs/manual-de-uso/growth/operar-hallazgos-de-sitio-seo.md`.
+
 ## 2026-09-01 (12) — TASK-1670 cerrada, y el punto ciego del audit SEO SIGUE ABIERTO
 
 `TASK-1670` quedó `complete` como **`code complete, rollout pendiente`**. La distinción importa más
@@ -480,18 +517,3 @@ fuente protegida `225984`. `/blog/` no cambió. Siguiente slice: mapear sus 15
 Ohio y suscripción, y ejecutar QA antes de pedir aprobación de cutover. Canon:
 `docs/public-site/decisions/PDR-019-taxonomia-editorial-canonica-blog-wordpress.md`
 y `docs/audits/public-site/2026-08-31-blog-taxonomy-demo35-work-copy.md`.
-
-## 2026-08-31 — Superficies misceláneas WordPress: discovery y canon, sin rollout
-
-Se documentó el ownership live de 404, búsqueda/no-results, categorías, tags, autor, fecha y archivos:
-Ohio padre sigue resolviendo `404.php`, `search.php`, `content-none.php`, `searchform.php` e `index.php`; la
-librería Elementor no tiene templates/conditions especiales y la integración Ohio observada sólo cubre
-header/footer. El diseño objetivo queda `child-theme-first`, con `PublicUtilityRecoverySurface`, búsqueda y
-archivos como slices separadas y reglas HTTP/SEO por query type. No hubo mutación WordPress, caché ni deploy.
-
-Riesgos P0 observados: una página pública/indexable con `(Borrador)` en título/slug y chrome global con enlaces
-demo/rotos; search vacío expone 154 resultados. El runtime repo continúa con WIP ajeno y
-`fullRepoDeploySafe=false`, por lo que una futura publicación exige artefacto acotado de `ohio-child`, snapshot,
-rollback y aprobación. Canon:
-`docs/architecture/public-site/PUBLIC_MISCELLANEOUS_SURFACES_V1.md` y
-`docs/audits/public-site/2026-08-31-wordpress-miscellaneous-surfaces-discovery.md`.

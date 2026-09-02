@@ -1,5 +1,21 @@
 # TASK-1672 — Growth SEO: artefacto de la auditoría técnica (web + print)
 
+## Delta 2026-09-01 (2) — `TASK-1671` cerró; el gate de esta task SIGUE siendo el flag, no una task
+
+`TASK-1671` está en `complete`: la superficie que renderiza los hallazgos de dominio existe en
+código. Con eso, **ya no queda ninguna task bloqueando a ésta** — pero el gate real nunca fue una
+task, y por eso `Blocked by` pasa a `none` sin que la condición se afloje ni un milímetro:
+
+🔴 **El artefacto NO se publica hasta que `GROWTH_SEO_SITE_FINDINGS_ENABLED` esté en `ON` en
+producción con una corrida real verificada.** Hoy sigue OFF, y además el código de `TASK-1670` y
+`TASK-1671` todavía no está desplegado. Publicar el artefacto con el detector apagado produce
+exactamente lo que esta task existe para evitar: un documento con nuestro nombre, reenviado a una
+agencia, declarando sano un sitio invisible para los motores de IA.
+
+Lo que sí hereda esta task, ya resuelto: la partición por alcance (`partitionAuditIssuesByScope`),
+las 7 fichas es-CL, la taxonomía de familias y la regla de que un hallazgo de dominio va ANTES de
+la lista y nunca se cuenta como página afectada.
+
 ## Delta 2026-09-01 — `TASK-1670` cerró, pero el gate de esta task NO se movió
 
 `TASK-1670` está en `complete`: el motor de hallazgos de sitio existe y está verificado. **El gate de
@@ -108,7 +124,7 @@ Grupo Berel**, no es supuesto.
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|ui`
-- Blocked by: `TASK-1671` (**condición del flip; el gate real sigue siendo el flag `GROWTH_SEO_SITE_FINDINGS_ENABLED` en `ON` con corrida verificada, no un merge**) — ver Delta 2026-09-01
+- Blocked by: `none` en tasks — **pero el gate NO se levantó**: el artefacto no se publica hasta que `GROWTH_SEO_SITE_FINDINGS_ENABLED` esté en `ON` en producción con una corrida real verificada. Ver Delta 2026-09-01 (2)
 - Branch: `Greenhouse develop; local-first, sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

@@ -75,10 +75,19 @@ escritos se sirven por el reader canónico, que no lo consulta.
 
 ## Paso a paso del flip
 
-### 1. Confirmar que `TASK-1671` está desplegada
+### 1. Confirmar que la superficie está desplegada
 
-No "mergeada": desplegada y visible en `/admin/growth/seo/audit`. Si los hallazgos de sitio todavía
-se renderizarían como "1 página afectada", **para acá**.
+`TASK-1671` cerró el 2026-09-01: la sección "Acceso y presentación del sitio" **existe en código**.
+Pero acá la pregunta no es si existe, es si **corre**: no "mergeada", desplegada y visible en
+`/admin/growth/seo/audit`. Si los hallazgos de sitio todavía se renderizarían como "1 página
+afectada", **para acá**.
+
+Verificación rápida, en este orden:
+
+1. `git show origin/main:src/views/greenhouse/admin/growth/seo/audit/SiteAuditSiteFindings.tsx` —
+   si no existe, el código no está en producción y no hay nada que prender.
+2. Abrir `/admin/growth/seo/audit` en el entorno donde vas a prender y confirmar que la sección
+   aparece (o que aparecería con datos).
 
 ### 2. Prender el flag en los dos lugares
 

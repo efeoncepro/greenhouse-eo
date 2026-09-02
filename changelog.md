@@ -27,6 +27,25 @@ dirección visual, changelog de cliente, `project_context.md` y las dos copias e
 `hubspot-as-a-service`. No se modificaron el router global ni la arquitectura comercial porque no cambió ningún
 contrato transversal.
 
+## 2026-09-01 — La auditoría gana una sección para lo que vale en todo el sitio (TASK-1671)
+
+La pantalla de auditoría separa dos preguntas que antes mezclaba. Arriba, una sección nueva
+—"Acceso y presentación del sitio"— responde si los motores de IA pueden leer el sitio, si la
+portada se presenta y si el mapa del sitio está sano. Abajo, la lista de siempre, ahora rotulada
+como lo que es: problemas **por página**.
+
+La distinción importa porque cada hallazgo de la sección nueva vale para el dominio entero. En la
+lista se habrían rotulado como "1 página afectada" —falso— y habrían quedado hundidos debajo de
+cualquier problema menor que toque muchas páginas. Ahora dicen "Todo el sitio" y nombran dónde se
+detectó el problema, para que el cliente pueda verificarlo en vez de concluir que el informe miente.
+
+Y el bloqueo de entrenamiento de modelos de IA no se pinta como una falla: lleva la etiqueta
+"Decisión declarada", porque es una decisión legítima sobre el uso del contenido.
+
+🔴 **Sigue apagado.** El código existe pero no está desplegado, y el interruptor tampoco está
+encendido. Hasta que las dos cosas pasen, un sitio invisible para los motores de IA **sigue**
+saliendo con 95 de salud.
+
 ## 2026-09-01 — El audit SEO aprende a mirar el sitio, no sólo sus páginas (TASK-1670)
 
 La auditoría técnica pasa a evaluar cuatro cosas que el crawl de páginas no ve: si el `robots.txt`
@@ -1078,10 +1097,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
 - `TASK-1697` (mitad A, complete): el fetcher SSRF-guarded + parseo HTML/robots sale de las tripas del grader a `src/lib/growth/site-substrate/` (git mv, diff puro, shims — cero dependientes modificados) con carta verificable por test de allowlist: no importa `growth/*`, no persiste, dice cómo se OBTIENE la evidencia y nunca cómo se JUZGA.
 - Lint rule nueva `greenhouse/growth-substrate-boundary` en `error` desde commit-1 sin exenciones: `ai-visibility/probes/**` pasa a ser privado del dominio AEO (la puerta externa es el sustrato) — el deep import que TASK-1670/1701 podían escribir mañana hoy rompe el build. La rule universal de fronteras `growth/*` queda declarada de `TASK-1713` (30 deep imports vivos la harían nacer sucia).
 - Desbloquea a `TASK-1670`, `TASK-1701` y `TASK-1709` (el carril comercial de diagnóstico de prospectos ya tiene de dónde consumir la evidencia de sitio).
-
-## 2026-08-27 — El fetcher de sitios de terceros deja de prometer garantías que no implementa
-
-- `TASK-1778` (Slices 1–4b, code complete): el único fetcher con el que Greenhouse lee sitios de terceros (grader AEO público + brand intelligence + diagnóstico de prospectos) gana mecanismo para sus cuatro garantías: contención de redirects por salto acotada a la familia del sujeto (`apex↔www`, upgrade `http→https`), guarda DNS pre-conexión contra rangos no públicos, tope de memoria real por stream con truncado rastreable, y obediencia de `robots.txt` matcheando nuestro token — jamás los bots de IA que auditamos.
-- Un probe de presencia ya no puede afirmar «no tiene datos estructurados» sobre un cuerpo truncado o un shell de render JS: degrada a `skipped` con razón explícita (`truncated_body`/`not_observable`), el mismo invariante `null ≠ 0` un nivel más abajo.
-- El endurecimiento de red queda tras `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (dual-location Vercel + ops-worker) como kill switch de cobertura; el resto viaja sin flag.
-- **Cutover aplicado el mismo día:** flag ON en el ops-worker compartido staging+prod (la cadena viva del intake público) + declarativo en `deploy.sh` + Vercel staging; la regla de saltos se extendió a subdominios descendientes del sujeto con evidencia real de cartera (bancochile). Corrida real `EO-GRUN-00048` verde con cero bloqueos falsos → `ISSUE-164` resuelto. Residuales en el ledger: revisión Sentry 48 h (2026-08-29) y env var en Vercel Production con el release que lleve el código a `main`.

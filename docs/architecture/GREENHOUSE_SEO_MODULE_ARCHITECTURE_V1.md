@@ -952,9 +952,23 @@ salud, no fabrica snapshots y no toca DataForSEO en el render.
 >
 > 🔴 **Distinción que esta sección tiene que sostener: código mergeado ≠ punto ciego cerrado.** El
 > evaluador está en `develop` y verificado, pero el flag `GROWTH_SEO_SITE_FINDINGS_ENABLED` nace
-> **OFF** y no se prende hasta que `TASK-1671` renderice el alcance correcto. Hasta ese flip, un
-> sitio invisible para los motores de IA **sigue** puntuando 95/100 en esta pantalla. El agujero lo
-> cierra el flip verificado en producción, no el merge.
+> **OFF** y no se prende hasta que la superficie que renderiza el alcance esté DESPLEGADA. Hasta
+> ese flip, un sitio invisible para los motores de IA **sigue** puntuando 95/100 en esta pantalla.
+> El agujero lo cierra el flip verificado en producción, no el merge.
+>
+> **Delta 2026-09-01 (TASK-1671) — la superficie existe en código.** `/admin/growth/seo/audit` gana
+> una tercera región contained, «Acceso y presentación del sitio», entre la salud y la lista.
+> `groupAuditIssues` gana el eje `scope` y `partitionAuditIssuesByScope` alimenta las dos regiones
+> desde UNA pasada: no nace una segunda lista con su propio orden. El `priorityScore` de un grupo de
+> dominio deja el alcance fuera **por contrato** — con `affectedPages = 1` no cambia el número, así
+> que es un guardrail contra un futuro conteo sintético, no un arreglo de hoy; quien separa las dos
+> familias es la partición. La región tiene tres densidades en una posición fija (confirmación ·
+> hallazgos · parcial) y **no se renderiza** cuando el run no trae filas de dominio: ese caso es «no
+> se midió», y mostrar «Verificado» ahí reintroduciría en la UI el falso sano que TASK-1670 cerró en
+> el motor. El bloqueo de entrenamiento lleva etiqueta textual propia («Decisión declarada»), porque
+> `notice` describe prioridad y acá hace falta describir naturaleza. El filtro `?severity=` **no**
+> alcanza a esta región: ocultar la mitad de un veredicto lo convierte en otro veredicto.
+> Contrato de diseño: `docs/ui/wireframes/TASK-1671-growth-seo-site-findings-audit-surface.md`.
 >
 > 1. **El juicio vive en `growth/seo`, la evidencia viene del sustrato.** `site-audit/site-findings.ts`
 >    consume `@/lib/growth/site-substrate` (fetcher SSRF-guarded + parseo HTML/robots de `TASK-1697`)

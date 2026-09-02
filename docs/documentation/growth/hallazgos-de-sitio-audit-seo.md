@@ -46,9 +46,14 @@ dominio se rotularía "1 página afectada" —lo cual es falso, afecta al sitio 
 debajo de 400 imágenes sin texto alternativo. Prenderlo antes de tener una pantalla que sepa leer el
 alcance correcto convertiría el hallazgo más caro del informe en el menos visible.
 
-**Qué falta para prenderlo:** que se despliegue la superficie que sabe renderizar hallazgos de dominio
-(**TASK-1671**). Recién ahí se enciende el interruptor, se corre una auditoría real y se contrasta contra
-el `robots.txt` verdadero del cliente.
+**Qué falta para prenderlo:** que se **despliegue** la superficie que sabe renderizar hallazgos de dominio.
+
+Al 2026-09-01 esa pantalla ya está **construida** (`TASK-1671`): la auditoría gana una sección propia,
+"Acceso y presentación del sitio", entre la salud y la lista de problemas, donde cada hallazgo dice
+"Todo el sitio" en vez de un conteo de páginas y nombra dónde se detectó. Pero construida no es lo mismo
+que desplegada: el código todavía no está en ningún servidor. Lo que falta es el despliegue, después el
+encendido del interruptor, y recién ahí una auditoría real contrastada contra el `robots.txt` verdadero
+del cliente.
 
 > Detalle técnico: fila de `GROWTH_SEO_SITE_FINDINGS_ENABLED` en
 > [FEATURE_FLAG_STATE_LEDGER.md](../../operations/FEATURE_FLAG_STATE_LEDGER.md), con la secuencia exacta

@@ -27,7 +27,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -40,7 +40,7 @@
 - Motion: `none`
 - Backend impact: `none`
 - Epic: `EPIC-022`
-- Status real: `Diseno aprobado; implementacion pendiente`
+- Status real: `Code complete; el flip del flag de TASK-1670 sigue pendiente y con el flag OFF el punto ciego SIGUE ABIERTO`
 - Rank: `TBD`
 - Domain: `growth|ui`
 - Blocked by: `none`
@@ -574,37 +574,63 @@ va a creerle al PDF.
 
 ## Acceptance Criteria
 
-- [ ] Se declaró `Execution profile: ui-ux` y `UI impact: layout`.
-- [ ] Existe `docs/ui/wireframes/TASK-1671-growth-seo-site-findings-audit-surface.md` con
-      `## Implementation Mapping`, `## GVC Scenario Plan` y `## Design Decision Log` sustantivos, y
-      `## Status` apunta a él.
-- [ ] `UI ready` permanece `no` hasta que ese wireframe y el `## UI/UX Contract` estén completos;
-      si pasa a `yes`, `pnpm task:lint --task TASK-1671` sale sin findings.
-- [ ] `SeoAuditIssueGroup` tiene un eje de alcance con dos valores y los hallazgos de sitio no
-      calculan ni exponen `affectedPages`.
-- [ ] Un hallazgo de sitio `critical` se lista **antes** que cualquier hallazgo de página, sin
-      importar cuántas URLs afecte el de página — cubierto por test en `group-audit-issues`.
-- [ ] Ningún nodo renderizado de la región de sitio contiene el texto de "páginas afectadas",
-      verificado por assertion en el escenario GVC.
-- [ ] El bloqueo de **retrieval** se presenta `critical` y el de **training** se presenta `notice`,
-      con `issue_type` distintos y copy que los nombra como cosas distintas.
-- [ ] El copy de un hallazgo de bloqueo nombra la **familia** de agentes y el **lugar** donde se
-      detectó; no existe un texto genérico sin sujeto ni lugar.
-- [ ] Los dos vacíos —verificado-y-sano y no-verificado-con-razón— tienen copy e iconografía
-      distintos y ambos están capturados en GVC.
-- [ ] El copy visible nuevo vive en `src/lib/copy/growth.ts` y el test de drift bidireccional de
-      `TASK-1309` pasa.
-- [ ] La severidad se comunica con icono + label además del tono, nunca color solo.
-- [ ] No nació un reader nuevo, ni una lista paralela, ni una ruta nueva, ni una capability nueva.
-- [ ] GVC desktop 1440 + mobile 390 capturado y **mirado**, con las cinco capturas declaradas y el
-      scorecard sobre el umbral.
-- [ ] Sin scroll horizontal de página en desktop ni en 390px.
-- [ ] El retorno de foco al cerrar el drill de un hallazgo de sitio funciona con teclado.
-- [ ] `TASK-1670` recibió su `## Delta` con los criterios de severidad por familia **como
-      checkboxes en su `## Acceptance Criteria`**.
-- [ ] Está declarado, en esta task y en `TASK-1672`, que el artefacto no se publica hasta que este
-      flag esté ON en producción con una corrida real verificada.
-- [ ] `pnpm task:lint --task TASK-1671` reporta `template=1 errors=0`.
+- [x] Se declaró `Execution profile: ui-ux` y `UI impact: layout`.
+- [x] Existe `docs/ui/wireframes/TASK-1671-growth-seo-site-findings-audit-surface.md` con esas
+      tres secciones sustantivas + `Decision`, `Desktop/Mobile Target`, `Action Hierarchy`,
+      `Visual Fidelity Mapping`, `Token mapping` y `Anti-patterns`, y `## Status` apunta a él.
+      🔴 El campo `Wireframe` apuntaba antes al wireframe de **TASK-1672** —otra superficie, cuyo
+      propio encabezado dice `Owner task: TASK-1672`—: era un archivo existente puesto ahí para
+      satisfacer el lint, no el diseño de esta pantalla.
+- [x] `UI ready: yes` con `pnpm task:lint --task TASK-1671` en `errors=0 warnings=0`, incluido el
+      gate `ui-premium-readiness` completo.
+- [~] `SeoAuditIssueGroup` tiene el eje `scope` (`page`|`site`), leído del dato persistido.
+      **Desviación declarada:** los grupos de sitio **sí exponen** `affectedPages` (vale 1) en vez
+      de omitirlo. Se prefirió el conteo honesto de URLs distintas —documentado en el tipo como
+      "no aplica"— antes que un `0` que un consumer podría leer como "no afecta a nadie". Lo que
+      sí se cumple, y es lo que el criterio perseguía: **no se usa en el orden** (queda fuera del
+      `priorityScore` de dominio) **y no se renderiza** (test que prohíbe la cadena "páginas
+      afectadas" en la región).
+- [~] Los hallazgos de sitio se presentan **arriba** de la lista de página, siempre. **El
+      mecanismo no es el que el criterio asumía**: no compiten dentro de una lista ordenada, se
+      renderizan en una región propia (dirección C del wireframe, elegida sobre A y B con su
+      razón). Por construcción ningún hallazgo de página puede quedar por encima. Cubierto por
+      `partitionAuditIssuesByScope` + su test de partición.
+- [~] Ningún nodo de la región contiene "páginas afectadas" — verificado por **assertion de
+      componente** (`site-audit-site-findings.test.tsx`) sobre el DOM renderizado, no por el
+      escenario GVC: con el flag OFF no hay filas de dominio en la base, así que la assertion en
+      el escenario pasaría trivialmente sobre una región ausente y no probaría nada.
+- [x] Retrieval `critical` / training `notice`, con `issue_type` distintos, copy distinto y —lo
+      que decide la lectura— **etiqueta textual propia** para la postura ("Decisión declarada" en
+      vez de "Info"). Test dedicado que además prohíbe que aparezca "Info" en ese caso.
+- [x] Cada fila nombra el lugar ("En robots.txt" / "En el borde (CDN o firewall)" / "En la
+      portada") y los agentes acotados ("OAI-SearchBot y 4 más"). El lugar **se omite** si el dato
+      no lo trae, en vez de inventarse — con test. El hallazgo de borde agrega "el robots.txt está
+      limpio", que es la mitad que lo distingue del de robots.
+- [x] Los dos son distintos y ambos capturados: "Verificado" (chip `success` + qué se revisó) y
+      "No pudimos verificar" (sin chip, menor peso, con la razón). Un test fija que con un chequeo
+      sin medir **no** puede decir "Verificado" — bug real que la primera versión tenía.
+- [x] Todo el copy nuevo en `GH_GROWTH_SEO_AUDIT.site`; el drift bidireccional pasa (13.004 tests
+      de la suite completa en verde).
+- [x] Icono + palabra dentro del chip, en las cuatro filas y en la confirmación.
+- [x] Cero readers, rutas, capabilities y migraciones nuevas. `Backend impact: none` se sostuvo.
+- [~] GVC desktop 1440 + mobile 390 **capturado y mirado** en dos corridas; scorecard sobre el
+      umbral (promedio 4.59, piso 4.5, las cinco dimensiones con umbral propio ≥4.5) y
+      `ui:visual-gate` + `ui:quality` en PASS. **Advertencia que hay que leer:** la región poblada
+      NO se capturó con datos de un run real —el flag está OFF, la tabla es append-only sobre una
+      instancia compartida con producción y encolar un crawl le cargaría presupuesto al cliente—.
+      Esos frames salen de una ruta local temporal, no commiteada, que renderiza el componente
+      REAL con props representativas. Sirven para juzgar layout y responsive; **no** sustituyen
+      evidencia de runtime, que queda para el flip (paso 3 del runbook).
+- [x] `scrollWidth == clientWidth` en 1440 y 390 (assertions del scenario premium, dos corridas).
+- [n/a] **No aplica por diseño:** un hallazgo de dominio no tiene URLs que listar, así que no
+      tiene drill. Las filas de la región no son interactivas y no entran al orden de tabulación
+      como controles falsos. Un `[Ver →]` que no lleva a ninguna parte es una promesa rota
+      (anti-patrón declarado en el wireframe).
+- [x] `TASK-1670` ya los lleva como checkboxes tildados con su evidencia (retrieval `critical`
+      verificado contra `nytimes.com`; training-only `notice` verificado contra `axios.com`).
+- [x] Declarado en `TASK-1672` (`Blocked by` + su Delta 2026-09-01: el gate es el flag en ON con
+      corrida verificada, no un merge) y acá.
+- [x] `template=1 errors=0 warnings=0`.
 
 ## Verification
 
