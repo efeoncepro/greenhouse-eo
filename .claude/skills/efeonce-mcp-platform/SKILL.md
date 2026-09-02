@@ -112,7 +112,10 @@ If a source conflicts with remembered behavior, the verified runtime and its can
   🚩 **And the name lies, which is what makes the above dangerous:** that app's Entra `displayName` is
   **"Efeonce MCP Local Canary Client"**, yet it IS the tenant-wide shared production client the shim hands to every
   standard MCP client. The real canary is `66985833-14e9-438e-add4-b740e84e9a64` ("Base-Only Canary Client", 2
-  scopes), which the shim never returns. Verified with `az ad app show` 2026-09-02. Compound failure mode: whoever
+  scopes), which the shim never returns. Verified with `az ad app show` 2026-09-02. ✅ **Renamed the same day**
+  (TASK-1804) to "Efeonce MCP Public Client (Claude Code, claude.ai, Claude Desktop)" via `az ad app update
+  --display-name`; readback: appId, 3 redirect URIs and 3 read scopes intact, no write scope. The loopback finding
+  above stays under review — never close it by narrowing `http://localhost`. Compound failure mode: whoever
   opens Entra, reads "Local Canary" and assumes a toy blast radius is exactly whoever will not audit its redirect
   URIs. **NEVER reason about this client's blast radius from its name — read `requiredResourceAccess` and
   `publicClient.redirectUris`.** Renaming is cheap and touches neither `appId` nor consents.
