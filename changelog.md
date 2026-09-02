@@ -7,6 +7,34 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-02 — DCR deprecado en MCP `2026-07-28`: el shim del gateway se queda, pero deja de ser el futuro
+
+La revisión Current del protocolo marcó Dynamic Client Registration como `Deprecated` (PR #2858),
+migración a Client ID Metadata Documents, retiro más temprano en la primera revisión publicada en o
+después de 2027-07-28. El shim se mantiene porque la excepción está redactada para nuestro caso exacto:
+DCR se retiene *"for backwards compatibility with authorization servers that do not support Client ID
+Metadata Documents"*, y Entra no soporta ninguno de los dos — su única vía oficial es el pre-registro,
+que es justo lo que `POST /register` devuelve.
+
+Lo que cierra la pregunta de fondo: **CIMD no es implementable en la capa del shim.** Es capacidad del
+authorization server, el AS es Entra, y el gateway espeja `authorize`/`token` en lugar de proxearlos;
+soportarlo exige emitir los tokens, o sea el broker que `TASK-1631` ya está eligiendo con CIMD entre sus
+requisitos. No hay task paralela que abrir.
+
+En el camino aparecieron tres cosas que la evaluación no buscaba. La misma revisión agregó texto que no
+existía en `2025-11-25` —el `issuer` de la metadata debe ser idéntico al identificador con que se
+construyó la well-known URL— y los nuestros difieren desde que el shim existe; funciona sólo porque los
+clientes todavía no lo aplican. El `client_id` estático compartido, con `http://localhost` sin puerto
+entre sus redirect URIs y el consentimiento cacheado por Entra, reproduce la forma del confused deputy
+aunque la letra del `MUST` no ate: lo acota que ese cliente no lleve scopes de escritura, una regla
+escrita por otra razón que resulta ser la que limita el daño a lectura. Y esa misma aplicación se llama
+"Local Canary Client" cuando es el cliente compartido de producción, de modo que quien la audite por el
+nombre concluirá lo contrario de lo que debe.
+
+El horizonte del shim no lo fija el calendario de la spec sino el día que un cliente endurezca
+cualquiera de las dos validaciones. Para ese día queda declarado un plan B de pre-registro puro que no
+toca Entra ni el modelo de tokens.
+
 ## 2026-09-02 — un release quedó huérfano en `main` y se recuperó sin ensuciar el control plane
 
 La promoción `develop→main` (PR #215, 726 archivos, 1490 commits, 2 migraciones) entró a `main` a las
@@ -1143,14 +1171,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
   `20260828113457119` aplicada; sanity 22/22 contra PG real. Slice 4 (emisión a la cola)
   bloqueado por TASK-1700; rollout con autorización del operador
   (`docs/manual-de-uso/growth/operar-gap-competitivo-seo.md`).
-
-## 2026-08-28 — Outreach de partnership para agencias con Higgsfield y Magnific
-
-- Investigación vigente y formularios enterprise enviados a ambos providers para explorar un partnership de agencia
-  orientado a clientes enterprise en LATAM. Las dos páginas confirmaron recepción; el registry mantiene el estado
-  `Postulación enviada`, sin inferir reseller, co-selling, certificación ni economics hasta recibir evidencia
-  contractual. Constancia: `docs/audits/commercial/HIGGSFIELD_MAGNIFIC_AGENCY_PARTNERSHIP_OUTREACH_2026-08-28.md`.
-- Magnific respondió mediante su Enterprise BDR EMEA & LATAM y derivó la conversación a
-  `ai-partnerships@magnific.com`. La ruta oficial queda verificada, pero el estado comercial no cambia a partnership
-  activo hasta recibir aceptación y términos. El outreach especializado quedó enviado desde Outlook Web, con Susana
-  en copia y la firma configurada de Julio.

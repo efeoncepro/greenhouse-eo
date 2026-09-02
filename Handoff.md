@@ -2,6 +2,53 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-09-02 (9) — DCR quedó deprecado en MCP `2026-07-28`: el shim de `mcp.efeonce.org` se mantiene, con dos hallazgos que la evaluación no buscaba
+
+Evaluación de impacto pedida por el operador, **sin migración**. Verificada contra la spec en vivo.
+Ya en producción vía release `375f56e24187` (commits `7788c8626` + `b4135f287`, verificados por blob
+contra `origin/main`). **Cero cambios de código.**
+
+**Veredicto:** el shim DCR sigue siendo correcto y no por inercia. La spec retiene DCR *"for backwards
+compatibility with authorization servers that do not support Client ID Metadata Documents"* — que es
+literalmente Entra, que no soporta **ni CIMD ni RFC 7591**. El shim es pre-registro (prioridad 1 de la
+spec) por el único canal que los clientes MCP estándar consumen sin configuración manual. Earliest
+removal de DCR: primera revisión publicada en o después de **2027-07-28**.
+
+**Hallazgo estructural:** *"migrar el gateway a CIMD" no existe como trabajo.* CIMD es capacidad del
+**authorization server**; el nuestro es Entra y el gateway **espeja** `authorize`/`token` en vez de
+proxearlos. Soportarlo exige emitir los tokens = el broker de `TASK-1631`, cuyos invariantes **ya** lo
+exigían al proveedor. No se abrió task paralela; esta evaluación es insumo de esa task.
+
+**🔴 Riesgo más cercano que la deprecación, en la misma revisión:** la página nueva *Authorization
+Server Discovery* (no existía en `2025-11-25`) exige `issuer` **idéntico** al identificador usado para
+construir la well-known URL. **Los nuestros difieren** desde que el shim existe. Funciona sólo porque
+los clientes todavía no lo aplican — empírico, no garantizado. **No se parchea** reclamando issuer
+propio: rompería la validación `iss` de RFC 9207, que hoy pasamos *porque* espejamos el de Entra.
+
+**Dos hallazgos que salieron de coordinar con otras sesiones, no de la evaluación:**
+
+1. *Confused deputy* (aporte de `greenhouse-eo-1e`, adoptado a medias tras verificar): la letra del
+   `MUST` no ata —no reenviamos— y el modo de la cookie de consentimiento quedó **refutado** leyendo
+   `src/app.ts`. Pero el riesgo está por construcción: `client_id` estático compartido +
+   `http://localhost` **sin puerto** + consentimiento cacheado por Entra = un proceso local toma un
+   código en silencio. Acotado a lectura porque ese cliente **no lleva scopes de escritura**.
+2. *La etiqueta miente:* `32617b87-…` se llama **"Efeonce MCP Local Canary Client"** siendo el cliente
+   compartido de producción; el canary real es `66985833-…`. Quien lee "Local Canary" y asume radio de
+   juguete es quien no auditará las redirect URIs.
+
+**Plan B declarado, sin ejecutar:** si un cliente endurece cualquiera de las dos validaciones antes del
+broker → pre-registro puro (apuntar `authorization_servers` a Entra, apagar `OAUTH_PUBLIC_CLIENT_ID`
+—el shim ya está gateado por esa env— y `client_id` manual por usuario).
+
+**Pendiente con dueño:** renombrar el cliente en Entra y decidir sobre las redirect URIs — **NO**
+angostando `http://localhost` a secas, que es el loopback que Claude Code necesita. Opcional para quien
+formalice `TASK-1654`: publicar `client_id_metadata_document_supported: false` explícito.
+
+**Deuda de proceso, ajena a la task:** el worktree de esta sesión nació de `origin/main` (1490 commits
+detrás de `develop`) porque `origin/HEAD` apunta a `main`. Le pasó igual al worktree
+`busy-shirley-80edbf` del 2026-08-27. Fix propuesto y **no aplicado** (decisión del operador):
+`git remote set-head origin develop` + borrar ambos worktrees.
+
 ## 2026-09-02 (8) — El release `375f56e24187` quedó huérfano y se recuperó; `main` vuelve a tener manifest
 
 La promoción `develop→main` del 2026-09-02 entró a `main` por el PR #215 a las `20:51:04Z` (726 archivos,
@@ -489,33 +536,3 @@ Corregida la contradicción entre skills: `hubspot-greenhouse-bridge` ahora coin
 con `project_context.md`: el MCP de HubSpot es el writer gobernado para promociones manuales confirmadas; la brecha
 del bridge sólo limita automatización. Registros CRM general y de licitaciones sincronizados tras readback. Pendiente
 comercial real: admisibilidad, loaded cost/margen y producción de propuestas; ninguna postulación fue enviada.
-
-## 2026-09-01 (6) — barrido documental de los 19 cierres y la calibración que faltaba
-
-Cerré el ciclo del barrido: 19 tasks quedaron en `complete/` y el registro alrededor de ellas ya no
-miente. Tres subagentes barrieron docs de proceso, ledger de flags y coherencia epic↔registro; lo que
-reportaron lo verifiqué yo antes de escribirlo — los conteos de hijas los medí por campo `Epic:`
-(`EPIC-022` 36/39, `EPIC-020` 38/14, `EPIC-040` 11/10, `EPIC-023` 7/3) y coincidieron.
-
-Corregido: `Lifecycle` desincronizado en `TASK-1090`; 5 rutas stale en `README`/`TASK_ID_REGISTRY`;
-9 estados falsos en el `README` (1036, 1040, 1253, 1321, 1330, 1335, 1113, 1430, 1431); conteos y
-prosa stale en cinco epics y en `AEO_PROGRAM_STATUS.md` —que decía «no existe entrada pública
-self-serve» cuando `/aeo-2/` ya corre el grader—; 10 archivos con rutas rotas a tasks cerradas; y
-las reglas duras de `TASK-1112`, `TASK-1246`, `TASK-1261` y `TASK-1336` que se apoyaban en un hecho
-ya falso.
-
-Lo estructural, que es el hallazgo de fondo: **el registro del avance no estaba en ningún checklist
-de cierre**. `stale-progress` avisaba en un comando que el protocolo no mandaba correr — un
-mecanismo apagado. Quedó agregado a los checklists de `CLAUDE.md` y `AGENTS.md`: tildar los
-criterios que la evidencia respalda, dejar sin tildar y con razón lo que no, poner `Status real` al
-día y correr `pnpm task:lint --task TASK-###` antes de mover a `complete/`.
-
-Además: `ui-flow-contract` recibió la misma calibración incidental-vs-focal que ya tenía
-`ui-wireframe-contract` —una task en `to-do/` a la que sólo le corrigen una ruta no debe romper el
-gate por deuda previa—, con test falsable (rojo sin la calibración, verde con ella; el fixture hace
-`git init` porque sin repo el modo `changed` no ve nada y el test sería teatro). El footer de
-`flags:audit` decía «verdad live = `vercel env ls`»; `ls` sólo dice que la variable existe, así que
-ahora nombra `vercel env pull`. Y el mensaje de `no-opacity-on-text` estaba en voseo.
-
-Gates: `local:check` exit 0, `task:lint:test` 47/47, `ops:lint --changed` errors=0,
-`docs:closure-check` sin dueño faltante, `docs:context-check:strict` 0/0, 262 tests de lint-rules.
