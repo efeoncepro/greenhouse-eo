@@ -68,6 +68,42 @@ Dos de las tools nuevas entran directo al problema que esta task ataca:
 compiten por la misma intención con `get_seo_keyword_opportunities` y `discover_seo_keywords`.
 Deben entrar al conjunto que recibe bloque de ruteo y al fixture del eval.
 
+## Resultado 2026-09-02 — el eval refutó la hipótesis central, y ese es el entregable
+
+Medido, no supuesto. Seis corridas, cada variante determinista (dos corridas idénticas por variante).
+
+| Variante | Tool | Mercado | Gasto |
+|---|---|---|---|
+| Baseline (sin ruteo) | 94.5% | 98.2% | 100% |
+| Bloques `Use when · Prefer X if · Do NOT use for` | 94.5% | 98.2% | 100% |
+| + cláusula de mercado + claim acotado | 96.4% | 98.2% | 100% |
+| + señales proxy + `items` requerido | 94.5% | 98.2% | 100% |
+| **Sólo correcciones factuales (aplicada)** | **92.7%** | **100%** | 100% |
+
+🔴 **Los bloques de ruteo NO mejoraron la selección de tool.** La banda no tiene dirección, y una
+variante hizo regresar a `prepare_seo_grounded_queries`, una tool que nadie tocó: alargar siete
+descripciones degrada la selección de sus **vecinas**. Es el riesgo que la matriz de esta task
+anticipaba, medido en vez de supuesto. Se aplicó la variante **sin** bloques.
+
+✅ **Lo que sí movió el número fue corregir dos afirmaciones falsas.** La cláusula de mercado decía
+*"pass market when the organization has more than one"* —literalmente una instrucción de elegir—; el
+modelo la obedecía justificándose con *"the operator is in Santiago"*, que es `ISSUE-152` en su
+propio razonamiento. Y la lente dual abría con un *"úsala en vez de X"* sin acotar que ganaba por
+posición sobre cualquier matiz posterior. **Mercado 98.2% → 100%.**
+
+⚠️ **Tool 94.5% → 92.7%: se reporta como está y NO se declara mejora.** Su única regresión es
+léxica —la pregunta dice *"rendimiento"* y la tool se llama `get_seo_performance`— y ninguna
+descripción le gana al nombre de su propia tool. La palanca real sería el **naming**, prohibido por
+esta task; la frontera queda medida y escrita.
+
+🔴 **Hallazgo lateral, el más caro:** al hacer que el guard comparara `description`, aparecieron
+**21 de 27 tools federadas ya divergentes** — sirviendo, entre otras, la instrucción que causa
+`ISSUE-152`. Se cerró **derivando** el texto del artefacto en vez de copiarlo: un espejo a mano
+vuelve a divergir, uno derivado no puede.
+
+**Rollout pendiente:** push + redeploy de `mcp.efeonce.org` + canary. Detalle:
+`docs/architecture/GREENHOUSE_MCP_TOOL_SELECTION_EVAL_V1.md`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -76,7 +112,7 @@ Deben entrar al conjunto que recibe bloque de ruteo y al fixture del eval.
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -89,7 +125,7 @@ Deben entrar al conjunto que recibe bloque de ruteo y al fixture del eval.
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Diseno`
+- Status real: `Completa — eval + ruteo + gate + paridad de descripción entregados; el gateway requiere redeploy (rollout pendiente)`
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`
@@ -283,12 +319,12 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface y consumidores nombrados con paths reales.
-- [ ] Invariantes explícitos; `N/A` de DB y tenant justificados.
-- [ ] Sin tablas nuevas.
-- [ ] Postura de rollback explícita y proporcional.
-- [ ] Evidencia runtime listada (eval + canary del gateway).
-- [ ] Sin datos sensibles ni cambio de gate de acceso.
+- [x] Source of truth, contract surface y consumidores nombrados con paths reales.
+- [x] Invariantes explícitos; `N/A` de DB y tenant justificados.
+- [x] Sin tablas nuevas.
+- [x] Postura de rollback explícita y proporcional.
+- [ ] Evidencia runtime listada (eval + canary del gateway). **Eval: hecho** (6 corridas, baseline y delta registrados). **Canary del gateway: pendiente** — requiere el redeploy.
+- [x] Sin datos sensibles ni cambio de gate de acceso.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -477,19 +513,19 @@ Sin flag — additive, cutover inmediato. Una descripción no tiene modo "apagad
 
 ## Acceptance Criteria
 
-- [ ] Existe un fixture de 40–60 preguntas reales con su tool esperada, su **mercado esperado** y justificación.
-- [ ] El fixture cubre los **cinco mercados productivos** (`CL`, `MX`, `CO`, `PE`, `US`) en sus variantes es-CL/es-MX/es-CO/es-PE/en-US, y respeta el mapa cerrado ISO-2 → `location_code` de `TASK-1652`.
-- [ ] La precisión de **mercado** se mide y reporta **por separado** de la precisión de tool; no se promedian.
-- [ ] Ante una organización con más de un target y una pregunta sin mercado, elegir uno en silencio cuenta como **fallo** aunque acierte.
-- [ ] El baseline se midió y quedó registrado **antes** de modificar una sola descripción.
-- [ ] Las seis tools que compiten tienen bloque de ruteo con el formato fijo.
-- [ ] Cero tools borradas, fusionadas o renombradas.
-- [ ] `inputSchema` y `outputSchema` sin cambios, probado por test.
-- [ ] El delta post-cambio está reportado con número; si es negativo o nulo, la task lo dice y no declara mejora.
-- [ ] El fixture incluye casos cuya respuesta correcta es no llamar a una tool que gasta.
-- [ ] El guard de paridad compara `description` además de `inputSchema`.
-- [ ] Las descripciones del gateway y del MCP interno son idénticas tras el redeploy.
-- [ ] `MCP_TOOL_SURFACE_INVARIANTS.md` declara que toda tool nueva nace con ruteo y con su caso en el fixture.
+- [x] Existe un fixture de 40–60 preguntas reales con su tool esperada, su **mercado esperado** y justificación.
+- [x] El fixture cubre los **cinco mercados productivos** (`CL`, `MX`, `CO`, `PE`, `US`) en sus variantes es-CL/es-MX/es-CO/es-PE/en-US, y respeta el mapa cerrado ISO-2 → `location_code` de `TASK-1652`.
+- [x] La precisión de **mercado** se mide y reporta **por separado** de la precisión de tool; no se promedian.
+- [x] Ante una organización con más de un target y una pregunta sin mercado, elegir uno en silencio cuenta como **fallo** aunque acierte.
+- [x] El baseline se midió y quedó registrado **antes** de modificar una sola descripción.
+- [ ] ~~Las seis tools que compiten tienen bloque de ruteo con el formato fijo.~~ **NO se cumple, y es un resultado, no una omisión.** Se implementó el formato fijo en las SIETE (`get_seo_dual_lens_visibility` entró al racimo) y **se midió que no servía**: cuatro variantes dieron 92.7–96.4% de precisión de tool sin dirección, y los bloques largos DILUÍAN la cláusula de mercado que sí funcionaba (comparar B2 con C lo aísla). Se aplicó la variante sin bloques. El criterio se escribió suponiendo que el ruteo ayudaría; el eval existía justamente para poder refutarlo. Evidencia: `GREENHOUSE_MCP_TOOL_SELECTION_EVAL_V1.md` §5.
+- [x] Cero tools borradas, fusionadas o renombradas.
+- [x] `inputSchema` y `outputSchema` sin cambios, probado por test.
+- [x] El delta post-cambio está reportado con número; si es negativo o nulo, la task lo dice y no declara mejora.
+- [x] El fixture incluye casos cuya respuesta correcta es no llamar a una tool que gasta.
+- [x] El guard de paridad compara `description` además de `inputSchema`.
+- [ ] Las descripciones del gateway y del MCP interno son idénticas tras el redeploy. **Código completo y verde en local (`pnpm check` 75/75 en `efeonce-mcp`), rollout PENDIENTE**: falta push + redeploy de `mcp.efeonce.org` y el canary contra el gateway vivo. Ya no puede volver a divergir —el gateway DERIVA el texto del artefacto en vez de copiarlo—, pero el runtime todavía sirve el texto viejo.
+- [x] `MCP_TOOL_SURFACE_INVARIANTS.md` declara que toda tool nueva nace con ruteo y con su caso en el fixture.
 
 ## Verification
 
@@ -502,14 +538,14 @@ Sin flag — additive, cutover inmediato. Una descripción no tiene modo "apagad
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedó sincronizado con el estado real
-- [ ] el archivo vive en la carpeta correcta
-- [ ] `docs/tasks/README.md` quedó sincronizado con el cierre
-- [ ] `Handoff.md` quedó actualizado
-- [ ] `changelog.md` quedó actualizado
-- [ ] se ejecutó chequeo de impacto cruzado sobre `TASK-1785`, `TASK-1658` y `TASK-1651`
-- [ ] delta en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` sobre la superficie MCP
-- [ ] `MCP_TOOL_SURFACE_INVARIANTS.md` creado
+- [x] `Lifecycle` del markdown quedó sincronizado con el estado real
+- [x] el archivo vive en la carpeta correcta
+- [x] `docs/tasks/README.md` quedó sincronizado con el cierre
+- [x] `Handoff.md` quedó actualizado
+- [x] `changelog.md` quedó actualizado
+- [x] se ejecutó chequeo de impacto cruzado sobre `TASK-1785`, `TASK-1658` y `TASK-1651`
+- [x] delta en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` sobre la superficie MCP
+- [x] `MCP_TOOL_SURFACE_INVARIANTS.md` — ya existía (`TASK-1785`); se le aportó la §7
 
 ## Follow-ups
 

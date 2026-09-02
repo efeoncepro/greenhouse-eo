@@ -7,6 +7,50 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-02 — La superficie MCP del módulo SEO pasa a tener eval de selección
+
+TASK-1784 agregó un fixture de 55 preguntas de operador en los cinco mercados productivos y un runner que mide
+tres precisiones que nunca se promedian: qué tool se elige, qué mercado se pasa y si se llamó a una tool que
+gasta cuando no correspondía. Baseline registrado antes de tocar una descripción: tool 94.5%, mercado 98.2%,
+gasto 100%.
+
+El resultado contradijo la hipótesis con la que se escribió la task: agregar bloques de ruteo a las
+descripciones NO mejoró la selección de tool, y en una variante degradó una tool que nadie había tocado. Lo que
+sí funcionó fue corregir dos afirmaciones falsas — la cláusula de mercado ordenaba elegir un país en vez de
+preguntar, y la lente dual reclamaba prioridad sin acotarla. La precisión de mercado llegó a 100%, cerrando la
+elección silenciosa que costó un año de mediciones contra el país equivocado en ISSUE-152; la de tool bajó a
+92.7% y se reporta sin declarar mejora.
+
+El gate de CI mide cobertura del fixture, no precisión: una tool SEO nueva sin caso rompe el build. El guard de
+paridad del gateway ahora compara la descripción, y al conectarlo encontró 21 de 27 tools federadas divergentes;
+se cerró haciendo que el gateway derive el texto del artefacto en vez de mantener una copia. El redeploy de
+`mcp.efeonce.org` queda pendiente.
+
+## 2026-09-02 — Globe entra en hibernación profunda reversible
+
+TASK-1807 incorporó una state machine Terraform `active | draining | hibernated`. Globe quedó en
+`hibernated`: tres schedulers pausados, vías productivas cerradas, Cloud Run en scale-to-zero y Cloud SQL
+`STOPPED/NEVER`; datos, backups/PITR, buckets, secretos, imágenes, identidades, front door, budgets y
+observabilidad permanecen intactos. Los applies finales tuvieron cero deletes/replacements y el post-plan quedó
+sin drift.
+
+El runbook nuevo documenta el gate anti-borrado, todos los inputs de preservación, la secuencia segura de apagado
+y encendido, los readbacks, rollback, monitoreo y medición de costo. El baseline era ~CLP 348.152/30 días y la
+reducción modelada es CLP 318.000–328.000; el ahorro realizado queda pendiente de Billing Export a 24 horas,
+7 días y cierre mensual.
+
+Se sincronizaron los índices, arquitectura de persistencia, runbooks IaC/rollout/promoción, ledger de modelos,
+plan TASK-1807 y prompt de sesiones nuevas. Las skills `greenhouse-globe` y `greenhouse-globe-model-fleet`
+quedaron espejadas Codex/Claude con una compuerta que impide gasto o reactivación implícita.
+
+## 2026-09-02 — tools y skills MCP pasan a ser Definition of Done de toda la secuencia ETV
+
+TASK-1805/1806, TASK-1312/1313/1314 y TASK-1808–1811 exigen ahora crear o actualizar su tool MCP, lane,
+manifiesto, federación y skill operativa en el mismo PR. Una tool existente se amplía en vez de duplicarse y toda
+ausencia del gateway debe ser una exclusión razonada. Las lecturas no compran al proveedor durante el read; writes
+y gasto conservan confirmación, capability fina y scope fail-closed. No cambió runtime: son criterios de ejecución
+y cierre para trabajo futuro.
+
 ## 2026-09-02 — las cinco familias Labs restantes ya tienen ownership ejecutable
 
 El backlog de Growth SEO incorpora `TASK-1808`–`TASK-1811`: categorías y mercado temático, competidores SERP por
@@ -1090,21 +1134,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
 - **Flags prendidos con el release** (ambos requerían que su lector estuviera en `main`, regla ISSUE-150 — verificado x0 antes y x1/x2/x3 después): `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` (Vercel, sign-off comercial del operador) y `GROWTH_PROBE_FETCH_STRICT_NETWORK_ENABLED` (Vercel Production; en ops-worker ya estaba ON). Redeploy `greenhouse-if2u2c8ys` porque Vercel congela env vars al build; `pnpm flags:audit --strict` cierra en 0/0.
 - **Los 3 gotchas del squash-merge se pre-emptaron, no se sufrieron**: merge canónico `-s ours` con ambas verificaciones vacías; el push a develop se bundleó con una edición del `FEATURE_FLAG_STATE_LEDGER` (está en `deployControlDocs` y fuerza el build de staging, evitando el `vercel_readiness` en exit 1); el Playwright smoke sobre `main` se produjo en 3 min en vez de taparlo con bypass. El `bypass_preflight_reason` quedó reservado para `db_migrations`, único dominio irreversible real, con razón auditable (migraciones ya aplicadas en la instancia única Cloud SQL).
 - ⚠️ **El watchdog post-release recomendó una regresión.** Reportó DRIFT en 3 workers comparando contra `gh=6f7e246ea888` (commit del 2026-07-30, ancestro del target) y propuso redeployar `hubspot-greenhouse-integration` con ese `expected_sha` — pisar código correcto con código de un mes atrás. No se ejecutó: `pnpm release:workers` (lee Cloud Run, fuente autoritativa) mostró 3/4 workers exactamente en el target y el `ops-worker` en change-gate legítimo, verificado con las **28 rutas reales** leídas del workflow y diff vacío. Es la clase de falso positivo abierta hasta TASK-920.
-
-## 2026-08-27 — El provider Google AI Mode del AEO grader deja de mentir "sin bloque AI" (TASK-1652)
-
-- Los runs productivos del grader (market ISO-2) fallaban per-task en DataForSEO por `location_name` inválido y el fallo se clasificaba `skipped:no_ai_overview_block` — 60 observaciones históricas eran ese falso negativo (54 con el error exacto `40501`). Fix: mapa cerrado market→`location_code` verificado en vivo (CL=2152, MX=2484, CO=2170, PE=2604, US=2840) + gate per-task por `status_code` (el skip honesto queda reservado para tasks `20000` realmente ejecutadas). Regrade descartado con evidencia: los tasks fallidos nunca se ejecutaron y río abajo skip/failed pesan igual.
-- El parser ahora desciende a las `references[]` anidadas de los `ai_overview_element` (dedupe por URL), y el smoke live destapó que Google envuelve TODA reference en redirects propios (`domain: google.com` + `goto?url=<token>`): la atribución ahora deriva el dominio real desde `source` cuando es domain-shaped y descarta honesto (contado en `usage.dataforseo_citations_unattributable`) lo no atribuible — antes todo el SoV de citabilidad se atribuía a google.com. Herencia declarada en `TASK-1311`. AIO producción sigue OFF (TASK-1341).
-
-## 2026-08-27 — El módulo SEO gana el tier `prospect`: diagnóstico sin contrato y sin acceso del cliente (TASK-1709)
-
-- Nuevo carril de adquisición `src/lib/growth/seo/prospect/**`: una corrida ÚNICA por dominio con tope duro POR DIAGNÓSTICO (min(USD 1,00, restante mensual de Efeonce), validado contra el forecast del conjunto ANTES de la primera llamada), idempotencia por dominio/mercado/día (repetir = USD 0), y gasto de adquisición atribuido a `EO-ORG-0007` en el ledger único. Estrena 4 endpoints de familias ya permitidas (`ranked_keywords` +`ai_overview_reference`, `competitors_domain`, `backlinks/competitors`, `domain_intersection`) — el colector de competidores que `TASK-1662` consumirá.
-- Todo hecho nace con lente `estimated` + `captured_at` (CHECK de un solo valor) y el contrato de salida no tiene score/veredicto/benchmark/lift; la evidencia de sitio se delega al sustrato (`site-substrate`, USD 0) y un bloqueo del sitio es un hallazgo, no un obstáculo. Cero captura recurrente sobre prospectos (sin cron/scheduler; test fuente + DO guard).
-- Full API Parity mismo PR: lane app + lane ecosystem (`internal`-only) + MCP `get/run_seo_prospect_diagnostic`; capabilities `growth.seo.prospect_diagnostic.{run,read}` seedeadas + granteadas; señal `growth.seo.prospect_diagnostic.cost_overrun` (steady 0); evento `growth.seo.prospect_diagnostic.completed`.
-- Corrida real verificada (skyairline.com CL): forecast USD 0,205 vs real 0,1991, ledger Δ exacto, idempotencia USD 0, cost_blocked con cero llamadas. Flag `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` default OFF (Vercel V1); ON sólo con decisión del operador.
-
-## 2026-08-27 — Gemini Omni 1.1 entra al gobierno de la flota, no al runtime
-
-- Investigación oficial de Gemini Omni 1.1 Flash: se separan Developer API (`gemini-omni-1.1-flash`, modelo listado Stable) y Google Cloud (`gemini-omni-1.1-flash-preview`, Pre-GA), ambas sobre Interactions `v1beta`; se documentan capacidades, precios, cuotas, residencia, retención, C2PA, restricciones regionales y contradicciones del proveedor.
-- `TASK-1781` queda creada como P0 para migrar antes del shutdown anunciado de `gemini-omni-flash-preview` el 2026-09-30 y expandir capacidades por rutas/output shapes independientes, sin heredar evidencia del modelo anterior.
-- Nueva route card candidata y actualización espejada de `greenhouse-globe-model-fleet` y las referencias Omni de `motion-design-studio`. Sin cambio de binding, deploy, gasto, canary ni promoción: 1.1 sigue `gated` hasta readback live.

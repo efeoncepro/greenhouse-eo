@@ -136,12 +136,75 @@ el resultado no se lea como más de lo que es.
 
 ---
 
-## 5. Delta post-ruteo
+## 5. Delta post-ruteo — 2026-09-02
 
-> ⏳ **Pendiente de medición.** Esta sección se llena corriendo el eval DESPUÉS de aplicar el
-> bloque de ruteo, con el mismo modelo, el mismo fixture y las mismas condiciones. Se deja
-> explícitamente vacía —y no con una expectativa— porque escribir el número esperado antes de
-> medirlo es la forma más barata de convertir un eval en una confirmación del autor.
+Se midieron **cuatro variantes** de descripción contra el mismo fixture, mismo modelo y mismas
+condiciones. Cada una es determinista: dos corridas de una misma variante devuelven exactamente
+los mismos fallos.
+
+| Variante | Precisión de tool | Precisión de mercado | Disciplina de gasto |
+|---|---|---|---|
+| **Baseline** — sin ruteo | 94.5% | 98.2% | 100% |
+| **A** — bloques `Use when · Prefer X if · Do NOT use for` | 94.5% | 98.2% | 100% |
+| **B** — A + cláusula de mercado + claim de la lente dual acotado | 96.4% | 98.2% | 100% |
+| **B2** — B + señales proxy nombradas + `items` requerido | 94.5% | 98.2% | 100% |
+| **C** — sólo las correcciones factuales, sin bloques | **92.7%** | **100%** | 100% |
+
+**Se aplicó la variante C.**
+
+### 🔴 Los bloques de ruteo NO mejoraron la selección de tool
+
+Esta es la conclusión principal, y contradice la hipótesis con la que la task fue escrita. La
+banda 92.7–96.4% **no tiene dirección**: agregar prosa de ruteo movió casos en ambos sentidos sin
+converger. Peor: en la variante B2 la regresión cayó sobre `prepare_seo_grounded_queries`, una
+tool que **nadie tocó**. Alargar siete descripciones degradó la selección de sus vecinas, que es
+exactamente el riesgo que la matriz de la task anticipaba —*"descripciones muy largas degradan la
+selección en vez de mejorarla"*— medido en vez de supuesto.
+
+### Lo que sí movió el número: corregir afirmaciones falsas, no agregar prosa
+
+Dos ediciones cerraron casos, y las dos son **correcciones**, no adiciones:
+
+1. **La cláusula de mercado decía lo contrario de lo que debía.** El texto era *"pass
+   market=&lt;ISO-2&gt; when the organization has more than one"* — literalmente una instrucción de
+   **elegir**. Ahora dice que hay que **preguntar**, y nombra la clase de señal que no es una
+   declaración: dónde está el operador, de dónde viene la marca, en qué idioma escribe, qué target
+   se creó primero. No es una hipótesis sobre por qué hacía falta: el modelo justificó su elección
+   silenciosa con *"the operator is in Santiago"*, que es `ISSUE-152` en su propio razonamiento.
+
+2. **La lente dual abría con un imperativo sin acotar.** *"Use this instead of get_seo_performance
+   and get_seo_rank_evolution"* estaba al **principio** de la descripción, y se llevaba preguntas
+   que no le tocaban. El ruteo que lo corregía llegaba 2.000 caracteres después y perdía por
+   posición.
+
+### El mecanismo, aislado
+
+Comparar **B2 con C** lo aísla limpiamente: llevan la **misma** cláusula de mercado, y sólo la que
+**no** tiene los bloques largos llega a 100% de mercado. La prosa que sirve compite por atención
+con la prosa que se le apila encima. Más texto no es gratis.
+
+### Por qué C, con la precisión de tool más baja
+
+C cambia un caso de tool por el caso de mercado, y esa es la elección correcta según la doctrina
+que la propia task declara: **el error de mercado es más caro porque es invisible**. Una tool
+equivocada responde con la lente equivocada y se nota; el mercado equivocado produce una respuesta
+perfectamente formada sobre otro país, y nada en la salida lo delata. Además C es la variante más
+barata en contexto (+2.9 KB frente a +7.2 KB), y ese costo lo paga **cada llamada de cada
+consumidor**.
+
+### El techo que ninguna descripción puede cruzar
+
+La única regresión de C es léxica: la pregunta dice *"muéstrame el rendimiento de Chile"* y la
+tool se llama `get_seo_performance`. **Ninguna descripción le gana al nombre de su propia tool.**
+La palanca que movería de verdad la selección es el naming de la superficie —y la task prohíbe
+explícitamente renombrar—, así que esa frontera queda **medida y escrita**, no adivinada. Si algún
+día se reabre la decisión de nombres, este eval es el instrumento para justificarla.
+
+### Qué NO prueba este delta
+
+Prueba que estas descripciones rutean así **estas 55 preguntas** con **este modelo**. El fixture
+lo escribió quien conoce la respuesta correcta, así que no es una muestra de producción. El
+follow-up que más valor agrega es alimentarlo con preguntas reales de Nexa.
 
 ## 6. El gate de regresión
 
@@ -170,18 +233,36 @@ pasar, está mal el gate, no el cambio.
 
 Si el ruteo vive en la `description`, una descripción vieja en el gateway sirve un **mapa
 desactualizado** — y eso era invisible: el guard de paridad de `TASK-1658` comparaba `inputSchema`
-y `annotations`, nunca el texto.
+y `annotations`, nunca el texto. Se probó en vivo: aplicar el ruteo a siete descripciones dejó
+`pnpm mcp:manifest:check` respondiendo *"artefacto al día"*. El gate no mentía; no miraba ahí.
 
-`TASK-1784` cierra ese punto ciego: el artefacto generado
-(`src/mcp/greenhouse/tool-manifest.generated.json`) ahora lleva `descriptionHash` por tool
-—introspectado del servidor real— y el guard del gateway compara ese hash contra la descripción que
-él registra. Un drift de texto pasa a ser un **finding**, no una diferencia silenciosa.
+Al conectar la comparación, el guard encontró **21 de 27 tools federadas ya divergentes**. La
+deriva no era un riesgo futuro: era el estado presente. Y el caso concreto lo vuelve nítido —
+`get_seo_overview_kpis` servía en el gateway *"Pass market for multi-market organizations"*, que
+es **exactamente la instrucción que causa `ISSUE-152`** y que Greenhouse acababa de corregir.
 
-Se transporta el **hash** y no el texto completo a propósito: el artefacto cruza a otro repo y
-duplicar ahí ~40 KB de prosa lo volvería ilegible en cada diff, sin agregar poder de detección — un
-hash detecta exactamente la misma divergencia.
+🔴 **Detectar no alcanzaba.** Cerrar 21 divergencias por hash significaba copiar 21 textos a mano
+y volver a copiarlos en cada edición futura: un espejo manual, que es precisamente lo que
+`TASK-1780` eliminó para el inventario. Los espejos manuales vuelven a divergir; los derivados no
+pueden.
 
----
+Por eso el artefacto (`src/mcp/greenhouse/tool-manifest.generated.json`) transporta la
+**descripción completa**, introspectada del servidor real, y el gateway la **deriva** con
+`greenhouseToolDescription(name)` igual que ya derivaba `writes` e `inputKeys`. La clase de
+defecto deja de existir en vez de quedar vigilada. El `descriptionHash` se conserva para comparar
+barato y para que una edición a mano del artefacto se note.
+
+Tres findings nuevos en el guard, cada uno ejercitado con estado sintético: `description_mismatch`
+(texto divergente sin declarar), `description_divergence_stale` (divergencia declarada que ya no
+aplica — una excepción muerta se lee como cobertura y no cubre nada) y `description_missing` (tool
+federada sin descripción: el agente elige por descripción, así que es una puerta sin cartel).
+
+Una divergencia deliberada sigue siendo posible —la frontera pública puede necesitar una
+advertencia propia— pero declarada con razón en `GREENHOUSE_SEO_DESCRIPTION_DIVERGENCES`. El
+silencio no es válido.
+
+`get_seo_provider_spend` conserva su literal en el gateway: es nativa —se resuelve contra la ruta
+HTTP del lane sin existir como tool interna— y ya está declarada como tal.
 
 ## Documentación relacionada
 

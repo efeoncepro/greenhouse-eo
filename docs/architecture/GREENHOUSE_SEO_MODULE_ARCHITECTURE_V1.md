@@ -377,6 +377,32 @@ y `get_seo_provider_spend` federada **sin contraparte interna** (declarada en
 léelo de ahí — un conteo escrito en una spec es exactamente lo que el manifiesto existe para
 desterrar.
 
+**Delta 2026-09-02 (TASK-1784) — la superficie deja de ser un catálogo y pasa a tener eval.** Siete
+tools contestan alguna versión de *"¿cómo va este cliente?"* (`get_seo_visibility_360`,
+`get_seo_overview_kpis`, `get_seo_domain_overview`, `get_seo_performance`, `get_seo_rank_evolution`,
+`get_seo_url_visibility`, `get_seo_dual_lens_visibility`) y ninguna decía **cuándo preferirla sobre
+la vecina**. Ahora hay un fixture de 55 preguntas de operador en los cinco mercados productivos y un
+runner que mide **tres precisiones que jamás se promedian** (tool · mercado · disciplina de gasto):
+`pnpm mcp:selection-eval`. Baseline **antes** de tocar una descripción: tool 94.5%, mercado 98.2%.
+
+🔴 **El resultado contradijo la hipótesis: agregar prosa de ruteo NO mejoró la selección de tool.**
+Cuatro variantes dieron 92.7–96.4% **sin dirección**, y una hizo regresar a
+`prepare_seo_grounded_queries` — una tool que nadie tocó: alargar siete descripciones degrada la
+selección de sus vecinas. Lo que sí movió el número fue **corregir dos afirmaciones falsas**: la
+cláusula de mercado decía *"pass market when the organization has more than one"* —literalmente una
+instrucción de elegir— y la lente dual abría con un *"úsala en vez de X"* sin acotar que ganaba por
+posición. **Mercado 98.2% → 100%**, cerrando la elección silenciosa que es `ISSUE-152`. La precisión
+de tool bajó a 92.7% y se reporta como está: **no se declara mejora**. Su regresión es léxica
+—*"muéstrame el rendimiento"* enruta a `get_seo_performance` por el nombre— y ninguna descripción le
+gana al nombre de su propia tool; renombrar está fuera de alcance por decisión del operador.
+
+El gate de CI **no mide precisión** (un umbral se satisface editando expectativas): mide
+**cobertura**, y rompe el build si una tool SEO nueva no tiene caso en el fixture. Y el guard de
+paridad del gateway ahora compara la `description`: al conectarlo encontró **21 de 27 federadas ya
+divergentes**, sirviendo entre otras cosas la instrucción que causa `ISSUE-152`. Se cerró
+**derivando** el texto del artefacto en vez de copiarlo — un espejo a mano vuelve a divergir. Spec:
+`GREENHOUSE_MCP_TOOL_SELECTION_EVAL_V1.md`; invariantes: `MCP_TOOL_SURFACE_INVARIANTS.md` §7.
+
 **Delta 2026-08-07 (TASK-1308) — el lane SEO deja de ser sólo lectura.** `keywords/track` y
 `keywords/untrack` son sus **dos primeros commands**: van por `runEcosystemCommandRoute`, no por el
 helper de lectura, porque un write necesita idempotencia por `Idempotency-Key` + auditoría de
@@ -2037,3 +2063,17 @@ Las cinco familias Labs sin caller dejan de ser backlog anónimo y se particiona
 Las cuatro capacidades dependen de la identidad metodológica de `TASK-1805` y se habilitan individualmente tras
 el método productivo gobernado por `TASK-1806`. Cada una nace con Improved ETV explícito, series mono-metodología,
 persistencia append-only, costo acotado, API parity y MCP; no existe activación global de «todos los endpoints».
+
+### Contrato transversal de tools y skills para esta expansión
+
+Cada task de la secuencia (`1805`, `1806`, `1312`, `1313`, `1314`, `1808`–`1811`) es dueña también de su capa de
+uso por agentes. En el mismo PR debe crear o actualizar: primitive/read-command, lane ecosystem, tool MCP,
+manifiesto canónico y artefacto, federación o exclusión razonada, y las guías aplicables en las skills
+`dataforseo-operator` y `seo-aeo` con espejos Codex/Claude. Si `TASK-1804` ya está disponible, debe actualizar
+además el recurso de skill servido por MCP. Ningún endpoint justifica por sí solo una skill nueva cuando la skill
+de dominio puede ampliarse.
+
+Una tool de lectura sólo consume evidencia persistida. Capturar, escribir o comprometer gasto requiere una tool
+separada cuando exista un consumer legítimo, con presupuesto, idempotencia, audit, confirmación y el scope de
+blast-radius vigente; nunca se cablea un write scope al cliente PKCE público. La capacidad no está operativa hasta
+probar lane y gateway con allow/deny/fault y sincronizar `mcp:manifest` + `skills:mirrors`.

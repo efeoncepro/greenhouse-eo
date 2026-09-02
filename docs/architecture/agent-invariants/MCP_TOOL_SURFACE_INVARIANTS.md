@@ -2,7 +2,7 @@
 
 > **Tipo de documento:** Companion de invariantes (load-on-demand)
 > **Creado:** 2026-08-29 por TASK-1785
-> **Compartido con:** `TASK-1784` (ruteo de selección entre tools), `TASK-1780` (manifiesto canónico de tools)
+> **Compartido con:** `TASK-1784` (ruteo de selección entre tools · §7), `TASK-1780` (manifiesto canónico de tools · §0)
 > **Cargar al tocar:** `src/mcp/greenhouse/**`, `src/lib/api-platform/resources/ecosystem-*`, o cualquier reader cuyo DTO cruce a una tool.
 
 Cargar este doc al agregar, modificar o federar una tool MCP; al escribir la descripción de una
@@ -161,9 +161,59 @@ y ninguno de los dos es cero. **NUNCA** dejar que un agente tenga que inferirlo.
 
 ---
 
+## 7. Ruteo entre tools que compiten por la misma intención (`TASK-1784`)
+
+**SIEMPRE** que una tool nueva conteste una pregunta que otra ya contesta, nace con (a) su
+criterio de elección **dentro de la descripción de las dos**, y (b) su caso en el fixture de
+selección (`scripts/mcp/tool-selection-fixture.ts`). El gate
+`src/mcp/greenhouse/__tests__/tool-selection-eval.test.ts` rompe el build si falta (b): sin él, la
+superficie crece y el eval reporta una precisión alta sobre una muestra que dejó de cubrirla —
+peor que no medir, porque afirma haber medido.
+
+🔴 **NUNCA** agregar prosa de ruteo suponiendo que ayuda. Está **medido** que no: cuatro variantes
+de descripción sobre 55 preguntas dieron 92.7–96.4% de precisión de tool **sin dirección**, y una
+de ellas hizo regresar a `prepare_seo_grounded_queries`, una tool que nadie había tocado. Alargar
+una descripción degrada la selección de sus **vecinas**, porque compite por atención con la prosa
+que sí funciona. Lo que movió el número fue **corregir afirmaciones falsas**, no agregar texto.
+
+🔴 **NUNCA** dejar que una descripción invite a elegir un mercado. La cláusula original —*"pass
+market=&lt;ISO-2&gt; when the organization has more than one"*— era literalmente una instrucción de
+elegir, y el modelo la obedecía justificándose con *"the operator is in Santiago"*. **Dónde está
+el operador, de dónde viene la marca, en qué idioma escribe y qué target se creó primero están
+CORRELACIONADOS con el mercado y ninguno lo DECLARA.** Tratar cualquiera de ellos como declaración
+es `ISSUE-152`: el target de Berel midió Chile un año, 238 snapshots contra el SERP equivocado.
+`resolveSeoTargetForMarket` ya se niega a elegir callado del lado del runtime; el hueco que queda
+es que el agente **invente** el argumento, y el runtime lo resuelva obedientemente.
+
+**SIEMPRE** poner una afirmación fuerte del tipo *"úsala en vez de X"* **acotada en su propio
+lugar**. Sin acotar y al principio de la descripción, gana por posición sobre cualquier matiz que
+llegue después.
+
+⚠️ **Ninguna descripción le gana al nombre de su propia tool.** Está medido: *"muéstrame el
+rendimiento"* enruta a `get_seo_performance` por semejanza léxica, contra lo que diga el texto. Si
+la selección de una tool importa de verdad, la palanca es el **naming**, no la prosa.
+
+🔴 **NUNCA** hacer que el eval de selección sea un gate de CI con umbral de precisión. Llama a un
+modelo: cuesta y no es reproducible entre versiones, y un umbral se satisface editando
+expectativas hasta poner el build en verde — que es cómo un eval deja de medir. El gate
+determinista mide **cobertura de la superficie**, no precisión.
+
+**SIEMPRE** que una tool federada cambie de descripción, el gateway la recibe **derivada**, nunca
+copiada: el texto viaja en el artefacto generado y `src/mcp.ts` lo consume con
+`greenhouseToolDescription(name)`. Cuando el guard empezó a mirar el texto encontró **21 de 27
+federadas ya divergentes**, sirviendo entre otras cosas la instrucción que causaba `ISSUE-152`. Un
+espejo a mano vuelve a divergir; uno derivado no puede. Una divergencia deliberada se declara con
+razón en `GREENHOUSE_SEO_DESCRIPTION_DIVERGENCES`; el silencio no es válido.
+
+**Fuente:** `docs/architecture/GREENHOUSE_MCP_TOOL_SELECTION_EVAL_V1.md`
+
+---
+
 ## Documentación relacionada
 
 - `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §5 (contrato de honestidad `●`/`◑`) y §7 (Full API Parity)
 - `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` (lanes ecosystem/app)
 - `docs/architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md` (gateway, scopes, federación)
 - `src/lib/growth/seo/lens.ts` · `lens-coverage.ts` · `lens-surface-manifest.ts`
+- `docs/architecture/GREENHOUSE_MCP_TOOL_SELECTION_EVAL_V1.md` — baseline, delta medido y gate de selección
+- `src/lib/growth/seo/resolve-target.ts` — la negativa a elegir mercado callado, del lado del runtime

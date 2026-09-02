@@ -2,6 +2,68 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+## 2026-09-02 (5) — TASK-1784: el eval de selección MCP refutó su propia hipótesis, y eso es el entregable
+
+Se midió la selección de tools SEO antes de tocar una descripción: **tool 94.5% / mercado 98.2% / gasto 100%**
+sobre 55 preguntas de operador en los cinco mercados productivos, con piso de ruido cero (dos corridas
+idénticas). Después se probaron cuatro variantes de descripción, cada una determinista.
+
+🔴 **Los bloques de ruteo `Use when · Prefer X if · Do NOT use for` NO mejoraron la selección de tool.** La
+banda 92.7–96.4% no tiene dirección, y una variante hizo regresar a `prepare_seo_grounded_queries`, una tool que
+nadie tocó: alargar siete descripciones degrada la selección de sus vecinas. Se aplicó la variante SIN bloques.
+
+Lo que sí movió el número fue corregir dos afirmaciones falsas. La cláusula de mercado decía *"pass market when
+the organization has more than one"* —una instrucción de elegir—, y el modelo la obedecía justificándose con
+*"the operator is in Santiago"*: `ISSUE-152` en su propio razonamiento. Ahora nombra la clase de señal que NO es
+una declaración. **Mercado 98.2% → 100%.** Tool bajó a 92.7% y se reporta sin declarar mejora: su regresión es
+léxica y ninguna descripción le gana al nombre de su propia tool.
+
+**Hallazgo lateral, el más caro:** al hacer que el guard de paridad comparara `description`, aparecieron
+**21 de 27 tools federadas ya divergentes** — el gateway servía, entre otras, la instrucción que causa
+`ISSUE-152`. Se cerró **derivando** el texto del artefacto (`greenhouseToolDescription`) en vez de copiarlo.
+
+🔴 **Rollout pendiente, no es "listo".** El repo hermano `efeonce-mcp` tiene el cambio committeado **en local**,
+con `pnpm check` completo verde (75/75), pero **sin push y sin redeploy**: `mcp.efeonce.org` sigue sirviendo las
+descripciones viejas. Próximo paso: push + `workflow_dispatch` del deploy + canary contra el gateway vivo
+verificando que las descripciones servidas son las nuevas. Después, revisar `seo_provider_spend_daily` a 7 días
+(la disciplina de gasto quedó en 100% en el eval, pero eso se confirma en la factura).
+
+## 2026-09-02 (4) — Globe queda en hibernación profunda, reversible y documentada
+
+Por decisión del operador, Globe dejó de consumir trabajo productivo mientras todavía no genera ingresos. El
+estado live verificado a `2026-09-02T10:30:38Z` es: Cloud SQL `globe-pg` `STOPPED/NEVER`; schedulers Producer,
+Media y Governance `PAUSED`; cero ejecuciones activas; API `00216-wmm` y Studio `00150-m2m` listas, con
+`minInstances=0` y `GLOBE_PRODUCTIVE_LANES_ENABLED=false`. Se preservaron el disco SQL con deletion protection,
+backups/PITR, 10 buckets, 17 secretos, Artifact Registry, servicios/jobs, IAM, front door, budgets,
+observabilidad y Terraform. Ningún apply destruyó o reemplazó recursos; el post-plan quedó `No changes`.
+
+El Terraform de `efeonce-globe` gobierna ahora `active -> draining -> hibernated`. `draining` es obligatorio en
+ambos sentidos: mantiene SQL encendido mientras publica y verifica revisiones fail-closed. Un primer apply dejó
+una revisión API sin startup al apagar SQL demasiado pronto; la revisión anterior conservó tráfico, SQL se
+restauró temporalmente y se corrigió la secuencia antes del stop final, sin pérdida de datos.
+
+Baseline previo: ~CLP 348.152 netos/30 días. Residual hibernado modelado: CLP 20.000–30.000; reducción modelada:
+CLP 318.000–328.000. No es ahorro realizado hasta Billing Export a 24 h, 7 días y cierre mensual. Encender de
+nuevo requiere autorización explícita de gasto y seguir sin saltos
+`docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md`: `hibernated -> draining`, integridad y
+readback no facturable, luego `draining -> active`; ante falla se vuelve primero a `draining`.
+
+Las skills espejo `greenhouse-globe` y `greenhouse-globe-model-fleet` ya bloquean deploys, migraciones,
+generaciones, canarios y promociones mientras el estado siga hibernado. El ledger de modelos conserva evidencia
+histórica de integración, pero deja explícito que `available` no significa ejecutable durante la hibernación.
+
+## 2026-09-02 (3) — cada task ETV/cluster incluye tools y skills MCP
+
+Las nueve tasks de la secuencia (`1805`, `1806`, `1312`, `1313`, `1314`, `1808`–`1811`) declaran ahora un
+`MCP Tools & Skills Contract` exigible. Cada una debe crear o actualizar tools, lane ecosystem,
+manifest/artefacto, federación o exclusión razonada y las skills `dataforseo-operator`/`seo-aeo` espejadas. Si el
+registro de skills servidas de `TASK-1804` existe al ejecutarla, también actualiza ese recurso agent-facing.
+
+Las tools read no compran datos on-read. Writes o gasto siguen bajo capability fina,
+`propose → confirm → execute`, presupuesto, idempotencia y audit; el cliente PKCE público nunca recibe write
+scope. El cierre requiere canaries allow/deny/fault y readback real del gateway. Cambio documental solamente:
+sin código, tools creadas, gasto, deploy ni runtime mutation todavía.
+
 ## 2026-09-02 (2) — cinco endpoints Labs sin caller quedan repartidos en cuatro tasks
 
 El operador confirmó que quiere usar las cinco familias que `TASK-1805` había dejado
@@ -426,67 +488,3 @@ gasto incremental es sólo comparación temporal. Sin code/schema/flag/scheduler
 Siguiente paso: enviar el correo sólo con autorización, incorporar la respuesta contractual y, en otra instrucción,
 tomar `TASK-1805`; `TASK-1806` requiere además autorizaciones separadas de gasto y cutover. Estado:
 **diseño pre-implementación completo; implementación/rollout pendiente**.
-
-## 2026-09-01 — Performance Report agosto comunicado por TeamBot
-
-Nexa publicó el anuncio grupal en `EO Team` con cuatro menciones reconocidas como `aadUser` y CTA al informe; después envió cuatro lecturas 1:1 a Daniela, Andrés, Melkin y Valentina. Los cinco audit runs quedaron `succeeded`. El copy personal conserva contexto: volumen alto no implica sobrecarga, los atrasos heredados se separan del tiempo de ejecución y onboarding se trata como muestra pequeña. Evidencia: `docs/audits/communications/2026-09-01-performance-report-teambot.md`.
-
-El workflow canónico sigue siendo temporal para DMs genéricos: aprobación → Entra activa → dry-run → dedupe/source object → `--yes` → auditoría. Lo recurrente converge a Notification Hub; no quedó script permanente.
-
-## 2026-09-01 (5) — gateway MCP desplegado: `TASK-1780` operativamente completa
-
-El deploy del gateway (`workflow_dispatch`, no se dispara solo) se ejecutó. Revisión
-**`efeonce-mcp-gateway-00026-ctp`**, 100% del tráfico, `Ready=True`, `headSha` del run = `e92961e`.
-La revisión anterior (`00024-8b8`) era del 28-ago y **no llevaba el cambio**: lo verifiqué por
-timestamp antes de disparar, en vez de asumirlo.
-
-Antes del deploy re-verifiqué lo único capaz de romper runtime: `GREENHOUSE_SEO_WRITE_TOOLS` —que
-gatea el 403 de scope en `app.ts`— deriva ahora de `writes || spendsProviderBudget` y da **el mismo
-conjunto de 7**. Sin efecto de comportamiento, comprobado antes y no después.
-
-**Canary verde de punta a punta contra producción.** `serp-top-results` con filas reales
-(`captureDate: 2026-09-01`), deny `404` anti-oracle en todas, escrituras honestas en su gate.
-
-⏳ **Paso 9 de `TASK-1699` NO se puede cerrar hoy, y lo medí en vez de deducirlo:**
-`readSerpCompetitorCandidates` devuelve `candidates: []` con `minDays: 5` y la serie en **4 días**
-(29, 30, 31-ago y 1-sep). La lista vacía es el resultado **esperado** con serie joven, no un error.
-La quinta captura entra el **2026-09-02 a las 05:00 CLT**; recién ahí la revisión de candidatos con
-el operador tiene sustrato.
-
-Corregidas de paso las referencias a la revisión productiva en el runbook, la doc del gateway y la
-skill (los dos espejos) — decían `00024-8b8`. Y el runbook declaraba un commit `807fb76` «local sin
-push» que **hoy es ancestro de `origin/main`**: drift cerrado.
-
-## 2026-09-01 (4) — 15 tasks cerradas del barrido, y una que NO se cerró a propósito
-
-**15 de las 16 de papeleo quedaron `complete`**, cada una con su evidencia por criterio y su
-`Status real` corregido: `1036 1040 1090 1113 1209 1210 1225 1253 1282 1321 1330 1335 1430 1431 1747`.
-Desbloqueadas de paso `TASK-1246`, `1254`, `1255` y `1336`.
-
-✅ **`TASK-1078` cerrada por instrucción del operador, y el wireframe se escribió DE VERDAD.**
-`docs/ui/wireframes/TASK-1078-nexa-floating-chat-expandable-persisted.md` documenta el diseño que ya
-corre —regiones, riel de 272px, los seis estados, la persistencia compartida con `HomeView`, las
-cinco primitives— todo leído del código con archivo y línea. El propio documento declara en su
-encabezado que es **retroactivo** y **enumera lo que NO cubre** (geometría del contenedor, GVC mobile
-del runtime, baseline `fe:capture:diff --promote`) en vez de rellenarlo.
-
-`UI ready` quedó en **`n/a`, no `yes`**: `yes` reclamaría un paquete de diseño previo —UI/UX Contract,
-Implementation Mapping, GVC Scenario Plan, Design Decision Log— que esta task nunca tuvo.
-Desbloqueada `TASK-1112`.
-
-⚠️ **Dos defectos de `task:lint` corregidos en el camino**, ambos de la misma clase que veníamos
-cazando —un mensaje que promete algo que el mecanismo no honra—:
-1. `ui-wireframe-contract` ofrecía la salida «set UI impact to none with rationale», pero la
-   inferencia por `Domain` la anulaba. Ahora una declaración EXPLÍCITA gana sobre una INFERIDA.
-2. `normalizeStatusValue` comparaba el valor crudo del campo, y el parser dobla las líneas de
-   continuación DENTRO de él: `UI impact: none` **seguido de su razón** llegaba como `"none\n> razón…"`.
-   La regla se rompía justo cuando el autor hacía lo que la plantilla PIDE. Rompió TRES reglas
-   distintas en el mismo cierre antes de que lo viera. Ahora compara la primera línea.
-3. `ui-wireframe-contract` trataba como **error** a una task en `to-do` tocada de refilón —limpiar un
-   `Blocked by` obsoleto bastaba—, cuando su propio mensaje dice *"before implementation"*. En modo
-   FOCAL sigue siendo error, porque ahí alguien va a trabajarla y hay test que lo fija; en modo
-   `--changed` sobre `to-do` queda warning. ⚠️ Mi primer intento rompió ese test: la calibración
-   correcta distingue focal de incidental, no afloja el gate.
-
-Retrofit honesto en `TASK-1036` y `TASK-1113`: `UI impact: none` **con razón escrita** — ninguna
-diseña superficie (tokens y un fix de render), así que no les corresponde wireframe.
