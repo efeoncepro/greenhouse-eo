@@ -343,8 +343,14 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `TASK-1798` — [creada 2026-08-30, to-do, ui-ux] **Dirección visual del canvas de candidatos.**
   Convierte volumen y barrera de enlaces en comparaciones visuales escaneables sin bajar la densidad
   ni ocultar la jerarquía de gasto; no cambia contratos ni captura.
-- `TASK-1784` — [creada 2026-08-27, backend-data] **Ruteo de selección en la superficie MCP.** Seis de
-  las 20 tools contestan la misma pregunta; el eval de selección va primero y puede cerrar la task.
+- `TASK-1784` — [✅ complete 2026-09-02, backend-data] **Ruteo de selección en la superficie MCP.**
+  El eval fue primero y **refutó la hipótesis**: los bloques de ruteo NO mejoraron la selección de
+  tool (92.7–96.4% sin dirección; una variante degradó una tool que nadie tocó). Lo que movió el
+  número fue corregir dos afirmaciones falsas — la cláusula de mercado ordenaba ELEGIR país, y el
+  modelo la obedecía con *"the operator is in Santiago"*. Mercado 98.2% → **100%**; tool 94.5% →
+  92.7%, reportado sin declarar mejora. Destapó **21 de 27 descripciones federadas divergentes**,
+  cerradas haciendo que el gateway DERIVE el texto. Gate de CI de **cobertura**, no de precisión.
+  Rollout del gateway pendiente.
 - `TASK-1785` — [creada 2026-08-27, backend-data] **La lente como campo del contrato, no como
   instrucción.** El invariante ●/◑ opera ENTRE tools, donde ninguna puede defenderlo sola.
 - `TASK-1786` — [creada 2026-08-27, backend-data] **Consistencia internacional (hreflang).** Cinco
