@@ -65,9 +65,22 @@ const buildMemoryCaps = { cpus: resolveBuildCpus() }
 // (307) — reversible por rollback (revert + redeploy), sin caché dura del navegador.
 const GRADER_HUB_URL = (process.env.PUBLIC_GRADER_HUB_URL?.trim() || 'https://think.efeoncepro.com').replace(/\/+$/, '')
 
+// TASK-1804 — los manuales de uso de la superficie MCP (`docs/mcp/skills/**/SKILL.md`) son
+// FILESYSTEM INPUT del runtime: la lane ecosystem los lee con `readFileSync` en cada cold start
+// y el servidor MCP remoto valida su cobertura al construirse. Sin esta declaración el bundle de
+// Vercel no los incluye, el reader lanza `declared_without_file` y la lane responde 500 en
+// producción con verde en local. El smoke del runbook MCP compara la CUENTA EXACTA del catálogo.
+const MCP_SKILL_MANUALS_GLOB = './docs/mcp/skills/**'
+
 const nextConfig: NextConfig = {
   basePath: process.env.BASEPATH,
   distDir: process.env.NEXT_DIST_DIR || '.next',
+
+  outputFileTracingIncludes: {
+    '/api/platform/ecosystem/mcp/skills': [MCP_SKILL_MANUALS_GLOB],
+    '/api/platform/ecosystem/mcp/skills/[name]': [MCP_SKILL_MANUALS_GLOB],
+    '/api/mcp/greenhouse': [MCP_SKILL_MANUALS_GLOB]
+  },
 
 
   async redirects() {
