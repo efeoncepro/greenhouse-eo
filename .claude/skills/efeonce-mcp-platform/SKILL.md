@@ -94,6 +94,19 @@ If a source conflicts with remembered behavior, the verified runtime and its can
   §"El scope de escritura NO se cablea al cliente público compartido".
   ⚠️ `az ad app update` **replaces** the whole scope array: any Entra scope change goes with a verified round-trip or
   it wipes the live ones.
+- **Operating manuals travel through the protocol (Greenhouse `TASK-1804`).** The internal MCP and the gateway both
+  serve `get_greenhouse_skill` (domain `platform`, read-only, base scope): without `name` the catalog, with `name` the
+  full manual as text; also as resource `skill://efeonce/<name>/SKILL.md`. Source of truth is the manifest
+  `src/mcp/greenhouse/skill-manifest.ts` + `docs/mcp/skills/**/SKILL.md` (frontmatter `name`/`description` is the
+  catalog; never transcribe it), reader `skill-catalog.ts`, lane `/api/platform/ecosystem/mcp/skills[/{name}]`. The
+  gateway provider `greenhouse-skills` delegates to the lane and NEVER embeds content; it rides the SEO provider's
+  config (same lane, same service identity). `audience: internal` only exists for `internal` bindings — client
+  bindings get an empty catalog and 404 anti-oracle on detail, never 403. A manual that leaks a UUID, `org-` id,
+  repo path, task id, secret name or GCP project breaks the build (leak test); NEVER serve `.claude/skills/**` by
+  MCP. The SEO parity guard is domain-anchored, so non-SEO federated tools are declared in
+  `EXPECTED_GREENHOUSE_PLATFORM_TOOLS` (+ `computeFederatedNonSeoToolFindings`). Manuals today:
+  `seo-spend-discipline`, `seo-visibility-reading`, `competitor-loop` (all internal). The gateway commit for this
+  is local until the operator authorizes the Cloud Run deploy.
 - Treat writes, approvals, spending, rights-sensitive creative work, webhooks and new public auth surfaces as new
   ADR/task work. Do not infer permission from a read-only MCP capability.
 - The certified internal Studio Credits write is `globe.credits.funding.ensure`. It accepts only a Greenhouse-issued

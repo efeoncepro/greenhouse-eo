@@ -7,6 +7,18 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-02 — MCP: el manual de uso viaja por el protocolo (TASK-1804, code complete)
+
+La superficie MCP gana un segundo canal de conocimiento de uso: un manifiesto de manuales
+(`skill-manifest.ts`) hermano del de tools, tres `SKILL.md` publicables en `docs/mcp/skills/`
+(`seo-spend-discipline`, `seo-visibility-reading`, `competitor-loop`), la tool `get_greenhouse_skill`,
+el recurso `skill://efeonce/<name>/SKILL.md` y la lane ecosystem `GET /api/platform/ecosystem/mcp/skills[/{name}]`,
+todos sobre el mismo reader. Publicar es un acto explícito (drift manifiesto↔filesystem no construye el
+servidor), un binding de cliente no sabe que los manuales existen (404 anti-oráculo) y la fuga de contenido
+interno la controla un test. Las `instructions` del handshake rutean al manual en vez de contener el
+procedimiento de gasto. El gateway federa la tool con su propio guard de paridad no-SEO (commit local en
+`efeonce-mcp`, deploy pendiente). Sin Entra, flag ni persistencia nuevos.
+
 ## 2026-09-02 — ANAM: entrega premium de Emma y soporte explícito de tres meses
 
 Se consolidó el cierre de la landing, identidad y handoff de Emma en dos PDF de cinco páginas: una especificación
@@ -1138,9 +1150,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
   predicado de movimiento a USD 0 — convertido en follow-up F1 con fecha y dueño (lunes
   2026-08-31, receta SQL en el Delta (3) del task file). Con esto 1775/1776/1777 + 1658 están
   `complete`; gasto total del rollout de la tríada: USD 0.2958.
-
-## 2026-08-27 — Gateway MCP desplegado y cierre de la tríada SEO (TASK-1658/1775/1776)
-
-- Federación en producción: revisión `efeonce-mcp-gateway-00023-zt2`, `tools/list` autenticado observado en **21 tools SEO** (antes 13), con las 8 recién federadas presentes. Canary del provider verde contra producción para Efeonce y Berel.
-- **El `oauth:canary` tenía un punto ciego de inventario y se cerró**: ejercitaba `tools/call` sobre tools puntuales y nunca `tools/list`, así que una tool que quedara fuera del server pasaba invisible mientras las probadas siguieran verdes. Ahora asserta el inventario (`efeonce-mcp` commit `4058a07`). El charset del nombre incluye el punto a propósito — las tools no-SEO son punteadas (`hiring.talent_pool.search`) y sin él el total excluía Globe y Hiring en silencio, reportando el conteo SEO como si fuera el total.
-- `TASK-1658`, `TASK-1775` y `TASK-1776` pasan a `complete` con `task:lint` 0/0. Queda un residual declarado en 1775 (sujeto desconocido → fila NULL: cubierto por unit test, no observado en runtime) y la verificación del lunes 2026-08-31 para `TASK-1777`.

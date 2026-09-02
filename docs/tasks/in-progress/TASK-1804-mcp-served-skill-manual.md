@@ -1,5 +1,24 @@
 # TASK-1804 — MCP: el manual de uso viaja por el protocolo, no en la nota del handshake
 
+## Delta 2026-09-02 — code complete, rollout pendiente
+
+- **Slices 1–4 en código y tests verdes.** Greenhouse: `ec89014e4` (manifiesto + 3 manuales + tool +
+  recurso + test de fuga), `12c0ea85d` (instructions rutean), `5a6ae57f4` (lane + tracing). Gateway
+  `efeonce-mcp`: `c588a1b` **local, sin push** (provider `greenhouse-skills`, `get_greenhouse_skill`
+  con annotations, `EXPECTED_GREENHOUSE_PLATFORM_TOOLS` + guard no-SEO, canary extendido).
+- **Decisión de forma no cubierta por el spec:** la tool interna y el recurso `skill://` piden el
+  cuerpo a la lane (como las otras 43 tools: el servidor sigue downstream de
+  `api/platform/ecosystem/*` y el gating queda en un solo lugar); el guard de cobertura
+  manifiesto↔filesystem corre igual al construir el servidor. Byte-identidad probada en test.
+- **El guard SEO del gateway está anclado al dominio** y no veía una tool `platform`: se agregó
+  `EXPECTED_GREENHOUSE_PLATFORM_TOOLS` + `computeFederatedNonSeoToolFindings` (bidireccional sobre el
+  subconjunto no-SEO federado; no fuerza exclusiones para las 15 de plataforma fuera de alcance).
+- **Runtime pendiente:** lane en staging/producción con binding real (cuenta exacta, negación,
+  401) y deploy de Cloud Run del gateway + smoke en `mcp.efeonce.org`. `pnpm build` de producción
+  no se corrió en local (cuelga la máquina; correr con autorización o dejar que lo pruebe Vercel).
+- `next.config.ts` ganó `outputFileTracingIncludes` para `docs/mcp/skills/**` en las tres rutas
+  que los sirven: primer uso de esa clave en el repo.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -21,7 +40,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `none`
-- Status real: `En ejecución — Slice 1 (manifiesto, contenido, tool interna)`
+- Status real: `code complete, rollout pendiente — slices 1–4 en código y tests verdes en los dos repos (2026-09-02); falta ejercitar la lane en staging/producción con binding real y desplegar el gateway (commit local en efeonce-mcp)`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
@@ -273,27 +292,27 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface y consumidores nombrados con paths reales.
-- [ ] Invariantes, frontera de acceso y posture de idempotencia explícitos.
-- [ ] `N/A — no crea tablas`, declarado con razón, en vez de allowlist de escritura.
-- [ ] Posture de migración/rollback explícita y proporcional.
-- [ ] Evidencia runtime listada para todo lo que no sea documentación.
-- [ ] Sin fuga de datos internos, verificada por test y no por lectura humana.
+- [x] Source of truth, contract surface y consumidores nombrados con paths reales.
+- [x] Invariantes, frontera de acceso y posture de idempotencia explícitos.
+- [x] `N/A — no crea tablas`, declarado con razón, en vez de allowlist de escritura.
+- [x] Posture de migración/rollback explícita y proporcional.
+- [x] Evidencia runtime listada para todo lo que no sea documentación.
+- [x] Sin fuga de datos internos, verificada por test y no por lectura humana.
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] Lógica en el primitive: la resolución catálogo/manual vive en `src/mcp/greenhouse/`, no dentro
+- [x] Lógica en el primitive: la resolución catálogo/manual vive en `src/mcp/greenhouse/`, no dentro
       del route handler ni del adapter del gateway.
-- [ ] Modelada como reader canónico sobre el manifiesto, no como handler acoplado a la tool.
-- [ ] Read expuesto como reader + recurso; **no hay write**, así que el bloque de command semantics
+- [x] Modelada como reader canónico sobre el manifiesto, no como handler acoplado a la tool.
+- [x] Read expuesto como reader + recurso; **no hay write**, así que el bloque de command semantics
       no aplica y se declara así.
-- [ ] Capability + grant: `N/A — no gatea por capability`. La autorización es el binding del lane y
+- [x] Capability + grant: `N/A — no gatea por capability`. La autorización es el binding del lane y
       el scope de lectura ya existente. Declarado explícito para que no se lea como olvido.
-- [ ] Camino programático declarado: `api/platform/ecosystem` + MCP, en esta misma task.
-- [ ] `propose → confirm → execute`: `N/A — no hay write.`
-- [ ] Un primitive, muchos consumidores: tool interna, recurso `skill://`, lane y gateway leen el
+- [x] Camino programático declarado: `api/platform/ecosystem` + MCP, en esta misma task.
+- [x] `propose → confirm → execute`: `N/A — no hay write.`
+- [x] Un primitive, muchos consumidores: tool interna, recurso `skill://`, lane y gateway leen el
       mismo manifiesto.
-- [ ] Parity check: sí — la capacidad nace con contrato gobernado y sin superficie UI equivalente.
+- [x] Parity check: sí — la capacidad nace con contrato gobernado y sin superficie UI equivalente.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -459,28 +478,28 @@ secretos nuevos, sin variables de entorno nuevas, sin coordinación con operador
 
 ## Acceptance Criteria
 
-- [ ] `skill-manifest.ts` existe y su cobertura es bidireccional: declarar sin archivo, o dejar un
+- [x] `skill-manifest.ts` existe y su cobertura es bidireccional: declarar sin archivo, o dejar un
       archivo sin declarar, hace fallar la construcción del servidor. Probado con un test que
       ejercita ambas direcciones.
-- [ ] Existen exactamente tres manuales bajo `docs/mcp/skills/`, con frontmatter `name` +
+- [x] Existen exactamente tres manuales bajo `docs/mcp/skills/`, con frontmatter `name` +
       `description`, y el manifiesto lee ese frontmatter en vez de transcribirlo.
-- [ ] El test de fuga recorre todo `docs/mcp/skills/**` y falla ante un patrón de secreto, un UUID
+- [x] El test de fuga recorre todo `docs/mcp/skills/**` y falla ante un patrón de secreto, un UUID
       de aplicación Entra, un identificador `org-` o una ruta `src/`.
-- [ ] `get_greenhouse_skill` está registrada, tiene entrada en `GREENHOUSE_MCP_TOOL_MANIFEST` con
+- [x] `get_greenhouse_skill` está registrada, tiene entrada en `GREENHOUSE_MCP_TOOL_MANIFEST` con
       `writes: false` y `spendsProviderBudget: false`, y `pnpm mcp:manifest:check` pasa.
-- [ ] Los recursos `skill://efeonce/<name>/SKILL.md` resuelven y devuelven el mismo cuerpo que la tool.
-- [ ] Las `instructions` del servidor nombran el manual y ya no contienen el procedimiento de gasto;
+- [x] Los recursos `skill://efeonce/<name>/SKILL.md` resuelven y devuelven el mismo cuerpo que la tool.
+- [x] Las `instructions` del servidor nombran el manual y ya no contienen el procedimiento de gasto;
       la enumeración de tools que comprometen presupuesto sigue derivada del inventario.
-- [ ] La lane responde en **staging** y en **producción** con binding real: catálogo completo con
+- [ ] (PENDIENTE — sin evidencia runtime: la lane no se puede ejercitar en localhost y no se ha desplegado; se verifica post-push contra staging y luego producción) La lane responde en **staging** y en **producción** con binding real: catálogo completo con
       binding `internal`, catálogo sin `internal` con binding de cliente, `404` en el detalle desde
       binding de cliente, `401` sin token.
-- [ ] El smoke de producción compara la **cuenta exacta** del catálogo contra el manifiesto, no `≥ 1`.
-- [ ] El gateway federa la tool con `readOnlyHint: true`, tiene su entrada `EXPECTED_*` con razón, y
+- [ ] (PENDIENTE — el assert existe en el canary del gateway y en el runbook; falta correrlo contra producción) El smoke de producción compara la **cuenta exacta** del catálogo contra el manifiesto, no `≥ 1`.
+- [x] El gateway federa la tool con `readOnlyHint: true`, tiene su entrada `EXPECTED_*` con razón, y
       el guard de paridad pasa.
-- [ ] Un manual recuperado por `mcp.efeonce.org` es byte-idéntico al que devuelve la tool interna.
-- [ ] `MCP_TOOL_SURFACE_INVARIANTS.md` documenta el contrato del manifiesto de manuales y la regla de
+- [ ] (PENDIENTE — exige el deploy de Cloud Run del commit local de `efeonce-mcp`; la byte-identidad está probada en tests con el mismo reader) Un manual recuperado por `mcp.efeonce.org` es byte-idéntico al que devuelve la tool interna.
+- [x] `MCP_TOOL_SURFACE_INVARIANTS.md` documenta el contrato del manifiesto de manuales y la regla de
       no publicar contenido interno.
-- [ ] Cero cambios en Entra, cero scopes nuevos, cero escrituras.
+- [x] Cero cambios en Entra, cero scopes nuevos, cero escrituras.
 
 ## Verification
 

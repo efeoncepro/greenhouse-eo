@@ -694,11 +694,12 @@ Tres cosas que cuestan una sesión si no se saben:
 Las tools **no aparecen en la sesión que autenticó** — los MCP se cargan al iniciar sesión. `✔ Connected` en el health
 check es la evidencia válida; la ausencia de tools en esa sesión no es un fallo.
 
-### Inventario federado — 35 tools
+### Inventario federado — 36 tools (código; 35 en la revisión productiva hasta el deploy de TASK-1804)
 
 | Grupo | Nº | Tools |
 | --- | --- | --- |
 | Gateway | 1 | `efeonce.gateway.status` |
+| Plataforma Greenhouse | 1 | `get_greenhouse_skill` (TASK-1804 — manuales de uso bajo demanda; provider `greenhouse-skills`, commit local en `efeonce-mcp` pendiente de deploy) |
 | Globe | 3 | `globe.capabilities.list`, `globe.producer.fleet.list`, `globe.credits.funding.ensure` (write) |
 | Hiring | 4 | `hiring.talent_pool.search`, `hiring.talent_pool.profile.get`, `hiring.applications.review.list`, `hiring.application.review_packet.get` |
 | SEO / Search Visibility 360 | 27 | 20 reads + 7 writes (detalle en §Provider Greenhouse-SEO) |
@@ -709,10 +710,11 @@ verificables, sin token que los abra, hasta `TASK-1631`.
 
 ### Cobertura de federación vs el MCP interno de Greenhouse
 
-`src/mcp/greenhouse/server.ts` declara **41 tools**; el gateway federa 35. El delta no es homogéneo:
+`src/mcp/greenhouse/tool-manifest.ts` declara **44 tools** (as-of 2026-09-02; la cifra se lee del manifiesto, nunca de acá); el gateway federa 36 en código. El delta no es homogéneo:
 
 - **Dominio SEO: paridad completa.** Las 26 SEO internas están federadas, con el guard bidireccional de `TASK-1658`
   vigilándolo y `GREENHOUSE_SEO_TOOL_EXCLUSIONS` vacío (ninguna exclusión declarada).
+- **`get_greenhouse_skill` (plataforma) federada por TASK-1804** con su entrada en `EXPECTED_GREENHOUSE_PLATFORM_TOOLS` — el guard SEO está anclado al dominio, así que las tools no-SEO federadas tienen su propia lista con razón.
 - **15 tools NO-SEO fuera del alcance federado, y sin declarar**: `get_context`, `get_organization`,
   `list_organizations`, `get_platform_health`, `get_integration_readiness`, `list_capabilities`, `list_event_types`,
   `search_knowledge`, `get_knowledge_document`, `search_services`, `quote_price`, `get_webhook_subscription`,
@@ -725,6 +727,31 @@ que consume el guard viaja con todas. Lo que sigue siendo SEO-only es el **allow
 es una decisión de frontera con revisión humana por tool y no cambia con esta task. La diferencia práctica: un
 operador que conecta el MCP esperando "el 360 de Greenhouse" y encuentra sólo SEO ahora puede leer el alcance real en
 un archivo, en vez de deducirlo de una ausencia.
+
+### Manuales de uso servidos por el protocolo (TASK-1804)
+
+`get_greenhouse_skill` entrega bajo demanda el catálogo y el cuerpo de los manuales declarados en
+`src/mcp/greenhouse/skill-manifest.ts` (hoy tres, todos `internal`: `seo-spend-discipline`,
+`seo-visibility-reading`, `competitor-loop`). El gateway delega en la lane
+`/api/platform/ecosystem/mcp/skills[/{name}]` y no embebe contenido.
+
+Smoke (lane, con el consumer del gateway; también incorporado a `scripts/greenhouse-seo-canary.mjs`):
+
+```bash
+BASE=https://greenhouse.efeoncepro.com   # o el .vercel.app de staging + bypass
+curl -s -H "Authorization: Bearer $TOK" "$BASE/api/platform/ecosystem/mcp/skills?externalScopeType=other&externalScopeId=efeonce-mcp-gateway" | jq '.data.count, [.data.skills[].name]'
+curl -s -H "Authorization: Bearer $TOK" "$BASE/api/platform/ecosystem/mcp/skills/seo-spend-discipline?externalScopeType=other&externalScopeId=efeonce-mcp-gateway" | jq -r '.data.body' | head -3
+```
+
+Asserts, en este orden y sin atajos: `count` **igual** a la cuenta del manifiesto (no `≥ 1` — un
+catálogo corto con manifiesto no vacío es el síntoma de que los `.md` no entraron al bundle de
+Vercel; el reader lanza y la lane responde 500, nunca vacío); cada `body` empieza con
+`---\nname: <nombre>`; un nombre inexistente responde `404`; sin token `401`; con un binding de
+cliente el catálogo es `[]` y cualquier detalle `404` (anti-oráculo, nunca `403`).
+
+Estado as-of 2026-09-02: código y tests verdes en los dos repos; **rollout pendiente** — la lane
+espera el deploy de Greenhouse (staging → release) y el gateway espera el deploy de Cloud Run del
+commit local de `efeonce-mcp`. No hay Entra, flag ni secreto nuevos.
 
 ### `get_seo_provider_spend` — federada sin tool interna, por diseño
 

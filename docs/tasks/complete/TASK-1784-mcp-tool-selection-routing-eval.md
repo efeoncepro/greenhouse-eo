@@ -1,5 +1,12 @@
 # TASK-1784 — MCP: ruteo de selección entre tools que se parecen, con eval que lo pruebe
 
+## Delta 2026-09-02 — `TASK-1804` cambió el baseline de conteo: 44 tools
+
+`get_greenhouse_skill` (domain `platform`, lectura pura) entró al manifiesto: **44 tools** (28 SEO +
+16 no-SEO), 7 escrituras, 4 que comprometen gasto. El eval de selección no cambia (censa sólo el
+dominio SEO), pero el canal de manuales que esta task nombró como complementario ya existe: si el
+eval vuelve a correr, puede medir el delta con y sin manual cargado. Relee del código, nunca de acá.
+
 ## Delta 2026-08-31 — `TASK-1780` cerró: el censo dejó de ser un grep, y el hueco de esta task SUBIÓ de valor
 
 `TASK-1780` está `complete`. Tres consecuencias directas para esta task:

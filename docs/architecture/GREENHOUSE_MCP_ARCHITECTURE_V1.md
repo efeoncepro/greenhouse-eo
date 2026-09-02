@@ -689,3 +689,52 @@ gateway sigue decidiendo qué CRUZA con revisión humana por tool. Y como el gat
 contra rutas HTTP del lane, una capacidad puede estar federada **sin existir** como tool interna: ese caso
 se declara (`GREENHOUSE_GATEWAY_NATIVE_TOOLS`), nunca queda ausente en silencio. Caso vivo:
 `get_seo_provider_spend`.
+
+## 23. Delta 2026-09-02 — El manual de uso viaja por el protocolo (TASK-1804)
+
+§14 fijó la separación: MCP = capability layer, skills = behavior layer. Lo que faltaba era un
+**canal** para que la capa de comportamiento llegara al consumidor MCP sin pagar contexto en cada
+request. Hasta acá todo lo que un agente sabía sobre cómo operar las 43 tools cabía en las
+`instructions` del handshake (viajan en cada request) o se metía dentro de la `description` de una
+tool (caso vivo: el contrato del `proposalRef` dentro de `get_seo_competitor_candidates`), y
+`.claude/skills/**` no es publicable.
+
+**Manifiesto de manuales.** `src/mcp/greenhouse/skill-manifest.ts` declara los manuales (`name`,
+`audience`, `sourcePath`, `appliesTo` validado contra el manifiesto de tools). Es puro; el reader
+canónico `skill-catalog.ts` construye el catálogo desde `docs/mcp/skills/**`, toma `name` +
+`description` del frontmatter de cada `SKILL.md` (formato Agent Skills / SEP-2640, para no
+reescribir el día que el SDK implemente `skills/list`) y **falla la construcción del servidor** ante
+cualquier drift manifiesto↔filesystem, en las dos direcciones. Publicar es un acto explícito.
+
+**Un primitive, tres consumidores.** La tool `get_greenhouse_skill` (domain `platform`, lectura
+pura; sin `name` devuelve el catálogo, con `name` el manual como TEXTO), el recurso
+`skill://efeonce/<name>/SKILL.md` y la lane `GET /api/platform/ecosystem/mcp/skills[/{name}]`. La
+tool y el recurso del MCP interno piden el cuerpo a la lane —el servidor sigue siendo downstream
+de `api/platform/ecosystem/*`— y el gateway federado (`efeonce-mcp`, provider `greenhouse-skills`)
+también delega en la lane: cero contenido embebido, byte-idéntico en todos.
+
+**Gating por binding, anti-oráculo.** `audience: internal` sólo para bindings de scope `internal`;
+para cualquier otro, el manual no aparece en el catálogo y su detalle es `404` (nunca `403`).
+`audience: client` queda reservado hasta `TASK-1631`. Ningún manual publica contenido interno: lo
+controla un test de fuga sobre `docs/mcp/skills/**`, no una revisión.
+
+**Las `instructions` rutean en vez de contener.** `buildGreenhouseMcpServerIdentity` recibe
+también el manifiesto de manuales: el párrafo de gasto conserva la afirmación y la enumeración
+derivada de las tools que comprometen presupuesto, pero el procedimiento vive en
+`seo-spend-discipline` y sólo se rutea a él si ese manual gobierna a TODAS las que gastan (la
+derivación es real: sin la tool en el inventario o con un gastador sin cobertura, el texto inline
+se conserva).
+
+**Federación.** `get_greenhouse_skill` viaja en el artefacto (44 tools) y el gateway la deriva
+igual que las SEO. Como el guard de paridad está anclado al dominio SEO, el gateway gana
+`EXPECTED_GREENHOUSE_PLATFORM_TOOLS` + `computeFederatedNonSeoToolFindings`: toda tool no-SEO de
+Greenhouse que el gateway registre se declara con razón, y toda declarada está registrada, existe
+en el manifiesto, lleva `annotations` coherentes, no diverge en schema y deriva su descripción.
+Las 15 tools de plataforma fuera del alcance federado siguen siendo una decisión de frontera, no
+drift.
+
+**Runtime.** Los `.md` son filesystem input de Vercel: `next.config.ts` los declara en
+`outputFileTracingIncludes` para las tres rutas que los sirven; el smoke compara la cuenta EXACTA
+del catálogo. Sin flag (aditivo, lectura pura), sin Entra (scope base), sin persistencia.
+
+Invariantes operativos: `agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md` §8.

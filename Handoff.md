@@ -22,6 +22,27 @@ documentación derivada de una corrección. No cubre nuevas funcionalidades, KPI
 integraciones, rediseños ni innovación; toda evolución requiere alcance y aprobación separados. Este cierre sólo
 actualiza documentación y entregables; no mutó HubSpot, no envió correo, no creó SharePoint y no hizo push.
 
+## 2026-09-02 (6) — TASK-1804: el manual de uso viaja por el protocolo — code complete, rollout pendiente
+
+Tres slices en Greenhouse (`ec89014e4`, `12c0ea85d`, `5a6ae57f4`) y uno en `efeonce-mcp` (`c588a1b`,
+**local, sin push**: `main` auto-despliega a Cloud Run). Manifiesto de manuales
+(`src/mcp/greenhouse/skill-manifest.ts`) + reader canónico + tres `SKILL.md` en `docs/mcp/skills/`
+escritos de cero para el consumidor MCP; tool `get_greenhouse_skill` (44 tools en el artefacto),
+recurso `skill://efeonce/<name>/SKILL.md`, lane `/api/platform/ecosystem/mcp/skills[/{name}]` con
+404 anti-oráculo para bindings no-internal; las `instructions` rutean al manual en vez de contener
+el procedimiento. Test de fuga sobre todo `docs/mcp/skills/**`. `next.config.ts` declara los `.md`
+como `outputFileTracingIncludes` (primer uso en el repo).
+
+🔴 **Pendiente de runtime, en este orden:** (1) push de `develop` y verificar la lane en staging con
+binding real — `count` **exactamente 3**, cuerpo con frontmatter, `404` inexistente, `401` sin token,
+catálogo `[]` + `404` con binding de cliente; (2) release a producción y repetir; (3) push del commit
+local de `efeonce-mcp` → deploy de Cloud Run → `scripts/greenhouse-seo-canary.mjs` (ya trae los
+asserts de skills). Sin Entra, flag ni secreto nuevos. `pnpm build` de producción no se corrió en
+local (cuelga la máquina): lo prueba Vercel o se corre con autorización.
+
+⚠️ El guard de paridad del gateway está anclado al dominio SEO y no veía una tool `platform`: nació
+`EXPECTED_GREENHOUSE_PLATFORM_TOOLS` + `computeFederatedNonSeoToolFindings` (test con regresiones).
+
 ## 2026-09-02 (5) — TASK-1784: el eval de selección MCP refutó su propia hipótesis, y eso es el entregable
 
 Se midió la selección de tools SEO antes de tocar una descripción: **tool 94.5% / mercado 98.2% / gasto 100%**
@@ -471,33 +492,3 @@ Falsifícalo revirtiendo la corrección.
 
 Reparado además un empalme que yo mismo introduje antes: la nota de `stale-progress` se había
 insertado en medio de la regla de los markers ZONE del `greenhouse-task-planner` y la había partido.
-
-## 2026-09-01 (7) — barrido `stale-progress`: 16 tasks auditadas, 12 con el aviso resuelto
-
-Ninguna se cerró, y eso es el resultado, no una falla: **ninguna estaba realmente terminada**. Lo que
-faltaba era el registro. 319 checkboxes en cero repartidos entre las 16.
-
-Regla que me impuse y sostuve: tildar sin evidencia es peor que no tildar. Por eso 1258 y 1352
-quedaron en cero criterios con la razón escrita, y 927 se llevó 1 de 6 aunque tiene 5 slices
-construidos —el único criterio que el estado OFF satisface de verdad es «cero escrituras».
-
-Hallazgos que valen más que los checkboxes: **TASK-1160** predijo en agosto que al 100% del budget
-toda invariante nueva se degradaría por falta de espacio, y hoy me pasó a mí, medido. **TASK-1258**
-nunca construyó su control plane de migración, pero 1253 y 1254 difirieron su flip «al cutover de
-1258» y terminaron ON en prod por otra vía: el cutover ocurrió sin su gobierno. **TASK-1427** tenía
-una ventana de siete días de observación de signals que venció el 2026-07-25 y nadie miró.
-**TASK-1255** no tiene retención ni purga de PII —el mismo hueco que 1246 declara.
-
-Tres defectos propios corregidos en el detector, los tres con test falsable (verificado revirtiendo
-la regla): `stale-blocker` disparaba con `Blocked by: none (explicación que nombra al blocker)`;
-`ui-flow-contract` rompía el gate por deuda previa al tocar una task incidentalmente; y un commit
-`fix(docs):` contaba como implementación. NO filtré los `TASK-###` entre paréntesis: medido sobre
-los 31 asuntos con 2+ referencias, arreglaría 6 casos y escondería 8 reales.
-
-**Me equivoqué con TASK-1259 y lo corregí en la misma sesión.** Escribí «no empezada» porque no
-encontré el selector — buscándolo en el repo equivocado. Está construido en
-`efeonce-public-site-runtime` (`27c1468`), sin deploy. Le escribí wireframe y flow retroactivos
-—reales, desde el manual, no stubs— porque estaba `in-progress` con UI y sin contratos declarados.
-
-Quedan 4 con el aviso vivo (1112, 1258, 1259, 1352): son justo aquellas donde nada se puede tildar
-con verdad. Su `Status real` ahora responde el aviso en la primera línea que alguien lee.

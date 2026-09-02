@@ -209,6 +209,70 @@ razón en `GREENHOUSE_SEO_DESCRIPTION_DIVERGENCES`; el silencio no es válido.
 
 ---
 
+## 8. El manual de uso viaja por el protocolo, no en la nota del handshake (`TASK-1804`)
+
+Todo lo que un agente sabía sobre cómo OPERAR la superficie cabía en tres lugares y ninguno
+servía: las `instructions` del handshake (viajan en CADA request, no pueden crecer), la
+`description` de cada tool (siempre en contexto: dispara, no enseña — y §7 midió que alargarla
+degrada la selección de las vecinas) y `.claude/skills/**` (escritas para un agente que opera el
+REPOSITORIO: llevan ids de aplicación Entra, nombres de secretos, org ids reales y razones de
+exclusión competitiva; **no son publicables**).
+
+El segundo canal es un **manifiesto de manuales**, hermano del de tools:
+
+- `src/mcp/greenhouse/skill-manifest.ts` declara QUÉ manuales existen (`name`, `audience`,
+  `sourcePath`, `appliesTo`). Es PURO: `tool-manifest.ts` lo importa para derivar la línea de
+  ruteo de las `instructions`.
+- `src/mcp/greenhouse/skill-catalog.ts` es el **reader canónico**: lee `docs/mcp/skills/**`,
+  toma `name` + `description` del **frontmatter** de cada `SKILL.md` (contrato de Agent Skills /
+  SEP-2640) y valida la cobertura en las DOS direcciones. **NUNCA** transcribir la `description`
+  al manifiesto: el frontmatter es la fuente, y copiarlo reintroduce el drift que un manifiesto
+  existe para impedir.
+- Tres consumidores del mismo primitive: la tool `get_greenhouse_skill`, el recurso
+  `skill://efeonce/<name>/SKILL.md` y la lane `GET /api/platform/ecosystem/mcp/skills[/{name}]`.
+  El gateway federado delega en la lane y **NUNCA embebe contenido** (un bundle estático en el
+  gateway es una segunda fuente de verdad). El cuerpo es el archivo VERBATIM, byte-idéntico en
+  los tres.
+
+🔴 **Publicar es un acto explícito.** Manual declarado sin archivo, archivo bajo `docs/mcp/skills/`
+sin entrada, frontmatter cuyo `name` no coincide, o tool gobernada (`appliesTo`) que no existe en
+el manifiesto de tools → **el servidor no construye** (`createGreenhouseMcpServer` corre la
+cobertura) y la lane responde 500, nunca un catálogo vacío en verde.
+
+🔴 **NUNCA** publicar contenido interno. Ningún manual cita secretos, UUIDs (ids de app Entra,
+clientes OAuth, bindings), identificadores de organización (`org-…`, `EO-ORG/SPK/SPB-…`), rutas
+del repositorio (`src/`, `docs/`, `.claude/`…), ids de task/issue, el proyecto GCP, revisiones de
+Cloud Run ni emails internos. **El control es el test de fuga**
+(`src/mcp/greenhouse/__tests__/skill-manifest.test.ts`) que recorre todo `docs/mcp/skills/**` —
+la revisión humana NO lo es. Los manuales se escriben de cero para el consumidor MCP; **NUNCA**
+se sirve `.claude/skills/**` por MCP, ni filtrado.
+
+🔴 **`audience: internal` NO EXISTE para un binding que no sea `internal`.** No aparece en el
+catálogo y su detalle responde `404` anti-oráculo, **nunca `403`** (un 403 confirma que hay algo
+que no se puede leer). Inexistente, no visible y nombre malformado devuelven el MISMO 404.
+`audience: client` está reservado hasta que existan grants por tenant (`TASK-1631`): ningún manual
+nace con ese valor.
+
+⚠️ **Los `.md` son FILESYSTEM INPUT del runtime de Vercel.** `next.config.ts` los declara en
+`outputFileTracingIncludes` para las tres rutas que los sirven. Sin eso, el reader lanza
+`declared_without_file` en producción con verde en local. El smoke del runbook MCP compara la
+**cuenta EXACTA** del catálogo contra el manifiesto, nunca `≥ 1`.
+
+**SIEMPRE** que una tool nueva comprometa presupuesto, entra al `appliesTo` de
+`seo-spend-discipline` en el mismo PR: el test lo exige, y la línea de gasto de las
+`instructions` sólo rutea al manual si éste gobierna a TODAS las tools que gastan (si no, conserva
+el procedimiento inline — la derivación es real, no un literal). La `description` de
+`get_greenhouse_skill` nombra cada manual: es la única palanca garantizada en contexto (patrón
+Figma: nombrar el prerrequisito ANTES de la tool que gobierna).
+
+**El catálogo devuelve resúmenes, nunca cuerpos.** Techo declarado: ~12 manuales antes de
+particionar por dominio (estimación; se revisa al pasar de 6).
+
+**Fuente:** `docs/architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md` §23 ·
+`docs/tasks/in-progress/TASK-1804-mcp-served-skill-manual.md`
+
+---
+
 ## Documentación relacionada
 
 - `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §5 (contrato de honestidad `●`/`◑`) y §7 (Full API Parity)
