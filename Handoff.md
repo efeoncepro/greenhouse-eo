@@ -83,6 +83,12 @@ reales: release `develop→main` (decisión del operador) y el camino de negaci�
 runtime. ⚠️ `4620875eb` arrastró archivos que otra sesión tenía en el índice compartido (`mcp-craft/**`,
 `.claude/rules/mcp-tool-surface.md`); esa sesión lo registró en `bd112e66a`.
 
+**Cierre definitivo (21:27Z):** la lane salió a producción en el release `375f56e24` (release_id
+`375f56e24187-546f452b-…`, run `33683893124`, llevado por `greenhouse-eo-ac`); canary de contrato contra
+producción post-`released` verde (count=3 exacto, cuerpos byte-idénticos, ETag/304, 404/401, provider del
+gateway 5/5). TASK-1804 → `complete`. Sin evidencia runtime: `tools/call` por el front door OAuth (login
+Entra interactivo) y la negación con binding de cliente (sin consumer de cliente con token).
+
 ## 2026-09-02 (5) — TASK-1784: el eval de selección MCP refutó su propia hipótesis, y eso es el entregable
 
 Se midió la selección de tools SEO antes de tocar una descripción: **tool 94.5% / mercado 98.2% / gasto 100%**

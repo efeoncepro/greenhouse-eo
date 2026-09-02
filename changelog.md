@@ -16,7 +16,7 @@ group, delivery, métricas, límites de claims y gates de madurez. El estado que
 autoriza todavía partnership, badge, certificaciones, reventa, pricing, casos ni Product Service comercialmente
 aprobado sin evidencia y sign-offs propios.
 
-## 2026-09-02 — MCP: el manual de uso viaja por el protocolo (TASK-1804, code complete)
+## 2026-09-02 — MCP: el manual de uso viaja por el protocolo (TASK-1804, released)
 
 La superficie MCP gana un segundo canal de conocimiento de uso: un manifiesto de manuales
 (`skill-manifest.ts`) hermano del de tools, tres `SKILL.md` publicables en `docs/mcp/skills/`
@@ -27,8 +27,9 @@ todos sobre el mismo reader. Los cuerpos viajan en el bundle como artefacto gene
 de 397 MB). Publicar es un acto explícito (drift manifiesto↔filesystem no construye el
 servidor), un binding de cliente no sabe que los manuales existen (404 anti-oráculo) y la fuga de contenido
 interno la controla un test. Las `instructions` del handshake rutean al manual en vez de contener el
-procedimiento de gasto. El gateway federa la tool con su propio guard de paridad no-SEO (commit local en
-`efeonce-mcp`, deploy pendiente). Sin Entra, flag ni persistencia nuevos.
+procedimiento de gasto. El gateway federa la tool con su propio guard de paridad no-SEO (desplegado,
+`efeonce-mcp-gateway-00028-pmx`) y la lane salió a producción en el release `375f56e24` del mismo día, con canary de
+contrato verde contra producción. Sin Entra, flag ni persistencia nuevos.
 
 ## 2026-09-02 — ANAM: entrega premium de Emma y soporte explícito de tres meses
 
