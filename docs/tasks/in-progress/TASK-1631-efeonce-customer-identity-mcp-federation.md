@@ -108,11 +108,23 @@ Reglas obligatorias:
   del issuer externo que traiga ese string se deniega en dispatch, fail-closed, además de las defensas downstream
   (token-exchange Entra→Greenhouse por `(microsoft_tenant_id, microsoft_oid)`).
 - **CIMD es el mecanismo primario de registro; DCR queda como compatibilidad hacia atrás.** Verificado contra la
-  spec MCP vigente (2026-08-02): *"Dynamic Client Registration is deprecated. New implementations should use Client
-  ID Metadata Documents instead"*, con orden normativo pre-registro → **CIMD** (`client_id_metadata_document_supported`)
-  → DCR (`registration_endpoint`) → entrada manual, y `SHOULD` para CIMD contra `MAY` para DCR. El proveedor
-  elegido debe soportar **ambos**: ChatGPT admite DCR y CIMD; Claude admite DCR y además permite configurar
-  client id/secret a mano. Un proveedor con excelente DCR y sin CIMD **no cumple** el requisito primario.
+  spec MCP vigente (revalidado 2026-09-02 sobre la revisión Current `2026-07-28`): *"Dynamic Client Registration is
+  deprecated. New implementations should use Client ID Metadata Documents instead"*, con orden normativo
+  pre-registro → **CIMD** (`client_id_metadata_document_supported`) → DCR (`registration_endpoint`) → entrada
+  manual, y `SHOULD` para CIMD contra `MAY` para DCR. El proveedor elegido debe soportar **ambos**: ChatGPT admite
+  DCR y CIMD; Claude admite DCR y además permite configurar client id/secret a mano. Un proveedor con excelente DCR
+  y sin CIMD **no cumple** el requisito primario.
+  **Delta 2026-09-02 — DCR pasó de "preferencia en contra" a `Deprecated` formal, y esta task es la ÚNICA dueña de
+  cerrarlo.** El [registro de deprecados](https://modelcontextprotocol.io/specification/2026-07-28/deprecated) lista
+  DCR como `Deprecated` desde `2026-07-28` ([PR #2858](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2858)),
+  migration path CIMD, **earliest removal = primera revisión publicada en o después de 2027-07-28**. La evaluación
+  de impacto sobre `mcp.efeonce.org` (gateway ADR, §"Delta 2026-09-02") concluye que **CIMD no es implementable en
+  la capa del shim DCR**: CIMD es una capacidad del *authorization server*, el AS ahí es Entra —que no soporta ni
+  CIMD ni RFC 7591— y el gateway espeja `authorize`/`token` en vez de proxearlos. Soportar CIMD exige **emitir los
+  tokens**, o sea el broker que esta task está eligiendo. Consecuencia dura para el Slice 0: **el soporte CIMD del
+  proveedor deja de ser un criterio de comparación "deseable" y pasa a ser el mecanismo de cumplimiento de la spec
+  para todo el acceso MCP de Efeonce, interno incluido** — el shim sostiene hoy a los clientes internos, pero su
+  horizonte es de cliente, no de calendario. No se abre task paralela de migración del shim.
 - **Ni DCR ni CIMD autentican a la persona ni autorizan organización o capabilities; sólo identifican una
   aplicación.** Son mecanismos distintos y no se conflacionan: en DCR (RFC 7591) el `client_id` lo **emite el
   authorization server**; en CIMD el `client_id` es una **URL que el propio cliente controla** y desde la que se

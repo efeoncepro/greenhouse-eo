@@ -61,6 +61,54 @@ If a source conflicts with remembered behavior, the verified runtime and its can
   metadata and one fixed client; Entra keeps issuing and validating every token, so the gateway remains a neutral
   adapter. Verified live with the real client: Claude Code authenticated and connected. This broadens internal
   tenant connectivity only; external/B2B access stays gated. Formalization pending as `TASK-1654`.
+- 🔴 **DCR is DEPRECATED as of MCP revision `2026-07-28` — the shim stays, but do NOT read it as the mechanism
+  the protocol is heading toward.** Registered 2026-09-02 against the live spec. The
+  [deprecated registry](https://modelcontextprotocol.io/specification/2026-07-28/deprecated) lists Dynamic Client
+  Registration as `Deprecated` ([PR #2858](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2858)),
+  migration path **Client ID Metadata Documents (CIMD)**, **earliest removal = first revision released on or after
+  2027-07-28** (a Core Maintainer decision that may land later). Normative order is pre-registration → CIMD
+  (`SHOULD`, advertised via `client_id_metadata_document_supported`) → DCR (`MAY`, via `registration_endpoint`) →
+  manual entry. **We keep the shim on purpose, not by inertia:** the spec retains DCR *"for backwards compatibility
+  with authorization servers that do not support Client ID Metadata Documents"*, and Entra supports **neither** CIMD
+  **nor** DCR — pre-registration is its only official path, which is exactly what `POST /register` returns.
+  **NEVER open a task to "migrate the gateway to CIMD": it is not implementable at this layer.** CIMD is an
+  *authorization server* capability — the AS resolves the URL-shaped `client_id`. Our AS is Entra; the gateway
+  *mirrors* `authorize`/`token`, it does not proxy them, so a URL `client_id` goes straight to Entra and is
+  rejected. Supporting CIMD requires ISSUING the tokens, i.e. being a real authorization server — forbidden by the
+  neutral-adapter rule and already owned by `TASK-1631`, whose invariants ALREADY require CIMD as the primary
+  mechanism from the chosen identity provider (a DCR-only provider **fails** the requirement). Route CIMD work
+  there; this evaluation is its input, never a parallel track.
+- ⚠️ **The clock that matters is the client's, not the spec's — and a nearer break is already written.** 2027-07-28
+  only marks when DCR becomes *eligible* for removal from the spec; what actually kills the shim is Claude Code /
+  claude.ai / Claude Desktop dropping the DCR fallback, with no announced date. Worse, the same `2026-07-28`
+  revision added text that did **not** exist in `2025-11-25`
+  ([authorization server discovery](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/authorization-server-discovery)):
+  the metadata document's `issuer` **MUST** be identical to the issuer identifier used to build the well-known URL,
+  and if they differ the client **MUST NOT** use the metadata. **Ours differ** (verified live 2026-09-02):
+  `authorization_servers: ["https://mcp.efeonce.org"]`, but that origin's
+  `/.well-known/oauth-authorization-server` returns Entra's issuer. It works today only because real clients do not
+  enforce it yet — empirical, not guaranteed. **NEVER "fix" this by claiming `issuer: https://mcp.efeonce.org`**:
+  that trades RFC 8414 §3.3 for a worse RFC 9207 `iss` mismatch (Entra emits its own `iss`; we pass that check today
+  *precisely because* we mirror Entra's real issuer). The mismatch is the intrinsic cost of announcing as an AS
+  without issuing tokens; it is not patchable below the broker. **Contingency if any client hardens first**
+  (spec priority 1, no architecture change, plan B only — do not execute unprompted): point `authorization_servers`
+  back at Entra's real issuer, unset `OAUTH_PUBLIC_CLIENT_ID` (the shim is already gated on it and collapses on its
+  own), and have each tenant user configure client id `32617b87-e7ef-493a-838f-1ff3f0213b93` by hand. Full reasoning
+  in the gateway ADR, §"Delta 2026-09-02".
+- ⚠️ **Static shared `client_id` + bare `http://localhost` = confused-deputy-shaped risk, and it is NOT closable in
+  the shim.** The spec's normative line (*"MCP proxy servers using static client IDs MUST obtain user consent for
+  each dynamically registered client before forwarding to third-party authorization servers"*) does **not** bind us
+  literally — the gateway mirrors `authorize`/`token`, it never forwards, and `POST /register` returns JSON with **no
+  consent screen and no cookie** (so the "consent cookie set before approval" failure mode is **refuted** for this
+  codebase, verified in `src/app.ts`). But the risk it prevents is present by construction: every tenant user shares
+  ONE `client_id`, its Entra redirect URIs include bare `http://localhost` (no port — verified 2026-09-02), and Entra
+  caches consent per `(user, application)`, so after the first consent there is **no second screen**. A local
+  malicious process can obtain a token silently on any loopback port with its own PKCE. Blast radius is bounded by
+  the write-scope rule above — the shared public client carries **no** write scope, so a stolen token is read-only;
+  that rule is doing security work beyond the reason it was written for. **NEVER close this by adding a consent
+  screen to the gateway** (that would make it an authorization authority) and **NEVER by narrowing `http://localhost`
+  alone** (it is what Claude Code's loopback needs). Per-client consent requires per-client identities with revocable
+  grants — `TASK-1631`. Tracked as pending review, not an incident: no observed exploitation.
 - Derive tenant/workspace from verified identity and provider policy. Never accept a free-form tenant boundary.
 - Treat `auth.efeonce.org` as session/runtime-isolated, not identity-isolated. Greenhouse, auth and MCP keep separate
   cookies, session secrets and token audiences, but an existing customer must resolve to one canonical

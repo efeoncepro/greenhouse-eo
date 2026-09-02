@@ -6,7 +6,7 @@
 - **Scope:** repositorio `efeonce-mcp`, transporte MCP remoto, autenticación, federación de productos, Cloud Run, front door y dominio público
 - **Reversibility:** two-way-but-slow
 - **Confidence:** high para boundary, hosting, hostname, authorization server y el primer reader Globe después del canary PKCE real
-- **Validated as of:** 2026-08-06 (delta shim DCR; base 2026-08-01)
+- **Validated as of:** 2026-09-02 (delta deprecación DCR en la revisión MCP `2026-07-28`; shim verificado en vivo; base 2026-08-01)
 - **Implementation owner:** [`TASK-1626`](../tasks/in-progress/TASK-1626-efeonce-mcp-platform-gateway.md)
 - **First provider owner:** [`TASK-1473`](../tasks/in-progress/TASK-1473-globe-contract-packaging-parity-certification.md)
 
@@ -243,6 +243,117 @@ B2B/multitenant del delta anterior.
   acceso por tenant y capability; el cliente Entra interno actual no prueba esa separación porque recibe base +
   reader (`efeonce.mcp.read` y `efeonce.mcp.globe.read`) aunque solicite sólo el base.
 
+### Delta 2026-09-02 — DCR quedó **deprecado** en la revisión `2026-07-28`; el shim se mantiene, con horizonte y disparadores declarados
+
+Evaluación, no migración. Verificado contra la spec en vivo el 2026-09-02.
+
+**Qué cambió realmente.** La revisión Current del protocolo es `2026-07-28`, y su
+[registro de deprecados](https://modelcontextprotocol.io/specification/2026-07-28/deprecated) lista *Dynamic
+Client Registration* como `Deprecated`, vía [PR #2858](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2858),
+con migration path *Client ID Metadata Documents* (CIMD) y **earliest removal = primera revisión publicada en o
+después de 2027-07-28**. La política de ciclo de vida ([SEP-2596](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2596),
+ventana mínima de doce meses) dice que un feature deprecado *"remains part of the specification"*, que
+implementaciones nuevas **SHOULD NOT** adoptarlo y que las existentes **SHOULD** migrar antes del retiro más
+temprano; el retiro efectivo es decisión de los Core Maintainers y **puede ocurrir después**.
+
+**La preferencia no es nueva; la etiqueta sí.** Ya en `2025-11-25` el orden normativo de registro era
+pre-registro → CIMD (`SHOULD`) → DCR (`MAY`) → entrada manual, con el mismo `client_id_metadata_document_supported`
+como señal. Lo que agrega `2026-07-28` es la **clasificación formal** como deprecado, el registro derivado, la
+política de ciclo de vida y el requisito de `application_type` en DCR ([SEP-837](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/837)).
+Es decir: el shim nació el 2026-08-06 en un mundo donde CIMD ya era el mecanismo preferido. La deprecación no
+invalida una decisión que se tomó ignorándola.
+
+**Por qué el shim sigue siendo el camino correcto, y no por inercia.** La spec preserva DCR con una excepción
+redactada exactamente para nuestro caso: *"retained for backwards compatibility with authorization servers that do
+not support Client ID Metadata Documents"*. Microsoft Entra **no soporta CIMD ni DCR**; para Entra la única vía
+oficial es el pre-registro. El shim es, en el fondo, **pre-registro disfrazado de DCR**: `POST /register` no
+registra nada, devuelve siempre el cliente PKCE pre-registrado. Entrega el mecanismo de prioridad 1 de la spec por
+el único canal que los clientes MCP estándar saben consumir sin configuración manual.
+
+**Hallazgo estructural — CIMD no es implementable en la capa del shim, en ninguna versión.** CIMD es una capacidad
+del **authorization server**: es el AS quien detecta un `client_id` con forma de URL, lo resuelve, valida el
+documento y los `redirect_uris`. En esta arquitectura el AS es Entra: el gateway espeja `authorization_endpoint` y
+`token_endpoint`, no los proxea. Un `client_id` URL viajaría directo a Entra, que lo rechaza. Soportar CIMD exige
+**emitir los tokens**, es decir, ser un authorization server de verdad — precisamente lo que el gateway tiene
+prohibido ser (§Decision) y lo que `TASK-1631` está eligiendo. **Conclusión: "adoptar CIMD" no es trabajo del
+gateway; es un requisito del broker de identidad, y `TASK-1631` ya lo lleva declarado** (§Invariants: CIMD como
+mecanismo primario, DCR como compatibilidad, y un proveedor DCR-only **no cumple**). Esta evaluación es insumo de
+esa task, no una línea de trabajo paralela.
+
+**El riesgo real no es el calendario, es el cliente.** El 2027-07-28 sólo marca cuándo DCR se vuelve *elegible*
+para retiro de la **spec**. Lo que apaga el shim no es la spec: es que Claude Code / claude.ai / Claude Desktop
+dejen de implementar el fallback DCR. Eso es un cambio de cliente, sin fecha anunciada y sin obligación de
+avisarnos. Mientras el cliente consulte `client_id_metadata_document_supported` (ausente en nuestra metadata, que
+es lo correcto y honesto) y caiga a `registration_endpoint`, el shim funciona. El día que un cliente exija CIMD y
+no traiga fallback, la conexión se cae sin que nosotros hayamos tocado nada.
+
+**🔴 Riesgo más cercano que la deprecación, encontrado en la misma revisión: el `issuer` del shim no cuadra.** La
+página nueva
+[Authorization Server Discovery](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/authorization-server-discovery)
+—que **no existía en `2025-11-25`**— agrega texto normativo: *"the `issuer` value in the document **MUST** be
+identical to the issuer identifier used to construct the well-known URL. If they differ, the client **MUST NOT**
+use the metadata"*, con un ejemplo que es literalmente nuestra forma. Verificado en vivo el 2026-09-02: el
+protected-resource anuncia `authorization_servers: ["https://mcp.efeonce.org"]`, el cliente construye
+`https://mcp.efeonce.org/.well-known/oauth-authorization-server`, y ese documento devuelve
+`issuer: "https://login.microsoftonline.com/a80bf6c1-.../v2.0"`. **Difieren.** Un cliente que aplique esa
+validación rechaza nuestra metadata y no llega ni a `/register`. No es una regresión: es la misma forma que el
+shim tiene desde el 2026-08-06, ahora con texto normativo explícito en contra. Sigue funcionando porque los
+clientes reales todavía no la aplican — lo cual es una observación empírica, no una garantía.
+
+Ese desajuste **no se parcha**: es el costo intrínseco de anunciarse como authorization server sin emitir tokens.
+Reclamar `issuer: https://mcp.efeonce.org` para cuadrar RFC 8414 §3.3 rompería la validación `iss` de RFC 9207
+—también reforzada en `2026-07-28` ([SEP-2468](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2468))—
+porque Entra emite su propio `iss`. Hoy pasa esa comprobación **justamente porque espejamos el issuer real de
+Entra**. Se cambia una inconsistencia por una peor. La salida honesta es la misma que para CIMD: un AS que emita
+sus propios tokens, o sea el broker de `TASK-1631`.
+
+**Contingencia sin cambio de arquitectura.** Si un cliente endurece cualquiera de las dos validaciones antes de
+que exista el broker, la salida es **pre-registro**, que es prioridad 1 de la spec: apuntar el
+`authorization_servers` al issuer real de Entra, apagar `OAUTH_PUBLIC_CLIENT_ID` (el shim ya está gateado por esa
+env, así que se cae solo) y que cada usuario configure a mano el `client_id`
+`32617b87-e7ef-493a-838f-1ff3f0213b93`. Degrada la UX a configuración manual por usuario, no rompe el acceso, y no
+toca ni Entra ni el modelo de tokens. Registrado como plan B, sin ejecutar.
+
+**🔴 Hallazgo de seguridad adjunto, surgido de la coordinación con la skill `mcp-craft` (2026-09-02).** La página
+de [security considerations](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/security-considerations)
+de la misma revisión dice: *"MCP proxy servers using static client IDs **MUST** obtain user consent for each
+dynamically registered client before forwarding to third-party authorization servers"*. **La letra no nos ata —
+pero el riesgo que la norma previene sí está presente por construcción.**
+
+- *Por qué la letra no aplica:* el gateway **no reenvía** la autorización. No proxea `/authorize` ni `/token`: los
+  espeja en metadata y el navegador va directo a `login.microsoftonline.com`. Nunca vemos la request de
+  autorización.
+- *Refutado explícitamente:* el modo de falla fino de «setear la cookie de consentimiento antes de la aprobación»
+  **no existe acá**. Verificado leyendo `src/app.ts` del gateway: `POST /register` devuelve JSON y nada más — el
+  shim **no tiene pantalla de consentimiento ni cookie**, así que no hay nada que setear antes de tiempo.
+- *Lo que sí aplica, y es concreto:* el `client_id` es **estático y compartido por todo el tenant**, y las redirect
+  URIs del cliente público incluyen `http://localhost` **sin puerto** (verificado con `az ad app show` el
+  2026-09-02: `https://claude.ai/api/mcp/auth_callback`, `http://localhost`, `http://localhost:8765/callback`).
+  Entra cachea consentimiento por `(usuario, aplicación)`, y como todos los clientes SON la misma aplicación, tras
+  el primer consentimiento **no vuelve a haber pantalla**. Consecuencia: un proceso malicioso corriendo en la
+  máquina del usuario puede iniciar una autorización con nuestro `client_id`, escuchar en cualquier puerto de
+  loopback y recibir el código con su propio PKCE, en silencio.
+- *Radio de explosión, honestamente acotado:* exige atacante con ejecución local, el tenant es único
+  (`signInAudience: AzureADMyOrg`) y —lo importante— el cliente público **no carga ningún scope de escritura**, por
+  la regla dura de §"El scope de escritura NO se cablea al cliente público compartido". El token robado es de
+  lectura. Esa regla, escrita para otra razón, es la que acota este riesgo.
+- *Dónde se cierra:* no en el shim. El consentimiento por cliente exige clientes distintos, y clientes distintos
+  con grant revocable per-tenant es, otra vez, el broker de `TASK-1631`. Se registra como **revisión pendiente**,
+  no como incidente: no hay explotación observada y la mitigación estructural ya tiene dueño.
+
+**Decisión.** No se migra ahora y no se abre task de migración del shim. Se mantiene el shim tal cual, se declara
+su horizonte y sus disparadores, y el destino queda asignado a `TASK-1631` (broker con CIMD nativo), no a una
+evolución del gateway. Micro-endurecimiento opcional para quien formalice `TASK-1654`: publicar
+`client_id_metadata_document_supported: false` explícito en la metadata espejada — hoy va ausente, que la spec
+trata igual, pero explícito documenta la postura.
+
+**Disparadores de revisión (cualquiera obliga a reabrir):**
+
+- un cliente MCP objetivo deja de traer fallback DCR, o empieza a aplicar la igualdad de `issuer` de RFC 8414 §3.3;
+- Entra anuncia soporte de CIMD (o de RFC 7591) — desaparecería la razón entera del shim;
+- se acepta el ADR de identidad de cliente y el broker de `TASK-1631` entra en runtime;
+- una revisión MCP publicada en o después de 2027-07-28 remueve DCR de la spec.
+
 ## Rollout and rollback
 
 1. Crear repo, tests, container y CI local.
@@ -265,12 +376,20 @@ Rollback: quitar tráfico a la revisión defectuosa o deshabilitar el provider/s
 - el authorization server elegido no sea interoperable con al menos dos clientes MCP objetivo;
 - una región distinta reduzca latencia material sin degradar la llamada a providers;
 - exista necesidad contractual de un segundo dominio canónico o residencia regional.
-- se defina el modelo B2B/multitenant que permite asignar, verificar y revocar scopes/capabilities por cliente.
+- se defina el modelo B2B/multitenant que permite asignar, verificar y revocar scopes/capabilities por cliente;
+- se cumpla cualquier disparador del delta 2026-09-02 sobre la deprecación de DCR (cliente sin fallback DCR o que
+  aplique la igualdad de `issuer` de RFC 8414 §3.3, soporte CIMD en Entra, broker de `TASK-1631` en runtime, o una
+  revisión MCP publicada en o después de 2027-07-28 que remueva DCR).
 
 ## References
 
 - [MCP Specification 2026-07-28](https://modelcontextprotocol.io/specification/2026-07-28)
 - [MCP authorization](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization)
+- [MCP client registration (CIMD / pre-registro / DCR)](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/client-registration)
+- [MCP authorization server discovery](https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/authorization-server-discovery)
+- [MCP deprecated features registry](https://modelcontextprotocol.io/specification/2026-07-28/deprecated)
+- [MCP feature lifecycle and deprecation policy](https://modelcontextprotocol.io/community/feature-lifecycle)
+- [OAuth Client ID Metadata Document (`draft-ietf-oauth-client-id-metadata-document-00`)](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-client-id-metadata-document-00)
 - [MCP transports](https://modelcontextprotocol.io/specification/2026-07-28/basic/transports)
 - [Official TypeScript SDK v2](https://github.com/modelcontextprotocol/typescript-sdk)
 - [Cloud Run overview](https://docs.cloud.google.com/run/docs/overview/what-is-cloud-run)
