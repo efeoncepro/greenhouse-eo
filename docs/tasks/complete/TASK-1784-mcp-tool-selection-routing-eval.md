@@ -101,8 +101,19 @@ esta task; la frontera queda medida y escrita.
 `ISSUE-152`. Se cerró **derivando** el texto del artefacto en vez de copiarlo: un espejo a mano
 vuelve a divergir, uno derivado no puede.
 
-**Rollout pendiente:** push + redeploy de `mcp.efeonce.org` + canary. Detalle:
-`docs/architecture/GREENHOUSE_MCP_TOOL_SELECTION_EVAL_V1.md`.
+**Rollout — dos superficies, una desplegada:**
+
+✅ **Gateway `mcp.efeonce.org` (repo `efeonce-mcp`, Cloud Run): DESPLEGADO** el 2026-09-02, revisión
+`efeonce-mcp-gateway-00027-6pj` desde el commit `3d09e152`. Es la superficie pública, la que consumen
+los clientes MCP externos, y la que servía la instrucción defectuosa: ya no.
+
+⏳ **Ruta `/api/mcp/greenhouse` (Vercel, este repo): PENDIENTE.** Los commits de Greenhouse están en
+`develop` **local, sin push**, así que esa ruta sigue sirviendo las descripciones viejas hasta que se
+empuje y se promueva. No hay inconsistencia funcional —el cambio es de texto y el runtime que describe
+(`resolveSeoTargetForMarket`, que ya se niega a elegir mercado callado) no se tocó— pero sí quedan dos
+superficies con textos distintos hasta el próximo release.
+
+Detalle: `docs/architecture/GREENHOUSE_MCP_TOOL_SELECTION_EVAL_V1.md`.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -125,7 +136,7 @@ vuelve a divergir, uno derivado no puede.
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Completa — eval + ruteo + gate + paridad de descripción entregados; el gateway requiere redeploy (rollout pendiente)`
+- Status real: `Completa — gateway mcp.efeonce.org desplegado (rev 00027-6pj); Greenhouse sin push y su ruta /api/mcp/greenhouse aún sirve el texto viejo`
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`
@@ -323,7 +334,7 @@ Reglas obligatorias:
 - [x] Invariantes explícitos; `N/A` de DB y tenant justificados.
 - [x] Sin tablas nuevas.
 - [x] Postura de rollback explícita y proporcional.
-- [ ] Evidencia runtime listada (eval + canary del gateway). **Eval: hecho** (6 corridas, baseline y delta registrados). **Canary del gateway: pendiente** — requiere el redeploy.
+- [x] Evidencia runtime listada (eval + canary del gateway). **Eval:** 6 corridas, baseline y delta registrados. **Gateway:** desplegado y verificado en el runtime vivo (revisión, postura, health, desafío 401, cadena commit→imagen→revisión).
 - [x] Sin datos sensibles ni cambio de gate de acceso.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -524,7 +535,7 @@ Sin flag — additive, cutover inmediato. Una descripción no tiene modo "apagad
 - [x] El delta post-cambio está reportado con número; si es negativo o nulo, la task lo dice y no declara mejora.
 - [x] El fixture incluye casos cuya respuesta correcta es no llamar a una tool que gasta.
 - [x] El guard de paridad compara `description` además de `inputSchema`.
-- [ ] Las descripciones del gateway y del MCP interno son idénticas tras el redeploy. **Código completo y verde en local (`pnpm check` 75/75 en `efeonce-mcp`), rollout PENDIENTE**: falta push + redeploy de `mcp.efeonce.org` y el canary contra el gateway vivo. Ya no puede volver a divergir —el gateway DERIVA el texto del artefacto en vez de copiarlo—, pero el runtime todavía sirve el texto viejo.
+- [x] Las descripciones del gateway y del MCP interno son idénticas tras el redeploy. **Desplegado 2026-09-02**: `mcp.efeonce.org` corre la revisión `efeonce-mcp-gateway-00027-6pj`, construida del commit `3d09e152` (cadena commit→imagen→revisión verificada en el log del deploy). Postura preservada (`internal-and-cloud-load-balancing` + invoker `allUsers`), `health=200`, `/mcp` desafía 401 sin token. En el commit desplegado: 27 tools derivan su descripción con `greenhouseToolDescription`, el manifiesto embebido lleva la cláusula corregida y hay **cero** ocurrencias de la instrucción vieja que causaba ISSUE-152. ⚠️ Leer `tools/list` servido exige login Entra interactivo (no automatizable): esa verificación de punta a punta queda para el operador con el smoke documentado.
 - [x] `MCP_TOOL_SURFACE_INVARIANTS.md` declara que toda tool nueva nace con ruteo y con su caso en el fixture.
 
 ## Verification

@@ -42,11 +42,18 @@ léxica y ninguna descripción le gana al nombre de su propia tool.
 **21 de 27 tools federadas ya divergentes** — el gateway servía, entre otras, la instrucción que causa
 `ISSUE-152`. Se cerró **derivando** el texto del artefacto (`greenhouseToolDescription`) en vez de copiarlo.
 
-🔴 **Rollout pendiente, no es "listo".** El repo hermano `efeonce-mcp` tiene el cambio committeado **en local**,
-con `pnpm check` completo verde (75/75), pero **sin push y sin redeploy**: `mcp.efeonce.org` sigue sirviendo las
-descripciones viejas. Próximo paso: push + `workflow_dispatch` del deploy + canary contra el gateway vivo
-verificando que las descripciones servidas son las nuevas. Después, revisar `seo_provider_spend_daily` a 7 días
-(la disciplina de gasto quedó en 100% en el eval, pero eso se confirma en la factura).
+✅ **Gateway desplegado.** `mcp.efeonce.org` corre la revisión `efeonce-mcp-gateway-00027-6pj` desde el commit
+`3d09e152`, con la postura intacta (`internal-and-cloud-load-balancing` + invoker `allUsers`), `health=200` y
+`/mcp` desafiando 401. En ese commit hay **cero** ocurrencias de la instrucción vieja. Lo que NO se verificó:
+leer el `tools/list` servido exige login Entra interactivo y no es automatizable — la cadena
+commit→imagen→revisión es fuerte, pero no reemplaza leer el texto servido.
+
+⏳ **Queda la OTRA superficie MCP.** Los commits de Greenhouse siguen en `develop` **local, sin push**, así que
+la ruta `/api/mcp/greenhouse` (Vercel) todavía sirve las descripciones viejas. Mismo servidor, distinto
+transporte: hasta el próximo release conviven dos textos. No hay inconsistencia funcional —el runtime descrito
+no cambió— pero la brecha existe. Próximos pasos: push de `develop` + release a producción; después, revisar
+`seo_provider_spend_daily` a 7 días (la disciplina de gasto dio 100% en el eval, pero eso se confirma en la
+factura, no en la medición).
 
 ## 2026-09-02 (4) — Globe queda en hibernación profunda, reversible y documentada
 

@@ -261,6 +261,26 @@ Una divergencia deliberada sigue siendo posible —la frontera pública puede ne
 advertencia propia— pero declarada con razón en `GREENHOUSE_SEO_DESCRIPTION_DIVERGENCES`. El
 silencio no es válido.
 
+### Estado de despliegue — 2026-09-02
+
+✅ **`mcp.efeonce.org` desplegado.** Revisión `efeonce-mcp-gateway-00027-6pj`, construida del commit
+`3d09e152` del repo `efeonce-mcp` (cadena commit → imagen → revisión verificada contra el log del
+deploy, no contra el resumen del workflow). Postura preservada sin cambios:
+`ingress=internal-and-cloud-load-balancing` + invoker `allUsers`. `health=200`; `/mcp` responde 401
+sin token, así que la capa OAuth está viva. En el commit desplegado: 27 tools derivan su descripción,
+el manifiesto embebido lleva la cláusula corregida y hay **cero** ocurrencias de la instrucción que
+causaba `ISSUE-152`.
+
+⚠️ **Lo que NO se verificó y por qué:** leer el `tools/list` realmente servido exige login Entra
+interactivo por el front door y no es automatizable. La cadena de procedencia es fuerte, pero no
+sustituye leer el texto servido; el smoke autenticado está documentado en
+`docs/manual-de-uso/plataforma/operar-provider-greenhouse-seo-mcp.md`.
+
+⏳ **La ruta `/api/mcp/greenhouse` (Vercel) sigue con el texto viejo.** Es la OTRA superficie MCP:
+mismo servidor, distinto transporte. Los commits de Greenhouse no están empujados, así que hasta el
+próximo release conviven dos textos. No hay inconsistencia funcional —el runtime descrito no cambió—
+pero sí una brecha de texto que este mismo guard reportaría si midiera esa ruta.
+
 `get_seo_provider_spend` conserva su literal en el gateway: es nativa —se resuelve contra la ruta
 HTTP del lane sin existir como tool interna— y ya está declarada como tal.
 
