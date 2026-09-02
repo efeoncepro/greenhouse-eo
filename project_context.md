@@ -15,12 +15,13 @@ PAT temporal aprobado para la migración permanece activo hasta su sustitución 
 antes del rollout externo. El release productivo `30502476429` y el rollback ejercitado están documentados en
 [`AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
 
-El payload React activo de Efeonce Globe (`../efeonce-globe`) usa Tailwind v4 como pipeline único de estilos:
-composer, shell, diálogos, feed, viewer, share board, primitives y capas base/motion están absorbidos por el
-payload Tailwind. El renderer vanilla y `producerStyles` permanecen sólo como fallback de rollout hasta
-`TASK-1560`; no confundir esa frontera con una hoja activa en la ruta React.
+Globe (`../efeonce-globe`) usa Tailwind v4 como único pipeline activo; el renderer vanilla queda sólo como
+fallback hasta `TASK-1560`. Su lifecycle Terraform es `active -> draining -> hibernated`; `draining` es la
+frontera obligatoria de apagado/encendido. Estado y recuperación: [`GLOBE_RUNTIME_HANDOFF.md`](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md)
+y [`GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md`](docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md).
 
-La dirección de producto móvil de Globe es continuity-first y native-first según [ADR-018](docs/architecture/creative-studio/EFEONCE_GLOBE_MOBILE_CONTINUITY_APPLICATION_DECISION_V1.md): React Native + Expo development builds/CNG es la dirección tecnológica de una companion Android/iOS; web/PWA queda como fallback. El vertical slice debe validar PKCE, deep links, captura, upload interrumpible, push reconciliable, handoff y compatibilidad binary/API; no cambia todavía el runtime ni el rollout internal-only.
+La dirección móvil de Globe es native-first con React Native + Expo; web/PWA queda como fallback. ADR, vertical
+slice y gates: [ADR-018](docs/architecture/creative-studio/EFEONCE_GLOBE_MOBILE_CONTINUITY_APPLICATION_DECISION_V1.md).
 
 Las decisiones de arquitectura de Globe se enrutan por el overlay `.claude/skills/arch-architect/globe-overlay.md`
 (pinned decisions G1–G10, los dos bug class canonizados y cómo condiciona un modelo generativo). Decide la FORMA;

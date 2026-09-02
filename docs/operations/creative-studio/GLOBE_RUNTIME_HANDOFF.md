@@ -13,6 +13,40 @@
 > `d3fe90e`, digest `sha256:d8295862dc12c14427e90e0bb413577802916c37ca6bf32c202680492ca7bae9`,
 > deploy `30717266572` y baseline IaC `e369ef8` sin drift.
 
+## Corte 2026-09-02 — TASK-1807: Globe en hibernación profunda
+
+El operador decidió detener Globe mientras el producto todavía no produce ingresos. La hibernación está aplicada
+en producción y reconciliada en el Terraform del repo hermano; no es una eliminación ni un retiro del producto.
+
+Estado vivo verificado a `2026-09-02T10:30:38Z`:
+
+- `globe_operating_state=hibernated` y plan posterior `No changes`;
+- Cloud SQL `globe-pg` `STOPPED`, `activationPolicy=NEVER`, disco SSD 10 GB, deletion protection, backups y PITR
+  preservados;
+- schedulers `globe-producer-worker`, `globe-media-derivatives` y `globe-asset-governance` en `PAUSED`;
+- cero Cloud Run Job executions activas; las últimas ejecuciones de cada workload terminaron correctamente antes
+  de la pausa;
+- API `globe-api-internal-00216-wmm` y Studio `globe-studio-internal-00150-m2m` tienen revisión creada = revisión
+  lista, `minInstances=0` y `GLOBE_PRODUCTIVE_LANES_ENABLED=false`;
+- 10 buckets, 17 secretos, servicios/jobs, IAM, front door, Artifact Registry, budgets, observabilidad y estado
+  Terraform permanecen existentes;
+- ningún apply destruyó o reemplazó recursos.
+
+El lifecycle versionado es `active -> draining -> hibernated`. `draining` mantiene SQL encendido, pausa los tres
+schedulers y cierra todas las vías productivas; es obligatorio en ambos sentidos porque API y Studio necesitan
+PostgreSQL durante el startup de una revisión. Un primer apply mostró precisamente ese riesgo: SQL se detuvo antes
+del startup API, la revisión nueva falló y la anterior retuvo tráfico. Se restauró SQL, se introdujo `draining`,
+se publicaron revisiones fail-closed listas y sólo entonces se volvió a detener SQL. No hubo pérdida de datos.
+
+Baseline previo aproximado: CLP 348.152 netos/30 días. Residual hibernado esperado: CLP 20.000–30.000/30 días;
+reducción modelada: CLP 318.000–328.000. No reportar esa cifra como ahorro realizado hasta observar Billing
+Export a 24 h, 7 días y cierre mensual.
+
+Reactivación: requiere autorización explícita de gasto y seguir, sin saltos, el runbook
+[`GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md`](GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md): primero source/apply/readback en
+`draining`; luego integridad no facturable; finalmente source/apply/readback en `active`. Ante falla, volver a
+`draining`; nunca prender schedulers con SQL detenido ni probar el encendido generando gasto de proveedor.
+
 ## Corte 2026-09-01 — TASK-1807: Producer reduce no-op ticks a cada cinco minutos
 
 `globe-producer-worker` cambió su Scheduler de `* * * * *` a `*/5 * * * *` mediante Terraform, sin cambiar

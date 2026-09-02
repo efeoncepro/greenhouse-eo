@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `cron`
 - Epic: `none`
-- Status real: `Slices 1 y 5 aplicadas; watcher neto live en ops-worker y Vercel staging; Artifact Registry y Cloud Build cleanup dry-run activos sin borrar; Asset Governance multi-stage validado con canary real; ventanas Producer/Media, dedupe runtime natural y evaluación posterior de cadence Governance pendientes`
+- Status real: `Hibernación profunda aplicada y reconciliada en Terraform: Cloud SQL STOPPED/NEVER, tres schedulers PAUSED, vías productivas fail-closed, servicios minScale=0 y recursos preservados; ahorro realizado pendiente de ventanas Billing Export de 24 h, 7 días y cierre mensual`
 - Rank: `1`
 - Domain: `ops`
 - Blocked by: `none`
@@ -34,6 +34,11 @@
 Reduce el run-rate mensual de Google Cloud removiendo ejecuciones Cloud Run sin trabajo, sin degradar la
 latencia operativa de Efeonce Globe. Entrega un rollout reversible por workload, evidencia de colas y costo,
 budgets nativos, atribucion y controles FinOps que impidan que el desperdicio reaparezca.
+
+El 2026-09-02 el operador tomó una decisión posterior y de mayor alcance: Globe no produce ingresos todavía, por
+lo que debe permanecer en hibernación profunda, reversible y documentada. Esa decisión reemplaza temporalmente
+la optimización gradual de cadencias como estado operativo objetivo; los experimentos de cadence se retoman sólo
+después de una reactivación explícitamente autorizada.
 
 ## Why This Task Exists
 
@@ -63,6 +68,9 @@ mezcla con el cutover urgente de los schedulers.
 - Alcanzar un run-rate modelado de CLP 409.528 tras Producer + Media y cercano a CLP 321.557 si Asset Governance
   puede espaciarse de forma segura después de ambas ventanas; cualquier objetivo CLP 290.000–320.000 requiere
   ahorro residual adicional probado, sujeto siempre a readback real a 24 horas, 7 dias y cierre mensual.
+- Mantener Globe en `hibernated` sin eliminar datos ni infraestructura: schedulers pausados, vías productivas
+  cerradas, Cloud Run en scale-to-zero y Cloud SQL detenido; dejar un camino versionado `hibernated -> draining
+  -> active` que permita reactivarlo con guardas, readback y rollback explícitos.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -135,6 +143,8 @@ Reglas obligatorias:
 - `/Users/jreye/Documents/efeonce-globe/infra/terraform/*observability*.tf`
 - `/Users/jreye/Documents/efeonce-globe/infra/terraform/tests/*worker*.test.mjs`
 - `/Users/jreye/Documents/efeonce-globe/infra/terraform/tests/*governance*.test.mjs`
+- `/Users/jreye/Documents/efeonce-globe/infra/terraform/{variables,locals,cloud_sql,cloud_run_services,outputs}.tf`
+- `docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md`
 
 ## Current Repo State
 
@@ -514,8 +524,8 @@ Terraform, un scheduler a la vez. El rollback restaura el schedule anterior.
 
 ## Acceptance Criteria
 
-- [ ] Producer corre cada 5 minutos desde Terraform y mantiene queue age p99 < 900 s durante 24 h y 7 dias.
-- [ ] Media Derivatives corre escalonado cada 5 minutos y mantiene backlog/oldest age bajo guardrail.
+- [ ] Tras una futura reactivación, Producer corre cada 5 minutos desde Terraform y mantiene queue age p99 < 900 s durante 24 h y 7 dias; no aplica mientras `hibernated`.
+- [ ] Tras una futura reactivación, Media Derivatives corre escalonado cada 5 minutos y mantiene backlog/oldest age bajo guardrail; no aplica mientras `hibernated`.
 - [x] Asset Governance no se degrada por un cambio directo de cadence: permanece `*/1`; el runtime multi-stage convergió un canary real hasta `eligible`, con rights/provenance, malware, lector gobernado y cola verificados.
 - [ ] Después de cerrar Producer y Media, se evalúa Asset Governance `4-59/5` con plan/readback y rollback a `*/1`; sólo se aplica si la convergencia multi-stage mantiene cola < 900 s y cero fallos materiales.
 - [ ] El costo diario observado de los jobs intervenidos baja al menos 50% sin aumento material de errores.
@@ -528,6 +538,14 @@ Terraform, un scheduler a la vez. El rollback restaura el schedule anterior.
 - [x] Labels cubren al menos 90% del costo o queda follow-up con owner y brecha medida. El histórico de 30 días mide 0%; Globe ya etiqueta cuatro dimensiones y `efeonce-platform` posee la convergencia del export y la brecha de proyectos restantes.
 - [ ] El ahorro a 24 h, 7 dias y cierre mensual queda registrado; forecast no se presenta como ahorro realizado.
 - [x] CUD permanece fuera hasta decision financiera sobre baseline estable.
+- [x] La hibernación profunda vive en Terraform como `active | draining | hibernated`, con default fail-closed,
+  validación, outputs y contratos focales.
+- [x] El corte productivo tuvo planes `0 destroy`, schedulers pausados, cero ejecuciones activas, revisiones
+  fail-closed listas antes del stop y Cloud SQL `STOPPED/NEVER` con backup, PITR y deletion protection retenidos.
+- [x] API y Studio conservan `minInstances=0`; buckets, secretos, jobs, servicios, IAM, front door, Artifact
+  Registry, budgets y estado Terraform permanecen existentes.
+- [x] Existe un runbook canónico con preflight, variables obligatorias, gate anti-delete, apagado, readbacks,
+  reactivación en dos fases, monitoreo, rollback, medición de costo e incidente documentado.
 
 ## Verification
 
@@ -557,7 +575,9 @@ Terraform, un scheduler a la vez. El rollback restaura el schedule anterior.
 
 ## Follow-ups
 
-- Decision de CUD Cloud SQL una vez estabilizado el baseline.
+- Medir ahorro realizado a 24 horas, 7 días y cierre mensual desde `2026-09-02T10:30:38Z`.
+- Decision de CUD Cloud SQL sólo si Globe vuelve a activarse y estabiliza un baseline; no comprar durante
+  hibernación.
 - Cancelacion de Gemini Code Assist solo si Finance/owner confirma que no se usa.
 - Retiro de `kortex-pg-dev` solo si se demuestra sin consumer; nunca rightsizing hacia abajo.
 
@@ -565,6 +585,38 @@ Terraform, un scheduler a la vez. El rollback restaura el schedule anterior.
 
 - Cual ruta para Asset Governance satisface mejor el producto: convergencia multi-etapa acotada o dispatch por evento.
 - Que owner financiero aprueba budgets, CUDs y cancelacion de suscripciones.
+
+## Delta 2026-09-02 — Hibernación profunda reversible
+
+- Decisión del operador: detener Globe porque todavía no produce ingresos, preservando la capacidad de volver a
+  encenderlo y documentando el procedimiento completo.
+- Baseline previo de 30 días: aproximadamente CLP 348.152 netos; Cloud Run CLP 285.931, Cloud SQL CLP 34.980,
+  Networking CLP 16.770 y otros retenidos ~CLP 10.400. Residual hibernado modelado: CLP 20.000–30.000/mes;
+  reducción modelada: CLP 318.000–328.000/mes. No es ahorro realizado todavía.
+- IaC: nueva state machine `active -> draining -> hibernated`; `draining` mantiene SQL encendido mientras crea y
+  verifica revisiones fail-closed. Default actual: `hibernated`.
+- Contención inicial: Producer Worker, Media Derivatives y Asset Governance quedaron `PAUSED`; últimas
+  ejecuciones completaron correctamente y la consulta de ejecuciones activas devolvió `[]`.
+- Primer apply: el plan seguro era `0 add, 7 change, 0 destroy`. SQL se detuvo antes de que la nueva revisión API
+  pudiera iniciar; la revisión previa conservó tráfico, no hubo borrado y los schedulers siguieron pausados. SQL
+  se restauró temporalmente y el diseño se corrigió con el estado intermedio obligatorio `draining`.
+- Apply `draining`: `0 add, 3 change, 0 destroy`; API `00216-wmm` y Studio `00150-m2m` quedaron como
+  `latestCreated == latestReady`; API, Studio y Producer Worker reportaron
+  `GLOBE_PRODUCTIVE_LANES_ENABLED=false` y flags productivos seleccionados en `false`.
+- Apply final: `0 add, 1 change, 0 destroy`, exclusivamente Cloud SQL `ALWAYS -> NEVER`.
+- Readback `2026-09-02T10:30:38Z`: SQL `STOPPED/NEVER`, disco SSD 10 GB, deletion protection, backups y PITR
+  activos; tres schedulers `PAUSED`; servicios `minInstances=0`; cero ejecuciones activas; 10 buckets, 17
+  secretos y Artifact Registry Docker preservados. Post-plan: `No changes`.
+- Guardas: dos planes preliminares sin todos los inputs de preservación propusieron 20 y 1 destroys,
+  respectivamente; ambos fueron descartados y nunca aplicados. El runbook obliga a suministrar development,
+  principal, budgets y quota project, y rechaza cualquier delete/replacement.
+- Documentación canónica:
+  `docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md`.
+- Source publicado: Globe `main@a33031621a8678c1848d71f1a98413e9763b41d5`; CI remoto
+  `33620423241` completó `pnpm check` y build en verde (5m36s). Documentación Greenhouse:
+  `develop@5074fcc55`, commit local no publicado para no inferir autorización sobre Greenhouse.
+- Estado honesto: hibernación aplicada; ahorro observado pendiente de Billing Export a 24 h, 7 días y cierre
+  mensual. La task permanece `in-progress` por esas ventanas y por el cierre del watcher neto.
 
 ## Delta 2026-09-01 — Slice 1 aplicada
 
