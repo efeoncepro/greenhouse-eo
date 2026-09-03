@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `none`
-- Status real: `Code complete 2026-09-03 (slices 0–4 en develop, sin push); rollout pendiente: release, flag OFF, recovery por allowlist sin aplicar, UI TASK-1814, conciliación Finance`
+- Status real: `En producción + recovery aplicada 2026-09-03 (Felipe termination ejecutado; Luis/María Camila cerrados; señales 1/0/0). Abierto: restauración de Valentina por SQL del operador (ISSUE-163), release con guarda de reingreso (c5c030e99 en develop), Finance, UI TASK-1814`
 - Rank: `TBD`
 - Domain: `hr|payroll|identity|finance`
 - Blocked by: `none`
@@ -316,9 +316,9 @@ ya están confirmados; no pedirlos nuevamente. Release y cambios de flags siguen
 - [x] SCIM/backfill BQ respetan ownership y no reactivan salidas confirmadas; detector sin caso exige revisión. — guard en cascade #2 (`linked_inactive_prior_exit`), CASE en el upsert del backfill, señal `deprovisioned_member_without_case`. No ejercitado en vivo contra Entra (pendiente en staging).
 - [x] Write-target allowlists, source of truth, tenancy, acceso, migración y rollback documentados y verificados. — Delta 2026-09-03 en la arquitectura de offboarding + invariantes TASK-1349 + ledger de flags + migración seed con guard DO.
 - [ ] TASK-1814 permite completar el flujo desde la UI y comparte la decisión canónica sin lógica duplicada. — Contrato publicado en TASK-1814 (Delta 2026-09-03); UI no implementada (task hermana).
-- [ ] Felipe queda fuera de períodos posteriores al 02/06/2026; todo pagado y saldo pendiente cero conciliado con trazabilidad, sin nuevo pago ni reescritura de exports. — Dry-run ejecutado (preview correcto); apply NO ejecutado: requiere causal respaldada declarada por People y autorización del operador; conciliación Finance de junio/julio (obligación 550.875 + SII 99.125 generadas por error, gasto `pending`) sin contrato de anulación → dependencia Finance registrada.
-- [ ] Cohorte de otros casos revisada con allowlist por sujeto, sin baja automática de casos solo de acceso. — Cohorte clasificada por el dry-run (3 lifecycle, 3 stubs stale → `access_only`, 1 draft manual); ninguna escritura aplicada.
-- [ ] Readbacks live de UI, PG, oficial/proyectada y señales confirman resultado; flags/deploy/recovery registrados por separado. — Pendiente de release + rollout (flag OFF).
+- [x] Felipe queda fuera de períodos posteriores al 02/06/2026 — Recovery aplicada 2026-09-03 (`termination` declarada por el operador): executed, member inactivo, compensación cerrada al 02/06; readback mayo `full_period`, junio `exclude_from_cutoff`, julio/sept `exclude_entire_period`. La conciliación Finance (obligación junio 550.875 + SII 99.125 generadas por error) sigue como dependencia sin contrato de anulación: saldo cero confirmado por el operador, registros internos por conciliar.
+- [x] Cohorte de otros casos revisada con allowlist por sujeto, sin baja automática de casos solo de acceso. — Luis Reyes y María Camila Hoyos cerrados (lifecycle + stubs `access_only`); Maria Fernanda draft queda a decisión manual de HR; **Valentina Hoyos fue un falso positivo** (reingreso como contractor desde 20/08): guarda de reingreso agregada (`c5c030e99`), relación employee re-terminada por command; restauración final por SQL del operador (ISSUE-163).
+- [ ] Readbacks live de UI, PG, oficial/proyectada y señales confirman resultado; flags/deploy/recovery registrados por separado. — PG, resolver y señales verificados tras la recovery (1/0/0); falta readback UI (TASK-1814), la restauración de Valentina y el release de la guarda de reingreso.
 
 ## Verification
 
@@ -357,7 +357,36 @@ SII 99.125 de Felipe) — hoy sólo existe `supersedePaymentObligation`, no canc
 posee el hallazgo «entry julio gross 0 con retención SII 99.125».
 
 **Gate omitido a propósito:** `pnpm build` de producción no se corrió en esta máquina (consume ~30 GB y requiere
-autorización del operador); `pnpm test` completo, `pnpm typecheck` y `pnpm lint` sí.
+autorización del operador); `pnpm test` completo, `pnpm typecheck` y `pnpm lint` sí. El build real lo hizo Vercel en
+el release.
+
+## Delta 2026-09-03 — rollout ejecutado (release `62356c9b7fd4`)
+
+- Merge canónico `-s ours` (V1 = sólo el squash #218), push, PR #219 con marker `[release-coupled: payroll +
+  auth_access = la misma capability]`, smoke en main, orquestador `33779259694` con `bypass_preflight_reason`
+  forense (`db_migrations` ya aplicada; `cloud_release` deploy.sh ya desplegado). Los dos gates `production`
+  aprobados; manifest `released` 16:45:09Z. Ledger de tiempos actualizado.
+- Live smoke sintético `src/lib/workforce/offboarding/review-execute.live.test.ts` (sujetos por el primitive SCIM):
+  guard de revisión, gate de nómina por período, version conflict, reclasificación, ejecución con writeback (member
+  inactivo, relación terminada con la fecha real, `member.deactivated`), historia preservada, SCIM no resucita, e
+  inverso `access_only` sin efectos. Verde con el flag en la invocación.
+- Flag `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` ON en Production y staging + redeploys; ledger
+  actualizado. Ruta `review/preview` desplegada (401 sin sesión); canary read-only en staging sobre el caso real de
+  Felipe: lane→`non_payroll`, junio `exclude_from_cutoff`, julio/sept `exclude_entire_period`.
+- Residual: mi push del live test a `develop` redeployó los workers compartidos con `2c2c92683` durante el run
+  (diff de árbol vs target = sólo el test); watchdog `drift_count=2` documentado, sin redeploy forzado.
+- **Recovery ejecutada después con autorización explícita del operador (mismo día):** Felipe (`termination`),
+  Luis, María Camila. **Incidente:** Valentina Hoyos desactivada por error (reingreso contractor 20/08 no
+  contemplado) → guarda `findReentryAfterExit` en `applyOffboardingLifecycleEffects` + señal excluye reingresos
+  (`c5c030e99`, sólo en develop); `updateMember` falló a mitad (ISSUE-163) y su `member.updated` reactivó la relación
+  employee terminada (re-terminada por command). Residual de member/asignación → SQL del operador.
+- **Incidente «fantasmas» en pre-nómina (mismo día):** los sujetos sintéticos del live test quedaron inactivos con
+  compensación abierta y aparecían como `Colaborador <uuid>` en la pre-nómina de septiembre: el roster relajado los
+  admitía y `hasDecidedExitFact` contaba un `identity_only` ejecutado como salida decidida. Corregido en datos
+  (compensaciones cerradas por command) y en código (política + cleanup del live test); roster verificado limpio.
+- **Lección canónica:** «executed + member activo» NO es drift si existe un episodio posterior (relación o
+  engagement con inicio > LWD). El detector, la recovery y el executor deben mirar el episodio, no sólo la
+  compensación. Producción no tiene la guarda hasta el próximo release.
 
 ## Follow-ups
 

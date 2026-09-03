@@ -134,8 +134,15 @@ const buildBaseWindow = (
 
 const STATUSES_UNRESOLVED: ReadonlySet<ExitStatus> = new Set<ExitStatus>(['draft', 'needs_review', 'blocked'])
 
+// An access-only case (`identity_only`) is never a LABOR exit fact, even when
+// decided/executed: it must not rescue an inactive member into a period.
 const hasDecidedExitFact = (facts: ExitCaseFacts, cutoffDate: string | null): boolean =>
-  Boolean(facts.exitStatus && STATUSES_DECIDED.has(facts.exitStatus) && cutoffDate)
+  Boolean(
+    facts.exitStatus &&
+      STATUSES_DECIDED.has(facts.exitStatus) &&
+      cutoffDate &&
+      facts.exitLane !== 'identity_only'
+  )
 
 /**
  * TASK-1349 — an unresolved case (draft / needs_review / blocked) governs the

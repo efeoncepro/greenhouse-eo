@@ -7,7 +7,11 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-## 2026-09-03 — TASK-1349: revisión contractual de offboarding, elegibilidad por episodio y writeback de lifecycle (code complete, sin push)
+## 2026-09-03 — Corrección de reingreso y recuperación de disponibilidad (código local, rollout pendiente)
+
+Las actualizaciones de member confirman identidad y auditoría de forma transaccional; la proyección legal no reabre relaciones terminadas. Recovery y detector comparten vigencia real de episodios. Comando compensatorio con preview, hash de estado e idempotencia sustituye el SQL puntual. [Decisión y contrato](docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md). Restauración de Valentina espera verificar el consumidor corregido desplegado.
+
+## 2026-09-03 — TASK-1349 en producción (release `62356c9b7fd4`) — revisión contractual de offboarding, elegibilidad por episodio y writeback de lifecycle
 
 Cierra el circuito SCIM → decisión → nómina → lifecycle que la auditoría del 03/09 encontró incompleto (ISSUE-117,
 near miss del 06/07). Nómina: el resolver de elegibilidad elige el caso gobernante por relevancia temporal, sirve
@@ -22,7 +26,9 @@ detrás de `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED`, OFF), proyeccion
 nuevas, guards de ownership en SCIM y backfill BQ, capability `workforce.offboarding.review_case` (seed aplicado),
 rutas HR + carril `app`, y `pnpm workforce:offboarding:recovery` (dry-run ejecutado sobre la cohorte real; nada
 aplicado). Tras el release la nómina de septiembre bloqueará hasta resolver Felipe y Maria Fernanda: es el control
-buscado. Pendiente: release, flag ON tras smoke en staging, recovery autorizada, UI TASK-1814, conciliación Finance.
+buscado. **Rollout 2026-09-03:** PR #219 squash, orquestador `33779259694` `released` 16:45Z, `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED`
+ON en Production+staging tras live smoke sintético (`review-execute.live.test.ts`). Pendiente del operador: recovery
+por allowlist (bloqueada al agente por permisos), causal de Felipe, conciliación Finance, UI TASK-1814.
 
 ## 2026-09-03 — TASK-1806 seguimiento: alerta Teams determinista para drift de metodología ETV
 
@@ -1095,17 +1101,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
   que produciría la señal), así que puntuar con ella sería puntuar con algo que el aggregate no puede
   citar. El hallazgo queda además en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §7 (no sólo en una
   bitácora que rota) porque tres sesiones lo verificaron por separado el mismo día.
-
-## 2026-08-28 — El drain de keyword discovery baja de 10 a 2 minutos
-
-- `ops-seo-keyword-discovery-drain` pasa de `*/10` a `*/2`. `Descubrir` es un workbench
-  interactivo: el operador encolaba y esperaba **5 minutos de media, 10 en el peor caso**, cuando la
-  corrida en sí tarda segundos. El `*/10` no compraba nada — el drain con cola vacía es no-op, así
-  que correrlo 5× más seguido **no gasta un centavo más**. Es la cadencia que `ops-outbox-publish`
-  ya usaba por el mismo motivo.
-- Seguro a esta cadencia: el claim de la corrida es un `UPDATE` condicional
-  (`WHERE status='pending' … RETURNING`), así que un segundo worker matchea cero filas y responde
-  `busy` sin tocar al proveedor.
-- Aplicado en los dos lugares (SoT `services/ops-worker/deploy.sh` + `gcloud scheduler jobs update`).
-  ⚠️ `main` todavía declara `*/10`: hasta el próximo release, un deploy del worker desde `main`
-  revertiría el schedule en silencio. Documentado en el Handoff.

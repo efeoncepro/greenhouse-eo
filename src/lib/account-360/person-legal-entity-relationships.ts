@@ -52,6 +52,7 @@ type ExistingRelationshipRow = {
   role_label: string | null
   status: string
   space_id: string | null
+  effective_to: string | Date | null
 }
 
 export type OperatingEntityEmployeeRelationshipSyncResult =
@@ -280,7 +281,8 @@ const publishRelationshipEvent = async (
 )
 
 export const syncOperatingEntityEmployeeLegalRelationshipForMember = async (
-  memberId: string
+  memberId: string,
+  transactionClient?: PoolClient
 ): Promise<OperatingEntityEmployeeRelationshipSyncResult> => {
   const operatingEntity = await getOperatingEntityIdentity()
 
@@ -288,25 +290,27 @@ export const syncOperatingEntityEmployeeLegalRelationshipForMember = async (
     return { action: 'skipped', relationshipId: null }
   }
 
-  const [member] = await query<MemberContextRow>(
-    `SELECT identity_profile_id, role_title, active
-     FROM greenhouse_core.members
-     WHERE member_id = $1
-     LIMIT 1`,
-    [memberId]
-  )
+  const execute = async (client: PoolClient): Promise<OperatingEntityEmployeeRelationshipSyncResult> => {
+    // Serialize this projection with member commands, including reactivation.
+    // The member read belongs to the caller's transaction when composed there.
+    const { rows: [member] } = await client.query<MemberContextRow>(
+      `SELECT identity_profile_id, role_title, active
+       FROM greenhouse_core.members
+       WHERE member_id = $1
+       FOR UPDATE`,
+      [memberId]
+    )
 
-  const profileId = normalizeString(member?.identity_profile_id)
+    const profileId = normalizeString(member?.identity_profile_id)
 
-  if (!profileId) {
-    return { action: 'skipped', relationshipId: null }
-  }
+    if (!profileId) {
+      return { action: 'skipped', relationshipId: null }
+    }
 
-  return withTransaction(async (client) => {
     const legalEntitySpaceId = await getOrganizationDefaultSpaceId(operatingEntity.organizationId, client)
 
     const result = await client.query<ExistingRelationshipRow>(
-      `SELECT relationship_id, role_label, status, space_id
+      `SELECT relationship_id, role_label, status, space_id, effective_to
        FROM greenhouse_core.person_legal_entity_relationships
        WHERE profile_id = $1
          AND legal_entity_organization_id = $2
@@ -322,6 +326,13 @@ export const syncOperatingEntityEmployeeLegalRelationshipForMember = async (
     )
 
     const existing = result.rows[0]
+
+    // Legal episodes own their dates and lifecycle. An operational member update
+    // is not a new employment contract, even when the member becomes active again.
+    // A new employee episode must be created by the governed relationship command.
+    if (existing && (existing.status !== 'active' || existing.effective_to !== null)) {
+      return { action: 'noop', relationshipId: null }
+    }
 
     if (!member.active) {
       if (!existing || existing.status !== 'active') {
@@ -351,6 +362,23 @@ export const syncOperatingEntityEmployeeLegalRelationshipForMember = async (
     const desiredRoleLabel = normalizeString(member.role_title)
 
     if (!existing) {
+      // Bootstrap is legacy compatibility for members without a legal work
+      // episode. Contractor/executive history is explicit legal authority;
+      // member.contract_type/active cannot silently turn it into employment.
+      const workHistory = await client.query<{ relationship_id: string }>(
+        `SELECT relationship_id
+         FROM greenhouse_core.person_legal_entity_relationships
+         WHERE profile_id = $1
+           AND legal_entity_organization_id = $2
+           AND relationship_type IN ('contractor', 'executive')
+         LIMIT 1`,
+        [profileId, operatingEntity.organizationId]
+      )
+
+      if (workHistory.rows.length) {
+        return { action: 'skipped', relationshipId: null }
+      }
+
       const relationshipId = generatePersonLegalEntityRelationshipId()
       const publicId = await nextPublicId('EO-PLR')
 
@@ -404,38 +432,6 @@ export const syncOperatingEntityEmployeeLegalRelationshipForMember = async (
       return { action: 'created', relationshipId }
     }
 
-    if (existing.status !== 'active') {
-      await client.query(
-        `UPDATE greenhouse_core.person_legal_entity_relationships
-         SET status = 'active',
-             effective_to = NULL,
-             source_of_truth = $2,
-             source_record_type = 'member',
-             source_record_id = $3,
-             role_label = $4,
-             space_id = $5,
-             updated_at = CURRENT_TIMESTAMP
-         WHERE relationship_id = $1`,
-        [
-          existing.relationship_id,
-          PERSON_LEGAL_ENTITY_SOURCE_OF_TRUTH.operatingEntityMemberRuntime,
-          memberId,
-          desiredRoleLabel,
-          legalEntitySpaceId
-        ]
-      )
-
-      await publishRelationshipEvent({
-        relationshipId: existing.relationship_id,
-        profileId,
-        legalEntityOrganizationId: operatingEntity.organizationId,
-        spaceId: legalEntitySpaceId,
-        eventType: EVENT_TYPES.personLegalEntityRelationshipUpdated
-      }, client)
-
-      return { action: 'reactivated', relationshipId: existing.relationship_id }
-    }
-
     const roleChanged = normalizeString(existing.role_label) !== desiredRoleLabel
     const spaceChanged = normalizeString(existing.space_id) !== legalEntitySpaceId
 
@@ -461,7 +457,9 @@ export const syncOperatingEntityEmployeeLegalRelationshipForMember = async (
     }, client)
 
     return { action: 'updated', relationshipId: existing.relationship_id }
-  })
+  }
+
+  return transactionClient ? execute(transactionClient) : withTransaction(execute)
 }
 
 export const isSupportedPersonLegalEntityRelationshipType = (

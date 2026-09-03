@@ -89,7 +89,7 @@ Para V1 solo se soporta renuncia de trabajador dependiente Chile con payroll int
 Cuando un caso pasa a `executed`, el efecto depende de la lane, no de un único camino genérico:
 
 - **Caso `identity_only` (solo acceso)**: la ejecución es informativa. No toca compensación, no toca la relación laboral y no toca el registro del colaborador.
-- **Caso de término real** (`relationship_ended` revisado, con `last_working_day` real): antes de ejecutar, Greenhouse rechaza el cierre si existen versiones de compensación que empiezan después del último día trabajado (no las borra — pide corregirlas o supersederlas primero). La vigencia de compensación se cierra en el último día trabajado. Terminar la relación legal y marcar al colaborador como inactivo (`members.active=false`) queda detrás del flag `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` (hoy **apagado**) — mientras esté apagado, esos dos pasos no se ejecutan todavía, aunque el caso quede `executed`.
+- **Caso de término real** (`relationship_ended` revisado, con `last_working_day` real): antes de ejecutar, Greenhouse rechaza el cierre si existen versiones de compensación que empiezan después del último día trabajado (no las borra — pide corregirlas o supersederlas primero). La vigencia de compensación se cierra en el último día trabajado. Terminar la relación legal y marcar al colaborador como inactivo (`members.active=false`) queda detrás del flag `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` (**prendido en Production y staging desde el 2026-09-03**, release `62356c9b7fd4`). Las salidas ejecutadas antes de esa fecha no recibieron el writeback: se cierran con la recuperación gobernada.
 
 > Detalle técnico: `applyOffboardingLifecycleEffects` (`src/lib/workforce/offboarding/member-lifecycle.ts`); error `compensation_future_version_conflict` (409) cuando hay versiones futuras sin resolver.
 
@@ -188,7 +188,7 @@ Todo esto corre bajo el flag `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED`, hoy ence
 
 En `/hr/offboarding`, un caso de acceso todavía sin revisar se muestra como **"Por clasificar"** (ya no como "Cierre contractual", etiqueta que solo aplica a honorarios). Una vez revisado como solo acceso, se muestra **"Solo acceso"**. El progreso de las lanes que no tienen finiquito ahora refleja pasos reales — clasificado, fechas declaradas, decisión tomada, ejecutado — en vez de mostrar siempre "2/2". La acción **"Revisar caso"** está disponible para cualquier caso no terminal, incluidos los bloqueados.
 
-En el cierre del caso: una capa cuyo estado se desconoce ya no cuenta como completa — aparece el paso "Verificar capas sin confirmar". Y si la salida quedó ejecutada pero el colaborador sigue activo (porque el flag de desactivación está apagado, o por una inconsistencia), aparece el paso **"Cerrar ciclo de vida del colaborador"**, que lleva a la recuperación gobernada — nunca a un ajuste manual en base de datos.
+En el cierre del caso: una capa cuyo estado se desconoce ya no cuenta como completa — aparece el paso "Verificar capas sin confirmar". Y si la salida quedó ejecutada pero el colaborador sigue activo (salidas ejecutadas antes del 2026-09-03, cuando el writeback aún no existía, o por una inconsistencia), aparece el paso **"Cerrar ciclo de vida del colaborador"**, que lleva a la recuperación gobernada — nunca a un ajuste manual en base de datos.
 
 La pantalla dedicada a revisar un caso desde la cola (TASK-1814) todavía no existe; hoy la revisión se opera por API o por el script de recuperación descrito abajo.
 

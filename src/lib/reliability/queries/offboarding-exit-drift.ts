@@ -2,6 +2,7 @@
 import 'server-only'
 
 import { query } from '@/lib/db'
+import { reentryEngagementPredicate, reentryRelationshipPredicate } from '@/lib/workforce/offboarding/reentry-predicates'
 import { captureWithDomain } from '@/lib/observability/capture'
 import type { ReliabilitySignal } from '@/types/reliability'
 
@@ -64,6 +65,17 @@ const EXECUTED_STILL_ACTIVE_SQL = `
     AND NOT EXISTS (
       SELECT 1 FROM greenhouse_payroll.compensation_versions cv
       WHERE cv.member_id = m.member_id AND cv.effective_from > c.last_working_day
+    )
+    -- re-entry under a NEW episode (employee → contractor, re-hire): the exit
+    -- governs its episode only; an active relationship or engagement that
+    -- started after the LWD means the member is current workforce.
+    AND NOT EXISTS (
+      SELECT 1 FROM greenhouse_core.person_legal_entity_relationships r
+      WHERE ${reentryRelationshipPredicate({ profileIdSql: 'm.identity_profile_id', lastWorkingDaySql: 'c.last_working_day' })}
+    )
+    AND NOT EXISTS (
+      SELECT 1 FROM greenhouse_hr.contractor_engagements e
+      WHERE ${reentryEngagementPredicate({ profileIdSql: 'm.identity_profile_id', memberIdSql: 'm.member_id', lastWorkingDaySql: 'c.last_working_day' })}
     )
 `
 

@@ -152,6 +152,7 @@ mide el avance (sube `governed`, baja `session-coarse`/`declared-unwired`, sube
 | 3 | `organization.*` facets (account-360) | 🟡 lib-only (12 de 12) | `src/lib/organization-workspace/facet-capability-mapping.ts` | **Deuda:** projection server-only sin superficie API → MCP/app no la alcanzan por contrato |
 | 4 | `client_portal.*` reads | ⚠️ declared-unwired (13) | solo en tests / cableado por facet-resolver, no por literal | **Verificar binding:** confirmar si el facet-resolver los consume por constante (OK) o están realmente sin cablear |
 | 5 | Acción de negocio Nexa-operable | 0 capabilities accionables | `src/lib/nexa/nexa-tools.ts` (solo `mark_notifications_read`) | **Gap North Star principal** |
+| 6 | Revisión de un caso de offboarding (`workforce.offboarding.review_case`) | ✅ governed | primitive `reviewOffboardingCase` (`src/lib/workforce/offboarding/store.ts`) ⨝ portal `POST /api/hr/offboarding/cases/[caseId]/review` (+ `/preview`) ⨝ app lane `platform.app.hr.offboarding.case.review[.preview]` (`src/lib/api-platform/resources/app-hr-offboarding-case-review.ts`) | **Patrón canónico completo desde TASK-1349** — ver Delta 2026-09-03 abajo |
 
 **Lección de método (de los casos 2 y 4):** la clasificación automática es una señal de
 literal, no un veredicto. El `can()` puede vivir en el command (mejor patrón) y el cableado
@@ -205,6 +206,25 @@ falla en CI si una route de mutación de negocio NUEVA nace session-coarse sin c
 admin-coarse no puede volver a crecer en silencio.
 
 Re-medir: `pnpm tsx scripts/audit/session-coarse-triage.ts` · guard: `pnpm test scripts/audit`.
+
+## Delta 2026-09-03 — TASK-1349: `workforce.offboarding.review_case` nace ✅ governed
+
+La capability de revisar/corregir un caso de offboarding existente con una decisión contractual explícita
+(`access_only` | `relationship_ended`) nació con el patrón canónico completo, no como deuda:
+
+| Capa | Contrato |
+| --- | --- |
+| Primitive | `reviewOffboardingCase` — `src/lib/workforce/offboarding/store.ts` (toda la regla vive acá: motivo, conflicto de versión, causal y fechas explícitas, recómputo de lane, invalidación de aprobación previa) |
+| Portal | `POST /api/hr/offboarding/cases/[caseId]/review` + `/preview` — adapter delgado (transporte + `assertHrEntitlement('workforce.offboarding.review_case', 'execute', 'tenant')`), reusa el primitive por literal |
+| App lane (ecosystem) | `platform.app.hr.offboarding.case.review` + `.review.preview` — `src/lib/api-platform/resources/app-hr-offboarding-case-review.ts`; confirmar (no solo preview) está **fail-closed para tokens delegados**: `context.authSource === 'sister_platform_oauth'` se rechaza (403) — revisar la salida de una persona exige sesión humana, el mismo split que Hiring |
+| Nexa | Pendiente — sin action registrada en `src/lib/nexa/actions/registry.ts` todavía. El primitive y el lane ya existen (Full API Parity cumplida); falta solo el wiring del action runtime |
+| MCP | No federado — es un write de blast radius alto (datos de personas/lifecycle laboral), consistente con la política de no federar writes sensibles del `tool-manifest.ts` |
+| UI (portal) | Pendiente — **TASK-1814** (bandeja de revisión/recuperación de casos). El comando y sus dos consumers programáticos ya están completos; falta la superficie visible |
+
+Capability: `workforce.offboarding.review_case` (`src/config/entitlements-catalog.ts`, grant en
+`src/lib/entitlements/runtime.ts`). Recuperación operativa mientras TASK-1814 no ship-ea: CLI
+`pnpm workforce:offboarding:recovery` (llama el mismo primitive) — runbook
+[`docs/operations/runbooks/offboarding-recovery.md`](../operations/runbooks/offboarding-recovery.md).
 
 ## Related
 

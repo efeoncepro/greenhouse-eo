@@ -111,9 +111,11 @@ registros correspondientes y corregir generaciones improcedentes con trazabilida
 pendiente cero. Esta aclaración actualiza el estado de negocio; no reescribe la observación histórica
 del near miss del 06/07.
 
-## Avance 2026-09-03 — TASK-1349 code complete en `develop` (rollout pendiente)
+## Avance 2026-09-03 — TASK-1349 en producción (release `62356c9b7fd4`); recovery de datos pendiente del operador
 
-Implementado local-first, sin push ni deploy (commits Slice 0–4 en `develop`):
+Desplegado a producción el mismo día (PR #219, orquestador `33779259694`, flag ON tras live smoke sintético). Lo que
+sigue abierto es la **recovery de datos**: el clasificador de permisos bloqueó `pnpm workforce:offboarding:recovery
+--apply` al agente; la corre el operador (runbook `docs/operations/runbooks/offboarding-recovery.md`). Contenido:
 
 - Resolver de elegibilidad por episodio (`active` = disponibilidad actual; `contract_type_snapshot` servido; reingreso
   detectado) + gate fail-closed en readiness y `calculatePayroll` ante salida sin resolver o resolver caído.
@@ -131,6 +133,23 @@ Implementado local-first, sin push ni deploy (commits Slice 0–4 en `develop`):
 **Sigue abierto**: el cierre operativo exige release, flag ON tras smoke en staging, recovery aplicada (Felipe +
 Valentina/Luis/María Camila), UI TASK-1814 y conciliación Finance de junio/julio de Felipe (obligación 550.875 y SII
 99.125 generadas por error; no existe `cancelPaymentObligation` → dependencia Finance registrada en la task).
+
+## Recovery ejecutada 2026-09-03 (autorizada por el operador)
+
+- Felipe Zurita: `relationship_ended` / `termination` (causal declarada por el operador) → `executed`; member
+  inactivo, compensación cerrada al 02/06/2026, elegibilidad mayo íntegra / junio desde el cutoff / julio+ excluido.
+- Luis Reyes y María Camila Hoyos: lifecycle cerrado (relación employee terminada al LWD real, member inactivo) y
+  stubs SCIM cerrados como `access_only` con la fecha de la señal.
+- Valentina Hoyos: **falso positivo del drift** — su salida employee (LWD 30/04) está bien ejecutada, pero está
+  activa como contractor desde el 20/08. La lane A la desactivó; se agregó la guarda de reingreso (`c5c030e99`,
+  develop) y se re-terminó su relación employee; restaurar `status/contract_end_date/assignable` y su asignación
+  requiere `scripts/workforce/restore-valentina-hoyos-2026-09-03.sql` (ISSUE-163 explica por qué no fue posible por
+  command).
+- Señales tras la recovery: `executed_member_still_active` **0**, `unresolved_exit_signal` **1** (Maria Fernanda,
+  draft manual), `deprovisioned_member_without_case` 0.
+
+**Cierre de este issue:** pendiente de (a) restauración de Valentina, (b) release con la guarda de reingreso, (c) UI
+TASK-1814 y (d) conciliación Finance de junio/julio de Felipe.
 
 ## Relacionado
 

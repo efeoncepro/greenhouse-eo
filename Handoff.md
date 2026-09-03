@@ -2,18 +2,39 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
-TASK-1349 **code complete, rollout pendiente** (2026-09-03, sesión Claude, `develop`, sin push, commits Slice 0–4
-`b825e0a40`→`ff2f7623e` + cierre documental). Backend completo: resolver por episodio + gate fail-closed de nómina,
-command de revisión (`access_only`|`relationship_ended`) con capability y carril `app`, executor lane-aware con
-writeback detrás de `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` (OFF en todos los runtimes), proyecciones
-honestas, 3 señales (hoy 2 / 3 / 0), guards SCIM/backfill y `pnpm workforce:offboarding:recovery` (dry-run real
-ejecutado; NADA aplicado). **Riesgos/decisiones para el operador:** (1) tras el release, readiness de septiembre
-bloqueará con `unresolved_exit_signal` hasta resolver Felipe (blocked) y Maria Fernanda (draft 07-29) — control
-buscado; (2) `pnpm build` de producción NO se corrió (30 GB, requiere autorización) — `pnpm test` completo,
-typecheck y lint sí; (3) la recovery de Felipe exige causal respaldada declarada por People (`--separation-type`)
-y autorización explícita; (4) Finance: obligación junio 550.875 + SII junio/julio 99.125 de Felipe generadas por
-error, sin contrato de anulación (`supersede` sí, `cancel` no) → dependencia registrada, no SQL. Próximo paso:
-confirmar push/PR a `develop`, smoke sintético en staging, flag ON, recovery por allowlist, UI TASK-1814.
+Valentina reingreso (2026-09-03): acceso recuperado con autorización del operador sobre la misma persona/usuario/member;
+cuenta Microsoft nueva activa y buscador por correo nuevo verificados mediante readers canónicos. Roles e historia
+financiera preservados. [Auditoría y recuperación](docs/audits/payroll/VALENTINA_REHIRE_IDENTITY_RECOVERY_2026-09-03.md).
+Operador confirmó último día anterior 30/05/2026: EO-CENG-0001 ending, relación anterior ended; nuevo EO-CENG-0002
+active desde 20/08, bruto mensual 530.973. Confirmado 12/31: EO-CWS-0004 aprobado → EO-CPAY-0002 pending_readiness,
+líquido 174.193,55; único blocker boleta faltante. Sin obligación/orden nueva. Login interactivo no probado.
+
+TASK-1349 **EN PRODUCCIÓN + recovery aplicada** (2026-09-03; release `62356c9b7fd4`, run `33779259694`, flag
+`WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` ON prod+staging). Recovery por los commands canónicos, autorizada
+en chat: **Felipe** revisado `relationship_ended` con causal `termination` declarada por el operador → approved →
+scheduled → executed; member inactivo, compensación cerrada al 02/06, mayo `full_period`, junio `exclude_from_cutoff`,
+julio+ `exclude_entire_period`. **Luis Reyes y María Camila Hoyos**: lifecycle cerrado (relación employee terminada
+al LWD real, member inactivo) y stubs SCIM cerrados como `access_only`. Señales: unresolved **1** (Maria Fernanda,
+draft 07-29, decisión manual de HR), executed_member_still_active **0**, deprovisioned_without_case 0.
+
+🔴 **Incidente «colaboradores fantasma» (2026-09-03, ~17:50Z, resuelto en datos):** la pre-nómina de septiembre mostró
+seis `Colaborador <uuid>` «sin contrato»: eran los sujetos sintéticos de mi live test (`TASK-1349 live access`),
+inactivos pero con compensación abierta; el roster relajado de Slice 2 los dejaba entrar y `derivePolicy` trataba su
+caso `identity_only` ejecutado como hecho de salida decidido → `full_period`. Cerré sus 9 versiones de compensación por
+command (`closeCompensationVigencyAtExit`), la política ya no cuenta un caso `identity_only` como hecho laboral
+(`hasDecidedExitFact`), y el live test cierra la compensación de sus sujetos al terminar. Roster de septiembre
+verificado: 5 personas reales con compensación, cero uuids. El fix de código viaja en el PR #220 (develop), sin mergear.
+
+🔴 **Incidente Valentina Hoyos (recuperación gobernada preparada por Codex):** la lane A la desactivó pese a tener una
+relación `contractor` activa desde 2026-08-20 (reingreso). Fix commiteado en develop `c5c030e99` (guard
+`findReentryAfterExit` + señal excluye reingresos) — **NO está en `main`: producción sigue sin la guarda hasta el
+próximo release.** El intento de reactivarla por `updateMember` falló a mitad (ISSUE-163) y su `member.updated`
+reactivó la relación employee terminada; ya la re-terminé al 30/04 por command canónico. **Residual que el
+clasificador impidió corregir en Claude:** `status='inactive'`, `contract_end_date=2026-04-30`, `assignable=false` y su
+asignación cerrada. Codex preparó command transaccional con preview real; SQL puntual retirado. Ver
+[runbook de recuperación](docs/operations/runbooks/workforce-reentry-recovery.md). Falta desplegar la guarda del consumidor
+antes de aplicar y verificar la recuperación; acceso, contratos y pagos siguen intactos.
+Finance de Felipe (obligación junio + SII) sigue como dependencia sin command de anulación. UI: TASK-1814.
 
 Offboarding (2026-09-03): auditoría UI/código/PG registrada en
 [informe](docs/audits/payroll/OFFBOARDING_ROOT_CAUSE_AND_REMEDIATION_2026-09-03.md).

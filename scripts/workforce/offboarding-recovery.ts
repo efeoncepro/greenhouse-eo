@@ -100,6 +100,7 @@ const main = async () => {
   }
 
   type CohortRow = {
+    profile_id: string
     member_id: string
     display_name: string
     active: boolean
@@ -120,7 +121,7 @@ const main = async () => {
 
   const cohort = await runGreenhousePostgresQuery<CohortRow>(
     `
-      SELECT m.member_id, m.display_name, m.active,
+      SELECT c.profile_id, m.member_id, m.display_name, m.active,
              c.offboarding_case_id, c.public_id, c.status, c.rule_lane, c.separation_type, c.source,
              c.effective_date::text AS effective_date, c.last_working_day::text AS last_working_day,
              c.metadata_json -> 'review' ->> 'decision' AS review_decision,
@@ -138,10 +139,31 @@ const main = async () => {
     [args.members.length > 0 ? args.members : null]
   )
 
+  // The preview uses the exact canonical resolver used again inside the apply
+  // transaction. An active member after a historical exit is not itself drift.
+  const reentries = await withTransaction(async client => {
+    await client.query('SET TRANSACTION READ ONLY')
+    const found = new Map<string, NonNullable<Awaited<ReturnType<typeof offboarding.findReentryAfterExit>>>>()
+
+    for (const row of cohort) {
+      if (row.status !== 'executed' || !row.active || !row.last_working_day) continue
+
+      const reentry = await offboarding.findReentryAfterExit(client, {
+        profileId: row.profile_id, memberId: row.member_id, lastWorkingDay: row.last_working_day
+      })
+
+      if (reentry) found.set(row.offboarding_case_id, reentry)
+    }
+
+    return found
+  })
+
   const classify = (row: CohortRow) => {
     const isIdentity = row.rule_lane === 'identity_only' || row.separation_type === 'identity_only'
 
     if (row.status === 'executed') {
+      if (reentries.has(row.offboarding_case_id)) return 'reentry_preserved'
+
       return !isIdentity && row.active ? 'A_close_lifecycle' : 'ok'
     }
 
@@ -188,6 +210,13 @@ const main = async () => {
   if (!args.apply) {
     for (const row of cohort) {
       const kind = classify(row)
+
+      if (kind === 'reentry_preserved') {
+        const reentry = reentries.get(row.offboarding_case_id)!
+
+        console.log(`\n  [preservado] ${row.public_id}: episodio ${reentry.kind} ${reentry.id} vigente desde ${reentry.from}; no se desactiva a la persona ni se cierran sus asignaciones.`)
+        continue
+      }
 
       if (kind === 'ok' || kind === 'in_lifecycle' || kind === 'manual_decision_pending') {
         if (kind === 'manual_decision_pending') console.log(`\n  [manual] ${row.public_id}: draft manual con fecha pasada — HR decide aprobar/cancelar por el flujo normal; bloquea nómina mientras tanto.`)
