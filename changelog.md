@@ -7,6 +7,74 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-03 — TASK-1349: revisión contractual de offboarding, elegibilidad por episodio y writeback de lifecycle (code complete, sin push)
+
+Cierra el circuito SCIM → decisión → nómina → lifecycle que la auditoría del 03/09 encontró incompleto (ISSUE-117,
+near miss del 06/07). Nómina: el resolver de elegibilidad elige el caso gobernante por relevancia temporal, sirve
+`contract_type_snapshot` (el threshold `international_internal` era inalcanzable), detecta reingresos y deja de tratar
+`members.active=false` como filtro histórico (un inactivo con salida el 02/06 conserva mayo íntegro); una salida sin
+resolver relevante al período mantiene al colaborador proyectado pero **bloquea calcular/aprobar** (readiness
+`unresolved_exit_signal`, `calculatePayroll` 409) y una falla del resolver ya no incluye a todos en silencio.
+Offboarding: command `reviewOffboardingCase` (`access_only` | `relationship_ended`, causal y fechas explícitas,
+`expectedUpdatedAt`, audit + outbox), guard «sin revisión no se aprueba» en el state machine, executor lane-aware
+(solo acceso no toca compensación/relación/member; término real termina relación con fecha real y desactiva member
+detrás de `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED`, OFF), proyecciones honestas en la cola, tres señales
+nuevas, guards de ownership en SCIM y backfill BQ, capability `workforce.offboarding.review_case` (seed aplicado),
+rutas HR + carril `app`, y `pnpm workforce:offboarding:recovery` (dry-run ejecutado sobre la cohorte real; nada
+aplicado). Tras el release la nómina de septiembre bloqueará hasta resolver Felipe y Maria Fernanda: es el control
+buscado. Pendiente: release, flag ON tras smoke en staging, recovery autorizada, UI TASK-1814, conciliación Finance.
+
+## 2026-09-03 — TASK-1806 seguimiento: alerta Teams determinista para drift de metodología ETV
+
+Nuevo cron `ops-seo-etv-drift-watch` (Cloud Scheduler, diario 12:00 America/Santiago, sin flag) en el
+ops-worker: lee la señal existente `seo.etv_methodology.drift` y avisa a Microsoft Teams sólo si
+`severity=error`, vía el dispatcher determinista `sendManualTeamsAnnouncement` y un destino nuevo
+`growth-seo-reliability-alerts` (mismo canal "EO - Admin" que `production-release-alerts`). Antes,
+la única forma de enterarse era abrir `/admin/operations`. Verificado en vivo (rev `ops-worker-00637-2ww`):
+respondió `warning`/`alerted:false`, correcto para el estado actual de la señal.
+
+## 2026-09-03 — TASK-1806: Improved ETV de DataForSEO en producción (rebaseline versionado)
+
+Release `bda12be7e33a` (PR #218, orquestador `33758619690`, manifest `released` 13:14Z, watchdog `ok`). El módulo
+SEO sirve desde hoy `improved_layout_clickstream_v2` en los siete caminos consumidores: ops-worker (`deploy.sh`,
+rev `00636-h6w`) y Vercel Production+staging con ambos selectores en improved; canary de contrato 13:15:26Z sobre
+los lanes de Berel. Antes: contract de schema ETV aplicado (`20260903103858964`), shadow `exact_ab` de 26 requests
+(USD 1,095) evaluado contra Search Console — improved 6× mejor calibrado en Berel (err. rel. 49 % vs 321 %),
+Jaccard 1,0 en páginas/subdominios, historia continua —, memo de decisión y aprobación del operador; drill de
+rollback en staging; rebaseline acotado (historia improved de Berel y Comex, USD 0,2568). Las cifras de tráfico
+estimado bajan ≈ 60 % por cambio de fórmula del proveedor, no por pérdida real; cada cifra declara `etvMethodology`.
+Efeonce se mide aparte de los clientes (guard de organización en celdas bulk). Writers `rowsWritten` ahora cuentan
+filas insertadas. Legacy sólo vuelve como rollback antes del corte 2026-11-01T00:00:00Z.
+
+## 2026-09-03 — Berel: cobertura por negocio, skills sincronizadas y minería trazable
+
+Decisión local del operador 2026-09-02: fortalecer elección, protección y aplicación, manteniendo color
+y paletas. [Estrategia](docs/operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md), inventario de 49 cuerpos,
+modelo/brief/manual/funcional y skills espejo Berel/SEO-AEO/DataForSEO actualizados; Playbook Notion
+ampliado y releído. [Discovery](docs/audits/seo/BEREL_CAPILLARY_KEYWORD_MINING_2026-09-02.md):
+14 runs Labs, 1.517 keywords distintas, 13 SERPs y 52 PAA; costo reportado US$1,23572.
+Mapa propuesto de 27 intenciones, no 27 artículos aprobados. No tracking, calendario, CMS ni release.
+Ampliación 2026-09-03: skill Berel y espejos incorporan completitud técnica por macropaso, correcciones
+acotadas y conciliación de producto; se retira la inferencia «campo CMS vacío = tiempo inexistente».
+Control técnico y caso Berelex Semibrillante en módulos 12/13; N29 corregido en Notion, artes y
+derivados pendientes, sin publicación. Evidencia: [QA de guardrails](docs/audits/seo/BEREL_TUTORIAL_GUARDRAILS_2026-09-03.md).
+Clasificación de piezas: 51 tareas corregidas y releídas; la skill exige tipo/canal/formato
+y excluye principales del conteo visual. [Auditoría y límites](docs/audits/seo/BEREL_PIECE_COUNT_CLASSIFICATION_2026-09-03.md).
+Tipo/canal obligatorios desde la creación de cada tarea visual, incluidos bloqueados; requisitos y
+checklists explícitos en banners, sociales y fotos. Se mantiene el esquema y la agrupación existentes.
+Distribución: cuatro opciones, no cuatro derivados obligatorios; módulo 15 y matrices por artículo.
+Playbooks Social/Producción en Notion alineados, Instagram Story corregido, contrato 8 artículos
+de 3.000–5.000 palabras/50 gráficas/3 videos y cortesía extendida a nov/dic registrados. Octubre
+excluido. Aclaración: 50 incluyen blog/RRSS; Blog/Facebook/Instagram/Pinterest. Priorización N52→Navidad
+aprobada: 4 banners N52 fuera del paquete, 4 banners y 2 sociales N59 creados. Distribución 50 gráficas
++ 3 videos por mes, con reservas técnicas/editoriales; 193 páginas modificadas releídas, sin pérdida de historial.
+
+Corrección de numeración verificada: [mapa por ID y readback 179/179](docs/audits/seo/BEREL_EDITORIAL_NUMBERING_2026-09-03.md).
+Skill Berel módulo 16: bloques mensuales completos, reserva de slots, cambios coordinados y aliases
+de archivos; no numerar por orden de trabajo. Se preserva el corte histórico descrito arriba.
+Complemento de `1fcc2ade3`: metodología de research SEO/AEO y DataForSEO versionada con su referencia
+canónica de minería, gate de espejos y documentación de priorización/brief/operación; sin cambios runtime.
+
 ## 2026-09-03 — TASK-1805 en producción: foundation ETV versionada desplegada, selección legacy explícita
 
 Release `5ec4cf769977` (run `33698245254`): readers/lane/MCP sirven `etvMethodology`, señal `seo.etv_methodology.drift`,
@@ -1041,131 +1109,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
 - Aplicado en los dos lugares (SoT `services/ops-worker/deploy.sh` + `gcloud scheduler jobs update`).
   ⚠️ `main` todavía declara `*/10`: hasta el próximo release, un deploy del worker desde `main`
   revertiría el schedule en silencio. Documentado en el Handoff.
-
-## 2026-08-28 — Release a producción `e82c18579b05`: el contrato de discovery corregido, vivo
-
-- Paso a producción de **TASK-1694** y **TASK-1692** (PR #209, 30 archivos de código, **cero
-  migraciones**). Manifest `released` en un solo run del orquestador (`33208942436`, 12m51s), ambos
-  gates `production` aprobados sin stall, watchdog `ok` con `drift_count=0`.
-- **Primer release del ledger que pasa sin break-glass desde un batch de dos tasks.** La razón es
-  estructural: sin migraciones no hay dominio irreversible, así que el classifier dio `ship` limpio.
-- **Cero flags que prender.** El release no introduce ninguno, y los que gatean el dominio ya
-  estaban `true` en Production — verificado leyendo el VALOR, no la presencia.
-- 🔴 **Verificado con canary de contrato, no sólo con el manifest.** Producción respondió
-  `maxLinkBarrier aceptado; ignoredFilters=maxDifficulty` (TASK-1694 ejecutándose), y el lane
-  devolvió **400** a un consumer intentando escribir `promoted_to_tracking` o el retirado
-  `selected_for_target` (TASK-1692: el boundary de escritura vivo). Un manifest `released` prueba
-  despliegue; el canary prueba comportamiento.
-- Gateway MCP desplegado con el schema federado nuevo de `get_seo_keyword_discovery`.
-- **Smoke con gasto ejecutado el mismo día** — 3 corridas, USD 0,0482, MX y CL, los dos endpoints
-  cuyo payload cambió. Las tres `succeeded`: el payload sin `filters` es aceptado por Labs (riesgo
-  de la matriz refutado con evidencia) y `volumePolicy: "all"` quedó persistido en el snapshot.
-- 🔴 **Y desmintió la justificación escrita de la propia task**: 102 candidatos, 2 endpoints, 2
-  mercados → CERO con volumen nulo o cero. Los índices de sugerencias e ideas del proveedor sólo
-  devuelven keywords con volumen medido, así que el filtro que se quitó era un **no-op** ahí; los
-  nulos aparecen sólo en `keyword_overview`, que nunca lo llevó. Quitarlo sigue siendo correcto
-  (elimina una asimetría no declarada), pero el beneficio prometido no tiene evidencia. `TASK-1700`
-  (P0) queda desbloqueada y con su prerequisito de runtime cumplido.
-
-## 2026-08-28 — TASK-1692: el candidato de discovery recuerda qué se decidió sobre él
-
-- **El hecho lo escribe el primitive que lo produce, jamás el consumer.** De los cinco
-  `action_kind` que el dominio declaraba, sólo `dismissed` tenía writer: preparar consultas AEO o
-  promover a seguimiento pasaban de verdad y no dejaban rastro. Ahora `createGroundedQueryDraft`
-  escribe `selected_for_grounded_query` y `applyKeywordTracking` escribe `promoted_to_tracking`
-  **en la misma transacción que abre la membresía**. Si el writer viviera en cada consumer,
-  bastaría con que se cayera la red entre las dos llamadas para dejar el compromiso de gasto hecho
-  y la decisión sin autor.
-- **Guard en runtime, no sólo en test:** los dos lanes validan contra
-  `SEO_DISCOVERY_CONSUMER_ACTION_KINDS`, así que `promoted_to_tracking` deja de ser escribible
-  desde afuera. `record_action` queda para lo que una persona decide sin que ningún command lo
-  produzca — descarte, rechazo y la **re-selección** de un descartado, que ahora existe y no
-  necesitó ni command nuevo ni migración: el ledger es append-only, así que re-seleccionar ES
-  escribir una decisión posterior que supersede al descarte.
-- **`selected_for_target` retirado del enum TS**, con el `CHECK` de la base intacto para que una
-  fila histórica siga siendo legible. No tenía writer y no podía tenerlo: la intención es atributo
-  de la MEMBRESÍA con autor y fecha, así que un candidato que no se sigue no puede tener intención
-  declarada.
-- **Efecto visible sin un solo cambio de UI:** el chip del candidato se mueve solo (deja de decir
-  "Nuevo" tras un draft AEO o una promoción) y el inbox deja de poner arriba lo ya resuelto.
-- **Los grados de atomicidad se declaran, no se disimulan.** Tracking es atómico. El bridge grounded
-  no puede serlo —el draft se escribe en otra conexión— así que expone `decisionLogged: false` +
-  aviso en vez de callarlo o descartar un draft que ya pagó una llamada LLM; repetir la acción
-  repara la fila sin crear un draft nuevo.
-- Sin migración, sin flag, sin capability. **Sin backfill a propósito**: inventar `actor` y
-  `created_at` sería fabricar autoría en un log de decisiones.
-- Verificado contra PG real en transacciones que abortan (11/11 + 12/12), incluido que con un
-  candidato inexistente **no queda membresía**. Tres falsos verdes destapados en el camino: el
-  check del trigger append-only pasaba sobre tabla vacía (es `FOR EACH ROW`), un mock devolvía la
-  fila del target para cualquier consulta, y el parser del guard nuevo devolvía lista vacía.
-- Estado: **`code complete, rollout pendiente`** — falta verificación funcional en staging.
-  Desbloquea `TASK-1700`, que queda `Blocked by: none`.
-
-## 2026-08-28 — TASK-1694: en descubrimiento SEO, un candidato es una keyword y la dificultad cruda deja de decidir
-
-- **`maxDifficulty` se acepta pero ya no filtra**, y la respuesta lo declara en `ignoredFilters`
-  con su reemplazo. El filtro canónico es `maxLinkBarrier` (`low|medium|high`) sobre la barrera
-  derivada por `deriveLinkBarrier`, con `includeUnknownBarrier` (default `false`): "Sin dato" no
-  es "Baja". Medido contra el store real: **764 de 923 filas tienen `keyword_difficulty = 0`**, así
-  que en es-LATAM el filtro viejo no discriminaba nada — sobre la corrida productiva,
-  `maxDifficulty=20` devolvía las 10 keywords, barrera Alta incluida.
-- **El reader colapsa por `normalizedKeyword`**: la misma keyword hallada por dos métodos es UNA
-  fila con `candidateIds[]` + `provenance[]`, y `totalCandidates` cuenta keywords distintas. Es
-  cambio de cardinalidad del contrato, no de la UI: aguas abajo la cola priorizada (TASK-1700) es
-  un aggregate append-only y habría congelado la misma decisión hasta cuatro veces, con cuatro
-  compromisos de gasto sobre una sola intención. Levanta su bloqueo duro.
-- **`clusterConflict`** advierte canibalización contra el set seguido del target (hasta 5 miembros
-  nombrados + total), derivado al leer y con **cero llamadas al proveedor**. Señal separada de
-  `alreadyTracked`, con `unknown` que nunca se lee como `clear`.
-- **Los cuatro adapters de expansión compran igual**: `keyword_suggestions` y `keyword_ideas` dejan
-  de mandar `filters` de `search_volume`. El filtro no abarataba la llamada (se paga por fila y el
-  `limit` ya la acota) — sólo cambiaba qué se compraba por el mismo precio, y en mercados ralos se
-  comía el long-tail. Cada corrida persiste su `volumePolicy`; las anteriores se leen con el
-  default histórico.
-- 🔴 **Un defecto propio lo destapó la verificación runtime, no los tests**: `core_keyword IS NULL`
-  se estaba leyendo como "no se sabe" y dejaba 8 de 10 candidatos en `unknown`, escondiendo
-  colisiones reales. El proveedor no emite el core cuando la keyword YA ES la canónica del clúster
-  (527 nulos, 396 apuntando a otra, **cero autorreferentes** en 923 filas), así que el core efectivo
-  es `core_keyword ?? la keyword misma`.
-- Federado en el mismo PR: route admin, lane ecosystem y tool MCP `get_seo_keyword_discovery`. El
-  gateway `efeonce-mcp` tiene su commit local (espejo de inventario, schema, descripción y canary,
-  67 tests verdes) **sin push**: viaja con su próximo release.
-- Estado: **`code complete, rollout pendiente`** — falta la corrida de smoke con gasto (~USD 0,013)
-  y el deploy del gateway.
-
-## 2026-08-28 — Release a producción `c983be7f18e6`: carril Growth/SEO vivo, flag prendido y gateway MCP a 27 tools
-
-- Paso a producción end-to-end del trabajo del día (PR #208, 181 archivos, 4 migraciones):
-  **TASK-1696** (dimensión de consumidor del ledger de gasto DataForSEO), **TASK-1662** (fundación
-  del gap competitivo), **TASK-1699** (top-N del SERP + descubrimiento de competidores por
-  recurrencia) y **TASK-1652** (request AI Mode del grader). Manifest `released`
-  (`c983be7f18e6-92b1b327-a1c9-4e7a-85dc-6a5e300f4e32`, run `33178544139`, 11m41s), watchdog `ok`
-  con `drift_count=0`. Break-glass por `db_migrations` con razón verificada: las 4 migraciones ya
-  figuraban aplicadas en la instancia única Cloud SQL antes del dispatch.
-- `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED` quedó **ON en los dos runtimes**: ya estaba en el
-  `ops-worker` (escritura) y este release lo prendió en Vercel Production (lectura) con su redeploy
-  obligatorio. La verificación no fue "la env var existe" sino el canary contra producción
-  devolviendo `ok:true` en vez de `disabled`.
-- El gateway `mcp.efeonce.org` pasó de **21 a 27 tools SEO** (revisión
-  `efeonce-mcp-gateway-00024-8b8`): entran `get_seo_provider_spend`, `get_seo_keyword_gap`,
-  `declare_seo_competitors`, `retire_seo_competitors`, `get_seo_serp_top_results` y
-  `get_seo_competitor_candidates`, sin un solo cambio en Entra — los writes viajan en el scope
-  `efeonce.mcp.seo.write` existente y siguen fail-closed hasta TASK-1631.
-- **Corregida la regla del merge canónico en los 5 lugares que la prescribían** (runbook, playbook,
-  las dos skills espejadas de release y el manual del orchestrator, que contradecía al resto). Ya no
-  cuenta V1: la clasifica. Sólo squashes de release ⇒ `-s ours`; un hotfix cuyo contenido no volvió a
-  `develop` ⇒ parar y reconciliarlo. Cuarta verificación nueva (`--diff-filter=A`) y `-X ours`
-  degradado a excepción con auditoría completa obligatoria.
-- **`TASK-1790` registrada**: el merge canónico `develop←main` pasa de regla en prosa a gate ejecutable
-  (`pnpm release:merge-canonical`), que clasifica los commits divergentes contra `release_manifests` y se
-  detiene ante lo que no reconoce. Se registra porque la prosa ya se había corregido una vez y no alcanzó:
-  tres releases seguidos pisaron la misma clase de bug.
-- Barrido documental post-release: gateway MCP a 27 tools en skills/runbook/manuales, estado de flags
-  por runtime en arquitectura del módulo SEO + rules + skills `dataforseo-operator` + EPIC-022, y
-  deltas 2026-08-28 en 15 tasks con impacto cruzado. `TASK-1699` y `TASK-1662` quedan a propósito en
-  `in-progress`: la serie del top-N no arranca hasta el 2026-08-29 y el Slice 4 de 1662 sigue
-  bloqueado por `TASK-1700`.
-- Hallazgo de proceso: la regla del merge canónico del runbook (`-s ours` sólo si V1 está vacía)
-  está mal formulada para un flujo con squash-merge, donde V1 nunca está vacía. `-X ours` volvió a
-  duplicar contenido documental y a resucitar tasks en un lifecycle viejo **con la V2 vacía**; la
-  pregunta correcta es si `main` aporta archivos propios.

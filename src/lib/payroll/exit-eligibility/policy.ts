@@ -57,6 +57,23 @@ export type ExitCaseFacts = {
   contractTypeSnapshot: ContractType | null
   lastWorkingDay: string | null
   effectiveDate: string | null
+  /**
+   * TASK-1349 — origen del caso (`scim`, `admin`, `manual_hr`, …). Informativo:
+   * la política no distingue por origen (una señal SCIM y un draft manual sin
+   * resolver exigen la misma revisión); se conserva como evidencia.
+   */
+  exitSource?: string | null
+  /**
+   * TASK-1349 — fecha en que la señal de salida entró al sistema
+   * (`created_at::date` del caso). Sustituye al cutoff cuando el caso aún no
+   * tiene fechas para decidir si la señal es relevante al período.
+   */
+  caseSignalDate?: string | null
+  /**
+   * TASK-1349 — `true` cuando existe una compensación que empieza después del
+   * cutoff de la salida decidida y no después del fin del período: reingreso.
+   */
+  reenteredAfterExit?: boolean
 }
 
 /**
@@ -115,21 +132,56 @@ const buildBaseWindow = (
   cutoffDate
 })
 
+const STATUSES_UNRESOLVED: ReadonlySet<ExitStatus> = new Set<ExitStatus>(['draft', 'needs_review', 'blocked'])
+
+const hasDecidedExitFact = (facts: ExitCaseFacts, cutoffDate: string | null): boolean =>
+  Boolean(facts.exitStatus && STATUSES_DECIDED.has(facts.exitStatus) && cutoffDate)
+
+/**
+ * TASK-1349 — an unresolved case (draft / needs_review / blocked) governs the
+ * period when its signal (cutoff, or the date the case entered the system when
+ * it has no dates yet) is on or before `periodEnd`. A signal that only exists
+ * after the period cannot demand a review of it.
+ */
+export const isUnresolvedExitRelevantToPeriod = (
+  facts: Pick<ExitCaseFacts, 'exitStatus' | 'caseSignalDate' | 'lastWorkingDay' | 'effectiveDate'>,
+  periodEnd: string
+): boolean => {
+  if (!facts.exitStatus || !STATUSES_UNRESOLVED.has(facts.exitStatus)) return false
+
+  const signal = computeCutoff(facts.lastWorkingDay, facts.effectiveDate) ?? facts.caseSignalDate ?? null
+
+  if (!signal) return false
+
+  return signal <= periodEnd
+}
+
 /**
  * Derive the canonical eligibility window from case facts + period.
  *
- * Decision matrix (§2 ADR):
+ * Decision matrix (§2 ADR + Architecture Decision 2026-09-03):
  *
- * - `members.active = FALSE` → `exclude_entire_period`
+ * - decided case with cutoff + compensation starting after it (≤ periodEnd) →
+ *   re-entry: `full_period` + info `reentry_after_prior_exit` (the previous
+ *   exit does not govern this episode)
+ * - `members.active = FALSE`:
+ *   - with a decided exit fact (approved/scheduled/executed + cutoff) → the
+ *     cutoff governs, exactly like an active member (history is preserved:
+ *     a May payroll is still eligible when the exit is 2 June)
+ *   - without one → `exclude_entire_period` + warning `inactive_without_exit_fact`
+ *     (`active` is current availability, never a labor fact)
  * - no case OR status ∈ {draft, needs_review, blocked, cancelled} → `full_period`
- *   (+ info warning if draft/needs_review con cutoff en periodo)
+ *   (+ info warning if draft/needs_review con cutoff en periodo). When the
+ *   unresolved signal is relevant to the period, `reviewRequired = true` +
+ *   blocking warning `unresolved_exit_signal`: access alone never removes pay,
+ *   but nobody may calculate or approve without deciding.
  * - lane `identity_only` → `full_period` (identity doesn't gate payroll)
  * - lane `unknown` → `full_period` + `unclassified_lane` warning (conservador)
  * - status decided + no cutoff date → `full_period` + `effective_date_only_no_lwd` warning
  * - cutoff < periodStart → `exclude_entire_period` (any lane)
  * - cutoff > periodEnd → `full_period` (exit is after this period)
  * - cutoff in [periodStart, periodEnd]:
- *   - external_payroll | non_payroll → `exclude_from_cutoff` (Greenhouse no paga)
+ *   - external_payroll | non_payroll | international_internal → `exclude_from_cutoff`
  *   - internal_payroll | relationship_transition:
  *     - executed → `partial_until_cutoff` (prorratear hasta LWD)
  *     - approved/scheduled (no executed) → `full_period` (esperar finiquito)
@@ -141,22 +193,54 @@ export const derivePolicy = (
 ): WorkforceExitPayrollEligibilityWindow => {
   const warnings: ExitEligibilityWarning[] = []
   const cutoffDate = computeCutoff(facts.lastWorkingDay, facts.effectiveDate)
-  const relationshipStatus = inferRelationshipStatus(facts.exitStatus, facts.memberActive)
+  const decidedExitFact = hasDecidedExitFact(facts, cutoffDate)
+  const relationshipStatus = inferRelationshipStatus(facts.exitStatus, facts.memberActive || decidedExitFact)
   const base = buildBaseWindow(facts, periodStart, periodEnd, cutoffDate, relationshipStatus)
 
-  // Member inactive → defensive exclusion regardless of case
-  if (!facts.memberActive) {
+  // Re-entry: a new compensation episode started after the decided exit.
+  // The previous exit does not govern this period.
+  if (facts.reenteredAfterExit === true && decidedExitFact && facts.memberActive) {
+    warnings.push({
+      code: 'reentry_after_prior_exit',
+      severity: 'info',
+      messageKey: 'exit_eligibility.reentry_after_prior_exit',
+      evidence: { cutoffDate, exitCaseId: facts.exitCaseId, exitStatus: facts.exitStatus }
+    })
+
+    return {
+      ...base,
+      relationshipStatus: 'active',
+      eligibleFrom: periodStart,
+      eligibleTo: periodEnd,
+      projectionPolicy: 'full_period',
+      reviewRequired: false,
+      warnings
+    }
+  }
+
+  // Member inactive WITHOUT a decided exit fact → defensive exclusion, declared.
+  // With a decided fact, the cutoff below governs (history preserved).
+  if (!facts.memberActive && !decidedExitFact) {
+    warnings.push({
+      code: 'inactive_without_exit_fact',
+      severity: 'warning',
+      messageKey: 'exit_eligibility.inactive_without_exit_fact',
+      evidence: { exitCaseId: facts.exitCaseId, exitStatus: facts.exitStatus, exitLane: facts.exitLane }
+    })
+
     return {
       ...base,
       relationshipStatus: 'ended',
       eligibleFrom: null,
       eligibleTo: null,
       projectionPolicy: 'exclude_entire_period',
+      reviewRequired: false,
       warnings
     }
   }
 
-  // No case OR case in non-blocking status → full period
+  // No case OR case in non-blocking status → full period (+ review when the
+  // unresolved signal is relevant to this period).
   if (!facts.exitStatus || STATUSES_NON_BLOCKING.has(facts.exitStatus)) {
     if (
       (facts.exitStatus === 'draft' || facts.exitStatus === 'needs_review') &&
@@ -171,11 +255,31 @@ export const derivePolicy = (
       })
     }
 
+    const reviewRequired = isUnresolvedExitRelevantToPeriod(facts, periodEnd)
+
+    if (reviewRequired) {
+      warnings.push({
+        code: 'unresolved_exit_signal',
+        severity: 'blocking',
+        messageKey: 'exit_eligibility.unresolved_exit_signal',
+        evidence: {
+          exitCaseId: facts.exitCaseId,
+          exitCasePublicId: facts.exitCasePublicId,
+          exitStatus: facts.exitStatus,
+          exitLane: facts.exitLane,
+          exitSource: facts.exitSource ?? null,
+          cutoffDate,
+          caseSignalDate: facts.caseSignalDate ?? null
+        }
+      })
+    }
+
     return {
       ...base,
       eligibleFrom: periodStart,
       eligibleTo: periodEnd,
       projectionPolicy: 'full_period',
+      reviewRequired,
       warnings
     }
   }
@@ -188,6 +292,7 @@ export const derivePolicy = (
       eligibleFrom: periodStart,
       eligibleTo: periodEnd,
       projectionPolicy: 'full_period',
+      reviewRequired: false,
       warnings
     }
   }
@@ -206,6 +311,7 @@ export const derivePolicy = (
       eligibleFrom: periodStart,
       eligibleTo: periodEnd,
       projectionPolicy: 'full_period',
+      reviewRequired: false,
       warnings
     }
   }
@@ -225,6 +331,7 @@ export const derivePolicy = (
       eligibleFrom: periodStart,
       eligibleTo: periodEnd,
       projectionPolicy: 'full_period',
+      reviewRequired: false,
       warnings
     }
   }
@@ -237,6 +344,7 @@ export const derivePolicy = (
       eligibleFrom: null,
       eligibleTo: null,
       projectionPolicy: 'exclude_entire_period',
+      reviewRequired: false,
       warnings
     }
   }
@@ -249,6 +357,7 @@ export const derivePolicy = (
       eligibleFrom: periodStart,
       eligibleTo: periodEnd,
       projectionPolicy: 'full_period',
+      reviewRequired: false,
       warnings
     }
   }
@@ -267,6 +376,7 @@ export const derivePolicy = (
       eligibleFrom: null,
       eligibleTo: null,
       projectionPolicy: 'exclude_from_cutoff',
+      reviewRequired: false,
       warnings
     }
   }
@@ -279,6 +389,7 @@ export const derivePolicy = (
         eligibleFrom: periodStart,
         eligibleTo: cutoffDate,
         projectionPolicy: 'partial_until_cutoff',
+        reviewRequired: false,
         warnings
       }
     }
@@ -291,13 +402,13 @@ export const derivePolicy = (
       eligibleFrom: periodStart,
       eligibleTo: periodEnd,
       projectionPolicy: 'full_period',
+      reviewRequired: false,
       warnings
     }
   }
 
   // Defensive fallback — should not reach here. If schema adds a new lane,
   // CHECK constraint blocks it from persisting AND this fallback alerts.
-  STATUSES_DECIDED // referenced for compile-time anchor (unused at runtime)
   warnings.push({
     code: 'unclassified_lane',
     severity: 'warning',
@@ -310,6 +421,7 @@ export const derivePolicy = (
     eligibleFrom: periodStart,
     eligibleTo: periodEnd,
     projectionPolicy: 'full_period',
+    reviewRequired: false,
     warnings
   }
 }

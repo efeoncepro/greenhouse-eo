@@ -206,6 +206,9 @@ Indice maestro de la documentacion no operativa del repo.
 - [HR_PAYROLL_BRANCH_RESCUE_RUNBOOK_V1.md](operations/HR_PAYROLL_BRANCH_RESCUE_RUNBOOK_V1.md)
 - [RELEASE_CHANNELS_OPERATING_MODEL_V1.md](operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md)
 - [SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md](operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md)
+- [Berel — estrategia de cobertura editorial](operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md), con inventario auditado y criterios de minería por necesidad.
+- [Berel — clasificación y conteo de piezas](audits/seo/BEREL_PIECE_COUNT_CLASSIFICATION_2026-09-03.md): etiquetas verificadas y límites del conteo por tarea frente a archivos.
+- [Berel — distribución social selectiva](audits/seo/BEREL_SELECTIVE_SOCIAL_DISTRIBUTION_2026-09-03.md): selección por artículo, cupos y aplicación nov/dic verificada; entregas no certificadas y octubre excluido.
 - [SEO_CONTENT_BRIEF_STRUCTURE_V1.md](operations/SEO_CONTENT_BRIEF_STRUCTURE_V1.md)
 
 ### Changelog

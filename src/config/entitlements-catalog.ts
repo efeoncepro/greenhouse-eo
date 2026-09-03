@@ -1668,6 +1668,19 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     defaultScope: 'tenant'
   },
   {
+    // TASK-1349 — revisión/corrección de un caso de offboarding existente con
+    // decisión contractual explícita: `access_only` (baja de acceso; no toca
+    // relación, compensación ni member) o `relationship_ended` (término real con
+    // causal respaldada y fechas explícitas; recomputa lane/requisitos e invalida
+    // la aprobación previa). Distinta de `hr.offboarding_case:update` a propósito:
+    // editar un caso no es reclasificar la naturaleza laboral de una salida.
+    // Reason >= 10 chars + expectedUpdatedAt (409 conflict) enforced en el command.
+    key: 'workforce.offboarding.review_case',
+    module: 'workforce',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
+  {
     // TASK-1019 — Workforce Contracting Studio (cartas oferta + contratos laborales
     // bilingües). read=ver cola/casos/drafts; manage=crear/editar casos y drafts;
     // ai_draft=disparar drafting Claude (advisory); approve=aprobar par bilingüe

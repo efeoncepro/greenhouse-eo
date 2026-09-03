@@ -1,7 +1,7 @@
 # Estructura canónica del brief editorial SEO/AEO — V1
 
 > **Tipo de documento:** contrato de proceso
-> **Versión:** 1.2 · **Creado:** 2026-08-25 · **Última actualización:** 2026-08-25
+> **Versión:** 1.3 · **Creado:** 2026-08-25 · **Última actualización:** 2026-09-02
 > **Dueño del oficio:** `content-marketing-studio` ([`templates/content-brief.md`](../../.codex/skills/content-marketing-studio/templates/content-brief.md)) + `copywriting` (titulares) + `seo-aeo` (descubribilidad y citabilidad)
 > **Metodología del research que lo alimenta:** [`SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md`](SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md)
 > **Cómo se deposita en el sistema del cliente:** [`producir-serie-de-briefs-seo.md`](../manual-de-uso/growth/producir-serie-de-briefs-seo.md)
@@ -109,6 +109,11 @@ Pillar o satélite, de qué territorio, **qué enlaza a qué en ambas direccione
 taxonomía. Si la pieza no tiene lugar en un clúster, decláralo — puede ser señal de que no debe
 escribirse todavía. Si la pieza pertenece a un ciclo anual de marca, la bidireccionalidad incluye
 **la edición del año anterior** (modelo operativo §5.2.1).
+
+Declarar categoría principal e intención; separar etiquetas de espacio/superficie y formato. Indicar
+qué hueco resuelve frente a páginas y secciones existentes, y si exige artículo nuevo o ampliación.
+La evidencia completa queda en el dossier, no en el brief. Aplicar el modelo operativo §2.3 y, para
+Berel, [su estrategia de cobertura](BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md).
 
 ### 6. La gran idea y el ángulo propietario
 **Una sola.** Qué dice esta pieza que nadie más puede decir, y por qué. Si dice todo, no dice nada.

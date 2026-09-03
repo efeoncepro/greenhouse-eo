@@ -1,7 +1,7 @@
 # SEO Editorial Prioritization Operating Model V1
 
 > **Tipo de documento:** Modelo operativo (proceso repetible, agnóstico al cliente).
-> **Versión:** 1.3 · **Fecha:** 2026-08-25.
+> **Versión:** 1.4 · **Fecha:** 2026-09-02.
 > **Ámbito:** cómo Efeonce ejecuta un research de SEO/AEO y una priorización editorial para un cliente
 > con blog activo, de punta a punta: insumos, carriles, intake del sistema editorial, secuencia,
 > criterio de descarte, producción de briefs, entrega, atomización y distribución, verificación y
@@ -206,6 +206,27 @@ capacidad faltante con demanda demostrada. Se registra como tal —igual que el 
 registra el caso inverso, reimplementar a mano lo que el portal ya tiene—.
 
 ---
+
+### 2.3 Cobertura temática orientada al negocio antes de minar
+
+La cantidad de artículos por categoría describe presencia editorial, no prioridad, demanda ni autoridad.
+Primero definir qué decisiones del comprador y usuario puede resolver legítimamente la marca. Clasificar
+una categoría principal por cuerpo e intención; espacio, superficie, producto y formato son ejes aparte.
+
+La matriz de research cruza categoría, problema, superficie/exposición y decisión. Cada celda declara
+cubierto / parcial / nuevo candidato / fuera de foco / bloqueado técnico, con página y sección propia.
+Leer también borradores futuros: una pieza desarrollada, una entrega y una publicación son hechos distintos.
+
+Capilaridad no significa una URL por keyword ni agotar un top-N del proveedor. Cada intención debe tener
+hogar canónico, satélites distintos y enlaces entrantes/salientes. Separar artículo nuevo, ampliación,
+consolidación, FAQ y ficha comercial. Minería y métricas no autorizan cambios de calendario o tracking.
+
+Presupuestar el conjunto de lotes antes de comprar, conservar procedencia y límites. PAA observada,
+consulta de research propuesta y prompt observado en un LLM nunca se rotulan como lo mismo.
+RICE requiere alcance y esfuerzo defendibles; si faltan, declarar prioridad estratégica provisional.
+
+Overlay Berel: [estrategia y baseline](BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md).
+Oficio de adquisición: dataforseo-operator, referencia 09-editorial-mining.md.
 
 ## 3. Los DOS CARRILES y por qué no se mezclan
 

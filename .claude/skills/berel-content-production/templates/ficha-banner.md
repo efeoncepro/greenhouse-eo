@@ -33,7 +33,7 @@
 - [ ] La descripción permite a diseño producirla **sin leer el artículo completo**
 - [ ] Declara su objetivo de permanencia y su justificación anti banner-blindness
 - [ ] N1 anota que también sirve de `og:image` (1200 × 630) y va **sin** lazy — es el LCP
-- [ ] N2 lleva 🔁 y sus cuatro variantes: Pin 2:3 1000×1500 · IG 4:5 1080×1350 · Historia 9:16 1080×1920 · Reel 9:16
+- [ ] N2 lleva 🔁 y solo las variantes seleccionadas: Pin 2:3 1000×1500 · Facebook 4:5 1080×1350 · Instagram Story 9:16 1080×1920 · Reel 9:16; catálogo sin cambio
 - [ ] Ningún HEX ni RGB de un color de PINTURA: solo familia + nombre + código
 - [ ] Si es infografía: **formato y variante declarados** (`../modules/10_FORMATOS_DE_INFOGRAFIA.md`) y acento en Rojo Editorial `#B3153A` o la paleta complementaria — nunca el rojo corporativo
 - [ ] Si aparece la Paleta Frida Kahlo, la pieza lleva el **logo de la licencia oficial**

@@ -53,6 +53,7 @@ const buildExitWindow = (overrides: Partial<WorkforceExitPayrollEligibilityWindo
   exitLane: null,
   exitStatus: null,
   projectionPolicy: 'full_period',
+  reviewRequired: false,
   cutoffDate: null,
   warnings: [],
   ...overrides
@@ -192,6 +193,7 @@ describe('resolvePayrollParticipationWindowsForMembers', () => {
           buildExitWindow({
             memberId: 'member-maria',
             projectionPolicy: 'exclude_from_cutoff',
+            reviewRequired: false,
             eligibleFrom: null,
             eligibleTo: null,
             cutoffDate: '2026-04-30',

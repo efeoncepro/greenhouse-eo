@@ -945,6 +945,14 @@ export const pgGetApplicableCompensationVersionsForPeriod = async (
             AND oc.last_working_day < $1::date
         )`
 
+  // TASK-1349 — `members.active` is CURRENT availability, not the historical
+  // filter. With the exit window ON, a member deactivated after a real exit
+  // still enters the roster for the periods a compensation version covers, and
+  // the canonical resolver decides (cutoff governs; inactive WITHOUT any exit
+  // fact is excluded, declared). Legacy inactive rows without compensation never
+  // enter (no `missing_compensation` noise). Flag OFF keeps `m.active = TRUE`.
+  const rosterAvailabilityGate = exitWindowEnabled ? '(m.active = TRUE OR cv.version_id IS NOT NULL)' : 'm.active = TRUE'
+
   const rows = await runGreenhousePostgresQuery<PgCompensationRow & { active: boolean }>(
     `
       SELECT DISTINCT ON (m.member_id)
@@ -992,7 +1000,7 @@ export const pgGetApplicableCompensationVersionsForPeriod = async (
         ON cv.member_id = m.member_id
        AND cv.effective_from <= $2::date
        AND (cv.effective_to IS NULL OR cv.effective_to >= $1::date)
-      WHERE m.active = TRUE
+      WHERE ${rosterAvailabilityGate}
         ${intakeGate}${legacyExitGate}
       ORDER BY m.member_id, cv.effective_from DESC, cv.version DESC
     `,

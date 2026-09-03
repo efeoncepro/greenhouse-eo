@@ -127,6 +127,79 @@ cliente, Greenhouse es el motor de métricas**. Producir contenido en esta base 
 crear ni editar una fórmula de métrica → skill `greenhouse-ico` +
 `docs/architecture/metrics/ICO_DELIVERY_METRICS_AGENT_INVARIANTS.md`.
 
+## Clasificación para conteos de piezas — verificada 2026-09-03
+
+No confundir cuatro propiedades: `Tipo de entregable` describe el oficio; `Tipo de pieza`
+y `Canal de pieza` alimentan los auxiliares de conteo; `Formato` distingue la estructura editorial.
+
+| Propiedad en Tareas | Tipo | Opciones exactas |
+|---|---|---|
+| `Tipo de pieza` | select | `Estatico` · `Video` |
+| `Canal de pieza` | select | `Blog` · `Social Media` |
+| `Formato` | select | `Articulo` · `Tutorial` |
+
+**Atención a los acentos:** Content Hub usa `Artículo`; Tareas usa `Articulo`. No crear opciones
+nuevas ni copiar literalmente el valor entre bases sin mapearlo.
+
+| Registro de producción | Tipo de pieza | Canal de pieza | Formato |
+|---|---|---|---|
+| Tarea principal editorial | vacío | vacío | Articulo o Tutorial, según Content Hub |
+| Banner N1–N4 | Estatico | Blog | hereda la estructura del Content Hub |
+| Secuencia de fotos Paso a Paso | Estatico | Blog | Tutorial |
+| Facebook, Pinterest, Story de imágenes estáticas | Estatico | Social Media | no aplica; no heredar Articulo/Tutorial |
+| Reel/TikTok/Short o Story efectivamente animada | Video | Social Media | no aplica |
+| Coordinación, ajustes o contenedor sin pieza independiente | vacío | vacío | solo si corresponde editorialmente |
+
+El criterio del operador es etiquetar las piezas visuales, no convertir la tarea principal
+en otra pieza. Puede conservar `Formato` y `Tipo de entregable = Contenido` sin canal de pieza.
+No duplicar el conteo agregando el subítem del Content Hub: su función es editorial, no otro asset.
+
+### Qué suma el esquema existente y qué no demuestra
+
+Las descripciones vivas del esquema declaran: `Es Estatico (1/0)` y `Es Video (1/0)`
+evalúan `Tipo de pieza`; `Es Pieza (1/0)` suma una tarea clasificada como uno de ambos.
+`Es Blog (1/0)` y `Es Social Media (1/0)` evalúan el canal, independientemente del tipo.
+Proyectos suma esos auxiliares mediante rollups sobre su relación `Tareas`.
+
+Por eso poner `Blog` en una principal infla el desglose Blog aunque no incremente Piezas Totales.
+La relación directa `Proyecto` es necesaria. Una etiqueta no acredita producción, aprobación ni
+entrega; reportar estados y bloqueos aparte, sin borrar etiquetas para esconder capacidad prevista.
+
+**Una tarea de cuatro fotos sigue sumando una unidad en ese modelo.** Igual sucede con una Story
+de varias pantallas o un paquete de variantes. No dividir la tarea canónica del tutorial ni cambiar
+fórmulas para simular cantidades. Si se necesitan archivos individuales, acordar primero la unidad
+de conteo y un campo de cantidad con su agregación; es un cambio de esquema distinto del etiquetado.
+
+### Obligatorio al crear tareas — confirmación del operador 2026-09-03
+
+Cada tarea de banner, secuencia de fotos o derivado social nace con `Tipo de pieza` y
+`Canal de pieza` en las **propiedades de la base Tareas**, no solo en el cuerpo o en Content Hub.
+Aplicar la matriz anterior incluso a reservas `Bloqueado` cuyo entregable ya esté definido.
+`Tipo de entregable` y `Formato` no sustituyen estas dos etiquetas.
+El operador confirmó conservar el patrón existente: **solo etiquetar**, sin añadir cantidades,
+modificar fórmulas ni dividir tareas. No convertir la necesidad de controlar el cupo en una migración.
+Si falta cualquiera de las dos etiquetas en una pieza visual, la creación del lote queda incompleta:
+corregir y releer todas las afectadas. Las principales editoriales y contenedores siguen excluidos.
+
+### Procedimiento obligatorio
+
+1. Resolver proyecto, tarea y pieza real; leer esquema y las opciones antes de escribir.
+2. Abrir la página por ID y confirmar título, relación, contenido y formato de la fuente. Si la
+   consulta devuelve una URL que no corresponde al título al abrirla, detener ese destino y resolverlo
+   desde las relaciones verificadas del proyecto; no escribir sobre el resultado ambiguo.
+3. Registrar valores anteriores y actualizar únicamente las propiedades con diferencia.
+4. Releer todas las tareas modificadas: etiquetas correctas y resto de propiedades/cuerpo intactos.
+5. Conciliar por proyecto tipo, canal, tareas principales excluidas y paquetes multiarchivo.
+   Un total calculado desde etiquetas no es prueba de que el rollup visible ya se actualizó.
+6. Ante conflicto Content Hub Artículo vs tarea Tutorial, reportar y no cambiar la decisión editorial.
+   Respetar el alcance temporal: regularizar el histórico requiere autorización.
+7. Si el inventario supera el umbral de capacidad acordado, advertir y no añadir producción sin
+   decisión del operador. No alterar conteos, fechas ni estados para forzar el umbral.
+
+En esta revisión el MCP expone descripciones y referencias `formulaCode://`/`rollupResult://`,
+pero no permitió abrir el código de fórmula ni sus valores calculados. No declarar verificación
+del rollup numérico a partir de esas referencias. Las fórmulas y métricas `[GH]` no se modifican.
+
 ## Las dos jerarquías paralelas — no confundirlas
 
 - **Dentro de `Tareas`:** `Tarea principal` ⇄ `Subtareas` (sub-task nativo de Notion). Los banners y
@@ -139,11 +212,13 @@ artículo) y una fila en `Tareas` (hija de la tarea del artículo). **Es por dis
 accidental: la primera lo muestra en el ecosistema de la pieza, la segunda lo pone en el flujo de
 producción.
 
-### Cómo cuelgan las 8 subtareas de un artículo (verificado sobre el lote de septiembre)
+### Cómo cuelgan las subtareas seleccionadas de un artículo
 
-Un artículo genera **8 subtareas**: 4 banners + 4 derivados sociales. Las 8 se cuelgan del artículo
-**escribiendo `Tarea principal`** —la propiedad del lado hijo—, **no `Subtareas`** desde el padre. Y
-las 8 llevan **además** la relación `Artículo (Content Hub)` apuntando a la fila del artículo.
+Un artículo genera **4 banners + S derivados seleccionados**; el Tutorial escrito agrega su
+secuencia fotográfica. Todas se cuelgan del artículo **escribiendo `Tarea principal`** —la propiedad
+del lado hijo—, **no `Subtareas`** desde el padre. Todas llevan además `Artículo (Content Hub)`.
+El lote histórico de septiembre tenía ocho; no es una cantidad obligatoria para nuevos ciclos.
+Selección, reservas y excepción de etiquetas para descartadas: [módulo 15](15_DISTRIBUCION_SELECTIVA.md).
 
 | Pieza | Patrón de `Nombre de tarea` | Detalle verificado |
 |---|---|---|

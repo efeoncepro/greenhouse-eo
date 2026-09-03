@@ -1,12 +1,12 @@
 # Offboarding Laboral y Contractual
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-05-04 por Codex
-> **Ultima actualizacion:** 2026-05-15 por Claude Opus (TASK-892 — closure completeness aggregate 4 capas)
+> **Ultima actualizacion:** 2026-09-03 por Claude (TASK-1349)
 > **Documentacion tecnica:** [GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md)
 > **ADRs relacionados:**
-> - [GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md](../../architecture/GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md) (TASK-890)
+> - [GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md](../../architecture/GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md) (TASK-890, TASK-1349)
 > - [GREENHOUSE_PERSON_LEGAL_RELATIONSHIP_RECONCILIATION_V1.md](../../architecture/GREENHOUSE_PERSON_LEGAL_RELATIONSHIP_RECONCILIATION_V1.md) (TASK-891)
 
 ---
@@ -39,6 +39,24 @@ La fecha `contractEndDate` sigue existiendo como dato contractual y puede abrir 
 | `executed` | Caso ejecutado. |
 | `cancelled` | Caso cancelado. |
 
+## Revisión de un caso (TASK-1349)
+
+Un caso ya creado puede revisarse una o varias veces mientras no esté en estado terminal (`executed` o `cancelled`). Revisar es una decisión humana explícita entre dos opciones — nunca se infiere de la fecha ni de la fuente del caso:
+
+- **`access_only` (solo acceso)**: la señal que abrió o mantiene el caso fue solo una baja de acceso (SCIM/Admin). La separación sigue siendo `identity_only`, se declara la fecha en que se dio de baja el acceso, y la relación laboral, la compensación y el member **no cambian**. El caso queda listo para cerrarse como cierre informativo directo (acción "Ejecutar").
+- **`relationship_ended` (terminó la relación)**: la relación realmente terminó. Exige una causal explícita (renuncia, despido, fin de contrato a plazo fijo, mutuo acuerdo, término de contrato u otra) — nunca se infiere —, la fecha efectiva y el último día trabajado. Con esos datos, Greenhouse recalcula la lane y los requisitos con la matriz canónica de lanes.
+
+Reglas que aplican a ambas decisiones:
+
+- El motivo de la revisión es obligatorio y debe tener al menos 10 caracteres; queda en el registro de auditoría append-only del caso.
+- La revisión exige la versión vigente del caso (`expectedUpdatedAt`). Si el caso cambió desde que se abrió la pantalla, Greenhouse rechaza el guardado (conflicto de versión) y pide recargar antes de reintentar.
+- Revisar nunca cancela el caso ni crea uno nuevo — corrige el mismo caso que se está mirando.
+- Si el caso ya tenía una aprobación o programación previa y la revisión cambia algo material, esa aprobación queda invalidada y el caso vuelve a "Requiere revisión", salvo que quien revisa también tenga permiso de aprobar y decida aprobar en el mismo acto.
+
+**Guardia de aprobación**: un caso que nació de una señal de acceso (`identity_only`, sin revisión) no puede aprobarse, programarse ni ejecutarse todavía — Greenhouse lo rechaza y pide revisarlo primero. Contener el caso (bloquearlo) o cancelarlo sigue permitido en cualquier momento.
+
+> Detalle técnico: comando `reviewOffboardingCase` (`src/lib/workforce/offboarding/store.ts`), reglas puras en `review-policy.ts`, previsualización sin escritura en `review-preview.ts`, guardia de transición en `state-machine.ts`.
+
 ## Lanes
 
 Greenhouse resuelve una lane para orientar los pasos posteriores:
@@ -65,6 +83,15 @@ TASK-760 crea el caso y la lane. TASK-761 agrega el aggregate de finiquito para 
 El motor de finiquito consume un caso aprobado o agendado con `effective_date`, `last_working_day`, causal y snapshot contractual. No calcula desde `member.active` ni desde `contractEndDate` directo. El documento formal consume el settlement aprobado; no recalcula montos desde datos vivos.
 
 Para V1 solo se soporta renuncia de trabajador dependiente Chile con payroll interno. Honorarios, Deel/EOR, contractors e internacional quedan bloqueados como regimenes no soportados por el engine interno.
+
+## Ejecución coherente por lane (TASK-1349)
+
+Cuando un caso pasa a `executed`, el efecto depende de la lane, no de un único camino genérico:
+
+- **Caso `identity_only` (solo acceso)**: la ejecución es informativa. No toca compensación, no toca la relación laboral y no toca el registro del colaborador.
+- **Caso de término real** (`relationship_ended` revisado, con `last_working_day` real): antes de ejecutar, Greenhouse rechaza el cierre si existen versiones de compensación que empiezan después del último día trabajado (no las borra — pide corregirlas o supersederlas primero). La vigencia de compensación se cierra en el último día trabajado. Terminar la relación legal y marcar al colaborador como inactivo (`members.active=false`) queda detrás del flag `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` (hoy **apagado**) — mientras esté apagado, esos dos pasos no se ejecutan todavía, aunque el caso quede `executed`.
+
+> Detalle técnico: `applyOffboardingLifecycleEffects` (`src/lib/workforce/offboarding/member-lifecycle.ts`); error `compensation_future_version_conflict` (409) cuando hay versiones futuras sin resolver.
 
 ## Transicion employee -> contractor/honorarios
 
@@ -147,10 +174,50 @@ Post TASK-892, ese mismo caso muestra `closureState='partial'` + step canonico `
 
 `hr.offboarding.completeness_partial` (subsystem Identity & Access). Cuenta cases terminales con drift Person 360 detectado. Steady state esperado: 0. Cuando warning > 0, operador puede ejecutar reconciliacion desde `/admin/identity/drift-reconciliation` o desde la seccion "Capas pendientes" del case inspector.
 
+## Salidas sin resolver y nómina (TASK-1349, ADR 2026-09-03)
+
+`members.active` refleja disponibilidad **actual**, no un filtro histórico: un colaborador ya inactivo conserva íntegro un mes anterior ya pagado y se mantiene proyectado hasta el corte del período donde su salida tomó efecto. Un reingreso (compensación que empieza después del corte) no hereda la salida anterior.
+
+El punto que sí bloquea nómina es otro: una salida **sin resolver** (caso en `draft`, `needs_review` o `blocked`) cuya señal — sus fechas declaradas, o si no hay fechas, la fecha en que se creó el caso — cae en o antes del período. En ese caso el colaborador se mantiene proyectado, pero Greenhouse **bloquea** calcular o aprobar el período hasta que HR decida (revisar el caso). Si el resolver de elegibilidad no puede correr, tampoco se autoriza el cálculo — el sistema nunca asume "sin problema" ante una falla.
+
+Todo esto corre bajo el flag `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED`, hoy encendido en producción y en staging.
+
+> Detalle técnico: [GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md](../../architecture/GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md); resolver en `src/lib/payroll/exit-eligibility/**`; warning bloqueante `unresolved_exit_signal` y error `exit_eligibility_unavailable` en `src/lib/payroll/calculate-payroll.ts` / `payroll-readiness.ts`.
+
+## Cola de offboarding — señales más precisas (TASK-1349)
+
+En `/hr/offboarding`, un caso de acceso todavía sin revisar se muestra como **"Por clasificar"** (ya no como "Cierre contractual", etiqueta que solo aplica a honorarios). Una vez revisado como solo acceso, se muestra **"Solo acceso"**. El progreso de las lanes que no tienen finiquito ahora refleja pasos reales — clasificado, fechas declaradas, decisión tomada, ejecutado — en vez de mostrar siempre "2/2". La acción **"Revisar caso"** está disponible para cualquier caso no terminal, incluidos los bloqueados.
+
+En el cierre del caso: una capa cuyo estado se desconoce ya no cuenta como completa — aparece el paso "Verificar capas sin confirmar". Y si la salida quedó ejecutada pero el colaborador sigue activo (porque el flag de desactivación está apagado, o por una inconsistencia), aparece el paso **"Cerrar ciclo de vida del colaborador"**, que lleva a la recuperación gobernada — nunca a un ajuste manual en base de datos.
+
+La pantalla dedicada a revisar un caso desde la cola (TASK-1814) todavía no existe; hoy la revisión se opera por API o por el script de recuperación descrito abajo.
+
+## Ownership frente a reactivaciones e integraciones (TASK-1349)
+
+- Si SCIM reactiva por OID a un colaborador cuya salida real ya fue ejecutada, Greenhouse no lo "resucita": el registro queda enlazado pero inactivo. Un reingreso real es un episodio nuevo, activado de forma gobernada — no una reactivación silenciosa del anterior.
+- El backfill desde BigQuery (`pnpm backfill:postgres:canonical-360`) no sobrescribe `active` ni `contract_end_date` cuando Greenhouse ya es dueño de esa salida.
+
+## Señales en Operaciones (TASK-1349)
+
+Visibles en `/admin/operations`, estado estable esperado: 0.
+
+| Señal | Qué detecta |
+| --- | --- |
+| `hr.offboarding.unresolved_exit_signal` | Salidas sin decidir cuya fecha bloquea el cálculo de nómina del período. |
+| `hr.offboarding.executed_member_still_active` | Salida real ejecutada cuyo colaborador sigue activo (ver [ISSUE-117](../../issues/open/ISSUE-117-offboarding-executed-never-deactivates-member-canonical.md)). |
+| `workforce.offboarding.deprovisioned_member_without_case` | Cuenta dada de baja de acceso sin que exista un caso de offboarding — solo detección, no corrige nada por sí sola. |
+
+> Detalle técnico: `src/lib/reliability/queries/offboarding-exit-drift.ts`.
+
+## Recuperación gobernada (TASK-1349)
+
+Cuando un caso quedó atrás de la realidad (ejecutado pero colaborador activo, o solo-acceso que en verdad fue un término real), la corrección se hace con el script `pnpm workforce:offboarding:recovery` — nunca por SQL manual. El script corre en modo simulación por defecto y solo aplica cambios con `--apply --member <id>` explícito, usando los mismos commands canónicos que la API (revisar → aprobar → programar → ejecutar). Ver el manual de uso para el paso a paso.
+
 ## Acceso
 
 - Surface visible: view `equipo.offboarding` en `/hr/offboarding`.
 - Autorizacion fina: capability `hr.offboarding_case` con acciones `read`, `create`, `update`, `approve`, `manage`.
+- Revisión de caso (TASK-1349): capability `workforce.offboarding.review_case`, acción `execute`, scope `tenant`. Rutas: `POST /api/hr/offboarding/cases/{caseId}/review` y `.../review/preview` (previsualización sin escritura); carril programático `POST /api/platform/app/hr/offboarding/cases/{caseId}/review[/preview]`.
 - Cierre con proveedor externo (TASK-890): capability granular `workforce.offboarding.close_external_provider` con accion `update`.
 - Reconciliacion drift Person 360 (TASK-891): capability granular `person.legal_entity_relationships.reconcile_drift` con accion `update`, scope `tenant`. V1.0 grant EFEONCE_ADMIN-only.
 - Finiquito: capability `hr.final_settlement` con acciones `read`, `create`, `update`, `approve`, `manage`.

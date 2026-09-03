@@ -40,7 +40,9 @@ import type {
 export type OffboardingClosureStepCode =
   | 'case_lifecycle'
   | 'reconcile_drift'
+  | 'close_member_lifecycle'
   | 'verify_payroll_exclusion'
+  | 'verify_member_runtime'
 
 /**
  * Orden canonical de prioridad. Si emerge step nuevo, agregarlo aqui con
@@ -48,9 +50,11 @@ export type OffboardingClosureStepCode =
  * orden cuya capa este pending.
  */
 export const STEP_PRIORITY: readonly OffboardingClosureStepCode[] = Object.freeze([
-  'case_lifecycle',         // 1. case lifecycle pending (most operator-relevant)
-  'reconcile_drift',        // 2. Person 360 drift (post-terminal usually)
-  'verify_payroll_exclusion'// 3. informational confirmation
+  'case_lifecycle',          // 1. case lifecycle pending (most operator-relevant)
+  'reconcile_drift',         // 2. Person 360 drift (post-terminal usually)
+  'close_member_lifecycle',  // 3. TASK-1349 — executed real exit but member still active (recovery command)
+  'verify_payroll_exclusion',// 4. informational confirmation
+  'verify_member_runtime'    // 5. TASK-1349 — a layer is UNKNOWN: unknown never counts as complete
 ] as const)
 
 // ─── State enum canonical ─────────────────────────────────────────────────
@@ -161,6 +165,15 @@ export interface ClosureCompletenessFacts {
    */
   payrollExcluded: boolean | null
 
+  /**
+   * TASK-1349 — Layer 2b: member lifecycle closed for a REAL termination.
+   *   - `true`: `members.active = false` (writeback done) or not applicable
+   *     (identity_only / cancelled).
+   *   - `false`: executed real termination but the member is still active
+   *     (ISSUE-117 drift) → step `close_member_lifecycle`.
+   *   - `null`: unknown (member not found).
+   */
+  memberLifecycleClosed?: boolean | null
   /** Label es-CL canonical para el case_lifecycle step. Tomado del nextStep. */
   caseLifecycleStepLabel: string
 
@@ -179,7 +192,13 @@ const COPY = {
     'El member declara contractor/Deel pero la relación legal activa sigue como "employee". Resuelve via comando auditado.',
   verifyPayrollExclusionLabel: 'Confirmar exclusión de nómina',
   verifyPayrollExclusionHint:
-    'Verifica que el colaborador haya sido excluido de la próxima nómina proyectada.'
+    'Verifica que el colaborador haya sido excluido de la próxima nómina proyectada.',
+  closeMemberLifecycleLabel: 'Cerrar ciclo de vida del colaborador',
+  closeMemberLifecycleHint:
+    'La salida está ejecutada pero el colaborador sigue activo en el registro canónico. Ejecuta la recuperación gobernada (dry-run → apply); no desactives por SQL.',
+  verifyMemberRuntimeLabel: 'Verificar capas sin confirmar',
+  verifyMemberRuntimeHint:
+    'Una capa del cierre no pudo determinarse (member, relación o nómina). Desconocido no es completo: revisa antes de dar el caso por cerrado.'
 }
 
 // ─── Capability constants (single source of truth) ────────────────────────
@@ -278,6 +297,49 @@ const buildVerifyPayrollExclusionStep = (facts: ClosureCompletenessFacts): Offbo
   }
 }
 
+const buildCloseMemberLifecycleStep = (facts: ClosureCompletenessFacts): OffboardingPendingStep | null => {
+  if (facts.caseStatus !== 'executed') return null
+  if (facts.memberLifecycleClosed !== false) return null
+
+  return {
+    code: 'close_member_lifecycle',
+    label: COPY.closeMemberLifecycleLabel,
+    capability: 'hr.offboarding_case',
+    actionable: false, // recovery command (script/API), not a UI transition
+    severity: 'warning',
+    href: null,
+    hint: COPY.closeMemberLifecycleHint
+  }
+}
+
+const buildVerifyMemberRuntimeStep = (facts: ClosureCompletenessFacts): OffboardingPendingStep | null => {
+  // TASK-1349 — on a terminal case, an UNKNOWN layer is not a closed layer.
+  // Without this step the aggregate reported `complete` while it could not
+  // see the member (audit 2026-09-03: "unknown counted as complete").
+  const caseIsTerminal = facts.caseStatus === 'executed' || facts.caseStatus === 'cancelled'
+
+  if (!caseIsTerminal) return null
+
+  const unknownLayers = [
+    facts.memberRuntimeAligned === null ? 'member_runtime' : null,
+    facts.personRelationshipDrift === null ? 'person_relationship' : null,
+    facts.payrollExcluded === null ? 'payroll_scope' : null,
+    facts.memberLifecycleClosed === null ? 'member_lifecycle' : null
+  ].filter((layer): layer is string => layer !== null)
+
+  if (unknownLayers.length === 0) return null
+
+  return {
+    code: 'verify_member_runtime',
+    label: COPY.verifyMemberRuntimeLabel,
+    capability: null,
+    actionable: false,
+    severity: 'warning',
+    href: null,
+    hint: `${COPY.verifyMemberRuntimeHint} (${unknownLayers.join(', ')})`
+  }
+}
+
 // ─── Helper builders (per layer) ─────────────────────────────────────────
 
 const deriveCaseLifecycleStatus = (
@@ -347,7 +409,9 @@ export const computeClosureCompleteness = (
   const stepBuilders: Record<OffboardingClosureStepCode, (f: ClosureCompletenessFacts) => OffboardingPendingStep | null> = {
     case_lifecycle: buildCaseLifecycleStep,
     reconcile_drift: buildReconcileDriftStep,
-    verify_payroll_exclusion: buildVerifyPayrollExclusionStep
+    close_member_lifecycle: buildCloseMemberLifecycleStep,
+    verify_payroll_exclusion: buildVerifyPayrollExclusionStep,
+    verify_member_runtime: buildVerifyMemberRuntimeStep
   }
 
   const pendingSteps = STEP_PRIORITY.map(code => stepBuilders[code](facts)).filter(

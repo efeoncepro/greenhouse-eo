@@ -27,6 +27,29 @@ const ACTIVE_CASE_STATUSES = new Set(['draft', 'needs_review', 'approved', 'sche
 const DOCUMENT_ACTIVE_STATUSES = new Set(['rendered', 'in_review', 'approved', 'issued'])
 
 export const resolveOffboardingClosureLane = (item: OffboardingCase): OffboardingClosureLane => {
+  // TASK-1349 — the PERSISTED lane governs. An access signal (`identity_only`)
+  // never displays as a contractual close because the contract is honorarios:
+  // that is exactly what hid Felipe's unresolved case behind "Cierre contractual".
+  if (item.ruleLane === 'identity_only' || item.separationType === 'identity_only') {
+    if (item.review?.decision === 'access_only') {
+      return {
+        code: 'access_only',
+        label: copy.lane.accessOnly,
+        documentLabel: copy.lane.accessOnly,
+        allowsFinalSettlement: false,
+        helpText: copy.lane.accessOnlyHelp
+      }
+    }
+
+    return {
+      code: 'needs_classification',
+      label: copy.lane.needsClassification,
+      documentLabel: copy.lane.needsClassification,
+      allowsFinalSettlement: false,
+      helpText: copy.lane.identitySignalHelp
+    }
+  }
+
   if (item.ruleLane === 'internal_payroll' && item.countryCode === 'CL' && item.payrollViaSnapshot === 'internal') {
     return {
       code: 'final_settlement',
@@ -159,6 +182,8 @@ const actionLabel = (code: OffboardingWorkQueueActionCode) => {
       return copy.actions.reissueDocument
     case 'download_pdf':
       return copy.actions.downloadPdf
+    case 'review_case':
+      return copy.actions.reviewCase
     case 'reconcile_drift_action':
       // TASK-892 — label es-CL viene del closure-completeness step builder; el
       // descriptor lo provee inline. Esta rama es defensive (no se invoca por
@@ -192,16 +217,32 @@ const action = ({
 })
 
 const deriveNextStep = ({
+  item,
   closureLane,
   prerequisites,
   settlement,
   document
 }: {
+  item: OffboardingCase
   closureLane: OffboardingClosureLane
   prerequisites: OffboardingPrerequisiteStatus
   settlement: OffboardingWorkQueueSettlementSummary | null
   document: OffboardingWorkQueueDocumentSummary | null
 }): OffboardingNextStep => {
+  // TASK-1349 — lifecycle-aware next step for lanes without a labor settlement:
+  // an unresolved access signal asks for review; a decided case names the
+  // transition that is actually pending instead of a generic "review payment".
+  if (closureLane.code === 'access_only') {
+    return item.status === 'executed' || item.status === 'cancelled'
+      ? { code: 'completed', label: labelForNextStep('completed'), severity: 'success' }
+      : { code: 'classify_case', label: copy.actions.executeCase, severity: 'info' }
+  }
+
+  if (!closureLane.allowsFinalSettlement && closureLane.code !== 'needs_classification') {
+    if (item.status === 'executed') return { code: 'completed', label: labelForNextStep('completed'), severity: 'success' }
+    if (item.status === 'cancelled') return { code: 'none', label: labelForNextStep('none'), severity: 'neutral' }
+  }
+
   if (closureLane.code === 'contractual_close') {
     return { code: 'review_payment', label: labelForNextStep('review_payment'), severity: 'info' }
   }
@@ -266,12 +307,14 @@ const deriveNextStep = ({
 }
 
 const deriveProgress = ({
+  item,
   closureLane,
   prerequisites,
   settlement,
   document,
   nextStep
 }: {
+  item: OffboardingCase
   closureLane: OffboardingClosureLane
   prerequisites: OffboardingPrerequisiteStatus
   settlement: OffboardingWorkQueueSettlementSummary | null
@@ -279,8 +322,17 @@ const deriveProgress = ({
   nextStep: OffboardingNextStep
 }): OffboardingProgress => {
   if (!closureLane.allowsFinalSettlement) {
-    const completed = closureLane.code === 'needs_classification' ? 1 : 2
-    const total = 2
+    // TASK-1349 — progress derived from the REAL requirements of a case without
+    // labor settlement, never a fixed 2/2: classified (a decided lane, or an
+    // access-only review), explicit dates, decided (approved+), executed.
+    // `unknown`/missing never counts as done.
+    const classified = closureLane.code !== 'needs_classification'
+    const datesDeclared = Boolean(item.effectiveDate) && Boolean(item.lastWorkingDay)
+    const decided = item.status === 'approved' || item.status === 'scheduled' || item.status === 'executed'
+    const executed = item.status === 'executed'
+    const checks = [classified, datesDeclared, decided, executed]
+    const completed = checks.filter(Boolean).length
+    const total = checks.length
 
     return {
       completed,
@@ -318,8 +370,20 @@ const deriveSecondaryActions = (
 ) => {
   const secondary: OffboardingWorkQueueActionDescriptor[] = []
 
-  if (item.status === 'draft' || item.status === 'needs_review') {
+  // TASK-1349 — every non-terminal case can be reviewed/corrected in place
+  // (decision, cause, dates); blocked cases recover through the same command.
+  if (item.status !== 'executed' && item.status !== 'cancelled') {
+    secondary.push(action({ code: 'review_case', severity: item.status === 'blocked' ? 'warning' : 'neutral' }))
+  }
+
+  const unreviewedAccessSignal = item.separationType === 'identity_only' && !item.review
+
+  if ((item.status === 'draft' || item.status === 'needs_review') && !unreviewedAccessSignal) {
     secondary.push(action({ code: 'transition_approve', severity: 'info' }))
+  }
+
+  if (item.review?.decision === 'access_only' && item.status !== 'executed' && item.status !== 'cancelled') {
+    secondary.push(action({ code: 'transition_execute', severity: 'success' }))
   }
 
   if (item.status === 'approved') {
@@ -394,6 +458,8 @@ export interface OffboardingClosureFactsInput {
   memberRuntimeAligned?: boolean | null
   personRelationshipDrift?: boolean | null
   payrollExcluded?: boolean | null
+  /** TASK-1349 — `members.active=false` after an executed real exit (or n/a). */
+  memberLifecycleClosed?: boolean | null
 }
 
 export const buildOffboardingWorkQueueItem = ({
@@ -419,8 +485,8 @@ export const buildOffboardingWorkQueueItem = ({
     : null
 
   const prerequisites = deriveOffboardingPrerequisites(item, closureLane)
-  const nextStep = deriveNextStep({ closureLane, prerequisites, settlement, document: latestDocument })
-  const progress = deriveProgress({ closureLane, prerequisites, settlement, document: latestDocument, nextStep })
+  const nextStep = deriveNextStep({ item, closureLane, prerequisites, settlement, document: latestDocument })
+  const progress = deriveProgress({ item, closureLane, prerequisites, settlement, document: latestDocument, nextStep })
 
   const legacyAction = nextStep.code === 'completed' || nextStep.code === 'none'
     ? null
@@ -440,6 +506,7 @@ export const buildOffboardingWorkQueueItem = ({
     personRelationshipDrift: closureFacts?.personRelationshipDrift ?? null,
     memberRuntimeAligned: closureFacts?.memberRuntimeAligned ?? null,
     payrollExcluded: closureFacts?.payrollExcluded ?? null,
+    memberLifecycleClosed: closureFacts?.memberLifecycleClosed ?? null,
     caseLifecycleStepLabel: nextStep.label,
     caseLifecycleStepSeverity: nextStep.severity,
     memberId: item.memberId

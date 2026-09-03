@@ -338,6 +338,17 @@ export type PayrollReadinessIssueCode =
   | 'payroll_regime_mismatch'
   | 'period_not_calculated'
   | 'leave_data_unavailable'
+  /**
+   * TASK-1349 — al menos un colaborador en scope tiene una salida sin resolver
+   * (draft / needs_review / blocked) relevante al período. Bloquea cálculo y
+   * aprobación hasta que HR decida el caso; no excluye al colaborador.
+   */
+  | 'unresolved_exit_signal'
+  /**
+   * TASK-1349 — el resolver de elegibilidad de salida no pudo ejecutarse. Un
+   * cálculo oficial no puede autorizarse incluyendo a todos en silencio.
+   */
+  | 'exit_eligibility_unavailable'
 
 export interface PayrollReadinessIssue {
   code: PayrollReadinessIssueCode

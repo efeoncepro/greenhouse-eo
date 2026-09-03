@@ -2,6 +2,28 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+TASK-1349 **code complete, rollout pendiente** (2026-09-03, sesión Claude, `develop`, sin push, commits Slice 0–4
+`b825e0a40`→`ff2f7623e` + cierre documental). Backend completo: resolver por episodio + gate fail-closed de nómina,
+command de revisión (`access_only`|`relationship_ended`) con capability y carril `app`, executor lane-aware con
+writeback detrás de `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` (OFF en todos los runtimes), proyecciones
+honestas, 3 señales (hoy 2 / 3 / 0), guards SCIM/backfill y `pnpm workforce:offboarding:recovery` (dry-run real
+ejecutado; NADA aplicado). **Riesgos/decisiones para el operador:** (1) tras el release, readiness de septiembre
+bloqueará con `unresolved_exit_signal` hasta resolver Felipe (blocked) y Maria Fernanda (draft 07-29) — control
+buscado; (2) `pnpm build` de producción NO se corrió (30 GB, requiere autorización) — `pnpm test` completo,
+typecheck y lint sí; (3) la recovery de Felipe exige causal respaldada declarada por People (`--separation-type`)
+y autorización explícita; (4) Finance: obligación junio 550.875 + SII junio/julio 99.125 de Felipe generadas por
+error, sin contrato de anulación (`supersede` sí, `cancel` no) → dependencia registrada, no SQL. Próximo paso:
+confirmar push/PR a `develop`, smoke sintético en staging, flag ON, recovery por allowlist, UI TASK-1814.
+
+Offboarding (2026-09-03): auditoría UI/código/PG registrada en
+[informe](docs/audits/payroll/OFFBOARDING_ROOT_CAUSE_AND_REMEDIATION_2026-09-03.md).
+[TASK-1349](docs/tasks/in-progress/TASK-1349-offboarding-member-lifecycle-writeback.md) amplía revisión contractual,
+elegibilidad temporal y recovery; nueva [TASK-1814](docs/tasks/to-do/TASK-1814-offboarding-case-review-recovery-ui.md)
+posee UI dependiente. Ambas to-do, sin implementar; 20–32 horas efectivas estimadas en conjunto.
+Felipe salió 02/06/2026 y el operador confirma todo pagado/saldo cero. Caso blocked con fechas corregidas,
+member/compensación abiertos: aún puede entrar a nómina. Registro no autoriza otro pago ni deploy.
+Siguiente paso: plan de ejecución/ADR temporal, luego backend → UI → recovery/readback conjunto; preservar historia.
+
 Seguimiento OAuth (2026-09-02): [TASK-1813](docs/tasks/to-do/TASK-1813-efeonce-mcp-oauth-client-interoperability.md)
 creada `to-do`, sin implementar. Codex 0.152.0 rechazó discovery; metadata pública revalidada a las 22:51Z.
 La [auditoría](docs/audits/EFEONCE_MCP_CODEX_OAUTH_INTEROPERABILITY_2026-09-02.md) identifica scopes sin cualificar
@@ -9,32 +31,81 @@ al apagar shim, fallback de deploy que lo reactiva y canary directo que no prueb
 de abajo no basta sin esos gates. Próximo paso: plan humano aprobado y coordinación con dueños de archivos;
 no push/deploy ni mutación de Entra autorizados por esta creación. Incidente Git/Berel separado.
 
-## 2026-09-03 — TASK-1806: shadow ETV comprado y evaluado; improved calibra 6× mejor contra GSC; cutover espera aprobación
+## 2026-09-03 — TASK-1806 seguimiento: alerta Teams determinista + rutina de recordatorio del cutover ETV
 
-`TASK-1806` `in-progress`, Slices 0-2 ejecutados. Contract de schema aplicado (migración
-`20260903103858964`). Shadow `exact_ab` corrido con autorización explícita del operador en chat (run
-`etvshadow-f3fef9b3c2a8`): 26/26 requests OK, **USD 1,09536** real vs 1,14384 forecast, ledger `labs` cuadra,
-inputs idénticos salvo el flag (hash). Evaluador con GSC (client_id público del flujo OAuth + secret por referencia):
-**hold mecánico sólo por la regla §5.2** (ETV −64,5 % en Berel con `organic.count` intacto), que en un A/B exacto se
-dispara por construcción; calibración a favor de improved (**err. rel. 49,4 % vs 321,3 %** legacy sobre 30.898
-clics/mes GSC), Jaccard 1,0 en páginas/subdominios, historia continua (0,1 % vs 8,1 %), Comex −52 %, prospecto −43,9 %.
-Memo con explicación y recomendación **`go_rebaseline`**: `docs/audits/seo/etv-shadow/2026-09-03-…-decision-memo.md`.
+Después del cierre `complete` de TASK-1806 (ver entrada debajo, release `bda12be7e33a`), el operador preguntó
+quién vigila la señal `seo.etv_methodology.drift` — hoy sólo es pull vía `/admin/operations`, nadie se entera
+si no lo abre. Autorizado en chat ("las 3 formas de vigilar"), se desplegaron dos capas nuevas: (1) cron
+`ops-seo-etv-drift-watch` (Cloud Scheduler, diario 12:00 America/Santiago, sin flag) que llama
+`checkAndAlertSeoEtvMethodologyDrift()` (`src/lib/growth/seo/etv-methodology/drift-alert.ts`), lee la señal
+existente sin tocarla y avisa a Teams sólo si `severity=error` — endpoint `POST /seo/etv-methodology-drift-watch`,
+dispatcher `sendManualTeamsAnnouncement`, destino nuevo `growth-seo-reliability-alerts`
+(`src/config/manual-teams-announcements.ts`), mismo canal físico "EO - Admin" que `production-release-alerts`.
+Commit `79a1c3f74` en `develop`. Verificado en vivo (revisión `ops-worker-00637-2ww`): llamada real respondió
+`{"severity":"warning","alerted":false}` — correcto, hoy es `warning` no `error`. 6/6 tests verdes. (2) Rutina
+`trig_015zxhP1D4yXfTacUm5HqmQU`, dispara una vez el 2026-09-17 13:00 America/Santiago tras la primera captura
+improved desatendida, sin credenciales locales: sólo recuerda verificar manualmente, no ejecuta verificación real.
 
-**Hallazgos de la corrida:** (1) la celda bulk de Berel/Comex no persistió: comparte tabla y clave con la foto de
-dominio del mismo día (DO NOTHING; valores en el crudo) — defecto de cohorte, anotado; (2) los writers contaban
-INTENTOS en `rowsWritten`: ahora cuentan filas insertadas por `RETURNING` (persist de domain-overview y
-url-visibility; tests adaptados); (3) señal `seo.etv_methodology.drift` en `warning` hasta que las filas
-contractuales del 27-29 de agosto salgan de la ventana de 7 días — no es drift de runtime.
+## 2026-09-03 — TASK-1806 COMPLETE: Improved ETV en producción (release `bda12be7e33a`), rebaseline versionado
 
-**Corrección del operador:** `efeoncepro.com` sí se mide, pero APARTE de Berel (su org, mercado CL, su GSC). El
-error fue la celda bulk, que metió a Efeonce en la consulta de Berel (MX, org de Berel): esa fila queda anulada;
-las celdas propias de Efeonce siguen válidas y sin voto. Cohorte vigente `2026-09-03-preregistered-v2.json` (bulk
-por organización y en día distinto a la foto).
+Cuarto release del día: PR #218 squash (`main=bda12be7e33af93906805054146c5e17a8b9c328`, 12:42Z), orquestador
+`33758619690` (13:01→13:14Z, un solo run, sin retry; los DOS gates `production` aprobados a 13:04:26Z/13:04:57Z),
+manifest `released` (`bda12be7e33a-4bb99ca1-8077-451a-9611-5929f933a990`), watchdog `ok`, 3/4 workers en el
+target y ops-worker change-gated en `d2ebdb8f3` (diff de árbol completo = sólo el ledger de flags). **Canary de
+contrato 13:15:26Z:** lanes prod `domain-overview`/`url-visibility` de Berel sirven
+`etvMethodology.version=improved_layout_clickstream_v2` `single_methodology`; `/health` del worker
+(`00636-h6w`) improved en escritura y lectura; `/api/auth/health` 200. Vercel Production+staging con ambos
+selectores improved (valores verificados por `env pull`); staging con cutover y **drill de rollback** ejercitado
+(legacy → improved, 3 redeploys).
 
-**Pendiente con dueño:** aprobación separada del operador del tratamiento histórico (`rebaseline`) y del cutover
-staging/producción (Slices 3-4; un solo ops-worker compartido = cutover del worker es producción y exige release).
-Selectores productivos siguen `legacy_static_v1`; lanes prod de Berel verificados sirviendo legacy tras el shadow.
-Sin push: WIP ajeno en el árbol (Berel, EPIC-022, 8 tasks).
+**Decisión:** el shadow (USD 1,095) mostró improved 6× mejor calibrado contra GSC en Berel (err. rel. 49 % vs
+321 %), Jaccard 1,0 e historia continua; el operador aprobó `go_rebaseline` y el cutover. Rebaseline acotado:
+historia improved de Berel 2025-09..2026-09 y de Comex 2025-09..2026-03 (backfill USD 0,2568, sembró 14 filas);
+la de julio 2026 en adelante es `fully_recomputed`, antes `calibrated_approximation`; `breakpointDate=null`.
+Efeonce se mide aparte (su org/CL/GSC); guard en `assertEtvShadowCohort` para que un bulk nunca mezcle
+organizaciones; cohorte v2.
+
+**Riesgos abiertos / pendientes con dueño:** (1) señal `seo.etv_methodology.drift` en `warning` hasta que las
+filas contractuales del 27-29/08 salgan de la ventana de 7 días (≤ 2026-09-05); el cron del 16/17 será la
+primera captura improved DESATENDIDA del worker — si escribiera otra cosa, es incidente. (2) Berel verá sus
+cifras de tráfico estimado ≈ −60 % por cambio de fórmula, no por pérdida real: comunicarlo. (3) Sujetos sin fila
+improved degradan `not_available_for_method` hasta su próxima captura (subfolder/url de Berel el día 17).
+(4) Rollback a legacy sólo antes del 2026-11-01T00:00:00Z (selectores + deploy.sh + redeploy). Sin push de
+docs de cierre hasta este commit; WIP ajeno en el árbol intacto.
+
+## 2026-09-03 — Berel: cobertura temática y minería solicitadas por el operador
+
+Fecha local 2026-09-02. [Estrategia](docs/operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md) y skills
+Berel/SEO-AEO/DataForSEO sincronizadas; Playbook Notion ampliado y confirmado por nueva lectura.
+[Research](docs/audits/seo/BEREL_CAPILLARY_KEYWORD_MINING_2026-09-02.md): 14 runs succeeded,
+1.517 keywords distintas, 13 SERPs, 52 PAA, costo US$1,23572. 27 intenciones propuestas; 60 keywords
+representativas revisadas, el resto del CSV es triage explícito. El tutorial público de baño aparece
+#2 en SERP fuera de los 49 cuerpos del Hub: no crear duplicado. Priorizar elección/protección/aplicación.
+Ese corte describe discovery, no las ediciones posteriores en Notion. Continuidad 2026-09-03: N29 pasó
+a Berelex Semibrillante tras Wiki/página/PDF; tutorial, ALT paso 3, ficha N2 y nota de tarea releídos.
+Artes y copies sociales aún pendientes; no asumir paquete aprobado ni publicación Drupal. La skill
+incorpora [control técnico y QA](docs/audits/seo/BEREL_TUTORIAL_GUARDRAILS_2026-09-03.md) para futuras piezas.
+Etiquetado: [auditoría](docs/audits/seo/BEREL_PIECE_COUNT_CLASSIFICATION_2026-09-03.md), 51 correcciones
+Notion releídas (formato/canal/tipo), sin otros cambios. Nov/dic: 65 tareas visuales por mes, no archivos
+ni entregas; rollups numéricos no expuestos por MCP. Operador confirma solo etiquetas, sin migración.
+Relectura oct–dic: 221 tareas, 196 visuales etiquetadas y 25 principales excluidas; sin nuevas escrituras.
+Skills espejo exigen tipo/canal desde la creación y en QA. Histórico fuera de esos meses y N31 pendientes.
+Distribución selectiva: [auditoría y continuación](docs/audits/seo/BEREL_SELECTIVE_SOCIAL_DISTRIBUTION_2026-09-03.md).
+Playbooks/skills y matrices de 17 slots + principales actualizados; 34/34 releídas e historial intacto.
+Aplicación terminada: 193 páginas modificadas releídas, 128/128 registros sociales; octubre excluido. Cupos 8 artículos de 3.000–5.000 palabras,
+50 gráficas y 3 videos/mes (cortesía mayo–octubre extendida a nov/dic). Operador confirmó: las 50
+incluyen blog/RRSS; superficies Blog/Facebook/Instagram/Pinterest. Priorización N52→Navidad aprobada:
+4 banners N52 Cancelada sin etiquetas de reserva, historial intacto; 4 banners y 2 sociales N59 creados.
+Conteo vivo + briefs: 50 gráficas + 3 videos/mes (41/44 tareas estáticas); N45/N46 En curso, N50/N54 con gates.
+Siguiente paso: conciliar derivados/assets de N29 y mantener bloqueos de sistemas no validados.
+Commit local solicitado del trabajo editorial propio; sin push/cambio de branch/release.
+Cambios ajenos de SEO y OAuth preservados; este trabajo no resuelve ese incidente Git/MCP.
+
+Corrección de numeración verificada: [mapa y readback 179/179](docs/audits/seo/BEREL_EDITORIAL_NUMBERING_2026-09-03.md).
+Noviembre N43–N51 (Navidad adicional), diciembre N52–N59; números de párrafos/auditorías anteriores
+son históricos. Módulo 16 en skills espejo; no renombrar archivos ni reutilizar IDs por número.
+Complemento autorizado: el método SEO/AEO y DataForSEO excluido de `1fcc2ade3` se incorpora por separado:
+referencia 09 de minería, routers/espejos, priorización §2.3, brief, manual y funcional; sin nueva compra ni push.
 
 ## 2026-09-03 — TASK-1805 en producción: la fórmula detrás de `etv` es identidad del hecho, todavía legacy
 
@@ -486,91 +557,3 @@ Esa evidencia se produce en el paso 3 del runbook del flip.
 
 Próximo paso: desplegar (`TASK-1670` + `TASK-1671`) y recién entonces el flip.
 Sin push. Runbook: `docs/manual-de-uso/growth/operar-hallazgos-de-sitio-seo.md`.
-
-## 2026-09-01 (12) — TASK-1670 cerrada, y el punto ciego del audit SEO SIGUE ABIERTO
-
-`TASK-1670` quedó `complete` como **`code complete, rollout pendiente`**. La distinción importa más
-que el resumen: el motor de hallazgos de sitio existe y está verificado, pero
-`GROWTH_SEO_SITE_FINDINGS_ENABLED` nace **OFF** y no se prende hasta que `TASK-1671` esté desplegada.
-Hasta ese flip, **un sitio que bloquea a los crawlers de IA sigue puntuando 95/100 y presentándose
-como sano**. El merge no cerró el agujero.
-
-Qué quedó en `develop`: migración aditiva `finding_scope` (`page`|`site`) sobre
-`seo_site_audit_findings` — aplicada, 4.977 filas históricas clasificadas sin backfill —;
-`growth/seo/site-audit/site-findings.ts` con los cuatro chequeos (crawlers de IA en `robots.txt`,
-acceso en el borde/WAF, JSON-LD ausente, salud de sitemap); materialización en el collect detrás del
-flag; `findingScope` aditivo en el reader canónico; y 7 fichas es-CL con el drift test corriendo
-contra la unión de los dos allowlists.
-
-Tres cosas que el próximo agente debe saber antes de tocar esto:
-
-1. **Retrieval y training no comparten severidad.** Bloquear el rastreo que te cita es `critical`;
-   bloquear el de entrenamiento es `notice` con lectura de postura y **nunca** `critical` — es una
-   decisión de derechos, y pintarla en rojo enseña al cliente a ignorar la severidad más alta.
-2. **El chequeo de borde usa NUESTRO token variado, jamás el de un bot ajeno.** Suplantar `GPTBot` o
-   `OAI-SearchBot` es evasión verificable por DNS inverso. El criterio de aceptación que pedía lo
-   contrario quedó corregido en la spec.
-3. **La verificación con red real encontró un bug que ningún test con mocks podía ver**: contra
-   `reuters.com`, un `robots.txt` que nos prohíbe la ruta se reportaba como sitemap roto — le
-   inventábamos un defecto a un archivo que nunca miramos. Corregido a "no verificado" + regresión.
-
-Próximo paso: `TASK-1671` (desbloqueada, `Blocked by: none`). Es dueña del flip y por lo tanto del
-cierre real del agujero. `TASK-1672` conserva su gate: el flag en `ON` con corrida verificada, no un
-merge.
-
-Sin push. Cinco commits locales en `develop`.
-
-**Capa documental completada el mismo día (tres agentes en paralelo).** El cierre anterior sólo tenía
-la capa técnica (§10.6 de la arquitectura); el protocolo pide tres. Ahora existen: doc funcional
-(`docs/documentation/growth/hallazgos-de-sitio-audit-seo.md`), manual + runbook del flip
-(`docs/manual-de-uso/growth/operar-hallazgos-de-sitio-seo.md` y la actualización de
-`usar-auditoria-sitio-seo.md`), y las skills de oficio corregidas: `seo-aeo/modules/01_SEO_TECHNICAL.md`
-§8 pasó de cuatro viñetas descriptivas a siete reglas accionables con su razón, y
-`dataforseo-operator/references/04-onpage.md` dejó de implicar que nadie resuelve lo que OnPage no ve.
-Los cinco documentos declaran el flag OFF y el punto ciego abierto — ninguno promete la capacidad. La
-skill agrega la consecuencia operativa de hoy: al auditar, estas verificaciones se hacen a mano.
-
-## 2026-09-01 (11) — Brand Visibility Grader entra al menú público
-
-El menú primario de WordPress (`Menu 1`, ID 61) suma el ítem custom `251916`, **Brand Visibility
-Grader**, bajo `Recursos` (`242524`) y con destino
-`https://think.efeoncepro.com/brand-visibility`. La escritura se hizo por la API nativa de menús con
-el usuario operativo de WP-CLI, luego de confirmar que el enlace no existía y que los 26 ítems
-anteriores tenían `menu_order` persistido igual al orden visible.
-
-Snapshot recuperable: `_gh_backup_before_brand_visibility_menu_20260901T212219Z`. La verificación
-post-write confirmó 27 ítems, el nuevo en posición 27 y los 26 previos sin cambios. Se purgaron el
-object cache de WordPress y el cache de Kinsta. Playwright anónimo live verificó el submenú y el clic
-en 1440 px y 390 px: destino HTTP 200, título correcto, `scrollWidth === clientWidth` en origen y
-destino, y cero errores de consola. No hubo cambio de código, deploy, Elementor ni contenido del
-Grader.
-
-## 2026-09-01 (10) — TASK-1807 tomada: reducción GCP con guardrails por workload
-
-El operador aprobó ejecutar la reducción urgente de gasto GCP. `TASK-1807` quedó `in-progress`, con baseline live
-de CLP 538.785 netos en agosto y ~CLP 540.383 de run-rate. Los tres Cloud Run Jobs de Globe explican ~CLP
-286.196, pero la ejecución no aplica el mismo cron a los tres: la skill y el contrato runtime de Globe registran
-que Asset Governance avanza una etapa por tick y que `*/5` elevaba la convergencia en frío a ~20–25 minutos.
-
-Orden vigente: Producer `* * * * * -> */5` con Terraform/readback/rollback; observar 24 h; Media `*/2 ->
-2-59/5` con señal de backlog; Asset Governance conserva `*/1` hasta un rediseño multi-stage o event-driven con
-ADR y canary. No hay autorización para CUDs, eliminación de artefactos/secretos ni cancelación de suscripciones.
-Plan: `docs/tasks/plans/TASK-1807-plan.md`.
-
-Slice 1 quedó aplicada a las 20:55Z: plan `0 add/1 change/0 destroy`, apply `0/1/0`, post-plan `No changes`.
-Primer tick de la nueva cadence: `globe-producer-worker-2lq2v` a las 21:00:07Z, sano y no-op:
-`queueOldestAgeSeconds=0`, retry storm/terminal attempts/divergencias/fallos en 0. La ventana de 24 h sigue abierta;
-Media no cambia antes de cerrarla.
-
-Slice 5 quedó operativo: dos budgets alert-only en CLP (Globe 250.000; consolidado 370.000), umbrales actuales
-50/75/90/100% y forecast 90/100%, post-plan sin drift. Greenhouse `aad71bf07` reconcilia neto = bruto + créditos
-y estabiliza el cooldown; 5 pruebas focales pasan y el dry-run no envía notificaciones. En 30 días Globe midió
-CLP 350.442 brutos, CLP -2.218 en créditos y CLP 348.224 netos.
-
-Globe `5b01e99` agregó labels a 33 recursos y retention de Artifact Registry en dry-run: 418 versiones / 10,4 GB,
-KEEP 10 por paquete y DELETE simulado >30 días; cero eliminaciones. Con autorización del operador, Globe fue
-publicado hasta `7eeb1da`. Asset Governance quedó desplegado por el workflow canónico `33561719287` sobre el digest
-`sha256:864a33c2ac30a9e10b4ab17c4b34c51cb149a4e1fc22889680875af322c69095`, con cuatro stages máximos por
-ejecución, scheduler restaurado `ENABLED`, cron `*/1` y post-plan sin drift. La reconciliación fue sana pero no-op
-(`claimed=0`, `failed=0`, cola 0), así que no sustituye el canary con asset real y no habilita espaciar el cron.
-Greenhouse sigue local y no fue publicado.

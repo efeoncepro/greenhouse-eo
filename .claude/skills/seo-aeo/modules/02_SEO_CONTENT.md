@@ -10,6 +10,23 @@
 > **estacionalidad vinculante**, **gate de canibalización leyendo contenido**)
 > as-of 2026-08-25.
 
+## Cobertura temática: prioridad de negocio antes que volumen
+
+Antes de minar, ordenar categorías por decisiones del lector que la marca puede resolver, no por menor
+conteo. Separar categoría primaria de etiquetas de espacio/material/producto y del formato. Inventariar
+cuerpos, versiones y piezas futuras; no usar slug, estado Publicado ni ausencia en GSC como prueba de novedad.
+
+Cruzar la matriz categoría × problema × superficie/exposición × decisión con el corpus. Cada intención
+necesita dictamen cubierto/parcial/nuevo candidato/fuera de foco/bloqueado técnico y página/sección de soporte.
+La salida puede ser una ampliación, FAQ, consolidación o ficha, no siempre un artículo nuevo.
+
+Capilaridad es cobertura útil conectada, no más URLs. PAA observadas no son prompts medidos de LLMs.
+Conservar procedencia, presupuesto, límites de adquisición y huecos sin investigar. RICE sólo con alcance
+y esfuerzo defendibles; si faltan, declarar prioridad estratégica provisional, sin inventar scores.
+
+Procedimiento: docs/operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md §2.3.
+Para Berel: berel-content-production/modules/14_PLANEACION_TEMATICA_Y_COBERTURA.md.
+
 ## Principio raíz: intención > keyword
 
 Google y los motores IA resuelven **intención**, no cadenas de texto. Antes de

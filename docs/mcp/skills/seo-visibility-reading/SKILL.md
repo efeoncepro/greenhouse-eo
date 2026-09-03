@@ -24,14 +24,20 @@ presented with the confidence of a measurement and mean nothing.
 Every figure travels with its provenance and a capture date. Always report which lens a number
 comes from and its as-of date.
 
-Estimated traffic (`etv`) carries one more dimension, the formula version: `etvMethodology.version`
-(`legacy_static_v1` today; `improved_layout_clickstream_v2` becomes mandatory at the provider on
-2026-11-01T00:00:00Z). The provider changes the formula behind the same field, so two etv figures
-are comparable only when their versions match. Report the version next to any etv figure, never
-compute a delta across versions, and read `errorCode: not_available_for_method` as "evidence
-exists under another formula", not as zero. The served formula is chosen server-side; no tool
-argument selects it. When a payload lists several provenances, the lens is a property
-of each figure, not of the whole response.
+Estimated traffic (`etv`) carries one more dimension, the formula version: `etvMethodology.version`.
+Since 2026-09-03 the served version is `improved_layout_clickstream_v2` (the provider's new formula,
+mandatory at the provider from 2026-11-01T00:00:00Z); `legacy_static_v1` is what was captured before
+the switch. The provider changes the formula behind the same field, so two etv figures are
+comparable only when their versions match. Improved figures sit roughly 60 % below legacy ones for
+the same subject and day: that is a change of scale by formula, not a loss of traffic, and you never
+present it as performance. The history was rebaselined, not cut: `breakpointDate` is `null`, each
+history month declares its basis (`fully_recomputed` from 2026-07, `calibrated_approximation`
+earlier), and `availableMethodologies` may list both versions because the legacy rows are kept as
+evidence. Report the version next to any etv figure, never compute a delta across versions, and read
+`errorCode: not_available_for_method` as "this subject has no improved capture yet" (it arrives with
+the next monthly capture), never as zero. The served formula is chosen server-side; no tool argument
+selects it. When a payload lists several provenances, the lens is a property of each figure, not of
+the whole response.
 
 ## What absence means
 

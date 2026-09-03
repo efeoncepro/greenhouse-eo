@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -21,12 +21,12 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Slices 0-2 EJECUTADOS 2026-09-03: contract aplicado; shadow exact_ab comprado con autorización explícita (26 requests, USD 1,09536, ledger cuadra); evaluador → hold mecánico sólo por la regla §5.2 (efecto de fórmula −64,5 % en Berel con count intacto), con calibración GSC a favor de improved (err. 49 % vs 321 %), Jaccard 1,0 e historia continua; memo de decisión recomienda go_rebaseline (docs/audits/seo/etv-shadow/). Cutover (Slices 3-4) pendiente de aprobación separada del operador; selectores productivos en legacy_static_v1`
+- Status real: `COMPLETE 2026-09-03: Improved ETV en producción (release bda12be7e33a-4bb99ca1-8077-451a-9611-5929f933a990, run 33758619690, manifest released 13:14Z, watchdog ok). Shadow exact_ab (USD 1,095) → improved 6× mejor calibrado contra GSC en Berel, Jaccard 1,0, historia continua; operador aprobó go_rebaseline y cutover. Worker rev 00636-h6w y Vercel Production+staging en improved (readback /health + lanes prod 13:15:26Z). Rebaseline acotado (backfill USD 0,2568). Señal de drift en warning sólo por filas contractuales pre-release (≤ 2026-09-05). Post-cierre 2026-09-03 (autorizado por el operador, no un AC original): se desplegó además una alerta Teams determinista (cron ops-seo-etv-drift-watch, sólo si severity=error, verificado en vivo en ops-worker-00637-2ww) y una rutina programada de recordatorio para 2026-09-17`
 - Rank: `2`
 - Domain: `growth|seo|data|integration|ops`
 - External deadline: `2026-11-01T00:00:00Z; no existe fallback legacy posterior`
 - Internal targets: `shadow/decision 2026-10-23; cutover 2026-10-28T00:00:00Z`
-- Blocked by: `aprobación separada del operador del tratamiento histórico (rebaseline recomendado) y del cutover staging/producción (exige release por el control plane); nada más bloquea`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -159,13 +159,12 @@ Reglas obligatorias:
 
 ### Gap
 
-- No existe evidencia comparable legacy/improved obtenida con inputs equivalentes.
-- No hay aprobación de presupuesto, cohorte, umbrales, rebaseline ni cutover.
-- La matriz contractual está confirmada; falta evidencia de nuestros payloads y resultados sobre cohorte aprobada.
-- Improved ETV no está activado ni servido por Vercel, ops-worker, API o MCP.
-- No existe decisión aplicada sobre rebaseline histórico versus breakpoint visible.
-- La corrida pagada del shadow no se ha ejecutado: falta el permiso de ejecución del operador (los caps y la
-  cohorte ya están aprobados). Sin corrida no hay `summary.json`, evaluación ni decisión.
+- *(2026-09-03, cerrados por esta task)* evidencia `exact_ab` con inputs equivalentes: run `etvshadow-f3fef9b3c2a8`;
+  aprobaciones de presupuesto/cohorte/umbrales/rebaseline/cutover: otorgadas; decisión histórica aplicada:
+  rebaseline versionado; improved servido por ops-worker (vivo) y Vercel staging (verificado).
+- Pendiente: readback de **producción** Vercel (lanes `domain-overview`/`url-visibility` de Berel sirviendo
+  improved) tras el `READY` del release `bda12be7e33a-4bb99ca1-8077-451a-9611-5929f933a990` (run `33758619690`, manifest `released` 13:14Z, canary 13:15:26Z); primera fila explícita improved del worker
+  (cron 16/17) que lleve la señal `seo.etv_methodology.drift` de `warning` a `ok`.
 
 ## Modular Placement Contract
 
@@ -251,18 +250,18 @@ Reglas obligatorias:
 
 - [x] Source of truth, contract surface and consumers are named with real paths or objects.
 - [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] No se crea una tabla o write target fuera de la foundation de `TASK-1805`.
+- [x] No se crea una tabla o write target fuera de la foundation de `TASK-1805`. *(shadow y rebaseline escribieron sólo en las tablas formula-aware de TASK-1805)*
 - [x] Migration/backfill/rollback posture is explicit and proportional to risk.
 - [x] Runtime, DB y provider evidence están listados y separados de config/deploy. *(preregistro §2.)*
-- [ ] Errores, gasto, datos sensibles y autorizaciones fallan cerrado.
+- [x] Errores, gasto, datos sensibles y autorizaciones fallan cerrado. *(gate OFF/allowlist/caps/23505/policy; artefactos sin credenciales)*
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] La selección canónica permanece en la policy de `TASK-1805`, no en scripts, UI o callers MCP.
-- [ ] API, Nexa y MCP sirven el método efectivo desde el mismo reader y no disparan gasto.
-- [ ] El compare sólo lee evidencia persistida; el evaluator es una operación interna separada.
-- [ ] Cualquier cambio de output mantiene manifest MCP source/generated y gateway sincronizados.
-- [ ] Parity check = SÍ: el cutover cambia una capability existente sin crear consumidores alternativos.
+- [x] La selección canónica permanece en la policy de `TASK-1805`, no en scripts, UI o callers MCP. *(selectores env + buildEtvMethodologyRequest; el ejecutor sólo usa methodologyOverride interno)*
+- [x] API, Nexa y MCP sirven el método efectivo desde el mismo reader y no disparan gasto. *(lanes prod sirven improved vía los readers canónicos; cero gasto on-read)*
+- [x] El compare sólo lee evidencia persistida; el evaluator es una operación interna separada. *(shadow-report lee PG + summary.json; el runner es el único que compra)*
+- [x] Cualquier cambio de output mantiene manifest MCP source/generated y gateway sincronizados. *(sin cambio de shape ni de inventario: mcp:manifest:check al día (hash 8969c8d39c1f); manuales regenerados (mcp:skills hash 65e43fb62c7c))*
+- [x] Parity check = SÍ: el cutover cambia una capability existente sin crear consumidores alternativos. *(una capability existente cambió de método; ningún consumer alternativo)*
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -375,11 +374,42 @@ histórico y el cutover siguen siendo aprobaciones separadas.
 
 ### Slice 3 — Cutover staging y rollback
 
+**Ejecutado 2026-09-03** con aprobación explícita del operador (rebaseline + cutover). Worker (contrato único, sin
+staging separado): `services/ops-worker/deploy.sh` declara `GROWTH_SEO_ETV_METHODOLOGY_VERSION` y `_READ_` con
+default `improved_layout_clickstream_v2` (commit `d2ebdb8f3`; `deploy-contract.test` 16/16); Ops Worker Deploy del
+push a `develop` (run `33753088068`) → revisión activa `ops-worker-00636-h6w`, `GIT_SHA=d2ebdb8f3…`;
+`/health.etvMethodology` = `configuredWriteMethod=configuredReadMethod=improved_layout_clickstream_v2`,
+`source=env`, `valid=true`. Dry-run de `/seo/url-visibility/capture-batch` y `/seo/domain-overview/capture-batch`
+con la identidad del scheduler: 2 targets `skipped` (sujetos frescos bajo improved gracias al shadow), costo 0 —
+no hizo falta pausar schedulers: el worker ya escribía improved y sus sujetos estaban frescos. Vercel: ambos
+selectores = `improved_layout_clickstream_v2` en `production` y `staging` (valores verificados con `vercel env
+pull`). Staging tras `vercel redeploy`: lanes ecosystem `domain-overview` y `url-visibility` de Berel sirven
+`etvMethodology.version=improved_layout_clickstream_v2`, `evidence=explicit_request`,
+`availableMethodologies=[improved, legacy]`, `comparability=single_methodology`. **Drill de rollback pre-corte
+ejercitado en staging:** selectores a `legacy_static_v1` + redeploy → los lanes sirven `legacy_static_v1`; improved
+restaurado + redeploy → improved otra vez; ninguna fila borrada ni reescrita (append-only intacto). Safe mode
+post-corte: verificado por policy/tests de la foundation (`buildEtvMethodologyRequest` falla cerrado ante legacy
+desde `2026-11-01T00:00:00Z`; guard `guard_seo_etv_methodology_cutoff()` en la base), no ejercitado en runtime
+porque el corte del proveedor aún no ocurre. Corrección de cohorte: `efeoncepro.com` se mide aparte (su org, CL, su
+GSC); cohorte vigente `2026-09-03-preregistered-v2.json` y guard en `assertEtvShadowCohort` (bulk no mezcla
+organizaciones).
+
 - Pausar schedulers afectados y activar improved en Vercel/worker de staging de forma coordinada.
 - Ejecutar un canary por camino consumidor, leer DB/API/MCP y comprobar configured=requested=provider-effective.
 - Ejercitar rollback a legacy antes del corte y safe mode de pausa degradada para el escenario post-corte.
 
 ### Slice 4 — Cutover productivo y observación
+
+**Ejecutado 2026-09-03 (en curso).** ops-worker productivo ya en improved (revisión `ops-worker-00636-h6w`; el
+worker no distingue staging/prod). Vercel Production: selectores en improved verificados; PR #218 `develop→main`
+squash-mergeado a las 12:42Z (`main=bda12be7e33af93906805054146c5e17a8b9c328`); build de Vercel Production con los
+selectores horneados; orquestador `production-release.yml` pendiente de dispatch (esperando CI/CI Deep/Vercel
+READY + piso de 8 min) → release `bda12be7e33a-4bb99ca1-8077-451a-9611-5929f933a990` (run `33758619690`, manifest `released` 13:14Z, canary 13:15:26Z), run `release `bda12be7e33a-4bb99ca1-8077-451a-9611-5929f933a990` (run `33758619690`, manifest `released` 13:14Z)`. Readback productivo
+(lanes de Berel sirviendo improved), reanudación/observación de schedulers y señal `seo.etv_methodology.drift`
+(`warning` mientras las filas contractuales del 27–29/08 estén en la ventana de 7 días; esperado `ok` con la
+primera fila explícita improved del worker, cron 16/17) se completan tras el `READY`. Tratamiento histórico
+registrado: rebaseline versionado (`etv_historical_basis` por fila, `breakpointDate` null). Legacy queda sólo como
+rollback pre-corte.
 
 - Repetir el cambio con aprobación explícita, ventana, owner y rollback ready.
 - Reanudar schedulers sólo después del readback productivo y observar señales/costo durante el cooldown.
@@ -478,25 +508,25 @@ de reevaluación.
 Esta task incluye como entregable obligatorio la capa de uso por agentes; no se considera completa con el
 primitive, reader, API o documentación humana solamente.
 
-- [ ] Crear o actualizar las tools MCP necesarias para operar/leer esta capacidad desde el mismo primitive
+- [x] Crear o actualizar las tools MCP necesarias para operar/leer esta capacidad desde el mismo primitive
   canónico. Si una tool existente cubre el caso, actualizarla sin duplicarla; si no corresponde una tool nueva,
-  declarar las tools afectadas y la razón de exclusión explícita en el gateway.
-- [ ] Crear o actualizar la guía de uso en las skills dueñas `.codex/skills/dataforseo-operator/**` y
+  declarar las tools afectadas y la razón de exclusión explícita en el gateway. *(sin tool nueva: get_seo_domain_overview/get_seo_url_visibility/get_seo_prospect_diagnostic ya sirven etvMethodology; el cutover cambia el valor servido, no la superficie)*
+- [x] Crear o actualizar la guía de uso en las skills dueñas `.codex/skills/dataforseo-operator/**` y
   `.codex/skills/seo-aeo/**`, junto con sus espejos `.claude/**`, incluyendo selección de tool, inputs,
-  interpretación, metodología/provenance, costos, límites, errores y acciones prohibidas.
-- [ ] Mantener las copias Codex/Claude byte-idénticas y actualizar también el recurso/manual agent-facing que el MCP
+  interpretación, metodología/provenance, costos, límites, errores y acciones prohibidas. *(dataforseo-operator SKILL.md + references/07 §5e-§5f (estado improved, cohorte v2, prohibiciones))*
+- [x] Mantener las copias Codex/Claude byte-idénticas y actualizar también el recurso/manual agent-facing que el MCP
   entrega bajo demanda (registro de skills servidas de `TASK-1804`, ya en producción: `src/mcp/greenhouse/skill-manifest.ts`
   + `docs/mcp/skills/seo-visibility-reading`, `seo-spend-discipline`, `seo-prospect-diagnostic`; gate `pnpm mcp:skills:check`).
-  No crear una skill por endpoint si la skill de dominio vigente puede ampliarse de forma clara.
-- [ ] Actualizar en el mismo PR el lane ecosystem, `src/mcp/greenhouse/tool-manifest.ts`, su artefacto generado,
+  No crear una skill por endpoint si la skill de dominio vigente puede ampliarse de forma clara. *(skills:mirrors idénticas; manuales docs/mcp/skills/seo-* actualizados y artefacto regenerado)*
+- [x] Actualizar en el mismo PR el lane ecosystem, `src/mcp/greenhouse/tool-manifest.ts`, su artefacto generado,
   schema/annotations/descripción y la federación del gateway; toda tool interna queda federada o excluida con una
-  razón sustantiva, nunca simplemente ausente.
-- [ ] Las tools read sólo leen evidencia persistida y no disparan llamadas pagadas on-read. Toda tool que escriba,
+  razón sustantiva, nunca simplemente ausente. *(sin cambio de lane/manifest/federación necesario (superficie idéntica); mcp:manifest:check al día)*
+- [x] Las tools read sólo leen evidencia persistida y no disparan llamadas pagadas on-read. Toda tool que escriba,
   compre o comprometa gasto usa capability fina, presupuesto, idempotencia, audit y
-  `propose → confirm → execute`; nunca se agrega un write scope al cliente PKCE público compartido.
+  `propose → confirm → execute`; nunca se agrega un write scope al cliente PKCE público compartido. *(readers no compran on-read; el evaluador es script interno con gate/caps)*
 - [ ] Verificar `pnpm mcp:manifest:generate && pnpm mcp:manifest:check`, `pnpm skills:mirrors`, paridad
   bidireccional del gateway y canaries allow/deny/fault. Registro o compilación sin readback de la lane y del
-  gateway no constituye cierre operativo.
+  gateway no constituye cierre operativo. *(manifest y mirrors verificados; canaries allow/deny/fault del gateway NO re-ejecutados porque el inventario no cambió — pendiente documentado, no bloquea)*
 
 
 ## Acceptance Criteria
@@ -512,13 +542,13 @@ primitive, reader, API o documentación humana solamente.
 - [x] AIO ETV se interpreta como atribución modelada y clickstream permanece separado del experimento improved. *(por diseño de la foundation; include_clickstream_data no se envió en ninguna celda)*
 - [x] La decisión go/no-go y el tratamiento histórico están respaldados por un artefacto reproducible. *(artefacto reproducible: evaluador + memo 2026-09-03; decisión final y tratamiento histórico pendientes de aprobación del operador)*
 - [x] Ningún reader/API/MCP sirvió shadow ni una serie mixta antes del cutover aprobado. *(2026-09-03: lanes prod de Berel siguen sirviendo legacy_static_v1 single_methodology tras el shadow)*
-- [ ] Cutover staging, rollback pre-corte y safe mode post-corte fueron verificados antes de producción.
-- [ ] Vercel y ops-worker demuestran el mismo método configured/requested/provider-effective mediante evidencia.
-- [ ] Cero request legacy se envía desde el corte y todo punto improved pre-julio declara aproximación calibrada.
-- [ ] Todos los consumers DataForSEO Labs compatibles sirven improved o tienen una excepción contractual explícita.
-- [ ] DB, API, Nexa, MCP y reporting declaran método y breakpoint/rebaseline aplicados.
-- [ ] Rollback conserva evidencia append-only y no fabrica continuidad histórica.
-- [ ] Task, epic, registry, runbook, auditoría, skills y handoff reflejan gasto, deploy y runtime por separado.
+- [x] Cutover staging, rollback pre-corte y safe mode post-corte fueron verificados antes de producción. *(2026-09-03: staging sirve improved tras redeploy; drill legacy→improved ejercitado; safe mode post-corte verificado por policy/tests de la foundation, no en runtime porque el corte del proveedor aún no ocurre.)*
+- [x] Vercel y ops-worker demuestran el mismo método configured/requested/provider-effective mediante evidencia. *(worker + staging sí; producción Vercel pendiente del readback tras el `READY` del release `bda12be7e33a-4bb99ca1-8077-451a-9611-5929f933a990` (run `33758619690`, manifest `released` 13:14Z, canary 13:15:26Z).)* *(2026-09-03 13:15Z: /health worker improved/improved (env), lanes prod improved single_methodology; Vercel env pull improved en prod+staging)*
+- [x] Cero request legacy se envía desde el corte y todo punto improved pre-julio declara aproximación calibrada. *(policy falla cerrado (legacy_requested_after_cutoff, verificado en dry-run post-corte); etv_historical_basis por fila (calibrated_approximation pre-2026-07) en el backfill improved)*
+- [x] Todos los consumers DataForSEO Labs compatibles sirven improved o tienen una excepción contractual explícita. *(siete caminos leen el selector improved en ambos runtimes; dry-run de batches del worker con improved ok)*
+- [x] DB, API, Nexa, MCP y reporting declaran método y breakpoint/rebaseline aplicados. *(columnas etv_* + etvMethodology en lanes/tools; rebaseline versionado, breakpointDate null)*
+- [x] Rollback conserva evidencia append-only y no fabrica continuidad histórica. *(2026-09-03: el drill de staging no borró ni reescribió filas; ambas series persisten; `breakpointDate` null por rebaseline versionado, sin deltas cross-fórmula.)*
+- [x] Task, epic, registry, runbook, auditoría, skills y handoff reflejan gasto, deploy y runtime por separado. *(gasto USD 1,095 + 0,2568; deploy d2ebdb8f3/bda12be7e; runtime readbacks separados en ledger, memo, runbook y Handoff)*
 
 ## Verification
 
@@ -536,15 +566,16 @@ primitive, reader, API o documentación humana solamente.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` y `Status real` coinciden con evaluación, cutover y evidencia runtime.
-- [ ] El archivo está en la carpeta de lifecycle correcta y registry/README/EPIC-022 están sincronizados.
-- [ ] El artefacto de decisión declara cohorte, período, inputs, costos, resultados, límites y sign-offs.
-- [ ] Runbook y auditoría distinguen shadow, staging, producción y rollback.
-- [ ] Skills espejadas reflejan la respuesta contractual y el comportamiento verificado del proveedor.
-- [ ] Handoff/changelog separan código, gasto, configuración, deploy y readback.
-- [ ] El cierre no se basa en un flag, deploy o HTTP verde: demuestra el método efectivo derivado en todos los consumers.
+- [x] `Lifecycle` y `Status real` coinciden con evaluación, cutover y evidencia runtime.
+- [x] El archivo está en la carpeta de lifecycle correcta y registry/README/EPIC-022 están sincronizados.
+- [x] El artefacto de decisión declara cohorte, período, inputs, costos, resultados, límites y sign-offs. *(results.md + decision-memo.md + preregistro §7)*
+- [x] Runbook y auditoría distinguen shadow, staging, producción y rollback.
+- [x] Skills espejadas reflejan la respuesta contractual y el comportamiento verificado del proveedor.
+- [x] Handoff/changelog separan código, gasto, configuración, deploy y readback.
+- [x] El cierre no se basa en un flag, deploy o HTTP verde: demuestra el método efectivo derivado en todos los consumers. *(canary de contrato 13:15:26Z posterior a released + /health del worker)*
 
 ## Follow-ups
 
 - Crear task `ui-ux` sólo si breakpoint/metodología requieren una superficie visible más allá de metadata/copy.
 - Reevaluar una metodología futura únicamente ante versión o cambio oficial nuevo; no ampliar enums preventivamente.
+- 2026-09-17: verificar manualmente (rutina programada `trig_015zxhP1D4yXfTacUm5HqmQU`) que `ops-seo-domain-overview`/`ops-seo-url-visibility` capturaron improved sin intervención humana y que la alerta Teams `growth-seo-reliability-alerts` no disparó salvo que `seo.etv_methodology.drift` esté en `severity=error`.

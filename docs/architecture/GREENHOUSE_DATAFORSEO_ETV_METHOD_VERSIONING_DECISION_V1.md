@@ -200,10 +200,21 @@ Fuentes oficiales consultadas:
 
 ## Runtime Contract
 
-**Estado 2026-09-03: foundation EN PRODUCCIÓN (`TASK-1805` completa, release `5ec4cf769977`); contract de schema
-aplicado; selección productiva `legacy_static_v1` explícita en Vercel y ops-worker; Improved ETV NO activado.**
-Lo que la decisión prescribía ya tiene mecanismo; lo que sigue sin ejecutarse (shadow pagado, decisión, cutover)
-se declara aparte.
+**Estado 2026-09-03: CUTOVER a `improved_layout_clickstream_v2` ejecutado por `TASK-1806`.** Foundation en
+producción (`TASK-1805`, release `5ec4cf769977`), contract de schema aplicado, shadow `exact_ab` ejecutado y
+evaluado, y la selección productiva pasó a improved en los dos selectores (escritura y lectura): **ops-worker
+VIVO** (revisión `ops-worker-00636-h6w`, `services/ops-worker/deploy.sh` con `:-improved_layout_clickstream_v2`
+en `GROWTH_SEO_ETV_METHODOLOGY_VERSION` y `_READ_`, commit `d2ebdb8f3`; `/health.etvMethodology` reporta
+`configuredWriteMethod=configuredReadMethod=improved_layout_clickstream_v2`, `source=env`, `valid=true`) y
+**Vercel horneado** (ambos selectores = improved en `production` y `staging`, valores verificados con
+`vercel env pull`; staging sirve improved tras redeploy; producción efectiva al `READY` del release
+`release `bda12be7e33a-4bb99ca1-8077-451a-9611-5929f933a990` (run `33758619690`, manifest `released` 13:14Z)`). Tratamiento histórico = **rebaseline versionado** (§7): la serie servida es improved,
+cada fila declara `etv_historical_basis` (`fully_recomputed` desde 2026-07, `calibrated_approximation` antes) y
+`breakpointDate` sigue `null` porque un reader sirve una sola metodología (§4). Resultado del shadow en una línea:
+run `etvshadow-f3fef9b3c2a8`, 26 requests / USD 1,09536, improved err. rel. 49,4 % vs legacy 321,3 % contra GSC en
+berel.com (30.898 clics/mes), Jaccard 1,0 en `relevant_pages`/`subdomains`, historia continua, efecto de escala
+≈ −60 % (Berel −64,5 %, Comex −52 %); artefactos en `docs/audits/seo/etv-shadow/`. Rollback a legacy sólo
+pre-corte (§8), ejercitado en staging el 2026-09-03 antes del corte productivo.
 
 Fuente de verdad implementada:
 
@@ -244,11 +255,19 @@ Fuente de verdad implementada:
   `get_seo_url_visibility` y `get_seo_prospect_diagnostic` lo declaran (manifest `8969c8d39c1f`; gateway sincronizado).
 - **Observabilidad:** señal `seo.etv_methodology.drift` (módulo `growth`, kind `drift`, steady 0) + readback
   `etvMethodology` en `/health` del ops-worker + selector declarado en `services/ops-worker/deploy.sh`.
+  **Alerta push (TASK-1806, 2026-09-03):** `/admin/operations` es pull (nadie se entera si no lo abre); el
+  cron `ops-seo-etv-drift-watch` (ops-worker, diario 12:00 America/Santiago, sin flag) llama
+  `checkAndAlertSeoEtvMethodologyDrift()` (`etv-methodology/drift-alert.ts`) y, sólo si `severity=error`, envía
+  un aviso a Teams (destino `growth-seo-reliability-alerts`, canal "EO - Admin") vía el dispatcher determinista
+  existente (`sendManualTeamsAnnouncement`, reusado del patrón de `production-release-alerts`; sin dedup propio,
+  la cadencia diaria del cron es el dedup — un recordatorio diario mientras el error persista). `warning` y
+  `awaiting_data` no alertan por diseño (son estados esperados de la foundation).
 - **Evaluador seguro:** `etv-methodology/evaluator.ts` + `replay.ts` + fixtures sintéticos versionados +
   `scripts/growth/_sanity-task-1805-etv-evaluator.ts` (plan, forecast, dry-run `providerCalls=0`, comparación de
   valor/membresía/traffic cost/prospecto y benchmark GSC sin promediar). Gate `GROWTH_SEO_ETV_EVALUATOR_ENABLED`
-  default OFF con allowlist, máximo de requests y tope USD; `TASK-1806` lo activa. Sobre él, `TASK-1806` agrega
-  (code complete 2026-09-03, sin corrida pagada todavía) el **ejecutor bounded** `shadow-runner.ts` + CLI
+  default OFF con allowlist, máximo de requests y tope USD; `TASK-1806` lo activó sólo en el proceso local de la
+  corrida del 2026-09-03 (sigue OFF en Vercel y ops-worker). Sobre él, `TASK-1806` agrega (corrida ejecutada y
+  evaluada el 2026-09-03) el **ejecutor bounded** `shadow-runner.ts` + CLI
   `scripts/growth/dataforseo-etv-shadow.ts` (`exact_ab` sobre la cohorte preregistrada
   `scripts/growth/etv-shadow-cohorts/2026-09-03-preregistered.json`; improved→legacy por celda para no falsear la
   señal de drift; hash de inputs sin el flag; idempotencia `already_captured`; parada dura por caps/policy/drift/
@@ -258,10 +277,24 @@ Fuente de verdad implementada:
   (ambas metodologías por celda sin mezclar; GSC 28 días terminando D-2, normalizado ×30/28, sólo dominios propios)
   + CLI `scripts/growth/dataforseo-etv-shadow-evaluate.ts` (artefacto en `docs/audits/seo/etv-shadow/`).
 
-Rollout de la foundation completado (release `5ec4cf769977` en producción, selector explícito en Vercel y
-ops-worker con readback `configuredWriteSource: env`, contract aplicado el 2026-09-03). Pendiente y **no
-autorizado**: la corrida pagada del shadow, la decisión histórica y el cutover. `TASK-1806` sigue siendo la única
-unidad que puede seleccionar `improved_layout_clickstream_v2`.
+Rollout de la foundation completado (release `5ec4cf769977`, contract aplicado el 2026-09-03) y **cutover
+ejecutado el 2026-09-03** bajo `TASK-1806` con aprobación explícita del operador (rebaseline + cutover). Evidencia
+por runtime: ops-worker vivo en improved (revisión `ops-worker-00636-h6w`, `GIT_SHA=d2ebdb8f3…`; dry-run de
+`/seo/url-visibility/capture-batch` y `/seo/domain-overview/capture-batch` con la identidad del scheduler → 2
+targets `skipped` por frescura bajo improved gracias a las filas del shadow, costo 0; `deploy-contract.test`
+16/16). Vercel con ambos selectores en improved en `production` y `staging`; staging verificado tras `vercel
+redeploy`: los lanes ecosystem `domain-overview` y `url-visibility` de Berel sirven
+`etvMethodology.version=improved_layout_clickstream_v2`, `evidence=explicit_request`,
+`availableMethodologies=[improved, legacy]`, `comparability=single_methodology`; el drill de rollback pre-corte se
+ejercitó ahí (selectores a legacy + redeploy → `legacy_static_v1`; improved restaurado + redeploy → improved).
+Producción Vercel: PR #218 `develop→main` squash-mergeado (`main=bda12be7e33af93906805054146c5e17a8b9c328`),
+efectiva al `READY` del release `bda12be7e33a-4bb99ca1-8077-451a-9611-5929f933a990` (run `33758619690`, manifest `released` 13:14Z, canary 13:15:26Z). Los sujetos sin fila improved degradan
+`not_available_for_method` hasta su próxima captura (cron del día 16/17). Cohorte vigente
+`scripts/growth/etv-shadow-cohorts/2026-09-03-preregistered-v2.json`: cada sujeto se mide aparte por organización
+y mercado (efeoncepro.com en CL con su propio GSC, nunca dentro de la consulta de un cliente) y
+`assertEtvShadowCohort` rechaza una celda bulk que mezcle organizaciones. La señal `seo.etv_methodology.drift`
+queda en `warning` mientras las filas contractuales del 27–29/08 sigan dentro de su ventana de 7 días y se espera
+`ok` cuando el worker escriba su primera fila explícita improved.
 
 ## Revisit When
 

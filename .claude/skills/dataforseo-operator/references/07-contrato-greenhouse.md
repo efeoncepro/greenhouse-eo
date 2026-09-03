@@ -218,14 +218,49 @@ formula-aware junto a la legacy, guard de corte en la base; filas previas `legac
 (`_sanity-task-1805-etv-schema.ts`). **Foundation en producción desde el 2026-09-03 (release `5ec4cf769977`)** y el
 **contract** (retirar UNIQUE legacy + defaults + CHECK del hecho del prospecto) **aplicado el 2026-09-03** por
 `TASK-1806` (migración `20260903103858964_task-1806-etv-methodology-contract`): la coexistencia real legacy/improved
-por sujeto/día ya está abierta. Lo que sigue **no autorizado**: corrida pagada del shadow, rebaseline/breakpoint y
-cutover (`TASK-1806`).
+por sujeto/día ya está abierta. Shadow, rebaseline y cutover **ejecutados el 2026-09-03** por `TASK-1806` — estado
+vigente y cifras en §5f.
 
-## §5f Shadow legacy/improved (TASK-1806) — ejecutor bounded + decisor, sin corrida pagada todavía
+## §5f Shadow legacy/improved (TASK-1806) — ejecutado, evaluado y CUTOVER a improved (2026-09-03)
 
-Code complete 2026-09-03; 75 tests verdes en `src/lib/growth/seo/etv-methodology/`. Cero llamadas pagadas de esta
-task al 2026-09-03. Runbook operador-facing: `docs/manual-de-uso/growth/evaluar-transicion-dataforseo-improved-etv.md`
-§«Comandos del shadow». Preregistro (cohorte, umbrales, caps): `docs/audits/seo/2026-09-03-dataforseo-improved-etv-shadow-preregistration.md`.
+**Estado vigente (2026-09-03).** La versión servida por writers, readers, API y MCP es
+`improved_layout_clickstream_v2`: ops-worker vivo (revisión `ops-worker-00636-h6w`, `deploy.sh` con
+`:-improved_layout_clickstream_v2` en `GROWTH_SEO_ETV_METHODOLOGY_VERSION` y `_READ_`, commit `d2ebdb8f3`;
+`/health.etvMethodology` `source=env`, `valid=true`); Vercel `production`+`staging` con los dos selectores en
+improved (valores verificados con `vercel env pull`); staging sirve improved tras redeploy
+(`evidence=explicit_request`, `availableMethodologies=[improved, legacy]`, `comparability=single_methodology`);
+producción Vercel efectiva al `READY` del release `bda12be7e33a-4bb99ca1-8077-451a-9611-5929f933a990` (run `33758619690`, manifest `released` 13:14Z, canary 13:15:26Z). Tratamiento histórico: **rebaseline
+versionado** (`breakpointDate` null; `etv_historical_basis` `fully_recomputed` desde 2026-07 /
+`calibrated_approximation` antes). `legacy_static_v1` queda **sólo como rollback pre-corte** (selectores a legacy en
+Vercel prod+staging y en `deploy.sh` + redeploy/deploy; drill ejercitado en staging el 2026-09-03 sin borrar nada);
+desde `2026-11-01T00:00:00Z` el rollback es safe mode. Un sujeto sin fila improved degrada
+`not_available_for_method` hasta su próxima captura (cron 16/17).
+
+**Alerta push (2026-09-03).** `/admin/operations` es pull; el cron `ops-seo-etv-drift-watch` (ops-worker, diario
+12:00 America/Santiago, sin flag) llama `checkAndAlertSeoEtvMethodologyDrift()`
+(`etv-methodology/drift-alert.ts`) y publica en Teams (destino `growth-seo-reliability-alerts`, canal "EO -
+Admin") sólo si `severity=error`; `warning`/`awaiting_data` no avisan. Verificado en vivo tras el deploy
+(revisión `ops-worker-00637-2ww`): `severity=warning, alerted=false` — no envió nada, como corresponde.
+
+**Corrida y evaluación.** Run `etvshadow-f3fef9b3c2a8` (2026-09-03 ~11:05Z, autorización explícita del operador),
+`exact_ab`, 26/26 requests `20000`, USD 1,09536 real (forecast 1,14384), ledger `labs` cuadra. Contra GSC en
+berel.com (30.898 clics/mes): improved err. rel. 49,4 % vs legacy 321,3 %; Jaccard 1,0 en
+`relevant_pages`/`subdomains`; historia 2026-04..09 continua (salto 0,1 % vs mediana 8,1 %); efecto de escala
+≈ −60 % (Berel −64,5 %, Comex −52 %); prospecto Comex −43,9 %. Decisión mecánica `hold` **sólo** por la regla §5.2
+(dispara por construcción en un A/B exacto: el `organic.count` es idéntico); memo → `go_rebaseline`; el operador
+aprobó rebaseline y cutover. Artefactos:
+`docs/audits/seo/etv-shadow/2026-09-03-2026-09-03-preregistered-{results,decision-memo}.md`.
+
+**Cohorte vigente v2** `scripts/growth/etv-shadow-cohorts/2026-09-03-preregistered-v2.json`: **cada sujeto se mide
+APARTE por organización y mercado** — `efeoncepro.com` es Efeonce (CL, su propio GSC) y NUNCA viaja dentro de una
+consulta de un cliente; la celda bulk v1 que lo metió en MX bajo la org de Berel quedó anulada como evidencia
+(append-only) y `assertEtvShadowCohort` rechaza un bulk que mezcle organizaciones. Bulk en día distinto a la foto de
+dominio (misma tabla/clave).
+
+75 tests verdes en `src/lib/growth/seo/etv-methodology/`. Runbook operador-facing:
+`docs/manual-de-uso/growth/evaluar-transicion-dataforseo-improved-etv.md` (§«Comandos del shadow», «Resultado y
+decisión ejecutada», «Cutover ejecutado», «Rollback vigente»). Preregistro (cohorte, umbrales, caps):
+`docs/audits/seo/2026-09-03-dataforseo-improved-etv-shadow-preregistration.md`.
 
 - **Qué CLI.** Ejecutor `scripts/growth/dataforseo-etv-shadow.ts` (`--dry-run` default; `--execute` compra;
   `--cohort`, `--artifact-dir`) sobre `src/lib/growth/seo/etv-methodology/shadow-runner.ts` (`preflightEtvShadow`,
@@ -246,7 +281,9 @@ task al 2026-09-03. Runbook operador-facing: `docs/manual-de-uso/growth/evaluar-
   el ops-worker (la corrida es un proceso local acotado del operador, no un runtime); NUNCA describir un canary
   temporal como A/B (`exact_ab` exige ambas fórmulas por celda con inputs idénticos salvo el flag — el hash
   `taskHashWithoutFlag` lo prueba); NUNCA cambiar umbrales tras ver resultados (versión nueva del preregistro);
-  NUNCA reutilizar la corrida para decidir cutover: rebaseline/breakpoint y cutover son sign-offs separados.
+  NUNCA reutilizar la corrida para decidir cutover: rebaseline/breakpoint y cutover son sign-offs separados (ambos
+  otorgados el 2026-09-03); NUNCA volver un selector a `legacy_static_v1` fuera de un rollback pre-corte aprobado, ni
+  presentar la baja de ≈60 % como pérdida de tráfico.
 - **Cómo leer `summary.json`.** `executed`, `reasons[]`, `totals` (`requests`, `costUsd`, `forecastUsd`, `aborted`,
   `abortReason`) y `requests[]` por request (`methodology`, `requested`/`providerEffective`/`requestedAt`,
   `taskHashWithoutFlag`, `status` `executed | already_captured | skipped_after_abort`, `statusCode`, `costUsd`,

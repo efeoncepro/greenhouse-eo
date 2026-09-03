@@ -50,7 +50,15 @@
 	- Recordatorio: el CMS antepone la marca al title; hay que invertirlo a `NoTitle | Pinturas Berel`
 ```
 
+## Distribución social antes de producir derivados
+
+Incorporar [matriz de distribución social](matriz-distribucion-social.md) dentro del plan.
+Evaluar cuatro opciones; registrar Producir / No aplica / Pendiente, fuentes, ángulo, recursos,
+CTA, señal y gates. No crear tareas por defecto ni cambiar formatos/cuotas/fórmulas.
+
 ## Antes de escribir una sola línea
+
+- [ ] Número reservado en el bloque mensual completo e identidad del artículo comprobada (módulo 16)
 
 - [ ] Brief buscado en Teams y material en SharePoint **antes** de proponer nada
 - [ ] Justificado por escrito por qué es artículo y no ficha

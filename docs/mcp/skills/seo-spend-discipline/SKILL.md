@@ -104,8 +104,12 @@ position 60 and that is the distance left, not a failure.
 ## The ETV methodology evaluator is a separate spend
 
 Estimated traffic (ETV) from the provider carries a formula version, and every read tool that
-serves it reports that version as `etvMethodology.version`. Comparing the legacy formula with the
-improved one is **not** a read and not part of any capture: it is a separate spend with its own
+serves it reports that version as `etvMethodology.version`. Since 2026-09-03 the served version is
+`improved_layout_clickstream_v2`; the exact A/B against the legacy formula already ran that day
+(26 requests, USD 1.09536, approved and reconciled against the ledger) and the history was
+rebaselined (`breakpointDate` stays `null`). Improved figures sit roughly 60 % below legacy ones
+for the same subject and day: a change of scale by formula, never a loss. Comparing the legacy
+formula with the improved one is **not** a read and not part of any capture: it is a separate spend with its own
 controls. It stays off by default and runs only behind its own gate, an allowlist of subjects, a
 maximum number of requests and a USD ceiling; when any of those is unset it fails closed. Its dry
 run declares `providerCalls: 0` and lists what it would execute and why, and that dry run is the

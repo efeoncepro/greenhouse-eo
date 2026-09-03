@@ -16,6 +16,13 @@ separadas.
 
 ## Antes de empezar
 
+- Para un plan editorial, empezar por la matriz de necesidades y cobertura propia del
+  [modelo editorial §2.3](../../operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md).
+  Presupuestar el conjunto de corridas, no sólo cada lote. Para Berel aplica
+  [la estrategia de cobertura](../../operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md).
+- Leer todas las páginas de candidatos antes de concluir ausencia. Una categoría con menos piezas
+  no es automáticamente prioridad; un candidato puede pedir ampliar una pieza existente.
+
 - La organización necesita assignment `seo_v2` vigente y un target activo (con más de un mercado,
   declara `market`).
 - **Cada corrida gasta** (Labs cobra por request y por fila). El gate de entitlement y el

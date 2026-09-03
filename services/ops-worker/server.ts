@@ -18,6 +18,7 @@
  *   POST /batch-email-send             → Send a transactional email via the Greenhouse delivery pipeline
  *   POST /nexa/weekly-digest           → Send the weekly Nexa executive digest via email
  *   POST /reliability-ai-watch         → Reliability AI Observer (TASK-638): Gemini watcher over RCP overview
+ *   POST /seo/etv-methodology-drift-watch → Daily deterministic Teams alert if seo.etv_methodology.drift=error (TASK-1806)
  *   POST /cloud-cost-ai-watch          → Cloud cost FinOps AI + deterministic alert sweep (TASK-769)
  *   POST /finance/account-balances/fx-drift/remediate → Bounded FX drift remediation (TASK-842)
  *   POST /finance/dte-emission-retry → Retry queued DTE emissions (TASK-1194)
@@ -672,6 +673,31 @@ const handlePartyLifecycleSweep = async (req: IncomingMessage, res: ServerRespon
  * POST /product-catalog/drift-detect
  * TASK-548: nightly product catalog drift detect against HubSpot Products.
  */
+/**
+ * POST /seo/etv-methodology-drift-watch
+ * TASK-1806: chequeo diario de la señal seo.etv_methodology.drift; alerta a Teams sólo si
+ * severity=error (deterministic, sin LLM, sin flag — cron de bajo costo, ver drift-alert.ts).
+ */
+const handleSeoEtvMethodologyDriftWatch = async (_req: IncomingMessage, res: ServerResponse) => {
+  console.log('[ops-worker] POST /seo/etv-methodology-drift-watch')
+
+  try {
+    const { checkAndAlertSeoEtvMethodologyDrift } = await import('@/lib/growth/seo/etv-methodology/drift-alert')
+    const result = await checkAndAlertSeoEtvMethodologyDrift()
+
+    console.log(
+      `[ops-worker] /seo/etv-methodology-drift-watch done — severity=${result.severity} alerted=${result.alerted}${result.teamsError ? ` teamsError=${result.teamsError}` : ''}`
+    )
+
+    json(res, 200, result)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    console.error('[ops-worker] /seo/etv-methodology-drift-watch failed:', message)
+    json(res, 500, { error: message })
+  }
+}
+
 const handleProductCatalogDriftDetect = async (_req: IncomingMessage, res: ServerResponse) => {
   console.log('[ops-worker] POST /product-catalog/drift-detect')
 
@@ -3124,6 +3150,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/party-lifecycle/sweep') {
       await handlePartyLifecycleSweep(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/seo/etv-methodology-drift-watch') {
+      await handleSeoEtvMethodologyDriftWatch(req, res)
 
       return
     }

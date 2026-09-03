@@ -1,5 +1,8 @@
 # SEO Audits
 
+Numeración operativa de Berel: [mapa noviembre/diciembre 2026](BEREL_EDITORIAL_NUMBERING_2026-09-03.md).
+Las auditorías anteriores conservan los números de su corte; el mapa resuelve la identidad por página.
+
 Auditorías de búsqueda orgánica y AEO — de Efeonce y de clientes a los que Efeonce opera contenido.
 
 ## Regla de uso

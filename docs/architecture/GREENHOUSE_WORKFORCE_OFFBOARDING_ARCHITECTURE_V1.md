@@ -541,3 +541,82 @@ El concepto "`pendingSteps[]` decide el primaryAction" es reusable para:
 - Final settlement document lifecycle (TASK-863)
 
 Cuando emerja una surface con `primaryAction` derivado de una sola dimension pero la realidad operativa involucra multiples capas ortogonales, replicar el patron: pure function + STEP_PRIORITY + state machine cerrado + signal de cierre parcial.
+
+## Delta 2026-09-03 — TASK-1349: revisión contractual, elegibilidad temporal por episodio y writeback de lifecycle
+
+Cierra el circuito que la auditoría del 03/09 (`docs/audits/payroll/OFFBOARDING_ROOT_CAUSE_AND_REMEDIATION_2026-09-03.md`)
+encontró incompleto: SCIM abría un caso que exigía revisión humana, pero no existía el command para convertir esa
+revisión en una decisión contractual; el executor cortaba compensación aunque el caso fuera sólo de acceso; ningún
+path desactivaba el member; y `members.active=false` habría borrado elegibilidad histórica.
+
+### Decisión (Accepted)
+
+1. **Revisar es un command, no un click.** `reviewOffboardingCase` (`src/lib/workforce/offboarding/store.ts`, reglas
+   puras en `review-policy.ts`) decide sobre el caso EXISTENTE con dos salidas explícitas: `access_only` (baja de
+   acceso; separación/lane `identity_only`, fecha de baja declarada; relación, compensación y member intactos) o
+   `relationship_ended` (causal respaldada obligatoria —nunca inferida de la fecha—, fecha efectiva + último día
+   trabajado obligatorios, lane/requisitos recomputados con `resolveOffboardingLane` desde los snapshots del caso,
+   aprobación previa invalidada). Nunca cancela ni crea otro caso para eludir la unicidad. Motivo ≥ 10 chars,
+   `expectedUpdatedAt` obligatorio (409 `offboarding_case_version_conflict`), `FOR UPDATE`, audit append-only
+   `offboarding_case.reviewed` (before/after) y outbox en la misma transacción. Preview sin escritura
+   (`review-preview.ts`) con el efecto de nómina por período calculado con el mismo `derivePolicy`.
+2. **Un caso nacido de una señal de acceso no se aprueba sin revisión.** `assertOffboardingTransition` rechaza
+   `approved|scheduled|executed` cuando `separation_type='identity_only'` y no hay `metadata_json.review`
+   (409 `offboarding_case_review_required`). Contener (`blocked`) y cancelar siguen permitidos. Un `access_only`
+   revisado cierra informational directo a `executed` (fast-track) desde `needs_review|approved|scheduled|blocked`.
+3. **La ejecución es lane-aware** (`member-lifecycle.ts`): `identity_only` no toca compensación, relación ni
+   member. Término real: rechaza versiones de compensación con `effective_from > LWD` (409
+   `compensation_future_version_conflict`; nunca borra), cierra la vigencia al LWD y, detrás de
+   `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` (OFF), termina la relación legal con la fecha REAL antes de
+   marcar `members.active=false`/`status='inactive'`/`assignable=false`, cierra `client_team_assignments` y publica
+   `member.deactivated` (`deactivationKind='offboarding_executed'`). El orden relación→member es load-bearing: la
+   proyección reactiva `operating_entity_legal_relationship` reacciona a `member.deactivated` y, si encontrara la
+   relación aún activa, la cerraría con `CURRENT_DATE`.
+4. **`members.active` es disponibilidad actual, no filtro histórico** — decisión dueña en
+   `GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md` (Architecture Decision 2026-09-03): el resolver elige el
+   caso gobernante por relevancia temporal, sirve `contract_type_snapshot`, detecta reingreso, y una salida sin
+   resolver relevante al período exige revisión (`reviewRequired`) que readiness y `calculatePayroll` convierten en
+   bloqueo fail-closed. El roster entra inactivos sólo con compensación aplicable al período.
+5. **Ownership de la salida.** `findExecutedRealExitForMember` (`exit-facts.ts`): la reactivación SCIM por OID no
+   resucita a un member con salida real ejecutada (outcome `linked_inactive_prior_exit`; el reingreso es un episodio
+   nuevo por activación gobernada) y el backfill BQ canónico-360 no sobrescribe `active`/`contract_end_date` cuando
+   Greenhouse posee la salida.
+6. **Proyecciones honestas.** El lane persistido gobierna la clasificación visual (`identity_only` → «Por clasificar»
+   o «Solo acceso» tras revisión; nunca «Cierre contractual» por ser honorarios); progreso por requisitos reales;
+   acción `review_case` para todo caso no terminal; `closureCompleteness` agrega la capa `memberLifecycleClosed`
+   (step `close_member_lifecycle`) y trata una capa desconocida en caso terminal como `partial`
+   (step `verify_member_runtime`): desconocido nunca es completo.
+7. **Señales (steady 0, módulo identity):** `hr.offboarding.unresolved_exit_signal`,
+   `hr.offboarding.executed_member_still_active`, `workforce.offboarding.deprovisioned_member_without_case`
+   (`src/lib/reliability/queries/offboarding-exit-drift.ts`). La última sólo detecta: nadie infiere salida laboral de
+   una baja de acceso (TASK-1761 posee el lado Microsoft).
+8. **Recuperación gobernada:** `pnpm workforce:offboarding:recovery` (dry-run por defecto; apply por allowlist
+   `--member`, datos explícitos, readback). Finance no se toca: las obligaciones/gastos generados por error se
+   concilian con commands de Finance (dependencia registrada; hoy no existe `cancelPaymentObligation`).
+
+### Contratos
+
+- Capability `workforce.offboarding.review_case` (execute, tenant; HR route group ∪ EFEONCE_ADMIN; seed
+  `capabilities_registry` aplicado). Rutas HR `POST /api/hr/offboarding/cases/[caseId]/review` y `.../review/preview`;
+  carril `app` `platform.app.hr.offboarding.case.review[.preview]` (fail-closed para tokens delegados). Full API
+  Parity: UI (TASK-1814), app lane y Nexa consumen el mismo command.
+- `TransitionOffboardingCaseInput.expectedUpdatedAt` (opcional) y `OffboardingCase.review` (registro persistido en
+  `metadata_json.review`: `decision`, `reviewedAt`, `reviewedByUserId`, `reason`, `previous`).
+- Errores canónicos (es-CL, código estable): `offboarding_case_review_required`, `offboarding_case_version_conflict`,
+  `offboarding_case_version_required`, `offboarding_review_reason_too_short`, `offboarding_review_dates_required`,
+  `offboarding_review_dates_inconsistent`, `offboarding_review_separation_type_required`, `offboarding_case_terminal`,
+  `compensation_future_version_conflict`.
+
+### Alternativas rechazadas
+
+- Deducir la baja laboral desde SCIM con un trigger PG: la baja de acceso no es un hecho laboral (§«SCIM nunca cierra
+  el negocio por sí solo»).
+- Cancelar el caso SCIM y crear uno manual: rompe la unicidad y pierde la procedencia de la señal.
+- Poner `active=false` sin corregir el contrato temporal: excluía retroactivamente mayo y junio (simulación con hechos
+  reales en la auditoría).
+
+### Estado
+
+Code complete en `develop` (slices 0–4, 2026-09-03). Rollout pendiente: release, flag OFF hasta smoke temporal en
+staging, recovery por allowlist con autorización del operador, UI TASK-1814. ISSUE-117 sigue abierto hasta el cierre
+operativo conjunto.
