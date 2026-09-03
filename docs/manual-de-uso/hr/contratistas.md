@@ -111,12 +111,16 @@ Bruto, retencion (cuando aplica) y neto, siempre como mejor estimacion disponibl
 
 El **monto acordado** lo fija RR.HH., nunca el contratista. Desde el workbench HR (`/hr/contractors`):
 
-1. Selecciona la contratacion en la cola. En el inspector aparece el panel **Compensacion**.
+1. Selecciona la contratación en la cola o en el Directorio. En el inspector aparece el panel **Compensacion**.
 2. Si dice "Sin monto acordado", pulsa **Definir compensacion**. Si ya tiene monto, **Editar compensacion**.
-3. Ingresa el tipo de tarifa (fija, por hora, por hito, etc.), el monto y la cadencia. La **moneda no se edita** aqui (se eligio al crear la contratacion).
+3. Ingresa el tipo de tarifa (fija, por hora, por hito, etc.), el monto **bruto antes de retención** y la cadencia. La **moneda no se edita** aqui (se eligio al crear la contratacion).
 4. Guarda. El cambio queda registrado (quien y cuando) y el contratista vera el monto como dato de solo lectura.
 
 Mientras una contratacion activa no tenga monto, el contratista **no puede enviar trabajo** y una senal de salud lo marca para RR.HH.
+
+Para un acuerdo líquido, calcula el bruto con la política aplicable antes de guardarlo. La tarifa fija es del mes completo: **no se prorratea automáticamente por las fechas** y guardarla no actualiza los envíos ni payables anteriores. Para un mes parcial sigue [Cambiar el acuerdo y pagar un mes parcial](../../documentation/hr/contratistas-compensacion.md#cambiar-el-acuerdo-y-pagar-un-mes-parcial); conserva la tarifa recurrente y documenta la excepción del período en su envío.
+
+Si volvió después de renunciar o cambió de correo, revisa [Reingreso](../../documentation/hr/contratistas-onboarding.md#reingreso-con-otro-correo-o-después-de-una-renuncia) antes de crear otra persona o reutilizar el contrato anterior.
 
 ## Autorizar un pago que excede lo acordado (Finanzas) — TASK-968
 
@@ -202,7 +206,7 @@ El engagement nace en **Borrador** con clasificación **Necesita revisión**. Pa
 
 ### Qué no hace el onboarding
 
-No paga. No activa el engagement (queda en Borrador). No crea la relación legal desde cero (Person 360). No requiere `hr.contractor_engagement:create` (Camino A) o `:manage` (Camino B) — si no lo tienes, el botón no aparece.
+No paga. Activa el engagement si la clasificación no es bloqueante; una revisión pendiente no se marca como realizada. No crea la relación legal desde cero (Person 360). Requiere `hr.contractor_engagement:create` (Camino A) o `:manage` (Camino B) — si no lo tienes, el botón no aparece.
 
 ## Gestionar el ciclo de vida del engagement (TASK-975)
 
@@ -228,7 +232,7 @@ Los botones de ciclo de vida muestran **solo las transiciones validas** del esta
 
 ### Que no hace
 
-No paga ni prepara payables (eso es Finanzas, `/finance/contractor-payments`). No crea engagements ni convierte empleados (onboarding, futuro). No toca nomina ni finiquito.
+No paga ni prepara payables (eso es Finanzas, `/finance/contractor-payments`). No crea engagements ni convierte empleados (onboarding). No toca nomina ni finiquito.
 
 ## Puente hacia Finanzas
 

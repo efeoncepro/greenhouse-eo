@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-03 — Contratos y skills de reingreso sincronizados
+
+Arquitectura, invariantes, manuales, documentación funcional y runbooks reflejan compensación bruta/snapshots,
+proporcionales autorizados, identidad longitudinal, recuperación transaccional y verificación de consumidores.
+Skills de Payroll, Talent, Finance, Release, QA y arquitectura actualizadas para Codex/Claude; nuevo espejo
+Finance con gate. Tareas e índices ya no prescriben restaurar Valentina por SQL ni presentan la guarda como
+pendiente de deploy. [Cobertura documental](docs/audits/payroll/VALENTINA_DOCUMENTATION_SKILLS_CLOSURE_2026-09-03.md).
+Sin nuevas mutaciones de datos, flags o release. Prorrateo automático, resolución de ID público en off-cycle,
+UI TASK-1814 y bug de correlación de releases conservan su condición pendiente.
+
 ## 2026-09-03 — Corrección de reingreso y recuperación de disponibilidad
 
 Las actualizaciones de member confirman identidad y auditoría de forma transaccional; la proyección legal no reabre relaciones terminadas. Recovery y detector comparten vigencia real de episodios. Comando compensatorio con preview, hash de estado e idempotencia sustituye el SQL puntual. [Decisión y contrato](docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md). Vercel Production y worker corregidos verificados; Valentina restaurada 18:38:48Z, contratos/pagos/usuario intactos. Proyecciones People completadas 18:42:05Z sin reabrir employee ni alterar datos protegidos. Release `33795564223` cerrado, manifest released 19:30:49Z, health success y watchdog ok; readback final intacto.
@@ -1078,26 +1088,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
 - El readback live encontró los ocho Deals Wherex en `Core Pipeline` pese a que continúan `newbusiness`; se registra
   la deriva frente a la política `Strategic Bet` sin corregirla silenciosamente. CINTERMEX queda `HOLD vencido /
   portal no verificado` y los cuatro IDs de Grupo Reditos quedan `No bid` por decisión del operador.
-
-## 2026-08-28 — El candidato de discovery no declara pertinencia (hueco documentado y levantado)
-
-- Auditando la salida del smoke apareció que el candidato **no transporta ninguna señal de marca,
-  categoría ni relevancia** — ni en la tabla ni en el DTO. Consecuencia medida: 50 keywords de
-  consumidor sobre ChatGPT (`chatgpt en linea`, `chatgpt rojo`) pasaron **todos** los checks para un
-  target que vende servicios AEO B2B.
-- 🔴 El vector estructural no es elegir mal la seed: es **`TASK-1662`**. En el gap competitivo los
-  candidatos salen de dominios del competidor, así que **las seeds las elige él**, y sirve segmentos
-  que el cliente no. Ahí no hay operador a quien educar.
-- ⚠️ **La urgencia que se argumentó primero era falsa, y se corrigió el mismo día** (`65372ea68`).
-  Se afirmó que el orden por defecto pondera volumen y que la cola append-only de `TASK-1700`
-  congelaría lo irrelevante arriba. No ocurre: `work-queue/priority-score.ts` no mira el volumen
-  estimado del proveedor, y el CHECK `basis_band_score` impide fabricar un score sin demanda medida —
-  un candidato irrelevante **sin** impresiones cae a banda 3 con score `NULL` y no compite. El caso
-  que sí sostiene la task es el otro: keyword irrelevante **con** impresiones reales, que atraviesa
-  el CHECK y entra a la cola. El vector es la demanda medida, no el volumen del proveedor.
-- **Levantada como `TASK-1791`** (`to-do`, P1, `EPIC-022`, `backend-data`, `Blocked by: none`), sin
-  dueño asignado todavía. La señal entra como **factor del item con su procedencia, jamás como
-  entrada del `priority_score`**: `evidence_ref` es opaca por contrato (cero FK, cero JOIN al motor
-  que produciría la señal), así que puntuar con ella sería puntuar con algo que el aggregate no puede
-  citar. El hallazgo queda además en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §7 (no sólo en una
-  bitácora que rota) porque tres sesiones lo verificaron por separado el mismo día.

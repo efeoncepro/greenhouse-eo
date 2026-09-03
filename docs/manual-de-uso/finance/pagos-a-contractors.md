@@ -3,7 +3,7 @@
 > **Para:** operador de Finanzas
 > **Ruta:** Finanzas › Tesorería › Pagos a contractors (`/finance/contractor-payments`)
 > **Creado:** 2026-05-31 (TASK-974)
-> **Ultima actualizacion:** 2026-06-02 — flujo end-to-end validado desde envio aprobado hasta orden de pago y pago
+> **Última actualización:** 2026-09-03 — compensación, meses parciales y reingreso
 
 ## Para qué sirve
 
@@ -22,7 +22,7 @@ Un envio aprobado **no es un pago**. Un envio aprobado es el insumo para crear u
 - Necesitas rol de Finanzas (`finance_admin` / `finance_analyst`) o `efeonce_admin`.
 - El **override** (pagar por encima del monto acordado) y el **waiver** (pagar sin perfil de pago resuelto) requieren capability adicional — si no la tienes, el botón no aparece.
 - El monto a pagar lo fija HR en el engagement. Tú no cambias el monto acordado: lo pagas, o autorizas una excepción documentada.
-- La boleta/evidencia ya debe estar revisada por HR si vas a crear desde un envio aprobado.
+- HR debe haber aprobado el trabajo y monto del envío. Crear un payable todavía sin boleta no acredita haberla recibido: quedará bloqueado por `invoice_asset_missing` hasta adjuntar el documento correcto.
 - Para pagos mensuales, usa la **corrida mensual** despues de enviar los payables a Finanzas. Crear el payable no crea por si solo la orden de pago.
 
 ## Mapa mental del flujo
@@ -70,7 +70,7 @@ Al crear desde envio:
 - El sistema calcula retencion y neto desde el payable, no desde una estimacion visual.
 - No se paga nada todavia.
 
-Ejemplo: si HR aprobo `EO-CWS-0003` de Valentina por bruto `$707.965`, Finanzas crea un payable con bruto `$707.965`, retencion SII `$107.965` y neto a pagar `$600.000`.
+Ejemplo histórico de mayo de 2026 (no tarifa actual): si HR aprobó `EO-CWS-0003` de Valentina por bruto `$707.965`, Finanzas crea un payable con bruto `$707.965`, retencion SII `$107.965` y neto a pagar `$600.000`.
 
 ### 3. Crear payable off-cycle
 
@@ -82,6 +82,18 @@ Usa **Pago off-cycle** para ajustes, bonos, reembolsos o pagos que no nacen de u
 4. Confirma. El payable queda **Por preparar**.
 
 No uses off-cycle para saltarte un envio aprobado normal. Si existe envio aprobado, usa **Crear desde envio**.
+
+El campo **Engagement** del formulario off-cycle actual exige el identificador interno (`ceng-…`), no el identificador visible `EO-CENG-…`. Si dice «El engagement contractor no existe», no crees otro contractor: pide al operador autorizado resolver ambos IDs con el reader canónico y confirmar persona y episodio. Es una limitación actual del selector; no implica que la contratación no exista. Si ya hay un envío normal aprobado, vuelve a **Crear desde envío**.
+
+### Pago de un mes parcial o cambio de acuerdo
+
+1. Confirma con HR el episodio correcto, fechas, pacto bruto/líquido y la base proporcional autorizada.
+2. Comprueba si ya hay envío/payable para ese trabajo. Un cambio de compensación no modifica importes anteriores.
+3. HR registra el bruto proporcional en el envío, mediante los commands canónicos si la UI no permite ese importe, y aprueba el trabajo y cálculo. No reduzcas la tarifa mensual recurrente para representar un solo mes.
+4. Crea **un único payable desde ese envío** y revisa su desglose persistido.
+5. Si falta boleta, adjunta la del período y engagement correctos y vuelve a evaluar readiness. No reutilices la boleta de una etapa anterior ni desactives el requisito para desbloquear.
+
+La fecha de inicio no dispara prorrateo automático en la tarifa fija actual. El criterio **12/31** del caso Valentina fue una decisión explícita para agosto; no se aplica automáticamente a otro contrato. Consulta [Compensación y meses parciales](../../documentation/hr/contratistas-compensacion.md#cambiar-el-acuerdo-y-pagar-un-mes-parcial).
 
 ### 4. Revisar el detalle del payable
 
@@ -134,7 +146,7 @@ Despues de la corrida, el payable cambia a **En orden de pago**. Eso significa q
    - fecha comprometida;
    - metodo / processor / instrumento de salida cuando aplique.
 
-Para Valentina, el chequeo esperado era:
+En el ejemplo histórico de mayo de 2026, el chequeo era:
 
 - Contractor: **Valentina Hoyos**.
 - Payable: `EO-CPAY-0001`.

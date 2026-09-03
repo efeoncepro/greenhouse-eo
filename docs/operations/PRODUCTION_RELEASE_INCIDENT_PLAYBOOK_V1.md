@@ -3,7 +3,7 @@
 > **Tipo de documento:** Playbook operativo canónico
 > **Version:** 1.3
 > **Creado:** 2026-05-12 por Claude Opus 4.7 (post incidente TASK-870)
-> **Ultima actualizacion:** 2026-08-29 por Claude Fable 5 (release `e1718a359575`, 4.º del día: Deep rojo por drift test↔contrato + el rojo-no-leído en `develop`)
+> **Ultima actualizacion:** 2026-09-03 por Codex (cancelaciones concurrentes y correlación de webhooks por SHA)
 > **Audience:** Cualquier agente AI (Claude, Codex, Cursor) y operadores humanos que enfrenten un `Production Release Orchestrator` fallando
 
 ---
@@ -94,8 +94,8 @@ Identifica:
 | `release_batch_policy` **`split_batch`** | Dos dominios sensibles **independientes** mezclados sin documentar acoplamiento | Agregar el marker `[release-coupled: <razón>]` **abriendo una línea** del cuerpo del commit de squash (se lee sólo de ese commit, TASK-1676) OR partir en batches separados |
 | `release_batch_policy` **`requires_break_glass`** | El diff toca al menos un dominio **irreversible** (migraciones, schema, runtime de workers) | `--override-batch-policy` con reason ≥20 chars; la razón queda en `release_state_transitions.metadata_json`. ⚠️ **El marker `[release-coupled: …]` NO resuelve este caso** — ver la nota bajo la tabla |
 | `release_batch_policy` **`unknown`, "Diff vacío"** | El rango no contiene archivos: el `target_sha` coincide con el último release `released`, o falta `git fetch`/historia completa en el checkout | **NO es una aprobación** — verificar el `target_sha` y la base que declara el evidence (`diffBase`/`diffBaseSource`). Nunca bypassear esto como si fuera un `ship` |
-| `stale_approvals` | Run waiting > umbral en Production environment | Aprobar el run pendiente OR cancelar `gh run cancel` |
-| `pending_without_jobs` | Run queued/in_progress con `jobs.length === 0` (deadlock por concurrency) | Verificar `concurrency` setting per TASK-848; cancel el run trapped |
+| `stale_approvals` | Run waiting > umbral en Production environment | Aprobar sólo el run canónico; antes de cancelar, revisar colisión SHA/run/manifest y seguir §16 |
+| `pending_without_jobs` | Run queued/in_progress con `jobs.length === 0` (deadlock por concurrency) | Verificar `concurrency` per TASK-848; aplicar §16 antes de cancelar o despachar otro intento |
 | `vercel_readiness` | `VERCEL_TOKEN` unset OR Vercel API down | Set token en workflow env OR esperar Vercel recovery |
 | `postgres_health` | `pg:doctor` falla | Ejecutar `pnpm pg:doctor` local, fix lo que reporte |
 | `postgres_migrations` | Migrations pendientes | `pnpm pg:connect:migrate` |
@@ -531,6 +531,34 @@ después. Un release no es idempotente: dos merges `-s ours` + dos dispatches pr
 duplicados y gates cruzados. Corolario del mismo día: `git log origin/develop..HEAD` antes de cada
 push, porque un commit huérfano de otra sesión delante de `origin/develop` viaja en el push de quien
 sea, y su autoría se atribuye mal.
+
+### 16. Cancelar un duplicado puede abortar el manifest del intento correcto
+
+**Incidente 2026-09-03, SHA `a824d073a5fb01b916386312f6ae61c0082b67c9`:** el run
+`33793141529` había completado deploys y health con éxito cuando el webhook de cancelación del duplicado
+`33793232779` abortó su manifest. El reconciler vigente selecciona por SHA antes que por run ID y da
+prioridad al manifest activo: un evento firmado y allowlisted puede quedar asociado al intento ajeno.
+La concurrency group no evita esta asociación tardía. **Defecto de correlación pendiente**, no arreglo
+incluido en el release de recuperación de Valentina.
+
+El segundo intento `33794622145` fue cancelado por `@cesargrowth11` (anotación `100780409856`): sus jobs
+workers/health cancelados no acreditan fallo de Bicep ni éxito de despliegue. Codex canceló únicamente
+`33794635945`, todavía en cola y sin manifest; su webhook no aplicó transición. Claude dejó la coordinación
+(commit `587179533`) y Codex cerró el único intento posterior `33795564223`: `success`, manifest
+`a824d073a5fb-c2cf99e9-1ba1-40b3-9d85-76ad0a8e8372` `released` a las **19:30:49Z**, health `success` y
+watchdog `ok` con 4/4 workers. Estos son hechos del incidente, no una promesa de que una cancelación futura
+sea inocua. Evidencia detallada: [auditoría](../audits/payroll/VALENTINA_REHIRE_IDENTITY_RECOVERY_2026-09-03.md).
+
+**Recuperación operativa:** un coordinador; ningún dispatch duplicado; identificar run/SHA/manifest antes
+de cancelar; esperar y comprobar el procesamiento de todos los eventos terminales conocidos e inbox antes
+de crear otro intento; releer el manifest después. `aborted` es terminal: nunca SQL ni retry del job
+`transition-released`; se crea un intento canónico nuevo con preflight válido. Detalle ejecutable en
+[runbook §0.1](runbooks/production-release.md#01-un-coordinador-y-un-intento-vivo-por-release).
+
+**Trabajo técnico pendiente:** correlacionar eventos terminales con el intento dueño y cubrir dos runs
+con el mismo SHA, webhook tardío/cancelación de duplicado y ausencia de manifest propio. Una deduplicación
+por delivery ID no prueba propiedad del intento. Hasta implementar y desplegar ese arreglo con pruebas,
+la coordinación serial es mitigación y el bug permanece abierto.
 
 ## Caso positivo 2026-08-06 — el release que no generó incidente
 

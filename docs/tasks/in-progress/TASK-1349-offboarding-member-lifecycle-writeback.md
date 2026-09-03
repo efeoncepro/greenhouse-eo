@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `none`
-- Status real: `En producción + recovery aplicada 2026-09-03 (Felipe termination ejecutado; Luis/María Camila cerrados; señales 1/0/0). Abierto: restauración de Valentina por SQL del operador (ISSUE-163), release con guarda de reingreso (c5c030e99 en develop), Finance, UI TASK-1814`
+- Status real: `Backend en producción; recuperación de Valentina aplicada y verificada, ISSUE-163 resuelto (release 33795564223, 2026-09-03). Abiertos: conciliación Finance y UI TASK-1814; no repetir recuperaciones históricas.`
 - Rank: `TBD`
 - Domain: `hr|payroll|identity|finance`
 - Blocked by: `none`
@@ -308,7 +308,7 @@ ya están confirmados; no pedirlos nuevamente. Release y cambios de flags siguen
 - [x] ADR temporal actualizada y contrato de revisión/ejecución publicado con autorización fina, grant, errores y API parity. — Evidencia: `GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md` Architecture Decision 2026-09-03 + fila en `DECISIONS_INDEX.md`; capability `workforce.offboarding.review_case` (catálogo + grant + seed aplicado, verificado en PG); rutas HR + carril `app`; `capability-grant-coverage.test` verde (commits Slice 0/1).
 - [x] Caso SCIM existente puede revisarse/corregirse sin cancelar/crear; causal respaldada, fechas explícitas y aprobación invalidada si cambia su base. — `review-policy.test.ts` (16 casos) + preview read-only sobre el caso real de Felipe (lane → `non_payroll`, `unblocked`).
 - [x] Transacción, idempotencia, version conflict, rollback y auditoría/outbox verificados por comportamiento. — `member-lifecycle.test.ts` (idempotencia, 409 sin escrituras), `review-policy.test.ts` (409 conflict/400 required), tx única en `reviewOffboardingCase`/`transitionOffboardingCase` (`withTransaction` + `FOR UPDATE`, audit + outbox dentro). Rollback real (fallo intermedio) queda cubierto por `withTransaction`; no ejercitado contra PG con fixture sintético (pendiente en staging).
-- [x] Solo acceso no cierra compensación/member; término real coordina relación, vigencias y lifecycle. — `member-lifecycle.test.ts` ambos sentidos; writeback de member/relación detrás de flag OFF.
+- [x] Solo acceso no cierra compensación/member; término real coordina relación, vigencias y lifecycle. — `member-lifecycle.test.ts` ambos sentidos; writeback de member/relación detrás de flag (activación y evidencia posterior en ledger).
 - [x] Reader entrega contract_type_snapshot y selecciona episodio/período correcto; reingreso y versiones futuras cubiertos. — `policy.test.ts` (reingreso, international_internal) + smoke real `pnpm payroll:exit-eligibility:smoke` (Maggie `exclude_from_cutoff` desde approved); versiones futuras → 409 en el executor.
 - [x] active=false no excluye retrospectivamente mayo ni participación legítima hasta 02/06; períodos posteriores quedan excluidos. — `policy.test.ts` «Felipe-like» (mayo full, junio exclude_from_cutoff, julio exclude_entire_period).
 - [x] Readiness y comandos impiden cálculo autorizado ante salida relevante sin resolver o error del resolver; SCIM solo no implica impago. — `payroll-readiness.test.ts` + `calculation-gate.test.ts`; `calculatePayroll` 409; smoke real: Felipe `full_period` + `REVIEW` en jun/sep.
@@ -317,8 +317,8 @@ ya están confirmados; no pedirlos nuevamente. Release y cambios de flags siguen
 - [x] Write-target allowlists, source of truth, tenancy, acceso, migración y rollback documentados y verificados. — Delta 2026-09-03 en la arquitectura de offboarding + invariantes TASK-1349 + ledger de flags + migración seed con guard DO.
 - [ ] TASK-1814 permite completar el flujo desde la UI y comparte la decisión canónica sin lógica duplicada. — Contrato publicado en TASK-1814 (Delta 2026-09-03); UI no implementada (task hermana).
 - [x] Felipe queda fuera de períodos posteriores al 02/06/2026 — Recovery aplicada 2026-09-03 (`termination` declarada por el operador): executed, member inactivo, compensación cerrada al 02/06; readback mayo `full_period`, junio `exclude_from_cutoff`, julio/sept `exclude_entire_period`. La conciliación Finance (obligación junio 550.875 + SII 99.125 generadas por error) sigue como dependencia sin contrato de anulación: saldo cero confirmado por el operador, registros internos por conciliar.
-- [x] Cohorte de otros casos revisada con allowlist por sujeto, sin baja automática de casos solo de acceso. — Luis Reyes y María Camila Hoyos cerrados (lifecycle + stubs `access_only`); Maria Fernanda draft queda a decisión manual de HR; **Valentina Hoyos fue un falso positivo** (reingreso como contractor desde 20/08): guarda de reingreso agregada (`c5c030e99`), relación employee re-terminada por command; restauración final por SQL del operador (ISSUE-163).
-- [ ] Readbacks live de UI, PG, oficial/proyectada y señales confirman resultado; flags/deploy/recovery registrados por separado. — PG, resolver y señales verificados tras la recovery (1/0/0); falta readback UI (TASK-1814), la restauración de Valentina y el release de la guarda de reingreso.
+- [x] Cohorte de otros casos revisada con allowlist por sujeto, sin baja automática de casos solo de acceso. — Luis Reyes y María Camila Hoyos cerrados (lifecycle + stubs `access_only`); Maria Fernanda draft queda a decisión manual de HR; **Valentina Hoyos fue un falso positivo** (reingreso como contractor desde 20/08): guarda de reingreso y writer transaccional desplegados; restauración gobernada aplicada 18:38:48Z, proyecciones completadas 18:42:05Z, datos protegidos idénticos; ISSUE-163 resuelto. Véase auditoría de Valentina y release `33795564223`. La referencia a Maria Fernanda describe la primera cohorte, no una instrucción actual de recuperación.
+- [ ] Readbacks live de UI, PG, oficial/proyectada y señales confirman resultado; flags/deploy/recovery registrados por separado. — PG, resolver y señales verificados tras la recovery (1/0/0); restauración de Valentina y release de la guarda cerrados; falta recorrido UI de TASK-1814. Los conteos de esa cohorte son evidencia fechada, no estado actual.
 
 ## Verification
 
@@ -329,7 +329,7 @@ ya están confirmados; no pedirlos nuevamente. Release y cambios de flags siguen
 
 ## Closing Protocol
 
-- [x] Lifecycle/carpeta, Status real y acceptance criteria reflejan lo demostrado. — `in-progress`, code complete con rollout pendiente (no se mueve a `complete`).
+- [x] Lifecycle/carpeta, Status real y acceptance criteria reflejan lo demostrado. — `in-progress`: backend desplegado, recuperación de Valentina cerrada; UI y conciliación Finance siguen abiertas.
 - [x] Registry/README y TASK-1814 sincronizados; ISSUE-117 resuelto solo con cierre operativo conjunto. — ISSUE-117 sigue `open` con avance registrado.
 - [x] Arquitectura, invariantes, manual, runbook, Handoff y changelog actualizados según impacto.
 - [ ] `pnpm docs:closure-check` y `pnpm docs:context-check:strict` aprobados al cierre documental. — Se ejecutan al cierre de esta sesión (ver Delta).
@@ -378,15 +378,26 @@ el release.
 - **Recovery ejecutada después con autorización explícita del operador (mismo día):** Felipe (`termination`),
   Luis, María Camila. **Incidente:** Valentina Hoyos desactivada por error (reingreso contractor 20/08 no
   contemplado) → guarda `findReentryAfterExit` en `applyOffboardingLifecycleEffects` + señal excluye reingresos
-  (`c5c030e99`, sólo en develop); `updateMember` falló a mitad (ISSUE-163) y su `member.updated` reactivó la relación
-  employee terminada (re-terminada por command). Residual de member/asignación → SQL del operador.
+  (`c5c030e99`, entonces sólo en develop); `updateMember` falló a mitad (ISSUE-163) y su `member.updated` reactivó la relación
+  employee terminada (re-terminada por command). Ese residual se resolvió después por command compensatorio; el SQL puntual fue retirado. Véase cierre abajo.
 - **Incidente «fantasmas» en pre-nómina (mismo día):** los sujetos sintéticos del live test quedaron inactivos con
   compensación abierta y aparecían como `Colaborador <uuid>` en la pre-nómina de septiembre: el roster relajado los
   admitía y `hasDecidedExitFact` contaba un `identity_only` ejecutado como salida decidida. Corregido en datos
   (compensaciones cerradas por command) y en código (política + cleanup del live test); roster verificado limpio.
-- **Lección canónica:** «executed + member activo» NO es drift si existe un episodio posterior (relación o
-  engagement con inicio > LWD). El detector, la recovery y el executor deben mirar el episodio, no sólo la
-  compensación. Producción no tiene la guarda hasta el próximo release.
+- **Lección canónica:** «executed + member activo» no es drift cuando existe reingreso posterior vigente
+  según el predicado compartido (no un draft ni un episodio futuro). El command compensatorio exige además
+  relación vigente de la misma entidad. Guarda desplegada en release `33795564223`; detalle en la ADR de reingreso.
+
+## Cierre de recuperación de Valentina — 2026-09-03
+
+La [auditoría](../../audits/payroll/VALENTINA_REHIRE_IDENTITY_RECOVERY_2026-09-03.md) registra el command
+compensatorio aplicado, outbox publicado, consumers completados y siete categorías protegidas idénticas.
+`203fa04ec` incorpora actualización atómica de member/links/audit/outbox, proyección legal sin resurrección
+ y guardas de reingreso. Verificación: 41 unitarias, dos pruebas SQL read-only, build, CI y release
+`33795564223` success; manifest released 19:30:49Z, health success, watchdog 4/4.
+El [runbook](../../operations/runbooks/workforce-reentry-recovery.md) sustituye el SQL retirado. No repetir
+la recuperación para validar la UI; esta y Finance conservan su scope pendiente. La elegibilidad SSO no
+se presenta como prueba de login interactivo.
 
 ## Follow-ups
 

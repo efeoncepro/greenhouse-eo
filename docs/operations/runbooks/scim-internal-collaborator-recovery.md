@@ -7,9 +7,9 @@
 
 ## Overview
 
-Esta task introduce un primitive atomic para materializar `client_user + identity_profile + member + person_membership` desde un SCIM CREATE elegible. Esta runbook cubre los **5 escenarios canónicos** de recovery operativo.
+Esta task introduce un primitive atomic para materializar `client_user + identity_profile + member + person_membership` desde un SCIM CREATE elegible. Este runbook cubre escenarios de recovery operativo, incluido el reingreso con una cuenta nueva.
 
-Comportamiento canónico de producción (post-merge, sin flags flippeadas todavía):
+Defaults históricos de TASK-872; no representan el estado actual de Production. Antes de operar, verifica flags/runtime y el ledger vigente:
 
 - `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED=false` (default) → SCIM CREATE corre legacy `createUser` (solo crea `client_user`). Behavior idéntico a pre-TASK-872.
 - `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED=false` (default) → payroll engine no filtra por `workforce_intake_status`. Behavior idéntico a pre-TASK-872.
@@ -66,7 +66,11 @@ WHERE cu.microsoft_oid = '<external_id>';
 
 Esperado: 1 row con `identity_profile_id`, `member_id` no NULL + `workforce_intake_status='pending_intake'`.
 
-## Escenario 2 — Backfill apply Felipe Zurita + Maria Camila Hoyos (Sesión 2)
+## Escenario 2 — Referencia histórica del backfill inicial (TASK-872)
+
+**No ejecutar esta allowlist como recuperación vigente.** Estos nombres y estados describen el alta inicial;
+los episodios posteriores pueden incluir salidas. Relee identidad, relaciones, engagements y elegibilidad antes
+de preparar cualquier plan nuevo. La historia del backfill no autoriza reactivar a una persona.
 
 **Síntoma**: signal `identity.scim.users_without_member` = 2 (Felipe + Maria) tras merge TASK-872.
 
@@ -148,27 +152,33 @@ FROM greenhouse_core.members m
 WHERE m.member_id = '<member_id_from_error>';
 ```
 
-**Recovery (admin endpoint TBD V1.1)**:
+**Recovery gobernada**:
 
-V1.0 path: humano resuelve manualmente vía SQL UPDATE con audit row + decisión documentada.
-
-Opción A — reassign member a expected profile:
-
-```sql
-UPDATE greenhouse_core.members
-SET identity_profile_id = '<expected_profile_id>',
-    azure_oid = '<expected_external_id>',
-    updated_at = NOW()
-WHERE member_id = '<member_id>';
-```
-
-Opción B — crear nuevo member (legacy era una persona distinta):
-
-Se requiere TASK derivada con investigación de doble identidad. NO ejecutar sin investigación.
+1. Verifica la identidad longitudinal y el OID en el proveedor. Un cambio de correo no prueba otra persona
+   ni autoriza un merge. Relee profile, user, member, source links y relaciones antes de proponer la corrección.
+2. Distingue un vínculo obsoleto de una colisión entre personas. Una colisión requiere investigación y una
+   decisión explícita; no reasignes un member ni crees otro para hacer desaparecer el error.
+3. Usa el command dueño disponible. Si falta un command de rebinding que cubra el caso, documenta ese gap;
+   una reparación excepcional requiere plan revisado, autorización, locks/estado esperado, audit y outbox
+   en una transacción y comparación posterior. Este runbook no proporciona un `UPDATE` aislado ejecutable.
+4. Preserva historial y roles vigentes; no amplíes acceso como parte de corregir un vínculo. El command de
+   restauración de lifecycle descrito abajo no modifica identidades del proveedor.
 
 **Validación post-resolución**:
 
-Reintentar `provisionOnDemand` Entra para el user. Signal `member_identity_drift` debe bajar a 0 cuando no hay más logs `member_identity_drift` en últimos 30 días.
+Relee los vínculos por identificadores estables y confirma que no hay duplicados ni colisiones. Un retry de
+`provisionOnDemand`, cuando corresponda, necesita su propio readback; no demuestra reingreso legal ni
+reactivación correcta. Distingue logs históricos de un fallo actual y elegibilidad SSO de login interactivo.
+
+### Reingreso con correo/OID nuevo y salida anterior ejecutada
+
+Resuelve por separado identidad/acceso, nuevo episodio contractual y disponibilidad. Reutiliza la misma
+persona/usuario/member tras verificar el proveedor; registra el nuevo episodio por el flujo contractual
+canónico y conserva las fechas del anterior. No reabras una relación employee por tener un contractor activo.
+Si una salida histórica dañó member/asignación pese a un reingreso vigente, usa el
+[runbook de recuperación](workforce-reentry-recovery.md): preview, plan explícito, estado esperado,
+command compensatorio autorizado e idempotencia. No es un command de rebinding ni sustituye el onboarding.
+Después verifica outbox, consumers, relaciones y pagos protegidos, además de los readers de acceso.
 
 ## Escenario 4 — Member pending_intake > 30 días sin completar
 

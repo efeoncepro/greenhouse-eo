@@ -775,6 +775,14 @@ Exits are NOT this skill's domain. Once a person leaves — or an access signal 
 - A case born from an access signal (`identity_only`) cannot be approved/scheduled/executed without that review first.
 - Detail + live state: `docs/architecture/agent-invariants/PAYROLL_WORKFORCE_AGENT_INVARIANTS.md` → `### Offboarding review, temporal eligibility and lifecycle writeback invariants (TASK-1349, desde 2026-09-03)`; runtime code paths: `greenhouse-payroll-auditor/references/greenhouse-payroll-runtime.md`.
 
+### Return after an ended episode
+
+Preserve the canonical person across work-email changes, with Identity verifying ownership/bindings. Keep ended employee and contractor episodes distinct from the new engagement; active member/user flags are not authority to reopen legal history. New dates and agreement need explicit People evidence; a closed employee episode and an active contractor engagement can validly coexist.
+
+Workforce's executor/detector/discovery use `reentry-predicates.ts` / `findReentryAfterExit` to preserve later current episodes (`reentry_detected` / `reentry_preserved`). For an incorrect writeback already applied, route to `restoreOffboardingLifecycleAfterReentry` and `scripts/workforce/restore-offboarding-lifecycle.ts`: preview → exact reviewed snapshot/hash → authorized apply → protected-state/event readback. The compensating command checks active admin and same-entity later workforce relationship, updates only availability/selected assignments, leaves legal/money/access objects untouched and records audit/outbox atomically. Vercel and worker consumers must both be corrected before emitting the events; member activation never reopens ended employee history.
+
+The canonical procedure is `docs/operations/runbooks/workforce-reentry-recovery.md`; the accepted contract is `docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md`. The dated Valentina audit records the successful repair and release, not a generic authorization to replay her plan. Verify access through Identity readers separately; “eligible” does not prove interactive SSO. Contractor monthly rate, per-period proration and invoice readiness remain the contractor/Finance lane.
+
 ## First reads inside the repo
 
 `CLAUDE.md` · `AGENTS.md` · `project_context.md` · `Handoff.md` · `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` · `EPIC-011` + `TASK-1360..1363` · `docs/context/` (agency roles, ICO, voice).

@@ -40,6 +40,14 @@ El pago a un contractor nace en HR y termina en el banco. Esta pantalla es la **
 
 El bruto, la retención y el neto se leen **tal cual vienen del payable**. La tasa de retención (honorarios CL) viene congelada del engagement (lo que estaba vigente cuando se firmó). La pantalla nunca inventa ni recalcula un número.
 
+## Compensación recurrente, período parcial y reingreso
+
+La compensación del engagement es **bruta**. Actualizarla no reescribe los envíos ni los payables existentes. Una tarifa fija toma el mes completo; actualmente las fechas del servicio no generan prorrateo automático. El importe parcial autorizado se documenta en el envío del período y el payable se crea desde ese envío aprobado, conservando la tarifa recurrente. Consulta [Compensación](../hr/contratistas-compensacion.md).
+
+Un reingreso usa una etapa contractual nueva sobre la misma persona; el payable viejo sigue asociado a su engagement y conserva su obligación/orden. La recuperación de disponibilidad no debe cambiar identidad, condiciones ni importes de ningún episodio. Una boleta faltante conserva `invoice_asset_missing`; aprobación del trabajo no significa documento recibido ni pago autorizado al banco.
+
+El formulario off-cycle recibe actualmente la PK `ceng-…`; el ID público `EO-CENG-…` no se resuelve en ese writer. El mensaje de inexistencia exige comprobar ambos IDs y el episodio, no duplicar a la persona. Procedimiento: [manual de pagos](../../manual-de-uso/finance/pagos-a-contractors.md).
+
 ## ¿Cuándo se paga? — el compromiso de 5 días hábiles
 
 Efeonce se compromete a pagar a sus contractors (igual que a sus colaboradores) **dentro de los primeros 5 días hábiles posteriores al cierre del mes**. Por eso, cuando se crea un payable, su **fecha límite de pago (`due_date`) se calcula automáticamente**: último día hábil del mes operativo **+ 5 días hábiles** (usando el mismo calendario de feriados y la misma zona horaria que la nómina).

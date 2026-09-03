@@ -1,4 +1,4 @@
-# Valentina Hoyos — recuperación de acceso y pendientes de reingreso
+# Valentina Hoyos — reingreso y recuperación verificados
 
 - Fecha: 2026-09-03.
 - Estado: acceso, disponibilidad y asignación recuperados; etapas contractuales separadas; payable agosto creado por 12/31, pendiente de boleta. Guardas correctivas desplegadas y eventos de recuperación procesados; release cerrado y verificado; detalle y límites al final.
@@ -129,3 +129,8 @@ La coordinación se resolvió posteriormente mediante el commit `587179533`: Cla
 El intento `33795564223` terminó **success**, con manifest `a824d073a5fb-c2cf99e9-1ba1-40b3-9d85-76ad0a8e8372` **released** (19:20:51.833Z → 19:30:49.381Z), health **success** a las 19:29:40Z y watchdog **ok**, 4/4 workers sincronizados. Los workers están Ready; tres ejecutan `a824d073` y ops-worker `203fa04ec` con diff de árbol completo vacío. El readback posterior a este release vuelve a confirmar disponibilidad restaurada, contractor vigente y siete categorías protegidas intactas. Acceso elegible con el correo nuevo; login interactivo no ejercitado. Agosto sigue pendiente de boleta.
 
 La recuperación de Valentina y su protección de reingreso quedan cerradas. El defecto independiente de asociación de eventos de release por SHA queda documentado para Platform/DevOps; no se cambió ese control plane en este lote. Los intentos fallidos se conservaron como historia auditable, sin forzar estados terminales ni repetir la recuperación.
+
+## Cierre de documentación y skills
+
+La [matriz de cobertura](VALENTINA_DOCUMENTATION_SKILLS_CLOSURE_2026-09-03.md) registra los dueños actualizados,
+verificación documental y capacidades pendientes. No añade otro apply ni otra prueba de login.

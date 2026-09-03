@@ -12,6 +12,9 @@ Indice de auditorias tecnicas y operativas versionadas dentro de `docs/`.
 
 ## Categorias
 
+- [Valentina — cobertura documental y skills — 2026-09-03](payroll/VALENTINA_DOCUMENTATION_SKILLS_CLOSURE_2026-09-03.md).
+- [Valentina Hoyos — reingreso y recuperación verificados — 2026-09-03](payroll/VALENTINA_REHIRE_IDENTITY_RECOVERY_2026-09-03.md) — contractor activa desde 20/08, disponibilidad restaurada y release cerrado; historia/pagos preservados. Agosto 12/31 registrado, pendiente boleta; login interactivo no probado.
+
 - [Berel — numeración editorial noviembre/diciembre — 2026-09-03](seo/BEREL_EDITORIAL_NUMBERING_2026-09-03.md) — mapa por ID, alias de archivos y readback de dependencias; consultar antes de interpretar números de auditorías anteriores.
 
 - [ANAM Customer Agent QA — 2026-07-16](ANAM_CUSTOMER_AGENT_QA_REPORT_2026-07-16.md)

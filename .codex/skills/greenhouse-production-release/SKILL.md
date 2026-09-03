@@ -121,12 +121,33 @@ legacy credential until the production build and runtime evidence are green. Aft
 replacement still builds a private package and record the legacy disable/revocation result without exposing
 either credential.
 
+## Coordinación de intentos y recuperación con eventos
+
+- Un coordinador por release. Antes de merge/dispatch/approval/cancelación, lee los runs existentes,
+  el manifest y sus `workflow_runs`; al retomar otra sesión conserva SHA, run ID y release ID.
+- **No canceles un duplicado como limpieza inocua:** el reconciler vigente prioriza `target_sha`
+  antes de run ID y puede abortar el manifest del intento correcto. La concurrency group no evita
+  webhooks tardíos. Este defecto sigue pendiente; operación serial es mitigación, no corrección.
+- Tras cancelaciones, verifica conclusiones terminales y procesamiento de sus webhooks/inbox antes
+  del próximo dispatch. Relee el manifest. `aborted` es terminal: nunca SQL ni retry del job final
+  contra ese manifest; crea el nuevo intento por el orquestador con preflight válido.
+- `completed/cancelled` no es éxito ni prueba de fallo Bicep/proveedor. Lee jobs, anotaciones y actor;
+  atribuye cada acción al run y coordinador verificados. Runtime sano no sustituye manifest cerrado.
+- Si una recuperación emite eventos, verifica antes la guarda en todos los runtimes consumidores
+  activos (incluidos Vercel y worker cuando ambos la ejecutan). Después, verifica entrega y proyección
+  de los eventos exactos y compara los datos protegidos; un readback inmediato no cubre una regresión
+  asíncrona. Recuperación aplicada y release cerrado se reportan por separado.
+
+Procedimiento dueño: `docs/operations/runbooks/production-release.md` §0.1. Incidente y evidencia:
+`docs/operations/PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md` §16. No repitas cancelaciones ni recuperaciones
+por una nota histórica; consulta estado actual y la clave de idempotencia.
+
 ## Canonical Release Path
 
 The normal release path is:
 
 0. Start an agent E2E release timer and prepare the timing-ledger row. Reading, review, analysis and preparation count.
-1. Confirm current branch, remotes, and dirty worktree.
+1. Confirm current branch, remotes, dirty worktree, coordinator and existing orchestrator/manifest. Follow the existing attempt when one is active.
 2. Confirm `develop` is green and no unrelated local changes will be included.
 3. Run or inspect release preflight:
    - local exploratory: `pnpm release:preflight --target-sha=<sha> --target-branch=main`

@@ -32,6 +32,16 @@ This overlay pins the Greenhouse decisions so the global skill's "boring tech pr
 - **`docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`** — Full API parity (UI is a client of governed contracts; Duncan Lennox / HubSpot principle). See pinned decision #16.
 - **`docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`** — EPIC-026 contract for continuing product work extraction-ready without pre-creating target apps/packages.
 
+## Workforce reentry / member identity transaction
+
+For reentry, offboarding recovery or member/source-link atomicity, load
+`docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md`,
+`docs/architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` and
+`docs/operations/runbooks/workforce-reentry-recovery.md`; compose with
+`greenhouse-payroll-auditor` and `greenhouse-talent-people-operator`.
+Keep availability, access, legal episodes and payments separate. Verify event consumption and protected
+history after recovery; a member event must not reopen a terminated employment relationship.
+
 ## Compose with the `astro` skill (Astro / static-site / efeonce-think work)
 
 When a design or review touches an **Astro** property — `efeonce-think` (the AI

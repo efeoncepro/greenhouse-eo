@@ -2,10 +2,11 @@
 
 ## Estado vigente para agentes
 
-Greenhouse es la plataforma operativa de Efeonce Group sobre Next.js 16, MUI 7, Vuexy starter-kit y
-TypeScript. Este archivo contiene solo contratos durables y rutas de descubrimiento. El estado de una sesión,
-rollout o bloqueo vive en [Handoff.md](Handoff.md); la historia pre-2026-07-19 quedó preservada en
+Greenhouse: plataforma operativa Efeonce Group, Next.js 16/MUI 7/Vuexy starter-kit/TypeScript.
+Contratos durables aquí; estado en [Handoff.md](Handoff.md); historia preservada en
 [`docs/operations/agent-context-history/2026-07-19/project_context.legacy.md`](docs/operations/agent-context-history/2026-07-19/project_context.legacy.md).
+
+Reingresos e identidad: [contrato canónico](docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md).
 
 TeamBot usa `pnpm teams:announce` para grupos: menciones explícitas, no `@todos` ni DMs. Un 1:1 manual aprobado exige dispatcher/audit canónicos, Entra revalidada e idempotencia; lo recurrente converge a Notification Hub. En Performance Reports, volumen no prueba sobrecarga y el mensaje publicado verifica la mención. Contrato: [`manual-teams-announcements.md`](docs/operations/manual-teams-announcements.md).
 

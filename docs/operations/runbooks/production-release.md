@@ -3,7 +3,7 @@
 > **Audience:** EFEONCE_ADMIN + DEVOPS_OPERATOR
 > **Spec canónico:** [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
 > **Source task:** TASK-848 V1 (parcial; V1.1 follow-ups en TASK-850..855)
-> **Last updated:** 2026-08-29
+> **Last updated:** 2026-09-03
 > **Timing ledger:** [PRODUCTION_RELEASE_TIMING_LEDGER.md](../PRODUCTION_RELEASE_TIMING_LEDGER.md)
 
 Este runbook es el contrato operativo para promover `develop` → `main` y para ejecutar rollback de emergencia.
@@ -45,6 +45,40 @@ preparar. La metrica principal es **tiempo agente end-to-end**, no
 `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md` con agente, fecha, release
 ID, run ID, target SHA, tiempo agente E2E, workflow elapsed, manifest elapsed,
 runtime-green elapsed, desglose de fases, bloqueo principal y aprendizaje.
+
+### 0.1. Un coordinador y un intento vivo por release
+
+Antes de mergear, despachar, aprobar o cancelar, identifica al coordinador y lee los runs recientes del
+orquestador, el manifest activo y su `workflow_runs`. Si otra sesión ya opera el mismo release, continúa
+observando ese intento; no crees otro. En un traspaso registra coordinador, SHA, run ID, release ID, gates
+pendientes y última evidencia. La concurrencia de GitHub no sustituye esta coordinación.
+
+**Limitación vigente (2026-09-03):** `github-webhook-reconciler.ts` busca primero por `target_sha` y prioriza
+un manifest activo; el `workflow_run_id` sólo es fallback. Un evento terminal `cancelled` de un duplicado
+puede por ello abortar/degradar el intento correcto del mismo SHA. El incidente está contenido mediante
+operación serial; el defecto de correlación **no quedó corregido** por el release de Valentina.
+
+1. Antes de cancelar un run obsoleto, cruza su SHA/run ID con el manifest activo. No canceles duplicados
+   del mismo SHA mientras otro intento esté activo como si fuera una limpieza inocua. El coordinador debe
+   resolver la colisión y registrar los efectos; consulta el [playbook §16](../PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md#16-cancelar-un-duplicado-puede-abortar-el-manifest-del-intento-correcto).
+2. Antes de un nuevo dispatch tras una cancelación, espera las conclusiones terminales y confirma que sus
+   eventos se procesaron en `greenhouse_sync.github_release_webhook_events` y el inbox correspondiente.
+   Lee `workflow_run_id`, `release_id`, `matched_by`, `transition_applied` y el estado final del manifest.
+   Un run `completed` no prueba que sus webhooks hayan terminado; una espera fija tampoco lo demuestra.
+3. Si el manifest quedó `aborted`, conserva evidencia y crea un intento nuevo por el orquestador después
+   de verificar lo anterior y el preflight. Nunca hagas SQL, fuerces `aborted → released` ni reintentes
+   sólo el job final contra ese manifest terminal.
+4. Distingue el estado de cada plano: `cancelled` no es `success`; un job cancelado no demuestra fallo
+   de Bicep, una dependencia o un proveedor. Revisa conclusiones, anotaciones y actor antes de atribuir
+   causas. Cierra con workflow, manifest, health, watchdog y efectos del dominio verificados.
+
+Para recuperación de datos que emite eventos, despliega primero las guardas en **todos** los runtimes
+que pueden consumirlos (Vercel y worker si ambos ejecutan el consumer), verifica alias/tráfico activo y
+luego aplica el command gobernado. El readback debe repetirse después de la entrega y proyección de los
+eventos exactos, comparando los datos protegidos. La recuperación puede preceder al cierre del manifest
+cuando la revisión activa ya está verificada; no equivale por sí misma a release cerrado. Véanse el
+[contrato code-first](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md#lesson-5--path-b-recovery--ship-requiere-code-first-cuando-ambos-usan-el-mismo-bug-class)
+y el [runbook de reingreso](workforce-reentry-recovery.md).
 
 ## 1. Decision tree (flujo normal canonico)
 
@@ -536,7 +570,8 @@ Approval desde GitHub UI:
 Repo → Actions → <Workflow> → <Run> → Review pending deployments → Approve & deploy
 ```
 
-**⚠️ Crítico**: NO aprobar runs viejos (>24h). Si hay runs antiguos waiting, **cancelar primero**:
+**⚠️ Crítico**: NO aprobar runs viejos (>24h). Antes de cancelar, aplica §0.1: identifica el manifest
+y drena los eventos terminales antes del siguiente intento. Sólo entonces ejecuta la cancelación acordada:
 
 ```bash
 gh run list --status waiting --workflow=<name>
@@ -975,8 +1010,9 @@ Visitar [`/admin/operations`](https://greenhouse.efeoncepro.com/admin/operations
 
 Si **stale_approval** o **pending_without_jobs** > 0:
 1. `gh run list --status waiting --status queued` para identificar runs
-2. Cancelar runs antiguos: `gh run cancel <id>`
-3. Re-correr el deploy si fue cancelado en cascada
+2. Aplicar §0.1 antes de cancelar runs antiguos; revisar el SHA, manifest y posible colisión.
+3. Esperar y verificar eventos terminales/inbox; si el manifest quedó `aborted`, iniciar un nuevo intento
+   canónico. No reintentar jobs finales de un manifest terminal.
 
 ## 9. Configuración requerida (one-time)
 

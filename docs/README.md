@@ -49,6 +49,8 @@ Indice maestro de la documentacion no operativa del repo.
 
 ### Architecture
 
+- [Reingreso Workforce: contrato y recuperación](architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md) · [Runbook](operations/runbooks/workforce-reentry-recovery.md)
+
 - [Architecture Decisions Index](architecture/DECISIONS_INDEX.md)
 - [Efeonce Shared Product UI Platform Decision](architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md)
 - [Creative Studio — Business Model Decision V1](architecture/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_DECISION_V1.md)

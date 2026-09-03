@@ -805,6 +805,14 @@ SQL instance shared by dev, staging and production**. Every rule below exists be
   the capacity-closure reconciler's live tests are **read-only over candidate data on purpose** — and why
   green live tests there never prove the write path was exercised.
 
+## Returning people: preserve the person, distinguish the episodes
+
+A person who returns with another work email is not automatically a new person or a revived employee contract. Discover the existing identity/profile, prior legal episodes, current contractor engagement, member availability and access separately; names and email similarity alone never authorize a merge. People owns the confirmed dates and agreement; Identity owns account linking, Workforce owns legal episodes/availability, and Finance owns period submissions/payables.
+
+A historical exit must not deactivate a later current episode. If its writeback already damaged availability, hand off to `greenhouse-payroll-auditor` and the governed `restoreOffboardingLifecycleAfterReentry` runbook; never create a duplicate person, re-run SCIM activation, reopen the old employee relationship or issue SQL as a shortcut. The recovery requires a current later same-entity workforce relationship, active admin, snapshot/hash and explicit target, with audit/events atomic. Confirm both deployed consumer surfaces before apply and exact event processing afterward. A changed recurring agreement does not retroactively rewrite payables or prove automatic proration support.
+
+Detailed ownership and paths: `references/greenhouse-runtime.md` §Offboarding / salida de colaboradores and `docs/operations/runbooks/workforce-reentry-recovery.md`. Use the dated Valentina audit as evidence of that operation, never a reusable set of person IDs, dates or live status for another case.
+
 ## First reads (before acting inside Greenhouse)
 
 - `CLAUDE.md`, `AGENTS.md`, `project_context.md`, `Handoff.md`

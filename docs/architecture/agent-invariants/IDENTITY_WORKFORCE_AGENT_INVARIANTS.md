@@ -6,6 +6,18 @@
 
 > **Relocados de `CLAUDE.md` por TASK-1160 (2026-06-16), verbatim.** Contrato: `GREENHOUSE_IDENTITY_ACCESS_V2.md`, `GREENHOUSE_INTERNAL_IDENTITY_V1.md` + task-specs TASK-784/785/872. Dedup = Slice 4.
 
+### Reingreso, disponibilidad e historia (2026-09-03)
+
+- Un correo/OID nuevo no crea otra persona por sí solo: conserva el principal longitudinal y verifica el vínculo del proveedor sin auto-merge por email.
+- Acceso, disponibilidad del member, relación legal, engagement y pago son estados independientes. Recuperar uno no autoriza reabrir los demás.
+- La rama PostgreSQL de `updateMember` confirma member, source links canónicos, audit y outbox en una transacción; los mirrors BigQuery son posteriores al commit. No reproducir esa operación mediante un `UPDATE` aislado.
+- Un evento `member.updated` no puede reabrir una relación employee terminada ni crear una si existe historia employee/contractor/executive.
+- Una salida histórica no debe desactivar un reingreso vigente. La restauración requiere preview, estado esperado, autorización vigente e idempotencia; no reutilizar planes de otra persona ni el SQL retirado.
+- Verifica por separado commit, publicación, consumo de proyecciones y datos protegidos. Elegibilidad SSO no demuestra login interactivo.
+
+Contrato: [decisión de recuperación](../GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md) y
+[runbook](../../operations/runbooks/workforce-reentry-recovery.md).
+
 ### Hiring → Entra workforce provisioning invariants (TASK-1761, ADR Proposed 2026-08-21)
 
 Hasta aceptar `GREENHOUSE_HIRING_ENTRA_WORKFORCE_ACCOUNT_PROVISIONING_DECISION_V1.md`, no ejecutar writes Azure.

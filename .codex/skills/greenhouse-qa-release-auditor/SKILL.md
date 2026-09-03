@@ -105,6 +105,18 @@ verdict. Codex and Claude skill names are not assumed to match.
    - Use `operativamente bloqueado` when the behavior cannot exist until an
      external action or missing dependency is resolved.
 
+## Recuperación de lifecycle y cierre del release
+
+Para una reparación que emite eventos, exige guardas activas en todos los runtimes consumidores y
+readback después de sus entregas/proyecciones exactas. Compara los datos protegidos antes y después;
+no basta que el command devuelva éxito. Acceso elegible por reader no prueba un login interactivo.
+`references/runtime-rollout.md` contiene el checklist y los límites de evidencia.
+
+En releases con intentos concurrentes, separa run, manifest y runtime; `cancelled` no es éxito ni una
+causa técnica de fallo. La cancelación de un duplicado del mismo SHA puede afectar al manifest activo
+por una limitación aún abierta del reconciler. Usa `greenhouse-production-release` y su runbook §0.1;
+no recomiendes retry del job final sobre `aborted` ni cierres el bug de correlación por un release verde.
+
 ## Cierre de incidentes Sentry
 
 Para un incidente de cliente o identidad, separa corrección, evidencia de runtime y estado de

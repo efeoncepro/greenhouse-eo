@@ -5,19 +5,17 @@
 Maggie/María Fernanda: cierre 4/4 aplicado, unresolved=0; nómina agosto ready. Finance histórico requiere
 conciliación. [Evidencia 03/09](docs/audits/payroll/MAGGIE_MARIA_FERNANDA_OFFBOARDING_CLOSURE_2026-09-03.md).
 
-Valentina reingreso (2026-09-03): acceso recuperado con autorización del operador sobre la misma persona/usuario/member;
-cuenta Microsoft nueva activa y buscador por correo nuevo verificados mediante readers canónicos. Roles e historia
-financiera preservados. [Auditoría y recuperación](docs/audits/payroll/VALENTINA_REHIRE_IDENTITY_RECOVERY_2026-09-03.md).
-Operador confirmó último día anterior 30/05/2026: EO-CENG-0001 ending, relación anterior ended; nuevo EO-CENG-0002
-active desde 20/08, bruto mensual 530.973. Confirmado 12/31: EO-CWS-0004 aprobado → EO-CPAY-0002 pending_readiness,
-líquido 174.193,55; único blocker boleta faltante. Sin obligación/orden nueva. Login interactivo no probado.
+Valentina (03/09): misma persona/usuario/member, correo nuevo y elegibilidad SSO verificados; login
+interactivo no probado. Último día anterior 30/05/2026, EO-CENG-0001 ending; EO-CENG-0002 activo desde
+20/08, bruto mensual 530.973 (450.000 líquidos). Agosto 12/31: EO-CPAY-0002 pending_readiness,
+neto 174.193,55, única falta boleta; sin obligación/orden nueva. Recuperación y evidencia abajo.
 
 TASK-1349 **EN PRODUCCIÓN + recovery aplicada** (2026-09-03; release `62356c9b7fd4`, run `33779259694`, flag
 `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` ON prod+staging). Recovery por los commands canónicos, autorizada
 en chat: **Felipe** revisado `relationship_ended` con causal `termination` declarada por el operador → approved →
 scheduled → executed; member inactivo, compensación cerrada al 02/06, mayo `full_period`, junio `exclude_from_cutoff`,
 julio+ `exclude_entire_period`. **Luis Reyes y María Camila Hoyos**: lifecycle cerrado (relación employee terminada
-al LWD real, member inactivo) y stubs SCIM cerrados como `access_only`. Señales: unresolved **1** (Maria Fernanda,
+al LWD real, member inactivo) y stubs SCIM cerrados como `access_only`. Snapshot inicial, sustituido por el cierre Maggie/María Fernanda de arriba: unresolved **1** (Maria Fernanda,
 draft 07-29, decisión manual de HR), executed_member_still_active **0**, deprovisioned_without_case 0.
 
 🔴 **«Colaboradores fantasma» (2026-09-03 ~17:50Z, resuelto):** la pre-nómina de septiembre mostró seis
@@ -45,14 +43,15 @@ Attempts 1 y 2 `aborted` por cancelaciones cruzadas: el webhook empareja por `ta
 APLICADA 18:37Z:** 12 members `TASK-1349 live …` (253 filas, `scripts/workforce/purge-task1349-live-subjects.sql`);
 265→253 members, 8 activos, todos reales.
 
-Offboarding (2026-09-03): auditoría UI/código/PG registrada en
-[informe](docs/audits/payroll/OFFBOARDING_ROOT_CAUSE_AND_REMEDIATION_2026-09-03.md).
-[TASK-1349](docs/tasks/in-progress/TASK-1349-offboarding-member-lifecycle-writeback.md) amplía revisión contractual,
-elegibilidad temporal y recovery; nueva [TASK-1814](docs/tasks/to-do/TASK-1814-offboarding-case-review-recovery-ui.md)
-posee UI dependiente. Ambas to-do, sin implementar; 20–32 horas efectivas estimadas en conjunto.
-Felipe salió 02/06/2026 y el operador confirma todo pagado/saldo cero. Caso blocked con fechas corregidas,
-member/compensación abiertos: aún puede entrar a nómina. Registro no autoriza otro pago ni deploy.
-Siguiente paso: plan de ejecución/ADR temporal, luego backend → UI → recovery/readback conjunto; preservar historia.
+Offboarding: la [auditoría inicial](docs/audits/payroll/OFFBOARDING_ROOT_CAUSE_AND_REMEDIATION_2026-09-03.md)
+es antecedente, no estado vigente. [TASK-1349](docs/tasks/in-progress/TASK-1349-offboarding-member-lifecycle-writeback.md)
+conserva pendientes Finance; [TASK-1814](docs/tasks/to-do/TASK-1814-offboarding-case-review-recovery-ui.md) posee
+la UI aún sin implementar. No repetir las recoveries cerradas para probar ese recorrido.
+
+Cierre documental 03/09: tres subagentes sincronizaron Workforce/Talent, Contractors/Finance y Release/QA;
+root integró identidad, arquitectura, tareas e índices. [Cobertura y límites](docs/audits/payroll/VALENTINA_DOCUMENTATION_SKILLS_CLOSURE_2026-09-03.md).
+Bug independiente de correlación de releases por SHA/run ID sigue pendiente; el runbook documenta mitigación
+con un coordinador y lectura de intentos/eventos, sin declararlo corregido.
 
 Seguimiento OAuth (2026-09-02): [TASK-1813](docs/tasks/to-do/TASK-1813-efeonce-mcp-oauth-client-interoperability.md)
 creada `to-do`, sin implementar. Codex 0.152.0 rechazó discovery; metadata pública revalidada a las 22:51Z.

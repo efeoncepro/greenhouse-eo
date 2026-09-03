@@ -22,7 +22,7 @@ Panel operativo de tasks del repo.
 Primer bloque operativo asignado:
 
 - `TASK-1814` 📋 to-do — **Offboarding: revisión, corrección y recuperación desde la UI.** P1, ui-ux/flow;
-  bloqueada por TASK-1349. Completa el inspector y elimina fechas implícitas/progreso falso. UI ready no;
+  dependiente de contratos TASK-1349, cuyo backend ya está desplegado. Completa el inspector y elimina fechas implícitas/progreso falso. UI ready no;
   wireframe, flow y motion registrados. Backend existente ampliado en TASK-1349; estimación conjunta 20–32 horas
   efectivas (3–5 jornadas), incluyendo QA/release/recovery. Ambas sin implementar; Felipe 02/06/2026 y saldo cero.
   Spec: [TASK-1814](to-do/TASK-1814-offboarding-case-review-recovery-ui.md).
