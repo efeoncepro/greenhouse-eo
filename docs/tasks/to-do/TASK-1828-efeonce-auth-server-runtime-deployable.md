@@ -19,10 +19,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Especificación; sin excepción EPIC-027 abierta, sin recursos GCP creados`
+- Status real: `Especificación; DNS auth.efeonce.org → 34.111.78.237 creado por el operador 2026-09-03 (verificado en ns24/ns25.hostgator.cl y 8.8.8.8); sin excepción EPIC-027 abierta, sin recursos GCP creados`
 - Rank: `TBD`
 - Domain: `platform|identity|ops`
-- Blocked by: `excepción documentada de EPIC-027 para el deployable services/auth-server (patrón artifact-worker 2026-07-12) y registro DNS auth.efeonce.org por el operador`
+- Blocked by: `excepción documentada de EPIC-027 para el deployable services/auth-server (patrón artifact-worker 2026-07-12)`
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -97,7 +97,7 @@ Reglas obligatorias:
 
 - Excepción documentada de EPIC-027 registrada en `GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md` con
   costo, routing/auth, rollback y runtime ownership (mismo formato que `artifact-worker`).
-- Registro DNS `auth.efeonce.org` (zona en HostGator) apuntando a la IP global existente del gateway (`34.111.78.237`).
+- Registro DNS `auth.efeonce.org` → `34.111.78.237` — **HECHO 2026-09-03** por el operador en HostGator; verificado en ambos nameservers. HTTPS responde vacío hasta que el Slice 2 agregue el host y el certificado al LB (esperado).
 - Proyecto `efeonce-group`, service account dedicado con `roles/cloudkms.signerVerifier` sobre la llave y
   `roles/cloudsql.client`; acceso a Secret Manager por `*_SECRET_REF`.
 

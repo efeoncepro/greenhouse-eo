@@ -16,7 +16,8 @@ sesiones interactivas para la matriz de tokens, pentest. Task ui-ux de login sin
 Siguiente ID libre `TASK-1835` / `EPIC-045`. **Costo GCP (billing export 30d):** front door propio ≈ USD 58/mes vs compartir
 el LB del gateway ≈ USD 15/mes; el operador eligió compartir → TASK-1828 edita `efeonce-mcp/infra/terraform/` (host rule +
 backend + cert). Hallazgo lateral: los Cloud Run Jobs de Globe (`asset-governance`, `producer-worker`, `media-derivatives`)
-sumaban USD 336 de 471/mes; el operador indica que Globe ya se frenó.
+sumaban USD 336 de 471/mes; el operador indica que Globe ya se frenó. **DNS `auth.efeonce.org` → `34.111.78.237` creado en HostGator (2026-09-03,
+verificado ns24/ns25 + 8.8.8.8)**; TASK-1828 queda bloqueada sólo por la excepción EPIC-027.
 
 Maggie/María Fernanda: cierre 4/4, unresolved=0; agosto ready. Método documentado en runbook/manual y
 skills Payroll/Talent Codex/Claude; Finance histórico pendiente de conciliación. [Evidencia 03/09](docs/audits/payroll/MAGGIE_MARIA_FERNANDA_OFFBOARDING_CLOSURE_2026-09-03.md).
