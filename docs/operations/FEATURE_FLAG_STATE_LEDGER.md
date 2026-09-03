@@ -194,12 +194,11 @@ Este ledger gobierna los flags de **este repo**: los 5 runtimes de Greenhouse (V
 ## § Pendientes de acción (la parte que se olvida)
 
 - **`WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` (TASK-1349) — PRENDIDO en Production y staging el
-  2026-09-03 (release `62356c9b7fd4`, run `33779259694`), tras el live smoke sintético exigido.** Lo que sigue
-  pendiente NO es el flag sino la **recovery de datos** por allowlist (`pnpm workforce:offboarding:recovery --apply`):
-  el clasificador de permisos la bloqueó en la sesión del release y requiere ejecución/autorización del operador —
-  Valentina/Luis/María Camila (lane A + stubs `access_only` con la fecha de la señal) y Felipe (`relationship_ended`
-  con la causal respaldada que declare People). Hasta entonces `hr.offboarding.executed_member_still_active` sigue en 3
-  y `hr.offboarding.unresolved_exit_signal` en 2. Rollback del flag: `vercel env rm` + redeploy; los datos ya escritos
+  2026-09-03 (release `62356c9b7fd4`, run `33779259694`), tras el live smoke sintético exigido.** Recovery
+  aplicada el mismo día con autorización del operador (Felipe `termination`; Luis y María Camila). ⚠️ **Producción
+  corre el executor SIN la guarda de reingreso** (`findReentryAfterExit`, `c5c030e99` sólo en develop): un caso
+  ejecutado para una persona con relación/engagement posterior la desactivaría (caso Valentina Hoyos, ISSUE-163).
+  Promover develop→main antes de ejecutar más salidas con el flag ON, o apagar el flag hasta entonces. Rollback del flag: `vercel env rm` + redeploy; los datos ya escritos
   se corrigen por command compensatorio auditado, nunca por SQL.
 
 > ### ⛔ Antes de prender un `*_ENABLED` en Production (ISSUE-150)

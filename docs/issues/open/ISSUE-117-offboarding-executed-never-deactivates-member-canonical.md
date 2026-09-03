@@ -134,6 +134,23 @@ sigue abierto es la **recovery de datos**: el clasificador de permisos bloqueó 
 Valentina/Luis/María Camila), UI TASK-1814 y conciliación Finance de junio/julio de Felipe (obligación 550.875 y SII
 99.125 generadas por error; no existe `cancelPaymentObligation` → dependencia Finance registrada en la task).
 
+## Recovery ejecutada 2026-09-03 (autorizada por el operador)
+
+- Felipe Zurita: `relationship_ended` / `termination` (causal declarada por el operador) → `executed`; member
+  inactivo, compensación cerrada al 02/06/2026, elegibilidad mayo íntegra / junio desde el cutoff / julio+ excluido.
+- Luis Reyes y María Camila Hoyos: lifecycle cerrado (relación employee terminada al LWD real, member inactivo) y
+  stubs SCIM cerrados como `access_only` con la fecha de la señal.
+- Valentina Hoyos: **falso positivo del drift** — su salida employee (LWD 30/04) está bien ejecutada, pero está
+  activa como contractor desde el 20/08. La lane A la desactivó; se agregó la guarda de reingreso (`c5c030e99`,
+  develop) y se re-terminó su relación employee; restaurar `status/contract_end_date/assignable` y su asignación
+  requiere `scripts/workforce/restore-valentina-hoyos-2026-09-03.sql` (ISSUE-163 explica por qué no fue posible por
+  command).
+- Señales tras la recovery: `executed_member_still_active` **0**, `unresolved_exit_signal` **1** (Maria Fernanda,
+  draft manual), `deprovisioned_member_without_case` 0.
+
+**Cierre de este issue:** pendiente de (a) restauración de Valentina, (b) release con la guarda de reingreso, (c) UI
+TASK-1814 y (d) conciliación Finance de junio/julio de Felipe.
+
 ## Relacionado
 
 - Código: [src/lib/workforce/offboarding/store.ts](../../../src/lib/workforce/offboarding/store.ts) (`updateOffboardingCaseStatus`), [src/lib/workforce/offboarding/lane.ts](../../../src/lib/workforce/offboarding/lane.ts)

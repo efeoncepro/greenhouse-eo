@@ -9,20 +9,22 @@ Operador confirmó último día anterior 30/05/2026: EO-CENG-0001 ending, relaci
 active desde 20/08, bruto mensual 530.973. Confirmado 12/31: EO-CWS-0004 aprobado → EO-CPAY-0002 pending_readiness,
 líquido 174.193,55; único blocker boleta faltante. Sin obligación/orden nueva. Login interactivo no probado.
 
-TASK-1349 **EN PRODUCCIÓN — release `62356c9b7fd4` (PR #219, orquestador `33779259694`, manifest `released`
-16:45:09Z, 2026-09-03)**, con flag `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` ON en Production y staging
-(valor leído con `env pull`; redeploys ~16:48Z/16:55Z) tras el live smoke sintético `review-execute.live.test.ts`
-(commit `2c2c92683`, pusheado a develop). Verificado: `/api/auth/health` 200, ruta `review/preview` responde 401
-(desplegada), canary read-only en staging sobre el caso de Felipe (lane→`non_payroll`, junio `exclude_from_cutoff`),
-`hubspot-greenhouse-integration` en el target; `ops-worker`/`commercial-cost`/`ico-batch` sirven `2c2c92683` porque
-mi push a develop del live test los redeployó durante el run — diff de árbol completo vs el target = sólo ese test
-(no entra al bundle): residual de label, watchdog `drift_count=2`, sin redeploy forzado. **Pendiente que sólo el
-operador puede cerrar:** (1) `pnpm workforce:offboarding:recovery --apply` por allowlist — el clasificador de permisos
-lo bloqueó para el agente — para Valentina/Luis/María Camila (`--decision access_only --access-revoked-on`
-2026-07-14/2026-05-13/2026-06-01, que además cierra su lifecycle) y para Felipe (`--decision relationship_ended
---separation-type <causal declarada por People> --approve`); (2) conciliación Finance de junio/julio de Felipe (sin
-`cancelPaymentObligation`); (3) UI TASK-1814. Readiness de septiembre bloquea por diseño hasta resolver Felipe y
-Maria Fernanda. Señales hoy: unresolved 2 / executed_member_still_active 3 / deprovisioned_without_case 0.
+TASK-1349 **EN PRODUCCIÓN + recovery aplicada** (2026-09-03; release `62356c9b7fd4`, run `33779259694`, flag
+`WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` ON prod+staging). Recovery por los commands canónicos, autorizada
+en chat: **Felipe** revisado `relationship_ended` con causal `termination` declarada por el operador → approved →
+scheduled → executed; member inactivo, compensación cerrada al 02/06, mayo `full_period`, junio `exclude_from_cutoff`,
+julio+ `exclude_entire_period`. **Luis Reyes y María Camila Hoyos**: lifecycle cerrado (relación employee terminada
+al LWD real, member inactivo) y stubs SCIM cerrados como `access_only`. Señales: unresolved **1** (Maria Fernanda,
+draft 07-29, decisión manual de HR), executed_member_still_active **0**, deprovisioned_without_case 0.
+
+🔴 **Incidente Valentina Hoyos (abierto hasta que el operador corra un SQL):** la lane A la desactivó pese a tener una
+relación `contractor` activa desde 2026-08-20 (reingreso). Fix commiteado en develop `c5c030e99` (guard
+`findReentryAfterExit` + señal excluye reingresos) — **NO está en `main`: producción sigue sin la guarda hasta el
+próximo release.** El intento de reactivarla por `updateMember` falló a mitad (ISSUE-163) y su `member.updated`
+reactivó la relación employee terminada; ya la re-terminé al 30/04 por command canónico. **Residual que el
+clasificador me impidió corregir:** `status='inactive'`, `contract_end_date=2026-04-30`, `assignable=false` y su
+asignación cerrada → ejecutar `scripts/workforce/restore-valentina-hoyos-2026-09-03.sql` vía `pnpm pg:connect:shell`.
+Finance de Felipe (obligación junio + SII) sigue como dependencia sin command de anulación. UI: TASK-1814.
 
 Offboarding (2026-09-03): auditoría UI/código/PG registrada en
 [informe](docs/audits/payroll/OFFBOARDING_ROOT_CAUSE_AND_REMEDIATION_2026-09-03.md).
