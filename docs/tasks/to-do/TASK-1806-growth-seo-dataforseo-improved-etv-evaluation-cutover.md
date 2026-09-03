@@ -26,7 +26,7 @@
 - Domain: `growth|seo|data|integration|ops`
 - External deadline: `2026-11-01T00:00:00Z; no existe fallback legacy posterior`
 - Internal targets: `shadow/decision 2026-10-23; cutover 2026-10-28T00:00:00Z`
-- Blocked by: `TASK-1805 complete; explicit spend approval; explicit historical-treatment and cutover approval`
+- Blocked by: `contract de schema ETV aplicado post-release (docs/tasks/pending-migrations/, condición de 7 días); explicit spend approval; explicit historical-treatment and cutover approval`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

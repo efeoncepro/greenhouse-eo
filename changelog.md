@@ -7,6 +7,13 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-03 — TASK-1805 en producción: foundation ETV versionada desplegada, selección legacy explícita
+
+Release `5ec4cf769977` (run `33698245254`): readers/lane/MCP sirven `etvMethodology`, señal `seo.etv_methodology.drift`,
+readback del selector en `/health` del ops-worker, selectores `legacy_static_v1` explícitos en Vercel y worker,
+gateway sincronizado. Canary de contrato en producción verde. Contract de schema parqueado con condición de 7 días
+(precondición de `TASK-1806`). Improved ETV no activado.
+
 ## 2026-09-02 — TASK-1805: la fórmula detrás de `etv` pasa a ser identidad del hecho (foundation, todavía legacy)
 
 DataForSEO cambia el cálculo de `etv` bajo el mismo campo y corta legacy el `2026-11-01T00:00:00Z` sin exponer
@@ -1162,16 +1169,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
   está mal formulada para un flujo con squash-merge, donde V1 nunca está vacía. `-X ours` volvió a
   duplicar contenido documental y a resucitar tasks en un lifecycle viejo **con la V2 vacía**; la
   pregunta correcta es si `main` aporta archivos propios.
-
-## 2026-08-28 — TASK-1699: el top-N del SERP ya pagado deja de tirarse (code complete, rollout pendiente)
-
-- El rank capture diario compra el SERP completo (`depth 20`) y descartaba ~19 de 20 filas. Ahora
-  `seo_serp_top_results` (append-only estricto, ranura `rank_absolute`) las persiste con **costo
-  marginal CERO** (test de no-regresión sobre `buildSerpTask`), en la misma transacción que el
-  snapshot de rank y con fallback que jamás pierde la medición pagada. Encima: descubrimiento de
-  competidores por recurrencia medida (propose→confirm hacia `declareCompetitors` de TASK-1662),
-  lanes sólo-internal, 2 tools MCP federadas (inventario a 27) y señal de cobertura con pérdida
-  irrecuperable declarada. Flag dual-runtime **ON y VIVO en el worker el mismo día** (el
-  Ops Worker Deploy corre en cada push a develop; revisión `ops-worker-00610-kc8` verificada) —
-  **día 1 de la serie: 2026-08-29**; el scheduler de cobertura de competidores quedó ENABLED tras
-  verificar el endpoint con dry-run real. Sanity 9/9 contra PG real con rollback sin residuo.

@@ -24,7 +24,7 @@
 - Status real: `Diseño registrado; sin implementación, gasto ni rollout`
 - Rank: `TBD`
 - Domain: `growth|seo|data|integration`
-- Blocked by: `TASK-1805; ejecución productiva después del cutover gobernado de TASK-1806`
+- Blocked by: `ejecución productiva después del cutover gobernado de TASK-1806`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

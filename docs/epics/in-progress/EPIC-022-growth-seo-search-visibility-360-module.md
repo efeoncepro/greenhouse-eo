@@ -1151,3 +1151,10 @@ worker y un evaluador dry-run/replay sin gasto. Selección productiva `legacy_st
 complete, rollout pendiente** (release + selector explícito en Vercel + readback cross-runtime + contract). El
 shadow pagado, la decisión histórica y el cutover siguen siendo de `TASK-1806`; `TASK-1808`–`TASK-1811` nacen
 sobre esta foundation.
+
+## Delta 2026-09-03 — TASK-1805 desplegada: la foundation ETV está en producción, en legacy
+
+Release `5ec4cf769977` (tercero del 2026-09-02): la foundation versionada quedó en producción con selección
+`legacy_static_v1` explícita en Vercel y ops-worker, provenance `etvMethodology` servida por lanes y MCP, señal de
+drift y evaluador dry-run. `TASK-1805` → `complete`. Pendientes con dueño: contract de schema (condición de 7 días;
+precondición de `TASK-1806`) y flip a improved (`TASK-1806`).

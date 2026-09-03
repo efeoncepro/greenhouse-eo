@@ -24,7 +24,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|seo|data|integration`
-- Blocked by: `TASK-1805, TASK-1806`
+- Blocked by: `TASK-1806`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

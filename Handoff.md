@@ -9,31 +9,28 @@ al apagar shim, fallback de deploy que lo reactiva y canary directo que no prueb
 de abajo no basta sin esos gates. Próximo paso: plan humano aprobado y coordinación con dueños de archivos;
 no push/deploy ni mutación de Entra autorizados por esta creación. Incidente Git/Berel separado.
 
-## 2026-09-02 (10) — TASK-1805 foundation ETV implementada: code complete, rollout pendiente, todavía legacy
+## 2026-09-03 — TASK-1805 en producción: la fórmula detrás de `etv` es identidad del hecho, todavía legacy
 
-Sesión `greenhouse-eo-fe` sobre `develop`, **sin push** (incidente de `main` en curso; `origin/develop` quedó en
-`e5d7675d8` = Slice 3, empujado por `Task-1804` dentro de su release). Seis slices locales (`7adf5ffc7`…`9477b83e7`)
-+ gateway `efeonce-mcp` `58517f0` local. Cero gasto de proveedor; selección productiva `legacy_static_v1`
-explícita; `use_improved_etv:false` en cada request.
+Tercer release del día (`5ec4cf769977-18572878-583b-43f0-aad0-01eb7b394aba`, run `33698245254`, target `5ec4cf76997722d5ae31621808b5ae967602bf0a`, PR #217): manifest `released`
+00:20:29Z, watchdog `ok`, 3/4 workers en el target y ops-worker change-gated en `57abe3f1e` (diff de árbol
+completo vacío: el `push:develop` ya lo había desplegado). Dispatch con bypass forense por `cloud_release`
+(`deploy.sh`), sin runs quemados; coordinado con `Task-1804` para no pisar su release #216 (freeze de ~25 min).
 
-**Qué existe ya:** policy pura `src/lib/growth/seo/etv-methodology/**` (14 familias, `buildEtvMethodologyRequest`
-fail-closed, selectores `GROWTH_SEO_ETV_METHODOLOGY_VERSION`/`_READ_`); expand APLICADO a la instancia compartida
-(`20260902221432772`; filas previas 5+8+2 atribuidas legacy por contrato, guard de corte en la base, UNIQUE
-formula-aware junto a la legacy); siete writers explícitos; readers/lane/MCP con `etvMethodology` y
-`not_available_for_method`; señal `seo.etv_methodology.drift` (`awaiting_data` hoy); `/health` del worker con
-readback; evaluador dry-run/replay (8/8, ledger intacto). Sanity del schema 17/17 en transacción con rollback,
-incluido el contract.
+**Verificado en producción (00:22Z):** lanes `domain-overview` y `url-visibility` de Berel MX sirven
+`etvMethodology` (`legacy_static_v1`, evidencia `contract_default_pre_cutoff`, corte `2026-11-01T00:00:00Z`);
+`/health` del ops-worker → `configuredWriteSource: env`, `policyVersion: etv-policy.v1`. Selectores
+`GROWTH_SEO_ETV_METHODOLOGY_VERSION`/`_READ_` = `legacy_static_v1` en Vercel Production+staging (horneados por el
+build del release) y en `deploy.sh`. Gateway `efeonce-mcp` con el manifest sincronizado desplegado
+(`efeonce-mcp-gateway-00029-bwg`). `TASK-1805` → `complete/`.
 
-**Riesgos abiertos:** el **contract** (`docs/tasks/pending-migrations/TASK-1805-etv-methodology-contract.sql.pending`)
-NO está aplicado a propósito — hasta entonces la coexistencia legacy/improved por sujeto/día está cerrada y el
-código viejo sigue escribiendo con evidencia contractual; aplicarlo antes del release rompería los crons del 16/17
-y el prospecto en Vercel. `pnpm build` de producción no se corrió (cuelga el equipo): correrlo antes de `complete/`.
-
-**Pendientes inmediatos:** (1) push/release de Slices 4–6 cuando el operador cierre el incidente de `main`;
-(2) `vercel env add GROWTH_SEO_ETV_METHODOLOGY_VERSION legacy_static_v1` (+ `_READ_`) en Production+staging con
-redeploy; (3) readback: `/health` del worker + señal en `ok`; (4) contract post-release (3 condiciones en el
-archivo); (5) deploy del gateway + paridad/canaries; (6) mover `TASK-1805` a `complete/`. Improved, shadow pagado
-y cutover: **sólo `TASK-1806`**.
+**Riesgos abiertos / pendientes con dueño:** (1) el **contract** de schema sigue parqueado en
+`docs/tasks/pending-migrations/TASK-1805-etv-methodology-contract.sql.pending`; su condición de 7 días sin filas con
+evidencia contractual empieza a correr con este release y es precondición 4 de `TASK-1806` — sin él la coexistencia
+legacy/improved por sujeto/día sigue cerrada a propósito. (2) La señal `seo.etv_methodology.drift` queda en
+`awaiting_data` hasta la primera captura explícita del worker (cron `ops-seo-domain-overview`, día 16); si tras ese
+run sigue en `awaiting_data`, el worker no está escribiendo evidencia explícita — investigar, no esperar.
+(3) Improved ETV, shadow pagado, decisión histórica y cutover: **sólo `TASK-1806`**, con presupuesto aprobado.
+Evaluador dry-run listo: `scripts/growth/_sanity-task-1805-etv-evaluator.ts`.
 
 ## 2026-09-02 (9) — DCR quedó deprecado en MCP `2026-07-28`: el shim de `mcp.efeonce.org` se mantiene, con dos hallazgos que la evaluación no buscaba
 
