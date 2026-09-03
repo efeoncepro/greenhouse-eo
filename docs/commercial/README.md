@@ -29,6 +29,10 @@ verificados sin convertir Markdown en una segunda base de datos comercial.
 5. Actualiza el forecast sin reescribir retroactivamente la meta aprobada. Un cambio de meta requiere decisión
    explícita, motivo, fecha y versión.
 
+## Workspaces comerciales
+
+- [Berel — App móvil](tenders/berel-app-movil/README.md): expansión de cliente SEO; brief de venta y análisis del lanzamiento de nueva Color Berel, con ASO, creatividad, adquisición, activación y medición. Propuesta interna pendiente de build, alcance y aprobación.
+
 ## Convención documental
 
 - **Contrato durable:** `SALES_GOALS_OPERATING_MODEL_V1.md`; cambia sólo cuando cambia el método.

@@ -1141,6 +1141,15 @@ incorpora reader/API/MCP, provenance, gasto y rollout propios. Ninguna llamada, 
 autorizada por registrar el backlog. `TASK-1312` mantiene el source of truth de topic clusters y `TASK-1314`
 mantiene su regla «compone, no captura».
 
+## Delta 2026-09-02 (2) — cada task entrega tools y skills MCP
+
+`TASK-1805`, `TASK-1806`, `TASK-1312`, `TASK-1313`, `TASK-1314` y `TASK-1808`–`TASK-1811` incorporan un contrato
+binario común: cada capacidad crea o actualiza sus tools MCP, lane ecosystem, manifiesto/artefacto, federación y
+skills de operación Codex/Claude en el mismo PR. Reusar una tool es preferible a duplicarla; una ausencia sólo es
+válida como exclusión explícita con razón. Reads no compran on-read y writes/gasto permanecen bajo
+`propose → confirm → execute`, capability fina y scope no público. El cierre exige readback de lane/gateway,
+paridad bidireccional y skills espejadas, no sólo registro o compilación.
+
 ## Delta 2026-09-02 (3) — la foundation ETV versionada está implementada, todavía en legacy
 
 `TASK-1805` entregó policy pura endpoint-aware (14 familias; `use_improved_etv` siempre explícito; fail-closed),

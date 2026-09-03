@@ -174,6 +174,7 @@ Indice maestro de la documentacion no operativa del repo.
 ### Audits
 
 - [Audits Index](audits/README.md)
+- [Efeonce MCP — interoperabilidad OAuth Codex/Claude — 2026-09-02](audits/EFEONCE_MCP_CODEX_OAUTH_INTEROPERABILITY_2026-09-02.md)
 - Regla de uso: las auditorias deben consumirse frecuentemente cuando el trabajo toque esa zona, pero siempre revalidando si sus hallazgos siguen vigentes o si hace falta una auditoria nueva/refresh.
 - [Globe UI competitive benchmark — Higgsfield y Magnific — 2026-08-05](audits/competitive-ui/GLOBE_COMPETITIVE_BENCHMARK_HIGGSFIELD_MAGNIFIC_2026-08-05.md)
 - [ICO Audits](audits/ico/README.md)
