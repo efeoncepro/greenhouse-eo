@@ -191,6 +191,7 @@ describe('ops-worker deploy Globe tenancy reconciliation contract', () => {
     ].join('\n')], {
       encoding: 'utf8',
       env: {
+        NODE_ENV: 'test',
         PATH: '/usr/bin:/bin',
         PROJECT_ID: 'test-project', REGION: 'test-region',
         SCHEDULER_TZ: 'America/Santiago', SERVICE_URL: 'https://worker.invalid',
