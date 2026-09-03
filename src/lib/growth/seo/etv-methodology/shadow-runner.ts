@@ -283,6 +283,19 @@ export const assertEtvShadowCohort = (raw: unknown): EtvShadowCohort => {
         if (!organizations[target]) {
           throw new EtvShadowCohortError('Target bulk sin organización declarada en `organizations`.', { index, target })
         }
+
+        // 🔴 Una consulta bulk NUNCA junta dominios de organizaciones distintas: el gasto y el
+        // `captured_by_organization_id` se atribuyen a UNA org, y una fila mal atribuida se escribe sin
+        // error y nadie la ve hasta un readback (caso 2026-09-03: efeoncepro.com, la agencia, viajó dentro
+        // de la consulta MX de Berel). Cada sujeto se mide aparte, por su organización y su mercado.
+        if (organizations[target] !== organizations[normalizedSubject]) {
+          throw new EtvShadowCohortError('Celda bulk mezcla dominios de organizaciones distintas: cada sujeto se mide aparte.', {
+            index,
+            target,
+            targetOrganizationId: organizations[target],
+            cellOrganizationId: organizations[normalizedSubject]
+          })
+        }
       }
 
       if (targets[0] !== normalizedSubject) {

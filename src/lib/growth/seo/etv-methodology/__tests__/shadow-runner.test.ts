@@ -157,6 +157,38 @@ describe('TASK-1806 — cohorte fail-closed', () => {
     ).toThrowError(/sin organización declarada/)
   })
 
+  it('una celda bulk NO mezcla dominios de organizaciones distintas (cada sujeto se mide aparte)', () => {
+    expect(() =>
+      cohort([
+        {
+          subject: 'berel.com',
+          locationCode: '2484',
+          languageCode: 'es',
+          familySlug: 'bulk_traffic_estimation',
+          rowLimit: 2,
+          targets: ['berel.com', 'efeoncepro.com'],
+          organizationId: ORG_BEREL
+        }
+      ])
+    ).toThrowError(/organizaciones distintas/)
+  })
+
+  it('una celda bulk con targets de la misma organización sí planifica', () => {
+    expect(() =>
+      cohort([
+        {
+          subject: 'efeoncepro.com',
+          locationCode: '2152',
+          languageCode: 'es',
+          familySlug: 'bulk_traffic_estimation',
+          rowLimit: 1,
+          targets: ['efeoncepro.com'],
+          organizationId: ORG_EFEONCE
+        }
+      ])
+    ).not.toThrow()
+  })
+
   it('la celda prospecto exige ranked_keywords con el limit del diagnóstico', () => {
     expect(() => cohort([{ ...PROSPECT_CELL, rowLimit: 100 }])).toThrowError(/limit del diagnóstico/)
   })
