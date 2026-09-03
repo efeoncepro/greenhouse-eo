@@ -6,8 +6,10 @@ import type { PoolClient } from 'pg'
 
 import { syncOperatingEntityMembershipForMember } from '@/lib/account-360/operating-entity-membership'
 import { withTransaction } from '@/lib/db'
+import { captureWithDomain } from '@/lib/observability/capture'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
+import { findExecutedRealExitForMember } from '@/lib/workforce/offboarding/exit-facts'
 import { applyEntraRoleTitleWithClient } from '@/lib/workforce/role-title'
 
 import type { EligibilityVerdict } from './eligibility'
@@ -56,6 +58,13 @@ export type MemberCascadeOutcome =
   | 'reused_by_email_legacy'
   | 'created_new'
   | 'reactivated_via_oid_reuse'
+  /**
+   * TASK-1349 — the OID matched an inactive member whose exit was EXECUTED by
+   * Greenhouse (real termination, last working day in the past). The identity is
+   * linked but the member is NOT reactivated: a re-hire is a new episode declared
+   * through the governed activation/intake commands, never a silent resurrection.
+   */
+  | 'linked_inactive_prior_exit'
 
 export interface ProvisionInternalCollaboratorResult {
   readonly idempotent: boolean
@@ -295,6 +304,25 @@ const resolveMemberIdCascade = async (
 
     // Re-hire OID reuse case: member inactive + active=FALSE → reactivate
     if (!m.active) {
+      // TASK-1349 — ownership guard: an executed REAL exit owns `members.active`.
+      // Entra re-enabling the account (or re-pushing the user) must not resurrect
+      // a person Greenhouse already terminated. Link the identity, keep the member
+      // inactive, and let the governed activation flow open the new episode.
+      const priorExit = await findExecutedRealExitForMember(m.member_id, client)
+
+      if (priorExit) {
+        captureWithDomain(new Error('scim.member_reactivation_blocked_prior_exit'), 'identity', {
+          extra: {
+            source: 'scim.provisioning.reactivation_guard',
+            memberId: m.member_id,
+            offboardingCasePublicId: priorExit.publicId,
+            lastWorkingDay: priorExit.lastWorkingDay
+          }
+        })
+
+        return { memberId: m.member_id, outcome: 'linked_inactive_prior_exit' }
+      }
+
       await client.query(
         `UPDATE greenhouse_core.members
          SET active = TRUE,

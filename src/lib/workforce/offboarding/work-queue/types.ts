@@ -11,6 +11,8 @@ export type OffboardingClosureLaneCode =
   | 'contractual_close'
   | 'external_provider'
   | 'needs_classification'
+  /** TASK-1349 — access signal reviewed as access-only: informational close, no labor effect. */
+  | 'access_only'
 
 export type OffboardingWorkQueueSeverity = 'neutral' | 'info' | 'warning' | 'error' | 'success'
 
@@ -39,6 +41,7 @@ export type OffboardingNextStepCode =
 
 export type OffboardingWorkQueueActionCode =
   | OffboardingNextStepCode
+  | 'review_case'
   | 'transition_approve'
   | 'transition_schedule'
   | 'transition_execute'

@@ -274,11 +274,14 @@ export const GH_FINIQUITO = {
         contractualClose: 'Cierre contractual',
         externalProvider: 'Proveedor externo',
         needsClassification: 'Por clasificar',
+        accessOnly: 'Solo acceso',
         finalSettlementHelp: 'Trabajador dependiente en nómina interna; requiere cálculo, documento y ratificación.',
         internationalPayrollHelp: 'Relación interna pagada por Greenhouse fuera de Chile; requiere cierre de nómina, sin finiquito chileno.',
         contractualCloseHelp: 'Honorarios o relación no laboral; se cierra como relación contractual sin finiquito laboral.',
         externalProviderHelp: 'El cierre vive en el proveedor laboral o payroll externo.',
-        needsClassificationHelp: 'La combinación contractual requiere clasificación antes de habilitar documentos o pagos.'
+        needsClassificationHelp: 'La combinación contractual requiere clasificación antes de habilitar documentos o pagos.',
+        accessOnlyHelp: 'Baja de acceso revisada: no representa una salida laboral. Relación, compensación y nómina no cambian.',
+        identitySignalHelp: 'Señal de acceso (SCIM/admin) sin revisar. Decide si fue solo acceso o si la relación terminó antes de aprobar.'
       },
       nextStep: {
         uploadResignationLetter: 'Subir carta de renuncia',
@@ -304,7 +307,8 @@ export const GH_FINIQUITO = {
         editMaintenance: 'Editar pensión alimentos',
         reissueDocument: 'Reemitir documento',
         downloadPdf: 'PDF',
-        reconcileDriftAction: 'Reconciliar relación legal'
+        reconcileDriftAction: 'Reconciliar relación legal',
+        reviewCase: 'Revisar caso'
       },
       blockers: {
         resignationLetter: 'Falta carta de renuncia ratificada.',
@@ -314,7 +318,13 @@ export const GH_FINIQUITO = {
         historicalDocument: 'El documento corresponde a un cálculo anterior.'
       },
       progress: {
-        done: 'listo'
+        done: 'listo',
+        steps: {
+          classified: 'Clasificado',
+          datesDeclared: 'Fechas declaradas',
+          decided: 'Decidido',
+          executed: 'Ejecutado'
+        }
       }
     }
   }

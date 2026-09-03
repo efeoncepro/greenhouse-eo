@@ -31,12 +31,16 @@ const makeNextStep = (
   severity: OffboardingNextStep['severity'] = 'info'
 ): OffboardingNextStep => ({ code, label, severity })
 
+// TASK-1349 — defaults are KNOWN layers on purpose: an unknown (`null`) layer on
+// a terminal case now yields `verify_member_runtime` (unknown ≠ complete), which
+// the audit of 2026-09-03 found this suite silently accepting as `complete`.
 const facts = (overrides: Partial<ClosureCompletenessFacts> = {}): ClosureCompletenessFacts => ({
   caseStatus: 'draft',
   nextStep: makeNextStep('upload_resignation_letter', 'Subir carta de renuncia'),
-  personRelationshipDrift: null,
-  memberRuntimeAligned: null,
-  payrollExcluded: null,
+  personRelationshipDrift: false,
+  memberRuntimeAligned: true,
+  payrollExcluded: true,
+  memberLifecycleClosed: true,
   caseLifecycleStepLabel: 'Subir carta de renuncia',
   caseLifecycleStepSeverity: 'warning',
   memberId: 'member_abc',
@@ -44,8 +48,14 @@ const facts = (overrides: Partial<ClosureCompletenessFacts> = {}): ClosureComple
 })
 
 describe('STEP_PRIORITY constant', () => {
-  it('preserva el orden canonical case_lifecycle > reconcile_drift > verify_payroll_exclusion', () => {
-    expect(STEP_PRIORITY).toEqual(['case_lifecycle', 'reconcile_drift', 'verify_payroll_exclusion'])
+  it('preserva el orden canonical case_lifecycle > reconcile_drift > close_member_lifecycle > verify_payroll_exclusion > verify_member_runtime', () => {
+    expect(STEP_PRIORITY).toEqual([
+      'case_lifecycle',
+      'reconcile_drift',
+      'close_member_lifecycle',
+      'verify_payroll_exclusion',
+      'verify_member_runtime'
+    ])
   })
 
   it('es readonly — no permite mutation accidental', () => {
@@ -295,7 +305,10 @@ describe('computeClosureCompleteness — null inputs (unknown)', () => {
     )
 
     expect(result.pendingSteps.some(s => s.code === 'reconcile_drift')).toBe(false)
-    expect(result.closureState).toBe('complete')
+    // TASK-1349 — unknown is not closed: the aggregate stays partial and names the layer.
+    expect(result.closureState).toBe('partial')
+    expect(result.pendingSteps.map(s => s.code)).toEqual(['verify_member_runtime'])
+    expect(result.pendingSteps[0]?.hint).toContain('person_relationship')
   })
 })
 
@@ -425,5 +438,54 @@ describe('memberId URI encoding', () => {
     const driftStep = result.pendingSteps.find(s => s.code === 'reconcile_drift')
 
     expect(driftStep?.href).toBe('/admin/identity/drift-reconciliation?memberId=member%20with%20spaces%26special')
+  })
+})
+
+describe('TASK-1349 — member lifecycle layer and unknown ≠ complete', () => {
+  it('executed real exit with the member still active → partial + close_member_lifecycle (informational, recovery command)', () => {
+    const result = computeClosureCompleteness(
+      facts({
+        caseStatus: 'executed',
+        nextStep: makeNextStep('completed', 'Cierre completo', 'success'),
+        memberLifecycleClosed: false
+      })
+    )
+
+    expect(result.closureState).toBe('partial')
+    expect(result.pendingSteps.map(s => s.code)).toEqual(['close_member_lifecycle'])
+    expect(result.pendingSteps[0]?.actionable).toBe(false)
+    expect(result.pendingSteps[0]?.severity).toBe('warning')
+    expect(derivePrimaryActionFromCompleteness(result, null)).toBeNull()
+  })
+
+  it('executed with every layer known and aligned → complete', () => {
+    const result = computeClosureCompleteness(
+      facts({ caseStatus: 'executed', nextStep: makeNextStep('completed', 'Cierre completo', 'success') })
+    )
+
+    expect(result.closureState).toBe('complete')
+    expect(result.pendingSteps).toHaveLength(0)
+  })
+
+  it('executed with an unknown member runtime → partial + verify_member_runtime naming the unknown layers', () => {
+    const result = computeClosureCompleteness(
+      facts({
+        caseStatus: 'executed',
+        nextStep: makeNextStep('completed', 'Cierre completo', 'success'),
+        memberRuntimeAligned: null,
+        memberLifecycleClosed: null
+      })
+    )
+
+    expect(result.closureState).toBe('partial')
+    expect(result.memberRuntime).toBe('unknown')
+    expect(result.pendingSteps.map(s => s.code)).toEqual(['verify_member_runtime'])
+    expect(result.pendingSteps[0]?.hint).toContain('member_runtime, member_lifecycle')
+  })
+
+  it('a non-terminal case never gets the lifecycle or unknown steps', () => {
+    const result = computeClosureCompleteness(facts({ caseStatus: 'needs_review', memberRuntimeAligned: null, memberLifecycleClosed: null }))
+
+    expect(result.pendingSteps.map(s => s.code)).toEqual(['case_lifecycle'])
   })
 })

@@ -1,3 +1,4 @@
+export * from './exit-facts'
 export * from './lane'
 export * from './member-lifecycle'
 export * from './review-policy'

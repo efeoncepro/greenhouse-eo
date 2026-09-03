@@ -454,8 +454,32 @@ const upsertMember = async (row: Record<string, unknown>) => {
         job_level = EXCLUDED.job_level,
         employment_type = EXCLUDED.employment_type,
         hire_date = EXCLUDED.hire_date,
-        contract_end_date = EXCLUDED.contract_end_date,
-        active = EXCLUDED.active,
+        -- TASK-1349 ownership guard: when Greenhouse holds an EXECUTED real exit
+        -- (offboarding lane <> identity_only, last working day in the past) the
+        -- offboarding domain owns active/contract_end_date; the BigQuery
+        -- mirror can be stale and must never resurrect a terminated member.
+        contract_end_date = CASE
+          WHEN EXISTS (
+            SELECT 1 FROM greenhouse_hr.work_relationship_offboarding_cases oc
+            WHERE oc.member_id = greenhouse_core.members.member_id
+              AND oc.status = 'executed'
+              AND oc.rule_lane <> 'identity_only'
+              AND oc.last_working_day IS NOT NULL
+              AND oc.last_working_day <= CURRENT_DATE
+          ) THEN COALESCE(greenhouse_core.members.contract_end_date, EXCLUDED.contract_end_date)
+          ELSE EXCLUDED.contract_end_date
+        END,
+        active = CASE
+          WHEN EXISTS (
+            SELECT 1 FROM greenhouse_hr.work_relationship_offboarding_cases oc
+            WHERE oc.member_id = greenhouse_core.members.member_id
+              AND oc.status = 'executed'
+              AND oc.rule_lane <> 'identity_only'
+              AND oc.last_working_day IS NOT NULL
+              AND oc.last_working_day <= CURRENT_DATE
+          ) THEN FALSE
+          ELSE EXCLUDED.active
+        END,
         first_name = EXCLUDED.first_name,
         last_name = EXCLUDED.last_name,
         preferred_name = EXCLUDED.preferred_name,

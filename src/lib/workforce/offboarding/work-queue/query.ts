@@ -3,6 +3,8 @@ import 'server-only'
 import { query } from '@/lib/db'
 import { resolveExitEligibilityForMembers } from '@/lib/payroll/exit-eligibility'
 
+import type { OffboardingCase } from '../types'
+
 import { listOffboardingCases } from '../store'
 import type { OffboardingWorkQueue, OffboardingWorkQueueDocumentSummary, OffboardingWorkQueueFilters, OffboardingWorkQueueSettlementSummary } from './types'
 import { buildOffboardingWorkQueueItem, buildOffboardingWorkQueueSummary } from './derivation'
@@ -294,6 +296,25 @@ export const detectMemberRuntimeAlignment = (
   return null
 }
 
+/**
+ * TASK-1349 — Layer 2b: for an EXECUTED real termination the canonical member
+ * must be inactive (lifecycle writeback). Returns:
+ *   - `true`: member inactive, or the layer does not apply (identity_only,
+ *     non-executed, cancelled);
+ *   - `false`: executed real exit but `members.active = true` (ISSUE-117 drift);
+ *   - `null`: member not found (unknown ≠ closed).
+ */
+export const detectMemberLifecycleClosed = (
+  member: MemberRuntimeSnapshot | null,
+  item: Pick<OffboardingCase, 'status' | 'ruleLane' | 'separationType'>
+): boolean | null => {
+  if (item.status !== 'executed') return true
+  if (item.ruleLane === 'identity_only' || item.separationType === 'identity_only') return true
+  if (!member) return null
+
+  return member.active === false
+}
+
 export const getOffboardingWorkQueue = async (filters: OffboardingWorkQueueFilters = {}): Promise<OffboardingWorkQueue> => {
   const cases = await listOffboardingCases(filters)
   const caseIds = cases.map(item => item.offboardingCaseId)
@@ -370,7 +391,8 @@ export const getOffboardingWorkQueue = async (filters: OffboardingWorkQueueFilte
       closureFacts: {
         memberRuntimeAligned: detectMemberRuntimeAlignment(member, item.ruleLane),
         personRelationshipDrift: detectPersonRelationshipDrift(member, activeRelationshipType),
-        payrollExcluded
+        payrollExcluded,
+        memberLifecycleClosed: detectMemberLifecycleClosed(member, item)
       }
     })
   })

@@ -285,8 +285,12 @@ describe('HrOffboardingView', () => {
 
     await userEvent.setup().click(screen.getByText('EO-OFF-2026-HON'))
 
-    // findByRole espera el mount async tras el cross-fade del inspector (round 4 microinteractions)
-    expect(await screen.findByRole('link', { name: 'Revisar pago pendiente' })).toHaveAttribute('href', '/hr/payroll')
+    // TASK-1349 — an EXECUTED contractual close is complete: the legacy
+    // "Revisar pago pendiente" CTA (which described a UI defect, audit
+    // 2026-09-03) no longer appears; payroll verification lives in the
+    // closure-completeness informational step. No finiquito action either.
+    expect(await screen.findByText('EO-OFF-2026-HON')).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Revisar pago pendiente' })).toBeNull()
   })
 
   it('reissues an active finiquito document with an auditable reason', async () => {

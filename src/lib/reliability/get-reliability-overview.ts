@@ -132,6 +132,11 @@ import { getIdentitySessionRouteGroupDriftSignal } from './queries/identity-sess
 import { getLeaveInvalidDelegatedApprovalSnapshotsSignal } from './queries/leave-invalid-delegated-approval-snapshots'
 import { getIdentityRelationshipMemberContractDriftSignal } from './queries/identity-relationship-member-contract-drift'
 import { getOffboardingCompletenessPartialSignal } from './queries/offboarding-completeness-partial'
+import {
+  getOffboardingExecutedMemberStillActiveSignal,
+  getOffboardingUnresolvedExitSignal,
+  getWorkforceDeprovisionedMemberWithoutCaseSignal
+} from './queries/offboarding-exit-drift'
 import { getContractorEngagementClassificationReviewPendingSignal } from './queries/contractor-engagement-classification-review-pending'
 import { getContractorEngagementClassificationRiskOpenSignal } from './queries/contractor-engagement-classification-risk-open'
 import { getContractorEngagementClosedWithOpenPayablesSignal } from './queries/contractor-engagement-closed-with-open-payables'
@@ -2362,6 +2367,11 @@ export const getReliabilityOverview = async (
           // TASK-892 — closure completeness partial (case-level UX surface
           // del drift Person 360, complementario al signal sistema).
           getOffboardingCompletenessPartialSignal().catch(() => null),
+          // TASK-1349 — exit drift: salidas sin resolver que bloquean nómina,
+          // executed con member aún activo (ISSUE-117) y bajas de acceso sin caso.
+          getOffboardingUnresolvedExitSignal().catch(() => null),
+          getOffboardingExecutedMemberStillActiveSignal().catch(() => null),
+          getWorkforceDeprovisionedMemberWithoutCaseSignal().catch(() => null),
           // Notion bridge coverage drift — detecta regresión del resolver
           // Notion-user-id → member-id (caso fuente: incidente 2026-05-16
           // post-TASK-877 dejó coverage en 3.7%, colapsando OTD/RpA bonuses).
