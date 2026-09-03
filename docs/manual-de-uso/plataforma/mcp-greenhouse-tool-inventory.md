@@ -1,9 +1,9 @@
 # MCP Greenhouse — Inventario de Tools
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 3.0
+> **Version:** 3.1
 > **Creado:** 2026-04-30 por Codex
-> **Ultima actualizacion:** 2026-08-31 por Claude (TASK-1780: el archivo dejó de llamarse read-only porque el servidor no lo es; las cifras de superficie se leen del manifiesto, no de este texto)
+> **Ultima actualizacion:** 2026-09-02 por Claude (TASK-1804: la superficie sirve sus propios manuales de uso — tool `get_greenhouse_skill` + recurso `skill://efeonce/{name}/SKILL.md`, §9; 44 tools medidas en el manifiesto; delta previo 2026-08-31 TASK-1780: el archivo dejó de llamarse read-only porque el servidor no lo es; las cifras de superficie se leen del manifiesto, no de este texto)
 > **Modulo:** plataforma / MCP
 > **Ruta en portal:** `N/A` (server MCP local `stdio` o remoto HTTP)
 > **Documentacion relacionada:** [API Platform Ecosystem](../../documentation/plataforma/api-platform-ecosystem.md), [Platform Health API](../../documentation/plataforma/platform-health-api.md), [GREENHOUSE_MCP_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md)
@@ -27,6 +27,7 @@ Hoy sirve para:
 - revisar integration readiness
 - consultar platform health
 - leer el event control plane en modo consulta
+- cargar el **manual de uso de la propia superficie** bajo demanda (`get_greenhouse_skill`, §9) antes de operar una tool que gaste
 
 ## Modalidades disponibles
 
@@ -108,10 +109,13 @@ Desde el 2026-08-06 el gateway público `mcp.efeonce.org` acepta **clientes MCP 
 **Claude Code:**
 
 ```bash
-claude mcp add --transport http efeonce-mcp https://mcp.efeonce.org/mcp
+claude mcp add --transport http efeonce-mcp https://mcp.efeonce.org/mcp -s user
+claude mcp login efeonce-mcp
 ```
 
-Luego, en una sesión interactiva, ejecuta `/mcp`, elige el server y usa `Authenticate`: se abre el login Entra en el navegador y al volver el server queda `connected` con las tools SEO federadas (inventario exacto y estado de despliegue en el §8), más el lector de Globe.
+El `login` abre el login Entra en el navegador (necesita una terminal real; desde una sesión no interactiva se envuelve en `script -q /dev/null`). Alternativa en sesión interactiva: `/mcp`, elegir el server y usar `Authenticate`. Al volver, el server queda `connected` con las tools SEO federadas (inventario exacto y estado de despliegue en el §8), el manual de uso de la superficie (`get_greenhouse_skill`, §9) y el lector de Globe. **El token Entra expira en ~1 hora:** cuando el server aparece como `Needs authentication`, repite `claude mcp login efeonce-mcp`; no es una falla del gateway.
+
+Primer paso recomendado con el server conectado, verificado el 2026-09-02 con un agente `claude -p` real: pedir `get_greenhouse_skill` **sin argumentos** (devuelve el catálogo de manuales) y luego con `name` (devuelve el manual como texto) antes de tocar cualquier tool que comprometa gasto.
 
 **claude.ai / Claude Desktop:** `Settings` → `Connectors` → `Add custom connector` con la URL `https://mcp.efeonce.org/mcp`, y autentica con la misma cuenta Entra.
 
@@ -332,6 +336,52 @@ revisión humana por tool** (decisión TASK-1647: nunca auto-federación). Lectu
 [Search Visibility 360 por MCP](../../documentation/growth/search-visibility-360-por-mcp.md); operación en
 [Operar el provider Greenhouse-SEO del MCP](operar-provider-greenhouse-seo-mcp.md).
 
+### 9. Manuales de uso de la superficie (TASK-1804)
+
+Desde el 2026-09-02 la superficie **sirve su propio manual de uso por el protocolo**: un agente no depende de
+que alguien le haya pegado este documento en el prompt. El manifiesto de manuales es
+`src/mcp/greenhouse/skill-manifest.ts`; el contenido vive en `docs/mcp/skills/<name>/SKILL.md` (formato Agent
+Skills: frontmatter `name` + `description`) y viaja al runtime como artefacto generado
+`src/mcp/greenhouse/skill-catalog.generated.json` (`pnpm mcp:skills:generate` / `pnpm mcp:skills:check`, gate en
+`local:check` y CI). **Medido 2026-09-02 contra el manifiesto: 44 tools en total en el MCP interno**, y una de
+ellas es la de manuales.
+
+Tres caminos al mismo byte:
+
+- tool `get_greenhouse_skill` — sin `name` devuelve el **catálogo** (nombre, descripción y qué tools gobierna cada
+  manual); con `name` devuelve el **manual completo como texto**, listo para cargarlo como instrucción de trabajo;
+- resource `skill://efeonce/{name}/SKILL.md` — el mismo manual direccionable por URI estable (`resources/list`
+  enumera el catálogo; `mimeType: text/markdown`). Un URI `skill://` detrás de una tool ordinaria **no** es
+  SEP-2640 —ese SEP sigue sin publicarse—; el esquema se eligió compatible para no migrar después;
+- lane `GET /api/platform/ecosystem/mcp/skills[/{name}]` — lo que los dos anteriores consultan por debajo
+  (`ETag`/`304`).
+
+Seis manuales hoy, todos de audiencia `internal`:
+
+| Manual | Gobierna | Cuándo cargarlo |
+|---|---|---|
+| `seo-spend-discipline` | `track_seo_keywords` / `untrack_seo_keywords`, `declare_seo_competitors` / `retire_seo_competitors`, `discover_seo_keywords`, `run_seo_prospect_diagnostic`, `get_seo_entitlement` | **Antes de cualquier tool que comprometa gasto** |
+| `seo-visibility-reading` | Las lecturas de visibilidad: lentes ● medida / ◑ estimada, ausencias honestas, cadena de readers, la work queue como única autoridad de orden | Antes de interpretar o reportar un dato SEO |
+| `competitor-loop` | observar → proponer → confirmar → declarar con `proposalRef` → cubrir → leer gap → retirar | Antes de tocar competidores |
+| `seo-discovery-to-tracking` | preview → queue → poll → candidatos → `clusterConflict` → track con `intent` | Antes de descubrir keywords o pasarlas a seguimiento |
+| `seo-technical-health` | site audit, backlink profile, backlink detail con sus tres estados (`available` / `skipped_no_movement` / `drilldown_failed`); nunca certificar salud | Antes de describir la salud técnica o de enlaces de un sitio |
+| `seo-prospect-diagnostic` | Gasta por corrida, idempotente por dominio + mercado + día, todo estimado, sin veredicto | Antes de correr o leer un diagnóstico de prospecto |
+
+Reglas:
+
+- **Solo bindings de scope `internal`** ven el catálogo. Un binding de cliente recibe **catálogo vacío** y `404`
+  por nombre (anti-oráculo): no aprende ni qué manuales existen.
+- **Cómo cargar un manual desde el MCP local (`stdio`):** con el server levantado (`pnpm mcp:greenhouse`), llama
+  `get_greenhouse_skill` sin argumentos, elige el nombre y vuelve a llamarla con `{ "name": "<manual>" }`; o lee el
+  resource `skill://efeonce/<manual>/SKILL.md`. El cuerpo sale del lane en cada llamada: es byte-idéntico al que
+  sirve el gateway público.
+- **Agregar o cambiar un manual** no toca la tool ni exige redeploy del gateway: se escribe el `SKILL.md`, se declara
+  en `skill-manifest.ts` (`appliesTo` con tools que existan en el manifiesto de tools), se regenera el artefacto, corren
+  los tests (incluida la prueba automática de fuga de contenido interno) y `pnpm local:check`; aparece en el catálogo
+  con el release. Paso a paso en [Operar los manuales MCP servidos por el protocolo](operar-manuales-mcp.md).
+- 🔴 **NUNCA `node:fs` en un módulo alcanzable desde una ruta**: Turbopack incluyó el proyecto entero en la función
+  (397 MB, tres builds fallidos). Por eso los manuales viajan como artefacto generado, no se leen del disco en runtime.
+
 ## Que no puede hacer
 
 Este MCP no hace lo siguiente:
@@ -360,6 +410,7 @@ Si necesitas alguno de esos casos, eso ya vive en otra task o follow-up:
 5. Usa solo las tools necesarias para tu caso.
 6. Si vas a automatizar algo sensible, corre `get_platform_health` antes.
 7. Si `safeModes` o el scope no son los esperados, detente antes de seguir.
+8. Antes de una tool que comprometa gasto, carga el manual que la gobierna: `get_greenhouse_skill` sin argumentos y luego con `name` (§9).
 
 ## Que significan los limites del scope
 
@@ -458,3 +509,4 @@ Acción recomendada:
 - Lane ecosystem: [docs/documentation/plataforma/api-platform-ecosystem.md](../../documentation/plataforma/api-platform-ecosystem.md)
 - Platform health: [docs/documentation/plataforma/platform-health-api.md](../../documentation/plataforma/platform-health-api.md)
 - Knowledge (Knowledge Platform): [docs/documentation/plataforma/knowledge-platform.md](../../documentation/plataforma/knowledge-platform.md) · builder ecosystem [src/lib/api-platform/resources/ecosystem-knowledge.ts](../../../src/lib/api-platform/resources/ecosystem-knowledge.ts) · TASK-1086
+- Manuales de uso servidos por el protocolo: manifiesto [src/mcp/greenhouse/skill-manifest.ts](../../../src/mcp/greenhouse/skill-manifest.ts) · contenido [docs/mcp/skills/](../../mcp/skills/) · funcional [manuales-mcp-servidos-por-el-protocolo.md](../../documentation/plataforma/manuales-mcp-servidos-por-el-protocolo.md) · operación [operar-manuales-mcp.md](operar-manuales-mcp.md) · TASK-1804

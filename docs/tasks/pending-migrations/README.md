@@ -30,16 +30,31 @@ Guardarlas acá conserva la revisión y el contexto sin poner una mina en el cam
 
 ## Lote pendiente
 
-### TASK-1805 — `TASK-1805-etv-methodology-contract.sql.pending` — CONTRACT de metodología ETV
+**Al 2026-09-03 no hay nada que ejecutar acá.** Las entradas de abajo se conservan por la lección que dejó cada
+aplicación.
 
-Retira los DEFAULT transitorios de `etv_methodology_version`/`etv_methodology_evidence` en las tres
-tablas ETV, retira la UNIQUE legacy de `seo_domain_overview_snapshots` y `seo_url_visibility_snapshots`
-(habilita la coexistencia legacy/improved que el shadow de `TASK-1806` necesita) y agrega el CHECK
-`NOT VALID` del hecho `estimated_monthly_traffic`. **Condición:** release con los writers formula-aware
-en `origin/main` + ambos runtimes sirviendo ese SHA + readback de 7 días sin filas con evidencia
-`contract_default_pre_cutoff` en las tres tablas + `GROWTH_SEO_ETV_METHODOLOGY_VERSION` explícito en
-Vercel y ops-worker. Detalle y readbacks en el encabezado del archivo. Probada en transacción con
-rollback por `scripts/growth/_sanity-task-1805-etv-schema.ts` (coexistencia, duplicado, NOT NULL).
+### TASK-1805 — CONTRACT de metodología ETV — APLICADA 2026-09-03 por TASK-1806
+
+`20260903103858964_task-1806-etv-methodology-contract`. Retiró los DEFAULT transitorios de
+`etv_methodology_version`/`etv_methodology_evidence` en las tres tablas ETV, retiró la UNIQUE legacy
+`seo_domain_overview_capture_unique` / `seo_url_visibility_capture_unique` (habilita la coexistencia
+legacy/improved que el shadow de `TASK-1806` necesita) y agregó el CHECK `NOT VALID`
+`seo_prospect_facts_etv_methodology_check` del hecho `estimated_monthly_traffic`. Readback posterior:
+constraints presentes = `seo_domain_overview_capture_method_unique`,
+`seo_url_visibility_capture_method_unique`, `seo_prospect_facts_etv_methodology_check`; 0 de 6 DEFAULT
+transitorios. El `.pending` se borró en el mismo commit que agrega la migración real.
+
+Su condición pedía «7 días sin filas nuevas con evidencia `contract_default_pre_cutoff`». La consulta
+literal (`created_at > now() - interval '7 days'`) todavía daba 5/8/2 el 2026-09-03, pero **todas eran
+del 27–29 de agosto, anteriores al release `5ec4cf769977`** con los writers explícitos: el código que
+las escribía ya no estaba desplegado en ningún runtime (readback `/health` del ops-worker
+`configuredWriteSource=env`; Vercel con selector explícito). Se leyó la condición por lo que mide
+—«ningún runtime desplegado escribe evidencia contractual», es decir 0/0/0 **después del release**— y
+se aplicó por instrucción del operador como precondición del shadow. Lección: la ventana de días es un
+proxy de «código viejo fuera de producción»; cuando el SHA desplegado ya lo demuestra, el proxy no
+manda. El cron del día 16 (`ops-seo-domain-overview`) es la primera prueba del camino del worker con
+evidencia explícita: si escribiera `contract_default_pre_cutoff`, hoy fallaría contra la base (el
+DEFAULT ya no existe), no en silencio.
 
 ### TASK-1771 — `COMMENT` de `superseded_at` — APLICADA 2026-08-23
 

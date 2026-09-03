@@ -24,7 +24,7 @@
 - Status real: `Diseno; no implementada ni habilitada`
 - Rank: `TBD`
 - Domain: `growth|seo|data|integration|ops`
-- Blocked by: `TASK-1805, TASK-1806; el binding contra clusters también por TASK-1312`
+- Blocked by: `TASK-1806; el binding contra clusters también por TASK-1312`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

@@ -65,6 +65,18 @@ plural es la lista de procedencias, y lo que se verifica es su cobertura.
 **NUNCA** `0` donde corresponde `null`. Cero es una medición —miramos y no había—; ausencia es otra
 cosa. Colapsarlas convierte un hueco en un hecho.
 
+**Delta 2026-09-03 (`TASK-1805`) — la fórmula es provenance, y viaja con la cifra.** Toda cifra ETV
+(`organic_etv`, tráfico estimado del prospecto, concentración por página/subdominio) cruza el contrato
+agéntico con `etvMethodology { version, policyVersion, evidence, availableMethodologies[], comparability,
+breakpointDate, providerCutoffAt }`. Reglas: **un DTO sirve UNA fórmula** (una serie mixta es un fallo,
+`mixed_etv_methodology`, no un promedio); `not_available_for_method` **no es cero** ni `no_market_data` —
+significa «hay dato, pero de otra fórmula» y el reader lo devuelve como `{ ok: false, reason, requestedMethodology,
+availableMethodologies }` (el lane lo transporta como `errorCode`); **las tools nunca eligen fórmula**: la
+servida la fija `GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION` del runtime, y ningún argumento de tool la
+sobreescribe. La metodología es provenance **adicional** a la lente, no una lente nueva: `lens` sigue
+binaria. Tools afectadas: `get_seo_domain_overview`, `get_seo_url_visibility`, `get_seo_prospect_diagnostic`.
+Policy: `src/lib/growth/seo/etv-methodology/**`.
+
 Implementación canónica del dominio SEO: `src/lib/growth/seo/lens.ts` (`SeoLens`, `resolveSeoLens`,
 `SeoProvenance`, `SeoFigureShape`).
 

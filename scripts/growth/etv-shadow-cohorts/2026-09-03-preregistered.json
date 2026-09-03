@@ -1,0 +1,116 @@
+{
+  "id": "2026-09-03-preregistered",
+  "approvedBy": "operador (instrucción 'avanza end-to-end' 2026-09-03)",
+  "approvedAt": "2026-09-03T02:40:00Z",
+  "preregistration": "docs/audits/seo/2026-09-03-dataforseo-improved-etv-shadow-preregistration.md",
+  "organizations": {
+    "berel.com": "org-32333527-02a8-487b-819e-6f76a761777d",
+    "comex.com.mx": "org-32333527-02a8-487b-819e-6f76a761777d",
+    "efeoncepro.com": "org-2df565fb-98aa-42f7-b324-ea9a2209017f"
+  },
+  "cells": [
+    {
+      "subject": "berel.com",
+      "locationCode": "2484",
+      "languageCode": "es",
+      "familySlug": "domain_rank_overview",
+      "organizationId": "org-32333527-02a8-487b-819e-6f76a761777d"
+    },
+    {
+      "subject": "berel.com",
+      "locationCode": "2484",
+      "languageCode": "es",
+      "familySlug": "ranked_keywords",
+      "rowLimit": 100,
+      "organizationId": "org-32333527-02a8-487b-819e-6f76a761777d"
+    },
+    {
+      "subject": "berel.com",
+      "locationCode": "2484",
+      "languageCode": "es",
+      "familySlug": "relevant_pages",
+      "rowLimit": 100,
+      "organizationId": "org-32333527-02a8-487b-819e-6f76a761777d"
+    },
+    {
+      "subject": "berel.com",
+      "locationCode": "2484",
+      "languageCode": "es",
+      "familySlug": "subdomains",
+      "rowLimit": 100,
+      "organizationId": "org-32333527-02a8-487b-819e-6f76a761777d"
+    },
+    {
+      "subject": "berel.com",
+      "locationCode": "2484",
+      "languageCode": "es",
+      "familySlug": "historical_rank_overview",
+      "period": { "fromMonth": "2026-04", "toMonth": "2026-06" },
+      "organizationId": "org-32333527-02a8-487b-819e-6f76a761777d"
+    },
+    {
+      "subject": "berel.com",
+      "locationCode": "2484",
+      "languageCode": "es",
+      "familySlug": "historical_rank_overview",
+      "period": { "fromMonth": "2026-07", "toMonth": "2026-09" },
+      "organizationId": "org-32333527-02a8-487b-819e-6f76a761777d"
+    },
+    {
+      "subject": "comex.com.mx",
+      "locationCode": "2484",
+      "languageCode": "es",
+      "familySlug": "domain_rank_overview",
+      "organizationId": "org-32333527-02a8-487b-819e-6f76a761777d"
+    },
+    {
+      "subject": "comex.com.mx",
+      "locationCode": "2484",
+      "languageCode": "es",
+      "familySlug": "ranked_keywords",
+      "rowLimit": 100,
+      "organizationId": "org-32333527-02a8-487b-819e-6f76a761777d"
+    },
+    {
+      "subject": "comex.com.mx",
+      "locationCode": "2484",
+      "languageCode": "es",
+      "familySlug": "relevant_pages",
+      "rowLimit": 100,
+      "organizationId": "org-32333527-02a8-487b-819e-6f76a761777d"
+    },
+    {
+      "subject": "efeoncepro.com",
+      "locationCode": "2152",
+      "languageCode": "es",
+      "familySlug": "domain_rank_overview",
+      "organizationId": "org-2df565fb-98aa-42f7-b324-ea9a2209017f"
+    },
+    {
+      "subject": "efeoncepro.com",
+      "locationCode": "2152",
+      "languageCode": "es",
+      "familySlug": "ranked_keywords",
+      "rowLimit": 100,
+      "organizationId": "org-2df565fb-98aa-42f7-b324-ea9a2209017f"
+    },
+    {
+      "subject": "berel.com",
+      "locationCode": "2484",
+      "languageCode": "es",
+      "familySlug": "bulk_traffic_estimation",
+      "rowLimit": 3,
+      "targets": ["berel.com", "comex.com.mx", "efeoncepro.com"],
+      "organizationId": "org-32333527-02a8-487b-819e-6f76a761777d"
+    },
+    {
+      "subject": "comex.com.mx",
+      "locationCode": "2484",
+      "languageCode": "es",
+      "familySlug": "ranked_keywords",
+      "rowLimit": 1000,
+      "purpose": "prospect",
+      "organizationId": "org-32333527-02a8-487b-819e-6f76a761777d"
+    }
+  ]
+}

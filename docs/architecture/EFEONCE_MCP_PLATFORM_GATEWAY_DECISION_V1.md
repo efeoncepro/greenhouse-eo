@@ -365,6 +365,23 @@ trata igual, pero explícito documenta la postura.
 - se acepta el ADR de identidad de cliente y el broker de `TASK-1631` entra en runtime;
 - una revisión MCP publicada en o después de 2027-07-28 remueve DCR de la spec.
 
+### Delta 2026-09-02 — provider `greenhouse-skills`: el gateway federa manuales, no sólo datos (TASK-1804)
+
+`src/providers/greenhouse-skills.ts` registra una sola tool, `get_greenhouse_skill` (annotations
+`readOnlyHint: true`; descripción derivada del artefacto de Greenhouse vía `greenhouseToolDescription`, no
+escrita a mano), y **delega** cada llamada a la lane `GET /api/platform/ecosystem/mcp/skills[/{name}]`. El
+provider no embebe ningún manual ni bundle estático: el contenido vive y se versiona en Greenhouse, y un cambio
+allá se sirve acá sin redeploy. Comparte la configuración e identidad del provider SEO
+(`GREENHOUSE_SEO_PROVIDER_ENABLED`, mismo consumer token de binding `internal`): apagado el SEO, apagado éste.
+Scope requerido: `efeonce.mcp.read`; **cero cambios en Entra**. Con él la revisión `efeonce-mcp-gateway-00028-pmx`
+federa 36 tools (28 SEO + `get_greenhouse_skill` + nativas).
+
+Consecuencia sobre los guards: el guard de paridad SEO (`greenhouse-seo-tool-parity.ts`) está anclado a su
+dominio y **no veía** una tool de plataforma federada. Se agregó `EXPECTED_GREENHOUSE_PLATFORM_TOOLS` +
+`computeFederatedNonSeoToolFindings` para que toda tool no-SEO que el gateway federe tenga entrada con razón en el
+mismo PR; una tool de plataforma nueva sin entrada hace fallar el guard. El renombre del cliente público del mismo
+día queda descrito en el delta anterior; no cambia nada de este provider.
+
 ## Rollout and rollback
 
 1. Crear repo, tests, container y CI local.

@@ -1,9 +1,9 @@
 # API Platform Ecosystem
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-04-25 por Codex (TASK-616 follow-up)
-> **Ultima actualizacion:** 2026-06-15 por Claude (TASK-655 command & idempotency foundation)
+> **Ultima actualizacion:** 2026-09-02 por Claude (TASK-1804 manuales de uso servidos por el protocolo)
 > **Documentacion tecnica:** [GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md)
 
 ---
@@ -84,6 +84,13 @@ Y hoy ya suma extensiones read-only downstream sobre el mismo cliente:
 - `get_webhook_subscription`
 - `list_webhook_deliveries`
 - `get_webhook_delivery`
+
+Desde `TASK-1804` (2026-09-02) el mismo server también sirve los **manuales de uso** de su superficie: la tool
+`get_greenhouse_skill` (sin `name` devuelve el catálogo; con `name`, el manual como texto) y el recurso MCP
+`skill://efeonce/{name}/SKILL.md`. Ninguno lee archivos: los dos piden el cuerpo a la lane ecosystem descrita en
+[Manuales de uso MCP](#manuales-de-uso-mcp). El inventario vigente es de 44 tools declaradas en
+`src/mcp/greenhouse/tool-manifest.ts` (7 de escritura); `get_greenhouse_skill` no escribe ni gasta presupuesto de
+proveedor.
 
 ## Como funciona hoy
 
@@ -286,6 +293,39 @@ No debe confundirse con:
 - writes de control plane
 - bypass de observabilidad interna
 
+### Manuales de uso MCP
+
+`GET /api/platform/ecosystem/mcp/skills` y `GET /api/platform/ecosystem/mcp/skills/{name}` (TASK-1804,
+2026-09-02; routeKeys `platform.ecosystem.mcp.skills` / `platform.ecosystem.mcp.skill`; payload helpers en
+`src/lib/api-platform/resources/ecosystem-mcp-skills.ts`).
+
+Qué devuelven:
+
+- el catálogo entrega `skills[]` con `name`, `description`, `audience`, `appliesTo` (las tools que gobierna) y
+  `uri`, más `count`. Nunca trae cuerpos: existe para no inflar el contexto del agente.
+- el detalle entrega el manual completo (`body`, markdown con frontmatter) más `contentHash`.
+
+Qué NO hacen:
+
+- leer archivos en runtime. El contenido nace en `docs/mcp/skills/<name>/SKILL.md` y viaja en el artefacto generado
+  `src/mcp/greenhouse/skill-catalog.generated.json` (`pnpm mcp:skills:generate`; `pnpm mcp:skills:check` corre en
+  `local:check` y en CI). El reader re-verifica los hashes y lanza si hay drift: un manual editado sin regenerar
+  no se sirve a medias, rompe el build.
+- servir `.claude/skills/**`. Sólo se publica lo que el manifiesto `src/mcp/greenhouse/skill-manifest.ts` declara, y
+  un test de fuga rechaza UUIDs, ids `org-`, rutas del repo, ids de task, secretos y correos internos dentro de
+  un manual.
+
+Gating: hoy los seis manuales son `audience: internal` y sólo los ve un binding `greenhouseScopeType=internal`. Para
+cualquier otro binding el manual **no existe**: catálogo vacío y detalle `404` anti-oráculo (nunca `403`); un
+nombre malformado también responde `404`.
+
+Freshness: `Cache-Control: private, max-age=300, must-revalidate` + `ETag` (derivado del `contentHash`; el ETag
+del catálogo depende del subconjunto visible, así que un binding nunca revalida contra el de otro) y
+`If-None-Match` → `304`.
+
+Contrato HTTP completo, con ejemplos, lo documenta `TASK-1793`; detalle funcional en
+[Manuales MCP servidos por el protocolo](./manuales-mcp-servidos-por-el-protocolo.md).
+
 ## Como resuelve seguridad y tenancy
 
 La lane ecosystem no adivina tenancy por nombre visible ni por etiquetas comerciales.
@@ -455,7 +495,7 @@ Reglas operativas:
 - no inventar consumers nuevos a ciegas solo para probar el MCP
 - si el target es `staging` o `preview`, respetar el flujo operativo de bypass SSO ya documentado para requests programaticos
 
-La V1 del MCP arrancó con un set chico de tools (histórico; hoy el inventario vigente son 43 tools declaradas en `src/mcp/greenhouse/tool-manifest.ts`, 7 de ellas de escritura):
+La V1 del MCP arrancó con un set chico de tools (histórico; hoy el inventario vigente son 44 tools declaradas en `src/mcp/greenhouse/tool-manifest.ts`, 7 de ellas de escritura; la 44.ª es `get_greenhouse_skill`, TASK-1804):
 
 - `get_context`
 - `list_organizations`

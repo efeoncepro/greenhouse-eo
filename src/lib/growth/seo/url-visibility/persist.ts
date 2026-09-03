@@ -125,7 +125,7 @@ export const persistUrlVisibilitySnapshots = async (input: {
     const rowCost = rowsWritten === 0 ? input.providerCostUsd : 0
     const positions = snapshot.organic.positions
 
-    await runGreenhousePostgresQuery(
+    const inserted = await runGreenhousePostgresQuery<{ inserted: number }>(
       `INSERT INTO greenhouse_growth.seo_url_visibility_snapshots
          (subject_kind, normalized_subject, raw_subject, location_code, language_code,
           capture_date, source_endpoint,
@@ -147,7 +147,8 @@ export const persistUrlVisibilitySnapshots = async (input: {
                $26, $27, $28, $29,
                $30, $31,
                $32, $33, $34::timestamptz, $35)
-       ON CONFLICT ON CONSTRAINT seo_url_visibility_capture_method_unique DO NOTHING`,
+       ON CONFLICT ON CONSTRAINT seo_url_visibility_capture_method_unique DO NOTHING
+       RETURNING 1 AS inserted`,
       [
         snapshot.subjectKind,
         snapshot.normalizedSubject,
@@ -187,7 +188,9 @@ export const persistUrlVisibilitySnapshots = async (input: {
       ]
     )
 
-    rowsWritten += 1
+    // TASK-1806 — cuenta filas INSERTADAS de verdad: con `ON CONFLICT DO NOTHING` el RETURNING vuelve vacío
+    // y la fila no se cuenta (antes se contaban los intentos, y un writer podía reportar 3 escritas con 0 nuevas).
+    rowsWritten += inserted.length
   }
 
   return { rowsWritten }

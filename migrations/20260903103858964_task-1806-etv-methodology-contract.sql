@@ -1,29 +1,12 @@
--- ═══════════════════════════════════════════════════════════════════════════════════════════
--- TASK-1805 — CONTRACT de la metodología ETV. Parqueada aquí DELIBERADAMENTE (ver README.md).
+-- TASK-1806 Slice 0b — CONTRACT de la metodología ETV (cuerpo revisado de TASK-1805, parqueado en
+-- docs/tasks/pending-migrations/ hasta hoy). Condiciones verificadas el 2026-09-03 antes de aplicar:
+--   1. Release 5ec4cf769977 con los writers formula-aware en origin/main; Vercel Production y ops-worker
+--      (rev 00635-tbt, env GROWTH_SEO_ETV_METHODOLOGY_VERSION=legacy_static_v1) sirven ese SHA.
+--   2. CERO filas con evidencia contractual escritas DESPUÉS del release (las 5/8/2 de la ventana literal de
+--      7 días son del 27-29 de agosto, anteriores al release: el código viejo ya no está desplegado).
+--   3. Selectores explícitos en ambos runtimes (readback /health del worker: configuredWriteSource=env).
+-- Aplicada por instrucción del operador («avanza end-to-end») como precondición del shadow de TASK-1806.
 --
--- CONDICIÓN DE EJECUCIÓN (verificar las TRES antes de `pnpm migrate:create`):
---   1. El release con los writers formula-aware de TASK-1805 está en `origin/main` (Vercel Production
---      sirve ese SHA y el ops-worker corre una revisión con ese SHA: `pnpm release:workers`).
---   2. Readback: en los últimos 7 días NO hay filas nuevas con evidencia contractual —
---        SELECT count(*) FROM greenhouse_growth.seo_domain_overview_snapshots
---         WHERE etv_methodology_evidence = 'contract_default_pre_cutoff' AND created_at > now() - interval '7 days';
---      (repetir para seo_url_visibility_snapshots y seo_prospect_diagnostics) → 0 en las tres.
---      Si el cron mensual (16/17) o un diagnóstico de prospecto aún escribió sin flag, el código viejo
---      sigue vivo en algún runtime: NO aplicar.
---   3. Ambos runtimes reportan `GROWTH_SEO_ETV_METHODOLOGY_VERSION` explícito (readback del
---      ops-worker por `gcloud run services describe` + Vercel `vercel env ls`), aunque el valor sea
---      `legacy_static_v1`.
---
--- Qué hace: retira los DEFAULT transitorios (una escritura nueva DEBE declarar método y evidencia),
--- retira la UNIQUE legacy (habilita la coexistencia real legacy/improved por sujeto/mercado/fecha,
--- precondición del shadow de TASK-1806) y exige metodología en el hecho ETV del prospecto.
---
--- Qué NO hace: no borra filas, no reetiqueta nada por fecha, no toca append-only.
---
--- Down: reponer sólo lo compatible. La UNIQUE legacy NO se repone si ya coexisten dos métodos para
--- un mismo sujeto/día (fallaría); en ese caso el rollback es de código (selector a legacy), no de schema.
--- ═══════════════════════════════════════════════════════════════════════════════════════════
-
 -- Up Migration
 
 ALTER TABLE greenhouse_growth.seo_domain_overview_snapshots

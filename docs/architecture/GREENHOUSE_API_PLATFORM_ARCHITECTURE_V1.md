@@ -49,6 +49,43 @@ Runtime: capabilities y schema vivos desde el 2026-08-19; Application 360 es el 
 
 ---
 
+## Delta 2026-09-02 — la lane de manuales de uso MCP: el lane sirve documentación, no sólo datos (TASK-1804)
+
+`GET /api/platform/ecosystem/mcp/skills` (catálogo: `skills[] {name, description, audience, appliesTo, uri}` +
+`count`, nunca cuerpos) y `GET /api/platform/ecosystem/mcp/skills/{name}` (`name, description, audience,
+appliesTo, uri, contentHash, body`). routeKeys `platform.ecosystem.mcp.skills` / `platform.ecosystem.mcp.skill`,
+sobre `runEcosystemReadRoute`; payload helpers en `src/lib/api-platform/resources/ecosystem-mcp-skills.ts`. Es
+la primera lane cuyo recurso es **prosa operativa** (el manual de uso de la superficie MCP) y no un aggregate
+de dominio, y la razón de que exista es de contexto: el agente carga el manual que gobierna la tool que va a
+usar, cuando la va a usar, en vez de recibirlo entero en la nota del handshake.
+
+- **Fuente = artefacto generado, nunca filesystem.** El lane construye el catálogo desde
+  `src/mcp/greenhouse/skill-catalog.generated.json` (`pnpm mcp:skills:generate` / `pnpm mcp:skills:check`, en
+  `local:check` y CI) y re-verifica `catalogHash`/`contentHash` contra el manifiesto puro
+  `src/mcp/greenhouse/skill-manifest.ts`; con drift **lanza**. 🔴 **NUNCA `node:fs` en un módulo alcanzable
+  desde una ruta**: Vercel rechazó el build (`api/mcp/greenhouse` de 397 MB > 250 MB) cuando un módulo leía
+  `docs/mcp/skills/**` con fs dinámico — Turbopack arrastró el proyecto entero; `outputFileTracingIncludes`
+  no era la causa y **no** es la solución. La lectura de disco vive sólo en `skill-catalog-fs.ts`
+  (generador + tests).
+- **Anti-oráculo por audiencia.** `audience: internal` sólo es visible para bindings
+  `greenhouseScopeType=internal`; para cualquier otro binding el manual **no existe** — catálogo vacío, detalle
+  `404`, nunca `403` — y un `name` malformado responde el mismo `404`. Mismo boundary que el work-queue
+  (delta 2026-08-28) y que el read-detail de Knowledge.
+- **Freshness declarada.** `Cache-Control: private, max-age=300, must-revalidate` + `ETag` (del
+  `contentHash`; el ETag del catálogo depende del subconjunto visible, así que un binding nunca revalida
+  contra el de otro) + `If-None-Match` → `304`.
+- **Tres consumers del mismo primitive**, cero contenido duplicado: la tool interna `get_greenhouse_skill`
+  (dominio `platform`, `writes:false`, `spendsProviderBudget:false`; 44.ª del manifiesto) y el recurso
+  `skill://efeonce/{name}/SKILL.md` en `src/mcp/greenhouse/server.ts` piden el cuerpo a esta lane vía
+  `http-client`; el gateway `mcp.efeonce.org` la delega desde su provider `greenhouse-skills`
+  (`EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md`, delta 2026-09-02). Nunca se sirve `.claude/skills/**`; un
+  test de fuga rechaza UUIDs, ids `org-`, rutas del repo, ids de task, secretos y correos internos.
+
+Verificado contra producción el 2026-09-02 (releases `375f56e24` y `4379c495013f`): count exacto, cuerpos
+byte-idénticos al artefacto, `304`/`404`/`401`, provider del gateway N/N. Contrato HTTP completo con ejemplos =
+`TASK-1793`. Invariantes: `agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md` §8;
+`GREENHOUSE_MCP_ARCHITECTURE_V1.md` §23.
+
 ## Delta 2026-08-28 — la cola priorizada de trabajo entra al lane SEO, `internal`-only (TASK-1700)
 
 `GET /api/platform/ecosystem/growth/seo/work-queue` publica la cola priorizada del target: el snapshot

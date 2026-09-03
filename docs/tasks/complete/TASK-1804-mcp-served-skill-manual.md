@@ -1,5 +1,19 @@
 # TASK-1804 — MCP: el manual de uso viaja por el protocolo, no en la nota del handshake
 
+## Delta 2026-09-02 (follow-up, released) — seis manuales en producción
+
+Release `develop→main` llevado por esta sesión: PR #216, target `4379c495013f`, orquestador run
+`33693657365` completed/success, release_id `4379c495013f-2493cf4b-bcf5-4c96-ac57-8aeb365f905c`,
+manifest `released` 23:19Z. Canary de contrato post-released contra producción (23:20:25Z→23:20:36Z):
+lane `mcp/skills` con binding interno → `count=6` exacto con los seis nombres, ETag + `If-None-Match` →
+304, cuerpos byte-idénticos al artefacto (`seo-discovery-to-tracking` 5382 B `4d0b810c2f80…`,
+`seo-technical-health` 4665 B `918d1b382ff8…`, `seo-prospect-diagnostic` 3959 B `f9ac28be68e0…`, más los
+tres originales sin cambio), inexistente 404, sin token 401; provider del gateway contra producción 6/6;
+front door 200/200/401. Watchdog `aggregateSeverity=ok`, 4/4 workers synced (`ops-worker` change-gated
+con diff de árbol completo vacío). Evidencia de agente real por el front door OAuth: `claude -p` cargó el
+catálogo y `seo-spend-discipline` (~22:05Z); un segundo intento a las 23:21Z no vio el servidor porque el
+token de Entra de Claude Code había expirado (re-login requerido), no por el runtime.
+
 ## Delta 2026-09-02 (follow-up) — el catálogo pasa de 3 a 6 manuales
 
 Por instrucción del operador ("haz la 3 end-to-end") se agregaron tres manuales dentro del contrato

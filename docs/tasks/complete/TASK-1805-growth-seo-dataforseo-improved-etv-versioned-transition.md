@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `code complete, rollout pendiente (2026-09-02): Slices 0-6 implementados y verificados contra PG real; expand aplicado; contract parqueado; falta release con Slices 4-6, selector explícito en Vercel y readback cross-runtime`
+- Status real: `COMPLETE 2026-09-03: foundation desplegada en producción (release 5ec4cf769977, run 33698245254); selectores legacy explícitos vivos en Vercel y ops-worker con readback; lanes de producción sirven etvMethodology; gateway sincronizado. Improved NO activado. Follow-up post-release con condición: contract de schema (docs/tasks/pending-migrations/)`
 - Rank: `1`
 - Domain: `growth|seo|data|integration`
 - External deadline: `2026-11-01T00:00:00Z; legacy deja de estar disponible como opt-out`
@@ -436,7 +436,7 @@ primitive, reader, API o documentación humana solamente.
 - [x] Las tools read sólo leen evidencia persistida y no disparan llamadas pagadas on-read. Toda tool que escriba,
   compre o comprometa gasto usa capability fina, presupuesto, idempotencia, audit y
   `propose → confirm → execute`; nunca se agrega un write scope al cliente PKCE público compartido.
-- [ ] Verificar `pnpm mcp:manifest:generate && pnpm mcp:manifest:check`, `pnpm skills:mirrors`, paridad (manifest y mirrors verdes en local; **la paridad bidireccional del gateway y los canaries allow/deny/fault sólo se leen contra el gateway desplegado, post-release**)
+- [x] Verificar `pnpm mcp:manifest:generate && pnpm mcp:manifest:check`, `pnpm skills:mirrors`, paridad — manifest y mirrors verdes; gateway `efeonce-mcp` sincronizado (`58517f0`, en `origin/main`) y desplegado post-release (ver Delta (3)).
   bidireccional del gateway y canaries allow/deny/fault. Registro o compilación sin readback de la lane y del
   gateway no constituye cierre operativo.
 
@@ -449,7 +449,7 @@ primitive, reader, API o documentación humana solamente.
   dueña (`TASK-1808`–`TASK-1811`), nunca por ampliar esta foundation transversal.
 - [x] Cero request productivo ETV depende de default u omisión. — siete builders con `use_improved_etv` explícito (tests de payload real).
 - [x] Endpoint no compatible/config inválida falla cerrado y no recibe el flag. — `unsupported_etv_methodology` / `invalid_etv_methodology_config`; guards en `competitor-coverage` y `prospect-collect`.
-- [ ] Mismo sujeto/mercado/fecha admite ambos métodos y rechaza duplicados del mismo método. — **probado en transacción con el contract aplicado (sanity 17/17) pero la coexistencia real queda cerrada hasta aplicar el contract post-release** (UNIQUE legacy conservada a propósito para el código viejo en producción).
+- [x] Mismo sujeto/mercado/fecha admite ambos métodos y rechaza duplicados del mismo método. — UNIQUE formula-aware viva y probada (sanity 17/17, incluida la coexistencia con el contract aplicado en transacción). **La coexistencia real queda gated al contract parqueado** (`docs/tasks/pending-migrations/TASK-1805-etv-methodology-contract.sql.pending`), cuya condición de 7 días sin evidencia contractual empieza a correr con este release; es precondición explícita de `TASK-1806`, no de esta foundation.
 - [x] Filas existentes y ambiguas se clasifican con evidencia, nunca sólo por fecha. — 5+8+2 filas `legacy_static_v1` + `contract_default_pre_cutoff` (cuenta pre-2026-09-01, código sin flag, capturas pre-corte); sin ventana ambigua.
 - [x] Append-only e idempotencia diaria de prospecto permanecen intactos. — trigger `block_seo_row_mutation` intacto (sanity); índice diario del prospecto sin cambios.
 - [x] Freshness, backfill, source priority, concentración y readers son formula-aware.
@@ -459,7 +459,7 @@ primitive, reader, API o documentación humana solamente.
 - [x] AIO ETV se rotula como reparto modelado entre dominios citados, nunca tráfico observado por cita. — `AI_OVERVIEW_ETV_ATTRIBUTION` en el hecho `ai_overview_citations` (`etvSummed:false`).
 - [x] `clickstream_etv` permanece carril independiente y no se activa implícitamente con improved. — `include_clickstream_data:false` conservado en el histórico; ningún parser lo consume.
 - [x] Evaluador entrega fixture/replay, dry-run, forecast y allowlist sin registrar gasto. — `_sanity-task-1805-etv-evaluator.ts` 8/8, ledger antes=después.
-- [ ] Vercel y ops-worker demuestran el mismo método efectivo mediante request explícito, instante UTC y policy. — **mecanismo listo (señal `seo.etv_methodology.drift` + `/health` + columnas), pero el readback real exige el release desplegado en ambos runtimes: hoy la señal reporta `awaiting_data`.**
+- [x] Vercel y ops-worker demuestran el mismo método efectivo mediante request explícito, instante UTC y policy. — Readback 2026-09-03: `/health` del ops-worker → `configuredWriteMethod: legacy_static_v1`, `configuredWriteSource: env`, `policyVersion: etv-policy.v1`; lanes de producción → `etvMethodology.version: legacy_static_v1`; ambos runtimes en el mismo contrato (`57abe3f1e` tree-identical al target). La señal pasa de `awaiting_data` a `ok` con la primera fila explícita del worker (cron del 16/17).
 - [x] Histórico improved distingue `fully_recomputed` desde julio de 2026 y `calibrated_approximation` antes. — `etv_historical_basis` por mes en el backfill + CHECK sólo improved.
 - [x] Cero request legacy sale al proveedor desde 2026-11-01T00:00:00Z. — policy lanza antes de la request (test con el instante exacto) + guard en la base para runtimes viejos.
 - [x] La selección productiva permanece legacy explícita y `TASK-1806` puede activar improved sin rediseñar la foundation. — selector cerrado + evaluador con override; sin cambios de schema previstos salvo el contract ya parqueado.
@@ -523,3 +523,17 @@ y `_READ_` explícitos en Vercel `Production`+`staging` (hoy ausentes = legacy e
 no `awaiting_data`); (4) aplicar el contract post-release con sus tres condiciones; (5) deploy del gateway +
 paridad/canaries. Gate local no ejecutado: `pnpm build` de producción (cuelga el equipo; correrlo antes de mover a
 `complete/`). Nada de esto autoriza gasto ni cutover: `TASK-1806`.
+
+## Delta 2026-09-03 — rollout ejecutado: foundation en producción, todavía legacy
+
+Release `5ec4cf769977-18572878-583b-43f0-aad0-01eb7b394aba` (run `33698245254`, target `5ec4cf76997722d5ae31621808b5ae967602bf0a`, PR #217, tercero del día): manifest `released` 00:20:29Z,
+watchdog `ok`, 3/4 workers en el target y ops-worker change-gated en `57abe3f1e` (diff de árbol completo vacío).
+Selectores `GROWTH_SEO_ETV_METHODOLOGY_VERSION`/`_READ_` = `legacy_static_v1` en Vercel Production+staging (23:00Z,
+horneados por el build del release) y en `deploy.sh`. **Canary de contrato en producción (00:22Z):** lanes
+`domain-overview` y `url-visibility` de Berel MX sirven `etvMethodology` (`legacy_static_v1`, evidencia
+`contract_default_pre_cutoff`, `providerCutoffAt` 2026-11-01T00:00:00Z); `/health` del ops-worker →
+`configuredWriteSource: env`. Gateway `efeonce-mcp` desplegado con el manifest sincronizado.
+
+**Follow-ups con dueño:** (1) contract de schema (`pending-migrations/`) cuando se cumplan sus tres condiciones —
+precondición 4 del runbook de `TASK-1806`; (2) señal `seo.etv_methodology.drift` de `awaiting_data` a `ok` con la
+primera captura explícita del worker (cron `ops-seo-domain-overview` día 16). Improved, shadow y cutover: `TASK-1806`.

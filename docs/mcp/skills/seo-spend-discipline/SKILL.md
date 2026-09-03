@@ -101,6 +101,30 @@ fact with an author, not a default. Omit it unless a human stated why the keywor
 Guessing `opportunity` fabricates a classification nobody made. A `target` keyword may sit at
 position 60 and that is the distance left, not a failure.
 
+## The ETV methodology evaluator is a separate spend
+
+Estimated traffic (ETV) from the provider carries a formula version, and every read tool that
+serves it reports that version as `etvMethodology.version`. Comparing the legacy formula with the
+improved one is **not** a read and not part of any capture: it is a separate spend with its own
+controls. It stays off by default and runs only behind its own gate, an allowlist of subjects, a
+maximum number of requests and a USD ceiling; when any of those is unset it fails closed. Its dry
+run declares `providerCalls: 0` and lists what it would execute and why, and that dry run is the
+only step you may report without a recorded approval.
+
+What the money looks like:
+
+- An **exact A/B** doubles the provider calls of every cell, one per formula, so the forecast is
+  twice a normal capture of the same subjects.
+- The **improved formula carries no surcharge**: switching formulas does not change the price of
+  a call.
+- **Clickstream-based traffic is a different lane**, priced at twice the rate, and is not part of
+  this comparison. Do not fold it into an ETV forecast.
+
+Never run the evaluator from a read tool or as a side effect of reading visibility. The read tools
+serve persisted evidence with its formula version; none of them buys a comparison, and none of
+them accepts a formula argument. If a human wants the comparison, it is a proposal with a dry run,
+a subject list, a request cap and a USD cap, confirmed before anything is called.
+
 ## What you never do
 
 - Never call a spending tool "to see what happens", to test, or to demonstrate the tool.
@@ -109,5 +133,7 @@ position 60 and that is the distance left, not a failure.
 - Never declare a competitor straight from a candidate list without the human confirming it.
   The competitor loop has its own manual: load `competitor-loop`.
 - Never assume a rejection is transient. Read the outcome or the error code and report it.
+- Never trigger a formula comparison of estimated traffic from a read, without its dry run, or
+  without an approved subject list, request cap and USD cap.
 - Never close a window (untrack or retire) as a way to pause; propose it only when the human
   wants the spend to stop.

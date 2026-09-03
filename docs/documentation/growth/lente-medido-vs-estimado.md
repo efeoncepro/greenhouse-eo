@@ -1,9 +1,9 @@
 # Lente de los datos SEO — medido (●) vs estimado (◑)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-08-29 por Claude Opus 5 (TASK-1785)
-> **Ultima actualizacion:** 2026-08-29 por Claude Opus 5
+> **Ultima actualizacion:** 2026-09-03 por Claude (TASK-1805: la metodología ETV es una procedencia adicional de la lente estimada, no una tercera lente)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md §5](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) · [MCP_TOOL_SURFACE_INVARIANTS.md](../../architecture/agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md)
 
 ## Qué problema resuelve
@@ -46,6 +46,17 @@ se capturó.
 > **Un detalle que sorprende:** la posición del SERP comprado es **exacta**, y aun así es
 > `estimated`. La distinción no es "exacto vs aproximado" — es **quién hizo la búsqueda**. Search
 > Console promedia, y aun así es `measured`, porque cada impresión que promedia ocurrió de verdad.
+
+## La fórmula del tráfico estimado no es una tercera lente (2026-09-03)
+
+Desde `TASK-1805`, las cifras de tráfico estimado que salen del ETV del proveedor viajan además con
+`etvMethodology`: la versión de la fórmula con que se calcularon (hoy `legacy_static_v1`), de dónde salió
+esa versión y si la lectura es comparable consigo misma. Es una **procedencia adicional dentro de la
+lente ◑ estimada** —dice *con qué fórmula* se estimó—, no una lente nueva: siguen existiendo dos lentes,
+medida y estimada. Se reporta junto al `capturedAt` por la misma razón por la que viaja la fecha: un
+número sin fecha se lee como vigente para siempre, y un ETV sin versión se lee como comparable con
+cualquier otro ETV, cosa que desde el corte del proveedor (2026-11-01) deja de ser cierta. Detalle:
+[Metodología detrás del tráfico estimado](modulo-seo-search-visibility-360.md).
 
 ## Vista de las dos lentes juntas
 

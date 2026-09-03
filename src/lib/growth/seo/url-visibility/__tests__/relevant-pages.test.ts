@@ -19,7 +19,8 @@ vi.mock('@/lib/postgres/client', () => ({
     if (sql.includes('INSERT INTO greenhouse_growth.seo_url_visibility_snapshots')) {
       state.inserts.push({ sql, params })
 
-      return []
+      // El writer cuenta filas INSERTADAS por el RETURNING (TASK-1806): una por INSERT sin conflicto.
+      return [{ inserted: 1 }]
     }
 
     if (sql.includes('FROM greenhouse_growth.seo_url_visibility_snapshots')) {

@@ -22,7 +22,10 @@ describe('ops-worker deploy Nubox contract', () => {
 
     // TASK-1805 — el selector de metodología ETV es dual-runtime; si desaparece de acá, el
     // próximo deploy lo borra en silencio y la señal de drift lo reporta como "default".
-    expect(script).toContain('GROWTH_SEO_ETV_METHODOLOGY_VERSION="${GROWTH_SEO_ETV_METHODOLOGY_VERSION:-legacy_static_v1}"')
+    // TASK-1806 (2026-09-03) — cutover aprobado: el default declarativo del worker es improved. Legacy sólo
+    // vuelve como rollback explícito ANTES del corte del proveedor (2026-11-01T00:00:00Z).
+    expect(script).toContain('GROWTH_SEO_ETV_METHODOLOGY_VERSION="${GROWTH_SEO_ETV_METHODOLOGY_VERSION:-improved_layout_clickstream_v2}"')
+    expect(script).toContain('GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION="${GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION:-improved_layout_clickstream_v2}"')
     expect(script).toContain('ENV_VARS="${ENV_VARS},GROWTH_SEO_ETV_METHODOLOGY_VERSION=${GROWTH_SEO_ETV_METHODOLOGY_VERSION}"')
     expect(script).toContain('ENV_VARS="${ENV_VARS},GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION=${GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION}"')
   })

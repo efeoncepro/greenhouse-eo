@@ -266,3 +266,28 @@ conviertan una revisión de modelo en performance SEO.
 
 Estos artefactos cierran discovery y diseño pre-implementación. No son evidencia de código, migración, llamada al
 proveedor, gasto, envío, deploy ni runtime.
+
+## Estado post-implementación 2026-09-03
+
+`TASK-1805` está en producción (release `5ec4cf769977-18572878-583b-43f0-aad0-01eb7b394aba`, run `33698245254`,
+PR #217; Slice 3 en PR #216). Cierre punto por punto de §8:
+
+| § 8 | Estado | Qué existe hoy |
+|---|---|---|
+| 1. Respuesta contractual | Resuelto (1805) | Constantes en `src/lib/growth/seo/etv-methodology/contracts.ts`: corte `ETV_PROVIDER_CUTOFF_ISO = 2026-11-01T00:00:00.000Z`, evidencia `explicit_request \| contract_default_pre_cutoff`, base histórica `fully_recomputed` (desde 2026-07) \| `calibrated_approximation`, `AI_OVERVIEW_ETV_ATTRIBUTION = modeled_uniform_share_among_cited_domains`. Sandbox/OpenAPI públicos siguen como seguimiento no bloqueante. |
+| 2. ADR + task propia | Resuelto | ADR `GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md` (§Runtime Contract); `TASK-1805` (foundation) y `TASK-1806` (evaluación/cutover). |
+| 3. Policy canónica | Resuelto (1805) | `etv-methodology/policy.ts`: `buildEtvMethodologyRequest` es el único punto que emite `use_improved_etv`; los siete caminos consumidores lo piden por la policy, el transporte genérico no lo conoce y `competitors_domain` no lo recibe. Versiones `legacy_static_v1 \| improved_layout_clickstream_v2`; `ETV_METHODOLOGY_POLICY_VERSION = etv-policy.v1`; selector `GROWTH_SEO_ETV_METHODOLOGY_VERSION`. |
+| 4. Provenance/schema formula-aware | Resuelto (1805, fase expand) | Migración `20260902221432772_task-1805-etv-methodology-expand`: columnas `etv_methodology_version` / `etv_methodology_evidence` / `etv_requested_at` / `etv_policy_version` (+ `etv_historical_basis` en domain overview) con CHECKs cerrados y de consistencia; UNIQUE formula-aware `seo_domain_overview_capture_method_unique` y `seo_url_visibility_capture_method_unique`; trigger `guard_seo_etv_methodology_cutoff()`; pre-checks, writers, readers (`etvMethodology` + `not_available_for_method`), lane ecosystem (`errorCode`) y tools MCP (`get_seo_domain_overview`, `get_seo_url_visibility`, `get_seo_prospect_diagnostic`) actualizados. Prospecto: método fijado antes del claim, `estimated_monthly_traffic.detail.etvMethodologyVersion`. **Contract parqueado** en `docs/tasks/pending-migrations/TASK-1805-etv-methodology-contract.sql.pending` (retira DEFAULT transitorios y UNIQUE legacy; CHECK `NOT VALID` en `seo_prospect_diagnostic_facts`); condición: release en `main` (cumplida) + 7 días sin filas con evidencia contractual (cuenta desde 2026-09-03) + selectores explícitos en ambos runtimes (cumplida). |
+| 5. Dónde vive el shadow | Resuelto por diseño (1805); ejecución en 1806 | La clave productiva incluye `etv_methodology_version`: legacy e improved coexisten por sujeto/mercado/fecha sin tabla experimental. La coexistencia real por sujeto/día exige el contract (retiro de la UNIQUE legacy), precondición 4 de `TASK-1806`. |
+| 6. Cohorte legacy/improved | Pendiente (1806) | Evaluador puro `etv-methodology/evaluator.ts` con gate `GROWTH_SEO_ETV_EVALUATOR_ENABLED` (OFF) y knobs `_SUBJECT_ALLOWLIST` / `_MAX_REQUESTS` / `_BUDGET_USD` (fail-closed por default); `planEtvEvaluation` (`exact_ab` = 2 requests por celda), `dryRunEtvEvaluation` (`providerCalls: 0`). Sin gasto ejecutado. |
+| 7. Comparación con GSC | Pendiente (1806) | `compareEtvWithGscBenchmark` compara y nunca promedia; falta la corrida con período/propiedad/país equivalentes. |
+| 8. Membresía relevant pages/subdomains, traffic cost, suma truncada | Pendiente (1806) | `compareEtvSnapshots` cubre Jaccard/entradas/salidas/rank del top-N, traffic cost y tráfico del prospecto con truncamiento; `replay.ts` proyecta fixtures con los parsers de producción (fixtures sintéticos en `__fixtures__/`). Sin dato real todavía. |
+| 9. Decisión rebaseline vs breakpoint | Pendiente (1806) | `etvMethodology.breakpointDate` viaja en `null`; `resolveEtvHistoricalCalculationBasis` ya distingue `fully_recomputed` / `calibrated_approximation`. |
+| 10. Tests conductuales | Resuelto (1805) | Suites en `etv-methodology/__tests__/`, `deploy-contract.test.ts`, `seo-etv-methodology-drift.test.ts`; sanity contra PG real `scripts/growth/_sanity-task-1805-etv-schema.ts` (17/17) y `_sanity-task-1805-etv-evaluator.ts` (8/8). |
+| 11. Señales | Resuelto (1805) | `seo.etv_methodology.drift` (steady 0; `awaiting_data` sin evidencia explícita; `error` por drift configurado↔solicitado, legacy post-corte o config inválida; `warning` por evidencia contractual reciente junto a explícita). Filas sin versión no existen por CHECK NOT NULL; la mezcla la rechaza el reader (`mixed_etv_methodology`). |
+| 12. Runbook/copy | Parcial | Runbook `docs/manual-de-uso/growth/evaluar-transicion-dataforseo-improved-etv.md` y manuales MCP servidos; el copy de superficie visible con versión/cutover queda para la cara visible del módulo. |
+| 13. Cutover controlado | Pendiente (1806) | Selectores explícitos en `legacy_static_v1` en Vercel Production + staging y `services/ops-worker/deploy.sh`; `/health` del worker expone `etvMethodology`. Desde el corte la policy falla cerrado con `legacy_requested_after_cutoff`. |
+
+Estado runtime verificado 2026-09-03: lanes de producción (Berel MX) sirven `etvMethodology.version = legacy_static_v1`
+con evidencia `contract_default_pre_cutoff`; señal en `awaiting_data` hasta la primera captura explícita del worker
+(día 16/17). Improved NO activado.

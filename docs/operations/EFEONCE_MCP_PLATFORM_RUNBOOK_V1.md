@@ -750,7 +750,8 @@ hace que el reader lance, nunca un catálogo corto en verde); cada `body` empiez
 `---\nname: <nombre>`; un nombre inexistente responde `404`; sin token `401`; con un binding de
 cliente el catálogo es `[]` y cualquier detalle `404` (anti-oráculo, nunca `403`).
 
-Estado as-of 2026-09-02 21:27Z: **vivo en producción**. Gateway `efeonce-mcp-gateway-00028-pmx`
+Estado as-of 2026-09-02 23:20Z: **vivo en producción con SEIS manuales** (release `4379c495013f`, run
+`33693657365`; canary `count=6` exacto, provider del gateway 6/6). Estado previo 21:27Z: **vivo en producción** con tres. Gateway `efeonce-mcp-gateway-00028-pmx`
 (commit `c588a1b`, front door 200/200/401) + lane released con `375f56e24` (release
 `375f56e24187-546f452b-…`, run `33683893124`). Canary de contrato contra producción verde: `count=3`
 exacto, cuerpos byte-idénticos al artefacto, 404/401, provider del gateway 5/5. No hay Entra, flag ni

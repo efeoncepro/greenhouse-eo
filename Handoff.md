@@ -2,31 +2,62 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
-## 2026-09-02 (10) — TASK-1805 foundation ETV implementada: code complete, rollout pendiente, todavía legacy
+Seguimiento OAuth (2026-09-02): [TASK-1813](docs/tasks/to-do/TASK-1813-efeonce-mcp-oauth-client-interoperability.md)
+creada `to-do`, sin implementar. Codex 0.152.0 rechazó discovery; metadata pública revalidada a las 22:51Z.
+La [auditoría](docs/audits/EFEONCE_MCP_CODEX_OAUTH_INTEROPERABILITY_2026-09-02.md) identifica scopes sin cualificar
+al apagar shim, fallback de deploy que lo reactiva y canary directo que no prueba discovery. El plan B histórico
+de abajo no basta sin esos gates. Próximo paso: plan humano aprobado y coordinación con dueños de archivos;
+no push/deploy ni mutación de Entra autorizados por esta creación. Incidente Git/Berel separado.
 
-Sesión `greenhouse-eo-fe` sobre `develop`, **sin push** (incidente de `main` en curso; `origin/develop` quedó en
-`e5d7675d8` = Slice 3, empujado por `Task-1804` dentro de su release). Seis slices locales (`7adf5ffc7`…`9477b83e7`)
-+ gateway `efeonce-mcp` `58517f0` local. Cero gasto de proveedor; selección productiva `legacy_static_v1`
-explícita; `use_improved_etv:false` en cada request.
+## 2026-09-03 — TASK-1806: shadow ETV comprado y evaluado; improved calibra 6× mejor contra GSC; cutover espera aprobación
 
-**Qué existe ya:** policy pura `src/lib/growth/seo/etv-methodology/**` (14 familias, `buildEtvMethodologyRequest`
-fail-closed, selectores `GROWTH_SEO_ETV_METHODOLOGY_VERSION`/`_READ_`); expand APLICADO a la instancia compartida
-(`20260902221432772`; filas previas 5+8+2 atribuidas legacy por contrato, guard de corte en la base, UNIQUE
-formula-aware junto a la legacy); siete writers explícitos; readers/lane/MCP con `etvMethodology` y
-`not_available_for_method`; señal `seo.etv_methodology.drift` (`awaiting_data` hoy); `/health` del worker con
-readback; evaluador dry-run/replay (8/8, ledger intacto). Sanity del schema 17/17 en transacción con rollback,
-incluido el contract.
+`TASK-1806` `in-progress`, Slices 0-2 ejecutados. Contract de schema aplicado (migración
+`20260903103858964`). Shadow `exact_ab` corrido con autorización explícita del operador en chat (run
+`etvshadow-f3fef9b3c2a8`): 26/26 requests OK, **USD 1,09536** real vs 1,14384 forecast, ledger `labs` cuadra,
+inputs idénticos salvo el flag (hash). Evaluador con GSC (client_id público del flujo OAuth + secret por referencia):
+**hold mecánico sólo por la regla §5.2** (ETV −64,5 % en Berel con `organic.count` intacto), que en un A/B exacto se
+dispara por construcción; calibración a favor de improved (**err. rel. 49,4 % vs 321,3 %** legacy sobre 30.898
+clics/mes GSC), Jaccard 1,0 en páginas/subdominios, historia continua (0,1 % vs 8,1 %), Comex −52 %, prospecto −43,9 %.
+Memo con explicación y recomendación **`go_rebaseline`**: `docs/audits/seo/etv-shadow/2026-09-03-…-decision-memo.md`.
 
-**Riesgos abiertos:** el **contract** (`docs/tasks/pending-migrations/TASK-1805-etv-methodology-contract.sql.pending`)
-NO está aplicado a propósito — hasta entonces la coexistencia legacy/improved por sujeto/día está cerrada y el
-código viejo sigue escribiendo con evidencia contractual; aplicarlo antes del release rompería los crons del 16/17
-y el prospecto en Vercel. `pnpm build` de producción no se corrió (cuelga el equipo): correrlo antes de `complete/`.
+**Hallazgos de la corrida:** (1) la celda bulk de Berel/Comex no persistió: comparte tabla y clave con la foto de
+dominio del mismo día (DO NOTHING; valores en el crudo) — defecto de cohorte, anotado; (2) los writers contaban
+INTENTOS en `rowsWritten`: ahora cuentan filas insertadas por `RETURNING` (persist de domain-overview y
+url-visibility; tests adaptados); (3) señal `seo.etv_methodology.drift` en `warning` hasta que las filas
+contractuales del 27-29 de agosto salgan de la ventana de 7 días — no es drift de runtime.
 
-**Pendientes inmediatos:** (1) push/release de Slices 4–6 cuando el operador cierre el incidente de `main`;
-(2) `vercel env add GROWTH_SEO_ETV_METHODOLOGY_VERSION legacy_static_v1` (+ `_READ_`) en Production+staging con
-redeploy; (3) readback: `/health` del worker + señal en `ok`; (4) contract post-release (3 condiciones en el
-archivo); (5) deploy del gateway + paridad/canaries; (6) mover `TASK-1805` a `complete/`. Improved, shadow pagado
-y cutover: **sólo `TASK-1806`**.
+**Corrección del operador:** `efeoncepro.com` sí se mide, pero APARTE de Berel (su org, mercado CL, su GSC). El
+error fue la celda bulk, que metió a Efeonce en la consulta de Berel (MX, org de Berel): esa fila queda anulada;
+las celdas propias de Efeonce siguen válidas y sin voto. Cohorte vigente `2026-09-03-preregistered-v2.json` (bulk
+por organización y en día distinto a la foto).
+
+**Pendiente con dueño:** aprobación separada del operador del tratamiento histórico (`rebaseline`) y del cutover
+staging/producción (Slices 3-4; un solo ops-worker compartido = cutover del worker es producción y exige release).
+Selectores productivos siguen `legacy_static_v1`; lanes prod de Berel verificados sirviendo legacy tras el shadow.
+Sin push: WIP ajeno en el árbol (Berel, EPIC-022, 8 tasks).
+
+## 2026-09-03 — TASK-1805 en producción: la fórmula detrás de `etv` es identidad del hecho, todavía legacy
+
+Tercer release del día (`5ec4cf769977-18572878-583b-43f0-aad0-01eb7b394aba`, run `33698245254`, target `5ec4cf76997722d5ae31621808b5ae967602bf0a`, PR #217): manifest `released`
+00:20:29Z, watchdog `ok`, 3/4 workers en el target y ops-worker change-gated en `57abe3f1e` (diff de árbol
+completo vacío: el `push:develop` ya lo había desplegado). Dispatch con bypass forense por `cloud_release`
+(`deploy.sh`), sin runs quemados; coordinado con `Task-1804` para no pisar su release #216 (freeze de ~25 min).
+
+**Verificado en producción (00:22Z):** lanes `domain-overview` y `url-visibility` de Berel MX sirven
+`etvMethodology` (`legacy_static_v1`, evidencia `contract_default_pre_cutoff`, corte `2026-11-01T00:00:00Z`);
+`/health` del ops-worker → `configuredWriteSource: env`, `policyVersion: etv-policy.v1`. Selectores
+`GROWTH_SEO_ETV_METHODOLOGY_VERSION`/`_READ_` = `legacy_static_v1` en Vercel Production+staging (horneados por el
+build del release) y en `deploy.sh`. Gateway `efeonce-mcp` con el manifest sincronizado desplegado
+(`efeonce-mcp-gateway-00029-bwg`). `TASK-1805` → `complete/`.
+
+**Riesgos abiertos / pendientes con dueño:** (1) el **contract** de schema sigue parqueado en
+`docs/tasks/pending-migrations/TASK-1805-etv-methodology-contract.sql.pending`; su condición de 7 días sin filas con
+evidencia contractual empieza a correr con este release y es precondición 4 de `TASK-1806` — sin él la coexistencia
+legacy/improved por sujeto/día sigue cerrada a propósito. (2) La señal `seo.etv_methodology.drift` queda en
+`awaiting_data` hasta la primera captura explícita del worker (cron `ops-seo-domain-overview`, día 16); si tras ese
+run sigue en `awaiting_data`, el worker no está escribiendo evidencia explícita — investigar, no esperar.
+(3) Improved ETV, shadow pagado, decisión histórica y cutover: **sólo `TASK-1806`**, con presupuesto aprobado.
+Evaluador dry-run listo: `scripts/growth/_sanity-task-1805-etv-evaluator.ts`.
 
 ## 2026-09-02 (9) — DCR quedó deprecado en MCP `2026-07-28`: el shim de `mcp.efeonce.org` se mantiene, con dos hallazgos que la evaluación no buscaba
 
@@ -210,6 +241,21 @@ manuales, todos SEO federado (`seo-discovery-to-tracking`, `seo-technical-health
 redespliega: los nuevos aparecen tras el release. Hiring/Globe quedan fuera: sus tools no están en el manifiesto de
 Greenhouse y el contrato de manuales sólo gobierna ése. Techo "revisar al pasar de 6" alcanzado: la próxima adición
 particiona por dominio.
+
+**Segundo release del día (23:19Z), llevado por esta sesión:** PR #216 → `4379c495013f`, run `33693657365`
+success, release_id `4379c495013f-2493cf4b-…`, manifest `released`; canary post-released: catálogo `count=6`,
+cuerpos byte-idénticos, 304/404/401, provider del gateway 6/6; watchdog ok, 4/4 workers (ops-worker
+change-gated con diff de árbol vacío). Incluyó TASK-1805 Slices 1–3 (sin flag; migración expand ya aplicada,
+único bypass) y la reconciliación de **10 commits que `cesargrowth11` empujó directo a `main`** (skill Berel,
+22:06–22:10Z) por cherry-pick + `-s ours`. Playbook gana el anti-patrón #15. Ledger de tiempos actualizado.
+
+**Barrido documental por subagentes (23:45Z):** dos agentes actualizaron lo que el cierre manual no cubría —
+`api-platform-ecosystem.md` (lane de manuales), `efeonce-mcp-gateway.md` (provider `greenhouse-skills`, 36 tools),
+arquitectura API Platform (delta), ADR del gateway (delta provider + guard no-SEO), patrones canónicos (segundo
+uso del patrón manifiesto+artefacto+hash), `docs/api` (pointer), arquitectura SEO §7 (manuales obligatorios por
+task), manuales de uso del inventario/gateway/provider SEO, doc funcional SV360 por MCP, skills
+`dataforseo-operator` y `seo-aeo-practice` (espejadas), README y AGENTS del repo `efeonce-mcp` (cifras 28/36/6).
+Regla auto-cargada `.claude/rules/mcp-tool-surface.md` gana el invariante de manuales.
 
 ## 2026-09-02 (5) — TASK-1784: el eval de selección MCP refutó su propia hipótesis, y eso es el entregable
 
@@ -528,36 +574,3 @@ publicado hasta `7eeb1da`. Asset Governance quedó desplegado por el workflow ca
 ejecución, scheduler restaurado `ENABLED`, cron `*/1` y post-plan sin drift. La reconciliación fue sana pero no-op
 (`claimed=0`, `failed=0`, cola 0), así que no sustituye el canary con asset real y no habilita espaciar el cron.
 Greenhouse sigue local y no fue publicado.
-
-## 2026-09-01 (10) — ISSUE-167 resuelto: el foco no era del form, era del eje de modelado
-
-Resuelto el mismo día que lo abrí. **Code complete, rollout pendiente**: el bundle desplegado sigue
-siendo el anterior, así que en producción el defecto continúa hasta el próximo release.
-
-La primera lectura culpaba al path del form. Al abrir el código apareció lo real: el comportamiento
-existía **dos veces y distinto** —`slide-in` con foco-return y `Escape` a nivel de shell,
-`meeting-action` con el suyo propio— y faltaba una tercera. El foco y la salida por teclado se
-habían modelado como propiedad del **placement**, no de «hay una superficie revelada por activación
-del usuario». Por eso `embedded` no las heredaba.
-
-Primitive canónica `src/growth-cta-renderer/disclosure-focus.ts`. Es disclosure y no modal (sin
-focus trap ni `aria-modal`), y **`Escape` se escucha en el contenedor, jamás en el documento**: un
-CTA incrustado no puede secuestrarle el `Escape` a la página del cliente.
-
-🔴 **El hallazgo que vale más que el arreglo de accesibilidad salió del test:** `Escape` estaba por
-emitir `dismissed`, que es una **señal de negocio** —«el visitante rechazó la oferta»— que viaja al
-ledger de conversión. Cerrar un formulario abierto por curiosidad no es rechazar el CTA. Ahora
-`Escape` **colapsa** al card sin telemetría, y el botón «✕ Ahora no» sigue siendo el único rechazo.
-El colapso queda deliberadamente sin evento: el vocabulario de `cta_conversion_event` no tiene
-`form_closed` y agregarlo es cambio de contrato server-side.
-
-Verificación: 8 tests de la primitive + 3 del cableado, **falsificados** revirtiendo el arreglo (2
-rojos de 22; 47/47 con él). Y un riesgo que jsdom no habría atrapado, cerrado con medición contra el
-DOM real de producción: si `<greenhouse-form>` montara en shadow DOM el selector no lo vería y el
-arreglo sería inerte — verificado que no usa shadow DOM y expone 5 controles al selector exacto.
-
-`meeting-action.ts` conserva su gestión propia: funciona, no tenía defecto medido, y refactorizarla
-sin necesidad era riesgo sin retorno. Queda como consumidor candidato.
-
-Próximo paso: release develop→main + rebuild del renderer, y repetir el recorrido con teclado en
-vivo en ambos hosts antes de dar el issue por cerrado operativamente.

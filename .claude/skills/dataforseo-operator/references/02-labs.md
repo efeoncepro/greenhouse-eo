@@ -178,6 +178,19 @@ cutover elige rebaseline versionado o breakpoint visible, nunca una línea que m
 14 familias y de los seis endpoints/siete caminos consumidores actuales:
 `docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md`.
 
+**Implementado en Greenhouse (2026-09-03).** El builder canónico es `buildEtvMethodologyRequest({ endpoint, env?, now?,
+methodologyOverride? })` en `src/lib/growth/seo/etv-methodology/policy.ts`: devuelve `requestParams: { use_improved_etv }`
+junto a `requested`, `providerEffective`, `requestedAt`, `policyVersion` (`etv-policy.v1`) y `evidence: 'explicit_request'`,
+y es el único punto que emite el flag (siete caminos consumidores; `competitors_domain` no lo recibe). Selectores:
+`GROWTH_SEO_ETV_METHODOLOGY_VERSION` (escritura) y `GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION` (lectura), vocabulario
+`legacy_static_v1 | improved_layout_clickstream_v2`, ausentes = legacy explícito. Evidencia persistida por fila en
+`seo_domain_overview_snapshots`, `seo_url_visibility_snapshots` y `seo_prospect_diagnostics`: `etv_methodology_version`,
+`etv_methodology_evidence`, `etv_requested_at`, `etv_policy_version` (+ `etv_historical_basis` sólo en domain overview),
+con la versión dentro de la UNIQUE de captura. Corte fail-closed: desde `2026-11-01T00:00:00Z` una configuración legacy
+lanza `legacy_requested_after_cutoff` antes del request, y el trigger `guard_seo_etv_methodology_cutoff()` rechaza en
+BD evidencia contractual o legacy explícita desde esa fecha. Improved no está activado; el shadow y el cutover son
+`TASK-1806`.
+
 ---
 
 ## 4. Filtros y ordenamiento

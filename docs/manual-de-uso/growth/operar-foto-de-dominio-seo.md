@@ -1,9 +1,9 @@
 # Operar la foto de dominio SEO (TASK-1775)
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-08-27 por Claude (TASK-1775)
-> **Ultima actualizacion:** 2026-09-01 por Codex
+> **Ultima actualizacion:** 2026-09-03 por Claude (TASK-1805: `etvMethodology`, readback del selector de fórmula y qué no tocar)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) §3 y §4.2
 
 ## Para qué sirve
@@ -16,12 +16,15 @@ cliente **y de sus competidores declarados**, más la trayectoria histórica men
 Toda cifra es **◑ estimada** (DataForSEO Labs, ciclo mensual). Nunca se compara, promedia ni
 grafica junto a datos ● medidos de Search Console.
 
-> **Alerta metodológica actualizada 2026-09-02:** DataForSEO confirmó Improved ETV y el corte global
-> `2026-11-01T00:00:00Z`; desde ese instante `false` se ignora y no existe fallback legacy. La respuesta no
-> expone una versión de fórmula, y el runtime actual no persiste un método efectivo derivado; no ejecutes un backfill, shadow o cutover
-> manual agregando el flag a esta corrida. Hasta implementar provenance formula-aware, cualquier salto de ETV
-> se trata como posible cambio de modelo, no como crecimiento/caída. Auditoría y plan:
-> [DataForSEO Improved ETV](../../audits/seo/2026-09-01-dataforseo-improved-etv-impact.md).
+> **Metodología ETV (actualizado 2026-09-03, TASK-1805):** DataForSEO confirmó Improved ETV y el corte global
+> `2026-11-01T00:00:00Z`; desde ese instante `false` se ignora y no existe fallback legacy. Desde el
+> 2026-09-03 cada foto persiste y sirve la fórmula con que se compró (`etvMethodology`), el reader sirve una
+> sola fórmula por lectura y hoy todo va en `legacy_static_v1`. No agregues `use_improved_etv` a mano a esta
+> corrida ni al backfill: la fórmula la fija la policy (`buildEtvMethodologyRequest`) desde
+> `GROWTH_SEO_ETV_METHODOLOGY_VERSION`, y el cambio a improved lo decide `TASK-1806`. Un salto de ETV entre
+> versiones distintas es cambio de fórmula, no crecimiento/caída. Antecedente:
+> [auditoría Improved ETV](../../audits/seo/2026-09-01-dataforseo-improved-etv-impact.md) · runbook:
+> [Evaluar la transición a DataForSEO Improved ETV](evaluar-transicion-dataforseo-improved-etv.md).
 
 ## Antes de empezar
 
@@ -65,7 +68,9 @@ curl -s -X POST "$OPS_WORKER_URL/seo/domain-overview/capture-batch" \
 
 Verificar: (a) el `costUsd` devuelto contra el estimado del dry-run; (b) la fila en
 `greenhouse_growth.seo_domain_overview_snapshots`; (c) **re-disparar el mismo target y confirmar
-costo USD 0** con outcome `fresh` — el pre-check de frescura es el seguro del presupuesto.
+costo USD 0** con outcome `fresh` — el pre-check de frescura es el seguro del presupuesto; (d) que la
+fila trae `etv_methodology_version = legacy_static_v1` y `etv_methodology_evidence = explicit_request`
+(una captura nueva siempre pide la fórmula de forma explícita; la frescura también se evalúa por fórmula).
 
 ### 3. Backfill histórico (manual, tope duro)
 
@@ -113,6 +118,38 @@ Las filas capturadas quedan — son mediciones válidas de una tabla append-only
 | `cap_blocked` (backfill) | El tope duro `--max-usd` de la corrida no alcanza para ese sujeto |
 | `provider_error` | El proveedor falló; NO se escribió fila (sin veredicto no hay hecho) |
 
+### Qué significa `etvMethodology`
+
+Cada foto (fila, reader, lane y tool MCP) trae `etvMethodology`:
+
+| Campo | Significado |
+|---|---|
+| `version` | Fórmula del proveedor con que se compró el ETV: `legacy_static_v1` (hoy, todas) o `improved_layout_clickstream_v2` (sólo cuando `TASK-1806` lo decida) |
+| `evidence` | `explicit_request` = la corrida pidió la fórmula de forma explícita (toda captura desde el 2026-09-03); `contract_default_pre_cutoff` = fila previa, atribuida a legacy porque era lo único que el proveedor aplicaba antes del corte |
+| `availableMethodologies` | Qué fórmulas existen para ese sujeto en la ventana pedida |
+| `comparability` | `single_methodology` = la lectura es de una sola fórmula; `not_available_for_method` = no hay filas en la fórmula pedida. En ese caso el reader responde `{ ok: false, reason: 'not_available_for_method', requestedMethodology, availableMethodologies }` y el lane lo transporta como `errorCode` — es un estado, nunca ceros |
+| `policyVersion` / `providerCutoffAt` | `etv-policy.v1` y `2026-11-01T00:00:00.000Z` (desde ahí el proveedor sólo calcula improved) |
+
+Sólo la foto de dominio guarda además `etv_historical_basis` (base del histórico en improved: recalculado
+por completo o aproximación calibrada); queda vacío mientras todo sea legacy.
+
+### Readback del selector de fórmula
+
+1. `GET $OPS_WORKER_URL/health` → `etvMethodology.configuredWriteSource` debe ser `env` (selector declarado
+   en `deploy.sh` y presente en la revisión activa; `default` significa que la env var no está y el worker cayó
+   al legacy implícito) y `valid: true`. El mismo bloque expone `configuredWriteMethod`,
+   `configuredReadMethod`, `policyVersion`, `providerCutoffAt` y `afterCutoff`.
+2. Señal `seo.etv_methodology.drift` en `/admin/operations` (módulo Growth; steady = 0):
+   - `awaiting_data` — todavía no hay ninguna captura con evidencia explícita (estado esperado hasta la
+     primera corrida del cron posterior al 2026-09-03: día 16 esta foto, día 17 visibilidad por URL).
+   - `ok` — lo configurado coincide con lo que se pidió en las capturas.
+   - `warning` — hay evidencia contractual reciente conviviendo con evidencia explícita.
+   - `error` — drift entre lo configurado y lo solicitado, legacy configurado después del corte o
+     configuración inválida. Revisar la revisión activa del worker antes que el `deploy.sh`.
+
+Cómo evaluar el paso a improved (fixtures sin gasto, A/B bajo autorización, decisión histórica): runbook
+[Evaluar la transición a DataForSEO Improved ETV](evaluar-transicion-dataforseo-improved-etv.md).
+
 ## Señal de confiabilidad
 
 `seo.domain_overview.stale_subjects` (dashboard `/admin/operations`, módulo Growth; steady = 0):
@@ -131,6 +168,11 @@ Las filas capturadas quedan — son mediciones válidas de una tabla append-only
 - **NO** exponer `captured_by_organization_id` en ninguna superficie.
 - **NO** "actualizar" una fila: la tabla es append-only; una medición errónea se corrige con una
   captura nueva, jamás con UPDATE/DELETE.
+- **NO** cambiar `GROWTH_SEO_ETV_METHODOLOGY_VERSION` ni `GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION` a mano
+  fuera de `TASK-1806`: la fórmula es identidad del hecho; cambiarla en un runtime y no en el otro produce
+  drift, y legacy después del corte se rechaza en la captura y en la base.
+- **NO** comparar, restar ni graficar juntas fotos con `etvMethodology.version` distinta.
+- **NO** pasar `use_improved_etv` a mano en una primitive: sólo `buildEtvMethodologyRequest` lo construye.
 
 ## Problemas comunes
 
@@ -145,6 +187,7 @@ Las filas capturadas quedan — son mediciones válidas de una tabla append-only
 
 - Primitives: `src/lib/growth/seo/domain-overview/{capture,history-backfill,traffic-estimation,reader,persist}.ts`
 - Worker: `services/ops-worker/server.ts` (`/seo/domain-overview/capture-batch`) + `deploy.sh` (`ops-seo-domain-overview`)
-- Migración: `migrations/20260827190156045_task-1775-seo-domain-overview.sql`
+- Migración: `migrations/20260827190156045_task-1775-seo-domain-overview.sql` (+ `20260902221432772_task-1805-etv-methodology-expand.sql`)
+- Metodología ETV: `src/lib/growth/seo/etv-methodology/` + ADR `docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md` + señal `src/lib/reliability/queries/seo-etv-methodology-drift.ts`
 - Spec: `docs/tasks/TASK_ID_REGISTRY.md → TASK-1775 (spec en la carpeta de su lifecycle vigente)`
 - Proveedor: `.claude/skills/dataforseo-operator/references/02-labs.md` §2/§5

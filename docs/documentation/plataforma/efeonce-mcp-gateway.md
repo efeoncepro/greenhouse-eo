@@ -16,11 +16,21 @@ Globe para el workspace interno autorizado. El gateway no recrea catálogo, rout
 
 Desde el 6 de agosto de 2026 hay una **segunda capacidad federada**: Search Visibility 360 de Greenhouse. Partió
 con tres consultas de solo lectura y creció hasta federar **28 tools SEO** (al 2026-08-31). ⚠️ Federado e interno NO son el mismo conjunto por construcción —el gateway resuelve contra rutas HTTP del lane—: `get_seo_work_queue` existe adentro y está excluida con razón, y `get_seo_provider_spend` está federada sin contraparte interna. Desde el 28 de agosto de 2026 esas 27 están **efectivamente
-desplegadas** en la revisión productiva del gateway (`efeonce-mcp-gateway-00026-ctp`, desde el 2026-09-01; antes `efeonce-mcp-gateway-00024-8b8`), que reemplazó a la del 27
+desplegadas** en la revisión productiva del gateway (`efeonce-mcp-gateway-00028-pmx`, desde el 2026-09-02; antes `00026-ctp` del 2026-09-01 y `00024-8b8`), que reemplazó a la del 27
 de agosto (servía 21). Ya no queda ninguna tool esperando despliegue. Igual que con Globe, el gateway no recrea
 lógica: transporta la pregunta y Greenhouse decide qué se puede ver. El inventario vigente y su estado de
 despliegue viven en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-tool-inventory.md) §8; detalle
 funcional en [Search Visibility 360 por MCP](../growth/search-visibility-360-por-mcp.md).
+
+Desde el 2 de septiembre de 2026 hay una **tercera capacidad federada**, y no es de dominio: los **manuales de uso**
+de la superficie Greenhouse (`TASK-1804`). El provider `greenhouse-skills` expone una sola tool,
+`get_greenhouse_skill` (anotada `readOnlyHint: true`; sin `name` devuelve el catálogo, con `name` el manual como
+texto), y delega cada llamada a la lane `GET /api/platform/ecosystem/mcp/skills[/{name}]` de Greenhouse. No embebe
+contenido: si Greenhouse cambia un manual, el gateway lo sirve sin redeploy. Comparte interruptor e identidad con el
+provider SEO (`GREENHOUSE_SEO_PROVIDER_ENABLED`, mismo consumer token) y no agregó permisos en Entra: basta el
+permiso base de conexión (`efeonce.mcp.read`). Con eso el gateway federa **36 tools** (28 SEO +
+`get_greenhouse_skill` + las nativas del propio gateway). Detalle funcional en
+[Manuales MCP servidos por el protocolo](./manuales-mcp-servidos-por-el-protocolo.md).
 
 ## Cómo se comporta
 
@@ -48,6 +58,8 @@ Disponible hoy:
   (`get_seo_provider_spend`, `get_seo_keyword_gap`, `get_seo_serp_top_results`, `get_seo_competitor_candidates`)
   que sólo responden a conexiones internas de Efeonce: una conexión de cliente recibe un "no existe", nunca una
   pista de que el dato está ahí. Inventario exacto en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-tool-inventory.md) §8.
+- `get_greenhouse_skill` para leer los manuales de uso de esa superficie (hoy seis, todos internos). Una conexión
+  que no sea interna recibe un catálogo vacío y un "no existe" por nombre, nunca un "prohibido".
 
 No disponible:
 
@@ -78,3 +90,8 @@ aparte y no forma parte de lo comprobado en ese comportamiento.
 
 Este gateway no reemplaza el MCP local/remoto de Greenhouse (que no es read-only: registra 7 escrituras). Ese MCP sirve al portal Greenhouse y sus
 contratos ecosystem; Efeonce MCP Gateway sirve como borde federado para productos hermanos y capacidades futuras.
+
+Los manuales son el mismo primitive en los dos bordes: el MCP de Greenhouse los sirve como tool y como recurso
+`skill://efeonce/{name}/SKILL.md`, el gateway sólo como tool, y ambos leen la misma lane. Un guard del gateway
+(`EXPECTED_GREENHOUSE_PLATFORM_TOOLS`) vigila que las tools de plataforma federadas —las que no son SEO— sigan
+declaradas con razón, porque el guard de paridad SEO está anclado a ese dominio y no las veía.

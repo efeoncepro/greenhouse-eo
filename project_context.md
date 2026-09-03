@@ -116,8 +116,8 @@ ETV de DataForSEO Labs se versiona por metodología. DataForSEO confirmó 14 fam
 antes de persistir provenance, separar idempotencia y medir shadow contra GSC. Contrato confirmado:
 [auditoría ETV 2026-09-01/02](docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md). La decisión aceptada es
 [`GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md`](docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md)
-y su entrega futura se divide en `TASK-1805` (foundation formula-aware) y `TASK-1806` (evaluación/cutover), ambas
-`to-do` P0; no hay código, schema, gasto ni cutover activo.
+y se entrega en `TASK-1805` (foundation formula-aware, complete en producción 2026-09-03, legacy explícito) y
+`TASK-1806` (evaluación/cutover, in-progress; gasto y cutover gated).
 
 Berel: Notion live + skill `berel-content-production`. Contacto/cobertura:
 `docs/context/01_quienes-somos.md` y `docs/public-site/CONTACT_PAGE_REBUILD_BRIEF_V1.md`.

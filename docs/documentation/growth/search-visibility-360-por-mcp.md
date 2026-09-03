@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-08-06 por Claude (TASK-1645 + TASK-1647)
-> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1792: la consulta de oportunidades declara de dónde salió el techo de clics, con cuánta muestra y con qué criterio se ordenó; delta previo 2026-08-14 TASK-1664/1666: descubrir keywords + preparar grounded queries AEO — sección nueva y alcance de escrituras actualizado)
+> **Ultima actualizacion:** 2026-09-02 por Claude (TASK-1804: sección nueva con los seis manuales de uso del dominio que el asistente carga por el mismo MCP; delta previo 2026-08-28 TASK-1792: la consulta de oportunidades declara de dónde salió el techo de clics, con cuánta muestra y con qué criterio se ordenó; delta previo 2026-08-14 TASK-1664/1666: descubrir keywords + preparar grounded queries AEO — sección nueva y alcance de escrituras actualizado)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) · [EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md](../../architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md)
 > **Manual de uso:** [Operar el provider Greenhouse-SEO del MCP](../../manual-de-uso/plataforma/operar-provider-greenhouse-seo-mcp.md)
 
@@ -159,6 +159,21 @@ Regla de acceso que cambia acá: con la identidad máquina compartida del gatewa
 `prepare_seo_grounded_queries` responde **denegado** aunque el conector tenga el scope de escritura —
 es un cierre deliberado (fail-closed) hasta que existan credenciales por usuario (`TASK-1631`), porque
 crear borradores del grader es una capacidad de persona, no de máquina.
+
+## Manuales de uso del dominio
+
+Desde el 2 de septiembre de 2026 (`TASK-1804`) el asistente no depende de que alguien le explique estas reglas en el prompt: **el mismo punto de acceso sirve el manual de uso de cada parte del dominio**. Con la consulta `get_greenhouse_skill` sin argumentos obtiene el catálogo; con el nombre de un manual, el manual completo como texto (también existe como recurso `skill://efeonce/<nombre>/SKILL.md`). Son seis, todos de audiencia interna — un conector de cliente ve el catálogo vacío:
+
+| Manual | Qué enseña |
+|---|---|
+| `seo-spend-discipline` | Qué consultas comprometen gasto (seguir/dejar de seguir keywords, declarar/retirar competidores, descubrir keywords, correr un diagnóstico de prospecto) y la disciplina de proponer, confirmar y leer el resultado por ítem. |
+| `seo-visibility-reading` | Cómo leer una respuesta: lo medido ● frente a lo estimado ◑, las ausencias honestas y la cola de trabajo como única autoridad de orden. |
+| `competitor-loop` | El ciclo completo de competidores: observar, proponer, confirmar, declarar con su referencia de propuesta, cubrir, leer el gap y retirar. |
+| `seo-discovery-to-tracking` | Del descubrimiento al seguimiento: vista previa, corrida, espera, candidatos, conflictos de cluster y seguimiento con intención. |
+| `seo-technical-health` | Audit técnico, perfil de enlaces y detalle de enlaces con sus tres estados; qué ausencias son hallazgos positivos y por qué nunca se certifica salud. |
+| `seo-prospect-diagnostic` | El diagnóstico de prospecto: gasta por corrida, es idempotente por dominio, mercado y día, todo es estimado y no emite veredicto. |
+
+**Regla para el asistente: antes de cualquier consulta que comprometa gasto, carga `seo-spend-discipline`.** Los manuales viven en el repo (`docs/mcp/skills/`) con un manifiesto que declara qué consultas gobierna cada uno; cambiar una consulta obliga a actualizar su manual. Detalle operativo en [Manuales MCP servidos por el protocolo](../plataforma/manuales-mcp-servidos-por-el-protocolo.md).
 
 ## Que pasa cuando falta una lente
 

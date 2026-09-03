@@ -80,17 +80,25 @@ const main = async () => {
     await withGreenhousePostgresTransaction(async rawClient => {
       const client = rawClient as unknown as Client
 
-      // 1. Filas existentes: todas legacy con evidencia contractual, sin requested_at.
+      // 1. Filas existentes: cada fila es legacy contractual (sin requested_at) O explícita completa
+      //    (requested_at + policy). Un conteo duro (5/8/2) mentía apenas un writer/sanity escribió
+      //    su primera fila explícita (TASK-1806 Slice 0, 2026-09-03): el invariante es la consistencia
+      //    de la evidencia, no la foto del día del expand.
       for (const table of ['seo_domain_overview_snapshots', 'seo_url_visibility_snapshots', 'seo_prospect_diagnostics']) {
         const { rows } = await client.query(
           `SELECT count(*)::int AS total,
-                  count(*) FILTER (WHERE etv_methodology_version = 'legacy_static_v1' AND etv_methodology_evidence = 'contract_default_pre_cutoff' AND etv_requested_at IS NULL)::int AS attributed
+                  count(*) FILTER (WHERE etv_methodology_version = 'legacy_static_v1' AND etv_methodology_evidence = 'contract_default_pre_cutoff' AND etv_requested_at IS NULL)::int AS contractual,
+                  count(*) FILTER (WHERE etv_methodology_evidence = 'explicit_request' AND etv_requested_at IS NOT NULL AND etv_policy_version IS NOT NULL)::int AS explicit
              FROM greenhouse_growth.${table}`
         )
 
-        const row = rows[0] as { total: number; attributed: number }
+        const row = rows[0] as { total: number; contractual: number; explicit: number }
 
-        check(`${table}: filas existentes atribuidas legacy por contrato`, row.total === row.attributed, `${row.attributed}/${row.total}`)
+        check(
+          `${table}: toda fila es legacy contractual o explícita completa`,
+          row.total === row.contractual + row.explicit,
+          `contractual=${row.contractual} explicit=${row.explicit} total=${row.total}`
+        )
       }
 
       // 2. Escritura explícita legacy pre-corte (writer nuevo) → inserta.

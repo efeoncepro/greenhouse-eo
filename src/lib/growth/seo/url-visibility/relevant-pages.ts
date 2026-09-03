@@ -21,7 +21,7 @@ import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { parseDomainOverviewSide, type DomainRankOverviewSideRaw } from '../domain-overview/capture'
 import { normalizeOverviewDomain } from '../domain-overview/persist'
 import { buildEtvMethodologyRequest, resolveConfiguredEtvMethodology, type EtvMethodologyVersion } from '../etv-methodology'
-import { toPersistedEtvMethodology } from '../etv-methodology/persisted'
+import { toPersistedEtvMethodology, type PersistedEtvMethodology } from '../etv-methodology/persisted'
 import { enforceSeoRunEntitlement } from '../entitlement'
 import { isSeoModuleEnabled, isSeoUrlVisibilityEnabled } from '../flags'
 import { LABS_RESULT_ROW_USD, LABS_TASK_SETUP_USD } from '../provider-pricing'
@@ -87,6 +87,75 @@ const projectSideMetrics = (metrics: {
     // `count` del agregado = SERPs del top-100 donde aparece el sujeto.
     totalRankedKeywords: asNonNegativeInt(metrics?.organic?.count)
   }
+}
+
+/**
+ * Proyecta los items de `relevant_pages` / `subdomains` a filas persistibles (una por sujeto
+ * hijo, deduplicadas por clave normalizada) + el resumen que devuelve el colector. Pura y
+ * exportada (TASK-1806): el shadow legacy/improved la reutiliza tal cual para que ambas
+ * fórmulas se proyecten con el MISMO código que el writer productivo — cero derivación paralela.
+ */
+export const projectConcentrationItems = (
+  items: ReadonlyArray<RelevantPageItemRaw & SubdomainItemRaw>,
+  context: {
+    sourceEndpoint: Extract<SeoUrlVisibilitySourceEndpoint, 'relevant_pages' | 'subdomains'>
+    locationCode: string
+    languageCode: string
+    etvMethodology: PersistedEtvMethodology
+  }
+): {
+  snapshots: SeoUrlVisibilitySnapshotInput[]
+  items: Array<{ subject: string; organicEtv: number | null; organicCount: number | null }>
+} => {
+  const snapshots: SeoUrlVisibilitySnapshotInput[] = []
+  const resultItems: Array<{ subject: string; organicEtv: number | null; organicCount: number | null }> = []
+  const seen = new Set<string>()
+
+  for (const item of items) {
+    const rawSubject =
+      context.sourceEndpoint === 'relevant_pages'
+        ? typeof item.page_address === 'string'
+          ? item.page_address
+          : ''
+        : typeof item.subdomain === 'string'
+          ? item.subdomain
+          : ''
+
+    if (!rawSubject) continue
+
+    const normalized =
+      context.sourceEndpoint === 'relevant_pages'
+        ? normalizePageAddress(rawSubject)
+        : rawSubject.trim().toLowerCase()
+
+    if (!normalized || seen.has(normalized)) continue
+
+    seen.add(normalized)
+
+    const metrics = projectSideMetrics(item.metrics)
+
+    snapshots.push({
+      subjectKind: context.sourceEndpoint === 'relevant_pages' ? 'url' : 'subdomain',
+      normalizedSubject: normalized,
+      rawSubject,
+      locationCode: context.locationCode,
+      languageCode: context.languageCode,
+      sourceEndpoint: context.sourceEndpoint,
+      organic: metrics.organic,
+      paid: metrics.paid,
+      totalRankedKeywords: metrics.totalRankedKeywords,
+      topKeywords: null,
+      etvMethodology: context.etvMethodology
+    })
+
+    resultItems.push({
+      subject: normalized,
+      organicEtv: metrics.organic.etv,
+      organicCount: metrics.organic.count
+    })
+  }
+
+  return { snapshots, items: resultItems }
 }
 
 /**
@@ -261,53 +330,13 @@ const runConcentrationCapture = async (input: {
     }
 
     const items = task.result?.[0]?.items ?? []
-    const snapshots: SeoUrlVisibilitySnapshotInput[] = []
-    const resultItems: Array<{ subject: string; organicEtv: number | null; organicCount: number | null }> = []
-    const seen = new Set<string>()
 
-    for (const item of items ?? []) {
-      const rawSubject =
-        input.sourceEndpoint === 'relevant_pages'
-          ? typeof item.page_address === 'string'
-            ? item.page_address
-            : ''
-          : typeof item.subdomain === 'string'
-            ? item.subdomain
-            : ''
-
-      if (!rawSubject) continue
-
-      const normalized =
-        input.sourceEndpoint === 'relevant_pages'
-          ? normalizePageAddress(rawSubject)
-          : rawSubject.trim().toLowerCase()
-
-      if (!normalized || seen.has(normalized)) continue
-
-      seen.add(normalized)
-
-      const metrics = projectSideMetrics(item.metrics)
-
-      snapshots.push({
-        subjectKind: input.sourceEndpoint === 'relevant_pages' ? 'url' : 'subdomain',
-        normalizedSubject: normalized,
-        rawSubject,
-        locationCode: input.locationCode,
-        languageCode: input.languageCode,
-        sourceEndpoint: input.sourceEndpoint,
-        organic: metrics.organic,
-        paid: metrics.paid,
-        totalRankedKeywords: metrics.totalRankedKeywords,
-        topKeywords: null,
-        etvMethodology
-      })
-
-      resultItems.push({
-        subject: normalized,
-        organicEtv: metrics.organic.etv,
-        organicCount: metrics.organic.count
-      })
-    }
+    const { snapshots, items: resultItems } = projectConcentrationItems(items ?? [], {
+      sourceEndpoint: input.sourceEndpoint,
+      locationCode: input.locationCode,
+      languageCode: input.languageCode,
+      etvMethodology
+    })
 
     if (snapshots.length === 0) {
       // Proveedor OK sin items: fila-marcador del dominio para no re-comprar el ciclo.

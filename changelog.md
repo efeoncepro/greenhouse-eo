@@ -7,6 +7,13 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-03 — TASK-1805 en producción: foundation ETV versionada desplegada, selección legacy explícita
+
+Release `5ec4cf769977` (run `33698245254`): readers/lane/MCP sirven `etvMethodology`, señal `seo.etv_methodology.drift`,
+readback del selector en `/health` del ops-worker, selectores `legacy_static_v1` explícitos en Vercel y worker,
+gateway sincronizado. Canary de contrato en producción verde. Contract de schema parqueado con condición de 7 días
+(precondición de `TASK-1806`). Improved ETV no activado.
+
 ## 2026-09-02 — TASK-1805: la fórmula detrás de `etv` pasa a ser identidad del hecho (foundation, todavía legacy)
 
 DataForSEO cambia el cálculo de `etv` bajo el mismo campo y corta legacy el `2026-11-01T00:00:00Z` sin exponer
@@ -90,7 +97,11 @@ procedimiento de gasto. El gateway federa la tool con su propio guard de paridad
 `efeonce-mcp-gateway-00028-pmx`) y la lane salió a producción en el release `375f56e24` del mismo día, con canary de
 contrato verde contra producción. Sin Entra, flag ni persistencia nuevos. Follow-up del mismo día: un agente Claude Code
 real cargó el manual por el front door OAuth, y el catálogo creció a seis manuales (discovery→tracking, salud técnica,
-diagnóstico de prospecto) sin tocar la tool ni el gateway.
+diagnóstico de prospecto) sin tocar la tool ni el gateway; los seis salieron a producción en el segundo release del día
+(`4379c495013f`) con canary de contrato verde. Barrido documental posterior por subagentes: manuales de uso del
+inventario MCP/gateway/provider SEO, docs funcionales de API Platform y gateway, deltas en arquitectura API/ADR del
+gateway/patrones canónicos/arquitectura SEO, skills `dataforseo-operator` y `seo-aeo-practice`, y README/AGENTS del
+repo `efeonce-mcp`.
 
 ## 2026-09-02 — ANAM: entrega premium de Emma y soporte explícito de tres meses
 
@@ -1158,16 +1169,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
   está mal formulada para un flujo con squash-merge, donde V1 nunca está vacía. `-X ours` volvió a
   duplicar contenido documental y a resucitar tasks en un lifecycle viejo **con la V2 vacía**; la
   pregunta correcta es si `main` aporta archivos propios.
-
-## 2026-08-28 — TASK-1699: el top-N del SERP ya pagado deja de tirarse (code complete, rollout pendiente)
-
-- El rank capture diario compra el SERP completo (`depth 20`) y descartaba ~19 de 20 filas. Ahora
-  `seo_serp_top_results` (append-only estricto, ranura `rank_absolute`) las persiste con **costo
-  marginal CERO** (test de no-regresión sobre `buildSerpTask`), en la misma transacción que el
-  snapshot de rank y con fallback que jamás pierde la medición pagada. Encima: descubrimiento de
-  competidores por recurrencia medida (propose→confirm hacia `declareCompetitors` de TASK-1662),
-  lanes sólo-internal, 2 tools MCP federadas (inventario a 27) y señal de cobertura con pérdida
-  irrecuperable declarada. Flag dual-runtime **ON y VIVO en el worker el mismo día** (el
-  Ops Worker Deploy corre en cada push a develop; revisión `ops-worker-00610-kc8` verificada) —
-  **día 1 de la serie: 2026-08-29**; el scheduler de cobertura de competidores quedó ENABLED tras
-  verificar el endpoint con dry-run real. Sanity 9/9 contra PG real con rollback sin residuo.

@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -21,12 +21,12 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Registrada; deadline externo confirmado; bloqueada por foundation y autorizaciones separadas`
+- Status real: `Slices 0-2 EJECUTADOS 2026-09-03: contract aplicado; shadow exact_ab comprado con autorización explícita (26 requests, USD 1,09536, ledger cuadra); evaluador → hold mecánico sólo por la regla §5.2 (efecto de fórmula −64,5 % en Berel con count intacto), con calibración GSC a favor de improved (err. 49 % vs 321 %), Jaccard 1,0 e historia continua; memo de decisión recomienda go_rebaseline (docs/audits/seo/etv-shadow/). Cutover (Slices 3-4) pendiente de aprobación separada del operador; selectores productivos en legacy_static_v1`
 - Rank: `2`
 - Domain: `growth|seo|data|integration|ops`
 - External deadline: `2026-11-01T00:00:00Z; no existe fallback legacy posterior`
 - Internal targets: `shadow/decision 2026-10-23; cutover 2026-10-28T00:00:00Z`
-- Blocked by: `TASK-1805 complete; explicit spend approval; explicit historical-treatment and cutover approval`
+- Blocked by: `aprobación separada del operador del tratamiento histórico (rebaseline recomendado) y del cutover staging/producción (exige release por el control plane); nada más bloquea`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -97,7 +97,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/tasks/to-do/TASK-1805-growth-seo-dataforseo-improved-etv-versioned-transition.md`
+- `docs/tasks/complete/TASK-1805-growth-seo-dataforseo-improved-etv-versioned-transition.md`
 - `docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md`
 - `docs/audits/communications/2026-09-01-dataforseo-improved-etv-provider-questions.md`
 - `docs/manual-de-uso/growth/evaluar-transicion-dataforseo-improved-etv.md`
@@ -141,7 +141,21 @@ Reglas obligatorias:
 - Spend ledger, entitlement, circuit breaker y registro de costo de la familia Labs.
 - GSC per-org para benchmark separado de la lente estimada.
 - Auditoría de impacto, ADR aceptado, correo contractual y runbook de evaluación.
-- `TASK-1805` especifica la foundation y el evaluador dry-run necesarios, pero no están implementados.
+- Foundation de `TASK-1805` desplegada en producción (release `5ec4cf769977`, verificada 2026-09-03): policy pura
+  y provenance `etvMethodology` en los siete caminos writer, schema formula-aware (migración expand aplicada;
+  filas previas atribuidas `legacy_static_v1` + `contract_default_pre_cutoff`), readers/API/MCP que filtran por
+  método y devuelven `not_available_for_method`, selectores legacy explícitos en Vercel y en
+  `services/ops-worker/deploy.sh` (`GROWTH_SEO_ETV_METHODOLOGY_VERSION` / `GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION`;
+  `/health` del worker responde `configuredWriteSource: env`), señal `seo.etv_methodology.drift` (en
+  `awaiting_data` hasta la primera captura explícita del worker) y evaluador dry-run OFF por defecto con
+  `scripts/growth/_sanity-task-1805-etv-evaluator.ts` (8/8, `providerCalls: 0`).
+- Contract de schema **aplicado el 2026-09-03** por esta task: `migrations/20260903103858964_task-1806-etv-methodology-contract.sql`
+  (drop de DEFAULT transitorios + drop de UNIQUE legacy `seo_domain_overview_capture_unique` /
+  `seo_url_visibility_capture_unique` + CHECK NOT VALID `seo_prospect_facts_etv_methodology_check`). Readback:
+  constraints formula-aware presentes, 0 de 6 defaults transitorios, 0/0/0 filas contractuales escritas después
+  del release. El `.pending` se eliminó (`docs/tasks/pending-migrations/README.md` lo registra como aplicada).
+- Ejecutor bounded del shadow (Slice 1) y evaluador/decisor (Slice 2), code complete 2026-09-03 — ver los
+  párrafos **Avance 2026-09-03** de cada slice.
 
 ### Gap
 
@@ -150,6 +164,8 @@ Reglas obligatorias:
 - La matriz contractual está confirmada; falta evidencia de nuestros payloads y resultados sobre cohorte aprobada.
 - Improved ETV no está activado ni servido por Vercel, ops-worker, API o MCP.
 - No existe decisión aplicada sobre rebaseline histórico versus breakpoint visible.
+- La corrida pagada del shadow no se ha ejecutado: falta el permiso de ejecución del operador (los caps y la
+  cohorte ya están aprobados). Sin corrida no hay `summary.json`, evaluación ni decisión.
 
 ## Modular Placement Contract
 
@@ -202,7 +218,9 @@ Reglas obligatorias:
 
 ### Migration, backfill and rollout
 
-- Migration posture: `none`; consume el expand-contract ya verificado de `TASK-1805`.
+- Migration posture: `none` (sin DDL propio); consume el expand-contract ya verificado de `TASK-1805`. El
+  contract parqueado de `TASK-1805` se aplicó bajo esta task el 2026-09-03 (migración
+  `20260903103858964_task-1806-etv-methodology-contract`) sin agregar objetos nuevos.
 - Default state: evaluator OFF y canonical method legacy explícito.
 - Backfill plan: distinguir recomputación completa desde julio de 2026 y aproximación calibrada antes; cualquier
   rebaseline amplio exige aprobación separada y etiqueta de `calculation_basis`.
@@ -231,11 +249,11 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
 - [ ] No se crea una tabla o write target fuera de la foundation de `TASK-1805`.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime, DB y provider evidence están listados y separados de config/deploy.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime, DB y provider evidence están listados y separados de config/deploy. *(preregistro §2.)*
 - [ ] Errores, gasto, datos sensibles y autorizaciones fallan cerrado.
 
 ## Capability Definition of Done — Full API Parity gate
@@ -263,17 +281,92 @@ Reglas obligatorias:
 
 ### Slice 0 — Readiness y preregistro
 
+**Avance 2026-09-03 (sin gasto, sin mutación runtime).** Readback hecho: ops-worker rev `00635-tbt` con selectores
+explícitos y `/health.etvMethodology` (`configuredWriteSource=env`, `valid=true`, `afterCutoff=false`); lanes de
+producción `domain-overview`/`url-visibility` (Berel) sirven `legacy_static_v1` con `single_methodology`; evaluador
+dry-run 8/8 (`providerCalls=0`, ledger intacto); schema sanity en transacción 15/17 (coexistencia sólo tras el
+contract; los 2 ❌ eran un conteo duro desactualizado del script, corregido); señal de drift en `awaiting_data`.
+Contract NO aplicado: la ventana de 7 días cuenta 5/8/2 filas contractuales (última 2026-08-29 11:04Z) → aplicable
+≥ 2026-09-10 con readback 0/0/0. Preregistro congelado en
+`docs/audits/seo/2026-09-03-dataforseo-improved-etv-shadow-preregistration.md` (cohorte Berel MX + Comex MX +
+Efeonce CL, 13 celdas / 26 requests / USD ≈1,02, caps propuestos 30 requests / USD 2,00, umbrales y decisión
+predefinidos). Pendiente del Slice 0: aplicar el contract cuando se cumpla la condición y registrar la aprobación
+explícita del operador (cohorte + caps + ventana). Hasta entonces, cero llamadas pagadas.
+
+**Cierre del Slice 0 (2026-09-03, más tarde el mismo día).** Contract aplicado con
+`migrations/20260903103858964_task-1806-etv-methodology-contract.sql` tras releer la condición: las 5/8/2 filas de
+la ventana literal eran del 27–29 de agosto, anteriores al release `5ec4cf769977` con los writers explícitos, y
+ambos runtimes ya servían ese SHA → 0/0/0 filas contractuales **después del release**. Readback post-aplicación:
+constraints presentes `seo_domain_overview_capture_method_unique`, `seo_url_visibility_capture_method_unique`,
+`seo_prospect_facts_etv_methodology_check`; UNIQUE legacy retiradas; 0 de 6 DEFAULT transitorios. Aprobación del
+operador de cohorte + caps (30 requests / USD 2,00) registrada en el preregistro §7 y en la cohorte committeada
+`scripts/growth/etv-shadow-cohorts/2026-09-03-preregistered.json` (`approvedBy`/`approvedAt`). Sigue sin
+ejercerse el permiso de ejecución de la corrida pagada. Cero llamadas pagadas.
+
+
 - Verificar `TASK-1805` completa mediante DB/API/MCP y configured/requested/provider-effective en ambos runtimes.
 - Incorporar respuesta DataForSEO y congelar endpoint matrix, cohorte, período, inputs, métricas y umbrales.
 - Generar dry-run con número de requests y costo máximo; obtener aprobación explícita antes de ejecutar.
+- Readback concreto de la foundation antes de cualquier llamada: `GET /health` del ops-worker → bloque
+  `etvMethodology` (`configuredWriteMethod`, `configuredWriteSource`, `configuredReadMethod`, `policyVersion`,
+  `providerCutoffAt`, `afterCutoff`, `valid`); señal `seo.etv_methodology.drift` en `/admin/operations`
+  (`awaiting_data` sin captura explícita es esperable; cualquier `error` bloquea);
+  `npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/_sanity-task-1805-etv-evaluator.ts`
+  (dry-run + replay, `providerCalls: 0`, ledger intacto) y
+  `npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/_sanity-task-1805-etv-schema.ts`
+  (17/17 en transacción con rollback, incluye el contract); ambos con el proxy Cloud SQL arriba.
+- Aplicar el contract parqueado (`docs/tasks/pending-migrations/TASK-1805-etv-methodology-contract.sql.pending`)
+  tras verificar sus tres condiciones: release en `main` (cumplida 2026-09-03), 7 días sin filas nuevas con
+  evidencia `contract_default_pre_cutoff` (cuenta desde 2026-09-03) y selectores explícitos en Vercel y ops-worker
+  (cumplida). Sólo entonces puede empezar el Slice 1.
 
 ### Slice 1 — Shadow bounded
+
+**Ejecutado 2026-09-03 ~11:05Z** con autorización explícita del operador en chat: run `etvshadow-f3fef9b3c2a8`, 26/26 requests `20000`, USD 1,09536 real (forecast 1,14384), ledger `labs` del día cuadra; filas persistidas por método para domain overview (foto + 6 meses de historia + bulk de Efeonce), ranked_keywords (3 sujetos), relevant_pages (100+100), subdomains (3+3); la celda prospecto sólo en el crudo. Limitación: la celda bulk de Berel/Comex colisionó con la foto de dominio del mismo día (misma tabla/clave) → sin fila, valores en el crudo.
+
+
+**Avance 2026-09-03 — code complete; ejecución pagada PENDIENTE.** `src/lib/growth/seo/etv-methodology/shadow-runner.ts`
+(server-only; `assertEtvShadowCohort`, `preflightEtvShadow`, `runEtvShadow`): compra ambas fórmulas por celda en
+la misma ventana con inputs byte-idénticos salvo `use_improved_etv` (hash `taskHashWithoutFlag`), en el orden
+**improved → legacy** para que la última request explícita del día sea legacy y la señal
+`seo.etv_methodology.drift` no reporte un drift inexistente; idempotencia `already_captured` por
+`(sujeto, mercado, endpoint, capture_date, metodología)`; parada dura antes de cada llamada por caps de
+requests/USD y aborto de la corrida completa por policy, drift `requested ≠ providerEffective`, `status_code
+!= 20000` en ambas fórmulas, breaker, transporte o 23505; verifica en preflight que la UNIQUE legacy ya no exista;
+reutiliza parsers/proyecciones y writers canónicos de `TASK-1805` (no `captureDomainOverview`/`captureUrlVisibility`,
+que filtran por frescura contra el selector del ENV y convertirían el A/B en canary temporal); artefactos
+inyectados (`.captures/etv-shadow/<run>/raw/*.json` + `summary.json`). Cohorte committeada
+`scripts/growth/etv-shadow-cohorts/2026-09-03-preregistered.json`. CLI `scripts/growth/dataforseo-etv-shadow.ts`
+(`--dry-run` default, `--execute` compra, `--cohort`, `--artifact-dir`; reconcilia el ledger `labs` del día
+antes/después, exit ≠ 0 si no ejecutó, abortó o no cuadra). Knobs (`GROWTH_SEO_ETV_EVALUATOR_ENABLED=true`,
+`_SUBJECT_ALLOWLIST=berel.com,comex.com.mx,efeoncepro.com`, `_MAX_REQUESTS=30`, `_BUDGET_USD=2.00`) exportados
+sólo en el proceso del script, no en Vercel ni ops-worker. `relevant-pages.ts` ganó el export
+`projectConcentrationItems` sin cambio de comportamiento. Tests: `pnpm vitest run
+src/lib/growth/seo/etv-methodology` 75/75; `pnpm typecheck` verde. Dry-run real de hoy: 13 celdas, 26 requests,
+forecast USD 1,14384, preflight `wouldExecute=true`, `providerCalls=0`. **Ninguna llamada pagada ejecutada.**
 
 - Ejecutar legacy/improved con inputs equivalentes en cada endpoint compatible y bajo allowlist.
 - Persistir ambas metodologías con run/costo/latencia/error y sin cambiar el canonical reader.
 - Detenerse automáticamente al alcanzar request cap, USD cap, drift o error contractual.
 
 ### Slice 2 — Evaluación y decisión histórica
+
+**Ejecutado 2026-09-03** (`dataforseo-etv-shadow-evaluate.ts` con GSC): `hold` mecánico sólo por la regla §5.2; calibración GSC improved 49,4 % vs legacy 321,3 % de error relativo en Berel; Jaccard 1,0; historia continua (0,1 % vs 8,1 %); prospecto −43,9 %. Memo de decisión con la explicación de §5.2 y recomendación `go_rebaseline`: `docs/audits/seo/etv-shadow/2026-09-03-2026-09-03-preregistered-decision-memo.md`. Aprobación separada del operador pendiente. **Corrección 2026-09-03:** `efeoncepro.com` se mide APARTE (su org, mercado CL, su GSC), nunca dentro de la consulta de Berel: la celda bulk de la corrida lo mezcló (MX, org de Berel) y esa fila queda anulada; las celdas propias de Efeonce siguen válidas y sin voto sobre Berel. Cohorte vigente `2026-09-03-preregistered-v2.json` (bulk por organización y en día distinto a la foto).
+
+
+**Avance 2026-09-03 — code complete; sin corrida real todavía.** `shadow-decision.ts` (puro, sin IO):
+`PREREGISTERED_ETV_SHADOW_THRESHOLDS_2026_09_03` congela los umbrales del preregistro §5, una función nombrada
+por regla (`rule*`), `decideEtvShadow` → `go_rebaseline | go_breakpoint | hold | no_go` con precedencia explícita
+(`hold` inconcluso > `no_go` calibración peor en Berel > `hold` regresión ±40 % sin explicación > `go`); Efeonce CL
+sólo produce hallazgos `info`. `shadow-report.ts` (server-only): lee ambas metodologías por celda del mismo
+`capture_date` sin mezclarlas, el `summary.json` del ejecutor y el benchmark GSC first-party sólo para dominios
+propios (28 días terminando D-2, país = mercado, todos los dispositivos, normalizado ×30/28; se compara, no se
+promedia). `shadow-report-markdown.ts` (render puro, sin payloads ni secretos). CLI
+`scripts/growth/dataforseo-etv-shadow-evaluate.ts` (`--cohort`, `--capture-date`, `--summary`, `--out` default
+`docs/audits/seo/etv-shadow/<capture-date>-<cohortId>-results.md`, `--json` default `evaluation.json` junto al
+summary; exige `GROWTH_SEARCH_CONSOLE_ENABLED=true` en su env; `hold`/`no_go` son resultados con exit 0). Tests
+incluidos en los 75/75 del módulo. **Sin `summary.json` real no hay evaluación ni decisión**; el tratamiento
+histórico y el cutover siguen siendo aprobaciones separadas.
 
 - Comparar ETV contra GSC con error, sesgo y correlación definidos antes de observar resultados.
 - Medir delta de valores, orden, Jaccard top-N, traffic cost, prospect traffic, nulls, latencia y costo.
@@ -380,19 +473,45 @@ de reevaluación.
      al cerrar la task completa.
      ═══════════════════════════════════════════════════════════ -->
 
+## MCP Tools & Skills Contract
+
+Esta task incluye como entregable obligatorio la capa de uso por agentes; no se considera completa con el
+primitive, reader, API o documentación humana solamente.
+
+- [ ] Crear o actualizar las tools MCP necesarias para operar/leer esta capacidad desde el mismo primitive
+  canónico. Si una tool existente cubre el caso, actualizarla sin duplicarla; si no corresponde una tool nueva,
+  declarar las tools afectadas y la razón de exclusión explícita en el gateway.
+- [ ] Crear o actualizar la guía de uso en las skills dueñas `.codex/skills/dataforseo-operator/**` y
+  `.codex/skills/seo-aeo/**`, junto con sus espejos `.claude/**`, incluyendo selección de tool, inputs,
+  interpretación, metodología/provenance, costos, límites, errores y acciones prohibidas.
+- [ ] Mantener las copias Codex/Claude byte-idénticas y actualizar también el recurso/manual agent-facing que el MCP
+  entrega bajo demanda (registro de skills servidas de `TASK-1804`, ya en producción: `src/mcp/greenhouse/skill-manifest.ts`
+  + `docs/mcp/skills/seo-visibility-reading`, `seo-spend-discipline`, `seo-prospect-diagnostic`; gate `pnpm mcp:skills:check`).
+  No crear una skill por endpoint si la skill de dominio vigente puede ampliarse de forma clara.
+- [ ] Actualizar en el mismo PR el lane ecosystem, `src/mcp/greenhouse/tool-manifest.ts`, su artefacto generado,
+  schema/annotations/descripción y la federación del gateway; toda tool interna queda federada o excluida con una
+  razón sustantiva, nunca simplemente ausente.
+- [ ] Las tools read sólo leen evidencia persistida y no disparan llamadas pagadas on-read. Toda tool que escriba,
+  compre o comprometa gasto usa capability fina, presupuesto, idempotencia, audit y
+  `propose → confirm → execute`; nunca se agrega un write scope al cliente PKCE público compartido.
+- [ ] Verificar `pnpm mcp:manifest:generate && pnpm mcp:manifest:check`, `pnpm skills:mirrors`, paridad
+  bidireccional del gateway y canaries allow/deny/fault. Registro o compilación sin readback de la lane y del
+  gateway no constituye cierre operativo.
+
+
 ## Acceptance Criteria
 
-- [ ] `TASK-1805` está completa y legacy explícito está verificado en DB/API/MCP, Vercel y ops-worker.
-- [ ] Matriz oficial de 14 familias, campos, booleano, pricing, históricos y clickstream está incorporada; Sandbox y
-  docs públicas pendientes están declaradas sin convertirlas en bloqueo ficticio.
-- [ ] Cohorte, inputs, métricas, umbrales, request cap y USD cap quedaron congelados antes del shadow.
-- [ ] Ninguna llamada pagada ocurrió antes de la aprobación explícita registrada.
-- [ ] Cada endpoint compatible fue evaluado con inputs equivalentes o marcado honestamente como no comparable.
-- [ ] GSC se evaluó como benchmark separado, sin promedio ni sustitución de ETV.
-- [ ] Se midieron valores, orden, membresía top-N, traffic cost, prospect traffic, nulls, latencia y costo.
-- [ ] AIO ETV se interpreta como atribución modelada y clickstream permanece separado del experimento improved.
-- [ ] La decisión go/no-go y el tratamiento histórico están respaldados por un artefacto reproducible.
-- [ ] Ningún reader/API/MCP sirvió shadow ni una serie mixta antes del cutover aprobado.
+- [x] `TASK-1805` está completa y legacy explícito está verificado en DB/API/MCP, Vercel y ops-worker. *(2026-09-03: DB + lanes prod + `/health` worker + env de la revisión activa; MCP vía manifest sincronizado del release, sin login Entra interactivo en esta sesión.)*
+- [x] Matriz oficial de 14 familias, campos, booleano, pricing, históricos y clickstream está incorporada; Sandbox y
+  docs públicas pendientes están declaradas sin convertirlas en bloqueo ficticio. *(`families.ts` + preregistro §3.)*
+- [x] Cohorte, inputs, métricas, umbrales, request cap y USD cap quedaron congelados antes del shadow. *(preregistro 2026-09-03 §4–§5; aprobación del operador pendiente.)*
+- [x] Ninguna llamada pagada ocurrió antes de la aprobación explícita registrada. *(vigente al 2026-09-03: gate OFF, ledger intacto; se re-verifica al cerrar.)*
+- [x] Cada endpoint compatible fue evaluado con inputs equivalentes o marcado honestamente como no comparable. *(2026-09-03: 13 celdas, hash de inputs idéntico; la celda bulk de Berel/Comex quedó sin fila por colisión de clave con la foto del día y se declaró no comparable en el memo)*
+- [x] GSC se evaluó como benchmark separado, sin promedio ni sustitución de ETV. *(2026-09-03: sc-domain:berel.com, 28 días ×30/28, comparado nunca promediado)*
+- [x] Se midieron valores, orden, membresía top-N, traffic cost, prospect traffic, nulls, latencia y costo. *(2026-09-03: results.md + evaluation.json)*
+- [x] AIO ETV se interpreta como atribución modelada y clickstream permanece separado del experimento improved. *(por diseño de la foundation; include_clickstream_data no se envió en ninguna celda)*
+- [x] La decisión go/no-go y el tratamiento histórico están respaldados por un artefacto reproducible. *(artefacto reproducible: evaluador + memo 2026-09-03; decisión final y tratamiento histórico pendientes de aprobación del operador)*
+- [x] Ningún reader/API/MCP sirvió shadow ni una serie mixta antes del cutover aprobado. *(2026-09-03: lanes prod de Berel siguen sirviendo legacy_static_v1 single_methodology tras el shadow)*
 - [ ] Cutover staging, rollback pre-corte y safe mode post-corte fueron verificados antes de producción.
 - [ ] Vercel y ops-worker demuestran el mismo método configured/requested/provider-effective mediante evidencia.
 - [ ] Cero request legacy se envía desde el corte y todo punto improved pre-julio declara aproximación calibrada.

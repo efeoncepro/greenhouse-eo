@@ -69,6 +69,10 @@ Endpoints:
 - `GET /api/platform/ecosystem/capabilities`
 - `GET /api/platform/ecosystem/integration-readiness`
 - `GET /api/platform/ecosystem/health`
+- `GET /api/platform/ecosystem/mcp/skills` y `GET /api/platform/ecosystem/mcp/skills/{name}` — manuales de uso
+  de la superficie MCP (TASK-1804): catálogo sin cuerpos y manual completo; `audience: internal` sólo visible
+  para bindings `internal` (si no, `404` anti-oráculo); `ETag` + `If-None-Match` → `304`. Contrato completo con
+  ejemplos: `TASK-1793`.
 
 ### Platform Health (preflight contract)
 
