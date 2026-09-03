@@ -110,6 +110,20 @@ net = gross
 
 Provider/local compliance remains outside Greenhouse unless a jurisdiction-specific engine is added.
 
+## Offboarding — temporal eligibility, review and lifecycle writeback (TASK-1349, LIVE en producción 2026-09-03)
+
+Code paths:
+
+- Resolver: `src/lib/payroll/exit-eligibility/query.ts` (governing case per member+period), `policy.ts` (pure `derivePolicy`), `calculation-gate.ts` (`evaluateExitReviewGate`/`collectUnresolvedExitMemberIds`), `flag.ts` (`isPayrollExitEligibilityWindowEnabled`), `index.ts`.
+- Gate consumers: `src/lib/payroll/payroll-readiness.ts` (blocking codes `unresolved_exit_signal` / `exit_eligibility_unavailable`), `src/lib/payroll/calculate-payroll.ts` (409 with the same codes).
+- Offboarding review: `src/lib/workforce/offboarding/review-policy.ts` (`deriveOffboardingCaseReview`, pure — decision `access_only`|`relationship_ended`, `reason` >= 10 chars, `expectedUpdatedAt` mandatory), `store.ts` (`reviewOffboardingCase`, tx + audit + outbox), `review-preview.ts` (preview before write), `state-machine.ts` (`assertOffboardingTransition`, `isTerminalOffboardingStatus` — an `identity_only` case cannot advance without a review; reviewed `access_only` fast-tracks to `executed`), `member-lifecycle.ts` (`applyOffboardingLifecycleEffects`, gated by `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED`), `exit-facts.ts` (`findExecutedRealExitForMember` — anti-resurrection guard consumed by SCIM re-activation and the BigQuery canonical-360 backfill).
+- Routes: `POST /api/hr/offboarding/cases/[caseId]/review` + `.../review/preview`; app-lane parity `src/lib/api-platform/resources/app-hr-offboarding-case-review.ts` + `src/app/api/platform/app/hr/offboarding/cases/[caseId]/review[/preview]/route.ts`.
+- Capability: `workforce.offboarding.review_case` (execute, tenant scope) — HR route group ∪ EFEONCE_ADMIN; seeded by `migrations/20260903150515261_task-1349-offboarding-review-capability-seed.sql`.
+- Signals (module `identity`, steady state 0): `src/lib/reliability/queries/offboarding-exit-drift.ts` — `hr.offboarding.unresolved_exit_signal`, `hr.offboarding.executed_member_still_active`, `workforce.offboarding.deprovisioned_member_without_case`.
+- Recovery: `scripts/workforce/offboarding-recovery.ts` (`pnpm workforce:offboarding:recovery`, dry-run by default; `--apply` requires an explicit `--member` allowlist).
+
+State (2026-09-03): both `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED` and `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` are ON in Production and staging (release `62356c9b7fd4`, PR #219, orchestrator run `33779259694`). Code is live; the pending recovery for real people (Felipe, Maria Fernanda, Valentina/Luis/María Camila lifecycle, stale SCIM stubs) is authorization-gated, not code-gated — see `greenhouse-payroll-auditor/SKILL.md` → `## Offboarding review, temporal eligibility and lifecycle writeback` for the live signal counts and the Finance side-effect on Felipe's June obligation/SII. Spec: `docs/architecture/agent-invariants/PAYROLL_WORKFORCE_AGENT_INVARIANTS.md` → `### Offboarding review, temporal eligibility and lifecycle writeback invariants (TASK-1349, desde 2026-09-03)`.
+
 ## Known Audit Watchlist As Of 2026-05-01
 
 These are not theoretical. Re-check before approving Payroll changes:

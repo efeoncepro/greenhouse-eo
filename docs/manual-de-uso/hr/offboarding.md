@@ -257,7 +257,7 @@ Hay al menos un colaborador con una salida sin decidir (caso en `Borrador`, `Req
 
 ### El caso quedó "Ejecutado" pero el colaborador sigue activo en People 360
 
-Puede ser esperado: el paso que marca `members.active=false` está detrás del flag `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED`, hoy apagado. Si ves la señal `hr.offboarding.executed_member_still_active` en `/admin/operations`, usa `pnpm workforce:offboarding:recovery` (lane A, "cerrar ciclo de vida") — nunca un UPDATE manual.
+Puede ser esperado: el paso que marca `members.active=false` está detrás del flag `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` (prendido en Production y staging desde el 2026-09-03; sólo lo lee Vercel). Los casos ejecutados ANTES de ese día no recibieron el writeback. Si ves la señal `hr.offboarding.executed_member_still_active` en `/admin/operations`, usa `pnpm workforce:offboarding:recovery` (lane A, "cerrar ciclo de vida") — nunca un UPDATE manual.
 
 ### El colaborador sigue saliendo en nomina proyectada despues de cerrar con proveedor
 

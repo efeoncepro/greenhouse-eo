@@ -7,7 +7,7 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-## 2026-09-03 — TASK-1349: revisión contractual de offboarding, elegibilidad por episodio y writeback de lifecycle (code complete, sin push)
+## 2026-09-03 — TASK-1349 en producción (release `62356c9b7fd4`) — revisión contractual de offboarding, elegibilidad por episodio y writeback de lifecycle
 
 Cierra el circuito SCIM → decisión → nómina → lifecycle que la auditoría del 03/09 encontró incompleto (ISSUE-117,
 near miss del 06/07). Nómina: el resolver de elegibilidad elige el caso gobernante por relevancia temporal, sirve
@@ -22,7 +22,9 @@ detrás de `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED`, OFF), proyeccion
 nuevas, guards de ownership en SCIM y backfill BQ, capability `workforce.offboarding.review_case` (seed aplicado),
 rutas HR + carril `app`, y `pnpm workforce:offboarding:recovery` (dry-run ejecutado sobre la cohorte real; nada
 aplicado). Tras el release la nómina de septiembre bloqueará hasta resolver Felipe y Maria Fernanda: es el control
-buscado. Pendiente: release, flag ON tras smoke en staging, recovery autorizada, UI TASK-1814, conciliación Finance.
+buscado. **Rollout 2026-09-03:** PR #219 squash, orquestador `33779259694` `released` 16:45Z, `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED`
+ON en Production+staging tras live smoke sintético (`review-execute.live.test.ts`). Pendiente del operador: recovery
+por allowlist (bloqueada al agente por permisos), causal de Felipe, conciliación Finance, UI TASK-1814.
 
 ## 2026-09-03 — TASK-1806 seguimiento: alerta Teams determinista para drift de metodología ETV
 

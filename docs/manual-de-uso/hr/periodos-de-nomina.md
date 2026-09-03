@@ -1,9 +1,9 @@
 # Periodos de Nomina
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-04-30 por Codex
-> **Ultima actualizacion:** 2026-08-10 por Claude (TASK-1388 — ruta de menu: dominio Personas en la zona Operacion)
+> **Ultima actualizacion:** 2026-09-03 por Claude (TASK-1349)
 > **Modulo:** HR / Nomina
 > **Ruta en portal:** `/hr/payroll`
 > **Documentacion relacionada:** [GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md), [Periodos de nomina](../../documentation/hr/periodos-de-nomina.md)
@@ -129,6 +129,29 @@ Que hacer:
 1. Confirma si el colaborador realmente requiere control de asistencia en nomina.
 2. Si si lo requiere, valida que exista senal de asistencia o licencia para el mes.
 3. Si el colaborador es `honorarios` o se procesa via `Deel`, ese bloqueo no deberia aplicar.
+
+### El readiness dice que hay una salida sin resolver (TASK-1349)
+
+Este blocker (`unresolved_exit_signal`) aparece cuando hay colaboradores con una salida sin resolver que afecta este periodo: revisa el caso de offboarding — solo acceso o termino de relacion — antes de calcular/aprobar.
+
+Que hacer:
+
+1. Ve a `Personas > Offboarding` (`/hr/offboarding`) y ubica el caso del colaborador senalado.
+2. Revisa el caso con la decision correcta: `solo acceso` (la baja fue solo de sistemas, la relacion sigue vigente) o `termino de relacion` (la persona realmente dejo de trabajar, con causal y fechas). Mientras la bandeja visible de revision/recuperacion (`TASK-1814`) no este disponible, la revision se aplica via el comando `POST /api/hr/offboarding/cases/[caseId]/review`.
+3. Vuelve al periodo y refresca `Calcular`; el blocker se limpia apenas la revision queda registrada.
+
+Un caso `borrador` creado manualmente con fecha pasada tambien bloquea el periodo de esta forma: apruebalo o cancelalo por el flujo normal de offboarding, no lo dejes sin decision.
+
+Importante: mientras el caso sigue sin resolver, la nomina proyectada del periodo **sigue mostrando al colaborador**. El acceso a Greenhouse por si solo nunca le quita el pago — solo la revision explicita cambia su elegibilidad.
+
+### El readiness dice que la elegibilidad de salida no se pudo evaluar (TASK-1349)
+
+Este blocker (`exit_eligibility_unavailable`) significa que el resolver de elegibilidad de salida fallo al correr. Greenhouse no autoriza un calculo oficial en silencio sin poder verificar el roster.
+
+Que hacer:
+
+1. Vuelve a intentar `Calcular` en unos minutos.
+2. Si persiste, escala el caso: revisa el resolver (`src/lib/payroll/exit-eligibility`) antes de forzar cualquier calculo o aprobacion.
 
 ### Un colaborador inicio a mitad de mes y aparece como mes completo
 

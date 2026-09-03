@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `none`
-- Status real: `Code complete 2026-09-03 (slices 0–4 en develop, sin push); rollout pendiente: release, flag OFF, recovery por allowlist sin aplicar, UI TASK-1814, conciliación Finance`
+- Status real: `En producción 2026-09-03 (release 62356c9b7fd4, flag ON prod+staging, live smoke verde); pendiente del operador: recovery por allowlist (bloqueada al agente), causal de Felipe, Finance, UI TASK-1814`
 - Rank: `TBD`
 - Domain: `hr|payroll|identity|finance`
 - Blocked by: `none`
@@ -318,7 +318,7 @@ ya están confirmados; no pedirlos nuevamente. Release y cambios de flags siguen
 - [ ] TASK-1814 permite completar el flujo desde la UI y comparte la decisión canónica sin lógica duplicada. — Contrato publicado en TASK-1814 (Delta 2026-09-03); UI no implementada (task hermana).
 - [ ] Felipe queda fuera de períodos posteriores al 02/06/2026; todo pagado y saldo pendiente cero conciliado con trazabilidad, sin nuevo pago ni reescritura de exports. — Dry-run ejecutado (preview correcto); apply NO ejecutado: requiere causal respaldada declarada por People y autorización del operador; conciliación Finance de junio/julio (obligación 550.875 + SII 99.125 generadas por error, gasto `pending`) sin contrato de anulación → dependencia Finance registrada.
 - [ ] Cohorte de otros casos revisada con allowlist por sujeto, sin baja automática de casos solo de acceso. — Cohorte clasificada por el dry-run (3 lifecycle, 3 stubs stale → `access_only`, 1 draft manual); ninguna escritura aplicada.
-- [ ] Readbacks live de UI, PG, oficial/proyectada y señales confirman resultado; flags/deploy/recovery registrados por separado. — Pendiente de release + rollout (flag OFF).
+- [ ] Readbacks live de UI, PG, oficial/proyectada y señales confirman resultado; flags/deploy/recovery registrados por separado. — Release + flag verificados (health 200, ruta desplegada, canary staging read-only, live smoke sintético con readback PG); falta la recovery aplicada y sus readbacks (bloqueada al agente por permisos) y la UI.
 
 ## Verification
 
@@ -357,7 +357,26 @@ SII 99.125 de Felipe) — hoy sólo existe `supersedePaymentObligation`, no canc
 posee el hallazgo «entry julio gross 0 con retención SII 99.125».
 
 **Gate omitido a propósito:** `pnpm build` de producción no se corrió en esta máquina (consume ~30 GB y requiere
-autorización del operador); `pnpm test` completo, `pnpm typecheck` y `pnpm lint` sí.
+autorización del operador); `pnpm test` completo, `pnpm typecheck` y `pnpm lint` sí. El build real lo hizo Vercel en
+el release.
+
+## Delta 2026-09-03 — rollout ejecutado (release `62356c9b7fd4`)
+
+- Merge canónico `-s ours` (V1 = sólo el squash #218), push, PR #219 con marker `[release-coupled: payroll +
+  auth_access = la misma capability]`, smoke en main, orquestador `33779259694` con `bypass_preflight_reason`
+  forense (`db_migrations` ya aplicada; `cloud_release` deploy.sh ya desplegado). Los dos gates `production`
+  aprobados; manifest `released` 16:45:09Z. Ledger de tiempos actualizado.
+- Live smoke sintético `src/lib/workforce/offboarding/review-execute.live.test.ts` (sujetos por el primitive SCIM):
+  guard de revisión, gate de nómina por período, version conflict, reclasificación, ejecución con writeback (member
+  inactivo, relación terminada con la fecha real, `member.deactivated`), historia preservada, SCIM no resucita, e
+  inverso `access_only` sin efectos. Verde con el flag en la invocación.
+- Flag `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` ON en Production y staging + redeploys; ledger
+  actualizado. Ruta `review/preview` desplegada (401 sin sesión); canary read-only en staging sobre el caso real de
+  Felipe: lane→`non_payroll`, junio `exclude_from_cutoff`, julio/sept `exclude_entire_period`.
+- Residual: mi push del live test a `develop` redeployó los workers compartidos con `2c2c92683` durante el run
+  (diff de árbol vs target = sólo el test); watchdog `drift_count=2` documentado, sin redeploy forzado.
+- **No ejecutado:** `pnpm workforce:offboarding:recovery --apply` (clasificador de permisos) — queda para el
+  operador con la causal de Felipe; conciliación Finance; UI TASK-1814.
 
 ## Follow-ups
 

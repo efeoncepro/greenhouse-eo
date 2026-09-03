@@ -31,6 +31,8 @@ Read only what is needed for the requested task:
 - `src/lib/payroll/compute-chile-tax.ts`
 - `src/lib/payroll/compensation-requirements.ts`
 - `src/lib/payroll/payroll-readiness.ts`
+- `src/lib/payroll/exit-eligibility/policy.ts` + `calculation-gate.ts` — optional, when the task touches exits, temporal eligibility, or a period blocked by an unresolved exit (TASK-1349)
+- `src/lib/workforce/offboarding/review-policy.ts` — optional, when the task touches offboarding review decisions (`access_only`/`relationship_ended`, TASK-1349)
 
 ## Supporting References
 
@@ -111,6 +113,31 @@ Never substitute compensation `effective_from`, record creation time, or synchro
 
 If those layers disagree, document the drift and route the policy decision to People/Payroll/Legal before changing a balance or generalizing the case. Use `docs/audits/payroll/CONTRACTOR_VACATION_ANNIVERSARY_AUDIT_2026-08-25.md` as the source case.
 
+## Offboarding review, temporal eligibility and lifecycle writeback (TASK-1349 — LIVE en producción 2026-09-03)
+
+When the audit touches a departing/departed member — payroll eligibility for a partial month, readiness that blocks on an exit, or a member still `active=true` after leaving — this is a governed domain, not something to infer from `members.active` or SCIM.
+
+- **Temporal eligibility resolver** (`src/lib/payroll/exit-eligibility/{query,policy,calculation-gate,index}.ts`): for each member+period it picks the governing offboarding case by temporal relevance (`COALESCE(last_working_day, effective_date, created_at::date) <= periodEnd`, decided cases first, latest episode), then derives a `projectionPolicy` (`full_period` | `partial_until_cutoff` | `exclude_from_cutoff` | `exclude_entire_period`). `members.active=false` alone is NEVER treated as a historical eligibility fact — an inactive member with a decided exit follows the cutoff (history preserved even for a month before the exit); inactive without any exit fact degrades to `exclude_entire_period` + warning `inactive_without_exit_fact`. A compensation version starting after a decided exit's cutoff (and on/before `periodEnd`) is a re-entry → `full_period` + info `reentry_after_prior_exit` (the prior exit does not govern the new episode). An unresolved case (`draft`/`needs_review`/`blocked`) whose signal date is `<= periodEnd` sets `reviewRequired=true` + blocking warning `unresolved_exit_signal` — the member is still projected (access alone never removes pay) but nobody may authorize calculation/approval until a human decides.
+- **Calculation gate**: `src/lib/payroll/payroll-readiness.ts` surfaces the blocking codes `unresolved_exit_signal` / `exit_eligibility_unavailable` (resolver failed — a preview may degrade to the legacy roster, an official calculation/approval never silently includes everybody); `calculatePayroll()` (`src/lib/payroll/calculate-payroll.ts`) throws 409 with those same codes. Both gated by `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED` — **ON in Production and staging**.
+- **Offboarding review command** (`src/lib/workforce/offboarding/{store,review-policy,review-preview}.ts`, `reviewOffboardingCase`/`deriveOffboardingCaseReview`): turns an explicit human decision into persisted facts. Decision is `access_only` | `relationship_ended` — never inferred. `reason` requires >=10 chars, `expectedUpdatedAt` is mandatory (409 `offboarding_case_version_conflict` on a stale read), `relationship_ended` requires an explicit `separationType` from a closed enum (never `identity_only`/inferred) + `effectiveDate` + `lastWorkingDay`. The lane is recomputed via `resolveOffboardingLane`; a prior approval is invalidated unless the caller both requests `approveNow` and holds `hr.offboarding_case:approve`. Every review appends `offboarding_case.reviewed` (audit + outbox) inside one transaction.
+- **State machine** (`src/lib/workforce/offboarding/state-machine.ts`): a case born `identity_only` (an access signal, e.g. SCIM deprovisioning) can NEVER be approved/scheduled/executed without a review first (409 `offboarding_case_review_required`) — an access signal is not a labor fact. Once reviewed `access_only`, the case fast-tracks straight to `executed` as informational (nothing to approve/schedule/settle).
+- **Lifecycle executor** (`applyOffboardingLifecycleEffects`, `src/lib/workforce/offboarding/member-lifecycle.ts`): `access_only` is informational (touches nothing). A real exit refuses to execute over a future compensation version (409 `compensation_future_version_conflict`), closes compensation at the last working day, and — only behind `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` — ends the legal relationship with the REAL date BEFORE flipping `members.active=false`/`status='inactive'`, closes `client_team_assignments`, and publishes `member.deactivated` (`deactivationKind='offboarding_executed'`). Flag **ON in Production and staging** since 2026-09-03 (release `62356c9b7fd4`).
+- **Ownership guard against resurrection** (`findExecutedRealExitForMember`, `src/lib/workforce/offboarding/exit-facts.ts`): once Greenhouse holds an EXECUTED real exit (lane <> `identity_only`, LWD in the past) for a member, neither SCIM re-activation by OID (`src/lib/scim/provisioning-internal-collaborator.ts`, outcome `linked_inactive_prior_exit`) nor the BigQuery canonical-360 backfill (`scripts/backfill-postgres-canonical-360.ts`) may flip `members.active` back to `true` — a genuine re-hire is a new episode through the governed intake/activation commands, never a silent resurrection.
+- **Reliability signals** (module `identity`, steady state 0, `src/lib/reliability/queries/offboarding-exit-drift.ts`): `hr.offboarding.unresolved_exit_signal`, `hr.offboarding.executed_member_still_active` (ISSUE-117 shape — recover with the governed command, never SQL), `workforce.offboarding.deprovisioned_member_without_case` (an access deactivation with no offboarding case at all — detection only, never infer the labor exit).
+- **Recovery**: `pnpm workforce:offboarding:recovery` (dry-run by default; `--apply --member <id> --decision relationship_ended --separation-type <causal> --reason "..." [--approve]` or `--decision access_only --access-revoked-on YYYY-MM-DD --reason "..."`). Never recover by SQL.
+
+**LIVE STATE (2026-09-03):** released to production via `62356c9b7fd4` (PR #219, orchestrator run `33779259694`); both flags ON in Production and staging. The actual data recovery (Valentina/Luis/María Camila lifecycle backfill + stale SCIM stubs; Felipe as `relationship_ended` with a People-declared causal) is NOT applied yet — blocked by the permission classifier pending operator authorization on real-person data. Signals as of release: `unresolved_exit_signal=2`, `executed_member_still_active=3`, `deprovisioned_without_case=0`. September payroll readiness blocks by design on Felipe (`blocked`) and Maria Fernanda (`draft`, 07-29) until reviewed. Finance side-effect: June obligation 550.875 + SII (June/July) 99.125 for Felipe were generated in error — no `cancelPaymentObligation` command exists (only supersede), so this is a Finance dependency, never a direct SQL fix.
+
+**Hard rules:**
+- NEVER infer a labor exit from a SCIM/access-deprovisioning signal alone.
+- NEVER approve/schedule/execute an `identity_only` case without a review first.
+- NEVER use `members.active` as the historical payroll-eligibility filter (use the resolver).
+- NEVER authorize a calculation/approval with an unresolved exit signal or a failed resolver.
+- NEVER let SCIM/BQ backfill resurrect an executed real exit.
+- NEVER recover offboarding/exit data by direct SQL — use the governed command/recovery script.
+- NEVER treat an `unknown` closure-completeness layer as complete.
+- ALWAYS run the focal suites (`pnpm vitest run src/lib/payroll src/lib/workforce/offboarding`) + the real-PG smoke when touching this domain.
+
 ## Known Payroll Audit Watchlist
 
 When auditing current code, check these areas first:
@@ -134,6 +161,8 @@ Use the smallest command set that proves the claim:
 - `pnpm staging:request POST /api/hr/payroll/periods/<periodId>/calculate '{}' --pretty`
 - `pnpm test:e2e:setup`
 - `pnpm exec playwright test tests/e2e/smoke/hr-payroll.spec.ts --project=chromium`
+- `pnpm payroll:exit-eligibility:smoke` (TASK-1349 — exercises the resolver against real PG)
+- `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED=true pnpm test:live src/lib/workforce/offboarding` (TASK-1349 — live review→execute circuit, synthetic subjects via the SCIM primitive)
 
 ## Output Format
 

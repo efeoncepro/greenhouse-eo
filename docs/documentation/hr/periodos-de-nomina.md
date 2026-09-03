@@ -1,9 +1,9 @@
 # Periodos de Nomina
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-04-30 por Codex
-> **Ultima actualizacion:** 2026-05-16 por Claude Opus (TASK-893 — payroll participation window V1 SHIPPED Slices 1-5)
+> **Ultima actualizacion:** 2026-09-03 por Claude (TASK-1349)
 > **Documentacion tecnica:** [GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md)
 > **ADR relacionado:** [GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md](../../architecture/GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md)
 
@@ -156,6 +156,29 @@ Solo se consideran requeridas cuando la asistencia puede cambiar el monto calcul
 Esto evita marcar como faltantes casos donde el propio motor no prorratea por asistencia.
 
 Si la asistencia o licencias son requeridas para el calculo y no existe senal confiable del periodo, Greenhouse bloquea el calculo oficial en vez de asumir una nomina optimista.
+
+---
+
+## Cuando una salida sin resolver realmente bloquea (TASK-1349)
+
+Desde TASK-1349, el readiness de calculo/aprobacion tambien revisa el ciclo de vida de offboarding de cada colaborador elegible, no solo su ficha de compensacion.
+
+Dos blockers nuevos, distintos entre si:
+
+- **`unresolved_exit_signal`**: hay uno o mas colaboradores con un caso de offboarding sin resolver (`borrador`, `en revision` o `bloqueado`) cuya senal de salida (ultimo dia trabajado o fecha efectiva) ya paso, y nadie registro una revision `solo acceso`. El periodo no se puede calcular ni aprobar hasta revisar ese caso — solo acceso o termino de relacion.
+- **`exit_eligibility_unavailable`**: el resolver que evalua elegibilidad de salida fallo al correr. Greenhouse no autoriza un calculo oficial en silencio con un roster que no pudo verificar; una previsualizacion si puede degradar al roster legado, pero el calculo/aprobacion oficial no.
+
+Importante: `unresolved_exit_signal` **no excluye** al colaborador de la nomina proyectada. El acceso a Greenhouse por si solo nunca quita el pago — solo una decision contractual explicita (revision `solo acceso` o `termino de relacion`) puede cambiar su elegibilidad. Por eso, mientras el caso sigue sin resolver, la nomina proyectada sigue mostrando al colaborador con normalidad; lo que cambia es que el periodo queda bloqueado hasta que alguien decida.
+
+Un caso `borrador` creado manualmente con fecha pasada tambien bloquea de esta forma: HR debe aprobarlo o cancelarlo por el flujo normal de offboarding, no queda ignorado por estar en borrador.
+
+Que hacer si aparece alguno de estos blockers:
+
+1. Ve a `Personas > Offboarding` (`/hr/offboarding`) y busca el caso del colaborador senalado.
+2. Revisa el caso con la decision correcta — `solo acceso` si la baja fue solo de sistemas, o `termino de relacion` si la persona realmente dejo de trabajar — via el comando de revision (`POST /api/hr/offboarding/cases/[caseId]/review`) hasta que TASK-1814 entregue la bandeja visible de revision/recuperacion en el portal.
+3. Vuelve al periodo de nomina y refresca el readiness; el blocker desaparece apenas la revision queda registrada (o el caso se cierra si corresponde).
+
+> Detalle tecnico: [`GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md`](../../architecture/GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md), [`GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md`](../../architecture/GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md) y `src/lib/payroll/exit-eligibility/calculation-gate.ts`.
 
 ---
 

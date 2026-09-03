@@ -111,9 +111,11 @@ registros correspondientes y corregir generaciones improcedentes con trazabilida
 pendiente cero. Esta aclaración actualiza el estado de negocio; no reescribe la observación histórica
 del near miss del 06/07.
 
-## Avance 2026-09-03 — TASK-1349 code complete en `develop` (rollout pendiente)
+## Avance 2026-09-03 — TASK-1349 en producción (release `62356c9b7fd4`); recovery de datos pendiente del operador
 
-Implementado local-first, sin push ni deploy (commits Slice 0–4 en `develop`):
+Desplegado a producción el mismo día (PR #219, orquestador `33779259694`, flag ON tras live smoke sintético). Lo que
+sigue abierto es la **recovery de datos**: el clasificador de permisos bloqueó `pnpm workforce:offboarding:recovery
+--apply` al agente; la corre el operador (runbook `docs/operations/runbooks/offboarding-recovery.md`). Contenido:
 
 - Resolver de elegibilidad por episodio (`active` = disponibilidad actual; `contract_type_snapshot` servido; reingreso
   detectado) + gate fail-closed en readiness y `calculatePayroll` ante salida sin resolver o resolver caído.

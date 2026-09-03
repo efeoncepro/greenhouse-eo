@@ -2,10 +2,35 @@
 
 > Spec canónica del `Reliability Control Plane` de Greenhouse EO. Define el registry por módulo, el modelo unificado de señales, el contrato de evidencia y cómo `Admin Center`, `Ops Health` y `Cloud & Integrations` consumen la lectura consolidada sin duplicar fuentes.
 >
-> Versión: `1.17`
+> Versión: `1.18`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-09-02` por TASK-1805 (signal de drift de metodología ETV cross-runtime bajo el módulo `growth`)
+> Última actualización: `2026-09-03` por TASK-1349 (3 signals de deriva de salida bajo el módulo `identity`: `hr.offboarding.unresolved_exit_signal`, `hr.offboarding.executed_member_still_active`, `workforce.offboarding.deprovisioned_member_without_case`)
+
+## Delta 2026-09-03 — TASK-1349: 3 signals de deriva de salida (offboarding ↔ nómina ↔ acceso)
+
+Tres señales nuevas, un solo reader
+[`offboarding-exit-drift.ts`](../../src/lib/reliability/queries/offboarding-exit-drift.ts) (mirror del
+patrón de honest-degradation de `offboarding-completeness-partial.ts`: cada signal corre su propio query,
+degrada a `unknown` + `captureWithDomain('identity', ...)` si falla, y nunca lanza hacia el agregador).
+Las tres ruedan bajo `moduleKey='identity'` (rollup `Identity & Access` — `hr` no es un module key del
+control plane) y **steady = 0** en las tres. Compuestas en `get-reliability-overview.ts` con
+`.catch(() => null)` por getter. Cierran el circuito que faltaba entre el ciclo de vida de un caso de
+offboarding, el gate de cálculo/aprobación de nómina (`src/lib/payroll/exit-eligibility`) y el registro
+canónico del colaborador (`greenhouse_core.members`).
+
+| `signalId` | `kind` | Qué mide | Severidad | Steady |
+| --- | --- | --- | --- | --- |
+| `hr.offboarding.unresolved_exit_signal` | `drift` | Casos de offboarding no terminales (`draft`/`needs_review`/`blocked`) cuya señal de salida (`last_working_day`/`effective_date`/`created_at`) ya está en el pasado y que ninguna revisión `access_only` resolvió — excluye los stubs SCIM obsoletos de una persona cuya salida REAL ya está `executed`. Cada uno bloquea el cálculo/aprobación de nómina de los períodos que toca (gate `unresolved_exit_signal` en `src/lib/payroll/exit-eligibility/calculation-gate.ts` + `payroll-readiness.ts`) — es una decisión contractual que nadie tomó | `0 → ok`; `1-3 → warning`; `>3 → error` (el near-miss de 2026-07-06 compone) | **0** |
+| `hr.offboarding.executed_member_still_active` | `drift` | Salidas REALES ejecutadas (`status='executed'`, `rule_lane <> 'identity_only'`, `last_working_day` en el pasado) cuyo colaborador sigue `members.active=TRUE` sin compensación nueva posterior — la brecha de writeback de lifecycle que documenta ISSUE-117 | `0 → ok`; `>0 → warning` | **0** |
+| `workforce.offboarding.deprovisioned_member_without_case` | `drift` | Colaboradores `members.active=TRUE` cuya cuenta interna (`client_users`, `tenant_type='efeonce_internal'`) fue dada de baja (SCIM/admin) sin que exista ningún caso de offboarding no cancelado — la forma "Maggie": detección únicamente, nadie infiere una salida laboral desde una señal de acceso (el lado Microsoft lo cubre TASK-1761) | `0 → ok`; `>0 → warning` | **0** |
+
+Recuperación: comando gobernado `reviewOffboardingCase` (`src/lib/workforce/offboarding/store.ts`) vía
+`POST /api/hr/offboarding/cases/[caseId]/review` (+ `/preview`) o el CLI
+`pnpm workforce:offboarding:recovery` — **nunca** SQL manual para reactivar/desactivar un `member` ni para
+cerrar un caso. Runbook: [`docs/operations/runbooks/offboarding-recovery.md`](../operations/runbooks/offboarding-recovery.md).
+Flag que gatea el writeback de lifecycle al ejecutar: `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED`
+(ledger `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`). Task dueña: `TASK-1349`.
 
 ## Delta 2026-09-02 — TASK-1805: `seo.etv_methodology.drift` (configurado vs. solicitado, Vercel + ops-worker)
 

@@ -2,18 +2,27 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
-TASK-1349 **code complete, rollout pendiente** (2026-09-03, sesión Claude, `develop`, sin push, commits Slice 0–4
-`b825e0a40`→`ff2f7623e` + cierre documental). Backend completo: resolver por episodio + gate fail-closed de nómina,
-command de revisión (`access_only`|`relationship_ended`) con capability y carril `app`, executor lane-aware con
-writeback detrás de `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` (OFF en todos los runtimes), proyecciones
-honestas, 3 señales (hoy 2 / 3 / 0), guards SCIM/backfill y `pnpm workforce:offboarding:recovery` (dry-run real
-ejecutado; NADA aplicado). **Riesgos/decisiones para el operador:** (1) tras el release, readiness de septiembre
-bloqueará con `unresolved_exit_signal` hasta resolver Felipe (blocked) y Maria Fernanda (draft 07-29) — control
-buscado; (2) `pnpm build` de producción NO se corrió (30 GB, requiere autorización) — `pnpm test` completo,
-typecheck y lint sí; (3) la recovery de Felipe exige causal respaldada declarada por People (`--separation-type`)
-y autorización explícita; (4) Finance: obligación junio 550.875 + SII junio/julio 99.125 de Felipe generadas por
-error, sin contrato de anulación (`supersede` sí, `cancel` no) → dependencia registrada, no SQL. Próximo paso:
-confirmar push/PR a `develop`, smoke sintético en staging, flag ON, recovery por allowlist, UI TASK-1814.
+Valentina reingreso (2026-09-03): acceso recuperado con autorización del operador sobre la misma persona/usuario/member;
+cuenta Microsoft nueva activa y buscador por correo nuevo verificados mediante readers canónicos. Roles e historia
+financiera preservados. [Auditoría y recuperación](docs/audits/payroll/VALENTINA_REHIRE_IDENTITY_RECOVERY_2026-09-03.md).
+Operador confirmó último día anterior 30/05/2026: EO-CENG-0001 ending, relación anterior ended; nuevo EO-CENG-0002
+active desde 20/08, bruto mensual 530.973. Confirmado 12/31: EO-CWS-0004 aprobado → EO-CPAY-0002 pending_readiness,
+líquido 174.193,55; único blocker boleta faltante. Sin obligación/orden nueva. Login interactivo no probado.
+
+TASK-1349 **EN PRODUCCIÓN — release `62356c9b7fd4` (PR #219, orquestador `33779259694`, manifest `released`
+16:45:09Z, 2026-09-03)**, con flag `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` ON en Production y staging
+(valor leído con `env pull`; redeploys ~16:48Z/16:55Z) tras el live smoke sintético `review-execute.live.test.ts`
+(commit `2c2c92683`, pusheado a develop). Verificado: `/api/auth/health` 200, ruta `review/preview` responde 401
+(desplegada), canary read-only en staging sobre el caso de Felipe (lane→`non_payroll`, junio `exclude_from_cutoff`),
+`hubspot-greenhouse-integration` en el target; `ops-worker`/`commercial-cost`/`ico-batch` sirven `2c2c92683` porque
+mi push a develop del live test los redeployó durante el run — diff de árbol completo vs el target = sólo ese test
+(no entra al bundle): residual de label, watchdog `drift_count=2`, sin redeploy forzado. **Pendiente que sólo el
+operador puede cerrar:** (1) `pnpm workforce:offboarding:recovery --apply` por allowlist — el clasificador de permisos
+lo bloqueó para el agente — para Valentina/Luis/María Camila (`--decision access_only --access-revoked-on`
+2026-07-14/2026-05-13/2026-06-01, que además cierra su lifecycle) y para Felipe (`--decision relationship_ended
+--separation-type <causal declarada por People> --approve`); (2) conciliación Finance de junio/julio de Felipe (sin
+`cancelPaymentObligation`); (3) UI TASK-1814. Readiness de septiembre bloquea por diseño hasta resolver Felipe y
+Maria Fernanda. Señales hoy: unresolved 2 / executed_member_still_active 3 / deprovisioned_without_case 0.
 
 Offboarding (2026-09-03): auditoría UI/código/PG registrada en
 [informe](docs/audits/payroll/OFFBOARDING_ROOT_CAUSE_AND_REMEDIATION_2026-09-03.md).

@@ -766,6 +766,15 @@ Docs: ADR `GREENHOUSE_CANDIDATE_IDENTITY_INTAKE_CANONICALIZATION_DECISION_V1.md`
 - **Careers + assessment UI** → product-design skills.
 - **Person legal profile / identity docs** → identity/workforce invariants (`docs/architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md`).
 
+## Offboarding / salida de colaboradores (TASK-1349)
+
+Exits are NOT this skill's domain. Once a person leaves — or an access signal (e.g. SCIM deprovisioning) merely suggests they might — ownership moves to the offboarding domain (`src/lib/workforce/offboarding/`) and its audit surface, `greenhouse-payroll-auditor` (temporal eligibility resolver + review invariants). This skill hands off the hire; it never adjudicates the exit.
+
+- Every case requires an explicit human review decision: **`access_only`** (the signal was only an access deprovision, nothing labor-related happened) or **`relationship_ended`** (the relationship really ended, with an explicit causal — never inferred from the dates alone).
+- **Never infer a labor exit from a SCIM/access-deprovisioning signal alone.** An account going inactive is an access fact, not a termination; the offboarding case + explicit review is the only source of truth for whether the relationship actually ended.
+- A case born from an access signal (`identity_only`) cannot be approved/scheduled/executed without that review first.
+- Detail + live state: `docs/architecture/agent-invariants/PAYROLL_WORKFORCE_AGENT_INVARIANTS.md` → `### Offboarding review, temporal eligibility and lifecycle writeback invariants (TASK-1349, desde 2026-09-03)`; runtime code paths: `greenhouse-payroll-auditor/references/greenhouse-payroll-runtime.md`.
+
 ## First reads inside the repo
 
 `CLAUDE.md` · `AGENTS.md` · `project_context.md` · `Handoff.md` · `GREENHOUSE_HIRING_ATS_ARCHITECTURE_V1.md` · `EPIC-011` + `TASK-1360..1363` · `docs/context/` (agency roles, ICO, voice).
