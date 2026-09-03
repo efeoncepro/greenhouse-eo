@@ -90,8 +90,10 @@ celda mide el borde inferior (nulls, ceros, estabilidad), no exactitud.
 | 11 | berel.com + comex.com.mx + efeoncepro.com | `bulk_traffic_estimation` | 3 `targets`, 2484 / es | 0,01236 |
 | 12 | comex.com.mx | `ranked_keywords` (prospecto) | `limit` 1000, prospecto sintético sin PII | 0,132 |
 
-Forecast del plan puro (`planEtvEvaluation`, 2026-09-03): **13 celdas → 26 requests → USD ≈ 1,02** (12 celdas con
-histórico en una sola ventana: 24 requests, USD 0,89904). Ningún request queda bloqueado antes del corte; con
+Forecast del plan puro (`planEtvEvaluation`, 2026-09-03): **13 celdas → 26 requests → USD 1,14384** (cifra del
+ejecutor `scripts/growth/dataforseo-etv-shadow.ts --dry-run` sobre la cohorte committeada
+`scripts/growth/etv-shadow-cohorts/2026-09-03-preregistered.json`; una estimación previa a mano daba ≈1,02 sin la
+segunda ventana histórica completa). Ningún request queda bloqueado antes del corte; con
 `now ≥ 2026-11-01T00:00:00Z` la mitad legacy se bloquea `legacy_requested_after_cutoff` (verificado).
 
 ### Caps propuestos (fail-closed hasta que se configuren)
@@ -164,8 +166,8 @@ corrida y readback del ledger antes/después. Fuera de esa ventana el gate vuelv
 
 | Acto | Estado | Quién |
 |---|---|---|
-| Aplicar contract de schema (≥ 2026-09-10, readback 0/0/0) | pendiente | operador |
-| Aprobar cohorte + caps + ventana + USD 2,00 | pendiente | operador |
+| Aplicar contract de schema | **aplicado 2026-09-03** (migración `20260903103858964_task-1806-etv-methodology-contract`) por instrucción del operador; condición leída como «cero filas contractuales escritas DESPUÉS del release» (0/0/0; las 5/8/2 de la ventana literal son del 27-29 de agosto, pre-release) + ambos runtimes en el SHA del release | operador |
+| Aprobar cohorte + caps + ventana + USD 2,00 | **aprobado 2026-09-03** (instrucción «ok avanza end-to-end» sobre este preregistro; caps 30 requests / USD 2,00) | operador |
 | Aprobar tratamiento histórico (rebaseline/breakpoint) | pendiente, después del Slice 2 | operador |
 | Aprobar cutover staging y productivo | pendiente, después del Slice 2 | operador |
 

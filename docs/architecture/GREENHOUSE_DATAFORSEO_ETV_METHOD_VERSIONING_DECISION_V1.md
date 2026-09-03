@@ -200,9 +200,10 @@ Fuentes oficiales consultadas:
 
 ## Runtime Contract
 
-**Estado 2026-09-02: foundation IMPLEMENTADA (`TASK-1805`, code complete, rollout pendiente); selección
-productiva `legacy_static_v1` explícita; Improved ETV NO activado.** Lo que la decisión prescribía ya tiene
-mecanismo, y lo que todavía no está desplegado se declara aparte.
+**Estado 2026-09-03: foundation EN PRODUCCIÓN (`TASK-1805` completa, release `5ec4cf769977`); contract de schema
+aplicado; selección productiva `legacy_static_v1` explícita en Vercel y ops-worker; Improved ETV NO activado.**
+Lo que la decisión prescribía ya tiene mecanismo; lo que sigue sin ejecutarse (shadow pagado, decisión, cutover)
+se declara aparte.
 
 Fuente de verdad implementada:
 
@@ -223,10 +224,15 @@ Fuente de verdad implementada:
   legacy con `etv_requested_at` desde el corte, para cualquier runtime. Las filas preexistentes (5+8+2) quedaron
   `legacy_static_v1` + `contract_default_pre_cutoff` por contrato (cuenta pre-2026-09-01, código sin flag, capturas
   pre-corte), nunca por fecha. Append-only intacto.
-- **Contract (parqueado, NO aplicado):** `docs/tasks/pending-migrations/TASK-1805-etv-methodology-contract.sql.pending`
-  retira los DEFAULT transitorios y la UNIQUE legacy y exige metodología en el hecho ETV del prospecto. Condición:
-  release con los writers explícitos en ambos runtimes + 7 días sin evidencia contractual nueva. Hasta entonces la
-  coexistencia legacy/improved por sujeto/día está cerrada a propósito (probada en transacción con rollback).
+- **Contract aplicado 2026-09-03 (migración `20260903103858964_task-1806-etv-methodology-contract`, por
+  `TASK-1806` como precondición del shadow):** retira los DEFAULT transitorios de `etv_methodology_version` /
+  `etv_methodology_evidence` en las tres tablas (readback: 0 de 6), retira las UNIQUE legacy
+  `seo_domain_overview_capture_unique` / `seo_url_visibility_capture_unique` (quedan sólo las formula-aware
+  `*_capture_method_unique`) y agrega el CHECK `NOT VALID` `seo_prospect_facts_etv_methodology_check` al hecho ETV
+  del prospecto. La condición se leyó como «cero filas con evidencia contractual escritas DESPUÉS del release»
+  (0/0/0; las 5/8/2 de la ventana literal de 7 días eran del 27–29 de agosto, pre-release) + ambos runtimes en el
+  SHA del release. Desde entonces la coexistencia legacy/improved por sujeto/día está abierta; el ejecutor del
+  shadow verifica la ausencia de la UNIQUE legacy antes de la primera llamada.
 - **Writers:** los siete caminos (`domain_rank_overview`, `historical_rank_overview`, `bulk_traffic_estimation`,
   `ranked_keywords` ×2, `relevant_pages`, `subdomains`) piden fórmula por request y persisten la identidad completa;
   frescura/pre-check/meses existentes filtran por método; el prospecto fija el método ANTES del claim y el hecho
@@ -241,11 +247,21 @@ Fuente de verdad implementada:
 - **Evaluador seguro:** `etv-methodology/evaluator.ts` + `replay.ts` + fixtures sintéticos versionados +
   `scripts/growth/_sanity-task-1805-etv-evaluator.ts` (plan, forecast, dry-run `providerCalls=0`, comparación de
   valor/membresía/traffic cost/prospecto y benchmark GSC sin promediar). Gate `GROWTH_SEO_ETV_EVALUATOR_ENABLED`
-  default OFF con allowlist, máximo de requests y tope USD; `TASK-1806` lo activa.
+  default OFF con allowlist, máximo de requests y tope USD; `TASK-1806` lo activa. Sobre él, `TASK-1806` agrega
+  (code complete 2026-09-03, sin corrida pagada todavía) el **ejecutor bounded** `shadow-runner.ts` + CLI
+  `scripts/growth/dataforseo-etv-shadow.ts` (`exact_ab` sobre la cohorte preregistrada
+  `scripts/growth/etv-shadow-cohorts/2026-09-03-preregistered.json`; improved→legacy por celda para no falsear la
+  señal de drift; hash de inputs sin el flag; idempotencia `already_captured`; parada dura por caps/policy/drift/
+  23505; artefactos `.captures/etv-shadow/<run>/`; knobs exportados sólo en el proceso del operador) y el
+  **decisor** `shadow-decision.ts` (puro; `PREREGISTERED_ETV_SHADOW_THRESHOLDS_2026_09_03`, una regla por umbral
+  del preregistro §5, `decideEtvShadow` → `go_rebaseline | go_breakpoint | hold | no_go`) + lector `shadow-report.ts`
+  (ambas metodologías por celda sin mezclar; GSC 28 días terminando D-2, normalizado ×30/28, sólo dominios propios)
+  + CLI `scripts/growth/dataforseo-etv-shadow-evaluate.ts` (artefacto en `docs/audits/seo/etv-shadow/`).
 
-Rollout pendiente (declarado en `TASK-1805` y en el ledger de flags): release con Slices 4–6, selector explícito
-en Vercel, readback `configured=requested=provider-effective` en ambos runtimes, y el contract post-release.
-`TASK-1806` sigue siendo la única unidad que puede seleccionar `improved_layout_clickstream_v2`.
+Rollout de la foundation completado (release `5ec4cf769977` en producción, selector explícito en Vercel y
+ops-worker con readback `configuredWriteSource: env`, contract aplicado el 2026-09-03). Pendiente y **no
+autorizado**: la corrida pagada del shadow, la decisión histórica y el cutover. `TASK-1806` sigue siendo la única
+unidad que puede seleccionar `improved_layout_clickstream_v2`.
 
 ## Revisit When
 

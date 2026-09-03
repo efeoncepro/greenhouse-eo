@@ -9,26 +9,28 @@ al apagar shim, fallback de deploy que lo reactiva y canary directo que no prueb
 de abajo no basta sin esos gates. Próximo paso: plan humano aprobado y coordinación con dueños de archivos;
 no push/deploy ni mutación de Entra autorizados por esta creación. Incidente Git/Berel separado.
 
-## 2026-09-03 — TASK-1806 tomada: readiness verificada y shadow preregistrado, cero gasto
+## 2026-09-03 — TASK-1806: contract aplicado y shadow ETV listo para comprar; la compra quedó bloqueada por permisos
 
-`TASK-1806` → `in-progress/` (Slice 0). Readback de la foundation sin mutar nada: ops-worker rev `00635-tbt`
-con `GROWTH_SEO_ETV_METHODOLOGY_VERSION=legacy_static_v1` y `/health.etvMethodology` (`source=env`, `valid`,
-`afterCutoff=false`); lanes prod `domain-overview`/`url-visibility` de Berel sirven `legacy_static_v1`
-`single_methodology`; evaluador dry-run 8/8 con `providerCalls=0` y ledger intacto; schema sanity 15/17 en
-transacción (los 2 ❌ eran conteos duros 5/8 que envejecieron con filas `*.invalid` explícitas — assert
-corregido a «contractual o explícita completa»). GSC `active` para berel.com y efeoncepro.com.
+`TASK-1806` `in-progress`. Slice 0 (readback + preregistro) cerrado en `ea31a9add`. Después, por instrucción del
+operador («avanza end-to-end»): (1) **contract de schema APLICADO** — migración
+`20260903103858964_task-1806-etv-methodology-contract` (UNIQUE legacy retiradas, 0 defaults transitorios,
+CHECK del hecho del prospecto); condición leída como «0/0/0 filas contractuales escritas DESPUÉS del release»
+(las 5/8/2 de la ventana literal eran del 27-29 de agosto, pre-release); `.pending` retirado, `db.d.ts` regenerado.
+(2) **Ejecutor bounded** `shadow-runner.ts` + CLI `scripts/growth/dataforseo-etv-shadow.ts` (improved→legacy por
+celda, hash de inputs, `already_captured`, parada por caps/23505, reconciliación del ledger) y **decisor**
+`shadow-decision.ts` + `shadow-report.ts` + CLI `dataforseo-etv-shadow-evaluate.ts` con los umbrales del
+preregistro congelados. Cohorte committeada `scripts/growth/etv-shadow-cohorts/2026-09-03-preregistered.json`.
+Dry-run real: 13 celdas / 26 requests / USD 1,14384, preflight `wouldExecute=true`. Tests 13.169 verdes, lint 0
+errores, typecheck verde.
 
-**Preregistro congelado** en `docs/audits/seo/2026-09-03-dataforseo-improved-etv-shadow-preregistration.md`:
-cohorte Berel MX + Comex MX + Efeonce CL, 13 celdas / 26 requests `exact_ab`, forecast USD ≈1,02, caps propuestos
-30 requests / USD 2,00, umbrales (GSC, Jaccard ≥ 0,8, ±40 %) y decisión go/hold/no-go definidos antes de ver datos.
-
-**Bloqueos con fecha y dueño:** (1) contract de schema NO aplicado — la ventana de 7 días cuenta 5/8/2 filas
-contractuales (última 2026-08-29 11:04Z); aplicar **≥ 2026-09-10** sólo con readback 0/0/0 (`pending-migrations/`);
-(2) aprobación explícita del operador de cohorte + caps + ventana + USD 2,00 antes de cualquier llamada;
-(3) el ejecutor pagado del Slice 1 no existe aún: los seis writers no-prospecto leen el selector de proceso, así que
-el ejecutor hará dos pases fijando el selector por pase y abortará ante colisión con la UNIQUE legacy.
-Próximo paso: operador aprueba el preregistro → aplicar contract (≥ 09-10) → construir/ejecutar el shadow bounded.
-Sin push: hay WIP ajeno en el árbol (skills Berel, 8 tasks, EPIC-022) y `d27b6ec97` local de `greenhouse-eo-fe`.
+**Bloqueo real:** `--execute` (compra ≤ USD 2,00) fue **denegado por el clasificador de permisos** de la sesión;
+no se rodeó. Cero llamadas pagadas por esta task hasta ahora. Próximo paso: el operador corre (o autoriza) con los
+cuatro knobs exportados en su shell:
+`GROWTH_SEO_ETV_EVALUATOR_ENABLED=true … npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/dataforseo-etv-shadow.ts --execute`,
+luego `dataforseo-etv-shadow-evaluate.ts --summary=<.captures/etv-shadow/<run>/summary.json>` (necesita
+`GROWTH_SEARCH_CONSOLE_ENABLED=true`) → artefacto de decisión en `docs/audits/seo/etv-shadow/`. Cutover (Slices
+3-4) sigue sin autorizar; selectores productivos en `legacy_static_v1`; señal de drift en `awaiting_data`.
+Sin push: hay WIP ajeno en el árbol (Berel, EPIC-022, 8 tasks).
 
 ## 2026-09-03 — TASK-1805 en producción: la fórmula detrás de `etv` es identidad del hecho, todavía legacy
 

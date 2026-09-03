@@ -21,12 +21,12 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Slice 0 en curso (2026-09-03): readiness verificada en DB/API/worker, preregistro congelado (docs/audits/seo/2026-09-03-dataforseo-improved-etv-shadow-preregistration.md, 13 celdas / 26 requests / USD ≈1,02, caps propuestos 30 req / USD 2,00). Bloqueada por contract de schema (aplicable ≥ 2026-09-10 con readback 0/0/0) y por aprobación explícita de gasto. Cero llamadas pagadas`
+- Status real: `Slice 0 cerrado (2026-09-03): readiness verificada, preregistro congelado y aprobado (cohorte + caps 30 req / USD 2,00), contract de schema APLICADO (migración 20260903103858964_task-1806-etv-methodology-contract; readback constraints formula-aware presentes, 0/6 defaults, 0/0/0 filas contractuales post-release). Slices 1 y 2 code complete (shadow-runner + CLI dataforseo-etv-shadow; shadow-decision + shadow-report + CLI dataforseo-etv-shadow-evaluate; 75/75 tests, typecheck verde; dry-run real 13 celdas / 26 requests / forecast USD 1,14384, wouldExecute=true, providerCalls=0). Corrida pagada del shadow NO ejecutada (cero llamadas pagadas de esta task), decisión pendiente, cutover no autorizado; selectores productivos en legacy_static_v1 en Vercel y ops-worker; señal seo.etv_methodology.drift en awaiting_data`
 - Rank: `2`
 - Domain: `growth|seo|data|integration|ops`
 - External deadline: `2026-11-01T00:00:00Z; no existe fallback legacy posterior`
 - Internal targets: `shadow/decision 2026-10-23; cutover 2026-10-28T00:00:00Z`
-- Blocked by: `contract de schema ETV parqueado en docs/tasks/pending-migrations/ (hoy 5/8/2 filas contractuales en la ventana de 7 días; aplicable ≥ 2026-09-10 con readback 0/0/0); aprobación explícita de gasto/cohorte/caps (preregistro 2026-09-03); aprobación separada de tratamiento histórico y cutover`
+- Blocked by: `ejecución pagada del shadow pendiente de permiso de ejecución del operador (cohorte y caps ya aprobados en el preregistro 2026-09-03 §7; contract de schema ya aplicado); aprobación separada de tratamiento histórico (rebaseline/breakpoint) y de cutover staging/productivo después del Slice 2`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -97,7 +97,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/tasks/to-do/TASK-1805-growth-seo-dataforseo-improved-etv-versioned-transition.md`
+- `docs/tasks/complete/TASK-1805-growth-seo-dataforseo-improved-etv-versioned-transition.md`
 - `docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md`
 - `docs/audits/communications/2026-09-01-dataforseo-improved-etv-provider-questions.md`
 - `docs/manual-de-uso/growth/evaluar-transicion-dataforseo-improved-etv.md`
@@ -149,9 +149,13 @@ Reglas obligatorias:
   `/health` del worker responde `configuredWriteSource: env`), señal `seo.etv_methodology.drift` (en
   `awaiting_data` hasta la primera captura explícita del worker) y evaluador dry-run OFF por defecto con
   `scripts/growth/_sanity-task-1805-etv-evaluator.ts` (8/8, `providerCalls: 0`).
-- Contract de schema parqueado, no aplicado: `docs/tasks/pending-migrations/TASK-1805-etv-methodology-contract.sql.pending`
-  (drop de DEFAULT transitorios + drop de UNIQUE legacy + CHECK NOT VALID en `seo_prospect_diagnostic_facts`).
-  Condición de 7 días sin filas nuevas con evidencia contractual corriendo desde 2026-09-03.
+- Contract de schema **aplicado el 2026-09-03** por esta task: `migrations/20260903103858964_task-1806-etv-methodology-contract.sql`
+  (drop de DEFAULT transitorios + drop de UNIQUE legacy `seo_domain_overview_capture_unique` /
+  `seo_url_visibility_capture_unique` + CHECK NOT VALID `seo_prospect_facts_etv_methodology_check`). Readback:
+  constraints formula-aware presentes, 0 de 6 defaults transitorios, 0/0/0 filas contractuales escritas después
+  del release. El `.pending` se eliminó (`docs/tasks/pending-migrations/README.md` lo registra como aplicada).
+- Ejecutor bounded del shadow (Slice 1) y evaluador/decisor (Slice 2), code complete 2026-09-03 — ver los
+  párrafos **Avance 2026-09-03** de cada slice.
 
 ### Gap
 
@@ -160,8 +164,8 @@ Reglas obligatorias:
 - La matriz contractual está confirmada; falta evidencia de nuestros payloads y resultados sobre cohorte aprobada.
 - Improved ETV no está activado ni servido por Vercel, ops-worker, API o MCP.
 - No existe decisión aplicada sobre rebaseline histórico versus breakpoint visible.
-- El contract parqueado sigue sin aplicar (ventana de 7 días desde 2026-09-03); aplicarlo es precondición del
-  Slice 1: mientras no se aplique, los DEFAULT transitorios y las UNIQUE legacy siguen vigentes.
+- La corrida pagada del shadow no se ha ejecutado: falta el permiso de ejecución del operador (los caps y la
+  cohorte ya están aprobados). Sin corrida no hay `summary.json`, evaluación ni decisión.
 
 ## Modular Placement Contract
 
@@ -214,7 +218,9 @@ Reglas obligatorias:
 
 ### Migration, backfill and rollout
 
-- Migration posture: `none`; consume el expand-contract ya verificado de `TASK-1805`.
+- Migration posture: `none` (sin DDL propio); consume el expand-contract ya verificado de `TASK-1805`. El
+  contract parqueado de `TASK-1805` se aplicó bajo esta task el 2026-09-03 (migración
+  `20260903103858964_task-1806-etv-methodology-contract`) sin agregar objetos nuevos.
 - Default state: evaluator OFF y canonical method legacy explícito.
 - Backfill plan: distinguir recomputación completa desde julio de 2026 y aproximación calibrada antes; cualquier
   rebaseline amplio exige aprobación separada y etiqueta de `calculation_basis`.
@@ -287,6 +293,16 @@ Efeonce CL, 13 celdas / 26 requests / USD ≈1,02, caps propuestos 30 requests /
 predefinidos). Pendiente del Slice 0: aplicar el contract cuando se cumpla la condición y registrar la aprobación
 explícita del operador (cohorte + caps + ventana). Hasta entonces, cero llamadas pagadas.
 
+**Cierre del Slice 0 (2026-09-03, más tarde el mismo día).** Contract aplicado con
+`migrations/20260903103858964_task-1806-etv-methodology-contract.sql` tras releer la condición: las 5/8/2 filas de
+la ventana literal eran del 27–29 de agosto, anteriores al release `5ec4cf769977` con los writers explícitos, y
+ambos runtimes ya servían ese SHA → 0/0/0 filas contractuales **después del release**. Readback post-aplicación:
+constraints presentes `seo_domain_overview_capture_method_unique`, `seo_url_visibility_capture_method_unique`,
+`seo_prospect_facts_etv_methodology_check`; UNIQUE legacy retiradas; 0 de 6 DEFAULT transitorios. Aprobación del
+operador de cohorte + caps (30 requests / USD 2,00) registrada en el preregistro §7 y en la cohorte committeada
+`scripts/growth/etv-shadow-cohorts/2026-09-03-preregistered.json` (`approvedBy`/`approvedAt`). Sigue sin
+ejercerse el permiso de ejecución de la corrida pagada. Cero llamadas pagadas.
+
 
 - Verificar `TASK-1805` completa mediante DB/API/MCP y configured/requested/provider-effective en ambos runtimes.
 - Incorporar respuesta DataForSEO y congelar endpoint matrix, cohorte, período, inputs, métricas y umbrales.
@@ -306,11 +322,45 @@ explícita del operador (cohorte + caps + ventana). Hasta entonces, cero llamada
 
 ### Slice 1 — Shadow bounded
 
+**Avance 2026-09-03 — code complete; ejecución pagada PENDIENTE.** `src/lib/growth/seo/etv-methodology/shadow-runner.ts`
+(server-only; `assertEtvShadowCohort`, `preflightEtvShadow`, `runEtvShadow`): compra ambas fórmulas por celda en
+la misma ventana con inputs byte-idénticos salvo `use_improved_etv` (hash `taskHashWithoutFlag`), en el orden
+**improved → legacy** para que la última request explícita del día sea legacy y la señal
+`seo.etv_methodology.drift` no reporte un drift inexistente; idempotencia `already_captured` por
+`(sujeto, mercado, endpoint, capture_date, metodología)`; parada dura antes de cada llamada por caps de
+requests/USD y aborto de la corrida completa por policy, drift `requested ≠ providerEffective`, `status_code
+!= 20000` en ambas fórmulas, breaker, transporte o 23505; verifica en preflight que la UNIQUE legacy ya no exista;
+reutiliza parsers/proyecciones y writers canónicos de `TASK-1805` (no `captureDomainOverview`/`captureUrlVisibility`,
+que filtran por frescura contra el selector del ENV y convertirían el A/B en canary temporal); artefactos
+inyectados (`.captures/etv-shadow/<run>/raw/*.json` + `summary.json`). Cohorte committeada
+`scripts/growth/etv-shadow-cohorts/2026-09-03-preregistered.json`. CLI `scripts/growth/dataforseo-etv-shadow.ts`
+(`--dry-run` default, `--execute` compra, `--cohort`, `--artifact-dir`; reconcilia el ledger `labs` del día
+antes/después, exit ≠ 0 si no ejecutó, abortó o no cuadra). Knobs (`GROWTH_SEO_ETV_EVALUATOR_ENABLED=true`,
+`_SUBJECT_ALLOWLIST=berel.com,comex.com.mx,efeoncepro.com`, `_MAX_REQUESTS=30`, `_BUDGET_USD=2.00`) exportados
+sólo en el proceso del script, no en Vercel ni ops-worker. `relevant-pages.ts` ganó el export
+`projectConcentrationItems` sin cambio de comportamiento. Tests: `pnpm vitest run
+src/lib/growth/seo/etv-methodology` 75/75; `pnpm typecheck` verde. Dry-run real de hoy: 13 celdas, 26 requests,
+forecast USD 1,14384, preflight `wouldExecute=true`, `providerCalls=0`. **Ninguna llamada pagada ejecutada.**
+
 - Ejecutar legacy/improved con inputs equivalentes en cada endpoint compatible y bajo allowlist.
 - Persistir ambas metodologías con run/costo/latencia/error y sin cambiar el canonical reader.
 - Detenerse automáticamente al alcanzar request cap, USD cap, drift o error contractual.
 
 ### Slice 2 — Evaluación y decisión histórica
+
+**Avance 2026-09-03 — code complete; sin corrida real todavía.** `shadow-decision.ts` (puro, sin IO):
+`PREREGISTERED_ETV_SHADOW_THRESHOLDS_2026_09_03` congela los umbrales del preregistro §5, una función nombrada
+por regla (`rule*`), `decideEtvShadow` → `go_rebaseline | go_breakpoint | hold | no_go` con precedencia explícita
+(`hold` inconcluso > `no_go` calibración peor en Berel > `hold` regresión ±40 % sin explicación > `go`); Efeonce CL
+sólo produce hallazgos `info`. `shadow-report.ts` (server-only): lee ambas metodologías por celda del mismo
+`capture_date` sin mezclarlas, el `summary.json` del ejecutor y el benchmark GSC first-party sólo para dominios
+propios (28 días terminando D-2, país = mercado, todos los dispositivos, normalizado ×30/28; se compara, no se
+promedia). `shadow-report-markdown.ts` (render puro, sin payloads ni secretos). CLI
+`scripts/growth/dataforseo-etv-shadow-evaluate.ts` (`--cohort`, `--capture-date`, `--summary`, `--out` default
+`docs/audits/seo/etv-shadow/<capture-date>-<cohortId>-results.md`, `--json` default `evaluation.json` junto al
+summary; exige `GROWTH_SEARCH_CONSOLE_ENABLED=true` en su env; `hold`/`no_go` son resultados con exit 0). Tests
+incluidos en los 75/75 del módulo. **Sin `summary.json` real no hay evaluación ni decisión**; el tratamiento
+histórico y el cutover siguen siendo aprobaciones separadas.
 
 - Comparar ETV contra GSC con error, sesgo y correlación definidos antes de observar resultados.
 - Medir delta de valores, orden, Jaccard top-N, traffic cost, prospect traffic, nulls, latencia y costo.

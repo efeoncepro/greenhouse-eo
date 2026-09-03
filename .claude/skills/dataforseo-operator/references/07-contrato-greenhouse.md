@@ -215,9 +215,48 @@ formula-aware junto a la legacy, guard de corte en la base; filas previas `legac
 `contract_default_pre_cutoff`), siete writers explícitos, readers/API/MCP con `etvMethodology` y
 `not_available_for_method`, señal `seo.etv_methodology.drift`, `/health` del worker con readback, evaluador dry-run
 (`scripts/growth/_sanity-task-1805-etv-evaluator.ts`, `providerCalls=0`) y sanity del schema con rollback
-(`_sanity-task-1805-etv-schema.ts`). El **contract** (retirar UNIQUE legacy + defaults) está parqueado en
-`docs/tasks/pending-migrations/` hasta el release; la coexistencia real por sujeto/día llega con él. Lo que sigue
-**no autorizado**: shadow pagado, rebaseline/breakpoint y cutover (`TASK-1806`).
+(`_sanity-task-1805-etv-schema.ts`). **Foundation en producción desde el 2026-09-03 (release `5ec4cf769977`)** y el
+**contract** (retirar UNIQUE legacy + defaults + CHECK del hecho del prospecto) **aplicado el 2026-09-03** por
+`TASK-1806` (migración `20260903103858964_task-1806-etv-methodology-contract`): la coexistencia real legacy/improved
+por sujeto/día ya está abierta. Lo que sigue **no autorizado**: corrida pagada del shadow, rebaseline/breakpoint y
+cutover (`TASK-1806`).
+
+## §5f Shadow legacy/improved (TASK-1806) — ejecutor bounded + decisor, sin corrida pagada todavía
+
+Code complete 2026-09-03; 75 tests verdes en `src/lib/growth/seo/etv-methodology/`. Cero llamadas pagadas de esta
+task al 2026-09-03. Runbook operador-facing: `docs/manual-de-uso/growth/evaluar-transicion-dataforseo-improved-etv.md`
+§«Comandos del shadow». Preregistro (cohorte, umbrales, caps): `docs/audits/seo/2026-09-03-dataforseo-improved-etv-shadow-preregistration.md`.
+
+- **Qué CLI.** Ejecutor `scripts/growth/dataforseo-etv-shadow.ts` (`--dry-run` default; `--execute` compra;
+  `--cohort`, `--artifact-dir`) sobre `src/lib/growth/seo/etv-methodology/shadow-runner.ts` (`preflightEtvShadow`,
+  `runEtvShadow`; server-only). Cohorte committeada `scripts/growth/etv-shadow-cohorts/2026-09-03-preregistered.json`
+  (13 celdas → 26 requests, forecast USD 1,14384). Evaluador `scripts/growth/dataforseo-etv-shadow-evaluate.ts`
+  (`--cohort`, `--capture-date`, `--summary`, `--out`, `--json`; exige `GROWTH_SEARCH_CONSOLE_ENABLED=true` en su
+  env) sobre `shadow-report.ts` (lector; GSC 28 días terminando D-2, ×30/28, sólo dominios propios) +
+  `shadow-decision.ts` (puro; `PREREGISTERED_ETV_SHADOW_THRESHOLDS_2026_09_03`, una función por regla del §5;
+  `decideEtvShadow` → `go_rebaseline | go_breakpoint | hold | no_go`) + `shadow-report-markdown.ts`.
+- **Por qué NO reutiliza `captureDomainOverview`/`captureUrlVisibility`.** Esos comandos filtran por frescura contra
+  el selector del ENV (legacy): la mitad legacy «fresca» se saltaría y el A/B quedaría como canary temporal. El
+  ejecutor es la ÚNICA pieza del dominio autorizada a pedir `improved_layout_clickstream_v2` antes del cutover, y
+  reutiliza sólo parsers/proyecciones y los writers canónicos de `TASK-1805`.
+- **Orden improved → legacy por celda.** La señal `seo.etv_methodology.drift` compara el selector configurado con la
+  ÚLTIMA request explícita del día; dejar legacy al final la mantiene en steady 0. No lo inviertas.
+- **Qué NO hacer.** NUNCA `--execute` sin el gate `GROWTH_SEO_ETV_EVALUATOR_ENABLED=true` + allowlist + caps
+  aprobados (30 requests / USD 2,00) exportados en el proceso del script; NUNCA prender esos knobs en Vercel ni en
+  el ops-worker (la corrida es un proceso local acotado del operador, no un runtime); NUNCA describir un canary
+  temporal como A/B (`exact_ab` exige ambas fórmulas por celda con inputs idénticos salvo el flag — el hash
+  `taskHashWithoutFlag` lo prueba); NUNCA cambiar umbrales tras ver resultados (versión nueva del preregistro);
+  NUNCA reutilizar la corrida para decidir cutover: rebaseline/breakpoint y cutover son sign-offs separados.
+- **Cómo leer `summary.json`.** `executed`, `reasons[]`, `totals` (`requests`, `costUsd`, `forecastUsd`, `aborted`,
+  `abortReason`) y `requests[]` por request (`methodology`, `requested`/`providerEffective`/`requestedAt`,
+  `taskHashWithoutFlag`, `status` `executed | already_captured | skipped_after_abort`, `statusCode`, `costUsd`,
+  `latencyMs`, `persisted`, `prospectTraffic`, `errorCode`). `aborted=true` es evidencia conservada, no un fallo
+  silencioso; el CLI además reconcilia el ledger `labs` del día antes/después (tolerancia 0,000001) y sale ≠ 0 si
+  no cuadra.
+- **Cómo leer `evaluation.json` / el Markdown** (`docs/audits/seo/etv-shadow/<capture-date>-<cohortId>-results.md`).
+  `decision.decision` + `historicalTreatment` + `findings[]` + `rationale[]`; `inputsEquivalent`; `cells[]` por
+  celda (validez y métricas, no sólo promedio); `cost` forecast vs real; `latency`; `declarations[]`. Efeonce CL es
+  celda de borde: sólo hallazgos `info`, no veta ni certifica. `hold`/`no_go` son resultados (exit 0).
 
 ## §6 Secretos / env
 

@@ -7564,11 +7564,11 @@ export interface GreenhouseGrowthSeoDomainOverviewSnapshots {
   /**
    * TASK-1805: explicit_request (la request llevó use_improved_etv + requested_at + policy) o contract_default_pre_cutoff (atribuido por contrato: cuenta pre-2026-09-01 y código sin flag, siempre antes del corte). Nunca por fecha.
    */
-  etv_methodology_evidence: Generated<string>;
+  etv_methodology_evidence: string;
   /**
    * TASK-1805: fórmula ETV detrás de la fila (legacy_static_v1|improved_layout_clickstream_v2). Parte de la identidad: dos métodos pueden coexistir el mismo día; el mismo método no se duplica.
    */
-  etv_methodology_version: Generated<string>;
+  etv_methodology_version: string;
   /**
    * TASK-1805: versión de la policy con la que se tradujo configuración → parámetro → método efectivo.
    */
@@ -7760,11 +7760,11 @@ export interface GreenhouseGrowthSeoProspectDiagnostics {
   /**
    * TASK-1805: explicit_request o contract_default_pre_cutoff.
    */
-  etv_methodology_evidence: Generated<string>;
+  etv_methodology_evidence: string;
   /**
    * TASK-1805: fórmula ETV solicitada al proveedor para este diagnóstico; el hecho estimated_monthly_traffic la hereda.
    */
-  etv_methodology_version: Generated<string>;
+  etv_methodology_version: string;
   /**
    * TASK-1805: versión de la policy ETV aplicada.
    */
@@ -7881,11 +7881,11 @@ export interface GreenhouseGrowthSeoUrlVisibilitySnapshots {
   /**
    * TASK-1805: explicit_request o contract_default_pre_cutoff (ver seo_domain_overview_snapshots).
    */
-  etv_methodology_evidence: Generated<string>;
+  etv_methodology_evidence: string;
   /**
    * TASK-1805: fórmula ETV de la fila y de sus top_keywords (heredan del padre). Parte de la identidad por método.
    */
-  etv_methodology_version: Generated<string>;
+  etv_methodology_version: string;
   /**
    * TASK-1805: versión de la policy ETV aplicada.
    */
