@@ -49,8 +49,11 @@ el único ancla de organización; el binding y los grants son los ya diseñados 
 Partes de la decisión:
 
 1. **Runtime.** `services/auth-server/` en `greenhouse-eo`, Cloud Run service en `us-east4` (misma región que
-   Cloud SQL y que las llaves KMS), detrás de un global load balancer con certificado managed y Cloud Armor,
-   replicando el Terraform del front door de `efeonce-mcp` (`infra/terraform/front_door.tf`). Cookie propia
+   Cloud SQL y que las llaves KMS), publicado como **segundo host del front door existente del gateway MCP**
+   (decisión del operador 2026-09-03, «un escritorio más en la misma oficina»): el mismo global load balancer,
+   la misma IP `34.111.78.237` y la misma policy de Cloud Armor, con una host rule `auth.efeonce.org` → backend
+   service propio (serverless NEG en `us-east4`) y un certificado managed adicional en el target HTTPS proxy.
+   No se crea un segundo LB ni una segunda policy; el Terraform vive en `efeonce-mcp/infra/terraform/`. Cookie propia
    `__Host-` en namespace separado, session store propio, secretos propios en Secret Manager, deploy por
    workflow con `--set-env-vars` declarado en `deploy.sh` como los cuatro workers existentes. Nunca comparte
    `NEXTAUTH_SECRET` ni acepta una cookie del portal. Es una **excepción documentada de EPIC-027** del mismo
@@ -91,8 +94,8 @@ Tabla de las tecnologías (todas ya presentes o de costo marginal):
 
 | Necesidad | Solución | Estado |
 | --- | --- | --- |
-| Runtime público, TLS, anti-abuso | Cloud Run + global LB + certificado managed + Cloud Armor | patrón vivo en `efeonce-mcp` |
-| DNS `auth.efeonce.org` | zona `efeonce.org` en HostGator | registro manual del operador |
+| Runtime público, TLS, anti-abuso | Cloud Run + host rule en el global LB del gateway + certificado managed adicional + la misma policy Cloud Armor | reutiliza el front door de `efeonce-mcp` |
+| DNS `auth.efeonce.org` | registro A a la IP global existente del gateway, zona `efeonce.org` en HostGator | registro manual del operador |
 | Estado (sesiones, refresh tokens, consents, passkeys, TOTP, clientes) | Cloud SQL `greenhouse-pg-dev`, schema nuevo `greenhouse_auth` | migración aditiva |
 | Binding, invitaciones, grants | `greenhouse_core` (diseño Slice 0) | migración aditiva |
 | Firma de tokens | Cloud KMS HSM, ES256, ~USD 5/mes por dos versiones activas | por crear |
@@ -174,7 +177,7 @@ Tabla de las tecnologías (todas ya presentes o de costo marginal):
 
 | Orden | Task | Alcance | Estimación agéntica |
 | --- | --- | --- | --- |
-| 1 | `TASK-1828` | Runtime `auth.efeonce.org`: deployable, front door, KMS, JWKS, session store, excepción EPIC-027 | 3 a 4 días |
+| 1 | `TASK-1828` | Runtime `auth.efeonce.org`: deployable, host en el front door del gateway, KMS, JWKS, session store, excepción EPIC-027 | 3 a 4 días |
 | 2 | `TASK-1829` | Superficie OAuth: metadata, CIMD, DCR compat, PKCE, tokens ES256, refresh, revocación, consentimiento | 3 a 4 días |
 | 3 | `TASK-1830` | Autenticación de personas externas: passkeys, magic link, TOTP, recuperación, anti-abuso | 5 a 7 días |
 | 4 | `TASK-1631` | Binding Account 360, invitaciones, grants, `grants_version`, eligibility reader (re-alcance) | 3 a 4 días |
@@ -215,3 +218,13 @@ primer cliente: 5 a 7 semanas por los gates humanos.
 - [`GREENHOUSE_360_OBJECT_MODEL_V1.md`](GREENHOUSE_360_OBJECT_MODEL_V1.md) · [`GREENHOUSE_IDENTITY_ACCESS_V2.md`](GREENHOUSE_IDENTITY_ACCESS_V2.md)
 - [`TASK-1631`](../tasks/in-progress/TASK-1631-efeonce-customer-identity-mcp-federation.md) · [`TASK-1626`](../tasks/in-progress/TASK-1626-efeonce-mcp-platform-gateway.md) · [`TASK-1813`](../tasks/to-do/TASK-1813-efeonce-mcp-oauth-client-interoperability.md)
 - Cloud KMS pricing (vigente 2025-03-17): https://cloud.google.com/kms/pricing
+
+## Delta 2026-09-03 — costo en Google Cloud y front door compartido
+
+Medido en el billing export (30 días, USD): el front door del gateway cuesta 36,84 en forwarding rules y 6,95 en
+Cloud Armor con tráfico casi nulo; el Cloud Run del gateway 0,39. Un front door propio para el emisor habría
+sumado ≈ USD 58/mes; compartir el del gateway deja el adicional en **≈ USD 15/mes** (Cloud Run con una instancia
+mínima ≈ 8, KMS HSM ≈ 5, Secret Manager/Scheduler/Artifact Registry ≈ 1, Cloud SQL 0 por ser la misma
+instancia). El operador eligió compartir. Consecuencia: la task `TASK-1828` edita el Terraform del repo
+`efeonce-mcp` (host rule, backend service, NEG, certificado) y el aislamiento entre emisor y gateway queda en
+Cloud Run, IAM, cookies, secretos y audiencia, no en el LB.

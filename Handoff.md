@@ -9,7 +9,10 @@ nuevas TASK-1828…1834 (runtime Cloud Run + KMS HSM · superficie OAuth/CIMD/to
 multi-issuer · canaries + primera cohorte · aseguramiento/pentest · convergencia login). Estimación agéntica: 3–4 semanas
 code-complete, 5–7 operativo. Bloqueos humanos: excepción EPIC-027 para `services/auth-server`, DNS `auth.efeonce.org`,
 sesiones interactivas para la matriz de tokens, pentest. Task ui-ux de login sin ID hasta tener wireframe/flow reales.
-Siguiente ID libre `TASK-1835` / `EPIC-045`.
+Siguiente ID libre `TASK-1835` / `EPIC-045`. **Costo GCP (billing export 30d):** front door propio ≈ USD 58/mes vs compartir
+el LB del gateway ≈ USD 15/mes; el operador eligió compartir → TASK-1828 edita `efeonce-mcp/infra/terraform/` (host rule +
+backend + cert). Hallazgo lateral: los Cloud Run Jobs de Globe (`asset-governance`, `producer-worker`, `media-derivatives`)
+sumaban USD 336 de 471/mes; el operador indica que Globe ya se frenó.
 
 Maggie/María Fernanda: cierre 4/4, unresolved=0; agosto ready. Método documentado en runbook/manual y
 skills Payroll/Talent Codex/Claude; Finance histórico pendiente de conciliación. [Evidencia 03/09](docs/audits/payroll/MAGGIE_MARIA_FERNANDA_OFFBOARDING_CLOSURE_2026-09-03.md).

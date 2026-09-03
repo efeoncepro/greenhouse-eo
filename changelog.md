@@ -16,7 +16,9 @@ TASK-1626/1631/1813 y crea TASK-1828 (runtime Cloud Run + front door + KMS HSM +
 compat, PKCE, tokens ES256, refresh, revocación, consentimiento), TASK-1830 (passkeys, magic link, TOTP, recuperación),
 TASK-1831 (gateway multi-issuer `AuthContext`), TASK-1832 (canaries + primera cohorte), TASK-1833 (red-team, pentest,
 rotación, runbooks, privacidad V2) y TASK-1834 (convergencia del login cliente). `TASK-1631` re-alcanzada a binding/grants.
-`DECISIONS_INDEX`, registries y READMEs sincronizados.
+`DECISIONS_INDEX`, registries y READMEs sincronizados. Delta posterior el mismo día: el emisor se publica como segundo host
+del front door del gateway (sin LB ni Armor nuevos, ≈ USD 15/mes adicionales medidos contra el billing export) —
+ADR §Delta 2026-09-03 y TASK-1828 actualizados.
 
 ## 2026-09-03 — TASK-1349: un `identity_only` ejecutado no es hecho de salida; purga de sujetos sintéticos (PR #220)
 

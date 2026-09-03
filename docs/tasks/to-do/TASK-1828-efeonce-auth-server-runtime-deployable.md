@@ -30,9 +30,11 @@
 ## Summary
 
 Crear el runtime independiente del authorization server de Efeonce: `services/auth-server/` en Greenhouse,
-Cloud Run en `us-east4` detrás de un global load balancer con certificado managed y Cloud Armor, llave de
-firma ES256 en Cloud KMS HSM con JWKS publicado, schema `greenhouse_auth`, session store y cookie `__Host-`
-propios. Entrega un servicio vivo que responde `/.well-known/jwks.json` y `/healthz` firmando un token de
+Cloud Run en `us-east4` publicado como segundo host del front door existente del gateway MCP (misma IP, mismo
+global load balancer, misma policy Cloud Armor; host rule + backend service + NEG + certificado managed
+adicionales en `efeonce-mcp/infra/terraform/`), llave de firma ES256 en Cloud KMS HSM con JWKS publicado,
+schema `greenhouse_auth`, session store y cookie `__Host-` propios. Decisión del operador 2026-09-03: no se
+crea un segundo LB (≈ USD 37/mes) ni una segunda policy; el adicional en GCP queda en ≈ USD 15/mes. Entrega un servicio vivo que responde `/.well-known/jwks.json` y `/healthz` firmando un token de
 prueba; los flujos OAuth y la autenticación de personas llegan en `TASK-1829` y `TASK-1830`.
 
 ## Why This Task Exists
@@ -46,8 +48,9 @@ sobre lo que probar clientes, y cada deploy del portal sería un deploy del emis
 
 - Deployable `services/auth-server/` con Dockerfile, `deploy.sh` (`--set-env-vars` declarativo), workflow de
   deploy por el carril de workers Cloud Run y `--no-allow-unauthenticated` sólo alcanzable por el LB.
-- Front door: global LB + serverless NEG + certificado managed para `auth.efeonce.org` + Cloud Armor con
-  throttle por IP, en Terraform replicando `efeonce-mcp/infra/terraform/front_door.tf`.
+- Front door compartido: en `efeonce-mcp/infra/terraform/front_door.tf` agregar host rule `auth.efeonce.org` en
+  el URL map, backend service propio con serverless NEG en `us-east4`, certificado managed adicional en el
+  target HTTPS proxy y la policy Cloud Armor existente adjunta al backend nuevo. Sin IP ni LB nuevos.
 - Llave ES256 en Cloud KMS con protección HSM; endpoint `/.well-known/jwks.json` con `kid`; firma vía KMS y
   verificación local con la pública; rotación con dos versiones activas probada en staging.
 - Schema `greenhouse_auth` (sesiones, refresh tokens, consents, passkeys, TOTP, clientes registrados) creado
@@ -94,7 +97,7 @@ Reglas obligatorias:
 
 - Excepción documentada de EPIC-027 registrada en `GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md` con
   costo, routing/auth, rollback y runtime ownership (mismo formato que `artifact-worker`).
-- Registro DNS `auth.efeonce.org` (zona en HostGator) apuntando a la IP global reservada.
+- Registro DNS `auth.efeonce.org` (zona en HostGator) apuntando a la IP global existente del gateway (`34.111.78.237`).
 - Proyecto `efeonce-group`, service account dedicado con `roles/cloudkms.signerVerifier` sobre la llave y
   `roles/cloudsql.client`; acceso a Secret Manager por `*_SECRET_REF`.
 
@@ -102,13 +105,13 @@ Reglas obligatorias:
 
 - `TASK-1829` (superficie OAuth) y `TASK-1830` (autenticación de personas): no pueden desplegar sin este runtime.
 - `TASK-1833`: la rotación de llave y las señales nacen aquí y se auditan allá.
-- Presupuesto GCP: un Cloud Run service más (mínimo 1 instancia en producción), un LB global (~USD 18/mes),
-  KMS HSM (~USD 5/mes).
+- Presupuesto GCP: un Cloud Run service más (mínimo 1 instancia sólo en producción, ≈ USD 8/mes), KMS HSM
+  (≈ USD 5/mes), Secret Manager/Scheduler/Artifact Registry (≈ USD 1/mes). Sin LB ni Armor nuevos: ≈ USD 15/mes.
 
 ### Files owned
 
 - `services/auth-server/**` (nuevo: `server.ts`, `Dockerfile`, `deploy.sh`, `README.md`)
-- `infra/auth-server/terraform/**` (nuevo) `[verificar ubicación canónica de Terraform en Greenhouse; si no existe, proponer en el plan]`
+- `../efeonce-mcp/infra/terraform/front_door.tf` + `variables.tf` (host rule, backend service, NEG `us-east4`, certificado; coordinar con la sesión dueña de `TASK-1626`/`TASK-1813` antes de editar)
 - `src/lib/auth-server/keys/**` (nuevo: cliente KMS, JWKS, rotación)
 - `migrations/<timestamp>_task-1828-greenhouse-auth-schema.sql` (nuevo)
 - `.github/workflows/deploy-auth-server.yml` (nuevo, ordering pnpm → node canónico)
@@ -130,7 +133,7 @@ Reglas obligatorias:
 
 - No existe ningún runtime de auth fuera de Vercel; el broker depende de `getOptionalServerSession()`.
 - No existe llave asimétrica ni KMS en el proyecto; no hay JWKS publicado por Efeonce.
-- No existe schema `greenhouse_auth` ni Terraform de Greenhouse para un LB propio `[verificar]`.
+- No existe schema `greenhouse_auth`; el front door del gateway sólo conoce el host `mcp.efeonce.org`.
 
 ## Modular Placement Contract
 
@@ -213,7 +216,7 @@ Reglas obligatorias:
 ### Slice 0 — Excepción EPIC-027 y recursos base
 
 - Delta en `GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md` con costo, routing/auth, rollback y ownership.
-- Llave KMS `auth-server-es256` (HSM, EC_SIGN_P256_SHA256), SA dedicado, IP global reservada, DNS.
+- Llave KMS `auth-server-es256` (HSM, EC_SIGN_P256_SHA256), SA dedicado, DNS a la IP existente.
 
 ### Slice 1 — Servicio y llaves
 
@@ -221,9 +224,9 @@ Reglas obligatorias:
 - `src/lib/auth-server/keys/`: cliente KMS, cache de públicas, `signAccessToken` (ES256, `kid`), `rotateSigningKey`.
 - Migración `greenhouse_auth` + `signing_keys` con bloque DO anti pre-up-marker.
 
-### Slice 2 — Front door y deploy
+### Slice 2 — Host en el front door del gateway y deploy
 
-- Terraform LB + NEG + certificado + Cloud Armor; `deploy.sh`; workflow; allowlist de release.
+- Terraform en `efeonce-mcp`: host rule, backend service, NEG `us-east4`, certificado managed adicional, policy Armor adjunta; `deploy.sh`; workflow; allowlist de release.
 - Sentry, señales de reliability, runbook de deploy/rollback/rotación.
 
 ## Out of Scope
@@ -260,7 +263,8 @@ Reglas obligatorias:
 | Deployable creado sin excepción EPIC-027 aprobada | release / arquitectura | medium | Slice 0 bloqueante; el plan no avanza sin el delta registrado | revisión humana del plan |
 | Llave privada expuesta por mal uso de KMS (export) | identity / KMS | low | HSM no exportable; SA sólo `signerVerifier`; sin `cryptoKeyVersions.destroy` para runtime | audit log de KMS |
 | Env var out-of-band borrada por `--set-env-vars` | Cloud Run | medium | toda var declarada en `deploy.sh`; ledger de flags | `readyz` falla tras deploy |
-| LB apunta al servicio antes de estar listo | front door | low | `enable_front_door=false` hasta el canary negativo, como en `efeonce-mcp` | 5xx en el LB |
+| Cambio del URL map afecta a `mcp.efeonce.org` | front door compartido | medium | `terraform plan` revisado; host rule aditiva; canary del gateway antes y después del apply | canary interno rojo |
+| Backend nuevo recibe tráfico antes de estar listo | front door | low | backend creado con el servicio en `readyz` 503 hasta el smoke | 5xx en el host `auth` |
 | Cloud SQL saturado por pool extra | Postgres | low | max=15 por runtime; `min-instances=1` | `pg:doctor` conexiones |
 
 ### Feature flags / cutover
@@ -272,22 +276,22 @@ Reglas obligatorias:
 
 | Slice | Rollback | Tiempo | Reversible? |
 |---|---|---|---|
-| Slice 0 | deshabilitar versión KMS, liberar IP, borrar registro DNS | 10 min | sí |
+| Slice 0 | deshabilitar versión KMS, borrar registro DNS | 10 min | sí |
 | Slice 1 | revisión anterior de Cloud Run; el schema vacío se queda | < 5 min | sí |
-| Slice 2 | `enable_front_door=false` en Terraform + apply; revert del workflow | < 10 min | sí |
+| Slice 2 | revert del Terraform (quitar host rule + backend) y apply; el gateway no cambia | < 10 min | sí |
 
 ### Production verification sequence
 
 1. Staging: deploy con flag `false`; `/healthz` 200, `/readyz` 503.
 2. Staging: flag `true`; `/readyz` 200; JWKS publica `kid`; token de prueba verifica con `jose`.
 3. Rotación en staging: dos `kid` en JWKS, token viejo y nuevo verifican; `retired` desaparece.
-4. Producción: repetir 1–3 con cooldown de 24 h; `auth.efeonce.org` con certificado managed `ACTIVE`.
+4. Producción: repetir 1–3 con cooldown de 24 h; `auth.efeonce.org` con certificado managed `ACTIVE`; canary del gateway `mcp.efeonce.org` verde después del apply.
 5. Señales steady 7 días.
 
 ### Out-of-band coordination required
 
 - Operador: registro DNS en HostGator; aprobación de la excepción EPIC-027; presupuesto GCP.
-- `gcloud`: key ring, llave HSM, SA, IP global, certificado; Sentry DSN nuevo.
+- `gcloud`/Terraform en `efeonce-mcp`: key ring, llave HSM, SA, host rule, backend, certificado; Sentry DSN nuevo. Coordinar la edición del front door con la sesión dueña del gateway.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -302,6 +306,7 @@ Reglas obligatorias:
 - [ ] La llave está en KMS con protección `HSM` y el SA del servicio no tiene permisos de export/destroy.
 - [ ] Schema `greenhouse_auth` existe con owner `greenhouse_ops` y GRANTs runtime; `signing_keys` con CHECK de estado.
 - [ ] `deploy.sh` declara todas las env vars; el workflow está en `RELEASE_DEPLOY_WORKFLOWS`.
+- [ ] No existe un segundo forwarding rule ni una segunda policy Cloud Armor; `auth.efeonce.org` resuelve a la IP del gateway y `mcp.efeonce.org` sigue verde tras el apply.
 - [ ] Señales `auth.issuer.jwks_unreachable` y `auth.kms.sign_failures` registradas y en steady 0.
 - [ ] Flag `AUTH_SERVER_ENABLED` con fila en el ledger y estado por runtime.
 

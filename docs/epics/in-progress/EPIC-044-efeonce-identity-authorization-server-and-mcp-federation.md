@@ -45,8 +45,9 @@ KMS, los canaries de cliente, el aseguramiento y la convergencia del login del p
 
 ## Outcome
 
-- `auth.efeonce.org` opera como authorization server propio, aislado del portal y del gateway, con llave de
-  firma en Cloud KMS HSM, metadata conforme y CIMD como registro primario.
+- `auth.efeonce.org` opera como authorization server propio, aislado del portal y del gateway en runtime, IAM,
+  cookies, secretos y audiencia (comparte sólo el front door del gateway), con llave de firma en Cloud KMS HSM,
+  metadata conforme y CIMD como registro primario.
 - Personas de organizaciones cliente existentes se autentican sin contraseñas y consienten por cliente y por
   scope; el operador las invita, liga y revoca por commands canónicos auditados sobre Account 360.
 - `mcp.efeonce.org` valida dos issuers con `AuthContext` separado, tools calificadas por issuer y clase de
@@ -76,7 +77,7 @@ KMS, los canaries de cliente, el aseguramiento y la convergencia del login del p
 | Unidad | Task | Entregable y límite de ownership | Depende de |
 |---|---|---|---|
 | **U00** | [TASK-1626](../../tasks/in-progress/TASK-1626-efeonce-mcp-platform-gateway.md) | Gateway neutral en `mcp.efeonce.org` y federación Globe (en curso). Conserva transporte, discovery, providers. No emite tokens. | — |
-| **U01** | [TASK-1828](../../tasks/to-do/TASK-1828-efeonce-auth-server-runtime-deployable.md) | Runtime `auth.efeonce.org`: `services/auth-server/`, Cloud Run + front door + Cloud Armor, llave KMS HSM + JWKS, schema `greenhouse_auth`, session store y cookie propios, excepción EPIC-027. Sin flujos OAuth visibles todavía. | — |
+| **U01** | [TASK-1828](../../tasks/to-do/TASK-1828-efeonce-auth-server-runtime-deployable.md) | Runtime `auth.efeonce.org`: `services/auth-server/` en Cloud Run publicado como segundo host del front door del gateway (mismo LB, IP y Cloud Armor; decisión 2026-09-03, ≈ USD 15/mes adicionales), llave KMS HSM + JWKS, schema `greenhouse_auth`, session store y cookie propios, excepción EPIC-027. Sin flujos OAuth visibles todavía. | — |
 | **U02** | [TASK-1829](../../tasks/to-do/TASK-1829-efeonce-auth-server-oauth-protocol-surface.md) | Superficie OAuth/OIDC: metadata RFC 8414, CIMD, DCR compat, PKCE, access token ES256, refresh rotativo, revocación, introspección, consentimiento persistido. Extrae el broker sister-platform. | U01 |
 | **U03** | [TASK-1830](../../tasks/to-do/TASK-1830-efeonce-auth-external-person-authentication.md) | Autenticación de personas externas sin contraseña: passkeys, magic link, TOTP step-up, recuperación por re-invitación, anti-abuso. Sólo primitives y rutas; la UI es de U06. | U01 |
 | **U04** | [TASK-1631](../../tasks/in-progress/TASK-1631-efeonce-customer-identity-mcp-federation.md) | Re-alcance: binding Account 360, environments registry, invitaciones, grants, `grants_version`, eligibility reader, señales. Deja de poseer runtime y gateway. | U02 en contrato; ejecutable en paralelo |
