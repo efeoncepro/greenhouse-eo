@@ -53,7 +53,7 @@ pnpm workforce:offboarding:recovery --apply --member <memberId> \
   --reason "…" \
   [--approve]
 
-# Aplicar — Lane B: un caso de solo-acceso que en verdad era un término real
+# Aplicar — Lane B: cerrar una señal de acceso como solo acceso, sin término de relación
 pnpm workforce:offboarding:recovery --apply --member <memberId> \
   --decision access_only \
   --access-revoked-on YYYY-MM-DD \
@@ -82,6 +82,50 @@ previsualización, nunca escribir.
   `has_executed_real_exit=true`) no se cierra como término real — se revisa `access_only` con
   `--access-revoked-on <fecha de la señal>` y queda cerrado como informational, sin tocar relación,
   compensación ni `member`.
+
+## Casos manuales en borrador o ya aprobados
+
+El CLI no ejecuta todos los casos que lista: `manual_decision_pending` y `in_lifecycle` terminan en
+«nada que aplicar». No repetir `--apply` ni reclasificar el caso como señal SCIM para hacerlo entrar.
+El cierre normal usa los commands de `src/lib/workforce/offboarding`, también consumidos por la API.
+
+Procedimiento aplicado a Maggie y María Fernanda el 03/09/2026:
+
+1. Identificar cada caso por `public_id`, resolver su ID interno y member, y leerlo con
+   `getOffboardingCase`. La fila de la cola y el inspector pueden mostrar personas distintas: una
+   captura con un conteo no identifica al colaborador. Confirmar el período por su registro, no
+   por el mes del deadline: el vencimiento 07/09 correspondía a la nómina `2026-08`.
+2. Obtener la decisión humana. «Fueron despedidas» respaldó `relationship_ended` + `termination`;
+   «ya se les pagó todo» se registró en el motivo. Se conservaron `effectiveDate` y `lastWorkingDay`
+   de cada caso existente. Si faltan o se contradicen, pedir el dato; nunca asumir hoy.
+3. Previsualizar con `previewOffboardingCaseReview({current, input, actorUserId, canApprove})`.
+   `input` incluye decisión, causal, ambas fechas, motivo, `expectedUpdatedAt` y `approveNow`.
+   `canApprove` corresponde a la autoridad verificada del actor; no se concede por usar un script.
+   Antes del write, ejecutar `assertNoFutureCompensationVersions` y `findReentryAfterExit` dentro
+   de una transacción de lectura. Un reingreso actual requiere evaluar el episodio, no desactivarlo.
+4. Con autorización del operador y versión vigente, invocar `reviewOffboardingCase` sobre el mismo
+   caso. La aprobación simultánea exige `approveNow=true` y autoridad de aprobación. Luego llamar
+   `transitionOffboardingCase` a `scheduled` y a `executed`, pasando en cada paso el `updatedAt`
+   recién devuelto. Cada command es transaccional; la secuencia completa no es una sola transacción.
+   Si se interrumpe, releer y continuar desde el estado persistido; no repetir la revisión a ciegas.
+5. El executor aplica las guardas canónicas y el flag de lifecycle. En la operación documentada se
+   habilitó el flag sólo en el proceso autorizado, siguiendo el runbook; eso no demuestra ni cambia
+   el valor de Vercel. No sustituir `assertPayrollExecutionReadiness` por reglas del agente:
+   `international_internal` no requiere el agregado de finiquito chileno; `indefinido` y `plazo_fijo`
+   conservan sus gates de cálculo/documento. No generar un finiquito chileno para destrabar este caso.
+6. Releer member, relaciones, compensaciones y resolver de elegibilidad para el mes de salida y
+   los siguientes. Consultar `getOffboardingWorkQueue`: exigir `closureState=complete`, sin capas
+   desconocidas ni pasos pendientes. Leer señales de salida y `getPayrollPeriodReadiness` del
+   período realmente materializado. `ready=true` no significa que se haya calculado o aprobado.
+7. Comparar las obligaciones de Finance antes/después. El cierre no concilia pagos: si siguen
+   `generated`, documentar esa diferencia y remitir a Finance con los IDs existentes. No emitir
+   nuevos pagos ni cambiar obligaciones por SQL a partir de la declaración del operador.
+
+La operación fue una invocación puntual de commands existentes, no una ampliación del CLI ni una
+nueva función de la UI. No promover los scripts `.tmp` con IDs personales a herramienta reutilizable.
+La evidencia durable y los IDs auditados están en
+[la auditoría de cierre](../../audits/payroll/MAGGIE_MARIA_FERNANDA_OFFBOARDING_CLOSURE_2026-09-03.md).
+Sus casos ya son terminales: no volver a ejecutar el apply. Los snapshots no sustituyen una lectura actual.
 
 ## Readback (impreso después de cada dry-run y cada apply)
 
@@ -125,9 +169,10 @@ command compensatorio auditado que reactive una relación legal cerrada o revier
 gobernada hacia adelante (p. ej. una reincorporación real vía el flujo de alta), nunca un
 `UPDATE` directo en PostgreSQL para "deshacer" el estado.
 
-## Estado de la cohorte (2026-09-03, hechos de solo lectura)
+## Snapshot histórico de la cohorte antes de aplicar (2026-09-03)
 
-Snapshot tomado el día del release, antes de cualquier `--apply`:
+Snapshot tomado el día del release, antes de cualquier `--apply`; no representa pendientes actuales.
+El cierre posterior de Maggie/María Fernanda está documentado arriba. Releer la cohorte antes de actuar:
 
 | Colaborador | Situación | Detalle |
 | --- | --- | --- |

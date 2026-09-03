@@ -230,6 +230,29 @@ When the audit touches a departing/departed member — payroll eligibility for a
 - NEVER treat an `unknown` closure-completeness layer as complete.
 - ALWAYS run the focal suites (`pnpm vitest run src/lib/payroll src/lib/workforce/offboarding`) + the real-PG smoke when touching this domain.
 
+## Manual draft / approved offboarding closure
+
+- Identify the live case/member before naming an unresolved exit. Screenshot queue and inspector may show
+  different people; the unresolved signal counts undecided cases, not every unfinished closure.
+- `workforce:offboarding:recovery` does not apply `manual_decision_pending` or `in_lifecycle` rows. Use the
+  normal canonical commands: `getOffboardingCase` → `previewOffboardingCaseReview` → authorized
+  `reviewOffboardingCase` (`approveNow` only with approval authority) → `scheduled` → `executed`.
+  Carry each returned `updatedAt`; commands are individually transactional, not one atomic batch.
+- A human-confirmed dismissal supports `termination`. Preserve explicit dates already recorded when
+  consistent with the instruction; missing/conflicting dates require clarification. Preflight future
+  compensation and reentry through the canonical helpers. Never turn a manual case into SCIM to force the CLI.
+- Keep Chile settlement gates in the executor: `international_internal` has no Chile final-settlement
+  aggregate. Never create one solely to unblock this lane.
+- Resolve the actual payroll period before readiness: a September deadline may govern August. Verify the
+  canonical queue's complete layers, member/legal/compensation readback, historical and future eligibility,
+  drift signals and readiness; ready is not calculated/approved. No live tests that create synthetic people
+  are necessary for a documentation-only follow-up to an already verified operation.
+- Paid-in-full operator confirmation belongs in the audit reason; it is not bank reconciliation. Compare
+  Finance obligations before/after, preserve them, and report any remaining `generated` records separately.
+- Procedure: `docs/operations/runbooks/offboarding-recovery.md` §Casos manuales en borrador o ya aprobados.
+  Dated evidence: `docs/audits/payroll/MAGGIE_MARIA_FERNANDA_OFFBOARDING_CLOSURE_2026-09-03.md`.
+  Never replay its terminal cases or copy its person IDs into a reusable tool.
+
 ## Reentry recovery: availability is not a contract
 
 - Use the shared `src/lib/workforce/offboarding/reentry-predicates.ts`: active employee/contractor/executive relationship or active/paused/ending engagement, strictly after historical LWD, already started, inclusive end not expired. Engagement lookup accepts profile **or** member. Future/draft/non-workforce records do not qualify. Executor and drift detector share this predicate; `pnpm workforce:offboarding:recovery` discovery calls `findReentryAfterExit` and reports `reentry_preserved`.

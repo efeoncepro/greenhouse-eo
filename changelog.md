@@ -23,6 +23,11 @@ Las actualizaciones de member confirman identidad y auditoría de forma transacc
 
 ## 2026-09-03 — TASK-1349 en producción (release `62356c9b7fd4`) — revisión contractual de offboarding, elegibilidad por episodio y writeback de lifecycle
 
+Cierre operativo posterior: Maggie y María Fernanda revisadas como despido y ejecutadas con fechas 29/06 y
+29/07; reader 4/4, unresolved=0 y nómina agosto lista. Runbook, manual, documentación funcional y skills
+Payroll/Talent Codex/Claude distinguen casos manuales del recovery SCIM y cierre de conciliación Finance.
+[Evidencia y método](docs/audits/payroll/MAGGIE_MARIA_FERNANDA_OFFBOARDING_CLOSURE_2026-09-03.md).
+
 Cierra el circuito SCIM → decisión → nómina → lifecycle que la auditoría del 03/09 encontró incompleto (ISSUE-117,
 near miss del 06/07). Nómina: el resolver de elegibilidad elige el caso gobernante por relevancia temporal, sirve
 `contract_type_snapshot` (el threshold `international_internal` era inalcanzable), detecta reingresos y deja de tratar

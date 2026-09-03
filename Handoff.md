@@ -2,8 +2,8 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
-Maggie/María Fernanda: cierre 4/4 aplicado, unresolved=0; nómina agosto ready. Finance histórico requiere
-conciliación. [Evidencia 03/09](docs/audits/payroll/MAGGIE_MARIA_FERNANDA_OFFBOARDING_CLOSURE_2026-09-03.md).
+Maggie/María Fernanda: cierre 4/4, unresolved=0; agosto ready. Método documentado en runbook/manual y
+skills Payroll/Talent Codex/Claude; Finance histórico pendiente de conciliación. [Evidencia 03/09](docs/audits/payroll/MAGGIE_MARIA_FERNANDA_OFFBOARDING_CLOSURE_2026-09-03.md).
 
 Valentina (03/09): misma persona/usuario/member, correo nuevo y elegibilidad SSO verificados; login
 interactivo no probado. Último día anterior 30/05/2026, EO-CENG-0001 ending; EO-CENG-0002 activo desde

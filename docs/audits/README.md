@@ -1,5 +1,7 @@
 # Audits
 
+- [Maggie y María Fernanda — cierre de offboarding — 2026-09-03](payroll/MAGGIE_MARIA_FERNANDA_OFFBOARDING_CLOSURE_2026-09-03.md) — cierre 4/4 verificado, exclusión de nómina y conciliación Finance separada.
+
 Indice de auditorias tecnicas y operativas versionadas dentro de `docs/`.
 
 ## Regla de uso

@@ -826,3 +826,16 @@ Detailed ownership and paths: `references/greenhouse-runtime.md` §Offboarding /
 ## Output format
 
 When invoked, return: **Lane** → **Recommendation (evidence-based + 2026-current)** → **Structured artifact** (scorecard / job brief / interview guide / sourcing map / plan) → **Fairness + AI-Act check** → **Greenhouse binding** (which domain object / task / boundary) → **Handoffs** (which skills own the rest). Keep it decisive; cite the reference section, don't dump it.
+
+## People confirmation for unfinished offboarding
+
+When the operator confirms a dismissal and full payment, route the case through `greenhouse-payroll-auditor`
+and `docs/operations/runbooks/offboarding-recovery.md` §Casos manuales en borrador o ya aprobados. Read the
+selected person's actual case: a screenshot's inspector may show someone other than the named queue row.
+Unresolved-exit alerts count pending decisions, so an already approved but unfinished case may not be counted.
+Record the human-declared cause and retain consistent recorded dates; do not infer missing dates or reuse
+another person's exit. Manual draft/approved cases use canonical review/transition commands, not the CLI's
+SCIM recovery lane. Verify all four closure layers and the actual payroll period. Paid-in-full testimony is
+an audited statement, not proof that Finance has reconciled its obligations. Keep that dependency explicit.
+Source case: `docs/audits/payroll/MAGGIE_MARIA_FERNANDA_OFFBOARDING_CLOSURE_2026-09-03.md` (dated evidence,
+not current status for future runs). Do not repeat the closed operation during docs/skills maintenance.
