@@ -46,6 +46,8 @@ aprobada: 4 banners N52 fuera del paquete, 4 banners y 2 sociales N59 creados. D
 Corrección de numeración verificada: [mapa por ID y readback 179/179](docs/audits/seo/BEREL_EDITORIAL_NUMBERING_2026-09-03.md).
 Skill Berel módulo 16: bloques mensuales completos, reserva de slots, cambios coordinados y aliases
 de archivos; no numerar por orden de trabajo. Se preserva el corte histórico descrito arriba.
+Complemento de `1fcc2ade3`: metodología de research SEO/AEO y DataForSEO versionada con su referencia
+canónica de minería, gate de espejos y documentación de priorización/brief/operación; sin cambios runtime.
 
 ## 2026-09-03 — TASK-1805 en producción: foundation ETV versionada desplegada, selección legacy explícita
 

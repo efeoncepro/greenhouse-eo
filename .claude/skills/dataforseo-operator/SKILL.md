@@ -170,6 +170,7 @@ Regla de composición: esta skill **nunca decide la estrategia SEO/AEO** (eso es
 | `../../../.claude/skills/dataforseo-operator/references/06-resto-catalogo.md` | Business Data, Merchant, App Data, Content Analysis + evaluación de candidatas |
 | `../../../.claude/skills/dataforseo-operator/references/07-contrato-greenhouse.md` | Contrato interno: firmas del cliente, allowlist, breaker, spend, invariantes, tasks, shadow ETV legacy/improved (§5f) |
 | `../../../.claude/skills/dataforseo-operator/references/08-ai-optimization.md` | Deep-dive AI Optimization API (LLM Mentions/Responses/Scraper/AI Keyword Data) |
+| `../../../.claude/skills/dataforseo-operator/references/09-editorial-mining.md` | Minería por categorías prioritarias, presupuesto agregado, cobertura propia y preguntas observadas vs propuestas |
 
 ## Estado del runtime y drift conocido (as-of 2026-08-28)
 

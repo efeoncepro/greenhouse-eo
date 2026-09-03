@@ -146,6 +146,7 @@ const mirroredSkills = [
       'references/06-resto-catalogo.md',
       'references/07-contrato-greenhouse.md',
       'references/08-ai-optimization.md',
+      'references/09-editorial-mining.md',
     ],
     codex: '.codex/skills/dataforseo-operator',
     claude: '.claude/skills/dataforseo-operator',

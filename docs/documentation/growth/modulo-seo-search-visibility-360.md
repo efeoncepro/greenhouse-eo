@@ -8,6 +8,12 @@
 
 ## Que es
 
+**Uso editorial:** discovery entrega candidatos, no artículos aprobados ni cobertura completa. La
+priorización por negocio y el cruce con contenido propio viven en el
+[modelo editorial §2.3](../../operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md);
+Berel tiene [overlay de cobertura](../../operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md).
+Son criterios de operación, no nuevas categorías o automatizaciones del producto.
+
 El modulo SEO es la mitad "buscadores clasicos" de **Search Visibility 360**: mide cómo le va a una marca en Google y otros buscadores a lo largo del tiempo — en qué posición aparece por cada keyword que importa, qué tan sano está su sitio a nivel técnico, y cómo evoluciona su perfil de enlaces. La otra mitad de Search Visibility 360 es el [AI Visibility Grader](ai-visibility-grader.md) (AEO), que mide lo mismo pero en los motores de respuesta de IA (ChatGPT, Claude, Perplexity, Gemini).
 
 La idea central es que la visibilidad no es una foto: es una **serie de tiempo**. El valor del módulo no está en saber "hoy estás en la posición 7", sino en poder mostrar "hace tres meses estabas en la 15, hoy estás en la 7, y este competidor te está alcanzando". Por eso todo el modelo de datos está construido como mediciones append-only: cada captura se guarda y **nunca** se edita ni se borra.
