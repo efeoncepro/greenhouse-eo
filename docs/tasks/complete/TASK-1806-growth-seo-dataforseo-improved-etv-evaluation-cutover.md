@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `COMPLETE 2026-09-03: Improved ETV en producción (release bda12be7e33a-4bb99ca1-8077-451a-9611-5929f933a990, run 33758619690, manifest released 13:14Z, watchdog ok). Shadow exact_ab (USD 1,095) → improved 6× mejor calibrado contra GSC en Berel, Jaccard 1,0, historia continua; operador aprobó go_rebaseline y cutover. Worker rev 00636-h6w y Vercel Production+staging en improved (readback /health + lanes prod 13:15:26Z). Rebaseline acotado (backfill USD 0,2568). Señal de drift en warning sólo por filas contractuales pre-release (≤ 2026-09-05)`
+- Status real: `COMPLETE 2026-09-03: Improved ETV en producción (release bda12be7e33a-4bb99ca1-8077-451a-9611-5929f933a990, run 33758619690, manifest released 13:14Z, watchdog ok). Shadow exact_ab (USD 1,095) → improved 6× mejor calibrado contra GSC en Berel, Jaccard 1,0, historia continua; operador aprobó go_rebaseline y cutover. Worker rev 00636-h6w y Vercel Production+staging en improved (readback /health + lanes prod 13:15:26Z). Rebaseline acotado (backfill USD 0,2568). Señal de drift en warning sólo por filas contractuales pre-release (≤ 2026-09-05). Post-cierre 2026-09-03 (autorizado por el operador, no un AC original): se desplegó además una alerta Teams determinista (cron ops-seo-etv-drift-watch, sólo si severity=error, verificado en vivo en ops-worker-00637-2ww) y una rutina programada de recordatorio para 2026-09-17`
 - Rank: `2`
 - Domain: `growth|seo|data|integration|ops`
 - External deadline: `2026-11-01T00:00:00Z; no existe fallback legacy posterior`
@@ -578,3 +578,4 @@ primitive, reader, API o documentación humana solamente.
 
 - Crear task `ui-ux` sólo si breakpoint/metodología requieren una superficie visible más allá de metadata/copy.
 - Reevaluar una metodología futura únicamente ante versión o cambio oficial nuevo; no ampliar enums preventivamente.
+- 2026-09-17: verificar manualmente (rutina programada `trig_015zxhP1D4yXfTacUm5HqmQU`) que `ops-seo-domain-overview`/`ops-seo-url-visibility` capturaron improved sin intervención humana y que la alerta Teams `growth-seo-reliability-alerts` no disparó salvo que `seo.etv_methodology.drift` esté en `severity=error`.

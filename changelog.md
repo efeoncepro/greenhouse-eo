@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-03 — TASK-1806 seguimiento: alerta Teams determinista para drift de metodología ETV
+
+Nuevo cron `ops-seo-etv-drift-watch` (Cloud Scheduler, diario 12:00 America/Santiago, sin flag) en el
+ops-worker: lee la señal existente `seo.etv_methodology.drift` y avisa a Microsoft Teams sólo si
+`severity=error`, vía el dispatcher determinista `sendManualTeamsAnnouncement` y un destino nuevo
+`growth-seo-reliability-alerts` (mismo canal "EO - Admin" que `production-release-alerts`). Antes,
+la única forma de enterarse era abrir `/admin/operations`. Verificado en vivo (rev `ops-worker-00637-2ww`):
+respondió `warning`/`alerted:false`, correcto para el estado actual de la señal.
+
 ## 2026-09-03 — TASK-1806: Improved ETV de DataForSEO en producción (rebaseline versionado)
 
 Release `bda12be7e33a` (PR #218, orquestador `33758619690`, manifest `released` 13:14Z, watchdog `ok`). El módulo
@@ -1108,37 +1117,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
   nulos aparecen sólo en `keyword_overview`, que nunca lo llevó. Quitarlo sigue siendo correcto
   (elimina una asimetría no declarada), pero el beneficio prometido no tiene evidencia. `TASK-1700`
   (P0) queda desbloqueada y con su prerequisito de runtime cumplido.
-
-## 2026-08-28 — TASK-1692: el candidato de discovery recuerda qué se decidió sobre él
-
-- **El hecho lo escribe el primitive que lo produce, jamás el consumer.** De los cinco
-  `action_kind` que el dominio declaraba, sólo `dismissed` tenía writer: preparar consultas AEO o
-  promover a seguimiento pasaban de verdad y no dejaban rastro. Ahora `createGroundedQueryDraft`
-  escribe `selected_for_grounded_query` y `applyKeywordTracking` escribe `promoted_to_tracking`
-  **en la misma transacción que abre la membresía**. Si el writer viviera en cada consumer,
-  bastaría con que se cayera la red entre las dos llamadas para dejar el compromiso de gasto hecho
-  y la decisión sin autor.
-- **Guard en runtime, no sólo en test:** los dos lanes validan contra
-  `SEO_DISCOVERY_CONSUMER_ACTION_KINDS`, así que `promoted_to_tracking` deja de ser escribible
-  desde afuera. `record_action` queda para lo que una persona decide sin que ningún command lo
-  produzca — descarte, rechazo y la **re-selección** de un descartado, que ahora existe y no
-  necesitó ni command nuevo ni migración: el ledger es append-only, así que re-seleccionar ES
-  escribir una decisión posterior que supersede al descarte.
-- **`selected_for_target` retirado del enum TS**, con el `CHECK` de la base intacto para que una
-  fila histórica siga siendo legible. No tenía writer y no podía tenerlo: la intención es atributo
-  de la MEMBRESÍA con autor y fecha, así que un candidato que no se sigue no puede tener intención
-  declarada.
-- **Efecto visible sin un solo cambio de UI:** el chip del candidato se mueve solo (deja de decir
-  "Nuevo" tras un draft AEO o una promoción) y el inbox deja de poner arriba lo ya resuelto.
-- **Los grados de atomicidad se declaran, no se disimulan.** Tracking es atómico. El bridge grounded
-  no puede serlo —el draft se escribe en otra conexión— así que expone `decisionLogged: false` +
-  aviso en vez de callarlo o descartar un draft que ya pagó una llamada LLM; repetir la acción
-  repara la fila sin crear un draft nuevo.
-- Sin migración, sin flag, sin capability. **Sin backfill a propósito**: inventar `actor` y
-  `created_at` sería fabricar autoría en un log de decisiones.
-- Verificado contra PG real en transacciones que abortan (11/11 + 12/12), incluido que con un
-  candidato inexistente **no queda membresía**. Tres falsos verdes destapados en el camino: el
-  check del trigger append-only pasaba sobre tabla vacía (es `FOR EACH ROW`), un mock devolvía la
-  fila del target para cualquier consulta, y el parser del guard nuevo devolvía lista vacía.
-- Estado: **`code complete, rollout pendiente`** — falta verificación funcional en staging.
-  Desbloquea `TASK-1700`, que queda `Blocked by: none`.

@@ -9,6 +9,21 @@ al apagar shim, fallback de deploy que lo reactiva y canary directo que no prueb
 de abajo no basta sin esos gates. Próximo paso: plan humano aprobado y coordinación con dueños de archivos;
 no push/deploy ni mutación de Entra autorizados por esta creación. Incidente Git/Berel separado.
 
+## 2026-09-03 — TASK-1806 seguimiento: alerta Teams determinista + rutina de recordatorio del cutover ETV
+
+Después del cierre `complete` de TASK-1806 (ver entrada debajo, release `bda12be7e33a`), el operador preguntó
+quién vigila la señal `seo.etv_methodology.drift` — hoy sólo es pull vía `/admin/operations`, nadie se entera
+si no lo abre. Autorizado en chat ("las 3 formas de vigilar"), se desplegaron dos capas nuevas: (1) cron
+`ops-seo-etv-drift-watch` (Cloud Scheduler, diario 12:00 America/Santiago, sin flag) que llama
+`checkAndAlertSeoEtvMethodologyDrift()` (`src/lib/growth/seo/etv-methodology/drift-alert.ts`), lee la señal
+existente sin tocarla y avisa a Teams sólo si `severity=error` — endpoint `POST /seo/etv-methodology-drift-watch`,
+dispatcher `sendManualTeamsAnnouncement`, destino nuevo `growth-seo-reliability-alerts`
+(`src/config/manual-teams-announcements.ts`), mismo canal físico "EO - Admin" que `production-release-alerts`.
+Commit `79a1c3f74` en `develop`. Verificado en vivo (revisión `ops-worker-00637-2ww`): llamada real respondió
+`{"severity":"warning","alerted":false}` — correcto, hoy es `warning` no `error`. 6/6 tests verdes. (2) Rutina
+`trig_015zxhP1D4yXfTacUm5HqmQU`, dispara una vez el 2026-09-17 13:00 America/Santiago tras la primera captura
+improved desatendida, sin credenciales locales: sólo recuerda verificar manualmente, no ejecuta verificación real.
+
 ## 2026-09-03 — TASK-1806 COMPLETE: Improved ETV en producción (release `bda12be7e33a`), rebaseline versionado
 
 Cuarto release del día: PR #218 squash (`main=bda12be7e33af93906805054146c5e17a8b9c328`, 12:42Z), orquestador
@@ -563,18 +578,3 @@ la capa técnica (§10.6 de la arquitectura); el protocolo pide tres. Ahora exis
 `dataforseo-operator/references/04-onpage.md` dejó de implicar que nadie resuelve lo que OnPage no ve.
 Los cinco documentos declaran el flag OFF y el punto ciego abierto — ninguno promete la capacidad. La
 skill agrega la consecuencia operativa de hoy: al auditar, estas verificaciones se hacen a mano.
-
-## 2026-09-01 (11) — Brand Visibility Grader entra al menú público
-
-El menú primario de WordPress (`Menu 1`, ID 61) suma el ítem custom `251916`, **Brand Visibility
-Grader**, bajo `Recursos` (`242524`) y con destino
-`https://think.efeoncepro.com/brand-visibility`. La escritura se hizo por la API nativa de menús con
-el usuario operativo de WP-CLI, luego de confirmar que el enlace no existía y que los 26 ítems
-anteriores tenían `menu_order` persistido igual al orden visible.
-
-Snapshot recuperable: `_gh_backup_before_brand_visibility_menu_20260901T212219Z`. La verificación
-post-write confirmó 27 ítems, el nuevo en posición 27 y los 26 previos sin cambios. Se purgaron el
-object cache de WordPress y el cache de Kinsta. Playwright anónimo live verificó el submenú y el clic
-en 1440 px y 390 px: destino HTTP 200, título correcto, `scrollWidth === clientWidth` en origen y
-destino, y cero errores de consola. No hubo cambio de código, deploy, Elementor ni contenido del
-Grader.

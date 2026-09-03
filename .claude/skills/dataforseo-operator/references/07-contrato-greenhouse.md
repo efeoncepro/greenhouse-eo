@@ -236,6 +236,12 @@ Vercel prod+staging y en `deploy.sh` + redeploy/deploy; drill ejercitado en stag
 desde `2026-11-01T00:00:00Z` el rollback es safe mode. Un sujeto sin fila improved degrada
 `not_available_for_method` hasta su próxima captura (cron 16/17).
 
+**Alerta push (2026-09-03).** `/admin/operations` es pull; el cron `ops-seo-etv-drift-watch` (ops-worker, diario
+12:00 America/Santiago, sin flag) llama `checkAndAlertSeoEtvMethodologyDrift()`
+(`etv-methodology/drift-alert.ts`) y publica en Teams (destino `growth-seo-reliability-alerts`, canal "EO -
+Admin") sólo si `severity=error`; `warning`/`awaiting_data` no avisan. Verificado en vivo tras el deploy
+(revisión `ops-worker-00637-2ww`): `severity=warning, alerted=false` — no envió nada, como corresponde.
+
 **Corrida y evaluación.** Run `etvshadow-f3fef9b3c2a8` (2026-09-03 ~11:05Z, autorización explícita del operador),
 `exact_ab`, 26/26 requests `20000`, USD 1,09536 real (forecast 1,14384), ledger `labs` cuadra. Contra GSC en
 berel.com (30.898 clics/mes): improved err. rel. 49,4 % vs legacy 321,3 %; Jaccard 1,0 en
