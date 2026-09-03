@@ -112,6 +112,13 @@ export interface OffboardingCase {
   updatedByUserId: string | null
   createdAt: string
   updatedAt: string
+  /**
+   * TASK-1349 — decisión de revisión persistida (`metadata_json.review`).
+   * `null` = nunca revisado. Un caso nacido de una señal de acceso
+   * (`separationType='identity_only'`) no puede aprobarse/programarse/ejecutarse
+   * sin este registro.
+   */
+  review?: OffboardingCaseReviewRecord | null
   // TASK-862 Slice C — pre-requisitos del finiquito de renuncia voluntaria.
   // Ambos opcionales en el type para no romper consumers existentes; los endpoints
   // POST .../resignation-letter y POST .../maintenance-obligation los poblan.
@@ -150,6 +157,73 @@ export interface TransitionOffboardingCaseInput {
   blockedReason?: string | null
   reason?: string | null
   notes?: string | null
+  /**
+   * TASK-1349 — optimistic concurrency. When present, the transition is
+   * rejected (409 `offboarding_case_version_conflict`) if the case's
+   * `updatedAt` no longer matches: a stale screen never overwrites a newer
+   * decision silently.
+   */
+  expectedUpdatedAt?: string | null
+}
+
+/**
+ * TASK-1349 — decisión contractual explícita sobre un caso existente.
+ *
+ * - `access_only`: la señal (SCIM/admin) fue sólo una baja de acceso. La
+ *   relación, la compensación y el member NO cambian. El caso queda como
+ *   `identity_only` informational con la fecha de baja de acceso explícita.
+ * - `relationship_ended`: la relación laboral/contractual terminó. Exige
+ *   causal respaldada (`separationType` explícito, nunca inferido) y fechas
+ *   explícitas; recomputa lane/requisitos con la matriz canónica.
+ */
+export type OffboardingReviewDecision = 'access_only' | 'relationship_ended'
+
+export interface ReviewOffboardingCaseInput {
+  decision: OffboardingReviewDecision
+  /** Motivo humano, >= 10 chars. Se persiste en el audit append-only. */
+  reason: string
+  /** `updatedAt` que vio el operador. Obligatorio: sin él no hay control de versión. */
+  expectedUpdatedAt: string
+  /**
+   * `relationship_ended`: causal respaldada. Nunca `identity_only`.
+   * `access_only`: ignorado (el caso conserva `identity_only`).
+   */
+  separationType?: OffboardingSeparationType | null
+  /**
+   * `relationship_ended`: fecha efectiva del término (obligatoria).
+   * `access_only`: fecha de la baja de acceso (obligatoria; suele ser la de la
+   * señal SCIM, pero nunca se asume — el operador la declara).
+   */
+  effectiveDate?: string | null
+  /** `relationship_ended`: último día trabajado (obligatorio). `access_only`: opcional, default = effectiveDate. */
+  lastWorkingDay?: string | null
+  lastWorkingDayAfterEffectiveReason?: string | null
+  notes?: string | null
+  /**
+   * Aprobar en el mismo acto. Sólo se honra cuando el actor tiene
+   * `hr.offboarding_case:approve`; de lo contrario la revisión deja el caso en
+   * `needs_review` y la aprobación es un paso gobernado aparte.
+   */
+  approveNow?: boolean
+}
+
+/**
+ * Registro persistido de la revisión (en `metadata_json.review` del caso).
+ * Su presencia es lo que autoriza aprobar/programar/ejecutar un caso nacido
+ * de una señal de acceso.
+ */
+export interface OffboardingCaseReviewRecord {
+  decision: OffboardingReviewDecision
+  reviewedAt: string
+  reviewedByUserId: string
+  reason: string
+  previous: {
+    separationType: OffboardingSeparationType
+    ruleLane: OffboardingRuleLane
+    status: OffboardingCaseStatus
+    effectiveDate: string | null
+    lastWorkingDay: string | null
+  }
 }
 
 export interface OffboardingCaseListFilters {

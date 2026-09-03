@@ -1063,6 +1063,23 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-1349 — Revisión contractual de un caso de offboarding existente
+  // (`access_only` | `relationship_ended`). Misma matriz que la operación HR del
+  // caso (HR route_group ∪ EFEONCE_ADMIN): quien puede aprobar una salida puede
+  // declarar su naturaleza. FINANCE_ADMIN queda fuera a propósito: cerrar con
+  // proveedor es una decisión de pago; reclasificar la relación laboral no.
+  if (hasRouteGroup(subject, 'hr') || hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    const source: TenantEntitlementSource = hasRouteGroup(subject, 'hr') ? 'route_group' : 'role'
+
+    addEntitlement(entries, {
+      module: 'workforce',
+      capability: 'workforce.offboarding.review_case',
+      action: 'execute',
+      scope: 'tenant',
+      source
+    })
+  }
+
   // TASK-1019 — Workforce Contracting Studio (cartas oferta + contratos bilingües).
   // Matriz decidida por el operador 2026-06-05 (no existe rol `legal`; el sign-off
   // legal colapsa a EFEONCE_ADMIN, patrón TASK-935). Spec:

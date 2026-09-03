@@ -105,3 +105,52 @@ describe('assertOffboardingTransition', () => {
     expect(isTerminalOffboardingStatus('scheduled')).toBe(false)
   })
 })
+
+describe('TASK-1349 — review guard and access-only fast track', () => {
+  const scimStub: OffboardingCase = {
+    ...baseCase,
+    separationType: 'identity_only',
+    source: 'scim',
+    ruleLane: 'identity_only',
+    greenhouseExecutionMode: 'informational',
+    requiresPayrollClosure: false,
+    status: 'needs_review',
+    effectiveDate: '2026-06-10',
+    lastWorkingDay: '2026-06-10',
+    review: null
+  }
+
+  const reviewed = (decision: 'access_only' | 'relationship_ended'): OffboardingCase => ({
+    ...scimStub,
+    review: {
+      decision,
+      reviewedAt: '2026-09-03T15:00:00.000Z',
+      reviewedByUserId: 'hr-1',
+      reason: 'Revisado con People Ops.',
+      previous: { separationType: 'identity_only', ruleLane: 'identity_only', status: 'needs_review', effectiveDate: null, lastWorkingDay: null }
+    }
+  })
+
+  it('refuses to approve/schedule/execute an unreviewed access-signal case even with dates', () => {
+    expect(() => assertOffboardingTransition(scimStub, { status: 'approved' })).toThrow(/revisión/)
+    expect(() => assertOffboardingTransition({ ...scimStub, status: 'approved' }, { status: 'scheduled' })).toThrow(/revisión/)
+  })
+
+  it('still allows containment (blocked) and cancellation without a review', () => {
+    expect(() => assertOffboardingTransition(scimStub, { status: 'blocked', blockedReason: 'Pendiente de clasificación' })).not.toThrow()
+    expect(() => assertOffboardingTransition(scimStub, { status: 'cancelled' })).not.toThrow()
+  })
+
+  it('allows approval once reviewed', () => {
+    expect(() => assertOffboardingTransition(reviewed('relationship_ended'), { status: 'approved' })).not.toThrow()
+  })
+
+  it('fast-tracks a reviewed access_only case straight to executed (informational close)', () => {
+    expect(() => assertOffboardingTransition(reviewed('access_only'), { status: 'executed' })).not.toThrow()
+    expect(() => assertOffboardingTransition({ ...reviewed('access_only'), status: 'blocked', blockedReason: 'x' }, { status: 'executed' })).not.toThrow()
+  })
+
+  it('does NOT fast-track a relationship_ended review — the labor lifecycle still applies', () => {
+    expect(() => assertOffboardingTransition(reviewed('relationship_ended'), { status: 'executed' })).toThrow(/Invalid offboarding transition/)
+  })
+})

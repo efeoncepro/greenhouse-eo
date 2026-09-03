@@ -54,6 +54,11 @@ export type ApiPlatformErrorCode =
   | 'missing_session'
   | 'missing_token'
   | 'not_found'
+  // TASK-1349 — carril app de revisión de offboarding: dos 409 con acción distinta.
+  //   · la pantalla está desactualizada → recargar y volver a revisar
+  //   · el caso nació de una señal de acceso y nadie lo ha revisado → revisar antes de aprobar
+  | 'offboarding_case_version_conflict'
+  | 'offboarding_case_review_required'
   | 'rate_limited'
   | 'scope_not_allowed'
   | 'session_revoked'

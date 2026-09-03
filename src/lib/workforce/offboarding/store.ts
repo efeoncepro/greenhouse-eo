@@ -11,6 +11,7 @@ import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { normalizeContractType, normalizePayRegime, normalizePayrollVia } from '@/types/hr-contracts'
 
 import { resolveOffboardingLane } from './lane'
+import { assertReviewVersionMatches, deriveOffboardingCaseReview, readOffboardingCaseReview } from './review-policy'
 import { assertOffboardingTransition, isTerminalOffboardingStatus } from './state-machine'
 import type {
   CreateOffboardingCaseInput,
@@ -20,6 +21,7 @@ import type {
   OffboardingRelationshipType,
   OffboardingSource,
   OffboardingSeparationType,
+  ReviewOffboardingCaseInput,
   TransitionOffboardingCaseInput
 } from './types'
 
@@ -127,6 +129,7 @@ const mapCaseRow = (row: OffboardingCaseRow): OffboardingCase => ({
   legacyChecklistRef: toJsonRecord(row.legacy_checklist_ref),
   sourceRef: toJsonRecord(row.source_ref),
   metadata: toJsonRecord(row.metadata_json),
+  review: readOffboardingCaseReview(toJsonRecord(row.metadata_json)),
   createdByUserId: row.created_by_user_id,
   updatedByUserId: row.updated_by_user_id,
   createdAt: toTimestampString(row.created_at) ?? '',
@@ -924,6 +927,12 @@ export const transitionOffboardingCase = async ({
       )
     }
 
+    // TASK-1349 — optional optimistic concurrency for transitions (the review
+    // command makes it mandatory). A stale screen never overwrites silently.
+    if (input.expectedUpdatedAt !== undefined && input.expectedUpdatedAt !== null) {
+      assertReviewVersionMatches(current, input.expectedUpdatedAt)
+    }
+
     assertOffboardingTransition(current, input)
 
     const nextEffectiveDate = input.effectiveDate !== undefined ? input.effectiveDate : current.effectiveDate
@@ -1004,5 +1013,139 @@ export const transitionOffboardingCase = async ({
     })
 
     return updated
+  })
+}
+
+/**
+ * TASK-1349 — Review/correct an EXISTING offboarding case with an explicit,
+ * audited contractual decision. Never cancels/creates another case.
+ *
+ * - `access_only`: the signal was only an access deprovision. Separation type
+ *   stays `identity_only`, lane stays informational, dates record when the
+ *   access was revoked. Relationship, compensation and member are untouched —
+ *   here and at execution (see `transitionOffboardingCase`).
+ * - `relationship_ended`: the relationship really ended. Explicit cause +
+ *   dates, lane/requirements recomputed with the canonical matrix, previous
+ *   approval invalidated (back to `needs_review`) unless `approveNow` is
+ *   honoured (`canApprove`).
+ *
+ * Concurrency: `FOR UPDATE` + mandatory `expectedUpdatedAt` (409 on mismatch).
+ * Audit: append-only case event `offboarding_case.reviewed` with before/after;
+ * outbox `work_relationship_offboarding_case.updated` in the same transaction.
+ */
+export const reviewOffboardingCase = async ({
+  caseId,
+  input,
+  actorUserId,
+  canApprove
+}: {
+  caseId: string
+  input: ReviewOffboardingCaseInput
+  actorUserId: string
+  canApprove: boolean
+}) => {
+  return withTransaction(async client => {
+    const currentRows = await client.query<OffboardingCaseRow>(
+      `
+        SELECT *
+        FROM greenhouse_hr.work_relationship_offboarding_cases
+        WHERE offboarding_case_id = $1
+        FOR UPDATE
+      `,
+      [caseId]
+    )
+
+    if (!currentRows.rows[0]) {
+      throw new HrCoreValidationError('Offboarding case not found.', 404)
+    }
+
+    const current = mapCaseRow(currentRows.rows[0])
+    const derivation = deriveOffboardingCaseReview({ current, input, actorUserId, canApprove })
+    const { next, review } = derivation
+
+    const result = await client.query<OffboardingCaseRow>(
+      `
+        UPDATE greenhouse_hr.work_relationship_offboarding_cases
+        SET
+          separation_type = $2,
+          rule_lane = $3,
+          requires_payroll_closure = $4,
+          requires_leave_reconciliation = $5,
+          requires_hr_documents = $6,
+          requires_access_revocation = $7,
+          requires_asset_recovery = $8,
+          requires_assignment_handoff = $9,
+          requires_approval_reassignment = $10,
+          greenhouse_execution_mode = $11,
+          effective_date = $12::date,
+          last_working_day = $13::date,
+          last_working_day_after_effective_reason = $14,
+          status = $15,
+          blocked_reason = NULL,
+          approved_at = CASE WHEN $15 = 'approved' THEN now() ELSE NULL END,
+          scheduled_at = NULL,
+          notes = COALESCE($16, notes),
+          metadata_json = metadata_json || jsonb_build_object('review', $17::jsonb),
+          updated_by_user_id = $18
+        WHERE offboarding_case_id = $1
+        RETURNING *
+      `,
+      [
+        caseId,
+        next.separationType,
+        next.lane.ruleLane,
+        next.lane.requiresPayrollClosure,
+        next.lane.requiresLeaveReconciliation,
+        next.lane.requiresHrDocuments,
+        next.lane.requiresAccessRevocation,
+        next.lane.requiresAssetRecovery,
+        next.lane.requiresAssignmentHandoff,
+        next.lane.requiresApprovalReassignment,
+        next.lane.greenhouseExecutionMode,
+        next.effectiveDate,
+        next.lastWorkingDay,
+        next.lastWorkingDayAfterEffectiveReason,
+        next.status,
+        next.notes,
+        JSON.stringify(review),
+        actorUserId
+      ]
+    )
+
+    const updated = mapCaseRow(result.rows[0])
+
+    await insertCaseEvent(client, {
+      caseId,
+      eventType: 'offboarding_case.reviewed',
+      fromStatus: current.status,
+      toStatus: updated.status,
+      actorUserId,
+      source: 'manual_hr',
+      reason: review.reason,
+      payload: {
+        decision: review.decision,
+        changes: derivation.changes,
+        approvalInvalidated: derivation.approvalInvalidated,
+        before: review.previous,
+        after: {
+          separationType: updated.separationType,
+          ruleLane: updated.ruleLane,
+          status: updated.status,
+          effectiveDate: updated.effectiveDate,
+          lastWorkingDay: updated.lastWorkingDay
+        }
+      }
+    })
+
+    await publishCaseEvent(
+      client,
+      updated.status === 'approved'
+        ? EVENT_TYPES.workRelationshipOffboardingCaseApproved
+        : EVENT_TYPES.workRelationshipOffboardingCaseUpdated,
+      updated,
+      { previousStatus: current.status, reviewDecision: review.decision, reviewChanges: derivation.changes }
+    )
+
+    return { case: updated, changes: derivation.changes, approvalInvalidated: derivation.approvalInvalidated }
   })
 }
