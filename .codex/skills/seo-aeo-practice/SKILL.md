@@ -294,6 +294,35 @@ REGRESIÓN, no un estado legítimo para el canary.
 
 ---
 
+## 4d. 🔴 Tráfico estimado (ETV) — toda cifra lleva versión de fórmula (delta 2026-09-03)
+
+El tráfico estimado que aparece en propuestas, diagnósticos de prospecto (§4c), QBR y en cualquier lectura de
+`get_seo_domain_overview` / `get_seo_url_visibility` / `get_seo_prospect_diagnostic` sale de DataForSEO Labs y
+**tiene versión de fórmula**: `etvMethodology.version` (`legacy_static_v1` hoy; `improved_layout_clickstream_v2`
+sólo cuando su evaluación y cutover se aprueben por task propia, TASK-1806). El proveedor **retira la fórmula
+legacy el 2026-11-01**: las cifras legacy no continúan después de esa fecha.
+
+Reglas al hablar de tráfico estimado con un prospecto o cliente:
+
+1. 🔴 **SIEMPRE reportar la versión de fórmula junto a la cifra y al as-of.** *"Tráfico estimado 12.400/mes
+   (fórmula `legacy_static_v1`, as-of 2026-09-02)"*. Una cifra sin versión es incomparable con la siguiente.
+2. 🔴 **SIEMPRE avisar del corte del 2026-11-01** en cualquier documento que vaya a seguir vivo después de esa
+   fecha (propuesta, baseline de un retainer, KPI de un QBR): la serie legacy termina ahí y la lectura siguiente
+   sale de otra fórmula.
+3. 🔴 **NUNCA prometer continuidad de serie** (*"te medimos contra este baseline durante el contrato"*) ni
+   **comparar cifras de versiones distintas**: la fórmula cambia el valor Y la membresía del top-N de páginas y
+   keywords. Un cruce de versión es un breakpoint declarado, no una tendencia ni un resultado nuestro.
+4. 🔴 **`truncated=true` en el hecho `estimated_monthly_traffic` del diagnóstico de prospecto = la suma es un
+   PISO**, calculada sobre un límite de filas; no es "el tráfico del dominio". Se dice así.
+5. Improved **no está activado** (legacy explícito en Vercel y ops-worker): no vender que *"ya medimos con la
+   fórmula nueva"* ni que el cambio corrige algo. Las tools no aceptan elegir fórmula; la fija la plataforma.
+
+Canon (no repetir acá): ADR `docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md`
+(§Runtime Contract) · runbook `docs/manual-de-uso/growth/evaluar-transicion-dataforseo-improved-etv.md` · oficio
+`seo-aeo/modules/07_MEASUREMENT.md` · proveedor `dataforseo-operator` (`references/07-contrato-greenhouse.md` §5e).
+
+---
+
 ## 5. Antes de responder cualquier cosa
 
 1. ¿Vas a decir un precio? → **cotizador primero.** `modules/04_PRICING.md`.
@@ -303,3 +332,5 @@ REGRESIÓN, no un estado legítimo para el canary.
 4. ¿Vas a citar un dato de mercado (CTR, zero-click, tráfico de IA)? → **`SOURCES.md`, y si no está: verifícalo.**
    **Es el dominio más volátil que existe.**
 5. ¿Es una decisión de método de venta genérica? → **es de `commercial-expert`**, no de acá.
+6. ¿Vas a citar tráfico estimado? → **versión de fórmula + as-of + aviso del corte 2026-11-01** (§4d). Con
+   `truncated=true`, es un piso.

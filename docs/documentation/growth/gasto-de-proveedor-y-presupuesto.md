@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-08-27 por Claude (TASK-1696)
-> **Ultima actualizacion:** 2026-08-27 por Claude (TASK-1696)
+> **Ultima actualizacion:** 2026-09-03 por Claude (TASK-1805: el evaluador de la fórmula ETV nace apagado, con allowlist, máximo de requests y tope USD; el dry-run no gasta)
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) · [GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_PUBLIC_AI_VISIBILITY_GRADER_ARCHITECTURE_V1.md)
 
 # Gasto de Proveedor y Presupuesto — Growth (SEO + AEO)
@@ -135,6 +135,28 @@ Avisa cuando una organización pasa el **80%** de su presupuesto del mes (amaril
 El control duro ya existía: `enforceSeoRunEntitlement` bloquea antes de gastar. Lo que faltaba era el aviso previo — hasta ahora el sobregiro sólo se manifestaba como corridas que empezaban a fallar, sin advertencia. Cubre los dos consumidores, cada uno contra el tope de su propio tier.
 
 > Nota de higiene: esta señal aparecía citada como mitigación en la tabla de riesgos de nueve tasks (ocho de ellas ya cerradas) y **no existía**. Cada una la daba por construida por otra. Entró acá porque necesita el corte por consumidor para ser correcta: una alarma que sólo viera el gasto `seo` sub-reportaría exactamente el gasto del grader que se acaba de atribuir.
+
+## El evaluador de la fórmula ETV: gasto que hoy es cero (TASK-1805, 2026-09-03)
+
+Para decidir si el módulo pasa a la fórmula nueva de tráfico estimado del proveedor (Improved ETV, corte
+2026-11-01) existe un evaluador que compara las dos fórmulas sobre los mismos sujetos. Nace **apagado** y
+con frenos propios, porque comparar cuesta dinero real:
+
+- **Interruptor:** `GROWTH_SEO_ETV_EVALUATOR_ENABLED` (OFF). Sin él, el evaluador sólo planifica.
+- **Frenos:** una lista de sujetos permitidos (`GROWTH_SEO_ETV_EVALUATOR_SUBJECT_ALLOWLIST`), un máximo
+  de requests (`GROWTH_SEO_ETV_EVALUATOR_MAX_REQUESTS`) y un tope en USD
+  (`GROWTH_SEO_ETV_EVALUATOR_BUDGET_USD`). Vacío y cero son los valores por defecto: sin allowlist, sin
+  requests y sin dólares, nada corre.
+- **El dry-run no gasta.** Reporta qué haría y por qué no lo haría, con `providerCalls: 0`.
+- **Un A/B exacto duplica las llamadas.** Comparar de verdad exige comprar el mismo sujeto dos veces, una
+  por fórmula. El costo de una evaluación exacta es 2× el de una captura normal por cada celda comparada.
+- **La fórmula nueva no tiene recargo.** Pedir Improved ETV cuesta lo mismo que la fórmula anterior. Lo que
+  sí es **otro carril, con precio ×2**, es pedir datos de navegación real (`include_clickstream_data`),
+  que el módulo mantiene apagado.
+
+Hoy el evaluador no ha comprado nada. La decisión de correr una evaluación pagada —con qué sujetos, cuántos
+requests y qué tope— es de `TASK-1806`. Runbook:
+[Evaluar la transición a DataForSEO Improved ETV](../../manual-de-uso/growth/evaluar-transicion-dataforseo-improved-etv.md).
 
 ## Quién puede ver el gasto
 

@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.17
+> **Version:** 1.18
 > **Creado:** 2026-08-05 por Claude (TASK-1299 + TASK-1301)
-> **Ultima actualizacion:** 2026-09-01 por Claude (TASK-1670: el punto ciego de la auditoría —rastreadores de IA, borde/CDN, datos estructurados y mapa del sitio— ya tiene motor, documentado aparte en [hallazgos-de-sitio-audit-seo.md](hallazgos-de-sitio-audit-seo.md); sigue **APAGADO** hasta TASK-1671, así que un sitio invisible para la IA todavía puntúa 95/100 acá; delta previo TASK-1792: el techo de clics de una oportunidad declara de dónde salió, y cuando la curva del sitio no alcanza la lista se ordena por demanda medida en vez de fingir un orden por ganancia; delta previo TASK-1692: el candidato recuerda qué se decidió sobre él — el estado se mueve solo, lo resuelto deja de encabezar la bandeja y un descartado se puede volver a elegir; delta previo TASK-1694: en el descubrimiento, un candidato es una keyword —no una fila por método—, el filtro de dificultad del proveedor deja de decidir y aparece el aviso de canibalización; delta previo 2026-08-28 TASK-1699 + TASK-1662 + TASK-1696 vivos en producción con el release `c983be7f18e6`: el módulo ya guarda quién más aparece en tu SERP, compara contra un competidor declarado y anota quién consumió cada dólar del proveedor; delta previo 2026-08-14 por Claude (TASK-1661 + follow-ups: las columnas de mercado se llenan solas, la captura es mensual y acotada con simulacro de costo previo, "Dificultad" pasa a ser **Barrera de enlaces** en niveles con "Sin dato" como estado propio, todo dato de mercado viaja con su fecha, y cada respuesta declara el país que muestra — incluida la corrección del caso Berel (ISSUE-152/153); delta previo 2026-08-09 TASK-1677 Slice 1: la clave del módulo es `seo_v2` y es la única que el runtime lee))
+> **Ultima actualizacion:** 2026-09-03 por Claude (TASK-1805: cada cifra de tráfico estimado declara la fórmula del proveedor con que se calculó (`etvMethodology`, sección «Metodología detrás del tráfico estimado (ETV)»); hoy todo se sirve en `legacy_static_v1`, una lectura sirve una sola fórmula, y pedir una fórmula que el sujeto no tiene responde `not_available_for_method`, nunca cero; el cambio a improved lo decide TASK-1806; delta previo TASK-1670: el punto ciego de la auditoría —rastreadores de IA, borde/CDN, datos estructurados y mapa del sitio— ya tiene motor, documentado aparte en [hallazgos-de-sitio-audit-seo.md](hallazgos-de-sitio-audit-seo.md); sigue **APAGADO** hasta TASK-1671, así que un sitio invisible para la IA todavía puntúa 95/100 acá; delta previo TASK-1792: el techo de clics de una oportunidad declara de dónde salió, y cuando la curva del sitio no alcanza la lista se ordena por demanda medida en vez de fingir un orden por ganancia; delta previo TASK-1692: el candidato recuerda qué se decidió sobre él — el estado se mueve solo, lo resuelto deja de encabezar la bandeja y un descartado se puede volver a elegir; delta previo TASK-1694: en el descubrimiento, un candidato es una keyword —no una fila por método—, el filtro de dificultad del proveedor deja de decidir y aparece el aviso de canibalización; delta previo 2026-08-28 TASK-1699 + TASK-1662 + TASK-1696 vivos en producción con el release `c983be7f18e6`: el módulo ya guarda quién más aparece en tu SERP, compara contra un competidor declarado y anota quién consumió cada dólar del proveedor; delta previo 2026-08-14 por Claude (TASK-1661 + follow-ups: las columnas de mercado se llenan solas, la captura es mensual y acotada con simulacro de costo previo, "Dificultad" pasa a ser **Barrera de enlaces** en niveles con "Sin dato" como estado propio, todo dato de mercado viaja con su fecha, y cada respuesta declara el país que muestra — incluida la corrección del caso Berel (ISSUE-152/153); delta previo 2026-08-09 TASK-1677 Slice 1: la clave del módulo es `seo_v2` y es la única que el runtime lee))
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 
 # Modulo SEO — Search Visibility 360 (Growth)
@@ -219,9 +219,10 @@ series medidas de Search Console. La **autoridad** de dominio para superficies s
 sola: el `domain_rank` del snapshot de enlaces (esta capa no crea una segunda).
 
 Desde el aviso DataForSEO del 2026-09-01, "◑ estimada" exige además **metodología**: legacy e improved
-no son puntos comparables sólo porque ambos se llamen `etv`. El runtime todavía no versiona fórmula; el
-cutover anunciado para 2026-11-01 requiere ADR, shadow y schema/provenance antes de activarse. Ver la
-[auditoría Improved ETV](../../audits/seo/2026-09-01-dataforseo-improved-etv-impact.md).
+no son puntos comparables sólo porque ambos se llamen `etv`. Desde el 2026-09-03 (TASK-1805) cada foto
+declara la fórmula con la que se compró (`etvMethodology`) y el reader sirve **una sola fórmula por
+lectura**; el detalle está en la sección «Metodología detrás del tráfico estimado (ETV)» de este
+documento. Antecedente: [auditoría Improved ETV](../../audits/seo/2026-09-01-dataforseo-improved-etv-impact.md).
 
 Se consume por el reader canónico (`readDomainOverview`), el lane ecosystem
 (`/api/platform/ecosystem/growth/seo/domain-overview`) y la tool MCP `get_seo_domain_overview`.
@@ -250,9 +251,10 @@ Search Console. Se consume por `readUrlVisibility`/`readVisibilityConcentration`
 (`/growth/seo/url-visibility`) y la tool MCP `get_seo_url_visibility`.
 Operación: [Operar la visibilidad por URL](../../manual-de-uso/growth/operar-visibilidad-por-url-seo.md).
 
-La misma alerta metodológica aplica a esta superficie: el ETV improved puede cambiar valores, sumas y el top-N
-de concentración. Hasta que la fórmula viaje en snapshot/readers/API/MCP, una variación cruzando el cutover no
-se presenta como performance SEO.
+La misma regla metodológica aplica a esta superficie: el ETV improved puede cambiar valores, sumas y el top-N
+de concentración. Desde el 2026-09-03 (TASK-1805) la fórmula viaja en el snapshot, el reader, el lane y la tool
+MCP (`etvMethodology`), y una variación entre fórmulas distintas **no se presenta como performance SEO** — ver
+«Metodología detrás del tráfico estimado (ETV)».
 
 > Detalle técnico: [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md §4.2 y §15](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md).
 
@@ -319,6 +321,49 @@ dólares del motor de IA quedó **en observación, sin bloquear**: mide y avisa,
 — prenderlo es una decisión del operador después de un mes de medición.
 
 > Detalle técnico: [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) (Delta 2026-08-28 + §4.2 + §8).
+
+## Metodología detrás del tráfico estimado (ETV) (TASK-1805)
+
+Casi toda cifra de **tráfico** "◑ estimado" del módulo —el de la foto de dominio, el de cada página o
+subdominio, el "tráfico orgánico mensual estimado" del diagnóstico de prospecto— sale de la misma pieza
+del proveedor: el **ETV** (*estimated traffic value*), una estimación mensual que DataForSEO calcula a
+partir de las posiciones que observa y del volumen de cada búsqueda. No es una medición: es una
+**fórmula**, y una fórmula puede cambiar.
+
+**Por qué importa ahora.** DataForSEO anunció una fórmula nueva ("Improved ETV") con otro reparto de
+clics. A partir del **2026-11-01** el proveedor calcula **todo** con la fórmula nueva y deja de existir
+la anterior; antes de esa fecha conviven las dos y cada llamada elige una. El mismo dominio, el mismo
+día, puede valer distinto con una fórmula y con la otra sin que haya pasado nada en el sitio. Un gráfico
+que junte ambos puntos muestra una caída —o una subida— que no ocurrió.
+
+**Qué ve quien lee el módulo.**
+
+- **Cada cifra viaja con su fórmula.** Junto al tráfico estimado aparece `etvMethodology`: la versión
+  (`legacy_static_v1` hoy; `improved_layout_clickstream_v2` cuando se adopte), de dónde salió esa
+  versión (`explicit_request` si la corrida la pidió de forma explícita; `contract_default_pre_cutoff`
+  si es la que el proveedor aplicaba por defecto antes del corte), qué versiones existen para ese sujeto
+  y si la lectura es comparable consigo misma. Es una procedencia **adicional** a la lente ◑: no es una
+  tercera lente (ver [lente medido vs estimado](lente-medido-vs-estimado.md)).
+- **Una lectura sirve una sola fórmula.** El módulo no mezcla puntos de dos fórmulas en una serie. Si
+  alguien pide un dato en una fórmula que ese sujeto no tiene, la respuesta es el estado
+  `not_available_for_method` —con la fórmula pedida y las que sí existen—, **nunca un cero ni una serie
+  a medias**.
+- **Hoy todo se sirve en `legacy_static_v1`.** Las capturas anteriores al 2026-09-03 quedaron
+  atribuidas a esa fórmula porque era la única que el proveedor aplicaba; las nuevas la piden de forma
+  explícita. Ninguna cifra cambió de valor: cada una ganó su etiqueta.
+
+**Quién decide el cambio.** Pasar a la fórmula nueva **no es un interruptor que alguien prende**: es
+una unidad de trabajo aparte (`TASK-1806`) que primero compara las dos fórmulas sobre los mismos sujetos
+—con presupuesto propio y autorización, porque cada comparación exacta duplica las llamadas— y decide,
+con evidencia, si el histórico se recalcula o se declara un punto de quiebre. Hasta entonces el módulo
+sigue pidiendo la fórmula anterior y avisa en `/admin/operations` (señal `seo.etv_methodology.drift`)
+si lo configurado deja de coincidir con lo que se pidió, o si alguien deja la fórmula anterior
+configurada después del corte.
+
+> 🔴 **Regla:** nunca comparar, restar ni graficar juntas cifras de versiones distintas de ETV. Si las
+> etiquetas no coinciden, la diferencia es de fórmula, no de rendimiento.
+
+> Detalle técnico: ADR [GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md](../../architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md) (§Runtime Contract) · policy, provenance y evaluador en `src/lib/growth/seo/etv-methodology/` · runbook de evaluación [evaluar-transicion-dataforseo-improved-etv.md](../../manual-de-uso/growth/evaluar-transicion-dataforseo-improved-etv.md).
 
 ## Que NO existe todavia
 

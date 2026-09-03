@@ -141,7 +141,17 @@ Reglas obligatorias:
 - Spend ledger, entitlement, circuit breaker y registro de costo de la familia Labs.
 - GSC per-org para benchmark separado de la lente estimada.
 - Auditoría de impacto, ADR aceptado, correo contractual y runbook de evaluación.
-- `TASK-1805` especifica la foundation y el evaluador dry-run necesarios, pero no están implementados.
+- Foundation de `TASK-1805` desplegada en producción (release `5ec4cf769977`, verificada 2026-09-03): policy pura
+  y provenance `etvMethodology` en los siete caminos writer, schema formula-aware (migración expand aplicada;
+  filas previas atribuidas `legacy_static_v1` + `contract_default_pre_cutoff`), readers/API/MCP que filtran por
+  método y devuelven `not_available_for_method`, selectores legacy explícitos en Vercel y en
+  `services/ops-worker/deploy.sh` (`GROWTH_SEO_ETV_METHODOLOGY_VERSION` / `GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION`;
+  `/health` del worker responde `configuredWriteSource: env`), señal `seo.etv_methodology.drift` (en
+  `awaiting_data` hasta la primera captura explícita del worker) y evaluador dry-run OFF por defecto con
+  `scripts/growth/_sanity-task-1805-etv-evaluator.ts` (8/8, `providerCalls: 0`).
+- Contract de schema parqueado, no aplicado: `docs/tasks/pending-migrations/TASK-1805-etv-methodology-contract.sql.pending`
+  (drop de DEFAULT transitorios + drop de UNIQUE legacy + CHECK NOT VALID en `seo_prospect_diagnostic_facts`).
+  Condición de 7 días sin filas nuevas con evidencia contractual corriendo desde 2026-09-03.
 
 ### Gap
 
@@ -150,6 +160,8 @@ Reglas obligatorias:
 - La matriz contractual está confirmada; falta evidencia de nuestros payloads y resultados sobre cohorte aprobada.
 - Improved ETV no está activado ni servido por Vercel, ops-worker, API o MCP.
 - No existe decisión aplicada sobre rebaseline histórico versus breakpoint visible.
+- El contract parqueado sigue sin aplicar (ventana de 7 días desde 2026-09-03); aplicarlo es precondición del
+  Slice 1: mientras no se aplique, los DEFAULT transitorios y las UNIQUE legacy siguen vigentes.
 
 ## Modular Placement Contract
 
@@ -266,6 +278,18 @@ Reglas obligatorias:
 - Verificar `TASK-1805` completa mediante DB/API/MCP y configured/requested/provider-effective en ambos runtimes.
 - Incorporar respuesta DataForSEO y congelar endpoint matrix, cohorte, período, inputs, métricas y umbrales.
 - Generar dry-run con número de requests y costo máximo; obtener aprobación explícita antes de ejecutar.
+- Readback concreto de la foundation antes de cualquier llamada: `GET /health` del ops-worker → bloque
+  `etvMethodology` (`configuredWriteMethod`, `configuredWriteSource`, `configuredReadMethod`, `policyVersion`,
+  `providerCutoffAt`, `afterCutoff`, `valid`); señal `seo.etv_methodology.drift` en `/admin/operations`
+  (`awaiting_data` sin captura explícita es esperable; cualquier `error` bloquea);
+  `npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/_sanity-task-1805-etv-evaluator.ts`
+  (dry-run + replay, `providerCalls: 0`, ledger intacto) y
+  `npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/_sanity-task-1805-etv-schema.ts`
+  (17/17 en transacción con rollback, incluye el contract); ambos con el proxy Cloud SQL arriba.
+- Aplicar el contract parqueado (`docs/tasks/pending-migrations/TASK-1805-etv-methodology-contract.sql.pending`)
+  tras verificar sus tres condiciones: release en `main` (cumplida 2026-09-03), 7 días sin filas nuevas con
+  evidencia `contract_default_pre_cutoff` (cuenta desde 2026-09-03) y selectores explícitos en Vercel y ops-worker
+  (cumplida). Sólo entonces puede empezar el Slice 1.
 
 ### Slice 1 — Shadow bounded
 

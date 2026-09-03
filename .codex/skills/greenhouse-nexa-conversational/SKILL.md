@@ -166,6 +166,14 @@ Vive en `src/components/greenhouse/primitives/nexa-<x>/` + barrel + resolver `ki
 - **NUNCA** leer `null` como `0`. `null` = no se midió; `0` = se midió y era cero. Y `unavailable: { reason }` en una lente es un ESTADO con causa, nunca un cero, y no invalida la otra lente.
 - **PREFERIR `get_seo_dual_lens_visibility`** cuando la pregunta sea "¿dónde rankea este cliente?": devuelve las dos series ya separadas y rotuladas en una llamada. Existe para que componer bien cueste MENOS que componer mal — antes presentarlas bien costaba dos llamadas y una decisión, y mal costaba una y ninguna. **No tiene campo combinado y no es una omisión**: si necesitas un índice único, es una decisión de producto con su propia ADR.
 - Canon: `docs/architecture/agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md` + `src/lib/growth/seo/lens.ts`.
+
+**Tráfico estimado con versión de fórmula (TASK-1805, delta 2026-09-03)**
+- `get_seo_domain_overview`, `get_seo_url_visibility` y `get_seo_prospect_diagnostic` devuelven `etvMethodology { version, policyVersion, evidence, availableMethodologies, comparability, providerCutoffAt }`. **SIEMPRE** citar `etvMethodology.version` junto al as-of de la cifra: *"tráfico estimado 12.400/mes (fórmula `legacy_static_v1`, as-of 2026-09-02)"*. Una cifra de tráfico estimado sin versión es incomparable con la siguiente.
+- `{ ok: false, reason: 'not_available_for_method', requestedMethodology, availableMethodologies }` significa **"hay evidencia, bajo otra fórmula"**: es un estado, no un cero ni "sin datos". Se reporta nombrando las metodologías disponibles; **NUNCA** se lee como ausencia de visibilidad ni invalida la lente medida.
+- **NUNCA** ofrecer elegir fórmula ni intentar pasarla: las tools no tienen argumento de metodología (no existe); la fija la policy server-side y se lee de la respuesta. Si el usuario pide *"la fórmula nueva"*, se responde cuál sirve la plataforma hoy y que el cambio es una decisión gobernada (TASK-1806), no un parámetro.
+- **NUNCA** comparar, promediar ni encadenar cifras con `version` distinto, ni prometer continuidad de una serie más allá de `providerCutoffAt` (2026-11-01: el proveedor retira legacy). La fórmula cambia valor Y membresía del top-N.
+- En el prospecto, `estimated_monthly_traffic.detail.truncated = true` = la suma es un piso (límite de filas), no el tráfico del dominio.
+- Canon: `docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md` §Runtime Contract + manuales MCP `seo-visibility-reading` / `seo-prospect-diagnostic` (`docs/mcp/skills/**`).
 - **NUNCA** duplicar el live region (lo lleva la identidad Nexa).
 - **NUNCA** hardcodear HEX/px/fontFamily/ms — tokens AXIS + SoT + motion tokens.
 
