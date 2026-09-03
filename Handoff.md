@@ -9,6 +9,27 @@ al apagar shim, fallback de deploy que lo reactiva y canary directo que no prueb
 de abajo no basta sin esos gates. Próximo paso: plan humano aprobado y coordinación con dueños de archivos;
 no push/deploy ni mutación de Entra autorizados por esta creación. Incidente Git/Berel separado.
 
+## 2026-09-03 — TASK-1806 tomada: readiness verificada y shadow preregistrado, cero gasto
+
+`TASK-1806` → `in-progress/` (Slice 0). Readback de la foundation sin mutar nada: ops-worker rev `00635-tbt`
+con `GROWTH_SEO_ETV_METHODOLOGY_VERSION=legacy_static_v1` y `/health.etvMethodology` (`source=env`, `valid`,
+`afterCutoff=false`); lanes prod `domain-overview`/`url-visibility` de Berel sirven `legacy_static_v1`
+`single_methodology`; evaluador dry-run 8/8 con `providerCalls=0` y ledger intacto; schema sanity 15/17 en
+transacción (los 2 ❌ eran conteos duros 5/8 que envejecieron con filas `*.invalid` explícitas — assert
+corregido a «contractual o explícita completa»). GSC `active` para berel.com y efeoncepro.com.
+
+**Preregistro congelado** en `docs/audits/seo/2026-09-03-dataforseo-improved-etv-shadow-preregistration.md`:
+cohorte Berel MX + Comex MX + Efeonce CL, 13 celdas / 26 requests `exact_ab`, forecast USD ≈1,02, caps propuestos
+30 requests / USD 2,00, umbrales (GSC, Jaccard ≥ 0,8, ±40 %) y decisión go/hold/no-go definidos antes de ver datos.
+
+**Bloqueos con fecha y dueño:** (1) contract de schema NO aplicado — la ventana de 7 días cuenta 5/8/2 filas
+contractuales (última 2026-08-29 11:04Z); aplicar **≥ 2026-09-10** sólo con readback 0/0/0 (`pending-migrations/`);
+(2) aprobación explícita del operador de cohorte + caps + ventana + USD 2,00 antes de cualquier llamada;
+(3) el ejecutor pagado del Slice 1 no existe aún: los seis writers no-prospecto leen el selector de proceso, así que
+el ejecutor hará dos pases fijando el selector por pase y abortará ante colisión con la UNIQUE legacy.
+Próximo paso: operador aprueba el preregistro → aplicar contract (≥ 09-10) → construir/ejecutar el shadow bounded.
+Sin push: hay WIP ajeno en el árbol (skills Berel, 8 tasks, EPIC-022) y `d27b6ec97` local de `greenhouse-eo-fe`.
+
 ## 2026-09-03 — TASK-1805 en producción: la fórmula detrás de `etv` es identidad del hecho, todavía legacy
 
 Tercer release del día (`5ec4cf769977-18572878-583b-43f0-aad0-01eb7b394aba`, run `33698245254`, target `5ec4cf76997722d5ae31621808b5ae967602bf0a`, PR #217): manifest `released`
@@ -547,36 +568,3 @@ publicado hasta `7eeb1da`. Asset Governance quedó desplegado por el workflow ca
 ejecución, scheduler restaurado `ENABLED`, cron `*/1` y post-plan sin drift. La reconciliación fue sana pero no-op
 (`claimed=0`, `failed=0`, cola 0), así que no sustituye el canary con asset real y no habilita espaciar el cron.
 Greenhouse sigue local y no fue publicado.
-
-## 2026-09-01 (10) — ISSUE-167 resuelto: el foco no era del form, era del eje de modelado
-
-Resuelto el mismo día que lo abrí. **Code complete, rollout pendiente**: el bundle desplegado sigue
-siendo el anterior, así que en producción el defecto continúa hasta el próximo release.
-
-La primera lectura culpaba al path del form. Al abrir el código apareció lo real: el comportamiento
-existía **dos veces y distinto** —`slide-in` con foco-return y `Escape` a nivel de shell,
-`meeting-action` con el suyo propio— y faltaba una tercera. El foco y la salida por teclado se
-habían modelado como propiedad del **placement**, no de «hay una superficie revelada por activación
-del usuario». Por eso `embedded` no las heredaba.
-
-Primitive canónica `src/growth-cta-renderer/disclosure-focus.ts`. Es disclosure y no modal (sin
-focus trap ni `aria-modal`), y **`Escape` se escucha en el contenedor, jamás en el documento**: un
-CTA incrustado no puede secuestrarle el `Escape` a la página del cliente.
-
-🔴 **El hallazgo que vale más que el arreglo de accesibilidad salió del test:** `Escape` estaba por
-emitir `dismissed`, que es una **señal de negocio** —«el visitante rechazó la oferta»— que viaja al
-ledger de conversión. Cerrar un formulario abierto por curiosidad no es rechazar el CTA. Ahora
-`Escape` **colapsa** al card sin telemetría, y el botón «✕ Ahora no» sigue siendo el único rechazo.
-El colapso queda deliberadamente sin evento: el vocabulario de `cta_conversion_event` no tiene
-`form_closed` y agregarlo es cambio de contrato server-side.
-
-Verificación: 8 tests de la primitive + 3 del cableado, **falsificados** revirtiendo el arreglo (2
-rojos de 22; 47/47 con él). Y un riesgo que jsdom no habría atrapado, cerrado con medición contra el
-DOM real de producción: si `<greenhouse-form>` montara en shadow DOM el selector no lo vería y el
-arreglo sería inerte — verificado que no usa shadow DOM y expone 5 controles al selector exacto.
-
-`meeting-action.ts` conserva su gestión propia: funciona, no tenía defecto medido, y refactorizarla
-sin necesidad era riesgo sin retorno. Queda como consumidor candidato.
-
-Próximo paso: release develop→main + rebuild del renderer, y repetir el recorrido con teclado en
-vivo en ambos hosts antes de dar el issue por cerrado operativamente.

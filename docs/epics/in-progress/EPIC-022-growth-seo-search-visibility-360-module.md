@@ -366,7 +366,7 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
   medición; legacy/improved no comparten serie ni clave, y ningún request productivo depende del
   default del provider. Clasifica 14 familias ETV-capable y migra seis familias/siete caminos consumidores,
   schema, freshness/readers, API/MCP, configuración Vercel/worker, señales y evaluator dry-run; cierra en legacy.
-- `TASK-1806` — [creada 2026-09-01, to-do, backend-critical/integration] **Evaluación y cutover de
+- `TASK-1806` — [creada 2026-09-01, in-progress desde 2026-09-03 (Slice 0: readiness + preregistro, cero gasto), backend-critical/integration] **Evaluación y cutover de
   DataForSEO Improved ETV.** Depende de 1805 y ejecuta shadow bounded, comparación contra GSC,
   decisión rebaseline/breakpoint y activación en los siete caminos consumidores antes del corte
   2026-11-01T00:00:00Z. P0 deadline-bound; rollback legacy sólo pre-corte y safe mode después.

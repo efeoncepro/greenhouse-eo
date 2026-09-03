@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -21,12 +21,12 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Registrada; deadline externo confirmado; bloqueada por foundation y autorizaciones separadas`
+- Status real: `Slice 0 en curso (2026-09-03): readiness verificada en DB/API/worker, preregistro congelado (docs/audits/seo/2026-09-03-dataforseo-improved-etv-shadow-preregistration.md, 13 celdas / 26 requests / USD ≈1,02, caps propuestos 30 req / USD 2,00). Bloqueada por contract de schema (aplicable ≥ 2026-09-10 con readback 0/0/0) y por aprobación explícita de gasto. Cero llamadas pagadas`
 - Rank: `2`
 - Domain: `growth|seo|data|integration|ops`
 - External deadline: `2026-11-01T00:00:00Z; no existe fallback legacy posterior`
 - Internal targets: `shadow/decision 2026-10-23; cutover 2026-10-28T00:00:00Z`
-- Blocked by: `contract de schema ETV aplicado post-release (docs/tasks/pending-migrations/, condición de 7 días); explicit spend approval; explicit historical-treatment and cutover approval`
+- Blocked by: `contract de schema ETV parqueado en docs/tasks/pending-migrations/ (hoy 5/8/2 filas contractuales en la ventana de 7 días; aplicable ≥ 2026-09-10 con readback 0/0/0); aprobación explícita de gasto/cohorte/caps (preregistro 2026-09-03); aprobación separada de tratamiento histórico y cutover`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -243,11 +243,11 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
 - [ ] No se crea una tabla o write target fuera de la foundation de `TASK-1805`.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime, DB y provider evidence están listados y separados de config/deploy.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime, DB y provider evidence están listados y separados de config/deploy. *(preregistro §2.)*
 - [ ] Errores, gasto, datos sensibles y autorizaciones fallan cerrado.
 
 ## Capability Definition of Done — Full API Parity gate
@@ -274,6 +274,19 @@ Reglas obligatorias:
 ## Scope
 
 ### Slice 0 — Readiness y preregistro
+
+**Avance 2026-09-03 (sin gasto, sin mutación runtime).** Readback hecho: ops-worker rev `00635-tbt` con selectores
+explícitos y `/health.etvMethodology` (`configuredWriteSource=env`, `valid=true`, `afterCutoff=false`); lanes de
+producción `domain-overview`/`url-visibility` (Berel) sirven `legacy_static_v1` con `single_methodology`; evaluador
+dry-run 8/8 (`providerCalls=0`, ledger intacto); schema sanity en transacción 15/17 (coexistencia sólo tras el
+contract; los 2 ❌ eran un conteo duro desactualizado del script, corregido); señal de drift en `awaiting_data`.
+Contract NO aplicado: la ventana de 7 días cuenta 5/8/2 filas contractuales (última 2026-08-29 11:04Z) → aplicable
+≥ 2026-09-10 con readback 0/0/0. Preregistro congelado en
+`docs/audits/seo/2026-09-03-dataforseo-improved-etv-shadow-preregistration.md` (cohorte Berel MX + Comex MX +
+Efeonce CL, 13 celdas / 26 requests / USD ≈1,02, caps propuestos 30 requests / USD 2,00, umbrales y decisión
+predefinidos). Pendiente del Slice 0: aplicar el contract cuando se cumpla la condición y registrar la aprobación
+explícita del operador (cohorte + caps + ventana). Hasta entonces, cero llamadas pagadas.
+
 
 - Verificar `TASK-1805` completa mediante DB/API/MCP y configured/requested/provider-effective en ambos runtimes.
 - Incorporar respuesta DataForSEO y congelar endpoint matrix, cohorte, período, inputs, métricas y umbrales.
@@ -404,13 +417,39 @@ de reevaluación.
      al cerrar la task completa.
      ═══════════════════════════════════════════════════════════ -->
 
+## MCP Tools & Skills Contract
+
+Esta task incluye como entregable obligatorio la capa de uso por agentes; no se considera completa con el
+primitive, reader, API o documentación humana solamente.
+
+- [ ] Crear o actualizar las tools MCP necesarias para operar/leer esta capacidad desde el mismo primitive
+  canónico. Si una tool existente cubre el caso, actualizarla sin duplicarla; si no corresponde una tool nueva,
+  declarar las tools afectadas y la razón de exclusión explícita en el gateway.
+- [ ] Crear o actualizar la guía de uso en las skills dueñas `.codex/skills/dataforseo-operator/**` y
+  `.codex/skills/seo-aeo/**`, junto con sus espejos `.claude/**`, incluyendo selección de tool, inputs,
+  interpretación, metodología/provenance, costos, límites, errores y acciones prohibidas.
+- [ ] Mantener las copias Codex/Claude byte-idénticas y actualizar también el recurso/manual agent-facing que el MCP
+  entrega bajo demanda (registro de skills servidas de `TASK-1804`, ya en producción: `src/mcp/greenhouse/skill-manifest.ts`
+  + `docs/mcp/skills/seo-visibility-reading`, `seo-spend-discipline`, `seo-prospect-diagnostic`; gate `pnpm mcp:skills:check`).
+  No crear una skill por endpoint si la skill de dominio vigente puede ampliarse de forma clara.
+- [ ] Actualizar en el mismo PR el lane ecosystem, `src/mcp/greenhouse/tool-manifest.ts`, su artefacto generado,
+  schema/annotations/descripción y la federación del gateway; toda tool interna queda federada o excluida con una
+  razón sustantiva, nunca simplemente ausente.
+- [ ] Las tools read sólo leen evidencia persistida y no disparan llamadas pagadas on-read. Toda tool que escriba,
+  compre o comprometa gasto usa capability fina, presupuesto, idempotencia, audit y
+  `propose → confirm → execute`; nunca se agrega un write scope al cliente PKCE público compartido.
+- [ ] Verificar `pnpm mcp:manifest:generate && pnpm mcp:manifest:check`, `pnpm skills:mirrors`, paridad
+  bidireccional del gateway y canaries allow/deny/fault. Registro o compilación sin readback de la lane y del
+  gateway no constituye cierre operativo.
+
+
 ## Acceptance Criteria
 
-- [ ] `TASK-1805` está completa y legacy explícito está verificado en DB/API/MCP, Vercel y ops-worker.
-- [ ] Matriz oficial de 14 familias, campos, booleano, pricing, históricos y clickstream está incorporada; Sandbox y
-  docs públicas pendientes están declaradas sin convertirlas en bloqueo ficticio.
-- [ ] Cohorte, inputs, métricas, umbrales, request cap y USD cap quedaron congelados antes del shadow.
-- [ ] Ninguna llamada pagada ocurrió antes de la aprobación explícita registrada.
+- [x] `TASK-1805` está completa y legacy explícito está verificado en DB/API/MCP, Vercel y ops-worker. *(2026-09-03: DB + lanes prod + `/health` worker + env de la revisión activa; MCP vía manifest sincronizado del release, sin login Entra interactivo en esta sesión.)*
+- [x] Matriz oficial de 14 familias, campos, booleano, pricing, históricos y clickstream está incorporada; Sandbox y
+  docs públicas pendientes están declaradas sin convertirlas en bloqueo ficticio. *(`families.ts` + preregistro §3.)*
+- [x] Cohorte, inputs, métricas, umbrales, request cap y USD cap quedaron congelados antes del shadow. *(preregistro 2026-09-03 §4–§5; aprobación del operador pendiente.)*
+- [x] Ninguna llamada pagada ocurrió antes de la aprobación explícita registrada. *(vigente al 2026-09-03: gate OFF, ledger intacto; se re-verifica al cerrar.)*
 - [ ] Cada endpoint compatible fue evaluado con inputs equivalentes o marcado honestamente como no comparable.
 - [ ] GSC se evaluó como benchmark separado, sin promedio ni sustitución de ETV.
 - [ ] Se midieron valores, orden, membresía top-N, traffic cost, prospect traffic, nulls, latencia y costo.
