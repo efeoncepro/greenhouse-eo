@@ -6,7 +6,7 @@ This runbook is the operational source of truth for stopping and later reactivat
 deleting its data, credentials, artifacts, network perimeter or Terraform ownership. The business decision was
 made on 2026-09-02 because Globe was not yet producing revenue and its live run-rate was not sustainable.
 
-Current verified state at `2026-09-02T10:30:38Z`:
+Initial hibernation evidence at `2026-09-02T10:30:38Z` (preserved historical cutoff):
 
 - lifecycle: `hibernated`;
 - Cloud SQL `globe-pg`: `STOPPED`, `activationPolicy=NEVER`;
@@ -21,6 +21,13 @@ Current verified state at `2026-09-02T10:30:38Z`:
 
 This state is reversible. Reactivation must follow section 9 in order. Do not jump directly from
 `hibernated` to `active`.
+
+**Latest containment, `2026-09-03T22:26:05Z`:** the external Greenhouse scheduler
+`ops-globe-tenancy-reconcile` in `efeonce-group/us-east4` was also paused and read back as `PAUSED`.
+SQL was rechecked as `STOPPED/NEVER` with deletion protection enabled. This is a temporary commercial-product
+pause, not closure or decommissioning. The local Greenhouse deploy source now preserves this external pause;
+commit/push/deploy of that source were not performed in this slice. No new Terraform apply, no-drift plan or
+restore rehearsal was performed on September 3. See sections 3.1 and 13.1 before any restart or deployment.
 
 ## 2. Financial decision and measurement contract
 
@@ -74,6 +81,37 @@ hibernated -> draining -> verify ready/closed -> active -> verify productive
 
 This is an operational lifecycle inside the existing Terraform boundary. It does not introduce a new dispatch,
 data or authority boundary, so no new ADR was required.
+
+### 3.1 External caller: separate source of truth, mandatory lifecycle companion
+
+The table above governs only the three **Globe-owned** schedulers. Globe Terraform does not own the following
+Greenhouse scheduler; a Terraform `No changes` result cannot prove that it is paused:
+
+| Field | Preserved contract |
+| --- | --- |
+| Project / region / name | `efeonce-group` / `us-east4` / `ops-globe-tenancy-reconcile` |
+| Schedule / timezone | `*/5 * * * *` / `America/Santiago` |
+| HTTP target | `https://ops-worker-y6egnifl6a-uk.a.run.app/globe/tenancy/reconcile` |
+| Scheduler OIDC identity | `greenhouse-portal@efeonce-group.iam.gserviceaccount.com` |
+| Source owner | Greenhouse `services/ops-worker/deploy.sh`, `upsert_scheduler_job` call |
+| Pause input | Fifth positional argument `true` means paused; omitted defaults to `false` |
+
+The endpoint runs on the **shared** Greenhouse ops worker. Pause this scheduler only; never stop the worker,
+change its other schedules, or remove its identity/IAM/target. The OIDC identity above authenticates Scheduler
+to ops-worker; it is not a replacement for the separately governed Globe broker identity used by that worker.
+
+Hibernation requires both source pause `true` and live `PAUSED`. Before deploying Greenhouse, inspect the actual
+branch/revision being deployed: a stale remote source can resume the job. The September 3 local correction is
+not evidence that remote branches or CI already contain it. Reactivation changes the same argument to `false`
+and resumes the live job **only after** section 9 phase C prerequisites. Record source and runtime separately.
+
+Pausing refresh intentionally lets tenancy snapshots expire (Greenhouse snapshot TTL: 12 minutes). Do not
+extend TTL, disable tenancy enforcement, grant broader capabilities or recreate identity to bypass expiry.
+Broker reconciliation has an existing narrow bootstrap path independent of productive flags, but verify that
+contract against the deployed revision at every restart. Source pointers: Globe `apps/studio-web/src/app.ts`
+(`registerTenancyCapabilities`, `tenancyContextAuthorizer`, `internalServicePrincipal`) and Greenhouse
+`src/lib/globe/tenancy-reconciler.ts` (`SNAPSHOT_LEASE_MS`). This correction preserves those authority boundaries;
+it does not introduce a new authorization exception.
 
 ## 4. What hibernation disables
 
@@ -207,6 +245,8 @@ Use this procedure if Globe is reactivated and must later return to deep hiberna
 1. Obtain explicit authorization for the production shutdown.
 2. Complete section 6 and confirm current source/live state is `active`.
 3. Inspect queue age, running executions and the most recent successful execution for all three jobs.
+   Also set the external caller source pause to `true`, pause it using section 10, and verify `PAUSED` before
+   SQL is stopped. Allow already accepted reconciliation requests to finish; pause is not cancellation.
 4. Change the source-controlled default from `active` to `draining`.
 5. Plan with every preservation input in section 6. Require zero delete/replacement.
 6. Apply the saved `draining` plan.
@@ -275,10 +315,32 @@ printing secrets, correct the cause, and redeploy the fail-closed revision while
 5. Run non-billable API/read-model smokes only. No image, video, audio, Omni or external-provider generation.
 6. Inspect queue age and pending durable work. Decide explicitly whether old queued work should resume; never
    purge or abandon it implicitly.
+7. Revalidate the narrow broker reconciliation path described in section 3.1 against the deployed code/config.
+   Once SQL is `RUNNABLE/ALWAYS` and API created = ready, change the Greenhouse scheduler's fifth argument to
+   `false` in reviewed source. Update the hibernation-specific expectations in
+   `services/ops-worker/deploy-contract.test.ts` to the newly authorized active state, retaining executable
+   pause/resume coverage; run that suite and `bash -n services/ops-worker/deploy.sh`. Do not skip failing tests
+   or leave the source at `true` after a manual resume. Then resume only that caller:
+
+   ```bash
+   gcloud --configuration=default scheduler jobs resume ops-globe-tenancy-reconcile \
+     --project=efeonce-group --location=us-east4
+   ```
+
+8. Observe the next scheduled reconciliation while Globe stays `draining` and its three schedulers stay paused.
+   Require successful domain reconciliation for the intended workspaces and a governed tenancy readback with
+   current broker revision and future `expiresAt` (12-minute refresh TTL), not merely Scheduler/ops-worker
+   HTTP 200. The wrapper can return 200 even when individual reconciliations failed. Check Globe error logs and
+   the persisted projection; no provider generation is needed.
+9. If authorization, connectivity or projection refresh fails, immediately pause the external caller again and
+   restore its source pause `true`. Keep productive flags closed and diagnose the existing broker path. Do not
+   switch to `active`, change TTL/enforcement or widen permissions to make reconciliation succeed. This phase
+   is an authorized control-plane refresh, not a read-only smoke; restart was not rehearsed during hibernation.
 
 ### Phase D — activate productive operation
 
 1. Change the source-controlled default from `draining` to `active` in a second focused, reviewed change.
+   Proceed only after phase C projection readback; refresh again if it expired during review/apply.
 2. Run format, validation and contract tests again.
 3. Create an `active` plan with all mandatory preservation inputs.
 4. Require `0 destroy`. Expected changes are productive flags/revisions, Producer Worker configuration and
@@ -288,6 +350,7 @@ printing secrets, correct the cause, and redeploy the fail-closed revision while
 7. Require `GLOBE_PRODUCTIVE_LANES_ENABLED=true` on API, Studio and Producer Worker.
 8. Confirm each scheduler is `ENABLED`, with its source-controlled schedule, original OIDC identity, target,
    timezone and retry contract.
+   Verify the external Greenhouse scheduler independently; Globe Terraform does not resume or validate it.
 9. Observe the first successful execution of Asset Governance, Media Derivatives and Producer Worker. Validate
    structured completion, queue age, retry storm, terminal attempts and failures.
 10. Observe at least one real work item only if normal business demand exists. Do not create external-provider
@@ -319,6 +382,16 @@ active -> draining
 
 This pauses all schedulers and closes productive flags while keeping SQL available for diagnosis. Follow the
 same reviewed plan/apply gate and require zero destructive actions.
+
+Here “all schedulers” requires an additional explicit action for the external caller; Terraform alone pauses
+only the Globe-owned three. Set its source pause back to `true` and execute/read back:
+
+```bash
+gcloud --configuration=default scheduler jobs pause ops-globe-tenancy-reconcile \
+  --project=efeonce-group --location=us-east4
+```
+
+This preserves the definition for section 9 phase C. Never resume it against `STOPPED/NEVER` SQL.
 
 Deep rollback:
 
@@ -364,6 +437,19 @@ gcloud --configuration=globe scheduler jobs list \
 ```
 
 Hibernated/draining expectation: all `PAUSED`.
+
+### External Greenhouse scheduler
+
+```bash
+gcloud --configuration=default scheduler jobs describe ops-globe-tenancy-reconcile \
+  --project=efeonce-group --location=us-east4 \
+  --format='yaml(name,state,schedule,timeZone,httpTarget.uri,httpTarget.oidcToken.serviceAccountEmail,retryConfig)'
+```
+
+Hibernated expectation: `PAUSED`. During `draining`, it remains paused except for the explicitly controlled
+phase C refresh after SQL/API readiness. Compare the preserved contract in section 3.1 before resume.
+After a pause, observe at least two missed five-minute slots plus logging ingestion lag; separate requests
+already accepted before the cutoff from new arrivals. Do not wake Globe with HTTP probes just to test silence.
 
 ### Service revisions and scale-to-zero
 
@@ -485,10 +571,34 @@ The failed intermediate API revision caused no deletion and was not accepted as 
 criterion was a new fail-closed revision with `latestCreatedRevisionName == latestReadyRevisionName` while SQL
 was available. This incident is why the `draining` state is mandatory.
 
+### 13.1 September 3 discovery and reversible external-caller containment
+
+Before containment, the complete hour `2026-09-03T21:00:00Z`–`22:00:00Z` contained 24 API requests to
+`/v1/commands`, all HTTP 500, mean latency approximately 127 seconds. Structured logs named
+`globe.tenancy.projection.reconcile` with `ETIMEDOUT`; the Greenhouse caller was still scheduled every five
+minutes. This explains recurring compute despite minimum instances zero and paused Globe-owned jobs.
+
+The operator authorized pausing that caller, and live readback at `2026-09-03T22:26:05Z` confirmed `PAUSED`.
+The only cloud mutation in this slice was that scheduler pause. Its cadence, target, identity and definition
+were preserved; SQL remained `STOPPED/NEVER`. Greenhouse's deploy source was corrected locally to pass `true`
+as the fifth argument. No commit/push/deploy, restore test or new Terraform plan is asserted by this evidence.
+
+Billing before this additional pause, window `[2026-09-02T11:00:00Z, 2026-09-03T11:00:00Z)`, showed CLP
+2,278.27 gross/net (credits zero), including API CLP 1,248.97, networking CLP 547.03 and SQL CLP 388.56.
+The 24-hour total extrapolates to approximately CLP 68,348/30 days; it is not a monthly invoice, a stable
+post-containment residual, or realized savings. This observation supersedes reliance on the earlier modeled
+CLP 20,000–30,000 residual without readback. Re-query equivalent complete windows after the new cutoff;
+API cost cannot all be attributed to this caller without post-change evidence. Retained storage, IP/front door,
+secrets and scheduler definitions can still bill. Do not delete them to meet the old modeled range.
+
+Verification scope, executable regression tests and the still-pending source promotion are recorded in the
+[September 3 QA audit](../../audits/globe/GLOBE_REVERSIBLE_CALLER_PAUSE_2026-09-03.md).
+
 ## 14. Ownership and status language
 
 - owner: Efeonce Platform / Globe operations;
 - code/IaC source: `/Users/jreye/Documents/efeonce-globe/infra/terraform`;
+- external caller source: Greenhouse `services/ops-worker/deploy.sh`; source promotion is separate from live pause;
 - control-plane task: `TASK-1807` in Greenhouse;
 - mutable runtime summary: `GLOBE_RUNTIME_HANDOFF.md`;
 - budget alerts remain alert-only; they do not shut down resources;

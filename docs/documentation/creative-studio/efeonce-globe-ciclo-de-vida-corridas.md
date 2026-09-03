@@ -3,8 +3,15 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.1
 > **Creado:** 2026-08-03 por Claude
-> **Ultima actualizacion:** 2026-08-04 por Claude
+> **Ultima actualizacion:** 2026-09-03 (aviso de pausa reversible; historia del ciclo preservada)
 > **Documentacion tecnica:** [ADR-021 — Captura de completitud por proveedor](../../architecture/creative-studio/EFEONCE_GLOBE_PROVIDER_COMPLETION_CAPTURE_DECISION_V1.md) · [`ISSUE-138` — la captura pierde assets ya cobrados](../../issues/open/ISSUE-138-globe-provider-completion-capture-loses-paid-assets.md) · [`TASK-1469` — Governed Run Lifecycle, Submission Fence and Provider Completion](../../tasks/in-progress/TASK-1469-globe-governed-run-lifecycle-submission-fence.md) · [`ISSUE-135` — la outbox reintenta infinito y en silencio](../../issues/open/ISSUE-135-globe-governed-run-outbox-infinite-silent-retry.md) · [`ISSUE-127` — códigos genéricos esconden causas accionables](../../issues/open/ISSUE-127-globe-generic-error-codes-hide-actionable-causes.md) · [Persistencia durable de Globe](../../architecture/creative-studio/EFEONCE_GLOBE_DURABLE_PERSISTENCE_V1.md)
+
+> **Pausa temporal del producto:** este ciclo describe el funcionamiento con Globe activo, no su
+> disponibilidad durante la hibernación. La pausa conserva datos y corridas; no cancela ni elimina trabajo
+> implícitamente. También se pausa el refresco externo de permisos desde Greenhouse: las proyecciones vencen
+> y el acceso se cierra por seguridad, sin borrar las identidades. Para volver a operar se requiere autorización,
+> recuperar SQL/API y refrescar permisos antes de abrir producción, según el
+> [runbook de hibernación y reactivación](../../operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md).
 
 Cuando alguien pide una pieza en Globe, esa pieza no se produce en el momento en que se aprieta el
 botón. Se produce a lo largo de **minutos**, en pasos que sobreviven a reinicios, a que el navegador

@@ -2,6 +2,10 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+**Globe, 2026-09-03:** caller externo pausado; protección deploy sólo local, sin commit/push/deploy.
+Platform debe promoverla y medir ahorro. Reactivación/evidencia:
+[runbook TASK-1807](docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md).
+
 **EPIC-044 creado (2026-09-03) — authorization server PROPIO, decisión del operador:** no se compra WorkOS ni otro IdP.
 ADR aceptado `docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md` (supersede la composición del ADR de
 federación; invariantes/binding/gateway contract vigentes). Epic `in-progress` con TASK-1626/1631/1813 re-homed y siete tasks

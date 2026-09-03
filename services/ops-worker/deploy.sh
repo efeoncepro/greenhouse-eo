@@ -1311,12 +1311,18 @@ echo "  -> ops-artifact-render-dispatch: */2 * * * * (TASK-1391 render queue)"
 # TASK-1521 — Freshness is a renewable lease, independent from semantic
 # workspace/member revisions. Five-minute cadence leaves a seven-minute
 # failure budget inside the reconciler's 12-minute fail-closed snapshot TTL.
+# Temporary Globe hibernation: pause the external caller as well as Globe-owned
+# jobs. Keep this fifth argument true until the authorized reactivation sequence
+# has restored SQL and verified API readiness. A manual resume alone is reverted
+# by the next deploy. Canonical pause/resume procedure:
+# docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md
 upsert_scheduler_job \
   "ops-globe-tenancy-reconcile" \
   "*/5 * * * *" \
   "/globe/tenancy/reconcile" \
-  '{}'
-echo "  -> ops-globe-tenancy-reconcile: */5 * * * * (Greenhouse → Globe full-workspace tenancy V2)"
+  '{}' \
+  "true"
+echo "  -> ops-globe-tenancy-reconcile: */5 * * * * (paused=true; reversible Globe hibernation)"
 
 # TASK-1723 — Incremental safety-net over the canonical Hiring sources. The
 # handler is idempotent and flag-gated; five minutes bounds projection staleness

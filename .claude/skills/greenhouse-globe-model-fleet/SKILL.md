@@ -54,6 +54,19 @@ Una autorización de gasto no elimina esta compuerta. Primero sigue
 `hibernated → draining → active` con sus readbacks y después
 aplica el spend fence propio de la ruta. Si el trabajo es sólo documental o de discovery, conserva la hibernación.
 
+La reactivación no termina al arrancar SQL ni al ver una revisión lista: incluye el caller externo
+`ops-globe-tenancy-reconcile` (`efeonce-group`, `us-east4`), su estado deseado en
+`services/ops-worker/deploy.sh` y el readback del scheduler. Sigue el orden del runbook para recuperar SQL/API,
+verificar el lifecycle que admite la reconciliación y refrescar las proyecciones de tenancy (TTL de 12 minutos)
+antes de reabrir acceso normal o canariar rutas. El runbook contempla el refresco controlado en fase C, todavía
+en `draining`; revalida ese carril y no uses `active` para sortear un bloqueo de tenancy. Un HTTP 200 del wrapper
+de Greenhouse no acredita éxito remoto. Mientras la base siga detenida, conserva ese caller pausado;
+`minScale=0` no impide que una llamada despierte la API. No pauses el `ops-worker` compartido para lograrlo.
+
+Esta pausa conserva el producto y su evidencia: no borres route cards, promociones, bindings, datos, backups,
+secretos ni infraestructura para reducir gasto. Cambiar el lifecycle o reanudar un scheduler no autoriza por sí
+solo nuevas generaciones ni gasto de proveedores. Registra source, deploy, readback y frescura por separado.
+
 ## Flujo de trabajo
 
 ### 1. Fijar identidad y superficie

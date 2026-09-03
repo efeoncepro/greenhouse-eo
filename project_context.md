@@ -16,12 +16,12 @@ PAT temporal aprobado para la migración permanece activo hasta su sustitución 
 antes del rollout externo. El release productivo `30502476429` y el rollback ejercitado están documentados en
 [`AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
 
-Globe (`../efeonce-globe`) usa Tailwind v4 como único pipeline activo; el renderer vanilla queda sólo como
-fallback hasta `TASK-1560`. Su lifecycle Terraform es `active -> draining -> hibernated`; `draining` es la
-frontera obligatoria de apagado/encendido. Estado y recuperación: [`GLOBE_RUNTIME_HANDOFF.md`](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md)
-y [`GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md`](docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md).
-Las skills espejo `greenhouse-globe` y `greenhouse-globe-model-fleet` aplican esta compuerta: discovery y
-validación estática pueden continuar, pero ningún canary, promoción o trabajo facturable despierta Globe.
+Globe (`../efeonce-globe`): Tailwind v4 activo, vanilla fallback hasta TASK-1560.
+Hibernación reversible: `draining` obligatorio al apagar/encender; discovery estático permitido, nunca despertar
+para canaries/promoción. [Estado](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md) y
+[runbook](docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md) gobiernan las skills Globe/fleet
+y el caller externo `ops-globe-tenancy-reconcile` (`efeonce-group/us-east4`): sincronizar pausa source/runtime;
+reactivar SQL/API antes del caller y verificar tenancy fresca antes del uso productivo.
 
 La dirección móvil de Globe es native-first con React Native + Expo; web/PWA queda como fallback. ADR, vertical
 slice y gates: [ADR-018](docs/architecture/creative-studio/EFEONCE_GLOBE_MOBILE_CONTINUITY_APPLICATION_DECISION_V1.md).

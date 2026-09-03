@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
@@ -167,13 +168,57 @@ describe('ops-worker deploy Globe tenancy reconciliation contract', () => {
     )
   })
 
-  it('renews the full-workspace projection every five minutes', () => {
+  // Execute the actual helper and declaration, not a textual assertion of the
+  // pause argument. gcloud is a shell function: these tests cannot contact GCP.
+  // Runtime counterpart: scheduler describe + post-pause request logs, per the
+  // Globe deep-hibernation runbook. A passing local test is not cloud evidence.
+  const executeScheduler = (existing: boolean, resume = false) => {
     const script = deployScript()
-    const jobIndex = script.indexOf('"ops-globe-tenancy-reconcile"')
+    const helper = script.match(/^upsert_scheduler_job\(\) \{[\s\S]*?^\}/m)?.[0]
+    const declaration = script.match(/^upsert_scheduler_job \\\n  "ops-globe-tenancy-reconcile"[\s\S]*?(?=^echo )/m)?.[0]
 
-    expect(jobIndex).toBeGreaterThan(0)
-    expect(script.slice(jobIndex, jobIndex + 220)).toContain('"*/5 * * * *"')
-    expect(script.slice(jobIndex, jobIndex + 220)).toContain('"/globe/tenancy/reconcile"')
+    expect(helper).toBeDefined()
+    expect(declaration).toBeDefined()
+
+    const invocation = resume
+      ? 'upsert_scheduler_job "ops-globe-tenancy-reconcile" "*/5 * * * *" "/globe/tenancy/reconcile" "{}" "false"'
+      : declaration
+
+    const result = spawnSync('/bin/bash', ['-euc', [
+      'gcloud() { printf "%s\\n" "$*"; if [ "$3" = create ] && [ "$EXISTING" = true ]; then return 1; fi; }',
+      helper,
+      invocation
+    ].join('\n')], {
+      encoding: 'utf8',
+      env: {
+        PATH: '/usr/bin:/bin',
+        PROJECT_ID: 'test-project', REGION: 'test-region',
+        SCHEDULER_TZ: 'America/Santiago', SERVICE_URL: 'https://worker.invalid',
+        SERVICE_ACCOUNT: 'scheduler@test.invalid', EXISTING: String(existing)
+      }
+    })
+
+    expect(result.status, result.stderr).toBe(0)
+
+    return result.stdout.trim().split('\n')
+  }
+
+  it.each([false, true])('keeps the Globe caller paused after upsert (existing=%s)', existing => {
+    const calls = executeScheduler(existing)
+
+    expect(calls.some(call => call.startsWith('scheduler jobs update http '))).toBe(existing)
+    expect(calls.at(-1)).toBe(
+      'scheduler jobs pause ops-globe-tenancy-reconcile --project=test-project --location=test-region --quiet'
+    )
+    expect(calls.some(call => call.startsWith('scheduler jobs resume '))).toBe(false)
+    expect(calls[0]).toContain('--schedule=*/5 * * * *')
+    expect(calls[0]).toContain('--uri=https://worker.invalid/globe/tenancy/reconcile')
+  })
+
+  it('retains an explicit resume path for an authorized reactivation', () => {
+    expect(executeScheduler(true, true).at(-1)).toBe(
+      'scheduler jobs resume ops-globe-tenancy-reconcile --project=test-project --location=test-region --quiet'
+    )
   })
 })
 
