@@ -7,6 +7,23 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-03 — TASK-1349: revisión contractual de offboarding, elegibilidad por episodio y writeback de lifecycle (code complete, sin push)
+
+Cierra el circuito SCIM → decisión → nómina → lifecycle que la auditoría del 03/09 encontró incompleto (ISSUE-117,
+near miss del 06/07). Nómina: el resolver de elegibilidad elige el caso gobernante por relevancia temporal, sirve
+`contract_type_snapshot` (el threshold `international_internal` era inalcanzable), detecta reingresos y deja de tratar
+`members.active=false` como filtro histórico (un inactivo con salida el 02/06 conserva mayo íntegro); una salida sin
+resolver relevante al período mantiene al colaborador proyectado pero **bloquea calcular/aprobar** (readiness
+`unresolved_exit_signal`, `calculatePayroll` 409) y una falla del resolver ya no incluye a todos en silencio.
+Offboarding: command `reviewOffboardingCase` (`access_only` | `relationship_ended`, causal y fechas explícitas,
+`expectedUpdatedAt`, audit + outbox), guard «sin revisión no se aprueba» en el state machine, executor lane-aware
+(solo acceso no toca compensación/relación/member; término real termina relación con fecha real y desactiva member
+detrás de `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED`, OFF), proyecciones honestas en la cola, tres señales
+nuevas, guards de ownership en SCIM y backfill BQ, capability `workforce.offboarding.review_case` (seed aplicado),
+rutas HR + carril `app`, y `pnpm workforce:offboarding:recovery` (dry-run ejecutado sobre la cohorte real; nada
+aplicado). Tras el release la nómina de septiembre bloqueará hasta resolver Felipe y Maria Fernanda: es el control
+buscado. Pendiente: release, flag ON tras smoke en staging, recovery autorizada, UI TASK-1814, conciliación Finance.
+
 ## 2026-09-03 — TASK-1806 seguimiento: alerta Teams determinista para drift de metodología ETV
 
 Nuevo cron `ops-seo-etv-drift-watch` (Cloud Scheduler, diario 12:00 America/Santiago, sin flag) en el
@@ -1092,28 +1109,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
 - Aplicado en los dos lugares (SoT `services/ops-worker/deploy.sh` + `gcloud scheduler jobs update`).
   ⚠️ `main` todavía declara `*/10`: hasta el próximo release, un deploy del worker desde `main`
   revertiría el schedule en silencio. Documentado en el Handoff.
-
-## 2026-08-28 — Release a producción `e82c18579b05`: el contrato de discovery corregido, vivo
-
-- Paso a producción de **TASK-1694** y **TASK-1692** (PR #209, 30 archivos de código, **cero
-  migraciones**). Manifest `released` en un solo run del orquestador (`33208942436`, 12m51s), ambos
-  gates `production` aprobados sin stall, watchdog `ok` con `drift_count=0`.
-- **Primer release del ledger que pasa sin break-glass desde un batch de dos tasks.** La razón es
-  estructural: sin migraciones no hay dominio irreversible, así que el classifier dio `ship` limpio.
-- **Cero flags que prender.** El release no introduce ninguno, y los que gatean el dominio ya
-  estaban `true` en Production — verificado leyendo el VALOR, no la presencia.
-- 🔴 **Verificado con canary de contrato, no sólo con el manifest.** Producción respondió
-  `maxLinkBarrier aceptado; ignoredFilters=maxDifficulty` (TASK-1694 ejecutándose), y el lane
-  devolvió **400** a un consumer intentando escribir `promoted_to_tracking` o el retirado
-  `selected_for_target` (TASK-1692: el boundary de escritura vivo). Un manifest `released` prueba
-  despliegue; el canary prueba comportamiento.
-- Gateway MCP desplegado con el schema federado nuevo de `get_seo_keyword_discovery`.
-- **Smoke con gasto ejecutado el mismo día** — 3 corridas, USD 0,0482, MX y CL, los dos endpoints
-  cuyo payload cambió. Las tres `succeeded`: el payload sin `filters` es aceptado por Labs (riesgo
-  de la matriz refutado con evidencia) y `volumePolicy: "all"` quedó persistido en el snapshot.
-- 🔴 **Y desmintió la justificación escrita de la propia task**: 102 candidatos, 2 endpoints, 2
-  mercados → CERO con volumen nulo o cero. Los índices de sugerencias e ideas del proveedor sólo
-  devuelven keywords con volumen medido, así que el filtro que se quitó era un **no-op** ahí; los
-  nulos aparecen sólo en `keyword_overview`, que nunca lo llevó. Quitarlo sigue siendo correcto
-  (elimina una asimetría no declarada), pero el beneficio prometido no tiene evidencia. `TASK-1700`
-  (P0) queda desbloqueada y con su prerequisito de runtime cumplido.

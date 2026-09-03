@@ -2,15 +2,18 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
-TASK-1349 en ejecución (2026-09-03, sesión Claude, `develop`, checkout compartido, sin push): Discovery con tres
-subagentes + lectura PG real confirmó los hallazgos de la auditoría y sumó tres más: el reader de elegibilidad
-omite `contract_type_snapshot`, la baja administrativa (`deactivateMember`) excluye de nómina retroactivamente vía
-`members.active=false`, y la reactivación SCIM por OID no consulta casos ejecutados. Plan por slices 0–4 en la
-task; writeback de member/relación nace detrás de `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` OFF; el gate
-de readiness/cálculo ante salida sin resolver es incondicional bajo `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED` (ON
-en prod/staging) y **tras el release bloqueará la nómina de septiembre hasta resolver los casos de Felipe (blocked)
-y Maria Fernanda (draft con fecha pasada)** — eso es el control buscado, no un efecto colateral. Recovery de
-Felipe: dry-run solamente; ningún pago, SQL ni flag se toca sin autorización.
+TASK-1349 **code complete, rollout pendiente** (2026-09-03, sesión Claude, `develop`, sin push, commits Slice 0–4
+`b825e0a40`→`ff2f7623e` + cierre documental). Backend completo: resolver por episodio + gate fail-closed de nómina,
+command de revisión (`access_only`|`relationship_ended`) con capability y carril `app`, executor lane-aware con
+writeback detrás de `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` (OFF en todos los runtimes), proyecciones
+honestas, 3 señales (hoy 2 / 3 / 0), guards SCIM/backfill y `pnpm workforce:offboarding:recovery` (dry-run real
+ejecutado; NADA aplicado). **Riesgos/decisiones para el operador:** (1) tras el release, readiness de septiembre
+bloqueará con `unresolved_exit_signal` hasta resolver Felipe (blocked) y Maria Fernanda (draft 07-29) — control
+buscado; (2) `pnpm build` de producción NO se corrió (30 GB, requiere autorización) — `pnpm test` completo,
+typecheck y lint sí; (3) la recovery de Felipe exige causal respaldada declarada por People (`--separation-type`)
+y autorización explícita; (4) Finance: obligación junio 550.875 + SII junio/julio 99.125 de Felipe generadas por
+error, sin contrato de anulación (`supersede` sí, `cancel` no) → dependencia registrada, no SQL. Próximo paso:
+confirmar push/PR a `develop`, smoke sintético en staging, flag ON, recovery por allowlist, UI TASK-1814.
 
 Offboarding (2026-09-03): auditoría UI/código/PG registrada en
 [informe](docs/audits/payroll/OFFBOARDING_ROOT_CAUSE_AND_REMEDIATION_2026-09-03.md).
@@ -554,46 +557,3 @@ Esa evidencia se produce en el paso 3 del runbook del flip.
 
 Próximo paso: desplegar (`TASK-1670` + `TASK-1671`) y recién entonces el flip.
 Sin push. Runbook: `docs/manual-de-uso/growth/operar-hallazgos-de-sitio-seo.md`.
-
-## 2026-09-01 (12) — TASK-1670 cerrada, y el punto ciego del audit SEO SIGUE ABIERTO
-
-`TASK-1670` quedó `complete` como **`code complete, rollout pendiente`**. La distinción importa más
-que el resumen: el motor de hallazgos de sitio existe y está verificado, pero
-`GROWTH_SEO_SITE_FINDINGS_ENABLED` nace **OFF** y no se prende hasta que `TASK-1671` esté desplegada.
-Hasta ese flip, **un sitio que bloquea a los crawlers de IA sigue puntuando 95/100 y presentándose
-como sano**. El merge no cerró el agujero.
-
-Qué quedó en `develop`: migración aditiva `finding_scope` (`page`|`site`) sobre
-`seo_site_audit_findings` — aplicada, 4.977 filas históricas clasificadas sin backfill —;
-`growth/seo/site-audit/site-findings.ts` con los cuatro chequeos (crawlers de IA en `robots.txt`,
-acceso en el borde/WAF, JSON-LD ausente, salud de sitemap); materialización en el collect detrás del
-flag; `findingScope` aditivo en el reader canónico; y 7 fichas es-CL con el drift test corriendo
-contra la unión de los dos allowlists.
-
-Tres cosas que el próximo agente debe saber antes de tocar esto:
-
-1. **Retrieval y training no comparten severidad.** Bloquear el rastreo que te cita es `critical`;
-   bloquear el de entrenamiento es `notice` con lectura de postura y **nunca** `critical` — es una
-   decisión de derechos, y pintarla en rojo enseña al cliente a ignorar la severidad más alta.
-2. **El chequeo de borde usa NUESTRO token variado, jamás el de un bot ajeno.** Suplantar `GPTBot` o
-   `OAI-SearchBot` es evasión verificable por DNS inverso. El criterio de aceptación que pedía lo
-   contrario quedó corregido en la spec.
-3. **La verificación con red real encontró un bug que ningún test con mocks podía ver**: contra
-   `reuters.com`, un `robots.txt` que nos prohíbe la ruta se reportaba como sitemap roto — le
-   inventábamos un defecto a un archivo que nunca miramos. Corregido a "no verificado" + regresión.
-
-Próximo paso: `TASK-1671` (desbloqueada, `Blocked by: none`). Es dueña del flip y por lo tanto del
-cierre real del agujero. `TASK-1672` conserva su gate: el flag en `ON` con corrida verificada, no un
-merge.
-
-Sin push. Cinco commits locales en `develop`.
-
-**Capa documental completada el mismo día (tres agentes en paralelo).** El cierre anterior sólo tenía
-la capa técnica (§10.6 de la arquitectura); el protocolo pide tres. Ahora existen: doc funcional
-(`docs/documentation/growth/hallazgos-de-sitio-audit-seo.md`), manual + runbook del flip
-(`docs/manual-de-uso/growth/operar-hallazgos-de-sitio-seo.md` y la actualización de
-`usar-auditoria-sitio-seo.md`), y las skills de oficio corregidas: `seo-aeo/modules/01_SEO_TECHNICAL.md`
-§8 pasó de cuatro viñetas descriptivas a siete reglas accionables con su razón, y
-`dataforseo-operator/references/04-onpage.md` dejó de implicar que nadie resuelve lo que OnPage no ve.
-Los cinco documentos declaran el flag OFF y el punto ciego abierto — ninguno promete la capacidad. La
-skill agrega la consecuencia operativa de hoy: al auditar, estas verificaciones se hacen a mano.

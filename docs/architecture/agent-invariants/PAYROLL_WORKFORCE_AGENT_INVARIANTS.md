@@ -251,6 +251,48 @@ El bug class observado live 2026-05-15 con María Camila Hoyos: case `executed` 
 
 ---
 
+### Offboarding review, temporal eligibility and lifecycle writeback invariants (TASK-1349, desde 2026-09-03)
+
+Cierra el circuito SCIM → decisión contractual → nómina → lifecycle que ISSUE-117 y la auditoría del 03/09 encontraron
+incompleto. Contrato: `GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md` (Delta 2026-09-03) +
+`GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md` (Architecture Decision 2026-09-03). Código:
+`src/lib/workforce/offboarding/{review-policy,review-preview,member-lifecycle,exit-facts}.ts`,
+`src/lib/payroll/exit-eligibility/{query,policy,calculation-gate}.ts`.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** deducir un término laboral desde una señal de acceso (SCIM/admin). Un caso `identity_only` sólo cambia de
+  naturaleza por `reviewOffboardingCase` con decisión explícita (`access_only` | `relationship_ended`), causal
+  respaldada y fechas declaradas. **NUNCA** aprobar/programar/ejecutar un caso `identity_only` sin `review`
+  (el state machine lo rechaza con 409 `offboarding_case_review_required`).
+- **NUNCA** inferir la causal ni la fecha: `separationType` explícito (jamás `identity_only`/`relationship_transition`
+  como causal de término) y `effectiveDate`/`lastWorkingDay` declarados; «hoy» no es un default.
+- **NUNCA** cancelar y crear otro caso para eludir la unicidad por member: se corrige el existente.
+- **NUNCA** escribir sobre un caso sin `expectedUpdatedAt`: el command exige la versión y responde 409
+  `offboarding_case_version_conflict` ante una pantalla desactualizada.
+- **NUNCA** cerrar compensación, relación ni member al ejecutar un caso `identity_only` (informational). **NUNCA**
+  ejecutar un término real con versiones de compensación posteriores al LWD (409; se supersede, no se borra).
+- **NUNCA** desactivar el member antes de terminar la relación legal con la fecha real (la proyección reactiva
+  estamparía `CURRENT_DATE`). El writeback vive detrás de `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED`
+  (OFF); el cierre de compensación y el guard de revisión NO dependen del flag.
+- **NUNCA** usar `members.active` como filtro de elegibilidad histórica: la relación/compensación y el cutoff
+  gobiernan; un inactivo sin hecho de salida se excluye DECLARADO (`inactive_without_exit_fact`).
+- **NUNCA** autorizar un cálculo/aprobación de nómina con una salida sin resolver relevante al período
+  (`reviewRequired` → readiness `unresolved_exit_signal` + `calculatePayroll` 409) ni cuando el resolver falló
+  (`exit_eligibility_unavailable`). La proyección puede degradar; el path oficial no.
+- **NUNCA** reactivar por SCIM/backfill BQ un member con salida real ejecutada (`findExecutedRealExitForMember`);
+  el reingreso es un episodio nuevo por activación gobernada.
+- **NUNCA** contar una capa `unknown` de `closureCompleteness` como completa; **NUNCA** mostrar «Cierre contractual»
+  a un caso cuyo lane persistido es `identity_only`.
+- **NUNCA** recuperar por SQL: `pnpm workforce:offboarding:recovery` (dry-run → `--apply --member` con datos
+  explícitos). **NUNCA** emitir pagos ni marcar pagada una obligación generada por error desde este dominio
+  (Finance concilia con sus commands; hoy falta `cancelPaymentObligation`).
+- **SIEMPRE** que se toque este dominio: `pnpm vitest run src/lib/workforce/offboarding src/lib/payroll/exit-eligibility
+  src/lib/payroll/payroll-readiness` + `pnpm payroll:exit-eligibility:smoke` contra PG real (los mocks no ejecutan
+  el SQL: así se detectó un `$2` sin bind).
+
+---
+
 ## Invariantes operativos para agentes — International Internal contract type (TASK-894)
 
 > **Relocados de `CLAUDE.md` por TASK-1160 (2026-06-16), verbatim — cero cambio semántico.** Espejo operativo (NUNCA/SIEMPRE) que un agente carga al tocar este dominio; el contrato técnico vive en su spec. Dedup = TASK-1160 Slice 4.

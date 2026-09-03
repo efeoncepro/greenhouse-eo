@@ -2,6 +2,20 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-09-03 — TASK-1349: revisión de offboarding + writeback de lifecycle (0 events nuevos, 1 emisor nuevo)
+
+- `member.deactivated` (aggregate `member`, v1) gana un **segundo emisor**: el executor de offboarding
+  (`applyOffboardingLifecycleEffects`, `src/lib/workforce/offboarding/member-lifecycle.ts`) lo publica dentro de la tx
+  de `→ executed` para términos REALES con `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED=true`. Payload:
+  `{ schemaVersion: 1, memberId, deactivationKind: 'offboarding_executed', offboardingCaseId, offboardingCasePublicId,
+  lastWorkingDay, relationshipEnded }`. El emisor legacy (`team-admin/mutate-team.ts`, baja administrativa) usa
+  `deactivationKind` implícito (`administrative_identity_only` en su audit). Consumer existente:
+  `operating_entity_legal_relationship` (encuentra la relación ya terminada con la fecha real → noop).
+- `work_relationship_offboarding_case.updated|approved` (existentes) llevan ahora `reviewDecision` y `reviewChanges`
+  cuando los emite `reviewOffboardingCase`. Sin consumer reactivo aún (igual que el resto de la familia).
+- Audit (tabla `work_relationship_offboarding_case_events`, NO outbox): `offboarding_case.reviewed` con
+  `{ decision, changes, approvalInvalidated, before, after }`.
+
 ## Delta 2026-08-17 — TASK-1719: policy de assignment de assessment (5 events v1)
 
 Aggregate types nuevos: `hiring_assessment_assignment` (ledger durable de la asignación, identity `haa-{uuid}`) y `hiring_assessment_assignment_proposal` (preview del camino manual, identity `haap-{uuid}`).

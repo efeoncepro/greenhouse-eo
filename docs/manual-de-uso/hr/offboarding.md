@@ -1,9 +1,9 @@
 # Offboarding
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-05-04 por Codex
-> **Ultima actualizacion:** 2026-08-10 por Claude (TASK-1388 — ruta de menu: dominio Personas en la zona Operacion)
+> **Ultima actualizacion:** 2026-09-03 por Claude (TASK-1349 — revisión de caso, ejecución por lane, elegibilidad de nómina, recuperación gobernada)
 > **Modulo:** HR / Workforce
 > **Ruta en portal:** `/hr/offboarding`
 > **Documentacion relacionada:** [Offboarding laboral y contractual](../../documentation/hr/offboarding.md), [GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md)
@@ -47,6 +47,61 @@ La vista principal muestra una cola con summary, filtros y una accion principal 
 
 Haz clic en una fila para abrir el drawer de detalle con progreso, prerequisitos y acciones secundarias.
 
+Desde TASK-1349, un caso de acceso sin revisar se muestra como **"Por clasificar"**; una vez revisado como solo acceso, se muestra **"Solo acceso"**. La acción **"Revisar caso"** aparece para cualquier caso no terminal, incluidos los bloqueados.
+
+## Revisar un caso — solo acceso vs. término de relación (TASK-1349)
+
+La revisión es obligatoria antes de poder aprobar, programar o ejecutar un caso que nació de una señal de acceso (SCIM/Admin). Hoy no existe pantalla dedicada para esto en la cola (viene con TASK-1814) — se opera por API, con `pnpm staging:request` (o directo contra local con `curl`) usando la persona agente HR o EFEONCE_ADMIN.
+
+1. Ubica el caso en `/hr/offboarding` y copia su `caseId` y su `updatedAt` vigente (visible en el drawer de detalle o en la respuesta de `GET /api/hr/offboarding/cases`). El `updatedAt` es obligatorio: si el caso cambió desde que lo miraste, la revisión se rechaza con conflicto de versión.
+2. Decide con el HR responsable si la señal fue **solo baja de acceso** o si la relación **realmente terminó**. Nunca se infiere de la fecha ni de la fuente del caso.
+3. (Opcional pero recomendado) Antes de guardar, previsualiza el efecto en nómina sin escribir nada:
+
+   ```bash
+   pnpm staging:request POST /api/hr/offboarding/cases/<caseId>/review/preview '{
+     "decision": "relationship_ended",
+     "separationType": "resignation",
+     "effectiveDate": "2026-09-15",
+     "lastWorkingDay": "2026-09-15",
+     "reason": "Renuncia confirmada por el colaborador, carta recibida 2026-09-01.",
+     "expectedUpdatedAt": "2026-09-01T14:32:10.123Z"
+   }'
+   ```
+
+   La respuesta muestra qué campos cambiarían, si se invalida una aprobación previa, y el efecto en los períodos de nómina afectados (política proyectada, si el período queda bloqueado, y advertencias).
+
+4. Envía la revisión real (mismo body, sin `/preview`):
+
+   **Solo acceso:**
+
+   ```bash
+   pnpm staging:request POST /api/hr/offboarding/cases/<caseId>/review '{
+     "decision": "access_only",
+     "effectiveDate": "2026-09-01",
+     "reason": "Cuenta dada de baja por SCIM al desvincular acceso; no hay término de relación laboral confirmado.",
+     "expectedUpdatedAt": "2026-09-01T14:32:10.123Z"
+   }'
+   ```
+
+   **Terminó la relación** (causal obligatoria — una de `resignation`, `termination`, `fixed_term_expiry`, `mutual_agreement`, `contract_end`, `other`):
+
+   ```bash
+   pnpm staging:request POST /api/hr/offboarding/cases/<caseId>/review '{
+     "decision": "relationship_ended",
+     "separationType": "resignation",
+     "effectiveDate": "2026-09-15",
+     "lastWorkingDay": "2026-09-15",
+     "reason": "Renuncia confirmada por el colaborador, carta recibida 2026-09-01.",
+     "expectedUpdatedAt": "2026-09-01T14:32:10.123Z",
+     "approveNow": false
+   }'
+   ```
+
+   El motivo (`reason`) es obligatorio, mínimo 10 caracteres, y queda en el registro de auditoría del caso — escribe contexto real, no "ok" o "revisado".
+
+5. Si la revisión de "terminó la relación" invalida una aprobación previa, el caso vuelve a "Requiere revisión" y hay que aprobarlo de nuevo — a menos que se envíe `"approveNow": true` y quien ejecuta tenga permiso de aprobar, en cuyo caso queda aprobado en el mismo paso.
+6. Cuando la revisión es "solo acceso", el caso queda listo para cerrarse directo con la acción **"Ejecutar"** (cierre informativo — no toca compensación, relación ni el registro del colaborador).
+
 ## Avanzar estados
 
 La cola muestra la accion disponible cuando corresponde:
@@ -56,6 +111,19 @@ La cola muestra la accion disponible cuando corresponde:
 - `Ejecutar`: marca el caso como ejecutado.
 
 Si el ultimo dia trabajado cae despues de la salida efectiva, debes registrar una razon explicita antes de avanzar. Esa excepcion queda auditada.
+
+**Guardia de revisión (TASK-1349):** si el caso nació de una señal de acceso y todavía no tiene revisión, `Aprobar`, `Programar` y `Ejecutar` se rechazan con el error `offboarding_case_review_required`. Revisa el caso primero (ver sección anterior). Bloquear el caso o cancelarlo sigue permitido sin revisión previa.
+
+### Estados y errores de la revisión
+
+| Código | Cuándo aparece | Qué hacer |
+| --- | --- | --- |
+| `offboarding_case_review_required` (409) | Se intenta aprobar/programar/ejecutar un caso `identity_only` sin revisión. | Revisar el caso primero (solo acceso o término de relación). |
+| `offboarding_case_version_conflict` (409) | El caso cambió desde que se leyó `updatedAt`. | Recargar el caso y reintentar con el `updatedAt` vigente. |
+| `offboarding_review_dates_required` (400) | Falta `effectiveDate` (ambas decisiones) o `lastWorkingDay` (término de relación). | Declarar la fecha explícita — nunca se asume "hoy". |
+| `offboarding_review_separation_type_required` (400) | `decision=relationship_ended` sin `separationType` válido. | Declarar la causal explícita del término. |
+| `compensation_future_version_conflict` (409) | Al ejecutar un término real, hay versiones de compensación que empiezan después del último día trabajado. | Corregir o supersender esas versiones en Payroll antes de reintentar — el sistema no las borra. |
+| `unresolved_exit_signal` (warning bloqueante en readiness de nómina) | Hay una salida sin decidir cuya señal cae en o antes del período de cálculo. | Revisar el caso pendiente antes de calcular o aprobar ese período. |
 
 ## Desde People 360
 
@@ -119,6 +187,40 @@ Para resolverlo (solo si tienes rol EFEONCE_ADMIN):
 
 **Quién más puede ejecutar**: V1.0 solo EFEONCE_ADMIN. Delegación a HR queda como follow-up V1.1 post 30 días sin incidentes operativos.
 
+## Recuperación gobernada (TASK-1349)
+
+Cuando un caso quedó desalineado con la realidad — por ejemplo, una salida real ya ejecutada pero el colaborador sigue activo (`hr.offboarding.executed_member_still_active`, ver [ISSUE-117](../../issues/open/ISSUE-117-offboarding-executed-never-deactivates-member-canonical.md)), o un caso de solo-acceso que en verdad fue un término real — la corrección se hace con el script `pnpm workforce:offboarding:recovery`. **Nunca** con un UPDATE manual en PostgreSQL: el script usa los mismos commands canónicos que la API (revisar → aprobar → programar → ejecutar), así que deja el mismo rastro de auditoría y respeta las mismas reglas.
+
+El script corre en modo simulación por defecto — no escribe nada hasta que se lo pidas explícitamente:
+
+```bash
+# Ver el estado de toda la cohorte con drift, sin aplicar nada
+pnpm workforce:offboarding:recovery
+
+# Ver el estado de un colaborador puntual
+pnpm workforce:offboarding:recovery --member <memberId>
+```
+
+Para aplicar un cambio real, siempre con `--apply` y `--member <memberId>` explícito (nunca aplica a la cohorte completa de una sola vez):
+
+```bash
+# Lane A — cerrar el ciclo de vida de una salida real ya ejecutada
+# (compensación, relación legal, members.active=false, cierre de asignaciones)
+pnpm workforce:offboarding:recovery --apply --member <memberId> \
+  --decision relationship_ended --separation-type resignation \
+  --reason "Renuncia confirmada, caso quedó ejecutado sin cerrar el ciclo de vida del colaborador." \
+  --approve
+
+# Lane B — un caso de solo-acceso que en verdad fue un término real
+pnpm workforce:offboarding:recovery --apply --member <memberId> \
+  --decision access_only --access-revoked-on 2026-09-01 \
+  --reason "Baja de acceso SCIM confirmada, sin evidencia de término de relación laboral."
+```
+
+El script vuelve a leer el estado en vivo justo antes de escribir, e imprime un readback después: elegibilidad de nómina por período, estado del colaborador, y obligaciones de Finance en solo lectura. **Nunca** emite pagos ni toca datos de Finance — si hay una obligación generada por error, esa se corrige en Finance con sus propios commands, no desde este script.
+
+Para verificar el resolver de elegibilidad de nómina de forma aislada (sin tocar casos), usa `pnpm payroll:exit-eligibility:smoke`.
+
 ## Que no hacer
 
 - No uses `Desactivar` como sustituto de salida laboral.
@@ -126,6 +228,10 @@ Para resolverlo (solo si tienes rol EFEONCE_ADMIN):
 - No emitas documento formal desde esta vista; eso pertenece a la lane documental posterior.
 - No cierres un caso si faltan handoffs, assets, permisos o aprobaciones criticas.
 - No uses "Cerrar con proveedor" cuando el caso es `internal_payroll` (Chile dependiente). Esa lane requiere finiquito formal — usa el flujo normal "Calcular finiquito" + "Aprobar" + "Emitir documento".
+- No apruebes, programes ni ejecutes un caso `identity_only` sin revisarlo primero (TASK-1349) — el sistema lo va a rechazar, pero tampoco lo intentes forzar.
+- No corrijas un caso desalineado (ejecutado con colaborador activo, o solo-acceso mal clasificado) con un UPDATE manual en PostgreSQL. Usa siempre `pnpm workforce:offboarding:recovery` — es la vía auditada y gobernada.
+- No asumas la fecha de hoy al revisar un caso, y no infieras la causal del término desde la fecha efectiva — ambas deben declararse explícitamente.
+- No marques como pagada una obligación de Finance generada por un caso mal clasificado; esa corrección la hace Finance con sus propios commands, no este flujo.
 
 ## Problemas comunes
 
@@ -141,12 +247,24 @@ Confirma que el caso tenga `Salida efectiva` y `Ultimo dia`. El ultimo dia no pu
 
 Es esperado. SCIM es una senal de identidad, no una decision laboral. HR debe revisar si corresponde abrir o completar un offboarding laboral real.
 
+### No puedo aprobar/programar/ejecutar un caso — dice "offboarding_case_review_required"
+
+El caso nació de una señal de acceso y todavía no tiene revisión. Revísalo primero (ver "Revisar un caso — solo acceso vs. término de relación") declarando si fue solo baja de acceso o si la relación realmente terminó.
+
+### Al calcular nómina del período aparece un bloqueo por "unresolved_exit_signal"
+
+Hay al menos un colaborador con una salida sin decidir (caso en `Borrador`, `Requiere revisión` o `Bloqueado`) cuya señal cae en o antes de ese período. Identifica el caso desde `/hr/offboarding` (filtro `Atención` o `Por clasificar`) y revísalo — el cálculo se desbloquea una vez que la revisión queda registrada.
+
+### El caso quedó "Ejecutado" pero el colaborador sigue activo en People 360
+
+Puede ser esperado: el paso que marca `members.active=false` está detrás del flag `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED`, hoy apagado. Si ves la señal `hr.offboarding.executed_member_still_active` en `/admin/operations`, usa `pnpm workforce:offboarding:recovery` (lane A, "cerrar ciclo de vida") — nunca un UPDATE manual.
+
 ### El colaborador sigue saliendo en nomina proyectada despues de cerrar con proveedor
 
 Verifica:
 
 1. El caso quedo en `Aprobado` (no en `Borrador`). Si quedo en `Borrador`, el cierre falló — vuelve a intentar con motivo y referencia.
-2. El feature flag `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED` esta en `true` para el ambiente. Mientras esta en `false` (default V1.0 hasta staging shadow compare verde ≥7d), Greenhouse mantiene comportamiento legacy y el colaborador puede seguir apareciendo full-month.
+2. El feature flag `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED` esta en `true` para el ambiente (desde TASK-1349 esta encendido en producción y staging). Si estuviera en `false`, Greenhouse mantiene comportamiento legacy y el colaborador puede seguir apareciendo full-month.
 3. El `last_working_day` esta poblado en el caso. Sin esa fecha el resolver no puede calcular el cutoff.
 
 Si despues de revisar los tres puntos el colaborador sigue apareciendo, contacta a plataforma/HR para revisar el signal `payroll.exit_window.full_month_projection_drift` en `/admin/operations`.
@@ -188,8 +306,10 @@ Si NO tienes capability para el step (no eres EFEONCE_ADMIN), el step se esconde
 - `greenhouse_hr.work_relationship_offboarding_cases`
 - `greenhouse_hr.work_relationship_offboarding_case_events`
 - `src/lib/workforce/offboarding/**`
+- `src/lib/workforce/offboarding/store.ts` (`reviewOffboardingCase`), `review-policy.ts`, `review-preview.ts`, `state-machine.ts`, `member-lifecycle.ts` (TASK-1349)
 - `src/lib/workforce/offboarding/work-queue/closure-completeness.ts` (TASK-892 aggregate canonical)
-- `src/lib/payroll/exit-eligibility/**` (TASK-890 resolver canonico)
-- `/api/hr/offboarding/cases`
-- Capabilities: `hr.offboarding_case`, `workforce.offboarding.close_external_provider` (TASK-890), `person.legal_entity_relationships.reconcile_drift` (TASK-891)
-- Signals: `identity.relationship.member_contract_drift` + `hr.offboarding.completeness_partial` (TASK-892), ambos subsystem Identity & Access
+- `src/lib/payroll/exit-eligibility/**` (TASK-890/1349 resolver canonico)
+- `scripts/workforce/offboarding-recovery.ts` (`pnpm workforce:offboarding:recovery`, TASK-1349)
+- `/api/hr/offboarding/cases`, `/api/hr/offboarding/cases/{caseId}/review[/preview]`, `/api/platform/app/hr/offboarding/cases/{caseId}/review[/preview]` (TASK-1349)
+- Capabilities: `hr.offboarding_case`, `workforce.offboarding.close_external_provider` (TASK-890), `person.legal_entity_relationships.reconcile_drift` (TASK-891), `workforce.offboarding.review_case` (TASK-1349)
+- Signals: `identity.relationship.member_contract_drift` + `hr.offboarding.completeness_partial` (TASK-892), `hr.offboarding.unresolved_exit_signal` + `hr.offboarding.executed_member_still_active` + `workforce.offboarding.deprovisioned_member_without_case` (TASK-1349)

@@ -111,6 +111,27 @@ registros correspondientes y corregir generaciones improcedentes con trazabilida
 pendiente cero. Esta aclaración actualiza el estado de negocio; no reescribe la observación histórica
 del near miss del 06/07.
 
+## Avance 2026-09-03 — TASK-1349 code complete en `develop` (rollout pendiente)
+
+Implementado local-first, sin push ni deploy (commits Slice 0–4 en `develop`):
+
+- Resolver de elegibilidad por episodio (`active` = disponibilidad actual; `contract_type_snapshot` servido; reingreso
+  detectado) + gate fail-closed en readiness y `calculatePayroll` ante salida sin resolver o resolver caído.
+- Command `reviewOffboardingCase` (`access_only` | `relationship_ended`) con causal/fechas explícitas, control de
+  versión, audit y outbox; guard de revisión en el state machine; capability `workforce.offboarding.review_case`
+  (seed aplicado); rutas HR + carril `app`.
+- Executor lane-aware: `identity_only` informational; término real cierra compensación (rechaza versiones futuras),
+  termina relación con fecha real y desactiva member + `member.deactivated` **detrás de
+  `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` (OFF)**.
+- Proyecciones honestas, tres señales (`hr.offboarding.unresolved_exit_signal` = 2, `hr.offboarding.executed_member_still_active`
+  = 3, `workforce.offboarding.deprovisioned_member_without_case` = 0 al 03/09), guards SCIM/backfill.
+- Recovery gobernada `pnpm workforce:offboarding:recovery` (dry-run ejecutado sobre la cohorte real; apply pendiente
+  de autorización del operador y de la causal respaldada de Felipe).
+
+**Sigue abierto**: el cierre operativo exige release, flag ON tras smoke en staging, recovery aplicada (Felipe +
+Valentina/Luis/María Camila), UI TASK-1814 y conciliación Finance de junio/julio de Felipe (obligación 550.875 y SII
+99.125 generadas por error; no existe `cancelPaymentObligation` → dependencia Finance registrada en la task).
+
 ## Relacionado
 
 - Código: [src/lib/workforce/offboarding/store.ts](../../../src/lib/workforce/offboarding/store.ts) (`updateOffboardingCaseStatus`), [src/lib/workforce/offboarding/lane.ts](../../../src/lib/workforce/offboarding/lane.ts)

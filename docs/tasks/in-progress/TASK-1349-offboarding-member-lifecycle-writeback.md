@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `none`
-- Status real: `In progress 2026-09-03; Discovery + auditoría de código/PG hechas; slices 0–4 en ejecución local-first`
+- Status real: `Code complete 2026-09-03 (slices 0–4 en develop, sin push); rollout pendiente: release, flag OFF, recovery por allowlist sin aplicar, UI TASK-1814, conciliación Finance`
 - Rank: `TBD`
 - Domain: `hr|payroll|identity|finance`
 - Blocked by: `none`
@@ -305,20 +305,20 @@ ya están confirmados; no pedirlos nuevamente. Release y cambios de flags siguen
 
 ## Acceptance Criteria
 
-- [ ] ADR temporal actualizada y contrato de revisión/ejecución publicado con autorización fina, grant, errores y API parity.
-- [ ] Caso SCIM existente puede revisarse/corregirse sin cancelar/crear; causal respaldada, fechas explícitas y aprobación invalidada si cambia su base.
-- [ ] Transacción, idempotencia, version conflict, rollback y auditoría/outbox verificados por comportamiento.
-- [ ] Solo acceso no cierra compensación/member; término real coordina relación, vigencias y lifecycle.
-- [ ] Reader entrega contract_type_snapshot y selecciona episodio/período correcto; reingreso y versiones futuras cubiertos.
-- [ ] active=false no excluye retrospectivamente mayo ni participación legítima hasta 02/06; períodos posteriores quedan excluidos.
-- [ ] Readiness y comandos impiden cálculo autorizado ante salida relevante sin resolver o error del resolver; SCIM solo no implica impago.
-- [ ] Progreso/señales detectan pendientes y unknown; executed con member activo no se oculta.
-- [ ] SCIM/backfill BQ respetan ownership y no reactivan salidas confirmadas; detector sin caso exige revisión.
-- [ ] Write-target allowlists, source of truth, tenancy, acceso, migración y rollback documentados y verificados.
-- [ ] TASK-1814 permite completar el flujo desde la UI y comparte la decisión canónica sin lógica duplicada.
-- [ ] Felipe queda fuera de períodos posteriores al 02/06/2026; todo pagado y saldo pendiente cero conciliado con trazabilidad, sin nuevo pago ni reescritura de exports.
-- [ ] Cohorte de otros casos revisada con allowlist por sujeto, sin baja automática de casos solo de acceso.
-- [ ] Readbacks live de UI, PG, oficial/proyectada y señales confirman resultado; flags/deploy/recovery registrados por separado.
+- [x] ADR temporal actualizada y contrato de revisión/ejecución publicado con autorización fina, grant, errores y API parity. — Evidencia: `GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md` Architecture Decision 2026-09-03 + fila en `DECISIONS_INDEX.md`; capability `workforce.offboarding.review_case` (catálogo + grant + seed aplicado, verificado en PG); rutas HR + carril `app`; `capability-grant-coverage.test` verde (commits Slice 0/1).
+- [x] Caso SCIM existente puede revisarse/corregirse sin cancelar/crear; causal respaldada, fechas explícitas y aprobación invalidada si cambia su base. — `review-policy.test.ts` (16 casos) + preview read-only sobre el caso real de Felipe (lane → `non_payroll`, `unblocked`).
+- [x] Transacción, idempotencia, version conflict, rollback y auditoría/outbox verificados por comportamiento. — `member-lifecycle.test.ts` (idempotencia, 409 sin escrituras), `review-policy.test.ts` (409 conflict/400 required), tx única en `reviewOffboardingCase`/`transitionOffboardingCase` (`withTransaction` + `FOR UPDATE`, audit + outbox dentro). Rollback real (fallo intermedio) queda cubierto por `withTransaction`; no ejercitado contra PG con fixture sintético (pendiente en staging).
+- [x] Solo acceso no cierra compensación/member; término real coordina relación, vigencias y lifecycle. — `member-lifecycle.test.ts` ambos sentidos; writeback de member/relación detrás de flag OFF.
+- [x] Reader entrega contract_type_snapshot y selecciona episodio/período correcto; reingreso y versiones futuras cubiertos. — `policy.test.ts` (reingreso, international_internal) + smoke real `pnpm payroll:exit-eligibility:smoke` (Maggie `exclude_from_cutoff` desde approved); versiones futuras → 409 en el executor.
+- [x] active=false no excluye retrospectivamente mayo ni participación legítima hasta 02/06; períodos posteriores quedan excluidos. — `policy.test.ts` «Felipe-like» (mayo full, junio exclude_from_cutoff, julio exclude_entire_period).
+- [x] Readiness y comandos impiden cálculo autorizado ante salida relevante sin resolver o error del resolver; SCIM solo no implica impago. — `payroll-readiness.test.ts` + `calculation-gate.test.ts`; `calculatePayroll` 409; smoke real: Felipe `full_period` + `REVIEW` en jun/sep.
+- [x] Progreso/señales detectan pendientes y unknown; executed con member activo no se oculta. — `closure-completeness.test.ts` (unknown → partial, `close_member_lifecycle`); señales validadas contra PG real (2 / 3 / 0).
+- [x] SCIM/backfill BQ respetan ownership y no reactivan salidas confirmadas; detector sin caso exige revisión. — guard en cascade #2 (`linked_inactive_prior_exit`), CASE en el upsert del backfill, señal `deprovisioned_member_without_case`. No ejercitado en vivo contra Entra (pendiente en staging).
+- [x] Write-target allowlists, source of truth, tenancy, acceso, migración y rollback documentados y verificados. — Delta 2026-09-03 en la arquitectura de offboarding + invariantes TASK-1349 + ledger de flags + migración seed con guard DO.
+- [ ] TASK-1814 permite completar el flujo desde la UI y comparte la decisión canónica sin lógica duplicada. — Contrato publicado en TASK-1814 (Delta 2026-09-03); UI no implementada (task hermana).
+- [ ] Felipe queda fuera de períodos posteriores al 02/06/2026; todo pagado y saldo pendiente cero conciliado con trazabilidad, sin nuevo pago ni reescritura de exports. — Dry-run ejecutado (preview correcto); apply NO ejecutado: requiere causal respaldada declarada por People y autorización del operador; conciliación Finance de junio/julio (obligación 550.875 + SII 99.125 generadas por error, gasto `pending`) sin contrato de anulación → dependencia Finance registrada.
+- [ ] Cohorte de otros casos revisada con allowlist por sujeto, sin baja automática de casos solo de acceso. — Cohorte clasificada por el dry-run (3 lifecycle, 3 stubs stale → `access_only`, 1 draft manual); ninguna escritura aplicada.
+- [ ] Readbacks live de UI, PG, oficial/proyectada y señales confirman resultado; flags/deploy/recovery registrados por separado. — Pendiente de release + rollout (flag OFF).
 
 ## Verification
 
@@ -329,10 +329,35 @@ ya están confirmados; no pedirlos nuevamente. Release y cambios de flags siguen
 
 ## Closing Protocol
 
-- [ ] Lifecycle/carpeta, Status real y acceptance criteria reflejan lo demostrado.
-- [ ] Registry/README y TASK-1814 sincronizados; ISSUE-117 resuelto solo con cierre operativo conjunto.
-- [ ] Arquitectura, invariantes, manual, runbook, Handoff y changelog actualizados según impacto.
-- [ ] `pnpm docs:closure-check` y `pnpm docs:context-check:strict` aprobados al cierre documental.
+- [x] Lifecycle/carpeta, Status real y acceptance criteria reflejan lo demostrado. — `in-progress`, code complete con rollout pendiente (no se mueve a `complete`).
+- [x] Registry/README y TASK-1814 sincronizados; ISSUE-117 resuelto solo con cierre operativo conjunto. — ISSUE-117 sigue `open` con avance registrado.
+- [x] Arquitectura, invariantes, manual, runbook, Handoff y changelog actualizados según impacto.
+- [ ] `pnpm docs:closure-check` y `pnpm docs:context-check:strict` aprobados al cierre documental. — Se ejecutan al cierre de esta sesión (ver Delta).
+
+## Delta 2026-09-03 — implementación local-first (slices 0–4, sin push)
+
+Commits en `develop`: Slice 0 (`b825e0a40`), Slice 1 (`f622a22ce`), Slice 2 (`5df9d727a`), Slice 3 (`7bb6060e3`),
+Slice 4 (`ff2f7623e`) + cierre documental. Resumen ejecutable:
+
+| Slice | Entrega | Verificación |
+|---|---|---|
+| 0 | Resolver por episodio (`active` = disponibilidad), `contract_type_snapshot` servido, `reviewRequired`, gate fail-closed en readiness + `calculatePayroll`, ADR | 167 tests focales; smoke PG real (destapó `$2` sin bind, 42P18) |
+| 1 | `reviewOffboardingCase` + preview, guard de revisión, `expectedUpdatedAt`, capability + seed, rutas HR + app lane | 113 tests; preview real sobre Felipe (read-only); typecheck |
+| 2 | Executor lane-aware, `applyOffboardingLifecycleEffects` (flag OFF), roster sin filtro `active` universal | 68 tests; smoke roster PG real flag off/on |
+| 3 | Proyecciones honestas, 3 señales, guards SCIM/backfill | 141 tests; señales validadas en PG (2/3/0) |
+| 4 | `pnpm workforce:offboarding:recovery` dry-run/apply por allowlist | dry-run real de la cohorte; ninguna escritura |
+
+**Efecto operativo post-release (deliberado):** readiness de septiembre bloqueará con `unresolved_exit_signal` hasta
+resolver Felipe (blocked) y Maria Fernanda (draft con fecha pasada). Es el control que faltó el 06/07.
+
+**Dependencias ejecutables antes de cerrar ISSUE-117:** (1) release + `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED`
+ON tras smoke sintético en staging (ledger); (2) recovery por allowlist con la causal respaldada de Felipe declarada
+por People; (3) Finance: contrato para anular obligación/gasto generados por error (junio 550.875 / SII 99.125 y julio
+SII 99.125 de Felipe) — hoy sólo existe `supersedePaymentObligation`, no cancel; (4) TASK-1814 UI; (5) TASK-1625
+posee el hallazgo «entry julio gross 0 con retención SII 99.125».
+
+**Gate omitido a propósito:** `pnpm build` de producción no se corrió en esta máquina (consume ~30 GB y requiere
+autorización del operador); `pnpm test` completo, `pnpm typecheck` y `pnpm lint` sí.
 
 ## Follow-ups
 

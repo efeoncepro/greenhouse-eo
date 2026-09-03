@@ -29,6 +29,27 @@
 - Legacy ID: `none`
 - GitHub Issue: `ISSUE-117`
 
+## Delta 2026-09-03 — contrato backend de TASK-1349 disponible (code complete, rollout pendiente)
+
+- Command y rutas: `POST /api/hr/offboarding/cases/[caseId]/review` (body `ReviewOffboardingCaseInput`: `decision`
+  `access_only|relationship_ended`, `reason` ≥10, `expectedUpdatedAt` = `case.updatedAt` visto, `separationType`
+  (obligatoria en `relationship_ended`; nunca `identity_only`), `effectiveDate`, `lastWorkingDay`,
+  `lastWorkingDayAfterEffectiveReason?`, `notes?`, `approveNow?`) → `{ case, changes[], approvalInvalidated }`.
+  `POST .../review/preview` (mismo body, sin escritura) → `{ derivation: { next, review, changes, approvalInvalidated },
+  payrollEffect[{ periodId, projectionPolicy, reviewRequired, cutoffDate, warnings }], approvalStillRequiredForPayroll }`.
+- Errores (es-CL + `code`): `offboarding_case_review_required` (409, aprobar sin revisar), `offboarding_case_version_conflict`
+  (409, recargar), `offboarding_case_version_required` (400), `offboarding_review_reason_too_short`,
+  `offboarding_review_dates_required`, `offboarding_review_dates_inconsistent`, `offboarding_review_separation_type_required`,
+  `offboarding_case_terminal` (409), `compensation_future_version_conflict` (409 al ejecutar).
+- DTO `OffboardingWorkQueueItem`: `case.review` (registro persistido), `case.updatedAt` para la versión,
+  `closureLane.code` nuevo `access_only`, `secondaryActions` con `review_case` (todo caso no terminal, blocked incluido)
+  y `transition_execute` para `access_only` revisado; `progress` real (4 pasos) en lanes sin finiquito;
+  `closureCompleteness.pendingSteps` con `close_member_lifecycle` y `verify_member_runtime`.
+- `TransitionOffboardingCaseInput.expectedUpdatedAt` opcional: enviar siempre desde la UI para que aprobar/programar
+  nunca sobrescriba una versión ajena. Un caso `identity_only` sin `review` ya no ofrece «Aprobar».
+- Regla UI derivada: ninguna fecha se toma del formulario «Nuevo caso»; el preview muestra el efecto de nómina antes
+  de guardar; `approvalStillRequiredForPayroll=true` significa que aprobar es lo que libera el período.
+
 ## Summary
 
 Permitir revisar y corregir el caso de offboarding existente desde su inspector: clasificación contractual,
