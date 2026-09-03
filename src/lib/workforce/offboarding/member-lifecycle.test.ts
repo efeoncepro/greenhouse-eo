@@ -27,6 +27,7 @@ import type { OffboardingCase } from './types'
 let futureVersions: Array<{ version_id: string; effective_from: string }> = []
 let activeRelationship = true
 let reentryRelationship: Array<{ relationship_id: string; effective_from: string }> = []
+let reentryEngagement: Array<{ contractor_engagement_id: string; start_date: string }> = []
 
 const client = {
   query: vi.fn(async (text: string, values: unknown[] = []) => {
@@ -34,7 +35,7 @@ const client = {
 
     if (text.includes('greenhouse_payroll.compensation_versions') && text.includes('effective_from > $2::date')) return { rows: futureVersions }
     if (text.includes('person_legal_entity_relationships') && text.includes('effective_from > $2::date')) return { rows: reentryRelationship }
-    if (text.includes('greenhouse_hr.contractor_engagements')) return { rows: [] }
+    if (text.includes('greenhouse_hr.contractor_engagements')) return { rows: reentryEngagement }
     if (text.includes('UPDATE greenhouse_payroll.compensation_versions')) return { rows: [{ version_id: 'v1' }] }
 
     if (text.includes('FROM greenhouse_core.person_legal_entity_relationships') && text.includes('FOR UPDATE')) {
@@ -110,6 +111,7 @@ beforeEach(() => {
   futureVersions = []
   activeRelationship = true
   reentryRelationship = []
+  reentryEngagement = []
   delete process.env.WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED
 })
 
@@ -207,6 +209,21 @@ describe('applyOffboardingLifecycleEffects', () => {
     expect(sql('UPDATE greenhouse_core.members')).toHaveLength(0)
     expect(endRelationshipMock).not.toHaveBeenCalled()
     expect(publishMock).not.toHaveBeenCalled()
+  })
+
+  it('preserves a returning contractor when only the profile anchors the engagement', async () => {
+    process.env.WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED = 'true'
+    reentryEngagement = [{ contractor_engagement_id: 'profile-only-engagement', start_date: '2026-08-20' }]
+
+    const effects = await applyOffboardingLifecycleEffects(client, { current: realExit, lastWorkingDay: '2026-06-02', actorUserId: 'hr-1', reason: null })
+
+    expect(effects.skippedReason).toBe('reentry_detected')
+    expect(effects.memberDeactivated).toBe(false)
+    expect(endRelationshipMock).not.toHaveBeenCalled()
+    expect(publishMock).not.toHaveBeenCalled()
+    // Predicate behavior is exercised on PostgreSQL in reentry-predicates.live.test.ts.
+    // Here we verify the command supplies both identity anchors to that predicate.
+    expect(sql('greenhouse_hr.contractor_engagements')[0]?.values).toEqual(['member-1', '2026-06-02', 'profile-1'])
   })
 
   it('without a member or a last working day it skips declaratively', async () => {

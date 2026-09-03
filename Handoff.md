@@ -25,13 +25,15 @@ command (`closeCompensationVigencyAtExit`), la política ya no cuenta un caso `i
 (`hasDecidedExitFact`), y el live test cierra la compensación de sus sujetos al terminar. Roster de septiembre
 verificado: 5 personas reales con compensación, cero uuids. El fix de código viaja en el PR #220 (develop), sin mergear.
 
-🔴 **Incidente Valentina Hoyos (abierto hasta que el operador corra un SQL):** la lane A la desactivó pese a tener una
+🔴 **Incidente Valentina Hoyos (recuperación gobernada preparada por Codex):** la lane A la desactivó pese a tener una
 relación `contractor` activa desde 2026-08-20 (reingreso). Fix commiteado en develop `c5c030e99` (guard
 `findReentryAfterExit` + señal excluye reingresos) — **NO está en `main`: producción sigue sin la guarda hasta el
 próximo release.** El intento de reactivarla por `updateMember` falló a mitad (ISSUE-163) y su `member.updated`
 reactivó la relación employee terminada; ya la re-terminé al 30/04 por command canónico. **Residual que el
-clasificador me impidió corregir:** `status='inactive'`, `contract_end_date=2026-04-30`, `assignable=false` y su
-asignación cerrada → ejecutar `scripts/workforce/restore-valentina-hoyos-2026-09-03.sql` vía `pnpm pg:connect:shell`.
+clasificador impidió corregir en Claude:** `status='inactive'`, `contract_end_date=2026-04-30`, `assignable=false` y su
+asignación cerrada. Codex preparó command transaccional con preview real; SQL puntual retirado. Ver
+[runbook de recuperación](docs/operations/runbooks/workforce-reentry-recovery.md). Falta desplegar la guarda del consumidor
+antes de aplicar y verificar la recuperación; acceso, contratos y pagos siguen intactos.
 Finance de Felipe (obligación junio + SII) sigue como dependencia sin command de anulación. UI: TASK-1814.
 
 Offboarding (2026-09-03): auditoría UI/código/PG registrada en

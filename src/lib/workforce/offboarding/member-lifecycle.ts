@@ -8,6 +8,7 @@ import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 import type { OffboardingCase } from './types'
+import { reentryEngagementPredicate, reentryRelationshipPredicate } from './reentry-predicates'
 
 /**
  * TASK-1349 — Lifecycle effects of a REAL termination, applied inside the
@@ -57,11 +58,8 @@ export const findReentryAfterExit = async (
   const relationship = await client.query<{ relationship_id: string; effective_from: string }>(
     `
       SELECT relationship_id, effective_from::text AS effective_from
-      FROM greenhouse_core.person_legal_entity_relationships
-      WHERE profile_id = $1
-        AND status = 'active'
-        AND effective_to IS NULL
-        AND effective_from > $2::date
+      FROM greenhouse_core.person_legal_entity_relationships r
+      WHERE ${reentryRelationshipPredicate({ profileIdSql: '$1', lastWorkingDaySql: '$2::date' })}
       ORDER BY effective_from DESC
       LIMIT 1
     `,
@@ -75,15 +73,12 @@ export const findReentryAfterExit = async (
   const engagement = await client.query<{ contractor_engagement_id: string; start_date: string }>(
     `
       SELECT contractor_engagement_id, start_date::text AS start_date
-      FROM greenhouse_hr.contractor_engagements
-      WHERE member_id = $1
-        AND status IN ('active', 'paused', 'ending', 'pending_review', 'draft')
-        AND (end_date IS NULL OR end_date > CURRENT_DATE)
-        AND start_date > $2::date
+      FROM greenhouse_hr.contractor_engagements e
+      WHERE ${reentryEngagementPredicate({ profileIdSql: '$3', memberIdSql: '$1', lastWorkingDaySql: '$2::date' })}
       ORDER BY start_date DESC
       LIMIT 1
     `,
-    [memberId, lastWorkingDay]
+    [memberId, lastWorkingDay, profileId]
   )
 
   if (engagement.rows[0]) {

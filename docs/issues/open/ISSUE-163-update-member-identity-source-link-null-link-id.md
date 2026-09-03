@@ -52,10 +52,19 @@ NULL sin default). Probablemente sólo se ejercita cuando el member tiene `azure
 
 ## Estado
 
-open
+Code complete local; rollout y recuperación operativa pendientes. No se declara reparada Valentina hasta readback del comando compensatorio y del consumidor desplegado.
+
+### Corrección 2026-09-03 — Codex
+
+- `updateMember`: member, identity links con ID canónico y outbox auditado en una transacción. BigQuery es espejo postcommit.
+- Proyección legal: no reabre episodios terminados/inactivos ni crea employee sobre historia contractor/executive.
+- Resolver compartido de reingreso: sólo episodios laborales vigentes; soporte de engagements anclados por profile sin member. Recovery preview y señal usan el mismo criterio.
+- Nuevo comando `restoreOffboardingLifecycleAfterReentry`: admin vigente, snapshot/hash, target explícito, transacción, idempotencia y eventos. [Decisión](../../architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md) y [runbook](../../operations/runbooks/workforce-reentry-recovery.md).
+- SQL puntual retirado; no ejecutar la reversión sin verificar el consumidor corregido en runtime.
+- Validación local: pruebas de fallo/rollback de commands y proyección, dos pruebas SQL de predicados con CTE sintéticos en transacciones READ ONLY y preview real de Valentina. Los tests no sustituyen la prueba de despliegue.
 
 ## Relacionado
 
 - `docs/tasks/in-progress/TASK-1349-offboarding-member-lifecycle-writeback.md` (Delta recovery 2026-09-03)
-- `scripts/workforce/restore-valentina-hoyos-2026-09-03.sql` (compensación puntual pendiente del operador)
+- `scripts/workforce/restore-offboarding-lifecycle.ts` (reemplazo gobernado del SQL puntual retirado)
 - `src/lib/account-360/person-legal-entity-relationships.ts`, `src/lib/team-admin/mutate-team.ts`

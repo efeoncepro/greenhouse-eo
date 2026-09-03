@@ -4,7 +4,10 @@ import { randomUUID } from 'node:crypto'
 
 import { NextResponse } from 'next/server'
 
+import type { PoolClient } from 'pg'
+
 import { ROLE_CODES } from '@/config/role-codes'
+import { buildIdentitySourceLinkId } from '@/lib/ids/greenhouse-ids'
 import { getBigQueryClient, getBigQueryProjectId } from '@/lib/bigquery'
 import { isGreenhousePostgresConfigured, runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
@@ -450,10 +453,14 @@ const getMemberRecordFromBigQuery = async (memberId: string) => {
   return rows[0] ? mapMemberRecord(rows[0]) : null
 }
 
-const getMemberRecord = async (memberId: string) => {
-  if (isGreenhousePostgresConfigured()) {
+const getMemberRecord = async (memberId: string, client?: PoolClient) => {
+  if (client || isGreenhousePostgresConfigured()) {
     try {
-      const rows = await runGreenhousePostgresQuery<MemberRow>(
+      const query = client
+        ? async (sql: string, values: unknown[]) => (await client.query<MemberRow>(sql, values)).rows
+        : runGreenhousePostgresQuery<MemberRow>
+
+      const rows = await query(
         `SELECT
            member_id,
            display_name,
@@ -474,13 +481,13 @@ const getMemberRecord = async (memberId: string) => {
            active
          FROM greenhouse_core.members
          WHERE member_id = $1
-         LIMIT 1`,
+         LIMIT 1${client ? ' FOR UPDATE' : ''}`,
         [memberId]
       )
 
       return rows[0] ? mapMemberRecord(rows[0]) : null
     } catch (error) {
-      if (!shouldFallbackToLegacy(error)) throw error
+      if (client || !shouldFallbackToLegacy(error)) throw error
       console.warn('[team-admin] getMemberRecord Postgres failed, falling back to BigQuery:', error instanceof Error ? error.message : error)
     }
   }
@@ -1364,8 +1371,8 @@ const buildMemberInsertPayload = async (input: CreateMemberInput) => {
   }
 }
 
-const buildMemberUpdatePayload = async (memberId: string, input: UpdateMemberInput) => {
-  const existing = await getMemberRecord(memberId)
+const buildMemberUpdatePayload = async (memberId: string, input: UpdateMemberInput, client?: PoolClient) => {
+  const existing = await getMemberRecord(memberId, client)
 
   if (!existing) {
     throw new TeamAdminValidationError('Team member not found.', 404)
@@ -1643,22 +1650,26 @@ const syncIdentitySourceLinksToBigQuery = async (member: TeamAdminMemberRecord) 
   }
 }
 
-const syncIdentitySourceLinksForMember = async (member: TeamAdminMemberRecord) => {
+const syncIdentitySourceLinksForMember = async (member: TeamAdminMemberRecord, client?: PoolClient) => {
   if (!member.identityProfileId) {
     return
   }
 
-  if (isGreenhousePostgresConfigured()) {
+  if (client || isGreenhousePostgresConfigured()) {
     const syncRows = getMemberIdentitySyncInput(member)
 
     for (const row of syncRows) {
       if (!row.sourceObjectId) continue
 
-      await runGreenhousePostgresQuery(
+      const query = client
+        ? (sql: string, values: unknown[]) => client.query(sql, values)
+        : (sql: string, values: unknown[]) => runGreenhousePostgresQuery(sql, values)
+
+      await query(
         `INSERT INTO greenhouse_core.identity_profile_source_links (
-           profile_id, source_system, source_object_type, source_object_id,
+           link_id, profile_id, source_system, source_object_type, source_object_id,
            source_user_id, source_email, source_display_name, active
-         ) VALUES ($1, $2, $3, $4, $5, $6, $7, TRUE)
+         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, TRUE)
          ON CONFLICT (profile_id, source_system, source_object_type, source_object_id)
          DO UPDATE SET
            source_user_id = EXCLUDED.source_user_id,
@@ -1666,6 +1677,12 @@ const syncIdentitySourceLinksForMember = async (member: TeamAdminMemberRecord) =
            source_display_name = EXCLUDED.source_display_name,
            active = TRUE`,
         [
+          buildIdentitySourceLinkId({
+            profileId: member.identityProfileId,
+            sourceSystem: row.sourceSystem,
+            sourceObjectType: row.sourceObjectType,
+            sourceObjectId: row.sourceObjectId
+          }),
           member.identityProfileId,
           row.sourceSystem, row.sourceObjectType, row.sourceObjectId,
           row.sourceUserId, row.sourceEmail, row.sourceDisplayName
@@ -1673,7 +1690,7 @@ const syncIdentitySourceLinksForMember = async (member: TeamAdminMemberRecord) =
       )
     }
 
-    syncToBigQuery('syncIdentitySourceLinks', () => syncIdentitySourceLinksToBigQuery(member))
+    if (!client) syncToBigQuery('syncIdentitySourceLinks', () => syncIdentitySourceLinksToBigQuery(member))
 
     return
   }
@@ -1898,42 +1915,73 @@ export const updateMember = async ({
   actorUserId: string
   actorEmail: string | null
 }) => {
-  const { existing, updates } = await buildMemberUpdatePayload(memberId, input)
-
-  if (Object.keys(updates).length === 0) {
-    return existing
-  }
-
-  // Map column names: BigQuery `email` → Postgres `primary_email`
-  const pgColumnMap: Record<string, string> = { email: 'primary_email' }
-
   if (isGreenhousePostgresConfigured()) {
-    const pgClauses: string[] = []
-    const pgValues: unknown[] = []
-    let pi = 1
+    const result = await withGreenhousePostgresTransaction(async client => {
+      const { existing, updates } = await buildMemberUpdatePayload(memberId, input, client)
 
-    for (const [col, val] of Object.entries(updates)) {
-      if (!writableMemberColumns.has(col)) continue
-      const pgCol = pgColumnMap[col] || col
+      if (Object.keys(updates).length === 0) return { existing, updated: existing, updates }
 
-      pgClauses.push(`${pgCol} = $${pi++}`)
-      pgValues.push(val)
-    }
+      const pgClauses: string[] = []
+      const pgValues: unknown[] = []
 
-    if (pgClauses.length > 0) {
-      pgClauses.push('updated_at = CURRENT_TIMESTAMP')
+      for (const [column, value] of Object.entries(updates)) {
+        if (!writableMemberColumns.has(column)) continue
+        pgValues.push(value)
+        pgClauses.push(`${column === 'email' ? 'primary_email' : column} = $${pgValues.length}`)
+      }
+
       pgValues.push(memberId)
-
-      await runGreenhousePostgresQuery(
-        `UPDATE greenhouse_core.members SET ${pgClauses.join(', ')} WHERE member_id = $${pi}`,
+      await client.query(
+        `UPDATE greenhouse_core.members SET ${pgClauses.join(', ')}, updated_at = CURRENT_TIMESTAMP
+         WHERE member_id = $${pgValues.length}`,
         pgValues
       )
+      const updated = await getMemberRecord(memberId, client)
+
+      if (!updated) throw new TeamAdminValidationError('Updated member could not be reloaded.', 500)
+
+      await syncIdentitySourceLinksForMember(updated, client)
+      // The durable actor/before/after audit commits with the member and its identity links.
+      // BigQuery remains a compatibility mirror and cannot leave a partial canonical write.
+      await publishOutboxEvent({
+        aggregateType: AGGREGATE_TYPES.member,
+        aggregateId: updated.memberId,
+        eventType: EVENT_TYPES.memberUpdated,
+        payload: {
+          memberId: updated.memberId,
+          updatedFields: Object.keys(updates),
+          actorUserId,
+          actorEmail,
+          previous: existing,
+          next: updated
+        }
+      }, client)
+
+      return { existing, updated, updates }
+    })
+
+    if (Object.keys(result.updates).length > 0) {
+      syncToBigQuery('updateMember', async () => {
+        await updateMemberInBigQuery(memberId, result.updates)
+        await syncIdentitySourceLinksToBigQuery(result.updated)
+        await writeAuditEvent({
+          actorUserId,
+          eventType: 'admin.team_member.updated',
+          targetEntityType: 'team_member',
+          targetEntityId: memberId,
+          payload: { actorEmail, previous: result.existing, next: result.updated }
+        })
+      })
     }
 
-    syncToBigQuery('updateMember', () => updateMemberInBigQuery(memberId, updates))
-  } else {
-    await updateMemberInBigQuery(memberId, updates)
+    return result.updated
   }
+
+  const { existing, updates } = await buildMemberUpdatePayload(memberId, input)
+
+  if (Object.keys(updates).length === 0) return existing
+
+  await updateMemberInBigQuery(memberId, updates)
 
   const updated = await getMemberRecord(memberId)
 

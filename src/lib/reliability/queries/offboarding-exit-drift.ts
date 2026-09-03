@@ -2,6 +2,7 @@
 import 'server-only'
 
 import { query } from '@/lib/db'
+import { reentryEngagementPredicate, reentryRelationshipPredicate } from '@/lib/workforce/offboarding/reentry-predicates'
 import { captureWithDomain } from '@/lib/observability/capture'
 import type { ReliabilitySignal } from '@/types/reliability'
 
@@ -70,13 +71,11 @@ const EXECUTED_STILL_ACTIVE_SQL = `
     -- started after the LWD means the member is current workforce.
     AND NOT EXISTS (
       SELECT 1 FROM greenhouse_core.person_legal_entity_relationships r
-      WHERE r.profile_id = m.identity_profile_id AND r.status = 'active' AND r.effective_to IS NULL
-        AND r.effective_from > c.last_working_day
+      WHERE ${reentryRelationshipPredicate({ profileIdSql: 'm.identity_profile_id', lastWorkingDaySql: 'c.last_working_day' })}
     )
     AND NOT EXISTS (
       SELECT 1 FROM greenhouse_hr.contractor_engagements e
-      WHERE e.member_id = m.member_id AND e.status IN ('active', 'paused', 'ending', 'pending_review', 'draft')
-        AND (e.end_date IS NULL OR e.end_date > CURRENT_DATE) AND e.start_date > c.last_working_day
+      WHERE ${reentryEngagementPredicate({ profileIdSql: 'm.identity_profile_id', memberIdSql: 'm.member_id', lastWorkingDaySql: 'c.last_working_day' })}
     )
 `
 
