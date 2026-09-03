@@ -225,6 +225,14 @@ change-gated con diff de árbol vacío). Incluyó TASK-1805 Slices 1–3 (sin fl
 único bypass) y la reconciliación de **10 commits que `cesargrowth11` empujó directo a `main`** (skill Berel,
 22:06–22:10Z) por cherry-pick + `-s ours`. Playbook gana el anti-patrón #15. Ledger de tiempos actualizado.
 
+**Barrido documental por subagentes (23:45Z):** dos agentes actualizaron lo que el cierre manual no cubría —
+`api-platform-ecosystem.md` (lane de manuales), `efeonce-mcp-gateway.md` (provider `greenhouse-skills`, 36 tools),
+arquitectura API Platform (delta), ADR del gateway (delta provider + guard no-SEO), patrones canónicos (segundo
+uso del patrón manifiesto+artefacto+hash), `docs/api` (pointer), arquitectura SEO §7 (manuales obligatorios por
+task), manuales de uso del inventario/gateway/provider SEO, doc funcional SV360 por MCP, skills
+`dataforseo-operator` y `seo-aeo-practice` (espejadas), README y AGENTS del repo `efeonce-mcp` (cifras 28/36/6).
+Regla auto-cargada `.claude/rules/mcp-tool-surface.md` gana el invariante de manuales.
+
 ## 2026-09-02 (5) — TASK-1784: el eval de selección MCP refutó su propia hipótesis, y eso es el entregable
 
 Se midió la selección de tools SEO antes de tocar una descripción: **tool 94.5% / mercado 98.2% / gasto 100%**

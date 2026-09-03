@@ -349,6 +349,17 @@ domain    /v3/domain_analytics/  domain metrics
 
 Cada capacidad = primitive gobernado `src/lib/growth/seo/**`, reusable por UI + Nexa + MCP. Reads directos; writes vía `propose → confirm → execute`.
 
+**Manuales agent-facing del módulo (TASK-1804, 2026-09-02).** El "cómo se opera" de estas tools no vive en la
+descripción de cada tool ni en la nota del handshake: vive en `docs/mcp/skills/<name>/SKILL.md` (hoy seis, todos
+`audience: internal`: `seo-spend-discipline`, `seo-visibility-reading`, `competitor-loop`,
+`seo-discovery-to-tracking`, `seo-technical-health`, `seo-prospect-diagnostic`), declarados en
+`src/mcp/greenhouse/skill-manifest.ts` con `appliesTo` validado contra el manifiesto de tools, y servidos por el
+protocolo (`get_greenhouse_skill`, `skill://efeonce/{name}/SKILL.md`, lane
+`/api/platform/ecosystem/mcp/skills`). **Toda task SEO que agregue o cambie una tool actualiza el manual que la
+gobierna en el mismo PR** (y agrega la tool a su `appliesTo`), regenera el artefacto con
+`pnpm mcp:skills:generate` y deja verde `pnpm mcp:skills:check`. Un manual nunca contiene UUIDs, ids de
+organización, rutas del repo, ids de task, secretos ni correos internos: el test de fuga rompe el build.
+
 **Exposición MCP/ecosystem — IMPLEMENTADA (TASK-1645, 2026-08-05).** Lane machine-authed
 `/api/platform/ecosystem/growth/seo/{keyword-opportunities,visibility-360,entitlement}` (vía
 `runEcosystemReadRoute`; resource builder `src/lib/api-platform/resources/ecosystem-growth-seo.ts`:
@@ -2069,8 +2080,9 @@ persistencia append-only, costo acotado, API parity y MCP; no existe activación
 Cada task de la secuencia (`1805`, `1806`, `1312`, `1313`, `1314`, `1808`–`1811`) es dueña también de su capa de
 uso por agentes. En el mismo PR debe crear o actualizar: primitive/read-command, lane ecosystem, tool MCP,
 manifiesto canónico y artefacto, federación o exclusión razonada, y las guías aplicables en las skills
-`dataforseo-operator` y `seo-aeo` con espejos Codex/Claude. Si `TASK-1804` ya está disponible, debe actualizar
-además el recurso de skill servido por MCP. Ningún endpoint justifica por sí solo una skill nueva cuando la skill
+`dataforseo-operator` y `seo-aeo` con espejos Codex/Claude. `TASK-1804` está disponible desde el 2026-09-02: debe
+actualizar además el manual servido por MCP (`docs/mcp/skills/<name>/SKILL.md` + `appliesTo` en el manifiesto de
+skills + `pnpm mcp:skills:generate`). Ningún endpoint justifica por sí solo una skill nueva cuando la skill
 de dominio puede ampliarse.
 
 Una tool de lectura sólo consume evidencia persistida. Capturar, escribir o comprometer gasto requiere una tool

@@ -91,7 +91,10 @@ procedimiento de gasto. El gateway federa la tool con su propio guard de paridad
 contrato verde contra producción. Sin Entra, flag ni persistencia nuevos. Follow-up del mismo día: un agente Claude Code
 real cargó el manual por el front door OAuth, y el catálogo creció a seis manuales (discovery→tracking, salud técnica,
 diagnóstico de prospecto) sin tocar la tool ni el gateway; los seis salieron a producción en el segundo release del día
-(`4379c495013f`) con canary de contrato verde.
+(`4379c495013f`) con canary de contrato verde. Barrido documental posterior por subagentes: manuales de uso del
+inventario MCP/gateway/provider SEO, docs funcionales de API Platform y gateway, deltas en arquitectura API/ADR del
+gateway/patrones canónicos/arquitectura SEO, skills `dataforseo-operator` y `seo-aeo-practice`, y README/AGENTS del
+repo `efeonce-mcp`.
 
 ## 2026-09-02 — ANAM: entrega premium de Emma y soporte explícito de tres meses
 

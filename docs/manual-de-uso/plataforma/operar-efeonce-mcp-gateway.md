@@ -24,6 +24,16 @@ No uses la URL `run.app`: el acceso público pasa por el front door y el hostnam
    costo de vendor ni margen.
 6. Para el provider Greenhouse-SEO, sigue su manual dedicado:
    [Operar el provider Greenhouse-SEO del MCP](operar-provider-greenhouse-seo-mcp.md). Sus tools de lectura viven en el permiso base `efeonce.mcp.read` y las 7 de escritura bajo `efeonce.mcp.seo.write`; el permiso base, se verifican con dos canaries distintos y tienen su propio interruptor de rollback.
+7. Ejecuta `get_greenhouse_skill` sin argumentos: debe devolver el catálogo de manuales de uso (seis al 2026-09-02,
+   la cuenta exacta la fija `src/mcp/greenhouse/skill-manifest.ts` en Greenhouse). Con `{ "name": "seo-spend-discipline" }`
+   debe volver el manual completo como texto, empezando por su frontmatter. Un catálogo vacío con la revisión
+   correcta desplegada significa que el binding no es `internal` o que el provider está apagado — nunca "no hay manuales".
+8. Cuenta `tools/list`: **36 tools federadas al 2026-09-02** (28 del provider SEO + `get_greenhouse_skill` + las nativas
+   de gateway, Globe y hiring), revisión activa `efeonce-mcp-gateway-00028-pmx`. La cifra se lee del server, no de
+   este texto; si difiere, compara contra el manifiesto de Greenhouse antes de declarar drift.
+
+Si tu cliente MCP muestra el server como `Needs authentication` después de haber funcionado, el token Entra expiró
+(~1 hora): vuelve a autenticar (`claude mcp login efeonce-mcp` en Claude Code) y repite. No es una falla del gateway.
 
 Para una prueba release-controlada desde el repo `efeonce-mcp`, usa `pnpm oauth:canary`. En macOS abre Google
 Chrome y debe ejecutarse con el perfil autenticado autorizado. Al terminar, cierra sólo la ventana de prueba; no
@@ -33,6 +43,9 @@ cierres la sesión compartida del perfil.
 
 - La capacidad actual es lectura interna más 7 escrituras federadas y fail-closed por scope. No habilites tools de runs, assets, review, delivery, créditos o writes
   como parte de una prueba de acceso.
+- El provider `greenhouse-skills` (manuales de uso, `get_greenhouse_skill`) **no tiene interruptor propio**: se prende y se
+  apaga con `GREENHOUSE_SEO_PROVIDER_ENABLED`, porque es la misma lane ecosystem y la misma identidad de servicio.
+  Apagar el SEO apaga también los manuales (responden `policy_blocked`), y eso es lo esperado.
 - Mantén Cloud Run en `concurrency=80` y `maxScale=5` mientras no haya una decisión explícita de capacidad.
 - Ante una falla de un provider, conserva OAuth y el gateway; deshabilita sólo ese provider y redespliega
   siguiendo el runbook (`GLOBE_PROVIDER_ENABLED=false` o `GREENHOUSE_SEO_PROVIDER_ENABLED=false`, según el caso).

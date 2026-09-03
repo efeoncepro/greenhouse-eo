@@ -1,9 +1,9 @@
 # Operar el provider Greenhouse-SEO del MCP
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-08-06 por Claude (TASK-1647)
-> **Ultima actualizacion:** 2026-08-28 por Claude (TASK-1662+1699 desplegadas: 27 tools — 20 lectura + 7 escritura — federadas Y sirviendo en producción; revisión `efeonce-mcp-gateway-00024-8b8`)
+> **Ultima actualizacion:** 2026-09-02 por Claude (TASK-1804: el provider hermano `greenhouse-skills` sirve los manuales de uso con la MISMA configuración; 36 tools federadas en total — 28 SEO + `get_greenhouse_skill` + nativas — revisión `efeonce-mcp-gateway-00028-pmx`; delta previo 2026-08-28 TASK-1662+1699: 27 tools federadas, revisión `efeonce-mcp-gateway-00024-8b8`)
 > **Endpoint canonico:** `https://mcp.efeonce.org/mcp`
 > **Documentacion funcional:** [Search Visibility 360 por MCP](../../documentation/growth/search-visibility-360-por-mcp.md)
 > **Runbook tecnico:** [Efeonce MCP Platform Runbook](../../operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md) §Provider Greenhouse-SEO
@@ -72,6 +72,19 @@ estos docs listaban como pendiente **ya se ejecutó**; no queda ninguna tool esp
   `provider-spend` ✓.
 - **CERO cambios en Entra.** Las dos escrituras nuevas viajan en el scope `efeonce.mcp.seo.write` que
   ya existía, así que siguen live-but-fail-closed hasta TASK-1631 igual que las demás.
+
+✅ **Delta 2026-09-02 (TASK-1804): 36 tools federadas en total; el manual de uso viaja con ellas.** Revisión activa
+`efeonce-mcp-gateway-00028-pmx` (verificada con `gcloud run services describe`, 100% del tráfico). La cuenta de
+`tools/list` es **36 = 28 SEO (21 lecturas + 7 escrituras) + `get_greenhouse_skill` + las nativas de gateway, Globe y
+hiring**. La tool nueva la sirve el provider hermano `greenhouse-skills` (`src/providers/greenhouse-skills.ts` en
+`efeonce-mcp`): delega en la lane `/api/platform/ecosystem/mcp/skills[/{name}]` de Greenhouse, **no embebe contenido**
+y **comparte la configuración de este provider** (`GREENHOUSE_SEO_PROVIDER_ENABLED`, `GREENHOUSE_ECOSYSTEM_API_URL`,
+`GREENHOUSE_ECOSYSTEM_TOKEN`) porque es la misma lane y la misma identidad de servicio — no hay variable nueva que
+verificar en el Nivel 2, y apagar este provider apaga también los manuales. El canary de Nivel 3 ya incluye la
+verificación: cuenta **exacta** del catálogo (seis manuales, comparada contra el manifiesto, nunca `≥ 1`), cada manual
+recuperado completo con su frontmatter y `contentHash`, y `404` anti-oracle para un nombre inexistente. Los manuales
+`internal` sólo existen para el binding interno: un binding de cliente ve catálogo vacío y `404` por nombre. Cómo se
+agregan o cambian: [Operar los manuales MCP servidos por el protocolo](operar-manuales-mcp.md).
 
 ⚠️ **Las siete de escritura no comparten el scope de lectura.** Viven en `efeonce.mcp.seo.write`
 (la lista se DERIVA del inventario — `GREENHOUSE_SEO_WRITE_TOOLS` — y el gate HTTP de scopes en
@@ -155,7 +168,10 @@ Salida esperada:
 
 - `✓ entitlement(...)` con `hasModule`, `tier`, auditorías y presupuesto restantes;
 - `✓ visibility-360(...)` con `domainQuadrant` **o** una degradación honesta explícita;
-- para la org sin módulo, un fallo con `greenhouse_seo_lane_404` — eso es **éxito** (deny anti-oracle funcionando).
+- para la org sin módulo, un fallo con `greenhouse_seo_lane_404` — eso es **éxito** (deny anti-oracle funcionando);
+- `✓ skills catalog: count=6 names=…` seguido de un `✓ skill(<nombre>): bytes=… hash=…` por manual y
+  `✓ skill(no-such-manual) → 404 anti-oracle` (TASK-1804). Un `✗ skills catalog` con `count` menor al manifiesto es el
+  síntoma de que los `.md` no entraron al artefacto generado del release de Greenhouse, no un problema del gateway.
 
 Contra un entorno con Vercel Deployment Protection (staging), agrega
 `GREENHOUSE_ECOSYSTEM_VERCEL_BYPASS_SECRET`. Ese bypass va solo a Greenhouse: nunca a Globe, logs ni respuestas MCP.
@@ -331,7 +347,13 @@ carga de configuración aborta a propósito. Es fail-fast correcto: completa la 
 ### Las tools responden 503 policy_blocked
 
 El provider está apagado o le falta configuración. Nivel 2 de verificación. Si acabas de hacer rollback, es el
-comportamiento esperado.
+comportamiento esperado. `get_greenhouse_skill` responde igual en ese estado: el provider `greenhouse-skills` comparte
+esta configuración y no tiene interruptor propio.
+
+### El cliente MCP muestra el server como `Needs authentication`
+
+El token Entra del usuario expira en ~1 hora. No es una falla del gateway ni del provider: vuelve a autenticar
+(`claude mcp login efeonce-mcp` en Claude Code; `/mcp` → `Authenticate` en sesión interactiva) y repite la llamada.
 
 ### El canary del provider pasa pero el smoke autenticado falla
 
@@ -345,5 +367,6 @@ gateway, no el módulo SEO.
 - ADR del gateway: [`EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md`](../../architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md)
 - Lane de Greenhouse: [`src/lib/api-platform/resources/ecosystem-growth-seo.ts`](../../../src/lib/api-platform/resources/ecosystem-growth-seo.ts)
 - Adaptador del gateway: repo hermano `efeonce-mcp`, `src/providers/greenhouse-seo.ts`
+- Provider de manuales de uso (misma configuración): repo hermano `efeonce-mcp`, `src/providers/greenhouse-skills.ts`; manifiesto en Greenhouse [`src/mcp/greenhouse/skill-manifest.ts`](../../../src/mcp/greenhouse/skill-manifest.ts); operación en [Operar los manuales MCP servidos por el protocolo](operar-manuales-mcp.md) (TASK-1804)
 - Gateway completo: [Operar Efeonce MCP Gateway](operar-efeonce-mcp-gateway.md)
 - Mismas tools por el MCP interno: [MCP Greenhouse — Inventario de Tools](mcp-greenhouse-tool-inventory.md) §8

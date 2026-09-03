@@ -221,6 +221,7 @@ mueve, y este es el orden"* sí.
 | **`greenhouse-public-private-tenders`** | **Si entra por licitación.** | El caso SKY vive ahí (`docs/commercial/tenders/sky-blog-2026/`). |
 | **`deck-studio`** | **El deck.** | La propuesta se compone ahí. Esta skill es *consumer*. |
 | **`greenhouse-ico`** | **La prueba operativa.** | El portal + ICO son **la línea de plataforma**, y son **transparencia como producto**. |
+| **`efeonce-mcp-platform`** | **La superficie agéntica.** | Las tools SEO/AEO por MCP y sus **manuales de uso servidos por el protocolo** (`docs/mcp/skills/**`, manifiesto `src/mcp/greenhouse/skill-manifest.ts`; TASK-1804). Toda task que toque una tool actualiza el manual que la gobierna; un agente carga `seo-spend-discipline` antes de cualquier tool que gaste. |
 
 ---
 

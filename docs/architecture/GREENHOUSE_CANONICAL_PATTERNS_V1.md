@@ -263,6 +263,22 @@ forma vieja del workflow`), forward-fix del rediseño `146070ffc` + gate
 `scripts/ci/worker-deploy-path-coverage-gate.mjs`. El mismo defecto que `TASK-1785` persigue en la
 prosa —una afirmación que ocupa el lugar de un mecanismo— reaparecido en los tests de sus vecinos.
 
+**Delta 2026-09-02 — la forma "manifiesto puro + artefacto generado con hash + gate" tiene segundo uso
+(TASK-1804).** TASK-1780 la estrenó para el inventario de tools MCP (`tool-manifest.ts` →
+`tool-manifest.generated.json`, `pnpm mcp:manifest:check`); TASK-1804 la replicó para los manuales de uso
+(`skill-manifest.ts` → `skill-catalog.generated.json` con `catalogHash` + `contentHash` por manual,
+`pnpm mcp:skills:generate` / `pnpm mcp:skills:check` en `local:check` y CI). Es la regla 2 de este patrón
+aplicada al pie de la letra: el gate deriva su expectativa del filesystem (`docs/mcp/skills/**`) y la compara
+con el artefacto que el producto lee; editar un manual sin regenerar pone el gate en rojo **y** hace lanzar
+al reader de runtime. Lo que este segundo uso agregó al patrón: **el artefacto no es sólo la expectativa del
+gate, es la única fuente del runtime.** El intento previo —leer `docs/mcp/skills/**` con `node:fs` desde un
+módulo alcanzable por una ruta— hizo que Turbopack arrastrara el proyecto entero a la función
+`api/mcp/greenhouse` (397 MB > 250 MB; Vercel rechazó el build), y `outputFileTracingIncludes` no era la
+causa ni el remedio. Por eso la lectura de disco vive en un módulo aparte (`skill-catalog-fs.ts`, sólo
+generador y tests) y el reader de runtime (`skill-catalog.ts`) no importa `node:fs`. Si aparece un tercer uso
+(un catálogo que un manifiesto declara y un artefacto materializa con hash), este delta asciende a forma
+canónica propia.
+
 ---
 
 ## 8. Hecho declarado al nacer + copia derivada donde se filtra + obligación de propagar
