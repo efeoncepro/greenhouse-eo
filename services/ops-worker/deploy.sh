@@ -864,13 +864,15 @@ ENV_VARS="${ENV_VARS},GROWTH_SEO_URL_VISIBILITY_ENABLED=${GROWTH_SEO_URL_VISIBIL
 # compara lo configurado con lo que cada runtime pidió de verdad. Un valor fuera del vocabulario
 # hace fallar CERRADO toda captura ETV (mejor que comprar la fórmula equivocada en silencio).
 # Desde 2026-11-01T00:00:00Z `legacy_static_v1` también falla cerrado: el proveedor ya no lo
-# sirve, y el cutover a improved lo gobierna TASK-1806 (nunca "se prende" desde acá).
-GROWTH_SEO_ETV_METHODOLOGY_VERSION="${GROWTH_SEO_ETV_METHODOLOGY_VERSION:-legacy_static_v1}"
+# sirve. CUTOVER TASK-1806 (2026-09-03, aprobado por el operador): improved_layout_clickstream_v2
+# tras el shadow exact_ab del 2026-09-03 (calibración GSC 49 % vs 321 % legacy; Jaccard 1,0;
+# historia continua; rebaseline versionado). Legacy sólo vuelve como rollback ANTES del corte.
+GROWTH_SEO_ETV_METHODOLOGY_VERSION="${GROWTH_SEO_ETV_METHODOLOGY_VERSION:-improved_layout_clickstream_v2}"
 ENV_VARS="${ENV_VARS},GROWTH_SEO_ETV_METHODOLOGY_VERSION=${GROWTH_SEO_ETV_METHODOLOGY_VERSION}"
 
 # Selector de LECTURA (readers/API/MCP): separado porque el cutover es writer-primero,
 # reader-después. El worker no sirve lecturas, pero declararlo acá mantiene un solo contrato.
-GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION="${GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION:-legacy_static_v1}"
+GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION="${GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION:-improved_layout_clickstream_v2}"
 ENV_VARS="${ENV_VARS},GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION=${GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION}"
 
 # TASK-1662 — Cobertura de keywords de competidores declarados (keyword gap competitivo,
