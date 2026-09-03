@@ -11,6 +11,7 @@ import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { normalizeContractType, normalizePayRegime, normalizePayrollVia } from '@/types/hr-contracts'
 
 import { resolveOffboardingLane } from './lane'
+import { applyOffboardingLifecycleEffects, type OffboardingLifecycleEffects } from './member-lifecycle'
 import { assertReviewVersionMatches, deriveOffboardingCaseReview, readOffboardingCaseReview } from './review-policy'
 import { assertOffboardingTransition, isTerminalOffboardingStatus } from './state-machine'
 import type {
@@ -346,32 +347,6 @@ const assertPayrollExecutionReadiness = async (client: PoolClient, current: Offb
       })
     }
   }
-}
-
-const closeFuturePayrollEligibility = async (
-  client: PoolClient,
-  current: OffboardingCase,
-  lastWorkingDay: string | null
-) => {
-  if (!current.memberId || !lastWorkingDay) {
-    return { updatedCompensationVersions: 0 }
-  }
-
-  const result = await client.query<{ version_id: string }>(
-    `
-      UPDATE greenhouse_payroll.compensation_versions
-      SET
-        effective_to = $2::date,
-        is_current = FALSE
-      WHERE member_id = $1
-        AND effective_from <= $2::date
-        AND (effective_to IS NULL OR effective_to > $2::date)
-      RETURNING version_id
-    `,
-    [current.memberId, lastWorkingDay]
-  )
-
-  return { updatedCompensationVersions: result.rows.length }
 }
 
 export const listOffboardingCases = async (filters: OffboardingCaseListFilters = {}) => {
@@ -938,11 +913,23 @@ export const transitionOffboardingCase = async ({
     const nextEffectiveDate = input.effectiveDate !== undefined ? input.effectiveDate : current.effectiveDate
     const nextLastWorkingDay = input.lastWorkingDay !== undefined ? input.lastWorkingDay : current.lastWorkingDay
 
-    let payrollCutoff: { updatedCompensationVersions: number } | null = null
+    let payrollCutoff: OffboardingLifecycleEffects | null = null
 
     if (input.status === 'executed') {
       await assertPayrollExecutionReadiness(client, current)
-      payrollCutoff = await closeFuturePayrollEligibility(client, current, nextLastWorkingDay)
+
+      // TASK-1349 — lane-aware effects: an `identity_only` (access-only) case
+      // closes informationally and touches neither compensation, relationship
+      // nor member; a REAL termination closes compensation vigencia at the last
+      // working day (refusing future versions), ends the legal relationship with
+      // the real date and deactivates the member — the last two behind
+      // WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED until verified.
+      payrollCutoff = await applyOffboardingLifecycleEffects(client, {
+        current,
+        lastWorkingDay: nextLastWorkingDay,
+        actorUserId,
+        reason: normalizeNullableString(input.reason)
+      })
     }
 
     const nextExceptionReason =
@@ -994,7 +981,8 @@ export const transitionOffboardingCase = async ({
         effectiveDate: updated.effectiveDate,
         lastWorkingDay: updated.lastWorkingDay,
         blockedReason: updated.blockedReason,
-        payrollCutoff
+        payrollCutoff,
+        lifecycleEffects: payrollCutoff
       }
     })
 

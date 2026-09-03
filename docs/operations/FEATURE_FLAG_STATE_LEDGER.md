@@ -193,6 +193,14 @@ Este ledger gobierna los flags de **este repo**: los 5 runtimes de Greenhouse (V
 
 ## § Pendientes de acción (la parte que se olvida)
 
+- **`WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` (TASK-1349, 2026-09-03) — code complete, OFF en todos los
+  runtimes.** Runtime que lo lee: Vercel (executor `transitionOffboardingCase` en `POST /api/hr/offboarding/cases/[caseId]/transition`).
+  Condición para prender: staging con caso sintético `relationship_ended` ejecutado → readback `members.active=false`,
+  relación `ended` con `effective_to = last_working_day`, `member.deactivated` consumido sin reactivar; y caso inverso
+  `access_only` ejecutado → nada cambia. Después: `vercel env add` en Production + staging, redeploy, señal
+  `hr.offboarding.executed_member_still_active` en 0 tras la recovery. Rollback: OFF + revert; los datos ya escritos
+  se corrigen por command compensatorio auditado, nunca por SQL.
+
 > ### ⛔ Antes de prender un `*_ENABLED` en Production (ISSUE-150)
 >
 > **Producción sirve `main`. Verificar que el código que LEE el flag está en `main`, no en tu working tree ni en
@@ -375,6 +383,7 @@ _(Agrega acá cualquier flag que dejes code-complete sin prender. Si está vací
 | `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED` | ✅ | ✅ | Preview | TASK-872 |
 | `PAYROLL_PARTICIPATION_WINDOW_ENABLED` | ✅ | ✅ | — | TASK-890 |
 | `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED` | ✅ | ✅ | — | TASK-891 |
+| `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` | — | — | — | TASK-1349 — writeback de lifecycle al ejecutar una salida REAL: termina la relación legal con la fecha real, `members.active=false`/`status='inactive'`, cierra `client_team_assignments`, publica `member.deactivated`. Se lee en Vercel (API HR); nace OFF hasta smoke temporal en staging. NO gatea el cierre de compensación ni el guard de revisión. |
 | `LEAVE_PARTICIPATION_AWARE_ENABLED` | ✅ | ✅ | — | TASK-892 |
 | `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED` | ✅ | ✅ | Preview | TASK-872 |
 | `CONTRACTOR_PAYABLE_SETTLEMENT_ENABLED` | ✅ | ✅ | — | EPIC-013 |
@@ -577,7 +586,7 @@ Para los **PG rollout flags** (`home_rollout_flags`): se prenden vía admin endp
 
 **Knowledge (lente de composición):** `KNOWLEDGE_COMPOSITION_LENS_ENABLED` (TASK-1110 — composición in-place de la respuesta de Knowledge). **Registrado 2026-08-29**, misma causa que los dos de arriba.
 
-**Payroll / Workforce:** `PAYROLL_PARTICIPATION_WINDOW_ENABLED` (TASK-890) · `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED` (TASK-891) · `LEAVE_PARTICIPATION_AWARE_ENABLED` (TASK-892) · `PAYROLL_CONTRACTOR_ENGAGEMENT_EXCLUSION_ENABLED` · `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED` (TASK-872) · `WORKFORCE_ACTIVATION_READINESS_GUARD_ENABLED` · `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED` (TASK-872) · `WORKFORCE_CONTRACTING_AI_ENABLED` (TASK-1019).
+**Payroll / Workforce:** `PAYROLL_PARTICIPATION_WINDOW_ENABLED` (TASK-890) · `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED` (TASK-891) · `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` (TASK-1349) · `LEAVE_PARTICIPATION_AWARE_ENABLED` (TASK-892) · `PAYROLL_CONTRACTOR_ENGAGEMENT_EXCLUSION_ENABLED` · `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED` (TASK-872) · `WORKFORCE_ACTIVATION_READINESS_GUARD_ENABLED` · `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED` (TASK-872) · `WORKFORCE_CONTRACTING_AI_ENABLED` (TASK-1019).
 
 **Hiring / ATS (EPIC-011):** evaluación provisional activa en producción mediante `HIRING_ASSESSMENT_AI_ENABLED` + `HIRING_ASSESSMENT_AI_RUN_ENQUEUE_ENABLED` y `RUN_MODE=global_provisional`; exception policy y run confirm permanecen OFF. El expediente usa `HIRING_EVALUATION_DOSSIER_AI_ENABLED` + `_AUTO_PROPOSE_ENABLED` ON en producción, con confirmación humana. Candidate review internal-only usa reader/projection + gate del gateway; no habilita B2B ni writes. `HIRING_SYNTHETIC_DATA_FILTER_ENABLED` (TASK-1739) filtra por procedencia el desk y el talent pool y está ON en staging y en producción; es Vercel-only y no gatea la guarda de publicación, la exclusión del gold set ni los commands de marcado/purga. El inventario exacto, owners y rollback están en las filas anteriores y en los runbooks de Hiring/MCP.
 
