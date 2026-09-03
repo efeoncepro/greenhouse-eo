@@ -26,6 +26,12 @@ Readback del método por runtime: `GET /health` del ops-worker (`etvMethodology.
 `configuredWriteSource`, `policyVersion`) y la señal `seo.etv_methodology.drift` en `/admin/operations`, que
 compara lo configurado con la última request explícita persistida por el worker y por Vercel.
 
+**Aviso automático (desde 2026-09-03).** `/admin/operations` no avisa a nadie: hay que abrirlo. El cron
+`ops-seo-etv-drift-watch` (ops-worker, diario 12:00 America/Santiago) revisa esa misma señal y, sólo si
+`severity=error`, publica un mensaje en Teams (canal "EO - Admin", destino `growth-seo-reliability-alerts`)
+con el resumen y la evidencia. `warning`/`awaiting_data` no avisan (son esperados durante el rollout). Si el
+error persiste, el aviso se repite cada día hasta que se corrija — no hace falta silenciarlo a mano.
+
 ### Comandos del shadow (`TASK-1806`, Slices 1 y 2)
 
 Los dos CLIs corren **desde un proceso local del operador** con el proxy Cloud SQL arriba, ADC vigente y las

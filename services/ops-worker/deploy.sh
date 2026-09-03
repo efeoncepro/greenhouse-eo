@@ -1597,6 +1597,17 @@ upsert_scheduler_job \
   "false"
 echo "  -> ops-seo-url-visibility: 0 9 17 * * ACTIVO (visibilidad por sujeto-página mensual, TASK-1776 — despausado 2026-08-27 tras smoke con los cuatro subject_kind + autorización del operador)"
 
+# TASK-1806 — chequeo diario y determinista de la señal seo.etv_methodology.drift; alerta a
+# Teams SOLO si severity=error (destino growth-seo-reliability-alerts, canal "EO - Admin").
+# Sin flag: costo de una query PG + un POST Teams condicional; misma cadencia = mismo dedup
+# (ver docblock de drift-alert.ts). Corre TODOS los días, no sólo alrededor del día 16/17.
+upsert_scheduler_job \
+  "ops-seo-etv-drift-watch" \
+  "0 12 * * *" \
+  "/seo/etv-methodology-drift-watch" \
+  '{}'
+echo "  -> ops-seo-etv-drift-watch: 0 12 * * * (alerta Teams diaria si drift de metodología ETV=error, TASK-1806)"
+
 # TASK-1662 — cobertura mensual de keywords de competidores declarados (keyword gap).
 # Día 18: cadencia mensual en día propio para no apilar gasto con los jobs SEO de los
 # días 15/16/17 (mercado / foto de dominio / visibilidad por sujeto).
@@ -1996,4 +2007,4 @@ echo "  1. Verify health:  gcloud run services proxy ${SERVICE_NAME} --port=9092
 echo "  2. Run a lane manually:  gcloud scheduler jobs run ops-reactive-finance --project=${PROJECT_ID} --location=${REGION}"
 echo "  3. Check queue depth:  gcloud run services proxy ${SERVICE_NAME} --port=9092 & sleep 3 && curl -s 'http://localhost:9092/reactive/queue-depth?domain=finance'"
 echo "  4. Check logs:  gcloud logging read 'resource.labels.service_name=\"${SERVICE_NAME}\"' --project=${PROJECT_ID} --limit=10"
-echo "  5. Active scheduler jobs: ops-reactive-{organization,finance,people,notifications,delivery,cost-intelligence,recover} + ops-nexa-weekly-digest + ops-reliability-ai-watch + ops-cloud-cost-ai-watch"
+echo "  5. Active scheduler jobs: ops-reactive-{organization,finance,people,notifications,delivery,cost-intelligence,recover} + ops-nexa-weekly-digest + ops-reliability-ai-watch + ops-cloud-cost-ai-watch + ops-seo-etv-drift-watch"

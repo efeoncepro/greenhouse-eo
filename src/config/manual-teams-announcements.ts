@@ -56,6 +56,23 @@ export const MANUAL_TEAMS_ANNOUNCEMENT_DESTINATIONS: Record<string, ManualTeamsA
     teamId: 'aae47836-8e59-4d9a-bce5-37d12978a1ad',
     channelId: '19:19UgRoht3Vmw0qgzfC71rKlOpHtfEI4Qz1jVdWMGqXE1@thread.tacv2',
     defaultCtaLabel: 'Ver run en GitHub'
+  },
+  // TASK-1806 — Growth SEO reliability alerts. Mismo canal físico "EO - Admin" que
+  // production-release-alerts (ops-alerts en greenhouse_core.teams_notification_channels);
+  // channelCode propio para audit trazable de origen (señales del módulo growth/SEO,
+  // hoy sólo seo.etv_methodology.drift, no releases).
+  'growth-seo-reliability-alerts': {
+    key: 'growth-seo-reliability-alerts',
+    label: 'Growth SEO Reliability Alerts (EO - Admin)',
+    description: 'Alertas deterministas de señales de confiabilidad del módulo growth/SEO en severidad error (hoy: drift de metodología ETV). Destino: canal "EO - Admin" del Equipo Efeonce.',
+    channelCode: 'growth-seo-reliability-watch',
+    secretRef: 'greenhouse-teams-bot-client-credentials',
+    botAppId: 'a1397477-4aae-4f16-a0a2-a213cb1b00b2',
+    azureTenantId: 'a80bf6c1-7c45-4d70-b043-51389622a0e4',
+    recipientKind: 'channel',
+    teamId: 'aae47836-8e59-4d9a-bce5-37d12978a1ad',
+    channelId: '19:19UgRoht3Vmw0qgzfC71rKlOpHtfEI4Qz1jVdWMGqXE1@thread.tacv2',
+    defaultCtaLabel: 'Ver /admin/operations'
   }
 }
 

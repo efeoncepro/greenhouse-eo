@@ -255,6 +255,13 @@ Fuente de verdad implementada:
   `get_seo_url_visibility` y `get_seo_prospect_diagnostic` lo declaran (manifest `8969c8d39c1f`; gateway sincronizado).
 - **Observabilidad:** señal `seo.etv_methodology.drift` (módulo `growth`, kind `drift`, steady 0) + readback
   `etvMethodology` en `/health` del ops-worker + selector declarado en `services/ops-worker/deploy.sh`.
+  **Alerta push (TASK-1806, 2026-09-03):** `/admin/operations` es pull (nadie se entera si no lo abre); el
+  cron `ops-seo-etv-drift-watch` (ops-worker, diario 12:00 America/Santiago, sin flag) llama
+  `checkAndAlertSeoEtvMethodologyDrift()` (`etv-methodology/drift-alert.ts`) y, sólo si `severity=error`, envía
+  un aviso a Teams (destino `growth-seo-reliability-alerts`, canal "EO - Admin") vía el dispatcher determinista
+  existente (`sendManualTeamsAnnouncement`, reusado del patrón de `production-release-alerts`; sin dedup propio,
+  la cadencia diaria del cron es el dedup — un recordatorio diario mientras el error persista). `warning` y
+  `awaiting_data` no alertan por diseño (son estados esperados de la foundation).
 - **Evaluador seguro:** `etv-methodology/evaluator.ts` + `replay.ts` + fixtures sintéticos versionados +
   `scripts/growth/_sanity-task-1805-etv-evaluator.ts` (plan, forecast, dry-run `providerCalls=0`, comparación de
   valor/membresía/traffic cost/prospecto y benchmark GSC sin promediar). Gate `GROWTH_SEO_ETV_EVALUATOR_ENABLED`
