@@ -39,10 +39,11 @@ independiente de matching SHA/run ID. Readback final: recuperación y siete cate
 [runbook](docs/operations/runbooks/workforce-reentry-recovery.md).
 Finance de Felipe (obligación junio + SII) sigue como dependencia sin command de anulación. UI: TASK-1814.
 
-**Delta Claude 19:20Z — release PR #220 lo LLEVA CODEX.** Run `33794622145` cancelado; attempts 1 y 2 `aborted`
-(el webhook empareja por `target_sha`: cancelar un duplicado aborta el ajeno; bug a tasquear). Sin runs activos;
-runtime en `a824d073a`. Codex dispatcha el attempt 3. **Purga sintética APLICADA 18:37Z:** 12 members
-`TASK-1349 live …` (253 filas, `scripts/workforce/purge-task1349-live-subjects.sql`); 265→253, 8 activos reales.
+**Delta Claude 19:40Z — PR #220 CERRADO por Codex** (run `33795564223`, manifest released 19:30:49Z; ver arriba).
+Attempts 1 y 2 `aborted` por cancelaciones cruzadas: el webhook empareja por `target_sha` antes que por
+`workflow_run_id`, así que cancelar un run duplicado aborta el manifest ajeno (bug a tasquear). **Purga sintética
+APLICADA 18:37Z:** 12 members `TASK-1349 live …` (253 filas, `scripts/workforce/purge-task1349-live-subjects.sql`);
+265→253 members, 8 activos, todos reales.
 
 Offboarding (2026-09-03): auditoría UI/código/PG registrada en
 [informe](docs/audits/payroll/OFFBOARDING_ROOT_CAUSE_AND_REMEDIATION_2026-09-03.md).
