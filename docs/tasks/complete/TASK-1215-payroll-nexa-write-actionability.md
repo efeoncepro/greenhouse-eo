@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -15,13 +15,26 @@
 - UI impact: `none`
 - Backend impact: `command`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Cerrada por supersesión documental el 2026-09-03; reemplazada por TASK-1825; implementación original no certificada`
 - Rank: `TBD`
 - Domain: `hr`
-- Blocked by: `TASK-1214`
-- Branch: `task/TASK-1215-payroll-nexa-write-actionability`
+- Blocked by: `none` — cierre administrativo; dependencias de ejecución trasladadas a la sucesora.
+- Branch: `develop; checkout compartido; sin ramas ni worktrees por task`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Supersesión — 2026-09-03
+
+**Cerrada por instrucción explícita del operador; no ejecutar la especificación histórica de abajo.**
+La sucesora es [**TASK-1825**](../to-do/TASK-1825-payroll-nexa-governed-complete-operations.md), hija de [EPIC-043](../../epics/to-do/EPIC-043-payroll-reliability-and-agentic-api-parity.md).
+Este cierre retira el brief del backlog; no afirma que su funcionalidad esté implementada, desplegada o probada.
+Los criterios originales sin evidencia permanecen sin marcar como historia.
+
+Se retira la premisa histórica de cero acciones globales en Nexa y de que un subset equivale a paridad completa. La sucesora consume operaciones y commands compartidos, con período/moneda explícitos y confirmación ligada a versión y destinatarios.
+
+- [x] Retiro administrativo autorizado y sucesora identificada en EPIC-043.
+- [x] Supuestos reemplazados declarados; contenido anterior preservado para trazabilidad.
+
 
 ## Summary
 

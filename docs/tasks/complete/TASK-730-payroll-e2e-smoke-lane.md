@@ -6,16 +6,29 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
 - Type: `implementation`
-- Status real: `Diseño`
+- Status real: `Cerrada por supersesión documental el 2026-09-03; reemplazada por TASK-1827; implementación original no certificada`
 - Rank: `TBD`
 - Domain: `hr`
-- Blocked by: `TASK-729` (necesita el subsystem para reportar resultado del lane via `smoke_lane_runs`)
-- Branch: `task/TASK-730-payroll-e2e-smoke-lane`
+- Blocked by: `none` — cierre administrativo; dependencias de ejecución trasladadas a la sucesora.
+- Branch: `develop; checkout compartido; sin ramas ni worktrees por task`
+
+## Supersesión — 2026-09-03
+
+**Cerrada por instrucción explícita del operador; no ejecutar la especificación histórica de abajo.**
+La sucesora es [**TASK-1827**](../to-do/TASK-1827-payroll-cross-client-e2e-and-operational-release-proof.md), hija de [EPIC-043](../../epics/to-do/EPIC-043-payroll-reliability-and-agentic-api-parity.md).
+Este cierre retira el brief del backlog; no afirma que su funcionalidad esté implementada, desplegada o probada.
+Los criterios originales sin evidencia permanecen sin marcar como historia.
+
+El smoke basado en diciembre de 2026 y un supuesto tenant de prueba no demuestra aislamiento: los entornos comparten Cloud SQL. La sucesora exige fixtures aisladas, verificación por cliente/canal, recuperación y readback de PDF/email.
+
+- [x] Retiro administrativo autorizado y sucesora identificada en EPIC-043.
+- [x] Supuestos reemplazados declarados; contenido anterior preservado para trazabilidad.
+
 
 ## Summary
 
@@ -291,3 +304,7 @@ limpia rows orphan con `_test=true AND created_at < NOW() - INTERVAL '24 hours'`
   Por simplicidad inicial: queda fuera de scope.
 - ¿Debemos versionar el harness para soportar evolución del schema de payroll? Por ahora
   asume schema actual.
+
+## Rollout Plan & Risk Matrix
+
+Cierre exclusivamente documental por supersesión: sin impacto runtime, migraciones, cambios de flags ni datos. No ejecutar el rollout del brief histórico. TASK-1827 define el rollout y la recuperación exigibles. Si se corrige esta decisión documental, actualizar el vínculo de sucesión y el registro; no reactivar instrucciones antiguas automáticamente.

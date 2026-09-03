@@ -62,8 +62,8 @@ Reglas obligatorias:
 
 ### Blocks / Impacts
 
-- `TASK-730`
-- `TASK-731`
+- `TASK-1827`
+- `TASK-1820`
 - payroll export/admin screens
 - reliquidación audit trail
 
@@ -130,7 +130,7 @@ Reglas obligatorias:
 - [ ] `docs/tasks/README.md` sincronizado
 - [ ] `Handoff.md` actualizado si aplica
 - [ ] `changelog.md` actualizado si cambia comportamiento visible
-- [ ] chequeo de impacto cruzado sobre `TASK-414`, `TASK-730`, `TASK-731`
+- [ ] chequeo de impacto cruzado sobre `TASK-414`, `TASK-1827`, `TASK-1820`
 
 ## Follow-ups
 
@@ -139,3 +139,7 @@ Reglas obligatorias:
 ## Delta 2026-04-30
 
 Task creada a partir de auditoría ICO + verificación Cloud SQL. La evidencia actual confirma que reliquidación ya existe y que el schema vivo todavía no conserva provenance KPI suficiente para nómina oficial.
+
+## Delta 2026-09-03 — Sucesoras EPIC-043
+
+Referencias de integración actualizadas a TASK-1827 (E2E) y TASK-1820 (preflight), que superseden a TASK-730/731. El ownership KPI/provenance y los criterios de esta task permanecen vigentes; los cierres anteriores son documentales, no evidencia de implementación.

@@ -1932,7 +1932,7 @@ Payroll es un módulo first-class del Reliability Control Plane (`STATIC_RELIABI
 
 - **No reemplaza `getPayrollPeriodReadiness`**. Ese helper es el gate canónico de aprobación server-side y sigue siendo source of truth para bloqueantes pre-approval. Los detectores son visibilidad continua, no enforcement.
 - **No mide duración de cálculo ni emite histograms**. Fuera de scope V1 — follow-up TASK derivada si se necesita.
-- **No emite alertas a Teams automáticamente**. La conexión con notifications queda para TASK-731 (pre-close validator).
+- **No emite alertas a Teams automáticamente**. TASK-1820 (EPIC-043, sucesora de TASK-731) define el preflight read-only; no incluye alertas automáticas. Una conexión con notifications requiere alcance y autorización propios.
 - **No persiste resultados de detectores**. Cada llamada a Operations Overview re-corre las queries. Si la cardinalidad lo justifica, agregar caching (TTL 30s in-process, patrón ya usado en Platform Health).
 
 ### 27.5 Cómo detectar un gap nuevo de payroll

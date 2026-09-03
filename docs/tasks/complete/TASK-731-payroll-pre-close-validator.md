@@ -6,16 +6,29 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Bajo` (reusa `getPayrollPeriodReadiness` + agrega checks complementarios)
 - Type: `implementation`
-- Status real: `Diseño`
+- Status real: `Cerrada por supersesión documental el 2026-09-03; reemplazada por TASK-1820; implementación original no certificada`
 - Rank: `TBD`
 - Domain: `hr`
-- Blocked by: `TASK-729` (necesita el subsystem para exponer el resultado al dashboard)
-- Branch: `task/TASK-731-payroll-pre-close-validator`
+- Blocked by: `none` — cierre administrativo; dependencias de ejecución trasladadas a la sucesora.
+- Branch: `develop; checkout compartido; sin ramas ni worktrees por task`
+
+## Supersesión — 2026-09-03
+
+**Cerrada por instrucción explícita del operador; no ejecutar la especificación histórica de abajo.**
+La sucesora es [**TASK-1820**](../to-do/TASK-1820-payroll-stage-preflight-and-payment-readiness.md), hija de [EPIC-043](../../epics/to-do/EPIC-043-payroll-reliability-and-agentic-api-parity.md).
+Este cierre retira el brief del backlog; no afirma que su funcionalidad esté implementada, desplegada o probada.
+Los criterios originales sin evidencia permanecen sin marcar como historia.
+
+Se retira el endpoint mezclado con UI y cron opcional como unidad de trabajo. La sucesora posee un reader puro por etapa, moneda y versión; integra UF resoluble y perfiles de pago. El enforcement permanece en commands; UI tiene TASK-1826.
+
+- [x] Retiro administrativo autorizado y sucesora identificada en EPIC-043.
+- [x] Supuestos reemplazados declarados; contenido anterior preservado para trazabilidad.
+
 
 ## Summary
 
@@ -382,3 +395,7 @@ sincronizarse con eso.
   por período activo.
 - ¿Endpoint debe ser cacheable a nivel HTTP (ETag, max-age)? Por ahora no — preflight
   cambia con cada update de inputs.
+
+## Rollout Plan & Risk Matrix
+
+Cierre exclusivamente documental por supersesión: sin impacto runtime, migraciones, cambios de flags ni datos. No ejecutar el rollout del brief histórico. TASK-1820 define el rollout y la recuperación exigibles. Si se corrige esta decisión documental, actualizar el vínculo de sucesión y el registro; no reactivar instrucciones antiguas automáticamente.

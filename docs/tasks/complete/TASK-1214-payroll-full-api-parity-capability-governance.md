@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -15,13 +15,26 @@
 - UI impact: `none`
 - Backend impact: `api`
 - Epic: `none`
-- Status real: `Diseno`
+- Status real: `Cerrada por supersesión documental el 2026-09-03; reemplazada por TASK-1821; implementación original no certificada`
 - Rank: `TBD`
 - Domain: `hr`
-- Blocked by: `none`
-- Branch: `task/TASK-1214-payroll-full-api-parity-capability-governance`
+- Blocked by: `none` — cierre administrativo; dependencias de ejecución trasladadas a la sucesora.
+- Branch: `develop; checkout compartido; sin ramas ni worktrees por task`
 - Legacy ID: `none`
 - GitHub Issue: `none`
+
+## Supersesión — 2026-09-03
+
+**Cerrada por instrucción explícita del operador; no ejecutar la especificación histórica de abajo.**
+La sucesora es [**TASK-1821**](../to-do/TASK-1821-payroll-canonical-commands-and-governed-api.md), hija de [EPIC-043](../../epics/to-do/EPIC-043-payroll-reliability-and-agentic-api-parity.md).
+Este cierre retira el brief del backlog; no afirma que su funcionalidad esté implementada, desplegada o probada.
+Los criterios originales sin evidencia permanecen sin marcar como historia.
+
+El conteo histórico de rutas y capabilities no se toma como inventario actual. La sucesora exige matriz de operaciones, comandos/API Platform, autorización vigente, versión esperada, idempotencia y readback; atomicidad corresponde a TASK-1816.
+
+- [x] Retiro administrativo autorizado y sucesora identificada en EPIC-043.
+- [x] Supuestos reemplazados declarados; contenido anterior preservado para trazabilidad.
+
 
 ## Summary
 

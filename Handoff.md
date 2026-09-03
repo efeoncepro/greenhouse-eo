@@ -60,6 +60,16 @@ al apagar shim, fallback de deploy que lo reactiva y canary directo que no prueb
 de abajo no basta sin esos gates. Próximo paso: plan humano aprobado y coordinación con dueños de archivos;
 no push/deploy ni mutación de Entra autorizados por esta creación. Incidente Git/Berel separado.
 
+## 2026-09-03 — EPIC-043: Payroll confiable y operable desde chat
+
+[EPIC-043](docs/epics/to-do/EPIC-043-payroll-reliability-and-agentic-api-parity.md), `to-do`, P0: doce tasks
+TASK-1816–TASK-1827, con contratos y dependencias por unidad. Por instrucción del operador, TASK-731/1214/1215/730
+quedaron `complete` por supersesión documental hacia TASK-1820/1821/1825/1827; sin certificar implementación.
+TASK-1625/ISSUE-129–134 conservan trazabilidad; OAuth TASK-1813 e identidad TASK-1631 son dependencias compartidas.
+Primer paso: plan y ADR acotado de TASK-1816, cálculo atómico/aprobación de versión.
+[Baseline](docs/audits/payroll/PAYROLL_RELIABILITY_API_PARITY_PROGRAM_BASELINE_2026-09-03.md).
+Sólo planificación/documentación; sin código, migraciones, envíos, pagos ni deploy.
+
 ## 2026-09-03 — TASK-1806 seguimiento: alerta Teams determinista + rutina de recordatorio del cutover ETV
 
 Después del cierre `complete` de TASK-1806 (ver entrada debajo, release `bda12be7e33a`), el operador preguntó
@@ -549,40 +559,3 @@ Playwright anónimo sobre `1440x1100` y `390x1000` confirmó HTTP 200, Emma visi
 `scrollWidth === clientWidth`, cero errores de consola, cero page errors y cero requests fallidas. Evidencia:
 `.captures/anam-emma-build23-2026-09-01/`. No se modificaron el Customer Agent, los intents, el chatflow, CRM,
 copy visible ni el portal Greenhouse `48713323`.
-
-## 2026-09-01 (13) — TASK-1671 cerrada: la pantalla existe, pero nada está desplegado
-
-`TASK-1671` quedó `complete`. Con eso **ninguna task bloquea el flip**, pero el flip sigue sin poder
-hacerse, y por una razón distinta de la de ayer: ya no falta código, falta **despliegue**.
-
-Verificado en vivo el 2026-09-01, no leído de un doc:
-
-- `origin/develop` y `origin/main` **no tienen** `site-findings.ts` ni `SiteAuditSiteFindings.tsx`.
-- La revisión activa del ops-worker (`ops-worker-00625-5qj`) **no tiene la env var**
-  `GROWTH_SEO_SITE_FINDINGS_ENABLED`. Está OFF por AUSENCIA. Prenderla hoy con `--update-env-vars`
-  no haría nada: esa revisión no tiene el evaluador.
-- La migración `finding_scope` **sí** está aplicada: es la única pieza que ya cruzó a la base
-  compartida (aditiva, default `page`, 4.977 filas históricas clasificadas; nadie la lee todavía).
-
-Qué se construyó: región propia "Acceso y presentación del sitio" entre la salud y la lista,
-alimentada por `partitionAuditIssuesByScope` desde UNA sola pasada de agrupación — no hay una
-segunda lista con su propio orden. El bloqueo de entrenamiento lleva etiqueta textual propia
-("Decisión declarada"); el filtro `?severity=` no alcanza a la región; el empty de la lista pasó a
-decir "Sin problemas de PÁGINA" porque sin ese alcance se contradecía con un crítico de dominio.
-
-Dos cosas que la revisión visual corrigió, y que ningún gate habría atrapado:
-
-1. El alcance flotaba a la derecha en desktop y caía huérfano al final de la fila en 390px. **El
-   wireframe que yo mismo escribí estaba mal**: decía "misma posición que N páginas afectadas"
-   cuando esa posición real es un caption bajo el título. Corregido el código y el wireframe.
-2. Con un único chequeo sin verificar, la región decía "Verificado" y "No pudimos verificar" a la
-   vez — el falso sano de TASK-1670 reintroducido en la UI. Lo cazó su propio test.
-
-⚠️ **Deuda declarada:** la región poblada no tiene evidencia de runtime. El flag está OFF, la tabla
-es append-only sobre una instancia compartida con producción, y encolar un crawl le cargaría
-presupuesto al cliente. Los frames del scorecard salen de una ruta local temporal (no commiteada)
-con el componente real y props representativas: sirven para layout y responsive, no para runtime.
-Esa evidencia se produce en el paso 3 del runbook del flip.
-
-Próximo paso: desplegar (`TASK-1670` + `TASK-1671`) y recién entonces el flip.
-Sin push. Runbook: `docs/manual-de-uso/growth/operar-hallazgos-de-sitio-seo.md`.

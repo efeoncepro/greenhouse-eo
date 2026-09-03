@@ -65,7 +65,7 @@ confirma, y la mutación ocurre sólo en el endpoint de confirmación**.
 
 O sea que la forma ya está resuelta dentro de Hiring. Falta aplicarla al pipeline.
 
-`TASK-1214` hizo lo mismo para payroll y sirve como segundo precedente de la forma.
+`TASK-1214` era un brief de Payroll, no evidencia de implementación; quedó supersedida documentalmente por `TASK-1821` (EPIC-043). Usar sólo los precedentes implementados y verificados de este contrato.
 
 ### Por qué importa más que la simetría
 
