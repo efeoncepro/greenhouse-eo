@@ -26,6 +26,10 @@ INTENTOS en `rowsWritten`: ahora cuentan filas insertadas por `RETURNING` (persi
 url-visibility; tests adaptados); (3) señal `seo.etv_methodology.drift` en `warning` hasta que las filas
 contractuales del 27-29 de agosto salgan de la ventana de 7 días — no es drift de runtime.
 
+**Corrección del operador:** `efeoncepro.com` (la agencia) no debía ser sujeto de la cohorte —entró por arrastre del
+runbook de 1805—; sus celdas quedan anuladas (no tenían voto, la decisión no cambia) y la cohorte vigente para
+próximas corridas es `2026-09-03-preregistered-v2.json` (sin Efeonce; bulk sólo Berel+Comex en día distinto).
+
 **Pendiente con dueño:** aprobación separada del operador del tratamiento histórico (`rebaseline`) y del cutover
 staging/producción (Slices 3-4; un solo ops-worker compartido = cutover del worker es producción y exige release).
 Selectores productivos siguen `legacy_static_v1`; lanes prod de Berel verificados sirviendo legacy tras el shadow.

@@ -71,10 +71,10 @@ AI Overview ETV, cuando aparezca en `ranked_keywords`, se interpreta como atribu
 |---|---|---|---|---|
 | A | `berel.com` | MX / es (`2484`) | cliente propio, dominio grande (773 kw, ETV legacy ~135k) | `sc-domain:berel.com` |
 | B | `comex.com.mx` | MX / es (`2484`) | competidor declarado de Berel, dominio muy grande (ETV legacy ~880k) | no (competidor) |
-| C | `efeoncepro.com` | CL / es (`2152`) | dominio propio pequeño (5 kw, ETV legacy ~5) | `sc-domain:efeoncepro.com` |
+| C | ~~`efeoncepro.com`~~ | CL / es (`2152`) | **RETIRADA 2026-09-03 por el operador: Efeonce es la agencia, no un sujeto de evaluación** (entró por arrastre del runbook de TASK-1805). Sus celdas de la corrida quedan anuladas; cohorte vigente para próximas corridas: `2026-09-03-preregistered-v2.json` | — |
 
-No se agregan clientes, marcas ni mercados. Efeonce CL no admite calibración estadística (ETV de un dígito): su
-celda mide el borde inferior (nulls, ceros, estabilidad), no exactitud.
+No se agregan clientes, marcas ni mercados. (La justificación original de Efeonce como «borde inferior» queda sin
+efecto: la agencia no es sujeto de evaluación; ver fila C.)
 
 ### Celdas y forecast (`exact_ab`, dos requests por celda, precios Labs vigentes)
 

@@ -20,7 +20,7 @@
 | 5.3 Historia (2026-04..09, dos bases) | **continua**: salto del ratio improved/legacy 2026-06→07 = 0,1 % vs variación mensual mediana legacy 8,1 % | sin breakpoint por discontinuidad |
 | 5.4 Prospecto (Comex, `ranked_keywords` 1.000 filas, truncado en ambas) | −43,9 % (384.207 → 215.526) | hallazgo para el copy del diagnóstico, no bloquea |
 | 5.5 Operabilidad | latencia media 822 ms; costo real ≤ forecast (−4,2 %) | ok |
-| Borde Efeonce CL | 5,09 → 0,59 (dominio de cinco keywords) | sin voto, como preregistrado |
+| Borde Efeonce CL | 5,09 → 0,59 | **anulada**: Efeonce (la agencia) no debía ser sujeto; ver §3 |
 | Competidor Comex MX | −52,0 % (880.415 → 422.500), count 5.127 → 5.127; traffic cost −51,6 % | dirección y magnitud coherentes con Berel |
 
 Decisión mecánica del evaluador: **`hold`**, únicamente por la regla 5.2 de regresión.
@@ -36,8 +36,8 @@ anomalía. Tres evidencias sostienen que el −64,5 % es la fórmula y no un art
 1. **Calibración**: improved pasa de sobreestimar 4,2× los clics observados de Berel a sobreestimarlos 1,5×.
    Es la dirección que DataForSEO declaró (CTR sensible a layout/intención y normalización clickstream, para
    acercarse a GSC en SERPs con AIO, snippets, local packs y zero-click).
-2. **Consistencia transversal**: Comex (−52 %), Berel (−64,5 %) y Efeonce (−88 %) bajan con `count` y membresía
-   intactos; el ratio por mes de la historia de Berel es estable (variación 0,1 % entre bases).
+2. **Consistencia transversal**: Comex (−52 %) y Berel (−64,5 %) bajan con `count` y membresía intactos; el ratio
+   por mes de la historia de Berel es estable (variación 0,1 % entre bases).
 3. **Membresía**: Jaccard 1,0 en páginas y subdominios — el orden relativo entre páginas se reacomoda (63 cambios
    de rango) pero nadie entra ni sale del top-N.
 
@@ -45,6 +45,15 @@ Con esta explicación documentada la regla 5.2 no describe un riesgo abierto sin
 que cualquier consumer verá: **toda serie ETV cambia de nivel en ~−60 %** (Berel) al pasar a improved.
 
 ## 3. Limitaciones de esta corrida (declaradas)
+
+- **Efeonce no debía estar en la cohorte (error corregido 2026-09-03).** `efeoncepro.com` es la agencia, no un
+  cliente ni un sujeto de evaluación; entró por arrastre de la «cohorte mínima» del runbook de `TASK-1805` y el
+  operador lo señaló como error. Sus celdas (9, 10 y su target en la 11) quedan **anuladas como evidencia**: nunca
+  tuvieron voto (rol «borde»), así que la decisión no cambia. Las filas persistidas de Efeonce de esta corrida
+  (foto de dominio CL, visibilidad CL y screening bulk en MX atribuido a la organización de Berel) son append-only
+  y no se borran; los lectores de Efeonce filtran por su mercado (CL) y el screening MX no llega a ninguna
+  superficie. Para futuras corridas existe la cohorte `2026-09-03-preregistered-v2.json` sin Efeonce y con bulk
+  sólo Berel+Comex.
 
 - **Celda bulk (11) sin fila para Berel/Comex**: `bulk_traffic_estimation` persiste en la misma tabla y clave
   (`normalized_domain, location, language, capture_date, método`) que `domain_rank_overview`, y las celdas 0/6 ya
