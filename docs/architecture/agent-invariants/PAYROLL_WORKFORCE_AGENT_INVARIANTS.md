@@ -289,6 +289,19 @@ incompleto. Contrato: `GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md` (Del
 - **NUNCA** recuperar por SQL: `pnpm workforce:offboarding:recovery` (dry-run → `--apply --member` con datos
   explícitos). **NUNCA** emitir pagos ni marcar pagada una obligación generada por error desde este dominio
   (Finance concilia con sus commands; hoy falta `cancelPaymentObligation`).
+- **NUNCA** aplicar una recovery de lane A («executed + member activo») en lote confiando en la clasificación
+  automática: **readback previo por sujeto** de `person_legal_entity_relationships`, `contractor_engagements` y
+  `compensation_versions` con fechas posteriores al LWD; si hay episodio posterior, NO tocar; aplicar sujeto por
+  sujeto mostrando el «antes» y confirmando por nombre; el command de reversión debe existir ANTES del directo.
+  Caso fuente 2026-09-03: Valentina reingresó como contractor el 20/08 y fue desactivada. Desde PR #220 el CLI
+  clasifica `reentry_preserved` y el executor devuelve `reentry_detected` (`findReentryAfterExit`), pero el guard
+  no reemplaza la lectura humana. Runbook: `docs/operations/runbooks/offboarding-recovery.md`.
+- **NUNCA** dejar que un live test de este dominio (`review-execute.live.test.ts`) termine con compensación o
+  relación abierta en sus sujetos sintéticos: el roster relajado los admite y la pre-nómina los muestra como
+  `Colaborador <uuid>` (incidente 2026-09-03, seis fantasmas). El `afterAll` cierra compensación y desactiva; un run
+  que muere a mitad deja huérfanos → purgar con `scripts/workforce/purge-task1349-live-subjects.sql` (predicado
+  sintético explícito, aborta ante un member real) y verificar la pre-nómina después. Canon:
+  `LIVE_TESTS_AGENT_INVARIANTS.md` §3.
 - **SIEMPRE** que se toque este dominio: `pnpm vitest run src/lib/workforce/offboarding src/lib/payroll/exit-eligibility
   src/lib/payroll/payroll-readiness` + `pnpm payroll:exit-eligibility:smoke` contra PG real (los mocks no ejecutan
   el SQL: así se detectó un `$2` sin bind).

@@ -136,6 +136,8 @@ When the audit touches a departing/departed member — payroll eligibility for a
 - NEVER let SCIM/BQ backfill resurrect an executed real exit.
 - NEVER recover offboarding/exit data by direct SQL — use the governed command/recovery script.
 - NEVER treat an `unknown` closure-completeness layer as complete.
+- NEVER apply a lane-A recovery in batch on the automatic classification: read each subject's later relationships/engagements/compensation first (a later episode = reentry, not drift — Valentina 2026-09-03), apply one `--member` at a time confirming by name, and make sure the reversal command exists before the direct one (`docs/operations/runbooks/offboarding-recovery.md` §Disciplina).
+- NEVER leave a live-test subject with open compensation/relationship: the relaxed roster admits inactive members and the pre-nómina showed six `Colaborador <uuid>` ghosts (2026-09-03). If a run dies mid-way, purge with `scripts/workforce/purge-task1349-live-subjects.sql` (explicit synthetic predicate) and re-check the roster.
 - ALWAYS run the focal suites (`pnpm vitest run src/lib/payroll src/lib/workforce/offboarding`) + the real-PG smoke when touching this domain.
 
 ## Manual draft / approved offboarding closure
@@ -195,7 +197,8 @@ Use the smallest command set that proves the claim:
 - `pnpm test:e2e:setup`
 - `pnpm exec playwright test tests/e2e/smoke/hr-payroll.spec.ts --project=chromium`
 - `pnpm payroll:exit-eligibility:smoke` (TASK-1349 — exercises the resolver against real PG)
-- `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED=true pnpm test:live src/lib/workforce/offboarding` (TASK-1349 — live review→execute circuit, synthetic subjects via the SCIM primitive)
+- `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED=true pnpm test:live src/lib/workforce/offboarding` (TASK-1349 — live review→execute circuit, synthetic subjects via the SCIM primitive; its `afterAll` closes compensation and deactivates them — verify the roster afterwards)
+- When the harness blocks raw DML or a mass `--apply` on people data: run a `tsx --require ./scripts/lib/server-only-shim.cjs` script that calls the canonical commands per subject (or the `ops` profile for a predicate-scoped purge), or hand the SQL/CLI to the operator. Never bypass.
 
 ## Output Format
 

@@ -127,6 +127,24 @@ La evidencia durable y los IDs auditados están en
 [la auditoría de cierre](../../audits/payroll/MAGGIE_MARIA_FERNANDA_OFFBOARDING_CLOSURE_2026-09-03.md).
 Sus casos ya son terminales: no volver a ejecutar el apply. Los snapshots no sustituyen una lectura actual.
 
+## Disciplina para personas reales — readback previo por sujeto (lección Valentina, 2026-09-03)
+
+El 03/09 la recovery de lane A se aplicó en lote confiando en la clasificación automática, sin leer antes los
+episodios posteriores de cada sujeto: Valentina había reingresado como contractor el 20/08 y quedó desactivada
+(reparada por command; ver [runbook de reingreso](workforce-reentry-recovery.md)). Desde PR #220 el CLI clasifica
+`reentry_preserved` (`findReentryAfterExit` en `scripts/workforce/offboarding-recovery.ts`) y el executor devuelve
+`reentry_detected` (`src/lib/workforce/offboarding/member-lifecycle.ts`), pero el guard no sustituye la lectura.
+
+1. **Readback previo por sujeto**, antes de cualquier `--apply`: `person_legal_entity_relationships`,
+   `contractor_engagements` y `compensation_versions` con fechas posteriores al `last_working_day` del caso. Si
+   existe un episodio posterior —aunque la clasificación diga lane A—, **no tocar**: es un reingreso, no drift.
+2. **Sujeto por sujeto, nunca la cohorte**: un `--member` por invocación, mostrando el «antes» (member, relación,
+   compensación, obligaciones) y confirmando **por nombre** con el operador antes de escribir.
+3. **El command de reversión existe antes que el directo.** Hoy la compensación de una baja incorrecta es
+   `restoreOffboardingLifecycleAfterReentry` (`scripts/workforce/restore-offboarding-lifecycle.ts`); si para un
+   efecto nuevo no hay reversión auditada, no se aplica.
+4. Releer el sujeto después del apply (sección siguiente) antes de pasar al próximo.
+
 ## Readback (impreso después de cada dry-run y cada apply)
 
 - Ventanas del resolver de elegibilidad de salida (`resolveExitEligibilityForMembers`) para los
@@ -163,11 +181,26 @@ pnpm payroll:exit-eligibility:smoke
 
 ## Rollback
 
-Los efectos del executor (lane A) son **idempotentes**, no auto-reversibles: no existe todavía un
-command compensatorio auditado que reactive una relación legal cerrada o revierta
-`members.active=false`. Si una aplicación fue un error, la corrección es una **nueva** decisión
-gobernada hacia adelante (p. ej. una reincorporación real vía el flujo de alta), nunca un
-`UPDATE` directo en PostgreSQL para "deshacer" el estado.
+Los efectos del executor (lane A) son **idempotentes**, no auto-reversibles desde este script. Si una
+aplicación cerró por error la disponibilidad de una persona con episodio posterior vigente, la compensación
+es el command `restoreOffboardingLifecycleAfterReentry` por el
+[runbook de reingreso](workforce-reentry-recovery.md) (restaura member/asignaciones; **no** reabre una relación
+employee terminada ni toca pagos). Cualquier otro error se corrige con una **nueva** decisión gobernada hacia
+adelante (p. ej. una reincorporación real vía el flujo de alta), nunca con un `UPDATE` directo en PostgreSQL.
+
+## Problemas comunes
+
+- **El harness del agente bloquea el `--apply` o el DML.** El clasificador de permisos de Claude rechaza
+  `UPDATE`/`DELETE` sueltos (psql/heredoc) y un `--apply` masivo sobre personas. Lo que sí pasa: un script
+  `tsx --require ./scripts/lib/server-only-shim.cjs` que invoque los commands canónicos
+  (`closeCompensationVigencyAtExit`, `reviewOffboardingCase`, `transitionOffboardingCase`) sujeto por sujeto, o
+  que el operador ejecute él mismo el SQL/CLI. Una purga con predicado explícito corre con el perfil `ops`
+  (`pnpm pg:connect:shell` → `\i scripts/workforce/purge-task1349-live-subjects.sql`). No forzar el bypass.
+- **`Colaborador <uuid>` «sin contrato» en la pre-nómina.** Member inactivo con `compensation_versions` abierta.
+  El 03/09 fueron los sujetos sintéticos de `review-execute.live.test.ts` (nombre `TASK-1349 live …`, correo
+  `t1349-…@efeoncepro.com`): cerrar compensación por command y purgar con el script anterior; un `identity_only`
+  ejecutado ya no los rescata al roster (`0233f81e7`). Si el uuid es una persona real, es un inactivo sin hecho de
+  salida: abrir/revisar su caso, nunca calcular con él dentro.
 
 ## Snapshot histórico de la cohorte antes de aplicar (2026-09-03)
 
@@ -176,7 +209,7 @@ El cierre posterior de Maggie/María Fernanda está documentado arriba. Releer l
 
 | Colaborador | Situación | Detalle |
 | --- | --- | --- |
-| Valentina Hoyos | Lane A — salida real ejecutada, `member.active=true` | + stub SCIM obsoleto, señal 2026-07-14 |
+| Valentina Hoyos | Lane A — salida real ejecutada, `member.active=true` | + stub SCIM obsoleto, señal 2026-07-14. **Tenía reingreso contractor 20/08: no era drift** (hoy `reentry_preserved`; desactivada por error y restaurada, ver disciplina arriba) |
 | Luis Reyes | Lane A — salida real ejecutada, `member.active=true` | + stub SCIM obsoleto, señal 2026-05-13 |
 | María Camila Hoyos | Lane A — salida real ejecutada, `member.active=true` | + stub SCIM obsoleto, señal 2026-06-01 |
 | Felipe Zurita | Bloqueado, `identity_only`, sin revisión | Último día y fecha efectiva 2026-06-02; a la espera de que People declare la causal real antes de aplicar el lane B |

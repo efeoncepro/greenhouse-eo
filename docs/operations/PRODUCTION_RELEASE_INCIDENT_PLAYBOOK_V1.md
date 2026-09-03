@@ -532,6 +532,11 @@ duplicados y gates cruzados. Corolario del mismo día: `git log origin/develop..
 push, porque un commit huérfano de otra sesión delante de `origin/develop` viaja en el push de quien
 sea, y su autoría se atribuye mal.
 
+**Delta 2026-09-03:** `ListAgents` sólo ve sesiones Claude; una sesión Codex no aparece. La única detección
+cross-agente es `gh run list --workflow=production-release.yml --limit 3` ANTES de cada dispatch; si hay un run
+`queued|pending|in_progress|waiting` para el SHA, se sigue ese run y no se dispatcha ni se cancela nada. El
+caso en que esa detección faltó es el §16.
+
 ### 16. Cancelar un duplicado puede abortar el manifest del intento correcto
 
 **Incidente 2026-09-03, SHA `a824d073a5fb01b916386312f6ae61c0082b67c9`:** el run
@@ -555,10 +560,26 @@ de crear otro intento; releer el manifest después. `aborted` es terminal: nunca
 `transition-released`; se crea un intento canónico nuevo con preflight válido. Detalle ejecutable en
 [runbook §0.1](runbooks/production-release.md#01-un-coordinador-y-un-intento-vivo-por-release).
 
+**Cronología verificada en PG (`release_state_transitions` + `github_release_webhook_events`):**
+
+| UTC | Hecho |
+|---|---|
+| 18:52:58 | Codex dispatcha `33793141529` (attempt 1 `a824d073a5fb-41320325`). |
+| 18:53:54 | Claude dispatcha `33793232779` para el mismo SHA sin ver el anterior (Codex no aparece en `ListAgents`; faltó `gh run list`); queda `pending` por el grupo `production-release-<sha>`. |
+| 19:04:35 | Cancel de `33793232779` → `workflow_run.cancelled` → `matched_by = target_sha` → attempt 1 `preflight → aborted` con los 4 workers desplegados y health verde; el job «Transition → released» falla (`aborted` es terminal). |
+| 19:07:58 / 19:08:06 | Claude dispatcha `33794622145` (attempt 2 `a824d073a5fb-4306ff12`); Codex `33794635945` y lo cancela. |
+| 19:08:23 | Cancel de `33794635945` → `matched` por SHA con el attempt 1 (ya terminal), sin transición: el attempt 2 aún no existía; de haber existido, lo habría abortado igual. |
+| 19:11:53 | Attempt 2 `→ aborted` por `workflow_job.cancelled` de su PROPIO run (job `100780469269`; cancelación con la cuenta `cesargrowth11`). Abort legítimo del run dueño. |
+| 19:17:30 → 19:30:49 | Codex, único coordinador, dispatcha `33795564223` (attempt 3 `a824d073a5fb-c2cf99e9`) → `released`; health `success`, watchdog `ok` 4/4. |
+
+`release_manifests.workflow_runs` está `[]` en los tres manifests: el orquestador nunca registra su `github.run_id`
+(`scripts/release/orchestrator-record-started.ts` no lo recibe; `recordReleaseStarted` no escribe la columna), así
+que el fallback por `workflow_run_id` de `findReleaseMatch` es inalcanzable en producción.
+
 **Trabajo técnico pendiente:** correlacionar eventos terminales con el intento dueño y cubrir dos runs
 con el mismo SHA, webhook tardío/cancelación de duplicado y ausencia de manifest propio. Una deduplicación
 por delivery ID no prueba propiedad del intento. Hasta implementar y desplegar ese arreglo con pruebas,
-la coordinación serial es mitigación y el bug permanece abierto.
+la coordinación serial es mitigación y el bug permanece abierto. Dueña del fix: `TASK-1815` (registro del run en `workflow_runs` al nacer el manifest, matching por run ID antes que por SHA, `foreign_workflow_run` nunca transiciona, test que reproduce este caso).
 
 ## Caso positivo 2026-08-06 — el release que no generó incidente
 

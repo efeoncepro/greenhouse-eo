@@ -334,6 +334,20 @@ ya están confirmados; no pedirlos nuevamente. Release y cambios de flags siguen
 - [x] Arquitectura, invariantes, manual, runbook, Handoff y changelog actualizados según impacto.
 - [ ] `pnpm docs:closure-check` y `pnpm docs:context-check:strict` aprobados al cierre documental. — Se ejecutan al cierre de esta sesión (ver Delta).
 
+## Delta 2026-09-03 — fix `identity_only`, purga sintética y PR #220
+
+- **Política** (`0233f81e7`): `hasDecidedExitFact` (`src/lib/payroll/exit-eligibility/policy.ts`) exige lane ≠
+  `identity_only`; un inactivo cuyo único caso es de acceso cae en `exclude_entire_period` +
+  `inactive_without_exit_fact` (tests en `policy.test.ts`). En producción con PR #220 (`main a824d073a`, manifest
+  released 19:30:49Z; attempt 3 cerrado por Codex).
+- **Datos**: 9 compensaciones de sujetos sintéticos cerradas con `closeCompensationVigencyAtExit`; 18:37Z purga de
+  los 12 sujetos `TASK-1349 live …` (253 filas, `scripts/workforce/purge-task1349-live-subjects.sql`, aborta ante
+  un member real; 265→253 members, 0 reales tocados). `review-execute.live.test.ts` cierra compensación y desactiva
+  en `afterAll`. Regla en `LIVE_TESTS_AGENT_INVARIANTS.md` §3 + `PAYROLL_WORKFORCE_AGENT_INVARIANTS.md`.
+- **Recovery sobre personas**: readback previo por sujeto + sujeto por sujeto + reversión antes que directo
+  (`runbooks/offboarding-recovery.md` §Disciplina). Sigue `in-progress`: Finance de Felipe y UI TASK-1814 abiertas;
+  `pnpm test` full + `pnpm build` no corridos localmente.
+
 ## Delta 2026-09-03 — implementación local-first (slices 0–4, sin push)
 
 Commits en `develop`: Slice 0 (`b825e0a40`), Slice 1 (`f622a22ce`), Slice 2 (`5df9d727a`), Slice 3 (`7bb6060e3`),

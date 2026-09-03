@@ -56,7 +56,7 @@ pendientes y última evidencia. La concurrencia de GitHub no sustituye esta coor
 **Limitación vigente (2026-09-03):** `github-webhook-reconciler.ts` busca primero por `target_sha` y prioriza
 un manifest activo; el `workflow_run_id` sólo es fallback. Un evento terminal `cancelled` de un duplicado
 puede por ello abortar/degradar el intento correcto del mismo SHA. El incidente está contenido mediante
-operación serial; el defecto de correlación **no quedó corregido** por el release de Valentina.
+operación serial; el defecto de correlación **no quedó corregido** por el release de Valentina. Fix de raíz: `TASK-1815` (registro del run en `workflow_runs` + matching por run ID + test del caso).
 
 1. Antes de cancelar un run obsoleto, cruza su SHA/run ID con el manifest activo. No canceles duplicados
    del mismo SHA mientras otro intento esté activo como si fuera una limpieza inocua. El coordinador debe
@@ -71,6 +71,26 @@ operación serial; el defecto de correlación **no quedó corregido** por el rel
 4. Distingue el estado de cada plano: `cancelled` no es `success`; un job cancelado no demuestra fallo
    de Bicep, una dependencia o un proveedor. Revisa conclusiones, anotaciones y actor antes de atribuir
    causas. Cierra con workflow, manifest, health, watchdog y efectos del dominio verificados.
+
+
+**Caso verificado 2026-09-03 (`a824d073a5fb`; PG `release_state_transitions` + `github_release_webhook_events`):**
+
+- Detección: `gh run list --workflow=production-release.yml --limit 3` ANTES del dispatch era la única forma de ver
+  el run de Codex (`33793141529`, 18:52:58Z); `ListAgents` no lista sesiones Codex. Claude dispatchó `33793232779`
+  a las 18:53:54Z para el mismo SHA y quedó `pending` por el grupo de concurrencia.
+- Efecto del cancel vía webhook: cancel de `33793232779` (19:04) → `workflow_run.cancelled` → `matched_by = target_sha`
+  → attempt 1 `a824d073a5fb-41320325` `preflight → aborted` (19:04:35Z, actor `system:github-release-webhook`,
+  `workflowRunId: 33793232779`) con los 4 workers ya desplegados y health verde; el job final «Transition → released»
+  falló porque `aborted` es terminal (`state-machine.ts`).
+- Secuencia: attempt 2 `a824d073a5fb-4306ff12` (run `33794622145`, 19:07:58Z) abortó a las 19:11:53Z por un
+  `workflow_job.cancelled` de su PROPIO run (job `100780469269`, cancelación con la cuenta `cesargrowth11`), no por
+  el duplicado. El cancel del duplicado `33794635945` (19:08:23Z) llegó antes de que existiera ese manifest y
+  emparejó por SHA con el attempt 1 ya terminal (`matched`, sin transición): de haber existido el attempt 2 en ese
+  instante, lo habría abortado igual. Attempt 3 `a824d073a5fb-c2cf99e9` (run `33795564223`, 19:17:30Z, un solo
+  coordinador) → `released` 19:30:49Z.
+- `release_manifests.workflow_runs` está `[]` en los tres manifests: el orquestador nunca registra su `github.run_id`
+  en el manifest, así que el fallback por `workflow_run_id` del reconciler no se ejerce nunca. Dueña del fix y del
+  test que reproduce el caso: `TASK-1815`.
 
 Para recuperación de datos que emite eventos, despliega primero las guardas en **todos** los runtimes
 que pueden consumirlos (Vercel y worker si ambos ejecutan el consumer), verifica alias/tráfico activo y

@@ -144,6 +144,14 @@ Un caso `borrador` creado manualmente con fecha pasada tambien bloquea el period
 
 Importante: mientras el caso sigue sin resolver, la nomina proyectada del periodo **sigue mostrando al colaborador**. El acceso a Greenhouse por si solo nunca le quita el pago — solo la revision explicita cambia su elegibilidad.
 
+### Aparece un `Colaborador <uuid>` sin contrato en la nomina proyectada
+
+Es un colaborador inactivo que todavia tiene una compensacion vigente abierta: la nomina lo muestra sin nombre
+porque su ficha ya no esta activa. No calcules ni apruebes con esa fila adentro. Pasale el uuid a People Ops o al
+equipo de plataforma: si es una persona real, hay que abrir o revisar su caso de offboarding; si es un sujeto de
+prueba (nombre `TASK-1349 live …`), plataforma cierra su compensacion y lo purga. Un caso de solo acceso ya
+ejecutado no lo devuelve a la nomina (desde 2026-09-03).
+
 ### El readiness dice que la elegibilidad de salida no se pudo evaluar (TASK-1349)
 
 Este blocker (`exit_eligibility_unavailable`) significa que el resolver de elegibilidad de salida fallo al correr. Greenhouse no autoriza un calculo oficial en silencio sin poder verificar el roster.

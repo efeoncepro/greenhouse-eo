@@ -773,6 +773,7 @@ Exits are NOT this skill's domain. Once a person leaves — or an access signal 
 - Every case requires an explicit human review decision: **`access_only`** (the signal was only an access deprovision, nothing labor-related happened) or **`relationship_ended`** (the relationship really ended, with an explicit causal — never inferred from the dates alone).
 - **Never infer a labor exit from a SCIM/access-deprovisioning signal alone.** An account going inactive is an access fact, not a termination; the offboarding case + explicit review is the only source of truth for whether the relationship actually ended.
 - A case born from an access signal (`identity_only`) cannot be approved/scheduled/executed without that review first.
+- An executed `access_only` case is not a labor exit fact for payroll either (`0233f81e7`): an inactive member whose only case is access-only stays out of the roster. Recovery on real people is per subject with a prior readback of later relationships/engagements (Valentina 2026-09-03 was a reentry, not drift).
 - Detail + live state: `docs/architecture/agent-invariants/PAYROLL_WORKFORCE_AGENT_INVARIANTS.md` → `### Offboarding review, temporal eligibility and lifecycle writeback invariants (TASK-1349, desde 2026-09-03)`; runtime code paths: `greenhouse-payroll-auditor/references/greenhouse-payroll-runtime.md`.
 
 ### Return after an ended episode

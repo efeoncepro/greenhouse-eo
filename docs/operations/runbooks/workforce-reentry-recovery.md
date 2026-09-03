@@ -2,7 +2,7 @@
 
 Este runbook aplica cuando un caso de salida ejecutado cerró por error la disponibilidad de una persona que ya tiene un episodio laboral posterior vigente. No crea contrataciones, no reabre relaciones legales y no modifica pagos.
 
-Canon: [decisión de recuperación](../../architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md). Implementación: `src/lib/workforce/offboarding/lifecycle-recovery.ts`. La recuperación se ejecuta por persona; no es una operación en lote.
+Canon: [decisión de recuperación](../../architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md). Implementación: `src/lib/workforce/offboarding/lifecycle-recovery.ts`. La recuperación se ejecuta por persona; no es una operación en lote. Runbook hermano para las lanes A/B y el readback previo por sujeto: [offboarding-recovery.md](offboarding-recovery.md).
 
 ## Antes de aplicar
 

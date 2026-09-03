@@ -594,6 +594,20 @@ path desactivaba el member; y `members.active=false` habría borrado elegibilida
    `--member`, datos explícitos, readback); discovery identifica `reentry_preserved` antes de proponer otro cierre. Para una baja incorrecta **ya aplicada**, el command distinto `restoreOffboardingLifecycleAfterReentry` y su CLI `restore-offboarding-lifecycle.ts` compensan solo disponibilidad/asignaciones con admin vigente, snapshot/hash, locks, idempotencia, audit y outbox atómicos. Exigen una relación posterior activa de la misma entidad legal; no basta un engagement. El consumidor de `member.updated` debe estar corregido y activo en Vercel/worker antes de aplicar, y nunca reabrir employee terminado. Contrato y secuencia: [decisión de recuperación](GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md) + [runbook](../operations/runbooks/workforce-reentry-recovery.md). Finance no se toca: las obligaciones/gastos generados por error se
    concilian con commands de Finance (dependencia registrada; hoy no existe `cancelPaymentObligation`).
 
+### Incidente 2026-09-03 — sujetos sintéticos del live smoke en la pre-nómina
+
+Consecuencia directa de (4): el roster ya no filtra `members.active` universalmente, así que **todo** member inactivo
+con compensación aplicable entra al resolver, incluidos los sujetos que `review-execute.live.test.ts` crea por el
+primitive SCIM. Seis quedaron inactivos con `compensation_versions` abiertas y `hasDecidedExitFact` contaba su caso
+`identity_only` ejecutado como salida decidida → aparecieron como `Colaborador <uuid>` «sin contrato». Corrección
+(`0233f81e7`, PR #220): la política exige lane ≠ `identity_only` (decisión dueña en
+`GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md`, Delta 2026-09-03 (2)); el live test cierra compensación
+(`effective_to = effective_from`) y desactiva usuarios/members en `afterAll`; las 9 versiones abiertas se cerraron
+con `closeCompensationVigencyAtExit` y los 12 sujetos se purgaron con `scripts/workforce/purge-task1349-live-subjects.sql`
+(predicado `display_name LIKE 'TASK-1349 live %' AND primary_email LIKE 't1349-%@efeoncepro.com'`; aborta si el
+conjunto contiene un member no sintético). Regla: un live test que crea sujetos de dominio nunca deja compensación
+ni relación abierta al terminar (`agent-invariants/LIVE_TESTS_AGENT_INVARIANTS.md` §3).
+
 ### Contratos
 
 - Capability `workforce.offboarding.review_case` (execute, tenant; HR route group ∪ EFEONCE_ADMIN; seed

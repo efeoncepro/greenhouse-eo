@@ -1,19 +1,22 @@
 ---
 name: greenhouse-payroll-auditor
-description: Audit, review, diagnose, and propose fixes for Efeonce/Greenhouse Payroll across Chile dependent workers, honorarios, Deel/EOR/contractor international workers, KPI ICO bonuses, attendance/leave, PREVIRED/ImpUnico, tax tables, deductions, employer costs, payroll readiness, period calculation, exports, and compliance risk.
+description: "Audit Efeonce/Greenhouse Payroll: Chile workers, honorarios, Deel/international, KPI ICO bonuses, readiness, calculations, exports, and compliance risk."
 ---
 
 # Greenhouse Payroll Auditor
 
 Use this skill whenever the task touches Payroll amounts, worker classification, Chile tax/previsional rules, honorarios, Deel/international compensation, KPI bonus eligibility, attendance/leave impact, payroll period readiness, payroll exports, or payroll incident diagnosis.
 
-This skill is an audit and decision aid, not legal advice. For current Chile rates, caps, tax tables, minimum wage, SII retention, or labor-law interpretation, verify against official sources before concluding.
+This skill is an audit and decision aid, not legal advice. For current Chile rates, caps, tax tables, minimum wage, SII retention, or labor-law interpretation, verify against official sources before approving official payroll.
+
+Manual invocation in Claude Code: `/greenhouse-payroll-auditor [period, payroll issue, employee cohort, calculation/export/readiness symptom, or audit scope]`.
 
 ## First Reads
 
 Read only what is needed for the requested task:
 
 - `AGENTS.md`
+- `CLAUDE.md`
 - `project_context.md`
 - `Handoff.md`
 - `docs/architecture/GREENHOUSE_HR_PAYROLL_ARCHITECTURE_V1.md`
@@ -31,7 +34,9 @@ Read only what is needed for the requested task:
 - `src/lib/payroll/exit-eligibility/policy.ts` + `calculation-gate.ts` — optional, when the task touches exits, temporal eligibility, or a period blocked by an unresolved exit (TASK-1349)
 - `src/lib/workforce/offboarding/review-policy.ts` — optional, when the task touches offboarding review decisions (`access_only`/`relationship_ended`, TASK-1349)
 
-## References
+## Supporting References
+
+Load the smallest reference that matches the task:
 
 - `references/chile-payroll-law.md`: Chile legal/payroll formula map and official source links.
 - `references/greenhouse-payroll-runtime.md`: Greenhouse schema, code paths, formulas, known audit watchlist, and verification commands.
@@ -77,118 +82,21 @@ Red flag: if a person has subordination/dependency signals but is classified as 
 1. Establish period: `periodId`, status, year/month, timezone, cut date, UF/UTM/IMM, tax table version, PREVIRED freshness.
 2. Build roster: active members, compensation versions effective during the period, members excluded for missing compensation.
 3. Classify each worker: Chile dependent, honorarios, Deel contractor, Deel EOR, or international internal exception.
-4. Validate source data:
-   - Compensation snapshot.
-   - ICO KPI snapshot when bonuses can affect pay.
-   - Attendance/leave only when it can affect pay.
-   - Chile tax/previsional snapshots when Chile dependent payroll exists.
+4. Validate source data: compensation snapshot, ICO KPI snapshot when bonuses can affect pay, attendance/leave only when it can affect pay, and Chile tax/previsional snapshots when Chile dependent payroll exists.
 5. Recompute formulas independently enough to detect material drift.
 6. Compare persisted `payroll_entries` against the expected formula and source data.
-7. Separate blockers from warnings:
-   - Blockers prevent official calculation/export.
-   - Warnings can allow calculation but require operator awareness or follow-up.
+7. Separate blockers from warnings: blockers prevent official calculation/export; warnings can allow calculation but require operator awareness or follow-up.
 8. Document findings with severity, evidence, affected people, source path, and recommended fix.
 
-## Chile Dependent Payroll Checklist
+## Payroll Domain Checklists
 
-For `contractType in ('indefinido', 'plazo_fijo')` and `payRegime = 'chile'`:
+For Chile dependent payroll, verify tax table version, UTM, UF, AFP split, health, Seguro de Cesantia, legal caps, gratificacion, and non-imponible allowances. Load `references/chile-payroll-law.md`.
 
-- Tax table must exist for the imputable month and be resolved, usually `gael-YYYY-MM`.
-- UTM must exist for monthly tax.
-- UF must exist when Isapre plan is in UF.
-- AFP total rate and split must resolve from compensation or PREVIRED.
-- Legal topes must be considered for AFP, health, accident insurance, and cesantia.
-- Health is 7 percent for Fonasa; Isapre can exceed 7 percent and must split obligatory vs voluntary/excess.
-- Seguro de cesantia depends on contract type: indefinido worker 0.6 percent plus employer 2.4 percent; fixed-term/obra worker 0 percent plus employer 3 percent.
-- Gratificacion legal under article 50 is 25 percent of eligible monthly remuneration capped by 4.75 IMM annually, usually handled monthly as `min(base * 25%, 4.75 * IMM / 12)` when the monthly mode applies.
-- Colacion/movilizacion are non-imponible only when reasonable and compensatory.
+For `honorarios`, do not apply AFP, Fonasa/Isapre, cesantia, SIS, mutual, or IUSC as dependent payroll deductions. Apply SII retention for the emission year and escalate classification risk when the work relationship behaves like employment.
 
-## Previred Planilla Audit Checklist
+For `payRegime = 'international'` or `payrollVia = 'deel'`, keep currency explicit, do not apply Chile statutory deductions by default, and preserve KPI ICO requirements when OTD/RPA bonuses can change pay. Load `references/international-remote-payroll.md`.
 
-Use this when a user uploads a Previred error/warning CSV or asks whether the Previred file is accepted.
-
-Operational lesson from Greenhouse TASK-812 / 2026-04 upload: Previred validator reveals issues in a cascade. Do
-not patch one warning at a time by mutating payroll entries. Treat Previred as a regulatory projection over closed
-payroll entries plus periodized Previred snapshots.
-
-Audit order:
-
-1. Parse the Previred CSV first. Separate `Errores` from `Advertencias`; blockers require a new file, warnings may
-   allow `Continuar sin modificar` but should still be classified.
-2. Classify the worker before formulas:
-   - `contract_type_snapshot`
-   - `pay_regime`
-   - `payroll_via`
-   - `currency`
-   - `employment_type`
-   - Person 360 `identity_profile_id`
-3. Verify identity/legal profile:
-   - CL_RUT from Person Legal Snapshot, not a HubSpot-only field.
-   - `chile_previred_worker_profiles.profile_id = members.identity_profile_id`.
-   - explicit Previred `sex_code`, `nationality_code`, `health_institution_code`.
-4. Verify periodized references:
-   - `greenhouse_payroll.chile_afp_rates.total_rate`
-   - `greenhouse_payroll.chile_previred_indicators.sis_rate`
-   - `greenhouse_payroll.chile_previred_indicators.imm_clp`
-5. Keep receipt and planilla semantics separate:
-   - Payroll receipt/LRE can reflect closed entry amounts and attendance working days.
-   - Previred fields use statutory/regulatory bases expected by the validator.
-   - Never rewrite `payroll_entries` just to silence Previred unless the payroll calculation itself is wrong and the period is being formally recalculated/reopened.
-6. Validate known Previred fields:
-   - Field 13: statutory days, usually `30` unless a formal movement-of-personnel record is explicitly modeled. Do not use attendance working days.
-   - Field 27 and related bases: full-time entries use at least the period IMM (`max(chileTaxableBase, imm_clp)`).
-   - Field 28: AFP contribution from Previred AFP total rate and regulatory base.
-   - Field 29: SIS from period SIS rate and regulatory base.
-   - Fields 79/80/81: Isapre pactada, 7 percent obligatoria, and additional difference.
-   - Field 71: ISL/accident contribution from canonical accident insurance rate and regulatory base unless a supported mutual code is explicitly modeled.
-   - Fields 93/94: jornada (`1` full-time, `2` part-time) and expectativa de vida.
-   - Fields 101/102: AFC employee/employer split by contract type and regulatory base.
-
-Accepted-state evidence for Valentina Hoyos `2026-04` after TASK-812 hardening:
-
-- field 13 = `30`
-- field 27 = `539000`
-- field 28 = `56918`
-- field 29 = `8732`
-- field 71 = `5013`
-- field 79 = `162475`
-- field 80 = `37730`
-- field 81 = `124745`
-- field 93 = `1`
-- field 94 = `4851`
-- field 101/102 = `3234` / `12936`
-
-Canonical repo references:
-
-- `src/lib/payroll/compliance-exports/previred.ts`
-- `src/lib/payroll/compliance-exports/store.ts`
-- `src/lib/payroll/chile-statutory-rates.ts`
-- `docs/documentation/hr/payroll-compliance-exports-chile.md`
-- `docs/audits/payroll/PREVIRED_VALIDATOR_CASCADE_AUDIT_2026-05-10.md`
-
-## Honorarios Checklist
-
-For `contractType = 'honorarios'`:
-
-- Do not apply AFP, Fonasa/Isapre, cesantia, SIS, mutual, or IUSC as dependent payroll deductions.
-- Apply SII honorarios retention rate for the emission year.
-- Validate the rate against SII before calculating. As of 2026, SII publishes 15.25 percent from January 1, 2026.
-- If attendance, schedules, subordination, fixed command structure, or exclusivity look like employment, flag classification risk.
-- KPI bonuses should not be required unless the compensation contract explicitly makes them payable and the business has modeled the legal/tax treatment.
-
-## International/Remote Checklist
-
-For `payRegime = 'international'` or `payrollVia = 'deel'`:
-
-- Greenhouse stores an operational compensation snapshot; Deel/provider may be the legal payroll system.
-- Do not apply Chile statutory deductions by default.
-- Currency must remain explicit. Do not silently convert USD/CLP.
-- Remote allowance is allowed for `contractor` and `eor` in current Greenhouse policy.
-- KPI ICO is still mandatory when OTD/RPA bonus exposure can change pay, even if the worker is outside Chile.
-- Treat local-country taxes, social security, benefits, and withholding as provider/legal-counsel scope unless Greenhouse has a jurisdiction-specific engine.
-- For `international_internal`, do not assume gross equals compliant net. If a Chile payer directly pays a non-resident, review `references/international-withholding-americas-sii.md` and, for European tax residence, `references/international-withholding-europe-sii.md` before approving calculation, readiness, receipts, or payment obligations.
-- Europe is outside TASK-905 Americas V1 approved seed. Spain/Europe must resolve `needs_tax_review` until a Europe-specific catalog is legally approved.
-- Never apply a treaty zero/reduced withholding rate without residence certificate, no-PE/base-fixed declaration, beneficiary eligibility, service category, period, and evidence snapshot.
+For `international_internal`, do not assume gross equals compliant net. If a Chile payer directly pays a non-resident, load `references/international-withholding-americas-sii.md` and, for European tax residence, `references/international-withholding-europe-sii.md` before approving calculation, readiness, receipts, or payment obligations. Europe is outside TASK-905 Americas V1 approved seed; Spain/Europe must resolve `needs_tax_review` until a Europe-specific catalog is legally approved. Never apply a treaty zero/reduced withholding rate without residence certificate, no-PE/base-fixed declaration, beneficiary eligibility, service category, period, and evidence snapshot.
 
 ## Leave and Anniversary Communication Reconciliation
 
@@ -228,6 +136,8 @@ When the audit touches a departing/departed member — payroll eligibility for a
 - NEVER let SCIM/BQ backfill resurrect an executed real exit.
 - NEVER recover offboarding/exit data by direct SQL — use the governed command/recovery script.
 - NEVER treat an `unknown` closure-completeness layer as complete.
+- NEVER apply a lane-A recovery in batch on the automatic classification: read each subject's later relationships/engagements/compensation first (a later episode = reentry, not drift — Valentina 2026-09-03), apply one `--member` at a time confirming by name, and make sure the reversal command exists before the direct one (`docs/operations/runbooks/offboarding-recovery.md` §Disciplina).
+- NEVER leave a live-test subject with open compensation/relationship: the relaxed roster admits inactive members and the pre-nómina showed six `Colaborador <uuid>` ghosts (2026-09-03). If a run dies mid-way, purge with `scripts/workforce/purge-task1349-live-subjects.sql` (explicit synthetic predicate) and re-check the roster.
 - ALWAYS run the focal suites (`pnpm vitest run src/lib/payroll src/lib/workforce/offboarding`) + the real-PG smoke when touching this domain.
 
 ## Manual draft / approved offboarding closure
@@ -269,8 +179,8 @@ When auditing current code, check these areas first:
 
 - `src/types/hr-contracts.ts`: `SII_RETENTION_RATES` must match SII. Verify 2026; official SII rate is 15.25 percent from January 1, 2026.
 - `src/lib/payroll/chile-previsional-helpers.ts`: fixed-term cesantia worker/employer split must match AFC/SP; worker should not be charged 3 percent for fixed-term contracts.
-- `src/lib/payroll/calculate-chile-deductions.ts`: verify whether AFP, health, cesantia, SIS, and mutual are capped by legal topes before approving high-salary payroll.
-- `src/lib/payroll/compute-chile-tax.ts`: tax table must be current for the period and non-empty; missing brackets cannot be treated as a valid zero-tax result for Chile dependent payroll.
+- `src/lib/payroll/calculate-chile-deductions.ts`: verify AFP, health, cesantia, SIS, and mutual caps before approving high-salary payroll.
+- `src/lib/payroll/compute-chile-tax.ts`: tax table must be current for the period and non-empty; missing brackets cannot be treated as valid zero tax for Chile dependent payroll.
 - `src/lib/payroll/compensation-requirements.ts`: readiness must block missing KPI only for compensation where variable bonuses affect pay.
 - Manual overrides require a reason and should never hide missing legal/source data.
 
@@ -280,14 +190,15 @@ Use the smallest command set that proves the claim:
 
 - `pnpm vitest run src/lib/payroll`
 - `pnpm exec eslint src/lib/payroll src/types/payroll.ts src/types/hr-contracts.ts`
-- `pnpm exec tsc --noEmit --pretty false`
+- `pnpm typecheck` (NO bare `tsc --noEmit` — OOM bajo el Node 20 de Volta, ISSUE-104)
 - `pnpm build`
 - `pnpm staging:request /api/hr/payroll/periods/<periodId>/readiness --pretty`
 - `pnpm staging:request POST /api/hr/payroll/periods/<periodId>/calculate '{}' --pretty`
 - `pnpm test:e2e:setup`
 - `pnpm exec playwright test tests/e2e/smoke/hr-payroll.spec.ts --project=chromium`
 - `pnpm payroll:exit-eligibility:smoke` (TASK-1349 — exercises the resolver against real PG)
-- `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED=true pnpm test:live src/lib/workforce/offboarding` (TASK-1349 — live review→execute circuit, synthetic subjects via the SCIM primitive)
+- `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED=true pnpm test:live src/lib/workforce/offboarding` (TASK-1349 — live review→execute circuit, synthetic subjects via the SCIM primitive; its `afterAll` closes compensation and deactivates them — verify the roster afterwards)
+- When the harness blocks raw DML or a mass `--apply` on people data: run a `tsx --require ./scripts/lib/server-only-shim.cjs` script that calls the canonical commands per subject (or the `ops` profile for a predicate-scoped purge), or hand the SQL/CLI to the operator. Never bypass.
 
 ## Output Format
 
@@ -296,7 +207,7 @@ For audits, answer with:
 - `Decision`: pass, pass with warnings, block, or needs legal review.
 - `Scope`: period, workers, entries, exports, or code paths reviewed.
 - `Findings`: ordered by severity, with affected people/entries and file paths.
-- `Formula Check`: the formula used, inputs, source table/API, and observed delta.
+- `Formula Check`: formula used, inputs, source table/API, and observed delta.
 - `Data Quality`: missing KPI, attendance, compensation, PREVIRED, ImpUnico, UF/UTM/IMM, or provider data.
 - `Recommended Fix`: robust code/data/ops action, not a superficial patch.
 - `Verification`: commands or runtime checks executed.
