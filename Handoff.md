@@ -2,6 +2,9 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+Maggie/María Fernanda: cierre 4/4 aplicado, unresolved=0; nómina agosto ready. Finance histórico requiere
+conciliación. [Evidencia 03/09](docs/audits/payroll/MAGGIE_MARIA_FERNANDA_OFFBOARDING_CLOSURE_2026-09-03.md).
+
 Valentina reingreso (2026-09-03): acceso recuperado con autorización del operador sobre la misma persona/usuario/member;
 cuenta Microsoft nueva activa y buscador por correo nuevo verificados mediante readers canónicos. Roles e historia
 financiera preservados. [Auditoría y recuperación](docs/audits/payroll/VALENTINA_REHIRE_IDENTITY_RECOVERY_2026-09-03.md).
@@ -17,24 +20,25 @@ julio+ `exclude_entire_period`. **Luis Reyes y María Camila Hoyos**: lifecycle 
 al LWD real, member inactivo) y stubs SCIM cerrados como `access_only`. Señales: unresolved **1** (Maria Fernanda,
 draft 07-29, decisión manual de HR), executed_member_still_active **0**, deprovisioned_without_case 0.
 
-🔴 **Incidente «colaboradores fantasma» (2026-09-03, ~17:50Z, resuelto en datos):** la pre-nómina de septiembre mostró
-seis `Colaborador <uuid>` «sin contrato»: eran los sujetos sintéticos de mi live test (`TASK-1349 live access`),
-inactivos pero con compensación abierta; el roster relajado de Slice 2 los dejaba entrar y `derivePolicy` trataba su
-caso `identity_only` ejecutado como hecho de salida decidido → `full_period`. Cerré sus 9 versiones de compensación por
-command (`closeCompensationVigencyAtExit`), la política ya no cuenta un caso `identity_only` como hecho laboral
-(`hasDecidedExitFact`), y el live test cierra la compensación de sus sujetos al terminar. Roster de septiembre
-verificado: 5 personas reales con compensación, cero uuids. El fix de código viaja en el PR #220 (develop), sin mergear.
+🔴 **«Colaboradores fantasma» (2026-09-03 ~17:50Z, resuelto):** la pre-nómina de septiembre mostró seis
+`Colaborador <uuid>` sin contrato: sujetos sintéticos de mi live test con compensación abierta, que `derivePolicy`
+trataba como salida decidida (`identity_only` ejecutado → `full_period`). Compensaciones cerradas por command,
+`hasDecidedExitFact` ya excluye `identity_only`, el live test limpia al terminar; fix en PR #220 (`main`).
 
-🔴 **Incidente Valentina Hoyos (recuperación gobernada preparada por Codex):** la lane A la desactivó pese a tener una
-relación `contractor` activa desde 2026-08-20 (reingreso). Fix commiteado en develop `c5c030e99` (guard
-`findReentryAfterExit` + señal excluye reingresos) — **NO está en `main`: producción sigue sin la guarda hasta el
-próximo release.** El intento de reactivarla por `updateMember` falló a mitad (ISSUE-163) y su `member.updated`
-reactivó la relación employee terminada; ya la re-terminé al 30/04 por command canónico. **Residual que el
-clasificador impidió corregir en Claude:** `status='inactive'`, `contract_end_date=2026-04-30`, `assignable=false` y su
-asignación cerrada. Codex preparó command transaccional con preview real; SQL puntual retirado. Ver
-[runbook de recuperación](docs/operations/runbooks/workforce-reentry-recovery.md). Falta desplegar la guarda del consumidor
-antes de aplicar y verificar la recuperación; acceso, contratos y pagos siguen intactos.
+**Valentina Hoyos — restauración gobernada APLICADA por Codex a las 18:38:48Z:** member activo/status activo,
+asignable y sin corte antiguo; asignación existente activa sin fecha final. Se verificaron alias Production hacia
+`a824d073` y 100% del tráfico `ops-worker-00641-dl2` hacia el árbol corregido antes de aplicar. Las siete categorías
+protegidas (relaciones, engagements, envíos, payables, usuario, obligación y orden) siguen idénticas; SSO elegible con
+correo nuevo y rol collaborator. Clave `valentina-lifecycle-reentry-restore-2026-09-03`; no repetir ni usar el SQL retirado.
+Eventos publicados 18:40:03Z y proyecciones People completadas 18:42:05Z: employee permanece terminado y datos protegidos idénticos. Release PR #220: run Codex `33793141529` tuvo deploys/health verdes, pero webhook del duplicado cancelado `33793232779` abortó su manifest por asociación errónea por SHA (19:04:35Z); transición final falló. Reintento activo único `33794622145` (otra sesión, 19:07:58Z); Codex retiró su duplicado `33794635945` aún sin jobs/manifest y verificó webhook procesado sin transición a las 19:08:23Z. Seguir el run activo; no lanzar otro ni repetir recuperación.
+[Auditoría](docs/audits/payroll/VALENTINA_REHIRE_IDENTITY_RECOVERY_2026-09-03.md) ·
+[runbook](docs/operations/runbooks/workforce-reentry-recovery.md).
 Finance de Felipe (obligación junio + SII) sigue como dependencia sin command de anulación. UI: TASK-1814.
+
+**Delta Claude 19:20Z — release PR #220 lo LLEVA CODEX.** Run `33794622145` cancelado; attempts 1 y 2 `aborted`
+(el webhook empareja por `target_sha`: cancelar un duplicado aborta el ajeno; bug a tasquear). Sin runs activos;
+runtime en `a824d073a`. Codex dispatcha el attempt 3. **Purga sintética APLICADA 18:37Z:** 12 members
+`TASK-1349 live …` (253 filas, `scripts/workforce/purge-task1349-live-subjects.sql`); 265→253, 8 activos reales.
 
 Offboarding (2026-09-03): auditoría UI/código/PG registrada en
 [informe](docs/audits/payroll/OFFBOARDING_ROOT_CAUSE_AND_REMEDIATION_2026-09-03.md).
