@@ -30,6 +30,7 @@ const exit = (
   exitLane: null,
   exitStatus: null,
   projectionPolicy: 'full_period',
+  reviewRequired: false,
   cutoffDate: null,
   warnings: [],
   ...overrides
@@ -274,6 +275,7 @@ describe('deriveLeaveAccrualPolicy (TASK-895 V1.1a S1)', () => {
         cutoffDate: '2026-05-14',
         eligibleTo: '2026-05-14',
         projectionPolicy: 'partial_until_cutoff',
+        reviewRequired: false,
         relationshipStatus: 'ended'
       })
     })
@@ -303,6 +305,7 @@ describe('deriveLeaveAccrualPolicy (TASK-895 V1.1a S1)', () => {
         cutoffDate: '2026-08-15',
         eligibleTo: '2026-08-15',
         projectionPolicy: 'exclude_from_cutoff',
+        reviewRequired: false,
         relationshipStatus: 'scheduled_exit'
       })
     })
@@ -332,6 +335,7 @@ describe('deriveLeaveAccrualPolicy (TASK-895 V1.1a S1)', () => {
         cutoffDate: '2027-02-15',
         eligibleTo: '2027-02-15',
         projectionPolicy: 'partial_until_cutoff',
+        reviewRequired: false,
         relationshipStatus: 'scheduled_exit'
       })
     })
@@ -362,6 +366,7 @@ describe('deriveLeaveAccrualPolicy (TASK-895 V1.1a S1)', () => {
         periodEnd: '2025-12-31',
         eligibleTo: '2025-12-31',
         projectionPolicy: 'partial_until_cutoff',
+        reviewRequired: false,
         relationshipStatus: 'ended'
       })
     })
@@ -448,6 +453,7 @@ describe('deriveLeaveAccrualPolicy (TASK-895 V1.1a S1)', () => {
       cutoffDate: '2026-12-31',
       eligibleTo: '2026-12-31',
       projectionPolicy: 'exclude_from_cutoff',
+      reviewRequired: false,
       relationshipStatus: 'scheduled_exit'
     })
 

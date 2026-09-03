@@ -2,6 +2,25 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+TASK-1349 en ejecución (2026-09-03, sesión Claude, `develop`, checkout compartido, sin push): Discovery con tres
+subagentes + lectura PG real confirmó los hallazgos de la auditoría y sumó tres más: el reader de elegibilidad
+omite `contract_type_snapshot`, la baja administrativa (`deactivateMember`) excluye de nómina retroactivamente vía
+`members.active=false`, y la reactivación SCIM por OID no consulta casos ejecutados. Plan por slices 0–4 en la
+task; writeback de member/relación nace detrás de `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` OFF; el gate
+de readiness/cálculo ante salida sin resolver es incondicional bajo `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED` (ON
+en prod/staging) y **tras el release bloqueará la nómina de septiembre hasta resolver los casos de Felipe (blocked)
+y Maria Fernanda (draft con fecha pasada)** — eso es el control buscado, no un efecto colateral. Recovery de
+Felipe: dry-run solamente; ningún pago, SQL ni flag se toca sin autorización.
+
+Offboarding (2026-09-03): auditoría UI/código/PG registrada en
+[informe](docs/audits/payroll/OFFBOARDING_ROOT_CAUSE_AND_REMEDIATION_2026-09-03.md).
+[TASK-1349](docs/tasks/in-progress/TASK-1349-offboarding-member-lifecycle-writeback.md) amplía revisión contractual,
+elegibilidad temporal y recovery; nueva [TASK-1814](docs/tasks/to-do/TASK-1814-offboarding-case-review-recovery-ui.md)
+posee UI dependiente. Ambas to-do, sin implementar; 20–32 horas efectivas estimadas en conjunto.
+Felipe salió 02/06/2026 y el operador confirma todo pagado/saldo cero. Caso blocked con fechas corregidas,
+member/compensación abiertos: aún puede entrar a nómina. Registro no autoriza otro pago ni deploy.
+Siguiente paso: plan de ejecución/ADR temporal, luego backend → UI → recovery/readback conjunto; preservar historia.
+
 Seguimiento OAuth (2026-09-02): [TASK-1813](docs/tasks/to-do/TASK-1813-efeonce-mcp-oauth-client-interoperability.md)
 creada `to-do`, sin implementar. Codex 0.152.0 rechazó discovery; metadata pública revalidada a las 22:51Z.
 La [auditoría](docs/audits/EFEONCE_MCP_CODEX_OAUTH_INTEROPERABILITY_2026-09-02.md) identifica scopes sin cualificar

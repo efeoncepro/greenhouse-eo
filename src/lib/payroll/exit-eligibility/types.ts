@@ -62,6 +62,25 @@ export type ExitEligibilityWarningCode =
   | 'unclassified_lane'
   | 'missing_relationship'
   | 'effective_date_only_no_lwd'
+  /**
+   * TASK-1349 — salida sin resolver (draft / needs_review / blocked) cuya señal
+   * (cutoff o fecha de creación del caso) cae en o antes del período. La
+   * política sigue siendo `full_period` (una señal de acceso no quita pago),
+   * pero el período exige revisión humana antes de calcular/aprobar.
+   * Severity `blocking`.
+   */
+  | 'unresolved_exit_signal'
+  /**
+   * TASK-1349 — member `active=false` sin ningún hecho de salida decidido
+   * (caso approved/scheduled/executed con cutoff). Se excluye por defensa,
+   * pero se declara: `active` es disponibilidad actual, no un hecho laboral.
+   */
+  | 'inactive_without_exit_fact'
+  /**
+   * TASK-1349 — existe una compensación que empieza después del cutoff de la
+   * salida anterior: reingreso. La salida previa no gobierna este período.
+   */
+  | 'reentry_after_prior_exit'
 
 export type ExitEligibilityWarning = {
   code: ExitEligibilityWarningCode
@@ -99,6 +118,14 @@ export type WorkforceExitPayrollEligibilityWindow = {
 
   /** Canonical cutoff = COALESCE(last_working_day, effective_date) */
   cutoffDate: string | null
+
+  /**
+   * TASK-1349 — `true` cuando el período no puede calcularse/aprobarse sin
+   * una decisión humana sobre la salida (warning `unresolved_exit_signal`).
+   * Readiness y `calculatePayroll` fallan cerrado sobre este campo; la
+   * proyección lo muestra sin excluir.
+   */
+  reviewRequired: boolean
 
   warnings: readonly ExitEligibilityWarning[]
 }

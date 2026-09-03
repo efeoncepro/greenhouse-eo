@@ -15,7 +15,8 @@ export type {
 } from './types'
 
 export type { ExitCaseFacts } from './policy'
-export { computeCutoff, derivePolicy } from './policy'
+export { computeCutoff, derivePolicy, isUnresolvedExitRelevantToPeriod } from './policy'
+export { collectUnresolvedExitMemberIds, evaluateExitReviewGate, type ExitReviewGate } from './calculation-gate'
 export { isPayrollExitEligibilityWindowEnabled } from './flag'
 
 /**
@@ -39,7 +40,7 @@ export const resolveExitEligibilityForMembers = async (
   periodStart: string,
   periodEnd: string
 ): Promise<Map<string, WorkforceExitPayrollEligibilityWindow>> => {
-  const facts = await fetchExitCaseFactsForMembers(memberIds)
+  const facts = await fetchExitCaseFactsForMembers(memberIds, periodStart, periodEnd)
   const out = new Map<string, WorkforceExitPayrollEligibilityWindow>()
 
   for (const memberId of memberIds) {

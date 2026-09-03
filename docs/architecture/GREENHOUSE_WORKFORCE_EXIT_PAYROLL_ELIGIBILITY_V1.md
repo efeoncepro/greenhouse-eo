@@ -150,10 +150,13 @@ export async function isMemberInPayrollScope(
 | `external_payroll` | `status IN ('approved','scheduled','executed')` AND cutoff < periodStart | `exclude_entire_period` |
 | `non_payroll` | `status IN ('approved','scheduled','executed')` AND cutoff < periodStart | `exclude_entire_period` |
 | `non_payroll` | `status IN ('approved','scheduled','executed')` AND cutoff in periodo | `exclude_from_cutoff` |
-| `identity_only` | N/A — siempre `full_period` salvo `members.active=FALSE` | `full_period` |
+| `identity_only` | N/A — siempre `full_period` (identidad ortogonal a nómina; ver decisión 2026-09-03: `members.active` ya no es filtro) | `full_period` |
 | `relationship_transition` | `status='executed'` AND cutoff in periodo | `partial_until_cutoff` |
 | `unknown` | conservador: NO excluye | `full_period` + warning `unclassified_lane` |
-| Cualquier lane | `status IN ('draft','needs_review','blocked','cancelled')` | `full_period` + warning si aplica |
+| Cualquier lane | `status IN ('draft','needs_review','blocked')` con señal (`COALESCE(cutoff, created_at::date)`) ≤ `periodEnd` | `full_period` + warning **blocking** `unresolved_exit_signal` + `reviewRequired=true` (decisión 2026-09-03) |
+| Cualquier lane | `status IN ('draft','needs_review','blocked','cancelled')` sin señal relevante | `full_period` + warning info si aplica |
+| Cualquier lane | `members.active=FALSE` **sin** hecho de salida decidido (approved/scheduled/executed + cutoff) | `exclude_entire_period` + warning `inactive_without_exit_fact` |
+| Cualquier lane | compensación con `effective_from` > cutoff de la salida decidida y ≤ `periodEnd` (reingreso) | `full_period` + info `reentry_after_prior_exit` |
 
 **Rationale (defensa de la asimetria)**:
 
@@ -352,12 +355,78 @@ La migración `TASK-1630` acepta el snapshot. `resolveOffboardingLane` produce `
 
 Reabrir si aparece un proceso legal/documental específico para `international_internal`, si otro tipo internacional interno requiere un threshold distinto o si Payroll adopta un aggregate de cierre no chileno.
 
+## Architecture Decision 2026-09-03 — Elegibilidad temporal por episodio, `active` como disponibilidad actual y gate de revisión (TASK-1349)
+
+- **Status:** Accepted
+- **Owner:** HR / Payroll / Workforce / Identity / Reliability
+- **Scope:** `src/lib/payroll/exit-eligibility/**`, `payroll-readiness.ts`, `calculate-payroll.ts`, executor de offboarding.
+- **Reversibility:** two-way-but-slow (cambia qué períodos ve un member inactivo y cuándo un período se bloquea).
+- **Confidence:** high — verificado contra PG real con el caso Felipe Zurita (`EO-OFF-2026-8B8AF9BA`) y la cohorte del 03/09.
+- **Validated as of:** 2026-09-03
+
+### Context
+
+La auditoría del 03/09 (`docs/audits/payroll/OFFBOARDING_ROOT_CAUSE_AND_REMEDIATION_2026-09-03.md`) demostró tres
+defectos del contrato V1: (1) `derivePolicy` excluía `exclude_entire_period` ante `members.active=FALSE` **antes** de
+mirar fechas, así que desactivar a Felipe (salida 02/06) habría borrado su elegibilidad legítima de mayo y del 1–2 de
+junio en cualquier recálculo; y la baja administrativa (`deactivateMember`, sólo acceso) ya producía ese efecto hoy;
+(2) el SELECT exterior del reader omitía `contract_type_snapshot`, dejando inalcanzable el threshold
+`international_internal`; (3) una salida sin resolver (`needs_review`/`blocked`/`draft`) devolvía `full_period` sin
+ninguna señal, y readiness/cálculo no la consultaban: el near miss del 06/07 se calculó y exportó por eso. Además el
+LATERAL elegía el caso por prioridad de estado sin scope temporal: un reingreso heredaba la salida anterior.
+
+### Decision
+
+1. **La relación/episodio y sus fechas gobiernan la elegibilidad histórica; `members.active` es disponibilidad
+   actual.** Un member inactivo con hecho de salida decidido (approved/scheduled/executed + cutoff) se evalúa
+   exactamente igual que uno activo: mayo completo, junio hasta el cutoff, julio excluido. Un inactivo **sin** hecho
+   de salida se excluye por defensa, pero **declarado** (`inactive_without_exit_fact`), nunca en silencio.
+2. **El caso que gobierna un período se elige por relevancia temporal**: casos con
+   `COALESCE(last_working_day, effective_date, created_at::date) <= periodEnd` primero, decididos antes que sin
+   resolver, episodio más reciente primero. Una compensación que empieza después del cutoff decidido y ≤ `periodEnd`
+   prueba reingreso: la salida anterior no gobierna (`reentry_after_prior_exit`).
+3. **Una señal de acceso por sí sola no quita pago, pero exige decisión.** Un caso sin resolver cuya señal cae en o
+   antes del período mantiene `full_period` y marca `reviewRequired=true` con warning **blocking**
+   `unresolved_exit_signal`. `getPayrollPeriodReadiness` lo convierte en blocker (`unresolved_exit_signal`) y
+   `calculatePayroll` falla cerrado con 409. Se resuelve con el command de revisión (`access_only` |
+   `relationship_ended`) o cancelando/aprobando el caso; nunca con un flag.
+4. **Una falla del resolver no autoriza cálculo.** La proyección puede degradar al roster legacy (preview honesta);
+   readiness (`exit_eligibility_unavailable`) y el cálculo oficial (409) no.
+5. `contract_type_snapshot` viaja en el SELECT exterior; el threshold `international_internal` queda operativo.
+6. Todo lo anterior vive detrás de `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED` (ON en Production y staging desde
+   mayo). Con la flag OFF el gate legacy sigue bit-for-bit.
+
+### Consequences
+
+- Tras el release, readiness de un período bloquea mientras existan casos sin resolver relevantes (a la fecha:
+  Felipe `blocked` y Maria Fernanda `draft` 07-29). Es el control buscado, no un efecto colateral; el operador
+  decide el caso y el período se libera.
+- Un `draft` manual con fecha futura no bloquea el período actual; uno sin fechas creado dentro del período sí.
+- Los ~240 members `active=false` legacy sin caso siguen fuera del roster, ahora con warning explícito cuando un
+  consumer los consulta.
+- Alternativas rechazadas: (a) mantener `active` como filtro y prohibir desactivar — rompe rosters/360 (ISSUE-117);
+  (b) trigger PG que deduzca la baja desde SCIM — la baja de acceso no es un hecho laboral; (c) crear un source of
+  truth nuevo de episodios — la relación legal + compensación + caso ya lo expresan.
+
+### Runtime Contract
+
+`fetchExitCaseFactsForMembers(memberIds, periodStart, periodEnd)` → `ExitCaseFacts` (+ `exitSource`,
+`caseSignalDate`, `reenteredAfterExit`); `derivePolicy` → `WorkforceExitPayrollEligibilityWindow.reviewRequired`;
+`collectUnresolvedExitMemberIds` / `evaluateExitReviewGate` (`calculation-gate.ts`) compartidos por readiness y
+cálculo. Warning codes nuevos: `unresolved_exit_signal` (blocking), `inactive_without_exit_fact`,
+`reentry_after_prior_exit`. Readiness codes nuevos: `unresolved_exit_signal`, `exit_eligibility_unavailable`.
+
+### Revisit When
+
+Aparezca un source of truth de episodios laborales distinto de relación+compensación, o Payroll necesite que un
+`draft` manual sin fechas no bloquee (hoy bloquea a propósito: un caso abierto es una decisión pendiente).
+
 ## Open Questions (deliberadamente NO decididas en V1)
 
 1. **Operational accrual external_provider en cost intelligence**: ¿Member Loaded Cost Model (TASK-710-713) debe pre-cargar el partial USD hasta `cutoffDate` para external_provider, aunque payroll proyectada lo excluya? **Hipotesis canonica**: SI, porque Member Loaded Cost es ABC costing y Greenhouse paga Deel fees + provider invoice — sigue siendo costo Greenhouse. Decidir en TASK-710 V2 cuando emerja el caso real.
 2. **Evidence requirement para EOR cross-border**: V1.0 no obligatorio. ¿V1.1 ship obligatoriedad para `country_code != legal_entity_country_code`? Requiere review legal.
 3. **Drift reconciliation write path**: V1 solo signal. Cuando emerja TASK-891+, decidir command shape (manual operator-driven vs semi-auto con approval).
-4. **`identity_only` lane interaction con projection**: V1 default `full_period` salvo `members.active=FALSE`. ¿Existe caso real donde `identity_only` deba excluir? Pendiente confirmar con operador HR.
+4. ~~**`identity_only` lane interaction con projection**~~ — **Resuelta 2026-09-03 (TASK-1349):** `identity_only` nunca excluye; una señal de acceso sin resolver exige revisión (`reviewRequired`) y la exclusión sólo nace de una decisión `relationship_ended` que reclasifica el caso.
 
 ## Roadmap by Slices
 

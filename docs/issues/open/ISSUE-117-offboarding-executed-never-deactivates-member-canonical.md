@@ -84,9 +84,44 @@ Remediación: **TASK-1349** (`docs/tasks/to-do/TASK-1349-offboarding-member-life
 
 open
 
+## Verificación UI 2026-09-03 — Felipe continúa bloqueado
+
+La [auditoría Computer Use en producción](../../audits/payroll/FELIPE_OFFBOARDING_UI_AUDIT_2026-09-03.md)
+reprodujo un defecto adicional: `Aprobar caso` tomó las fechas default del formulario de creación y
+guardó `2026-09-03` sin preguntarlas. Felipe pasó de `needs_review` a `approved`, manteniendo
+`rule_lane=identity_only`, member activo y compensación abierta. El operador confirmó después
+**02/06/2026**. Se repararon ambas fechas mediante la API autenticada canónica y se contuvo la
+aprobación en `blocked`, con auditoría, readback PG y recarga de producción verificados.
+La UI no ofrece editar/reclasificar/revertir; muestra “Cierre contractual” y 2/2 listo pese a la
+clasificación de identidad. **El bloqueo del caso no excluye a Felipe de nómina**; sigue pendiente
+el cierre contractual y de elegibilidad. No hubo cálculo ni pago. La auditoría precisa reproducción, causa y
+recuperación requerida. Sigue abierto; los hallazgos amplían el circuito de revisión que debe cubrir
+TASK-1349.
+
+La [investigación ampliada con tres subagentes](../../audits/payroll/OFFBOARDING_ROOT_CAUSE_AND_REMEDIATION_2026-09-03.md)
+confirmó la ausencia del command de revisión/reclasificación, los defectos desde los commits de mayo,
+3 casos ejecutados con member activo y 40 tests focales verdes que no cubren el recorrido SCIM.
+Propone corregir el contrato temporal antes del writeback (active=false hoy afecta recálculos históricos),
+incorporar una unidad UI dependiente y conciliar la obligación/gasto de junio de Felipe.
+
+**Aclaración del operador (2026-09-03): a Felipe se le pagó absolutamente todo y no se le debe nada.**
+Los estados generated/pending observados en junio no reflejan ese cierre real; no son deuda confirmada
+ni autorización para pagar nuevamente. La recuperación debe enlazar el pago ya realizado con los
+registros correspondientes y corregir generaciones improcedentes con trazabilidad, dejando saldo
+pendiente cero. Esta aclaración actualiza el estado de negocio; no reescribe la observación histórica
+del near miss del 06/07.
+
 ## Relacionado
 
 - Código: [src/lib/workforce/offboarding/store.ts](../../../src/lib/workforce/offboarding/store.ts) (`updateOffboardingCaseStatus`), [src/lib/workforce/offboarding/lane.ts](../../../src/lib/workforce/offboarding/lane.ts)
 - Arquitectura: `docs/architecture/GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md`, `docs/architecture/agent-invariants/PAYROLL_WORKFORCE_AGENT_INVARIANTS.md` (§offboarding closure completeness), `docs/architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` (SCIM provisioning/deprovisioning)
 - Detectado desde: CLI `pnpm teams:payment-announcement` (skill `greenhouse-teams-message-operator`)
 - Objeto canónico: `Colaborador` → `greenhouse_core.members.member_id`
+
+## Registro de solución 2026-09-03
+
+TASK-1349 actualizada como dueña backend; [TASK-1814](../../tasks/to-do/TASK-1814-offboarding-case-review-recovery-ui.md)
+creada como consumidor UI dependiente. Cierre conjunto exige revisión/corrección accesible, elegibilidad temporal,
+recovery auditado de Felipe con salida 02/06/2026 y saldo cero, y readbacks productivos. Solo documentación;
+sin implementación, pagos, commit, push ni deploy. Estimación conjunta 20–32 horas efectivas (3–5 jornadas),
+sin esperas externas ni una migración financiera adicional que el dry-run pudiera requerir.

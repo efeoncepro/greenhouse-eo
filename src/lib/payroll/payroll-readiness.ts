@@ -17,6 +17,12 @@ import { fetchKpisForPeriod } from '@/lib/payroll/fetch-kpis-for-period'
 import { getApplicableCompensationVersionsForPeriod } from '@/lib/payroll/get-compensation'
 import { getPayrollEntries } from '@/lib/payroll/get-payroll-entries'
 import { getPayrollPeriod } from '@/lib/payroll/get-payroll-periods'
+import {
+  collectUnresolvedExitMemberIds,
+  isPayrollExitEligibilityWindowEnabled,
+  resolveExitEligibilityForMembers
+} from '@/lib/payroll/exit-eligibility'
+import { captureWithDomain } from '@/lib/observability/capture'
 import { resolvePayrollCalculationDeadline } from '@/lib/payroll/calculation-deadline'
 import { PayrollValidationError, getPeriodRangeFromId } from '@/lib/payroll/shared'
 import { resolvePayrollTaxTableVersion } from '@/lib/payroll/tax-table-version'
@@ -48,6 +54,8 @@ export const buildPayrollPeriodReadiness = ({
   attendanceDiagnostics,
   regimeMismatchMemberIds = [],
   missingUtmValue = false,
+  unresolvedExitMemberIds = [],
+  exitEligibilityUnavailable = false,
   referenceDate = new Date()
 }: {
   period: PayrollPeriod
@@ -57,6 +65,10 @@ export const buildPayrollPeriodReadiness = ({
   attendanceDiagnostics: PayrollPeriodReadiness['attendanceDiagnostics']
   regimeMismatchMemberIds?: string[]
   missingUtmValue?: boolean
+  /** TASK-1349 — members whose exit window demands a human decision. */
+  unresolvedExitMemberIds?: string[]
+  /** TASK-1349 — the exit resolver failed; the gate cannot be evaluated. */
+  exitEligibilityUnavailable?: boolean
   referenceDate?: Date | string
 }): PayrollPeriodReadiness => {
   const includedCompensations = compensationRows.filter(row => row.hasCompensationVersion)
@@ -143,6 +155,27 @@ export const buildPayrollPeriodReadiness = ({
       message:
         `${missingAttendanceMemberIds.length} colaborador(es) requieren señales de asistencia o licencias antes de calcular este período.`,
       memberIds: missingAttendanceMemberIds
+    })
+  }
+
+  // TASK-1349 — una salida sin resolver relevante al período no excluye al
+  // colaborador, pero nadie puede calcular ni aprobar sin decidirla. Y si el
+  // resolver no corrió, el período no queda autorizado en silencio.
+  if (exitEligibilityUnavailable) {
+    blockingIssues.push({
+      code: 'exit_eligibility_unavailable',
+      severity: 'blocking',
+      message:
+        'No se pudo resolver la elegibilidad de salida de los colaboradores. Reintenta; si persiste, revisa el resolver antes de calcular o aprobar.'
+    })
+  }
+
+  if (unresolvedExitMemberIds.length > 0) {
+    blockingIssues.push({
+      code: 'unresolved_exit_signal',
+      severity: 'blocking',
+      message: `${unresolvedExitMemberIds.length} colaborador(es) tienen una salida sin resolver que afecta este período. Revisa el caso de offboarding (solo acceso o término de relación) antes de calcular o aprobar.`,
+      memberIds: unresolvedExitMemberIds
     })
   }
 
@@ -312,6 +345,29 @@ export const getPayrollPeriodReadiness = async (periodId: string): Promise<Payro
 
   const regimeMismatchMemberIds = await getPayrollRegimeMismatchMemberIds(period)
 
+  // TASK-1349 — exit review gate (same decision as `calculatePayroll`). Only
+  // under the exit-window flag; with the flag OFF the legacy gate (executed
+  // AND last_working_day < periodStart) keeps its bit-for-bit behaviour.
+  let unresolvedExitMemberIds: string[] = []
+  let exitEligibilityUnavailable = false
+
+  if (isPayrollExitEligibilityWindowEnabled()) {
+    try {
+      const windows = await resolveExitEligibilityForMembers(
+        includedCompensations.map(row => row.memberId),
+        range.periodStart,
+        range.periodEnd
+      )
+
+      unresolvedExitMemberIds = collectUnresolvedExitMemberIds(windows.values())
+    } catch (error) {
+      captureWithDomain(error, 'payroll', {
+        extra: { source: 'payroll_readiness.exit_review_gate_unavailable', periodId }
+      })
+      exitEligibilityUnavailable = true
+    }
+  }
+
   return buildPayrollPeriodReadiness({
     period:
       resolvedUfValue == null && resolvedTaxTableVersion === period.taxTableVersion
@@ -322,6 +378,8 @@ export const getPayrollPeriodReadiness = async (periodId: string): Promise<Payro
     missingAttendanceMemberIds,
     attendanceDiagnostics: attendanceResult.diagnostics,
     regimeMismatchMemberIds,
-    missingUtmValue: includesChilePayroll && resolvedTaxTableVersion != null && typeof resolvedUtmValue !== 'number'
+    missingUtmValue: includesChilePayroll && resolvedTaxTableVersion != null && typeof resolvedUtmValue !== 'number',
+    unresolvedExitMemberIds,
+    exitEligibilityUnavailable
   })
 }

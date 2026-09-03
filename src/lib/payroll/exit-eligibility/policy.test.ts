@@ -54,13 +54,205 @@ describe('derivePolicy — no exit case', () => {
     expect(window.warnings).toEqual([])
   })
 
-  it('returns exclude_entire_period when member is inactive (defensive)', () => {
+  it('returns exclude_entire_period when member is inactive WITHOUT any decided exit fact (declared, not silent)', () => {
     const window = derivePolicy({ ...baseFacts, memberActive: false }, PERIOD_START, PERIOD_END)
 
     expect(window.projectionPolicy).toBe('exclude_entire_period')
     expect(window.eligibleFrom).toBeNull()
     expect(window.eligibleTo).toBeNull()
     expect(window.relationshipStatus).toBe('ended')
+    expect(window.reviewRequired).toBe(false)
+    expect(window.warnings.map(w => w.code)).toEqual(['inactive_without_exit_fact'])
+  })
+})
+
+describe('derivePolicy — TASK-1349 active is current availability, not the historical filter', () => {
+  // Felipe-like: honorarios (non_payroll), exit 2026-06-02, member deactivated afterwards.
+  const felipeLike = (overrides: Partial<ExitCaseFacts> = {}): ExitCaseFacts =>
+    withCase({
+      memberActive: false,
+      exitLane: 'non_payroll',
+      exitStatus: 'executed',
+      contractTypeSnapshot: 'honorarios',
+      lastWorkingDay: '2026-06-02',
+      effectiveDate: '2026-06-02',
+      ...overrides
+    })
+
+  it('inactive member with executed exit on 2 June keeps May fully eligible (history preserved)', () => {
+    const window = derivePolicy(felipeLike(), '2026-05-01', '2026-05-31')
+
+    expect(window.projectionPolicy).toBe('full_period')
+    expect(window.eligibleFrom).toBe('2026-05-01')
+    expect(window.eligibleTo).toBe('2026-05-31')
+    expect(window.relationshipStatus).toBe('scheduled_exit')
+    expect(window.warnings.map(w => w.code)).not.toContain('inactive_without_exit_fact')
+  })
+
+  it('inactive member with executed exit on 2 June is excluded from the cutoff in June (non_payroll)', () => {
+    const window = derivePolicy(felipeLike(), '2026-06-01', '2026-06-30')
+
+    expect(window.projectionPolicy).toBe('exclude_from_cutoff')
+    expect(window.cutoffDate).toBe('2026-06-02')
+  })
+
+  it('inactive member with executed exit on 2 June is excluded entirely in July and later', () => {
+    const window = derivePolicy(felipeLike(), '2026-07-01', '2026-07-31')
+
+    expect(window.projectionPolicy).toBe('exclude_entire_period')
+    expect(window.relationshipStatus).toBe('ended')
+  })
+
+  it('an administrative deactivation (identity_only, unresolved) does NOT exclude retroactively — it asks for review instead', () => {
+    const window = derivePolicy(
+      withCase({
+        memberActive: false,
+        exitLane: 'identity_only',
+        exitStatus: 'needs_review',
+        caseSignalDate: '2026-06-10'
+      }),
+      '2026-06-01',
+      '2026-06-30'
+    )
+
+    // No decided fact → still excluded defensively (active=false), but declared…
+    expect(window.projectionPolicy).toBe('exclude_entire_period')
+    expect(window.warnings.map(w => w.code)).toEqual(['inactive_without_exit_fact'])
+  })
+})
+
+describe('derivePolicy — TASK-1349 unresolved exit signals demand review (access alone never removes pay)', () => {
+  it('SCIM identity_only needs_review with no dates, created inside the period → full_period + reviewRequired', () => {
+    const window = derivePolicy(
+      withCase({
+        exitLane: 'identity_only',
+        exitStatus: 'needs_review',
+        exitSource: 'scim',
+        contractTypeSnapshot: 'honorarios',
+        caseSignalDate: '2026-06-10'
+      }),
+      '2026-06-01',
+      '2026-06-30'
+    )
+
+    expect(window.projectionPolicy).toBe('full_period')
+    expect(window.reviewRequired).toBe(true)
+    expect(window.warnings.find(w => w.code === 'unresolved_exit_signal')?.severity).toBe('blocking')
+  })
+
+  it('the same unresolved signal does NOT affect a period that ended before the signal existed', () => {
+    const window = derivePolicy(
+      withCase({ exitLane: 'identity_only', exitStatus: 'needs_review', caseSignalDate: '2026-06-10' }),
+      '2026-05-01',
+      '2026-05-31'
+    )
+
+    expect(window.projectionPolicy).toBe('full_period')
+    expect(window.reviewRequired).toBe(false)
+    expect(window.warnings).toEqual([])
+  })
+
+  it('blocked case with explicit dates in the past keeps demanding review in later periods (Felipe blocked 2026-06-02)', () => {
+    const window = derivePolicy(
+      withCase({
+        exitLane: 'identity_only',
+        exitStatus: 'blocked',
+        lastWorkingDay: '2026-06-02',
+        effectiveDate: '2026-06-02',
+        caseSignalDate: '2026-06-10'
+      }),
+      '2026-09-01',
+      '2026-09-30'
+    )
+
+    expect(window.projectionPolicy).toBe('full_period')
+    expect(window.reviewRequired).toBe(true)
+  })
+
+  it('draft manual case with a cutoff in a FUTURE period does not block the current one', () => {
+    const window = derivePolicy(
+      withCase({
+        exitLane: 'internal_payroll',
+        exitStatus: 'draft',
+        effectiveDate: '2026-10-15',
+        caseSignalDate: '2026-09-02'
+      }),
+      '2026-09-01',
+      '2026-09-30'
+    )
+
+    expect(window.reviewRequired).toBe(false)
+    expect(window.warnings).toEqual([])
+  })
+
+  it('decided identity_only (access_only review) never gates payroll and needs no review', () => {
+    const window = derivePolicy(
+      withCase({
+        exitLane: 'identity_only',
+        exitStatus: 'approved',
+        effectiveDate: '2026-06-10',
+        caseSignalDate: '2026-06-10'
+      }),
+      '2026-06-01',
+      '2026-06-30'
+    )
+
+    expect(window.projectionPolicy).toBe('full_period')
+    expect(window.reviewRequired).toBe(false)
+  })
+})
+
+describe('derivePolicy — TASK-1349 re-entry does not inherit a prior exit', () => {
+  it('executed exit last year + compensation starting after it → full_period with info warning', () => {
+    const window = derivePolicy(
+      withCase({
+        exitLane: 'internal_payroll',
+        exitStatus: 'executed',
+        lastWorkingDay: '2025-11-30',
+        effectiveDate: '2025-11-30',
+        reenteredAfterExit: true
+      }),
+      '2026-05-01',
+      '2026-05-31'
+    )
+
+    expect(window.projectionPolicy).toBe('full_period')
+    expect(window.relationshipStatus).toBe('active')
+    expect(window.warnings.map(w => w.code)).toEqual(['reentry_after_prior_exit'])
+  })
+
+  it('without a re-entry compensation the old executed exit still excludes the period', () => {
+    const window = derivePolicy(
+      withCase({
+        exitLane: 'internal_payroll',
+        exitStatus: 'executed',
+        lastWorkingDay: '2025-11-30',
+        effectiveDate: '2025-11-30',
+        reenteredAfterExit: false
+      }),
+      '2026-05-01',
+      '2026-05-31'
+    )
+
+    expect(window.projectionPolicy).toBe('exclude_entire_period')
+  })
+})
+
+describe('derivePolicy — TASK-1349 contract_type_snapshot reaches the international_internal threshold', () => {
+  it('internal_payroll + international_internal approved with cutoff in period → exclude_from_cutoff', () => {
+    const window = derivePolicy(
+      withCase({
+        exitLane: 'internal_payroll',
+        exitStatus: 'approved',
+        contractTypeSnapshot: 'international_internal',
+        effectiveDate: '2026-06-29',
+        lastWorkingDay: '2026-06-29'
+      }),
+      '2026-06-01',
+      '2026-06-30'
+    )
+
+    expect(window.projectionPolicy).toBe('exclude_from_cutoff')
   })
 })
 
@@ -88,9 +280,12 @@ describe('derivePolicy — non-blocking statuses', () => {
     )
 
     expect(window.projectionPolicy).toBe('full_period')
-    expect(window.warnings).toHaveLength(1)
-    expect(window.warnings[0].code).toBe('draft_case_with_cutoff_in_period')
+    // TASK-1349: a draft with its cutoff inside the period is an unresolved exit
+    // relevant to it → still projected (full_period) but review is required.
+    expect(window.warnings.map(w => w.code)).toEqual(['draft_case_with_cutoff_in_period', 'unresolved_exit_signal'])
     expect(window.warnings[0].severity).toBe('info')
+    expect(window.warnings[1].severity).toBe('blocking')
+    expect(window.reviewRequired).toBe(true)
   })
 
   it('needs_review case → behaves like draft', () => {
@@ -633,8 +828,11 @@ describe('derivePolicy — Maria Camila Hoyos canonical regression fixture', () 
     )
 
     expect(window.projectionPolicy).toBe('full_period')
-    expect(window.warnings).toHaveLength(1)
-    expect(window.warnings[0].code).toBe('draft_case_with_cutoff_in_period')
+    // TASK-1349: a draft with its cutoff inside the period is an unresolved exit
+    // relevant to it → still projected (full_period) but review is required.
+    expect(window.warnings.map(w => w.code)).toEqual(['draft_case_with_cutoff_in_period', 'unresolved_exit_signal'])
     expect(window.warnings[0].severity).toBe('info')
+    expect(window.warnings[1].severity).toBe('blocking')
+    expect(window.reviewRequired).toBe(true)
   })
 })

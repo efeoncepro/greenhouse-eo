@@ -75,6 +75,37 @@ const compensatedMember = {
 }
 
 describe('buildPayrollPeriodReadiness', () => {
+  it('TASK-1349 — blocks calculation and approval when a member carries an unresolved exit signal, without excluding them', () => {
+    const readiness = buildPayrollPeriodReadiness({
+      period,
+      compensationRows: [compensatedMember],
+      missingKpiMemberIds: [],
+      missingAttendanceMemberIds: [],
+      attendanceDiagnostics,
+      unresolvedExitMemberIds: ['member-1']
+    })
+
+    expect(readiness.ready).toBe(false)
+    expect(readiness.approval.ready).toBe(false)
+    expect(readiness.includedMemberIds).toEqual(['member-1'])
+    expect(readiness.blockingIssues.map(issue => issue.code)).toContain('unresolved_exit_signal')
+    expect(readiness.blockingIssues.find(issue => issue.code === 'unresolved_exit_signal')?.memberIds).toEqual(['member-1'])
+  })
+
+  it('TASK-1349 — blocks when the exit resolver is unavailable (never authorizes by silent inclusion)', () => {
+    const readiness = buildPayrollPeriodReadiness({
+      period,
+      compensationRows: [compensatedMember],
+      missingKpiMemberIds: [],
+      missingAttendanceMemberIds: [],
+      attendanceDiagnostics,
+      exitEligibilityUnavailable: true
+    })
+
+    expect(readiness.ready).toBe(false)
+    expect(readiness.blockingIssues.map(issue => issue.code)).toContain('exit_eligibility_unavailable')
+  })
+
   it('is ready when there is at least one compensated member and no blockers', () => {
     const readiness = buildPayrollPeriodReadiness({
       period,

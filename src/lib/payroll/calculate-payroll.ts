@@ -31,6 +31,11 @@ import {
   prorateCompensationForParticipationWindow,
   resolvePayrollParticipationWindowsForMembers
 } from '@/lib/payroll/participation-window'
+import {
+  collectUnresolvedExitMemberIds,
+  isPayrollExitEligibilityWindowEnabled,
+  resolveExitEligibilityForMembers
+} from '@/lib/payroll/exit-eligibility'
 import { captureWithDomain } from '@/lib/observability/capture'
 import {
   canRecalculatePayrollPeriod,
@@ -617,6 +622,49 @@ export const calculatePayroll = async ({
    * Read-only call to PG. Safe to invoke before opening the write
    * transaction.
    */
+  /*
+   * TASK-1349 — Exit review gate, fail-closed for the OFFICIAL calculation.
+   *
+   * The roster reader and the participation resolver degrade honestly when
+   * the exit resolver fails (a preview may still render). An official
+   * calculation may NOT: a resolver failure would silently include every
+   * member with an unresolved exit, which is exactly the near miss of
+   * 2026-07-06. Same decision as `getPayrollPeriodReadiness`.
+   */
+  if (isPayrollExitEligibilityWindowEnabled()) {
+    let unresolvedExitMemberIds: string[]
+
+    try {
+      const windows = await resolveExitEligibilityForMembers(
+        compensationRows.map(c => c.memberId),
+        range.periodStart,
+        range.periodEnd
+      )
+
+      unresolvedExitMemberIds = collectUnresolvedExitMemberIds(windows.values())
+    } catch (error) {
+      captureWithDomain(error, 'payroll', {
+        extra: { source: 'calculate_payroll.exit_review_gate_unavailable', periodId }
+      })
+
+      throw new PayrollValidationError(
+        'No se pudo resolver la elegibilidad de salida de los colaboradores. El cálculo oficial no puede autorizarse hasta que el resolver responda.',
+        409,
+        { code: 'exit_eligibility_unavailable', periodId },
+        'exit_eligibility_unavailable'
+      )
+    }
+
+    if (unresolvedExitMemberIds.length > 0) {
+      throw new PayrollValidationError(
+        'Hay colaboradores con una salida sin resolver que afecta este período. Revisa sus casos de offboarding antes de calcular.',
+        409,
+        { code: 'unresolved_exit_signal', periodId, memberIds: unresolvedExitMemberIds },
+        'unresolved_exit_signal'
+      )
+    }
+  }
+
   const participationByMember = isPayrollParticipationWindowEnabled()
     ? await resolvePayrollParticipationWindowsForMembers(
         compensationRows.map(c => c.memberId),
