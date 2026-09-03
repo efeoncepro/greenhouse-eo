@@ -26,12 +26,15 @@ import type { OffboardingCase } from './types'
 
 let futureVersions: Array<{ version_id: string; effective_from: string }> = []
 let activeRelationship = true
+let reentryRelationship: Array<{ relationship_id: string; effective_from: string }> = []
 
 const client = {
   query: vi.fn(async (text: string, values: unknown[] = []) => {
     queryCalls.push({ text, values })
 
-    if (text.includes('effective_from > $2::date')) return { rows: futureVersions }
+    if (text.includes('greenhouse_payroll.compensation_versions') && text.includes('effective_from > $2::date')) return { rows: futureVersions }
+    if (text.includes('person_legal_entity_relationships') && text.includes('effective_from > $2::date')) return { rows: reentryRelationship }
+    if (text.includes('greenhouse_hr.contractor_engagements')) return { rows: [] }
     if (text.includes('UPDATE greenhouse_payroll.compensation_versions')) return { rows: [{ version_id: 'v1' }] }
 
     if (text.includes('FROM greenhouse_core.person_legal_entity_relationships') && text.includes('FOR UPDATE')) {
@@ -106,6 +109,7 @@ beforeEach(() => {
   endRelationshipMock.mockReset().mockResolvedValue({ relationshipId: 'pler-1' })
   futureVersions = []
   activeRelationship = true
+  reentryRelationship = []
   delete process.env.WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED
 })
 
@@ -188,6 +192,20 @@ describe('applyOffboardingLifecycleEffects', () => {
     ).rejects.toMatchObject({ statusCode: 409, code: 'compensation_future_version_conflict' })
 
     expect(sql('UPDATE ')).toHaveLength(0)
+    expect(publishMock).not.toHaveBeenCalled()
+  })
+
+  it('re-entry guard: a relationship that started AFTER the last working day keeps the member active (Valentina case, 2026-09-03)', async () => {
+    process.env.WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED = 'true'
+    reentryRelationship = [{ relationship_id: 'pler-contractor-new', effective_from: '2026-08-20' }]
+
+    const effects = await applyOffboardingLifecycleEffects(client, { current: realExit, lastWorkingDay: '2026-06-02', actorUserId: 'hr-1', reason: null })
+
+    expect(effects.skippedReason).toBe('reentry_detected')
+    expect(effects.memberDeactivated).toBe(false)
+    expect(effects.relationshipEnded).toBeNull()
+    expect(sql('UPDATE greenhouse_core.members')).toHaveLength(0)
+    expect(endRelationshipMock).not.toHaveBeenCalled()
     expect(publishMock).not.toHaveBeenCalled()
   })
 
