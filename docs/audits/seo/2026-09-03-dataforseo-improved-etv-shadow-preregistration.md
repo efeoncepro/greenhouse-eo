@@ -3,8 +3,12 @@
 - Fecha: 2026-09-03 (UTC)
 - Task: `TASK-1806` · Epic: `EPIC-022` · ADR: `GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md`
 - Tipo: artefacto de preregistro (cohorte, inputs, métricas, umbrales, caps y forecast) + readback de readiness
-- Estado: **congelado a la espera de aprobación**. Este documento NO autoriza gasto, flags, deploy ni cutover.
-- Gasto ejecutado por este artefacto: **USD 0** (plan puro, `providerCalls: 0`; ledger intacto)
+- Estado: **congelado → aprobado y ejecutado el 2026-09-03** (ver §7). Este documento NO autoriza deploy ni cutover.
+- Gasto ejecutado por este artefacto al congelarlo: **USD 0** (plan puro). Gasto del shadow ejecutado bajo este
+  preregistro: **USD 1,09536** (26 requests; resultados y memo de decisión en `docs/audits/seo/etv-shadow/`).
+- Nota de lectura: §2 es el readback del Slice 0 tal como se hizo a las ~02:12Z; el contract se aplicó después ese
+  mismo día (migración `20260903103858964`), así que las filas «⏳ NO aplicado» y «Condición de 7 días» describen el
+  estado previo, no el vigente.
 
 ## 1. Qué es y qué no es
 
@@ -87,7 +91,7 @@ celda mide el borde inferior (nulls, ceros, estabilidad), no exactitud.
 | 8 | comex.com.mx | `relevant_pages` | `limit` 100 | 0,024 |
 | 9 | efeoncepro.com | `domain_rank_overview` | 2152 / es | 0,01212 |
 | 10 | efeoncepro.com | `ranked_keywords` (visibilidad) | `limit` 100 | 0,024 |
-| 11 | berel.com + comex.com.mx + efeoncepro.com | `bulk_traffic_estimation` | 3 `targets`, 2484 / es | 0,01236 |
+| 11 | berel.com + comex.com.mx + efeoncepro.com | `bulk_traffic_estimation` | 3 `targets`, 2484 / es. ⚠️ Defecto detectado en la corrida: comparte tabla y clave con la foto de dominio del mismo día → Berel/Comex no persisten (DO NOTHING); valores sólo en el crudo. Próxima cohorte: correr bulk otro día o excluir sujetos con foto ese día | 0,01236 |
 | 12 | comex.com.mx | `ranked_keywords` (prospecto) | `limit` 1000, prospecto sintético sin PII | 0,132 |
 
 Forecast del plan puro (`planEtvEvaluation`, 2026-09-03): **13 celdas → 26 requests → USD 1,14384** (cifra del
@@ -168,7 +172,8 @@ corrida y readback del ledger antes/después. Fuera de esa ventana el gate vuelv
 |---|---|---|
 | Aplicar contract de schema | **aplicado 2026-09-03** (migración `20260903103858964_task-1806-etv-methodology-contract`) por instrucción del operador; condición leída como «cero filas contractuales escritas DESPUÉS del release» (0/0/0; las 5/8/2 de la ventana literal son del 27-29 de agosto, pre-release) + ambos runtimes en el SHA del release | operador |
 | Aprobar cohorte + caps + ventana + USD 2,00 | **aprobado 2026-09-03** (instrucción «ok avanza end-to-end» sobre este preregistro; caps 30 requests / USD 2,00) | operador |
-| Aprobar tratamiento histórico (rebaseline/breakpoint) | pendiente, después del Slice 2 | operador |
+| Ejecutar el shadow | **ejecutado 2026-09-03** con autorización explícita en chat (run `etvshadow-f3fef9b3c2a8`, 26 requests, USD 1,09536); resultados y memo en `docs/audits/seo/etv-shadow/` | operador / Claude |
+| Aprobar tratamiento histórico (rebaseline/breakpoint) | pendiente; el memo recomienda `rebaseline` | operador |
 | Aprobar cutover staging y productivo | pendiente, después del Slice 2 | operador |
 
 Sin la segunda fila no se ejecuta ninguna llamada pagada.

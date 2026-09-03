@@ -21,12 +21,12 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-022`
-- Status real: `Slice 0 cerrado (2026-09-03): readiness verificada, preregistro congelado y aprobado (cohorte + caps 30 req / USD 2,00), contract de schema APLICADO (migración 20260903103858964_task-1806-etv-methodology-contract; readback constraints formula-aware presentes, 0/6 defaults, 0/0/0 filas contractuales post-release). Slices 1 y 2 code complete (shadow-runner + CLI dataforseo-etv-shadow; shadow-decision + shadow-report + CLI dataforseo-etv-shadow-evaluate; 75/75 tests, typecheck verde; dry-run real 13 celdas / 26 requests / forecast USD 1,14384, wouldExecute=true, providerCalls=0). Corrida pagada del shadow NO ejecutada (cero llamadas pagadas de esta task), decisión pendiente, cutover no autorizado; selectores productivos en legacy_static_v1 en Vercel y ops-worker; señal seo.etv_methodology.drift en awaiting_data`
+- Status real: `Slices 0-2 EJECUTADOS 2026-09-03: contract aplicado; shadow exact_ab comprado con autorización explícita (26 requests, USD 1,09536, ledger cuadra); evaluador → hold mecánico sólo por la regla §5.2 (efecto de fórmula −64,5 % en Berel con count intacto), con calibración GSC a favor de improved (err. 49 % vs 321 %), Jaccard 1,0 e historia continua; memo de decisión recomienda go_rebaseline (docs/audits/seo/etv-shadow/). Cutover (Slices 3-4) pendiente de aprobación separada del operador; selectores productivos en legacy_static_v1`
 - Rank: `2`
 - Domain: `growth|seo|data|integration|ops`
 - External deadline: `2026-11-01T00:00:00Z; no existe fallback legacy posterior`
 - Internal targets: `shadow/decision 2026-10-23; cutover 2026-10-28T00:00:00Z`
-- Blocked by: `ejecución pagada del shadow pendiente de permiso de ejecución del operador (cohorte y caps ya aprobados en el preregistro 2026-09-03 §7; contract de schema ya aplicado); aprobación separada de tratamiento histórico (rebaseline/breakpoint) y de cutover staging/productivo después del Slice 2`
+- Blocked by: `aprobación separada del operador del tratamiento histórico (rebaseline recomendado) y del cutover staging/producción (exige release por el control plane); nada más bloquea`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -322,6 +322,9 @@ ejercerse el permiso de ejecución de la corrida pagada. Cero llamadas pagadas.
 
 ### Slice 1 — Shadow bounded
 
+**Ejecutado 2026-09-03 ~11:05Z** con autorización explícita del operador en chat: run `etvshadow-f3fef9b3c2a8`, 26/26 requests `20000`, USD 1,09536 real (forecast 1,14384), ledger `labs` del día cuadra; filas persistidas por método para domain overview (foto + 6 meses de historia + bulk de Efeonce), ranked_keywords (3 sujetos), relevant_pages (100+100), subdomains (3+3); la celda prospecto sólo en el crudo. Limitación: la celda bulk de Berel/Comex colisionó con la foto de dominio del mismo día (misma tabla/clave) → sin fila, valores en el crudo.
+
+
 **Avance 2026-09-03 — code complete; ejecución pagada PENDIENTE.** `src/lib/growth/seo/etv-methodology/shadow-runner.ts`
 (server-only; `assertEtvShadowCohort`, `preflightEtvShadow`, `runEtvShadow`): compra ambas fórmulas por celda en
 la misma ventana con inputs byte-idénticos salvo `use_improved_etv` (hash `taskHashWithoutFlag`), en el orden
@@ -347,6 +350,9 @@ forecast USD 1,14384, preflight `wouldExecute=true`, `providerCalls=0`. **Ningun
 - Detenerse automáticamente al alcanzar request cap, USD cap, drift o error contractual.
 
 ### Slice 2 — Evaluación y decisión histórica
+
+**Ejecutado 2026-09-03** (`dataforseo-etv-shadow-evaluate.ts` con GSC): `hold` mecánico sólo por la regla §5.2; calibración GSC improved 49,4 % vs legacy 321,3 % de error relativo en Berel; Jaccard 1,0; historia continua (0,1 % vs 8,1 %); prospecto −43,9 %. Memo de decisión con la explicación de §5.2 y recomendación `go_rebaseline`: `docs/audits/seo/etv-shadow/2026-09-03-2026-09-03-preregistered-decision-memo.md`. Aprobación separada del operador pendiente.
+
 
 **Avance 2026-09-03 — code complete; sin corrida real todavía.** `shadow-decision.ts` (puro, sin IO):
 `PREREGISTERED_ETV_SHADOW_THRESHOLDS_2026_09_03` congela los umbrales del preregistro §5, una función nombrada
@@ -500,12 +506,12 @@ primitive, reader, API o documentación humana solamente.
   docs públicas pendientes están declaradas sin convertirlas en bloqueo ficticio. *(`families.ts` + preregistro §3.)*
 - [x] Cohorte, inputs, métricas, umbrales, request cap y USD cap quedaron congelados antes del shadow. *(preregistro 2026-09-03 §4–§5; aprobación del operador pendiente.)*
 - [x] Ninguna llamada pagada ocurrió antes de la aprobación explícita registrada. *(vigente al 2026-09-03: gate OFF, ledger intacto; se re-verifica al cerrar.)*
-- [ ] Cada endpoint compatible fue evaluado con inputs equivalentes o marcado honestamente como no comparable.
-- [ ] GSC se evaluó como benchmark separado, sin promedio ni sustitución de ETV.
-- [ ] Se midieron valores, orden, membresía top-N, traffic cost, prospect traffic, nulls, latencia y costo.
-- [ ] AIO ETV se interpreta como atribución modelada y clickstream permanece separado del experimento improved.
-- [ ] La decisión go/no-go y el tratamiento histórico están respaldados por un artefacto reproducible.
-- [ ] Ningún reader/API/MCP sirvió shadow ni una serie mixta antes del cutover aprobado.
+- [x] Cada endpoint compatible fue evaluado con inputs equivalentes o marcado honestamente como no comparable. *(2026-09-03: 13 celdas, hash de inputs idéntico; la celda bulk de Berel/Comex quedó sin fila por colisión de clave con la foto del día y se declaró no comparable en el memo)*
+- [x] GSC se evaluó como benchmark separado, sin promedio ni sustitución de ETV. *(2026-09-03: sc-domain:berel.com, 28 días ×30/28, comparado nunca promediado)*
+- [x] Se midieron valores, orden, membresía top-N, traffic cost, prospect traffic, nulls, latencia y costo. *(2026-09-03: results.md + evaluation.json)*
+- [x] AIO ETV se interpreta como atribución modelada y clickstream permanece separado del experimento improved. *(por diseño de la foundation; include_clickstream_data no se envió en ninguna celda)*
+- [x] La decisión go/no-go y el tratamiento histórico están respaldados por un artefacto reproducible. *(artefacto reproducible: evaluador + memo 2026-09-03; decisión final y tratamiento histórico pendientes de aprobación del operador)*
+- [x] Ningún reader/API/MCP sirvió shadow ni una serie mixta antes del cutover aprobado. *(2026-09-03: lanes prod de Berel siguen sirviendo legacy_static_v1 single_methodology tras el shadow)*
 - [ ] Cutover staging, rollback pre-corte y safe mode post-corte fueron verificados antes de producción.
 - [ ] Vercel y ops-worker demuestran el mismo método configured/requested/provider-effective mediante evidencia.
 - [ ] Cero request legacy se envía desde el corte y todo punto improved pre-julio declara aproximación calibrada.
