@@ -71,10 +71,11 @@ AI Overview ETV, cuando aparezca en `ranked_keywords`, se interpreta como atribu
 |---|---|---|---|---|
 | A | `berel.com` | MX / es (`2484`) | cliente propio, dominio grande (773 kw, ETV legacy ~135k) | `sc-domain:berel.com` |
 | B | `comex.com.mx` | MX / es (`2484`) | competidor declarado de Berel, dominio muy grande (ETV legacy ~880k) | no (competidor) |
-| C | ~~`efeoncepro.com`~~ | CL / es (`2152`) | **RETIRADA 2026-09-03 por el operador: Efeonce es la agencia, no un sujeto de evaluación** (entró por arrastre del runbook de TASK-1805). Sus celdas de la corrida quedan anuladas; cohorte vigente para próximas corridas: `2026-09-03-preregistered-v2.json` | — |
+| C | `efeoncepro.com` | CL / es (`2152`) | dominio propio de Efeonce (la agencia), **sujeto aparte**: su organización, su mercado y su GSC; no forma parte del universo de Berel ni se compara con él. Dominio pequeño (5 kw): mide el borde inferior, sin voto sobre la decisión de Berel | `sc-domain:efeoncepro.com` |
 
-No se agregan clientes, marcas ni mercados. (La justificación original de Efeonce como «borde inferior» queda sin
-efecto: la agencia no es sujeto de evaluación; ver fila C.)
+No se agregan clientes, marcas ni mercados. Cada sujeto se mide **por su organización y su mercado**; la celda bulk
+de la corrida del 2026-09-03 violó eso (Efeonce dentro de la consulta de Berel, MX, org de Berel) y la cohorte v2 lo
+separa.
 
 ### Celdas y forecast (`exact_ab`, dos requests por celda, precios Labs vigentes)
 
@@ -91,7 +92,7 @@ efecto: la agencia no es sujeto de evaluación; ver fila C.)
 | 8 | comex.com.mx | `relevant_pages` | `limit` 100 | 0,024 |
 | 9 | efeoncepro.com | `domain_rank_overview` | 2152 / es | 0,01212 |
 | 10 | efeoncepro.com | `ranked_keywords` (visibilidad) | `limit` 100 | 0,024 |
-| 11 | berel.com + comex.com.mx + efeoncepro.com | `bulk_traffic_estimation` | 3 `targets`, 2484 / es. ⚠️ Defecto detectado en la corrida: comparte tabla y clave con la foto de dominio del mismo día → Berel/Comex no persisten (DO NOTHING); valores sólo en el crudo. Próxima cohorte: correr bulk otro día o excluir sujetos con foto ese día | 0,01236 |
+| 11 | berel.com + comex.com.mx + efeoncepro.com | `bulk_traffic_estimation` | 3 `targets`, 2484 / es. ⚠️ Dos defectos detectados en la corrida: (a) Efeonce viajó dentro de la consulta de Berel (mercado MX, org de Berel) — cada sujeto va aparte por organización/mercado (cohorte v2); (b) comparte tabla y clave con la foto de dominio del mismo día → Berel/Comex no persisten (DO NOTHING); valores sólo en el crudo. Próxima cohorte: bulk por organización y en otro día | 0,01236 |
 | 12 | comex.com.mx | `ranked_keywords` (prospecto) | `limit` 1000, prospecto sintético sin PII | 0,132 |
 
 Forecast del plan puro (`planEtvEvaluation`, 2026-09-03): **13 celdas → 26 requests → USD 1,14384** (cifra del
