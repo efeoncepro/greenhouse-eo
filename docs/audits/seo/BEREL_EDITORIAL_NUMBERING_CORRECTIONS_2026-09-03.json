@@ -1,0 +1,208 @@
+{
+  "status": "corrected_and_verified",
+  "checkedAt": "2026-09-03T13:36:35.629Z",
+  "rangeRule": "Both endpoints require N; title delimiters followed by ages or years are not ranges.",
+  "discrepancies": [
+    {
+      "id": "3c839c2fefe781198e6bdb1abd48495d",
+      "old": "<td>N48 — 79 años de Rayados: el origen de una identidad azul y blanca</td>",
+      "bad": "<td>N52–N54, N48–N50, N55–N59, N51, N60–N79 años de Rayados: el origen de una identidad azul y blanca</td>",
+      "correct": "<td>N52 — 79 años de Rayados: el origen de una identidad azul y blanca</td>"
+    },
+    {
+      "id": "3c839c2fefe781ad8bf0d4aad28e782b",
+      "property": "Nombre de tarea",
+      "original": "Artículo N48 - 79 años de Rayados: el origen de una identidad azul y blanca",
+      "bad": "Artículo N52–N54, N48–N50, N55–N59, N51, N60–N79 años de Rayados: el origen de una identidad azul y blanca",
+      "correct": "Artículo N52 - 79 años de Rayados: el origen de una identidad azul y blanca"
+    },
+    {
+      "id": "3c839c2fefe781be8862c27ab864691e",
+      "old": "<td>Artículo N48 — 79 años de Rayados: el origen de una identidad azul y blanca</td>",
+      "bad": "<td>Artículo N52–N54, N48–N50, N55–N59, N51, N60–N79 años de Rayados: el origen de una identidad azul y blanca</td>",
+      "correct": "<td>Artículo N52 — 79 años de Rayados: el origen de una identidad azul y blanca</td>"
+    },
+    {
+      "id": "3c839c2fefe781d09ea5dbbb8eb7fb0f",
+      "old": "<td>N48 — 79 años de Rayados: el origen de una identidad azul y blanca</td>",
+      "bad": "<td>N52–N54, N48–N50, N55–N59, N51, N60–N79 años de Rayados: el origen de una identidad azul y blanca</td>",
+      "correct": "<td>N52 — 79 años de Rayados: el origen de una identidad azul y blanca</td>"
+    },
+    {
+      "id": "3c839c2fefe781ea884fea6228ef048a",
+      "old": "<td>Artículo N48 — 79 años de Rayados: el origen de una identidad azul y blanca</td>",
+      "bad": "<td>Artículo N52–N54, N48–N50, N55–N59, N51, N60–N79 años de Rayados: el origen de una identidad azul y blanca</td>",
+      "correct": "<td>Artículo N52 — 79 años de Rayados: el origen de una identidad azul y blanca</td>"
+    }
+  ],
+  "rootRecovery": [
+    {
+      "id": "3c839c2fefe7811fa638e75a34cc2f41",
+      "month": "Noviembre",
+      "title": "Artículo N43 - Cómo aplicar mancha al aceite y realzar la veta de la madera",
+      "corrected": false,
+      "verified": true
+    },
+    {
+      "id": "3c839c2fefe78173af9bdf57041994e7",
+      "month": "Noviembre",
+      "title": "Artículo N44 - Cómo llevar color y alegría a tu hogar sin saturar los espacios",
+      "corrected": false,
+      "verified": true
+    },
+    {
+      "id": "3c839c2fefe7819981bfca4f0262f01d",
+      "month": "Noviembre",
+      "title": "Artículo N45 - Minimalismo o maximalismo: dos formas de vivir el color en casa",
+      "corrected": false,
+      "verified": true
+    },
+    {
+      "id": "3c839c2fefe781a39179cb780234ca1c",
+      "month": "Noviembre",
+      "title": "Artículo N46 - Cómo elegir colores para una recámara que se sienta tuya",
+      "corrected": false,
+      "verified": true
+    },
+    {
+      "id": "3c839c2fefe781f9ba93c5e469c96e65",
+      "month": "Noviembre",
+      "title": "Artículo N47 - Tres colores para celebrar San Valentín a tu manera",
+      "corrected": false,
+      "verified": true
+    },
+    {
+      "id": "3d039c2fefe781539f65fc589de7adaf",
+      "month": "Noviembre",
+      "title": "Artículo N48 - Cuánto rinde una cubeta — tabla de rendimiento por línea Berel",
+      "corrected": false,
+      "verified": true
+    },
+    {
+      "id": "3d039c2fefe781d396d0eb7a6d42b5b4",
+      "month": "Noviembre",
+      "title": "Artículo N49 - ¿Se puede pintar sobre esmalte? Qué revisar antes de repintar",
+      "corrected": true,
+      "verified": true
+    },
+    {
+      "id": "3d039c2fefe781199aa6d76331f07388",
+      "month": "Noviembre",
+      "title": "Artículo N50 - Por qué se desprende la pintura y cómo preparar el repintado",
+      "corrected": false,
+      "verified": true
+    },
+    {
+      "id": "3d039c2fefe781bdb0e5f1e551ae7a68",
+      "month": "Noviembre",
+      "title": "Artículo N51 - Colores para Navidad que también se quedan en enero",
+      "corrected": false,
+      "verified": true
+    },
+    {
+      "id": "3c839c2fefe781ad8bf0d4aad28e782b",
+      "month": "Diciembre",
+      "title": "Artículo N52 - 79 años de Rayados: el origen de una identidad azul y blanca",
+      "corrected": true,
+      "verified": true
+    },
+    {
+      "id": "3c839c2fefe781adbe63ec0cb760ad47",
+      "month": "Diciembre",
+      "title": "Artículo N53 - ¿Qué significan los colores del 8M?",
+      "corrected": false,
+      "verified": true
+    },
+    {
+      "id": "3c839c2fefe7810e9438dea5ad611ada",
+      "month": "Diciembre",
+      "title": "Artículo N54 - Cómo elegir colores para consentir a mamá sin adivinar sus gustos",
+      "corrected": false,
+      "verified": true
+    },
+    {
+      "id": "3d039c2fefe781bfba0bdfe87f493a5c",
+      "month": "Diciembre",
+      "title": "Artículo N55 - Cómo resanar una pared y prepararla para pintar",
+      "corrected": false,
+      "verified": true
+    },
+    {
+      "id": "3d039c2fefe781b2b91cf9d6f57ae2c9",
+      "month": "Diciembre",
+      "title": "Artículo N56 - Tipos de rodillos para pintar: cuál usar en cada superficie",
+      "corrected": false,
+      "verified": true
+    },
+    {
+      "id": "3d039c2fefe7812aa606d65b0980f79b",
+      "month": "Diciembre",
+      "title": "Artículo N57 - Cómo pintar un techo interior: preparación y aplicación",
+      "corrected": false,
+      "verified": true
+    },
+    {
+      "id": "3d039c2fefe781dba4e9edc6f2b888d8",
+      "month": "Diciembre",
+      "title": "Artículo N58 - Cómo quitar papel tapiz y preparar la pared para pintar",
+      "corrected": true,
+      "verified": true
+    },
+    {
+      "id": "3d039c2fefe781129694d3ccfc652d50",
+      "month": "Diciembre",
+      "title": "Artículo N59 - Cómo guardar pintura sobrante y revisar si puedes reutilizarla",
+      "corrected": false,
+      "verified": true
+    }
+  ],
+  "rayadosRecovery": [
+    {
+      "id": "3c839c2fefe781198e6bdb1abd48495d",
+      "fixed": true
+    },
+    {
+      "id": "3c839c2fefe781be8862c27ab864691e",
+      "fixed": true
+    },
+    {
+      "id": "3c839c2fefe781d09ea5dbbb8eb7fb0f",
+      "fixed": true
+    },
+    {
+      "id": "3c839c2fefe781ea884fea6228ef048a",
+      "fixed": true
+    }
+  ],
+  "historyCorrection": {
+    "id": "3d039c2fefe781bdb0e5f1e551ae7a68",
+    "old_str": "N51 continúa el último número observado N59, sin renumerar piezas existentes.",
+    "new_str": "Nota histórica: esta pieza se creó como N59 tras el entonces N58. La corrección autorizada del 2026-09-03 la identifica ahora como N51 de noviembre; no usar la asignación inicial como secuencia vigente.",
+    "verified": true
+  },
+  "rootSequence": {
+    "count": 17,
+    "numbers": [
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59
+    ],
+    "unique": true,
+    "titleMismatch": [],
+    "has_more": false
+  }
+}

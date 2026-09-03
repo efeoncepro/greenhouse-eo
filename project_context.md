@@ -119,7 +119,7 @@ antes de persistir provenance, separar idempotencia y medir shadow contra GSC. C
 entregado en `TASK-1805`/`TASK-1806`: desde 2026-09-03 producción sirve `improved_layout_clickstream_v2`
 (rebaseline); legacy sólo como rollback pre-corte.
 
-Berel: Notion live + skill `berel-content-production`. Contacto/cobertura:
+Berel: [plan](docs/operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md). Contacto:
 `docs/context/01_quienes-somos.md` y `docs/public-site/CONTACT_PAGE_REBUILD_BRIEF_V1.md`.
 
 WordPress/Ohio: skill `efeonce-public-site-wordpress`; contratos [Home](docs/architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md),

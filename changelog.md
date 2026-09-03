@@ -20,6 +20,33 @@ estimado bajan ≈ 60 % por cambio de fórmula del proveedor, no por pérdida re
 Efeonce se mide aparte de los clientes (guard de organización en celdas bulk). Writers `rowsWritten` ahora cuentan
 filas insertadas. Legacy sólo vuelve como rollback antes del corte 2026-11-01T00:00:00Z.
 
+## 2026-09-03 — Berel: cobertura por negocio, skills sincronizadas y minería trazable
+
+Decisión local del operador 2026-09-02: fortalecer elección, protección y aplicación, manteniendo color
+y paletas. [Estrategia](docs/operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md), inventario de 49 cuerpos,
+modelo/brief/manual/funcional y skills espejo Berel/SEO-AEO/DataForSEO actualizados; Playbook Notion
+ampliado y releído. [Discovery](docs/audits/seo/BEREL_CAPILLARY_KEYWORD_MINING_2026-09-02.md):
+14 runs Labs, 1.517 keywords distintas, 13 SERPs y 52 PAA; costo reportado US$1,23572.
+Mapa propuesto de 27 intenciones, no 27 artículos aprobados. No tracking, calendario, CMS ni release.
+Ampliación 2026-09-03: skill Berel y espejos incorporan completitud técnica por macropaso, correcciones
+acotadas y conciliación de producto; se retira la inferencia «campo CMS vacío = tiempo inexistente».
+Control técnico y caso Berelex Semibrillante en módulos 12/13; N29 corregido en Notion, artes y
+derivados pendientes, sin publicación. Evidencia: [QA de guardrails](docs/audits/seo/BEREL_TUTORIAL_GUARDRAILS_2026-09-03.md).
+Clasificación de piezas: 51 tareas corregidas y releídas; la skill exige tipo/canal/formato
+y excluye principales del conteo visual. [Auditoría y límites](docs/audits/seo/BEREL_PIECE_COUNT_CLASSIFICATION_2026-09-03.md).
+Tipo/canal obligatorios desde la creación de cada tarea visual, incluidos bloqueados; requisitos y
+checklists explícitos en banners, sociales y fotos. Se mantiene el esquema y la agrupación existentes.
+Distribución: cuatro opciones, no cuatro derivados obligatorios; módulo 15 y matrices por artículo.
+Playbooks Social/Producción en Notion alineados, Instagram Story corregido, contrato 8 artículos
+de 3.000–5.000 palabras/50 gráficas/3 videos y cortesía extendida a nov/dic registrados. Octubre
+excluido. Aclaración: 50 incluyen blog/RRSS; Blog/Facebook/Instagram/Pinterest. Priorización N52→Navidad
+aprobada: 4 banners N52 fuera del paquete, 4 banners y 2 sociales N59 creados. Distribución 50 gráficas
++ 3 videos por mes, con reservas técnicas/editoriales; 193 páginas modificadas releídas, sin pérdida de historial.
+
+Corrección de numeración verificada: [mapa por ID y readback 179/179](docs/audits/seo/BEREL_EDITORIAL_NUMBERING_2026-09-03.md).
+Skill Berel módulo 16: bloques mensuales completos, reserva de slots, cambios coordinados y aliases
+de archivos; no numerar por orden de trabajo. Se preserva el corte histórico descrito arriba.
+
 ## 2026-09-03 — TASK-1805 en producción: foundation ETV versionada desplegada, selección legacy explícita
 
 Release `5ec4cf769977` (run `33698245254`): readers/lane/MCP sirven `etvMethodology`, señal `seo.etv_methodology.drift`,
@@ -1113,35 +1140,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
   fila del target para cualquier consulta, y el parser del guard nuevo devolvía lista vacía.
 - Estado: **`code complete, rollout pendiente`** — falta verificación funcional en staging.
   Desbloquea `TASK-1700`, que queda `Blocked by: none`.
-
-## 2026-08-28 — TASK-1694: en descubrimiento SEO, un candidato es una keyword y la dificultad cruda deja de decidir
-
-- **`maxDifficulty` se acepta pero ya no filtra**, y la respuesta lo declara en `ignoredFilters`
-  con su reemplazo. El filtro canónico es `maxLinkBarrier` (`low|medium|high`) sobre la barrera
-  derivada por `deriveLinkBarrier`, con `includeUnknownBarrier` (default `false`): "Sin dato" no
-  es "Baja". Medido contra el store real: **764 de 923 filas tienen `keyword_difficulty = 0`**, así
-  que en es-LATAM el filtro viejo no discriminaba nada — sobre la corrida productiva,
-  `maxDifficulty=20` devolvía las 10 keywords, barrera Alta incluida.
-- **El reader colapsa por `normalizedKeyword`**: la misma keyword hallada por dos métodos es UNA
-  fila con `candidateIds[]` + `provenance[]`, y `totalCandidates` cuenta keywords distintas. Es
-  cambio de cardinalidad del contrato, no de la UI: aguas abajo la cola priorizada (TASK-1700) es
-  un aggregate append-only y habría congelado la misma decisión hasta cuatro veces, con cuatro
-  compromisos de gasto sobre una sola intención. Levanta su bloqueo duro.
-- **`clusterConflict`** advierte canibalización contra el set seguido del target (hasta 5 miembros
-  nombrados + total), derivado al leer y con **cero llamadas al proveedor**. Señal separada de
-  `alreadyTracked`, con `unknown` que nunca se lee como `clear`.
-- **Los cuatro adapters de expansión compran igual**: `keyword_suggestions` y `keyword_ideas` dejan
-  de mandar `filters` de `search_volume`. El filtro no abarataba la llamada (se paga por fila y el
-  `limit` ya la acota) — sólo cambiaba qué se compraba por el mismo precio, y en mercados ralos se
-  comía el long-tail. Cada corrida persiste su `volumePolicy`; las anteriores se leen con el
-  default histórico.
-- 🔴 **Un defecto propio lo destapó la verificación runtime, no los tests**: `core_keyword IS NULL`
-  se estaba leyendo como "no se sabe" y dejaba 8 de 10 candidatos en `unknown`, escondiendo
-  colisiones reales. El proveedor no emite el core cuando la keyword YA ES la canónica del clúster
-  (527 nulos, 396 apuntando a otra, **cero autorreferentes** en 923 filas), así que el core efectivo
-  es `core_keyword ?? la keyword misma`.
-- Federado en el mismo PR: route admin, lane ecosystem y tool MCP `get_seo_keyword_discovery`. El
-  gateway `efeonce-mcp` tiene su commit local (espejo de inventario, schema, descripción y canary,
-  67 tests verdes) **sin push**: viaja con su próximo release.
-- Estado: **`code complete, rollout pendiente`** — falta la corrida de smoke con gasto (~USD 0,013)
-  y el deploy del gateway.

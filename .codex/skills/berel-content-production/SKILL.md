@@ -43,19 +43,23 @@ específica, **no degradar la skill**: mantener la regla más reciente/específi
 2. **Determinar modalidad por contenido vivo, no por el campo ni por HTTP 200.**
    - A · Reescritura: la URL tiene `title`, H1 y cuerpo editorial real.
    - B · Artículo nuevo: no hay URL viva o la canónica planificada devuelve el shell soft-404.
-3. Cargar solo los módulos de la fase solicitada.
+3. Cargar solo los módulos de la fase solicitada. Para tutoriales, leer también el módulo 12 y
+   completar `templates/control-tecnico-tutorial.md`: la estructura no sustituye la validación del sistema.
 4. Aplicar las reglas duras.
 5. Cerrar con artefacto/tarea/estado verificado en una lectura fresca de Notion.
 
 ## Router
 
 ```text
+Planeación temática, prioridades y minería de huecos ............... modules/14_PLANEACION_TEMATICA_Y_COBERTURA.md
 Mes completo, modalidades, tareas y estados ........................ modules/01_CICLO_MENSUAL.md
+Numeración mensual, identidad y corrección de referencias .......... modules/16_NUMERACION_EDITORIAL.md
 Auditoría de URL viva y análisis SEO/AEO ........................... modules/02_ANALISIS_AUDITORIA.md
 Redacción de reescritura o artículo nuevo .......................... modules/03_REDACCION_ARTICULO.md
 Voz y tono Berel es-MX ............................................. modules/04_VOZ_Y_TONO_BEREL.md
 Banners, imágenes y ficha visual ................................... modules/05_BANNERS_IMAGENES.md
 Derivados sociales ................................................. modules/06_DERIVADOS_SOCIALES.md
+Selección de canales, capacidad y exclusiones reversibles .......... modules/15_DISTRIBUCION_SELECTIVA.md
 Sistema Notion, propiedades y relaciones ........................... modules/07_SISTEMA_NOTION.md
 CMS Drupal ........................................................ modules/08_PUBLICACION_CMS_DRUPAL.md
 Correcciones y pedidos fechados del cliente ........................ modules/09_RECOMENDACIONES_DEL_CLIENTE.md
@@ -115,7 +119,7 @@ Plantillas ......................................................... templates/
 26. 🔴 **Instagram = Story, no post estático.** Decisión posterior del cliente: secuencia 9:16; la
     mención vieja a “Instagram Post estático” del Playbook no gobierna.
 27. 🔴 **Paridad social:** tarea + subítem deben terminar con la misma cadena de contenido/enlaces;
-    verificar los cuatro pares por artículo en lectura fresca.
+    verificar todos los pares seleccionados y los históricos modificados en lectura fresca.
 28. 🔴 **Pieza histórica = `Archivo YYYY`** y sin programación hasta validar vigencia/derechos.
 29. 🔴 **Sensibilidad y consolidación cambian el CTA** y pueden bloquear derivados hasta confirmar
     canónica.
@@ -130,6 +134,34 @@ Plantillas ......................................................... templates/
 34. 🔴 **Banners heredados viajan completos al híbrido.** No poner un simple puntero al V1.
 35. 🔴 **Canónica planificada soft-404 puede vivir como metadata**, pero no activa enlaces entrantes
     ni derivados hasta QA live de `title`, H1, cuerpo, canonical y schema.
+36. 🔴 **Cuatro macropasos no permiten omitir operaciones.** Preparación, compatibilidad, mezcla,
+    dilución, aplicación y esperas se verifican por producto/acabado; declarar no aplica con fuente.
+37. 🔴 **Campo vacío del CMS ≠ dato inexistente.** Contrastar Wiki, página y PDF oficial antes de
+    bloquear un dato; tacto, repintado, curado, primer lavado y reocupación son condiciones distintas.
+38. 🔴 **Cambio de producto = revisión de dependencias**, no reemplazo de nombre. Aplicar el
+    protocolo del módulo 13 a texto, tablas, FAQ, ALT, PNG, banners, tareas y pares sociales.
+39. 🔴 **Auditar no autoriza reescribir.** Una corrección de una pieza previa se limita al alcance
+    aprobado; conservar historia, metadatos, colores, alias y assets no afectados.
+
+40. 🔴 **Etiquetas obligatorias desde la creación de cada tarea visual:** guardar `Tipo de pieza`
+    y `Canal de pieza` como propiedades de Tareas según el módulo 07, también en reservas bloqueadas.
+    No basta escribirlas en el brief ni completar `Tipo de entregable` o `Formato`.
+    Principales editoriales sin tipo/canal; conservar tareas agrupadas y fórmulas existentes.
+    Verificar ambas etiquetas en todas las tareas visuales del lote antes de cerrar.
+
+41. 🔴 **Contrato vigente:** ocho artículos mensuales de 3.000–5.000 palabras, cincuenta gráficas
+    y cuatro superficies activas; tres videos mensuales con cortesía mayo–octubre extendida por
+    el operador a noviembre/diciembre 2026. Las cincuenta incluyen blog y RRSS; superficies:
+    Blog, Facebook, Instagram y Pinterest. No inferir cumplimiento desde filas de tareas. Detalle y restricciones en módulo 15.
+42. 🔴 **Cuatro opciones, no cuatro derivados obligatorios.** Aplicar el módulo 15 antes de crear
+    tareas: Producir / No aplica / Pendiente por artículo/canal, con fuente y motivo. Las reservas
+    descartadas sin producción se cancelan de forma reversible y dejan de llevar tipo/canal;
+    nunca retirar etiquetas a piezas trabajadas/entregadas sin conciliación autorizada.
+
+43. 🔴 **Numerar por bloque mensual completo, no por orden de trabajo.** Reservar slots antes del
+    siguiente mes; heredar N## por ID de artículo. Corregir solo con mapa autorizado y readback de
+    dependencias; conservar archivos históricos con equivalencia. Banner N1–N4 no es N## editorial.
+    Protocolo y mapa noviembre/diciembre: módulo 16.
 
 ## Lo que no se toca
 

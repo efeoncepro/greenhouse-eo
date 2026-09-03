@@ -151,12 +151,16 @@ Buscar primero si ya existe. No duplicar.
 
 Naming: `Artículo N## - [Título]`.
 
-`N##` es continuo entre meses.
+`N##` es continuo por bloques mensuales completos, no por orden de redacción o creación.
+Antes de asignarlo, aplicar [numeración editorial e identidad](16_NUMERACION_EDITORIAL.md):
+reservar también slots nuevos/por definir y revisar adicionales antes de numerar el siguiente mes.
 
 Propiedades mínimas:
 
 - Responsable del ciclo
 - `Tipo de entregable = Contenido`
+- `Formato` mapeado desde Content Hub: `Artículo → Articulo`, `Tutorial → Tutorial`
+- `Tipo de pieza` y `Canal de pieza` vacíos en la principal para no inflar el conteo visual
 - primera semana como fecha objetivo
 - relación al proyecto
 - relación `Artículo (Content Hub)`
@@ -169,9 +173,9 @@ Propiedades mínimas:
 Por artículo escrito:
 
 - 4 banners
-- 4 derivados sociales
+- de 0 a 4 derivados sociales según la matriz del [módulo 15](15_DISTRIBUCION_SELECTIVA.md)
 
-Canales sociales vigentes:
+Opciones vigentes, sin obligación de producirlas todas:
 
 1. Facebook
 2. **Instagram Story** — no post estático
@@ -196,7 +200,7 @@ Además del set anterior, cuando el híbrido ya esté escrito:
 
 ### Relaciones
 
-Toda subtarea debe llevar:
+Toda subtarea visual debe llevar desde su creación:
 
 - Proyecto
 - Tarea principal
@@ -204,22 +208,23 @@ Toda subtarea debe llevar:
 - Responsable real tomado del ciclo anterior o instrucción explícita
 - Estado real
 
+- `Tipo de pieza` = `Estatico` o `Video`, según el entregable
+- `Canal de pieza` = `Blog` o `Social Media`, según el destino
+
+Antes de cerrar subtareas, aplicar la matriz de clasificación y el readback de
+[`07_SISTEMA_NOTION.md`](07_SISTEMA_NOTION.md): tipo, canal y formato son propiedades separadas.
+Las cantidades siguientes describen tareas/paquetes; no acreditan cantidad de archivos entregados.
+
 ## 10 · Aritmética de aceptación
 
-Para `A` piezas formato Artículo escritas:
+Definir `P` principales editoriales (artículos + tutoriales), `B` tareas de banners,
+`T` tareas de secuencia fotográfica y `S` derivados sociales seleccionados/reservados.
 
-- `A` tareas principales
-- `4A` banners
-- `4A` sociales
-- `4A` subítems sociales
-- **`9A` tareas** en proyecto
-
-Para `T` piezas formato Tutorial, sumar además:
-
-- `T` tareas de secuencia Paso a Paso
-
-Total de tareas del proyecto = **`9A + 10T`** si todas las piezas del lote están escritas y cada
-Tutorial mantiene los 4 banners + 4 sociales + 1 secuencia de fotos.
+- Tareas activas/reservadas esperadas: **`P + B + T + S`**.
+- Si todas las piezas tienen sus cuatro banners: `B = 4P`; total **`5P + T + S`**.
+- Subítems sociales activos/reservados: **`S`**, con pares verificados `S/S`.
+- Cancelados/archivados históricos se conservan y reportan aparte; las filas físicas pueden ser más.
+- Son tareas/paquetes, no archivos entregados ni una modificación de fórmulas Notion.
 
 ## 11 · Fase 9 — Íconos
 
@@ -266,10 +271,11 @@ Siempre tres grupos:
 - [ ] Tareas principales relacionadas al Content Hub
 - [ ] 4 banners solo después de texto escrito
 - [ ] Instagram = Story
-- [ ] 4 derivados sociales con paridad tarea ↔ subítem
+- [ ] Derivados seleccionados con paridad tarea ↔ subítem; exclusiones y reservas documentadas
 - [ ] Tutoriales llevan híbrido antes de fotos
 - [ ] Tutoriales llevan 1 tarea adicional de secuencia Paso a Paso
 - [ ] ALT/archivo/posición conservan una sola fuente de verdad
+- [ ] Cada tarea visual, incluidas las bloqueadas, tiene tipo y canal verificados según módulo 07
 - [ ] Segunda lectura fresca confirma propiedades guardadas
-- [ ] Conteo `9A + 10T` cuadra para el lote terminado
+- [ ] Conteo `P + B + T + S` conciliado; históricos separados y cupos/archivos/entregas diferenciados
 - [ ] Reporte final separa listos · bloqueados · fuera de alcance

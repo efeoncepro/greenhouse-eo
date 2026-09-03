@@ -1,7 +1,9 @@
 # 12 · Datos verificados del catálogo (y del costo de pintar)
 
 > **Fuente de verdad:** verificación en vivo del catálogo público de Berel y del payload de su CMS,
-> más un reporte de costos de mano de obra en México. Todo extraído el **2026-08-25**.
+> más un reporte de costos de mano de obra en México. Baseline extraído el **2026-08-25**.
+> **Corrección acotada 2026-09-03:** §3 y §3.1, con Wiki y ficha técnica de Berelex Semibrillante.
+> El resto del baseline no se declara revalidado por esta actualización.
 
 ## Por qué existe este módulo
 
@@ -13,8 +15,9 @@ costo de pintar una sala.
 estimado es un claim inventado, y el cliente ya marcó esa regla: ningún claim sin ficha técnica
 → [`09_RECOMENDACIONES_DEL_CLIENTE.md`](09_RECOMENDACIONES_DEL_CLIENTE.md).
 
-Antes de escribir un dato técnico, **búscalo acá primero**. Si no está acá y no puedes abrir la
-ficha, el dato **no se publica**.
+Este módulo orienta la búsqueda, no reemplaza una ficha vigente. Antes de reutilizar un dato,
+confirmar producto, acabado, soporte, condiciones, fuente y fecha en la Wiki y documentación oficial.
+Si no se puede verificar, declarar el pendiente concreto; no inventar ni trasladar datos entre variantes.
 
 ## 1 · Rendimiento y lavabilidad de las vinílicas de muro
 
@@ -57,25 +60,56 @@ Fíjate en el salto: el **Mate** rinde `10 - 12 m2/L` y viene en **2 colores**; 
 
 **Antes de citar un dato de Summa, decide de qué acabado hablas** y toma la fila correcta.
 
-## 3 · 🔴 El secado entre manos NO EXISTE en ninguna ficha
+## 3 · Secados: ausencia en el CMS no demuestra ausencia en la ficha
 
-Verificado en el payload del CMS: el campo `secado_manos` viene **vacío** (`""`) en **Berelinte,
-Berelinte-0, Kalos Tone, Esmalte Summa y Esmalte Summa-0**. Igual de vacíos vienen `secado_duro`,
-`tiempo_curado` y `para_recubrir`.
+El 2026-08-25 se observaron campos vacíos de repintado/curado en el payload de algunas variantes.
+Esa observación no cubría todos los productos ni sus PDF. La prohibición general que se derivó de
+ella queda corregida: **sí se puede citar un tiempo explícito de la ficha exacta, con sus condiciones**.
 
-🔴 **Ninguna pieza puede publicar un tiempo entre manos como dato de Berel.** No existe fuente.
+Antes de declarar un bloqueo:
+1. Identificar producto y acabado, soporte y uso.
+2. Abrir la Wiki, la página pública y el PDF oficial enlazado; registrar revisión/fecha y sección.
+3. Separar tacto, intervalo entre manos, curado, manipulación, primer lavado y reocupación.
+4. Registrar cada dato como confirmado, contradictorio, no encontrado o fuente inaccesible.
+   Un dato confirmado no completa los demás por inferencia.
+5. Si sigue faltando, pedir confirmación de ese dato y bloquear sólo la instrucción/pieza dependiente.
+   No trasladar el tiempo de otra pintura ni convertir el pendiente en permanente.
 
-Lo único citable es el **secado libre al tacto** (`30 minutos Max` en Summa), y al citarlo hay que
-decir explícitamente que **libre al tacto no significa listo para la segunda mano**. Son cosas
-distintas y el lector las confunde solo.
+Una contradicción bloquea **ese claim**, no todos los datos coincidentes del producto. No escoger
+silenciosamente una cifra ni transformar “calidad de X años” en garantía. La petición del cliente
+elige el producto, pero no crea prestaciones técnicas.
 
-Este hueco **bloqueó dos artículos de septiembre 2026** (herrería y sala). No es un olvido de quien
-escribió: es un **pendiente permanente para asesoría técnica del cliente**. Si vuelve a aparecer,
-se declara como pendiente, no se rellena.
+En diseño, el dato no resuelto conserva el literal
+`PENDIENTE DE CONFIRMACIÓN — NO INCLUIR EN ARTE`; ver
+[`11_FICHA_DE_PRODUCCION_INFOGRAFIA.md`](11_FICHA_DE_PRODUCCION_INFOGRAFIA.md).
 
-Cuando el dato haga falta en una ficha de diseño, se escribe el literal de la ficha de infografía:
-`PENDIENTE DE CONFIRMACIÓN — NO INCLUIR EN ARTE`
-→ [`11_FICHA_DE_PRODUCCION_INFOGRAFIA.md`](11_FICHA_DE_PRODUCCION_INFOGRAFIA.md).
+### 3.1 · Caso verificado: Berelex Semibrillante para N29 (2026-09-03)
+
+Fuentes: [Wiki de producto](https://www.notion.so/36c39c2fefe780d79d85c8eceefdd098),
+[ficha pública](https://berel.com/productos/arquitectonico/vinilacrilicas/berelex-semibrillante-2)
+y [PDF oficial R0-07/23](https://fs4inq5psfy6zdpxht.berel.com/sites/default/files/2024-07/FT_Berelex%20Semibrillante.pdf).
+El PDF es evidencia interna; el enlace público del artículo lleva a la ficha de berel.com.
+
+| Dato | Evidencia y límite de uso |
+|---|---|
+| Producto/acabado | Resina acrílica, semibrillante. No Berelex Green ni Berelinte Mate/Satinado. |
+| Rendimiento | 8–10 m²/L **a dos manos**; puede bajar según color, rugosidad, porosidad y aplicación. |
+| Dilución de pintura | Habitualmente 10–20% de agua limpia, según superficie/método; mezclar antes y después. No usar esta proporción para el sellador. |
+| Tacto / entre manos | Máximo 1 hora al tacto; **mínimo 2 horas** antes de la segunda mano. Wiki y PDF. |
+| Lavabilidad | Más de 100,000 ciclos en página y PDF; la Wiki expresa clasificación normativa, no esa cifra. No convertir ciclos en lavados domésticos garantizados ni copiarlos a redes. |
+| Preparación | Superficie limpia, seca y sin grasa/polvo; retirar pintura desprendida; lijar acabados brillantes según ficha. Corregir humedad antes. |
+| Aplicación | Ventilar durante aplicación/secado; no aplicar por debajo de 10 °C ni mezclar con otras pinturas. |
+| Igualación | Bases Pastel y Tint. Confirmar fórmula de cada tono propuesto; pertenecer al catálogo no confirma disponibilidad en esta variante. |
+| No establecidos | Las fuentes consultadas no fijan primer lavado ni momento de volver a cocinar. No deducirlos del tacto, olor o intervalo entre manos. |
+| Discrepancia | Página: calidad de 20 años; PDF: 15. En N29 no se añadió promesa de años. Confirmar documentación coincidente antes de usar ese claim. |
+
+No extender el sistema de muros a azulejos, laminados o muebles sin identificar soporte, acabado previo
+y sistema específico. La resistencia al crecimiento de hongos no elimina humedad ni hongos existentes;
+no atribuir purificación del aire de otra línea.
+
+Cálculo de N29: 30 − 1,6 − 1,5 − 4 = 22,9 m²; a 8 m²/L, unos 2,9 L teóricos a dos manos.
+No duplicar litros por las dos manos ya incluidas ni garantizar que 4 L siempre alcancen.
+Este caso no prescribe Berelex para todos los tutoriales: volver a verificar la ficha elegida.
 
 ## 4 · Descripciones de ficha citables (verbatim)
 
@@ -151,8 +185,9 @@ cuadro de la §1.
 🔴 **Por mano, el rendimiento real declarado es bastante mayor.** Decir *"1 L rinde 6 m² a una mano"*
 **subestima el producto a la mitad** y es un error contra la propia ficha.
 
-Calcular con el piso es deliberado: **deja sobrante para retoques**. Al explicarlo en un artículo,
-di que es una regla de bolsillo conservadora, no el rendimiento del producto.
+Calcular con el piso es una estimación conservadora, **no garantiza sobrante para retoques**:
+porosidad, textura, color y aplicación pueden reducir el rendimiento. Al explicarlo, distinguir una
+regla orientativa del dato de la variante y no multiplicar otra vez por manos ya incluidas.
 
 ## Cross-links
 

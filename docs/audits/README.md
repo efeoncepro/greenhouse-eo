@@ -12,6 +12,8 @@ Indice de auditorias tecnicas y operativas versionadas dentro de `docs/`.
 
 ## Categorias
 
+- [Berel — numeración editorial noviembre/diciembre — 2026-09-03](seo/BEREL_EDITORIAL_NUMBERING_2026-09-03.md) — mapa por ID, alias de archivos y readback de dependencias; consultar antes de interpretar números de auditorías anteriores.
+
 - [ANAM Customer Agent QA — 2026-07-16](ANAM_CUSTOMER_AGENT_QA_REPORT_2026-07-16.md)
 - [ANAM RevOps diagnosis and change-set QA — 2026-07-16](ANAM_REVOPS_CHANGE_SET_QA_2026-07-16.md)
 - [ANAM execution countries property QA — 2026-07-17](ANAM_EXECUTION_COUNTRIES_PROPERTY_QA_2026-07-17.md)

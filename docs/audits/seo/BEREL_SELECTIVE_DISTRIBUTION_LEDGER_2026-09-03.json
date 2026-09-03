@@ -1,0 +1,5557 @@
+{
+  "asOf": "2026-09-03",
+  "status": "applied_and_verified",
+  "scope": [
+    "November 2026",
+    "December 2026"
+  ],
+  "excluded": "October 2026: no writes, deletions, cancellations or retagging in this change",
+  "contract": {
+    "articles": 8,
+    "articleWords": [
+      3000,
+      5000
+    ],
+    "graphics": 50,
+    "shortVideos": 3,
+    "initialCourtesy": "May-October 2026",
+    "courtesyExtension": "November-December 2026 authorized",
+    "surfaces": [
+      "Blog",
+      "Facebook",
+      "Instagram",
+      "Pinterest"
+    ],
+    "pending": [],
+    "graphicsIncludes": "all blog and social graphics, including banners, tutorial photos and individual static Story screens"
+  },
+  "authorization": {
+    "question": "Dejar fuera del paquete activo cuatro banners N52 bloqueados; incorporar cuatro banners N59 y Facebook/Pinterest de Navidad dentro de 50.",
+    "answer": "Oka",
+    "octoberReadOnly": true,
+    "preserveInProgress": [
+      45,
+      46
+    ]
+  },
+  "selection": [
+    {
+      "n": 43,
+      "decisions": [
+        "No aplica",
+        "No aplica",
+        "No aplica",
+        "No aplica"
+      ],
+      "source": "¿Qué necesitas antes de comenzar? / aplicación siguiendo la veta",
+      "angle": "Restaurar madera conservando su veta",
+      "resource": "Preparación y muestra de tono; N2 y demostración controlada",
+      "reason": "No seleccionado en este ciclo por capacidad: se conservan gráficos en curso N45/N46 y se prioriza Navidad. No implica que el tema sea inadecuado para esas redes.",
+      "month": "Noviembre",
+      "videoReason": "No seleccionado entre los tres videos del mes; no amplía el alcance a TikTok o YouTube."
+    },
+    {
+      "n": 44,
+      "decisions": [
+        "No aplica",
+        "No aplica",
+        "No aplica",
+        "No aplica"
+      ],
+      "source": "¿Cómo equilibrar tres colores en una misma casa?",
+      "angle": "Elegir base, acento y detalle sin saturar",
+      "resource": "N2 amarillo/azul/verde y referencias de espacio",
+      "reason": "No seleccionado en este ciclo por capacidad: se conservan gráficos en curso N45/N46 y se prioriza Navidad. No implica que el tema sea inadecuado para esas redes.",
+      "month": "Noviembre",
+      "videoReason": "No seleccionado entre los tres videos del mes; no amplía el alcance a TikTok o YouTube."
+    },
+    {
+      "n": 45,
+      "decisions": [
+        "Producir",
+        "Producir",
+        "Producir",
+        "Producir"
+      ],
+      "source": "¿Cómo saber cuál funciona para ti? / ¿Puedes combinar ambos estilos?",
+      "angle": "Comparar dos estilos con una decisión propia",
+      "resource": "N2 comparativo; contraste visual y secuencia ya en curso",
+      "reason": "Prioridad de continuidad: conservar las cuatro piezas ya En curso; cada formato tiene función distinta y no se reinicia el trabajo.",
+      "month": "Noviembre",
+      "videoReason": "Uno de los tres videos de cortesía extendida del mes. Mantener guion de cinco escenas, 20–30 s, y gates editoriales/técnicos; no equivale a entrega."
+    },
+    {
+      "n": 46,
+      "decisions": [
+        "Producir",
+        "Producir",
+        "Producir",
+        "Producir"
+      ],
+      "source": "¿Cómo hacer una prueba útil?",
+      "angle": "Elegir color según luz, muebles y textiles",
+      "resource": "N2 por luz; prueba de muestras en distintas condiciones",
+      "reason": "Prioridad de continuidad: conservar las cuatro piezas ya En curso; cada formato tiene función distinta y no se reinicia el trabajo.",
+      "month": "Noviembre",
+      "videoReason": "Uno de los tres videos de cortesía extendida del mes. Mantener guion de cinco escenas, 20–30 s, y gates editoriales/técnicos; no equivale a entrega."
+    },
+    {
+      "n": 47,
+      "decisions": [
+        "No aplica",
+        "No aplica",
+        "No aplica",
+        "No aplica"
+      ],
+      "source": "¿Cómo renovar sin pintar toda la habitación?",
+      "angle": "Tres rutas de color para un proyecto compartido",
+      "resource": "N2 paletas; ventana de San Valentín por confirmar",
+      "reason": "No seleccionado en este ciclo por capacidad: se conservan gráficos en curso N45/N46 y se prioriza Navidad. No implica que el tema sea inadecuado para esas redes.",
+      "month": "Noviembre",
+      "videoReason": "No seleccionado entre los tres videos del mes; no amplía el alcance a TikTok o YouTube."
+    },
+    {
+      "n": 48,
+      "decisions": [
+        "No aplica",
+        "No aplica",
+        "No aplica",
+        "No aplica"
+      ],
+      "source": "¿Por qué un patrón puede convertirse en identidad?",
+      "angle": "Archivo 2024: azul, blanco e identidad Rayados",
+      "resource": "N2 cronología; derechos y vigencia de colaboración pendientes",
+      "reason": "Archivo Rayados 2024: no activar derivados sin un encargo vigente; el cupo se asigna a contenidos prácticos actuales.",
+      "month": "Diciembre",
+      "videoReason": "No seleccionado entre los tres videos del mes; no amplía el alcance a TikTok o YouTube."
+    },
+    {
+      "n": 49,
+      "decisions": [
+        "No aplica",
+        "No aplica",
+        "No aplica",
+        "No aplica"
+      ],
+      "source": "¿Por qué importa atribuir los significados?",
+      "angle": "Contexto de los colores del 8M, sin apropiación comercial",
+      "resource": "N2 documental; revisión humana de sensibilidad",
+      "reason": "Tema 8M: requiere intención y revisión humana específicas; no se incorpora al paquete social actual.",
+      "month": "Diciembre",
+      "videoReason": "No seleccionado entre los tres videos del mes; no amplía el alcance a TikTok o YouTube."
+    },
+    {
+      "n": 50,
+      "decisions": [
+        "Pendiente",
+        "Pendiente",
+        "No aplica",
+        "Pendiente"
+      ],
+      "source": "¿Qué proyecto conviene según el tiempo disponible?",
+      "angle": "Acordar el proyecto con mamá, no adivinar sus gustos",
+      "resource": "N2 por alcance; consolidación y ventana mayo pendientes",
+      "reason": "Reserva de capacidad: Facebook/Story/Pin dependen de consolidación editorial y ventana estacional confirmada. No publicar ni producir hasta resolver el gate.",
+      "month": "Diciembre",
+      "videoReason": "No seleccionado entre los tres videos del mes; no amplía el alcance a TikTok o YouTube."
+    },
+    {
+      "n": 51,
+      "decisions": [
+        "No aplica",
+        "No aplica",
+        "No aplica",
+        "No aplica"
+      ],
+      "source": "Hoja de cálculo manual para guardar o imprimir",
+      "angle": "Calcular área y envases sin duplicar las dos manos",
+      "resource": "N2 tabla y hoja de cálculo del V1; conservar revisión técnica",
+      "reason": "No seleccionado en este ciclo por capacidad: se conservan gráficos en curso N45/N46 y se prioriza Navidad. No implica que el tema sea inadecuado para esas redes.",
+      "month": "Noviembre",
+      "videoReason": "No seleccionado entre los tres videos del mes; no amplía el alcance a TikTok o YouTube."
+    },
+    {
+      "n": 52,
+      "decisions": [
+        "No aplica",
+        "No aplica",
+        "No aplica",
+        "No aplica"
+      ],
+      "source": "Contraste de fuentes y validación requerida — esmalte",
+      "angle": "Reconocer cuándo detenerse y consultar el sistema completo",
+      "resource": "N2 árbol y eventual demostración; sistema técnico sin validar",
+      "reason": "Sistema de esmalte aún bloqueado; sin producción social activa. Cuatro banners excluidos del paquete por aprobación específica, conservando artículo e historial.",
+      "month": "Noviembre",
+      "videoReason": "No seleccionado entre los tres videos del mes; no amplía el alcance a TikTok o YouTube."
+    },
+    {
+      "n": 53,
+      "decisions": [
+        "No aplica",
+        "No aplica",
+        "Producir",
+        "No aplica"
+      ],
+      "source": "FAQ: ¿Cuándo debes detener el trabajo decorativo? / Paso a Paso",
+      "angle": "Distinguir desprendimiento y preparar el repintado con criterio",
+      "resource": "N2 diagnóstico y secuencia del tutorial; no omitir causas ni esperas",
+      "reason": "Prioridad de demostración del tutorial: se reserva el tercer video; las otras redes no entran en el cupo actual.",
+      "month": "Noviembre",
+      "videoReason": "Uno de los tres videos de cortesía extendida del mes. Mantener guion de cinco escenas, 20–30 s, y gates editoriales/técnicos; no equivale a entrega."
+    },
+    {
+      "n": 54,
+      "decisions": [
+        "No aplica",
+        "No aplica",
+        "No aplica",
+        "No aplica"
+      ],
+      "source": "Contraste de fuentes y validación requerida — resane / Paso a Paso",
+      "angle": "Llevar una reparación hasta una base apta para repintar",
+      "resource": "N2 y checklist de proyecto; resanador/sistema por validar",
+      "reason": "Tutorial de resane bloqueado por validación del sistema; el cupo social se asigna a piezas con insumos disponibles. No se descarta el artículo.",
+      "month": "Diciembre",
+      "videoReason": "No seleccionado entre los tres videos del mes; no amplía el alcance a TikTok o YouTube."
+    },
+    {
+      "n": 55,
+      "decisions": [
+        "Producir",
+        "No aplica",
+        "Producir",
+        "Producir"
+      ],
+      "source": "¿Qué prueba ayuda a revisar la carga y el acabado?",
+      "angle": "Elegir rodillo por soporte y comprobar acabado",
+      "resource": "N2 matriz; prueba visual controlada de rodillo compatible",
+      "reason": "Facebook orienta la decisión, Pinterest conserva una referencia visual y video demuestra una secuencia. La Story vigente fuerza una elección cromática que no aporta al objetivo de este contenido.",
+      "month": "Diciembre",
+      "videoReason": "Uno de los tres videos de cortesía extendida del mes. Mantener guion de cinco escenas, 20–30 s, y gates editoriales/técnicos; no equivale a entrega."
+    },
+    {
+      "n": 56,
+      "decisions": [
+        "Producir",
+        "No aplica",
+        "Producir",
+        "Producir"
+      ],
+      "source": "¿Cómo organizar las zonas antes de comenzar? / Lista de revisión para compartir",
+      "angle": "Planear acceso y secuencia de un techo interior",
+      "resource": "N2 plano y checklist; secuencia fotográfica del tutorial",
+      "reason": "Facebook orienta la decisión, Pinterest conserva una referencia visual y video demuestra una secuencia. La Story vigente fuerza una elección cromática que no aporta al objetivo de este contenido.",
+      "month": "Diciembre",
+      "videoReason": "Uno de los tres videos de cortesía extendida del mes. Mantener guion de cinco escenas, 20–30 s, y gates editoriales/técnicos; no equivale a entrega."
+    },
+    {
+      "n": 57,
+      "decisions": [
+        "Producir",
+        "No aplica",
+        "Producir",
+        "Producir"
+      ],
+      "source": "¿Cómo preparar una prueba que realmente te ayude?",
+      "angle": "Identificar soporte antes de retirar papel tapiz",
+      "resource": "N2 matriz soporte/papel; prueba limitada y criterio de detenerse",
+      "reason": "Facebook orienta la decisión, Pinterest conserva una referencia visual y video demuestra una secuencia. La Story vigente fuerza una elección cromática que no aporta al objetivo de este contenido.",
+      "month": "Diciembre",
+      "videoReason": "Uno de los tres videos de cortesía extendida del mes. Mantener guion de cinco escenas, 20–30 s, y gates editoriales/técnicos; no equivale a entrega."
+    },
+    {
+      "n": 58,
+      "decisions": [
+        "Producir",
+        "No aplica",
+        "No aplica",
+        "Producir"
+      ],
+      "source": "Una etiqueta reutilizable para tus próximos proyectos",
+      "angle": "Guardar identidad del sobrante y revisar antes de reutilizar",
+      "resource": "N2 etiqueta y matriz; sin prometer duración universal",
+      "reason": "Facebook responde una duda práctica y Pinterest ofrece referencia guardable. La Story vigente fuerza una elección cromática ajena al problema; video no prioritario frente a demostraciones de N55/N56/N57.",
+      "month": "Diciembre",
+      "videoReason": "No seleccionado entre los tres videos del mes; no amplía el alcance a TikTok o YouTube."
+    },
+    {
+      "n": 59,
+      "decisions": [
+        "Producir",
+        "No aplica",
+        "No aplica",
+        "Producir"
+      ],
+      "source": "¿Qué puedes conservar cuando termine Navidad?",
+      "angle": "Separar pintura permanente de decoración temporal",
+      "resource": "N2 matriz base/acento y cuatro fichas de banners creadas; Facebook/Pinterest encargados y enlazados. Arte y aprobación pendientes.",
+      "reason": "Prioridad navideña aprobada: Facebook convierte la tabla en conversación y Pinterest en referencia guardable. Story/video no aportan prioridad adicional frente a las piezas ya seleccionadas.",
+      "month": "Noviembre",
+      "videoReason": "No seleccionado entre los tres videos del mes; no amplía el alcance a TikTok o YouTube."
+    }
+  ],
+  "expectedAllocation": {
+    "november": {
+      "graphics": 50,
+      "videos": 3,
+      "banners": 32,
+      "tutorialPhotos": 4,
+      "socialGraphics": 14,
+      "staticTaskRows": 41,
+      "videoTaskRows": 3,
+      "physicalTaskRows": 80,
+      "cancelledTasks": 27
+    },
+    "december": {
+      "graphics": 50,
+      "videos": 3,
+      "banners": 32,
+      "tutorialPhotos": 4,
+      "socialGraphics": 14,
+      "staticTaskRows": 44,
+      "videoTaskRows": 3,
+      "physicalTaskRows": 73,
+      "cancelledTasks": 18,
+      "blockedSocialGraphicsN50": 6,
+      "blockedBlogGraphicsN54": 4
+    }
+  },
+  "beforePairs": [
+    {
+      "n": 43,
+      "ch": 0,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3c839c2fefe781d39538d873c1c1c76b",
+      "hub": "https://app.notion.com/p/3c839c2fefe78165939dfc121d2022cb",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7807eb976f719ef54b2e1",
+          "https://app.notion.com/p/3c839c2fefe78165939dfc121d2022cb"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N43 - Derivado: Facebook — Mancha al aceite y veta de la madera",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe7811fa638e75a34cc2f41"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe781d39538d873c1c1c76b"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Facebook: Mancha al aceite y veta de la madera",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe7807eb976f719ef54b2e1"
+        ]
+      },
+      "taskBodyChars": 1943,
+      "hubBodyChars": 1480,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 43,
+      "ch": 1,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3c839c2fefe78101abccf1480fc477f9",
+      "hub": "https://app.notion.com/p/3c839c2fefe78191870cd77c6efc9f62",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7807eb976f719ef54b2e1",
+          "https://app.notion.com/p/3c839c2fefe78191870cd77c6efc9f62"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N43 - Derivado: Instagram Story — Mancha al aceite y veta de la madera",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe7811fa638e75a34cc2f41"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe78101abccf1480fc477f9"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Instagram Story: Mancha al aceite y veta de la madera",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe7807eb976f719ef54b2e1"
+        ]
+      },
+      "taskBodyChars": 2232,
+      "hubBodyChars": 1769,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 43,
+      "ch": 2,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3c839c2fefe78180bcb7c2dd53f9069f",
+      "hub": "https://app.notion.com/p/3c839c2fefe7811e9984e90229322b82",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7807eb976f719ef54b2e1",
+          "https://app.notion.com/p/3c839c2fefe7811e9984e90229322b82"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N43 - Derivado: Reel/TikTok/Short — Mancha al aceite y veta de la madera",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe7811fa638e75a34cc2f41"
+        ],
+        "Tipo de pieza": "Video",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe78180bcb7c2dd53f9069f"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Reel/TikTok/Short: Mancha al aceite y veta de la madera",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe7807eb976f719ef54b2e1"
+        ]
+      },
+      "taskBodyChars": 2820,
+      "hubBodyChars": 2357,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 43,
+      "ch": 3,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3c839c2fefe78141bf4aceaa02f2683f",
+      "hub": "https://app.notion.com/p/3c839c2fefe781769511d80f8542a672",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7807eb976f719ef54b2e1",
+          "https://app.notion.com/p/3c839c2fefe781769511d80f8542a672"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N43 - Derivado: Pinterest Pin — Mancha al aceite y veta de la madera",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe7811fa638e75a34cc2f41"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe78141bf4aceaa02f2683f"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Pinterest Pin: Mancha al aceite y veta de la madera",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe7807eb976f719ef54b2e1"
+        ]
+      },
+      "taskBodyChars": 1755,
+      "hubBodyChars": 1292,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 44,
+      "ch": 0,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3c839c2fefe781eb8ef6ceccff725454",
+      "hub": "https://app.notion.com/p/3c839c2fefe7815ebd96f097e8278f20",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe78079b5a4f1244919b756",
+          "https://app.notion.com/p/3c839c2fefe7815ebd96f097e8278f20"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N44 - Derivado: Facebook — Color y alegría sin saturar",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe78173af9bdf57041994e7"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe781eb8ef6ceccff725454"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Facebook: Color y alegría sin saturar",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe78079b5a4f1244919b756"
+        ]
+      },
+      "taskBodyChars": 1455,
+      "hubBodyChars": 1455,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 44,
+      "ch": 1,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3c839c2fefe78123bdb4fe16f3c45e20",
+      "hub": "https://app.notion.com/p/3c839c2fefe7815bb315f73e845fc682",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe78079b5a4f1244919b756",
+          "https://app.notion.com/p/3c839c2fefe7815bb315f73e845fc682"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N44 - Derivado: Instagram Story — Color y alegría sin saturar",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe78173af9bdf57041994e7"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe78123bdb4fe16f3c45e20"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Instagram Story: Color y alegría sin saturar",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe78079b5a4f1244919b756"
+        ]
+      },
+      "taskBodyChars": 1759,
+      "hubBodyChars": 1759,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 44,
+      "ch": 2,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3c839c2fefe781ce9d43c7906356a05e",
+      "hub": "https://app.notion.com/p/3c839c2fefe781b18c33fc202130f9e1",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe78079b5a4f1244919b756",
+          "https://app.notion.com/p/3c839c2fefe781b18c33fc202130f9e1"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N44 - Derivado: Reel/TikTok/Short — Color y alegría sin saturar",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe78173af9bdf57041994e7"
+        ],
+        "Tipo de pieza": "Video",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe781ce9d43c7906356a05e"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Reel/TikTok/Short: Color y alegría sin saturar",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe78079b5a4f1244919b756"
+        ]
+      },
+      "taskBodyChars": 2393,
+      "hubBodyChars": 2393,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 44,
+      "ch": 3,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3c839c2fefe7813a8049e57f3827a57a",
+      "hub": "https://app.notion.com/p/3c839c2fefe78155b7eccc44b1e127c4",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe78079b5a4f1244919b756",
+          "https://app.notion.com/p/3c839c2fefe78155b7eccc44b1e127c4"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N44 - Derivado: Pinterest Pin — Color y alegría sin saturar",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe78173af9bdf57041994e7"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe7813a8049e57f3827a57a"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Pinterest Pin: Color y alegría sin saturar",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe78079b5a4f1244919b756"
+        ]
+      },
+      "taskBodyChars": 1297,
+      "hubBodyChars": 1297,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 45,
+      "ch": 0,
+      "decision": "Producir",
+      "task": "https://app.notion.com/p/3c839c2fefe781c18090e605c943d96a",
+      "hub": "https://app.notion.com/p/3c839c2fefe781cfa3a0c49c16759831",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe78002a99fe5e2d9edbade",
+          "https://app.notion.com/p/3c839c2fefe781cfa3a0c49c16759831"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "En curso",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N45 - Derivado: Facebook — Minimalismo o maximalismo",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe7819981bfca4f0262f01d"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha de inicio:start": "2026-09-02T16:40:00.000Z",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe781c18090e605c943d96a"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Facebook: Minimalismo o maximalismo",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe78002a99fe5e2d9edbade"
+        ]
+      },
+      "taskBodyChars": 1496,
+      "hubBodyChars": 1496,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 45,
+      "ch": 1,
+      "decision": "Producir",
+      "task": "https://app.notion.com/p/3c839c2fefe781178502fc82b0f070da",
+      "hub": "https://app.notion.com/p/3c839c2fefe78153b85fd617dfb92e3a",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe78002a99fe5e2d9edbade",
+          "https://app.notion.com/p/3c839c2fefe78153b85fd617dfb92e3a"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "En curso",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N45 - Derivado: Instagram Story — Minimalismo o maximalismo",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe7819981bfca4f0262f01d"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha de inicio:start": "2026-09-02T16:40:00.000Z",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe781178502fc82b0f070da"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Instagram Story: Minimalismo o maximalismo",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe78002a99fe5e2d9edbade"
+        ]
+      },
+      "taskBodyChars": 1816,
+      "hubBodyChars": 1816,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 45,
+      "ch": 2,
+      "decision": "Producir",
+      "task": "https://app.notion.com/p/3c839c2fefe7819a9b93e45da7dddff8",
+      "hub": "https://app.notion.com/p/3c839c2fefe78149a69deb7c519d0002",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe78002a99fe5e2d9edbade",
+          "https://app.notion.com/p/3c839c2fefe78149a69deb7c519d0002"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "En curso",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N45 - Derivado: Reel/TikTok/Short — Minimalismo o maximalismo",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe7819981bfca4f0262f01d"
+        ],
+        "Tipo de pieza": "Video",
+        "URL Frame.io": "",
+        "date:Fecha de inicio:start": "2026-09-02T16:40:00.000Z",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe7819a9b93e45da7dddff8"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Reel/TikTok/Short: Minimalismo o maximalismo",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe78002a99fe5e2d9edbade"
+        ]
+      },
+      "taskBodyChars": 2402,
+      "hubBodyChars": 2402,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 45,
+      "ch": 3,
+      "decision": "Producir",
+      "task": "https://app.notion.com/p/3c839c2fefe78108b609dd8714eaab1a",
+      "hub": "https://app.notion.com/p/3c839c2fefe78120be82e8d78e06f40a",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe78002a99fe5e2d9edbade",
+          "https://app.notion.com/p/3c839c2fefe78120be82e8d78e06f40a"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "En curso",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N45 - Derivado: Pinterest Pin — Minimalismo o maximalismo",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe7819981bfca4f0262f01d"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha de inicio:start": "2026-09-02T16:40:00.000Z",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe78108b609dd8714eaab1a"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Pinterest Pin: Minimalismo o maximalismo",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe78002a99fe5e2d9edbade"
+        ]
+      },
+      "taskBodyChars": 1286,
+      "hubBodyChars": 1286,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 46,
+      "ch": 0,
+      "decision": "Producir",
+      "task": "https://app.notion.com/p/3c839c2fefe7814db027e5206b6d45e8",
+      "hub": "https://app.notion.com/p/3c839c2fefe781d8a84fd7b5c23383b2",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe78056a4ccfc5f40d58539",
+          "https://app.notion.com/p/3c839c2fefe781d8a84fd7b5c23383b2"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "En curso",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N46 - Derivado: Facebook — Color de recámara según la luz",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe781a39179cb780234ca1c"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha de inicio:start": "2026-09-02T16:40:00.000Z",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe7814db027e5206b6d45e8"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Facebook: Color de recámara según la luz",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe78056a4ccfc5f40d58539"
+        ]
+      },
+      "taskBodyChars": 1446,
+      "hubBodyChars": 1446,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 46,
+      "ch": 1,
+      "decision": "Producir",
+      "task": "https://app.notion.com/p/3c839c2fefe7814cb84ad0fdcb820e99",
+      "hub": "https://app.notion.com/p/3c839c2fefe781e68855f39f1061dfe8",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe78056a4ccfc5f40d58539",
+          "https://app.notion.com/p/3c839c2fefe781e68855f39f1061dfe8"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "En curso",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N46 - Derivado: Instagram Story — Color de recámara según la luz",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe781a39179cb780234ca1c"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha de inicio:start": "2026-09-02T16:40:00.000Z",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe7814cb84ad0fdcb820e99"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Instagram Story: Color de recámara según la luz",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe78056a4ccfc5f40d58539"
+        ]
+      },
+      "taskBodyChars": 1752,
+      "hubBodyChars": 1752,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 46,
+      "ch": 2,
+      "decision": "Producir",
+      "task": "https://app.notion.com/p/3c839c2fefe7819abd6bfd89812bff9e",
+      "hub": "https://app.notion.com/p/3c839c2fefe78107b57ddf5bdd6b65c5",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe78056a4ccfc5f40d58539",
+          "https://app.notion.com/p/3c839c2fefe78107b57ddf5bdd6b65c5"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "En curso",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N46 - Derivado: Reel/TikTok/Short — Color de recámara según la luz",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe781a39179cb780234ca1c"
+        ],
+        "Tipo de pieza": "Video",
+        "URL Frame.io": "",
+        "date:Fecha de inicio:start": "2026-09-02T16:40:00.000Z",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe7819abd6bfd89812bff9e"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Reel/TikTok/Short: Color de recámara según la luz",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe78056a4ccfc5f40d58539"
+        ]
+      },
+      "taskBodyChars": 2361,
+      "hubBodyChars": 2361,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 46,
+      "ch": 3,
+      "decision": "Producir",
+      "task": "https://app.notion.com/p/3c839c2fefe7818b9c58dffac8f68b67",
+      "hub": "https://app.notion.com/p/3c839c2fefe781b49920c0e9bbd74b39",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe78056a4ccfc5f40d58539",
+          "https://app.notion.com/p/3c839c2fefe781b49920c0e9bbd74b39"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "En curso",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N46 - Derivado: Pinterest Pin — Color de recámara según la luz",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe781a39179cb780234ca1c"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha de inicio:start": "2026-09-02T16:40:00.000Z",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe7818b9c58dffac8f68b67"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Pinterest Pin: Color de recámara según la luz",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe78056a4ccfc5f40d58539"
+        ]
+      },
+      "taskBodyChars": 1260,
+      "hubBodyChars": 1260,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 47,
+      "ch": 0,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3c839c2fefe781e6a4a4f740351c1048",
+      "hub": "https://app.notion.com/p/3c839c2fefe78195be8ec34a2511fb6e",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe780af896fe53d6c7e72c1",
+          "https://app.notion.com/p/3c839c2fefe78195be8ec34a2511fb6e"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N47 - Derivado: Facebook — Tres rutas de color para San Valentín",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe781f9ba93c5e469c96e65"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe781e6a4a4f740351c1048"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Facebook: Tres rutas de color para San Valentín",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe780af896fe53d6c7e72c1"
+        ]
+      },
+      "taskBodyChars": 1474,
+      "hubBodyChars": 1474,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 47,
+      "ch": 1,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3c839c2fefe7813b9259f921279c0935",
+      "hub": "https://app.notion.com/p/3c839c2fefe7817bba34e0564a6f5a2c",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe780af896fe53d6c7e72c1",
+          "https://app.notion.com/p/3c839c2fefe7817bba34e0564a6f5a2c"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N47 - Derivado: Instagram Story — Tres rutas de color para San Valentín",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe781f9ba93c5e469c96e65"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe7813b9259f921279c0935"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Instagram Story: Tres rutas de color para San Valentín",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe780af896fe53d6c7e72c1"
+        ]
+      },
+      "taskBodyChars": 1780,
+      "hubBodyChars": 1780,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 47,
+      "ch": 2,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3c839c2fefe7813f8f97ccfced728960",
+      "hub": "https://app.notion.com/p/3c839c2fefe781acb838f9902ac7eb31",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe780af896fe53d6c7e72c1",
+          "https://app.notion.com/p/3c839c2fefe781acb838f9902ac7eb31"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N47 - Derivado: Reel/TikTok/Short — Tres rutas de color para San Valentín",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe781f9ba93c5e469c96e65"
+        ],
+        "Tipo de pieza": "Video",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe7813f8f97ccfced728960"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Reel/TikTok/Short: Tres rutas de color para San Valentín",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe780af896fe53d6c7e72c1"
+        ]
+      },
+      "taskBodyChars": 2425,
+      "hubBodyChars": 2425,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 47,
+      "ch": 3,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3c839c2fefe7819d9413d11dc08198b0",
+      "hub": "https://app.notion.com/p/3c839c2fefe78186a017df97e5ae6c52",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe780af896fe53d6c7e72c1",
+          "https://app.notion.com/p/3c839c2fefe78186a017df97e5ae6c52"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N47 - Derivado: Pinterest Pin — Tres rutas de color para San Valentín",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe781f9ba93c5e469c96e65"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe7819d9413d11dc08198b0"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Pinterest Pin: Tres rutas de color para San Valentín",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe780af896fe53d6c7e72c1"
+        ]
+      },
+      "taskBodyChars": 1284,
+      "hubBodyChars": 1284,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 51,
+      "ch": 0,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3d039c2fefe7814bb2e1f12272310d3a",
+      "hub": "https://app.notion.com/p/3d039c2fefe78132bde7e1a1cd596e75",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7804db40ad5570d3f31ec",
+          "https://app.notion.com/p/3d039c2fefe78132bde7e1a1cd596e75"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N51 - Derivado: Facebook — Cuánto rinde una cubeta de pintura",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781539f65fc589de7adaf"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe7814bb2e1f12272310d3a"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Facebook: Cuánto rinde una cubeta de pintura",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe7804db40ad5570d3f31ec"
+        ]
+      },
+      "taskBodyChars": 4282,
+      "hubBodyChars": 4284,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 51,
+      "ch": 1,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3d039c2fefe781678f0cfc781f5ccf46",
+      "hub": "https://app.notion.com/p/3d039c2fefe781bea4c0e645ea54bd7a",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7804db40ad5570d3f31ec",
+          "https://app.notion.com/p/3d039c2fefe781bea4c0e645ea54bd7a"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N51 - Derivado: Instagram Story — Cuánto rinde una cubeta de pintura",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781539f65fc589de7adaf"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe781678f0cfc781f5ccf46"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Instagram Story: Cuánto rinde una cubeta de pintura",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe7804db40ad5570d3f31ec"
+        ]
+      },
+      "taskBodyChars": 4837,
+      "hubBodyChars": 4839,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 51,
+      "ch": 2,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3d039c2fefe78108ad42fdb47be1baa7",
+      "hub": "https://app.notion.com/p/3d039c2fefe781dfb3def2ba723e7d32",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7804db40ad5570d3f31ec",
+          "https://app.notion.com/p/3d039c2fefe781dfb3def2ba723e7d32"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N51 - Derivado: Reel/TikTok/Short — Cuánto rinde una cubeta de pintura",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781539f65fc589de7adaf"
+        ],
+        "Tipo de pieza": "Video",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe78108ad42fdb47be1baa7"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Reel/TikTok/Short: Cuánto rinde una cubeta de pintura",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe7804db40ad5570d3f31ec"
+        ]
+      },
+      "taskBodyChars": 5120,
+      "hubBodyChars": 5122,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 51,
+      "ch": 3,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3d039c2fefe7810b80d8f5f3dcac3e22",
+      "hub": "https://app.notion.com/p/3d039c2fefe78121be20e766ccb9e9dc",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7804db40ad5570d3f31ec",
+          "https://app.notion.com/p/3d039c2fefe78121be20e766ccb9e9dc"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N51 - Derivado: Pinterest Pin — Cuánto rinde una cubeta de pintura",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781539f65fc589de7adaf"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe7810b80d8f5f3dcac3e22"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Pinterest Pin: Cuánto rinde una cubeta de pintura",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe7804db40ad5570d3f31ec"
+        ]
+      },
+      "taskBodyChars": 4071,
+      "hubBodyChars": 4073,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 52,
+      "ch": 0,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3d039c2fefe78101b167d6baa517c904",
+      "hub": "https://app.notion.com/p/3d039c2fefe781009de6e733f06df42b",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7800bad66fedbc7630de0",
+          "https://app.notion.com/p/3d039c2fefe781009de6e733f06df42b"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Bloqueado",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N52 - Derivado: Facebook — Qué revisar antes de pintar sobre esmalte",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781d396d0eb7a6d42b5b4"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "Bloqueado",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe78101b167d6baa517c904"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Facebook: Qué revisar antes de pintar sobre esmalte",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe7800bad66fedbc7630de0"
+        ]
+      },
+      "taskBodyChars": 4291,
+      "hubBodyChars": 4293,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 52,
+      "ch": 1,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3d039c2fefe78111a88cf09cf78ad95c",
+      "hub": "https://app.notion.com/p/3d039c2fefe78146b385deeb3b1a5480",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7800bad66fedbc7630de0",
+          "https://app.notion.com/p/3d039c2fefe78146b385deeb3b1a5480"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Bloqueado",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N52 - Derivado: Instagram Story — Qué revisar antes de pintar sobre esmalte",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781d396d0eb7a6d42b5b4"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "Bloqueado",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe78111a88cf09cf78ad95c"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Instagram Story: Qué revisar antes de pintar sobre esmalte",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe7800bad66fedbc7630de0"
+        ]
+      },
+      "taskBodyChars": 4729,
+      "hubBodyChars": 4731,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 52,
+      "ch": 2,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3d039c2fefe7814f8b47c7e7d9134616",
+      "hub": "https://app.notion.com/p/3d039c2fefe781e9bc9cc3329506cfb9",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7800bad66fedbc7630de0",
+          "https://app.notion.com/p/3d039c2fefe781e9bc9cc3329506cfb9"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Bloqueado",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N52 - Derivado: Reel/TikTok/Short — Qué revisar antes de pintar sobre esmalte",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781d396d0eb7a6d42b5b4"
+        ],
+        "Tipo de pieza": "Video",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "Bloqueado",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe7814f8b47c7e7d9134616"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Reel/TikTok/Short: Qué revisar antes de pintar sobre esmalte",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe7800bad66fedbc7630de0"
+        ]
+      },
+      "taskBodyChars": 5098,
+      "hubBodyChars": 5100,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 52,
+      "ch": 3,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3d039c2fefe78118aabac954ce15965c",
+      "hub": "https://app.notion.com/p/3d039c2fefe7816f8223fe8ef362311d",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7800bad66fedbc7630de0",
+          "https://app.notion.com/p/3d039c2fefe7816f8223fe8ef362311d"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Bloqueado",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N52 - Derivado: Pinterest Pin — Qué revisar antes de pintar sobre esmalte",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781d396d0eb7a6d42b5b4"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "Bloqueado",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe78118aabac954ce15965c"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Pinterest Pin: Qué revisar antes de pintar sobre esmalte",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe7800bad66fedbc7630de0"
+        ]
+      },
+      "taskBodyChars": 4071,
+      "hubBodyChars": 4073,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 53,
+      "ch": 0,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3d039c2fefe78114ae54d0af5d179b06",
+      "hub": "https://app.notion.com/p/3d039c2fefe781b99df7cc15ff95fd04",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe780ecb1dbd5cace1008d3",
+          "https://app.notion.com/p/3d039c2fefe781b99df7cc15ff95fd04"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N53 - Derivado: Facebook — Pintura que se desprende: qué revisar",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781199aa6d76331f07388"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe78114ae54d0af5d179b06"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Facebook: Pintura que se desprende: qué revisar",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe780ecb1dbd5cace1008d3"
+        ]
+      },
+      "taskBodyChars": 4258,
+      "hubBodyChars": 4260,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 53,
+      "ch": 1,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3d039c2fefe7817ea13acf3dca5f2ae4",
+      "hub": "https://app.notion.com/p/3d039c2fefe7810c9f0cfbd25e37eef2",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe780ecb1dbd5cace1008d3",
+          "https://app.notion.com/p/3d039c2fefe7810c9f0cfbd25e37eef2"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N53 - Derivado: Instagram Story — Pintura que se desprende: qué revisar",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781199aa6d76331f07388"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe7817ea13acf3dca5f2ae4"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Instagram Story: Pintura que se desprende: qué revisar",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe780ecb1dbd5cace1008d3"
+        ]
+      },
+      "taskBodyChars": 4734,
+      "hubBodyChars": 4736,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 53,
+      "ch": 2,
+      "decision": "Producir",
+      "task": "https://app.notion.com/p/3d039c2fefe7817896fbee9c2f890bde",
+      "hub": "https://app.notion.com/p/3d039c2fefe78128bce8fce6f7accabe",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe780ecb1dbd5cace1008d3",
+          "https://app.notion.com/p/3d039c2fefe78128bce8fce6f7accabe"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N53 - Derivado: Reel/TikTok/Short — Pintura que se desprende: qué revisar",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781199aa6d76331f07388"
+        ],
+        "Tipo de pieza": "Video",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe7817896fbee9c2f890bde"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Reel/TikTok/Short: Pintura que se desprende: qué revisar",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe780ecb1dbd5cace1008d3"
+        ]
+      },
+      "taskBodyChars": 5105,
+      "hubBodyChars": 5107,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 53,
+      "ch": 3,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3d039c2fefe781889ff8c59c33baa3d2",
+      "hub": "https://app.notion.com/p/3d039c2fefe781a0872feae19af5fa60",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe780ecb1dbd5cace1008d3",
+          "https://app.notion.com/p/3d039c2fefe781a0872feae19af5fa60"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N53 - Derivado: Pinterest Pin — Pintura que se desprende: qué revisar",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781199aa6d76331f07388"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-11-15"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe781889ff8c59c33baa3d2"
+        ],
+        "date:Fecha límite:start": "2026-11-15",
+        "tecnicas": "Derivado social — Pinterest Pin: Pintura que se desprende: qué revisar",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe780ecb1dbd5cace1008d3"
+        ]
+      },
+      "taskBodyChars": 4057,
+      "hubBodyChars": 4059,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 48,
+      "ch": 0,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3c839c2fefe7818997aaccbd6faa70d4",
+      "hub": "https://app.notion.com/p/3c839c2fefe781c0ac35fca0e67d079a",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe780cdbac7e101feb2eb7e",
+          "https://app.notion.com/p/3c839c2fefe781c0ac35fca0e67d079a"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N48 - Derivado: Facebook — Archivo 2024: identidad azul y blanca",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe781ad8bf0d4aad28e782b"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe7818997aaccbd6faa70d4"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Facebook: Archivo 2024: identidad azul y blanca",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe780cdbac7e101feb2eb7e"
+        ]
+      },
+      "taskBodyChars": 1780,
+      "hubBodyChars": 1780,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 48,
+      "ch": 1,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3c839c2fefe781cbbd23cc0df8ab63a9",
+      "hub": "https://app.notion.com/p/3c839c2fefe781ff9c48e94d7997a4fa",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe780cdbac7e101feb2eb7e",
+          "https://app.notion.com/p/3c839c2fefe781ff9c48e94d7997a4fa"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N48 - Derivado: Instagram Story — Archivo 2024: identidad azul y blanca",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe781ad8bf0d4aad28e782b"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe781cbbd23cc0df8ab63a9"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Instagram Story: Archivo 2024: identidad azul y blanca",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe780cdbac7e101feb2eb7e"
+        ]
+      },
+      "taskBodyChars": 2105,
+      "hubBodyChars": 2105,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 48,
+      "ch": 2,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3c839c2fefe781f08ca5cbb192d0acd7",
+      "hub": "https://app.notion.com/p/3c839c2fefe781af8b3dcdc4e0975ac8",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe780cdbac7e101feb2eb7e",
+          "https://app.notion.com/p/3c839c2fefe781af8b3dcdc4e0975ac8"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N48 - Derivado: Reel/TikTok/Short — Archivo 2024: identidad azul y blanca",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe781ad8bf0d4aad28e782b"
+        ],
+        "Tipo de pieza": "Video",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe781f08ca5cbb192d0acd7"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Reel/TikTok/Short: Archivo 2024: identidad azul y blanca",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe780cdbac7e101feb2eb7e"
+        ]
+      },
+      "taskBodyChars": 2628,
+      "hubBodyChars": 2628,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 48,
+      "ch": 3,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3c839c2fefe781d4adf0c164470893f0",
+      "hub": "https://app.notion.com/p/3c839c2fefe781748197e8cce40a5fc4",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe780cdbac7e101feb2eb7e",
+          "https://app.notion.com/p/3c839c2fefe781748197e8cce40a5fc4"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N48 - Derivado: Pinterest Pin — Archivo 2024: identidad azul y blanca",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe781ad8bf0d4aad28e782b"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe781d4adf0c164470893f0"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Pinterest Pin: Archivo 2024: identidad azul y blanca",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe780cdbac7e101feb2eb7e"
+        ]
+      },
+      "taskBodyChars": 1602,
+      "hubBodyChars": 1602,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 49,
+      "ch": 0,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3c839c2fefe7813788bbff16f1cb92fb",
+      "hub": "https://app.notion.com/p/3c839c2fefe78184bd4dc6035598bcff",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7800981c0de042a91a6c6",
+          "https://app.notion.com/p/3c839c2fefe78184bd4dc6035598bcff"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N49 - Derivado: Facebook — Colores del 8M con contexto",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe781adbe63ec0cb760ad47"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe7813788bbff16f1cb92fb"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Facebook: Colores del 8M con contexto",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe7800981c0de042a91a6c6"
+        ]
+      },
+      "taskBodyChars": 1796,
+      "hubBodyChars": 1796,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 49,
+      "ch": 1,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3c839c2fefe78142892cde3f696c4349",
+      "hub": "https://app.notion.com/p/3c839c2fefe781fa9b99e033cffde6ad",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7800981c0de042a91a6c6",
+          "https://app.notion.com/p/3c839c2fefe781fa9b99e033cffde6ad"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N49 - Derivado: Instagram Story — Colores del 8M con contexto",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe781adbe63ec0cb760ad47"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe78142892cde3f696c4349"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Instagram Story: Colores del 8M con contexto",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe7800981c0de042a91a6c6"
+        ]
+      },
+      "taskBodyChars": 2099,
+      "hubBodyChars": 2099,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 49,
+      "ch": 2,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3c839c2fefe781f292ceed83d4ab8f5d",
+      "hub": "https://app.notion.com/p/3c839c2fefe78155bfc5f69e6d59cc9c",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7800981c0de042a91a6c6",
+          "https://app.notion.com/p/3c839c2fefe78155bfc5f69e6d59cc9c"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N49 - Derivado: Reel/TikTok/Short — Colores del 8M con contexto",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe781adbe63ec0cb760ad47"
+        ],
+        "Tipo de pieza": "Video",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe781f292ceed83d4ab8f5d"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Reel/TikTok/Short: Colores del 8M con contexto",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe7800981c0de042a91a6c6"
+        ]
+      },
+      "taskBodyChars": 2649,
+      "hubBodyChars": 2649,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 49,
+      "ch": 3,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3c839c2fefe7819d8ad0d3d9f7ae7048",
+      "hub": "https://app.notion.com/p/3c839c2fefe781a38c7cd508268daedf",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7800981c0de042a91a6c6",
+          "https://app.notion.com/p/3c839c2fefe781a38c7cd508268daedf"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N49 - Derivado: Pinterest Pin — Colores del 8M con contexto",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe781adbe63ec0cb760ad47"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe7819d8ad0d3d9f7ae7048"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Pinterest Pin: Colores del 8M con contexto",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe7800981c0de042a91a6c6"
+        ]
+      },
+      "taskBodyChars": 1587,
+      "hubBodyChars": 1587,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 50,
+      "ch": 0,
+      "decision": "Pendiente",
+      "task": "https://app.notion.com/p/3c839c2fefe78154a78bfc2d53514d6d",
+      "hub": "https://app.notion.com/p/3c839c2fefe78184b938d2e562f35e0a",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7804d97ebdda97455267b",
+          "https://app.notion.com/p/3c839c2fefe78184b938d2e562f35e0a"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N50 - Derivado: Facebook — Proyectos para mamá según alcance",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe7810e9438dea5ad611ada"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe78154a78bfc2d53514d6d"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Facebook: Proyectos para mamá según alcance",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe7804d97ebdda97455267b"
+        ]
+      },
+      "taskBodyChars": 1757,
+      "hubBodyChars": 1757,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 50,
+      "ch": 1,
+      "decision": "Pendiente",
+      "task": "https://app.notion.com/p/3c839c2fefe7814689a5de0278877bf1",
+      "hub": "https://app.notion.com/p/3c839c2fefe78116a279d53ac276ef05",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7804d97ebdda97455267b",
+          "https://app.notion.com/p/3c839c2fefe78116a279d53ac276ef05"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N50 - Derivado: Instagram Story — Proyectos para mamá según alcance",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe7810e9438dea5ad611ada"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe7814689a5de0278877bf1"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Instagram Story: Proyectos para mamá según alcance",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe7804d97ebdda97455267b"
+        ]
+      },
+      "taskBodyChars": 2005,
+      "hubBodyChars": 2005,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 50,
+      "ch": 2,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3c839c2fefe781a0bf47c4bca3dbb635",
+      "hub": "https://app.notion.com/p/3c839c2fefe78199bd55df79b09ace29",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7804d97ebdda97455267b",
+          "https://app.notion.com/p/3c839c2fefe78199bd55df79b09ace29"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N50 - Derivado: Reel/TikTok/Short — Proyectos para mamá según alcance",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe7810e9438dea5ad611ada"
+        ],
+        "Tipo de pieza": "Video",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe781a0bf47c4bca3dbb635"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Reel/TikTok/Short: Proyectos para mamá según alcance",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe7804d97ebdda97455267b"
+        ]
+      },
+      "taskBodyChars": 2632,
+      "hubBodyChars": 2632,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 50,
+      "ch": 3,
+      "decision": "Pendiente",
+      "task": "https://app.notion.com/p/3c839c2fefe7810caeb4d5dfccf1f68f",
+      "hub": "https://app.notion.com/p/3c839c2fefe78153a1a8f78e4574da72",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7804d97ebdda97455267b",
+          "https://app.notion.com/p/3c839c2fefe78153a1a8f78e4574da72"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N50 - Derivado: Pinterest Pin — Proyectos para mamá según alcance",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3c839c2fefe7810e9438dea5ad611ada"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "Tareas": [
+          "https://app.notion.com/p/3c839c2fefe7810caeb4d5dfccf1f68f"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Pinterest Pin: Proyectos para mamá según alcance",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe7804d97ebdda97455267b"
+        ]
+      },
+      "taskBodyChars": 1522,
+      "hubBodyChars": 1522,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 54,
+      "ch": 0,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3d039c2fefe78126b229c34b2d0ede85",
+      "hub": "https://app.notion.com/p/3d039c2fefe7813ebd01e486269d3674",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7806ea576ee066ac16074",
+          "https://app.notion.com/p/3d039c2fefe7813ebd01e486269d3674"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Bloqueado",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N54 - Derivado: Facebook — Resanar una pared antes de pintar",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781bfba0bdfe87f493a5c"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "Bloqueado",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe78126b229c34b2d0ede85"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Facebook: Resanar una pared antes de pintar",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe7806ea576ee066ac16074"
+        ]
+      },
+      "taskBodyChars": 4310,
+      "hubBodyChars": 4312,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 54,
+      "ch": 1,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3d039c2fefe78137b6c4fcfe2598a9c8",
+      "hub": "https://app.notion.com/p/3d039c2fefe781a4a42df5740710ac45",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7806ea576ee066ac16074",
+          "https://app.notion.com/p/3d039c2fefe781a4a42df5740710ac45"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Bloqueado",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N54 - Derivado: Instagram Story — Resanar una pared antes de pintar",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781bfba0bdfe87f493a5c"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "Bloqueado",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe78137b6c4fcfe2598a9c8"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Instagram Story: Resanar una pared antes de pintar",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe7806ea576ee066ac16074"
+        ]
+      },
+      "taskBodyChars": 4773,
+      "hubBodyChars": 4775,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 54,
+      "ch": 2,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3d039c2fefe7810ba1cfe704a7557044",
+      "hub": "https://app.notion.com/p/3d039c2fefe781a38565ef4d20d5e7e3",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7806ea576ee066ac16074",
+          "https://app.notion.com/p/3d039c2fefe781a38565ef4d20d5e7e3"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Bloqueado",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N54 - Derivado: Reel/TikTok/Short — Resanar una pared antes de pintar",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781bfba0bdfe87f493a5c"
+        ],
+        "Tipo de pieza": "Video",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "Bloqueado",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe7810ba1cfe704a7557044"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Reel/TikTok/Short: Resanar una pared antes de pintar",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe7806ea576ee066ac16074"
+        ]
+      },
+      "taskBodyChars": 5083,
+      "hubBodyChars": 5085,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 54,
+      "ch": 3,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3d039c2fefe7819797cbcd7105408783",
+      "hub": "https://app.notion.com/p/3d039c2fefe7819085b9d46c0d611042",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7806ea576ee066ac16074",
+          "https://app.notion.com/p/3d039c2fefe7819085b9d46c0d611042"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Bloqueado",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N54 - Derivado: Pinterest Pin — Resanar una pared antes de pintar",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781bfba0bdfe87f493a5c"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "Bloqueado",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe7819797cbcd7105408783"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Pinterest Pin: Resanar una pared antes de pintar",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe7806ea576ee066ac16074"
+        ]
+      },
+      "taskBodyChars": 4089,
+      "hubBodyChars": 4091,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 55,
+      "ch": 0,
+      "decision": "Producir",
+      "task": "https://app.notion.com/p/3d039c2fefe781928366f0a8b97ca254",
+      "hub": "https://app.notion.com/p/3d039c2fefe7814fb428feff3320f706",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe780918df4c5c4194db8b2",
+          "https://app.notion.com/p/3d039c2fefe7814fb428feff3320f706"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N55 - Derivado: Facebook — Cómo elegir rodillo para pintar",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781b2b91cf9d6f57ae2c9"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe781928366f0a8b97ca254"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Facebook: Cómo elegir rodillo para pintar",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe780918df4c5c4194db8b2"
+        ]
+      },
+      "taskBodyChars": 4264,
+      "hubBodyChars": 4266,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 55,
+      "ch": 1,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3d039c2fefe7813fa456efa5f990039c",
+      "hub": "https://app.notion.com/p/3d039c2fefe7818a9e3ff84b28e65af9",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe780918df4c5c4194db8b2",
+          "https://app.notion.com/p/3d039c2fefe7818a9e3ff84b28e65af9"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N55 - Derivado: Instagram Story — Cómo elegir rodillo para pintar",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781b2b91cf9d6f57ae2c9"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe7813fa456efa5f990039c"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Instagram Story: Cómo elegir rodillo para pintar",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe780918df4c5c4194db8b2"
+        ]
+      },
+      "taskBodyChars": 4712,
+      "hubBodyChars": 4714,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 55,
+      "ch": 2,
+      "decision": "Producir",
+      "task": "https://app.notion.com/p/3d039c2fefe7818daa64e4da98d130e3",
+      "hub": "https://app.notion.com/p/3d039c2fefe7817f9ba7e79940ab70c5",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe780918df4c5c4194db8b2",
+          "https://app.notion.com/p/3d039c2fefe7817f9ba7e79940ab70c5"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N55 - Derivado: Reel/TikTok/Short — Cómo elegir rodillo para pintar",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781b2b91cf9d6f57ae2c9"
+        ],
+        "Tipo de pieza": "Video",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe7818daa64e4da98d130e3"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Reel/TikTok/Short: Cómo elegir rodillo para pintar",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe780918df4c5c4194db8b2"
+        ]
+      },
+      "taskBodyChars": 5078,
+      "hubBodyChars": 5080,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 55,
+      "ch": 3,
+      "decision": "Producir",
+      "task": "https://app.notion.com/p/3d039c2fefe7814181b4ea0e7ca6cbd9",
+      "hub": "https://app.notion.com/p/3d039c2fefe781c6b0b1e5e467648c46",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe780918df4c5c4194db8b2",
+          "https://app.notion.com/p/3d039c2fefe781c6b0b1e5e467648c46"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N55 - Derivado: Pinterest Pin — Cómo elegir rodillo para pintar",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781b2b91cf9d6f57ae2c9"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe7814181b4ea0e7ca6cbd9"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Pinterest Pin: Cómo elegir rodillo para pintar",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe780918df4c5c4194db8b2"
+        ]
+      },
+      "taskBodyChars": 4073,
+      "hubBodyChars": 4075,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 56,
+      "ch": 0,
+      "decision": "Producir",
+      "task": "https://app.notion.com/p/3d039c2fefe781258f77fed6ece5be9f",
+      "hub": "https://app.notion.com/p/3d039c2fefe7819fb0d1def6c2efe8f4",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe78092a6b3d3f5ae684d3e",
+          "https://app.notion.com/p/3d039c2fefe7819fb0d1def6c2efe8f4"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N56 - Derivado: Facebook — Cómo preparar un techo interior para pintar",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe7812aa606d65b0980f79b"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe781258f77fed6ece5be9f"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Facebook: Cómo preparar un techo interior para pintar",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe78092a6b3d3f5ae684d3e"
+        ]
+      },
+      "taskBodyChars": 4305,
+      "hubBodyChars": 4307,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 56,
+      "ch": 1,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3d039c2fefe7811fa4ebf6d4cf35156a",
+      "hub": "https://app.notion.com/p/3d039c2fefe78120b956e01b6a9d7f2c",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe78092a6b3d3f5ae684d3e",
+          "https://app.notion.com/p/3d039c2fefe78120b956e01b6a9d7f2c"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N56 - Derivado: Instagram Story — Cómo preparar un techo interior para pintar",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe7812aa606d65b0980f79b"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe7811fa4ebf6d4cf35156a"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Instagram Story: Cómo preparar un techo interior para pintar",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe78092a6b3d3f5ae684d3e"
+        ]
+      },
+      "taskBodyChars": 4722,
+      "hubBodyChars": 4724,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 56,
+      "ch": 2,
+      "decision": "Producir",
+      "task": "https://app.notion.com/p/3d039c2fefe7816f8359c591c4ee3e9d",
+      "hub": "https://app.notion.com/p/3d039c2fefe78190899bf149b2e987ef",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe78092a6b3d3f5ae684d3e",
+          "https://app.notion.com/p/3d039c2fefe78190899bf149b2e987ef"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N56 - Derivado: Reel/TikTok/Short — Cómo preparar un techo interior para pintar",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe7812aa606d65b0980f79b"
+        ],
+        "Tipo de pieza": "Video",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe7816f8359c591c4ee3e9d"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Reel/TikTok/Short: Cómo preparar un techo interior para pintar",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe78092a6b3d3f5ae684d3e"
+        ]
+      },
+      "taskBodyChars": 5115,
+      "hubBodyChars": 5117,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 57,
+      "ch": 0,
+      "decision": "Producir",
+      "task": "https://app.notion.com/p/3d039c2fefe781279304f6d7bf42646f",
+      "hub": "https://app.notion.com/p/3d039c2fefe781859e57f76f7066678b",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7809b9d7dcc1152ec2b1e",
+          "https://app.notion.com/p/3d039c2fefe781859e57f76f7066678b"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N57 - Derivado: Facebook — Qué revisar antes de quitar papel tapiz",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781dba4e9edc6f2b888d8"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe781279304f6d7bf42646f"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Facebook: Qué revisar antes de quitar papel tapiz",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe7809b9d7dcc1152ec2b1e"
+        ]
+      },
+      "taskBodyChars": 4239,
+      "hubBodyChars": 4241,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 56,
+      "ch": 3,
+      "decision": "Producir",
+      "task": "https://app.notion.com/p/3d039c2fefe78168adadc4e3dcbf4fc0",
+      "hub": "https://app.notion.com/p/3d039c2fefe781de9f49d187e6af547c",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe78092a6b3d3f5ae684d3e",
+          "https://app.notion.com/p/3d039c2fefe781de9f49d187e6af547c"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N56 - Derivado: Pinterest Pin — Cómo preparar un techo interior para pintar",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe7812aa606d65b0980f79b"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe78168adadc4e3dcbf4fc0"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Pinterest Pin: Cómo preparar un techo interior para pintar",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe78092a6b3d3f5ae684d3e"
+        ]
+      },
+      "taskBodyChars": 4091,
+      "hubBodyChars": 4093,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 57,
+      "ch": 1,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3d039c2fefe7816f9e38fcdf8b5f3fde",
+      "hub": "https://app.notion.com/p/3d039c2fefe781e18a7bdeac97291f3b",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7809b9d7dcc1152ec2b1e",
+          "https://app.notion.com/p/3d039c2fefe781e18a7bdeac97291f3b"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N57 - Derivado: Instagram Story — Qué revisar antes de quitar papel tapiz",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781dba4e9edc6f2b888d8"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe7816f9e38fcdf8b5f3fde"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Instagram Story: Qué revisar antes de quitar papel tapiz",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe7809b9d7dcc1152ec2b1e"
+        ]
+      },
+      "taskBodyChars": 4659,
+      "hubBodyChars": 4661,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 57,
+      "ch": 2,
+      "decision": "Producir",
+      "task": "https://app.notion.com/p/3d039c2fefe7817aa3e8fb8db4adb343",
+      "hub": "https://app.notion.com/p/3d039c2fefe7814890dbc6c21fe4882f",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7809b9d7dcc1152ec2b1e",
+          "https://app.notion.com/p/3d039c2fefe7814890dbc6c21fe4882f"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N57 - Derivado: Reel/TikTok/Short — Qué revisar antes de quitar papel tapiz",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781dba4e9edc6f2b888d8"
+        ],
+        "Tipo de pieza": "Video",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe7817aa3e8fb8db4adb343"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Reel/TikTok/Short: Qué revisar antes de quitar papel tapiz",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe7809b9d7dcc1152ec2b1e"
+        ]
+      },
+      "taskBodyChars": 5049,
+      "hubBodyChars": 5051,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 57,
+      "ch": 3,
+      "decision": "Producir",
+      "task": "https://app.notion.com/p/3d039c2fefe78141a16ecf1837a46956",
+      "hub": "https://app.notion.com/p/3d039c2fefe7819fa52ef0edaba87134",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7809b9d7dcc1152ec2b1e",
+          "https://app.notion.com/p/3d039c2fefe7819fa52ef0edaba87134"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N57 - Derivado: Pinterest Pin — Qué revisar antes de quitar papel tapiz",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781dba4e9edc6f2b888d8"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe78141a16ecf1837a46956"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Pinterest Pin: Qué revisar antes de quitar papel tapiz",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe7809b9d7dcc1152ec2b1e"
+        ]
+      },
+      "taskBodyChars": 4024,
+      "hubBodyChars": 4026,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 58,
+      "ch": 0,
+      "decision": "Producir",
+      "task": "https://app.notion.com/p/3d039c2fefe781ec9c6aec908c73d71e",
+      "hub": "https://app.notion.com/p/3d039c2fefe781458d7ccad564f76475",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe780e58a8de05d62cc7133",
+          "https://app.notion.com/p/3d039c2fefe781458d7ccad564f76475"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N58 - Derivado: Facebook — Cómo guardar pintura sobrante",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781129694d3ccfc652d50"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe781ec9c6aec908c73d71e"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Facebook: Cómo guardar pintura sobrante",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe780e58a8de05d62cc7133"
+        ]
+      },
+      "taskBodyChars": 4325,
+      "hubBodyChars": 4327,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 58,
+      "ch": 1,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3d039c2fefe781e3b1a6d63c471bbeca",
+      "hub": "https://app.notion.com/p/3d039c2fefe7813a8c4dcf49805a4cdd",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe780e58a8de05d62cc7133",
+          "https://app.notion.com/p/3d039c2fefe7813a8c4dcf49805a4cdd"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N58 - Derivado: Instagram Story — Cómo guardar pintura sobrante",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781129694d3ccfc652d50"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe781e3b1a6d63c471bbeca"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Instagram Story: Cómo guardar pintura sobrante",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe780e58a8de05d62cc7133"
+        ]
+      },
+      "taskBodyChars": 4803,
+      "hubBodyChars": 4805,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 58,
+      "ch": 3,
+      "decision": "Producir",
+      "task": "https://app.notion.com/p/3d039c2fefe78183b861fd422829754d",
+      "hub": "https://app.notion.com/p/3d039c2fefe7816f97f2d7fadd9d2db6",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe780e58a8de05d62cc7133",
+          "https://app.notion.com/p/3d039c2fefe7816f97f2d7fadd9d2db6"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N58 - Derivado: Pinterest Pin — Cómo guardar pintura sobrante",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781129694d3ccfc652d50"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe78183b861fd422829754d"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Pinterest Pin: Cómo guardar pintura sobrante",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe780e58a8de05d62cc7133"
+        ]
+      },
+      "taskBodyChars": 4096,
+      "hubBodyChars": 4098,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    },
+    {
+      "n": 58,
+      "ch": 2,
+      "decision": "No aplica",
+      "task": "https://app.notion.com/p/3d039c2fefe78198a334eec1e02212d6",
+      "hub": "https://app.notion.com/p/3d039c2fefe781179072e781d089c0ae",
+      "beforeTask": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe780e58a8de05d62cc7133",
+          "https://app.notion.com/p/3d039c2fefe781179072e781d089c0ae"
+        ],
+        "Canal de pieza": "Social Media",
+        "Entregable": "",
+        "Estado": "Sin empezar",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Social N58 - Derivado: Reel/TikTok/Short — Cómo guardar pintura sobrante",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78160992fd31d5b96feb0"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781129694d3ccfc652d50"
+        ],
+        "Tipo de pieza": "Video",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-12-13"
+      },
+      "beforeHub": {
+        "Estado": "En curso",
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe78198a334eec1e02212d6"
+        ],
+        "date:Fecha límite:start": "2026-12-13",
+        "tecnicas": "Derivado social — Reel/TikTok/Short: Cómo guardar pintura sobrante",
+        "ítem principal": [
+          "https://app.notion.com/p/3a639c2fefe780e58a8de05d62cc7133"
+        ]
+      },
+      "taskBodyChars": 5126,
+      "hubBodyChars": 5128,
+      "preflightBlocker": false,
+      "relationsChecked": true
+    }
+  ],
+  "deferredN52Banners": [
+    {
+      "id": "https://app.notion.com/p/3d039c2fefe781fcb0afd33a53c589a4",
+      "status": "written",
+      "before": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7800bad66fedbc7630de0"
+        ],
+        "Canal de pieza": "Blog",
+        "Entregable": "",
+        "Estado": "Bloqueado",
+        "Formato": "Tutorial",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Banner N1 - Portada (Hero: Qué revisar antes de pintar sobre esmalte)",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781d396d0eb7a6d42b5b4"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-11-13"
+      }
+    },
+    {
+      "id": "https://app.notion.com/p/3d039c2fefe7810c8b08d30cb733b50d",
+      "status": "written",
+      "before": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7800bad66fedbc7630de0"
+        ],
+        "Canal de pieza": "Blog",
+        "Entregable": "",
+        "Estado": "Bloqueado",
+        "Formato": "Tutorial",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Banner N2 - Antes del nuevo acabado 🔁",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781d396d0eb7a6d42b5b4"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-11-13"
+      }
+    },
+    {
+      "id": "https://app.notion.com/p/3d039c2fefe781679dcaf57e2c6fcce1",
+      "status": "written",
+      "before": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7800bad66fedbc7630de0"
+        ],
+        "Canal de pieza": "Blog",
+        "Entregable": "",
+        "Estado": "Bloqueado",
+        "Formato": "Tutorial",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Banner N3 - Infografía: No son garantías de compatibilidad",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781d396d0eb7a6d42b5b4"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-11-13"
+      }
+    },
+    {
+      "id": "https://app.notion.com/p/3d039c2fefe7819391bfdaa09f475ba4",
+      "status": "written",
+      "before": {
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3a639c2fefe7800bad66fedbc7630de0"
+        ],
+        "Canal de pieza": "Blog",
+        "Entregable": "",
+        "Estado": "Bloqueado",
+        "Formato": "Tutorial",
+        "Frame Asset ID": "",
+        "Nombre de tarea": "Banner N4 - Cierre: Qué revisar antes de pintar sobre esmalte",
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Responsables": [
+          "<mention-user url=\"user://2a4d872b-594c-8161-9250-000270ffdfea\"></mention-user>"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781d396d0eb7a6d42b5b4"
+        ],
+        "Tipo de pieza": "Estatico",
+        "URL Frame.io": "",
+        "date:Fecha límite:start": "2026-11-13"
+      }
+    }
+  ],
+  "createdTasks": [
+    {
+      "key": "banner1",
+      "id": "3d039c2f-efe7-81af-8ed2-df07b741ad08",
+      "url": "https://app.notion.com/p/3d039c2fefe781af8ed2df07b741ad08",
+      "properties": {
+        "Nombre de tarea": "Banner N1 - Portada (Hero: Colores para Navidad que también se quedan en enero)",
+        "Estado": "Sin empezar",
+        "Formato": "Articulo",
+        "Tipo de pieza": "Estatico",
+        "Canal de pieza": "Blog",
+        "Tipo de entregable": [
+          "Diseño gráfico"
+        ],
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781bdb0e5f1e551ae7a68"
+        ],
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3d039c2fefe78120a69ac2156b348511"
+        ],
+        "Responsables": [
+          "2a4d872b-594c-8161-9250-000270ffdfea"
+        ],
+        "date:Fecha límite:start": "2026-11-11",
+        "date:Fecha límite:is_datetime": 0,
+        "Resumen": "N59: Banner N1 - Portada (Hero: Colores para Navidad que también se quedan en enero). Una gráfica; ficha de producción, arte pendiente."
+      }
+    },
+    {
+      "key": "banner2",
+      "id": "3d039c2f-efe7-8123-94d4-ecbd15750732",
+      "url": "https://app.notion.com/p/3d039c2fefe7812394d4ecbd15750732",
+      "properties": {
+        "Nombre de tarea": "Banner N2 - Pintura y decoración por espacio 🔁",
+        "Estado": "Sin empezar",
+        "Formato": "Articulo",
+        "Tipo de pieza": "Estatico",
+        "Canal de pieza": "Blog",
+        "Tipo de entregable": [
+          "Diseño gráfico"
+        ],
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781bdb0e5f1e551ae7a68"
+        ],
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3d039c2fefe78120a69ac2156b348511"
+        ],
+        "Responsables": [
+          "2a4d872b-594c-8161-9250-000270ffdfea"
+        ],
+        "date:Fecha límite:start": "2026-11-11",
+        "date:Fecha límite:is_datetime": 0,
+        "Resumen": "N59: Banner N2 - Pintura y decoración por espacio 🔁. Una gráfica; ficha de producción, arte pendiente."
+      }
+    },
+    {
+      "key": "banner3",
+      "id": "3d039c2f-efe7-8137-8aee-dc168fc59143",
+      "url": "https://app.notion.com/p/3d039c2fefe781378aeedc168fc59143",
+      "properties": {
+        "Nombre de tarea": "Banner N3 - El mismo espacio después de las fiestas",
+        "Estado": "Sin empezar",
+        "Formato": "Articulo",
+        "Tipo de pieza": "Estatico",
+        "Canal de pieza": "Blog",
+        "Tipo de entregable": [
+          "Diseño gráfico"
+        ],
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781bdb0e5f1e551ae7a68"
+        ],
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3d039c2fefe78120a69ac2156b348511"
+        ],
+        "Responsables": [
+          "2a4d872b-594c-8161-9250-000270ffdfea"
+        ],
+        "date:Fecha límite:start": "2026-11-11",
+        "date:Fecha límite:is_datetime": 0,
+        "Resumen": "N59: Banner N3 - El mismo espacio después de las fiestas. Una gráfica; ficha de producción, arte pendiente."
+      }
+    },
+    {
+      "key": "banner4",
+      "id": "3d039c2f-efe7-810e-83a1-d88ec84e2ce0",
+      "url": "https://app.notion.com/p/3d039c2fefe7810e83a1d88ec84e2ce0",
+      "properties": {
+        "Nombre de tarea": "Banner N4 - Cierre: La sala después de guardar los adornos",
+        "Estado": "Sin empezar",
+        "Formato": "Articulo",
+        "Tipo de pieza": "Estatico",
+        "Canal de pieza": "Blog",
+        "Tipo de entregable": [
+          "Diseño gráfico"
+        ],
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781bdb0e5f1e551ae7a68"
+        ],
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3d039c2fefe78120a69ac2156b348511"
+        ],
+        "Responsables": [
+          "2a4d872b-594c-8161-9250-000270ffdfea"
+        ],
+        "date:Fecha límite:start": "2026-11-11",
+        "date:Fecha límite:is_datetime": 0,
+        "Resumen": "N59: Banner N4 - Cierre: La sala después de guardar los adornos. Una gráfica; ficha de producción, arte pendiente."
+      }
+    },
+    {
+      "key": "facebook",
+      "id": "3d039c2f-efe7-81bd-a8b5-f0209ebdafa9",
+      "url": "https://app.notion.com/p/3d039c2fefe781bda8b5f0209ebdafa9",
+      "properties": {
+        "Nombre de tarea": "Social N59 - Derivado: Facebook — Colores para Navidad y después",
+        "Estado": "Sin empezar",
+        "Formato": "Articulo",
+        "Tipo de pieza": "Estatico",
+        "Canal de pieza": "Social Media",
+        "Tipo de entregable": [
+          "Diseño gráfico"
+        ],
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781bdb0e5f1e551ae7a68"
+        ],
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3d039c2fefe78120a69ac2156b348511"
+        ],
+        "Responsables": [
+          "2a4d872b-594c-8161-9250-000270ffdfea"
+        ],
+        "date:Fecha límite:start": "2026-11-13",
+        "date:Fecha límite:is_datetime": 0,
+        "Resumen": "Facebook 4:5: pintura base y decoración temporal; destino a la guía de Navidad N59."
+      }
+    },
+    {
+      "key": "pinterest",
+      "id": "3d039c2f-efe7-81dc-ab05-cd771b6ec977",
+      "url": "https://app.notion.com/p/3d039c2fefe781dcab05cd771b6ec977",
+      "properties": {
+        "Nombre de tarea": "Social N59 - Derivado: Pinterest Pin — Colores para Navidad y después",
+        "Estado": "Sin empezar",
+        "Formato": "Articulo",
+        "Tipo de pieza": "Estatico",
+        "Canal de pieza": "Social Media",
+        "Tipo de entregable": [
+          "Diseño gráfico"
+        ],
+        "Proyecto": [
+          "https://app.notion.com/p/3c839c2fefe78166b1ccef16538c46c6"
+        ],
+        "Tarea principal": [
+          "https://app.notion.com/p/3d039c2fefe781bdb0e5f1e551ae7a68"
+        ],
+        "Artículo (Content Hub)": [
+          "https://app.notion.com/p/3d039c2fefe78120a69ac2156b348511"
+        ],
+        "Responsables": [
+          "2a4d872b-594c-8161-9250-000270ffdfea"
+        ],
+        "date:Fecha límite:start": "2026-11-13",
+        "date:Fecha límite:is_datetime": 0,
+        "Resumen": "Pinterest 2:3: pintura base y decoración temporal; destino a la guía de Navidad N59."
+      }
+    }
+  ],
+  "createdHubItems": [
+    {
+      "id": "3d039c2f-efe7-818e-96db-f15728f41ac9",
+      "url": "https://app.notion.com/p/3d039c2fefe7818e96dbf15728f41ac9",
+      "properties": {
+        "tecnicas": "Derivado social — Facebook: Colores para Navidad y después",
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "ítem principal": [
+          "https://app.notion.com/p/3d039c2fefe78120a69ac2156b348511"
+        ],
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe781bda8b5f0209ebdafa9"
+        ],
+        "Tipo": [
+          "Facebook"
+        ],
+        "date:Fecha límite:start": "2026-11-13",
+        "date:Fecha límite:is_datetime": 0
+      }
+    },
+    {
+      "id": "3d039c2f-efe7-81d7-929f-d113d212369f",
+      "url": "https://app.notion.com/p/3d039c2fefe781d7929fd113d212369f",
+      "properties": {
+        "tecnicas": "Derivado social — Pinterest Pin: Colores para Navidad y después",
+        "Estado": "En curso",
+        "Formato": "Artículo",
+        "ítem principal": [
+          "https://app.notion.com/p/3d039c2fefe78120a69ac2156b348511"
+        ],
+        "Tareas": [
+          "https://app.notion.com/p/3d039c2fefe781dcab05cd771b6ec977"
+        ],
+        "date:Fecha límite:start": "2026-11-13",
+        "date:Fecha límite:is_datetime": 0
+      }
+    }
+  ],
+  "verification": {
+    "socialPages": 128,
+    "socialPassed": 128,
+    "matrixPages": 34,
+    "otherChecks": 24,
+    "newPages": 8,
+    "uniqueModifiedPages": 193,
+    "duplicateDecisionNotes": [],
+    "existingSocialStates": {
+      "Cancelada": 41,
+      "En curso": 8,
+      "Sin empezar": 12,
+      "Bloqueado": 3
+    },
+    "status": "all_changed_pages_read_back",
+    "rollupNumeric": "not_available; live classified task row counts and source-brief quantities reconstructed separately",
+    "assetsProducedByThisChange": 0,
+    "publicationsPerformed": 0,
+    "newPairs": {
+      "count": 8,
+      "errors": [],
+      "checks": [
+        {
+          "key": "facebook",
+          "identicalCopyAndLinks": true
+        },
+        {
+          "key": "pinterest",
+          "identicalCopyAndLinks": true
+        }
+      ],
+      "note": "Notion normalizes some internal Markdown links into mention-page; canonicalized without dropping text or links."
+    },
+    "n59BannerContentChecks": [
+      {
+        "id": "3d039c2f-efe7-8137-8aee-dc168fc59143",
+        "key": "banner3",
+        "contentExact": true
+      },
+      {
+        "id": "3d039c2f-efe7-81af-8ed2-df07b741ad08",
+        "key": "banner1",
+        "contentExact": true
+      },
+      {
+        "id": "3d039c2f-efe7-8123-94d4-ecbd15750732",
+        "key": "banner2",
+        "contentExact": true
+      },
+      {
+        "id": "3d039c2f-efe7-810e-83a1-d88ec84e2ce0",
+        "key": "banner4",
+        "contentExact": true
+      }
+    ],
+    "n59FinalContextReadback": [
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe78120a69ac2156b348511",
+        "ok": true
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781bdb0e5f1e551ae7a68",
+        "ok": true
+      }
+    ],
+    "readbacks": [
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe78165939dfc121d2022cb",
+        "kind": "socialHub",
+        "n": 43,
+        "ch": 0,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781d39538d873c1c1c76b",
+        "kind": "socialTask",
+        "n": 43,
+        "ch": 0,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe78101abccf1480fc477f9",
+        "kind": "socialTask",
+        "n": 43,
+        "ch": 1,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe78191870cd77c6efc9f62",
+        "kind": "socialHub",
+        "n": 43,
+        "ch": 1,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe7811e9984e90229322b82",
+        "kind": "socialHub",
+        "n": 43,
+        "ch": 2,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe78180bcb7c2dd53f9069f",
+        "kind": "socialTask",
+        "n": 43,
+        "ch": 2,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe78141bf4aceaa02f2683f",
+        "kind": "socialTask",
+        "n": 43,
+        "ch": 3,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781769511d80f8542a672",
+        "kind": "socialHub",
+        "n": 43,
+        "ch": 3,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe7815ebd96f097e8278f20",
+        "kind": "socialHub",
+        "n": 44,
+        "ch": 0,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781eb8ef6ceccff725454",
+        "kind": "socialTask",
+        "n": 44,
+        "ch": 0,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe7815bb315f73e845fc682",
+        "kind": "socialHub",
+        "n": 44,
+        "ch": 1,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe78123bdb4fe16f3c45e20",
+        "kind": "socialTask",
+        "n": 44,
+        "ch": 1,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781b18c33fc202130f9e1",
+        "kind": "socialHub",
+        "n": 44,
+        "ch": 2,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe7813a8049e57f3827a57a",
+        "kind": "socialTask",
+        "n": 44,
+        "ch": 3,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781ce9d43c7906356a05e",
+        "kind": "socialTask",
+        "n": 44,
+        "ch": 2,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe78155b7eccc44b1e127c4",
+        "kind": "socialHub",
+        "n": 44,
+        "ch": 3,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe78153b85fd617dfb92e3a",
+        "kind": "socialHub",
+        "n": 45,
+        "ch": 1,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781c18090e605c943d96a",
+        "kind": "socialTask",
+        "n": 45,
+        "ch": 0,
+        "verified": true,
+        "actualState": "En curso",
+        "type": "Estatico",
+        "channel": "Social Media",
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781178502fc82b0f070da",
+        "kind": "socialTask",
+        "n": 45,
+        "ch": 1,
+        "verified": true,
+        "actualState": "En curso",
+        "type": "Estatico",
+        "channel": "Social Media",
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781cfa3a0c49c16759831",
+        "kind": "socialHub",
+        "n": 45,
+        "ch": 0,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe78120be82e8d78e06f40a",
+        "kind": "socialHub",
+        "n": 45,
+        "ch": 3,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe7819a9b93e45da7dddff8",
+        "kind": "socialTask",
+        "n": 45,
+        "ch": 2,
+        "verified": true,
+        "actualState": "En curso",
+        "type": "Video",
+        "channel": "Social Media",
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe7814db027e5206b6d45e8",
+        "kind": "socialTask",
+        "n": 46,
+        "ch": 0,
+        "verified": true,
+        "actualState": "En curso",
+        "type": "Estatico",
+        "channel": "Social Media",
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781d8a84fd7b5c23383b2",
+        "kind": "socialHub",
+        "n": 46,
+        "ch": 0,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe7814cb84ad0fdcb820e99",
+        "kind": "socialTask",
+        "n": 46,
+        "ch": 1,
+        "verified": true,
+        "actualState": "En curso",
+        "type": "Estatico",
+        "channel": "Social Media",
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781e68855f39f1061dfe8",
+        "kind": "socialHub",
+        "n": 46,
+        "ch": 1,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe78108b609dd8714eaab1a",
+        "kind": "socialTask",
+        "n": 45,
+        "ch": 3,
+        "verified": true,
+        "actualState": "En curso",
+        "type": "Estatico",
+        "channel": "Social Media",
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe78149a69deb7c519d0002",
+        "kind": "socialHub",
+        "n": 45,
+        "ch": 2,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe7819abd6bfd89812bff9e",
+        "kind": "socialTask",
+        "n": 46,
+        "ch": 2,
+        "verified": true,
+        "actualState": "En curso",
+        "type": "Video",
+        "channel": "Social Media",
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe78107b57ddf5bdd6b65c5",
+        "kind": "socialHub",
+        "n": 46,
+        "ch": 2,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe7818b9c58dffac8f68b67",
+        "kind": "socialTask",
+        "n": 46,
+        "ch": 3,
+        "verified": true,
+        "actualState": "En curso",
+        "type": "Estatico",
+        "channel": "Social Media",
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781b49920c0e9bbd74b39",
+        "kind": "socialHub",
+        "n": 46,
+        "ch": 3,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe78195be8ec34a2511fb6e",
+        "kind": "socialHub",
+        "n": 47,
+        "ch": 0,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781e6a4a4f740351c1048",
+        "kind": "socialTask",
+        "n": 47,
+        "ch": 0,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe7813b9259f921279c0935",
+        "kind": "socialTask",
+        "n": 47,
+        "ch": 1,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe7817bba34e0564a6f5a2c",
+        "kind": "socialHub",
+        "n": 47,
+        "ch": 1,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe7819d9413d11dc08198b0",
+        "kind": "socialTask",
+        "n": 47,
+        "ch": 3,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe78186a017df97e5ae6c52",
+        "kind": "socialHub",
+        "n": 47,
+        "ch": 3,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7814bb2e1f12272310d3a",
+        "kind": "socialTask",
+        "n": 51,
+        "ch": 0,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe7813f8f97ccfced728960",
+        "kind": "socialTask",
+        "n": 47,
+        "ch": 2,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781acb838f9902ac7eb31",
+        "kind": "socialHub",
+        "n": 47,
+        "ch": 2,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781bea4c0e645ea54bd7a",
+        "kind": "socialHub",
+        "n": 51,
+        "ch": 1,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe78132bde7e1a1cd596e75",
+        "kind": "socialHub",
+        "n": 51,
+        "ch": 0,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781678f0cfc781f5ccf46",
+        "kind": "socialTask",
+        "n": 51,
+        "ch": 1,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe78108ad42fdb47be1baa7",
+        "kind": "socialTask",
+        "n": 51,
+        "ch": 2,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe78121be20e766ccb9e9dc",
+        "kind": "socialHub",
+        "n": 51,
+        "ch": 3,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781dfb3def2ba723e7d32",
+        "kind": "socialHub",
+        "n": 51,
+        "ch": 2,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe78101b167d6baa517c904",
+        "kind": "socialTask",
+        "n": 52,
+        "ch": 0,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7810b80d8f5f3dcac3e22",
+        "kind": "socialTask",
+        "n": 51,
+        "ch": 3,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781009de6e733f06df42b",
+        "kind": "socialHub",
+        "n": 52,
+        "ch": 0,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe78111a88cf09cf78ad95c",
+        "kind": "socialTask",
+        "n": 52,
+        "ch": 1,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe78146b385deeb3b1a5480",
+        "kind": "socialHub",
+        "n": 52,
+        "ch": 1,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7814f8b47c7e7d9134616",
+        "kind": "socialTask",
+        "n": 52,
+        "ch": 2,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781e9bc9cc3329506cfb9",
+        "kind": "socialHub",
+        "n": 52,
+        "ch": 2,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe78118aabac954ce15965c",
+        "kind": "socialTask",
+        "n": 52,
+        "ch": 3,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7816f8223fe8ef362311d",
+        "kind": "socialHub",
+        "n": 52,
+        "ch": 3,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe78114ae54d0af5d179b06",
+        "kind": "socialTask",
+        "n": 53,
+        "ch": 0,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781b99df7cc15ff95fd04",
+        "kind": "socialHub",
+        "n": 53,
+        "ch": 0,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7817ea13acf3dca5f2ae4",
+        "kind": "socialTask",
+        "n": 53,
+        "ch": 1,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7810c9f0cfbd25e37eef2",
+        "kind": "socialHub",
+        "n": 53,
+        "ch": 1,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7817896fbee9c2f890bde",
+        "kind": "socialTask",
+        "n": 53,
+        "ch": 2,
+        "verified": true,
+        "actualState": "Sin empezar",
+        "type": "Video",
+        "channel": "Social Media",
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe78128bce8fce6f7accabe",
+        "kind": "socialHub",
+        "n": 53,
+        "ch": 2,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781889ff8c59c33baa3d2",
+        "kind": "socialTask",
+        "n": 53,
+        "ch": 3,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781a0872feae19af5fa60",
+        "kind": "socialHub",
+        "n": 53,
+        "ch": 3,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe7818997aaccbd6faa70d4",
+        "kind": "socialTask",
+        "n": 48,
+        "ch": 0,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781c0ac35fca0e67d079a",
+        "kind": "socialHub",
+        "n": 48,
+        "ch": 0,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781cbbd23cc0df8ab63a9",
+        "kind": "socialTask",
+        "n": 48,
+        "ch": 1,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781ff9c48e94d7997a4fa",
+        "kind": "socialHub",
+        "n": 48,
+        "ch": 1,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781f08ca5cbb192d0acd7",
+        "kind": "socialTask",
+        "n": 48,
+        "ch": 2,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781af8b3dcdc4e0975ac8",
+        "kind": "socialHub",
+        "n": 48,
+        "ch": 2,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781d4adf0c164470893f0",
+        "kind": "socialTask",
+        "n": 48,
+        "ch": 3,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781748197e8cce40a5fc4",
+        "kind": "socialHub",
+        "n": 48,
+        "ch": 3,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe7813788bbff16f1cb92fb",
+        "kind": "socialTask",
+        "n": 49,
+        "ch": 0,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe78184bd4dc6035598bcff",
+        "kind": "socialHub",
+        "n": 49,
+        "ch": 0,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe78142892cde3f696c4349",
+        "kind": "socialTask",
+        "n": 49,
+        "ch": 1,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781fa9b99e033cffde6ad",
+        "kind": "socialHub",
+        "n": 49,
+        "ch": 1,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781f292ceed83d4ab8f5d",
+        "kind": "socialTask",
+        "n": 49,
+        "ch": 2,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe78155bfc5f69e6d59cc9c",
+        "kind": "socialHub",
+        "n": 49,
+        "ch": 2,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe7819d8ad0d3d9f7ae7048",
+        "kind": "socialTask",
+        "n": 49,
+        "ch": 3,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781a38c7cd508268daedf",
+        "kind": "socialHub",
+        "n": 49,
+        "ch": 3,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe78154a78bfc2d53514d6d",
+        "kind": "socialTask",
+        "n": 50,
+        "ch": 0,
+        "verified": true,
+        "actualState": "Bloqueado",
+        "type": "Estatico",
+        "channel": "Social Media",
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe78184b938d2e562f35e0a",
+        "kind": "socialHub",
+        "n": 50,
+        "ch": 0,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe7814689a5de0278877bf1",
+        "kind": "socialTask",
+        "n": 50,
+        "ch": 1,
+        "verified": true,
+        "actualState": "Bloqueado",
+        "type": "Estatico",
+        "channel": "Social Media",
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe78116a279d53ac276ef05",
+        "kind": "socialHub",
+        "n": 50,
+        "ch": 1,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781a0bf47c4bca3dbb635",
+        "kind": "socialTask",
+        "n": 50,
+        "ch": 2,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe78199bd55df79b09ace29",
+        "kind": "socialHub",
+        "n": 50,
+        "ch": 2,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe7810caeb4d5dfccf1f68f",
+        "kind": "socialTask",
+        "n": 50,
+        "ch": 3,
+        "verified": true,
+        "actualState": "Bloqueado",
+        "type": "Estatico",
+        "channel": "Social Media",
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe78153a1a8f78e4574da72",
+        "kind": "socialHub",
+        "n": 50,
+        "ch": 3,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe78126b229c34b2d0ede85",
+        "kind": "socialTask",
+        "n": 54,
+        "ch": 0,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7813ebd01e486269d3674",
+        "kind": "socialHub",
+        "n": 54,
+        "ch": 0,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe78137b6c4fcfe2598a9c8",
+        "kind": "socialTask",
+        "n": 54,
+        "ch": 1,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781a4a42df5740710ac45",
+        "kind": "socialHub",
+        "n": 54,
+        "ch": 1,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7810ba1cfe704a7557044",
+        "kind": "socialTask",
+        "n": 54,
+        "ch": 2,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781a38565ef4d20d5e7e3",
+        "kind": "socialHub",
+        "n": 54,
+        "ch": 2,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7819797cbcd7105408783",
+        "kind": "socialTask",
+        "n": 54,
+        "ch": 3,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7819085b9d46c0d611042",
+        "kind": "socialHub",
+        "n": 54,
+        "ch": 3,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781928366f0a8b97ca254",
+        "kind": "socialTask",
+        "n": 55,
+        "ch": 0,
+        "verified": true,
+        "actualState": "Sin empezar",
+        "type": "Estatico",
+        "channel": "Social Media",
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7814fb428feff3320f706",
+        "kind": "socialHub",
+        "n": 55,
+        "ch": 0,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7813fa456efa5f990039c",
+        "kind": "socialTask",
+        "n": 55,
+        "ch": 1,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7818a9e3ff84b28e65af9",
+        "kind": "socialHub",
+        "n": 55,
+        "ch": 1,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7818daa64e4da98d130e3",
+        "kind": "socialTask",
+        "n": 55,
+        "ch": 2,
+        "verified": true,
+        "actualState": "Sin empezar",
+        "type": "Video",
+        "channel": "Social Media",
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7817f9ba7e79940ab70c5",
+        "kind": "socialHub",
+        "n": 55,
+        "ch": 2,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7814181b4ea0e7ca6cbd9",
+        "kind": "socialTask",
+        "n": 55,
+        "ch": 3,
+        "verified": true,
+        "actualState": "Sin empezar",
+        "type": "Estatico",
+        "channel": "Social Media",
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781c6b0b1e5e467648c46",
+        "kind": "socialHub",
+        "n": 55,
+        "ch": 3,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781258f77fed6ece5be9f",
+        "kind": "socialTask",
+        "n": 56,
+        "ch": 0,
+        "verified": true,
+        "actualState": "Sin empezar",
+        "type": "Estatico",
+        "channel": "Social Media",
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7819fb0d1def6c2efe8f4",
+        "kind": "socialHub",
+        "n": 56,
+        "ch": 0,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7811fa4ebf6d4cf35156a",
+        "kind": "socialTask",
+        "n": 56,
+        "ch": 1,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe78120b956e01b6a9d7f2c",
+        "kind": "socialHub",
+        "n": 56,
+        "ch": 1,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7816f8359c591c4ee3e9d",
+        "kind": "socialTask",
+        "n": 56,
+        "ch": 2,
+        "verified": true,
+        "actualState": "Sin empezar",
+        "type": "Video",
+        "channel": "Social Media",
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe78190899bf149b2e987ef",
+        "kind": "socialHub",
+        "n": 56,
+        "ch": 2,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781279304f6d7bf42646f",
+        "kind": "socialTask",
+        "n": 57,
+        "ch": 0,
+        "verified": true,
+        "actualState": "Sin empezar",
+        "type": "Estatico",
+        "channel": "Social Media",
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781859e57f76f7066678b",
+        "kind": "socialHub",
+        "n": 57,
+        "ch": 0,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe78168adadc4e3dcbf4fc0",
+        "kind": "socialTask",
+        "n": 56,
+        "ch": 3,
+        "verified": true,
+        "actualState": "Sin empezar",
+        "type": "Estatico",
+        "channel": "Social Media",
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781de9f49d187e6af547c",
+        "kind": "socialHub",
+        "n": 56,
+        "ch": 3,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7816f9e38fcdf8b5f3fde",
+        "kind": "socialTask",
+        "n": 57,
+        "ch": 1,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781e18a7bdeac97291f3b",
+        "kind": "socialHub",
+        "n": 57,
+        "ch": 1,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7817aa3e8fb8db4adb343",
+        "kind": "socialTask",
+        "n": 57,
+        "ch": 2,
+        "verified": true,
+        "actualState": "Sin empezar",
+        "type": "Video",
+        "channel": "Social Media",
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7814890dbc6c21fe4882f",
+        "kind": "socialHub",
+        "n": 57,
+        "ch": 2,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe78141a16ecf1837a46956",
+        "kind": "socialTask",
+        "n": 57,
+        "ch": 3,
+        "verified": true,
+        "actualState": "Sin empezar",
+        "type": "Estatico",
+        "channel": "Social Media",
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7819fa52ef0edaba87134",
+        "kind": "socialHub",
+        "n": 57,
+        "ch": 3,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781ec9c6aec908c73d71e",
+        "kind": "socialTask",
+        "n": 58,
+        "ch": 0,
+        "verified": true,
+        "actualState": "Sin empezar",
+        "type": "Estatico",
+        "channel": "Social Media",
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781458d7ccad564f76475",
+        "kind": "socialHub",
+        "n": 58,
+        "ch": 0,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781e3b1a6d63c471bbeca",
+        "kind": "socialTask",
+        "n": 58,
+        "ch": 1,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7813a8c4dcf49805a4cdd",
+        "kind": "socialHub",
+        "n": 58,
+        "ch": 1,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe78183b861fd422829754d",
+        "kind": "socialTask",
+        "n": 58,
+        "ch": 3,
+        "verified": true,
+        "actualState": "Sin empezar",
+        "type": "Estatico",
+        "channel": "Social Media",
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7816f97f2d7fadd9d2db6",
+        "kind": "socialHub",
+        "n": 58,
+        "ch": 3,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe78198a334eec1e02212d6",
+        "kind": "socialTask",
+        "n": 58,
+        "ch": 2,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781179072e781d089c0ae",
+        "kind": "socialHub",
+        "n": 58,
+        "ch": 2,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe7811fa638e75a34cc2f41",
+        "kind": "matrix-main",
+        "n": 43,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3a639c2fefe78079b5a4f1244919b756",
+        "kind": "matrix-article",
+        "n": 44,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3a639c2fefe7807eb976f719ef54b2e1",
+        "kind": "matrix-article",
+        "n": 43,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe7819981bfca4f0262f01d",
+        "kind": "matrix-main",
+        "n": 45,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3a639c2fefe78002a99fe5e2d9edbade",
+        "kind": "matrix-article",
+        "n": 45,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe78173af9bdf57041994e7",
+        "kind": "matrix-main",
+        "n": 44,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3a639c2fefe78056a4ccfc5f40d58539",
+        "kind": "matrix-article",
+        "n": 46,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3a639c2fefe780af896fe53d6c7e72c1",
+        "kind": "matrix-article",
+        "n": 47,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3a639c2fefe780cdbac7e101feb2eb7e",
+        "kind": "matrix-article",
+        "n": 48,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781a39179cb780234ca1c",
+        "kind": "matrix-main",
+        "n": 46,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781f9ba93c5e469c96e65",
+        "kind": "matrix-main",
+        "n": 47,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781ad8bf0d4aad28e782b",
+        "kind": "matrix-main",
+        "n": 48,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3a639c2fefe7804d97ebdda97455267b",
+        "kind": "matrix-article",
+        "n": 50,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781adbe63ec0cb760ad47",
+        "kind": "matrix-main",
+        "n": 49,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe7810e9438dea5ad611ada",
+        "kind": "matrix-main",
+        "n": 50,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3a639c2fefe7800bad66fedbc7630de0",
+        "kind": "matrix-article",
+        "n": 52,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781539f65fc589de7adaf",
+        "kind": "matrix-main",
+        "n": 51,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3a639c2fefe7800981c0de042a91a6c6",
+        "kind": "matrix-article",
+        "n": 49,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3a639c2fefe7804db40ad5570d3f31ec",
+        "kind": "matrix-article",
+        "n": 51,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3a639c2fefe780ecb1dbd5cace1008d3",
+        "kind": "matrix-article",
+        "n": 53,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781d396d0eb7a6d42b5b4",
+        "kind": "matrix-main",
+        "n": 52,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3a639c2fefe7806ea576ee066ac16074",
+        "kind": "matrix-article",
+        "n": 54,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781199aa6d76331f07388",
+        "kind": "matrix-main",
+        "n": 53,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781bfba0bdfe87f493a5c",
+        "kind": "matrix-main",
+        "n": 54,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3a639c2fefe780918df4c5c4194db8b2",
+        "kind": "matrix-article",
+        "n": 55,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781b2b91cf9d6f57ae2c9",
+        "kind": "matrix-main",
+        "n": 55,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7812aa606d65b0980f79b",
+        "kind": "matrix-main",
+        "n": 56,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3a639c2fefe78092a6b3d3f5ae684d3e",
+        "kind": "matrix-article",
+        "n": 56,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781dba4e9edc6f2b888d8",
+        "kind": "matrix-main",
+        "n": 57,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781129694d3ccfc652d50",
+        "kind": "matrix-main",
+        "n": 58,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3a639c2fefe7809b9d7dcc1152ec2b1e",
+        "kind": "matrix-article",
+        "n": 57,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3a639c2fefe780e58a8de05d62cc7133",
+        "kind": "matrix-article",
+        "n": 58,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe78120a69ac2156b348511",
+        "kind": "matrix-article",
+        "n": 59,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781bdb0e5f1e551ae7a68",
+        "kind": "matrix-main",
+        "n": 59,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781fcb0afd33a53c589a4",
+        "kind": "n52Banner",
+        "n": 52,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781679dcaf57e2c6fcce1",
+        "kind": "n52Banner",
+        "n": 52,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7810c8b08d30cb733b50d",
+        "kind": "n52Banner",
+        "n": 52,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe7819a8c19f603cfa7df77",
+        "kind": "n2",
+        "n": 43,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7819391bfdaa09f475ba4",
+        "kind": "n52Banner",
+        "n": 52,
+        "verified": true,
+        "actualState": "Cancelada",
+        "type": null,
+        "channel": null,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe7816bbba5e09e77b2ae20",
+        "kind": "n2",
+        "n": 44,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe7811e9529d4342fd28324",
+        "kind": "n2",
+        "n": 45,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781d9b3edec5c04523795",
+        "kind": "n2",
+        "n": 47,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe78118b037c1541a34f8c7",
+        "kind": "n2",
+        "n": 51,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe7815cbc78cbc7444a39aa",
+        "kind": "n2",
+        "n": 46,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781198e6bdb1abd48495d",
+        "kind": "n2",
+        "n": 48,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7810c8b08d30cb733b50d",
+        "kind": "n2",
+        "n": 52,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7812f9ad5c334f9e9e173",
+        "kind": "n2",
+        "n": 53,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781dbbe3ed2166e0be8e4",
+        "kind": "n2",
+        "n": 54,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe78154b2cde7974ab15e4c",
+        "kind": "n2",
+        "n": 49,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781878d76fd9c0185f10b",
+        "kind": "n2",
+        "n": 55,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3c839c2fefe781729046d9df0377b941",
+        "kind": "n2",
+        "n": 50,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe7818baf8ce1758a2eb676",
+        "kind": "n2",
+        "n": 57,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "3c839c2fefe78166b1ccef16538c46c6",
+        "kind": "project",
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781e6adc9c869619be552",
+        "kind": "n2",
+        "n": 58,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "https://app.notion.com/p/3d039c2fefe781458e91ecacbef5898f",
+        "kind": "n2",
+        "n": 56,
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "3c839c2fefe78160992fd31d5b96feb0",
+        "kind": "project",
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "f58f34efd1e04043b9982b932a034464",
+        "kind": "playbook",
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "3b239c2fefe780ceb71dff4f5bed4646",
+        "kind": "playbook",
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "3d039c2f-efe7-8137-8aee-dc168fc59143",
+        "kind": "task",
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "3d039c2f-efe7-81af-8ed2-df07b741ad08",
+        "kind": "task",
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "3d039c2f-efe7-8123-94d4-ecbd15750732",
+        "kind": "task",
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "3d039c2f-efe7-810e-83a1-d88ec84e2ce0",
+        "kind": "task",
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "3d039c2f-efe7-81dc-ab05-cd771b6ec977",
+        "kind": "task",
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "3d039c2f-efe7-81bd-a8b5-f0209ebdafa9",
+        "kind": "task",
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "3d039c2f-efe7-818e-96db-f15728f41ac9",
+        "kind": "hub",
+        "verified": true,
+        "errors": []
+      },
+      {
+        "id": "3d039c2f-efe7-81d7-929f-d113d212369f",
+        "kind": "hub",
+        "verified": true,
+        "errors": []
+      }
+    ],
+    "retry": {
+      "n": 48,
+      "ch": 1,
+      "initial": "first note insert rejected; fresh fetch showed neither task nor hub note saved",
+      "recovery": "retried only missing steps; both pages subsequently read back with preserved originals",
+      "verified": true
+    }
+  },
+  "actualCounts": {
+    "November": {
+      "taskRows": 80,
+      "cancelled": 27,
+      "staticRows": 41,
+      "videoRows": 3,
+      "blogRows": 33,
+      "socialRows": 11,
+      "unclassifiedActive": 9,
+      "individualGraphics": 50,
+      "shortVideos": 3,
+      "storyAdditionalScreensBeyondTaskRows": 6,
+      "photoAdditionalImagesBeyondTaskRows": 3
+    },
+    "December": {
+      "taskRows": 73,
+      "cancelled": 18,
+      "staticRows": 44,
+      "videoRows": 3,
+      "blogRows": 33,
+      "socialRows": 14,
+      "unclassifiedActive": 8,
+      "individualGraphics": 50,
+      "shortVideos": 3,
+      "storyAdditionalScreensBeyondTaskRows": 3,
+      "photoAdditionalImagesBeyondTaskRows": 3
+    }
+  },
+  "quantityEvidence": {
+    "stories": [
+      {
+        "n": 45,
+        "task": "https://app.notion.com/p/3c839c2fefe781178502fc82b0f070da",
+        "individualGraphics": 4,
+        "screenIds": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "n": 46,
+        "task": "https://app.notion.com/p/3c839c2fefe7814cb84ad0fdcb820e99",
+        "individualGraphics": 4,
+        "screenIds": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      {
+        "n": 50,
+        "task": "https://app.notion.com/p/3c839c2fefe7814689a5de0278877bf1",
+        "individualGraphics": 4,
+        "screenIds": [
+          1,
+          2,
+          3,
+          4
+        ]
+      }
+    ],
+    "photos": [
+      {
+        "id": "3d039c2fefe781cd93d0c284e4fa6edc",
+        "individualGraphics": 4
+      },
+      {
+        "id": "3d039c2fefe7814eb50cea68bb70686a",
+        "individualGraphics": 4
+      }
+    ]
+  },
+  "liveAggregateRows": [
+    {
+      "Proyecto": "[\"https://app.notion.com/3c839c2fefe78160992fd31d5b96feb0\"]",
+      "Estado": "Bloqueado",
+      "Tipo de pieza": null,
+      "Canal de pieza": null,
+      "n": 1
+    },
+    {
+      "Proyecto": "[\"https://app.notion.com/3c839c2fefe78160992fd31d5b96feb0\"]",
+      "Estado": "Bloqueado",
+      "Tipo de pieza": "Estatico",
+      "Canal de pieza": "Blog",
+      "n": 4
+    },
+    {
+      "Proyecto": "[\"https://app.notion.com/3c839c2fefe78160992fd31d5b96feb0\"]",
+      "Estado": "Bloqueado",
+      "Tipo de pieza": "Estatico",
+      "Canal de pieza": "Social Media",
+      "n": 3
+    },
+    {
+      "Proyecto": "[\"https://app.notion.com/3c839c2fefe78160992fd31d5b96feb0\"]",
+      "Estado": "Cancelada",
+      "Tipo de pieza": null,
+      "Canal de pieza": null,
+      "n": 18
+    },
+    {
+      "Proyecto": "[\"https://app.notion.com/3c839c2fefe78160992fd31d5b96feb0\"]",
+      "Estado": "Listo para diseñar",
+      "Tipo de pieza": null,
+      "Canal de pieza": null,
+      "n": 3
+    },
+    {
+      "Proyecto": "[\"https://app.notion.com/3c839c2fefe78160992fd31d5b96feb0\"]",
+      "Estado": "Listo para diseñar",
+      "Tipo de pieza": "Estatico",
+      "Canal de pieza": "Blog",
+      "n": 12
+    },
+    {
+      "Proyecto": "[\"https://app.notion.com/3c839c2fefe78160992fd31d5b96feb0\"]",
+      "Estado": "Listo para revisión",
+      "Tipo de pieza": null,
+      "Canal de pieza": null,
+      "n": 4
+    },
+    {
+      "Proyecto": "[\"https://app.notion.com/3c839c2fefe78160992fd31d5b96feb0\"]",
+      "Estado": "Sin empezar",
+      "Tipo de pieza": "Estatico",
+      "Canal de pieza": "Blog",
+      "n": 17
+    },
+    {
+      "Proyecto": "[\"https://app.notion.com/3c839c2fefe78160992fd31d5b96feb0\"]",
+      "Estado": "Sin empezar",
+      "Tipo de pieza": "Estatico",
+      "Canal de pieza": "Social Media",
+      "n": 8
+    },
+    {
+      "Proyecto": "[\"https://app.notion.com/3c839c2fefe78160992fd31d5b96feb0\"]",
+      "Estado": "Sin empezar",
+      "Tipo de pieza": "Video",
+      "Canal de pieza": "Social Media",
+      "n": 3
+    },
+    {
+      "Proyecto": "[\"https://app.notion.com/3c839c2fefe78166b1ccef16538c46c6\"]",
+      "Estado": "Bloqueado",
+      "Tipo de pieza": null,
+      "Canal de pieza": null,
+      "n": 1
+    },
+    {
+      "Proyecto": "[\"https://app.notion.com/3c839c2fefe78166b1ccef16538c46c6\"]",
+      "Estado": "Cancelada",
+      "Tipo de pieza": null,
+      "Canal de pieza": null,
+      "n": 27
+    },
+    {
+      "Proyecto": "[\"https://app.notion.com/3c839c2fefe78166b1ccef16538c46c6\"]",
+      "Estado": "En curso",
+      "Tipo de pieza": null,
+      "Canal de pieza": null,
+      "n": 2
+    },
+    {
+      "Proyecto": "[\"https://app.notion.com/3c839c2fefe78166b1ccef16538c46c6\"]",
+      "Estado": "En curso",
+      "Tipo de pieza": "Estatico",
+      "Canal de pieza": "Blog",
+      "n": 8
+    },
+    {
+      "Proyecto": "[\"https://app.notion.com/3c839c2fefe78166b1ccef16538c46c6\"]",
+      "Estado": "En curso",
+      "Tipo de pieza": "Estatico",
+      "Canal de pieza": "Social Media",
+      "n": 6
+    },
+    {
+      "Proyecto": "[\"https://app.notion.com/3c839c2fefe78166b1ccef16538c46c6\"]",
+      "Estado": "En curso",
+      "Tipo de pieza": "Video",
+      "Canal de pieza": "Social Media",
+      "n": 2
+    },
+    {
+      "Proyecto": "[\"https://app.notion.com/3c839c2fefe78166b1ccef16538c46c6\"]",
+      "Estado": "Listo para diseñar",
+      "Tipo de pieza": null,
+      "Canal de pieza": null,
+      "n": 3
+    },
+    {
+      "Proyecto": "[\"https://app.notion.com/3c839c2fefe78166b1ccef16538c46c6\"]",
+      "Estado": "Listo para diseñar",
+      "Tipo de pieza": "Estatico",
+      "Canal de pieza": "Blog",
+      "n": 12
+    },
+    {
+      "Proyecto": "[\"https://app.notion.com/3c839c2fefe78166b1ccef16538c46c6\"]",
+      "Estado": "Listo para revisión",
+      "Tipo de pieza": null,
+      "Canal de pieza": null,
+      "n": 3
+    },
+    {
+      "Proyecto": "[\"https://app.notion.com/3c839c2fefe78166b1ccef16538c46c6\"]",
+      "Estado": "Sin empezar",
+      "Tipo de pieza": "Estatico",
+      "Canal de pieza": "Blog",
+      "n": 13
+    },
+    {
+      "Proyecto": "[\"https://app.notion.com/3c839c2fefe78166b1ccef16538c46c6\"]",
+      "Estado": "Sin empezar",
+      "Tipo de pieza": "Estatico",
+      "Canal de pieza": "Social Media",
+      "n": 2
+    },
+    {
+      "Proyecto": "[\"https://app.notion.com/3c839c2fefe78166b1ccef16538c46c6\"]",
+      "Estado": "Sin empezar",
+      "Tipo de pieza": "Video",
+      "Canal de pieza": "Social Media",
+      "n": 1
+    }
+  ]
+}

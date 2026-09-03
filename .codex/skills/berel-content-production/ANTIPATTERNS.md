@@ -4,6 +4,22 @@
 > documentados en su propia wiki. El resto son reglas que el cliente marcó en revisión, algunas más
 > de una vez.
 
+## Tutoriales: regresiones detectadas el 2026-09-03
+
+- **Confundir cuatro encabezados con un procedimiento completo.** Cada operación necesaria debe
+  tener fuente y ubicación; mezcla, dilución y esperas no desaparecen por el corte del CMS. (→ 13)
+- **Generalizar campos vacíos del CMS a todas las fichas.** Leer Wiki y PDF de la variante antes de
+  declarar inexistencia o bloqueo permanente. Tacto no equivale a repintado, curado o uso. (→ 12 §3)
+- **Sustituir una marca y conservar los datos anteriores.** Revisar acabado, soporte, aplicación,
+  cifras, tablas, FAQ, ALT, PNG, banners y pares sociales; una referencia a otro tutorial no se
+  cambia a ciegas. (→ 13)
+- **Reescribir ampliamente una pieza anterior durante una corrección puntual.** Preservar texto,
+  metadatos, colores y assets no afectados; auditoría y permiso de edición son distintos. (→ 13)
+- **Conservar en la revisión vigente una receta desmentida porque está en el V1.** El original queda
+  como historial; corregir o retirar del cuerpo vigente el claim no sustentado. (→ 12, 13)
+- **Dar por corregido el arte o el paquete social al guardar el artículo.** Leer tareas y subítems,
+  contrastar assets; declarar pendientes y bloquear distribución cuando falte conciliación. (→ 13)
+
 ## Verificación y honestidad del dato
 
 - 🔴 **Auditar sobre el texto rescatado en vez de la URL en vivo.** *Caso real:* se afirmó que un
@@ -26,14 +42,10 @@
   propios bloques de supuestos suelen decirlo, y se leen por encima—. **Todo dato que vaya entre
   comillas se confirma contra la ficha vigente antes de escribirlo**; si el brief marca un supuesto,
   es una tarea, no una nota al pie. (→ `12`, `02`)
-- 🔴 **Inventar un dato porque el hueco es incómodo.** *Caso real:* dos artículos de septiembre 2026
-  necesitaban el tiempo de espera entre manos y **ese dato no existe en ninguna ficha de Berel**: el
-  campo viene vacío en el CMS en todos los productos revisados. Era tentador poner "espera 4 horas"
-  porque suena razonable y nadie lo notaría. Un número inventado en una guía técnica de un fabricante
-  es exactamente el tipo de error que el lector **sí** comprueba, y encima lo hereda cada pieza
-  siguiente del cluster. **Publica el dato que sí existe** —el secado libre al tacto—, explica por
-  qué no es lo mismo, da criterios prácticos que no dependan del reloj y **declara el hueco en el
-  callout de pendientes**. (→ `12`, `03`)
+- 🔴 **Inventar un dato porque el hueco es incómodo.** Un intervalo no se deduce del tacto ni de
+  otra variante. Tampoco se declara inexistente porque un campo del CMS esté vacío: contrastar
+  Wiki, página y PDF oficial. Si sigue sin respaldo, declarar el pendiente y su efecto en el
+  procedimiento; no sustituirlo por un criterio práctico igualmente inventado. (→ `12` §3, `13`)
 - **Prometer lo que el cliente no respaldó** — ahorros, porcentajes de eficiencia, garantías. Sin
   documento, no se escribe. (→ `01`, `09`)
 - **Rellenar con supuestos una fuente vacía de la wiki.** Hay **siete páginas vacías** y varias son
@@ -43,7 +55,21 @@
 - **Omitir un pendiente.** *Un pendiente declarado es gestionable; uno omitido se publica como
   error.* (→ `03`)
 
+## Distribución selectiva
+
+- Crear cuatro derivados por costumbre, o considerar faltante un canal No aplica. (→ 15)
+- Excluir Pinterest por palabra temática, o forzar color en una Story técnica sin encaje. (→ 15)
+- Confundir el mes de producción con la fecha de publicación de una campaña. (→ 15)
+- Cancelar una tarea y asumir que dejó de sumar sin revisar etiquetas; retirar etiquetas de
+  una entrega real para cuadrar el cupo; alterar fórmulas o dividir tareas sin permiso. (→ 15)
+- Presentar reservas etiquetadas como imágenes/videos entregados, o inventar el cupo mensual. (→ 15)
+
 ## Orden de producción
+
+- **Numerar según qué artículo se trabajó primero.** Reservar el bloque mensual completo,
+  incluidos slots nuevos. No intercalar noviembre con diciembre. (→ 16)
+- **Corregir solo el título o hacer reemplazos encadenados.** Usar mapa por ID y actualizar
+  dependencias; no tocar Banner N1–N4 ni renombrar archivos/URLs históricos. (→ 16)
 
 - 🔴 **Definir un banner antes de que el artículo esté escrito.** La escena del hero, el dato de la
   infografía, la comparativa y el cierre **salen del texto**. Un banner creado antes es un
@@ -107,7 +133,7 @@
 - **Mencionar series de producto en el cuerpo** (*Serie 800*, *Serie 2300*) — también en tablas,
   listas de materiales y CTA. (→ `09`)
 - **Usar "sin plomo" como argumento de venta.** Toda la categoría lo es hoy; el argumento es la
-  **nueva garantía de 10 años**. (→ `09`)
+  una prestación verificada de la variante; ninguna garantía de años es universal. (→ `09`, `12`)
 - **Incluir precios por región.** Nunca. (→ `09`)
 - **Decir "estancias" o "zonas"** en vez de **"espacios"**. (→ `09`)
 - **Proponer espacios que no existen** en las categorías de la sección Inspiración. (→ `09`)

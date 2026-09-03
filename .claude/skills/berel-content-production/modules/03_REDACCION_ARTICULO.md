@@ -174,12 +174,12 @@ Del estándar editorial de la marca (→ [`04_VOZ_Y_TONO_BEREL.md`](04_VOZ_Y_TON
   `twitter:description`.
 - **Jerarquía limpia:** un solo H1, H2 por sección, H3 por subtema. **Nunca saltos H1→H4** ni
   encabezados vacíos del CMS.
-- **Extensión:** 900-1.200+ palabras de **cuerpo útil**, no relleno. ⚠️ **Ese rango es un piso
-  histórico, no el tamaño real de una pieza con fan-out.** Cuando el brief pide 12 H2 con su cápsula
-  autocontenida, la estructura sola ya empuja el cuerpo a **1.800-3.000 palabras** — así salieron las
-  tres de septiembre 2026 (N31 ~3.000, N32 ~2.240, N33 ~1.800). **Manda el piso que declare el
-  brief**, y si el brief no declara ninguno, manda la estructura: recortar a 1.200 una pieza de 12 H2
-  significa dejar cápsulas cojas, que es justo lo que rompe la recuperación por pasajes.
+- **Extensión contractual comunicada por el operador (2026-09-03): 3.000–5.000 palabras por
+  artículo.** Sustituye el piso histórico de 900–1.200+ como aceptación del plan contratado.
+  Contar cuerpo útil de la versión vigente, sin sumar V1 + híbrido, historia, metadata ni fichas.
+  No rellenar ni inventar datos para llegar al número. Si un tutorial/template o brief exige otra
+  longitud, documentar y obtener excepción explícita; no presumir cumplimiento ni reescribir
+  piezas previas fuera del alcance autorizado. La auditoría de longitud del lote sigue separada.
 - **AEO:** definiciones canónicas "X es Y" en la primera frase de cada sección · FAQ con respuesta
   directa en la primera línea · tablas comparativas y listas reales (los LLM las extraen con
   facilidad) · datos verificables y citables.
@@ -202,7 +202,7 @@ piezas evergreen **evita frases dependientes del momento** ("paleta vigente", "t
   CTA. El cierre **retoma la escena de apertura**: el arco cierra el círculo.
 - **Respuesta directa extractable** de **40 a 55 palabras** justo después del gancho. Es lo que cita
   un motor de respuesta.
-- **Longitud:** 900–1.200+ palabras según la guía editorial.
+- **Longitud:** 3.000–5.000 palabras según contrato vigente; excepción explícita si corresponde.
 - **FAQ de 4 a 6 preguntas**, extractables.
 - **CTA con tres acciones**, no un enlace suelto: calcular o explorar · dónde comprar · lectura
   relacionada.

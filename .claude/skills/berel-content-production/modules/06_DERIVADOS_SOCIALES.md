@@ -66,13 +66,14 @@ emojis · hashtags y keywords · CTA · surface del contenido.
 un proyecto, el contenido vive meses o años y es una de las mejores fuentes de tráfico evergreen al
 blog. Por eso su registro es keyword-first y no poético.
 
-## El set del ciclo mensual: 4 derivados por artículo
+## Catálogo del ciclo mensual: cuatro opciones, selección por artículo
 
 Se identifican en la base `Tareas` filtrando por la relación `Artículo (Content Hub)`. Naming:
 `Social N## - Derivado: [Canal] — [Tema]`. **No se toca la tarea principal del artículo.**
 
-Hay artículos con menos de cuatro: **confirmar con el usuario cuáles existen antes de redactar y
-avisar si falta alguno del set.**
+Antes de crear tareas, aplicar [distribución selectiva](15_DISTRIBUCION_SELECTIVA.md).
+Cada artículo lleva cuatro decisiones, pero solo de cero a cuatro derivados. Un canal No aplica
+no es un faltante; Pendiente conserva su motivo y condición de salida.
 
 | Canal                    | Secciones del cuerpo de la tarea                                                                                                                    | Claves del registro                                                                                                                                                                                           |
 | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -83,12 +84,18 @@ avisar si falta alguno del set.**
 
 Cada tarea lleva un **callout de cabecera** que enlaza al artículo y cita la Modulación por canal.
 
+**Desde su creación**, todas las tareas sociales llevan `Canal de pieza = Social Media`.
+`Tipo de pieza = Estatico` para Facebook, Pinterest y Stories de imágenes; `Video` para
+Reel/TikTok/Short o una Story efectivamente animada. Guardar estas etiquetas como propiedades
+de **Tareas**, también en reservas bloqueadas, no solo en el cuerpo ni en el subítem del Hub.
+No usar el campo `Tipo` del Content Hub como sustituto. Matriz y excepciones: [módulo 07](07_SISTEMA_NOTION.md).
+
 Además, en la misma edición:
 
 - Llenar la propiedad `Resumen` con 1-2 líneas: **formato + eje del copy + destino**. Es lo que ve
   el equipo en las vistas de la base.
-- El `Estado` de la tarea **se queda en `Sin empezar`**: el copy es el brief; la tarea avanza cuando
-  diseño produce la pieza.
+- El `Estado` de una tarea nueva seleccionada es **`Sin empezar`**: el copy es el brief.
+  Conservar estados reales de existentes; bloqueos y exclusiones siguen el módulo 15.
 
 → Plantillas por canal: [`../templates/copy-derivado-social.md`](../templates/copy-derivado-social.md)
 
@@ -100,16 +107,15 @@ divergencia que arrastraban los dos playbooks de la wiki.
 | Fuente                          | Qué decía                                                    | Estado                |
 | ------------------------------- | ------------------------------------------------------------ | --------------------- |
 | **Playbook Derivados Sociales** | canal 2 = **Instagram Story**, secuencia de 3-4 stories 9:16 | ✅ **es lo que rige** |
-| **Playbook Producción**, Fase 8 | canal 2 = "Instagram Post estático", `Diseño gráfico`        | ❌ **desactualizado** |
+| **Playbook Producción**, Fase 8 | canal 2 corregido a Instagram Story el 2026-09-03 | Sincronizado con decisión vigente |
 
-🔴 **Queda un arreglo pendiente en el origen:** la Fase 8 del **Playbook Producción** en Notion
-sigue nombrando la tarea como _"Instagram Post estático"_. Hay que corregirla ahí — el playbook
-crea las tareas, así que mientras diga eso, el siguiente ciclo vuelve a nacer mal.
+La Fase 8 del Playbook Producción en Notion fue corregida a **Instagram Story** el 2026-09-03,
+junto con el paso de cuatro derivados obligatorios a selección por artículo.
 
 **Consecuencia sobre el master 🔁 que conviene no perder de vista:** la variante **4:5** de la Spec
 **no desaparece** — deja de servir a Instagram y **pasa a ser la de Facebook**, que publica en ese
-formato. La variante de Instagram es la **9:16**. Las cuatro adaptaciones siguen siendo las mismas;
-lo que cambió es **quién consume cada una**.
+formato. La variante de Instagram es la **9:16**. El catálogo de cuatro adaptaciones se mantiene;
+se producen solo las seleccionadas y cambia **quién consume cada una**.
 
 ## Reglas de voz no negociables (valen para todos los canales)
 
@@ -169,8 +175,9 @@ existe antes de crearla, el depósito correcto es de dos fases:
    completo del canal.
 3. Crear el subítem con esa cadena final y la relación `Tareas`.
 4. Reemplazar el cuerpo de la tarea con **la misma cadena**, sin regenerar el copy.
-5. Hacer `fetch` de ambos registros y comparar el contenido completo. El cierre es `4A/4A` pares
-   iguales para `A` artículos; revisar una muestra no prueba el lote.
+5. Hacer `fetch` de ambos registros y comparar el contenido completo. El cierre es `S/S` pares
+   iguales para `S` derivados seleccionados; verificar también cada par histórico modificado.
+   Revisar una muestra no prueba el lote.
 
 Una respuesta `success`, los conteos correctos o la relación inversa completa no prueban igualdad de
 contenido. Notion puede normalizar bloques o una automatización puede editar propiedades después de
@@ -193,15 +200,16 @@ retire con evidencia.
 
 ## Checklist de cierre por artículo
 
-- [ ] Derivados identificados y confirmados con el usuario (avisado si falta algún canal del set)
+- [ ] Cuatro opciones evaluadas por artículo; selección, exclusiones y pendientes justificados
 - [ ] Copy redactado en el cuerpo de cada tarea, con callout de cabecera y notas de voz aplicadas
+- [ ] Tipo y canal de cada tarea social verificados por lectura fresca; principales editoriales excluidas
 - [ ] Propiedad `Resumen` llena en cada tarea
 - [ ] Regla del posesivo aplicada ("nuestro blog") y sin claims sin respaldo del Lab
 - [ ] Enlaces verificados: artículo real o canónica planificada con gate explícito de no programación; nunca `/search?q=`
 - [ ] Producto nombrado una sola vez por pieza
 - [ ] Un subítem por derivado en el Content Hub, con relación a su tarea y copy volcado
 - [ ] Segunda lectura confirma que el cuerpo del subítem coincide exactamente con el de su tarea social
-- [ ] La comparación cubrió los `4A` pares del lote, no solo una muestra
+- [ ] La comparación cubrió todos los pares seleccionados y los históricos modificados
 - [ ] Estados: tarea en `Sin empezar` para diseño, subítem en `En curso`
 - [ ] Piezas históricas, sensibles, consolidadas o con soft-404 conservan su gate visible
 - [ ] Gancho en la primera línea / primer segundo

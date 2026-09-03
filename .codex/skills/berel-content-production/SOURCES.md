@@ -5,7 +5,36 @@
 > fechada del cliente o una spec específica contradice una regla más vieja, manda la fuente más
 > reciente/específica y se registra el drift.
 
+## Clasificación de piezas verificada — 2026-09-03
+
+Esquemas vivos de Tareas, Content Hub y Proyectos: `Tipo de pieza`, `Canal de pieza`,
+`Formato`, auxiliares y destinos de rollup. Revisión directa de 147 tareas de noviembre/diciembre
+y tareas puntuales de tutoriales; 51 correcciones de propiedades con readback, sin modificar cuerpos,
+estados, fórmulas ni automatizaciones. El módulo 07 conserva la matriz y los límites de conteo.
+El Playbook vivo fue leído, no editado en esta corrección. No es una resincronización completa de la Wiki.
+Confirmación posterior del operador (2026-09-03): mantener el patrón y solo etiquetar; no crear
+campos de cantidad, cambiar fórmulas ni dividir tareas. Se exige tipo/canal desde la creación
+y en los checklists de banners, sociales y fotos. Relectura de 221 tareas de octubre–diciembre:
+196 visuales con ambas etiquetas y 25 principales excluidas; sin nuevas escrituras en esa revisión.
+
+## Distribución selectiva y cupos — 2026-09-03
+
+Petición explícita del operador: mantener formatos, seleccionar distribución por artículo y aplicar
+noviembre/diciembre. Playbooks Social y Producción actualizados en Notion; módulo 15 gobierna la
+selección y el tratamiento reversible. No es aprobación de publicaciones ni de nuevos formatos.
+Contrato comunicado en esta sesión: 8 artículos de 3.000–5.000 palabras, 50 gráficas, 3 videos
+cortos de cortesía durante seis meses, 4 superficies activas y reporting quincenal; SEO técnico,
+AEO, Laboratorio Berel, Digital PR y link building. El operador confirmó que las 50 gráficas
+incluyen blog y RRSS. Superficies verificadas contra las tareas N35 del ciclo anterior:
+Blog, Facebook, Instagram y Pinterest; no se crean redes adicionales. El operador confirmó inicio de cortesía en mayo y extensión a noviembre/diciembre
+2026 (tres videos por mes). No inferir cumplimiento desde tareas ni reescribir todos los artículos
+para alcanzar longitud dentro de este cambio de distribución.
+
 ## Fuentes principales
+
+Numeración editorial: corrección autorizada 2026-09-03 en módulo 16 y
+[auditoría por ID](../../../docs/audits/seo/BEREL_EDITORIAL_NUMBERING_2026-09-03.md).
+Los números de las auditorías anteriores son históricos; consultar el mapa antes de operar.
 
 | Fuente | ID / ubicación | Qué gobierna |
 |---|---|---|
@@ -45,6 +74,38 @@
    explícitamente superada.
 8. **Nunca `/search?q=`**: aunque una línea vieja del Playbook todavía lo mencione, `robots.txt` lo
    bloquea y la regla vigente es paleta/artículo válido → `/colores/<familia>`.
+
+## Decisión de cobertura editorial del operador — 2026-09-02
+
+La conversación del operador y el inventario de 49 páginas desarrolladas sustentan
+[`BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md`](../../../docs/operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md).
+La sección «Planeación temática y cobertura capilar — decisión del operador 2026-09-02» fue añadida
+al Playbook vivo y confirmada mediante una nueva lectura. Es dirección editorial del operador,
+no aprobación del cliente de artículos concretos ni del calendario.
+
+- Prioridad: elección/planeación; protección/reparación/mantenimiento; preparación/aplicación.
+- Color y paletas conservan su papel de marca; cultura y celebraciones no tienen cuota.
+- Baseline: 49 desarrolladas, no 49 entregadas ni 49 publicadas.
+- Minería de México/español con presupuesto agregado, lectura de cuerpos y hogar canónico por intención.
+- Implementación operativa: `modules/14_PLANEACION_TEMATICA_Y_COBERTURA.md`.
+- Este añadido no declara una nueva sincronización integral de todas las fuentes de la Wiki.
+
+## Aprendizajes de tutoriales incorporados — 2026-09-03
+
+Ajuste autorizado por el operador tras la auditoría y corrección de N29; **no es una nueva
+sincronización integral de la Wiki** ni aprobación editorial/técnica del cliente de nuevas piezas.
+
+- Evidencia: [N29, revisión vigente y control de fuentes](https://www.notion.so/3a639c2fefe78004bf2dd1a2864a29b6);
+  [solicitud de María Fernanda del 2026-09-02](https://teams.microsoft.com/l/message/19%3a1f04b439276946b6b8285e9969bf2d2d%40thread.v2/1788379450056?context=%7B%22contextType%22:%22chat%22%7D).
+- Wiki, página y PDF de Berelex Semibrillante: fuentes, datos coincidentes y discrepancia de años
+  registrados en [módulo 12 §3.1](modules/12_DATOS_VERIFICADOS_DEL_CATALOGO.md).
+- [Módulo 13](modules/13_FORMATO_TUTORIAL_HIBRIDO.md): operaciones completas dentro de cuatro
+  macropasos, alcance acotado, revisión vigente y conciliación de dependencias de producto.
+- [Control técnico](templates/control-tecnico-tutorial.md): evidencia por operación, fuente y
+  destino; no un check de cantidad de títulos.
+- N29 en Notion: tutorial, ALT del paso 3, instrucciones de N2 y nota en tarea principal corregidos
+  y releídos. Artes/Frame.io, copies sociales y publicación Drupal no quedaron cerrados.
+- Estas reglas gobiernan nuevas ejecuciones; no autorizan más reescrituras retroactivas.
 
 ## Precedencia cuando hay contradicción
 
@@ -91,6 +152,7 @@ Cada vez que cambie el Playbook Producción, revisar como mínimo:
 - `08_PUBLICACION_CMS_DRUPAL.md`
 - `09_RECOMENDACIONES_DEL_CLIENTE.md`
 - `13_FORMATO_TUTORIAL_HIBRIDO.md`
+- `14_PLANEACION_TEMATICA_Y_COBERTURA.md`
 - `GLOSSARY.md`
 - este `SOURCES.md`
 

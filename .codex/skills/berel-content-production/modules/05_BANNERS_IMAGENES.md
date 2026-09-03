@@ -38,6 +38,13 @@ saber qué imagen es la adecuada.
 
 > Un banner creado antes del artículo es un **placeholder**, no un brief.
 
+## Propiedades obligatorias al crear la tarea
+
+Cada subtarea de banner nace con `Tipo de pieza = Estatico` y `Canal de pieza = Blog`,
+también si es una reserva bloqueada. Son propiedades de Tareas: la ficha, `Formato` y
+`Tipo de entregable` no las reemplazan. Conservar el patrón de tareas y el conteo existente.
+Matriz completa y verificación: [módulo 07](07_SISTEMA_NOTION.md).
+
 ## Los cuatro banners por artículo
 
 | # | Rol | Naming de la subtarea |
@@ -53,7 +60,7 @@ saber qué imagen es la adecuada.
 - **N1 Hero:** 1408 × 768 px + variante `og:image` 1200 × 630 px · menos de 200 KB · es el **LCP**:
   **sin** `loading="lazy"`.
 - **N2 Infografía:** master 1408 × 768 px · menos de 200 KB · con lazy · marcada 🔁 como imagen
-  base de adaptación social, con sus cuatro variantes (ver abajo).
+  base de adaptación social, con las variantes seleccionadas en la matriz del módulo 15 (catálogo abajo).
 - **N3 y N4:** 1408 × 768 px · menos de 200 KB · con lazy.
 
 ## 🔁 La convención de adaptación social
@@ -130,9 +137,10 @@ Corolarios que el origen declara explícitamente:
 
 - [ ] Cada imagen está anclada a una sección/tabla/paso/concepto real del artículo
 - [ ] La composición refleja el contenido específico, no es stock genérico
+- [ ] Cada tarea de banner tiene `Tipo de pieza = Estatico` y `Canal de pieza = Blog`, confirmados por lectura fresca
 - [ ] Banners numerados por orden de lectura
 - [ ] Todos los campos de la ficha están completos en cada imagen
-- [ ] Una imagen marcada con 🔁 como base de adaptación social, con sus cuatro variantes
+- [ ] Una imagen marcada con 🔁 como base de adaptación social, con sus variantes seleccionadas según el módulo 15
 - [ ] Los ALT del banner y de las notas para Dev coinciden exactamente
 - [ ] Imágenes del artículo en el tamaño estándar 1408 × 768 px
 - [ ] Formatos `.webp`, peso menos de 200 KB, lazy-load (LCP sin lazy)

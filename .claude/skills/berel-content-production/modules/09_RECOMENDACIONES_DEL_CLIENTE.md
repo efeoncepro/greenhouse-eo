@@ -44,10 +44,11 @@ resuelvas en silencio a favor del documento más viejo.
 - **Paletas de temporada:** **no mencionar los meses exactos de vigencia** en el cuerpo. Referirlas
   por su relación con el Color del Año ("la última paleta de temporada de nuestro Color del Año
   2026, Pitaya 2-3605D"). Crea expectativa del siguiente color y **mantiene el contenido evergreen**.
-- **Garantía de 10 años:** referirla como **"nueva garantía"** — el upgrade de 7 a 10 años se anunció
-  en mayo de 2026.
+- **Garantía de 10 años:** la indicación histórica de mayo de 2026 pedía llamarla **"nueva garantía"**
+  para el producto de ese anuncio. No extenderla a todas las líneas; confirmar variante, vigencia,
+  términos y fuente antes de citar años. “Calidad” y “garantía” no son sinónimos.
 - 🔴 **"Sin plomo": evitarlo como argumento de venta.** Hoy todas las pinturas de la categoría son
-  sin plomo. En su lugar, destacar la **nueva garantía de 10 años**.
+  sin plomo. Destacar una prestación respaldada del producto concreto, no una garantía genérica.
 - **Berelex Green:** sus diferenciadores son que **purifica el aire en interiores** (remueve
   formaldehído; **siempre especificar "en interiores"**) y su **garantía de por vida**. Ambos
   verificados en ficha técnica. Destacarlos por encima de atributos genéricos.
@@ -135,6 +136,17 @@ solución y el gancho con micro-escena; lo que se recorta es la **densidad figur
 
 ## Solicitudes operativas por el canal de Teams
 
+### Cocina N29 — cambio confirmado por el operador el 2026-09-03
+
+María Fernanda reiteró el 2026-09-02 el cambio de Berelinte a Berelex en el chat Berel–Efeonce
+([mensaje](https://teams.microsoft.com/l/message/19%3a1f04b439276946b6b8285e9969bf2d2d%40thread.v2/1788379450056?context=%7B%22contextType%22:%22chat%22%7D)).
+La corrección del operador usa **Berelex Semibrillante**; datos y límites en el módulo 12 §3.1.
+Aplica a N29, no a todo tutorial de la marca. Revisar observaciones posteriores antes de reutilizar.
+El cambio exige revisar dependencias (módulo 13), no un reemplazo global de nombres ni reescribir
+los textos no afectados. La preferencia de producto no valida prestaciones ni otros soportes.
+
+### Otras solicitudes del canal
+
 - **CTA del blog en piezas sociales:** referir al blog en su totalidad como **Inspiración**, usando
   `berel.com/inspiracion` y mostrado en **negrita**. Como los artículos derivan técnicamente de
   `berel.com/articulos` y los tutoriales de `berel.com/tutoriales`, la cortinilla/CTA puede variar
@@ -190,10 +202,9 @@ solución y el gancho con micro-escena; lo que se recorta es la **densidad figur
   `PENDIENTE DE CONFIRMACIÓN — NO INCLUIR EN ARTE`, y **eso frena producción de diseño**.
 - 🔴 **Falta definir la autoría.** El estándar de citabilidad exige atribuir cada pieza a **un
   especialista identificable de Berel**, no a "Equipo Berel". **Nadie ha nombrado a esa persona.**
-- **Recordatorio del arreglo pendiente en el origen:** la Fase 8 del **Playbook Producción** en
-  Notion sigue nombrando la tarea de Instagram como *"Instagram Post estático"*, cuando el cliente
-  ya decidió que solo publicará historias. Mientras diga eso, **el siguiente ciclo vuelve a nacer
-  mal**. Detalle y tabla de precedencia →
+- **Drift de Instagram corregido el 2026-09-03:** la Fase 8 del Playbook Producción en Notion
+  ya nombra **Instagram Story**. La distribución se selecciona por artículo, sin cambiar el formato.
+  Detalle y tabla de precedencia →
   [`06_DERIVADOS_SOCIALES.md`](06_DERIVADOS_SOCIALES.md).
 
 ## Cross-links
