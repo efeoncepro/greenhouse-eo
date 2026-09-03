@@ -1,9 +1,9 @@
 # Valentina Hoyos — recuperación de acceso y pendientes de reingreso
 
 - Fecha: 2026-09-03.
-- Estado: acceso recuperado y etapas contractuales separadas; payable agosto creado por 12/31, pendiente de boleta.
+- Estado: acceso, disponibilidad y asignación recuperados; etapas contractuales separadas; payable agosto creado por 12/31, pendiente de boleta. Guardas correctivas desplegadas y eventos de recuperación procesados; release cerrado y verificado; detalle y límites al final.
 - Autorización: Julio Reyes, instrucción explícita en Codex «Haz eso sin romper nada» tras discovery de identidad, contratación y pago parcial.
-- Alcance aplicado: recuperación puntual de datos, sin cambios de schema, código de producto, permisos, flags ni despliegues.
+- Alcance inicial: recuperación puntual de identidad y contratación. El incidente posterior, documentado al final, requirió guardas de producto y despliegue antes de restaurar disponibilidad. Sin cambios de schema, roles ni flags.
 
 ## Evidencia previa
 
@@ -97,4 +97,35 @@ La corrección se diseñó como una compensación gobernada por persona, descrit
 
 El plan privado revisado para Valentina tiene hash `e04cad36c968086a1928289d28d394662e4bf0075f477427634d23a0cfe58568` y pasó en modo `preview` contra el estado real. Solo puede restaurar el member a `active/status=active/assignable=true/contract_end_date=null` y esa asignación a `active=true/end_date=null`; exige el reingreso vigente desde 20/08, administrador vigente, snapshot exacto e idempotencia. Relaciones legales, engagements, usuario, envíos, payables, obligación y orden están fuera de su write set y cuentan con snapshot protegido independiente.
 
-Estado al preparar esta corrección: **código completo local; despliegue del consumidor y aplicación de la compensación pendientes**. La compensación no debe aplicarse hasta verificar que la revisión activa del consumidor contiene la guarda contra resurrección de la relación employee terminada.
+La recuperación de disponibilidad se aplicó a las **18:38:48Z del 03/09/2026** con resultado `restored`, después de verificar el alias `greenhouse.efeoncepro.com` hacia `dpl_827gG56uPpLohEsmwAVRqK57btWa` (`a824d073a5fb01b916386312f6ae61c0082b67c9`, Production READY) y el 100% del tráfico del worker hacia `ops-worker-00641-dl2` (`203fa04ec`, árbol idéntico al squash productivo). Ambas superficies ya ejecutaban las guardas; el cierre del orquestador continúa por separado conforme al orden canónico deploy → verificación → recovery → verificación → release.
+
+- Member: `active=true`, `status=active`, `assignable=true`, `contract_end_date=null`.
+- Asignación existente: `active=true`, `end_date=null`; inicio histórico preservado.
+- Auditoría: `offboarding-case-event-41c1c44a-6e65-4abf-bcb2-656c38059e50`.
+- Eventos: `outbox-900825ee-43e3-477e-951f-41e1efe48afd` (`member.updated`) y `outbox-d1aad94b-3c52-4f2a-8b8d-33181c589728` (`assignment.updated`). Ambos publicados a las 18:40:03Z; `operating_entity_legal_relationship` y `operating_entity_membership` completaron el evento de member a las 18:42:05Z, y `assignment_membership_sync` completó el de asignación. Canary de contrato real: tras procesarlos, la relación employee sigue terminada y las siete categorías protegidas permanecen idénticas.
+- Comparación independiente exacta: las tres relaciones, dos engagements, cuatro envíos, dos payables, usuario, obligación y orden **idénticos** a sus snapshots protegidos.
+- El reader SSO resuelve el mismo usuario, correo `valentina.hoyos@efeonce.org`, activo/status activo, rol `collaborator`, elegibilidad `true`. No se simuló login interactivo.
+
+### Incidente independiente del control de release
+
+El run `33793141529` (18:52:58Z) completó todos los deploys y health, pero falló al transicionar el manifest. Una segunda ejecución del mismo SHA, `33793232779`, quedó en cola y fue cancelada a las 19:04:34Z, sin jobs. Su webhook abortó a las 19:04:35Z el manifest activo `a824d073a5fb-41320325-2fc5-4296-96cc-c3f3eae6ec51` del primer run. Actor auditado: `system:github-release-webhook`; motivo: `GitHub webhook Production Release Orchestrator reported cancelled`.
+
+Causa en `github-webhook-reconciler.ts`: el matching prioriza SHA sobre run ID; la cancelación de un duplicado puede afectar otro intento activo. El estado terminal no se fuerza por SQL ni se vuelve a aplicar la recuperación de datos. Reintento completo canónico después de confirmar el drenaje de esos eventos. Readback posterior a los deploys: disponibilidad restaurada y las siete categorías protegidas siguen idénticas.
+
+Los webhooks terminales del primer intento y del duplicado se verificaron procesados, con cero inbox pendientes. Otra sesión inició el reintento `33794622145` a las 19:07:58Z, ocho segundos antes de un dispatch de Codex; Codex canceló inmediatamente su duplicado `33794635945` cuando seguía sin jobs ni manifest. Su webhook quedó `matched`, sin transición, a las 19:08:23Z, antes del nuevo manifest. Se sigue únicamente `33794622145`.
+
+### Estado antes del cierre bajo un único operador
+
+La recuperación de Valentina está aplicada y verificada, incluso después de la cancelación del segundo intento: member y asignación permanecen activos, employee histórica terminada, contractor vigente activo y las siete categorías protegidas idénticas. El pago de agosto continúa pendiente de boleta; no se generaron nuevas transferencias.
+
+El segundo manifest `a824d073a5fb-4306ff12-75d3-4452-a101-e729e8cbf172` quedó **aborted** a las 19:11:53Z. Un evento `workflow_job` del propio run `33794622145`, job `100780469269` (Validate Bicep template), reportó `cancelled`; la lectura final del run muestra **workers y health cancelados**, no aprobados. Los health Azure anteriores también se cancelaron sin runner; no se identificó un fallo de Bicep ni un grupo de concurrencia Azure. Codex no canceló ese run. GitHub confirma en las anotaciones del check `100780409856`: «The run was canceled by @cesargrowth11.» La cuenta está identificada; qué agente/proceso la usó debe aclararse antes de otro intento; se pausaron los reintentos hasta resolver la coordinación.
+
+Los cuatro workers se verificaron Ready después del primer intento, tres en `a824d073` y ops-worker en `203fa04ec` con diff completo vacío. El watchdog final reporta `worker_revision_drift` respecto del último manifest released `62356c9b7fd4`; no equivale a reversión de datos, pero impide declarar el release cerrado. Owner de continuidad: Platform/DevOps, un único operador del release, investigar cancelación y asociación por run ID antes de reintentar. Sin cambios de flags ni env durante esta reparación; ningún SQL de reversión ejecutado.
+
+La coordinación se resolvió posteriormente mediante el commit `587179533`: Claude dejó constancia de su retiro y del ownership de Codex sobre el cierre. Tras verificar ambos webhooks terminales nuevos y cero inbox pendientes, con preflight 19:17:21Z verde salvo la excepción payroll autorizada, Codex lanzó el intento único `33795564223` a las 19:17:30Z. No se cambiaron datos de Valentina.
+
+### Cierre verificado a las 19:30:49Z
+
+El intento `33795564223` terminó **success**, con manifest `a824d073a5fb-c2cf99e9-1ba1-40b3-9d85-76ad0a8e8372` **released** (19:20:51.833Z → 19:30:49.381Z), health **success** a las 19:29:40Z y watchdog **ok**, 4/4 workers sincronizados. Los workers están Ready; tres ejecutan `a824d073` y ops-worker `203fa04ec` con diff de árbol completo vacío. El readback posterior a este release vuelve a confirmar disponibilidad restaurada, contractor vigente y siete categorías protegidas intactas. Acceso elegible con el correo nuevo; login interactivo no ejercitado. Agosto sigue pendiente de boleta.
+
+La recuperación de Valentina y su protección de reingreso quedan cerradas. El defecto independiente de asociación de eventos de release por SHA queda documentado para Platform/DevOps; no se cambió ese control plane en este lote. Los intentos fallidos se conservaron como historia auditable, sin forzar estados terminales ni repetir la recuperación.

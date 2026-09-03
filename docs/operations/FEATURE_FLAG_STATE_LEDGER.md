@@ -195,11 +195,14 @@ Este ledger gobierna los flags de **este repo**: los 5 runtimes de Greenhouse (V
 
 - **`WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` (TASK-1349) — PRENDIDO en Production y staging el
   2026-09-03 (release `62356c9b7fd4`, run `33779259694`), tras el live smoke sintético exigido.** Recovery
-  aplicada el mismo día con autorización del operador (Felipe `termination`; Luis y María Camila). ⚠️ **Producción
-  corre el executor SIN la guarda de reingreso** (`findReentryAfterExit`, `c5c030e99` sólo en develop): un caso
-  ejecutado para una persona con relación/engagement posterior la desactivaría (caso Valentina Hoyos, ISSUE-163).
-  Promover develop→main antes de ejecutar más salidas con el flag ON, o apagar el flag hasta entonces. Rollback del flag: `vercel env rm` + redeploy; los datos ya escritos
-  se corrigen por command compensatorio auditado, nunca por SQL.
+  aplicada el mismo día con autorización del operador (Felipe `termination`; Luis y María Camila).
+  **Guarda de reingreso desplegada y verificada 2026-09-03:** alias Production apunta a
+  `dpl_827gG56uPpLohEsmwAVRqK57btWa` (`a824d073`); worker `ops-worker-00641-dl2` con árbol equivalente
+  `203fa04ec` recibió y procesó los eventos de recuperación de Valentina. El flag sigue en `true`, verificado
+  con `env pull`; este incidente no lo cambió. Recuperación gobernada aplicada 18:38:48Z; proyecciones People
+  completadas 18:42:05Z sin reabrir employee ni alterar contratos/pagos/usuario. Orquestador `33795564223` success, manifest released 19:30:49Z y watchdog ok; flag sin cambio.
+  [Evidencia](../audits/payroll/VALENTINA_REHIRE_IDENTITY_RECOVERY_2026-09-03.md).
+  Rollback del flag: `vercel env rm` + redeploy; datos escritos se corrigen por command compensatorio auditado.
 
 > ### ⛔ Antes de prender un `*_ENABLED` en Production (ISSUE-150)
 >
@@ -383,7 +386,7 @@ _(Agrega acá cualquier flag que dejes code-complete sin prender. Si está vací
 | `PAYROLL_WORKFORCE_INTAKE_GATE_ENABLED` | ✅ | ✅ | Preview | TASK-872 |
 | `PAYROLL_PARTICIPATION_WINDOW_ENABLED` | ✅ | ✅ | — | TASK-890 |
 | `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED` | ✅ | ✅ | — | TASK-891 |
-| `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` | ✅ (2026-09-03 16:47Z, `vercel env add … production` valor `true` verificado con `env pull`; redeploy de producción ~16:55Z tras el release `62356c9b7fd4`) | ✅ (2026-09-03, `env add … staging` + redeploy) | — | TASK-1349 — writeback de lifecycle al ejecutar una salida REAL: termina la relación legal con la fecha real, `members.active=false`/`status='inactive'`, cierra `client_team_assignments`, publica `member.deactivated`. Runtime que lo lee: **sólo Vercel** (API HR `transition`). Condición cumplida antes del flip: live smoke sintético `review-execute.live.test.ts` verde contra el PG compartido con el flag en la invocación (relación terminada con la fecha real, member inactivo, `member.deactivated`, SCIM no resucita; caso inverso `access_only` sin efectos). NO gatea el cierre de compensación ni el guard de revisión. |
+| `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` | ✅ (2026-09-03 16:47Z, `vercel env add … production` valor `true` verificado con `env pull`; redeploy de producción ~16:55Z tras el release `62356c9b7fd4`) | ✅ (2026-09-03, `env add … staging` + redeploy) | — | TASK-1349 — writeback de lifecycle al ejecutar una salida REAL: termina la relación legal con la fecha real, `members.active=false`/`status='inactive'`, cierra `client_team_assignments`, publica `member.deactivated`. Runtime que lo lee: **sólo Vercel** (API HR `transition`). Condición cumplida antes del flip: live smoke sintético `review-execute.live.test.ts` verde contra el PG compartido con el flag en la invocación (relación terminada con la fecha real, member inactivo, `member.deactivated`, SCIM no resucita; caso inverso `access_only` sin efectos). NO gatea el cierre de compensación ni el guard de revisión. Guarda de reingreso y consumidor legal corregidos en Production `a824d073`, verificados el 03/09 a las 18:42Z mediante eventos reales de recuperación; valor del flag sin cambio. |
 | `LEAVE_PARTICIPATION_AWARE_ENABLED` | ✅ | ✅ | — | TASK-892 |
 | `SCIM_INTERNAL_COLLABORATOR_PRIMITIVE_ENABLED` | ✅ | ✅ | Preview | TASK-872 |
 | `CONTRACTOR_PAYABLE_SETTLEMENT_ENABLED` | ✅ | ✅ | — | EPIC-013 |

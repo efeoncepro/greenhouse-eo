@@ -30,7 +30,11 @@ asignable y sin corte antiguo; asignación existente activa sin fecha final. Se 
 `a824d073` y 100% del tráfico `ops-worker-00641-dl2` hacia el árbol corregido antes de aplicar. Las siete categorías
 protegidas (relaciones, engagements, envíos, payables, usuario, obligación y orden) siguen idénticas; SSO elegible con
 correo nuevo y rol collaborator. Clave `valentina-lifecycle-reentry-restore-2026-09-03`; no repetir ni usar el SQL retirado.
-Eventos publicados 18:40:03Z y proyecciones People completadas 18:42:05Z: employee permanece terminado y datos protegidos idénticos. Release PR #220: run Codex `33793141529` tuvo deploys/health verdes, pero webhook del duplicado cancelado `33793232779` abortó su manifest por asociación errónea por SHA (19:04:35Z); transición final falló. Reintento activo único `33794622145` (otra sesión, 19:07:58Z); Codex retiró su duplicado `33794635945` aún sin jobs/manifest y verificó webhook procesado sin transición a las 19:08:23Z. Seguir el run activo; no lanzar otro ni repetir recuperación.
+Eventos publicados 18:40:03Z y People completado 18:42:05Z; employee cerrado y datos protegidos idénticos.
+**Release cerrado:** `33795564223` success, manifest `a824d073a5fb-c2cf99e9-1ba1-40b3-9d85-76ad0a8e8372`
+released 19:30:49Z, health success y watchdog ok/4 de 4 workers. Dos intentos anteriores fueron abortados por
+cancelaciones concurrentes; Claude se retiró y Codex cerró bajo un solo operador. La auditoría conserva el incidente
+independiente de matching SHA/run ID. Readback final: recuperación y siete categorías protegidas intactas.
 [Auditoría](docs/audits/payroll/VALENTINA_REHIRE_IDENTITY_RECOVERY_2026-09-03.md) ·
 [runbook](docs/operations/runbooks/workforce-reentry-recovery.md).
 Finance de Felipe (obligación junio + SII) sigue como dependencia sin command de anulación. UI: TASK-1814.

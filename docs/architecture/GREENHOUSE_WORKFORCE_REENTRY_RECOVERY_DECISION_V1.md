@@ -2,7 +2,7 @@
 
 - Status: Accepted for implementation; runtime rollout and recovery evidence tracked separately.
 - Date: 2026-09-03.
-- Owner: Workforce / Identity. Incident: [member mutation issue](../issues/open/ISSUE-163-update-member-identity-source-link-null-link-id.md).
+- Owner: Workforce / Identity. Incident: [member mutation issue](../issues/resolved/ISSUE-163-update-member-identity-source-link-null-link-id.md).
 - Scope: current member availability, legal-episode projection and compensating recovery after an incorrect historical offboarding writeback.
 
 ## Context
