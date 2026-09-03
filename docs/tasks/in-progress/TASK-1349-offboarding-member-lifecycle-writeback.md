@@ -380,6 +380,10 @@ el release.
   contemplado) → guarda `findReentryAfterExit` en `applyOffboardingLifecycleEffects` + señal excluye reingresos
   (`c5c030e99`, sólo en develop); `updateMember` falló a mitad (ISSUE-163) y su `member.updated` reactivó la relación
   employee terminada (re-terminada por command). Residual de member/asignación → SQL del operador.
+- **Incidente «fantasmas» en pre-nómina (mismo día):** los sujetos sintéticos del live test quedaron inactivos con
+  compensación abierta y aparecían como `Colaborador <uuid>` en la pre-nómina de septiembre: el roster relajado los
+  admitía y `hasDecidedExitFact` contaba un `identity_only` ejecutado como salida decidida. Corregido en datos
+  (compensaciones cerradas por command) y en código (política + cleanup del live test); roster verificado limpio.
 - **Lección canónica:** «executed + member activo» NO es drift si existe un episodio posterior (relación o
   engagement con inicio > LWD). El detector, la recovery y el executor deben mirar el episodio, no sólo la
   compensación. Producción no tiene la guarda hasta el próximo release.

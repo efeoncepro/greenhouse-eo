@@ -17,6 +17,14 @@ julio+ `exclude_entire_period`. **Luis Reyes y María Camila Hoyos**: lifecycle 
 al LWD real, member inactivo) y stubs SCIM cerrados como `access_only`. Señales: unresolved **1** (Maria Fernanda,
 draft 07-29, decisión manual de HR), executed_member_still_active **0**, deprovisioned_without_case 0.
 
+🔴 **Incidente «colaboradores fantasma» (2026-09-03, ~17:50Z, resuelto en datos):** la pre-nómina de septiembre mostró
+seis `Colaborador <uuid>` «sin contrato»: eran los sujetos sintéticos de mi live test (`TASK-1349 live access`),
+inactivos pero con compensación abierta; el roster relajado de Slice 2 los dejaba entrar y `derivePolicy` trataba su
+caso `identity_only` ejecutado como hecho de salida decidido → `full_period`. Cerré sus 9 versiones de compensación por
+command (`closeCompensationVigencyAtExit`), la política ya no cuenta un caso `identity_only` como hecho laboral
+(`hasDecidedExitFact`), y el live test cierra la compensación de sus sujetos al terminar. Roster de septiembre
+verificado: 5 personas reales con compensación, cero uuids. El fix de código viaja en el PR #220 (develop), sin mergear.
+
 🔴 **Incidente Valentina Hoyos (abierto hasta que el operador corra un SQL):** la lane A la desactivó pese a tener una
 relación `contractor` activa desde 2026-08-20 (reingreso). Fix commiteado en develop `c5c030e99` (guard
 `findReentryAfterExit` + señal excluye reingresos) — **NO está en `main`: producción sigue sin la guarda hasta el

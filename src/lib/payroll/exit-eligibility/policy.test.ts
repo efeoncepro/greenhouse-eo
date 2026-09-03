@@ -121,6 +121,36 @@ describe('derivePolicy — TASK-1349 active is current availability, not the his
   })
 })
 
+describe('derivePolicy — TASK-1349 an executed access-only case is not a labor exit fact', () => {
+  it('inactive member whose only case is identity_only executed is excluded, declared (ghost roster fix 2026-09-03)', () => {
+    const window = derivePolicy(
+      withCase({
+        memberActive: false,
+        exitLane: 'identity_only',
+        exitStatus: 'executed',
+        effectiveDate: '2026-06-10',
+        lastWorkingDay: '2026-06-10'
+      }),
+      '2026-09-01',
+      '2026-09-30'
+    )
+
+    expect(window.projectionPolicy).toBe('exclude_entire_period')
+    expect(window.warnings.map(w => w.code)).toEqual(['inactive_without_exit_fact'])
+  })
+
+  it('ACTIVE member with an executed access-only case stays full_period (access never removes pay)', () => {
+    const window = derivePolicy(
+      withCase({ exitLane: 'identity_only', exitStatus: 'executed', effectiveDate: '2026-06-10', lastWorkingDay: '2026-06-10' }),
+      '2026-09-01',
+      '2026-09-30'
+    )
+
+    expect(window.projectionPolicy).toBe('full_period')
+    expect(window.reviewRequired).toBe(false)
+  })
+})
+
 describe('derivePolicy — TASK-1349 unresolved exit signals demand review (access alone never removes pay)', () => {
   it('SCIM identity_only needs_review with no dates, created inside the period → full_period + reviewRequired', () => {
     const window = derivePolicy(

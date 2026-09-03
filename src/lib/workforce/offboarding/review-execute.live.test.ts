@@ -108,6 +108,15 @@ const openCompensation = async (memberId: string) =>
   )[0]
 
 afterAll(async () => {
+  // Synthetic subjects must never enter a payroll roster after the run: close
+  // any open compensation (ghost rows in pre-nómina, 2026-09-03).
+  for (const memberId of createdMemberIds) {
+    await query(
+      `UPDATE greenhouse_payroll.compensation_versions SET effective_to = effective_from, is_current = FALSE WHERE member_id = $1 AND effective_to IS NULL`,
+      [memberId]
+    ).catch(() => undefined)
+  }
+
   for (const userId of createdUserIds) {
     await query(`UPDATE greenhouse_core.client_users SET active = FALSE, status = 'deactivated' WHERE user_id = $1`, [userId]).catch(() => undefined)
   }
