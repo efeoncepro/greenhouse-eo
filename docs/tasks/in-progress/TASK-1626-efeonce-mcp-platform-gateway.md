@@ -1,5 +1,9 @@
 # TASK-1626 — Efeonce MCP Platform Gateway and Globe Federation
 
+## Delta 2026-09-03 — EPIC-044 (U00)
+
+La task pasa a `EPIC-044`. Decisión del operador: Efeonce opera su propio authorization server (`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`). El gateway sigue siendo adapter neutral y NO emite tokens; el segundo issuer y el `AuthContext` de seis campos los materializa `TASK-1831`, y la prueba base-only pendiente de esta task la cierra `TASK-1832`.
+
 ## Delta 2026-08-02 — Provider de cotización separado
 
 El gateway permanece adapter-neutral. La futura capability de cotización entra como provider read/recommend
@@ -22,7 +26,7 @@ datos. Clientes externos requieren además identidad y entitlements verificables
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `integration`
-- Epic: `none`
+- Epic: `EPIC-044`
 - Status real: `gateway público y fleet reader Globe verificados; write interno de fondeo en ejecución, acceso externo B2B/multitenant sigue gated`
 - Rank: `TBD`
 - Domain: `platform|agentic|integration|cloud|identity`

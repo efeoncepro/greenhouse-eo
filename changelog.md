@@ -7,6 +7,17 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-03 — EPIC-044: authorization server propio de Efeonce (ADR aceptado) y siete tasks nuevas
+
+Decisión del operador: Efeonce construye y opera su propio authorization server en `auth.efeonce.org`; no se compra
+un IdP. Nuevo ADR `EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md` (Accepted) supersede la composición WorkOS del
+ADR de federación y conserva sus invariantes, binding y contrato del gateway. `EPIC-044` (`in-progress`) agrupa
+TASK-1626/1631/1813 y crea TASK-1828 (runtime Cloud Run + front door + KMS HSM + JWKS), TASK-1829 (metadata, CIMD, DCR
+compat, PKCE, tokens ES256, refresh, revocación, consentimiento), TASK-1830 (passkeys, magic link, TOTP, recuperación),
+TASK-1831 (gateway multi-issuer `AuthContext`), TASK-1832 (canaries + primera cohorte), TASK-1833 (red-team, pentest,
+rotación, runbooks, privacidad V2) y TASK-1834 (convergencia del login cliente). `TASK-1631` re-alcanzada a binding/grants.
+`DECISIONS_INDEX`, registries y READMEs sincronizados.
+
 ## 2026-09-03 — TASK-1349: un `identity_only` ejecutado no es hecho de salida; purga de sujetos sintéticos (PR #220)
 
 Incidente «colaboradores fantasma» ~17:50Z: la pre-nómina de septiembre mostró seis `Colaborador <uuid>` «sin
@@ -1019,31 +1030,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
   metadata, imagen, schema, sitemap, menú y HTML inicial. La ruta queda publicada y elegible para indexación, sin
   presentar ese estado como prueba de indexación en Google. Menú: `Soluciones → Servicios Destacados`, después de
   `Redes Sociales`.
-
-## 2026-08-28 — La curva de CTR declara si es utilizable, o la lente no ordena (`TASK-1792`)
-
-- `readKeywordOpportunities` ordenaba por un campo colapsado a cero. `expectedCtrAt` preguntaba «¿está el
-  bucket en el `Map`?» cuando la pregunta era «¿hay muestra para estimar un CTR?»: con un bucket presente y
-  sin clics (`efeoncepro.com`: 75 impresiones, 0 clics en la posición objetivo) el guard devolvía `0`, la
-  ganancia estimada colapsaba en **toda** la lente y el `.sort()` quedaba en no-op. La pantalla no ordenaba
-  mal: **no ordenaba**, y nada fallaba. Medido contra PG el 2026-08-28: Efeonce 24/24 filas en cero; Berel,
-  con curva sana, 1.445 de 1.798 (80%) empatadas. El disparador está garantizado en todo target recién
-  onboardeado, así que no es un defecto de un cliente.
-- Primitive nuevo [`src/lib/growth/seo/ctr-curve.ts`](src/lib/growth/seo/ctr-curve.ts): la curva se lee **sin
-  `HAVING`** (un filtro en el SQL borra el bucket y vuelve indistinguible «no vino» de «vino sin muestra»),
-  transporta su muestra por bucket y declara su usabilidad con un piso de **dos dimensiones** — impresiones
-  **y** clics, porque la precisión de un estimador de tasa la gobiernan los éxitos. El umbral `1000/5` se
-  **adopta** de `work-queue/score-versions.ts` y lo sostiene un test que compara el **veredicto** del
-  predicado sobre nueve curvas fixture, no las constantes.
-- El envelope de `KeywordOpportunitiesResult` gana `ctrCurveSource`, `curveSampleSize`, `orderedBy`,
-  `targetPosition` y `expectedCtrAtTarget`. Cuando el techo no discrimina —curva no utilizable, o ganancia
-  idéntica en todas las filas— la lente ordena por **demanda medida** (impresiones × cercanía a página 1) y
-  lo declara. Los tres consumers (page server, lane ecosystem, tool MCP) son passthrough y heredan la
-  procedencia sin lógica propia.
-- El `FALLBACK_CTR_CURVE` declaraba 6% en la posición objetivo contra ~1% medido en dos sitios independientes:
-  estaba calibrado para una SERP que ya no existe. Se reemplaza por **forma de referencia + nivel estimado del
-  propio sitio** (un parámetro medido en vez de veinte prestados), con la curva expuesta forzada monótona no
-  creciente — el híbrido anterior producía bucket 8 en `0,0000` junto a bucket 9 en `≈0,027`.
-- Verificación: 663 unitarios + `src/lib/growth/seo/ctr-curve.live.test.ts` contra PG real, **4 passed, no
-  `skipped`**. Cierra la costura que dejó pasar el defecto: los mocks ejercitaban el TS sin el SQL y el sanity
-  el SQL sin el TS. Levanta el bloqueo del cutover de `TASK-1700`.

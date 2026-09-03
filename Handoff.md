@@ -2,6 +2,15 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+**EPIC-044 creado (2026-09-03) — authorization server PROPIO, decisión del operador:** no se compra WorkOS ni otro IdP.
+ADR aceptado `docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md` (supersede la composición del ADR de
+federación; invariantes/binding/gateway contract vigentes). Epic `in-progress` con TASK-1626/1631/1813 re-homed y siete tasks
+nuevas TASK-1828…1834 (runtime Cloud Run + KMS HSM · superficie OAuth/CIMD/tokens ES256 · personas sin contraseña · gateway
+multi-issuer · canaries + primera cohorte · aseguramiento/pentest · convergencia login). Estimación agéntica: 3–4 semanas
+code-complete, 5–7 operativo. Bloqueos humanos: excepción EPIC-027 para `services/auth-server`, DNS `auth.efeonce.org`,
+sesiones interactivas para la matriz de tokens, pentest. Task ui-ux de login sin ID hasta tener wireframe/flow reales.
+Siguiente ID libre `TASK-1835` / `EPIC-045`.
+
 Maggie/María Fernanda: cierre 4/4, unresolved=0; agosto ready. Método documentado en runbook/manual y
 skills Payroll/Talent Codex/Claude; Finance histórico pendiente de conciliación. [Evidencia 03/09](docs/audits/payroll/MAGGIE_MARIA_FERNANDA_OFFBOARDING_CLOSURE_2026-09-03.md).
 

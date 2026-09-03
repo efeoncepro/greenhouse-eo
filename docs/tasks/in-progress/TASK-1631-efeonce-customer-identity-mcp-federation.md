@@ -1,5 +1,19 @@
 # TASK-1631 — Efeonce Customer Identity and MCP Federation Foundation
 
+## Delta 2026-09-03 — Composición decidida: authorization server PROPIO (EPIC-044, re-alcance)
+
+El operador decidió construir y operar el emisor de Efeonce; no se compra WorkOS ni otro IdP. ADR aceptado:
+`docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`. Esta task pasa a `EPIC-044` (U04) y
+**re-alcanza sus slices**: conserva el registry de environments, el binding de organización, las invitaciones,
+los grants por capability, `grants_version`, el eligibility reader y las cuatro señales (todo el diseño S0.4).
+Pierde el runtime y el protocolo del emisor (→ `TASK-1828`, `TASK-1829`), la autenticación de personas
+(→ `TASK-1830`), el gateway multi-issuer (→ `TASK-1831`, materializa S0.5), los canaries y la primera cohorte
+(→ `TASK-1832`, absorbe S0.1) y la convergencia del login (→ `TASK-1834`, S0.6). El gate de subprocesador
+(S0.3) deja de bloquear: con emisor propio no aparece un encargado nuevo; la postura de seguridad se audita en
+`TASK-1833`. La task `ui-ux` de login/consentimiento nace al cerrar el contrato de flujo de `TASK-1830`.
+El delta 2026-08-26 (grants `growth.ai_visibility.*`) se resuelve en el binding/gateway o en una task propia de
+Growth, y el epic no cierra sin declararlo.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
@@ -16,11 +30,11 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `integration`
-- Epic: `none`
-- Status real: `Slice 0 en curso; composición aprobada 2026-08-05 (WorkOS staging de gasto cero: free tier sin dominio propio, provisión diferida a demanda real); S0.2-S0.5 entregados en el ADR; restan S0.1 (matriz de tokens, requiere sesión interactiva), contrato de convergencia (S0.6) y cierre legal/checklist pre-provisión (S0.7)`
+- Epic: `EPIC-044`
+- Status real: `Composición decidida 2026-09-03: authorization server propio (ADR nativo aceptado); re-alcance a binding/invitaciones/grants como U04 de EPIC-044; S0.2-S0.6 entregados; la migración aditiva del binding es el próximo slice ejecutable`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|agentic`
-- Blocked by: `aceptación explícita de EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md; comparación y aprobación de WorkOS vs broker Greenhouse extraído vs híbrido con costo/operación presentados; y revisión de privacidad/subprocesador cerrada`
+- Blocked by: `none para la migración aditiva del binding y los commands; los canaries de cliente dependen de TASK-1828/1829/1830/1831 y de la task ui-ux de login`
 - Branch: `Greenhouse develop; MCP main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

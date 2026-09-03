@@ -1,5 +1,9 @@
 # TASK-1813 — Compatibilidad OAuth del MCP Efeonce con Codex y Claude
 
+## Delta 2026-09-03 — EPIC-044 (U10, carril interno)
+
+La task pasa a `EPIC-044`. El emisor propio (`TASK-1828`/`TASK-1829`) es quien resolverá de raíz el desajuste de `issuer` y CIMD; esta task conserva su alcance interno Entra (discovery, shim, scopes) y no construye broker. Coordinar con `TASK-1831` antes de editar `app.ts`/config del gateway.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -20,7 +24,7 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `integration`
-- Epic: `none`
+- Epic: `EPIC-044`
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`

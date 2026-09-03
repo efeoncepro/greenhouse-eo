@@ -1,13 +1,14 @@
 # Efeonce Customer Identity and MCP Federation Decision V1
 
-> **Status:** `Proposed`
+> **Status:** `Proposed` — **composición superseded 2026-09-03** por [`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) (nativo, aceptado). Siguen vigentes: `Invariants`, `Required binding design`, `Slice 0 binding design proposal`, `Slice 0 gateway authorization-context contract`, `Slice 0 convergence contract`. La recomendación WorkOS de `Slice 0 measurement` queda como historia.
 > **Date:** 2026-08-01
 > **Owner:** Efeonce Platform / Identity
 > **Scope:** customer identity, B2B federation, MCP OAuth, Account 360 organization binding and Globe access
 > **Reversibility:** `two-way-but-slow`
 > **Confidence:** `medium`
 > **Validated as of:** 2026-08-02 — gateway MCP, Entra canary, current Greenhouse NextAuth/session resolution and Account 360 contracts verified; WorkOS has a staging project with MCP discovery configuration only. There is no external customer binding, public login, production domain, production secret, Greenhouse customer-login convergence or customer access.
-> **Implementation:** [`TASK-1631`](../tasks/to-do/TASK-1631-efeonce-customer-identity-mcp-federation.md)
+> **Implementation:** [`TASK-1631`](../tasks/in-progress/TASK-1631-efeonce-customer-identity-mcp-federation.md) · programa [`EPIC-044`](../epics/in-progress/EPIC-044-efeonce-identity-authorization-server-and-mcp-federation.md)
+> **Superseded by (composición):** `EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md` — 2026-09-03, decisión del operador: authorization server propio; no se compra a un tercero.
 
 ## Context
 
