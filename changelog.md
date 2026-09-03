@@ -7,6 +7,19 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-03 — TASK-1806: Improved ETV de DataForSEO en producción (rebaseline versionado)
+
+Release `bda12be7e33a` (PR #218, orquestador `33758619690`, manifest `released` 13:14Z, watchdog `ok`). El módulo
+SEO sirve desde hoy `improved_layout_clickstream_v2` en los siete caminos consumidores: ops-worker (`deploy.sh`,
+rev `00636-h6w`) y Vercel Production+staging con ambos selectores en improved; canary de contrato 13:15:26Z sobre
+los lanes de Berel. Antes: contract de schema ETV aplicado (`20260903103858964`), shadow `exact_ab` de 26 requests
+(USD 1,095) evaluado contra Search Console — improved 6× mejor calibrado en Berel (err. rel. 49 % vs 321 %),
+Jaccard 1,0 en páginas/subdominios, historia continua —, memo de decisión y aprobación del operador; drill de
+rollback en staging; rebaseline acotado (historia improved de Berel y Comex, USD 0,2568). Las cifras de tráfico
+estimado bajan ≈ 60 % por cambio de fórmula del proveedor, no por pérdida real; cada cifra declara `etvMethodology`.
+Efeonce se mide aparte de los clientes (guard de organización en celdas bulk). Writers `rowsWritten` ahora cuentan
+filas insertadas. Legacy sólo vuelve como rollback antes del corte 2026-11-01T00:00:00Z.
+
 ## 2026-09-03 — TASK-1805 en producción: foundation ETV versionada desplegada, selección legacy explícita
 
 Release `5ec4cf769977` (run `33698245254`): readers/lane/MCP sirven `etvMethodology`, señal `seo.etv_methodology.drift`,
@@ -1132,40 +1145,3 @@ del conteo de Sentry, con la salvedad explícita de que la muestra es una sola c
   67 tests verdes) **sin push**: viaja con su próximo release.
 - Estado: **`code complete, rollout pendiente`** — falta la corrida de smoke con gasto (~USD 0,013)
   y el deploy del gateway.
-
-## 2026-08-28 — Release a producción `c983be7f18e6`: carril Growth/SEO vivo, flag prendido y gateway MCP a 27 tools
-
-- Paso a producción end-to-end del trabajo del día (PR #208, 181 archivos, 4 migraciones):
-  **TASK-1696** (dimensión de consumidor del ledger de gasto DataForSEO), **TASK-1662** (fundación
-  del gap competitivo), **TASK-1699** (top-N del SERP + descubrimiento de competidores por
-  recurrencia) y **TASK-1652** (request AI Mode del grader). Manifest `released`
-  (`c983be7f18e6-92b1b327-a1c9-4e7a-85dc-6a5e300f4e32`, run `33178544139`, 11m41s), watchdog `ok`
-  con `drift_count=0`. Break-glass por `db_migrations` con razón verificada: las 4 migraciones ya
-  figuraban aplicadas en la instancia única Cloud SQL antes del dispatch.
-- `GROWTH_SEO_SERP_TOP_RESULTS_ENABLED` quedó **ON en los dos runtimes**: ya estaba en el
-  `ops-worker` (escritura) y este release lo prendió en Vercel Production (lectura) con su redeploy
-  obligatorio. La verificación no fue "la env var existe" sino el canary contra producción
-  devolviendo `ok:true` en vez de `disabled`.
-- El gateway `mcp.efeonce.org` pasó de **21 a 27 tools SEO** (revisión
-  `efeonce-mcp-gateway-00024-8b8`): entran `get_seo_provider_spend`, `get_seo_keyword_gap`,
-  `declare_seo_competitors`, `retire_seo_competitors`, `get_seo_serp_top_results` y
-  `get_seo_competitor_candidates`, sin un solo cambio en Entra — los writes viajan en el scope
-  `efeonce.mcp.seo.write` existente y siguen fail-closed hasta TASK-1631.
-- **Corregida la regla del merge canónico en los 5 lugares que la prescribían** (runbook, playbook,
-  las dos skills espejadas de release y el manual del orchestrator, que contradecía al resto). Ya no
-  cuenta V1: la clasifica. Sólo squashes de release ⇒ `-s ours`; un hotfix cuyo contenido no volvió a
-  `develop` ⇒ parar y reconciliarlo. Cuarta verificación nueva (`--diff-filter=A`) y `-X ours`
-  degradado a excepción con auditoría completa obligatoria.
-- **`TASK-1790` registrada**: el merge canónico `develop←main` pasa de regla en prosa a gate ejecutable
-  (`pnpm release:merge-canonical`), que clasifica los commits divergentes contra `release_manifests` y se
-  detiene ante lo que no reconoce. Se registra porque la prosa ya se había corregido una vez y no alcanzó:
-  tres releases seguidos pisaron la misma clase de bug.
-- Barrido documental post-release: gateway MCP a 27 tools en skills/runbook/manuales, estado de flags
-  por runtime en arquitectura del módulo SEO + rules + skills `dataforseo-operator` + EPIC-022, y
-  deltas 2026-08-28 en 15 tasks con impacto cruzado. `TASK-1699` y `TASK-1662` quedan a propósito en
-  `in-progress`: la serie del top-N no arranca hasta el 2026-08-29 y el Slice 4 de 1662 sigue
-  bloqueado por `TASK-1700`.
-- Hallazgo de proceso: la regla del merge canónico del runbook (`-s ours` sólo si V1 está vacía)
-  está mal formulada para un flujo con squash-merge, donde V1 nunca está vacía. `-X ours` volvió a
-  duplicar contenido documental y a resucitar tasks en un lifecycle viejo **con la V2 vacía**; la
-  pregunta correcta es si `main` aporta archivos propios.

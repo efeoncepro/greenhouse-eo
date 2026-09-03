@@ -78,4 +78,9 @@ The `estimated_monthly_traffic` fact is the sum of the organic `etv` of the purc
 `etvMethodology`), `sampleRows`, `rowLimit` and `truncated`. When `truncated` is true the sum is a
 FLOOR of the real surface, not the total. The `ai_overview_citations` fact counts citations and does
 not add their etv (`etvSummed: false`): AI Overview etv is a modeled share among cited domains, never
-observed clicks. Never compare traffic figures across different methodology versions.
+observed clicks. Never compare traffic figures across different methodology versions. Since
+2026-09-03 the served version is `improved_layout_clickstream_v2`; its sums sit roughly 40-60 %
+below what the legacy formula returned for the same domain, by formula, not by loss, so a
+diagnostic run before the switch is not a baseline for one run after it. The history behind it was
+rebaselined (`breakpointDate` is `null`), `availableMethodologies` may list both versions, and a
+`not_available_for_method` on a subject means it has no improved capture yet.

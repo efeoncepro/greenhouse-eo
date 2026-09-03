@@ -2,13 +2,15 @@
 
 ## Estado y alcance
 
-Este runbook describe la evaluación que ejecuta `TASK-1806`. **No autoriza ni ejecuta llamadas a DataForSEO,
-flags, deploys o cutover.** La foundation (`TASK-1805`) está **en producción** desde el 2026-09-03 (release
-`5ec4cf769977`) —policy, schema formula-aware con el contract aplicado, writers/readers/API/MCP formula-aware,
-señal de drift y evaluador dry-run— con selección productiva `legacy_static_v1` explícita en Vercel y ops-worker.
-Al 2026-09-03 el ejecutor bounded del shadow (Slice 1) y el evaluador/decisor (Slice 2) de `TASK-1806` están
-**code complete**; la corrida pagada **no se ha ejecutado** (cero llamadas de esta task), la decisión sigue
-pendiente y el cutover no está autorizado. Ambas deben respetar
+Este runbook describe la evaluación y el cutover que ejecutó `TASK-1806`. **Leerlo no autoriza llamadas a
+DataForSEO, flags, deploys ni un nuevo cutover.** La foundation (`TASK-1805`) está **en producción** desde el
+2026-09-03 (release `5ec4cf769977`) —policy, schema formula-aware con el contract aplicado, writers/readers/API/MCP
+formula-aware, señal de drift y evaluador dry-run—. **Estado al 2026-09-03:** el shadow `exact_ab` se ejecutó y
+evaluó, el operador aprobó **rebaseline** y **cutover**, y la selección productiva pasó a
+`improved_layout_clickstream_v2` en los dos selectores: ops-worker vivo (revisión `ops-worker-00636-h6w`), Vercel
+`production`+`staging` con los valores en improved (staging verificado con drill de rollback), producción Vercel
+efectiva al `READY` del release `bda12be7e33a-4bb99ca1-8077-451a-9611-5929f933a990` (run `33758619690`, manifest `released` 13:14Z, canary 13:15:26Z). Ver «Resultado y decisión ejecutada», «Cutover
+ejecutado» y «Rollback vigente» más abajo. Todo debe respetar
 `GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md`.
 
 Comandos de la foundation que este runbook usa:
@@ -122,12 +124,13 @@ No iniciar una prueba con proveedor hasta que todas estén satisfechas:
    persistido chocaba con la UNIQUE legacy; el preflight del ejecutor lo sigue verificando antes de la primera
    llamada.
 5. Readers productivos siguen fijados a legacy (`GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION` ausente o
-   `legacy_static_v1`) y rechazan series mixtas.
+   `legacy_static_v1`) y rechazan series mixtas. *(Precondición del shadow, vigente hasta el cutover del
+   2026-09-03; desde entonces ambos selectores están en `improved_layout_clickstream_v2`.)*
 6. `/health` del ops-worker y la señal `seo.etv_methodology.drift` reportan la misma configuración
    (`source: env`, no `default`); el dry-run muestra método, requests previstas y `providerCalls=0`.
 7. Existe un presupuesto máximo en USD aprobado por el operador. Sin monto aprobado, sólo fixtures/replay.
    (Caps 30 requests / USD 2,00 aprobados el 2026-09-03 en el preregistro §7; el permiso para ejecutar la corrida
-   pagada es un acto aparte del operador y al 2026-09-03 no se ha ejercido.)
+   pagada es un acto aparte del operador; se ejerció el 2026-09-03 ~11:05Z por instrucción explícita en chat.)
 8. Se definieron ventana, propiedades GSC, países, dispositivos y tratamiento de datos faltantes antes de mirar
    resultados.
 9. El calendario interno preserva margen: foundation objetivo 2026-10-15, shadow/decisión 2026-10-23 y cutover
@@ -229,14 +232,17 @@ genérica.
 
 | Criterio | Umbral aprobado | Evidencia | Resultado |
 |---|---|---|---|
-| Calibración contra GSC | pendiente de aprobación | celdas propias comparables | pendiente |
-| Regresión máxima por cliente ancla | pendiente de aprobación | Efeonce y Berel separados | pendiente |
-| Estabilidad de ranking/membresía | pendiente de aprobación | top-N y concentración | pendiente |
-| Costo total | monto USD explícito | dry-run + ledger | pendiente |
-| Contrato histórico | rebaseline o breakpoint | respuesta oficial + prueba | pendiente |
+| Calibración contra GSC | preregistro §5.1 | berel.com · GSC 30.898 clics/mes (28 d ×30/28) | ✅ improved err. rel. 49,4 % vs legacy 321,3 % |
+| Regresión máxima por cliente ancla | ±40 % sin cambio equivalente de `organic.count` (§5.2) | Berel −64,5 % con count 630 → 630 | ⚠️ se dispara por construcción en un A/B exacto (el count no puede cambiar); explicado en el memo como efecto de fórmula |
+| Estabilidad de ranking/membresía | Jaccard ≥ 0,8 (§5.2) | `relevant_pages` (66) y `subdomains` (3) de Berel | ✅ Jaccard 1,0; 0 entradas/salidas |
+| Costo total | 30 requests / USD 2,00 (§7) | dry-run USD 1,14384 + ledger `labs` | ✅ 26 requests / USD 1,09536; ledger cuadra |
+| Contrato histórico | rebaseline o breakpoint | historia 2026-04..09 de Berel en las dos bases | ✅ continua (salto 0,1 % vs mediana mensual 8,1 %) → rebaseline |
 
 Go requiere que improved cumpla todos los criterios registrados. Un promedio favorable no compensa una regresión
 material no aceptada en un cliente ancla. Si la evidencia es inconclusa, el resultado es `hold`, no cutover.
+Resultado de la corrida del 2026-09-03: decisión mecánica `hold` **sólo** por la regla §5.2; el memo de decisión
+la explica y recomienda `go_rebaseline`; el operador aprobó rebaseline y cutover ese mismo día (ver «Resultado y
+decisión ejecutada»).
 
 ## Decisión histórica
 
@@ -246,7 +252,7 @@ material no aceptada en un cliente ancla. Si la evidencia es inconclusa, el resu
   crucen el quiebre.
 - Nunca reetiquetar filas por fecha ni sobrescribir evidencia append-only.
 
-## Rollout futuro
+## Rollout (secuencia prescrita; ejecutada el 2026-09-03 — ver «Cutover ejecutado»)
 
 1. Fixtures/replay verdes.
 2. Expand de schema verificado en staging; readers aún legacy.
@@ -266,11 +272,71 @@ Stop conditions:
 - regression no aceptada o cambio top-N inexplicable;
 - Vercel y ops-worker divergen.
 
-## Rollback
+## Resultado y decisión ejecutada (2026-09-03)
 
-Antes de 2026-11-01T00:00:00Z, volver writers/readers a `legacy_static_v1`, conservar ambas series y verificar el
-request explícito. Desde el corte no existe rollback legacy: activar safe mode, detener nuevas capturas ETV y
-servir la última serie comparable con estado degradado. No borrar improved ni recomputar legacy localmente.
+- **Corrida:** run `etvshadow-f3fef9b3c2a8`, modo `exact_ab`, 26/26 requests con `status_code 20000`, USD
+  **1,09536** real (forecast 1,14384), ledger `labs` del día cuadra. Autorización explícita del operador en chat.
+- **Evaluación con GSC (berel.com, 30.898 clics/mes):** improved err. rel. **49,4 %** vs legacy **321,3 %**;
+  Jaccard **1,0** en `relevant_pages` y `subdomains` (0 entradas/salidas); historia 2026-04..09 **continua**
+  (salto del ratio 0,1 % vs variación mediana 8,1 %); efecto de escala ≈ **−60 %** (Berel −64,5 %, Comex −52 %);
+  prospecto Comex −43,9 %.
+- **Decisión:** el evaluador emitió `hold` **sólo** por la regla §5.2 (dispara por construcción en un A/B exacto:
+  el `organic.count` es idéntico en las dos requests); el memo la explica y recomienda `go_rebaseline`; el
+  operador **aprobó rebaseline y cutover** el 2026-09-03.
+- **Tratamiento histórico aplicado: rebaseline versionado.** La serie servida es improved; cada fila declara
+  `etv_historical_basis` (`fully_recomputed` desde 2026-07, `calibrated_approximation` antes); `breakpointDate`
+  sigue `null` (un reader sirve una sola metodología). Berel ya tiene historia improved 2026-04..2026-09 gracias al
+  shadow; un sujeto sin fila improved responde `not_available_for_method` hasta su próxima captura (cron del día
+  16/17). Nada se borró: las filas legacy siguen como evidencia append-only.
+- **Corrección de cohorte:** `efeoncepro.com` se mide **aparte** (su organización, mercado CL, su propio GSC),
+  nunca dentro de una consulta de un cliente; la celda bulk v1 que lo metió en MX bajo la org de Berel quedó
+  anulada como evidencia (append-only, no llega a ninguna superficie). Cohorte vigente
+  `scripts/growth/etv-shadow-cohorts/2026-09-03-preregistered-v2.json`; `assertEtvShadowCohort` rechaza un bulk
+  que mezcle organizaciones.
+- **Artefactos:** [resultados](../../audits/seo/etv-shadow/2026-09-03-2026-09-03-preregistered-results.md) ·
+  [memo de decisión](../../audits/seo/etv-shadow/2026-09-03-2026-09-03-preregistered-decision-memo.md) ·
+  [preregistro](../../audits/seo/2026-09-03-dataforseo-improved-etv-shadow-preregistration.md). Crudos y
+  `summary.json`/`evaluation.json` en `.captures/etv-shadow/…` (gitignored, conservados localmente).
+
+## Cutover ejecutado (2026-09-03)
+
+Pasos hechos, en orden; cada uno con su readback:
+
+1. **ops-worker (writer + reader, por contrato único).** `services/ops-worker/deploy.sh` declara
+   `GROWTH_SEO_ETV_METHODOLOGY_VERSION` y `GROWTH_SEO_ETV_READ_METHODOLOGY_VERSION` con default
+   `improved_layout_clickstream_v2` (commit `d2ebdb8f3`; `deploy-contract.test` 16/16). Ops Worker Deploy del push a
+   `develop` (run `33753088068`) → revisión activa `ops-worker-00636-h6w`, `GIT_SHA=d2ebdb8f3…`. Readback: `GET
+   /health` → `etvMethodology.configuredWriteMethod=configuredReadMethod=improved_layout_clickstream_v2`,
+   `source=env`, `valid=true`. Dry-run de `/seo/url-visibility/capture-batch` y `/seo/domain-overview/capture-batch`
+   con la identidad del scheduler: 2 targets `skipped` (sujetos frescos bajo improved gracias al shadow), costo 0.
+2. **Vercel env.** Los dos selectores = `improved_layout_clickstream_v2` en `production` y `staging`; valores
+   verificados con `vercel env pull` (no sólo presencia).
+3. **Staging.** `vercel redeploy` → los lanes ecosystem `domain-overview` y `url-visibility` de Berel sirven
+   `etvMethodology.version=improved_layout_clickstream_v2`, `evidence=explicit_request`,
+   `availableMethodologies=[improved, legacy]`, `comparability=single_methodology`.
+4. **Drill de rollback pre-corte (staging).** Selectores a `legacy_static_v1` + redeploy → los lanes sirven
+   `legacy_static_v1`; improved restaurado + redeploy → improved otra vez. Ninguna fila se borró ni se reescribió.
+5. **Producción.** PR #218 `develop→main` squash-mergeado (`main=bda12be7e33af93906805054146c5e17a8b9c328`); build
+   de Vercel Production con los selectores improved horneados; orquestador `production-release.yml`
+   `release `bda12be7e33a-4bb99ca1-8077-451a-9611-5929f933a990` (run `33758619690`, manifest `released` 13:14Z)` (release_id / run id se completan al dispatch). Producción Vercel sirve improved
+   desde el `READY` de ese release; hasta entonces los lanes de producción siguen en `legacy_static_v1`.
+6. **Señal `seo.etv_methodology.drift`:** `warning` mientras las filas contractuales del 27–29/08 sigan dentro de la
+   ventana de 7 días; esperado `ok` cuando el worker escriba su primera fila explícita improved (cron 16/17). Un
+   `error` sí bloquea.
+
+Readback pendiente al cierre de este runbook: lanes de **producción** de Berel sirviendo improved tras el `READY`
+del release `bda12be7e33a-4bb99ca1-8077-451a-9611-5929f933a990` (run `33758619690`, manifest `released` 13:14Z, canary 13:15:26Z).
+
+## Rollback vigente
+
+- **Antes del corte del proveedor (2026-11-01T00:00:00Z):** poner los dos selectores en `legacy_static_v1` en
+  Vercel `production` **y** `staging` (`vercel env`) y en `services/ops-worker/deploy.sh` (nunca sólo con
+  `--update-env-vars`: el próximo deploy lo borra), luego `vercel redeploy` y deploy del worker; verificar `GET
+  /health` del worker y los lanes ecosystem sirviendo `legacy_static_v1`. Conservar ambas series y comprobar el
+  request explícito. Este drill se ejercitó en staging el 2026-09-03.
+- **Desde el corte:** no existe rollback legacy (`false` se ignora): activar **safe mode** —la policy falla cerrado
+  ante legacy configurado desde el corte, se detienen las capturas ETV nuevas y se sirve la última serie comparable
+  con estado degradado—. No borrar improved ni recomputar legacy localmente.
 
 ## Registro de evidencia
 
@@ -283,7 +349,7 @@ El cierre debe enlazar:
 - matriz congelada de requests;
 - dry-run con llamadas/costo;
 - `summary.json` de la corrida y artefacto de decisión (`docs/audits/seo/etv-shadow/<capture-date>-<cohortId>-results.md`
-  + `evaluation.json`);
+  + `evaluation.json`); corrida 2026-09-03: `…/2026-09-03-2026-09-03-preregistered-results.md` + `…-decision-memo.md`;
 - resultados por celda, no sólo promedio;
 - decisión rebaseline/breakpoint;
 - readback de staging y producción;

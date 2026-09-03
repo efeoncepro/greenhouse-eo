@@ -9,32 +9,32 @@ al apagar shim, fallback de deploy que lo reactiva y canary directo que no prueb
 de abajo no basta sin esos gates. Próximo paso: plan humano aprobado y coordinación con dueños de archivos;
 no push/deploy ni mutación de Entra autorizados por esta creación. Incidente Git/Berel separado.
 
-## 2026-09-03 — TASK-1806: shadow ETV comprado y evaluado; improved calibra 6× mejor contra GSC; cutover espera aprobación
+## 2026-09-03 — TASK-1806 COMPLETE: Improved ETV en producción (release `bda12be7e33a`), rebaseline versionado
 
-`TASK-1806` `in-progress`, Slices 0-2 ejecutados. Contract de schema aplicado (migración
-`20260903103858964`). Shadow `exact_ab` corrido con autorización explícita del operador en chat (run
-`etvshadow-f3fef9b3c2a8`): 26/26 requests OK, **USD 1,09536** real vs 1,14384 forecast, ledger `labs` cuadra,
-inputs idénticos salvo el flag (hash). Evaluador con GSC (client_id público del flujo OAuth + secret por referencia):
-**hold mecánico sólo por la regla §5.2** (ETV −64,5 % en Berel con `organic.count` intacto), que en un A/B exacto se
-dispara por construcción; calibración a favor de improved (**err. rel. 49,4 % vs 321,3 %** legacy sobre 30.898
-clics/mes GSC), Jaccard 1,0 en páginas/subdominios, historia continua (0,1 % vs 8,1 %), Comex −52 %, prospecto −43,9 %.
-Memo con explicación y recomendación **`go_rebaseline`**: `docs/audits/seo/etv-shadow/2026-09-03-…-decision-memo.md`.
+Cuarto release del día: PR #218 squash (`main=bda12be7e33af93906805054146c5e17a8b9c328`, 12:42Z), orquestador
+`33758619690` (13:01→13:14Z, un solo run, sin retry; los DOS gates `production` aprobados a 13:04:26Z/13:04:57Z),
+manifest `released` (`bda12be7e33a-4bb99ca1-8077-451a-9611-5929f933a990`), watchdog `ok`, 3/4 workers en el
+target y ops-worker change-gated en `d2ebdb8f3` (diff de árbol completo = sólo el ledger de flags). **Canary de
+contrato 13:15:26Z:** lanes prod `domain-overview`/`url-visibility` de Berel sirven
+`etvMethodology.version=improved_layout_clickstream_v2` `single_methodology`; `/health` del worker
+(`00636-h6w`) improved en escritura y lectura; `/api/auth/health` 200. Vercel Production+staging con ambos
+selectores improved (valores verificados por `env pull`); staging con cutover y **drill de rollback** ejercitado
+(legacy → improved, 3 redeploys).
 
-**Hallazgos de la corrida:** (1) la celda bulk de Berel/Comex no persistió: comparte tabla y clave con la foto de
-dominio del mismo día (DO NOTHING; valores en el crudo) — defecto de cohorte, anotado; (2) los writers contaban
-INTENTOS en `rowsWritten`: ahora cuentan filas insertadas por `RETURNING` (persist de domain-overview y
-url-visibility; tests adaptados); (3) señal `seo.etv_methodology.drift` en `warning` hasta que las filas
-contractuales del 27-29 de agosto salgan de la ventana de 7 días — no es drift de runtime.
+**Decisión:** el shadow (USD 1,095) mostró improved 6× mejor calibrado contra GSC en Berel (err. rel. 49 % vs
+321 %), Jaccard 1,0 e historia continua; el operador aprobó `go_rebaseline` y el cutover. Rebaseline acotado:
+historia improved de Berel 2025-09..2026-09 y de Comex 2025-09..2026-03 (backfill USD 0,2568, sembró 14 filas);
+la de julio 2026 en adelante es `fully_recomputed`, antes `calibrated_approximation`; `breakpointDate=null`.
+Efeonce se mide aparte (su org/CL/GSC); guard en `assertEtvShadowCohort` para que un bulk nunca mezcle
+organizaciones; cohorte v2.
 
-**Corrección del operador:** `efeoncepro.com` sí se mide, pero APARTE de Berel (su org, mercado CL, su GSC). El
-error fue la celda bulk, que metió a Efeonce en la consulta de Berel (MX, org de Berel): esa fila queda anulada;
-las celdas propias de Efeonce siguen válidas y sin voto. Cohorte vigente `2026-09-03-preregistered-v2.json` (bulk
-por organización y en día distinto a la foto).
-
-**Pendiente con dueño:** aprobación separada del operador del tratamiento histórico (`rebaseline`) y del cutover
-staging/producción (Slices 3-4; un solo ops-worker compartido = cutover del worker es producción y exige release).
-Selectores productivos siguen `legacy_static_v1`; lanes prod de Berel verificados sirviendo legacy tras el shadow.
-Sin push: WIP ajeno en el árbol (Berel, EPIC-022, 8 tasks).
+**Riesgos abiertos / pendientes con dueño:** (1) señal `seo.etv_methodology.drift` en `warning` hasta que las
+filas contractuales del 27-29/08 salgan de la ventana de 7 días (≤ 2026-09-05); el cron del 16/17 será la
+primera captura improved DESATENDIDA del worker — si escribiera otra cosa, es incidente. (2) Berel verá sus
+cifras de tráfico estimado ≈ −60 % por cambio de fórmula, no por pérdida real: comunicarlo. (3) Sujetos sin fila
+improved degradan `not_available_for_method` hasta su próxima captura (subfolder/url de Berel el día 17).
+(4) Rollback a legacy sólo antes del 2026-11-01T00:00:00Z (selectores + deploy.sh + redeploy). Sin push de
+docs de cierre hasta este commit; WIP ajeno en el árbol intacto.
 
 ## 2026-09-03 — TASK-1805 en producción: la fórmula detrás de `etv` es identidad del hecho, todavía legacy
 

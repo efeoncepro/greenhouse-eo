@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.19
+> **Version:** 1.20
 > **Creado:** 2026-08-05 por Claude (TASK-1299 + TASK-1301)
-> **Ultima actualizacion:** 2026-09-03 por Claude (TASK-1806: existe una evaluación interna legacy/improved del ETV —comparación acotada y pagada sobre tres dominios— que no cambia nada de lo que ve el usuario hasta que se apruebe el cutover; delta previo TASK-1805: cada cifra de tráfico estimado declara la fórmula del proveedor con que se calculó (`etvMethodology`, sección «Metodología detrás del tráfico estimado (ETV)»); hoy todo se sirve en `legacy_static_v1`, una lectura sirve una sola fórmula, y pedir una fórmula que el sujeto no tiene responde `not_available_for_method`, nunca cero; el cambio a improved lo decide TASK-1806; delta previo TASK-1670: el punto ciego de la auditoría —rastreadores de IA, borde/CDN, datos estructurados y mapa del sitio— ya tiene motor, documentado aparte en [hallazgos-de-sitio-audit-seo.md](hallazgos-de-sitio-audit-seo.md); sigue **APAGADO** hasta TASK-1671, así que un sitio invisible para la IA todavía puntúa 95/100 acá; delta previo TASK-1792: el techo de clics de una oportunidad declara de dónde salió, y cuando la curva del sitio no alcanza la lista se ordena por demanda medida en vez de fingir un orden por ganancia; delta previo TASK-1692: el candidato recuerda qué se decidió sobre él — el estado se mueve solo, lo resuelto deja de encabezar la bandeja y un descartado se puede volver a elegir; delta previo TASK-1694: en el descubrimiento, un candidato es una keyword —no una fila por método—, el filtro de dificultad del proveedor deja de decidir y aparece el aviso de canibalización; delta previo 2026-08-28 TASK-1699 + TASK-1662 + TASK-1696 vivos en producción con el release `c983be7f18e6`: el módulo ya guarda quién más aparece en tu SERP, compara contra un competidor declarado y anota quién consumió cada dólar del proveedor; delta previo 2026-08-14 por Claude (TASK-1661 + follow-ups: las columnas de mercado se llenan solas, la captura es mensual y acotada con simulacro de costo previo, "Dificultad" pasa a ser **Barrera de enlaces** en niveles con "Sin dato" como estado propio, todo dato de mercado viaja con su fecha, y cada respuesta declara el país que muestra — incluida la corrección del caso Berel (ISSUE-152/153); delta previo 2026-08-09 TASK-1677 Slice 1: la clave del módulo es `seo_v2` y es la única que el runtime lee))
+> **Ultima actualizacion:** 2026-09-03 por Claude (TASK-1806 cutover: desde el 2026-09-03 el módulo sirve la fórmula nueva del proveedor (`improved_layout_clickstream_v2`); las cifras de tráfico estimado bajan ≈ 60 % respecto a las anteriores por cambio de fórmula, no por pérdida real; la historia desde julio 2026 está recomputada y antes es aproximación calibrada; cada cifra sigue declarando `etvMethodology`; delta previo TASK-1806 evaluación: comparación acotada y pagada sobre tres dominios, sin efecto visible hasta el cutover; delta previo TASK-1805: cada cifra de tráfico estimado declara la fórmula del proveedor con que se calculó (`etvMethodology`, sección «Metodología detrás del tráfico estimado (ETV)»); hoy todo se sirve en `legacy_static_v1`, una lectura sirve una sola fórmula, y pedir una fórmula que el sujeto no tiene responde `not_available_for_method`, nunca cero; el cambio a improved lo decide TASK-1806; delta previo TASK-1670: el punto ciego de la auditoría —rastreadores de IA, borde/CDN, datos estructurados y mapa del sitio— ya tiene motor, documentado aparte en [hallazgos-de-sitio-audit-seo.md](hallazgos-de-sitio-audit-seo.md); sigue **APAGADO** hasta TASK-1671, así que un sitio invisible para la IA todavía puntúa 95/100 acá; delta previo TASK-1792: el techo de clics de una oportunidad declara de dónde salió, y cuando la curva del sitio no alcanza la lista se ordena por demanda medida en vez de fingir un orden por ganancia; delta previo TASK-1692: el candidato recuerda qué se decidió sobre él — el estado se mueve solo, lo resuelto deja de encabezar la bandeja y un descartado se puede volver a elegir; delta previo TASK-1694: en el descubrimiento, un candidato es una keyword —no una fila por método—, el filtro de dificultad del proveedor deja de decidir y aparece el aviso de canibalización; delta previo 2026-08-28 TASK-1699 + TASK-1662 + TASK-1696 vivos en producción con el release `c983be7f18e6`: el módulo ya guarda quién más aparece en tu SERP, compara contra un competidor declarado y anota quién consumió cada dólar del proveedor; delta previo 2026-08-14 por Claude (TASK-1661 + follow-ups: las columnas de mercado se llenan solas, la captura es mensual y acotada con simulacro de costo previo, "Dificultad" pasa a ser **Barrera de enlaces** en niveles con "Sin dato" como estado propio, todo dato de mercado viaja con su fecha, y cada respuesta declara el país que muestra — incluida la corrección del caso Berel (ISSUE-152/153); delta previo 2026-08-09 TASK-1677 Slice 1: la clave del módulo es `seo_v2` y es la única que el runtime lee))
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 
 # Modulo SEO — Search Visibility 360 (Growth)
@@ -339,7 +339,7 @@ que junte ambos puntos muestra una caída —o una subida— que no ocurrió.
 **Qué ve quien lee el módulo.**
 
 - **Cada cifra viaja con su fórmula.** Junto al tráfico estimado aparece `etvMethodology`: la versión
-  (`legacy_static_v1` hoy; `improved_layout_clickstream_v2` cuando se adopte), de dónde salió esa
+  (`improved_layout_clickstream_v2` desde el 2026-09-03; `legacy_static_v1` en lo capturado antes), de dónde salió esa
   versión (`explicit_request` si la corrida la pidió de forma explícita; `contract_default_pre_cutoff`
   si es la que el proveedor aplicaba por defecto antes del corte), qué versiones existen para ese sujeto
   y si la lectura es comparable consigo misma. Es una procedencia **adicional** a la lente ◑: no es una
@@ -348,28 +348,38 @@ que junte ambos puntos muestra una caída —o una subida— que no ocurrió.
   alguien pide un dato en una fórmula que ese sujeto no tiene, la respuesta es el estado
   `not_available_for_method` —con la fórmula pedida y las que sí existen—, **nunca un cero ni una serie
   a medias**.
-- **Hoy todo se sirve en `legacy_static_v1`.** Las capturas anteriores al 2026-09-03 quedaron
-  atribuidas a esa fórmula porque era la única que el proveedor aplicaba; las nuevas la piden de forma
-  explícita. Ninguna cifra cambió de valor: cada una ganó su etiqueta.
+- **Desde el 2026-09-03 el módulo sirve `improved_layout_clickstream_v2`.** Es la fórmula nueva del
+  proveedor, la misma que será obligatoria desde el 2026-11-01. Lo que cambia para quien lee: **las cifras
+  de tráfico estimado bajan alrededor de un 60 %** respecto a las que el módulo mostraba antes (en Berel
+  −64,5 %, en su competidor Comex −52 %) **por el cambio de fórmula del proveedor, no por una pérdida
+  real de tráfico**: el mismo día, con las mismas posiciones y el mismo número de keywords, la fórmula
+  nueva reparte menos clics por posición porque descuenta lo que se llevan los resúmenes de IA, los
+  fragmentos y las búsquedas sin clic. Contra los clics reales de Search Console de Berel la fórmula
+  nueva queda mucho más cerca (sobreestima 1,5× en vez de 4,2×).
+- **La historia no se corta: se recalcula.** La serie que se muestra es una sola, toda en la fórmula
+  nueva. Desde julio de 2026 el proveedor la recalculó keyword por keyword (`fully_recomputed`); los
+  meses anteriores son una **aproximación calibrada** (`calibrated_approximation`), y cada punto lo
+  declara. No hay "punto de quiebre" en el gráfico ni variaciones que crucen fórmulas. Las capturas
+  anteriores al cambio siguen guardadas con su etiqueta `legacy_static_v1` como evidencia; no se borró
+  ni se reescribió nada.
+- **Un sujeto que todavía no tiene captura con la fórmula nueva** responde `not_available_for_method`
+  hasta su próxima captura mensual (días 16/17). No es un cero ni un error: es "aún no hay foto nueva".
 
-**Quién decide el cambio.** Pasar a la fórmula nueva **no es un interruptor que alguien prende**: es
-una unidad de trabajo aparte (`TASK-1806`) que primero compara las dos fórmulas sobre los mismos sujetos
-—con presupuesto propio y autorización, porque cada comparación exacta duplica las llamadas— y decide,
-con evidencia, si el histórico se recalcula o se declara un punto de quiebre. Hasta entonces el módulo
-sigue pidiendo la fórmula anterior y avisa en `/admin/operations` (señal `seo.etv_methodology.drift`)
-si lo configurado deja de coincidir con lo que se pidió, o si alguien deja la fórmula anterior
-configurada después del corte.
+**Cómo se decidió el cambio.** Pasar a la fórmula nueva **no fue un interruptor que alguien prendió**: fue
+una unidad de trabajo aparte (`TASK-1806`) que primero comparó las dos fórmulas sobre los mismos sujetos
+—con presupuesto propio y autorización, porque cada comparación exacta duplica las llamadas— y decidió,
+con evidencia, que el histórico se recalcula (rebaseline) en vez de declarar un punto de quiebre. El módulo
+sigue avisando en `/admin/operations` (señal `seo.etv_methodology.drift`) si lo configurado deja de coincidir
+con lo que se pidió, o si alguien deja la fórmula anterior configurada después del corte.
 
-**Qué existe hoy de esa comparación (2026-09-03).** La herramienta interna que compara las dos fórmulas ya
-está construida: sobre una cohorte fija y pequeña (Berel MX, su competidor Comex MX y Efeonce CL), con un
-tope de requests y de dólares aprobado de antemano, compra el mismo dato con las dos fórmulas el mismo día,
-lo guarda etiquetado por fórmula y luego un evaluador aplica reglas fijadas **antes** de ver resultados
-—qué tan cerca queda cada fórmula de los clics reales de Search Console, cuánto cambia el ranking de
-páginas y subdominios, cuánto cuesta— y emite un veredicto (`go` con recálculo del histórico, `go` con
-punto de quiebre, `hold` o `no_go`). **Nada de esto toca lo que ve el usuario:** el módulo sigue sirviendo
-`legacy_static_v1`, ninguna pantalla, API ni tool muestra las cifras del experimento, y el veredicto por
-sí solo no activa nada — el cambio de fórmula y el tratamiento del histórico son aprobaciones separadas del
-operador. Al 2026-09-03 la comparación pagada todavía no se ha ejecutado.
+**Qué se hizo antes de cambiar (2026-09-03).** Sobre una cohorte fija y pequeña (Berel MX, su competidor
+Comex MX y, por separado, Efeonce CL), con un tope de requests y de dólares aprobado de antemano, se compró
+el mismo dato con las dos fórmulas el mismo día (26 llamadas, USD 1,10), se guardó etiquetado por fórmula
+y un evaluador aplicó reglas fijadas **antes** de ver resultados: la fórmula nueva quedó más cerca de los
+clics reales de Search Console (error 49 % frente a 321 %), ninguna página ni subdominio entró o salió del
+ranking, y la historia mensual siguió continua. El operador aprobó el recálculo del histórico y el cambio
+en un acto separado. Efeonce se mide aparte, con su propia organización y su propio Search Console, nunca
+dentro de la consulta de un cliente.
 
 > 🔴 **Regla:** nunca comparar, restar ni graficar juntas cifras de versiones distintas de ETV. Si las
 > etiquetas no coinciden, la diferencia es de fórmula, no de rendimiento.
