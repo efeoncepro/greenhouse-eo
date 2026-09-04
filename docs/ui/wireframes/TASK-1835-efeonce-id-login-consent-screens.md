@@ -117,7 +117,9 @@ Propuestas para `src/lib/copy/auth-server.ts` (`GH_AUTH_SERVER`); los ids existe
 | stepup | Confirma que eres tú | Código de tu app | Verificar código · Usar código de respaldo | Error inline conserva el valor; sin «recordar este dispositivo» (el `amr` sale de la aserción real, TASK-1830) |
 | passkey_unsupported | (login) | `login_passkey_unsupported` | Sólo «Enviarme el enlace» (sin reintento) | Del dispositivo/navegador; el botón de passkey se oculta o deshabilita |
 | passkey_failed | (login) | `login_passkey_failed` | «Intentar de nuevo» · «Enviarme el enlace» | La ceremonia falló o se canceló; sí tiene reintento útil |
-| totp_enroll | Configura tu segundo factor | Secreto/QR + 10 códigos de respaldo mostrados UNA sola vez | Confirmar con un código · Guardar códigos | Exige sesión; los códigos no se vuelven a mostrar; sin JS de terceros |
+| totp_enroll (pending) | (`totp_*` de TASK-1830) QR + secreto alterno + 10 códigos de respaldo | El servidor los entrega UNA sola vez; no hay endpoint para volver a pedirlos | Checkbox obligatorio «Ya guardé mis códigos» ANTES de habilitar «Continuar»; luego campo de código | El enrolamiento queda `pending` hasta un código correcto: esta pantalla NO celebra nada |
+| totp_enroll (confirmado) | Segundo factor activo | Confirmación sólo tras código válido (`totp_*` confirmación) | Volver a la aplicación / `return_to` | El éxito es después del código, nunca al mostrar el QR |
+| totp_envelope_unavailable | Degradación honesta (`totp_*` envelope caído) | Explica que las lecturas siguen funcionando y la escritura espera | Volver a la aplicación con permisos de lectura | Copy de degradación, no «error de sistema» |
 | invitation_confirm | Activa tu acceso (`confirm_invitation_*`) | Botón que hace el POST de aceptación | Activar mi acceso | No abre sesión; después «revisa tu correo» (`invitation_accepted_*`) |
 | access_revoked | Tu acceso ya no está activo (`link_access_revoked_*`) | Sin PII; a quién escribir | — | Sustituye a la antigua «recovery» |
 | session_started / session_closed | `session_started_*` / `session_closed_*` | Volver a la aplicación / cerrar pestaña | — | Terminales |

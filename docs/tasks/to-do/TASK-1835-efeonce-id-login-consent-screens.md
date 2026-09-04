@@ -317,7 +317,7 @@ Reglas obligatorias:
 
 ### Slice 3 — Step-up, recuperación y sesión (bloqueado por TASK-1830 Slice 3)
 
-- Step-up TOTP (`POST /auth/totp/verify`, error inline, límite de intentos), **alta del segundo factor** (`totp_enroll`: secreto + 10 códigos de respaldo mostrados UNA vez, con copia/descarga sin JS de terceros), página de invitación `GET /i/<token>` (`invitation_confirm` → `invitation_accepted`), `access_revoked`, `session_started` y `session_closed` (`POST /auth/session/logout`). Estados exactos: §5.bis del flujo maestro.
+- Step-up TOTP (`POST /auth/totp/verify`, error inline, límite de intentos), **alta del segundo factor** (`totp_enroll`, copy `totp_*` de TASK-1830, commit `fa01887bc`: QR + secreto alterno + 10 códigos de respaldo entregados por el servidor UNA sola vez y sin endpoint para repetirlos → confirmación explícita «ya guardé mis códigos» antes de avanzar; el enrolamiento queda `pending` hasta un código correcto, así que el éxito se muestra DESPUÉS del código, nunca al mostrar el QR; estado `totp_envelope_unavailable` como degradación honesta: las lecturas siguen, la escritura espera), página de invitación `GET /i/<token>` (`invitation_confirm` → `invitation_accepted`), `access_revoked`, `session_started` y `session_closed` (`POST /auth/session/logout`). Estados exactos: §5.bis del flujo maestro.
 - GVC completo de las 11 fixtures, `pnpm ui:quality`, before/after y `UI ready: yes`.
 
 ## Out of Scope

@@ -70,6 +70,8 @@ servidor, nunca el navegador.
 | magic_sent | Enlace enviado (o no) | request | clic en correo / 60 s | Copy idéntico exista o no la invitación |
 | link_confirm | Página intermedia del enlace | `GET /m/<tokenId>.<verificador>` | Continuar (POST) → ok / expirado / usado | Botón explícito; el GET no consume (escáneres de correo) |
 | invitation_accept | Aceptar invitación | `GET /i/<token>` | aceptar → «revisa tu correo» | No crea sesión |
+| totp_enroll_pending | QR/secreto/códigos mostrados una vez | `POST /auth/totp/enroll/start` | confirmación «ya guardé» + código válido (`enroll/finish`) | Sin éxito visible hasta el código; sin re-solicitud de códigos |
+| totp_envelope_unavailable | Envelope KMS caído | `enroll`/`verify` fallan cerrados | ninguno (volver con lectura) | Degradación honesta: lecturas siguen; escritura espera |
 | passkey_ceremony | WebAuthn en curso | botón | ok / cancelado / no soportado | Estados del módulo; fallback a magic link |
 | step_up | Escritura exige 2FA | authorize con scope write y `authLevel=primary` | código ok | Campo `one-time-code`; error inline; límite por TASK-1830 |
 | consent_pending_decision | Falta consentimiento | authorize sin consents | allow / deny | `Permitir` sin foco inicial; escritura marcada |
