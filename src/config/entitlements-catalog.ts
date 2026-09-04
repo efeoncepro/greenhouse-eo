@@ -1831,6 +1831,13 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['execute'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1830 — revocar sesión, passkeys y TOTP de una persona externa del emisor.
+  {
+    key: 'identity.auth_person.revoke',
+    module: 'organization',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-910 — Notion Demo Teamspace Sandbox capabilities (canonical defense in depth).
   // Demo teamspace (Notion 36339c2f-...4ca0f5-...) sirve como gate canonical pre-Fase 1
   // del ADR GREENHOUSE_ICO_METRICS_PROGRESSIVE_MIGRATION_V1. Demo NUNCA toca payroll real

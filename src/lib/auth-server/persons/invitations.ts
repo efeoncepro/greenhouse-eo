@@ -15,6 +15,7 @@
 
 import { sha256Hex } from '../oauth/primitives'
 import { enforceRateLimit, INVITATION_ACCEPT_IP_RULE } from './rate-limit'
+import { revokeSupersededSubjects } from './recovery'
 import type { MagicLinkDeps } from './magic-link'
 import { issueMagicLinkForPerson, sanitizeReturnTo } from './magic-link'
 
@@ -24,7 +25,14 @@ import { issueMagicLinkForPerson, sanitizeReturnTo } from './magic-link'
  */
 export type InvitationAcceptancePort = {
   accept(input: { token: string; environmentId: string; subject: string }): Promise<
-    | { status: 'linked'; profileId: string; linkId: string; email: string }
+    | {
+        status: 'linked'
+        profileId: string
+        linkId: string
+        email: string
+        /** Subjects anteriores desactivados por esta re-invitación (recuperación). */
+        supersededSubjects: string[]
+      }
     | { status: 'rejected'; reason: string }
   >
 }
@@ -132,6 +140,16 @@ export const acceptInvitationAndSendMagicLink = async (
     correlationId: input.correlationId,
     details: { profileId: accepted.profileId }
   })
+
+  // Recuperación: los subjects que esta re-invitación dejó atrás pierden sesión, passkeys y TOTP.
+  // El link ya lo desactivó el command de TASK-1631; sin esta mitad, el passkey viejo abriría una
+  // sesión nueva y la re-invitación no habría recuperado nada.
+  if (accepted.supersededSubjects.length > 0) {
+    await revokeSupersededSubjects(
+      { store: deps.store, environmentId: deps.environmentId, now: deps.now },
+      { subjects: accepted.supersededSubjects, correlationId: input.correlationId }
+    )
+  }
 
   // El correo sale a la dirección que el OPERADOR declaró en la invitación (`source_email`), nunca a
   // una que venga en la request: ahí está la prueba de control del buzón.

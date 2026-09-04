@@ -48,6 +48,13 @@ export const GH_AUTH_SERVER = {
     'Si ese correo tiene acceso, te acaba de llegar un enlace para entrar. Es válido por 15 minutos y funciona una sola vez.',
   login_sent_hint: 'No cierres esta pestaña: puedes abrir el enlace desde el mismo navegador.',
   login_invalid_email: 'Ese correo no tiene un formato válido. Revísalo e inténtalo de nuevo.',
+  // Passkey primero: el login por passkey no pide correo (credenciales descubribles), así que va
+  // arriba del campo. Los dos fallbacks son distintos a propósito: «no hay soporte» es del
+  // dispositivo y «no resultó» es de la ceremonia; mezclarlos manda a la persona a revisar lo que no es.
+  login_passkey_cta: 'Entrar con mi passkey',
+  login_passkey_unsupported: 'Este dispositivo no admite passkeys. Usa el enlace por correo.',
+  login_passkey_failed: 'No resultó el acceso con passkey. Puedes intentarlo de nuevo o usar el enlace por correo.',
+  login_email_fallback_hint: 'O entra con un enlace por correo:',
   login_rate_limited_title: 'Demasiados intentos',
   login_rate_limited_body: 'Espera unos minutos antes de volver a pedir un enlace de acceso.',
 

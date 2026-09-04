@@ -58,7 +58,8 @@ export const createExternalInvitationAcceptancePort = (): InvitationAcceptancePo
         status: 'linked',
         profileId: result.profileId,
         linkId: result.linkId,
-        email: result.invitation.email
+        email: result.invitation.email,
+        supersededSubjects: result.supersededSubjects
       }
     } catch (error) {
       // El código viaja al ledger, jamás al cliente: distinguir "no existe" de "vencida" es un oráculo.

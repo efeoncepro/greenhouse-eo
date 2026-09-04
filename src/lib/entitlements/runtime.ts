@@ -1493,7 +1493,12 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
   // TASK-1829 — Authorization server propio: registro de clientes confidenciales y revocación de
   // consentimientos OAuth. Sólo EFEONCE_ADMIN (least privilege; invariante TASK-873/935).
   if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
-    for (const capability of ['identity.auth_client.register', 'identity.auth_consent.revoke'] as const) {
+    for (const capability of [
+      'identity.auth_client.register',
+      'identity.auth_consent.revoke',
+      // TASK-1830 — revocación de acceso de una persona externa (recuperación operada).
+      'identity.auth_person.revoke'
+    ] as const) {
       addEntitlement(entries, {
         module: 'organization',
         capability,

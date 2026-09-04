@@ -45,7 +45,10 @@ type Harness = {
   acceptedSubjects: string[]
 }
 
-const buildHarness = (options: { linkActive?: boolean; knownEmail?: boolean } = {}): Harness => {
+const buildHarness = (
+  options: { linkActive?: boolean; knownEmail?: boolean; supersededOnAccept?: string[] } = {}
+): Harness => {
+  const supersededOnAccept = options.supersededOnAccept ?? []
   const store = new InMemoryPersonAuthStore()
   const sent: Array<{ email: string; url: string }> = []
   const sleeps: number[] = []
@@ -89,7 +92,13 @@ const buildHarness = (options: { linkActive?: boolean; knownEmail?: boolean } = 
 
       if (token !== 'invitation-token-valida-0123456789') return { status: 'rejected', reason: 'not_found' }
 
-      return { status: 'linked', profileId: 'prof-2', linkId: 'ipsl-test-2', email: invitationEmail }
+      return {
+        status: 'linked',
+        profileId: 'prof-2',
+        linkId: 'ipsl-test-2',
+        email: invitationEmail,
+        supersededSubjects: supersededOnAccept
+      }
     }
   }
 
@@ -149,7 +158,7 @@ describe('superficie de personas — enrutamiento y flag', () => {
       config: { ...config, personAuthEnabled: false },
       directory: { findBySubject: async () => null, findByEmail: async () => null },
       mailer: { send: async () => undefined },
-      invitations: { accept: async () => ({ status: 'rejected', reason: 'disabled' }) },
+      invitations: { accept: async () => ({ status: 'rejected' as const, reason: 'disabled' }) },
       mintSubject: () => 'x',
       environmentId: ENVIRONMENT_ID,
       expectedSourceSystem: SOURCE_SYSTEM,
@@ -668,5 +677,102 @@ describe('ergonomía del navegador', () => {
     expect((await harness.handler(request('GET', '/auth/magic-link/request')))?.status).toBe(405)
     expect((await harness.handler(request('POST', '/login')))?.status).toBe(405)
     expect(vi.isMockFunction(harness.handler)).toBe(false)
+  })
+})
+
+describe('recuperación por re-invitación', () => {
+  it('la re-invitación mata sesión, passkeys y TOTP del subject anterior', async () => {
+    const OLD_SUBJECT = 'subject-viejo'
+    const harness = buildHarness({ supersededOnAccept: [OLD_SUBJECT] })
+    const now = new Date('2026-09-04T12:00:00.000Z')
+
+    // Estado del subject viejo: una sesión viva, un passkey y un TOTP activo.
+    harness.store.registerLink({
+      linkId: 'ipsl-viejo',
+      subject: OLD_SUBJECT,
+      sourceSystem: SOURCE_SYSTEM,
+      active: true
+    })
+    await harness.store.insertSession({
+      sessionHash: 'f'.repeat(64),
+      subject: OLD_SUBJECT,
+      environmentId: ENVIRONMENT_ID,
+      profileId: 'prof-2',
+      linkId: 'ipsl-viejo',
+      amr: ['passkey', 'uv'],
+      authTime: now,
+      stepUpAt: now,
+      createdAt: now,
+      lastSeenAt: now,
+      expiresAt: new Date(now.getTime() + 3_600_000),
+      absoluteExpiresAt: new Date(now.getTime() + 7 * 86_400_000),
+      revokedAt: null,
+      revokeReason: null,
+      ipHash: null,
+      userAgentHash: null,
+      correlationId: null
+    })
+    await harness.store.insertPasskeyCredential({
+      credentialId: 'cred-viejo',
+      environmentId: ENVIRONMENT_ID,
+      subject: OLD_SUBJECT,
+      publicKey: new Uint8Array(new ArrayBuffer(4)),
+      counter: 3,
+      transports: [],
+      deviceName: 'Teléfono perdido',
+      deviceType: 'multiDevice',
+      backedUp: true,
+      aaguid: null,
+      createdAt: now,
+      lastUsedAt: null,
+      revokedAt: null,
+      revokeReason: null
+    })
+    await harness.store.upsertTotpEnrollment({
+      environmentId: ENVIRONMENT_ID,
+      subject: OLD_SUBJECT,
+      secretCiphertext: new Uint8Array(new ArrayBuffer(8)),
+      kmsKeyName: 'test',
+      status: 'active',
+      lastUsedStep: 1,
+      createdAt: now,
+      confirmedAt: now,
+      lastVerifiedAt: now,
+      revokedAt: null,
+      revokeReason: null
+    })
+
+    const response = await harness.handler(
+      request('POST', '/auth/invitations/accept', {
+        body: JSON.stringify({ token: 'invitation-token-valida-0123456789' })
+      })
+    )
+
+    expect(response?.status).toBe(202)
+
+    expect(harness.store.sessions.get('f'.repeat(64))?.revokeReason).toBe('superseded_by_reinvitation')
+    expect((await harness.store.getPasskeyCredential('cred-viejo'))?.revokedAt).not.toBeNull()
+    expect(
+      (await harness.store.getTotpEnrollment({ environmentId: ENVIRONMENT_ID, subject: OLD_SUBJECT }))?.status
+    ).toBe('revoked')
+
+    // Y queda rastro en el ledger, con el sujeto hasheado.
+    const revocation = harness.store.attempts.find(attempt => attempt.method === 'recovery')
+
+    expect(revocation?.stage).toBe('revoke')
+    expect(revocation?.subjectHash).toBe(sha256(OLD_SUBJECT))
+    expect(JSON.stringify(revocation)).not.toContain(OLD_SUBJECT)
+  })
+
+  it('sin subjects anteriores no revoca nada: una invitación normal no es una recuperación', async () => {
+    const harness = buildHarness()
+
+    await harness.handler(
+      request('POST', '/auth/invitations/accept', {
+        body: JSON.stringify({ token: 'invitation-token-valida-0123456789' })
+      })
+    )
+
+    expect(harness.store.attempts.some(attempt => attempt.method === 'recovery')).toBe(false)
   })
 })

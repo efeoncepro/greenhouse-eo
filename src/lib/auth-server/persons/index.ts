@@ -55,6 +55,12 @@ export {
   MAGIC_LINK_EMAIL_RULE,
   MAGIC_LINK_IP_RULE
 } from './rate-limit'
+export {
+  revokePersonAuthState,
+  revokeSupersededSubjects,
+  type RevokePersonAuthStateDeps,
+  type RevokePersonAuthStateResult
+} from './recovery'
 export { createPersonAuthHandler, isPersonAuthPath, type PersonAuthHandler, type PersonAuthHandlerDeps } from './routes'
 export {
   buildSessionClearCookie,
