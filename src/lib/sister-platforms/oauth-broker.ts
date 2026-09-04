@@ -1,7 +1,22 @@
 import 'server-only'
 
-import { createHash, randomBytes, randomUUID, timingSafeEqual } from 'node:crypto'
+import { randomUUID } from 'node:crypto'
 
+import {
+  CORRELATION_ID_PATTERN,
+  buildPkceChallenge,
+  generateOpaqueToken,
+  hashSensitiveValue,
+  isLoopbackRedirectUri,
+  isPkceToken,
+  matchRedirectUri,
+  normalizeRegisteredRedirectUris,
+  normalizeStringArray,
+  parseScopeParam,
+  safeEquals,
+  sha256Hex,
+  toIsoString
+} from '@/lib/auth-server/oauth/primitives'
 import { query, withTransaction } from '@/lib/db'
 import { getTenantAccessRecordByUserId, type TenantAccessRecord } from '@/lib/tenant/access'
 
@@ -200,87 +215,33 @@ const AUTHORIZATION_CODE_TTL_MAX_SECONDS = 10 * 60
 
 export const OAUTH_ACCESS_TOKEN_TTL_MAX_SECONDS = 8 * 60 * 60
 const DEFAULT_ALLOWED_SCOPES = ['openid', 'profile', 'email']
-const CORRELATION_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/
 
-const toIsoString = (value: string | Date | null) => {
-  if (!value) return null
-  if (typeof value === 'string') return value
+const hashValue = sha256Hex
 
-  return value.toISOString()
-}
-
-const hashValue = (value: string) => createHash('sha256').update(value).digest('hex')
-
-const hashSensitiveValue = (value: string | null) => (value ? hashValue(value).slice(0, 32) : null)
-
-const safeEquals = (left: string, right: string) => {
-  const leftBuffer = Buffer.from(left)
-  const rightBuffer = Buffer.from(right)
-
-  if (leftBuffer.length !== rightBuffer.length) return false
-
-  return timingSafeEqual(leftBuffer, rightBuffer)
-}
-
-const normalizeStringArray = (value: string[] | null | undefined, fallback: string[]) => {
-  if (!Array.isArray(value)) return fallback
-
-  return value.map(item => item.trim()).filter(Boolean)
-}
-
-const normalizeScopeParam = (value: string | null) => {
-  const scopes = (value || '')
-    .split(/\s+/)
-    .map(scope => scope.trim())
-    .filter(Boolean)
-
-  return Array.from(new Set(scopes.length > 0 ? scopes : DEFAULT_ALLOWED_SCOPES))
-}
+const normalizeScopeParam = (value: string | null) => parseScopeParam(value, DEFAULT_ALLOWED_SCOPES)
 
 const normalizeRedirectUris = (value: string[]) => {
-  const uris = Array.from(new Set(value.map(uri => uri.trim()).filter(Boolean)))
+  const result = normalizeRegisteredRedirectUris(value)
 
-  if (uris.length === 0) {
-    throw new SisterPlatformOAuthError('At least one redirect URI is required.', {
-      errorCode: 'missing_redirect_uri'
-    })
+  if (result.ok) return result.uris
+
+  if (result.reason === 'unparseable') {
+    // Comportamiento legacy: `new URL(uri)` lanzaba TypeError antes de la extracción (TASK-1829).
+    throw new TypeError('Invalid URL')
   }
 
-  for (const uri of uris) {
-    if (uri.includes('*')) {
-      throw new SisterPlatformOAuthError('Redirect URI wildcards are not allowed.', {
-        errorCode: 'invalid_redirect_uri'
-      })
-    }
+  const message =
+    result.error === 'missing_redirect_uri'
+      ? 'At least one redirect URI is required.'
+      : result.reason === 'wildcard'
+        ? 'Redirect URI wildcards are not allowed.'
+        : 'Redirect URI must use HTTPS except localhost development.'
 
-    const parsed = new URL(uri)
-
-    if (parsed.protocol !== 'https:' && parsed.hostname !== 'localhost' && parsed.hostname !== '127.0.0.1') {
-      throw new SisterPlatformOAuthError('Redirect URI must use HTTPS except localhost development.', {
-        errorCode: 'invalid_redirect_uri'
-      })
-    }
-  }
-
-  return uris
+  throw new SisterPlatformOAuthError(message, { errorCode: result.error })
 }
 
-const isLoopbackPublicRedirectUri = (uri: string, allowRuntimeLocalhostAlias = false) => {
-  try {
-    const parsed = new URL(uri)
-
-    return (
-      parsed.protocol === 'http:' &&
-      (parsed.hostname === '127.0.0.1' || (allowRuntimeLocalhostAlias && parsed.hostname === 'localhost')) &&
-      !parsed.username &&
-      !parsed.password &&
-      !parsed.hash &&
-      Boolean(parsed.pathname)
-    )
-  } catch {
-    return false
-  }
-}
+const isLoopbackPublicRedirectUri = (uri: string, allowRuntimeLocalhostAlias = false) =>
+  isLoopbackRedirectUri(uri, { allowLocalhostAlias: allowRuntimeLocalhostAlias, allowIpv6Loopback: false })
 
 const assertPublicClientRedirectUris = (redirectUris: readonly string[]) => {
   if (redirectUris.some(uri => !isLoopbackPublicRedirectUri(uri))) {
@@ -291,6 +252,10 @@ const assertPublicClientRedirectUris = (redirectUris: readonly string[]) => {
   }
 }
 
+/**
+ * Política del broker legacy: `127.0.0.1` registrado; la URI pedida tolera `localhost` (Vercel/Next
+ * normaliza el query) y vuelve al host registrado preservando el puerto efímero (RFC 8252).
+ */
 const resolveClientRedirectUri = ({
   client,
   registeredRedirectUri,
@@ -299,38 +264,7 @@ const resolveClientRedirectUri = ({
   client: SisterPlatformOAuthClient
   registeredRedirectUri: string
   requestedRedirectUri: string
-}) => {
-  if (client.clientType === 'confidential') {
-    return registeredRedirectUri === requestedRedirectUri ? requestedRedirectUri : null
-  }
-
-  if (
-    !isLoopbackPublicRedirectUri(registeredRedirectUri) ||
-    !isLoopbackPublicRedirectUri(requestedRedirectUri, true)
-  ) {
-    return null
-  }
-
-  const registered = new URL(registeredRedirectUri)
-  const requested = new URL(requestedRedirectUri)
-
-  const matches =
-    registered.protocol === requested.protocol &&
-    (registered.hostname === requested.hostname ||
-      (registered.hostname === '127.0.0.1' && requested.hostname === 'localhost')) &&
-    registered.pathname === requested.pathname &&
-    registered.search === requested.search
-
-  if (!matches) return null
-
-  // Vercel/Next can normalize a 127.0.0.1 query parameter to localhost before
-  // the route sees it. Return the registered loopback host while preserving the
-  // RFC 8252 ephemeral port so authorization, callback and token exchange share
-  // one exact redirect_uri value.
-  requested.hostname = registered.hostname
-
-  return requested.toString()
-}
+}) => matchRedirectUri({ clientType: client.clientType, registeredRedirectUri, requestedRedirectUri })
 
 const normalizeAllowedScopes = (value: string[] | undefined) => {
   const scopes = Array.from(
@@ -354,13 +288,9 @@ const normalizeTtl = (value: number | undefined, fallback: number, min: number, 
   return Math.trunc(value)
 }
 
-const isPkceToken = (value: string) => /^[A-Za-z0-9._~-]{43,128}$/.test(value)
+const generateAuthorizationCode = () => generateOpaqueToken('ghspoac', 32)
 
-const generateAuthorizationCode = () => `ghspoac_${randomBytes(32).toString('base64url')}`
-
-const generateAccessToken = () => `ghspoat_${randomBytes(48).toString('base64url')}`
-
-const buildPkceChallenge = (codeVerifier: string) => createHash('sha256').update(codeVerifier).digest('base64url')
+const generateAccessToken = () => generateOpaqueToken('ghspoat', 48)
 
 const mapOAuthClient = (row: OAuthClientRow): SisterPlatformOAuthClient => {
   const allowedScopes = normalizeStringArray(row.allowed_scopes, DEFAULT_ALLOWED_SCOPES)
