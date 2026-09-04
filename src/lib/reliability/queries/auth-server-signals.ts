@@ -187,5 +187,106 @@ export const getAuthSigningKeysLifecycleSignal = async (deps: AuthServerSignalDe
   }
 }
 
-export const getAuthServerSignals = async (): Promise<ReliabilitySignal[]> =>
-  Promise.all([getAuthIssuerJwksSignal(), getAuthSigningKeysLifecycleSignal()])
+// ─── TASK-1829 — abuso del protocolo OAuth (lectura de greenhouse_auth.oauth_audit_events) ──────
+
+export const AUTH_OAUTH_CODE_REUSE_SIGNAL_ID = 'auth.oauth.code_reuse_detected'
+export const AUTH_OAUTH_REFRESH_REUSE_SIGNAL_ID = 'auth.oauth.refresh_reuse_detected'
+export const AUTH_OAUTH_CIMD_REJECTED_SIGNAL_ID = 'auth.oauth.cimd_rejected'
+
+const OAUTH_ABUSE_WINDOW_HOURS = 24
+
+type OAuthAbuseRow = { event_type: 'code_reuse' | 'refresh_reuse' | 'cimd_fetch'; events: number; clients: number }
+
+const OAUTH_ABUSE_SQL = `
+  SELECT event_type, COUNT(*)::int AS events, COUNT(DISTINCT client_id)::int AS clients
+  FROM greenhouse_auth.oauth_audit_events
+  WHERE occurred_at >= now() - ($1::int * INTERVAL '1 hour')
+    AND (
+      event_type IN ('code_reuse', 'refresh_reuse')
+      OR (event_type = 'cimd_fetch' AND outcome = 'rejected')
+    )
+  GROUP BY event_type
+`
+
+export type AuthOAuthAbuseSignalDeps = Readonly<{ loadRows?: () => Promise<OAuthAbuseRow[]> }>
+
+const defaultLoadAbuseRows = () => query<OAuthAbuseRow>(OAUTH_ABUSE_SQL, [OAUTH_ABUSE_WINDOW_HOURS])
+
+const buildAbuseSignal = (
+  signalId: string,
+  label: string,
+  row: OAuthAbuseRow | undefined,
+  copy: { steady: string; alert: (events: number, clients: number) => string; severity: ReliabilitySignal['severity'] },
+  observedAt: string
+): ReliabilitySignal => {
+  const events = row?.events ?? 0
+  const clients = row?.clients ?? 0
+
+  return {
+    signalId,
+    moduleKey: 'identity' as const,
+    kind: 'incident' as const,
+    source: 'getAuthOAuthAbuseSignals',
+    label,
+    observedAt,
+    severity: events > 0 ? copy.severity : 'ok',
+    summary: events > 0 ? copy.alert(events, clients) : copy.steady,
+    evidence: [
+      { kind: 'sql', label: 'Query', value: `greenhouse_auth.oauth_audit_events últimas ${OAUTH_ABUSE_WINDOW_HOURS} h` },
+      { kind: 'metric', label: 'events_24h', value: String(events) },
+      { kind: 'metric', label: 'clients_24h', value: String(clients) }
+    ]
+  }
+}
+
+/**
+ * Tres señales steady = 0: un code reutilizado o un refresh reutilizado es un token filtrado o un
+ * cliente roto (el emisor ya revocó la familia; la señal existe para que alguien mire); un CIMD
+ * rechazado es un cliente mal formado o un intento de SSRF/spoof.
+ */
+export const getAuthOAuthAbuseSignals = async (deps: AuthOAuthAbuseSignalDeps = {}): Promise<ReliabilitySignal[]> => {
+  const observedAt = new Date().toISOString()
+
+  try {
+    const rows = await (deps.loadRows ?? defaultLoadAbuseRows)()
+    const byType = new Map(rows.map(row => [row.event_type, row]))
+
+    return [
+      buildAbuseSignal(AUTH_OAUTH_CODE_REUSE_SIGNAL_ID, 'Reuso de authorization code (OAuth)', byType.get('code_reuse'), {
+        steady: 'Ningún authorization code reutilizado en 24 h.',
+        alert: (events, clients) => `${events} intento(s) de reuso de code en 24 h (${clients} cliente(s)); las familias afectadas ya quedaron revocadas.`,
+        severity: 'error'
+      }, observedAt),
+      buildAbuseSignal(AUTH_OAUTH_REFRESH_REUSE_SIGNAL_ID, 'Reuso de refresh token (OAuth)', byType.get('refresh_reuse'), {
+        steady: 'Ningún refresh token reutilizado en 24 h.',
+        alert: (events, clients) => `${events} reuso(s) de refresh token en 24 h (${clients} cliente(s)); las familias afectadas ya quedaron revocadas.`,
+        severity: 'error'
+      }, observedAt),
+      buildAbuseSignal(AUTH_OAUTH_CIMD_REJECTED_SIGNAL_ID, 'Documentos CIMD rechazados', byType.get('cimd_fetch'), {
+        steady: 'Ningún client_id metadata document rechazado en 24 h.',
+        alert: (events, clients) => `${events} documento(s) CIMD rechazado(s) en 24 h (${clients} client_id distintos): revisar razones en oauth_audit_events.`,
+        severity: 'warning'
+      }, observedAt)
+    ]
+  } catch (error) {
+    captureWithDomain(error, 'identity', { tags: { source: 'reliability_signal_auth_oauth_abuse', component: 'auth-server' } })
+
+    return [AUTH_OAUTH_CODE_REUSE_SIGNAL_ID, AUTH_OAUTH_REFRESH_REUSE_SIGNAL_ID, AUTH_OAUTH_CIMD_REJECTED_SIGNAL_ID].map(signalId => ({
+      signalId,
+      moduleKey: 'identity' as const,
+      kind: 'incident' as const,
+      source: 'getAuthOAuthAbuseSignals',
+      label: signalId,
+      observedAt,
+      severity: 'error' as const,
+      summary: 'No se pudo leer greenhouse_auth.oauth_audit_events.',
+      evidence: []
+    }))
+  }
+}
+
+export const getAuthServerSignals = async (): Promise<ReliabilitySignal[]> => {
+  const [jwks, lifecycle, abuse] = await Promise.all([getAuthIssuerJwksSignal(), getAuthSigningKeysLifecycleSignal(), getAuthOAuthAbuseSignals()])
+
+  return [jwks, lifecycle, ...abuse]
+}

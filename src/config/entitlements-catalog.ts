@@ -1816,6 +1816,21 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['execute'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1829 — Authorization server propio (EPIC-044). Registrar clientes OAuth confidenciales
+  // y revocar consentimientos (+ familias de tokens) son commands canónicos consumidos por Admin
+  // Center, CLI (`pnpm auth-server:register-client`) y Nexa. Grant: EFEONCE_ADMIN (runtime.ts, mismo PR).
+  {
+    key: 'identity.auth_client.register',
+    module: 'organization',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'identity.auth_consent.revoke',
+    module: 'organization',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-910 — Notion Demo Teamspace Sandbox capabilities (canonical defense in depth).
   // Demo teamspace (Notion 36339c2f-...4ca0f5-...) sirve como gate canonical pre-Fase 1
   // del ADR GREENHOUSE_ICO_METRICS_PROGRESSIVE_MIGRATION_V1. Demo NUNCA toca payroll real

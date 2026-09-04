@@ -64,6 +64,7 @@ export type CanonicalErrorCode =
   | 'external_access_invitation_not_open'
   | 'external_access_invitation_expired'
   | 'external_access_identity_collision'
+  | 'auth_server_invalid_request'
   // Design System Figma node linking (TASK-1072).
   | 'invalid_figma_url'
   | 'figma_node_not_axis'
@@ -297,6 +298,12 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     status: 409,
     message: 'La persona no se pudo resolver de forma única. Requiere revisión manual de identidad.',
     actionable: false
+  },
+  // TASK-1829 — Commands del authorization server propio (clientes OAuth, consentimientos).
+  auth_server_invalid_request: {
+    status: 422,
+    message: 'Revisa los datos del cliente OAuth o del consentimiento: hay un campo inválido o faltante.',
+    actionable: true
   },
   invalid_figma_url: {
     status: 422,
