@@ -49,9 +49,11 @@ resolver responde `revoked` leyendo el link inactivo; `issuer_class` inmutable p
 gateway en TASK-1831). Drift preexistente detectado por el test live de paridad registry↔catálogo (11 capabilities
 ajenas sin seed) → task aparte; las 6 de esta task están en sync.
 
-**Estado: `code complete, rollout pendiente`** — falta deploy de `develop` (release control plane) y observar las 4
-señales en `/admin/operations` en steady 0; la baja end-to-end con token vigente y los canaries de cliente son
-evidencia de TASK-1831/1832.
+**Estado: `code complete, staging verificado, producción pendiente`** — push de `develop` (`02dc5d987`) coordinado con
+TASK-1828; en staging las 4 señales responden por `/api/admin/reliability`, `GET …/external-access/environments` y
+`/eligibility` devuelven datos reales y el lane ecosystem responde `401 missing_token` sin consumer. El release a `main`
+espera a TASK-1828 (decisión del operador). La baja end-to-end con token vigente y los canaries de cliente son evidencia
+de TASK-1831/1832.
 
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
@@ -70,7 +72,7 @@ evidencia de TASK-1831/1832.
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Slice 1 (U04) code complete 2026-09-04: schema aditivo APLICADO en PG (2 migraciones), commands/readers/resolver, 6 capabilities, 7 rutas admin + reader ecosystem para el gateway, 4 señales cableadas, smoke live verde (bind → grant → invite → accept → resolve bound → revoke → resolve revoked). Rollout pendiente: deploy develop→staging/prod y verificación de las señales en /admin/operations; canaries y revocación end-to-end viven en TASK-1831/1832`
+- Status real: `Slice 1 (U04) code complete 2026-09-04: schema aditivo APLICADO en PG (2 migraciones), commands/readers/resolver, 6 capabilities, 7 rutas admin + reader ecosystem para el gateway, 4 señales cableadas, smoke live verde (bind → grant → invite → accept → resolve bound → revoke → resolve revoked). Staging verificado 2026-09-04 (develop 02dc5d987: 4 señales en /api/admin/reliability, rutas admin 200 con datos reales, lane ecosystem 401 sin consumer token); producción espera el release a main junto con TASK-1828; canaries y revocación end-to-end viven en TASK-1831/1832`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|agentic`
 - Blocked by: `none para el slice entregado; la verificación operativa exige deploy (release control plane) y la evidencia end-to-end (token vigente denegado tras revocación, canaries Claude/Codex/ChatGPT) depende de TASK-1829/1830/1831/1832 y de la task ui-ux de login`
@@ -744,10 +746,10 @@ production secrets, client registrations and the first customer onboarding conse
 - [x] Cada command de operador tiene capability dedicada y granular, seedeada en registry + catálogo TS y
       granteada a ≥1 rol real en el mismo PR; `capability-grant-coverage.test.ts` pasa. _Evidencia 2026-09-04: 6
       capabilities `identity.external_*` (seed migración 20260904104914802 + catálogo + `efeonce_admin`)._
-- [ ] Las cuatro reliability signals están registradas, visibles en `/admin/operations` y en `steady = 0`.
-      _Registradas y cableadas (`external-identity-binding-signals.ts`, overview, registry); smoke live: 3 en ok y
-      `unbound_dispatch_attempt` en warning por los denials del propio smoke (decae en 24h). Visibilidad en
-      `/admin/operations` pendiente de deploy — rollout pendiente._
+- [x] Las cuatro reliability signals están registradas, visibles en `/admin/operations` y en `steady = 0`.
+      _Evidencia staging 2026-09-04 (deploy `greenhouse-extzoqo80`, develop `02dc5d987`): `/api/admin/reliability`
+      devuelve las 4 señales bajo `identity` — 3 en `ok`, `unbound_dispatch_attempt` en `warning` por los 4 denials del
+      smoke `--apply` (decae en 24h; steady 0 sin tráfico). Producción: pendiente del release con TASK-1828._
 - [ ] La baja de una persona en la organización cliente revoca su acceso MCP end-to-end, verificado en vivo: el
       binding queda desactivado, el grant deja de resolver y un token vigente emitido antes de la baja se deniega
       en dispatch sin esperar a su expiración.

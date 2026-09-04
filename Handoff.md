@@ -15,7 +15,7 @@ ADR Delta 2026-09-03, fila Accepted en DECISIONS_INDEX); **TASK-1828 EN EJECUCI�
 tener wireframe/flow reales. Siguiente ID libre `TASK-1835` / `EPIC-045`.
 **TASK-1631 (U04) Slice 1, 2026-09-04 — code complete, rollout pendiente.** Binding aplicado en PG, dominio
 `src/lib/identity/external-access/**`, rutas admin, reader del gateway `GET /api/platform/ecosystem/identity/binding` y 4
-señales; smoke `pnpm identity:external-access:smoke`. **Próximo paso:** deploy de `develop` y señales en `/admin/operations`.
+señales; smoke `pnpm identity:external-access:smoke`. **Staging verificado 2026-09-04** (develop `02dc5d987` pusheado coordinado con TASK-1828): 4 señales en `/api/admin/reliability`, rutas admin 200, lane ecosystem 401 sin consumer. **Próximo paso:** release a `main` junto con TASK-1828 (decisión del operador); luego TASK-1831.
 Paridad registry↔catálogo roja por 11 capabilities ajenas sin seed (task aparte).
 
 Maggie/María Fernanda: cierre 4/4, unresolved=0; agosto ready. Método documentado en runbook/manual y
