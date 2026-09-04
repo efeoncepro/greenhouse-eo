@@ -135,6 +135,33 @@ registrada como candidata sin haber postulado ni consentido nada, por pura mecá
 
 La corrección no es limpiar después: es no tocar a nadie real.
 
+### 🔴 NUNCA dejar un sujeto de dominio con compensación o relación abierta al terminar
+
+Cuando el sujeto no es un candidato sino un **member** (hoy: `src/lib/workforce/offboarding/review-execute.live.test.ts`,
+que crea colaboradores por el primitive SCIM con `display_name` `TASK-1349 live access|exit` y correo
+`t1349-<run>-…@efeoncepro.com`), cada fila que el test deja abierta es un hecho laboral para los lectores de nómina.
+
+**Incidente 2026-09-03 («colaboradores fantasma»).** La pre-nómina de septiembre mostró seis
+`Colaborador <uuid>` «sin contrato». Eran sujetos de ese live test: inactivos, pero con `compensation_versions`
+abiertas. Dos causas encadenadas, ninguna en el test que fallaba: el roster de TASK-1349 dejó de filtrar
+`members.active` universalmente (decisión correcta: `active` es disponibilidad, no elegibilidad histórica) y la
+política contaba su caso `identity_only` ejecutado como salida decidida (corregido en `0233f81e7`). Remediación:
+9 versiones cerradas con el command `closeCompensationVigencyAtExit`; el `afterAll` ahora cierra compensación
+(`effective_to = effective_from`) y desactiva usuarios/members; a las 18:37Z se purgaron los 12 sujetos (253 filas)
+con `scripts/workforce/purge-task1349-live-subjects.sql`.
+
+Reglas que deja:
+
+- **Nunca** terminar con compensación, relación legal o engagement abierto en un sujeto sintético. El cierre va en
+  el propio `afterAll`, y con `.catch` por fila: un teardown que aborta en la primera deja abiertas las demás.
+- **Nombre y correo con predicado sintético reconocible** (`display_name LIKE 'TASK-1349 live %' AND primary_email
+  LIKE 't1349-%@efeoncepro.com'`): es lo que permite una purga con `WHERE` explícito que **aborta** si el conjunto
+  contiene un member real. Sin predicado no hay purga segura, sólo SQL a mano.
+- **Verificar la pre-nómina/roster después de correrlo** (`pnpm payroll:exit-eligibility:smoke` o la proyección
+  del período): el síntoma aparece en una pantalla de otro dominio, no en el test.
+- **Un live test que falla a mitad deja huérfanos.** El `afterAll` no corre sobre lo que un `expect` anterior no
+  llegó a registrar en `createdMemberIds`; tras un rojo, purgar con el predicado y releer el roster.
+
 ### Propiedades que todo fixture nuevo debe conservar
 
 - **`data_origin = 'smoke_test'` declarado en el nacimiento del dato.** Omitirlo deja el default del
@@ -321,6 +348,8 @@ también aislados.
 - [ ] Todo dato que cree declara su procedencia sintética en el INSERT, no después.
 - [ ] No hereda precondiciones del entorno: las garantiza en `beforeEach`.
 - [ ] Si el flujo emite outbox, el test lo retira antes de terminar.
+- [ ] Si crea members/relaciones/compensaciones, el `afterAll` las cierra (por fila, con `.catch`) y el nombre +
+      correo cumplen un predicado sintético con el que una purga pueda abortar ante un real (§3).
 - [ ] **Ejercita el CAMINO, no una constante.** Llama al reader/command exportado —no al SQL suelto—
       para que el helper de PG, los nombres de columna, los guards y los umbrales queden dentro del
       alcance. Si el sanity del módulo importa sólo la constante SQL por una razón legítima, este

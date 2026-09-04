@@ -10,6 +10,9 @@
 > [`GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md`](../../operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md).
 > La arquitectura descrita aquí sigue existiendo durante la hibernación; disponibilidad diseñada o histórica
 > no equivale a runtime ejecutable.
+> El scheduler externo `ops-globe-tenancy-reconcile` pertenece a Greenhouse (`efeonce-group/us-east4`), no al
+> Terraform Globe: su pausa/reanudación y prevención de redeploy se gobiernan aparte en el runbook §3.1/§9.
+> La reactivación exige refrescar proyecciones tenancy por el broker autorizado antes de abrir producción.
 
 > 🛰️ **Ledger de la flota de modelos (leer PRIMERO antes de asumir que un modelo no está integrado):**
 > [`../../operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md`](../../operations/creative-studio/GLOBE_MODEL_FLEET_STATUS.md)

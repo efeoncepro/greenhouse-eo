@@ -328,9 +328,13 @@ Nexa governed action `decide_hiring_application`. Contract in
 - 🔴 **Confirming is fail-closed for delegated agents.** `confirm` rejects `authSource ===
   'sister_platform_oauth'` with 403. A delegated token may **read** the outcome and **propose** a decision;
   confirming requires a human session. This is not an oversight: `efeonce.mcp.hiring.write` **does not
-  exist in code** — proposed in TASK-1720/1722 as a blast-radius class and blocked until the revocable
-  grant of **TASK-1631**. Same split as the rest of Hiring: the agent proposes and reads, the human
-  confirms. **NEVER** wire a delegated write scope into this lane before that grant.
+  exist in code** — proposed in TASK-1720/1722 as a blast-radius class and blocked until a delegated
+  token can carry a revocable grant. The grant itself already exists
+  (`greenhouse_core.external_capability_grants`, per organization and per person — **TASK-1631**,
+  2026-09-04); what is missing is the native issuer + multi-issuer gateway of EPIC-044
+  (TASK-1829/1830/1831/1832), which mints tokens with `gv`. Same split as the rest of Hiring: the agent
+  proposes and reads, the human confirms. **NEVER** wire a delegated write scope into this lane before
+  that issuer/gateway lands.
 - 🔴 **Every `hiring.*` capability checked with `can()` must declare its parity** in
   `src/lib/hiring/capability-parity-manifest.ts` as `federated` (with `evidence` = an `app` lane route the
   test verifies exists), `deliberately-internal` (with a reason) or `pending` (with a reason). Adding one
@@ -805,6 +809,14 @@ SQL instance shared by dev, staging and production**. Every rule below exists be
   the capacity-closure reconciler's live tests are **read-only over candidate data on purpose** — and why
   green live tests there never prove the write path was exercised.
 
+## Returning people: preserve the person, distinguish the episodes
+
+A person who returns with another work email is not automatically a new person or a revived employee contract. Discover the existing identity/profile, prior legal episodes, current contractor engagement, member availability and access separately; names and email similarity alone never authorize a merge. People owns the confirmed dates and agreement; Identity owns account linking, Workforce owns legal episodes/availability, and Finance owns period submissions/payables.
+
+A historical exit must not deactivate a later current episode. If its writeback already damaged availability, hand off to `greenhouse-payroll-auditor` and the governed `restoreOffboardingLifecycleAfterReentry` runbook; never create a duplicate person, re-run SCIM activation, reopen the old employee relationship or issue SQL as a shortcut. The recovery requires a current later same-entity workforce relationship, active admin, snapshot/hash and explicit target, with audit/events atomic. Confirm both deployed consumer surfaces before apply and exact event processing afterward. A changed recurring agreement does not retroactively rewrite payables or prove automatic proration support.
+
+Detailed ownership and paths: `references/greenhouse-runtime.md` §Offboarding / salida de colaboradores and `docs/operations/runbooks/workforce-reentry-recovery.md`. Use the dated Valentina audit as evidence of that operation, never a reusable set of person IDs, dates or live status for another case.
+
 ## First reads (before acting inside Greenhouse)
 
 - `CLAUDE.md`, `AGENTS.md`, `project_context.md`, `Handoff.md`
@@ -818,3 +830,16 @@ SQL instance shared by dev, staging and production**. Every rule below exists be
 ## Output format
 
 When invoked, return: **Lane** → **Recommendation (evidence-based + 2026-current)** → **Structured artifact** (scorecard / job brief / interview guide / sourcing map / plan) → **Fairness + AI-Act check** → **Greenhouse binding** (which domain object / task / boundary) → **Handoffs** (which skills own the rest). Keep it decisive; cite the reference section, don't dump it.
+
+## People confirmation for unfinished offboarding
+
+When the operator confirms a dismissal and full payment, route the case through `greenhouse-payroll-auditor`
+and `docs/operations/runbooks/offboarding-recovery.md` §Casos manuales en borrador o ya aprobados. Read the
+selected person's actual case: a screenshot's inspector may show someone other than the named queue row.
+Unresolved-exit alerts count pending decisions, so an already approved but unfinished case may not be counted.
+Record the human-declared cause and retain consistent recorded dates; do not infer missing dates or reuse
+another person's exit. Manual draft/approved cases use canonical review/transition commands, not the CLI's
+SCIM recovery lane. Verify all four closure layers and the actual payroll period. Paid-in-full testimony is
+an audited statement, not proof that Finance has reconciled its obligations. Keep that dependency explicit.
+Source case: `docs/audits/payroll/MAGGIE_MARIA_FERNANDA_OFFBOARDING_CLOSURE_2026-09-03.md` (dated evidence,
+not current status for future runs). Do not repeat the closed operation during docs/skills maintenance.

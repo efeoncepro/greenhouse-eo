@@ -150,6 +150,7 @@ import {
   getIdentityGovernanceAuditLogWriteFailuresSignal,
   getIdentityGovernancePendingApprovalOverdueSignal
 } from './queries/identity-governance-signals'
+import { getExternalIdentityBindingSignals } from './queries/external-identity-binding-signals'
 import {
   getSisterPlatformOAuthExchangeFailureRateSignal,
   getSisterPlatformOAuthRedirectRejectedSignal,
@@ -179,6 +180,7 @@ import { getVatEntryUnresolvedFxSignal } from './queries/vat-entry-unresolved-fx
 import { getVatEligibleWithoutPeriodSignal } from './queries/vat-eligible-without-period'
 import { getHubspotCompaniesIntakeDeadLetterSignal } from './queries/hubspot-companies-intake-dead-letter'
 import { getWorkforceUnlinkedInternalUsersSignal } from './queries/workforce-unlinked-internal-users'
+import { getAuthServerSignals } from './queries/auth-server-signals'
 import { getGlobeCreditFundingStaleProposalsSignal } from './queries/globe-credit-funding-stale-proposals'
 import { getGrowthAiVisibilitySignals } from './queries/growth-ai-visibility-signals'
 import { getGrowthAiVisibilityScoringSignals } from './queries/growth-ai-visibility-scoring-signals'
@@ -692,6 +694,8 @@ interface ReliabilityOverviewSources {
   providerBqSyncDeadLetter?: ReliabilitySignal[] | null
   hubspotCompaniesIntakeDeadLetter?: ReliabilitySignal | null
   workforceUnlinkedInternalUsers?: ReliabilitySignal | null
+  /** TASK-1828 — auth.issuer.jwks_unreachable + auth.signing_keys.lifecycle (emisor propio). */
+  authServerSignals?: ReliabilitySignal[] | null
   globeCreditFundingStaleProposals?: ReliabilitySignal | null
   growthAiVisibility?: ReliabilitySignal[] | null
   growthAiVisibilityScoring?: ReliabilitySignal[] | null
@@ -935,6 +939,8 @@ interface ReliabilityOverviewSources {
    * Roll up bajo moduleKey 'identity'.
    */
   identityGovernance?: ReliabilitySignal[] | null
+  /** TASK-1631 — external identity binding (4 señales, steady 0). Roll up bajo 'identity'. */
+  externalIdentityBinding?: ReliabilitySignal[] | null
   sisterPlatformOAuth?: ReliabilitySignal[] | null
 
   /**
@@ -1269,6 +1275,8 @@ export const buildReliabilityOverview = (
     ...(sources.hubspotCompaniesIntakeDeadLetter ? [sources.hubspotCompaniesIntakeDeadLetter] : []),
     // TASK-878 follow-up — Identity UX hardening: internal users sin member enlazado.
     ...(sources.workforceUnlinkedInternalUsers ? [sources.workforceUnlinkedInternalUsers] : []),
+    // TASK-1828 — authorization server propio: JWKS alcanzable/consistente + ciclo de vida de llaves.
+    ...(sources.authServerSignals ?? []),
     ...(sources.globeCreditFundingStaleProposals ? [sources.globeCreditFundingStaleProposals] : []),
     // TASK-1082 — Knowledge ingestion: quarantine count + failed sync source.
     ...(sources.knowledgeQuarantineCount ? [sources.knowledgeQuarantineCount] : []),
@@ -1355,6 +1363,9 @@ export const buildReliabilityOverview = (
     ...(sources.workforceRoleTitle ?? []),
     // TASK-839 — Admin Center entitlement governance signals (2).
     ...(sources.identityGovernance ?? []),
+    // TASK-1631 — External identity binding signals (4): unbound dispatch, revoked still
+    // dispatching, subject collision, orphan grant.
+    ...(sources.externalIdentityBinding ?? []),
     // TASK-948 — Sister-platform OAuth broker signals (exchange failures,
     // redirect rejects, stale client config). Roll up bajo identity.
     ...(sources.sisterPlatformOAuth ?? []),
@@ -1964,6 +1975,13 @@ export const getReliabilityOverview = async (
       ? preloadedSources.workforceUnlinkedInternalUsers
       : await getWorkforceUnlinkedInternalUsersSignal().catch(() => null)
 
+  // TASK-1828 — señales del emisor propio (auth.efeonce.org). `not_configured` hasta que el
+  // host esté publicado (AUTH_SERVER_JWKS_URL); después steady = ok.
+  const authServerSignals =
+    preloadedSources.authServerSignals !== undefined
+      ? preloadedSources.authServerSignals
+      : await getAuthServerSignals().catch(() => null)
+
   // TASK-1566 — propuestas de fondeo de Globe sin confirmar. Steady=0: un valor > 0 es una decision
   // humana pendiente, no un fallo del sistema, y por eso escala por ANTIGUEDAD y no por cantidad.
   const globeCreditFundingStaleProposals =
@@ -2438,6 +2456,12 @@ export const getReliabilityOverview = async (
         ])
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
+
+  // TASK-1631 — External identity binding signals (4 readers en paralelo, steady 0).
+  const externalIdentityBinding =
+    preloadedSources.externalIdentityBinding !== undefined
+      ? preloadedSources.externalIdentityBinding
+      : await getExternalIdentityBindingSignals().catch(() => null)
 
   // TASK-948 — Sister-platform OAuth broker signals. Estos readers se basan
   // en el audit log append-only del broker; no leen secretos ni tokens raw.
@@ -2950,6 +2974,7 @@ export const getReliabilityOverview = async (
     ppmPositionDrift,
     hubspotCompaniesIntakeDeadLetter,
     workforceUnlinkedInternalUsers,
+    authServerSignals,
     globeCreditFundingStaleProposals,
     knowledgeQuarantineCount,
     assetScanOpenQuarantine,
@@ -3015,6 +3040,7 @@ export const getReliabilityOverview = async (
     identityLegalProfile,
     workforceRoleTitle,
     identityGovernance,
+    externalIdentityBinding,
     sisterPlatformOAuth,
     workspaceProjection,
     organizationBrandAssets,

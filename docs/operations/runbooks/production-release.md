@@ -3,7 +3,7 @@
 > **Audience:** EFEONCE_ADMIN + DEVOPS_OPERATOR
 > **Spec canónico:** [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
 > **Source task:** TASK-848 V1 (parcial; V1.1 follow-ups en TASK-850..855)
-> **Last updated:** 2026-08-29
+> **Last updated:** 2026-09-03
 > **Timing ledger:** [PRODUCTION_RELEASE_TIMING_LEDGER.md](../PRODUCTION_RELEASE_TIMING_LEDGER.md)
 
 Este runbook es el contrato operativo para promover `develop` → `main` y para ejecutar rollback de emergencia.
@@ -45,6 +45,60 @@ preparar. La metrica principal es **tiempo agente end-to-end**, no
 `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md` con agente, fecha, release
 ID, run ID, target SHA, tiempo agente E2E, workflow elapsed, manifest elapsed,
 runtime-green elapsed, desglose de fases, bloqueo principal y aprendizaje.
+
+### 0.1. Un coordinador y un intento vivo por release
+
+Antes de mergear, despachar, aprobar o cancelar, identifica al coordinador y lee los runs recientes del
+orquestador, el manifest activo y su `workflow_runs`. Si otra sesión ya opera el mismo release, continúa
+observando ese intento; no crees otro. En un traspaso registra coordinador, SHA, run ID, release ID, gates
+pendientes y última evidencia. La concurrencia de GitHub no sustituye esta coordinación.
+
+**Limitación vigente (2026-09-03):** `github-webhook-reconciler.ts` busca primero por `target_sha` y prioriza
+un manifest activo; el `workflow_run_id` sólo es fallback. Un evento terminal `cancelled` de un duplicado
+puede por ello abortar/degradar el intento correcto del mismo SHA. El incidente está contenido mediante
+operación serial; el defecto de correlación **no quedó corregido** por el release de Valentina. Fix de raíz: `TASK-1815` (registro del run en `workflow_runs` + matching por run ID + test del caso).
+
+1. Antes de cancelar un run obsoleto, cruza su SHA/run ID con el manifest activo. No canceles duplicados
+   del mismo SHA mientras otro intento esté activo como si fuera una limpieza inocua. El coordinador debe
+   resolver la colisión y registrar los efectos; consulta el [playbook §16](../PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md#16-cancelar-un-duplicado-puede-abortar-el-manifest-del-intento-correcto).
+2. Antes de un nuevo dispatch tras una cancelación, espera las conclusiones terminales y confirma que sus
+   eventos se procesaron en `greenhouse_sync.github_release_webhook_events` y el inbox correspondiente.
+   Lee `workflow_run_id`, `release_id`, `matched_by`, `transition_applied` y el estado final del manifest.
+   Un run `completed` no prueba que sus webhooks hayan terminado; una espera fija tampoco lo demuestra.
+3. Si el manifest quedó `aborted`, conserva evidencia y crea un intento nuevo por el orquestador después
+   de verificar lo anterior y el preflight. Nunca hagas SQL, fuerces `aborted → released` ni reintentes
+   sólo el job final contra ese manifest terminal.
+4. Distingue el estado de cada plano: `cancelled` no es `success`; un job cancelado no demuestra fallo
+   de Bicep, una dependencia o un proveedor. Revisa conclusiones, anotaciones y actor antes de atribuir
+   causas. Cierra con workflow, manifest, health, watchdog y efectos del dominio verificados.
+
+
+**Caso verificado 2026-09-03 (`a824d073a5fb`; PG `release_state_transitions` + `github_release_webhook_events`):**
+
+- Detección: `gh run list --workflow=production-release.yml --limit 3` ANTES del dispatch era la única forma de ver
+  el run de Codex (`33793141529`, 18:52:58Z); `ListAgents` no lista sesiones Codex. Claude dispatchó `33793232779`
+  a las 18:53:54Z para el mismo SHA y quedó `pending` por el grupo de concurrencia.
+- Efecto del cancel vía webhook: cancel de `33793232779` (19:04) → `workflow_run.cancelled` → `matched_by = target_sha`
+  → attempt 1 `a824d073a5fb-41320325` `preflight → aborted` (19:04:35Z, actor `system:github-release-webhook`,
+  `workflowRunId: 33793232779`) con los 4 workers ya desplegados y health verde; el job final «Transition → released»
+  falló porque `aborted` es terminal (`state-machine.ts`).
+- Secuencia: attempt 2 `a824d073a5fb-4306ff12` (run `33794622145`, 19:07:58Z) abortó a las 19:11:53Z por un
+  `workflow_job.cancelled` de su PROPIO run (job `100780469269`, cancelación con la cuenta `cesargrowth11`), no por
+  el duplicado. El cancel del duplicado `33794635945` (19:08:23Z) llegó antes de que existiera ese manifest y
+  emparejó por SHA con el attempt 1 ya terminal (`matched`, sin transición): de haber existido el attempt 2 en ese
+  instante, lo habría abortado igual. Attempt 3 `a824d073a5fb-c2cf99e9` (run `33795564223`, 19:17:30Z, un solo
+  coordinador) → `released` 19:30:49Z.
+- `release_manifests.workflow_runs` está `[]` en los tres manifests: el orquestador nunca registra su `github.run_id`
+  en el manifest, así que el fallback por `workflow_run_id` del reconciler no se ejerce nunca. Dueña del fix y del
+  test que reproduce el caso: `TASK-1815`.
+
+Para recuperación de datos que emite eventos, despliega primero las guardas en **todos** los runtimes
+que pueden consumirlos (Vercel y worker si ambos ejecutan el consumer), verifica alias/tráfico activo y
+luego aplica el command gobernado. El readback debe repetirse después de la entrega y proyección de los
+eventos exactos, comparando los datos protegidos. La recuperación puede preceder al cierre del manifest
+cuando la revisión activa ya está verificada; no equivale por sí misma a release cerrado. Véanse el
+[contrato code-first](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md#lesson-5--path-b-recovery--ship-requiere-code-first-cuando-ambos-usan-el-mismo-bug-class)
+y el [runbook de reingreso](workforce-reentry-recovery.md).
 
 ## 1. Decision tree (flujo normal canonico)
 
@@ -536,7 +590,8 @@ Approval desde GitHub UI:
 Repo → Actions → <Workflow> → <Run> → Review pending deployments → Approve & deploy
 ```
 
-**⚠️ Crítico**: NO aprobar runs viejos (>24h). Si hay runs antiguos waiting, **cancelar primero**:
+**⚠️ Crítico**: NO aprobar runs viejos (>24h). Antes de cancelar, aplica §0.1: identifica el manifest
+y drena los eventos terminales antes del siguiente intento. Sólo entonces ejecuta la cancelación acordada:
 
 ```bash
 gh run list --status waiting --workflow=<name>
@@ -604,6 +659,7 @@ Interpretacion:
 
 - `data_missing` con `drift_count=0` es un warning de observabilidad, no drift. Si la sesion local de `gcloud` esta ausente o expirada, reautenticar o consultar los logs del job del orquestador antes de decidir. No redeployar para corregir una falta de evidencia.
 - `ico-batch-worker` con deploy job ejecutado, health OK, `Ready=True` y watchdog synced = NO fue skippeado.
+- `auth-server` (`us-east4`, TASK-1828 / EPIC-044) entra al orquestador desde 2026-09-04 por `auth-server-deploy.yml` (`workflow_call`, change-gated como los demás). Nace con `AUTH_SERVER_ENABLED=false`; su `/healthz` es público vía `auth.efeonce.org` y `/readyz` responde 503 mientras el flag esté OFF — eso NO es un deploy fallido.
 - `ops-worker` con workflow que salta deploy por diff runtime y `GIT_SHA` viejo puede ser cierre valido **solo si el diff de árbol completo entre el SHA servido y el target es vacío** (§4.1.1). No forzar redeploy solo para alinear el label — pero tampoco cerrar con el diff acotado a las rutas del gate, que fue el error del release `64bdd105c737`.
 - La recuperacion canonica para drift real es rerun del orquestador para el mismo `target_sha`; si el orquestador esta bloqueado, usar workflow individual como break-glass aprobado. Direct `gcloud run deploy` local es ultimo recurso break-glass y debe quedar documentado con target SHA, revision, verificacion y watchdog final.
 
@@ -975,8 +1031,9 @@ Visitar [`/admin/operations`](https://greenhouse.efeoncepro.com/admin/operations
 
 Si **stale_approval** o **pending_without_jobs** > 0:
 1. `gh run list --status waiting --status queued` para identificar runs
-2. Cancelar runs antiguos: `gh run cancel <id>`
-3. Re-correr el deploy si fue cancelado en cascada
+2. Aplicar §0.1 antes de cancelar runs antiguos; revisar el SHA, manifest y posible colisión.
+3. Esperar y verificar eventos terminales/inbox; si el manifest quedó `aborted`, iniciar un nuevo intento
+   canónico. No reintentar jobs finales de un manifest terminal.
 
 ## 9. Configuración requerida (one-time)
 

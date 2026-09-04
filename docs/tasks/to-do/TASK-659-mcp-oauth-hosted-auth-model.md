@@ -1,5 +1,22 @@
 # TASK-659 — MCP OAuth / Hosted Auth Model
 
+## Delta 2026-09-04
+
+- **Superseded en diseño por `EPIC-044` / `TASK-1829`.** Lo que esta task pedía diseñar (modelo OAuth para MCP
+  hosted/multiusuario: registry de clientes, audience, scopes, refresh, revocación, auditoría, relación con
+  bindings) ya tiene decisión y código: el authorization server propio `https://auth.efeonce.org`
+  (ADR `EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`) emite access tokens JWT ES256 con
+  `aud = https://mcp.efeonce.org/mcp`, `azp`, `scope` y `gv` (binding de `TASK-1631`), con CIMD/DCR/clientes
+  confidenciales, refresh rotativo con detección de reuso, `revoke`/`introspect` y consentimiento persistido;
+  contrato en `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`. `TASK-1829` quedó
+  `code complete, rollout pendiente` en `develop` el 2026-09-04 — cerrado por trabajo en `TASK-1829`.
+- **Respuestas a las preguntas de esta task:** registry separado (`greenhouse_auth.oauth_clients`), no
+  `sister_platform_consumers` (el broker sister-platform del portal sigue vivo e intacto para Globe/Kortex; sólo
+  se extrajeron helpers puros); el MCP local read-only (`TASK-647`) sigue con consumer token por env, sin cambio;
+  el carril interno Entra para Codex/Claude es `TASK-1813`; el gateway multi-issuer es `TASK-1831`.
+- **Decisión final de lifecycle** (cierre por supersesión vs re-alcance a lo que quede fuera de EPIC-044) la
+  registra la sesión principal al cerrar `TASK-1829`; hasta entonces esta task no debe arrancar trabajo propio.
+
 ## Status
 
 - Lifecycle: `to-do`

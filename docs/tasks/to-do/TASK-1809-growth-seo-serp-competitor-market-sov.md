@@ -422,6 +422,31 @@ dos datasets: sólo decide si la pregunta necesita una compra nueva.
      al cerrar la task completa.
      ═══════════════════════════════════════════════════════════ -->
 
+## MCP Tools & Skills Contract
+
+Esta task incluye como entregable obligatorio la capa de uso por agentes; no se considera completa con el
+primitive, reader, API o documentación humana solamente.
+
+- [ ] Crear o actualizar las tools MCP necesarias para operar/leer esta capacidad desde el mismo primitive
+  canónico. Si una tool existente cubre el caso, actualizarla sin duplicarla; si no corresponde una tool nueva,
+  declarar las tools afectadas y la razón de exclusión explícita en el gateway.
+- [ ] Crear o actualizar la guía de uso en las skills dueñas `.codex/skills/dataforseo-operator/**` y
+  `.codex/skills/seo-aeo/**`, junto con sus espejos `.claude/**`, incluyendo selección de tool, inputs,
+  interpretación, metodología/provenance, costos, límites, errores y acciones prohibidas.
+- [ ] Mantener las copias Codex/Claude byte-idénticas y, cuando el registro de skills servidas de `TASK-1804`
+  esté disponible, crear o actualizar también el recurso/manual agent-facing que el MCP entrega bajo demanda.
+  No crear una skill por endpoint si la skill de dominio vigente puede ampliarse de forma clara.
+- [ ] Actualizar en el mismo PR el lane ecosystem, `src/mcp/greenhouse/tool-manifest.ts`, su artefacto generado,
+  schema/annotations/descripción y la federación del gateway; toda tool interna queda federada o excluida con una
+  razón sustantiva, nunca simplemente ausente.
+- [ ] Las tools read sólo leen evidencia persistida y no disparan llamadas pagadas on-read. Toda tool que escriba,
+  compre o comprometa gasto usa capability fina, presupuesto, idempotencia, audit y
+  `propose → confirm → execute`; nunca se agrega un write scope al cliente PKCE público compartido.
+- [ ] Verificar `pnpm mcp:manifest:generate && pnpm mcp:manifest:check`, `pnpm skills:mirrors`, paridad
+  bidireccional del gateway y canaries allow/deny/fault. Registro o compilación sin readback de la lane y del
+  gateway no constituye cierre operativo.
+
+
 ## Acceptance Criteria
 
 - [ ] `serp_competitors` se llama sólo mediante command gobernado y siempre solicita Improved ETV explícitamente.

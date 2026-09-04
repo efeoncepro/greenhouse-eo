@@ -274,9 +274,11 @@ incompleto. Contrato: `GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md` (Del
   ejecutar un término real con versiones de compensación posteriores al LWD (409; se supersede, no se borra).
 - **NUNCA** desactivar el member antes de terminar la relación legal con la fecha real (la proyección reactiva
   estamparía `CURRENT_DATE`). El writeback vive detrás de `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED`
-  (OFF); el cierre de compensación y el guard de revisión NO dependen del flag.
+  (default OFF; estado desplegado en `FEATURE_FLAG_STATE_LEDGER.md`); el cierre de compensación y el guard de revisión NO dependen del flag.
 - **NUNCA** usar `members.active` como filtro de elegibilidad histórica: la relación/compensación y el cutoff
-  gobiernan; un inactivo sin hecho de salida se excluye DECLARADO (`inactive_without_exit_fact`).
+  gobiernan; un inactivo sin hecho de salida se excluye DECLARADO (`inactive_without_exit_fact`). Un caso
+  `identity_only` decidido/ejecutado no cuenta como hecho laboral para `hasDecidedExitFact` ni rescata al inactivo
+  dentro del período.
 - **NUNCA** autorizar un cálculo/aprobación de nómina con una salida sin resolver relevante al período
   (`reviewRequired` → readiness `unresolved_exit_signal` + `calculatePayroll` 409) ni cuando el resolver falló
   (`exit_eligibility_unavailable`). La proyección puede degradar; el path oficial no.
@@ -287,9 +289,34 @@ incompleto. Contrato: `GREENHOUSE_WORKFORCE_OFFBOARDING_ARCHITECTURE_V1.md` (Del
 - **NUNCA** recuperar por SQL: `pnpm workforce:offboarding:recovery` (dry-run → `--apply --member` con datos
   explícitos). **NUNCA** emitir pagos ni marcar pagada una obligación generada por error desde este dominio
   (Finance concilia con sus commands; hoy falta `cancelPaymentObligation`).
+- **NUNCA** aplicar una recovery de lane A («executed + member activo») en lote confiando en la clasificación
+  automática: **readback previo por sujeto** de `person_legal_entity_relationships`, `contractor_engagements` y
+  `compensation_versions` con fechas posteriores al LWD; si hay episodio posterior, NO tocar; aplicar sujeto por
+  sujeto mostrando el «antes» y confirmando por nombre; el command de reversión debe existir ANTES del directo.
+  Caso fuente 2026-09-03: Valentina reingresó como contractor el 20/08 y fue desactivada. Desde PR #220 el CLI
+  clasifica `reentry_preserved` y el executor devuelve `reentry_detected` (`findReentryAfterExit`), pero el guard
+  no reemplaza la lectura humana. Runbook: `docs/operations/runbooks/offboarding-recovery.md`.
+- **NUNCA** dejar que un live test de este dominio (`review-execute.live.test.ts`) termine con compensación o
+  relación abierta en sus sujetos sintéticos: el roster relajado los admite y la pre-nómina los muestra como
+  `Colaborador <uuid>` (incidente 2026-09-03, seis fantasmas). El `afterAll` cierra compensación y desactiva; un run
+  que muere a mitad deja huérfanos → purgar con `scripts/workforce/purge-task1349-live-subjects.sql` (predicado
+  sintético explícito, aborta ante un member real) y verificar la pre-nómina después. Canon:
+  `LIVE_TESTS_AGENT_INVARIANTS.md` §3.
 - **SIEMPRE** que se toque este dominio: `pnpm vitest run src/lib/workforce/offboarding src/lib/payroll/exit-eligibility
   src/lib/payroll/payroll-readiness` + `pnpm payroll:exit-eligibility:smoke` contra PG real (los mocks no ejecutan
   el SQL: así se detectó un `$2` sin bind).
+
+### Reingreso vigente y compensación de writeback incorrecto
+
+Canon: [`GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md`](../GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md) y [runbook](../../operations/runbooks/workforce-reentry-recovery.md).
+
+- **SIEMPRE** usar `reentry-predicates.ts` para el executor y la señal de drift; el discovery de recovery reutiliza `findReentryAfterExit`. Relación `employee|contractor|executive` activa o engagement `active|paused|ending`, inicio posterior al LWD y no futuro, fin inclusivo no vencido. El engagement se busca por profile **o** member. Drafts, episodios futuros y vínculos no laborales no protegen disponibilidad.
+- **NUNCA** interpretar `reentry_detected` como ausencia de todo efecto: el executor ya validó versiones futuras y cerró vigencia de compensación histórica. La guarda preserva relación actual, disponibilidad y asignaciones. El discovery informa `reentry_preserved` y no debe volver a desactivar a esa persona.
+- **NUNCA** reabrir una relación employee terminada desde `member.updated`. La activación de una ficha no autoriza un contrato; el bootstrap legado solo procede sin historia explícita employee/contractor/executive.
+- **SIEMPRE** usar `restoreOffboardingLifecycleAfterReentry` para compensar una disponibilidad dañada por una salida histórica. Exige admin activo/status activo/grant vigente, caso ejecutado real y exacto, relación posterior vigente en la misma entidad, snapshot con timestamps/hash, objetivo explícito e idempotencia. Un engagement solo no satisface esta autoridad más estricta.
+- **NUNCA** presentar el estado deseado como snapshot histórico. El command restaura solo campos de disponibilidad y asignaciones existentes seleccionadas, conservando inicio y pertenencia; member, asignaciones, audit y eventos se confirman o revierten juntos. Relaciones, compensaciones, pagos, identidad y grants quedan fuera del write set.
+- **SIEMPRE** verificar ambos runtimes consumidores (alias activo Vercel y revisión/tráfico Cloud Run) antes de aplicar; luego comprobar eventos exactos procesados y comparar todos los objetos protegidos. No basta `restored`, outbox publicado, test verde o deployment de un solo consumidor.
+- **NUNCA** repetir una reparación ya aplicada para arreglar un fallo independiente de release. La misma clave/contenido es idempotente; una solicitud distinta bajo esa clave se rechaza. El caso sigue `executed`, con evento append-only `offboarding_case.lifecycle_writeback_reverted`.
 
 ---
 

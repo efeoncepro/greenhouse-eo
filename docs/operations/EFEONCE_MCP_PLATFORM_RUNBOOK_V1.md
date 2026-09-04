@@ -21,6 +21,7 @@
 | DNS authority | HostGator (`ns24.hostgator.cl`, `ns25.hostgator.cl`) |
 | OAuth issuer | Microsoft Entra tenant `a80bf6c1-7c45-4d70-b043-51389622a0e4` |
 | OAuth resource app ID / JWT audience | `c5363215-b9a6-4bf1-bb1c-e61963b37dac` |
+| Second front-door host | `auth.efeonce.org` → Cloud Run `auth-server` (`us-east4`, repo Greenhouse; variable `enable_auth_host`, ver §`Segundo host del front door`) |
 
 ## State model
 
@@ -348,9 +349,9 @@ excluida (la dirección que antes era invisible).
 >
 > **CERO cambios en Entra en este deploy**: las dos escrituras nuevas (`declare_seo_competitors` /
 > `retire_seo_competitors`) viajan en el scope `efeonce.mcp.seo.write` que ya existía, así que siguen
-> **live-but-fail-closed** hasta `TASK-1631` igual que las demás escrituras — el scope no está cableado al cliente
+> **live-but-fail-closed** hasta EPIC-044 (TASK-1829/1831/1832: emisor propio + gateway multi-issuer; el grant revocable ya existe desde TASK-1631, 2026-09-04) igual que las demás escrituras — el scope no está cableado al cliente
 > PKCE público compartido, y eso es deliberado. `prepare_seo_grounded_queries` responde además
-> `aeo_forbidden` fail-closed para la identidad máquina compartida hasta TASK-1631, y el par de
+> `aeo_forbidden` fail-closed para la identidad máquina compartida hasta EPIC-044 (TASK-1829/1831/1832: emisor propio + gateway multi-issuer; el grant revocable ya existe desde TASK-1631, 2026-09-04), y el par de
 > prospecto queda detrás de `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED`, **ON en Vercel
 > Production desde el 2026-08-27** (verificado con `vercel env ls`). 🔴 El canary ya NO debe
 > normalizar un `disabled`: hoy sería una regresión real, no una respuesta honesta.
@@ -578,12 +579,69 @@ por lo que no debe usarse para cobrar, licenciar o decidir autorización de un c
 Cloud Run mantiene `concurrency=80` y `maxScale=5` efectivo inicialmente. Esa capacidad sirve al tráfico de transporte; cada provider
 debe declarar sus propios límites de concurrencia, cuotas y circuit breakers antes de exponer trabajo de dominio.
 
+### Segundo host del front door — `auth.efeonce.org` (2026-09-04)
+
+El authorization server propio de Efeonce (EPIC-044, TASK-1828) entra por **este mismo** load balancer como
+segundo host; el gateway y su ruta default no cambian. El Cloud Run `auth-server` vive en el repo Greenhouse
+(`services/auth-server/`, `us-east4`) y se opera con su propio runbook:
+`docs/operations/runbooks/auth-server.md` (deploy, flag, llaves KMS, señales). Acá sólo vive la parte del
+front door.
+
+Desde TASK-1829 (2026-09-04, `code complete, rollout pendiente`) ese mismo host trae la **superficie OAuth**
+(metadata RFC 8414/OIDC, `/oauth/register|authorize|consent|token|revoke|introspect`; CIMD primario, DCR compat,
+PKCE S256, JWT ES256 con claim `gv`) detrás de su propio flag `AUTH_SERVER_OAUTH_ENABLED` (default `false`, SoT
+`services/auth-server/deploy.sh`): con el flag OFF todo eso responde 404 y el gateway no nota diferencia. Su
+operación (prender en staging, precondición del environment `efeonce-auth`, registro de clientes confidenciales,
+revocación de consentimientos, señales `auth.oauth.*`, rollback) vive en `docs/operations/runbooks/auth-server.md`
+§`OAuth`; contrato en `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`. El gateway sólo verificará
+tokens de este issuer con TASK-1831.
+
+Variables en `efeonce-mcp/infra/terraform` (`variables.tf`):
+
+| Variable | Default | Qué controla |
+| --- | --- | --- |
+| `enable_auth_host` | `true` (aplicado 2026-09-04, commit `6a144a5`) | Publica o retira el host completo: host rule, backend, NEG y certificado. El gateway queda igual con cualquier valor |
+| `auth_domain` | `auth.efeonce.org` | Hostname de la host rule y del certificado managed `efeonce-auth-server-cert` |
+| `auth_service_name` | `auth-server` | Cloud Run service detrás del NEG `efeonce-auth-server-neg` |
+| `auth_region` | `us-east4` | Región del NEG (distinta a la del gateway, `southamerica-west1`) |
+
+El backend `efeonce-auth-server-backend` reutiliza la security policy `efeonce-mcp-gateway-edge`; misma IP
+`34.111.78.237`, sin forwarding rules nuevos. DNS: record `A` de `auth.efeonce.org` a esa IP (HostGator).
+
+Verificar:
+
+```bash
+gcloud compute url-maps describe efeonce-mcp-gateway-map --global \
+  --format='yaml(hostRules,pathMatchers[].name,defaultService)'      # host rule auth.efeonce.org → path matcher auth-server
+gcloud compute ssl-certificates describe efeonce-auth-server-cert --global \
+  --format='value(managed.status,managed.domainStatus)'             # ACTIVE
+curl -s -o /dev/null -w '%{http_code}\n' https://auth.efeonce.org/healthz   # 200
+curl -s -o /dev/null -w '%{http_code}\n' https://mcp.efeonce.org/.well-known/oauth-protected-resource   # 200: el gateway no se movió
+```
+
+`tofu plan` con `enable_auth_host=true` sobre un estado ya aplicado debe salir sin cambios; cualquier `destroy`
+o `replace` sobre recursos del gateway significa que algo está mal — abortar. No agregues `auth.efeonce.org`
+a `managed.domains` del certificado del gateway: re-provisiona `mcp.efeonce.org`; es un certificado aparte.
+
+Rollback del host (no toca `mcp.efeonce.org`):
+
+```bash
+cd efeonce-mcp/infra/terraform
+tofu plan  -input=false -var enable_auth_host=false   # esperado: sólo destroys de *auth-server*; 0 cambios en gateway
+tofu apply -input=false -var enable_auth_host=false
+```
+
+Retira host rule, backend, NEG y certificado en menos de diez minutos; el Cloud Run `auth-server` sigue vivo
+(sin tráfico público) y se apaga desde su propio runbook si hace falta. Hasta TASK-1831 el gateway no verifica
+tokens de este issuer, así que retirar el host no afecta ninguna sesión MCP.
+
 ## Rollback
 
 - Provider defectuoso: `GLOBE_PROVIDER_ENABLED=false` y deploy; no retires todo el gateway.
 - Revisión defectuosa: mueve 100% del tráfico a la revisión previa verificada.
 - Auth defectuoso: fail-closed, revoca cliente/consentimiento y restaura issuer/audience previos.
 - Edge defectuoso: conserva DNS con respuesta segura `503` o revierte el record exacto; considera TTL.
+- Segundo host `auth.efeonce.org` mal publicado: `tofu apply -var enable_auth_host=false` (no toca `mcp.efeonce.org`); ver §`Segundo host del front door`.
 - Compromiso: deshabilita provider WIF/cliente OAuth, revoca IAM, preserva logs y abre incidente.
 
 Nunca resuelvas rollback haciendo `/mcp` anónimo, aceptando tokens de otra audience o reutilizando una service
@@ -659,10 +717,17 @@ hay cliente, binding, secreto productivo ni login público operativo. La propues
 de Efeonce en `auth.efeonce.org`, el binding con la organización de Account 360 y el rollout
 allow/base-only/revoke viven en
 [`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](../architecture/EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md)
-y [`TASK-1631`](../tasks/to-do/TASK-1631-efeonce-customer-identity-mcp-federation.md). La primera cohorte será
+y [`TASK-1631`](../tasks/in-progress/TASK-1631-efeonce-customer-identity-mcp-federation.md). La primera cohorte será
 por invitación de organizaciones cliente ya existentes y explícitamente allowlisted en Account 360: un email o
 dominio no basta. Hasta la aceptación explícita del ADR y el plan de proveedor, no hay DNS productivo, secreto,
 binding ni acceso cliente que configurar.
+
+**Delta 2026-09-04 (TASK-1631, EPIC-044 U04):** WorkOS quedó descartado; el emisor será propio
+(`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1`). El grafo de binding (environment → binding → grants →
+invitaciones), sus 6 capabilities de `efeonce_admin`, el reader ecosystem
+`GET /api/platform/ecosystem/identity/binding` para este gateway y las 4 señales ya existen en Greenhouse y
+están aplicados en PG; sigue sin haber login externo, cliente real ligado ni canary con cliente. El camino de
+soporte vive en [§Soporte: cliente externo que no puede entrar](#soporte-cliente-externo-que-no-puede-entrar-task-1631).
 
 ## Superficie operable por un cliente MCP — snapshot 2026-08-28
 
@@ -706,7 +771,7 @@ check es la evidencia válida; la ausencia de tools en esa sesión no es un fall
 
 En la práctica el gateway es hoy **un operador de SEO con anexos de Hiring y Globe**. Los dos scopes de escritura
 (`efeonce.mcp.seo.write`, `efeonce.mcp.globe.credits.funding.ensure`) siguen **live-but-fail-closed**: registrados y
-verificables, sin token que los abra, hasta `TASK-1631`.
+verificables, sin token que los abra, hasta EPIC-044 (TASK-1829/1831/1832: emisor propio + gateway multi-issuer; el grant revocable ya existe desde TASK-1631, 2026-09-04).
 
 ### Cobertura de federación vs el MCP interno de Greenhouse
 
@@ -786,3 +851,91 @@ cd ~/Documents/efeonce-mcp && git rev-list --count origin/main..HEAD
 gcloud run services list --project efeonce-group \
   --format='table(metadata.name,status.latestReadyRevisionName)' | grep mcp
 ```
+
+## Soporte: cliente externo que no puede entrar (TASK-1631)
+
+> Aplica desde que el gateway consuma el reader de binding (TASK-1831) y exista login externo (TASK-1830). Hoy
+> el grafo de binding existe en Greenhouse y el camino de diagnóstico ya es operable por API; ningún cliente real
+> tiene acceso. Manual del operador:
+> [operar-binding-identidad-externa.md](../manual-de-uso/identity/operar-binding-identidad-externa.md);
+> modelo: [binding-identidad-externa-mcp.md](../documentation/identity/binding-identidad-externa-mcp.md).
+
+### Qué ve el cliente
+
+Un **deny genérico** del gateway, sin distinguir causa: el borde es anti-oráculo por diseño y no le dice si su
+organización no está ligada, si fue revocado o si el emisor está pausado. El cliente no puede autodiagnosticarse;
+el diagnóstico lo hace el operador con lo que sigue.
+
+### Qué consulta el operador (en este orden)
+
+1. **¿La organización tiene binding activo en ese environment?**
+
+   ```bash
+   pnpm staging:request "/api/admin/identity/external-access/bindings?organizationId=org-<uuid>" --pretty
+   ```
+
+   Sin filas → nunca se ligó (o se está mirando el environment equivocado). `status: revoked` → se cortó; mira
+   `revokedAt` y `revokeReason`.
+
+2. **¿La persona está `linked` y tiene grants?**
+
+   ```bash
+   pnpm staging:request /api/admin/identity/external-access/bindings/xob-<uuid> --pretty
+   ```
+
+   En `invitations` busca el correo: `issued` = nunca aceptó (token no entregado, vencido a punto de expirar);
+   `expired` = venció; `revoked` = alguien la cerró; `linked` = es miembro. En `grants` verifica que exista la
+   capability que la tool necesita (binding-wide o con su `profileId`). Anota `grantsVersion`.
+
+3. **¿Qué respondió el resolver?** El log de denegaciones guarda solo denies, con el subject hasheado:
+
+   ```sql
+   SELECT resolved_at, outcome, environment_id, client_id, binding_id, profile_id, grants_version
+     FROM greenhouse_core.external_access_resolution_log
+    WHERE environment_id = '<environment_id>'
+      AND resolved_at > now() - interval '24 hours'
+    ORDER BY resolved_at DESC
+    LIMIT 50;
+   ```
+
+   Lectura por `outcome`:
+
+   | outcome | Significa | Acción |
+   | --- | --- | --- |
+   | `unbound` | Ese subject nunca fue ligado en ese environment. | Invitación no aceptada / emitida a otro correo / persona entró con otra identidad. Reemitir y confirmar el correo con el admin designado del cliente. |
+   | `revoked` | Estuvo ligado y se revocó (persona o binding). | Confirmar con quien revocó; si procede, invitación nueva (binding nuevo si se revocó el binding). |
+   | `environment_inactive` | El environment está `draft`/`suspended`/`retired`: afecta a TODOS los de ese emisor. | Revisar `GET .../environments`; activar solo si el emisor está verificado. |
+   | `profile_inactive` | La persona existe pero está inactiva o fue fusionada. | Revisión de identidad en Person 360; no reactivar a mano. |
+   | *(sin filas)* | La petición no llegó al resolver: falló antes (token inválido, audiencia/issuer no configurados en el gateway, scope). | Diagnóstico del gateway (OAuth canary, logs de Cloud Run), no del binding. |
+
+   Un `revoked` cuya `resolved_at` supera en más de 5 minutos el `revoked_at` del binding es un cliente (o un
+   agente automatizado) reintentando después de la revocación: hay que avisarle, no "arreglar" nada.
+
+4. **Señales en `/admin/operations` → Identity:** `identity.external_binding.unbound_dispatch_attempt`,
+   `revoked_still_dispatching`, `subject_collision`, `orphan_grant`. `subject_collision` u `orphan_grant` en error
+   indican datos inconsistentes (identidad duplicada o escritura fuera de los commands) y van antes que cualquier
+   reemisión.
+
+### Qué evidencia se comparte (siempre redactada)
+
+Se puede compartir con el cliente o en un ticket: `bindingId`, `environmentId`, `invitationId`, estado y
+`grantsVersion`, el `outcome` y sus `resolved_at`, y el motivo de revocación si lo hubo.
+
+**Nunca** se comparte ni se pega en tickets: el token de invitación (viaja una vez y no se recupera), el subject
+en claro ni su hash, los claims del token, la lista de correos de terceros de la organización, ni el
+`client_id` del cliente OAuth fuera del canal interno.
+
+### Acciones
+
+| Diagnóstico | Acción del operador |
+| --- | --- |
+| Invitación `issued`/`expired`/token perdido | `POST .../bindings/<id>/invitations` con `reissue: true` (misma persona, token nuevo por canal seguro). |
+| Persona `linked` pero la tool deniega | Falta el grant: `POST .../bindings/<id>/grants` con la capability (binding-wide o `profileId`). El gateway lo toma en el siguiente recheck (≤ 60 s de caché + comparación de `grantsVersion`). |
+| Binding `revoked` | No se reactiva. Si el cliente vuelve, `POST .../bindings` nuevo (mismo trío org/env/ref permitido tras la revocación) y reinvitar. |
+| Environment `draft`/`suspended` | Activarlo por `POST .../environments` solo si el emisor está verificado; si está `retired`, registrar otro. |
+| `subject_collision` | Revisión manual en Person 360 antes de reinvitar; luego invitar con `profileId` explícito. |
+| `orphan_grant` | Revocar el grant por API con motivo; buscar quién escribió fuera de los commands. |
+
+Toda acción queda en `greenhouse_core.external_identity_audit_log` (append-only) y emite su evento outbox; no hay
+consumidor reactivo todavía (invalidación push de `grants_version` = TASK-1831), así que la revocación se hace
+efectiva por el recheck del gateway, no por push.

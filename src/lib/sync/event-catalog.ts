@@ -94,6 +94,8 @@ export const AGGREGATE_TYPES = {
   viewAccess: 'view_access',
   entitlementGovernance: 'entitlement_governance',
   asset: 'asset',
+  // TASK-1631 — external identity binding (Account 360 ↔ environment externo; provider-neutral).
+  externalIdentityBinding: 'external_identity_binding',
 
   // Services
   service: 'service',
@@ -1234,7 +1236,16 @@ export const EVENT_TYPES = {
   hiringAssessmentAiRunConfirmed: 'hiring.assessment.ai_run_confirmed',
 
   // TASK-1365 — payload contains only aggregate report scope/evidence references.
-  hiringAssessmentFairnessAdverseImpactDetected: 'hiring.assessment.fairness.adverse_impact_detected'
+  hiringAssessmentFairnessAdverseImpactDetected: 'hiring.assessment.fairness.adverse_impact_detected',
+
+  // TASK-1631 — External identity binding foundation (EPIC-044 U04). Payloads sin tokens, sin
+  // emails de terceros, sin claims: sólo ids, capability, grants_version y actor.
+  externalEnvironmentUpserted: 'identity.external_environment.upserted',
+  externalBindingBound: 'identity.external_binding.bound',
+  externalGrantGranted: 'identity.external_grant.granted',
+  externalInvitationIssued: 'identity.external_invitation.issued',
+  externalInvitationLinked: 'identity.external_invitation.linked',
+  externalAccessRevoked: 'identity.external_access.revoked'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]

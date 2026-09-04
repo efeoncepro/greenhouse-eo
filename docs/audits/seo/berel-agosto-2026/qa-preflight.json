@@ -1,0 +1,4055 @@
+{
+  "pdf": "/Users/jreye/Documents/greenhouse-eo/docs/audits/seo/berel-agosto-2026/BEREL_INFORME_AGOSTO_2026_A4.pdf",
+  "sha256": "6a0258a31a8b5434e6cf21bf36a4666e352eed2fed7e2195cdbf0c2916a50cda",
+  "pymupdf_version": "1.28.2",
+  "pages": 55,
+  "checks": [
+    {
+      "check": "pages_present",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_count",
+      "passed": true,
+      "detail": 55
+    },
+    {
+      "check": "page_1_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_1_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_1_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_1_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_1_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_1_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_2_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_2_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_2_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_2_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_2_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_2_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_3_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_3_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_3_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_3_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_3_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_3_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_4_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_4_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_4_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_4_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_4_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_4_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_5_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_5_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_5_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_5_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_5_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_5_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_6_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_6_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_6_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_6_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_6_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_6_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_7_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_7_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_7_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_7_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_7_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_7_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_8_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_8_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_8_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_8_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_8_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_8_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_9_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_9_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_9_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_9_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_9_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_9_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_10_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_10_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_10_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_10_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_10_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_10_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_11_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_11_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_11_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_11_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_11_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_11_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_12_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_12_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_12_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_12_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_12_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_12_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_13_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_13_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_13_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_13_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_13_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_13_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_14_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_14_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_14_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_14_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_14_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_14_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_15_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_15_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_15_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_15_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_15_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_15_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_16_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_16_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_16_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_16_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_16_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_16_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_17_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_17_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_17_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_17_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_17_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_17_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_18_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_18_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_18_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_18_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_18_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_18_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_19_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_19_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_19_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_19_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_19_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_19_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_20_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_20_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_20_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_20_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_20_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_20_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_21_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_21_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_21_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_21_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_21_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_21_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_22_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_22_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_22_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_22_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_22_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_22_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_23_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_23_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_23_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_23_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_23_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_23_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_24_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_24_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_24_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_24_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_24_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_24_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_25_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_25_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_25_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_25_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_25_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_25_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_26_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_26_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_26_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_26_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_26_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_26_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_27_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_27_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_27_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_27_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_27_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_27_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_28_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_28_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_28_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_28_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_28_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_28_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_29_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_29_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_29_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_29_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_29_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_29_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_30_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_30_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_30_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_30_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_30_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_30_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_31_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_31_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_31_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_31_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_31_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_31_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_32_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_32_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_32_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_32_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_32_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_32_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_33_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_33_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_33_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_33_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_33_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_33_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_34_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_34_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_34_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_34_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_34_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_34_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_35_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_35_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_35_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_35_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_35_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_35_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_36_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_36_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_36_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_36_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_36_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_36_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_37_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_37_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_37_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_37_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_37_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_37_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_38_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_38_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_38_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_38_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_38_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_38_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_39_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_39_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_39_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_39_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_39_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_39_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_40_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_40_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_40_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_40_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_40_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_40_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_41_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_41_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_41_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_41_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_41_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_41_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_42_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_42_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_42_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_42_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_42_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_42_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_43_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_43_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_43_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_43_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_43_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_43_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_44_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_44_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_44_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_44_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_44_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_44_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_45_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_45_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_45_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_45_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_45_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_45_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_46_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_46_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_46_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_46_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_46_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_46_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_47_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_47_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_47_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_47_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_47_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_47_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_48_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_48_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_48_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_48_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_48_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_48_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_49_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_49_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_49_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_49_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_49_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_49_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_50_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_50_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_50_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_50_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_50_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_50_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_51_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_51_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_51_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_51_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_51_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_51_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_52_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_52_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_52_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_52_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_52_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_52_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_53_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_53_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_53_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_53_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_53_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_53_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_54_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_54_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_54_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_54_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_54_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_54_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_55_size",
+      "passed": true,
+      "detail": [
+        209.88865288628472,
+        297.01066063774954
+      ]
+    },
+    {
+      "check": "page_55_rotation",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_55_text",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_55_text:Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_55_text:+56 9 3732 3064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "page_55_text:+1 (239) 235-2073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "metadata:author",
+      "passed": true,
+      "detail": "Efeonce"
+    },
+    {
+      "check": "metadata:title",
+      "passed": true,
+      "detail": "Berel · Resultados y gestión SEO/AEO · Agosto 2026"
+    },
+    {
+      "check": "language_present",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "structure_present_not_certification",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "required:74,3",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "required:85,1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "required:115 artículos",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "required:EO-GRUN-00049",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "occurrences:Cobertura: 63 de 74 tareas (85,1%)",
+      "passed": true,
+      "detail": 1
+    },
+    {
+      "check": "ordered:Contenidos redactados",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "ordered:Entregables gráficos cerrados",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "ordered:Entregar y cerrar son momentos distintos.",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "ordered:El crecimiento tiene",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "fonts_present",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "font_embedded:17",
+      "passed": true,
+      "detail": "AAAAAA+Geist-Bold"
+    },
+    {
+      "check": "font_embedded:18",
+      "passed": true,
+      "detail": "BAAAAA+Poppins-SemiBold"
+    },
+    {
+      "check": "font_embedded:19",
+      "passed": true,
+      "detail": "CAAAAA+Geist-Regular"
+    },
+    {
+      "check": "font_embedded:21",
+      "passed": true,
+      "detail": "DAAAAA+Geist-SemiBold"
+    },
+    {
+      "check": "font_embedded:24",
+      "passed": true,
+      "detail": "EAAAAA+Geist-Medium"
+    },
+    {
+      "check": "font_embedded:4088",
+      "passed": true,
+      "detail": "Geist Regular"
+    },
+    {
+      "check": "nonlocal_uri:1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:1",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:2",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:2",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:2",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:3",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:3",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:3",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:4",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:4",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:4",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:5",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:5",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:5",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:6",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:6",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:6",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:7",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:7",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:7",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:8",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:8",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:8",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:9",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:9",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:9",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:10",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:10",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:10",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:10",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:10",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:10",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:10",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:10",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:11",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:11",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:11",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:12",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:12",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:12",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:12",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:13",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:13",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:13",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:14",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:14",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:14",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:14",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:14",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:14",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:14",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:14",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:14",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:14",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:14",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:14",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:14",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:14",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:14",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:14",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:14",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:15",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:15",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:15",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:16",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:16",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:16",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:17",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:17",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:17",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:18",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:18",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:18",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:18",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:19",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:19",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:19",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:19",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:19",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:19",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:19",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:19",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:19",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:20",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:20",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:20",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:21",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:21",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:21",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:21",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:21",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:21",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:21",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:21",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:21",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:22",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:22",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:22",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:23",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:23",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:23",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:23",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:23",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:24",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:24",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:24",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:24",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:24",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:24",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:25",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:25",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:25",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:25",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:25",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:25",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:25",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:26",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:26",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:26",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:26",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:26",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:26",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:26",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:26",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:26",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:26",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:27",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:27",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:27",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:27",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:27",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:27",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:27",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:27",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:28",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:28",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:28",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:28",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:28",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:28",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:29",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:29",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:29",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:30",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:30",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:30",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:30",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:31",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:31",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:31",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:32",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:32",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:32",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:32",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:33",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:33",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:33",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:33",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:33",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:33",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:33",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:33",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:34",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:34",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:34",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:34",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:34",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:35",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:35",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:35",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:35",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:35",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:35",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:36",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:36",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:36",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:36",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:37",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:37",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:37",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:38",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:38",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:38",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:39",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:39",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:39",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:40",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:40",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:40",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:41",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:41",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:41",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:41",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:41",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:41",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:41",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:42",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:42",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:42",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:43",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:43",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:43",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:44",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:44",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:44",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:45",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:45",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:45",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:46",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:46",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:46",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:47",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:47",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:47",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:48",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:48",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:48",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:49",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:49",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:49",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:50",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:50",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:50",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:51",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:51",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:51",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:52",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:52",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:52",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:54",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:54",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:54",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:54",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:54",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:54",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:54",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:54",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:54",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:54",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:54",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:54",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:54",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:54",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:54",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:54",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:54",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:54",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:54",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:54",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:54",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:54",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:54",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:54",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:54",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:55",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:55",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:55",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:55",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:55",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:55",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:55",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:55",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:55",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:55",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "uri:https://efeoncepro.com/",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "uri:tel:+56937323064",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "uri:tel:+12392352073",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_present",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Informe de resultadosy auditoríaSEO/AEO.",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Más visitas desde buscadores.Recorridos que debemos mejorar.",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Nuestro siguiente paso",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Para entender el informe",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Dos fechas, dos lecturas",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Producción ycumplimiento de plazos.",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Contenidos redactados",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Entregables gráficos cerrados",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Entregar y cerrar son momentos distintos.",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:El crecimiento tienemás de una medida.",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Visitas desde buscadores",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Apariciones en Google",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Clics desde Google",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Contenido publicado.Conexiones por completar.",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Sin subtítulos H2",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Con enlaces hacia búsquedas internas",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Sin enlace entrante desde otro artículo del censo",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Sin enlace saliente hacia otro artículo del censo",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:De ser encontradosa facilitar la elección.",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Producimos",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Ganamos visibilidad",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Recibimos visitas",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Facilitamos acciones",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination: Para interpretar el On-time",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:El informe, secciónpor sección.",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Qué midecada indicador.",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:1. Resultados de nuestra gestión en agosto1. Resultados de nuestra gestión en agosto",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:1.1 Continuidad de nuestra gestión y responsabilidades",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:2. Alcance y cómo interpretar los2. Alcance y cómo interpretar losresultados",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:3. Cómo nos encontraron en Googledurante agosto",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:3.1 Más apariciones en Google, menos clics al sitio",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:3.2 El contenido editorial crece",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:3.3 Páginas comerciales que requieren atención",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:3.4 Búsquedas de marca y visitas a otras direcciones de Berel",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:4. Cómo aparece Berel frente a lademanda del mercado",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:4.1 Estimaciones de mercado: julio frente a agosto",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:4.2 Seguimiento de posiciones en México",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:4.3 Oportunidades con demanda ya observada",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:4.4 Competencia y oportunidades para los contenidos quetrabajamos",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:5. Qué facilita o dificulta encontrar yrecorrer el sitio",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:5.1 Qué páginas revisamos5.1 Qué páginas revisamos",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:5.2 Facilitar el acceso a todos los artículos",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:5.3 Familias de color y direcciones inválidas",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:5.4 Enlaces internos: conectar la respuesta con el siguiente paso",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:5.5 Encabezados, descripciones e imágenes",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:5.6 Información que ayuda a los buscadores a interpretar cadapágina",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:5.7 Qué encontró la revisión automática al cierre de agosto",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:5.8 Qué comprobamos después y qué páginas registra Google",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:5.9 Qué impide mostrar información adicional de producto en Google",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:6. Trabajo editorial de Efeonce en agosto ypendientes de cierre",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Qué acabado elegir",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Aerosoles",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Paleta Frida Kahlo",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Cuarto infantil",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Berelinte",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Pintura autoenfriante",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Tonos y subtonos",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Técnicas de pintura para sala",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:6.1 Trabajo ya avanzado que orienta la continuidad",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:6.2 Desempeño del equipo: producción acumulada y entregas atiempo",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Entregas a tiempo: cómo leer el indicador",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:7. Qué otros sitios enlazan a Berel",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:8. Cómo aparece Berel en las respuestasde inteligencia artificial",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:8.1 Presencia observada en Google y tráfico atribuido a IA",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:8.2 Nuestra evaluación con AEO Grader: qué demuestra y quédebemos corregir",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:8.3 Qué dicen las respuestas sobre la marca",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:8.4 Qué pudo comprobar el Grader y dónde falló nuestra medición",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:8.5 Continuidad de nuestro trabajo AEO",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:9. Cómo llegan las visitas, cómo navegany qué acciones realizan",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:9.1 Experiencia de navegación: corregir los movimientos inesperadosde la página",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:9.2 Las visitas desde buscadores crecieron",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:9.3 Qué acciones medimos y por qué todavía no equivalen a ventas",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:10. Qué vamos a completar y cómocomprobaremos el resultado",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Prioridad 1Versiones de agosto",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Prioridad 1Enlaces editoriales",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Prioridad 1Localizador y madera",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Prioridad 1Colores, archivo editorial y estabilidad visual",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Prioridad 2Encabezados, ALT, descripciones y enlaces a productos",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Prioridad 2Afirmaciones de producto",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Prioridad 2Consolidación y páginas centrales",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Prioridad 2Indexación y marcado de producto",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Prioridad 2Medición comercial",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Prioridad 1Medición AEO",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Prioridad 3AEO y autoridad",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:11. Seguimiento de auditorías anteriores11. Seguimiento de auditorías anteriores",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:11.1 Seguimiento del diagnóstico SEO de mayo",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:El blog conseguía visibilidad, pero convertía pocas impresiones en clics; se propusointervenir 32 URLs",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Concentración de la captación en un grupo pequeño de artículos",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:“Color Berel del año”: consolidar la referencia anual y diferenciar la aplicación de color",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:“Paleta Frida Kahlo”: revisar cuatro URLs superpuestas",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:“Colores de temporada”: convertir la guía general en entrada a contenidosestacionales",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:“Color como descubrimiento”: mejorar títulos de artículos estacionales sin fusionarintenciones distintas",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:“Berelex Green”: revisar dos artículos sobre beneficios del mismo producto",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:“Línea Kover”: diferenciar variantes y conectarlas mediante una guía central",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:El blog debía conducir a productos, tiendas y herramientas; se propusieron módulos yeventos de medición",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Alto peso de medios pagados y baja interacción de sus visitas al blog",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:La caída de impresiones se atribuyó a AI Overviews",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Mayor claridad de respuestas, preguntas frecuentes y sustento factual",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Meta de +207% de clics y ahorro anual estimado de MXN 300,000–500,000",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:11.2 Seguimiento de los 33 hallazgos técnicos de mayo11.2 Seguimiento de los 33 hallazgos técnicos de mayo",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T01. Bloqueo de imágenes, PDFs, CSS, JavaScript y recursos de la aplicación",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T02. Subdominio de contenido apareciendo en búsqueda",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T03. Marcado de artículo incompleto",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T04. Ausencia de FAQPage",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T05. Ausencia de HowTo",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T06. Ausencia de sitemap de imágenes",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T07. Ausencia de BreadcrumbList",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T08. Jerarquía de encabezados deficiente",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T09. Descripciones demasiado breves",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T10. Referencias inconsistentes con y sin www",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T11. Logo con extensión duplicada en el marcado",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T12. Core Web Vitals y carga de imagen principal",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T13. Fechas de modificación posiblemente artificiales",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T14. Falta de índice de sitemaps por tipo",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T15. Diferencias entre inventarios de sitemap y analítica",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T16. Enlazado insuficiente hacia y entre artículos",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T17. Autoría, fuentes y transparencia editorial",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T18. Ausencia de llms.txt",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T19. Autor corporativo marcado como Organization",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T20. Ausencia de tabla de contenidos",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T21. Imágenes sin ALT",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T22. Falta de módulo de productos relacionados",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T23. Falta de artículos relacionados",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T24. Contenido poco desarrollado",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T25. Falta de validación técnica continua",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T26. Espacios de nombres de sitemap sin uso",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T27. 25 URLs de vacantes dentro del sitemap general",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T28. Posible duplicación entre /inicio y la portada",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T29. changefreq y priority sin diferenciación",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T30. Ausencia de meta robots explícito",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T31. Imagen Open Graph con referencia malformada",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T32. Falta de “keywords LSI”",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:T33. Ausencia de reglas para bots de IA",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:11.3 Seguimiento de la comparación competitiva de julio11.3 Seguimiento de la comparación competitiva de julio",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Berel superaba ampliamente al distribuidor en tráfico y autoridad",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Contracción de cobertura orgánica de la marca durante 2026",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Liderazgo de la marca en consultas de su nombre",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:El distribuidor ganaba búsquedas transaccionales de precio",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:El distribuidor captaba búsquedas genéricas de producto",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:Definir papel del distribuidor como aliado y destino de compra",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:11.4 Lectura para la siguiente etapa",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:12. Anexo: páginas donde corregiremosenlaces",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "outline_destination:13. Fuentes del informe y alcance de lasconclusiones",
+      "passed": true,
+      "detail": null
+    }
+  ],
+  "passed": true,
+  "scope": "Automated preflight only; visual, factual and assistive-reading review are separate."
+}

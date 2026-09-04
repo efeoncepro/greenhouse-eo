@@ -1,5 +1,14 @@
 # Efeonce Customer Identity — Revisión de Privacidad y Subprocesador V1
 
+> **Superseded 2026-09-03** — La composición cambió: Efeonce opera su **propio** authorization server
+> ([`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md),
+> `EPIC-044`) y WorkOS quedó descartado. Con el emisor propio **no aparece un encargado/subprocesador nuevo**: los
+> datos personales de personas de organizaciones cliente no salen del perímetro GCP que Greenhouse ya opera, así
+> que el gate S0.3 de este memo no bloquea el binding aplicado por `TASK-1631` (2026-09-04). El memo se conserva
+> como referencia del análisis (normativa, riesgos, preguntas al abogado); el DPA con WorkOS y el registro de
+> subprocesador ya no aplican. La postura de seguridad del emisor propio (KMS, JWKS, sesiones, anti-abuso) se
+> audita en `TASK-1833`. El cuerpo de abajo no se reescribe.
+
 > **Tipo de documento:** Memo de revisión de privacidad (orientativo — NO es asesoría legal)
 > **Versión:** 1.0
 > **Creado:** 2026-08-05 por Claude (TASK-1631 Slice 0 / S0.3, skill `legal-privacy-ip-operator`)

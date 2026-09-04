@@ -2,6 +2,30 @@
 
 Catalogo canonico de eventos del sistema de outbox de Greenhouse. Cada evento se registra en `greenhouse_sync.outbox_events` y se publica a BigQuery via el consumer `outbox-publish`.
 
+## Delta 2026-09-04 — TASK-1631: External identity binding (6 events v1)
+
+Aggregate type nuevo: `external_identity_binding` (schema `greenhouse_core.external_*`, EPIC-044 U04). Los seis los
+emiten los commands de `src/lib/identity/external-access/commands.ts` dentro de la MISMA transacción que el estado y
+el `external_identity_audit_log` (estado + audit + outbox, o nada). Un command idempotente que no cambia nada
+(`changed:false` / audit `outcome='noop'`) **no emite**: el evento marca el hecho, no la consulta.
+
+**Contrato de payload NO negociable: IDs y metadatos de autoridad; NUNCA token, email de terceros ni claims.** Ningún
+evento lleva el token de invitación (ni su hash), el email invitado, el `subject` del IdP externo ni claims del
+token. El outbox se replica a BigQuery; lo que entra acá sale del control del dominio.
+
+| Event | Trigger | Payload |
+|---|---|---|
+| `identity.external_environment.upserted` | `upsertExternalIdentityEnvironment` (creación o cambio real; no-op no emite) | `{ environmentId, issuerUrl, issuerClass, status, previousIssuerUrl, changedByUserId }` — `previousIssuerUrl` es la traza de una rotación de issuer |
+| `identity.external_binding.bound` | `bindExternalOrganization` (creación; el re-bind idempotente no emite) | `{ bindingId, organizationId, environmentId, grantsVersion, designatedAdminProfileId, changedByUserId }` |
+| `identity.external_grant.granted` | `grantExternalCapability` (creación; bump de `grants_version`) | `{ bindingId, grantId, organizationId, environmentId, capability, profileId, grantsVersion, changedByUserId }` — `profileId: null` = grant binding-wide; set = grant per-persona |
+| `identity.external_invitation.issued` | `issueExternalInvitation` (emisión nueva o `reissue: true`) | `{ bindingId, invitationId, organizationId, environmentId, designatedAdmin, profileId, reissue, changedByUserId }` — SIN token, SIN email |
+| `identity.external_invitation.linked` | `acceptExternalInvitation` (consumer in-process del auth-server, TASK-1830) | `{ bindingId, invitationId, organizationId, environmentId, profileId, linkId, profileCreated, designatedAdmin, changedByUserId }` — SIN subject; `profileCreated` distingue persona nueva (`external_contact`) de persona existente enlazada |
+| `identity.external_access.revoked` | `revokeExternalAccess` con `scope` `binding` \| `grant` \| `member` \| `invitation` (sólo cuando `changed=true`) | `{ scope, bindingId, grantId?, invitationId?, profileId?, organizationId, environmentId, capability?, grantsVersion, revokedGrantIds?, revokedProfileIds?, changedByUserId }` — `grantsVersion` ya bumpeado salvo `scope='invitation'` |
+
+Ningún consumer reactivo escucha estos seis todavía: la invalidación push de `grantsVersion` hacia el gateway es
+`TASK-1831`; hoy el gateway compara `grantsVersion` por igualdad contra el reader ecosystem con TTL ≤ 60 s.
+Contrato: `EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md` §`Slice 1 binding foundation — applied`.
+
 ## Delta 2026-09-03 — TASK-1349: revisión de offboarding + writeback de lifecycle (0 events nuevos, 1 emisor nuevo)
 
 - `member.deactivated` (aggregate `member`, v1) gana un **segundo emisor**: el executor de offboarding
@@ -839,6 +863,16 @@ Invariants:
 | `identity_reconciliation` | `identity.reconciliation.approved` | `identity/reconciliation/apply-link.ts` | `{ proposalId, status, resolvedBy }`                                | —                 |
 | `identity_reconciliation` | `identity.reconciliation.rejected` | `identity/reconciliation/apply-link.ts` | `{ proposalId, status, resolvedBy }`                                | —                 |
 | `identity_profile`        | `identity.profile.linked`          | `identity/reconciliation/apply-link.ts` | `{ proposalId, profileId, memberId, sourceSystem, sourceObjectId }` | —                 |
+| `external_identity_binding` | `identity.external_environment.upserted` | `identity/external-access/commands.ts` (`upsertExternalIdentityEnvironment`) | `{ environmentId, issuerUrl, issuerClass, status, previousIssuerUrl, changedByUserId }` | — (TASK-1831) |
+| `external_identity_binding` | `identity.external_binding.bound` | `identity/external-access/commands.ts` (`bindExternalOrganization`) | `{ bindingId, organizationId, environmentId, grantsVersion, designatedAdminProfileId, changedByUserId }` | — (TASK-1831) |
+| `external_identity_binding` | `identity.external_grant.granted` | `identity/external-access/commands.ts` (`grantExternalCapability`) | `{ bindingId, grantId, organizationId, environmentId, capability, profileId, grantsVersion, changedByUserId }` | — (TASK-1831) |
+| `external_identity_binding` | `identity.external_invitation.issued` | `identity/external-access/commands.ts` (`issueExternalInvitation`) | `{ bindingId, invitationId, organizationId, environmentId, designatedAdmin, profileId, reissue, changedByUserId }` — nunca token ni email | — (TASK-1831) |
+| `external_identity_binding` | `identity.external_invitation.linked` | `identity/external-access/commands.ts` (`acceptExternalInvitation`) | `{ bindingId, invitationId, organizationId, environmentId, profileId, linkId, profileCreated, designatedAdmin, changedByUserId }` — nunca subject | — (TASK-1831) |
+| `external_identity_binding` | `identity.external_access.revoked` | `identity/external-access/commands.ts` (`revokeExternalAccess`) | `{ scope, bindingId, grantId?, invitationId?, profileId?, organizationId, environmentId, capability?, grantsVersion, revokedGrantIds?, revokedProfileIds?, changedByUserId }` | — (TASK-1831) |
+
+Regla del aggregate `external_identity_binding` (TASK-1631): los seis payloads llevan sólo IDs y metadatos de autoridad —
+**NUNCA** el token de invitación (ni su hash), el email de un tercero, el `subject` del IdP ni claims del token. Detalle
+en el delta `2026-09-04` al inicio de este catálogo.
 
 ### Operational Responsibility (nuevo, TASK-227)
 

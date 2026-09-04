@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.3
 > **Creado:** 2026-05-10 por Claude
-> **Ultima actualizacion:** 2026-08-09 por Claude
+> **Ultima actualizacion:** 2026-09-03 por Codex
 > **Documentacion tecnica:** [TASK-851](../../tasks/complete/TASK-851-production-release-orchestrator-workflow.md), [CLAUDE.md §Production Release Orchestrator invariants](../../../CLAUDE.md), [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
 
 # Orquestador de Release a Producción
@@ -38,11 +38,12 @@ workflow_dispatch (operator: target_sha + opcionalmente bypass_reason)
    ├────────────────────────────────────────┤
    │  3. Approval gate (Production env)     │ → required reviewers
    ├────────────────────────────────────────┤
-   │  4. Workers deploy (parallel × 4)      │
+   │  4. Workers deploy (parallel × 5)      │
    │     - ops-worker                       │
    │     - commercial-cost-worker           │ → cada uno verifica GIT_SHA
    │     - ico-batch-worker                 │   matches EXPECTED_SHA
    │     - hubspot-greenhouse-integration   │
+   │     - auth-server (TASK-1828)          │
    ├────────────────────────────────────────┤
    │  5. Wait Vercel READY                  │ → poll API hasta encontrar deploy
    ├────────────────────────────────────────┤
@@ -58,6 +59,19 @@ workflow_dispatch (operator: target_sha + opcionalmente bypass_reason)
    + 7 outbox events platform.release.* v1 emitidos
    + audit completo en release_state_transitions
 ```
+
+## Coordinación y evidencia de cierre
+
+Cada release tiene un coordinador y un intento activo identificado por SHA, run ID y release ID.
+Dos corridas del mismo SHA no son intercambiables: el reconciler todavía prioriza SHA y una cancelación
+del duplicado puede abortar el manifest del intento correcto. La operación serial contiene el riesgo;
+el arreglo técnico de correlación sigue pendiente. El [runbook §0.1](../../operations/runbooks/production-release.md#01-un-coordinador-y-un-intento-vivo-por-release)
+explica cómo comprobar cancelaciones, webhooks y manifest antes de iniciar otro intento.
+
+`completed` sólo significa que un run terminó: su conclusión puede ser `cancelled`. Vercel y workers
+sanos prueban despliegue; el manifest y el watchdog prueban el cierre del control plane; el readback de
+la operación del dominio prueba su efecto. En una recuperación que emite eventos, ese readback incluye
+las proyecciones posteriores, para detectar que un consumer vuelva a deshacer la reparación.
 
 ## Como decide
 

@@ -1,5 +1,7 @@
 # Audits
 
+- [Maggie y María Fernanda — cierre de offboarding — 2026-09-03](payroll/MAGGIE_MARIA_FERNANDA_OFFBOARDING_CLOSURE_2026-09-03.md) — cierre 4/4 verificado, exclusión de nómina y conciliación Finance separada.
+
 Indice de auditorias tecnicas y operativas versionadas dentro de `docs/`.
 
 ## Regla de uso
@@ -12,8 +14,12 @@ Indice de auditorias tecnicas y operativas versionadas dentro de `docs/`.
 
 ## Categorias
 
+- [Valentina — cobertura documental y skills — 2026-09-03](payroll/VALENTINA_DOCUMENTATION_SKILLS_CLOSURE_2026-09-03.md).
+- [Valentina Hoyos — reingreso y recuperación verificados — 2026-09-03](payroll/VALENTINA_REHIRE_IDENTITY_RECOVERY_2026-09-03.md) — contractor activa desde 20/08, disponibilidad restaurada y release cerrado; historia/pagos preservados. Agosto 12/31 registrado, pendiente boleta; login interactivo no probado.
+
 - [Berel — numeración editorial noviembre/diciembre — 2026-09-03](seo/BEREL_EDITORIAL_NUMBERING_2026-09-03.md) — mapa por ID, alias de archivos y readback de dependencias; consultar antes de interpretar números de auditorías anteriores.
 
+- [Efeonce MCP — interoperabilidad OAuth Codex/Claude — 2026-09-02](EFEONCE_MCP_CODEX_OAUTH_INTEROPERABILITY_2026-09-02.md) — mismatch live de issuer, scopes/challenges, fallback de deploy y límites del canary; seguimiento TASK-1813, sin cambios runtime.
 - [ANAM Customer Agent QA — 2026-07-16](ANAM_CUSTOMER_AGENT_QA_REPORT_2026-07-16.md)
 - [ANAM RevOps diagnosis and change-set QA — 2026-07-16](ANAM_REVOPS_CHANGE_SET_QA_2026-07-16.md)
 - [ANAM execution countries property QA — 2026-07-17](ANAM_EXECUTION_COUNTRIES_PROPERTY_QA_2026-07-17.md)

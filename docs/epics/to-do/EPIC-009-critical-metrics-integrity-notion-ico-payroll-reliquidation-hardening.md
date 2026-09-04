@@ -77,8 +77,8 @@ Eso vuelve este programa más amplio que una sola task: mezcla payroll safety, f
 - `docs/tasks/complete/TASK-412-payroll-reliquidation-admin-ui-preview-audit.md`
 - `docs/tasks/to-do/TASK-414-payroll-reopen-policy-engine-hardening.md`
 - `docs/tasks/complete/TASK-729-payroll-reliability-module.md`
-- `docs/tasks/to-do/TASK-730-payroll-e2e-smoke-lane.md`
-- `docs/tasks/to-do/TASK-731-payroll-pre-close-validator.md`
+- `docs/tasks/complete/TASK-730-payroll-e2e-smoke-lane.md` — supersedida por `TASK-1827` (EPIC-043), cierre documental sin implementación acreditada.
+- `docs/tasks/complete/TASK-731-payroll-pre-close-validator.md` — supersedida por `TASK-1820` (EPIC-043), cierre documental sin implementación acreditada.
 
 ## Exit Criteria
 

@@ -46,6 +46,7 @@ Routes:
 - `GET /api/platform/ecosystem/organizations/:id`
 - `GET /api/platform/ecosystem/capabilities`
 - `GET /api/platform/ecosystem/integration-readiness`
+- `GET /api/platform/ecosystem/identity/binding?environment=&subject=[&clientId=]` — reader de acceso externo para el gateway MCP (TASK-1631): sólo bindings de scope `internal`, cualquier otro recibe `404` anti-oráculo; `400 bad_request` sin `environment`/`subject`; `Cache-Control: private, no-store` + `cacheTtlSeconds: 60`
 - `GET /api/platform/ecosystem/event-types`
 - `GET/POST /api/platform/ecosystem/webhook-subscriptions`
 - `GET/PATCH /api/platform/ecosystem/webhook-subscriptions/:id`
@@ -143,6 +144,35 @@ Key rules:
 - manual admin assignments keep precedence
 - sync route now requires explicit payload
 - this is not the recommended external connector surface
+
+### 2b. Admin External Identity Binding API (TASK-1631)
+
+Purpose:
+- entitlement revocable por organización y por persona para el acceso externo vía MCP (EPIC-044 U04): environment de identidad → binding de la organización cliente → grants por capability namespaceada → invitación → persona ligada por `subject`
+- el grant ya existe (`greenhouse_core.external_capability_grants`, 2026-09-04); el acceso externo real espera al emisor propio y al gateway multi-issuer (TASK-1829/1830/1831/1832)
+
+Auth:
+- sesión admin interna (`requireAdminTenantContext`) + capability dedicada por ruta (`can()`, module `organization`, scope `tenant`; hoy sólo `efeonce_admin` la tiene)
+
+Routes:
+- `GET /api/admin/identity/external-access/environments` — `identity.external_binding.read`
+- `POST /api/admin/identity/external-access/environments` — `identity.external_environment.manage` (upsert idempotente; `issuer_class` inmutable)
+- `GET /api/admin/identity/external-access/eligibility?search=&limit=` — `identity.external_binding.read` (organizaciones cliente de Account 360; `eligible=true` sólo `active_client`)
+- `GET /api/admin/identity/external-access/bindings?organizationId=&environmentId=&status=` — `identity.external_binding.read`
+- `POST /api/admin/identity/external-access/bindings` — `identity.external_binding.bind` (idempotente por org + environment + ref)
+- `GET /api/admin/identity/external-access/bindings/[bindingId]` — `identity.external_binding.read` (binding + grants + invitations; nunca `token_hash`)
+- `POST /api/admin/identity/external-access/bindings/[bindingId]/grants` — `identity.external_grant.issue` (`{ capability, profileId?, reason? }`; `profileId` null = todos los miembros ligados)
+- `POST /api/admin/identity/external-access/bindings/[bindingId]/invitations` — `identity.external_invitation.issue` (`{ email, designatedAdmin?, profileId?, reason?, expiresInHours?, reissue? }`; el `token` viaja UNA sola vez)
+- `POST /api/admin/identity/external-access/revoke` — `identity.external_access.revoke` (`{ scope: binding|grant|member|invitation, bindingId?/grantId?/profileId?/invitationId?, reason }`; sube `grants_version` cuando cambia autoridad)
+
+Errors (contrato canónico `canonicalErrorResponse`, prose es-CL):
+- `external_access_invalid_request` 422 · `external_access_not_found` 404 · `external_access_conflict` 409 · `external_access_organization_not_eligible` 422 · `external_access_environment_not_active` 409 · `external_access_binding_not_active` 409 · `external_access_invitation_not_open` 409 · `external_access_invitation_expired` 410 · `external_access_identity_collision` 409
+- sin la capability: `forbidden` (con `extra.capability` + `extra.action`)
+
+Read next:
+- `docs/documentation/identity/binding-identidad-externa-mcp.md`
+- `docs/manual-de-uso/identity/operar-binding-identidad-externa.md`
+- `docs/architecture/EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`
 
 ### 3. Design Handoff Control Plane API
 

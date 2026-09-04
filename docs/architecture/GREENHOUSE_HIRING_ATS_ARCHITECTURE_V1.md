@@ -2539,9 +2539,11 @@ Código: `src/lib/hiring/decision-parity.ts` (propose/confirm + lectura del dese
 - 🔴 **`confirm` rechaza `authSource === 'sister_platform_oauth'` con 403.** Un token delegado puede
   **leer** el desenlace y **proponer** una decisión; **confirmar exige sesión humana**.
 - No es una omisión: **`efeonce.mcp.hiring.write` no existe en código**. Está propuesto en
-  `TASK-1720`/`TASK-1722` como clase de blast-radius y permanece bloqueado hasta el grant revocable de
-  `TASK-1631`. Es el mismo reparto que rige en el resto de Hiring: el agente propone y lee, el humano
-  confirma. **NUNCA** cablear un scope de escritura delegado a este carril antes de ese grant.
+  `TASK-1720`/`TASK-1722` como clase de blast-radius. El grant revocable por organización y por persona ya
+  existe (`greenhouse_core.external_capability_grants`, `TASK-1631`, 2026-09-04); el scope sigue bloqueado hasta
+  que el emisor propio y el gateway multi-issuer lo porten en un token (EPIC-044: `TASK-1829`/`TASK-1831`/
+  `TASK-1832`) (actualizado 2026-09-04, TASK-1631). Es el mismo reparto que rige en el resto de Hiring: el agente propone y lee, el
+  humano confirma. **NUNCA** cablear un scope de escritura delegado a este carril antes de ese token con grant.
 
 ### El manifiesto de parity vuelve obligatoria la pregunta
 

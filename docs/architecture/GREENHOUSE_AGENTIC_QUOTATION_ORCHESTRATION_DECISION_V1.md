@@ -90,7 +90,7 @@ La madurez verificada al 2026-08-02 es:
 | Simulación y authoring first-party por API Platform/HTTP | Operativo | Greenhouse puede calcular y crear drafts/versiones mediante commands canónicos y sesión autorizada. |
 | Consumer de ecosistema | Operativo en lectura/simulación | No autoriza writes externos ni expone el cost stack completo. |
 | MCP local de Greenhouse | Operativo en `search_services` + `quote_price`, read-only | Sirve consumers autenticados del runtime Greenhouse; no equivale al gateway federado público. |
-| Gateway federado `mcp.efeonce.org` | Operativo sin provider de cotizaciones | Requiere un provider read/recommend delgado; acceso B2B externo además espera identidad/entitlements de `TASK-1631`. |
+| Gateway federado `mcp.efeonce.org` | Operativo sin provider de cotizaciones | Requiere un provider read/recommend delgado; acceso B2B externo además espera un token con grants: el grant por organización/persona ya existe (`TASK-1631`, 2026-09-04); emisor propio y gateway multi-issuer en EPIC-044 (`TASK-1829`/`TASK-1831`/`TASK-1832`) (actualizado 2026-09-04, TASK-1631). |
 | Interpretación agentic `QuoteIntent → ServicePlan → CostCard` | Propuesto | Todavía no existe el orquestador completo ni su golden set de promoción. |
 | Writes de agentes externos o tools MCP de cotización | No implementados ni autorizados | Requieren contracts, grants, evals y aprobación posteriores. |
 | Emisión o envío autónomo client-facing | No autorizado | Continúa bajo confirmación humana y policy comercial. |

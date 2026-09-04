@@ -1435,6 +1435,75 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
     })
   }
 
+  // TASK-1631 — External identity binding foundation: sólo EFEONCE_ADMIN opera la cohorte externa
+  // (registry de environments, binding Account 360, grants, invitaciones y revocación). Cada
+  // command tiene su capability; el override per-usuario del Admin Center puede afinarlas.
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    for (const action of ['create', 'update'] as const) {
+      addEntitlement(entries, {
+        module: 'organization',
+        capability: 'identity.external_environment.manage',
+        action,
+        scope: 'tenant',
+        source: 'role'
+      })
+    }
+
+    addEntitlement(entries, {
+      module: 'organization',
+      capability: 'identity.external_binding.read',
+      action: 'read',
+      scope: 'tenant',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'organization',
+      capability: 'identity.external_binding.bind',
+      action: 'create',
+      scope: 'tenant',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'organization',
+      capability: 'identity.external_grant.issue',
+      action: 'create',
+      scope: 'tenant',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'organization',
+      capability: 'identity.external_invitation.issue',
+      action: 'create',
+      scope: 'tenant',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'organization',
+      capability: 'identity.external_access.revoke',
+      action: 'execute',
+      scope: 'tenant',
+      source: 'role'
+    })
+  }
+
+  // TASK-1829 — Authorization server propio: registro de clientes confidenciales y revocación de
+  // consentimientos OAuth. Sólo EFEONCE_ADMIN (least privilege; invariante TASK-873/935).
+  if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    for (const capability of ['identity.auth_client.register', 'identity.auth_consent.revoke'] as const) {
+      addEntitlement(entries, {
+        module: 'organization',
+        capability,
+        action: 'execute',
+        scope: 'tenant',
+        source: 'role'
+      })
+    }
+  }
+
   if (
     hasRouteGroup(subject, 'hr') ||
     hasAuthorizedView(subject, 'equipo.offboarding') ||

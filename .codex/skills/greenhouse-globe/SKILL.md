@@ -1684,6 +1684,22 @@ Mientras Globe esté hibernado:
 - cada plan OpenTofu lleva explícitos el estado operativo y los inputs de preservación, y debe demostrar cero
   deletes/replacements antes de aplicar.
 
+La pausa incluye callers fuera de `efeonce-globe`: en `efeonce-group` / `us-east4`,
+`ops-globe-tenancy-reconcile` invoca `/globe/tenancy/reconcile` cada cinco minutos. Debe quedar pausado
+mientras SQL esté detenido; `minScale=0` no bloquea nuevas solicitudes ni evita su costo. No pauses el
+`ops-worker` compartido ni otros schedulers de Greenhouse. Conserva la definición, identidad OIDC y permisos
+para su reactivación.
+
+El dueño del estado de ese scheduler en el deploy es `services/ops-worker/deploy.sh`: su quinto argumento
+`paused` se reaplica al crear **y** actualizar. La hibernación exige `true` en source y `PAUSED` en runtime;
+un cambio local no prueba que el deploy remoto ya lo preserve. Para reactivar, sigue la secuencia completa del
+runbook: cambia el estado deseado sólo con autorización, verifica SQL/API y el gate real que admite tenancy,
+reanuda el caller y exige reconciliaciones exitosas y proyecciones frescas (TTL de 12 minutos) antes de reabrir
+acceso normal. No asumas que `draining` permite reconciliar ni que un HTTP 200 del wrapper prueba éxito remoto.
+
+Registra por separado source, promoción/deploy, readback del scheduler, lifecycle, frescura y Billing posterior.
+No vuelvas a ejecutar el scheduler sólo para comprobar que permanece pausado.
+
 La hibernación conserva datos, backups/PITR, buckets, secretos, imágenes, IAM, red y state; no autoriza borrar ni
 recrear. Distingue siempre ahorro modelado de ahorro realizado: el segundo sólo se afirma con Billing Export a
 24 horas, 7 días y cierre mensual.

@@ -2,10 +2,11 @@
 
 ## Estado vigente para agentes
 
-Greenhouse es la plataforma operativa de Efeonce Group sobre Next.js 16, MUI 7, Vuexy starter-kit y
-TypeScript. Este archivo contiene solo contratos durables y rutas de descubrimiento. El estado de una sesión,
-rollout o bloqueo vive en [Handoff.md](Handoff.md); la historia pre-2026-07-19 quedó preservada en
+Greenhouse: plataforma operativa Efeonce Group, Next.js 16/MUI 7/Vuexy starter-kit/TypeScript.
+Contratos durables aquí; estado en [Handoff.md](Handoff.md); historia preservada en
 [`docs/operations/agent-context-history/2026-07-19/project_context.legacy.md`](docs/operations/agent-context-history/2026-07-19/project_context.legacy.md).
+
+Reingresos e identidad: [contrato canónico](docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md).
 
 TeamBot usa `pnpm teams:announce` para grupos: menciones explícitas, no `@todos` ni DMs. Un 1:1 manual aprobado exige dispatcher/audit canónicos, Entra revalidada e idempotencia; lo recurrente converge a Notification Hub. En Performance Reports, volumen no prueba sobrecarga y el mensaje publicado verifica la mención. Contrato: [`manual-teams-announcements.md`](docs/operations/manual-teams-announcements.md).
 
@@ -15,12 +16,12 @@ PAT temporal aprobado para la migración permanece activo hasta su sustitución 
 antes del rollout externo. El release productivo `30502476429` y el rollback ejercitado están documentados en
 [`AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md`](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
 
-Globe (`../efeonce-globe`) usa Tailwind v4 como único pipeline activo; el renderer vanilla queda sólo como
-fallback hasta `TASK-1560`. Su lifecycle Terraform es `active -> draining -> hibernated`; `draining` es la
-frontera obligatoria de apagado/encendido. Estado y recuperación: [`GLOBE_RUNTIME_HANDOFF.md`](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md)
-y [`GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md`](docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md).
-Las skills espejo `greenhouse-globe` y `greenhouse-globe-model-fleet` aplican esta compuerta: discovery y
-validación estática pueden continuar, pero ningún canary, promoción o trabajo facturable despierta Globe.
+Globe (`../efeonce-globe`): Tailwind v4 activo, vanilla fallback hasta TASK-1560.
+Hibernación reversible: `draining` obligatorio al apagar/encender; discovery estático permitido, nunca despertar
+para canaries/promoción. [Estado](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md) y
+[runbook](docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md) gobiernan las skills Globe/fleet
+y el caller externo `ops-globe-tenancy-reconcile` (`efeonce-group/us-east4`): sincronizar pausa source/runtime;
+reactivar SQL/API antes del caller y verificar tenancy fresca antes del uso productivo.
 
 La dirección móvil de Globe es native-first con React Native + Expo; web/PWA queda como fallback. ADR, vertical
 slice y gates: [ADR-018](docs/architecture/creative-studio/EFEONCE_GLOBE_MOBILE_CONTINUITY_APPLICATION_DECISION_V1.md).
@@ -119,8 +120,9 @@ antes de persistir provenance, separar idempotencia y medir shadow contra GSC. C
 entregado en `TASK-1805`/`TASK-1806`: desde 2026-09-03 producción sirve `improved_layout_clickstream_v2`
 (rebaseline); legacy sólo como rollback pre-corte.
 
-Berel: [plan](docs/operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md). Contacto:
-`docs/context/01_quienes-somos.md` y `docs/public-site/CONTACT_PAGE_REBUILD_BRIEF_V1.md`.
+Informes: skill `report-studio` (Claude/Codex), evidencia, diseño y QA PDF.
+Berel: [plan editorial](docs/operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md) ·
+[informes SEO/AEO](docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md).
 
 WordPress/Ohio: skill `efeonce-public-site-wordpress`; contratos [Home](docs/architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md),
 [HubSpot](docs/architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md) y [misceláneas](docs/architecture/public-site/PUBLIC_MISCELLANEOUS_SURFACES_V1.md).
@@ -154,10 +156,12 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   mantienen cookies, sesiones y audiencias propias, pero resuelven un único `identity_profile` y la membresía de
   Account 360 mediante bindings auditados. La coexistencia inicial con el login cliente actual requiere una ruta
   de convergencia posterior al mismo plano de identidad externo; nunca una segunda identidad o contraseña permanente.
-- Greenhouse ya dispone de NextAuth y un broker OAuth sister-platform reutilizable. `TASK-1631` debe decidir entre
-  WorkOS, extraer ese broker a `auth.efeonce.org` o un híbrido; el broker actual no es todavía un authorization
-  server MCP público y debe ganar metadata/CIMD-DCR, callbacks hospedados, consent/grants y verificación compatible
-  con el gateway antes de atender clientes.
+- EPIC-044 (ADR nativo): emisor propio en `auth.efeonce.org`; **runtime vivo** (TASK-1828: Cloud Run
+  `auth-server`, KMS HSM, JWKS vivo; prod tras el release). **Binding provider-neutral aplicado**
+  (TASK-1631, 2026-09-04): environments registry → bindings de organizaciones `active_client` (`grants_version`) →
+  grants por capability → invitaciones (`linked` = membership). El gateway resuelve por `(environment, subject)` en
+  `GET /api/platform/ecosystem/identity/binding`, nunca por `client_id` ni email.
+  OAuth del emisor code complete (TASK-1829, flag OFF): contrato `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`.
 - La operación o evolución MCP se enruta por las skills espejo `.codex/skills/efeonce-mcp-platform/` y
   `.claude/skills/efeonce-mcp-platform/`; estas componen la skill dueña de cada provider y no duplican su policy.
   Las skills de arquitectura `software-architect-2026` y `arch-architect` deben cargar ese router antes de
@@ -318,7 +322,7 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 | Cómo se estructura y vende Media & Distribution, sus tres soluciones, Performance & Commerce, capacidades de delivery, Influencers/UGC y el rol de Reach | `docs/services/media-distribution/README.md` + `docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md` + `docs/business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md` + `docs/business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md` + `docs/audits/commercial/CREATOR_INFLUENCE_CONTENT_MARKET_RESEARCH_2026-07-29.md` + `docs/audits/commercial/CREATOR_INFLUENCE_PERFUME_ATHLETES_CHILE_SIMULATION_2026-07-29.md` |
 | Cómo vender Revenue Operations & CRM y elegir HubSpot-first, Salesforce-first o híbrido | `docs/audits/commercial/CRM_PLATFORM_POSITIONING_GARTNER_CHILE_2026-08-27.md` + `docs/services/hubspot-as-a-service/HUBSPOT_OFFER_ARCHITECTURE_V2.md` + `docs/services/salesforce/README.md` + skills del provider; claims y reventa requieren evidencia vigente |
 | Cómo operar y entregar la landing, Customer Agent y handoff de Emma para ANAM | Skill `hubspot-as-a-service` → `anam-case.md` + canon CMS `anam-chat-landing.md` + entrega y soporte `anam-entrega-documentacion-y-soporte-2026-09-02.md`; cada superficie conserva ownership y readback separados |
-| Cómo construir y cerrar una licitación client-facing con Artifact Composer, desde evidencia y narrativa hasta deck auditado y Proposal versionada | `docs/commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md` + `docs/commercial/tenders/PROPOSAL_STUDIO_CLOSURE_SCHEMA.md` + `docs/architecture/GREENHOUSE_AGENTIC_QUOTATION_ORCHESTRATION_DECISION_V1.md` + `docs/audits/commercial/EFEONCE_SERVICE_PRICING_LEARNINGS_AND_GUARDRAILS_2026-07-31.md` + expedientes aprobados + skills `greenhouse-public-private-tenders` y `deck-studio`; separar fuentes y gobernanza técnica/económica sin imponer artefactos físicos distintos, derivar todo precio del quote congelado, declarar IVA, pasar `pnpm tender:canonical-gate <slug>` y no emitir stubs/HOLD como oferta |
+| Licitaciones y Proposal versionada | `docs/commercial/tenders/TENDER_WORKSPACE_TEMPLATE.md` + `docs/commercial/tenders/PROPOSAL_STUDIO_CLOSURE_SCHEMA.md` + `docs/architecture/GREENHOUSE_AGENTIC_QUOTATION_ORCHESTRATION_DECISION_V1.md` + `docs/audits/commercial/EFEONCE_SERVICE_PRICING_LEARNINGS_AND_GUARDRAILS_2026-07-31.md` + expedientes aprobados + skills `greenhouse-public-private-tenders` y `deck-studio`; quote congelado, IVA, `pnpm tender:canonical-gate <slug>`; sin stubs/HOLD |
 | Cómo descubrir y calificar licitaciones públicas de LicitaLAB | skill espejo `greenhouse-public-private-tenders` → `licitalab-radar-playwright.md` + `licitalab-mcp.md`; LicitaLAB sólo ve contratación pública. El radar entrega códigos al MCP documental. La promoción manual usa MCP HubSpot con confirmación, búsqueda por ID exacto + llave de idempotencia cuando esté poblada, asociaciones y readback; `gh_deal_origin` queda vacío mientras su enum sólo admita `greenhouse_quote_builder`. El bridge pendiente afecta automatización, no cargas manuales. |
 | Cómo descubrir y calificar oportunidades privadas de Wherex | `docs/manual-de-uso/comercial/revisar-licitaciones-wherex-con-chrome.md` + `greenhouse-public-private-tenders` → `wherex-radar-chrome-playwright.md`; lectura protegida evidence-first, sin acciones comerciales |
 | Cómo funcionan partnerships/providers, licencias, co-selling y captura de valor en Efeonce | `docs/operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md` (estado vigente) + `docs/business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md` + `docs/audits/commercial/README.md` (evidencia fechada) + `efeonce-agency` |

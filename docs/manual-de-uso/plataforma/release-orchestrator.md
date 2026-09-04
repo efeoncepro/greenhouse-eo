@@ -1,7 +1,7 @@
 > **Tipo de documento:** Manual de uso (operador)
 > **Version:** 1.2
 > **Creado:** 2026-05-10 por Claude
-> **Ultima actualizacion:** 2026-08-09 por Claude
+> **Ultima actualizacion:** 2026-09-03 por Codex
 > **Documentacion tecnica:** [CLAUDE.md §Production Release Orchestrator invariants (TASK-851)](../../../CLAUDE.md), [Spec TASK-851](../../tasks/complete/TASK-851-production-release-orchestrator-workflow.md), [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md)
 
 # Production Release Orchestrator
@@ -11,6 +11,19 @@
 Convierte el release `develop → main` en un flujo determinístico, auditable y reversible. Antes de TASK-851 el operador tenía que: (1) correr preflight a mano, (2) crear PR, (3) aprobar el environment Production en cada worker workflow individualmente, (4) inspeccionar logs Vercel y Cloud Run para confirmar que cada deploy quedó READY. Cualquier paso skipeado o desincronizado dejaba el ecosistema en estado mixto.
 
 El orquestador (`production-release.yml`) hace los 8 pasos en una sola corrida, con audit row + outbox event en cada transition + verificación post-deploy de que cada worker está sirviendo el SHA correcto.
+
+## Un solo coordinador, incluso después de una cancelación
+
+Confirma quién lleva el release y su SHA, run ID y release ID antes de actuar. Sigue el intento existente
+si ya hay uno. Cancelar un duplicado puede abortar el manifest activo del mismo SHA por una limitación
+vigente del reconciler; no es una limpieza inocua. Antes de reintentar, verifica que las cancelaciones y
+sus webhooks terminaron y relee el manifest. Si quedó `aborted`, usa un intento nuevo del orquestador;
+nunca SQL ni el retry aislado del job final. Procedimiento: [runbook §0.1](../../operations/runbooks/production-release.md#01-un-coordinador-y-un-intento-vivo-por-release).
+
+Un run `completed/cancelled` no terminó con éxito. Revisa las conclusiones de jobs y anotaciones antes
+de atribuir un fallo al proveedor. El cierre requiere manifest `released`, health y watchdog, además del
+readback funcional correspondiente. La reparación de datos y el cierre del release son verificaciones
+separadas.
 
 ## Antes de empezar
 
@@ -110,12 +123,12 @@ Cada transition: UPDATE atomic en `release_manifests` + audit row en `release_st
 | `released` | Todo verde end-to-end | Release exitoso |
 | `degraded` | Health soft-failed pero workers + Vercel OK | Inspeccionar dashboard, decidir rollback o forward-fix |
 | `rolled_back` | Operador disparó `pnpm release:rollback` | Revertido |
-| `aborted` | Job falló mid-flight (preflight, deploy, etc) | Investigar logs + re-INSERT con attempt_n + 1 |
+| `aborted` | Intento terminal por falla o cancelación reconciliada | Investigar run/eventos; nuevo intento por orquestador tras drenar webhooks, nunca INSERT manual |
 
 ## Que NO hacer
 
 - **NUNCA** modificar `release_manifests` directamente via SQL. Anti-immutable trigger lo bloquea para campos identity.
-- **NUNCA** correr `production-release.yml` en paralelo con el mismo `target_sha`. La concurrency group lo enforce a nivel workflow.
+- **NUNCA** correr `production-release.yml` en paralelo con el mismo `target_sha`. La concurrency group no protege contra webhooks tardíos de un duplicado; coordina un solo intento.
 - **NUNCA** correr `production-release.yml` cuando hay otro release ACTIVO en `main` con SHA distinto. El partial UNIQUE INDEX en DB lo bloquea (recordReleaseStarted falla); operador debe esperar a que el activo termine o abortarlo manualmente.
 - **NUNCA** forzar transitions fuera de la matrix canónica via CLI. `assertValidReleaseStateTransition` lo throw fail-loud.
 - **NUNCA** flagear `--override-batch-policy` (en preflight) sin reason >=20 chars + capability + post-mortem comprometido. Audit row registra la decisión.
@@ -159,8 +172,8 @@ Codex **no usa archivos de slash command** `.md`. Sus alias slash (`/implement-t
 | `preflight` marca `readyToDeploy=false` con **solo warnings** `playwright_smoke` (0 runs) / `ci_green` (aún corriendo) | El smoke/CI corren en `develop` (ya verdes); el commit squash fresco de `main` no tiene su propio run | Espera el CI de `main` verde y re-dispatcha con `bypass_preflight_reason` documentado (baja los warnings sin errors). Es el path canónico de estos releases |
 | Tras el release, `ops-worker` quedó con un GIT_SHA **anterior** al target | Normal si `ops-worker-deploy` saltó el rebuild (`deploy_needed=false`) y el diff de rutas runtime entre Cloud Run y target es vacío | No forzar redeploy solo para alinear el label. Documentar el residual y ver runbook §4.1.1 |
 | `transition-released` queda queued/stale después de runtime verde | GitHub Actions runner/concurrency quedó atascado al final, no necesariamente el runtime | No usar SQL. Si health/smoke/watchdog aplicable están verificados y el operador aprueba, cerrar con `pnpm release:orchestrator-transition-state --release-id=<id> --to-state=released --reason=<razon>` y documentar run/release/evidencia |
-| `record-started` falla con "release ya activo en main" | Otro release en `preflight`/`ready`/`deploying`/`verifying` | Esperar terminación o abortar manualmente via `pnpm release:orchestrator-transition-state --to-state=aborted` |
-| Worker deploy falla con "GIT_SHA mismatch" | Cloud Build cache stale, tag drift, deploy aborted mid-flight | Re-run el workflow; si persiste investigar Cloud Build console |
+| `record-started` falla con "release ya activo en main" | Otro release en `preflight`/`ready`/`deploying`/`verifying` | Seguir el intento dueño; aplicar runbook §0.1 antes de cancelar/abortar y antes de crear otro |
+| Worker deploy falla con "GIT_SHA mismatch" | Cloud Build cache stale, tag drift, deploy aborted mid-flight | Investigar revisión/logs; si el manifest quedó `aborted`, nuevo intento canónico después de verificar eventos terminales |
 | `wait-vercel` timeout 900s | Vercel deploy lento o no triggered | Verificar `vercel ls greenhouse-eo --environment=production`; si no hay deployment, push manual a main |
 | `post-release-health` soft-fail (release `degraded`) | `/api/auth/health` no devolvió 200 en 3 attempts | Inspeccionar `/admin/operations` dashboard; decidir rollback (`pnpm release:rollback`) o forward-fix |
 | `transition-released` falla con "race con otro actor" | Otro proceso ya transicionó el state | Investigar `release_state_transitions` audit log para ver qué pasó |

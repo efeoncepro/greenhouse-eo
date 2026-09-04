@@ -1,5 +1,14 @@
 # TASK-1235 — Growth AI Visibility: Report Builder
 
+## Delta 2026-09-04 — capability sin seed en `capabilities_registry` (deuda de paridad cerrada)
+
+`growth.ai_visibility.report.read` se declaró en `src/config/entitlements-catalog.ts` sin su fila en
+`greenhouse_core.capabilities_registry` (regla CLAUDE.md §Capability ⇒ grant coverage: registry + catálogo TS en el mismo
+PR). Lo detectó el test live `src/lib/capabilities-registry/parity.live.test.ts` durante `TASK-1631`; el seed lo aplica
+`migrations/20260904112408574_capabilities-registry-parity-backfill.sql` (aplicada 2026-09-04). Sin cambio de
+comportamiento: `can()` resolvía por el catálogo TS; la tabla de gobernanza era la que estaba desalineada.
+
+
 ## Delta 2026-06-24
 
 - La ejecución async del run está **`complete` (staging operativo)** por TASK-1234 (worker Cloud Run `POST /growth/grader/drain` + enqueue/poll + persistencia incremental + recovery de huérfanos; flag `GROWTH_AI_VISIBILITY_ASYNC_EXECUTION_ENABLED` ON en staging, verificado con un run `full` real). Los runs `full` multi-provider ya completan sin timeout. El report builder consume **runs completados** (`succeeded`/`partial`) + su `grader_score`; ya no asume ejecución inline. El GET detail (`/runs/[runId]`) sirve como poll de progreso.

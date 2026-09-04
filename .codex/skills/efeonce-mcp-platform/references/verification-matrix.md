@@ -12,6 +12,7 @@ customer payloads as evidence.
 | Customer/B2B MCP access | all OAuth and provider evidence plus a real client that receives only its granted tenant/capability entitlements, revocation evidence and an external-access decision; an internal client that receives both the base (`efeonce.mcp.read`) and Globe reader (`efeonce.mcp.globe.read`) scopes is insufficient |
 | Cloud Run/edge | deployed revision/image, ingress, service identity, rollback revision, DNS from independent resolvers, TLS, public unauthorized `401` |
 | Managed TLS incident | A/AAAA/CNAME answers from authoritative and independent public resolvers, forwarding-rule IP/443, HTTPS-proxy certificate attachment, certificate-map absence/precedence, managed/domain status and retry timestamp |
+| Auth host on the shared front door (`auth.efeonce.org`, TASK-1828) | Terraform plan for `enable_auth_host` with 0 destroy and the gateway cert's `managed.domains` untouched, own cert `efeonce-auth-server-cert` `ACTIVE`, host rule → `efeonce-auth-server-backend`, `mcp.efeonce.org` health/`401` unchanged, `/healthz` + `/.well-known/jwks.json` through the front door, wrong `Host` → `421`; runbook `docs/operations/runbooks/auth-server.md` |
 | New write or approval | all above plus ADR/task, preview/confirmation, idempotency, audit/redaction, entitlement revocation and reversible rollback |
 
 ## Public completion sequence

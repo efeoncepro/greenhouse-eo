@@ -42,6 +42,7 @@ preserve it and request operator direction.
 | UI platform or visible experience | `greenhouse-ai-design-studio`, then the UI implementation/accessibility skills and UI invariants |
 | Backend/API/events/webhooks | `software-architect-2026`, API/webhook architecture, backend invariants, and domain owner |
 | Identity/access | identity/workforce invariants and entitlements/roles architecture |
+| Workforce reentry / member identity transaction | `greenhouse-payroll-auditor`, `greenhouse-talent-people-operator`, `docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md` and `docs/operations/runbooks/workforce-reentry-recovery.md` |
 | Finance/payroll | finance or payroll specialist plus their canonical invariants |
 | Knowledge/Nexa | `greenhouse-nexa-conversational` and Knowledge/Nexa invariants |
 | HubSpot/CRM | `hubspot-greenhouse-bridge` or `hubspot-as-a-service` plus intake architecture |

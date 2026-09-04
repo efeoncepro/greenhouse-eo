@@ -43,7 +43,8 @@ const WORKERS = [
   { name: 'ops-worker', entry: 'services/ops-worker/server.ts' },
   { name: 'commercial-cost-worker', entry: 'services/commercial-cost-worker/server.ts' },
   { name: 'ico-batch', entry: 'services/ico-batch/server.ts' },
-  { name: 'artifact-worker', entry: 'services/artifact-worker/main.ts' }
+  { name: 'artifact-worker', entry: 'services/artifact-worker/main.ts' },
+  { name: 'auth-server', entry: 'services/auth-server/server.ts' }
 ]
 
 /** Resuelve el nombre de paquete de un specifier: `a/b/c`→`a`, `@s/p/sub`→`@s/p`. */

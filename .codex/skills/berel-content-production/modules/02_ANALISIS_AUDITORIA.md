@@ -4,6 +4,10 @@
 > auditar: la arquitectura se **decide** en el `🧭 Plan editorial y SEO`
 > (→ [`01_CICLO_MENSUAL.md`](01_CICLO_MENSUAL.md), Fase B3).
 
+Para el **informe periódico dirigido a Berel**, cargar
+[`17_INFORMES_AUDITORIA_CLIENTE.md`](17_INFORMES_AUDITORIA_CLIENTE.md): continuidad entre meses,
+responsabilidad de Efeonce, conciliación de producción y cierre Notion + Markdown.
+
 ## 🔴 Prerrequisito obligatorio: abrir la URL publicada en vivo
 
 El análisis **no se escribe sobre el `Contenido anterior del artículo`** rescatado en la Fase 2. Esa

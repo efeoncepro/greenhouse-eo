@@ -89,7 +89,7 @@ y cruce SEO↔AEO real — pero para el cliente el portal sigue mostrando NADA d
 > (TASK-1661, complete y en producción). 🔴 Seguir una keyword **compromete gasto recurrente del
 > proveedor** —el rank capture paga por cada keyword vigente en cada ciclo—, así que el command lleva techo por
 > target, entitlement per-ORG, outcome por keyword y su reverso; las tools quedan federadas y **fail-closed**
-> hasta que exista un cliente OAuth con grant revocable (TASK-1631). **Nada de esto es cara de cliente**: la
+> hasta que EPIC-044 (TASK-1829/1831/1832: emisor propio + gateway multi-issuer; el grant revocable ya existe desde TASK-1631, 2026-09-04) emita tokens con ese grant. **Nada de esto es cara de cliente**: la
 > fila de abajo sigue diciendo la verdad para lo que el cliente ve solo.
 
 > **Delta 2026-08-14 — la clave del módulo per-org es `seo_v2`, no `seo_v1`.** `TASK-1677` cerró la fase

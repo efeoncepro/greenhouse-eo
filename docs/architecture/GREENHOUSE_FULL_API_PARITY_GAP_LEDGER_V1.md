@@ -226,6 +226,26 @@ Capability: `workforce.offboarding.review_case` (`src/config/entitlements-catalo
 `pnpm workforce:offboarding:recovery` (llama el mismo primitive) — runbook
 [`docs/operations/runbooks/offboarding-recovery.md`](../operations/runbooks/offboarding-recovery.md).
 
+## Delta 2026-09-04 — TASK-1631: el binding de identidad externa nace ✅ governed (6 commands/readers, 2 lanes)
+
+El dominio `src/lib/identity/external-access/**` (EPIC-044 U04) nació con contrato programático gobernado en
+las dos lanes que hoy tienen consumidor, sin UI todavía — el orden inverso al de la deuda que este ledger mide:
+
+| Capa | Contrato |
+| --- | --- |
+| Primitives | `upsertExternalIdentityEnvironment`, `bindExternalOrganization`, `grantExternalCapability`, `issueExternalInvitation`, `acceptExternalInvitation`, `revokeExternalAccess` (`commands.ts`) + readers (`store.ts`) + `resolveExternalAccess` — idempotentes, una tx = estado + audit + outbox; sin `server-only` para que `services/auth-server` los importe |
+| Capabilities | Una dedicada por command: `identity.external_environment.manage`, `identity.external_binding.read` / `.bind`, `identity.external_grant.issue`, `identity.external_invitation.issue`, `identity.external_access.revoke` (módulo `organization`, scope `tenant`; grant sólo `efeonce_admin`; `capability-grant-coverage.test.ts` verde) |
+| Admin lane | `/api/admin/identity/external-access/{environments, eligibility, bindings, bindings/[id], bindings/[id]/grants, bindings/[id]/invitations, revoke}` — adapters delgados (`requireAdminTenantContext` + `can()`), errores canónicos `external_access_*` |
+| Ecosystem lane | `GET /api/platform/ecosystem/identity/binding` (routeKey `platform.ecosystem.identity.binding`, `runEcosystemReadRoute`, sólo bindings `internal`) — el reader del gateway MCP (`TASK-1831`) |
+| `acceptExternalInvitation` | **In-process** para el auth-server (`TASK-1830`); **sin ruta pública todavía** — es deliberado: la aceptación exige el `subject` verificado por el emisor, que sólo el auth-server tiene. No es deuda mientras el auth-server sea el único consumidor; si aparece otro (p. ej. convergencia del login Greenhouse), nace como lane gobernada, no como click handler |
+| Nexa | Pendiente — sin action en `src/lib/nexa/actions/registry.ts`. Los primitives y sus contratos ya existen; falta sólo el wiring del action runtime, si se decide que Nexa opere enrolamientos (write de acceso, blast radius alto) |
+| MCP | No federado — writes de acceso/identidad de terceros, consistente con la política de no federar writes sensibles del `tool-manifest.ts`; el gateway CONSUME el reader ecosystem, no lo re-expone como tool |
+| UI (portal) | Pendiente — task ui-ux sin ID (EPIC-044). Los commands y sus dos consumers programáticos ya están completos; falta la superficie visible |
+
+Verificación: Vitest del dominio (33) + señales (8) + coverage; smoke live `pnpm identity:external-access:smoke`.
+Contrato: [`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md)
+§`Slice 1 binding foundation — applied`.
+
 ## Related
 
 - [`GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`](GREENHOUSE_FULL_API_PARITY_DECISION_V1.md) — criterio

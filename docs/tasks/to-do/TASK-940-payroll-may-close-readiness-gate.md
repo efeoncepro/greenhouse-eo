@@ -107,7 +107,7 @@ Reglas obligatorias:
 - `TASK-893` / `docs/tasks/complete/TASK-893-payroll-participation-window.md`
 - `TASK-890` / `docs/tasks/complete/TASK-890-workforce-exit-payroll-eligibility-window.md`
 - `TASK-856` / `docs/tasks/to-do/TASK-856-previred-preflight-fixtures-mapping-hardening.md`
-- `TASK-731` / `docs/tasks/to-do/TASK-731-payroll-pre-close-validator-and-preflight-endpoint.md`
+- `TASK-1820` / `docs/tasks/to-do/TASK-1820-payroll-stage-preflight-and-payment-readiness.md`
 - `TASK-732` / `docs/tasks/to-do/TASK-732-payroll-ico-safety-gate-kpi-provenance.md`
 - `src/lib/payroll/payroll-readiness.ts`
 - `src/lib/payroll/calculate-payroll.ts`
@@ -135,7 +135,7 @@ Reglas obligatorias:
 - Exports Previred/LRE y paquetes compliance Chile.
 - Materializacion de obligaciones de pago desde payroll.
 - Reportes de costo de personal y recibos oficiales.
-- Posibles follow-ups de TASK-731/TASK-732/TASK-856, que pueden quedar absorbidos o reducidos si esta task entrega el gate canonico.
+- Posibles follow-ups de TASK-1820/TASK-732/TASK-856, que pueden quedar absorbidos o reducidos si esta task entrega el gate canonico.
 
 ### Files owned
 
@@ -150,6 +150,58 @@ Reglas obligatorias:
 - `docs/documentation/hr/*nomina*`
 - `docs/manual-de-uso/hr/*nomina*`
 - `docs/audits/payroll/*`
+
+## Backend/Data Contract
+
+### Backend/data brief
+
+- Backend rigor: `backend-critical`.
+- Impacto principal: `command`.
+- Source of truth afectado: `src/lib/payroll/payroll-readiness.ts`, resolvers canónicos de participación/exit,
+  KPI y perfil legal referenciados arriba. Los estados, personas y fechas de mayo son evidencia histórica.
+- Consumidores: commands oficiales, Product API y preflight TASK-1820; contrato vigente de publicación TASK-1816.
+- Runtime target: local primero; portal y consumers desplegados sólo después de verificar sus dependencias.
+
+### Contract surface
+
+- Contrato existente: `getPayrollPeriodReadiness` y commands canónicos; ningún gate independiente por consumer.
+- Full API parity: TASK-1821 integra el contrato oficial; TASK-1820 compone hechos por etapa. Coordinar slices
+  de shared files antes de implementar; no absorber estas sucesoras con el alcance amplio del brief de mayo.
+- Backward compatibility: preservar acceso operativo y errores sanitizados; fuente indisponible no equivale
+  a ready y ningún override elude una condición legal sin política explícita vigente.
+
+### Data model and invariants
+
+- `greenhouse_payroll.payroll_periods` y `greenhouse_payroll.payroll_entries` conservan revisión/historia;
+  person legal profile y KPI tienen sus fuentes propias. No inventar tasas ni fechas de salida.
+- Tenant/space boundary: actor y pertenencia se derivan de autorización canónica, nunca de IDs confiados del body.
+- Idempotency/concurrency: readiness es lectura pura; los commands revalidan hechos/revisión bajo el contrato
+  de TASK-1816/1821. Aprobar un preflight anterior no aprueba nuevos inputs.
+- Audit/outbox/history: cambios oficiales publican audit/eventos canónicos; diagnóstico no muta nómina.
+
+### Migration, backfill and rollout
+
+- Migration posture: revalidar necesidad antes de proponer schema/grants; no migración nueva autorizada aquí.
+- Default state: diagnóstico read-only durante Discovery, sin aplicar cierres o recoveries históricas.
+- Backfill plan: sólo inventario/dry-run; scope exacto y comando gobernado para cualquier reparación posterior.
+- Rollback path: seguir el rollout existente de esta task y el contrato vigente de EPIC-043; nunca retornar
+  a escritura permisiva ni borrar pagos/eventos. Verificar schema/flags/imagen actual antes del cutover.
+
+### Security and access
+
+- Auth/access gate: capacidades finas y scope salarial; grants mínimos del reader de perfil legal.
+- Sensitive data posture: fixtures sanitizadas, sin datos salariales/personales en errores o logs públicos.
+- Error contract: códigos canónicos, razones accionables y observabilidad de fuente fallida.
+- Abuse/rate-limit posture: reutilizar límites de API Platform; no N+1 ni tareas pesadas en GET.
+
+### Runtime evidence
+
+- Tests conductuales de fuentes fallidas, versión cambiada y actor denegado; tests de forma textual no bastan.
+- Leer schema, permisos y estado por entorno; `pnpm test:live` sólo con fixtures autorizadas y aislamiento
+  comprobado, porque staging comparte Cloud SQL. No repetir casos reales de mayo como smoke.
+- Antes de cierre: readback del command y consumidor, datos protegidos y runtime activo; si falta evidencia,
+  mantener abierta. Los snapshots de esta especificación no acreditan estado presente.
+
 
 ## Current Repo State
 
@@ -172,7 +224,7 @@ Reglas obligatorias:
 - KPI materialized-first puede aceptar snapshots viejos de mitad de mes.
 - Legal profile access falla para tablas sensibles desde el rol usado en auditoria; falta preflight least-privilege real.
 - Demo/test data y drift semantico pueden entrar como ruido de readiness o calculo oficial.
-- Existing tasks TASK-731/TASK-732/TASK-856 tratan piezas vecinas, pero no cierran end-to-end el camino `readiness -> calculate -> approve -> compliance export`.
+- Existing tasks TASK-1820/TASK-732/TASK-856 tratan piezas vecinas, pero no cierran end-to-end el camino `readiness -> calculate -> approve -> compliance export`.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -442,12 +494,12 @@ No exponer PII sensible en `evidence`; usar IDs internos, estados, timestamps y 
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] `docs/documentation/hr/periodos-de-nomina.md` quedo actualizado
 - [ ] `docs/manual-de-uso/hr/periodos-de-nomina.md` quedo actualizado
-- [ ] chequeo de impacto cruzado con TASK-731, TASK-732 y TASK-856 documentado
+- [ ] chequeo de impacto cruzado con TASK-1820, TASK-732 y TASK-856 documentado
 - [ ] HR/Finance signoff de mayo 2026 registrado antes de cualquier flip productivo
 
 ## Follow-ups
 
-- Revisar si TASK-731/TASK-732/TASK-856 deben cerrarse, reducirse o quedar como sub-slices despues de esta task.
+- Revisar si TASK-1820/TASK-732/TASK-856 deben cerrarse, reducirse o quedar como sub-slices despues de esta task.
 - Crear task separada si se decide limpiar historico de demo/fixtures o drift legacy fuera de mayo.
 - Crear task separada si el KPI materializer necesita freshness SLA general para todo ICO, no solo payroll.
 
@@ -460,3 +512,7 @@ Task creada desde la auditoria profunda de Payroll para cierre de mayo 2026 y la
 - Definir el cutoff exacto de KPI para mayo: fin de mes calendario, cierre operacional HR/Finance o timestamp de aprobacion.
 - Definir si overrides de readiness viven en tabla nueva, metadata del periodo o audit log existente.
 - Definir si el gate de indicadores economicos exige UF exacta del ultimo dia del periodo o permite politica at-or-before hasta que SII/CMF publique el valor final.
+
+## Delta 2026-09-03 — Coordinación con EPIC-043
+
+TASK-1820 reemplaza el preflight de TASK-731 (supersesión documental, sin funcionalidad acreditada). Esta task conserva el enforcement especializado pendiente y sus hechos deben revalidarse fuera de las premisas de mayo. TASK-1820 compone diagnósticos por etapa; TASK-1818 posee vigencias/participación y TASK-1821 expone commands. No implementar políticas paralelas ni absorber estas sucesoras automáticamente por el alcance histórico de este brief.

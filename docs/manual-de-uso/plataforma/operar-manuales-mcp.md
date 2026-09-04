@@ -81,7 +81,9 @@ incluye estos tres chequeos (cuenta exacta, cuerpo completo, 404 de inexistente)
 - No escribir la `description` en el manifiesto: se lee del frontmatter.
 - No embeber manuales en el gateway; el gateway delega en la lane.
 - No responder 403 a un consumidor sin acceso: el contrato es 404.
-- No declarar un manual con `audience: client` mientras no existan grants por tenant.
+- No declarar un manual con `audience: client` mientras el acceso externo no esté operativo: el grant revocable
+  por organización y por persona ya existe (`greenhouse_core.external_capability_grants`, TASK-1631, 2026-09-04),
+  pero el acceso externo real espera al emisor propio y al gateway multi-issuer (EPIC-044: TASK-1829/1830/1831/1832).
 
 ## Problemas comunes
 

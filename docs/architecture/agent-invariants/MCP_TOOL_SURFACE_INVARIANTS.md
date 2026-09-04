@@ -262,8 +262,10 @@ se sirve `.claude/skills/**` por MCP, ni filtrado.
 🔴 **`audience: internal` NO EXISTE para un binding que no sea `internal`.** No aparece en el
 catálogo y su detalle responde `404` anti-oráculo, **nunca `403`** (un 403 confirma que hay algo
 que no se puede leer). Inexistente, no visible y nombre malformado devuelven el MISMO 404.
-`audience: client` está reservado hasta que existan grants por tenant (`TASK-1631`): ningún manual
-nace con ese valor.
+`audience: client` está reservado hasta que existan tokens que porten grants por tenant: el grant
+revocable por organización y por persona ya existe (`greenhouse_core.external_capability_grants`,
+`TASK-1631`, 2026-09-04); el token lo emiten el emisor propio y el gateway multi-issuer
+(`TASK-1831`/`TASK-1832`) (actualizado 2026-09-04, TASK-1631). Ningún manual nace con ese valor.
 
 🔴 **Los manuales viajan en el bundle como ARTEFACTO GENERADO, nunca se leen del filesystem en
 runtime.** La primera versión los leía con `readFileSync` y los declaraba en

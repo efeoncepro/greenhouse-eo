@@ -17,7 +17,7 @@ sirviendo el frontend Next.js y las API routes. Distribución regional vigente:
 | Concern | Región | Nota |
 | --- | --- | --- |
 | Cloud SQL (PostgreSQL) | `us-east4` (Northern Virginia) | OLTP de baja latencia |
-| Cloud Run workers modernos (`ops-worker`, `commercial-cost-worker`, `ico-batch-worker`, Job `artifact-worker`) | `us-east4` | co-locados con Cloud SQL |
+| Cloud Run workers modernos (`ops-worker`, `commercial-cost-worker`, `ico-batch-worker`, Job `artifact-worker`) + `auth-server` (emisor `auth.efeonce.org`, EPIC-044) | `us-east4` | co-locados con Cloud SQL; `auth-server` firma con Cloud KMS HSM en la misma región |
 | Cloud Run / Functions legacy (syncs Notion/HubSpot/Frame.io) | `us-central1` | capa heredada, pendiente de modernización |
 | BigQuery | `US` (multi-region) | analytics + snapshots |
 | Buckets GCS de assets | `US-CENTRAL1` | ver [STORAGE_BUCKETS.md](STORAGE_BUCKETS.md) |

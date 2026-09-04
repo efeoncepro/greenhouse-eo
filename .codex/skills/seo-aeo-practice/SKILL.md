@@ -285,7 +285,9 @@ obstáculo.
 `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` **ON en Vercel Production desde 2026-08-27** (verificado con `vercel env ls`; corrida real sobre `skyairline.com`: previsto USD 0,2050 vs medido USD 0,1991). 🔴 Un `disabled` hoy es una REGRESION, no un estado legitimo. Ambas
 tools quedaron federadas al gateway público `mcp.efeonce.org` por TASK-1658 (deploy del gateway al día; la revisión
 productiva vigente la declara la skill `efeonce-mcp-platform`, que es su dueña); `run_` exige el scope `efeonce.mcp.seo.write`, NO cableado al cliente
-PKCE público — fail-closed hasta TASK-1631. 🔴 El flag ya NO está OFF: un `disabled` hoy es una
+PKCE público — fail-closed hasta que un token pueda portar el grant: el grant revocable por organización y por persona YA
+existe (`greenhouse_core.external_capability_grants`, TASK-1631, 2026-09-04); lo que falta es el emisor propio y el
+gateway multi-issuer (EPIC-044: TASK-1829/1830/1831/1832), donde se emiten tokens con `gv`. 🔴 El flag ya NO está OFF: un `disabled` hoy es una
 REGRESIÓN, no un estado legítimo para el canary.
 
 **Cargar al usarlo:** `docs/manual-de-uso/comercial/diagnostico-seo-prospecto-en-venta.md`

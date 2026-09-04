@@ -2,6 +2,8 @@ import type * as ChildProcess from 'node:child_process'
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { WORKFLOWS_WITH_CLOUD_RUN_DRIFT_DETECTION } from '@/lib/release/workflow-allowlist'
+
 const childProcessMock = vi.hoisted(() => ({
   execFile: vi.fn()
 }))
@@ -151,7 +153,7 @@ describe('release-worker-revision-drift signal', () => {
     expect(['warning', 'unknown']).toContain(signal.severity)
   })
 
-  it('checks all 4 workflows with Cloud Run mapping', async () => {
+  it('checks every workflow with Cloud Run mapping (derived from the allowlist, never a literal count)', async () => {
     process.env.GITHUB_RELEASE_OBSERVER_TOKEN = 'fake-token'
 
     global.fetch = vi.fn(async () => ({
@@ -163,12 +165,14 @@ describe('release-worker-revision-drift signal', () => {
 
     const signal = await getReleaseWorkerRevisionDriftSignal()
 
-    // 4 workflows have cloudRunService mapping (3 workers + 1 hubspot bridge).
-    // TASK-1378 — ClamAV Scanner Deploy queda FUERA del mapping a propósito: el
-    // orquestador no lo despliega, así que su GIT_SHA marcaría drift en cada release.
+    // El denominador se DERIVA del allowlist (WORKFLOWS_WITH_CLOUD_RUN_DRIFT_DETECTION):
+    // un literal ('4') consagra el snapshot con que se escribió el test y se pone rojo
+    // por hacer lo correcto (TASK-1828 agregó auth-server). ClamAV Scanner Deploy queda
+    // FUERA del mapping a propósito (TASK-1378): el orquestador no lo despliega.
     const workersChecked = signal.evidence?.find((e) => e.label === 'workers_checked')
 
-    expect(workersChecked?.value).toBe('4')
+    expect(WORKFLOWS_WITH_CLOUD_RUN_DRIFT_DETECTION.length).toBeGreaterThanOrEqual(4)
+    expect(workersChecked?.value).toBe(String(WORKFLOWS_WITH_CLOUD_RUN_DRIFT_DETECTION.length))
   })
 
   it('adds actionable HubSpot remediation when only HubSpot drifts against the canonical manifest', async () => {

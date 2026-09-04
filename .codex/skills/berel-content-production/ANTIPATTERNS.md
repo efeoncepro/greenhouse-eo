@@ -261,3 +261,18 @@
   viejo. El de Instagram ya se cerró. (→ `SKILL.md`, `06`)
 - **Lanzar búsqueda y extracción en paralelo.** Una de las dos se cae y se pierde el resultado.
   (→ `01`)
+
+## Informe periódico dirigido a Berel
+
+- **Hablar como auditor externo de contenidos que redactamos y publicamos.** «Verificar la calidad
+  de lo publicado» o «se localizaron versiones» ocultan nuestra responsabilidad. Identificar trabajo
+  realizado, resultado y corrección pendiente con evidencia. (→ `17`)
+- **Proponer comenzar el Content Hub, tutoriales o AEO sin leer la operación existente.** Revisar
+  auditorías previas, Playbook y tareas antes de convertir una iniciativa en recomendación. (→ `17`)
+- **Convertir un estado antiguo en culpa del cliente o una carga CMS en obligación del proveedor.**
+  Conciliar redacción, aprobación, CMS, público y registro por separado. (→ `17`)
+- **Corregir solo el párrafo señalado.** Revisar también tablas, anexos y propiedades resumen, y
+  releer Notion y Markdown después de guardar. (→ `17`)
+- **Presentar el score del Grader como diagnóstico válido sin revisar sus preguntas y controles.**
+  Un sector equivocado o un soft-404 técnico limita el resultado; asumir nuestra corrección de la
+  medición y conservar el score bruto con ese alcance. (→ `17`)

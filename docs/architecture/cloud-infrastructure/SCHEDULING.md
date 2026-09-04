@@ -111,6 +111,17 @@
 | `ops-reliability-ai-watch` | `0 */1 * * *` | `/reliability-ai-watch` |
 | `ops-cloud-cost-ai-watch` | `15 */6 * * *` | `/cloud-cost-ai-watch` |
 
+**Complemento operativo 2026-09-03 — pausa reversible de Globe (TASK-1807).** La cadencia de
+`ops-globe-tenancy-reconcile` se conserva, pero no implica que el job esté habilitado: en
+`efeonce-group/us-east4` quedó `PAUSED` según readback de `2026-09-03T22:26:05Z`. El quinto argumento
+`paused` de su llamada en `services/ops-worker/deploy.sh` debe permanecer `true` durante la hibernación;
+una corrección local no prueba su promoción a la fuente remota que usará el siguiente deploy. Globe Terraform
+no controla este caller externo. No pauses el worker compartido ni borres el job, su identidad o su target.
+Para reactivarlo, sigue la fase C del
+[runbook de hibernación](../../operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md): SQL/API
+listas, refresco controlado de tenancy en `draining` y proyecciones frescas antes de abrir operación normal.
+Verifica source y estado live por separado; no reanudes contra SQL detenido.
+
 ## Cloud Scheduler — otros workers
 
 | Job | Schedule | Target | SoT |

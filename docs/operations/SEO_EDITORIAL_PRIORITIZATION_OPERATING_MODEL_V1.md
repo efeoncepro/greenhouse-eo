@@ -19,6 +19,10 @@
 
 ---
 
+Para rendir cuentas del ciclo y cerrar su auditoría, usa el
+[modelo de informes para clientes](SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md).
+La priorización decide el trabajo siguiente; el informe reconoce el trabajo hecho y sus pendientes.
+
 ## 1. Para qué sirve y cuándo se usa
 
 Este modelo se aplica cuando hay que **decidir sobre qué escribir** para un cliente que ya tiene blog

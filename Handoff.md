@@ -2,48 +2,85 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
-Valentina reingreso (2026-09-03): acceso recuperado con autorización del operador sobre la misma persona/usuario/member;
-cuenta Microsoft nueva activa y buscador por correo nuevo verificados mediante readers canónicos. Roles e historia
-financiera preservados. [Auditoría y recuperación](docs/audits/payroll/VALENTINA_REHIRE_IDENTITY_RECOVERY_2026-09-03.md).
-Operador confirmó último día anterior 30/05/2026: EO-CENG-0001 ending, relación anterior ended; nuevo EO-CENG-0002
-active desde 20/08, bruto mensual 530.973. Confirmado 12/31: EO-CWS-0004 aprobado → EO-CPAY-0002 pending_readiness,
-líquido 174.193,55; único blocker boleta faltante. Sin obligación/orden nueva. Login interactivo no probado.
+**SEO/AEO y Berel, 2026-09-04:** método de informes documentado en
+[modelo operativo](docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md) y skills espejo.
+[Auditoría agosto](docs/audits/seo/BEREL_AUDITORIA_SEO_AEO_AGOSTO_2026.md) guardada y verificada en
+[Notion](https://app.notion.com/3d139c2fefe781ba8928eef8dadfb219) y Markdown. El run EO-GRUN-00049
+no es línea base comercial válida: categoría amplia y probes MCP/API falsos positivos. Corregir instrumento
+y repetir medición sigue pendiente; este cambio solo documenta el método y el caso.
+[Informe PDF A4](docs/audits/seo/berel-agosto-2026/BEREL_INFORME_AGOSTO_2026_A4.pdf): 55 páginas revisadas,
+desempeño de Berel y pie institucional completo. [Estándar de informes](docs/operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md)
+y skill `report-studio` creada para Claude/Codex: investigación primaria, siete módulos, plantillas y preflight probado. HTML queda como insumo; cobertura On-time explícita y exportación reproducible. Entrega local, sin envío al cliente.
+
+
+**Globe, 2026-09-03:** caller externo pausado; protección deploy sólo local, sin commit/push/deploy.
+Platform debe promoverla y medir ahorro. Reactivación/evidencia:
+[runbook TASK-1807](docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md).
+
+**TASK-1829 (EPIC-044 U02) — `code complete, rollout pendiente` (2026-09-04, sesión greenhouse-eo-45; commits `263ee3a74` · `19d1658de` · `d31e6e913` en develop).** Superficie OAuth del emisor detrás de `AUTH_SERVER_OAUTH_ENABLED=false` (`deploy.sh`; ledger al día): metadata RFC 8414/OIDC, CIMD primario + DCR compat, authorize/token/revoke/introspect/consent, JWT ES256 15 min con `gv`, refresh rotativo, 7 tablas `greenhouse_auth` y 2 capabilities APLICADAS en Cloud SQL, 3 señales `auth.oauth.*`, contrato `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`. Decisión del operador: `localhost` aceptado como loopback sólo para clientes públicos. **Pendientes inmediatos:** (1) release del runtime a `main` (control plane; el push a develop dispara `Auth Server Deploy` con el flag OFF); (2) registrar la fila del emisor en `external_identity_environments` (`efeonce-auth`, command de TASK-1631) ANTES de prender el flag; (3) flag ON en staging + validar metadata con curl/`oauth4webapi` + cliente CIMD y DCR de prueba; (4) flujo con persona real exige TASK-1830 (implementa `SubjectSessionPort` y agrega sus 5 tablas al boundary test). **Riesgo abierto:** el canary de Globe OAuth no se corrió (Globe hibernado); la extracción del broker sólo movió helpers puros con la suite 117/117 verde. `pnpm build` de producción NO se corrió en esta sesión (autorización del operador pendiente, memoria de consumo). Task sigue `in-progress` hasta el rollout.
+
+**EPIC-044 (2026-09-03) — authorization server PROPIO, decidido por el operador; WorkOS descartado.** ADR aceptado
+`docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`; epic `in-progress` con TASK-1626/1631/1813 y las
+nuevas TASK-1828…1834 (runtime · OAuth/CIMD/tokens · personas sin contraseña · gateway multi-issuer · canaries · pentest ·
+convergencia login). Emisor como segundo host del front door del gateway (≈ USD 15/mes medidos). DNS `auth.efeonce.org` →
+`34.111.78.237` creado y verificado. Excepción EPIC-027 para `services/auth-server` **APROBADA** por el operador (Build Unit
+ADR Delta 2026-09-03, fila Accepted en DECISIONS_INDEX); **TASK-1828 EN EJECUCIÓN (sesión Claude greenhouse-eo-a3, `/implement-task 1828`, 2026-09-03/04)**: Slice 0 (KMS HSM `auth-server-es256` v1 + SA) y Slice 1 (schema `greenhouse_auth`, `src/lib/auth-server/keys`, `services/auth-server`, workflow, gates; commit `765ff0ca7`) HECHOS; token real firmado por HSM y verificado con el JWKS de PG. Slice 2 HECHO: `https://auth.efeonce.org` vivo (cert ACTIVE; rev `auth-server-00002-gfh`, `AUTH_SERVER_ENABLED=true`): `/readyz` 200 (postgres/kms/activeKey ok), JWKS publicado; rotación ejercitada (KMS v2 activa, v1 `retiring` — retiro pendiente tras 1 h: `pnpm auth-server:rotate-key --retire VjbDUgwc5bd1zj5olC8VndMXKk_G60tLF8xRw945nI8` + `gcloud kms keys versions disable 1`); `tofu apply` en `efeonce-mcp` `6a144a5` (pusheado), allowlist + orquestador + señales `auth.*` + runbook. CI `Auth Server Deploy` verde en develop (rev `auth-server-00003-jtf`, GIT_SHA `02dc5d987`; el deployer necesitó `cloudkms.viewer` sobre la llave). Barrido documental hecho (ADR nativo §Delta 2026-09-04, `GREENHOUSE_IDENTITY_ACCESS_V2`, invariantes identity/ops, `cloud-infrastructure/CLOUD_RUN.md`, control plane de reliability, runbook MCP, doc funcional + manual del autorizador, rule `.claude/rules/auth-server.md`, skills, EPIC-044 y tasks 1829–1833). **Retiro de la llave v1 pendiente** (`pnpm auth-server:rotate-key --retire VjbDUgwc…nI8` + disable KMS v1); `AUTH_SERVER_JWKS_URL` en Vercel pendiente de autorización. Producción del emisor = `code complete, rollout pendiente` (release control plane). Otra sesión tiene WIP sin commit de TASK-1631 (`src/lib/identity/external-access/`, `reliability/registry.ts`, `event-catalog.ts`, entitlements): no acoplar; señales del emisor se agregan después de que ese WIP se commitee. Task ui-ux de login sin ID hasta
+tener wireframe/flow reales. Siguiente ID libre `TASK-1835` / `EPIC-045`.
+**TASK-1631 (U04) Slice 1, 2026-09-04 — code complete, rollout pendiente.** Binding aplicado en PG, dominio
+`src/lib/identity/external-access/**`, rutas admin, reader del gateway `GET /api/platform/ecosystem/identity/binding` y 4
+señales; smoke `pnpm identity:external-access:smoke`. **Staging verificado 2026-09-04** (develop `02dc5d987` pusheado coordinado con TASK-1828): 4 señales en `/api/admin/reliability`, rutas admin 200, lane ecosystem 401 sin consumer. **Próximo paso:** release a `main` junto con TASK-1828 (decisión del operador); luego TASK-1831.
+Paridad registry↔catálogo roja por 11 capabilities ajenas sin seed (task aparte).
+
+Maggie/María Fernanda: cierre 4/4, unresolved=0; agosto ready. Método documentado en runbook/manual y
+skills Payroll/Talent Codex/Claude; Finance histórico pendiente de conciliación. [Evidencia 03/09](docs/audits/payroll/MAGGIE_MARIA_FERNANDA_OFFBOARDING_CLOSURE_2026-09-03.md).
+
+Valentina (03/09): misma persona/usuario/member, correo nuevo y elegibilidad SSO verificados; login
+interactivo no probado. Último día anterior 30/05/2026, EO-CENG-0001 ending; EO-CENG-0002 activo desde
+20/08, bruto mensual 530.973 (450.000 líquidos). Agosto 12/31: EO-CPAY-0002 pending_readiness,
+neto 174.193,55, única falta boleta; sin obligación/orden nueva. Recuperación y evidencia abajo.
 
 TASK-1349 **EN PRODUCCIÓN + recovery aplicada** (2026-09-03; release `62356c9b7fd4`, run `33779259694`, flag
 `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` ON prod+staging). Recovery por los commands canónicos, autorizada
 en chat: **Felipe** revisado `relationship_ended` con causal `termination` declarada por el operador → approved →
 scheduled → executed; member inactivo, compensación cerrada al 02/06, mayo `full_period`, junio `exclude_from_cutoff`,
 julio+ `exclude_entire_period`. **Luis Reyes y María Camila Hoyos**: lifecycle cerrado (relación employee terminada
-al LWD real, member inactivo) y stubs SCIM cerrados como `access_only`. Señales: unresolved **1** (Maria Fernanda,
+al LWD real, member inactivo) y stubs SCIM cerrados como `access_only`. Snapshot inicial, sustituido por el cierre Maggie/María Fernanda de arriba: unresolved **1** (Maria Fernanda,
 draft 07-29, decisión manual de HR), executed_member_still_active **0**, deprovisioned_without_case 0.
 
-🔴 **Incidente «colaboradores fantasma» (2026-09-03, ~17:50Z, resuelto en datos):** la pre-nómina de septiembre mostró
-seis `Colaborador <uuid>` «sin contrato»: eran los sujetos sintéticos de mi live test (`TASK-1349 live access`),
-inactivos pero con compensación abierta; el roster relajado de Slice 2 los dejaba entrar y `derivePolicy` trataba su
-caso `identity_only` ejecutado como hecho de salida decidido → `full_period`. Cerré sus 9 versiones de compensación por
-command (`closeCompensationVigencyAtExit`), la política ya no cuenta un caso `identity_only` como hecho laboral
-(`hasDecidedExitFact`), y el live test cierra la compensación de sus sujetos al terminar. Roster de septiembre
-verificado: 5 personas reales con compensación, cero uuids. El fix de código viaja en el PR #220 (develop), sin mergear.
+🔴 **«Colaboradores fantasma» (2026-09-03 ~17:50Z, resuelto):** la pre-nómina de septiembre mostró seis
+`Colaborador <uuid>` sin contrato: sujetos sintéticos de mi live test con compensación abierta, que `derivePolicy`
+trataba como salida decidida (`identity_only` ejecutado → `full_period`). Compensaciones cerradas por command,
+`hasDecidedExitFact` ya excluye `identity_only`, el live test limpia al terminar; fix en PR #220 (`main`).
 
-🔴 **Incidente Valentina Hoyos (recuperación gobernada preparada por Codex):** la lane A la desactivó pese a tener una
-relación `contractor` activa desde 2026-08-20 (reingreso). Fix commiteado en develop `c5c030e99` (guard
-`findReentryAfterExit` + señal excluye reingresos) — **NO está en `main`: producción sigue sin la guarda hasta el
-próximo release.** El intento de reactivarla por `updateMember` falló a mitad (ISSUE-163) y su `member.updated`
-reactivó la relación employee terminada; ya la re-terminé al 30/04 por command canónico. **Residual que el
-clasificador impidió corregir en Claude:** `status='inactive'`, `contract_end_date=2026-04-30`, `assignable=false` y su
-asignación cerrada. Codex preparó command transaccional con preview real; SQL puntual retirado. Ver
-[runbook de recuperación](docs/operations/runbooks/workforce-reentry-recovery.md). Falta desplegar la guarda del consumidor
-antes de aplicar y verificar la recuperación; acceso, contratos y pagos siguen intactos.
+**Valentina Hoyos — restauración gobernada APLICADA por Codex a las 18:38:48Z:** member activo/status activo,
+asignable y sin corte antiguo; asignación existente activa sin fecha final. Se verificaron alias Production hacia
+`a824d073` y 100% del tráfico `ops-worker-00641-dl2` hacia el árbol corregido antes de aplicar. Las siete categorías
+protegidas (relaciones, engagements, envíos, payables, usuario, obligación y orden) siguen idénticas; SSO elegible con
+correo nuevo y rol collaborator. Clave `valentina-lifecycle-reentry-restore-2026-09-03`; no repetir ni usar el SQL retirado.
+Eventos publicados 18:40:03Z y People completado 18:42:05Z; employee cerrado y datos protegidos idénticos.
+**Release cerrado:** `33795564223` success, manifest `a824d073a5fb-c2cf99e9-1ba1-40b3-9d85-76ad0a8e8372`
+released 19:30:49Z, health success y watchdog ok/4 de 4 workers. Dos intentos anteriores fueron abortados por
+cancelaciones concurrentes; Claude se retiró y Codex cerró bajo un solo operador. La auditoría conserva el incidente
+independiente de matching SHA/run ID. Readback final: recuperación y siete categorías protegidas intactas.
+[Auditoría](docs/audits/payroll/VALENTINA_REHIRE_IDENTITY_RECOVERY_2026-09-03.md) ·
+[runbook](docs/operations/runbooks/workforce-reentry-recovery.md).
 Finance de Felipe (obligación junio + SII) sigue como dependencia sin command de anulación. UI: TASK-1814.
 
-Offboarding (2026-09-03): auditoría UI/código/PG registrada en
-[informe](docs/audits/payroll/OFFBOARDING_ROOT_CAUSE_AND_REMEDIATION_2026-09-03.md).
-[TASK-1349](docs/tasks/in-progress/TASK-1349-offboarding-member-lifecycle-writeback.md) amplía revisión contractual,
-elegibilidad temporal y recovery; nueva [TASK-1814](docs/tasks/to-do/TASK-1814-offboarding-case-review-recovery-ui.md)
-posee UI dependiente. Ambas to-do, sin implementar; 20–32 horas efectivas estimadas en conjunto.
-Felipe salió 02/06/2026 y el operador confirma todo pagado/saldo cero. Caso blocked con fechas corregidas,
-member/compensación abiertos: aún puede entrar a nómina. Registro no autoriza otro pago ni deploy.
-Siguiente paso: plan de ejecución/ADR temporal, luego backend → UI → recovery/readback conjunto; preservar historia.
+**Delta Claude 19:40Z — PR #220 CERRADO por Codex** (run `33795564223`, manifest released 19:30:49Z; ver arriba).
+Attempts 1 y 2 `aborted` por cancelaciones cruzadas: el webhook empareja por `target_sha` antes que por
+`workflow_run_id`, así que cancelar un run duplicado aborta el manifest ajeno (bug a tasquear). **Purga sintética
+APLICADA 18:37Z:** 12 members `TASK-1349 live …` (253 filas, `scripts/workforce/purge-task1349-live-subjects.sql`);
+265→253 members, 8 activos, reales. Barrido documental 20:10Z + [TASK-1815](docs/tasks/to-do/TASK-1815-release-webhook-reconciler-run-id-matching.md).
+
+Offboarding: la [auditoría inicial](docs/audits/payroll/OFFBOARDING_ROOT_CAUSE_AND_REMEDIATION_2026-09-03.md)
+es antecedente, no estado vigente. [TASK-1349](docs/tasks/in-progress/TASK-1349-offboarding-member-lifecycle-writeback.md)
+conserva pendientes Finance; [TASK-1814](docs/tasks/to-do/TASK-1814-offboarding-case-review-recovery-ui.md) posee
+la UI aún sin implementar. No repetir las recoveries cerradas para probar ese recorrido.
+
+Cierre documental 03/09: tres subagentes sincronizaron Workforce/Talent, Contractors/Finance y Release/QA;
+root integró identidad, arquitectura, tareas e índices. [Cobertura y límites](docs/audits/payroll/VALENTINA_DOCUMENTATION_SKILLS_CLOSURE_2026-09-03.md).
+Bug independiente de correlación de releases por SHA/run ID sigue pendiente; el runbook documenta mitigación
+con un coordinador y lectura de intentos/eventos, sin declararlo corregido.
 
 Seguimiento OAuth (2026-09-02): [TASK-1813](docs/tasks/to-do/TASK-1813-efeonce-mcp-oauth-client-interoperability.md)
 creada `to-do`, sin implementar. Codex 0.152.0 rechazó discovery; metadata pública revalidada a las 22:51Z.
@@ -51,6 +88,16 @@ La [auditoría](docs/audits/EFEONCE_MCP_CODEX_OAUTH_INTEROPERABILITY_2026-09-02.
 al apagar shim, fallback de deploy que lo reactiva y canary directo que no prueba discovery. El plan B histórico
 de abajo no basta sin esos gates. Próximo paso: plan humano aprobado y coordinación con dueños de archivos;
 no push/deploy ni mutación de Entra autorizados por esta creación. Incidente Git/Berel separado.
+
+## 2026-09-03 — EPIC-043: Payroll confiable y operable desde chat
+
+[EPIC-043](docs/epics/to-do/EPIC-043-payroll-reliability-and-agentic-api-parity.md), `to-do`, P0: doce tasks
+TASK-1816–TASK-1827, con contratos y dependencias por unidad. Por instrucción del operador, TASK-731/1214/1215/730
+quedaron `complete` por supersesión documental hacia TASK-1820/1821/1825/1827; sin certificar implementación.
+TASK-1625/ISSUE-129–134 conservan trazabilidad; OAuth TASK-1813 e identidad TASK-1631 son dependencias compartidas.
+Primer paso: plan y ADR acotado de TASK-1816, cálculo atómico/aprobación de versión.
+[Baseline](docs/audits/payroll/PAYROLL_RELIABILITY_API_PARITY_PROGRAM_BASELINE_2026-09-03.md).
+Sólo planificación/documentación; sin código, migraciones, envíos, pagos ni deploy.
 
 ## 2026-09-03 — TASK-1806 seguimiento: alerta Teams determinista + rutina de recordatorio del cutover ETV
 
@@ -471,110 +518,3 @@ una respuesta humana ni una segunda reasignación en el mismo chat. En live hand
 reasignar manualmente el ticket mientras el chat siga abierto; el workflow vigente no resuelve nombres escritos
 libremente. No se requirió ADR: se documentó el comportamiento existente sin modificar runtime, ownership ni
 arquitectura.
-
-## 2026-09-01 (15) — Customer Agent ANAM adopta la identidad Emma
-
-El Customer Agent del portal ANAM `19893546` quedó alineado con la landing: el nombre visible cambió de
-`Agente de clientes de ANAM` a `Emma` y el saludo guionizado de `Soy ANA, de ANAM` a `Soy Emma, de ANAM`.
-HubSpot confirmó `Perfil actualizado` y `Cambios publicados`; el readback mostró `Agente de clientes, Emma`,
-preview `Hola, soy Emma.`, saludo exacto y `Borrador (0)`.
-
-El cambio no tocó personalidad (`Amigable`), idioma, conocimiento, permisos, acciones, handoff, routing,
-canales, chatflow ni datos CRM. Tampoco abrió o envió una conversación real. El preflight dejó dos advertencias
-preexistentes sobre `Registraré tu consulta`; se documentaron como deuda separada porque corregirlas requiere
-aprobación y regresión conversacional propia.
-
-La evidencia y el contrato vigente están en
-`docs/audits/ANAM_CUSTOMER_AGENT_EMMA_IDENTITY_QA_2026-09-01.md` y en el source pack. Se actualizaron además la
-documentación funcional, el manual, el changelog client-facing y las referencias espejadas de la skill
-`hubspot-as-a-service`. No se requirió ADR: fue una edición reversible de identidad, sin cambio de autonomía,
-ownership, permisos ni arquitectura.
-
-## 2026-09-01 (14) — La landing ANAM pasa a una experiencia editorial centrada en Emma
-
-La landing pública `https://anam-2.hubspotpagebuilder.com/agente-anam` sirve el build `#28` del proyecto
-`kortex-cms-react` en el portal ANAM `19893546`. La pantalla dejó el layout institucional de tarjetas y ahora
-presenta a Emma como concierge: hero asimétrico, una superficie única para seleccionar intención, un solo CTA
-`Conversar con Emma` y un panel navy con disponibilidad, orientación, protección de datos y derivación humana.
-
-HubSpot renderiza el módulo React en servidor, por lo que la selección se implementó en el controlador Hubl
-existente: los tres botones usan `aria-pressed` y sólo preparan el contexto; el CTA final es el único nodo que
-abre el chat. El smoke confirmó selección por clic y teclado y transferencia de
-`requerimiento_calidad` al CTA, sin abrir ni enviar una conversación real.
-
-El feedback visual del operador quedó incorporado antes del cierre: se eliminó el espacio blanco inferior
-recortando la decoración dentro del hero y reseteando el margen del body; el header usa ahora
-`anam-logo-horizontal.svg`, copiado del catálogo canónico del repo y sin el círculo superior, a `199x54` en
-desktop y `166x45` en mobile. Playwright live en `1440x1100` y `390x1000` confirmó HTTP 200,
-`scrollWidth === clientWidth`, `bodyMargin=0px`, tres opciones íntegras, interacción por teclado y cero errores
-de consola, página o red. Evidencia: `.captures/anam-emma-premium-build27-2026-09-01/`.
-
-El uniforme de Emma quedó corregido en `anam-virtual-executive-v2.png` mediante edición generativa: el bordado
-ya no dice `AUTORIDAD NACIONAL DEL AMBIENTE`, sino `ANÁLISIS AMBIENTALES S.A.`. Se descartó explícitamente
-un montaje tipográfico determinista y se mantuvo el asset anterior como rollback. El readback #28 confirmó el
-nuevo archivo tanto en desktop como en mobile sin alterar layout, interacción ni overflow.
-
-La fuente sigue en `/Users/jreye/Documents/dev/kortex/hubspot-cms-react-project`; el cambio quedó en el commit
-`2ae3b42`. `hs project validate --profile anam` pasó y `hs project upload --profile anam` construyó y
-auto-desplegó #28.
-
-La continuidad quedó sincronizada en las capas técnica, funcional y operativa: canon y runbook CMS, documento
-end-to-end, manual ANAM, dirección visual, changelog client-facing y referencias espejadas de la skill
-`hubspot-as-a-service` para Codex y Claude. `project_context.md` ahora enruta explícitamente este seam; `AGENTS.md`
-y la arquitectura de la oferta no cambiaron porque el trabajo no alteró ownership, schema, permisos ni el modelo
-de servicio.
-
-## 2026-09-01 (13) — Emma reemplaza al personaje masculino en la landing ANAM
-
-La landing pública `https://anam-2.hubspotpagebuilder.com/agente-anam` sirve ahora el build `#23` del
-Developer Project `kortex-cms-react` en el portal ANAM `19893546`. El único cambio funcional fue reemplazar
-`anam-virtual-executive.png` por una asistente virtual femenina coherente con el nombre Emma y corregir el ALT
-a `Emma, asistente virtual de ANAM, sonriendo`; las dimensiones intrínsecas quedaron sincronizadas en `900x675`.
-
-La fuente vive en el checkout externo
-`/Users/jreye/Documents/dev/kortex/hubspot-cms-react-project` y conserva dos cambios locales sin commit: el PNG
-y `KortexLandingHero/index.jsx`. `hs project validate --profile anam` pasó; `hs project upload --profile anam`
-construyó y auto-desplegó `#23`; el readback público convergió desde el bundle cacheado `#22` a
-`kortex-cms-react/23`.
-
-Playwright anónimo sobre `1440x1100` y `390x1000` confirmó HTTP 200, Emma visible, ALT y asset del build 23,
-`scrollWidth === clientWidth`, cero errores de consola, cero page errors y cero requests fallidas. Evidencia:
-`.captures/anam-emma-build23-2026-09-01/`. No se modificaron el Customer Agent, los intents, el chatflow, CRM,
-copy visible ni el portal Greenhouse `48713323`.
-
-## 2026-09-01 (13) — TASK-1671 cerrada: la pantalla existe, pero nada está desplegado
-
-`TASK-1671` quedó `complete`. Con eso **ninguna task bloquea el flip**, pero el flip sigue sin poder
-hacerse, y por una razón distinta de la de ayer: ya no falta código, falta **despliegue**.
-
-Verificado en vivo el 2026-09-01, no leído de un doc:
-
-- `origin/develop` y `origin/main` **no tienen** `site-findings.ts` ni `SiteAuditSiteFindings.tsx`.
-- La revisión activa del ops-worker (`ops-worker-00625-5qj`) **no tiene la env var**
-  `GROWTH_SEO_SITE_FINDINGS_ENABLED`. Está OFF por AUSENCIA. Prenderla hoy con `--update-env-vars`
-  no haría nada: esa revisión no tiene el evaluador.
-- La migración `finding_scope` **sí** está aplicada: es la única pieza que ya cruzó a la base
-  compartida (aditiva, default `page`, 4.977 filas históricas clasificadas; nadie la lee todavía).
-
-Qué se construyó: región propia "Acceso y presentación del sitio" entre la salud y la lista,
-alimentada por `partitionAuditIssuesByScope` desde UNA sola pasada de agrupación — no hay una
-segunda lista con su propio orden. El bloqueo de entrenamiento lleva etiqueta textual propia
-("Decisión declarada"); el filtro `?severity=` no alcanza a la región; el empty de la lista pasó a
-decir "Sin problemas de PÁGINA" porque sin ese alcance se contradecía con un crítico de dominio.
-
-Dos cosas que la revisión visual corrigió, y que ningún gate habría atrapado:
-
-1. El alcance flotaba a la derecha en desktop y caía huérfano al final de la fila en 390px. **El
-   wireframe que yo mismo escribí estaba mal**: decía "misma posición que N páginas afectadas"
-   cuando esa posición real es un caption bajo el título. Corregido el código y el wireframe.
-2. Con un único chequeo sin verificar, la región decía "Verificado" y "No pudimos verificar" a la
-   vez — el falso sano de TASK-1670 reintroducido en la UI. Lo cazó su propio test.
-
-⚠️ **Deuda declarada:** la región poblada no tiene evidencia de runtime. El flag está OFF, la tabla
-es append-only sobre una instancia compartida con producción, y encolar un crawl le cargaría
-presupuesto al cliente. Los frames del scorecard salen de una ruta local temporal (no commiteada)
-con el componente real y props representativas: sirven para layout y responsive, no para runtime.
-Esa evidencia se produce en el paso 3 del runbook del flip.
-
-Próximo paso: desplegar (`TASK-1670` + `TASK-1671`) y recién entonces el flip.
-Sin push. Runbook: `docs/manual-de-uso/growth/operar-hallazgos-de-sitio-seo.md`.

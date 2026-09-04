@@ -20,11 +20,12 @@ The two versioned bundles are intentionally mirrored:
 `pnpm skills:mirrors` makes drift in the declared mirrors a failing local check.
 
 El gateway público ya opera el reader interno y read-only `globe.producer.fleet.list`. Eso no cambia la postura
-por defecto de una capacidad nueva ni autoriza acceso de clientes: Entra es sólo el canary interno. El acceso
-B2B/multitenant sigue bloqueado hasta que la identidad cliente propuesta, el binding Account 360 y el provider
-puedan aplicar y revocar entitlements por tenant y capability según
-[`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md)
-y `TASK-1631`.
+por defecto de una capacidad nueva ni autoriza acceso de clientes: Entra es sólo el canary interno. El binding
+Account 360 y el grant revocable por organización y por persona ya existen
+(`greenhouse_core.external_capability_grants`, `TASK-1631`, 2026-09-04) según
+[`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md);
+el acceso B2B/multitenant real sigue cerrado hasta que el emisor propio y el gateway multi-issuer porten esos
+grants en un token (EPIC-044: `TASK-1829`/`TASK-1830`/`TASK-1831`/`TASK-1832`) (actualizado 2026-09-04, TASK-1631).
 
 ## Invocation boundary
 
@@ -55,7 +56,9 @@ provider `greenhouse-hiring` y únicamente los readers `hiring.talent_pool.searc
 `hiring.talent_pool.profile.get`; allow search/profile `200` y deny base-only `403` fueron verificados el
 2026-08-16. No incluyen contacto, CV, documentos, URLs, notas ni acciones. El reader de
 Application 360 y el token one-shot de assessment siguen siendo contratos privados: `TASK-1718`–`TASK-1722`
-conservan sus propios gates y `TASK-1631` sigue bloqueando writes y acceso externo/B2B.
+conservan sus propios gates; los writes y el acceso externo/B2B siguen cerrados hasta que el emisor propio y el
+gateway multi-issuer (EPIC-044: `TASK-1829`/`TASK-1831`/`TASK-1832`) porten los grants que `TASK-1631` ya
+materializó (2026-09-04) (actualizado 2026-09-04, TASK-1631).
 
 El código de TASK-1718 agrega `hiring.applications.review.list` y
 `hiring.application.review_packet.get` con OAuth interno separado, purpose cerrado y packet exacto por postulación.

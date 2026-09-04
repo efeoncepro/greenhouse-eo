@@ -150,12 +150,12 @@ export async function isMemberInPayrollScope(
 | `external_payroll` | `status IN ('approved','scheduled','executed')` AND cutoff < periodStart | `exclude_entire_period` |
 | `non_payroll` | `status IN ('approved','scheduled','executed')` AND cutoff < periodStart | `exclude_entire_period` |
 | `non_payroll` | `status IN ('approved','scheduled','executed')` AND cutoff in periodo | `exclude_from_cutoff` |
-| `identity_only` | N/A — siempre `full_period` (identidad ortogonal a nómina; ver decisión 2026-09-03: `members.active` ya no es filtro) | `full_period` |
+| `identity_only` | N/A — siempre `full_period` para un member activo (identidad ortogonal a nómina; ver decisión 2026-09-03: `members.active` ya no es filtro). Un `identity_only` decidido/ejecutado **no es hecho de salida**: no rescata a un inactivo (fix `0233f81e7`, PR #220) | `full_period` |
 | `relationship_transition` | `status='executed'` AND cutoff in periodo | `partial_until_cutoff` |
 | `unknown` | conservador: NO excluye | `full_period` + warning `unclassified_lane` |
 | Cualquier lane | `status IN ('draft','needs_review','blocked')` con señal (`COALESCE(cutoff, created_at::date)`) ≤ `periodEnd` | `full_period` + warning **blocking** `unresolved_exit_signal` + `reviewRequired=true` (decisión 2026-09-03) |
 | Cualquier lane | `status IN ('draft','needs_review','blocked','cancelled')` sin señal relevante | `full_period` + warning info si aplica |
-| Cualquier lane | `members.active=FALSE` **sin** hecho de salida decidido (approved/scheduled/executed + cutoff) | `exclude_entire_period` + warning `inactive_without_exit_fact` |
+| Cualquier lane | `members.active=FALSE` **sin** hecho de salida decidido (approved/scheduled/executed + cutoff **y** lane ≠ `identity_only`) | `exclude_entire_period` + warning `inactive_without_exit_fact` |
 | Cualquier lane | compensación con `effective_from` > cutoff de la salida decidida y ≤ `periodEnd` (reingreso) | `full_period` + info `reentry_after_prior_exit` |
 
 **Rationale (defensa de la asimetria)**:
@@ -415,6 +415,16 @@ LATERAL elegía el caso por prioridad de estado sin scope temporal: un reingreso
 `collectUnresolvedExitMemberIds` / `evaluateExitReviewGate` (`calculation-gate.ts`) compartidos por readiness y
 cálculo. Warning codes nuevos: `unresolved_exit_signal` (blocking), `inactive_without_exit_fact`,
 `reentry_after_prior_exit`. Readiness codes nuevos: `unresolved_exit_signal`, `exit_eligibility_unavailable`.
+
+### Delta 2026-09-03 (2) — un `identity_only` ejecutado no es hecho de salida (commit `0233f81e7`, PR #220 / `a824d073a`)
+
+`hasDecidedExitFact` (`src/lib/payroll/exit-eligibility/policy.ts`) exige `exitLane !== 'identity_only'` además de
+estado decidido + cutoff. Antes, un member inactivo cuyo único caso era de acceso ejecutado se leía como «salida
+decidida» y caía en `full_period`; ahora cae en `exclude_entire_period` + `inactive_without_exit_fact` (casos en
+`policy.test.ts`). Caso fuente: seis sujetos sintéticos del live smoke (`review-execute.live.test.ts`), inactivos
+con `compensation_versions` abiertas, entraron al roster relajado de Slice 2 y aparecieron como
+`Colaborador <uuid>` «sin contrato» en la pre-nómina de septiembre. La regla de higiene de esos sujetos vive en
+`agent-invariants/LIVE_TESTS_AGENT_INVARIANTS.md`; la de nómina, en `PAYROLL_WORKFORCE_AGENT_INVARIANTS.md`.
 
 ### Revisit When
 

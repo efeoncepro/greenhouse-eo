@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-1814-offboarding-case-review-recovery-ui-motion.md`
 - Backend impact: `none`
 - Epic: `none`
-- Status real: `Diseno; pendiente contrato TASK-1349 y validación visual`
+- Status real: `Diseño; backend TASK-1349 desplegado, pendiente implementación y validación visual de UI`
 - Rank: `TBD`
 - Domain: `hr|ui|payroll`
 - Blocked by: `TASK-1349`
@@ -29,7 +29,7 @@
 - Legacy ID: `none`
 - GitHub Issue: `ISSUE-117`
 
-## Delta 2026-09-03 — contrato backend de TASK-1349 disponible (code complete, rollout pendiente)
+## Delta 2026-09-03 — contrato backend de TASK-1349 disponible en producción
 
 - Command y rutas: `POST /api/hr/offboarding/cases/[caseId]/review` (body `ReviewOffboardingCaseInput`: `decision`
   `access_only|relationship_ended`, `reason` ≥10, `expectedUpdatedAt` = `case.updatedAt` visto, `separationType`
@@ -49,6 +49,11 @@
   nunca sobrescriba una versión ajena. Un caso `identity_only` sin `review` ya no ofrece «Aprobar».
 - Regla UI derivada: ninguna fecha se toma del formulario «Nuevo caso»; el preview muestra el efecto de nómina antes
   de guardar; `approvalStillRequiredForPayroll=true` significa que aprobar es lo que libera el período.
+
+La recuperación de disponibilidad de Valentina ya fue ejecutada y verificada mediante el command/CLI
+[canónico](../../operations/runbooks/workforce-reentry-recovery.md). Eso no implementa esta UI ni crea una
+API pública de restauración. El cierre visual debe verificar readers y estados, sin repetir la recuperación
+sobre personas reales. Los contratos adicionales necesarios para UI siguen bajo ownership backend.
 
 ## Summary
 
@@ -103,7 +108,7 @@ La task no redefine reglas financieras: consume la ADR temporal de TASK-1349. No
 
 ### Depends on
 
-- `docs/tasks/to-do/TASK-1349-offboarding-member-lifecycle-writeback.md`: contrato review/correct, DTO de requisitos,
+- `docs/tasks/in-progress/TASK-1349-offboarding-member-lifecycle-writeback.md`: contrato review/correct, DTO de requisitos,
   autorización, errores y readback estable antes de integrar writes.
 
 ### Blocks / Impacts
@@ -339,12 +344,12 @@ revisión no disponible; nunca volver a aprobación con fecha inventada. Release
 
 1. GVC premium desktop/móvil y pruebas funcionales en staging con fixtures sintéticos.
 2. Release autorizado tras canary de contrato; verificar permisos, review/correct y readback.
-3. Completar recovery de Felipe por TASK-1349; comprobar pre-nómina posterior y saldo cero.
+3. Verificar en UI el resultado de la recovery ya aplicada a Felipe; comprobar pre-nómina posterior y saldo cero sin repetir la mutación.
 4. Confirmar después de recarga completa y registrar evidencia, sin reejecutar pagos.
 
 ### Out-of-band coordination required
 
-Mismo release/recovery de TASK-1349. Causal respaldada si falta; no pedir otra vez la fecha ni saldo de Felipe.
+Release propio de la UI sobre backend ya desplegado. No repetir recoveries; usar resultados persistidos y fixtures para pruebas de mutación.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING

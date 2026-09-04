@@ -9,6 +9,24 @@
 > Anotaciones `⚠️ Superseded` agregadas por TASK-1646 donde un delta quedó contradicho por
 > estado posterior verificado contra runtime.
 
+## Delta 2026-09-04 — `auth-server`: sexto Cloud Run custom, llave Cloud KMS HSM y front door compartido con el gateway MCP (TASK-1828, EPIC-044)
+
+Se desplegó el authorization server propio de Efeonce como Cloud Run service `auth-server` en `us-east4`
+(imagen `gcr.io/efeonce-group/auth-server` vía Cloud Build; SA propia `auth-server@` con
+`roles/cloudkms.signerVerifier` sólo sobre la llave `auth-server-es256` + `roles/cloudsql.client`;
+`cpu=1`/`512Mi`, `concurrency=80`, `timeout=30s`, `min=1` production / `0` staging; ingress
+`internal-and-cloud-load-balancing` + `--allow-unauthenticated`). Servicio único compartido por staging y
+producción, como el `ops-worker`. Revisión activa `auth-server-00003-jtf` (`GIT_SHA 02dc5d987`, run CI/WIF
+`33870746218`). La llave de firma vive en Cloud KMS (key ring `us-east4/auth-server`, `EC_SIGN_P256_SHA256`,
+HSM; `v2` active, `v1` retiring). El host `auth.efeonce.org` se publicó como **segundo host del front door
+del gateway MCP** (`efeonce-mcp/infra/terraform`, `enable_auth_host`, commit `6a144a5`): NEG + backend +
+certificado adicionales sobre el mismo LB, misma IP `34.111.78.237` y misma policy Cloud Armor; el gateway no
+cambió. JWKS vivo en `https://auth.efeonce.org/.well-known/jwks.json`; producción pendiente del próximo
+release (`Auth Server Deploy` en el control plane). Dos hallazgos operativos: el deployer de CI necesita
+`roles/cloudkms.viewer` sobre la llave (sin él el preflight reporta `KMS key not found`), y `/readyz` 503 con
+el flag OFF **no** es un deploy fallido. Estado vigente en [CLOUD_RUN.md](CLOUD_RUN.md) §`auth-server`;
+runbook `docs/operations/runbooks/auth-server.md`.
+
 ## Delta 2026-08-05 — La topología compartida del `ops-worker` es CANÓNICA, no transitoria (TASK-1302)
 
 El rollout de TASK-1302 obligó a cerrar una ambigüedad que arrastraba el Delta 2026-04-15 ("staging y

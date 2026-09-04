@@ -1,0 +1,4 @@
+*.raw.pdf
+*.finished.pdf
+*.tmp.pdf
+__pycache__/

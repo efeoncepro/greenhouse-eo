@@ -99,12 +99,56 @@ de drift:
 - **GitHub webhook es evidencia firmada, no estado primario**: `POST /api/webhooks/github/release-events` valida `X-Hub-Signature-256` antes de parsear/persistir.
 - **Dedupe canónico**: `X-GitHub-Delivery` se guarda como `github:<delivery_id>` en `webhook_inbox_events`.
 - **Ledger normalizado**: `greenhouse_sync.github_release_webhook_events` guarda delivery/event/workflow/sha/status/conclusion redacted, match result, transition result y evidence JSON.
-- **Reconciliación segura**: match primario por `target_sha`; fallback por `workflow_run_id` en `workflow_runs`. Si no hay match verificable, queda `unmatched` y no crea ni muta manifests.
+- **Correlación vigente (limitación conocida 2026-09-03)**: match primario por `target_sha`; fallback por `workflow_run_id` en `workflow_runs`. Si no hay match, queda `unmatched` y no crea ni muta manifests. El SHA no identifica el intento: la cancelación de un duplicado puede afectar al manifest activo del mismo SHA. El incidente no corrigió ese matching; coordinación serial y drenaje de eventos terminales mitigan el riesgo. [Playbook §16](../operations/PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md#16-cancelar-un-duplicado-puede-abortar-el-manifest-del-intento-correcto). Además, el fallback por `workflow_run_id` es hoy inalcanzable: nada escribe `release_manifests.workflow_runs` (`[]` en todos los manifests). Decisión propuesta y dueña: Delta 2026-09-03 más abajo / `TASK-1815`.
 - **Transiciones acotadas**: solo eventos de falla de workflows allowlisted pueden mover estado, y únicamente si `assertValidReleaseStateTransition` lo permite (`ready|deploying -> aborted`, `verifying -> degraded`). Eventos exitosos se registran como `matched`; no declaran `released`.
 - **Watchdog manual-only temporal**: TASK-849 queda manual-only en repo, pero el workflow remoto está `disabled_manually` como emergency stop mientras `main` aún tiene el schedule viejo. El CLI `pnpm release:watchdog --json` sigue disponible para verificación puntual; no reactivar schedule sin corregir falsos positivos/failures en TASK-920.
 - **Sin outbox nuevo en V1.2**: las transiciones siguen emitiendo los 7 `platform.release.*` existentes. Los eventos GitHub recibidos no emiten outbox propio hasta que exista un consumer real.
 
 Steady state: `platform.release.github_webhook_unmatched = ok` con `0 unmatched / 0 failed` en 24h.
+
+
+## Delta 2026-09-03 — Correlación del webhook por intento (run ID), no por SHA (TASK-1815, `Proposed`)
+
+**Estado actual (verificado en código y en PG):**
+
+- `src/lib/release/github-webhook-reconciler.ts` → `findReleaseMatch`: (1) `findReleaseByTargetSha` — manifests de
+  `main` de los últimos 30 días con ese `target_sha`, activos primero y luego el más reciente — devuelve
+  `matchedBy: 'target_sha'`; (2) sólo si el SHA no encontró nada, `findReleaseByWorkflowRunId` recorre
+  `release_manifests.workflow_runs` (acepta `id|run_id|runId|workflow_run_id|workflowRunId`).
+- El run ID del orquestador **no se registra en el manifest**: `recordReleaseStarted` (`manifest-store.ts`) hace el
+  INSERT sin `workflow_runs`, y `scripts/release/orchestrator-record-started.ts` no recibe `github.run_id` (el
+  workflow sólo lo cita en el texto de `--reason` de `orchestrator-transition-state`). El run ID sí queda, por
+  evento, en `github_release_webhook_events.workflow_run_id` y en `release_state_transitions.metadata_json`
+  (`workflowRunId`, `matchedBy`) cuando el reconciler transiciona.
+- Consecuencia: el SHA no identifica el intento. Un `workflow_run.cancelled` de un run duplicado (`FAILURE_CONCLUSIONS`)
+  aborta el manifest activo de OTRO run del mismo SHA (`deriveFailureTransition`: `preflight|ready|deploying → aborted`),
+  y `aborted` es terminal. Caso 2026-09-03 (`a824d073a5fb`): attempt 1 abortado a las 19:04:35Z por el cancel de
+  `33793232779` (`matchedBy: target_sha`) cuando el run dueño `33793141529` ya había desplegado y pasado health;
+  el cancel de `33794635945` (19:08:23Z) emparejó por SHA con el attempt 1 ya terminal y no transicionó sólo porque
+  el attempt 2 aún no existía. Cronología completa: playbook §16.
+
+**Decisión propuesta (a aceptar en `TASK-1815`):**
+
+1. El orquestador registra su run al nacer el manifest: Job 2 pasa `--workflow-run-id=${{ github.run_id }}`
+   (+ `--workflow-run-attempt`) y `recordReleaseStarted` persiste
+   `workflow_runs = [{ id, workflow: 'production-release', run_attempt, recorded_at, source: 'orchestrator' }]`
+   en el mismo INSERT. Sin migración: la columna existe desde TASK-848 (`jsonb`, `DEFAULT '[]'`, CHECK array).
+2. `findReleaseMatch` empareja PRIMERO por `workflow_run_id` cuando el evento lo trae y algún manifest lo registró;
+   cae a `target_sha` sólo si el evento no trae run ID o el manifest candidato no registró ninguno (legacy).
+3. **Nunca abortar ni degradar un manifest cuyo `workflow_runs` registrado no contenga el run del evento:** el
+   evento queda `matched_no_transition` con `errorCode: 'foreign_workflow_run'` (y `matchedBy` distinguible), visible
+   en el ledger y contado por una señal `platform.release.*` con steady `0` (un valor `>0` revela un dispatch
+   duplicado).
+4. Los worker workflows invocados por `workflow_call` corren bajo el mismo `github.run_id` del orquestador, así que
+   sus `workflow_job`/`deployment_status` siguen emparejando con el manifest dueño (verificado en el ledger:
+   los `deployment_status` de Azure del 2026-09-03 llegaron con `workflow_run_id = 33794622145`).
+5. Test unitario que reproduce el caso: manifest `preflight` con run `A` registrado; `workflow_run.cancelled` de
+   run `B` con el mismo SHA ⇒ el manifest no cambia y `transitionReleaseState` no se llama; control: falla del run
+   `A` ⇒ `aborted`; legacy: `workflow_runs=[]` ⇒ comportamiento actual.
+
+Mientras `TASK-1815` no esté desplegada, la coordinación serial del runbook §0.1 y las reglas duras de la skill
+`greenhouse-production-release` (listar runs antes de dispatchar; nunca cancelar con otro manifest activo del
+mismo SHA) son la única defensa.
 
 ## 1. Why this exists
 
@@ -727,6 +771,22 @@ V1 partial entregado directo en `develop`:
 - 6 follow-up TASKs derivadas registradas (TASK-850..855).
 
 ---
+
+## Delta 2026-09-04 — TASK-1828: `Auth Server Deploy` entra al control plane
+
+`services/auth-server/` (authorization server propio de Efeonce, EPIC-044) es el quinto deployable Cloud Run
+gobernado por el release: `.github/workflows/auth-server-deploy.yml` replica el contrato de los workers
+(`workflow_call` con `environment` + `expected_sha`, drift check por `WORKER_RUNTIME_PATHS`, `GIT_SHA`
+verificado post-deploy, `cancel-in-progress` dinámico) y `production-release.yml` lo despliega en paralelo con
+los otros cuatro (`deploy-auth-server`, `needs: [approval-gate]`). Registrado en `RELEASE_DEPLOY_WORKFLOWS`
+con `cloudRunService: 'auth-server'` / `us-east4`, así que el watchdog compara su `GIT_SHA`
+(`WORKFLOWS_WITH_CLOUD_RUN_DRIFT_DETECTION` pasa de 4 a 5; el test de drift deriva el denominador del
+allowlist, nunca de un literal). Los tres gates de workers (`worker:build-contract-gate`,
+`worker:runtime-deps-gate`, `worker:deploy-path-gate`) lo incluyen. Particularidades: ingreso
+`internal-and-cloud-load-balancing` + `allow-unauthenticated` (sólo el LB del gateway MCP lo alcanza, host
+`auth.efeonce.org` publicado desde `efeonce-mcp/infra/terraform`), flag maestro `AUTH_SERVER_ENABLED=false` por
+defecto (ledger), y `/readyz` 503 con el flag OFF no es un deploy fallido. Runbook:
+`docs/operations/runbooks/auth-server.md`.
 
 ## Invariantes operativos para agentes (TASK-848…871)
 

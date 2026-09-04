@@ -157,8 +157,10 @@ AI Visibility Grader. Son cuatro piezas, dos de lectura y dos de escritura:
 
 Regla de acceso que cambia acá: con la identidad máquina compartida del gateway,
 `prepare_seo_grounded_queries` responde **denegado** aunque el conector tenga el scope de escritura —
-es un cierre deliberado (fail-closed) hasta que existan credenciales por usuario (`TASK-1631`), porque
-crear borradores del grader es una capacidad de persona, no de máquina.
+es un cierre deliberado (fail-closed), porque crear borradores del grader es una capacidad de persona, no de
+máquina. El grant revocable por organización y por persona ya existe (`greenhouse_core.external_capability_grants`,
+`TASK-1631`, 2026-09-04); el acceso externo real espera al emisor propio y al gateway multi-issuer (EPIC-044:
+TASK-1829/1830/1831/1832).
 
 ## Manuales de uso del dominio
 

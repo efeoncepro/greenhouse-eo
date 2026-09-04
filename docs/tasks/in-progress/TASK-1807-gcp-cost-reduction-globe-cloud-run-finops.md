@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `cron`
 - Epic: `none`
-- Status real: `Hibernación profunda aplicada y reconciliada en Terraform: Cloud SQL STOPPED/NEVER, tres schedulers PAUSED, vías productivas fail-closed, servicios minScale=0 y recursos preservados; ahorro realizado pendiente de ventanas Billing Export de 24 h, 7 días y cierre mensual`
+- Status real: `Hibernación reversible aplicada; tres schedulers Globe y caller externo ops-globe-tenancy-reconcile PAUSED, SQL STOPPED/NEVER y recursos preservados. Protección deploy del caller sólo local, sin promoción; ahorro posterior pendiente de Billing Export 24 h, 7 días y cierre mensual`
 - Rank: `1`
 - Domain: `ops`
 - Blocked by: `none`
@@ -546,6 +546,10 @@ Terraform, un scheduler a la vez. El rollback restaura el schedule anterior.
   Registry, budgets y estado Terraform permanecen existentes.
 - [x] Existe un runbook canónico con preflight, variables obligatorias, gate anti-delete, apagado, readbacks,
   reactivación en dos fases, monitoreo, rollback, medición de costo e incidente documentado.
+- [x] Caller externo `ops-globe-tenancy-reconcile` pausado reversiblemente: readback `2026-09-03T22:26:05Z`
+  `PAUSED` en `efeonce-group/us-east4`; conserva cron, target e identidad. La reactivación sigue el runbook.
+- [ ] La declaración de pausa del caller en `services/ops-worker/deploy.sh` llega al source publicado y al
+  siguiente despliegue autorizado; el cambio existe sólo localmente, sin commit/push/deploy en este corte.
 
 ## Verification
 
@@ -576,6 +580,11 @@ Terraform, un scheduler a la vez. El rollback restaura el schedule anterior.
 ## Follow-ups
 
 - Medir ahorro realizado a 24 horas, 7 días y cierre mensual desde `2026-09-02T10:30:38Z`.
+- Medir por separado el efecto incremental del caller pausado desde `2026-09-03T22:26:05Z`; esperar cobertura
+  completa del export y verificar desaparición de los ticks en logs, sin generar requests para despertar Globe.
+- `efeonce-platform`: promover la pausa deseada de `services/ops-worker/deploy.sh` por el carril autorizado;
+  hasta entonces un deploy desde el source anterior puede reactivar el caller. Al reabrir, sincronizar source y
+  runtime y comprobar tenancy fresca antes de habilitar uso productivo, según el runbook canónico.
 - Decision de CUD Cloud SQL sólo si Globe vuelve a activarse y estabiliza un baseline; no comprar durante
   hibernación.
 - Cancelacion de Gemini Code Assist solo si Finance/owner confirma que no se usa.
@@ -585,6 +594,35 @@ Terraform, un scheduler a la vez. El rollback restaura el schedule anterior.
 
 - Cual ruta para Asset Governance satisface mejor el producto: convergencia multi-etapa acotada o dispatch por evento.
 - Que owner financiero aprueba budgets, CUDs y cancelacion de suscripciones.
+
+## Delta 2026-09-03 — Caller externo omitido, pausa reversible aplicada
+
+- El operador confirmó pausa temporal, no cierre ni eliminación, y autorizó detener el caller residual y dejar
+  documentación/skills de reactivación para agentes futuros.
+- Discovery: en `2026-09-03T21:00:00Z–22:00:00Z`, API recibió 24 POST `/v1/commands`, todos HTTP 500,
+  duración media ~127 s. Los logs identificaron `globe.tenancy.projection.reconcile` y `ETIMEDOUT`; el caller
+  `ops-globe-tenancy-reconcile` seguía `ENABLED` cada cinco minutos en `efeonce-group/us-east4`, fuera del
+  lifecycle Terraform de Globe. El wrapper puede devolver HTTP 200 aun con reconciliaciones fallidas.
+- Pausa autorizada y readback `2026-09-03T22:26:05Z`: job `PAUSED`, cron `*/5 * * * *`, timezone
+  `America/Santiago`, mismo target `/globe/tenancy/reconcile` e identidad OIDC. No se apagó el worker compartido.
+  SQL `globe-pg` revalidado `STOPPED/NEVER` y deletion protection activa; no se eliminó ningún recurso.
+- Source local: quinto argumento `true` de `upsert_scheduler_job` en `services/ops-worker/deploy.sh` declara la
+  pausa para despliegues futuros. No hubo commit, push ni deploy; source publicado previo sigue siendo riesgo de
+  reactivación accidental hasta promoción autorizada. Resume manual aislado no basta después de esa promoción.
+- Billing previo a esta pausa, ventana `2026-09-02T11:00:00Z–2026-09-03T11:00:00Z`: CLP 2.278,27 netos
+  (créditos 0); API CLP 1.248,97, Networking CLP 547,03, SQL CLP 388,56 y resto CLP 93,71. Export con retraso:
+  no demuestra ahorro de esta intervención ni garantiza que todo el costo API desaparezca.
+- Recuperación canónica: `docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md`. El caller se
+  reanuda sólo después de recuperar SQL/API en `draining`; la proyección de tenancy debe estar fresca antes de
+  abrir las vías productivas. La pausa deja vencer su TTL fail-closed intencionalmente.
+- Estado: mitigación runtime aplicada; protección deploy local pendiente de promoción y ahorro posterior no
+  verificado. TASK-1807 conserva `in-progress`; no se certifica restauración productiva ni cierre FinOps.
+- QA: 18/18 tests focales de deploy; falsificación con pausa retirada produce dos fallos y, restaurada,
+  vuelve a verde. Shell, ESLint, worker build/runtime dependencies, mirrors y cierre documental verificados.
+  Alcance y pendientes: `docs/audits/globe/GLOBE_REVERSIBLE_CALLER_PAUSE_2026-09-03.md`.
+- Observación inicial a `22:36Z`: cero requests indexadas al caller y API entre `22:26:05Z` y `22:35:40Z`,
+  cubriendo los intervalos `22:30` y `22:35`; readback final del scheduler `PAUSED`. La ingestión de logs es
+  asíncrona: esto no certifica ahorro ni silencio futuro después de un redeploy.
 
 ## Delta 2026-09-02 — Hibernación profunda reversible
 

@@ -25,33 +25,12 @@ Payroll consumes:
 
 ## Main Code Paths
 
-- Types and classification:
-  - `src/types/hr-contracts.ts`
-  - `src/types/payroll.ts`
-- Period lifecycle:
-  - `src/lib/payroll/get-payroll-periods.ts`
-  - `src/lib/payroll/period-lifecycle.ts`
-  - `src/lib/payroll/payroll-readiness.ts`
-- Calculation:
-  - `src/lib/payroll/calculate-payroll.ts`
-  - `src/lib/payroll/calculate-chile-deductions.ts`
-  - `src/lib/payroll/calculate-honorarios.ts`
-  - `src/lib/payroll/compute-chile-tax.ts`
-  - `src/lib/payroll/chile-previsional-helpers.ts`
-- Source data:
-  - `src/lib/payroll/fetch-kpis-for-period.ts`
-  - `src/lib/payroll/fetch-attendance-for-period.ts`
-  - `src/lib/payroll/previred-sync.ts`
-  - `src/lib/payroll/tax-table-version.ts`
-- Persistence:
-  - `src/lib/payroll/postgres-store.ts`
-  - `src/lib/payroll/persist-entry.ts`
-  - `src/lib/payroll/supersede-entry.ts`
-- Outputs:
-  - `src/lib/payroll/export-payroll.ts`
-  - `src/lib/payroll/generate-payroll-excel.ts`
-  - `src/lib/payroll/generate-payroll-pdf.tsx`
-  - `src/lib/payroll/generate-payroll-receipts.ts`
+- Types and classification: `src/types/hr-contracts.ts`, `src/types/payroll.ts`
+- Period lifecycle: `src/lib/payroll/get-payroll-periods.ts`, `src/lib/payroll/period-lifecycle.ts`, `src/lib/payroll/payroll-readiness.ts`
+- Calculation: `src/lib/payroll/calculate-payroll.ts`, `src/lib/payroll/calculate-chile-deductions.ts`, `src/lib/payroll/calculate-honorarios.ts`, `src/lib/payroll/compute-chile-tax.ts`, `src/lib/payroll/chile-previsional-helpers.ts`
+- Source data: `src/lib/payroll/fetch-kpis-for-period.ts`, `src/lib/payroll/fetch-attendance-for-period.ts`, `src/lib/payroll/previred-sync.ts`, `src/lib/payroll/tax-table-version.ts`
+- Persistence: `src/lib/payroll/postgres-store.ts`, `src/lib/payroll/persist-entry.ts`, `src/lib/payroll/supersede-entry.ts`
+- Outputs: `src/lib/payroll/export-payroll.ts`, `src/lib/payroll/generate-payroll-excel.ts`, `src/lib/payroll/generate-payroll-pdf.tsx`, `src/lib/payroll/generate-payroll-receipts.ts`
 
 ## Period Readiness Contract
 
@@ -74,9 +53,9 @@ total_variable_bonus = bonus_otd + bonus_rpa + bonus_other
 gratificacion = if enabled then min(base_salary * 0.25, IMM * 4.75 / 12)
 gross_total = base_salary + remote_allowance + colacion + movilizacion + fixed_bonus + total_variable_bonus + gratificacion
 imponible_base = base_salary + fixed_bonus + total_variable_bonus + gratificacion
-afp = imponible_base * afp_total_rate
-health = isapre_plan_uf * UF or imponible_base * 0.07
-unemployment = imponible_base * unemployment_rate
+afp = capped_imponible_base * afp_total_rate
+health = capped_health_base * 0.07 or Isapre plan handling
+unemployment = capped_cesantia_base * unemployment_rate
 taxable_base = max(0, imponible_base - afp - health - unemployment)
 net = imponible_base + remote_allowance + colacion + movilizacion - afp - health - unemployment - tax - APV
 ```
@@ -101,7 +80,7 @@ No dependent payroll deductions should apply.
 
 ### Deel/international
 
-`calculatePayrollTotals()` returns gross equals net for `payRegime = international`. In `calculate-payroll.ts`, Deel entries use:
+For `payRegime = international`, Greenhouse tracks an operational amount and does not apply Chile statutory deductions by default:
 
 ```text
 gross = adjusted_base + adjusted_remote_allowance + adjusted_fixed_bonus + bonus_otd + bonus_rpa
@@ -121,21 +100,27 @@ Code paths:
 - Capability: `workforce.offboarding.review_case` (execute, tenant scope) — HR route group ∪ EFEONCE_ADMIN; seeded by `migrations/20260903150515261_task-1349-offboarding-review-capability-seed.sql`.
 - Signals (module `identity`, steady state 0): `src/lib/reliability/queries/offboarding-exit-drift.ts` — `hr.offboarding.unresolved_exit_signal`, `hr.offboarding.executed_member_still_active`, `workforce.offboarding.deprovisioned_member_without_case`.
 - Recovery: `scripts/workforce/offboarding-recovery.ts` (`pnpm workforce:offboarding:recovery`, dry-run by default; `--apply` requires an explicit `--member` allowlist).
+- `hasDecidedExitFact` (`policy.ts`) requires `exitLane !== 'identity_only'` since `0233f81e7` (PR #220): an executed access-only case never rescues an inactive member (`exclude_entire_period` + `inactive_without_exit_fact`); cases in `policy.test.ts`.
+- Live smoke `src/lib/workforce/offboarding/review-execute.live.test.ts` (subjects `TASK-1349 live …` / `t1349-…@efeoncepro.com`): `afterAll` closes compensation (`effective_to = effective_from`) and deactivates users/members. Orphans from a failed run: `scripts/workforce/purge-task1349-live-subjects.sql` (aborts on any non-synthetic member).
 
-State (2026-09-03): both `PAYROLL_EXIT_ELIGIBILITY_WINDOW_ENABLED` and `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` are ON in Production and staging (release `62356c9b7fd4`, PR #219, orchestrator run `33779259694`). Code is live; the pending recovery for real people (Felipe, Maria Fernanda, Valentina/Luis/María Camila lifecycle, stale SCIM stubs) is authorization-gated, not code-gated — see `greenhouse-payroll-auditor/SKILL.md` → `## Offboarding review, temporal eligibility and lifecycle writeback` for the live signal counts and the Finance side-effect on Felipe's June obligation/SII. Spec: `docs/architecture/agent-invariants/PAYROLL_WORKFORCE_AGENT_INVARIANTS.md` → `### Offboarding review, temporal eligibility and lifecycle writeback invariants (TASK-1349, desde 2026-09-03)`.
+- Shared reentry semantics: `src/lib/workforce/offboarding/reentry-predicates.ts` → executor `findReentryAfterExit`, drift detector, discovery `reentry_preserved`. Relationship types are employee/contractor/executive; engagement statuses active/paused/ending, profile-or-member anchored; start strictly after LWD and <= today, end inclusive >= today or null. The executor's guard protects availability after its historical compensation closure; it does not replace payroll period eligibility.
+- Compensating recovery: `src/lib/workforce/offboarding/lifecycle-recovery.ts` (`restoreOffboardingLifecycleAfterReentry`, `hashLifecycleRecoverySnapshot`) + `scripts/workforce/restore-offboarding-lifecycle.ts --plan-file <private-json> [--apply]`. No UI/API recovery surface is introduced. Admin grant, exact snapshot/timestamps/hash and same-entity later active workforce relationship are checked transactionally. Audit `offboarding_case.lifecycle_writeback_reverted`, member/assignment events and writes commit together; same request/key is idempotent.
+- Downstream safety: `src/lib/account-360/person-legal-entity-relationships.ts` prevents member activation reopening ended employee history. `src/lib/team-admin/mutate-team.ts` keeps canonical source IDs and member/outbox writes atomic. Both Vercel reactive routes and the worker must run the corrected consumer before applying a recovery.
+- Verification: behavioral tests in `member-lifecycle.test.ts`, `lifecycle-recovery.test.ts`, `mutate-team.test.ts`, `person-legal-entity-relationships.test.ts`; SQL semantics in `reentry-predicates.live.test.ts` use read-only CTE fixtures through `pnpm test:live`. A production canary reads exact event processing and compares protected objects after convergence; tests are not operational mutations.
+
+Dated execution evidence lives in `docs/audits/payroll/VALENTINA_REHIRE_IDENTITY_RECOVERY_2026-09-03.md`; current flags in `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`. The incident is repaired and its consumer canary/release documented. Do not infer another person's recovery status from that result. Repeatable procedure: `docs/operations/runbooks/workforce-reentry-recovery.md`.
 
 ## Known Audit Watchlist As Of 2026-05-01
 
-These are not theoretical. Re-check before approving Payroll changes:
+Re-check before approving Payroll changes:
 
-1. `src/types/hr-contracts.ts` has `SII_RETENTION_RATES[2026] = 0.145`. SII publishes 15.25 percent for boletas honorarios from January 1, 2026. Any 2026 honorarios entry using 14.5 percent is materially stale.
-2. `src/lib/payroll/chile-previsional-helpers.ts` returns `0.03` as worker unemployment rate for `plazo_fijo`. AFC/SP indicate fixed-term worker share is 0 percent and employer share is 3 percent.
-3. `resolveChileEmployerCostAmounts()` uses employer cesantia rate `0` for `plazo_fijo`. That understates employer cost for fixed-term workers.
-4. `calculatePayrollTotals()` imports cap helpers indirectly but does not apply AFP/health/cesantia topes in the visible formula. Audit high salaries against legal caps before trusting deductions.
-5. `computeChileTax()` can return `computed: false` with zero tax if brackets are missing. Readiness/calculate should block Chile dependent payroll before this is treated as valid.
-6. Manual compensation AFP rates can override synced rates. Verify whether compensation-stored rates are intentionally pinned or stale.
-7. `honorarios` suppresses attendance and KPI requirements in readiness. That is correct for current model, but classification must be audited if the work relationship looks dependent.
-8. Deel and international entries can still require ICO KPI when variable bonuses are configured. Do not skip KPI just because payroll is international.
+1. `SII_RETENTION_RATES[2026]` should stay aligned with SII boletas honorarios. SII publishes 15.25 percent from January 1, 2026.
+2. Fixed-term Seguro de Cesantia should charge worker 0 percent and employer 3 percent.
+3. AFP, health, cesantia, SIS, and mutual calculations must apply legal caps where available.
+4. `computeChileTax()` missing brackets cannot be accepted as valid zero tax for Chile dependent payroll.
+5. Manual compensation AFP rates can override synced rates. Verify whether compensation-stored rates are intentionally pinned or stale.
+6. `honorarios` suppresses attendance and KPI requirements in readiness. That is correct for current model, but classification must be audited if the work relationship looks dependent.
+7. Deel and international entries can still require ICO KPI when variable bonuses are configured. Do not skip KPI just because payroll is international.
 
 ## Data Quality Audit
 

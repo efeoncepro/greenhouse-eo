@@ -46,7 +46,8 @@ curl -s -X POST https://<host>/api/admin/growth/seo/grounded-queries \
    revisión humana. Sólo entonces el set queda `active` y el próximo run del grader lo usa.
 4. Por MCP: `get_seo_grounded_query_draft` (lectura) y `prepare_seo_grounded_queries` (write bajo
    `efeonce.mcp.seo.write`; con la identidad máquina compartida responde `aeo_forbidden`
-   fail-closed hasta TASK-1631).
+   fail-closed: el grant revocable por organización y por persona ya existe —TASK-1631, 2026-09-04— y el acceso
+   externo real espera al emisor propio y al gateway multi-issuer, EPIC-044 TASK-1829/1830/1831/1832).
 
 ## Que NO hacer
 

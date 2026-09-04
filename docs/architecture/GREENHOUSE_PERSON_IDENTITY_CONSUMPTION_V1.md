@@ -142,6 +142,22 @@ Reglas:
 - Un apply de link externo debe verificar conflictos activos por `(source_system, source_object_type, source_object_id)` antes de escribir.
 - Workforce Activation puede orquestar el blocker y la aprobación humana, pero no se convierte en source of truth de identidades externas.
 
+### Mutación de member y reingreso
+
+La rama PostgreSQL de `updateMember` (`src/lib/team-admin/mutate-team.ts`) usa una sola transacción para
+bloquear/actualizar el member, sincronizar source links con `buildIdentitySourceLinkId` y persistir auditoría
++ `member.updated` en outbox. Acepta el cliente transaccional del command; los mirrors/audit BigQuery se
+intentan después del commit. Este contrato no declara atómicos todos los writers históricos de members.
+
+La proyección legal conserva relaciones employee terminadas/inactivas/con fecha final. Solo permite
+bootstrap employee cuando no existe historia employee, contractor o executive; disponibilidad actual no
+reabre un episodio. Un reingreso con correo nuevo conserva su identidad longitudinal y exige verificar
+el vínculo del proveedor; esta entrega no crea un command genérico de rebinding de identidades.
+
+La recuperación de disponibilidad se rige por la [decisión de reingreso](GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md),
+con [procedimiento y readbacks](../operations/runbooks/workforce-reentry-recovery.md). Usuario activo,
+rol vigente y elegibilidad del reader se verifican por separado de una sesión interactiva real.
+
 ## Canonical Resolution Shape
 
 Todo resolver shared nuevo o endurecido debería poder exponer, como mínimo:

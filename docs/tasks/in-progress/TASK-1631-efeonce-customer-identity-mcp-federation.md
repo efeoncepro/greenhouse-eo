@@ -1,5 +1,60 @@
 # TASK-1631 — Efeonce Customer Identity and MCP Federation Foundation
 
+## Delta 2026-09-03 — Composición decidida: authorization server PROPIO (EPIC-044, re-alcance)
+
+El operador decidió construir y operar el emisor de Efeonce; no se compra WorkOS ni otro IdP. ADR aceptado:
+`docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`. Esta task pasa a `EPIC-044` (U04) y
+**re-alcanza sus slices**: conserva el registry de environments, el binding de organización, las invitaciones,
+los grants por capability, `grants_version`, el eligibility reader y las cuatro señales (todo el diseño S0.4).
+Pierde el runtime y el protocolo del emisor (→ `TASK-1828`, `TASK-1829`), la autenticación de personas
+(→ `TASK-1830`), el gateway multi-issuer (→ `TASK-1831`, materializa S0.5), los canaries y la primera cohorte
+(→ `TASK-1832`, absorbe S0.1) y la convergencia del login (→ `TASK-1834`, S0.6). El gate de subprocesador
+(S0.3) deja de bloquear: con emisor propio no aparece un encargado nuevo; la postura de seguridad se audita en
+`TASK-1833`. La task `ui-ux` de login/consentimiento nace al cerrar el contrato de flujo de `TASK-1830`.
+El delta 2026-08-26 (grants `growth.ai_visibility.*`) se resuelve en el binding/gateway o en una task propia de
+Growth, y el epic no cierra sin declararlo.
+
+## Delta 2026-09-04 — Slice 1 (U04) entregado: schema aplicado, commands, API, resolver del gateway y señales
+
+Ejecutado local-first sobre `develop` (commits `689b56044` y `cf8f15224`, sin push). Migraciones
+`20260904104914802_task-1631-external-identity-binding-foundation.sql` y
+`20260904110809060_task-1631-invitation-linked-check-one-directional.sql` **aplicadas** en `greenhouse-pg-dev`
+(instancia única): `external_identity_environments`, `external_organization_bindings`, `external_capability_grants`,
+`external_member_invitations`, `external_identity_audit_log` y `external_access_resolution_log` (append-only por
+trigger), índice único parcial sobre `identity_profile_source_links` para subjects `external_idp:%` (un subject activo
+→ un solo `identity_profile`), `canonical_source_system()` reconoce `external_idp`, y seed de las 6 capabilities. Sin
+backfill, sin grants de clientes reales.
+
+Dominio `src/lib/identity/external-access/**` (sin `server-only`, bundleable por el auth-server): commands
+`upsertExternalIdentityEnvironment` · `bindExternalOrganization` · `grantExternalCapability` · `issueExternalInvitation`
+· `acceptExternalInvitation` · `revokeExternalAccess` (idempotentes; una tx con audit + outbox; `grants_version` sube en
+todo cambio de autoridad) y reader `resolveExternalAccess(environment, subject)` con outcomes
+`bound|unbound|revoked|environment_inactive|profile_inactive` y log **sólo de denials** (subject hasheado). API:
+`/api/admin/identity/external-access/{environments,eligibility,bindings,bindings/[id],bindings/[id]/grants,
+bindings/[id]/invitations,revoke}` (capability dedicada por ruta, sólo `efeonce_admin`) y
+`GET /api/platform/ecosystem/identity/binding?environment=&subject=` (lane ecosystem, binding `internal` del gateway,
+404 anti-oráculo) — el contrato que consume `TASK-1831` (`grantsVersion` por igualdad, TTL 60 s). Señales
+`identity.external_binding.{unbound_dispatch_attempt,revoked_still_dispatching,subject_collision,orphan_grant}` cableadas
+en el overview y el registry `identity`. Smoke live `pnpm identity:external-access:smoke` (read-only) y `-- --apply`
+(fixture `ZZZ Q2C Smoke Fixture`, environment `smoke-task-1631` hoy `retired`): ciclo completo verificado contra PG
+real, gv 1→4; el primer apply atrapó el CHECK bidireccional de `linked_consistent` → forward-fix (segunda migración).
+
+Decisiones tomadas en el slice (vigentes, detalle en el ADR de federación §"Slice 1 binding foundation — applied"):
+membership de acceso externo = invitación `linked` bajo binding activo (no se escribe `person_memberships`); grants
+per-persona vía `profile_id` en `external_capability_grants` (resuelve el modelo del delta 2026-08-26 sin migración
+futura — el grant Growth concreto se emite en TASK-1831/Growth, no acá); revocar desactiva el source link si la persona
+no conserva otra membership activa en el environment (así muere también la sesión del auth-server, TASK-1830) y el
+resolver responde `revoked` leyendo el link inactivo; `issuer_class` inmutable por environment; elegibilidad estricta
+`active_client`; sin feature flag nuevo en Greenhouse (los commands son admin-gated y el uso externo lo gatea el flag del
+gateway en TASK-1831). Drift preexistente detectado por el test live de paridad registry↔catálogo (11 capabilities
+ajenas sin seed) → task aparte; las 6 de esta task están en sync.
+
+**Estado: `code complete, staging verificado, producción pendiente`** — push de `develop` (`02dc5d987`) coordinado con
+TASK-1828; en staging las 4 señales responden por `/api/admin/reliability`, `GET …/external-access/environments` y
+`/eligibility` devuelven datos reales y el lane ecosystem responde `401 missing_token` sin consumer. El release a `main`
+espera a TASK-1828 (decisión del operador). La baja end-to-end con token vigente y los canaries de cliente son evidencia
+de TASK-1831/1832.
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status
@@ -16,11 +71,11 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `integration`
-- Epic: `none`
-- Status real: `Slice 0 en curso; composición aprobada 2026-08-05 (WorkOS staging de gasto cero: free tier sin dominio propio, provisión diferida a demanda real); S0.2-S0.5 entregados en el ADR; restan S0.1 (matriz de tokens, requiere sesión interactiva), contrato de convergencia (S0.6) y cierre legal/checklist pre-provisión (S0.7)`
+- Epic: `EPIC-044`
+- Status real: `Slice 1 (U04) code complete 2026-09-04: schema aditivo APLICADO en PG (2 migraciones), commands/readers/resolver, 6 capabilities, 7 rutas admin + reader ecosystem para el gateway, 4 señales cableadas, smoke live verde (bind → grant → invite → accept → resolve bound → revoke → resolve revoked). Staging verificado 2026-09-04 (develop 02dc5d987: 4 señales en /api/admin/reliability, rutas admin 200 con datos reales, lane ecosystem 401 sin consumer token); producción espera el release a main junto con TASK-1828; canaries y revocación end-to-end viven en TASK-1831/1832`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|agentic`
-- Blocked by: `aceptación explícita de EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md; comparación y aprobación de WorkOS vs broker Greenhouse extraído vs híbrido con costo/operación presentados; y revisión de privacidad/subprocesador cerrada`
+- Blocked by: `none para el slice entregado; la verificación operativa exige deploy (release control plane) y la evidencia end-to-end (token vigente denegado tras revocación, canaries Claude/Codex/ChatGPT) depende de TASK-1829/1830/1831/1832 y de la task ui-ux de login`
 - Branch: `Greenhouse develop; MCP main; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -175,16 +230,22 @@ Reglas obligatorias:
 - Onboarding B2B, revocación y auditoría por organización/capacidad.
 - Compatibilidad verificada de clientes Claude, Codex y ChatGPT.
 - La task `ui-ux` dependiente de la superficie de login `auth.efeonce.org` (nace al cierre del Slice 0).
+- Growth SEO/AEO: `prepare_seo_grounded_queries` y `get_seo_grounded_query_draft` están fail-closed
+  (`aeo_forbidden`) esperando grants por persona. **Declarado 2026-09-04:** el modelo de grant per-persona ya existe
+  (`external_capability_grants.profile_id`); el grant concreto `growth.ai_visibility.prompt_set.manage` para sujetos
+  internos (Entra) se emite cuando TASK-1831 registre el issuer interno como environment `internal` y ligue la
+  organización propia de Efeonce, o en una task propia de Growth — no queda en silencio.
 
 ### Files owned
 
 - `docs/architecture/EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`
-- `docs/tasks/to-do/TASK-1631-efeonce-customer-identity-mcp-federation.md`
+- `docs/tasks/in-progress/TASK-1631-efeonce-customer-identity-mcp-federation.md`
 - `../efeonce-mcp/**`
 - `src/lib/sister-platforms/**` (broker/allowlist de redirect URIs y su primitive canónica; ya existente)
-- `src/lib/identity/**` + `src/lib/reliability/queries/**` + `migrations/**` — paths exactos de los primitives de
-  binding, sus capabilities y sus signals se fijan en el Slice 0; se declaran acá para detectar colisión con otras
-  tasks antes de escribir código, no para reservarlos a ciegas
+- `src/lib/identity/external-access/**` · `src/app/api/admin/identity/external-access/**` ·
+  `src/app/api/platform/ecosystem/identity/**` · `src/lib/api-platform/resources/ecosystem-identity-binding.ts` ·
+  `src/lib/reliability/queries/external-identity-binding-signals.ts` · `scripts/identity/external-access-smoke.ts` ·
+  `migrations/20260904104914802_*.sql` + `migrations/20260904110809060_*.sql` (fijados en el Slice 1, 2026-09-04)
 - contratos/provider policy de `../efeonce-globe/**` sólo para revalidación, sin mover ownership de Globe
 
 ## Current Repo State
@@ -330,13 +391,19 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Account 360, binding y provider sources of truth quedan nombrados y no existe un segundo modelo de
-      organización cliente.
-- [ ] Existing-person linking, colisión/revisión manual, recovery, desactivación y revocación mapean un subject
-      externo a un único `identity_profile` canónico; el matching sólo-por-email se rechaza.
+- [x] Account 360, binding y provider sources of truth quedan nombrados y no existe un segundo modelo de
+      organización cliente. _Evidencia 2026-09-04: `external_organization_bindings.organization_id` FK a
+      `greenhouse_core.organizations`; elegibilidad sólo sobre organizaciones existentes; sin columnas de provider._
+- [x] Existing-person linking, colisión/revisión manual, recovery, desactivación y revocación mapean un subject
+      externo a un único `identity_profile` canónico; el matching sólo-por-email se rechaza. _Evidencia:
+      `acceptExternalInvitation` (profile_id → link (environment, subject) → email exacto único bajo invitación
+      auditada; >1 ⇒ `identity_collision`), índice único parcial de subjects, `revokeExternalAccess`, `reissue`;
+      tests `commands.test.ts` + smoke live. El email nunca resuelve un token: el resolver sólo usa (environment,
+      subject)._
 - [ ] La coexistencia del login cliente actual de Greenhouse y la delegación futura al plano de identidad externo
       aceptado quedan documentadas, con cookies/audiencias separadas y cutover gateado por separado.
 - [ ] Gateway y provider fallan cerrado de forma independiente ante binding o capability ausente/revocada.
+      _Lado Greenhouse listo (resolver deniega y registra); el dispatch del gateway es TASK-1831._
 - [ ] El contexto de autorización expone `issuer`, `subject`, `clientId`, `audience`, `delegatedScopes` y `roles`
       como campos separados, y el binding de persona se resuelve por `(issuer, subject)`; ningún camino lo resuelve
       por `client_id` ni deriva un campo de otro por fallback.
@@ -352,7 +419,9 @@ Reglas obligatorias:
       proveedor en vez de `sub`.
 - [ ] El proveedor aprobado soporta **CIMD** (mecanismo primario de la spec MCP vigente) y DCR como
       compatibilidad, verificado contra su discovery y su documentación.
-- [ ] Migración, audit, revocación y rollback quedan verificados antes de acceso de clientes.
+- [x] Migración, audit, revocación y rollback quedan verificados antes de acceso de clientes. _Evidencia: 2
+      migraciones aplicadas con DO checks; audit append-only; smoke `-- --apply` revocó member y binding (gv 3→4) y
+      retiró el environment; rollback = `revokeExternalAccess` + environment `suspended|retired`._
 - [ ] Canaries OAuth reales de Claude, Codex y ChatGPT cubren allow, base-only deny y revocación.
 - [ ] Ningún token, code, secret o respuesta cruda de provider aparece en logs o respuestas de error.
 
@@ -674,15 +743,21 @@ production secrets, client registrations and the first customer onboarding conse
       without closing its metadata, client-compatibility and verification gaps.
 - [ ] La revisión de privacidad/subprocesador está cerrada (DPA, subprocesadores, región, retención, derechos de
       titular y notificación contractual cuando aplique) antes de provisionar el tenant productivo.
-- [ ] Cada command de operador tiene capability dedicada y granular, seedeada en registry + catálogo TS y
-      granteada a ≥1 rol real en el mismo PR; `capability-grant-coverage.test.ts` pasa.
-- [ ] Las cuatro reliability signals están registradas, visibles en `/admin/operations` y en `steady = 0`.
+- [x] Cada command de operador tiene capability dedicada y granular, seedeada en registry + catálogo TS y
+      granteada a ≥1 rol real en el mismo PR; `capability-grant-coverage.test.ts` pasa. _Evidencia 2026-09-04: 6
+      capabilities `identity.external_*` (seed migración 20260904104914802 + catálogo + `efeonce_admin`)._
+- [x] Las cuatro reliability signals están registradas, visibles en `/admin/operations` y en `steady = 0`.
+      _Evidencia staging 2026-09-04 (deploy `greenhouse-extzoqo80`, develop `02dc5d987`): `/api/admin/reliability`
+      devuelve las 4 señales bajo `identity` — 3 en `ok`, `unbound_dispatch_attempt` en `warning` por los 4 denials del
+      smoke `--apply` (decae en 24h; steady 0 sin tráfico). Producción: pendiente del release con TASK-1828._
 - [ ] La baja de una persona en la organización cliente revoca su acceso MCP end-to-end, verificado en vivo: el
       binding queda desactivado, el grant deja de resolver y un token vigente emitido antes de la baja se deniega
       en dispatch sin esperar a su expiración.
-- [ ] El camino de soporte está documentado en el runbook MCP: qué ve un cliente que no puede entrar, qué
-      diagnostica el operador y con qué evidencia redactada, sin exponer tokens ni claims de terceros.
-- [ ] An Account 360 organization is the sole customer anchor and has an audited external identity binding.
+- [x] El camino de soporte está documentado en el runbook MCP: qué ve un cliente que no puede entrar, qué
+      diagnostica el operador y con qué evidencia redactada, sin exponer tokens ni claims de terceros. _Evidencia
+      2026-09-04: sección de soporte en el runbook MCP + manual `operar-binding-identidad-externa.md`._
+- [x] An Account 360 organization is the sole customer anchor and has an audited external identity binding.
+      _Evidencia: FK + `external_identity_audit_log` (`organization_bound`); smoke live sobre el fixture._
 - [ ] An existing customer authenticating through the external plane resolves to the same canonical
       `identity_profile`; Greenhouse/auth/MCP sessions remain audience-separated.
 - [ ] The customer-facing Greenhouse login convergence contract is approved, even though its runtime cutover is a
@@ -693,8 +768,9 @@ production secrets, client registrations and the first customer onboarding conse
 - [ ] Gateway and Globe both deny unknown, base-only, expired or revoked access.
 - [ ] Tool authority is issuer-qualified: an external-issuer token never satisfies an internal-only tool,
       regardless of scope strings.
-- [ ] The binding/grant model is provider-neutral and a second provider can register capabilities without schema
-      migration of the binding.
+- [x] The binding/grant model is provider-neutral and a second provider can register capabilities without schema
+      migration of the binding. _Evidencia: `capability` es un string namespaceado validado por CHECK; ninguna
+      columna de Globe/Wave/Kortex; el resolver devuelve `grants[]` sin interpretar el namespace._
 - [ ] The Entra internal canary and `globe.producer.fleet.list` remain available through the transition.
 - [ ] Claude, Codex and ChatGPT canaries pass OAuth/PKCE plus MCP initialize for the allowlisted organization.
 - [ ] No write, spend, approval or rights-sensitive Globe capability is exposed by this task.

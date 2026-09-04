@@ -19,6 +19,19 @@ const repo = resolve(new URL('../..', import.meta.url).pathname)
 
 const mirroredSkills = [
   {
+    id: 'report-studio',
+    mode: 'shared-files',
+    agentLocal: ['agents/openai.yaml'],
+    codex: '.codex/skills/report-studio',
+    claude: '.claude/skills/report-studio',
+  },
+  {
+    id: 'greenhouse-finance-accounting-operator',
+    mode: 'byte-identical',
+    codex: '.codex/skills/greenhouse-finance-accounting-operator',
+    claude: '.claude/skills/greenhouse-finance-accounting-operator',
+  },
+  {
     // La skill de release declara "Paridad obligatoria entre agentes" en su propio texto, y hasta
     // 2026-08-29 NADA lo verificaba: no estaba en este allowlist. Una afirmación sin mecanismo es
     // exactamente lo que un espejo divergente aprovecha — dos agentes promoviendo a producción con

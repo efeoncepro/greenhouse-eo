@@ -39,6 +39,8 @@ Lo que el contratista **no** ve: estados del proveedor, comisiones, ni ningun da
 
 > Detalle tecnico: `src/lib/contractor-engagements/self-service-projection.ts` · rutas `/api/my/contractor/*`
 
+La tarifa recurrente es bruta y, si es fija, el cálculo actual toma el período completo: no prorratea por las fechas ingresadas. Para un mes parcial, HR debe registrar la excepción autorizada siguiendo [Compensación y meses parciales](contratistas-compensacion.md#cambiar-el-acuerdo-y-pagar-un-mes-parcial). Si ya existe un payable, cambiar la compensación no lo recalcula.
+
 ## El workbench HR (`/hr/contractors`)
 
 HR y administracion trabajan desde un tablero unico que ordena todo lo que requiere atencion:
@@ -63,8 +65,9 @@ El recorrido de una entrega de contratista pasa por etapas claras:
 1. **Contratacion.** Existe una contratacion de contratista activa, con su entidad contratante, tipo, periodo y modelo de pago.
 2. **Envio.** El contratista prepara su entrega de trabajo, adjunta boleta o factura y evidencia, y la envia a revision.
 3. **Revision.** HR revisa la entrega y decide: aprueba, observa (pide cambios) o rechaza. Si la observa, el contratista corrige y vuelve a enviar.
-4. **Obligacion a Finanzas.** Una entrega aprobada deja lista la obligacion de pago para que Finanzas la procese.
-5. **Pago.** Finanzas ejecuta el pago por sus propios flujos.
+4. **Payable.** Finanzas crea un payable desde la entrega aprobada y revisa readiness. La boleta faltante sigue bloqueando aunque el trabajo esté aprobado.
+5. **Obligación y orden.** Solo después de enviar el payable listo a Finanzas, el bridge genera la obligación; la corrida prepara la orden.
+6. **Pago.** Finanzas completa aprobación, envío y confirmación bancaria por el flujo de órdenes de pago.
 
 La linea de tiempo en la vista del contratista refleja exactamente este recorrido, asi cada persona sabe en que etapa esta y que sigue.
 

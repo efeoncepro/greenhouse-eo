@@ -1,5 +1,14 @@
 # TASK-1279 — AEO Operator Cross-Sell: Send Report + Create Lead (governed)
 
+## Delta 2026-09-04 — capability sin seed en `capabilities_registry` (deuda de paridad cerrada)
+
+`growth.ai_visibility.lead.open` se declaró en `src/config/entitlements-catalog.ts` sin su fila en
+`greenhouse_core.capabilities_registry` (regla CLAUDE.md §Capability ⇒ grant coverage: registry + catálogo TS en el mismo
+PR). Lo detectó el test live `src/lib/capabilities-registry/parity.live.test.ts` durante `TASK-1631`; el seed lo aplica
+`migrations/20260904112408574_capabilities-registry-parity-backfill.sql` (aplicada 2026-09-04). Sin cambio de
+comportamiento: `can()` resolvía por el catálogo TS; la tabla de gobernanza era la que estaba desalineada.
+
+
 > **Nota de objeto comercial (corrección 2026-06-29):** este command crea/asocia un **Lead de HubSpot** (objeto `leads`, asociado a Contact y/o Company), **NO un Deal/Negocio**. Un Deal es un momento comercial más avanzado (oportunidad calificada con pipeline/stage/monto). El diagnóstico AEO es pre-pitch (tope del bowtie): genera un Lead; recién al calificar se convierte en Deal. El slug del archivo conserva `open-opportunity` por estabilidad de links, pero el objeto correcto es **Lead**.
 
 <!-- ═══════════════════════════════════════════════════════════

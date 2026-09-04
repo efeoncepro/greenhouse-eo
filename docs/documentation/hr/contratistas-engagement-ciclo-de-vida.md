@@ -81,6 +81,12 @@ Además aparece un **recordatorio de access offboarding** (cuando el contractor 
 
 **Invoices post-cierre**: tras "Finalizado", **no se crean nuevos pagos** salvo que se habilite explícitamente la política "permitir invoices post-cierre" (decisión auditada). Un engagement **cancelado** nunca permite pagos.
 
+## Volver después de terminar una etapa
+
+Un reingreso conserva la misma persona y crea una relación y engagement propios del nuevo episodio. El fin de servicios anterior y la liquidación de sus pendientes son hechos distintos: **En cierre** puede conservar pagos abiertos sin convertirlos en trabajo de la nueva etapa. No anules esos pagos ni reconozcas sus bloqueadores solo para terminar el alta nueva.
+
+Las salidas employee históricas no deben desactivar un episodio vigente posterior. Restaurar disponibilidad no cambia al contractor a empleado ni reabre su relación laboral anterior. La reparación administrativa, sus precondiciones y la verificación después de procesar eventos viven en el [runbook de reingreso](../../operations/runbooks/workforce-reentry-recovery.md).
+
 ## Revisión de clasificación laboral (riesgo de reclasificación)
 
 Un contractor mal modelado puede ser, en la práctica, un empleado encubierto. Greenhouse evalúa **7 factores de subordinación** (horario fijo impuesto, supervisión directa, exclusividad, dependencia económica, continuidad inmediata de relación laboral, cargo interno indistinguible, pagos recurrentes sin entregables).

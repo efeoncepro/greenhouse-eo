@@ -338,13 +338,22 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       { path: '/api/hr/workforce/role-title-drift', label: 'Role title drift queue' },
       { path: '/api/admin/data-quality/organization-logos', label: 'Organization logo review overview' },
       { path: '/api/admin/data-quality/organization-logos/candidates', label: 'Organization logo candidates' },
-      { path: '/api/organizations/[id]/brand-assets/logo', label: 'Organization logo apply command' }
+      { path: '/api/organizations/[id]/brand-assets/logo', label: 'Organization logo apply command' },
+      // TASK-1631 — external identity binding (operador) + reader del gateway MCP.
+      { path: '/api/admin/identity/external-access/bindings', label: 'External identity bindings (operator)' },
+      { path: '/api/platform/ecosystem/identity/binding', label: 'External access reader (MCP gateway)' }
     ],
     dependencies: [
       'greenhouse_core.identity_profiles',
       'greenhouse_core.person_identity_documents',
       'greenhouse_core.person_addresses',
       'greenhouse_core.client_users',
+      'greenhouse_core.identity_profile_source_links',
+      'greenhouse_core.external_identity_environments',
+      'greenhouse_core.external_organization_bindings',
+      'greenhouse_core.external_capability_grants',
+      'greenhouse_core.external_member_invitations',
+      'greenhouse_core.external_access_resolution_log',
       'greenhouse_core.organization_brand_asset_candidates',
       'greenhouse_core.member_role_title_audit_log',
       'greenhouse_sync.member_role_title_drift_proposals',
@@ -378,9 +387,15 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'src/lib/admin/view-access-catalog.ts',
       'src/lib/tenant/access.ts',
       'src/lib/tenant/authorization.ts',
-      'src/lib/tenant/role-route-mapping.ts'
+      'src/lib/tenant/role-route-mapping.ts',
+
+      // TASK-1631 — external identity binding foundation (EPIC-044 U04).
+      'src/lib/identity/external-access/**',
+      'src/app/api/admin/identity/external-access/**',
+      'src/app/api/platform/ecosystem/identity/**',
+      'src/lib/api-platform/resources/ecosystem-identity-binding.ts'
     ],
-    expectedSignalKinds: ['incident', 'drift', 'data_quality'],
+    expectedSignalKinds: ['incident', 'drift', 'data_quality', 'runtime'],
     incidentDomainTag: 'identity'
   },
   {

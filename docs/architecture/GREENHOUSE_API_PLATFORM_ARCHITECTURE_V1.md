@@ -49,6 +49,38 @@ Runtime: capabilities y schema vivos desde el 2026-08-19; Application 360 es el 
 
 ---
 
+## Delta 2026-09-04 — el lane ecosystem que resuelve PERSONAS para el gateway, `internal`-only (TASK-1631)
+
+`GET /api/platform/ecosystem/identity/binding?environment=<id>&subject=<sub>[&clientId=<azp>]` (+
+`externalScopeType=other&externalScopeId=efeonce-mcp-gateway` del binding sister-platform del gateway). routeKey
+`platform.ecosystem.identity.binding`, sobre `runEcosystemReadRoute`; payload helper en
+`src/lib/api-platform/resources/ecosystem-identity-binding.ts`. Es el reader con el que el gateway MCP
+(`TASK-1831`) convierte un token de un issuer externo —o del emisor propio de Efeonce— en "qué persona, en
+nombre de qué organización cliente, con qué capabilities": el gateway valida el token; Greenhouse decide la
+autoridad.
+
+- **Sólo bindings `internal`**: para cualquier otro binding la ruta responde `404` anti-oráculo (mismo patrón
+  que `mcp/skills` con `audience: internal`). Resolver personas es una capacidad del gateway, no de un cliente.
+- **Params**: `environment` + `subject` obligatorios (faltantes ⇒ `400 bad_request`; formato inválido ⇒ `400`
+  con `details`); `clientId` opcional y sólo se registra en el log de denegaciones — **nunca** es llave de
+  resolución (contrato `Slice 0 gateway authorization-context` del ADR: la persona resuelve por
+  `(environment, subject)`; `clientId` ausente significa ausente).
+- **Respuesta** = passthrough de `resolveExternalAccess` —
+  `{ outcome, environmentId, issuerClass, profileId, memberships[{ bindingId, organizationId, externalOrganizationRef, grantsVersion, grants[], designatedAdmin }], resolvedAt }`
+  — más `cacheTtlSeconds: 60`; `Cache-Control: private, no-store`. Cero lógica de dominio en el lane. La
+  respuesta nunca incluye el subject ni un email: el gateway ya tiene el token.
+- **Outcomes**: `bound` \| `unbound` \| `revoked` \| `environment_inactive` \| `profile_inactive`. Sólo `bound`
+  autoriza; el gateway compara `grantsVersion` por **igualdad estricta** con el claim `gv` del token y cachea la
+  resolución ≤ 60 s. Toda denegación queda en `greenhouse_core.external_access_resolution_log` (subject
+  hasheado) y alimenta las señales `identity.external_binding.*`.
+- **No hay command en este lane**: las escrituras del dominio (bind, grant, invitar, revocar) viven en el lane
+  admin `/api/admin/identity/external-access/**` con capability dedicada por command;
+  `acceptExternalInvitation` la ejecuta el auth-server in-process (`TASK-1830`) y no tiene ruta pública todavía.
+  Invalidación push de `grantsVersion` hacia el gateway = `TASK-1831`.
+
+Contrato completo: [`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md)
+§`Slice 1 binding foundation — applied`.
+
 ## Delta 2026-09-02 — la lane de manuales de uso MCP: el lane sirve documentación, no sólo datos (TASK-1804)
 
 `GET /api/platform/ecosystem/mcp/skills` (catálogo: `skills[] {name, description, audience, appliesTo, uri}` +

@@ -83,6 +83,10 @@ If rollback, watchdog, Azure, Vercel, or HubSpot is involved, also read:
 - **NUNCA prender un `*_ENABLED` en Production sin verificar que el código que lo LEE está en `main`.** **Producción sirve `main`** — no `develop`, no tu working tree: `git show origin/main:<archivo> | grep <FLAG>`. Si no está, el flag no se prende: se promueve primero. El caso sutil y real: el flag puede existir en `main` desde una task anterior y aun así faltar el comportamiento **nuevo** que otra task le agregó (una credencial, un header, un adapter). 🔴 **`vercel env ls` lista PRESENCIA, NUNCA el VALOR**: una var presente en Production puede estar en `false`. Para confirmar un flip hay que hacer `vercel env pull <tmp> --environment=production --scope efeonce-7670142f` y leer el valor; `env ls` sólo sirve para detectar el `env add` que no llegó. Desde 2026-09-01 `pnpm flags:audit` hace ese pull y **avisa cuando la fila del ledger dice `prod: OFF` y el valor live es `true`** — el drift que hace que un agente lea «rollout pendiente» sobre algo que lleva meses vivo y re-ejecute trabajo hecho (24 hallazgos al medirlo; warning a propósito, no error). Además `pnpm flags:audit` **falla** si un flag está ON en Production sin su código lector en `origin/main`, y **avisa** si ese código DIFIERE entre `main` y la rama de trabajo. **Correr un script con las env vars de producción NO es una prueba de producción**: usa tus credenciales, tu red y tu código. Con semántica **fail-closed** un flag mal prendido no degrada: saca usuarios reales. Caso fuente 2026-08-11 (`ISSUE-150`): `ASSET_MALWARE_SCAN_ENABLED` prendido con el adapter autenticado sólo en `develop` → 403 del scanner y 5 CV de candidatos reales en cuarentena durante 89 minutos. **Desenlace (`ISSUE-150` resuelta 2026-08-12):** el caso tuvo una SEGUNDA causa — producción corre `GCP_AUTH_PREFERENCE=service_account_key` (TASK-800) y el resolver de ID tokens no tenía esa rama; staging no la mostró porque usa WIF. Una prueba de credencial vale sólo para la RAMA de credencial que ejercita: si los environments difieren en `GCP_AUTH_PREFERENCE`, el gate de staging NO cubre producción. Verificación canónica antes del flip de todo flag que dependa de una credencial de runtime: correr el diagnóstico por-runtime EN el runtime destino — para el scanner, `GET /api/internal/health/scanner-auth?probe=scan` (reporta `flagEnabled`, `credentialPlan`, `mint.ok`, `probe.ok`; nunca el token); patrón replicable para cualquier flag credencial-dependiente.
 - **SIEMPRE revisar `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` (§ Pendientes de acción) al planear Y al cerrar un paso a producción.** Una feature `code-complete` mergeada a `main` queda **invisible** en prod si su flag `*_ENABLED` (default OFF) no se prende explícitamente — a veces además requiere su migración aplicada a prod (vía este release) y/o redeploy del ops-worker. El deploy del código NO prende flags. Qué flags prender con este release se lee del ledger, no de la memoria; tras prenderlos, actualizar el snapshot del ledger. **NUNCA** declarar un release `released` dejando un flag que debía prenderse en este release sin prender (queda como `degraded` o pendiente documentado).
 
+- **NUNCA dispatchar `production-release.yml` sin listar antes los runs del orquestador** (delta 2026-09-03): `gh run list --workflow=production-release.yml --limit 3 --json databaseId,status,headSha,createdAt`. Si existe un run `queued|pending|in_progress|waiting` para el mismo SHA, NO se dispatcha ni se cancela: se sigue ese run (approval, verificación, watchdog, ledgers). `ListAgents` sólo ve sesiones Claude — Codex no aparece —, así que ese comando es la única detección cross-agente posible. Caso `a824d073a5fb`: Codex dispatchó `33793141529` a las 18:52:58Z y Claude `33793232779` a las 18:53:54Z para el mismo SHA sin saberlo; el segundo quedó `pending` por el grupo `production-release-<sha>`.
+- **NUNCA cancelar un run del orquestador mientras exista otro run o manifest activo del mismo SHA.** `src/lib/release/github-webhook-reconciler.ts` → `findReleaseMatch` empareja PRIMERO por `target_sha` (manifest activo primero) y sólo después por `workflow_run_id`; ese fallback es hoy inalcanzable porque nada escribe `release_manifests.workflow_runs` (`[]` en los tres manifests del caso). Un `workflow_run.cancelled` del duplicado aborta el manifest ajeno: a las 19:04:35Z el cancel de `33793232779` abortó el attempt 1 (`a824d073a5fb-41320325`, `matchedBy: target_sha`) cuando el run de Codex ya había desplegado los 4 workers y pasado health; el job final «Transition → released» falló porque `aborted` es terminal. Un duplicado `pending` se deja morir por concurrencia, o se cancela SOLO cuando el manifest del run dueño ya está en estado terminal. Fix de raíz (registro del run en el manifest + matching por run ID + test del caso): `TASK-1815`.
+- **Si el operador designa a otra sesión para llevar el release, retirarse ANTES de aprobar gates o dispatchar, nunca después:** no aprobar el gate del run ajeno «creyéndolo el reintento único», cancelar sólo lo propio y sólo cuando no quede manifest ajeno activo, y dejar el retiro escrito (commit, Handoff o ledger). Caso 2026-09-03: el retiro de Claude quedó en `587179533`; el intento único `33795564223` (attempt 3, un coordinador) cerró `released` a las 19:30:49Z.
+
 ### AXIS private package release boundary
 
 AXIS package authentication is a **build-time** concern. `NPM_RC`, GitHub Packages
@@ -121,12 +125,33 @@ legacy credential until the production build and runtime evidence are green. Aft
 replacement still builds a private package and record the legacy disable/revocation result without exposing
 either credential.
 
+## Coordinación de intentos y recuperación con eventos
+
+- Un coordinador por release. Antes de merge/dispatch/approval/cancelación, lee los runs existentes,
+  el manifest y sus `workflow_runs`; al retomar otra sesión conserva SHA, run ID y release ID.
+- **No canceles un duplicado como limpieza inocua:** el reconciler vigente prioriza `target_sha`
+  antes de run ID y puede abortar el manifest del intento correcto. La concurrency group no evita
+  webhooks tardíos. Este defecto sigue pendiente; operación serial es mitigación, no corrección.
+- Tras cancelaciones, verifica conclusiones terminales y procesamiento de sus webhooks/inbox antes
+  del próximo dispatch. Relee el manifest. `aborted` es terminal: nunca SQL ni retry del job final
+  contra ese manifest; crea el nuevo intento por el orquestador con preflight válido.
+- `completed/cancelled` no es éxito ni prueba de fallo Bicep/proveedor. Lee jobs, anotaciones y actor;
+  atribuye cada acción al run y coordinador verificados. Runtime sano no sustituye manifest cerrado.
+- Si una recuperación emite eventos, verifica antes la guarda en todos los runtimes consumidores
+  activos (incluidos Vercel y worker cuando ambos la ejecutan). Después, verifica entrega y proyección
+  de los eventos exactos y compara los datos protegidos; un readback inmediato no cubre una regresión
+  asíncrona. Recuperación aplicada y release cerrado se reportan por separado.
+
+Procedimiento dueño: `docs/operations/runbooks/production-release.md` §0.1. Incidente y evidencia:
+`docs/operations/PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md` §16. No repitas cancelaciones ni recuperaciones
+por una nota histórica; consulta estado actual y la clave de idempotencia.
+
 ## Canonical Release Path
 
 The normal release path is:
 
 0. Start an agent E2E release timer and prepare the timing-ledger row. Reading, review, analysis and preparation count.
-1. Confirm current branch, remotes, and dirty worktree.
+1. Confirm current branch, remotes, dirty worktree, coordinator and existing orchestrator/manifest. Follow the existing attempt when one is active.
 2. Confirm `develop` is green and no unrelated local changes will be included.
 3. Run or inspect release preflight:
    - local exploratory: `pnpm release:preflight --target-sha=<sha> --target-branch=main`
@@ -175,7 +200,7 @@ gh workflow run production-release.yml \
    - preflight
    - record-started
    - approval-gate
-   - 4 Cloud Run workers via `workflow_call`
+   - 5 Cloud Run services via `workflow_call` (4 workers + `auth-server`, TASK-1828)
    - Azure gated jobs
    - Vercel production READY
    - `/api/auth/health`
@@ -201,6 +226,7 @@ pnpm release:workers --expected-sha=<target_sha>
    - `commercial-cost-worker` in `us-east4`
    - `ico-batch-worker` in `us-east4`
    - `hubspot-greenhouse-integration` in `us-central1`
+   - `auth-server` in `us-east4` (TASK-1828 / EPIC-044 — authorization server propio; `AUTH_SERVER_ENABLED` default `true` en `deploy.sh` desde 2026-09-04; producción lo recibe con el próximo release)
    Si el wrapper marca un SHA distinto, dice «NO es drift automáticamente: ver runbook §4.1». Lo que
    decide si ese no-op es legítimo es un **diff de árbol completo, sin `--`** — no el skip del
    change-gate, que sólo habla de las rutas declaradas (anti-patrón #4):
@@ -212,7 +238,7 @@ git diff --name-only <cloud_run_git_sha> <target_sha>   # vacío ⇒ skip legít
    For AXIS consumers, also verify the active revision/image digest and that the deployed artifact does
    not contain `.npmrc`, the package token, or an unscoped registry credential.
 10. **Prender los flags pendientes de este release — en TODOS los runtimes, no sólo Vercel.** Revisar `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` → `§ Pendientes de acción`. Por cada feature `code-complete` cuyo flip estaba gated a este release:
-    - **Paso 0 obligatorio — mapear dónde se LEE el flag:** `grep -rn "<FLAG>" src/ services/ | grep -v __tests__`. Hay **5 runtimes con env vars independientes**: Vercel (app Next.js) + 4 Cloud Run (`ops-worker`, `commercial-cost-worker`, `ico-batch-worker`, `hubspot-greenhouse-integration`). Prenderlo en uno **NO** lo prende en los otros. **Heurística:** si gatea algo **async** (email, projection reactiva, consumer del outbox, cron de Cloud Scheduler, materializer) vive en el **`ops-worker`, NO en Vercel** — prenderlo en Vercel no hace nada; si gatea una ruta/superficie visible vive en Vercel; puede vivir en **ambos**.
+    - **Paso 0 obligatorio — mapear dónde se LEE el flag:** `grep -rn "<FLAG>" src/ services/ | grep -v __tests__`. Hay **6 runtimes con env vars independientes** (5 hasta TASK-1828): Vercel (app Next.js) + 5 Cloud Run (`ops-worker`, `commercial-cost-worker`, `ico-batch-worker`, `hubspot-greenhouse-integration`, `auth-server` — sus `AUTH_SERVER_*` viven sólo en `services/auth-server/deploy.sh`). Prenderlo en uno **NO** lo prende en los otros. **Heurística:** si gatea algo **async** (email, projection reactiva, consumer del outbox, cron de Cloud Scheduler, materializer) vive en el **`ops-worker`, NO en Vercel** — prenderlo en Vercel no hace nada; si gatea una ruta/superficie visible vive en Vercel; puede vivir en **ambos**.
     - **Paso 0.5 obligatorio — confirmar que el código lector está en `main`:** `git show origin/main:<archivo> | grep <FLAG>` por cada archivo del mapeo. Producción sirve `main`; un flag ON sobre código ausente (o sobre una versión vieja del lector) es fail-closed esperando gente. `pnpm flags:audit` lo chequea, pero hazlo también a mano antes de prender. Ver la hard rule de `ISSUE-150`.
     - **Aplicar en cada runtime del mapeo:** Vercel → `vercel env add <FLAG> Production` + **redeploy obligatorio** (Vercel **congela las env vars al crear el build**: un flag agregado después del build productivo del release no existe para el runtime hasta que hay un deployment nuevo — caso 2026-08-06, `GROWTH_SEO_ENABLED` requirió `dpl_GyGkdEQQTk65qkCs1S3TEH6Jquy9`). Si el flag se puede prender **antes** del merge del PR, el build del release lo hornea y el redeploy no existe. Cloud Run → **los DOS pasos**: (a) declarar el flag en `services/<worker>/deploy.sh` (SoT; esos scripts usan `--set-env-vars` **destructivo**, que borra cualquier var agregada out-of-band) y (b) `gcloud run services update <svc> --region <us-east4|us-central1> --project efeonce-group --update-env-vars <FLAG>=true` para efecto inmediato. Hacer sólo (b) = el flag desaparece en el próximo deploy del worker, en silencio.
     - **Verificar en el deploy/revisión ACTIVO** (`vercel env ls` · `gcloud run revisions describe <rev> --format="json(spec.containers[0].env)"`) **y ejercitar el flujo real** — que la var exista ≠ que el consumer funcione. En Vercel, **confirmar cada flag con `vercel env ls | grep <FLAG>` filtrando por environment**: un `env add` fallido **no siempre es evidente en la salida** (sobre todo en batch, donde el script suele imprimir un `✗ falló` sin el mensaje de la API). Ver gotcha #14.

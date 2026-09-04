@@ -1,0 +1,16 @@
+{
+  "page_size_mm": [210, 297],
+  "size_tolerance_mm": 0.5,
+  "rotation": 0,
+  "metadata": {"author": "Efeonce"},
+  "require_extractable_text": true,
+  "require_embedded_fonts": true,
+  "require_language": true,
+  "require_structure": true,
+  "require_outline": true,
+  "each_page_text": [],
+  "required_text": [],
+  "exact_occurrences": {},
+  "ordered_text": [],
+  "required_uris": ["https://efeoncepro.com"]
+}

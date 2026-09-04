@@ -2,10 +2,87 @@
 
 > Spec canónica del `Reliability Control Plane` de Greenhouse EO. Define el registry por módulo, el modelo unificado de señales, el contrato de evidencia y cómo `Admin Center`, `Ops Health` y `Cloud & Integrations` consumen la lectura consolidada sin duplicar fuentes.
 >
-> Versión: `1.18`
+> Versión: `1.21`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-09-03` por TASK-1349 (3 signals de deriva de salida bajo el módulo `identity`: `hr.offboarding.unresolved_exit_signal`, `hr.offboarding.executed_member_still_active`, `workforce.offboarding.deprovisioned_member_without_case`)
+> Última actualización: `2026-09-04` por TASK-1829 (3 signals `incident` de la superficie OAuth del emisor propio bajo el módulo `identity`: `auth.oauth.code_reuse_detected`, `auth.oauth.refresh_reuse_detected`, `auth.oauth.cimd_rejected`; antes ese mismo día TASK-1828 agregó `auth.issuer.jwks_unreachable` + `auth.signing_keys.lifecycle` y TASK-1631 las 4 de `identity.external_binding.*`)
+
+## Delta 2026-09-04 — TASK-1829: 3 signals de la superficie OAuth del emisor propio (`auth.oauth.*`)
+
+Tres señales nuevas en el **mismo reader** de TASK-1828
+([`auth-server-signals.ts`](../../src/lib/reliability/queries/auth-server-signals.ts), `getAuthServerSignals()`),
+bajo `moduleKey='identity'`, `kind='incident'`, ventana **24 h** sobre `greenhouse_auth.oauth_audit_events`
+(append-only; cada evento del protocolo OAuth escribe ahí con IP/UA/sujeto hasheados), **steady = 0** en las tres.
+Observan la superficie OAuth de `auth.efeonce.org` (TASK-1829, `code complete, rollout pendiente`; flag
+`AUTH_SERVER_OAUTH_ENABLED=false` en `services/auth-server/deploy.sh`): con el flag OFF no hay eventos y las tres
+quedan en steady, lo cual **no** es evidencia de salud sino de que el emisor no emite.
+
+| `signalId` | `kind` | Qué mide | Severidad | Steady |
+| --- | --- | --- | --- | --- |
+| `auth.oauth.code_reuse_detected` | `incident` | Eventos `code_reuse`: un authorization code presentado dos veces (el store lo consume una sola vez bajo `SELECT … FOR UPDATE`; el segundo intento revoca la familia `grant_id` completa) | ≥ 1 en 24 h → `error` | **0** |
+| `auth.oauth.refresh_reuse_detected` | `incident` | Eventos `refresh_reuse`: refresh ya rotado, revocado o presentado por otro cliente (RFC 6819 §5.2.2.3); la familia ya quedó revocada, la señal pide investigar el cliente | ≥ 1 en 24 h → `error` | **0** |
+| `auth.oauth.cimd_rejected` | `incident` | Eventos `cimd_fetch` con outcome `rejected`: documento CIMD inválido, host en rango privado (anti-SSRF), timeout 3 s o > 64 KB; el rechazo se cachea 15 min | ≥ 1 en 24 h → `warning` | **0** |
+
+Sin contadores extra ni tabla propia: el rate limit del emisor (`token` 60/IP · 120/cliente, `register` 10/IP)
+también cuenta sobre `oauth_audit_events` (patrón `party-endpoint-rate-limit.ts`) y sus `429 slow_down` quedan
+como eventos `rate_limited`, sin señal dedicada en V1. Recuperación: revocar consentimiento/familia por command
+(`revokeClientConsent`, `POST /api/admin/auth-server/consents/revoke`) o apagar el flag (rollback < 5 min);
+**nunca** `DELETE`/`UPDATE` manual sobre codes, tokens o consents. Contrato:
+[`EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`](EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md) §8; runbook
+`docs/operations/runbooks/auth-server.md` §`OAuth`. Task dueña: `TASK-1829`.
+
+## Delta 2026-09-04 — TASK-1828: 2 signals del emisor propio de Efeonce (`auth.issuer.jwks_unreachable`, `auth.signing_keys.lifecycle`)
+
+Dos señales nuevas, un solo reader
+[`auth-server-signals.ts`](../../src/lib/reliability/queries/auth-server-signals.ts), bajo
+`moduleKey='identity'` (rollup `Identity & Access`), **steady = `ok`** en ambas. Observan el authorization
+server propio de Efeonce (EPIC-044, Cloud Run `auth-server` en `us-east4`, JWKS en
+`https://auth.efeonce.org/.well-known/jwks.json`, llaves en Cloud KMS HSM con registry
+`greenhouse_auth.signing_keys`). Compuestas en `get-reliability-overview.ts` como `authServerSignals`; el
+módulo `identity` del registry declara `runtime` entre sus `expectedSignalKinds`. Si PostgreSQL o el fetch
+fallan, la señal degrada con `captureWithDomain('identity', ...)` y nunca lanza hacia el agregador.
+
+| `signalId` | `kind` | Qué mide | Severidad | Steady |
+| --- | --- | --- | --- | --- |
+| `auth.issuer.jwks_unreachable` | `runtime` | Hace `GET` al JWKS público del emisor y compara los `kid` publicados con las llaves `active` + `retiring` del registry. Es la vista **desde afuera** del front door compartido con el gateway MCP: si el LB, el certificado `efeonce-auth-server-cert`, el flag `AUTH_SERVER_ENABLED` o la caché de 60 s del servicio se desalinean, el gateway (TASK-1831) no podría verificar tokens de este issuer | `not_configured` mientras Vercel no declare `AUTH_SERVER_JWKS_URL` (el host aún no está cableado en el consumidor); `200` + `kid` iguales → `ok`; HTTP ≠ 200, `kid` faltantes/inesperados o fetch fallido → `error` | **`ok`** (`not_configured` hasta cablear la env var) |
+| `auth.signing_keys.lifecycle` | `data_quality` | Estado del registry de llaves de firma: exige exactamente una llave `active` y vigila que ninguna `retiring` sobreviva a su ventana | `1 active` y sin `retiring` viejas → `ok`; `retiring` con más de 7 días → `warning`; `0` o `>1 active`, o tabla ilegible → `error` | **`ok`** |
+
+Los fallos de firma (KMS) **no** tienen contador propio (`auth.kms.sign_failures` no existe como señal): se
+leen como incidentes Sentry de `identity` con tags `component=auth-server` y `check=kms`, por el path
+canónico de attribution (§`Sentry incident → module attribution`). Recuperación: `pnpm auth-server:rotate-key`
+(`--status`, `--retire <kid>`, `--register`) y redeploy vía `services/auth-server/deploy.sh`; **nunca** SQL
+manual sobre `greenhouse_auth.signing_keys`. Runbook: `docs/operations/runbooks/auth-server.md`. ADR:
+[`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md).
+Flag: `AUTH_SERVER_ENABLED` (Cloud Run, SoT `deploy.sh`; ledger `FEATURE_FLAG_STATE_LEDGER.md`). Task dueña:
+`TASK-1828`.
+
+## Delta 2026-09-04 — TASK-1631: 4 signals del binding de identidad externa (`identity.external_binding.*`)
+
+Cuatro señales nuevas, un solo reader
+[`external-identity-binding-signals.ts`](../../src/lib/reliability/queries/external-identity-binding-signals.ts),
+bajo `moduleKey='identity'` (rollup `Identity & Access`), **steady = 0** en las cuatro. Observan el grafo de
+acceso externo de EPIC-044 U04 (`greenhouse_core.external_*` + los `identity_profile_source_links` con
+`source_system LIKE 'external_idp:%'`), que decide si una persona autenticada por un IdP externo puede operar
+en nombre de una organización cliente y con qué capabilities. Compuestas en `get-reliability-overview.ts`
+como `externalIdentityBinding`; el módulo `identity` del registry declara sus APIs, dependencias y
+`filesOwned`. Si PostgreSQL falla, cada señal degrada a `unknown` + `captureWithDomain('identity', ...)` y
+nunca lanza hacia el agregador.
+
+| `signalId` | `kind` | Qué mide | Severidad | Steady |
+| --- | --- | --- | --- | --- |
+| `identity.external_binding.unbound_dispatch_attempt` | `incident` | Denegaciones del resolver (`external_access_resolution_log`, `outcome` ∈ `unbound`, `environment_inactive`, `profile_inactive`) en 24 h: alguien llegó al gateway con un token válido que Greenhouse no reconoce como nadie — cohorte mal enrolada, subject rotado o environment apagado con clientes vivos | `0 → ok`; `1-19 → warning`; `≥20 → error` | **0** (un `pnpm identity:external-access:smoke -- --apply` deja 4 denials → `warning` por 24 h, esperado) |
+| `identity.external_binding.revoked_still_dispatching` | `incident` | Denegaciones `revoked` cuyo `resolved_at` es posterior a `binding.revoked_at + 5 min` en 24 h: el cliente sigue intentando después de la ventana de caché del gateway (TTL 60 s) — o el gateway no refrescó, o hay un consumer que ignora la revocación | `0 → ok`; `1-9 → warning`; `≥10 → error` | **0** |
+| `identity.external_binding.subject_collision` | `data_quality` | Un subject `external_idp:*` que apunta a más de un `identity_profile` (activos o no) ∪ un profile con más de un subject activo en el mismo environment. El índice único parcial impide el primer caso con links activos; la señal cubre lo que el índice no ve (links inactivos, merges) | `0 → ok`; `≥1 → error` | **0** |
+| `identity.external_binding.orphan_grant` | `drift` | Grants `active` cuyo binding está `revoked` o cuyo environment está `suspended`/`retired`: autoridad que sobrevivió a la revocación de su contenedor — sólo puede aparecer por escritura fuera de `revokeExternalAccess` | `0 → ok`; `≥1 → error` | **0** |
+
+Recuperación: siempre por los commands canónicos de `src/lib/identity/external-access/commands.ts`
+(`revokeExternalAccess`, `issueExternalInvitation` con `reissue: true`), vía `/api/admin/identity/external-access/**`
+— **nunca** SQL manual sobre `external_*`, que es justamente lo que `orphan_grant` detecta. Diagnóstico:
+`pnpm identity:external-access:smoke` (read-only = readers + estas 4 señales). Contrato:
+[`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md)
+§`Slice 1 binding foundation — applied` + invariantes en
+[`agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md`](agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md)
+§`External identity binding`. Sin flag nuevo. Task dueña: `TASK-1631`.
 
 ## Delta 2026-09-03 — TASK-1349: 3 signals de deriva de salida (offboarding ↔ nómina ↔ acceso)
 

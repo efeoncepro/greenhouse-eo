@@ -1,5 +1,14 @@
 # Greenhouse Public Website Landing Control Plane Architecture V1
 
+## Delta 2026-09-04 — `platform.public_site.bridge.inspect` sin seed en `capabilities_registry` (cerrado)
+
+La capability del bridge inspection API (commit `ece391362`, 2026-06-14, sin task asociada) se declaró en
+`src/config/entitlements-catalog.ts` sin su fila en `greenhouse_core.capabilities_registry`. Lo detectó el test live
+`src/lib/capabilities-registry/parity.live.test.ts`; el seed lo aplica
+`migrations/20260904112408574_capabilities-registry-parity-backfill.sql` (aplicada 2026-09-04) junto con otras diez
+capabilities de Growth/Commercial/Public site. Sin cambio de comportamiento: `can()` resolvía por el catálogo TS.
+
+
 > Tipo de documento: arquitectura de producto/plataforma
 > Status: Proposed for WordPress bridge/content-factory rail; frontend runtime target recalibrated by `GREENHOUSE_PUBLIC_SITE_ASTRO_RUNTIME_STRATEGY_DECISION_V1.md`
 > Version: V1

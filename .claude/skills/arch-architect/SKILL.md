@@ -32,6 +32,16 @@ This overlay pins the Greenhouse decisions so the global skill's "boring tech pr
 - **`docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`** — Full API parity (UI is a client of governed contracts; Duncan Lennox / HubSpot principle). See pinned decision #16.
 - **`docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`** — EPIC-026 contract for continuing product work extraction-ready without pre-creating target apps/packages.
 
+## Workforce reentry / member identity transaction
+
+For reentry, offboarding recovery or member/source-link atomicity, load
+`docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md`,
+`docs/architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` and
+`docs/operations/runbooks/workforce-reentry-recovery.md`; compose with
+`greenhouse-payroll-auditor` and `greenhouse-talent-people-operator`.
+Keep availability, access, legal episodes and payments separate. Verify event consumption and protected
+history after recovery; a member event must not reopen a terminated employment relationship.
+
 ## Compose with the `astro` skill (Astro / static-site / efeonce-think work)
 
 When a design or review touches an **Astro** property — `efeonce-think` (the AI
@@ -301,6 +311,7 @@ When designing in this repo, the 3-most-relevant-patterns step (from the global 
 - **NEVER** delete data. Use supersede / archive / soft-tombstone with explicit retention.
 - **NEVER** invoke Sentry directly when a domain rollup exists. Use `captureWithDomain`.
 - **NEVER** invent primitives the canonized patterns inventory already covers.
+- **NEVER** propose a second token issuer, an OAuth vendor, or the MCP gateway minting tokens: the native authorization server already exists as a runtime (`TASK-1828`, `services/auth-server`, `auth.efeonce.org`) and is the only place tokens get minted — read `docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md` + `TASK-1829` before any OAuth/CIMD/consent design.
 - **SIEMPRE** crear el TASK-### file (via `greenhouse-task-planner`) cuando un spec requiere implementación.
 - **SIEMPRE** declarar `Domain boundary` en el spec.
 - **SIEMPRE** scoring 4-pilar explícito.

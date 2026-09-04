@@ -70,7 +70,7 @@ Reglas obligatorias:
 
 - `docs/documentation/hr/payroll-compliance-exports-chile.md`
 - `docs/tasks/in-progress/TASK-812-compliance-exports-chile-previred-planilla-lre-libro.md`
-- `docs/tasks/to-do/TASK-731-payroll-pre-close-validator.md`
+- `docs/tasks/to-do/TASK-1820-payroll-stage-preflight-and-payment-readiness.md`
 - `.codex/skills/greenhouse-payroll-auditor/SKILL.md`
 
 ## Dependencies & Impact
@@ -88,7 +88,7 @@ Reglas obligatorias:
 
 - Cierre mensual Payroll Chile con menor riesgo de upload manual fallido.
 - Futuras extensiones de movimientos de personal y mutualidades.
-- `TASK-731` Payroll Pre-Close Validator, que puede consumir el readiness Previred como check especializado.
+- `TASK-1820` Payroll Pre-Close Validator, que puede consumir el readiness Previred como check especializado.
 - Reliability subsystem "Payroll Data Quality" y signal `payroll.compliance_exports.artifact_drift`.
 
 ### Files owned
@@ -194,7 +194,7 @@ Reglas obligatorias:
 ### Slice 5 — Reliability Signal & Pre-Close Integration
 
 - Agregar o extender signal para detectar periodos exportables con Previred readiness critical/warn.
-- Integrar el check como input de `TASK-731` si esa task ya existe/avanza; si no, dejar helper consumible.
+- Integrar el check como input de `TASK-1820` si esa task ya existe/avanza; si no, dejar helper consumible.
 - Definir steady state:
   - `ok`: todos los periodos aprobados/exportables tienen readiness ok o warnings aceptados;
   - `warning`: faltan datos no bloqueantes o warnings conocidas;
@@ -215,6 +215,28 @@ Reglas obligatorias:
 - Implementar todos los movimientos de personal. Esta task debe modelar readiness/contrato; la implementacion completa de movimientos puede derivarse.
 - Implementar mutualidades completas si no existe profile/codigo/tasa soportada.
 - Cambiar LRE salvo que el mapping compartido obligue a ajustar contrato documental.
+
+## Rollout Plan & Risk Matrix
+
+Contrato de ejecución actualizado al cambiar el consumer a TASK-1820. Este cambio documental no ejecuta el
+plan ni certifica que las fuentes/estados históricos de mayo sigan vigentes.
+
+- Orden: fixtures sanitizadas de Slice 2 → helper/mapping de Slices 1/3 → compatibilidad de metadata de Slice 4 → integración/señales de Slice 5 → documentación y verificación de Slice 6.
+- Riesgo principal: bloquear un export válido o permitir uno incompleto. Comparar clasificación y bytes del
+  export con controles aceptados y negativos usando el mismo snapshot; no certificar validación del proveedor
+  mediante un test local. Datos o permisos ausentes quedan no verificables, nunca aceptados.
+- Metadata/eventos nuevos deben ser aditivos y tolerados por consumers anteriores. No introducir schema ni
+  flag sin inventario y decisión en el plan; si se necesita migración, verificarla antes de desplegar writers.
+- Rollback Slices 1/3/5: retirar el adapter nuevo o revertir código compatible; no habilitar un export conocido
+  como inválido para restaurar disponibilidad. Conservar readers y diagnóstico durante contención.
+- Rollback Slice 4: conservar artefactos y evidencia; no borrar estados de validación observados. Revertir sólo
+  el writer compatible y probar que los consumers soportan ambos formatos antes del cutover.
+- Verificación: fixtures locales → preview con datos autorizados → readback de permisos/schema/artefacto en
+  runtime → promoción autorizada. Staging comparte datos con producción; no upload automático a Previred.
+- Coordinación: TASK-1820 consume hechos del helper, TASK-940 conserva enforcement relacionado; ningún
+  consumer crea otra fórmula. Registrar tiempo real del ensayo de rollback y actualizar manual/arquitectura
+  antes de declarar cierre. Cualquier upload manual real requiere autorización propia y evidencia recibida.
+
 
 ## Detailed Spec
 
@@ -307,3 +329,7 @@ Los fixtures derivados de CSV Previred deben sanitizar PII cuando sea razonable,
 
 - Debe resolverse durante Discovery si el estado `passed_with_warnings` vive en `validation_status` formal de `compliance_export_artifacts` o en `totals_json`/metadata para evitar migracion innecesaria.
 - Debe resolverse durante Discovery si los fixtures CSV reales se versionan completos sanitizados o como estructura normalizada JSON.
+
+## Delta 2026-09-03 — Preflight sucesor
+
+La integración apunta a TASK-1820 (EPIC-043), sucesora de TASK-731 cerrada por supersesión documental. El helper especializado PREVIRED conserva este owner; la nueva task compone sus hechos sin cron ni política divergente.

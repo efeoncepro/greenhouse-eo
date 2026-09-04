@@ -1,0 +1,7 @@
+interface:
+  display_name: "Report Studio"
+  short_description: "Informes con evidencia, diseño editorial y QA PDF"
+  brand_color: "#023C70"
+  default_prompt: "Usa $report-studio para crear un informe completo con evidencia, identidad de marca y PDF final revisado."
+policy:
+  allow_implicit_invocation: true

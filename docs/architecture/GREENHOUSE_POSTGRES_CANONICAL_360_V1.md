@@ -49,7 +49,7 @@ Columnas nuevas relevantes:
 
 Normalizacion de source systems:
 - Funcion `greenhouse_core.canonical_source_system(raw TEXT)` (`IMMUTABLE`, SQL puro) normaliza valores tecnicos a nombres display-friendly
-- Mapping: `azure_ad`/`azure-ad`/`microsoft_sso`/`entra` → `microsoft`, `hubspot`/`hubspot_crm` → `hubspot`, `notion` → `notion`, `google`/`google_oauth`/`google_workspace` → `google`, `deel`/`deel_hr`/`deel_com` → `deel`
+- Mapping: `azure_ad`/`azure-ad`/`microsoft_sso`/`entra` → `microsoft`, `hubspot`/`hubspot_crm` → `hubspot`, `notion` → `notion`, `google`/`google_oauth`/`google_workspace` → `google`, `deel`/`deel_hr`/`deel_com` → `deel`, `external_idp:%` → `external_idp` ((actualizado 2026-09-04, TASK-1631))
 - Sistemas internos (`greenhouse_auth`, `greenhouse_team`) retornan `NULL` → filtrados del array
 - La funcion se usa en el LATERAL join de `link_agg` para producir `linked_systems` limpio y deduplicado
 - Migracion: `20260405180048252_canonical-source-system-function-person360.sql`
@@ -117,6 +117,7 @@ This schema owns:
 - `roles`
 - `user_role_assignments`
 - `entity_source_links`
+- `external_identity_environments`, `external_organization_bindings`, `external_capability_grants`, `external_member_invitations`, `external_identity_audit_log`, `external_access_resolution_log` — binding externo de persona/organizacion (TASK-1631, 2026-09-04)
 
 Rule:
 - shared identities live here first
@@ -243,6 +244,7 @@ Important fields:
 
 Bridge:
 - `greenhouse_core.identity_profile_source_links`
+- Indice unico parcial `identity_profile_source_links_external_idp_subject_uidx` `(source_system, source_object_type, source_object_id) WHERE active AND source_system LIKE 'external_idp:%'`: un subject externo activo apunta a un solo `identity_profile` (TASK-1631, 2026-09-04)
 
 ### Auth Principal
 

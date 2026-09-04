@@ -567,11 +567,11 @@ path desactivaba el member; y `members.active=false` habría borrado elegibilida
 3. **La ejecución es lane-aware** (`member-lifecycle.ts`): `identity_only` no toca compensación, relación ni
    member. Término real: rechaza versiones de compensación con `effective_from > LWD` (409
    `compensation_future_version_conflict`; nunca borra), cierra la vigencia al LWD y, detrás de
-   `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` (OFF), termina la relación legal con la fecha REAL antes de
+   `WORKFORCE_OFFBOARDING_MEMBER_DEACTIVATION_ENABLED` (default OFF; estado operativo en el ledger), comprueba primero reingreso vigente y, si no lo hay, termina la relación legal con la fecha REAL antes de
    marcar `members.active=false`/`status='inactive'`/`assignable=false`, cierra `client_team_assignments` y publica
    `member.deactivated` (`deactivationKind='offboarding_executed'`). El orden relación→member es load-bearing: la
    proyección reactiva `operating_entity_legal_relationship` reacciona a `member.deactivated` y, si encontrara la
-   relación aún activa, la cerraría con `CURRENT_DATE`.
+   relación aún activa, la cerraría con `CURRENT_DATE`. El reingreso devuelve `reentry_detected`: preserva relación actual/member/asignaciones, pero el cierre de compensación histórica ya ocurrió. `reentry-predicates.ts` es compartido con la señal: relación workforce activa o engagement `active|paused|ending`, posterior al LWD, ya iniciado y no vencido (fin inclusivo), por profile o member para engagements.
 4. **`members.active` es disponibilidad actual, no filtro histórico** — decisión dueña en
    `GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md` (Architecture Decision 2026-09-03): el resolver elige el
    caso gobernante por relevancia temporal, sirve `contract_type_snapshot`, detecta reingreso, y una salida sin
@@ -591,8 +591,22 @@ path desactivaba el member; y `members.active=false` habría borrado elegibilida
    (`src/lib/reliability/queries/offboarding-exit-drift.ts`). La última sólo detecta: nadie infiere salida laboral de
    una baja de acceso (TASK-1761 posee el lado Microsoft).
 8. **Recuperación gobernada:** `pnpm workforce:offboarding:recovery` (dry-run por defecto; apply por allowlist
-   `--member`, datos explícitos, readback). Finance no se toca: las obligaciones/gastos generados por error se
+   `--member`, datos explícitos, readback); discovery identifica `reentry_preserved` antes de proponer otro cierre. Para una baja incorrecta **ya aplicada**, el command distinto `restoreOffboardingLifecycleAfterReentry` y su CLI `restore-offboarding-lifecycle.ts` compensan solo disponibilidad/asignaciones con admin vigente, snapshot/hash, locks, idempotencia, audit y outbox atómicos. Exigen una relación posterior activa de la misma entidad legal; no basta un engagement. El consumidor de `member.updated` debe estar corregido y activo en Vercel/worker antes de aplicar, y nunca reabrir employee terminado. Contrato y secuencia: [decisión de recuperación](GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md) + [runbook](../operations/runbooks/workforce-reentry-recovery.md). Finance no se toca: las obligaciones/gastos generados por error se
    concilian con commands de Finance (dependencia registrada; hoy no existe `cancelPaymentObligation`).
+
+### Incidente 2026-09-03 — sujetos sintéticos del live smoke en la pre-nómina
+
+Consecuencia directa de (4): el roster ya no filtra `members.active` universalmente, así que **todo** member inactivo
+con compensación aplicable entra al resolver, incluidos los sujetos que `review-execute.live.test.ts` crea por el
+primitive SCIM. Seis quedaron inactivos con `compensation_versions` abiertas y `hasDecidedExitFact` contaba su caso
+`identity_only` ejecutado como salida decidida → aparecieron como `Colaborador <uuid>` «sin contrato». Corrección
+(`0233f81e7`, PR #220): la política exige lane ≠ `identity_only` (decisión dueña en
+`GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md`, Delta 2026-09-03 (2)); el live test cierra compensación
+(`effective_to = effective_from`) y desactiva usuarios/members en `afterAll`; las 9 versiones abiertas se cerraron
+con `closeCompensationVigencyAtExit` y los 12 sujetos se purgaron con `scripts/workforce/purge-task1349-live-subjects.sql`
+(predicado `display_name LIKE 'TASK-1349 live %' AND primary_email LIKE 't1349-%@efeoncepro.com'`; aborta si el
+conjunto contiene un member no sintético). Regla: un live test que crea sujetos de dominio nunca deja compensación
+ni relación abierta al terminar (`agent-invariants/LIVE_TESTS_AGENT_INVARIANTS.md` §3).
 
 ### Contratos
 
@@ -617,6 +631,4 @@ path desactivaba el member; y `members.active=false` habría borrado elegibilida
 
 ### Estado
 
-Code complete en `develop` (slices 0–4, 2026-09-03). Rollout pendiente: release, flag OFF hasta smoke temporal en
-staging, recovery por allowlist con autorización del operador, UI TASK-1814. ISSUE-117 sigue abierto hasta el cierre
-operativo conjunto.
+El contrato base y las guardas de reingreso están implementados; el estado de flags se consulta en el [ledger](../operations/FEATURE_FLAG_STATE_LEDGER.md), no se infiere del default. La [auditoría Valentina](../audits/payroll/VALENTINA_REHIRE_IDENTITY_RECOVERY_2026-09-03.md) registra reparación aplicada, canary real de consumidores y release cerrado del árbol `a824d073`. El estado de otras personas y de UI TASK-1814 conserva sus propios owners y evidencias; una reparación individual no cierra todos los casos de offboarding.

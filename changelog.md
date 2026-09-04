@@ -7,11 +7,117 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-## 2026-09-03 — Corrección de reingreso y recuperación de disponibilidad (código local, rollout pendiente)
+## 2026-09-04 — TASK-1829 (EPIC-044 U02): superficie OAuth del emisor propio, code complete detrás de flag
 
-Las actualizaciones de member confirman identidad y auditoría de forma transaccional; la proyección legal no reabre relaciones terminadas. Recovery y detector comparten vigencia real de episodios. Comando compensatorio con preview, hash de estado e idempotencia sustituye el SQL puntual. [Decisión y contrato](docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md). Restauración de Valentina espera verificar el consumidor corregido desplegado.
+`auth.efeonce.org` gana su protocolo, detrás de `AUTH_SERVER_OAUTH_ENABLED=false` (`services/auth-server/deploy.sh`):
+metadata RFC 8414 + OIDC con `issuer` idéntico al origen y `client_id_metadata_document_supported`, CIMD como
+registro primario (URL `client_id`, anti-SSRF, cache 24 h + etag), DCR RFC 7591 sólo para clientes públicos,
+clientes confidenciales pre-registrados por command (`pnpm auth-server:register-client` · `POST /api/admin/auth-server/oauth-clients`),
+`authorize` con PKCE S256 obligatorio, consentimiento por (sujeto, cliente, scope) y step-up para escrituras,
+access JWT ES256 de 15 min firmado en KMS HSM (`iss sub aud azp scope gv jti`), refresh opaco rotativo 30/90 d
+con detección de reuso que revoca la familia, revoke RFC 7009, introspect RFC 7662 y `POST /oauth/consent`.
+Siete tablas nuevas en `greenhouse_auth` (aplicadas) y dos capabilities (`identity.auth_client.register`,
+`identity.auth_consent.revoke`, EFEONCE_ADMIN). Las primitives puras del broker sister-platform se extrajeron a
+`src/lib/auth-server/oauth/primitives.ts` sin cambiar su contrato. Tres señales `auth.oauth.*` (steady 0).
+`gv = max(grantsVersion)` de memberships `bound` (TASK-1631); sin binding, `access_denied`. Hasta TASK-1830
+`authorize` responde `login_required`: ningún token para persona real todavía. Contrato:
+[EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1](docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md). Rollout
+pendiente: release del runtime a `main`, fila del emisor en `external_identity_environments`, flag ON en staging.
+
+## 2026-09-04 — Método de informes SEO/AEO y continuidad de Berel
+
+Se incorpora el [modelo de informes para clientes](docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md)
+a las skills SEO/AEO y Berel, espejadas para Claude/Codex: lectura de auditorías y Content Hub, voz de agencia
+que redacta/publica, límites GSC/GA4/DataForSEO, validez de preguntas y probes del Grader y readback Notion/Markdown.
+Se conserva la [auditoría de agosto](docs/audits/seo/BEREL_AUDITORIA_SEO_AEO_AGOSTO_2026.md) como caso fechado.
+El método no implementa las correcciones del Grader ni del sitio; esas acciones siguen pendientes.
+Se añade `report-studio` para Claude/Codex, registrada en router y gate de espejos: fuentes primarias, siete módulos, plantillas, evaluación editorial y preflight PDF con pruebas negativas. Berel conserva 55 páginas A4 con marca/contacto completos, cobertura On-time, gráficos y acabado reproducible; revisión y evidencia en su carpeta de informe. Entrega local, sin envío.
+
+## 2026-09-04 — TASK-1631 (EPIC-044 U04): binding de identidad externa aplicado, commands, API y señales
+
+Migración aditiva aplicada en `greenhouse_core` (environments registry, bindings Account 360, grants provider-neutral con
+`profile_id` opcional, invitaciones con `token_hash`, audit y resolution log append-only, índice único parcial de subjects
+`external_idp:%`) más forward-fix del CHECK `linked_consistent`. Dominio `src/lib/identity/external-access/**`: seis
+commands idempotentes en una transacción (estado + audit + outbox, `grants_version` sube en cada cambio de autoridad) y el
+reader `resolveExternalAccess(environment, subject)` que deniega fail-closed y registra sólo denials. Seis capabilities
+`identity.external_*` (sólo `efeonce_admin`), rutas admin `/api/admin/identity/external-access/**`, lane ecosystem
+`GET /api/platform/ecosystem/identity/binding` para el gateway (TASK-1831) y cuatro señales `identity.external_binding.*`.
+Smoke live `pnpm identity:external-access:smoke` verificó bind → grant → invite → accept → resolve → revoke contra PG real.
+Estado: code complete, rollout pendiente (deploy + señales en `/admin/operations`).
+Barrido documental del mismo día: skills `efeonce-mcp-platform`/`seo-aeo-practice`/`talent`/`growth-cro` (+ espejos), regla
+`.claude/rules/identity-external-access.md`, AGENTS.md, docs de API (OpenAPI + referencia), 18 docs de arquitectura y 10
+manuales/docs funcionales: «fail-closed hasta TASK-1631» pasa a «hasta el emisor + gateway multi-issuer de EPIC-044; el grant
+ya existe». Backfill de paridad `capabilities_registry` (11 capabilities ajenas).
+
+## 2026-09-04 — TASK-1828: runtime del authorization server propio desplegado en staging y publicado en el front door del gateway
+
+Slices 0–2 de `TASK-1828` (EPIC-044): llave ES256 con protección **HSM** en Cloud KMS (`auth-server-es256`, versión 1
+activa) y SA `auth-server@` con permiso de firma sólo sobre esa llave; schema `greenhouse_auth` (`signing_keys` con una
+sola `active` por índice parcial + `signing_key_events` append-only) aplicado; `src/lib/auth-server/keys` (firma vía
+KMS con CRC32C, DER→JOSE, `kid` RFC 7638, verificación local obligatoria, rotación `active→retiring→retired`) con token
+real firmado por el HSM y verificado con el JWKS servido desde PG; `services/auth-server` (node:http, `/healthz`,
+`/readyz`, `/.well-known/jwks.json`, Host allowlist) desplegado en Cloud Run `us-east4` con `AUTH_SERVER_ENABLED=false`;
+`Auth Server Deploy` registrado en `RELEASE_DEPLOY_WORKFLOWS` y cableado en `production-release.yml`; host
+`auth.efeonce.org` publicado como segundo host del LB del gateway (`efeonce-mcp` `6a144a5`: 3 recursos nuevos, 2
+in-place, 0 destruidos; `mcp.efeonce.org` intacto); señales `auth.issuer.jwks_unreachable` y
+`auth.signing_keys.lifecycle` en el control plane; runbook `docs/operations/runbooks/auth-server.md`. Producción del
+emisor queda `code complete, rollout pendiente` (release control plane).
+
+## 2026-09-03 — Globe: pausa reversible del reconciliador externo de tenancy
+
+`ops-globe-tenancy-reconcile` (`efeonce-group/us-east4`) quedó `PAUSED` a las 22:26:05Z, sin eliminar su
+definición ni modificar cron, destino o identidad. Deja de programar llamadas hacia Globe con SQL detenido.
+`services/ops-worker/deploy.sh` declara la pausa deseada localmente; sin commit/push/deploy en esta ejecución,
+la protección frente a futuros despliegues aún requiere promoción. Reinicio y sincronización source/runtime:
+[runbook](docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md).
+TASK-1807 sigue abierta; ahorro posterior al corte pendiente de Billing Export.
+
+## 2026-09-03 — EPIC-044: authorization server propio de Efeonce (ADR aceptado) y siete tasks nuevas
+
+Decisión del operador: Efeonce construye y opera su propio authorization server en `auth.efeonce.org`; no se compra
+un IdP. Nuevo ADR `EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md` (Accepted) supersede la composición WorkOS del
+ADR de federación y conserva sus invariantes, binding y contrato del gateway. `EPIC-044` (`in-progress`) agrupa
+TASK-1626/1631/1813 y crea TASK-1828 (runtime Cloud Run + front door + KMS HSM + JWKS), TASK-1829 (metadata, CIMD, DCR
+compat, PKCE, tokens ES256, refresh, revocación, consentimiento), TASK-1830 (passkeys, magic link, TOTP, recuperación),
+TASK-1831 (gateway multi-issuer `AuthContext`), TASK-1832 (canaries + primera cohorte), TASK-1833 (red-team, pentest,
+rotación, runbooks, privacidad V2) y TASK-1834 (convergencia del login cliente). `TASK-1631` re-alcanzada a binding/grants.
+`DECISIONS_INDEX`, registries y READMEs sincronizados. Delta posterior el mismo día: el emisor se publica como segundo host
+del front door del gateway (sin LB ni Armor nuevos, ≈ USD 15/mes adicionales medidos contra el billing export) —
+ADR §Delta 2026-09-03 y TASK-1828 actualizados.
+
+## 2026-09-03 — TASK-1349: un `identity_only` ejecutado no es hecho de salida; purga de sujetos sintéticos (PR #220)
+
+Incidente «colaboradores fantasma» ~17:50Z: la pre-nómina de septiembre mostró seis `Colaborador <uuid>` «sin
+contrato» — sujetos sintéticos de `review-execute.live.test.ts`, inactivos con compensación abierta, admitidos por el
+roster relajado de Slice 2 y rescatados por `hasDecidedExitFact`, que contaba su caso `identity_only` ejecutado como
+salida decidida. Fix `0233f81e7` (`policy.ts` exige lane ≠ `identity_only`; `policy.test.ts`; el live test cierra
+compensación y desactiva en `afterAll`), en producción con PR #220 (`a824d073a`, manifest released 19:30:49Z). Datos:
+9 compensaciones cerradas con `closeCompensationVigencyAtExit`; 18:37Z purga de los 12 sujetos (253 filas,
+`scripts/workforce/purge-task1349-live-subjects.sql`, predicado sintético explícito; 265→253 members, 0 reales).
+Docs: `LIVE_TESTS_AGENT_INVARIANTS.md` §3 (nunca dejar compensación abierta en un sujeto sintético),
+`PAYROLL_WORKFORCE_AGENT_INVARIANTS.md`, decisión (2) en `GREENHOUSE_WORKFORCE_EXIT_PAYROLL_ELIGIBILITY_V1.md`,
+runbook `offboarding-recovery.md` (readback previo por sujeto, lección Valentina; harness vs commands por `tsx`).
+
+## 2026-09-03 — Contratos y skills de reingreso sincronizados
+
+Arquitectura, invariantes, manuales, documentación funcional y runbooks reflejan compensación bruta/snapshots,
+proporcionales autorizados, identidad longitudinal, recuperación transaccional y verificación de consumidores.
+Skills de Payroll, Talent, Finance, Release, QA y arquitectura actualizadas para Codex/Claude; nuevo espejo
+Finance con gate. Tareas e índices ya no prescriben restaurar Valentina por SQL ni presentan la guarda como
+pendiente de deploy. [Cobertura documental](docs/audits/payroll/VALENTINA_DOCUMENTATION_SKILLS_CLOSURE_2026-09-03.md).
+Sin nuevas mutaciones de datos, flags o release. Prorrateo automático, resolución de ID público en off-cycle,
+UI TASK-1814 y bug de correlación de releases conservan su condición pendiente.
+
+## 2026-09-03 — Corrección de reingreso y recuperación de disponibilidad
+
+Las actualizaciones de member confirman identidad y auditoría de forma transaccional; la proyección legal no reabre relaciones terminadas. Recovery y detector comparten vigencia real de episodios. Comando compensatorio con preview, hash de estado e idempotencia sustituye el SQL puntual. [Decisión y contrato](docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md). Vercel Production y worker corregidos verificados; Valentina restaurada 18:38:48Z, contratos/pagos/usuario intactos. Proyecciones People completadas 18:42:05Z sin reabrir employee ni alterar datos protegidos. Release `33795564223` cerrado, manifest released 19:30:49Z, health success y watchdog ok; readback final intacto.
 
 ## 2026-09-03 — TASK-1349 en producción (release `62356c9b7fd4`) — revisión contractual de offboarding, elegibilidad por episodio y writeback de lifecycle
+
+Cierre operativo posterior: Maggie y María Fernanda revisadas como despido y ejecutadas con fechas 29/06 y
+29/07; reader 4/4, unresolved=0 y nómina agosto lista. Runbook, manual, documentación funcional y skills
+Payroll/Talent Codex/Claude distinguen casos manuales del recovery SCIM y cierre de conciliación Finance.
+[Evidencia y método](docs/audits/payroll/MAGGIE_MARIA_FERNANDA_OFFBOARDING_CLOSURE_2026-09-03.md).
 
 Cierra el circuito SCIM → decisión → nómina → lifecycle que la auditoría del 03/09 encontró incompleto (ISSUE-117,
 near miss del 06/07). Nómina: el resolver de elegibilidad elige el caso gobernante por relevancia temporal, sirve
@@ -841,263 +947,3 @@ medición donde alguien esté obligado a mirar.
 
 De paso: la arquitectura afirmaba en cuatro lugares que un scheduler estaba activo cuando estaba
 pausado, y el runbook de AXIS documentaba el `.npmrc` con una línea de menos.
-
-## 2026-08-29 — La lente `●`/`◑` llega a producción con mecanismo, no con prosa
-
-Release `b7f74c95a2af` (`released`, watchdog `drift_count=0`). **TASK-1785**: los readers de
-`growth/seo` emiten `provenance` **requerido** —así que `tsc` nombra a cualquiera que no lo declare—,
-un guard camina el DTO real exigiendo que cada hoja numérica tenga exactamente un dueño, y un censo
-compara las superficies contra el filesystem en ambas direcciones. Tool
-`get_seo_dual_lens_visibility` federada al gateway: devuelve las dos series separadas y **sin campo
-combinado por contrato**.
-
-Viajaron también **TASK-1700** (cola priorizada, 3 migraciones ya aplicadas en la única instancia
-Cloud SQL) y **TASK-1792** (curva de CTR con sus 4 estados). `GROWTH_SEO_WORK_QUEUE_ENABLED` prendido
-en los dos runtimes por el SoT; el scheduler del materializador sigue PAUSADO a propósito.
-
-Dos hallazgos que no eran el objetivo y valen por separado: el PAT `read:packages` de AXIS llevaba
-14 h vencido tumbando 3 de los 4 workers **sin que nada avisara**, y el audit de flags tenía un punto
-ciego que **anulaba su propio gate ISSUE-150** (39 de 43 «env vars muertas» eran falsos positivos).
-Los dos quedaron documentados y el segundo, arreglado.
-
-## 2026-08-29 — El contrato `●`/`◑` deja de depender de que alguien lea la descripción
-
-`TASK-1785`. Los readers de `growth/seo` emiten `provenance: SeoProvenance[]` en su `ok: true`:
-**requerido**, así que `tsc` nombra a cualquier reader que no declare de qué naturaleza es lo que
-devuelve. En lista, porque hay DTO genuinamente mixtos — `SeoPerformanceResult` declaraba UNA fuente
-mientras su `summary` era siempre Search Console, o sea cifras medidas dentro de un envoltorio
-rotulado estimado.
-
-Dos guards nuevos: uno camina el DTO real y exige que **cada hoja numérica tenga exactamente un
-dueño** (detecta sin-dueño y con-dos-dueños); otro censa las superficies del lane y del MCP
-comparando contra el **filesystem**, en ambas direcciones. Sin ellos, el campo habría sido una
-promesa: nada obligaba a que las procedencias declaradas cubrieran lo que hay.
-
-Tool nueva `get_seo_dual_lens_visibility`: las dos series de posición separadas y rotuladas en una
-sola llamada, **sin campo combinado por contrato**. Existe para invertir un incentivo — presentar
-bien las dos lentes costaba dos llamadas y una decisión, presentarlas mal costaba una y ninguna.
-⚠️ **Falta federarla al gateway** (cross-repo): hasta entonces Nexa y los clientes MCP no la ven.
-
-Sin migración, sin flag, sin cambio de valor en ninguna cifra. `dataforseo_serp` quedó como lente
-`estimated` y no `measured`: exacto no es medido — esa consulta la hicimos nosotros.
-
-## 2026-08-29 — Las capacidades SEO nuevas pasan de "prendidas" a "ejercitadas"
-
-`domain-overview` y `url-visibility` corrieron por el camino desatendido del scheduler (body `{}`),
-con costo real **clavado al preview** (USD 0,01212 y USD 0,024) y re-corrida a USD 0. Los schedulers
-tenían `lastAttemptTime` vacío y su próxima corrida agendada era el 16-17 de septiembre. La ventana de
-48 h de `ISSUE-164` quedó cerrada midiendo el efecto en `grader_probe_results` (`blocked%` = 0) en vez
-del conteo de Sentry, con la salvedad explícita de que la muestra es una sola corrida.
-
-## 2026-08-28 — El módulo SEO tiene una sola cola de trabajo (`TASK-1700`)
-
-- `greenhouse_growth.seo_work_queue_{snapshots,items,decisions}`: aggregate append-only que pasa a ser la
-  ÚNICA autoridad de orden del módulo. Antes había cuatro criterios no comparables y el operador abría
-  tres pantallas sin que ninguna dijera qué hacer primero.
-- El score deja de ser un índice compuesto y pasa a **clics incrementales sobre demanda MEDIDA**, con la
-  curva de CTR del propio sitio y su versión persistida en cada fila. Sin demanda medida no se fabrica un
-  score: la fila recibe `NULL`, cae a su banda y su verbo honesto es `measure` — y lo impone un CHECK de
-  la base, no el TypeScript.
-- La lente de oportunidades de `/admin/growth/seo/keywords` cambia de FUENTE del orden sin cambiar de
-  forma, detrás de `GROWTH_SEO_WORK_QUEUE_ENABLED` (OFF) con caída al reader legacy. Paridad verificada
-  contra PG real: techo idéntico y orden relativo idéntico sobre las keywords compartidas.
-- Materializador en Cloud Scheduler + ops-worker (nunca Vercel cron), tres señales de reliability nuevas
-  y la capability `growth.seo.work_queue.decide` — ver y decidir son dos permisos distintos.
-- Documentación en las tres capas (arquitectura §18, funcional y manual de uso), invariantes nuevos en
-  `.claude/rules/growth-seo.md`, y la skill `seo-aeo` (`modules/02_SEO_CONTENT.md`, espejada en `.codex/`)
-  gana la implementación de referencia del score más la advertencia comercial: la métrica es *table
-  stakes* y lo propio es la COMBINACIÓN curva-propia × cambio-de-posición, una afirmación NEGATIVA que
-  exige re-verificación a la fecha antes de cualquier uso comercial.
-- **Rollout pendiente:** flag OFF en los dos runtimes, scheduler pausado, sin promover a `main`.
-
-## 2026-08-28 — Landing Agencia de influencers publicada (`TASK-1598`)
-
-- Se canonizó el estilo del brief como `Editorial Premium Brief`: una composición host candidate sobre
-  `diagnostic_premium`, con una sola superficie editorial, jerarquía Poppins/Geist, controles accesibles, submit azul
-  y decoración semántica. La frontera renderer/host quedó sincronizada en arquitectura, documentación funcional,
-  manuales, registry público y skills `.codex/.claude`; copiar los observadores/iconos page-scoped a otra landing
-  queda explícitamente prohibido hasta promover metadata browser-safe al renderer.
-
-- El submit del brief abandona el teal heredado y adopta azul Efeonce con texto blanco. El selector de mercado
-  reemplaza siglas por banderas SVG circulares para Chile, Colombia, México y Perú, visibles también tras elegir;
-  las centra ópticamente, elimina el blur y conserva un outline nítido. Región/otro mantienen iconos semánticos. El
-  gate live fija paleta, contraste, persistencia, teclado y responsive.
-
-- Los selects premium eliminan la doble señal visual que mezclaba un caret del renderer con otro pseudo-elemento
-  del host. Cada trigger conserva un solo indicador alineado al borde y las opciones mantienen iconos semánticos
-  sobre superficies tonales claras, sin bloques azules sólidos. El gate live fija ambos invariantes en
-  1536/1440/1414/890/390 y reduced motion.
-
-- El cierre responsive corrige la franja de divulgación IA que a 1414 px dejaba un bloque vacío: ahora es full-bleed
-  y conserva la retícula. El form reemplaza sparkle por documento y fija una jerarquía medible Poppins/Geist sin
-  peso 650. Los assets mantienen duración, eliminan fechas ficticias y explican publicación, pauta o canales con
-  chips tonales; el CTA secundario de ofertas usa contorno navy e icono diagonal. Fidelidad live pasó en
-  1536/1440/1414/890/390 y reduced motion; SEO/AEO no tuvo drift.
-
-- El rail estático de cuatro logos se reemplazó por el widget compartido `greenhouse_social_trust` de la landing de
-  Redes Sociales. Conserva las tres señales regionales y añade el marquee monocromático canónico `logoMarquee.v2`
-  con 3×7 marcas, label/nombre accesible y reduced motion; el gate live cubre composición y overflow en cuatro
-  viewports. No se duplicó markup ni se creó otro widget.
-
-- El último refinamiento visual convierte la franja bajo el hero en un rail editorial responsive, añade profundidad
-  controlada a “Cinco capas”, usa iconos monocromos reales/semánticos en los destinos de assets y corrige el lenguaje
-  visual del form con megáfono y contador próximo al textarea. El gate de fidelidad ahora cubre estos contratos en
-  1536/1440/890/390 y reduced motion; el gate SEO/AEO volvió a pasar sin drift de metadata o schema.
-
-- El CTA fijo se refinó como dock Midnight flotante y contenido, con safe-area y targets de 48 px. `Agenda una
-  reunión` conserva la única superficie sólida verde; `Cuéntanos tu campaña` usa contorno transparente e icono
-  diagonal. El gate live cubre geometría, clipping, superficie, jerarquía e icono en 1536/1440/890/390.
-
-- El brief publicó una v2 `diagnostic_premium`: los dos selects ya no abren el popup nativo, sino comboboxes
-  accesibles del renderer. La landing añade 11 marcas semánticas para mercado y activación sin duplicar estado ni
-  validación; el gate live abre ambas listas y prueba teclado, overlay, contraste y clipping en cuatro viewports.
-
-- Tras el review live del owner se corrigió una regresión de fidelidad que el smoke inicial no detectó: cargar assets
-  no probaba la secuencia. El hero vuelve a rotar tres clips con progreso, play/pausa y sonido; también se restauraron
-  badge de derechos, stack social, pulgar decorativo, selección por teclado de ofertas, CTA sticky y reveals. El gate
-  nuevo `public-website:verify-influencer-landing-fidelity` ejerce esos contratos en 1536/1440/890/390 y reduced
-  motion. Tras el segundo review, el hero mide el masthead Ohio y reserva 32 px adicionales: kicker, teléfono y
-  sticker ya no entran en el área visual del header en ningún breakpoint probado. Tras el tercer review se corrigió
-  la cascada `font: inherit` que dejaba los CTA en peso 400 y se consolidó un sistema AXIS con siete botones
-  primary/secondary/tonal, iconos sin discos de fondo, foco doble, targets ≥44 px y sticky `inert` al ocultarse. El
-  hero mantiene una sola acción sólida (`Agenda una reunión`); `Cuéntanos tu campaña` sigue como enlace secundario.
-  El intro de conversión se mantiene sticky a 32 px junto al formulario desde 761 px; en móvil se apila y vuelve a
-  flujo estático. El intro del FAQ es sticky sólo cuando caben sus dos columnas (>900 px); en 890/390 se apila y
-  queda estático para no cubrir el acordeón durante el scroll. El gate cubre estos contratos en 1536/1440/890/390.
-- Se corrigió la desaparición del brief: el loader estable de meetings sólo registraba
-  `<efeonce-meeting-scheduler>` y dejaba vacío `<greenhouse-form>`. La landing carga ahora el renderer canónico de
-  Growth Forms y conserva fallback host-owned. El gate live ya no acepta la mera etiqueta: exige custom element,
-  root, siete bloques de campo, CTA submit, altura útil y ausencia del fallback tras montar.
-- El brief se rediseñó como una sola superficie editorial premium: encabezado útil, duración, señales de confianza,
-  seis iconos semánticos sin discos, controles de 56 px con texto de 16 px, estados focus/autofill/error, consentimiento
-  tonal y submit full-width. El cambio es host/CSS page-scoped; no bifurca contrato, validación, Turnstile, destino ni
-  tracking. El scorecard visual live quedó en `4.68/5` y el gate cubre el contrato visual en 1536/1440/890/390.
-- El último review refinó el ritmo del form, reemplazó la URL cruda por `Consulta nuestra Política de privacidad` y
-  convirtió los selects en controles tonales con affordance propia. El acordeón de agenda se retiró: el Growth CTA
-  published `influencer-discovery-meeting` abre `open_meeting_scheduler` en diálogo nativo sobre el scheduler
-  `discovery`; el smoke live verificó teclado, 390 px, reduced motion y cero enlaces HubSpot sin crear una reserva.
-- Se publicó `https://efeoncepro.com/servicios/agencia-de-influencers/` como página Elementor `251627`, conservando
-  el header/footer Ohio global y la dirección visual aprobada de Claude Design. El slug responde a intención comercial
-  validada en CL, MX, CO y PE; la página sirve canonical, `index, follow`, schema visible y sitemap/lastmod.
-- La conversión usa Growth Form gobernado `efeonce-creator-influence-brief` y el meeting canónico
-  `fhsf-efeonce-lead-gen-web` / `discovery`; no reconstruye destinos, scheduler, CRM ni tracking en WordPress. El
-  menu item nativo `Influencer Marketing` quedó bajo `Servicios Destacados`.
-- Los seis clips únicos del diseño están activos y rotulados como visuales ilustrativos generados con IA, no casos ni
-  resultados. QA live post-cache cubrió secuencia/interacciones, teclado, form, meeting, FAQ, schema, overflow,
-  consola y performance de laboratorio; snapshots de página y menú dejan rollback acotado.
-- El hardening SEO/AEO final publicó title y description comerciales, canonical/robots/excerpt, Open Graph/Twitter con
-  imagen dedicada `1200×630` y un grafo sin entidades duplicadas: Yoast posee WebPage/Breadcrumb/WebSite/Organization;
-  la página completa Service con cinco ofertas y FAQPage con seis respuestas visibles. El gate live nuevo valida
-  metadata, imagen, schema, sitemap, menú y HTML inicial. La ruta queda publicada y elegible para indexación, sin
-  presentar ese estado como prueba de indexación en Google. Menú: `Soluciones → Servicios Destacados`, después de
-  `Redes Sociales`.
-
-## 2026-08-28 — La curva de CTR declara si es utilizable, o la lente no ordena (`TASK-1792`)
-
-- `readKeywordOpportunities` ordenaba por un campo colapsado a cero. `expectedCtrAt` preguntaba «¿está el
-  bucket en el `Map`?» cuando la pregunta era «¿hay muestra para estimar un CTR?»: con un bucket presente y
-  sin clics (`efeoncepro.com`: 75 impresiones, 0 clics en la posición objetivo) el guard devolvía `0`, la
-  ganancia estimada colapsaba en **toda** la lente y el `.sort()` quedaba en no-op. La pantalla no ordenaba
-  mal: **no ordenaba**, y nada fallaba. Medido contra PG el 2026-08-28: Efeonce 24/24 filas en cero; Berel,
-  con curva sana, 1.445 de 1.798 (80%) empatadas. El disparador está garantizado en todo target recién
-  onboardeado, así que no es un defecto de un cliente.
-- Primitive nuevo [`src/lib/growth/seo/ctr-curve.ts`](src/lib/growth/seo/ctr-curve.ts): la curva se lee **sin
-  `HAVING`** (un filtro en el SQL borra el bucket y vuelve indistinguible «no vino» de «vino sin muestra»),
-  transporta su muestra por bucket y declara su usabilidad con un piso de **dos dimensiones** — impresiones
-  **y** clics, porque la precisión de un estimador de tasa la gobiernan los éxitos. El umbral `1000/5` se
-  **adopta** de `work-queue/score-versions.ts` y lo sostiene un test que compara el **veredicto** del
-  predicado sobre nueve curvas fixture, no las constantes.
-- El envelope de `KeywordOpportunitiesResult` gana `ctrCurveSource`, `curveSampleSize`, `orderedBy`,
-  `targetPosition` y `expectedCtrAtTarget`. Cuando el techo no discrimina —curva no utilizable, o ganancia
-  idéntica en todas las filas— la lente ordena por **demanda medida** (impresiones × cercanía a página 1) y
-  lo declara. Los tres consumers (page server, lane ecosystem, tool MCP) son passthrough y heredan la
-  procedencia sin lógica propia.
-- El `FALLBACK_CTR_CURVE` declaraba 6% en la posición objetivo contra ~1% medido en dos sitios independientes:
-  estaba calibrado para una SERP que ya no existe. Se reemplaza por **forma de referencia + nivel estimado del
-  propio sitio** (un parámetro medido en vez de veinte prestados), con la curva expuesta forzada monótona no
-  creciente — el híbrido anterior producía bucket 8 en `0,0000` junto a bucket 9 en `≈0,027`.
-- Verificación: 663 unitarios + `src/lib/growth/seo/ctr-curve.live.test.ts` contra PG real, **4 passed, no
-  `skipped`**. Cierra la costura que dejó pasar el defecto: los mocks ejercitaban el TS sin el SQL y el sanity
-  el SQL sin el TS. Levanta el bloqueo del cutover de `TASK-1700`.
-
-## 2026-08-28 — LicitaLAB: MCP oficial + radar Playwright autenticado y gateado
-
-- La skill espejada `greenhouse-public-private-tenders` incorpora el companion `licitalab-mcp.md` en
-  [Codex](.codex/skills/greenhouse-public-private-tenders/licitalab-mcp.md) y
-  [Claude](.claude/skills/greenhouse-public-private-tenders/licitalab-mcp.md), con endpoint OAuth, inventario live
-  de cinco tools read-only, recetas por oportunidad/proveedor/documentos, estados RAG, límites y canary verificado.
-  El bundle entra a `pnpm skills:mirrors` para impedir que ambos agentes operen licitaciones reales con contratos
-  distintos.
-- `pnpm licitalab:radar:setup` guarda la credencial local ignorada con modo `0600`; `pnpm licitalab:radar`
-  reutiliza un perfil Chrome aislado, pagina la vista autenticada y emite un reporte `efeonce.licitalab-radar.v1`
-  bajo `.auth/`. El canary leyó 45 oportunidades únicas atravesando la primera página. Discovery no postula ni
-  escribe CRM: los códigos pasan al MCP para análisis documental y cualquier promoción a HubSpot conserva
-  confirmación humana, asociación y readback.
-- Frontera canónica explícita: **LicitaLAB ve licitaciones públicas solamente**. Toda fila mantiene
-  `public_opportunity` y cualquier `Proposal` derivada usa `origin='public_tender'`; nunca se interpreta una
-  modalidad pública como `private_rfp` ni se mezcla este radar con Wherex, Ariba, Coupa u otras fuentes privadas.
-- El contrato descubierto de promoción a HubSpot quedó documentado en la skill de licitaciones y en
-  `hubspot-greenhouse-bridge`: upsert por ID + `gh_idempotency_key`, reutilización de Company, asociaciones
-  idempotentes sin contactos ficticios, URL directa, y separación de `fecha_de_cierre_de_licitacion` versus
-  `closedate`. La precedencia es cliente existente → Core; nueva cuenta por Licitación → Strategic Bets; Compra
-  Ágil nueva queda `policy_required`. El bridge actual todavía no transporta esos campos ni resuelve todas las
-  identidades/asociaciones; es contrato objetivo para automatización. La carga manual confirmada usa el MCP de
-  HubSpot como writer gobernado y no queda bloqueada por esa brecha.
-- La etapa inicial quedó fijada por metadata live: una candidata aprobada entra a `Pipeline de ventas`
-  (`default`) en `Calificado para comprar` (`qualifiedtobuy`), nunca en `Cita programada`; las filas crudas del
-  radar permanecen fuera del CRM. La skill documenta el avance técnico→muestra opcional→precio→formalización→cierre
-  y excluye el pipeline de Shared Selling. El snapshot completo de 99 deals LicitaLAB mostró 95 perdidos, 3 ganados,
-  1 en `appointmentscheduled` y 0 intermedios, por lo que el histórico no se canonizó como workflow.
-- Primera promoción live aprobada y releída: la oportunidad `1098710-22-LP26` creó Company HubSpot `57870164778`
-  y deal `64461187076`, asociado en `default/qualifiedtobuy`, `Strategic Bets`, CLP 250.000.000, con deadline y
-  adjudicación separados. La Company terminó con `num_associated_deals=1`; no se inventó contacto.
-  `gh_commercial_party_id` permanece vacío y la automatización por bridge continúa pendiente.
-- La promoción manual se amplió con ProChile (`deal 64482163516` ↔ Company `31209269815`) y Defensoría
-  (`deal 64471071912` ↔ Company nueva `57878590071`). ProChile quedó `Core Pipeline`/`existingbusiness` porque la
-  Company es cliente vigente; Defensoría quedó `Strategic Bets`/`newbusiness`. Ambas usan
-  `default/qualifiedtobuy`, conservan fechas separadas y tienen una sola coincidencia por `gh_idempotency_key`.
-  `gh_deal_origin` queda vacío: el enum live sólo admite `greenhouse_quote_builder` y nunca se etiqueta una
-  licitación con un origen falso.
-- El radar ampliado leyó 163 oportunidades y se promovieron otras cinco con Company y asociación verificadas:
-  UOH/web (`64466117716`), Beneficios Estudiantiles/medios (`64482321775`), Campaña VCM (`64466272830`),
-  Valparaíso/paid media (`64469214508`) y JUNJI/RFI ticketing (`64469523247`). Cada búsqueda por
-  `id_de_licitacion` devolvió una sola fila; no se asociaron contactos sin evidencia. Los cinco nuevos Deals no
-  recibieron `gh_idempotency_key` en la carga aprobada, por lo que esa propiedad queda como brecha explícita y no
-  como garantía supuesta.
-- Se creó `docs/commercial/tenders/LICITATION_CRM_REGISTER.md` como índice operativo compartido para Codex y
-  Claude, actualizado con diez oportunidades y ocho Deals verificados. Registra decisión, postulación, fechas, IDs/enlaces y
-  asociaciones sin desplazar las fuentes autoritativas; el histórico de 99 deals permanece sólo en HubSpot.
-- El patrón se extendió a `docs/commercial/CRM_DEAL_REGISTER.md`: vista transversal para negocios Core, Strategic
-  Bets y otros orígenes, con una fila sólo después de verificar el Deal en HubSpot. Las licitaciones promovidas se
-  sincronizan en ambos registros por `deal_id`; las oportunidades todavía en radar permanecen sólo en bid desk.
-- El segundo lote público y ocho RFP privados Wherex elevaron el registro a 30 oportunidades revisadas y 24 Deals
-  verificados. Al 2026-08-29 hay 23 Deals abiertos de esta admisión y uno `closedlost`; HubSpot suma además el RFI
-  CRM Mineduc anterior al corte, para 24 Deals de licitación abiertos en total. Ajinomoto ya está `closedlost`.
-- La skill espejada suma `crm-portfolio-operating-model.md`: promoción común con segundo readback posterior a
-  automatizaciones y cartera separada en diez bids prioritarios, tres RFI livianos y diez gates previos.
-- El readback live encontró los ocho Deals Wherex en `Core Pipeline` pese a que continúan `newbusiness`; se registra
-  la deriva frente a la política `Strategic Bet` sin corregirla silenciosamente. CINTERMEX queda `HOLD vencido /
-  portal no verificado` y los cuatro IDs de Grupo Reditos quedan `No bid` por decisión del operador.
-
-## 2026-08-28 — El candidato de discovery no declara pertinencia (hueco documentado y levantado)
-
-- Auditando la salida del smoke apareció que el candidato **no transporta ninguna señal de marca,
-  categoría ni relevancia** — ni en la tabla ni en el DTO. Consecuencia medida: 50 keywords de
-  consumidor sobre ChatGPT (`chatgpt en linea`, `chatgpt rojo`) pasaron **todos** los checks para un
-  target que vende servicios AEO B2B.
-- 🔴 El vector estructural no es elegir mal la seed: es **`TASK-1662`**. En el gap competitivo los
-  candidatos salen de dominios del competidor, así que **las seeds las elige él**, y sirve segmentos
-  que el cliente no. Ahí no hay operador a quien educar.
-- ⚠️ **La urgencia que se argumentó primero era falsa, y se corrigió el mismo día** (`65372ea68`).
-  Se afirmó que el orden por defecto pondera volumen y que la cola append-only de `TASK-1700`
-  congelaría lo irrelevante arriba. No ocurre: `work-queue/priority-score.ts` no mira el volumen
-  estimado del proveedor, y el CHECK `basis_band_score` impide fabricar un score sin demanda medida —
-  un candidato irrelevante **sin** impresiones cae a banda 3 con score `NULL` y no compite. El caso
-  que sí sostiene la task es el otro: keyword irrelevante **con** impresiones reales, que atraviesa
-  el CHECK y entra a la cola. El vector es la demanda medida, no el volumen del proveedor.
-- **Levantada como `TASK-1791`** (`to-do`, P1, `EPIC-022`, `backend-data`, `Blocked by: none`), sin
-  dueño asignado todavía. La señal entra como **factor del item con su procedencia, jamás como
-  entrada del `priority_score`**: `evidence_ref` es opaca por contrato (cero FK, cero JOIN al motor
-  que produciría la señal), así que puntuar con ella sería puntuar con algo que el aggregate no puede
-  citar. El hallazgo queda además en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §7 (no sólo en una
-  bitácora que rota) porque tres sesiones lo verificaron por separado el mismo día.

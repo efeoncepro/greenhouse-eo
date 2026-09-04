@@ -244,7 +244,7 @@ Cuando un colaborador tiene un caso de offboarding abierto, su inclusion en la n
 | `internal_payroll` / `relationship_transition` | `status='executed'` AND cutoff en periodo | Prorrateado hasta el ultimo dia laboral |
 | `external_payroll` / `non_payroll` | `status IN ('approved','scheduled','executed')` AND cutoff en periodo | Excluido de nomina interna (proveedor maneja el cierre afuera) |
 | `external_payroll` / `non_payroll` | `status IN ('approved','scheduled','executed')` AND cutoff `<` periodo | Excluido completo |
-| `identity_only` | N/A | Sigue full_period (identity no gobierna payroll) |
+| `identity_only` | N/A | Sigue full_period mientras el colaborador esta activo (identity no gobierna payroll). Si el colaborador esta inactivo, un caso de solo acceso **no cuenta como salida**: queda excluido con `inactive_without_exit_fact` (desde 2026-09-03) |
 | `unknown` | conservador | Sigue full_period + warning de clasificacion |
 
 El **cutoff canonico** = `COALESCE(last_working_day, effective_date)`. Esto respeta los CHECK constraints de schema TASK-760: `effective_date` esta poblado desde `approved+` y `last_working_day` desde `scheduled+`.

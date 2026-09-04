@@ -5,13 +5,37 @@
 > conserva sólo el estado mutable, los riesgos abiertos y el siguiente paso. La historia anterior
 > permanece auditable en el git log y en las tasks/ADRs enlazadas.
 >
-> **Corte verificado:** 2026-08-02 · Globe `main@fa286dbda0a3c1ce02de7d5a2ab173ba1bf34966`; Greenhouse
+> **Corte histórico:** 2026-08-02 · Globe `main@fa286dbda0a3c1ce02de7d5a2ab173ba1bf34966`; Greenhouse
 > tenía como base `develop@4a609c3adbffd909a665b0a7776fb22ef3d19f01` antes de este cierre documental. TASK-1614 conserva su cierre runtime en Globe
 > `d79fda94ba97c7bd4b358c4eaf957ca1389ed9fc`; el corte posterior corresponde a TASK-1504 y no implica que Omni
 > esté disponible. El fondeo mensual live fue verificado sobre
 > `649eb08`; migraciones hasta `0048`, API y Studio están aplicados. El worker de expiry/recovery usa código
 > `d3fe90e`, digest `sha256:d8295862dc12c14427e90e0bb413577802916c37ca6bf32c202680492ca7bae9`,
 > deploy `30717266572` y baseline IaC `e369ef8` sin drift.
+
+## Corte 2026-09-03 — TASK-1807: pausa reversible del caller externo de tenancy
+
+Globe sigue siendo un producto comercial temporalmente pausado, no cerrado. Readback a
+`2026-09-03T22:26:05Z`: `ops-globe-tenancy-reconcile` (`efeonce-group/us-east4`) en `PAUSED`; SQL
+`STOPPED/NEVER`, con protección contra eliminación. La única mutación cloud de este corte fue pausar ese
+scheduler; no se apagó el ops-worker compartido ni se eliminaron datos, identidades o recursos.
+
+Discovery encontró 24 solicitudes API en 21:00–22:00Z, todas 500 y ~127 s, de
+`globe.tenancy.projection.reconcile`: el caller Greenhouse seguía activo cada cinco minutos aunque los tres
+schedulers Globe estaban pausados. Terraform Globe no gobierna ese caller. El quinto argumento del
+`upsert_scheduler_job` en `services/ops-worker/deploy.sh` quedó `true` en el checkout local para conservar la
+pausa; **sin commit/push/deploy**, un despliegue desde source remoto anterior podría reactivarlo.
+
+Para reactivar: seguir el [runbook, sección 9](GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md#9-reactivation-procedure),
+restaurar SQL/API en `draining`, refrescar tenancy por su broker autorizado y comprobar proyecciones vigentes
+(TTL 12 minutos) antes de `active`. El caller externo requiere source `false` + resume/readback propios;
+Terraform no lo reactiva. Si el refresco falla, pausarlo de nuevo; no ampliar permisos ni activar producción
+como bypass. No se ensayó la reactivación ni una restauración durante este corte.
+
+Billing anterior a esta pausa adicional: CLP 2.278,27/24 h en la ventana Sep2 11:00Z–Sep3 11:00Z; API
+CLP 1.248,97. La extrapolación ~CLP 68.348/30 días no confirma ahorro ni costo residual estable. La reducción
+tras la pausa sigue pendiente de ventanas completas y desfase Billing. El modelo Sep2 queda como historia,
+no como garantía. No hubo nuevo Terraform plan/apply en este corte.
 
 ## Corte 2026-09-02 — TASK-1807: Globe en hibernación profunda
 
@@ -746,4 +770,6 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
 3. Implementar TASK-1632 dentro de Globe sin introducir a Greenhouse en el path de finalización; conservar los
    schedulers como recovery y demostrar deduplicación/idempotencia antes del rollout.
 4. Completar receipts/calibración amplia de TASK-1468/TASK-1579 sin reabrir TASK-1614/TASK-1630 ni alterar los
-   800 efectivos. Mantener rollout externo y acceso MCP B2B gated por TASK-1480/TASK-1631.
+   800 efectivos. Mantener rollout externo y acceso MCP B2B gated por TASK-1480 y por el emisor propio + gateway
+   multi-issuer de EPIC-044 (TASK-1829/1831/1832); el grant por organización/persona ya existe (TASK-1631,
+   2026-09-04) (actualizado 2026-09-04, TASK-1631).

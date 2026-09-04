@@ -64,7 +64,7 @@ describe('TASK-1773 — el lane app del eje de desenlace', () => {
     await expect(getAppHiringApplicationOutcome({ context: delegated, applicationId: 'app-1' })).resolves.toBeTruthy()
     await expect(proposeAppHiringApplicationDecision({ context: delegated, applicationId: 'app-1', body: {} })).resolves.toBeTruthy()
 
-    // Confirmar: fail-closed. `efeonce.mcp.hiring.write` no existe y está bloqueado hasta TASK-1631.
+    // Confirmar: fail-closed. `efeonce.mcp.hiring.write` no existe y está bloqueado hasta EPIC-044 (TASK-1829/1831/1832: emisor propio + gateway multi-issuer; el grant revocable ya existe desde TASK-1631, 2026-09-04).
     await expect(
       confirmAppHiringApplicationDecision({ context: delegated, request: request(), applicationId: 'app-1', body: {} })
     ).rejects.toMatchObject({ errorCode: 'forbidden' })

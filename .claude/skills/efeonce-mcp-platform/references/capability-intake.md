@@ -32,8 +32,10 @@ this file is a checklist, not a second registry.
     already has one needs no Entra change. If the domain has no write scope yet, adding one is an Entra change and
     `az ad app update` replaces the whole array — verified round-trip or it wipes the live scopes.
   - **A write scope is never wired into the shared public PKCE client** (see the SKILL hard rule). Expect the tool to
-    be federated and fail-closed until a revocable per-tenant grant exists (`TASK-1631`); that is the designed state,
-    not a broken deploy.
+    be federated and fail-closed until a token can carry the grant: the revocable per-organization / per-person grant
+    already exists (`greenhouse_core.external_capability_grants`, `TASK-1631`, 2026-09-04); what is missing is the
+    native issuer + multi-issuer gateway that mints tokens with `gv` (EPIC-044: `TASK-1829`/`1830`/`1831`/`1832`).
+    That is the designed state, not a broken deploy.
 - `admin`: do not expose until an entitlement model, named operators, high-signal audit trail and incident runbook exist.
 
 ## Provider boundary

@@ -11,6 +11,21 @@
 
 ---
 
+## Cierre de salidas ya pagadas
+
+Una salida puede seguir en borrador o aprobada aunque la persona ya haya salido y recibido sus pagos.
+La confirmación humana de despido permite registrar la causal y completar el mismo caso por el flujo
+normal. El cierre alinea caso, disponibilidad del colaborador, relación y vigencia de compensación;
+la elegibilidad histórica conserva la fecha de corte. Un reingreso posterior debe permanecer protegido.
+
+La señal «salida sin resolver» cuenta decisiones pendientes; no es un inventario de todos los cierres
+incompletos. Maggie ya estaba aprobada y María Fernanda seguía en borrador: ambas necesitaban terminar
+el flujo, aunque sólo una disparaba esa alerta. «Cierre completo» y «nómina lista» tampoco significan
+pago conciliado. La confirmación de pago se audita y Finanzas reconcilia sus registros por separado.
+
+[Procedimiento operativo](../../operations/runbooks/offboarding-recovery.md#casos-manuales-en-borrador-o-ya-aprobados)
+· [Evidencia fechada del cierre](../../audits/payroll/MAGGIE_MARIA_FERNANDA_OFFBOARDING_CLOSURE_2026-09-03.md).
+
 ## Que es un caso de offboarding
 
 Un caso de offboarding representa una salida laboral o contractual formal. No es lo mismo que desactivar un usuario, cerrar una sesion o marcar un colaborador como inactivo.

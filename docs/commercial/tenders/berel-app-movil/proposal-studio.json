@@ -1,0 +1,21 @@
+{
+  "$schema": "../PROPOSAL_STUDIO_CLOSURE_SCHEMA.md",
+  "schemaVersion": 1,
+  "deal": "berel-app-movil",
+  "workspacePath": "docs/commercial/tenders/berel-app-movil",
+  "status": "workshop_only",
+  "proposalId": null,
+  "registration": null,
+  "composition": {
+    "sourcePlans": []
+  },
+  "renderJobs": [],
+  "deliverables": [],
+  "verification": null,
+  "notes": [
+    "Workspace de expansión del cliente Berel; Deal HubSpot 64591709456.",
+    "Brief comercial v0.2, estrategia de lanzamiento y plan de medición internos v0.1; fuentes públicas consultadas el 2026-09-03.",
+    "Sin deck, Proposal registrada, render, salida versionada ni aprobación del cliente.",
+    "Nueva Color Berel por lanzar según Julio; build, novedades, fecha, presupuesto y ejecución de muestra/campaña pendientes."
+  ]
+}

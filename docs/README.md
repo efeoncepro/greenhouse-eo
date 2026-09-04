@@ -49,6 +49,8 @@ Indice maestro de la documentacion no operativa del repo.
 
 ### Architecture
 
+- [Reingreso Workforce: contrato y recuperación](architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md) · [Runbook](operations/runbooks/workforce-reentry-recovery.md)
+
 - [Architecture Decisions Index](architecture/DECISIONS_INDEX.md)
 - [Efeonce Shared Product UI Platform Decision](architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md)
 - [Creative Studio — Business Model Decision V1](architecture/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_DECISION_V1.md)
@@ -172,6 +174,7 @@ Indice maestro de la documentacion no operativa del repo.
 ### Audits
 
 - [Audits Index](audits/README.md)
+- [Efeonce MCP — interoperabilidad OAuth Codex/Claude — 2026-09-02](audits/EFEONCE_MCP_CODEX_OAUTH_INTEROPERABILITY_2026-09-02.md)
 - Regla de uso: las auditorias deben consumirse frecuentemente cuando el trabajo toque esa zona, pero siempre revalidando si sus hallazgos siguen vigentes o si hace falta una auditoria nueva/refresh.
 - [Globe UI competitive benchmark — Higgsfield y Magnific — 2026-08-05](audits/competitive-ui/GLOBE_COMPETITIVE_BENCHMARK_HIGGSFIELD_MAGNIFIC_2026-08-05.md)
 - [ICO Audits](audits/ico/README.md)
@@ -206,6 +209,7 @@ Indice maestro de la documentacion no operativa del repo.
 - [HR_PAYROLL_BRANCH_RESCUE_RUNBOOK_V1.md](operations/HR_PAYROLL_BRANCH_RESCUE_RUNBOOK_V1.md)
 - [RELEASE_CHANNELS_OPERATING_MODEL_V1.md](operations/RELEASE_CHANNELS_OPERATING_MODEL_V1.md)
 - [SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md](operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md)
+- [Informes de auditoría SEO/AEO para clientes](operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md) — continuidad, responsabilidad de agencia, validez del Grader y entrega verificada.
 - [Berel — estrategia de cobertura editorial](operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md), con inventario auditado y criterios de minería por necesidad.
 - [Berel — clasificación y conteo de piezas](audits/seo/BEREL_PIECE_COUNT_CLASSIFICATION_2026-09-03.md): etiquetas verificadas y límites del conteo por tarea frente a archivos.
 - [Berel — distribución social selectiva](audits/seo/BEREL_SELECTIVE_SOCIAL_DISTRIBUTION_2026-09-03.md): selección por artículo, cupos y aplicación nov/dic verificada; entregas no certificadas y octubre excluido.

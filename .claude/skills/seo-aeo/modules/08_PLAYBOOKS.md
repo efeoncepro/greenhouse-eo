@@ -10,6 +10,11 @@
 
 **Cuándo:** diagnóstico inicial de un sitio, o revisión periódica.
 
+**Antes de redactar:** si la salida se entrega a un cliente, carga
+`09_CLIENT_AUDIT_REPORTING.md` y el modelo operativo allí enlazado. Para una
+revisión recurrente, lee las auditorías anteriores y los registros de ejecución
+antes de interpretar el nuevo rastreo.
+
 **Secuencia:**
 1. **Intake** (SKILL.md §2) — motor objetivo, vertical, tamaño, estado, geo,
    objetivo, herramientas. Sin esto no hay auditoría útil.
@@ -25,8 +30,12 @@
 7. **Local/Internacional** (`06`) si aplica: GBP, NAP, hreflang.
 8. **Medición** (`07`): baseline de visibilidad orgánica + Share of Voice IA +
    tráfico/conversión.
-9. **Síntesis:** hallazgos priorizados por **RICE** (SKILL.md §4) → 3–5
-   movimientos primero, no lista de 40. Cada uno con "cómo se mide".
+9. **Síntesis:** iniciativas priorizadas por **RICE** y hallazgos por severidad,
+   alcance y valor de búsqueda (SKILL.md §4) → 3–5 movimientos primero. Conserva
+   el inventario completo y el estado de cada hallazgo anterior en el anexo. Cada
+   prioridad explica responsable, siguiente acción y cómo se comprobará el cierre.
+10. **Entrega:** revisión editorial integral y lectura de vuelta de la página,
+   propiedades, tablas y copia local conforme a `09_CLIENT_AUDIT_REPORTING.md`.
 
 **Salida:** documento con lectura del caso, hallazgos por capa, roadmap RICE,
 baseline de métricas. Contrasta toda táctica con `ANTIPATTERNS.md`.

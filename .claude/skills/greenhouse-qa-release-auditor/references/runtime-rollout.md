@@ -47,3 +47,27 @@ de no buscar: el repo ya tenía la forma resuelta.
   desplegado (`pnpm staging:request` o `curl` con bypass), no sólo en local.
 - Antes de inventar una variante de guard por entorno, `grep -rn "VERCEL_ENV" src/`
   y copia el patrón vigente.
+
+## Recuperaciones que publican eventos y varios intentos de release
+
+- Mapea quién puede consumir cada evento: un worker nuevo no protege una ruta Vercel que todavía
+  ejecute el consumer anterior. Verifica alias, revisión y tráfico, no sólo existencia del build.
+- Aplica sólo el command gobernado con preview, sujeto exacto, snapshot esperado e idempotencia;
+  conserva baseline de relaciones, compensaciones, pagos e identidad que deben permanecer intactos.
+- Después de la mutación, identifica los outbox IDs, confirma publicación y ejecución de las
+  proyecciones relevantes y repite el readback protegido. La ausencia de error inmediato no cubre
+  una escritura reactiva posterior que reabra una relación histórica o vuelva a desactivar al sujeto.
+- Caso verificado 2026-09-03: Valentina fue restaurada a las 18:38:48Z; eventos publicados a las
+  18:40:03Z y People completado a las 18:42:05Z; la relación employee siguió cerrada y las siete
+  categorías protegidas permanecieron idénticas. Es evidencia fechada, no estado actual permanente.
+- Separa elegibilidad de acceso, sesión interactiva y pago. Un reader SSO elegible no acredita login;
+  un payable pendiente de boleta no acredita obligación, orden ni transferencia.
+- Para el control plane exige conclusión de run, manifest, health, workers y watchdog. `completed`
+  con `cancelled` no es verde. Comprueba anotación/actor para distinguir cancelación de fallo técnico.
+- Antes de reintentar tras una colisión, el coordinador verifica eventos terminales/inbox y manifest.
+  El reconciler todavía prioriza SHA sobre run ID; un duplicado cancelado puede abortar otro intento.
+  Un manifest `aborted` requiere un nuevo intento canónico, nunca SQL ni retry del job final.
+
+Fuente operativa: `docs/operations/runbooks/production-release.md` §0.1; evidencia y defecto pendiente:
+`docs/operations/PRODUCTION_RELEASE_INCIDENT_PLAYBOOK_V1.md` §16 y
+`docs/audits/payroll/VALENTINA_REHIRE_IDENTITY_RECOVERY_2026-09-03.md`.

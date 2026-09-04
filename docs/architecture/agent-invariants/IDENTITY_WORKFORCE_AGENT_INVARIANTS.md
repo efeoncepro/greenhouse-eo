@@ -6,6 +6,18 @@
 
 > **Relocados de `CLAUDE.md` por TASK-1160 (2026-06-16), verbatim.** Contrato: `GREENHOUSE_IDENTITY_ACCESS_V2.md`, `GREENHOUSE_INTERNAL_IDENTITY_V1.md` + task-specs TASK-784/785/872. Dedup = Slice 4.
 
+### Reingreso, disponibilidad e historia (2026-09-03)
+
+- Un correo/OID nuevo no crea otra persona por sí solo: conserva el principal longitudinal y verifica el vínculo del proveedor sin auto-merge por email.
+- Acceso, disponibilidad del member, relación legal, engagement y pago son estados independientes. Recuperar uno no autoriza reabrir los demás.
+- La rama PostgreSQL de `updateMember` confirma member, source links canónicos, audit y outbox en una transacción; los mirrors BigQuery son posteriores al commit. No reproducir esa operación mediante un `UPDATE` aislado.
+- Un evento `member.updated` no puede reabrir una relación employee terminada ni crear una si existe historia employee/contractor/executive.
+- Una salida histórica no debe desactivar un reingreso vigente. La restauración requiere preview, estado esperado, autorización vigente e idempotencia; no reutilizar planes de otra persona ni el SQL retirado.
+- Verifica por separado commit, publicación, consumo de proyecciones y datos protegidos. Elegibilidad SSO no demuestra login interactivo.
+
+Contrato: [decisión de recuperación](../GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md) y
+[runbook](../../operations/runbooks/workforce-reentry-recovery.md).
+
 ### Hiring → Entra workforce provisioning invariants (TASK-1761, ADR Proposed 2026-08-21)
 
 Hasta aceptar `GREENHOUSE_HIRING_ENTRA_WORKFORCE_ACCOUNT_PROVISIONING_DECISION_V1.md`, no ejecutar writes Azure.
@@ -346,3 +358,181 @@ del `RELIABILITY_REGISTRY` — antes no tenían owner pese a ser el gate de acce
 **Spec completa**: `docs/tasks/complete/TASK-742-auth-resilience-7-layers.md`.
 
 > **Reubicado desde `CLAUDE.md` el 2026-07-14 (TASK-1160).** El router estaba a 14 tokens del techo de 35k y no aceptaba ninguna incorporación nueva; este bloque es un invariante de DOMINIO (identity/auth), así que su casa es este companion — no el router, que lo cargaba en cada turno y en cada subagente. Contrato completo: `docs/tasks/complete/TASK-742-auth-resilience-7-layers.md`.
+
+---
+
+## External identity binding (TASK-1631)
+
+> Dominio `src/lib/identity/external-access/**` + schema `greenhouse_core.external_*` (EPIC-044 U04, aplicado
+> 2026-09-04). Contrato vigente: `EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`
+> §`Slice 1 binding foundation — applied`; eventos en `GREENHOUSE_EVENT_CATALOG_V1.md` §Identity; señales en
+> `GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` (delta 2026-09-04).
+
+Es el grafo que decide si una persona autenticada por un IdP externo (o por el emisor propio de Efeonce) puede
+operar en nombre de una organización cliente de Account 360 y con qué capabilities. Lo consumen el gateway MCP
+(`TASK-1831`) y el auth-server (`TASK-1830`); la UI de administración es una task aparte. Todo lo que sigue
+protege tres cosas: que una persona resuelva a UN solo perfil, que la autoridad revocada muera de verdad, y que
+ningún secreto ni PII de terceros salga del dominio.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** escribir `external_identity_environments`, `external_organization_bindings`,
+  `external_capability_grants`, `external_member_invitations` ni los `identity_profile_source_links` con
+  `source_system LIKE 'external_idp:%'` fuera de los commands canónicos de
+  `src/lib/identity/external-access/commands.ts` (`upsertExternalIdentityEnvironment`,
+  `bindExternalOrganization`, `grantExternalCapability`, `issueExternalInvitation`, `acceptExternalInvitation`,
+  `revokeExternalAccess`). Cada uno es UNA transacción = estado + `external_identity_audit_log` + outbox; un
+  `UPDATE`/`INSERT` suelto deja estado sin audit, sin evento y sin bump de `grants_version`.
+- **NUNCA** resolver la persona por `client_id`/`azp` ni por email en el gateway o en el resolver: la llave
+  durable es `(environment_id, subject)` vía el source link activo. `clientId` sólo se registra en el
+  resolution log. El email únicamente participa al ACEPTAR una invitación (match exacto y único en
+  `identity_profiles.canonical_email`; 0 ⇒ persona nueva `external_contact`; >1 ⇒ `identity_collision`, nunca
+  auto-merge).
+- **NUNCA** llavear nada por el issuer crudo (`issuer_url`): los links y bindings apuntan al `environment_id`, y
+  la rotación de issuer es un UPDATE auditado de la fila del environment (evento `previousIssuerUrl`). Tampoco
+  cambiar `issuer_class` de un environment existente (el command responde `conflict`): un environment
+  `internal` no se vuelve `external` ni al revés; se crea otro.
+- **SIEMPRE** hacer bump de `grants_version` cuando cambia la autoridad efectiva de un binding — grant nuevo,
+  revocación de grant, de miembro o de binding. Los commands ya lo hacen; si nace un command nuevo que toque
+  grants o membresías, hereda la regla. El gateway compara `grantsVersion` por IGUALDAD contra el claim `gv`
+  del token: un cambio sin bump es autoridad vieja que sigue despachando hasta que el token expire. Revocar una
+  invitación abierta (`scope='invitation'`) es lo único que NO bumpea, porque todavía no era autoridad.
+- **NUNCA** borrar ni actualizar filas de `external_identity_audit_log` ni de
+  `external_access_resolution_log` (append-only; los triggers bloquean UPDATE/DELETE en el audit). El
+  resolution log guarda SÓLO denegaciones con `subject_hash`; no se poda todavía y no se le agrega `bound`
+  aunque el CHECK lo admita (convertirlo en log de aciertos lo hace crecer con cada dispatch).
+- **SIEMPRE** correr `pnpm identity:external-access:smoke` (read-only: readers + 4 señales) tras tocar SQL,
+  readers, resolver o migraciones del dominio, y `-- --apply` (fixture `ZZZ Q2C Smoke Fixture` + environment
+  `smoke-task-1631`) cuando el cambio toca commands o constraints. Los mocks de Vitest ejercitan el TS, no el
+  SQL: la migración 1 pasó todos los tests y el CHECK bidireccional sólo lo atrapó el smoke `--apply`. Efecto
+  colateral esperado de un apply: `identity.external_binding.unbound_dispatch_attempt` en `warning` 24 h.
+- **NUNCA** exponer `token_hash`, el token de invitación, el `subject` ni el email de un tercero en respuestas
+  de API, payloads de outbox, evidencia de señales, Sentry ni logs. El token se devuelve UNA vez desde
+  `issueExternalInvitation` y no vuelve a existir en claro; el detalle del binding (`GET .../bindings/[id]`)
+  lista invitaciones sin `token_hash`; el reader ecosystem responde IDs + `grants[]`, nunca el subject.
+- **SIEMPRE** una capability dedicada por command (`identity.external_environment.manage`,
+  `identity.external_binding.read` / `.bind`, `identity.external_grant.issue`,
+  `identity.external_invitation.issue`, `identity.external_access.revoke`; módulo `organization`, scope
+  `tenant`, grant hoy sólo a `efeonce_admin`). **NUNCA** reutilizar una capability existente para gatear un
+  command nuevo del dominio ni branchear `roleCodes.includes(...)`: la granularidad es la traza de quién pudo
+  dar acceso externo a quién.
+- **Membership = invitación `linked` bajo un binding `active`.** No existe otra tabla de membresía externa ni
+  se escribe `person_memberships`; quien necesite "los miembros externos de la org" lee las invitaciones
+  `linked` (reader canónico), no inventa una proyección. Una persona re-invitada supersede su membership
+  anterior (`superseded_by_reinvitation`); nunca hay dos `linked` activas para la misma (binding, persona).
+- **Grants per-persona = `profile_id` en `external_capability_grants`.** `NULL` = todos los miembros
+  ligados del binding; set = sólo esa persona (exige que ya esté `linked`). **NUNCA** crear una tabla o columna
+  paralela para "grants por usuario": la dimensión ya existe y el resolver la une (binding-wide ∪ per-persona).
+- **NUNCA** bindear una organización que no sea cliente `active_client` (`organization_type ∈ client|both`,
+  `active`, `status='active'`): el command responde `organization_not_eligible` y el reader de elegibilidad
+  la lista con `eligible=false` para que el operador vea por qué. No relajar el predicado para "probar":
+  usar el fixture del smoke.
+- **NUNCA** dar por muerta una sesión externa sólo porque el binding se revocó: la revocación de miembro o
+  binding desactiva el source link únicamente si la persona no conserva otra membership activa en el mismo
+  environment; el auth-server (`TASK-1830`) lee ese link. Verificar con `resolveExternalAccess` que el outcome
+  sea `revoked`, no asumirlo.
+- **NUNCA** agregar un `*_ENABLED` en Greenhouse para este dominio sin pasar por el ledger: hoy no hay flag
+  propio a propósito — los commands los gatea la capability admin, el reader ecosystem sólo responde a bindings
+  `internal` (404 anti-oráculo para el resto) y el uso externo lo gatea `OAUTH_EXTERNAL_ISSUER_ENABLED` del
+  gateway (`TASK-1831`).
+
+**Helpers canónicos**: `resolveExternalAccess({ environmentId, subject, clientId? })`
+(`resolve-external-access.ts`) · readers en `store.ts` · `ExternalAccessError` + códigos en `errors.ts` (mapean a
+`external_access_*` en `canonical-error-response.ts`) · adapter Next en `http.ts` (el único archivo `server-only`
+del dominio; el resto lo bundlea `services/auth-server`).
+
+**Observability**: 4 señales `identity.external_binding.*` (`unbound_dispatch_attempt`,
+`revoked_still_dispatching`, `subject_collision`, `orphan_grant`) en
+`src/lib/reliability/queries/external-identity-binding-signals.ts`, steady 0 · Sentry `domain=identity`
+(`captureWithDomain('identity')`) · `external_identity_audit_log` (qué se hizo) + `external_access_resolution_log`
+(qué se negó).
+
+## Auth server propio (TASK-1828 / TASK-1829)
+
+> Dominio `services/auth-server/**` + `src/lib/auth-server/{keys,oauth}/**` + schema `greenhouse_auth` (EPIC-044,
+> ejecutado 2026-09-04). Contratos: `EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md` (§Decision + §Delta
+> 2026-09-04) y, para la superficie OAuth, `EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md` (TASK-1829); runbook
+> `docs/operations/runbooks/auth-server.md`; señales en `src/lib/reliability/queries/auth-server-signals.ts`.
+
+Es el emisor de tokens de Efeonce en `https://auth.efeonce.org`: Cloud Run `auth-server` (`us-east4`, un solo
+servicio para staging y production), segundo host del front door del gateway MCP, firma ES256 con la llave
+`auth-server-es256` en Cloud KMS HSM y publica el JWKS. Expone `/healthz`, `/readyz` y `/.well-known/jwks.json`
+(TASK-1828) y, detrás de `AUTH_SERVER_OAUTH_ENABLED` (default `false`; `TASK-1829` code complete en `develop`
+2026-09-04, rollout pendiente), la superficie OAuth: metadata RFC 8414/OIDC, CIMD primario + DCR compat, PKCE S256,
+access JWT ES256 de 15 min con claim `gv`, refresh rotativo, revocación, introspección y consentimiento persistido.
+Personas (`TASK-1830`) y gateway multi-issuer (`TASK-1831`) llegan después. El login del portal no cambia.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** exportar, copiar ni cachear la llave privada: vive en Cloud KMS con protección HSM y no existe
+  fuera del hardware. El servicio sólo llama `asymmetricSign` sobre un digest; `signing_keys.public_jwk` guarda
+  la pública sin `d`. Un "backup" de la privada, un secreto en Secret Manager o una llave local "para tests"
+  cambian la clase de seguridad del emisor, no su grado.
+- **NUNCA** almacenar contraseñas ni construir un password store en este servicio: la autenticación de personas
+  será passkeys, magic link y TOTP (`TASK-1830`).
+- **NUNCA** firmar un token con una llave que no esté en estado `active` en `greenhouse_auth.signing_keys`:
+  `signWithActiveKey` es el único camino de firma; una `retiring` sólo verifica, una `retired` no hace nada.
+- **NUNCA** dejar más de una llave `active`: el índice parcial único lo impide en PG y `registerSigningKeyVersion`
+  (advisory lock) mueve la anterior a `retiring` en la misma transacción. Si el índice estorba, el bug está en el
+  flujo, no en el índice.
+- **SIEMPRE** publicar en el JWKS las llaves `active` **y** `retiring` (solapamiento mínimo 1 h, ≥ 4× el TTL
+  del token) para que un token firmado justo antes de rotar siga verificando; `retireSigningKey` rechaza el
+  retiro anticipado y `--force` sólo en incidente, auditado en `signing_key_events`.
+- **NUNCA** compartir `NEXTAUTH_SECRET`, cookies ni sesión del portal con el auth-server, ni aceptar en él una
+  cookie de Greenhouse: cookie propia `__Host-`, session store propio, secretos propios, audiencia propia.
+- **SIEMPRE** declarar las env vars del servicio en `services/auth-server/deploy.sh` (SoT; `--set-env-vars` es
+  destructivo). **NUNCA** `gcloud run services update --update-env-vars` a mano: el próximo deploy lo borra en
+  silencio. `AUTH_SERVER_ENABLED` vive en `FEATURE_FLAG_STATE_LEDGER.md`.
+- **SIEMPRE** que se toque IAM del deployer: `github-actions-deployer@` necesita `roles/iam.serviceAccountUser`
+  sobre `auth-server@` **y** `roles/cloudkms.viewer` sobre la llave — sin el viewer, el preflight de `deploy.sh`
+  (`gcloud kms keys describe`) falla con «KMS key not found» aunque la llave exista (run `33870746218`,
+  2026-09-04). El SA de runtime conserva sólo `cloudkms.signerVerifier` sobre la llave + `cloudsql.client`; no
+  puede crear ni destruir versiones.
+- **NUNCA** editar `managed.domains` del certificado del gateway (`mcp.efeonce.org`) para agregar
+  `auth.efeonce.org`: re-provisiona el certificado del gateway y lo deja caído. Es un **segundo** certificado
+  managed (`efeonce-auth-server-cert`) en el mismo proxy HTTPS; el host se prende/apaga con `enable_auth_host` en
+  `efeonce-mcp/infra/terraform`. Cualquier `destroy`/`replace` sobre recursos `gateway` en el plan = abortar.
+- **NUNCA** relajar el allowlist de `Host` (`AUTH_SERVER_ALLOWED_HOSTS`): el servicio responde 421 a cualquier
+  host que no sea `auth.efeonce.org`; la URL `.run.app` no es una puerta alternativa.
+- **NUNCA** cerrar una regresión del JWKS "porque los tests pasan": la verificación válida es un token firmado
+  por el HSM verificado con `jose` `createRemoteJWKSet` contra `https://auth.efeonce.org/.well-known/jwks.json`
+  y `pnpm auth-server:rotate-key --status` mostrando los mismos `kid` que publica el endpoint.
+
+**⚠️ Reglas duras OAuth (TASK-1829; detalle en `EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md` §10)**:
+
+- **NUNCA** publicar un `issuer` distinto del origen del well-known ni espejar un issuer ajeno.
+- **NUNCA** aceptar `code_challenge_method` distinto de `S256`; no existe camino para `plain`.
+- **NUNCA** redirigir con un `client_id` o `redirect_uri` no validados (antes de cualquier redirect); `localhost`
+  por nombre sólo como alias de loopback de clientes **públicos** (puerto libre, path exacto), nunca para
+  hospedados/confidenciales (HTTPS exacto); nunca wildcards.
+- **NUNCA** emitir un access token sin fila `active` en `client_consents` para **cada** scope ni sin membership
+  `bound` en `external_organization_bindings` (`gv = max(grantsVersion)` re-resuelto en cada emisión; sin `bound`
+  ⇒ `access_denied`, fail-closed); un scope de escritura exige además `authLevel = step_up`.
+- **NUNCA** consumir un code ni rotar un refresh fuera del `SELECT … FOR UPDATE` del store
+  (`src/lib/auth-server/oauth/store/**`): code de un solo uso, refresh rotado en cada uso; el reuso revoca la
+  familia completa (`grant_id`) y emite señal. **NUNCA** `DELETE`/`UPDATE` manual sobre codes, tokens o consents:
+  `revokeClientConsent` / `revoke` son el único camino.
+- **NUNCA** persistir ni loggear tokens, codes, `code_verifier`, secrets, IP, UA o `sub` en claro (sólo hashes);
+  `oauth_audit_events` es append-only (trigger) y el rate limit cuenta sobre ella, sin tabla extra.
+- **NUNCA** resolver un cliente CIMD sin el guard anti-SSRF (DNS resuelto, rangos privados rechazados, sin
+  redirects, 3 s, 64 KB) ni cachear un documento más de 24 h.
+- **NUNCA** registrar un cliente confidencial fuera de `registerConfidentialClient` (consumers: `POST
+  /api/admin/auth-server/oauth-clients` con `identity.auth_client.register` y `pnpm auth-server:register-client`);
+  DCR sólo registra públicos.
+- **NUNCA** hacer que el gateway dependa de `/oauth/introspect` para autorizar: JWT + JWKS + recheck de `gv`.
+- **NUNCA** prender `AUTH_SERVER_OAUTH_ENABLED` sin la fila `active` del emisor en
+  `greenhouse_core.external_identity_environments` (`efeonce-auth`, `https://auth.efeonce.org`, `external`) ni sin
+  validar la metadata; **NUNCA** emitir un code para una persona que este emisor no autenticó (hasta TASK-1830
+  `authorize` responde `login_required`).
+- **SIEMPRE** que se agregue un scope al gateway, agregarlo a `scopes.ts` (test de paridad con
+  `efeonce-mcp/src/config.ts`) y a la copia es-CL de `src/lib/copy/auth-server.ts`. **NUNCA** editar
+  `pages/efeonce-isotipo.generated.ts` a mano (`pnpm auth-server:brand-assets:generate`).
+
+**Helpers canónicos**: `src/lib/auth-server/keys/index.ts` (`signWithActiveKey`, `registerSigningKeyVersion`,
+`retireSigningKey`, adapter KMS) · `src/lib/auth-server/oauth/**` (`registerConfidentialClient`,
+`grantClientConsent`, `revokeClientConsent`, store atómico, `cimd.ts`, `scopes.ts`) · CLIs
+`pnpm auth-server:rotate-key`, `pnpm auth-server:register-client`, `pnpm auth-server:oauth-store:smoke` · señales
+`auth.issuer.jwks_unreachable` (`runtime`), `auth.signing_keys.lifecycle` (`data_quality`) y
+`auth.oauth.{code_reuse_detected,refresh_reuse_detected,cimd_rejected}` (`incident`, 24 h, steady 0) · Sentry
+`captureWithDomain('identity')` con tag `component=auth-server` (`check=kms` reemplaza al contador
+`auth.kms.sign_failures`).

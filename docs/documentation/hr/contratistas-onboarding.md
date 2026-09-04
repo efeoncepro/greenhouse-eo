@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-05-31 por Claude (TASK-976)
-> **Ultima actualizacion:** 2026-05-31 por Claude (TASK-976)
+> **Ultima actualizacion:** 2026-09-03 — autoactivación y reingreso por episodio
 > **Documentacion tecnica:** [GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_CONTRACTOR_ENGAGEMENTS_PAYABLES_ARCHITECTURE_V1.md)
 
 # Onboarding de Contractor — Crear un engagement (HR)
@@ -43,9 +43,19 @@ Una persona con una **relación de contractor ya activa**. El wizard:
 
 > El wizard **no fabrica** la relación legal — la exige o te deriva. Crear una relación desde cero es gobernanza de Person 360.
 
+## Reingreso con otro correo o después de una renuncia
+
+El correo nuevo no crea otra persona. Busca también por nombre y verifica la ficha longitudinal en Person 360 antes de concluir que falta la identidad. Si usuario, correo u OID están desalineados, People/Identity debe reconciliarlos por el carril administrativo canónico; este wizard no repara acceso.
+
+Cuando existe una etapa contractor anterior finalizada en términos de servicio, conserva su relación y engagement históricos y registra la nueva etapa con fechas y condiciones propias sobre el mismo profile. La anterior puede seguir **En cierre** mientras sus pagos se liquidan; eso no autoriza trasladar sus envíos ni boletas al episodio nuevo. No repitas una transición desde el antiguo offboarding employee para representar un reingreso contractor.
+
+Primero debe existir la **relación contractor activa del nuevo episodio**; después usa el Camino A. Si no existe, resuelve la relación en Person 360 o mediante operación administrativa autorizada con los comandos del dominio. El wizard no crea esa relación ni ofrece por sí solo una recuperación integral de reingreso.
+
+Si una salida histórica dañó disponibilidad o asignaciones de alguien ya reingresado, sigue el [runbook de recuperación](../../operations/runbooks/workforce-reentry-recovery.md): no recrees la persona ni reabras la relación employee como reparación.
+
 ## El resultado
 
-El engagement nace en estado **Borrador** con clasificación **Necesita revisión**. Para activarlo, revisas la clasificación y mueves el ciclo de vida desde el workbench (ver [Detalle, Ciclo de Vida y Clasificación](contratistas-engagement-ciclo-de-vida.md)).
+El onboarding activa el engagement cuando la clasificación **no es bloqueante**, incluso con **Necesita revisión**. Eso no equivale a una revisión legal realizada: `classificationReviewed` conserva su valor y la revisión pendiente sigue visible. Ante **Requiere revisión legal** o **Bloqueado**, permanece en borrador hasta resolverlo (ver [Detalle, Ciclo de Vida y Clasificación](contratistas-engagement-ciclo-de-vida.md)).
 
 ## Quién puede entrar
 

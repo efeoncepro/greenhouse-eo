@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
  * `readGroundedQueryDraft`): app route (actor humano), lane ecosystem (actor máquina,
  * sólo bindings `internal`) y handlers MCP (vía el client del lane). También fija los
  * boundaries: binding org-scoped no puede preparar drafts (403) y el write máquina queda
- * fail-closed por capability humana hasta TASK-1631.
+ * fail-closed por capability humana hasta EPIC-044 (TASK-1829/1831/1832: emisor propio + gateway multi-issuer; el grant revocable ya existe desde TASK-1631, 2026-09-04).
  */
 
 vi.mock('server-only', () => ({}))

@@ -1,0 +1,271 @@
+name: Auth Server Deploy
+
+# TASK-1828 / EPIC-044 — Efeonce authorization server (`auth.efeonce.org`) on Cloud Run.
+#
+# Mirrors the ops-worker deploy contract: pushes to `develop` that touch the
+# service or its bundled runtime surface deploy staging automatically;
+# production deploys are owned by `production-release.yml` via workflow_call;
+# workflow_dispatch remains available for audited break-glass.
+#
+# The service ships with AUTH_SERVER_ENABLED=false by default (readyz 503,
+# JWKS 404); flipping the flag is a declarative change in deploy.sh + ledger.
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - 'services/auth-server/**'
+      - 'services/_shared/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.dockerignore'
+      - '.gcloudignore'
+      - 'vendor/**'
+      - 'tsconfig.json'
+      # Coarse on purpose (same rationale as ops-worker): the bundle pulls
+      # src/lib transitively. Gate: `pnpm worker:deploy-path-gate`.
+      - 'src/lib/**'
+      - 'src/emails/**'
+      - 'src/types/**'
+      - 'src/config/**'
+      - 'src/components/**'
+      - 'src/i18n/**'
+      - 'src/@core/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        type: choice
+        required: true
+        default: staging
+        options:
+          - staging
+          - production
+      expected_sha:
+        description: 'Expected git SHA (default: github.sha). TASK-851 — orchestrator passes target_sha.'
+        type: string
+        required: false
+        default: ''
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Target environment (staging | production)'
+        type: string
+        required: true
+      expected_sha:
+        description: 'Target git SHA the orchestrator wants deployed'
+        type: string
+        required: true
+    secrets:
+      GCP_WORKLOAD_IDENTITY_PROVIDER:
+        required: true
+
+# Dynamic cancel-in-progress (TASK-848 Slice 3 / TASK-931) — never revert to a literal false.
+concurrency:
+  group: auth-server-deploy-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref == 'refs/heads/develop' || (github.event_name == 'workflow_call' && inputs.environment == 'production') || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production') }}
+
+permissions:
+  contents: read
+  id-token: write # Workload Identity Federation to GCP
+
+jobs:
+  deploy:
+    name: Deploy auth-server to Cloud Run
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    environment: >-
+      ${{
+        github.event_name == 'workflow_call'
+          && inputs.environment
+          || (github.event_name == 'workflow_dispatch'
+              && github.event.inputs.environment
+              || 'staging')
+      }}
+
+    env:
+      ENV: >-
+        ${{
+          github.event_name == 'workflow_call'
+            && inputs.environment
+            || (github.event_name == 'workflow_dispatch'
+                && github.event.inputs.environment
+                || 'staging')
+        }}
+      RAW_EXPECTED_SHA: >-
+        ${{
+          github.event_name == 'workflow_call'
+            && inputs.expected_sha
+            || (github.event_name == 'workflow_dispatch'
+                && github.event.inputs.expected_sha
+                || github.sha)
+        }}
+      GCP_PROJECT_ID: efeonce-group
+      GCP_REGION: us-east4
+      # Deployer identity via WIF; runtime identity is the dedicated auth-server SA
+      # (set by deploy.sh). Deploy and runtime identities are kept separate on purpose.
+      DEPLOYER_SERVICE_ACCOUNT: github-actions-deployer@efeonce-group.iam.gserviceaccount.com
+      RUNTIME_SERVICE_ACCOUNT: auth-server@efeonce-group.iam.gserviceaccount.com
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Resolve expected SHA
+        id: resolve-sha
+        shell: bash
+        env:
+          RAW_EXPECTED_SHA: ${{ env.RAW_EXPECTED_SHA }}
+        run: |
+          set -euo pipefail
+
+          if [ -n "${RAW_EXPECTED_SHA}" ]; then
+            RESOLVED_SHA="${RAW_EXPECTED_SHA}"
+            RESOLUTION_SOURCE="explicit-input"
+          elif [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ]; then
+            RESOLVED_SHA="$(git log -1 --format=%H -- \
+              package.json \
+              pnpm-lock.yaml \
+              tsconfig.json \
+              services/auth-server \
+              services/_shared \
+              src/lib \
+              src/types \
+              src/config)"
+            RESOLUTION_SOURCE="latest-worker-runtime-path"
+          else
+            RESOLVED_SHA="${GITHUB_SHA}"
+            RESOLUTION_SOURCE="event-sha"
+          fi
+
+          if [ -z "${RESOLVED_SHA}" ]; then
+            echo "ERROR: could not resolve expected auth-server SHA."
+            exit 1
+          fi
+
+          echo "EXPECTED_SHA=${RESOLVED_SHA}" >> "${GITHUB_ENV}"
+          echo "expected_sha=${RESOLVED_SHA}" >> "${GITHUB_OUTPUT}"
+          echo "resolution_source=${RESOLUTION_SOURCE}" >> "${GITHUB_OUTPUT}"
+          echo "Resolved auth-server expected SHA: ${RESOLVED_SHA} (${RESOLUTION_SOURCE})"
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.DEPLOYER_SERVICE_ACCOUNT }}
+
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v3
+        with:
+          project_id: ${{ env.GCP_PROJECT_ID }}
+
+      - name: Verify gcloud account
+        run: |
+          gcloud config list --format='value(core.project,core.account)'
+          gcloud auth list
+
+      - name: Check deployed revision drift
+        id: worker-drift
+        shell: bash
+        run: |
+          set -euo pipefail
+          WORKER_RUNTIME_PATHS=(
+            package.json
+            pnpm-lock.yaml
+            tsconfig.json
+            services/auth-server
+            services/_shared
+            src/lib
+            src/emails
+            src/types
+            src/config
+            src/components
+            src/i18n
+            src/@core
+          )
+
+          CURRENT_REVISION="$(gcloud run services describe auth-server \
+            --project="${GCP_PROJECT_ID}" \
+            --region="${GCP_REGION}" \
+            --format='value(status.latestReadyRevisionName)' 2>/dev/null || true)"
+
+          CURRENT_GIT_SHA=""
+          if [ -n "${CURRENT_REVISION}" ]; then
+            CURRENT_GIT_SHA="$(gcloud run revisions describe "${CURRENT_REVISION}" \
+              --project="${GCP_PROJECT_ID}" \
+              --region="${GCP_REGION}" \
+              --format=json | python3 -c 'import json, sys; data = json.load(sys.stdin); print(next((env.get("value", "") for c in (data.get("spec", {}).get("containers", []) or []) for env in (c.get("env") or []) if env.get("name") == "GIT_SHA"), ""))' 2>/dev/null || true)"
+          fi
+
+          if [ "${CURRENT_GIT_SHA}" = "${EXPECTED_SHA}" ]; then
+            DEPLOY_NEEDED="false"
+            echo "auth-server already serves EXPECTED_SHA=${EXPECTED_SHA} at revision ${CURRENT_REVISION}; skipping build/deploy."
+          elif [ -n "${CURRENT_GIT_SHA}" ] \
+            && git cat-file -e "${CURRENT_GIT_SHA}^{commit}" 2>/dev/null \
+            && git diff --quiet "${EXPECTED_SHA}..${CURRENT_GIT_SHA}" -- "${WORKER_RUNTIME_PATHS[@]}"; then
+            DEPLOY_NEEDED="false"
+            echo "auth-server serves ${CURRENT_GIT_SHA}; runtime paths unchanged since EXPECTED_SHA=${EXPECTED_SHA}; skipping build/deploy."
+          else
+            DEPLOY_NEEDED="true"
+            echo "auth-server deploy required: current_revision=${CURRENT_REVISION:-none}, current_git_sha=${CURRENT_GIT_SHA:-none}, expected_sha=${EXPECTED_SHA}"
+          fi
+
+          echo "deploy_needed=${DEPLOY_NEEDED}" >> "${GITHUB_OUTPUT}"
+          echo "current_revision=${CURRENT_REVISION}" >> "${GITHUB_OUTPUT}"
+          echo "current_git_sha=${CURRENT_GIT_SHA}" >> "${GITHUB_OUTPUT}"
+
+      - name: Deploy auth-server
+        if: steps.worker-drift.outputs.deploy_needed == 'true'
+        run: |
+          bash services/auth-server/deploy.sh
+        env:
+          ENV: ${{ env.ENV }}
+          EXPECTED_SHA: ${{ steps.resolve-sha.outputs.expected_sha }}
+
+      - name: Verify deployment health
+        run: |
+          REVISION="$(gcloud run services describe auth-server \
+            --project=${GCP_PROJECT_ID} \
+            --region=${GCP_REGION} \
+            --format='value(status.latestReadyRevisionName)')"
+          READY="$(gcloud run services describe auth-server \
+            --project=${GCP_PROJECT_ID} \
+            --region=${GCP_REGION} \
+            --format='value(status.conditions[0].status)')"
+          echo "Latest ready revision: ${REVISION}"
+          echo "Service ready: ${READY}"
+          if [ "${READY}" != "True" ]; then
+            echo "::warning::Service reports not-ready. Check Cloud Run logs."
+          fi
+          echo "✓ auth-server deploy verified (revision ${REVISION})"
+
+      - name: Poll Ready=True bounded
+        run: |
+          DEADLINE=$((SECONDS + 300))
+          while [ ${SECONDS} -lt ${DEADLINE} ]; do
+            READY="$(gcloud run services describe auth-server \
+              --project=${GCP_PROJECT_ID} \
+              --region=${GCP_REGION} \
+              --format='value(status.conditions[0].status)')"
+            if [ "${READY}" = "True" ]; then
+              echo "✓ Service Ready=True at $((SECONDS))s"
+              exit 0
+            fi
+            echo "  waiting Ready=True (current=${READY}, elapsed=${SECONDS}s)"
+            sleep 10
+          done
+          echo "ERROR: Service did not reach Ready=True within 300s"
+          exit 1
+
+      - name: Record deployment commit
+        run: |
+          echo "Deployed commit: ${{ steps.resolve-sha.outputs.expected_sha }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Environment: ${{ env.ENV }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Triggered by: ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "SHA resolution: ${{ steps.resolve-sha.outputs.resolution_source }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Deploy needed: ${{ steps.worker-drift.outputs.deploy_needed }}" >> "$GITHUB_STEP_SUMMARY"

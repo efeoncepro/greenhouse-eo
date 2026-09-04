@@ -211,7 +211,7 @@ pnpm workforce:offboarding:recovery --apply --member <memberId> \
   --reason "Renuncia confirmada, caso quedó ejecutado sin cerrar el ciclo de vida del colaborador." \
   --approve
 
-# Lane B — un caso de solo-acceso que en verdad fue un término real
+# Lane B — baja de acceso sin término de relación
 pnpm workforce:offboarding:recovery --apply --member <memberId> \
   --decision access_only --access-revoked-on 2026-09-01 \
   --reason "Baja de acceso SCIM confirmada, sin evidencia de término de relación laboral."
@@ -220,6 +220,19 @@ pnpm workforce:offboarding:recovery --apply --member <memberId> \
 El script vuelve a leer el estado en vivo justo antes de escribir, e imprime un readback después: elegibilidad de nómina por período, estado del colaborador, y obligaciones de Finance en solo lectura. **Nunca** emite pagos ni toca datos de Finance — si hay una obligación generada por error, esa se corrige en Finance con sus propios commands, no desde este script.
 
 Para verificar el resolver de elegibilidad de nómina de forma aislada (sin tocar casos), usa `pnpm payroll:exit-eligibility:smoke`.
+
+### Si el caso está en borrador o aprobado y ya terminó la relación
+
+Confirma la persona seleccionada en el inspector, la causal y las fechas. El CLI de recuperación
+puede mostrar `manual_decision_pending` o `in_lifecycle` sin aplicar nada: esos casos necesitan
+la revisión y el cierre normal del caso existente. El operador técnico usa la secuencia gobernada
+[documentada en el runbook](../../operations/runbooks/offboarding-recovery.md#casos-manuales-en-borrador-o-ya-aprobados),
+con aprobación autorizada y control de versión; no crea otro caso ni lo desactiva por SQL.
+
+Al terminar, verifica «Cierre completo», 4/4 pasos, exclusión en el período de nómina abierto y
+la ausencia de salidas sin resolver. El deadline puede pertenecer al mes siguiente: no confundirlo
+con el período. Si se confirmó que ya se pagó todo, esa declaración queda auditada; las obligaciones
+que Finanzas aún muestre como generadas requieren conciliación separada y no justifican pagar otra vez.
 
 ## Que no hacer
 

@@ -22,6 +22,15 @@ ejecuta. La skill que carga los invariantes es `greenhouse-globe`.
 
 ## Antes de empezar
 
+**Verifica primero el lifecycle, antes de conectar la base o probar una corrida.** Lee el
+[handoff vigente](../../operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md). Si Globe está hibernado, no
+enciendas SQL, schedulers ni proveedores para diagnosticarlo. La pausa reversible incluye el caller externo
+`ops-globe-tenancy-reconcile` de Greenhouse, que Terraform Globe no gobierna; el vencimiento de proyecciones
+de permisos es esperado y no autoriza un bypass. Para una reactivación expresamente autorizada, sigue el
+[runbook §9](../../operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md#9-reactivation-procedure):
+SQL/API listas en `draining`, refresco verificado de tenancy y sólo después producción. Los comandos de base
+y los tiempos históricos de este manual no prueban disponibilidad ni cadencia actual durante la pausa.
+
 ⚠️ **Antes de concluir por una edad: las filas viejas de la cola tienen el reloj sucio.** De 131 filas terminadas
 medidas en producción, **23 eran contradictorias** (la peor decía haber terminado 9,7 horas antes de estar
 disponible). Desde el 2026-08-04 se sellan con el reloj real y las nuevas dan **0**. Una latencia calculada sobre

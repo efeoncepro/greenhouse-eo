@@ -197,3 +197,20 @@ The following rules are normative:
 
 V2 supersedes only the V1 reconciliation shape and revision/freshness semantics. The ownership boundary, effective
 authority intersection, no-parallel-identity rule, tenant isolation and external promotion gates remain unchanged.
+
+## Operational lifecycle clarification — 2026-09-03 (TASK-1807)
+
+The periodic-refresh requirement above governs normal active operation; it does not authorize waking a
+deliberately hibernated product. During reversible hibernation, pause the external Greenhouse scheduler
+`ops-globe-tenancy-reconcile` (`efeonce-group/us-east4`) and intentionally let leases expire. Expiry continues
+to deny authority: do not extend TTL, disable enforcement, recreate memberships or widen grants to preserve
+access while paused. Data and append-only history remain retained.
+
+Reactivation follows phase C of the
+[deep-hibernation runbook](../../operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md): recover
+SQL/API, revalidate the existing narrow broker reconciliation path while productive lanes remain closed in
+`draining`, resume the caller through its source and runtime controls, and require successful domain
+reconciliation plus fresh projections before `active`. A Scheduler/ops-worker HTTP 200 is not proof of remote
+reconciliation. Failure keeps productive access closed; it never authorizes bypassing this ADR. This operating
+clarification preserves the accepted authority, semantic-revision and freshness contracts; it does not add an
+authorization exception or change the historical decision.

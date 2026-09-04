@@ -7,7 +7,7 @@ description: >-
   research → brief y ejecuta brief → pieza publicada → átomos sociales. Invoca copywriting,
   seo-aeo, content-marketing-studio, social-media-studio, notion-platform y greenhouse-ico cuando
   corresponde. Usar para cualquier producción mensual, artículo, tutorial, banner, derivado social,
-  QA o publicación de Berel.
+  QA, publicación o informe periódico de auditoría de Berel.
 type: skill
 user-invocable: true
 argument-hint: '[fase del ciclo, artículo, tutorial o pregunta concreta]'
@@ -20,6 +20,7 @@ argument-hint: '[fase del ciclo, artículo, tutorial o pregunta concreta]'
 
 **Berel = Pinturas Berel, México.** El contenido vive en `berel.com`, sección **Inspiración**, sobre
 Drupal. La voz pública es español de México y habla como la marca, no como Efeonce.
+Los informes dirigidos a Berel hablan desde Efeonce como su agencia: ver módulo 17.
 
 ## Precedencia documental
 
@@ -35,6 +36,9 @@ Si Notion contiene una regla vieja que contradice una decisión posterior del cl
 específica, **no degradar la skill**: mantener la regla más reciente/específica y registrar el drift.
 
 ## Cómo se usa
+
+Para informes periódicos dirigidos al cliente, comenzar por el módulo 17 y el canon compartido
+de reporting; los pasos siguientes gobiernan la producción de piezas.
 
 1. **Consultar `Formato` en Content Hub antes de escribir.**
    - `Artículo` → modalidades A/B normales.
@@ -54,6 +58,7 @@ específica, **no degradar la skill**: mantener la regla más reciente/específi
 Planeación temática, prioridades y minería de huecos ............... modules/14_PLANEACION_TEMATICA_Y_COBERTURA.md
 Mes completo, modalidades, tareas y estados ........................ modules/01_CICLO_MENSUAL.md
 Numeración mensual, identidad y corrección de referencias .......... modules/16_NUMERACION_EDITORIAL.md
+Informe periódico al cliente, continuidad y responsabilidad ........ modules/17_INFORMES_AUDITORIA_CLIENTE.md
 Auditoría de URL viva y análisis SEO/AEO ........................... modules/02_ANALISIS_AUDITORIA.md
 Redacción de reescritura o artículo nuevo .......................... modules/03_REDACCION_ARTICULO.md
 Voz y tono Berel es-MX ............................................. modules/04_VOZ_Y_TONO_BEREL.md
@@ -79,7 +84,8 @@ Plantillas ......................................................... templates/
    debe estar escrito antes de crear la tarea de fotos del Paso a Paso.
 2. 🔴 **Nada técnico se afirma sin abrir la URL viva.** La extracción de texto plano no prueba
    enlaces, ALT, `title`, jerarquías ni schema.
-3. 🔴 **No borrar contenido existente en Notion.** Agregar nuevos desplegables al final.
+3. 🔴 **No borrar contenido existente del Content Hub.** Agregar nuevos desplegables al final.
+   Las revisiones autorizadas del informe de auditoría se integran en la misma página (módulo 17).
 4. 🔴 **Nada se promete sin respaldo documental.** Claims, garantías, rendimientos y cifras deben
    existir en ficha/fuente del cliente. Si dos fuentes contradicen, ninguna entra al cuerpo.
 5. 🔴 **Nunca RGB/HEX de colores de pintura en texto público.** Nombre + código alfanumérico. HEX de
@@ -90,8 +96,8 @@ Plantillas ......................................................... templates/
    control inventado + `title`/H1/cuerpo.
 8. 🔴 **Links para CMS se entregan como rutas relativas** desde el primer `/` posterior a `.com`
    cuando el handoff lo requiera; el anchor visible siempre es descriptivo, nunca la URL cruda.
-9. 🔴 **Voz Berel en es-MX y primera persona plural:** `creamos`, `nuestra paleta`, `nuestro blog`.
-   ALT y schema pueden usar tercera persona.
+9. 🔴 **Contenido público: voz Berel en es-MX y primera persona plural:** `creamos`, `nuestra paleta`, `nuestro blog`.
+   ALT y schema pueden usar tercera persona. En informes al cliente, nosotros = Efeonce (módulo 17).
 10. 🔴 **Mexicanidad por objetos y contexto, no por etiquetas ni modismos cerrados.**
 11. 🔴 **Auditoría de voz obligatoria antes de cerrar.** Revisar detalles, no solo “sensación de tono”.
 12. 🔴 **Sin series de producto en cuerpo público**, incluidas tablas, materiales y CTA. Las series
@@ -162,6 +168,10 @@ Plantillas ......................................................... templates/
     siguiente mes; heredar N## por ID de artículo. Corregir solo con mapa autorizado y readback de
     dependencias; conservar archivos históricos con equivalencia. Banner N1–N4 no es N## editorial.
     Protocolo y mapa noviembre/diciembre: módulo 16.
+
+44. 🔴 **El informe rinde cuentas de nuestra gestión.** Leer auditorías anteriores y operación viva;
+    asumir los pendientes de lo que redactamos/publicamos, distinguir estados y revisar toda la
+    redacción, incluidas tablas, anexos y propiedades. Cierre con Notion + Markdown releídos: módulo 17.
 
 ## Lo que no se toca
 
