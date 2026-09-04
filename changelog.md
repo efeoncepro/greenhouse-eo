@@ -19,15 +19,6 @@ reader `resolveExternalAccess(environment, subject)` que deniega fail-closed y r
 Smoke live `pnpm identity:external-access:smoke` verificó bind → grant → invite → accept → resolve → revoke contra PG real.
 Estado: code complete, rollout pendiente (deploy + señales en `/admin/operations`).
 
-## 2026-09-03 — Globe: pausa reversible del reconciliador externo de tenancy
-
-`ops-globe-tenancy-reconcile` (`efeonce-group/us-east4`) quedó `PAUSED` a las 22:26:05Z, sin eliminar su
-definición ni modificar cron, destino o identidad. Deja de programar llamadas hacia Globe con SQL detenido.
-`services/ops-worker/deploy.sh` declara la pausa deseada localmente; sin commit/push/deploy en esta ejecución,
-la protección frente a futuros despliegues aún requiere promoción. Reinicio y sincronización source/runtime:
-[runbook](docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md).
-TASK-1807 sigue abierta; ahorro posterior al corte pendiente de Billing Export.
-
 ## 2026-09-04 — TASK-1828: runtime del authorization server propio desplegado en staging y publicado en el front door del gateway
 
 Slices 0–2 de `TASK-1828` (EPIC-044): llave ES256 con protección **HSM** en Cloud KMS (`auth-server-es256`, versión 1
@@ -41,6 +32,15 @@ real firmado por el HSM y verificado con el JWKS servido desde PG; `services/aut
 in-place, 0 destruidos; `mcp.efeonce.org` intacto); señales `auth.issuer.jwks_unreachable` y
 `auth.signing_keys.lifecycle` en el control plane; runbook `docs/operations/runbooks/auth-server.md`. Producción del
 emisor queda `code complete, rollout pendiente` (release control plane).
+
+## 2026-09-03 — Globe: pausa reversible del reconciliador externo de tenancy
+
+`ops-globe-tenancy-reconcile` (`efeonce-group/us-east4`) quedó `PAUSED` a las 22:26:05Z, sin eliminar su
+definición ni modificar cron, destino o identidad. Deja de programar llamadas hacia Globe con SQL detenido.
+`services/ops-worker/deploy.sh` declara la pausa deseada localmente; sin commit/push/deploy en esta ejecución,
+la protección frente a futuros despliegues aún requiere promoción. Reinicio y sincronización source/runtime:
+[runbook](docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md).
+TASK-1807 sigue abierta; ahorro posterior al corte pendiente de Billing Export.
 
 ## 2026-09-03 — EPIC-044: authorization server propio de Efeonce (ADR aceptado) y siete tasks nuevas
 
@@ -956,11 +956,3 @@ bien las dos lentes costaba dos llamadas y una decisión, presentarlas mal costa
 
 Sin migración, sin flag, sin cambio de valor en ninguna cifra. `dataforseo_serp` quedó como lente
 `estimated` y no `measured`: exacto no es medido — esa consulta la hicimos nosotros.
-
-## 2026-08-29 — Las capacidades SEO nuevas pasan de "prendidas" a "ejercitadas"
-
-`domain-overview` y `url-visibility` corrieron por el camino desatendido del scheduler (body `{}`),
-con costo real **clavado al preview** (USD 0,01212 y USD 0,024) y re-corrida a USD 0. Los schedulers
-tenían `lastAttemptTime` vacío y su próxima corrida agendada era el 16-17 de septiembre. La ventana de
-48 h de `ISSUE-164` quedó cerrada midiendo el efecto en `grader_probe_results` (`blocked%` = 0) en vez
-del conteo de Sentry, con la salvedad explícita de que la muestra es una sola corrida.
