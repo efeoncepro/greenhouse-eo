@@ -58,6 +58,7 @@ Always inspect the real consumers before acting:
 | `GREENHOUSE_POSTGRES_*` passwords | Must validate with `pnpm pg:doctor` or a real connection. |
 | `GOOGLE_CLIENT_SECRET` / `AZURE_AD_CLIENT_SECRET` | Can break SSO login for all users. |
 | `NUBOX_*` | Can break finance integrations (invoice download, DTE). |
+| Cloud KMS `auth-server-es256` versions | Retiring/disabling the wrong version breaks verification of in-flight tokens; only via `pnpm auth-server:rotate-key`. |
 
 7. If a secret publication error caused runtime degradation, **document it as `ISSUE-###`** even if the fix also includes defensive code.
 
@@ -95,6 +96,32 @@ The current operator-owned PAT is a temporary distribution credential with an ex
 
 For a migration from the legacy AXIS credential: (1) inventory all code, workflow, Cloud Build, IAM, and runtime references; (2) create/enable the replacement secret in the control-plane project; (3) grant only the required build identities; (4) publish the temporary credential by stdin; (5) run a non-leaking package-install/build verification; (6) deploy and verify the consumer digest/revision; and only then (7) disable the legacy secret version and revoke the legacy credential. Keep the legacy container disabled, rather than deleting it immediately, if a short recovery window is required. Never revoke the replacement credential or delete the legacy secret before production evidence is complete.
 
+### Auth server signing key (Cloud KMS HSM)
+
+The native authorization server (`services/auth-server`, `TASK-1828` / EPIC-044) signs with `auth-server-es256`
+(EC P-256, HSM) in Cloud KMS `us-east4/auth-server`. The private key NEVER leaves KMS: signing goes through the KMS
+API (CRC32C-checked, mandatory local verification of every signature) and PostgreSQL (`greenhouse_auth.signing_keys`
++ append-only `signing_key_events`) holds only the PUBLIC JWK (no `d`) and the lifecycle. There is no secret value to
+publish, rotate in Secret Manager, paste or export — a "copy of the key" anywhere is an incident, not a backup.
+
+- Rotation is `pnpm auth-server:rotate-key` (`--status` | `--register <version>` | `--retire <kid> [--force]`):
+  create the new KMS version, register it (it becomes `active`, ≤1 active by partial index; the previous one moves
+  to `retiring` and stays in the JWKS so in-flight tokens still verify), then retire the previous one after the
+  overlap window (≥ 1 h) and `gcloud kms keys versions disable` it. Never `INSERT` into `signing_keys` by hand;
+  never sign with a key that is not `active`; never leave a `retiring` version around indefinitely. The CLI needs
+  the Cloud SQL proxy (`GREENHOUSE_POSTGRES_HOST=127.0.0.1`, `GREENHOUSE_POSTGRES_PORT=15432`,
+  `GREENHOUSE_POSTGRES_SSL=false`, `GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=""`) and `AUTH_SERVER_KMS_KEY`.
+- Minimum IAM, resource-level only: runtime SA `auth-server@efeonce-group` = `roles/cloudkms.signerVerifier` on the
+  key (+ `cloudsql.client`); deployer `github-actions-deployer@` = `roles/cloudkms.viewer` on the key +
+  `iam.serviceAccountUser` on `auth-server@`. Never grant KMS roles at project level; the deployer never gets
+  `signerVerifier`.
+- Service env vars (`AUTH_SERVER_ENABLED`, `AUTH_SERVER_ISSUER`, `AUTH_SERVER_ALLOWED_HOSTS`, `AUTH_SERVER_KMS_KEY`)
+  live only in `services/auth-server/deploy.sh` (`--set-env-vars`, destructive). Never
+  `gcloud run services update --update-env-vars` by hand. Never share `NEXTAUTH_SECRET` or portal cookies with the
+  issuer — the auth server is its own trust boundary and the portal login does not change.
+- Signals: `auth.signing_keys.lifecycle` (data_quality) and `auth.issuer.jwks_unreachable`. Runbook:
+  `docs/operations/runbooks/auth-server.md`; invariants: `.claude/rules/auth-server.md`.
+
 ---
 
 ## Workflow
@@ -108,6 +135,7 @@ For a migration from the legacy AXIS credential: (1) inventory all code, workflo
 | **database** | `GREENHOUSE_POSTGRES_PASSWORD`, `GREENHOUSE_POSTGRES_HOST` | Secret Manager via `*_SECRET_REF` or direct env |
 | **provider** | `NUBOX_BEARER_TOKEN`, `SLACK_*`, `SENTRY_*`, `SCIM_*` | Secret Manager via `*_SECRET_REF` or direct env |
 | **agent** | `AGENT_AUTH_SECRET` | Direct env only |
+| **signing key** | `auth-server-es256` (Cloud KMS HSM) | KMS key version; no secret value exists anywhere |
 
 ### Step 2 — Confirm the resolution path
 

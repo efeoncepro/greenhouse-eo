@@ -1,5 +1,21 @@
 # TASK-1830 — Efeonce Auth External Person Authentication (passkeys, magic link, TOTP, recovery)
 
+## Delta 2026-09-04
+
+- `TASK-1828` entregó el runtime y el schema sobre los que viven las primitives de esta task: Cloud Run
+  `auth-server` (us-east4, revisión `auth-server-00003-jtf`, `AUTH_SERVER_ENABLED=true`),
+  `https://auth.efeonce.org/readyz` 200, `services/auth-server/server.ts` como host de las rutas JSON y schema
+  `greenhouse_auth` aplicado (`signing_keys`, `signing_key_events`) por
+  `migrations/20260904111156246_task-1828-greenhouse-auth-schema.sql` — cerrado por trabajo en `TASK-1828`.
+- **Corrección de supuesto:** la llave KMS que existe (`us-east4/auth-server/auth-server-es256`, HSM) es una
+  llave de **firma** EC (ES256) con SA `auth-server@` como `signerVerifier`; **no sirve para envelope**. El
+  cifrado en reposo de los secretos TOTP (Slice 3) necesita una llave KMS **simétrica propia** (encrypt/decrypt)
+  con su IAM, que esta task debe declarar y provisionar; se registra como gap nuevo.
+- `TASK-1631` Slice 1 quedó code complete y verificado en staging el 2026-09-04 (invitaciones, source links,
+  `acceptExternalInvitation` in-process); sigue en `Blocked by` hasta que su release a producción acompañe al
+  del runtime, pero el contrato ya existe para diseñar contra él.
+- `Blocked by` pierde `TASK-1828`; queda sólo `TASK-1631`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -19,10 +35,10 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-044`
-- Status real: `Especificación; el auth server no tiene capa propia de autenticación de personas`
+- Status real: `Especificación con runtime disponible (2026-09-04): auth.efeonce.org y schema greenhouse_auth entregados por TASK-1828 en staging; el auth server no tiene capa propia de autenticación de personas; falta una llave KMS simétrica para el envelope de secretos TOTP`
 - Rank: `TBD`
 - Domain: `platform|identity`
-- Blocked by: `TASK-1828 (runtime y schema greenhouse_auth); TASK-1631 (invitaciones y source links para ligar el subject)`
+- Blocked by: `TASK-1631 (invitaciones y source links para ligar el subject; Slice 1 code complete + staging verificado 2026-09-04, producción con el próximo release)`
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -91,8 +107,10 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `TASK-1828` (runtime, KMS para envelope de secretos TOTP, schema).
-- `TASK-1631` (`external_member_invitations`, `identity_profile_source_links`, `external_identity_environments`).
+- `TASK-1828` (cumplida en staging 2026-09-04): runtime `services/auth-server/**` y schema `greenhouse_auth`. Su
+  llave KMS `auth-server-es256` es de firma (EC), NO de envelope: la llave simétrica para secretos TOTP es de esta task.
+- `TASK-1631` (`external_member_invitations`, `identity_profile_source_links`, `external_identity_environments`;
+  Slice 1 code complete y verificado en staging 2026-09-04).
 - Resend (`src/lib/resend.ts`) y un `EmailType` nuevo para magic link e invitación externa `[verificar catálogo de EmailType]`.
 
 ### Blocks / Impacts
@@ -118,11 +136,20 @@ Reglas obligatorias:
 - `src/lib/auth/magic-link.ts` (TASK-742 capa 5) con bcrypt, TTL 15 min, single-use y rate limit declarado.
 - `src/lib/auth/attempt-tracker.ts` (ledger `auth_attempts`).
 - `bcryptjs`, `jose`, `resend` en dependencias; plantillas de correo gobernadas (`src/emails/**`).
-- Invitaciones y source links diseñados en `TASK-1631` (schema pendiente de aplicar).
+- Invitaciones y source links de `TASK-1631`: schema APLICADO en PG (2 migraciones), commands
+  (`issueExternalInvitation`, `acceptExternalInvitation`), rutas admin y reader ecosystem; staging verificado 2026-09-04.
+- **Desde `TASK-1828` (2026-09-04):** runtime `services/auth-server/server.ts` en Cloud Run (`readyz`, JWKS;
+  host donde nacen las rutas `/auth/*` de esta task), `deploy.sh` como SoT de env vars (flag
+  `AUTH_SERVER_ENABLED`), schema `greenhouse_auth` con `signing_keys`/`signing_key_events`, SA `auth-server@`
+  con `cloudsql.client`, runbook `docs/operations/runbooks/auth-server.md`.
 
 ### Gap
 
-- No hay WebAuthn ni TOTP en el repo; no hay sesión fuera de NextAuth.
+- No hay WebAuthn ni TOTP en el repo; no hay sesión fuera de NextAuth (`greenhouse_auth` no tiene `sessions`
+  ni tablas de credenciales).
+- **Sin llave KMS simétrica para el envelope de secretos TOTP:** la única llave del auth server
+  (`auth-server-es256`) es EC de firma y su IAM es `signerVerifier`; hay que crear una llave `ENCRYPT_DECRYPT`
+  propia en el keyring `auth-server` y otorgar `cryptoKeyEncrypterDecrypter` a `auth-server@`.
 - No hay `EmailType` para invitación externa/magic link del auth server.
 - No hay flujo maestro UI para login/consentimiento.
 

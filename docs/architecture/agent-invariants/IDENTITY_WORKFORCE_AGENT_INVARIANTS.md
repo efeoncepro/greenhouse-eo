@@ -446,3 +446,57 @@ del dominio; el resto lo bundlea `services/auth-server`).
 `src/lib/reliability/queries/external-identity-binding-signals.ts`, steady 0 · Sentry `domain=identity`
 (`captureWithDomain('identity')`) · `external_identity_audit_log` (qué se hizo) + `external_access_resolution_log`
 (qué se negó).
+
+## Auth server propio (TASK-1828)
+
+> Dominio `services/auth-server/**` + `src/lib/auth-server/keys/**` + schema `greenhouse_auth` (EPIC-044,
+> ejecutado 2026-09-04). Contrato: `EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md` (§Decision + §Delta
+> 2026-09-04); runbook `docs/operations/runbooks/auth-server.md`; señales en
+> `src/lib/reliability/queries/auth-server-signals.ts`.
+
+Es el emisor de tokens de Efeonce en `https://auth.efeonce.org`: Cloud Run `auth-server` (`us-east4`, un solo
+servicio para staging y production), segundo host del front door del gateway MCP, firma ES256 con la llave
+`auth-server-es256` en Cloud KMS HSM y publica el JWKS. Hoy sólo expone `/healthz`, `/readyz` y
+`/.well-known/jwks.json`; OAuth (`TASK-1829`) y personas (`TASK-1830`) llegan después. El login del portal no
+cambia.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** exportar, copiar ni cachear la llave privada: vive en Cloud KMS con protección HSM y no existe
+  fuera del hardware. El servicio sólo llama `asymmetricSign` sobre un digest; `signing_keys.public_jwk` guarda
+  la pública sin `d`. Un "backup" de la privada, un secreto en Secret Manager o una llave local "para tests"
+  cambian la clase de seguridad del emisor, no su grado.
+- **NUNCA** almacenar contraseñas ni construir un password store en este servicio: la autenticación de personas
+  será passkeys, magic link y TOTP (`TASK-1830`).
+- **NUNCA** firmar un token con una llave que no esté en estado `active` en `greenhouse_auth.signing_keys`:
+  `signWithActiveKey` es el único camino de firma; una `retiring` sólo verifica, una `retired` no hace nada.
+- **NUNCA** dejar más de una llave `active`: el índice parcial único lo impide en PG y `registerSigningKeyVersion`
+  (advisory lock) mueve la anterior a `retiring` en la misma transacción. Si el índice estorba, el bug está en el
+  flujo, no en el índice.
+- **SIEMPRE** publicar en el JWKS las llaves `active` **y** `retiring` (solapamiento mínimo 1 h, ≥ 4× el TTL
+  del token) para que un token firmado justo antes de rotar siga verificando; `retireSigningKey` rechaza el
+  retiro anticipado y `--force` sólo en incidente, auditado en `signing_key_events`.
+- **NUNCA** compartir `NEXTAUTH_SECRET`, cookies ni sesión del portal con el auth-server, ni aceptar en él una
+  cookie de Greenhouse: cookie propia `__Host-`, session store propio, secretos propios, audiencia propia.
+- **SIEMPRE** declarar las env vars del servicio en `services/auth-server/deploy.sh` (SoT; `--set-env-vars` es
+  destructivo). **NUNCA** `gcloud run services update --update-env-vars` a mano: el próximo deploy lo borra en
+  silencio. `AUTH_SERVER_ENABLED` vive en `FEATURE_FLAG_STATE_LEDGER.md`.
+- **SIEMPRE** que se toque IAM del deployer: `github-actions-deployer@` necesita `roles/iam.serviceAccountUser`
+  sobre `auth-server@` **y** `roles/cloudkms.viewer` sobre la llave — sin el viewer, el preflight de `deploy.sh`
+  (`gcloud kms keys describe`) falla con «KMS key not found» aunque la llave exista (run `33870746218`,
+  2026-09-04). El SA de runtime conserva sólo `cloudkms.signerVerifier` sobre la llave + `cloudsql.client`; no
+  puede crear ni destruir versiones.
+- **NUNCA** editar `managed.domains` del certificado del gateway (`mcp.efeonce.org`) para agregar
+  `auth.efeonce.org`: re-provisiona el certificado del gateway y lo deja caído. Es un **segundo** certificado
+  managed (`efeonce-auth-server-cert`) en el mismo proxy HTTPS; el host se prende/apaga con `enable_auth_host` en
+  `efeonce-mcp/infra/terraform`. Cualquier `destroy`/`replace` sobre recursos `gateway` en el plan = abortar.
+- **NUNCA** relajar el allowlist de `Host` (`AUTH_SERVER_ALLOWED_HOSTS`): el servicio responde 421 a cualquier
+  host que no sea `auth.efeonce.org`; la URL `.run.app` no es una puerta alternativa.
+- **NUNCA** cerrar una regresión del JWKS "porque los tests pasan": la verificación válida es un token firmado
+  por el HSM verificado con `jose` `createRemoteJWKSet` contra `https://auth.efeonce.org/.well-known/jwks.json`
+  y `pnpm auth-server:rotate-key --status` mostrando los mismos `kid` que publica el endpoint.
+
+**Helpers canónicos**: `src/lib/auth-server/keys/index.ts` (`signWithActiveKey`, `registerSigningKeyVersion`,
+`retireSigningKey`, adapter KMS) · CLI `pnpm auth-server:rotate-key` · señales `auth.issuer.jwks_unreachable`
+(`runtime`) y `auth.signing_keys.lifecycle` (`data_quality`) · Sentry `captureWithDomain('identity')` con tag
+`component=auth-server` (`check=kms` reemplaza al contador `auth.kms.sign_failures`).

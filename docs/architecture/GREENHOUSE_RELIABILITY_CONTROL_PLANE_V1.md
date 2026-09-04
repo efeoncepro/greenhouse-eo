@@ -2,10 +2,35 @@
 
 > Spec canónica del `Reliability Control Plane` de Greenhouse EO. Define el registry por módulo, el modelo unificado de señales, el contrato de evidencia y cómo `Admin Center`, `Ops Health` y `Cloud & Integrations` consumen la lectura consolidada sin duplicar fuentes.
 >
-> Versión: `1.19`
+> Versión: `1.20`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-09-04` por TASK-1631 (4 signals del binding de identidad externa bajo el módulo `identity`: `identity.external_binding.unbound_dispatch_attempt`, `.revoked_still_dispatching`, `.subject_collision`, `.orphan_grant`)
+> Última actualización: `2026-09-04` por TASK-1828 (2 signals del emisor propio de Efeonce bajo el módulo `identity`: `auth.issuer.jwks_unreachable`, `auth.signing_keys.lifecycle`; antes ese mismo día TASK-1631 agregó las 4 de `identity.external_binding.*`)
+
+## Delta 2026-09-04 — TASK-1828: 2 signals del emisor propio de Efeonce (`auth.issuer.jwks_unreachable`, `auth.signing_keys.lifecycle`)
+
+Dos señales nuevas, un solo reader
+[`auth-server-signals.ts`](../../src/lib/reliability/queries/auth-server-signals.ts), bajo
+`moduleKey='identity'` (rollup `Identity & Access`), **steady = `ok`** en ambas. Observan el authorization
+server propio de Efeonce (EPIC-044, Cloud Run `auth-server` en `us-east4`, JWKS en
+`https://auth.efeonce.org/.well-known/jwks.json`, llaves en Cloud KMS HSM con registry
+`greenhouse_auth.signing_keys`). Compuestas en `get-reliability-overview.ts` como `authServerSignals`; el
+módulo `identity` del registry declara `runtime` entre sus `expectedSignalKinds`. Si PostgreSQL o el fetch
+fallan, la señal degrada con `captureWithDomain('identity', ...)` y nunca lanza hacia el agregador.
+
+| `signalId` | `kind` | Qué mide | Severidad | Steady |
+| --- | --- | --- | --- | --- |
+| `auth.issuer.jwks_unreachable` | `runtime` | Hace `GET` al JWKS público del emisor y compara los `kid` publicados con las llaves `active` + `retiring` del registry. Es la vista **desde afuera** del front door compartido con el gateway MCP: si el LB, el certificado `efeonce-auth-server-cert`, el flag `AUTH_SERVER_ENABLED` o la caché de 60 s del servicio se desalinean, el gateway (TASK-1831) no podría verificar tokens de este issuer | `not_configured` mientras Vercel no declare `AUTH_SERVER_JWKS_URL` (el host aún no está cableado en el consumidor); `200` + `kid` iguales → `ok`; HTTP ≠ 200, `kid` faltantes/inesperados o fetch fallido → `error` | **`ok`** (`not_configured` hasta cablear la env var) |
+| `auth.signing_keys.lifecycle` | `data_quality` | Estado del registry de llaves de firma: exige exactamente una llave `active` y vigila que ninguna `retiring` sobreviva a su ventana | `1 active` y sin `retiring` viejas → `ok`; `retiring` con más de 7 días → `warning`; `0` o `>1 active`, o tabla ilegible → `error` | **`ok`** |
+
+Los fallos de firma (KMS) **no** tienen contador propio (`auth.kms.sign_failures` no existe como señal): se
+leen como incidentes Sentry de `identity` con tags `component=auth-server` y `check=kms`, por el path
+canónico de attribution (§`Sentry incident → module attribution`). Recuperación: `pnpm auth-server:rotate-key`
+(`--status`, `--retire <kid>`, `--register`) y redeploy vía `services/auth-server/deploy.sh`; **nunca** SQL
+manual sobre `greenhouse_auth.signing_keys`. Runbook: `docs/operations/runbooks/auth-server.md`. ADR:
+[`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md).
+Flag: `AUTH_SERVER_ENABLED` (Cloud Run, SoT `deploy.sh`; ledger `FEATURE_FLAG_STATE_LEDGER.md`). Task dueña:
+`TASK-1828`.
 
 ## Delta 2026-09-04 — TASK-1631: 4 signals del binding de identidad externa (`identity.external_binding.*`)
 

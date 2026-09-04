@@ -21,6 +21,7 @@
 | DNS authority | HostGator (`ns24.hostgator.cl`, `ns25.hostgator.cl`) |
 | OAuth issuer | Microsoft Entra tenant `a80bf6c1-7c45-4d70-b043-51389622a0e4` |
 | OAuth resource app ID / JWT audience | `c5363215-b9a6-4bf1-bb1c-e61963b37dac` |
+| Second front-door host | `auth.efeonce.org` → Cloud Run `auth-server` (`us-east4`, repo Greenhouse; variable `enable_auth_host`, ver §`Segundo host del front door`) |
 
 ## State model
 
@@ -578,12 +579,60 @@ por lo que no debe usarse para cobrar, licenciar o decidir autorización de un c
 Cloud Run mantiene `concurrency=80` y `maxScale=5` efectivo inicialmente. Esa capacidad sirve al tráfico de transporte; cada provider
 debe declarar sus propios límites de concurrencia, cuotas y circuit breakers antes de exponer trabajo de dominio.
 
+### Segundo host del front door — `auth.efeonce.org` (2026-09-04)
+
+El authorization server propio de Efeonce (EPIC-044, TASK-1828) entra por **este mismo** load balancer como
+segundo host; el gateway y su ruta default no cambian. El Cloud Run `auth-server` vive en el repo Greenhouse
+(`services/auth-server/`, `us-east4`) y se opera con su propio runbook:
+`docs/operations/runbooks/auth-server.md` (deploy, flag, llaves KMS, señales). Acá sólo vive la parte del
+front door.
+
+Variables en `efeonce-mcp/infra/terraform` (`variables.tf`):
+
+| Variable | Default | Qué controla |
+| --- | --- | --- |
+| `enable_auth_host` | `true` (aplicado 2026-09-04, commit `6a144a5`) | Publica o retira el host completo: host rule, backend, NEG y certificado. El gateway queda igual con cualquier valor |
+| `auth_domain` | `auth.efeonce.org` | Hostname de la host rule y del certificado managed `efeonce-auth-server-cert` |
+| `auth_service_name` | `auth-server` | Cloud Run service detrás del NEG `efeonce-auth-server-neg` |
+| `auth_region` | `us-east4` | Región del NEG (distinta a la del gateway, `southamerica-west1`) |
+
+El backend `efeonce-auth-server-backend` reutiliza la security policy `efeonce-mcp-gateway-edge`; misma IP
+`34.111.78.237`, sin forwarding rules nuevos. DNS: record `A` de `auth.efeonce.org` a esa IP (HostGator).
+
+Verificar:
+
+```bash
+gcloud compute url-maps describe efeonce-mcp-gateway-map --global \
+  --format='yaml(hostRules,pathMatchers[].name,defaultService)'      # host rule auth.efeonce.org → path matcher auth-server
+gcloud compute ssl-certificates describe efeonce-auth-server-cert --global \
+  --format='value(managed.status,managed.domainStatus)'             # ACTIVE
+curl -s -o /dev/null -w '%{http_code}\n' https://auth.efeonce.org/healthz   # 200
+curl -s -o /dev/null -w '%{http_code}\n' https://mcp.efeonce.org/.well-known/oauth-protected-resource   # 200: el gateway no se movió
+```
+
+`tofu plan` con `enable_auth_host=true` sobre un estado ya aplicado debe salir sin cambios; cualquier `destroy`
+o `replace` sobre recursos del gateway significa que algo está mal — abortar. No agregues `auth.efeonce.org`
+a `managed.domains` del certificado del gateway: re-provisiona `mcp.efeonce.org`; es un certificado aparte.
+
+Rollback del host (no toca `mcp.efeonce.org`):
+
+```bash
+cd efeonce-mcp/infra/terraform
+tofu plan  -input=false -var enable_auth_host=false   # esperado: sólo destroys de *auth-server*; 0 cambios en gateway
+tofu apply -input=false -var enable_auth_host=false
+```
+
+Retira host rule, backend, NEG y certificado en menos de diez minutos; el Cloud Run `auth-server` sigue vivo
+(sin tráfico público) y se apaga desde su propio runbook si hace falta. Hasta TASK-1831 el gateway no verifica
+tokens de este issuer, así que retirar el host no afecta ninguna sesión MCP.
+
 ## Rollback
 
 - Provider defectuoso: `GLOBE_PROVIDER_ENABLED=false` y deploy; no retires todo el gateway.
 - Revisión defectuosa: mueve 100% del tráfico a la revisión previa verificada.
 - Auth defectuoso: fail-closed, revoca cliente/consentimiento y restaura issuer/audience previos.
 - Edge defectuoso: conserva DNS con respuesta segura `503` o revierte el record exacto; considera TTL.
+- Segundo host `auth.efeonce.org` mal publicado: `tofu apply -var enable_auth_host=false` (no toca `mcp.efeonce.org`); ver §`Segundo host del front door`.
 - Compromiso: deshabilita provider WIF/cliente OAuth, revoca IAM, preserva logs y abre incidente.
 
 Nunca resuelvas rollback haciendo `/mcp` anónimo, aceptando tokens de otra audience o reutilizando una service

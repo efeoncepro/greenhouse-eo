@@ -311,6 +311,7 @@ When designing in this repo, the 3-most-relevant-patterns step (from the global 
 - **NEVER** delete data. Use supersede / archive / soft-tombstone with explicit retention.
 - **NEVER** invoke Sentry directly when a domain rollup exists. Use `captureWithDomain`.
 - **NEVER** invent primitives the canonized patterns inventory already covers.
+- **NEVER** propose a second token issuer, an OAuth vendor, or the MCP gateway minting tokens: the native authorization server already exists as a runtime (`TASK-1828`, `services/auth-server`, `auth.efeonce.org`) and is the only place tokens get minted — read `docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md` + `TASK-1829` before any OAuth/CIMD/consent design.
 - **SIEMPRE** crear el TASK-### file (via `greenhouse-task-planner`) cuando un spec requiere implementación.
 - **SIEMPRE** declarar `Domain boundary` en el spec.
 - **SIEMPRE** scoring 4-pilar explícito.

@@ -24,6 +24,15 @@ The current build units covered by this contract are:
 The machine-readable registry lives in `scripts/ci/worker-build-contract-gate.mjs`. A new Node worker is not
 part of the platform contract until it is registered there and passes both worker gates.
 
+`auth-server` (EPIC-044, TASK-1828, registered 2026-09-04) is the Efeonce authorization server, not a worker:
+it serves HTTP behind the shared MCP front door, but it is built with the same recipe (esbuild
+`--packages=external`, Node 22-slim, `pnpm install --prod`) and is registered in all three gates —
+`worker:build-contract-gate`, `worker:runtime-deps-gate` and `worker:deploy-path-gate` (its bundle is 11
+files, so the deploy-path check is cheap and complete). Its image copies only `package.json`, the lockfile,
+`vendor/`, `tsconfig.json`, `src/`, `services/auth-server/` and `services/_shared/`; it does **not** copy
+branding or fonts (no PDF/render surface), so a missing brand asset can never be an `auth-server` build
+failure. Runbook: `docs/operations/runbooks/auth-server.md`.
+
 ## Package-manager source of truth
 
 `package.json#packageManager` is the sole source of truth for pnpm in GitHub Actions. Workflows use
@@ -56,7 +65,7 @@ Dockerfile edit, while the gate still validates each declared `file:` input indi
 
 ## Runtime dependency closure
 
-`pnpm worker:runtime-deps-gate` builds the static import graph of all four workers and rejects a direct runtime
+`pnpm worker:runtime-deps-gate` builds the static import graph of all five registered build units (the four workers plus `auth-server`) and rejects a direct runtime
 package that is absent from `dependencies`. This includes `artifact-worker`: although its image installs the
 full root dependency set, direct runtime imports must not rely on incidental transitive packages.
 
@@ -105,13 +114,15 @@ review by eye. It reports two failure kinds:
 The second check only applies where the mechanism exists: a workflow with no `WORKER_RUNTIME_PATHS` block has no
 drift check to skip. Remediation always declares a **directory**, never a single file.
 
-Scope: the three esbuild-bundled Node workers registered in the script — `ops-worker`, `commercial-cost-worker`,
-`ico-batch`. `artifact-worker` runs from source through `tsx` rather than an esbuild bundle and is not registered
-in this gate; its path list remains under manual review.
+Scope: the four esbuild-bundled Node build units registered in the script — `ops-worker`, `commercial-cost-worker`,
+`ico-batch` and, since 2026-09-04, `auth-server` (`.github/workflows/auth-server-deploy.yml`). `artifact-worker`
+runs from source through `tsx` rather than an esbuild bundle and is not registered in this gate; its path list
+remains under manual review.
 
 Verified coverage on 2026-08-29: `ops-worker` 1449 files, `commercial-cost-worker` 107, `ico-batch` 55. The first
 run surfaced two gaps nobody was looking for: `commercial-cost-worker` and `ico-batch` did not cover
-`services/_shared/sentry-init.ts`, which both bundle.
+`services/_shared/sentry-init.ts`, which both bundle. On 2026-09-04 `auth-server` registered with 11 files in its
+bundle, all covered.
 
 ### Reading a skipped deploy
 

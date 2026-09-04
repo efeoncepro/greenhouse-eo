@@ -1,5 +1,26 @@
 # TASK-1833 — Efeonce Auth Server Security Assurance and Operations
 
+## Delta 2026-09-04
+
+- `TASK-1828` ya entregó parte de la base operativa que esta task asumía como gap — cerrado por trabajo en
+  `TASK-1828`:
+  - Rotación de llave: el equivalente de `rotateSigningKey` son `registerSigningKeyVersion` +
+    `retireSigningKey` en `src/lib/auth-server/keys/signing-keys-store.ts` (solapamiento mínimo
+    `SIGNING_KEY_MIN_OVERLAP_MS` = 1 h, `force` explícito), con CLI `pnpm auth-server:rotate-key`
+    (`scripts/auth-server/rotate-signing-key.ts`). La rotación ya se ejercitó en staging: v1 → v2, JWKS con dos
+    `kid`, v2 `active` y v1 `retiring`.
+  - Señales: `auth.issuer.jwks_unreachable` (kind runtime; `not_configured` hasta declarar
+    `AUTH_SERVER_JWKS_URL` en Vercel) y `auth.signing_keys.lifecycle` (kind data_quality) en
+    `src/lib/reliability/queries/auth-server-signals.ts`.
+  - Runbook base `docs/operations/runbooks/auth-server.md`; audit append-only en
+    `greenhouse_auth.signing_key_events`.
+- **Queda en esta task:** retiro programado de la versión 1 (hoy `retiring`; retiro pendiente con ≥ 1 h de
+  solapamiento), scheduler trimestral `ops-auth-key-rotate` + `auth.keys.rotation_overdue`, señal
+  `auth.kms.sign_failures`, jobs de retención, red-team agéntico, pentest externo, runbooks de incidente y
+  revocación masiva, y la revisión de privacidad V2.
+- Sigue bloqueada por `TASK-1829` y `TASK-1830` (superficie completa a auditar); la rotación y las señales base
+  ya se pueden verificar contra el runtime en staging.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -19,7 +40,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Especificación; sin red-team, pentest ni runbooks del emisor`
+- Status real: `Especificación; desde 2026-09-04 existen rotación manual ejercitada (registerSigningKeyVersion/retireSigningKey, CLI auth-server:rotate-key), 2 señales base y el runbook base de TASK-1828; sin red-team, pentest, scheduler de rotación, retención ni privacidad V2; retiro de la versión 1 (retiring) pendiente`
 - Rank: `TBD`
 - Domain: `platform|identity|ops`
 - Blocked by: `TASK-1829 y TASK-1830 en staging (superficie completa a auditar)`
@@ -112,10 +133,21 @@ Reglas obligatorias:
 - Reliability Control Plane con registry de señales y dashboard `/admin/operations`.
 - Patrón de rotación con verify-before-cutover (`pnpm secrets:rotate`) y Cloud Scheduler en `ops-worker`.
 - Revisión de privacidad V1 (subprocesador).
+- **Desde `TASK-1828` (2026-09-04):** commands `registerSigningKeyVersion`/`retireSigningKey`
+  (`src/lib/auth-server/keys/signing-keys-store.ts`, solapamiento mínimo 1 h) y CLI
+  `pnpm auth-server:rotate-key`; rotación ejercitada en staging (KMS `auth-server-es256` v2 `active`, v1
+  `retiring`); señales `auth.issuer.jwks_unreachable` y `auth.signing_keys.lifecycle`
+  (`src/lib/reliability/queries/auth-server-signals.ts`); runbook base `docs/operations/runbooks/auth-server.md`;
+  audit append-only `greenhouse_auth.signing_key_events`; IAM mínimo (SA `auth-server@` signerVerifier +
+  cloudsql.client; deployer `cloudkms.viewer`).
 
 ### Gap
 
-- Sin abuse cases, pentest, runbooks ni señales del emisor; privacidad V1 no aplica al tratamiento propio.
+- Sin abuse cases, pentest, runbooks de incidente/revocación masiva ni scheduler de rotación; privacidad V1
+  no aplica al tratamiento propio.
+- Señales pendientes: `auth.kms.sign_failures`, `auth.keys.rotation_overdue`, `auth.oauth.*`, `auth.person.*`;
+  `auth.issuer.jwks_unreachable` sigue `not_configured` hasta declarar `AUTH_SERVER_JWKS_URL` en Vercel.
+- Retiro programado de la versión 1 de la llave (hoy `retiring`) y retención por tabla sin ejecutar.
 
 ## Modular Placement Contract
 
@@ -139,7 +171,7 @@ Reglas obligatorias:
 
 ### Contract surface
 
-- Contrato existente a respetar: registry de señales; `rotateSigningKey` de `TASK-1828`
+- Contrato existente a respetar: registry de señales; `registerSigningKeyVersion`/`retireSigningKey` de `TASK-1828` (equivalentes de `rotateSigningKey`)
 - Contrato nuevo o modificado: endpoint `POST /auth/keys/rotate` en `ops-worker` (autenticado por OIDC de Scheduler) `[verificar patrón vigente de endpoints programados]`
 - Backward compatibility: `compatible`
 - Full API parity: la rotación y la revocación masiva son commands con capability (`auth.keys.rotate`, `auth.access.revoke_all`) operables por CLI/Admin/Nexa vía propose→confirm
@@ -221,7 +253,7 @@ Reglas obligatorias:
 - Red-team: cada agente recibe la superficie (metadata, endpoints, contratos) y un objetivo por caso; la
   evidencia es un request reproducible; el otro agente intenta refutar el hallazgo antes de aceptarlo
   (los hallazgos de subagentes fallan hacia el daño máximo).
-- Rotación: `rotateSigningKey` → verificación de JWKS con dos `kid` → espera 30 min → `retire` del viejo.
+- Rotación: `registerSigningKeyVersion` → verificación de JWKS con dos `kid` → espera ≥ `SIGNING_KEY_MIN_OVERLAP_MS` (1 h, mayor que el TTL del access token) → `retireSigningKey` del viejo.
 
 ## Rollout Plan & Risk Matrix
 

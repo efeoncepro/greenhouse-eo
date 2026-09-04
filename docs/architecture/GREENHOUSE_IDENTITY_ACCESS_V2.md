@@ -1220,3 +1220,47 @@ TASK-1180 agrega una capability fina para registrar la decision de implementacio
 La capability permite actualizar strategy, primitive key, variant/kind, Lab route, runtime route, GVC ref, docs ref, rationale, owner y due date. No concede allowlist, verify-node, evidence attach ni transition por si sola. El cierre `implemented` sigue requiriendo `design_system.handoff.transition`, pero la state machine bloquea cierre si Primitive governance está vacía o en `research_required`.
 
 Spec: `docs/tasks/in-progress/TASK-1180-design-handoff-primitive-governance-loop.md`.
+
+## Authorization server propio (`auth.efeonce.org`) — TASK-1828 (2026-09-04)
+
+Efeonce opera un emisor de tokens propio, separado del portal, decidido en
+[`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md)
+(programa `EPIC-044`). Esta sección describe lo que existe hoy; el detalle de lo implementado vive en el
+§Delta 2026-09-04 de ese ADR.
+
+**Runtime.** `services/auth-server/` (`server.ts` sobre `node:http`, `Dockerfile`, `deploy.sh`), Cloud Run
+`auth-server` en `us-east4`, un solo servicio compartido por staging y production (como `ops-worker`), 1 vCPU /
+512 Mi, concurrency 80, timeout 30 s, min 1 instancia en production / 0 en staging. Publicado como **segundo
+host** del front door del gateway MCP (LB global de `efeonce-mcp`, misma IP `34.111.78.237`, misma policy Cloud
+Armor, certificado managed propio `efeonce-auth-server-cert`). Ingress `internal-and-cloud-load-balancing` +
+`allow-unauthenticated` porque el ALB no emite IAM hacia un serverless NEG; el `Host` se valida contra
+`AUTH_SERVER_ALLOWED_HOSTS` (421 si no coincide). Env vars declaradas únicamente en `deploy.sh`
+(`AUTH_SERVER_ENABLED`, `AUTH_SERVER_ISSUER`, `AUTH_SERVER_ALLOWED_HOSTS`, `AUTH_SERVER_KMS_KEY`,
+`GREENHOUSE_POSTGRES_*`, `SENTRY_ENVIRONMENT`). Es una excepción documentada de `EPIC-027`: no toca el grafo del
+portal.
+
+**Llaves.** Firma ES256 con la llave `auth-server-es256` del key ring `us-east4/auth-server` en Cloud KMS con
+protección **HSM**: la privada nunca sale del hardware; el servicio sólo pide `asymmetricSign` sobre el digest
+(`src/lib/auth-server/keys/kms-signer.ts`, con CRC32C, DER→JOSE, `kid` = thumbprint RFC 7638 y verificación
+local antes de devolver un JWS). El SA `auth-server@efeonce-group` tiene `roles/cloudkms.signerVerifier` sólo
+sobre esa llave más `roles/cloudsql.client`. El ciclo de vida se registra en el schema `greenhouse_auth`
+(`signing_keys` con estados `active|retiring|retired`, máximo 1 `active` por índice parcial; `signing_key_events`
+append-only), sin material privado en PG. Rotación con solapamiento mínimo de 1 h vía
+`pnpm auth-server:rotate-key` (`--status | --register | --retire | --force`); la primera rotación ya se ejercitó
+(versión 2 `active`, versión 1 `retiring`).
+
+**JWKS.** `GET https://auth.efeonce.org/.well-known/jwks.json` publica las llaves `active` + `retiring`
+(`Cache-Control: max-age=300`; 404 con el flag OFF). Un token ES256 firmado por el HSM verifica con `jose`
+`createRemoteJWKSet` contra ese JWKS — es la verificación que hará el gateway en `TASK-1831`. Señales:
+`auth.issuer.jwks_unreachable` (`not_configured` hasta que Vercel tenga `AUTH_SERVER_JWKS_URL`) y
+`auth.signing_keys.lifecycle` (`src/lib/reliability/queries/auth-server-signals.ts`).
+
+**Límite de hoy.** El servicio expone **sólo** `GET /healthz` (200 siempre), `GET /readyz` (503 con
+`AUTH_SERVER_ENABLED=false`; 200 únicamente con PG + KMS + llave `active`) y el JWKS. **No hay** endpoints OAuth
+(metadata, CIMD, `authorize`, `token`, revocación: `TASK-1829`) ni autenticación de personas (passkeys, magic
+link, TOTP: `TASK-1830`); el gateway todavía no lo acepta como issuer (`TASK-1831`). **El login del portal
+Greenhouse no cambia**: NextAuth, Entra, magic link y las sesiones descritas en este documento siguen iguales; el
+auth-server nunca comparte `NEXTAUTH_SECRET` ni acepta cookies del portal, y la convergencia del login cliente es
+un gate posterior (`TASK-1834`). Invariantes para agentes:
+[`agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` §Auth server propio](agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md#auth-server-propio-task-1828).
+Runbook: [`docs/operations/runbooks/auth-server.md`](../operations/runbooks/auth-server.md).

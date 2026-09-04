@@ -155,8 +155,9 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   mantienen cookies, sesiones y audiencias propias, pero resuelven un único `identity_profile` y la membresía de
   Account 360 mediante bindings auditados. La coexistencia inicial con el login cliente actual requiere una ruta
   de convergencia posterior al mismo plano de identidad externo; nunca una segunda identidad o contraseña permanente.
-- EPIC-044 (ADR nativo): emisor propio en `auth.efeonce.org`. **Binding provider-neutral aplicado** (TASK-1631,
-  2026-09-04): environments registry → bindings de organizaciones `active_client` (`grants_version`) →
+- EPIC-044 (ADR nativo): emisor propio en `auth.efeonce.org`; **runtime vivo** (TASK-1828: Cloud Run
+  `auth-server`, KMS HSM, JWKS vivo; prod tras el release). **Binding provider-neutral aplicado**
+  (TASK-1631, 2026-09-04): environments registry → bindings de organizaciones `active_client` (`grants_version`) →
   grants por capability → invitaciones (`linked` = membership). El gateway resuelve por `(environment, subject)` en
   `GET /api/platform/ecosystem/identity/binding`, nunca por `client_id` ni email.
 - La operación o evolución MCP se enruta por las skills espejo `.codex/skills/efeonce-mcp-platform/` y

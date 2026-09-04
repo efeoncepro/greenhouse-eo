@@ -140,6 +140,15 @@ If a source conflicts with remembered behavior, the verified runtime and its can
   `TASK-1831` multi-issuer gateway with `gv` verification, `TASK-1832` client canaries, `TASK-1833` security
   posture). Never make the gateway own browser login or share a Greenhouse cookie/`NEXTAUTH_SECRET`, and never make
   a Greenhouse release the rollback boundary for external OAuth.
+- The gateway's front door serves a SECOND host, `auth.efeonce.org` — the native authorization server
+  (`services/auth-server`, `TASK-1828` / EPIC-044, live 2026-09-04). `efeonce-mcp/infra/terraform` (`6a144a5`,
+  `enable_auth_host` default `true`) adds a host rule → its own backend `efeonce-auth-server-backend` (serverless NEG,
+  `us-east4`) under the SAME Cloud Armor policy, plus its own managed cert `efeonce-auth-server-cert` (ACTIVE) on the
+  same forwarding IP `34.111.78.237`; plan was 3 add / 2 change / 0 destroy and `mcp.efeonce.org` stayed intact. The
+  gateway does NOT mint tokens and did not change; the second issuer reaches the verifier only with `TASK-1831`.
+  **NEVER add the host by editing `managed.domains` of the gateway certificate** — that field is ForceNew and
+  re-provisions `mcp.efeonce.org`. Runbook `docs/operations/runbooks/auth-server.md`; the service's own env vars,
+  KMS signing key and rotation belong to `.claude/rules/auth-server.md` + `greenhouse-secret-hygiene`.
 - Customer access needs entitlements that issue and revoke access per tenant and capability — and those EXIST
   since `TASK-1631` (applied 2026-09-04): `greenhouse_core.external_capability_grants` under an Account 360 binding,
   revocable per organization and per person. Entra is the internal canary only. What is still missing for real

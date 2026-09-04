@@ -1,5 +1,15 @@
 # TASK-1832 — Efeonce MCP Client Canaries and First Customer Cohort Rollout
 
+## Delta 2026-09-04
+
+- `TASK-1828` dejó el runtime del emisor vivo en staging: `https://auth.efeonce.org/readyz` 200 y
+  `/.well-known/jwks.json` con dos `kid` (KMS HSM ES256), publicado en el mismo front door del gateway. Los
+  canaries de esta task ya tienen un issuer real contra el que verificar JWT — cerrado por trabajo en `TASK-1828`.
+- `TASK-1631` Slice 1 (commands de binding/invitación/grant y 4 señales) quedó code complete y verificado en
+  staging el mismo día.
+- **Sigue bloqueada** por `TASK-1829` (metadata, CIMD/DCR y tokens), `TASK-1830` (autenticación de personas),
+  `TASK-1631` (release a producción), `TASK-1831` (gateway multi-issuer) y la task ui-ux de login/consentimiento.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -19,7 +29,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Especificación; matriz de tokens S0.1 de TASK-1631 pendiente desde agosto por requerir sesión interactiva`
+- Status real: `Especificación; matriz de tokens S0.1 de TASK-1631 pendiente desde agosto por requerir sesión interactiva; desde 2026-09-04 el emisor auth.efeonce.org está vivo en staging (readyz + JWKS) pero sin OAuth ni personas, así que ningún canary puede correr aún`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
 - Blocked by: `TASK-1829, TASK-1830, TASK-1631, TASK-1831 y la task ui-ux de login/consentimiento`
@@ -104,8 +114,10 @@ Reglas obligatorias:
 ### Already exists
 
 - Canary interno Entra y prueba manual con Claude Code (ADR gateway §Delta 2026-08-06).
-- Commands de binding diseñados en `TASK-1631`; señales `unbound_dispatch_attempt`, `revoked_still_dispatching`, `subject_collision`, `orphan_grant`.
+- Commands de binding de `TASK-1631` (Slice 1 code complete + staging verificado 2026-09-04); señales `unbound_dispatch_attempt`, `revoked_still_dispatching`, `subject_collision`, `orphan_grant`.
 - Personas agente para smoke (`agent-client@greenhouse.efeonce.org`).
+- **Desde `TASK-1828` (2026-09-04):** emisor `https://auth.efeonce.org` vivo en staging (`readyz`, JWKS con 2
+  `kid`, front door compartido con el gateway); sin metadata OAuth, CIMD/DCR ni tokens todavía.
 
 ### Gap
 

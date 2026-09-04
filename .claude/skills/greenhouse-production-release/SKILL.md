@@ -200,7 +200,7 @@ gh workflow run production-release.yml \
    - preflight
    - record-started
    - approval-gate
-   - 4 Cloud Run workers via `workflow_call`
+   - 5 Cloud Run services via `workflow_call` (4 workers + `auth-server`, TASK-1828)
    - Azure gated jobs
    - Vercel production READY
    - `/api/auth/health`
@@ -226,7 +226,7 @@ pnpm release:workers --expected-sha=<target_sha>
    - `commercial-cost-worker` in `us-east4`
    - `ico-batch-worker` in `us-east4`
    - `hubspot-greenhouse-integration` in `us-central1`
-   - `auth-server` in `us-east4` (TASK-1828 / EPIC-044 — authorization server propio; nace con `AUTH_SERVER_ENABLED=false`)
+   - `auth-server` in `us-east4` (TASK-1828 / EPIC-044 — authorization server propio; `AUTH_SERVER_ENABLED` default `true` en `deploy.sh` desde 2026-09-04; producción lo recibe con el próximo release)
    Si el wrapper marca un SHA distinto, dice «NO es drift automáticamente: ver runbook §4.1». Lo que
    decide si ese no-op es legítimo es un **diff de árbol completo, sin `--`** — no el skip del
    change-gate, que sólo habla de las rutas declaradas (anti-patrón #4):
@@ -238,7 +238,7 @@ git diff --name-only <cloud_run_git_sha> <target_sha>   # vacío ⇒ skip legít
    For AXIS consumers, also verify the active revision/image digest and that the deployed artifact does
    not contain `.npmrc`, the package token, or an unscoped registry credential.
 10. **Prender los flags pendientes de este release — en TODOS los runtimes, no sólo Vercel.** Revisar `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` → `§ Pendientes de acción`. Por cada feature `code-complete` cuyo flip estaba gated a este release:
-    - **Paso 0 obligatorio — mapear dónde se LEE el flag:** `grep -rn "<FLAG>" src/ services/ | grep -v __tests__`. Hay **5 runtimes con env vars independientes**: Vercel (app Next.js) + 4 Cloud Run (`ops-worker`, `commercial-cost-worker`, `ico-batch-worker`, `hubspot-greenhouse-integration`). Prenderlo en uno **NO** lo prende en los otros. **Heurística:** si gatea algo **async** (email, projection reactiva, consumer del outbox, cron de Cloud Scheduler, materializer) vive en el **`ops-worker`, NO en Vercel** — prenderlo en Vercel no hace nada; si gatea una ruta/superficie visible vive en Vercel; puede vivir en **ambos**.
+    - **Paso 0 obligatorio — mapear dónde se LEE el flag:** `grep -rn "<FLAG>" src/ services/ | grep -v __tests__`. Hay **6 runtimes con env vars independientes** (5 hasta TASK-1828): Vercel (app Next.js) + 5 Cloud Run (`ops-worker`, `commercial-cost-worker`, `ico-batch-worker`, `hubspot-greenhouse-integration`, `auth-server` — sus `AUTH_SERVER_*` viven sólo en `services/auth-server/deploy.sh`). Prenderlo en uno **NO** lo prende en los otros. **Heurística:** si gatea algo **async** (email, projection reactiva, consumer del outbox, cron de Cloud Scheduler, materializer) vive en el **`ops-worker`, NO en Vercel** — prenderlo en Vercel no hace nada; si gatea una ruta/superficie visible vive en Vercel; puede vivir en **ambos**.
     - **Paso 0.5 obligatorio — confirmar que el código lector está en `main`:** `git show origin/main:<archivo> | grep <FLAG>` por cada archivo del mapeo. Producción sirve `main`; un flag ON sobre código ausente (o sobre una versión vieja del lector) es fail-closed esperando gente. `pnpm flags:audit` lo chequea, pero hazlo también a mano antes de prender. Ver la hard rule de `ISSUE-150`.
     - **Aplicar en cada runtime del mapeo:** Vercel → `vercel env add <FLAG> Production` + **redeploy obligatorio** (Vercel **congela las env vars al crear el build**: un flag agregado después del build productivo del release no existe para el runtime hasta que hay un deployment nuevo — caso 2026-08-06, `GROWTH_SEO_ENABLED` requirió `dpl_GyGkdEQQTk65qkCs1S3TEH6Jquy9`). Si el flag se puede prender **antes** del merge del PR, el build del release lo hornea y el redeploy no existe. Cloud Run → **los DOS pasos**: (a) declarar el flag en `services/<worker>/deploy.sh` (SoT; esos scripts usan `--set-env-vars` **destructivo**, que borra cualquier var agregada out-of-band) y (b) `gcloud run services update <svc> --region <us-east4|us-central1> --project efeonce-group --update-env-vars <FLAG>=true` para efecto inmediato. Hacer sólo (b) = el flag desaparece en el próximo deploy del worker, en silencio.
     - **Verificar en el deploy/revisión ACTIVO** (`vercel env ls` · `gcloud run revisions describe <rev> --format="json(spec.containers[0].env)"`) **y ejercitar el flujo real** — que la var exista ≠ que el consumer funcione. En Vercel, **confirmar cada flag con `vercel env ls | grep <FLAG>` filtrando por environment**: un `env add` fallido **no siempre es evidente en la salida** (sobre todo en batch, donde el script suele imprimir un `✗ falló` sin el mensaje de la API). Ver gotcha #14.

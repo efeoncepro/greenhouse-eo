@@ -391,6 +391,37 @@ dominio y **no veía** una tool de plataforma federada. Se agregó `EXPECTED_GRE
 mismo PR; una tool de plataforma nueva sin entrada hace fallar el guard. El renombre del cliente público del mismo
 día queda descrito en el delta anterior; no cambia nada de este provider.
 
+### Delta 2026-09-04 — el front door del gateway sirve un segundo host (`auth.efeonce.org`)
+
+El authorization server propio de Efeonce (EPIC-044, ADR
+[`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md),
+TASK-1828) se publicó **como segundo host del front door existente**, no como un LB nuevo. En
+`efeonce-mcp/infra/terraform` (commit `6a144a5`, variable `enable_auth_host`, default `true`) el mismo Global
+External Application Load Balancer suma: un serverless NEG `efeonce-auth-server-neg` apuntando al Cloud Run
+`auth-server` (`us-east4`, repo Greenhouse; la región del gateway no cambia), un backend propio
+`efeonce-auth-server-backend` con la **misma** security policy Cloud Armor `efeonce-mcp-gateway-edge`, un
+certificado managed **adicional** `efeonce-auth-server-cert` (`ACTIVE`) sobre el proxy HTTPS existente y una
+host rule `auth.efeonce.org → path matcher auth-server`. Misma IP global `34.111.78.237`, sin forwarding rules
+nuevos; el `apply` fue 3 add / 2 change / 0 destroy y `mcp.efeonce.org` respondió 200 antes y después.
+
+Lo que **no** cambia, y es la frontera del ADR:
+
+- El gateway (`efeonce-mcp-gateway`) y su ruta default (`mcp.efeonce.org`) quedan intactos. El diagrama de
+  *Deployment View* sigue describiendo el gateway; el segundo host es un backend distinto detrás del mismo LB.
+- El gateway **sigue sin emitir tokens**. `auth-server` hoy expone sólo `/healthz`, `/readyz` y el JWKS
+  (`/.well-known/jwks.json`); los flujos OAuth son TASK-1829 y la autenticación de personas TASK-1830. Por eso el
+  disparador "emisor propio en runtime" del delta 2026-09-02 (deprecación de DCR) **aún no se cumple**: existe el
+  runtime, no el emisor.
+- El gateway **todavía verifica un solo issuer** (Entra). El segundo issuer en el verificador llega con
+  TASK-1831 (gateway multi-issuer); hasta entonces un token firmado por `auth.efeonce.org` no abre `/mcp`.
+- El certificado del gateway no se toca: agregar `auth.efeonce.org` a sus `managed.domains` re-provisionaría
+  `mcp.efeonce.org`. El rollback del host es `tofu apply -var enable_auth_host=false` (quita host rule, backend,
+  NEG y cert; el gateway no cambia). Costo adicional ≈ USD 15/mes, todo en GCP.
+
+Operación: [`EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md`](../operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md)
+§`Segundo host del front door` + runbook del emisor
+[`docs/operations/runbooks/auth-server.md`](../operations/runbooks/auth-server.md).
+
 ## Rollout and rollback
 
 1. Crear repo, tests, container y CI local.

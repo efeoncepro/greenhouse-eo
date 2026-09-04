@@ -1,5 +1,23 @@
 # TASK-1829 — Efeonce Auth Server OAuth Protocol Surface (metadata, CIMD, tokens, consent)
 
+## Delta 2026-09-04
+
+- `TASK-1828` entregó el runtime sobre el que esta task construye: Cloud Run `auth-server` (us-east4,
+  revisión `auth-server-00003-jtf`, desplegado por CI con `AUTH_SERVER_ENABLED=true`), `https://auth.efeonce.org/readyz`
+  200 y `/.well-known/jwks.json` con dos `kid` (v2 `active`, v1 `retiring`) — cerrado por trabajo en `TASK-1828`.
+- El equivalente de `signAccessToken` ya existe: `signWithActiveKey` + `signCompactJws` en
+  `src/lib/auth-server/keys/` (firma ES256 en Cloud KMS HSM, llave `auth-server-es256`); un token firmado se
+  verificó con `createRemoteJWKSet` contra el JWKS remoto. Esta task los consume, no los reimplementa.
+- Schema `greenhouse_auth` aplicado (`signing_keys` ≤1 active, `signing_key_events` append-only) por
+  `migrations/20260904111156246_task-1828-greenhouse-auth-schema.sql`; las cinco tablas OAuth de esta task se
+  agregan sobre ese schema.
+- Deploy y gates listos: `services/auth-server/{server.ts,Dockerfile,deploy.sh,README.md}`,
+  `.github/workflows/auth-server-deploy.yml`, `deploy-auth-server` en `production-release.yml` y en
+  `RELEASE_DEPLOY_WORKFLOWS`. `server.ts` ya documenta que `/.well-known/oauth-authorization-server` y `/oauth/*`
+  llegan con esta task.
+- `Blocked by` pasa a `none`: puede arrancar sobre el runtime en staging; producción del runtime llega con el
+  próximo release a `main`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -19,10 +37,10 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-044`
-- Status real: `Especificación; broker sister-platform vivo dentro del portal, sin extracción`
+- Status real: `Lista para arrancar (2026-09-04): runtime auth.efeonce.org, llave KMS HSM, JWKS y schema greenhouse_auth entregados por TASK-1828 en staging; broker sister-platform vivo dentro del portal, sin extracción; sin código propio aún`
 - Rank: `TBD`
 - Domain: `platform|identity|integration`
-- Blocked by: `TASK-1828 (runtime, llave KMS y schema greenhouse_auth)`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -95,7 +113,8 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `TASK-1828`: runtime, `signAccessToken` vía KMS, JWKS, schema `greenhouse_auth`.
+- `TASK-1828` (cumplida en staging 2026-09-04): runtime, `signWithActiveKey`/`signCompactJws` vía KMS en
+  `src/lib/auth-server/keys/`, JWKS en `/.well-known/jwks.json`, schema `greenhouse_auth`.
 - `src/lib/sister-platforms/oauth-broker.ts`, `oauth-policy.ts`, `oauth-workspace-bindings.ts`, `types.ts`.
 - Tablas actuales del broker (`sister_platform_oauth_*`) `[verificar nombres exactos en migrations/]`.
 
@@ -124,12 +143,23 @@ Reglas obligatorias:
   `revokeSisterPlatformOAuthAccessTokens`, TTLs, allowlists y audit (`oauth-broker.ts`, 2.100+ líneas).
 - `mcp-token-exchange.ts` con el token exchange hacia el gateway.
 - `jose` para JWT; `auth-tokens.ts` con hashing de tokens por tipo.
+- **Desde `TASK-1828` (2026-09-04):** runtime `services/auth-server/server.ts` en Cloud Run con `readyz` y
+  `/.well-known/jwks.json`; `src/lib/auth-server/keys/{kms-signer.ts,signing-keys-store.ts,index.ts}` con
+  `signWithActiveKey`, `signCompactJws`, `registerSigningKeyVersion`, `retireSigningKey`, `buildPublishedJwks`
+  (15 tests); schema `greenhouse_auth` con `signing_keys` y `signing_key_events`; llave KMS HSM
+  `auth-server-es256` con SA `auth-server@` como signerVerifier; `deploy.sh` (SoT de env vars, flag
+  `AUTH_SERVER_ENABLED`), workflow de deploy y gates de release; señales `auth.issuer.jwks_unreachable` y
+  `auth.signing_keys.lifecycle`; runbook `docs/operations/runbooks/auth-server.md`.
 
 ### Gap
 
-- Sin metadata, CIMD, DCR, refresh rotativo, introspección ni consentimiento persistido.
-- Access tokens opacos hasheados, no JWT verificables por JWKS.
+- Sin metadata RFC 8414/OIDC, CIMD, DCR, refresh rotativo, introspección ni consentimiento persistido
+  (`server.ts` responde sólo `readyz` y JWKS).
+- Access tokens del broker legacy opacos hasheados, no JWT; el firmador ES256 existe pero ningún endpoint lo
+  expone todavía como emisión de access token con claims `sub`/`azp`/`scope`/`gv`.
 - `authorize` depende de la sesión NextAuth del portal.
+- Las cinco tablas OAuth (`oauth_clients`, `authorization_codes`, `refresh_tokens`, `client_consents`,
+  `cimd_cache`) no existen en `greenhouse_auth`; el boundary test del dominio tampoco.
 
 ## Modular Placement Contract
 
@@ -222,7 +252,7 @@ Reglas obligatorias:
 
 ### Slice 3 — Tokens
 
-- Access JWT ES256 vía `signAccessToken` (KMS); refresh rotativo; `revoke`; `introspect`; `gv` desde `TASK-1631`.
+- Access JWT ES256 vía `signWithActiveKey`/`signCompactJws` de `src/lib/auth-server/keys/` (KMS, ya entregados por `TASK-1828`); refresh rotativo; `revoke`; `introspect`; `gv` desde `TASK-1631`.
 
 ### Slice 4 — Consentimiento
 

@@ -1,6 +1,6 @@
 # Efeonce Native Authorization Server Decision V1
 
-> **Status:** `Accepted` (decisión del operador 2026-09-03; sin runtime autorizado hasta que cada task hija abra su gate)
+> **Status:** `Accepted` (decisión del operador 2026-09-03; sin runtime autorizado hasta que cada task hija abra su gate — `TASK-1828` abrió el suyo el 2026-09-04: runtime, llaves y front door vivos en staging, producción pendiente del release; ver §Delta 2026-09-04)
 > **Date:** 2026-09-03
 > **Owner:** Efeonce Platform / Identity
 > **Scope:** authorization server propio en `auth.efeonce.org`, autenticación de personas externas, emisión y verificación de tokens para `mcp.efeonce.org`, binding con Account 360, convergencia del login cliente de Greenhouse
@@ -177,7 +177,7 @@ Tabla de las tecnologías (todas ya presentes o de costo marginal):
 
 | Orden | Task | Alcance | Estimación agéntica |
 | --- | --- | --- | --- |
-| 1 | `TASK-1828` | Runtime `auth.efeonce.org`: deployable, host en el front door del gateway, KMS, JWKS, session store, excepción EPIC-027 | 3 a 4 días |
+| 1 | `TASK-1828` ✅ | Runtime `auth.efeonce.org`: deployable, host en el front door del gateway, KMS, JWKS, session store, excepción EPIC-027. **Ejecutada 2026-09-04**: Cloud Run `auth-server` desplegado por CI (revisión `auth-server-00003-jtf`), llave ES256 en KMS HSM con rotación probada, schema `greenhouse_auth`, host publicado en el LB del gateway y `https://auth.efeonce.org/readyz` 200; producción entra con el próximo release (ver §Delta 2026-09-04) | 3 a 4 días (real: 2 días) |
 | 2 | `TASK-1829` | Superficie OAuth: metadata, CIMD, DCR compat, PKCE, tokens ES256, refresh, revocación, consentimiento | 3 a 4 días |
 | 3 | `TASK-1830` | Autenticación de personas externas: passkeys, magic link, TOTP, recuperación, anti-abuso | 5 a 7 días |
 | 4 | `TASK-1631` | Binding Account 360, invitaciones, grants, `grants_version`, eligibility reader (re-alcance). **Slice 1 entregado 2026-09-04** (schema, commands, reader del gateway, 4 señales; migraciones aplicadas); rollout pendiente: sin environment real, sin binding de cliente real, sin UI | 3 a 4 días |
@@ -231,3 +231,79 @@ mínima ≈ 8, KMS HSM ≈ 5, Secret Manager/Scheduler/Artifact Registry ≈ 1, 
 instancia). El operador eligió compartir. Consecuencia: la task `TASK-1828` edita el Terraform del repo
 `efeonce-mcp` (host rule, backend service, NEG, certificado) y el aislamiento entre emisor y gateway queda en
 Cloud Run, IAM, cookies, secretos y audiencia, no en el LB.
+
+## Delta 2026-09-04 — TASK-1828 ejecutada (runtime, llaves, front door)
+
+Estado implementado y verificado en vivo el 2026-09-04. Cubre sólo la capa de runtime y llaves; los endpoints
+OAuth, la autenticación de personas y el gateway multi-issuer siguen en sus tasks (ver *Fuera de alcance*).
+Producción: **code complete, rollout pendiente** — el servicio entra con el próximo release por el orquestador.
+
+**Llaves (Cloud KMS).** Cloud KMS habilitada en `efeonce-group`; key ring `us-east4/auth-server`; llave
+`auth-server-es256` (`ASYMMETRIC_SIGN`, `EC_SIGN_P256_SHA256`, protección **HSM**). La rotación ya se ejercitó:
+versión 2 `ACTIVE` (kid `xjjMaYxidu3Vk57K5py6w6WGDN41T0WMeOtHMEyppKc`) es la que firma; versión 1 quedó en
+`retiring` (kid `VjbDUgwc5bd1zj5olC8VndMXKk_G60tLF8xRw945nI8`) y su retiro está pendiente tras la ventana mínima
+de solapamiento (≥ 1 h) más `gcloud kms keys versions disable 1`. La llave privada nunca sale del HSM.
+
+**IAM.** SA de runtime `auth-server@efeonce-group`: `roles/cloudkms.signerVerifier` **sólo sobre la llave** +
+`roles/cloudsql.client`. Deployer de CI `github-actions-deployer@`: `roles/iam.serviceAccountUser` sobre
+`auth-server@` + `roles/cloudkms.viewer` sobre la llave — sin este último el preflight de `deploy.sh` falla con
+«KMS key not found» (ocurrió en el run `33870746218` y se corrigió; el rerun terminó `success`).
+
+**Schema `greenhouse_auth`** (migración `20260904111156246_task-1828-greenhouse-auth-schema.sql`): tabla
+`signing_keys` (`kid` PK, `kms_key_version` UNIQUE, `public_jwk` JSONB sin `d`, `state` `active|retiring|retired`
+con CHECK y timestamps coherentes, índice parcial único = máximo 1 `active`) y `signing_key_events` (append-only
+por trigger). Owner `greenhouse_ops`; grants SELECT/INSERT/UPDATE a `greenhouse_app` y `greenhouse_runtime`. **Sin
+material privado en PG.**
+
+**Código.** `src/lib/auth-server/keys/{kms-signer.ts,signing-keys-store.ts,index.ts}`: adapter KMS
+(`asymmetricSign` sobre digest SHA-256 con CRC32C del digest y de la firma, DER→JOSE, `kid` = thumbprint RFC 7638,
+verificación local obligatoria antes de devolver un JWS) y store con `registerSigningKeyVersion` /
+`retireSigningKey` / `signWithActiveKey` (advisory lock, ventana mínima de solapamiento 1 h, audit). 15 tests.
+CLI `pnpm auth-server:rotate-key` (`scripts/auth-server/rotate-signing-key.ts`) con `--status`, `--register`,
+`--retire`, `--force`.
+
+**Servicio.** `services/auth-server/{server.ts,Dockerfile,deploy.sh,README.md}` sobre `node:http`. Rutas:
+`GET /healthz` (200 siempre), `GET /readyz` (503 con `AUTH_SERVER_ENABLED=false`; 200 sólo con PG + KMS + llave
+`active`), `GET /.well-known/jwks.json` (`active` + `retiring`, `Cache-Control: max-age=300`; 404 con flag OFF).
+Allowlist de `Host` por `AUTH_SERVER_ALLOWED_HOSTS` (421 si no coincide); errores sanitizados +
+`captureWithDomain('identity', component=auth-server)`. Cloud Run `auth-server` en `us-east4`, 1 vCPU / 512 Mi,
+concurrency 80, timeout 30 s, min 1 instancia en production / 0 en staging, ingress
+`internal-and-cloud-load-balancing` + `allow-unauthenticated` (el ALB no emite IAM hacia un serverless NEG).
+Servicio **único compartido por staging y production**, como `ops-worker`. Revisión activa `auth-server-00003-jtf`
+con `GIT_SHA=02dc5d987`, desplegada por CI vía WIF (run `33870746218`, rerun `success`).
+
+**Env vars** (SoT `deploy.sh`; `--set-env-vars` es destructivo): `AUTH_SERVER_ENABLED` (default `true` desde
+2026-09-04; fila en `FEATURE_FLAG_STATE_LEDGER.md` actualizada), `AUTH_SERVER_ISSUER=https://auth.efeonce.org`,
+`AUTH_SERVER_ALLOWED_HOSTS=auth.efeonce.org`, `AUTH_SERVER_KMS_KEY=<nombre completo de la llave>`,
+`GREENHOUSE_POSTGRES_*` (Connector), `SENTRY_ENVIRONMENT`; secretos `GREENHOUSE_POSTGRES_PASSWORD` y `SENTRY_DSN`.
+
+**Front door.** `auth.efeonce.org` es el **segundo host** del LB global del gateway MCP
+(`efeonce-mcp/infra/terraform`, commit `6a144a5`, variable `enable_auth_host` default `true`): host rule + path
+matcher → backend `efeonce-auth-server-backend` (NEG serverless `us-east4`) con la **misma** policy Cloud Armor;
+certificado managed adicional `efeonce-auth-server-cert` (`ACTIVE`) en el proxy HTTPS existente; misma IP
+`34.111.78.237`; sin forwarding rules nuevos. Apply: 3 add / 2 change in-place / 0 destroy; `mcp.efeonce.org`
+respondió 200 antes y después. DNS A `auth.efeonce.org` → `34.111.78.237` (HostGator).
+
+**Verificado en vivo.** `https://auth.efeonce.org/readyz` → 200 `{postgres, kms, activeKey: ok}`; el JWKS publica
+los dos `kid`; un token ES256 firmado por el HSM verifica con `jose` `createRemoteJWKSet` contra ese JWKS —
+exactamente lo que hará el gateway en `TASK-1831`.
+
+**Release.** Workflow `.github/workflows/auth-server-deploy.yml` (`workflow_call`, drift check
+`WORKER_RUNTIME_PATHS`, verificación de `GIT_SHA`); registrado en `RELEASE_DEPLOY_WORKFLOWS` (`'Auth Server Deploy'`,
+`cloudRunService: auth-server`, `us-east4`), en `production-release.yml` (job `deploy-auth-server`) y en los tres
+gates de workers (build-contract, runtime-deps, deploy-path-coverage).
+
+**Reliability.** `auth.issuer.jwks_unreachable` (`runtime`; `not_configured` hasta que Vercel tenga
+`AUTH_SERVER_JWKS_URL`; `error` si el JWKS difiere del registry) y `auth.signing_keys.lifecycle` (`data_quality`;
+`error` sin `active` o con más de una; `warning` si una `retiring` supera 7 días) en
+`src/lib/reliability/queries/auth-server-signals.ts`, cableadas en `get-reliability-overview.ts` y en el registry
+`identity`. `auth.kms.sign_failures` se observa por incidentes Sentry con tag `component=auth-server` /
+`check=kms`, no como contador propio.
+
+**Costo.** Adicional en GCP ≈ USD 15/mes (Cloud Run min 1 ≈ 8, KMS HSM ≈ 5 por versión activa, resto ≈ 1); sin LB
+ni Cloud Armor nuevos, como se midió en el delta anterior.
+
+**Fuera de alcance de TASK-1828** (queda en sus tasks): endpoints OAuth/CIMD/tokens (`TASK-1829`), passkeys /
+magic link / TOTP (`TASK-1830`), gateway multi-issuer (`TASK-1831`), canaries (`TASK-1832`), pentest y rotación
+programada (`TASK-1833`), convergencia del login (`TASK-1834`). **El login de Greenhouse no cambia.** Runbook:
+[`docs/operations/runbooks/auth-server.md`](../operations/runbooks/auth-server.md).

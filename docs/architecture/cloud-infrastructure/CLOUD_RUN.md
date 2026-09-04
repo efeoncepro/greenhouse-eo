@@ -1,6 +1,6 @@
 # Cloud Infrastructure — Cloud Run (services, Functions legacy, Jobs)
 
-> **Estado vigente** · Updated: 2026-08-12 (TASK-1378 cerrada — scanner LIVE) · Cronología: [HISTORIAL.md](HISTORIAL.md)
+> **Estado vigente** · Updated: 2026-09-04 (TASK-1828 — `auth-server` desplegado, JWKS vivo) · Cronología: [HISTORIAL.md](HISTORIAL.md)
 > **SoT:** `services/<worker>/deploy.sh` (config declarativa) + `gcloud run services|jobs list`
 > (estado live). Inventario live completo auditado por última vez el 2026-04-23 (`13`
 > serverless: 5 Cloud Run custom + 8 Functions Gen 2); re-baseline pendiente (`TASK-127`).
@@ -15,6 +15,7 @@
 | `hubspot-greenhouse-integration` | `us-central1` | default compute SA | **public** (`allUsers`) | parcial | revisar si el exposure público es realmente el deseado |
 | `notion-bq-sync` | `us-central1` | default compute SA | **public** (`allUsers`) | Secret Manager | exposición pública innecesaria para un sync interno; `minScale=0` desde 2026-04-24 |
 | `clamav` | `us-east4` | `greenhouse-portal@...` | IAM only (ingress `all` + `--no-allow-unauthenticated`, invoker sólo `greenhouse-portal@`) | **ninguno** — no lee secretos ni toca PostgreSQL | Escáner de firmas de assets de candidato (TASK-1378). **PRODUCTIVO desde 2026-08-12**: `ASSET_MALWARE_SCAN_ENABLED=true` en staging Y producción de Vercel (ISSUE-150 resuelta). `mem=2Gi`, `cpu=1`, `min=1`, `max=3`, `concurrency=4`, `timeout=120s`, 3,6 M firmas. **Servicio ÚNICO para staging y producción** (ver abajo). ≈USD 19/mes |
+| `auth-server` | `us-east4` | `auth-server@efeonce-group` (SA propia: `roles/cloudkms.signerVerifier` **sólo** sobre la llave `auth-server-es256` + `roles/cloudsql.client`) | **LB + sin auth Cloud Run**: ingress `internal-and-cloud-load-balancing` + `--allow-unauthenticated`; entra únicamente por el front door **compartido** del gateway MCP como segundo host `auth.efeonce.org` (misma IP `34.111.78.237`, misma policy Cloud Armor) | Secret Manager; la llave privada de firma vive en **Cloud KMS (HSM)** y nunca sale | Authorization server propio de Efeonce (EPIC-044, TASK-1828). Imagen `gcr.io/efeonce-group/auth-server` (Cloud Build, `services/auth-server/Dockerfile`, esbuild `--packages=external`, Node 22-slim). `cpu=1`, `mem=512Mi`, `concurrency=80`, `timeout=30s`, `min=1` production / `0` staging. **Servicio ÚNICO compartido staging+producción** (como `ops-worker`). Flag `AUTH_SERVER_ENABLED` (SoT `services/auth-server/deploy.sh`, default `true` desde 2026-09-04). Revisión activa `auth-server-00003-jtf` (`GIT_SHA 02dc5d987`, CI/WIF run `33870746218`); producción pendiente del próximo release. ≈USD 15/mes (Cloud Run + KMS + front door). Ver §`auth-server` abajo |
 
 ## Cloud Run Jobs
 
@@ -131,6 +132,41 @@ credencial (`GCP_AUTH_PREFERENCE=service_account_key` sin rama en el resolver de
 - Spec: [`../../tasks/complete/TASK-1378-clamav-malware-scanner-provisioning-decision.md`](../../tasks/complete/TASK-1378-clamav-malware-scanner-provisioning-decision.md).
   Runbook: `docs/manual-de-uso/plataforma/operar-scanner-malware-assets.md`. Incidente del flip:
   `docs/issues/resolved/ISSUE-150-production-flag-enabled-for-code-only-on-develop.md`.
+
+## `auth-server` — emisor propio de Efeonce (EPIC-044, TASK-1828)
+
+- **Qué es:** el authorization server de `auth.efeonce.org` (ADR nativo de EPIC-044). En TASK-1828 sólo
+  existe la capa de runtime + llaves: `/healthz` (200 siempre), `/readyz` (503 con
+  `AUTH_SERVER_ENABLED=false`; 200 con PG + KMS + llave `active`), `/.well-known/jwks.json`
+  (`active` + `retiring`, `Cache-Control: max-age=300`; 404 con flag OFF) y allowlist de `Host`
+  (`AUTH_SERVER_ALLOWED_HOSTS`, 421 fuera de ella). Los flujos OAuth (TASK-1829) y la autenticación
+  de personas (TASK-1830) llegan después; **hoy no emite tokens**.
+- **Llave de firma — Cloud KMS HSM:** key ring `us-east4/auth-server`, llave `auth-server-es256`
+  (`EC_SIGN_P256_SHA256`, nivel de protección HSM); al 2026-09-04 la versión `v2` está `active` y la
+  `v1` en `retiring`. La firma ocurre dentro de KMS (`roles/cloudkms.signerVerifier` del SA, acotado a la
+  llave); no hay material privado en el contenedor ni en Secret Manager. Rotación: `pnpm
+  auth-server:rotate-key` (registry `greenhouse_auth.signing_keys`). Costo ≈ USD 2,50 por versión al mes.
+- **Front door compartido con el gateway MCP:** el host se publica desde `efeonce-mcp/infra/terraform`
+  (variable `enable_auth_host`, commit `6a144a5`): NEG serverless `efeonce-auth-server-neg` (`us-east4`),
+  backend `efeonce-auth-server-backend` con la **misma** security policy `efeonce-mcp-gateway-edge`,
+  certificado managed adicional `efeonce-auth-server-cert` (`ACTIVE`) sobre el proxy HTTPS existente y
+  host rule `auth.efeonce.org → path matcher auth-server`. Sin forwarding rules ni IP nuevos; el gateway
+  y su ruta default no cambian (`apply`: 3 add / 2 change / 0 destroy; `mcp.efeonce.org` 200 antes y
+  después). Rollback del host: `tofu apply -var enable_auth_host=false`.
+- **IAM del deployer de CI** (`github-actions-deployer@`): `roles/iam.serviceAccountUser` sobre
+  `auth-server@` **y** `roles/cloudkms.viewer` sobre la llave — el preflight de `deploy.sh` hace
+  `gcloud kms keys describe`; sin el viewer, KMS responde como si la llave no existiera (`KMS key not
+  found`) y el run falla aunque la llave exista.
+- **Release:** `.github/workflows/auth-server-deploy.yml` (`workflow_call`, drift check por rutas,
+  verificación de `GIT_SHA` en la revisión activa); registrado en `RELEASE_DEPLOY_WORKFLOWS` como
+  `Auth Server Deploy` (`cloudRunService: auth-server`, `us-east4`) y como job `deploy-auth-server` de
+  `production-release.yml`. Los tres gates de worker (`worker:build-contract-gate`,
+  `worker:runtime-deps-gate`, `worker:deploy-path-gate`) lo cubren.
+- **Señales:** `auth.issuer.jwks_unreachable` (`runtime`) y `auth.signing_keys.lifecycle`
+  (`data_quality`) bajo el módulo `identity` (reader `src/lib/reliability/queries/auth-server-signals.ts`);
+  los fallos de KMS se leen como incidentes Sentry con tag `component=auth-server` / `check=kms`.
+- Runbook canónico: [`docs/operations/runbooks/auth-server.md`](../../operations/runbooks/auth-server.md).
+  ADR: [`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](../EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md).
 
 ## Deploy scripts — reglas compartidas
 

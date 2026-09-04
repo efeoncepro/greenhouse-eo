@@ -1,5 +1,19 @@
 # TASK-1831 — Efeonce MCP Gateway Multi-Issuer Authorization Context
 
+## Delta 2026-09-04
+
+- El issuer `https://auth.efeonce.org` ya publica un JWKS real en staging (`/.well-known/jwks.json`, llave
+  KMS HSM `auth-server-es256`): `kid` v2 `active` `xjjMaYxidu3Vk57K5py6w6WGDN41T0WMeOtHMEyppKc` y `kid` v1
+  `retiring` `VjbDUgwc5bd1zj5olC8VndMXKk_G60tLF8xRw945nI8`; un token ES256 firmado por el HSM se verificó con
+  `createRemoteJWKSet` contra ese JWKS. El Slice 3 puede apuntar `jwksUri` a esa URL sin mocks — cerrado por
+  trabajo en `TASK-1828`.
+- El host comparte el front door del gateway (`efeonce-mcp` `6a144a5`, `enable_auth_host=true`, mismo LB, IP y
+  Cloud Armor; gateway intacto), así que no hay infraestructura nueva que coordinar en el repo hermano.
+- `TASK-1631` Slice 1 dejó el reader `GET /api/platform/ecosystem/identity/binding` code complete y
+  verificado en staging (lane 401 sin consumer token); la ruta ya no requiere el `[verificar]` de diseño.
+- **Sigue bloqueada:** `TASK-1829` aún no emite un access token con claims `sub`/`azp`/`scope`/`gv` (el
+  runtime sólo sirve `readyz` y JWKS) y el reader de `TASK-1631` espera su release a producción.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -19,10 +33,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Especificación; contrato AuthContext diseñado en TASK-1631 Slice 0 (2026-08-05), sin código`
+- Status real: `Especificación; contrato AuthContext diseñado en TASK-1631 Slice 0 (2026-08-05), sin código; desde 2026-09-04 el issuer auth.efeonce.org publica JWKS real en staging (2 kid) y el reader de binding de TASK-1631 está verificado en staging; falta el token con claims de TASK-1829`
 - Rank: `TBD`
 - Domain: `platform|identity|integration`
-- Blocked by: `TASK-1829 (token ES256 real en staging); TASK-1631 (resolver de bindings y grants_version)`
+- Blocked by: `TASK-1829 (access token ES256 con claims sub/azp/scope/gv; el JWKS ya existe); TASK-1631 (reader de bindings y grants_version en producción)`
 - Branch: `efeonce-mcp main; Greenhouse develop para el lane de bindings; checkout compartido de cada repo; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -118,11 +132,16 @@ Reglas obligatorias:
 - Verificador single-issuer y `AuthInfo = { token, clientId, scopes, expiresAt }` (verificado 2026-08-05).
 - Gate HTTP de scopes por tool derivado de `GREENHOUSE_SEO_WRITE_TOOLS`; guard de paridad bidireccional.
 - Shim DCR y cliente público compartido en el carril Entra (ADR gateway §Delta 2026-08-06/09-02).
+- **Desde `TASK-1828` (2026-09-04):** JWKS real del issuer externo en `https://auth.efeonce.org/.well-known/jwks.json`
+  (2 `kid`, ES256, KMS HSM) y host publicado en el mismo front door del gateway.
+- **Desde `TASK-1631` Slice 1 (2026-09-04):** reader `GET /api/platform/ecosystem/identity/binding` en el lane
+  ecosystem de Greenhouse, verificado en staging.
 
 ### Gap
 
 - Sin resolver por issuer, sin `AuthContext`, sin `allowedIssuers`, sin recheck de grants.
-- Sin reader de binding en el lane de Greenhouse (lo entrega `TASK-1631`).
+- El issuer externo aún no emite access tokens con `sub`/`azp`/`scope`/`gv` (`TASK-1829`); sólo JWKS.
+- Reader de binding sin release a producción y sin credencial workload del gateway hacia el lane.
 
 ## Modular Placement Contract
 
