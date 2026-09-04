@@ -327,6 +327,113 @@ const run = async () => {
 
     assert(registrationChallengeRejected, 'el CHECK exige sujeto en un reto de registro')
 
+    // ─── TOTP: envelope KMS REAL + anti-replay + código de respaldo ──────────
+    //
+    // El cifrador va contra la llave de verdad (`auth-server-totp-envelope`): es la única pieza
+    // que ningún mock puede probar, y la que decide si el step-up funciona en producción.
+    const { createCloudKmsTotpCipher } = await import('@/lib/auth-server/persons/totp-cipher')
+
+    const cipher = createCloudKmsTotpCipher({
+      keyName:
+        process.env.AUTH_SERVER_TOTP_KMS_KEY ??
+        'projects/efeonce-group/locations/us-east4/keyRings/auth-server/cryptoKeys/auth-server-totp-envelope'
+    })
+
+    const totpSecret = 'JBSWY3DPEHPK3PXP'
+
+    const encryptedSecret = await cipher.encrypt({
+      plaintext: new TextEncoder().encode(totpSecret),
+      environmentId,
+      subject
+    })
+
+    assert(encryptedSecret.ciphertext.length > 0, 'KMS devolvió ciphertext')
+
+    const roundTrip = new TextDecoder().decode(
+      await cipher.decrypt({ ciphertext: encryptedSecret.ciphertext, environmentId, subject })
+    )
+
+    assert(roundTrip === totpSecret, 'round-trip del secreto TOTP contra KMS real')
+
+    // AAD: el mismo ciphertext bajo OTRA persona no descifra. Es la defensa contra mover una fila.
+    let aadRejected = false
+
+    try {
+      await cipher.decrypt({
+        ciphertext: encryptedSecret.ciphertext,
+        environmentId,
+        subject: `${subject}-otro`
+      })
+    } catch {
+      aadRejected = true
+    }
+
+    assert(aadRejected, 'el AAD ata el ciphertext a la persona: movido de fila NO descifra')
+
+    await store.upsertTotpEnrollment({
+      environmentId,
+      subject,
+      secretCiphertext: encryptedSecret.ciphertext,
+      kmsKeyName: encryptedSecret.keyName,
+      status: 'pending',
+      lastUsedStep: null,
+      createdAt: now,
+      confirmedAt: null,
+      lastVerifiedAt: null,
+      revokedAt: null,
+      revokeReason: null
+    })
+
+    const pending = await store.getTotpEnrollment({ environmentId, subject })
+
+    assert(pending?.status === 'pending', 'el enrolamiento nace pending')
+    assert(pending?.lastUsedStep === null, 'sin paso usado todavía')
+
+    await store.markTotpVerified({
+      environmentId,
+      subject,
+      lastUsedStep: 59618500,
+      lastVerifiedAt: now,
+      confirm: true
+    })
+
+    const active = await store.getTotpEnrollment({ environmentId, subject })
+
+    assert(active?.status === 'active' && active.confirmedAt !== null, 'confirmar activa el enrolamiento')
+    // `BIGINT` como string rompería la comparación anti-replay en silencio.
+    assert(typeof active?.lastUsedStep === 'number' && active.lastUsedStep === 59618500, 'last_used_step es number')
+
+    const backupHashes = [sha256(`smoke-backup-a-${suffix}`), sha256(`smoke-backup-b-${suffix}`)]
+
+    await store.replaceTotpBackupCodes({ environmentId, subject, codeHashes: backupHashes, createdAt: now })
+    assert((await store.countOpenTotpBackupCodes({ environmentId, subject })) === 2, 'dos códigos abiertos')
+
+    const consumedOnce = await store.consumeTotpBackupCode({
+      environmentId,
+      subject,
+      codeHash: backupHashes[0],
+      now,
+      consumedIpHash: null
+    })
+
+    const consumedTwice = await store.consumeTotpBackupCode({
+      environmentId,
+      subject,
+      codeHash: backupHashes[0],
+      now,
+      consumedIpHash: null
+    })
+
+    assert(consumedOnce && !consumedTwice, 'un código de respaldo sirve una sola vez')
+    assert((await store.countOpenTotpBackupCodes({ environmentId, subject })) === 1, 'queda uno abierto')
+
+    // Re-emitir reemplaza el set: los anteriores dejan de existir, no se acumulan.
+    await store.replaceTotpBackupCodes({ environmentId, subject, codeHashes: [sha256(`smoke-c-${suffix}`)], createdAt: now })
+    assert((await store.countOpenTotpBackupCodes({ environmentId, subject })) === 1, 'el set se reemplaza entero')
+
+    assert((await store.revokeTotpEnrollment({ environmentId, subject, now, reason: 'smoke' })) === 1, 'revoca')
+    assert((await store.revokeTotpEnrollment({ environmentId, subject, now, reason: 'smoke' })) === 0, 'idempotente')
+
     // ─── Ledger append-only ──────────────────────────────────────────────────
     await store.recordAttempt({
       method: 'magic_link',
@@ -361,7 +468,7 @@ const run = async () => {
     assert(blockedMutation, 'el trigger append-only bloquea el UPDATE del ledger')
 
     console.log(
-      '[person-auth-smoke] OK — sesión, magic link, rate limit, passkeys y ledger verificados contra PG real'
+      '[person-auth-smoke] OK — sesión, magic link, rate limit, passkeys, TOTP (envelope KMS real) y ledger verificados'
     )
   } finally {
     // Limpieza: el orden respeta las FKs (sesión → link → profile).
@@ -372,6 +479,11 @@ const run = async () => {
     await query(`DELETE FROM greenhouse_auth.passkey_credentials WHERE subject = $1`, [subject]).catch(() => undefined)
     await query(`DELETE FROM greenhouse_auth.passkey_challenges WHERE correlation_id = $1`, [
       `smoke-${suffix}`
+    ]).catch(() => undefined)
+    // Los códigos de respaldo caen por FK en cascada con el enrolamiento.
+    await query(`DELETE FROM greenhouse_auth.totp_enrollments WHERE environment_id = $1 AND subject = $2`, [
+      environmentId,
+      subject
     ]).catch(() => undefined)
     await query(`DELETE FROM greenhouse_auth.magic_link_tokens WHERE subject = $1`, [subject]).catch(() => undefined)
     await query(`DELETE FROM greenhouse_auth.auth_rate_limits WHERE bucket_key = $1`, [bucketKey]).catch(

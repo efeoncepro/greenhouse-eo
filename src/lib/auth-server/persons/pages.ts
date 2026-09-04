@@ -27,7 +27,10 @@ export const PERSON_AUTH_PATHS = {
   passkeyRegisterFinish: '/auth/passkeys/register/finish',
   passkeyAuthenticateStart: '/auth/passkeys/authenticate/start',
   passkeyAuthenticateFinish: '/auth/passkeys/authenticate/finish',
-  passkeyList: '/auth/passkeys'
+  passkeyList: '/auth/passkeys',
+  totpEnrollStart: '/auth/totp/enroll/start',
+  totpEnrollFinish: '/auth/totp/enroll/finish',
+  totpVerify: '/auth/totp/verify'
 } as const
 
 const hiddenField = (name: string, value: string | null): string =>

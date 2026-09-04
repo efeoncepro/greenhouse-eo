@@ -17,6 +17,8 @@
  *   POST /auth/passkeys/register/{start,finish}      alta de passkey (exige sesión)
  *   POST /auth/passkeys/authenticate/{start,finish}  login por passkey (credenciales descubribles)
  *   GET  /auth/passkeys             dispositivos registrados de la persona
+ *   POST /auth/totp/enroll/{start,finish}            alta del segundo factor (exige sesión)
+ *   POST /auth/totp/verify          step-up: escribe `step_up_at` + `amr` en la sesión
  */
 
 import { buildRequestAuditContext } from '../oauth/audit'
@@ -61,6 +63,8 @@ import {
   type PasskeyDeps
 } from './passkeys'
 import type { PersonAuthStorePort } from './store/port'
+import type { TotpSecretCipherPort } from './totp-cipher'
+import { startTotpEnrollment, verifyTotp, type TotpDeps } from './totp'
 
 export type PersonAuthHandlerDeps = Omit<MagicLinkDeps, 'store' | 'config'> & {
   store: PersonAuthStorePort
@@ -73,6 +77,10 @@ export type PersonAuthHandlerDeps = Omit<MagicLinkDeps, 'store' | 'config'> & {
   rpId: string
   /** Observabilidad del contador que retrocede (señal `auth.person.passkey_counter_regression`). */
   onPasskeyCounterRegression?: (input: { credentialId: string }) => void
+  /** Cifrado en reposo del secreto TOTP (Cloud KMS en runtime; fake en tests). */
+  totpCipher: TotpSecretCipherPort
+  /** Observabilidad del envelope caído (señal `auth.person.totp_envelope_unavailable`). */
+  onTotpEnvelopeUnavailable?: () => void
 }
 
 export type PersonAuthHandler = (request: OAuthHttpRequest) => Promise<OAuthHttpResponse | null>
@@ -88,7 +96,10 @@ const STATIC_PATHS = new Set<string>([
   PERSON_AUTH_PATHS.passkeyRegisterFinish,
   PERSON_AUTH_PATHS.passkeyAuthenticateStart,
   PERSON_AUTH_PATHS.passkeyAuthenticateFinish,
-  PERSON_AUTH_PATHS.passkeyList
+  PERSON_AUTH_PATHS.passkeyList,
+  PERSON_AUTH_PATHS.totpEnrollStart,
+  PERSON_AUTH_PATHS.totpEnrollFinish,
+  PERSON_AUTH_PATHS.totpVerify
 ])
 
 export const isPersonAuthPath = (pathname: string): boolean =>
@@ -132,6 +143,14 @@ export const createPersonAuthHandler = (deps: PersonAuthHandlerDeps): PersonAuth
     environmentId: deps.environmentId,
     origin: new URL(deps.issuer).origin,
     rpId: deps.rpId,
+    now: deps.now
+  }
+
+  const totpDeps: TotpDeps = {
+    store: deps.store,
+    config: deps.config,
+    cipher: deps.totpCipher,
+    environmentId: deps.environmentId,
     now: deps.now
   }
 
@@ -454,6 +473,97 @@ export const createPersonAuthHandler = (deps: PersonAuthHandlerDeps): PersonAuth
           )
         }
       )
+    }
+
+    // ─── TOTP (segundo factor) ───────────────────────────────────────────────
+    //
+    // Las tres rutas exigen sesión: el TOTP no es un método de login, es el step-up que autoriza
+    // consentir un scope de escritura sobre una sesión que YA existe.
+    if (
+      path === PERSON_AUTH_PATHS.totpEnrollStart ||
+      path === PERSON_AUTH_PATHS.totpEnrollFinish ||
+      path === PERSON_AUTH_PATHS.totpVerify
+    ) {
+      if (request.method !== 'POST') return methodNotAllowed('POST')
+
+      const resolution = await resolvePersonSession({
+        store: deps.store,
+        config: deps.config,
+        sessionId: readCookie(request.headers.get('cookie'), deps.config.sessionCookieName),
+        expectedEnvironmentId: deps.environmentId,
+        expectedSourceSystem: deps.expectedSourceSystem,
+        now: deps.now()
+      })
+
+      if (resolution.status !== 'active') return jsonResponse(401, { status: 'unauthenticated' })
+
+      const { session } = resolution
+
+      if (path === PERSON_AUTH_PATHS.totpEnrollStart) {
+        const started = await startTotpEnrollment(totpDeps, { subject: session.subject })
+
+        if (started.status === 'envelope_unavailable') {
+          deps.onTotpEnvelopeUnavailable?.()
+
+          // Degradación honesta: no se guarda un secreto sin cifrar «por esta vez».
+          return jsonResponse(503, { status: 'envelope_unavailable' })
+        }
+
+        if (started.status === 'already_active') return jsonResponse(409, { status: 'already_active' })
+
+        // Secreto y códigos en claro SÓLO acá: no vuelven a salir del servidor nunca más.
+        return jsonResponse(200, {
+          status: 'ready',
+          secret: started.secret,
+          otpauthUri: started.otpauthUri,
+          backupCodes: started.backupCodes
+        })
+      }
+
+      const code = readField(request, 'code') ?? ''
+
+      const result = await verifyTotp(totpDeps, {
+        subject: session.subject,
+        code,
+        confirmEnrollment: path === PERSON_AUTH_PATHS.totpEnrollFinish,
+        ipHash: audit.ipHash,
+        userAgentHash: audit.userAgentHash,
+        correlationId: audit.correlationId
+      })
+
+      if (result.status === 'rate_limited') {
+        return jsonResponse(429, { status: 'rate_limited' }, { 'Retry-After': String(result.retryAfterSeconds) })
+      }
+
+      if (result.status === 'envelope_unavailable') {
+        deps.onTotpEnvelopeUnavailable?.()
+
+        return jsonResponse(503, { status: 'envelope_unavailable' })
+      }
+
+      if (result.status !== 'verified') {
+        // `invalid`, `replayed` y `not_enrolled` comparten respuesta: el detalle vive en el ledger.
+        return jsonResponse(400, { status: 'rejected' })
+      }
+
+      // El step-up se ESCRIBE en la sesión: `authorize` lo lee de ahí, no de esta respuesta.
+      await deps.store.recordSessionStepUp({
+        sessionHash: session.sessionHash,
+        stepUpAt: deps.now(),
+        amr: result.amr
+      })
+
+      const openBackupCodes = await deps.store.countOpenTotpBackupCodes({
+        environmentId: deps.environmentId,
+        subject: session.subject
+      })
+
+      return jsonResponse(200, {
+        status: 'verified',
+        authLevel: 'step_up',
+        usedBackupCode: result.usedBackupCode,
+        remainingBackupCodes: openBackupCodes
+      })
     }
 
     // ─── Contexto de la sesión ───────────────────────────────────────────────

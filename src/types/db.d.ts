@@ -461,6 +461,29 @@ export interface GreenhouseAuthSigningKeys {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseAuthTotpBackupCodes {
+  code_hash: string;
+  consumed_at: Timestamp | null;
+  consumed_ip_hash: string | null;
+  created_at: Generated<Timestamp>;
+  environment_id: string;
+  subject: string;
+}
+
+export interface GreenhouseAuthTotpEnrollments {
+  confirmed_at: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  environment_id: string;
+  kms_key_name: string;
+  last_used_step: Int8 | null;
+  last_verified_at: Timestamp | null;
+  revoke_reason: string | null;
+  revoked_at: Timestamp | null;
+  secret_ciphertext: Buffer;
+  status: Generated<string>;
+  subject: string;
+}
+
 export interface GreenhouseClientPortalModuleAssignmentEvents {
   actor_user_id: string;
   assignment_id: string;
@@ -13157,6 +13180,8 @@ export interface DB {
   "greenhouse_auth.sessions": GreenhouseAuthSessions;
   "greenhouse_auth.signing_key_events": GreenhouseAuthSigningKeyEvents;
   "greenhouse_auth.signing_keys": GreenhouseAuthSigningKeys;
+  "greenhouse_auth.totp_backup_codes": GreenhouseAuthTotpBackupCodes;
+  "greenhouse_auth.totp_enrollments": GreenhouseAuthTotpEnrollments;
   "greenhouse_client_portal.module_assignment_events": GreenhouseClientPortalModuleAssignmentEvents;
   "greenhouse_client_portal.module_assignments": GreenhouseClientPortalModuleAssignments;
   "greenhouse_client_portal.modules": GreenhouseClientPortalModules;

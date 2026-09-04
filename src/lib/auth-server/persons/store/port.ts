@@ -15,7 +15,8 @@ import type {
   PersonSessionWithLink,
   PasskeyChallengeRecord,
   PasskeyCredentialRecord,
-  RateLimitDecision
+  RateLimitDecision,
+  TotpEnrollmentRecord
 } from '../types'
 
 export interface PersonAuthStorePort {
@@ -71,6 +72,40 @@ export interface PersonAuthStorePort {
   listPasskeyCredentials(input: { environmentId: string; subject: string }): Promise<PasskeyCredentialRecord[]>
   updatePasskeyCounter(input: { credentialId: string; counter: number; lastUsedAt: Date }): Promise<void>
   revokePasskeyCredential(input: { credentialId: string; now: Date; reason: string }): Promise<number>
+
+  // ─── TOTP ─────────────────────────────────────────────────────────────────
+  getTotpEnrollment(input: { environmentId: string; subject: string }): Promise<TotpEnrollmentRecord | null>
+  upsertTotpEnrollment(record: TotpEnrollmentRecord): Promise<void>
+  /** `confirm` pasa `pending` → `active`: el código que prueba la copia del secreto lo activa. */
+  markTotpVerified(input: {
+    environmentId: string
+    subject: string
+    lastUsedStep: number | null
+    lastVerifiedAt: Date
+    confirm: boolean
+  }): Promise<void>
+  revokeTotpEnrollment(input: {
+    environmentId: string
+    subject: string
+    now: Date
+    reason: string
+  }): Promise<number>
+  /** Reemplaza el set completo: regenerar códigos invalida los anteriores, no los acumula. */
+  replaceTotpBackupCodes(input: {
+    environmentId: string
+    subject: string
+    codeHashes: readonly string[]
+    createdAt: Date
+  }): Promise<void>
+  /** Atómico: un código de respaldo sirve UNA vez. `false` = no existía o ya se usó. */
+  consumeTotpBackupCode(input: {
+    environmentId: string
+    subject: string
+    codeHash: string
+    now: Date
+    consumedIpHash: string | null
+  }): Promise<boolean>
+  countOpenTotpBackupCodes(input: { environmentId: string; subject: string }): Promise<number>
 
   // ─── Ledger ───────────────────────────────────────────────────────────────
   recordAttempt(event: PersonAuthAttemptEvent): Promise<void>

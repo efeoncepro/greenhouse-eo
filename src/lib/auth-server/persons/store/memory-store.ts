@@ -14,7 +14,8 @@ import type {
   PersonSessionWithLink,
   PasskeyChallengeRecord,
   PasskeyCredentialRecord,
-  RateLimitDecision
+  RateLimitDecision,
+  TotpEnrollmentRecord
 } from '../types'
 import { computeLockoutSeconds } from '../rate-limit'
 import type { PersonAuthStorePort } from './port'
@@ -29,6 +30,8 @@ export class InMemoryPersonAuthStore implements PersonAuthStorePort {
   readonly attempts: PersonAuthAttemptEvent[] = []
   readonly passkeys = new Map<string, PasskeyCredentialRecord>()
   readonly challenges = new Map<string, PasskeyChallengeRecord>()
+  readonly totpEnrollments = new Map<string, TotpEnrollmentRecord>()
+  readonly totpBackupCodes = new Map<string, { environmentId: string; subject: string; consumedAt: Date | null }>()
   private readonly buckets = new Map<string, BucketState>()
   /** Espejo del estado de `identity_profile_source_links` que la implementación PG resuelve por JOIN. */
   readonly links = new Map<string, LinkState>()
@@ -301,6 +304,130 @@ export class InMemoryPersonAuthStore implements PersonAuthStorePort {
     record.revokeReason = reason
 
     return 1
+  }
+
+  // ─── TOTP ─────────────────────────────────────────────────────────────────
+
+  private totpKey(environmentId: string, subject: string): string {
+    return `${environmentId}|${subject}`
+  }
+
+  async getTotpEnrollment({
+    environmentId,
+    subject
+  }: {
+    environmentId: string
+    subject: string
+  }): Promise<TotpEnrollmentRecord | null> {
+    const record = this.totpEnrollments.get(this.totpKey(environmentId, subject))
+
+    return record ? { ...record } : null
+  }
+
+  async upsertTotpEnrollment(record: TotpEnrollmentRecord): Promise<void> {
+    this.totpEnrollments.set(this.totpKey(record.environmentId, record.subject), { ...record })
+  }
+
+  async markTotpVerified({
+    environmentId,
+    subject,
+    lastUsedStep,
+    lastVerifiedAt,
+    confirm
+  }: {
+    environmentId: string
+    subject: string
+    lastUsedStep: number | null
+    lastVerifiedAt: Date
+    confirm: boolean
+  }): Promise<void> {
+    const record = this.totpEnrollments.get(this.totpKey(environmentId, subject))
+
+    if (!record || record.status === 'revoked') return
+
+    record.lastUsedStep = lastUsedStep
+    record.lastVerifiedAt = lastVerifiedAt
+
+    if (confirm) {
+      record.status = 'active'
+      record.confirmedAt = record.confirmedAt ?? lastVerifiedAt
+    }
+  }
+
+  async revokeTotpEnrollment({
+    environmentId,
+    subject,
+    now,
+    reason
+  }: {
+    environmentId: string
+    subject: string
+    now: Date
+    reason: string
+  }): Promise<number> {
+    const record = this.totpEnrollments.get(this.totpKey(environmentId, subject))
+
+    if (!record || record.status === 'revoked') return 0
+
+    record.status = 'revoked'
+    record.revokedAt = now
+    record.revokeReason = reason
+
+    return 1
+  }
+
+  async replaceTotpBackupCodes({
+    environmentId,
+    subject,
+    codeHashes
+  }: {
+    environmentId: string
+    subject: string
+    codeHashes: readonly string[]
+    createdAt: Date
+  }): Promise<void> {
+    for (const [hash, record] of this.totpBackupCodes) {
+      if (record.environmentId === environmentId && record.subject === subject) this.totpBackupCodes.delete(hash)
+    }
+
+    for (const hash of codeHashes) {
+      this.totpBackupCodes.set(hash, { environmentId, subject, consumedAt: null })
+    }
+  }
+
+  async consumeTotpBackupCode({
+    environmentId,
+    subject,
+    codeHash,
+    now
+  }: {
+    environmentId: string
+    subject: string
+    codeHash: string
+    now: Date
+    consumedIpHash: string | null
+  }): Promise<boolean> {
+    const record = this.totpBackupCodes.get(codeHash)
+
+    if (!record || record.environmentId !== environmentId || record.subject !== subject || record.consumedAt) {
+      return false
+    }
+
+    record.consumedAt = now
+
+    return true
+  }
+
+  async countOpenTotpBackupCodes({
+    environmentId,
+    subject
+  }: {
+    environmentId: string
+    subject: string
+  }): Promise<number> {
+    return [...this.totpBackupCodes.values()].filter(
+      record => record.environmentId === environmentId && record.subject === subject && !record.consumedAt
+    ).length
   }
 
   async recordAttempt(event: PersonAuthAttemptEvent): Promise<void> {

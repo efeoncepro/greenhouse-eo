@@ -155,3 +155,23 @@ export type ClaimPasskeyChallengeResult =
 export type PasskeyAmrFactors = {
   userVerified: boolean
 }
+
+// ─── TOTP ─────────────────────────────────────────────────────────────────────
+
+export type TotpEnrollmentStatus = 'pending' | 'active' | 'revoked'
+
+export type TotpEnrollmentRecord = {
+  environmentId: string
+  subject: string
+  /** Ciphertext de KMS. El secreto en claro NUNCA se persiste, ni transitoriamente. */
+  secretCiphertext: Uint8Array<ArrayBuffer>
+  kmsKeyName: string
+  status: TotpEnrollmentStatus
+  /** Último paso de tiempo aceptado: un código no se acepta dos veces (anti-replay). */
+  lastUsedStep: number | null
+  createdAt: Date
+  confirmedAt: Date | null
+  lastVerifiedAt: Date | null
+  revokedAt: Date | null
+  revokeReason: string | null
+}

@@ -20,7 +20,8 @@ import type {
   PersonSessionWithLink,
   PasskeyChallengeRecord,
   PasskeyCredentialRecord,
-  RateLimitDecision
+  RateLimitDecision,
+  TotpEnrollmentRecord
 } from '../types'
 import { computeLockoutSeconds } from '../rate-limit'
 import type { PersonAuthStorePort } from './port'
@@ -174,6 +175,42 @@ const mapChallenge = (row: ChallengeRow): PasskeyChallengeRecord => ({
   consumedAt: asDateOrNull(row.consumed_at),
   ipHash: row.ip_hash,
   correlationId: row.correlation_id
+})
+
+
+// ─── TOTP ─────────────────────────────────────────────────────────────────────
+
+const TOTP_COLUMNS = `environment_id, subject, secret_ciphertext, kms_key_name, status, last_used_step,
+  created_at, confirmed_at, last_verified_at, revoked_at, revoke_reason`
+
+type TotpRow = {
+  environment_id: string
+  subject: string
+  secret_ciphertext: Buffer
+  kms_key_name: string
+  status: TotpEnrollmentRecord['status']
+  last_used_step: string | number | null
+  created_at: Date | string
+  confirmed_at: Date | string | null
+  last_verified_at: Date | string | null
+  revoked_at: Date | string | null
+  revoke_reason: string | null
+}
+
+const mapTotp = (row: TotpRow): TotpEnrollmentRecord => ({
+  environmentId: row.environment_id,
+  subject: row.subject,
+  secretCiphertext: new Uint8Array(row.secret_ciphertext),
+  kmsKeyName: row.kms_key_name,
+  status: row.status,
+  // `BIGINT` viaja como string en node-postgres: sin `Number(...)` la comparación anti-replay
+  // compararía '12' con 12 y dejaría pasar el replay.
+  lastUsedStep: row.last_used_step === null ? null : Number(row.last_used_step),
+  createdAt: asDate(row.created_at),
+  confirmedAt: asDateOrNull(row.confirmed_at),
+  lastVerifiedAt: asDateOrNull(row.last_verified_at),
+  revokedAt: asDateOrNull(row.revoked_at),
+  revokeReason: row.revoke_reason
 })
 
 export class PostgresPersonAuthStore implements PersonAuthStorePort {
@@ -573,6 +610,172 @@ export class PostgresPersonAuthStore implements PersonAuthStorePort {
     )
 
     return rows.length
+  }
+
+  // ─── TOTP ─────────────────────────────────────────────────────────────────
+
+  async getTotpEnrollment({
+    environmentId,
+    subject
+  }: {
+    environmentId: string
+    subject: string
+  }): Promise<TotpEnrollmentRecord | null> {
+    const rows = await query<TotpRow>(
+      `SELECT ${TOTP_COLUMNS}
+         FROM greenhouse_auth.totp_enrollments
+        WHERE environment_id = $1 AND subject = $2`,
+      [environmentId, subject]
+    )
+
+    return rows[0] ? mapTotp(rows[0]) : null
+  }
+
+  async upsertTotpEnrollment(record: TotpEnrollmentRecord): Promise<void> {
+    // Re-enrolar reemplaza el secreto ANTERIOR: dos secretos vivos para la misma persona serían
+    // dos segundos factores, y sólo uno de ellos estaría en su teléfono.
+    await query(
+      `INSERT INTO greenhouse_auth.totp_enrollments (${TOTP_COLUMNS})
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+       ON CONFLICT (environment_id, subject) DO UPDATE SET
+         secret_ciphertext = EXCLUDED.secret_ciphertext,
+         kms_key_name = EXCLUDED.kms_key_name,
+         status = EXCLUDED.status,
+         last_used_step = EXCLUDED.last_used_step,
+         created_at = EXCLUDED.created_at,
+         confirmed_at = EXCLUDED.confirmed_at,
+         last_verified_at = EXCLUDED.last_verified_at,
+         revoked_at = EXCLUDED.revoked_at,
+         revoke_reason = EXCLUDED.revoke_reason`,
+      [
+        record.environmentId,
+        record.subject,
+        Buffer.from(record.secretCiphertext),
+        record.kmsKeyName,
+        record.status,
+        record.lastUsedStep,
+        record.createdAt,
+        record.confirmedAt,
+        record.lastVerifiedAt,
+        record.revokedAt,
+        record.revokeReason
+      ]
+    )
+  }
+
+  async markTotpVerified({
+    environmentId,
+    subject,
+    lastUsedStep,
+    lastVerifiedAt,
+    confirm
+  }: {
+    environmentId: string
+    subject: string
+    lastUsedStep: number | null
+    lastVerifiedAt: Date
+    confirm: boolean
+  }): Promise<void> {
+    await query(
+      `UPDATE greenhouse_auth.totp_enrollments
+          SET last_used_step = $3,
+              last_verified_at = $4,
+              status = CASE WHEN $5::boolean THEN 'active' ELSE status END,
+              confirmed_at = CASE WHEN $5::boolean THEN COALESCE(confirmed_at, $4) ELSE confirmed_at END
+        WHERE environment_id = $1 AND subject = $2 AND status <> 'revoked'`,
+      [environmentId, subject, lastUsedStep, lastVerifiedAt, confirm]
+    )
+  }
+
+  async revokeTotpEnrollment({
+    environmentId,
+    subject,
+    now,
+    reason
+  }: {
+    environmentId: string
+    subject: string
+    now: Date
+    reason: string
+  }): Promise<number> {
+    const rows = await query<{ subject: string }>(
+      `UPDATE greenhouse_auth.totp_enrollments
+          SET status = 'revoked', revoked_at = $3, revoke_reason = $4
+        WHERE environment_id = $1 AND subject = $2 AND status <> 'revoked'
+        RETURNING subject`,
+      [environmentId, subject, now, reason]
+    )
+
+    return rows.length
+  }
+
+  async replaceTotpBackupCodes({
+    environmentId,
+    subject,
+    codeHashes,
+    createdAt
+  }: {
+    environmentId: string
+    subject: string
+    codeHashes: readonly string[]
+    createdAt: Date
+  }): Promise<void> {
+    await withTransaction(async client => {
+      await client.query(
+        `DELETE FROM greenhouse_auth.totp_backup_codes WHERE environment_id = $1 AND subject = $2`,
+        [environmentId, subject]
+      )
+
+      if (codeHashes.length === 0) return
+
+      await client.query(
+        `INSERT INTO greenhouse_auth.totp_backup_codes (code_hash, environment_id, subject, created_at)
+         SELECT unnest($3::text[]), $1, $2, $4`,
+        [environmentId, subject, [...codeHashes], createdAt]
+      )
+    })
+  }
+
+  async consumeTotpBackupCode({
+    environmentId,
+    subject,
+    codeHash,
+    now,
+    consumedIpHash
+  }: {
+    environmentId: string
+    subject: string
+    codeHash: string
+    now: Date
+    consumedIpHash: string | null
+  }): Promise<boolean> {
+    // Atómico en una sola sentencia: `consumed_at IS NULL` decide la carrera, sin lock explícito.
+    const rows = await query<{ code_hash: string }>(
+      `UPDATE greenhouse_auth.totp_backup_codes
+          SET consumed_at = $4, consumed_ip_hash = $5
+        WHERE code_hash = $3 AND environment_id = $1 AND subject = $2 AND consumed_at IS NULL
+        RETURNING code_hash`,
+      [environmentId, subject, codeHash, now, consumedIpHash]
+    )
+
+    return rows.length === 1
+  }
+
+  async countOpenTotpBackupCodes({
+    environmentId,
+    subject
+  }: {
+    environmentId: string
+    subject: string
+  }): Promise<number> {
+    const rows = await query<{ count: number }>(
+      `SELECT COUNT(*)::int AS count
+         FROM greenhouse_auth.totp_backup_codes
+        WHERE environment_id = $1 AND subject = $2 AND consumed_at IS NULL`,
+      [environmentId, subject]
+    )
+
+    return Number(rows[0]?.count ?? 0)
   }
 
   async recordAttempt(event: PersonAuthAttemptEvent): Promise<void> {

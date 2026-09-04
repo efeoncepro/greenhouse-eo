@@ -37,6 +37,7 @@ import {
   createExternalInvitationAcceptancePort,
   createGovernedMagicLinkMailer,
   createPersonSubjectPort,
+  createCloudKmsTotpCipher,
   createSourceLinkDirectoryPort,
   deriveRpId,
   expectedSourceSystemFor,
@@ -88,6 +89,10 @@ const personDeps = {
   rpId: deriveRpId(oauthConfig.issuer),
   onPasskeyCounterRegression: ({ credentialId }: { credentialId: string }) =>
     console.warn(`[${SERVICE_NAME}] passkey counter regression — credential revoked: ${credentialId}`),
+  // Llave SIMÉTRICA propia (`auth-server-totp-envelope`): la de firma es EC y no puede cifrar.
+  totpCipher: createCloudKmsTotpCipher(),
+  onTotpEnvelopeUnavailable: () =>
+    console.error(`[${SERVICE_NAME}] TOTP envelope unavailable — step-up failing closed`),
   now: () => new Date(),
   onError: (error: unknown, context: Record<string, unknown>) =>
     captureWithDomain(error, 'identity', { tags: { component: SERVICE_NAME, ...context } })

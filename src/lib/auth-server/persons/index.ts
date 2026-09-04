@@ -68,5 +68,23 @@ export {
 export { PostgresPersonAuthStore, expectedSourceSystemFor } from './store/postgres-store'
 export { InMemoryPersonAuthStore } from './store/memory-store'
 export { createPersonSubjectPort, type PersonSubjectPortDeps } from './subject-port'
+export {
+  buildOtpauthUri,
+  generateBackupCode,
+  hashBackupCode,
+  normalizeBackupCode,
+  startTotpEnrollment,
+  verifyTotp,
+  type TotpDeps
+} from './totp'
+export {
+  buildTotpAad,
+  createCloudKmsTotpCipher,
+  createInMemoryTotpCipher,
+  getTotpEnvelopeKeyName,
+  isTotpCipherUnavailableError,
+  TotpCipherUnavailableError,
+  type TotpSecretCipherPort
+} from './totp-cipher'
 export type * from './types'
 export type { PersonAuthStorePort } from './store/port'

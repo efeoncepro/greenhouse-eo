@@ -57,6 +57,17 @@ export const INVITATION_ACCEPT_IP_RULE: RateLimitRule = {
   limit: 10
 }
 
+/**
+ * Seis dígitos con ventana ±1 aceptan tres códigos a la vez: un millón de combinaciones se recorre
+ * rápido sin límite. ESTE es el mecanismo que hace inviable la fuerza bruta, no la longitud.
+ */
+export const TOTP_VERIFY_SUBJECT_RULE: RateLimitRule = {
+  action: 'totp_verify',
+  dimension: 'subject',
+  windowSeconds: 5 * 60,
+  limit: 5
+}
+
 export type EnforceRateLimitInput = {
   store: PersonAuthStorePort
   config: AuthServerPersonAuthConfig

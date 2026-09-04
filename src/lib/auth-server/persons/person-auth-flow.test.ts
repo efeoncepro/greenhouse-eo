@@ -9,6 +9,7 @@ import { buildMagicLinkUrl, parseMagicLinkToken } from './magic-link'
 import { createPersonAuthHandler, isPersonAuthPath } from './routes'
 import { resolveAuthLevel } from './sessions'
 import { InMemoryPersonAuthStore } from './store/memory-store'
+import { createInMemoryTotpCipher } from './totp-cipher'
 import { createPersonSubjectPort } from './subject-port'
 import type { PersonSessionRecord } from './types'
 import { headersFromRecord, type OAuthHttpRequest } from '../oauth/http'
@@ -103,6 +104,7 @@ const buildHarness = (options: { linkActive?: boolean; knownEmail?: boolean } = 
     expectedSourceSystem: SOURCE_SYSTEM,
     issuer: ISSUER,
     rpId: 'auth.efeonce.org',
+    totpCipher: createInMemoryTotpCipher(),
     now: () => clock.current,
     sleep: async ms => {
       sleeps.push(ms)
@@ -153,6 +155,7 @@ describe('superficie de personas — enrutamiento y flag', () => {
       expectedSourceSystem: SOURCE_SYSTEM,
       issuer: ISSUER,
       rpId: 'auth.efeonce.org',
+      totpCipher: createInMemoryTotpCipher(),
       now: () => new Date()
     })
 

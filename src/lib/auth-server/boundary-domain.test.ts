@@ -56,7 +56,12 @@ const ALLOWED_WRITE_TARGETS = new Set([
   // TASK-1830 Slice 2 — passkeys. `passkey_credentials` guarda SÓLO material público (COSE);
   // `passkey_challenges` existe porque el reto de autenticación ocurre ANTES de que haya sesión.
   'greenhouse_auth.passkey_credentials',
-  'greenhouse_auth.passkey_challenges'
+  'greenhouse_auth.passkey_challenges',
+
+  // TASK-1830 Slice 3 — TOTP. El secreto vive cifrado por KMS con AAD `<environment>|<subject>`;
+  // los códigos de respaldo, sólo su sha256 (nacen de 128 bits, no necesitan KDF lento).
+  'greenhouse_auth.totp_enrollments',
+  'greenhouse_auth.totp_backup_codes'
 ])
 
 describe('auth-server domain-wide write boundary (TASK-1829/1830)', () => {

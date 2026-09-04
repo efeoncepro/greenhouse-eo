@@ -73,6 +73,10 @@ EMAIL_FROM="${EMAIL_FROM:-Efeonce <greenhouse@efeoncepro.com>}"
 AUTH_SERVER_ISSUER="${AUTH_SERVER_ISSUER:-https://auth.efeonce.org}"
 AUTH_SERVER_ALLOWED_HOSTS="${AUTH_SERVER_ALLOWED_HOSTS:-auth.efeonce.org}"
 AUTH_SERVER_KMS_KEY="${AUTH_SERVER_KMS_KEY:-projects/${PROJECT_ID}/locations/${REGION}/keyRings/auth-server/cryptoKeys/auth-server-es256}"
+# Llave SIMÉTRICA del envelope de secretos TOTP (TASK-1830). Es OTRA llave: `auth-server-es256`
+# es EC de firma y no puede cifrar. Creada 2026-09-04 (HSM, ENCRYPT_DECRYPT, rotación 90 d) con
+# `cryptoKeyEncrypterDecrypter` para `auth-server@`.
+AUTH_SERVER_TOTP_KMS_KEY="${AUTH_SERVER_TOTP_KMS_KEY:-projects/${PROJECT_ID}/locations/${REGION}/keyRings/auth-server/cryptoKeys/auth-server-totp-envelope}"
 
 echo "=== $(printf "%s" "${ENV}" | tr "[:lower:]" "[:upper:]") deployment of ${SERVICE_NAME} (${REGION}) ==="
 
@@ -80,6 +84,11 @@ echo "=== $(printf "%s" "${ENV}" | tr "[:lower:]" "[:upper:]") deployment of ${S
 
 if ! gcloud kms keys describe "${AUTH_SERVER_KMS_KEY}" --project="${PROJECT_ID}" >/dev/null 2>&1; then
   echo "ERROR: KMS key '${AUTH_SERVER_KMS_KEY}' not found. Run TASK-1828 Slice 0 first."
+  exit 1
+fi
+
+if ! gcloud kms keys describe "${AUTH_SERVER_TOTP_KMS_KEY}" --project="${PROJECT_ID}" >/dev/null 2>&1; then
+  echo "ERROR: TOTP envelope KMS key '${AUTH_SERVER_TOTP_KMS_KEY}' not found. Run TASK-1830 Slice 3 provisioning first."
   exit 1
 fi
 
@@ -188,6 +197,7 @@ ENV_VARS="${ENV_VARS},AUTH_SERVER_MCP_AUDIENCE=${AUTH_SERVER_MCP_AUDIENCE:-https
 # así que `authorize` sigue en `login_required`. Ledger: docs/operations/FEATURE_FLAG_STATE_LEDGER.md
 # (runtime auth-server únicamente).
 ENV_VARS="${ENV_VARS},AUTH_SERVER_PERSON_AUTH_ENABLED=${AUTH_SERVER_PERSON_AUTH_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},AUTH_SERVER_TOTP_KMS_KEY=${AUTH_SERVER_TOTP_KMS_KEY}"
 # Correo del magic link por el pipeline gobernado (`sendEmail`). Sin esto el enlace nunca sale y el
 # acceso queda muerto en silencio: la respuesta es idéntica por anti-enumeración y no puede avisar.
 ENV_VARS="${ENV_VARS},EMAIL_FROM=${EMAIL_FROM}"
