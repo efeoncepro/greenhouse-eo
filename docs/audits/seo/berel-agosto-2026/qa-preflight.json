@@ -1,6 +1,6 @@
 {
   "pdf": "/Users/jreye/Documents/greenhouse-eo/docs/audits/seo/berel-agosto-2026/BEREL_INFORME_AGOSTO_2026_A4.pdf",
-  "sha256": "6a0258a31a8b5434e6cf21bf36a4666e352eed2fed7e2195cdbf0c2916a50cda",
+  "sha256": "47c3f99bdb9b66669671125dd1712d46d39a403f668f204c29c81e3dac9fad00",
   "pymupdf_version": "1.28.2",
   "pages": 55,
   "checks": [
@@ -1925,7 +1925,7 @@
       "detail": "EAAAAA+Geist-Medium"
     },
     {
-      "check": "font_embedded:4088",
+      "check": "font_embedded:4086",
       "passed": true,
       "detail": "Geist Regular"
     },
@@ -2705,6 +2705,16 @@
       "detail": null
     },
     {
+      "check": "nonlocal_uri:32",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:32",
+      "passed": true,
+      "detail": null
+    },
+    {
       "check": "nonlocal_uri:33",
       "passed": true,
       "detail": null
@@ -2770,17 +2780,7 @@
       "detail": null
     },
     {
-      "check": "nonlocal_uri:35",
-      "passed": true,
-      "detail": null
-    },
-    {
-      "check": "nonlocal_uri:35",
-      "passed": true,
-      "detail": null
-    },
-    {
-      "check": "nonlocal_uri:35",
+      "check": "nonlocal_uri:34",
       "passed": true,
       "detail": null
     },
@@ -2880,22 +2880,22 @@
       "detail": null
     },
     {
-      "check": "nonlocal_uri:41",
+      "check": "nonlocal_uri:40",
       "passed": true,
       "detail": null
     },
     {
-      "check": "nonlocal_uri:41",
+      "check": "nonlocal_uri:40",
       "passed": true,
       "detail": null
     },
     {
-      "check": "nonlocal_uri:41",
+      "check": "nonlocal_uri:40",
       "passed": true,
       "detail": null
     },
     {
-      "check": "nonlocal_uri:41",
+      "check": "nonlocal_uri:40",
       "passed": true,
       "detail": null
     },
@@ -3140,7 +3140,102 @@
       "detail": null
     },
     {
-      "check": "nonlocal_uri:54",
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "check": "nonlocal_uri:53",
       "passed": true,
       "detail": null
     },
@@ -3181,101 +3276,6 @@
     },
     {
       "check": "nonlocal_uri:54",
-      "passed": true,
-      "detail": null
-    },
-    {
-      "check": "nonlocal_uri:54",
-      "passed": true,
-      "detail": null
-    },
-    {
-      "check": "nonlocal_uri:54",
-      "passed": true,
-      "detail": null
-    },
-    {
-      "check": "nonlocal_uri:54",
-      "passed": true,
-      "detail": null
-    },
-    {
-      "check": "nonlocal_uri:54",
-      "passed": true,
-      "detail": null
-    },
-    {
-      "check": "nonlocal_uri:54",
-      "passed": true,
-      "detail": null
-    },
-    {
-      "check": "nonlocal_uri:54",
-      "passed": true,
-      "detail": null
-    },
-    {
-      "check": "nonlocal_uri:54",
-      "passed": true,
-      "detail": null
-    },
-    {
-      "check": "nonlocal_uri:54",
-      "passed": true,
-      "detail": null
-    },
-    {
-      "check": "nonlocal_uri:54",
-      "passed": true,
-      "detail": null
-    },
-    {
-      "check": "nonlocal_uri:54",
-      "passed": true,
-      "detail": null
-    },
-    {
-      "check": "nonlocal_uri:54",
-      "passed": true,
-      "detail": null
-    },
-    {
-      "check": "nonlocal_uri:54",
-      "passed": true,
-      "detail": null
-    },
-    {
-      "check": "nonlocal_uri:54",
-      "passed": true,
-      "detail": null
-    },
-    {
-      "check": "nonlocal_uri:54",
-      "passed": true,
-      "detail": null
-    },
-    {
-      "check": "nonlocal_uri:54",
-      "passed": true,
-      "detail": null
-    },
-    {
-      "check": "nonlocal_uri:54",
-      "passed": true,
-      "detail": null
-    },
-    {
-      "check": "nonlocal_uri:55",
-      "passed": true,
-      "detail": null
-    },
-    {
-      "check": "nonlocal_uri:55",
-      "passed": true,
-      "detail": null
-    },
-    {
-      "check": "nonlocal_uri:55",
       "passed": true,
       "detail": null
     },
@@ -3655,7 +3655,7 @@
       "detail": null
     },
     {
-      "check": "outline_destination:8.2 Nuestra evaluación con AEO Grader: qué demuestra y quédebemos corregir",
+      "check": "outline_destination:8.2 Nuestra evaluación con AEO Grader: resultados y alcance",
       "passed": true,
       "detail": null
     },
@@ -3665,7 +3665,7 @@
       "detail": null
     },
     {
-      "check": "outline_destination:8.4 Qué pudo comprobar el Grader y dónde falló nuestra medición",
+      "check": "outline_destination:8.4 Comprobaciones técnicas y alcance de la validación",
       "passed": true,
       "detail": null
     },
@@ -3675,7 +3675,7 @@
       "detail": null
     },
     {
-      "check": "outline_destination:9. Cómo llegan las visitas, cómo navegany qué acciones realizan",
+      "check": "outline_destination:9. Cómo llegan las visitas, cómo navegan9. Cómo llegan las visitas, cómo navegany qué acciones realizan",
       "passed": true,
       "detail": null
     },
@@ -3685,7 +3685,7 @@
       "detail": null
     },
     {
-      "check": "outline_destination:9.2 Las visitas desde buscadores crecieron",
+      "check": "outline_destination:9.2 Las visitas desde buscadores crecieron9.2 Las visitas desde buscadores crecieron",
       "passed": true,
       "detail": null
     },
@@ -3755,12 +3755,12 @@
       "detail": null
     },
     {
-      "check": "outline_destination:11. Seguimiento de auditorías anteriores11. Seguimiento de auditorías anteriores",
+      "check": "outline_destination:11. Seguimiento de auditorías anteriores",
       "passed": true,
       "detail": null
     },
     {
-      "check": "outline_destination:11.1 Seguimiento del diagnóstico SEO de mayo",
+      "check": "outline_destination:11.1 Seguimiento del diagnóstico SEO de mayo11.1 Seguimiento del diagnóstico SEO de mayo",
       "passed": true,
       "detail": null
     },
@@ -3830,7 +3830,7 @@
       "detail": null
     },
     {
-      "check": "outline_destination:11.2 Seguimiento de los 33 hallazgos técnicos de mayo11.2 Seguimiento de los 33 hallazgos técnicos de mayo",
+      "check": "outline_destination:11.2 Seguimiento de los 33 hallazgos técnicos de mayo",
       "passed": true,
       "detail": null
     },
@@ -4000,7 +4000,7 @@
       "detail": null
     },
     {
-      "check": "outline_destination:11.3 Seguimiento de la comparación competitiva de julio11.3 Seguimiento de la comparación competitiva de julio",
+      "check": "outline_destination:11.3 Seguimiento de la comparación competitiva de julio",
       "passed": true,
       "detail": null
     },

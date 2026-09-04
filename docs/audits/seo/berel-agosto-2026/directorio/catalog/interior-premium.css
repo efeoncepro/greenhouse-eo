@@ -1,0 +1,44 @@
+/* Editorial analytical canvas. Color communicates comparison, not card boundaries. */
+.slide:not(.monthly-cover){padding:40px 64px 92px}
+.header{height:36px;margin-bottom:27px}
+.header .agency{width:103px;height:30px}.header .client{width:44px;height:43px}
+.header span{font-size:9px;letter-spacing:1.6px;color:#748294}
+.eyebrow{font-size:11px;letter-spacing:2px;color:#B3153A;margin-bottom:14px}
+h1{font-size:35px;line-height:1.17;letter-spacing:-1.1px;max-width:970px;margin-bottom:18px}
+.lede{font-size:19px;line-height:1.4;max-width:960px;color:#526174}
+.content{margin-top:32px}
+.insight{background:transparent;border:0;border-top:1px solid #cad5e0;color:#023c70;font-size:17px;line-height:1.45;margin-top:28px;padding:17px 0 0;font-weight:500}
+.source{bottom:72px;font-size:10px;line-height:1.45;color:#697787}
+.footer{bottom:23px}
+.metrics{gap:0;min-height:270px;align-items:start}
+.metric{background:transparent;border:0;padding:6px 27px 12px;min-height:0;position:relative}
+.metric:first-child{padding-left:0}.metric:last-child{padding-right:0}
+.metric+.metric{border-left:1px solid #d3dde6}
+.metric .value{font-size:76px;line-height:1.05;letter-spacing:-3.5px;font-weight:500}
+.metric .label{font-size:19px;line-height:1.3;margin:24px 0 13px;font-weight:600;color:#023c70}
+.metric .detail{font-size:16px;line-height:1.5;color:#617184}
+.cards{gap:32px}
+.card{border-top:0;padding-top:7px;position:relative;min-width:0}
+.card+.card{border-left:1px solid #d3dde6;padding-left:28px}
+.card .tag{font-size:10px;letter-spacing:1.5px;margin-bottom:23px;color:#647184}
+.card h2{font-size:23px;line-height:1.25;letter-spacing:-.6px;margin-bottom:18px}
+.card p{font-size:18px;line-height:1.5;color:#526174}
+.card .section-icon{width:38px;height:38px;display:block;margin-bottom:20px;color:#0375d9}
+.actions .cards{gap:0;flex-direction:column;margin-top:25px}
+.actions .card{display:grid;grid-template-columns:205px 250px 1fr;gap:25px;background:transparent;padding:22px 0;border:0;border-bottom:1px solid #d3dde6;min-height:0;align-items:start}
+.actions .card:last-child{border-bottom:0}
+.actions .card .tag{font-size:10px;line-height:1.5;letter-spacing:1px;margin:4px 0;color:#B3153A}
+.actions .card h2{font-size:20px;margin:0;line-height:1.3}
+.actions .card p{font-size:16px;line-height:1.45;margin:0}
+.actions .insight{margin-top:19px}
+.slide-mes .metrics{min-height:210px}.slide-mes .metric .value{font-size:88px}
+.delivery-chart{margin-top:20px;width:100%;height:40px;display:block}
+.delivery-key{display:flex;gap:25px;margin-top:12px;font-size:13px;color:#526174}
+.delivery-key span{display:flex;gap:7px;align-items:center}.delivery-key i{width:9px;height:9px;display:inline-block;background:var(--series)}
+.slide-puntualidad .metrics{min-height:285px}
+.slide-puntualidad .metric .value{font-size:65px}
+.waffle{width:244px;height:76px;display:block;margin-top:22px}
+.slide-acumulado .metric .value{font-size:106px}
+.slide-acumulado .metrics{min-height:285px;gap:30px}
+.slide-acumulado .metric+.metric{padding-left:50px}
+.slide-ia .metric .value{font-size:64px}

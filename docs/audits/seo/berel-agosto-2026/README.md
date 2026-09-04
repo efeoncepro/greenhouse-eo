@@ -53,3 +53,7 @@ El renderer espera fuentes e imágenes después de aplicar estilos de impresión
 `pdf-check-manifest.json` configura el preflight reutilizable; `qa-preflight.json` registra resultado y hash. Ejecución desde la raíz: `python .codex/skills/report-studio/scripts/check_pdf.py docs/audits/seo/berel-agosto-2026/BEREL_INFORME_AGOSTO_2026_A4.pdf --manifest docs/audits/seo/berel-agosto-2026/pdf-check-manifest.json --output docs/audits/seo/berel-agosto-2026/qa-preflight.json` (requiere PyMuPDF).
 
 La conservación de 648 campos ahora consume las ocurrencias en orden, evitando que una aparición cubra dos celdas repetidas. Se revisaron las páginas modificadas 3, 4, 6 y 55 y se mantuvo el mapa de 55 páginas ya inspeccionadas. Tags y texto seleccionable presentes; orden asistivo y etiquetado de anotaciones del acabado no validados integralmente. No se afirma conformidad PDF/UA.
+
+## Resumen para el directorio
+
+[Presentación PDF de 15 láminas A4 horizontal](directorio/BEREL_DIRECTORIO_AGOSTO_2026_A4_HORIZONTAL.pdf), con portada y contraportada, gráficos de resultados y síntesis de desempeño y prioridades. Fuentes editables, regeneración y evidencia de revisión en [directorio/README.md](directorio/README.md).

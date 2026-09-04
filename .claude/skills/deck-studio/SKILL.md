@@ -30,6 +30,12 @@ description: >-
 
 ---
 
+## Pie institucional de decks Efeonce
+
+Cuando se solicite la contraportada institucional, reutiliza `BackCoverFull` del Artifact Composer. Su bloque de redes y contacto pertenece a esa composición oficial de cierre; no se replica como pie en las otras láminas.
+
+El pie de una lámina lleva como máximo la URL bubble oficial. No hereda dirección, teléfonos, separadores ni folio de un informe escrito, aunque se exporte a PDF A4. Mantén los logos oficiales en la composición. Canon: `docs/operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md`.
+
 ## ⚠️ Antes de nada: las 3 preguntas que decides ANTES de abrir nada
 
 Casi todo el mal deck del mundo nace de saltarse una de estas. **Contéstalas en voz alta.**
@@ -371,3 +377,7 @@ cuando aplique; gráficos con unidades y fuentes claras. Si el destino es PDF, e
 y revisa el PDF A4; el HTML queda como insumo editable.
 
 Para crear o mejorar el informe completo, carga `report-studio`: narrativa, evidencia, gráficos, producción y QA del formato final. La práctica especializada conserva sus contratos y datos.
+
+## Metodología de deck ejecutivo mensual
+
+Para resumir una auditoría o informe en un deck para directorio, cargar `docs/operations/EFEONCE_EXECUTIVE_REPORT_DECK_METHOD_V1.md`: continuidad de evidencia, producción mensual frente a acumulada, On-time con denominadores, narrativa ejecutiva, selección visual antes de implementación, marcas/pie/contraportada, HTML como insumo del PDF A4 y verificación del archivo final. El caso Berel conserva sus decisiones y límites; las cifras no se reutilizan entre meses.

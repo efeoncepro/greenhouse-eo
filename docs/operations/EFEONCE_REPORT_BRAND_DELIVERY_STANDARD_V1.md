@@ -6,6 +6,8 @@ La metodología y las cifras siguen bajo el contrato del dominio; este estándar
 
 ## Identidad y pie de página obligatorios
 
+**Distinción de formato · instrucción del operador, 2026-09-04:** en decks o presentaciones, incluidas las exportadas a PDF A4 horizontal, el pie lleva como máximo la URL bubble oficial. No trasladar dirección, teléfonos, línea divisoria ni folio del informe escrito a las láminas. El pie completo descrito abajo aplica a informes escritos, no a decks.
+
 - Cada página del informe lleva un pie legible con el **URL bubble oficial de Efeonce**, dirección
   institucional y teléfono. Incluye la portada, adaptando contraste y espacio sin omitir los datos.
   Reserva el área del pie antes de paginar: no debe invadir texto, tablas, notas ni numeración.

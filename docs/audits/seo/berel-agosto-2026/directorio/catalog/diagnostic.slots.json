@@ -1,0 +1,91 @@
+{
+  "template": "BoardDiagnostic",
+  "version": "1.0",
+  "viewport": {
+    "width": 1123,
+    "height": 794
+  },
+  "slots": {
+    "eyebrow": {
+      "selector": "[data-slot=\"eyebrow\"]",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 55,
+        "overflow": "reject"
+      }
+    },
+    "title": {
+      "selector": "[data-slot=\"title\"]",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 100,
+        "overflow": "reject"
+      }
+    },
+    "lead": {
+      "selector": "[data-slot=\"lead\"]",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 230,
+        "overflow": "reject"
+      }
+    },
+    "source": {
+      "selector": "[data-slot=\"source\"]",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 165,
+        "overflow": "reject"
+      }
+    },
+    "insight": {
+      "selector": "[data-slot=\"insight\"]",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 205,
+        "overflow": "reject"
+      }
+    },
+    "bars": {
+      "selector": "[data-slot=\"bars\"]",
+      "type": "array",
+      "required": true,
+      "itemSelector": ".bar-item",
+      "constraints": {
+        "minItems": 2,
+        "maxItems": 4,
+        "overflow": "reject"
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "label": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 70
+          },
+          "display": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 20
+          },
+          "note": {
+            "type": "string",
+            "required": false,
+            "maxCharacters": 90
+          },
+          "amount": {
+            "type": "string",
+            "required": true,
+            "consumer": "validation-only"
+          }
+        }
+      }
+    }
+  }
+}

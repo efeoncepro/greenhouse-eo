@@ -1,0 +1,86 @@
+{
+  "template": "BoardMetrics",
+  "version": "1.0",
+  "viewport": {
+    "width": 1123,
+    "height": 794
+  },
+  "slots": {
+    "eyebrow": {
+      "selector": "[data-slot=\"eyebrow\"]",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 55,
+        "overflow": "reject"
+      }
+    },
+    "title": {
+      "selector": "[data-slot=\"title\"]",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 100,
+        "overflow": "reject"
+      }
+    },
+    "lead": {
+      "selector": "[data-slot=\"lead\"]",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 230,
+        "overflow": "reject"
+      }
+    },
+    "source": {
+      "selector": "[data-slot=\"source\"]",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 165,
+        "overflow": "reject"
+      }
+    },
+    "insight": {
+      "selector": "[data-slot=\"insight\"]",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 205,
+        "overflow": "reject"
+      }
+    },
+    "metrics": {
+      "selector": "[data-slot=\"metrics\"]",
+      "type": "array",
+      "required": true,
+      "itemSelector": ".metric",
+      "constraints": {
+        "minItems": 2,
+        "maxItems": 3,
+        "overflow": "reject"
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "value": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 14
+          },
+          "label": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 55
+          },
+          "detail": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 150
+          }
+        }
+      }
+    }
+  }
+}

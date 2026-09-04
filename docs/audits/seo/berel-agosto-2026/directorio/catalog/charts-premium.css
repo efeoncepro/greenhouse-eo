@@ -1,0 +1,50 @@
+/* Analytical plate: stable row geometry, direct values, common zero.
+   Borders retain the origin; repeating gradients are excluded because PDF rasterization
+   introduced thick gray guide artifacts at fractional positions. */
+.premium-chart,.premium-diagnostic{--plot-ink:#023c70;--plot-muted:#66717d;--plot-rule:#d8e0e7;--plot-prior:#9baec1;--plot-accent:#B3153A}
+.premium-chart .content.chart{display:grid;grid-template-columns:minmax(0,1fr) 235px;gap:38px;margin-top:29px;align-items:stretch}
+.premium-chart .plot{min-width:0}
+.premium-chart .plot-heading{display:flex;align-items:baseline;justify-content:space-between;padding-bottom:16px;border-bottom:1px solid var(--plot-rule);font-size:13px;color:var(--plot-muted)}
+.premium-chart .plot-heading>span:first-child{font-size:17px;font-weight:600;color:var(--plot-ink)}
+.premium-chart .bars{padding:0;margin-top:19px}
+.premium-chart .bar-item{display:grid;grid-template-columns:104px minmax(0,1fr) 89px;column-gap:15px;align-items:center;min-height:77px;margin:0;position:relative}
+.premium-chart .bar-top{display:contents}
+.premium-chart .bar-top span{grid-column:1;grid-row:1;font-size:17px;font-weight:500;line-height:1.3;color:var(--plot-ink)}
+.premium-chart .bar-top b{grid-column:3;grid-row:1;font-family:Geist;font-size:27px;font-weight:600;letter-spacing:-.7px;text-align:right;color:var(--plot-ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.premium-chart .track{grid-column:2;grid-row:1;position:relative;height:39px;align-self:center;background:none;border-left:1px solid var(--plot-rule)}
+.premium-chart .fill{position:absolute;top:5px;bottom:5px;height:auto;background:var(--plot-ink);min-width:0;border-radius:0}
+.premium-chart .bar-item:nth-child(odd) .fill{background:var(--plot-prior)}
+.premium-chart .row-note{grid-column:2/4;font-size:12px;line-height:1.3;margin:0 0 8px}
+.premium-chart .plot-axis{display:flex;justify-content:space-between;margin-left:119px;margin-right:104px;padding-top:10px;border-top:1px solid var(--plot-rule);font-size:11px;color:var(--plot-muted)}
+.premium-chart .plot-axis span:first-child{transform:translateX(-3px);font-variant-numeric:tabular-nums}
+.premium-chart .chart-hero{padding:5px 0 0 28px;background:transparent;color:var(--plot-ink);border-left:1px solid var(--plot-rule);display:flex;justify-content:flex-start;flex-direction:column;gap:0}
+.premium-chart .result-kicker{font-size:10px;font-weight:600;letter-spacing:1.6px;color:var(--plot-muted);line-height:1.4;margin:0 0 26px}
+.premium-chart .chart-hero strong{font:600 52px/1.06 Geist;letter-spacing:-2.5px;white-space:nowrap;color:var(--plot-ink)}
+.premium-chart .chart-hero p{font-size:16px;line-height:1.5;margin-top:22px;color:#445769}
+.premium-chart .insight{margin-top:27px}
+/* Two comparable pairs retain one shared axis; grouping does not rescale. */
+.premium-chart.multi-series .content.chart{margin-top:22px}
+.premium-chart.multi-series .plot-heading{padding-bottom:12px}
+.premium-chart.multi-series .bars{margin-top:10px}
+.premium-chart.multi-series .bar-item{min-height:47px;margin:0;grid-template-columns:152px minmax(0,1fr) 65px;column-gap:12px}
+.premium-chart.multi-series .bar-item:nth-child(3){margin-top:13px}
+.premium-chart.multi-series .bar-top span{font-size:15px}
+.premium-chart.multi-series .bar-top b{font-size:24px}
+.premium-chart.multi-series .track{height:29px}
+.premium-chart.multi-series .plot-axis{margin-left:164px;margin-right:77px;padding-top:8px}
+.premium-chart.multi-series .chart-hero strong{font-size:86px;line-height:.96;letter-spacing:-4px}
+.premium-chart.multi-series .chart-hero p{margin-top:22px}
+.premium-chart.multi-series .insight{margin-top:22px}
+/* Four diagnostic rows: zero and full census endpoints, one consistent base. */
+.premium-diagnostic .diagnostic-heading{display:flex;justify-content:space-between;align-items:baseline;margin-top:28px;padding-bottom:12px;border-bottom:1px solid var(--plot-rule);font-size:10px;letter-spacing:1.3px;font-weight:600;color:var(--plot-muted)}
+.premium-diagnostic .content.bars{padding:0;margin:0}
+.premium-diagnostic .bar-item{display:grid;grid-template-columns:354px minmax(0,1fr) 63px;column-gap:22px;min-height:58px;margin:0;border-bottom:1px solid #edf1f5;align-items:center}
+.premium-diagnostic .bar-top{display:contents}
+.premium-diagnostic .bar-top span{grid-column:1;grid-row:1;font-size:16px;line-height:1.3;font-weight:400;color:#243247}
+.premium-diagnostic .bar-top b{grid-column:3;grid-row:1;font:600 27px/1 Geist;letter-spacing:-.5px;text-align:right;color:var(--plot-ink);font-variant-numeric:tabular-nums}
+.premium-diagnostic .track{grid-column:2;grid-row:1;height:30px;position:relative;border-left:1px solid var(--plot-rule);background:none}
+.premium-diagnostic .fill,.premium-diagnostic .bar-item:nth-child(odd) .fill{position:absolute;top:6px;bottom:6px;height:auto;background:var(--plot-accent);min-width:0}
+.premium-diagnostic .row-note{grid-column:2/4;margin:0;font-size:12px}
+.premium-diagnostic .diagnostic-axis{display:flex;justify-content:space-between;margin-left:376px;margin-right:85px;padding-top:9px;font-size:11px;color:var(--plot-muted)}
+.premium-diagnostic .diagnostic-axis>span:first-child{transform:translateX(-3px)}
+.premium-diagnostic .insight{margin-top:19px}

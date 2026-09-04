@@ -32,3 +32,10 @@ Inspección visual individual dividida en 1–18 (principal), 19–37 (revisor d
 Investigación paralela sobre narrativa/evaluación, comunicación visual y producción PDF, con fuentes en `report-studio/SOURCES.md`. Aplicados: cobertura explícita del On-time (p. 3), ámbito/período/escalas (p. 4), límite causal del recorrido (p. 6), colofón con contacto textual enlazado (p. 55). Las cuatro páginas se inspeccionaron tras exportar; sin cortes ni cambios de índice. Las otras 51 conservan contenido y composición previamente revisados.
 
 Preflight final comprueba metadata, idioma, estructura presente, bytes de todas las fuentes, páginas A4 y destinos. El verificador específico consume las 648 ocurrencias de campos en orden. Repetir el acabado preserva los renders y conteos de enlaces de las 55 páginas. Resultado visual y de integridad aprobado dentro de este alcance; la revisión asistiva de tags y anotaciones sigue fuera de la evidencia, sin declaración PDF/UA.
+
+
+## Ajuste editorial del Grader · 4 de septiembre
+
+A petición del operador se reformuló la explicación de alcance como calibración comercial pendiente, retirando el nombre de la categoría de las versiones para cliente. Se conserva el puntaje preliminar, la limitación de comparabilidad y los resultados observados; no se modificaron mediciones ni se declaró una nueva ejecución. Notion: 15 sustituciones en contenido y dos propiedades, comprobadas mediante lectura posterior. Markdown y PDF sincronizados.
+
+PDF: 55 páginas A4, 648 campos consumidos en orden, T01–T33, contacto e índice verificados. Revisión visual de páginas 2, 10, 11 y 29–35 por el agente principal; 36–45 y 46–55 por revisores independientes. El índice se recalculó tras cambiar la composición. Sin cortes ni pérdida de contenido detectados.
