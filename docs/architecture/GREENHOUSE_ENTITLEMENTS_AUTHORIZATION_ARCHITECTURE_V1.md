@@ -769,7 +769,8 @@ Ese modelo permite:
 - Antes de persistir una capability, validar que exista en `greenhouse_core.capabilities_registry` y `deprecated_at IS NULL`. Nunca bypassar el registry ni escribir grants con strings ad hoc.
 - Grants sensibles (`*_sensitive`, `.reveal_sensitive`, `.export_snapshot`) quedan `pending_approval` y requieren segunda firma con actor distinto. Pending grants no se aplican al acceso efectivo.
 - Outbox governance debe incluir `schemaVersion: 1` y `affectedUserIds` cuando el cambio impacte usuarios; `organizationWorkspaceCacheInvalidationProjection` soporta fan-out vía `extractScopes`.
-- Signals canónicos: `identity.governance.audit_log_write_failures` y `identity.governance.pending_approval_overdue`; para el binding externo, `identity.external_binding.{unbound_dispatch_attempt,revoked_still_dispatching,subject_collision,orphan_grant}` ((actualizado 2026-09-04, TASK-1631)). Steady state esperado: 0.
+- Signals canónicos: `identity.governance.audit_log_write_failures` y `identity.governance.pending_approval_overdue`. Steady state esperado: 0.
+- Signals del binding de identidad externa (TASK-1631, 2026-09-04): `identity.external_binding.{unbound_dispatch_attempt,revoked_still_dispatching,subject_collision,orphan_grant}`. Steady state esperado: 0.
 
 ### Deprecated Capabilities Discipline (TASK-840, desde 2026-05-11)
 
