@@ -51,6 +51,15 @@ export const RELEASE_DEPLOY_WORKFLOWS: readonly ReleaseDeployWorkflow[] = [
     cloudRunRegion: 'us-central1'
   },
   {
+    // TASK-1828 / EPIC-044 — authorization server propio de Efeonce (auth.efeonce.org).
+    // Registrado ANTES del primer deploy production, como exige la regla dura del
+    // control plane. Con cloudRunService: el orquestador lo despliega vía workflow_call
+    // y el watchdog compara su GIT_SHA (deploy change-gated como los demás workers).
+    workflowName: 'Auth Server Deploy',
+    cloudRunService: 'auth-server',
+    cloudRunRegion: 'us-east4'
+  },
+  {
     // TASK-1378 — Scanner de firmas de assets de candidato. Registrado ANTES
     // del primer deploy production, como exige la regla dura del control plane.
     //

@@ -362,6 +362,18 @@ jobs:
     secrets:
       GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
 
+  # TASK-1828 / EPIC-044 — authorization server propio (auth.efeonce.org), Cloud Run
+  # us-east4, change-gated como los demás workers. Nace con AUTH_SERVER_ENABLED=false.
+  deploy-auth-server:
+    name: Deploy auth-server
+    needs: [approval-gate]
+    uses: ./.github/workflows/auth-server-deploy.yml
+    with:
+      environment: production
+      expected_sha: ${{ inputs.target_sha }}
+    secrets:
+      GCP_WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+
   # TASK-853 — Azure infra release gating.
   # Health check Azure corre SIEMPRE (preflight-style); Bicep apply real
   # gated por diff infra/azure/<sub>/** o force_infra_deploy=true input.
@@ -456,6 +468,7 @@ jobs:
       - deploy-commercial-cost-worker
       - deploy-ico-batch
       - deploy-hubspot-integration
+      - deploy-auth-server
       - deploy-azure-teams-notifications
       - deploy-azure-teams-bot
       - wait-vercel
@@ -582,6 +595,7 @@ jobs:
       - deploy-commercial-cost-worker
       - deploy-ico-batch
       - deploy-hubspot-integration
+      - deploy-auth-server
       - deploy-azure-teams-notifications
       - deploy-azure-teams-bot
       - wait-vercel
@@ -611,6 +625,7 @@ jobs:
             echo "| commercial-cost-worker | ${{ needs.deploy-commercial-cost-worker.result }} |"
             echo "| ico-batch-worker | ${{ needs.deploy-ico-batch.result }} |"
             echo "| hubspot-integration | ${{ needs.deploy-hubspot-integration.result }} |"
+            echo "| auth-server | ${{ needs.deploy-auth-server.result }} |"
             echo "| azure-teams-notifications (gated) | ${{ needs.deploy-azure-teams-notifications.result }} |"
             echo "| azure-teams-bot (gated) | ${{ needs.deploy-azure-teams-bot.result }} |"
             echo "| Vercel ready | ${{ needs.wait-vercel.result }} |"

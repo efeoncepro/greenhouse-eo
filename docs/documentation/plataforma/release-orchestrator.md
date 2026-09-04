@@ -38,11 +38,12 @@ workflow_dispatch (operator: target_sha + opcionalmente bypass_reason)
    ├────────────────────────────────────────┤
    │  3. Approval gate (Production env)     │ → required reviewers
    ├────────────────────────────────────────┤
-   │  4. Workers deploy (parallel × 4)      │
+   │  4. Workers deploy (parallel × 5)      │
    │     - ops-worker                       │
    │     - commercial-cost-worker           │ → cada uno verifica GIT_SHA
    │     - ico-batch-worker                 │   matches EXPECTED_SHA
    │     - hubspot-greenhouse-integration   │
+   │     - auth-server (TASK-1828)          │
    ├────────────────────────────────────────┤
    │  5. Wait Vercel READY                  │ → poll API hasta encontrar deploy
    ├────────────────────────────────────────┤

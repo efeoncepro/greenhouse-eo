@@ -659,6 +659,7 @@ Interpretacion:
 
 - `data_missing` con `drift_count=0` es un warning de observabilidad, no drift. Si la sesion local de `gcloud` esta ausente o expirada, reautenticar o consultar los logs del job del orquestador antes de decidir. No redeployar para corregir una falta de evidencia.
 - `ico-batch-worker` con deploy job ejecutado, health OK, `Ready=True` y watchdog synced = NO fue skippeado.
+- `auth-server` (`us-east4`, TASK-1828 / EPIC-044) entra al orquestador desde 2026-09-04 por `auth-server-deploy.yml` (`workflow_call`, change-gated como los demás). Nace con `AUTH_SERVER_ENABLED=false`; su `/healthz` es público vía `auth.efeonce.org` y `/readyz` responde 503 mientras el flag esté OFF — eso NO es un deploy fallido.
 - `ops-worker` con workflow que salta deploy por diff runtime y `GIT_SHA` viejo puede ser cierre valido **solo si el diff de árbol completo entre el SHA servido y el target es vacío** (§4.1.1). No forzar redeploy solo para alinear el label — pero tampoco cerrar con el diff acotado a las rutas del gate, que fue el error del release `64bdd105c737`.
 - La recuperacion canonica para drift real es rerun del orquestador para el mismo `target_sha`; si el orquestador esta bloqueado, usar workflow individual como break-glass aprobado. Direct `gcloud run deploy` local es ultimo recurso break-glass y debe quedar documentado con target SHA, revision, verificacion y watchdog final.
 

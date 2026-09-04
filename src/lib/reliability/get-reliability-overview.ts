@@ -180,6 +180,7 @@ import { getVatEntryUnresolvedFxSignal } from './queries/vat-entry-unresolved-fx
 import { getVatEligibleWithoutPeriodSignal } from './queries/vat-eligible-without-period'
 import { getHubspotCompaniesIntakeDeadLetterSignal } from './queries/hubspot-companies-intake-dead-letter'
 import { getWorkforceUnlinkedInternalUsersSignal } from './queries/workforce-unlinked-internal-users'
+import { getAuthServerSignals } from './queries/auth-server-signals'
 import { getGlobeCreditFundingStaleProposalsSignal } from './queries/globe-credit-funding-stale-proposals'
 import { getGrowthAiVisibilitySignals } from './queries/growth-ai-visibility-signals'
 import { getGrowthAiVisibilityScoringSignals } from './queries/growth-ai-visibility-scoring-signals'
@@ -693,6 +694,8 @@ interface ReliabilityOverviewSources {
   providerBqSyncDeadLetter?: ReliabilitySignal[] | null
   hubspotCompaniesIntakeDeadLetter?: ReliabilitySignal | null
   workforceUnlinkedInternalUsers?: ReliabilitySignal | null
+  /** TASK-1828 — auth.issuer.jwks_unreachable + auth.signing_keys.lifecycle (emisor propio). */
+  authServerSignals?: ReliabilitySignal[] | null
   globeCreditFundingStaleProposals?: ReliabilitySignal | null
   growthAiVisibility?: ReliabilitySignal[] | null
   growthAiVisibilityScoring?: ReliabilitySignal[] | null
@@ -1272,6 +1275,8 @@ export const buildReliabilityOverview = (
     ...(sources.hubspotCompaniesIntakeDeadLetter ? [sources.hubspotCompaniesIntakeDeadLetter] : []),
     // TASK-878 follow-up — Identity UX hardening: internal users sin member enlazado.
     ...(sources.workforceUnlinkedInternalUsers ? [sources.workforceUnlinkedInternalUsers] : []),
+    // TASK-1828 — authorization server propio: JWKS alcanzable/consistente + ciclo de vida de llaves.
+    ...(sources.authServerSignals ?? []),
     ...(sources.globeCreditFundingStaleProposals ? [sources.globeCreditFundingStaleProposals] : []),
     // TASK-1082 — Knowledge ingestion: quarantine count + failed sync source.
     ...(sources.knowledgeQuarantineCount ? [sources.knowledgeQuarantineCount] : []),
@@ -1969,6 +1974,13 @@ export const getReliabilityOverview = async (
     preloadedSources.workforceUnlinkedInternalUsers !== undefined
       ? preloadedSources.workforceUnlinkedInternalUsers
       : await getWorkforceUnlinkedInternalUsersSignal().catch(() => null)
+
+  // TASK-1828 — señales del emisor propio (auth.efeonce.org). `not_configured` hasta que el
+  // host esté publicado (AUTH_SERVER_JWKS_URL); después steady = ok.
+  const authServerSignals =
+    preloadedSources.authServerSignals !== undefined
+      ? preloadedSources.authServerSignals
+      : await getAuthServerSignals().catch(() => null)
 
   // TASK-1566 — propuestas de fondeo de Globe sin confirmar. Steady=0: un valor > 0 es una decision
   // humana pendiente, no un fallo del sistema, y por eso escala por ANTIGUEDAD y no por cantidad.
@@ -2962,6 +2974,7 @@ export const getReliabilityOverview = async (
     ppmPositionDrift,
     hubspotCompaniesIntakeDeadLetter,
     workforceUnlinkedInternalUsers,
+    authServerSignals,
     globeCreditFundingStaleProposals,
     knowledgeQuarantineCount,
     assetScanOpenQuarantine,

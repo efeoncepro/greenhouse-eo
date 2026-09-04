@@ -226,6 +226,7 @@ pnpm release:workers --expected-sha=<target_sha>
    - `commercial-cost-worker` in `us-east4`
    - `ico-batch-worker` in `us-east4`
    - `hubspot-greenhouse-integration` in `us-central1`
+   - `auth-server` in `us-east4` (TASK-1828 / EPIC-044 — authorization server propio; nace con `AUTH_SERVER_ENABLED=false`)
    Si el wrapper marca un SHA distinto, dice «NO es drift automáticamente: ver runbook §4.1». Lo que
    decide si ese no-op es legítimo es un **diff de árbol completo, sin `--`** — no el skip del
    change-gate, que sólo habla de las rutas declaradas (anti-patrón #4):

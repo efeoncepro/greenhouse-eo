@@ -11,6 +11,7 @@ describe('workflow-allowlist — canonical 9 workflows (7 deploy workers + orche
   it('contains exactly the 9 production release workflows', () => {
     expect(RELEASE_DEPLOY_WORKFLOWS.map((w) => w.workflowName).sort()).toEqual(
       [
+        'Auth Server Deploy',
         'Azure Teams Bot Deploy',
         'Azure Teams Deploy',
         'ClamAV Scanner Deploy',
@@ -30,7 +31,7 @@ describe('workflow-allowlist — canonical 9 workflows (7 deploy workers + orche
   })
 
   it('Set is read-only (preserve canonical immutability)', () => {
-    expect(RELEASE_DEPLOY_WORKFLOW_NAMES.size).toBe(9)
+    expect(RELEASE_DEPLOY_WORKFLOW_NAMES.size).toBe(10)
   })
 
   // Anti-regression: el orchestrator DEBE estar en el allowlist para que
@@ -71,7 +72,7 @@ describe('workflow-allowlist — canonical 9 workflows (7 deploy workers + orche
 
 describe('workflow-allowlist — Cloud Run drift detection mapping', () => {
   it('maps 4 workflows to Cloud Run services', () => {
-    expect(WORKFLOWS_WITH_CLOUD_RUN_DRIFT_DETECTION).toHaveLength(4)
+    expect(WORKFLOWS_WITH_CLOUD_RUN_DRIFT_DETECTION).toHaveLength(5)
   })
 
   // TASK-1378 — El scanner está en el allowlist (lo necesita para ci_green y

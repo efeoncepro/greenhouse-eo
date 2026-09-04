@@ -70,7 +70,7 @@ AUTH_SERVER_ISSUER="${AUTH_SERVER_ISSUER:-https://auth.efeonce.org}"
 AUTH_SERVER_ALLOWED_HOSTS="${AUTH_SERVER_ALLOWED_HOSTS:-auth.efeonce.org}"
 AUTH_SERVER_KMS_KEY="${AUTH_SERVER_KMS_KEY:-projects/${PROJECT_ID}/locations/${REGION}/keyRings/auth-server/cryptoKeys/auth-server-es256}"
 
-echo "=== ${ENV^^} deployment of ${SERVICE_NAME} (${REGION}) ==="
+echo "=== $(printf "%s" "${ENV}" | tr "[:lower:]" "[:upper:]") deployment of ${SERVICE_NAME} (${REGION}) ==="
 
 # ─── Preflight: KMS key + SA exist (Slice 0) ────────────────────────────────
 

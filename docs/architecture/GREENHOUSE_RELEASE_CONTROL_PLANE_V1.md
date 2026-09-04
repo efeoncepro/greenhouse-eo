@@ -772,6 +772,22 @@ V1 partial entregado directo en `develop`:
 
 ---
 
+## Delta 2026-09-04 — TASK-1828: `Auth Server Deploy` entra al control plane
+
+`services/auth-server/` (authorization server propio de Efeonce, EPIC-044) es el quinto deployable Cloud Run
+gobernado por el release: `.github/workflows/auth-server-deploy.yml` replica el contrato de los workers
+(`workflow_call` con `environment` + `expected_sha`, drift check por `WORKER_RUNTIME_PATHS`, `GIT_SHA`
+verificado post-deploy, `cancel-in-progress` dinámico) y `production-release.yml` lo despliega en paralelo con
+los otros cuatro (`deploy-auth-server`, `needs: [approval-gate]`). Registrado en `RELEASE_DEPLOY_WORKFLOWS`
+con `cloudRunService: 'auth-server'` / `us-east4`, así que el watchdog compara su `GIT_SHA`
+(`WORKFLOWS_WITH_CLOUD_RUN_DRIFT_DETECTION` pasa de 4 a 5; el test de drift deriva el denominador del
+allowlist, nunca de un literal). Los tres gates de workers (`worker:build-contract-gate`,
+`worker:runtime-deps-gate`, `worker:deploy-path-gate`) lo incluyen. Particularidades: ingreso
+`internal-and-cloud-load-balancing` + `allow-unauthenticated` (sólo el LB del gateway MCP lo alcanza, host
+`auth.efeonce.org` publicado desde `efeonce-mcp/infra/terraform`), flag maestro `AUTH_SERVER_ENABLED=false` por
+defecto (ledger), y `/readyz` 503 con el flag OFF no es un deploy fallido. Runbook:
+`docs/operations/runbooks/auth-server.md`.
+
 ## Invariantes operativos para agentes (TASK-848…871)
 
 > **Relocados de `CLAUDE.md` por TASK-1160 (2026-06-16), verbatim — cero cambio semántico.** Espejo operativo (NUNCA/SIEMPRE) que un agente carga al tocar el control plane de release; el contrato técnico vive arriba. Dedup con la prosa = TASK-1160 Slice 4.

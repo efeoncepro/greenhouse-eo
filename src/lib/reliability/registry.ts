@@ -395,7 +395,7 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'src/app/api/platform/ecosystem/identity/**',
       'src/lib/api-platform/resources/ecosystem-identity-binding.ts'
     ],
-    expectedSignalKinds: ['incident', 'drift', 'data_quality'],
+    expectedSignalKinds: ['incident', 'drift', 'data_quality', 'runtime'],
     incidentDomainTag: 'identity'
   },
   {
