@@ -42,8 +42,8 @@ interno a la tarjeta.
 
 ## Action Hierarchy
 
-- Primary: «Permitir» (consent), «Continuar» (correo), «Enviar enlace» / «Usar passkey» (método), «Verificar código» (step-up).
-- Secondary: «Cancelar» (consent → `access_denied`), «Usar otro método», «Pedir un enlace nuevo», «Usar código de respaldo».
+- Primary: «Permitir» (consent), «Usar mi passkey» (login, ANTES del correo: credenciales descubribles), «Continuar» (página intermedia del enlace, POST consume), «Verificar código» (step-up).
+- Secondary: «Cancelar» (consent → `access_denied`), «Enviarme un enlace» (con el correo), «Pedir un enlace nuevo», «Usar código de respaldo».
 - Destructive: ninguna; «Cancelar» del consent se explica antes de enviar («Volverás a {client} sin acceso»).
 - Selection vs action: elegir método no autentica; sólo el paso final (enlace verificado, passkey OK, código OK) crea sesión.
 - Pending / disabled: al enviar, primario en pending con copy «Confirmando…»/«Enviando…»; secundario deshabilitado; sin doble submit.
@@ -87,14 +87,10 @@ Propuestas para `src/lib/copy/auth-server.ts` (`GH_AUTH_SERVER`); los ids existe
 | consent_deny_hint | 5 | Volverás a {clientName} sin acceso. | clientName | nuevo; bajo «Cancelar» |
 | consent_pending | 4 | Confirmando… | — | nuevo; `aria-busy` |
 | consent_footer | 6 | Puedes revocar este acceso en cualquier momento desde Efeonce. | — | existe |
-| login_title | 2 | Inicia sesión en Efeonce | — | nuevo (TASK-1830 valida) |
-| login_email_label | 3 | Correo de trabajo | — | nuevo |
-| login_method_magic | 5 | Enviarme un enlace | — | nuevo |
-| login_method_passkey | 5 | Usar mi passkey | — | nuevo |
-| magic_sent_title | 2 | Revisa tu correo | — | nuevo; anti-enumeración |
-| magic_sent_body | 3 | Si {email} está invitado a Efeonce, recibirás un enlace válido por 15 minutos. | email | mismo copy exista o no |
-| magic_verify_pending | 4 | Verificando tu enlace… | — | nuevo |
-| magic_verify_expired | 4 | Este enlace ya no es válido. | — | nuevo + CTA «Pedir un enlace nuevo» |
+| login_* / confirm_* / link_* / session_* | 2–5 | (ya existen en `src/lib/copy/auth-server.ts`, agregados por TASK-1830 el 2026-09-04) | — | La UI los consume tal cual; cualquier ajuste se negocia con TASK-1830 |
+| (login) orden de la pantalla | 3–5 | «Usar mi passkey» primero; luego «Correo de trabajo» + «Enviarme un enlace» | — | Credenciales descubribles: passkey no pide correo |
+| (revisa tu correo) | 2–3 | Copy y tiempo de respuesta IDÉNTICOS exista o no el correo; misma pantalla tras aceptar invitación | email | Anti-enumeración (TASK-1830) |
+| (enlace) página intermedia | 2–5 | `GET /m/<tokenId>.<verificador>` muestra «Continuar» que hace el POST de consumo; expirado/usado → «Pedir un enlace nuevo» | — | Los escáneres de correo abren los GET |
 | stepup_title | 2 | Confirma que eres tú | — | nuevo |
 | stepup_code_label | 3 | Código de tu app de autenticación | — | nuevo; `one-time-code` |
 | stepup_backup_cta | 5 | Usar un código de respaldo | — | nuevo |
@@ -113,7 +109,8 @@ Propuestas para `src/lib/copy/auth-server.ts` (`GH_AUTH_SERVER`); los ids existe
 | ready | Autorizar acceso | {clientName} quiere acceder… + lista de permisos | Permitir · Cancelar | Escritura marcada; foco inicial en el título |
 | loading | Autorizar acceso | Confirmando… | CTAs deshabilitados | `aria-busy`; texto siempre presente |
 | empty | Inicia sesión en Efeonce | Campo de correo vacío con ayuda | Continuar deshabilitado hasta correo válido | Sólo login |
-| partial | Revisa tu correo | Si {email} está invitado… | Pedir un enlace nuevo (tras 60 s) | Anti-enumeración; proveedor degradado no cambia el copy |
+| partial | Revisa tu correo | (copy `link_*`/`confirm_*` de TASK-1830) | Pedir un enlace nuevo (tras 60 s) | Anti-enumeración incluida la latencia; misma pantalla tras aceptar invitación |
+| confirm | Continuar a Efeonce | Página intermedia del enlace: un botón «Continuar» hace el POST de consumo | Continuar · Pedir un enlace nuevo (si expiró) | Nunca se consume por GET |
 | error | No pudimos completar la autorización | Cuerpo por código + Referencia | Volver a la aplicación (si hay redirect válido) | Sin detalle interno |
 | denied | Tu cuenta no tiene una organización vinculada | Explicación breve | Pedir acceso a tu contacto en Efeonce | `access_denied`; sin PII |
 | stepup | Confirma que eres tú | Código de tu app | Verificar código · Usar código de respaldo | Error inline conserva el valor; sin «recordar este dispositivo» (el `amr` sale de la aserción real, TASK-1830) |
@@ -130,7 +127,7 @@ Propuestas para `src/lib/copy/auth-server.ts` (`GH_AUTH_SERVER`); los ids existe
 
 ## Implementation Mapping
 
-- Route / surface: `GET /oauth/authorize` (consent 200 · login_required 401 · step-up 403 · error), `POST /oauth/consent`; rutas HTML `/login*`, `/session` sobre los handlers de TASK-1830.
+- Route / surface: `GET /oauth/authorize` (consent 200 · login_required 401 · step-up 403 · error), `POST /oauth/consent`; rutas de TASK-1830: `GET /login`, `GET /m/<tokenId>.<verificador>`, `GET /i/<token>`, `/auth/*` (magic-link request/consume, invitations/accept, passkeys, totp, session, session/logout).
 - Primitives: `IdShell`, `IdCard`, `IdClientBadge`, `IdScopeList`, `IdField`, `IdStatus`, `IdButton` como funciones `render*(input) → string` en `src/lib/auth-server/oauth/pages/`.
 - Variants / kinds: `IdButton primary|secondary|link`; `IdStatus info|success|warning|error`; `IdScopeList` items `read|write`.
 - Component candidates: `layout.ts`, `consent.ts`, `login.ts`, `magic-link.ts`, `passkey.ts`, `step-up.ts`, `recovery.ts`, `session.ts`, `error.ts`; `styles.generated.ts` (tokens → CSS).

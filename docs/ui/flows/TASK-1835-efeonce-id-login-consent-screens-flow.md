@@ -26,20 +26,20 @@ servidor, nunca el navegador.
 |---|---|---|---|---|
 | `/oauth/authorize` (consent 200) | Decisión de acceso | Tarjeta con cliente, organización, scopes, Permitir/Cancelar | CTAs apilados | `IdCard` + `IdScopeList` |
 | `/oauth/authorize` (login_required 401 → redirect a `/login?return_to=`) | Entrada sin sesión | Con TASK-1830, redirect; hoy página mínima | Igual | `IdShell` |
-| `/login` | Correo + método | Campo de correo, «Enviarme un enlace» / «Usar mi passkey» | Igual, botones a ancho completo | `IdField` + `IdButton` |
-| `/login/magic-link/sent` | Espera | Copy anti-enumeración, CTA «Pedir un enlace nuevo» tras 60 s | Igual | `IdStatus info` |
-| `/login/magic-link/verify?token` | Consumo del enlace | Verificando… → redirect a `return_to` o expirado | Igual | `IdStatus` |
-| `/login/passkey` | Ceremonia WebAuthn | Botón «Usar mi passkey» + estados del módulo JS (nonce) | Igual | `IdStatus` + módulo TASK-1830 |
+| `GET /login` | Passkey primero, luego correo + enlace | «Usar mi passkey» (ceremonia con credenciales descubribles) arriba; debajo «Correo de trabajo» + «Enviarme un enlace» (`POST /auth/magic-link/request`) | Igual, botones a ancho completo | `IdButton` + `IdField` + módulo WebAuthn (nonce) |
+| «Revisa tu correo» | Espera (tras pedir enlace o aceptar invitación) | Copy y latencia idénticos exista o no el correo; «Pedir un enlace nuevo» tras 60 s | Igual | `IdStatus info` |
+| `GET /m/<tokenId>.<verificador>` | Página intermedia del enlace | Botón «Continuar» → `POST /auth/magic-link/consume` → sesión → `return_to`; expirado/usado → CTA | Igual | `IdButton primary` + `IdStatus` |
+| `GET /i/<token>` | Aceptar invitación | Confirmar → `POST /auth/invitations/accept` → NO abre sesión: envía magic link → «Revisa tu correo» | Igual | `IdCard` + `IdButton` |
 | `/login/step-up` | Segundo factor | Código TOTP / código de respaldo | `inputmode=numeric` | `IdField one-time-code` |
 | `/login/recovery` | Invitación inválida | Explicación + a quién pedir re-invitación | Igual | `IdStatus warning` |
-| `/session` | Sesión activa | Cerrar sesión | Igual | `IdButton secondary` |
+| `GET /auth/session` / `/session` | Sesión activa | «Cerrar sesión» → `POST /auth/session/logout` | Igual | `IdButton secondary` |
 | Error (`invalid_client`, `invalid_redirect_uri`, `access_denied`, `slow_down`) | Terminal | Título humano + código + referencia | Igual | `IdStatus error` |
 
 ## Flow Map
 
 1. Entry: `GET /oauth/authorize?client_id&redirect_uri&scope&state&code_challenge…` desde la aplicación. Cliente y redirect se validan antes de renderizar nada (error → página, nunca redirect).
-2. Primary action: sin sesión → `/login?return_to=<authorize URL>` (TASK-1830). La persona escribe su correo y elige método.
-3. Transition: magic link → `sent` → clic en el correo → `verify` → sesión creada → redirect a `return_to`; passkey → ceremonia → sesión → redirect a `return_to`.
+2. Primary action: sin sesión → `/login?return_to=<authorize URL>` (TASK-1830). Primero «Usar mi passkey» (sin correo); si no, correo + «Enviarme un enlace».
+3. Transition: magic link → «revisa tu correo» (idéntico exista o no) → clic en el correo abre `GET /m/<tokenId>.<verificador>` (sin consumir) → «Continuar» hace el POST de consumo → sesión creada → redirect a `return_to`; passkey → ceremonia `start/finish` → sesión → redirect a `return_to`. Invitación: `GET /i/<token>` → aceptar → magic link → «revisa tu correo» → mismo camino.
 4. User decision: `authorize` re-evalúa: escritura sin `step_up` → `/login/step-up?return_to=`; consentimiento faltante → página de consent; `Permitir` → `POST /oauth/consent decision=allow` → `303 return_to` → `authorize` emite `302 redirect_uri?code&state&iss`.
 5. Completion: la aplicación recibe el `code`; la persona ve la pantalla de la propia aplicación. `Cancelar` → `302 redirect_uri?error=access_denied&state&iss`.
 6. Recovery / exit: sujeto sin binding → `access_denied` (página o redirect según `prompt`); enlace expirado → «Pedir un enlace nuevo»; invitación revocada → `/login/recovery`; `slow_down` → espera y reintento; error de protocolo → página terminal con referencia.
@@ -50,12 +50,14 @@ servidor, nunca el navegador.
 |---|---|---|---|---|
 | Permitir | Consent | `POST /oauth/consent allow` → pending → 303 | Activación explícita del botón (Tab + Enter/Espacio) | `Enter` en el documento NO envía cuando hay escritura |
 | Cancelar | Consent | `POST /oauth/consent deny` → 302 `access_denied` | Tab + Enter | Hint «Volverás a {client} sin acceso» |
-| Continuar / Enviarme un enlace | Login | `POST /auth/magic-link/request` → `sent` | Enter en el campo | Anti-enumeración |
-| Usar mi passkey | Login | `/login/passkey` → ceremonia | Enter | Requiere JS con nonce |
+| Usar mi passkey | Login (primero) | `POST /auth/passkeys/authenticate/start` → ceremonia → `finish` → sesión | Enter | Sin correo; requiere JS con nonce; fallback visible al enlace |
+| Enviarme un enlace | Login (correo) | `POST /auth/magic-link/request` → «revisa tu correo» | Enter en el campo | Respuesta idéntica exista o no |
+| Continuar (enlace) | `GET /m/<tokenId>.<verificador>` | `POST /auth/magic-link/consume` → sesión → `return_to` | Enter | El GET nunca consume |
+| Aceptar invitación | `GET /i/<token>` | `POST /auth/invitations/accept` → magic link → «revisa tu correo» | Enter | No abre sesión |
 | Verificar código | Step-up | `POST /auth/totp/verify` → sesión `step_up` → `return_to` | Enter | Error inline conserva el valor |
 | Usar código de respaldo | Step-up | Campo alterno | Tab + Enter | Mismo formulario |
 | Pedir un enlace nuevo | Magic sent/expired | `/login?email=` | Enter | Aparece tras 60 s en `sent` |
-| Cerrar sesión | Session | `POST /auth/session` (delete) → `/login` | Enter | Sin confirmación |
+| Cerrar sesión | Session | `POST /auth/session/logout` → `/login` | Enter | Sin confirmación |
 
 ## State Machine
 
@@ -66,7 +68,8 @@ servidor, nunca el navegador.
 | login_required | Sin sesión | `SubjectSessionPort` null | sesión creada | Redirect a `/login` (TASK-1830); hoy página 401 |
 | login_email | Correo pendiente | `/login` | método elegido | Foco en el campo; Continuar deshabilitado hasta correo válido |
 | magic_sent | Enlace enviado (o no) | request | clic en correo / 60 s | Copy idéntico exista o no la invitación |
-| magic_verifying | Consumiendo token | `/verify` | ok / expirado / usado | Texto «Verificando…»; sin dependencia de animación |
+| link_confirm | Página intermedia del enlace | `GET /m/<tokenId>.<verificador>` | Continuar (POST) → ok / expirado / usado | Botón explícito; el GET no consume (escáneres de correo) |
+| invitation_accept | Aceptar invitación | `GET /i/<token>` | aceptar → «revisa tu correo» | No crea sesión |
 | passkey_ceremony | WebAuthn en curso | botón | ok / cancelado / no soportado | Estados del módulo; fallback a magic link |
 | step_up | Escritura exige 2FA | authorize con scope write y `authLevel=primary` | código ok | Campo `one-time-code`; error inline; límite por TASK-1830 |
 | consent_pending_decision | Falta consentimiento | authorize sin consents | allow / deny | `Permitir` sin foco inicial; escritura marcada |

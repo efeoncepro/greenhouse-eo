@@ -199,7 +199,7 @@ Reglas obligatorias:
 
 ### Surface & system decision
 
-- Surface: `auth.efeonce.org` — rutas `/oauth/authorize` (consent, login_required, step-up, error), `/login`, `/login/magic-link/sent`, `/login/magic-link/verify`, `/login/passkey`, `/login/step-up`, `/login/recovery`, `/session` (TASK-1830 define las rutas JSON; esta task las pantallas HTML equivalentes).
+- Surface: `auth.efeonce.org` — rutas `/oauth/authorize` (consent, login_required, step-up, error) y las HTML/JSON de TASK-1830 (contrato 2026-09-04): `GET /login` (passkey primero, luego correo → `POST /auth/magic-link/request`), `GET /m/<tokenId>.<verificador>` (página intermedia obligatoria con botón que hace `POST /auth/magic-link/consume` — los escáneres de correo abren los GET y quemarían el enlace), `GET /i/<token>` + `POST /auth/invitations/accept` (aceptar invitación NO abre sesión: envía un magic link → pantalla «revisa tu correo»), `POST /auth/passkeys/{register,authenticate}/{start,finish}`, `POST /auth/totp/{enroll/start,enroll/finish,verify}`, `GET /auth/session`, `POST /auth/session/logout`.
 - Nav placement: `none` — no es una superficie del portal; no agrega destino de navegación en Greenhouse.
 - Composition Shell: `no aplica` — runtime `node:http` sin React; se define un **shell HTML propio «Efeonce ID»** (documento, cabecera de marca, tarjeta única centrada, pie con ayuda/legal) documentado en el wireframe, que cumple el mismo rol de regiones declaradas.
 - Primitive decision: `new` — primitives HTML+CSS propias del emisor (`IdShell`, `IdCard`, `IdButton`, `IdField`, `IdScopeList`, `IdClientBadge`, `IdStatus`) derivadas por tokens del SSOT, sin duplicar el DS del portal (no puede ejecutarse ahí). Se registran como patrón en `docs/architecture/ui-platform/PATTERNS.md` con la nota «runtime sin React».
@@ -212,9 +212,9 @@ Reglas obligatorias:
 
 - Default: consent con cliente identificado, lista de scopes (lectura primero, escritura con marca «escritura» y descripción del efecto), organización, CTAs «Permitir» (primario) y «Cancelar» (secundario).
 - Loading: envío del formulario (`allow`/`deny`) con botón en pending y texto «Confirmando…»; verificación de magic link con estado «Verificando tu enlace…».
-- Empty: no aplica a consent (siempre hay ≥ 1 scope); en login, campo de correo vacío con ayuda contextual.
+- Empty: no aplica a consent (siempre hay ≥ 1 scope); en login, el botón «Usar mi passkey» va ANTES del campo de correo (credenciales descubribles, sin `allowCredentials`) y el campo de correo vacío sólo gobierna «Enviarme un enlace».
 - Error: `invalid_client`, `invalid_redirect_uri`, `invalid_request` → página de error con código visible, sin redirect; magic link inválido/expirado → estado con CTA «Pedir un enlace nuevo»; TOTP incorrecto → error inline sin bloquear (límite de intentos lo gobierna TASK-1830).
-- Degraded / partial: `slow_down` (429) → «Demasiados intentos» con espera sugerida; correo enviado pero proveedor degradado → mismo copy anti-enumeración («Si tu correo está invitado, recibirás un enlace»).
+- Degraded / partial: `slow_down` (429) → «Demasiados intentos» con espera sugerida; la respuesta de pedir magic link es IDÉNTICA exista o no el correo, incluido el tiempo de respuesta (TASK-1830): una sola pantalla «revisa tu correo», sin estados distintos; aceptar una invitación termina en esa misma pantalla.
 - Permission denied: `access_denied` por sujeto sin organización vinculada → explicación y CTA «Pedir acceso a tu contacto en Efeonce» (mailto/texto, sin formulario); invitación revocada → misma página.
 - Long content: cliente con nombre largo (truncado con `title`), lista de 5 scopes con descripciones de dos líneas; nunca scroll interno en la tarjeta.
 - Mobile / compact: tarjeta a ancho completo con márgenes 16 px, CTAs apilados (primario arriba), campo de correo con `inputmode=email`, TOTP con `inputmode=numeric` y `autocomplete=one-time-code`.
@@ -223,7 +223,7 @@ Reglas obligatorias:
 
 ### Interaction contract
 
-- Primary interaction: `Permitir` (POST `/oauth/consent` `decision=allow`) y, en login, `Continuar` (elige método) / `Enviar enlace` / `Usar passkey` / `Verificar código`.
+- Primary interaction: `Permitir` (POST `/oauth/consent` `decision=allow`); en login `Usar mi passkey` (primario, antes del correo) y `Enviarme un enlace` (secundario, con el correo); en la página intermedia del enlace `Continuar` (POST consume); en step-up `Verificar código`.
 - Hover / focus / active: botones con estados por token (contraste ≥ 4.5:1 en todos), anillo de foco visible de 2 px con color de marca sobre fondo claro; enlaces subrayados en foco.
 - Pending / disabled: al enviar, el botón primario pasa a `disabled` + `aria-busy` + copy «Confirmando…»; el secundario se deshabilita para evitar doble decisión; sin doble submit (el servidor además es idempotente).
 - Escape / click-away: no aplica (sin overlays). El botón «Cancelar» del consent devuelve `access_denied` a la aplicación y lo dice antes de enviar («Volverás a {client} sin acceso»).
@@ -312,8 +312,8 @@ Reglas obligatorias:
 
 ### Slice 2 — Login: correo, magic link y passkey (bloqueado por TASK-1830 Slices 1–2)
 
-- Pantalla `/login` (correo + elección de método), `/login/magic-link/sent` (anti-enumeración), `/login/magic-link/verify` (verificando / ok / expirado / usado), `/login/passkey` (contenedor + estados del módulo WebAuthn de TASK-1830).
-- Copy nuevo en `src/lib/copy/auth-server.ts` validado con `greenhouse-ux-writing`.
+- Pantalla `/login` (passkey primero; correo + «Enviarme un enlace»), «revisa tu correo» (anti-enumeración; también tras aceptar invitación en `/i/<token>`), página intermedia `/m/<tokenId>.<verificador>` con botón que consume por POST (ok / expirado / usado), estados del módulo WebAuthn de TASK-1830.
+- Copy: reutilizar los ids `login_*`, `confirm_*`, `link_*`, `session_*` que TASK-1830 ya agregó a `src/lib/copy/auth-server.ts`; esta task sólo agrega los de layout/consent (`consent_*`, `brand_domain`, `error_correlation`), validados con `greenhouse-ux-writing`.
 
 ### Slice 3 — Step-up, recuperación y sesión (bloqueado por TASK-1830 Slice 3)
 
