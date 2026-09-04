@@ -47,7 +47,9 @@ sobre lo que probar clientes, y cada deploy del portal sería un deploy del emis
 ## Goal
 
 - Deployable `services/auth-server/` con Dockerfile, `deploy.sh` (`--set-env-vars` declarativo), workflow de
-  deploy por el carril de workers Cloud Run y `--no-allow-unauthenticated` sólo alcanzable por el LB.
+  deploy por el carril de workers Cloud Run, `--ingress=internal-and-cloud-load-balancing` y
+  `--allow-unauthenticated` (el ALB no emite tokens IAM hacia un serverless NEG; la autenticación ocurre en la
+  aplicación, igual que en `efeonce-mcp-gateway`). SA dedicado `auth-server@efeonce-group`.
 - Front door compartido: en `efeonce-mcp/infra/terraform/front_door.tf` agregar host rule `auth.efeonce.org` en
   el URL map, backend service propio con serverless NEG en `us-east4`, certificado managed adicional en el
   target HTTPS proxy y la policy Cloud Armor existente adjunta al backend nuevo. Sin IP ni LB nuevos.
@@ -88,7 +90,7 @@ Reglas obligatorias:
 - `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`
 - `docs/operations/GREENHOUSE_CLOUD_GOVERNANCE_OPERATING_MODEL_V1.md`
 - `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`
-- `../efeonce-mcp/infra/terraform/README.md` y `front_door.tf` (patrón a replicar)
+- `../efeonce-mcp/infra/terraform/README.md` y `front_door.tf` — OpenTofu (`tofu`), estado en GCS `efeonce-group-efeonce-mcp-terraform`, **apply manual del operador, sin CI**; nueva variable `enable_auth_host` (default `false`)
 - `services/ops-worker/deploy.sh` (patrón de env vars y deploy)
 
 ## Dependencies & Impact
@@ -183,7 +185,7 @@ Reglas obligatorias:
 
 ### Security and access
 
-- Auth/access gate: Cloud Run privado, sólo el LB lo alcanza; `/healthz` público, `/readyz` interno
+- Auth/access gate: ingreso restringido al LB (`internal-and-cloud-load-balancing`) + `allow-unauthenticated` a nivel IAM; validación de `Host: auth.efeonce.org` en la app; `/healthz` público, `/readyz` interno
 - Sensitive data posture: sin PII en esta task; secretos por `*_SECRET_REF`
 - Error contract: `captureWithDomain(err, 'identity.auth_server', …)`; respuestas JSON sanitizadas
 - Abuse/rate-limit posture: Cloud Armor por IP en el LB (mismo umbral que el gateway)
@@ -244,8 +246,10 @@ Reglas obligatorias:
   margen) → `retired` y deshabilitada en KMS.
 - Firma: `asymmetricSign` con digest SHA-256 del signing input; la firma DER se convierte a formato JOSE
   (r||s). Verificación local con la pública para el test de humo; el gateway verifica sólo con JWKS.
-- Runtime: Node 24, Fastify o el mismo servidor HTTP mínimo de `ops-worker` `[verificar patrón vigente]`,
-  `min-instances=1` en production, `max=5`, concurrency 80, timeout 30 s.
+- Runtime: `node:http` mínimo como `ops-worker` (Node 22-slim, esbuild bundle `--packages=external`, imagen
+  `gcr.io/efeonce-group/auth-server` vía Cloud Build); `min-instances=1` en production, `max=5`, concurrency 80,
+  timeout 30 s. Registro en los tres gates de workers (`worker-build-contract-gate.mjs`, `worker-runtime-deps-gate.mjs`,
+  `worker-deploy-path-coverage-gate.mjs`) y en la tabla de `GREENHOUSE_WORKER_BUILD_CONTRACT_V1.md`.
 - Cookie base: `__Host-efeonce_auth`, `Secure; HttpOnly; SameSite=Lax; Path=/`, sin `Domain`.
 
 ## Rollout Plan & Risk Matrix
@@ -335,4 +339,4 @@ Reglas obligatorias:
 
 ## Open Questions
 
-- Servidor HTTP: reutilizar el patrón de `ops-worker` o adoptar Fastify; decidir en el plan con el gate de deps.
+- Servidor HTTP — **RESUELTA 2026-09-03 (Discovery):** `node:http` como `ops-worker`. Razón: los tres gates de workers y el Dockerfile canónico ya entienden ese shape; Fastify agregaría una dependencia de runtime sin ganancia para ~6 rutas.
