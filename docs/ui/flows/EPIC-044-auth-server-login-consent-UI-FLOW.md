@@ -7,7 +7,7 @@
 > (pantallas), `TASK-1832` (canaries), `TASK-1834` (convergencia del login del portal).
 > **Creado:** 2026-09-04 al autorar `TASK-1835`, con `info-architecture` como lente principal.
 > **Contratos técnicos:** `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md` (§2, §5, §6) y
-> `docs/tasks/to-do/TASK-1830-efeonce-auth-external-person-authentication.md`.
+> `docs/tasks/in-progress/TASK-1830-efeonce-auth-external-person-authentication.md` (§5.bis de este doc = su contrato implementado).
 
 ## 1. Un motor, varias formas de render
 
@@ -44,21 +44,23 @@ formularios que vuelven al mismo handler.
 |---|---|---|---|---|
 | S0 | Shell «Efeonce ID» (cabecera de marca, tarjeta, pie) | todas | — | TASK-1835 |
 | S1 | Consentimiento | `GET /oauth/authorize` → 200 | `consent_pending_decision` | TASK-1835 (contrato TASK-1829 §5.1) |
-| S2 | Inicio de sesión: correo + método | `/login?return_to=` | `login_required` | TASK-1835 (rutas/handlers TASK-1830) |
-| S3 | Magic link enviado | `/login/magic-link/sent` | espera | TASK-1835 / TASK-1830 |
-| S4 | Magic link verificando / expirado / usado | `/login/magic-link/verify?token` | consumo del token | TASK-1835 / TASK-1830 |
-| S5 | Passkey (ceremonia WebAuthn) | `/login/passkey` | ceremonia | TASK-1830 (módulo JS) + TASK-1835 (shell) |
-| S6 | Step-up TOTP / código de respaldo | `/login/step-up?return_to=` | `interaction_required` | TASK-1835 / TASK-1830 |
-| S7 | Recuperación (invitación no activa) | `/login/recovery` | `access_denied` por invitación | TASK-1835 / TASK-1830 |
-| S8 | Sesión activa / cerrar sesión | `/session` | sesión | TASK-1835 / TASK-1830 |
+| S2 | Inicio de sesión: passkey primero, luego correo + enlace | `GET /login?return_to=` → `POST /auth/passkeys/authenticate/{start,finish}` · `POST /auth/magic-link/request` | `login_required` | TASK-1835 (rutas/handlers TASK-1830) |
+| S3 | «Revisa tu correo» (idéntico exista o no el correo; también tras aceptar invitación) | respuesta HTML de `POST /auth/magic-link/request` / `POST /auth/invitations/accept` | `magic_link_sent` · `invitation_accepted` | TASK-1835 / TASK-1830 |
+| S4 | Página intermedia del enlace (botón que consume por POST) y sus fallos | `GET /m/<tokenId>.<verificador>` → `POST /auth/magic-link/consume` | `magic_link_confirm` · `link_invalid` / `link_expired` / `link_used` | TASK-1835 / TASK-1830 |
+| S5 | Passkey (ceremonia WebAuthn, credenciales descubribles) | dentro de `/login`; módulo JS con nonce | `passkey_unsupported` · `passkey_failed` | TASK-1830 (módulo JS) + TASK-1835 (shell) |
+| S6 | Step-up TOTP / código de respaldo | `POST /auth/totp/verify` (pantalla con `return_to`) | `step_up_required` | TASK-1835 / TASK-1830 |
+| S6b | Alta del segundo factor (secreto + 10 códigos de respaldo, mostrados UNA vez) | `POST /auth/totp/enroll/{start,finish}` (exige sesión) | `totp_enroll` | TASK-1835 / TASK-1830 |
+| S7 | Invitación: página intermedia y aceptación (no abre sesión) · acceso retirado | `GET /i/<token>` → `POST /auth/invitations/accept` · resultado `link_access_revoked` | `invitation_confirm` · `access_revoked` | TASK-1835 / TASK-1830 |
+| S8 | Sesión iniciada / cerrada | `GET /auth/session` (JSON) · `POST /auth/session/logout` | `session_started` · `session_closed` | TASK-1835 / TASK-1830 |
 | S9 | Error terminal del protocolo | `GET /oauth/authorize` → 4xx | `invalid_client`, `invalid_redirect_uri`, `invalid_request`, `slow_down` | TASK-1835 |
 | S10 | Denegado por binding | `GET /oauth/authorize` → redirect o página | `access_denied` (unbound) | TASK-1835 |
 
 ## 4. Recorridos cross-surface
 
 **A. Primer uso (sin sesión, sin consentimiento, scope de lectura)**
-App → S1? no: `authorize` detecta sin sesión → S2 (`/login?return_to`) → S3 → correo → S4 (verify)
-→ sesión creada → `return_to` → `authorize` → S1 (consent) → Permitir → `POST /oauth/consent` →
+App → S1? no: `authorize` detecta sin sesión → S2 (`/login?return_to`: passkey primero; si no, correo)
+→ S3 («revisa tu correo») → clic en el correo abre S4 (`/m/<tokenId>.<verificador>`, sin consumir) →
+«Entrar» hace el POST de consumo → sesión creada → `return_to` → `authorize` → S1 (consent) → Permitir → `POST /oauth/consent` →
 303 `return_to` → `authorize` emite `302 redirect_uri?code&state&iss` → la app muestra su propia
 pantalla. Efeonce ID desaparece.
 
@@ -77,8 +79,10 @@ S1 → Cancelar → `302 redirect_uri?error=access_denied&state&iss`. La app dec
 Sesión OK → `authorize` → grants no `bound` → S10 (o redirect si `prompt=none`). Salida: pedir
 acceso a su contacto en Efeonce (fuera de banda; sin formulario público).
 
-**F. Invitación expirada / revocada**
-S2 → magic link → S4 → el link es válido pero la invitación ya no → S7. Copy sin enumeración.
+**F. Invitación: aceptar, y acceso retirado**
+Correo del operador → `GET /i/<token>` (S7) → «Activar mi acceso» → `POST /auth/invitations/accept` (liga a la
+persona, **no abre sesión**) → S3 («revisa tu correo») → S4 → sesión. Si el acceso fue retirado, el
+consumo termina en `access_revoked` (S7) con copy sin enumeración.
 
 **G. Revocación posterior (operador)**
 Admin/CLI/Nexa → `revokeClientConsent` → familias de tokens revocadas → la próxima llamada de la app

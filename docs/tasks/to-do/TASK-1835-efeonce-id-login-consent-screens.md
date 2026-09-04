@@ -250,7 +250,7 @@ Reglas obligatorias:
 - Data reader / command: `handleAuthorize`/`handleConsent` (TASK-1829) y los handlers de TASK-1830; las plantillas sólo reciben DTOs. Los endpoints que la UI consume por formulario (`magic-link/request`, `magic-link/consume`, `invitations/accept`, `session/logout`) responden HTML cuando el `Content-Type` es `application/x-www-form-urlencoded` y JSON en cualquier otro caso: los formularios postean directo, sin `fetch` ni JS.
 - API parity: la UI es un cliente del mismo handler que Nexa/CLI/Admin (`grantClientConsent`); no hay lógica de negocio en el HTML.
 - Access / capability: ninguna nueva; `SubjectSessionPort` + consent + `gv` deciden en el handler.
-- States to implement: los diez del State inventory por pantalla, enumerados en el wireframe (§State Copy) y en el flow (§State Machine).
+- States to implement: los del State inventory por pantalla más la lista cerrada de §5.bis del flujo maestro (`login`, `magic_link_sent`, `magic_link_confirm`, `link_invalid/expired/used`, `access_revoked`, `session_started`, `session_closed`, `rate_limited`, `invitation_confirm`, `invitation_accepted`, `passkey_unsupported`, `passkey_failed`, `step_up_required`, `totp_enroll`), enumerados en el wireframe (§State Copy) y en el flow (§State Machine).
 
 ### GVC scenario plan
 
@@ -317,7 +317,7 @@ Reglas obligatorias:
 
 ### Slice 3 — Step-up, recuperación y sesión (bloqueado por TASK-1830 Slice 3)
 
-- `/login/step-up` (TOTP + código de respaldo, error inline, límite de intentos), `/login/recovery` (invitación expirada/revocada; pedir re-invitación), `/session` (sesión activa, cerrar sesión).
+- Step-up TOTP (`POST /auth/totp/verify`, error inline, límite de intentos), **alta del segundo factor** (`totp_enroll`: secreto + 10 códigos de respaldo mostrados UNA vez, con copia/descarga sin JS de terceros), página de invitación `GET /i/<token>` (`invitation_confirm` → `invitation_accepted`), `access_revoked`, `session_started` y `session_closed` (`POST /auth/session/logout`). Estados exactos: §5.bis del flujo maestro.
 - GVC completo de las 11 fixtures, `pnpm ui:quality`, before/after y `UI ready: yes`.
 
 ## Out of Scope
