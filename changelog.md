@@ -7,6 +7,33 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-04 — TASK-1830: autenticación de personas externas del emisor, sin contraseñas (code complete)
+
+Cuatro slices en `develop` detrás de `AUTH_SERVER_PERSON_AUTH_ENABLED=false`: sesión propia
+(`__Host-efeonce_auth`) que implementa el `SubjectSessionPort` que dejaba a `authorize` en
+`login_required` desde TASK-1829; magic link con patrón selector/verificador (15 min, un uso, consumo
+por POST tras página intermedia porque los escáneres de correo abren los GET); passkeys con
+credenciales descubribles —sin `allowCredentials`, que sería un oráculo de existencia— y contador
+anti-clonación; TOTP de step-up cifrado con la llave KMS **simétrica** `auth-server-totp-envelope`
+creada el mismo día (la de firma es EC y no cifra), con AAD `<environment>|<subject>` verificada
+contra la llave real; recuperación por re-invitación auditada, sin self-service de reset.
+
+8 tablas `greenhouse_auth` aplicadas y verificadas contra PG real, capability
+`identity.auth_person.revoke` con su ruta admin por Full API Parity y 3 señales `auth.person.*`.
+Desviaciones declaradas: ledger propio `person_auth_attempts` (el del portal tiene CHECK cerrados de
+NextAuth y GRANT a otro rol) y `sha256`+timing-safe en vez de bcrypt (un KDF lento no agrega nada
+sobre 256 bits y sí 300-800 ms de CPU en un endpoint no autenticado).
+
+Cuatro defectos los encontró el trabajo, no una revisión: la librería de WebAuthn lanzaba al
+retroceder el contador y dejaba **viva** la credencial clonada; `deactivateOrphanSourceLinks` no se
+llamaba al aceptar una re-invitación, así que el subject anterior seguía autenticando y la
+recuperación no recuperaba nada; `epochTolerance` de `otplib` va en `verify` y el `epoch` en
+segundos; y un código mal formado hacía responder 500 a un endpoint público de autenticación.
+
+Falta rollout: prender el flag en staging (exige `AUTH_SERVER_OAUTH_ENABLED=true` + environment
+`efeonce-auth` en `active`), verificar que el correo sale de verdad por Resend y probar passkey en
+dos navegadores.
+
 ## 2026-09-04 — Release `9100bbd2765d` a producción: EPIC-044 (auth-server + OAuth code complete) y TASK-1631
 
 PR #221 squash `9100bbd27`, orquestador `33893120972` (un run, sin retry), manifest `released` 16:39:40Z. `auth-server` en producción (`/readyz` 200, JWKS 2 kid, superficie OAuth 404 con `AUTH_SERVER_OAUTH_ENABLED=false`), TASK-1631 lane ecosystem verificado en prod, 4/4 workers + auth-server Ready (dos change-gated con árbol idéntico). Post-release: `AUTH_SERVER_JWKS_URL` en Vercel Production+staging con redeploy; environment `efeonce-auth` registrado `draft` por command (`pnpm auth-server:register-issuer-environment`). El watchdog aprendió el change-gate del `auth-server` (espejo por servicio + test de paridad con los workflows). Ledger de tiempos y de flags actualizados. Barrido documental del release: control plane, playbook (anti-patterns #17/#18), runbooks y manuales del orquestador/watchdog/auth-server, ADR nativo, contrato OAuth, `CLOUD_RUN.md`, EPIC-044, rule `auth-server` y skills `efeonce-mcp-platform` (+espejo Codex), `greenhouse-production-release` y `greenhouse-backend`.
@@ -901,36 +928,3 @@ filtra por versión, así que un snapshot v1 dejó de contar como reciente. En B
 cayó de 200 a 11 mientras `gsc_striking_distance` subía de 168 a 200 — reclasificación, no filtrado
 de más. Y el 200 de v1 era el tope de `maxItemsPerOrigin`, o sea que el número real estaba truncado:
 la mejora es mayor que la que muestra la resta.
-
-## 2026-08-29 — el detector de canibalización de la cola SEO detectaba marca, y de paso vaciaba media pantalla
-
-La cola priorizada decidía si una keyword era canibalización preguntando "¿aparece más de una página
-del sitio?". Medido contra berel.com sobre 28 días, eso no mide canibalización: la población no-marca
-tenía **80,7 %** de sus impresiones concentradas en su página principal y la de marca **34,2 %**. El
-predicado seleccionaba marca — donde el sitio ocupa legítimamente su propia SERP. El caso que lo
-retrata es la query de mayor demanda del sitio: `pinturas`, 41 páginas, **99,3 %** de las impresiones
-en una sola, y la cola proponiendo "fusiona 41 URLs" sobre el ítem #1.
-
-El daño mayor estaba en el otro lado. Como el colector de striking-distance excluía todo lo
-multi-página, sacaba **216 de 269** filas de su ventana: reconstruida la lente, el operador veía
-**92 keywords donde el reader anterior mostraba 269**. Al validar el cutover se verificó la dirección
-que agregaba filas y nunca la que las quitaba.
-
-`incremental-clicks-v2` corrige el predicado (no-marca ∧ concentración de la principal ≤ 70 % ∧ ≥2
-páginas fusionables), lo escribe en **un solo lugar** que los dos colectores importan —antes estaba
-escrito dos veces— y separa dos preguntas que parecían una: quién se queda con la query se mide sobre
-todas las páginas, home incluida; qué se puede fusionar excluye home, PDFs e imágenes. Mezclarlas
-invierte el veredicto, y lo destapó medir: al sacar la home también del denominador, `pinturas` cayó a
-13,2 % y volvió a salir canibalizada. La marca tolera un error de tipeo, que no era un lujo: `bereñ`
-con 38 páginas, `verel`, `berol`, `berrl`, `betel`, `berem`, `bere` — 16 queries de marca entraban
-como canibalización.
-
-De 400 candidatas, v1 llamaba canibalizadas 400 y v2 llama 11; la población real del sitio son 29.
-Quedan ~5 sub-marcas propias (`kover` son 19 fichas de una línea de producto) que no se detectan desde
-el dominio: es un límite declarado en la versión, no un pendiente silencioso, y cerrarlo exige una
-fuente de marca con autor.
-
-El bump destapó dos defectos latentes que sólo existen cuando hay más de una versión: el piso de
-recomputación reusaba snapshots de otra versión y devolvía la versión activa sobre ellos —un campo que
-miente—, y la huella congelada de parámetros no puede ver un cambio de fórmula. Lo primero ahora filtra
-por versión con su gate; lo segundo tiene vectores dorados que congelan la salida.

@@ -25,7 +25,7 @@ Greenhouse — plataforma operativa/subproducto de Efeonce Group dentro del mode
 | Business model, customer model, packaging, pricing, unit economics | `efeonce-business-model-operator` + `efeonce-customer-model-operator` + `efeonce-pricing-operator` + práctica dueña | `business-models/README.md` + modelo vigente + Finance/Legal/Product según corresponda; customer model gobierna ICP/JTBD/buying group; `creative-practice` conserva Creative Studio |
 | Capital, inversión y fundraising | `efeonce-investor-readiness` + `efeonce-agency` + Finance/Legal | `strategy/EFEONCE_CAPITAL_AND_INVESTMENT_STRATEGY_V1.md` + `strategy/ASAAS_MANIFESTO_V1.md`; no emitir, endeudar, transferir IP ni crear spinout sin aprobación proporcional |
 | Integraciones/infra (signature/observability/postgres-pooling) | — | `architecture/agent-invariants/INTEGRATIONS_INFRA_AGENT_INVARIANTS.md` |
-| Identity/Workforce (legal profile/role-title/SCIM/session-access/bridge-cutover) | — | `architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` |
+| Identity/Workforce (legal profile/role-title/SCIM/session-access/bridge-cutover/auth de personas externas) | — | `architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` |
 | Org workspace + Client portal | — | `architecture/agent-invariants/ORG_CLIENT_AGENT_INVARIANTS.md` |
 | Client lifecycle / onboarding | — | `architecture/GREENHOUSE_CLIENT_LIFECYCLE_V1.md` |
 | UI/feature platforms (home-rollout/nexa-insights/shortcuts/table-density/sample-sprints/account-360) | `greenhouse-ux` + product-design | `architecture/agent-invariants/UI_FEATURE_AGENT_INVARIANTS.md` |

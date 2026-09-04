@@ -548,3 +548,76 @@ Personas (`TASK-1830`) y gateway multi-issuer (`TASK-1831`) llegan después. El 
 `auth.oauth.{code_reuse_detected,refresh_reuse_detected,cimd_rejected}` (`incident`, 24 h, steady 0) · Sentry
 `captureWithDomain('identity')` con tag `component=auth-server` (`check=kms` reemplaza al contador
 `auth.kms.sign_failures`).
+
+## Autenticación de personas externas del emisor (TASK-1830)
+
+**Contexto.** `auth.efeonce.org` autentica personas EXTERNAS sin contraseñas: passkeys (método
+primario), magic link por Resend (alternativa), TOTP (step-up para escritura) y recuperación por
+re-invitación auditada. Vive en `src/lib/auth-server/persons/**`, detrás de
+`AUTH_SERVER_PERSON_AUTH_ENABLED` (default `false` ⇒ toda la superficie responde **404**, no 403:
+un 403 confirma que la ruta existe). Ocho tablas en `greenhouse_auth`: `sessions`,
+`magic_link_tokens`, `auth_rate_limits`, `person_auth_attempts`, `passkey_credentials`,
+`passkey_challenges`, `totp_enrollments`, `totp_backup_codes`. Gate contra PG real:
+`pnpm auth-server:person-auth:smoke`.
+
+**No hay password store y no debe haberlo.** La clase de ataque más frecuente contra un servicio de
+auth público —credential stuffing, phishing de contraseña, reset abusable— desaparece por diseño.
+Un flujo de recuperación self-service reintroduce exactamente esa puerta.
+
+### Reglas duras
+
+1. **NUNCA** escribir fuera de `greenhouse_auth` desde `src/lib/auth-server/**`. La única escritura
+   legítima en `greenhouse_core` —ligar la persona— se delega al command `acceptExternalInvitation`
+   de `TASK-1631`, que la ejecuta en su propia transacción con audit y outbox. El guard
+   `src/lib/auth-server/boundary-domain.test.ts` escanea el SQL literal del dominio.
+2. **NUNCA** mandar los intentos de persona a `greenhouse_serving.auth_attempts` (ledger TASK-742).
+   Ese ledger es del PORTAL y no admite este runtime sin romperlo: `provider` y `stage` tienen CHECK
+   cerrados de NextAuth (sin passkey ni TOTP), `user_id_resolved` pertenece al espacio de
+   `client_users` y su GRANT de INSERT es sólo para `greenhouse_runtime`, mientras el emisor conecta
+   como `greenhouse_app`. El ledger del emisor es `greenhouse_auth.person_auth_attempts`,
+   append-only por trigger, con `subject_hash` indexado (el de `oauth_audit_events` no lo está, así
+   que un bloqueo progresivo por sujeto allí sería un scan).
+3. **NUNCA** hashear un bearer del emisor con bcrypt. Todos —magic link, códigos de respaldo— usan
+   `sha256Hex` + `safeEquals`, igual que codes/refresh/access. Sobre 256 bits de entropía un KDF
+   lento no agrega resistencia y sí agrega 300-800 ms de CPU de un solo hilo en un endpoint NO
+   autenticado: es un amplificador de DoS en la puerta de entrada. El shim de `bcryptjs` del
+   Dockerfile del auth-server **se queda**. Corolario: un código de respaldo se hace LARGO
+   (~127 bits) para no necesitar KDF, no corto y luego protegido con uno.
+4. **NUNCA** guardar el secreto TOTP sin cifrar. Es la única excepción al punto anterior porque es
+   simétrico: el servidor debe poder leerlo. Va cifrado con la llave KMS **simétrica**
+   `auth-server-totp-envelope` (HSM, `ENCRYPT_DECRYPT`, rotación 90 d) y AAD
+   `<environment>|<subject>` — un ciphertext movido a la fila de otra persona NO descifra.
+   `auth-server-es256` es EC de firma y **no puede cifrar**; nunca intentes usarla para esto.
+5. **NUNCA** derivar `amr` de lo que declare el cliente. `uv` sale del flag REAL de la aserción
+   WebAuthn y `totp` de una verificación real. `authLevel = 'step_up'` exige factor fuerte **y**
+   reciente (< 10 min): en el lane ecosystem el actor es la máquina, así que este es el único gate
+   de toda la cadena que depende de QUIÉN es la persona. No existe «recordar este dispositivo».
+6. **NUNCA** dejar que la respuesta de pedir un magic link distinga si el correo existe: mismo
+   cuerpo, mismo código, mismos encabezados **y mismo tiempo** (hay un piso de latencia deliberado,
+   y el despacho del correo no se espera). El cuerpo idéntico sin el piso no cierra nada: el camino
+   "existe" hace INSERT y despacha correo.
+7. **NUNCA** consumir un magic link por GET. Los escáneres de correo abren los enlaces y quemarían
+   el acceso antes de que la persona llegue: el GET pinta una página intermedia y el consumo es POST
+   con verificación de `rowCount === 1` dentro de transacción.
+8. **NUNCA** pedir `allowCredentials` con el correo antes de autenticar por passkey: sería el
+   oráculo de existencia que la regla 6 evita. Se usan credenciales descubribles.
+9. **NUNCA** verificar una aserción WebAuthn pasándole a la librería el contador almacenado.
+   `verifyAuthenticationResponse` LANZA cuando el contador retrocede, y entonces la regresión llega
+   como un "no verificó" cualquiera: la credencial clonada se queda VIVA y la señal no se dispara.
+   Se le pasa `counter: 0` (omite sólo ese chequeo) y la política del contador se aplica sobre datos
+   YA verificados — revocar antes de verificar la firma sería un botón de denegación de servicio
+   para quien conozca un `credential_id`. Un contador que se queda en 0 **no** es regresión.
+10. **NUNCA** construir self-service de reset. Recuperar es re-invitar
+    (`issueExternalInvitation` con `reissue`); al aceptar, `acceptExternalInvitation` desactiva los
+    subjects anteriores del mismo perfil y environment —su `deactivateOrphanSourceLinks` NO cubre
+    esto, porque su condición es por perfil y tras una re-invitación siempre queda una membership
+    linked— y el emisor revoca sesión, passkeys y TOTP de esos subjects. Las dos mitades juntas:
+    sin la primera el passkey viejo abre sesión nueva; sin la segunda la sesión viva sobrevive
+    hasta su próximo request.
+11. **SIEMPRE** ligar la sesión a un source link ACTIVO resuelto en la MISMA consulta
+    (`getSessionWithLink`): resolverlos por separado abre una ventana donde la sesión sobrevive a la
+    revocación. Cuando el link murió, la sesión se revoca en el request que lo detecta, no se
+    responde 401 y se deja viva. Señal `auth.person.session_without_link`, steady 0.
+12. **SIEMPRE** que se agregue una tabla al dominio, declararla en el allowlist de
+    `boundary-domain.test.ts` en el mismo PR, y ejercitar su SQL en el smoke: los tests con mocks
+    ejercitan el TS, nunca el SQL (CHECK, `ON CONFLICT`, triggers, `BYTEA`, `BIGINT`).

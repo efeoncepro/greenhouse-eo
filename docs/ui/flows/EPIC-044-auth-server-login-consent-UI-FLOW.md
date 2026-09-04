@@ -104,8 +104,66 @@ futura.
 - **Accesibilidad:** un `h1` por pantalla, una región viva por página, foco inicial nunca en
   «Permitir», contraste ≥ 4.5:1, `autocomplete` correctos; verificado con axe en GVC.
 
+## 5.bis Contrato implementado por TASK-1830 (backend)
+
+Esta sección la escribe la task que entrega los métodos, no la que entrega las pantallas. Todo lo
+de acá **ya existe y está probado** en `src/lib/auth-server/persons/**` detrás de
+`AUTH_SERVER_PERSON_AUTH_ENABLED` (default `false` ⇒ toda la superficie responde 404).
+
+### Rutas
+
+| Ruta | Método | Qué hace |
+|---|---|---|
+| `/login` | GET | Formulario de acceso por correo (`return_to` opcional, sólo path propio) |
+| `/auth/magic-link/request` | POST | Emite el enlace. Acepta form o JSON; responde 202 |
+| `/m/<tokenId>.<verificador>` | GET | Página intermedia con el botón que hace el POST |
+| `/auth/magic-link/consume` | POST | Consume el enlace, abre sesión, redirige a `return_to` |
+| `/i/<token>` | GET | Página intermedia de invitación |
+| `/auth/invitations/accept` | POST | Liga a la persona y despacha el enlace; **no abre sesión** |
+| `/auth/passkeys/register/{start,finish}` | POST | Alta de passkey; exige sesión |
+| `/auth/passkeys/authenticate/{start,finish}` | POST | Login por passkey; no exige sesión |
+| `/auth/passkeys` | GET | Dispositivos registrados (id, nombre, tipo, alta, último uso) |
+| `/auth/totp/enroll/{start,finish}` | POST | Alta del segundo factor; exige sesión |
+| `/auth/totp/verify` | POST | Step-up: escribe `step_up_at` + `amr` en la sesión |
+| `/auth/session` | GET | Contexto de la sesión vigente (JSON) |
+| `/auth/session/logout` | POST | Revoca la sesión y limpia la cookie |
+
+Los endpoints que la UI consume por formulario (`magic-link/request`, `magic-link/consume`,
+`invitations/accept`, `session/logout`) responden **HTML** cuando el `Content-Type` es
+`application/x-www-form-urlencoded` y **JSON** en cualquier otro caso. La misma ruta sirve a la
+pantalla y al canary sin bifurcar el contrato.
+
+### Cuatro cosas que la UI no puede contradecir
+
+1. **La respuesta de pedir un enlace es idéntica exista o no el correo** — cuerpo, código,
+   encabezados y tiempo (hay un piso de latencia deliberado). La pantalla NO puede decir «no
+   encontramos ese correo», ni mostrar un estado distinto, ni saltarse el «revisa tu correo».
+   El único 4xx que sí distingue es el formato inválido del correo, que no revela nada.
+2. **El passkey va antes del correo.** El login por passkey usa credenciales descubribles y no
+   pide correo: pedirlo primero convertiría el servidor en un oráculo de existencia. Por eso
+   `login_passkey_cta` es el CTA primario y el campo de correo es el fallback.
+3. **El GET del enlace no consume nada.** Los escáneres de correo abren los enlaces; si el consumo
+   fuera GET, el acceso se quemaría antes de que la persona llegue. La página intermedia con botón
+   es un requisito de seguridad, no una preferencia de diseño — no se puede auto-enviar el form.
+4. **`step_up` no se declara, se demuestra.** Lo escribe el servidor en la sesión a partir de los
+   flags reales del factor (`uv` de la aserción WebAuthn, verificación TOTP) y **caduca a los 10
+   minutos**. No existe «recordar este dispositivo» para el step-up, y la UI no puede ofrecerlo.
+
+### Estados que la UI tiene que representar
+
+`login` · `magic_link_sent` (idéntico para correo conocido y desconocido) · `magic_link_confirm` ·
+`link_invalid` / `link_expired` / `link_used` (mismo título, distinta línea de ayuda) ·
+`access_revoked` · `session_started` · `session_closed` · `rate_limited` ·
+`invitation_confirm` · `invitation_accepted` · `passkey_unsupported` · `passkey_failed` ·
+`step_up_required` · `totp_enroll` (secreto + 10 códigos de respaldo, mostrados UNA vez).
+
+Copy en `src/lib/copy/auth-server.ts` con los prefijos `login_*`, `confirm_*`, `link_*`,
+`session_*` e `invitation_*`. TASK-1835 los consume; no crea ids paralelos.
+
 ## 6. Qué no cubre este flujo
 
 - Registro público, recuperación de contraseña (no existen contraseñas), perfil.
 - Gestión de aplicaciones autorizadas y consentimientos desde Greenhouse (task futura).
 - El login del portal Greenhouse (TASK-1834 lo conecta a este mismo emisor más adelante).
+- Autoadministración de dispositivos por la persona más allá de listarlos (fuera de la primera
+  cohorte) y notificación por correo al agregar o quitar un passkey (follow-up de TASK-1830).
