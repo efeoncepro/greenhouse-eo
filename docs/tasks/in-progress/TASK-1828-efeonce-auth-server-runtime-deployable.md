@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Tomada 2026-09-03 por /implement-task (instrucción explícita del operador). Excepción EPIC-027 aprobada; DNS verificado; sin recursos GCP creados aún. Fase: Discovery/Audit/Plan; Slice 0 espera checkpoint humano del plan`
+- Status real: `Tomada 2026-09-03 por /implement-task (instrucción explícita del operador). Excepción EPIC-027 aprobada; DNS verificado; sin recursos GCP creados aún. Slice 0 HECHO 2026-09-03 (KMS API habilitada; key ring us-east4/auth-server; llave auth-server-es256 HSM EC_SIGN_P256_SHA256 versión 1 ENABLED; SA auth-server@ con cloudkms.signerVerifier sólo sobre la llave + cloudsql.client + serviceAccountUser para github-actions-deployer). Slice 1 en curso`
 - Rank: `TBD`
 - Domain: `platform|identity|ops`
 - Blocked by: `none`
@@ -307,7 +307,7 @@ Reglas obligatorias:
 - [ ] `https://auth.efeonce.org/.well-known/jwks.json` devuelve una llave EC P-256 con `kid` y `use: sig`.
 - [ ] Un token firmado por el servicio verifica con la pública del JWKS y falla con una pública distinta.
 - [ ] La rotación produce dos `kid` activos y luego retira el viejo sin invalidar tokens vigentes.
-- [ ] La llave está en KMS con protección `HSM` y el SA del servicio no tiene permisos de export/destroy.
+- [x] La llave está en KMS con protección `HSM` y el SA del servicio no tiene permisos de export/destroy — readback 2026-09-03: policy de la llave = sólo `roles/cloudkms.signerVerifier` para `auth-server@efeonce-group`; versión 1 `ENABLED`, `HSM`, `EC_SIGN_P256_SHA256`.
 - [ ] Schema `greenhouse_auth` existe con owner `greenhouse_ops` y GRANTs runtime; `signing_keys` con CHECK de estado.
 - [ ] `deploy.sh` declara todas las env vars; el workflow está en `RELEASE_DEPLOY_WORKFLOWS`.
 - [ ] No existe un segundo forwarding rule ni una segunda policy Cloud Armor; `auth.efeonce.org` resuelve a la IP del gateway y `mcp.efeonce.org` sigue verde tras el apply.
