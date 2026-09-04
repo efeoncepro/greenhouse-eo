@@ -1,6 +1,6 @@
 # Efeonce Native Authorization Server Decision V1
 
-> **Status:** `Accepted` (decisión del operador 2026-09-03; sin runtime autorizado hasta que cada task hija abra su gate — `TASK-1828` abrió el suyo el 2026-09-04: runtime, llaves y front door vivos en staging, producción pendiente del release; ver §Delta 2026-09-04)
+> **Status:** `Accepted` (decisión del operador 2026-09-03; sin runtime autorizado hasta que cada task hija abra su gate — `TASK-1828` abrió el suyo el 2026-09-04: runtime, llaves y front door vivos en staging, producción pendiente del release; `TASK-1829` quedó `code complete, rollout pendiente` ese mismo día detrás de `AUTH_SERVER_OAUTH_ENABLED=false`; ver §Delta 2026-09-04 y §Delta 2026-09-04 — TASK-1829)
 > **Date:** 2026-09-03
 > **Owner:** Efeonce Platform / Identity
 > **Scope:** authorization server propio en `auth.efeonce.org`, autenticación de personas externas, emisión y verificación de tokens para `mcp.efeonce.org`, binding con Account 360, convergencia del login cliente de Greenhouse
@@ -178,7 +178,7 @@ Tabla de las tecnologías (todas ya presentes o de costo marginal):
 | Orden | Task | Alcance | Estimación agéntica |
 | --- | --- | --- | --- |
 | 1 | `TASK-1828` ✅ | Runtime `auth.efeonce.org`: deployable, host en el front door del gateway, KMS, JWKS, session store, excepción EPIC-027. **Ejecutada 2026-09-04**: Cloud Run `auth-server` desplegado por CI (revisión `auth-server-00003-jtf`), llave ES256 en KMS HSM con rotación probada, schema `greenhouse_auth`, host publicado en el LB del gateway y `https://auth.efeonce.org/readyz` 200; producción entra con el próximo release (ver §Delta 2026-09-04) | 3 a 4 días (real: 2 días) |
-| 2 | `TASK-1829` | Superficie OAuth: metadata, CIMD, DCR compat, PKCE, tokens ES256, refresh, revocación, consentimiento | 3 a 4 días |
+| 2 | `TASK-1829` ✅ | Superficie OAuth: metadata, CIMD, DCR compat, PKCE, tokens ES256, refresh, revocación, consentimiento. **Code complete en `develop` 2026-09-04, rollout pendiente**: flag `AUTH_SERVER_OAUTH_ENABLED=false`, 7 tablas `greenhouse_auth` aplicadas, 68 tests + smoke PG real; contrato [`EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`](EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md) (ver §Delta 2026-09-04 — TASK-1829) | 3 a 4 días (real: 1 día) |
 | 3 | `TASK-1830` | Autenticación de personas externas: passkeys, magic link, TOTP, recuperación, anti-abuso | 5 a 7 días |
 | 4 | `TASK-1631` | Binding Account 360, invitaciones, grants, `grants_version`, eligibility reader (re-alcance). **Slice 1 entregado 2026-09-04** (schema, commands, reader del gateway, 4 señales; migraciones aplicadas); rollout pendiente: sin environment real, sin binding de cliente real, sin UI | 3 a 4 días |
 | 5 | `TASK-1831` | Gateway multi-issuer: `AuthContext`, resolver por issuer, tools calificadas, recheck de grants | 2 a 3 días |
@@ -307,3 +307,67 @@ ni Cloud Armor nuevos, como se midió en el delta anterior.
 magic link / TOTP (`TASK-1830`), gateway multi-issuer (`TASK-1831`), canaries (`TASK-1832`), pentest y rotación
 programada (`TASK-1833`), convergencia del login (`TASK-1834`). **El login de Greenhouse no cambia.** Runbook:
 [`docs/operations/runbooks/auth-server.md`](../operations/runbooks/auth-server.md).
+
+## Delta 2026-09-04 — TASK-1829 code complete (superficie OAuth, rollout pendiente)
+
+Entregado en `develop` el mismo día (commits `263ee3a74` Slice 1, `19d1658de` Slices 2–3, `d31e6e913` Slice 4),
+estado **`code complete, rollout pendiente`**: el runtime en staging sigue sirviendo sólo `/readyz` + JWKS porque
+`AUTH_SERVER_OAUTH_ENABLED` nace en `false` en `deploy.sh`. Contrato técnico completo (endpoints, claims, tablas,
+invariantes): [`EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`](EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md).
+
+**Qué existe.** Dominio `src/lib/auth-server/oauth/**` (primitives extraídas de
+`src/lib/sister-platforms/oauth-broker.ts` sin cambio de contrato; la suite sister-platforms sigue verde), handler
+testeable en `services/auth-server/app.ts`, cableado PG/KMS/ports en `server.ts`. Rutas en `auth.efeonce.org`:
+metadata RFC 8414 + OIDC (`issuer` idéntico al origen), `POST /oauth/register` (DCR compat, sólo públicos, 10/min
+por IP), `GET /oauth/authorize` + `POST /oauth/consent` (PKCE `S256` obligatorio, consentimiento por scope),
+`POST /oauth/token` (`authorization_code` + `refresh_token`; `none` / `client_secret_basic` / `client_secret_post`;
+60/min por IP · 120/min por cliente), `POST /oauth/revoke` (RFC 7009), `POST /oauth/introspect` (RFC 7662, sólo
+confidenciales); todo 404 con el flag OFF, y `/healthz` + `/readyz` reportan `oauth: <bool>`. **CIMD** es el
+registro primario (`client_id` = URL https con path; anti-SSRF con DNS resuelto y rangos privados rechazados, sin
+redirects, 3 s, 64 KB; cache 24 h + `etag`, rechazo cacheado 15 min); confidenciales pre-registrados por
+`registerConfidentialClient` ← `POST /api/admin/auth-server/oauth-clients` (capability
+`identity.auth_client.register`) y `pnpm auth-server:register-client`; revocación de consentimiento ←
+`POST /api/admin/auth-server/consents/revoke` (`identity.auth_consent.revoke`); ambas capabilities módulo
+`organization`, grant `EFEONCE_ADMIN`, seeds aplicados (`20260904132753267` + forward-fix `20260904133148469`).
+Access token JWT ES256 de 15 min firmado por `signWithActiveKey` (KMS HSM) con `iss/sub/aud/azp/client_id/scope/
+gv/iat/exp/jti/auth_time`; refresh opaco `efr_` (sha256 persistido, familia = `grant_id`, 30 d deslizante / 90 d
+absoluto, rotación en cada uso, reuso revoca la familia); code `efc_` de un solo uso bajo `FOR UPDATE`.
+
+**Decisión `localhost` (operador, 2026-09-04).** Clientes **públicos**: loopback `127.0.0.1` / `[::1]` y el alias
+`localhost` por nombre, puerto libre, path exacto (RFC 8252 §7.3; Claude Code lo necesita) — o HTTPS exacto para
+públicos hospedados. Clientes **confidenciales**: HTTPS exacto; `localhost` por nombre **rechazado**. Nunca
+wildcards. Con esto la regla «no estrechar `http://localhost` a secas» del gateway queda satisfecha sin abrir la
+puerta a un confidencial escuchando en loopback.
+
+**Siete tablas, no cinco.** El plan contaba `oauth_clients`, `cimd_cache`, `authorization_codes`, `refresh_tokens` y
+`client_consents`. Se agregaron dos: `access_tokens` (registro de `jti`) porque revocación RFC 7009 e introspección
+RFC 7662 necesitan saber qué access tokens vivos pertenecen a una familia, y sin registro «revocar la familia» sólo
+podría alcanzar a los refresh; y `oauth_audit_events` propia (append-only por trigger) porque el audit legacy de
+identidad tiene FK/CHECK hacia sujetos internos y no admite sujetos externos ni clientes CIMD — además de que el
+rate limit cuenta sobre ella (patrón `party-endpoint-rate-limit`), lo que evita una tabla de contadores aparte.
+Migration `20260904130826694_task-1829-auth-oauth-tables.sql`, aplicada en Cloud SQL.
+
+**`gv`.** El claim es `max(grantsVersion)` de las memberships **`bound`** del sujeto, resuelto en cada emisión
+(code y refresh) vía `resolveExternalAccess({ environmentId: AUTH_SERVER_ENVIRONMENT_ID, subject })`; sin
+membership `bound` el emisor responde `access_denied` (fail-closed). Cualquier revoke de TASK-1631 bumpea la
+versión y el gateway (TASK-1831) compara por igualdad estricta sin llamar a introspección.
+
+**Persona.** Hasta TASK-1830 el runtime inyecta `unauthenticatedSubjectPort`: `authorize` responde
+`login_required` (401; `prompt=none` ⇒ redirect con error). La pantalla de consentimiento es una página mínima
+server-side (isotipo Efeonce del SSOT bundleado por `pnpm auth-server:brand-assets:generate` + test de drift; copy
+en `src/lib/copy/auth-server.ts`); la task ui-ux reemplaza la vista conservando el contrato de campos
+(`client_id`, `scope`, `return_to`, `decision`).
+
+**Observabilidad y verificación.** Señales `auth.oauth.code_reuse_detected` (`error`),
+`auth.oauth.refresh_reuse_detected` (`error`), `auth.oauth.cimd_rejected` (`warning`) en el mismo reader de
+TASK-1828 (módulo `identity`, kind `incident`, 24 h sobre `oauth_audit_events`, steady 0). Gates:
+`pnpm vitest run src/lib/auth-server` (68 tests, flujo completo in-process) · `pnpm auth-server:oauth-store:smoke`
+(PG real, OK 2026-09-04) · typecheck · gates de workers (runtime-deps, build-contract, deploy-path).
+
+**Rollout pendiente.** (1) Release de producción del runtime; (2) prender `AUTH_SERVER_OAUTH_ENABLED` en staging
+**sólo** después de registrar el environment del emisor en `greenhouse_core.external_identity_environments`
+(`environment_id=efeonce-auth`, `issuer_url=https://auth.efeonce.org`, `issuer_class=external`, command de
+TASK-1631) y validar la metadata; (3) flujo con persona real exige TASK-1830. Nunca
+`gcloud run services update --update-env-vars` a mano. Follow-ups: `private_key_jwt`, migración de los
+sister-platform consumers internos, command `oauth-gc` + scheduler para filas expiradas, decisión `TASK-659` al
+cierre. Runbook: [`docs/operations/runbooks/auth-server.md`](../operations/runbooks/auth-server.md) §`OAuth`.

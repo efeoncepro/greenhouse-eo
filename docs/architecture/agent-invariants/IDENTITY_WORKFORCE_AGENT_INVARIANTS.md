@@ -447,18 +447,20 @@ del dominio; el resto lo bundlea `services/auth-server`).
 (`captureWithDomain('identity')`) · `external_identity_audit_log` (qué se hizo) + `external_access_resolution_log`
 (qué se negó).
 
-## Auth server propio (TASK-1828)
+## Auth server propio (TASK-1828 / TASK-1829)
 
-> Dominio `services/auth-server/**` + `src/lib/auth-server/keys/**` + schema `greenhouse_auth` (EPIC-044,
-> ejecutado 2026-09-04). Contrato: `EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md` (§Decision + §Delta
-> 2026-09-04); runbook `docs/operations/runbooks/auth-server.md`; señales en
-> `src/lib/reliability/queries/auth-server-signals.ts`.
+> Dominio `services/auth-server/**` + `src/lib/auth-server/{keys,oauth}/**` + schema `greenhouse_auth` (EPIC-044,
+> ejecutado 2026-09-04). Contratos: `EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md` (§Decision + §Delta
+> 2026-09-04) y, para la superficie OAuth, `EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md` (TASK-1829); runbook
+> `docs/operations/runbooks/auth-server.md`; señales en `src/lib/reliability/queries/auth-server-signals.ts`.
 
 Es el emisor de tokens de Efeonce en `https://auth.efeonce.org`: Cloud Run `auth-server` (`us-east4`, un solo
 servicio para staging y production), segundo host del front door del gateway MCP, firma ES256 con la llave
-`auth-server-es256` en Cloud KMS HSM y publica el JWKS. Hoy sólo expone `/healthz`, `/readyz` y
-`/.well-known/jwks.json`; OAuth (`TASK-1829`) y personas (`TASK-1830`) llegan después. El login del portal no
-cambia.
+`auth-server-es256` en Cloud KMS HSM y publica el JWKS. Expone `/healthz`, `/readyz` y `/.well-known/jwks.json`
+(TASK-1828) y, detrás de `AUTH_SERVER_OAUTH_ENABLED` (default `false`; `TASK-1829` code complete en `develop`
+2026-09-04, rollout pendiente), la superficie OAuth: metadata RFC 8414/OIDC, CIMD primario + DCR compat, PKCE S256,
+access JWT ES256 de 15 min con claim `gv`, refresh rotativo, revocación, introspección y consentimiento persistido.
+Personas (`TASK-1830`) y gateway multi-issuer (`TASK-1831`) llegan después. El login del portal no cambia.
 
 **⚠️ Reglas duras**:
 
@@ -496,7 +498,41 @@ cambia.
   por el HSM verificado con `jose` `createRemoteJWKSet` contra `https://auth.efeonce.org/.well-known/jwks.json`
   y `pnpm auth-server:rotate-key --status` mostrando los mismos `kid` que publica el endpoint.
 
+**⚠️ Reglas duras OAuth (TASK-1829; detalle en `EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md` §10)**:
+
+- **NUNCA** publicar un `issuer` distinto del origen del well-known ni espejar un issuer ajeno.
+- **NUNCA** aceptar `code_challenge_method` distinto de `S256`; no existe camino para `plain`.
+- **NUNCA** redirigir con un `client_id` o `redirect_uri` no validados (antes de cualquier redirect); `localhost`
+  por nombre sólo como alias de loopback de clientes **públicos** (puerto libre, path exacto), nunca para
+  hospedados/confidenciales (HTTPS exacto); nunca wildcards.
+- **NUNCA** emitir un access token sin fila `active` en `client_consents` para **cada** scope ni sin membership
+  `bound` en `external_organization_bindings` (`gv = max(grantsVersion)` re-resuelto en cada emisión; sin `bound`
+  ⇒ `access_denied`, fail-closed); un scope de escritura exige además `authLevel = step_up`.
+- **NUNCA** consumir un code ni rotar un refresh fuera del `SELECT … FOR UPDATE` del store
+  (`src/lib/auth-server/oauth/store/**`): code de un solo uso, refresh rotado en cada uso; el reuso revoca la
+  familia completa (`grant_id`) y emite señal. **NUNCA** `DELETE`/`UPDATE` manual sobre codes, tokens o consents:
+  `revokeClientConsent` / `revoke` son el único camino.
+- **NUNCA** persistir ni loggear tokens, codes, `code_verifier`, secrets, IP, UA o `sub` en claro (sólo hashes);
+  `oauth_audit_events` es append-only (trigger) y el rate limit cuenta sobre ella, sin tabla extra.
+- **NUNCA** resolver un cliente CIMD sin el guard anti-SSRF (DNS resuelto, rangos privados rechazados, sin
+  redirects, 3 s, 64 KB) ni cachear un documento más de 24 h.
+- **NUNCA** registrar un cliente confidencial fuera de `registerConfidentialClient` (consumers: `POST
+  /api/admin/auth-server/oauth-clients` con `identity.auth_client.register` y `pnpm auth-server:register-client`);
+  DCR sólo registra públicos.
+- **NUNCA** hacer que el gateway dependa de `/oauth/introspect` para autorizar: JWT + JWKS + recheck de `gv`.
+- **NUNCA** prender `AUTH_SERVER_OAUTH_ENABLED` sin la fila `active` del emisor en
+  `greenhouse_core.external_identity_environments` (`efeonce-auth`, `https://auth.efeonce.org`, `external`) ni sin
+  validar la metadata; **NUNCA** emitir un code para una persona que este emisor no autenticó (hasta TASK-1830
+  `authorize` responde `login_required`).
+- **SIEMPRE** que se agregue un scope al gateway, agregarlo a `scopes.ts` (test de paridad con
+  `efeonce-mcp/src/config.ts`) y a la copia es-CL de `src/lib/copy/auth-server.ts`. **NUNCA** editar
+  `pages/efeonce-isotipo.generated.ts` a mano (`pnpm auth-server:brand-assets:generate`).
+
 **Helpers canónicos**: `src/lib/auth-server/keys/index.ts` (`signWithActiveKey`, `registerSigningKeyVersion`,
-`retireSigningKey`, adapter KMS) · CLI `pnpm auth-server:rotate-key` · señales `auth.issuer.jwks_unreachable`
-(`runtime`) y `auth.signing_keys.lifecycle` (`data_quality`) · Sentry `captureWithDomain('identity')` con tag
-`component=auth-server` (`check=kms` reemplaza al contador `auth.kms.sign_failures`).
+`retireSigningKey`, adapter KMS) · `src/lib/auth-server/oauth/**` (`registerConfidentialClient`,
+`grantClientConsent`, `revokeClientConsent`, store atómico, `cimd.ts`, `scopes.ts`) · CLIs
+`pnpm auth-server:rotate-key`, `pnpm auth-server:register-client`, `pnpm auth-server:oauth-store:smoke` · señales
+`auth.issuer.jwks_unreachable` (`runtime`), `auth.signing_keys.lifecycle` (`data_quality`) y
+`auth.oauth.{code_reuse_detected,refresh_reuse_detected,cimd_rejected}` (`incident`, 24 h, steady 0) · Sentry
+`captureWithDomain('identity')` con tag `component=auth-server` (`check=kms` reemplaza al contador
+`auth.kms.sign_failures`).

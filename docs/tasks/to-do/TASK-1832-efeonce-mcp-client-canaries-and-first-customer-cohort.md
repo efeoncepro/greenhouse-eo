@@ -1,5 +1,31 @@
 # TASK-1832 — Efeonce MCP Client Canaries and First Customer Cohort Rollout
 
+## Delta 2026-09-04 (TASK-1829)
+
+- `TASK-1829` quedó `code complete, rollout pendiente` en `develop` (commits `263ee3a74`, `19d1658de`,
+  `d31e6e913`): metadata RFC 8414/OIDC (`issuer` idéntico al origen, `client_id_metadata_document_supported:
+  true`, S256 único), CIMD como registro primario, DCR (`POST /oauth/register`) como compatibilidad para
+  públicos, clientes confidenciales por command, `authorize`/`token`/`revoke`/`introspect` y consentimiento
+  persistido, todo detrás de `AUTH_SERVER_OAUTH_ENABLED=false`; contrato en
+  `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md` — cerrado por trabajo en `TASK-1829`.
+- **Mecanismos de registro disponibles para los canaries:** CIMD (`client_id` = URL https del documento,
+  validado con guard anti-SSRF y cacheado 24 h), DCR (`dcr-…`, sólo `token_endpoint_auth_method: none`, 10/min
+  por IP) y cliente confidencial pre-registrado vía `pnpm auth-server:register-client` o
+  `POST /api/admin/auth-server/oauth-clients` (capability `identity.auth_client.register`; secreto una sola vez).
+  La fila «cliente no soporta CIMD ni DCR» de la matriz de riesgos ya tiene camino.
+- **Política de redirect decidida por el operador (2026-09-04):** públicos = loopback `127.0.0.1`/`[::1]`/alias
+  `localhost` en cualquier puerto (Claude Code lo necesita) o HTTPS exacto; confidenciales/hospedados = HTTPS
+  exacto y `localhost` por nombre rechazado. La matriz de tokens debe registrar la forma de redirect por cliente
+  contra esa política.
+- Revocación operativa que los canaries de allow/deny/expiración/revocación deben ejercitar: `POST /oauth/revoke`
+  (familia completa) y `POST /api/admin/auth-server/consents/revoke` (capability
+  `identity.auth_consent.revoke`; mata todas las familias de `(subject, client)`). Señales a observar en
+  `/admin/operations`: `auth.oauth.code_reuse_detected`, `auth.oauth.refresh_reuse_detected`,
+  `auth.oauth.cimd_rejected` (steady 0).
+- **Qué sigue faltando para correr un canary:** flag ON en staging (environment `efeonce-auth` `active` +
+  metadata validada), `TASK-1830` (`authorize` responde `login_required` hasta entonces: ningún code para una
+  persona), `TASK-1831` (gateway multi-issuer) y la task ui-ux. `Blocked by` se precisa en consecuencia.
+
 ## Delta 2026-09-04
 
 - `TASK-1828` dejó el runtime del emisor vivo en staging: `https://auth.efeonce.org/readyz` 200 y
@@ -29,10 +55,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Especificación; matriz de tokens S0.1 de TASK-1631 pendiente desde agosto por requerir sesión interactiva; desde 2026-09-04 el emisor auth.efeonce.org está vivo en staging (readyz + JWKS) pero sin OAuth ni personas, así que ningún canary puede correr aún`
+- Status real: `Especificación; matriz de tokens S0.1 de TASK-1631 pendiente desde agosto por requerir sesión interactiva; desde 2026-09-04 el emisor auth.efeonce.org está vivo en staging (readyz + JWKS) y TASK-1829 dejó la superficie OAuth (CIMD/DCR/confidencial, tokens, revocación, consentimiento) code complete en develop detrás de AUTH_SERVER_OAUTH_ENABLED=false; sin flag ON ni personas (TASK-1830) ningún canary puede correr aún`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
-- Blocked by: `TASK-1829, TASK-1830, TASK-1631, TASK-1831 y la task ui-ux de login/consentimiento`
+- Blocked by: `TASK-1829 (code complete en develop 2026-09-04; espera AUTH_SERVER_OAUTH_ENABLED=true en staging con el environment efeonce-auth registrado), TASK-1830, TASK-1631 (producción), TASK-1831 y la task ui-ux de login/consentimiento`
 - Branch: `Greenhouse develop; efeonce-mcp main; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

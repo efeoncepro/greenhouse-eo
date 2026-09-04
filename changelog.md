@@ -7,6 +7,23 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-04 — TASK-1829 (EPIC-044 U02): superficie OAuth del emisor propio, code complete detrás de flag
+
+`auth.efeonce.org` gana su protocolo, detrás de `AUTH_SERVER_OAUTH_ENABLED=false` (`services/auth-server/deploy.sh`):
+metadata RFC 8414 + OIDC con `issuer` idéntico al origen y `client_id_metadata_document_supported`, CIMD como
+registro primario (URL `client_id`, anti-SSRF, cache 24 h + etag), DCR RFC 7591 sólo para clientes públicos,
+clientes confidenciales pre-registrados por command (`pnpm auth-server:register-client` · `POST /api/admin/auth-server/oauth-clients`),
+`authorize` con PKCE S256 obligatorio, consentimiento por (sujeto, cliente, scope) y step-up para escrituras,
+access JWT ES256 de 15 min firmado en KMS HSM (`iss sub aud azp scope gv jti`), refresh opaco rotativo 30/90 d
+con detección de reuso que revoca la familia, revoke RFC 7009, introspect RFC 7662 y `POST /oauth/consent`.
+Siete tablas nuevas en `greenhouse_auth` (aplicadas) y dos capabilities (`identity.auth_client.register`,
+`identity.auth_consent.revoke`, EFEONCE_ADMIN). Las primitives puras del broker sister-platform se extrajeron a
+`src/lib/auth-server/oauth/primitives.ts` sin cambiar su contrato. Tres señales `auth.oauth.*` (steady 0).
+`gv = max(grantsVersion)` de memberships `bound` (TASK-1631); sin binding, `access_denied`. Hasta TASK-1830
+`authorize` responde `login_required`: ningún token para persona real todavía. Contrato:
+[EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1](docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md). Rollout
+pendiente: release del runtime a `main`, fila del emisor en `external_identity_environments`, flag ON en staging.
+
 ## 2026-09-04 — Método de informes SEO/AEO y continuidad de Berel
 
 Se incorpora el [modelo de informes para clientes](docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md)
@@ -930,21 +947,3 @@ medición donde alguien esté obligado a mirar.
 
 De paso: la arquitectura afirmaba en cuatro lugares que un scheduler estaba activo cuando estaba
 pausado, y el runbook de AXIS documentaba el `.npmrc` con una línea de menos.
-
-## 2026-08-29 — La lente `●`/`◑` llega a producción con mecanismo, no con prosa
-
-Release `b7f74c95a2af` (`released`, watchdog `drift_count=0`). **TASK-1785**: los readers de
-`growth/seo` emiten `provenance` **requerido** —así que `tsc` nombra a cualquiera que no lo declare—,
-un guard camina el DTO real exigiendo que cada hoja numérica tenga exactamente un dueño, y un censo
-compara las superficies contra el filesystem en ambas direcciones. Tool
-`get_seo_dual_lens_visibility` federada al gateway: devuelve las dos series separadas y **sin campo
-combinado por contrato**.
-
-Viajaron también **TASK-1700** (cola priorizada, 3 migraciones ya aplicadas en la única instancia
-Cloud SQL) y **TASK-1792** (curva de CTR con sus 4 estados). `GROWTH_SEO_WORK_QUEUE_ENABLED` prendido
-en los dos runtimes por el SoT; el scheduler del materializador sigue PAUSADO a propósito.
-
-Dos hallazgos que no eran el objetivo y valen por separado: el PAT `read:packages` de AXIS llevaba
-14 h vencido tumbando 3 de los 4 workers **sin que nada avisara**, y el audit de flags tenía un punto
-ciego que **anulaba su propio gate ISSUE-150** (39 de 43 «env vars muertas» eran falsos positivos).
-Los dos quedaron documentados y el segundo, arreglado.

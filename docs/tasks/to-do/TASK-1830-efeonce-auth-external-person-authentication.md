@@ -1,5 +1,25 @@
 # TASK-1830 — Efeonce Auth External Person Authentication (passkeys, magic link, TOTP, recovery)
 
+## Delta 2026-09-04 (TASK-1829)
+
+- `TASK-1829` quedó `code complete, rollout pendiente` en `develop` (commits `263ee3a74`, `19d1658de`,
+  `d31e6e913`): la superficie OAuth del emisor (metadata RFC 8414/OIDC, CIMD, DCR, `authorize` con PKCE S256,
+  `token` ES256 15 min + refresh rotativo, `revoke`, `introspect`, consentimiento persistido) existe detrás de
+  `AUTH_SERVER_OAUTH_ENABLED=false`; contrato en
+  `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md` — cerrado por trabajo en `TASK-1829`.
+- **Contrato que esta task debe implementar:** `SubjectSessionPort` en `src/lib/auth-server/oauth/subject.ts`
+  (`resolve(request) → { subject, environmentId, authLevel: 'primary' | 'step_up', authTime } | null`). Hoy el
+  runtime inyecta `unauthenticatedSubjectPort`, así que `authorize` responde `login_required` (página 401;
+  `prompt=none` ⇒ redirect con `error=login_required`) y **no se emite ningún code** hasta que esta task provea la
+  sesión (`greenhouse_auth.sessions`, cookie `__Host-efeonce_auth`). Los scopes de escritura exigen
+  `authLevel = 'step_up'` (TOTP, Slice 3); sin él, `interaction_required`.
+- **Write-target allowlist:** `src/lib/auth-server/boundary-domain.test.ts` ya existe (creado por
+  `TASK-1829`); esta task agrega sus cinco tablas ahí, no crea otro guard.
+- La pantalla de consentimiento actual es una página mínima server-side (isotipo del SSOT, copy en
+  `src/lib/copy/auth-server.ts`, form `POST /oauth/consent` con `client_id`/`scope`/`return_to`/`decision`);
+  la task `ui-ux` la reemplaza sin cambiar el contrato, y el login de esta task convive con ese mismo patrón.
+- `Blocked by` no cambia (`TASK-1631`); `TASK-1829` nunca fue bloqueante de esta task, es consumidora de su sesión.
+
 ## Delta 2026-09-04
 
 - `TASK-1828` entregó el runtime y el schema sobre los que viven las primitives de esta task: Cloud Run

@@ -161,6 +161,7 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   (TASK-1631, 2026-09-04): environments registry → bindings de organizaciones `active_client` (`grants_version`) →
   grants por capability → invitaciones (`linked` = membership). El gateway resuelve por `(environment, subject)` en
   `GET /api/platform/ecosystem/identity/binding`, nunca por `client_id` ni email.
+  OAuth del emisor code complete (TASK-1829, flag OFF): contrato `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`.
 - La operación o evolución MCP se enruta por las skills espejo `.codex/skills/efeonce-mcp-platform/` y
   `.claude/skills/efeonce-mcp-platform/`; estas componen la skill dueña de cada provider y no duplican su policy.
   Las skills de arquitectura `software-architect-2026` y `arch-architect` deben cargar ese router antes de

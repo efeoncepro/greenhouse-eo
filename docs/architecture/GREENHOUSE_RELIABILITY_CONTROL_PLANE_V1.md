@@ -2,10 +2,34 @@
 
 > Spec canónica del `Reliability Control Plane` de Greenhouse EO. Define el registry por módulo, el modelo unificado de señales, el contrato de evidencia y cómo `Admin Center`, `Ops Health` y `Cloud & Integrations` consumen la lectura consolidada sin duplicar fuentes.
 >
-> Versión: `1.20`
+> Versión: `1.21`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-09-04` por TASK-1828 (2 signals del emisor propio de Efeonce bajo el módulo `identity`: `auth.issuer.jwks_unreachable`, `auth.signing_keys.lifecycle`; antes ese mismo día TASK-1631 agregó las 4 de `identity.external_binding.*`)
+> Última actualización: `2026-09-04` por TASK-1829 (3 signals `incident` de la superficie OAuth del emisor propio bajo el módulo `identity`: `auth.oauth.code_reuse_detected`, `auth.oauth.refresh_reuse_detected`, `auth.oauth.cimd_rejected`; antes ese mismo día TASK-1828 agregó `auth.issuer.jwks_unreachable` + `auth.signing_keys.lifecycle` y TASK-1631 las 4 de `identity.external_binding.*`)
+
+## Delta 2026-09-04 — TASK-1829: 3 signals de la superficie OAuth del emisor propio (`auth.oauth.*`)
+
+Tres señales nuevas en el **mismo reader** de TASK-1828
+([`auth-server-signals.ts`](../../src/lib/reliability/queries/auth-server-signals.ts), `getAuthServerSignals()`),
+bajo `moduleKey='identity'`, `kind='incident'`, ventana **24 h** sobre `greenhouse_auth.oauth_audit_events`
+(append-only; cada evento del protocolo OAuth escribe ahí con IP/UA/sujeto hasheados), **steady = 0** en las tres.
+Observan la superficie OAuth de `auth.efeonce.org` (TASK-1829, `code complete, rollout pendiente`; flag
+`AUTH_SERVER_OAUTH_ENABLED=false` en `services/auth-server/deploy.sh`): con el flag OFF no hay eventos y las tres
+quedan en steady, lo cual **no** es evidencia de salud sino de que el emisor no emite.
+
+| `signalId` | `kind` | Qué mide | Severidad | Steady |
+| --- | --- | --- | --- | --- |
+| `auth.oauth.code_reuse_detected` | `incident` | Eventos `code_reuse`: un authorization code presentado dos veces (el store lo consume una sola vez bajo `SELECT … FOR UPDATE`; el segundo intento revoca la familia `grant_id` completa) | ≥ 1 en 24 h → `error` | **0** |
+| `auth.oauth.refresh_reuse_detected` | `incident` | Eventos `refresh_reuse`: refresh ya rotado, revocado o presentado por otro cliente (RFC 6819 §5.2.2.3); la familia ya quedó revocada, la señal pide investigar el cliente | ≥ 1 en 24 h → `error` | **0** |
+| `auth.oauth.cimd_rejected` | `incident` | Eventos `cimd_fetch` con outcome `rejected`: documento CIMD inválido, host en rango privado (anti-SSRF), timeout 3 s o > 64 KB; el rechazo se cachea 15 min | ≥ 1 en 24 h → `warning` | **0** |
+
+Sin contadores extra ni tabla propia: el rate limit del emisor (`token` 60/IP · 120/cliente, `register` 10/IP)
+también cuenta sobre `oauth_audit_events` (patrón `party-endpoint-rate-limit.ts`) y sus `429 slow_down` quedan
+como eventos `rate_limited`, sin señal dedicada en V1. Recuperación: revocar consentimiento/familia por command
+(`revokeClientConsent`, `POST /api/admin/auth-server/consents/revoke`) o apagar el flag (rollback < 5 min);
+**nunca** `DELETE`/`UPDATE` manual sobre codes, tokens o consents. Contrato:
+[`EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`](EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md) §8; runbook
+`docs/operations/runbooks/auth-server.md` §`OAuth`. Task dueña: `TASK-1829`.
 
 ## Delta 2026-09-04 — TASK-1828: 2 signals del emisor propio de Efeonce (`auth.issuer.jwks_unreachable`, `auth.signing_keys.lifecycle`)
 

@@ -1,5 +1,26 @@
 # TASK-1831 — Efeonce MCP Gateway Multi-Issuer Authorization Context
 
+## Delta 2026-09-04 (TASK-1829)
+
+- `TASK-1829` quedó `code complete, rollout pendiente` en `develop` (commits `263ee3a74`, `19d1658de`,
+  `d31e6e913`): el emisor ya **emite en código** el access token que esta task consume — JWT ES256 de 15 min
+  firmado en KMS HSM con `iss` (`https://auth.efeonce.org`), `sub`, `aud` (`https://mcp.efeonce.org/mcp`),
+  `azp`, `client_id`, `scope`, `gv`, `exp`, `iat`, `jti`, `auth_time`; contrato en
+  `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md` §4 — cerrado por trabajo en `TASK-1829`.
+- `gv` = `max(grantsVersion)` de las memberships `bound` del sujeto en `external_organization_bindings`
+  (`resolveExternalAccess`), re-resuelto en cada emisión (code y refresh); sin binding ⇒ `access_denied`. El
+  gateway compara por **igualdad estricta** con el reader de `TASK-1631`; cualquier revoke bumpea la versión.
+- **Decisión que fija el diseño:** el gateway verifica JWT + JWKS y re-chequea `gv` contra el reader de
+  bindings; `POST /oauth/introspect` existe (RFC 7662, sólo clientes confidenciales) pero **no es el camino del
+  gateway** (invariante del contrato §10).
+- **Desbloqueo por el lado del token:** en cuanto `AUTH_SERVER_OAUTH_ENABLED` esté ON en staging (exige el
+  environment `efeonce-auth` `active` en `external_identity_environments` vía el command de `TASK-1631` +
+  validación de metadata + clientes CIMD/DCR de prueba), el Slice 3 puede apuntar `jwksUri`/`issuer` reales y
+  verificar tokens emitidos por DCR/CIMD; el flujo con persona real espera `TASK-1830` (`authorize` responde
+  `login_required` hasta entonces).
+- `Blocked by` se actualiza: `TASK-1829` deja de ser "sin token" y pasa a "flag ON en staging"; `TASK-1631`
+  sigue esperando producción.
+
 ## Delta 2026-09-04
 
 - El issuer `https://auth.efeonce.org` ya publica un JWKS real en staging (`/.well-known/jwks.json`, llave
@@ -33,10 +54,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Especificación; contrato AuthContext diseñado en TASK-1631 Slice 0 (2026-08-05), sin código; desde 2026-09-04 el issuer auth.efeonce.org publica JWKS real en staging (2 kid) y el reader de binding de TASK-1631 está verificado en staging; falta el token con claims de TASK-1829`
+- Status real: `Especificación; contrato AuthContext diseñado en TASK-1631 Slice 0 (2026-08-05), sin código; desde 2026-09-04 el issuer auth.efeonce.org publica JWKS real en staging (2 kid), el reader de binding de TASK-1631 está verificado en staging y TASK-1829 emite en código (develop) el JWT ES256 con sub/azp/scope/gv detrás de AUTH_SERVER_OAUTH_ENABLED=false; falta prender ese flag en staging`
 - Rank: `TBD`
 - Domain: `platform|identity|integration`
-- Blocked by: `TASK-1829 (access token ES256 con claims sub/azp/scope/gv; el JWKS ya existe); TASK-1631 (reader de bindings y grants_version en producción)`
+- Blocked by: `TASK-1829 (code complete en develop 2026-09-04: el access token ES256 con sub/azp/scope/gv ya existe en código; espera AUTH_SERVER_OAUTH_ENABLED=true en staging con el environment efeonce-auth registrado); TASK-1631 (reader de bindings y grants_version en producción)`
 - Branch: `efeonce-mcp main; Greenhouse develop para el lane de bindings; checkout compartido de cada repo; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

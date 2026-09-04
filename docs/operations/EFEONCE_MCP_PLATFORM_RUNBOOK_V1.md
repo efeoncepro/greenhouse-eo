@@ -587,6 +587,15 @@ segundo host; el gateway y su ruta default no cambian. El Cloud Run `auth-server
 `docs/operations/runbooks/auth-server.md` (deploy, flag, llaves KMS, señales). Acá sólo vive la parte del
 front door.
 
+Desde TASK-1829 (2026-09-04, `code complete, rollout pendiente`) ese mismo host trae la **superficie OAuth**
+(metadata RFC 8414/OIDC, `/oauth/register|authorize|consent|token|revoke|introspect`; CIMD primario, DCR compat,
+PKCE S256, JWT ES256 con claim `gv`) detrás de su propio flag `AUTH_SERVER_OAUTH_ENABLED` (default `false`, SoT
+`services/auth-server/deploy.sh`): con el flag OFF todo eso responde 404 y el gateway no nota diferencia. Su
+operación (prender en staging, precondición del environment `efeonce-auth`, registro de clientes confidenciales,
+revocación de consentimientos, señales `auth.oauth.*`, rollback) vive en `docs/operations/runbooks/auth-server.md`
+§`OAuth`; contrato en `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`. El gateway sólo verificará
+tokens de este issuer con TASK-1831.
+
 Variables en `efeonce-mcp/infra/terraform` (`variables.tf`):
 
 | Variable | Default | Qué controla |

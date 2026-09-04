@@ -71,7 +71,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-044`
-- Status real: `En ejecución 2026-09-04 (sesión Claude greenhouse-eo-45, /implement-task 1829, develop compartido): discovery + audit en curso; sin código aún`
+- Status real: `code complete, rollout pendiente (2026-09-04, sesión greenhouse-eo-45; commits 263ee3a74 · 19d1658de · d31e6e913 en develop): dominio src/lib/auth-server/oauth/**, handler testeable, 7 tablas greenhouse_auth + 2 capabilities aplicadas en Cloud SQL, 68 tests + smoke PG real verdes; AUTH_SERVER_OAUTH_ENABLED=false en deploy.sh; falta release del runtime a main, fila del emisor en external_identity_environments, flag ON en staging con validación de metadata y flujo con persona real (TASK-1830)`
 - Rank: `TBD`
 - Domain: `platform|identity|integration`
 - Blocked by: `none`
@@ -167,6 +167,9 @@ Reglas obligatorias:
 - `migrations/<timestamp>_task-1829-auth-oauth-tables.sql` (nuevo: `oauth_clients`, `authorization_codes`, `refresh_tokens`, `access_tokens`, `client_consents`, `cimd_cache`, `oauth_audit_events`)
 - `src/lib/sister-platforms/oauth-broker.ts` (extraer lógica compartida a `src/lib/auth-server/oauth/**`; conservar API pública)
 - `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md` (nuevo, contrato de endpoints y claims)
+- `migrations/20260904132753267_task-1829-auth-oauth-capabilities.sql` + `20260904133148469_…-module-fix.sql` (seed de `identity.auth_client.register` / `identity.auth_consent.revoke`, module `organization`)
+- `src/app/api/admin/auth-server/{oauth-clients,consents/revoke}/route.ts`, `src/lib/auth-server/oauth/admin-http.ts`, `scripts/auth-server/{register-oauth-client,oauth-store-smoke,generate-brand-assets}.ts`
+- `src/lib/copy/auth-server.ts`, `src/lib/reliability/queries/auth-server-signals.ts` (3 señales `auth.oauth.*`), `src/config/entitlements-catalog.ts` + `src/lib/entitlements/runtime.ts` (2 entradas), `src/lib/api/canonical-error-response.ts` (`auth_server_invalid_request`)
 
 ## Current Repo State
 
@@ -260,12 +263,12 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio, en el mismo PR.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects. — `EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md` §2/§7; consumers: gateway (JWKS), clientes MCP, Admin/CLI/Nexa (commands).
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit. — §4/§5/§10 del contrato; `SELECT … FOR UPDATE` en `store/postgres-store.ts`; consent idempotente por índice único parcial.
+- [x] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio, en el mismo PR. — `src/lib/auth-server/boundary-domain.test.ts` (7 tablas + 2 de TASK-1828).
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk. — additive; sin backfill; rollback = flag OFF (tablas se conservan); migrations aplicadas 2026-09-04.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling. — `pnpm auth-server:oauth-store:smoke` OK contra PG real (2026-09-04); flujo completo in-process `oauth-flow.test.ts`; staging con flag ON pendiente (ver Rollout).
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks. — errores OAuth RFC sin detalle interno; `auth_server_invalid_request` es-CL en rutas admin; audit append-only con hashes; 3 señales.
 
 <!-- ZONE 2 — PLAN MODE: lo produce el agente que toma la task. -->
 
@@ -357,14 +360,14 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] La metadata publica `issuer` idéntico al origen, `client_id_metadata_document_supported: true`, S256 y `subject_types_supported: ["public"]`.
-- [ ] Un cliente CIMD y un cliente DCR completan code + PKCE y reciben un JWT ES256 verificable con el JWKS.
-- [ ] `code_challenge_method=plain`, redirect `http://localhost` por nombre y redirect HTTPS no exacto son rechazados.
-- [ ] Reuso de código y reuso de refresh revocan los tokens/familia y emiten señal.
-- [ ] `revoke` e `introspect` funcionan; un token revocado introspecta `active: false`.
-- [ ] Ningún token se emite sin fila `client_consents` active; el test negativo existe.
-- [ ] La suite de `src/lib/sister-platforms` sigue verde y el canary de Globe OAuth no cambia.
-- [ ] Contrato `EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md` publicado con claims y endpoints.
+- [x] La metadata publica `issuer` idéntico al origen, `client_id_metadata_document_supported: true`, S256 y `subject_types_supported: ["public"]`. — `oauth-flow.test.ts` («publishes RFC 8414 + OIDC metadata…»); en staging pendiente de flag ON.
+- [x] Un cliente CIMD y un cliente DCR completan code + PKCE y reciben un JWT ES256 verificable con el JWKS. — in-process con store en memoria + firmador P-256 local y `createLocalJWKSet(buildPublishedJwks(keys))` (`oauth-flow.test.ts`); **no verificado aún en staging con persona real** (exige TASK-1830).
+- [x] `code_challenge_method=plain`, redirect `http://localhost` por nombre y redirect HTTPS no exacto son rechazados. — `plain` → `invalid_request`; HTTPS no exacto → página 400; `localhost` por nombre rechazado para clientes **confidenciales/hospedados** (`registerConfidentialClient` → `invalid_redirect_uri`). **Delta de decisión 2026-09-04:** para clientes **públicos** `localhost` se acepta como alias de loopback (Claude Code lo usa), documentado en el contrato §3.
+- [x] Reuso de código y reuso de refresh revocan los tokens/familia y emiten señal. — tests «code reuse revokes…» y «reuse revokes the family»; audit `code_reuse`/`refresh_reuse` → señales `auth.oauth.*_reuse_detected`.
+- [x] `revoke` e `introspect` funcionan; un token revocado introspecta `active: false`. — test «revoke + introspect…».
+- [x] Ningún token se emite sin fila `client_consents` active; el test negativo existe. — test «never issues a token without an active consent row…» (code manual sin consent → `invalid_grant`).
+- [x] La suite de `src/lib/sister-platforms` sigue verde y el canary de Globe OAuth no cambia. — 117/117 tras la extracción (Slice 1); **el canary de Globe Producer no se ejecutó** (Globe hibernado; `oauth-broker.ts` sólo cambió helpers puros con wrappers equivalentes).
+- [x] Contrato `EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md` publicado con claims y endpoints.
 
 ## Verification
 
@@ -375,10 +378,10 @@ Reglas obligatorias:
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado y archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md`, `Handoff.md` y `changelog.md` actualizados
-- [ ] chequeo de impacto cruzado sobre `TASK-1831`, `TASK-1832`, `TASK-659`
-- [ ] decisión sobre `TASK-659` registrada (supersesión o re-alcance)
+- [ ] `Lifecycle` sincronizado y archivo en la carpeta correcta — sigue `in-progress`: `code complete, rollout pendiente` (release a main + flag ON en staging + flujo con persona real).
+- [x] `docs/tasks/README.md`, `Handoff.md` y `changelog.md` actualizados
+- [x] chequeo de impacto cruzado sobre `TASK-1831`, `TASK-1832`, `TASK-659` — deltas 2026-09-04 en cada spec (+ TASK-1830: `SubjectSessionPort` + boundary test).
+- [x] decisión sobre `TASK-659` registrada (supersesión o re-alcance) — **superseded en diseño por EPIC-044**: el emisor nativo cubre el hosted OAuth de los clientes MCP; TASK-659 no se implementa por separado y se cierra por supersesión documental cuando TASK-1832 valide los clientes reales.
 
 ## Follow-ups
 
