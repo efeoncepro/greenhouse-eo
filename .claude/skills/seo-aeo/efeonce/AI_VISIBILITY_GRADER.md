@@ -79,6 +79,17 @@ explicar la visibilidad, pide/implementa el fact backend; el hub sólo pinta y
 degrada snapshots antiguos honestamente. No tocar scoring/pesos/probes/normalizer
 para ajustes de presentación del informe.
 
+## Uso de un run en auditorías de clientes
+
+Antes de convertir el score en diagnóstico, aplica
+`../modules/09_CLIENT_AUDIT_REPORTING.md`: inspecciona el run y las preguntas
+realmente ejecutadas, su categoría comercial, competidores, motores, fechas y
+respuestas. Un score reproducible puede proceder de un panel inadecuado; un
+HTTP 200 con HTML de fallback no acredita MCP ni API. Separa observaciones
+rescatables, limitaciones y correcciones de nuestra medición sin modificar el
+score histórico ni adjudicar al cliente carencias que la evidencia no demuestra.
+Canon: `docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md`.
+
 ## Tesis del producto (por qué importa para la skill)
 HubSpot mide *percepción de marca* en answer engines. Efeonce convierte los
 **gaps de visibilidad en IA en un plan operativo** (contenido, CRM, PR, SEO/AEO,

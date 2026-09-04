@@ -50,6 +50,9 @@ description: >-
    contrástala con `ANTIPATTERNS.md`. Greenhouse/Efeonce no hace black-hat.
 6. **Cierra con medición.** Ninguna recomendación está completa sin decir *cómo
    se mide el resultado* (`modules/07_MEASUREMENT.md`).
+7. **Si entregas una auditoría al cliente**, carga `modules/09_CLIENT_AUDIT_REPORTING.md`
+   antes de redactar: continuidad histórica, responsabilidad de la agencia, validez
+   de las fuentes y lectura de vuelta del entregable forman parte del cierre.
 
 ---
 
@@ -129,6 +132,8 @@ decláralo. Ramifica la recomendación según las respuestas.
 | **Priorizar sólo con datos propios de GSC**: striking distance 8–20, curva de CTR del propio sitio, canibalización como consolidación; y **frescura real de GSC** (no hay D-1) + posición ponderada por impresiones | `modules/02_SEO_CONTENT.md` + `modules/07_MEASUREMENT.md` (**medido** as-of 2026-08-05) |
 | **Los dos carriles** (empujar página existente con GSC vs. cubrir demanda nueva con volumen de terceros — no se sustituyen) + **trampas de lectura de GSC**: piso mínimo de impresiones, doble conteo por sitelinks, curva de CTR propia deprimida, largo de la serie | `modules/02_SEO_CONTENT.md` + `modules/07_MEASUREMENT.md` (**medido** as-of 2026-08) |
 | Auditoría completa, migración, recuperación de penalización/caída, lanzamiento | `modules/08_PLAYBOOKS.md` |
+| Informe de auditoría para cliente, cierre mensual, continuidad de hallazgos, voz de agencia y publicación Notion + Markdown | `modules/09_CLIENT_AUDIT_REPORTING.md` + `docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md` |
+| Incorporar un run del Grader a un informe: pertinencia de preguntas ejecutadas, menciones espontáneas/sugeridas, score y falsos positivos de probes | `modules/09_CLIENT_AUDIT_REPORTING.md` + `efeonce/AI_VISIBILITY_GRADER.md` |
 | Qué **NO** hacer (black-hat, spam IA, riesgos) | `ANTIPATTERNS.md` |
 | Vocabulario (AEO vs GEO vs LLMO vs SGE vs AI Mode, etc.) | `GLOSSARY.md` |
 | Fuentes canónicas + qué reverificar y cada cuánto | `SOURCES.md` |
@@ -284,7 +289,11 @@ una estimación como medición.
   técnicos en inglés cuando son el estándar (crawl budget, answer capsule,
   fan-out). Cambia a en-US si la tarea está en inglés.
 - **Entregables siempre accionables:** diagnóstico → 3–5 movimientos RICE →
-  cómo medir. Evita la lista de 40 ítems sin priorizar.
+  cómo medir. Conserva el inventario completo de hallazgos en el anexo; priorizar
+  la síntesis no autoriza a omitir pendientes históricos.
+- **Informe al cliente:** escribe desde el rol real de la agencia. Si redactamos
+  y publicamos, asumimos esos actos y sus correcciones; no narramos nuestra
+  producción como observadores externos. Aplica `modules/09_CLIENT_AUDIT_REPORTING.md`.
 - **Cita tus fuentes** cuando afirmes datos de mercado (la skill se sostiene en
   evidencia, no en opinión). Marca el `as-of`.
 

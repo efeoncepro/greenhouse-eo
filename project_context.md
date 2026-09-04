@@ -120,8 +120,8 @@ antes de persistir provenance, separar idempotencia y medir shadow contra GSC. C
 entregado en `TASK-1805`/`TASK-1806`: desde 2026-09-03 producción sirve `improved_layout_clickstream_v2`
 (rebaseline); legacy sólo como rollback pre-corte.
 
-Berel: [plan](docs/operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md). Contacto:
-`docs/context/01_quienes-somos.md` y `docs/public-site/CONTACT_PAGE_REBUILD_BRIEF_V1.md`.
+Berel: [plan editorial](docs/operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md) ·
+[informes SEO/AEO](docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md).
 
 WordPress/Ohio: skill `efeonce-public-site-wordpress`; contratos [Home](docs/architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md),
 [HubSpot](docs/architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md) y [misceláneas](docs/architecture/public-site/PUBLIC_MISCELLANEOUS_SURFACES_V1.md).

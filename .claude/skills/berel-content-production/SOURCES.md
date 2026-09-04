@@ -30,6 +30,16 @@ Blog, Facebook, Instagram y Pinterest; no se crean redes adicionales. El operado
 2026 (tres videos por mes). No inferir cumplimiento desde tareas ni reescribir todos los artículos
 para alcanzar longitud dentro de este cambio de distribución.
 
+## Informes de auditoría al cliente — 2026-09-04
+
+Petición explícita del operador tras la auditoría de agosto: incorporar la continuidad con auditorías
+anteriores y Content Hub, la responsabilidad de Efeonce como redactor y publicador, la revisión
+integral de voz y los límites del run de AEO Grader. El módulo 17 aplica estas reglas junto al
+canon compartido de reporting. Es una actualización del proceso autorizada en esta conversación,
+no una nueva sincronización integral de la Wiki ni una declaración de estado actual del sitio.
+El informe de agosto enlazado en el módulo es un caso fechado; sus cifras no se reutilizan como
+baseline sin comprobar periodo y comparabilidad.
+
 ## Fuentes principales
 
 Numeración editorial: corrección autorizada 2026-09-03 en módulo 16 y

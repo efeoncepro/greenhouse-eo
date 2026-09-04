@@ -2,6 +2,14 @@
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+**SEO/AEO y Berel, 2026-09-04:** método de informes documentado en
+[modelo operativo](docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md) y skills espejo.
+[Auditoría agosto](docs/audits/seo/BEREL_AUDITORIA_SEO_AEO_AGOSTO_2026.md) guardada y verificada en
+[Notion](https://app.notion.com/3d139c2fefe781ba8928eef8dadfb219) y Markdown. El run EO-GRUN-00049
+no es línea base comercial válida: categoría amplia y probes MCP/API falsos positivos. Corregir instrumento
+y repetir medición sigue pendiente; este cambio solo documenta el método y el caso.
+
+
 **Globe, 2026-09-03:** caller externo pausado; protección deploy sólo local, sin commit/push/deploy.
 Platform debe promoverla y medir ahorro. Reactivación/evidencia:
 [runbook TASK-1807](docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md).

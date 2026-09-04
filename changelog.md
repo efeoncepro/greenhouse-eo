@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-04 — Método de informes SEO/AEO y continuidad de Berel
+
+Se incorpora el [modelo de informes para clientes](docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md)
+a las skills SEO/AEO y Berel, espejadas para Claude/Codex: lectura de auditorías y Content Hub, voz de agencia
+que redacta/publica, límites GSC/GA4/DataForSEO, validez de preguntas y probes del Grader y readback Notion/Markdown.
+Se conserva la [auditoría de agosto](docs/audits/seo/BEREL_AUDITORIA_SEO_AEO_AGOSTO_2026.md) como caso fechado.
+El método no implementa las correcciones del Grader ni del sitio; esas acciones siguen pendientes.
+
 ## 2026-09-04 — TASK-1631 (EPIC-044 U04): binding de identidad externa aplicado, commands, API y señales
 
 Migración aditiva aplicada en `greenhouse_core` (environments registry, bindings Account 360, grants provider-neutral con
@@ -939,24 +947,3 @@ Dos hallazgos que no eran el objetivo y valen por separado: el PAT `read:package
 14 h vencido tumbando 3 de los 4 workers **sin que nada avisara**, y el audit de flags tenía un punto
 ciego que **anulaba su propio gate ISSUE-150** (39 de 43 «env vars muertas» eran falsos positivos).
 Los dos quedaron documentados y el segundo, arreglado.
-
-## 2026-08-29 — El contrato `●`/`◑` deja de depender de que alguien lea la descripción
-
-`TASK-1785`. Los readers de `growth/seo` emiten `provenance: SeoProvenance[]` en su `ok: true`:
-**requerido**, así que `tsc` nombra a cualquier reader que no declare de qué naturaleza es lo que
-devuelve. En lista, porque hay DTO genuinamente mixtos — `SeoPerformanceResult` declaraba UNA fuente
-mientras su `summary` era siempre Search Console, o sea cifras medidas dentro de un envoltorio
-rotulado estimado.
-
-Dos guards nuevos: uno camina el DTO real y exige que **cada hoja numérica tenga exactamente un
-dueño** (detecta sin-dueño y con-dos-dueños); otro censa las superficies del lane y del MCP
-comparando contra el **filesystem**, en ambas direcciones. Sin ellos, el campo habría sido una
-promesa: nada obligaba a que las procedencias declaradas cubrieran lo que hay.
-
-Tool nueva `get_seo_dual_lens_visibility`: las dos series de posición separadas y rotuladas en una
-sola llamada, **sin campo combinado por contrato**. Existe para invertir un incentivo — presentar
-bien las dos lentes costaba dos llamadas y una decisión, presentarlas mal costaba una y ninguna.
-⚠️ **Falta federarla al gateway** (cross-repo): hasta entonces Nexa y los clientes MCP no la ven.
-
-Sin migración, sin flag, sin cambio de valor en ninguna cifra. `dataforseo_serp` quedó como lente
-`estimated` y no `measured`: exacto no es medido — esa consulta la hicimos nosotros.

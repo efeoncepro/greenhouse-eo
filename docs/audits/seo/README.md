@@ -7,8 +7,8 @@ Auditorías de búsqueda orgánica y AEO — de Efeonce y de clientes a los que 
 
 ## Regla de uso
 
-- Toda cifra lleva declarada su naturaleza: **MEDIDO** (Search Console, o una consulta directa a la API de un
-  proveedor con fecha y costo registrados), **ESTIMADO** (Semrush u otra fuente de terceros) u **OBSERVADO**
+- Toda cifra lleva declarada su naturaleza: **MEDIDO** (actividad registrada por Search Console o GA4, con su alcance),
+  **ESTIMADO** (ETV, volumen o tráfico modelado por un proveedor, incluso si se consultan por API) u **OBSERVADO**
   (SERP en vivo o HTML del sitio, una foto de un momento). Cuando el research incluye fechas de mercado o
   afirmaciones de terceros, se agregan **INFERIDO** (deducción sobre lo observado) y **REPORTADO** (un tercero
   lo afirma y no se pudo verificar de primera fuente). Un dato REPORTADO o INFERIDO nunca se presenta como verificado.
@@ -16,9 +16,16 @@ Auditorías de búsqueda orgánica y AEO — de Efeonce y de clientes a los que 
   en cuanto el equipo dueño del sitio lo toca; las líneas base caducan con las semanas. Revalidar antes de consumir.
 - El oficio vive en la skill `seo-aeo`; el proceso repetible en
   [`docs/operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md`](../../operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md);
-  el uso comercial en la skill `seo-aeo-practice`. Estas auditorías son **evidencia de caso**, no doctrina.
+  el uso comercial en la skill `seo-aeo-practice`. Para informes periódicos dirigidos al cliente, aplica el
+  [modelo de reporting y continuidad](../../operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md).
+  Estas auditorías son **evidencia de caso**, no doctrina.
 
 ## Auditorías
+
+- [Berel — auditoría SEO/AEO de agosto 2026](BEREL_AUDITORIA_SEO_AEO_AGOSTO_2026.md) — revisión del 4 de septiembre,
+  continuidad de mayo/julio, GSC/GA4/DataForSEO y contenido redactado/publicado por Efeonce. Incorpora el Grader
+  del 3 de septiembre con límites de categoría y falsos positivos; no acredita corrección del instrumento.
+  [Copia verificada en Notion](https://app.notion.com/3d139c2fefe781ba8928eef8dadfb219).
 
 - [DataForSEO Improved ETV — impacto en Greenhouse SEO — 2026-09-01](2026-09-01-dataforseo-improved-etv-impact.md) —
   respuesta contractual incorporada el 2026-09-02: 14 familias ETV-capable, nueve callers, seis familias/siete
