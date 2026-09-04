@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Especificación; DNS auth.efeonce.org → 34.111.78.237 creado por el operador 2026-09-03 (verificado en ns24/ns25.hostgator.cl y 8.8.8.8); sin excepción EPIC-027 abierta, sin recursos GCP creados`
+- Status real: `Especificación; DNS auth.efeonce.org → 34.111.78.237 creado por el operador 2026-09-03 (verificado en ns24/ns25.hostgator.cl y 8.8.8.8); excepción EPIC-027 PROPUESTA 2026-09-03 (Delta en GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md), pendiente de aprobación; sin recursos GCP creados`
 - Rank: `TBD`
 - Domain: `platform|identity|ops`
 - Blocked by: `excepción documentada de EPIC-027 para el deployable services/auth-server (patrón artifact-worker 2026-07-12)`
@@ -215,7 +215,7 @@ Reglas obligatorias:
 
 ### Slice 0 — Excepción EPIC-027 y recursos base
 
-- Delta en `GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md` con costo, routing/auth, rollback y ownership.
+- Delta en `GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md` con costo, routing/auth, rollback y ownership — **escrito 2026-09-03 como propuesta**; falta la aprobación explícita del operador.
 - Llave KMS `auth-server-es256` (HSM, EC_SIGN_P256_SHA256), SA dedicado, DNS a la IP existente.
 
 ### Slice 1 — Servicio y llaves

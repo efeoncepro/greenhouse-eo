@@ -114,3 +114,55 @@ productivos, con la única novedad del modo Job + Chromium. La decisión de fron
 
 **Registro cruzado:** EPIC-027 (child + exit criterion parcial), `DECISIONS_INDEX.md`, TASK-1391 Slice 0.
 
+## Delta 2026-09-03 — Excepción documentada: frontera `auth-server` (Cloud Run Service) — PROPUESTA, pendiente de aprobación del operador
+
+**Solicitud (sesión EPIC-044 / TASK-1828):** autorizar la creación del deployable **`services/auth-server/`**
+(Cloud Run **Service** en `us-east4`, el authorization server propio de Efeonce decidido en
+[`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md))
+por la **misma vía de excepción documentada** que `artifact-worker` (Delta 2026-07-12), sin esperar la vía
+ordinaria (pilot Labs TASK-1382 + rebaseline de costo de 30 días). Estado: **propuesta**; se convierte en
+autorizada sólo con la aprobación explícita del operador registrada en este delta.
+
+**Evidencia exigida por EPIC-027 (cost · routing/auth · rollback · runtime ownership):**
+
+- **Costo:** medido contra el billing export (30 días, USD): el servicio con una instancia mínima de
+  1 vCPU / 512 MiB ≈ 8/mes (referencia: `clamav` con 1 vCPU / 2 GiB paga 15,5/mes por su mínimo); Cloud KMS
+  HSM ≈ 5/mes; Secret Manager, Scheduler y Artifact Registry ≈ 1/mes. **Sin load balancer ni Cloud Armor
+  nuevos**: `auth.efeonce.org` entra como segundo host del front door existente del gateway MCP (sus
+  forwarding rules ya cuestan 36,84/mes y su policy 6,95/mes con tráfico casi nulo). Total adicional
+  **≈ USD 15/mes**; staging con scale-to-zero ≈ 0,5/mes. Órdenes de magnitud bajo el problema de costo que
+  originó EPIC-027 (builds Vercel/Elastic).
+- **Routing/auth:** Cloud Run **privado** (`--no-allow-unauthenticated`), alcanzable sólo desde el global LB
+  del gateway vía serverless NEG; host rule `auth.efeonce.org` en el URL map existente, certificado managed
+  adicional, la misma policy Cloud Armor. DNS ya creado por el operador el 2026-09-03 (`auth.efeonce.org` →
+  `34.111.78.237`, verificado en ns24/ns25.hostgator.cl, 8.8.8.8 y 1.1.1.1). Cookie `__Host-` propia, session
+  store propio, secretos propios por `*_SECRET_REF`, audiencia propia; nunca comparte `NEXTAUTH_SECRET` ni
+  acepta una cookie del portal. IAM: SA dedicado con `roles/cloudkms.signerVerifier` sobre una sola llave y
+  `roles/cloudsql.client`; sin permisos de export/destroy.
+- **Rollback:** < 10 min — flag `AUTH_SERVER_ENABLED=false` (el servicio responde 503 en `/readyz` y el LB
+  deja de enrutar tráfico útil) o revert del Terraform que quita la host rule y el backend, sin tocar
+  `mcp.efeonce.org`; el schema `greenhouse_auth` y la llave KMS se conservan auditables. El deployable puede
+  eliminarse por completo sin tocar dominio: el broker sister-platform legacy sigue sirviendo a Globe desde
+  el portal detrás de su flag hasta que la extracción lo reemplace.
+- **Runtime ownership:** Platform/Identity (deploy, llaves, señales `auth.issuer.jwks_unreachable` y
+  `auth.kms.sign_failures`, runbook `docs/operations/runbooks/auth-server.md`) + Ops (front door compartido y
+  Cloud Scheduler de rotación). El emisor NUNCA corre en Vercel ni dentro del gateway MCP (invariante del ADR
+  nativo y de la regla de adapter neutral).
+
+**Por qué la excepción es segura respecto del espíritu del ADR:** este deployable NO toca el problema que el
+gate protege (el grafo/build del portal Next.js): no mueve rutas del portal, no divide el build de Vercel, no
+crea `apps/*` ni `packages/*`. Es un servicio HTTP aislado del mismo tipo operativo que los cuatro Cloud Run
+services productivos y que el gateway `efeonce-mcp`, con la única novedad de que es la primera pieza de
+autenticación fuera del portal — exactamente lo que el ADR nativo exige por seguridad (cookie, sesión y
+secretos separados). La decisión de frontera del PORTAL (Labs/Admin/Public) sigue intacta y sigue gateada por
+la vía ordinaria. Diferencia con `artifact-worker`: aquí SÍ hay endpoint HTTP público, mitigado por LB + Cloud
+Armor compartidos, Cloud Run privado y el aseguramiento de `TASK-1833` (red-team + pentest) antes del primer
+cliente pagando.
+
+**Aprobación del operador:** _pendiente_. Al aprobarse, reemplazar este renglón por
+`Aprobada YYYY-MM-DD por el operador (sesión …)`, mover la fila del `DECISIONS_INDEX.md` a «Decisiones
+vigentes» y quitar el bloqueo de `TASK-1828`.
+
+**Registro cruzado:** EPIC-027 (child + exit criterion parcial), EPIC-044 (U01), `DECISIONS_INDEX.md`,
+TASK-1828 Slice 0.
+
