@@ -1,5 +1,14 @@
 # TASK-1239 — Growth AI Visibility: Public Report Snapshot + Token Reader
 
+## Delta 2026-09-04 — capability sin seed en `capabilities_registry` (deuda de paridad cerrada)
+
+`growth.ai_visibility.report.publish` se declaró en `src/config/entitlements-catalog.ts` sin su fila en
+`greenhouse_core.capabilities_registry` (regla CLAUDE.md §Capability ⇒ grant coverage: registry + catálogo TS en el mismo
+PR). Lo detectó el test live `src/lib/capabilities-registry/parity.live.test.ts` durante `TASK-1631`; el seed lo aplica
+`migrations/20260904112408574_capabilities-registry-parity-backfill.sql` (aplicada 2026-09-04). Sin cambio de
+comportamiento: `can()` resolvía por el catálogo TS; la tabla de gobernanza era la que estaba desalineada.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
