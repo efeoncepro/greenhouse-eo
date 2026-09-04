@@ -155,10 +155,10 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   mantienen cookies, sesiones y audiencias propias, pero resuelven un único `identity_profile` y la membresía de
   Account 360 mediante bindings auditados. La coexistencia inicial con el login cliente actual requiere una ruta
   de convergencia posterior al mismo plano de identidad externo; nunca una segunda identidad o contraseña permanente.
-- Greenhouse ya dispone de NextAuth y un broker OAuth sister-platform reutilizable. `TASK-1631` debe decidir entre
-  WorkOS, extraer ese broker a `auth.efeonce.org` o un híbrido; el broker actual no es todavía un authorization
-  server MCP público y debe ganar metadata/CIMD-DCR, callbacks hospedados, consent/grants y verificación compatible
-  con el gateway antes de atender clientes.
+- EPIC-044 (ADR nativo): emisor propio en `auth.efeonce.org`. **Binding provider-neutral aplicado** (TASK-1631,
+  2026-09-04): environments registry → bindings de organizaciones `active_client` (`grants_version`) →
+  grants por capability → invitaciones (`linked` = membership). El gateway resuelve por `(environment, subject)` en
+  `GET /api/platform/ecosystem/identity/binding`, nunca por `client_id` ni email.
 - La operación o evolución MCP se enruta por las skills espejo `.codex/skills/efeonce-mcp-platform/` y
   `.claude/skills/efeonce-mcp-platform/`; estas componen la skill dueña de cada provider y no duplican su policy.
   Las skills de arquitectura `software-architect-2026` y `arch-architect` deben cargar ese router antes de

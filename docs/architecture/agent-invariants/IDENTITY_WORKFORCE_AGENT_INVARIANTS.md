@@ -358,3 +358,91 @@ del `RELIABILITY_REGISTRY` — antes no tenían owner pese a ser el gate de acce
 **Spec completa**: `docs/tasks/complete/TASK-742-auth-resilience-7-layers.md`.
 
 > **Reubicado desde `CLAUDE.md` el 2026-07-14 (TASK-1160).** El router estaba a 14 tokens del techo de 35k y no aceptaba ninguna incorporación nueva; este bloque es un invariante de DOMINIO (identity/auth), así que su casa es este companion — no el router, que lo cargaba en cada turno y en cada subagente. Contrato completo: `docs/tasks/complete/TASK-742-auth-resilience-7-layers.md`.
+
+---
+
+## External identity binding (TASK-1631)
+
+> Dominio `src/lib/identity/external-access/**` + schema `greenhouse_core.external_*` (EPIC-044 U04, aplicado
+> 2026-09-04). Contrato vigente: `EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`
+> §`Slice 1 binding foundation — applied`; eventos en `GREENHOUSE_EVENT_CATALOG_V1.md` §Identity; señales en
+> `GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` (delta 2026-09-04).
+
+Es el grafo que decide si una persona autenticada por un IdP externo (o por el emisor propio de Efeonce) puede
+operar en nombre de una organización cliente de Account 360 y con qué capabilities. Lo consumen el gateway MCP
+(`TASK-1831`) y el auth-server (`TASK-1830`); la UI de administración es una task aparte. Todo lo que sigue
+protege tres cosas: que una persona resuelva a UN solo perfil, que la autoridad revocada muera de verdad, y que
+ningún secreto ni PII de terceros salga del dominio.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** escribir `external_identity_environments`, `external_organization_bindings`,
+  `external_capability_grants`, `external_member_invitations` ni los `identity_profile_source_links` con
+  `source_system LIKE 'external_idp:%'` fuera de los commands canónicos de
+  `src/lib/identity/external-access/commands.ts` (`upsertExternalIdentityEnvironment`,
+  `bindExternalOrganization`, `grantExternalCapability`, `issueExternalInvitation`, `acceptExternalInvitation`,
+  `revokeExternalAccess`). Cada uno es UNA transacción = estado + `external_identity_audit_log` + outbox; un
+  `UPDATE`/`INSERT` suelto deja estado sin audit, sin evento y sin bump de `grants_version`.
+- **NUNCA** resolver la persona por `client_id`/`azp` ni por email en el gateway o en el resolver: la llave
+  durable es `(environment_id, subject)` vía el source link activo. `clientId` sólo se registra en el
+  resolution log. El email únicamente participa al ACEPTAR una invitación (match exacto y único en
+  `identity_profiles.canonical_email`; 0 ⇒ persona nueva `external_contact`; >1 ⇒ `identity_collision`, nunca
+  auto-merge).
+- **NUNCA** llavear nada por el issuer crudo (`issuer_url`): los links y bindings apuntan al `environment_id`, y
+  la rotación de issuer es un UPDATE auditado de la fila del environment (evento `previousIssuerUrl`). Tampoco
+  cambiar `issuer_class` de un environment existente (el command responde `conflict`): un environment
+  `internal` no se vuelve `external` ni al revés; se crea otro.
+- **SIEMPRE** hacer bump de `grants_version` cuando cambia la autoridad efectiva de un binding — grant nuevo,
+  revocación de grant, de miembro o de binding. Los commands ya lo hacen; si nace un command nuevo que toque
+  grants o membresías, hereda la regla. El gateway compara `grantsVersion` por IGUALDAD contra el claim `gv`
+  del token: un cambio sin bump es autoridad vieja que sigue despachando hasta que el token expire. Revocar una
+  invitación abierta (`scope='invitation'`) es lo único que NO bumpea, porque todavía no era autoridad.
+- **NUNCA** borrar ni actualizar filas de `external_identity_audit_log` ni de
+  `external_access_resolution_log` (append-only; los triggers bloquean UPDATE/DELETE en el audit). El
+  resolution log guarda SÓLO denegaciones con `subject_hash`; no se poda todavía y no se le agrega `bound`
+  aunque el CHECK lo admita (convertirlo en log de aciertos lo hace crecer con cada dispatch).
+- **SIEMPRE** correr `pnpm identity:external-access:smoke` (read-only: readers + 4 señales) tras tocar SQL,
+  readers, resolver o migraciones del dominio, y `-- --apply` (fixture `ZZZ Q2C Smoke Fixture` + environment
+  `smoke-task-1631`) cuando el cambio toca commands o constraints. Los mocks de Vitest ejercitan el TS, no el
+  SQL: la migración 1 pasó todos los tests y el CHECK bidireccional sólo lo atrapó el smoke `--apply`. Efecto
+  colateral esperado de un apply: `identity.external_binding.unbound_dispatch_attempt` en `warning` 24 h.
+- **NUNCA** exponer `token_hash`, el token de invitación, el `subject` ni el email de un tercero en respuestas
+  de API, payloads de outbox, evidencia de señales, Sentry ni logs. El token se devuelve UNA vez desde
+  `issueExternalInvitation` y no vuelve a existir en claro; el detalle del binding (`GET .../bindings/[id]`)
+  lista invitaciones sin `token_hash`; el reader ecosystem responde IDs + `grants[]`, nunca el subject.
+- **SIEMPRE** una capability dedicada por command (`identity.external_environment.manage`,
+  `identity.external_binding.read` / `.bind`, `identity.external_grant.issue`,
+  `identity.external_invitation.issue`, `identity.external_access.revoke`; módulo `organization`, scope
+  `tenant`, grant hoy sólo a `efeonce_admin`). **NUNCA** reutilizar una capability existente para gatear un
+  command nuevo del dominio ni branchear `roleCodes.includes(...)`: la granularidad es la traza de quién pudo
+  dar acceso externo a quién.
+- **Membership = invitación `linked` bajo un binding `active`.** No existe otra tabla de membresía externa ni
+  se escribe `person_memberships`; quien necesite "los miembros externos de la org" lee las invitaciones
+  `linked` (reader canónico), no inventa una proyección. Una persona re-invitada supersede su membership
+  anterior (`superseded_by_reinvitation`); nunca hay dos `linked` activas para la misma (binding, persona).
+- **Grants per-persona = `profile_id` en `external_capability_grants`.** `NULL` = todos los miembros
+  ligados del binding; set = sólo esa persona (exige que ya esté `linked`). **NUNCA** crear una tabla o columna
+  paralela para "grants por usuario": la dimensión ya existe y el resolver la une (binding-wide ∪ per-persona).
+- **NUNCA** bindear una organización que no sea cliente `active_client` (`organization_type ∈ client|both`,
+  `active`, `status='active'`): el command responde `organization_not_eligible` y el reader de elegibilidad
+  la lista con `eligible=false` para que el operador vea por qué. No relajar el predicado para "probar":
+  usar el fixture del smoke.
+- **NUNCA** dar por muerta una sesión externa sólo porque el binding se revocó: la revocación de miembro o
+  binding desactiva el source link únicamente si la persona no conserva otra membership activa en el mismo
+  environment; el auth-server (`TASK-1830`) lee ese link. Verificar con `resolveExternalAccess` que el outcome
+  sea `revoked`, no asumirlo.
+- **NUNCA** agregar un `*_ENABLED` en Greenhouse para este dominio sin pasar por el ledger: hoy no hay flag
+  propio a propósito — los commands los gatea la capability admin, el reader ecosystem sólo responde a bindings
+  `internal` (404 anti-oráculo para el resto) y el uso externo lo gatea `OAUTH_EXTERNAL_ISSUER_ENABLED` del
+  gateway (`TASK-1831`).
+
+**Helpers canónicos**: `resolveExternalAccess({ environmentId, subject, clientId? })`
+(`resolve-external-access.ts`) · readers en `store.ts` · `ExternalAccessError` + códigos en `errors.ts` (mapean a
+`external_access_*` en `canonical-error-response.ts`) · adapter Next en `http.ts` (el único archivo `server-only`
+del dominio; el resto lo bundlea `services/auth-server`).
+
+**Observability**: 4 señales `identity.external_binding.*` (`unbound_dispatch_attempt`,
+`revoked_still_dispatching`, `subject_collision`, `orphan_grant`) en
+`src/lib/reliability/queries/external-identity-binding-signals.ts`, steady 0 · Sentry `domain=identity`
+(`captureWithDomain('identity')`) · `external_identity_audit_log` (qué se hizo) + `external_access_resolution_log`
+(qué se negó).

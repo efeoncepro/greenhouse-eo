@@ -659,10 +659,17 @@ hay cliente, binding, secreto productivo ni login público operativo. La propues
 de Efeonce en `auth.efeonce.org`, el binding con la organización de Account 360 y el rollout
 allow/base-only/revoke viven en
 [`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](../architecture/EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md)
-y [`TASK-1631`](../tasks/to-do/TASK-1631-efeonce-customer-identity-mcp-federation.md). La primera cohorte será
+y [`TASK-1631`](../tasks/in-progress/TASK-1631-efeonce-customer-identity-mcp-federation.md). La primera cohorte será
 por invitación de organizaciones cliente ya existentes y explícitamente allowlisted en Account 360: un email o
 dominio no basta. Hasta la aceptación explícita del ADR y el plan de proveedor, no hay DNS productivo, secreto,
 binding ni acceso cliente que configurar.
+
+**Delta 2026-09-04 (TASK-1631, EPIC-044 U04):** WorkOS quedó descartado; el emisor será propio
+(`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1`). El grafo de binding (environment → binding → grants →
+invitaciones), sus 6 capabilities de `efeonce_admin`, el reader ecosystem
+`GET /api/platform/ecosystem/identity/binding` para este gateway y las 4 señales ya existen en Greenhouse y
+están aplicados en PG; sigue sin haber login externo, cliente real ligado ni canary con cliente. El camino de
+soporte vive en [§Soporte: cliente externo que no puede entrar](#soporte-cliente-externo-que-no-puede-entrar-task-1631).
 
 ## Superficie operable por un cliente MCP — snapshot 2026-08-28
 
@@ -786,3 +793,91 @@ cd ~/Documents/efeonce-mcp && git rev-list --count origin/main..HEAD
 gcloud run services list --project efeonce-group \
   --format='table(metadata.name,status.latestReadyRevisionName)' | grep mcp
 ```
+
+## Soporte: cliente externo que no puede entrar (TASK-1631)
+
+> Aplica desde que el gateway consuma el reader de binding (TASK-1831) y exista login externo (TASK-1830). Hoy
+> el grafo de binding existe en Greenhouse y el camino de diagnóstico ya es operable por API; ningún cliente real
+> tiene acceso. Manual del operador:
+> [operar-binding-identidad-externa.md](../manual-de-uso/identity/operar-binding-identidad-externa.md);
+> modelo: [binding-identidad-externa-mcp.md](../documentation/identity/binding-identidad-externa-mcp.md).
+
+### Qué ve el cliente
+
+Un **deny genérico** del gateway, sin distinguir causa: el borde es anti-oráculo por diseño y no le dice si su
+organización no está ligada, si fue revocado o si el emisor está pausado. El cliente no puede autodiagnosticarse;
+el diagnóstico lo hace el operador con lo que sigue.
+
+### Qué consulta el operador (en este orden)
+
+1. **¿La organización tiene binding activo en ese environment?**
+
+   ```bash
+   pnpm staging:request "/api/admin/identity/external-access/bindings?organizationId=org-<uuid>" --pretty
+   ```
+
+   Sin filas → nunca se ligó (o se está mirando el environment equivocado). `status: revoked` → se cortó; mira
+   `revokedAt` y `revokeReason`.
+
+2. **¿La persona está `linked` y tiene grants?**
+
+   ```bash
+   pnpm staging:request /api/admin/identity/external-access/bindings/xob-<uuid> --pretty
+   ```
+
+   En `invitations` busca el correo: `issued` = nunca aceptó (token no entregado, vencido a punto de expirar);
+   `expired` = venció; `revoked` = alguien la cerró; `linked` = es miembro. En `grants` verifica que exista la
+   capability que la tool necesita (binding-wide o con su `profileId`). Anota `grantsVersion`.
+
+3. **¿Qué respondió el resolver?** El log de denegaciones guarda solo denies, con el subject hasheado:
+
+   ```sql
+   SELECT resolved_at, outcome, environment_id, client_id, binding_id, profile_id, grants_version
+     FROM greenhouse_core.external_access_resolution_log
+    WHERE environment_id = '<environment_id>'
+      AND resolved_at > now() - interval '24 hours'
+    ORDER BY resolved_at DESC
+    LIMIT 50;
+   ```
+
+   Lectura por `outcome`:
+
+   | outcome | Significa | Acción |
+   | --- | --- | --- |
+   | `unbound` | Ese subject nunca fue ligado en ese environment. | Invitación no aceptada / emitida a otro correo / persona entró con otra identidad. Reemitir y confirmar el correo con el admin designado del cliente. |
+   | `revoked` | Estuvo ligado y se revocó (persona o binding). | Confirmar con quien revocó; si procede, invitación nueva (binding nuevo si se revocó el binding). |
+   | `environment_inactive` | El environment está `draft`/`suspended`/`retired`: afecta a TODOS los de ese emisor. | Revisar `GET .../environments`; activar solo si el emisor está verificado. |
+   | `profile_inactive` | La persona existe pero está inactiva o fue fusionada. | Revisión de identidad en Person 360; no reactivar a mano. |
+   | *(sin filas)* | La petición no llegó al resolver: falló antes (token inválido, audiencia/issuer no configurados en el gateway, scope). | Diagnóstico del gateway (OAuth canary, logs de Cloud Run), no del binding. |
+
+   Un `revoked` cuya `resolved_at` supera en más de 5 minutos el `revoked_at` del binding es un cliente (o un
+   agente automatizado) reintentando después de la revocación: hay que avisarle, no "arreglar" nada.
+
+4. **Señales en `/admin/operations` → Identity:** `identity.external_binding.unbound_dispatch_attempt`,
+   `revoked_still_dispatching`, `subject_collision`, `orphan_grant`. `subject_collision` u `orphan_grant` en error
+   indican datos inconsistentes (identidad duplicada o escritura fuera de los commands) y van antes que cualquier
+   reemisión.
+
+### Qué evidencia se comparte (siempre redactada)
+
+Se puede compartir con el cliente o en un ticket: `bindingId`, `environmentId`, `invitationId`, estado y
+`grantsVersion`, el `outcome` y sus `resolved_at`, y el motivo de revocación si lo hubo.
+
+**Nunca** se comparte ni se pega en tickets: el token de invitación (viaja una vez y no se recupera), el subject
+en claro ni su hash, los claims del token, la lista de correos de terceros de la organización, ni el
+`client_id` del cliente OAuth fuera del canal interno.
+
+### Acciones
+
+| Diagnóstico | Acción del operador |
+| --- | --- |
+| Invitación `issued`/`expired`/token perdido | `POST .../bindings/<id>/invitations` con `reissue: true` (misma persona, token nuevo por canal seguro). |
+| Persona `linked` pero la tool deniega | Falta el grant: `POST .../bindings/<id>/grants` con la capability (binding-wide o `profileId`). El gateway lo toma en el siguiente recheck (≤ 60 s de caché + comparación de `grantsVersion`). |
+| Binding `revoked` | No se reactiva. Si el cliente vuelve, `POST .../bindings` nuevo (mismo trío org/env/ref permitido tras la revocación) y reinvitar. |
+| Environment `draft`/`suspended` | Activarlo por `POST .../environments` solo si el emisor está verificado; si está `retired`, registrar otro. |
+| `subject_collision` | Revisión manual en Person 360 antes de reinvitar; luego invitar con `profileId` explícito. |
+| `orphan_grant` | Revocar el grant por API con motivo; buscar quién escribió fuera de los commands. |
+
+Toda acción queda en `greenhouse_core.external_identity_audit_log` (append-only) y emite su evento outbox; no hay
+consumidor reactivo todavía (invalidación push de `grants_version` = TASK-1831), así que la revocación se hace
+efectiva por el recheck del gateway, no por push.

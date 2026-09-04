@@ -2,10 +2,38 @@
 
 > Spec canónica del `Reliability Control Plane` de Greenhouse EO. Define el registry por módulo, el modelo unificado de señales, el contrato de evidencia y cómo `Admin Center`, `Ops Health` y `Cloud & Integrations` consumen la lectura consolidada sin duplicar fuentes.
 >
-> Versión: `1.18`
+> Versión: `1.19`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-09-03` por TASK-1349 (3 signals de deriva de salida bajo el módulo `identity`: `hr.offboarding.unresolved_exit_signal`, `hr.offboarding.executed_member_still_active`, `workforce.offboarding.deprovisioned_member_without_case`)
+> Última actualización: `2026-09-04` por TASK-1631 (4 signals del binding de identidad externa bajo el módulo `identity`: `identity.external_binding.unbound_dispatch_attempt`, `.revoked_still_dispatching`, `.subject_collision`, `.orphan_grant`)
+
+## Delta 2026-09-04 — TASK-1631: 4 signals del binding de identidad externa (`identity.external_binding.*`)
+
+Cuatro señales nuevas, un solo reader
+[`external-identity-binding-signals.ts`](../../src/lib/reliability/queries/external-identity-binding-signals.ts),
+bajo `moduleKey='identity'` (rollup `Identity & Access`), **steady = 0** en las cuatro. Observan el grafo de
+acceso externo de EPIC-044 U04 (`greenhouse_core.external_*` + los `identity_profile_source_links` con
+`source_system LIKE 'external_idp:%'`), que decide si una persona autenticada por un IdP externo puede operar
+en nombre de una organización cliente y con qué capabilities. Compuestas en `get-reliability-overview.ts`
+como `externalIdentityBinding`; el módulo `identity` del registry declara sus APIs, dependencias y
+`filesOwned`. Si PostgreSQL falla, cada señal degrada a `unknown` + `captureWithDomain('identity', ...)` y
+nunca lanza hacia el agregador.
+
+| `signalId` | `kind` | Qué mide | Severidad | Steady |
+| --- | --- | --- | --- | --- |
+| `identity.external_binding.unbound_dispatch_attempt` | `incident` | Denegaciones del resolver (`external_access_resolution_log`, `outcome` ∈ `unbound`, `environment_inactive`, `profile_inactive`) en 24 h: alguien llegó al gateway con un token válido que Greenhouse no reconoce como nadie — cohorte mal enrolada, subject rotado o environment apagado con clientes vivos | `0 → ok`; `1-19 → warning`; `≥20 → error` | **0** (un `pnpm identity:external-access:smoke -- --apply` deja 4 denials → `warning` por 24 h, esperado) |
+| `identity.external_binding.revoked_still_dispatching` | `incident` | Denegaciones `revoked` cuyo `resolved_at` es posterior a `binding.revoked_at + 5 min` en 24 h: el cliente sigue intentando después de la ventana de caché del gateway (TTL 60 s) — o el gateway no refrescó, o hay un consumer que ignora la revocación | `0 → ok`; `1-9 → warning`; `≥10 → error` | **0** |
+| `identity.external_binding.subject_collision` | `data_quality` | Un subject `external_idp:*` que apunta a más de un `identity_profile` (activos o no) ∪ un profile con más de un subject activo en el mismo environment. El índice único parcial impide el primer caso con links activos; la señal cubre lo que el índice no ve (links inactivos, merges) | `0 → ok`; `≥1 → error` | **0** |
+| `identity.external_binding.orphan_grant` | `drift` | Grants `active` cuyo binding está `revoked` o cuyo environment está `suspended`/`retired`: autoridad que sobrevivió a la revocación de su contenedor — sólo puede aparecer por escritura fuera de `revokeExternalAccess` | `0 → ok`; `≥1 → error` | **0** |
+
+Recuperación: siempre por los commands canónicos de `src/lib/identity/external-access/commands.ts`
+(`revokeExternalAccess`, `issueExternalInvitation` con `reissue: true`), vía `/api/admin/identity/external-access/**`
+— **nunca** SQL manual sobre `external_*`, que es justamente lo que `orphan_grant` detecta. Diagnóstico:
+`pnpm identity:external-access:smoke` (read-only = readers + estas 4 señales). Contrato:
+[`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md)
+§`Slice 1 binding foundation — applied` + invariantes en
+[`agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md`](agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md)
+§`External identity binding`. Sin flag nuevo. Task dueña: `TASK-1631`.
 
 ## Delta 2026-09-03 — TASK-1349: 3 signals de deriva de salida (offboarding ↔ nómina ↔ acceso)
 

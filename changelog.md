@@ -7,6 +7,18 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-04 — TASK-1631 (EPIC-044 U04): binding de identidad externa aplicado, commands, API y señales
+
+Migración aditiva aplicada en `greenhouse_core` (environments registry, bindings Account 360, grants provider-neutral con
+`profile_id` opcional, invitaciones con `token_hash`, audit y resolution log append-only, índice único parcial de subjects
+`external_idp:%`) más forward-fix del CHECK `linked_consistent`. Dominio `src/lib/identity/external-access/**`: seis
+commands idempotentes en una transacción (estado + audit + outbox, `grants_version` sube en cada cambio de autoridad) y el
+reader `resolveExternalAccess(environment, subject)` que deniega fail-closed y registra sólo denials. Seis capabilities
+`identity.external_*` (sólo `efeonce_admin`), rutas admin `/api/admin/identity/external-access/**`, lane ecosystem
+`GET /api/platform/ecosystem/identity/binding` para el gateway (TASK-1831) y cuatro señales `identity.external_binding.*`.
+Smoke live `pnpm identity:external-access:smoke` verificó bind → grant → invite → accept → resolve → revoke contra PG real.
+Estado: code complete, rollout pendiente (deploy + señales en `/admin/operations`).
+
 ## 2026-09-03 — Globe: pausa reversible del reconciliador externo de tenancy
 
 `ops-globe-tenancy-reconcile` (`efeonce-group/us-east4`) quedó `PAUSED` a las 22:26:05Z, sin eliminar su
@@ -938,24 +950,3 @@ con costo real **clavado al preview** (USD 0,01212 y USD 0,024) y re-corrida a U
 tenían `lastAttemptTime` vacío y su próxima corrida agendada era el 16-17 de septiembre. La ventana de
 48 h de `ISSUE-164` quedó cerrada midiendo el efecto en `grader_probe_results` (`blocked%` = 0) en vez
 del conteo de Sentry, con la salvedad explícita de que la muestra es una sola corrida.
-
-## 2026-08-28 — El módulo SEO tiene una sola cola de trabajo (`TASK-1700`)
-
-- `greenhouse_growth.seo_work_queue_{snapshots,items,decisions}`: aggregate append-only que pasa a ser la
-  ÚNICA autoridad de orden del módulo. Antes había cuatro criterios no comparables y el operador abría
-  tres pantallas sin que ninguna dijera qué hacer primero.
-- El score deja de ser un índice compuesto y pasa a **clics incrementales sobre demanda MEDIDA**, con la
-  curva de CTR del propio sitio y su versión persistida en cada fila. Sin demanda medida no se fabrica un
-  score: la fila recibe `NULL`, cae a su banda y su verbo honesto es `measure` — y lo impone un CHECK de
-  la base, no el TypeScript.
-- La lente de oportunidades de `/admin/growth/seo/keywords` cambia de FUENTE del orden sin cambiar de
-  forma, detrás de `GROWTH_SEO_WORK_QUEUE_ENABLED` (OFF) con caída al reader legacy. Paridad verificada
-  contra PG real: techo idéntico y orden relativo idéntico sobre las keywords compartidas.
-- Materializador en Cloud Scheduler + ops-worker (nunca Vercel cron), tres señales de reliability nuevas
-  y la capability `growth.seo.work_queue.decide` — ver y decidir son dos permisos distintos.
-- Documentación en las tres capas (arquitectura §18, funcional y manual de uso), invariantes nuevos en
-  `.claude/rules/growth-seo.md`, y la skill `seo-aeo` (`modules/02_SEO_CONTENT.md`, espejada en `.codex/`)
-  gana la implementación de referencia del score más la advertencia comercial: la métrica es *table
-  stakes* y lo propio es la COMBINACIÓN curva-propia × cambio-de-posición, una afirmación NEGATIVA que
-  exige re-verificación a la fecha antes de cualquier uso comercial.
-- **Rollout pendiente:** flag OFF en los dos runtimes, scheduler pausado, sin promover a `main`.

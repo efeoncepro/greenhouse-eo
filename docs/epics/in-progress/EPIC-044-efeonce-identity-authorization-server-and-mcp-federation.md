@@ -6,7 +6,7 @@
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `ADR nativo aceptado 2026-09-03; TASK-1626 y TASK-1631 en curso (gateway vivo, Slice 0 de identidad cerrado en diseño); siete tasks nuevas TASK-1828–TASK-1834 registradas; excepción EPIC-027 aprobada y TASK-1828 tomada 2026-09-03 vía /implement-task; task ui-ux de login por crear al cerrar el contrato de diseño`
+- Status real: `ADR nativo aceptado 2026-09-03; TASK-1626 en curso (gateway vivo); TASK-1631 (U04) Slice 1 code complete 2026-09-04 — schema de binding APLICADO, commands, API admin, reader ecosystem para el gateway y 4 señales, rollout pendiente (deploy + /admin/operations); siete tasks nuevas TASK-1828–TASK-1834 registradas; excepción EPIC-027 aprobada y TASK-1828 tomada 2026-09-03 vía /implement-task; task ui-ux de login por crear al cerrar el contrato de diseño`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
 - Owner: `Efeonce Platform / Identity`
@@ -80,7 +80,7 @@ KMS, los canaries de cliente, el aseguramiento y la convergencia del login del p
 | **U01** | [TASK-1828](../../tasks/in-progress/TASK-1828-efeonce-auth-server-runtime-deployable.md) | Runtime `auth.efeonce.org`: `services/auth-server/` en Cloud Run publicado como segundo host del front door del gateway (mismo LB, IP y Cloud Armor; decisión 2026-09-03, ≈ USD 15/mes adicionales), llave KMS HSM + JWKS, schema `greenhouse_auth`, session store y cookie propios, excepción EPIC-027. Sin flujos OAuth visibles todavía. | — |
 | **U02** | [TASK-1829](../../tasks/to-do/TASK-1829-efeonce-auth-server-oauth-protocol-surface.md) | Superficie OAuth/OIDC: metadata RFC 8414, CIMD, DCR compat, PKCE, access token ES256, refresh rotativo, revocación, introspección, consentimiento persistido. Extrae el broker sister-platform. | U01 |
 | **U03** | [TASK-1830](../../tasks/to-do/TASK-1830-efeonce-auth-external-person-authentication.md) | Autenticación de personas externas sin contraseña: passkeys, magic link, TOTP step-up, recuperación por re-invitación, anti-abuso. Sólo primitives y rutas; la UI es de U06. | U01 |
-| **U04** | [TASK-1631](../../tasks/in-progress/TASK-1631-efeonce-customer-identity-mcp-federation.md) | Re-alcance: binding Account 360, environments registry, invitaciones, grants, `grants_version`, eligibility reader, señales. Deja de poseer runtime y gateway. | U02 en contrato; ejecutable en paralelo |
+| **U04** | [TASK-1631](../../tasks/in-progress/TASK-1631-efeonce-customer-identity-mcp-federation.md) | Re-alcance: binding Account 360, environments registry, invitaciones, grants, `grants_version`, eligibility reader, señales. Deja de poseer runtime y gateway. **Slice 1 code complete 2026-09-04:** schema aplicado, commands, `GET /api/platform/ecosystem/identity/binding` (contrato de U05), `acceptExternalInvitation` in-process (contrato de U03), 4 señales; rollout pendiente. | U02 en contrato; ejecutable en paralelo |
 | **U05** | [TASK-1831](../../tasks/to-do/TASK-1831-efeonce-mcp-gateway-multi-issuer-authorization-context.md) | Gateway multi-issuer en `efeonce-mcp`: `AuthContext` de seis campos, resolver por issuer, `allowedIssuers` + clase de autoridad por tool, recheck de `grants_version`, tres tests de regresión. | U02, U04 |
 | **U06** | task `ui-ux` por crear | Login, consentimiento y recuperación en `auth.efeonce.org`. Nace al cerrar el contrato de diseño de U03 con wireframe y flow reales (nunca stubs). Bloquea sólo U07. | U03 |
 | **U07** | [TASK-1832](../../tasks/to-do/TASK-1832-efeonce-mcp-client-canaries-and-first-customer-cohort.md) | Matriz de tokens live, canaries Claude/Codex/ChatGPT en loopback y HTTPS hospedado, primera organización allowlisted, allow/deny/expiración/revocación, verificación de producción. | U02–U06 |
@@ -124,6 +124,9 @@ coordinación. Todo release a producción pasa por el control plane, una sesión
 - Delta 2026-08-26 de `TASK-1631`: `prepare_seo_grounded_queries` y `get_seo_grounded_query_draft` fail-closed
   por capability `growth.ai_visibility.prompt_set.manage`; el grant por persona se resuelve en U04/U05 o en una
   task propia de Growth, y el epic no se cierra sin declararlo.
+  **Declarado por U04 (2026-09-04):** el modelo per-persona ya existe (`external_capability_grants.profile_id`);
+  el grant concreto para sujetos internos se emite cuando U05 registre Entra como environment `internal` y ligue la
+  organización propia de Efeonce, o en la task de Growth.
 - Consumidores: EPIC-011 (TASK-1720/1722), EPIC-012, EPIC-022, EPIC-043 (TASK-1824).
 
 ## Exit Criteria

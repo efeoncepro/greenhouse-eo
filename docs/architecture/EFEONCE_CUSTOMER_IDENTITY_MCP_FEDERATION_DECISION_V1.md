@@ -6,7 +6,7 @@
 > **Scope:** customer identity, B2B federation, MCP OAuth, Account 360 organization binding and Globe access
 > **Reversibility:** `two-way-but-slow`
 > **Confidence:** `medium`
-> **Validated as of:** 2026-08-02 — gateway MCP, Entra canary, current Greenhouse NextAuth/session resolution and Account 360 contracts verified; WorkOS has a staging project with MCP discovery configuration only. There is no external customer binding, public login, production domain, production secret, Greenhouse customer-login convergence or customer access.
+> **Validated as of:** 2026-08-02 — gateway MCP, Entra canary, current Greenhouse NextAuth/session resolution and Account 360 contracts verified; WorkOS has a staging project with MCP discovery configuration only. There is no external customer binding, public login, production domain, production secret, Greenhouse customer-login convergence or customer access. **Slice 1 binding foundation applied 2026-09-04** (`TASK-1631`): schema, commands, gateway reader and the four reliability signals are live in `greenhouse-pg-dev`; still no external issuer registered, no real customer binding, no auth-server, no UI (see `Slice 1 binding foundation — applied`).
 > **Implementation:** [`TASK-1631`](../tasks/in-progress/TASK-1631-efeonce-customer-identity-mcp-federation.md) · programa [`EPIC-044`](../epics/in-progress/EPIC-044-efeonce-identity-authorization-server-and-mcp-federation.md)
 > **Superseded by (composición):** `EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md` — 2026-09-03, decisión del operador: authorization server propio; no se compra a un tercero.
 
@@ -298,6 +298,121 @@ granularity rule, all idempotent and audit-appending): `bindExternalOrganization
 Reads: eligibility reader over existing Account 360 client organizations; binding/grant resolvers for the
 gateway. The four reliability signals declared in `TASK-1631` (`unbound_dispatch_attempt`,
 `revoked_still_dispatching`, `subject_collision`, `orphan_grant`) observe this schema, steady = 0.
+
+### Slice 1 binding foundation — applied (2026-09-04)
+
+`TASK-1631` Slices 1–5 (commits `689b56044`, `cf8f15224`) materialize the Slice 0 proposal. Two migrations are
+applied to `greenhouse-pg-dev` (the single dev/staging/prod instance):
+`20260904104914802_task-1631-external-identity-binding-foundation.sql` and the forward-fix
+`20260904110809060_task-1631-invitation-linked-check-one-directional.sql`. No backfill, no real customer binding,
+no external issuer registered — the domain is live but empty. External usage is gated by the gateway's
+`OAUTH_EXTERNAL_ISSUER_ENABLED` (`TASK-1831`), not by a new Greenhouse flag.
+
+**Schema as applied (`greenhouse_core`).** The four proposed tables landed with these deltas over the Slice 0
+shape, plus two tables the proposal did not have:
+
+| Table | As applied (delta vs. the proposal) |
+| --- | --- |
+| `external_identity_environments` | `environment_id` is a slug (`^[a-z0-9][a-z0-9_-]{2,63}$`); adds `audience`, `issuer_class` (`internal` \| `external`, **immutable** once created), `subject_type` (`public` \| `pairwise`), `status` (`draft` \| `active` \| `suspended` \| `retired`); partial unique index on `issuer_url WHERE status <> 'retired'`. Issuer rotation is one audited UPDATE; nothing is keyed by the raw issuer |
+| `external_organization_bindings` | ids `xob-<uuid>`; `grants_version` int ≥ 1 (default 1); `designated_admin_profile_id` FK → `identity_profiles`; partial uniques (`organization_id`, `environment_id`) and (`environment_id`, `external_organization_ref`) while `active` |
+| `external_capability_grants` | ids `xcg-<uuid>`; capability regex `^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$`; **`profile_id` nullable FK** — `NULL` = every linked member of the binding, set = only that person (per-person grants without a future migration); partial unique (`binding_id`, `capability`, `COALESCE(profile_id,'')`) while `active` |
+| `external_member_invitations` | ids `xmi-<uuid>`; `email` + `email_normalized`; `token_hash` (sha256 hex, unique) — the raw token is never persisted; `expires_at`; `link_id` FK → `identity_profile_source_links`; partial uniques (`binding_id`, `email_normalized`) while `issued`/`accepted` and (`binding_id`, `profile_id`) while `linked`; CHECK `linked_consistent` is **one-directional** (`status='linked'` ⇒ `linked_at`, `profile_id`, `link_id` NOT NULL) after the forward-fix |
+| `external_identity_audit_log` (**new**) | append-only (triggers block UPDATE/DELETE); `event_type` ∈ `environment_upserted`, `organization_bound`, `capability_granted`, `invitation_issued`, `invitation_linked`, `binding_revoked`, `grant_revoked`, `member_revoked`, `invitation_revoked`; `outcome` `applied` \| `noop`; `metadata_json` |
+| `external_access_resolution_log` (**new**) | append-only; **denials only** from the resolver (`outcome` ∈ `unbound`, `revoked`, `environment_inactive`, `profile_inactive`; `bound` is admitted by the CHECK but never written); `subject_hash` sha256, optional `client_id`, `binding_id` / `profile_id` / `grants_version` |
+
+Person links: partial unique index
+`identity_profile_source_links_external_idp_subject_uidx (source_system, source_object_type, source_object_id) WHERE active AND source_system LIKE 'external_idp:%'`
+— one active subject resolves to exactly one `identity_profile`. Links use
+`source_system = 'external_idp:<environment_id>'`, `source_object_type = 'subject'`, `source_object_id = <sub>`,
+`is_login_identity = TRUE`; `link_id = buildIdentitySourceLinkId(...)`. `canonical_source_system()` maps
+`external_idp:%` → `external_idp`, so the link is visible in `person_360.linked_systems`. GRANTs: runtime/app
+SELECT+INSERT+UPDATE on the four state tables and SELECT+INSERT on the two logs; migrator ALL.
+
+**Membership = the `linked` invitation.** A row in `external_member_invitations` with `status='linked'` under an
+active binding IS the external-access membership; `person_memberships` is not written (follow-up only if Account
+360 needs that projection). Effective grants = binding-wide (`profile_id IS NULL`) ∪ per-person
+(`profile_id = member`).
+
+**Commands** — `src/lib/identity/external-access/commands.ts` (no `server-only`, no `@core`, bundleable by
+`services/auth-server`). Each is idempotent and runs one transaction = state + `external_identity_audit_log` +
+outbox. One dedicated capability per command (module `organization`, scope `tenant`, seeded in the registry and
+the TS catalog, granted only to `efeonce_admin`):
+
+| Command | Capability | Rule that matters |
+| --- | --- | --- |
+| `upsertExternalIdentityEnvironment` | `identity.external_environment.manage` | no-op when nothing changed; `issuer_class` cannot change on an existing environment (`conflict`) |
+| `bindExternalOrganization` | `identity.external_binding.bind` | organization must be `organization_type ∈ client \| both`, `active`, `status='active'`, `lifecycle_stage='active_client'`; environment `draft` \| `active`; idempotent by (org, env, ref); `conflict` if the ref differs or is already used by another organization |
+| `grantExternalCapability` | `identity.external_grant.issue` | binding active + environment not retired; per-person requires a `linked` member; bumps `grants_version` on create |
+| `issueExternalInvitation` | `identity.external_invitation.issue` | base64url 32-byte token returned ONCE, sha256 persisted; an existing open invitation ⇒ 200 without token unless `reissue: true` (revokes the open one with reason `reissued` and issues another — the `TASK-1830` recovery path); `expiresInHours` default 72, max 720; optional `profileId` (existing person) |
+| `acceptExternalInvitation({ token, environmentId, subject, verifiedEmail?, displayName? })` | — (in-process consumer: the auth-server, `TASK-1830`; **no public route in this slice**) | person resolution order: `invitation.profile_id` → already-active link (environment, subject) → single exact match on `identity_profiles.canonical_email` (0 ⇒ creates an `external_contact`; >1 ⇒ `identity_collision`); `verifiedEmail` ≠ invited email ⇒ `invalid_request`; environment must be `active`; supersedes the person's previous `linked` membership (`superseded_by_reinvitation`); `designated_admin` updates the binding's `designated_admin_profile_id` |
+| `revokeExternalAccess` | `identity.external_access.revoke` | scope `binding` (revokes grants + members, deactivates orphan links, bump) \| `grant` (bump) \| `member` (its invitations + per-person grants; deactivates the link if no other active membership in the environment; bump) \| `invitation` (open ones only, no bump); `reason` mandatory; idempotent (`changed:false`) |
+
+Reads (`identity.external_binding.read`): environments; eligibility over existing Account 360 client organizations
+(`eligible=true` only for `active_client`, the rest listed with `eligible=false` and their `activeBindings`);
+bindings (filters `organizationId`, `environmentId`, `status`); binding detail = binding + grants + invitations,
+never `token_hash`. Admin adapters: `src/app/api/admin/identity/external-access/**` (`requireAdminTenantContext` +
+`can()` with the dedicated capability). Domain errors map to canonical es-CL codes `external_access_*` in
+`src/lib/api/canonical-error-response.ts` (422 / 404 / 409 / 410).
+
+**Gateway reader contract** (consumer: the MCP gateway, `TASK-1831`):
+`GET /api/platform/ecosystem/identity/binding?environment=<id>&subject=<sub>[&clientId=<azp>]&externalScopeType=other&externalScopeId=efeonce-mcp-gateway`,
+routeKey `platform.ecosystem.identity.binding`, served by `runEcosystemReadRoute` with the gateway's existing
+`internal`-scope sister-platform binding (`GREENHOUSE_ECOSYSTEM_TOKEN`); resource
+`src/lib/api-platform/resources/ecosystem-identity-binding.ts`. A non-`internal` binding gets `404` (anti-oracle);
+missing `environment`/`subject` gets `400 bad_request`. Response = the `resolveExternalAccess` result —
+`{ outcome, environmentId, issuerClass, profileId, memberships[{ bindingId, organizationId, externalOrganizationRef, grantsVersion, grants[], designatedAdmin }], resolvedAt }`
+— plus `cacheTtlSeconds: 60` and `Cache-Control: private, no-store`. Outcomes: `bound` \| `unbound` \| `revoked`
+\| `environment_inactive` \| `profile_inactive`; only `bound` authorizes, and the gateway compares `grantsVersion`
+with the token's `gv` claim by **strict equality**. Resolution order: environment `active` → active link
+(environment, subject) → profile active and not merged → `linked` memberships under active bindings → grants
+(binding-wide ∪ per-person). An inactive link plus a revoked membership answers `revoked`, so support can tell
+"never anyone" from "was revoked". Every denial is inserted into `external_access_resolution_log`; if that INSERT
+fails it is captured (`captureWithDomain('identity')`) and the denial stands. `clientId` is logged, never a
+binding key. The response never carries the subject or an email.
+
+**Outbox**: aggregate `external_identity_binding`, six v1 events without token/email/subject —
+[`GREENHOUSE_EVENT_CATALOG_V1.md`](GREENHOUSE_EVENT_CATALOG_V1.md) §Identity. No reactive consumer yet; push
+invalidation of `grants_version` toward the gateway is `TASK-1831`.
+
+**Reliability**: the four Slice 0 signals are live under `moduleKey='identity'`, steady 0 —
+[`GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md`](GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md) (delta 2026-09-04).
+Agent invariants: [`agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md`](agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md)
+§`External identity binding`.
+
+**Verification.** Vitest green: `src/lib/identity/external-access/*.test.ts` (33),
+`external-identity-binding-signals.test.ts` (8), `capability-grant-coverage.test.ts`, `registry-store.test.ts`;
+`pnpm typecheck` exit 0; eslint clean; `pnpm migration-marker-gate` OK. Live smoke
+`pnpm identity:external-access:smoke` (`scripts/identity/external-access-smoke.ts`, PG profile `runtime`):
+read-only mode exercises the readers and the four signals; `-- --apply` runs the whole lifecycle against the
+fixture organization `org-ddd962ae-6417-4325-92d0-f1994dc06cc5` (ZZZ Q2C Smoke Fixture, `active_client`) and the
+environment `smoke-task-1631` (left `retired`): environment → binding gv1 → idempotent re-bind → grant
+`globe.producer.fleet.read` gv2 → invitation → resolve `unbound` → accept (profile `data_origin='smoke_test'`,
+link `external_idp:smoke-task-1631`) → resolve `bound` with grants + `designatedAdmin` → revoke member gv3 →
+resolve `revoked` → revoke binding gv4 → environment retired. The first apply caught the bidirectional CHECK
+(hence the forward-fix migration). Expected side effect: `unbound_dispatch_attempt` warns for 24 h after an
+apply. **Not exercised in this slice**: customer OAuth canaries (Claude/Codex/ChatGPT), live tokens, multi-issuer
+gateway, auth-server, UI — those live in `TASK-1828`/`1829`/`1830`/`1831`/`1832` and the ui-ux task.
+
+**Design decisions taken in this slice (in force):**
+
+1. External-access membership = `linked` invitation under an active binding; `person_memberships` is not
+   written (follow-up if Account 360 needs the projection).
+2. Per-person grants via `profile_id` on `external_capability_grants` resolve the 2026-08-26 delta
+   (`growth.ai_visibility.*` per person) without a future migration. The concrete Growth grant is not issued
+   here: `TASK-1831`/Growth decide it, registering Entra as an `internal` environment plus a binding for
+   Efeonce's own organization (EO-ORG-0007) if this graph is to serve internal people too.
+3. Resolution log stores denials only, subject hashed; growth is bounded (denials are anomalies); no automatic
+   pruning yet.
+4. Revocation deactivates the source link when the person keeps no other active membership in the environment
+   ⇒ the auth-server session dies (`TASK-1830` contract) and the resolver answers `revoked` from the inactive link.
+5. `issuer_class` is immutable per environment; `subject_type` is recorded (`public` by default; the native
+   issuer emits `public` per the native ADR).
+6. Strict eligibility: `active_client` only; inactive/churned organizations are listed with `eligible=false` so
+   the operator sees why they do not enter.
+7. The subprocessor gate (S0.3) does not block (native issuer); the security posture is audited in `TASK-1833`.
+8. No new Greenhouse feature flag: commands are gated by admin capability; the gateway reader only answers
+   `internal` bindings; external usage is gated by the gateway's `OAUTH_EXTERNAL_ISSUER_ENABLED` (`TASK-1831`).
+   No new `*_ENABLED` ⇒ the flag ledger is unchanged.
 
 ### Slice 0 gateway authorization-context contract (2026-08-05)
 

@@ -13,6 +13,10 @@ convergencia login). Emisor como segundo host del front door del gateway (≈ US
 `34.111.78.237` creado y verificado. Excepción EPIC-027 para `services/auth-server` **APROBADA** por el operador (Build Unit
 ADR Delta 2026-09-03, fila Accepted en DECISIONS_INDEX); **TASK-1828 TOMADA 2026-09-03 (sesión Claude greenhouse-eo-a3, `/implement-task 1828`)**: Discovery/Plan en curso, sin recursos GCP creados hasta el checkpoint del plan. Otra sesión tiene WIP sin commit de TASK-1631 (`src/lib/identity/external-access/`, `reliability/registry.ts`, `event-catalog.ts`, entitlements): no acoplar; señales del emisor se agregan después de que ese WIP se commitee. Task ui-ux de login sin ID hasta
 tener wireframe/flow reales. Siguiente ID libre `TASK-1835` / `EPIC-045`.
+**TASK-1631 (U04) Slice 1, 2026-09-04 — code complete, rollout pendiente.** Binding aplicado en PG, dominio
+`src/lib/identity/external-access/**`, rutas admin, reader del gateway `GET /api/platform/ecosystem/identity/binding` y 4
+señales; smoke `pnpm identity:external-access:smoke`. **Próximo paso:** deploy de `develop` y señales en `/admin/operations`.
+Paridad registry↔catálogo roja por 11 capabilities ajenas sin seed (task aparte).
 
 Maggie/María Fernanda: cierre 4/4, unresolved=0; agosto ready. Método documentado en runbook/manual y
 skills Payroll/Talent Codex/Claude; Finance histórico pendiente de conciliación. [Evidencia 03/09](docs/audits/payroll/MAGGIE_MARIA_FERNANDA_OFFBOARDING_CLOSURE_2026-09-03.md).
@@ -501,73 +505,3 @@ una respuesta humana ni una segunda reasignación en el mismo chat. En live hand
 reasignar manualmente el ticket mientras el chat siga abierto; el workflow vigente no resuelve nombres escritos
 libremente. No se requirió ADR: se documentó el comportamiento existente sin modificar runtime, ownership ni
 arquitectura.
-
-## 2026-09-01 (15) — Customer Agent ANAM adopta la identidad Emma
-
-El Customer Agent del portal ANAM `19893546` quedó alineado con la landing: el nombre visible cambió de
-`Agente de clientes de ANAM` a `Emma` y el saludo guionizado de `Soy ANA, de ANAM` a `Soy Emma, de ANAM`.
-HubSpot confirmó `Perfil actualizado` y `Cambios publicados`; el readback mostró `Agente de clientes, Emma`,
-preview `Hola, soy Emma.`, saludo exacto y `Borrador (0)`.
-
-El cambio no tocó personalidad (`Amigable`), idioma, conocimiento, permisos, acciones, handoff, routing,
-canales, chatflow ni datos CRM. Tampoco abrió o envió una conversación real. El preflight dejó dos advertencias
-preexistentes sobre `Registraré tu consulta`; se documentaron como deuda separada porque corregirlas requiere
-aprobación y regresión conversacional propia.
-
-La evidencia y el contrato vigente están en
-`docs/audits/ANAM_CUSTOMER_AGENT_EMMA_IDENTITY_QA_2026-09-01.md` y en el source pack. Se actualizaron además la
-documentación funcional, el manual, el changelog client-facing y las referencias espejadas de la skill
-`hubspot-as-a-service`. No se requirió ADR: fue una edición reversible de identidad, sin cambio de autonomía,
-ownership, permisos ni arquitectura.
-
-## 2026-09-01 (14) — La landing ANAM pasa a una experiencia editorial centrada en Emma
-
-La landing pública `https://anam-2.hubspotpagebuilder.com/agente-anam` sirve el build `#28` del proyecto
-`kortex-cms-react` en el portal ANAM `19893546`. La pantalla dejó el layout institucional de tarjetas y ahora
-presenta a Emma como concierge: hero asimétrico, una superficie única para seleccionar intención, un solo CTA
-`Conversar con Emma` y un panel navy con disponibilidad, orientación, protección de datos y derivación humana.
-
-HubSpot renderiza el módulo React en servidor, por lo que la selección se implementó en el controlador Hubl
-existente: los tres botones usan `aria-pressed` y sólo preparan el contexto; el CTA final es el único nodo que
-abre el chat. El smoke confirmó selección por clic y teclado y transferencia de
-`requerimiento_calidad` al CTA, sin abrir ni enviar una conversación real.
-
-El feedback visual del operador quedó incorporado antes del cierre: se eliminó el espacio blanco inferior
-recortando la decoración dentro del hero y reseteando el margen del body; el header usa ahora
-`anam-logo-horizontal.svg`, copiado del catálogo canónico del repo y sin el círculo superior, a `199x54` en
-desktop y `166x45` en mobile. Playwright live en `1440x1100` y `390x1000` confirmó HTTP 200,
-`scrollWidth === clientWidth`, `bodyMargin=0px`, tres opciones íntegras, interacción por teclado y cero errores
-de consola, página o red. Evidencia: `.captures/anam-emma-premium-build27-2026-09-01/`.
-
-El uniforme de Emma quedó corregido en `anam-virtual-executive-v2.png` mediante edición generativa: el bordado
-ya no dice `AUTORIDAD NACIONAL DEL AMBIENTE`, sino `ANÁLISIS AMBIENTALES S.A.`. Se descartó explícitamente
-un montaje tipográfico determinista y se mantuvo el asset anterior como rollback. El readback #28 confirmó el
-nuevo archivo tanto en desktop como en mobile sin alterar layout, interacción ni overflow.
-
-La fuente sigue en `/Users/jreye/Documents/dev/kortex/hubspot-cms-react-project`; el cambio quedó en el commit
-`2ae3b42`. `hs project validate --profile anam` pasó y `hs project upload --profile anam` construyó y
-auto-desplegó #28.
-
-La continuidad quedó sincronizada en las capas técnica, funcional y operativa: canon y runbook CMS, documento
-end-to-end, manual ANAM, dirección visual, changelog client-facing y referencias espejadas de la skill
-`hubspot-as-a-service` para Codex y Claude. `project_context.md` ahora enruta explícitamente este seam; `AGENTS.md`
-y la arquitectura de la oferta no cambiaron porque el trabajo no alteró ownership, schema, permisos ni el modelo
-de servicio.
-
-## 2026-09-01 (13) — Emma reemplaza al personaje masculino en la landing ANAM
-
-La landing pública `https://anam-2.hubspotpagebuilder.com/agente-anam` sirve ahora el build `#23` del
-Developer Project `kortex-cms-react` en el portal ANAM `19893546`. El único cambio funcional fue reemplazar
-`anam-virtual-executive.png` por una asistente virtual femenina coherente con el nombre Emma y corregir el ALT
-a `Emma, asistente virtual de ANAM, sonriendo`; las dimensiones intrínsecas quedaron sincronizadas en `900x675`.
-
-La fuente vive en el checkout externo
-`/Users/jreye/Documents/dev/kortex/hubspot-cms-react-project` y conserva dos cambios locales sin commit: el PNG
-y `KortexLandingHero/index.jsx`. `hs project validate --profile anam` pasó; `hs project upload --profile anam`
-construyó y auto-desplegó `#23`; el readback público convergió desde el bundle cacheado `#22` a
-`kortex-cms-react/23`.
-
-Playwright anónimo sobre `1440x1100` y `390x1000` confirmó HTTP 200, Emma visible, ALT y asset del build 23,
-`scrollWidth === clientWidth`, cero errores de consola, cero page errors y cero requests fallidas. Evidencia:
-`.captures/anam-emma-build23-2026-09-01/`. No se modificaron el Customer Agent, los intents, el chatflow, CRM,
-copy visible ni el portal Greenhouse `48713323`.
