@@ -19,6 +19,7 @@ The current build units covered by this contract are:
 | `commercial-cost-worker` | `services/commercial-cost-worker/Dockerfile` | `.github/workflows/commercial-cost-worker-deploy.yml` |
 | `ico-batch-worker` | `services/ico-batch/Dockerfile` | `.github/workflows/ico-batch-deploy.yml` |
 | `artifact-worker` | `services/artifact-worker/Dockerfile` | `.github/workflows/artifact-worker-deploy.yml` |
+| `auth-server` | `services/auth-server/Dockerfile` | `.github/workflows/auth-server-deploy.yml` |
 
 The machine-readable registry lives in `scripts/ci/worker-build-contract-gate.mjs`. A new Node worker is not
 part of the platform contract until it is registered there and passes both worker gates.

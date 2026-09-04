@@ -241,6 +241,29 @@ export interface GreenhouseAiToolCatalog {
   website_url: string | null;
 }
 
+export interface GreenhouseAuthSigningKeyEvents {
+  actor: string;
+  details: Generated<Json>;
+  event_id: Generated<string>;
+  event_type: string;
+  kid: string;
+  occurred_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseAuthSigningKeys {
+  activated_at: Generated<Timestamp>;
+  algorithm: Generated<string>;
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  kid: string;
+  kms_key_version: string;
+  public_jwk: Json;
+  retired_at: Timestamp | null;
+  retiring_at: Timestamp | null;
+  state: string;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseClientPortalModuleAssignmentEvents {
   actor_user_id: string;
   assignment_id: string;
@@ -12922,6 +12945,8 @@ export interface DB {
   "greenhouse_ai.nexa_turn_telemetry": GreenhouseAiNexaTurnTelemetry;
   "greenhouse_ai.reliability_ai_observations": GreenhouseAiReliabilityAiObservations;
   "greenhouse_ai.tool_catalog": GreenhouseAiToolCatalog;
+  "greenhouse_auth.signing_key_events": GreenhouseAuthSigningKeyEvents;
+  "greenhouse_auth.signing_keys": GreenhouseAuthSigningKeys;
   "greenhouse_client_portal.module_assignment_events": GreenhouseClientPortalModuleAssignmentEvents;
   "greenhouse_client_portal.module_assignments": GreenhouseClientPortalModuleAssignments;
   "greenhouse_client_portal.modules": GreenhouseClientPortalModules;

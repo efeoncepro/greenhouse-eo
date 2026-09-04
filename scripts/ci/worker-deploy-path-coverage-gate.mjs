@@ -54,6 +54,11 @@ const WORKERS = [
     name: 'ico-batch',
     entry: 'services/ico-batch/server.ts',
     workflow: '.github/workflows/ico-batch-deploy.yml'
+  },
+  {
+    name: 'auth-server',
+    entry: 'services/auth-server/server.ts',
+    workflow: '.github/workflows/auth-server-deploy.yml'
   }
 ]
 

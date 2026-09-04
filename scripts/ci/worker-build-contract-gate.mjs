@@ -30,6 +30,12 @@ export const WORKER_BUILD_UNITS = [
     name: 'artifact-worker',
     dockerfile: 'services/artifact-worker/Dockerfile',
     workflow: '.github/workflows/artifact-worker-deploy.yml'
+  },
+  {
+    // TASK-1828 — Efeonce auth server (authorization server propio, EPIC-044).
+    name: 'auth-server',
+    dockerfile: 'services/auth-server/Dockerfile',
+    workflow: '.github/workflows/auth-server-deploy.yml'
   }
 ]
 

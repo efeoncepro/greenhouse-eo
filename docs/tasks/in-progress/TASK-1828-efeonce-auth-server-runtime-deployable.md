@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Tomada 2026-09-03 por /implement-task (instrucción explícita del operador). Excepción EPIC-027 aprobada; DNS verificado; sin recursos GCP creados aún. Slice 0 HECHO 2026-09-03 (KMS API habilitada; key ring us-east4/auth-server; llave auth-server-es256 HSM EC_SIGN_P256_SHA256 versión 1 ENABLED; SA auth-server@ con cloudkms.signerVerifier sólo sobre la llave + cloudsql.client + serviceAccountUser para github-actions-deployer). Slice 1 en curso`
+- Status real: `Tomada 2026-09-03 por /implement-task (instrucción explícita del operador). Excepción EPIC-027 aprobada; DNS verificado; sin recursos GCP creados aún. Slice 0 HECHO 2026-09-03 (KMS API habilitada; key ring us-east4/auth-server; llave auth-server-es256 HSM EC_SIGN_P256_SHA256 versión 1 ENABLED; SA auth-server@ con cloudkms.signerVerifier sólo sobre la llave + cloudsql.client + serviceAccountUser para github-actions-deployer). Slice 1 HECHO 2026-09-04 (schema greenhouse_auth aplicado + db.d.ts; src/lib/auth-server/keys con KMS ES256 + CRC32C + JWKS + store/rotación; services/auth-server server/Dockerfile/deploy.sh; workflow; 3 gates de workers verdes; versión KMS 1 registrada como active kid=VjbDUgwc…nI8; token real firmado por HSM y verificado con el JWKS de PG). Slice 2 pendiente: deploy staging + host en el front door`
 - Rank: `TBD`
 - Domain: `platform|identity|ops`
 - Blocked by: `none`
@@ -304,15 +304,15 @@ Reglas obligatorias:
 ## Acceptance Criteria
 
 - [x] Existe el delta de excepción EPIC-027 para `services/auth-server` con los cuatro campos de evidencia (aprobado 2026-09-03).
-- [ ] `https://auth.efeonce.org/.well-known/jwks.json` devuelve una llave EC P-256 con `kid` y `use: sig`.
-- [ ] Un token firmado por el servicio verifica con la pública del JWKS y falla con una pública distinta.
-- [ ] La rotación produce dos `kid` activos y luego retira el viejo sin invalidar tokens vigentes.
+- [ ] `https://auth.efeonce.org/.well-known/jwks.json` devuelve una llave EC P-256 con `kid` y `use: sig`. — pendiente: servicio no desplegado ni host en el LB (Slice 2). Localmente `buildPublishedJwks` publica `kid=VjbDUgwc5bd1zj5olC8VndMXKk_G60tLF8xRw945nI8`, `use: sig`, `alg: ES256` (smoke 2026-09-04).
+- [x] Un token firmado por el servicio verifica con la pública del JWKS y falla con una pública distinta. — evidencia 2026-09-04: smoke real contra KMS HSM (`signWithActiveKey` → `jwtVerify` con el JWK del registry, kid/alg/sub correctos, CRC32C de digest y firma verificados); test `fails loud when the signer returns a signature for a different key` en `kms-signer.test.ts`.
+- [ ] La rotación produce dos `kid` activos y luego retira el viejo sin invalidar tokens vigentes. — pendiente de ejercitar en staging (Slice 2/3); la state machine `active → retiring → retired` con ventana mínima de 1 h está cubierta por `signing-keys-store.test.ts` y el CLI `pnpm auth-server:rotate-key`.
 - [x] La llave está en KMS con protección `HSM` y el SA del servicio no tiene permisos de export/destroy — readback 2026-09-03: policy de la llave = sólo `roles/cloudkms.signerVerifier` para `auth-server@efeonce-group`; versión 1 `ENABLED`, `HSM`, `EC_SIGN_P256_SHA256`.
-- [ ] Schema `greenhouse_auth` existe con owner `greenhouse_ops` y GRANTs runtime; `signing_keys` con CHECK de estado.
-- [ ] `deploy.sh` declara todas las env vars; el workflow está en `RELEASE_DEPLOY_WORKFLOWS`.
+- [x] Schema `greenhouse_auth` existe con owner `greenhouse_ops` y GRANTs runtime; `signing_keys` con CHECK de estado. — verificado 2026-09-04 contra PG real (owner `greenhouse_ops`; grants `greenhouse_app`/`greenhouse_runtime` = SELECT,INSERT,UPDATE; índice parcial único `signing_keys_single_active_idx`; `signing_key_events` append-only por trigger).
+- [ ] `deploy.sh` declara todas las env vars; el workflow está en `RELEASE_DEPLOY_WORKFLOWS`. — `deploy.sh` y `auth-server-deploy.yml` escritos (gates de workers verdes); falta la entrada en `RELEASE_DEPLOY_WORKFLOWS` y el `uses:` del orquestador (Slice 2, antes del primer deploy productivo).
 - [ ] No existe un segundo forwarding rule ni una segunda policy Cloud Armor; `auth.efeonce.org` resuelve a la IP del gateway y `mcp.efeonce.org` sigue verde tras el apply.
 - [ ] Señales `auth.issuer.jwks_unreachable` y `auth.kms.sign_failures` registradas y en steady 0.
-- [ ] Flag `AUTH_SERVER_ENABLED` con fila en el ledger y estado por runtime.
+- [x] Flag `AUTH_SERVER_ENABLED` con fila en el ledger y estado por runtime. — filas en `FEATURE_FLAG_STATE_LEDGER.md` (§Pendientes + §Snapshot), runtime `auth-server`, OFF.
 
 ## Verification
 
