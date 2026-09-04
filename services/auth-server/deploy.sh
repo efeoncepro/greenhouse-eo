@@ -163,7 +163,10 @@ ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_DATABASE=greenhouse_app"
 ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_USER=greenhouse_app"
 # TASK-1828 — flag maestro del emisor. OFF ⇒ /readyz 503 y JWKS 404; el LB no enruta
 # tráfico útil. Ledger: docs/operations/FEATURE_FLAG_STATE_LEDGER.md (runtime auth-server).
-ENV_VARS="${ENV_VARS},AUTH_SERVER_ENABLED=${AUTH_SERVER_ENABLED:-false}"
+# 🚩 ON desde 2026-09-04 (Slice 2, autorizado por el operador «ejecuta tú todo»): con ON el
+# servicio sólo expone /readyz y el JWKS (llaves PÚBLICAS); los endpoints OAuth y la
+# autenticación de personas llegan en TASK-1829/1830 con sus propios flags.
+ENV_VARS="${ENV_VARS},AUTH_SERVER_ENABLED=${AUTH_SERVER_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},AUTH_SERVER_ISSUER=${AUTH_SERVER_ISSUER}"
 ENV_VARS="${ENV_VARS},AUTH_SERVER_ALLOWED_HOSTS=${AUTH_SERVER_ALLOWED_HOSTS}"
 ENV_VARS="${ENV_VARS},AUTH_SERVER_KMS_KEY=${AUTH_SERVER_KMS_KEY}"

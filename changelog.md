@@ -28,6 +28,20 @@ la protección frente a futuros despliegues aún requiere promoción. Reinicio y
 [runbook](docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md).
 TASK-1807 sigue abierta; ahorro posterior al corte pendiente de Billing Export.
 
+## 2026-09-04 — TASK-1828: runtime del authorization server propio desplegado en staging y publicado en el front door del gateway
+
+Slices 0–2 de `TASK-1828` (EPIC-044): llave ES256 con protección **HSM** en Cloud KMS (`auth-server-es256`, versión 1
+activa) y SA `auth-server@` con permiso de firma sólo sobre esa llave; schema `greenhouse_auth` (`signing_keys` con una
+sola `active` por índice parcial + `signing_key_events` append-only) aplicado; `src/lib/auth-server/keys` (firma vía
+KMS con CRC32C, DER→JOSE, `kid` RFC 7638, verificación local obligatoria, rotación `active→retiring→retired`) con token
+real firmado por el HSM y verificado con el JWKS servido desde PG; `services/auth-server` (node:http, `/healthz`,
+`/readyz`, `/.well-known/jwks.json`, Host allowlist) desplegado en Cloud Run `us-east4` con `AUTH_SERVER_ENABLED=false`;
+`Auth Server Deploy` registrado en `RELEASE_DEPLOY_WORKFLOWS` y cableado en `production-release.yml`; host
+`auth.efeonce.org` publicado como segundo host del LB del gateway (`efeonce-mcp` `6a144a5`: 3 recursos nuevos, 2
+in-place, 0 destruidos; `mcp.efeonce.org` intacto); señales `auth.issuer.jwks_unreachable` y
+`auth.signing_keys.lifecycle` en el control plane; runbook `docs/operations/runbooks/auth-server.md`. Producción del
+emisor queda `code complete, rollout pendiente` (release control plane).
+
 ## 2026-09-03 — EPIC-044: authorization server propio de Efeonce (ADR aceptado) y siete tasks nuevas
 
 Decisión del operador: Efeonce construye y opera su propio authorization server en `auth.efeonce.org`; no se compra
