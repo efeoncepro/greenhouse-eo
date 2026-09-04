@@ -24,7 +24,7 @@
 - Status real: `Especificación (2026-09-04). El runtime del emisor está en producción con la pantalla mínima de consentimiento y las páginas de error/login_required de TASK-1829; la dirección visual aprobada de "Efeonce ID" aún no existe (mode repo-native-benchmark) y los métodos de login (passkey, magic link, TOTP) los entrega TASK-1830. Slice 1 (shell + consentimiento) puede arrancar sobre el contrato vigente; Slices 2–3 esperan a TASK-1830`
 - Rank: `TBD`
 - Domain: `ui`
-- Blocked by: `TASK-1830 (Slices 2–3: sesión, métodos de login y step-up); Slice 1 no está bloqueado`
+- Blocked by: `TASK-1830 code complete 2026-09-04 (flag AUTH_SERVER_PERSON_AUTH_ENABLED=false): Slices 2–3 necesitan ese flag ON en staging para mirar algo real; Slice 1 no está bloqueado`
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -106,7 +106,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/ui/flows/EPIC-044-auth-server-login-consent-UI-FLOW.md` (flujo maestro del programa; esta task es sus nodos «consent», «login», «step-up», «recovery» y «error»)
+- `docs/ui/flows/EPIC-044-auth-server-login-consent-UI-FLOW.md` (flujo maestro del programa; esta task es sus nodos «consent», «login», «step-up», «recovery» y «error»; la **§5.bis** (TASK-1830, commit `95a569265`) trae la tabla completa de rutas, las cuatro cosas que la UI no puede contradecir y la lista de estados a representar — es contrato, no sugerencia)
 - `docs/tasks/in-progress/TASK-1830-efeonce-auth-external-person-authentication.md` (contrato de sesión, métodos y errores canónicos que consumen las pantallas de login)
 - `docs/tasks/TASK_UI_UX_ADDENDUM.md`
 - `docs/manual-de-uso/plataforma/captura-visual-playwright.md` (GVC)
@@ -247,7 +247,7 @@ Reglas obligatorias:
 - Primitive / variant / kind: primitives HTML propias del emisor (ver Surface & system decision); variantes de botón `primary|secondary|link`; kinds de estado `info|success|warning|error`.
 - Component candidates: `src/lib/auth-server/oauth/pages/{layout,consent,login,magic-link,passkey,step-up,recovery,error}.ts` (funciones puras `render*Page(input) → string`).
 - Copy source: `src/lib/copy/auth-server.ts` (`GH_AUTH_SERVER`), ids nuevos en el Copy Ledger del wireframe.
-- Data reader / command: `handleAuthorize`/`handleConsent` (TASK-1829) y los handlers JSON de TASK-1830; las plantillas sólo reciben DTOs.
+- Data reader / command: `handleAuthorize`/`handleConsent` (TASK-1829) y los handlers de TASK-1830; las plantillas sólo reciben DTOs. Los endpoints que la UI consume por formulario (`magic-link/request`, `magic-link/consume`, `invitations/accept`, `session/logout`) responden HTML cuando el `Content-Type` es `application/x-www-form-urlencoded` y JSON en cualquier otro caso: los formularios postean directo, sin `fetch` ni JS.
 - API parity: la UI es un cliente del mismo handler que Nexa/CLI/Admin (`grantClientConsent`); no hay lógica de negocio en el HTML.
 - Access / capability: ninguna nueva; `SubjectSessionPort` + consent + `gv` deciden en el handler.
 - States to implement: los diez del State inventory por pantalla, enumerados en el wireframe (§State Copy) y en el flow (§State Machine).
