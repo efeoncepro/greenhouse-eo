@@ -71,7 +71,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-044`
-- Status real: `code complete, rollout pendiente (2026-09-04, sesión greenhouse-eo-45; commits 263ee3a74 · 19d1658de · d31e6e913 en develop): dominio src/lib/auth-server/oauth/**, handler testeable, 7 tablas greenhouse_auth + 2 capabilities aplicadas en Cloud SQL, 68 tests + smoke PG real verdes; AUTH_SERVER_OAUTH_ENABLED=false en deploy.sh; falta release del runtime a main, fila del emisor en external_identity_environments, flag ON en staging con validación de metadata y flujo con persona real (TASK-1830)`
+- Status real: `code complete, rollout pendiente (2026-09-04; commits 263ee3a74 · 19d1658de · d31e6e913 · 2633d9a67): runtime con la superficie OAuth EN PRODUCCIÓN desde el release 9100bbd2765d (flag AUTH_SERVER_OAUTH_ENABLED=false: metadata y /oauth/* responden 404); environment efeonce-auth registrado en draft; 7 tablas + 2 capabilities aplicadas; 68 tests + smoke PG. Falta: flag ON en staging con validación de metadata + clientes CIMD/DCR de prueba, environment a active, y flujo con persona real (TASK-1830)`
 - Rank: `TBD`
 - Domain: `platform|identity|integration`
 - Blocked by: `none`

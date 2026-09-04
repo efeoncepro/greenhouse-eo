@@ -106,6 +106,15 @@ Requiere `AUTH_SERVER_KMS_KEY` y acceso a PG por el proxy con las variables `GRE
 > Estado 2026-09-04: **`code complete, rollout pendiente`** — código en `develop` (commits `263ee3a74`, `19d1658de`,
 > `d31e6e913`), migraciones aplicadas en Cloud SQL, flag `AUTH_SERVER_OAUTH_ENABLED=false` en `deploy.sh`.
 
+### Registrar el environment del emisor (precondición del flag OAuth)
+
+La fila `efeonce-auth` de `greenhouse_core.external_identity_environments` se registra por el command canónico de
+TASK-1631, nunca por SQL: `pnpm auth-server:register-issuer-environment` (proxy PG + `.env.local`, perfil ops).
+Nace en `draft` (registrado el 2026-09-04) y se pasa a `active` con `--status active` en el mismo momento en que se
+prende `AUTH_SERVER_OAUTH_ENABLED` en staging; en `draft` el resolver responde `environment_inactive` y ningún token
+sería `bound`. `issuerClass` no se puede cambiar después: el issuer es `https://auth.efeonce.org` exacto.
+
+
 ### Rutas y flag
 
 Con `AUTH_SERVER_OAUTH_ENABLED=true` el servicio agrega, sobre las tres rutas de TASK-1828:

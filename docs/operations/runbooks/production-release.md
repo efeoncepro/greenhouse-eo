@@ -743,6 +743,13 @@ operativa: si hoy ves `severity=error` por `ops-worker` con diff runtime vacío,
 `main` actual antes de asumirlo benigno. El `git diff` de arriba sigue siendo la
 verificación que manda.
 
+**Delta 2026-09-04 (release `9100bbd2765d`): `auth-server` también es change-gated y el watchdog ya lo sabe.** El
+servicio quedó en `f6db4255a` (el push a `develop` lo había desplegado con el mismo árbol que el squash; diff completo
+vacío; `deploy_needed=false`) y el watchdog lo reportó como DRIFT porque su clasificador sólo conocía a `ops-worker`.
+Desde ese día `CHANGE_GATED_RUNTIME_PATHS` (`src/lib/reliability/queries/release-worker-revision-drift.ts`) es un espejo
+por servicio del array `WORKER_RUNTIME_PATHS=(` de cada workflow, sostenido por
+`release-worker-change-gate-parity.test.ts`. La verificación que manda sigue siendo el diff de árbol completo.
+
 ### 4.1.2. Transition final en cola tras runtime verde
 
 Si `transition-released` queda queued o sin runner despues de que workers,

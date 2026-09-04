@@ -137,6 +137,7 @@
     "auth-server:brand-assets:generate": "npx tsx scripts/auth-server/generate-brand-assets.ts",
     "auth-server:oauth-store:smoke": "npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/oauth-store-smoke.ts",
     "auth-server:register-client": "npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/register-oauth-client.ts",
+    "auth-server:register-issuer-environment": "npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/register-issuer-environment.ts",
     "auth-server:rotate-key": "npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/rotate-signing-key.ts",
     "claude-md": "node scripts/ci/claude-md.mjs",
     "claude-md:budget": "node scripts/ci/claude-md.mjs budget",

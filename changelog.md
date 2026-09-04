@@ -7,6 +7,10 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-04 — Release `9100bbd2765d` a producción: EPIC-044 (auth-server + OAuth code complete) y TASK-1631
+
+PR #221 squash `9100bbd27`, orquestador `33893120972` (un run, sin retry), manifest `released` 16:39:40Z. `auth-server` en producción (`/readyz` 200, JWKS 2 kid, superficie OAuth 404 con `AUTH_SERVER_OAUTH_ENABLED=false`), TASK-1631 lane ecosystem verificado en prod, 4/4 workers + auth-server Ready (dos change-gated con árbol idéntico). Post-release: `AUTH_SERVER_JWKS_URL` en Vercel Production+staging con redeploy; environment `efeonce-auth` registrado `draft` por command (`pnpm auth-server:register-issuer-environment`). El watchdog aprendió el change-gate del `auth-server` (espejo por servicio + test de paridad con los workflows). Ledger de tiempos y de flags actualizados.
+
 ## 2026-09-04 — TASK-1829 (EPIC-044 U02): superficie OAuth del emisor propio, code complete detrás de flag
 
 `auth.efeonce.org` gana su protocolo, detrás de `AUTH_SERVER_OAUTH_ENABLED=false` (`services/auth-server/deploy.sh`):
@@ -930,20 +934,3 @@ El bump destapó dos defectos latentes que sólo existen cuando hay más de una 
 recomputación reusaba snapshots de otra versión y devolvía la versión activa sobre ellos —un campo que
 miente—, y la huella congelada de parámetros no puede ver un cambio de fórmula. Lo primero ahora filtra
 por versión con su gate; lo segundo tiene vectores dorados que congelan la salida.
-
-## 2026-08-29 — La cola SEO empieza a correr sola, y un detector que avisaba a tiempo no llegaba a nadie
-
-Los dos schedulers del módulo quedaron activos: `ops-seo-work-queue-materialize` (`0 10 * * *`, tras
-corrida shadow con la identidad OIDC real y revisión fila por fila) y `ops-seo-competitor-coverage`
-(`0 9 18 * *`, ~USD 0,11/mes). Ambos despausados en el **SoT y en vivo**, porque
-`upsert_scheduler_job` re-aplica `pause`/`resume` en cada deploy y un resume suelto se revierte solo.
-
-El hallazgo del día no fue técnico sino de enrutamiento: la credencial AXIS que bloqueó el release
-**sí tenía detector, y avisó tres días antes** con el modo de falla exacto. Nadie lo leyó porque su
-único canal de salida era el color de su corrida, y ese color ya venía rojo por un bug ajeno. Un gate
-cuyo único canal es su propio color es un registro, no una alerta; y un detector con rojo crónico
-deja de ser un detector. `TASK-1794` recoge el arreglo, con el check de preflight primero — poner la
-medición donde alguien esté obligado a mirar.
-
-De paso: la arquitectura afirmaba en cuatro lugares que un scheduler estaba activo cuando estaba
-pausado, y el runbook de AXIS documentaba el `.npmrc` con una línea de menos.
