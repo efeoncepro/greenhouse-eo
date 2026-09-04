@@ -10,7 +10,7 @@ front door del gateway MCP** (mismo global LB, misma IP `34.111.78.237`, misma p
 tokens ES256 firmados con una llave asimétrica en **Cloud KMS con protección HSM**; la privada nunca sale del
 hardware.
 
-## Qué hace hoy (Slice 1)
+## Qué hace hoy (Slices 1–2)
 
 | Ruta | Comportamiento |
 | --- | --- |
@@ -26,6 +26,8 @@ autenticación de personas (passkeys, magic link, TOTP) `TASK-1830`.
 - `services/auth-server/server.ts` (`node:http`, esbuild bundle, Node 22-slim), reusa `src/lib/**`.
 - Service account dedicado `auth-server@efeonce-group` con `roles/cloudkms.signerVerifier` **sólo sobre la
   llave** `auth-server-es256` y `roles/cloudsql.client`. Sin permisos de export/destroy.
+- Deployer de CI `github-actions-deployer@`: `roles/iam.serviceAccountUser` sobre `auth-server@` +
+  `roles/cloudkms.viewer` sobre la llave (lo exige el preflight de `deploy.sh`).
 - Ingreso `internal-and-cloud-load-balancing` + `allow-unauthenticated`: sólo el LB lo alcanza; la app valida
   `Host` contra `AUTH_SERVER_ALLOWED_HOSTS` (421 si no coincide).
 - Cookie/sesión/secretos propios. **Nunca** `NEXTAUTH_SECRET` ni la cookie del portal.
@@ -34,7 +36,7 @@ autenticación de personas (passkeys, magic link, TOTP) `TASK-1830`.
 
 | Variable | Valor | Nota |
 | --- | --- | --- |
-| `AUTH_SERVER_ENABLED` | `false` por defecto | Flag maestro. Ledger: `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`. |
+| `AUTH_SERVER_ENABLED` | `true` por defecto desde 2026-09-04 (Slice 2) | Flag maestro. Con ON sólo expone `/readyz` y el JWKS. Ledger: `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`. |
 | `AUTH_SERVER_ISSUER` | `https://auth.efeonce.org` | Debe ser idéntico al origen del well-known. |
 | `AUTH_SERVER_ALLOWED_HOSTS` | `auth.efeonce.org` | Lista separada por comas. |
 | `AUTH_SERVER_KMS_KEY` | `projects/efeonce-group/locations/us-east4/keyRings/auth-server/cryptoKeys/auth-server-es256` | Nombre completo del recurso. |
@@ -79,4 +81,4 @@ selecciona el mínimo de instancias (production 1, staging 0). Workflow: `.githu
 
 ## Runbook
 
-`docs/operations/runbooks/auth-server.md` (Slice 3).
+`docs/operations/runbooks/auth-server.md`.

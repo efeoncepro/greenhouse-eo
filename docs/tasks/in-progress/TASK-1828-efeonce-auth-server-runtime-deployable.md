@@ -101,7 +101,9 @@ Reglas obligatorias:
   costo, routing/auth, rollback y runtime ownership (mismo formato que `artifact-worker`).
 - Registro DNS `auth.efeonce.org` → `34.111.78.237` — **HECHO 2026-09-03** por el operador en HostGator; verificado en ambos nameservers. HTTPS responde vacío hasta que el Slice 2 agregue el host y el certificado al LB (esperado).
 - Proyecto `efeonce-group`, service account dedicado con `roles/cloudkms.signerVerifier` sobre la llave y
-  `roles/cloudsql.client`; acceso a Secret Manager por `*_SECRET_REF`.
+  `roles/cloudsql.client`; acceso a Secret Manager por `*_SECRET_REF`. **Delta 2026-09-04:** el deployer
+  `github-actions-deployer@` necesita además `roles/cloudkms.viewer` sobre la llave (preflight de `deploy.sh`);
+  faltaba y el primer run de CI (`33870746218`) falló con «KMS key not found»; con el viewer, el rerun cerró `success`: revisión `auth-server-00003-jtf` sirve `GIT_SHA=02dc5d987` vía WIF (12:10Z).
 
 ### Blocks / Impacts
 

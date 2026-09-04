@@ -22,6 +22,9 @@ agregan sus propias secciones cuando existan.
 - Identidad de runtime: SA `auth-server@efeonce-group` con `roles/cloudkms.signerVerifier` **sólo** sobre la
   llave `auth-server-es256` y `roles/cloudsql.client`. No puede crear ni destruir versiones KMS.
 - Source of truth de env vars: `services/auth-server/deploy.sh` (`--set-env-vars` es destructivo).
+- IAM del deployer de CI (`github-actions-deployer@`): `roles/iam.serviceAccountUser` sobre `auth-server@` y
+  `roles/cloudkms.viewer` **sobre la llave** (el preflight de `deploy.sh` hace `gcloud kms keys describe`; sin
+  el viewer, KMS responde como si la llave no existiera y el run falla — caso 2026-09-04, run `33870746218`).
 
 ## Paso a paso
 
@@ -51,10 +54,12 @@ rotación, esperar hasta cinco minutos para ver ambos `kid`.
 
 ### 3. Prender o apagar el flag
 
-`AUTH_SERVER_ENABLED` vive en `deploy.sh` (default `false`). Para prenderlo:
+`AUTH_SERVER_ENABLED` vive en `deploy.sh` (default `true` desde 2026-09-04; con ON el servicio sólo expone
+`/readyz` y el JWKS). Para apagarlo de forma durable, cambiar el default en `deploy.sh` y redeployar; para un
+apagado puntual:
 
 ```bash
-AUTH_SERVER_ENABLED=true ENV=staging bash services/auth-server/deploy.sh
+AUTH_SERVER_ENABLED=false ENV=staging bash services/auth-server/deploy.sh
 ```
 
 Nunca `gcloud run services update --update-env-vars` a mano: el próximo deploy lo borra en silencio.
