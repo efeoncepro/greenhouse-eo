@@ -6,7 +6,7 @@
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `ADR nativo aceptado 2026-09-03; TASK-1626 y TASK-1631 en curso (gateway vivo, Slice 0 de identidad cerrado en diseño); siete tasks nuevas TASK-1828–TASK-1834 registradas sin implementación; task ui-ux de login por crear al cerrar el contrato de diseño`
+- Status real: `ADR nativo aceptado 2026-09-03; TASK-1626 y TASK-1631 en curso (gateway vivo, Slice 0 de identidad cerrado en diseño); siete tasks nuevas TASK-1828–TASK-1834 registradas; excepción EPIC-027 para TASK-1828 aprobada 2026-09-03 (task lista, sin iniciar por instrucción del operador); task ui-ux de login por crear al cerrar el contrato de diseño`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
 - Owner: `Efeonce Platform / Identity`

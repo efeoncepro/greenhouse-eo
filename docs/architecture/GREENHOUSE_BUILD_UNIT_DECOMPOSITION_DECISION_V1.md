@@ -114,14 +114,14 @@ productivos, con la única novedad del modo Job + Chromium. La decisión de fron
 
 **Registro cruzado:** EPIC-027 (child + exit criterion parcial), `DECISIONS_INDEX.md`, TASK-1391 Slice 0.
 
-## Delta 2026-09-03 — Excepción documentada: frontera `auth-server` (Cloud Run Service) — PROPUESTA, pendiente de aprobación del operador
+## Delta 2026-09-03 — Excepción documentada: frontera `auth-server` (Cloud Run Service) AUTORIZADA
 
 **Solicitud (sesión EPIC-044 / TASK-1828):** autorizar la creación del deployable **`services/auth-server/`**
 (Cloud Run **Service** en `us-east4`, el authorization server propio de Efeonce decidido en
 [`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md))
 por la **misma vía de excepción documentada** que `artifact-worker` (Delta 2026-07-12), sin esperar la vía
-ordinaria (pilot Labs TASK-1382 + rebaseline de costo de 30 días). Estado: **propuesta**; se convierte en
-autorizada sólo con la aprobación explícita del operador registrada en este delta.
+ordinaria (pilot Labs TASK-1382 + rebaseline de costo de 30 días). Estado: **AUTORIZADA** — aprobada por el
+operador el 2026-09-03 en la sesión EPIC-044 (chat), tras revisar las cuatro evidencias de abajo.
 
 **Evidencia exigida por EPIC-027 (cost · routing/auth · rollback · runtime ownership):**
 
@@ -159,9 +159,9 @@ la vía ordinaria. Diferencia con `artifact-worker`: aquí SÍ hay endpoint HTTP
 Armor compartidos, Cloud Run privado y el aseguramiento de `TASK-1833` (red-team + pentest) antes del primer
 cliente pagando.
 
-**Aprobación del operador:** _pendiente_. Al aprobarse, reemplazar este renglón por
-`Aprobada YYYY-MM-DD por el operador (sesión …)`, mover la fila del `DECISIONS_INDEX.md` a «Decisiones
-vigentes» y quitar el bloqueo de `TASK-1828`.
+**Aprobación del operador:** Aprobada 2026-09-03 por el operador (sesión EPIC-044). Fila movida a «Decisiones
+vigentes» en `DECISIONS_INDEX.md`; bloqueo de `TASK-1828` retirado. La task queda lista y se inicia sólo con
+instrucción explícita del operador.
 
 **Registro cruzado:** EPIC-027 (child + exit criterion parcial), EPIC-044 (U01), `DECISIONS_INDEX.md`,
 TASK-1828 Slice 0.

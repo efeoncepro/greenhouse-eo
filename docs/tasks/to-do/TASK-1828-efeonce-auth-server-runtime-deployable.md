@@ -19,10 +19,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Especificación; DNS auth.efeonce.org → 34.111.78.237 creado por el operador 2026-09-03 (verificado en ns24/ns25.hostgator.cl y 8.8.8.8); excepción EPIC-027 PROPUESTA 2026-09-03 (Delta en GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md), pendiente de aprobación; sin recursos GCP creados`
+- Status real: `Lista para tomar. Excepción EPIC-027 APROBADA por el operador 2026-09-03 (Delta en GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md); DNS auth.efeonce.org → 34.111.78.237 verificado; sin recursos GCP creados. NO iniciar hasta instrucción explícita del operador (2026-09-03)`
 - Rank: `TBD`
 - Domain: `platform|identity|ops`
-- Blocked by: `excepción documentada de EPIC-027 para el deployable services/auth-server (patrón artifact-worker 2026-07-12)`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -215,7 +215,7 @@ Reglas obligatorias:
 
 ### Slice 0 — Excepción EPIC-027 y recursos base
 
-- Delta en `GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md` con costo, routing/auth, rollback y ownership — **escrito 2026-09-03 como propuesta**; falta la aprobación explícita del operador.
+- Delta en `GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md` con costo, routing/auth, rollback y ownership — **APROBADO 2026-09-03 por el operador**.
 - Llave KMS `auth-server-es256` (HSM, EC_SIGN_P256_SHA256), SA dedicado, DNS a la IP existente.
 
 ### Slice 1 — Servicio y llaves
@@ -299,7 +299,7 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] Existe el delta de excepción EPIC-027 para `services/auth-server` con los cuatro campos de evidencia.
+- [x] Existe el delta de excepción EPIC-027 para `services/auth-server` con los cuatro campos de evidencia (aprobado 2026-09-03).
 - [ ] `https://auth.efeonce.org/.well-known/jwks.json` devuelve una llave EC P-256 con `kid` y `use: sig`.
 - [ ] Un token firmado por el servicio verifica con la pública del JWKS y falla con una pública distinta.
 - [ ] La rotación produce dos `kid` activos y luego retira el viejo sin invalidar tokens vigentes.
