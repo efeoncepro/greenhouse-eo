@@ -103,3 +103,14 @@ tablas/celdas, métricas, IDs de hallazgo, enlaces, propiedades y los cambios
 editoriales. Un éxito de escritura o un archivo local correcto no demuestra que
 la versión de Notion quedó actualizada. Informa por separado cualquier destino
 que no se pudo verificar; sólo declara completa la entrega verificada.
+
+## Presentación y entrega institucional
+
+Aplica `docs/operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md` al informe:
+pie en cada página con URL bubble oficial, dirección y teléfono; logos Efeonce y
+cliente; colores y tipografías verificados; gráficos cuando aclaran la evidencia.
+Si se entrega en PDF, usa A4 y revisa visualmente el archivo exportado completo.
+El HTML es el insumo editable, no la entrega final. Conserva detalle, fuentes y
+limitaciones del informe al mejorar su composición.
+
+Para crear o mejorar el informe completo, carga `report-studio`: narrativa, evidencia, gráficos, producción y QA del formato final. La práctica especializada conserva sus contratos y datos.

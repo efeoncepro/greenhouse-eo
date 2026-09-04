@@ -14,6 +14,7 @@ a las skills SEO/AEO y Berel, espejadas para Claude/Codex: lectura de auditoría
 que redacta/publica, límites GSC/GA4/DataForSEO, validez de preguntas y probes del Grader y readback Notion/Markdown.
 Se conserva la [auditoría de agosto](docs/audits/seo/BEREL_AUDITORIA_SEO_AEO_AGOSTO_2026.md) como caso fechado.
 El método no implementa las correcciones del Grader ni del sitio; esas acciones siguen pendientes.
+Se añade `report-studio` para Claude/Codex, registrada en router y gate de espejos: fuentes primarias, siete módulos, plantillas, evaluación editorial y preflight PDF con pruebas negativas. Berel conserva 55 páginas A4 con marca/contacto completos, cobertura On-time, gráficos y acabado reproducible; revisión y evidencia en su carpeta de informe. Entrega local, sin envío.
 
 ## 2026-09-04 — TASK-1631 (EPIC-044 U04): binding de identidad externa aplicado, commands, API y señales
 

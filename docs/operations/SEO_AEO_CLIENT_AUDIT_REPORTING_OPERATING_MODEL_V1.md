@@ -168,3 +168,7 @@ Para una entrega en Notion y Markdown:
 El informe está listo cuando su historia es trazable, las cifras conservan su alcance, la agencia responde
 por su trabajo, las dependencias están justificadas y ambas copias coinciden tras la lectura de verificación.
 El cierre documental no convierte los pendientes técnicos o metodológicos descritos en acciones ejecutadas.
+
+## Presentación institucional
+
+La entrega aplica el [estándar de marca de informes Efeonce](EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md): pie y contacto en cada página, logos oficiales y gráficos interpretables. Para PDF, el HTML es insumo; el cierre exige revisar el archivo exportado en su formato final.

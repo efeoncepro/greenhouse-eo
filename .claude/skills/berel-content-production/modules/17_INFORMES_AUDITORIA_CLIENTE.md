@@ -129,3 +129,14 @@ verificar una superficie, informar exactamente cuál; nunca declarar ambas actua
 [Auditoría de agosto de 2026](../../../../docs/audits/seo/BEREL_AUDITORIA_SEO_AEO_AGOSTO_2026.md):
 caso que originó estas reglas, revisado en septiembre de 2026. Sus métricas, estados y limitaciones
 del Grader no son hechos permanentes ni una plantilla para copiar a otros meses.
+
+## Presentación y entrega institucional
+
+Aplica `docs/operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md` al informe:
+pie en cada página con URL bubble oficial, dirección y teléfono; logos Efeonce y
+cliente; colores y tipografías verificados; gráficos cuando aclaran la evidencia.
+Si se entrega en PDF, usa A4 y revisa visualmente el archivo exportado completo.
+El HTML es el insumo editable, no la entrega final. Conserva detalle, fuentes y
+limitaciones del informe al mejorar su composición.
+
+Para crear o mejorar el informe completo, carga `report-studio`: narrativa, evidencia, gráficos, producción y QA del formato final. La práctica especializada conserva sus contratos y datos.

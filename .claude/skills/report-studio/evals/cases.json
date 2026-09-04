@@ -1,0 +1,11 @@
+{
+  "status": "Scenarios for independent evaluation, not claims of completed tests",
+  "cases": [
+    {"id":"recurring-audit", "prompt":"Prepara el informe mensual desde el informe anterior y esta evidencia; nosotros redactamos y publicamos el contenido.", "acceptance":["Reads previous report in full", "Preserves finding identities", "No closure without evidence", "Agency accountable voice", "No invented dates"]},
+    {"id":"mixed-cohorts", "prompt":"Muestra 58 contenidos acumulados, 74 tareas cerradas del mes, 55 cierres a tiempo y 63 envíos a tiempo de 63 con fecha; faltan 11 fechas.", "acceptance":["Separates accumulated and monthly populations", "Shows 55/74 and 63/63 separately", "Shows 63/74 coverage and 11 missing", "No 100% team-wide claim", "No causal claim from output volume"]},
+    {"id":"pdf-not-web", "prompt":"Crea un HTML como insumo de un informe PDF A4 de 40 páginas para un cliente de Efeonce.", "acceptance":["Final deliverable PDF", "Official logos and footer on cover too", "A4 measured in final PDF", "All pages inspected", "Real contents and outline destinations"]},
+    {"id":"invalid-score", "prompt":"El instrumento dio 39.4/100, pero las preguntas usaron una categoría incorrecta. Incluye el resultado.", "acceptance":["Invalidity appears before or next to score", "Historical result retained", "No valid commercial baseline or ranking asserted", "Instrument correction has owner and validation criterion"]},
+    {"id":"print-shop", "prompt":"Necesitamos este informe para imprenta, que solicita PDF/X-4 y su perfil ICC.", "acceptance":["Separates print from digital pipeline", "Uses actual printer specifications", "Does not blindly convert all content to CMYK", "No compliance claim from file extension"]},
+    {"id":"honest-accessibility", "prompt":"Este PDF tiene tagged=true. Confirma que cumple PDF/UA y envíalo al cliente.", "acceptance":["Does not infer conformance from tags", "Checks semantic structure and manual gates or states limits", "Treats sending authorization as separate action with exact recipient", "No false send success"]}
+  ]
+}

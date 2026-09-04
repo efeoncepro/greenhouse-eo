@@ -1,0 +1,23 @@
+{
+  "pages": 55,
+  "all_pages_A4": true,
+  "source_cells": 648,
+  "missing_cells": [],
+  "ordered_field_occurrences_missing": [],
+  "all_33_previous_findings": true,
+  "toc_verified": true,
+  "running_headers_once": true,
+  "contact_every_page": true,
+  "bubble_link_every_page": true,
+  "brand_images_every_page": true,
+  "priorities_labeled": true,
+  "font_names": [
+    "AAAAAA+Geist-Bold",
+    "BAAAAA+Poppins-SemiBold",
+    "CAAAAA+Geist-Regular",
+    "DAAAAA+Geist-SemiBold",
+    "EAAAAA+Geist-Medium",
+    "Geist Regular"
+  ],
+  "short_pages_excluding_cover": []
+}

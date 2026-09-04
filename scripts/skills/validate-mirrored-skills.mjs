@@ -19,6 +19,13 @@ const repo = resolve(new URL('../..', import.meta.url).pathname)
 
 const mirroredSkills = [
   {
+    id: 'report-studio',
+    mode: 'shared-files',
+    agentLocal: ['agents/openai.yaml'],
+    codex: '.codex/skills/report-studio',
+    claude: '.claude/skills/report-studio',
+  },
+  {
     id: 'greenhouse-finance-accounting-operator',
     mode: 'byte-identical',
     codex: '.codex/skills/greenhouse-finance-accounting-operator',

@@ -32,6 +32,8 @@ Daremos continuidad a la optimización editorial, la medición y el trabajo AEO,
 
 El AEO Grader del 3 de septiembre añade una comprobación de nuestra medición: generó 39,4/100, pero sus preguntas sin marca usaron «Manufactura» en lugar de pinturas y recubrimientos. No interpretamos ese puntaje como desempeño comercial de Berel. Los cuatro motores sí reconocieron a la marca cuando se la nombró; corregiremos el conjunto de preguntas y dos falsos positivos técnicos antes de establecer una línea base (§8.2–8.4).
 
+El desempeño de nuestro equipo se presenta en §6.2: 58 contenidos redactados y 154 entregables gráficos registrados como cerrados al 4 de septiembre. En el proyecto de agosto, el 74,3% de los cierres quedó dentro del plazo; los envíos a revisión documentados fueron a tiempo en 63 de 63 casos, con 11 tareas sin fecha de envío. Distinguimos ambos momentos para interpretar la puntualidad correctamente.
+
 ### 1.1 Continuidad de nuestra gestión y responsabilidades
 
 Esta auditoría forma parte del servicio SEO/AEO que prestamos a Berel. Da seguimiento a las auditorías de mayo y al benchmark de julio, al trabajo editorial del Content Hub y a las correcciones técnicas observadas. Realizamos la investigación de consultas, las reescrituras, la estructura de respuestas, los enlaces, los metadatos y las especificaciones de imágenes de las piezas que producimos.
@@ -348,6 +350,40 @@ El trabajo del siguiente ciclo parte de piezas que ya hemos desarrollado. Presen
 - **Continuidad de los meses siguientes:** ya desarrollamos guías de pisos, barnices y preparación, con piezas en revisión y producción anticipada en curso. Resolveremos sus validaciones y pendientes de publicación antes de duplicar intenciones con nuevos contenidos. [Piso de cemento](https://app.notion.com/143e4d8c573c479a921dc7dca78bcc58) y [barniz](https://app.notion.com/3c839c2fefe781e29a59d8aab1e29594).
 
 Debemos cerrar las diferencias entre las versiones aprobadas, el contenido publicado y los registros del Content Hub. Los enlaces, las imágenes, los metadatos y la consistencia de las afirmaciones de producto forman parte de nuestra responsabilidad editorial y de publicación.
+
+### 6.2 Desempeño del equipo: producción acumulada y entregas a tiempo
+
+**Al 4 de septiembre, hemos redactado 58 contenidos y Notion registra 154 entregables gráficos cerrados dentro del programa de Berel.** Este acumulado incluye trabajo preparado para los próximos ciclos, hasta diciembre. Es distinto de los resultados de búsqueda de agosto y no representa 58 publicaciones nuevas en ese mes.
+
+| Producción acumulada | Cantidad | Qué incluye |
+|---|---:|---|
+| Contenidos redactados | 58 | Artículos, reescrituras y tutoriales con una versión desarrollada. Contamos cada ficha principal una sola vez, aunque tenga varias versiones. |
+| Banners registrados como cerrados | 116 | Entregables de portada y apoyo visual de los contenidos. |
+| Entregables sociales estáticos registrados como cerrados | 38 | Paquetes gráficos para redes sociales; una tarea puede incluir adaptaciones o varias imágenes. |
+| **Total de entregables gráficos cerrados** | **154** | **116 banners + 38 paquetes sociales estáticos.** Los videos se contabilizan por separado. |
+
+De los 58 contenidos redactados, el Content Hub registra **22 como Publicado, 32 En revisión, uno Aprobado y tres Bloqueado**. Los tres bloqueados tienen redacción desarrollada, pero requieren resolver sus pendientes antes de avanzar. Estos son estados del registro editorial, no una nueva comprobación de 22 páginas públicas. Excluimos una idea en pausa que solo cuenta con un brief.
+
+El conteo gráfico representa **unidades de entrega registradas como terminadas**, no un inventario de archivos, diapositivas o adaptaciones. Excluimos tareas genéricas que podrían duplicar banners, así como briefs, pendientes y fichas preparadas para diseño que todavía no acreditan una pieza terminada. Así evitamos presentar la planificación como producción realizada.
+
+**En el proyecto de producción de agosto**, cerramos ocho tareas editoriales, **54 entregables gráficos** —32 banners y 22 paquetes sociales estáticos—, diez tareas de video y dos cargas de contenido en el sitio. Son **74 tareas cerradas** del proyecto; las cargas en el sitio no se suman como piezas creativas adicionales.
+
+#### Entregas a tiempo: cómo leer el indicador
+
+El indicador **On-time** significa cumplimiento del plazo. La definición que utiliza el registro de proyectos compara la fecha de cierre con la fecha límite. Para agosto, el resultado es **74,3%: 55 de 74 tareas cerradas dentro del plazo registrado**. Las 74 cuentan con ambas fechas.
+
+| Seguimiento de agosto | Resultado | Alcance |
+|---|---:|---|
+| Cierres dentro del plazo | 55 de 74 · **74,3%** | Todas las tareas cerradas del proyecto de agosto con fecha límite y fecha de cierre. |
+| Cierres posteriores al plazo | 19 de 74 | No demuestra por sí solo que la primera entrega haya sido tardía. |
+| Envíos a revisión dentro del plazo, con fecha registrada | 63 de 63 · **100% de los envíos documentados** | Hay fecha de envío en el 85,1% de las tareas: 63 de 74. |
+| Tareas sin fecha de envío a revisión | 11 | No podemos determinar su puntualidad de primera entrega con ese campo. |
+
+**La entrega y el cierre son momentos distintos.** Por ejemplo, cuatro artículos registran envío a revisión el 4 de agosto, antes de su fecha límite del 7 de agosto, aunque se cerraron el 18. Por eso, no atribuimos automáticamente los 19 cierres posteriores a retrasos de producción, ni presentamos el 100% de los envíos documentados como cumplimiento de todo el equipo.
+
+Nuestro pendiente de seguimiento es completar las fechas de envío y mantenerlas separadas de la aprobación y del cierre. Esto permitirá que el próximo informe muestre con mayor precisión cuándo entregamos y cuándo termina cada revisión. En este corte medimos volumen y puntualidad; las rondas de revisión se incorporarán en los siguientes meses únicamente para este proyecto y cliente.
+
+Fuentes del desempeño: [Content Hub de Berel](https://app.notion.com/35f39c2fefe7808186efc6ec63475640), [tareas de Berel](https://app.notion.com/35c39c2fefe780c9bc37e811a7b95a7c) y [proyecto de producción de agosto](https://app.notion.com/65eb3ea7d03f4414818ce7e3159bcbd6), consultados el 4 de septiembre. Revisamos 242 registros editoriales, 545 tareas y 12 proyectos de las bases de Berel. Reprodujimos el indicador de cierre a partir de sus fechas; no usamos métricas globales de la agencia ni promedios de otros clientes.
 
 ## 7. Autoridad y enlaces externos
 

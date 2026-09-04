@@ -261,3 +261,7 @@ ICO y el ecosistema de producto no son solo operaciones — son **experiencia de
 
 *Última verificación de drift contra runtime: 2026-07-23 — doctrina de autoría Creative Studio reconciliada con
 el business model V1.1; sin claims de runtime hardcodeados.*
+
+## Identidad en informes
+
+Todos los informes de Efeonce aplican el [estándar de marca y entrega](../operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md): pie institucional, URL bubble oficial, contacto, logos de Efeonce y del cliente cuando corresponda, tipografías de marca y gráficos con evidencia. Los valores se resuelven desde sus fuentes canónicas, sin duplicarlos en este contexto.

@@ -1,0 +1,45 @@
+{
+  "page_size_mm": [
+    210,
+    297
+  ],
+  "size_tolerance_mm": 0.5,
+  "rotation": 0,
+  "metadata": {
+    "author": "Efeonce",
+    "title": "Berel · Resultados y gestión SEO/AEO · Agosto 2026"
+  },
+  "require_extractable_text": true,
+  "require_embedded_fonts": true,
+  "require_language": true,
+  "require_structure": true,
+  "require_outline": true,
+  "each_page_text": [
+    "Dr. Manuel Barros Borgoño 71 OF 1105, Providencia, Chile",
+    "+56 9 3732 3064",
+    "+1 (239) 235-2073"
+  ],
+  "required_text": [
+    "74,3",
+    "85,1",
+    "115 artículos",
+    "EO-GRUN-00049"
+  ],
+  "exact_occurrences": {
+    "Cobertura: 63 de 74 tareas (85,1%)": 1
+  },
+  "ordered_text": [
+    [
+      "Contenidos redactados",
+      "Entregables gráficos cerrados",
+      "Entregar y cerrar son momentos distintos.",
+      "El crecimiento tiene"
+    ]
+  ],
+  "required_uris": [
+    "https://efeoncepro.com/",
+    "tel:+56937323064",
+    "tel:+12392352073"
+  ],
+  "page_count": 55
+}

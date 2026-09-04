@@ -8,6 +8,9 @@
 [Notion](https://app.notion.com/3d139c2fefe781ba8928eef8dadfb219) y Markdown. El run EO-GRUN-00049
 no es línea base comercial válida: categoría amplia y probes MCP/API falsos positivos. Corregir instrumento
 y repetir medición sigue pendiente; este cambio solo documenta el método y el caso.
+[Informe PDF A4](docs/audits/seo/berel-agosto-2026/BEREL_INFORME_AGOSTO_2026_A4.pdf): 55 páginas revisadas,
+desempeño de Berel y pie institucional completo. [Estándar de informes](docs/operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md)
+y skill `report-studio` creada para Claude/Codex: investigación primaria, siete módulos, plantillas y preflight probado. HTML queda como insumo; cobertura On-time explícita y exportación reproducible. Entrega local, sin envío al cliente.
 
 
 **Globe, 2026-09-03:** caller externo pausado; protección deploy sólo local, sin commit/push/deploy.

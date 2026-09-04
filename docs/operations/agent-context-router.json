@@ -4,6 +4,12 @@
   "fallbackSnapshot": "docs/operations/agent-context-history/2026-07-19/AGENTS.legacy.md",
   "domains": [
     {
+      "id": "report-production",
+      "triggers": ["informe", "reporte", "report", "PDF A4", "auditoría para cliente"],
+      "skills": ["report-studio"],
+      "sources": ["docs/operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md"]
+    },
+    {
       "id": "architecture-modularity",
       "triggers": ["architecture", "boundary", "schema ownership", "EPIC-027", "deployable"],
       "skills": ["software-architect-2026"],

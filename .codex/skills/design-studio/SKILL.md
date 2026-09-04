@@ -213,3 +213,13 @@ Cada apuesta con su volatilidad en `SOURCES.md`:
   `CLIENT_DELIVERY.md`.
 - `docs/business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_CREDIT_MODEL_V1.md` — contrato económico
   canónico de Studio Credits; no duplicar bandas ni equivalencias dentro de esta skill.
+
+## Estándar obligatorio para informes Efeonce
+
+Al producir o revisar un informe, carga
+`docs/operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md`: pie en todas las páginas
+con URL bubble oficial, dirección y teléfono; logos oficiales de Efeonce y del cliente
+cuando aplique; gráficos con unidades y fuentes claras. Si el destino es PDF, entrega
+y revisa el PDF A4; el HTML queda como insumo editable.
+
+Para crear o mejorar el informe completo, carga `report-studio`: narrativa, evidencia, gráficos, producción y QA del formato final. La práctica especializada conserva sus contratos y datos.
