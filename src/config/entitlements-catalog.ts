@@ -1777,6 +1777,45 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['execute'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1631 — External identity binding foundation (EPIC-044 U04). Una capability por
+  // autoridad: registrar environment, leer, ligar organización, otorgar capability, invitar y
+  // revocar son autoridades distintas; NUNCA un cajón identity.admin.
+  {
+    key: 'identity.external_environment.manage',
+    module: 'organization',
+    actions: ['create', 'update'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'identity.external_binding.read',
+    module: 'organization',
+    actions: ['read'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'identity.external_binding.bind',
+    module: 'organization',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'identity.external_grant.issue',
+    module: 'organization',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'identity.external_invitation.issue',
+    module: 'organization',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'identity.external_access.revoke',
+    module: 'organization',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-910 — Notion Demo Teamspace Sandbox capabilities (canonical defense in depth).
   // Demo teamspace (Notion 36339c2f-...4ca0f5-...) sirve como gate canonical pre-Fase 1
   // del ADR GREENHOUSE_ICO_METRICS_PROGRESSIVE_MIGRATION_V1. Demo NUNCA toca payroll real

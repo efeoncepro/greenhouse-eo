@@ -54,6 +54,16 @@ export type CanonicalErrorCode =
   | 'invalid_period'
   | 'rate_limited'
   | 'internal_error'
+  // TASK-1631 — External identity binding foundation (commands de operador + lane del gateway).
+  | 'external_access_invalid_request'
+  | 'external_access_not_found'
+  | 'external_access_conflict'
+  | 'external_access_organization_not_eligible'
+  | 'external_access_environment_not_active'
+  | 'external_access_binding_not_active'
+  | 'external_access_invitation_not_open'
+  | 'external_access_invitation_expired'
+  | 'external_access_identity_collision'
   // Design System Figma node linking (TASK-1072).
   | 'invalid_figma_url'
   | 'figma_node_not_axis'
@@ -241,6 +251,52 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
     status: 500,
     message: 'Algo salió mal de nuestro lado. Inténtalo de nuevo en unos minutos.',
     actionable: true
+  },
+  // TASK-1631 — External identity binding foundation. Nunca exponen tokens, claims ni emails.
+  external_access_invalid_request: {
+    status: 422,
+    message: 'Revisa los datos del binding externo: hay un campo inválido o faltante.',
+    actionable: true
+  },
+  external_access_not_found: {
+    status: 404,
+    message: 'No encontramos el environment, binding, grant o invitación indicado.',
+    actionable: false
+  },
+  external_access_conflict: {
+    status: 409,
+    message: 'La operación choca con un binding o vínculo vigente. Revisa el estado actual antes de reintentar.',
+    actionable: false
+  },
+  external_access_organization_not_eligible: {
+    status: 422,
+    message: 'Solo una organización cliente activa de Account 360 puede recibir un binding externo.',
+    actionable: false
+  },
+  external_access_environment_not_active: {
+    status: 409,
+    message: 'El environment de identidad no está activo para esta operación.',
+    actionable: false
+  },
+  external_access_binding_not_active: {
+    status: 409,
+    message: 'El binding de la organización está revocado. Crea uno nuevo si corresponde.',
+    actionable: false
+  },
+  external_access_invitation_not_open: {
+    status: 409,
+    message: 'La invitación ya no está abierta. Emite una nueva invitación.',
+    actionable: false
+  },
+  external_access_invitation_expired: {
+    status: 410,
+    message: 'La invitación expiró. Emite una nueva invitación.',
+    actionable: false
+  },
+  external_access_identity_collision: {
+    status: 409,
+    message: 'La persona no se pudo resolver de forma única. Requiere revisión manual de identidad.',
+    actionable: false
   },
   invalid_figma_url: {
     status: 422,

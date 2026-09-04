@@ -150,6 +150,7 @@ import {
   getIdentityGovernanceAuditLogWriteFailuresSignal,
   getIdentityGovernancePendingApprovalOverdueSignal
 } from './queries/identity-governance-signals'
+import { getExternalIdentityBindingSignals } from './queries/external-identity-binding-signals'
 import {
   getSisterPlatformOAuthExchangeFailureRateSignal,
   getSisterPlatformOAuthRedirectRejectedSignal,
@@ -935,6 +936,8 @@ interface ReliabilityOverviewSources {
    * Roll up bajo moduleKey 'identity'.
    */
   identityGovernance?: ReliabilitySignal[] | null
+  /** TASK-1631 — external identity binding (4 señales, steady 0). Roll up bajo 'identity'. */
+  externalIdentityBinding?: ReliabilitySignal[] | null
   sisterPlatformOAuth?: ReliabilitySignal[] | null
 
   /**
@@ -1355,6 +1358,9 @@ export const buildReliabilityOverview = (
     ...(sources.workforceRoleTitle ?? []),
     // TASK-839 — Admin Center entitlement governance signals (2).
     ...(sources.identityGovernance ?? []),
+    // TASK-1631 — External identity binding signals (4): unbound dispatch, revoked still
+    // dispatching, subject collision, orphan grant.
+    ...(sources.externalIdentityBinding ?? []),
     // TASK-948 — Sister-platform OAuth broker signals (exchange failures,
     // redirect rejects, stale client config). Roll up bajo identity.
     ...(sources.sisterPlatformOAuth ?? []),
@@ -2439,6 +2445,12 @@ export const getReliabilityOverview = async (
           .then(signals => signals.filter((s): s is NonNullable<typeof s> => s !== null))
           .catch(() => null)
 
+  // TASK-1631 — External identity binding signals (4 readers en paralelo, steady 0).
+  const externalIdentityBinding =
+    preloadedSources.externalIdentityBinding !== undefined
+      ? preloadedSources.externalIdentityBinding
+      : await getExternalIdentityBindingSignals().catch(() => null)
+
   // TASK-948 — Sister-platform OAuth broker signals. Estos readers se basan
   // en el audit log append-only del broker; no leen secretos ni tokens raw.
   const sisterPlatformOAuth =
@@ -3015,6 +3027,7 @@ export const getReliabilityOverview = async (
     identityLegalProfile,
     workforceRoleTitle,
     identityGovernance,
+    externalIdentityBinding,
     sisterPlatformOAuth,
     workspaceProjection,
     organizationBrandAssets,
