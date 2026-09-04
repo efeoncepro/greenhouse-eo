@@ -1,9 +1,9 @@
 # Runbook — Efeonce Auth Server (`auth.efeonce.org`)
 
 > **Tipo de documento:** Runbook operativo
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-09-04 por Claude (TASK-1828, EPIC-044)
-> **Última actualización:** 2026-09-04 por Claude (TASK-1829: sección OAuth)
+> **Última actualización:** 2026-09-04 por Claude (release 9100bbd2765d: producción + environment del emisor)
 > **Documentación técnica:** [`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) · [`EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`](../../architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md) · [`services/auth-server/README.md`](../../../services/auth-server/README.md)
 
 ## Para qué sirve
@@ -18,7 +18,8 @@ personas (TASK-1830) agrega su sección cuando exista.
 - `gcloud` autenticado en `efeonce-group`. Para PG local, `pnpm pg:connect` (proxy `127.0.0.1:15432`).
 - Topología: **un** Cloud Run service `auth-server` (`us-east4`) compartido por staging y producción, como
   `ops-worker`; publicado como **segundo host** del front door del gateway MCP (`efeonce-mcp/infra/terraform`,
-  variable `enable_auth_host`). Misma IP `34.111.78.237`, misma policy Cloud Armor.
+  variable `enable_auth_host`). Misma IP `34.111.78.237`, misma policy Cloud Armor. **En producción desde
+  2026-09-04** (release `9100bbd2765d`, revisión `auth-server-00005-pk8`).
 - Identidad de runtime: SA `auth-server@efeonce-group` con `roles/cloudkms.signerVerifier` **sólo** sobre la
   llave `auth-server-es256` y `roles/cloudsql.client`. No puede crear ni destruir versiones KMS.
 - Source of truth de env vars: `services/auth-server/deploy.sh` (`--set-env-vars` es destructivo).
@@ -54,6 +55,15 @@ con ese flag en `false`, la metadata OAuth y `/oauth/*` responden 404 aunque el 
 El `kid` publicado debe coincidir con `pnpm auth-server:rotate-key --status` (llave `active`, y `retiring`
 durante una rotación). El JWKS lleva `Cache-Control: max-age=300` y el servicio cachea 60 s: tras una
 rotación, esperar hasta cinco minutos para ver ambos `kid`.
+
+Evidencia de producción (2026-09-04, release `9100bbd2765d`, run `33893120972`): revisión activa
+`auth-server-00005-pk8` (`GIT_SHA f6db4255a`, árbol idéntico al target; deploy change-gated); `/healthz`
+`{enabled:true, oauth:false}`; `/readyz` 200 con `postgres`, `kms` y `activeKey` en `ok`; JWKS con 2 `kid` (v2
+`active` `xjjMaYxidu3Vk57K5py6w6WGDN41T0WMeOtHMEyppKc`, v1 `retiring` `VjbDUgwc5bd1zj5olC8VndMXKk_G60tLF8xRw945nI8`);
+`/.well-known/oauth-authorization-server` → 404 (flag OAuth OFF, esperado). La revisión activa se lee con
+`gcloud run services describe auth-server --region us-east4 --format='value(status.latestReadyRevisionName)'`.
+`AUTH_SERVER_JWKS_URL` quedó declarada en Vercel Production y staging el mismo día (señal
+`auth.issuer.jwks_unreachable` fuera de `not_configured`; lectura humana en producción pendiente).
 
 ### 3. Prender o apagar el flag
 
@@ -109,11 +119,17 @@ Requiere `AUTH_SERVER_KMS_KEY` y acceso a PG por el proxy con las variables `GRE
 ### Registrar el environment del emisor (precondición del flag OAuth)
 
 La fila `efeonce-auth` de `greenhouse_core.external_identity_environments` se registra por el command canónico de
-TASK-1631, nunca por SQL: `pnpm auth-server:register-issuer-environment` (proxy PG + `.env.local`, perfil ops).
-Nace en `draft` (registrado el 2026-09-04) y se pasa a `active` con `--status active` en el mismo momento en que se
-prende `AUTH_SERVER_OAUTH_ENABLED` en staging; en `draft` el resolver responde `environment_inactive` y ningún token
-sería `bound`. `issuerClass` no se puede cambiar después: el issuer es `https://auth.efeonce.org` exacto.
-
+TASK-1631 (`upsertExternalIdentityEnvironment`: tx + audit + outbox), nunca por SQL:
+`pnpm auth-server:register-issuer-environment` (`scripts/auth-server/register-issuer-environment.ts`; proxy PG
+`127.0.0.1:15432` + `.env.local`, perfil ops; flags `--status draft|active`, `--environment-id`). Registra
+`displayName` «Efeonce Auth», provider `efeonce_auth`, `issuerUrl https://auth.efeonce.org`, `jwksUri
+https://auth.efeonce.org/.well-known/jwks.json`, `audience https://mcp.efeonce.org/mcp`, `issuerClass external`,
+`subjectType public`. Nace en `draft` (**registrada el 2026-09-04**, actor `cli:jreye`, `created=true`) y se pasa a
+`active` con `--status active` en el mismo momento en que se prende `AUTH_SERVER_OAUTH_ENABLED` en staging; en
+`draft` el resolver responde `environment_inactive` y ningún token sería `bound` (verificado en producción por el
+lane ecosystem: `GET /api/platform/ecosystem/identity/binding?environment=efeonce-auth&subject=…` con el token
+consumer del gateway → 200 `outcome: environment_inactive`; 400 sin parámetros; 401 sin token). `issuerClass` no
+se puede cambiar después: el issuer es `https://auth.efeonce.org` exacto.
 
 ### Rutas y flag
 
@@ -143,10 +159,11 @@ Precondiciones, en este orden:
 1. Runtime desplegado con el código de TASK-1829 (`GIT_SHA` ≥ `d31e6e913` en la revisión activa; lo hace
    `auth-server-deploy.yml` en el push a `develop`).
 2. Fila del emisor en `greenhouse_core.external_identity_environments`: `environment_id=efeonce-auth`
-   (= `AUTH_SERVER_ENVIRONMENT_ID`), `issuer_url=https://auth.efeonce.org`, `issuer_class=external`, `status=active`,
-   creada con el command de TASK-1631 (`upsertExternalIdentityEnvironment`, `src/lib/identity/external-access`),
-   nunca con `INSERT` a mano. Sin esa fila ningún sujeto resuelve `bound` y todo `token` termina en `access_denied`
-   (fail-closed por diseño, no bug).
+   (= `AUTH_SERVER_ENVIRONMENT_ID`), `issuer_url=https://auth.efeonce.org`, `issuer_class=external`, `status=active`.
+   La fila **ya existe en `draft`** (2026-09-04); pasarla a `active` con
+   `pnpm auth-server:register-issuer-environment --status active` (command de TASK-1631,
+   `src/lib/identity/external-access`), nunca con `UPDATE` a mano. Sin la fila `active` ningún sujeto resuelve
+   `bound` y todo `token` termina en `access_denied` (fail-closed por diseño, no bug).
 3. Fila de `AUTH_SERVER_OAUTH_ENABLED` al día en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
 
 Prender (durable): cambiar el default en `services/auth-server/deploy.sh` (`AUTH_SERVER_OAUTH_ENABLED:-true`) y
@@ -264,6 +281,6 @@ Para cortar a un solo cliente o persona sin apagar el emisor: revocar el consent
 
 - `services/auth-server/{server.ts,app.ts,deploy.sh,Dockerfile}` · `src/lib/auth-server/keys/**` · `src/lib/auth-server/oauth/**` ·
   `src/lib/reliability/queries/auth-server-signals.ts` · `migrations/20260904111156246_task-1828-greenhouse-auth-schema.sql` ·
-  `migrations/20260904130826694_task-1829-auth-oauth-tables.sql` · `scripts/auth-server/{rotate-signing-key,register-oauth-client,oauth-store-smoke,generate-brand-assets}.ts`
+  `migrations/20260904130826694_task-1829-auth-oauth-tables.sql` · `scripts/auth-server/{rotate-signing-key,register-oauth-client,oauth-store-smoke,generate-brand-assets,register-issuer-environment}.ts`
 - Gates OAuth: `pnpm vitest run src/lib/auth-server` (68 tests, flujo completo in-process) · `pnpm auth-server:oauth-store:smoke` (PG real)
 - Tasks: `TASK-1828` (runtime + llaves) · `TASK-1829` (OAuth) en `docs/tasks/`

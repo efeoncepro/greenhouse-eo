@@ -3,8 +3,11 @@
 > **Tipo:** contrato técnico (endpoints, claims, tablas, invariantes) del authorization server propio
 > `https://auth.efeonce.org` — **TASK-1829** (EPIC-044 U02).
 > **Estado:** `code complete, rollout pendiente` (2026-09-04): flag `AUTH_SERVER_OAUTH_ENABLED=false` en
-> `services/auth-server/deploy.sh`; migrations aplicadas en Cloud SQL; runtime en staging sirve sólo
-> `/readyz` + JWKS hasta prender el flag. ADR gobernante:
+> `services/auth-server/deploy.sh`; migrations aplicadas en Cloud SQL; el runtime está **en producción** desde el
+> release `9100bbd2765d` (revisión `auth-server-00005-pk8`, servicio único staging+producción) y sirve sólo
+> `/readyz` + JWKS hasta prender el flag (`/.well-known/oauth-authorization-server` → 404 verificado en vivo);
+> environment del emisor `efeonce-auth` registrado en **`draft`** el 2026-09-04 (`pnpm auth-server:register-issuer-environment`).
+> ADR gobernante:
 > [`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md).
 > Contrato de federación: [`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md).
 > Código: `src/lib/auth-server/oauth/**` (dominio, server-only) · `services/auth-server/app.ts` (handler) ·
@@ -218,11 +221,24 @@ ventana 24 h, steady 0): `auth.oauth.code_reuse_detected` (error), `auth.oauth.r
 |---|---|---|
 | `AUTH_SERVER_OAUTH_ENABLED` | `false` | OFF ⇒ metadata y `/oauth/*` 404 |
 | `AUTH_SERVER_ISSUER` | `https://auth.efeonce.org` | `issuer` publicado (origen https sin query/fragment) |
-| `AUTH_SERVER_ENVIRONMENT_ID` | `efeonce-auth` | `environment_id` del emisor en `external_identity_environments` (debe existir `active` para que haya `bound`) |
+| `AUTH_SERVER_ENVIRONMENT_ID` | `efeonce-auth` | `environment_id` del emisor en `external_identity_environments` (debe existir `active` para que haya `bound`; **existe en `draft` desde 2026-09-04**, ver abajo) |
 | `AUTH_SERVER_MCP_AUDIENCE` | `https://mcp.efeonce.org/mcp` | `aud` de los access tokens y `resource` aceptado |
 
 TTLs y límites: `AUTH_SERVER_OAUTH_DEFAULTS` (`config.ts`) — code 300 s, access 900 s, refresh 30 d /
 90 d, CIMD 24 h, rate limits arriba.
+
+### 9.1 Precondición: environment del emisor (CLI)
+
+La fila `efeonce-auth` de `greenhouse_core.external_identity_environments` se registra **únicamente** por el
+command canónico de TASK-1631 (`upsertExternalIdentityEnvironment`: tx + audit + outbox), nunca por SQL, a través
+de `pnpm auth-server:register-issuer-environment` (`scripts/auth-server/register-issuer-environment.ts`; lee
+`.env.local`, perfil ops, proxy `127.0.0.1:15432`; `--status draft|active`, `--environment-id`). Registrada el
+2026-09-04 en **`draft`**: `displayName` «Efeonce Auth», provider `efeonce_auth`, `issuerUrl`
+`https://auth.efeonce.org`, `jwksUri` `https://auth.efeonce.org/.well-known/jwks.json`, `audience`
+`https://mcp.efeonce.org/mcp`, `issuerClass external` (**inmutable** después), `subjectType public`. En `draft`
+el resolver responde `environment_inactive` y ningún sujeto es `bound`; se pasa a `active` con `--status active`
+en el mismo momento en que se prende `AUTH_SERVER_OAUTH_ENABLED` en staging (precondición registrada en
+`FEATURE_FLAG_STATE_LEDGER.md`).
 
 ## 10. Invariantes duros
 
@@ -248,9 +264,15 @@ TTLs y límites: `AUTH_SERVER_OAUTH_DEFAULTS` (`config.ts`) — code 300 s, acce
   reuso → revoke → introspect `active:false`, rate limit, step-up, unbound).
 - `pnpm auth-server:oauth-store:smoke` — store PostgreSQL contra PG real (single-use, rotación/reuso,
   revoke de familia, consent idempotente, trigger append-only).
-- Staging (flag ON, pendiente): `curl https://auth.efeonce.org/.well-known/oauth-authorization-server`
-  con `issuer` idéntico; `POST /oauth/register` 201; `POST /oauth/token` con code inválido ⇒
-  `invalid_grant`; flujo con persona real cuando TASK-1830 esté en staging.
+- Producción (hecho 2026-09-04, release `9100bbd2765d`, revisión `auth-server-00005-pk8`, flag OFF):
+  `/healthz` `{enabled:true, oauth:false}`; `/readyz` 200 con `postgres`/`kms`/`activeKey` ok;
+  `/.well-known/jwks.json` con 2 `kid`; `/.well-known/oauth-authorization-server` → 404 (esperado con el flag
+  OFF). Environment `efeonce-auth` en `draft`: `GET /api/platform/ecosystem/identity/binding?environment=efeonce-auth&subject=…`
+  con el token consumer del gateway → 200 `outcome: environment_inactive` (400 sin parámetros, 401 sin token).
+- Staging (flag ON, pendiente): environment a `active` (`pnpm auth-server:register-issuer-environment --status active`);
+  `curl https://auth.efeonce.org/.well-known/oauth-authorization-server` con `issuer` idéntico;
+  `POST /oauth/register` 201; `POST /oauth/token` con code inválido ⇒ `invalid_grant`; clientes CIMD + DCR de
+  prueba (TASK-1832); flujo con persona real cuando TASK-1830 esté en staging.
 
 ## 12. Fuera de alcance / follow-ups
 

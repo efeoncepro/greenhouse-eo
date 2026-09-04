@@ -1,11 +1,11 @@
 # Operar el autorizador de Efeonce (`auth.efeonce.org`)
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-09-04 por Claude
-> **Ultima actualizacion:** 2026-09-04 por Claude (TASK-1829)
+> **Ultima actualizacion:** 2026-09-04 por Claude (release 9100bbd2765d)
 > **Modulo:** Identidad y acceso (EPIC-044 · TASK-1828 · TASK-1829)
-> **Ruta en portal:** sin UI; se opera con `curl`, `gcloud`, `pnpm auth-server:rotate-key`, `pnpm auth-server:register-client` y las rutas admin `POST /api/admin/auth-server/oauth-clients` y `POST /api/admin/auth-server/consents/revoke`. Señales en `/admin/operations`.
+> **Ruta en portal:** sin UI; se opera con `curl`, `gcloud`, `pnpm auth-server:rotate-key`, `pnpm auth-server:register-client`, `pnpm auth-server:register-issuer-environment` y las rutas admin `POST /api/admin/auth-server/oauth-clients` y `POST /api/admin/auth-server/consents/revoke`. Señales en `/admin/operations`.
 > **Documentacion relacionada:** [Autorizador de Efeonce](../../documentation/identity/autorizador-efeonce.md), [Runbook auth-server](../../operations/runbooks/auth-server.md), [EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md](../../architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md), [Operar el binding de identidad externa](operar-binding-identidad-externa.md), [EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md)
 
 ## Para que sirve
@@ -24,7 +24,8 @@ El despliegue y la publicación del host en el balanceador son operaciones de pl
 - Necesitas `gcloud` autenticado en el proyecto `efeonce-group` y, para rotar llaves, acceso a PostgreSQL por el
   proxy local (`pnpm pg:connect`, queda en `127.0.0.1:15432`).
 - Ten claro que es **un solo servicio** Cloud Run (`auth-server`, `us-east4`) compartido por staging y
-  producción, igual que `ops-worker`. Lo que hagas afecta a ambos.
+  producción, igual que `ops-worker`. Lo que hagas afecta a ambos. Está **en producción desde el 2026-09-04**
+  (release `9100bbd2765d`, revisión `auth-server-00005-pk8`).
 - La única dirección válida es `https://auth.efeonce.org`. La URL `.run.app` del servicio responde `421` a
   propósito.
 - Las variables del servicio viven en `services/auth-server/deploy.sh`. Cambiarlas a mano en Cloud Run no dura:
@@ -46,8 +47,9 @@ curl -s -o /dev/null -w '%{http_code}\n' https://auth.efeonce.org/readyz
 curl -s https://auth.efeonce.org/.well-known/jwks.json
 ```
 
-Esperado con el flag ON: `healthz` → `200`; `readyz` → `200` con `postgres`, `kms` y `activeKey` en `ok`; el
-JWKS lista una llave `active` y, si hay rotación en curso, también la `retiring`.
+Esperado con el flag ON: `healthz` → `200` (body `{enabled:true, oauth:false}` mientras OAuth siga apagado);
+`readyz` → `200` con `postgres`, `kms` y `activeKey` en `ok`; el JWKS lista una llave `active` y, si hay rotación
+en curso, también la `retiring`. Así respondió producción el 2026-09-04 tras el release `9100bbd2765d`.
 
 Luego compara con el registro:
 
@@ -179,15 +181,47 @@ Efecto:
   grant o el binding de la persona ([manual de binding](operar-binding-identidad-externa.md)): eso sube `gv` y
   el gateway rechaza el token en la siguiente llamada.
 
-### 8. Prender la superficie OAuth en staging
+### 8. Registrar el environment del emisor
 
-Hoy `AUTH_SERVER_OAUTH_ENABLED` está apagado en todos los entornos. Antes de prenderlo en staging, confirma:
+Para que el emisor pueda ligar personas a organizaciones, tiene que existir como **environment** en
+`greenhouse_core.external_identity_environments`. Esa fila se crea y se actualiza **sólo** con el CLI, que llama al
+command canónico de `TASK-1631` (`upsertExternalIdentityEnvironment`: transacción + auditoría + outbox). Nunca con
+SQL a mano.
+
+Requisitos: `.env.local` y PostgreSQL por el proxy (`pnpm pg:connect`, perfil ops).
+
+```bash
+pnpm auth-server:register-issuer-environment                     # crea o actualiza la fila en draft (idempotente)
+pnpm auth-server:register-issuer-environment --status active     # la activa (hacerlo junto con el paso 9)
+pnpm auth-server:register-issuer-environment --environment-id efeonce-auth --status draft   # id explícito
+```
+
+Lo que registra: `environmentId` `efeonce-auth` (debe ser **igual** a `AUTH_SERVER_ENVIRONMENT_ID`), nombre
+"Efeonce Auth", provider `efeonce_auth`, `issuerUrl` `https://auth.efeonce.org`, `jwksUri`
+`https://auth.efeonce.org/.well-known/jwks.json`, `audience` `https://mcp.efeonce.org/mcp`, `issuerClass`
+`external` y `subjectType` `public`. `issuerClass` **no se puede cambiar después**; si te equivocas, es un
+environment nuevo.
+
+Estado actual: la fila **ya existe en `draft`** (registrada el 2026-09-04, actor `cli:jreye`). Se deja en borrador
+a propósito hasta el momento exacto en que se prenda `AUTH_SERVER_OAUTH_ENABLED` en staging (paso 9); ahí se corre
+el CLI con `--status active`.
+
+Qué significa `environment_inactive`: mientras el environment siga en `draft`, cualquier consulta de binding para
+ese emisor (por ejemplo `pnpm staging:request "/api/platform/ecosystem/identity/binding?environment=efeonce-auth&subject=<sub>"`
+con el token consumer del gateway) responde `200` con `outcome: environment_inactive`, y ningún token sería
+`bound`. Es fail-closed por diseño, no una falla: en producción se comprobó exactamente eso el 2026-09-04 (`400`
+sin parámetros, `401` sin token).
+
+### 9. Prender la superficie OAuth en staging
+
+Hoy `AUTH_SERVER_OAUTH_ENABLED` está apagado en todos los entornos (el runtime de producción lo lleva apagado
+desde el release `9100bbd2765d`). Antes de prenderlo en staging, confirma:
 
 1. El runtime está sano (paso 1) con `AUTH_SERVER_ENABLED=true`.
-2. El emisor existe como environment `active` en `greenhouse_core.external_identity_environments` con
-   `environmentId` **igual** a `AUTH_SERVER_ENVIRONMENT_ID` (default `efeonce-auth`), `issuerUrl`
-   `https://auth.efeonce.org` y `audience` `https://mcp.efeonce.org/mcp`. Se registra con el command de
-   `TASK-1631` (paso 1 del [manual de binding](operar-binding-identidad-externa.md)). Sin esta fila, toda
+2. El emisor existe como environment en `greenhouse_core.external_identity_environments` (paso 8; hoy en `draft`)
+   con `environmentId` **igual** a `AUTH_SERVER_ENVIRONMENT_ID` (default `efeonce-auth`), `issuerUrl`
+   `https://auth.efeonce.org` y `audience` `https://mcp.efeonce.org/mcp`. En el mismo momento del flip, pásalo a
+   `active` con `pnpm auth-server:register-issuer-environment --status active`. Sin la fila `active`, toda
    autorización termina en `access_denied` aunque el resto funcione.
 3. Tienes al menos un cliente de prueba: un documento CIMD publicado por HTTPS o un registro DCR (abajo).
 4. La fila del flag existe en [`FEATURE_FLAG_STATE_LEDGER.md`](../../operations/FEATURE_FLAG_STATE_LEDGER.md).
@@ -236,7 +270,7 @@ curl -s -X POST https://auth.efeonce.org/oauth/token \
 
 | Señal (en `/admin/operations`) | Normal | En alerta |
 | --- | --- | --- |
-| `auth.issuer.jwks_unreachable` | `ok` | `not_configured`: Vercel aún no tiene `AUTH_SERVER_JWKS_URL` (esperado hasta que se configure). `error`: el JWKS no responde `200` o sus `kid` no coinciden con `signing_keys`. |
+| `auth.issuer.jwks_unreachable` | `ok` | `not_configured`: a Vercel le falta `AUTH_SERVER_JWKS_URL` — ya está configurada en producción y staging desde el 2026-09-04 (con redeploy), así que verla ahora es un drift, no lo esperado; la primera lectura humana en producción sigue pendiente. `error`: el JWKS no responde `200` o sus `kid` no coinciden con `signing_keys`. |
 | `auth.signing_keys.lifecycle` | `ok` | `error`: no hay llave `active` o hay más de una. `warning`: una llave lleva más de 7 días en `retiring` — te olvidaste del paso 4. |
 | `auth.oauth.code_reuse_detected` | `ok` (0 en 24 h) | `error`: alguien canjeó dos veces el mismo código de autorización. La familia ya quedó revocada sola; busca en `oauth_audit_events` por `client_id` para saber si es un cliente mal implementado o un código robado. |
 | `auth.oauth.refresh_reuse_detected` | `ok` (0 en 24 h) | `error`: se presentó un refresh ya rotado o revocado (o desde otro cliente). Igual que arriba: familia revocada, investigar por `client_id` y `grant_id`. |
@@ -284,10 +318,10 @@ no debería pasar nunca.
 | El JWKS no muestra la llave nueva después de rotar | Caché (60 s en el servicio, 300 s en clientes) | Esperar hasta 5 minutos y repetir el paso 1 |
 | `421 misdirected_request` | Llamaste por la URL `.run.app` o con otro `Host` | Usar `https://auth.efeonce.org` |
 | `https://auth.efeonce.org` no responde | El certificado sigue `PROVISIONING` o el host no está publicado (`enable_auth_host=false`) | Runbook §4 (plataforma) |
-| La metadata y `/oauth/*` responden `404` con `AUTH_SERVER_ENABLED=true` | `AUTH_SERVER_OAUTH_ENABLED` está en `false` (estado actual) | Esperado hasta prenderlo (paso 8); no es una falla |
+| La metadata y `/oauth/*` responden `404` con `AUTH_SERVER_ENABLED=true` | `AUTH_SERVER_OAUTH_ENABLED` está en `false` (estado actual, también en producción) | Esperado hasta prenderlo (paso 9); no es una falla |
 | Un cliente rechaza la metadata por «issuer mismatch» | `AUTH_SERVER_ISSUER` no es idéntico al origen (`https://auth.efeonce.org`, sin barra final, sin `http://`) | Revisar el valor en `services/auth-server/deploy.sh`, corregir y redesplegar |
 | `invalid_redirect_uri` al registrar o autorizar | La política de redirects: público = loopback `127.0.0.1`/`[::1]`/`localhost` en cualquier puerto con path y query exactos, o HTTPS exacto; confidencial = HTTPS exacto, `localhost` rechazado; nunca comodines | Corregir el redirect en la app o en el registro; no relajar la política |
-| `access_denied` (o `invalid_grant` al canjear un código válido) con una persona autenticada | La persona no tiene membership `bound` en el environment `efeonce-auth`, o el environment no está `active` | Registrar el environment y ligar a la persona ([manual de binding](operar-binding-identidad-externa.md)); no es un problema del emisor |
+| `access_denied` (o `invalid_grant` al canjear un código válido) con una persona autenticada | La persona no tiene membership `bound` en el environment `efeonce-auth`, o el environment sigue en `draft` (`environment_inactive`) | Activar el environment (paso 8, `--status active`) y ligar a la persona ([manual de binding](operar-binding-identidad-externa.md)); no es un problema del emisor |
 | `/oauth/authorize` responde «Necesitas iniciar sesión» (`login_required`) | El emisor aún no autentica personas (`TASK-1830`) | Esperado; ningún código se emite hasta esa task |
 | `consent_required` con `prompt=none` | La persona nunca consintió esa app y ese scope | Repetir la autorización sin `prompt=none` para que vea la pantalla |
 | `429 slow_down` | Rate limit: `token` 60/min por IP y 120/min por cliente; `register` 10/min por IP | Esperar la ventana (60 s); si es un cliente legítimo en loop, revisar su implementación de refresh |
@@ -302,7 +336,9 @@ no debería pasar nunca.
 - Invariantes para agentes: [`IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` §Auth server propio](../../architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md#auth-server-propio-task-1828)
 - Código: `services/auth-server/{server.ts,app.ts,deploy.sh,Dockerfile,README.md}` · `src/lib/auth-server/keys/**` ·
   `src/lib/auth-server/oauth/**` · `scripts/auth-server/rotate-signing-key.ts` ·
-  `scripts/auth-server/register-oauth-client.ts` · `src/app/api/admin/auth-server/**` ·
+  `scripts/auth-server/register-oauth-client.ts` · `scripts/auth-server/register-issuer-environment.ts` ·
+  `scripts/auth-server/oauth-store-smoke.ts` · `scripts/auth-server/generate-brand-assets.ts` ·
+  `src/app/api/admin/auth-server/**` ·
   `src/lib/reliability/queries/auth-server-signals.ts` ·
   `migrations/20260904111156246_task-1828-greenhouse-auth-schema.sql` ·
   `migrations/20260904130826694_task-1829-auth-oauth-tables.sql`

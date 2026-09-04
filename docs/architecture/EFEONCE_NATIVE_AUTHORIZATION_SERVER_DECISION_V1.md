@@ -1,6 +1,6 @@
 # Efeonce Native Authorization Server Decision V1
 
-> **Status:** `Accepted` (decisión del operador 2026-09-03; sin runtime autorizado hasta que cada task hija abra su gate — `TASK-1828` abrió el suyo el 2026-09-04: runtime, llaves y front door vivos en staging, producción pendiente del release; `TASK-1829` quedó `code complete, rollout pendiente` ese mismo día detrás de `AUTH_SERVER_OAUTH_ENABLED=false`; ver §Delta 2026-09-04 y §Delta 2026-09-04 — TASK-1829)
+> **Status:** `Accepted` (decisión del operador 2026-09-03; sin runtime autorizado hasta que cada task hija abra su gate — `TASK-1828` abrió el suyo el 2026-09-04: runtime, llaves y front door vivos en staging y, ese mismo día, **en producción** por el release `9100bbd2765d` (revisión `auth-server-00005-pk8`), con `AUTH_SERVER_JWKS_URL` declarada en Vercel; `TASK-1829` quedó `code complete, rollout pendiente` detrás de `AUTH_SERVER_OAUTH_ENABLED=false`, con el environment del emisor `efeonce-auth` registrado en `draft`; ver §Delta 2026-09-04, §Delta 2026-09-04 — TASK-1829 y §Delta 2026-09-04 — producción)
 > **Date:** 2026-09-03
 > **Owner:** Efeonce Platform / Identity
 > **Scope:** authorization server propio en `auth.efeonce.org`, autenticación de personas externas, emisión y verificación de tokens para `mcp.efeonce.org`, binding con Account 360, convergencia del login cliente de Greenhouse
@@ -293,8 +293,8 @@ exactamente lo que hará el gateway en `TASK-1831`.
 `cloudRunService: auth-server`, `us-east4`), en `production-release.yml` (job `deploy-auth-server`) y en los tres
 gates de workers (build-contract, runtime-deps, deploy-path-coverage).
 
-**Reliability.** `auth.issuer.jwks_unreachable` (`runtime`; `not_configured` hasta que Vercel tenga
-`AUTH_SERVER_JWKS_URL`; `error` si el JWKS difiere del registry) y `auth.signing_keys.lifecycle` (`data_quality`;
+**Reliability.** `auth.issuer.jwks_unreachable` (`runtime`; `not_configured` mientras Vercel no tenga
+`AUTH_SERVER_JWKS_URL` — declarada en Production y staging el 2026-09-04, ver §Delta producción; `error` si el JWKS difiere del registry) y `auth.signing_keys.lifecycle` (`data_quality`;
 `error` sin `active` o con más de una; `warning` si una `retiring` supera 7 días) en
 `src/lib/reliability/queries/auth-server-signals.ts`, cableadas en `get-reliability-overview.ts` y en el registry
 `identity`. `auth.kms.sign_failures` se observa por incidentes Sentry con tag `component=auth-server` /
@@ -364,10 +364,54 @@ TASK-1828 (módulo `identity`, kind `incident`, 24 h sobre `oauth_audit_events`,
 `pnpm vitest run src/lib/auth-server` (68 tests, flujo completo in-process) · `pnpm auth-server:oauth-store:smoke`
 (PG real, OK 2026-09-04) · typecheck · gates de workers (runtime-deps, build-contract, deploy-path).
 
-**Rollout pendiente.** (1) Release de producción del runtime; (2) prender `AUTH_SERVER_OAUTH_ENABLED` en staging
-**sólo** después de registrar el environment del emisor en `greenhouse_core.external_identity_environments`
-(`environment_id=efeonce-auth`, `issuer_url=https://auth.efeonce.org`, `issuer_class=external`, command de
-TASK-1631) y validar la metadata; (3) flujo con persona real exige TASK-1830. Nunca
+**Rollout pendiente.** (1) ~~Release de producción del runtime~~ — **hecho** el 2026-09-04 con el release
+`9100bbd2765d` (el runtime corre en producción con el flag OFF; ver §Delta 2026-09-04 — producción); (2) prender
+`AUTH_SERVER_OAUTH_ENABLED` en staging **sólo** después de pasar a `active` el environment del emisor en
+`greenhouse_core.external_identity_environments` (`environment_id=efeonce-auth`, `issuer_url=https://auth.efeonce.org`,
+`issuer_class=external`; **registrado en `draft` el 2026-09-04** por el command de TASK-1631 vía
+`pnpm auth-server:register-issuer-environment`; `--status active` en el mismo momento del flip) y validar la
+metadata; (3) flujo con persona real exige TASK-1830. Nunca
 `gcloud run services update --update-env-vars` a mano. Follow-ups: `private_key_jwt`, migración de los
 sister-platform consumers internos, command `oauth-gc` + scheduler para filas expiradas, decisión `TASK-659` al
 cierre. Runbook: [`docs/operations/runbooks/auth-server.md`](../operations/runbooks/auth-server.md) §`OAuth`.
+
+## Delta 2026-09-04 — producción (release `9100bbd2765d`)
+
+**Runtime en producción.** El release `9100bbd2765d` (orquestador `production-release.yml`, run `33893120972`,
+manifest `released` a las 16:39:40Z) ejecutó por primera vez el job `deploy-auth-server`: revisión activa
+`auth-server-00005-pk8` con `GIT_SHA f6db4255a` (árbol byte-idéntico al target del release; el deploy es
+change-gated por rutas, así que la revisión sólo cambia cuando cambia `services/auth-server/**` o el código que
+bundlea). Servicio Cloud Run único compartido por staging y producción, como `ops-worker`. Verificado en vivo en
+`https://auth.efeonce.org`: `/healthz` `{enabled:true, oauth:false}`, `/readyz` 200 con `postgres`, `kms` y
+`activeKey` en `ok`, `/.well-known/jwks.json` con los dos `kid` (v2 `active`
+`xjjMaYxidu3Vk57K5py6w6WGDN41T0WMeOtHMEyppKc`, v1 `retiring` `VjbDUgwc5bd1zj5olC8VndMXKk_G60tLF8xRw945nI8`) y
+`/.well-known/oauth-authorization-server` → 404 porque `AUTH_SERVER_OAUTH_ENABLED=false` (TASK-1829 sigue
+`code complete, rollout pendiente`). El retiro de la versión 1 de la llave sigue pendiente (dueño: la sesión de
+TASK-1828).
+
+**`AUTH_SERVER_JWKS_URL` en Vercel.** `https://auth.efeonce.org/.well-known/jwks.json` declarada en Production y
+en staging el 2026-09-04, con redeploy de ambos (Production `greenhouse-or66smmd7…` READY, staging
+`greenhouse-a55noth42…` READY): el reader de `auth.issuer.jwks_unreachable` deja de responder `not_configured`.
+Nadie ha leído todavía esa señal en producción con una sesión humana (el agent auth está deshabilitado en
+producción por diseño): **verificación pendiente**, no evidencia.
+
+**Environment del emisor registrado en `draft`.** La fila `efeonce-auth` de
+`greenhouse_core.external_identity_environments` se creó el 2026-09-04 por el command canónico de TASK-1631
+(`upsertExternalIdentityEnvironment`: transacción + audit + outbox; nunca SQL) a través del CLI nuevo
+`pnpm auth-server:register-issuer-environment` (`scripts/auth-server/register-issuer-environment.ts`; lee
+`.env.local`, perfil ops, proxy `127.0.0.1:15432`; flags `--status draft|active`, `--environment-id`): `displayName`
+«Efeonce Auth», provider `efeonce_auth`, `issuerUrl https://auth.efeonce.org`, `jwksUri
+https://auth.efeonce.org/.well-known/jwks.json`, `audience https://mcp.efeonce.org/mcp`, `issuerClass external`
+(inmutable después), `subjectType public`, **status `draft`**, actor `cli:jreye`, `created=true`. En `draft` el
+resolver responde `environment_inactive` — verificado en producción por el lane ecosystem
+`GET /api/platform/ecosystem/identity/binding?environment=efeonce-auth&subject=…` con el token consumer del
+gateway → 200 `outcome: environment_inactive` (400 sin parámetros, 401 sin token). Pasarla a `active` = el mismo
+CLI con `--status active`, exactamente cuando se prenda `AUTH_SERVER_OAUTH_ENABLED` en staging (precondición
+registrada en el ledger de flags). Scripts hermanos del mismo día bajo `scripts/auth-server/`:
+`register-oauth-client.ts` (`pnpm auth-server:register-client`), `oauth-store-smoke.ts`
+(`pnpm auth-server:oauth-store:smoke`), `generate-brand-assets.ts` (`pnpm auth-server:brand-assets:generate`);
+todos salvo el de brand assets exigen `.env.local` + proxy PG.
+
+**Próximos pasos de TASK-1829 (sin cambio de estado).** Flag ON en staging (default en
+`services/auth-server/deploy.sh` + workflow `auth-server-deploy.yml`), environment a `active`, validación de la
+metadata, clientes CIMD + DCR de prueba (TASK-1832); el flujo con persona real exige TASK-1830.

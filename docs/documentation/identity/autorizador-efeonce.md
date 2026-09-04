@@ -1,9 +1,9 @@
 # Autorizador de Efeonce (`auth.efeonce.org`)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-09-04 por Claude
-> **Ultima actualizacion:** 2026-09-04 por Claude (TASK-1829)
+> **Ultima actualizacion:** 2026-09-04 por Claude (release 9100bbd2765d)
 > **Modulo:** Identidad y acceso (EPIC-044 · TASK-1828 · TASK-1829)
 > **Documentacion tecnica:** [EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) (ADR nativo; §Delta 2026-09-04 = lo implementado), [EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md](../../architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md) (contrato OAuth: endpoints, claims, tablas e invariantes de TASK-1829), [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md#authorization-server-propio-authefeonceorg--task-1828-2026-09-04), [EPIC-044](../../epics/in-progress/EPIC-044-efeonce-identity-authorization-server-and-mcp-federation.md)
 > **Manual de uso:** [Operar el autorizador de Efeonce](../../manual-de-uso/identity/operar-autorizador-efeonce.md)
@@ -31,7 +31,7 @@ que hoy está en código pero con su propio interruptor apagado.
 
 | Pieza | Qué es, en simple | Estado |
 | --- | --- | --- |
-| **Servicio** | Un programa pequeño corriendo en Google Cloud (Cloud Run, región `us-east4`), uno solo para staging y producción. | Vivo en staging desde 2026-09-04; producción entra con el próximo release. |
+| **Servicio** | Un programa pequeño corriendo en Google Cloud (Cloud Run, región `us-east4`), uno solo para staging y producción. | **En producción desde 2026-09-04** (release `9100bbd2765d`, revisión `auth-server-00005-pk8`). |
 | **Dirección** | `https://auth.efeonce.org`, servida por la **misma puerta de entrada** (balanceador, IP y protección anti-abuso) que ya usa `mcp.efeonce.org`. No se creó una puerta nueva. | Vivo; certificado activo. |
 | **Llave de firma** | La "máquina de sellar" pases. Vive en un módulo de hardware de Google Cloud (Cloud KMS HSM): el servicio puede pedirle que firme, pero **nadie puede sacar la llave de ahí**, ni siquiera Efeonce. | Creada y rotada una vez (ver más abajo). |
 | **Registro de llaves** | Una tabla propia (`greenhouse_auth.signing_keys`) que dice qué versión de la llave está activa, cuál está en retiro y cuál ya se retiró, con un historial que no se puede borrar. Sólo guarda la parte **pública**. | Aplicado en la base de datos. |
@@ -47,7 +47,11 @@ Concretamente, hoy responde tres cosas:
 
 Se verificó en vivo el 2026-09-04: `/readyz` respondió `200` con base de datos, KMS y llave activa en orden, y un
 token de prueba firmado por el hardware se validó correctamente contra esas llaves públicas — exactamente la
-comprobación que hará el MCP cuando empiece a aceptar estos pases.
+comprobación que hará el MCP cuando empiece a aceptar estos pases. Ese mismo día el release de producción
+`9100bbd2765d` publicó el servicio en producción (revisión `auth-server-00005-pk8`): `/healthz` responde
+`{enabled:true, oauth:false}`, `/readyz` `200` y el JWKS publica las dos llaves; la "hoja informativa" OAuth
+responde `404` porque su interruptor sigue apagado. Además, Greenhouse ya sabe dónde leer esas llaves
+(`AUTH_SERVER_JWKS_URL` configurada en Vercel, producción y staging).
 
 > Detalle técnico: rutas y flag en [`services/auth-server/server.ts`](../../../services/auth-server/server.ts) y
 > [`services/auth-server/README.md`](../../../services/auth-server/README.md); estado por entorno del flag en
@@ -144,7 +148,7 @@ compara en cada llamada.
 
 | Situación | Respuesta | Por qué |
 | --- | --- | --- |
-| Flag `AUTH_SERVER_OAUTH_ENABLED` apagado (estado actual en todos los entornos) | `404` en metadata y en `/oauth/*` | La superficie está en código pero no publicada. Prenderla en staging exige registrar el emisor como environment y validar la metadata (ver el manual). |
+| Flag `AUTH_SERVER_OAUTH_ENABLED` apagado (estado actual en todos los entornos, incluida producción) | `404` en metadata y en `/oauth/*` | La superficie viaja en el runtime de producción pero no está publicada. Prenderla en staging exige pasar el emisor a `active` como environment (hoy registrado en `draft`) y validar la metadata (ver el manual). |
 | Flag prendido, una app lee la metadata o se registra por DCR | Funciona (`200` / `201`) | Estas rutas no necesitan a la persona. |
 | Flag prendido, una app manda a la persona a `/oauth/authorize` | **"Necesitas iniciar sesión"** (`login_required`; con `prompt=none`, redirect a la app con `error=login_required`). **No se emite ningún código.** | Todavía no existe quien autentique a la persona: el emisor no acepta la sesión del portal ni ninguna otra. `TASK-1830` trae passkeys, magic link y TOTP con su cookie propia `__Host-efeonce_auth`. |
 | Flag prendido, persona autenticada pero sin organización ligada | `access_denied` | Sin membership `bound` (`TASK-1631`) no hay `gv`, y sin `gv` no hay pase. |
@@ -171,7 +175,7 @@ una auditoría que no se puede editar ni borrar, con IPs, agentes y sujetos guar
 
 | Falta | Qué significa para una persona | Task |
 | --- | --- | --- |
-| Superficie OAuth **prendida** en un entorno real | Está en código (`develop`) y probada, pero `AUTH_SERVER_OAUTH_ENABLED` sigue apagado: ninguna app puede leer la metadata ni pedir un pase todavía. Prenderla en staging exige registrar el environment `efeonce-auth`, validar la metadata y probar clientes CIMD/DCR; producción entra con el próximo release. | `TASK-1829` (rollout pendiente) |
+| Superficie OAuth **prendida** en un entorno real | Está en producción (release `9100bbd2765d`) y probada, pero `AUTH_SERVER_OAUTH_ENABLED` sigue apagado: ninguna app puede leer la metadata ni pedir un pase todavía. El emisor ya está registrado como environment `efeonce-auth` en **borrador** (`draft`, 2026-09-04); prender en staging exige pasarlo a `active`, validar la metadata y probar clientes CIMD/DCR. | `TASK-1829` (rollout pendiente) |
 | Pantalla de consentimiento definitiva | Hoy es una página mínima servida por el emisor; la task `ui-ux` la reemplaza sin cambiar rutas ni campos. | task `ui-ux` (U06) |
 | Login de personas (passkeys, magic link, TOTP, recuperación) | No hay pantalla donde alguien demuestre quién es. No habrá contraseñas. | `TASK-1830` |
 | Que el MCP acepte estos pases | El gateway sigue aceptando sólo la identidad interna (Entra). | `TASK-1831` |
@@ -190,7 +194,13 @@ no comparte sesiones, cookies ni secretos con el portal.
 - El portal expone dos rutas de administración (registrar cliente confidencial, revocar consentimiento) que
   llaman a los **mismos commands** que usa el emisor; no hay lógica duplicada en la UI.
 - Comparte el **repositorio** (`services/auth-server/`) y el **carril de despliegue** de los workers Cloud Run:
-  se despliega a staging al empujar a `develop` y a producción sólo por el release controlado.
+  se despliega a staging al empujar a `develop` y a producción sólo por el release controlado (el primero fue
+  `9100bbd2765d`, 2026-09-04). Como es un solo servicio, la misma revisión sirve staging y producción.
+- Para que una persona pueda algún día recibir un pase, el emisor tiene que figurar como **environment** en el
+  registro de identidades externas (ver [Binding de Identidad Externa para el MCP](binding-identidad-externa-mcp.md)).
+  Esa fila (`efeonce-auth`) ya existe desde el 2026-09-04, creada por el command canónico (nunca a mano en la base
+  de datos) y en estado **borrador**: mientras siga así, cualquier consulta responde "environment inactivo" y no
+  se liga a nadie. Se activa en el mismo momento en que se prenda la superficie OAuth en staging.
 - Usa las mismas piezas de **observabilidad**: incidentes en Sentry (dominio `identity`, componente
   `auth-server`) y cinco señales en `/admin/operations` (dos de llaves, tres del protocolo OAuth).
 - Está aislado a propósito: cookie propia, secretos propios, identidad propia en Google Cloud. Es una excepción
@@ -219,7 +229,7 @@ no comparte sesiones, cookies ni secretos con el portal.
 
 | Señal | Qué vigila | Cuándo se pone en alerta |
 | --- | --- | --- |
-| `auth.issuer.jwks_unreachable` | Que las llaves públicas se puedan leer desde Greenhouse y coincidan con el registro. | Muestra `not_configured` hasta que Vercel tenga `AUTH_SERVER_JWKS_URL`; `error` si el endpoint no responde o publica llaves distintas a las registradas. |
+| `auth.issuer.jwks_unreachable` | Que las llaves públicas se puedan leer desde Greenhouse y coincidan con el registro. | `AUTH_SERVER_JWKS_URL` ya está configurada en Vercel (producción y staging, 2026-09-04), así que ya no debería mostrar `not_configured`; `error` si el endpoint no responde o publica llaves distintas a las registradas. Falta una lectura humana en producción para confirmarlo. |
 | `auth.signing_keys.lifecycle` | Que exista exactamente una llave activa y que ninguna se quede "en retiro" para siempre. | `error` sin llave activa o con más de una; `warning` si una llave lleva más de 7 días en retiro. |
 | `auth.oauth.code_reuse_detected` | Que nadie canjee dos veces el mismo código de autorización. | Cualquier reuso en 24 h (`error`): la familia ya quedó revocada; puede ser un cliente mal implementado o un código robado. Normal = 0. |
 | `auth.oauth.refresh_reuse_detected` | Que nadie presente un refresh token ya rotado o revocado. | Cualquier reuso en 24 h (`error`): igual que arriba, la familia ya quedó revocada. Normal = 0. |

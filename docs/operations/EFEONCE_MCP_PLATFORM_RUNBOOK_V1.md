@@ -583,18 +583,27 @@ debe declarar sus propios límites de concurrencia, cuotas y circuit breakers an
 
 El authorization server propio de Efeonce (EPIC-044, TASK-1828) entra por **este mismo** load balancer como
 segundo host; el gateway y su ruta default no cambian. El Cloud Run `auth-server` vive en el repo Greenhouse
-(`services/auth-server/`, `us-east4`) y se opera con su propio runbook:
+(`services/auth-server/`, `us-east4`; servicio único staging+producción) y **está en producción desde el
+2026-09-04** por el release `9100bbd2765d` (job `deploy-auth-server` del orquestador; revisión
+`auth-server-00005-pk8`; `/readyz` 200, JWKS con 2 `kid`). Se opera con su propio runbook:
 `docs/operations/runbooks/auth-server.md` (deploy, flag, llaves KMS, señales). Acá sólo vive la parte del
 front door.
 
 Desde TASK-1829 (2026-09-04, `code complete, rollout pendiente`) ese mismo host trae la **superficie OAuth**
 (metadata RFC 8414/OIDC, `/oauth/register|authorize|consent|token|revoke|introspect`; CIMD primario, DCR compat,
 PKCE S256, JWT ES256 con claim `gv`) detrás de su propio flag `AUTH_SERVER_OAUTH_ENABLED` (default `false`, SoT
-`services/auth-server/deploy.sh`): con el flag OFF todo eso responde 404 y el gateway no nota diferencia. Su
-operación (prender en staging, precondición del environment `efeonce-auth`, registro de clientes confidenciales,
-revocación de consentimientos, señales `auth.oauth.*`, rollback) vive en `docs/operations/runbooks/auth-server.md`
-§`OAuth`; contrato en `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`. El gateway sólo verificará
-tokens de este issuer con TASK-1831.
+`services/auth-server/deploy.sh`): con el flag OFF todo eso responde 404 (verificado en producción:
+`/.well-known/oauth-authorization-server` → 404) y el gateway no nota diferencia. El environment del emisor
+`efeonce-auth` ya está registrado en `greenhouse_core.external_identity_environments` en **`draft`** (2026-09-04,
+`pnpm auth-server:register-issuer-environment` → command de TASK-1631, nunca SQL; `issuerClass external`
+inmutable): el resolver responde `environment_inactive` —comprobado por este lane con
+`GET /api/platform/ecosystem/identity/binding?environment=efeonce-auth&subject=…` → 200 `environment_inactive`—
+hasta correr el mismo CLI con `--status active`, en el mismo momento en que se prenda el flag en staging. Su
+operación (prender en staging, environment a `active`, registro de clientes confidenciales, revocación de
+consentimientos, señales `auth.oauth.*`, rollback) vive en `docs/operations/runbooks/auth-server.md` §`OAuth`;
+contrato en `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`. El gateway sólo verificará tokens de
+este issuer con TASK-1831; `AUTH_SERVER_JWKS_URL` ya está declarada en Vercel (Production + staging) para la señal
+`auth.issuer.jwks_unreachable` del portal.
 
 Variables en `efeonce-mcp/infra/terraform` (`variables.tf`):
 

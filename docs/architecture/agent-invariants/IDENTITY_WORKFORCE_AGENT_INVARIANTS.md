@@ -455,10 +455,12 @@ del dominio; el resto lo bundlea `services/auth-server`).
 > `docs/operations/runbooks/auth-server.md`; señales en `src/lib/reliability/queries/auth-server-signals.ts`.
 
 Es el emisor de tokens de Efeonce en `https://auth.efeonce.org`: Cloud Run `auth-server` (`us-east4`, un solo
-servicio para staging y production), segundo host del front door del gateway MCP, firma ES256 con la llave
+servicio para staging y production; **en producción desde 2026-09-04** por el release `9100bbd2765d`, revisión
+`auth-server-00005-pk8`), segundo host del front door del gateway MCP, firma ES256 con la llave
 `auth-server-es256` en Cloud KMS HSM y publica el JWKS. Expone `/healthz`, `/readyz` y `/.well-known/jwks.json`
-(TASK-1828) y, detrás de `AUTH_SERVER_OAUTH_ENABLED` (default `false`; `TASK-1829` code complete en `develop`
-2026-09-04, rollout pendiente), la superficie OAuth: metadata RFC 8414/OIDC, CIMD primario + DCR compat, PKCE S256,
+(TASK-1828; `AUTH_SERVER_JWKS_URL` ya declarada en Vercel Production y staging) y, detrás de
+`AUTH_SERVER_OAUTH_ENABLED` (default `false`; `TASK-1829` code complete, rollout pendiente: el runtime en producción
+sirve la superficie OAuth como 404; environment del emisor `efeonce-auth` registrado en `draft`), la superficie OAuth: metadata RFC 8414/OIDC, CIMD primario + DCR compat, PKCE S256,
 access JWT ES256 de 15 min con claim `gv`, refresh rotativo, revocación, introspección y consentimiento persistido.
 Personas (`TASK-1830`) y gateway multi-issuer (`TASK-1831`) llegan después. El login del portal no cambia.
 
@@ -524,6 +526,14 @@ Personas (`TASK-1830`) y gateway multi-issuer (`TASK-1831`) llegan después. El 
   `greenhouse_core.external_identity_environments` (`efeonce-auth`, `https://auth.efeonce.org`, `external`) ni sin
   validar la metadata; **NUNCA** emitir un code para una persona que este emisor no autenticó (hasta TASK-1830
   `authorize` responde `login_required`).
+- **Environment del emisor — sólo por command.** La fila `efeonce-auth` **ya existe en `draft`** (registrada el
+  2026-09-04 por `pnpm auth-server:register-issuer-environment`, que llama al command canónico de TASK-1631
+  `upsertExternalIdentityEnvironment`: tx + audit + outbox). **NUNCA** crearla, editarla ni activarla con SQL;
+  **NUNCA** cambiar `issuerClass` después de creada (es inmutable: el issuer es `https://auth.efeonce.org` exacto);
+  se pasa a `active` con `--status active` en el mismo momento en que se prende el flag OAuth en staging. Mientras
+  esté en `draft`, el resolver responde `environment_inactive` (verificado en producción por el lane ecosystem
+  `GET /api/platform/ecosystem/identity/binding?environment=efeonce-auth&subject=…` → 200 `environment_inactive`):
+  es fail-closed por diseño, no un bug.
 - **SIEMPRE** que se agregue un scope al gateway, agregarlo a `scopes.ts` (test de paridad con
   `efeonce-mcp/src/config.ts`) y a la copia es-CL de `src/lib/copy/auth-server.ts`. **NUNCA** editar
   `pages/efeonce-isotipo.generated.ts` a mano (`pnpm auth-server:brand-assets:generate`).
@@ -531,8 +541,10 @@ Personas (`TASK-1830`) y gateway multi-issuer (`TASK-1831`) llegan después. El 
 **Helpers canónicos**: `src/lib/auth-server/keys/index.ts` (`signWithActiveKey`, `registerSigningKeyVersion`,
 `retireSigningKey`, adapter KMS) · `src/lib/auth-server/oauth/**` (`registerConfidentialClient`,
 `grantClientConsent`, `revokeClientConsent`, store atómico, `cimd.ts`, `scopes.ts`) · CLIs
-`pnpm auth-server:rotate-key`, `pnpm auth-server:register-client`, `pnpm auth-server:oauth-store:smoke` · señales
-`auth.issuer.jwks_unreachable` (`runtime`), `auth.signing_keys.lifecycle` (`data_quality`) y
+`pnpm auth-server:rotate-key`, `pnpm auth-server:register-client`, `pnpm auth-server:oauth-store:smoke`,
+`pnpm auth-server:register-issuer-environment` (todos con `.env.local` + proxy PG) y
+`pnpm auth-server:brand-assets:generate` · señales `auth.issuer.jwks_unreachable` (`runtime`; reader en Vercel,
+`AUTH_SERVER_JWKS_URL` presente en Production y staging desde 2026-09-04), `auth.signing_keys.lifecycle` (`data_quality`) y
 `auth.oauth.{code_reuse_detected,refresh_reuse_detected,cimd_rejected}` (`incident`, 24 h, steady 0) · Sentry
 `captureWithDomain('identity')` con tag `component=auth-server` (`check=kms` reemplaza al contador
 `auth.kms.sign_failures`).

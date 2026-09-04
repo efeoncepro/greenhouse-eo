@@ -1,9 +1,9 @@
 # Manual de uso — Release Watchdog
 
 > **Tipo de documento:** Manual operativo (lenguaje simple, paso a paso)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-05-10 por TASK-849 V1.1
-> **Ultima actualizacion:** 2026-07-09
+> **Ultima actualizacion:** 2026-09-04 por Claude (release `9100bbd2765d`: 5 servicios; change-gate por servicio `ops-worker` + `auth-server`)
 > **Documentacion tecnica:** [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md), [runbook operativo](../../operations/runbooks/production-release-watchdog.md)
 
 ## Estado vigente
@@ -12,7 +12,7 @@ El Watchdog está **manual-only temporalmente** en el repo desde el 2026-05-24 h
 
 ## Para que sirve
 
-El **Release Watchdog** es el sistema que vigila los workflows de despliegue a produccion (`Ops Worker`, `Commercial Cost Worker`, `ICO Batch Worker`, `HubSpot Integration`, `Azure Teams`) y alerta cuando algo se traba. Cierra el bucle de un incidente real (2026-04-26 → 2026-05-09) donde 3 workflows quedaron bloqueados 14-22 dias **sin que nadie se diera cuenta**.
+El **Release Watchdog** es el sistema que vigila los workflows de despliegue a produccion (`Ops Worker`, `Commercial Cost Worker`, `ICO Batch Worker`, `HubSpot Integration`, `Auth Server` desde 2026-09-04, `Azure Teams`) y alerta cuando algo se traba. Cierra el bucle de un incidente real (2026-04-26 → 2026-05-09) donde 3 workflows quedaron bloqueados 14-22 dias **sin que nadie se diera cuenta**.
 
 Hace 3 cosas:
 
@@ -90,7 +90,7 @@ Bug en vivo que requiere atencion. Casos comunes:
 - **stale_approval `error` (>24h)**: deploy esperando approval >1 dia. Cancelar el run viejo (esta superseded por commits mas recientes).
 - **pending_without_jobs `error` (>5min)**: el bug class del incidente historico se reprodujo. Investigar.
 - **worker_revision_drift `error`**: la revision Cloud Run no matchea el ultimo deploy verde. Si el worker drifted es `hubspot-greenhouse-integration`, ejecutar el recovery del runbook con `hubspot-greenhouse-integration-deploy.yml`, `environment=production`, `expected_sha=<release target_sha>` y `skip_tests=false`; luego verificar `/health`, `/contract` y watchdog `drift_count=0`.
-- **worker_revision_drift solo en `ops-worker`**: puede ser residual conocido si el deploy fue change-gated. Antes de re-disparar workflows, confirmar que Cloud Run esta `Ready=True`, el workflow dice `deploy_needed=false` y el diff de rutas runtime entre el SHA servido y el target es vacío. Si todo eso se cumple, documentar y no redeployar por etiqueta.
+- **worker_revision_drift en `ops-worker` o `auth-server`**: son los dos servicios **change-gated** (su workflow salta el deploy cuando ninguna ruta runtime cambió y conserva el `GIT_SHA` anterior). Desde 2026-09-04 el watchdog lo distingue solo: en la evidencia `detail` de cada servicio lee `(synced)`, `(change-gated — rutas runtime sin cambios …)` — SHA distinto pero contado como synced — o `(DRIFT — …)`, que es el único caso que produce `error`. Antes de re-disparar workflows, confirmar que Cloud Run esta `Ready=True`, el workflow dice `deploy_needed=false` y el diff de **árbol completo** entre el SHA servido y el target es vacío. Si todo eso se cumple, documentar y no redeployar por etiqueta.
 
 ### 🟠 `critical` — INCIDENT MODE
 
@@ -179,18 +179,19 @@ gcloud run services describe ops-worker \
 
 **2. Si difieren** → re-trigger workflow:
 
-Antes de re-trigger, si el worker es `ops-worker`, descarta el caso conocido de
-change-gate:
+Antes de re-trigger, si el servicio es `ops-worker` o `auth-server` (los dos
+change-gated), descarta el caso conocido con el diff de árbol completo — sin
+limitar rutas, porque el skip del gate sólo mira las rutas declaradas:
 
 ```bash
-git diff --name-only <cloud_run_git_sha> <release_target_sha> -- \
-  package.json pnpm-lock.yaml tsconfig.json \
-  services/ops-worker scripts/ops-worker src/lib/ops src/lib/release
+git diff --name-only <cloud_run_git_sha> <release_target_sha>
 ```
 
 Si no hay archivos, el workflow summary muestra `deploy_needed=false` y Cloud
 Run está `Ready=True`, no hay acción técnica pendiente: documenta el residual de
-label y cierra con esa caveat.
+label y cierra con esa caveat. Desde 2026-09-04 el watchdog debería haberlo
+mostrado como `change-gated` (no `DRIFT`); si dice `DRIFT` con diff vacío, el
+problema es del clasificador (ver "Problemas comunes").
 
 Si hay diff runtime real o el worker no es ese caso:
 
@@ -235,6 +236,16 @@ gh workflow run "ICO Batch Worker Deploy" --ref main
 ```
 
 Despues del deploy, el watchdog detecta GIT_SHA en la nueva revision y devuelve severity `ok`.
+
+### "Un servicio change-gated aparece como DRIFT aunque el diff con el target esté vacío"
+
+→ El clasificador del reader (`CHANGE_GATED_RUNTIME_PATHS` en
+`src/lib/reliability/queries/release-worker-revision-drift.ts`) no conoce ese servicio. Cada servicio
+change-gated necesita su entrada espejo del array `WORKER_RUNTIME_PATHS=(` de su workflow de deploy, y
+`release-worker-change-gate-parity.test.ts` comprueba que el espejo coincida con el YAML real. Pasó el
+2026-09-04 con `auth-server` (release `9100bbd2765d`): árbol idéntico al target, `deploy_needed=false`, y el
+watchdog dijo «1 worker con revision drift confirmado (auth-server)» porque sólo conocía a `ops-worker`. El fix
+es agregar la entrada + el workflow al test, nunca redeployar el servicio para "alinear" el SHA.
 
 ### "Recibo alertas Teams erradas o spam del Watchdog"
 

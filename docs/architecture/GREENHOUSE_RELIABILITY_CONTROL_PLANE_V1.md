@@ -2,10 +2,34 @@
 
 > Spec canónica del `Reliability Control Plane` de Greenhouse EO. Define el registry por módulo, el modelo unificado de señales, el contrato de evidencia y cómo `Admin Center`, `Ops Health` y `Cloud & Integrations` consumen la lectura consolidada sin duplicar fuentes.
 >
-> Versión: `1.21`
+> Versión: `1.22`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-09-04` por TASK-1829 (3 signals `incident` de la superficie OAuth del emisor propio bajo el módulo `identity`: `auth.oauth.code_reuse_detected`, `auth.oauth.refresh_reuse_detected`, `auth.oauth.cimd_rejected`; antes ese mismo día TASK-1828 agregó `auth.issuer.jwks_unreachable` + `auth.signing_keys.lifecycle` y TASK-1631 las 4 de `identity.external_binding.*`)
+> Última actualización: `2026-09-04` por el release `9100bbd2765d` (semántica de `platform.release.worker_revision_drift`: change-gate por servicio — `ops-worker` + `auth-server` — con espejo de rutas y test de paridad; 5 servicios Cloud Run mapeados). Ese mismo día TASK-1829 agregó 3 signals `incident` de la superficie OAuth del emisor propio bajo el módulo `identity` (`auth.oauth.code_reuse_detected`, `auth.oauth.refresh_reuse_detected`, `auth.oauth.cimd_rejected`), TASK-1828 `auth.issuer.jwks_unreachable` + `auth.signing_keys.lifecycle` y TASK-1631 las 4 de `identity.external_binding.*`.
+
+## Delta 2026-09-04 — Release `9100bbd2765d`: `platform.release.worker_revision_drift` clasifica el change-gate por servicio
+
+Cambio de semántica del signal del subsistema `Platform Release` (reader
+`src/lib/reliability/queries/release-worker-revision-drift.ts`, TASK-849), sin signal nuevo ni cambio de módulo:
+
+- **Denominador:** 5 servicios Cloud Run (`ops-worker`, `commercial-cost-worker`, `ico-batch-worker`,
+  `hubspot-greenhouse-integration` y, desde TASK-1828, `auth-server`), derivados de `RELEASE_DEPLOY_WORKFLOWS`
+  (`WORKFLOWS_WITH_CLOUD_RUN_DRIFT_DETECTION`), nunca de un literal. Summary sano: `5/5 workers synced`.
+- **Change-gate por servicio:** un `GIT_SHA` servido distinto al del último run `success` **no es drift** cuando el
+  servicio es change-gated y el diff entre ambos SHA sobre sus rutas runtime es vacío; el reader lo cuenta como
+  `synced` con `detail` `change-gated — rutas runtime sin cambios; workflow omitió deploy y servicio está Ready=True`.
+  Sólo `DRIFT — revision Cloud Run no matchea ultimo deploy verde` produce `error`; `data missing` sigue en `warning`.
+  Hasta el 2026-09-04 el reader sólo conocía las rutas de `ops-worker`, así que `auth-server` (change-gated con árbol
+  idéntico al target, `deploy_needed=false`) salió como DRIFT `error` sobre un release sano.
+- **Mecanismo:** `CHANGE_GATED_RUNTIME_PATHS` es un mapa por servicio (`ops-worker`, `auth-server`), cada entrada un
+  **espejo** del array `WORKER_RUNTIME_PATHS=(` de `.github/workflows/<service>-deploy.yml`. No se lee el YAML con
+  `node:fs` en runtime (módulo alcanzable desde rutas; Turbopack trazaría el repo). La paridad la sostiene
+  `src/lib/reliability/queries/release-worker-change-gate-parity.test.ts`, que parsea los workflows reales.
+- **Regla para agentes:** un servicio Cloud Run change-gated nuevo entra en el mismo PR con su fila en
+  `RELEASE_DEPLOY_WORKFLOWS`, su entrada espejo y su workflow en el test de paridad. La verificación que manda sobre un
+  SHA distinto sigue siendo el diff de árbol completo (`git diff --name-only <served_sha> <target_sha>` vacío);
+  la etiqueta `change-gated` sólo afirma que las rutas declaradas no cambiaron. Detalle operativo: runbook
+  `production-release-watchdog.md` §3/§6 y `GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md` Delta 2026-09-04.
 
 ## Delta 2026-09-04 — TASK-1829: 3 signals de la superficie OAuth del emisor propio (`auth.oauth.*`)
 
