@@ -42,7 +42,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
