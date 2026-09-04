@@ -2603,6 +2603,109 @@ export interface GreenhouseCoreEntitySourceLinks {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseCoreExternalAccessResolutionLog {
+  binding_id: string | null;
+  client_id: string | null;
+  environment_id: string;
+  grants_version: number | null;
+  outcome: string;
+  profile_id: string | null;
+  resolution_id: string;
+  resolved_at: Generated<Timestamp>;
+  subject_hash: string;
+}
+
+export interface GreenhouseCoreExternalCapabilityGrants {
+  binding_id: string;
+  capability: string;
+  created_at: Generated<Timestamp>;
+  grant_id: string;
+  granted_at: Generated<Timestamp>;
+  granted_by: string;
+  profile_id: string | null;
+  reason: string | null;
+  revoke_reason: string | null;
+  revoked_at: Timestamp | null;
+  revoked_by: string | null;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCoreExternalIdentityAuditLog {
+  audit_id: string;
+  binding_id: string | null;
+  created_at: Generated<Timestamp>;
+  environment_id: string | null;
+  event_type: string;
+  grant_id: string | null;
+  invitation_id: string | null;
+  metadata_json: Generated<Json>;
+  organization_id: string | null;
+  outcome: Generated<string>;
+  performed_by: string;
+  profile_id: string | null;
+  reason: string | null;
+}
+
+export interface GreenhouseCoreExternalIdentityEnvironments {
+  audience: string;
+  created_at: Generated<Timestamp>;
+  created_by: string | null;
+  display_name: string;
+  environment_id: string;
+  issuer_class: string;
+  issuer_url: string;
+  jwks_uri: string;
+  notes: string | null;
+  provider: string;
+  provider_environment_ref: string | null;
+  status: Generated<string>;
+  subject_type: Generated<string>;
+  updated_at: Generated<Timestamp>;
+  updated_by: string | null;
+}
+
+export interface GreenhouseCoreExternalMemberInvitations {
+  accepted_at: Timestamp | null;
+  binding_id: string;
+  created_at: Generated<Timestamp>;
+  designated_admin: Generated<boolean>;
+  email: string;
+  email_normalized: string;
+  expires_at: Timestamp;
+  invitation_id: string;
+  issued_at: Generated<Timestamp>;
+  issued_by: string;
+  link_id: string | null;
+  linked_at: Timestamp | null;
+  profile_id: string | null;
+  reason: string | null;
+  revoke_reason: string | null;
+  revoked_at: Timestamp | null;
+  revoked_by: string | null;
+  status: Generated<string>;
+  token_hash: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCoreExternalOrganizationBindings {
+  binding_id: string;
+  bound_at: Generated<Timestamp>;
+  bound_by: string;
+  created_at: Generated<Timestamp>;
+  designated_admin_profile_id: string | null;
+  environment_id: string;
+  external_organization_ref: string;
+  grants_version: Generated<number>;
+  organization_id: string;
+  reason: string | null;
+  revoke_reason: string | null;
+  revoked_at: Timestamp | null;
+  revoked_by: string | null;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCoreFirstPartyAppSessions {
   app_session_id: string;
   app_version: string | null;
@@ -12932,6 +13035,12 @@ export interface DB {
   "greenhouse_core.design_system_figma_nodes": GreenhouseCoreDesignSystemFigmaNodes;
   "greenhouse_core.entitlement_governance_audit_log": GreenhouseCoreEntitlementGovernanceAuditLog;
   "greenhouse_core.entity_source_links": GreenhouseCoreEntitySourceLinks;
+  "greenhouse_core.external_access_resolution_log": GreenhouseCoreExternalAccessResolutionLog;
+  "greenhouse_core.external_capability_grants": GreenhouseCoreExternalCapabilityGrants;
+  "greenhouse_core.external_identity_audit_log": GreenhouseCoreExternalIdentityAuditLog;
+  "greenhouse_core.external_identity_environments": GreenhouseCoreExternalIdentityEnvironments;
+  "greenhouse_core.external_member_invitations": GreenhouseCoreExternalMemberInvitations;
+  "greenhouse_core.external_organization_bindings": GreenhouseCoreExternalOrganizationBindings;
   "greenhouse_core.first_party_app_sessions": GreenhouseCoreFirstPartyAppSessions;
   "greenhouse_core.globe_credit_funding_authority_auth_attestations": GreenhouseCoreGlobeCreditFundingAuthorityAuthAttestations;
   "greenhouse_core.globe_credit_funding_authority_execution_events": GreenhouseCoreGlobeCreditFundingAuthorityExecutionEvents;
