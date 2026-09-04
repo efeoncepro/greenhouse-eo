@@ -241,6 +241,114 @@ export interface GreenhouseAiToolCatalog {
   website_url: string | null;
 }
 
+export interface GreenhouseAuthAccessTokens {
+  client_id: string;
+  environment_id: string;
+  expires_at: Timestamp;
+  grant_id: string;
+  issued_at: Timestamp;
+  jti: string;
+  revoke_reason: string | null;
+  revoked_at: Timestamp | null;
+  scopes: string[];
+  subject: string;
+}
+
+export interface GreenhouseAuthAuthorizationCodes {
+  auth_time: Timestamp;
+  client_id: string;
+  code_challenge: string;
+  code_challenge_method: Generated<string>;
+  code_hash: string;
+  consumed_at: Timestamp | null;
+  correlation_id: string | null;
+  created_at: Generated<Timestamp>;
+  environment_id: string;
+  expires_at: Timestamp;
+  grant_id: string;
+  grants_version: number;
+  ip_hash: string | null;
+  nonce: string | null;
+  redirect_uri: string;
+  scopes: string[];
+  subject: string;
+}
+
+export interface GreenhouseAuthCimdCache {
+  client_id_url: string;
+  document: Json | null;
+  etag: string | null;
+  expires_at: Timestamp;
+  fetched_at: Generated<Timestamp>;
+  reject_reason: string | null;
+  status: string;
+}
+
+export interface GreenhouseAuthClientConsents {
+  client_id: string;
+  consent_id: Generated<string>;
+  environment_id: string;
+  granted_at: Generated<Timestamp>;
+  granted_by: string;
+  granted_via: string;
+  revoke_reason: string | null;
+  revoked_at: Timestamp | null;
+  revoked_by: string | null;
+  scope: string;
+  status: Generated<string>;
+  subject: string;
+}
+
+export interface GreenhouseAuthOauthAuditEvents {
+  client_id: string | null;
+  correlation_id: string | null;
+  details: Generated<Json>;
+  error_code: string | null;
+  event_id: Generated<string>;
+  event_type: string;
+  grant_id: string | null;
+  ip_hash: string | null;
+  occurred_at: Generated<Timestamp>;
+  outcome: string;
+  subject_hash: string | null;
+  user_agent_hash: string | null;
+}
+
+export interface GreenhouseAuthOauthClients {
+  allowed_scopes: string[] | null;
+  client_id: string;
+  client_name: string;
+  client_secret_hash: string | null;
+  client_type: string;
+  created_at: Generated<Timestamp>;
+  created_by: string;
+  grant_types: string[];
+  metadata_json: Generated<Json>;
+  redirect_uris: string[];
+  registration_kind: string;
+  response_types: string[];
+  status: Generated<string>;
+  token_endpoint_auth_method: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseAuthRefreshTokens {
+  absolute_expires_at: Timestamp;
+  client_id: string;
+  created_at: Generated<Timestamp>;
+  environment_id: string;
+  expires_at: Timestamp;
+  grant_id: string;
+  revoke_reason: string | null;
+  revoked_at: Timestamp | null;
+  rotated_to_hash: string | null;
+  scopes: string[];
+  status: Generated<string>;
+  subject: string;
+  token_hash: string;
+  used_at: Timestamp | null;
+}
+
 export interface GreenhouseAuthSigningKeyEvents {
   actor: string;
   details: Generated<Json>;
@@ -12945,6 +13053,13 @@ export interface DB {
   "greenhouse_ai.nexa_turn_telemetry": GreenhouseAiNexaTurnTelemetry;
   "greenhouse_ai.reliability_ai_observations": GreenhouseAiReliabilityAiObservations;
   "greenhouse_ai.tool_catalog": GreenhouseAiToolCatalog;
+  "greenhouse_auth.access_tokens": GreenhouseAuthAccessTokens;
+  "greenhouse_auth.authorization_codes": GreenhouseAuthAuthorizationCodes;
+  "greenhouse_auth.cimd_cache": GreenhouseAuthCimdCache;
+  "greenhouse_auth.client_consents": GreenhouseAuthClientConsents;
+  "greenhouse_auth.oauth_audit_events": GreenhouseAuthOauthAuditEvents;
+  "greenhouse_auth.oauth_clients": GreenhouseAuthOauthClients;
+  "greenhouse_auth.refresh_tokens": GreenhouseAuthRefreshTokens;
   "greenhouse_auth.signing_key_events": GreenhouseAuthSigningKeyEvents;
   "greenhouse_auth.signing_keys": GreenhouseAuthSigningKeys;
   "greenhouse_client_portal.module_assignment_events": GreenhouseClientPortalModuleAssignmentEvents;

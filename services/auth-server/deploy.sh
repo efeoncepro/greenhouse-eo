@@ -170,6 +170,15 @@ ENV_VARS="${ENV_VARS},AUTH_SERVER_ENABLED=${AUTH_SERVER_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},AUTH_SERVER_ISSUER=${AUTH_SERVER_ISSUER}"
 ENV_VARS="${ENV_VARS},AUTH_SERVER_ALLOWED_HOSTS=${AUTH_SERVER_ALLOWED_HOSTS}"
 ENV_VARS="${ENV_VARS},AUTH_SERVER_KMS_KEY=${AUTH_SERVER_KMS_KEY}"
+# TASK-1829 — superficie OAuth del emisor (metadata RFC 8414/OIDC, CIMD/DCR, /oauth/*).
+# OFF ⇒ los endpoints OAuth y la metadata responden 404; sólo /readyz y el JWKS siguen vivos.
+# Ledger: docs/operations/FEATURE_FLAG_STATE_LEDGER.md (runtime auth-server únicamente).
+ENV_VARS="${ENV_VARS},AUTH_SERVER_OAUTH_ENABLED=${AUTH_SERVER_OAUTH_ENABLED:-false}"
+# environment_id del emisor en greenhouse_core.external_identity_environments (TASK-1631): la
+# llave durable con la que se resuelve (subject → identity_profile → bindings → gv). Nunca el issuer crudo.
+ENV_VARS="${ENV_VARS},AUTH_SERVER_ENVIRONMENT_ID=${AUTH_SERVER_ENVIRONMENT_ID:-efeonce-auth}"
+# Audiencia única del recurso MCP (nunca un alias).
+ENV_VARS="${ENV_VARS},AUTH_SERVER_MCP_AUDIENCE=${AUTH_SERVER_MCP_AUDIENCE:-https://mcp.efeonce.org/mcp}"
 ENV_VARS="${ENV_VARS},SENTRY_ENVIRONMENT=${ENV}"
 
 # ─── Secrets (Secret Manager → env) ─────────────────────────────────────────

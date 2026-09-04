@@ -23,6 +23,7 @@ export type OAuthErrorCode =
   | 'consent_required'
   | 'interaction_required'
   | 'slow_down'
+  | 'invalid_target'
 
 const DEFAULT_STATUS: Record<OAuthErrorCode, number> = {
   invalid_request: 400,
@@ -42,7 +43,8 @@ const DEFAULT_STATUS: Record<OAuthErrorCode, number> = {
   login_required: 401,
   consent_required: 403,
   interaction_required: 403,
-  slow_down: 429
+  slow_down: 429,
+  invalid_target: 400
 }
 
 export class OAuthProtocolError extends Error {

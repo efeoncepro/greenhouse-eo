@@ -197,6 +197,9 @@ export const generateOpaqueToken = (prefix: string, bytes: number): string =>
 /** Identificador aleatorio para `jti`, `grant_id`, `consent_id` (URL-safe, sin prefijo). */
 export const generateOpaqueId = (bytes = 16): string => randomBytes(bytes).toString('base64url')
 
+/** Identificador hex en minúsculas para `client_id` legibles (`^[a-z0-9]`). */
+export const generateHexId = (bytes = 12): string => randomBytes(bytes).toString('hex')
+
 // ─── Correlación ────────────────────────────────────────────────────────────
 
 export const CORRELATION_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/
