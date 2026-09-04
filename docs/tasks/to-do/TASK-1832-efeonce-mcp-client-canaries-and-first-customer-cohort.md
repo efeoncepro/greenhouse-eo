@@ -1,5 +1,9 @@
 # TASK-1832 — Efeonce MCP Client Canaries and First Customer Cohort Rollout
 
+## Delta 2026-09-04 (TASK-1835)
+
+- Las pantallas que los canaries y la primera cohorte verán (consentimiento, login, step-up, recuperación) son `TASK-1835` (EPIC-044 U06); esta task queda bloqueada también por ella para la cohorte real (los canaries de protocolo con `prompt=none` o clientes de prueba no la necesitan).
+
 ## Delta 2026-09-04 (TASK-1829)
 
 - `TASK-1829` quedó `code complete, rollout pendiente` en `develop` (commits `263ee3a74`, `19d1658de`,

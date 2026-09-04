@@ -1,5 +1,11 @@
 # TASK-1830 — Efeonce Auth External Person Authentication (passkeys, magic link, TOTP, recovery)
 
+## Delta 2026-09-04 (TASK-1835)
+
+- La task `ui-ux` de login/consentimiento ya existe: `TASK-1835` (`docs/tasks/to-do/TASK-1835-efeonce-id-login-consent-screens.md`), con wireframe, flow y motion.
+- El flujo maestro `docs/ui/flows/EPIC-044-auth-server-login-consent-UI-FLOW.md` (listado en `Files owned` de esta task) fue CREADO al autorar TASK-1835 con el inventario de superficies S0–S10 y los recorridos A–G: esta task lo **extiende** con el detalle de cada método (magic link, passkey, TOTP, rutas `/auth/*` y `/login*`), no lo recrea.
+- TASK-1835 consume de aquí: rutas HTML `/login*`/`/session`, DTOs de login/step-up/sesión, errores canónicos y el copy de métodos en `src/lib/copy/auth-server.ts`; TASK-1835 aporta el shell «Efeonce ID» y las plantillas.
+
 ## Delta 2026-09-04 (TASK-1829)
 
 - `TASK-1829` quedó `code complete, rollout pendiente` en `develop` (commits `263ee3a74`, `19d1658de`,
