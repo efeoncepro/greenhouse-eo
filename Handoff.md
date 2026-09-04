@@ -14,6 +14,8 @@ y repetir medición sigue pendiente; este cambio solo documenta el método y el 
 Platform debe promoverla y medir ahorro. Reactivación/evidencia:
 [runbook TASK-1807](docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md).
 
+**TASK-1829 EN EJECUCIÓN (sesión Claude greenhouse-eo-45, `/implement-task 1829`, 2026-09-04, develop compartido):** discovery + audit hechos; spec recalibrada (7 tablas `greenhouse_auth` en vez de 5: se agregan `access_tokens` y `oauth_audit_events`; audit propio del dominio, no el legacy; `gv = max(grantsVersion)` de memberships `bound`, sin binding → `access_denied`; `SubjectSessionPort` hasta TASK-1830). Plan en checkpoint humano (P0): decisión pendiente sobre `localhost` por nombre en redirects de clientes públicos (spec lo rechaza, Claude Code lo usa). Sin código aún; no tocar `src/lib/auth-server/oauth/**`, `services/auth-server/**` ni `oauth-broker.ts` desde otra sesión.
+
 **EPIC-044 (2026-09-03) — authorization server PROPIO, decidido por el operador; WorkOS descartado.** ADR aceptado
 `docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`; epic `in-progress` con TASK-1626/1631/1813 y las
 nuevas TASK-1828…1834 (runtime · OAuth/CIMD/tokens · personas sin contraseña · gateway multi-issuer · canaries · pentest ·

@@ -1,5 +1,39 @@
 # TASK-1829 — Efeonce Auth Server OAuth Protocol Surface (metadata, CIMD, tokens, consent)
 
+## Delta 2026-09-04 — recalibración de baseline pre-ejecución (sesión greenhouse-eo-45)
+
+- **Tablas: 5 → 7.** Los invariantes «el segundo uso de un code revoca los tokens del primero» y «un token revocado
+  introspecta `active: false`» exigen registrar el `jti` de cada access token: se agrega `greenhouse_auth.access_tokens`
+  (jti, grant_id, expires_at, revoked_at). El audit del broker legacy (`greenhouse_core.sister_platform_oauth_audit_log`)
+  tiene FK `user_id → client_users` y un `CHECK` cerrado a 11 `event_type`; los sujetos externos no son `client_users` y
+  los eventos nuevos (`refresh`, `consent_*`, `cimd_*`, `client_registered`) obligarían a un `ALTER` cross-domain sobre
+  `greenhouse_core`. Se crea `greenhouse_auth.oauth_audit_events` (append-only, misma forma: outcome, error_code,
+  ip_hash, user_agent_hash, correlation_id) y el rate limit por IP/`client_id` cuenta sobre esa tabla (patrón
+  `party-endpoint-rate-limit.ts`, sin tabla extra). `recordSisterPlatformOAuthAuditEvent` queda para el broker legacy.
+- **El broker legacy NO depende de NextAuth** (verificado: cero `getServerAuthSession` en `src/lib/sister-platforms/`); la
+  sesión vive sólo en `src/app/api/auth/sister-platforms/authorize/route.ts`. La extracción del Slice 1 mueve los helpers
+  puros (hash, `timingSafeEqual`, PKCE S256, reglas de redirect, scopes, correlation id, generadores) a
+  `src/lib/auth-server/oauth/primitives.ts`; el broker los importa sin cambio de contrato.
+- **Nombres exactos de las tablas legacy** (`migrations/20260528163738200_task-948-…`): `greenhouse_core.sister_platform_oauth_clients`,
+  `sister_platform_authorization_codes`, `sister_platform_oauth_access_tokens`, `sister_platform_oauth_audit_log`.
+- **`gv` es por binding, no por persona** (`external_organization_bindings.grants_version`, TASK-1631). Regla de emisión:
+  `sub` se resuelve con `resolveExternalAccess({ environmentId: AUTH_SERVER_ENVIRONMENT_ID, subject })`; sin membership
+  `bound` → `access_denied` (fail-closed); con varias, `gv = max(grantsVersion)` y el gateway rechequea por membership
+  (TASK-1831). La fila del emisor en `external_identity_environments` (`issuer_url = https://auth.efeonce.org`,
+  `issuer_class='external'`) se registra por el command de TASK-1631 como paso de rollout, no por migration de esta task.
+- **`authorize` consume un `SubjectSessionPort`** (`{ subject, environmentId, authLevel, authTime }`); hasta TASK-1830 el
+  runtime inyecta el port `unauthenticated` y `authorize` responde `login_required` (página mínima, sin redirect al
+  cliente). El flujo completo code → token → refresh → revoke → introspect se prueba in-process contra el handler real
+  con store en memoria + firmador P-256 local; en staging sólo se ejercitan metadata, CIMD/DCR y los errores de `token`.
+- **Store como port** (`src/lib/auth-server/oauth/store/`): operaciones atómicas (`consumeAuthorizationCode`,
+  `rotateRefreshToken`, `revokeGrant`) con implementación PostgreSQL (`SELECT … FOR UPDATE` en tx) y en memoria para
+  tests; el handler HTTP se extrae de `server.ts` a `services/auth-server/app.ts` (factory con deps) para poder probarlo.
+- **Open Question resuelta:** `introspect` se expone (client-authenticated) para consumidores que no verifican JWT y para
+  probar revocación; el gateway sigue la recomendación del ADR (JWT + JWKS + recheck de `gv`, TASK-1831).
+- **`private_key_jwt`** sigue en Follow-ups; `token` acepta `none`+PKCE, `client_secret_basic` y `client_secret_post`.
+- **Riesgo abierto para el checkpoint:** la regla «`localhost` por nombre rechazado» choca con los redirects observados de
+  Claude Code (`http://localhost…`, runbook MCP §clientes conocidos). Decisión pendiente del operador antes del Slice 2.
+
 ## Delta 2026-09-04
 
 - `TASK-1828` entregó el runtime sobre el que esta task construye: Cloud Run `auth-server` (us-east4,
@@ -24,7 +58,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -37,7 +71,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-044`
-- Status real: `Lista para arrancar (2026-09-04): runtime auth.efeonce.org, llave KMS HSM, JWKS y schema greenhouse_auth entregados por TASK-1828 en staging; broker sister-platform vivo dentro del portal, sin extracción; sin código propio aún`
+- Status real: `En ejecución 2026-09-04 (sesión Claude greenhouse-eo-45, /implement-task 1829, develop compartido): discovery + audit en curso; sin código aún`
 - Rank: `TBD`
 - Domain: `platform|identity|integration`
 - Blocked by: `none`
@@ -129,8 +163,8 @@ Reglas obligatorias:
 ### Files owned
 
 - `src/lib/auth-server/oauth/**` (nuevo: metadata, clients, cimd, dcr, authorize, token, refresh, revoke, introspect, consent)
-- `services/auth-server/routes/**` (nuevo)
-- `migrations/<timestamp>_task-1829-auth-oauth-tables.sql` (nuevo: `oauth_clients`, `authorization_codes`, `refresh_tokens`, `client_consents`, `cimd_cache`)
+- `services/auth-server/app.ts` (nuevo, handler testeable) + `services/auth-server/server.ts` (delega en el handler)
+- `migrations/<timestamp>_task-1829-auth-oauth-tables.sql` (nuevo: `oauth_clients`, `authorization_codes`, `refresh_tokens`, `access_tokens`, `client_consents`, `cimd_cache`, `oauth_audit_events`)
 - `src/lib/sister-platforms/oauth-broker.ts` (extraer lógica compartida a `src/lib/auth-server/oauth/**`; conservar API pública)
 - `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md` (nuevo, contrato de endpoints y claims)
 
@@ -177,7 +211,7 @@ Reglas obligatorias:
 
 - Backend rigor: `backend-critical`
 - Impacto principal: `api`
-- Source of truth afectado: `greenhouse_auth.oauth_clients`, `authorization_codes`, `refresh_tokens`, `client_consents`, `cimd_cache`
+- Source of truth afectado: `greenhouse_auth.oauth_clients`, `authorization_codes`, `refresh_tokens`, `access_tokens`, `client_consents`, `cimd_cache`, `oauth_audit_events`
 - Consumidores afectados: gateway `efeonce-mcp`, clientes MCP (Claude, Codex, ChatGPT), portal (legacy sister-platforms), `TASK-1830`
 - Runtime target: `worker` (staging y production)
 
@@ -190,16 +224,16 @@ Reglas obligatorias:
 
 ### Data model and invariants
 
-- Entidades/tablas/views afectadas: las cinco tablas nuevas de `greenhouse_auth`
+- Entidades/tablas/views afectadas: las siete tablas nuevas de `greenhouse_auth` (ver Delta 2026-09-04)
 - Invariantes que no se pueden romper:
   - `Un authorization code se consume exactamente una vez; el segundo intento revoca los tokens emitidos por el primero.`
   - `Un refresh token reutilizado revoca toda su familia (RFC 6819 §5.2.2.3).`
   - `Ningún access token se emite para (subject, client_id, scope) sin fila active en client_consents.`
   - `client_id de CIMD es la URL del documento y el documento cacheado tiene TTL ≤ 24 h y re-validación en cada authorize.`
-- Write-target allowlist: `N/A — el dominio auth-server nace con esta task; declarar boundary test en src/lib/auth-server/boundary-domain.test.ts con estas cinco tablas`
+- Write-target allowlist: `el dominio auth-server nace con esta task; boundary test en src/lib/auth-server/boundary-domain.test.ts con signing_keys/signing_key_events (TASK-1828) + las siete tablas OAuth`
 - Tenant/space boundary: subject → `identity_profile` vía `(environment, subject)` (`TASK-1631`); scopes calificados por organización en el gateway
 - Idempotency/concurrency: `SELECT FOR UPDATE` en codes y refresh; `jti` único; commands con idempotency key
-- Audit/outbox/history: audit por evento (`authorize`, `token`, `refresh`, `revoke`, `consent_granted`, `consent_revoked`) reutilizando `recordSisterPlatformOAuthAuditEvent`
+- Audit/outbox/history: audit por evento (`authorize`, `token`, `refresh`, `revoke`, `introspect`, `register`, `cimd_fetch`, `consent_granted`, `consent_revoked`) en `greenhouse_auth.oauth_audit_events` (append-only; el legacy conserva `recordSisterPlatformOAuthAuditEvent`)
 
 ### Migration, backfill and rollout
 
@@ -353,4 +387,5 @@ Reglas obligatorias:
 
 ## Open Questions
 
-- Si `introspect` se expone al gateway o el gateway sólo verifica JWT + `gv` (recomendación del ADR: JWT + recheck de grants).
+- ~~Si `introspect` se expone al gateway o el gateway sólo verifica JWT + `gv`~~ **Resuelta 2026-09-04:** se expone `introspect` client-authenticated para consumidores sin verificación JWT y como prueba de revocación; el gateway sigue JWT + JWKS + recheck de `gv` (ADR, TASK-1831).
+- `localhost` por nombre en redirects de clientes públicos: la spec lo rechaza, Claude Code lo usa (runbook MCP). Pendiente de decisión del operador en el checkpoint del plan.
