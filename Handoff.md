@@ -11,7 +11,7 @@ Platform debe promoverla y medir ahorro. Reactivación/evidencia:
 nuevas TASK-1828…1834 (runtime · OAuth/CIMD/tokens · personas sin contraseña · gateway multi-issuer · canaries · pentest ·
 convergencia login). Emisor como segundo host del front door del gateway (≈ USD 15/mes medidos). DNS `auth.efeonce.org` →
 `34.111.78.237` creado y verificado. Excepción EPIC-027 para `services/auth-server` **APROBADA** por el operador (Build Unit
-ADR Delta 2026-09-03, fila Accepted en DECISIONS_INDEX); **TASK-1828 lista pero NO iniciada** por instrucción del operador (sin recursos GCP creados). Task ui-ux de login sin ID hasta
+ADR Delta 2026-09-03, fila Accepted en DECISIONS_INDEX); **TASK-1828 TOMADA 2026-09-03 (sesión Claude greenhouse-eo-a3, `/implement-task 1828`)**: Discovery/Plan en curso, sin recursos GCP creados hasta el checkpoint del plan. Otra sesión tiene WIP sin commit de TASK-1631 (`src/lib/identity/external-access/`, `reliability/registry.ts`, `event-catalog.ts`, entitlements): no acoplar; señales del emisor se agregan después de que ese WIP se commitee. Task ui-ux de login sin ID hasta
 tener wireframe/flow reales. Siguiente ID libre `TASK-1835` / `EPIC-045`.
 
 Maggie/María Fernanda: cierre 4/4, unresolved=0; agosto ready. Método documentado en runbook/manual y

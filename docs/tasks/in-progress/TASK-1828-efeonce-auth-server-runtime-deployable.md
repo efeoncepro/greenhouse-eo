@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Lista para tomar. Excepción EPIC-027 APROBADA por el operador 2026-09-03 (Delta en GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md); DNS auth.efeonce.org → 34.111.78.237 verificado; sin recursos GCP creados. NO iniciar hasta instrucción explícita del operador (2026-09-03)`
+- Status real: `Tomada 2026-09-03 por /implement-task (instrucción explícita del operador). Excepción EPIC-027 aprobada; DNS verificado; sin recursos GCP creados aún. Fase: Discovery/Audit/Plan; Slice 0 espera checkpoint humano del plan`
 - Rank: `TBD`
 - Domain: `platform|identity|ops`
 - Blocked by: `none`
