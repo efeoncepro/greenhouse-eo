@@ -36,7 +36,12 @@ const STYLES = `
   .code { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #5b6b82; word-break: break-all; }
 `
 
-const layout = (title: string, body: string): string => `<!doctype html>
+/**
+ * Shell compartido de las páginas del emisor. Exportado para que la superficie de personas
+ * (TASK-1830) use EXACTAMENTE la misma marca y CSP que las del protocolo, en vez de un segundo
+ * layout que se desincronice.
+ */
+export const layout = (title: string, body: string): string => `<!doctype html>
 <html lang="${GH_AUTH_SERVER.page_lang}">
 <head>
 <meta charset="utf-8">

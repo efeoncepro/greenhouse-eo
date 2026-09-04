@@ -2041,6 +2041,7 @@ export interface EmailsCopy {
   auth: {
     verifyEmail: VerifyEmailTemplateCopy
     magicLink: MagicLinkEmailTemplateCopy
+    authServerMagicLink: MagicLinkEmailTemplateCopy
     passwordReset: PasswordResetEmailTemplateCopy
     invitation: InvitationEmailTemplateCopy
   }

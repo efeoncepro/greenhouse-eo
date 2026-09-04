@@ -15,13 +15,16 @@ export {
   hashExternalSubject
 } from './ids'
 export {
+  findActiveExternalIdpLinkByEmail,
+  getActiveExternalIdpLinkBySubject,
   getExternalIdentityEnvironment,
   getExternalOrganizationBinding,
   listEligibleClientOrganizations,
   listExternalCapabilityGrants,
   listExternalIdentityEnvironments,
   listExternalMemberInvitations,
-  listExternalOrganizationBindings
+  listExternalOrganizationBindings,
+  type ExternalIdpSourceLink
 } from './store'
 export {
   acceptExternalInvitation,

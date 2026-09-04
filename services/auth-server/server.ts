@@ -31,9 +31,19 @@ import {
 import {
   createExternalAccessGrantsPort,
   PostgresOAuthStore,
-  readAuthServerOAuthConfig,
-  unauthenticatedSubjectPort
+  readAuthServerOAuthConfig
 } from '@/lib/auth-server/oauth'
+import {
+  createExternalInvitationAcceptancePort,
+  createGovernedMagicLinkMailer,
+  createPersonSubjectPort,
+  createSourceLinkDirectoryPort,
+  expectedSourceSystemFor,
+  mintOpaqueSubject,
+  PostgresPersonAuthStore,
+  readAuthServerPersonAuthConfig
+} from '@/lib/auth-server/persons'
+import { captureWithDomain } from '@/lib/observability/capture'
 
 import { createAuthServerRequestHandler, SERVICE_NAME } from './app'
 
@@ -46,6 +56,7 @@ const AUTH_SERVER_ENABLED = process.env.AUTH_SERVER_ENABLED?.trim().toLowerCase(
 const ALLOWED_HOSTS = (process.env.AUTH_SERVER_ALLOWED_HOSTS ?? '').split(',')
 const GIT_SHA = process.env.GIT_SHA ?? 'unknown'
 const oauthConfig = readAuthServerOAuthConfig()
+const personAuthConfig = readAuthServerPersonAuthConfig()
 
 let kmsSigner: KmsSignerPort | null = null
 
@@ -56,6 +67,25 @@ const getSigner = (): KmsSignerPort => {
 }
 
 // ─── Wiring ─────────────────────────────────────────────────────────────────
+
+const personStore = new PostgresPersonAuthStore()
+const expectedSourceSystem = expectedSourceSystemFor(oauthConfig.environmentId)
+
+/** Deps compartidas por el router de personas y por el `SubjectSessionPort` que consume `authorize`. */
+const personDeps = {
+  store: personStore,
+  config: personAuthConfig,
+  directory: createSourceLinkDirectoryPort(),
+  mailer: createGovernedMagicLinkMailer(),
+  invitations: createExternalInvitationAcceptancePort(),
+  mintSubject: mintOpaqueSubject,
+  environmentId: oauthConfig.environmentId,
+  expectedSourceSystem,
+  issuer: oauthConfig.issuer,
+  now: () => new Date(),
+  onError: (error: unknown, context: Record<string, unknown>) =>
+    captureWithDomain(error, 'identity', { tags: { component: SERVICE_NAME, ...context } })
+}
 
 const handler = createAuthServerRequestHandler({
   enabled: AUTH_SERVER_ENABLED,
@@ -70,9 +100,18 @@ const handler = createAuthServerRequestHandler({
   getSigner,
   signAccessToken: payload => signWithActiveKey({ signer: getSigner(), payload }),
   store: new PostgresOAuthStore(),
-  // TASK-1830 reemplaza este port por la sesión propia (`__Host-efeonce_auth`); hasta entonces
-  // `authorize` responde `login_required` y ningún code se emite.
-  subjectPort: unauthenticatedSubjectPort,
+  // TASK-1830 — la persona la resuelve la sesión propia (`__Host-efeonce_auth`). Con
+  // `AUTH_SERVER_PERSON_AUTH_ENABLED=false` el port devuelve `null` y `authorize` sigue
+  // respondiendo `login_required`: prender la superficie es un flag, no un deploy distinto.
+  subjectPort: createPersonSubjectPort({
+    store: personStore,
+    config: personAuthConfig,
+    environmentId: oauthConfig.environmentId,
+    expectedSourceSystem,
+    onInvalidSession: status =>
+      console.warn(`[${SERVICE_NAME}] session invalidated by source link: ${status}`)
+  }),
+  persons: personDeps,
   grantsPort: createExternalAccessGrantsPort(),
   cimd: {}
 })
@@ -83,7 +122,7 @@ const server = createServer((req, res) => {
 
 server.listen(PORT, () => {
   console.log(
-    `[${SERVICE_NAME}] listening on :${PORT} enabled=${AUTH_SERVER_ENABLED} oauth=${oauthConfig.oauthEnabled} issuer=${oauthConfig.issuer} env=${oauthConfig.environmentId} hosts=${ALLOWED_HOSTS.map(h => h.trim()).filter(Boolean).join(',') || '*'} gitSha=${GIT_SHA}`
+    `[${SERVICE_NAME}] listening on :${PORT} enabled=${AUTH_SERVER_ENABLED} oauth=${oauthConfig.oauthEnabled} persons=${personAuthConfig.personAuthEnabled} issuer=${oauthConfig.issuer} env=${oauthConfig.environmentId} hosts=${ALLOWED_HOSTS.map(h => h.trim()).filter(Boolean).join(',') || '*'} gitSha=${GIT_SHA}`
   )
 
   if (AUTH_SERVER_ENABLED) {

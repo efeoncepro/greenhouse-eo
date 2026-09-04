@@ -66,6 +66,10 @@ DEFAULT_PG_INSTANCE="efeonce-group:us-east4:greenhouse-pg-dev"
 PG_PASSWORD_REF="${PG_PASSWORD_REF:-${DEFAULT_PG_PASSWORD_REF}}"
 PG_INSTANCE="${PG_INSTANCE:-${DEFAULT_PG_INSTANCE}}"
 
+DEFAULT_RESEND_API_KEY_SECRET_REF="greenhouse-resend-api-key-${ENV}"
+RESEND_API_KEY_SECRET_REF="${RESEND_API_KEY_SECRET_REF:-${DEFAULT_RESEND_API_KEY_SECRET_REF}}"
+EMAIL_FROM="${EMAIL_FROM:-Efeonce <greenhouse@efeoncepro.com>}"
+
 AUTH_SERVER_ISSUER="${AUTH_SERVER_ISSUER:-https://auth.efeonce.org}"
 AUTH_SERVER_ALLOWED_HOSTS="${AUTH_SERVER_ALLOWED_HOSTS:-auth.efeonce.org}"
 AUTH_SERVER_KMS_KEY="${AUTH_SERVER_KMS_KEY:-projects/${PROJECT_ID}/locations/${REGION}/keyRings/auth-server/cryptoKeys/auth-server-es256}"
@@ -179,6 +183,15 @@ ENV_VARS="${ENV_VARS},AUTH_SERVER_OAUTH_ENABLED=${AUTH_SERVER_OAUTH_ENABLED:-fal
 ENV_VARS="${ENV_VARS},AUTH_SERVER_ENVIRONMENT_ID=${AUTH_SERVER_ENVIRONMENT_ID:-efeonce-auth}"
 # Audiencia única del recurso MCP (nunca un alias).
 ENV_VARS="${ENV_VARS},AUTH_SERVER_MCP_AUDIENCE=${AUTH_SERVER_MCP_AUDIENCE:-https://mcp.efeonce.org/mcp}"
+# TASK-1830 — autenticación de personas (magic link, sesión propia `__Host-efeonce_auth`, passkeys,
+# TOTP). OFF ⇒ `/login`, `/auth/*` y `/m/*` responden 404 y el `SubjectSessionPort` devuelve `null`,
+# así que `authorize` sigue en `login_required`. Ledger: docs/operations/FEATURE_FLAG_STATE_LEDGER.md
+# (runtime auth-server únicamente).
+ENV_VARS="${ENV_VARS},AUTH_SERVER_PERSON_AUTH_ENABLED=${AUTH_SERVER_PERSON_AUTH_ENABLED:-false}"
+# Correo del magic link por el pipeline gobernado (`sendEmail`). Sin esto el enlace nunca sale y el
+# acceso queda muerto en silencio: la respuesta es idéntica por anti-enumeración y no puede avisar.
+ENV_VARS="${ENV_VARS},EMAIL_FROM=${EMAIL_FROM}"
+ENV_VARS="${ENV_VARS},RESEND_API_KEY_SECRET_REF=${RESEND_API_KEY_SECRET_REF}"
 ENV_VARS="${ENV_VARS},SENTRY_ENVIRONMENT=${ENV}"
 
 # ─── Secrets (Secret Manager → env) ─────────────────────────────────────────

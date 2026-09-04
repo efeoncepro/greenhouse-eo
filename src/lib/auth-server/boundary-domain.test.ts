@@ -4,9 +4,13 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 /**
- * Write-target allowlist del dominio `auth-server` (TASK-1828 llaves, TASK-1829 OAuth; TASK-1830 agrega
- * sesiones/credenciales). El emisor NUNCA escribe fuera de `greenhouse_auth`: la identidad de la persona
- * se resuelve por `(environment, subject)` a través de `src/lib/identity/external-access` (lectura).
+ * Write-target allowlist del dominio `auth-server` (TASK-1828 llaves, TASK-1829 OAuth, TASK-1830
+ * sesiones/credenciales). El emisor NUNCA escribe fuera de `greenhouse_auth`: la identidad de la
+ * persona se resuelve por `(environment, subject)` a través de `src/lib/identity/external-access`
+ * (lectura), y la ÚNICA escritura en `greenhouse_core` —ligar la persona— se delega al command
+ * `acceptExternalInvitation` de TASK-1631, que la ejecuta en su propia transacción con audit y
+ * outbox. Por eso este guard escanea SQL literal dentro de `src/lib/auth-server/**`: un `INSERT`
+ * propio sobre `greenhouse_core` acá sería exactamente la violación que busca.
  */
 
 const ROOT = join(process.cwd(), 'src/lib/auth-server')
@@ -39,10 +43,18 @@ const ALLOWED_WRITE_TARGETS = new Set([
   'greenhouse_auth.refresh_tokens',
   'greenhouse_auth.access_tokens',
   'greenhouse_auth.client_consents',
-  'greenhouse_auth.oauth_audit_events'
+  'greenhouse_auth.oauth_audit_events',
+
+  // TASK-1830 — autenticación de personas. `person_auth_attempts` es el ledger de intentos del
+  // EMISOR: `greenhouse_serving.auth_attempts` (TASK-742) es del portal y no admite este runtime
+  // sin romperlo (CHECK cerrados de NextAuth, FK a `client_users`, GRANT sólo a `greenhouse_runtime`).
+  'greenhouse_auth.sessions',
+  'greenhouse_auth.magic_link_tokens',
+  'greenhouse_auth.auth_rate_limits',
+  'greenhouse_auth.person_auth_attempts'
 ])
 
-describe('auth-server domain-wide write boundary (TASK-1829)', () => {
+describe('auth-server domain-wide write boundary (TASK-1829/1830)', () => {
   const files = collectSourceFiles(ROOT)
 
   it('recorre un set no trivial de archivos del dominio', () => {

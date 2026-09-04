@@ -38,6 +38,44 @@ export const GH_AUTH_SERVER = {
   } as Record<string, string>,
   scope_description_fallback: (scope: string) => `Permiso ${scope}`,
 
+  // Inicio de sesión sin contraseña (TASK-1830)
+  login_title: 'Entra a Efeonce',
+  login_intro: 'Te enviamos un enlace de acceso al correo con el que te invitaron. No usamos contraseñas.',
+  login_email_label: 'Correo electrónico',
+  login_submit_cta: 'Enviarme el enlace',
+  login_sent_title: 'Revisa tu correo',
+  login_sent_body:
+    'Si ese correo tiene acceso, te acaba de llegar un enlace para entrar. Es válido por 15 minutos y funciona una sola vez.',
+  login_sent_hint: 'No cierres esta pestaña: puedes abrir el enlace desde el mismo navegador.',
+  login_invalid_email: 'Ese correo no tiene un formato válido. Revísalo e inténtalo de nuevo.',
+  login_rate_limited_title: 'Demasiados intentos',
+  login_rate_limited_body: 'Espera unos minutos antes de volver a pedir un enlace de acceso.',
+
+  // Confirmación del enlace (página intermedia; el consumo es por POST)
+  confirm_title: 'Confirma tu acceso',
+  confirm_body: 'Presiona el botón para terminar de entrar. El enlace funciona una sola vez.',
+  confirm_cta: 'Entrar',
+  confirm_invitation_title: 'Activa tu acceso',
+  confirm_invitation_body:
+    'Presiona el botón para activar tu invitación. Después te enviaremos un enlace al correo con el que te invitaron.',
+  confirm_invitation_cta: 'Activar mi acceso',
+  invitation_accepted_title: 'Revisa tu correo',
+  invitation_accepted_body:
+    'Activamos tu invitación. Te enviamos un enlace de acceso al correo con el que te invitaron; es válido por 15 minutos.',
+
+  // Resultados del consumo
+  link_invalid_title: 'Este enlace ya no sirve',
+  link_invalid_body: 'El enlace es inválido o ya fue usado. Pide uno nuevo desde el inicio de sesión.',
+  link_expired_body: 'El enlace expiró. Pide uno nuevo desde el inicio de sesión.',
+  link_used_body: 'Este enlace ya se usó. Pide uno nuevo desde el inicio de sesión.',
+  link_access_revoked_title: 'Tu acceso ya no está activo',
+  link_access_revoked_body:
+    'Tu acceso a Efeonce fue retirado. Si crees que es un error, escríbele a la persona de Efeonce que te invitó.',
+  session_started_title: 'Listo, ya entraste',
+  session_started_body: 'Puedes volver a la aplicación que pidió el acceso.',
+  session_closed_title: 'Cerraste tu sesión',
+  session_closed_body: 'Puedes cerrar esta pestaña.',
+
   // Errores
   error_title: 'No pudimos completar la autorización',
   error_generic_body: 'La solicitud de la aplicación no es válida. Vuelve a intentarlo desde la aplicación.',

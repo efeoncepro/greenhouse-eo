@@ -9,6 +9,7 @@ import LeaveRequestDecisionEmail from '@/emails/LeaveRequestDecisionEmail'
 import LeaveRequestPendingReviewEmail from '@/emails/LeaveRequestPendingReviewEmail'
 import LeaveRequestSubmittedEmail from '@/emails/LeaveRequestSubmittedEmail'
 import LeaveReviewConfirmationEmail from '@/emails/LeaveReviewConfirmationEmail'
+import AuthServerMagicLinkEmail from '@/emails/AuthServerMagicLinkEmail'
 import MagicLinkEmail from '@/emails/MagicLinkEmail'
 import NotificationEmail from '@/emails/NotificationEmail'
 import PasswordResetEmail from '@/emails/PasswordResetEmail'
@@ -313,6 +314,35 @@ registerTemplate(
           : [`Entra a Greenhouse. V\u00e1lido por ${minutes} minutos.`, '', `Enlace: ${context.magicLinkUrl}`].join(
               '\n'
             )
+    }
+  }
+)
+
+// TASK-1830 — Acceso a Efeonce ID (`auth.efeonce.org`), persona EXTERNA autorizando una aplicación.
+registerTemplate(
+  'auth_server_magic_link',
+  (context: { magicLinkUrl: string; locale?: 'es' | 'en'; expiresInMinutes?: number }) => {
+    const locale = context.locale || 'es'
+    const minutes = context.expiresInMinutes ?? 15
+
+    return {
+      subject:
+        locale === 'en'
+          ? `Confirm your Efeonce sign-in \u2014 link valid ${minutes} min`
+          : `Confirma tu acceso a Efeonce \u2014 enlace v\u00e1lido ${minutes} min`,
+      react: AuthServerMagicLinkEmail({
+        magicLinkUrl: context.magicLinkUrl,
+        locale,
+        expiresInMinutes: minutes
+      }),
+      text:
+        locale === 'en'
+          ? [`Confirm your Efeonce sign-in. Valid ${minutes} minutes.`, '', `Link: ${context.magicLinkUrl}`].join('\n')
+          : [
+              `Confirma tu acceso a Efeonce. V\u00e1lido por ${minutes} minutos.`,
+              '',
+              `Enlace: ${context.magicLinkUrl}`
+            ].join('\n')
     }
   }
 )
@@ -1542,6 +1572,21 @@ registerPreviewMeta('magic_link', {
   },
   propsSchema: [
     { key: 'userName', label: 'Nombre del destinatario', type: 'text' },
+    { key: 'magicLinkUrl', label: 'URL de acceso', type: 'text' },
+    { key: 'expiresInMinutes', label: 'Minutos de vigencia', type: 'number' }
+  ]
+})
+
+registerPreviewMeta('auth_server_magic_link', {
+  label: 'Acceso a Efeonce ID',
+  description: 'Email critico del authorization server propio: enlace de un solo uso para una persona externa',
+  domain: 'identity',
+  supportsLocale: true,
+  defaultProps: {
+    magicLinkUrl: 'https://auth.efeonce.org/m/preview.preview',
+    expiresInMinutes: 15
+  },
+  propsSchema: [
     { key: 'magicLinkUrl', label: 'URL de acceso', type: 'text' },
     { key: 'expiresInMinutes', label: 'Minutos de vigencia', type: 'number' }
   ]

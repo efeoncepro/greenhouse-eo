@@ -10,6 +10,8 @@
  *   GET /.well-known/oauth-authorization-server      ┐
  *   GET /.well-known/openid-configuration            │ TASK-1829 — 404 mientras AUTH_SERVER_OAUTH_ENABLED=false
  *   /oauth/{authorize,token,register,revoke,introspect,consent} ┘
+ *   GET  /login · POST /auth/magic-link/{request,consume} · GET /m/<token>   ┐ TASK-1830 — 404 mientras
+ *   GET  /i/<token> · POST /auth/invitations/accept · /auth/session[/logout] ┘ AUTH_SERVER_PERSON_AUTH_ENABLED=false
  *
  * Invariantes: cookie/sesión/secretos propios (nunca NEXTAUTH_SECRET); la llave privada vive en
  * Cloud KMS HSM; ningún error interno se devuelve al cliente en prosa; `Host` fuera del allowlist → 421.
@@ -32,6 +34,7 @@ import {
 } from '@/lib/auth-server/oauth'
 import type { ClientResolverDeps } from '@/lib/auth-server/oauth/clients'
 import type { AccessTokenSigner } from '@/lib/auth-server/oauth/tokens'
+import { createPersonAuthHandler, isPersonAuthPath, type PersonAuthHandlerDeps } from '@/lib/auth-server/persons'
 
 export const SERVICE_NAME = 'auth-server'
 
@@ -54,6 +57,11 @@ export type AuthServerAppDeps = {
   subjectPort: SubjectSessionPort
   grantsPort: GrantsVersionPort
   cimd: ClientResolverDeps['cimd']
+  /**
+   * TASK-1830 — superficie de personas (login sin contraseña). `undefined` = no cableada; con el
+   * flag `AUTH_SERVER_PERSON_AUTH_ENABLED=false` el propio router responde 404.
+   */
+  persons?: PersonAuthHandlerDeps
   now?: () => Date
 }
 
@@ -118,6 +126,8 @@ export const createAuthServerRequestHandler = (deps: AuthServerAppDeps): NodeReq
     cimd: deps.cimd,
     now
   })
+
+  const persons = deps.persons ? createPersonAuthHandler(deps.persons) : null
 
   const requestHost = (req: IncomingMessage) => (req.headers.host ?? '').split(':')[0]?.trim().toLowerCase() ?? ''
   const isAllowedHost = (req: IncomingMessage) => allowedHosts.length === 0 || allowedHosts.includes(requestHost(req))
@@ -187,7 +197,10 @@ export const createAuthServerRequestHandler = (deps: AuthServerAppDeps): NodeReq
         return
       }
 
-      if (deps.enabled && isOAuthPath(path)) {
+      const isProtocolPath = isOAuthPath(path)
+      const isPersonPath = Boolean(persons) && isPersonAuthPath(path)
+
+      if (deps.enabled && (isProtocolPath || isPersonPath)) {
         const body = method === 'GET' || method === 'HEAD' ? '' : await readBody(req)
 
         if (body === null) {
@@ -197,7 +210,7 @@ export const createAuthServerRequestHandler = (deps: AuthServerAppDeps): NodeReq
         }
 
         const request: OAuthHttpRequest = { method, url, headers: headersFromRecord(req.headers), body }
-        const response = await oauth(request)
+        const response = isProtocolPath ? await oauth(request) : await persons!(request)
 
         if (response) {
           res.writeHead(response.status, { ...response.headers, 'Content-Length': Buffer.byteLength(response.body) })
