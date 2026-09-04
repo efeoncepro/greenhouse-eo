@@ -58,6 +58,29 @@ export const GH_AUTH_SERVER = {
   login_rate_limited_title: 'Demasiados intentos',
   login_rate_limited_body: 'Espera unos minutos antes de volver a pedir un enlace de acceso.',
 
+  // Segundo factor (TOTP). El enrolamiento muestra el secreto y los códigos UNA sola vez: si la
+  // persona cierra la pantalla sin guardarlos, el camino es re-enrolar, no recuperarlos.
+  totp_enroll_title: 'Activa tu segundo factor',
+  totp_enroll_body:
+    'Escanea el código con tu app de autenticación y escribe el número que te muestre. Recién entonces queda activo.',
+  totp_enroll_secret_label: 'Si no puedes escanear, escribe este código en tu app',
+  totp_enroll_code_label: 'Número que muestra tu app',
+  totp_enroll_submit_cta: 'Activar',
+  totp_backup_codes_title: 'Guarda tus códigos de respaldo',
+  totp_backup_codes_body:
+    'Cada uno sirve una sola vez y te deja entrar si pierdes el teléfono. Esta es la única vez que los ves: guárdalos donde puedas encontrarlos después.',
+  totp_backup_codes_confirm_cta: 'Ya los guardé',
+  totp_verify_title: 'Confirma que eres tú',
+  totp_verify_body: 'Escribe el número que muestra tu app de autenticación.',
+  totp_verify_backup_hint: 'También puedes usar uno de tus códigos de respaldo.',
+  totp_verify_submit_cta: 'Confirmar',
+  totp_invalid_code: 'Ese número no es válido o ya se usó. Espera a que tu app muestre uno nuevo.',
+  totp_not_enrolled: 'Todavía no tienes un segundo factor activo. Actívalo para poder autorizar permisos de escritura.',
+  // El envelope caído no es «error de sistema»: es una degradación honesta con un límite claro.
+  totp_unavailable_title: 'No podemos verificar tu segundo factor ahora',
+  totp_unavailable_body:
+    'Vuelve a intentarlo en unos minutos. Mientras tanto puedes seguir usando tus permisos de lectura.',
+
   // Confirmación del enlace (página intermedia; el consumo es por POST)
   confirm_title: 'Confirma tu acceso',
   confirm_body: 'Presiona el botón para terminar de entrar. El enlace funciona una sola vez.',

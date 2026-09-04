@@ -162,7 +162,13 @@ pantalla y al canary sin bifurcar el contrato.
 `step_up_required` · `totp_enroll` (secreto + 10 códigos de respaldo, mostrados UNA vez).
 
 Copy en `src/lib/copy/auth-server.ts` con los prefijos `login_*`, `confirm_*`, `link_*`,
-`session_*` e `invitation_*`. TASK-1835 los consume; no crea ids paralelos.
+`session_*`, `invitation_*`, `totp_*` y `step_up_*`. TASK-1835 los consume; no crea ids paralelos.
+
+Dos notas sobre el enrolamiento de TOTP, porque la pantalla decide algo irreversible: el secreto y
+los 10 códigos de respaldo salen del servidor **una sola vez** —no hay endpoint para volver a
+pedirlos— así que la UI tiene que exigir una confirmación explícita de que se guardaron antes de
+avanzar; y el enrolamiento queda `pending` hasta que la persona escribe un código correcto, así
+que una pantalla que celebre el éxito al mostrar el QR estaría mintiendo.
 
 ## 6. Qué no cubre este flujo
 
