@@ -86,7 +86,9 @@ Contexto completo de la fórmula y de su cambio: [Metodología detrás del tráf
   porque cada corrida compromete dinero real. Ambas tools (`get_` y `run_`) están además
   federadas al gateway público `mcp.efeonce.org` desde 2026-08-27 (TASK-1658; deploy del
   gateway **desplegado el 2026-08-28**, revisión `efeonce-mcp-gateway-00024-8b8`): `run_` exige el scope `efeonce.mcp.seo.write`, que NO está
-  cableado al cliente público — fail-closed hasta TASK-1631.
+  cableado al cliente público — fail-closed. El grant revocable por organización y por persona ya existe
+  (`greenhouse_core.external_capability_grants`, TASK-1631, 2026-09-04); el acceso externo real espera al emisor
+  propio y al gateway multi-issuer (EPIC-044: TASK-1829/1830/1831/1832).
 - Mercados habilitados: CL, MX, CO, PE, AR, ES, US.
 
 > Detalle técnico: primitives en `src/lib/growth/seo/prospect/`, flag

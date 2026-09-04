@@ -73,6 +73,17 @@ Endpoints:
   de la superficie MCP (TASK-1804): catálogo sin cuerpos y manual completo; `audience: internal` sólo visible
   para bindings `internal` (si no, `404` anti-oráculo); `ETag` + `If-None-Match` → `304`. Contrato completo con
   ejemplos: `TASK-1793`.
+- `GET /api/platform/ecosystem/identity/binding?environment=<environmentId>&subject=<sub>[&clientId=<azp>]` — reader
+  de acceso externo por `(environment, subject)` para el gateway MCP (TASK-1631; consumer TASK-1831). Además de
+  los params obligatorios de la lane (`externalScopeType`/`externalScopeId` del binding sister-platform `internal`
+  del gateway) exige `environment` y `subject`; si falta alguno responde `400 bad_request`. Sólo un binding de scope
+  `internal` puede resolver personas: cualquier otro binding recibe `404` anti-oráculo (mismo contrato que el
+  catálogo de skills). Respuesta = la resolución del dominio `{ outcome, environmentId, issuerClass, profileId,
+  memberships[{ bindingId, organizationId, externalOrganizationRef, grantsVersion, grants[], designatedAdmin }],
+  resolvedAt }` + `cacheTtlSeconds: 60`, servida con `Cache-Control: private, no-store`. `outcome` ∈
+  `bound | unbound | revoked | environment_inactive | profile_inactive`; sólo `bound` autoriza y el gateway compara
+  `grantsVersion` por IGUALDAD contra el claim `gv` del token. Nunca devuelve el subject ni el email. Resource:
+  `src/lib/api-platform/resources/ecosystem-identity-binding.ts`.
 
 ### Platform Health (preflight contract)
 
@@ -172,9 +183,11 @@ vacante cerrada)— porque cada uno tiene una acción distinta para quien llama.
 (422 con código `bad_request`), nunca en `propose`.
 
 **Confirmar es fail-closed para agentes delegados.** Un bearer `sister_platform_oauth` puede leer y proponer, pero
-no confirmar: `efeonce.mcp.hiring.write` no existe en código y queda bloqueado hasta el grant revocable de
-TASK-1631. La confirmación exige sesión humana (`cookie_session` o `first_party_app`). La clave de idempotencia es
-obligatoria (header `Idempotency-Key` o `idempotencyKey` en el body).
+no confirmar: `efeonce.mcp.hiring.write` no existe en código. El grant revocable por organización y por persona ya
+existe (`greenhouse_core.external_capability_grants`, TASK-1631, 2026-09-04), pero el acceso externo real espera
+al emisor propio y al gateway multi-issuer (EPIC-044: TASK-1829/1830/1831/1832); hasta entonces la confirmación
+exige sesión humana (`cookie_session` o `first_party_app`). La clave de idempotencia es obligatoria (header
+`Idempotency-Key` o `idempotencyKey` en el body).
 
 El adapter reenvía `decision`, `cause`, `reasonSummary`, `selectedDestination` y la clave de idempotencia.
 `selectedDestination` es obligatorio para `selected` y `backup_selected` (el command lo exige); omitirlo devuelve

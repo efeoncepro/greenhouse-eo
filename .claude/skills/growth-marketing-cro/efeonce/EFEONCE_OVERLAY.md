@@ -63,7 +63,9 @@ NO invade:
   y cockpit operador en `/admin/growth/seo`
   (TASK-1306/1307/1308) — `track_seo_keywords`/`untrack_seo_keywords` son las primeras escrituras del dominio y
   **comprometen gasto recurrente del proveedor**, por eso van con techo por target, entitlement per-ORG, outcome
-  por keyword y reverso append-only, federadas y fail-closed hasta TASK-1631. Regla: todo reader SEO/E-E-A-T
+  por keyword y reverso append-only, federadas y fail-closed hasta que un token porte el grant (el grant revocable por
+  organización y por persona YA existe: `external_capability_grants`, TASK-1631, 2026-09-04; falta el emisor propio +
+  gateway multi-issuer de EPIC-044, TASK-1829/1830/1831/1832, que emite tokens con `gv`). Regla: todo reader SEO/E-E-A-T
   futuro expone su MCP tool en el mismo PR, y si ESCRIBE, además scope de dominio + la frontera de grant de
   `.claude/rules/growth-seo.md`; destino Wave `wave.efeonce.org` §17/EPIC-037; **aún sin superficie cliente**)
 - `docs/architecture/GREENHOUSE_COMMERCIAL_PARTY_LIFECYCLE_V1.md` (funnel comercial)

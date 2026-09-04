@@ -69,8 +69,10 @@ profile metadata; it cannot read documents.
 
 The order is schema/projection OFF, synthetic extraction, portal exact-document integration, App API OFF, gateway
 provider OFF, staging allow/deny, real-data sign-off, then one-opening internal canary. Rollback disables reader and
-provider flags and stops materialization while preserving audit. External/B2B access remains out of scope until
-`TASK-1631`.
+provider flags and stops materialization while preserving audit. External/B2B access remains out of scope: the revocable per-organization/per-person grant already exists
+(`greenhouse_core.external_capability_grants`, `TASK-1631`, 2026-09-04); real external access waits for the
+native issuer and the multi-issuer gateway (EPIC-044: `TASK-1829`/`TASK-1831`/`TASK-1832`) (updated 2026-09-04,
+TASK-1631).
 
 ## Rejected alternatives
 

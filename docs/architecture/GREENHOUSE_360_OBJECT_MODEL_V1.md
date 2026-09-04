@@ -522,7 +522,7 @@ Primary access facet:
 
 Current base tables:
 - `greenhouse.identity_profiles`
-- `greenhouse.identity_profile_source_links`
+- `greenhouse.identity_profile_source_links` — incluye la fuente `external_idp:<environment_id>` + `subject` para personas de organizaciones cliente autenticadas por el emisor propio (TASK-1631, 2026-09-04)
 - `greenhouse.team_members`
 - `greenhouse.client_users`
 
@@ -565,6 +565,7 @@ Modules and systems that may enrich Person 360:
   - social security or tax related expense records
 - Identity:
   - `greenhouse.identity_profile_source_links`
+  - `greenhouse_core.external_member_invitations` / `external_capability_grants` — membership y grants de acceso externo por persona; la organizacion se extiende por `greenhouse_core.external_organization_bindings` via FK a `organizations`, no como identidad paralela (TASK-1631, 2026-09-04)
 - Operations:
   - `greenhouse.client_team_assignments`
   - `notion_ops.tareas` and other operational sources via semantic calculations

@@ -265,6 +265,13 @@ Toda operación MCP debe ejecutarse dentro de un scope resuelto:
 
 Cuando el caller venga desde ecosystem o sister-platform context, el MCP debe respetar bindings activos y allowlists de scope.
 
+El binding externo de persona/organización (identidad de cliente, `TASK-1631`, 2026-09-04) se resuelve por
+`GET /api/platform/ecosystem/identity/binding` con `(environment, subject)` y devuelve memberships, grants y
+`grantsVersion` (resource `src/lib/api-platform/resources/ecosystem-identity-binding.ts`, reader
+`resolveExternalAccess` en `src/lib/identity/external-access/**`). Ese lane lo autoriza el binding sister-platform
+`internal` del gateway (`efeonce-mcp-gateway`); cualquier otro binding recibe `404` anti-oráculo. El gateway compara
+`grantsVersion` por igualdad contra el claim `gv` del token (`TASK-1831`) (actualizado 2026-09-04, TASK-1631).
+
 ### 10.4 Internal MCP
 
 Si existe una surface interna de MCP para operadores o agentes del propio equipo, debe seguir usando auth controlada y trazable; nunca acceso implícito total.
@@ -715,7 +722,9 @@ también delega en la lane: cero contenido embebido, byte-idéntico en todos.
 
 **Gating por binding, anti-oráculo.** `audience: internal` sólo para bindings de scope `internal`;
 para cualquier otro, el manual no aparece en el catálogo y su detalle es `404` (nunca `403`).
-`audience: client` queda reservado hasta `TASK-1631`. Ningún manual publica contenido interno: lo
+`audience: client` queda reservado hasta que existan tokens que porten grants emitidos (el grant por organización
+y persona ya existe vía `TASK-1631`, 2026-09-04; el token lo emiten `TASK-1831`/`TASK-1832`) (actualizado 2026-09-04, TASK-1631).
+Ningún manual publica contenido interno: lo
 controla un test de fuga sobre `docs/mcp/skills/**`, no una revisión.
 
 **Las `instructions` rutean en vez de contener.** `buildGreenhouseMcpServerIdentity` recibe

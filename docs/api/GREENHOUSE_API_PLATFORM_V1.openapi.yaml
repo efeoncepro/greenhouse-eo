@@ -556,6 +556,48 @@ components:
           type: string
           format: date-time
           nullable: true
+    ExternalAccessMembership:
+      type: object
+      required: [bindingId, organizationId, externalOrganizationRef, grantsVersion, grants, designatedAdmin]
+      properties:
+        bindingId: { type: string }
+        organizationId: { type: string }
+        externalOrganizationRef: { type: string }
+        grantsVersion:
+          type: integer
+          minimum: 1
+          description: The gateway compares it by strict EQUALITY against the `gv` claim of the token.
+        grants:
+          type: array
+          description: Namespaced capabilities resolved for THIS person (binding-wide grants ∪ per-person grants).
+          items: { type: string }
+        designatedAdmin: { type: boolean }
+    ExternalAccessResolution:
+      type: object
+      required: [outcome, environmentId, issuerClass, profileId, memberships, resolvedAt, cacheTtlSeconds]
+      properties:
+        outcome:
+          type: string
+          enum: [bound, unbound, revoked, environment_inactive, profile_inactive]
+          description: Only `bound` authorizes; every other outcome is a deny and is appended to `external_access_resolution_log`.
+        environmentId: { type: string }
+        issuerClass:
+          type: string
+          enum: [internal, external]
+          nullable: true
+        profileId:
+          type: string
+          nullable: true
+        memberships:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExternalAccessMembership'
+        resolvedAt:
+          type: string
+          format: date-time
+        cacheTtlSeconds:
+          type: integer
+          description: Upper bound for gateway-side caching of this resolution (60).
     WebhookSubscriptionRequest:
       type: object
       required: [targetUrl, eventFilters]
@@ -720,6 +762,79 @@ paths:
                         $ref: '#/components/schemas/PlatformHealthV1'
         '304':
           description: Not modified
+  /api/platform/ecosystem/identity/binding:
+    get:
+      summary: Resolve external access for (environment, subject) — MCP gateway reader
+      description: |
+        TASK-1631 (EPIC-044 U04). Reader consumed by the MCP gateway (TASK-1831) to resolve a
+        token subject into canonical organization memberships and namespaced capability grants.
+        The gateway resolves issuer → environment with its own config, calls this route with
+        `subject` and compares the returned `grantsVersion` by strict equality against the `gv`
+        claim of the token. Never SQL from the gateway.
+
+        Only a consumer whose sister-platform binding has scope `internal` (the gateway) may
+        resolve people: any other binding receives `404` (anti-oracle, same contract as the MCP
+        skill catalog). The response never includes the subject nor the email.
+
+        Every non-`bound` outcome is a deny and is appended to
+        `greenhouse_core.external_access_resolution_log` (subject hashed). The gateway may cache
+        the resolution for at most `cacheTtlSeconds` (60); the HTTP response itself is
+        `Cache-Control: private, no-store`.
+      security:
+        - ecosystemBearer: []
+        - sisterPlatformKey: []
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/ExternalScopeType'
+        - $ref: '#/components/parameters/ExternalScopeId'
+        - in: query
+          name: environment
+          required: true
+          description: External identity environment id (`greenhouse_core.external_identity_environments.environment_id`).
+          schema:
+            type: string
+            pattern: '^[a-z0-9][a-z0-9_-]{2,63}$'
+        - in: query
+          name: subject
+          required: true
+          description: Token `sub` as issued by the environment's issuer.
+          schema:
+            type: string
+        - in: query
+          name: clientId
+          required: false
+          description: Token `azp`; recorded with denials for support triage.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Resolution (authorizes only when `outcome` is `bound`)
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                example: private, no-store
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PlatformEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ExternalAccessResolution'
+        '400':
+          description: '`bad_request` — missing `environment`/`subject`, or invalid environment id / subject shape'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformErrorEnvelope'
+        '404':
+          description: '`not_found` — anti-oracle: the consumer binding is not scope `internal`'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformErrorEnvelope'
   /api/platform/ecosystem/event-types:
     get:
       summary: List known event types
@@ -1200,9 +1315,11 @@ paths:
         this lane adds none.
 
         FAIL-CLOSED for delegated agents: a `sister_platform_oauth` bearer may read and propose but
-        NEVER confirm. `efeonce.mcp.hiring.write` does not exist in code and remains blocked until
-        the revocable grant of TASK-1631, so confirming requires a human session
-        (`cookie_session` or `first_party_app`).
+        NEVER confirm. `efeonce.mcp.hiring.write` does not exist in code. The revocable grant per
+        organization and per person already exists (`greenhouse_core.external_capability_grants`,
+        TASK-1631, 2026-09-04); real external access waits for the native issuer and the
+        multi-issuer gateway (EPIC-044: TASK-1829/1830/1831/1832), so confirming still requires a
+        human session (`cookie_session` or `first_party_app`).
 
         An idempotency key is mandatory: send the `Idempotency-Key` header or `idempotencyKey` in
         the body (up to 160 characters). The canonical command rejects an empty one.

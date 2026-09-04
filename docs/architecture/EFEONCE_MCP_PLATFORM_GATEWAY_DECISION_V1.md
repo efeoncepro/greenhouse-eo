@@ -192,8 +192,10 @@ onboarding de organizaciones cliente ni evidencia de autorización B2B, porque e
 (`efeonce.mcp.read` y `efeonce.mcp.globe.read`) aunque solicite sólo el base.
 La propuesta de identidad cliente, el vínculo con Account 360 y el gate de proveedor viven en
 [`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md)
-y [`TASK-1631`](../tasks/to-do/TASK-1631-efeonce-customer-identity-mcp-federation.md). Esta adición no acepta un
-proveedor ni altera el reader Globe interno habilitado.
+y [`TASK-1631`](../tasks/in-progress/TASK-1631-efeonce-customer-identity-mcp-federation.md). Esta adición no acepta un
+proveedor ni altera el reader Globe interno habilitado. El binding por organización y los grants revocables por
+tenant/capability/persona ya existen (`greenhouse_core.external_capability_grants`, TASK-1631 Slice 1, 2026-09-04);
+el emisor propio y el gateway multi-issuer viven en EPIC-044 (TASK-1828/1829/1831/1832) (actualizado 2026-09-04, TASK-1631).
 
 ### Delta 2026-08-06 — shim de compatibilidad DCR para clientes MCP estándar
 
@@ -241,7 +243,10 @@ B2B/multitenant del delta anterior.
 - el load balancer global tiene costo fijo mayor que exponer directamente la URL `run.app`;
 - La apertura a clientes externos requiere un modelo B2B/multitenant y entitlements que pueda emitir y revocar
   acceso por tenant y capability; el cliente Entra interno actual no prueba esa separación porque recibe base +
-  reader (`efeonce.mcp.read` y `efeonce.mcp.globe.read`) aunque solicite sólo el base.
+  reader (`efeonce.mcp.read` y `efeonce.mcp.globe.read`) aunque solicite sólo el base. El grant revocable por
+  organización y por persona ya existe (`greenhouse_core.external_capability_grants`, TASK-1631, 2026-09-04); el
+  acceso externo real espera al emisor propio y al gateway multi-issuer (EPIC-044: TASK-1829/1830/1831/1832)
+  (actualizado 2026-09-04, TASK-1631).
 
 ### Delta 2026-09-02 — DCR quedó **deprecado** en la revisión `2026-07-28`; el shim se mantiene, con horizonte y disparadores declarados
 
@@ -275,10 +280,12 @@ del **authorization server**: es el AS quien detecta un `client_id` con forma de
 documento y los `redirect_uris`. En esta arquitectura el AS es Entra: el gateway espeja `authorization_endpoint` y
 `token_endpoint`, no los proxea. Un `client_id` URL viajaría directo a Entra, que lo rechaza. Soportar CIMD exige
 **emitir los tokens**, es decir, ser un authorization server de verdad — precisamente lo que el gateway tiene
-prohibido ser (§Decision) y lo que `TASK-1631` está eligiendo. **Conclusión: "adoptar CIMD" no es trabajo del
-gateway; es un requisito del broker de identidad, y `TASK-1631` ya lo lleva declarado** (§Invariants: CIMD como
-mecanismo primario, DCR como compatibilidad, y un proveedor DCR-only **no cumple**). Esta evaluación es insumo de
-esa task, no una línea de trabajo paralela.
+prohibido ser (§Decision) y lo que el emisor propio de Efeonce asume (composición decidida en
+[`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md)).
+**Conclusión: "adoptar CIMD" no es trabajo del gateway; es un requisito del emisor, y ya está asignado a
+`TASK-1828`/`TASK-1829`** (CIMD como mecanismo primario, DCR como compatibilidad). `TASK-1631` ya no elige ni
+lleva el broker: entregó el binding y los grants por tenant/capability/persona el 2026-09-04 (actualizado 2026-09-04, TASK-1631). Esta
+evaluación es insumo de esas tasks, no una línea de trabajo paralela.
 
 **El riesgo real no es el calendario, es el cliente.** El 2027-07-28 sólo marca cuándo DCR se vuelve *elegible*
 para retiro de la **spec**. Lo que apaga el shim no es la spec: es que Claude Code / claude.ai / Claude Desktop
@@ -305,7 +312,7 @@ Reclamar `issuer: https://mcp.efeonce.org` para cuadrar RFC 8414 §3.3 rompería
 —también reforzada en `2026-07-28` ([SEP-2468](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2468))—
 porque Entra emite su propio `iss`. Hoy pasa esa comprobación **justamente porque espejamos el issuer real de
 Entra**. Se cambia una inconsistencia por una peor. La salida honesta es la misma que para CIMD: un AS que emita
-sus propios tokens, o sea el broker de `TASK-1631`.
+sus propios tokens, o sea el emisor propio de `TASK-1828`/`TASK-1829` (actualizado 2026-09-04, TASK-1631).
 
 **Contingencia sin cambio de arquitectura.** Si un cliente endurece cualquiera de las dos validaciones antes de
 que exista el broker, la salida es **pre-registro**, que es prioridad 1 de la spec: apuntar el
@@ -349,12 +356,13 @@ pero el riesgo que la norma previene sí está presente por construcción.**
   la regla dura de §"El scope de escritura NO se cablea al cliente público compartido". El token robado es de
   lectura. Esa regla, escrita para otra razón, es la que acota este riesgo.
 - *Dónde se cierra:* no en el shim. El consentimiento por cliente exige clientes distintos, y clientes distintos
-  con grant revocable per-tenant es, otra vez, el broker de `TASK-1631`. Se registra como **revisión pendiente**,
+  con grant revocable per-tenant es, otra vez, el emisor propio (`TASK-1828`/`TASK-1829`) sobre el grant que ya
+  existe (`external_capability_grants`, `TASK-1631`, 2026-09-04) (actualizado 2026-09-04, TASK-1631). Se registra como **revisión pendiente**,
   no como incidente: no hay explotación observada y la mitigación estructural ya tiene dueño.
 
 **Decisión.** No se migra ahora y no se abre task de migración del shim. Se mantiene el shim tal cual, se declara
-su horizonte y sus disparadores, y el destino queda asignado a `TASK-1631` (broker con CIMD nativo), no a una
-evolución del gateway. Micro-endurecimiento opcional para quien formalice `TASK-1654`: publicar
+su horizonte y sus disparadores, y el destino queda asignado al emisor propio (`TASK-1828`/`TASK-1829`, CIMD
+nativo) y al gateway multi-issuer (`TASK-1831`) (actualizado 2026-09-04, TASK-1631), no a una evolución del gateway actual. Micro-endurecimiento opcional para quien formalice `TASK-1654`: publicar
 `client_id_metadata_document_supported: false` explícito en la metadata espejada — hoy va ausente, que la spec
 trata igual, pero explícito documenta la postura.
 
@@ -362,7 +370,8 @@ trata igual, pero explícito documenta la postura.
 
 - un cliente MCP objetivo deja de traer fallback DCR, o empieza a aplicar la igualdad de `issuer` de RFC 8414 §3.3;
 - Entra anuncia soporte de CIMD (o de RFC 7591) — desaparecería la razón entera del shim;
-- se acepta el ADR de identidad de cliente y el broker de `TASK-1631` entra en runtime;
+- el emisor propio (`TASK-1828`/`TASK-1829`) entra en runtime y el gateway pasa a multi-issuer (`TASK-1831`); el
+  binding de `TASK-1631` ya está aplicado (2026-09-04) (actualizado 2026-09-04, TASK-1631);
 - una revisión MCP publicada en o después de 2027-07-28 remueve DCR de la spec.
 
 ### Delta 2026-09-02 — provider `greenhouse-skills`: el gateway federa manuales, no sólo datos (TASK-1804)
@@ -406,8 +415,8 @@ Rollback: quitar tráfico a la revisión defectuosa o deshabilitar el provider/s
 - exista necesidad contractual de un segundo dominio canónico o residencia regional.
 - se defina el modelo B2B/multitenant que permite asignar, verificar y revocar scopes/capabilities por cliente;
 - se cumpla cualquier disparador del delta 2026-09-02 sobre la deprecación de DCR (cliente sin fallback DCR o que
-  aplique la igualdad de `issuer` de RFC 8414 §3.3, soporte CIMD en Entra, broker de `TASK-1631` en runtime, o una
-  revisión MCP publicada en o después de 2027-07-28 que remueva DCR).
+  aplique la igualdad de `issuer` de RFC 8414 §3.3, soporte CIMD en Entra, emisor propio `TASK-1828`/`TASK-1829`
+  en runtime (actualizado 2026-09-04, TASK-1631), o una revisión MCP publicada en o después de 2027-07-28 que remueva DCR).
 
 ## References
 
@@ -452,6 +461,8 @@ cliente público compartido: eso no arregla un permiso, abre una puerta de gasto
 tenant y lo hace en silencio (nada falla, simplemente empieza a funcionar para todos).
 
 **El camino correcto** es un cliente con grant controlable —emitible y revocable por tenant y
-capability— que es exactamente el gate B2B/multitenant diferido en
-`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md` / `TASK-1631`. Hasta entonces las
-tools quedan federadas y **fail-closed**: registradas, verificables y sin token que las abra.
+capability— según `EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`. El grant revocable por
+organización y por persona ya existe (`greenhouse_core.external_capability_grants`, `TASK-1631`, 2026-09-04);
+lo que falta es un token que lo porte: emisor propio y gateway multi-issuer (EPIC-044: `TASK-1829`/`TASK-1831`/
+`TASK-1832`) (actualizado 2026-09-04, TASK-1631). Hasta entonces las tools quedan federadas y **fail-closed**: registradas,
+verificables y sin token que las abra.

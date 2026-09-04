@@ -303,6 +303,7 @@ Funcion SQL `greenhouse_core.canonical_source_system(raw TEXT)` normaliza `sourc
 | `notion`                                         | `notion`    | Si             |
 | `google`, `google_oauth`, `google_workspace`     | `google`    | Si             |
 | `deel`, `deel_hr`, `deel_com`                    | `deel`      | Si             |
+| `external_idp:<environment_id>`                  | `external_idp` | Si (actualizado 2026-09-04, TASK-1631) |
 | `greenhouse_auth`, `greenhouse_team`             | `NULL`      | No (filtrado)  |
 
 Regla: nuevos source systems se agregan al CASE de la funcion SQL, no al frontend ni al TypeScript.
@@ -314,6 +315,7 @@ Regla: nuevos source systems se agregan al CASE de la funcion SQL, no al fronten
 - `src/app/api/cron/entra-profile-sync/route.ts` — cron handler
 - `src/lib/tenant/internal-email-aliases.ts` — alias matching cross-domain
 - `greenhouse_core.canonical_source_system()` — funcion SQL de normalizacion
+- `src/lib/identity/external-access/**` — binding externo de persona/organizacion: links `external_idp:<environment_id>` + `subject`, grants por organizacion/persona, resolver `resolveExternalAccess` (TASK-1631, 2026-09-04)
 
 ## Delta 2026-04-05 — Agent Auth (headless session for agents & E2E)
 

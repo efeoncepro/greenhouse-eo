@@ -58,7 +58,9 @@ curl -s -X POST "$BASE/api/admin/growth/seo/competitors/declare" \
 
 Leer el `outcomes` **por dominio**: `declared | already_declared | capacity_exceeded | invalid`.
 El dominio del propio cliente es `invalid` por diseño. También existe la tool MCP
-`declare_seo_competitors` (scope `efeonce.mcp.seo.write`, fail-closed hasta TASK-1631) y el lane
+`declare_seo_competitors` (scope `efeonce.mcp.seo.write`, fail-closed en el cliente público: el grant revocable
+por organización y por persona ya existe —TASK-1631, 2026-09-04— y el acceso externo real espera al emisor propio
+y al gateway multi-issuer, EPIC-044 TASK-1829/1830/1831/1832) y el lane
 ecosystem (sólo bindings `internal`).
 
 ### 2. Dry-run de costo (sin gastar)

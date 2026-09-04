@@ -348,9 +348,9 @@ excluida (la dirección que antes era invisible).
 >
 > **CERO cambios en Entra en este deploy**: las dos escrituras nuevas (`declare_seo_competitors` /
 > `retire_seo_competitors`) viajan en el scope `efeonce.mcp.seo.write` que ya existía, así que siguen
-> **live-but-fail-closed** hasta `TASK-1631` igual que las demás escrituras — el scope no está cableado al cliente
+> **live-but-fail-closed** hasta EPIC-044 (TASK-1829/1831/1832: emisor propio + gateway multi-issuer; el grant revocable ya existe desde TASK-1631, 2026-09-04) igual que las demás escrituras — el scope no está cableado al cliente
 > PKCE público compartido, y eso es deliberado. `prepare_seo_grounded_queries` responde además
-> `aeo_forbidden` fail-closed para la identidad máquina compartida hasta TASK-1631, y el par de
+> `aeo_forbidden` fail-closed para la identidad máquina compartida hasta EPIC-044 (TASK-1829/1831/1832: emisor propio + gateway multi-issuer; el grant revocable ya existe desde TASK-1631, 2026-09-04), y el par de
 > prospecto queda detrás de `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED`, **ON en Vercel
 > Production desde el 2026-08-27** (verificado con `vercel env ls`). 🔴 El canary ya NO debe
 > normalizar un `disabled`: hoy sería una regresión real, no una respuesta honesta.
@@ -713,7 +713,7 @@ check es la evidencia válida; la ausencia de tools en esa sesión no es un fall
 
 En la práctica el gateway es hoy **un operador de SEO con anexos de Hiring y Globe**. Los dos scopes de escritura
 (`efeonce.mcp.seo.write`, `efeonce.mcp.globe.credits.funding.ensure`) siguen **live-but-fail-closed**: registrados y
-verificables, sin token que los abra, hasta `TASK-1631`.
+verificables, sin token que los abra, hasta EPIC-044 (TASK-1829/1831/1832: emisor propio + gateway multi-issuer; el grant revocable ya existe desde TASK-1631, 2026-09-04).
 
 ### Cobertura de federación vs el MCP interno de Greenhouse
 

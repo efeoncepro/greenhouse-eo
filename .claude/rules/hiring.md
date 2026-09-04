@@ -94,7 +94,9 @@ Cerrar una postulación ya NO se opera sólo desde el portal: además del desk h
   hizo la pregunta. **NUNCA** meter ahí un scope OAuth delegado (`oauthCapabilities.includes(...)`): son
   dos planos de autorización distintos.
 - **Confirmar es fail-closed para agentes delegados**: `authSource === 'sister_platform_oauth'` → 403.
-  Un token delegado lee y propone; confirmar exige sesión humana hasta el grant de `TASK-1631`.
+  Un token delegado lee y propone; confirmar exige sesión humana hasta que un token delegado porte el grant:
+  el grant revocable por organización y por persona YA existe (`external_capability_grants`, `TASK-1631`,
+  2026-09-04); falta el emisor propio + gateway multi-issuer de EPIC-044 (TASK-1829/1830/1831/1832).
 - **Nexa cierra una postulación ABIERTA, nunca re-decide una cerrada** (el contrato compartido de acciones
   no transporta la huella del preview al execute). Y el cierre **MASIVO** por capacidad sigue **sin
   federarse** (`TASK-1762`): de una cohorte un agente lee y explica, jamás dispara.

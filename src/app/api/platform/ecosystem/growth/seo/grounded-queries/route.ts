@@ -10,7 +10,7 @@ import {
  *
  * GET = draft con provenance SEO. POST = preparar el draft (COMMAND con `Idempotency-Key` vía
  * `runEcosystemCommandRoute`). 🔴 Ambos sólo bindings `internal` (V1 operador). El write queda
- * además FAIL-CLOSED por capability humana (`aeo_forbidden`) hasta TASK-1631 — ver el resource
+ * además FAIL-CLOSED por capability humana (`aeo_forbidden`) hasta EPIC-044 (TASK-1829/1831/1832: emisor propio + gateway multi-issuer; el grant revocable ya existe desde TASK-1631, 2026-09-04) — ver el resource
  * module; se federa igual por paridad con deny canary honesto.
  */
 

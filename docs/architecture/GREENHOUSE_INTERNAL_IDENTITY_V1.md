@@ -80,6 +80,7 @@ Examples of sources:
 - `greenhouse_auth` + `client_user`
 - future `notion` + `person`
 - future `azure_ad` + `user`
+- `external_idp:<environment_id>` + `subject` — persona externa autenticada por el emisor propio; un subject activo → un solo perfil (TASK-1631, 2026-09-04)
 
 ### 3. Auth principal link
 

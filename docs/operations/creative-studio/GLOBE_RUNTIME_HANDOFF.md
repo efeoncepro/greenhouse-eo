@@ -770,4 +770,6 @@ revisión/rights, readiness, binding, circuito, run terminal, output retenido y 
 3. Implementar TASK-1632 dentro de Globe sin introducir a Greenhouse en el path de finalización; conservar los
    schedulers como recovery y demostrar deduplicación/idempotencia antes del rollout.
 4. Completar receipts/calibración amplia de TASK-1468/TASK-1579 sin reabrir TASK-1614/TASK-1630 ni alterar los
-   800 efectivos. Mantener rollout externo y acceso MCP B2B gated por TASK-1480/TASK-1631.
+   800 efectivos. Mantener rollout externo y acceso MCP B2B gated por TASK-1480 y por el emisor propio + gateway
+   multi-issuer de EPIC-044 (TASK-1829/1831/1832); el grant por organización/persona ya existe (TASK-1631,
+   2026-09-04) (actualizado 2026-09-04, TASK-1631).

@@ -44,7 +44,7 @@ test rompe el CI si diverge en cualquiera de las dos direcciones. Ya reemplazado
 | `track_seo_keywords` ✍️ | **Escribe**: mete keywords al ciclo diario y compromete gasto recurrente |
 | `untrack_seo_keywords` ✍️ | **Escribe**: el reverso, cierra la ventana sin borrar historia |
 | `discover_seo_keywords` ✍️ | **Escribe y GASTA por corrida** (Labs Live factura por llamada y por fila); preview + confirmación humana antes de encolar; async (TASK-1664) |
-| `prepare_seo_grounded_queries` ✍️ | **Escribe** un DRAFT AEO (no gasta proveedor, jamás aprueba/activa); con la identidad máquina compartida responde `aeo_forbidden` fail-closed hasta TASK-1631 (TASK-1666) |
+| `prepare_seo_grounded_queries` ✍️ | **Escribe** un DRAFT AEO (no gasta proveedor, jamás aprueba/activa); con la identidad máquina compartida responde `aeo_forbidden` fail-closed — el grant revocable por organización y por persona ya existe (TASK-1631, 2026-09-04); el acceso externo real espera al emisor propio y al gateway multi-issuer (EPIC-044: TASK-1829/1830/1831/1832) — (TASK-1666) |
 | `run_seo_prospect_diagnostic` ✍️ | **Escribe y GASTA por corrida**: diagnóstico único sobre un prospecto, con confirmación humana previa; flag `GROWTH_SEO_PROSPECT_DIAGNOSTIC_ENABLED` **ON en Production desde 2026-08-27** — un `disabled` hoy es regresión (TASK-1709; federada por TASK-1658) |
 | `declare_seo_competitors` ✍️ | **Escribe y COMPROMETE GASTO DIFERIDO**: la cobertura mensual factura ~USD 0,11 por competidor cada ciclo hasta que alguien lo retire. Techo gobernado por target (default 5), resultados **por dominio** (`declared`/`already_declared`/`capacity_exceeded`/`invalid`), autoría humana obligatoria + `proposalRef` opaco (TASK-1662) |
 | `retire_seo_competitors` ✍️ | **Escribe**: el reverso append-only — cierra `effective_to` con su propia autoría de retiro y corta el gasto del ciclo siguiente. Nunca borra (TASK-1662) |
@@ -71,7 +71,9 @@ estos docs listaban como pendiente **ya se ejecutó**; no queda ninguna tool esp
   con `candidates: []` (esperado con serie joven <5 días), `keyword-gap` con 1 competidor declarado,
   `provider-spend` ✓.
 - **CERO cambios en Entra.** Las dos escrituras nuevas viajan en el scope `efeonce.mcp.seo.write` que
-  ya existía, así que siguen live-but-fail-closed hasta TASK-1631 igual que las demás.
+  ya existía, así que siguen live-but-fail-closed igual que las demás (el grant revocable por organización y por
+  persona ya existe —TASK-1631, 2026-09-04—; el acceso externo real espera al emisor propio y al gateway
+  multi-issuer, EPIC-044 TASK-1829/1830/1831/1832).
 
 ✅ **Delta 2026-09-02 (TASK-1804): 36 tools federadas en total; el manual de uso viaja con ellas.** Revisión activa
 `efeonce-mcp-gateway-00028-pmx` (verificada con `gcloud run services describe`, 100% del tráfico). La cuenta de
@@ -91,7 +93,9 @@ agregan o cambian: [Operar los manuales MCP servidos por el protocolo](operar-ma
 `src/app.ts` la consume; ya no hay lista a mano) porque comprometen gasto del proveedor, y el lane
 las acepta solo desde bindings de scope `internal`. Un `403 insufficient_scope` sobre ellas con el
 scope base es el comportamiento correcto. El scope NO está cableado al cliente PKCE público —
-fail-closed hasta TASK-1631.
+fail-closed. El grant revocable por organización y por persona ya existe (`greenhouse_core.external_capability_grants`,
+TASK-1631, 2026-09-04); el acceso externo real espera al emisor propio y al gateway multi-issuer (EPIC-044:
+TASK-1829/1830/1831/1832).
 
 No cubre el uso conversacional (para eso está la doc funcional) ni el gateway completo (para eso está
 [Operar Efeonce MCP Gateway](operar-efeonce-mcp-gateway.md)).
@@ -266,7 +270,9 @@ respuesta real era `no_seo_data`, eso es un bug del consumidor, no del provider.
 exigen `efeonce.mcp.seo.write`, un scope aparte: un cliente con solo el scope base recibe `403` sobre
 ellas **y eso es correcto**, no una falla. Ojo con `prepare_seo_grounded_queries`: aun con el scope de
 escritura, la identidad máquina compartida recibe `aeo_forbidden` del upstream — es el fail-closed
-documentado hasta TASK-1631, no un problema de scope. Si un cliente tiene el scope que
+documentado (el grant revocable por organización y por persona ya existe —TASK-1631, 2026-09-04—; el acceso
+externo real espera al emisor propio y al gateway multi-issuer, EPIC-044 TASK-1829/1830/1831/1832), no un
+problema de scope. Si un cliente tiene el scope que
 corresponde y aun así recibe `403`, revisa el consentimiento de la aplicación en Entra antes de tocar
 el gateway.
 

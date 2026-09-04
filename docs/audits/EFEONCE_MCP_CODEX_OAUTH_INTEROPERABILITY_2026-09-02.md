@@ -86,7 +86,8 @@ y [configuración OAuth de Claude Code](https://code.claude.com/docs/en/mcp#use-
 interoperabilidad de clientes internos y su regresión de discovery. Hay overlap físico: se coordina antes de
 editar `app.ts`, configuración, deploy y docs; no se concede ownership exclusivo del repo completo.
 
-`TASK-1631` conserva broker/identidad B2B, CIMD y grants por tenant/capability. No se duplica aquí. `TASK-659`
+`TASK-1631` conserva broker/identidad B2B, CIMD y grants por tenant/capability (superseded por EPIC-044: el
+emisor es TASK-1828/1829; el binding, TASK-1631, aplicado 2026-09-04). No se duplica aquí. `TASK-659`
 describe auth hosted del MCP interno de Greenhouse, no esta reparación sobre el gateway ya desplegado.
 `TASK-1654` aparece como formalización pendiente en comentarios/docs, pero no se encontró archivo ni fila propia
 en el registry; no es una implementación pendiente que deba asumirse existente.

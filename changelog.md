@@ -18,6 +18,10 @@ reader `resolveExternalAccess(environment, subject)` que deniega fail-closed y r
 `GET /api/platform/ecosystem/identity/binding` para el gateway (TASK-1831) y cuatro señales `identity.external_binding.*`.
 Smoke live `pnpm identity:external-access:smoke` verificó bind → grant → invite → accept → resolve → revoke contra PG real.
 Estado: code complete, rollout pendiente (deploy + señales en `/admin/operations`).
+Barrido documental del mismo día: skills `efeonce-mcp-platform`/`seo-aeo-practice`/`talent`/`growth-cro` (+ espejos), regla
+`.claude/rules/identity-external-access.md`, AGENTS.md, docs de API (OpenAPI + referencia), 18 docs de arquitectura y 10
+manuales/docs funcionales: «fail-closed hasta TASK-1631» pasa a «hasta el emisor + gateway multi-issuer de EPIC-044; el grant
+ya existe». Backfill de paridad `capabilities_registry` (11 capabilities ajenas).
 
 ## 2026-09-04 — TASK-1828: runtime del authorization server propio desplegado en staging y publicado en el front door del gateway
 

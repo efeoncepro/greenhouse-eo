@@ -248,8 +248,10 @@ interna**. Una ausencia en un lado nunca es, por sí sola, evidencia de olvido.
   humana del costo estimado antes de encolar
 - `prepare_seo_grounded_queries` (TASK-1666) — crea un **DRAFT** de grounded queries AEO desde
   candidatos de discovery (no gasta proveedor; jamás aprueba, activa ni corre el grader). Con la
-  identidad máquina compartida responde `aeo_forbidden` **fail-closed hasta TASK-1631** — se
-  reporta ese estado honesto, no se reintenta
+  identidad máquina compartida responde `aeo_forbidden` **fail-closed** (el grant revocable por
+  organización y por persona ya existe —TASK-1631, 2026-09-04—; el acceso externo real espera al emisor
+  propio y al gateway multi-issuer, EPIC-044 TASK-1829/1830/1831/1832) — se reporta ese estado honesto,
+  no se reintenta
 - `run_seo_prospect_diagnostic` (TASK-1709) — corre un diagnóstico ÚNICO sobre el dominio de un
   **prospecto** (sin contrato, sin acceso del cliente): **compromete gasto real del proveedor por
   corrida**, así que exige confirmación humana previa del dominio/mercado y su costo estimado.
@@ -287,7 +289,7 @@ Reglas que el agente debe respetar:
 - **`get_seo_provider_spend` es interno-only, y eso NO es una limitación temporal.** Lo que devuelve es lo que a Efeonce le **cuesta** servir a esa organización, no lo que la organización consumió: un binding org-scoped leyendo su propia fila estaría leyendo nuestra estructura de costos. Por eso un binding tenant-scoped recibe `404` (anti-oracle), igual que si el recurso no existiera.
 - **El par track/untrack compromete gasto recurrente.** `track_seo_keywords` factura cada keyword al proveedor en **cada ciclo diario** hasta que alguien la saque, así que la lista exacta se propone al humano y se confirma **antes** de llamarla — nunca especulativamente. Ambas son idempotentes y devuelven un **outcome por keyword** (`tracked` / `already_tracked` / `intent_changed` / `capacity_exceeded` / `invalid`, y `untracked` / `not_tracked` / `invalid`): reportar `data.ok` sin leer ese arreglo describe un cambio que puede no haber ocurrido. El lane acepta las 7 tools de escritura **solo desde bindings de scope `internal`**.
 - **`discover_seo_keywords` gasta al encolar, no al seguir.** Cada corrida paga a DataForSEO por llamada y por fila devuelta: primero `preview: true`, se muestra la fórmula de costo estimado al humano y se confirma ANTES de encolar — nunca especulativamente. La corrida es **async** (el 202 solo significa "encolada durable"): los candidatos se consultan después con `get_seo_keyword_discovery` + `runId`, y declarar resultados recién encolada la corrida describe datos que aún no existen. Es idempotente **dentro del ciclo mensual del proveedor** (mismo intent = misma corrida sin gastar de nuevo; un mes nuevo permite corrida fresca). Encolar **jamás auto-trackea**.
-- **`prepare_seo_grounded_queries` escribe un draft, nunca activa.** Se propone al humano la selección exacta de candidatos (≤20) y se confirma antes de llamar. El resultado declara `groundingMode` honesto, y desde la auditoría 2026-08-14 también la **cobertura por seed** (`seedCoverage`): si algún candidato quedó sin huella temática, viaja `coverageNotice` y se reporta al revisor — la etiqueta grounded se verifica, no se asume. Con la identidad máquina compartida el upstream responde `aeo_forbidden` fail-closed hasta TASK-1631.
+- **`prepare_seo_grounded_queries` escribe un draft, nunca activa.** Se propone al humano la selección exacta de candidatos (≤20) y se confirma antes de llamar. El resultado declara `groundingMode` honesto, y desde la auditoría 2026-08-14 también la **cobertura por seed** (`seedCoverage`): si algún candidato quedó sin huella temática, viaja `coverageNotice` y se reporta al revisor — la etiqueta grounded se verifica, no se asume. Con la identidad máquina compartida el upstream responde `aeo_forbidden` fail-closed (el grant revocable por organización y por persona ya existe —TASK-1631, 2026-09-04—; el acceso externo real espera al emisor propio y al gateway multi-issuer, EPIC-044 TASK-1829/1830/1831/1832).
 - **La intención de una keyword se declara, no se adivina** (TASK-1659). `track_seo_keywords` acepta `intent` opcional: `target` (compromiso acordado con el cliente — puede estar en la posición 60, y eso es la **distancia que falta**, no un fracaso) u `opportunity` (demanda medida que se está empujando). **Omítelo salvo que un humano lo haya declarado**: adivinarlo fabrica una clasificación que nadie hizo. Los dos **nunca se promedian** al reportar. Cambiar la intención de una keyword ya seguida devuelve `intent_changed` (no `already_tracked`: sí pasó algo), **no consume cupo** —cierra la membresía vigente y abre otra— y preserva desde cuándo es objetivo. `intentDeclaredBy` lleva la **autoría humana** cuando el agente actúa por encargo; el actor del write sigue siendo la máquina (`mcp:<consumer>`), que es la procedencia real del gasto, y una autoría sin intención se descarta. Las keywords seguidas antes del 2026-08-14 no tienen intención declarada: eso significa **"nadie la declaró"**, jamás "oportunidad".
 
 **Qué está federado al gateway público `mcp.efeonce.org`.** Desde TASK-1658 (2026-08-27) el
@@ -295,8 +297,9 @@ conjunto federado son **28 tools al 2026-08-31**, que NO es "el completo" del in
 conjuntos son distintos por construcción, ver el aviso del §8— (21 lecturas bajo
 `efeonce.mcp.read` — `get_seo_provider_spend` la sumó TASK-1696, `get_seo_keyword_gap` TASK-1662 y
 `get_seo_serp_top_results`/`get_seo_competitor_candidates` TASK-1699; las 7 escrituras bajo
-`efeonce.mcp.seo.write`, scope NO cableado al cliente PKCE público — fail-closed
-hasta TASK-1631). El guard de paridad del gateway
+`efeonce.mcp.seo.write`, scope NO cableado al cliente PKCE público — fail-closed; el grant
+revocable por organización y por persona ya existe —TASK-1631, 2026-09-04— y el acceso externo real
+espera al emisor propio y al gateway multi-issuer, EPIC-044 TASK-1829/1830/1831/1832). El guard de paridad del gateway
 (`efeonce-mcp/src/providers/greenhouse-seo-tool-parity.ts`) es ahora **bidireccional**: espejo
 committeado `GREENHOUSE_SEO_TOOL_INVENTORY` (nombre + claves exactas del inputSchema interno +
 clase `writes`) + paridad de schema (divergencia solo con razón declarada) + `annotations`
@@ -323,9 +326,11 @@ introspección runtime del server. El espejo **dejó de existir** (`TASK-1780`, 
   las 7 escrituras ejercitadas en su puerta sin escribir ni gastar ✓.
 - **Estar desplegada no vuelve usable una escritura.** Las dos nuevas
   (`declare_seo_competitors` / `retire_seo_competitors`) viajan en el scope `efeonce.mcp.seo.write`
-  que ya existía — **cero cambios en Entra** — así que siguen live-but-fail-closed hasta TASK-1631,
-  igual que las demás escrituras: ese scope no está cableado al cliente PKCE público compartido, y
-  eso es deliberado.
+  que ya existía — **cero cambios en Entra** — así que siguen live-but-fail-closed igual que las demás
+  escrituras: ese scope no está cableado al cliente PKCE público compartido, y eso es deliberado. El grant
+  revocable por organización y por persona ya existe (`greenhouse_core.external_capability_grants`,
+  TASK-1631, 2026-09-04); el acceso externo real espera al emisor propio y al gateway multi-issuer
+  (EPIC-044: TASK-1829/1830/1831/1832).
 - **Un array vacío no es una falla.** Los 4 lanes internal-only nuevos respondieron ok contra
   producción: `serp-top-results` con `rows: []` (el día 1 de la serie es 2026-08-29),
   `competitor-candidates` con `candidates: []` (esperado con serie joven <5 días), `keyword-gap` con

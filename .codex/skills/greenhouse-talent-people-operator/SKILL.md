@@ -328,9 +328,13 @@ Nexa governed action `decide_hiring_application`. Contract in
 - 🔴 **Confirming is fail-closed for delegated agents.** `confirm` rejects `authSource ===
   'sister_platform_oauth'` with 403. A delegated token may **read** the outcome and **propose** a decision;
   confirming requires a human session. This is not an oversight: `efeonce.mcp.hiring.write` **does not
-  exist in code** — proposed in TASK-1720/1722 as a blast-radius class and blocked until the revocable
-  grant of **TASK-1631**. Same split as the rest of Hiring: the agent proposes and reads, the human
-  confirms. **NEVER** wire a delegated write scope into this lane before that grant.
+  exist in code** — proposed in TASK-1720/1722 as a blast-radius class and blocked until a delegated
+  token can carry a revocable grant. The grant itself already exists
+  (`greenhouse_core.external_capability_grants`, per organization and per person — **TASK-1631**,
+  2026-09-04); what is missing is the native issuer + multi-issuer gateway of EPIC-044
+  (TASK-1829/1830/1831/1832), which mints tokens with `gv`. Same split as the rest of Hiring: the agent
+  proposes and reads, the human confirms. **NEVER** wire a delegated write scope into this lane before
+  that issuer/gateway lands.
 - 🔴 **Every `hiring.*` capability checked with `can()` must declare its parity** in
   `src/lib/hiring/capability-parity-manifest.ts` as `federated` (with `evidence` = an `app` lane route the
   test verifies exists), `deliberately-internal` (with a reason) or `pending` (with a reason). Adding one

@@ -23,12 +23,14 @@
   - `access.governance.user_overrides.approve`
   - `access.governance.startup_policy.update`
   - `access.governance.audit_log.read`
+- Binding externo de persona/organizacion ((actualizado 2026-09-04, TASK-1631)): 6 capabilities seedeadas bajo module `organization`, scope `tenant`, grant solo a `efeonce_admin` en `src/lib/entitlements/runtime.ts`: `identity.external_environment.manage`, `identity.external_binding.read`, `identity.external_binding.bind`, `identity.external_grant.issue`, `identity.external_invitation.issue`, `identity.external_access.revoke`.
 - `efeonce_admin` recibe estas capabilities desde `src/lib/entitlements/runtime.ts`; los endpoints siguen pasando primero por `requireAdminTenantContext` y luego por `can(tenant, access.governance.*, action, tenant)` para least privilege explícito.
 - Grants sensibles (`*_sensitive`, `.reveal_sensitive`, `.export_snapshot`) no se aplican inmediatamente cuando se crean como override usuario: quedan `approval_status='pending_approval'` en `greenhouse_core.user_entitlement_overrides` y requieren segunda firma vía endpoint de approval.
 - Los eventos `access.entitlement_role_default_changed` y `access.entitlement_user_override_changed` incluyen `schemaVersion: 1` y `affectedUserIds`; el reactive consumer soporta `extractScopes` opcional para invalidar cache por cada subject afectado.
 - Reliability signals nuevos bajo `moduleKey='identity'`:
   - `identity.governance.audit_log_write_failures` (drift, error si > 0)
   - `identity.governance.pending_approval_overdue` (drift, warning si > 7 días)
+  - Binding externo ((actualizado 2026-09-04, TASK-1631)): `identity.external_binding.unbound_dispatch_attempt` (incident), `identity.external_binding.revoked_still_dispatching` (incident), `identity.external_binding.subject_collision` (data_quality), `identity.external_binding.orphan_grant` (drift); steady 0.
 
 ## Delta 2026-05-08 — TASK-611 introduce el module `organization` y la projection canónica del Organization Workspace
 
@@ -767,7 +769,7 @@ Ese modelo permite:
 - Antes de persistir una capability, validar que exista en `greenhouse_core.capabilities_registry` y `deprecated_at IS NULL`. Nunca bypassar el registry ni escribir grants con strings ad hoc.
 - Grants sensibles (`*_sensitive`, `.reveal_sensitive`, `.export_snapshot`) quedan `pending_approval` y requieren segunda firma con actor distinto. Pending grants no se aplican al acceso efectivo.
 - Outbox governance debe incluir `schemaVersion: 1` y `affectedUserIds` cuando el cambio impacte usuarios; `organizationWorkspaceCacheInvalidationProjection` soporta fan-out vía `extractScopes`.
-- Signals canónicos: `identity.governance.audit_log_write_failures` y `identity.governance.pending_approval_overdue`. Steady state esperado: 0.
+- Signals canónicos: `identity.governance.audit_log_write_failures` y `identity.governance.pending_approval_overdue`; para el binding externo, `identity.external_binding.{unbound_dispatch_attempt,revoked_still_dispatching,subject_collision,orphan_grant}` ((actualizado 2026-09-04, TASK-1631)). Steady state esperado: 0.
 
 ### Deprecated Capabilities Discipline (TASK-840, desde 2026-05-11)
 

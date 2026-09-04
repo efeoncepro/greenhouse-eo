@@ -180,7 +180,7 @@ Tabla de las tecnologías (todas ya presentes o de costo marginal):
 | 1 | `TASK-1828` | Runtime `auth.efeonce.org`: deployable, host en el front door del gateway, KMS, JWKS, session store, excepción EPIC-027 | 3 a 4 días |
 | 2 | `TASK-1829` | Superficie OAuth: metadata, CIMD, DCR compat, PKCE, tokens ES256, refresh, revocación, consentimiento | 3 a 4 días |
 | 3 | `TASK-1830` | Autenticación de personas externas: passkeys, magic link, TOTP, recuperación, anti-abuso | 5 a 7 días |
-| 4 | `TASK-1631` | Binding Account 360, invitaciones, grants, `grants_version`, eligibility reader (re-alcance) | 3 a 4 días |
+| 4 | `TASK-1631` | Binding Account 360, invitaciones, grants, `grants_version`, eligibility reader (re-alcance). **Slice 1 entregado 2026-09-04** (schema, commands, reader del gateway, 4 señales; migraciones aplicadas); rollout pendiente: sin environment real, sin binding de cliente real, sin UI | 3 a 4 días |
 | 5 | `TASK-1831` | Gateway multi-issuer: `AuthContext`, resolver por issuer, tools calificadas, recheck de grants | 2 a 3 días |
 | 6 | task `ui-ux` | Login, consentimiento y recuperación (nace con wireframe y flow reales) | 3 a 5 días, en paralelo |
 | 7 | `TASK-1832` | Canaries Claude/Codex/ChatGPT, matriz de tokens, primera cohorte de clientes | 3 a 5 días + sesiones interactivas |
@@ -204,7 +204,10 @@ primer cliente: 5 a 7 semanas por los gates humanos.
 - Si el issuer propio reemplaza también a Entra para personas internas en MCP (hoy: no; Entra sigue interno).
 - Si `TASK-659` se cierra por supersesión o se re-alcanza como consumidor interno del emisor.
 - Modelo de grants por persona para capabilities internas como `growth.ai_visibility.prompt_set.manage`
-  (delta 2026-08-26 de `TASK-1631`): pertenece al binding, pero el sujeto interno hoy viene de Entra.
+  (delta 2026-08-26 de `TASK-1631`): el binding ya lo resuelve con `external_capability_grants.profile_id`
+  (NULL = todos los miembros ligados; set = solo esa persona) (actualizado 2026-09-04, TASK-1631). Queda registrar Entra como
+  environment `internal` + binding de la organización propia de Efeonce (EO-ORG-0007) en `TASK-1831` o en una
+  task de Growth si se quiere usar este grafo también para personas internas.
 - Región definitiva del runtime si el tráfico de clientes se concentra en Chile (`southamerica-west1` como
   el gateway) frente a la latencia hacia Cloud SQL en `us-east4`.
 

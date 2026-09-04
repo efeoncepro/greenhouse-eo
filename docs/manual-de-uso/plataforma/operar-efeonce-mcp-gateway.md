@@ -58,9 +58,14 @@ cierres la sesión compartida del perfil.
 
 ## Antes de clientes externos
 
-No entregues este endpoint a clientes hasta que exista entitlement por tenant/capability y una prueba real de
-persona base-only denegada para Globe. Al cliente interno actual se le entregan hoy el scope base y el de lectura
-de Globe incluso si solicita sólo el base; por eso no prueba esa separación.
+El entitlement por tenant/capability YA existe: el grant revocable por organización y por persona vive en
+`greenhouse_core.external_capability_grants` (TASK-1631, 2026-09-04) y se opera con el manual
+`docs/manual-de-uso/identity/operar-binding-identidad-externa.md` (environment → binding de la organización →
+grants → invitación → persona ligada por `subject`); el gateway lo consulta por
+`GET /api/platform/ecosystem/identity/binding`. Lo que todavía falta —y es la compuerta real— es el emisor propio
+y el gateway multi-issuer (EPIC-044: TASK-1829/1830/1831/1832), más una prueba real de persona base-only denegada
+para Globe. No entregues este endpoint a clientes hasta que eso exista. Al cliente interno actual se le entregan
+hoy el scope base y el de lectura de Globe incluso si solicita sólo el base; por eso no prueba esa separación.
 
 Cuando revises los scopes soportados en el paso 2 de la verificación, ten presente que el gateway declara tres, no
 dos: el base, el de lectura de Globe y el de escritura interna de fondeo de créditos, que aparece sólo cuando su

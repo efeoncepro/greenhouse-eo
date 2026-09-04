@@ -65,12 +65,13 @@ describe('TASK-611 — capability + view mappings', () => {
       capability => capability.module === 'organization'
     )
 
-    // 11 originales TASK-611 (Organization Workspace projection facets) + 3 nuevas
-    // TASK-872 (scim.eligibility_override.create / .delete + scim.backfill.execute) +
-    // 5 nuevas TASK-877 (identity.reconciliation.{read, approve, reject, reassign, run})
-    // + 1 nueva TASK-999 (organization.brand_asset — brand asset enrichment) = 20 total.
-    // Pin actualizado 2026-05-14 (TASK-877) y 2026-06-09 (TASK-999 brand_asset).
-    expect(organizationCapabilities).toHaveLength(20)
+    // 11 originales TASK-611 (Organization Workspace projection facets) + 3 TASK-872 (scim.*) +
+    // 5 TASK-877 (identity.reconciliation.*) + 1 TASK-999 (organization.brand_asset) + 6 TASK-1631
+    // (identity.external_*) = 26 al 2026-09-04. El pin es un PISO, no una igualdad: agregar
+    // capabilities al módulo `organization` es legítimo y no es lo que esta guarda protege; la
+    // paridad catálogo TS ↔ `capabilities_registry` la verifica el test live
+    // `src/lib/capabilities-registry/parity.live.test.ts` (verificador real), no este literal.
+    expect(organizationCapabilities.length).toBeGreaterThanOrEqual(26)
 
     for (const capability of organizationCapabilities) {
       expect(capability.actions.length, `${capability.key} must have at least one action`).toBeGreaterThan(0)

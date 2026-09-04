@@ -1,16 +1,16 @@
 # Sistema de Identidad, Roles y Acceso
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.9
+> **Version:** 1.10
 > **Creado:** 2026-04-05 por Claude (TASK-248)
-> **Ultima actualizacion:** 2026-08-11 por Claude (TASK-1685: la visibilidad del portal cliente la decide una sola regla — modulos contratados menos revocaciones por persona)
+> **Ultima actualizacion:** 2026-09-04 por Claude (TASK-1631: puerta MCP para clientes externos — environment, binding, invitacion y persona ligada por subject; el login del portal cliente no cambia)
 > **Documentacion tecnica:** [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md), [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md](../../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md), [GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md)
 
 ---
 
 ## La idea central
 
-Greenhouse es un portal donde entran dos tipos de personas: **gente de Efeonce** (el equipo interno) y **clientes externos**. Cada persona entra con su cuenta, y el sistema decide automaticamente que puede ver y que puede hacer.
+Greenhouse es un portal donde entran dos tipos de personas: **gente de Efeonce** (el equipo interno) y **clientes externos**. Cada persona entra con su cuenta, y el sistema decide automaticamente que puede ver y que puede hacer. Desde el 4 de septiembre de 2026 existe ademas una tercera puerta que no es el portal: un cliente puede conectar su asistente de IA (Claude, ChatGPT, Codex) al MCP de Efeonce, y Greenhouse decide con el mismo rigor a que organizacion pertenece esa persona y que capacidades tiene — ver [Binding de Identidad Externa para el MCP](binding-identidad-externa-mcp.md).
 
 ---
 
@@ -40,6 +40,21 @@ Cada persona tiene uno o mas **roles** asignados. Piensa en ellos como sombreros
 | **Cliente Ejecutivo**    | El CMO o VP — ve el dashboard ejecutivo, KPIs de alto nivel         |
 | **Cliente Manager**      | El marketing manager — ve mas detalle operativo, proyectos, sprints |
 | **Cliente Especialista** | Acceso limitado a proyectos o campanas especificas                  |
+
+### Clientes externos por MCP (sin entrar al portal)
+
+Un cliente tambien puede usar Greenhouse desde su asistente de IA, sin abrir el portal. Para eso no se le crea un usuario ni se le asigna un rol: se le abre una **puerta por organizacion**, en cuatro pasos y siempre desde Efeonce:
+
+1. **Environment:** Efeonce registra de donde vienen las identidades (el emisor que firma los tokens). Hoy solo se registra; el emisor propio de Efeonce llega con EPIC-044.
+2. **Binding:** se liga la organizacion cliente (tiene que ser un cliente activo en Account 360) a ese environment.
+3. **Invitacion:** se invita por correo a una persona concreta de ese cliente; el enlace se usa una sola vez y vence.
+4. **Persona ligada:** al aceptar, la persona queda unida por su `subject` (el identificador que trae el token) a su perfil canonico. Desde ahi, lo que puede hacer lo dicen los **grants**: capacidades que se otorgan a toda la organizacion o solo a esa persona, y que se revocan igual de facil.
+
+Todo queda auditado y cualquier revocacion cierra el acceso en el siguiente chequeo del gateway. El grant revocable por organizacion y por persona ya existe (`greenhouse_core.external_capability_grants`, TASK-1631, 4 de septiembre de 2026); el acceso externo real espera al emisor propio y al gateway multi-issuer (EPIC-044: TASK-1829/1830/1831/1832).
+
+**El login del portal cliente no cambia:** los roles Cliente Ejecutivo, Manager y Especialista y su forma de entrar siguen igual. Unificar ambas puertas en una sola identidad es un paso posterior (TASK-1834).
+
+> **Detalle:** [Binding de Identidad Externa para el MCP](binding-identidad-externa-mcp.md) (que es y como se comporta) y [Operar el binding de identidad externa](../../manual-de-uso/identity/operar-binding-identidad-externa.md) (paso a paso por API; en este slice no hay pantalla).
 
 ### Combinaciones de roles
 
