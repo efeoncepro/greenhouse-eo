@@ -89,6 +89,7 @@ Propuestas para `src/lib/copy/auth-server.ts` (`GH_AUTH_SERVER`); los ids existe
 | consent_footer | 6 | Puedes revocar este acceso en cualquier momento desde Efeonce. | — | existe |
 | login_* / confirm_* / link_* / session_* | 2–5 | (ya existen en `src/lib/copy/auth-server.ts`, agregados por TASK-1830 el 2026-09-04) | — | La UI los consume tal cual; cualquier ajuste se negocia con TASK-1830 |
 | (login) orden de la pantalla | 3–5 | «Usar mi passkey» primero; luego «Correo de trabajo» + «Enviarme un enlace» | — | Credenciales descubribles: passkey no pide correo |
+| login_passkey_cta · login_passkey_unsupported · login_passkey_failed · login_email_fallback_hint | 3–5 | (ids de TASK-1830, 2026-09-04) «Entrar con mi passkey»; sin soporte del dispositivo; la ceremonia no resultó; pista para usar el enlace | — | **Dos estados distintos, nunca el mismo mensaje:** `unsupported` es del dispositivo y NO ofrece reintento (sólo el fallback al enlace); `failed` SÍ ofrece «Intentar de nuevo» + el fallback |
 | (revisa tu correo) | 2–3 | Copy y tiempo de respuesta IDÉNTICOS exista o no el correo; misma pantalla tras aceptar invitación | email | Anti-enumeración (TASK-1830) |
 | (enlace) página intermedia | 2–5 | `GET /m/<tokenId>.<verificador>` muestra «Continuar» que hace el POST de consumo; expirado/usado → «Pedir un enlace nuevo» | — | Los escáneres de correo abren los GET |
 | stepup_title | 2 | Confirma que eres tú | — | nuevo |
@@ -114,6 +115,8 @@ Propuestas para `src/lib/copy/auth-server.ts` (`GH_AUTH_SERVER`); los ids existe
 | error | No pudimos completar la autorización | Cuerpo por código + Referencia | Volver a la aplicación (si hay redirect válido) | Sin detalle interno |
 | denied | Tu cuenta no tiene una organización vinculada | Explicación breve | Pedir acceso a tu contacto en Efeonce | `access_denied`; sin PII |
 | stepup | Confirma que eres tú | Código de tu app | Verificar código · Usar código de respaldo | Error inline conserva el valor; sin «recordar este dispositivo» (el `amr` sale de la aserción real, TASK-1830) |
+| passkey_unsupported | (login) | `login_passkey_unsupported` | Sólo «Enviarme el enlace» (sin reintento) | Del dispositivo/navegador; el botón de passkey se oculta o deshabilita |
+| passkey_failed | (login) | `login_passkey_failed` | «Intentar de nuevo» · «Enviarme el enlace» | La ceremonia falló o se canceló; sí tiene reintento útil |
 | rate_limited | Demasiados intentos | Espera un momento… | Reintentar (deshabilitado por N s) | `slow_down` |
 
 ## Accessibility Contract

@@ -117,7 +117,8 @@ servidor, nunca el navegador.
 | `access_denied` (unbound) | Explicación + a quién pedir acceso | Contacto en Efeonce | Sin PII; redirect a la app si `prompt=none` |
 | `consent_required` con `prompt=none` | Redirect a la app con error | La app reintenta sin `prompt=none` | Sin pantalla |
 | Magic link expirado/usado | «Este enlace ya no es válido» | Pedir un enlace nuevo | Copy anti-enumeración |
-| Passkey no soportada/cancelada | Estado explicativo | Usar enlace por correo | Fallback siempre visible |
+| Passkey sin soporte (`login_passkey_unsupported`) | Estado del dispositivo, sin botón de reintento | Sólo «Enviarme el enlace» | Distinto de «no resultó»: reintentar aquí manda a la persona a revisar lo que no es |
+| Passkey falló/cancelada (`login_passkey_failed`) | Estado con «Intentar de nuevo» | Reintento + fallback al enlace | Sí tiene reintento útil |
 | TOTP incorrecto | Error inline | Reintentar; código de respaldo | Límite de intentos (TASK-1830) |
 | `slow_down` (429) | «Demasiados intentos» | Esperar y reintentar | Sin contador exacto |
 | Proveedor de correo degradado | Mismo copy de `sent` | Pedir un enlace nuevo tras 60 s | No revelar el fallo |
