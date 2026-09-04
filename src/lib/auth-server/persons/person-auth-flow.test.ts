@@ -102,6 +102,7 @@ const buildHarness = (options: { linkActive?: boolean; knownEmail?: boolean } = 
     environmentId: ENVIRONMENT_ID,
     expectedSourceSystem: SOURCE_SYSTEM,
     issuer: ISSUER,
+    rpId: 'auth.efeonce.org',
     now: () => clock.current,
     sleep: async ms => {
       sleeps.push(ms)
@@ -151,6 +152,7 @@ describe('superficie de personas — enrutamiento y flag', () => {
       environmentId: ENVIRONMENT_ID,
       expectedSourceSystem: SOURCE_SYSTEM,
       issuer: ISSUER,
+      rpId: 'auth.efeonce.org',
       now: () => new Date()
     })
 

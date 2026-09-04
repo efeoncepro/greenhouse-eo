@@ -357,6 +357,35 @@ export interface GreenhouseAuthOauthClients {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GreenhouseAuthPasskeyChallenges {
+  challenge_hash: string;
+  consumed_at: Timestamp | null;
+  correlation_id: string | null;
+  created_at: Generated<Timestamp>;
+  environment_id: string;
+  expires_at: Timestamp;
+  ip_hash: string | null;
+  purpose: string;
+  subject: string | null;
+}
+
+export interface GreenhouseAuthPasskeyCredentials {
+  aaguid: string | null;
+  backed_up: Generated<boolean>;
+  counter: Generated<Int8>;
+  created_at: Generated<Timestamp>;
+  credential_id: string;
+  device_name: string | null;
+  device_type: string | null;
+  environment_id: string;
+  last_used_at: Timestamp | null;
+  public_key: Buffer;
+  revoke_reason: string | null;
+  revoked_at: Timestamp | null;
+  subject: string;
+  transports: Generated<string[]>;
+}
+
 export interface GreenhouseAuthPersonAuthAttempts {
   attempt_id: Generated<string>;
   correlation_id: string | null;
@@ -13121,6 +13150,8 @@ export interface DB {
   "greenhouse_auth.magic_link_tokens": GreenhouseAuthMagicLinkTokens;
   "greenhouse_auth.oauth_audit_events": GreenhouseAuthOauthAuditEvents;
   "greenhouse_auth.oauth_clients": GreenhouseAuthOauthClients;
+  "greenhouse_auth.passkey_challenges": GreenhouseAuthPasskeyChallenges;
+  "greenhouse_auth.passkey_credentials": GreenhouseAuthPasskeyCredentials;
   "greenhouse_auth.person_auth_attempts": GreenhouseAuthPersonAuthAttempts;
   "greenhouse_auth.refresh_tokens": GreenhouseAuthRefreshTokens;
   "greenhouse_auth.sessions": GreenhouseAuthSessions;

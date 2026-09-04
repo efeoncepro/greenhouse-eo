@@ -14,6 +14,9 @@
  *   POST /auth/invitations/accept   liga la persona y despacha el magic link al correo del operador
  *   GET  /auth/session              contexto de la sesión vigente (JSON)
  *   POST /auth/session/logout       revoca la sesión y limpia la cookie
+ *   POST /auth/passkeys/register/{start,finish}      alta de passkey (exige sesión)
+ *   POST /auth/passkeys/authenticate/{start,finish}  login por passkey (credenciales descubribles)
+ *   GET  /auth/passkeys             dispositivos registrados de la persona
  */
 
 import { buildRequestAuditContext } from '../oauth/audit'
@@ -50,6 +53,13 @@ import {
   readCookie,
   resolvePersonSession
 } from './sessions'
+import {
+  finishPasskeyAuthentication,
+  finishPasskeyRegistration,
+  startPasskeyAuthentication,
+  startPasskeyRegistration,
+  type PasskeyDeps
+} from './passkeys'
 import type { PersonAuthStorePort } from './store/port'
 
 export type PersonAuthHandlerDeps = Omit<MagicLinkDeps, 'store' | 'config'> & {
@@ -59,6 +69,10 @@ export type PersonAuthHandlerDeps = Omit<MagicLinkDeps, 'store' | 'config'> & {
   mintSubject: () => string
   /** `external_idp:<environment>` esperado en el link de toda sesión de este emisor. */
   expectedSourceSystem: string
+  /** `rpId` del WebAuthn: el HOST del emisor. Distinto del origen, que sí lleva esquema. */
+  rpId: string
+  /** Observabilidad del contador que retrocede (señal `auth.person.passkey_counter_regression`). */
+  onPasskeyCounterRegression?: (input: { credentialId: string }) => void
 }
 
 export type PersonAuthHandler = (request: OAuthHttpRequest) => Promise<OAuthHttpResponse | null>
@@ -69,7 +83,12 @@ const STATIC_PATHS = new Set<string>([
   PERSON_AUTH_PATHS.magicLinkConsume,
   PERSON_AUTH_PATHS.invitationAccept,
   PERSON_AUTH_PATHS.session,
-  PERSON_AUTH_PATHS.logout
+  PERSON_AUTH_PATHS.logout,
+  PERSON_AUTH_PATHS.passkeyRegisterStart,
+  PERSON_AUTH_PATHS.passkeyRegisterFinish,
+  PERSON_AUTH_PATHS.passkeyAuthenticateStart,
+  PERSON_AUTH_PATHS.passkeyAuthenticateFinish,
+  PERSON_AUTH_PATHS.passkeyList
 ])
 
 export const isPersonAuthPath = (pathname: string): boolean =>
@@ -104,6 +123,16 @@ export const createPersonAuthHandler = (deps: PersonAuthHandlerDeps): PersonAuth
     now: deps.now,
     sleep: deps.sleep,
     onError: deps.onError
+  }
+
+  const passkeyDeps: PasskeyDeps = {
+    store: deps.store,
+    config: deps.config,
+    directory: deps.directory,
+    environmentId: deps.environmentId,
+    origin: new URL(deps.issuer).origin,
+    rpId: deps.rpId,
+    now: deps.now
   }
 
   const requestContext = (request: OAuthHttpRequest) => {
@@ -258,6 +287,173 @@ export const createPersonAuthHandler = (deps: PersonAuthHandlerDeps): PersonAuth
       }
 
       return wantsHtml ? htmlResponse(202, renderInvitationAcceptedPage()) : jsonResponse(202, { status: 'accepted' })
+    }
+
+    // ─── Passkeys ────────────────────────────────────────────────────────────
+    //
+    // Registrar exige sesión (agregas una llave a TU cuenta); autenticar no, obviamente.
+    if (
+      path === PERSON_AUTH_PATHS.passkeyRegisterStart ||
+      path === PERSON_AUTH_PATHS.passkeyRegisterFinish ||
+      path === PERSON_AUTH_PATHS.passkeyList
+    ) {
+      const expectedMethod = path === PERSON_AUTH_PATHS.passkeyList ? 'GET' : 'POST'
+
+      if (request.method !== expectedMethod) return methodNotAllowed(expectedMethod)
+
+      const resolution = await resolvePersonSession({
+        store: deps.store,
+        config: deps.config,
+        sessionId: readCookie(request.headers.get('cookie'), deps.config.sessionCookieName),
+        expectedEnvironmentId: deps.environmentId,
+        expectedSourceSystem: deps.expectedSourceSystem,
+        now: deps.now()
+      })
+
+      if (resolution.status !== 'active') return jsonResponse(401, { status: 'unauthenticated' })
+
+      const { session } = resolution
+
+      if (path === PERSON_AUTH_PATHS.passkeyList) {
+        const credentials = await deps.store.listPasskeyCredentials({
+          environmentId: deps.environmentId,
+          subject: session.subject
+        })
+
+        return jsonResponse(200, {
+          status: 'ok',
+          max: deps.config.maxPasskeysPerPerson,
+          credentials: credentials.map(credential => ({
+            credentialId: credential.credentialId,
+            deviceName: credential.deviceName,
+            deviceType: credential.deviceType,
+            backedUp: credential.backedUp,
+            createdAt: credential.createdAt.toISOString(),
+            lastUsedAt: credential.lastUsedAt?.toISOString() ?? null
+          }))
+        })
+      }
+
+      if (path === PERSON_AUTH_PATHS.passkeyRegisterStart) {
+        const started = await startPasskeyRegistration(passkeyDeps, {
+          subject: session.subject,
+          displayName: readField(request, 'display_name'),
+          ipHash: audit.ipHash,
+          correlationId: audit.correlationId
+        })
+
+        if (started.status === 'limit_reached') {
+          return jsonResponse(409, { status: 'limit_reached', max: started.max })
+        }
+
+        return jsonResponse(200, { status: 'ready', options: started.options })
+      }
+
+      const body = parseJsonBody(request.body)
+      const payload = body && typeof body === 'object' ? (body as Record<string, unknown>) : {}
+      const challenge = typeof payload.challenge === 'string' ? payload.challenge : ''
+
+      const finished = await finishPasskeyRegistration(passkeyDeps, {
+        subject: session.subject,
+        challenge,
+        response: payload.response as never,
+        deviceName: typeof payload.device_name === 'string' ? payload.device_name : null
+      })
+
+      await deps.store.recordAttempt({
+        method: 'passkey',
+        stage: 'register',
+        outcome: finished.status === 'registered' ? 'success' : 'rejected',
+        reasonCode: finished.status === 'registered' ? null : finished.reason,
+        environmentId: deps.environmentId,
+        subjectHash: sha256Hex(session.subject),
+        ipHash: audit.ipHash,
+        userAgentHash: audit.userAgentHash,
+        correlationId: audit.correlationId,
+        details: {}
+      })
+
+      if (finished.status !== 'registered') return jsonResponse(400, { status: 'rejected' })
+
+      return jsonResponse(201, { status: 'registered', credentialId: finished.credentialId })
+    }
+
+    if (path === PERSON_AUTH_PATHS.passkeyAuthenticateStart) {
+      if (request.method !== 'POST') return methodNotAllowed('POST')
+
+      const started = await startPasskeyAuthentication(passkeyDeps, {
+        ipHash: audit.ipHash,
+        correlationId: audit.correlationId
+      })
+
+      return jsonResponse(200, { status: 'ready', options: started.options })
+    }
+
+    if (path === PERSON_AUTH_PATHS.passkeyAuthenticateFinish) {
+      if (request.method !== 'POST') return methodNotAllowed('POST')
+
+      const body = parseJsonBody(request.body)
+      const payload = body && typeof body === 'object' ? (body as Record<string, unknown>) : {}
+
+      const result = await finishPasskeyAuthentication(passkeyDeps, {
+        challenge: typeof payload.challenge === 'string' ? payload.challenge : '',
+        response: payload.response as never,
+        ipHash: audit.ipHash,
+        userAgentHash: audit.userAgentHash,
+        correlationId: audit.correlationId
+      })
+
+      const outcomeFor = () => {
+        if (result.status === 'authenticated') return { outcome: 'success' as const, reasonCode: null }
+
+        if (result.status === 'counter_regression') {
+          return { outcome: 'rejected' as const, reasonCode: 'counter_regression' }
+        }
+
+        if (result.status === 'access_revoked') return { outcome: 'rejected' as const, reasonCode: 'access_revoked' }
+
+        return { outcome: 'rejected' as const, reasonCode: result.reason }
+      }
+
+      const { outcome, reasonCode } = outcomeFor()
+
+      await deps.store.recordAttempt({
+        method: 'passkey',
+        stage: 'authenticate',
+        outcome,
+        reasonCode,
+        environmentId: deps.environmentId,
+        subjectHash:
+          result.status === 'authenticated' || result.status === 'counter_regression'
+            ? sha256Hex(result.subject)
+            : null,
+        ipHash: audit.ipHash,
+        userAgentHash: audit.userAgentHash,
+        correlationId: audit.correlationId,
+        details: {}
+      })
+
+      if (result.status === 'counter_regression') {
+        deps.onPasskeyCounterRegression?.({ credentialId: result.credentialId })
+
+        // La credencial ya quedó invalidada. Se responde 401 genérico: el detalle es del ledger.
+        return jsonResponse(401, { status: 'rejected' })
+      }
+
+      if (result.status === 'access_revoked') return jsonResponse(403, { status: 'access_revoked' })
+      if (result.status !== 'authenticated') return jsonResponse(401, { status: 'rejected' })
+
+      return jsonResponse(
+        200,
+        { status: 'authenticated', amr: result.amr },
+        {
+          'Set-Cookie': buildSessionCookie(
+            deps.config.sessionCookieName,
+            result.session.sessionId,
+            deps.config.sessionSlidingTtlSeconds
+          )
+        }
+      )
     }
 
     // ─── Contexto de la sesión ───────────────────────────────────────────────

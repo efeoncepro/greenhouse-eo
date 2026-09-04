@@ -102,3 +102,56 @@ export type RateLimitRule = {
 export type RateLimitDecision =
   | { allowed: true; hits: number }
   | { allowed: false; retryAfterSeconds: number; reason: 'window_exceeded' | 'locked_out' }
+
+// ─── Passkeys (WebAuthn) ──────────────────────────────────────────────────────
+
+export type PasskeyCredentialRecord = {
+  /** `credential_id` en base64url tal como lo devuelve el navegador. */
+  credentialId: string
+  environmentId: string
+  subject: string
+  /**
+   * Clave PÚBLICA en formato COSE. La privada nunca sale del autenticador.
+   * `Uint8Array<ArrayBuffer>` explícito: `@simplewebauthn/server` no acepta el `ArrayBufferLike`
+   * genérico, y dejarlo implícito rompe el typecheck recién en el callsite.
+   */
+  publicKey: Uint8Array<ArrayBuffer>
+  /** Contador anti-clonación. Muchos passkeys modernos reportan siempre 0: eso NO es regresión. */
+  counter: number
+  transports: string[]
+  deviceName: string | null
+  deviceType: 'singleDevice' | 'multiDevice' | null
+  backedUp: boolean
+  aaguid: string | null
+  createdAt: Date
+  lastUsedAt: Date | null
+  revokedAt: Date | null
+  revokeReason: string | null
+}
+
+export type PasskeyChallengePurpose = 'registration' | 'authentication'
+
+export type PasskeyChallengeRecord = {
+  /** sha256 hex del reto; el valor crudo vive en el navegador durante la ceremonia. */
+  challengeHash: string
+  purpose: PasskeyChallengePurpose
+  environmentId: string
+  /** `null` sólo en autenticación con credenciales descubribles. */
+  subject: string | null
+  createdAt: Date
+  expiresAt: Date
+  consumedAt: Date | null
+  ipHash: string | null
+  correlationId: string | null
+}
+
+export type ClaimPasskeyChallengeResult =
+  | { status: 'claimed'; record: PasskeyChallengeRecord }
+  | { status: 'already_consumed' }
+  | { status: 'expired' }
+  | { status: 'not_found' }
+
+/** Lo que la ASERCIÓN dice del factor. `userVerified` viene de los flags firmados, no del cliente. */
+export type PasskeyAmrFactors = {
+  userVerified: boolean
+}

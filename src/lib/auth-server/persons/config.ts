@@ -40,6 +40,12 @@ export type AuthServerPersonAuthConfig = {
   /** Bloqueo progresivo: base y tope del backoff cuando una llave supera su límite. */
   lockoutBaseSeconds: number
   lockoutMaxSeconds: number
+  /** TTL del reto WebAuthn: corto por diseño, la ceremonia dura segundos. */
+  passkeyChallengeTtlSeconds: number
+  /** Tope de credenciales activas por persona (el trigger de PG lo enforcea también). */
+  maxPasskeysPerPerson: number
+  /** Nombre visible del Relying Party en el diálogo del navegador. */
+  passkeyRelyingPartyName: string
 }
 
 export const AUTH_SERVER_PERSON_AUTH_DEFAULTS = {
@@ -53,7 +59,10 @@ export const AUTH_SERVER_PERSON_AUTH_DEFAULTS = {
   stepUpMaxAgeSeconds: 10 * 60,
   antiEnumerationFloorMs: 400,
   lockoutBaseSeconds: 60,
-  lockoutMaxSeconds: 60 * 60
+  lockoutMaxSeconds: 60 * 60,
+  passkeyChallengeTtlSeconds: 5 * 60,
+  maxPasskeysPerPerson: 5,
+  passkeyRelyingPartyName: 'Efeonce ID'
 } as const
 
 const parseFlag = (value: string | undefined): boolean => value?.trim().toLowerCase() === 'true'

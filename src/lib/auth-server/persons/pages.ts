@@ -22,7 +22,12 @@ export const PERSON_AUTH_PATHS = {
   invitationAccept: '/auth/invitations/accept',
   invitationLanding: '/i/',
   session: '/auth/session',
-  logout: '/auth/session/logout'
+  logout: '/auth/session/logout',
+  passkeyRegisterStart: '/auth/passkeys/register/start',
+  passkeyRegisterFinish: '/auth/passkeys/register/finish',
+  passkeyAuthenticateStart: '/auth/passkeys/authenticate/start',
+  passkeyAuthenticateFinish: '/auth/passkeys/authenticate/finish',
+  passkeyList: '/auth/passkeys'
 } as const
 
 const hiddenField = (name: string, value: string | null): string =>

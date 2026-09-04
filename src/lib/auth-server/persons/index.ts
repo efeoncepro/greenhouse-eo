@@ -37,6 +37,16 @@ export {
 } from './magic-link'
 export { PERSON_AUTH_PATHS } from './pages'
 export {
+  buildPasskeyAmr,
+  deriveRpId,
+  finishPasskeyAuthentication,
+  finishPasskeyRegistration,
+  isCounterRegression,
+  startPasskeyAuthentication,
+  startPasskeyRegistration,
+  type PasskeyDeps
+} from './passkeys'
+export {
   buildRateLimitBucketKey,
   computeLockoutSeconds,
   enforceRateLimit,

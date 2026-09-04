@@ -3,7 +3,8 @@
  *
  * Existe porque los tests con mocks ejercitan el TS, NUNCA el SQL: el CHECK del `bucket_key`, el
  * `ON CONFLICT` del bucket, el `ARRAY(SELECT DISTINCT unnest(...))` del `amr`, el JOIN con el source
- * link y el trigger append-only del ledger sólo se prueban acá. Requiere proxy:
+ * link, el trigger append-only del ledger, el trigger del tope de passkeys y el round-trip de
+ * `BYTEA`/`BIGINT` sólo se prueban acá. Requiere proxy:
  *
  *   pnpm auth-server:person-auth:smoke   (lee .env.local; proxy en 127.0.0.1:15432, perfil ops)
  *
@@ -224,6 +225,108 @@ const run = async () => {
 
     assert(rejectedBadKey, 'el CHECK rechaza una llave con el valor en claro')
 
+    // ─── Passkeys: tope por trigger, reto de un solo uso, BYTEA y BIGINT ─────
+    const credentialId = `smoke-cred-${suffix}`
+    const publicKey = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8])
+
+    await store.insertPasskeyCredential({
+      credentialId,
+      environmentId,
+      subject,
+      publicKey,
+      counter: 0,
+      transports: ['internal'],
+      deviceName: 'Smoke device',
+      deviceType: 'multiDevice',
+      backedUp: true,
+      aaguid: null,
+      createdAt: now,
+      lastUsedAt: null,
+      revokedAt: null,
+      revokeReason: null
+    })
+
+    const storedCredential = await store.getPasskeyCredential(credentialId)
+
+    assert(storedCredential?.subject === subject, 'passkey round-trip')
+    assert(
+      storedCredential?.publicKey.length === publicKey.length && storedCredential.publicKey[7] === 8,
+      'la clave pública sobrevive el round-trip por BYTEA'
+    )
+    // `BIGINT` viaja como string en node-postgres: sin el `Number(...)` del mapper esto sería '0'.
+    assert(typeof storedCredential?.counter === 'number', 'el contador vuelve como number, no string')
+
+    await store.updatePasskeyCounter({ credentialId, counter: 42, lastUsedAt: now })
+    assert((await store.getPasskeyCredential(credentialId))?.counter === 42, 'el contador se actualiza')
+
+    // Tope de 5: la sexta credencial la rechaza el TRIGGER, no la aplicación.
+    let limitEnforcedByDatabase = false
+
+    try {
+      for (let index = 0; index < 6; index += 1) {
+        await store.insertPasskeyCredential({
+          credentialId: `${credentialId}-extra-${index}`,
+          environmentId,
+          subject,
+          publicKey,
+          counter: 0,
+          transports: [],
+          deviceName: null,
+          deviceType: null,
+          backedUp: false,
+          aaguid: null,
+          createdAt: now,
+          lastUsedAt: null,
+          revokedAt: null,
+          revokeReason: null
+        })
+      }
+    } catch {
+      limitEnforcedByDatabase = true
+    }
+
+    assert(limitEnforcedByDatabase, 'el trigger corta la credencial que pasa el tope')
+
+    const challengeHash = sha256(`smoke-challenge-${suffix}`)
+
+    await store.insertPasskeyChallenge({
+      challengeHash,
+      purpose: 'authentication',
+      environmentId,
+      subject: null,
+      createdAt: now,
+      expiresAt: later(300),
+      consumedAt: null,
+      ipHash: null,
+      correlationId: `smoke-${suffix}`
+    })
+
+    const firstChallengeClaim = await store.claimPasskeyChallenge({ challengeHash, now: later(1) })
+    const secondChallengeClaim = await store.claimPasskeyChallenge({ challengeHash, now: later(2) })
+
+    assert(firstChallengeClaim.status === 'claimed', `reto reclamado (${firstChallengeClaim.status})`)
+    assert(secondChallengeClaim.status === 'already_consumed', `reto de un solo uso (${secondChallengeClaim.status})`)
+
+    let registrationChallengeRejected = false
+
+    try {
+      await store.insertPasskeyChallenge({
+        challengeHash: sha256(`smoke-bad-${suffix}`),
+        purpose: 'registration',
+        environmentId,
+        subject: null,
+        createdAt: now,
+        expiresAt: later(300),
+        consumedAt: null,
+        ipHash: null,
+        correlationId: null
+      })
+    } catch {
+      registrationChallengeRejected = true
+    }
+
+    assert(registrationChallengeRejected, 'el CHECK exige sujeto en un reto de registro')
+
     // ─── Ledger append-only ──────────────────────────────────────────────────
     await store.recordAttempt({
       method: 'magic_link',
@@ -257,13 +360,19 @@ const run = async () => {
 
     assert(blockedMutation, 'el trigger append-only bloquea el UPDATE del ledger')
 
-    console.log('[person-auth-smoke] OK — sesión, magic link, rate limit y ledger verificados contra PG real')
+    console.log(
+      '[person-auth-smoke] OK — sesión, magic link, rate limit, passkeys y ledger verificados contra PG real'
+    )
   } finally {
     // Limpieza: el orden respeta las FKs (sesión → link → profile).
     await query(`DELETE FROM greenhouse_auth.person_auth_attempts WHERE correlation_id = $1`, [`smoke-${suffix}`]).catch(
       () => undefined
     )
     await query(`DELETE FROM greenhouse_auth.sessions WHERE link_id = $1`, [linkId]).catch(() => undefined)
+    await query(`DELETE FROM greenhouse_auth.passkey_credentials WHERE subject = $1`, [subject]).catch(() => undefined)
+    await query(`DELETE FROM greenhouse_auth.passkey_challenges WHERE correlation_id = $1`, [
+      `smoke-${suffix}`
+    ]).catch(() => undefined)
     await query(`DELETE FROM greenhouse_auth.magic_link_tokens WHERE subject = $1`, [subject]).catch(() => undefined)
     await query(`DELETE FROM greenhouse_auth.auth_rate_limits WHERE bucket_key = $1`, [bucketKey]).catch(
       () => undefined

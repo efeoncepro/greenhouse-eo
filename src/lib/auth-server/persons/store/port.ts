@@ -8,10 +8,13 @@
 
 import type {
   ClaimMagicLinkResult,
+  ClaimPasskeyChallengeResult,
   MagicLinkRecord,
   PersonAuthAttemptEvent,
   PersonSessionRecord,
   PersonSessionWithLink,
+  PasskeyChallengeRecord,
+  PasskeyCredentialRecord,
   RateLimitDecision
 } from '../types'
 
@@ -58,6 +61,16 @@ export interface PersonAuthStorePort {
     lockoutBaseSeconds: number
     lockoutMaxSeconds: number
   }): Promise<RateLimitDecision>
+
+  // ─── Passkeys ─────────────────────────────────────────────────────────────
+  insertPasskeyChallenge(record: PasskeyChallengeRecord): Promise<void>
+  /** Atómico: un reto WebAuthn sirve para UNA ceremonia. El replay no llega al verificador. */
+  claimPasskeyChallenge(input: { challengeHash: string; now: Date }): Promise<ClaimPasskeyChallengeResult>
+  insertPasskeyCredential(record: PasskeyCredentialRecord): Promise<void>
+  getPasskeyCredential(credentialId: string): Promise<PasskeyCredentialRecord | null>
+  listPasskeyCredentials(input: { environmentId: string; subject: string }): Promise<PasskeyCredentialRecord[]>
+  updatePasskeyCounter(input: { credentialId: string; counter: number; lastUsedAt: Date }): Promise<void>
+  revokePasskeyCredential(input: { credentialId: string; now: Date; reason: string }): Promise<number>
 
   // ─── Ledger ───────────────────────────────────────────────────────────────
   recordAttempt(event: PersonAuthAttemptEvent): Promise<void>

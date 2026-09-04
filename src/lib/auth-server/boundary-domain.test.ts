@@ -51,7 +51,12 @@ const ALLOWED_WRITE_TARGETS = new Set([
   'greenhouse_auth.sessions',
   'greenhouse_auth.magic_link_tokens',
   'greenhouse_auth.auth_rate_limits',
-  'greenhouse_auth.person_auth_attempts'
+  'greenhouse_auth.person_auth_attempts',
+
+  // TASK-1830 Slice 2 — passkeys. `passkey_credentials` guarda SÓLO material público (COSE);
+  // `passkey_challenges` existe porque el reto de autenticación ocurre ANTES de que haya sesión.
+  'greenhouse_auth.passkey_credentials',
+  'greenhouse_auth.passkey_challenges'
 ])
 
 describe('auth-server domain-wide write boundary (TASK-1829/1830)', () => {

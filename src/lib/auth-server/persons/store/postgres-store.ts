@@ -13,10 +13,13 @@ import { buildExternalIdpSourceSystem } from '@/lib/identity/external-access'
 
 import type {
   ClaimMagicLinkResult,
+  ClaimPasskeyChallengeResult,
   MagicLinkRecord,
   PersonAuthAttemptEvent,
   PersonSessionRecord,
   PersonSessionWithLink,
+  PasskeyChallengeRecord,
+  PasskeyCredentialRecord,
   RateLimitDecision
 } from '../types'
 import { computeLockoutSeconds } from '../rate-limit'
@@ -102,6 +105,74 @@ const mapMagicLink = (row: MagicLinkRow): MagicLinkRecord => ({
   requestedIpHash: row.requested_ip_hash,
   consumedIpHash: row.consumed_ip_hash,
   userAgentHash: row.user_agent_hash,
+  correlationId: row.correlation_id
+})
+
+
+// ─── Passkeys ─────────────────────────────────────────────────────────────────
+
+const PASSKEY_COLUMNS = `credential_id, environment_id, subject, public_key, counter, transports, device_name,
+  device_type, backed_up, aaguid, created_at, last_used_at, revoked_at, revoke_reason`
+
+type PasskeyRow = {
+  credential_id: string
+  environment_id: string
+  subject: string
+  public_key: Buffer
+  counter: string | number
+  transports: string[]
+  device_name: string | null
+  device_type: PasskeyCredentialRecord['deviceType']
+  backed_up: boolean
+  aaguid: string | null
+  created_at: Date | string
+  last_used_at: Date | string | null
+  revoked_at: Date | string | null
+  revoke_reason: string | null
+}
+
+const mapPasskey = (row: PasskeyRow): PasskeyCredentialRecord => ({
+  credentialId: row.credential_id,
+  environmentId: row.environment_id,
+  subject: row.subject,
+  publicKey: new Uint8Array(row.public_key),
+  // `BIGINT` viaja como string en node-postgres: `Number(...)` es obligatorio, no cosmético.
+  counter: Number(row.counter),
+  transports: asStringArray(row.transports),
+  deviceName: row.device_name,
+  deviceType: row.device_type,
+  backedUp: row.backed_up,
+  aaguid: row.aaguid,
+  createdAt: asDate(row.created_at),
+  lastUsedAt: asDateOrNull(row.last_used_at),
+  revokedAt: asDateOrNull(row.revoked_at),
+  revokeReason: row.revoke_reason
+})
+
+const CHALLENGE_COLUMNS = `challenge_hash, purpose, environment_id, subject, created_at, expires_at, consumed_at,
+  ip_hash, correlation_id`
+
+type ChallengeRow = {
+  challenge_hash: string
+  purpose: PasskeyChallengeRecord['purpose']
+  environment_id: string
+  subject: string | null
+  created_at: Date | string
+  expires_at: Date | string
+  consumed_at: Date | string | null
+  ip_hash: string | null
+  correlation_id: string | null
+}
+
+const mapChallenge = (row: ChallengeRow): PasskeyChallengeRecord => ({
+  challengeHash: row.challenge_hash,
+  purpose: row.purpose,
+  environmentId: row.environment_id,
+  subject: row.subject,
+  createdAt: asDate(row.created_at),
+  expiresAt: asDate(row.expires_at),
+  consumedAt: asDateOrNull(row.consumed_at),
+  ipHash: row.ip_hash,
   correlationId: row.correlation_id
 })
 
@@ -362,6 +433,146 @@ export class PostgresPersonAuthStore implements PersonAuthStorePort {
     )
 
     return { allowed: false, reason: 'window_exceeded', retryAfterSeconds: lockoutSeconds }
+  }
+
+  // ─── Passkeys ─────────────────────────────────────────────────────────────
+
+  async insertPasskeyChallenge(record: PasskeyChallengeRecord): Promise<void> {
+    await query(
+      `INSERT INTO greenhouse_auth.passkey_challenges (${CHALLENGE_COLUMNS})
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+      [
+        record.challengeHash,
+        record.purpose,
+        record.environmentId,
+        record.subject,
+        record.createdAt,
+        record.expiresAt,
+        record.consumedAt,
+        record.ipHash,
+        record.correlationId
+      ]
+    )
+  }
+
+  async claimPasskeyChallenge({
+    challengeHash,
+    now
+  }: {
+    challengeHash: string
+    now: Date
+  }): Promise<ClaimPasskeyChallengeResult> {
+    return withTransaction(async client => {
+      const existing = await client.query<ChallengeRow>(
+        `SELECT ${CHALLENGE_COLUMNS} FROM greenhouse_auth.passkey_challenges WHERE challenge_hash = $1 FOR UPDATE`,
+        [challengeHash]
+      )
+
+      const row = existing.rows[0]
+
+      if (!row) return { status: 'not_found' } as const
+      if (row.consumed_at) return { status: 'already_consumed' } as const
+      if (asDate(row.expires_at) <= now) return { status: 'expired' } as const
+
+      const claimed = await client.query<ChallengeRow>(
+        `UPDATE greenhouse_auth.passkey_challenges
+            SET consumed_at = $2
+          WHERE challenge_hash = $1 AND consumed_at IS NULL
+          RETURNING ${CHALLENGE_COLUMNS}`,
+        [challengeHash, now]
+      )
+
+      if (claimed.rows.length !== 1) return { status: 'already_consumed' } as const
+
+      return { status: 'claimed', record: mapChallenge(claimed.rows[0]) } as const
+    })
+  }
+
+  async insertPasskeyCredential(record: PasskeyCredentialRecord): Promise<void> {
+    await query(
+      `INSERT INTO greenhouse_auth.passkey_credentials (${PASSKEY_COLUMNS})
+       VALUES ($1, $2, $3, $4, $5, $6::text[], $7, $8, $9, $10, $11, $12, $13, $14)`,
+      [
+        record.credentialId,
+        record.environmentId,
+        record.subject,
+        Buffer.from(record.publicKey),
+        record.counter,
+        record.transports,
+        record.deviceName,
+        record.deviceType,
+        record.backedUp,
+        record.aaguid,
+        record.createdAt,
+        record.lastUsedAt,
+        record.revokedAt,
+        record.revokeReason
+      ]
+    )
+  }
+
+  async getPasskeyCredential(credentialId: string): Promise<PasskeyCredentialRecord | null> {
+    const rows = await query<PasskeyRow>(
+      `SELECT ${PASSKEY_COLUMNS} FROM greenhouse_auth.passkey_credentials WHERE credential_id = $1`,
+      [credentialId]
+    )
+
+    return rows[0] ? mapPasskey(rows[0]) : null
+  }
+
+  async listPasskeyCredentials({
+    environmentId,
+    subject
+  }: {
+    environmentId: string
+    subject: string
+  }): Promise<PasskeyCredentialRecord[]> {
+    const rows = await query<PasskeyRow>(
+      `SELECT ${PASSKEY_COLUMNS}
+         FROM greenhouse_auth.passkey_credentials
+        WHERE environment_id = $1 AND subject = $2 AND revoked_at IS NULL
+        ORDER BY created_at DESC`,
+      [environmentId, subject]
+    )
+
+    return rows.map(mapPasskey)
+  }
+
+  async updatePasskeyCounter({
+    credentialId,
+    counter,
+    lastUsedAt
+  }: {
+    credentialId: string
+    counter: number
+    lastUsedAt: Date
+  }): Promise<void> {
+    await query(
+      `UPDATE greenhouse_auth.passkey_credentials
+          SET counter = $2, last_used_at = $3
+        WHERE credential_id = $1 AND revoked_at IS NULL`,
+      [credentialId, counter, lastUsedAt]
+    )
+  }
+
+  async revokePasskeyCredential({
+    credentialId,
+    now,
+    reason
+  }: {
+    credentialId: string
+    now: Date
+    reason: string
+  }): Promise<number> {
+    const rows = await query<{ credential_id: string }>(
+      `UPDATE greenhouse_auth.passkey_credentials
+          SET revoked_at = $2, revoke_reason = $3
+        WHERE credential_id = $1 AND revoked_at IS NULL
+        RETURNING credential_id`,
+      [credentialId, now, reason]
+    )
+
+    return rows.length
   }
 
   async recordAttempt(event: PersonAuthAttemptEvent): Promise<void> {

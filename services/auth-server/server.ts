@@ -38,6 +38,7 @@ import {
   createGovernedMagicLinkMailer,
   createPersonSubjectPort,
   createSourceLinkDirectoryPort,
+  deriveRpId,
   expectedSourceSystemFor,
   mintOpaqueSubject,
   PostgresPersonAuthStore,
@@ -82,6 +83,11 @@ const personDeps = {
   environmentId: oauthConfig.environmentId,
   expectedSourceSystem,
   issuer: oauthConfig.issuer,
+  // `rpId` es el HOST del emisor: `auth.efeonce.org`, sin esquema. Si no coincide exactamente con
+  // el origen que ve el navegador, la ceremonia WebAuthn falla del lado del cliente.
+  rpId: deriveRpId(oauthConfig.issuer),
+  onPasskeyCounterRegression: ({ credentialId }: { credentialId: string }) =>
+    console.warn(`[${SERVICE_NAME}] passkey counter regression — credential revoked: ${credentialId}`),
   now: () => new Date(),
   onError: (error: unknown, context: Record<string, unknown>) =>
     captureWithDomain(error, 'identity', { tags: { component: SERVICE_NAME, ...context } })

@@ -7,10 +7,13 @@
 
 import type {
   ClaimMagicLinkResult,
+  ClaimPasskeyChallengeResult,
   MagicLinkRecord,
   PersonAuthAttemptEvent,
   PersonSessionRecord,
   PersonSessionWithLink,
+  PasskeyChallengeRecord,
+  PasskeyCredentialRecord,
   RateLimitDecision
 } from '../types'
 import { computeLockoutSeconds } from '../rate-limit'
@@ -24,6 +27,8 @@ export class InMemoryPersonAuthStore implements PersonAuthStorePort {
   readonly sessions = new Map<string, PersonSessionRecord>()
   readonly magicLinks = new Map<string, MagicLinkRecord>()
   readonly attempts: PersonAuthAttemptEvent[] = []
+  readonly passkeys = new Map<string, PasskeyCredentialRecord>()
+  readonly challenges = new Map<string, PasskeyChallengeRecord>()
   private readonly buckets = new Map<string, BucketState>()
   /** Espejo del estado de `identity_profile_source_links` que la implementación PG resuelve por JOIN. */
   readonly links = new Map<string, LinkState>()
@@ -200,6 +205,102 @@ export class InMemoryPersonAuthStore implements PersonAuthStorePort {
     bucket.lockedUntil = new Date(now.getTime() + lockoutSeconds * 1000)
 
     return { allowed: false, reason: 'window_exceeded', retryAfterSeconds: lockoutSeconds }
+  }
+
+  // ─── Passkeys ─────────────────────────────────────────────────────────────
+
+  async insertPasskeyChallenge(record: PasskeyChallengeRecord): Promise<void> {
+    this.challenges.set(record.challengeHash, { ...record })
+  }
+
+  async claimPasskeyChallenge({
+    challengeHash,
+    now
+  }: {
+    challengeHash: string
+    now: Date
+  }): Promise<ClaimPasskeyChallengeResult> {
+    const record = this.challenges.get(challengeHash)
+
+    if (!record) return { status: 'not_found' }
+    if (record.consumedAt) return { status: 'already_consumed' }
+    if (record.expiresAt <= now) return { status: 'expired' }
+
+    record.consumedAt = now
+
+    return { status: 'claimed', record: { ...record } }
+  }
+
+  async insertPasskeyCredential(record: PasskeyCredentialRecord): Promise<void> {
+    const active = [...this.passkeys.values()].filter(
+      credential =>
+        credential.environmentId === record.environmentId &&
+        credential.subject === record.subject &&
+        !credential.revokedAt &&
+        credential.credentialId !== record.credentialId
+    )
+
+    // Espejo del trigger de PG: el tope vive en la base, y acá para que el flujo lo ejercite igual.
+    if (active.length >= 5) throw new Error('passkey credential limit reached for this subject (max 5, TASK-1830)')
+
+    this.passkeys.set(record.credentialId, { ...record })
+  }
+
+  async getPasskeyCredential(credentialId: string): Promise<PasskeyCredentialRecord | null> {
+    const record = this.passkeys.get(credentialId)
+
+    return record ? { ...record } : null
+  }
+
+  async listPasskeyCredentials({
+    environmentId,
+    subject
+  }: {
+    environmentId: string
+    subject: string
+  }): Promise<PasskeyCredentialRecord[]> {
+    return [...this.passkeys.values()]
+      .filter(
+        credential =>
+          credential.environmentId === environmentId && credential.subject === subject && !credential.revokedAt
+      )
+      .map(credential => ({ ...credential }))
+  }
+
+  async updatePasskeyCounter({
+    credentialId,
+    counter,
+    lastUsedAt
+  }: {
+    credentialId: string
+    counter: number
+    lastUsedAt: Date
+  }): Promise<void> {
+    const record = this.passkeys.get(credentialId)
+
+    if (!record || record.revokedAt) return
+
+    record.counter = counter
+    record.lastUsedAt = lastUsedAt
+  }
+
+  async revokePasskeyCredential({
+    credentialId,
+    now,
+    reason
+  }: {
+    credentialId: string
+    now: Date
+    reason: string
+  }): Promise<number> {
+    const record = this.passkeys.get(credentialId)
+
+    if (!record || record.revokedAt) return 0
+
+    record.revokedAt = now
+    record.revokeReason = reason
+
+    return 1
   }
 
   async recordAttempt(event: PersonAuthAttemptEvent): Promise<void> {
