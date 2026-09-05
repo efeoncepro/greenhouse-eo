@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `2026-09-05 21:09 UTC: PR224/main d551cf368 released por run33991304002; CI, Deep, smoke, Vercel y health correctos, watchdog5/5 sin drift. Gateway d7469d7/revisión00033-597 publicado. Migración/reconciliación aplicadas (gv3, idempotencia0/0, ambas señales0), reader productivo internal_population verificado. Emisor interno ON durable GitHub y auth-server-00015-jrc100%; UI Claude con Microsoft comprobada dentro de OAuth. Canary humano detenido en verificación reciente de contraseña Microsoft; todavía sin token. Refresh, revocación y rollback pendientes.`
+- Status real: `2026-09-05 21:20 UTC: PR224/main d551cf368 released, health/watchdog5/5 correctos; integridad aplicada y reader productivo verificados. Canary real21:15:25Z rechazado por jwtVerify (jwt_validation_failed), sin token MCP. Emisor OFF: GitHub false y auth-server-00016-srj Ready100%. Diagnósticos cerrados ampliados localmente, revisión independiente correcta y 106 pruebas passed, tsc y bundle emisor correctos; build Next interrumpido, publicación pendiente. Azure/app/discovery correctos, causa exacta JWT aún no demostrada. Refresh/revocación/rollback pendientes.`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -587,7 +587,7 @@ interactivo del sujeto real cuando corresponda. No enviar correos ni mensajes si
 
 - [x] ADR aceptado define proveedor upstream, población y autoridad independientemente del issuer. `EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md`, D1–D7.
 - [x] Efeonce e identidad interna se resuelven canónicamente sin cambiar organización a cliente ni duplicar persona. Reader real devuelve perfil autorizado + EO-ORG-0007; test PG de enrolamiento usa clones temporales y rollback. Posteriormente se enroló el piloto real sobre esa identidad canónica; la prueba de login humano sigue pendiente.
-- [ ] Login corporativo produce sesión y token MCP nativo con audiencia, azp, scopes y gv correctos. Intento real iniciado; Microsoft solicita contraseña reciente y aún no hay callback/sesión/token corporativo comprobado.
+- [ ] Login corporativo produce sesión y token MCP nativo con audiencia, azp, scopes y gv correctos. Intento real21:15:25Z volvió de Microsoft y fue rechazado por jwtVerify (`jwt_validation_failed`). No se emitió token MCP; diagnóstico específico en preparación.
 - [ ] Refresh y revocación funcionan; baja efectiva en el source of truth o retiro de grant invalida autorización con token vigente en ≤60 s,
   verificado junto al gateway, sin afirmar cierre por expiración natural del token.
 - [ ] Token externo del mismo issuer, tenant desconocido y roles sin scopes no acceden a tools internas.
@@ -929,3 +929,30 @@ OAuth. /login directo no presenta ese botón porque no tiene return_to válido; 
 introducido durante este release. Microsoft requiere contraseña reciente de la cuenta corporativa;
 operador solicitado en navegador, sin pedir ni capturar credenciales por chat. Sesión/token/canary,
 refresh, revocación y rollback siguen sin acreditar al corte21:09Z.
+
+### Callback real rechazado y diagnóstico específico — 2026-09-05 21:20 UTC
+
+Audit PG ocurrido21:15:25.036Z, stage consume, outcome rejected, reason upstream_rejected,
+diagnostic jwt_validation_failed. La solicitud21:15:08.701Z fue aceptada. Esto sitúa el fallo en
+JOSE tras el intercambio, sin demostrar todavía firma, claim o reloj específicos. No reutilizar el
+código consumido ni acreditar un token a partir de la aprobación Authenticator.
+
+Contención: GitHub internalAuth false y auth-server-00016-srj Ready100%, flag false verificado.
+El operador autorizó subagentes y Azure CLI: app/SP/tenant/redirect/optionalClaims correctos,
+auth_time esencial, sin claimsMappingPolicies ni tokenIssuancePolicies aplicadas; discovery y JWKS
+públicos corresponden al código. Graph aún no devuelve sign-ins de21:15; registros17:02 no prueban
+este intento. requestedAccessTokenVersion null sólo afecta access tokens, no justifica cambiar ID-token.
+Fuentes: [Microsoft Graph](https://learn.microsoft.com/en-us/graph/api/resources/apiapplication?view=graph-rest-1.0),
+[ID token claims](https://learn.microsoft.com/en-us/entra/identity-platform/id-token-claims-reference),
+[OIDC max_age](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest).
+
+La ampliación local clasifica causas JOSE en enum cerrado (firma, clave, algoritmo, claims requeridos,
+issuer/audience, nbf y exp). No retiene payload/cause ni modifica respuesta pública o validadores.
+20 pruebas focales y suite106 passed;4 live skipped no constituyen evidencia nueva. Revisión independiente
+sin hallazgos materiales; fixture deliberadamente malformada tipada explícitamente. TypeScript directo y bundle del emisor (opciones del Dockerfile) exit0. Build Next compiló, pero fue
+interrumpido tras aproximadamente14min en su fase de tipos; no cuenta como build completo aprobado.
+Publicación, nuevo canary y corrección de causa real pendientes.
+
+Azure adicional: tokenLifetimePolicies de app y SP vacías, inventario global0; sin política de duración
+configurable que explique el fallo. OIDC no prescribe auth_time<=iat y MSAL oficial valida frescura
+contra now, pero ese guard posterior a JOSE no explica este diagnóstico; sin cambio especulativo.

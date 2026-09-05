@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-05 — TASK-1836: diagnóstico cerrado del rechazo JWT corporativo
+
+El callback real pasó el intercambio upstream y fue rechazado por jwtVerify; no se emitió token MCP.
+Se añaden causas internas fijas para firma/clave/algoritmo, claims requeridos, issuer/audience y tiempo,
+sin conservar payload/cause ni relajar verificaciones. Respuesta pública sin detalles sensibles.
+20 pruebas focales y106 de auth correctas; revisión independiente sin hallazgos materiales. Emisor OFF
+tras el fallo, diagnóstico aún local y causa exacta pendiente de comprobar en runtime. Tsc y bundle
+del emisor correctos; build Next compiló pero se interrumpió en tipos, sin acreditarlo completo.
+
 ## 2026-09-05 — TASK-1836: reparación de integridad aplicada en PG
 
 Migración CLI `20260905183812333` aplicada: población explícita e inmutable, verificación de evidencia
@@ -897,20 +906,3 @@ Dirección visual, wireframe, flow y motion de TASK-1352 se reautoraron desde ce
 gran idea prefijada, normalizan las seis familias canónicas, subordinan agentes/capabilities a outcomes, incorporan
 copy slots research-dependent, restricciones SEO/AEO en HTML, flujo de conversión y no-fit, fallas honestas,
 transformación desktop/tablet/mobile y un motion system causal con tokens exactos, reduced-motion y budgets CWV.
-
-## 2026-08-30 — Growth SEO · la lente `Descubrir` entrega lo que ya tenía construido (TASK-1693)
-
-**Qué cambia para quien opera el módulo SEO.** Tres capacidades que estaban construidas y pagadas
-pero no llegaban a la pantalla:
-
-- **Se puede recorrer la corrida completa.** Una corrida materializa hasta 500 candidatos y la
-  pantalla servía 50 sin salida. Ahora hay «Ver N candidatos más» al pie. Recorrer **no cuesta**: lee
-  lo ya comprado, no llama al proveedor y por eso se ve distinto del botón que sí gasta.
-- **Se elige de dónde salen las seeds.** Cuatro fuentes, con Search Console a la cabeza — seeds con
-  demanda medida y resolución sin costo de proveedor. Cada una declara cuántas seeds aportaría. Una
-  fuente sin insumo se bloquea con su razón y **nunca** cae en silencio a «seeds escritas».
-- **Se puede filtrar el canvas**, y el filtro se aplica en el servidor: el conteo del encabezado
-  sigue al universo filtrado, no a la página que bajó. No hay filtro por «dificultad» a propósito;
-  el control correcto es «Barrera máxima», derivada del perfil real de enlaces.
-
-Manual actualizado: `docs/manual-de-uso/growth/descubrir-keywords-seo.md` v1.3.

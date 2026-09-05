@@ -1,6 +1,14 @@
 import { createHash } from 'node:crypto'
 
-import { createLocalJWKSet, exportJWK, generateKeyPair, SignJWT } from 'jose'
+import {
+  createLocalJWKSet,
+  createRemoteJWKSet,
+  customFetch,
+  exportJWK,
+  generateKeyPair,
+  SignJWT,
+  type JWTPayload
+} from 'jose'
 import { describe, expect, it, vi } from 'vitest'
 
 import { createEntraOidcClient, createInternalLoginFlow, type InternalLoginTransaction } from './oidc'
@@ -149,8 +157,108 @@ describe('corporate upstream identity', () => {
     expiry = mintedAt
     await expect(client.exchange(input)).rejects.toMatchObject({
       code: 'upstream_rejected',
-      diagnostic: 'jwt_validation_failed'
+      diagnostic: 'jwt_expired'
     })
+  })
+
+  it('classifies signed-token validation failures without retaining claims or credentials', async () => {
+    const { privateKey, publicKey } = await generateKeyPair('RS256')
+    const { privateKey: attackerKey } = await generateKeyPair('RS256')
+    const jwk = await exportJWK(publicKey)
+    const second = NOW.getTime() / 1000
+
+    const claims = {
+      iss: config.issuer,
+      aud: config.clientId,
+      sub: 'private-subject',
+      tid: config.tenantId,
+      oid: 'cccccccc-cccc-cccc-cccc-cccccccccccc',
+      nonce: 'private-nonce',
+      iat: second,
+      auth_time: second,
+      exp: second + 600,
+      private_claim: 'private-personal-data'
+    }
+
+    let token = ''
+
+    const client = createEntraOidcClient({
+      config,
+      now: () => NOW,
+      getClientSecret: async () => 'private-secret',
+      verificationKey: createLocalJWKSet({ keys: [{ ...jwk, kid: 'test' }] }),
+      fetch: async () => Response.json({ id_token: token })
+    })
+
+    const input = { code: 'private-code', nonce: 'private-nonce', codeVerifier: 'private-verifier', now: NOW }
+
+    for (const [override, diagnostic] of [
+      [{ auth_time: undefined }, 'jwt_auth_time_missing'],
+      [{ oid: undefined }, 'jwt_oid_missing'],
+      [{ nonce: undefined }, 'jwt_required_claim_missing'],
+      [{ iss: 'private-wrong-issuer' }, 'jwt_issuer_invalid'],
+      [{ aud: 'private-wrong-client' }, 'jwt_audience_invalid'],
+      [{ nbf: second + 1 }, 'jwt_not_yet_valid'],
+      [{ exp: second }, 'jwt_expired'],
+      [{ nbf: 'private-not-a-number' }, 'jwt_claim_invalid']
+    ] as const) {
+      // Malformed registered claims are deliberate inputs to the verifier.
+      token = await new SignJWT({ ...claims, ...override } as JWTPayload)
+        .setProtectedHeader({ alg: 'RS256', kid: 'test' })
+        .sign(privateKey)
+      const error = await client.exchange(input).catch(error => error)
+
+      expect(error).toMatchObject({ code: 'upstream_rejected', diagnostic })
+      expect(JSON.stringify(error)).not.toContain('private')
+      expect(error.cause).toBeUndefined()
+    }
+
+    for (const [key, alg, kid, diagnostic] of [
+      [attackerKey, 'RS256', 'test', 'jwt_signature_invalid'],
+      [privateKey, 'RS256', 'unknown', 'jwt_key_not_found'],
+      [new Uint8Array(32).fill(1), 'HS256', 'test', 'jwt_algorithm_invalid']
+    ] as const) {
+      token = await new SignJWT(claims).setProtectedHeader({ alg, kid }).sign(key)
+      const error = await client.exchange(input).catch(error => error)
+
+      expect(error).toMatchObject({ code: 'upstream_rejected', diagnostic })
+      expect(JSON.stringify(error)).not.toContain('private')
+    }
+  })
+
+  it('distinguishes malformed and ambiguous keys from a malformed token without exposing upstream responses', async () => {
+    const { privateKey, publicKey } = await generateKeyPair('RS256')
+    const jwk = { ...(await exportJWK(publicKey)), kid: 'test' }
+
+    const signedToken = await new SignJWT({ private_claim: 'private-personal-data' })
+      .setProtectedHeader({ alg: 'RS256', kid: 'test' })
+      .sign(privateKey)
+
+    const cases = [
+      { token: signedToken, keys: { keys: [jwk, jwk] }, diagnostic: 'jwt_key_ambiguous' },
+      { token: signedToken, keys: { keys: 'private-malformed-key-set' }, diagnostic: 'jwt_key_set_invalid' },
+      { token: 'private-malformed-token', keys: { keys: [jwk] }, diagnostic: 'jwt_malformed' }
+    ]
+
+    for (const item of cases) {
+      const client = createEntraOidcClient({
+        config,
+        now: () => NOW,
+        getClientSecret: async () => 'private-secret',
+        fetch: async () => Response.json({ id_token: item.token }),
+        verificationKey: createRemoteJWKSet(new URL('https://jwks.example/keys'), {
+          [customFetch]: async () => Response.json(item.keys)
+        })
+      })
+
+      const error = await client
+        .exchange({ code: 'private-code', nonce: 'private-nonce', codeVerifier: 'private-verifier', now: NOW })
+        .catch(error => error)
+
+      expect(error).toMatchObject({ code: 'upstream_rejected', diagnostic: item.diagnostic })
+      expect(JSON.stringify(error)).not.toContain('private')
+      expect(error.cause).toBeUndefined()
+    }
   })
 
   it('exposes only bounded diagnostics for token response and exchange failures', async () => {

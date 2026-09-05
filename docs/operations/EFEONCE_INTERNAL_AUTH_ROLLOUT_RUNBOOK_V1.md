@@ -452,3 +452,13 @@ La UI de Claude presenta Microsoft sólo con `internalLoginEnabled` y `return_to
 `/oauth/authorize`. Abrir `/login` directamente muestra la puerta de invitación por correo. Para probar
 el acceso corporativo, iniciar una solicitud OAuth válida del cliente registrado y seguir el enlace al
 login. No fabricar un return_to arbitrario ni eliminar validaciones para hacer visible el botón.
+
+
+## Nuevo rechazo JWT — 2026-09-05 21:20 UTC
+
+El callback21:15:25.036Z registra upstream_rejected / jwt_validation_failed, posterior al intercambio
+upstream. No existe token MCP nuevo. Emisor contenido otra vez: GitHub false y auth-server-00016-srj
+Ready100%, internalAuth false verificado. Reader/gateway no cambiados. Nueva clasificación JOSE local
+mantiene validación y respuesta pública; registrar sólo enums, nunca payload/cause/token.
+Azure CLI y documentación Microsoft no justifican cambiar tenant, firma ni claims: investigar con el
+diagnóstico publicado antes de repetir canary. Evidencia y fuentes en TASK-1836 §Callback real rechazado.

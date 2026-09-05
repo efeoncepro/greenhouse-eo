@@ -1,19 +1,20 @@
 # Handoff activo
 
-**TASK-1836, 2026-09-05 21:09 UTC — release publicado, canary humano pendiente:** PR224/main
-`d551cf368` released; orquestador único `33991304002` success, manifest
-`d551cf3689db-8a4af809-0c28-496d-82c9-a17ed7593ce3`. CI/Deep/smoke/Vercel/health correctos;
-watchdog5/5, sin drift. Gateway `d7469d7`, revisión00033-597100%, deploy33988521730 success.
-Migración20260905183812333 y reconciliación aplicadas (gv3, segunda revisión0/0, ambas señales0);
-no repetirlas. Reader productivo rechaza el recorrido externo con internal_population sin membresías.
-Emisor interno ON: variable durable GitHub true y auth-server-00015-jrc Ready100%, misma imagen
-validada de ace63705e. Única diferencia con main: ayuda del CLI, fuera de rutas runtime.
-UI Claude preservada; Microsoft aparece con flag ON y return_to OAuth válido, no en /login directo.
-Navegador está en contraseña reciente Microsoft; se pidió al operador completarla allí. Ningún token
-corporativo emitido todavía. Continuar canary/refresh/revocación/rollback con las autorizaciones vigentes.
+**TASK-1836, 2026-09-05 21:20 UTC — callback rechazado, diagnóstico en preparación:**
+PR224/main d551cf368 released por run33991304002, health/watchdog5/5 correctos. Migración y
+reconciliación aplicadas (gv3, segunda revisión0/0, señales0), gateway d7469d7 publicado.
+Canary real21:15:25Z falló en jwtVerify: audit upstream_rejected / jwt_validation_failed; sin token MCP.
+Emisión interna apagada otra vez: GitHub repo false y auth-server-00016-srj Ready100%, flag false.
+Reader/gateway permanecen preparados. UI Claude preservada; Microsoft requiere return_to OAuth válido.
+Azure CLI confirma app/tenant/redirect/claim auth_time y ausencia de políticas de firma personalizadas;
+Discovery/JWKS correctos; causa JWT pendiente.
+Cambio local: diagnósticos JOSE cerrados, sin token/payload/cause y sin relajar validación; 106 pruebas
+passed (4 live omitidas no cuentan), tsc y bundle emisor correctos; build Next interrumpido en tipos.
+Próximo: publicar diagnóstico,
+comprobar SHA/revisión, un nuevo canary y corregir causa demostrada; después refresh/revocación/rollback.
 [Task](docs/tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md) ·
 [Runbook](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md) ·
-[Autorizaciones originales](docs/operations/TASK-1836_INTEGRITY_SESSION_HANDOFF_2026-09-05.md).
+[Autorizaciones](docs/operations/TASK-1836_INTEGRITY_SESSION_HANDOFF_2026-09-05.md).
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
