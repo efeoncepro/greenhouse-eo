@@ -11,7 +11,7 @@ import { GH_AUTH_SERVER } from '@/lib/copy/auth-server'
 
 import type { OAuthErrorCode } from '../errors'
 import { EFEONCE_ISOTIPO_SVG, EFEONCE_LOGOTYPE_NEGATIVE_SVG } from './efeonce-isotipo.generated'
-import { ICON_ALERT, ICON_BUILDING, ICON_EYE, ICON_LOCK, ICON_PENCIL, ICON_SHIELD_CHECK } from './icons'
+import { ICON_ALERT, ICON_ARROW_RIGHT, ICON_BUILDING, ICON_EYE, ICON_LOCK, ICON_PENCIL, ICON_SHIELD_CHECK } from './icons'
 import { AUTH_SERVER_STYLES } from './styles.generated'
 import { isWriteScope } from '../scopes'
 
@@ -68,13 +68,18 @@ export const layout = (title: string, body: string, options: { state?: 'login' |
 </html>`
 }
 
+/**
+ * La salida SIEMPRE existe. Sin `returnTo` esta página mostraba el texto y ninguna acción: un
+ * callejón sin salida servido con 401 (lo alcanzaba `consent-endpoint`). Sin destino de retorno se
+ * va igual a `/login`, que es lo que la persona necesita; con destino, se preserva.
+ */
 export const renderLoginRequiredPage = (returnTo?: string): string =>
   layout(
     GH_AUTH_SERVER.login_required_title,
     `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.login_required_title)}</h1>
   <p>${escapeHtml(GH_AUTH_SERVER.login_required_body)}</p>
   <p class="muted">${escapeHtml(GH_AUTH_SERVER.login_required_hint)}</p>
-  ${returnTo ? `<a href="${escapeHtml('/login?' + new URLSearchParams({ return_to: returnTo }))}">${escapeHtml(GH_AUTH_SERVER.login_continue_cta)}</a>` : ''}`
+  <div class="id-actions"><a class="id-primary" href="${escapeHtml(returnTo ? '/login?' + new URLSearchParams({ return_to: returnTo }) : '/login')}">${ICON_ARROW_RIGHT}${escapeHtml(GH_AUTH_SERVER.login_continue_cta)}</a></div>`
   )
 
 export const renderStepUpRequiredPage = (returnTo?: string): string =>
@@ -82,7 +87,7 @@ export const renderStepUpRequiredPage = (returnTo?: string): string =>
     GH_AUTH_SERVER.step_up_required_title,
     `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.step_up_required_title)}</h1>
   <p>${escapeHtml(GH_AUTH_SERVER.step_up_required_body)}</p>
-  ${returnTo ? `<a class="id-primary" href="${escapeHtml('/login/step-up?' + new URLSearchParams({ return_to: returnTo }))}">${ICON_SHIELD_CHECK}${escapeHtml(GH_AUTH_SERVER.totp_verify_submit_cta)}</a>` : ''}`
+  <div class="id-actions"><a class="id-primary" href="${escapeHtml(returnTo ? '/login/step-up?' + new URLSearchParams({ return_to: returnTo }) : '/login/step-up')}">${ICON_SHIELD_CHECK}${escapeHtml(GH_AUTH_SERVER.totp_verify_submit_cta)}</a></div>`
   )
 
 export type ConsentPageInput = {

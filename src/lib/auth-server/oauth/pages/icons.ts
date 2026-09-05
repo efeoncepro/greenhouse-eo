@@ -41,6 +41,9 @@ export const ICON_ALERT = icon('<path d="M10.7 4.4 3.2 17.3A1.5 1.5 0 0 0 4.5 19
 /** Reloj: espera obligada (límite de intentos, enlace vencido). */
 export const ICON_CLOCK = icon('<circle cx="12" cy="12" r="8.4"/><path d="M12 7.4V12l2.9 1.8"/>')
 
+/** Flecha: continuar hacia el paso siguiente del flujo. */
+export const ICON_ARROW_RIGHT = icon('<path d="M5 12h13"/><path d="m12.5 6 6 6-6 6"/>')
+
 /** Candado: la línea de confianza del panel de acceso (enlace de un solo uso, sin contraseñas). */
 export const ICON_LOCK = icon('<rect x="4.8" y="10.4" width="14.4" height="9.8" rx="2"/><path d="M8.4 10.4V7.9a3.6 3.6 0 0 1 7.2 0v2.5"/>')
 
