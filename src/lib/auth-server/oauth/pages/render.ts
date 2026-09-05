@@ -11,6 +11,7 @@ import { GH_AUTH_SERVER } from '@/lib/copy/auth-server'
 
 import type { OAuthErrorCode } from '../errors'
 import { EFEONCE_ISOTIPO_SVG, EFEONCE_LOGOTYPE_NEGATIVE_SVG } from './efeonce-isotipo.generated'
+import { renderClientMark } from './client-marks'
 import { ICON_ALERT, ICON_ARROW_RIGHT, ICON_BUILDING, ICON_EYE, ICON_LOCK, ICON_PENCIL, ICON_SHIELD_CHECK } from './icons'
 import { AUTH_SERVER_STYLES } from './styles.generated'
 import { isWriteScope } from '../scopes'
@@ -43,7 +44,11 @@ const brandRail = (): string => `<aside class="id-rail">
     <span class="id-rail-mark" aria-hidden="true">${EFEONCE_ISOTIPO_SVG}</span>
   </aside>`
 
-export const layout = (title: string, body: string, options: { state?: 'login' | 'consent' | 'verification'; clientName?: string } = {}): string => {
+export const layout = (
+  title: string,
+  body: string,
+  options: { state?: 'login' | 'consent' | 'verification'; clientName?: string; clientId?: string } = {}
+): string => {
   const state = options.state ?? 'verification'
 
   return `<!doctype html>
@@ -52,6 +57,7 @@ export const layout = (title: string, body: string, options: { state?: 'login' |
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <title>${escapeHtml(title)} · ${escapeHtml(GH_AUTH_SERVER.brand_title)}</title>
 <style>${STYLES}</style>
 </head>
@@ -59,7 +65,7 @@ export const layout = (title: string, body: string, options: { state?: 'login' |
 <div class="id-canvas" data-state="${state}">
   <main class="id-page" data-capture="id-shell" data-state="${state}" data-surface-recipe="settingsFlow" aria-labelledby="page-title">
     <header class="id-brand" aria-label="${escapeHtml(EFEONCE_BRAND_NAME)}">${EFEONCE_ISOTIPO_SVG}<span>${escapeHtml(GH_AUTH_SERVER.brand_title)}</span></header>
-    ${options.clientName ? `<div class="id-context" data-capture="id-client"><span class="id-muted">${escapeHtml(GH_AUTH_SERVER.application_context_label)}</span><strong>${escapeHtml(options.clientName)}</strong></div>` : ''}
+    ${options.clientName ? `<div class="id-context" data-capture="id-client"><span class="id-muted">${escapeHtml(GH_AUTH_SERVER.application_context_label)}</span><span class="id-client">${renderClientMark({ clientId: options.clientId ?? '', clientName: options.clientName })}<strong>${escapeHtml(options.clientName)}</strong></span></div>` : ''}
     <div class="id-surface">${body}</div>
   </main>
   ${state === 'login' ? brandRail() : ''}
@@ -140,7 +146,7 @@ export const renderConsentPage = (input: ConsentPageInput): string => {
   </form>
   <p class="muted">${escapeHtml(GH_AUTH_SERVER.consent_footer)}</p>
   <p class="code">${escapeHtml(GH_AUTH_SERVER.consent_client_id_label)}: ${escapeHtml(input.clientId)}</p>`,
-    { state: 'consent', clientName: input.clientName }
+    { state: 'consent', clientName: input.clientName, clientId: input.clientId }
   )
 }
 

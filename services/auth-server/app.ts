@@ -159,7 +159,7 @@ export const createAuthServerRequestHandler = (deps: AuthServerAppDeps): NodeReq
         return
       }
 
-      if (deps.enabled && path.startsWith('/fonts/')) {
+      if (deps.enabled && (path.startsWith('/fonts/') || path === '/favicon.svg')) {
         const asset = getAuthFontAsset(path)
 
         if (!asset) {

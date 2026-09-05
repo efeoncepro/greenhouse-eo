@@ -145,6 +145,17 @@ button,input { font:inherit; color:inherit; }
 .id-brand svg { color:var(--id-mark); }
 .id-context { text-align:center; margin-block-end:${s(6)}; overflow-wrap:anywhere; font-size:${typographyScale.bodyMd.fontSize}; color:color-mix(in oklch, ${n.bgWhite} 66%, transparent); }
 .id-context strong { color:${n.bgWhite}; }
+.id-client { display:flex; align-items:center; justify-content:center; gap:${s(2)}; margin-block-start:${s(2)}; }
+.id-client strong { margin:0; font-size:${typographyScale.bodyLg.fontSize}; }
+/* Ficha de la aplicación: identifica sin suplantar. El asset verificado (cuando exista) sustituye
+   la inicial dentro de la MISMA ficha, así el layout no cambia entre un cliente y otro. */
+.id-client-mark { display:inline-flex; align-items:center; justify-content:center; width:${s(7)}; height:${s(7)}; flex:none;
+  border-radius:${r.sm}; font-family:${typographyScale.headlineMd.fontFamily}; font-size:${typographyScale.bodyMd.fontSize};
+  font-weight:${fontWeights.bold}; line-height:1; color:${n.bgWhite};
+  background:color-mix(in oklch, ${n.bgWhite} 16%, transparent);
+  box-shadow:inset 0 0 0 1px color-mix(in oklch, ${n.bgWhite} 22%, transparent); }
+.id-client-mark-brand { background:${n.paper}; box-shadow:none; padding:${s(1)}; }
+.id-client-mark-brand svg { width:100%; height:100%; }
 .id-context strong { display:block; margin-block-start:${s(1)}; font-size:${body.fontSize}; color:var(--id-text); font-weight:${fontWeights.semibold}; }
 .id-surface { background:var(--id-paper); border:1px solid var(--id-border); border-radius:${r.lg}; padding:${s(9)} ${s(8)} ${s(8)}; box-shadow:var(--id-shadow); }
 /* Presencia de la tarjeta sobre el campo: más superficie, radio y sombra derivados del sistema, y
