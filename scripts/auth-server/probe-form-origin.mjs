@@ -17,6 +17,11 @@ import { chromium, webkit } from 'playwright'
 
 const chromiumOnly = process.argv.length === 3 && process.argv[2] === '--chromium-only'
 
+/** Playwright says this when the browser was never downloaded. It is a missing optional
+ * dependency, not a regression of the issuer, and it must not stop the required engine. */
+const isMissingExecutable = error =>
+  /Executable doesn't exist|please run the following command to download/i.test(String(error?.message ?? ''))
+
 if (process.argv.length !== 2 && !chromiumOnly) throw new Error('Only --chromium-only is supported; no remote targets')
 const root = fileURLToPath(new URL('../../', import.meta.url))
 const temporary = await mkdtemp(join(tmpdir(), 'auth-form-origin-'))
@@ -155,8 +160,25 @@ return
         ['webkit', webkit]
       ]
 
+  const ran = []
+  const skipped = []
+
   for (const [name, engine] of engines) {
-    browser = await engine.launch({ headless: true })
+    // Chromium is required: the probe proves nothing without it, so a launch failure is fatal.
+    // WebKit is extra coverage; if its executable was never downloaded we skip it loudly instead of
+    // aborting, so a missing optional binary can never block validating Chromium. Any OTHER launch
+    // failure still fails the run — degrading on a real fault would hide the regression we look for.
+    try {
+      browser = await engine.launch({ headless: true })
+    } catch (error) {
+      if (name === 'chromium' || !isMissingExecutable(error)) throw error
+
+      console.warn(`${name}: SKIPPED — executable not installed (npx playwright install ${name})`)
+      skipped.push(name)
+      browser = undefined
+      continue
+    }
+
     const context = await browser.newContext({ serviceWorkers: 'block' })
     let externalRequests = 0
 
@@ -229,10 +251,15 @@ return
     assert.equal(externalRequests, 0)
     await browser.close()
     browser = undefined
+    ran.push(name)
   }
 
+  // A green run must never imply coverage it did not get: if Chromium never ran, nothing was proven.
+  assert.ok(ran.includes('chromium'), 'chromium did not run: the probe validated nothing')
+
   console.log(
-    `${checks} browser form-origin/redirect checks passed; no external requests; engines=${engines.map(([name]) => name).join(',')}`
+    `${checks} browser form-origin/redirect checks passed; no external requests; engines=${ran.join(',')}` +
+      (skipped.length ? `; skipped=${skipped.join(',')} (executable not installed)` : '')
   )
 } finally {
   await browser?.close()
