@@ -4,24 +4,40 @@
  * POR QUÉ NO SE PINTA EL LOGO SEGÚN EL NOMBRE. El `client_name` lo declara el propio cliente al
  * registrarse, y el registro dinámico (DCR) es auto-servicio: cualquiera puede llamarse «Claude
  * Desktop». Si el logo saliera del nombre, la pantalla donde una persona decide qué permisos entrega
- * le estaría regalando la confianza de una marca ajena a quien la escriba. Por eso el logo real sólo
- * puede venir de una de dos fuentes verificables:
+ * le estaría regalando la confianza de una marca ajena a quien la escriba.
  *
- *   1. `client_id` registrado, contra el allowlist de abajo (clientes confidenciales que registramos
- *      nosotros con `pnpm auth-server:register-client`), o
- *   2. `logo_uri` de un documento CIMD validado — el camino que declara TASK-1835 y que exige además
- *      ampliar `img-src` por origen en la CSP de esa página. Todavía no está implementado.
+ * DE DÓNDE SÍ PUEDE SALIR. En CIMD el `client_id` ES una URL https y el emisor va a buscar el
+ * documento de metadata a ese origen (`looksLikeCimdClientId`, `resolveCimdClient`). Servir ese
+ * documento exige controlar el dominio, así que el ORIGEN del `client_id` es prueba de propiedad —
+ * no una declaración. Ésa es la llave del allowlist de abajo. Un `client_id` de DCR (`dcr-…`) no es
+ * una URL y nunca entra acá.
  *
- * Mientras una de las dos no aplique, se pinta un monograma neutro: identifica sin suplantar.
+ * Los assets salen del registro curado del repo (`public/images/logos/axis/`), embebidos por
+ * `pnpm auth-server:brand-assets:generate`. NUNCA se redibuja una marca ajena a mano.
  */
+import { CLIENT_MARK_CLAUDE_SVG } from './efeonce-isotipo.generated'
 
 /**
- * `client_id` → marca inline. Vacío a propósito: hoy el único cliente registrado es un canary DCR
- * (`dcr-fivomSc2RQ7p0PbtsG5TGw`) y la cohorte real es TASK-1832. Cuando se registre un cliente
- * confidencial de Claude, Codex o ChatGPT, su asset curado entra acá — nunca dibujado a mano:
- * `public/images/logos/axis/` es el registro de isotipos del repo (ya tiene Claude y Gemini).
+ * Origen verificado del `client_id` CIMD → marca inline.
+ *
+ * Falta OpenAI (ChatGPT / Codex): su isotipo oficial todavía no está en `public/images/logos/axis/`
+ * y no se dibuja de memoria. Cuando el asset entre al registro, se agrega su origen acá.
  */
-const VERIFIED_CLIENT_MARKS: Readonly<Record<string, string>> = {}
+const VERIFIED_CLIENT_MARKS: Readonly<Record<string, string>> = {
+  'https://claude.ai': CLIENT_MARK_CLAUDE_SVG,
+  'https://claude.com': CLIENT_MARK_CLAUDE_SVG
+}
+
+/** Origen sólo cuando el `client_id` es una URL https absoluta; cualquier otra forma no califica. */
+const verifiedOriginOf = (clientId: string): string | null => {
+  if (!clientId.startsWith('https://')) return null
+
+  try {
+    return new URL(clientId).origin
+  } catch {
+    return null
+  }
+}
 
 /** Inicial visible del nombre; ignora comillas y símbolos para no mostrar basura. */
 const initialOf = (clientName: string): string => {
@@ -30,15 +46,12 @@ const initialOf = (clientName: string): string => {
   return (letter ?? '?').toUpperCase()
 }
 
-/**
- * Monograma neutro. No imita ninguna marca: es una ficha del sistema con la inicial del nombre que
- * el cliente declaró, y el nombre completo va al lado en texto. Decorativo para lectores de pantalla
- * (`aria-hidden`) porque el nombre ya está escrito.
- */
-const monogram = (clientName: string): string =>
-  `<span class="id-client-mark" aria-hidden="true">${initialOf(clientName)}</span>`
+export const renderClientMark = (input: { clientId: string; clientName: string }): string => {
+  const origin = verifiedOriginOf(input.clientId)
+  const mark = origin && Object.hasOwn(VERIFIED_CLIENT_MARKS, origin) ? VERIFIED_CLIENT_MARKS[origin] : null
 
-export const renderClientMark = (input: { clientId: string; clientName: string }): string =>
-  Object.hasOwn(VERIFIED_CLIENT_MARKS, input.clientId)
-    ? `<span class="id-client-mark id-client-mark-brand" aria-hidden="true">${VERIFIED_CLIENT_MARKS[input.clientId]}</span>`
-    : monogram(input.clientName)
+  // Decorativo en ambos casos (`aria-hidden`): el nombre de la aplicación ya va escrito al lado.
+  return mark
+    ? `<span class="id-client-mark id-client-mark-brand" aria-hidden="true">${mark}</span>`
+    : `<span class="id-client-mark" aria-hidden="true">${initialOf(input.clientName)}</span>`
+}

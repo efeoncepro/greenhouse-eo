@@ -17,12 +17,15 @@ const ROOT = process.cwd()
 const SOURCE = join(ROOT, 'public/branding/SVG/isotipo-full-efeonce.svg')
 /** Logotipo institucional en negativo: es el que va sobre el panel oscuro del acceso (TASK-1835). */
 const LOGOTYPE_SOURCE = join(ROOT, 'public/branding/logo-negative.svg')
+/** Isotipo oficial de Claude, del registro curado del repo: NUNCA redibujado a mano. */
+const CLAUDE_MARK_SOURCE = join(ROOT, 'public/images/logos/axis/claude-isologo.svg')
 const TARGET = join(ROOT, 'src/lib/auth-server/oauth/pages/efeonce-isotipo.generated.ts')
 
 const readBrandSvg = (path: string): string => sanitizeBrandSvg(readFileSync(path, 'utf8'))
 
 const svg = readBrandSvg(SOURCE)
 const logotype = readBrandSvg(LOGOTYPE_SOURCE)
+const claudeMark = readBrandSvg(CLAUDE_MARK_SOURCE)
 
 const output = `// GENERATED FILE — no editar a mano. Fuentes: public/branding/SVG/isotipo-full-efeonce.svg
 // y public/branding/logo-negative.svg
@@ -31,6 +34,9 @@ const output = `// GENERATED FILE — no editar a mano. Fuentes: public/branding
 export const EFEONCE_ISOTIPO_SVG = ${JSON.stringify(svg)}
 
 export const EFEONCE_LOGOTYPE_NEGATIVE_SVG = ${JSON.stringify(logotype)}
+
+/** Marca de tercero para la ficha de aplicación del consentimiento (ver client-marks.ts). */
+export const CLIENT_MARK_CLAUDE_SVG = ${JSON.stringify(claudeMark)}
 `
 
 writeFileSync(TARGET, output)
