@@ -1,9 +1,9 @@
 # Autenticacion de personas de clientes en el autorizador de Efeonce
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-09-04 por Claude (sesión greenhouse-eo-18)
-> **Ultima actualizacion:** 2026-09-04 por Claude (sesión greenhouse-eo-18)
+> **Ultima actualizacion:** 2026-09-05 por Claude (sesión greenhouse-eo-18)
 > **Modulo:** Identidad y acceso (EPIC-044 · TASK-1830)
 > **Documentacion tecnica:** [EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) (ADR del emisor propio), [TASK-1830](../../tasks/in-progress/TASK-1830-efeonce-auth-external-person-authentication.md) (alcance e invariantes), [Autorizador de Efeonce](autorizador-efeonce.md) (el servicio que la aloja), [Binding de Identidad Externa para el MCP](binding-identidad-externa-mcp.md) (quién puede ser invitado)
 > **Manual de uso:** [Operar la autenticacion de clientes externos](../../manual-de-uso/identity/operar-autenticacion-clientes-externos.md)
@@ -24,6 +24,11 @@ dispositivo (huella, cara o PIN) o el control de su buzón de correo.
 **Esto no cambia el login del portal Greenhouse.** Quien entra a `greenhouse.efeoncepro.com` sigue entrando
 igual que siempre, con la cuenta Microsoft de Efeonce. Son dos puertas distintas, con sesiones distintas,
 que no comparten nada.
+
+> **Antes de seguir leyendo, dos cosas del estado de hoy (2026-09-05):** la ventanilla **ya está abierta**
+> —dejó de estar apagada— pero **el correo de acceso todavía no sale** y **todavía no se puede autorizar una
+> aplicación**. El detalle está en [Estado actual](#estado-actual-viva-con-un-límite-y-una-falla-conocida),
+> al final. Si vas a invitar a una persona real, lee esa sección primero.
 
 > Detalle técnico: dominio completo en [`src/lib/auth-server/persons/`](../../../src/lib/auth-server/persons/);
 > decisión en el [ADR del autorizador nativo](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md).
@@ -89,6 +94,9 @@ personas de qué empresas trabajan con Efeonce. Con la respuesta idéntica no ap
 Consecuencia práctica para soporte: si una persona dice que no le llegó el enlace, la pantalla **no** te va a
 decir si su correo está bien escrito. Hay que revisarlo contra la invitación que emitió el operador.
 
+Y hoy hay una razón adicional, más prosaica, por la que un enlace puede no llegar: **el envío está roto**.
+Ver [El correo no está saliendo](#el-correo-no-está-saliendo-pendiente-de-redespliegue).
+
 > Detalle técnico: [`magic-link.ts`](../../../src/lib/auth-server/persons/magic-link.ts) y
 > [`pages.ts`](../../../src/lib/auth-server/persons/pages.ts) (la página intermedia existe justamente para
 > que el consumo no sea un simple GET).
@@ -103,6 +111,11 @@ la primera entrada, porque hace falta una sesión).
 | Cuántas por persona | Hasta **5** |
 | Cómo se distinguen | Cada una lleva un **nombre de dispositivo** que la persona elige ("iPhone del trabajo", "notebook") |
 | Qué se pide al entrar | **Nada más que la passkey.** No se pide el correo: el dispositivo ya dice de quién es la llave. |
+
+Hay un matiz que ahorra un paso: cuando el dispositivo **verifica a la persona** al usar la passkey (huella,
+cara o PIN, no un simple toque), esa entrada abre la sesión **ya con el segundo factor satisfecho**. No hay
+que pedir el TOTP encima. La diferencia es entre "este dispositivo tiene la llave" y "esta persona está
+usando el dispositivo": lo segundo ya es dos factores.
 
 ### La defensa contra copias
 
@@ -198,20 +211,83 @@ base de datos.
 > [`totp-cipher.ts`](../../../src/lib/auth-server/persons/totp-cipher.ts) (cifrado con KMS) y
 > [`rate-limit.ts`](../../../src/lib/auth-server/persons/rate-limit.ts) (registro de intentos).
 
-## Estado actual: construido y apagado
+## Cómo sabemos que esto funciona de verdad
 
-Todo lo descrito arriba **está construido y probado, pero apagado**. El interruptor es
-`AUTH_SERVER_PERSON_AUTH_ENABLED`, hoy en `false`.
+Hasta el 2026-09-05 todo lo de arriba estaba probado **contra la base de datos**, nunca contra el servicio
+desplegado. Un almacenamiento correcto detrás de una ruta mal cableada pasa esa prueba y falla igual en la
+vida real. Por eso ahora hay dos comprobaciones distintas, y las dos hacen falta:
 
-| Con el interruptor apagado | Qué ocurre |
+| Comprobación | Contra qué corre | Qué demuestra |
+| --- | --- | --- |
+| **Canary** (`pnpm auth-server:person-auth:canary`) | El **servidor real**, de punta a punta | Que una persona autenticada puede efectivamente hacer todo el recorrido |
+| **Smoke** (`pnpm auth-server:person-auth:smoke`) | La **base de datos** | Que el almacenamiento se comporta: registro append-only, topes, cifrado real |
+
+El canary se estrenó ese día y **lo primero que encontró fue el correo caído** — precisamente el fallo que
+por diseño nadie iba a reportar. Su corrida en vivo cerró con **22 comprobaciones correctas y ninguna
+fallida**.
+
+Cosas que quedaron verificadas contra el servicio real **por primera vez** ese día: que el enlace de correo
+se consume y **sirve una sola vez**; que la sesión queda bien formada; el **registro y el login por passkey**
+(incluido que abre ya con segundo factor cuando el dispositivo verifica a la persona); el **enrolamiento del
+TOTP**; que **un mismo código no se acepta dos veces**; y que **la sesión muere cuando el operador revoca el
+acceso**.
+
+Las tres alertas del dominio (`auth.person.magic_link_rate_limited`, `auth.person.passkey_counter_regression`
+y `auth.person.session_without_link`) también se leyeron por primera vez y responden. La de sesión huérfana
+va un paso más allá: el canary comprueba que **se enciende** al revocar un acceso, no sólo que está tranquila
+cuando no pasa nada. Una alarma que nunca sonó no está probada.
+
+> Detalle técnico: `scripts/auth-server/person-auth-canary.ts` y `scripts/auth-server/person-auth-smoke.ts`;
+> cómo correrlos, en el [manual de uso](../../manual-de-uso/identity/operar-autenticacion-clientes-externos.md).
+
+## Estado actual: viva, con un límite y una falla conocida
+
+Desde el 2026-09-05 la superficie **está prendida**. Los dos interruptores (`AUTH_SERVER_OAUTH_ENABLED` y
+`AUTH_SERVER_PERSON_AUTH_ENABLED`) están en `true` y desplegados. Lo verificado en vivo ese día: revisión
+`auth-server-00007-cxb`, `/readyz` responde `200` con `oauth: true`, y la pantalla de entrada `/login`
+responde `200`.
+
+| Qué | Cómo está hoy |
 | --- | --- |
-| Las pantallas de esta documentación | **No existen**: responden `404`. No responden "prohibido", porque un "prohibido" ya confirmaría que la pantalla está ahí. |
-| Autorizar una aplicación | Sigue respondiendo **"necesitas iniciar sesión"**, igual que antes. Ninguna aplicación recibe un pase. |
+| Las pantallas de entrada | **Existen y responden.** Ya no dan `404`. |
+| Identificarse: correo, passkey, TOTP | **Funciona**, verificado de punta a punta contra el servidor real. |
+| Recibir el enlace por correo | **Roto.** El envío falla hasta que se redespliegue el servicio. |
+| Autorizar una aplicación | **Todavía no.** Falta una decisión del operador. |
 
-Dicho de otra forma: hoy nadie de un cliente puede entrar todavía. Lo que cambió es que la pieza que faltaba
-ya existe y está lista para prenderse cuando corresponda.
+### El correo no está saliendo (pendiente de redespliegue)
 
-> Detalle técnico: estado del flag por entorno en
+Pedir un enlace de acceso **falla en producción**: el envío moría con `RESEND_API_KEY is not configured`. El
+arreglo ya está hecho en la configuración del despliegue, pero **necesita un redespliegue del auth-server
+para surtir efecto**. Mientras eso no ocurra:
+
+- quien pida un enlace ve en pantalla **"te enviamos un correo"**;
+- el correo **no llega**;
+- y **nadie se entera**. Es consecuencia directa de la propiedad de más arriba: como la respuesta es idéntica
+  exista o no el correo, un correo muerto no se reporta solo. No hay error en pantalla, ni alerta, ni ticket.
+
+Dónde se ve la verdad: en la fila correspondiente de `greenhouse_notifications.email_deliveries`, en sus
+columnas `status` y `error_message`. Eso —y no la pantalla— es lo que dice si el correo salió.
+
+**Consecuencia práctica: no invites a una persona real hasta que el redespliegue esté hecho y hayas visto
+llegar un correo de prueba a una casilla que controles.**
+
+### Se puede entrar, pero todavía no autorizar una aplicación
+
+Emitir un pase exige que la persona pertenezca a una **organización con binding activo**, y hoy **no hay
+ninguna organización elegible declarada**. Así que alguien puede identificarse y abrir sesión, pero al pedir
+un pase para una aplicación no lo va a obtener.
+
+No es una falla ni un pendiente técnico: es una **decisión del operador**, que es quien declara qué
+organización entra. La puerta funciona; falta decir a quién se le abre.
+
+### Un hueco conocido, declarado y no cerrado
+
+Pedir un reto de passkey (el primer paso del login con huella o cara) **no tiene límite de intentos y se
+puede llamar sin haber iniciado sesión**. Está declarado como pendiente. No abre nada por sí solo —un reto
+sin la llave del dispositivo no sirve de nada— pero permite golpear esa puerta sin costo. Se menciona acá
+para que, si aparece tráfico raro en ese punto, se reconozca como lo que es y no como un compromiso.
+
+> Detalle técnico: estado de los flags por entorno en
 > [`FEATURE_FLAG_STATE_LEDGER.md`](../../operations/FEATURE_FLAG_STATE_LEDGER.md); configuración en
 > [`config.ts`](../../../src/lib/auth-server/persons/config.ts); alcance y pendientes en
 > [TASK-1830](../../tasks/in-progress/TASK-1830-efeonce-auth-external-person-authentication.md).

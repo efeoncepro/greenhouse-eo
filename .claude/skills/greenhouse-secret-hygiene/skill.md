@@ -145,6 +145,22 @@ Check whether the consumer resolves from:
 2. Env fallback → `process.env[envVarName]` after Secret Manager miss
 3. Direct env only → no Secret Manager involvement
 
+**Declared ≠ mounted ≠ permitted — three separate things, and a working runtime needs all three.**
+
+| What you did | What it gives you | What it does NOT give you |
+|---|---|---|
+| Declare `X_SECRET_REF` as an env var | The async resolver a name to look up | The value in `process.env.X` |
+| `ensure_secret_accessor_binding` (IAM) | Permission to read it | Anyone actually reading it |
+| Mount it (`--update-secrets X=<ref>`) | The value in `process.env.X` at boot | — |
+
+A binding without a mount grants permission to read something nobody is reading. Whether the ref alone
+suffices depends entirely on the consumer: a **synchronous** reader (`process.env` or an already-warm
+cache) needs the mount; only a consumer that awaits the async resolver can live on the ref. Source case
+2026-09-05: `services/auth-server/deploy.sh` declared `RESEND_API_KEY_SECRET_REF` and granted its
+accessor binding, but never mounted `RESEND_API_KEY` — and `sendEmail` resolves Resend through the
+**synchronous** client. Production magic-link email failed for days with `RESEND_API_KEY is not
+configured`. `services/ops-worker/deploy.sh` works because it mounts it.
+
 Inspect the canonical resolver:
 
 ```typescript
@@ -203,6 +219,12 @@ For production verification:
 curl -s https://greenhouse.efeoncepro.com/api/auth/providers | head -c 100
 curl -s https://greenhouse.efeoncepro.com/api/auth/session | head -c 100
 ```
+
+**`gcloud secrets versions access` is not verification.** It proves the payload exists and is clean in
+Secret Manager; it says nothing about whether the runtime that needs it can see it. Exercise the **real
+consumer** and read its own observable evidence — the delivery ledger row, the signed webhook, the
+downstream write — not the store. In a runtime that is new to that secret, this is the only step that
+catches a declared-but-unmounted ref.
 
 ### Step 6 — Close the loop in docs
 

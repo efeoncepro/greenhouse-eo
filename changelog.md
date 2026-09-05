@@ -7,7 +7,29 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-## 2026-09-04 — TASK-1830: autenticación de personas externas del emisor, sin contraseñas (code complete)
+## 2026-09-04 — TASK-1830: autenticación de personas externas del emisor, sin contraseñas (viva desde el 05)
+
+**Delta 2026-09-05 — activada, y el correo del magic link estaba muerto.** El operador prendió ambos
+flags (revisión `auth-server-00007-cxb`) y la superficie quedó viva. El canary nuevo
+`pnpm auth-server:person-auth:canary` —que ejercita el contrato HTTP contra el host desplegado, no el
+SQL contra la base— encontró en su primera corrida que el enlace de acceso fallaba con
+`RESEND_API_KEY is not configured`: el `deploy.sh` declaraba el `*_SECRET_REF` sin montar el secreto,
+y `sendEmail` usa el cliente síncrono, que lee un secreto ya resuelto. Arreglado en `deploy.sh`,
+pendiente de redeploy.
+
+Nadie se habría enterado: la respuesta al pedir un enlace es 202 idéntica exista o no el correo, así
+que un correo muerto no se reporta solo (misma clase que `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED`). De
+ahí la regla generalizable: **toda superficie cuya respuesta es deliberadamente indistinguible
+necesita una verificación externa de su efecto**, porque por diseño renunció a reportarlo.
+
+Verificado en vivo por primera vez (22 ok / 0 fallidos): consumo del enlace y su uso único, sesión
+sin filtrar el sujeto, passkey con `uv` abriendo en `step_up`, TOTP con secreto cifrado por KMS,
+anti-replay y muerte de la sesión al revocar el link. El canary comprueba además que la señal de
+sesión huérfana **se enciende** al revocar —un detector que sólo se ve en `ok` es una afirmación— y
+distingue tres estados: verde, rojo e **incompleto**, porque un canary con pasos omitidos no es
+verde. Pendiente: redeploy, organización elegible para el carril de tokens, passkey en dos
+navegadores y el límite de tasa del reto de passkey anónimo.
+
 
 Cuatro slices en `develop` detrás de `AUTH_SERVER_PERSON_AUTH_ENABLED=false`: sesión propia
 (`__Host-efeonce_auth`) que implementa el `SubjectSessionPort` que dejaba a `authorize` en

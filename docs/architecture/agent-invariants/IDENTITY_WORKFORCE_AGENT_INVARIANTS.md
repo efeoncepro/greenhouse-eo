@@ -621,3 +621,40 @@ Un flujo de recuperación self-service reintroduce exactamente esa puerta.
 12. **SIEMPRE** que se agregue una tabla al dominio, declararla en el allowlist de
     `boundary-domain.test.ts` en el mismo PR, y ejercitar su SQL en el smoke: los tests con mocks
     ejercitan el TS, nunca el SQL (CHECK, `ON CONFLICT`, triggers, `BYTEA`, `BIGINT`).
+13. **NUNCA** dar por montado un secreto en un runtime nuevo porque se declaró su `*_SECRET_REF`.
+    Declarar la referencia —y hasta conceder el binding IAM con `ensure_secret_accessor_binding`— sólo
+    autoriza a leer algo que nadie está leyendo. Si el consumidor resuelve el secreto de forma
+    **SÍNCRONA**, hay que **MONTARLO** con `--update-secrets`. Caso fuente (commit `38fbfaeeb`,
+    2026-09-05): `services/auth-server/deploy.sh` declaraba `RESEND_API_KEY_SECRET_REF` como env var y
+    concedía el binding, pero nunca montaba `RESEND_API_KEY`; el correo del magic link moría en
+    producción con `RESEND_API_KEY is not configured` y la fila de
+    `greenhouse_notifications.email_deliveries` quedaba en `status=failed`. La razón exacta: `sendEmail`
+    (`src/lib/email/delivery.ts:898`) usa el cliente **síncrono** `getResendClient()`, que lee una
+    resolución CACHEADA que sólo puebla el resolvedor **asíncrono** `getResendClientAsync`, y en el
+    auth-server nadie precalienta el async. El `ops-worker` funciona porque SÍ lo monta
+    (`services/ops-worker/deploy.sh:1004`). Al portar a un runtime nuevo cualquier capacidad compartida
+    (correo, storage, providers), **SIEMPRE** verificar cómo RESUELVE el secreto el consumidor, no cómo
+    lo declara el deploy.
+14. **SIEMPRE** verificar por FUERA el efecto de una superficie cuya respuesta es deliberadamente
+    indistinguible. `POST /auth/magic-link/request` responde 202 idéntico exista o no el correo (regla
+    6): por diseño renunció a reportar su propio resultado, así que un correo muerto **no lo reporta
+    nadie** — la persona lee «te enviamos un enlace» y el acceso queda muerto en silencio. Es la misma
+    clase que `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED`, donde la success card prometía un correo que el
+    flag apagado nunca despachaba. La evidencia es el efecto real —la fila de `email_deliveries` en
+    `sent`—, **NUNCA** el 202.
+15. **NUNCA** declarar activada la superficie de personas con un canary compuesto sólo de casos
+    negativos y anónimos. Metadata, 401s y códigos inválidos no tocan el carril autenticado: la
+    activación de 2026-09-05 pasó **9/9 canaries públicos con el correo del magic link roto**. El gate
+    real es `pnpm auth-server:person-auth:canary`, que exige una persona y ejercita el contrato HTTP
+    contra el host DESPLEGADO — distinto de `pnpm auth-server:person-auth:smoke`, que ejercita el SQL
+    contra PG real; los dos hacen falta y ninguno sustituye al otro. **`exit 2` = INCOMPLETO**: un
+    canary con pasos omitidos no es verde, es una medición que no se hizo.
+16. **NUNCA** dar por probado un detector que sólo se vio en `ok`. Verlo apagado no distingue «no hay
+    nada que detectar» de «no detecta». Por eso el canary revoca el source link A PROPÓSITO y comprueba
+    que `auth.person.session_without_link` pasa de `ok` a `error` (y que la sesión se revoca en el
+    request que lo detecta, regla 11): un detector está probado cuando se lo ve **ENCENDERSE**.
+17. **Hueco conocido, NO resuelto:** `POST /auth/passkeys/authenticate/start` es anónimo y sin límite de
+    tasa, y cada llamada inserta una fila en `greenhouse_auth.passkey_challenges` sin recolección. Es
+    crecimiento no acotado disparable por un tercero anónimo. El GC (`pnpm auth:gc`) se está
+    construyendo aparte; hasta que exista y quede agendado, **NUNCA** registrar este endpoint como
+    cubierto por el anti-abuso de `auth_rate_limits`.

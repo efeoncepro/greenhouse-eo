@@ -415,3 +415,39 @@ todos salvo el de brand assets exigen `.env.local` + proxy PG.
 **Próximos pasos de TASK-1829 (sin cambio de estado).** Flag ON en staging (default en
 `services/auth-server/deploy.sh` + workflow `auth-server-deploy.yml`), environment a `active`, validación de la
 metadata, clientes CIMD + DCR de prueba (TASK-1832); el flujo con persona real exige TASK-1830.
+
+## Delta 2026-09-05 — U03 viva, y el correo que estaba muerto detrás de nueve canaries verdes
+
+**U03 (`TASK-1830`) activada.** La revisión `auth-server-00007-cxb` (SHA `3f68e8875`, 100% del tráfico,
+workflow de staging `33934410457` en `success`) sirve la superficie de personas y la OAuth con **ambos
+flags ON** (`AUTH_SERVER_PERSON_AUTH_ENABLED`, `AUTH_SERVER_OAUTH_ENABLED`), y el environment del emisor
+`efeonce-auth` pasó de `draft` a **`active`** por el command de U04. Esto supersede, para ambos flags, el
+`rollout pendiente` que declaran el encabezado y el §Delta 2026-09-04 — TASK-1829.
+
+**El defecto que la activación no vio.** El correo del magic link estaba **muerto en producción**:
+`RESEND_API_KEY is not configured`, con la fila de `greenhouse_notifications.email_deliveries` en
+`status=failed`. `services/auth-server/deploy.sh` declaraba `RESEND_API_KEY_SECRET_REF` como env var y
+concedía su binding IAM con `ensure_secret_accessor_binding`, pero **nunca montaba** `RESEND_API_KEY` con
+`--update-secrets`; el consumidor (`sendEmail` → `getResendClient()` síncrono) lee una caché que sólo
+puebla el resolvedor asíncrono, que en este runtime nadie precalienta. El `ops-worker` no lo sufre porque
+sí lo monta (`services/ops-worker/deploy.sh:1004`). Corregido en `38fbfaeeb`. Tres lecciones que quedan
+como invariantes del dominio (`agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md`, reglas 13-17):
+declarar un `*_SECRET_REF` no monta nada y el binding IAM sólo autoriza a leer algo que nadie lee; una
+superficie cuya respuesta es deliberadamente indistinguible —el 202 anti-enumeración— renunció por diseño
+a reportar su efecto y **necesita verificación externa**; y un canary de casos negativos y anónimos no
+toca el carril autenticado: la activación pasó **9/9 canaries públicos con el correo roto**. El gate real
+es `pnpm auth-server:person-auth:canary` (persona real, contrato HTTP contra el host desplegado, `exit 2`
+= incompleto), hermano —no reemplazo— de `pnpm auth-server:person-auth:smoke`, que ejercita el SQL.
+
+**Riesgo vigente: un solo servicio para dos ramas.** El `auth-server` es **un único** servicio Cloud Run
+compartido por staging y producción. Hoy sirve `develop` con ambos flags ON, pero `main` todavía trae
+`AUTH_SERVER_OAUTH_ENABLED=false` y **cero apariciones** de `AUTH_SERVER_PERSON_AUTH_ENABLED`: cualquier
+deploy disparado desde `main` antes de promover **apagaría la superficie viva**, sin que nada lo distinga
+de un despliegue sano. Mitigación mientras dure: promover antes de cualquier deploy de `main`, o tratar la
+promoción como parte de la activación y no como un paso posterior.
+
+**Pendiente conocido, no resuelto.** `POST /auth/passkeys/authenticate/start` es anónimo, sin límite de
+tasa, y cada llamada inserta una fila en `greenhouse_auth.passkey_challenges` sin recolección: crecimiento
+no acotado disparable por un tercero anónimo. El GC (`pnpm auth:gc`) se construye aparte; hasta que exista
+y quede agendado, el endpoint **no** está cubierto por el anti-abuso de `auth_rate_limits`. Entra al
+alcance de aseguramiento de U08 (`TASK-1833`).
