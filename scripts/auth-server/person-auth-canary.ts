@@ -78,15 +78,19 @@ type CanaryResponse = { status: number; body: string; headers: Headers; elapsedM
 
 const request = async (
   path: string,
-  init: { method?: string; json?: unknown; cookie?: string } = {}
+  init: { method?: string; json?: unknown; cookie?: string; origin?: string | null } = {}
 ): Promise<CanaryResponse> => {
   const startedAt = Date.now()
+
+  // `origin: null` omite el encabezado; un string lo falsea. Por defecto el canary se comporta
+  // como un navegador del propio origen, que es como se usa la superficie de verdad.
+  const originHeader = init.origin === undefined ? new URL(HOST).origin : init.origin
 
   const response = await fetch(`${HOST}${path}`, {
     method: init.method ?? 'GET',
     redirect: 'manual',
     headers: {
-      origin: new URL(HOST).origin,
+      ...(originHeader === null ? {} : { origin: originHeader }),
       ...(init.json === undefined ? {} : { 'content-type': 'application/json' }),
       ...(init.cookie ? { cookie: init.cookie } : {})
     },
@@ -331,6 +335,22 @@ const run = async () => {
       })
 
       check('passkey/registro completa', registerFinish.status === 201, `${registerFinish.status}`)
+
+      // La exigencia de mismo origen es una defensa CSRF que alguien puede quitar sin que nada
+      // falle: acá se ejercita su RECHAZO, no sólo el camino feliz. Un guard que nunca se ve
+      // rechazar es una afirmación (misma disciplina que la señal de sesión huérfana).
+      const noOrigin = await request('/auth/passkeys/authenticate/start', { method: 'POST', json: {}, origin: null })
+      const foreignOrigin = await request('/auth/passkeys/authenticate/start', {
+        method: 'POST',
+        json: {},
+        origin: 'https://evil.example'
+      })
+
+      check(
+        'passkey/exige mismo origen',
+        noOrigin.status === 403 && foreignOrigin.status === 403,
+        `sin Origin ${noOrigin.status} · origen ajeno ${foreignOrigin.status} (ambos deben ser 403)`
+      )
 
       const authStart = await request('/auth/passkeys/authenticate/start', { method: 'POST', json: {} })
       const authOptions = JSON.parse(authStart.body || '{}') as { options?: { challenge?: string; allowCredentials?: unknown[] } }
