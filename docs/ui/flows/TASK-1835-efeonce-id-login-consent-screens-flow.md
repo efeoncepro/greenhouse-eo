@@ -1,5 +1,31 @@
 # TASK-1835 — Efeonce ID: login, consentimiento y recuperación Flow Contract
 
+## Delta 2026-09-05 — dirección aprobada «Nocturno editorial» (implementada)
+
+El operador eligió la dirección **A · Nocturno editorial** entre tres exploradas en un lienzo de
+diseño, y ya está en el producto (`802b5b869`, `501f54b52`, `300d3c5cf`). Lo que cambia respecto de
+lo escrito arriba, que describía la tarjeta centrada sobre fondo claro:
+
+- **Composición del login.** El lienzo ENTERO es el campo de marca —degradado radial sobre la rampa
+  azul de AXIS más un grano de 1px— y la tarjeta clara flota encima. Desde 64rem se abre en dos: el
+  panel de marca a la izquierda con el logotipo institucional en negativo, kicker, titular con
+  palabra acentuada y línea de confianza; el formulario a la derecha. Bajo 64rem el panel se retira
+  y queda el campo con la tarjeta y la marca arriba.
+- **El formulario va PRIMERO en el DOM**; el orden visual lo pone CSS, para que el foco y los
+  lectores de pantalla lleguen antes al campo que al mensaje de marca.
+- **Sólo el login cambia de composición.** Consentimiento, verificación, step-up y error conservan la
+  columna centrada: son decisiones puntuales, no una bienvenida.
+- **El campo de marca se fija en claro y oscuro.** La tarjeta re-declara los tokens claros en su
+  subárbol; el resto de las pantallas conserva el sistema claro/oscuro con los neutrales de AXIS.
+
+- **Jerarquía de métodos.** El enlace por correo es la puerta de la mayoría (personas invitadas) y se
+  queda con el botón primario; el acceso del equipo interno delega en Microsoft, va en secundario y
+  lleva el logo oficial, como pide el botón estándar de Microsoft. Entre ambos, un separador.
+- **Sin estado de carga en el envío.** El formulario es un POST sin JavaScript por diseño de la CSP:
+  la única señal de progreso es el indicador de navegación del navegador. El step-up sí tiene estado
+  de espera porque ahí corre su controlador.
+
+
 ## Meta
 
 - Status: `draft`

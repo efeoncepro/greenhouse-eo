@@ -1,5 +1,31 @@
 # TASK-1835 — Revisión del primer fold
 
+## Delta 2026-09-05 — dirección aprobada «Nocturno editorial» (implementada)
+
+El operador eligió la dirección **A · Nocturno editorial** entre tres exploradas en un lienzo de
+diseño, y ya está en el producto (`802b5b869`, `501f54b52`, `300d3c5cf`). Lo que cambia respecto de
+lo escrito arriba, que describía la tarjeta centrada sobre fondo claro:
+
+- **Composición del login.** El lienzo ENTERO es el campo de marca —degradado radial sobre la rampa
+  azul de AXIS más un grano de 1px— y la tarjeta clara flota encima. Desde 64rem se abre en dos: el
+  panel de marca a la izquierda con el logotipo institucional en negativo, kicker, titular con
+  palabra acentuada y línea de confianza; el formulario a la derecha. Bajo 64rem el panel se retira
+  y queda el campo con la tarjeta y la marca arriba.
+- **El formulario va PRIMERO en el DOM**; el orden visual lo pone CSS, para que el foco y los
+  lectores de pantalla lleguen antes al campo que al mensaje de marca.
+- **Sólo el login cambia de composición.** Consentimiento, verificación, step-up y error conservan la
+  columna centrada: son decisiones puntuales, no una bienvenida.
+- **El campo de marca se fija en claro y oscuro.** La tarjeta re-declara los tokens claros en su
+  subárbol; el resto de las pantallas conserva el sistema claro/oscuro con los neutrales de AXIS.
+
+- **Evidencia de esta iteración.** Playwright + Chrome contra los renderers REALES del emisor (no el
+  harness de ejemplo del 19035): `/login`, `/login/error`, `/consent`, `/sent`, `/step-up` a 1440×900
+  y 390×844, en claro y oscuro, `deviceScaleFactor 2`. Defectos encontrados MIRANDO el frame, no
+  leyendo el código: el placeholder pisaba el icono del campo (especificidad), el panel se quedaba del
+  alto de su contenido, el titular partía en «a todo lo / que», y el `<circle>` del logotipo salía
+  negro porque su color venía de un `<style>` que la CSP bloquea.
+
+
 Fecha: 2026-09-05. Propuesta B, acceso enfocado con contexto explícito. Evidencia inicial del preview:
 `pnpm exec tsx scripts/auth-server/ui-preview-server.ts`, `http://127.0.0.1:19035/login` y `/consent`.
 Datos ficticios y acciones de navegación del preview; no acredita consentimiento ni acceso reales.

@@ -1,5 +1,26 @@
 # TASK-1835 — Efeonce ID: pantallas de login, consentimiento y recuperación en `auth.efeonce.org`
 
+## Delta 2026-09-05 — dirección aprobada, implementada y pendiente de build
+
+El operador eligió la dirección **A · «Nocturno editorial»** entre tres exploradas en un lienzo de
+diseño y quedó implementada en `develop`. Lo verificado, lo que falta y una trampa operativa:
+
+- **Verificado**: Playwright + Chrome contra los renderers REALES del emisor (no el harness del
+  19035) en `/login`, `/login/error`, `/consent`, `/sent` y `/step-up`, a 1440×900 y 390×844, claro y
+  oscuro. `pnpm vitest run src/lib/auth-server` 313 passed, typecheck limpio, lint sin errores.
+- **Bug de marca cerrado en la causa**: el color de los SVG institucionales venía en un `<style>`
+  interno que la CSP del emisor bloquea por hash, y la regla compensatoria sólo alcanzaba a `<path>`
+  — el `<circle>` del logotipo salía negro. Ahora se normalizan a `currentColor` al generarlos, con
+  drift test y una guarda que falla si reaparece un `<style>` embebido.
+- **Pendiente para `UI ready: yes`**: login por passkey, matriz completa de estados capturada, GVC
+  premium de las 11 fixtures, scorecard y los gates `design-contract:lint` / `ui:code-lint` /
+  `ui:visual-gate` / `ui:quality`.
+- **Trampa operativa que hay que leer antes de empujar**: `auth-server-deploy.yml` dispara en todo
+  push a `develop` que toque `src/lib/**`, y el servicio Cloud Run es UNO solo compartido que sirve
+  `auth.efeonce.org` en vivo. El push ES el despliegue y la pantalla queda pública. Además `main`
+  todavía trae `AUTH_SERVER_OAUTH_ENABLED=false` y ninguna aparición de
+  `AUTH_SERVER_PERSON_AUTH_ENABLED`: un release desde `main` sin arreglar eso APAGA este login.
+
 ## Delta 2026-09-04 — acceso interno nativo (TASK-1836)
 
 El flujo interno depende del contrato backend de TASK-1836 (U11). Incluir entrada corporativa Microsoft, retorno OAuth, errores de elegibilidad y consentimiento con organización/permisos reales; actualizar wireframe/flow/motion antes de implementar ese slice. La UI no determina población por correo ni concede permisos. El flujo externo conserva su contrato.
@@ -26,7 +47,7 @@ El flujo interno depende del contrato backend de TASK-1836 (U11). Incluir entrad
 - Motion: `docs/ui/motion/TASK-1835-efeonce-id-login-consent-screens-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-044`
-- Status real: `Renderers reales integrados localmente (2026-09-05): shell AXIS, fuentes/CSP, login/consentimiento, step-up TOTP/passkey UV y alta TOTP con QR. GVC pasa en 1440/390 para cuatro superficies; verificación Chromium 6 checks, 0 violations con factores simulados. Harness GET-only 19036 con DTOs ficticios; no acredita auth real ni deploy. UI ready no: aprobación del operador, passkey login, matriz completa de estados, review final y canary pendientes; typecheck global no confirmado.`
+- Status real: `Dirección visual APROBADA por el operador (A · «Nocturno editorial») e implementada en develop 2026-09-05: commits 802b5b869 (composición), 501f54b52 (presencia de la tarjeta), 300d3c5cf (UX writing + estados) y 78cc2dc67 (color de marca por currentColor). Wireframe/flow/motion/review sincronizados con lo implementado. Verificado con Playwright + Chrome contra los renderers REALES del emisor —login, error, consent, sent, step-up a 1440x900 y 390x844, claro y oscuro—; vitest src/lib/auth-server 313 passed, typecheck limpio, lint sin errores. SIN DESPLEGAR: el push a develop dispara auth-server-deploy y el servicio Cloud Run es UNO compartido que sirve auth.efeonce.org en vivo, así que el push ES el despliegue. UI ready sigue no: faltan login por passkey, matriz completa de estados capturada, GVC premium de las 11 fixtures, scorecard y los gates ui:*; sin estado de carga en el envío por diseño de la CSP (POST sin JS).`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none`
@@ -423,13 +444,13 @@ re-decidir:
 
 - [ ] Flujo interno Microsoft de TASK-1836 integrado en wireframe/flow y validado en GVC desktop/390, con teclado, errores y consentimiento; no duplica identidad ni reglas backend.
 
-- [ ] Se declaró `Execution profile: ui-ux` y `UI impact: flow`; wireframe, flow y motion existen y describen el diseño real (no stubs).
+- [x] Se declaró `Execution profile: ui-ux` y `UI impact: flow`; wireframe, flow y motion existen y describen el diseño real (no stubs).
 - [ ] `UI ready` permanece `no` hasta que exista la dirección visual aprobada, el implementation mapping, el GVC scenario plan y el decision log; si pasa a `yes`, `pnpm task:lint --task TASK-1835` sin findings.
-- [ ] El contrato del protocolo no cambia: `oauth-flow.test.ts` sigue verde sin editar sus asserts de rutas/campos.
+- [x] El contrato del protocolo no cambia: `oauth-flow.test.ts` sigue verde sin editar sus asserts de rutas/campos.
 - [ ] Ningún valor literal de color/tipografía/spacing en las plantillas: todo sale de `styles.generated.ts` y el drift test contra el SSOT pasa.
-- [ ] La pantalla de consentimiento muestra cliente (nombre + `client_id`), organización y cada scope con descripción es-CL; los scopes de escritura están marcados y `Permitir` nunca tiene foco inicial.
+- [x] La pantalla de consentimiento muestra cliente (nombre + `client_id`), organización y cada scope con descripción es-CL; los scopes de escritura están marcados y `Permitir` nunca tiene foco inicial. **Delta 2026-09-05:** ese CTA ahora se llama `Autorizar acceso` (verbo + objeto, pasada de UX writing) y la fila de escritura se distingue por icono, palabra y tinte, no sólo por color; el consentimiento no lleva autofoco.
 - [ ] `logo_uri` sólo se renderiza para clientes CIMD validados con esquema https y CSP por origen; en otro caso se muestra monograma.
-- [ ] Copy visible únicamente desde `src/lib/copy/auth-server.ts`, validado con `greenhouse-ux-writing`.
+- [x] Copy visible únicamente desde `src/lib/copy/auth-server.ts`, validado con `greenhouse-ux-writing`.
 - [ ] Los estados loading/error/degraded/denied/long content/mobile/keyboard/reduced-motion de cada pantalla están implementados y capturados.
 - [ ] CSP por página verificada por test: `default-src 'none'`, `script-src` sólo nonce (cuando hay WebAuthn), sin `unsafe-inline` en scripts.
 - [ ] Anti-enumeración: el copy de magic link enviado y de recuperación es idéntico exista o no la invitación (test de render).

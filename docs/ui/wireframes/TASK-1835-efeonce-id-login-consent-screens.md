@@ -1,5 +1,30 @@
 # TASK-1835 — Efeonce ID: login, consentimiento y recuperación (wireframe)
 
+## Delta 2026-09-05 — dirección aprobada «Nocturno editorial» (implementada)
+
+El operador eligió la dirección **A · Nocturno editorial** entre tres exploradas en un lienzo de
+diseño, y ya está en el producto (`802b5b869`, `501f54b52`, `300d3c5cf`). Lo que cambia respecto de
+lo escrito arriba, que describía la tarjeta centrada sobre fondo claro:
+
+- **Composición del login.** El lienzo ENTERO es el campo de marca —degradado radial sobre la rampa
+  azul de AXIS más un grano de 1px— y la tarjeta clara flota encima. Desde 64rem se abre en dos: el
+  panel de marca a la izquierda con el logotipo institucional en negativo, kicker, titular con
+  palabra acentuada y línea de confianza; el formulario a la derecha. Bajo 64rem el panel se retira
+  y queda el campo con la tarjeta y la marca arriba.
+- **El formulario va PRIMERO en el DOM**; el orden visual lo pone CSS, para que el foco y los
+  lectores de pantalla lleguen antes al campo que al mensaje de marca.
+- **Sólo el login cambia de composición.** Consentimiento, verificación, step-up y error conservan la
+  columna centrada: son decisiones puntuales, no una bienvenida.
+- **El campo de marca se fija en claro y oscuro.** La tarjeta re-declara los tokens claros en su
+  subárbol; el resto de las pantallas conserva el sistema claro/oscuro con los neutrales de AXIS.
+
+- **Tipografía.** El titular del panel escala con `clamp()` entre el mayor paso de la rampa y 1.45×
+  ese mismo token; en 390px se usa el tamaño móvil que el propio token `surfaceHeroTitle` declara.
+  Poppins sólo en 700, que es el único peso cargado — nada de negrita sintética.
+- **Rótulos de sección en caja normal.** Se probaron en versalitas y se revirtieron: es anti-patrón
+  declarado de `greenhouse-ux-writing`. Se separan del label del campo por tamaño, color y tracking.
+
+
 ## Meta
 
 - Status: `draft`
