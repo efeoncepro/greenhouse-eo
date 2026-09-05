@@ -149,7 +149,16 @@ describe('corporate login HTTP boundary', () => {
     expect(cancelled?.body).not.toContain('evil.example')
     const document = new JSDOM(cancelled?.body).window.document
 
-    expect(document.querySelector('[data-capture="auth-internal-login-error"]')?.querySelectorAll('a')).toHaveLength(0)
+    /*
+     * La página de error puede ofrecer UNA salida, pero jamás una que venga de la request: este
+     * callback recibe `return_to` y `error_description` del atacante, y un enlace derivado de eso
+     * sería un redirect abierto servido con la marca del emisor. Antes se garantizaba prohibiendo
+     * toda ancla; ahora se afirma lo que de verdad importa —destino estático y del mismo origen—,
+     * que además cubre el caso que la prohibición no veía: un `href` relativo construido con input.
+     */
+    const links = [...(document.querySelector('[data-capture="auth-internal-login-error"]')?.querySelectorAll('a') ?? [])]
+
+    expect(links.map(link => link.getAttribute('href'))).toEqual(['/login'])
     expect(cancelled?.headers['Set-Cookie']).toContain('Max-Age=0')
     expect(cancelled?.headers['Cache-Control']).toBe('no-store')
     f.flow.complete.mockRejectedValueOnce(new InternalLoginError('transaction_invalid'))

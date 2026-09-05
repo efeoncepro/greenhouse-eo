@@ -183,7 +183,10 @@ export const handleAuthorize = async (request: OAuthHttpRequest, deps: Authorize
             scopes,
             returnTo: `${url.pathname}${url.search}`,
             actionPath: OAUTH_ENDPOINT_PATHS.consent
-          })
+          }),
+          {},
+          // Already matched against this client's registered redirect before rendering consent.
+          { formActionRedirectUri: redirectUri }
         )
       }
 

@@ -7,6 +7,52 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-05 — MCP gateway: cartel propio del servidor (title, websiteUrl, íconos Efeonce)
+
+El gateway se anunciaba como `efeonce-mcp 0.1.0` sin título, sitio ni ícono. Declara ahora su
+`Implementation` completo y sirve el isotipo Efeonce desde su propio origen, con `src` derivados de
+`MCP_PUBLIC_URL` y nunca como `data:` URI (el SDK estampa el `serverInfo` en cada resultado del
+carril moderno). Tras el estudio de contenedor, el asset es UNO: isotipo blanco sobre placa navy
+opaca 512×512 (marca al 76%, safe area 12%, sin radio horneado). Se retiran la variante dark y el
+campo `theme` — la placa opaca no los necesita y el spec no define si `theme` describe el fondo del
+ícono o el del cliente, cosa que ningún cliente permite falsificar. Un ícono sólo se declara si sus bytes cargaron: asset ausente
+deja al gateway sin ícono + WARNING, nunca una promesa que responde 404. El `Dockerfile` copia
+`assets/` y un test lo afirma, porque ningún test de runtime ve el contenido de la imagen.
+`pnpm check` verde (131 tests) y ambas guardas falsificadas. **Desplegado** (`815df9b`, revisión
+`efeonce-mcp-gateway-00036-5wc`): `/icon-512.png` 200 `image/png` con bytes idénticos al repo y sin
+challenge, protected-resource 200, `POST /mcp` sin token 401, ruta retirada 404 y `auth.efeonce.org`
+intacto. Sabido: ningún cliente Claude renderiza `icons` hoy — se declara porque es correcto.
+Detalle y razones en
+[`EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md`](docs/architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md)
+§Delta 2026-09-05.
+
+## 2026-09-05 — TASK-1836: diagnóstico cerrado del rechazo JWT corporativo
+
+El callback real pasó el intercambio upstream y fue rechazado por jwtVerify; no se emitió token MCP.
+Se añaden causas internas fijas para firma/clave/algoritmo, claims requeridos, issuer/audience y tiempo,
+sin conservar payload/cause ni relajar verificaciones. Respuesta pública sin detalles sensibles.
+20 pruebas focales y106 de auth correctas; revisión independiente sin hallazgos materiales. Emisor OFF
+tras el fallo, diagnóstico aún local y causa exacta pendiente de comprobar en runtime. Tsc y bundle
+del emisor correctos; build Next compiló pero se interrumpió en tipos, sin acreditarlo completo.
+
+Actualización21:48Z: diagnóstico desplegado confirma jwt_expired. Corrección local sustituye
+max_age=0 por prompt=login, conserva exp estricto y auth_time firmado/fresco; elimina orden
+no requerido auth_time<=iat. Emisor OFF rev19; nuevo canary y rollout pendientes.
+
+Actualización22:04Z: SSO Microsoft correcto en runtime. Consentimiento bloqueado por lector
+externo usado para organización interna; corrección local agrega proyección interna mínima y
+selección/verificación explícita de población. Readback PG real y150pruebas correctos;
+publicación/token/canary final pendientes, emisorOFF rev22.
+
+Actualización22:19Z: consentimiento visible tras publicar reader. Envío del formulario
+rechazado por Origin:null bajo no-referrer, reproducido con navegador real. Corrección local
+HTMLstrict-origin conserva CSRF y no envía rutas/query en Referer; canarytoken pendiente.
+
+Actualización22:44Z: canary interno real completo con09def4fc4: Microsoft, consentimiento,
+token y lectura propia correctos, foreigndeny, refreshrotativo, revocacióntoken10.151s,
+retirogrant<=11s y gatewayOFFdeny<=20s. Piloto restauradoON, gv5 y expiración original;
+tokenspruebarevocados. Promociónformal main y matricesamplias externas/UI pendientes.
+
 ## 2026-09-05 — TASK-1836: reparación de integridad aplicada en PG
 
 Migración CLI `20260905183812333` aplicada: población explícita e inmutable, verificación de evidencia
@@ -874,43 +920,3 @@ Sin cambios live en esta consolidación. [Audit](docs/audits/public-site/2026-08
 Checkpoint de construcción anterior a la promoción:
 
 Se auditó el ZIP y se portó el cuerpo de Claude Design a `https://efeoncepro.com/home-claude-design-preview/` (`251731`, noindex), preservando el header/footer Ohio y Home `2791`. Tras la corrección solicitada por el operador, usa 17 widgets semánticos Elementor con controles editables y siete repeaters, **cero widgets HTML**. Assets condicionales y ciclo de vida idempotente; adaptación móvil del motor sin superposiciones. Tests PHP/JS y frontend 1440/390, reduced motion, filtros/FAQ/modal/foco pasan. Editor visual save/reload pendiente de login; media de 12 slots, copy/claims, captación y cutover siguen pendientes. [Contrato y manuales](docs/architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md).
-
-## 2026-08-30 — HubSpot as a Service y su futura landing adoptan arquitectura moderna e inmersiva
-
-La práctica dejó de reducirse a RevOps + Customer Agent y ahora se gobierna mediante seis familias: Marketing,
-Content & AEO; Sales & AI Pipeline; Revenue Lifecycle; Service, Customer Success & Delivery; Data, Integration &
-CRM Intelligence; y Agent Hub & Agentic Operations. La evaluación inicial para fit/cotización es sin costo; un
-blueprint pagado requiere un artefacto autónomo. Customer Agent queda como caso de uso, mientras Contracts,
-Projects y Services se clasifican correctamente como objetos/capabilities dentro de sus workflows.
-
-El benchmark de 11 partners, la oferta V2, tres fichas sectoriales, el pillar público, las skills HubSpot espejadas y
-el router de agentes quedaron reconciliados. `TASK-1352` fue **reemplazada integralmente**, sin conservar deltas,
-copy, claims ni composición del resultado rechazado de Claude Design. La nueva task impone research-first,
-copywriting completo, SEO/AEO por intención y motor, CRO medible, proof ledger y un gate humano del primer fold antes
-de la implementación total. Su dirección visual durable es **Sistema vivo de crecimiento**: atlas de seis resultados, tres lentes
-sectoriales, color HubSpot usado como señal dentro de Efeonce masterbrand, motion causal/interrumpible, frontera
-gratis-vs-blueprint y GVC premium. Los activos exactos de marca deben venir del Partner Brandfolder/guía vigente;
-no se autoriza copiar la UI/trade dress, modificar logos, inventar HEX ni usar inmersión ornamental que perjudique
-accesibilidad o CWV. No hubo cambio de runtime ni publicación web; la task permanece `to-do` y `UI ready: no`.
-
-Dirección visual, wireframe, flow y motion de TASK-1352 se reautoraron desde cero contra la task nueva. Eliminan la
-gran idea prefijada, normalizan las seis familias canónicas, subordinan agentes/capabilities a outcomes, incorporan
-copy slots research-dependent, restricciones SEO/AEO en HTML, flujo de conversión y no-fit, fallas honestas,
-transformación desktop/tablet/mobile y un motion system causal con tokens exactos, reduced-motion y budgets CWV.
-
-## 2026-08-30 — Growth SEO · la lente `Descubrir` entrega lo que ya tenía construido (TASK-1693)
-
-**Qué cambia para quien opera el módulo SEO.** Tres capacidades que estaban construidas y pagadas
-pero no llegaban a la pantalla:
-
-- **Se puede recorrer la corrida completa.** Una corrida materializa hasta 500 candidatos y la
-  pantalla servía 50 sin salida. Ahora hay «Ver N candidatos más» al pie. Recorrer **no cuesta**: lee
-  lo ya comprado, no llama al proveedor y por eso se ve distinto del botón que sí gasta.
-- **Se elige de dónde salen las seeds.** Cuatro fuentes, con Search Console a la cabeza — seeds con
-  demanda medida y resolución sin costo de proveedor. Cada una declara cuántas seeds aportaría. Una
-  fuente sin insumo se bloquea con su razón y **nunca** cae en silencio a «seeds escritas».
-- **Se puede filtrar el canvas**, y el filtro se aplica en el servidor: el conteo del encabezado
-  sigue al universo filtrado, no a la página que bajó. No hay filtro por «dificultad» a propósito;
-  el control correcto es «Barrera máxima», derivada del perfil real de enlaces.
-
-Manual actualizado: `docs/manual-de-uso/growth/descubrir-keywords-seo.md` v1.3.

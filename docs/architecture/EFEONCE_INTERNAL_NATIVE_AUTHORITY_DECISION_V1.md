@@ -191,3 +191,44 @@ La regularización exige evidencia interna original del grant con capability y v
 No puede certificar una ampliación de autoridad como recuperación de auditoría. Evidencia canónica previa
 requiere dimensiones correlacionadas y outbox correspondiente; si falta esa pareja, se registra una nueva
 reconciliación actual, atómica e idempotente. No se reescriben los audits previos ni se rejuvenece el grant.
+
+### Solicitud de autenticación reciente compatible con Entra — 2026-09-05
+
+Se usa `prompt=login` en lugar de `max_age=0`: Microsoft permite solicitar credenciales
+explícitamente sin introducir el efecto de max_age corto sobre la duración del token.
+La evidencia real disponible es `jwt_expired`; la causalidad de max_age para este ID token
+queda pendiente del canary. Se conserva expiración estricta y auth_time obligatorio firmado,
+no futuro, no anterior a now−600s ni al inicio server-side−60s. `auth_time<=iat` no es
+un requisito OIDC y se elimina; no se elimina ni sustituye auth_time. El navegador no puede
+eludir la frescura retirando prompt porque el callback la verifica contra la transacción.
+[Microsoft OIDC](https://learn.microsoft.com/en-us/entra/identity-platform/v2-protocols-oidc) ·
+[OIDC ID token](https://openid.net/specs/openid-connect-core-1_0.html#IDToken) ·
+[Antecedente MSAL](https://github.com/AzureAD/microsoft-authentication-library-for-python/discussions/598).
+
+### Presentación de consentimiento separada por población — 2026-09-05
+
+La resolución vigente de autoridad precede a cualquier lectura de nombres. El consentimiento
+interno usa una proyección mínima de bindings internos del store interno; el externo conserva
+el reader restringido a externos. Ambos verifican población, binding, organización, entorno,
+estado, revocación y gv. Un reader ausente o de otra población deniega, nunca elige fallback.
+El canary real detectó el antiguo uso del reader externo para internos después de un SSO
+correcto; la corrección no modifica la autoridad ni amplía el reader externo.
+
+### Formularios HTML y origen CSRF — 2026-09-05
+
+Las páginas HTML usan `Referrer-Policy: strict-origin`: no envían rutas ni queries como
+Referer y conservan Origin en POST HTTPS del formulario. JSON y redirecciones mantienen
+no-referrer. No se relaja el guard de origen ni se acepta Origin:null indiscriminadamente.
+Reproducción en navegador integrado: policy anterior produce Origin opaque/null con
+Sec-Fetch-Site same-origin y decision válida; strict-origin produce origen propio y Referer
+sólo origen. [Fetch Standard](https://fetch.spec.whatwg.org/#append-a-request-origin-header).
+La prueba de navegador canónica debe ejecutar el handler real, con controles negativo
+no-referrer y cross-origin; un test unitario con header Origin escrito a mano no reproduce
+la interacción del navegador y la política de respuesta.
+
+La página de consentimiento permite además en form-action el origen del callback que
+authorize ya resolvió contra los redirects registrados del cliente. No toma ese origen
+directamente de la query ni amplía la CSP de otras páginas. La ruta POST→authorize→callback
+se prueba en navegador: self-only bloquea la redirección final en Chromium; permitir el
+origen validado conserva el flujo y sigue bloqueando destinos de otros orígenes. La CSP
+no sustituye la coincidencia exacta de redirect_uri realizada por el protocolo.

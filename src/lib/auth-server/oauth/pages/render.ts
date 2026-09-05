@@ -11,7 +11,8 @@ import { GH_AUTH_SERVER } from '@/lib/copy/auth-server'
 
 import type { OAuthErrorCode } from '../errors'
 import { EFEONCE_ISOTIPO_SVG, EFEONCE_LOGOTYPE_NEGATIVE_SVG } from './efeonce-isotipo.generated'
-import { ICON_ALERT, ICON_BUILDING, ICON_EYE, ICON_LOCK, ICON_PENCIL, ICON_SHIELD_CHECK } from './icons'
+import { renderClientMark } from './client-marks'
+import { ICON_ALERT, ICON_ARROW_RIGHT, ICON_BUILDING, ICON_EYE, ICON_LOCK, ICON_PENCIL, ICON_SHIELD_CHECK } from './icons'
 import { AUTH_SERVER_STYLES } from './styles.generated'
 import { isWriteScope } from '../scopes'
 
@@ -40,10 +41,30 @@ const brandRail = (): string => `<aside class="id-rail">
       <p class="id-rail-body">${escapeHtml(GH_AUTH_SERVER.login_rail_body)}</p>
       <p class="id-rail-trust">${ICON_LOCK}<span>${escapeHtml(GH_AUTH_SERVER.login_rail_trust)}</span></p>
     </div>
-    <span class="id-rail-mark" aria-hidden="true">${EFEONCE_ISOTIPO_SVG}</span>
   </aside>`
 
-export const layout = (title: string, body: string, options: { state?: 'login' | 'consent' | 'verification'; clientName?: string } = {}): string => {
+/**
+ * Ficha de la aplicación que pide acceso.
+ *
+ * Cuando el origen del cliente no es comprobable no basta con no prestarle el logo: alguien que
+ * llega desde una app llamada «Claude Desktop» puede leer el monograma como «el logo no cargó». La
+ * ficha lo dice, con el hecho y no con una acusación, y el aviso va antes de la decisión.
+ */
+const clientContext = (clientName: string, clientId: string): string => {
+  const mark = renderClientMark({ clientId, clientName })
+
+  return `<div class="id-context" data-capture="id-client">
+      <span class="id-muted">${escapeHtml(GH_AUTH_SERVER.application_context_label)}</span>
+      <span class="id-client">${mark.html}<strong>${escapeHtml(clientName)}</strong></span>
+      ${mark.verified ? '' : `<span class="id-unverified" data-capture="id-client-unverified">${ICON_ALERT}<span><strong>${escapeHtml(GH_AUTH_SERVER.application_unverified_label)}.</strong> ${escapeHtml(GH_AUTH_SERVER.application_unverified_hint)}</span></span>`}
+    </div>`
+}
+
+export const layout = (
+  title: string,
+  body: string,
+  options: { state?: 'login' | 'consent' | 'verification'; clientName?: string; clientId?: string } = {}
+): string => {
   const state = options.state ?? 'verification'
 
   return `<!doctype html>
@@ -52,6 +73,7 @@ export const layout = (title: string, body: string, options: { state?: 'login' |
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <title>${escapeHtml(title)} · ${escapeHtml(GH_AUTH_SERVER.brand_title)}</title>
 <style>${STYLES}</style>
 </head>
@@ -59,7 +81,7 @@ export const layout = (title: string, body: string, options: { state?: 'login' |
 <div class="id-canvas" data-state="${state}">
   <main class="id-page" data-capture="id-shell" data-state="${state}" data-surface-recipe="settingsFlow" aria-labelledby="page-title">
     <header class="id-brand" aria-label="${escapeHtml(EFEONCE_BRAND_NAME)}">${EFEONCE_ISOTIPO_SVG}<span>${escapeHtml(GH_AUTH_SERVER.brand_title)}</span></header>
-    ${options.clientName ? `<div class="id-context" data-capture="id-client"><span class="id-muted">${escapeHtml(GH_AUTH_SERVER.application_context_label)}</span><strong>${escapeHtml(options.clientName)}</strong></div>` : ''}
+    ${options.clientName ? clientContext(options.clientName, options.clientId ?? '') : ''}
     <div class="id-surface">${body}</div>
   </main>
   ${state === 'login' ? brandRail() : ''}
@@ -68,13 +90,18 @@ export const layout = (title: string, body: string, options: { state?: 'login' |
 </html>`
 }
 
+/**
+ * La salida SIEMPRE existe. Sin `returnTo` esta página mostraba el texto y ninguna acción: un
+ * callejón sin salida servido con 401 (lo alcanzaba `consent-endpoint`). Sin destino de retorno se
+ * va igual a `/login`, que es lo que la persona necesita; con destino, se preserva.
+ */
 export const renderLoginRequiredPage = (returnTo?: string): string =>
   layout(
     GH_AUTH_SERVER.login_required_title,
     `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.login_required_title)}</h1>
   <p>${escapeHtml(GH_AUTH_SERVER.login_required_body)}</p>
   <p class="muted">${escapeHtml(GH_AUTH_SERVER.login_required_hint)}</p>
-  ${returnTo ? `<a href="${escapeHtml('/login?' + new URLSearchParams({ return_to: returnTo }))}">${escapeHtml(GH_AUTH_SERVER.login_continue_cta)}</a>` : ''}`
+  <div class="id-actions"><a class="id-primary" href="${escapeHtml(returnTo ? '/login?' + new URLSearchParams({ return_to: returnTo }) : '/login')}">${ICON_ARROW_RIGHT}${escapeHtml(GH_AUTH_SERVER.login_continue_cta)}</a></div>`
   )
 
 export const renderStepUpRequiredPage = (returnTo?: string): string =>
@@ -82,7 +109,7 @@ export const renderStepUpRequiredPage = (returnTo?: string): string =>
     GH_AUTH_SERVER.step_up_required_title,
     `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.step_up_required_title)}</h1>
   <p>${escapeHtml(GH_AUTH_SERVER.step_up_required_body)}</p>
-  ${returnTo ? `<a class="id-primary" href="${escapeHtml('/login/step-up?' + new URLSearchParams({ return_to: returnTo }))}">${ICON_SHIELD_CHECK}${escapeHtml(GH_AUTH_SERVER.totp_verify_submit_cta)}</a>` : ''}`
+  <div class="id-actions"><a class="id-primary" href="${escapeHtml(returnTo ? '/login/step-up?' + new URLSearchParams({ return_to: returnTo }) : '/login/step-up')}">${ICON_SHIELD_CHECK}${escapeHtml(GH_AUTH_SERVER.totp_verify_submit_cta)}</a></div>`
   )
 
 export type ConsentPageInput = {
@@ -135,7 +162,7 @@ export const renderConsentPage = (input: ConsentPageInput): string => {
   </form>
   <p class="muted">${escapeHtml(GH_AUTH_SERVER.consent_footer)}</p>
   <p class="code">${escapeHtml(GH_AUTH_SERVER.consent_client_id_label)}: ${escapeHtml(input.clientId)}</p>`,
-    { state: 'consent', clientName: input.clientName }
+    { state: 'consent', clientName: input.clientName, clientId: input.clientId }
   )
 }
 

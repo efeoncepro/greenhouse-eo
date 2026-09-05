@@ -1,4 +1,5 @@
 import { AUTH_INTERNAL_LOGIN_COPY } from '@/lib/copy/auth-server-internal-login'
+import { ICON_ALERT, ICON_ARROW_RIGHT } from '../oauth/pages/icons'
 import { escapeHtml, layout } from '../oauth/pages/render'
 import { htmlResponse, jsonResponse, type OAuthHttpRequest } from '../oauth/http'
 
@@ -34,7 +35,9 @@ export const internalLoginFailureResponse = (
       copy.title,
       `<section data-capture="auth-internal-login-error">
       <h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(copy.title)}</h1>
-      <p>${escapeHtml(body)}</p><p class="id-muted">${escapeHtml(copy.recovery)}</p>
+      <p class="id-alert" role="alert">${ICON_ALERT}<span>${escapeHtml(body)}</span></p>
+      <p class="id-muted">${escapeHtml(copy.recovery)}</p>
+      <div class="id-actions"><a class="id-primary" href="/login">${ICON_ARROW_RIGHT}${escapeHtml(copy.retryCta)}</a></div>
     </section>`
     ),
     responseHeaders

@@ -89,7 +89,7 @@ de reparar por un command explícito. No declarar este procedimiento ejecutado h
   intercambio/refresh y resolución de contexto. OFF no cambia el carril externo.
 - `AUTH_SERVER_ENTRA_TENANT_ID`, `AUTH_SERVER_ENTRA_CLIENT_ID`: aplicación upstream de un solo tenant.
 - Redirect web exacto: `https://auth.efeonce.org/auth/internal/callback`.
-- Solicitar `openid profile`, PKCE S256 y `max_age=0`; configurar emisión de `auth_time`. `profile` es necesario para el claim `oid`; no pedir scopes de negocio ni `offline_access`.
+- Solicitar `openid profile`, PKCE S256 y `prompt=login`; configurar emisión de `auth_time`. `profile` es necesario para el claim `oid`; no pedir scopes de negocio ni `offline_access`.
   No inferir MFA desde Entra ni pedir scopes Graph de negocio.
 - `AUTH_SERVER_ENTRA_CLIENT_SECRET_REF`: referencia Secret Manager en deploy;
   el runtime recibe `AUTH_SERVER_ENTRA_CLIENT_SECRET`. Nunca incluir valor en CLI/documentación.
@@ -433,3 +433,91 @@ revisión `efeonce-mcp-gateway-00032-qm5` Ready al 100%, digest
 `sha256:6f28046f525d965a54a6fca97e730fa5ef741c9be578181c79962df14bec4a39`. Ambos flags ON,
 referencias de máquina montadas; health 200 y discovery ON verificado, conservando Entra. Este
 resultado no acredita todavía un dispatch con token corporativo.
+
+
+## Integridad publicada y nuevo intento corporativo — 2026-09-05 21:09 UTC
+
+PR224/main d551cf368, release33991304002 success; manifest
+`d551cf3689db-8a4af809-0c28-496d-82c9-a17ed7593ce3` released, health y watchdog5/5 correctos.
+Migración/reconciliación aplicadas, dos eventos publicados, señales0. Gateway d7469d7/revisión00033-597
+publicado; reader Production devuelve internal_population sin membresías para el recorrido externo.
+Detalle de evidencias en TASK-1836 §Release de integridad y ledger de tiempos.
+
+Emisor activado después del release: GitHub repo true y revisión auth-server-00015-jrc Ready100%,
+misma imagen validada de ace63705e. Reader y gateway ON. No ampliar la cohorte: falta token humano,
+refresh, revocación selectiva y rollback cronometrado. El intento actual espera contraseña reciente
+Microsoft, introducida exclusivamente por el operador en su navegador.
+
+La UI de Claude presenta Microsoft sólo con `internalLoginEnabled` y `return_to` válido hacia
+`/oauth/authorize`. Abrir `/login` directamente muestra la puerta de invitación por correo. Para probar
+el acceso corporativo, iniciar una solicitud OAuth válida del cliente registrado y seguir el enlace al
+login. No fabricar un return_to arbitrario ni eliminar validaciones para hacer visible el botón.
+
+
+## Nuevo rechazo JWT — 2026-09-05 21:20 UTC
+
+El callback21:15:25.036Z registra upstream_rejected / jwt_validation_failed, posterior al intercambio
+upstream. No existe token MCP nuevo. Emisor contenido otra vez: GitHub false y auth-server-00016-srj
+Ready100%, internalAuth false verificado. Reader/gateway no cambiados. Nueva clasificación JOSE local
+mantiene validación y respuesta pública; registrar sólo enums, nunca payload/cause/token.
+Azure CLI y documentación Microsoft no justifican cambiar tenant, firma ni claims: investigar con el
+diagnóstico publicado antes de repetir canary. Evidencia y fuentes en TASK-1836 §Callback real rechazado.
+
+## Corrección de la solicitud interactiva — 2026-09-05 21:48 UTC
+
+Diagnóstico e4977392b publicado en auth-server-00017-mrd y activado temporalmente en
+00018-w7g. El intento real request21:47:13.951Z / callback21:48:03.553Z se rechazó
+con `jwt_expired`; no hubo token MCP. Emisor apagado nuevamente: GitHub false y
+auth-server-00019-4sg Ready100%.
+
+La solicitud pasa de `max_age=0` a `prompt=login`. Microsoft documenta que prompt login
+solicita credenciales; el mantenedor MSAL documentó efectos de max_age corto sobre exp,
+pero ese antecedente no prueba el lifetime del ID token de este intento. No se amplía
+tolerancia de exp ni se aceptan tokens expirados. auth_time sigue obligatorio y firmado,
+no futuro, dentro de 600 segundos y posterior a la transacción server-side menos 60 segundos.
+Se retira únicamente el orden auth_time<=iat, que OIDC no exige: el instante de
+autenticación no se deduce del instante de emisión retrospectivo. Firma, issuer, audiencia,
+nonce, PKCE, tenant y object ID siguen vigentes. Nuevo canary pendiente.
+
+Fuentes: [Microsoft OIDC](https://learn.microsoft.com/en-us/entra/identity-platform/v2-protocols-oidc),
+[MSAL discussion598](https://github.com/AzureAD/microsoft-authentication-library-for-python/discussions/598).
+
+## Follow-up 22:04 UTC — Microsoft completado, consentimiento en reparación
+
+SSO consume22:01:26.817Z success en61d5fe1f0; ya no jwt_expired. El siguiente authorize
+rechazó consent_context_unavailable porque usó reader externo para binding interno.
+Corrección local separa la proyección de nombre interna y comprueba población. Readback PG
+real y pruebas unitarias correctos; cero tokens MCP. Emisor OFF rev22-8n5/GitHub false.
+Publicación y nuevo authorize con sesión humana pendientes; no reutilizar el callback OAuth.
+
+## Follow-up 22:19 UTC — consentimiento visible, política del POST en corrección
+
+Deploy33995163892/buildadbe0456 correctos, SHA ddbd011f5 en rev23 y activación rev24.
+La sesión Microsoft se reutilizó: authorize muestra organización Efeonce y lectura sin
+contraseña nueva. POST Autorizar devuelve invalid_request; no hubo token. Diagnóstico
+local con formulario real en el mismo navegador confirma no-referrer→Origin:null,
+Sec-Fetch-Site same-origin y decisionallow. strict-origin produce origen propio y Referer
+sólo origen. Cambiar sólo respuestas HTML; conservar guardCSRF y no-referrer JSON/redirect.
+Reactivación suspendida mientras se publica; no reusar callback ni transacción abandonada.
+
+La reproducción completa detecta también bloqueo CSP de POST→authorize→callback en
+Chromium con form-action self-only. El consentimiento añade sólo el origen del callback
+prevalidado del cliente; otras páginas mantienen self-only. Gate local:
+`node scripts/auth-server/probe-form-origin.mjs` (sin credenciales ni destinos externos).
+No reemplazarlo por fetch ni por tests que escriben el header Origin manualmente.
+
+Validación local de la corrección de formularios: 229 pruebas passed/4live omitidas y tsc0.
+`node scripts/auth-server/probe-form-origin.mjs --chromium-only`: 6/6 passed, sin requests
+externos. WebKit pendiente de instalación; no declarado correcto. El navegador integrado
+confirmó además Origin:null anterior y origen propio con Referer sólo origen al corregir.
+
+## Canary interno completado — 2026-09-05 22:44 UTC
+
+09def4fc4 desplegado (build31ccc5d7, run33996045509, imagen0dd44fc490ef). Consentimiento,
+token y lecturaMCP Efeonce exitosos; organización ajena denegada; refreshrotativo correcto.
+Revocación token→dispatchdenegado10.151s; retirogrant→deny cota11s; gatewayOFF→deny cota20s.
+Restore completo79s. AuthON rev29-tfx; gatewayON rev35-bhd; variablesdurablesGitHubtrue.
+ReaderVercelProduction permaneceON. Grantrestaurado expiryoriginal2026-09-12T15:00Z, gv5;
+tokenscanaryrevocados y helperscerrados. Señalesintegridad0. Detalle y timestamps enTASK1836.
+No equivale a certificación de clientes externos/Entra legado ni a cierre del siguiente
+release main (último certificado d551cf368). La promoción nueva sigue pendiente.

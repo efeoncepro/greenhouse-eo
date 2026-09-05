@@ -1,17 +1,29 @@
 # Handoff activo
 
-**TASK-1836, 2026-09-05 — publicación reanudada:** Claude terminó la pasada UI autorizada
-(Nocturno editorial) y guardó la reparación de Codex en `0fc7a4bc5`; checkout limpio al retomar.
-Operador pidió revisar e integrar ese trabajo y avanzar con todo el rollout. 407 pruebas auth/identity
-pasaron y browser local 6/6 sin violaciones; build integrado exit0. Gateway `d7469d7` pusheado,
-CI/contenedor correctos y deploy33988521730 en curso. Emisor interno sigue OFF hasta readbacks.
-Migración `20260905183812333` y reconciliación ya aplicadas (gv3, segunda revisión0/0, ambas señales0);
-no repetir operaciones como si estuvieran pendientes. Sin canary humano/refresh/revocación/rollback
-todavía. [Task](docs/tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md) ·
+**TASK-1836, 2026-09-05 22:44 UTC — acceso interno verificado, promoción final pendiente:**
+Runtime09def4fc4: Microsoft→consentimiento→token→MCP Efeonce PASSED. Foreignorgdeny, refresh
+rotativo, revocacióntoken10.151s, retirogrant<=11s, gatewayOFFdeny<=20s; restore79s.
+PilotoON authrev29-tfx/gatewayrev35-bhd, GitHubtrue, grantoriginalvence2026-09-12T15:00Z, gv5.
+Todos los tokenscanaryrevocados, helperscerrados; integridadunaudited/mixed0.
+229unitpassed/4liveomitidas, Chromium6/6; WebKitinstalaciónfallida explícitamente pendiente.
+Main d551cf368 último release certificado; sync8d7b205ca conserva tree09def exacto (mainigual
+a ancestro25f3db5f9). Próximo: docs/gates, pushPRmain y release gobernado; no nueva MFA prevista.
+No cerrar matricesamplias de clientes externos, multicontexto ni UI (contraste pendiente).
+[Task](docs/tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md) ·
 [Runbook](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md) ·
-[Autorizaciones originales](docs/operations/TASK-1836_INTEGRITY_SESSION_HANDOFF_2026-09-05.md).
+[Autorizaciones](docs/operations/TASK-1836_INTEGRITY_SESSION_HANDOFF_2026-09-05.md).
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
+
+**MCP gateway — cartel del servidor, 2026-09-05 — DESPLEGADO:** `efeonce-mcp` `815df9b` en producción,
+revisión `efeonce-mcp-gateway-00036-5wc`. El gateway declara `title`/`websiteUrl`/`icons` y sirve UN ícono
+(isotipo blanco sobre placa navy opaca, sin `theme`, sin radio horneado). Front door verificado en vivo:
+`/icon-512.png` 200 `image/png` con bytes idénticos al asset del repo y sin challenge de auth;
+`/.well-known/oauth-protected-resource` 200; `POST /mcp` sin token 401 (fail-closed intacto);
+`/icon-512-dark.png` 404; `auth.efeonce.org/readyz` 200 (el piloto de TASK-1836 no se tocó). El deploy llevó
+sólo estos commits: la revisión anterior `00035-bhd` estaba construida desde `d7469d7`, su padre exacto. Sin
+impacto visible: ningún cliente Claude renderiza `icons` todavía. Razones:
+[ADR](docs/architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md) §Delta 2026-09-05.
 
 **Berel, 2026-09-04:** Playbook Producción y feedback nuevo de septiembre leídos completos y promovidos a
 `berel-content-production` en los espejos Claude/Codex. La skill ahora distingue ficha técnica de página
@@ -480,15 +492,3 @@ readback no facturable, luego `draining -> active`; ante falla se vuelve primero
 Las skills espejo `greenhouse-globe` y `greenhouse-globe-model-fleet` ya bloquean deploys, migraciones,
 generaciones, canarios y promociones mientras el estado siga hibernado. El ledger de modelos conserva evidencia
 histórica de integración, pero deja explícito que `available` no significa ejecutable durante la hibernación.
-
-## 2026-09-02 (3) — cada task ETV/cluster incluye tools y skills MCP
-
-Las nueve tasks de la secuencia (`1805`, `1806`, `1312`, `1313`, `1314`, `1808`–`1811`) declaran ahora un
-`MCP Tools & Skills Contract` exigible. Cada una debe crear o actualizar tools, lane ecosystem,
-manifest/artefacto, federación o exclusión razonada y las skills `dataforseo-operator`/`seo-aeo` espejadas. Si el
-registro de skills servidas de `TASK-1804` existe al ejecutarla, también actualiza ese recurso agent-facing.
-
-Las tools read no compran datos on-read. Writes o gasto siguen bajo capability fina,
-`propose → confirm → execute`, presupuesto, idempotencia y audit; el cliente PKCE público nunca recibe write
-scope. El cierre requiere canaries allow/deny/fault y readback real del gateway. Cambio documental solamente:
-sin código, tools creadas, gasto, deploy ni runtime mutation todavía.

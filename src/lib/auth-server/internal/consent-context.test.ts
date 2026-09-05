@@ -8,9 +8,12 @@ import {
   type ConsentContextDependencies
 } from './consent-context'
 
-const canonical = vi.hoisted(() => ({ getBinding: vi.fn(), external: vi.fn() }))
+const canonical = vi.hoisted(() => ({ getBinding: vi.fn(), getInternalBinding: vi.fn(), external: vi.fn() }))
 
 vi.mock('@/lib/identity/external-access/store', () => ({ getExternalOrganizationBinding: canonical.getBinding }))
+vi.mock('@/lib/identity/internal-access/store', () => ({
+  getInternalOrganizationBindingPresentation: canonical.getInternalBinding
+}))
 vi.mock('@/lib/identity/external-access/resolve-external-access', () => ({ resolveExternalAccess: canonical.external }))
 
 const config = { issuer: 'https://auth.example', environmentId: 'efeonce-auth', mcpAudience: 'https://mcp.example/mcp' }
@@ -42,22 +45,27 @@ const context: InternalAuthorizationContext = {
   revokedAt: null
 }
 
-const binding: ExternalOrganizationBinding = {
+type BindingPresentation = Pick<
+  ExternalOrganizationBinding,
+  | 'bindingId'
+  | 'organizationId'
+  | 'environmentId'
+  | 'population'
+  | 'organizationName'
+  | 'status'
+  | 'revokedAt'
+  | 'grantsVersion'
+>
+
+const binding: BindingPresentation = {
   population: 'external',
   bindingId: 'binding-a',
   organizationId: 'org-a',
   organizationName: 'Efeonce',
   environmentId: config.environmentId,
-  externalOrganizationRef: 'external-a',
   status: 'active',
   grantsVersion: 3,
-  designatedAdminProfileId: null,
-  reason: null,
-  boundBy: 'operator',
-  boundAt: new Date().toISOString(),
-  revokedBy: null,
-  revokedAt: null,
-  revokeReason: null
+  revokedAt: null
 }
 
 const fixture = () => {
@@ -88,7 +96,10 @@ const fixture = () => {
     ]
   }))
 
-  const getBinding = vi.fn<ConsentContextDependencies['getBinding']>(async () => binding)
+  const getBinding = vi.fn<ConsentContextDependencies['getBinding']>(async (_id, population) => ({
+    ...binding,
+    population
+  }))
 
   return { internal, external, getBinding, port: createConsentContextPort({ config, internal, external, getBinding }) }
 }
@@ -102,6 +113,7 @@ describe('consent context presentation from current authority', () => {
       population: 'internal',
       organizations: [{ organizationName: 'Efeonce', capabilities: ['growth.seo.observation.read'] }]
     })
+    expect(f.getBinding).toHaveBeenCalledWith('binding-a', 'internal')
     expect(f.internal.resolve).toHaveBeenCalledWith({
       id: 'ctx',
       version: 1,
@@ -143,6 +155,17 @@ describe('consent context presentation from current authority', () => {
       ]
     })
     expect(f.internal.resolve).not.toHaveBeenCalled()
+    expect(f.getBinding).toHaveBeenNthCalledWith(1, 'binding-a', 'external')
+    expect(f.getBinding).toHaveBeenNthCalledWith(2, 'binding-b', 'external')
+  })
+  it.each(['internal', 'external'] as const)('denies binding population crossing in the %s lane', async population => {
+    const f = fixture()
+
+    f.getBinding.mockResolvedValue({ ...binding, population: population === 'internal' ? 'external' : 'internal' })
+    expect(
+      await f.port.resolve({ ...input, authorizationContextId: population === 'internal' ? 'ctx' : null })
+    ).toEqual({ outcome: 'denied' })
+    expect(f.getBinding).toHaveBeenCalledWith('binding-a', population)
   })
   it.each([
     'bindingId',
@@ -157,6 +180,7 @@ describe('consent context presentation from current authority', () => {
 
     f.getBinding.mockResolvedValue({
       ...binding,
+      population: 'internal',
       [field]:
         field === 'grantsVersion'
           ? 4
@@ -235,10 +259,12 @@ describe('consent context presentation from current authority', () => {
     expect(f.getBinding).not.toHaveBeenCalled()
     expect(f.internal.resolve).not.toHaveBeenCalled()
   })
-  it('production factory uses the canonical binding and external readers', async () => {
+  it('production factory uses separate population readers without external fallback for internal bindings', async () => {
     const f = fixture()
 
-    canonical.getBinding.mockResolvedValue(binding)
+    canonical.getBinding.mockReset().mockResolvedValue(binding)
+    canonical.getInternalBinding.mockReset().mockResolvedValue({ ...binding, population: 'internal' })
+    canonical.external.mockReset()
     canonical.external.mockResolvedValue(
       await f.external({ environmentId: input.environmentId, subject: input.subject, clientId: input.clientId })
     )
@@ -252,8 +278,16 @@ describe('consent context presentation from current authority', () => {
     })
     expect(canonical.getBinding).toHaveBeenCalledWith('binding-a')
     expect(f.internal.resolve).not.toHaveBeenCalled()
+    expect(canonical.getInternalBinding).not.toHaveBeenCalled()
+    // An external reader correctly cannot see an internal binding in production.
+    canonical.getBinding.mockClear().mockResolvedValue(null)
     expect((await port.resolve(input)).outcome).toBe('resolved')
-    expect(f.internal.resolve).toHaveBeenCalledTimes(1)
+    expect(canonical.getInternalBinding).toHaveBeenCalledWith('binding-a')
+    expect(canonical.getBinding).not.toHaveBeenCalled()
+    canonical.getInternalBinding.mockResolvedValueOnce(null)
+    expect(await port.resolve(input)).toEqual({ outcome: 'denied' })
+    expect(canonical.getBinding).not.toHaveBeenCalled()
+    expect(f.internal.resolve).toHaveBeenCalledTimes(2)
     expect(canonical.external).toHaveBeenCalledTimes(1)
   })
 })

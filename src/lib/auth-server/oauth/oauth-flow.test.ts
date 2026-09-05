@@ -146,6 +146,17 @@ describe('auth-server OAuth flow (in-process)', () => {
     expect(shown?.body).toContain('&lt;Org A&gt;')
     expect(shown?.body).toContain('Org B')
     expect(shown?.body).not.toContain(PERSON.subject)
+    // Browser enforcement is exercised by scripts/auth-server/probe-form-origin.mjs;
+    // this contract checks that only the already-registered callback reaches that policy.
+    expect(shown?.headers['Content-Security-Policy'].split(';').map(part => part.trim()))
+      .toContain("form-action 'self' https://client.example")
+    const forged = new URL(authorizeUrl, ISSUER)
+
+    forged.searchParams.set('redirect_uri', 'https://unregistered.example/cb')
+    const rejectedRedirect = await h.handler(request('GET', forged.pathname + forged.search))
+
+    expect(rejectedRedirect?.status).not.toBe(200)
+    expect(rejectedRedirect?.headers['Content-Security-Policy'] ?? '').not.toContain('unregistered.example')
 
     for (const outcome of ['denied', 'unavailable'] as const) {
       h.consentContext.result = { outcome }

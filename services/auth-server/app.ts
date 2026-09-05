@@ -159,7 +159,7 @@ export const createAuthServerRequestHandler = (deps: AuthServerAppDeps): NodeReq
         return
       }
 
-      if (deps.enabled && path.startsWith('/fonts/')) {
+      if (deps.enabled && (path.startsWith('/fonts/') || path === '/favicon.svg')) {
         const asset = getAuthFontAsset(path)
 
         if (!asset) {
@@ -235,6 +235,20 @@ return
       }
 
       const isProtocolPath = isOAuthPath(path)
+
+      /**
+       * La raíz del host no es una ruta del protocolo, pero SÍ es lo que teclea una persona: hasta
+       * ahora devolvía `{"error":"not_found"}` en crudo sobre un dominio de marca. Se manda al login
+       * — y sólo cuando ese login existe, porque con la superficie de personas apagada el destino
+       * sería otro 404.
+       */
+      if (method === 'GET' && path === '/' && deps.enabled && persons) {
+        res.writeHead(302, { Location: '/login', 'Cache-Control': 'no-store' })
+        res.end()
+
+        return
+      }
+
       const isPersonPath = Boolean(persons) && isPersonAuthPath(path)
       const isInternalPath = Boolean(deps.internal) && isInternalLoginPath(path)
 

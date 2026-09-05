@@ -15,6 +15,20 @@ export const INTERNAL_LOGIN_DIAGNOSTICS = [
   'token_exchange_rejected',
   'token_response_invalid',
   'jwt_validation_failed',
+  'jwt_expired',
+  'jwt_not_yet_valid',
+  'jwt_issuer_invalid',
+  'jwt_audience_invalid',
+  'jwt_auth_time_missing',
+  'jwt_oid_missing',
+  'jwt_required_claim_missing',
+  'jwt_claim_invalid',
+  'jwt_signature_invalid',
+  'jwt_key_not_found',
+  'jwt_key_ambiguous',
+  'jwt_key_set_invalid',
+  'jwt_malformed',
+  'jwt_algorithm_invalid',
   'identity_claims_invalid',
   'authentication_stale',
   'identity_not_enrolled'
@@ -29,6 +43,34 @@ export class InternalLoginError extends Error {
     super(code)
     this.name = 'InternalLoginError'
   }
+}
+
+/** Closed classifications only: JOSE errors can contain the entire ID token payload. */
+const jwtFailureDiagnostic = (error: errors.JOSEError): InternalLoginDiagnostic => {
+  if (error instanceof errors.JWTExpired) return 'jwt_expired'
+  if (error instanceof errors.JWSSignatureVerificationFailed) return 'jwt_signature_invalid'
+  if (error instanceof errors.JWKSNoMatchingKey) return 'jwt_key_not_found'
+  if (error instanceof errors.JWKSMultipleMatchingKeys) return 'jwt_key_ambiguous'
+  if (error instanceof errors.JWKInvalid || error instanceof errors.JWKSInvalid) return 'jwt_key_set_invalid'
+  if (error instanceof errors.JWTInvalid || error instanceof errors.JWSInvalid) return 'jwt_malformed'
+  if (error instanceof errors.JOSEAlgNotAllowed) return 'jwt_algorithm_invalid'
+
+  if (error instanceof errors.JWTClaimValidationFailed) {
+    if (error.reason === 'missing') {
+      if (error.claim === 'auth_time') return 'jwt_auth_time_missing'
+      if (error.claim === 'oid') return 'jwt_oid_missing'
+
+      return 'jwt_required_claim_missing'
+    }
+
+    if (error.claim === 'iss') return 'jwt_issuer_invalid'
+    if (error.claim === 'aud') return 'jwt_audience_invalid'
+    if (error.claim === 'nbf' && error.reason === 'check_failed') return 'jwt_not_yet_valid'
+
+    return 'jwt_claim_invalid'
+  }
+
+  return 'jwt_validation_failed'
 }
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -135,8 +177,9 @@ export const createEntraOidcClient = (deps: {
         nonce,
         code_challenge: codeChallenge,
         code_challenge_method: 'S256',
-        // Request a fresh authentication time; no business API scopes or refresh custody upstream.
-        max_age: '0'
+        // Entra can shorten token lifetime with max_age. Require interactive login instead;
+        // signed auth_time is still checked against now and the server-side transaction below.
+        prompt: 'login'
       }).toString()
 
       return url.toString()
@@ -198,7 +241,6 @@ export const createEntraOidcClient = (deps: {
         }
 
         if (
-          payload.auth_time > payload.iat ||
           payload.auth_time > Math.floor(now.getTime() / 1000) ||
           payload.auth_time < Math.floor(now.getTime() / 1000) - 600
         ) {
@@ -215,7 +257,7 @@ export const createEntraOidcClient = (deps: {
         if (error instanceof InternalLoginError) throw error
 
         if (error instanceof errors.JOSEError && !(error instanceof errors.JWKSTimeout)) {
-          throw new InternalLoginError('upstream_rejected', 'jwt_validation_failed')
+          throw new InternalLoginError('upstream_rejected', jwtFailureDiagnostic(error))
         }
 
         // No upstream body, token, code or low-level message crosses this boundary.
@@ -333,7 +375,8 @@ export const createInternalLoginFlow = (deps: {
       now
     })
 
-    // max_age=0 is a fresh-login request. Tolerate only one minute of clock skew relative to start.
+    // Enforce fresh login from signed auth_time even if the browser removes prompt=login.
+    // Tolerate only one minute of clock skew relative to the server-side transaction start.
     if (
       !Number.isFinite(identity.authTime.getTime()) ||
       identity.authTime.getTime() < transaction.createdAt.getTime() - 60000

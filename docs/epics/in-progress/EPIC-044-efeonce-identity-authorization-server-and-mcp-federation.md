@@ -89,8 +89,9 @@ KMS, los canaries de cliente, el aseguramiento y la convergencia del login del p
 | **U10** | [TASK-1813](../../tasks/to-do/TASK-1813-efeonce-mcp-oauth-client-interoperability.md) | Interoperabilidad OAuth Codex/Claude del carril interno Entra (discovery, shim, scopes). Carril paralelo; no construye broker. | — |
 
 | **U11** | [TASK-1836](../../tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md) | Acceso interno por Efeonce ID: autenticación corporativa, binding canónico y autoridad delegada. Backend; gateway/UI conservan U05/U06. Contrato ADR antes de código; implementación pendiente. | Contratos U02/U03/U04 |
+| **U12** | [TASK-1837](../../tasks/to-do/TASK-1837-efeonce-id-external-invitation-delivery-delegated-authority.md) | Entrega gobernada de la invitación externa: el sistema envía el correo en el mismo acto que genera el token (el evento del outbox no lleva el secreto ni puede llevarlo), el token sale de la respuesta salvo excepción gobernada de 1 h, ciclo de vida observable (reenviar = rotar, rebote, caducidad, 3 señales), autoridad delegada del administrador del cliente por lane ecosystem, y host del `redirect_uri` en el consentimiento (MUST del protocolo hoy incumplido). Sin ella el último tramo del alta lo hace una persona copiando un secreto. Bloquea U07; desbloquea el carril de tokens de U03. | U02/U03/U04 |
 
-Una sola task ejecutable posee cada unidad. `TASK-1836` es U11; `TASK-659` y `TASK-658` permanecen relacionadas (ver
+Una sola task ejecutable posee cada unidad. `TASK-1836` es U11 y `TASK-1837` es U12; `TASK-659` y `TASK-658` permanecen relacionadas (ver
 *Existing Related Work*). El orden lo definen este epic y el `Rank`, no la antigüedad del ID.
 
 ## Execution Order

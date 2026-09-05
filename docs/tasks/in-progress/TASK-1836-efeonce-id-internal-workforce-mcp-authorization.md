@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `2026-09-05: publicación reanudada tras cierre UI de Claude y autorización del operador para integrar y avanzar. Reparación commit 0fc7a4bc5; 407 pruebas auth/identity y 6 checks browser local correctos, build exit0. Gateway d7469d7 pusheado y CI/contenedor verde, deploy en curso. Migración y reconciliación ya aplicadas (gv3, idempotencia0/0, ambas señales0). Emisor interno OFF hasta release/readbacks; canary humano, refresh, revocación y rollback pendientes.`
+- Status real: `2026-09-05 22:44 UTC: canary interno real PASSED en runtime09def4fc4. Microsoft+consentimiento+token+MCP lectura Efeonce correctos; foreign orgdenegada; refreshrotativo; revocacióntoken10.151s; retirogrant<=11s; gatewayOFFdeniega<=20s; emisorOFFdeniegarefresh. Piloto restauradoON authrev29-tfx/gatewayrev35-bhd, gv5, expiryoriginal2026-09-12T15:00Z; tokenspruebarevocados. Main d551cf368 sigue último release certificado; promoción formal nueva pendiente. Matrices amplias de clientes externos/WebKit yUI no declaradas completas.`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -580,14 +580,14 @@ interactivo del sujeto real cuando corresponda. No enviar correos ni mensajes si
 
 - [ ] Cada caso de la matriz §8 tiene evidencia de comportamiento y outcome esperado/real; casos live sin ejecutar quedan pendientes, nunca verdes por skip.
 - [ ] Inventario de configuración Entra, redirects, secrets y flags verificado sin valores sensibles; callback real corresponde al runtime desplegado.
-- [ ] Enrolamiento idempotente y auditado, con capability fina y camino programático; ningún vínculo nace por coincidencia de email. **Reabierto 2026-09-05:** los tests actuales prueban idempotencia y audit/outbox internos, pero el piloto carece de audit y eventos canónicos de las tablas compartidas. Falta unificar writer/política de población, proteger recuperación cruzada y regularizar filas con evidencia explícita; no considerar este criterio satisfecho por el audit interno solamente.
+- [x] Enrolamiento idempotente y auditado, con capability fina y camino programático; ningún vínculo nace por coincidencia de email. Reapertura de integridad resuelta: writers transaccionales compartidos, población inmutable y recuperación cruzada protegida; 20 live + recuperación externa live adicional passed. Migración aplicada y reconciliación explícita del piloto con audit/outbox canónicos correlacionados, publicados; repetición 0/0 sin cambiar gv3 ni expiración original. Evidencia en §Integridad aplicada y §Release de integridad.
 - [x] Consentimiento y refresh no permiten cambiar persona, contexto ni elevar permisos; tokens previos no adquieren autoridad interna por default. OAuth JWT ES256 y pruebas PG de consentimiento/rotación verificadas.
 - [ ] Baja remota y baja canónica tienen latencias declaradas separadamente; revocación multicontexto pasa el caso A=10/B=2->3.
 - [ ] Rollback ensayado registra duración real, revocación selectiva y comprobación de externos/Entra legado; no depende de apagar todo OAuth.
 
 - [x] ADR aceptado define proveedor upstream, población y autoridad independientemente del issuer. `EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md`, D1–D7.
 - [x] Efeonce e identidad interna se resuelven canónicamente sin cambiar organización a cliente ni duplicar persona. Reader real devuelve perfil autorizado + EO-ORG-0007; test PG de enrolamiento usa clones temporales y rollback. Posteriormente se enroló el piloto real sobre esa identidad canónica; la prueba de login humano sigue pendiente.
-- [ ] Login corporativo produce sesión y token MCP nativo con audiencia, azp, scopes y gv correctos. Intento real iniciado; Microsoft solicita contraseña reciente y aún no hay callback/sesión/token corporativo comprobado.
+- [x] Login corporativo produce sesión y token MCP nativo con audiencia, azp, scopes y gv correctos. Canary real22:38Z: consentimiento y token emitidos; gateway verifica y permite lectura propia, deniega otra organización. Véase evidencia22:44Z.
 - [ ] Refresh y revocación funcionan; baja efectiva en el source of truth o retiro de grant invalida autorización con token vigente en ≤60 s,
   verificado junto al gateway, sin afirmar cierre por expiración natural del token.
 - [ ] Token externo del mismo issuer, tenant desconocido y roles sin scopes no acceden a tools internas.
@@ -894,3 +894,143 @@ se corrigió la nota. GitHub internalAuth false y permisos del operador de excep
 Preflight configurado: PG/migraciones/WIF/Sentry correctos; faltan SHA publicado/CI y excepción batch
 por migración ya aplicada. Ningún bypass de evidencia CI/readiness. Gateway d7469d7, CI33988476298
 con contenedor success; deploy33988521730 en curso.
+
+
+### Release de integridad y activación — 2026-09-05
+
+PR224 integra el commit mixto autorizado, UI Claude y reparación0fc7a4bc5. Claude añadió
+25f3db5f9 (ayuda de uso del reconciliador); se revisó y probó antes de publicar. Main:
+`d551cf3689db54989552ebfe701c65afba94bc33`, merge20:32:57Z. CI33990441436,
+Deep33990441433 y smoke33990452162 success; Vercel Production
+`dpl_E6xpKi4XsYFKGduwL7MqVxHhPHsQ` READY para ese SHA.
+
+Preflight final12 checks: todos status ok, única severity warning por batch con migración ya
+aplicada. Excepción autorizada con capability del actor humano revalidada; no se exceptuaron CI,
+readiness ni el timeout transitorio del primer chequeo (reintento correcto). Orquestador único
+33991304002 success20:50:47→21:04:59Z, ambos gates Production aprobados. Manifest
+`d551cf3689db-8a4af809-0c28-496d-82c9-a17ed7593ce3` released21:04:51.013Z;
+PG conserva razón y actor GitHub cesargrowth11 como transporte, autorización humana Julio explícita.
+Health21:03:32Z; watchdog21:05:11Z severity ok,5/5 sincronizados. Auth/ops sirven ace63705e:
+diff completo contra main sólo `scripts/identity/reconcile-internal-authority.ts` (CLI, fuera de
+rutas runtime); no se afirma igualdad de árboles completos.
+
+Gateway sibling d7469d72085b894e364ff7fedb8fbfc34204e49f, deploy33988521730 success,
+revisión efeonce-mcp-gateway-00033-597100%; digest
+sha256:4408d4b5362e7bb78b523b5c771a7f95f02375388678dc3f652e6ab095dbd8b8.
+Reader Production: identidad interna por contrato externo devuelve200/internal_population,
+memberships[]; sin credencial401/invalid_token y contexto incompleto400/bad_request.
+Señales unaudited_write y mixed_population0; eventos de reconciliación publicados18:54:03.284Z.
+
+Tras release/readbacks, GitHub internal flag true y auth-server-00015-jrc Ready100% con
+AUTH_SERVER_INTERNAL_AUTH_ENABLED=true, OAuth/person true y misma imagen validada
+sha256:46bbc001c57335b6177b62f9a184d07f772900c5a7ce0f40d1139ed4fe0bebcd.
+Browser verificó UI Claude, selector Equipo Efeonce y Continuar con Microsoft dentro del flujo
+OAuth. /login directo no presenta ese botón porque no tiene return_to válido; no es un cambio visual
+introducido durante este release. Microsoft requiere contraseña reciente de la cuenta corporativa;
+operador solicitado en navegador, sin pedir ni capturar credenciales por chat. Sesión/token/canary,
+refresh, revocación y rollback siguen sin acreditar al corte21:09Z.
+
+### Callback real rechazado y diagnóstico específico — 2026-09-05 21:20 UTC
+
+Audit PG ocurrido21:15:25.036Z, stage consume, outcome rejected, reason upstream_rejected,
+diagnostic jwt_validation_failed. La solicitud21:15:08.701Z fue aceptada. Esto sitúa el fallo en
+JOSE tras el intercambio, sin demostrar todavía firma, claim o reloj específicos. No reutilizar el
+código consumido ni acreditar un token a partir de la aprobación Authenticator.
+
+Contención: GitHub internalAuth false y auth-server-00016-srj Ready100%, flag false verificado.
+El operador autorizó subagentes y Azure CLI: app/SP/tenant/redirect/optionalClaims correctos,
+auth_time esencial, sin claimsMappingPolicies ni tokenIssuancePolicies aplicadas; discovery y JWKS
+públicos corresponden al código. Graph aún no devuelve sign-ins de21:15; registros17:02 no prueban
+este intento. requestedAccessTokenVersion null sólo afecta access tokens, no justifica cambiar ID-token.
+Fuentes: [Microsoft Graph](https://learn.microsoft.com/en-us/graph/api/resources/apiapplication?view=graph-rest-1.0),
+[ID token claims](https://learn.microsoft.com/en-us/entra/identity-platform/id-token-claims-reference),
+[OIDC max_age](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest).
+
+La ampliación local clasifica causas JOSE en enum cerrado (firma, clave, algoritmo, claims requeridos,
+issuer/audience, nbf y exp). No retiene payload/cause ni modifica respuesta pública o validadores.
+20 pruebas focales y suite106 passed;4 live skipped no constituyen evidencia nueva. Revisión independiente
+sin hallazgos materiales; fixture deliberadamente malformada tipada explícitamente. TypeScript directo y bundle del emisor (opciones del Dockerfile) exit0. Build Next compiló, pero fue
+interrumpido tras aproximadamente14min en su fase de tipos; no cuenta como build completo aprobado.
+Publicación, nuevo canary y corrección de causa real pendientes.
+
+Azure adicional: tokenLifetimePolicies de app y SP vacías, inventario global0; sin política de duración
+configurable que explique el fallo. OIDC no prescribe auth_time<=iat y MSAL oficial valida frescura
+contra now, pero ese guard posterior a JOSE no explica este diagnóstico; sin cambio especulativo.
+
+## Follow-up 21:48 UTC — expiración confirmada, solicitud OIDC en corrección
+
+Audit real: request21:47:13.951Z ok, callback21:48:03.553Z upstream_rejected / jwt_expired.
+No hubo token MCP. Diagnóstico servido SHA e4977392b, rev17; intento en rev18; apagado rev19.
+Revisión independiente avala prompt=login con auth_time obligatorio/fresco contra transacción
+y presente, exp estricto, sin exigir orden auth_time<=iat. Regresiones firmadas cubren iat
+retrospectivo, auth_time futuro/ausente/antiguo, exp vencido y límite start−60s/start−61s.
+La comparación con NextAuth Greenhouse muestra tolerancia10s y ausencia de max_age; no se
+copia esa tolerancia ni su resolución de identidad. Ver ADR/runbook para fuentes y límites.
+
+Publicación de la corrección: c44856f4d incluido en push develop61d5fe1f0. Build/despliegue
+33994320247 en curso. Revisión independiente del diff OIDC sin hallazgos materiales; 106
+pruebas passed/4 live omitidas, tsc0, ESLint0errores y prepush0errores/26warnings existentes.
+UI Claude intercalada01598b44e/39484aff5/61d5fe1f0 revisada: assets y marcas no alteran
+autoridad. Dos seguimientos UI pendientes: CTA de error /login pierde contexto Microsoft
+y promete reintentar; selector id-context strong sobrescribe el contraste en campo de marca.
+No se reusan state/code ni retorno proporcionado por el callback para recuperar el flujo.
+
+## Follow-up 22:04 UTC — SSO exitoso; consentimiento con reader de población incorrecta
+
+SSO request22:01:02.720Z / consume22:01:26.817Z success. OAuth authorize22:01:27.450Z
+access_denied / consent_context_unavailable. Se resolvió autoridad interna, pero el reader
+getExternalOrganizationBinding restringe population=external y devolvía null para el binding
+interno. Pruebas previas usaban un mock externo para ambos carriles y no detectaban el defecto.
+
+Corrección local: getInternalOrganizationBindingPresentation (proyección mínima, sólo interno),
+selección por población después de resolver autoridad y comparación binding.population.
+Regresiones: cruce en ambos sentidos denegado, reader externo null y reader interno correcto,
+sin fallback cuando falta binding interno. Prueba dirigida26passed; suite150passed/22live
+omitidas. Readback PG real con readers canónicos: externo rechaza interno, interno obtiene
+nombre presente, active=true, gv3. No modifica base, grants ni datos personales.
+Emisor desactivado rev22-8n5/GitHub false mientras se publica esta segunda corrección.
+
+## Follow-up 22:19 UTC — guard de origen y política de formulario
+
+Tras publicar ddbd011f5, authorize muestra Efeonce y permiso lectura con sesión existente.
+POSTconsent devuelve invalid_request; no registra token ni consentimiento. Reproducción local
+con navegador integrado y formulario nativo (no fetch): no-referrer da Origin opaque/null,
+SecFetchSite same-origin, decisionallow; strict-origin da Origin propio y Referer sólo origen.
+Cambio limitado a htmlResponse; JSON/redirect mantienen no-referrer y guardCSRF no cambia.
+Scriptbrowser canónico: Chromium6/6passed, WebKit instalación pendiente (no cuenta como passed).
+Suite229passed/4liveomitidas, tsc0. El navegador integrado reprodujo ambas políticas.
+
+Ampliación de la regresión browser: CSP form-action self-only bloquea la cadena
+POST→authorize→callback en Chromium. htmlResponse permite opción de origen de retorno sólo
+para consentimiento; authorize la obtiene después de resolver redirect_uri contra el cliente.
+No cambia el guard de origen ni la validación exacta del redirect. Prueba del handler
+rechaza origen de callback no registrado antes de incorporarlo a CSP.
+
+## Evidencia de canary interno real — 2026-09-05 22:38–22:44 UTC
+
+Runtime auth09def4fc4, imagen0dd44fc490ef; deploy33996045509 correcto. La sesión Microsoft
+real22:01Z se reutilizó. Consent22:38:22.142Z, authorize22:38:22.598Z y token22:38:24.063Z
+auditados success. Helper mantuvo tokens exclusivamente en RAM; claim shape correcto no
+sustituye firma: la llamada real al gateway validó el token y permitió get_seo_entitlement
+para Efeonce (hasModuletrue, 3668ms). Foreign org denegada, lectura propia antes/después
+correcta (5875ms). Refreshrotativo963ms con identidad/contexto/auth_time/scope/gv estables.
+
+- Revocación familia/token: endpoint226ms; refresh posterior invalid_grant417ms; MCP denegado
+  con access aún vigente a10.151s de revocación (límite60s satisfecho).
+- Retiro canónico de grant: dry-run correcto; apply22:40:24→22:40:31Z; token aún vigente
+  denegado22:40:35Z (cota conservadora11s desde inicio del command). Restitución auditada con
+  expiryoriginal2026-09-12T15:00:00Z, sin ampliación; gv3→4→5. Grantprevio revocado permanece.
+- Gateway internoOFF: inicio22:41:31Z, rev34-fqb Ready100%; token vigente denegado22:41:51Z
+  (cota20s). Nativegeneral siguiótrue; health y metadata públicos correctos. Eso no sustituye
+  prueba humana de cliente externo ni tokenEntra legado, que permanece pendiente.
+- EmisorOFF rev28-6rv denegó refresh852ms. RestoregatewayON rev35-bhd Ready22:42:37.619Z;
+  authON rev29-tfx Ready22:42:49.990Z; ciclo apagado/restauración79s desde inicio. Nueva emisión
+  y lecturaMCP propia2875ms verificaron recuperación. Todos los tokens del helper se revocaron
+  antes de cerrar procesos; no quedaron tokens en disco.
+
+Readback:1enrollmentactivo,1grantactivo+1revocado, gv5 y expiración original; auditorías
+enrolled/granted/revoked/granted con actorcanónico yrazón. Señalesunaudited/mixed_population0.
+No se declara completa matriz multicontexto A/B, clientesexternos, WebKit o diseño UI.
+Merge main→develop8d7b205ca conserva árbol7728b56e8e638d3ce00770ef8e5e2d79a6173b46: main
+d551cf368 coincidebyte-for-byte con ancestro25f3db5f9 (tree2377b14a); conflictosresueltos
+conservando09def4fc4, sin descartar cambios exclusivos de main. Promociónformal pendiente.

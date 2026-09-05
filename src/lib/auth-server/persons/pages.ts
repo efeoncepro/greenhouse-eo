@@ -15,6 +15,9 @@ import { GH_AUTH_SERVER } from '@/lib/copy/auth-server'
 import { ICON_ALERT, ICON_CLOCK, ICON_MAIL, MICROSOFT_MARK_SVG } from '../oauth/pages/icons'
 import { escapeHtml, layout } from '../oauth/pages/render'
 
+const backToLogin = (): string =>
+  `<div class="id-actions"><a class="id-primary" href="/login">${escapeHtml(GH_AUTH_SERVER.login_continue_cta)}</a></div>`
+
 export const PERSON_AUTH_PATHS = {
   login: '/login',
   magicLinkRequest: '/auth/magic-link/request',
@@ -124,7 +127,8 @@ export const renderInvitationAcceptedPage = (): string =>
   layout(
     GH_AUTH_SERVER.invitation_accepted_title,
     `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.invitation_accepted_title)}</h1>
-  <p>${escapeHtml(GH_AUTH_SERVER.invitation_accepted_body)}</p>`
+  <p>${escapeHtml(GH_AUTH_SERVER.invitation_accepted_body)}</p>
+  ${backToLogin()}`
   )
 
 /**
@@ -164,5 +168,6 @@ export const renderSessionClosedPage = (): string =>
   layout(
     GH_AUTH_SERVER.session_closed_title,
     `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.session_closed_title)}</h1>
-  <p>${escapeHtml(GH_AUTH_SERVER.session_closed_body)}</p>`
+  <p>${escapeHtml(GH_AUTH_SERVER.session_closed_body)}</p>
+  ${backToLogin()}`
   )

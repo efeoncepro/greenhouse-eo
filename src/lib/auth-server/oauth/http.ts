@@ -12,7 +12,9 @@ import { EFEONCE_ISOTIPO_SVG } from './pages/efeonce-isotipo.generated'
 const styleHashes = [
   AUTH_SERVER_STYLES,
   ...[...EFEONCE_ISOTIPO_SVG.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)].map(match => match[1])
-].map(css => `'sha256-${createHash('sha256').update(css).digest('base64')}'`).join(' ')
+]
+  .map(css => `'sha256-${createHash('sha256').update(css).digest('base64')}'`)
+  .join(' ')
 
 export type HeaderReader = { get(name: string): string | null }
 
@@ -50,18 +52,49 @@ const SECURITY_HEADERS = {
   'X-Frame-Options': 'DENY'
 } as const
 
-export const jsonResponse = (status: number, body: unknown, headers: Record<string, string> = {}): OAuthHttpResponse => ({
+export const jsonResponse = (
+  status: number,
+  body: unknown,
+  headers: Record<string, string> = {}
+): OAuthHttpResponse => ({
   status,
   headers: { ...SECURITY_HEADERS, 'Content-Type': 'application/json; charset=utf-8', ...headers },
   body: JSON.stringify(body)
 })
 
-export const htmlResponse = (status: number, html: string, headers: Record<string, string> = {}): OAuthHttpResponse => ({
+/** Caller must supply only a redirect URI already accepted by the OAuth client resolver.
+ * Browsers apply form-action to the whole POST redirect chain, including the client callback.
+ * Restrict the added source to its serialized HTTP(S) origin, never arbitrary CSP text.
+ */
+const formActionSources = (redirectUri?: string): string => {
+  if (redirectUri === undefined) return "'self'"
+  const target = new URL(redirectUri)
+
+  if (
+    !['http:', 'https:'].includes(target.protocol) ||
+    target.username ||
+    target.password ||
+    /[\s'";*]/.test(target.origin)
+  )
+    throw new TypeError('Invalid form redirect origin')
+
+  return `'self' ${target.origin}`
+}
+
+export const htmlResponse = (
+  status: number,
+  html: string,
+  headers: Record<string, string> = {},
+  options: { formActionRedirectUri?: string } = {}
+): OAuthHttpResponse => ({
   status,
   headers: {
     ...SECURITY_HEADERS,
     'Content-Type': 'text/html; charset=utf-8',
-    'Content-Security-Policy': `default-src 'none'; img-src 'self' data:; font-src 'self'; style-src ${styleHashes}; form-action 'self'; base-uri 'none'; frame-ancestors 'none'`,
+    // Native HTML POSTs under no-referrer send Origin: null. Preserve their origin for CSRF
+    // validation while never sending a document path or OAuth query in the Referer header.
+    'Referrer-Policy': 'strict-origin',
+    'Content-Security-Policy': `default-src 'none'; img-src 'self' data:; font-src 'self'; style-src ${styleHashes}; form-action ${formActionSources(options.formActionRedirectUri)}; base-uri 'none'; frame-ancestors 'none'`,
     ...headers
   },
   body: html

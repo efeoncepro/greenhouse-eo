@@ -4,6 +4,52 @@ import type { PoolClient } from 'pg'
 import { query } from '@/lib/db'
 
 export const INTERNAL_ORGANIZATION_PUBLIC_ID = 'EO-ORG-0007'
+/** Presentation only, after the caller has resolved current internal authority. */
+export type InternalOrganizationBindingPresentation = {
+  population: 'internal'
+  bindingId: string
+  organizationId: string
+  organizationName: string | null
+  environmentId: string
+  status: 'active' | 'revoked'
+  revokedAt: string | null
+  grantsVersion: number
+}
+
+export const getInternalOrganizationBindingPresentation = async (
+  bindingId: string
+): Promise<InternalOrganizationBindingPresentation | null> => {
+  const rows = await query<{
+    binding_id: string
+    organization_id: string
+    organization_name: string | null
+    environment_id: string
+    status: 'active' | 'revoked'
+    revoked_at: string | null
+    grants_version: number | string
+  }>(
+    `SELECT b.binding_id, b.organization_id, o.organization_name, b.environment_id,
+       b.status, b.revoked_at, b.grants_version
+     FROM greenhouse_core.external_organization_bindings b
+     JOIN greenhouse_core.organizations o ON o.organization_id=b.organization_id
+     WHERE b.binding_id=$1 AND b.population='internal'`,
+    [bindingId]
+  )
+
+  const row = rows[0]
+
+  return row ? {
+    population: 'internal',
+    bindingId: row.binding_id,
+    organizationId: row.organization_id,
+    organizationName: row.organization_name,
+    environmentId: row.environment_id,
+    status: row.status,
+    revokedAt: row.revoked_at,
+    grantsVersion: Number(row.grants_version)
+  } : null
+}
+
 export type InternalIdentity = {
   subject: string
   profileId: string

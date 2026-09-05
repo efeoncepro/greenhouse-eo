@@ -92,45 +92,68 @@ button,input { font:inherit; color:inherit; }
    centrada las sirve mejor. El formulario va PRIMERO en el DOM y el panel se reordena por CSS, para
    que un lector de pantalla llegue al campo antes que al mensaje de marca. */
 .id-canvas { min-height:100svh; display:grid; align-items:stretch; }
-/* Dirección «Nocturno editorial»: en el acceso el lienzo ENTERO es el campo de marca y la tarjeta
-   clara flota encima. El campo se fija en ambos esquemas —el login es el momento de marca, no una
-   pantalla más del producto— y por eso la tarjeta re-declara los tokens claros en su subárbol: así
-   el modo oscuro del sistema sigue gobernando consentimiento, verificación y error, sin tocar ésta. */
-.id-canvas[data-state="login"] { position:relative; isolation:isolate; color:${n.bgWhite};
+/* Dirección «Nocturno editorial», aplicada a TODAS las pantallas del emisor: el lienzo entero es el
+   campo de marca y la tarjeta clara flota encima. Se fija en claro y oscuro —esto es una superficie
+   de marca, no una pantalla más del producto— y la tarjeta re-declara los tokens claros en su
+   subárbol para leerse igual en ambos esquemas. Sólo /login suma además el panel lateral: el resto
+   son decisiones puntuales y les basta la columna centrada sobre el mismo campo. */
+.id-canvas { position:relative; isolation:isolate; color:${n.bgWhite};
   background:radial-gradient(120% 90% at 8% 0%, ${railGlow} 0%, ${railBase} 42%, ${railDeep} 100%); }
-.id-canvas[data-state="login"]::after { content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
+.id-canvas::after { content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
   background-image:radial-gradient(color-mix(in oklch, ${n.bgWhite} 6%, transparent) 1px, transparent 1px); background-size:3px 3px; }
-.id-canvas[data-state="login"] .id-page { background:transparent; }
-.id-canvas[data-state="login"] .id-brand { color:${n.bgWhite}; }
-.id-canvas[data-state="login"] .id-brand svg { color:${n.bgWhite}; }
-.id-canvas[data-state="login"] .id-surface {
-  --id-paper:${n.paper}; --id-text:${n.textPrimary}; --id-muted:${n.textSecondary}; --id-border:${n.divider}; --id-hover:${n.actionHover};
+.id-canvas .id-page { background:transparent; }
+.id-canvas .id-brand { color:${n.bgWhite}; }
+.id-canvas .id-brand svg { color:${n.bgWhite}; }
+.id-canvas .id-surface {
+  /* --id-bg va en la lista: pinta los sub-fondos de dentro (tarjeta de organización, badge
+     de permiso). Sin él tomaban el neutro OSCURO del esquema y quedaban negro sobre negro. */
+  --id-paper:${n.paper}; --id-text:${n.textPrimary}; --id-muted:${n.textSecondary}; --id-border:${n.divider};
+  --id-hover:${n.actionHover}; --id-bg:${n.bodyBg}; --id-shadow-color:${n.snackbar};
   color:var(--id-text); border-color:transparent;
   box-shadow:inset 0 1px 0 ${n.bgWhite}, 0 2px 4px color-mix(in srgb, ${railDeep} 26%, transparent), 0 ${s(16)} ${s(32)} -${s(9)} color-mix(in srgb, ${railDeep} 70%, transparent); }
 .id-rail { display:none; }
 @media (min-width:64rem) {
   /* La fila en 1fr: sin eso el panel se queda del alto de su contenido y deja una franja muerta. */
-  .id-canvas[data-state="login"] { grid-template-columns:minmax(0,5fr) minmax(0,6fr); grid-template-rows:1fr; }
+  /* El campo cubre todo el borde, pero la COMPOSICIÓN tiene techo: sin esto, a 2560 el panel crece
+     a más de mil px con su contenido todavía en 528 y la pantalla se lee vacía, no amplia. */
+  /* El techo va por PADDING, no por max-width: con max-width el propio lienzo se encoge y el campo
+     de marca deja de sangrar hasta el borde — aparecen dos bandas claras a los lados. Con padding,
+     el fondo sigue cubriendo el 100% y lo único que se limita es la composición. */
+  .id-canvas[data-state="login"] { grid-template-columns:minmax(0,5fr) minmax(0,6fr); grid-template-rows:1fr;
+    padding-inline:max(0px, calc((100% - ${s(400)}) / 2)); }
   .id-canvas[data-state="login"] .id-rail { order:-1; display:flex; }
   .id-canvas[data-state="login"] .id-brand { display:none; }
   .id-canvas[data-state="login"] .id-page { min-height:auto; padding-inline:${s(10)}; }
 }
-.id-rail { position:relative; overflow:hidden; align-items:center; padding:${s(16)} ${s(12)};
-  border-inline-end:1px solid color-mix(in oklch, ${n.bgWhite} 13%, transparent); }
-.id-rail-inner { position:relative; z-index:1; max-width:${s(132)}; display:grid; gap:${s(5)}; }
+/* Sin línea divisoria: separaba dos fondos distintos y hoy el campo es continuo — dibujaba una
+   costura donde no la hay. La separación la hacen el vacío y la tarjeta clara flotando.
+   justify-content:center es lo que deja de anclar el bloque al padding: antes empezaba en x=48
+   pasara lo que pasara, y a 1920 quedaba 124px fuera del eje de su propia columna. */
+.id-rail { position:relative; overflow:hidden; align-items:center; justify-content:center;
+  padding:${s(16)} ${s(12)}; }
+.id-rail-inner { position:relative; z-index:1; width:100%; max-width:min(${s(148)}, 100%); display:grid; gap:0; }
 .id-rail-logo svg { width:${s(44)}; max-width:100%; height:auto; }
 .id-rail-logo svg { color:${n.bgWhite}; }
-.id-rail-kicker { font-size:${typographyScale.overline.fontSize}; font-weight:${fontWeights.semibold}; letter-spacing:${letterSpacings.caps}; text-transform:uppercase; color:color-mix(in oklch, ${n.bgWhite} 62%, transparent); }
+.id-rail-kicker { margin-block-start:${s(8)}; font-size:${typographyScale.overline.fontSize}; font-weight:${fontWeights.semibold}; letter-spacing:${letterSpacings.caps}; text-transform:uppercase; color:color-mix(in oklch, ${n.bgWhite} 62%, transparent); }
 /* El titular es una superficie de marca, no UI: escala con el viewport desde el mayor paso de la
    rampa hasta 1.6× ese mismo token — derivado del sistema, nunca un tamaño inventado. */
-.id-rail-headline { font-family:${hero.fontFamily}; font-size:clamp(${hero.fontSize}, 3.2vw, calc(${hero.fontSize} * 1.45)); font-weight:${fontWeights.bold}; line-height:1.04; letter-spacing:-.028em; margin-block-start:${s(2)}; text-wrap:balance; }
+.id-rail-headline { font-family:${hero.fontFamily}; font-size:clamp(${hero.fontSize}, 3.2vw, calc(${hero.fontSize} * 1.45)); font-weight:${fontWeights.bold}; line-height:1.04; letter-spacing:-.028em; margin-block-start:${s(2.5)}; text-wrap:balance; }
 .id-rail-headline em { font-style:normal; color:${axisRamp.primary[300]}; }
-.id-rail-body { max-width:46ch; color:color-mix(in oklch, ${n.bgWhite} 82%, transparent); }
-.id-rail-trust { display:flex; align-items:center; gap:${s(2)}; font-size:${typographyScale.bodyMd.fontSize}; color:color-mix(in oklch, ${n.bgWhite} 72%, transparent); }
+/* Medida por ancho, no por ch: ch es el ancho del CERO y en Geist es mucho más ancho que el
+   carácter promedio — 46ch rendían ~61 caracteres por línea, largo para texto de apoyo. */
+.id-rail-body { margin-block-start:${s(6)}; max-width:${s(100)}; text-wrap:balance; color:color-mix(in oklch, ${n.bgWhite} 82%, transparent); }
+.id-rail-trust { margin-block-start:${s(9)}; display:flex; align-items:center; gap:${s(2)}; font-size:${typographyScale.bodyMd.fontSize}; color:color-mix(in oklch, ${n.bgWhite} 72%, transparent); }
 /* Filigrana: el isotipo institucional a gran escala, casi invisible, para dar profundidad sin ruido. */
-.id-rail-mark { position:absolute; inset-block-end:-42%; inset-inline-start:-24%; width:${s(240)}; opacity:.045; pointer-events:none; }
-.id-rail-mark svg { width:100%; height:auto; }
-.id-rail-mark svg { color:${n.bgWhite}; }
+/* Profundidad SIN el logotipo. Se probaron dos tratamientos con el isotipo y los dos fallaron por la
+   misma razón: recortado se lee como objeto tajado —y además es uso incorrecto de la marca—, y a
+   escala de bandera su propia geometría mete un canto recto en mitad del panel. Dos anillos enormes
+   dan la misma profundidad y eco de marca sin ninguna arista posible: una circunferencia no tiene
+   dónde cortarse mal. */
+.id-rail::before,.id-rail::after { content:""; position:absolute; border-radius:50%; aspect-ratio:1;
+  border:1px solid color-mix(in oklch, ${n.bgWhite} 8%, transparent); pointer-events:none; }
+.id-rail::before { width:${s(248)}; inset-inline-start:-${s(88)}; inset-block-end:-${s(120)}; }
+.id-rail::after { width:${s(368)}; inset-inline-start:-${s(136)}; inset-block-end:-${s(176)};
+  border-color:color-mix(in oklch, ${n.bgWhite} 5%, transparent); }
 .id-page { width:min(100%,${s(152)}); margin-inline:auto; padding:${s(12)} ${s(6)}; display:grid; align-content:center; min-height:100svh; }
 @media (max-width:63.99rem) { .id-rail { display:none; } }
 .id-page[data-state="login"] { max-width:${s(140)}; }
@@ -139,7 +162,30 @@ button,input { font:inherit; color:inherit; }
 /* Los SVG de marca llegan normalizados a fill="currentColor" (scripts/auth-server/brand-svg.ts):
    el color se hereda por la propiedad color y alcanza a TODA figura — incluido el <circle> del logotipo. */
 .id-brand svg { color:var(--id-mark); }
-.id-context { text-align:center; margin-block-end:${s(6)}; overflow-wrap:anywhere; font-size:${typographyScale.bodyMd.fontSize}; color:var(--id-muted); }
+.id-context { text-align:center; margin-block-end:${s(6)}; overflow-wrap:anywhere; font-size:${typographyScale.bodyMd.fontSize}; color:color-mix(in oklch, ${n.bgWhite} 66%, transparent); }
+.id-context strong { color:${n.bgWhite}; }
+.id-client { display:flex; align-items:center; justify-content:center; gap:${s(2)}; margin-block-start:${s(2)}; }
+.id-client strong { margin:0; font-size:${typographyScale.bodyLg.fontSize}; }
+/* Ficha de la aplicación: identifica sin suplantar. El asset verificado (cuando exista) sustituye
+   la inicial dentro de la MISMA ficha, así el layout no cambia entre un cliente y otro. */
+.id-client-mark { display:inline-flex; align-items:center; justify-content:center; width:${s(7)}; height:${s(7)}; flex:none;
+  border-radius:${r.sm}; font-family:${typographyScale.headlineMd.fontFamily}; font-size:${typographyScale.bodyMd.fontSize};
+  font-weight:${fontWeights.bold}; line-height:1; color:${n.bgWhite};
+  background:color-mix(in oklch, ${n.bgWhite} 16%, transparent);
+  box-shadow:inset 0 0 0 1px color-mix(in oklch, ${n.bgWhite} 22%, transparent); }
+.id-client-mark-brand { background:${n.paper}; box-shadow:none; padding:${s(1)}; }
+.id-client-mark-brand svg { width:100%; height:100%; }
+/* Aviso de aplicación no verificada: vive sobre el campo, no dentro de la tarjeta, porque califica a
+   la aplicación —no a la decisión— y tiene que leerse ANTES de abrir la tarjeta. */
+.id-unverified { display:flex; align-items:flex-start; justify-content:center; gap:${s(2)}; margin-block-start:${s(3)};
+  padding:${s(2)} ${s(3)}; border-radius:${r.md}; text-align:start; max-width:${s(112)}; margin-inline:auto;
+  font-size:${typographyScale.bodyMd.fontSize}; color:color-mix(in oklch, ${n.bgWhite} 82%, transparent);
+  /* Nada de tinte ámbar sobre el azul: mezclar ambos da un verde sucio. El aviso se apoya en el
+     ícono y el filo; el fondo sólo profundiza el campo. */
+  background:color-mix(in srgb, ${railDeep} 42%, transparent);
+  box-shadow:inset 0 0 0 1px color-mix(in oklch, ${axisMain.warning} 46%, transparent); }
+.id-unverified strong { display:inline; color:${n.bgWhite}; font-weight:${fontWeights.semibold}; }
+.id-unverified .id-icon { color:${axisRamp.warning[300]}; margin-block-start:${s(0.5)}; }
 .id-context strong { display:block; margin-block-start:${s(1)}; font-size:${body.fontSize}; color:var(--id-text); font-weight:${fontWeights.semibold}; }
 .id-surface { background:var(--id-paper); border:1px solid var(--id-border); border-radius:${r.lg}; padding:${s(9)} ${s(8)} ${s(8)}; box-shadow:var(--id-shadow); }
 /* Presencia de la tarjeta sobre el campo: más superficie, radio y sombra derivados del sistema, y
@@ -176,7 +222,7 @@ button[aria-busy="true"] { cursor:progress; }
 .id-secondary:hover,button.secondary:hover { background:color-mix(in oklch, var(--id-accent) 6%, var(--id-paper)); border-color:color-mix(in oklch, var(--id-accent) 34%, transparent); }
 .id-section > .id-primary,.id-section > .id-secondary,form .id-secondary { width:100%; }
 .id-icon { width:${s(5)}; height:${s(5)}; flex:none; }
-.id-icon-brand { width:${s(4)}; height:${s(4)}; }
+.id-icon-brand { width:${s(5)}; height:${s(5)}; }
 .id-field { display:flex; flex-direction:column; gap:${s(2)}; margin-block:${s(4)}; font-size:${typographyScale.labelSm.fontSize}; font-weight:${fontWeights.semibold}; }
 .id-field .id-muted { font-weight:${fontWeights.regular}; margin-block-end:0; }
 form .id-actions { margin-block-start:${s(4)}; }

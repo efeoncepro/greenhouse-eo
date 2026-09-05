@@ -51,6 +51,23 @@ de OAuth/personas y no debe utilizarse como inventario actual.
 - **En ese momento quedaba bloqueada** por `TASK-1829` (metadata, CIMD/DCR y tokens), `TASK-1830` (autenticación de personas),
   `TASK-1631` (release a producción), `TASK-1831` (gateway multi-issuer) y la task ui-ux de login/consentimiento.
 
+## Delta 2026-09-05 — entrega de la invitación (TASK-1837)
+
+La cohorte no puede abrirse con el recorrido de alta actual. Medido sobre el código: `issueExternalInvitation`
+devuelve el token en claro en la respuesta de la ruta admin y el evento `identity.external_invitation.issued`
+no tiene ningún consumidor, así que **el último tramo del alta lo hace una persona de Efeonce copiando un
+secreto**. Investigación de mercado del 2026-09-05 (8 productos, 2 vendors de identidad): en los ocho productos
+la invitación nominal la envía el sistema, y mostrarle el secreto de otra persona a un administrador contradice
+NIST SP 800-63A-4 §3.8, NIST SP 800-63B-4 §3.1.3.1 e ISO/IEC 27002:2022 §5.17.
+
+Además, la pantalla de consentimiento **no muestra el host del `redirect_uri`** (verificado en
+`src/lib/auth-server/oauth/pages/render.ts`): la persona autoriza sin ver a dónde va el código. Es un MUST del
+protocolo y una cohorte real no debería abrirse incumpliéndolo.
+
+`TASK-1837` cierra ambos, más el ciclo de vida de la entrega y la autoridad delegada del administrador del
+cliente. Los canaries de protocolo (clientes de prueba, `prompt=none`) no dependen de ella; **la primera
+organización cliente real, sí**.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
@@ -73,7 +90,7 @@ de OAuth/personas y no debe utilizarse como inventario actual.
 - Status real: `Canaries reales pendientes; task to-do. Readback 2026-09-05T15:02:44Z: auth readyz 200 y metadata del gateway 200, authorization_servers=[https://mcp.efeonce.org]. OAuth/personas ON consta en readback anterior del runbook; estos GET no verifican flags actuales ni compatibilidad nativa. TASK-1836 y gateway/UI tienen integración local; faltan deploy/config coherentes, enrollment/grant real, selección del emisor nativo y canary refresh/revocación/rollback.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
-- Blocked by: `TASK-1829 (code complete en develop 2026-09-04; espera AUTH_SERVER_OAUTH_ENABLED=true en staging con el environment efeonce-auth registrado), TASK-1830, TASK-1631 (producción), TASK-1831 y la task ui-ux de login/consentimiento`
+- Blocked by: `TASK-1829 (code complete en develop 2026-09-04; espera AUTH_SERVER_OAUTH_ENABLED=true en staging con el environment efeonce-auth registrado), TASK-1830, TASK-1631 (producción), TASK-1831 y la task ui-ux de login/consentimiento, TASK-1837 (entrega de la invitación externa; sin ella la cohorte real exige que un operador transporte el token a mano y el consentimiento incumple el MUST del `redirect_uri`)`
 - Branch: `Greenhouse develop; efeonce-mcp main; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
