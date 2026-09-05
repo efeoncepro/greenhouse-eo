@@ -225,6 +225,7 @@ jobs:
           bash services/auth-server/deploy.sh
         env:
           ENV: ${{ env.ENV }}
+          AUTH_SERVER_INTERNAL_AUTH_ENABLED: ${{ vars.AUTH_SERVER_INTERNAL_AUTH_ENABLED || 'false' }}
           EXPECTED_SHA: ${{ steps.resolve-sha.outputs.expected_sha }}
 
       - name: Verify deployment health

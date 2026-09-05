@@ -44,6 +44,21 @@ GC permanece OFF/PAUSED.
 - Vercel, dueño del reader ecosystem, necesita su configuración de issuer/environment/audience y
   `AUTH_SERVER_INTERNAL_AUTH_ENABLED` coherente. No hereda variables de Cloud Run.
 
+### Control durable de activación
+
+Los workflows de Greenhouse transportan las variables de repositorio GitHub
+`AUTH_SERVER_INTERNAL_AUTH_ENABLED` y `AUTH_SERVER_GC_ENABLED` a sus deploy scripts, con default false.
+Se prepararon ambas en false y se verificó ausencia de overrides en los environments Production y
+staging. Ambos ambientes comparten servicio: no mantener valores contradictorios por environment.
+El script GC valida true/false antes de llamadas cloud y deriva la pausa del scheduler del mismo flag;
+una activación no debe desaparecer por el siguiente `--set-env-vars`.
+
+Después de verificar el reader productivo, activar la variable de GitHub y aplicar el mismo valor al
+runtime Cloud Run para efecto inmediato; confirmar revisión activa. Vercel requiere su propia variable
+y un deployment nuevo. El gateway tiene sus controles en su propio repo/environment. Para rollback,
+apagar también los controles durables, además de los runtimes activos, y pausar el scheduler GC.
+Un deploy local explícito conserva default OFF: la vía operativa normal es el workflow gobernado.
+
 ### Bootstrap verificado 2026-09-05
 
 Tras inventariar todas las aplicaciones por callback/nombre exactos, se creó `Efeonce ID Corporate Login`:
