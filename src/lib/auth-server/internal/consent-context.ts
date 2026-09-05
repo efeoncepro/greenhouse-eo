@@ -1,4 +1,5 @@
 import { getExternalOrganizationBinding } from '@/lib/identity/external-access/store'
+import { getInternalOrganizationBindingPresentation } from '@/lib/identity/internal-access/store'
 import { resolveExternalAccess } from '@/lib/identity/external-access/resolve-external-access'
 import type { ExternalAccessResolution, ExternalOrganizationBinding } from '@/lib/identity/external-access/types'
 import type { AuthServerOAuthConfig } from '../oauth/config'
@@ -11,7 +12,9 @@ export type ConsentContextDependencies = {
   config: Config
   internal: { resolve(input: InternalContextRequest): Promise<InternalContextResolution> }
   external: (input: { environmentId: string; subject: string; clientId: string }) => Promise<ExternalAccessResolution>
-  getBinding: (bindingId: string) => Promise<ExternalOrganizationBinding | null>
+  getBinding: (bindingId: string, population: 'internal' | 'external') => Promise<Pick<ExternalOrganizationBinding,
+    'bindingId' | 'organizationId' | 'environmentId' | 'population' | 'organizationName' | 'status' | 'revokedAt' | 'grantsVersion'
+  > | null>
 }
 
 /** Fresh provider authority followed by canonical names; no email lookup, cache, or cross-org union. */
@@ -85,10 +88,11 @@ export const createConsentContextPort = (deps: ConsentContextDependencies): Cons
       const organizations: Extract<ConsentContextResolution, { outcome: 'resolved' }>['organizations'][number][] = []
 
       for (const membership of memberships) {
-        const binding = await deps.getBinding(membership.bindingId)
+        const binding = await deps.getBinding(membership.bindingId, population)
 
         if (
           !binding ||
+          binding.population !== population ||
           binding.bindingId !== membership.bindingId ||
           binding.organizationId !== membership.organizationId ||
           binding.environmentId !== input.environmentId ||
@@ -120,5 +124,7 @@ export const createRuntimeConsentContextPort = (
     config,
     internal,
     external: resolveExternalAccess,
-    getBinding: getExternalOrganizationBinding
+    getBinding: (bindingId, population) => population === 'internal'
+      ? getInternalOrganizationBindingPresentation(bindingId)
+      : getExternalOrganizationBinding(bindingId)
   })

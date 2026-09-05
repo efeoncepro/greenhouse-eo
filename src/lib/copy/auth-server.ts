@@ -9,6 +9,12 @@ export const GH_AUTH_SERVER = {
   page_lang: 'es-CL',
   font_licenses_label: 'Licencias de fuentes',
   application_context_label: 'Aplicación',
+  /**
+   * Señal de la ficha de aplicación. Se muestra cuando el `client_id` NO es un origen comprobable:
+   * dice el hecho (no pudimos verificar quién la publica), no acusa a nadie de suplantar.
+   */
+  application_unverified_label: 'Aplicación no verificada',
+  application_unverified_hint: 'No pudimos comprobar quién publica esta aplicación. Continúa sólo si tú iniciaste la conexión.',
   login_methods_intro: 'Elige cómo quieres entrar.',
   login_team_title: 'Equipo Efeonce',
   login_invitation_title: 'Acceso por invitación',

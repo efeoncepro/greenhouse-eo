@@ -44,6 +44,23 @@ const brandRail = (): string => `<aside class="id-rail">
     <span class="id-rail-mark" aria-hidden="true">${EFEONCE_ISOTIPO_SVG}</span>
   </aside>`
 
+/**
+ * Ficha de la aplicación que pide acceso.
+ *
+ * Cuando el origen del cliente no es comprobable no basta con no prestarle el logo: alguien que
+ * llega desde una app llamada «Claude Desktop» puede leer el monograma como «el logo no cargó». La
+ * ficha lo dice, con el hecho y no con una acusación, y el aviso va antes de la decisión.
+ */
+const clientContext = (clientName: string, clientId: string): string => {
+  const mark = renderClientMark({ clientId, clientName })
+
+  return `<div class="id-context" data-capture="id-client">
+      <span class="id-muted">${escapeHtml(GH_AUTH_SERVER.application_context_label)}</span>
+      <span class="id-client">${mark.html}<strong>${escapeHtml(clientName)}</strong></span>
+      ${mark.verified ? '' : `<span class="id-unverified" data-capture="id-client-unverified">${ICON_ALERT}<span><strong>${escapeHtml(GH_AUTH_SERVER.application_unverified_label)}.</strong> ${escapeHtml(GH_AUTH_SERVER.application_unverified_hint)}</span></span>`}
+    </div>`
+}
+
 export const layout = (
   title: string,
   body: string,
@@ -65,7 +82,7 @@ export const layout = (
 <div class="id-canvas" data-state="${state}">
   <main class="id-page" data-capture="id-shell" data-state="${state}" data-surface-recipe="settingsFlow" aria-labelledby="page-title">
     <header class="id-brand" aria-label="${escapeHtml(EFEONCE_BRAND_NAME)}">${EFEONCE_ISOTIPO_SVG}<span>${escapeHtml(GH_AUTH_SERVER.brand_title)}</span></header>
-    ${options.clientName ? `<div class="id-context" data-capture="id-client"><span class="id-muted">${escapeHtml(GH_AUTH_SERVER.application_context_label)}</span><span class="id-client">${renderClientMark({ clientId: options.clientId ?? '', clientName: options.clientName })}<strong>${escapeHtml(options.clientName)}</strong></span></div>` : ''}
+    ${options.clientName ? clientContext(options.clientName, options.clientId ?? '') : ''}
     <div class="id-surface">${body}</div>
   </main>
   ${state === 'login' ? brandRail() : ''}

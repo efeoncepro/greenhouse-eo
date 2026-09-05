@@ -156,6 +156,17 @@ button,input { font:inherit; color:inherit; }
   box-shadow:inset 0 0 0 1px color-mix(in oklch, ${n.bgWhite} 22%, transparent); }
 .id-client-mark-brand { background:${n.paper}; box-shadow:none; padding:${s(1)}; }
 .id-client-mark-brand svg { width:100%; height:100%; }
+/* Aviso de aplicación no verificada: vive sobre el campo, no dentro de la tarjeta, porque califica a
+   la aplicación —no a la decisión— y tiene que leerse ANTES de abrir la tarjeta. */
+.id-unverified { display:flex; align-items:flex-start; justify-content:center; gap:${s(2)}; margin-block-start:${s(3)};
+  padding:${s(2)} ${s(3)}; border-radius:${r.md}; text-align:start; max-width:${s(112)}; margin-inline:auto;
+  font-size:${typographyScale.bodyMd.fontSize}; color:color-mix(in oklch, ${n.bgWhite} 82%, transparent);
+  /* Nada de tinte ámbar sobre el azul: mezclar ambos da un verde sucio. El aviso se apoya en el
+     ícono y el filo; el fondo sólo profundiza el campo. */
+  background:color-mix(in srgb, ${railDeep} 42%, transparent);
+  box-shadow:inset 0 0 0 1px color-mix(in oklch, ${axisMain.warning} 46%, transparent); }
+.id-unverified strong { display:inline; color:${n.bgWhite}; font-weight:${fontWeights.semibold}; }
+.id-unverified .id-icon { color:${axisRamp.warning[300]}; margin-block-start:${s(0.5)}; }
 .id-context strong { display:block; margin-block-start:${s(1)}; font-size:${body.fontSize}; color:var(--id-text); font-weight:${fontWeights.semibold}; }
 .id-surface { background:var(--id-paper); border:1px solid var(--id-border); border-radius:${r.lg}; padding:${s(9)} ${s(8)} ${s(8)}; box-shadow:var(--id-shadow); }
 /* Presencia de la tarjeta sobre el campo: más superficie, radio y sombra derivados del sistema, y

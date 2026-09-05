@@ -51,12 +51,14 @@ const initialOf = (clientName: string): string => {
   return (letter ?? '?').toUpperCase()
 }
 
-export const renderClientMark = (input: { clientId: string; clientName: string }): string => {
+export type ClientMark = { html: string; verified: boolean }
+
+export const renderClientMark = (input: { clientId: string; clientName: string }): ClientMark => {
   const origin = verifiedOriginOf(input.clientId)
   const mark = origin && Object.hasOwn(VERIFIED_CLIENT_MARKS, origin) ? VERIFIED_CLIENT_MARKS[origin] : null
 
   // Decorativo en ambos casos (`aria-hidden`): el nombre de la aplicación ya va escrito al lado.
   return mark
-    ? `<span class="id-client-mark id-client-mark-brand" aria-hidden="true">${mark}</span>`
-    : `<span class="id-client-mark" aria-hidden="true">${initialOf(input.clientName)}</span>`
+    ? { html: `<span class="id-client-mark id-client-mark-brand" aria-hidden="true">${mark}</span>`, verified: true }
+    : { html: `<span class="id-client-mark" aria-hidden="true">${initialOf(input.clientName)}</span>`, verified: false }
 }

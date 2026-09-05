@@ -124,7 +124,8 @@ export const renderInvitationAcceptedPage = (): string =>
   layout(
     GH_AUTH_SERVER.invitation_accepted_title,
     `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.invitation_accepted_title)}</h1>
-  <p>${escapeHtml(GH_AUTH_SERVER.invitation_accepted_body)}</p>`
+  <p>${escapeHtml(GH_AUTH_SERVER.invitation_accepted_body)}</p>
+  ${backToLogin()}`
   )
 
 /**
@@ -164,5 +165,6 @@ export const renderSessionClosedPage = (): string =>
   layout(
     GH_AUTH_SERVER.session_closed_title,
     `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.session_closed_title)}</h1>
-  <p>${escapeHtml(GH_AUTH_SERVER.session_closed_body)}</p>`
+  <p>${escapeHtml(GH_AUTH_SERVER.session_closed_body)}</p>
+  ${backToLogin()}`
   )

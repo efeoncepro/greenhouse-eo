@@ -11,16 +11,19 @@ describe('marca de la aplicación en el consentimiento', () => {
   it('muestra el isotipo cuando el origen del client_id CIMD es verificable', () => {
     const claude = renderClientMark({ clientId: 'https://claude.ai/.well-known/oauth-client', clientName: 'Claude' })
 
-    expect(claude).toContain('id-client-mark-brand')
-    expect(claude).toContain('<svg')
+    expect(claude.verified).toBe(true)
+    expect(claude.html).toContain('id-client-mark-brand')
+    expect(claude.html).toContain('<svg')
   })
 
   it('NUNCA presta el isotipo a quien sólo se pone el nombre', () => {
     // Registro dinámico: el `client_name` es auto-declarado y el `client_id` no es una URL.
     const impostor = renderClientMark({ clientId: 'dcr-cualquiera', clientName: 'Claude Desktop' })
 
-    expect(impostor).not.toContain('<svg')
-    expect(impostor).toContain('>C<')
+    // `verified: false` es lo que enciende el aviso de aplicación no verificada en la ficha.
+    expect(impostor.verified).toBe(false)
+    expect(impostor.html).not.toContain('<svg')
+    expect(impostor.html).toContain('>C<')
   })
 
   it('no acepta un dominio que sólo TERMINE en uno verificado', () => {
@@ -30,12 +33,15 @@ describe('marca de la aplicación en el consentimiento', () => {
       'https://gemini.google.com.evil.example/doc',
       'http://claude.ai/doc'
     ]) {
-      expect(renderClientMark({ clientId, clientName: 'Claude' })).not.toContain('<svg')
+      const spoofed = renderClientMark({ clientId, clientName: 'Claude' })
+
+      expect(spoofed.verified).toBe(false)
+      expect(spoofed.html).not.toContain('<svg')
     }
   })
 
   it('degrada a monograma legible con nombres raros, sin romper el marcado', () => {
-    expect(renderClientMark({ clientId: '', clientName: '«¿?» app' })).toContain('>A<')
-    expect(renderClientMark({ clientId: '', clientName: '' })).toContain('>?<')
+    expect(renderClientMark({ clientId: '', clientName: '«¿?» app' }).html).toContain('>A<')
+    expect(renderClientMark({ clientId: '', clientName: '' }).html).toContain('>?<')
   })
 })
