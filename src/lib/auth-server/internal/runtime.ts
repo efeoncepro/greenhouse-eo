@@ -114,7 +114,7 @@ export const createInternalAuthRuntime = (deps: {
         ipHash: null,
         userAgentHash: null,
         correlationId: null,
-        details: {}
+        details: event.diagnostic ? { diagnostic: event.diagnostic } : {}
       }),
     completeSession: async identity => {
       if (!enabled()) throw new InternalLoginError('configuration_invalid')
@@ -124,7 +124,7 @@ export const createInternalAuthRuntime = (deps: {
         environmentId: deps.oauthConfig.environmentId
       })
 
-      if (!enrolled) throw new InternalLoginError('upstream_rejected')
+      if (!enrolled) throw new InternalLoginError('upstream_rejected', 'identity_not_enrolled')
 
       const created = await createPersonSession({
         store: { insertSession: record => insertCorporateSession(record, enrolled.upstreamLinkId, identity) },

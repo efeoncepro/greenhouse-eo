@@ -1,17 +1,19 @@
-# TASK-1836 — reparación propuesta de permisos del release
+# TASK-1836 — reparación de permisos y auditoría del release
 
-Estado: diagnóstico verificado; reparación autorizada por el operador el 2026-09-05 tras explicar la
-diferencia entre promoción a producción y acceso MCP. La promoción espera reparación, pruebas y
-readback de permisos. No se ha usado bypass con una comprobación de autoridad denegada.
+Estado: reparación implementada, probada e integrada por PR #222 en main
+`1086fe40a55396fc199ef2e446391c14a69b665d` el 2026-09-05 a las 16:11:11 UTC. El actor real ya fue
+revalidado con permisos permitidos. CI, Deep, E2E y Production READY verificados; orquestador único `33978290957` en curso.
+El readback de la auditoría persistida ya coincide con el motivo autorizado. No se ha usado bypass con una
+comprobación de autoridad denegada.
 
 ## Evidencia
 
-- PR preparado: https://github.com/efeoncepro/greenhouse-eo/pull/222.
+- PR integrado: https://github.com/efeoncepro/greenhouse-eo/pull/222.
 - Preflight de `a9f16b89393cfb19995baf07f48616a139f6bffb`: `requires_break_glass` por schema,
   autenticación y deploy. Las 636 migraciones locales están aplicadas; no hay migraciones pendientes.
 - El actor canónico `user-efeonce-admin-julio-reyes` tiene rol `efeonce_admin` activo, vigente desde
   2026-03-15 y sin fecha de término. Las capabilities existen en el registro y no están deprecadas.
-- `can()` devuelve false tanto para `platform.release.preflight.override_batch_policy` (`update/all`)
+- Antes de la reparación, `can()` devolvía false tanto para `platform.release.preflight.override_batch_policy` (`update/all`)
   como para `platform.release.bypass_preflight` (`bypass_preflight/all`); ambas carecen de entradas.
 - `getTenantEntitlements()` sí agrega `platform.release.execute`; faltan las otras seis capabilities
   del contrato. El catálogo no concede acceso por sí solo. El mismo estado existe en el último release
@@ -23,9 +25,9 @@ readback de permisos. No se ha usado bypass con una comprobación de autoridad d
   operador de este rollout; no fue un rechazo emitido por GitHub o Vercel. Esto explica por qué los
   releases anteriores podían avanzar sin mostrar la discrepancia.
 
-## Cambio concreto propuesto
+## Cambio implementado
 
-Restaurar en `src/lib/entitlements/runtime.ts`, mediante `addEntitlement` y comprobación explícita
+Se restauró en `src/lib/entitlements/runtime.ts`, mediante `addEntitlement` y comprobación explícita
 de rol, el contrato vigente de `GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md` (TASK-935):
 
 | Capability | Acción / scope | Roles |
@@ -79,3 +81,12 @@ Un motivo inválido falla cerrado; un release sin excepción conserva su comport
 Validación integrada local: 46 passed en cinco archivos de pruebas y typecheck correcto. Pruebas
 de persistencia recorren recordReleaseStarted y sus writes transaccionales con DB mock; el readback
 PG de auditoría se verificará tras ejecutar el orquestador, no se cuenta como prueba live todavía.
+
+## Readback de persistencia en producción
+
+El run `33978290957` creó el manifest `1086fe40a553-2bdc070c-ead3-4f52-8100-708d63b6aa39`
+a las 16:37:07 UTC. Lectura real de PG confirmó el mismo objeto override en `preflight_result` y
+en metadata de la transición inicial: motivo completo y ambas flags `true`. El actor declarado por
+GitHub es `cesargrowth11`; la comprobación de autoridad del usuario canónico Greenhouse se realizó
+por separado. Esta evidencia no establece un enlace autenticado automático entre ambas identidades.
+La ejecución final del release y los canaries de acceso siguen sujetos a sus verificaciones propias.

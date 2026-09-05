@@ -6,9 +6,9 @@
 - Scope: TASK-1836; auth-server, sesiones, OAuth, contexto delegado y reader del gateway.
 - Reversibility: two-way-but-slow
 - Confidence: medium
-- Validated as of: 2026-09-05, código y contratos locales; runtime nuevo no desplegado.
+- Validated as of: 2026-09-05, runtime publicado parcialmente; follow-up OIDC local y canary corporativo pendiente.
 - Authorization: ejecución de TASK-1836 corregida D1–D7 solicitada por el operador y objetivo aprobado
-  en esta conversación. Formalización técnica dentro de ese alcance; no implica aprobación de release main.
+  en esta conversación. El rollout posterior fue autorizado explícitamente por el operador el 2026-09-05.
 
 ## Context
 
@@ -90,3 +90,22 @@ contexto/grant no observaba esa invalidación. La lectura del token permite dene
 sin revocar otras familias que comparten sesión/cliente/contexto. El acceso interno exige esta
 comprobación antes de activar la cohorte. Los bindings externos legacy sin contexto conservan su
 contrato; esta decisión no acredita una federación externa ni su revocación operativa completa.
+
+## Aclaración del contrato OIDC upstream — 2026-09-05
+
+La solicitud de identidad usa los scopes OIDC `openid profile`: `profile` es requerido por Entra para
+emitir `oid`, que forma parte de la identidad canónica junto a `tid`. No habilita Graph como provider
+MCP ni introduce scopes de APIs de negocio, `offline_access` o custody de refresh tokens upstream.
+Se mantienen firma, issuer, audience, nonce, PKCE, tenant, object ID y frescura. `auth_time` se configura
+como claim ID esencial en la aplicación; la instancia Entra fue releída y cumple ese contrato.
+
+La auditoría interna puede registrar una clasificación cerrada de la etapa que rechazó el login;
+no puede registrar URLs OAuth, códigos, tokens, valores de claims, cuerpos upstream ni mensajes
+crudos. La respuesta pública conserva el error genérico. El primer canary llegó desde Microsoft al
+callback pero fue rechazado; esta aclaración corrige el contrato documentado y no acredita aún un
+login operativo. [Contrato Microsoft](https://learn.microsoft.com/en-us/entra/identity-platform/id-token-claims-reference).
+
+El instante de validación del ID token se obtiene después de leer la respuesta del token endpoint,
+no al llegar el callback. La regresión con JWT firmado reproduce emisión en el segundo siguiente al
+callback: el token válido se acepta al recibirlo y el expirado en tránsito se rechaza. No se añade
+tolerancia al reloj, extensión de TTL ni fallback de identidad.

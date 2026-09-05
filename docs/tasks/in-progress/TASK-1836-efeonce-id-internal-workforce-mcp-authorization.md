@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `rollout parcial (2026-09-05): emisor y gateway publicados OFF; fix jti publicado en develop a9f16b893 y gateway fa1ee2a. Staging READY y smoke E2E success; PR222 de promoción main preparado. Enrolamiento y grant de lectura del piloto aplicados por commands canónicos, vencimiento 2026-09-12T15:00:00Z; todavía sin token corporativo ni canary autenticado. Promoción detenida: can() deniega ambas capabilities de excepción de release, pese al contrato de EFEONCE_ADMIN. Reparación de permisos autorizada: seis grants faltantes restaurados localmente; readback real can() permitido por rol y 28 tests passed. Auditoría del motivo en integración antes de publicar. GC sigue OFF/PAUSED. Ver runbook y TASK-1836_RELEASE_AUTHORITY_GAP_2026-09-05.md.`
+- Status real: `rollout parcial (2026-09-05): release main1086fe40 / run33978290957 completado, watchdog 5/5 correcto; GC ON y cron ejecutado. Reader Production ON; gateway dd04f470 / 00032-qm5 ON con discovery verificado. Login Microsoft completó MFA, pero callback rechazó upstream_rejected sin emitir token. Defectos de scope OIDC y reloj corregidos localmente con diagnóstico seguro; 65 pruebas y typecheck correctos, publicación pendiente. Emisor interno temporalmente OFF durable y revisión00012-tvn para evitar más intentos contra la versión anterior. Canary de lectura, revocación y rollback aún pendientes; no cerrar.`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -580,14 +580,14 @@ interactivo del sujeto real cuando corresponda. No enviar correos ni mensajes si
 
 - [ ] Cada caso de la matriz §8 tiene evidencia de comportamiento y outcome esperado/real; casos live sin ejecutar quedan pendientes, nunca verdes por skip.
 - [ ] Inventario de configuración Entra, redirects, secrets y flags verificado sin valores sensibles; callback real corresponde al runtime desplegado.
-- [ ] Enrolamiento idempotente y auditado, con capability fina y camino programático; ningún vínculo nace por coincidencia de email.
+- [x] Enrolamiento idempotente y auditado, con capability fina y camino programático; ningún vínculo nace por coincidencia de email. Commands/store y prueba PG `internal-access/commands.live.test.ts` verifican idempotencia y revocación; piloto real enrolado sobre identidad canónica, grant de lectura con vigencia y `gv=2`. El login humano permanece pendiente.
 - [x] Consentimiento y refresh no permiten cambiar persona, contexto ni elevar permisos; tokens previos no adquieren autoridad interna por default. OAuth JWT ES256 y pruebas PG de consentimiento/rotación verificadas.
 - [ ] Baja remota y baja canónica tienen latencias declaradas separadamente; revocación multicontexto pasa el caso A=10/B=2->3.
 - [ ] Rollback ensayado registra duración real, revocación selectiva y comprobación de externos/Entra legado; no depende de apagar todo OAuth.
 
 - [x] ADR aceptado define proveedor upstream, población y autoridad independientemente del issuer. `EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md`, D1–D7.
-- [x] Efeonce e identidad interna se resuelven canónicamente sin cambiar organización a cliente ni duplicar persona. Reader real devuelve perfil autorizado + EO-ORG-0007; test PG de enrolamiento usa clones temporales y rollback, sin enrolar persona real.
-- [ ] Login corporativo produce sesión y token MCP nativo con audiencia, azp, scopes y gv correctos.
+- [x] Efeonce e identidad interna se resuelven canónicamente sin cambiar organización a cliente ni duplicar persona. Reader real devuelve perfil autorizado + EO-ORG-0007; test PG de enrolamiento usa clones temporales y rollback. Posteriormente se enroló el piloto real sobre esa identidad canónica; la prueba de login humano sigue pendiente.
+- [ ] Login corporativo produce sesión y token MCP nativo con audiencia, azp, scopes y gv correctos. Intento real iniciado; Microsoft solicita contraseña reciente y aún no hay callback/sesión/token corporativo comprobado.
 - [ ] Refresh y revocación funcionan; baja efectiva en el source of truth o retiro de grant invalida autorización con token vigente en ≤60 s,
   verificado junto al gateway, sin afirmar cierre por expiración natural del token.
 - [ ] Token externo del mismo issuer, tenant desconocido y roles sin scopes no acceden a tools internas.
@@ -766,3 +766,40 @@ Build completo, bundle del emisor y gates worker/manifest pasan. Suite enfocada 
 en runbook §Preparación del piloto de lectura. Microsoft + scope read no requiere terminar login
 passkey ni el resto de UI para probar el piloto; siguen abiertos rollout, canary y rollback reales.
 Readback 15:02:44 UTC mantiene auth ready y gateway anunciando sólo el shim existente.
+
+
+### Release y activación parcial — 2026-09-05
+
+La evidencia anterior conserva el estado de cada etapa; esta sección actualiza el estado operativo.
+Main `1086fe40a55396fc199ef2e446391c14a69b665d` fue publicado mediante PR 222 y el orquestador
+único `33978290957`. Manifiesto `1086fe40a553-2bdc070c-ead3-4f52-8100-708d63b6aa39` en
+`released`, completado a las 16:46:02.837 UTC; watchdog 5/5 correcto. CI, Deep Verification,
+smoke y Production READY verificados. El motivo del override y `bypassWarnings=true` /
+`overrideBatchPolicy=true` quedaron coincidentes en manifiesto y auditoría. El actor GitHub
+`cesargrowth11` es una etiqueta de ejecución; la autoridad Greenhouse fue verificada aparte mediante
+`can()`, sin inferir que ambos identificadores son la misma identidad.
+
+- Reader Production: flag interno `true`, redeploy `dpl_4Ytq4GHm6rCSoDXAxK2vM5Br6gQ9` READY.
+- Emisor: `auth-server-00011-xkj` con acceso interno `true`, READY, 100% del tráfico y health PG/KMS correcto.
+- GC: flag durable `true`, revisión `ops-worker-00652-x8t`, scheduler `ENABLED`. Ejecución manual a
+  las 16:47:28.755 UTC y log de las 16:47:29.331 UTC: `dryRun=false`, `locked=true`, once tablas,
+  cero filas borradas. Esto prueba la invocación y sus guardas, no la necesidad de borrar filas.
+- Gateway: código `fa1ee` en revisión `00031`, flags internos restaurados a `false`. La activación
+  `33979293155` falló al intentar reconstruir un tag inmutable. El workflow fue corregido para reutilizar
+  el digest fijado; 125 pruebas correctas y revisión de root aprobada. Su publicación está en curso;
+  no se acredita todavía activación del gateway ni acceso MCP del piloto.
+- Login humano: iniciado con Microsoft para el piloto, pero el proveedor solicita contraseña reciente.
+  El usuario fue informado. Aún no se obtuvo sesión/token corporativo ni se completó el canary autenticado.
+
+La reversión del intento de activación del gateway no sustituye el ensayo de rollback completo:
+continúan sin marcar los criterios de tokens/canaries reales, latencia de revocación, coexistencia y
+rollback medido. TASK-1836 conserva `in-progress`.
+
+### Follow-up del primer login corporativo real
+
+Microsoft completó MFA y devolvió code/state sin error; PG confirma consumo de transacción dentro
+de vigencia a las 17:02:43.698 UTC y rechazo `upstream_rejected` a las 17:02:44.085 UTC. No se
+acredita causa exacta con ese código agregado. Se corrigieron dos defectos reproducibles/contractuales:
+OIDC solicita `openid profile` para disponer de `oid`, y el reloj JWT se lee después del intercambio.
+Diagnósticos internos limitados a enum, sin datos secretos ni exposición HTTP adicional. 65 pruebas
+integradas y typecheck correctos; emisor OFF durante publicación, reader/gateway preparados.
