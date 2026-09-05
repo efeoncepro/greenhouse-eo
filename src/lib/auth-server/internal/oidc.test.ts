@@ -47,6 +47,7 @@ describe('corporate upstream identity', () => {
 
     const client = createEntraOidcClient({
       config,
+      now: () => NOW,
       getClientSecret: async () => 'test-only',
       fetch: fetcher,
       verificationKey: createLocalJWKSet({ keys: [{ ...jwk, kid: 'test' }] })
@@ -75,7 +76,7 @@ describe('corporate upstream identity', () => {
 
     const url = new URL(client.authorizationUrl({ state: 's', nonce: 'n', codeChallenge: 'c' }))
 
-    expect(url.searchParams.get('scope')).toBe('openid')
+    expect(url.searchParams.get('scope')).toBe('openid profile')
     expect(url.searchParams.get('code_challenge_method')).toBe('S256')
   })
 
@@ -92,6 +93,7 @@ describe('corporate upstream identity', () => {
 
     const client = createEntraOidcClient({
       config,
+      now: () => NOW,
       getClientSecret: async () => 'test-only',
       fetch: async () => response,
       verificationKey: createLocalJWKSet({ keys: [{ ...jwk, kid: 'test' }] })
@@ -104,6 +106,76 @@ describe('corporate upstream identity', () => {
     await expect(client.exchange(input)).rejects.toThrow('upstream_rejected')
     response = new Response('x'.repeat(65537))
     await expect(client.exchange(input)).rejects.toThrow('upstream_rejected')
+  })
+
+  it('validates against time after exchange crosses a second, without accepting tokens expired in transit', async () => {
+    const { privateKey, publicKey } = await generateKeyPair('RS256')
+    const jwk = await exportJWK(publicKey)
+    const arrival = new Date(NOW.getTime() + 698)
+    let clock = arrival
+    const mintedAt = NOW.getTime() / 1000 + 1
+    let expiry = mintedAt + 600
+
+    const client = createEntraOidcClient({
+      config,
+      now: () => clock,
+      getClientSecret: async () => 'test-only',
+      verificationKey: createLocalJWKSet({ keys: [{ ...jwk, kid: 'test' }] }),
+      fetch: async () => {
+        const token = await new SignJWT({
+          iss: config.issuer,
+          aud: config.clientId,
+          sub: 'pairwise',
+          tid: config.tenantId,
+          oid: 'cccccccc-cccc-cccc-cccc-cccccccccccc',
+          nonce: 'nonce',
+          iat: mintedAt,
+          auth_time: mintedAt,
+          exp: expiry
+        })
+          .setProtectedHeader({ alg: 'RS256', kid: 'test' })
+          .sign(privateKey)
+
+        clock = new Date(NOW.getTime() + 1500)
+
+        return Response.json({ id_token: token })
+      }
+    })
+
+    const input = { code: 'private-code', nonce: 'nonce', codeVerifier: 'private-verifier', now: arrival }
+
+    await expect(client.exchange(input)).resolves.toMatchObject({ authTime: new Date(mintedAt * 1000) })
+    // No clock tolerance or lifetime extension: expires exactly at validation's second.
+    expiry = mintedAt
+    await expect(client.exchange(input)).rejects.toMatchObject({
+      code: 'upstream_rejected',
+      diagnostic: 'jwt_validation_failed'
+    })
+  })
+
+  it('exposes only bounded diagnostics for token response and exchange failures', async () => {
+    let response = new Response('private-code and token', { status: 400 })
+
+    const client = createEntraOidcClient({
+      config,
+      now: () => NOW,
+      getClientSecret: async () => 'private-secret',
+      fetch: async () => response
+    })
+
+    const input = { code: 'private-code', nonce: 'nonce', codeVerifier: 'private-verifier', now: NOW }
+
+    for (const [next, diagnostic] of [
+      [response, 'token_exchange_rejected'],
+      [new Response('private malformed body'), 'token_response_invalid'],
+      [Response.json({ access_token: 'private-token' }), 'token_response_invalid']
+    ] as const) {
+      response = next
+      const error = await client.exchange(input).catch(error => error)
+
+      expect(error).toMatchObject({ message: 'upstream_rejected', diagnostic })
+      expect(JSON.stringify(error)).not.toContain('private')
+    }
   })
 
   it('pins tenant/endpoints and rejects unsafe redirect configuration', () => {

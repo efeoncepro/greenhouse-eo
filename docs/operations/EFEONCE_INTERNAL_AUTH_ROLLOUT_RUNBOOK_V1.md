@@ -4,30 +4,30 @@ Owner: TASK-1836 / EPIC-044. Decisión: `EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECIS
 
 ## Estado verificado 2026-09-05
 
-Backend publicado parcialmente; promoción del reader y activación pendientes. Las migraciones
-`20260905124526557_task-1836-internal-authorization-contexts` y
-`20260905130319708_task-1836-auth-ephemeral-gc` y
-`20260905132652846_task-1836-session-bound-passkey-step-up` están aplicadas en la instancia compartida.
-Esto afecta al esquema común de staging/producción; no hay segunda instancia de pruebas.
-El runtime releído es `auth-server-00009-4tl`, SHA `a9f16b89393cfb19995baf07f48616a139f6bffb`,
-100% tráfico. OAuth/personas ON; configuración interna preparada pero OFF. Ingress real:
-`internal-and-cloud-load-balancing`.
+Main `1086fe40a55396fc199ef2e446391c14a69b665d` (PR #222) está released mediante el orquestador
+`33978290957`, con CI, Deep, E2E y watchdog (5/5 servicios) correctos. Las tres migraciones TASK-1836
+están aplicadas en la instancia compartida de staging/producción. Reader Production ON, redeploy
+`dpl_4Ytq4GHm6rCSoDXAxK2vM5Br6gQ9` READY. GC ON con scheduler ENABLED y ejecución real confirmada
+en `ops-worker-00652-x8t`. Gateway ON en `00032-qm5`, commit `dd04f470`, run `33979635307` success,
+health y discovery correctos. Su workflow ya reutiliza imágenes existentes por digest sin sobrescribir tags.
 
-El reader de elegibilidad en PG devuelve el perfil canónico del caso autorizado `jreyes@efeoncepro.com`
-y la organización `EO-ORG-0007` (`org-2df565fb-98aa-42f7-b324-ea9a2209017f`). Su condición comercial
-`other/inactive` no es una condición de pertenencia laboral: la organización está activa y es entidad
-operativa. No se modificó la organización. Tras autorización de rollout se aplicaron enrollment y grant
-`growth.seo.observation.read` por commands canónicos, con vencimiento `2026-09-12T15:00:00Z`.
-No se emitió todavía un token corporativo ni se completó el canary autenticado.
+El emisor interno está temporalmente OFF (variable GitHub false, `auth-server-00012-tvn` al 100%).
+El login real completó Microsoft/MFA y llegó al callback con code/state, pero fue rechazado dentro de
+vigencia con `upstream_rejected`; no se emitió token MCP. Follow-up local verificado: `openid profile`,
+reloj posterior al intercambio y diagnóstico seguro por etapa; 65 pruebas y typecheck correctos.
+Falta publicar ese fix y repetir el canary. No atribuir el rechazo agregado a una causa específica sin
+el diagnóstico correspondiente. La relación entre scope y claim, y el defecto temporal, sí se verificaron.
 
-Gateway `fa1ee2a05caf1adc66a034bdfe2e7db3ba4b103c`, revisión `efeonce-mcp-gateway-00031-xwx`,
-100% tráfico, contiene la validación jti; ambos flags nativos OFF. Vercel staging del SHA a9f16b893
-está READY y el smoke E2E `33975085336` terminó success. PR de promoción: #222, todavía sin merge.
-El preflight clasifica el batch `requires_break_glass`; la comprobación real de permisos deniega al
-actor ambas capabilities de excepción porque faltan los grants en el evaluador. Reparación concreta
-en [diagnóstico de autoridad](TASK-1836_RELEASE_AUTHORITY_GAP_2026-09-05.md), autorizada por el operador. Seis grants faltantes restaurados localmente y readback real permitido;
-pruebas de permisos 28 passed. Se integra la auditoría del motivo antes de publicar y usar la excepción.
-GC permanece OFF/PAUSED.
+El perfil canónico de `jreyes@efeoncepro.com` pertenece a `EO-ORG-0007`
+(`org-2df565fb-98aa-42f7-b324-ea9a2209017f`). Su condición comercial `other/inactive` no determina
+pertenencia laboral: la organización está activa y es entidad operativa. No se modificó la organización.
+Enrollment y grant `growth.seo.observation.read` aplicados mediante commands canónicos, con vencimiento
+`2026-09-12T15:00:00Z`, versión actual 2. No se completaron lectura MCP, revocación ni rollback con token.
+
+Los seis permisos de release faltantes se restauraron por rol; el actor canónico se revalidó antes de
+usar la excepción de batch. El motivo quedó persistido y releído en manifest y auditoría PG.
+[Diagnóstico y reparación](TASK-1836_RELEASE_AUTHORITY_GAP_2026-09-05.md). La identidad declarada por
+GitHub y la autoridad Greenhouse se comprobaron por separado, sin inventar un vínculo entre ellas.
 
 ## Configuración del emisor
 
@@ -35,7 +35,7 @@ GC permanece OFF/PAUSED.
   intercambio/refresh y resolución de contexto. OFF no cambia el carril externo.
 - `AUTH_SERVER_ENTRA_TENANT_ID`, `AUTH_SERVER_ENTRA_CLIENT_ID`: aplicación upstream de un solo tenant.
 - Redirect web exacto: `https://auth.efeonce.org/auth/internal/callback`.
-- Solicitar sólo `openid`, PKCE S256 y `max_age=0`; configurar emisión de `auth_time`.
+- Solicitar `openid profile`, PKCE S256 y `max_age=0`; configurar emisión de `auth_time`. `profile` es necesario para el claim `oid`; no pedir scopes de negocio ni `offline_access`.
   No inferir MFA desde Entra ni pedir scopes Graph de negocio.
 - `AUTH_SERVER_ENTRA_CLIENT_SECRET_REF`: referencia Secret Manager en deploy;
   el runtime recibe `AUTH_SERVER_ENTRA_CLIENT_SECRET`. Nunca incluir valor en CLI/documentación.
@@ -108,7 +108,35 @@ El contexto vence como máximo con el límite absoluto de la sesión y no se rej
 Una sesión web expirada no termina por sí sola una familia ya consentida; revocar la sesión sí invalida
 su contexto. Al vencer el contexto se requiere nueva autenticación/consentimiento.
 
+### Incorporar futuros colaboradores y clientes
+
+El piloto no crea una excepción por usuario o correo. Para incorporar otro colaborador, repetir este
+procedimiento con su identidad canónica:
+
+1. Verificar persona, vínculo workforce elegible y source Entra vigentes; resolver el tenant y object ID
+   exactos. No crear personas u organizaciones duplicadas ni inferir identidad por dominio de correo.
+2. Asignar al colaborador a la aplicación empresarial Efeonce ID Corporate Login en Microsoft Entra.
+   La aplicación requiere asignación; la asignación del piloto no habilita a todo el tenant.
+3. Ejecutar `enroll` primero con `dryRun:true`, revisar y aplicar con un actor autorizado.
+4. Otorgar sólo las capabilities necesarias mediante `grant`, con vencimiento explícito y dry-run previo.
+   El colaborador debe tener esos permisos vigentes en Greenhouse; enrolar no los concede por sí solo.
+5. Completar su autenticación Microsoft y consentimiento en el cliente MCP. Verificar una lectura
+   permitida, una operación fuera de alcance denegada y la revocación antes de ampliar permisos.
+
+No se requiere modificar código por cada incorporación. El grant del piloto vence el 2026-09-12 a las
+15:00 UTC; una renovación requiere el mismo command y una nueva vigencia explícita, no una extensión
+automática. La asignación Microsoft, el enrolamiento y los permisos son controles independientes.
+
+Los clientes siguen el acceso externo B2B de TASK-1631 y EPIC-044, con su organización y grants
+correspondientes; no deben convertirse en workforce interno para poder usar MCP. El rollout y la
+compatibilidad de clientes externos de TASK-1832 requieren su propia evidencia.
+
 ## Contrato del consumer TASK-1831
+
+Readback 2026-09-05 del despliegue Production `1086fe40a55396fc199ef2e446391c14a69b665d`:
+reader sin credencial → 401 `invalid_token`; con credencial máquina existente y contexto sintético
+sin `jti` → 400 `bad_request`. Probe GET sin escrituras, exit 0. Esto verifica el contrato publicado,
+no acredita todavía una sesión corporativa ni el canary autenticado.
 
 El JWT nativo interno añade `authorization_context_id` y `authorization_context_version:1`.
 Issuer, audiencia, azp, scopes, firma, expiración y `gv` conservan validación obligatoria. Un token sin
@@ -297,3 +325,57 @@ expiración o dimensiones ajenas antes de resolver contexto. Las pruebas usan lo
 `revokeGrant` y `revokeClientConsent` sobre store de memoria; una familia distinta del mismo contexto
 permanece válida al revocar sólo la primera. Gateway exige jti firmado, su prueba HTTP confirma 401
 sin llamar al provider cuando el ledger niega. La prueba productiva sigue pendiente.
+
+## GC operativo — 2026-09-05
+
+`AUTH_SERVER_GC_ENABLED=true` verificado en la variable del repositorio GitHub y en
+`ops-worker-00652-x8t`, Ready, 100% del tráfico, SHA `669a2b86186b880b335eb719ee8fa8b86f61d07c`.
+El scheduler `ops-auth-ephemeral-gc` quedó ENABLED. Ejecución manual del job existente a las
+16:47:28.755028 UTC y log `auth_ephemeral_gc_completed` a las 16:47:29.331126 UTC: `dryRun:false`,
+`locked:true`, batch 500, cutoff `2026-08-06T16:47:29Z`, cero borrados en las once tablas.
+Esto verifica scheduler → handler autenticado → función PG → log, sin necesidad de fabricar filas
+antiguas en producción. La siguiente ejecución automática conserva el horario minuto 13 de cada hora.
+
+## Release y activación de controles — 2026-09-05
+
+PR #222 integrado en main `1086fe40a55396fc199ef2e446391c14a69b665d`; CI, Deep y E2E success.
+Orquestador único `33978290957` success, manifest
+`1086fe40a553-2bdc070c-ead3-4f52-8100-708d63b6aa39` released a las 16:46:02 UTC. Watchdog
+posterior `aggregateSeverity:ok`, 5/5 servicios sincronizados. Auth/ops conservan SHA669a2b861 con
+árbol completo idéntico al target; los cambios posteriores de flags no reconstruyen ese código.
+
+Reader Production: valor `AUTH_SERVER_INTERNAL_AUTH_ENABLED=true` confirmado mediante env pull
+filtrado; redeploy del mismo SHA `dpl_4Ytq4GHm6rCSoDXAxK2vM5Br6gQ9` READY. Usar target CLI
+`production` en minúsculas para `vercel env update`; `Production` no encontró la variable existente.
+Emisor: variable GitHub del repositorio true y `auth-server-00011-xkj` Ready, 100% de tráfico, flag
+true. Readyz público: PostgreSQL, KMS y activeKey ok. El gateway se activa por su workflow independiente.
+La ruta de navegación es `/login`; la raíz `/` devuelve 404 y Chrome mostró ERR_BLOCKED_BY_CLIENT
+al intentar abrirla. `/login` abrió sin cambiar protecciones. Todavía no se ha emitido token corporativo.
+
+## Diagnóstico del primer login corporativo real
+
+El primer intento de Microsoft mostró AADSTS900561 (GET en un endpoint que exige POST). Un flujo nuevo
+llegó correctamente a la aprobación Authenticator y volvió al callback con code/state y sin error
+upstream. El callback propio rechazó ese segundo intento: request 17:02:18.767 UTC, transacción
+consumida 17:02:43.698 UTC dentro de vigencia, rechazo 17:02:44.085 UTC con `upstream_rejected`.
+Esto descarta expiración, replay y cookie ausente para ese intento; el motivo agregado no distingue
+intercambio, claims o elegibilidad. No se emitió un token MCP.
+
+Se confirmó un defecto contractual: el cliente pedía `openid` pero exigía `oid`; Microsoft documenta
+que `oid` requiere `profile`. La aplicación registrada sí tiene `auth_time` como claim ID esencial
+(readback de Entra), sin necesidad de cambiarlo. Se corrige el scope y se añade diagnóstico interno
+por etapa sin guardar tokens, códigos, valores de claims ni cuerpos upstream. La causa exacta del
+rechazo observado sigue sin demostrarse hasta contar con diagnóstico o canary posterior.
+Fuente: https://learn.microsoft.com/en-us/entra/identity-platform/id-token-claims-reference
+
+Corrección local verificada: `openid profile`, reloj de validación posterior al intercambio y seis
+diagnósticos internos cerrados; 65 pruebas integradas y typecheck correctos. Emisión interna apagada
+en la variable durable GitHub y en Cloud Run durante la publicación de este follow-up. Reader y
+gateway quedan preparados; no se emitió token corporativo. La prueba temporal usa JWT firmado y
+confirma también rechazo al vencer durante el intercambio, sin ampliar tolerancias.
+
+Gateway recuperado: commit `dd04f470415b7234cbda77df8c6b380c6d5e811e`, run `33979635307` success,
+revisión `efeonce-mcp-gateway-00032-qm5` Ready al 100%, digest
+`sha256:6f28046f525d965a54a6fca97e730fa5ef741c9be578181c79962df14bec4a39`. Ambos flags ON,
+referencias de máquina montadas; health 200 y discovery ON verificado, conservando Entra. Este
+resultado no acredita todavía un dispatch con token corporativo.

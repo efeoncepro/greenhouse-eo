@@ -2,7 +2,13 @@ import { internalLoginFailureResponse } from './login-error-page'
 /** TASK-1836 — browser-bound corporate login; identity/session writes belong to the injected command. */
 import { jsonResponse, redirectResponse, type OAuthHttpRequest, type OAuthHttpResponse } from '../oauth/http'
 
-import { InternalLoginError, type UpstreamIdentity, type createInternalLoginFlow } from './oidc'
+import {
+  InternalLoginError,
+  INTERNAL_LOGIN_DIAGNOSTICS,
+  type InternalLoginDiagnostic,
+  type UpstreamIdentity,
+  type createInternalLoginFlow
+} from './oidc'
 
 export const INTERNAL_LOGIN_COOKIE = '__Host-efeonce-internal-login'
 const COOKIE_ATTRIBUTES = 'Path=/; Secure; HttpOnly; SameSite=Lax'
@@ -12,6 +18,7 @@ export type InternalLoginOutcome = {
   stage: InternalLoginStage
   outcome: 'success' | 'failure'
   reason: 'ok' | 'rate_limited' | InternalLoginError['code']
+  diagnostic?: InternalLoginDiagnostic
 }
 
 export type InternalLoginHandlerDeps = {
@@ -98,21 +105,23 @@ export const createInternalLoginHandler =
     } catch (error) {
       const code = error instanceof InternalLoginError ? error.code : 'upstream_unavailable'
 
+      const diagnostic =
+        error instanceof InternalLoginError
+          ? INTERNAL_LOGIN_DIAGNOSTICS.find(value => value === error.diagnostic)
+          : undefined
+
       // Failure of the audit sink also fails closed; its own exception must never escape HTTP.
-      const audited = await deps.onOutcome({ stage, outcome: 'failure', reason: code }).then(
-        () => true,
-        () => false
-      )
+      const audited = await deps
+        .onOutcome({ stage, outcome: 'failure', reason: code, ...(diagnostic ? { diagnostic } : {}) })
+        .then(
+          () => true,
+          () => false
+        )
 
       const status = !audited || code === 'upstream_unavailable' || code === 'configuration_invalid' ? 503 : 400
 
-      return internalLoginFailureResponse(
-        request,
-        status,
-        audited ? code : 'upstream_unavailable',
-        {
-          'Set-Cookie': `${INTERNAL_LOGIN_COOKIE}=; ${COOKIE_ATTRIBUTES}; Max-Age=0`
-        }
-      )
+      return internalLoginFailureResponse(request, status, audited ? code : 'upstream_unavailable', {
+        'Set-Cookie': `${INTERNAL_LOGIN_COOKIE}=; ${COOKIE_ATTRIBUTES}; Max-Age=0`
+      })
     }
   }

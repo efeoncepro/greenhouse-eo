@@ -11,9 +11,20 @@ import { sha256Hex, safeEquals } from '../oauth/primitives'
 export type EntraOidcConfig = { tenantId: string; clientId: string; issuer: string; redirectUri: string }
 export type UpstreamIdentity = { issuer: string; tenantId: string; objectId: string; authTime: Date }
 
+export const INTERNAL_LOGIN_DIAGNOSTICS = [
+  'token_exchange_rejected',
+  'token_response_invalid',
+  'jwt_validation_failed',
+  'identity_claims_invalid',
+  'authentication_stale',
+  'identity_not_enrolled'
+] as const
+export type InternalLoginDiagnostic = (typeof INTERNAL_LOGIN_DIAGNOSTICS)[number]
+
 export class InternalLoginError extends Error {
   constructor(
-    readonly code: 'configuration_invalid' | 'transaction_invalid' | 'upstream_rejected' | 'upstream_unavailable'
+    readonly code: 'configuration_invalid' | 'transaction_invalid' | 'upstream_rejected' | 'upstream_unavailable',
+    readonly diagnostic?: InternalLoginDiagnostic
   ) {
     super(code)
     this.name = 'InternalLoginError'
@@ -68,7 +79,7 @@ export type EntraOidcClient = {
 const readTokenResponse = async (response: Response): Promise<unknown> => {
   const reader = response.body?.getReader()
 
-  if (!reader) throw new InternalLoginError('upstream_rejected')
+  if (!reader) throw new InternalLoginError('upstream_rejected', 'token_response_invalid')
   const chunks: Uint8Array[] = []
   let size = 0
 
@@ -78,14 +89,14 @@ const readTokenResponse = async (response: Response): Promise<unknown> => {
 
       if (done) break
       size += value.byteLength
-      if (size > 65536) throw new InternalLoginError('upstream_rejected')
+      if (size > 65536) throw new InternalLoginError('upstream_rejected', 'token_response_invalid')
       chunks.push(value)
     }
 
     try {
       return JSON.parse(Buffer.concat(chunks).toString('utf8'))
     } catch {
-      throw new InternalLoginError('upstream_rejected')
+      throw new InternalLoginError('upstream_rejected', 'token_response_invalid')
     }
   } finally {
     await reader.cancel().catch(() => undefined)
@@ -97,6 +108,8 @@ export const createEntraOidcClient = (deps: {
   config: EntraOidcConfig
   getClientSecret: () => Promise<string>
   fetch?: typeof globalThis.fetch
+  /** Validation clock is read after token exchange, never frozen at callback arrival. */
+  now?: () => Date
   /** Test seam: runtime omits this and always uses the tenant-pinned JWKS. */
   verificationKey?: JWTVerifyGetKey
 }): EntraOidcClient => {
@@ -117,7 +130,7 @@ export const createEntraOidcClient = (deps: {
         response_type: 'code',
         redirect_uri: config.redirectUri,
         response_mode: 'query',
-        scope: 'openid',
+        scope: 'openid profile',
         state,
         nonce,
         code_challenge: codeChallenge,
@@ -128,7 +141,7 @@ export const createEntraOidcClient = (deps: {
 
       return url.toString()
     },
-    exchange: async ({ code, nonce, codeVerifier, now }) => {
+    exchange: async ({ code, nonce, codeVerifier }) => {
       try {
         const secret = await deps.getClientSecret()
 
@@ -149,11 +162,14 @@ export const createEntraOidcClient = (deps: {
           })
         })
 
-        if (!response.ok) throw new InternalLoginError('upstream_rejected')
+        if (!response.ok) throw new InternalLoginError('upstream_rejected', 'token_exchange_rejected')
         const body: unknown = await readTokenResponse(response)
         const token = body && typeof body === 'object' && 'id_token' in body ? body.id_token : null
 
-        if (typeof token !== 'string' || token.length > 32768) throw new InternalLoginError('upstream_rejected')
+        if (typeof token !== 'string' || token.length > 32768)
+          throw new InternalLoginError('upstream_rejected', 'token_response_invalid')
+
+        const now = (deps.now ?? (() => new Date()))()
 
         const { payload } = await jwtVerify(token, key, {
           issuer: config.issuer,
@@ -176,12 +192,17 @@ export const createEntraOidcClient = (deps: {
           !safeEquals(payload.nonce, nonce) ||
           (payload.azp !== undefined && payload.azp !== config.clientId) ||
           typeof payload.auth_time !== 'number' ||
-          !Number.isSafeInteger(payload.auth_time) ||
+          !Number.isSafeInteger(payload.auth_time)
+        ) {
+          throw new InternalLoginError('upstream_rejected', 'identity_claims_invalid')
+        }
+
+        if (
           payload.auth_time > payload.iat ||
           payload.auth_time > Math.floor(now.getTime() / 1000) ||
           payload.auth_time < Math.floor(now.getTime() / 1000) - 600
         ) {
-          throw new InternalLoginError('upstream_rejected')
+          throw new InternalLoginError('upstream_rejected', 'authentication_stale')
         }
 
         return {
@@ -194,7 +215,7 @@ export const createEntraOidcClient = (deps: {
         if (error instanceof InternalLoginError) throw error
 
         if (error instanceof errors.JOSEError && !(error instanceof errors.JWKSTimeout)) {
-          throw new InternalLoginError('upstream_rejected')
+          throw new InternalLoginError('upstream_rejected', 'jwt_validation_failed')
         }
 
         // No upstream body, token, code or low-level message crosses this boundary.
@@ -317,7 +338,7 @@ export const createInternalLoginFlow = (deps: {
       !Number.isFinite(identity.authTime.getTime()) ||
       identity.authTime.getTime() < transaction.createdAt.getTime() - 60000
     )
-      throw new InternalLoginError('upstream_rejected')
+      throw new InternalLoginError('upstream_rejected', 'authentication_stale')
     if (!deps.enabled()) throw new InternalLoginError('configuration_invalid')
 
     return { identity, returnTo: returnUrl.pathname + returnUrl.search }

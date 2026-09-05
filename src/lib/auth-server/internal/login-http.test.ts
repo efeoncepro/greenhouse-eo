@@ -182,3 +182,61 @@ describe('corporate login HTTP boundary', () => {
     }
   })
 })
+
+describe('internal diagnostic audit boundary', () => {
+  it('records only the safe diagnostic, never upstream data or HTTP details', async () => {
+    for (const accept of ['', 'text/html']) {
+      const f = fixture()
+      const error = new InternalLoginError('upstream_rejected', 'identity_claims_invalid')
+
+      Object.assign(error, { message: 'PRIVATE raw error', token: 'PRIVATE token', body: 'PRIVATE response' })
+      f.flow.complete.mockRejectedValueOnce(error)
+      const response = await f.request('/auth/internal/callback?state=PRIVATE&code=PRIVATE', undefined, 'GET', accept)
+
+      expect(response?.status).toBe(400)
+      expect(response?.body).not.toContain('PRIVATE')
+      expect(response?.body).not.toContain('identity_claims_invalid')
+      expect(f.onOutcome).toHaveBeenCalledExactlyOnceWith({
+        stage: 'callback',
+        outcome: 'failure',
+        reason: 'upstream_rejected',
+        diagnostic: 'identity_claims_invalid'
+      })
+      expect(f.completeSession).not.toHaveBeenCalled()
+    }
+  })
+
+  it('rejects forged diagnostic fields and never copies an unknown exception', async () => {
+    for (const error of [
+      Object.assign(new InternalLoginError('upstream_rejected'), { diagnostic: 'PRIVATE upstream body' }),
+      Object.assign(new Error('PRIVATE raw error'), { diagnostic: 'identity_claims_invalid' })
+    ]) {
+      const f = fixture()
+
+      f.flow.complete.mockRejectedValueOnce(error)
+      const response = await f.request('/auth/internal/callback?state=a&code=PRIVATE')
+
+      expect(response?.body).not.toContain('PRIVATE')
+      expect(f.onOutcome).toHaveBeenCalledExactlyOnceWith({
+        stage: 'callback',
+        outcome: 'failure',
+        reason: error instanceof InternalLoginError ? 'upstream_rejected' : 'upstream_unavailable'
+      })
+    }
+  })
+
+  it('diagnoses enrollment denial without revealing it in HTTP', async () => {
+    const f = fixture()
+
+    f.completeSession.mockRejectedValueOnce(new InternalLoginError('upstream_rejected', 'identity_not_enrolled'))
+    const response = await f.request('/auth/internal/callback?state=a&code=PRIVATE')
+
+    expect(response?.body).toBe('{"error":"upstream_rejected"}')
+    expect(f.onOutcome).toHaveBeenCalledExactlyOnceWith({
+      stage: 'callback',
+      outcome: 'failure',
+      reason: 'upstream_rejected',
+      diagnostic: 'identity_not_enrolled'
+    })
+  })
+})
