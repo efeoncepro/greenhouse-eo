@@ -191,3 +191,16 @@ La regularización exige evidencia interna original del grant con capability y v
 No puede certificar una ampliación de autoridad como recuperación de auditoría. Evidencia canónica previa
 requiere dimensiones correlacionadas y outbox correspondiente; si falta esa pareja, se registra una nueva
 reconciliación actual, atómica e idempotente. No se reescriben los audits previos ni se rejuvenece el grant.
+
+### Solicitud de autenticación reciente compatible con Entra — 2026-09-05
+
+Se usa `prompt=login` en lugar de `max_age=0`: Microsoft permite solicitar credenciales
+explícitamente sin introducir el efecto de max_age corto sobre la duración del token.
+La evidencia real disponible es `jwt_expired`; la causalidad de max_age para este ID token
+queda pendiente del canary. Se conserva expiración estricta y auth_time obligatorio firmado,
+no futuro, no anterior a now−600s ni al inicio server-side−60s. `auth_time<=iat` no es
+un requisito OIDC y se elimina; no se elimina ni sustituye auth_time. El navegador no puede
+eludir la frescura retirando prompt porque el callback la verifica contra la transacción.
+[Microsoft OIDC](https://learn.microsoft.com/en-us/entra/identity-platform/v2-protocols-oidc) ·
+[OIDC ID token](https://openid.net/specs/openid-connect-core-1_0.html#IDToken) ·
+[Antecedente MSAL](https://github.com/AzureAD/microsoft-authentication-library-for-python/discussions/598).

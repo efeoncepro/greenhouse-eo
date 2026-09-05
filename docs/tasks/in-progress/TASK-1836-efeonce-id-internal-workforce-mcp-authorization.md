@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `2026-09-05 21:20 UTC: PR224/main d551cf368 released, health/watchdog5/5 correctos; integridad aplicada y reader productivo verificados. Canary real21:15:25Z rechazado por jwtVerify (jwt_validation_failed), sin token MCP. Emisor OFF: GitHub false y auth-server-00016-srj Ready100%. Diagnósticos cerrados ampliados localmente, revisión independiente correcta y 106 pruebas passed, tsc y bundle emisor correctos; build Next interrumpido, publicación pendiente. Azure/app/discovery correctos, causa exacta JWT aún no demostrada. Refresh/revocación/rollback pendientes.`
+- Status real: `2026-09-05 21:48 UTC: release PR224/main d551cf368 preservado. Diagnóstico e4977392b desplegado; nuevo callback rechazado por jwt_expired, sin token MCP. Emisor OFF en GitHub y auth-server-00019-4sg Ready100%. Corrección en validación local: prompt=login en lugar de max_age=0, auth_time firmado/fresco independiente de iat; exp sigue estricto. Publicación, nuevo canary, refresh/revocación/rollback pendientes.`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -956,3 +956,13 @@ Publicación, nuevo canary y corrección de causa real pendientes.
 Azure adicional: tokenLifetimePolicies de app y SP vacías, inventario global0; sin política de duración
 configurable que explique el fallo. OIDC no prescribe auth_time<=iat y MSAL oficial valida frescura
 contra now, pero ese guard posterior a JOSE no explica este diagnóstico; sin cambio especulativo.
+
+## Follow-up 21:48 UTC — expiración confirmada, solicitud OIDC en corrección
+
+Audit real: request21:47:13.951Z ok, callback21:48:03.553Z upstream_rejected / jwt_expired.
+No hubo token MCP. Diagnóstico servido SHA e4977392b, rev17; intento en rev18; apagado rev19.
+Revisión independiente avala prompt=login con auth_time obligatorio/fresco contra transacción
+y presente, exp estricto, sin exigir orden auth_time<=iat. Regresiones firmadas cubren iat
+retrospectivo, auth_time futuro/ausente/antiguo, exp vencido y límite start−60s/start−61s.
+La comparación con NextAuth Greenhouse muestra tolerancia10s y ausencia de max_age; no se
+copia esa tolerancia ni su resolución de identidad. Ver ADR/runbook para fuentes y límites.

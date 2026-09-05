@@ -1,17 +1,13 @@
 # Handoff activo
 
-**TASK-1836, 2026-09-05 21:20 UTC — callback rechazado, diagnóstico en preparación:**
-PR224/main d551cf368 released por run33991304002, health/watchdog5/5 correctos. Migración y
-reconciliación aplicadas (gv3, segunda revisión0/0, señales0), gateway d7469d7 publicado.
-Canary real21:15:25Z falló en jwtVerify: audit upstream_rejected / jwt_validation_failed; sin token MCP.
-Emisión interna apagada otra vez: GitHub repo false y auth-server-00016-srj Ready100%, flag false.
-Reader/gateway permanecen preparados. UI Claude preservada; Microsoft requiere return_to OAuth válido.
-Azure CLI confirma app/tenant/redirect/claim auth_time y ausencia de políticas de firma personalizadas;
-Discovery/JWKS correctos; causa JWT pendiente.
-Cambio local: diagnósticos JOSE cerrados, sin token/payload/cause y sin relajar validación; 106 pruebas
-passed (4 live omitidas no cuentan), tsc y bundle emisor correctos; build Next interrumpido en tipos.
-Próximo: publicar diagnóstico,
-comprobar SHA/revisión, un nuevo canary y corregir causa demostrada; después refresh/revocación/rollback.
+**TASK-1836, 2026-09-05 21:48 UTC — expiración confirmada, corrección local:**
+PR224/main d551cf368 released; integridad y gateway preservados. Diagnóstico e4977392b
+desplegado rev17; canary en rev18 falló21:48:03.553Z con jwt_expired, sin token MCP.
+Emisor OFF nuevamente: GitHub false y auth-server-00019-4sg Ready100%.
+Corrección local: prompt=login sustituye max_age=0; auth_time firmado/fresco independiente de iat.
+Exp continúa estricto, sin tolerancia adicional. Antecedente MSAL respalda hipótesis, no prueba
+aún causalidad del ID token. Próximo: validar/publicar y nuevo canary; refresh/revocación/rollback.
+UI ajena en curso: generate-brand-assets.ts y efeonce-isotipo.generated.ts; no incluir sin revisión.
 [Task](docs/tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md) ·
 [Runbook](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md) ·
 [Autorizaciones](docs/operations/TASK-1836_INTEGRITY_SESSION_HANDOFF_2026-09-05.md).

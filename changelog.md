@@ -16,6 +16,10 @@ sin conservar payload/cause ni relajar verificaciones. Respuesta pública sin de
 tras el fallo, diagnóstico aún local y causa exacta pendiente de comprobar en runtime. Tsc y bundle
 del emisor correctos; build Next compiló pero se interrumpió en tipos, sin acreditarlo completo.
 
+Actualización21:48Z: diagnóstico desplegado confirma jwt_expired. Corrección local sustituye
+max_age=0 por prompt=login, conserva exp estricto y auth_time firmado/fresco; elimina orden
+no requerido auth_time<=iat. Emisor OFF rev19; nuevo canary y rollout pendientes.
+
 ## 2026-09-05 — TASK-1836: reparación de integridad aplicada en PG
 
 Migración CLI `20260905183812333` aplicada: población explícita e inmutable, verificación de evidencia

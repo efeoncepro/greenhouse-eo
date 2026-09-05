@@ -89,7 +89,7 @@ de reparar por un command explícito. No declarar este procedimiento ejecutado h
   intercambio/refresh y resolución de contexto. OFF no cambia el carril externo.
 - `AUTH_SERVER_ENTRA_TENANT_ID`, `AUTH_SERVER_ENTRA_CLIENT_ID`: aplicación upstream de un solo tenant.
 - Redirect web exacto: `https://auth.efeonce.org/auth/internal/callback`.
-- Solicitar `openid profile`, PKCE S256 y `max_age=0`; configurar emisión de `auth_time`. `profile` es necesario para el claim `oid`; no pedir scopes de negocio ni `offline_access`.
+- Solicitar `openid profile`, PKCE S256 y `prompt=login`; configurar emisión de `auth_time`. `profile` es necesario para el claim `oid`; no pedir scopes de negocio ni `offline_access`.
   No inferir MFA desde Entra ni pedir scopes Graph de negocio.
 - `AUTH_SERVER_ENTRA_CLIENT_SECRET_REF`: referencia Secret Manager en deploy;
   el runtime recibe `AUTH_SERVER_ENTRA_CLIENT_SECRET`. Nunca incluir valor en CLI/documentación.
@@ -462,3 +462,22 @@ Ready100%, internalAuth false verificado. Reader/gateway no cambiados. Nueva cla
 mantiene validación y respuesta pública; registrar sólo enums, nunca payload/cause/token.
 Azure CLI y documentación Microsoft no justifican cambiar tenant, firma ni claims: investigar con el
 diagnóstico publicado antes de repetir canary. Evidencia y fuentes en TASK-1836 §Callback real rechazado.
+
+## Corrección de la solicitud interactiva — 2026-09-05 21:48 UTC
+
+Diagnóstico e4977392b publicado en auth-server-00017-mrd y activado temporalmente en
+00018-w7g. El intento real request21:47:13.951Z / callback21:48:03.553Z se rechazó
+con `jwt_expired`; no hubo token MCP. Emisor apagado nuevamente: GitHub false y
+auth-server-00019-4sg Ready100%.
+
+La solicitud pasa de `max_age=0` a `prompt=login`. Microsoft documenta que prompt login
+solicita credenciales; el mantenedor MSAL documentó efectos de max_age corto sobre exp,
+pero ese antecedente no prueba el lifetime del ID token de este intento. No se amplía
+tolerancia de exp ni se aceptan tokens expirados. auth_time sigue obligatorio y firmado,
+no futuro, dentro de 600 segundos y posterior a la transacción server-side menos 60 segundos.
+Se retira únicamente el orden auth_time<=iat, que OIDC no exige: el instante de
+autenticación no se deduce del instante de emisión retrospectivo. Firma, issuer, audiencia,
+nonce, PKCE, tenant y object ID siguen vigentes. Nuevo canary pendiente.
+
+Fuentes: [Microsoft OIDC](https://learn.microsoft.com/en-us/entra/identity-platform/v2-protocols-oidc),
+[MSAL discussion598](https://github.com/AzureAD/microsoft-authentication-library-for-python/discussions/598).

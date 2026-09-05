@@ -177,8 +177,9 @@ export const createEntraOidcClient = (deps: {
         nonce,
         code_challenge: codeChallenge,
         code_challenge_method: 'S256',
-        // Request a fresh authentication time; no business API scopes or refresh custody upstream.
-        max_age: '0'
+        // Entra can shorten token lifetime with max_age. Require interactive login instead;
+        // signed auth_time is still checked against now and the server-side transaction below.
+        prompt: 'login'
       }).toString()
 
       return url.toString()
@@ -240,7 +241,6 @@ export const createEntraOidcClient = (deps: {
         }
 
         if (
-          payload.auth_time > payload.iat ||
           payload.auth_time > Math.floor(now.getTime() / 1000) ||
           payload.auth_time < Math.floor(now.getTime() / 1000) - 600
         ) {
@@ -375,7 +375,8 @@ export const createInternalLoginFlow = (deps: {
       now
     })
 
-    // max_age=0 is a fresh-login request. Tolerate only one minute of clock skew relative to start.
+    // Enforce fresh login from signed auth_time even if the browser removes prompt=login.
+    // Tolerate only one minute of clock skew relative to the server-side transaction start.
     if (
       !Number.isFinite(identity.authTime.getTime()) ||
       identity.authTime.getTime() < transaction.createdAt.getTime() - 60000

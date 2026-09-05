@@ -70,11 +70,16 @@ describe('corporate upstream identity', () => {
       authTime: NOW
     })
 
+    // OIDC auth_time describes authentication, independently of Entra's backdated token iat.
+    token = await mint({ iat: NOW.getTime() / 1000 - 300 })
+    await expect(client.exchange(input)).resolves.toMatchObject({ authTime: NOW })
+
     for (const override of [
       { nonce: 'other' },
       { tid: 'other' },
       { azp: 'other' },
       { auth_time: NOW.getTime() / 1000 - 601 },
+      { auth_time: NOW.getTime() / 1000 + 1 },
       { iat: NOW.getTime() / 1000 + 60 },
       { aud: [config.clientId, 'another-client'] }
     ]) {
@@ -86,6 +91,8 @@ describe('corporate upstream identity', () => {
 
     expect(url.searchParams.get('scope')).toBe('openid profile')
     expect(url.searchParams.get('code_challenge_method')).toBe('S256')
+    expect(url.searchParams.get('prompt')).toBe('login')
+    expect(url.searchParams.has('max_age')).toBe(false)
   })
 
   it('rejects invalid signatures, malformed JSON and bounded oversized upstream bodies without leaking them', async () => {
@@ -347,6 +354,9 @@ describe('corporate upstream identity', () => {
     input = await begin()
     authTime = new Date(NOW.getTime() - 61000)
     await expect(flow.complete(input)).rejects.toThrow('upstream_rejected')
+    input = await begin()
+    authTime = new Date(NOW.getTime() - 60000)
+    await expect(flow.complete(input)).resolves.toMatchObject({ identity: { authTime } })
     input = await begin()
     authTime = NOW
     disableDuringExchange = true
