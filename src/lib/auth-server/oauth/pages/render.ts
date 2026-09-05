@@ -41,7 +41,6 @@ const brandRail = (): string => `<aside class="id-rail">
       <p class="id-rail-body">${escapeHtml(GH_AUTH_SERVER.login_rail_body)}</p>
       <p class="id-rail-trust">${ICON_LOCK}<span>${escapeHtml(GH_AUTH_SERVER.login_rail_trust)}</span></p>
     </div>
-    <span class="id-rail-mark" aria-hidden="true">${EFEONCE_ISOTIPO_SVG}</span>
   </aside>`
 
 /**

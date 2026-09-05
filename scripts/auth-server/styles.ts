@@ -131,20 +131,29 @@ button,input { font:inherit; color:inherit; }
    pasara lo que pasara, y a 1920 quedaba 124px fuera del eje de su propia columna. */
 .id-rail { position:relative; overflow:hidden; align-items:center; justify-content:center;
   padding:${s(16)} ${s(12)}; }
-.id-rail-inner { position:relative; z-index:1; width:100%; max-width:min(${s(148)}, 100%); display:grid; gap:${s(5)}; }
+.id-rail-inner { position:relative; z-index:1; width:100%; max-width:min(${s(148)}, 100%); display:grid; gap:0; }
 .id-rail-logo svg { width:${s(44)}; max-width:100%; height:auto; }
 .id-rail-logo svg { color:${n.bgWhite}; }
-.id-rail-kicker { font-size:${typographyScale.overline.fontSize}; font-weight:${fontWeights.semibold}; letter-spacing:${letterSpacings.caps}; text-transform:uppercase; color:color-mix(in oklch, ${n.bgWhite} 62%, transparent); }
+.id-rail-kicker { margin-block-start:${s(8)}; font-size:${typographyScale.overline.fontSize}; font-weight:${fontWeights.semibold}; letter-spacing:${letterSpacings.caps}; text-transform:uppercase; color:color-mix(in oklch, ${n.bgWhite} 62%, transparent); }
 /* El titular es una superficie de marca, no UI: escala con el viewport desde el mayor paso de la
    rampa hasta 1.6× ese mismo token — derivado del sistema, nunca un tamaño inventado. */
-.id-rail-headline { font-family:${hero.fontFamily}; font-size:clamp(${hero.fontSize}, 3.2vw, calc(${hero.fontSize} * 1.45)); font-weight:${fontWeights.bold}; line-height:1.04; letter-spacing:-.028em; margin-block-start:${s(2)}; text-wrap:balance; }
+.id-rail-headline { font-family:${hero.fontFamily}; font-size:clamp(${hero.fontSize}, 3.2vw, calc(${hero.fontSize} * 1.45)); font-weight:${fontWeights.bold}; line-height:1.04; letter-spacing:-.028em; margin-block-start:${s(2.5)}; text-wrap:balance; }
 .id-rail-headline em { font-style:normal; color:${axisRamp.primary[300]}; }
-.id-rail-body { max-width:46ch; color:color-mix(in oklch, ${n.bgWhite} 82%, transparent); }
-.id-rail-trust { display:flex; align-items:center; gap:${s(2)}; font-size:${typographyScale.bodyMd.fontSize}; color:color-mix(in oklch, ${n.bgWhite} 72%, transparent); }
+/* Medida por ancho, no por ch: ch es el ancho del CERO y en Geist es mucho más ancho que el
+   carácter promedio — 46ch rendían ~61 caracteres por línea, largo para texto de apoyo. */
+.id-rail-body { margin-block-start:${s(6)}; max-width:${s(100)}; text-wrap:balance; color:color-mix(in oklch, ${n.bgWhite} 82%, transparent); }
+.id-rail-trust { margin-block-start:${s(9)}; display:flex; align-items:center; gap:${s(2)}; font-size:${typographyScale.bodyMd.fontSize}; color:color-mix(in oklch, ${n.bgWhite} 72%, transparent); }
 /* Filigrana: el isotipo institucional a gran escala, casi invisible, para dar profundidad sin ruido. */
-.id-rail-mark { position:absolute; inset-block-end:-42%; inset-inline-start:-24%; width:${s(240)}; opacity:.045; pointer-events:none; }
-.id-rail-mark svg { width:100%; height:auto; }
-.id-rail-mark svg { color:${n.bgWhite}; }
+/* Profundidad SIN el logotipo. Se probaron dos tratamientos con el isotipo y los dos fallaron por la
+   misma razón: recortado se lee como objeto tajado —y además es uso incorrecto de la marca—, y a
+   escala de bandera su propia geometría mete un canto recto en mitad del panel. Dos anillos enormes
+   dan la misma profundidad y eco de marca sin ninguna arista posible: una circunferencia no tiene
+   dónde cortarse mal. */
+.id-rail::before,.id-rail::after { content:""; position:absolute; border-radius:50%; aspect-ratio:1;
+  border:1px solid color-mix(in oklch, ${n.bgWhite} 8%, transparent); pointer-events:none; }
+.id-rail::before { width:${s(248)}; inset-inline-start:-${s(88)}; inset-block-end:-${s(120)}; }
+.id-rail::after { width:${s(368)}; inset-inline-start:-${s(136)}; inset-block-end:-${s(176)};
+  border-color:color-mix(in oklch, ${n.bgWhite} 5%, transparent); }
 .id-page { width:min(100%,${s(152)}); margin-inline:auto; padding:${s(12)} ${s(6)}; display:grid; align-content:center; min-height:100svh; }
 @media (max-width:63.99rem) { .id-rail { display:none; } }
 .id-page[data-state="login"] { max-width:${s(140)}; }
@@ -213,7 +222,7 @@ button[aria-busy="true"] { cursor:progress; }
 .id-secondary:hover,button.secondary:hover { background:color-mix(in oklch, var(--id-accent) 6%, var(--id-paper)); border-color:color-mix(in oklch, var(--id-accent) 34%, transparent); }
 .id-section > .id-primary,.id-section > .id-secondary,form .id-secondary { width:100%; }
 .id-icon { width:${s(5)}; height:${s(5)}; flex:none; }
-.id-icon-brand { width:${s(4)}; height:${s(4)}; }
+.id-icon-brand { width:${s(5)}; height:${s(5)}; }
 .id-field { display:flex; flex-direction:column; gap:${s(2)}; margin-block:${s(4)}; font-size:${typographyScale.labelSm.fontSize}; font-weight:${fontWeights.semibold}; }
 .id-field .id-muted { font-weight:${fontWeights.regular}; margin-block-end:0; }
 form .id-actions { margin-block-start:${s(4)}; }

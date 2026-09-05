@@ -61,6 +61,9 @@ export const htmlResponse = (status: number, html: string, headers: Record<strin
   headers: {
     ...SECURITY_HEADERS,
     'Content-Type': 'text/html; charset=utf-8',
+    // Native HTML POSTs under no-referrer send Origin: null. Preserve their origin for CSRF
+    // validation while never sending a document path or OAuth query in the Referer header.
+    'Referrer-Policy': 'strict-origin',
     'Content-Security-Policy': `default-src 'none'; img-src 'self' data:; font-src 'self'; style-src ${styleHashes}; form-action 'self'; base-uri 'none'; frame-ancestors 'none'`,
     ...headers
   },
