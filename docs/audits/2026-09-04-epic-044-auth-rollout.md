@@ -18,3 +18,7 @@ Operador confirmó desplegar y activar TASK-1829/1830 por workflow canónico, ve
 Environment efeonce-auth activado por command auditado a 2026-09-05T00:50:17Z. Activación declarativa preparada, aún no desplegada. Verificar CI y runtime, metadata, DCR/CIMD, correo real, sesión, tokens, refresh/revocación y passkeys. Identidad de canary solicitada al operador; no crear acceso a clientes por inferencia.
 
 Rollback: revisión inicial auth-server-00006-znf; restituir flags false por workflow y environment draft por command si falla la activación. Tokens/cookies/codes/enlaces de acceso nunca se registran en evidencia.
+
+## Despliegue en curso
+
+Commit 3f68e8875 publicado en develop. Pre-push local:check pasó con cero errores (26 warnings existentes). Auth Server Deploy run 33934410457, primer intento detenido antes de build: deployer sin permiso para describir la llave TOTP. Se concedió roles/cloudkms.viewer únicamente sobre auth-server-totp-envelope a github-actions-deployer@, preservando el permiso de cifrado exclusivo del runtime; política releída. Reintento del job fallido solicitado. CLAUDE.md governance reportó 35.007/35.000 tokens; abreviación equivalente de una frase del router, sin retirar reglas.
