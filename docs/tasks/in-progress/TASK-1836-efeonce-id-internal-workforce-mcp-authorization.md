@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `2026-09-05 21:48 UTC: release PR224/main d551cf368 preservado. Diagnóstico e4977392b desplegado; nuevo callback rechazado por jwt_expired, sin token MCP. Emisor OFF en GitHub y auth-server-00019-4sg Ready100%. Corrección en validación local: prompt=login en lugar de max_age=0, auth_time firmado/fresco independiente de iat; exp sigue estricto. Publicación, nuevo canary, refresh/revocación/rollback pendientes.`
+- Status real: `2026-09-05 22:04 UTC: SSO Microsoft correcto en runtime61d5fe1f0 (consume22:01:26.817Z success). Authorize posterior rechazado access_denied/consent_context_unavailable: reader externo filtra binding interno. Corrección local separa reader interno y verifica población; readback PG real correcto, 150 pruebas passed/22live omitidas. Emisor OFF GitHub/rev22-8n5 Ready100%. Helper backToLogin completado; tsc0 y117 pruebas de personas correctas. Sin token MCP; publicación y canary final pendientes.`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -966,3 +966,26 @@ y presente, exp estricto, sin exigir orden auth_time<=iat. Regresiones firmadas 
 retrospectivo, auth_time futuro/ausente/antiguo, exp vencido y límite start−60s/start−61s.
 La comparación con NextAuth Greenhouse muestra tolerancia10s y ausencia de max_age; no se
 copia esa tolerancia ni su resolución de identidad. Ver ADR/runbook para fuentes y límites.
+
+Publicación de la corrección: c44856f4d incluido en push develop61d5fe1f0. Build/despliegue
+33994320247 en curso. Revisión independiente del diff OIDC sin hallazgos materiales; 106
+pruebas passed/4 live omitidas, tsc0, ESLint0errores y prepush0errores/26warnings existentes.
+UI Claude intercalada01598b44e/39484aff5/61d5fe1f0 revisada: assets y marcas no alteran
+autoridad. Dos seguimientos UI pendientes: CTA de error /login pierde contexto Microsoft
+y promete reintentar; selector id-context strong sobrescribe el contraste en campo de marca.
+No se reusan state/code ni retorno proporcionado por el callback para recuperar el flujo.
+
+## Follow-up 22:04 UTC — SSO exitoso; consentimiento con reader de población incorrecta
+
+SSO request22:01:02.720Z / consume22:01:26.817Z success. OAuth authorize22:01:27.450Z
+access_denied / consent_context_unavailable. Se resolvió autoridad interna, pero el reader
+getExternalOrganizationBinding restringe population=external y devolvía null para el binding
+interno. Pruebas previas usaban un mock externo para ambos carriles y no detectaban el defecto.
+
+Corrección local: getInternalOrganizationBindingPresentation (proyección mínima, sólo interno),
+selección por población después de resolver autoridad y comparación binding.population.
+Regresiones: cruce en ambos sentidos denegado, reader externo null y reader interno correcto,
+sin fallback cuando falta binding interno. Prueba dirigida26passed; suite150passed/22live
+omitidas. Readback PG real con readers canónicos: externo rechaza interno, interno obtiene
+nombre presente, active=true, gv3. No modifica base, grants ni datos personales.
+Emisor desactivado rev22-8n5/GitHub false mientras se publica esta segunda corrección.

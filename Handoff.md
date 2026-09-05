@@ -1,13 +1,14 @@
 # Handoff activo
 
-**TASK-1836, 2026-09-05 21:48 UTC — expiración confirmada, corrección local:**
-PR224/main d551cf368 released; integridad y gateway preservados. Diagnóstico e4977392b
-desplegado rev17; canary en rev18 falló21:48:03.553Z con jwt_expired, sin token MCP.
-Emisor OFF nuevamente: GitHub false y auth-server-00019-4sg Ready100%.
-Corrección local: prompt=login sustituye max_age=0; auth_time firmado/fresco independiente de iat.
-Exp continúa estricto, sin tolerancia adicional. Antecedente MSAL respalda hipótesis, no prueba
-aún causalidad del ID token. Próximo: validar/publicar y nuevo canary; refresh/revocación/rollback.
-UI ajena en curso: generate-brand-assets.ts y efeonce-isotipo.generated.ts; no incluir sin revisión.
+**TASK-1836, 2026-09-05 22:04 UTC — SSO resuelto, consentimiento en corrección:**
+Microsoft consume22:01:26.817Z success con61d5fe1f0; luego authorize access_denied /
+consent_context_unavailable. Causa: reader externo usado para binding interno. Corrección local
+reader interno mínimo + selección/verificación de población; readback PG real activo/gv3,
+150 pruebas passed/22live omitidas. Helper backToLogin completado; tsc0 y117 pruebas de personas correctas.
+Emisor OFF GitHub y auth-server-00022-8n5 Ready100%. Main d551cf368 último release certificado.
+Helper TTY10981 sin tokens ni transacción; reiniciar /start sólo tras publicación verificada.
+Siguiente: completar types/publicarfix, authorize/consent/token, allow/foreign/refresh/revoke/rollback
+y promoción final gobernada. UI ajena activa; preservar archivos.
 [Task](docs/tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md) ·
 [Runbook](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md) ·
 [Autorizaciones](docs/operations/TASK-1836_INTEGRITY_SESSION_HANDOFF_2026-09-05.md).

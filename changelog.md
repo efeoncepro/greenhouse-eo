@@ -20,6 +20,11 @@ Actualización21:48Z: diagnóstico desplegado confirma jwt_expired. Corrección 
 max_age=0 por prompt=login, conserva exp estricto y auth_time firmado/fresco; elimina orden
 no requerido auth_time<=iat. Emisor OFF rev19; nuevo canary y rollout pendientes.
 
+Actualización22:04Z: SSO Microsoft correcto en runtime. Consentimiento bloqueado por lector
+externo usado para organización interna; corrección local agrega proyección interna mínima y
+selección/verificación explícita de población. Readback PG real y150pruebas correctos;
+publicación/token/canary final pendientes, emisorOFF rev22.
+
 ## 2026-09-05 — TASK-1836: reparación de integridad aplicada en PG
 
 Migración CLI `20260905183812333` aplicada: población explícita e inmutable, verificación de evidencia

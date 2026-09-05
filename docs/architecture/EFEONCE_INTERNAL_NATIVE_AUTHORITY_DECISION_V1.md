@@ -204,3 +204,12 @@ eludir la frescura retirando prompt porque el callback la verifica contra la tra
 [Microsoft OIDC](https://learn.microsoft.com/en-us/entra/identity-platform/v2-protocols-oidc) ·
 [OIDC ID token](https://openid.net/specs/openid-connect-core-1_0.html#IDToken) ·
 [Antecedente MSAL](https://github.com/AzureAD/microsoft-authentication-library-for-python/discussions/598).
+
+### Presentación de consentimiento separada por población — 2026-09-05
+
+La resolución vigente de autoridad precede a cualquier lectura de nombres. El consentimiento
+interno usa una proyección mínima de bindings internos del store interno; el externo conserva
+el reader restringido a externos. Ambos verifican población, binding, organización, entorno,
+estado, revocación y gv. Un reader ausente o de otra población deniega, nunca elige fallback.
+El canary real detectó el antiguo uso del reader externo para internos después de un SSO
+correcto; la corrección no modifica la autoridad ni amplía el reader externo.

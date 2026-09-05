@@ -481,3 +481,11 @@ nonce, PKCE, tenant y object ID siguen vigentes. Nuevo canary pendiente.
 
 Fuentes: [Microsoft OIDC](https://learn.microsoft.com/en-us/entra/identity-platform/v2-protocols-oidc),
 [MSAL discussion598](https://github.com/AzureAD/microsoft-authentication-library-for-python/discussions/598).
+
+## Follow-up 22:04 UTC — Microsoft completado, consentimiento en reparación
+
+SSO consume22:01:26.817Z success en61d5fe1f0; ya no jwt_expired. El siguiente authorize
+rechazó consent_context_unavailable porque usó reader externo para binding interno.
+Corrección local separa la proyección de nombre interna y comprueba población. Readback PG
+real y pruebas unitarias correctos; cero tokens MCP. Emisor OFF rev22-8n5/GitHub false.
+Publicación y nuevo authorize con sesión humana pendientes; no reutilizar el callback OAuth.
