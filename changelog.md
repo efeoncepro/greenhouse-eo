@@ -18,9 +18,10 @@ campo `theme` — la placa opaca no los necesita y el spec no define si `theme` 
 ícono o el del cliente, cosa que ningún cliente permite falsificar. Un ícono sólo se declara si sus bytes cargaron: asset ausente
 deja al gateway sin ícono + WARNING, nunca una promesa que responde 404. El `Dockerfile` copia
 `assets/` y un test lo afirma, porque ningún test de runtime ve el contenido de la imagen.
-`pnpm check` verde (131 tests) y ambas guardas falsificadas. Commit `acda2c7` en `efeonce-mcp`, sin
-push ni deploy: el despliegue es `workflow_dispatch` manual, así que queda `code complete, rollout
-pendiente`. Sabido: ningún cliente Claude renderiza `icons` hoy — se declara porque es correcto.
+`pnpm check` verde (131 tests) y ambas guardas falsificadas. **Desplegado** (`815df9b`, revisión
+`efeonce-mcp-gateway-00036-5wc`): `/icon-512.png` 200 `image/png` con bytes idénticos al repo y sin
+challenge, protected-resource 200, `POST /mcp` sin token 401, ruta retirada 404 y `auth.efeonce.org`
+intacto. Sabido: ningún cliente Claude renderiza `icons` hoy — se declara porque es correcto.
 Detalle y razones en
 [`EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md`](docs/architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md)
 §Delta 2026-09-05.

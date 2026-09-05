@@ -504,6 +504,13 @@ ambigua —«theme preference (light or dark) for the icon background», sin dec
 puede falsificar contra nada**. Un ícono que no depende del tema no puede leerse al revés. Por eso
 `icon-512-dark.png` y el campo `theme` completo se retiraron del contrato.
 
+**Rollout:** en producción desde 2026-09-05, revisión `efeonce-mcp-gateway-00036-5wc` (commit `815df9b`).
+Verificado contra el front door real, no contra el código: `/icon-512.png` 200 `image/png` con bytes idénticos
+al asset del repo y **sin** challenge de auth, `/.well-known/oauth-protected-resource` 200, `POST /mcp` sin
+token 401 (fail-closed intacto), la ruta del asset retirado 404, y `auth.efeonce.org/readyz` 200. El deploy no
+arrastró trabajo ajeno: la revisión previa `00035-bhd` estaba construida desde `d7469d7`, padre exacto de
+estos commits — comprobado por el tag de la imagen desplegada antes de disparar.
+
 El estudio de contenedor que sostiene la decisión (recomendación especificada, las tres alternativas
 descartadas con su motivo, y los cuatro tratamientos a 48/32/24 px sobre lista clara, lista oscura y
 fondo con color) vive como lienzo de diseño; el isotipo no se alteró en ninguno: la geometría se

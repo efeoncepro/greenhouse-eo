@@ -15,12 +15,14 @@ No cerrar matricesamplias de clientes externos, multicontexto ni UI (contraste p
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
-**MCP gateway — cartel del servidor, 2026-09-05:** `efeonce-mcp` `acda2c7`+`815df9b` (local, **sin push**)
-declara `title`/`websiteUrl`/`icons` y sirve UN ícono en `/icon-512.png`: isotipo blanco sobre placa navy
-opaca, sin `theme`. `pnpm check` verde (131) + guardas falsificadas. **Rollout pendiente:** deploy
-`workflow_dispatch` manual; al dispararlo, verificar front door (`/icon-512.png` 200 `image/png` + `icons` en
-`initialize`) y que el `Dockerfile` copie `assets/`. Sin impacto visible: ningún cliente Claude renderiza
-`icons`. Razones:
+**MCP gateway — cartel del servidor, 2026-09-05 — DESPLEGADO:** `efeonce-mcp` `815df9b` en producción,
+revisión `efeonce-mcp-gateway-00036-5wc`. El gateway declara `title`/`websiteUrl`/`icons` y sirve UN ícono
+(isotipo blanco sobre placa navy opaca, sin `theme`, sin radio horneado). Front door verificado en vivo:
+`/icon-512.png` 200 `image/png` con bytes idénticos al asset del repo y sin challenge de auth;
+`/.well-known/oauth-protected-resource` 200; `POST /mcp` sin token 401 (fail-closed intacto);
+`/icon-512-dark.png` 404; `auth.efeonce.org/readyz` 200 (el piloto de TASK-1836 no se tocó). El deploy llevó
+sólo estos commits: la revisión anterior `00035-bhd` estaba construida desde `d7469d7`, su padre exacto. Sin
+impacto visible: ningún cliente Claude renderiza `icons` todavía. Razones:
 [ADR](docs/architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md) §Delta 2026-09-05.
 
 **Berel, 2026-09-04:** Playbook Producción y feedback nuevo de septiembre leídos completos y promovidos a
