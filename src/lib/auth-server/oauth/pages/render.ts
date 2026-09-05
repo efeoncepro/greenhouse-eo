@@ -35,7 +35,8 @@ const STYLES = AUTH_SERVER_STYLES
 const brandRail = (): string => `<aside class="id-rail">
     <div class="id-rail-inner">
       <div class="id-rail-logo" role="img" aria-label="${escapeHtml(EFEONCE_BRAND_NAME)}">${EFEONCE_LOGOTYPE_NEGATIVE_SVG}</div>
-      <p class="id-rail-headline">${escapeHtml(GH_AUTH_SERVER.login_rail_headline)}</p>
+      <p class="id-rail-kicker">${escapeHtml(GH_AUTH_SERVER.brand_title)}</p>
+      <p class="id-rail-headline">${escapeHtml(GH_AUTH_SERVER.login_rail_headline)} <em>${escapeHtml(GH_AUTH_SERVER.login_rail_headline_accent)}</em>.</p>
       <p class="id-rail-body">${escapeHtml(GH_AUTH_SERVER.login_rail_body)}</p>
       <p class="id-rail-trust">${ICON_LOCK}<span>${escapeHtml(GH_AUTH_SERVER.login_rail_trust)}</span></p>
     </div>

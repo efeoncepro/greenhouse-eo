@@ -17,7 +17,11 @@ export const GH_AUTH_SERVER = {
   /** Ejemplo dentro del campo; la etiqueta visible sigue siendo `login_email_label` (WCAG 3.3.2). */
   login_email_placeholder: 'nombre@empresa.com',
   /** Panel de marca del acceso: dice QUÉ es esto y CÓMO funciona, sin promesas genéricas. */
-  login_rail_headline: 'Un solo acceso a lo que Efeonce opera contigo.',
+  /** Titular del panel: se parte en dos para acentuar la promesa, no por capricho tipográfico. */
+  login_rail_headline: 'Un solo acceso a todo lo que',
+  login_rail_headline_accent: 'Efeonce opera contigo',
+  /** Línea fina al pie de la tarjeta: acota a quién le llega el enlace, sin revelar si existe. */
+  login_card_note: 'Te escribimos sólo al correo con el que te invitaron.',
   login_rail_body: 'Efeonce ID es la identidad con la que entras a los espacios de trabajo y a las herramientas conectadas de tu organización.',
   login_rail_trust: 'Enlace de un solo uso. Sin contraseñas que recordar.',
   scope_read_label: 'Lectura',

@@ -72,7 +72,8 @@ export const renderLoginPage = (input: { returnTo: string | null; internalLoginU
     <div class="actions">
       <button class="primary" type="submit">${ICON_MAIL}${escapeHtml(GH_AUTH_SERVER.login_submit_cta)}</button>
     </div>
-  </form></section>`,
+  </form>
+  <p class="id-note-fine">${escapeHtml(GH_AUTH_SERVER.login_card_note)}</p></section>`,
     { state: 'login' }
   )
 }

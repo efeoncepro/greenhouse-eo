@@ -92,6 +92,21 @@ button,input { font:inherit; color:inherit; }
    centrada las sirve mejor. El formulario va PRIMERO en el DOM y el panel se reordena por CSS, para
    que un lector de pantalla llegue al campo antes que al mensaje de marca. */
 .id-canvas { min-height:100svh; display:grid; align-items:stretch; }
+/* Dirección «Nocturno editorial»: en el acceso el lienzo ENTERO es el campo de marca y la tarjeta
+   clara flota encima. El campo se fija en ambos esquemas —el login es el momento de marca, no una
+   pantalla más del producto— y por eso la tarjeta re-declara los tokens claros en su subárbol: así
+   el modo oscuro del sistema sigue gobernando consentimiento, verificación y error, sin tocar ésta. */
+.id-canvas[data-state="login"] { position:relative; isolation:isolate; color:${n.bgWhite};
+  background:radial-gradient(120% 90% at 8% 0%, ${railGlow} 0%, ${railBase} 42%, ${railDeep} 100%); }
+.id-canvas[data-state="login"]::after { content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
+  background-image:radial-gradient(color-mix(in oklch, ${n.bgWhite} 6%, transparent) 1px, transparent 1px); background-size:3px 3px; }
+.id-canvas[data-state="login"] .id-page { background:transparent; }
+.id-canvas[data-state="login"] .id-brand { color:${n.bgWhite}; }
+.id-canvas[data-state="login"] .id-brand svg { color:${n.bgWhite}; }
+.id-canvas[data-state="login"] .id-surface {
+  --id-paper:${n.paper}; --id-text:${n.textPrimary}; --id-muted:${n.textSecondary}; --id-border:${n.divider}; --id-hover:${n.actionHover};
+  color:var(--id-text); border-color:transparent;
+  box-shadow:0 2px 4px color-mix(in srgb, ${railDeep} 22%, transparent), 0 ${s(12)} ${s(24)} -${s(8)} color-mix(in srgb, ${railDeep} 62%, transparent); }
 .id-rail { display:none; }
 @media (min-width:64rem) {
   /* La fila en 1fr: sin eso el panel se queda del alto de su contenido y deja una franja muerta. */
@@ -100,15 +115,20 @@ button,input { font:inherit; color:inherit; }
   .id-canvas[data-state="login"] .id-brand { display:none; }
   .id-canvas[data-state="login"] .id-page { min-height:auto; padding-inline:${s(10)}; }
 }
-.id-rail { position:relative; overflow:hidden; align-items:center; padding:${s(16)} ${s(12)}; color:${n.bgWhite}; background:linear-gradient(150deg, ${railDeep} 0%, ${railBase} 58%, ${railGlow} 140%); }
-.id-rail-inner { position:relative; z-index:1; max-width:${s(96)}; display:grid; gap:${s(5)}; }
+.id-rail { position:relative; overflow:hidden; align-items:center; padding:${s(16)} ${s(12)};
+  border-inline-end:1px solid color-mix(in oklch, ${n.bgWhite} 13%, transparent); }
+.id-rail-inner { position:relative; z-index:1; max-width:${s(132)}; display:grid; gap:${s(5)}; }
 .id-rail-logo svg { width:${s(44)}; max-width:100%; height:auto; }
 .id-rail-logo svg { color:${n.bgWhite}; }
-.id-rail-headline { font-family:${hero.fontFamily}; font-size:${hero.fontSize}; font-weight:${fontWeights.bold}; line-height:${hero.lineHeight}; letter-spacing:-.02em; margin-block-start:${s(4)}; text-wrap:balance; }
+.id-rail-kicker { font-size:${typographyScale.overline.fontSize}; font-weight:${fontWeights.semibold}; letter-spacing:${letterSpacings.caps}; text-transform:uppercase; color:color-mix(in oklch, ${n.bgWhite} 62%, transparent); }
+/* El titular es una superficie de marca, no UI: escala con el viewport desde el mayor paso de la
+   rampa hasta 1.6× ese mismo token — derivado del sistema, nunca un tamaño inventado. */
+.id-rail-headline { font-family:${hero.fontFamily}; font-size:clamp(${hero.fontSize}, 3.2vw, calc(${hero.fontSize} * 1.45)); font-weight:${fontWeights.bold}; line-height:1.04; letter-spacing:-.028em; margin-block-start:${s(2)}; text-wrap:balance; }
+.id-rail-headline em { font-style:normal; color:${axisRamp.primary[300]}; }
 .id-rail-body { max-width:46ch; color:color-mix(in oklch, ${n.bgWhite} 82%, transparent); }
 .id-rail-trust { display:flex; align-items:center; gap:${s(2)}; font-size:${typographyScale.bodyMd.fontSize}; color:color-mix(in oklch, ${n.bgWhite} 72%, transparent); }
 /* Filigrana: el isotipo institucional a gran escala, casi invisible, para dar profundidad sin ruido. */
-.id-rail-mark { position:absolute; inset-block-end:-32%; inset-inline-end:-24%; width:${s(196)}; opacity:.07; pointer-events:none; }
+.id-rail-mark { position:absolute; inset-block-end:-42%; inset-inline-start:-24%; width:${s(240)}; opacity:.045; pointer-events:none; }
 .id-rail-mark svg { width:100%; height:auto; }
 .id-rail-mark svg { color:${n.bgWhite}; }
 .id-page { width:min(100%,${s(152)}); margin-inline:auto; padding:${s(12)} ${s(6)}; display:grid; align-content:center; min-height:100svh; }
@@ -122,6 +142,8 @@ button,input { font:inherit; color:inherit; }
 .id-context { text-align:center; margin-block-end:${s(6)}; overflow-wrap:anywhere; font-size:${typographyScale.bodyMd.fontSize}; color:var(--id-muted); }
 .id-context strong { display:block; margin-block-start:${s(1)}; font-size:${body.fontSize}; color:var(--id-text); font-weight:${fontWeights.semibold}; }
 .id-surface { background:var(--id-paper); border:1px solid var(--id-border); border-radius:${r.lg}; padding:${s(9)} ${s(8)} ${s(8)}; box-shadow:var(--id-shadow); }
+.id-canvas[data-state="login"] .id-surface { padding:${s(11)} ${s(10)} ${s(10)}; }
+.id-note-fine { margin-block-start:${s(5)}; font-size:${typographyScale.bodySm.fontSize}; color:var(--id-muted); text-align:center; }
 .id-title { font-family:${title.fontFamily}; font-size:${title.fontSize}; font-weight:${title.fontWeight}; line-height:${title.lineHeight}; margin-block-end:${s(2)}; letter-spacing:-.02em; }
 .id-surface > p { max-width:60ch; margin-block-end:${s(4)}; text-wrap:pretty; }
 .id-intro { color:var(--id-muted); margin-block-end:${s(7)}; }
@@ -130,7 +152,7 @@ button,input { font:inherit; color:inherit; }
 .id-section p { margin-block-end:${s(4)}; }
 .id-primary,.id-secondary,button.primary,button.secondary {
   display:inline-flex; align-items:center; justify-content:center; gap:${s(2)};
-  min-height:${s(11)}; padding:${s(3)} ${s(4)}; border-radius:${r.md};
+  min-height:${s(12)}; padding:${s(3)} ${s(4)}; border-radius:${r.md};
   text-decoration:none; font-size:${label.fontSize}; line-height:${label.lineHeight}; font-weight:${fontWeights.semibold};
   cursor:pointer; text-align:center; overflow-wrap:anywhere;
   transition:background-color .15s cubic-bezier(.2,0,0,1), border-color .15s cubic-bezier(.2,0,0,1), box-shadow .15s cubic-bezier(.2,0,0,1);
@@ -149,7 +171,7 @@ form .id-actions { margin-block-start:${s(4)}; }
 .id-input { position:relative; display:block; }
 .id-input .id-icon { position:absolute; inset-block-start:50%; inset-inline-start:${s(3)}; translate:0 -50%; color:var(--id-muted); pointer-events:none; }
 .id-field input {
-  width:100%; min-width:0; min-height:${s(11)}; padding:${s(3)};
+  width:100%; min-width:0; min-height:${s(12)}; padding:${s(3)};
   border:1px solid var(--id-border); border-radius:${r.md};
   background:var(--id-paper); color:var(--id-text);
   font-size:${body.fontSize}; font-weight:${fontWeights.regular};
@@ -211,6 +233,7 @@ form .id-actions { margin-block-start:${s(4)}; }
   .id-page { padding:${s(8)} ${s(4)}; }
   .id-context strong { display:block; margin-block-start:${s(1)}; font-weight:${fontWeights.semibold}; }
   .id-surface { padding:${s(6)}; }
+  .id-canvas[data-state="login"] .id-surface { padding:${s(7)} ${s(6)} ${s(6)}; }
   .id-brand { margin-block-end:${s(6)}; }
   .id-actions,.actions { flex-direction:column; }
   .id-actions > *,.actions > * { flex:none; }
