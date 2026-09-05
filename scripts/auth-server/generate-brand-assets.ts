@@ -17,15 +17,45 @@ const ROOT = process.cwd()
 const SOURCE = join(ROOT, 'public/branding/SVG/isotipo-full-efeonce.svg')
 /** Logotipo institucional en negativo: es el que va sobre el panel oscuro del acceso (TASK-1835). */
 const LOGOTYPE_SOURCE = join(ROOT, 'public/branding/logo-negative.svg')
-/** Isotipo oficial de Claude, del registro curado del repo: NUNCA redibujado a mano. */
-const CLAUDE_MARK_SOURCE = join(ROOT, 'public/images/logos/axis/claude-isologo.svg')
+
+/**
+ * Isotipos oficiales de las aplicaciones cliente, del registro curado del repo
+ * (`public/images/logos/axis/`): NUNCA redibujados a mano.
+ */
+const CLIENT_MARK_SOURCES = {
+  CLAUDE: 'public/images/logos/axis/claude-isologo.svg',
+  GPT: 'public/images/logos/axis/gpt-isotype.svg',
+  GEMINI: 'public/images/logos/axis/gemini-isotype.svg'
+} as const
+
 const TARGET = join(ROOT, 'src/lib/auth-server/oauth/pages/efeonce-isotipo.generated.ts')
 
 const readBrandSvg = (path: string): string => sanitizeBrandSvg(readFileSync(path, 'utf8'))
 
 const svg = readBrandSvg(SOURCE)
 const logotype = readBrandSvg(LOGOTYPE_SOURCE)
-const claudeMark = readBrandSvg(CLAUDE_MARK_SOURCE)
+
+/**
+ * Las marcas de terceros se embeben TAL CUAL: `sanitizeBrandSvg` está hecho para los SVG de Efeonce
+ * (una sola regla `.cls-1` en un `<defs><style>`) y acá haría daño — quita `<defs>` e `id`, que es
+ * justo de lo que dependen los `clip-path="url(#…)"` de Gemini. Traen sus fills explícitos, así que
+ * no necesitan normalización; lo único que se exige es que NO traigan `<style>`, porque la CSP del
+ * emisor lo bloquearía por hash y la figura saldría negra.
+ */
+const readClientMarkSvg = (relativePath: string): string => {
+  const svg = readFileSync(join(ROOT, relativePath), 'utf8').replace(/^<\?xml[^>]*>\s*/u, '').trim()
+
+  if (/<style\b/u.test(svg)) {
+    console.error(`[auth-server] ${relativePath}: la marca trae un <style> interno; la CSP lo bloquea y saldría negra.`)
+    process.exit(1)
+  }
+
+  return svg
+}
+
+const clientMarks = Object.fromEntries(
+  Object.entries(CLIENT_MARK_SOURCES).map(([key, relativePath]) => [key, readClientMarkSvg(relativePath)])
+) as Record<keyof typeof CLIENT_MARK_SOURCES, string>
 
 const output = `// GENERATED FILE — no editar a mano. Fuentes: public/branding/SVG/isotipo-full-efeonce.svg
 // y public/branding/logo-negative.svg
@@ -35,8 +65,12 @@ export const EFEONCE_ISOTIPO_SVG = ${JSON.stringify(svg)}
 
 export const EFEONCE_LOGOTYPE_NEGATIVE_SVG = ${JSON.stringify(logotype)}
 
-/** Marca de tercero para la ficha de aplicación del consentimiento (ver client-marks.ts). */
-export const CLIENT_MARK_CLAUDE_SVG = ${JSON.stringify(claudeMark)}
+/** Marcas de terceros para la ficha de aplicación del consentimiento (ver client-marks.ts). */
+export const CLIENT_MARK_CLAUDE_SVG = ${JSON.stringify(clientMarks.CLAUDE)}
+
+export const CLIENT_MARK_GPT_SVG = ${JSON.stringify(clientMarks.GPT)}
+
+export const CLIENT_MARK_GEMINI_SVG = ${JSON.stringify(clientMarks.GEMINI)}
 `
 
 writeFileSync(TARGET, output)

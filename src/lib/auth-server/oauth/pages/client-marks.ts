@@ -15,17 +15,22 @@
  * Los assets salen del registro curado del repo (`public/images/logos/axis/`), embebidos por
  * `pnpm auth-server:brand-assets:generate`. NUNCA se redibuja una marca ajena a mano.
  */
-import { CLIENT_MARK_CLAUDE_SVG } from './efeonce-isotipo.generated'
+import { CLIENT_MARK_CLAUDE_SVG, CLIENT_MARK_GEMINI_SVG, CLIENT_MARK_GPT_SVG } from './efeonce-isotipo.generated'
 
 /**
  * Origen verificado del `client_id` CIMD → marca inline.
  *
- * Falta OpenAI (ChatGPT / Codex): su isotipo oficial todavía no está en `public/images/logos/axis/`
- * y no se dibuja de memoria. Cuando el asset entre al registro, se agrega su origen acá.
+ * Cada origen se lista de forma EXACTA, nunca por sufijo de dominio: `endsWith('.google.com')`
+ * dejaría entrar a `evil-google.com` y a cualquier subdominio tomado. Falta Copilot: no hay isotipo
+ * suyo en `public/images/logos/axis/` ni en el registro de marcas, y no se dibuja de memoria.
  */
 const VERIFIED_CLIENT_MARKS: Readonly<Record<string, string>> = {
   'https://claude.ai': CLIENT_MARK_CLAUDE_SVG,
-  'https://claude.com': CLIENT_MARK_CLAUDE_SVG
+  'https://claude.com': CLIENT_MARK_CLAUDE_SVG,
+  'https://chatgpt.com': CLIENT_MARK_GPT_SVG,
+  'https://openai.com': CLIENT_MARK_GPT_SVG,
+  'https://platform.openai.com': CLIENT_MARK_GPT_SVG,
+  'https://gemini.google.com': CLIENT_MARK_GEMINI_SVG
 }
 
 /** Origen sólo cuando el `client_id` es una URL https absoluta; cualquier otra forma no califica. */
