@@ -1,5 +1,31 @@
 # TASK-1830 — Efeonce Auth External Person Authentication (passkeys, magic link, TOTP, recovery)
 
+## Delta 2026-09-05 — canary autenticado y correo MUERTO en vivo
+
+`pnpm auth-server:person-auth:canary` (nuevo, commit `38fbfaeeb`) ejercita contra el host REAL el
+carril que los canaries de la activación no tocaron: todos ellos fueron negativos o anónimos.
+
+**Primera corrida: 🔴 el correo del magic link estaba fallando en producción** con
+`RESEND_API_KEY is not configured`. Causa raíz mía: declaré `RESEND_API_KEY_SECRET_REF` como env var
+pero nunca monté `RESEND_API_KEY` como secreto. `sendEmail` usa el cliente SÍNCRONO de Resend, que
+lee un secreto ya resuelto; el carril `*_SECRET_REF` sólo sirve donde algo lo resuelve async primero.
+El ops-worker lo monta con `--update-secrets`; copié la mitad del patrón. Corregido en `deploy.sh`,
+**pendiente de redeploy del auth-server**.
+
+Es exactamente el modo de falla documentado y no visto: la respuesta es 202 idéntica por
+anti-enumeración, así que un correo muerto no se reporta solo. Sin el canary, esto se descubría
+cuando una persona real dijera «no me llega el enlace».
+
+**Verificado en vivo por primera vez** (22 ok, 0 fallidos): consumo del magic link y su uso único,
+sesión y su contexto sin filtrar el `sub`, registro y login por passkey con `uv` abriendo en
+`step_up`, enrolamiento TOTP con secreto cifrado por KMS, anti-replay del código, y la muerte de la
+sesión al revocar el source link. Además, tras revocar, se comprueba que la señal
+`auth.person.session_without_link` **se enciende**: un detector que nunca se ejercita es una
+afirmación. Las tres señales `auth.person.*` se leyeron por primera vez y responden.
+
+**Sigue pendiente:** redeploy para el correo, y el carril de tokens (emisión, refresh/revocación,
+CIMD positivo) que exige una organización elegible — decisión del operador, hoy en `TASK-1836`.
+
 ## Delta 2026-09-04 (ejecución, sesión greenhouse-eo-18)
 
 **Estado: `runtime activado, verificación autenticada pendiente`.** Último readback y límites en `Status real` y auditoría de rollout; el bloque siguiente conserva el estado del cierre de implementación previo a la activación. Los 4 slices están en `develop` (`7459d96d4`,
