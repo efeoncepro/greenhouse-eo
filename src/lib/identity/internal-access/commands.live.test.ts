@@ -87,9 +87,9 @@ describe.skipIf(!configured)('internal identity real SQL canonical canary snapsh
       await client.query(
         "ALTER TABLE pg_temp.external_organization_bindings ADD COLUMN IF NOT EXISTS population text NOT NULL DEFAULT 'external'"
       )
-      await client.query(
-        'ALTER TABLE pg_temp.external_identity_audit_log DROP CONSTRAINT external_identity_audit_log_event_type_valid'
-      )
+      await client.query('ALTER TABLE pg_temp.external_identity_audit_log DROP CONSTRAINT external_identity_audit_log_event_type_valid')
+      await client.query("ALTER TABLE pg_temp.external_access_resolution_log DROP CONSTRAINT external_access_resolution_log_outcome_valid")
+      await client.query("ALTER TABLE pg_temp.external_access_resolution_log ADD CONSTRAINT external_access_resolution_log_outcome_valid CHECK(outcome IN ('bound','unbound','revoked','environment_inactive','profile_inactive','internal_population'))")
       await client.query(
         'CREATE TEMP TABLE outbox_events(LIKE greenhouse_sync.outbox_events INCLUDING ALL) ON COMMIT DROP'
       )
@@ -167,9 +167,10 @@ describe.skipIf(!configured)('internal identity real SQL canonical canary snapsh
       const identity = await resolveEnrolledInternalIdentity(input)
 
       expect(identity?.profileId).toBe(profileId)
-      expect(await resolveExternalAccess({environmentId,subject:identity!.subject})).toMatchObject({outcome:'unbound'})
+      expect(await resolveExternalAccess({environmentId,subject:identity!.subject})).toMatchObject({outcome:'internal_population'})
       expect((await client.query('SELECT count(*) AS count FROM pg_temp.external_member_invitations')).rows[0].count).toBe('0')
       expect(await resolveEnrolledInternalIdentity({ ...input, tenantId: randomUUID() })).toBeNull()
+      expect((await client.query("SELECT outcome FROM pg_temp.external_access_resolution_log")).rows[0].outcome).toBe('internal_population')
       const authorityInput = { environmentId, profileId, subject: identity!.subject, bindingId: identity!.bindingId }
 
       expect((await resolveInternalAuthority(authorityInput))?.capabilities).toEqual([])
@@ -185,6 +186,9 @@ describe.skipIf(!configured)('internal identity real SQL canonical canary snapsh
         deps
       )
       expect((await resolveInternalAuthority(authorityInput))?.capabilities).toEqual(['identity.external_binding.read'])
+      await client.query('UPDATE pg_temp.external_capability_grants SET expires_at=NULL')
+      expect((await resolveInternalAuthority(authorityInput))?.capabilities).toEqual([])
+      await client.query("UPDATE pg_temp.external_capability_grants SET expires_at=NOW()+INTERVAL '1 hour'")
       await client.query("UPDATE pg_temp.organizations SET status='inactive' WHERE public_id='EO-ORG-0007'")
       expect(await resolveInternalAuthority(authorityInput)).toBeNull()
       await client.query("UPDATE pg_temp.organizations SET status='active' WHERE public_id='EO-ORG-0007'")

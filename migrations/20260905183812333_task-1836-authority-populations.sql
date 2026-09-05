@@ -1,5 +1,5 @@
--- TASK-1836: explicit authority population; run through governed migration runner while internal auth is OFF.
 -- Up Migration
+-- TASK-1836: explicit authority population; run through governed migration runner while internal auth is OFF.
 SET LOCAL search_path = greenhouse_core, public;
 ALTER TABLE greenhouse_core.external_organization_bindings ADD COLUMN IF NOT EXISTS population text NOT NULL DEFAULT 'external'
  CONSTRAINT external_organization_bindings_population_valid CHECK(population IN ('external','internal'));
@@ -25,10 +25,16 @@ DO $$ BEGIN
   WHERE b.population='external' AND EXISTS(SELECT 1 FROM greenhouse_core.internal_native_enrollments e WHERE e.binding_id=b.binding_id)
     AND (EXISTS(SELECT 1 FROM greenhouse_core.external_member_invitations i WHERE i.binding_id=b.binding_id)
       OR EXISTS(SELECT 1 FROM greenhouse_core.external_capability_grants g WHERE g.binding_id=b.binding_id
-        AND (g.profile_id IS NULL OR NOT EXISTS(SELECT 1 FROM greenhouse_core.internal_native_enrollments e
+        AND (g.profile_id IS NULL OR g.expires_at IS NULL OR NOT EXISTS(SELECT 1 FROM greenhouse_core.internal_native_enrollments e
           WHERE e.binding_id=b.binding_id AND e.profile_id=g.profile_id AND e.environment_id=b.environment_id)
         OR NOT EXISTS(SELECT 1 FROM greenhouse_core.internal_native_access_audit a JOIN greenhouse_core.internal_native_enrollments e ON e.enrollment_id=a.enrollment_id
-          WHERE e.binding_id=b.binding_id AND e.profile_id=g.profile_id AND a.event_type='capability_granted' AND a.metadata_json->>'grantId'=g.grant_id)))
+          WHERE e.binding_id=b.binding_id AND e.profile_id=g.profile_id AND a.event_type='capability_granted' AND a.metadata_json->>'grantId'=g.grant_id
+          AND a.audit_id=(SELECT latest.audit_id FROM greenhouse_core.internal_native_access_audit latest
+            JOIN greenhouse_core.internal_native_enrollments le ON le.enrollment_id=latest.enrollment_id
+            WHERE le.binding_id=b.binding_id AND latest.event_type='capability_granted'
+              AND latest.metadata_json->>'grantId'=g.grant_id ORDER BY latest.created_at DESC,latest.audit_id DESC LIMIT 1)
+          AND a.metadata_json->>'capability'=g.capability
+          AND (a.metadata_json->>'expiresAt')::timestamptz=g.expires_at)))
       OR EXISTS(SELECT 1 FROM greenhouse_core.external_identity_audit_log a WHERE a.binding_id=b.binding_id AND a.event_type IN ('organization_bound','capability_granted','invitation_linked')))
  ) THEN RAISE EXCEPTION 'mixed authority population requires operator reconciliation'; END IF;
 END $$;
@@ -44,6 +50,10 @@ ALTER TABLE greenhouse_core.external_identity_audit_log DROP CONSTRAINT external
 ALTER TABLE greenhouse_core.external_identity_audit_log ADD CONSTRAINT external_identity_audit_log_event_type_valid CHECK(event_type IN (
  'environment_upserted','organization_bound','capability_granted','invitation_issued','invitation_linked',
  'binding_revoked','grant_revoked','member_revoked','invitation_revoked','binding_reconciled','grant_reconciled','internal_member_linked'));
+
+ALTER TABLE greenhouse_core.external_access_resolution_log DROP CONSTRAINT external_access_resolution_log_outcome_valid;
+ALTER TABLE greenhouse_core.external_access_resolution_log ADD CONSTRAINT external_access_resolution_log_outcome_valid
+ CHECK(outcome IN ('bound','unbound','revoked','environment_inactive','profile_inactive','internal_population'));
 
 -- Postcondition guard: a pre-up marker must never certify missing population infrastructure.
 DO $$
@@ -65,6 +75,10 @@ BEGIN
    AND pg_get_constraintdef(oid) LIKE '%binding_reconciled%' AND pg_get_constraintdef(oid) LIKE '%grant_reconciled%'
    AND pg_get_constraintdef(oid) LIKE '%internal_member_linked%')
  THEN RAISE EXCEPTION 'authority reconciliation audit contract missing'; END IF;
+ IF NOT EXISTS(SELECT 1 FROM pg_constraint WHERE conrelid='greenhouse_core.external_access_resolution_log'::regclass
+   AND conname='external_access_resolution_log_outcome_valid' AND convalidated
+   AND pg_get_constraintdef(oid) LIKE '%internal_population%')
+ THEN RAISE EXCEPTION 'authority population resolution contract missing'; END IF;
  IF (SELECT count(*) FROM greenhouse_core.external_organization_bindings WHERE population='internal')
    <> (SELECT count(DISTINCT binding_id) FROM greenhouse_core.internal_native_enrollments)
  THEN RAISE EXCEPTION 'authority population classification count mismatch'; END IF;
@@ -72,3 +86,4 @@ END $$;
 
 -- Down Migration
 -- Forward-only: removing population would merge authority contracts and cannot restore historical authorization.
+DO $$ BEGIN RAISE EXCEPTION 'TASK-1836 is forward-only; disable internal authority and use a new governed correction'; END $$;

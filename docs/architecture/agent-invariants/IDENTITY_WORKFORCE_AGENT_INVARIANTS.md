@@ -390,7 +390,9 @@ ningún secreto ni PII de terceros salga del dominio.
   población del issuer/email ni crear invitaciones ficticias. Recuperación/revocación externa no desactiva
   source links internos. La reconciliación es actual, idempotente, con actor/razón y referencia a evidencia
   original; nunca inventa timestamps históricos. Detector `identity.external_binding.unaudited_write`
-  steady 0 sobre bindings/grants vigentes con audit canónico aplicado y correlacionado.
+  steady 0 sobre bindings/grants vigentes con pareja audit/outbox canónica correlacionada.
+  `mixed_population` detecta relaciones estructurales incompatibles en todo lifecycle; `internal_population`
+  deniega el carril externo sin contaminar unbound. Predicados y precedencia en el ADR interno.
 - **NUNCA** resolver la persona por `client_id`/`azp` ni por email en el gateway o en el resolver: la llave
   durable es `(environment_id, subject)` vía el source link activo. `clientId` sólo se registra en el
   resolution log. El email únicamente participa al ACEPTAR una invitación (match exacto y único en

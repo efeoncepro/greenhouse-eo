@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `rollout detenido antes del piloto (2026-09-05): corrección OIDC y regresión CSRF promovidas por PR #223 a main a68662508b1d928bbb1b6d048215a970ff008d21; CI, Deep, smoke de staging y Vercel Production READY verificados. Orquestador33982717767 success, manifest a68662508b1d-750f5ab8-31c7-418d-a33c-9ea5b6871c1b released sin override, watchdog5/5 correcto; emisor interno permanece OFF. Hallazgo de integridad confirmado: writer interno sobre tablas compartidas sin audit/eventos externos canónicos y riesgo de recuperación cruzada. Sí existe audit/outbox interno; PG confirma cero access tokens del binding piloto. En corrección bajo decisión A: primitives transaccionales canónicas con población explícita, detector de escrituras sin audit y regularización trazable. No activar ni cerrar hasta pruebas live y canaries.`
+- Status real: `2026-09-05: reparación de integridad verificada localmente; migración 20260905183812333 aplicada por runner y reconciliación canónica aplicada al piloto (binding=1, grant=1, gv=3), idempotencia 0/0 y señales unaudited_write=0/mixed_population=0. Emisor interno OFF confirmado en auth-server-00013-jhz. Publicación pendiente: build compartido bloqueado por ICON_LOCK faltante en WIP UI de Claude; operador decidió esperar a que termine. Commit completo 7d704f483, incluido Berel, autorizado para publicación. Canary humano, refresh, revocación y rollback siguen sin acreditar.`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -828,3 +828,56 @@ y `lifecycle_stage=inactive`; se exige también status activo para no ignorar un
 Pendiente: finalizar y revisar migración/clasificación y command de reconciliación, comprobar atomicidad,
 recuperación cruzada y conflictos, aplicar con dry-run/evidencia, repetir smoke y live, publicar y recién
 entonces repetir login/MCP/revocación/rollback. El release OIDC223 completado no cierra esta corrección.
+
+
+### Revisión independiente de continuidad — 2026-09-05
+
+Objetivo y rollout autorizados conservados del traspaso; hook `pnpm codex:task-hook TASK-1836 --subagents`
+ejecutado en develop compartido. Ownership separado: resolver/gateway, señales y reconciliación; root
+posee migración, integración y publicación. El operador autorizó después el commit completo
+`7d704f483` que Claude creó con TASK-1836 y Berel; el WIP UI posterior queda separado.
+
+Auditoría: núcleo usa el mismo PoolClient para estado/audit/outbox/gv y serializa por environment/binding.
+Se corrigen clasificación interna como unbound, falta de detector permanente y migración manual. La revisión
+adicional halló grants internos NULL aceptados por reader y reconciliación que no verificaba capability,
+vencimiento y pareja audit/outbox. Son condiciones de integridad previas a aplicar, no aprobaciones heredadas.
+
+PG leído en esta sesión: ninguna migración authority-populations registrada, columna population ausente,
+última migración `20260905132652846`. Cloud Run `auth-server-00013-jhz` con acceso interno false.
+`pnpm migrate:create task-1836-authority-populations` generó `20260905183812333`; el SQL anterior se trasladó
+byte-for-byte (SHA256 `13f6eb700192fa102dd4558abd3b9a6f935d7d657206414e3a3a3f3ae5dbabc7`) antes de retirar el
+archivo manual no aplicado. Después se amplió CHECK de outcomes, validación del grant y guard final.
+
+Down es forward-only: eliminar población fusionaría contratos de autoridad y no restauraría el historial
+ni los tokens invalidados por gv. Rollback operativo apaga emisión/dispatch interno y conserva estructura;
+una corrección de datos posterior exige nueva migración/command, nunca deshacer historia.
+
+Plan restante: SQL live final y pruebas de reconciliación -> smoke externo -> gates locales -> apply de
+migración/regularización con readbacks -> release gobernado -> canary humano, refresh, revocación y rollback.
+No se marca aceptación por pruebas anteriores al diff final.
+
+
+### Integridad aplicada y publicación en espera — 2026-09-05
+
+- Runner: sólo una migración pendiente; `pnpm migrate:up` exit 0, registro y columna releídos,
+  tipos PG regenerados (una columna population). Piloto gv 2 → 3. Emisor OFF antes del cambio.
+- Reconciliación autorizada con actor canónico y razón explícita: dry-run 1 binding/1 grant,
+  apply 1/1, nueva revisión dry-run 0/0, gv 3. No amplía capability ni vencimiento original
+  2026-09-12T15:00:00Z. Audit/outbox actuales correlacionados; historia interna original conservada.
+- Readback de SQL real: `unaudited_write_count=0`, `mixed_population_count=0`, ambas severity ok.
+- Suites finales: 118 unitarias / 12 archivos; 20 live / 4 archivos; recuperación externa live
+  adicional 1 passed (segunda invitación, subject viejo invalidado y vínculo interno protegido).
+  Typecheck previo y gates worker/build-inputs, manifest y mirrors correctos; gateway 126 pruebas.
+- Build compartido compila pero falla TypeScript en WIP UI ajeno: `render.ts` importa `ICON_LOCK`
+  inexistente en `icons.ts`. El operador eligió esperar a Claude; no se modifica ese WIP ni se
+  declara build verde. No se ejecutó push, release ni activación por esta reparación todavía.
+
+- Smoke externo read-only y apply completados: alta/invitación/aceptación/bound/revocación,
+  fixture final revocada; audit e idempotencia correctos. La señal unbound conserva warnings
+  por los probes negativos de las últimas 24h; no se eliminaron logs para ocultarlos.
+- Readback del piloto verifica ambos pares canónicos y reconciliationId
+  `41659bc7-c6f0-4eb0-8c46-6dafb80e562b`, actor y motivo, dos IDs originales y expiración sin cambio.
+- Claude añadió posteriormente ICON_LOCK; esto no acredita que terminara la UI ni un build nuevo.
+  Se respeta la instrucción de esperar su cierre antes de repetir build/publicar.
+- `task:lint` template=1, errors=0, warnings=0; `docs:closure-check` exit 0 con advertencias
+  documentales preexistentes/de revisión. Lifecycle sigue in-progress; no se mueve la task.

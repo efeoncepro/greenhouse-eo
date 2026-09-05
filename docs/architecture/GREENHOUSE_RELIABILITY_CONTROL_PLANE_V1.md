@@ -84,14 +84,22 @@ Flag: `AUTH_SERVER_ENABLED` (Cloud Run, SoT `deploy.sh`; ledger `FEATURE_FLAG_ST
 
 `identity.external_binding.unaudited_write` se agrega al mismo grupo `externalIdentityBinding` del
 overview, module identity, kind data_quality, steady 0; cualquier anomalía es error. Cuenta bindings
-activos y grants activos no expirados sin audit aplicado de creación o reconciliación correlacionado.
-Reconciliación válida exige metadata `population=internal`, `reconciliationVersion=1` numérico; ni eventos
+activos y grants activos no expirados sin pareja correlacionada de audit aplicado y outbox de creación o reconciliación.
+La definición SQL compartida vive en `identity/external-access/authority-evidence.ts` y también gobierna
+la reconciliación: environment, organización, binding, persona, capability y versión deben coincidir.
+Reconciliación válida exige metadata `population=internal`, `reconciliationVersion=1` numérico y `reconciliationId` coincidente no vacío; ni eventos
 ajenos, ni denegados, ni metadata incompleta satisfacen el contrato. Error de PG produce unknown.
 No sustituye orphan_grant: detecta integridad auditora aunque el contenedor de autoridad esté activo.
 
 Baseline read-only previo a reparación: 2 (binding y grant del piloto). Tests SQL TEMP+rollback verifican
 la omisión y su corrección sin tocar datos productivos. Regularización por command canónico con evidencia
 actual, nunca insertar historia falsa para silenciar la señal. Estado local hasta publicación TASK-1836.
+
+`identity.external_binding.mixed_population` pertenece al mismo grupo: cuenta bindings distintos con
+mezcla estructural (invitación externa bajo interno, grants internos sin persona/vencimiento/enrollment,
+enrollment sobre externo o links/dimensiones incoherentes). Todos los estados históricos participan;
+revocación/expiración coherentes no alertan. Steady 0, error si >0, unknown si falla PG. Predicados exactos
+y explicación de `internal_population` en el ADR interno; no compara resultados de resolvers diferentes.
 
 ## Delta 2026-09-04 — TASK-1631: 4 signals del binding de identidad externa (`identity.external_binding.*`)
 

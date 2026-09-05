@@ -2990,6 +2990,7 @@ export interface GreenhouseCoreExternalOrganizationBindings {
   external_organization_ref: string;
   grants_version: Generated<number>;
   organization_id: string;
+  population: Generated<string>;
   reason: string | null;
   revoke_reason: string | null;
   revoked_at: Timestamp | null;

@@ -1,11 +1,16 @@
 # Handoff activo
 
-**Traspaso TASK-1836, 2026-09-05:** el operador pidió nueva task de Codex con revisión inicial independiente.
-Sesión anterior y subagentes detenidos, reparación aún sin commit ni aplicación PG. Las tres observaciones
-de Claude siguen abiertas (outcome interno, detector de mezcla y migración por CLI). Continuar desde el
-[handoff de integridad](docs/operations/TASK-1836_INTEGRITY_SESSION_HANDOFF_2026-09-05.md); no activar el piloto.
-
-**EPIC-044 / TASK-1836:** PR #223 released (run `33982717767`, watchdog 5/5); reparación de integridad local incompleta, issuer interno OFF. No hay canary humano MCP exitoso. Detalle, autorizaciones y evidencia en el handoff de integridad enlazado arriba; operación en el [runbook](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
+**TASK-1836, 2026-09-05 — integridad aplicada; publicación en espera:** Codex terminó revisión
+independiente, migración CLI `20260905183812333` y reconciliación actual del piloto (1 binding/1 grant,
+gv 2 → 3; segunda revisión 0/0). Señales `unaudited_write` y `mixed_population` en cero; 118 unitarias,
+20 live de integridad y 1 live de recuperación pasaron. Emisor interno OFF confirmado en `00013-jhz`.
+El operador autorizó publicar el commit completo `7d704f483` (incluye Berel). Build bloqueado por
+`ICON_LOCK` faltante en WIP UI posterior de Claude; **operador decidió esperar a que Claude termine**,
+sin modificar su trabajo. Claude añadió luego el símbolo faltante; falta confirmar cierre UI y nuevo build.
+Smoke externo completo pasó, fixture revocada. Reparación aún sin push/release; canary humano/refresh/revocación/rollback
+pendientes. Estado y evidencia: [task](docs/tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md),
+[runbook](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md). Autorizaciones anteriores y
+contexto original: [handoff de integridad](docs/operations/TASK-1836_INTEGRITY_SESSION_HANDOFF_2026-09-05.md).
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 

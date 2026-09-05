@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-05 — TASK-1836: reparación de integridad aplicada en PG
+
+Migración CLI `20260905183812333` aplicada: población explícita e inmutable, verificación de evidencia
+y grants internos con caducidad. Piloto gv 2 → 3; reconciliación actual audit/outbox para binding y
+grant, con actor/razón, sin extender autoridad ni fabricar historia. Repetición 0/0; señales de
+escrituras sin evidencia y mezcla ambas cero. Resolver externo devuelve `internal_population`;
+gateway comprende el rechazo sin fallback. Pruebas: 118 unitarias, 20 live y 1 live adicional de
+recuperación. Publicación pendiente mientras Claude termina WIP UI que bloqueó el build compartido;
+emisor interno OFF. Commit completo `7d704f483` autorizado por el operador, incluido Berel.
+
 ## 2026-09-05 — TASK-1836: autoridad corporativa nativa y límites de autenticación
 
 Backend implementado con Entra OIDC, procedencia de sesión persistida, contexto delegado por cliente/binding,
@@ -904,24 +914,3 @@ pero no llegaban a la pantalla:
   el control correcto es «Barrera máxima», derivada del perfil real de enlaces.
 
 Manual actualizado: `docs/manual-de-uso/growth/descubrir-keywords-seo.md` v1.3.
-
-## 2026-08-29 — release `e1718a359575`: dos guardas textuales fallaron el mismo día con signos opuestos
-
-El 4.º paso a producción del día promovió el fix de banda 2, el gate de cobertura del worker y la
-quema de la deuda de procedencia. Manifest `released` en un solo run del orquestador; canary de
-contrato verde por el lane de producción (provenance + rank monotónico — sólo el código nuevo lo
-produce) y Berel paginada entera: 501/501, secuencia == persistida. El índice keyset huérfano se
-retiró después del release (migración `20260829225504734`), como el contrato manda.
-
-El desvío enseñó el patrón del día: CI Deep rojo sobre el primer squash porque el test del contrato
-del deploy del worker contaba ocurrencias de string en el YAML — el proxy textual de un mecanismo
-que 146070ffc había reemplazado por cobertura de metafile. La misma clase que el string-match del
-ORDER BY del reader, con signo opuesto: aquél pasaba verde con banda 2 rota; éste se puso rojo con
-la cobertura mejorada. Una guarda textual debe señalar al verificador real, no reemplazarlo. Y la
-parte que no era del pipeline: la racha completa fue de **5 corridas rojas/canceladas en ~70
-minutos** — el run del commit culpable cancelado por `cancel-in-progress` (nunca juzgado), dos
-rojos de una sesión y uno del push del merge canónico de otra, sin que nadie abriera ninguno — en
-ráfagas el veredicto es del último push, y una alarma sostenida se normaliza hasta volverse
-invisible. El skip de 44 s del ops-worker esta vez fue legítimo (árboles
-idénticos, diff completo vacío): mismo síntoma que el incidente anterior, causa opuesta — los
-distingue el diff, no el cronómetro.

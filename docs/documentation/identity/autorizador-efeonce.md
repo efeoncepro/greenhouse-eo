@@ -238,3 +238,16 @@ no comparte sesiones, cookies ni secretos con el portal.
 
 > Detalle técnico: [`src/lib/reliability/queries/auth-server-signals.ts`](../../../src/lib/reliability/queries/auth-server-signals.ts);
 > runbook operativo en [`docs/operations/runbooks/auth-server.md`](../../operations/runbooks/auth-server.md).
+
+
+## Integridad del acceso corporativo
+
+La pertenencia interna y la membresía cliente siguen recorridos distintos. El diagnóstico
+`internal_population` rechaza una identidad corporativa en el recorrido externo; no significa que
+la persona carezca de identidad ni justifica crearle una invitación cliente. El acceso corporativo
+requiere su sesión y contexto propios, con permisos personales que tengan vencimiento.
+
+La recuperación de un acceso cliente no puede reemplazar el vínculo corporativo activo. Si soporte
+encuentra relaciones mezcladas o evidencia auditora incompleta, debe mantener apagado el piloto y
+seguir la [regularización gobernada](../../operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
+Esa reparación conserva permisos y vigencia; no es un mecanismo para conceder o renovar acceso.

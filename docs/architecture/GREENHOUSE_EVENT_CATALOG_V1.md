@@ -35,7 +35,7 @@ explícita sin cambiar la semántica comercial del wrapper externo. Audit intern
 | Event | Trigger | Evidencia |
 |---|---|---|
 | `identity.internal_authority.member_enrolled` | Source link interno nuevo, también sobre binding existente | IDs de binding, enrollment, perfil y link, población y actor; sin subject ni claims. Audit compartido `internal_member_linked`; no inventa invitación. |
-| `identity.external_binding.reconciled` | Regularización canónica actual de binding interno con audit faltante | IDs, versión de grants, población interna, reconciliationVersion1 y referencias a audit interno original. No representa una creación histórica. |
+| `identity.external_binding.reconciled` | Regularización canónica actual de binding interno con audit faltante | IDs, versión de grants, población interna, reconciliationVersion1, reconciliationId correlacionado con audit y referencias a audit interno original. No representa una creación histórica. |
 | `identity.external_grant.reconciled` | Regularización canónica actual de grant con audit faltante | Binding/grant y referencias de procedencia; mismo contrato de reconciliación. No amplía permisos ni rejuvenece vigencia. |
 
 El command idempotente no vuelve a emitir evidencia ya completa. Timestamps corresponden a la reparación,

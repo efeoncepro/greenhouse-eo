@@ -22,7 +22,8 @@ const tables = [
   'external_capability_grants',
   'external_member_invitations',
   'internal_native_access_audit',
-  'external_identity_audit_log'
+  'external_identity_audit_log',
+  'external_access_resolution_log'
 ] as const
 
 const tenant = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
@@ -30,6 +31,7 @@ const object = 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'
 
 let client: PoolClient | undefined
 let migration: string
+let downMigration: string
 
 const db = () => {
   if (!client) throw new Error('fixture_not_ready')
@@ -64,11 +66,16 @@ describe.skipIf(!configured)('authority population migration real PostgreSQL', (
       "ALTER TABLE pg_temp.external_identity_audit_log ADD CONSTRAINT external_identity_audit_log_event_type_valid CHECK(event_type IN ('organization_bound','capability_granted','invitation_linked'))"
     )
 
+    await db().query(
+      "ALTER TABLE pg_temp.external_access_resolution_log ADD CONSTRAINT external_access_resolution_log_outcome_valid CHECK(outcome IN ('bound','unbound','revoked','environment_inactive','profile_inactive'))"
+    )
+
     const source = await readFile(
-      resolve(process.cwd(), 'migrations/20260905201500000_task-1836-authority-populations.sql'),
+      resolve(process.cwd(), 'migrations/20260905183812333_task-1836-authority-populations.sql'),
       'utf8'
     )
 
+    downMigration = source.split('-- Down Migration')[1]!
     migration = source
       .split('-- Up Migration')[1]!
       .split('-- Down Migration')[0]!
@@ -92,10 +99,10 @@ describe.skipIf(!configured)('authority population migration real PostgreSQL', (
       [tenant, object]
     )
     await db().query(
-      "INSERT INTO pg_temp.external_capability_grants(grant_id,binding_id,profile_id,status) VALUES('grant','internal','person','active')"
+      "INSERT INTO pg_temp.external_capability_grants(grant_id,binding_id,profile_id,status,capability,expires_at) VALUES('grant','internal','person','active','growth.seo.observation.read','2026-09-12T15:00:00Z')"
     )
     await db().query(
-      "INSERT INTO pg_temp.internal_native_access_audit(enrollment_id,event_type,metadata_json) VALUES('enrollment','enrolled','{}'),('enrollment','capability_granted','{\"grantId\":\"grant\"}')"
+      "INSERT INTO pg_temp.internal_native_access_audit(audit_id,created_at,enrollment_id,event_type,metadata_json) VALUES('audit-enrolled',NOW(),'enrollment','enrolled','{}'),('audit-grant',NOW(),'enrollment','capability_granted','{\"grantId\":\"grant\",\"capability\":\"growth.seo.observation.read\",\"expiresAt\":\"2026-09-12T15:00:00Z\"}')"
     )
   })
 
@@ -112,6 +119,7 @@ describe.skipIf(!configured)('authority population migration real PostgreSQL', (
 
   it('classifies proved internal authority, retains external defaults, bumps gv once and enforces immutability', async () => {
     await db().query(migration)
+    await expectStatementRejected(downMigration, 'TASK-1836 is forward-only')
     expect(
       (
         await db().query(
@@ -141,6 +149,8 @@ describe.skipIf(!configured)('authority population migration real PostgreSQL', (
     await db().query(
       "INSERT INTO pg_temp.external_identity_audit_log(event_type) VALUES('binding_reconciled'),('grant_reconciled'),('internal_member_linked')"
     )
+    await db().query("INSERT INTO pg_temp.external_access_resolution_log(outcome) VALUES('internal_population')")
+    await expectStatementRejected("INSERT INTO pg_temp.external_access_resolution_log(outcome) VALUES('invented_population')", 'external_access_resolution_log_outcome_valid')
     await expectStatementRejected(
       "INSERT INTO pg_temp.external_identity_audit_log(event_type) VALUES('invented_history')",
       'external_identity_audit_log_event_type_valid'
@@ -168,6 +178,9 @@ describe.skipIf(!configured)('authority population migration real PostgreSQL', (
     "DELETE FROM pg_temp.internal_native_access_audit WHERE event_type='capability_granted'",
     'UPDATE pg_temp.internal_native_access_audit SET metadata_json=\'{"grantId":"foreign"}\' WHERE event_type=\'capability_granted\'',
     'UPDATE pg_temp.external_capability_grants SET profile_id=NULL',
+    'UPDATE pg_temp.external_capability_grants SET expires_at=NULL',
+    "UPDATE pg_temp.external_capability_grants SET capability='different.capability'",
+    "UPDATE pg_temp.external_capability_grants SET expires_at=expires_at+INTERVAL '1 day'",
     "UPDATE pg_temp.external_capability_grants SET profile_id='foreign'",
     "INSERT INTO pg_temp.external_member_invitations(binding_id) VALUES('internal')",
     "INSERT INTO pg_temp.external_identity_audit_log(binding_id,event_type) VALUES('internal','organization_bound')"

@@ -8,11 +8,24 @@ import { reconcileInternalAuthority } from './reconcile'
 
 const input = { bindingId: 'binding', actorId: 'operator', reason: 'Current reconciliation of reviewed pilot' }
 const deps = { authorize: async () => true }
+const expiry = new Date('2030-01-01T00:00:00.000Z')
+const capability = 'growth.seo.observation.read'
 
 function fixture({
   previous = [],
-  wrongProfile = false
-}: { previous?: Record<string, unknown>[]; wrongProfile?: boolean } = {}) {
+  wrongProfile = false,
+  proofCapability = capability,
+  proofExpiry = expiry.toISOString(),
+  grantExpiry = expiry,
+  laterCapability
+}: {
+  previous?: Record<string, unknown>[]
+  wrongProfile?: boolean
+  proofCapability?: string
+  proofExpiry?: string | null
+  grantExpiry?: Date | null
+  laterCapability?: string
+} = {}) {
   let audits: unknown[][] = []
   let committed: unknown[][] = []
 
@@ -22,9 +35,17 @@ function fixture({
       audit_id: 'original-grant',
       event_type: 'capability_granted',
       enrollment_id: wrongProfile ? 'another-enrollment' : 'enrollment',
-      metadata_json: { grantId: 'grant' }
+      metadata_json: { grantId: 'grant', capability: proofCapability, expiresAt: proofExpiry }
     }
   ]
+
+  if (laterCapability)
+    original.push({
+      audit_id: 'later-grant',
+      event_type: 'capability_granted',
+      enrollment_id: 'enrollment',
+      metadata_json: { grantId: 'grant', capability: laterCapability, expiresAt: expiry.toISOString() }
+    })
 
   const results = [
     { environment_id: 'efeonce-auth' },
@@ -44,7 +65,7 @@ function fixture({
       profile_id: 'person',
       capability: 'growth.seo.observation.read',
       status: 'active',
-      expires_at: null
+      expires_at: grantExpiry
     },
     original,
     previous
@@ -56,19 +77,17 @@ function fixture({
     if (index < results.length) {
       const row = results[index++]
 
-      
-return { rows: row === null ? [] : Array.isArray(row) ? row : [row] }
+      return { rows: row === null ? [] : Array.isArray(row) ? row : [row] }
     }
 
-    
-return { rows: [] }
+    return { rows: [] }
   })
 
   const client = {
     query: async (sql: string, values: unknown[]) => {
       if (sql.includes('INSERT INTO')) audits.push(values)
-      
-return state.query(sql, values)
+
+      return state.query(sql, values)
     }
   }
 
@@ -77,15 +96,15 @@ return state.query(sql, values)
       const result = await work(client)
 
       committed = [...audits]
-      
-return result
+
+      return result
     } catch (error) {
       audits = []
       throw error
     }
   })
-  
-return { getAudits: () => audits, getCommitted: () => committed }
+
+  return { getAudits: () => audits, getCommitted: () => committed }
 }
 
 beforeEach(() => {
@@ -149,22 +168,16 @@ describe('current-time internal authority reconciliation', () => {
     expect(repeat.getCommitted()).toEqual([])
     expect(state.event).not.toHaveBeenCalled()
   })
-  it('does not mistake malformed reconciliation metadata for completed canonical audit', async () => {
-    fixture({
-      previous: [
-        {
-          event_type: 'binding_reconciled',
-          grant_id: null,
-          metadata_json: { population: 'external', reconciliationVersion: 1 }
-        },
-        {
-          event_type: 'grant_reconciled',
-          grant_id: 'grant',
-          metadata_json: { population: 'internal', reconciliationVersion: '1' }
-        }
-      ]
-    })
-    expect(await reconcileInternalAuthority(input, deps)).toMatchObject({ bindingRecords: 1, grantRecords: 1 })
+  it.each([
+    { proofCapability: 'another.capability' },
+    { proofExpiry: '2031-01-01T00:00:00.000Z' },
+    { proofExpiry: null },
+    { grantExpiry: null },
+    { laterCapability: 'changed.capability' }
+  ])('rejects drifted or unbounded grant evidence %j', async overrides => {
+    fixture(overrides)
+    await expect(reconcileInternalAuthority(input, deps)).rejects.toMatchObject({ code: 'conflict' })
+    expect(state.event).not.toHaveBeenCalled()
   })
   it('rejects grant proof belonging to another enrollment', async () => {
     const f = fixture({ wrongProfile: true })
@@ -175,7 +188,7 @@ describe('current-time internal authority reconciliation', () => {
     expect(f.getCommitted()).toEqual([])
     expect(state.event).not.toHaveBeenCalled()
   })
-  it('rolls audit back when transactional outbox fails', async () => {
+  it('propagates outbox failure to the transaction owner (PG rollback covered by reconcile.live.test.ts)', async () => {
     const f = fixture()
 
     state.event.mockRejectedValueOnce(new Error('transaction unavailable'))

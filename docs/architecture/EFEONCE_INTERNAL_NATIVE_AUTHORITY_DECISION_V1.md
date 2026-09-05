@@ -153,8 +153,8 @@ publicación gobernada y canaries reales. Esta decisión no declara esas verific
 La fachada de dispatch existente del reader ecosystem selecciona autoridad interna sólo con contexto
 interno y `jti` válidos, y devuelve `population=internal`; el recorrido sin contexto conserva el resolver
 externo y sus requisitos. Son dos políticas explícitas detrás de una frontera común, no dos resolvers que
-deban producir la misma respuesta para toda persona. `resolveExternalAccess=unbound` junto a autoridad
-interna elegible es esperado cuando no hay membership externa `linked`; no crear esa membership para
+deban producir la misma respuesta para toda persona. `resolveExternalAccess=internal_population` deniega el recorrido externo para un source link
+propiedad de enrollment interno, incluso revocado; no crear una membership externa para
 hacer coincidir resultados ni usar esa diferencia sola como alerta `resolver_divergence`.
 
 Soporte debe identificar población y procedencia antes de interpretar un denial. El resolver externo
@@ -164,3 +164,30 @@ la fachada exige el contexto/token real en el canary; un reader externo aislado 
 Inconsistencias con la población persistida se rechazan y se prueban como tales; ausencia de audit se mide
 por `unaudited_write`. Un diagnóstico administrativo adicional sin token requeriría contrato de sólo lectura
 específico, no ampliar permisos del resolver externo. No es requisito para autorizar el canary actual.
+
+
+### Diagnóstico permanente y reconciliación verificable
+
+`internal_population` es un outcome cerrado del reader, su log PG y el gateway; nunca concede acceso ni
+invoca un fallback interno. Precedencia: environment inactivo, colisión de links activos, propiedad interna,
+y finalmente controles externos. La propiedad persiste aunque el enrollment/link/perfil esté inactivo;
+la elegibilidad se decide únicamente por el carril interno con contexto firmado. No se registra `unbound`
+para este caso ni se incluye en `unbound_dispatch_attempt`.
+
+`identity.external_binding.mixed_population` cuenta bindings distintos con cualquiera de estos defectos,
+en todo estado histórico (steady 0, error si >0, unknown si falla SQL):
+
+- Binding interno con cualquier invitación externa o grant sin persona, sin vencimiento, o sin enrollment
+  del mismo binding/persona/environment.
+- Enrollment con binding inexistente/externo, environment distinto o entidad operativa ajena a EO-ORG-0007.
+- Links nativo/upstream inexistentes o incoherentes en perfil, sistema, tipo u object ID; ausencia del
+  client_user que correlaciona perfil, tenant y object ID canónicos.
+
+Revocación, vencimiento y links inactivos coherentes no son mezcla. La señal no llama resolvers ni compara
+sus resultados. Las pruebas SQL corrompen cada relación en tablas temporales y comprueban deduplicación.
+El reader interno exige vencimiento futuro; NULL conserva semántica legacy sólo en grants externos.
+
+La regularización exige evidencia interna original del grant con capability y vencimiento idénticos.
+No puede certificar una ampliación de autoridad como recuperación de auditoría. Evidencia canónica previa
+requiere dimensiones correlacionadas y outbox correspondiente; si falta esa pareja, se registra una nueva
+reconciliación actual, atómica e idempotente. No se reescriben los audits previos ni se rejuvenece el grant.

@@ -69,7 +69,7 @@ const AUTHORITY = `WITH eligible AS (
 SELECT n.source_object_id AS subject, e.profile_id, e.native_link_id, e.upstream_link_id,
  e.binding_id, b.organization_id, e.environment_id, b.grants_version,
  ARRAY(SELECT DISTINCT g.capability FROM greenhouse_core.external_capability_grants g
-   WHERE g.binding_id = b.binding_id AND g.status = 'active' AND (g.expires_at IS NULL OR g.expires_at > NOW())
+   WHERE g.binding_id = b.binding_id AND g.status = 'active' AND g.expires_at > NOW()
      AND g.profile_id = e.profile_id ORDER BY g.capability) AS capabilities
 FROM greenhouse_core.internal_native_enrollments e
 JOIN eligible p ON p.profile_id = e.profile_id AND p.upstream_link_id = e.upstream_link_id

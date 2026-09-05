@@ -1,8 +1,11 @@
+import { randomUUID } from 'node:crypto'
+
 /** Current-time reconciliation of the pre-population pilot. Never fabricates historic creation events. */
 import { withTransaction } from '@/lib/db'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { appendAudit } from '../external-access/authority-transactions'
+import { AUTHORITY_EVIDENCE_SELECT } from '../external-access/authority-evidence'
 import { InternalAccessError, type InternalAccessCommandDependencies } from './commands'
 
 export const reconcileInternalAuthority = async (
@@ -21,8 +24,8 @@ export const reconcileInternalAuthority = async (
     !(await deps.authorize(input.actorId, 'identity.internal_access.grant'))
   )
     throw new InternalAccessError('forbidden')
-  
-return withTransaction(async client => {
+
+  return withTransaction(async client => {
     const lookup = await client.query<{ environment_id: string }>(
       `SELECT environment_id FROM greenhouse_core.external_organization_bindings WHERE binding_id=$1`,
       [input.bindingId]
@@ -56,6 +59,8 @@ return withTransaction(async client => {
          AND n.source_system='external_idp:'||e.environment_id AND n.source_object_type='subject'
        JOIN greenhouse_core.identity_profile_source_links u ON u.link_id=e.upstream_link_id AND u.profile_id=e.profile_id
          AND u.source_system='azure_ad' AND u.source_object_type='user' AND lower(u.source_object_id)=e.object_id::text
+       AND EXISTS (SELECT 1 FROM greenhouse_core.client_users cu WHERE cu.identity_profile_id=e.profile_id
+         AND lower(cu.microsoft_tenant_id)=e.tenant_id::text AND lower(cu.microsoft_oid)=e.object_id::text)
        WHERE e.binding_id=$1 AND e.environment_id=$2 FOR UPDATE OF e`,
       [input.bindingId, binding.environment_id]
     )
@@ -91,7 +96,7 @@ return withTransaction(async client => {
       audit_id: string
       event_type: string
       enrollment_id: string
-      metadata_json: { grantId?: string }
+      metadata_json: { grantId?: string; capability?: string; expiresAt?: string }
     }>(
       `SELECT audit_id,event_type,enrollment_id,metadata_json FROM greenhouse_core.internal_native_access_audit WHERE enrollment_id=ANY($1::text[]) ORDER BY created_at,audit_id`,
       [enrollments.map(e => e.enrollment_id)]
@@ -100,43 +105,46 @@ return withTransaction(async client => {
     for (const e of enrollments)
       if (!original.some(a => a.enrollment_id === e.enrollment_id && a.event_type === 'enrolled'))
         throw new InternalAccessError('conflict')
-    for (const g of grants)
+
+    for (const g of grants) {
+      // Renewal uses a new grant id. If historical commands reused an id, only its latest
+      // concession can attest its snapshot; an older matching event cannot hide later drift.
+      const proof = original
+        .filter(a => a.event_type === 'capability_granted' && a.metadata_json.grantId === g.grant_id)
+        .at(-1)
+
       if (
         !g.profile_id ||
-        !enrollments.some(e => e.profile_id === g.profile_id) ||
-        !original.some(
-          a =>
-            a.event_type === 'capability_granted' &&
-            a.metadata_json.grantId === g.grant_id &&
-            enrollments.some(e => e.enrollment_id === a.enrollment_id && e.profile_id === g.profile_id)
-        )
+        !g.expires_at ||
+        !Number.isFinite(new Date(g.expires_at).getTime()) ||
+        !proof ||
+        !enrollments.some(e => e.enrollment_id === proof.enrollment_id && e.profile_id === g.profile_id) ||
+        proof.metadata_json.capability !== g.capability ||
+        !proof.metadata_json.expiresAt ||
+        new Date(proof.metadata_json.expiresAt).getTime() !== new Date(g.expires_at).getTime()
       )
         throw new InternalAccessError('conflict')
+    }
 
+    // Evidence is a correlated audit + durable outbox pair. An audit alone (including a
+    // prior partial repair) is repaired with a NEW current reconciliation pair, never a
+    // fabricated historical creation event. Environment lock serializes repeated repairs.
     const { rows: previous } = await client.query<{
       event_type: string
       grant_id: string | null
-      metadata_json?: { population?: unknown; reconciliationVersion?: unknown }
     }>(
-      `SELECT event_type,grant_id,metadata_json FROM greenhouse_core.external_identity_audit_log WHERE binding_id=$1 AND outcome='applied'
-       AND (event_type IN ('organization_bound','capability_granted') OR (event_type IN ('binding_reconciled','grant_reconciled') AND metadata_json @> '{"population":"internal","reconciliationVersion":1}'::jsonb))`,
-      [input.bindingId]
+      `SELECT event_type,grant_id FROM (${AUTHORITY_EVIDENCE_SELECT}) evidence
+       WHERE binding_id=$1 AND environment_id=$2 AND organization_id=$3 AND population='internal'`,
+      [input.bindingId, binding.environment_id, binding.organization_id]
     )
 
-    const canonicalPrevious = previous.filter(
-      a =>
-        a.event_type === 'organization_bound' ||
-        a.event_type === 'capability_granted' ||
-        (a.metadata_json?.population === 'internal' && a.metadata_json.reconciliationVersion === 1)
-    )
-
-    const missingBinding = !canonicalPrevious.some(
+    const missingBinding = !previous.some(
       a => a.event_type === 'organization_bound' || a.event_type === 'binding_reconciled'
     )
 
     const missingGrants = grants.filter(
       g =>
-        !canonicalPrevious.some(
+        !previous.some(
           a =>
             a.grant_id === g.grant_id && (a.event_type === 'capability_granted' || a.event_type === 'grant_reconciled')
         )
@@ -161,6 +169,7 @@ return withTransaction(async client => {
     const metadata = {
       population: 'internal',
       reconciliationVersion: 1,
+      reconciliationId: randomUUID(),
       grantsVersion: Number(binding.grants_version),
       originalInternalAuditIds: original.map(a => a.audit_id)
     }
@@ -212,6 +221,9 @@ return withTransaction(async client => {
             changedByUserId: input.actorId,
             bindingId: input.bindingId,
             grantId: g.grant_id,
+            profileId: g.profile_id,
+            capability: g.capability,
+            expiresAt: g.expires_at?.toISOString() ?? null,
             environmentId: binding.environment_id,
             organizationId: binding.organization_id,
             ...metadata
@@ -221,7 +233,6 @@ return withTransaction(async client => {
       )
     }
 
-    
-return { applied: missingBinding || missingGrants.length > 0, ...planned }
+    return { applied: missingBinding || missingGrants.length > 0, ...planned }
   })
 }

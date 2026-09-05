@@ -4,7 +4,12 @@ import { parseArgs } from 'node:util'
 import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } from '../lib/load-greenhouse-tool-env'
 
 async function main() {
+  const args = process.argv.slice(2)
+
+  if (args[0] === '--') args.shift()
+
   const { values } = parseArgs({
+    args,
     options: {
       'binding-id': { type: 'string' },
       'actor-id': { type: 'string' },
@@ -32,8 +37,7 @@ async function main() {
         if (id !== actorId) return false
         const actor = await getTenantAccessRecordFromPostgresByUserId(id)
 
-        
-return Boolean(
+        return Boolean(
           actor &&
             actor.active &&
             actor.status === 'active' &&

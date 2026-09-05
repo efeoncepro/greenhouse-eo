@@ -2,7 +2,18 @@
 
 Owner: TASK-1836 / EPIC-044. Decisión: `EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md`.
 
-## Estado verificado 2026-09-05
+## Readback de integridad 2026-09-05 — posterior a PR #223
+
+Migración `20260905183812333` aplicada por runner; población y tracking releídos. Piloto gv 2 → 3.
+Reconciliación canónica: revisión 1 binding/1 grant, apply 1/1 y revisión posterior 0/0; ambas señales
+de integridad en cero. Emisor sigue OFF en `auth-server-00013-jhz`, 100% tráfico. Código aún pendiente
+de publicar: build compartido bloqueado por WIP UI de Claude, a quien el operador decidió esperar.
+Smoke externo read-only/apply completado con fixture final revocada. Los pares de reconciliación
+comparten ID `41659bc7-c6f0-4eb0-8c46-6dafb80e562b` y referencian la auditoría original.
+El commit completo `7d704f483` está autorizado, incluido Berel. No repetir la migración ni fabricar
+auditoría; repetir dry-run/readbacks para comprobar continuidad. Canary humano y rollback pendientes.
+
+## Estado previo verificado 2026-09-05
 
 Main `a68662508b1d928bbb1b6d048215a970ff008d21` (PR #223) está released por
 `33982717767`; manifest `a68662508b1d-750f5ab8-31c7-418d-a33c-9ea5b6871c1b`, sin override.
@@ -26,7 +37,7 @@ convierte en cliente ni exige reclasificación. La decisión A del ADR unifica p
 persistencia de población, recuperación aislada y reconciliación actual explícita sin falsear historia.
 
 Antes de continuar el piloto: migración aditiva y código compatibles, reconciliación dry-run/apply con
-actor/razón, detector `unaudited_write` en cero y tests live/smoke externo; luego publicación gobernada,
+actor/razón, detectores `unaudited_write` y `mixed_population` en cero y tests live/smoke externo; luego publicación gobernada,
 login nuevo y canaries de lectura/aislamiento/revocación/rollback. Todos siguen pendientes de cierre.
 
 Los seis permisos de release faltantes se restauraron por rol; el actor canónico se revalidó antes de
@@ -36,8 +47,8 @@ GitHub y la autoridad Greenhouse se comprobaron por separado, sin inventar un v�
 
 ## Interpretar el acceso interno frente al externo
 
-Consultar sólo `resolveExternalAccess` no determina el acceso corporativo: un interno puede devolver
-`unbound` allí porque carece de invitación externa, y ser elegible en su recorrido interno. Es esperado.
+Consultar sólo `resolveExternalAccess` no determina el acceso corporativo: un source link de enrollment interno devuelve
+`internal_population` y deniega ese recorrido, aunque pueda ser elegible en el interno. No es unbound.
 La fachada ecosystem usa contexto interno + jti verificados para resolverlo y devuelve población interna;
 sin ese contexto conserva la política externa. No conceder `linked` ficticio ni relajar active_client.
 Para soporte, registrar población, recorrido, contexto y resultado redacted del reader que realmente se usó.
@@ -47,7 +58,7 @@ positivos deben ejercitar el recorrido correcto; diferencia entre poblaciones no
 ## Regularización del piloto — procedimiento de integridad
 
 Estado inicial medido: dos registros sin audit canónico. Conservar emisor interno OFF durante toda la
-transición. La migración `20260905201500000_task-1836-authority-populations.sql` se ejecuta exclusivamente
+transición. La migración `20260905183812333_task-1836-authority-populations.sql` se ejecuta exclusivamente
 por el runner gobernado, después de pruebas y revisión; no ejecutar SQL copiado ni reclasificar registros
 ambiguos manualmente. Clasificación es por evidencia de enrollment y grants, no por issuer/email.
 
@@ -59,7 +70,9 @@ ambiguos manualmente. Clasificación es por evidencia de enrollment y grants, no
 4. Revisar que el plan corresponda al binding y grants existentes; no crea autoridad ni extiende vigencia.
    Ejecutar con `--apply` bajo la autorización del rollout. Repetir la revisión debe planear cero registros.
 5. Releer audit/eventos de reconciliación actuales, actor/razón, referencias a audit original y IDs exactos.
-   Ejecutar la señal: `unaudited_write_count=0` es necesario; nunca insertar audit ajeno para silenciarla.
+   Ejecutar la señal: `unaudited_write_count=0` y `mixed_population_count=0` son necesarios; nunca insertar audit ajeno para silenciarla.
+   El par audit/outbox debe estar correlacionado: una fila audit sola no acredita integración.
+   El command rechaza capability/vencimiento distintos de la última concesión original y no los renueva.
 6. Ejecutar smoke externo read-only y suites live por `pnpm test:live`, serializadas. Verificar separación
    de población, recuperación externa, revocación, grants personales y ausencia de escalamiento.
 7. Publicar por release control plane, releer todos los runtimes y recién entonces reactivar emisor para
