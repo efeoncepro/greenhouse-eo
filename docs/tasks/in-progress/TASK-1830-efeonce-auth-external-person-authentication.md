@@ -2,7 +2,7 @@
 
 ## Delta 2026-09-04 (ejecución, sesión greenhouse-eo-18)
 
-**Estado: `code complete, rollout pendiente`.** Los 4 slices están en `develop` (`7459d96d4`,
+**Estado: `runtime activado, verificación autenticada pendiente`.** Último readback y límites en `Status real` y auditoría de rollout; el bloque siguiente conserva el estado del cierre de implementación previo a la activación. Los 4 slices están en `develop` (`7459d96d4`,
 `937087404`, `db2622ba9`, `5b57b73f9`) detrás de `AUTH_SERVER_PERSON_AUTH_ENABLED=false`.
 
 **Tres desviaciones de la spec, decididas con `arch-architect` + `efeonce-mcp-platform` y
@@ -115,7 +115,7 @@ consumidor.
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-044`
-- Status real: `code complete, rollout pendiente (2026-09-04, sesión greenhouse-eo-18). Los 4 slices implementados en develop (7459d96d4, 937087404, db2622ba9, 5b57b73f9): 8 tablas greenhouse_auth aplicadas y verificadas contra PG real, SubjectSessionPort real cableado, passkeys con ceremonia verificada, TOTP con llave KMS simétrica auth-server-totp-envelope CREADA y probada en vivo (round-trip + rechazo por AAD), recuperación por re-invitación, capability identity.auth_person.revoke + ruta admin, 3 señales. Flag AUTH_SERVER_PERSON_AUTH_ENABLED=false. FALTA rollout: prender el flag en staging (exige AUTH_SERVER_OAUTH_ENABLED=true + environment efeonce-auth active), verificar el correo REAL por Resend, y ejercitar passkey en dos navegadores`
+- Status real: `runtime activado, verificación autenticada pendiente (2026-09-05T01:01Z). Auth Server Deploy 33934410457 success, revisión auth-server-00007-cxb, SHA 3f68e8875, 100% tráfico; OAuth y personas true; emisor active. Metadata/login y negativos públicos verificados (9/9). Falta identidad de canary indicada por operador, correo real, sesión, tokens/refresh/revocación y passkeys en dos navegadores. Deploy por staging sobre servicio compartido; no hay nuevo release main. Evidencia: docs/audits/2026-09-04-epic-044-auth-rollout.md`
 - Rank: `TBD`
 - Domain: `platform|identity`
 - Blocked by: `none`

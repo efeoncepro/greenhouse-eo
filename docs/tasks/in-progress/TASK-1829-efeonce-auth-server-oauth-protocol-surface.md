@@ -71,7 +71,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-044`
-- Status real: `code complete, rollout pendiente (2026-09-04; commits 263ee3a74 · 19d1658de · d31e6e913 · 2633d9a67): runtime con la superficie OAuth EN PRODUCCIÓN desde el release 9100bbd2765d (flag AUTH_SERVER_OAUTH_ENABLED=false: metadata y /oauth/* responden 404); environment efeonce-auth registrado en draft; 7 tablas + 2 capabilities aplicadas; 68 tests + smoke PG. Falta: flag ON en staging con validación de metadata + clientes CIMD/DCR de prueba, environment a active, y flujo con persona real (TASK-1830)`
+- Status real: `runtime activado, verificación autenticada pendiente (2026-09-05T01:01Z). Auth Server Deploy 33934410457 success, revisión auth-server-00007-cxb, SHA 3f68e8875, 100% tráfico; OAuth y personas true; emisor active. Metadata/login y negativos públicos verificados (9/9). Falta identidad de canary indicada por operador, correo real, sesión, tokens/refresh/revocación y passkeys en dos navegadores. Deploy por staging sobre servicio compartido; no hay nuevo release main. Evidencia: docs/audits/2026-09-04-epic-044-auth-rollout.md`
 - Rank: `TBD`
 - Domain: `platform|identity|integration`
 - Blocked by: `none`
