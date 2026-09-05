@@ -8,6 +8,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
+import { sanitizeBrandSvg } from './brand-svg'
 import { createAuthServerStyles } from './styles'
 import { renderAuthFontAssetsModule } from './generate-font-assets'
 import { generateStepUpController } from './step-up-controller-build'
@@ -18,7 +19,7 @@ const SOURCE = join(ROOT, 'public/branding/SVG/isotipo-full-efeonce.svg')
 const LOGOTYPE_SOURCE = join(ROOT, 'public/branding/logo-negative.svg')
 const TARGET = join(ROOT, 'src/lib/auth-server/oauth/pages/efeonce-isotipo.generated.ts')
 
-const readBrandSvg = (path: string): string => readFileSync(path, 'utf8').replace(/^<\?xml[^>]*>\s*/u, '').trim()
+const readBrandSvg = (path: string): string => sanitizeBrandSvg(readFileSync(path, 'utf8'))
 
 const svg = readBrandSvg(SOURCE)
 const logotype = readBrandSvg(LOGOTYPE_SOURCE)

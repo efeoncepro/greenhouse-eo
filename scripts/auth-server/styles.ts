@@ -103,21 +103,22 @@ button,input { font:inherit; color:inherit; }
 .id-rail { position:relative; overflow:hidden; align-items:center; padding:${s(16)} ${s(12)}; color:${n.bgWhite}; background:linear-gradient(150deg, ${railDeep} 0%, ${railBase} 58%, ${railGlow} 140%); }
 .id-rail-inner { position:relative; z-index:1; max-width:${s(96)}; display:grid; gap:${s(5)}; }
 .id-rail-logo svg { width:${s(44)}; max-width:100%; height:auto; }
-.id-rail-logo svg path { fill:${n.bgWhite}; }
+.id-rail-logo svg { color:${n.bgWhite}; }
 .id-rail-headline { font-family:${hero.fontFamily}; font-size:${hero.fontSize}; font-weight:${fontWeights.bold}; line-height:${hero.lineHeight}; letter-spacing:-.02em; margin-block-start:${s(4)}; text-wrap:balance; }
 .id-rail-body { max-width:46ch; color:color-mix(in oklch, ${n.bgWhite} 82%, transparent); }
 .id-rail-trust { display:flex; align-items:center; gap:${s(2)}; font-size:${typographyScale.bodyMd.fontSize}; color:color-mix(in oklch, ${n.bgWhite} 72%, transparent); }
 /* Filigrana: el isotipo institucional a gran escala, casi invisible, para dar profundidad sin ruido. */
 .id-rail-mark { position:absolute; inset-block-end:-32%; inset-inline-end:-24%; width:${s(196)}; opacity:.07; pointer-events:none; }
 .id-rail-mark svg { width:100%; height:auto; }
-.id-rail-mark svg path { fill:${n.bgWhite}; }
+.id-rail-mark svg { color:${n.bgWhite}; }
 .id-page { width:min(100%,${s(152)}); margin-inline:auto; padding:${s(12)} ${s(6)}; display:grid; align-content:center; min-height:100svh; }
 @media (max-width:63.99rem) { .id-rail { display:none; } }
 .id-page[data-state="login"] { max-width:${s(120)}; }
 .id-brand { display:flex; align-items:center; justify-content:center; gap:${s(2)}; margin-block-end:${s(7)}; font-family:${typographyScale.headlineMd.fontFamily}; font-size:${typographyScale.labelLg.fontSize}; font-weight:${fontWeights.bold}; letter-spacing:-.01em; }
 .id-brand img,.id-brand svg { width:${s(9)}; height:${s(7)}; object-fit:contain; }
-/* El isotipo trae su color de marca dentro del SVG; acá se reasigna al token para poder virar en oscuro. */
-.id-brand svg path { fill:var(--id-mark); }
+/* Los SVG de marca llegan normalizados a fill="currentColor" (scripts/auth-server/brand-svg.ts):
+   el color se hereda por la propiedad color y alcanza a TODA figura — incluido el <circle> del logotipo. */
+.id-brand svg { color:var(--id-mark); }
 .id-context { text-align:center; margin-block-end:${s(6)}; overflow-wrap:anywhere; font-size:${typographyScale.bodyMd.fontSize}; color:var(--id-muted); }
 .id-context strong { display:block; margin-block-start:${s(1)}; font-size:${body.fontSize}; color:var(--id-text); font-weight:${fontWeights.semibold}; }
 .id-surface { background:var(--id-paper); border:1px solid var(--id-border); border-radius:${r.lg}; padding:${s(9)} ${s(8)} ${s(8)}; box-shadow:var(--id-shadow); }
@@ -161,6 +162,8 @@ form .id-actions { margin-block-start:${s(4)}; }
 .id-field input[aria-invalid="true"] { border-color:var(--id-danger); }
 .id-or { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:${s(3)}; margin-block:${s(6)}; font-size:${typographyScale.bodySm.fontSize}; color:var(--id-muted); }
 .id-or::before,.id-or::after { content:""; height:1px; background:var(--id-border); }
+/* El separador ya corta la lectura: la sección siguiente no repite la línea. */
+.id-or + .id-section,.id-or + form.id-section { border-block-start:none; padding-block-start:0; margin-block-start:0; }
 .id-alert { display:flex; align-items:flex-start; gap:${s(2)}; margin-block-end:${s(4)}; padding:${s(3)}; border-radius:${r.md}; font-size:${typographyScale.bodyMd.fontSize}; border:1px solid color-mix(in oklch, var(--id-danger) 32%, transparent); background:color-mix(in oklch, var(--id-danger) 7%, transparent); color:var(--id-text); }
 .id-alert .id-icon { color:var(--id-danger); }
 /* Variante neutra del bloque anterior: confirma o explica una espera, no reporta un problema. */

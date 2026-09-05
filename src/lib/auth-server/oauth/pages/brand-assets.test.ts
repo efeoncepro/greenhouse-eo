@@ -3,12 +3,13 @@ import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import { EFEONCE_ISOTIPO_SVG } from './efeonce-isotipo.generated'
+import { EFEONCE_ISOTIPO_SVG, EFEONCE_LOGOTYPE_NEGATIVE_SVG } from './efeonce-isotipo.generated'
 import { AUTH_SERVER_STYLES } from './styles.generated'
 import { createAuthServerStyles } from '../../../../../scripts/auth-server/styles'
 import { buildAuthFontAssets } from '../../../../../scripts/auth-server/generate-font-assets'
 import { AUTH_FONT_ASSETS, AUTH_FONT_LICENSES } from './fonts.generated'
 import { generateStepUpController } from '../../../../../scripts/auth-server/step-up-controller-build'
+import { sanitizeBrandSvg } from '../../../../../scripts/auth-server/brand-svg'
 import { escapeHtml, renderConsentPage, renderErrorPage, renderLoginRequiredPage } from './render'
 
 /**
@@ -31,10 +32,29 @@ describe('auth-server brand assets', () => {
   })
   it('the bundled isotype matches public/branding/SVG/isotipo-full-efeonce.svg', () => {
     const source = readFileSync(join(process.cwd(), 'public/branding/SVG/isotipo-full-efeonce.svg'), 'utf8')
-      .replace(/^<\?xml[^>]*>\s*/u, '')
-      .trim()
 
-    expect(EFEONCE_ISOTIPO_SVG).toBe(source)
+    expect(EFEONCE_ISOTIPO_SVG).toBe(sanitizeBrandSvg(source))
+  })
+
+  it('the bundled logotype matches public/branding/logo-negative.svg', () => {
+    const source = readFileSync(join(process.cwd(), 'public/branding/logo-negative.svg'), 'utf8')
+
+    expect(EFEONCE_LOGOTYPE_NEGATIVE_SVG).toBe(sanitizeBrandSvg(source))
+  })
+
+  /**
+   * El color NO puede venir de un `<style>` dentro del SVG: la CSP del emisor lo bloquea por hash y
+   * la figura queda negra. Caso fuente: el `<circle>` del planeta del logotipo, que además se
+   * escapaba de un selector `svg path`.
+   */
+  it('brand assets carry no inline style block and color every shape via currentColor', () => {
+    for (const svg of [EFEONCE_ISOTIPO_SVG, EFEONCE_LOGOTYPE_NEGATIVE_SVG]) {
+      expect(svg).not.toContain('<style')
+      expect(svg).not.toContain('cls-')
+      expect([...svg.matchAll(/<(path|circle|ellipse|polygon|rect)\b/gu)].length).toBe(
+        [...svg.matchAll(/fill="currentColor"/gu)].length
+      )
+    }
   })
 
   it('pages embed the brand and escape untrusted strings', () => {

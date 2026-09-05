@@ -4,6 +4,7 @@ import { AUTH_STEP_UP_COPY } from '@/lib/copy/auth-server-step-up'
 import { STEP_UP_CONTROLLER_SCRIPT } from './step-up-controller.generated'
 /** Read-only page model. Reading factor availability never enrolls or replaces a factor. */
 import { GH_AUTH_SERVER } from '@/lib/copy/auth-server'
+import { ICON_DEVICE, ICON_KEY } from '../oauth/pages/icons'
 import { escapeHtml, layout } from '../oauth/pages/render'
 import { htmlResponse, type OAuthHttpRequest } from '../oauth/http'
 import type { AuthServerPersonAuthConfig } from './config'
@@ -97,14 +98,15 @@ export const renderStepUpPage = (model: StepUpPageModel) => {
       <p>${escapeHtml(GH_AUTH_SERVER.step_up_required_body)}</p>
       <p data-step-status role="status" aria-live="polite"></p>
       <input type="hidden" name="return_to" value="${escapeHtml(model.returnTo)}">
-      ${model.hasPasskey ? `<div class="id-actions"><button type="button" class="id-secondary" data-step-passkey>${escapeHtml(copy.passkey)}</button></div>` : ''}
+      ${model.hasPasskey ? `<div class="id-actions"><button type="button" class="id-secondary" data-step-passkey>${ICON_KEY}${escapeHtml(copy.passkey)}</button></div>
+      <p class="id-or" aria-hidden="true"><span>${escapeHtml(GH_AUTH_SERVER.login_methods_separator)}</span></p>` : ''}
       <section data-step-setup class="id-section" hidden>
         <p>${escapeHtml(copy.setup)}</p><img data-step-qr class="id-qr" alt="${escapeHtml(copy.qr)}" hidden><p>${escapeHtml(copy.secret)}</p><pre data-step-secret></pre>
         <p>${escapeHtml(copy.backups)}</p><pre data-step-backups></pre>
         <label><input type="checkbox" name="saved"> ${escapeHtml(copy.saved)}</label>
       </section>
       <form data-step-code class="id-section" ${model.hasTotp ? '' : 'hidden'}>
-        <label class="id-field"><span data-step-code-label>${escapeHtml(copy.codeLabel)}</span><input name="code" type="text" autocomplete="one-time-code" required></label>
+        <label class="id-field"><span data-step-code-label>${escapeHtml(copy.codeLabel)}</span><span class="id-input">${ICON_DEVICE}<input name="code" type="text" inputmode="numeric" autocomplete="one-time-code" autocapitalize="off" spellcheck="false" required></span></label>
         <div class="id-actions"><button class="id-primary" data-step-submit type="submit">${escapeHtml(copy.verify)}</button></div>
       </form>
       ${!model.hasTotp ? `<div class="id-actions"><button type="button" class="id-secondary" data-step-enroll>${escapeHtml(copy.enroll)}</button></div>` : ''}
