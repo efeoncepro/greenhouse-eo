@@ -114,14 +114,24 @@ button,input { font:inherit; color:inherit; }
 .id-rail { display:none; }
 @media (min-width:64rem) {
   /* La fila en 1fr: sin eso el panel se queda del alto de su contenido y deja una franja muerta. */
-  .id-canvas[data-state="login"] { grid-template-columns:minmax(0,5fr) minmax(0,6fr); grid-template-rows:1fr; }
+  /* El campo cubre todo el borde, pero la COMPOSICIÓN tiene techo: sin esto, a 2560 el panel crece
+     a más de mil px con su contenido todavía en 528 y la pantalla se lee vacía, no amplia. */
+  /* El techo va por PADDING, no por max-width: con max-width el propio lienzo se encoge y el campo
+     de marca deja de sangrar hasta el borde — aparecen dos bandas claras a los lados. Con padding,
+     el fondo sigue cubriendo el 100% y lo único que se limita es la composición. */
+  .id-canvas[data-state="login"] { grid-template-columns:minmax(0,5fr) minmax(0,6fr); grid-template-rows:1fr;
+    padding-inline:max(0px, calc((100% - ${s(400)}) / 2)); }
   .id-canvas[data-state="login"] .id-rail { order:-1; display:flex; }
   .id-canvas[data-state="login"] .id-brand { display:none; }
   .id-canvas[data-state="login"] .id-page { min-height:auto; padding-inline:${s(10)}; }
 }
-.id-rail { position:relative; overflow:hidden; align-items:center; padding:${s(16)} ${s(12)};
-  border-inline-end:1px solid color-mix(in oklch, ${n.bgWhite} 13%, transparent); }
-.id-rail-inner { position:relative; z-index:1; max-width:${s(132)}; display:grid; gap:${s(5)}; }
+/* Sin línea divisoria: separaba dos fondos distintos y hoy el campo es continuo — dibujaba una
+   costura donde no la hay. La separación la hacen el vacío y la tarjeta clara flotando.
+   justify-content:center es lo que deja de anclar el bloque al padding: antes empezaba en x=48
+   pasara lo que pasara, y a 1920 quedaba 124px fuera del eje de su propia columna. */
+.id-rail { position:relative; overflow:hidden; align-items:center; justify-content:center;
+  padding:${s(16)} ${s(12)}; }
+.id-rail-inner { position:relative; z-index:1; width:100%; max-width:min(${s(148)}, 100%); display:grid; gap:${s(5)}; }
 .id-rail-logo svg { width:${s(44)}; max-width:100%; height:auto; }
 .id-rail-logo svg { color:${n.bgWhite}; }
 .id-rail-kicker { font-size:${typographyScale.overline.fontSize}; font-weight:${fontWeights.semibold}; letter-spacing:${letterSpacings.caps}; text-transform:uppercase; color:color-mix(in oklch, ${n.bgWhite} 62%, transparent); }
