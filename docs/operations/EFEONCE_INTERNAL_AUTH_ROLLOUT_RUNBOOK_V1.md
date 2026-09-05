@@ -433,3 +433,22 @@ revisión `efeonce-mcp-gateway-00032-qm5` Ready al 100%, digest
 `sha256:6f28046f525d965a54a6fca97e730fa5ef741c9be578181c79962df14bec4a39`. Ambos flags ON,
 referencias de máquina montadas; health 200 y discovery ON verificado, conservando Entra. Este
 resultado no acredita todavía un dispatch con token corporativo.
+
+
+## Integridad publicada y nuevo intento corporativo — 2026-09-05 21:09 UTC
+
+PR224/main d551cf368, release33991304002 success; manifest
+`d551cf3689db-8a4af809-0c28-496d-82c9-a17ed7593ce3` released, health y watchdog5/5 correctos.
+Migración/reconciliación aplicadas, dos eventos publicados, señales0. Gateway d7469d7/revisión00033-597
+publicado; reader Production devuelve internal_population sin membresías para el recorrido externo.
+Detalle de evidencias en TASK-1836 §Release de integridad y ledger de tiempos.
+
+Emisor activado después del release: GitHub repo true y revisión auth-server-00015-jrc Ready100%,
+misma imagen validada de ace63705e. Reader y gateway ON. No ampliar la cohorte: falta token humano,
+refresh, revocación selectiva y rollback cronometrado. El intento actual espera contraseña reciente
+Microsoft, introducida exclusivamente por el operador en su navegador.
+
+La UI de Claude presenta Microsoft sólo con `internalLoginEnabled` y `return_to` válido hacia
+`/oauth/authorize`. Abrir `/login` directamente muestra la puerta de invitación por correo. Para probar
+el acceso corporativo, iniciar una solicitud OAuth válida del cliente registrado y seguir el enlace al
+login. No fabricar un return_to arbitrario ni eliminar validaciones para hacer visible el botón.

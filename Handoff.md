@@ -1,13 +1,17 @@
 # Handoff activo
 
-**TASK-1836, 2026-09-05 — publicación reanudada:** Claude terminó la pasada UI autorizada
-(Nocturno editorial) y guardó la reparación de Codex en `0fc7a4bc5`; checkout limpio al retomar.
-Operador pidió revisar e integrar ese trabajo y avanzar con todo el rollout. 407 pruebas auth/identity
-pasaron y browser local 6/6 sin violaciones; build integrado exit0. Gateway `d7469d7` pusheado,
-CI/contenedor correctos y deploy33988521730 en curso. Emisor interno sigue OFF hasta readbacks.
-Migración `20260905183812333` y reconciliación ya aplicadas (gv3, segunda revisión0/0, ambas señales0);
-no repetir operaciones como si estuvieran pendientes. Sin canary humano/refresh/revocación/rollback
-todavía. [Task](docs/tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md) ·
+**TASK-1836, 2026-09-05 21:09 UTC — release publicado, canary humano pendiente:** PR224/main
+`d551cf368` released; orquestador único `33991304002` success, manifest
+`d551cf3689db-8a4af809-0c28-496d-82c9-a17ed7593ce3`. CI/Deep/smoke/Vercel/health correctos;
+watchdog5/5, sin drift. Gateway `d7469d7`, revisión00033-597100%, deploy33988521730 success.
+Migración20260905183812333 y reconciliación aplicadas (gv3, segunda revisión0/0, ambas señales0);
+no repetirlas. Reader productivo rechaza el recorrido externo con internal_population sin membresías.
+Emisor interno ON: variable durable GitHub true y auth-server-00015-jrc Ready100%, misma imagen
+validada de ace63705e. Única diferencia con main: ayuda del CLI, fuera de rutas runtime.
+UI Claude preservada; Microsoft aparece con flag ON y return_to OAuth válido, no en /login directo.
+Navegador está en contraseña reciente Microsoft; se pidió al operador completarla allí. Ningún token
+corporativo emitido todavía. Continuar canary/refresh/revocación/rollback con las autorizaciones vigentes.
+[Task](docs/tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md) ·
 [Runbook](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md) ·
 [Autorizaciones originales](docs/operations/TASK-1836_INTEGRITY_SESSION_HANDOFF_2026-09-05.md).
 

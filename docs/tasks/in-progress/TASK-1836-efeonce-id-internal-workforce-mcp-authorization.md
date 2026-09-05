@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `2026-09-05: publicación reanudada tras cierre UI de Claude y autorización del operador para integrar y avanzar. Reparación commit 0fc7a4bc5; 407 pruebas auth/identity y 6 checks browser local correctos, build exit0. Gateway d7469d7 pusheado y CI/contenedor verde, deploy en curso. Migración y reconciliación ya aplicadas (gv3, idempotencia0/0, ambas señales0). Emisor interno OFF hasta release/readbacks; canary humano, refresh, revocación y rollback pendientes.`
+- Status real: `2026-09-05 21:09 UTC: PR224/main d551cf368 released por run33991304002; CI, Deep, smoke, Vercel y health correctos, watchdog5/5 sin drift. Gateway d7469d7/revisión00033-597 publicado. Migración/reconciliación aplicadas (gv3, idempotencia0/0, ambas señales0), reader productivo internal_population verificado. Emisor interno ON durable GitHub y auth-server-00015-jrc100%; UI Claude con Microsoft comprobada dentro de OAuth. Canary humano detenido en verificación reciente de contraseña Microsoft; todavía sin token. Refresh, revocación y rollback pendientes.`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -580,7 +580,7 @@ interactivo del sujeto real cuando corresponda. No enviar correos ni mensajes si
 
 - [ ] Cada caso de la matriz §8 tiene evidencia de comportamiento y outcome esperado/real; casos live sin ejecutar quedan pendientes, nunca verdes por skip.
 - [ ] Inventario de configuración Entra, redirects, secrets y flags verificado sin valores sensibles; callback real corresponde al runtime desplegado.
-- [ ] Enrolamiento idempotente y auditado, con capability fina y camino programático; ningún vínculo nace por coincidencia de email. **Reabierto 2026-09-05:** los tests actuales prueban idempotencia y audit/outbox internos, pero el piloto carece de audit y eventos canónicos de las tablas compartidas. Falta unificar writer/política de población, proteger recuperación cruzada y regularizar filas con evidencia explícita; no considerar este criterio satisfecho por el audit interno solamente.
+- [x] Enrolamiento idempotente y auditado, con capability fina y camino programático; ningún vínculo nace por coincidencia de email. Reapertura de integridad resuelta: writers transaccionales compartidos, población inmutable y recuperación cruzada protegida; 20 live + recuperación externa live adicional passed. Migración aplicada y reconciliación explícita del piloto con audit/outbox canónicos correlacionados, publicados; repetición 0/0 sin cambiar gv3 ni expiración original. Evidencia en §Integridad aplicada y §Release de integridad.
 - [x] Consentimiento y refresh no permiten cambiar persona, contexto ni elevar permisos; tokens previos no adquieren autoridad interna por default. OAuth JWT ES256 y pruebas PG de consentimiento/rotación verificadas.
 - [ ] Baja remota y baja canónica tienen latencias declaradas separadamente; revocación multicontexto pasa el caso A=10/B=2->3.
 - [ ] Rollback ensayado registra duración real, revocación selectiva y comprobación de externos/Entra legado; no depende de apagar todo OAuth.
@@ -894,3 +894,38 @@ se corrigió la nota. GitHub internalAuth false y permisos del operador de excep
 Preflight configurado: PG/migraciones/WIF/Sentry correctos; faltan SHA publicado/CI y excepción batch
 por migración ya aplicada. Ningún bypass de evidencia CI/readiness. Gateway d7469d7, CI33988476298
 con contenedor success; deploy33988521730 en curso.
+
+
+### Release de integridad y activación — 2026-09-05
+
+PR224 integra el commit mixto autorizado, UI Claude y reparación0fc7a4bc5. Claude añadió
+25f3db5f9 (ayuda de uso del reconciliador); se revisó y probó antes de publicar. Main:
+`d551cf3689db54989552ebfe701c65afba94bc33`, merge20:32:57Z. CI33990441436,
+Deep33990441433 y smoke33990452162 success; Vercel Production
+`dpl_E6xpKi4XsYFKGduwL7MqVxHhPHsQ` READY para ese SHA.
+
+Preflight final12 checks: todos status ok, única severity warning por batch con migración ya
+aplicada. Excepción autorizada con capability del actor humano revalidada; no se exceptuaron CI,
+readiness ni el timeout transitorio del primer chequeo (reintento correcto). Orquestador único
+33991304002 success20:50:47→21:04:59Z, ambos gates Production aprobados. Manifest
+`d551cf3689db-8a4af809-0c28-496d-82c9-a17ed7593ce3` released21:04:51.013Z;
+PG conserva razón y actor GitHub cesargrowth11 como transporte, autorización humana Julio explícita.
+Health21:03:32Z; watchdog21:05:11Z severity ok,5/5 sincronizados. Auth/ops sirven ace63705e:
+diff completo contra main sólo `scripts/identity/reconcile-internal-authority.ts` (CLI, fuera de
+rutas runtime); no se afirma igualdad de árboles completos.
+
+Gateway sibling d7469d72085b894e364ff7fedb8fbfc34204e49f, deploy33988521730 success,
+revisión efeonce-mcp-gateway-00033-597100%; digest
+sha256:4408d4b5362e7bb78b523b5c771a7f95f02375388678dc3f652e6ab095dbd8b8.
+Reader Production: identidad interna por contrato externo devuelve200/internal_population,
+memberships[]; sin credencial401/invalid_token y contexto incompleto400/bad_request.
+Señales unaudited_write y mixed_population0; eventos de reconciliación publicados18:54:03.284Z.
+
+Tras release/readbacks, GitHub internal flag true y auth-server-00015-jrc Ready100% con
+AUTH_SERVER_INTERNAL_AUTH_ENABLED=true, OAuth/person true y misma imagen validada
+sha256:46bbc001c57335b6177b62f9a184d07f772900c5a7ce0f40d1139ed4fe0bebcd.
+Browser verificó UI Claude, selector Equipo Efeonce y Continuar con Microsoft dentro del flujo
+OAuth. /login directo no presenta ese botón porque no tiene return_to válido; no es un cambio visual
+introducido durante este release. Microsoft requiere contraseña reciente de la cuenta corporativa;
+operador solicitado en navegador, sin pedir ni capturar credenciales por chat. Sesión/token/canary,
+refresh, revocación y rollback siguen sin acreditar al corte21:09Z.
