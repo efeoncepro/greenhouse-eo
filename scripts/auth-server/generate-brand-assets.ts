@@ -36,6 +36,17 @@ export const EFEONCE_LOGOTYPE_NEGATIVE_SVG = ${JSON.stringify(logotype)}
 writeFileSync(TARGET, output)
 console.log(`[auth-server] brand asset generated → ${TARGET} (${svg.length} chars)`)
 
+const stylesSource = readFileSync(join(ROOT, 'scripts/auth-server/styles.ts'), 'utf8')
+const stylesTemplate = stylesSource.slice(stylesSource.indexOf('  return `') + 10)
+
+if (stylesTemplate.split('`').length - 1 !== 1) {
+  console.error(
+    '[auth-server] styles.ts: hay un backtick dentro del template literal del CSS. Cierra la plantilla ' +
+      'y el resto se evalúa como código. Los comentarios CSS de ese archivo van SIN backticks.'
+  )
+  process.exit(1)
+}
+
 const stylesTarget = join(ROOT, 'src/lib/auth-server/oauth/pages/styles.generated.ts')
 const styles = createAuthServerStyles()
 

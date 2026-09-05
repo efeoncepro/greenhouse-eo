@@ -92,19 +92,23 @@ button,input { font:inherit; color:inherit; }
    centrada las sirve mejor. El formulario va PRIMERO en el DOM y el panel se reordena por CSS, para
    que un lector de pantalla llegue al campo antes que al mensaje de marca. */
 .id-canvas { min-height:100svh; display:grid; align-items:stretch; }
-/* Dirección «Nocturno editorial»: en el acceso el lienzo ENTERO es el campo de marca y la tarjeta
-   clara flota encima. El campo se fija en ambos esquemas —el login es el momento de marca, no una
-   pantalla más del producto— y por eso la tarjeta re-declara los tokens claros en su subárbol: así
-   el modo oscuro del sistema sigue gobernando consentimiento, verificación y error, sin tocar ésta. */
-.id-canvas[data-state="login"] { position:relative; isolation:isolate; color:${n.bgWhite};
+/* Dirección «Nocturno editorial», aplicada a TODAS las pantallas del emisor: el lienzo entero es el
+   campo de marca y la tarjeta clara flota encima. Se fija en claro y oscuro —esto es una superficie
+   de marca, no una pantalla más del producto— y la tarjeta re-declara los tokens claros en su
+   subárbol para leerse igual en ambos esquemas. Sólo /login suma además el panel lateral: el resto
+   son decisiones puntuales y les basta la columna centrada sobre el mismo campo. */
+.id-canvas { position:relative; isolation:isolate; color:${n.bgWhite};
   background:radial-gradient(120% 90% at 8% 0%, ${railGlow} 0%, ${railBase} 42%, ${railDeep} 100%); }
-.id-canvas[data-state="login"]::after { content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
+.id-canvas::after { content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
   background-image:radial-gradient(color-mix(in oklch, ${n.bgWhite} 6%, transparent) 1px, transparent 1px); background-size:3px 3px; }
-.id-canvas[data-state="login"] .id-page { background:transparent; }
-.id-canvas[data-state="login"] .id-brand { color:${n.bgWhite}; }
-.id-canvas[data-state="login"] .id-brand svg { color:${n.bgWhite}; }
-.id-canvas[data-state="login"] .id-surface {
-  --id-paper:${n.paper}; --id-text:${n.textPrimary}; --id-muted:${n.textSecondary}; --id-border:${n.divider}; --id-hover:${n.actionHover};
+.id-canvas .id-page { background:transparent; }
+.id-canvas .id-brand { color:${n.bgWhite}; }
+.id-canvas .id-brand svg { color:${n.bgWhite}; }
+.id-canvas .id-surface {
+  /* --id-bg va en la lista: pinta los sub-fondos de dentro (tarjeta de organización, badge
+     de permiso). Sin él tomaban el neutro OSCURO del esquema y quedaban negro sobre negro. */
+  --id-paper:${n.paper}; --id-text:${n.textPrimary}; --id-muted:${n.textSecondary}; --id-border:${n.divider};
+  --id-hover:${n.actionHover}; --id-bg:${n.bodyBg}; --id-shadow-color:${n.snackbar};
   color:var(--id-text); border-color:transparent;
   box-shadow:inset 0 1px 0 ${n.bgWhite}, 0 2px 4px color-mix(in srgb, ${railDeep} 26%, transparent), 0 ${s(16)} ${s(32)} -${s(9)} color-mix(in srgb, ${railDeep} 70%, transparent); }
 .id-rail { display:none; }
@@ -139,7 +143,8 @@ button,input { font:inherit; color:inherit; }
 /* Los SVG de marca llegan normalizados a fill="currentColor" (scripts/auth-server/brand-svg.ts):
    el color se hereda por la propiedad color y alcanza a TODA figura — incluido el <circle> del logotipo. */
 .id-brand svg { color:var(--id-mark); }
-.id-context { text-align:center; margin-block-end:${s(6)}; overflow-wrap:anywhere; font-size:${typographyScale.bodyMd.fontSize}; color:var(--id-muted); }
+.id-context { text-align:center; margin-block-end:${s(6)}; overflow-wrap:anywhere; font-size:${typographyScale.bodyMd.fontSize}; color:color-mix(in oklch, ${n.bgWhite} 66%, transparent); }
+.id-context strong { color:${n.bgWhite}; }
 .id-context strong { display:block; margin-block-start:${s(1)}; font-size:${body.fontSize}; color:var(--id-text); font-weight:${fontWeights.semibold}; }
 .id-surface { background:var(--id-paper); border:1px solid var(--id-border); border-radius:${r.lg}; padding:${s(9)} ${s(8)} ${s(8)}; box-shadow:var(--id-shadow); }
 /* Presencia de la tarjeta sobre el campo: más superficie, radio y sombra derivados del sistema, y
