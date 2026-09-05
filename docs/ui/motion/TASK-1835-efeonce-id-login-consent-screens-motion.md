@@ -21,10 +21,10 @@ animación, está prohibido.
 
 | Elemento | Motion | Trigger | Duración / easing (token) | Reduced motion |
 |---|---|---|---|---|
-| Tarjeta (`IdCard`) | Entrada: opacidad 0→1 + desplazamiento 8 px→0 | Carga de página | `motion.duration.short` / `motion.easing.standard` | Sin transición |
-| Botón primario | Pending: cambio de copy + `aria-busy` + atenuación por token | Submit | `motion.duration.instant` | Inmediato (igual) |
+| Tarjeta (`IdCard`) | Entrada estática por defecto; opacidad sólo si la revisión la justifica | Carga de página | `motionCss.duration.short` / `motionCss.ease.standard` | Sin transición |
+| Botón primario | Pending: cambio de copy + `aria-busy` + atenuación por token | Submit | `motionCss.duration.instant` | Inmediato (igual) |
 | Anillo de foco | Aparece sin transición | Foco por teclado | — | — |
-| `IdStatus` inline | Aparece en su lugar (sin deslizar) | Error/confirmación | `motion.duration.short` opacidad | Inmediato |
+| `IdStatus` inline | Aparece en su lugar (sin deslizar) | Error/confirmación | `motionCss.duration.short` opacidad | Inmediato |
 | Contador de reintento (`slow_down`, «Pedir un enlace nuevo» tras 60 s) | Texto que cambia | Tiempo | sin animación | — |
 
 ## Microinteraction States
@@ -33,7 +33,7 @@ animación, está prohibido.
 - Focus: anillo de 2 px por token, visible en todos los fondos; sin animación de aparición.
 - Active: botón primario baja un tono por token durante la pulsación.
 - Pending: copy «Confirmando…»/«Enviando…»/«Verificando…» + `aria-busy=true` + botones deshabilitados; sin spinner obligatorio (si hay indicador, es decorativo y se oculta con reduced motion).
-- Error inline: aparece bajo el campo sin desplazar el layout más de una línea; el campo conserva su valor.
+- Error inline: aparece bajo el campo sin truncar ni limitar la cantidad de líneas; el campo conserva su valor.
 
 ## Transition Specs
 
@@ -45,11 +45,11 @@ animación, está prohibido.
 
 | Token de motion (SSOT) | Uso | Valor literal prohibido |
 |---|---|---|
-| `motion.duration.instant` | pending, foco | `0ms`/`50ms` en CSS de plantilla |
-| `motion.duration.short` | entrada de tarjeta, estados inline | `160ms` escrito a mano |
-| `motion.easing.standard` | todas las transiciones | `cubic-bezier(...)` literal |
+| `motionCss.duration.instant` | pending, foco | `0ms`/`50ms` en CSS de plantilla |
+| `motionCss.duration.short` | entrada de tarjeta, estados inline | `160ms` escrito a mano |
+| `motionCss.ease.standard` | todas las transiciones | `cubic-bezier(...)` literal |
 
-Los nombres exactos se resuelven en el lookup de tokens de Slice 1 (`src/lib/design-tokens/*` y el
+Los nombres exactos se resuelven en el lookup de tokens de Slice 1 (`src/components/greenhouse/motion/core/tokens.ts` y el
 contrato de motion de la UI Platform, `docs/architecture/ui-platform/MOTION.md`); si el SSOT no
 expone un token de motion runtime-agnóstico, se agrega ahí primero y el generador lo exporta.
 
@@ -83,7 +83,7 @@ expone un token de motion runtime-agnóstico, se agrega ahí primero y el genera
 - Alternatives considered: animación de «éxito» al conceder (rechazada: no hay pantalla de éxito, el redirect es inmediato); spinner obligatorio en pending (rechazado: texto + `aria-busy` es más robusto y accesible).
 - Why this pattern: una superficie de identidad debe sentirse estable; el motion sólo asienta y confirma.
 - Reuse / extend / new primitive: tokens existentes del SSOT; sin primitive de motion nueva.
-- Open risks: disponibilidad de tokens de motion runtime-agnósticos en `src/lib/design-tokens/*` (si sólo existen en el theme MUI, se extraen primero).
+- Open risks: generación de aliases CSS desde `motionCss` sin importar React/MUI en runtime.
 - Follow-up: lookup de tokens en Slice 1.
 
 ## Acceptance Checklist

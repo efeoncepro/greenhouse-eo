@@ -109,7 +109,6 @@ const mapMagicLink = (row: MagicLinkRow): MagicLinkRecord => ({
   correlationId: row.correlation_id
 })
 
-
 // ─── Passkeys ─────────────────────────────────────────────────────────────────
 
 const PASSKEY_COLUMNS = `credential_id, environment_id, subject, public_key, counter, transports, device_name,
@@ -151,13 +150,14 @@ const mapPasskey = (row: PasskeyRow): PasskeyCredentialRecord => ({
 })
 
 const CHALLENGE_COLUMNS = `challenge_hash, purpose, environment_id, subject, created_at, expires_at, consumed_at,
-  ip_hash, correlation_id`
+  ip_hash, correlation_id, session_hash`
 
 type ChallengeRow = {
   challenge_hash: string
   purpose: PasskeyChallengeRecord['purpose']
   environment_id: string
   subject: string | null
+  session_hash: string | null
   created_at: Date | string
   expires_at: Date | string
   consumed_at: Date | string | null
@@ -170,13 +170,13 @@ const mapChallenge = (row: ChallengeRow): PasskeyChallengeRecord => ({
   purpose: row.purpose,
   environmentId: row.environment_id,
   subject: row.subject,
+  sessionHash: row.session_hash,
   createdAt: asDate(row.created_at),
   expiresAt: asDate(row.expires_at),
   consumedAt: asDateOrNull(row.consumed_at),
   ipHash: row.ip_hash,
   correlationId: row.correlation_id
 })
-
 
 // ─── TOTP ─────────────────────────────────────────────────────────────────────
 
@@ -281,6 +281,38 @@ export class PostgresPersonAuthStore implements PersonAuthStorePort {
         WHERE session_hash = $1 AND revoked_at IS NULL`,
       [sessionHash, lastSeenAt, expiresAt]
     )
+  }
+
+  async recordBoundSessionStepUp(input: {
+    sessionHash: string
+    subject: string
+    environmentId: string
+    profileId: string
+    linkId: string
+    stepUpAt: Date
+    amr: readonly string[]
+  }): Promise<boolean> {
+    const rows = await query<{ session_hash: string }>(
+      `UPDATE greenhouse_auth.sessions s SET step_up_at=$6,
+         amr=ARRAY(SELECT DISTINCT unnest(s.amr || $7::text[]))
+       WHERE s.session_hash=$1 AND s.subject=$2 AND s.environment_id=$3 AND s.profile_id=$4 AND s.link_id=$5
+         AND s.revoked_at IS NULL AND s.expires_at>$6 AND s.absolute_expires_at>$6
+         AND EXISTS(SELECT 1 FROM greenhouse_core.identity_profile_source_links l
+           WHERE l.link_id=s.link_id AND l.active=TRUE AND l.profile_id=s.profile_id
+             AND l.source_object_id=s.subject AND l.source_system='external_idp:' || s.environment_id)
+       RETURNING s.session_hash`,
+      [
+        input.sessionHash,
+        input.subject,
+        input.environmentId,
+        input.profileId,
+        input.linkId,
+        input.stepUpAt,
+        [...input.amr]
+      ]
+    )
+
+    return rows.length === 1
   }
 
   async recordSessionStepUp({
@@ -477,7 +509,7 @@ export class PostgresPersonAuthStore implements PersonAuthStorePort {
   async insertPasskeyChallenge(record: PasskeyChallengeRecord): Promise<void> {
     await query(
       `INSERT INTO greenhouse_auth.passkey_challenges (${CHALLENGE_COLUMNS})
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
       [
         record.challengeHash,
         record.purpose,
@@ -487,7 +519,8 @@ export class PostgresPersonAuthStore implements PersonAuthStorePort {
         record.expiresAt,
         record.consumedAt,
         record.ipHash,
-        record.correlationId
+        record.correlationId,
+        record.sessionHash ?? null
       ]
     )
   }
@@ -721,10 +754,10 @@ export class PostgresPersonAuthStore implements PersonAuthStorePort {
     createdAt: Date
   }): Promise<void> {
     await withTransaction(async client => {
-      await client.query(
-        `DELETE FROM greenhouse_auth.totp_backup_codes WHERE environment_id = $1 AND subject = $2`,
-        [environmentId, subject]
-      )
+      await client.query(`DELETE FROM greenhouse_auth.totp_backup_codes WHERE environment_id = $1 AND subject = $2`, [
+        environmentId,
+        subject
+      ])
 
       if (codeHashes.length === 0) return
 

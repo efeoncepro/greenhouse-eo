@@ -1,5 +1,10 @@
 # TASK-1835 — Efeonce ID: pantallas de login, consentimiento y recuperación en `auth.efeonce.org`
 
+## Delta 2026-09-04 — acceso interno nativo (TASK-1836)
+
+El flujo interno depende del contrato backend de TASK-1836 (U11). Incluir entrada corporativa Microsoft, retorno OAuth, errores de elegibilidad y consentimiento con organización/permisos reales; actualizar wireframe/flow/motion antes de implementar ese slice. La UI no determina población por correo ni concede permisos. El flujo externo conserva su contrato.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -8,7 +13,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,10 +26,10 @@
 - Motion: `docs/ui/motion/TASK-1835-efeonce-id-login-consent-screens-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-044`
-- Status real: `Especificación (2026-09-04). El runtime del emisor está en producción con la pantalla mínima de consentimiento y las páginas de error/login_required de TASK-1829; la dirección visual aprobada de "Efeonce ID" aún no existe (mode repo-native-benchmark) y los métodos de login (passkey, magic link, TOTP) los entrega TASK-1830. Slice 1 (shell + consentimiento) puede arrancar sobre el contrato vigente; Slices 2–3 esperan a TASK-1830`
+- Status real: `Renderers reales integrados localmente (2026-09-05): shell AXIS, fuentes/CSP, login/consentimiento, step-up TOTP/passkey UV y alta TOTP con QR. GVC pasa en 1440/390 para cuatro superficies; verificación Chromium 6 checks, 0 violations con factores simulados. Harness GET-only 19036 con DTOs ficticios; no acredita auth real ni deploy. UI ready no: aprobación del operador, passkey login, matriz completa de estados, review final y canary pendientes; typecheck global no confirmado.`
 - Rank: `TBD`
 - Domain: `ui`
-- Blocked by: `TASK-1830 code complete 2026-09-04 (flag AUTH_SERVER_PERSON_AUTH_ENABLED=false): Slices 2–3 necesitan ese flag ON en staging para mirar algo real; Slice 1 no está bloqueado`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -53,7 +58,7 @@ portal reutilizando el SSOT de marca y tokens.
 ## Goal
 
 - Shell visual «Efeonce ID» server-rendered (sin framework) con tokens derivados del SSOT
-  (`src/config/efeonce-brand.ts`, `src/config/typography-tokens.ts`, `src/lib/design-tokens/*`),
+  (`src/config/efeonce-brand.ts`, `src/components/theme/typography-tokens.ts`, `src/@core/theme/axis-tokens.ts`),
   isotipo bundleado, CSP estricta y sin JS salvo donde el protocolo lo exige (WebAuthn).
 - Pantalla de consentimiento que muestre con claridad quién pide acceso (`client_name`, `client_id`,
   `logo_uri` de CIMD cuando exista), a qué organización se accede, qué permisos se conceden (lectura
@@ -116,13 +121,13 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `TASK-1829` (en producción, flag OFF): handler `src/lib/auth-server/oauth/handler.ts`, páginas
+- `TASK-1829` (OAuth ON en el readback 2026-09-05): handler `src/lib/auth-server/oauth/handler.ts`, páginas
   `src/lib/auth-server/oauth/pages/render.ts`, copy `src/lib/copy/auth-server.ts`,
   `InMemoryOAuthStore` y `createStaticSubjectPort` para el harness.
 - `TASK-1830` (Slices 2–3): `greenhouse_auth.sessions`, rutas `/auth/passkeys/*`, `/auth/magic-link/*`,
   `/auth/totp/*`, `/auth/session`, errores canónicos y el flujo maestro UI.
-- SSOT de marca y tokens: `src/config/efeonce-brand.ts`, `src/config/typography-tokens.ts`
-  (Poppins para texto, Geist para numéricos), `src/lib/design-tokens/*`, `public/branding/SVG/*`.
+- SSOT de marca y tokens: `src/config/efeonce-brand.ts`, `src/components/theme/typography-tokens.ts`
+  (Poppins para texto, Geist para numéricos), `src/@core/theme/axis-tokens.ts`, `public/branding/SVG/*`.
 
 ### Blocks / Impacts
 
@@ -142,39 +147,34 @@ Reglas obligatorias:
 - `docs/ui/wireframes/TASK-1835-efeonce-id-login-consent-screens.md`
 - `docs/ui/flows/TASK-1835-efeonce-id-login-consent-screens-flow.md`
 - `docs/ui/motion/TASK-1835-efeonce-id-login-consent-screens-motion.md`
-- `docs/ui/direction/TASK-1835-efeonce-id-direction.md` (nuevo, dirección visual versionada; prerequisito de `UI ready: yes`)
+- `docs/ui/visual-directions/TASK-1835-efeonce-id-direction.md` (nuevo, dirección visual versionada; prerequisito de `UI ready: yes`)
 - `docs/ui/reviews/TASK-1835-efeonce-id-login-consent-screens.scorecard.json` (nuevo)
 
 ## Current Repo State
 
-### Already exists
+### Already exists — código local verificado 2026-09-05
 
-- `src/lib/auth-server/oauth/pages/render.ts`: `renderLoginRequiredPage`, `renderStepUpRequiredPage`,
-  `renderConsentPage`, `renderErrorPage` — HTML server-side con CSS inline, isotipo bundleado
-  (`efeonce-isotipo.generated.ts`, generado por `pnpm auth-server:brand-assets:generate` con drift
-  test) y `escapeHtml`; CSP `default-src 'none'; img-src data:; style-src 'unsafe-inline';
-  form-action 'self'; frame-ancestors 'none'` en `http.ts`.
-- `src/lib/copy/auth-server.ts` (`GH_AUTH_SERVER`): títulos, cuerpos, CTAs de consentimiento,
-  descripciones es-CL por scope, errores.
-- Contrato de la pantalla de consentimiento (`EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md` §5.1) y del
-  `SubjectSessionPort` (§6); `authorize` decide 401/403/200/302 según sesión, step-up y consent.
-- Harness in-process en `oauth-flow.test.ts` (store en memoria + firmador P-256 local + subject
-  estático) que ya renderiza la página de consentimiento en tests.
-- Runtime en producción (release `9100bbd2765d`) con `AUTH_SERVER_OAUTH_ENABLED=false`.
+- Shell compartido en `oauth/pages/render.ts`, CSS generado desde AXIS, fuentes locales y enlaces
+  a sus licencias OFL. `oauth/http.ts` permite estilos por hash y fuentes del propio origen.
+- Login corporativo/correo, consentimiento con DTO server-side de organización y permisos, páginas
+  de magic link/recuperación y respuestas de protocolo usan los renderers reales.
+- `/login/step-up` consume TOTP y passkey UV sobre la sesión existente; alta TOTP con QR, secreto
+  alterno, confirmación y respaldo mediante comandos existentes. Script con nonce y conexión al
+  propio origen; no afirma MFA por login Microsoft.
+- `scripts/auth-server/dev-ui-server.ts` sirve esos renderers en `127.0.0.1:19036`, sólo GET,
+  con DTOs ficticios y sin handlers OAuth/autenticación reales. GVC de cuatro superficies pasa.
+- `scripts/auth-server/verify-ui-browser.mjs`: 6 checks, 0 violations, exit 0; verifica fuentes,
+  overflow y controladores con respuestas de factores simuladas. Evidencia detallada en la review.
 
 ### Gap
 
-- No hay dirección visual aprobada de «Efeonce ID» ni doc de dirección versionado; la página actual
-  es un layout de una columna con estilos ad hoc.
-- No hay pantallas de login, magic link, passkey, step-up, recuperación ni sesión/cierre de sesión
-  (llegan como contratos JSON con TASK-1830).
-- Los tokens (color, tipografía, spacing, radios, sombras) no se derivan del SSOT: el CSS actual
-  tiene valores literales.
-- No existe harness HTTP local para capturar cada estado con GVC (los tests renderizan HTML pero
-  no sirven una URL).
-- No hay evidencia visual (GVC, scorecard), ni recorrido por teclado ni reduced-motion verificados.
-- La pantalla de consentimiento no muestra `logo_uri`/`client_uri` del cliente CIMD ni la
-  organización a la que se accede, ni distingue visualmente lectura de escritura.
+- Aprobación visual del operador pendiente; `UI ready: no`.
+- Login passkey completo, matriz de estados/recuperación, contenido largo, review enterprise y
+  scorecard final siguen pendientes. Fixtures disponibles no equivalen a estados revisados.
+- No se ha verificado aquí autenticación real, consentimiento persistido, canary ni despliegue de
+  estos renderers. El typecheck global sigue sin resultado confirmado para esta integración.
+- Logos CIMD, todos los criterios de accesibilidad y registro del patrón requieren su evidencia
+  específica antes de marcar los criterios completos.
 
 ## Modular Placement Contract
 
@@ -237,7 +237,7 @@ Reglas obligatorias:
 - Enter / exit: entrada de la tarjeta con opacidad+desplazamiento de 8 px en 160 ms; salida sin transición (redirect del servidor).
 - Layout morph: cambio de método de login (magic link ↔ passkey) por navegación server-side, sin morph.
 - Stagger: ninguno.
-- Timing / easing token: duraciones y easing exportados desde el SSOT de motion (`src/lib/design-tokens/*` / tokens de motion del portal) al CSS generado; sin valores literales en las plantillas.
+- Timing / easing token: duraciones y easing exportados desde el SSOT de motion (`src/@core/theme/axis-tokens.ts` / tokens de motion del portal) al CSS generado; sin valores literales en las plantillas.
 - Reduced-motion fallback: `@media (prefers-reduced-motion: reduce)` anula la entrada y los cambios de estado son inmediatos; el pending se comunica por texto y `aria-busy`.
 - Non-goal motion: sin loaders decorativos, sin confetti al conceder, sin parallax.
 
@@ -265,7 +265,7 @@ Reglas obligatorias:
 - Scroll-width checks: en las 11 fixtures × 2 viewports.
 - Reduced-motion / focus evidence: misma secuencia con la preferencia activada y capturas del anillo de foco.
 - Review dossier: `pnpm fe:capture:review task1835-efeonce-id` obligatorio antes de `UI ready: yes`.
-- Baseline decision / surface ID: baseline nuevo `efeonce-id` en `docs/ui/direction/TASK-1835-efeonce-id-direction.md`; sin surface ID de Figma (dirección repo-native).
+- Baseline decision / surface ID: baseline nuevo `efeonce-id` en `docs/ui/visual-directions/TASK-1835-efeonce-id-direction.md`; sin surface ID de Figma (dirección repo-native).
 
 ### Design decision log
 
@@ -273,7 +273,7 @@ Reglas obligatorias:
 - Alternatives considered: (a) montar una app Next.js para la UI del emisor — rechazada: duplica runtime, cookies y superficie de ataque, y el ADR fija un deployable propio y mínimo; (b) reutilizar componentes MUI del portal vía SSR aislado — rechazada: `@core/*` y el theme son del portal y su bundle no aplica a un servicio `node:http`; (c) dejar las páginas mínimas actuales — rechazada: no cumplen el estándar premium ni la claridad que exige el consentimiento.
 - Why this pattern: cero dependencias, CSP estricta, render determinista y testeable como string, mismos tokens que el portal por artefacto generado; el patrón ya existe (`efeonce-isotipo.generated.ts`).
 - Reuse / extend / new primitive: `new` (primitives HTML del emisor), registradas en la UI Platform como patrón «runtime sin React» para que no nazcan copias en otros servicios.
-- Open risks: dirección visual aún no aprobada (por eso `UI ready: no`); fuentes web (Poppins/Geist) en un runtime sin `public/` — opciones: sistema de fuentes fallback declarado o assets embebidos como `data:` (decidir en la dirección visual, con impacto en peso y CSP); WebAuthn exige un módulo JS con nonce (TASK-1830) que la CSP debe permitir sin abrir `unsafe-inline`.
+- Open risks: dirección visual aún no aprobada (`UI ready: no`); falta revisión completa de estados y canary real. Fuentes locales con OFL y script por nonce ya integrados; la matriz completa de CSP/accesibilidad queda pendiente.
 
 ### Visual verification
 
@@ -305,7 +305,7 @@ Reglas obligatorias:
 
 ### Slice 1 — Dirección visual, shell «Efeonce ID» y consentimiento (no bloqueado)
 
-- Dirección visual versionada `docs/ui/direction/TASK-1835-efeonce-id-direction.md` (Decision, Desktop target, Mobile target, Token mapping, Anti-patterns) autorada con `greenhouse-ai-design-studio`, comparando 2–3 direcciones antes de elegir.
+- Dirección visual versionada `docs/ui/visual-directions/TASK-1835-efeonce-id-direction.md` (Decision, Desktop target, Mobile target, Token mapping, Anti-patterns) autorada con `greenhouse-ai-design-studio`, comparando 2–3 direcciones antes de elegir.
 - Generador de tokens → `styles.generated.ts` (extensión de `generate-brand-assets.ts` con drift test) y shell `layout.ts` con cabecera de marca, tarjeta, pie y CSP.
 - Consentimiento rediseñado (`consent.ts`): cliente identificado (nombre, `client_id`, `logo_uri` sólo si viene de CIMD validado y pasa allowlist de esquema `https`), organización, lista de scopes con lectura/escritura diferenciada, CTAs, estado pending; página de error y `login_required` con el shell.
 - Harness `scripts/auth-server/dev-ui-server.ts` + fixtures + scenario GVC; capturas desktop/mobile miradas; scorecard.
@@ -338,7 +338,7 @@ re-decidir:
 
 - **Tokens generados, nunca literales.** `styles.generated.ts` se produce con
   `pnpm auth-server:brand-assets:generate` leyendo `efeonce-brand.ts`, `typography-tokens.ts` y los
-  tokens runtime-agnósticos de `src/lib/design-tokens/*`; un test de drift compara el artefacto con
+  tokens runtime-agnósticos de `src/@core/theme/axis-tokens.ts`; un test de drift compara el artefacto con
   la fuente (mismo mecanismo que el isotipo). Las plantillas sólo usan clases del CSS generado.
 - **Consentimiento honesto.** Orden: identidad del cliente → organización → permisos (lectura
   primero; escritura con etiqueta «Escritura» y descripción del efecto: «mueve dinero», «modifica
@@ -373,7 +373,7 @@ re-decidir:
 
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
-| El shell rompe el contrato del formulario de consentimiento (campos/rutas) | identity / OAuth | low | tests existentes de `oauth-flow.test.ts` (afirman `action="/oauth/consent"` y campos) + test de render por pantalla | tests rojos; `auth.oauth.*` sin efecto (el flag sigue OFF) |
+| El shell rompe el contrato del formulario de consentimiento (campos/rutas) | identity / OAuth | low | tests existentes de `oauth-flow.test.ts` (afirman `action="/oauth/consent"` y campos) + test de render por pantalla | tests rojos; `auth.oauth.*` y canary de consentimiento |
 | `logo_uri` de un cliente hostil abre vector de tracking/phishing | identity | medium | sólo CIMD validado, esquema https, CSP `img-src` por origen exacto, fallback a monograma; nunca `client_uri` clicable sin `rel=noopener` | `auth.oauth.cimd_rejected` |
 | CSP relajada para fuentes/JS | identity | medium | decisión explícita en el decision log; `script-src` sólo nonce; test que afirma la cabecera CSP por página | test de CSP rojo |
 | Copy inline fuera de `src/lib/copy/auth-server.ts` | UI | medium | lint `greenhouse/no-untokenized-copy` (si aplica al runtime) + revisión con `greenhouse-ux-writing` | lint |
@@ -382,8 +382,9 @@ re-decidir:
 ### Feature flags / cutover
 
 - Sin flag propio: las pantallas viajan con el runtime y sólo son visibles cuando
-  `AUTH_SERVER_OAUTH_ENABLED=true` (TASK-1829) y, para login, cuando TASK-1830 esté activo. Mientras
-  el flag esté OFF en producción, el cambio es invisible: cutover inmediato al desplegar.
+  `AUTH_SERVER_OAUTH_ENABLED=true` (TASK-1829) y personas activo. Ambos están ON en el runtime
+  compartido al readback 2026-09-05: desplegar modifica la superficie viva inmediatamente. El botón
+  corporativo requiere además el gate interno específico de TASK-1836; no apagar todo OAuth como rollback.
 
 ### Rollback plan per slice
 
@@ -406,7 +407,7 @@ re-decidir:
 
 - Aprobación de la dirección visual «Efeonce ID» por el operador (Product Design) antes de
   `UI ready: yes`.
-- Decisión sobre fuentes web (embebidas vs sistema) por su impacto en CSP y peso.
+- Fuentes locales con licencias OFL ya implementadas; conservar esos assets en el artefacto desplegado.
 - Coordinación con la sesión dueña de TASK-1830 para el copy de métodos y el módulo WebAuthn.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -417,6 +418,10 @@ re-decidir:
      ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
+
+- [ ] Auditoría MCP de TASK-1836 §11/13: UI consume el mapping de assurance aprobado; muestra challenge/cancelación y consentimiento por cliente. SSO previo no equivale a aprobar un cliente nuevo. Actualizar flujo antes de implementación; el perfil proxy exige orden de preconsent distinto al login OIDC puro.
+
+- [ ] Flujo interno Microsoft de TASK-1836 integrado en wireframe/flow y validado en GVC desktop/390, con teclado, errores y consentimiento; no duplica identidad ni reglas backend.
 
 - [ ] Se declaró `Execution profile: ui-ux` y `UI impact: flow`; wireframe, flow y motion existen y describen el diseño real (no stubs).
 - [ ] `UI ready` permanece `no` hasta que exista la dirección visual aprobada, el implementation mapping, el GVC scenario plan y el decision log; si pasa a `yes`, `pnpm task:lint --task TASK-1835` sin findings.
@@ -460,9 +465,33 @@ re-decidir:
 
 ## Open Questions
 
-- Fuentes web en un runtime sin `public/`: ¿Poppins/Geist embebidas como `data:` (peso ~100 KB por
-  página, CSP `font-src data:`) o pila de sistema con Poppins sólo si está instalada? Decidir en la
-  dirección visual con medición de peso.
+- Fuentes resueltas localmente: Poppins/Geist servidas desde rutas exactas del emisor, con licencias OFL y `font-src 'self'`; pendiente verificar su entrega tras deploy.
 - ¿La pantalla de consentimiento muestra la organización cuando el sujeto tiene varias memberships
-  `bound`, o el selector de organización es un slice de TASK-1830/1831? Hoy `gv = max` y el gateway
-  decide por organización; la UI informa, no elige.
+  `bound`? Para el slice interno TASK-1836 la autoridad está fijada por contexto server-side y `gv`
+  por contexto. El `max(gv)` sólo describe el carril externo legacy. La UI informa la organización
+  resuelta; no elige ni modifica autoridad mediante el formulario.
+
+## Correction 2026-09-05 — TASK-1836
+
+El ADR aceptado D1/D5 de TASK-1836 define login OIDC corporativo como primary y TOTP/passkey UV local para step-up sobre esa sesión. Mostrar ese recorrido y errores; no afirmar MFA por el mero retorno de Microsoft. Proxy a APIs upstream fuera de alcance.
+
+
+### Dependencias de rollout (no bloquean implementación local)
+
+Verificación interna en runtime requiere deploy TASK-1836 y consumer TASK-1831 compatible antes de habilitar la cohorte.
+
+
+## Evidencia de first fold — 2026-09-05
+
+[Revisión](../../ui/reviews/TASK-1835-first-fold-review.md). Harness scripts/auth-server/ui-preview-*.ts,
+copy en src/lib/copy/auth-server-preview.ts, sin rutas productivas. GVC incorpora modo anonymous
+explícito para no fabricar ni cargar sesiones del portal en login público. 27 pruebas focales del
+contrato de captura; defaults agent, production gates y restricciones mutating conservados.
+
+## Avance de integración local — 2026-09-05
+
+La [review actualizada](../../ui/reviews/TASK-1835-first-fold-review.md) distingue el preview inicial
+19035 del harness 19036 que consume renderers reales. Cuatro capturas GVC nuevas (consentimiento,
+login, step-up y alta de factor) pasan en desktop/móvil. La verificación del controlador usa mocks;
+no autentica personas ni ejecuta writes de negocio. Se mantienen sin marcar los criterios integrales
+que requieren aprobación, matriz completa, review y runtime real.

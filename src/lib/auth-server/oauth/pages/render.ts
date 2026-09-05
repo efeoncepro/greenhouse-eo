@@ -1,3 +1,4 @@
+import type { ConsentContextResolution } from '../consent-context'
 /**
  * Páginas HTML mínimas del emisor (TASK-1829): sin JS, CSS inline (CSP estricta), marca desde el
  * SSOT (`src/config/efeonce-brand.ts` + isotipo generado). La task ui-ux de login/consentimiento
@@ -10,38 +11,20 @@ import { GH_AUTH_SERVER } from '@/lib/copy/auth-server'
 
 import type { OAuthErrorCode } from '../errors'
 import { EFEONCE_ISOTIPO_SVG } from './efeonce-isotipo.generated'
+import { AUTH_SERVER_STYLES } from './styles.generated'
+import { isWriteScope } from '../scopes'
 
 export const escapeHtml = (value: string): string =>
   value.replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char] ?? char)
 
-const STYLES = `
-  :root { color-scheme: light; }
-  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-         background: #f4f6f9; color: #12213a; display: flex; min-height: 100vh; align-items: center; justify-content: center; }
-  main { background: #fff; border-radius: 16px; padding: 40px 36px; max-width: 440px; width: calc(100% - 32px);
-         box-shadow: 0 12px 40px rgba(2, 60, 112, 0.12); }
-  .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
-  .brand svg { width: 44px; height: auto; }
-  .brand span { font-size: 15px; font-weight: 600; letter-spacing: 0.02em; color: #023c70; }
-  h1 { font-size: 22px; margin: 0 0 12px; line-height: 1.25; }
-  p { margin: 0 0 12px; line-height: 1.5; font-size: 15px; }
-  ul { list-style: none; padding: 0; margin: 16px 0 24px; }
-  li { padding: 12px 14px; border: 1px solid #dfe5ee; border-radius: 10px; margin-bottom: 8px; font-size: 14px; }
-  li code { display: block; color: #5b6b82; font-size: 12px; margin-top: 4px; }
-  .actions { display: flex; gap: 12px; }
-  button { flex: 1; padding: 12px 16px; border-radius: 10px; border: 1px solid #023c70; font-size: 15px; cursor: pointer; }
-  button.primary { background: #023c70; color: #fff; }
-  button.secondary { background: #fff; color: #023c70; }
-  .muted { color: #5b6b82; font-size: 13px; }
-  .code { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #5b6b82; word-break: break-all; }
-`
+const STYLES = AUTH_SERVER_STYLES
 
 /**
  * Shell compartido de las páginas del emisor. Exportado para que la superficie de personas
  * (TASK-1830) use EXACTAMENTE la misma marca y CSP que las del protocolo, en vez de un segundo
  * layout que se desincronice.
  */
-export const layout = (title: string, body: string): string => `<!doctype html>
+export const layout = (title: string, body: string, options: { state?: 'login' | 'consent' | 'verification'; clientName?: string } = {}): string => `<!doctype html>
 <html lang="${GH_AUTH_SERVER.page_lang}">
 <head>
 <meta charset="utf-8">
@@ -51,29 +34,34 @@ export const layout = (title: string, body: string): string => `<!doctype html>
 <style>${STYLES}</style>
 </head>
 <body>
-<main>
-  <div class="brand" aria-label="${escapeHtml(EFEONCE_BRAND_NAME)}">${EFEONCE_ISOTIPO_SVG}<span>${escapeHtml(GH_AUTH_SERVER.brand_title)}</span></div>
-  ${body}
+<main class="id-page" data-capture="id-shell" data-state="${options.state ?? 'verification'}" data-surface-recipe="settingsFlow" aria-labelledby="page-title">
+  <header class="id-brand" aria-label="${escapeHtml(EFEONCE_BRAND_NAME)}">${EFEONCE_ISOTIPO_SVG}<span>${escapeHtml(GH_AUTH_SERVER.brand_title)}</span></header>
+  ${options.clientName ? `<div class="id-context" data-capture="id-client"><span class="id-muted">${escapeHtml(GH_AUTH_SERVER.application_context_label)}</span><strong>${escapeHtml(options.clientName)}</strong></div>` : ''}
+  <div class="id-surface">${body}</div>
+  <details class="id-footer"><summary>${escapeHtml(GH_AUTH_SERVER.font_licenses_label)}</summary><a href="/fonts/licenses/Geist-OFL.txt">Geist</a><a href="/fonts/licenses/Poppins-OFL.txt">Poppins</a></details>
 </main>
 </body>
 </html>`
 
-export const renderLoginRequiredPage = (): string =>
+export const renderLoginRequiredPage = (returnTo?: string): string =>
   layout(
     GH_AUTH_SERVER.login_required_title,
-    `<h1>${escapeHtml(GH_AUTH_SERVER.login_required_title)}</h1>
+    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.login_required_title)}</h1>
   <p>${escapeHtml(GH_AUTH_SERVER.login_required_body)}</p>
-  <p class="muted">${escapeHtml(GH_AUTH_SERVER.login_required_hint)}</p>`
+  <p class="muted">${escapeHtml(GH_AUTH_SERVER.login_required_hint)}</p>
+  ${returnTo ? `<a href="${escapeHtml('/login?' + new URLSearchParams({ return_to: returnTo }))}">${escapeHtml(GH_AUTH_SERVER.login_continue_cta)}</a>` : ''}`
   )
 
-export const renderStepUpRequiredPage = (): string =>
+export const renderStepUpRequiredPage = (returnTo?: string): string =>
   layout(
     GH_AUTH_SERVER.step_up_required_title,
-    `<h1>${escapeHtml(GH_AUTH_SERVER.step_up_required_title)}</h1>
-  <p>${escapeHtml(GH_AUTH_SERVER.step_up_required_body)}</p>`
+    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.step_up_required_title)}</h1>
+  <p>${escapeHtml(GH_AUTH_SERVER.step_up_required_body)}</p>
+  ${returnTo ? `<a class="id-primary" href="${escapeHtml('/login/step-up?' + new URLSearchParams({ return_to: returnTo }))}">${escapeHtml(GH_AUTH_SERVER.totp_verify_submit_cta)}</a>` : ''}`
   )
 
 export type ConsentPageInput = {
+  organizations: Extract<ConsentContextResolution, { outcome: 'resolved' }>['organizations']
   clientName: string
   clientId: string
   scopes: readonly string[]
@@ -83,19 +71,28 @@ export type ConsentPageInput = {
 }
 
 export const renderConsentPage = (input: ConsentPageInput): string => {
+  const organizationItems = input.organizations.map(organization => `<li>
+    <strong>${escapeHtml(organization.organizationName)}</strong>
+    <details><summary>${escapeHtml(GH_AUTH_SERVER.consent_capabilities_label)}</summary>
+      <ul>${organization.capabilities.map(capability => `<li><code>${escapeHtml(capability)}</code></li>`).join('')}</ul>
+    </details>
+  </li>`).join('')
+
   const scopeItems = input.scopes
     .map(scope => {
       const description = GH_AUTH_SERVER.scope_descriptions[scope] ?? GH_AUTH_SERVER.scope_description_fallback(scope)
 
-      return `<li>${escapeHtml(description)}<code>${escapeHtml(scope)}</code></li>`
+      return `<li class="id-scope"><span class="id-scope-kind">${escapeHtml(isWriteScope(scope) ? GH_AUTH_SERVER.scope_write_label : GH_AUTH_SERVER.scope_read_label)}</span><p>${escapeHtml(description)}</p><code class="code">${escapeHtml(scope)}</code></li>`
     })
     .join('\n    ')
 
   return layout(
     GH_AUTH_SERVER.consent_title,
-    `<h1>${escapeHtml(GH_AUTH_SERVER.consent_title)}</h1>
-  <p>${escapeHtml(GH_AUTH_SERVER.consent_intro(input.clientName))}</p>
-  <ul aria-label="${escapeHtml(GH_AUTH_SERVER.consent_scope_label)}">
+    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.consent_title)}</h1>
+  <p>${escapeHtml(GH_AUTH_SERVER.consent_context_intro(input.organizations.length))}</p>
+  <h2 class="id-muted">${escapeHtml(input.organizations.length === 1 ? GH_AUTH_SERVER.consent_organization_label : GH_AUTH_SERVER.consent_organizations_label)}</h2>
+  <ul aria-label="${escapeHtml(GH_AUTH_SERVER.consent_organizations_label)}">${organizationItems}</ul>
+  <ul class="id-permissions" aria-label="${escapeHtml(GH_AUTH_SERVER.consent_scope_label)}">
     ${scopeItems}
   </ul>
   <form method="post" action="${escapeHtml(input.actionPath)}">
@@ -108,7 +105,8 @@ export const renderConsentPage = (input: ConsentPageInput): string => {
     </div>
   </form>
   <p class="muted">${escapeHtml(GH_AUTH_SERVER.consent_footer)}</p>
-  <p class="code">${escapeHtml(GH_AUTH_SERVER.consent_client_id_label)}: ${escapeHtml(input.clientId)}</p>`
+  <p class="code">${escapeHtml(GH_AUTH_SERVER.consent_client_id_label)}: ${escapeHtml(input.clientId)}</p>`,
+    { state: 'consent', clientName: input.clientName }
   )
 }
 
@@ -122,7 +120,7 @@ const ERROR_BODIES: Partial<Record<OAuthErrorCode, string>> = {
 export const renderErrorPage = (code: OAuthErrorCode): string =>
   layout(
     GH_AUTH_SERVER.error_title,
-    `<h1>${escapeHtml(GH_AUTH_SERVER.error_title)}</h1>
+    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.error_title)}</h1>
   <p>${escapeHtml(ERROR_BODIES[code] ?? GH_AUTH_SERVER.error_generic_body)}</p>
   <p class="code">${escapeHtml(GH_AUTH_SERVER.error_code_label)}: ${escapeHtml(code)}</p>`
   )

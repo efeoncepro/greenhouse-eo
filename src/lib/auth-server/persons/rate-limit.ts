@@ -68,6 +68,30 @@ export const TOTP_VERIFY_SUBJECT_RULE: RateLimitRule = {
   limit: 5
 }
 
+/** Bound challenge allocation and verification work independently; neither route spends the other's quota. */
+export const PASSKEY_IP_RULES = {
+  step_up_start: { action: 'passkey_step_up_start', dimension: 'ip', windowSeconds: 60, limit: 10 },
+  step_up_finish: { action: 'passkey_step_up_finish', dimension: 'ip', windowSeconds: 60, limit: 20 },
+  authenticate_start: { action: 'passkey_authenticate_start', dimension: 'ip', windowSeconds: 60, limit: 20 },
+  authenticate_finish: { action: 'passkey_authenticate_finish', dimension: 'ip', windowSeconds: 60, limit: 30 },
+  register_start: { action: 'passkey_register_start', dimension: 'ip', windowSeconds: 60, limit: 10 },
+  register_finish: { action: 'passkey_register_finish', dimension: 'ip', windowSeconds: 60, limit: 20 }
+} as const satisfies Record<string, RateLimitRule>
+
+export const PASSKEY_STEP_UP_SUBJECT_RULE: RateLimitRule = {
+  action: 'passkey_step_up',
+  dimension: 'subject',
+  windowSeconds: 5 * 60,
+  limit: 10
+}
+
+export const PASSKEY_REGISTER_SUBJECT_RULE: RateLimitRule = {
+  action: 'passkey_register',
+  dimension: 'subject',
+  windowSeconds: 5 * 60,
+  limit: 20
+}
+
 export type EnforceRateLimitInput = {
   store: PersonAuthStorePort
   config: AuthServerPersonAuthConfig

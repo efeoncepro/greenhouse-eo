@@ -9,7 +9,7 @@
  */
 
 import { buildRequestAuditContext, enforceOAuthRateLimit, recordOAuthAudit, type OAuthRequestAuditContext } from './audit'
-import { authenticateClient, parseClientCredentials, resolveClient, type ClientResolverDeps } from './clients'
+import { assertScopesAllowedForClient, authenticateClient, parseClientCredentials, resolveClient, type ClientResolverDeps } from './clients'
 import type { AuthServerOAuthConfig } from './config'
 import { missingConsentScopes } from './consent'
 import { OAuthProtocolError, isOAuthProtocolError } from './errors'
@@ -67,15 +67,18 @@ export const parseTokenForm = (request: OAuthHttpRequest): Map<string, string> =
 
 const assertConsentAndBinding = async (
   deps: TokenDeps,
-  input: { client: OAuthClientRecord; subject: string; environmentId: string; scopes: readonly string[] }
+  input: { client: OAuthClientRecord; subject: string; environmentId: string; scopes: readonly string[]; authorizationContextId?: string | null }
 ): Promise<number> => {
-  const consents = await deps.store.listActiveConsents({ subject: input.subject, environmentId: input.environmentId, clientId: input.client.clientId })
+  // A previously granted scope does not bypass the client's current issuance policy.
+  assertScopesAllowedForClient(input.client, input.scopes)
+
+  const consents = await deps.store.listActiveConsents({ subject: input.subject, environmentId: input.environmentId, clientId: input.client.clientId, authorizationContextId: input.authorizationContextId })
 
   if (missingConsentScopes(consents, input.scopes).length > 0) {
     throw new OAuthProtocolError('invalid_grant', { description: 'consent missing', reason: 'consent_missing' })
   }
 
-  const grants = await deps.grantsPort.resolve({ environmentId: input.environmentId, subject: input.subject, clientId: input.client.clientId })
+  const grants = await deps.grantsPort.resolve({ environmentId: input.environmentId, subject: input.subject, clientId: input.client.clientId, authorizationContextId: input.authorizationContextId })
 
   if (!grants.bound) throw new OAuthProtocolError('invalid_grant', { description: 'no organization binding', reason: `unbound:${grants.outcome}` })
 
@@ -127,9 +130,10 @@ const handleAuthorizationCodeGrant = async (
   if (record.redirectUri !== redirectUri) throw new OAuthProtocolError('invalid_grant', { description: 'redirect_uri mismatch', reason: 'redirect_mismatch' })
   if (!verifyPkceS256(codeVerifier, record.codeChallenge)) throw new OAuthProtocolError('invalid_grant', { description: 'PKCE verification failed', reason: 'pkce_mismatch' })
 
-  const grantsVersion = await assertConsentAndBinding(deps, { client, subject: record.subject, environmentId: record.environmentId, scopes: record.scopes })
+  const grantsVersion = await assertConsentAndBinding(deps, { client, subject: record.subject, environmentId: record.environmentId, scopes: record.scopes, authorizationContextId: record.authorizationContextId })
 
   const tokens = await issueInitialTokenSet(deps, {
+    authorizationContextId: record.authorizationContextId ?? null,
     client,
     subject: record.subject,
     environmentId: record.environmentId,
@@ -191,16 +195,18 @@ const handleRefreshTokenGrant = async (
     scopes = narrowed
   }
 
-  const grantsVersion = await assertConsentAndBinding(deps, { client, subject: previous.subject, environmentId: previous.environmentId, scopes })
+  const grantsVersion = await assertConsentAndBinding(deps, { client, subject: previous.subject, environmentId: previous.environmentId, scopes, authorizationContextId: previous.authorizationContextId })
 
   const prepared = await prepareTokenSet(deps.config, deps.signer, {
+    authorizationContextId: previous.authorizationContextId ?? null,
     client,
     subject: previous.subject,
     environmentId: previous.environmentId,
     scopes,
     grantId: previous.grantId,
     grantsVersion,
-    authTime: now,
+    // Unknown legacy authentication time is conservatively ancient, never refreshed to now.
+    authTime: previous.authTime ?? new Date(0),
     now,
     absoluteExpiresAt: previous.absoluteExpiresAt
   })

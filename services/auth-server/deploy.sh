@@ -77,6 +77,15 @@ AUTH_SERVER_KMS_KEY="${AUTH_SERVER_KMS_KEY:-projects/${PROJECT_ID}/locations/${R
 # es EC de firma y no puede cifrar. Creada 2026-09-04 (HSM, ENCRYPT_DECRYPT, rotación 90 d) con
 # `cryptoKeyEncrypterDecrypter` para `auth-server@`.
 AUTH_SERVER_TOTP_KMS_KEY="${AUTH_SERVER_TOTP_KMS_KEY:-projects/${PROJECT_ID}/locations/${REGION}/keyRings/auth-server/cryptoKeys/auth-server-totp-envelope}"
+# TASK-1836: durable corporate references, shared by staging and production on this service.
+# Provisioning these dependencies does not activate login; activation remains a separate decision.
+AUTH_SERVER_INTERNAL_AUTH_ENABLED="${AUTH_SERVER_INTERNAL_AUTH_ENABLED:-false}"
+AUTH_SERVER_ENTRA_TENANT_ID="${AUTH_SERVER_ENTRA_TENANT_ID:-a80bf6c1-7c45-4d70-b043-51389622a0e4}"
+AUTH_SERVER_ENTRA_CLIENT_ID="${AUTH_SERVER_ENTRA_CLIENT_ID:-3a327355-b1a5-4de2-867b-08365c76fcd2}"
+AUTH_SERVER_INTERNAL_LOGIN_KMS_KEY="${AUTH_SERVER_INTERNAL_LOGIN_KMS_KEY:-projects/${PROJECT_ID}/locations/${REGION}/keyRings/auth-server/cryptoKeys/auth-server-internal-login-envelope}"
+AUTH_SERVER_ENTRA_CLIENT_SECRET_REF="${AUTH_SERVER_ENTRA_CLIENT_SECRET_REF:-auth-server-entra-client-secret:1}"
+AUTH_SERVER_ENTRA_CLIENT_SECRET_REF="$(normalize_secret_ref_for_cloud_run "${AUTH_SERVER_ENTRA_CLIENT_SECRET_REF}")"
+
 
 echo "=== $(printf "%s" "${ENV}" | tr "[:lower:]" "[:upper:]") deployment of ${SERVICE_NAME} (${REGION}) ==="
 
@@ -96,6 +105,42 @@ if ! gcloud iam service-accounts describe "${SERVICE_ACCOUNT}" --project="${PROJ
   echo "ERROR: runtime service account '${SERVICE_ACCOUNT}' not found. Run TASK-1828 Slice 0 first."
   exit 1
 fi
+
+# Validate configured corporate dependencies even while OFF, before paying for a build.
+if [[ "${AUTH_SERVER_INTERNAL_AUTH_ENABLED}" != "true" && "${AUTH_SERVER_INTERNAL_AUTH_ENABLED}" != "false" ]]; then
+  echo "ERROR: AUTH_SERVER_INTERNAL_AUTH_ENABLED must be true or false."
+  exit 1
+fi
+UUID_PATTERN='^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+if [[ ! "${AUTH_SERVER_ENTRA_TENANT_ID}" =~ ${UUID_PATTERN} || ! "${AUTH_SERVER_ENTRA_CLIENT_ID}" =~ ${UUID_PATTERN} ]]; then
+  echo "ERROR: corporate tenant and client must be UUIDs."
+  exit 1
+fi
+INTERNAL_KMS_PURPOSE="$(gcloud kms keys describe "${AUTH_SERVER_INTERNAL_LOGIN_KMS_KEY}" --project="${PROJECT_ID}" --format='value(purpose)' 2>/dev/null)" || {
+  echo "ERROR: corporate login envelope KMS key unavailable."
+  exit 1
+}
+if [ "${INTERNAL_KMS_PURPOSE}" != "ENCRYPT_DECRYPT" ]; then
+  echo "ERROR: corporate login envelope requires a symmetric ENCRYPT_DECRYPT key."
+  exit 1
+fi
+# Canonical IAM helper strips :latest only. Pass the unversioned name explicitly for numeric pins.
+if [[ "${AUTH_SERVER_ENTRA_CLIENT_SECRET_REF}" == projects/*/secrets/*/versions/* ]]; then
+  INTERNAL_SECRET_NAME="$(extract_secret_name "${AUTH_SERVER_ENTRA_CLIENT_SECRET_REF}")"
+  INTERNAL_SECRET_VERSION="${AUTH_SERVER_ENTRA_CLIENT_SECRET_REF##*/versions/}"
+else
+  INTERNAL_SECRET_NAME="${AUTH_SERVER_ENTRA_CLIENT_SECRET_REF%%:*}"
+  INTERNAL_SECRET_VERSION="${AUTH_SERVER_ENTRA_CLIENT_SECRET_REF##*:}"
+fi
+INTERNAL_SECRET_STATE="$(gcloud secrets versions describe "${INTERNAL_SECRET_VERSION}" --secret="${INTERNAL_SECRET_NAME}" --project="${PROJECT_ID}" --format='value(state)' 2>/dev/null)" || {
+  echo "ERROR: corporate client secret version unavailable."
+  exit 1
+}
+if [ "${INTERNAL_SECRET_STATE}" != "ENABLED" ]; then
+  echo "ERROR: corporate client secret version must be ENABLED."
+  exit 1
+fi
+ensure_secret_accessor_binding "${INTERNAL_SECRET_NAME}"
 
 # ─── Build (Cloud Build, inline config, async + poll) ───────────────────────
 
@@ -198,6 +243,12 @@ ENV_VARS="${ENV_VARS},AUTH_SERVER_MCP_AUDIENCE=${AUTH_SERVER_MCP_AUDIENCE:-https
 # (runtime auth-server únicamente).
 ENV_VARS="${ENV_VARS},AUTH_SERVER_PERSON_AUTH_ENABLED=${AUTH_SERVER_PERSON_AUTH_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},AUTH_SERVER_TOTP_KMS_KEY=${AUTH_SERVER_TOTP_KMS_KEY}"
+# TASK-1836: independent corporate lane. Never implicitly turn it on with persons/OAuth.
+ENV_VARS="${ENV_VARS},AUTH_SERVER_INTERNAL_AUTH_ENABLED=${AUTH_SERVER_INTERNAL_AUTH_ENABLED}"
+ENV_VARS="${ENV_VARS},AUTH_SERVER_ENTRA_TENANT_ID=${AUTH_SERVER_ENTRA_TENANT_ID}"
+ENV_VARS="${ENV_VARS},AUTH_SERVER_ENTRA_CLIENT_ID=${AUTH_SERVER_ENTRA_CLIENT_ID}"
+ENV_VARS="${ENV_VARS},AUTH_SERVER_INTERNAL_LOGIN_KMS_KEY=${AUTH_SERVER_INTERNAL_LOGIN_KMS_KEY}"
+
 # Correo del magic link por el pipeline gobernado (`sendEmail`). Sin esto el enlace nunca sale y el
 # acceso queda muerto en silencio: la respuesta es idéntica por anti-enumeración y no puede avisar.
 ENV_VARS="${ENV_VARS},EMAIL_FROM=${EMAIL_FROM}"
@@ -208,6 +259,7 @@ ENV_VARS="${ENV_VARS},SENTRY_ENVIRONMENT=${ENV}"
 
 SECRETS="GREENHOUSE_POSTGRES_PASSWORD=${PG_PASSWORD_REF}"
 ensure_secret_accessor_binding "${PG_PASSWORD_REF}"
+SECRETS="${SECRETS},AUTH_SERVER_ENTRA_CLIENT_SECRET=${AUTH_SERVER_ENTRA_CLIENT_SECRET_REF}"
 # El mailer resuelve esta referencia desde el runtime: declarar la env var no concede IAM.
 # 🔴 El secreto se MONTA, no basta con declarar la referencia. `sendEmail` usa el cliente SÍNCRONO
 # de Resend, que lee un secreto YA resuelto: el carril `*_SECRET_REF` sólo funciona donde algo lo

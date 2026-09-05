@@ -1,3 +1,4 @@
+import type { ConsentContextPort } from './consent-context'
 /**
  * Router de la superficie OAuth del emisor (TASK-1829). Transporte-agnóstico: `services/auth-server/app.ts`
  * lo adapta a `node:http`; los tests lo llaman con `OAuthHttpRequest` planos. Con
@@ -27,6 +28,7 @@ export type OAuthHandlerDeps = {
   config: AuthServerOAuthConfig
   signer: AccessTokenSigner
   subjectPort: SubjectSessionPort
+  consentContextPort: ConsentContextPort
   grantsPort: GrantsVersionPort
   loadKeys: () => Promise<readonly SigningKeyRecord[]>
   cimd: ClientResolverDeps['cimd']

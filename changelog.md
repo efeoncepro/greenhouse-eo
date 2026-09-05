@@ -7,6 +7,19 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-05 — TASK-1836: autoridad corporativa nativa y límites de autenticación
+
+Backend local con Entra OIDC, procedencia de sesión persistida, contexto delegado por cliente/binding,
+consentimiento aislado y refresh sin rejuvenecer auth_time. Enrolamiento interno gobernado sobre la
+persona y organización propias, grants personales con vigencia y reader sin caché positiva. Tres migraciones
+aplicadas en PG compartido; pruebas reales de persistencia/identidad/GC y UV ligado a sesión. Tras aviso de Claude se añaden
+límites passkey y limpieza SECURITY DEFINER acotada de estado vencido; auditoría y familias refresh vivas
+se conservan. App Entra, secreto y KMS dedicados preparados con cohorte upstream individual. Sin
+despliegue ni acceso MCP real nuevo. Gateway local con 114 pruebas y JWKS acotado; first fold UI con
+GVC anónimo sin credenciales, pendiente aprobación visual. Consentimiento revalida binding/step-up
+y reader externo excluye grants vencidos. DTO canónico integrado en authorize, POST y renderer;
+permisos separados por organización y fallos sin fallback. Retorno OAuth/Microsoft conectado con flag y validación de URL; code/refresh revalidan scopes actuales del cliente. Guard de origen protege sesiones y factores, con regresiones de login CSRF; shell consume fuentes/licencias y CSS bajo CSP estricta; segundo factor TOTP/UV y alta con QR local integrados. Cuatro GVC desktop/móvil y seis checks de navegador pasan con factores ficticios. Configuración runtime, UI completa/canaries y activación GC pendientes. [Runbook](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
+
 ## 2026-09-04 — TASK-1830: autenticación de personas externas del emisor, sin contraseñas (viva desde el 05)
 
 **Delta 2026-09-05 — activada, y el correo del magic link estaba muerto.** El operador prendió ambos
@@ -900,53 +913,3 @@ ráfagas el veredicto es del último push, y una alarma sostenida se normaliza h
 invisible. El skip de 44 s del ops-worker esta vez fue legítimo (árboles
 idénticos, diff completo vacío): mismo síntoma que el incidente anterior, causa opuesta — los
 distingue el diff, no el cronómetro.
-
-## 2026-08-29 — la cuarta llave invisible: el orden servido de la cola contradecía el rank persistido en banda 2
-
-Auditoría independiente post-release sobre el snapshot vigente: 54 de 55 items de banda 2 de
-`seot-efeonce-own-brand` salían fuera de su `rank_in_snapshot`. El comparador del materializador
-desempata esa banda por impresiones — un valor que no es columna — y el reader reconstruía el orden
-en SQL con las tres llaves que sí lo son; con el score NULL en toda la banda, colapsaba a orden
-alfabético. El test de paridad comparaba el **string** del SQL contra una constante, así que
-consagraba un modelo de tres llaves que el comparador no seguía y pasaba verde con el defecto
-puesto. Invisible en Berel (todo banda 1); total en la org sin curva — que es toda org nueva.
-
-El fix no agrega la columna que falta: **deja de reconstruir**. El reader sirve y pagina
-`rank_in_snapshot` (único, sin NULL, ahora con UNIQUE index estructural), y la coincidencia entre
-orden servido y persistido pasa a ser por construcción. Mueren de paso la disciplina `COLLATE "C"`
-del reader, el cursor expandido con NULLs y el test por string. Re-medido paginando la corrida real
-de punta a punta: 0 discrepancias en ambos targets, bandas 1 y 3 sin regresión. En el mismo tren se
-quemó la deuda de procedencia de `work-queue` (TASK-1785): fuente nueva `own_ctr_model` para el caso
-«insumos medidos, resultado estimado», censo en `emitted`. Queda con dueño el retiro post-release
-del índice de keyset huérfano. La bug class quedó documentada como la TERCERA de
-`SQL_DATE_MATH_AGENT_INVARIANTS` §"Orden y paginación", con el corolario de protocolo que la habría
-atrapado: la detección se corre sobre el dataset que EXHIBE cada estado, no sobre el más grande.
-
-## 2026-08-29 — el filtro que decide si un worker se despliega llevaba tiempo describiendo un bundle que ya no existía
-
-El release de `incremental-clicks-v2` cerró verde en todo: manifest `released`, Vercel READY,
-watchdog sin drift, tres de cuatro workers en el SHA. El `ops-worker` estaba sirviendo la versión
-**anterior** — o sea el predicado de canibalización que ese mismo release existía para corregir.
-Su job no falló: duró 46 segundos, se saltó el deploy solo y cerró `success`.
-
-La decisión de desplegar se tomaba contra `WORKER_RUNTIME_PATHS`, una lista de rutas mantenida a
-mano. Medido con el metafile de esbuild —el mismo bundle que arma el Dockerfile—, el `ops-worker`
-empaqueta **1449 archivos** y la lista cubría **24 prefijos**: **696 archivos invisibles**, entre
-ellos `src/lib/postgres`, casi todo `src/lib/finance` y todo `src/lib/growth/seo`. Como 1385 de los
-1449 vienen de `src/lib`, enumerar subdirectorios nunca iba a sostenerse.
-
-No era la primera vez. Los comentarios del propio workflow documentan **cinco** recurrencias
-(TASK-1210, 742, 1723, 1746, 1279) y cada una se cerró agregando una ruta más. La sexta habría sido
-`src/lib/growth/seo`.
-
-Ahora la declaración es la verdadera —gruesa a propósito, y sigue evitando el redeploy por cambios a
-`src/app/**`, `docs/**` o `tests/**`— y hay un gate, `pnpm worker:deploy-path-gate`, que la mantiene
-verdadera derivándola del árbol real del bundle en vez de la lista escrita. Corriéndolo aparecieron
-dos huecos más: `commercial-cost-worker` e `ico-batch` tampoco cubrían `services/_shared/sentry-init.ts`,
-que ambos bundlean.
-
-Con el worker ya en el SHA correcto, la cola se rematerializó **sin** `force`: el piso de recomputación
-filtra por versión, así que un snapshot v1 dejó de contar como reciente. En Berel MX `consolidation`
-cayó de 200 a 11 mientras `gsc_striking_distance` subía de 168 a 200 — reclasificación, no filtrado
-de más. Y el 200 de v1 era el tope de `maxItemsPerOrigin`, o sea que el número real estaba truncado:
-la mejora es mayor que la que muestra la resta.

@@ -70,9 +70,10 @@ const mapClient = (row: ClientRow): OAuthClientRecord => ({
 })
 
 const CODE_COLUMNS = `code_hash, client_id, subject, environment_id, grant_id, redirect_uri, scopes, code_challenge,
-  code_challenge_method, nonce, auth_time, grants_version, expires_at, consumed_at, created_at, ip_hash, correlation_id`
+  code_challenge_method, nonce, auth_time, grants_version, expires_at, consumed_at, created_at, ip_hash, correlation_id, authorization_context_id`
 
 type CodeRow = {
+  authorization_context_id: string | null
   code_hash: string
   client_id: string
   subject: string
@@ -93,6 +94,7 @@ type CodeRow = {
 }
 
 const mapCode = (row: CodeRow): AuthorizationCodeRecord => ({
+  authorizationContextId: row.authorization_context_id,
   codeHash: row.code_hash,
   clientId: row.client_id,
   subject: row.subject,
@@ -113,9 +115,11 @@ const mapCode = (row: CodeRow): AuthorizationCodeRecord => ({
 })
 
 const REFRESH_COLUMNS = `token_hash, grant_id, client_id, subject, environment_id, scopes, status, rotated_to_hash,
-  expires_at, absolute_expires_at, created_at, used_at, revoked_at, revoke_reason`
+  expires_at, absolute_expires_at, created_at, used_at, revoked_at, revoke_reason, authorization_context_id, auth_time`
 
 type RefreshRow = {
+  auth_time: Date | null
+  authorization_context_id: string | null
   token_hash: string
   grant_id: string
   client_id: string
@@ -133,6 +137,8 @@ type RefreshRow = {
 }
 
 const mapRefresh = (row: RefreshRow): RefreshTokenRecord => ({
+  authTime: asDateOrNull(row.auth_time),
+  authorizationContextId: row.authorization_context_id,
   tokenHash: row.token_hash,
   grantId: row.grant_id,
   clientId: row.client_id,
@@ -149,9 +155,10 @@ const mapRefresh = (row: RefreshRow): RefreshTokenRecord => ({
   revokeReason: row.revoke_reason
 })
 
-const ACCESS_COLUMNS = `jti, grant_id, client_id, subject, environment_id, scopes, issued_at, expires_at, revoked_at, revoke_reason`
+const ACCESS_COLUMNS = `jti, grant_id, client_id, subject, environment_id, scopes, issued_at, expires_at, revoked_at, revoke_reason, authorization_context_id`
 
 type AccessRow = {
+  authorization_context_id: string | null
   jti: string
   grant_id: string
   client_id: string
@@ -165,6 +172,7 @@ type AccessRow = {
 }
 
 const mapAccess = (row: AccessRow): AccessTokenRecord => ({
+  authorizationContextId: row.authorization_context_id,
   jti: row.jti,
   grantId: row.grant_id,
   clientId: row.client_id,
@@ -178,9 +186,10 @@ const mapAccess = (row: AccessRow): AccessTokenRecord => ({
 })
 
 const CONSENT_COLUMNS = `consent_id, subject, environment_id, client_id, scope, status, granted_via, granted_by, granted_at,
-  revoked_at, revoked_by, revoke_reason`
+  revoked_at, revoked_by, revoke_reason, authorization_context_id`
 
 type ConsentRow = {
+  authorization_context_id: string | null
   consent_id: string
   subject: string
   environment_id: string
@@ -196,6 +205,7 @@ type ConsentRow = {
 }
 
 const mapConsent = (row: ConsentRow): ClientConsentRecord => ({
+  authorizationContextId: row.authorization_context_id,
   consentId: row.consent_id,
   subject: row.subject,
   environmentId: row.environment_id,
@@ -213,7 +223,7 @@ const mapConsent = (row: ConsentRow): ClientConsentRecord => ({
 const insertRefresh = async (db: Queryable, r: RefreshTokenRecord) => {
   await db.query(
     `INSERT INTO greenhouse_auth.refresh_tokens (${REFRESH_COLUMNS})
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`,
     [
       r.tokenHash,
       r.grantId,
@@ -228,7 +238,9 @@ const insertRefresh = async (db: Queryable, r: RefreshTokenRecord) => {
       r.createdAt,
       r.usedAt,
       r.revokedAt,
-      r.revokeReason
+      r.revokeReason,
+      r.authorizationContextId ?? null,
+      r.authTime ?? null
     ]
   )
 }
@@ -236,8 +248,8 @@ const insertRefresh = async (db: Queryable, r: RefreshTokenRecord) => {
 const insertAccess = async (db: Queryable, r: AccessTokenRecord) => {
   await db.query(
     `INSERT INTO greenhouse_auth.access_tokens (${ACCESS_COLUMNS})
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
-    [r.jti, r.grantId, r.clientId, r.subject, r.environmentId, r.scopes, r.issuedAt, r.expiresAt, r.revokedAt, r.revokeReason]
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+    [r.jti, r.grantId, r.clientId, r.subject, r.environmentId, r.scopes, r.issuedAt, r.expiresAt, r.revokedAt, r.revokeReason, r.authorizationContextId ?? null]
   )
 }
 
@@ -362,7 +374,7 @@ export class PostgresOAuthStore implements OAuthStorePort {
   async insertAuthorizationCode(r: AuthorizationCodeRecord) {
     await query(
       `INSERT INTO greenhouse_auth.authorization_codes (${CODE_COLUMNS})
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)`,
       [
         r.codeHash,
         r.clientId,
@@ -380,7 +392,8 @@ export class PostgresOAuthStore implements OAuthStorePort {
         r.consumedAt,
         r.createdAt,
         r.ipHash,
-        r.correlationId
+        r.correlationId,
+        r.authorizationContextId ?? null
       ]
     )
   }
@@ -495,18 +508,20 @@ export class PostgresOAuthStore implements OAuthStorePort {
     return withTransaction(client => revokeWhere(client, where, where, [subject, environmentId, clientId], now, reason))
   }
 
-  async listActiveConsents({ subject, environmentId, clientId }: { subject: string; environmentId: string; clientId: string }) {
+  async listActiveConsents({ subject, environmentId, clientId, authorizationContextId }: { subject: string; environmentId: string; clientId: string; authorizationContextId?: string | null }) {
     const rows = (await query(
       `SELECT ${CONSENT_COLUMNS} FROM greenhouse_auth.client_consents
        WHERE subject = $1 AND environment_id = $2 AND client_id = $3 AND status = 'active'
+         AND authorization_context_id IS NOT DISTINCT FROM $4::uuid
        ORDER BY granted_at ASC`,
-      [subject, environmentId, clientId]
+      [subject, environmentId, clientId, authorizationContextId ?? null]
     )) as ConsentRow[]
 
     return rows.map(mapConsent)
   }
 
   async grantConsents({
+    authorizationContextId,
     subject,
     environmentId,
     clientId,
@@ -515,6 +530,7 @@ export class PostgresOAuthStore implements OAuthStorePort {
     grantedBy,
     now
   }: {
+    authorizationContextId?: string | null
     subject: string
     environmentId: string
     clientId: string
@@ -526,17 +542,18 @@ export class PostgresOAuthStore implements OAuthStorePort {
     // Idempotente por el índice único parcial `client_consents_active_uidx`.
     for (const scope of new Set(scopes)) {
       await query(
-        `INSERT INTO greenhouse_auth.client_consents (subject, environment_id, client_id, scope, status, granted_via, granted_by, granted_at)
-         SELECT $1, $2, $3, $4, 'active', $5, $6, $7
+        `INSERT INTO greenhouse_auth.client_consents (subject, environment_id, client_id, scope, status, granted_via, granted_by, granted_at, authorization_context_id)
+         SELECT $1, $2, $3, $4, 'active', $5, $6, $7, $8::uuid
          WHERE NOT EXISTS (
            SELECT 1 FROM greenhouse_auth.client_consents
            WHERE subject = $1 AND environment_id = $2 AND client_id = $3 AND scope = $4 AND status = 'active'
-         )`,
-        [subject, environmentId, clientId, scope, grantedVia, grantedBy, now]
+             AND authorization_context_id IS NOT DISTINCT FROM $8::uuid
+         ) ON CONFLICT DO NOTHING`,
+        [subject, environmentId, clientId, scope, grantedVia, grantedBy, now, authorizationContextId ?? null]
       )
     }
 
-    return this.listActiveConsents({ subject, environmentId, clientId })
+    return this.listActiveConsents({ subject, environmentId, clientId, authorizationContextId })
   }
 
   async revokeConsents({

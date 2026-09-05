@@ -46,7 +46,7 @@ type Harness = {
 }
 
 const buildHarness = (
-  options: { linkActive?: boolean; knownEmail?: boolean; supersededOnAccept?: string[] } = {}
+  options: { linkActive?: boolean; knownEmail?: boolean; internalLoginEnabled?: boolean; supersededOnAccept?: string[] } = {}
 ): Harness => {
   const supersededOnAccept = options.supersededOnAccept ?? []
   const store = new InMemoryPersonAuthStore()
@@ -103,6 +103,7 @@ const buildHarness = (
   }
 
   const handler = createPersonAuthHandler({
+    internalLoginEnabled: () => options.internalLoginEnabled ?? false,
     store,
     config,
     directory,
@@ -131,6 +132,7 @@ const request = (
   method,
   url: new URL(path, ISSUER),
   headers: headersFromRecord({
+    origin: ISSUER,
     'content-type': options.form ? 'application/x-www-form-urlencoded' : 'application/json',
     'x-forwarded-for': options.ip ?? '203.0.113.10',
     ...(options.cookie ? { cookie: options.cookie } : {})
@@ -154,6 +156,7 @@ describe('superficie de personas — enrutamiento y flag', () => {
     const harness = buildHarness()
 
     const handler = createPersonAuthHandler({
+      internalLoginEnabled: () => false,
       store: harness.store,
       config: { ...config, personAuthEnabled: false },
       directory: { findBySubject: async () => null, findByEmail: async () => null },
@@ -638,6 +641,30 @@ describe('ergonomía del navegador', () => {
     expect([...harness.store.magicLinks.values()][0]?.consumedAt).toBeNull()
   })
 
+  it('offers corporate login only when enabled with a safe OAuth return, preserving all parameters', async () => {
+    const returnTo = '/oauth/authorize?' + new URLSearchParams({ client_id: 'https://client.example/id', state: 'state&"value', resource: 'https://mcp.example/mcp', code_challenge: 'pkce', code_challenge_method: 'S256' })
+    const path = '/login?' + new URLSearchParams({ return_to: returnTo })
+    const enabled = buildHarness({ internalLoginEnabled: true })
+    const page = await enabled.handler(request('GET', path))
+    const href = page!.body.match(/href="([^"]*\/auth\/internal\/login[^"]*)"/)?.[1]
+
+    expect(href).toBeTruthy()
+    expect(new URL(href!, ISSUER).searchParams.get('return_to')).toBe(returnTo)
+    expect(page!.body).toContain('name="email"')
+    expect((await buildHarness().handler(request('GET', path)))!.body).not.toContain('/auth/internal/login')
+    const invalid = await enabled.handler(request('POST', '/auth/magic-link/request', { form: true, body: new URLSearchParams({ email: 'invalid', return_to: returnTo }).toString() }))
+
+    expect(invalid!.status).toBe(400)
+    expect(invalid!.body).toContain('/auth/internal/login')
+  })
+
+  it.each(['https://evil.example/oauth/authorize', '//evil.example/oauth/authorize', '/other', '/oauth/authorize#fragment', '/\\evil.example'])('does not advertise corporate login for tampered return %s', async returnTo => {
+    const harness = buildHarness({ internalLoginEnabled: true })
+    const response = await harness.handler(request('GET', '/login?' + new URLSearchParams({ return_to: returnTo })))
+
+    expect(response!.body).not.toContain('/auth/internal/login')
+  })
+
   it('el formulario de acceso pide correo y nada más: no hay contraseña que escribir', async () => {
     const harness = buildHarness()
     const response = await harness.handler(request('GET', '/login'))
@@ -645,6 +672,32 @@ describe('ergonomía del navegador', () => {
     expect(response?.status).toBe(200)
     expect(response?.body).toContain('name="email"')
     expect(response?.body).not.toContain('type="password"')
+  })
+
+  it('blocks login CSRF with a valid magic link before claiming it or creating a session', async () => {
+    const harness = buildHarness()
+
+    await requestMagicLinkFor(harness, EMAIL)
+    const token = harness.sent[0]!.url.slice(`${ISSUER}/m/`.length)
+    const claim = vi.spyOn(harness.store, 'claimMagicLink')
+    const submit = request('POST', '/auth/magic-link/consume', { form: true, body: new URLSearchParams({ token }).toString() })
+    const hostile = await harness.handler({ ...submit, headers: headersFromRecord({ origin: 'https://attacker.example', 'content-type': 'application/x-www-form-urlencoded' }) })
+
+    expect(hostile?.status).toBe(403)
+    expect(hostile?.headers['Set-Cookie']).toBeUndefined()
+    expect(claim).not.toHaveBeenCalled()
+    expect(harness.store.sessions.size).toBe(0)
+    expect([...harness.store.magicLinks.values()][0]?.consumedAt).toBeNull()
+    const landing = await harness.handler(request('GET', '/m/' + token))
+
+    expect(landing?.status).toBe(200)
+    expect(claim).not.toHaveBeenCalled()
+    const accepted = await harness.handler(submit)
+
+    expect(accepted?.status).toBe(200)
+    expect(accepted?.headers['Set-Cookie']).toContain('__Host-efeonce_auth=')
+    expect(claim).toHaveBeenCalledOnce()
+    expect(harness.store.sessions.size).toBe(1)
   })
 
   it('el consumo por form redirige al `return_to` con la cookie puesta', async () => {

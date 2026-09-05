@@ -49,7 +49,7 @@ export const createPersonSession = async ({
   input,
   now
 }: {
-  store: PersonAuthStorePort
+  store: Pick<PersonAuthStorePort, 'insertSession'>
   config: AuthServerPersonAuthConfig
   input: CreatePersonSessionInput
   now: Date

@@ -1,5 +1,12 @@
 # TASK-1833 — Efeonce Auth Server Security Assurance and Operations
 
+## Delta 2026-09-04 — acceso interno nativo (TASK-1836)
+
+Incluir en aseguramiento la frontera de autoridad introducida por TASK-1836: sujetos internos y externos
+bajo emisor común, binding upstream, baja efectiva, revocación multicontexto y aislamiento de consent/refresh.
+El assessment de este slice consume su ADR y código; no bloquea el diseño inicial de TASK-1836.
+
+
 ## Delta 2026-09-04
 
 - `TASK-1828` ya entregó parte de la base operativa que esta task asumía como gap — cerrado por trabajo en
@@ -299,6 +306,10 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
+- [ ] Revisar hallazgos A1–A7 y evidencia de docs/audits/2026-09-04-task-1836-mcp-design-audit.md; el cierre documental de la auditoría no acredita mitigaciones runtime ni pentest.
+
+- [ ] Cambio de frontera de TASK-1836 cubierto por assurance: externo del mismo issuer sin autoridad interna, binding no derivado de email y revocación con token vigente.
+
 - [ ] Catálogo de abuse cases con ≥ 10 casos ejecutados, cada uno con resultado y refutación cruzada.
 - [ ] Pentest externo con alcance documentado y sin críticos/altos abiertos.
 - [ ] Rotación de llave ejercitada en staging y producción; scheduler trimestral activo con verificación.
@@ -326,3 +337,7 @@ Reglas obligatorias:
 ## Open Questions
 
 - Proveedor y alcance del pentest; decisión del operador.
+
+## Correction 2026-09-05 — TASK-1836
+
+Evaluar propuesta D1–D7 de TASK-1836: OIDC puro, procedencia corporativa, factor local fuerte, contexto opaco firmado y permiso vigente leído por request; no dar por implementada la corrección documental.

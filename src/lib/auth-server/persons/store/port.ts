@@ -30,6 +30,15 @@ export interface PersonAuthStorePort {
   /** Renovación de la ventana deslizante; el caller decide cuándo, para no escribir en cada request. */
   touchSession(input: { sessionHash: string; lastSeenAt: Date; expiresAt: Date }): Promise<void>
   /** Marca un step-up verificado y fusiona el `amr` del factor usado. */
+  recordBoundSessionStepUp(input: {
+    sessionHash: string
+    subject: string
+    environmentId: string
+    profileId: string
+    linkId: string
+    stepUpAt: Date
+    amr: readonly string[]
+  }): Promise<boolean>
   recordSessionStepUp(input: { sessionHash: string; stepUpAt: Date; amr: readonly string[] }): Promise<void>
   revokeSession(input: { sessionHash: string; now: Date; reason: string }): Promise<number>
   revokeSessionsForSubject(input: {
@@ -84,12 +93,7 @@ export interface PersonAuthStorePort {
     lastVerifiedAt: Date
     confirm: boolean
   }): Promise<void>
-  revokeTotpEnrollment(input: {
-    environmentId: string
-    subject: string
-    now: Date
-    reason: string
-  }): Promise<number>
+  revokeTotpEnrollment(input: { environmentId: string; subject: string; now: Date; reason: string }): Promise<number>
   /** Reemplaza el set completo: regenerar códigos invalida los anteriores, no los acumula. */
   replaceTotpBackupCodes(input: {
     environmentId: string

@@ -14,11 +14,13 @@ export type GrantsVersionResolution =
   | { bound: false; outcome: string; profileId: string | null }
 
 export interface GrantsVersionPort {
-  resolve(input: { environmentId: string; subject: string; clientId: string }): Promise<GrantsVersionResolution>
+  resolve(input: { environmentId: string; subject: string; clientId: string; authorizationContextId?: string | null }): Promise<GrantsVersionResolution>
 }
 
 export const createExternalAccessGrantsPort = (): GrantsVersionPort => ({
-  resolve: async ({ environmentId, subject, clientId }) => {
+  resolve: async ({ environmentId, subject, clientId, authorizationContextId }) => {
+    if (authorizationContextId) return { bound: false, outcome: 'internal_context_not_supported', profileId: null }
+
     const resolution = await resolveExternalAccess({ environmentId, subject, clientId })
 
     if (resolution.outcome !== 'bound' || resolution.memberships.length === 0) {

@@ -243,13 +243,14 @@ const normalizeTenantAccessRow = (row: TenantAccessRow): TenantAccessRecord => {
   }
 }
 
-const resolveTenantRuntimeAccess = async (record: TenantAccessRecord): Promise<TenantAccessRecord> => {
+const resolveTenantRuntimeAccess = async (record: TenantAccessRecord, { strict = false }: { strict?: boolean } = {}): Promise<TenantAccessRecord> => {
   try {
     const resolvedAccess = await resolveAuthorizedViewsForUser({
       userId: record.userId,
       roleCodes: record.roleCodes,
       tenantType: record.tenantType,
-      fallbackRouteGroups: record.routeGroups
+      fallbackRouteGroups: record.routeGroups,
+      strict
     })
 
     return {
@@ -258,6 +259,7 @@ const resolveTenantRuntimeAccess = async (record: TenantAccessRecord): Promise<T
       authorizedViews: resolvedAccess.authorizedViews
     }
   } catch (error) {
+    if (strict) throw error
     // TASK-1678 Slice 4 — un claim de autorización que se vacía no puede ser sólo un log.
     //
     // Este catch deja la sesión VIVA con `authorizedViews: []`, que es la decisión
@@ -429,6 +431,13 @@ export const getTenantAccessRecordByEmail = async (email: string) => {
   }
 
   return getIdentityAccessRecordByEmail(email)
+}
+
+/** TASK-1836 — current identity authority. Missing rows and PostgreSQL failures never fall back to BigQuery. */
+export const getTenantAccessRecordFromPostgresByUserId = async (userId: string) => {
+  const pgRow = await getSessionFromPostgresByUserId(userId)
+
+  return pgRow ? resolveTenantRuntimeAccess(normalizeTenantAccessRow(pgRow as TenantAccessRow), { strict: true }) : null
 }
 
 export const getTenantAccessRecordByUserId = async (userId: string) => {

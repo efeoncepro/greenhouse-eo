@@ -81,10 +81,12 @@ const request = async (
   init: { method?: string; json?: unknown; cookie?: string } = {}
 ): Promise<CanaryResponse> => {
   const startedAt = Date.now()
+
   const response = await fetch(`${HOST}${path}`, {
     method: init.method ?? 'GET',
     redirect: 'manual',
     headers: {
+      origin: new URL(HOST).origin,
       ...(init.json === undefined ? {} : { 'content-type': 'application/json' }),
       ...(init.cookie ? { cookie: init.cookie } : {})
     },
@@ -199,7 +201,9 @@ const run = async () => {
       `SELECT COUNT(*)::int AS count FROM greenhouse_auth.magic_link_tokens WHERE subject = $1`,
       [subject]
     )
+
     const issued = await request('/auth/magic-link/request', { method: 'POST', json: { email } })
+
     const after = await query<{ count: number }>(
       `SELECT COUNT(*)::int AS count FROM greenhouse_auth.magic_link_tokens WHERE subject = $1`,
       [subject]
@@ -277,6 +281,7 @@ const run = async () => {
     })
 
     const landing = await request(`/m/${tokenId}.${verifier}`)
+
     const consumedAtAfterGet = await query<{ consumed_at: Date | null }>(
       `SELECT consumed_at FROM greenhouse_auth.magic_link_tokens WHERE token_id = $1`,
       [tokenId]
@@ -342,6 +347,7 @@ const run = async () => {
           method: 'POST',
           json: { challenge: authChallenge, response: authenticator.authenticate(authChallenge) }
         })
+
         const passkeyCookie = sessionCookieFrom(authFinish)
         const authBody = JSON.parse(authFinish.body || '{}') as { amr?: string[] }
 
@@ -396,6 +402,7 @@ const run = async () => {
       await query(`UPDATE greenhouse_core.identity_profile_source_links SET active = FALSE WHERE link_id = $1`, [linkId])
 
       const afterRevoke = await request('/auth/session', { cookie })
+
       const revokedRow = await query<{ revoke_reason: string | null }>(
         `SELECT revoke_reason FROM greenhouse_auth.sessions WHERE subject = $1 AND revoke_reason IS NOT NULL LIMIT 1`,
         [subject]

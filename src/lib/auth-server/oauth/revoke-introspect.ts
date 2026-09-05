@@ -7,6 +7,8 @@
  * un token revocado, expirado o ajeno responde `active: false` sin más detalle.
  */
 
+import type { GrantsVersionPort } from './grants'
+
 import type { SigningKeyRecord } from '../keys'
 import { buildRequestAuditContext, recordOAuthAudit } from './audit'
 import type { ClientResolverDeps } from './clients'
@@ -19,6 +21,7 @@ import { authenticateTokenEndpointClient, parseTokenForm } from './token'
 import { verifyIssuedAccessToken } from './verify'
 
 export type RevokeIntrospectDeps = {
+  grantsPort?: GrantsVersionPort
   store: OAuthStorePort
   config: AuthServerOAuthConfig
   cimd: ClientResolverDeps['cimd']
@@ -29,8 +32,8 @@ export type RevokeIntrospectDeps = {
 const looksLikeJwt = (token: string): boolean => token.split('.').length === 3
 
 type LocatedToken =
-  | { kind: 'access'; grantId: string; subject: string; clientId: string; active: boolean; scope: string; exp: number; iat: number; jti: string; gv: number }
-  | { kind: 'refresh'; grantId: string; subject: string; clientId: string; active: boolean; scopes: string[]; exp: number }
+  | { authorizationContextId: string | null; environmentId: string; kind: 'access'; grantId: string; subject: string; clientId: string; active: boolean; scope: string; exp: number; iat: number; jti: string; gv: number }
+  | { authorizationContextId: string | null; environmentId: string; kind: 'refresh'; grantId: string; subject: string; clientId: string; active: boolean; scopes: string[]; exp: number }
   | null
 
 const locateToken = async (token: string, deps: RevokeIntrospectDeps, now: Date): Promise<LocatedToken> => {
@@ -41,9 +44,12 @@ const locateToken = async (token: string, deps: RevokeIntrospectDeps, now: Date)
 
     const record = await deps.store.getAccessToken(verified.jti)
 
-    if (!record) return null
+    if (!record || record.subject !== verified.sub || record.clientId !== verified.azp ||
+        (record.authorizationContextId ?? null) !== verified.authorizationContextId) return null
 
     return {
+      authorizationContextId: record.authorizationContextId ?? null,
+      environmentId: record.environmentId,
       kind: 'access',
       grantId: record.grantId,
       subject: record.subject,
@@ -64,6 +70,8 @@ const locateToken = async (token: string, deps: RevokeIntrospectDeps, now: Date)
   const exp = Math.min(record.expiresAt.getTime(), record.absoluteExpiresAt.getTime())
 
   return {
+    authorizationContextId: record.authorizationContextId ?? null,
+    environmentId: record.environmentId,
     kind: 'refresh',
     grantId: record.grantId,
     subject: record.subject,
@@ -146,6 +154,18 @@ export const handleIntrospect = async (request: OAuthHttpRequest, deps: RevokeIn
 
     const located = await locateToken(token, deps, now)
 
+    // Context revocation, disabled lane and workforce/grant changes invalidate introspection too.
+    // Revoke deliberately uses stored liveness only, so it remains available when authority is off.
+    if (located?.active && located.authorizationContextId) {
+      try {
+        const authority = await deps.grantsPort?.resolve({ environmentId: located.environmentId, subject: located.subject, clientId: located.clientId, authorizationContextId: located.authorizationContextId })
+
+        located.active = Boolean(authority?.bound && (located.kind !== 'access' || authority.grantsVersion === located.gv))
+      } catch {
+        located.active = false
+      }
+    }
+
     await recordOAuthAudit(deps.store, audit, {
       eventType: 'introspect',
       outcome: 'success',
@@ -161,6 +181,7 @@ export const handleIntrospect = async (request: OAuthHttpRequest, deps: RevokeIn
     if (located.kind === 'access') {
       return jsonResponse(200, {
         active: true,
+        ...(located.authorizationContextId ? { authorization_context_id: located.authorizationContextId, authorization_context_version: 1 } : {}),
         token_type: 'Bearer',
         scope: located.scope,
         client_id: located.clientId,

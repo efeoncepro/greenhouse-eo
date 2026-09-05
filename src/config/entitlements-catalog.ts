@@ -1816,6 +1816,25 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['execute'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1836 — Internal enrollment, revocation and delegation are separate authorities.
+  {
+    key: 'identity.internal_access.enroll',
+    module: 'organization',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'identity.internal_access.revoke',
+    module: 'organization',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'identity.internal_access.grant',
+    module: 'organization',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1829 — Authorization server propio (EPIC-044). Registrar clientes OAuth confidenciales
   // y revocar consentimientos (+ familias de tokens) son commands canónicos consumidos por Admin
   // Center, CLI (`pnpm auth-server:register-client`) y Nexa. Grant: EFEONCE_ADMIN (runtime.ts, mismo PR).

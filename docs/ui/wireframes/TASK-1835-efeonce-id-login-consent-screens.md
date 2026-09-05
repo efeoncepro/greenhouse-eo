@@ -4,7 +4,7 @@
 
 - Status: `draft`
 - Owner task: TASK-1835
-- Product Design asset: dirección visual «Efeonce ID» por materializar en `docs/ui/direction/TASK-1835-efeonce-id-direction.md` (Slice 1) comparando 2–3 direcciones; evidencia de partida: página mínima actual en `src/lib/auth-server/oauth/pages/render.ts` (isotipo del SSOT, tarjeta única) y contrato §5.1 de `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`.
+- Product Design asset: dirección visual «Efeonce ID» propuesta, pendiente de revisión visual, documentada en `docs/ui/visual-directions/TASK-1835-efeonce-id-direction.md` (Slice 1) comparando 2–3 direcciones; evidencia de partida: página mínima actual en `src/lib/auth-server/oauth/pages/render.ts` (isotipo del SSOT, tarjeta única) y contrato §5.1 de `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`.
 - Visual direction mode: `repo-native-benchmark`
 - Intended consumers: personas de organizaciones cliente que conectan Claude / ChatGPT / Codex al MCP de Efeonce; operador Efeonce en pruebas y canaries (TASK-1832).
 - Copy source: `src/lib/copy/auth-server.ts` (`GH_AUTH_SERVER`).
@@ -21,28 +21,23 @@ terminable en una acción. Sin dashboard, sin navegación, sin decoración que c
 
 ## Desktop Target — 1440×1000
 
-Fondo neutro claro del SSOT con una veladura sutil de marca en la parte superior (no gradiente
-protagonista). Cabecera de marca fuera de la tarjeta: isotipo (44 px) + «Efeonce ID» + dominio
-visible `auth.efeonce.org` como señal de legitimidad. Tarjeta centrada de 440 px, radio y sombra
-por tokens, padding 40/36. Dentro, de arriba abajo: contexto del cliente (monograma o logo 40 px,
-nombre, `client_id` en monoespaciado de sistema pequeño), título `h1`, organización a la que se
-accede, lista de permisos (una fila por scope: icono de lectura/escritura, título humano, descripción
-de una o dos líneas, etiqueta «Escritura» en los de escritura), nota de revocación, acciones en fila
-(secundario a la izquierda, primario a la derecha, ancho igual). Pie fuera de la tarjeta con «Ayuda»
-y «Privacidad» (enlaces al sitio público). Nada por encima del fold que no sea la decisión.
+Dirección propuesta B: acceso enfocado con contexto explícito. Marca discreta, contexto de la
+aplicación abierto y una superficie principal plana. Login compacto, consentimiento con mayor ancho
+de lectura; las proporciones se verifican en first fold antes de implementación completa. Títulos
+Poppins y cuerpo Geist, tokens reales según documento de dirección. Organización exacta del contexto
+interno o membresías externas resueltas por servidor; los permisos pueden ocupar varias líneas.
+Acciones en orden DOM estable: Cancelar y Permitir; Permitir nunca recibe foco inicial.
 
 ## Mobile Target — 390×844
 
-Misma tarjeta a ancho completo con márgenes de 16 px y padding 28/20; cabecera de marca reducida
-(isotipo 36 px + nombre). El contexto del cliente ocupa una fila; la lista de scopes conserva
-descripciones completas (no se truncan; la tarjeta crece). Acciones apiladas: primario arriba a
-ancho completo, secundario debajo como botón de texto. Campos de formulario con `inputmode`
-correcto y altura táctil ≥ 44 px. Sin scroll horizontal; el scroll vertical es del documento, nunca
-interno a la tarjeta.
+Una columna desde arriba, márgenes y separación derivados de spacing. Sin altura fija ni scroll
+interior. Permisos y errores se envuelven completos. Acciones apiladas conservan el orden DOM de
+desktop. Controles táctiles suficientes, foco visible y sin scroll horizontal. No comprimir el
+consentimiento para forzar todas las acciones en el primer fold.
 
 ## Action Hierarchy
 
-- Primary: «Permitir» (consent), «Usar mi passkey» (login, ANTES del correo: credenciales descubribles), «Continuar» (página intermedia del enlace, POST consume), «Verificar código» (step-up).
+- Primary: «Permitir» (consent), «Continuar con Microsoft» (equipo, gate interno) y «Usar mi passkey» (recorrido externo, antes del correo), «Continuar» (página intermedia del enlace, POST consume), «Verificar código» (step-up).
 - Secondary: «Cancelar» (consent → `access_denied`), «Enviarme un enlace» (con el correo), «Pedir un enlace nuevo», «Usar código de respaldo».
 - Destructive: ninguna; «Cancelar» del consent se explica antes de enviar («Volverás a {client} sin acceso»).
 - Selection vs action: elegir método no autentica; sólo el paso final (enlace verificado, passkey OK, código OK) crea sesión.
@@ -53,8 +48,8 @@ interno a la tarjeta.
 | Source cue | Greenhouse token / primitive / recipe | Intent preserved | Literal value rejected |
 |---|---|---|---|
 | Marca (isotipo, «Efeonce», eslogan) | `src/config/efeonce-brand.ts` + `public/branding/SVG/isotipo-full-efeonce.svg` bundleado | Legitimidad y reconocimiento | Ningún logo re-dibujado ni color de marca literal |
-| Navy del isotipo | token de color primario del SSOT (`src/lib/design-tokens/*`) exportado al CSS generado | Un solo acento para acciones y foco | `#023c70` escrito en el CSS de las plantillas |
-| Tipografía del portal | `typography-tokens.ts`: Poppins para texto, Geist `tabular-nums` para códigos/números | Misma voz visual que Greenhouse | `font-size` inline; fuentes de terceros sin decisión |
+| Navy del isotipo | token de color primario del SSOT (`src/@core/theme/axis-tokens.ts`) exportado al CSS generado | Un solo acento para acciones y foco | `#023c70` escrito en el CSS de las plantillas |
+| Tipografía del portal | `typography-tokens.ts`: Poppins para títulos, Geist para cuerpo/formularios e identificadores | Misma voz visual que Greenhouse | `font-size` inline; fuentes de terceros sin decisión |
 | Botones del DS | primitives `IdButton primary|secondary|link` con los mismos radios/alturas por token | Jerarquía de acciones idéntica al portal | Botón MUI (no ejecutable en este runtime) |
 | Estados del DS (`state-design`) | `IdStatus info|success|warning|error` con icono + texto | Estado nunca sólo por color | Color como única señal |
 | Espaciado 4n | escala de spacing del SSOT en el CSS generado | Ritmo consistente | `px` sueltos |
@@ -178,3 +173,10 @@ Propuestas para `src/lib/copy/auth-server.ts` (`GH_AUTH_SERVER`); los ids existe
 - [ ] Dirección visual «Efeonce ID» aprobada y versionada en `docs/ui/direction/`.
 - [ ] Copy final de cada estado en `src/lib/copy/auth-server.ts`, validado con `greenhouse-ux-writing`.
 - [ ] GVC premium desktop + 390 px y scorecard ≥ 4.5 demuestran jerarquía, legitimidad y accesibilidad.
+
+## Integración corporativa TASK-1836
+
+Entrada explícita Equipo Efeonce y Acceso por invitación; nunca selección por email. Retorno OAuth
+validado preservado en cada transición. Consentimiento recibe DTO de organización/contexto desde
+servidor, no formulario. Step-up UV/TOTP conserva la sesión corporativa; login passkey externo no
+la sustituye. No declarar UI ready hasta revisión de dirección y gates.

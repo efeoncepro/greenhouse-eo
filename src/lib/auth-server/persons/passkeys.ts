@@ -238,24 +238,35 @@ export type FinishPasskeyAuthenticationResult =
 export const isCounterRegression = (storedCounter: number, newCounter: number): boolean =>
   storedCounter > 0 && newCounter <= storedCounter
 
-export const finishPasskeyAuthentication = async (
+type PasskeyAssertionInput = {
+  challenge: string
+  response: Parameters<typeof verifyAuthenticationResponse>[0]['response']
+  requireUserVerification: boolean
+  expectedSubject?: string
+}
+type PasskeyAssertionResult =
+  | Exclude<FinishPasskeyAuthenticationResult, { status: 'authenticated' }>
+  | {
+      status: 'verified'
+      person: NonNullable<Awaited<ReturnType<PersonDirectoryPort['findBySubject']>>>
+      amr: PersonAuthAmr[]
+      now: Date
+    }
+
+/** One verifier for login and explicit step-up; this primitive does not create a session. */
+const verifyPasskeyAssertion = async (
   deps: PasskeyDeps,
-  input: {
-    challenge: string
-    response: Parameters<typeof verifyAuthenticationResponse>[0]['response']
-    ipHash: string | null
-    userAgentHash: string | null
-    correlationId: string | null
-  }
-): Promise<FinishPasskeyAuthenticationResult> => {
-  const challenge = await claimChallenge(deps, { challenge: input.challenge, purpose: 'authentication' })
-
-  if (!challenge) return { status: 'rejected', reason: 'challenge_invalid' }
-
+  input: PasskeyAssertionInput
+): Promise<PasskeyAssertionResult> => {
+  if (!input.response || typeof input.response.id !== 'string')
+    return { status: 'rejected', reason: 'invalid_response' }
   const credential = await deps.store.getPasskeyCredential(input.response.id)
 
   if (!credential || credential.revokedAt) return { status: 'rejected', reason: 'unknown_credential' }
   if (credential.environmentId !== deps.environmentId) return { status: 'rejected', reason: 'environment_mismatch' }
+
+  if (input.expectedSubject && credential.subject !== input.expectedSubject)
+    return { status: 'rejected', reason: 'subject_mismatch' }
 
   let verification: VerifiedAuthenticationResponse
 
@@ -281,7 +292,7 @@ export const finishPasskeyAuthentication = async (
         counter: 0,
         transports: credential.transports as never
       },
-      requireUserVerification: false
+      requireUserVerification: input.requireUserVerification
     })
   } catch {
     return { status: 'rejected', reason: 'verification_failed' }
@@ -291,6 +302,9 @@ export const finishPasskeyAuthentication = async (
 
   const now = deps.now()
   const { newCounter, userVerified } = verification.authenticationInfo
+
+  if (input.requireUserVerification && !userVerified)
+    return { status: 'rejected', reason: 'user_verification_required' }
 
   if (isCounterRegression(credential.counter, newCounter)) {
     await deps.store.revokePasskeyCredential({
@@ -318,6 +332,27 @@ export const finishPasskeyAuthentication = async (
 
   const amr = buildPasskeyAmr({ userVerified })
 
+  return { status: 'verified', person, amr, now }
+}
+
+export const finishPasskeyAuthentication = async (
+  deps: PasskeyDeps,
+  input: {
+    challenge: string
+    response: Parameters<typeof verifyAuthenticationResponse>[0]['response']
+    ipHash: string | null
+    userAgentHash: string | null
+    correlationId: string | null
+  }
+): Promise<FinishPasskeyAuthenticationResult> => {
+  const challenge = await claimChallenge(deps, { challenge: input.challenge, purpose: 'authentication' })
+
+  if (!challenge) return { status: 'rejected', reason: 'challenge_invalid' }
+  const verified = await verifyPasskeyAssertion(deps, { ...input, requireUserVerification: false })
+
+  if (verified.status !== 'verified') return verified
+  const { person, amr, now } = verified
+
   const session = await createPersonSession({
     store: deps.store,
     config: deps.config,
@@ -329,8 +364,7 @@ export const finishPasskeyAuthentication = async (
       linkId: person.linkId,
       amr,
       authTime: now,
-      // Un passkey con user verification real YA es segundo factor: abre la sesión en `step_up`.
-      stepUp: userVerified,
+      stepUp: amr.includes('uv'),
       ipHash: input.ipHash,
       userAgentHash: input.userAgentHash,
       correlationId: input.correlationId
@@ -338,6 +372,103 @@ export const finishPasskeyAuthentication = async (
   })
 
   return { status: 'authenticated', session, subject: person.subject, amr }
+}
+
+const readStepUpSession = async (deps: PasskeyDeps, sessionHash: string) => {
+  const result = await deps.store.getSessionWithLink(sessionHash)
+
+  const now = deps.now(),
+    session = result?.session
+
+  if (
+    !result ||
+    !session ||
+    session.revokedAt ||
+    session.environmentId !== deps.environmentId ||
+    session.expiresAt <= now ||
+    session.absoluteExpiresAt <= now ||
+    !result.linkActive ||
+    result.linkSubject !== session.subject ||
+    result.linkSourceSystem !== `external_idp:${deps.environmentId}`
+  )
+    return null
+
+  return session
+}
+
+export const startPasskeyStepUp = async (
+  deps: PasskeyDeps,
+  input: { sessionHash: string; ipHash: string | null; correlationId: string | null }
+) => {
+  const session = await readStepUpSession(deps, input.sessionHash)
+
+  if (!session) return { status: 'unauthenticated' as const }
+  const options = await generateAuthenticationOptions({ rpID: deps.rpId, userVerification: 'required' })
+  const now = deps.now()
+
+  await deps.store.insertPasskeyChallenge({
+    challengeHash: sha256Hex(options.challenge),
+    purpose: 'step_up',
+    environmentId: deps.environmentId,
+    subject: session.subject,
+    sessionHash: session.sessionHash,
+    createdAt: now,
+    expiresAt: new Date(
+      Math.min(
+        now.getTime() + deps.config.passkeyChallengeTtlSeconds * 1000,
+        session.expiresAt.getTime(),
+        session.absoluteExpiresAt.getTime()
+      )
+    ),
+    consumedAt: null,
+    ipHash: input.ipHash,
+    correlationId: input.correlationId
+  })
+
+  return { status: 'ready' as const, options }
+}
+
+export type FinishPasskeyStepUpResult =
+  | Exclude<FinishPasskeyAuthenticationResult, { status: 'authenticated' }>
+  | { status: 'verified'; subject: string; amr: PersonAuthAmr[] }
+
+export const finishPasskeyStepUp = async (
+  deps: PasskeyDeps,
+  input: {
+    sessionHash: string
+    challenge: string
+    response: Parameters<typeof verifyAuthenticationResponse>[0]['response']
+  }
+): Promise<FinishPasskeyStepUpResult> => {
+  const session = await readStepUpSession(deps, input.sessionHash)
+
+  if (!session) return { status: 'access_revoked' }
+  const challenge = await claimChallenge(deps, { challenge: input.challenge, purpose: 'step_up' })
+
+  if (!challenge || challenge.subject !== session.subject || challenge.sessionHash !== session.sessionHash)
+    return { status: 'rejected', reason: 'challenge_invalid' }
+
+  const verified = await verifyPasskeyAssertion(deps, {
+    ...input,
+    requireUserVerification: true,
+    expectedSubject: session.subject
+  })
+
+  if (verified.status !== 'verified') return verified
+  if (verified.person.profileId !== session.profileId || verified.person.linkId !== session.linkId)
+    return { status: 'access_revoked' }
+
+  const updated = await deps.store.recordBoundSessionStepUp({
+    sessionHash: session.sessionHash,
+    subject: session.subject,
+    environmentId: session.environmentId,
+    profileId: session.profileId,
+    linkId: session.linkId,
+    stepUpAt: deps.now(),
+    amr: verified.amr
+  })
+
+  return updated ? { status: 'verified', subject: session.subject, amr: verified.amr } : { status: 'access_revoked' }
 }
 
 /** `uv` SÓLO cuando la aserción lo trae. Nunca porque el cliente lo declare en el cuerpo. */

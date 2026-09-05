@@ -61,7 +61,13 @@ const ALLOWED_WRITE_TARGETS = new Set([
   // TASK-1830 Slice 3 — TOTP. El secreto vive cifrado por KMS con AAD `<environment>|<subject>`;
   // los códigos de respaldo, sólo su sha256 (nacen de 128 bits, no necesitan KDF lento).
   'greenhouse_auth.totp_enrollments',
-  'greenhouse_auth.totp_backup_codes'
+  'greenhouse_auth.totp_backup_codes',
+
+  // TASK-1836 — encrypted OIDC transactions, corporate provenance and revocable delegated contexts.
+  // SQL and atomic consumption are verified by internal/persistence.live.test.ts, beyond this textual boundary guard.
+  'greenhouse_auth.internal_login_transactions',
+  'greenhouse_auth.corporate_session_evidence',
+  'greenhouse_auth.authorization_contexts'
 ])
 
 describe('auth-server domain-wide write boundary (TASK-1829/1830)', () => {

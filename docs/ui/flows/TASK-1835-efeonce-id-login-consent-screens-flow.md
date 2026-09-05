@@ -153,3 +153,12 @@ servidor, nunca el navegador.
 - [ ] Cada estado del State Machine tiene pantalla, copy y recuperación implementados.
 - [ ] Recorrido completo por teclado y a 390 px sin scroll horizontal.
 - [ ] GVC secuencial demuestra el flujo entero (consent → allow → redirect; login → magic → verify → consent).
+
+## Extensión corporativa TASK-1836
+
+Authorize 401 conserva retorno validado hacia login; Microsoft lleva a `/auth/internal/login` y
+el callback vuelve al authorize original tras enrollment canónico, sin otorgar consentimiento.
+Conservar el 401 del contrato; no sustituirlo silenciosamente por redirect automático. Para escritura,
+UV usa `/auth/passkeys/step-up/start|finish` o TOTP verify sobre la misma sesión. El consentimiento
+expone organización interna exacta del contexto; `gv=max` sólo pertenece al recorrido externo legacy.
+DOM y tabulación conservan el mismo orden en ambos viewports.

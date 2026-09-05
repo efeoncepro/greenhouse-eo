@@ -7,12 +7,21 @@
 export const GH_AUTH_SERVER = {
   brand_title: 'Efeonce ID',
   page_lang: 'es-CL',
+  font_licenses_label: 'Licencias de fuentes',
+  application_context_label: 'Aplicación',
+  login_methods_intro: 'Elige cómo acceder para continuar a la aplicación.',
+  login_team_title: 'Equipo Efeonce',
+  login_invitation_title: 'Acceso por invitación',
+  scope_read_label: 'Lectura',
+  scope_write_label: 'Escritura',
 
   // Inicio de sesión requerido (hasta TASK-1830)
   login_required_title: 'Necesitas iniciar sesión',
   login_required_body:
-    'Para autorizar esta aplicación primero tienes que iniciar sesión con tu identidad de Efeonce. El inicio de sesión todavía no está disponible en este entorno.',
-  login_required_hint: 'Vuelve a intentarlo desde la aplicación cuando el inicio de sesión esté habilitado.',
+    'Para autorizar esta aplicación primero tienes que iniciar sesión con tu identidad de Efeonce. Continúa para elegir cómo entrar.',
+  login_required_hint: 'Después de entrar podrás revisar los permisos que solicita la aplicación.',
+  login_continue_cta: 'Continuar al inicio de sesión',
+  login_microsoft_cta: 'Continuar con Microsoft',
 
   // Step-up
   step_up_required_title: 'Verificación adicional requerida',
@@ -23,6 +32,12 @@ export const GH_AUTH_SERVER = {
   consent_title: 'Autorizar acceso',
   consent_intro: (clientName: string) => `${clientName} quiere acceder a tu cuenta de Efeonce con estos permisos:`,
   consent_scope_label: 'Permiso',
+  consent_organizations_label: 'Organizaciones de este acceso',
+  consent_organization_label: 'Organización de este acceso',
+  consent_context_intro: (count: number) => count === 1
+    ? 'Esta aplicación solicita estos permisos para la organización indicada.'
+    : 'Esta aplicación solicita estos permisos para las organizaciones indicadas.',
+  consent_capabilities_label: 'Ver permisos vigentes en esta organización',
   consent_allow_cta: 'Permitir',
   consent_deny_cta: 'Cancelar',
   consent_footer: 'Puedes revocar este acceso en cualquier momento desde Efeonce.',

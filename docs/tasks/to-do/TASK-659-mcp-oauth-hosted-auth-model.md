@@ -136,3 +136,11 @@ Reglas obligatorias:
 ## Closing Protocol
 
 - [ ] README/Handoff updated.
+
+## Aclaración de ownership — 2026-09-04
+
+Se retira la propuesta no commiteada de incorporar TASK-659 como U11 de EPIC-044. Esta task conserva
+su alcance histórico, sin reasignación al epic ni cambio de lifecycle. El nuevo acceso corporativo interno
+por Efeonce ID pertenece exclusivamente a [TASK-1836](../in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md),
+creada por petición explícita del operador. La posible supersesión del diseño OAuth original por TASK-1829
+sigue pendiente de su cierre formal; no autoriza una implementación duplicada.

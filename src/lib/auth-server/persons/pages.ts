@@ -27,6 +27,8 @@ export const PERSON_AUTH_PATHS = {
   passkeyRegisterFinish: '/auth/passkeys/register/finish',
   passkeyAuthenticateStart: '/auth/passkeys/authenticate/start',
   passkeyAuthenticateFinish: '/auth/passkeys/authenticate/finish',
+  passkeyStepUpStart: '/auth/passkeys/step-up/start',
+  passkeyStepUpFinish: '/auth/passkeys/step-up/finish',
   passkeyList: '/auth/passkeys',
   totpEnrollStart: '/auth/totp/enroll/start',
   totpEnrollFinish: '/auth/totp/enroll/finish',
@@ -37,31 +39,33 @@ const hiddenField = (name: string, value: string | null): string =>
   value ? `<input type="hidden" name="${escapeHtml(name)}" value="${escapeHtml(value)}">` : ''
 
 /** Formulario de inicio de sesión por correo. Un solo campo: no hay contraseña que pedir. */
-export const renderLoginPage = (input: { returnTo: string | null; error?: 'invalid_email' | null }): string =>
+export const renderLoginPage = (input: { returnTo: string | null; internalLoginUrl?: string | null; error?: 'invalid_email' | null }): string =>
   layout(
     GH_AUTH_SERVER.login_title,
-    `<h1>${escapeHtml(GH_AUTH_SERVER.login_title)}</h1>
-  <p>${escapeHtml(GH_AUTH_SERVER.login_intro)}</p>
+    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.login_title)}</h1>
+  <p>${escapeHtml(input.internalLoginUrl ? GH_AUTH_SERVER.login_methods_intro : GH_AUTH_SERVER.login_intro)}</p>
   ${input.error === 'invalid_email' ? `<p class="muted">${escapeHtml(GH_AUTH_SERVER.login_invalid_email)}</p>` : ''}
+  ${input.internalLoginUrl ? `<section class="id-section"><h2>${escapeHtml(GH_AUTH_SERVER.login_team_title)}</h2><a class="id-primary" href="${escapeHtml(input.internalLoginUrl)}">${escapeHtml(GH_AUTH_SERVER.login_microsoft_cta)}</a></section>` : ''}
+  <section class="id-section"><h2>${escapeHtml(GH_AUTH_SERVER.login_invitation_title)}</h2>
   <form method="post" action="${escapeHtml(PERSON_AUTH_PATHS.magicLinkRequest)}">
     ${hiddenField('return_to', input.returnTo)}
     <ul>
-      <li>
+      <li class="id-field">
         <label for="email">${escapeHtml(GH_AUTH_SERVER.login_email_label)}</label>
-        <input id="email" name="email" type="email" autocomplete="email" required
-               style="width:100%;box-sizing:border-box;margin-top:8px;padding:10px;border:1px solid #dfe5ee;border-radius:8px;font-size:15px">
+        <input id="email" name="email" type="email" autocomplete="email" required>
       </li>
     </ul>
     <div class="actions">
       <button class="primary" type="submit">${escapeHtml(GH_AUTH_SERVER.login_submit_cta)}</button>
     </div>
-  </form>`
+  </form></section>`,
+    { state: 'login' }
   )
 
 export const renderMagicLinkSentPage = (): string =>
   layout(
     GH_AUTH_SERVER.login_sent_title,
-    `<h1>${escapeHtml(GH_AUTH_SERVER.login_sent_title)}</h1>
+    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.login_sent_title)}</h1>
   <p>${escapeHtml(GH_AUTH_SERVER.login_sent_body)}</p>
   <p class="muted">${escapeHtml(GH_AUTH_SERVER.login_sent_hint)}</p>`
   )
@@ -69,7 +73,7 @@ export const renderMagicLinkSentPage = (): string =>
 export const renderRateLimitedPage = (): string =>
   layout(
     GH_AUTH_SERVER.login_rate_limited_title,
-    `<h1>${escapeHtml(GH_AUTH_SERVER.login_rate_limited_title)}</h1>
+    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.login_rate_limited_title)}</h1>
   <p>${escapeHtml(GH_AUTH_SERVER.login_rate_limited_body)}</p>`
   )
 
@@ -77,7 +81,7 @@ export const renderRateLimitedPage = (): string =>
 export const renderMagicLinkConfirmPage = (token: string): string =>
   layout(
     GH_AUTH_SERVER.confirm_title,
-    `<h1>${escapeHtml(GH_AUTH_SERVER.confirm_title)}</h1>
+    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.confirm_title)}</h1>
   <p>${escapeHtml(GH_AUTH_SERVER.confirm_body)}</p>
   <form method="post" action="${escapeHtml(PERSON_AUTH_PATHS.magicLinkConsume)}">
     ${hiddenField('token', token)}
@@ -90,7 +94,7 @@ export const renderMagicLinkConfirmPage = (token: string): string =>
 export const renderInvitationConfirmPage = (token: string): string =>
   layout(
     GH_AUTH_SERVER.confirm_invitation_title,
-    `<h1>${escapeHtml(GH_AUTH_SERVER.confirm_invitation_title)}</h1>
+    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.confirm_invitation_title)}</h1>
   <p>${escapeHtml(GH_AUTH_SERVER.confirm_invitation_body)}</p>
   <form method="post" action="${escapeHtml(PERSON_AUTH_PATHS.invitationAccept)}">
     ${hiddenField('token', token)}
@@ -103,7 +107,7 @@ export const renderInvitationConfirmPage = (token: string): string =>
 export const renderInvitationAcceptedPage = (): string =>
   layout(
     GH_AUTH_SERVER.invitation_accepted_title,
-    `<h1>${escapeHtml(GH_AUTH_SERVER.invitation_accepted_title)}</h1>
+    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.invitation_accepted_title)}</h1>
   <p>${escapeHtml(GH_AUTH_SERVER.invitation_accepted_body)}</p>`
   )
 
@@ -121,7 +125,7 @@ export const renderLinkProblemPage = (kind: 'invalid' | 'expired' | 'already_use
 
   return layout(
     GH_AUTH_SERVER.link_invalid_title,
-    `<h1>${escapeHtml(GH_AUTH_SERVER.link_invalid_title)}</h1>
+    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.link_invalid_title)}</h1>
   <p>${escapeHtml(body)}</p>`
   )
 }
@@ -129,20 +133,20 @@ export const renderLinkProblemPage = (kind: 'invalid' | 'expired' | 'already_use
 export const renderAccessRevokedPage = (): string =>
   layout(
     GH_AUTH_SERVER.link_access_revoked_title,
-    `<h1>${escapeHtml(GH_AUTH_SERVER.link_access_revoked_title)}</h1>
+    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.link_access_revoked_title)}</h1>
   <p>${escapeHtml(GH_AUTH_SERVER.link_access_revoked_body)}</p>`
   )
 
 export const renderSessionStartedPage = (): string =>
   layout(
     GH_AUTH_SERVER.session_started_title,
-    `<h1>${escapeHtml(GH_AUTH_SERVER.session_started_title)}</h1>
+    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.session_started_title)}</h1>
   <p>${escapeHtml(GH_AUTH_SERVER.session_started_body)}</p>`
   )
 
 export const renderSessionClosedPage = (): string =>
   layout(
     GH_AUTH_SERVER.session_closed_title,
-    `<h1>${escapeHtml(GH_AUTH_SERVER.session_closed_title)}</h1>
+    `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.session_closed_title)}</h1>
   <p>${escapeHtml(GH_AUTH_SERVER.session_closed_body)}</p>`
   )

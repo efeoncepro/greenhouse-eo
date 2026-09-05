@@ -12,6 +12,7 @@ import type { EnvConfig } from './env'
 
 export interface LaunchOptions {
   envConfig: EnvConfig
+  authentication?: 'agent' | 'anonymous'
   viewport: { width: number; height: number }
   deviceScaleFactor?: number
   headed?: boolean
@@ -63,7 +64,7 @@ export const launchCaptureSession = async (opts: LaunchOptions): Promise<Launche
     // context. Strict production-like CSPs must remain intact on the target;
     // bypassing CSP here affects only this disposable evidence session.
     bypassCSP: true,
-    storageState: opts.envConfig.storageStatePath,
+    storageState: opts.authentication === 'anonymous' ? { cookies: [], origins: [] } : opts.envConfig.storageStatePath,
     viewport: effectiveViewport,
     deviceScaleFactor: devicePreset?.deviceScaleFactor ?? opts.deviceScaleFactor ?? 2,
     recordVideo: {
@@ -72,7 +73,7 @@ export const launchCaptureSession = async (opts: LaunchOptions): Promise<Launche
     }
   })
 
-  const bypassSecret = opts.envConfig.bypassSecret
+  const bypassSecret = opts.authentication === 'anonymous' ? undefined : opts.envConfig.bypassSecret
 
   if (bypassSecret) {
     const captureOrigin = new URL(opts.envConfig.baseUrl).origin

@@ -245,11 +245,13 @@ export const resolveExternalAccess = async (input: ResolveExternalAccessInput): 
 
   const bindingIds = activeMemberships.map(row => row.binding_id)
 
+  // TASK-1836: shared grants can expire; NULL preserves the legacy non-expiring contract.
   const grantRows = await query<GrantRow>(
     `SELECT binding_id, capability
        FROM greenhouse_core.external_capability_grants
       WHERE binding_id = ANY($1::text[])
         AND status = 'active'
+        AND (expires_at IS NULL OR expires_at > NOW())
         AND (profile_id IS NULL OR profile_id = $2)
       ORDER BY capability COLLATE "C"`,
     [bindingIds, link.profile_id]

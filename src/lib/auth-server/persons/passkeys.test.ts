@@ -1,12 +1,14 @@
 import { createHash } from 'node:crypto'
 
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { AUTH_SERVER_PERSON_AUTH_DEFAULTS, type AuthServerPersonAuthConfig } from './config'
 import type { PersonDirectoryPort } from './magic-link'
 import {
   buildPasskeyAmr,
   deriveRpId,
+  finishPasskeyStepUp,
+  startPasskeyStepUp,
   finishPasskeyAuthentication,
   finishPasskeyRegistration,
   isCounterRegression,
@@ -14,7 +16,10 @@ import {
   startPasskeyRegistration,
   type PasskeyDeps
 } from './passkeys'
-import { resolveAuthLevel } from './sessions'
+import { createPersonAuthHandler } from './routes'
+import { PASSKEY_IP_RULES, PASSKEY_REGISTER_SUBJECT_RULE, enforceRateLimit } from './rate-limit'
+import { createInMemoryTotpCipher } from './totp-cipher'
+import { resolveAuthLevel, createPersonSession } from './sessions'
 import { InMemoryPersonAuthStore } from './store/memory-store'
 import { SoftwareAuthenticator } from './test-support/software-authenticator'
 
@@ -37,7 +42,12 @@ const buildDeps = (options: { linkActive?: boolean } = {}) => {
   const clock = { current: new Date('2026-09-04T12:00:00.000Z') }
   const linkActive = options.linkActive ?? true
 
-  store.registerLink({ linkId: LINK_ID, subject: SUBJECT, sourceSystem: `external_idp:${ENVIRONMENT_ID}`, active: linkActive })
+  store.registerLink({
+    linkId: LINK_ID,
+    subject: SUBJECT,
+    sourceSystem: `external_idp:${ENVIRONMENT_ID}`,
+    active: linkActive
+  })
 
   const directory: PersonDirectoryPort = {
     findBySubject: async ({ subject }) =>
@@ -243,12 +253,8 @@ describe('autenticación por passkey', () => {
 
     const now = new Date('2026-09-04T12:00:00.000Z')
 
-    expect(
-      resultA.status === 'authenticated' && resolveAuthLevel(resultA.session.record, config, now)
-    ).toBe('step_up')
-    expect(
-      resultB.status === 'authenticated' && resolveAuthLevel(resultB.session.record, config, now)
-    ).toBe('primary')
+    expect(resultA.status === 'authenticated' && resolveAuthLevel(resultA.session.record, config, now)).toBe('step_up')
+    expect(resultB.status === 'authenticated' && resolveAuthLevel(resultB.session.record, config, now)).toBe('primary')
   })
 
   it('un contador que RETROCEDE invalida la credencial: es un clon', async () => {
@@ -442,5 +448,367 @@ describe('almacenamiento del reto', () => {
 
     expect(stored?.challengeHash).toBe(createHash('sha256').update(started.options.challenge).digest('hex'))
     expect(JSON.stringify([...store.challenges.values()])).not.toContain(started.options.challenge)
+  })
+})
+
+describe('public passkey rate limits', () => {
+  const harness = () => {
+    const { deps, store, clock } = buildDeps()
+
+    const handler = createPersonAuthHandler({
+      internalLoginEnabled: () => false,
+      ...deps,
+      issuer: ISSUER,
+      expectedSourceSystem: `external_idp:${ENVIRONMENT_ID}`,
+      mailer: { send: async () => undefined },
+      invitations: { accept: async () => ({ status: 'rejected', reason: 'not_found' }) },
+      mintSubject: () => 'unused',
+      totpCipher: createInMemoryTotpCipher(),
+      sleep: async () => undefined
+    })
+
+    const request = (action: string, ip: string | null = '203.0.113.44', cookie = '') =>
+      handler({
+        method: 'POST',
+        url: new URL(`/auth/passkeys/${action.replace('step_up', 'step-up').replace('_', '/')}`, ISSUER),
+        headers: new Headers({ origin: ISSUER, ...(ip ? { 'x-forwarded-for': ip } : {}), cookie }),
+        body: '{}'
+      })
+
+    return { deps, store, clock, request, handler }
+  }
+
+  it('blocks a valid assertion submitted from a hostile HTTP origin before consuming the challenge', async () => {
+    const { deps, store, handler } = harness()
+    const authenticator = new SoftwareAuthenticator({ rpId: RP_ID, origin: ISSUER })
+
+    await registerCredential(deps, authenticator)
+    const started = await startPasskeyAuthentication(deps, { ipHash: null, correlationId: null })
+    const claim = vi.spyOn(store, 'claimPasskeyChallenge')
+    const body = JSON.stringify({ challenge: started.options.challenge, response: authenticator.authenticate(started.options.challenge), padding: '=' })
+    const submit = (origin: string) => handler({ method: 'POST', url: new URL('/auth/passkeys/authenticate/finish', ISSUER), headers: new Headers({ origin, 'content-type': 'text/plain' }), body })
+    const hostile = await submit('https://attacker.example')
+
+    expect(hostile?.status).toBe(403)
+    expect(hostile?.headers['Set-Cookie']).toBeUndefined()
+    expect(claim).not.toHaveBeenCalled()
+    expect(store.sessions.size).toBe(0)
+    const accepted = await submit(ISSUER)
+
+    expect(accepted?.status).toBe(200)
+    expect(accepted?.headers['Set-Cookie']).toContain('__Host-efeonce_auth=')
+    expect(claim).toHaveBeenCalledOnce()
+    expect(store.sessions.size).toBe(1)
+  })
+
+  it('returns 429 before challenge insertion or challenge consumption on all public ceremonies', async () => {
+    for (const [action, rule] of Object.entries(PASSKEY_IP_RULES)) {
+      const { deps, store, clock, request } = harness()
+      const insert = vi.spyOn(store, 'insertPasskeyChallenge')
+      const consume = vi.spyOn(store, 'claimPasskeyChallenge')
+
+      for (let count = 0; count < rule.limit; count++) {
+        await enforceRateLimit({ store, config: deps.config, rule, value: '203.0.113.44', now: clock.current })
+      }
+
+      const result = await request(action)
+
+      expect(result?.status).toBe(429)
+      expect(Number(result?.headers['Retry-After'])).toBeGreaterThan(0)
+      expect(insert).not.toHaveBeenCalled()
+      expect(consume).not.toHaveBeenCalled()
+      expect(store.attempts.at(-1)).toMatchObject({
+        method: 'passkey',
+        outcome: 'rate_limited',
+        details: { dimension: 'ip', action: rule.action }
+      })
+      expect(JSON.stringify(store.attempts)).not.toContain('203.0.113.44')
+    }
+  })
+
+  it('keeps registration bound by subject even when the caller changes IP', async () => {
+    const { deps, store, clock, request } = harness()
+
+    const session = await createPersonSession({
+      store,
+      config: deps.config,
+      now: clock.current,
+      input: {
+        subject: SUBJECT,
+        environmentId: ENVIRONMENT_ID,
+        profileId: 'prof-1',
+        linkId: LINK_ID,
+        amr: ['magic_link'],
+        authTime: clock.current,
+        ipHash: null,
+        userAgentHash: null,
+        correlationId: null
+      }
+    })
+
+    for (let count = 0; count < PASSKEY_REGISTER_SUBJECT_RULE.limit; count++) {
+      await enforceRateLimit({
+        store,
+        config: deps.config,
+        rule: PASSKEY_REGISTER_SUBJECT_RULE,
+        value: SUBJECT,
+        now: clock.current
+      })
+    }
+
+    const insert = vi.spyOn(store, 'insertPasskeyChallenge')
+
+    const response = await request(
+      'register_start',
+      '203.0.113.99',
+      `${deps.config.sessionCookieName}=${session.sessionId}`
+    )
+
+    expect(response?.status).toBe(429)
+    expect(insert).not.toHaveBeenCalled()
+    expect(store.attempts.at(-1)).toMatchObject({ outcome: 'rate_limited', details: { dimension: 'subject' } })
+    expect(JSON.stringify(store.attempts)).not.toContain(SUBJECT)
+  })
+
+  it('bounds anonymous start allocations with a real limiter and puts missing IPs in a shared bucket', async () => {
+    const { store, request } = harness()
+
+    for (let count = 0; count < PASSKEY_IP_RULES.authenticate_start.limit; count++) {
+      expect((await request('authenticate_start', null))?.status).toBe(200)
+    }
+
+    const allocated = store.challenges.size
+
+    expect((await request('authenticate_start', null))?.status).toBe(429)
+    expect(store.challenges.size).toBe(allocated)
+    expect((await request('authenticate_start', '203.0.113.45'))?.status).toBe(200)
+  })
+})
+
+describe('TASK-1836 explicit UV step-up on existing corporate session', () => {
+  const corporateSession = async (deps: PasskeyDeps) =>
+    createPersonSession({
+      store: deps.store,
+      config: deps.config,
+      now: deps.now(),
+      input: {
+        subject: SUBJECT,
+        environmentId: ENVIRONMENT_ID,
+        profileId: 'prof-1',
+        linkId: LINK_ID,
+        amr: ['entra_oidc'],
+        authTime: deps.now(),
+        stepUp: false,
+        ipHash: null,
+        userAgentHash: null,
+        correlationId: null
+      }
+    })
+
+  it('verifies a real UV signature without changing session hash, primary auth time or corporate provenance', async () => {
+    const { deps, store, clock } = buildDeps()
+    const authenticator = new SoftwareAuthenticator({ rpId: RP_ID, origin: ISSUER, userVerified: true })
+
+    await registerCredential(deps, authenticator)
+
+    const existing = await corporateSession(deps),
+      before = store.sessions.get(existing.record.sessionHash)!
+
+    const authTime = before.authTime.getTime(),
+      sessionHash = before.sessionHash
+
+    clock.current = new Date(clock.current.getTime() + 60000)
+    const started = await startPasskeyStepUp(deps, { sessionHash, ipHash: null, correlationId: null })
+
+    if (started.status !== 'ready') throw new Error('stepup_not_ready')
+    expect(started.options.userVerification).toBe('required')
+    const response = authenticator.authenticate(started.options.challenge)
+
+    const result = await finishPasskeyStepUp(deps, {
+      sessionHash,
+      challenge: started.options.challenge,
+      response: response as never
+    })
+
+    expect(result.status).toBe('verified')
+    expect(store.sessions.size).toBe(1)
+    const after = store.sessions.get(sessionHash)!
+
+    expect(after.amr).toEqual(expect.arrayContaining(['entra_oidc', 'passkey', 'uv']))
+    expect(after.authTime.getTime()).toBe(authTime)
+    expect(after.stepUpAt?.getTime()).toBe(clock.current.getTime())
+    expect(resolveAuthLevel(after, config, clock.current)).toBe('step_up')
+    expect(
+      (
+        await finishPasskeyStepUp(deps, {
+          sessionHash,
+          challenge: started.options.challenge,
+          response: response as never
+        })
+      ).status
+    ).toBe('rejected')
+  })
+  it('cannot spend a challenge in a different session for the same person', async () => {
+    const { deps, store } = buildDeps(),
+      authenticator = new SoftwareAuthenticator({ rpId: RP_ID, origin: ISSUER, userVerified: true })
+
+    await registerCredential(deps, authenticator)
+
+    const a = await corporateSession(deps),
+      b = await corporateSession(deps)
+
+    const started = await startPasskeyStepUp(deps, {
+      sessionHash: a.record.sessionHash,
+      ipHash: null,
+      correlationId: null
+    })
+
+    if (started.status !== 'ready') throw new Error('stepup_not_ready')
+    expect(
+      (
+        await finishPasskeyStepUp(deps, {
+          sessionHash: b.record.sessionHash,
+          challenge: started.options.challenge,
+          response: authenticator.authenticate(started.options.challenge) as never
+        })
+      ).status
+    ).toBe('rejected')
+    expect(store.sessions.get(b.record.sessionHash)?.stepUpAt).toBeNull()
+  })
+  it('requires genuine UV and rejects a normal login challenge used as step-up', async () => {
+    const { deps } = buildDeps(),
+      authenticator = new SoftwareAuthenticator({ rpId: RP_ID, origin: ISSUER, userVerified: false })
+
+    await registerCredential(deps, authenticator)
+    const session = await corporateSession(deps)
+
+    const started = await startPasskeyStepUp(deps, {
+      sessionHash: session.record.sessionHash,
+      ipHash: null,
+      correlationId: null
+    })
+
+    if (started.status !== 'ready') throw new Error('stepup_not_ready')
+    expect(
+      (
+        await finishPasskeyStepUp(deps, {
+          sessionHash: session.record.sessionHash,
+          challenge: started.options.challenge,
+          response: authenticator.authenticate(started.options.challenge) as never
+        })
+      ).status
+    ).toBe('rejected')
+    const login = await startPasskeyAuthentication(deps, { ipHash: null, correlationId: null })
+
+    expect(
+      (
+        await finishPasskeyStepUp(deps, {
+          sessionHash: session.record.sessionHash,
+          challenge: login.options.challenge,
+          response: authenticator.authenticate(login.options.challenge) as never
+        })
+      ).status
+    ).toBe('rejected')
+  })
+  it('cannot elevate another person with a valid credential or use step-up as a login', async () => {
+    const { deps, store } = buildDeps(),
+      authenticator = new SoftwareAuthenticator({ rpId: RP_ID, origin: ISSUER, userVerified: true })
+
+    await registerCredential(deps, authenticator)
+    store.registerLink({
+      linkId: 'other-link',
+      subject: 'other-person',
+      sourceSystem: `external_idp:${ENVIRONMENT_ID}`,
+      active: true
+    })
+
+    const other = await createPersonSession({
+      store,
+      config,
+      now: deps.now(),
+      input: {
+        subject: 'other-person',
+        environmentId: ENVIRONMENT_ID,
+        profileId: 'other-profile',
+        linkId: 'other-link',
+        amr: ['entra_oidc'],
+        authTime: deps.now(),
+        stepUp: false,
+        ipHash: null,
+        userAgentHash: null,
+        correlationId: null
+      }
+    })
+
+    const started = await startPasskeyStepUp(deps, {
+      sessionHash: other.record.sessionHash,
+      ipHash: null,
+      correlationId: null
+    })
+
+    if (started.status !== 'ready') throw new Error('stepup_not_ready')
+    expect(
+      (
+        await finishPasskeyStepUp(deps, {
+          sessionHash: other.record.sessionHash,
+          challenge: started.options.challenge,
+          response: authenticator.authenticate(started.options.challenge) as never
+        })
+      ).status
+    ).toBe('rejected')
+    expect(store.sessions.get(other.record.sessionHash)?.stepUpAt).toBeNull()
+    const own = await corporateSession(deps)
+
+    const another = await startPasskeyStepUp(deps, {
+      sessionHash: own.record.sessionHash,
+      ipHash: null,
+      correlationId: null
+    })
+
+    if (another.status !== 'ready') throw new Error('stepup_not_ready')
+    expect(
+      (
+        await finishPasskeyAuthentication(deps, {
+          challenge: another.options.challenge,
+          response: authenticator.authenticate(another.options.challenge) as never,
+          ipHash: null,
+          userAgentHash: null,
+          correlationId: null
+        })
+      ).status
+    ).toBe('rejected')
+    expect(store.sessions.size).toBe(2)
+  })
+  it('does not report success when revocation wins after WebAuthn verification', async () => {
+    const { deps, store } = buildDeps(),
+      authenticator = new SoftwareAuthenticator({ rpId: RP_ID, origin: ISSUER, userVerified: true })
+
+    await registerCredential(deps, authenticator)
+    const session = await corporateSession(deps)
+
+    const started = await startPasskeyStepUp(deps, {
+      sessionHash: session.record.sessionHash,
+      ipHash: null,
+      correlationId: null
+    })
+
+    if (started.status !== 'ready') throw new Error('stepup_not_ready')
+    const apply = store.recordBoundSessionStepUp.bind(store)
+
+    vi.spyOn(store, 'recordBoundSessionStepUp').mockImplementation(async input => {
+      await store.revokeSession({ sessionHash: input.sessionHash, now: deps.now(), reason: 'concurrent_revoke' })
+
+      return apply(input)
+    })
+    expect(
+      (
+        await finishPasskeyStepUp(deps, {
+          sessionHash: session.record.sessionHash,
+          challenge: started.options.challenge,
+          response: authenticator.authenticate(started.options.challenge) as never
+        })
+      ).status
+    ).toBe('access_revoked')
+    expect(store.sessions.get(session.record.sessionHash)?.stepUpAt).toBeNull()
   })
 })

@@ -174,19 +174,21 @@ export class InMemoryOAuthStore implements OAuthStorePort {
     return this.revokeWhere(match, match, now, reason)
   }
 
-  async listActiveConsents({ subject, environmentId, clientId }: { subject: string; environmentId: string; clientId: string }) {
+  async listActiveConsents({ subject, environmentId, clientId, authorizationContextId }: { subject: string; environmentId: string; clientId: string; authorizationContextId?: string | null }) {
     return this.consents
       .filter(
         row =>
           row.status === 'active' &&
           row.subject === subject &&
           row.environmentId === environmentId &&
-          row.clientId === clientId
+          row.clientId === clientId &&
+          (row.authorizationContextId ?? null) === (authorizationContextId ?? null)
       )
       .map(clone)
   }
 
   async grantConsents({
+    authorizationContextId,
     subject,
     environmentId,
     clientId,
@@ -195,6 +197,7 @@ export class InMemoryOAuthStore implements OAuthStorePort {
     grantedBy,
     now
   }: {
+    authorizationContextId?: string | null
     subject: string
     environmentId: string
     clientId: string
@@ -203,13 +206,14 @@ export class InMemoryOAuthStore implements OAuthStorePort {
     grantedBy: string
     now: Date
   }) {
-    const active = await this.listActiveConsents({ subject, environmentId, clientId })
+    const active = await this.listActiveConsents({ subject, environmentId, clientId, authorizationContextId })
     const existing = new Set(active.map(row => row.scope))
 
     for (const scope of new Set(scopes)) {
       if (existing.has(scope)) continue
 
       this.consents.push({
+        authorizationContextId: authorizationContextId ?? null,
         consentId: `cst-${generateOpaqueId()}`,
         subject,
         environmentId,
@@ -225,7 +229,7 @@ export class InMemoryOAuthStore implements OAuthStorePort {
       })
     }
 
-    return this.listActiveConsents({ subject, environmentId, clientId })
+    return this.listActiveConsents({ subject, environmentId, clientId, authorizationContextId })
   }
 
   async revokeConsents({

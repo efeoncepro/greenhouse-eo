@@ -5,7 +5,7 @@
  */
 
 /** Métodos de autenticación reconocidos por el ledger y por `amr`. */
-export type PersonAuthMethod = 'magic_link' | 'passkey' | 'totp' | 'invitation' | 'session' | 'recovery'
+export type PersonAuthMethod = 'magic_link' | 'passkey' | 'totp' | 'invitation' | 'session' | 'recovery' | 'entra_oidc'
 
 export type PersonAuthStage = 'request' | 'consume' | 'register' | 'authenticate' | 'verify' | 'resolve' | 'revoke'
 
@@ -15,7 +15,7 @@ export type PersonAuthOutcome = 'success' | 'rejected' | 'failure' | 'rate_limit
  * Valores de `amr` (RFC 8176 en espíritu). `uv` sólo se escribe cuando la aserción WebAuthn trae el
  * flag de user verification REAL; jamás porque el cliente lo declare.
  */
-export type PersonAuthAmr = 'magic_link' | 'passkey' | 'uv' | 'totp' | 'invitation'
+export type PersonAuthAmr = 'magic_link' | 'passkey' | 'uv' | 'totp' | 'invitation' | 'entra_oidc'
 
 export type PersonSessionRecord = {
   /** sha256 hex del id de sesión. El id crudo sólo vive en la cookie del navegador. */
@@ -129,7 +129,7 @@ export type PasskeyCredentialRecord = {
   revokeReason: string | null
 }
 
-export type PasskeyChallengePurpose = 'registration' | 'authentication'
+export type PasskeyChallengePurpose = 'registration' | 'authentication' | 'step_up'
 
 export type PasskeyChallengeRecord = {
   /** sha256 hex del reto; el valor crudo vive en el navegador durante la ceremonia. */
@@ -138,6 +138,8 @@ export type PasskeyChallengeRecord = {
   environmentId: string
   /** `null` sólo en autenticación con credenciales descubribles. */
   subject: string | null
+  /** Present only for server-bound step-up; never a browser-supplied bearer. */
+  sessionHash?: string | null
   createdAt: Date
   expiresAt: Date
   consumedAt: Date | null

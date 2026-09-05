@@ -79,6 +79,38 @@ export class InMemoryPersonAuthStore implements PersonAuthStorePort {
     session.expiresAt = expiresAt < session.absoluteExpiresAt ? expiresAt : session.absoluteExpiresAt
   }
 
+  async recordBoundSessionStepUp(input: {
+    sessionHash: string
+    subject: string
+    environmentId: string
+    profileId: string
+    linkId: string
+    stepUpAt: Date
+    amr: readonly string[]
+  }): Promise<boolean> {
+    const session = this.sessions.get(input.sessionHash)
+    const link = session ? this.links.get(session.linkId) : null
+
+    if (
+      !session ||
+      session.revokedAt ||
+      session.subject !== input.subject ||
+      session.environmentId !== input.environmentId ||
+      session.profileId !== input.profileId ||
+      session.linkId !== input.linkId ||
+      session.expiresAt <= input.stepUpAt ||
+      session.absoluteExpiresAt <= input.stepUpAt ||
+      !link?.active ||
+      link.subject !== session.subject ||
+      link.sourceSystem !== `external_idp:${session.environmentId}`
+    )
+      return false
+    session.stepUpAt = input.stepUpAt
+    session.amr = Array.from(new Set([...session.amr, ...input.amr])) as PersonSessionRecord['amr']
+
+    return true
+  }
+
   async recordSessionStepUp({
     sessionHash,
     stepUpAt,
@@ -96,7 +128,15 @@ export class InMemoryPersonAuthStore implements PersonAuthStorePort {
     session.amr = Array.from(new Set([...session.amr, ...amr])) as PersonSessionRecord['amr']
   }
 
-  async revokeSession({ sessionHash, now, reason }: { sessionHash: string; now: Date; reason: string }): Promise<number> {
+  async revokeSession({
+    sessionHash,
+    now,
+    reason
+  }: {
+    sessionHash: string
+    now: Date
+    reason: string
+  }): Promise<number> {
     const session = this.sessions.get(sessionHash)
 
     if (!session || session.revokedAt) return 0

@@ -241,3 +241,11 @@ pnpm fe:capture mi-feature --env=staging   # revisa selectores/marks y captura
 - **NUNCA** mezclar `mutating` con `safeForCapture: false` (validation rompe)
 - **NUNCA** scenarios sin steps `mark` (no producirán frames útiles)
 - **NUNCA** scenarios que requieren `--env=production` sin pasar Triple Gate (env var + flag + capability)
+
+
+### Login público y harness anónimo
+
+Declara `authentication: anonymous` cuando el recorrido no debe recibir sesión del portal. El
+browser arranca con storage vacío y sin bypass; no se ejecuta auth setup. Es incompatible con
+`requiresStorageState`. Para capturar deliberadamente `/login` usa `quality.allowLogin: true`.
+Los gates de producción/mutación y los checks de calidad siguen vigentes. Ver `task1835-efeonce-id`.

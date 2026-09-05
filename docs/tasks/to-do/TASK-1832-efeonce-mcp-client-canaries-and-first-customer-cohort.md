@@ -1,10 +1,18 @@
 # TASK-1832 — Efeonce MCP Client Canaries and First Customer Cohort Rollout
 
+## Delta 2026-09-04 — acceso interno nativo (TASK-1836)
+
+La matriz incorpora empleados Efeonce por emisor nativo además de clientes externos y carril Entra existente. El canary interno depende de TASK-1836 + integración TASK-1831/1835; usar la identidad real indicada por operador y organización canónica, sin reclasificar Efeonce ni crear excepciones de prueba.
+
+
 ## Delta 2026-09-04 (TASK-1835)
 
 - Las pantallas que los canaries y la primera cohorte verán (consentimiento, login, step-up, recuperación) son `TASK-1835` (EPIC-044 U06); esta task queda bloqueada también por ella para la cohorte real (los canaries de protocolo con `prompt=none` o clientes de prueba no la necesitan).
 
-## Delta 2026-09-04 (TASK-1829)
+## Historia 2026-09-04 (TASK-1829) — estado anterior a activación
+
+Registro conservado de ese momento; las menciones de flag OFF y personas pendientes no describen
+el estado posterior. Ver actualización de readiness del 2026-09-05 al final.
 
 - `TASK-1829` quedó `code complete, rollout pendiente` en `develop` (commits `263ee3a74`, `19d1658de`,
   `d31e6e913`): metadata RFC 8414/OIDC (`issuer` idéntico al origen, `client_id_metadata_document_supported:
@@ -26,18 +34,21 @@
   `identity.auth_consent.revoke`; mata todas las familias de `(subject, client)`). Señales a observar en
   `/admin/operations`: `auth.oauth.code_reuse_detected`, `auth.oauth.refresh_reuse_detected`,
   `auth.oauth.cimd_rejected` (steady 0).
-- **Qué sigue faltando para correr un canary:** flag ON en staging (environment `efeonce-auth` `active` +
+- **Pendientes registrados entonces (históricos):** flag ON en staging (environment `efeonce-auth` `active` +
   metadata validada), `TASK-1830` (`authorize` responde `login_required` hasta entonces: ningún code para una
   persona), `TASK-1831` (gateway multi-issuer) y la task ui-ux. `Blocked by` se precisa en consecuencia.
 
-## Delta 2026-09-04
+## Historia 2026-09-04 — bootstrap inicial
+
+La lista de bloqueos siguiente corresponde al bootstrap; fue superada parcialmente por la activación
+de OAuth/personas y no debe utilizarse como inventario actual.
 
 - `TASK-1828` dejó el runtime del emisor vivo en staging: `https://auth.efeonce.org/readyz` 200 y
   `/.well-known/jwks.json` con dos `kid` (KMS HSM ES256), publicado en el mismo front door del gateway. Los
   canaries de esta task ya tienen un issuer real contra el que verificar JWT — cerrado por trabajo en `TASK-1828`.
 - `TASK-1631` Slice 1 (commands de binding/invitación/grant y 4 señales) quedó code complete y verificado en
   staging el mismo día.
-- **Sigue bloqueada** por `TASK-1829` (metadata, CIMD/DCR y tokens), `TASK-1830` (autenticación de personas),
+- **En ese momento quedaba bloqueada** por `TASK-1829` (metadata, CIMD/DCR y tokens), `TASK-1830` (autenticación de personas),
   `TASK-1631` (release a producción), `TASK-1831` (gateway multi-issuer) y la task ui-ux de login/consentimiento.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -59,7 +70,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Especificación; matriz de tokens S0.1 de TASK-1631 pendiente desde agosto por requerir sesión interactiva; desde 2026-09-04 el emisor auth.efeonce.org está vivo en staging (readyz + JWKS) y TASK-1829 dejó la superficie OAuth (CIMD/DCR/confidencial, tokens, revocación, consentimiento) code complete en develop detrás de AUTH_SERVER_OAUTH_ENABLED=false; sin flag ON ni personas (TASK-1830) ningún canary puede correr aún`
+- Status real: `Canaries reales pendientes; task to-do. Readback 2026-09-05T15:02:44Z: auth readyz 200 y metadata del gateway 200, authorization_servers=[https://mcp.efeonce.org]. OAuth/personas ON consta en readback anterior del runbook; estos GET no verifican flags actuales ni compatibilidad nativa. TASK-1836 y gateway/UI tienen integración local; faltan deploy/config coherentes, enrollment/grant real, selección del emisor nativo y canary refresh/revocación/rollback.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
 - Blocked by: `TASK-1829 (code complete en develop 2026-09-04; espera AUTH_SERVER_OAUTH_ENABLED=true en staging con el environment efeonce-auth registrado), TASK-1830, TASK-1631 (producción), TASK-1831 y la task ui-ux de login/consentimiento`
@@ -108,7 +119,7 @@ Revisar y respetar:
 
 Reglas obligatorias:
 
-- La cohorte es una organización cliente EXISTENTE en Account 360; NUNCA un cliente sintético ni match por dominio.
+- La cohorte externa es una organización cliente EXISTENTE en Account 360; NUNCA un cliente sintético ni match por dominio. El canary interno TASK-1836 usa la organización operativa canónica y no la reclasifica como cliente.
 - Una capability read-only primero; ninguna escritura, gasto ni derecho sensible en esta task.
 - Evidencia siempre redactada: nunca pegar tokens, códigos ni correos completos en docs o Handoff.
 - `agent@…` y personas agente NO son la cohorte; sirven sólo para el smoke previo.
@@ -299,6 +310,10 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
+- [ ] Auditoría MCP de TASK-1836 §14: registrar cliente y revisión reales, discovery desde URL canónica, login, consentimiento por cliente y revocación; no sustituir el flujo por inyección manual de token.
+
+- [ ] Cliente MCP real completa login interno, token nativo, llamada autorizada, refresh y revocación; externo del mismo issuer no puede ejecutar tools internas. Evidencia de cada cliente y limitación registrada.
+
 - [ ] Matriz de tokens publicada con al menos Claude Code, Codex y un cliente hospedado, sin tokens crudos.
 - [ ] El mismo `sub` para la misma persona en loopback y hospedado (evidencia).
 - [ ] Una organización Account 360 existente ligada, con administrador invitado y capability read-only, todo por commands auditados.
@@ -328,3 +343,57 @@ Reglas obligatorias:
 ## Open Questions
 
 - Qué organización cliente será la primera; decisión comercial del operador.
+
+## Correction 2026-09-05 — TASK-1836
+
+Probar D1–D7 de TASK-1836 con contexto firmado ligado a persona/cliente/recurso; el rollback debe rechazar también el token interno emitido antes de apagar el gate del gateway.
+
+
+## Readiness actualizada — 2026-09-05
+
+Readback del coordinador a `2026-09-05T15:02:44Z`: `https://auth.efeonce.org/readyz` respondió 200;
+`https://mcp.efeonce.org/.well-known/oauth-protected-resource` respondió 200 y anunció únicamente
+`authorization_servers=[https://mcp.efeonce.org]`. No acredita todavía discovery/dispatch del emisor
+nativo. OAuth/personas ON fue verificado anteriormente en el
+[runbook interno](../../operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md); estos dos GET no
+son un readback nuevo de esas flags. Se conserva la historia OFF anterior sin convertirla en bloqueo actual.
+
+### Canary interno mínimo y límites
+
+Recorrido: cliente MCP real → Microsoft → consentimiento por cliente/contexto → `get_seo_entitlement`
+→ refresh → revocación y rollback. Pedir sólo `efeonce.mcp.read`; requiere capability personal vigente
+`growth.seo.observation.read` y organización resuelta por el contexto. No hay writes de negocio.
+Microsoft crea sesión primary; este permiso de lectura no exige MFA adicional. Login passkey completo,
+alta TOTP y toda la matriz UI no son requisitos funcionales de este piloto read. La superficie utilizada
+sí requiere revisión proporcional; aprobación visual y `UI ready: no` de TASK-1835 siguen pendientes,
+y el piloto no constituye cierre de esa task ni aprobación de una cohorte amplia.
+
+### Prerrequisitos operativos y owners
+
+- Identity/TASK-1836: desplegar auth-server compatible conservando inicialmente gate interno OFF;
+  referencias Entra/secret/KMS y callback exacto del runbook. La asignación upstream no es enrollment.
+- Greenhouse/Identity: desplegar reader y commands en Vercel; configurar por separado
+  `AUTH_SERVER_INTERNAL_AUTH_ENABLED`, issuer/environment/audience coherentes con el emisor.
+  Enrolar la persona canónica mediante `POST /api/admin/identity/internal-access`, primero dry-run,
+  y otorgar grant personal read con vencimiento/razón. Sin SQL manual ni identidad ficticia.
+- MCP Platform/TASK-1831: desplegar gateway compatible; preparar `MCP_NATIVE_AUTH_ENABLED`,
+  `MCP_NATIVE_INTERNAL_AUTH_ENABLED`, issuer/JWKS/environment y `MCP_IDENTITY_BINDING_URL` con
+  secret del consumer autorizado (`MCP_IDENTITY_BINDING_SECRET_REF` en workflow). Verificar acceso
+  real al reader. SEO requiere `GREENHOUSE_SEO_PROVIDER_ENABLED`, URL/token ecosystem y bypass
+  Vercel cuando aplique; no deducir permisos de la mera presencia de configuración.
+- TASK-1832: seleccionar el emisor nativo en un cliente real mediante discovery; verificar redirect,
+  PKCE, consentimiento y token. Un cliente que siga usando el shim Entra no prueba este recorrido.
+- TASK-1832/1836: comprobar refresh sin elevación, retiro de grant/enrollment y rechazo de dispatch
+  con token vigente en ≤60 s. Apagar gates internos de emisor/reader/gateway debe denegar tokens
+  previos; medir rollback y preservar carriles externo/Entra. Registrar revisión, tiempos y resultados.
+
+Carril canónico: auth-server mediante `.github/workflows/auth-server-deploy.yml` desde `develop`;
+producción por `production-release.yml`. Gateway: `.github/workflows/deploy.yml` del repo hermano,
+`workflow_dispatch`, environment production e ingress ALB. Primero consumers compatibles con gates
+internos OFF, después cohorte y readbacks; no sustituir configuración declarativa por cambios ad hoc.
+
+Referencias: [runbook interno](../../operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md),
+[ADR interno](../../architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md),
+[review UI local](../../ui/reviews/TASK-1835-first-fold-review.md). Capturas con DTOs ficticios y tests
+locales no acreditan autenticación real, deploy ni consentimiento persistido. Lifecycle continúa
+`to-do`; todos los acceptance criteria de canary permanecen sin marcar.

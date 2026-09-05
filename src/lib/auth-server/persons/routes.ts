@@ -1,3 +1,4 @@
+import { handleStepUpPage, STEP_UP_PAGE_PATH } from './step-up-page'
 /**
  * Router de la superficie de personas del emisor (TASK-1830).
  *
@@ -29,6 +30,7 @@ import {
   parseFormBody,
   parseJsonBody,
   redirectResponse,
+  requestOrigin,
   type OAuthHttpRequest,
   type OAuthHttpResponse
 } from '../oauth/http'
@@ -49,13 +51,10 @@ import {
   renderSessionClosedPage,
   renderSessionStartedPage
 } from './pages'
+import { buildSessionClearCookie, buildSessionCookie, readCookie, resolvePersonSession } from './sessions'
 import {
-  buildSessionClearCookie,
-  buildSessionCookie,
-  readCookie,
-  resolvePersonSession
-} from './sessions'
-import {
+  finishPasskeyStepUp,
+  startPasskeyStepUp,
   finishPasskeyAuthentication,
   finishPasskeyRegistration,
   startPasskeyAuthentication,
@@ -64,9 +63,16 @@ import {
 } from './passkeys'
 import type { PersonAuthStorePort } from './store/port'
 import type { TotpSecretCipherPort } from './totp-cipher'
+import {
+  enforceRateLimit,
+  PASSKEY_IP_RULES,
+  PASSKEY_REGISTER_SUBJECT_RULE,
+  PASSKEY_STEP_UP_SUBJECT_RULE
+} from './rate-limit'
 import { startTotpEnrollment, verifyTotp, type TotpDeps } from './totp'
 
 export type PersonAuthHandlerDeps = Omit<MagicLinkDeps, 'store' | 'config'> & {
+  internalLoginEnabled: () => boolean
   store: PersonAuthStorePort
   config: AuthServerPersonAuthConfig
   invitations: InvitationAcceptancePort
@@ -83,9 +89,48 @@ export type PersonAuthHandlerDeps = Omit<MagicLinkDeps, 'store' | 'config'> & {
   onTotpEnvelopeUnavailable?: () => void
 }
 
+/** Same-origin authorize only; the corporate login transaction validates this again. */
+const corporateLoginUrl = (deps: PersonAuthHandlerDeps, rawReturnTo: string | null): string | null => {
+  const returnTo = sanitizeReturnTo(rawReturnTo)
+
+  if (!deps.internalLoginEnabled() || !returnTo) return null
+
+  try {
+    const url = new URL(returnTo, deps.issuer)
+
+    if (url.origin !== new URL(deps.issuer).origin || url.pathname !== '/oauth/authorize' || url.hash || url.username || url.password) return null
+
+    return '/auth/internal/login?' + new URLSearchParams({ return_to: url.pathname + url.search })
+  } catch {
+    return null
+  }
+}
+
+const BROWSER_MUTATION_PATHS = new Set<string>([
+  PERSON_AUTH_PATHS.magicLinkConsume, PERSON_AUTH_PATHS.passkeyAuthenticateStart, PERSON_AUTH_PATHS.passkeyAuthenticateFinish,
+  PERSON_AUTH_PATHS.passkeyRegisterStart, PERSON_AUTH_PATHS.passkeyRegisterFinish,
+  PERSON_AUTH_PATHS.passkeyStepUpStart, PERSON_AUTH_PATHS.passkeyStepUpFinish,
+  PERSON_AUTH_PATHS.totpEnrollStart, PERSON_AUTH_PATHS.totpEnrollFinish,
+  PERSON_AUTH_PATHS.totpVerify, PERSON_AUTH_PATHS.logout
+])
+
+/** Browser cookie mutations require origin evidence; Fetch Metadata can only tighten it. */
+const isTrustedBrowserMutation = (request: OAuthHttpRequest, issuer: string): boolean => {
+  const expected = new URL(issuer).origin
+  const origin = request.headers.get('origin')
+  const site = request.headers.get('sec-fetch-site')
+
+  if (site !== null && site !== 'same-origin') return false
+  if (origin !== null) return origin === expected
+
+  // Legacy browsers may omit Origin, but a same-origin Referer is still required.
+  return requestOrigin(request) === expected
+}
+
 export type PersonAuthHandler = (request: OAuthHttpRequest) => Promise<OAuthHttpResponse | null>
 
 const STATIC_PATHS = new Set<string>([
+  STEP_UP_PAGE_PATH,
   PERSON_AUTH_PATHS.login,
   PERSON_AUTH_PATHS.magicLinkRequest,
   PERSON_AUTH_PATHS.magicLinkConsume,
@@ -96,6 +141,8 @@ const STATIC_PATHS = new Set<string>([
   PERSON_AUTH_PATHS.passkeyRegisterFinish,
   PERSON_AUTH_PATHS.passkeyAuthenticateStart,
   PERSON_AUTH_PATHS.passkeyAuthenticateFinish,
+  PERSON_AUTH_PATHS.passkeyStepUpStart,
+  PERSON_AUTH_PATHS.passkeyStepUpFinish,
   PERSON_AUTH_PATHS.passkeyList,
   PERSON_AUTH_PATHS.totpEnrollStart,
   PERSON_AUTH_PATHS.totpEnrollFinish,
@@ -169,13 +216,79 @@ export const createPersonAuthHandler = (deps: PersonAuthHandlerDeps): PersonAuth
     if (!isPersonAuthPath(path)) return null
     if (!deps.config.personAuthEnabled) return jsonResponse(404, { error: 'not_found' })
 
+    if (request.method === 'POST' && BROWSER_MUTATION_PATHS.has(path) && !isTrustedBrowserMutation(request, deps.issuer)) {
+      return jsonResponse(403, { error: 'invalid_request' })
+    }
+
+    if (path === STEP_UP_PAGE_PATH) {
+      if (request.method !== 'GET') return methodNotAllowed('GET')
+
+      return handleStepUpPage(request, deps)
+    }
+
     const { audit, ipValue } = requestContext(request)
+
+    // Public ceremony gates run before session lookup, JSON/WebAuthn parsing or challenge allocation.
+    const passkeyAction = (
+      {
+        [PERSON_AUTH_PATHS.passkeyStepUpStart]: 'step_up_start',
+        [PERSON_AUTH_PATHS.passkeyStepUpFinish]: 'step_up_finish',
+        [PERSON_AUTH_PATHS.passkeyAuthenticateStart]: 'authenticate_start',
+        [PERSON_AUTH_PATHS.passkeyAuthenticateFinish]: 'authenticate_finish',
+        [PERSON_AUTH_PATHS.passkeyRegisterStart]: 'register_start',
+        [PERSON_AUTH_PATHS.passkeyRegisterFinish]: 'register_finish'
+      } as Partial<Record<string, keyof typeof PASSKEY_IP_RULES>>
+    )[path]
+
+    const limitPasskey = async (subject: string | null = null): Promise<OAuthHttpResponse | null> => {
+      if (!passkeyAction) return null
+
+      const rule = subject
+        ? passkeyAction.startsWith('step_up')
+          ? PASSKEY_STEP_UP_SUBJECT_RULE
+          : PASSKEY_REGISTER_SUBJECT_RULE
+        : PASSKEY_IP_RULES[passkeyAction]
+
+      const decision = await enforceRateLimit({
+        store: deps.store,
+        config: deps.config,
+        rule,
+        value: subject ?? ipValue,
+        now: deps.now()
+      })
+
+      if (decision.allowed) return null
+      await deps.store.recordAttempt({
+        method: 'passkey',
+        stage: passkeyAction.startsWith('register') ? 'register' : 'authenticate',
+        outcome: 'rate_limited',
+        reasonCode: decision.reason,
+        environmentId: deps.environmentId,
+        subjectHash: subject ? sha256Hex(subject) : null,
+        ipHash: audit.ipHash,
+        userAgentHash: audit.userAgentHash,
+        correlationId: audit.correlationId,
+        details: { dimension: rule.dimension, action: rule.action }
+      })
+
+      return jsonResponse(429, { status: 'rate_limited' }, { 'Retry-After': String(decision.retryAfterSeconds) })
+    }
+
+    if (passkeyAction) {
+      if (request.method !== 'POST') return methodNotAllowed('POST')
+      const limited = await limitPasskey()
+
+      if (limited) return limited
+    }
 
     // ─── Formulario de acceso ────────────────────────────────────────────────
     if (path === PERSON_AUTH_PATHS.login) {
       if (request.method !== 'GET') return methodNotAllowed('GET')
 
-      return htmlResponse(200, renderLoginPage({ returnTo: sanitizeReturnTo(request.url.searchParams.get('return_to')) }))
+      return htmlResponse(
+        200,
+        renderLoginPage({ returnTo: sanitizeReturnTo(request.url.searchParams.get('return_to')), internalLoginUrl: corporateLoginUrl(deps, request.url.searchParams.get('return_to')) })
+      )
     }
 
     // ─── Emisión del magic link ──────────────────────────────────────────────
@@ -201,7 +314,7 @@ export const createPersonAuthHandler = (deps: PersonAuthHandlerDeps): PersonAuth
 
       if (result.status === 'invalid_email') {
         return wantsHtml
-          ? htmlResponse(400, renderLoginPage({ returnTo: readField(request, 'return_to'), error: 'invalid_email' }))
+          ? htmlResponse(400, renderLoginPage({ returnTo: sanitizeReturnTo(readField(request, 'return_to')), internalLoginUrl: corporateLoginUrl(deps, readField(request, 'return_to')), error: 'invalid_email' }))
           : jsonResponse(400, { status: 'invalid_email' })
       }
 
@@ -241,11 +354,14 @@ export const createPersonAuthHandler = (deps: PersonAuthHandlerDeps): PersonAuth
       }
 
       if (result.status === 'access_revoked') {
-        return wantsHtml ? htmlResponse(403, renderAccessRevokedPage()) : jsonResponse(403, { status: 'access_revoked' })
+        return wantsHtml
+          ? htmlResponse(403, renderAccessRevokedPage())
+          : jsonResponse(403, { status: 'access_revoked' })
       }
 
       if (result.status !== 'authenticated') {
-        const kind = result.status === 'expired' ? 'expired' : result.status === 'already_used' ? 'already_used' : 'invalid'
+        const kind =
+          result.status === 'expired' ? 'expired' : result.status === 'already_used' ? 'already_used' : 'invalid'
 
         return wantsHtml ? htmlResponse(400, renderLinkProblemPage(kind)) : jsonResponse(400, { status: result.status })
       }
@@ -258,7 +374,10 @@ export const createPersonAuthHandler = (deps: PersonAuthHandlerDeps): PersonAuth
 
       // El `return_to` ya vino saneado a path relativo del emisor cuando se emitió el enlace.
       if (result.returnTo) {
-        return { ...redirectResponse(result.returnTo), headers: { ...redirectResponse(result.returnTo).headers, 'Set-Cookie': cookie } }
+        return {
+          ...redirectResponse(result.returnTo),
+          headers: { ...redirectResponse(result.returnTo).headers, 'Set-Cookie': cookie }
+        }
       }
 
       return wantsHtml
@@ -302,7 +421,9 @@ export const createPersonAuthHandler = (deps: PersonAuthHandlerDeps): PersonAuth
       }
 
       if (result.status === 'invalid') {
-        return wantsHtml ? htmlResponse(400, renderLinkProblemPage('invalid')) : jsonResponse(400, { status: 'invalid' })
+        return wantsHtml
+          ? htmlResponse(400, renderLinkProblemPage('invalid'))
+          : jsonResponse(400, { status: 'invalid' })
       }
 
       return wantsHtml ? htmlResponse(202, renderInvitationAcceptedPage()) : jsonResponse(202, { status: 'accepted' })
@@ -353,6 +474,10 @@ export const createPersonAuthHandler = (deps: PersonAuthHandlerDeps): PersonAuth
         })
       }
 
+      const limited = await limitPasskey(session.subject)
+
+      if (limited) return limited
+
       if (path === PERSON_AUTH_PATHS.passkeyRegisterStart) {
         const started = await startPasskeyRegistration(passkeyDeps, {
           subject: session.subject,
@@ -395,6 +520,62 @@ export const createPersonAuthHandler = (deps: PersonAuthHandlerDeps): PersonAuth
       if (finished.status !== 'registered') return jsonResponse(400, { status: 'rejected' })
 
       return jsonResponse(201, { status: 'registered', credentialId: finished.credentialId })
+    }
+
+    if (path === PERSON_AUTH_PATHS.passkeyStepUpStart || path === PERSON_AUTH_PATHS.passkeyStepUpFinish) {
+      const resolved = await resolvePersonSession({
+        store: deps.store,
+        config: deps.config,
+        sessionId: readCookie(request.headers.get('cookie'), deps.config.sessionCookieName),
+        expectedEnvironmentId: deps.environmentId,
+        expectedSourceSystem: deps.expectedSourceSystem,
+        now: deps.now()
+      })
+
+      if (resolved.status !== 'active') return jsonResponse(401, { status: 'unauthenticated' })
+      const limited = await limitPasskey(resolved.session.subject)
+
+      if (limited) return limited
+
+      if (path === PERSON_AUTH_PATHS.passkeyStepUpStart) {
+        const started = await startPasskeyStepUp(passkeyDeps, {
+          sessionHash: resolved.session.sessionHash,
+          ipHash: audit.ipHash,
+          correlationId: audit.correlationId
+        })
+
+        return started.status === 'ready'
+          ? jsonResponse(200, started)
+          : jsonResponse(401, { status: 'unauthenticated' })
+      }
+
+      const body = parseJsonBody(request.body)
+      const payload = body && typeof body === 'object' ? (body as Record<string, unknown>) : {}
+
+      const result = await finishPasskeyStepUp(passkeyDeps, {
+        sessionHash: resolved.session.sessionHash,
+        challenge: typeof payload.challenge === 'string' ? payload.challenge : '',
+        response: payload.response as never
+      })
+
+      await deps.store.recordAttempt({
+        method: 'passkey',
+        stage: 'authenticate',
+        outcome: result.status === 'verified' ? 'success' : 'rejected',
+        reasonCode: result.status === 'verified' ? null : result.status === 'rejected' ? result.reason : result.status,
+        environmentId: deps.environmentId,
+        subjectHash: sha256Hex(resolved.session.subject),
+        ipHash: audit.ipHash,
+        userAgentHash: audit.userAgentHash,
+        correlationId: audit.correlationId,
+        details: { purpose: 'step_up' }
+      })
+      if (result.status === 'counter_regression')
+        deps.onPasskeyCounterRegression?.({ credentialId: result.credentialId })
+      if (result.status !== 'verified') return jsonResponse(401, { status: 'rejected' })
+
+      // Same cookie/session/auth_time/provenance: a verified local factor only updates step_up_at/amr.
+      return jsonResponse(200, { status: 'verified', authLevel: 'step_up', amr: result.amr })
     }
 
     if (path === PERSON_AUTH_PATHS.passkeyAuthenticateStart) {
@@ -547,11 +728,17 @@ export const createPersonAuthHandler = (deps: PersonAuthHandlerDeps): PersonAuth
       }
 
       // El step-up se ESCRIBE en la sesión: `authorize` lo lee de ahí, no de esta respuesta.
-      await deps.store.recordSessionStepUp({
+      const elevated = await deps.store.recordBoundSessionStepUp({
         sessionHash: session.sessionHash,
+        subject: session.subject,
+        environmentId: session.environmentId,
+        profileId: session.profileId,
+        linkId: session.linkId,
         stepUpAt: deps.now(),
         amr: result.amr
       })
+
+      if (!elevated) return jsonResponse(401, { status: 'unauthenticated' })
 
       const openBackupCodes = await deps.store.countOpenTotpBackupCodes({
         environmentId: deps.environmentId,
@@ -580,7 +767,11 @@ export const createPersonAuthHandler = (deps: PersonAuthHandlerDeps): PersonAuth
       })
 
       if (resolution.status !== 'active') {
-        return jsonResponse(401, { status: 'unauthenticated' }, { 'Set-Cookie': buildSessionClearCookie(deps.config.sessionCookieName) })
+        return jsonResponse(
+          401,
+          { status: 'unauthenticated' },
+          { 'Set-Cookie': buildSessionClearCookie(deps.config.sessionCookieName) }
+        )
       }
 
       // El `sub` crudo NO sale al cliente: la sesión se identifica por su hash truncado.

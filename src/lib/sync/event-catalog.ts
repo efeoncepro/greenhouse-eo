@@ -96,6 +96,8 @@ export const AGGREGATE_TYPES = {
   asset: 'asset',
   // TASK-1631 — external identity binding (Account 360 ↔ environment externo; provider-neutral).
   externalIdentityBinding: 'external_identity_binding',
+  // TASK-1836 — opaque enrollment is the aggregate; person/organization remain canonical references.
+  internalNativeEnrollment: 'internal_native_enrollment',
 
   // Services
   service: 'service',
@@ -1245,7 +1247,14 @@ export const EVENT_TYPES = {
   externalGrantGranted: 'identity.external_grant.granted',
   externalInvitationIssued: 'identity.external_invitation.issued',
   externalInvitationLinked: 'identity.external_invitation.linked',
-  externalAccessRevoked: 'identity.external_access.revoked'
+  externalAccessRevoked: 'identity.external_access.revoked',
+
+  // TASK-1836 — audit/observability only; dispatch rechecks authority directly, without an async cache.
+  // Payloads contain opaque enrollment and actor IDs only, never upstream tokens or identity claims.
+  internalAccessEnrolled: 'identity.internal_access.enrolled',
+  internalAccessRevoked: 'identity.internal_access.revoked',
+  internalAccessCapabilityGranted: 'identity.internal_access.capability_granted',
+  internalAccessCapabilityRevoked: 'identity.internal_access.capability_revoked'
 } as const
 
 export type EventType = (typeof EVENT_TYPES)[keyof typeof EVENT_TYPES]

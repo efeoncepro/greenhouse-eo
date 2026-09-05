@@ -317,6 +317,9 @@ export interface CaptureScenario {
    */
   requiresStorageState?: string
 
+  /** Explicit public-surface capture: empty browser state, no agent refresh or bypass credentials. */
+  authentication?: 'agent' | 'anonymous'
+
   /** Metadata + contrato de visual diff para flujo mockup aprobado -> runtime. */
   baseline?: CaptureBaselineMeta
 
@@ -447,7 +450,23 @@ export const resolveCaptureQualityProfile = (
   return mergeQuality(defaults, quality)
 }
 
+export const resolveScenarioAuthentication = (
+  scenario: Pick<CaptureScenario, 'authentication' | 'requiresStorageState'>
+): 'agent' | 'anonymous' => {
+  const mode = scenario.authentication ?? 'agent'
+
+  if (mode !== 'agent' && mode !== 'anonymous') throw new Error('Invalid capture authentication mode')
+
+  if (mode === 'anonymous' && scenario.requiresStorageState !== undefined) {
+    throw new Error('Anonymous capture cannot declare requiresStorageState')
+  }
+
+  return mode
+}
+
 export const validateScenario = (s: CaptureScenario): void => {
+  resolveScenarioAuthentication(s)
+
   if (!s.name || !/^[a-z0-9-]+$/.test(s.name)) {
     throw new Error(`scenario.name inválido (kebab-case requerido): "${s.name}"`)
   }

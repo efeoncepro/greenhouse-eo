@@ -3,6 +3,17 @@
  * esta forma y los tests llaman al handler con objetos planos. Sin framework.
  */
 
+import { createHash } from 'node:crypto'
+
+import { AUTH_SERVER_STYLES } from './pages/styles.generated'
+import { EFEONCE_ISOTIPO_SVG } from './pages/efeonce-isotipo.generated'
+
+// Only trusted generated assets contribute hashes. Never derive this policy from request-rendered HTML.
+const styleHashes = [
+  AUTH_SERVER_STYLES,
+  ...[...EFEONCE_ISOTIPO_SVG.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)].map(match => match[1])
+].map(css => `'sha256-${createHash('sha256').update(css).digest('base64')}'`).join(' ')
+
 export type HeaderReader = { get(name: string): string | null }
 
 export type OAuthHttpRequest = {
@@ -50,7 +61,7 @@ export const htmlResponse = (status: number, html: string, headers: Record<strin
   headers: {
     ...SECURITY_HEADERS,
     'Content-Type': 'text/html; charset=utf-8',
-    'Content-Security-Policy': "default-src 'none'; img-src data:; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'",
+    'Content-Security-Policy': `default-src 'none'; img-src 'self' data:; font-src 'self'; style-src ${styleHashes}; form-action 'self'; base-uri 'none'; frame-ancestors 'none'`,
     ...headers
   },
   body: html

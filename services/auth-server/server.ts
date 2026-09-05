@@ -1,3 +1,6 @@
+import { createServer } from 'node:http'
+
+import { internalAuthEnabled } from '@/lib/auth-server/internal/config'
 /**
  * Efeonce Auth Server — Cloud Run Service (TASK-1828 runtime · TASK-1829 OAuth, EPIC-044)
  *
@@ -14,7 +17,6 @@
  * vive en Cloud KMS HSM; ningún error interno se devuelve al cliente en prosa.
  */
 
-import { createServer } from 'node:http'
 
 // TASK-844 — Sentry init must run BEFORE any function from @/lib/** is invoked.
 import { initSentryForService } from '../_shared/sentry-init'
@@ -45,6 +47,8 @@ import {
   PostgresPersonAuthStore,
   readAuthServerPersonAuthConfig
 } from '@/lib/auth-server/persons'
+import { createInternalAuthRuntime } from '@/lib/auth-server/internal/runtime'
+import { createNativeGrantsPort } from '@/lib/auth-server/internal/grants'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 import { createAuthServerRequestHandler, SERVICE_NAME } from './app'
@@ -75,6 +79,7 @@ const expectedSourceSystem = expectedSourceSystemFor(oauthConfig.environmentId)
 
 /** Deps compartidas por el router de personas y por el `SubjectSessionPort` que consume `authorize`. */
 const personDeps = {
+  internalLoginEnabled: () => internalAuthEnabled() && personAuthConfig.personAuthEnabled && oauthConfig.oauthEnabled,
   store: personStore,
   config: personAuthConfig,
   directory: createSourceLinkDirectoryPort(),
@@ -98,6 +103,17 @@ const personDeps = {
     captureWithDomain(error, 'identity', { tags: { component: SERVICE_NAME, ...context } })
 }
 
+const baseSubject = createPersonSubjectPort({
+    store: personStore,
+    config: personAuthConfig,
+    environmentId: oauthConfig.environmentId,
+    expectedSourceSystem,
+    onInvalidSession: status =>
+      console.warn(`[${SERVICE_NAME}] session invalidated by source link: ${status}`)
+  })
+
+const internalAuth = createInternalAuthRuntime({oauthConfig,personConfig:personAuthConfig,personStore,baseSubject})
+
 const handler = createAuthServerRequestHandler({
   enabled: AUTH_SERVER_ENABLED,
   allowedHosts: ALLOWED_HOSTS,
@@ -114,16 +130,11 @@ const handler = createAuthServerRequestHandler({
   // TASK-1830 — la persona la resuelve la sesión propia (`__Host-efeonce_auth`). Con
   // `AUTH_SERVER_PERSON_AUTH_ENABLED=false` el port devuelve `null` y `authorize` sigue
   // respondiendo `login_required`: prender la superficie es un flag, no un deploy distinto.
-  subjectPort: createPersonSubjectPort({
-    store: personStore,
-    config: personAuthConfig,
-    environmentId: oauthConfig.environmentId,
-    expectedSourceSystem,
-    onInvalidSession: status =>
-      console.warn(`[${SERVICE_NAME}] session invalidated by source link: ${status}`)
-  }),
+  subjectPort: internalAuth.subjectPort,
+  consentContextPort: internalAuth.consentContextPort,
+  internal: internalAuth.handler,
   persons: personDeps,
-  grantsPort: createExternalAccessGrantsPort(),
+  grantsPort: createNativeGrantsPort({config:oauthConfig,internal:internalAuth.contexts,external:createExternalAccessGrantsPort()}),
   cimd: {}
 })
 

@@ -248,3 +248,7 @@ Estas decisiones existen en runtime o docs, pero pueden merecer ADR mas explicit
 | Preview generic env baseline vs branch overrides | Evita deploys rojos por secrets solo en `Preview (develop)` | `RELEASE_CHANNELS_OPERATING_MODEL_V1.md` o cloud governance |
 | Access design dual-plane obligatorio | Muchas tasks deben distinguir `views` vs `entitlements` | `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md` |
 | Vocabulario contable: `income` = factura/AR (devengado), NO caja | El ingreso real es el cobro (`income_payments`→banco); fix semántico, sin rename físico (TASK-1208) | `GREENHOUSE_ACCOUNTING_VOCABULARY_V1.md` |
+
+## 2026-09-05 — autoridad interna Efeonce ID
+
+- [Efeonce internal native authority](EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md) — Accepted; TASK-1836, D1–D7: upstream OIDC, contexto delegado, assurance local y rollout multicomponente. Implementación/runtime pendientes.

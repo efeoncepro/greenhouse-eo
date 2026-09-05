@@ -19,6 +19,8 @@ export const AUTHORIZATION_CODE_PREFIX = 'efc'
 export type AccessTokenSigner = (payload: Record<string, unknown>) => Promise<string>
 
 export type AccessTokenClaims = {
+  authorization_context_id?: string
+  authorization_context_version?: 1
   iss: string
   sub: string
   aud: string
@@ -44,6 +46,7 @@ export type IssuedTokenSet = {
 }
 
 export type IssueTokenSetInput = {
+  authorizationContextId?: string | null
   client: OAuthClientRecord
   subject: string
   environmentId: string
@@ -60,6 +63,7 @@ export const buildAccessTokenClaims = (config: AuthServerOAuthConfig, input: Iss
   const iat = Math.floor(input.now.getTime() / 1000)
 
   return {
+    ...(input.authorizationContextId ? { authorization_context_id: input.authorizationContextId, authorization_context_version: 1 as const } : {}),
     iss: config.issuer,
     sub: input.subject,
     aud: config.mcpAudience,
@@ -79,6 +83,8 @@ export const buildRefreshTokenRecord = (
   input: IssueTokenSetInput,
   tokenHash: string
 ): RefreshTokenRecord => ({
+  authorizationContextId: input.authorizationContextId ?? null,
+  authTime: input.authTime,
   tokenHash,
   grantId: input.grantId,
   clientId: input.client.clientId,
@@ -96,6 +102,7 @@ export const buildRefreshTokenRecord = (
 })
 
 export const buildAccessTokenRecord = (input: IssueTokenSetInput, claims: AccessTokenClaims): AccessTokenRecord => ({
+  authorizationContextId: input.authorizationContextId ?? null,
   jti: claims.jti,
   grantId: input.grantId,
   clientId: input.client.clientId,

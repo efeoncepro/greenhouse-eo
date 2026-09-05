@@ -242,6 +242,7 @@ export interface GreenhouseAiToolCatalog {
 }
 
 export interface GreenhouseAuthAccessTokens {
+  authorization_context_id: string | null;
   client_id: string;
   environment_id: string;
   expires_at: Timestamp;
@@ -256,6 +257,7 @@ export interface GreenhouseAuthAccessTokens {
 
 export interface GreenhouseAuthAuthorizationCodes {
   auth_time: Timestamp;
+  authorization_context_id: string | null;
   client_id: string;
   code_challenge: string;
   code_challenge_method: Generated<string>;
@@ -272,6 +274,26 @@ export interface GreenhouseAuthAuthorizationCodes {
   redirect_uri: string;
   scopes: string[];
   subject: string;
+}
+
+export interface GreenhouseAuthAuthorizationContexts {
+  audience: string;
+  auth_time: Timestamp;
+  binding_id: string;
+  client_id: string;
+  context_id: string;
+  context_version: Generated<number>;
+  created_at: Timestamp;
+  environment_id: string;
+  expires_at: Timestamp;
+  issuer: string;
+  organization_id: string;
+  profile_id: string;
+  revoke_reason: string | null;
+  revoked_at: Timestamp | null;
+  session_hash: string;
+  subject: string;
+  upstream_link_id: string;
 }
 
 export interface GreenhouseAuthAuthRateLimits {
@@ -294,6 +316,7 @@ export interface GreenhouseAuthCimdCache {
 }
 
 export interface GreenhouseAuthClientConsents {
+  authorization_context_id: string | null;
   client_id: string;
   consent_id: Generated<string>;
   environment_id: string;
@@ -306,6 +329,25 @@ export interface GreenhouseAuthClientConsents {
   scope: string;
   status: Generated<string>;
   subject: string;
+}
+
+export interface GreenhouseAuthCorporateSessionEvidence {
+  authenticated_at: Timestamp;
+  created_at: Generated<Timestamp>;
+  object_id: string;
+  session_hash: string;
+  tenant_id: string;
+  upstream_issuer: string;
+  upstream_link_id: string;
+}
+
+export interface GreenhouseAuthInternalLoginTransactions {
+  browser_binding_hash: string;
+  consumed_at: Timestamp | null;
+  created_at: Timestamp;
+  encrypted_payload: string;
+  expires_at: Timestamp;
+  transaction_id: string;
 }
 
 export interface GreenhouseAuthMagicLinkTokens {
@@ -366,6 +408,10 @@ export interface GreenhouseAuthPasskeyChallenges {
   expires_at: Timestamp;
   ip_hash: string | null;
   purpose: string;
+  /**
+   * TASK-1836: opaque session hash for step_up only; same live session checked atomically at finish. No bearer token. Ephemeral challenge retention is independent of sessions.
+   */
+  session_hash: string | null;
   subject: string | null;
 }
 
@@ -403,6 +449,8 @@ export interface GreenhouseAuthPersonAuthAttempts {
 
 export interface GreenhouseAuthRefreshTokens {
   absolute_expires_at: Timestamp;
+  auth_time: Timestamp | null;
+  authorization_context_id: string | null;
   client_id: string;
   created_at: Generated<Timestamp>;
   environment_id: string;
@@ -2862,6 +2910,7 @@ export interface GreenhouseCoreExternalCapabilityGrants {
   binding_id: string;
   capability: string;
   created_at: Generated<Timestamp>;
+  expires_at: Timestamp | null;
   grant_id: string;
   granted_at: Generated<Timestamp>;
   granted_by: string;
@@ -3148,6 +3197,33 @@ export interface GreenhouseCoreIdentityProfileSourceLinks {
   source_system: string;
   source_user_id: string | null;
   updated_at: Generated<Timestamp>;
+}
+
+export interface GreenhouseCoreInternalNativeAccessAudit {
+  actor_id: string;
+  audit_id: string;
+  created_at: Generated<Timestamp>;
+  enrollment_id: string | null;
+  event_type: string;
+  metadata_json: Generated<Json>;
+  reason: string;
+}
+
+export interface GreenhouseCoreInternalNativeEnrollments {
+  binding_id: string;
+  enrolled_at: Generated<Timestamp>;
+  enrolled_by: string;
+  enrollment_id: string;
+  environment_id: string;
+  native_link_id: string;
+  object_id: string;
+  profile_id: string;
+  reason: string;
+  revoked_at: Timestamp | null;
+  revoked_by: string | null;
+  status: string;
+  tenant_id: string;
+  upstream_link_id: string;
 }
 
 export interface GreenhouseCoreLaunchNotifications {
@@ -13168,8 +13244,11 @@ export interface DB {
   "greenhouse_auth.access_tokens": GreenhouseAuthAccessTokens;
   "greenhouse_auth.auth_rate_limits": GreenhouseAuthAuthRateLimits;
   "greenhouse_auth.authorization_codes": GreenhouseAuthAuthorizationCodes;
+  "greenhouse_auth.authorization_contexts": GreenhouseAuthAuthorizationContexts;
   "greenhouse_auth.cimd_cache": GreenhouseAuthCimdCache;
   "greenhouse_auth.client_consents": GreenhouseAuthClientConsents;
+  "greenhouse_auth.corporate_session_evidence": GreenhouseAuthCorporateSessionEvidence;
+  "greenhouse_auth.internal_login_transactions": GreenhouseAuthInternalLoginTransactions;
   "greenhouse_auth.magic_link_tokens": GreenhouseAuthMagicLinkTokens;
   "greenhouse_auth.oauth_audit_events": GreenhouseAuthOauthAuditEvents;
   "greenhouse_auth.oauth_clients": GreenhouseAuthOauthClients;
@@ -13313,6 +13392,8 @@ export interface DB {
   "greenhouse_core.globe_credit_funding_policies": GreenhouseCoreGlobeCreditFundingPolicies;
   "greenhouse_core.identity_profile_source_links": GreenhouseCoreIdentityProfileSourceLinks;
   "greenhouse_core.identity_profiles": GreenhouseCoreIdentityProfiles;
+  "greenhouse_core.internal_native_access_audit": GreenhouseCoreInternalNativeAccessAudit;
+  "greenhouse_core.internal_native_enrollments": GreenhouseCoreInternalNativeEnrollments;
   "greenhouse_core.launch_notifications": GreenhouseCoreLaunchNotifications;
   "greenhouse_core.member_certifications": GreenhouseCoreMemberCertifications;
   "greenhouse_core.member_contract_type_audit_log": GreenhouseCoreMemberContractTypeAuditLog;

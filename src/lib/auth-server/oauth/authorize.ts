@@ -1,3 +1,4 @@
+import type { ConsentContextPort } from './consent-context'
 /**
  * `GET /oauth/authorize` (TASK-1829): authorization code + PKCE S256 obligatorio.
  *
@@ -28,6 +29,7 @@ export type AuthorizeDeps = {
   store: OAuthStorePort
   config: AuthServerOAuthConfig
   subjectPort: SubjectSessionPort
+  consentContextPort: ConsentContextPort
   grantsPort: GrantsVersionPort
   cimd: ClientResolverDeps['cimd']
   now?: () => Date
@@ -122,7 +124,7 @@ export const handleAuthorize = async (request: OAuthHttpRequest, deps: Authorize
       const nonce = paramOf(url, 'nonce')
 
       // 3. Persona autenticada por este emisor (TASK-1830).
-      const subject = await deps.subjectPort.resolve(request)
+      const subject = await deps.subjectPort.resolve(request, { clientId: client.clientId, audience: deps.config.mcpAudience })
 
       if (!subject || subject.environmentId !== deps.config.environmentId) {
         await recordOAuthAudit(deps.store, audit, { eventType: 'authorize', outcome: 'rejected', clientId, grantId: null, errorCode: 'login_required' })
@@ -131,10 +133,17 @@ export const handleAuthorize = async (request: OAuthHttpRequest, deps: Authorize
           return buildErrorRedirect(redirectUri, new OAuthProtocolError('login_required', { redirectable: true }), state, deps.config.issuer)
         }
 
-        return htmlResponse(401, renderLoginRequiredPage())
+        return htmlResponse(401, renderLoginRequiredPage(`${url.pathname}${url.search}`))
       }
 
-      // 4. Step-up para scopes de escritura (regla dura del ADR).
+      // 4. Autoridad vigente antes de pedir factor o consentimiento.
+      const grants = await deps.grantsPort.resolve({ environmentId: subject.environmentId, subject: subject.subject, clientId: client.clientId, authorizationContextId: subject.authorizationContextId })
+
+      if (!grants.bound) {
+        throw new OAuthProtocolError('access_denied', { description: 'no organization binding', reason: `unbound:${grants.outcome}`, redirectable: true })
+      }
+
+      // 5. Step-up para scopes de escritura (regla dura del ADR).
       if (scopes.some(isWriteScope) && subject.authLevel !== 'step_up') {
         await recordOAuthAudit(deps.store, audit, { eventType: 'authorize', outcome: 'rejected', clientId, subject: subject.subject, grantId: null, errorCode: 'interaction_required', details: { reason: 'step_up_required' } })
 
@@ -142,11 +151,22 @@ export const handleAuthorize = async (request: OAuthHttpRequest, deps: Authorize
           return buildErrorRedirect(redirectUri, new OAuthProtocolError('interaction_required', { redirectable: true }), state, deps.config.issuer)
         }
 
-        return htmlResponse(403, renderStepUpRequiredPage())
+        return htmlResponse(403, renderStepUpRequiredPage(`${url.pathname}${url.search}`))
       }
 
-      // 5. Consentimiento por cliente y scope.
-      const consents = await deps.store.listActiveConsents({ subject: subject.subject, environmentId: subject.environmentId, clientId: client.clientId })
+      const consentContext = await deps.consentContextPort.resolve({
+        environmentId: subject.environmentId, subject: subject.subject, clientId: client.clientId,
+        audience: deps.config.mcpAudience, authorizationContextId: subject.authorizationContextId
+      }).catch(() => ({ outcome: 'unavailable' as const }))
+
+      if (consentContext.outcome !== 'resolved' || consentContext.organizations.length === 0) {
+        throw new OAuthProtocolError(consentContext.outcome === 'unavailable' ? 'temporarily_unavailable' : 'access_denied', {
+          reason: 'consent_context_unavailable', redirectable: true
+        })
+      }
+
+      // 6. Consentimiento por cliente y scope.
+      const consents = await deps.store.listActiveConsents({ subject: subject.subject, environmentId: subject.environmentId, clientId: client.clientId, authorizationContextId: subject.authorizationContextId })
       const missing = missingConsentScopes(consents, scopes)
 
       if (missing.length > 0) {
@@ -157,6 +177,7 @@ export const handleAuthorize = async (request: OAuthHttpRequest, deps: Authorize
         return htmlResponse(
           200,
           renderConsentPage({
+            organizations: consentContext.organizations,
             clientName: client.clientName,
             clientId: client.clientId,
             scopes,
@@ -166,18 +187,12 @@ export const handleAuthorize = async (request: OAuthHttpRequest, deps: Authorize
         )
       }
 
-      // 6. Binding vigente → gv.
-      const grants = await deps.grantsPort.resolve({ environmentId: subject.environmentId, subject: subject.subject, clientId: client.clientId })
-
-      if (!grants.bound) {
-        throw new OAuthProtocolError('access_denied', { description: 'no organization binding', reason: `unbound:${grants.outcome}`, redirectable: true })
-      }
-
       // 7. Code de un solo uso.
       const code = generateOpaqueToken(AUTHORIZATION_CODE_PREFIX, 32)
       const grantId = `grt-${generateOpaqueId(12)}`
 
       await deps.store.insertAuthorizationCode({
+        authorizationContextId: subject.authorizationContextId ?? null,
         codeHash: sha256Hex(code),
         clientId: client.clientId,
         subject: subject.subject,

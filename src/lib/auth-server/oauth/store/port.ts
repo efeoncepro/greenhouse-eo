@@ -37,6 +37,8 @@ export type OAuthClientRecord = {
 }
 
 export type AuthorizationCodeRecord = {
+  /** TASK-1836: null/absent is legacy external, never internal. */
+  authorizationContextId?: string | null
   codeHash: string
   clientId: string
   /** Sujeto opaco dentro de este issuer. */
@@ -69,6 +71,9 @@ export type ConsumeAuthorizationCodeResult =
 export type RefreshTokenStatus = 'active' | 'rotated' | 'revoked'
 
 export type RefreshTokenRecord = {
+  authTime?: Date | null
+  /** TASK-1836: null/absent is legacy external, never internal. */
+  authorizationContextId?: string | null
   tokenHash: string
   grantId: string
   clientId: string
@@ -88,6 +93,8 @@ export type RefreshTokenRecord = {
 }
 
 export type AccessTokenRecord = {
+  /** TASK-1836: null/absent is legacy external, never internal. */
+  authorizationContextId?: string | null
   jti: string
   grantId: string
   clientId: string
@@ -108,6 +115,8 @@ export type RotateRefreshTokenResult =
   | { status: 'not_found' }
 
 export type ClientConsentRecord = {
+  /** TASK-1836: null/absent is legacy external, never internal. */
+  authorizationContextId?: string | null
   consentId: string
   subject: string
   environmentId: string
@@ -216,9 +225,10 @@ export interface OAuthStorePort {
   }): Promise<RevokeGrantResult>
 
   // consents
-  listActiveConsents(input: { subject: string; environmentId: string; clientId: string }): Promise<ClientConsentRecord[]>
+  listActiveConsents(input: { subject: string; environmentId: string; clientId: string; authorizationContextId?: string | null }): Promise<ClientConsentRecord[]>
   /** Idempotente: los scopes ya activos no se duplican; devuelve todas las filas activas resultantes. */
   grantConsents(input: {
+    authorizationContextId?: string | null
     subject: string
     environmentId: string
     clientId: string
