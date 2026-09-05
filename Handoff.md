@@ -15,6 +15,13 @@ No cerrar matricesamplias de clientes externos, multicontexto ni UI (contraste p
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
+**MCP gateway — cartel del servidor, 2026-09-05:** `efeonce-mcp` `acda2c7` (local, **sin push**) declara
+`title`/`websiteUrl`/`icons` y sirve el isotipo en `/icon-512{,-dark}.png`. `pnpm check` verde (131) + ambas
+guardas falsificadas. **Rollout pendiente:** deploy `workflow_dispatch` manual; al dispararlo, verificar front
+door (`/icon-512.png` 200 `image/png` + `icons` en `initialize`) y que el `Dockerfile` copie `assets/`. Sin
+impacto visible: ningún cliente Claude renderiza `icons`. Razones:
+[ADR](docs/architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md) §Delta 2026-09-05.
+
 **Berel, 2026-09-04:** Playbook Producción y feedback nuevo de septiembre leídos completos y promovidos a
 `berel-content-production` en los espejos Claude/Codex. La skill ahora distingue ficha técnica de página
 pública, elimina lenguaje interno del cuerpo, agrega la rama de awareness con render oficial, normaliza
@@ -482,15 +489,3 @@ readback no facturable, luego `draining -> active`; ante falla se vuelve primero
 Las skills espejo `greenhouse-globe` y `greenhouse-globe-model-fleet` ya bloquean deploys, migraciones,
 generaciones, canarios y promociones mientras el estado siga hibernado. El ledger de modelos conserva evidencia
 histórica de integración, pero deja explícito que `available` no significa ejecutable durante la hibernación.
-
-## 2026-09-02 (3) — cada task ETV/cluster incluye tools y skills MCP
-
-Las nueve tasks de la secuencia (`1805`, `1806`, `1312`, `1313`, `1314`, `1808`–`1811`) declaran ahora un
-`MCP Tools & Skills Contract` exigible. Cada una debe crear o actualizar tools, lane ecosystem,
-manifest/artefacto, federación o exclusión razonada y las skills `dataforseo-operator`/`seo-aeo` espejadas. Si el
-registro de skills servidas de `TASK-1804` existe al ejecutarla, también actualiza ese recurso agent-facing.
-
-Las tools read no compran datos on-read. Writes o gasto siguen bajo capability fina,
-`propose → confirm → execute`, presupuesto, idempotencia y audit; el cliente PKCE público nunca recibe write
-scope. El cierre requiere canaries allow/deny/fault y readback real del gateway. Cambio documental solamente:
-sin código, tools creadas, gasto, deploy ni runtime mutation todavía.

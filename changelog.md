@@ -7,6 +7,21 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-05 — MCP gateway: cartel propio del servidor (title, websiteUrl, íconos Efeonce)
+
+El gateway se anunciaba como `efeonce-mcp 0.1.0` sin título, sitio ni ícono. Declara ahora su
+`Implementation` completo y sirve el isotipo Efeonce (light + dark, 512×512) desde su propio origen,
+con `src` derivados de `MCP_PUBLIC_URL` y nunca como `data:` URI (el SDK estampa el `serverInfo` en
+cada resultado del carril moderno). Un ícono sólo se declara si sus bytes cargaron: asset ausente
+deja al gateway sin ícono + WARNING, nunca una promesa que responde 404. El `Dockerfile` copia
+`assets/` y un test lo afirma, porque ningún test de runtime ve el contenido de la imagen.
+`pnpm check` verde (131 tests) y ambas guardas falsificadas. Commit `acda2c7` en `efeonce-mcp`, sin
+push ni deploy: el despliegue es `workflow_dispatch` manual, así que queda `code complete, rollout
+pendiente`. Sabido: ningún cliente Claude renderiza `icons` hoy — se declara porque es correcto.
+Detalle y razones en
+[`EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md`](docs/architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md)
+§Delta 2026-09-05.
+
 ## 2026-09-05 — TASK-1836: diagnóstico cerrado del rechazo JWT corporativo
 
 El callback real pasó el intercambio upstream y fue rechazado por jwtVerify; no se emitió token MCP.
@@ -901,26 +916,3 @@ Sin cambios live en esta consolidación. [Audit](docs/audits/public-site/2026-08
 Checkpoint de construcción anterior a la promoción:
 
 Se auditó el ZIP y se portó el cuerpo de Claude Design a `https://efeoncepro.com/home-claude-design-preview/` (`251731`, noindex), preservando el header/footer Ohio y Home `2791`. Tras la corrección solicitada por el operador, usa 17 widgets semánticos Elementor con controles editables y siete repeaters, **cero widgets HTML**. Assets condicionales y ciclo de vida idempotente; adaptación móvil del motor sin superposiciones. Tests PHP/JS y frontend 1440/390, reduced motion, filtros/FAQ/modal/foco pasan. Editor visual save/reload pendiente de login; media de 12 slots, copy/claims, captación y cutover siguen pendientes. [Contrato y manuales](docs/architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md).
-
-## 2026-08-30 — HubSpot as a Service y su futura landing adoptan arquitectura moderna e inmersiva
-
-La práctica dejó de reducirse a RevOps + Customer Agent y ahora se gobierna mediante seis familias: Marketing,
-Content & AEO; Sales & AI Pipeline; Revenue Lifecycle; Service, Customer Success & Delivery; Data, Integration &
-CRM Intelligence; y Agent Hub & Agentic Operations. La evaluación inicial para fit/cotización es sin costo; un
-blueprint pagado requiere un artefacto autónomo. Customer Agent queda como caso de uso, mientras Contracts,
-Projects y Services se clasifican correctamente como objetos/capabilities dentro de sus workflows.
-
-El benchmark de 11 partners, la oferta V2, tres fichas sectoriales, el pillar público, las skills HubSpot espejadas y
-el router de agentes quedaron reconciliados. `TASK-1352` fue **reemplazada integralmente**, sin conservar deltas,
-copy, claims ni composición del resultado rechazado de Claude Design. La nueva task impone research-first,
-copywriting completo, SEO/AEO por intención y motor, CRO medible, proof ledger y un gate humano del primer fold antes
-de la implementación total. Su dirección visual durable es **Sistema vivo de crecimiento**: atlas de seis resultados, tres lentes
-sectoriales, color HubSpot usado como señal dentro de Efeonce masterbrand, motion causal/interrumpible, frontera
-gratis-vs-blueprint y GVC premium. Los activos exactos de marca deben venir del Partner Brandfolder/guía vigente;
-no se autoriza copiar la UI/trade dress, modificar logos, inventar HEX ni usar inmersión ornamental que perjudique
-accesibilidad o CWV. No hubo cambio de runtime ni publicación web; la task permanece `to-do` y `UI ready: no`.
-
-Dirección visual, wireframe, flow y motion de TASK-1352 se reautoraron desde cero contra la task nueva. Eliminan la
-gran idea prefijada, normalizan las seis familias canónicas, subordinan agentes/capabilities a outcomes, incorporan
-copy slots research-dependent, restricciones SEO/AEO en HTML, flujo de conversión y no-fit, fallas honestas,
-transformación desktop/tablet/mobile y un motion system causal con tokens exactos, reduced-motion y budgets CWV.

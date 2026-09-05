@@ -253,6 +253,16 @@ If a source conflicts with remembered behavior, the verified runtime and its can
   `dpl_CTxG3tx66S159tazMSyNiGSmqzHJ` READY, `ops-worker-00563-ghv` Ready, and watchdog `ok`/`drift_count=0`.
 - Do not call a product deployment successful because its MCP adapter compiled. Require provider allow/deny/fault
   evidence and a public gateway smoke.
+- **El cartel del servidor (`title`/`websiteUrl`/`icons`) vive en `efeonce-mcp:src/branding.ts`, fuente única.**
+  Los `icons[].src` se **derivan** de `MCP_PUBLIC_URL` (el spec pide mismo origen y fetch sin credenciales) y
+  **NUNCA** son `data:` URI: en el carril moderno el SDK estampa el `serverInfo` COMPLETO en el `_meta` de cada
+  resultado, así que un base64 se repetiría en todo el tráfico. Un ícono sólo se declara **si sus bytes
+  cargaron** (asset ausente ⇒ sin ícono + WARNING, jamás una promesa que da 404), y el `Dockerfile` debe copiar
+  `assets/` o el ícono desaparece en producción con todos los tests verdes — `test/branding.test.ts` afirma esa
+  línea y amarra declaración ↔ ruta ↔ bytes. ⚠️ **Ningún cliente Claude renderiza `icons` hoy**: claude.ai lo
+  ignora ([claude-ai-mcp#152](https://github.com/anthropics/claude-ai-mcp/issues/152), abierto) y Claude Code lo
+  cerró *not planned*; el reporte ya descartó empíricamente favicon, `data:` URI y `<link rel=icon>`. **NUNCA**
+  abras trabajo para "hacer que se vea": no hay palanca del lado servidor. ADR §Delta 2026-09-05.
 - Keep the Codex and Claude bundles byte-identical. Update both in the same change and verify the diff.
 
 ## External access binding (TASK-1631, applied 2026-09-04)

@@ -449,6 +449,46 @@ Rollback: quitar tráfico a la revisión defectuosa o deshabilitar el provider/s
   aplique la igualdad de `issuer` de RFC 8414 §3.3, soporte CIMD en Entra, emisor propio `TASK-1828`/`TASK-1829`
   en runtime (actualizado 2026-09-04, TASK-1631), o una revisión MCP publicada en o después de 2027-07-28 que remueva DCR).
 
+### Delta 2026-09-05 — el cartel del servidor: `title`, `websiteUrl` e íconos propios
+
+El gateway se presentaba como `{ name: 'efeonce-mcp', version: '0.1.0' }` y nada más, así que todo
+cliente MCP lo dibujaba con el ícono genérico. Ahora declara su `Implementation` completo y sirve el
+isotipo Efeonce desde su propio origen. Fuente única: `efeonce-mcp:src/branding.ts`.
+
+**Tres decisiones, cada una con su razón:**
+
+1. **URL HTTPS del mismo origen, NUNCA un `data:` URI.** Verificado en el SDK instalado
+   (`@modelcontextprotocol/server` 2.0.0): en el carril moderno `stampServerInfoMeta` estampa el
+   `serverInfo` COMPLETO en el `_meta` de **cada** resultado, así que un base64 se repetiría en todo
+   el tráfico. Los `src` se **derivan** de `MCP_PUBLIC_URL` (el spec pide mismo origen); escribirlos
+   a mano reintroduce el cartel que miente.
+2. **Un ícono sólo se declara si sus bytes cargaron.** Asset ilegible ⇒ el gateway queda **sin** ese
+   ícono + un `WARNING`, jamás una promesa que responde 404 y jamás una caída del gateway por un
+   asset cosmético. Falsificado quitando un PNG: el otro siguió sirviendo y el ausente no se declaró.
+3. **Las rutas del ícono son públicas por contrato del spec** (§`icons`: el cliente lo trae *sin*
+   credenciales). No es una excepción abierta en una compuerta: el gateway no tiene hook de auth
+   global — `/health` y los `/.well-known/*` ya son rutas públicas y la auth vive dentro del handler
+   MCP. Son bytes estáticos leídos al arranque, sin input del caller y sin redirect.
+
+**El asset tiene que llegar a la imagen.** El `Dockerfile` copiaba sólo `dist/`; sin
+`COPY assets ./assets` el ícono desaparece en producción con todos los tests en verde. Ningún test de
+runtime ve el contenido del contenedor, así que `test/branding.test.ts` afirma esa línea del
+Dockerfile además de amarrar declaración ↔ ruta ↔ bytes (magic bytes PNG, no la etiqueta `mimeType`).
+
+⚠️ **Ningún cliente Claude lo renderiza hoy, y se hizo sabiéndolo.** claude.ai ignora `icons` de
+custom connectors ([anthropics/claude-ai-mcp#152](https://github.com/anthropics/claude-ai-mcp/issues/152),
+abierto desde 2026-04-06, con `data:`, URL, `/favicon.ico` y `<link rel=icon>` ya descartados
+empíricamente por el reporte); Claude Code cerró el pedido equivalente como *not planned*
+([#49040](https://github.com/anthropics/claude-code/issues/49040)). Claude Desktop sí pinta íconos,
+pero sólo de extensiones locales `.mcpb`, no de conectores remotos. **NUNCA** vuelvas a intentar
+favicon o `data:` URI creyendo que es el camino que falta: no hay palanca del lado servidor.
+
+Nota de carril: hoy el gateway sirve el handshake legacy, donde el `serverInfo` viaja en el
+resultado de `initialize` — ahí es donde se verificó que el cartel llega al cliente.
+
+`version: '0.1.0'` sigue igual a propósito: cambiar la versión que el servidor declara es una
+decisión de operador, no un efecto colateral de ponerle ícono.
+
 ## References
 
 - [MCP Specification 2026-07-28](https://modelcontextprotocol.io/specification/2026-07-28)
