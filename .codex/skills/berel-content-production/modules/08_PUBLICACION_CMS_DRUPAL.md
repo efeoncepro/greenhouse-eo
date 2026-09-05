@@ -80,8 +80,10 @@ Un artículo no se sube si no está **aprobado por el cliente** en el Content Hu
   ese contexto. Criterio, no automatismo.
 - 🔴 **Vocabulario de los buscadores mexicanos.** Berel **solo opera en México** y algunas palabras
   difieren de las nuestras → [`04_VOZ_Y_TONO_BEREL.md`](04_VOZ_Y_TONO_BEREL.md).
-- Los **productos sugeridos** del artículo se agregan **solo cuando el cliente lo pide** (por ahora
-  no aplica).
+- 🔴 Agregar siempre los **productos que aplican** al artículo y comprobar que la tabla de productos
+  coincida con la imagen de producto de cada sección.
+- Los enlaces visibles usan anchors descriptivos; nunca mostrar una URL cruda. En el handoff, entregar
+  rutas internas relativas cuando corresponda.
 
 ## Checklist rápido antes de publicar
 
@@ -89,9 +91,17 @@ Un artículo no se sube si no está **aprobado por el cliente** en el Content Hu
 - [ ] Imágenes con texto alternativo + keyword
 - [ ] Callouts convertidos a emoji + "Berel tip" (sin etiquetas HTML residuales)
 - [ ] Tablas pegadas y con enlaces a productos funcionando
+- [ ] Productos que aplican etiquetados; tabla e imagen de producto coinciden
 - [ ] Metatag de título en formato `NoTitle | Pinturas Berel`
 - [ ] Meta descripción copiada de Notion (y en `Resumen`)
 - [ ] Alias de URL manual (checkbox automático desmarcado)
+
+## Correcciones posteriores a una publicación
+
+Corregir o aprobar el texto en Notion **no actualiza Drupal ni la URL pública**. Si el artículo ya estaba
+publicado, registrar un pendiente CMS con alcance, responsable y evidencia esperada. Ejecutar el cambio
+solo con autorización de publicación; después guardar, publicar y verificar la URL viva. No cerrar el
+pendiente con el éxito del guardado ni con el estado de Notion.
 
 ## Por qué el `title` se audita después
 

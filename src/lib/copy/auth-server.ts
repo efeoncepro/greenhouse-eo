@@ -9,9 +9,21 @@ export const GH_AUTH_SERVER = {
   page_lang: 'es-CL',
   font_licenses_label: 'Licencias de fuentes',
   application_context_label: 'Aplicación',
-  login_methods_intro: 'Elige cómo acceder para continuar a la aplicación.',
+  login_methods_intro: 'Elige cómo quieres entrar.',
   login_team_title: 'Equipo Efeonce',
   login_invitation_title: 'Acceso por invitación',
+  /** Separador entre los dos métodos de acceso; es decorativo (`aria-hidden`), nunca la única señal. */
+  login_methods_separator: 'o',
+  /** Ejemplo dentro del campo; la etiqueta visible sigue siendo `login_email_label` (WCAG 3.3.2). */
+  login_email_placeholder: 'nombre@empresa.com',
+  /** Panel de marca del acceso: dice QUÉ es esto y CÓMO funciona, sin promesas genéricas. */
+  /** Titular del panel: se parte en dos para acentuar la promesa, no por capricho tipográfico. */
+  login_rail_headline: 'Un solo acceso a todo lo que',
+  login_rail_headline_accent: 'Efeonce opera contigo',
+  /** Línea fina al pie de la tarjeta: acota a quién le llega el enlace, sin revelar si existe. */
+  login_card_note: 'Te escribimos sólo al correo con el que te invitaron.',
+  login_rail_body: 'Efeonce ID es la identidad con la que entras a los espacios de trabajo y a las herramientas conectadas de tu organización.',
+  login_rail_trust: 'Enlace de un solo uso. Sin contraseñas que recordar.',
   scope_read_label: 'Lectura',
   scope_write_label: 'Escritura',
 
@@ -38,7 +50,7 @@ export const GH_AUTH_SERVER = {
     ? 'Esta aplicación solicita estos permisos para la organización indicada.'
     : 'Esta aplicación solicita estos permisos para las organizaciones indicadas.',
   consent_capabilities_label: 'Ver permisos vigentes en esta organización',
-  consent_allow_cta: 'Permitir',
+  consent_allow_cta: 'Autorizar acceso',
   consent_deny_cta: 'Cancelar',
   consent_footer: 'Puedes revocar este acceso en cualquier momento desde Efeonce.',
   consent_client_id_label: 'Identificador de la aplicación',
@@ -48,8 +60,8 @@ export const GH_AUTH_SERVER = {
     'efeonce.mcp.read': 'Leer información de tus organizaciones en Efeonce',
     'efeonce.mcp.globe.read': 'Leer tus espacios y activos de Efeonce Globe',
     'efeonce.mcp.hiring.read': 'Leer información de procesos de selección',
-    'efeonce.mcp.globe.credits.funding.ensure': 'Cargar créditos de Globe (escritura, mueve dinero)',
-    'efeonce.mcp.seo.write': 'Modificar la configuración SEO de tus organizaciones (escritura)'
+    'efeonce.mcp.globe.credits.funding.ensure': 'Cargar créditos de Globe. Esta acción mueve dinero real.',
+    'efeonce.mcp.seo.write': 'Modificar la configuración SEO de tus organizaciones'
   } as Record<string, string>,
   scope_description_fallback: (scope: string) => `Permiso ${scope}`,
 
@@ -61,7 +73,7 @@ export const GH_AUTH_SERVER = {
   login_sent_title: 'Revisa tu correo',
   login_sent_body:
     'Si ese correo tiene acceso, te acaba de llegar un enlace para entrar. Es válido por 15 minutos y funciona una sola vez.',
-  login_sent_hint: 'No cierres esta pestaña: puedes abrir el enlace desde el mismo navegador.',
+  login_sent_hint: 'Ábrelo en este mismo navegador para volver justo donde estabas.',
   login_invalid_email: 'Ese correo no tiene un formato válido. Revísalo e inténtalo de nuevo.',
   // Passkey primero: el login por passkey no pide correo (credenciales descubribles), así que va
   // arriba del campo. Los dos fallbacks son distintos a propósito: «no hay soporte» es del
@@ -88,7 +100,7 @@ export const GH_AUTH_SERVER = {
   totp_verify_title: 'Confirma que eres tú',
   totp_verify_body: 'Escribe el número que muestra tu app de autenticación.',
   totp_verify_backup_hint: 'También puedes usar uno de tus códigos de respaldo.',
-  totp_verify_submit_cta: 'Confirmar',
+  totp_verify_submit_cta: 'Verificar código',
   totp_invalid_code: 'Ese número no es válido o ya se usó. Espera a que tu app muestre uno nuevo.',
   totp_not_enrolled: 'Todavía no tienes un segundo factor activo. Actívalo para poder autorizar permisos de escritura.',
   // El envelope caído no es «error de sistema»: es una degradación honesta con un límite claro.
@@ -109,7 +121,7 @@ export const GH_AUTH_SERVER = {
     'Activamos tu invitación. Te enviamos un enlace de acceso al correo con el que te invitaron; es válido por 15 minutos.',
 
   // Resultados del consumo
-  link_invalid_title: 'Este enlace ya no sirve',
+  link_invalid_title: 'Este enlace ya no es válido',
   link_invalid_body: 'El enlace es inválido o ya fue usado. Pide uno nuevo desde el inicio de sesión.',
   link_expired_body: 'El enlace expiró. Pide uno nuevo desde el inicio de sesión.',
   link_used_body: 'Este enlace ya se usó. Pide uno nuevo desde el inicio de sesión.',

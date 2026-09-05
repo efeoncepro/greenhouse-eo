@@ -34,6 +34,21 @@ const route = (handlers: Array<[RegExp, Handler]>) => {
   clientQueryMock.mockImplementation((sql: string, params: unknown[]) => {
     const match = handlers.find(([pattern]) => pattern.test(sql))
 
+    if (/^SELECT b.environment_id FROM/.test(sql.trim()))
+      return Promise.resolve({ rows: [{ environment_id: 'efeonce-auth' }] })
+    if (/^SELECT environment_id FROM greenhouse_core.external_organization_bindings/.test(sql.trim()))
+      return Promise.resolve({ rows: [{ environment_id: 'efeonce-auth' }] })
+    if (/^SELECT status FROM greenhouse_core.external_identity_environments/.test(sql.trim()))
+      return Promise.resolve({ rows: [{ status: 'active' }] })
+    if (!match && /SELECT binding_id FROM greenhouse_core.external_organization_bindings/.test(sql))
+      return Promise.resolve({ rows: [{ binding_id: params[0] }] })
+    if (!match && /SELECT enrollment_id FROM greenhouse_core.internal_native_enrollments/.test(sql))
+      return Promise.resolve({ rows: [] })
+    if (!match && /SELECT[\s\S]*external_capability_grants WHERE grant_id=\$1/.test(sql))
+      return Promise.resolve({ rows: [grantRow({ grant_id: params[0] })] })
+
+    if (!match && /FROM greenhouse_core\.external_identity_environments/.test(sql))
+      return Promise.resolve({ rows: [environmentRow()] })
     if (!match) throw new Error(`unexpected SQL: ${sql.replace(/\s+/g, ' ').slice(0, 120)}`)
 
     const result = match[1](params, sql)
@@ -64,6 +79,7 @@ const environmentRow = (overrides: Record<string, unknown> = {}) => ({
 })
 
 const bindingRow = (overrides: Record<string, unknown> = {}) => ({
+  population: 'external',
   binding_id: 'xob-1',
   organization_id: 'org-1',
   organization_name: 'Cliente Uno',
@@ -116,13 +132,20 @@ const invitationRow = (overrides: Record<string, unknown> = {}) => ({
   ...overrides
 })
 
-const activeClientOrganization = { organization_type: 'client', lifecycle_stage: 'active_client', active: true, status: 'active' }
+const activeClientOrganization = {
+  organization_type: 'client',
+  lifecycle_stage: 'active_client',
+  active: true,
+  status: 'active'
+}
 
 describe('TASK-1631 — upsertExternalIdentityEnvironment', () => {
   beforeEach(() => vi.clearAllMocks())
 
   it('refuses to change issuerClass on an existing environment (authority is not re-classified in place)', async () => {
-    route([[/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow({ issuer_class: 'internal' })]]])
+    route([
+      [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow({ issuer_class: 'internal' })]]
+    ])
 
     await expect(
       upsertExternalIdentityEnvironment(
@@ -166,9 +189,10 @@ describe('TASK-1631 — upsertExternalIdentityEnvironment', () => {
   it('rotates the issuer with one audited UPDATE and publishes the previous issuer', async () => {
     route([
       [/SELECT[\s\S]*FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
-      [/INSERT INTO greenhouse_core\.external_identity_environments/, () => [
-        environmentRow({ issuer_url: 'https://auth.efeonce.org/v2' })
-      ]],
+      [
+        /INSERT INTO greenhouse_core\.external_identity_environments/,
+        () => [environmentRow({ issuer_url: 'https://auth.efeonce.org/v2' })]
+      ],
       [/INSERT INTO greenhouse_core\.external_identity_audit_log/, () => []]
     ])
 
@@ -204,9 +228,10 @@ describe('TASK-1631 — bindExternalOrganization', () => {
   it('rejects an organization that is not an active client of Account 360', async () => {
     route([
       [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
-      [/FROM greenhouse_core\.organizations\s+WHERE organization_id/, () => [
-        { ...activeClientOrganization, lifecycle_stage: 'churned' }
-      ]]
+      [
+        /FROM greenhouse_core\.organizations\s+WHERE organization_id/,
+        () => [{ ...activeClientOrganization, lifecycle_stage: 'churned' }]
+      ]
     ])
 
     await expect(
@@ -256,12 +281,20 @@ describe('TASK-1631 — bindExternalOrganization', () => {
       [/FROM greenhouse_core\.organizations\s+WHERE organization_id/, () => [activeClientOrganization]],
       [/WHERE b\.environment_id = \$1[\s\S]*FOR UPDATE OF b/, () => []],
       [/INSERT INTO greenhouse_core\.external_organization_bindings/, () => []],
-      [/WHERE b\.binding_id = \$1\s+FOR UPDATE OF b/, params => [bindingRow({ binding_id: params[0] })]],
+      [
+        /WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/,
+        params => [bindingRow({ binding_id: params[0] })]
+      ],
       [/INSERT INTO greenhouse_core\.external_identity_audit_log/, () => []]
     ])
 
     const result = await bindExternalOrganization(
-      { organizationId: 'org-1', environmentId: 'efeonce-auth', externalOrganizationRef: 'ext-org-1', reason: 'cohorte 1' },
+      {
+        organizationId: 'org-1',
+        environmentId: 'efeonce-auth',
+        externalOrganizationRef: 'ext-org-1',
+        reason: 'cohorte 1'
+      },
       actor
     )
 
@@ -274,7 +307,10 @@ describe('TASK-1631 — bindExternalOrganization', () => {
     expect(audit[1]).toBe('organization_bound')
     expect(audit[8]).toBe('user-admin-1')
     expect(publishMock).toHaveBeenCalledWith(
-      expect.objectContaining({ eventType: 'identity.external_binding.bound', aggregateType: 'external_identity_binding' }),
+      expect.objectContaining({
+        eventType: 'identity.external_binding.bound',
+        aggregateType: 'external_identity_binding'
+      }),
       fakeClient
     )
   })
@@ -285,9 +321,12 @@ describe('TASK-1631 — grantExternalCapability', () => {
 
   it('bumps grants_version when a new grant is created', async () => {
     route([
-      [/WHERE b\.binding_id = \$1\s+FOR UPDATE OF b/, () => [bindingRow()]],
+      [/WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/, () => [bindingRow()]],
       [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
-      [/SELECT[\s\S]*FROM greenhouse_core\.external_capability_grants\s+WHERE binding_id = \$1 AND capability = \$2/, () => []],
+      [
+        /SELECT[\s\S]*FROM greenhouse_core\.external_capability_grants\s+WHERE binding_id = \$1 AND capability = \$2/,
+        () => []
+      ],
       [/INSERT INTO greenhouse_core\.external_capability_grants/, () => [grantRow()]],
       [/SET grants_version = grants_version \+ 1/, () => [{ grants_version: 2 }]],
       [/INSERT INTO greenhouse_core\.external_identity_audit_log/, () => []]
@@ -308,9 +347,15 @@ describe('TASK-1631 — grantExternalCapability', () => {
 
   it('is idempotent and does not bump grants_version for an existing active grant', async () => {
     route([
-      [/WHERE b\.binding_id = \$1\s+FOR UPDATE OF b/, () => [bindingRow({ grants_version: 5 })]],
+      [
+        /WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/,
+        () => [bindingRow({ grants_version: 5 })]
+      ],
       [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
-      [/SELECT[\s\S]*FROM greenhouse_core\.external_capability_grants\s+WHERE binding_id = \$1 AND capability = \$2/, () => [grantRow()]]
+      [
+        /SELECT[\s\S]*FROM greenhouse_core\.external_capability_grants\s+WHERE binding_id = \$1 AND capability = \$2/,
+        () => [grantRow()]
+      ]
     ])
 
     const result = await grantExternalCapability({ bindingId: 'xob-1', capability: 'globe.producer.fleet.read' }, actor)
@@ -323,13 +368,16 @@ describe('TASK-1631 — grantExternalCapability', () => {
 
   it('rejects a per-person grant for someone who is not a linked member', async () => {
     route([
-      [/WHERE b\.binding_id = \$1\s+FOR UPDATE OF b/, () => [bindingRow()]],
+      [/WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/, () => [bindingRow()]],
       [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
       [/SELECT invitation_id FROM greenhouse_core\.external_member_invitations/, () => []]
     ])
 
     await expect(
-      grantExternalCapability({ bindingId: 'xob-1', capability: 'growth.ai_visibility.prompt_set.manage', profileId: 'p-9' }, actor)
+      grantExternalCapability(
+        { bindingId: 'xob-1', capability: 'growth.ai_visibility.prompt_set.manage', profileId: 'p-9' },
+        actor
+      )
     ).rejects.toMatchObject({ code: 'invalid_request' })
   })
 
@@ -346,7 +394,7 @@ describe('TASK-1631 — issueExternalInvitation', () => {
 
   it('returns the open invitation without a token when one already exists (idempotent)', async () => {
     route([
-      [/WHERE b\.binding_id = \$1\s+FOR UPDATE OF b/, () => [bindingRow()]],
+      [/WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/, () => [bindingRow()]],
       [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
       [/status IN \('issued', 'accepted'\)\s+FOR UPDATE/, () => [invitationRow()]]
     ])
@@ -360,14 +408,20 @@ describe('TASK-1631 — issueExternalInvitation', () => {
 
   it('issues a new invitation, returns the token once and persists only its sha256 hash', async () => {
     route([
-      [/WHERE b\.binding_id = \$1\s+FOR UPDATE OF b/, () => [bindingRow()]],
+      [/WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/, () => [bindingRow()]],
       [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
       [/status IN \('issued', 'accepted'\)\s+FOR UPDATE/, () => []],
-      [/INSERT INTO greenhouse_core\.external_member_invitations/, params => [invitationRow({ invitation_id: params[0] })]],
+      [
+        /INSERT INTO greenhouse_core\.external_member_invitations/,
+        params => [invitationRow({ invitation_id: params[0] })]
+      ],
       [/INSERT INTO greenhouse_core\.external_identity_audit_log/, () => []]
     ])
 
-    const result = await issueExternalInvitation({ bindingId: 'xob-1', email: 'ana@cliente.cl', designatedAdmin: true }, actor)
+    const result = await issueExternalInvitation(
+      { bindingId: 'xob-1', email: 'ana@cliente.cl', designatedAdmin: true },
+      actor
+    )
 
     expect(result.created).toBe(true)
     expect(result.token).toMatch(/^[A-Za-z0-9_-]{40,}$/)
@@ -386,11 +440,14 @@ describe('TASK-1631 — issueExternalInvitation', () => {
 
   it('reissue revokes the open invitation (audited) before issuing the new one', async () => {
     route([
-      [/WHERE b\.binding_id = \$1\s+FOR UPDATE OF b/, () => [bindingRow()]],
+      [/WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/, () => [bindingRow()]],
       [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
       [/status IN \('issued', 'accepted'\)\s+FOR UPDATE/, () => [invitationRow()]],
       [/SET status = 'revoked'[\s\S]*revoke_reason = 'reissued'/, () => []],
-      [/INSERT INTO greenhouse_core\.external_member_invitations/, params => [invitationRow({ invitation_id: params[0] })]],
+      [
+        /INSERT INTO greenhouse_core\.external_member_invitations/,
+        params => [invitationRow({ invitation_id: params[0] })]
+      ],
       [/INSERT INTO greenhouse_core\.external_identity_audit_log/, () => []]
     ])
 
@@ -405,11 +462,18 @@ describe('TASK-1631 — issueExternalInvitation', () => {
   })
 
   it('refuses to invite under a revoked binding', async () => {
-    route([[/WHERE b\.binding_id = \$1\s+FOR UPDATE OF b/, () => [bindingRow({ status: 'revoked', revoked_at: '2026-09-04T00:00:00Z' })]]])
+    route([
+      [
+        /WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/,
+        () => [bindingRow({ status: 'revoked', revoked_at: '2026-09-04T00:00:00Z' })]
+      ]
+    ])
 
-    await expect(issueExternalInvitation({ bindingId: 'xob-1', email: 'ana@cliente.cl' }, actor)).rejects.toMatchObject({
-      code: 'binding_not_active'
-    })
+    await expect(issueExternalInvitation({ bindingId: 'xob-1', email: 'ana@cliente.cl' }, actor)).rejects.toMatchObject(
+      {
+        code: 'binding_not_active'
+      }
+    )
   })
 })
 
@@ -444,7 +508,7 @@ describe('TASK-1631 — acceptExternalInvitation', () => {
   it('fails closed with identity_collision when the invited email matches more than one active profile', async () => {
     route([
       [/WHERE token_hash = \$1\s+FOR UPDATE/, () => [invitationRow()]],
-      [/WHERE b\.binding_id = \$1\s+FOR UPDATE OF b/, () => [bindingRow()]],
+      [/WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/, () => [bindingRow()]],
       [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
       [/SELECT profile_id FROM greenhouse_core\.identity_profile_source_links/, () => []],
       [/lower\(canonical_email\) = \$1/, () => [{ profile_id: 'p-1' }, { profile_id: 'p-2' }]]
@@ -459,7 +523,7 @@ describe('TASK-1631 — acceptExternalInvitation', () => {
   it('fails closed when the subject is already linked to a different profile than the invited one', async () => {
     route([
       [/WHERE token_hash = \$1\s+FOR UPDATE/, () => [invitationRow({ profile_id: 'p-invited' })]],
-      [/WHERE b\.binding_id = \$1\s+FOR UPDATE OF b/, () => [bindingRow()]],
+      [/WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/, () => [bindingRow()]],
       [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
       [/SELECT profile_id FROM greenhouse_core\.identity_profile_source_links/, () => [{ profile_id: 'p-other' }]]
     ])
@@ -472,16 +536,28 @@ describe('TASK-1631 — acceptExternalInvitation', () => {
   it('desactiva los subjects ANTERIORES de la misma persona y los devuelve (recuperación, TASK-1830)', async () => {
     route([
       [/WHERE token_hash = \$1\s+FOR UPDATE/, () => [invitationRow({ profile_id: 'p-1' })]],
-      [/WHERE b\.binding_id = \$1\s+FOR UPDATE OF b/, () => [bindingRow()]],
+      [/WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/, () => [bindingRow()]],
       [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
       [/SELECT profile_id FROM greenhouse_core\.identity_profile_source_links/, () => []],
-      [/SELECT active, status, merged_into_profile_id/, () => [{ active: true, status: 'active', merged_into_profile_id: null }]],
+      [
+        /SELECT active, status, merged_into_profile_id/,
+        () => [{ active: true, status: 'active', merged_into_profile_id: null }]
+      ],
       [/INSERT INTO greenhouse_core\.identity_profile_source_links/, () => []],
       [/UPDATE greenhouse_core\.identity_profile_source_links/, () => [{ source_object_id: 'sub-viejo' }]],
       [/revoke_reason = 'superseded_by_reinvitation'/, () => []],
-      [/SET status = 'linked'/, params => [
-        invitationRow({ status: 'linked', profile_id: params[1], link_id: params[2], linked_at: '2026-09-04T00:00:00Z', accepted_at: '2026-09-04T00:00:00Z' })
-      ]],
+      [
+        /SET status = 'linked'/,
+        params => [
+          invitationRow({
+            status: 'linked',
+            profile_id: params[1],
+            link_id: params[2],
+            linked_at: '2026-09-04T00:00:00Z',
+            accepted_at: '2026-09-04T00:00:00Z'
+          })
+        ]
+      ],
       [/INSERT INTO greenhouse_core\.external_identity_audit_log/, () => []]
     ])
 
@@ -505,7 +581,7 @@ describe('TASK-1631 — acceptExternalInvitation', () => {
   it('creates a new external_contact profile when nobody matches, links (environment, subject) and marks linked', async () => {
     route([
       [/WHERE token_hash = \$1\s+FOR UPDATE/, () => [invitationRow({ designated_admin: true })]],
-      [/WHERE b\.binding_id = \$1\s+FOR UPDATE OF b/, () => [bindingRow()]],
+      [/WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/, () => [bindingRow()]],
       [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
       [/SELECT profile_id FROM greenhouse_core\.identity_profile_source_links/, () => []],
       [/lower\(canonical_email\) = \$1/, () => []],
@@ -513,15 +589,30 @@ describe('TASK-1631 — acceptExternalInvitation', () => {
       [/INSERT INTO greenhouse_core\.identity_profile_source_links/, () => []],
       [/UPDATE greenhouse_core\.identity_profile_source_links/, () => []],
       [/revoke_reason = 'superseded_by_reinvitation'/, () => []],
-      [/SET status = 'linked'/, params => [
-        invitationRow({ status: 'linked', profile_id: params[1], link_id: params[2], linked_at: '2026-09-04T00:00:00Z', accepted_at: '2026-09-04T00:00:00Z' })
-      ]],
+      [
+        /SET status = 'linked'/,
+        params => [
+          invitationRow({
+            status: 'linked',
+            profile_id: params[1],
+            link_id: params[2],
+            linked_at: '2026-09-04T00:00:00Z',
+            accepted_at: '2026-09-04T00:00:00Z'
+          })
+        ]
+      ],
       [/SET designated_admin_profile_id = \$2/, () => []],
       [/INSERT INTO greenhouse_core\.external_identity_audit_log/, () => []]
     ])
 
     const result = await acceptExternalInvitation(
-      { token: 'tok', environmentId: 'efeonce-auth', subject: 'sub-1', verifiedEmail: 'ANA@cliente.cl', displayName: 'Ana' },
+      {
+        token: 'tok',
+        environmentId: 'efeonce-auth',
+        subject: 'sub-1',
+        verifiedEmail: 'ANA@cliente.cl',
+        displayName: 'Ana'
+      },
       authServer
     )
 
@@ -547,19 +638,25 @@ describe('TASK-1631 — revokeExternalAccess', () => {
 
   it('binding scope revokes grants + members, deactivates orphan links and bumps grants_version', async () => {
     route([
-      [/WHERE b\.binding_id = \$1\s+FOR UPDATE OF b/, () => [bindingRow()]],
+      [/WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/, () => [bindingRow()]],
       [/UPDATE greenhouse_core\.external_capability_grants[\s\S]*RETURNING grant_id/, () => [{ grant_id: 'xcg-1' }]],
-      [/UPDATE greenhouse_core\.external_member_invitations[\s\S]*RETURNING invitation_id, profile_id/, () => [
-        { invitation_id: 'xmi-1', profile_id: 'p-1' },
-        { invitation_id: 'xmi-2', profile_id: null }
-      ]],
+      [
+        /UPDATE greenhouse_core\.external_member_invitations[\s\S]*RETURNING invitation_id, profile_id/,
+        () => [
+          { invitation_id: 'xmi-1', profile_id: 'p-1' },
+          { invitation_id: 'xmi-2', profile_id: null }
+        ]
+      ],
       [/UPDATE greenhouse_core\.external_organization_bindings\s+SET status = 'revoked'/, () => []],
       [/UPDATE greenhouse_core\.identity_profile_source_links l/, () => []],
       [/SET grants_version = grants_version \+ 1/, () => [{ grants_version: 2 }]],
       [/INSERT INTO greenhouse_core\.external_identity_audit_log/, () => []]
     ])
 
-    const result = await revokeExternalAccess({ scope: 'binding', bindingId: 'xob-1', reason: 'cliente terminó' }, actor)
+    const result = await revokeExternalAccess(
+      { scope: 'binding', bindingId: 'xob-1', reason: 'cliente terminó' },
+      actor
+    )
 
     expect(result).toMatchObject({
       scope: 'binding',
@@ -580,7 +677,12 @@ describe('TASK-1631 — revokeExternalAccess', () => {
   })
 
   it('is idempotent on an already revoked binding (no bump, no audit, no outbox)', async () => {
-    route([[/WHERE b\.binding_id = \$1\s+FOR UPDATE OF b/, () => [bindingRow({ status: 'revoked', revoked_at: '2026-09-04T00:00:00Z', grants_version: 7 })]]])
+    route([
+      [
+        /WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/,
+        () => [bindingRow({ status: 'revoked', revoked_at: '2026-09-04T00:00:00Z', grants_version: 7 })]
+      ]
+    ])
 
     const result = await revokeExternalAccess({ scope: 'binding', bindingId: 'xob-1', reason: 'again' }, actor)
 
@@ -592,23 +694,32 @@ describe('TASK-1631 — revokeExternalAccess', () => {
 
   it('member scope revokes only that person and bumps grants_version', async () => {
     route([
-      [/WHERE b\.binding_id = \$1\s+FOR UPDATE OF b/, () => [bindingRow()]],
-      [/UPDATE greenhouse_core\.external_member_invitations[\s\S]*RETURNING invitation_id, profile_id/, params => {
-        expect(params[3]).toBe('p-1')
+      [/WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/, () => [bindingRow()]],
+      [
+        /UPDATE greenhouse_core\.external_member_invitations[\s\S]*RETURNING invitation_id, profile_id/,
+        params => {
+          expect(params[3]).toBe('p-1')
 
-        return [{ invitation_id: 'xmi-1', profile_id: 'p-1' }]
-      }],
-      [/UPDATE greenhouse_core\.external_capability_grants[\s\S]*RETURNING grant_id/, params => {
-        expect(params[3]).toBe('p-1')
+          return [{ invitation_id: 'xmi-1', profile_id: 'p-1' }]
+        }
+      ],
+      [
+        /UPDATE greenhouse_core\.external_capability_grants[\s\S]*RETURNING grant_id/,
+        params => {
+          expect(params[3]).toBe('p-1')
 
-        return []
-      }],
+          return []
+        }
+      ],
       [/UPDATE greenhouse_core\.identity_profile_source_links l/, () => []],
       [/SET grants_version = grants_version \+ 1/, () => [{ grants_version: 3 }]],
       [/INSERT INTO greenhouse_core\.external_identity_audit_log/, () => []]
     ])
 
-    const result = await revokeExternalAccess({ scope: 'member', bindingId: 'xob-1', profileId: 'p-1', reason: 'baja' }, actor)
+    const result = await revokeExternalAccess(
+      { scope: 'member', bindingId: 'xob-1', profileId: 'p-1', reason: 'baja' },
+      actor
+    )
 
     expect(result).toMatchObject({ scope: 'member', changed: true, grantsVersion: 3, revokedProfileIds: ['p-1'] })
   })

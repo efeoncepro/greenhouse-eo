@@ -118,7 +118,7 @@ Jerarquías sin herramienta = **estimación**, no dato medido.
 
 ### B4 · Datos verificados
 
-Crear tabla de claims permitidos a partir de ficha técnica + ficha pública viva.
+Crear tabla de claims permitidos a partir de la ficha técnica + la página pública del producto viva.
 
 - lo que no esté verificado no entra;
 - si dos fuentes contradicen, ambas quedan como discrepancia y ninguna se publica;

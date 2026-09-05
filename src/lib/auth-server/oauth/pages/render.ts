@@ -10,7 +10,8 @@ import { EFEONCE_BRAND_NAME } from '@/config/efeonce-brand'
 import { GH_AUTH_SERVER } from '@/lib/copy/auth-server'
 
 import type { OAuthErrorCode } from '../errors'
-import { EFEONCE_ISOTIPO_SVG } from './efeonce-isotipo.generated'
+import { EFEONCE_ISOTIPO_SVG, EFEONCE_LOGOTYPE_NEGATIVE_SVG } from './efeonce-isotipo.generated'
+import { ICON_ALERT, ICON_BUILDING, ICON_EYE, ICON_LOCK, ICON_PENCIL, ICON_SHIELD_CHECK } from './icons'
 import { AUTH_SERVER_STYLES } from './styles.generated'
 import { isWriteScope } from '../scopes'
 
@@ -24,7 +25,28 @@ const STYLES = AUTH_SERVER_STYLES
  * (TASK-1830) use EXACTAMENTE la misma marca y CSP que las del protocolo, en vez de un segundo
  * layout que se desincronice.
  */
-export const layout = (title: string, body: string, options: { state?: 'login' | 'consent' | 'verification'; clientName?: string } = {}): string => `<!doctype html>
+/**
+ * Panel de marca del acceso. Sólo aparece en `/login` y sólo desde 64rem: es la primera pantalla que
+ * ve alguien de fuera de Efeonce y lleva el logotipo institucional en negativo (SSOT
+ * `public/branding/logo-negative.svg`), no una reconstrucción tipográfica. Va DESPUÉS del formulario
+ * en el DOM —el orden visual lo pone CSS— para que el foco y los lectores de pantalla lleguen antes
+ * al campo que al mensaje de marca.
+ */
+const brandRail = (): string => `<aside class="id-rail">
+    <div class="id-rail-inner">
+      <div class="id-rail-logo" role="img" aria-label="${escapeHtml(EFEONCE_BRAND_NAME)}">${EFEONCE_LOGOTYPE_NEGATIVE_SVG}</div>
+      <p class="id-rail-kicker">${escapeHtml(GH_AUTH_SERVER.brand_title)}</p>
+      <p class="id-rail-headline">${escapeHtml(GH_AUTH_SERVER.login_rail_headline)} <em>${escapeHtml(GH_AUTH_SERVER.login_rail_headline_accent)}</em>.</p>
+      <p class="id-rail-body">${escapeHtml(GH_AUTH_SERVER.login_rail_body)}</p>
+      <p class="id-rail-trust">${ICON_LOCK}<span>${escapeHtml(GH_AUTH_SERVER.login_rail_trust)}</span></p>
+    </div>
+    <span class="id-rail-mark" aria-hidden="true">${EFEONCE_ISOTIPO_SVG}</span>
+  </aside>`
+
+export const layout = (title: string, body: string, options: { state?: 'login' | 'consent' | 'verification'; clientName?: string } = {}): string => {
+  const state = options.state ?? 'verification'
+
+  return `<!doctype html>
 <html lang="${GH_AUTH_SERVER.page_lang}">
 <head>
 <meta charset="utf-8">
@@ -34,14 +56,17 @@ export const layout = (title: string, body: string, options: { state?: 'login' |
 <style>${STYLES}</style>
 </head>
 <body>
-<main class="id-page" data-capture="id-shell" data-state="${options.state ?? 'verification'}" data-surface-recipe="settingsFlow" aria-labelledby="page-title">
-  <header class="id-brand" aria-label="${escapeHtml(EFEONCE_BRAND_NAME)}">${EFEONCE_ISOTIPO_SVG}<span>${escapeHtml(GH_AUTH_SERVER.brand_title)}</span></header>
-  ${options.clientName ? `<div class="id-context" data-capture="id-client"><span class="id-muted">${escapeHtml(GH_AUTH_SERVER.application_context_label)}</span><strong>${escapeHtml(options.clientName)}</strong></div>` : ''}
-  <div class="id-surface">${body}</div>
-  <details class="id-footer"><summary>${escapeHtml(GH_AUTH_SERVER.font_licenses_label)}</summary><a href="/fonts/licenses/Geist-OFL.txt">Geist</a><a href="/fonts/licenses/Poppins-OFL.txt">Poppins</a></details>
-</main>
+<div class="id-canvas" data-state="${state}">
+  <main class="id-page" data-capture="id-shell" data-state="${state}" data-surface-recipe="settingsFlow" aria-labelledby="page-title">
+    <header class="id-brand" aria-label="${escapeHtml(EFEONCE_BRAND_NAME)}">${EFEONCE_ISOTIPO_SVG}<span>${escapeHtml(GH_AUTH_SERVER.brand_title)}</span></header>
+    ${options.clientName ? `<div class="id-context" data-capture="id-client"><span class="id-muted">${escapeHtml(GH_AUTH_SERVER.application_context_label)}</span><strong>${escapeHtml(options.clientName)}</strong></div>` : ''}
+    <div class="id-surface">${body}</div>
+  </main>
+  ${state === 'login' ? brandRail() : ''}
+</div>
 </body>
 </html>`
+}
 
 export const renderLoginRequiredPage = (returnTo?: string): string =>
   layout(
@@ -57,7 +82,7 @@ export const renderStepUpRequiredPage = (returnTo?: string): string =>
     GH_AUTH_SERVER.step_up_required_title,
     `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.step_up_required_title)}</h1>
   <p>${escapeHtml(GH_AUTH_SERVER.step_up_required_body)}</p>
-  ${returnTo ? `<a class="id-primary" href="${escapeHtml('/login/step-up?' + new URLSearchParams({ return_to: returnTo }))}">${escapeHtml(GH_AUTH_SERVER.totp_verify_submit_cta)}</a>` : ''}`
+  ${returnTo ? `<a class="id-primary" href="${escapeHtml('/login/step-up?' + new URLSearchParams({ return_to: returnTo }))}">${ICON_SHIELD_CHECK}${escapeHtml(GH_AUTH_SERVER.totp_verify_submit_cta)}</a>` : ''}`
   )
 
 export type ConsentPageInput = {
@@ -72,6 +97,7 @@ export type ConsentPageInput = {
 
 export const renderConsentPage = (input: ConsentPageInput): string => {
   const organizationItems = input.organizations.map(organization => `<li>
+    ${ICON_BUILDING}
     <strong>${escapeHtml(organization.organizationName)}</strong>
     <details><summary>${escapeHtml(GH_AUTH_SERVER.consent_capabilities_label)}</summary>
       <ul>${organization.capabilities.map(capability => `<li><code>${escapeHtml(capability)}</code></li>`).join('')}</ul>
@@ -81,8 +107,11 @@ export const renderConsentPage = (input: ConsentPageInput): string => {
   const scopeItems = input.scopes
     .map(scope => {
       const description = GH_AUTH_SERVER.scope_descriptions[scope] ?? GH_AUTH_SERVER.scope_description_fallback(scope)
+      // El icono distingue leer de escribir de un vistazo; el badge de texto sigue siendo el que
+      // porta el significado, porque el icono es decorativo (`aria-hidden`).
+      const write = isWriteScope(scope)
 
-      return `<li class="id-scope"><span class="id-scope-kind">${escapeHtml(isWriteScope(scope) ? GH_AUTH_SERVER.scope_write_label : GH_AUTH_SERVER.scope_read_label)}</span><p>${escapeHtml(description)}</p><code class="code">${escapeHtml(scope)}</code></li>`
+      return `<li class="id-scope" data-kind="${write ? 'write' : 'read'}">${write ? ICON_PENCIL : ICON_EYE}<span class="id-scope-kind" data-kind="${write ? 'write' : 'read'}">${escapeHtml(write ? GH_AUTH_SERVER.scope_write_label : GH_AUTH_SERVER.scope_read_label)}</span><p>${escapeHtml(description)}</p><code class="code">${escapeHtml(scope)}</code></li>`
     })
     .join('\n    ')
 
@@ -91,7 +120,7 @@ export const renderConsentPage = (input: ConsentPageInput): string => {
     `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.consent_title)}</h1>
   <p>${escapeHtml(GH_AUTH_SERVER.consent_context_intro(input.organizations.length))}</p>
   <h2 class="id-muted">${escapeHtml(input.organizations.length === 1 ? GH_AUTH_SERVER.consent_organization_label : GH_AUTH_SERVER.consent_organizations_label)}</h2>
-  <ul aria-label="${escapeHtml(GH_AUTH_SERVER.consent_organizations_label)}">${organizationItems}</ul>
+  <ul class="id-organizations" aria-label="${escapeHtml(GH_AUTH_SERVER.consent_organizations_label)}">${organizationItems}</ul>
   <ul class="id-permissions" aria-label="${escapeHtml(GH_AUTH_SERVER.consent_scope_label)}">
     ${scopeItems}
   </ul>
@@ -121,6 +150,6 @@ export const renderErrorPage = (code: OAuthErrorCode): string =>
   layout(
     GH_AUTH_SERVER.error_title,
     `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.error_title)}</h1>
-  <p>${escapeHtml(ERROR_BODIES[code] ?? GH_AUTH_SERVER.error_generic_body)}</p>
+  <p class="id-alert" role="alert">${ICON_ALERT}<span>${escapeHtml(ERROR_BODIES[code] ?? GH_AUTH_SERVER.error_generic_body)}</span></p>
   <p class="code">${escapeHtml(GH_AUTH_SERVER.error_code_label)}: ${escapeHtml(code)}</p>`
   )

@@ -8,20 +8,29 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
+import { sanitizeBrandSvg } from './brand-svg'
 import { createAuthServerStyles } from './styles'
 import { renderAuthFontAssetsModule } from './generate-font-assets'
 import { generateStepUpController } from './step-up-controller-build'
 
 const ROOT = process.cwd()
 const SOURCE = join(ROOT, 'public/branding/SVG/isotipo-full-efeonce.svg')
+/** Logotipo institucional en negativo: es el que va sobre el panel oscuro del acceso (TASK-1835). */
+const LOGOTYPE_SOURCE = join(ROOT, 'public/branding/logo-negative.svg')
 const TARGET = join(ROOT, 'src/lib/auth-server/oauth/pages/efeonce-isotipo.generated.ts')
 
-const svg = readFileSync(SOURCE, 'utf8').replace(/^<\?xml[^>]*>\s*/u, '').trim()
+const readBrandSvg = (path: string): string => sanitizeBrandSvg(readFileSync(path, 'utf8'))
 
-const output = `// GENERATED FILE — no editar a mano. Fuente: public/branding/SVG/isotipo-full-efeonce.svg
-// Regenerar: pnpm auth-server:brand-assets:generate (TASK-1829)
+const svg = readBrandSvg(SOURCE)
+const logotype = readBrandSvg(LOGOTYPE_SOURCE)
+
+const output = `// GENERATED FILE — no editar a mano. Fuentes: public/branding/SVG/isotipo-full-efeonce.svg
+// y public/branding/logo-negative.svg
+// Regenerar: pnpm auth-server:brand-assets:generate (TASK-1829 / TASK-1835)
 
 export const EFEONCE_ISOTIPO_SVG = ${JSON.stringify(svg)}
+
+export const EFEONCE_LOGOTYPE_NEGATIVE_SVG = ${JSON.stringify(logotype)}
 `
 
 writeFileSync(TARGET, output)

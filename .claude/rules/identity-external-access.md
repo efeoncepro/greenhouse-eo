@@ -1,6 +1,7 @@
 ---
 paths:
   - "src/lib/identity/external-access/**"
+  - "src/lib/identity/internal-access/**"
   - "src/app/api/admin/identity/external-access/**"
   - "src/app/api/platform/ecosystem/identity/**"
   - "scripts/identity/**"
@@ -14,7 +15,7 @@ Grafo: `external_identity_environments` → `external_organization_bindings` (`g
 
 Reglas duras:
 
-1. **NUNCA** escribir `greenhouse_core.external_*` fuera de los commands de `src/lib/identity/external-access/commands.ts` (una tx: estado + audit + outbox; los dos logs son append-only con trigger; el token de invitación se devuelve UNA vez y sólo se persiste su sha256).
+1. **NUNCA** escribir `greenhouse_core.external_*` fuera del núcleo canónico `src/lib/identity/external-access/commands.ts` y `authority-transactions.ts`. El wrapper interno compone las mismas primitives dentro de una única tx: estado + audit externo + outbox + versión; su audit interno es complementario. Población del binding explícita e inmutable: externo cliente activo + `linked`; interno enrollment + workforce y entidad operativa propia activos. Recuperación externa no toca source links internos. Ver delta de integridad del ADR interno TASK-1836. Los logs son append-only; reconciliar con actor/razón actuales, no fabricar historia. El token de invitación se devuelve UNA vez y sólo persiste sha256.
 2. **NUNCA** resolver una persona por `client_id` ni por email: sólo por `(environment_id, subject)` vía `identity_profile_source_links` (`external_idp:<env>`). El email sólo desambigua al ACEPTAR una invitación y >1 match es `identity_collision`, nunca "el primero".
 3. **NUNCA** llavear nada por el `issuer_url` crudo: la clave es `environment_id`; rotar issuer es un UPDATE auditado del environment e `issuer_class` es inmutable.
 4. **SIEMPRE** bump de `grants_version` cuando cambia la autoridad (grant nuevo; revoke de grant, member o binding). El gateway compara por igualdad: un cambio sin bump sigue sirviendo el token viejo hasta que expire.

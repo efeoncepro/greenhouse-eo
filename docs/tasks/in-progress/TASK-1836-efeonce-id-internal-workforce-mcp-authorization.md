@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `rollout parcial (2026-09-05): release main1086fe40 / run33978290957 completado, watchdog 5/5 correcto; GC ON y cron ejecutado. Reader Production ON; gateway dd04f470 / 00032-qm5 ON con discovery verificado. Login Microsoft completó MFA, pero callback rechazó upstream_rejected sin emitir token. Defectos de scope OIDC y reloj corregidos localmente con diagnóstico seguro; 65 pruebas y typecheck correctos, publicación pendiente. Emisor interno temporalmente OFF durable y revisión00012-tvn para evitar más intentos contra la versión anterior. Canary de lectura, revocación y rollback aún pendientes; no cerrar.`
+- Status real: `2026-09-05: publicación reanudada tras cierre UI de Claude y autorización del operador para integrar y avanzar. Reparación commit 0fc7a4bc5; 407 pruebas auth/identity y 6 checks browser local correctos, build exit0. Gateway d7469d7 pusheado y CI/contenedor verde, deploy en curso. Migración y reconciliación ya aplicadas (gv3, idempotencia0/0, ambas señales0). Emisor interno OFF hasta release/readbacks; canary humano, refresh, revocación y rollback pendientes.`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -580,7 +580,7 @@ interactivo del sujeto real cuando corresponda. No enviar correos ni mensajes si
 
 - [ ] Cada caso de la matriz §8 tiene evidencia de comportamiento y outcome esperado/real; casos live sin ejecutar quedan pendientes, nunca verdes por skip.
 - [ ] Inventario de configuración Entra, redirects, secrets y flags verificado sin valores sensibles; callback real corresponde al runtime desplegado.
-- [x] Enrolamiento idempotente y auditado, con capability fina y camino programático; ningún vínculo nace por coincidencia de email. Commands/store y prueba PG `internal-access/commands.live.test.ts` verifican idempotencia y revocación; piloto real enrolado sobre identidad canónica, grant de lectura con vigencia y `gv=2`. El login humano permanece pendiente.
+- [ ] Enrolamiento idempotente y auditado, con capability fina y camino programático; ningún vínculo nace por coincidencia de email. **Reabierto 2026-09-05:** los tests actuales prueban idempotencia y audit/outbox internos, pero el piloto carece de audit y eventos canónicos de las tablas compartidas. Falta unificar writer/política de población, proteger recuperación cruzada y regularizar filas con evidencia explícita; no considerar este criterio satisfecho por el audit interno solamente.
 - [x] Consentimiento y refresh no permiten cambiar persona, contexto ni elevar permisos; tokens previos no adquieren autoridad interna por default. OAuth JWT ES256 y pruebas PG de consentimiento/rotación verificadas.
 - [ ] Baja remota y baja canónica tienen latencias declaradas separadamente; revocación multicontexto pasa el caso A=10/B=2->3.
 - [ ] Rollback ensayado registra duración real, revocación selectiva y comprobación de externos/Entra legado; no depende de apagar todo OAuth.
@@ -803,3 +803,94 @@ acredita causa exacta con ese código agregado. Se corrigieron dos defectos repr
 OIDC solicita `openid profile` para disponer de `oid`, y el reloj JWT se lee después del intercambio.
 Diagnósticos internos limitados a enum, sin datos secretos ni exposición HTTP adicional. 65 pruebas
 integradas y typecheck correctos; emisor OFF durante publicación, reader/gateway preparados.
+
+
+## Corrección de integridad del writer compartido — 2026-09-05
+
+Hallazgo comunicado por Claude TASK-1631/1831 y confirmado independientemente por Codex. El operador
+confirmó que Claude no modifica el módulo y asignó la corrección a Codex. Binding
+`xob-139e3fe2-f897-4eff-83c6-39c29193d934` y grant
+`xcg-a6de7627-f57f-4686-9d70-ef850b62a526` tienen cero audit externo canónico. Sí existen audit interno
+enrolled/capability_granted y ambos eventos internos publicados. Cero access tokens emitidos para el
+binding. No afirmar ausencia total de auditoría ni exposición demostrada.
+
+El detector nuevo, ejecutado read-only sobre PG antes de reconciliar, devuelve
+`identity.external_binding.unaudited_write`, severity error, `unaudited_write_count=2`.
+Tests focales: 9 unitarios y 1 live de SQL pasaron; el live usa tablas TEMP y rollback, no muta datos reales.
+La reconciliación válida exige evento aplicado, IDs correlacionados y metadata interna/version numérica1;
+auditoría ajena, denegada o metadata incorrecta no oculta la anomalía. Implementación local, aún no publicada.
+
+Decisión A registrada en ADR: primitives canónicas compartidas y población persistida; enrollment interno
+es la membership interna, `linked` se conserva para externos. No crear invitaciones ficticias ni cambiar
+lifecycle comercial de Efeonce. EO-ORG-0007 tiene `status=active`, `active=true`, `is_operating_entity=true`
+y `lifecycle_stage=inactive`; se exige también status activo para no ignorar una suspensión administrativa.
+
+Pendiente: finalizar y revisar migración/clasificación y command de reconciliación, comprobar atomicidad,
+recuperación cruzada y conflictos, aplicar con dry-run/evidencia, repetir smoke y live, publicar y recién
+entonces repetir login/MCP/revocación/rollback. El release OIDC223 completado no cierra esta corrección.
+
+
+### Revisión independiente de continuidad — 2026-09-05
+
+Objetivo y rollout autorizados conservados del traspaso; hook `pnpm codex:task-hook TASK-1836 --subagents`
+ejecutado en develop compartido. Ownership separado: resolver/gateway, señales y reconciliación; root
+posee migración, integración y publicación. El operador autorizó después el commit completo
+`7d704f483` que Claude creó con TASK-1836 y Berel; el WIP UI posterior queda separado.
+
+Auditoría: núcleo usa el mismo PoolClient para estado/audit/outbox/gv y serializa por environment/binding.
+Se corrigen clasificación interna como unbound, falta de detector permanente y migración manual. La revisión
+adicional halló grants internos NULL aceptados por reader y reconciliación que no verificaba capability,
+vencimiento y pareja audit/outbox. Son condiciones de integridad previas a aplicar, no aprobaciones heredadas.
+
+PG leído en esta sesión: ninguna migración authority-populations registrada, columna population ausente,
+última migración `20260905132652846`. Cloud Run `auth-server-00013-jhz` con acceso interno false.
+`pnpm migrate:create task-1836-authority-populations` generó `20260905183812333`; el SQL anterior se trasladó
+byte-for-byte (SHA256 `13f6eb700192fa102dd4558abd3b9a6f935d7d657206414e3a3a3f3ae5dbabc7`) antes de retirar el
+archivo manual no aplicado. Después se amplió CHECK de outcomes, validación del grant y guard final.
+
+Down es forward-only: eliminar población fusionaría contratos de autoridad y no restauraría el historial
+ni los tokens invalidados por gv. Rollback operativo apaga emisión/dispatch interno y conserva estructura;
+una corrección de datos posterior exige nueva migración/command, nunca deshacer historia.
+
+Plan restante: SQL live final y pruebas de reconciliación -> smoke externo -> gates locales -> apply de
+migración/regularización con readbacks -> release gobernado -> canary humano, refresh, revocación y rollback.
+No se marca aceptación por pruebas anteriores al diff final.
+
+
+### Integridad aplicada y publicación en espera — 2026-09-05
+
+- Runner: sólo una migración pendiente; `pnpm migrate:up` exit 0, registro y columna releídos,
+  tipos PG regenerados (una columna population). Piloto gv 2 → 3. Emisor OFF antes del cambio.
+- Reconciliación autorizada con actor canónico y razón explícita: dry-run 1 binding/1 grant,
+  apply 1/1, nueva revisión dry-run 0/0, gv 3. No amplía capability ni vencimiento original
+  2026-09-12T15:00:00Z. Audit/outbox actuales correlacionados; historia interna original conservada.
+- Readback de SQL real: `unaudited_write_count=0`, `mixed_population_count=0`, ambas severity ok.
+- Suites finales: 118 unitarias / 12 archivos; 20 live / 4 archivos; recuperación externa live
+  adicional 1 passed (segunda invitación, subject viejo invalidado y vínculo interno protegido).
+  Typecheck previo y gates worker/build-inputs, manifest y mirrors correctos; gateway 126 pruebas.
+- Build compartido compila pero falla TypeScript en WIP UI ajeno: `render.ts` importa `ICON_LOCK`
+  inexistente en `icons.ts`. El operador eligió esperar a Claude; no se modifica ese WIP ni se
+  declara build verde. No se ejecutó push, release ni activación por esta reparación todavía.
+
+- Smoke externo read-only y apply completados: alta/invitación/aceptación/bound/revocación,
+  fixture final revocada; audit e idempotencia correctos. La señal unbound conserva warnings
+  por los probes negativos de las últimas 24h; no se eliminaron logs para ocultarlos.
+- Readback del piloto verifica ambos pares canónicos y reconciliationId
+  `41659bc7-c6f0-4eb0-8c46-6dafb80e562b`, actor y motivo, dos IDs originales y expiración sin cambio.
+- Claude añadió posteriormente ICON_LOCK; esto no acredita que terminara la UI ni un build nuevo.
+  Se respeta la instrucción de esperar su cierre antes de repetir build/publicar.
+- `task:lint` template=1, errors=0, warnings=0; `docs:closure-check` exit 0 con advertencias
+  documentales preexistentes/de revisión. Lifecycle sigue in-progress; no se mueve la task.
+
+
+### Reanudación después de Claude — 2026-09-05 19:51 UTC
+
+El operador confirmó cierre de Claude y autorizó avanzar con todo. Se revisaron los commits UI
+eec90bf10…dcb299cb7 y la reparación 0fc7a4bc5, con árbol limpio al retomar. Dirección visual aprobada
+A/Nocturno editorial; los criterios integrales de TASK-1835 siguen en su task y no se declaran completos
+por este piloto. 407 pruebas unitarias y 6 checks de renderers/controladores locales pasaron.
+La nota de Claude sobre flags de main estaba stale: origin/main a68662508 ya declara OAuth/person true;
+se corrigió la nota. GitHub internalAuth false y permisos del operador de excepción batch revalidados.
+Preflight configurado: PG/migraciones/WIF/Sentry correctos; faltan SHA publicado/CI y excepción batch
+por migración ya aplicada. Ningún bypass de evidencia CI/readiness. Gateway d7469d7, CI33988476298
+con contenedor success; deploy33988521730 en curso.

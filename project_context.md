@@ -121,8 +121,9 @@ entregado en `TASK-1805`/`TASK-1806`: desde 2026-09-03 producción sirve `improv
 (rebaseline); legacy sólo como rollback pre-corte.
 
 Informes: skill `report-studio` (Claude/Codex), evidencia, diseño y QA PDF.
-Berel: [plan editorial](docs/operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md) ·
-[informes SEO/AEO](docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md).
+Berel: `berel-content-production` ·
+[plan](docs/operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md) ·
+[informes](docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md).
 
 WordPress/Ohio: skill `efeonce-public-site-wordpress`; contratos [Home](docs/architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md),
 [HubSpot](docs/architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md) y [misceláneas](docs/architecture/public-site/PUBLIC_MISCELLANEOUS_SURFACES_V1.md).

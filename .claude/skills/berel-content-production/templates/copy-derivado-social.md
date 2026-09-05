@@ -96,6 +96,6 @@ CTA: "Guarda para tu proyecto" · enlace a ficha o artículo real
 - [ ] **Canales propios en posesivo**: "nuestro blog", nunca "el blog" a secas
 - [ ] Producto nombrado **una sola vez**
 - [ ] Sin claims sin respaldo del Lab — los ciclos de lavado **no se citan en social**
-- [ ] Enlace al artículo o ficha real, **nunca a la búsqueda del sitio**
+- [ ] Enlace al artículo o a la página pública del producto, **nunca a la búsqueda del sitio**
 - [ ] CTA de blog como **Inspiración**, con `berel.com/inspiracion` en negrita
 - [ ] Sin superlativos vacíos, urgencia, competencia ni clichés de mexicanidad

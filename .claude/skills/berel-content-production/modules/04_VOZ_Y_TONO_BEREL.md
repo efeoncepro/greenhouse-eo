@@ -69,6 +69,11 @@ el lector sienta un recorrido y no bloques sueltos.
 para la voz de Berel ("nuestro catálogo", "nuestro artículo"). Lo que se evita es **dirigirse al
 lector en "nosotros"**, no la primera persona de marca.
 
+🔴 **El texto público no narra el proceso interno.** Efeonce, `el cliente`, instrucciones recibidas,
+posicionamiento editorial, CMS, extracción y verificaciones quedan en callouts internos. En público,
+Berel afirma lo respaldado directamente. Distinguir siempre **ficha técnica** (documento) de **página
+pública del producto** (URL de berel.com).
+
 ## Anatomía del artículo
 
 | Bloque | Qué contiene y por qué |
@@ -79,7 +84,7 @@ lector en "nosotros"**, no la primera persona de marca.
 | **Eje de decisión** | Declara el criterio/hilo conductor ("Todo se reduce a tres preguntas") |
 | **Desarrollo (H2 por tema, H3 por subtema)** | Cada sección abre con **definición extractable**. Listas reales, no prosa para enumeraciones |
 | **Tabla comparativa** | Siempre que el contenido sea comparativo. Muy citable, genera rich snippets |
-| **Datos concretos** | Cifras verificables: % de brillo, °C, rendimiento m²/L, tiempos de secado, manos. La temperatura de luz **siempre** con la fórmula adjetivo + Kelvin (*foco cálido de 2700 K*), consistente en todo el artículo |
+| **Datos concretos** | Cifras verificables: % de brillo, °C, rendimiento m²/L, tiempos de secado, manos. Temperatura de luz: **luz cálida (2700–3000 K)** · **luz neutra (4000 K)** · **luz fría (5000 K o más)**, igual en todo el artículo. Los watts expresan consumo, nunca calidez |
 | **Guía paso a paso** (si aplica) | Cada paso: *Qué hacer · Cómo saber que está listo · Error común · Tip pro.* Listo para schema `HowTo` |
 | **FAQ** | **4-6 preguntas** reales de cola larga. Primera frase = respuesta directa. Listo para `FAQPage` |
 | **Cierre + CTA triple** | Síntesis que cierra el círculo + callout con **3 acciones**: catálogo/color · dónde comprar · artículo relacionado |
@@ -103,7 +108,7 @@ Esta es la precisión que el Playbook de Producción no alcanza a dar y que camb
 
 | | Cómo se enlaza | Por qué |
 |---|---|---|
-| **Producto** | A su **ficha real** (`berel.com/productos/...`) o a la categoría `berel.com/productos`. **Nunca al Home ni a `/search?q=`** | Los productos **sí tienen ficha pública** |
+| **Producto** | A su **página pública** (`berel.com/productos/...`) o a la categoría `berel.com/productos`. **Nunca al Home ni a `/search?q=`** | Los productos pueden tener una página pública distinta de su ficha técnica |
 | **Color** | **1.º** la página de **paleta o artículo** que sí rankea (hub & spoke) · **2.º** `berel.com/colores/<familia>` · 🔴 **NUNCA la búsqueda del sitio** | **Berel no tiene página pública por tono**, pero **sí por familia**. Verificado en `sitemap-colores.xml` el 2026-08-25: existen exactamente **nueve** — `amarillos` · `azules` · `cafes` · `grises` · `morados` · `naranjas` · `pasteles` · `rojos` · `verdes`. Ninguna otra |
 
 Siempre con **anchor descriptivo** —nunca la URL cruda como texto del enlace— y CTA que lleve
@@ -224,7 +229,7 @@ RGB es de **consumo interno para diseño**.
 | Mexicanidad real (textura, herrería, talavera, gastronomía) | Reducir "lo mexicano" a verde-blanco-rojo o folclore de postal |
 | Cerrar el círculo emocional + síntesis + CTA | Cerrar solo con "Pinta con Confianza. Pinta con Berel." |
 | Tablas, listas y FAQ extractables | Enumeraciones largas escondidas en prosa |
-| Enlaces internos a fichas reales con anchor descriptivo | Enlazar al Home, o a `/search?q=` **cuando sí existe ficha real**; alt de imagen con URLs — ⚠️ *verbatim de Voz y Tono; el matiz "cuando sí existe ficha real" quedó superado: `robots.txt` bloquea `/search`, así que **nunca**, exista ficha o no* |
+| Enlaces internos a páginas públicas con anchor descriptivo | Enlazar al Home, o a `/search?q=` aunque exista una página pública; ALT de imagen con URLs — ⚠️ la excepción histórica quedó superada: `robots.txt` bloquea `/search`, así que **nunca** se usa |
 | Emoción contenida y editorial | Urgencia, escasez, slang juvenil o **emojis en el cuerpo del artículo** |
 | Hablar solo de Berel y del lector | Mencionar o comparar con la competencia |
 
@@ -268,8 +273,10 @@ releyendo.
 | **5 · Enlaces prohibidos** | `grep -nE "/search\|\?q=" ARCHIVO` | Cualquier hallazgo es falla: `robots.txt` bloquea esas rutas |
 | **6 · Dosis del nombre de producto** | `for p in Berelinte "Kalos Tone" "Multitono Pro" Insignia "Esmalte Summa" Berelex; do echo -n "$p: "; grep -oi "$p" ARCHIVO \| wc -l; done` | El nombre completo va **una sola vez** y después "la pintura" o "el esmalte". ⚠️ **Descuenta las apariciones dentro de una URL y dentro de una tabla de datos** — una fila comparativa no es repetición promocional. Cuenta las visibles en prosa |
 | **7 · Extensión real del cuerpo** | El conteo debe **excluir callouts, tablas y el bloque de metadatos** | Con `wc -w` sobre el archivo completo el resultado **miente**: infla el número y te hace creer que llegaste al piso |
+| **8 · Lenguaje interno expuesto** | `grep -niE "el cliente\|instrucción del cliente\|posicionamiento editorial\|la ficha declara\|extracción\|CMS" ARCHIVO` | Revisar cada hallazgo; cualquiera que narre la operación interna dentro del cuerpo público es falla |
+| **9 · Giros corregidos por el cliente** | `grep -niE "pintura sana\|muévele la hora\|la cuenta fina\|aplicados en frío\|pintura pele\|formulación premium" ARCHIVO` | Sustituir por lenguaje literal es-MX o retirar el claim; no son fórmulas públicas aprobadas |
 
-**8 · Lo que se verifica mirando, porque ningún grep lo ve:**
+**10 · Lo que se verifica mirando, porque ningún grep lo ve:**
 
 - que exista el **BerelTip** en piezas de registro técnico o tutorial;
 - que la **respuesta directa extractable de 40 a 55 palabras** esté justo después del gancho;
@@ -303,6 +310,12 @@ done
 
 echo "== 7. Extensión del cuerpo (sin tablas, callouts ni metadatos) =="
 sed '/^---$/,/^---$/d' "$ARCHIVO" | grep -vE '^\s*(\||>|#|!\[|\[)' | wc -w
+
+echo "== 8. Lenguaje interno expuesto =="
+grep -niE "el cliente|instrucción del cliente|posicionamiento editorial|la ficha declara|extracción|CMS" "$ARCHIVO"
+
+echo "== 9. Giros corregidos por el cliente =="
+grep -niE "pintura sana|muévele la hora|la cuenta fina|aplicados en frío|pintura pele|formulación premium" "$ARCHIVO"
 ```
 
 ## Checklist de publicación (estándar de la marca)
@@ -311,10 +324,12 @@ sed '/^---$/,/^---$/d' "$ARCHIVO" | grep -vE '^\s*(\||>|#|!\[|\[)' | wc -w
 - [ ] Respuesta directa (TL;DR) en las primeras líneas
 - [ ] Hilo conductor declarado y sostenido hasta el cierre
 - [ ] Tuteo al lector y "nosotros/nuestro" solo para la voz de marca
+- [ ] Sin lenguaje de cliente/agencia/CMS/verificación dentro del cuerpo público
 - [ ] Definición extractable al abrir cada sección
 - [ ] Tabla comparativa y/o guía paso a paso donde aplique
 - [ ] FAQ de 4-6 preguntas con respuesta directa
 - [ ] Datos concretos y verificables (cifras, tiempos, rendimientos)
+- [ ] Kelvin con la fórmula homologada y watts solo como consumo
 - [ ] Producto integrado como solución, nombrado con mesura
 - [ ] Mexicanidad auténtica que sostiene el artículo
 - [ ] Léxico mexicano correcto (brochazo, deja, variedad de colores…)

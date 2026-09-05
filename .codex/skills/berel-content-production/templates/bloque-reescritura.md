@@ -41,19 +41,23 @@
 	  ← el callout se inserta EN LA POSICIÓN EXACTA del texto donde va la pieza
 
 	[callout ⚠️ Pendientes]
-	- [ficha de producto sin URL pública / serie por confirmar / dato que depende del cliente]
+		- [producto sin página pública / serie por confirmar / dato que requiere fuente oficial]
 	- [pendientes de schema y dominio para Dev]
 ```
 
 ## Antes de cerrar
 
 - [ ] Cada enlace **navegado y verificado**; ninguno 404 ni solo búsqueda
-- [ ] Productos a ficha real; colores a paleta/artículo, y la búsqueda solo como último recurso
+- [ ] Productos a página pública; colores a paleta/artículo o familia; **nunca** a la búsqueda del sitio
 - [ ] Anchors descriptivos, **nunca la URL cruda** como texto visible
 - [ ] Ningún RGB/HEX y ninguna serie de producto en el cuerpo
 - [ ] Temperatura de luz con la fórmula **adjetivo + Kelvin** en **todas** las menciones
 - [ ] Nombre completo del producto **una sola vez**, contado incluido el CTA
 - [ ] Marca en **primera persona del plural**, lector en tú
+- [ ] Sin lenguaje interno (`el cliente`, instrucciones, CMS, extracción o verificación) en el cuerpo público
+- [ ] Tablas con encabezados semánticos; cada columna comparativa nombra su producto
+- [ ] Si se recomienda un especialista: CTA descriptivo a `/contacto`
+- [ ] Si es producto de awareness: diferenciador temprano y render oficial del empaque especificado
 - [ ] **Auditoría de voz corrida** contra la lista de fallas típicas (módulo `04`)
 - [ ] Releído: sin erratas en nombres de producto ni de color
 - [ ] `Estado` del artículo movido a `En revisión`

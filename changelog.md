@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-05 — TASK-1836: reparación de integridad aplicada en PG
+
+Migración CLI `20260905183812333` aplicada: población explícita e inmutable, verificación de evidencia
+y grants internos con caducidad. Piloto gv 2 → 3; reconciliación actual audit/outbox para binding y
+grant, con actor/razón, sin extender autoridad ni fabricar historia. Repetición 0/0; señales de
+escrituras sin evidencia y mezcla ambas cero. Resolver externo devuelve `internal_population`;
+gateway comprende el rechazo sin fallback. Pruebas: 118 unitarias, 20 live y 1 live adicional de
+recuperación. Publicación pendiente mientras Claude termina WIP UI que bloqueó el build compartido;
+emisor interno OFF. Commit completo `7d704f483` autorizado por el operador, incluido Berel.
+
 ## 2026-09-05 — TASK-1836: autoridad corporativa nativa y límites de autenticación
 
 Backend implementado con Entra OIDC, procedencia de sesión persistida, contexto delegado por cliente/binding,
@@ -18,7 +28,19 @@ se conservan. App Entra, secreto y KMS dedicados preparados con cohorte upstream
 y gateway publicados con gates internos OFF; sin acceso MCP interno real todavía. Gateway con 114 pruebas y JWKS acotado; first fold UI con
 GVC anónimo sin credenciales, pendiente aprobación visual. Consentimiento revalida binding/step-up
 y reader externo excluye grants vencidos. DTO canónico integrado en authorize, POST y renderer;
-permisos separados por organización y fallos sin fallback. Retorno OAuth/Microsoft conectado con flag y validación de URL; code/refresh revalidan scopes actuales del cliente. Guard de origen protege sesiones y factores, con regresiones de login CSRF; shell consume fuentes/licencias y CSS bajo CSP estricta; segundo factor TOTP/UV y alta con QR local integrados. Cuatro GVC desktop/móvil y seis checks de navegador pasan con factores ficticios. Primer despliegue autorizado con gates OFF; recheck por jti agrega revocación del token a la validación de contexto antes de activar la cohorte. El piloto ya tiene enrollment y grant de lectura temporal, por commands canónicos. Se restauran seis permisos release faltantes del rol administrador (execute ya existía), con negativos para los otros roles y Finance sólo lectura de resultados. CLI exige motivo para excepciones y lo conserva en manifest/auditoría; no inventa identidad Greenhouse desde GitHub actor. Pruebas focales 46 passed y typecheck correcto. Actualización operativa: PR #222 / main1086fe40 released por run33978290957; CI/Deep/E2E y watchdog5/5 correctos. Reader y emisor internos ON; GC ON con scheduler y ejecución real confirmada, once tablas y cero borrados. Motivo de excepción releído en manifest y auditoría PG. Activación del gateway detenida por intento de sobrescribir tag inmutable; flags restaurados OFF y fix de reutilización por digest publicado en dd04f470, 125 pruebas correctas, nuevo deploy en curso. Login Microsoft/MFA completado, callback propio rechazado. Follow-up local con openid profile, reloj JWT posterior al intercambio y diagnóstico cerrado; 65 pruebas y typecheck correctos. Emisor temporalmente OFF durante publicación; token, canaries y rollback aún pendientes. [Runbook](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
+permisos separados por organización y fallos sin fallback. Retorno OAuth/Microsoft conectado con flag y validación de URL; code/refresh revalidan scopes actuales del cliente. Guard de origen protege sesiones y factores, con regresiones de login CSRF; shell consume fuentes/licencias y CSS bajo CSP estricta; segundo factor TOTP/UV y alta con QR local integrados. Cuatro GVC desktop/móvil y seis checks de navegador pasan con factores ficticios. Primer despliegue autorizado con gates OFF; recheck por jti agrega revocación del token a la validación de contexto antes de activar la cohorte. El piloto ya tiene enrollment y grant de lectura temporal, por el command interno (integración auditora compartida reabierta posteriormente). Se restauran seis permisos release faltantes del rol administrador (execute ya existía), con negativos para los otros roles y Finance sólo lectura de resultados. CLI exige motivo para excepciones y lo conserva en manifest/auditoría; no inventa identidad Greenhouse desde GitHub actor. Pruebas focales 46 passed y typecheck correcto. Actualización operativa: PR #222 / main1086fe40 released por run33978290957; CI/Deep/E2E y watchdog5/5 correctos. Reader y emisor internos ON; GC ON con scheduler y ejecución real confirmada, once tablas y cero borrados. Motivo de excepción releído en manifest y auditoría PG. Activación del gateway detenida por intento de sobrescribir tag inmutable; flags restaurados OFF y fix de reutilización por digest publicado en dd04f470, 125 pruebas correctas, nuevo deploy en curso. Login Microsoft/MFA completado, callback propio rechazado. Follow-up local con openid profile, reloj JWT posterior al intercambio y diagnóstico cerrado; 65 pruebas y typecheck correctos. Emisor temporalmente OFF durante publicación; token, canaries y rollback aún pendientes. [Runbook](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
+
+Estado actualizado: PR #223 / main a6866250 released por run33982717767, sin override, health y watchdog5/5 correctos. Corrección OIDC y CSRF publicadas; emisor permanece OFF por hallazgo de integridad confirmado. El audit interno existe pero faltaba audit externo canónico para binding/grant; detector nuevo mide2 en PG. Decisión A: población persistida y primitives transaccionales compartidas, recuperación aislada, reconciliación actual con procedencia sin fabricar historia. Implementación local: 146 tests integrados y typecheck correctos, migración SQL13/13 y commands live TEMP correctos; endurecimiento de guard final/último canary de poblaciones en validación. No se aplicó la migración ni reconciliación real. Criterio auditado de TASK-1836 reabierto; Claude dejó ownership a Codex.
+
+## 2026-09-04 — Berel: feedback de septiembre promovido a la skill de producción
+
+Lectura integral del Playbook Producción vivo y contraste con Recomendaciones Cliente, Reglas del cliente
+y Aprendizajes del feedback. Las skills espejo Claude/Codex incorporan voz pública sin lenguaje interno,
+la rama para productos nuevos/de awareness, vocabulario técnico/público inequívoco, Kelvin homologado,
+tablas y CTA accionables, render oficial del empaque, datos faltantes solo como pendientes internos,
+correcciones de catálogo y separación Notion → CMS → publicación → URL viva. Se conserva la precedencia
+vigente frente a reglas antiguas del Playbook (`Enlace`, `/search`, longitud). No se editaron artículos,
+assets ni Drupal y no se declara ninguna publicación.
 
 ## 2026-09-04 — TASK-1830: autenticación de personas externas del emisor, sin contraseñas (viva desde el 05)
 
@@ -892,24 +914,3 @@ pero no llegaban a la pantalla:
   el control correcto es «Barrera máxima», derivada del perfil real de enlaces.
 
 Manual actualizado: `docs/manual-de-uso/growth/descubrir-keywords-seo.md` v1.3.
-
-## 2026-08-29 — release `e1718a359575`: dos guardas textuales fallaron el mismo día con signos opuestos
-
-El 4.º paso a producción del día promovió el fix de banda 2, el gate de cobertura del worker y la
-quema de la deuda de procedencia. Manifest `released` en un solo run del orquestador; canary de
-contrato verde por el lane de producción (provenance + rank monotónico — sólo el código nuevo lo
-produce) y Berel paginada entera: 501/501, secuencia == persistida. El índice keyset huérfano se
-retiró después del release (migración `20260829225504734`), como el contrato manda.
-
-El desvío enseñó el patrón del día: CI Deep rojo sobre el primer squash porque el test del contrato
-del deploy del worker contaba ocurrencias de string en el YAML — el proxy textual de un mecanismo
-que 146070ffc había reemplazado por cobertura de metafile. La misma clase que el string-match del
-ORDER BY del reader, con signo opuesto: aquél pasaba verde con banda 2 rota; éste se puso rojo con
-la cobertura mejorada. Una guarda textual debe señalar al verificador real, no reemplazarlo. Y la
-parte que no era del pipeline: la racha completa fue de **5 corridas rojas/canceladas en ~70
-minutos** — el run del commit culpable cancelado por `cancel-in-progress` (nunca juzgado), dos
-rojos de una sesión y uno del push del merge canónico de otra, sin que nadie abriera ninguno — en
-ráfagas el veredicto es del último push, y una alarma sostenida se normaliza hasta volverse
-invisible. El skip de 44 s del ops-worker esta vez fue legítimo (árboles
-idénticos, diff completo vacío): mismo síntoma que el incidente anterior, causa opuesta — los
-distingue el diff, no el cronómetro.

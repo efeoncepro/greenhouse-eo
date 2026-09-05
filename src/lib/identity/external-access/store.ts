@@ -35,6 +35,7 @@ type EnvironmentRow = {
 }
 
 type BindingRow = {
+  population: ExternalOrganizationBinding['population']
   binding_id: string
   organization_id: string
   organization_name: string | null
@@ -103,7 +104,7 @@ export const ENVIRONMENT_SELECT = `
 
 export const BINDING_SELECT = `
   b.binding_id, b.organization_id, o.organization_name, b.environment_id, b.external_organization_ref,
-  b.status, b.grants_version, b.designated_admin_profile_id, b.reason, b.bound_by, b.bound_at,
+  b.population, b.status, b.grants_version, b.designated_admin_profile_id, b.reason, b.bound_by, b.bound_at,
   b.revoked_by, b.revoked_at, b.revoke_reason
 `
 
@@ -137,6 +138,7 @@ export const mapEnvironmentRow = (row: EnvironmentRow): ExternalIdentityEnvironm
 
 export const mapBindingRow = (row: BindingRow): ExternalOrganizationBinding => ({
   bindingId: row.binding_id,
+  population: row.population,
   organizationId: row.organization_id,
   organizationName: row.organization_name,
   environmentId: row.environment_id,
@@ -256,7 +258,7 @@ export const getExternalOrganizationBinding = async (
     `SELECT ${BINDING_SELECT}
        FROM greenhouse_core.external_organization_bindings b
        JOIN greenhouse_core.organizations o ON o.organization_id = b.organization_id
-      WHERE b.binding_id = $1`,
+      WHERE b.binding_id = $1 AND b.population='external'`,
     [bindingId]
   )
 
@@ -278,7 +280,7 @@ export const listExternalOrganizationBindings = async ({
     `SELECT ${BINDING_SELECT}
        FROM greenhouse_core.external_organization_bindings b
        JOIN greenhouse_core.organizations o ON o.organization_id = b.organization_id
-      WHERE ($1::text IS NULL OR b.organization_id = $1)
+      WHERE b.population='external' AND ($1::text IS NULL OR b.organization_id = $1)
         AND ($2::text IS NULL OR b.environment_id = $2)
         AND ($3::text IS NULL OR b.status = $3)
       ORDER BY b.bound_at DESC, b.binding_id COLLATE "C"

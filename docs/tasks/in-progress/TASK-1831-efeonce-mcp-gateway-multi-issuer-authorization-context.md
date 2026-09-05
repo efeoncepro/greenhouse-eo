@@ -1,5 +1,66 @@
 # TASK-1831 — Efeonce MCP Gateway Multi-Issuer Authorization Context
 
+## Delta 2026-09-05 — runtime desplegado y activo; verificación de autorización aún pendiente
+
+Medido en runtime por la sesión `greenhouse-eo-8d`, contrastado con `greenhouse-eo-45` (TASK-1829/1835),
+`greenhouse-eo-89` (TASK-1631), `greenhouse-eo-0f` (TASK-1828) y `greenhouse-eo-18` (TASK-1830/1836).
+Ninguna de esas sesiones tenía trabajo en vuelo sobre `../efeonce-mcp`.
+
+**Desplegado y activo (verificado):** `../efeonce-mcp` en `main` = `dd04f47` sin pendientes de push
+(`93819fa` contextos nativos + autoridad por tool, `fa1ee2a` ledger del access token antes del dispatch,
+`dd04f47` deploy por digest). Deploy Cloud Run run `33979635307` success 2026-09-05T17:01Z; revisión viva
+`efeonce-mcp-gateway-00032-qm5`, imagen por digest `sha256:6f28046f…`. Env de esa revisión:
+`MCP_NATIVE_AUTH_ENABLED=true`, `MCP_NATIVE_INTERNAL_AUTH_ENABLED=true`,
+`MCP_NATIVE_ISSUER=https://auth.efeonce.org`, `MCP_IDENTITY_BINDING_URL=https://greenhouse.efeoncepro.com`
+con token de máquina como secret-ref. Ambos flags registrados en `FEATURE_FLAG_STATE_LEDGER.md`.
+Sondas: `/.well-known/oauth-protected-resource` 200, `POST /mcp` sin token 401 — **negativas**: prueban que
+la puerta cierra, no que la llave abre.
+
+**Grafo de acceso (verificado contra PG):** `external_identity_environments.efeonce-auth` = `active` desde
+2026-09-05T00:50Z. Un binding `active` (`xob-139e3fe2…`) sobre `org-2df565fb…` = `EO-ORG-0007` "Efeonce"
+(`organization_type: other`), `grants_version: 2`, razón "TASK-1836 authorized seven-day internal read-only
+pilot"; grant `growth.seo.observation.read` `active` al perfil del operador, **vence 2026-09-12T15:00Z**.
+Source link `external_idp:efeonce-auth` activo (`is_login_identity=true`). Los otros dos bindings son smoke
+de TASK-1631, revocados.
+
+**La membership del piloto existe, por el carril interno.** `resolveExternalAccess(efeonce-auth, <subject>)`
+devuelve `unbound` / 0 memberships, pero `resolveInternalAuthority({environmentId, subject, profileId,
+bindingId})` devuelve `population: internal`, `eligible: true`, `grantsVersion: 2`,
+`capabilities: ['growth.seo.observation.read']` (ejercitado contra PG). Las 3 filas de
+`external_member_invitations` están `revoked`, pero el piloto **no las necesita**: las invitaciones
+pertenecen a la cohorte externa de TASK-1832.
+
+**Lo que NO está verificado, y por qué:** `greenhouse_auth.access_tokens` = **0 filas**. El emisor nativo
+nunca emitió un access token, así que el recheck de `grants_version` antes del dispatch — el corazón de esta
+task — no ha visto tráfico real, y tampoco el rollback. Gate único restante: el emisor tiene
+`AUTH_SERVER_INTERNAL_AUTH_ENABLED=false` en la revisión viva y por default en `main`. El gateway acepta hoy
+un contexto interno nativo que el emisor no puede emitir: fail-closed, inofensivo mientras no exista token,
+pero deja el rollout de TASK-1836 a medias. El reader del lane sí conoce la población interna (rama con
+`authorizationContextId` + `jti` en `ecosystem-identity-binding.ts`) — leído en código, no ejercitado.
+
+**El piloto no se mide por el carril Entra.** En `tool-policy.ts` de `dd04f47`, `evaluateToolAuthority` hace
+`if (auth.issuerClass === 'entra') return policy.allowedPopulations.includes('entra') ? {allowed:true} : deny(...)`
+**antes** de consultar binding y capabilities. La fila de `external_capability_grants` sólo se consume por el
+carril nativo; por Entra las tools SEO se autorizan por scope. Las tools son alcanzables, pero el grant, el
+scoping por organización y el `gv` quedan inertes hasta el primer token nativo — con la ventana del piloto
+corriendo.
+
+**Nota para TASK-1832:** `efeonce.gateway.status` es la única tool con `native-external`, y trae
+`organizationPolicy: 'none'` y `requiredCapabilities: []`. Un canary externo exitoso probaría scopes, issuer,
+binding con membership y población, pero **no** el grant ni el scoping por organización. No leer "el acceso
+externo funciona" como "el modelo de autorización quedó probado".
+
+**Deuda que arrastra este contrato (dominio de TASK-1836, escalada por `greenhouse-eo-89`):**
+`src/lib/identity/internal-access/commands.ts` escribe directo en `external_organization_bindings` y
+`external_capability_grants` (líneas ~180 y ~342) con auditoría y modelo de membership propios
+(`internal_native_access_audit`, `internal_native_enrollments`), fuera de los commands canónicos. Publica
+outbox y bumpea `grants_version`, así que no es estado suelto: la regla que rompe es la de **escritor único**
+(`IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` §External identity binding), sin excepción declarada en el ADR.
+Costo demostrado: el resolver canónico devuelve un **falso negativo** sobre una persona enrolada y elegible
+— hizo que una sesión dedicada al dominio concluyera lo contrario de lo que el runtime permite.
+`external_identity_audit_log` no tiene ninguna fila sobre el binding ni el grant del piloto.
+
+
 ## Delta 2026-09-04 — acceso interno nativo (TASK-1836)
 
 El slice interno nativo depende del contrato de TASK-1836 (U11). La policy actual que asocia toda autoridad interna exclusivamente con Entra debe revisarse mediante ADR antes de habilitar el emisor común. Validar población/autoridad procedentes del resolver confiable; aceptar el issuer nativo nunca basta para abrir herramientas internas. El slice externo puede avanzar sin esperar este slice interno.
@@ -59,7 +120,7 @@ El slice interno nativo depende del contrato de TASK-1836 (U11). La policy actua
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Integración local en curso (2026-09-05) como dependencia del goal TASK-1836: JWT multissuer, reader sin caché, 37 policies y guards de listado/dispatch implementados; 114 pruebas, typecheck y build pasan. Sin deploy ni activación nativa. Providers sin delegación compatible siguen denegados; canaries reales y rollback pendientes.`
+- Status real: `Desplegado y ACTIVO en producción (2026-09-05), sin verificación de autorización real. Gateway efeonce-mcp-gateway-00032-qm5 (SHA dd04f47, deploy run 33979635307), MCP_NATIVE_AUTH_ENABLED y MCP_NATIVE_INTERNAL_AUTH_ENABLED ON, ambos en el ledger; sondas negativas OK (protected-resource 200, MCP sin token 401). Grafo listo por el carril interno: environment active, binding Efeonce EO-ORG-0007, enrollment active y resolveInternalAuthority eligible con growth.seo.observation.read (vence 2026-09-12). SIN canary autenticado: greenhouse_auth.access_tokens = 0, el emisor nunca emitió un token, y por eso el recheck de grants_version antes del dispatch y el rollback siguen sin probarse. Gate único: el emisor tiene AUTH_SERVER_INTERNAL_AUTH_ENABLED=false (revisión viva y default en main) — decisión de operador sobre servicio compartido. Providers sin delegación compatible siguen denegados.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration`
 - Blocked by: `none`

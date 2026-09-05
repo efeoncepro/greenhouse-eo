@@ -23,6 +23,11 @@ resuelvas en silencio a favor del documento más viejo.
   persona** ("Berel ofrece…").
   **Excepción:** metadatos técnicos —textos ALT y schema—, donde sí se nombra la marca en tercera
   persona por SEO/AEO.
+- 🔴 **Nada de lenguaje interno en el cuerpo público.** Retirar `el cliente`, instrucciones recibidas,
+  posicionamiento editorial, referencias a extracción/CMS/verificación y fórmulas como `la ficha
+  declara`. Esas evidencias pertenecen a procedencia, datos verificados y pendientes internos.
+- **Dos objetos distintos:** `ficha técnica` es el documento técnico; `página pública del producto` es
+  la URL de berel.com. No usar una expresión ambigua para ambos.
 
 ## Vocabulario y localización (México)
 
@@ -58,11 +63,11 @@ resuelvas en silencio a favor del documento más viejo.
 - **Nombres de producto completos:** *Sellador Invisible*, *Sellador Wet Look*. **Nunca abreviados
   entre paréntesis sin introducción previa**; la abreviatura (*Invisible 540*) solo después de haber
   presentado el producto.
-- **Acabados metálicos: no afirmarlos.** Ninguna ficha pública los documenta hoy — el *Esmalte
+- **Acabados metálicos: no afirmarlos.** Ninguna página pública de producto los documenta hoy — el *Esmalte
   Summa* es alquidálico **mate** (solo Chocolate 672 y Negro 674) y el *Esmalte Acrílico en Aerosol*
   es **brillante**, sin colores metálicos. No afirmar acabados ni colores metálicos (Oro, Cobre)
   hasta que el cliente confirme el producto correcto.
-- **Ciclos de lavado:** la ficha pública de Berelinte respalda *"Lavabilidad: más de 60.000 ciclos"*;
+- **Ciclos de lavado:** la página pública de Berelinte respalda *"Lavabilidad: más de 60.000 ciclos"*;
   el dato es citable **con la ficha como fuente**. ⚠️ El cliente pidió revisar el criterio —
   **pendiente abierto desde agosto 2026**: mantener el dato solo con respaldo de ficha mientras
   responde. En **piezas sociales no se cita**: ahí se dice "acabado lavable" genérico.
@@ -98,10 +103,30 @@ quedó desactualizada en ese punto y hay que corregirla en Notion.
   *menor inversión* o *más sencilla*. **El remate en positivo aplica también a los BerelTips de Don
   Bere**: enseñar el beneficio de la técnica correcta en lugar de enumerar los defectos de la
   incorrecta (agosto 2026).
-- 🔴 **Temperatura de luz (Kelvin): fórmula completa adjetivo + dato en _todas_ las menciones** del
-  artículo — *foco cálido de 2700 K*, *foco neutro / luz neutra de 4000 K*, *foco frío de 5000 K o
-  más*. Preferencia expresa del cliente (agosto 2026); además, **la fórmula repetida de forma
-  idéntica mejora la extracción AEO**.
+- 🔴 **Temperatura de luz (Kelvin): fórmula homologada en _todas_ las menciones** — *luz cálida
+  (2700–3000 K)*, *luz neutra (4000 K)* y *luz fría (5000 K o más)*. Los watts indican consumo,
+  nunca temperatura o calidez. La fórmula repetida de forma idéntica mejora la extracción AEO.
+
+### Correcciones permanentes del 3–4 de septiembre de 2026
+
+- **Producto nuevo o de awareness:** lectura simple; no asumir posicionamiento ni usar por defecto
+  `Guía [Producto]` en title/H1; el diferenciador indicado en el brief es el mensaje central y aparece
+  antes que la explicación de categoría, resina o aplicación. La dirección visual incluye el render
+  oficial del empaque.
+- **Tono comercial:** acompañante experto, sin venta extrema ni FAQ autorreferencial. `Premium` puede
+  calificar la línea cuando esté respaldado; nunca la formulación. `Sin plomo` no es diferenciador.
+- **Insignia:** describirla como recomendada para interiores y exteriores, con uso preferente en
+  exteriores. Nunca reducirla a uso exclusivo exterior.
+- **Tablas:** encabezados semánticos como `Especificación` / `Dato`; en comparativas, cada columna nombra
+  el producto. Un criterio exclusivo de una alternativa —por ejemplo, garantía— se explica fuera.
+- **CTA:** toda recomendación de consultar a un especialista lleva un anchor descriptivo a `/contacto`.
+- **Datos faltantes:** retirar del cuerpo público, registrar en callout interno `⚠️` y solicitar fuente
+  oficial. No publicar el disclaimer ni explicar al lector el proceso de verificación.
+- **Español de México, literal y simple:** `pintura en buen estado`, `ajusta el horario`, `haz el cálculo
+  exacto`, describir aplicación con cubeta/brocha/rodillo y decir `que la pintura se desprenda o
+  descarapele`. Evitar `pintura sana`, `muévele la hora`, `la cuenta fina`, `aplicados en frío`, `que la
+  pintura pele` y frases literarias que obliguen a interpretar.
+- **Firma confirmada:** `Pinta con Confianza. Pinta con Berel.`
 
 ### ⚠️ Choque 2 — cuánta metáfora aguanta el texto
 

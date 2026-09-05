@@ -15,7 +15,7 @@
 <tr><td>**→ Objetivo (permanencia)**</td><td>[comprender / retener y compartir / cerrar emoción]</td></tr>
 <tr><td>**→ Descripción detallada de la imagen**</td><td>**Qué debe verse:** [encuadre, luz, elementos, qué sí y qué no aparece] <br><br> **Intención:** [qué debe lograr en el lector y por qué esa sección lo necesita]</td></tr>
 <tr><td>**→ Color pintura Berel**</td><td>[familia + Nombre + Código] · Tonos reales: Catálogo RGB interno</td></tr>
-<tr><td>**→ Producto**</td><td>[Sí + enlace a ficha oficial / No]</td></tr>
+<tr><td>**→ Producto**</td><td>[Sí + enlace a página pública / No] · Awareness: [render oficial + fuente / pendiente]</td></tr>
 <tr><td>**→ Texto en la imagen**</td><td>[literal / Sin texto]</td></tr>
 <tr><td>**→ Graficos adicionales en la imagen**</td><td>[... / Ninguno]</td></tr>
 <tr><td>**→ Estilo y paleta**</td><td>[línea visual y colores de marca; legible en móvil]</td></tr>
@@ -37,3 +37,4 @@
 - [ ] Ningún HEX ni RGB de un color de PINTURA: solo familia + nombre + código
 - [ ] Si es infografía: **formato y variante declarados** (`../modules/10_FORMATOS_DE_INFOGRAFIA.md`) y acento en Rojo Editorial `#B3153A` o la paleta complementaria — nunca el rojo corporativo
 - [ ] Si aparece la Paleta Frida Kahlo, la pieza lleva el **logo de la licencia oficial**
+- [ ] Si es producto nuevo/de awareness, usa el render oficial del empaque o declara el bloqueo

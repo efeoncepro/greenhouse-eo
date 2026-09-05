@@ -1,13 +1,24 @@
 import type { PoolClient } from 'pg'
 
+import {
+  appendAudit,
+  bumpGrantsVersion,
+  insertAuthorityBinding,
+  insertAuthorityGrant,
+  protectInternalSourceLinks
+} from './authority-transactions'
+
 import { withTransaction } from '@/lib/db'
-import { buildIdentityProfileId, buildIdentityProfilePublicId, buildIdentitySourceLinkId } from '@/lib/ids/greenhouse-ids'
+import {
+  buildIdentityProfileId,
+  buildIdentityProfilePublicId,
+  buildIdentitySourceLinkId
+} from '@/lib/ids/greenhouse-ids'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 import { ExternalAccessError } from './errors'
 import {
-  buildExternalAuditId,
   buildExternalBindingId,
   buildExternalGrantId,
   buildExternalIdpSourceSystem,
@@ -63,52 +74,6 @@ import {
  * Sin `server-only`: el auth-server (TASK-1830) consume `acceptExternalInvitation` in-process.
  */
 
-type AuditEventType =
-  | 'environment_upserted'
-  | 'organization_bound'
-  | 'capability_granted'
-  | 'invitation_issued'
-  | 'invitation_linked'
-  | 'binding_revoked'
-  | 'grant_revoked'
-  | 'member_revoked'
-  | 'invitation_revoked'
-
-type AuditInput = {
-  eventType: AuditEventType
-  environmentId?: string | null
-  bindingId?: string | null
-  grantId?: string | null
-  invitationId?: string | null
-  organizationId?: string | null
-  profileId?: string | null
-  performedBy: string
-  reason?: string | null
-  metadata?: Record<string, unknown>
-}
-
-const appendAudit = async (client: PoolClient, input: AuditInput) => {
-  await client.query(
-    `INSERT INTO greenhouse_core.external_identity_audit_log (
-       audit_id, event_type, environment_id, binding_id, grant_id, invitation_id, organization_id,
-       profile_id, performed_by, reason, outcome, metadata_json
-     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'applied', $11::jsonb)`,
-    [
-      buildExternalAuditId(),
-      input.eventType,
-      input.environmentId ?? null,
-      input.bindingId ?? null,
-      input.grantId ?? null,
-      input.invitationId ?? null,
-      input.organizationId ?? null,
-      input.profileId ?? null,
-      input.performedBy,
-      input.reason ?? null,
-      JSON.stringify(input.metadata ?? {})
-    ]
-  )
-}
-
 const actorId = (actor: ExternalAccessActor) => assertNonEmptyString(actor.actorId, 'actorId', 256)
 
 const loadEnvironmentForUpdate = async (client: PoolClient, environmentId: string) => {
@@ -124,11 +89,19 @@ const loadEnvironmentForUpdate = async (client: PoolClient, environmentId: strin
 }
 
 const loadBindingForUpdate = async (client: PoolClient, bindingId: string) => {
+  const lookup = await client.query<{ environment_id: string }>(
+    `SELECT environment_id FROM greenhouse_core.external_organization_bindings WHERE binding_id=$1`,
+    [bindingId]
+  )
+
+  if (!lookup.rows[0]) return null
+  await loadEnvironmentForUpdate(client, lookup.rows[0].environment_id)
+
   const { rows } = await client.query<Parameters<typeof mapBindingRow>[0]>(
     `SELECT ${BINDING_SELECT}
        FROM greenhouse_core.external_organization_bindings b
        JOIN greenhouse_core.organizations o ON o.organization_id = b.organization_id
-      WHERE b.binding_id = $1
+      WHERE b.binding_id = $1 AND b.population='external'
       FOR UPDATE OF b`,
     [bindingId]
   )
@@ -158,18 +131,6 @@ const requireActiveBinding = async (client: PoolClient, bindingId: string): Prom
   return binding
 }
 
-const bumpGrantsVersion = async (client: PoolClient, bindingId: string): Promise<number> => {
-  const { rows } = await client.query<{ grants_version: number | string }>(
-    `UPDATE greenhouse_core.external_organization_bindings
-        SET grants_version = grants_version + 1, updated_at = CURRENT_TIMESTAMP
-      WHERE binding_id = $1
-      RETURNING grants_version`,
-    [bindingId]
-  )
-
-  return Number(rows[0]?.grants_version ?? 0)
-}
-
 /**
  * Desactiva el source link `(environment, profile)` SÓLO si la persona ya no tiene ninguna
  * membership ligada bajo un binding activo del mismo environment. Una persona puede ser miembro
@@ -183,6 +144,7 @@ const deactivateOrphanSourceLinks = async (client: PoolClient, environmentId: st
         AND l.source_system = $2
         AND l.source_object_type = $3
         AND l.active = TRUE
+        AND NOT EXISTS (SELECT 1 FROM greenhouse_core.internal_native_enrollments e WHERE e.native_link_id=l.link_id AND e.status='active')
         AND NOT EXISTS (
           SELECT 1
             FROM greenhouse_core.external_member_invitations i
@@ -398,10 +360,13 @@ export const bindExternalOrganization = async (
     }
 
     if (designatedAdminProfileId) {
-      const { rows: profileRows } = await client.query<{ active: boolean; status: string; merged_into_profile_id: string | null }>(
-        `SELECT active, status, merged_into_profile_id FROM greenhouse_core.identity_profiles WHERE profile_id = $1`,
-        [designatedAdminProfileId]
-      )
+      const { rows: profileRows } = await client.query<{
+        active: boolean
+        status: string
+        merged_into_profile_id: string | null
+      }>(`SELECT active, status, merged_into_profile_id FROM greenhouse_core.identity_profiles WHERE profile_id = $1`, [
+        designatedAdminProfileId
+      ])
 
       const profile = profileRows[0] ?? null
 
@@ -426,6 +391,9 @@ export const bindExternalOrganization = async (
     const sameOrganization = existingRows.map(mapBindingRow).find(row => row.organizationId === organizationId)
 
     if (sameOrganization) {
+      if (sameOrganization.population !== 'external')
+        throw new ExternalAccessError('conflict', 'binding population mismatch')
+
       if (sameOrganization.externalOrganizationRef === externalOrganizationRef) {
         return { binding: sameOrganization, created: false }
       }
@@ -436,51 +404,28 @@ export const bindExternalOrganization = async (
     }
 
     if (existingRows.length > 0) {
-      throw new ExternalAccessError('conflict', 'external organization reference already bound to another organization', {
-        environmentId
-      })
+      throw new ExternalAccessError(
+        'conflict',
+        'external organization reference already bound to another organization',
+        {
+          environmentId
+        }
+      )
     }
 
     const bindingId = buildExternalBindingId()
 
-    await client.query(
-      `INSERT INTO greenhouse_core.external_organization_bindings (
-         binding_id, organization_id, environment_id, external_organization_ref, status, grants_version,
-         designated_admin_profile_id, reason, bound_by
-       ) VALUES ($1, $2, $3, $4, 'active', 1, $5, $6, $7)`,
-      [bindingId, organizationId, environmentId, externalOrganizationRef, designatedAdminProfileId, reason, performedBy]
-    )
-
-    const binding = (await loadBindingForUpdate(client, bindingId))!
-
-    await appendAudit(client, {
-      eventType: 'organization_bound',
-      environmentId,
+    await insertAuthorityBinding(client, {
       bindingId,
       organizationId,
-      profileId: designatedAdminProfileId,
-      performedBy,
+      environmentId,
+      externalOrganizationRef,
+      population: 'external',
       reason,
-      metadata: { externalOrganizationRef }
+      actorId: performedBy,
+      designatedAdminProfileId
     })
-
-    await publishOutboxEvent(
-      {
-        aggregateType: AGGREGATE_TYPES.externalIdentityBinding,
-        aggregateId: bindingId,
-        eventType: EVENT_TYPES.externalBindingBound,
-        payload: {
-          schemaVersion: 1,
-          bindingId,
-          organizationId,
-          environmentId,
-          grantsVersion: binding.grantsVersion,
-          designatedAdminProfileId,
-          changedByUserId: performedBy
-        }
-      },
-      client
-    )
+    const binding = (await loadBindingForUpdate(client, bindingId))!
 
     return { binding, created: true }
   })
@@ -538,49 +483,25 @@ export const grantExternalCapability = async (
 
     const grantId = buildExternalGrantId()
 
-    const { rows } = await client.query<Parameters<typeof mapGrantRow>[0]>(
-      `INSERT INTO greenhouse_core.external_capability_grants (
-         grant_id, binding_id, capability, profile_id, status, reason, granted_by
-       ) VALUES ($1, $2, $3, $4, 'active', $5, $6)
-       RETURNING ${GRANT_SELECT}`,
-      [grantId, bindingId, capability, profileId, reason, performedBy]
-    )
-
-    const grantsVersion = await bumpGrantsVersion(client, bindingId)
-
-    await appendAudit(client, {
-      eventType: 'capability_granted',
-      environmentId: binding.environmentId,
+    const grantsVersion = await insertAuthorityGrant(client, {
       bindingId,
-      grantId,
+      environmentId: binding.environmentId,
       organizationId: binding.organizationId,
+      population: 'external',
+      grantId,
+      capability,
       profileId,
-      performedBy,
       reason,
-      metadata: { capability, grantsVersion }
+      actorId: performedBy
     })
 
-    await publishOutboxEvent(
-      {
-        aggregateType: AGGREGATE_TYPES.externalIdentityBinding,
-        aggregateId: bindingId,
-        eventType: EVENT_TYPES.externalGrantGranted,
-        payload: {
-          schemaVersion: 1,
-          bindingId,
-          grantId,
-          organizationId: binding.organizationId,
-          environmentId: binding.environmentId,
-          capability,
-          profileId,
-          grantsVersion,
-          changedByUserId: performedBy
-        }
-      },
-      client
+    const { rows } = await client.query<Parameters<typeof mapGrantRow>[0]>(
+      `SELECT ${GRANT_SELECT} FROM greenhouse_core.external_capability_grants WHERE grant_id=$1`,
+      [grantId]
     )
 
-    return { grant: mapGrantRow(rows[0]!), created: true, grantsVersion }
+
+return { grant: mapGrantRow(rows[0]!), created: true, grantsVersion }
   })
 }
 
@@ -678,7 +599,17 @@ export const issueExternalInvitation = async (
          reason, issued_by, expires_at
        ) VALUES ($1, $2, $3, $4, $4, $5, $6, 'issued', $7, $8, CURRENT_TIMESTAMP + ($9::int * INTERVAL '1 hour'))
        RETURNING ${INVITATION_SELECT}`,
-      [invitationId, bindingId, profileId, email, designatedAdmin, hashInvitationToken(token), reason, performedBy, expiresInHours]
+      [
+        invitationId,
+        bindingId,
+        profileId,
+        email,
+        designatedAdmin,
+        hashInvitationToken(token),
+        reason,
+        performedBy,
+        expiresInHours
+      ]
     )
 
     await appendAudit(client, {
@@ -767,6 +698,8 @@ export const acceptExternalInvitation = async (
   const performedBy = actorId(actor)
 
   return withTransaction(async client => {
+    await loadEnvironmentForUpdate(client, environmentId)
+
     const { rows: invitationRows } = await client.query<Parameters<typeof mapInvitationRow>[0]>(
       `SELECT ${INVITATION_SELECT}
          FROM greenhouse_core.external_member_invitations
@@ -796,7 +729,9 @@ export const acceptExternalInvitation = async (
         [invitation.invitationId]
       )
 
-      throw new ExternalAccessError('invitation_expired', 'invitation expired', { invitationId: invitation.invitationId })
+      throw new ExternalAccessError('invitation_expired', 'invitation expired', {
+        invitationId: invitation.invitationId
+      })
     }
 
     if (verifiedEmail && verifiedEmail !== invitation.email.toLowerCase()) {
@@ -830,7 +765,9 @@ export const acceptExternalInvitation = async (
     const subjectProfileId = subjectLinkRows[0]?.profile_id ?? null
 
     if (subjectLinkRows.length > 1) {
-      throw new ExternalAccessError('identity_collision', 'subject resolves to more than one profile', { environmentId })
+      throw new ExternalAccessError('identity_collision', 'subject resolves to more than one profile', {
+        environmentId
+      })
     }
 
     if (invitation.profileId && subjectProfileId && invitation.profileId !== subjectProfileId) {
@@ -882,7 +819,11 @@ export const acceptExternalInvitation = async (
       )
       profileCreated = true
     } else {
-      const { rows: profileRows } = await client.query<{ active: boolean; status: string; merged_into_profile_id: string | null }>(
+      const { rows: profileRows } = await client.query<{
+        active: boolean
+        status: string
+        merged_into_profile_id: string | null
+      }>(
         `SELECT active, status, merged_into_profile_id FROM greenhouse_core.identity_profiles WHERE profile_id = $1 FOR UPDATE`,
         [profileId]
       )
@@ -893,6 +834,8 @@ export const acceptExternalInvitation = async (
         throw new ExternalAccessError('conflict', 'target profile is not active', { profileId })
       }
     }
+
+    await protectInternalSourceLinks(client, environmentId, profileId)
 
     const linkId = buildIdentitySourceLinkId({
       profileId,
@@ -1086,6 +1029,20 @@ export const revokeExternalAccess = async (
   const performedBy = actorId(actor)
 
   return withTransaction(async client => {
+    if (input.scope === 'grant' || input.scope === 'invitation') {
+      const table = input.scope === 'grant' ? 'external_capability_grants' : 'external_member_invitations'
+      const key = input.scope === 'grant' ? 'grant_id' : 'invitation_id'
+      const value = input.scope === 'grant' ? input.grantId : input.invitationId
+
+      const lookup = await client.query<{ environment_id: string }>(
+        `SELECT b.environment_id FROM greenhouse_core.${table} x JOIN greenhouse_core.external_organization_bindings b ON b.binding_id=x.binding_id WHERE x.${key}=$1`,
+        [value]
+      )
+
+      if (!lookup.rows[0]) throw new ExternalAccessError('not_found', 'authority not found')
+      await loadEnvironmentForUpdate(client, lookup.rows[0].environment_id)
+    }
+
     if (input.scope === 'binding') {
       const bindingId = assertNonEmptyString(input.bindingId, 'bindingId', 128)
       const binding = await loadBindingForUpdate(client, bindingId)
@@ -1093,7 +1050,15 @@ export const revokeExternalAccess = async (
       if (!binding) throw new ExternalAccessError('not_found', 'binding not found', { bindingId })
 
       if (binding.status === 'revoked') {
-        return { scope: 'binding', changed: false, bindingId, grantsVersion: binding.grantsVersion, revokedGrantIds: [], revokedProfileIds: [], revokedInvitationIds: [] }
+        return {
+          scope: 'binding',
+          changed: false,
+          bindingId,
+          grantsVersion: binding.grantsVersion,
+          revokedGrantIds: [],
+          revokedProfileIds: [],
+          revokedInvitationIds: []
+        }
       }
 
       const revokedGrantIds = await revokeGrantsOfBinding(client, bindingId, performedBy, reason)
@@ -1107,7 +1072,9 @@ export const revokeExternalAccess = async (
         [bindingId, performedBy, reason]
       )
 
-      const revokedProfileIds = Array.from(new Set(members.map(row => row.profile_id).filter((id): id is string => !!id)))
+      const revokedProfileIds = Array.from(
+        new Set(members.map(row => row.profile_id).filter((id): id is string => !!id))
+      )
 
       for (const profileId of revokedProfileIds) {
         await deactivateOrphanSourceLinks(client, binding.environmentId, profileId)
@@ -1122,7 +1089,12 @@ export const revokeExternalAccess = async (
         organizationId: binding.organizationId,
         performedBy,
         reason,
-        metadata: { grantsVersion, revokedGrantIds, revokedProfileIds, revokedInvitationIds: members.map(row => row.invitation_id) }
+        metadata: {
+          grantsVersion,
+          revokedGrantIds,
+          revokedProfileIds,
+          revokedInvitationIds: members.map(row => row.invitation_id)
+        }
       })
 
       await publishOutboxEvent(
@@ -1145,7 +1117,15 @@ export const revokeExternalAccess = async (
         client
       )
 
-      return { scope: 'binding', changed: true, bindingId, grantsVersion, revokedGrantIds, revokedProfileIds, revokedInvitationIds: members.map(row => row.invitation_id) }
+      return {
+        scope: 'binding',
+        changed: true,
+        bindingId,
+        grantsVersion,
+        revokedGrantIds,
+        revokedProfileIds,
+        revokedInvitationIds: members.map(row => row.invitation_id)
+      }
     }
 
     if (input.scope === 'grant') {
@@ -1165,7 +1145,15 @@ export const revokeExternalAccess = async (
       if (!binding) throw new ExternalAccessError('not_found', 'binding not found', { bindingId: grant.bindingId })
 
       if (grant.status === 'revoked') {
-        return { scope: 'grant', changed: false, bindingId: binding.bindingId, grantsVersion: binding.grantsVersion, revokedGrantIds: [], revokedProfileIds: [], revokedInvitationIds: [] }
+        return {
+          scope: 'grant',
+          changed: false,
+          bindingId: binding.bindingId,
+          grantsVersion: binding.grantsVersion,
+          revokedGrantIds: [],
+          revokedProfileIds: [],
+          revokedInvitationIds: []
+        }
       }
 
       const revokedGrantIds = await revokeGrantsOfBinding(client, binding.bindingId, performedBy, reason, { grantId })
@@ -1204,7 +1192,15 @@ export const revokeExternalAccess = async (
         client
       )
 
-      return { scope: 'grant', changed: true, bindingId: binding.bindingId, grantsVersion, revokedGrantIds, revokedProfileIds: [], revokedInvitationIds: [] }
+      return {
+        scope: 'grant',
+        changed: true,
+        bindingId: binding.bindingId,
+        grantsVersion,
+        revokedGrantIds,
+        revokedProfileIds: [],
+        revokedInvitationIds: []
+      }
     }
 
     if (input.scope === 'member') {
@@ -1218,7 +1214,15 @@ export const revokeExternalAccess = async (
       const revokedGrantIds = await revokeGrantsOfBinding(client, bindingId, performedBy, reason, { profileId })
 
       if (members.length === 0 && revokedGrantIds.length === 0) {
-        return { scope: 'member', changed: false, bindingId, grantsVersion: binding.grantsVersion, revokedGrantIds: [], revokedProfileIds: [], revokedInvitationIds: [] }
+        return {
+          scope: 'member',
+          changed: false,
+          bindingId,
+          grantsVersion: binding.grantsVersion,
+          revokedGrantIds: [],
+          revokedProfileIds: [],
+          revokedInvitationIds: []
+        }
       }
 
       await deactivateOrphanSourceLinks(client, binding.environmentId, profileId)
@@ -1256,7 +1260,15 @@ export const revokeExternalAccess = async (
         client
       )
 
-      return { scope: 'member', changed: true, bindingId, grantsVersion, revokedGrantIds, revokedProfileIds: [profileId], revokedInvitationIds: members.map(row => row.invitation_id) }
+      return {
+        scope: 'member',
+        changed: true,
+        bindingId,
+        grantsVersion,
+        revokedGrantIds,
+        revokedProfileIds: [profileId],
+        revokedInvitationIds: members.map(row => row.invitation_id)
+      }
     }
 
     const invitationId = assertNonEmptyString(input.invitationId, 'invitationId', 128)
@@ -1276,7 +1288,15 @@ export const revokeExternalAccess = async (
 
     if (invitation.status !== 'issued' && invitation.status !== 'accepted') {
       // Una invitación ya ligada es una membership: se revoca con scope `member`.
-      return { scope: 'invitation', changed: false, bindingId: binding.bindingId, grantsVersion: binding.grantsVersion, revokedGrantIds: [], revokedProfileIds: [], revokedInvitationIds: [] }
+      return {
+        scope: 'invitation',
+        changed: false,
+        bindingId: binding.bindingId,
+        grantsVersion: binding.grantsVersion,
+        revokedGrantIds: [],
+        revokedProfileIds: [],
+        revokedInvitationIds: []
+      }
     }
 
     await client.query(
@@ -1317,6 +1337,14 @@ export const revokeExternalAccess = async (
       client
     )
 
-    return { scope: 'invitation', changed: true, bindingId: binding.bindingId, grantsVersion: binding.grantsVersion, revokedGrantIds: [], revokedProfileIds: [], revokedInvitationIds: [invitationId] }
+    return {
+      scope: 'invitation',
+      changed: true,
+      bindingId: binding.bindingId,
+      grantsVersion: binding.grantsVersion,
+      revokedGrantIds: [],
+      revokedProfileIds: [],
+      revokedInvitationIds: [invitationId]
+    }
   })
 }

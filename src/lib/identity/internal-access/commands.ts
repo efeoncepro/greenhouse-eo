@@ -2,6 +2,15 @@ import { randomBytes, randomUUID } from 'node:crypto'
 
 import type { PoolClient } from 'pg'
 
+import {
+  recordInternalMembership,
+  insertAuthorityBinding,
+  insertAuthorityGrant,
+  revokeAuthorityGrant,
+  insertInternalSourceLink,
+  revokeInternalSourceLink
+} from '../external-access/authority-transactions'
+
 import { withTransaction } from '@/lib/db'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
@@ -68,6 +77,9 @@ const audit = async (
 }
 
 type Enrollment = {
+  environment_id: string
+  organization_id: string
+  binding_environment_id: string
   enrollment_id: string
   profile_id: string
   binding_id: string
@@ -115,7 +127,7 @@ export const enrollInternalNativeIdentity = async (
     if (!candidate) throw new InternalAccessError('ineligible')
 
     const existing = await client.query<Enrollment>(
-      `SELECT e.*,n.source_object_id AS subject,n.active AS native_active,n.is_login_identity AS native_login,b.status='active' AS binding_active FROM greenhouse_core.internal_native_enrollments e
+      `SELECT e.*,n.source_object_id AS subject,n.active AS native_active,n.is_login_identity AS native_login,(b.status='active' AND b.population='internal') AS binding_active,b.organization_id AS organization_id,b.environment_id AS binding_environment_id FROM greenhouse_core.internal_native_enrollments e
  JOIN greenhouse_core.identity_profile_source_links n ON n.link_id=e.native_link_id
  JOIN greenhouse_core.external_organization_bindings b ON b.binding_id=e.binding_id
  WHERE e.environment_id=$1 AND (e.profile_id=$2 OR (e.tenant_id=$3::uuid AND e.object_id=$4::uuid)) FOR UPDATE OF e`,
@@ -131,6 +143,8 @@ export const enrollInternalNativeIdentity = async (
         !e.native_active ||
         !e.native_login ||
         !e.binding_active ||
+        e.organization_id !== candidate.organization_id ||
+        e.binding_environment_id !== input.environmentId ||
         e.profile_id !== input.profileId ||
         e.tenant_id !== input.tenantId.toLowerCase() ||
         e.object_id !== input.objectId.toLowerCase() ||
@@ -159,11 +173,12 @@ export const enrollInternalNativeIdentity = async (
 
     if (native.rows.length) throw new InternalAccessError('conflict')
 
-    const bindings = await client.query<{ binding_id: string }>(
-      `SELECT binding_id FROM greenhouse_core.external_organization_bindings WHERE environment_id=$1 AND organization_id=$2 AND status='active' FOR UPDATE`,
+    const bindings = await client.query<{ binding_id: string; population: string }>(
+      `SELECT binding_id,population FROM greenhouse_core.external_organization_bindings WHERE environment_id=$1 AND organization_id=$2 AND status='active' FOR UPDATE`,
       [input.environmentId, candidate.organization_id]
     )
 
+    if (bindings.rows.some(b => b.population !== 'internal')) throw new InternalAccessError('conflict')
     if (input.dryRun)
       return {
         applied: false,
@@ -176,31 +191,30 @@ export const enrollInternalNativeIdentity = async (
 
     if (!bindingId) {
       bindingId = `xob-${randomUUID()}`
-      await client.query(
-        `INSERT INTO greenhouse_core.external_organization_bindings
- (binding_id,organization_id,environment_id,external_organization_ref,status,grants_version,reason,bound_by)
- VALUES ($1,$2,$3,$4,'active',1,$5,$6)`,
-        [
-          bindingId,
-          candidate.organization_id,
-          input.environmentId,
-          `internal:${candidate.organization_id}`,
-          input.reason,
-          input.actorId
-        ]
-      )
+      await insertAuthorityBinding(client, {
+        bindingId,
+        organizationId: candidate.organization_id,
+        environmentId: input.environmentId,
+        externalOrganizationRef: `internal:${candidate.organization_id}`,
+        population: 'internal',
+        actorId: input.actorId,
+        reason: input.reason
+      })
     }
 
     const subject = randomBytes(24).toString('base64url'),
       nativeLinkId = `identity-source-link-${randomUUID()}`,
       enrollmentId = `ine-${randomUUID()}`
 
-    await client.query(
-      `INSERT INTO greenhouse_core.identity_profile_source_links
- (link_id,profile_id,source_system,source_object_type,source_object_id,source_user_id,active,is_login_identity)
- VALUES ($1,$2,$3,'subject',$4,$4,TRUE,TRUE)`,
-      [nativeLinkId, input.profileId, `external_idp:${input.environmentId}`, subject]
-    )
+    await insertInternalSourceLink(client, {
+      bindingId,
+      organizationId: candidate.organization_id,
+      population: 'internal',
+      linkId: nativeLinkId,
+      profileId: input.profileId,
+      environmentId: input.environmentId,
+      subject
+    })
     await client.query(
       `INSERT INTO greenhouse_core.internal_native_enrollments
  (enrollment_id,environment_id,profile_id,binding_id,upstream_link_id,native_link_id,tenant_id,object_id,status,enrolled_by,reason,enrolled_at)
@@ -218,6 +232,16 @@ export const enrollInternalNativeIdentity = async (
         input.reason
       ]
     )
+    await recordInternalMembership(client, {
+      bindingId,
+      environmentId: input.environmentId,
+      organizationId: candidate.organization_id,
+      population: 'internal',
+      enrollmentId,
+      profileId: input.profileId,
+      actorId: input.actorId,
+      reason: input.reason
+    })
     await audit(client, { id: enrollmentId, actorId: input.actorId, reason: input.reason, event: 'enrolled' })
 
     return {
@@ -241,8 +265,10 @@ export const revokeInternalNativeIdentity = async (
   await guard(input, 'identity.internal_access.revoke', deps)
 
   return withTransaction(async client => {
+    await lockEnrollmentEnvironment(client, input.enrollmentId)
+
     const result = await client.query<Enrollment>(
-      'SELECT * FROM greenhouse_core.internal_native_enrollments WHERE enrollment_id=$1 FOR UPDATE',
+      `SELECT e.*,b.organization_id FROM greenhouse_core.internal_native_enrollments e JOIN greenhouse_core.external_organization_bindings b ON b.binding_id=e.binding_id AND b.population='internal' WHERE e.enrollment_id=$1 FOR UPDATE OF e`,
       [input.enrollmentId]
     )
 
@@ -255,14 +281,16 @@ export const revokeInternalNativeIdentity = async (
       `UPDATE greenhouse_core.internal_native_enrollments SET status='revoked',revoked_at=NOW(),revoked_by=$2 WHERE enrollment_id=$1`,
       [input.enrollmentId, input.actorId]
     )
-    await client.query(
-      `UPDATE greenhouse_core.identity_profile_source_links SET active=FALSE,is_login_identity=FALSE,updated_at=NOW() WHERE link_id=$1`,
-      [e.native_link_id]
-    )
-    await client.query(
-      `UPDATE greenhouse_core.external_organization_bindings SET grants_version=grants_version+1,updated_at=NOW() WHERE binding_id=$1`,
-      [e.binding_id]
-    )
+    await revokeInternalSourceLink(client, {
+      linkId: e.native_link_id,
+      bindingId: e.binding_id,
+      enrollmentId: input.enrollmentId,
+      environmentId: e.environment_id,
+      profileId: e.profile_id,
+      organizationId: e.organization_id,
+      actorId: input.actorId,
+      reason: input.reason
+    })
     await audit(client, { id: input.enrollmentId, actorId: input.actorId, reason: input.reason, event: 'revoked' })
 
     return { applied: true, idempotent: false }
@@ -291,26 +319,30 @@ export const setInternalCapabilityGrant = async (
     throw new InternalAccessError('invalid_request')
 
   return withTransaction(async client => {
+    await lockEnrollmentEnvironment(client, input.enrollmentId)
+
     const enrollment = await client.query<Enrollment>(
-      `SELECT * FROM greenhouse_core.internal_native_enrollments WHERE enrollment_id=$1 FOR UPDATE`,
+      `SELECT e.*,b.organization_id FROM greenhouse_core.internal_native_enrollments e JOIN greenhouse_core.external_organization_bindings b ON b.binding_id=e.binding_id AND b.population='internal' WHERE e.enrollment_id=$1 FOR UPDATE OF e`,
       [input.enrollmentId]
     )
 
     const e = enrollment.rows[0]
 
-    if (!e || e.status !== 'active') throw new InternalAccessError('ineligible')
+    if (!e || (input.active && e.status !== 'active')) throw new InternalAccessError('ineligible')
 
-    const candidate = await loadEnrollmentCandidate(client, {
-      profileId: e.profile_id,
-      tenantId: e.tenant_id,
-      objectId: e.object_id
-    })
+    const candidate = input.active
+      ? await loadEnrollmentCandidate(client, {
+          profileId: e.profile_id,
+          tenantId: e.tenant_id,
+          objectId: e.object_id
+        })
+      : { organization_id: e.organization_id, upstream_link_id: e.upstream_link_id }
 
     if (!candidate || candidate.upstream_link_id !== e.upstream_link_id) throw new InternalAccessError('ineligible')
 
     const binding = await client.query(
-      `SELECT binding_id FROM greenhouse_core.external_organization_bindings WHERE binding_id=$1 AND status='active' AND organization_id=$2 FOR UPDATE`,
-      [e.binding_id, candidate.organization_id]
+      `SELECT binding_id FROM greenhouse_core.external_organization_bindings WHERE binding_id=$1 AND ($4::boolean OR status='active') AND population='internal' AND organization_id=$2 AND environment_id=$3 FOR UPDATE`,
+      [e.binding_id, candidate.organization_id, e.environment_id, !input.active]
     )
 
     if (binding.rows.length !== 1) throw new InternalAccessError('ineligible')
@@ -330,22 +362,23 @@ export const setInternalCapabilityGrant = async (
     )
       return { applied: false, idempotent: true, grantId: g?.grant_id ?? null }
     if (input.dryRun) return { applied: false, idempotent: false, grantId: g?.grant_id ?? null }
-    if (g)
-      await client.query(
-        `UPDATE greenhouse_core.external_capability_grants SET status='revoked',revoked_at=NOW(),revoked_by=$2,revoke_reason=$3,updated_at=NOW() WHERE grant_id=$1`,
-        [g.grant_id, input.actorId, input.reason]
-      )
+
+    const bindingAuthority = {
+      bindingId: e.binding_id,
+      environmentId: e.environment_id,
+      organizationId: candidate.organization_id,
+      population: 'internal' as const,
+      profileId: e.profile_id,
+      capability: input.capability,
+      actorId: input.actorId,
+      reason: input.reason
+    }
+
+    if (g) await revokeAuthorityGrant(client, { ...bindingAuthority, grantId: g.grant_id })
     const grantId = input.active ? `xcg-${randomUUID()}` : (g?.grant_id ?? null)
 
     if (input.active)
-      await client.query(
-        `INSERT INTO greenhouse_core.external_capability_grants (grant_id,binding_id,profile_id,capability,status,granted_by,reason,expires_at) VALUES ($1,$2,$3,$4,'active',$5,$6,$7)`,
-        [grantId, e.binding_id, e.profile_id, input.capability, input.actorId, input.reason, input.expiresAt]
-      )
-    await client.query(
-      `UPDATE greenhouse_core.external_organization_bindings SET grants_version=grants_version+1,updated_at=NOW() WHERE binding_id=$1`,
-      [e.binding_id]
-    )
+      await insertAuthorityGrant(client, { ...bindingAuthority, grantId: grantId!, expiresAt: input.expiresAt })
     await audit(client, {
       id: input.enrollmentId,
       actorId: input.actorId,
@@ -361,4 +394,17 @@ export const setInternalCapabilityGrant = async (
 
     return { applied: true, idempotent: false, grantId }
   })
+}
+
+const lockEnrollmentEnvironment = async (client: PoolClient, enrollmentId: string) => {
+  const lookup = await client.query<{ environment_id: string }>(
+    `SELECT environment_id FROM greenhouse_core.internal_native_enrollments WHERE enrollment_id=$1`,
+    [enrollmentId]
+  )
+
+  if (!lookup.rows[0]) throw new InternalAccessError('not_found')
+  await client.query(
+    `SELECT environment_id FROM greenhouse_core.external_identity_environments WHERE environment_id=$1 FOR UPDATE`,
+    [lookup.rows[0].environment_id]
+  )
 }

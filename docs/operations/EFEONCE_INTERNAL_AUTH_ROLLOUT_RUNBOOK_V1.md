@@ -2,32 +2,86 @@
 
 Owner: TASK-1836 / EPIC-044. Decisión: `EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md`.
 
-## Estado verificado 2026-09-05
+## Readback de integridad 2026-09-05 — posterior a PR #223
 
-Main `1086fe40a55396fc199ef2e446391c14a69b665d` (PR #222) está released mediante el orquestador
-`33978290957`, con CI, Deep, E2E y watchdog (5/5 servicios) correctos. Las tres migraciones TASK-1836
-están aplicadas en la instancia compartida de staging/producción. Reader Production ON, redeploy
-`dpl_4Ytq4GHm6rCSoDXAxK2vM5Br6gQ9` READY. GC ON con scheduler ENABLED y ejecución real confirmada
-en `ops-worker-00652-x8t`. Gateway ON en `00032-qm5`, commit `dd04f470`, run `33979635307` success,
-health y discovery correctos. Su workflow ya reutiliza imágenes existentes por digest sin sobrescribir tags.
+Migración `20260905183812333` aplicada por runner; población y tracking releídos. Piloto gv 2 → 3.
+Reconciliación canónica: revisión 1 binding/1 grant, apply 1/1 y revisión posterior 0/0; ambas señales
+de integridad en cero. Emisor sigue OFF en `auth-server-00013-jhz`, 100% tráfico. Código aún pendiente
+de publicar: build compartido bloqueado por WIP UI de Claude, a quien el operador decidió esperar.
+Smoke externo read-only/apply completado con fixture final revocada. Los pares de reconciliación
+comparten ID `41659bc7-c6f0-4eb0-8c46-6dafb80e562b` y referencian la auditoría original.
+El commit completo `7d704f483` está autorizado, incluido Berel. No repetir la migración ni fabricar
+auditoría; repetir dry-run/readbacks para comprobar continuidad. Canary humano y rollback pendientes.
 
-El emisor interno está temporalmente OFF (variable GitHub false, `auth-server-00012-tvn` al 100%).
-El login real completó Microsoft/MFA y llegó al callback con code/state, pero fue rechazado dentro de
-vigencia con `upstream_rejected`; no se emitió token MCP. Follow-up local verificado: `openid profile`,
-reloj posterior al intercambio y diagnóstico seguro por etapa; 65 pruebas y typecheck correctos.
-Falta publicar ese fix y repetir el canary. No atribuir el rechazo agregado a una causa específica sin
-el diagnóstico correspondiente. La relación entre scope y claim, y el defecto temporal, sí se verificaron.
+## Estado previo verificado 2026-09-05
 
-El perfil canónico de `jreyes@efeoncepro.com` pertenece a `EO-ORG-0007`
-(`org-2df565fb-98aa-42f7-b324-ea9a2209017f`). Su condición comercial `other/inactive` no determina
-pertenencia laboral: la organización está activa y es entidad operativa. No se modificó la organización.
-Enrollment y grant `growth.seo.observation.read` aplicados mediante commands canónicos, con vencimiento
-`2026-09-12T15:00:00Z`, versión actual 2. No se completaron lectura MCP, revocación ni rollback con token.
+Main `a68662508b1d928bbb1b6d048215a970ff008d21` (PR #223) está released por
+`33982717767`; manifest `a68662508b1d-750f5ab8-31c7-418d-a33c-9ea5b6871c1b`, sin override.
+CI, Deep, smoke de staging y Vercel Production `dpl_J8KpRZzN8AMG6PYBJuzeUjPXpSbn` READY;
+health del orquestador correcto y watchdog posterior `ok`, 5/5 sincronizados. El árbol completo del
+squash coincide con develop `1c75e89f`, servido por auth-server y ops-worker mediante change-gate.
+La corrección OIDC y el canary CSRF ya están publicados. GC permanece ON y su ejecución real anterior
+está comprobada; gateway `00032-qm5` conserva discovery ON. Esto no acredita el canary humano.
+
+El emisor interno continúa OFF (variable durable false; `auth-server-00013-jhz`, 100% tráfico).
+El intento anterior completó Microsoft/MFA pero el callback rechazó `upstream_rejected`, sin token.
+No atribuir ese error agregado a una causa histórica específica. Los defectos de scope/reloj sí están
+corregidos y probados. **No reactivar todavía:** la auditoría posterior confirmó writer compartido fuera
+del owner canónico y recuperación externa potencialmente capaz de desactivar un source link interno.
+
+El piloto de EO-ORG-0007 conserva enrollment y grant personal vigentes hasta 2026-09-12T15:00:00Z,
+gv 2 al readback, cero access tokens emitidos. Esos commands escribieron audit/eventos internos reales,
+pero cero audit/eventos externos canónicos para binding/grant; no declarar integrado ese criterio.
+La organización tiene status activo y es entidad operativa; lifecycle comercial other/inactive no la
+convierte en cliente ni exige reclasificación. La decisión A del ADR unifica primitives transaccionales,
+persistencia de población, recuperación aislada y reconciliación actual explícita sin falsear historia.
+
+Antes de continuar el piloto: migración aditiva y código compatibles, reconciliación dry-run/apply con
+actor/razón, detectores `unaudited_write` y `mixed_population` en cero y tests live/smoke externo; luego publicación gobernada,
+login nuevo y canaries de lectura/aislamiento/revocación/rollback. Todos siguen pendientes de cierre.
 
 Los seis permisos de release faltantes se restauraron por rol; el actor canónico se revalidó antes de
 usar la excepción de batch. El motivo quedó persistido y releído en manifest y auditoría PG.
 [Diagnóstico y reparación](TASK-1836_RELEASE_AUTHORITY_GAP_2026-09-05.md). La identidad declarada por
 GitHub y la autoridad Greenhouse se comprobaron por separado, sin inventar un vínculo entre ellas.
+
+## Interpretar el acceso interno frente al externo
+
+Consultar sólo `resolveExternalAccess` no determina el acceso corporativo: un source link de enrollment interno devuelve
+`internal_population` y deniega ese recorrido, aunque pueda ser elegible en el interno. No es unbound.
+La fachada ecosystem usa contexto interno + jti verificados para resolverlo y devuelve población interna;
+sin ese contexto conserva la política externa. No conceder `linked` ficticio ni relajar active_client.
+Para soporte, registrar población, recorrido, contexto y resultado redacted del reader que realmente se usó.
+No ejecutar ambos resolvers como sondeo read-only: el externo registra denials. Los canaries negativos y
+positivos deben ejercitar el recorrido correcto; diferencia entre poblaciones no es automáticamente drift.
+
+## Regularización del piloto — procedimiento de integridad
+
+Estado inicial medido: dos registros sin audit canónico. Conservar emisor interno OFF durante toda la
+transición. La migración `20260905183812333_task-1836-authority-populations.sql` se ejecuta exclusivamente
+por el runner gobernado, después de pruebas y revisión; no ejecutar SQL copiado ni reclasificar registros
+ambiguos manualmente. Clasificación es por evidencia de enrollment y grants, no por issuer/email.
+
+1. Verificar versión del código, migraciones pendientes y autoridad actual del operador. Confirmar que no
+   hay otro writer operativo de este módulo durante la transición. Conservar snapshot de IDs, estado y gv.
+2. Aplicar migración aditiva por el runner y comprobar population interna sólo en bindings demostrables.
+   La versión aumenta una vez para invalidar contextos previos; no inventar un valor esperado fijo.
+3. Ejecutar `pnpm identity:internal-access:reconcile -- --binding-id <binding> --actor-id <actor> --reason "<razón de regularización>"`. Sin `--apply` es revisión: devolver conteos planeados, sin audit/outbox.
+4. Revisar que el plan corresponda al binding y grants existentes; no crea autoridad ni extiende vigencia.
+   Ejecutar con `--apply` bajo la autorización del rollout. Repetir la revisión debe planear cero registros.
+5. Releer audit/eventos de reconciliación actuales, actor/razón, referencias a audit original y IDs exactos.
+   Ejecutar la señal: `unaudited_write_count=0` y `mixed_population_count=0` son necesarios; nunca insertar audit ajeno para silenciarla.
+   El par audit/outbox debe estar correlacionado: una fila audit sola no acredita integración.
+   El command rechaza capability/vencimiento distintos de la última concesión original y no los renueva.
+6. Ejecutar smoke externo read-only y suites live por `pnpm test:live`, serializadas. Verificar separación
+   de población, recuperación externa, revocación, grants personales y ausencia de escalamiento.
+7. Publicar por release control plane, releer todos los runtimes y recién entonces reactivar emisor para
+   canary humano. Detector cero y release verde no sustituyen el login, aislamiento ni revocación reales.
+
+Rollback: apagar gate interno y conservar columnas, población e historia. No invertir clasificación,
+reducir `gv`, borrar auditoría ni recrear subjects. La migración tiene rollback conservador; un cambio de
+política exige nueva decisión/migración. Si la clasificación detecta mezcla, abortar y documentar antes
+de reparar por un command explícito. No declarar este procedimiento ejecutado hasta conservar readbacks.
 
 ## Configuración del emisor
 

@@ -127,7 +127,7 @@ se producen solo las seleccionadas y cambia **quién consume cada una**.
   hablando de tú, sin mezclarlo en el "nosotros".
 - **Sin claims no respaldados por el Lab.** Por ejemplo, los ciclos de lavado **no se citan en
   social**; se dice "acabado lavable" genérico.
-- **Enlace siempre al artículo o ficha real**, nunca a `/search?q=`.
+- **Enlace siempre al artículo o a la página pública del producto**, nunca a `/search?q=`.
 - Sin superlativos vacíos, sin urgencia, sin comparar con la competencia.
 - **La mexicanidad se muestra** en objetos y escenas (la raya de estatura, el comal), **no se
   anuncia** → [`04_VOZ_Y_TONO_BEREL.md`](04_VOZ_Y_TONO_BEREL.md).

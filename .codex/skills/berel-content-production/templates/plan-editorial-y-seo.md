@@ -18,7 +18,8 @@
 	- ¿Por qué esto es un artículo y no una ficha de producto? → [...]
 	- Problema del lector que el producto resuelve: [...]
 	- Por qué se descartó el enfoque de ficha: [...]
-	- Limitación evidente del producto y alternativa que se le ofrece al lector: [...]
+		- Limitación evidente del producto y alternativa que se le ofrece al lector: [...]
+		- ¿Es producto nuevo/de awareness?: [sí/no] · diferenciador central: [...] · render oficial: [fuente/pendiente]
 
 	## 3. Arquitectura SEO
 	- Keyword principal: «...» — intención: [...] — rol en el artículo: [title / H2 / FAQ / ALT]
@@ -65,5 +66,7 @@ CTA, señal y gates. No crear tareas por defecto ni cambiar formatos/cuotas/fór
 - [ ] Slug verificado contra lo ya publicado
 - [ ] Tabla de datos cerrada, con discrepancias anotadas y reportadas
 - [ ] Ningún claim sin respaldo documental
+- [ ] Si es awareness: diferenciador al frente, sin `Guía [Producto]` por defecto y render oficial previsto
+- [ ] Datos faltantes fuera del cuerpo y registrados en pendientes internos
 - [ ] Plan de enlaces entrantes hecho
 - [ ] Fila del Content Hub renombrada si traía "(por desarrollar)"

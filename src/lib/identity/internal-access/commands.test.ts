@@ -84,6 +84,8 @@ describe('governed internal enrollment', () => {
 
 it('grant cannot exceed the target existing authority even for an authorized operator', async () => {
   mock.query
+    .mockResolvedValueOnce({ rows: [{ environment_id: input.environmentId }] })
+    .mockResolvedValueOnce({ rows: [{ environment_id: input.environmentId }] })
     .mockResolvedValueOnce({
       rows: [
         {
@@ -130,8 +132,28 @@ it('active grants require explicit finite future validity', async () => {
 })
 
 it('publishes revocation on the enrollment aggregate with the catalogued event', async () => {
-  mock.query.mockResolvedValueOnce({
-    rows: [{ enrollment_id: 'e', status: 'active', native_link_id: 'native', binding_id: 'binding' }]
+  mock.query.mockImplementation(async (sql: string) => {
+    if (sql.startsWith('SELECT environment_id FROM greenhouse_core.internal_native_enrollments'))
+      return { rows: [{ environment_id: 'efeonce-auth' }] }
+    if (sql.includes('SELECT e.*,b.organization_id'))
+      return {
+        rows: [
+          {
+            enrollment_id: 'e',
+            status: 'active',
+            native_link_id: 'native',
+            binding_id: 'binding',
+            environment_id: 'efeonce-auth',
+            organization_id: 'own-org',
+            profile_id: 'person'
+          }
+        ]
+      }
+    if (sql.includes('SELECT status FROM')) return { rows: [{ status: 'active' }] }
+    if (sql.includes('SELECT binding_id FROM')) return { rows: [{ binding_id: 'binding' }] }
+    if (sql.includes('RETURNING grants_version')) return { rows: [{ grants_version: 2 }] }
+
+return { rows: [], rowCount: 1 }
   })
   await revokeInternalNativeIdentity(
     { enrollmentId: 'e', actorId: input.actorId, reason: input.reason },

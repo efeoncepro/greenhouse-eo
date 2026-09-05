@@ -6,7 +6,7 @@
 - Scope: TASK-1836; auth-server, sesiones, OAuth, contexto delegado y reader del gateway.
 - Reversibility: two-way-but-slow
 - Confidence: medium
-- Validated as of: 2026-09-05, runtime publicado parcialmente; follow-up OIDC local y canary corporativo pendiente.
+- Validated as of: 2026-09-05, follow-up OIDC publicado; integridad del writer compartido en corrección y piloto interno OFF.
 - Authorization: ejecución de TASK-1836 corregida D1–D7 solicitada por el operador y objetivo aprobado
   en esta conversación. El rollout posterior fue autorizado explícitamente por el operador el 2026-09-05.
 
@@ -109,3 +109,85 @@ El instante de validación del ID token se obtiene después de leer la respuesta
 no al llegar el callback. La regresión con JWT firmado reproduce emisión en el segundo siguiente al
 callback: el token válido se acepta al recibirlo y el expirado en tránsito se rechaza. No se añade
 tolerancia al reloj, extensión de TTL ni fallback de identidad.
+
+
+## Delta de integridad y población — 2026-09-05 (decisión A)
+
+La revisión arquitectónica de TASK-1836 confirma una desviación del writer único: el command interno
+escribió bindings, grants y source links compartidos con audit/outbox internos, pero sin el audit/outbox
+canónico de esas mutaciones. No constituye ausencia total de audit; sí rompe el contrato de ownership y
+la observabilidad compartida. El piloto permanece OFF y esta decisión exige reparación antes de activarlo.
+
+Se adopta **A: núcleo transaccional canónico compartido**, descartando declarar permanentemente un
+segundo writer. Las primitives de `identity/external-access/authority-transactions.ts` poseerán las
+mutaciones compartidas, su audit, outbox y versión, usando la misma transacción del command llamador.
+Los wrappers externos e internos conservan sus capabilities y políticas; no se crean transacciones anidadas
+independientes. El audit interno de enrollment se conserva como evidencia complementaria.
+
+El binding tendrá población persistida e inmutable `external | internal`, distinta de `issuer_class`.
+La membership externa continúa siendo una invitación `linked` y exige cliente activo. La membership
+interna continúa siendo enrollment vigente más identidad, pertenencia y relación laboral canónicas;
+no se fabrican invitaciones ni se clasifica a Efeonce como cliente. La organización propia debe tener
+`status=active`, `active=true` e `is_operating_entity=true`; su lifecycle comercial no concede ni revoca
+por sí mismo autoridad interna. Los readers, writers, recuperación y revocación respetarán la población.
+La recuperación externa no puede desactivar source links protegidos por un enrollment interno.
+
+La migración aditiva clasifica únicamente bindings sustentados por enrollment verificable y rechaza
+mezclas ambiguas de invitaciones/grants. Conserva IDs, subjects e historia y aumenta `gv` al clasificar
+para invalidar contextos anteriores. No infiere población desde emails, issuer ni prefijos. La regularización
+posterior es un command idempotente, con dry-run, actor y razón actuales, referencias al audit interno
+original y eventos explícitos de reconciliación; no inserta timestamps históricos ficticios ni reescribe logs.
+
+La señal `identity.external_binding.unaudited_write` tiene steady 0: observa bindings activos y grants
+activos vigentes sin evidencia canónica aplicada y correlacionada de creación o reconciliación. Un evento
+ajeno o denegado no satisface el contrato. Fallar la consulta produce `unknown`, nunca cero artificial.
+
+Aceptación: aislamiento de población y recuperación, organización suspendida denegada, ausencia de grants
+internos generales sin persona, atomicidad estado/audit/outbox/versiones, detector SQL real y smoke externo
+sin regresión. Secuencia: código y migración compatibles con gate OFF, regularización con evidencia,
+publicación gobernada y canaries reales. Esta decisión no declara esas verificaciones ya completadas.
+
+
+### Resolución y diagnóstico por población
+
+La fachada de dispatch existente del reader ecosystem selecciona autoridad interna sólo con contexto
+interno y `jti` válidos, y devuelve `population=internal`; el recorrido sin contexto conserva el resolver
+externo y sus requisitos. Son dos políticas explícitas detrás de una frontera común, no dos resolvers que
+deban producir la misma respuesta para toda persona. `resolveExternalAccess=internal_population` deniega el recorrido externo para un source link
+propiedad de enrollment interno, incluso revocado; no crear una membership externa para
+hacer coincidir resultados ni usar esa diferencia sola como alerta `resolver_divergence`.
+
+Soporte debe identificar población y procedencia antes de interpretar un denial. El resolver externo
+registra denials en `external_access_resolution_log`: llamar ambos resolvers para compararlos no es un
+diagnóstico puramente read-only y contaminaría la señal de intentos externos. La evidencia operativa de
+la fachada exige el contexto/token real en el canary; un reader externo aislado no describe acceso interno.
+Inconsistencias con la población persistida se rechazan y se prueban como tales; ausencia de audit se mide
+por `unaudited_write`. Un diagnóstico administrativo adicional sin token requeriría contrato de sólo lectura
+específico, no ampliar permisos del resolver externo. No es requisito para autorizar el canary actual.
+
+
+### Diagnóstico permanente y reconciliación verificable
+
+`internal_population` es un outcome cerrado del reader, su log PG y el gateway; nunca concede acceso ni
+invoca un fallback interno. Precedencia: environment inactivo, colisión de links activos, propiedad interna,
+y finalmente controles externos. La propiedad persiste aunque el enrollment/link/perfil esté inactivo;
+la elegibilidad se decide únicamente por el carril interno con contexto firmado. No se registra `unbound`
+para este caso ni se incluye en `unbound_dispatch_attempt`.
+
+`identity.external_binding.mixed_population` cuenta bindings distintos con cualquiera de estos defectos,
+en todo estado histórico (steady 0, error si >0, unknown si falla SQL):
+
+- Binding interno con cualquier invitación externa o grant sin persona, sin vencimiento, o sin enrollment
+  del mismo binding/persona/environment.
+- Enrollment con binding inexistente/externo, environment distinto o entidad operativa ajena a EO-ORG-0007.
+- Links nativo/upstream inexistentes o incoherentes en perfil, sistema, tipo u object ID; ausencia del
+  client_user que correlaciona perfil, tenant y object ID canónicos.
+
+Revocación, vencimiento y links inactivos coherentes no son mezcla. La señal no llama resolvers ni compara
+sus resultados. Las pruebas SQL corrompen cada relación en tablas temporales y comprueban deduplicación.
+El reader interno exige vencimiento futuro; NULL conserva semántica legacy sólo en grants externos.
+
+La regularización exige evidencia interna original del grant con capability y vencimiento idénticos.
+No puede certificar una ampliación de autoridad como recuperación de auditoría. Evidencia canónica previa
+requiere dimensiones correlacionadas y outbox correspondiente; si falta esa pareja, se registra una nueva
+reconciliación actual, atómica e idempotente. No se reescriben los audits previos ni se rejuvenece el grant.

@@ -19,6 +19,8 @@ const {
   EXTERNAL_BINDING_SUBJECT_COLLISION_SIGNAL_ID,
   EXTERNAL_BINDING_UNBOUND_DISPATCH_ATTEMPT_SIGNAL_ID,
   getExternalBindingOrphanGrantSignal,
+  getExternalBindingMixedPopulationSignal,
+  getExternalBindingUnauditedWriteSignal,
   getExternalBindingRevokedStillDispatchingSignal,
   getExternalBindingSubjectCollisionSignal,
   getExternalBindingUnboundDispatchAttemptSignal,
@@ -30,22 +32,25 @@ const {
  * `unknown`) con `query` mockeado. No afirman el texto del SQL: el verificador real de las consultas
  * es el smoke live `pnpm identity:external-access:smoke` (lecturas + las 4 señales contra PG real) y,
  * con `--apply`, el ciclo bind → grant → invite → accept → resolve → revoke que alimenta el
- * resolution log. Si cambia el SQL, es ahí donde tiene que seguir en verde.
+ * resolution log. Mixed population y unaudited_write ejecutan SQL conductual en el archivo
+ * external-identity-binding-signals.live.test.ts, con tablas TEMP y rollback.
  */
 describe('TASK-1631 — external identity binding reliability signals', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
-  it('declares the four canonical signal ids exactly once and each reader returns its own id', async () => {
+  it('declares the six canonical signal ids exactly once and each reader returns its own id', async () => {
     const ids = EXTERNAL_IDENTITY_BINDING_SIGNAL_READERS.map(reader => reader.signalId)
 
-    expect(new Set(ids).size).toBe(4)
+    expect(new Set(ids).size).toBe(6)
     expect(ids).toEqual([
       'identity.external_binding.unbound_dispatch_attempt',
       'identity.external_binding.revoked_still_dispatching',
       'identity.external_binding.subject_collision',
-      'identity.external_binding.orphan_grant'
+      'identity.external_binding.orphan_grant',
+      'identity.external_binding.unaudited_write',
+      'identity.external_binding.mixed_population'
     ])
 
     queryMock.mockResolvedValue([{ n: '0' }])
@@ -67,7 +72,9 @@ describe('TASK-1631 — external identity binding reliability signals', () => {
     expect(signal.signalId).toBe(EXTERNAL_BINDING_UNBOUND_DISPATCH_ATTEMPT_SIGNAL_ID)
     expect(signal.kind).toBe('incident')
     expect(signal.severity).toBe('warning')
-    expect(signal.evidence).toEqual(expect.arrayContaining([expect.objectContaining({ label: 'unbound_count', value: '3' })]))
+    expect(signal.evidence).toEqual(
+      expect.arrayContaining([expect.objectContaining({ label: 'unbound_count', value: '3' })])
+    )
   })
 
   it('unbound_dispatch_attempt escalates to error at 20 denials', async () => {
@@ -96,7 +103,6 @@ describe('TASK-1631 — external identity binding reliability signals', () => {
     expect(signal.signalId).toBe(EXTERNAL_BINDING_SUBJECT_COLLISION_SIGNAL_ID)
     expect(signal.kind).toBe('data_quality')
     expect(signal.severity).toBe('error')
-
   })
 
   it('orphan_grant is an error on the first active grant without an active binding/environment', async () => {
@@ -118,11 +124,35 @@ describe('TASK-1631 — external identity binding reliability signals', () => {
     expect(captureMock).toHaveBeenCalledWith(expect.any(Error), 'identity', expect.anything())
   })
 
+  it('unaudited writes are an error on the first row and unknown when PG fails', async () => {
+    queryMock.mockResolvedValueOnce([{ n: '1' }])
+    expect(await getExternalBindingUnauditedWriteSignal()).toMatchObject({
+      severity: 'error',
+      signalId: 'identity.external_binding.unaudited_write'
+    })
+    queryMock.mockRejectedValueOnce(new Error('connection refused'))
+    expect(await getExternalBindingUnauditedWriteSignal()).toMatchObject({ severity: 'unknown' })
+  })
+
+  it('mixed population is an error on the first binding and unknown when PG fails', async () => {
+    queryMock.mockResolvedValueOnce([{ n: '1' }])
+    expect(await getExternalBindingMixedPopulationSignal()).toMatchObject({
+      severity: 'error',
+      kind: 'data_quality',
+      signalId: 'identity.external_binding.mixed_population',
+      evidence: expect.arrayContaining([expect.objectContaining({ label: 'mixed_population_count', value: '1' })])
+    })
+    queryMock.mockRejectedValueOnce(new Error('connection refused'))
+    expect(await getExternalBindingMixedPopulationSignal()).toMatchObject({ severity: 'unknown' })
+  })
+
   it('group reader returns every signal and drops only readers that throw outside their own guard', async () => {
     queryMock.mockResolvedValue([{ n: '0' }])
 
     const signals = await getExternalIdentityBindingSignals()
 
-    expect(signals.map(signal => signal.signalId)).toEqual(EXTERNAL_IDENTITY_BINDING_SIGNAL_READERS.map(r => r.signalId))
+    expect(signals.map(signal => signal.signalId)).toEqual(
+      EXTERNAL_IDENTITY_BINDING_SIGNAL_READERS.map(r => r.signalId)
+    )
   })
 })

@@ -43,6 +43,8 @@ vi.mock('@/lib/db', async original => {
 import { getGreenhousePostgresPool } from '@/lib/db'
 import { server } from '@/mocks/node'
 import { enrollInternalNativeIdentity, revokeInternalNativeIdentity, setInternalCapabilityGrant } from './commands'
+import { resolveExternalAccess } from '../external-access/resolve-external-access'
+import {bindExternalOrganization,issueExternalInvitation,acceptExternalInvitation,grantExternalCapability} from '../external-access/commands'
 import { resolveEnrolledInternalIdentity, resolveInternalAuthority } from './store'
 
 const configured = Boolean(
@@ -73,12 +75,21 @@ describe.skipIf(!configured)('internal identity real SQL canonical canary snapsh
         'external_identity_environments',
         'external_organization_bindings',
         'external_capability_grants',
+        'external_member_invitations',
+        'external_identity_audit_log',
+        'external_access_resolution_log',
         'internal_native_enrollments',
         'internal_native_access_audit'
       ]
 
       for (const table of core)
         await client.query(`CREATE TEMP TABLE ${table}(LIKE greenhouse_core.${table} INCLUDING ALL) ON COMMIT DROP`)
+      await client.query(
+        "ALTER TABLE pg_temp.external_organization_bindings ADD COLUMN IF NOT EXISTS population text NOT NULL DEFAULT 'external'"
+      )
+      await client.query('ALTER TABLE pg_temp.external_identity_audit_log DROP CONSTRAINT external_identity_audit_log_event_type_valid')
+      await client.query("ALTER TABLE pg_temp.external_access_resolution_log DROP CONSTRAINT external_access_resolution_log_outcome_valid")
+      await client.query("ALTER TABLE pg_temp.external_access_resolution_log ADD CONSTRAINT external_access_resolution_log_outcome_valid CHECK(outcome IN ('bound','unbound','revoked','environment_inactive','profile_inactive','internal_population'))")
       await client.query(
         'CREATE TEMP TABLE outbox_events(LIKE greenhouse_sync.outbox_events INCLUDING ALL) ON COMMIT DROP'
       )
@@ -156,7 +167,10 @@ describe.skipIf(!configured)('internal identity real SQL canonical canary snapsh
       const identity = await resolveEnrolledInternalIdentity(input)
 
       expect(identity?.profileId).toBe(profileId)
+      expect(await resolveExternalAccess({environmentId,subject:identity!.subject})).toMatchObject({outcome:'internal_population'})
+      expect((await client.query('SELECT count(*) AS count FROM pg_temp.external_member_invitations')).rows[0].count).toBe('0')
       expect(await resolveEnrolledInternalIdentity({ ...input, tenantId: randomUUID() })).toBeNull()
+      expect((await client.query("SELECT outcome FROM pg_temp.external_access_resolution_log")).rows[0].outcome).toBe('internal_population')
       const authorityInput = { environmentId, profileId, subject: identity!.subject, bindingId: identity!.bindingId }
 
       expect((await resolveInternalAuthority(authorityInput))?.capabilities).toEqual([])
@@ -172,9 +186,23 @@ describe.skipIf(!configured)('internal identity real SQL canonical canary snapsh
         deps
       )
       expect((await resolveInternalAuthority(authorityInput))?.capabilities).toEqual(['identity.external_binding.read'])
+      await client.query('UPDATE pg_temp.external_capability_grants SET expires_at=NULL')
+      expect((await resolveInternalAuthority(authorityInput))?.capabilities).toEqual([])
+      await client.query("UPDATE pg_temp.external_capability_grants SET expires_at=NOW()+INTERVAL '1 hour'")
+      await client.query("UPDATE pg_temp.organizations SET status='inactive' WHERE public_id='EO-ORG-0007'")
+      expect(await resolveInternalAuthority(authorityInput)).toBeNull()
+      await client.query("UPDATE pg_temp.organizations SET status='active' WHERE public_id='EO-ORG-0007'")
       await client.query('UPDATE pg_temp.identity_profiles SET active=FALSE WHERE profile_id=$1', [profileId])
       expect(await resolveInternalAuthority(authorityInput)).toBeNull()
       await client.query('UPDATE pg_temp.identity_profiles SET active=TRUE WHERE profile_id=$1', [profileId])
+      await client.query(
+        "UPDATE pg_temp.external_identity_environments SET status='suspended' WHERE environment_id=$1",
+        [environmentId]
+      )
+      await client.query(
+        "UPDATE pg_temp.external_organization_bindings SET status='revoked',revoked_at=NOW(),revoked_by='test-operator' WHERE binding_id=$1",
+        [identity!.bindingId]
+      )
       await revokeInternalNativeIdentity(
         { enrollmentId: enrolled.enrollmentId!, actorId: input.actorId, reason: input.reason },
         deps
@@ -188,11 +216,36 @@ describe.skipIf(!configured)('internal identity real SQL canonical canary snapsh
           .map(r => r.event_type)
           .sort()
       ).toEqual(['capability_granted', 'enrolled', 'revoked'])
-      expect(Number((await client.query('SELECT count(*) AS count FROM pg_temp.outbox_events')).rows[0].count)).toBe(3)
+      expect(Number((await client.query('SELECT count(*) AS count FROM pg_temp.outbox_events')).rows[0].count)).toBe(7)
+      // Independent EXTERNAL control on the canonical smoke customer, entirely in transaction-local clones.
+      const customer='org-ddd962ae-6417-4325-92d0-f1994dc06cc5'
+
+      await client.query('INSERT INTO pg_temp.organizations SELECT * FROM greenhouse_core.organizations WHERE organization_id=$1',[customer])
+      expect((await client.query('SELECT organization_id FROM pg_temp.organizations WHERE organization_id=$1',[customer])).rows).toHaveLength(1)
+      await client.query("UPDATE pg_temp.external_identity_environments SET status='active' WHERE environment_id=$1",[environmentId])
+      const externalProfile=`temp-external-${randomUUID()}`,externalSubject=`temp-external-${randomUUID()}`,email='fixture@efeonce.invalid'
+
+      await client.query(`INSERT INTO pg_temp.identity_profiles(profile_id,profile_type,canonical_email,full_name,status,active,data_origin)
+       VALUES($1,'external_contact',$2,'Temporary external control','active',TRUE,'smoke_test')`,[externalProfile,email])
+      const actor={actorId:'test-operator'}
+      const externalBinding=await bindExternalOrganization({environmentId,organizationId:customer,externalOrganizationRef:'temp-control',reason:'Temporary external population control'},actor)
+      const invitation=await issueExternalInvitation({bindingId:externalBinding.binding.bindingId,profileId:externalProfile,email,reason:'Temporary control',expiresInHours:1},actor)
+
+      expect(invitation.token).toBeTruthy()
+      await acceptExternalInvitation({environmentId,subject:externalSubject,token:invitation.token!,verifiedEmail:email},actor)
+      await grantExternalCapability({bindingId:externalBinding.binding.bindingId,profileId:externalProfile,capability:'growth.seo.observation.read',reason:'Temporary external control'},actor)
+      const external=await resolveExternalAccess({environmentId,subject:externalSubject})
+
+      expect(external).toMatchObject({outcome:'bound',profileId:externalProfile})
+      if(external.outcome==='bound') expect(external.memberships).toEqual([expect.objectContaining({organizationId:customer,grants:['growth.seo.observation.read']})])
+      // Corrupt only the TEMP fixture to exercise reader fail-closed independently of immutable-population DDL.
+      await client.query("UPDATE pg_temp.external_organization_bindings SET population='internal' WHERE binding_id=$1",[externalBinding.binding.bindingId])
+      expect(await resolveExternalAccess({environmentId,subject:externalSubject})).toMatchObject({outcome:'unbound'})
+
     } finally {
       await client.query('ROLLBACK')
       state.client = null
       client.release()
     }
-  }, 30000)
+  }, 60000)
 })

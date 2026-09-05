@@ -12,6 +12,7 @@
 
 import { GH_AUTH_SERVER } from '@/lib/copy/auth-server'
 
+import { ICON_ALERT, ICON_CLOCK, ICON_MAIL, MICROSOFT_MARK_SVG } from '../oauth/pages/icons'
 import { escapeHtml, layout } from '../oauth/pages/render'
 
 export const PERSON_AUTH_PATHS = {
@@ -39,42 +40,57 @@ const hiddenField = (name: string, value: string | null): string =>
   value ? `<input type="hidden" name="${escapeHtml(name)}" value="${escapeHtml(value)}">` : ''
 
 /** Formulario de inicio de sesión por correo. Un solo campo: no hay contraseña que pedir. */
-export const renderLoginPage = (input: { returnTo: string | null; internalLoginUrl?: string | null; error?: 'invalid_email' | null }): string =>
-  layout(
+export const renderLoginPage = (input: { returnTo: string | null; internalLoginUrl?: string | null; error?: 'invalid_email' | null }): string => {
+  const invalidEmail = input.error === 'invalid_email'
+
+  /**
+   * Jerarquía deliberada: el enlace por correo es la puerta de la gente invitada —la mayoría— así
+   * que se queda con el botón primario. El acceso del equipo interno delega en Microsoft, va en
+   * secundario y lleva el logo oficial, como pide el botón estándar de Microsoft.
+   */
+  const internalMethod = input.internalLoginUrl
+    ? `<section class="id-section"><h2>${escapeHtml(GH_AUTH_SERVER.login_team_title)}</h2>
+    <a class="id-secondary" href="${escapeHtml(input.internalLoginUrl)}">${MICROSOFT_MARK_SVG}${escapeHtml(GH_AUTH_SERVER.login_microsoft_cta)}</a></section>
+  <p class="id-or" aria-hidden="true"><span>${escapeHtml(GH_AUTH_SERVER.login_methods_separator)}</span></p>`
+    : ''
+
+  return layout(
     GH_AUTH_SERVER.login_title,
     `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.login_title)}</h1>
-  <p>${escapeHtml(input.internalLoginUrl ? GH_AUTH_SERVER.login_methods_intro : GH_AUTH_SERVER.login_intro)}</p>
-  ${input.error === 'invalid_email' ? `<p class="muted">${escapeHtml(GH_AUTH_SERVER.login_invalid_email)}</p>` : ''}
-  ${input.internalLoginUrl ? `<section class="id-section"><h2>${escapeHtml(GH_AUTH_SERVER.login_team_title)}</h2><a class="id-primary" href="${escapeHtml(input.internalLoginUrl)}">${escapeHtml(GH_AUTH_SERVER.login_microsoft_cta)}</a></section>` : ''}
+  <p class="id-intro">${escapeHtml(input.internalLoginUrl ? GH_AUTH_SERVER.login_methods_intro : GH_AUTH_SERVER.login_intro)}</p>
+  ${invalidEmail ? `<p class="id-alert" id="email-error" role="alert">${ICON_ALERT}<span>${escapeHtml(GH_AUTH_SERVER.login_invalid_email)}</span></p>` : ''}
+  ${internalMethod}
   <section class="id-section"><h2>${escapeHtml(GH_AUTH_SERVER.login_invitation_title)}</h2>
   <form method="post" action="${escapeHtml(PERSON_AUTH_PATHS.magicLinkRequest)}">
     ${hiddenField('return_to', input.returnTo)}
     <ul>
       <li class="id-field">
         <label for="email">${escapeHtml(GH_AUTH_SERVER.login_email_label)}</label>
-        <input id="email" name="email" type="email" autocomplete="email" required>
+        <span class="id-input">${ICON_MAIL}<input id="email" name="email" type="email" inputmode="email" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="${escapeHtml(GH_AUTH_SERVER.login_email_placeholder)}" autofocus required${invalidEmail ? ' aria-invalid="true" aria-describedby="email-error"' : ''}></span>
       </li>
     </ul>
     <div class="actions">
-      <button class="primary" type="submit">${escapeHtml(GH_AUTH_SERVER.login_submit_cta)}</button>
+      <button class="primary" type="submit">${ICON_MAIL}${escapeHtml(GH_AUTH_SERVER.login_submit_cta)}</button>
     </div>
-  </form></section>`,
+  </form>
+  <p class="id-note-fine">${escapeHtml(GH_AUTH_SERVER.login_card_note)}</p></section>`,
     { state: 'login' }
   )
+}
 
 export const renderMagicLinkSentPage = (): string =>
   layout(
     GH_AUTH_SERVER.login_sent_title,
     `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.login_sent_title)}</h1>
   <p>${escapeHtml(GH_AUTH_SERVER.login_sent_body)}</p>
-  <p class="muted">${escapeHtml(GH_AUTH_SERVER.login_sent_hint)}</p>`
+  <p class="id-note">${ICON_MAIL}<span>${escapeHtml(GH_AUTH_SERVER.login_sent_hint)}</span></p>`
   )
 
 export const renderRateLimitedPage = (): string =>
   layout(
     GH_AUTH_SERVER.login_rate_limited_title,
     `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.login_rate_limited_title)}</h1>
-  <p>${escapeHtml(GH_AUTH_SERVER.login_rate_limited_body)}</p>`
+  <p class="id-note">${ICON_CLOCK}<span>${escapeHtml(GH_AUTH_SERVER.login_rate_limited_body)}</span></p>`
   )
 
 /** Página intermedia del magic link: el token viaja en un campo oculto y se consume por POST. */
