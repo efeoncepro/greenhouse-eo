@@ -17,9 +17,10 @@ diseño y quedó implementada en `develop`. Lo verificado, lo que falta y una tr
   `ui:visual-gate` / `ui:quality`.
 - **Trampa operativa que hay que leer antes de empujar**: `auth-server-deploy.yml` dispara en todo
   push a `develop` que toque `src/lib/**`, y el servicio Cloud Run es UNO solo compartido que sirve
-  `auth.efeonce.org` en vivo. El push ES el despliegue y la pantalla queda pública. Además `main`
-  todavía trae `AUTH_SERVER_OAUTH_ENABLED=false` y ninguna aparición de
-  `AUTH_SERVER_PERSON_AUTH_ENABLED`: un release desde `main` sin arreglar eso APAGA este login.
+  `auth.efeonce.org` en vivo. El push ES el despliegue y la pantalla queda pública. La advertencia
+  anterior sobre flags de main quedó corregida tras verificación de Codex contra `origin/main`
+  `a68662508`: `deploy.sh` ya declara OAuth y person auth con default true. El gate interno sigue
+  separado y durable en GitHub false hasta terminar la publicación y los readbacks de TASK-1836.
 
 ## Delta 2026-09-04 — acceso interno nativo (TASK-1836)
 

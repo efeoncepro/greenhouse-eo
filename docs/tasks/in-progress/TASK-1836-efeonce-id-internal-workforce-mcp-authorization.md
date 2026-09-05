@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `2026-09-05: reparación de integridad verificada localmente; migración 20260905183812333 aplicada por runner y reconciliación canónica aplicada al piloto (binding=1, grant=1, gv=3), idempotencia 0/0 y señales unaudited_write=0/mixed_population=0. Emisor interno OFF confirmado en auth-server-00013-jhz. Publicación pendiente: build compartido bloqueado por ICON_LOCK faltante en WIP UI de Claude; operador decidió esperar a que termine. Commit completo 7d704f483, incluido Berel, autorizado para publicación. Canary humano, refresh, revocación y rollback siguen sin acreditar.`
+- Status real: `2026-09-05: publicación reanudada tras cierre UI de Claude y autorización del operador para integrar y avanzar. Reparación commit 0fc7a4bc5; 407 pruebas auth/identity y 6 checks browser local correctos, build exit0. Gateway d7469d7 pusheado y CI/contenedor verde, deploy en curso. Migración y reconciliación ya aplicadas (gv3, idempotencia0/0, ambas señales0). Emisor interno OFF hasta release/readbacks; canary humano, refresh, revocación y rollback pendientes.`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -881,3 +881,16 @@ No se marca aceptación por pruebas anteriores al diff final.
   Se respeta la instrucción de esperar su cierre antes de repetir build/publicar.
 - `task:lint` template=1, errors=0, warnings=0; `docs:closure-check` exit 0 con advertencias
   documentales preexistentes/de revisión. Lifecycle sigue in-progress; no se mueve la task.
+
+
+### Reanudación después de Claude — 2026-09-05 19:51 UTC
+
+El operador confirmó cierre de Claude y autorizó avanzar con todo. Se revisaron los commits UI
+eec90bf10…dcb299cb7 y la reparación 0fc7a4bc5, con árbol limpio al retomar. Dirección visual aprobada
+A/Nocturno editorial; los criterios integrales de TASK-1835 siguen en su task y no se declaran completos
+por este piloto. 407 pruebas unitarias y 6 checks de renderers/controladores locales pasaron.
+La nota de Claude sobre flags de main estaba stale: origin/main a68662508 ya declara OAuth/person true;
+se corrigió la nota. GitHub internalAuth false y permisos del operador de excepción batch revalidados.
+Preflight configurado: PG/migraciones/WIF/Sentry correctos; faltan SHA publicado/CI y excepción batch
+por migración ya aplicada. Ningún bypass de evidencia CI/readiness. Gateway d7469d7, CI33988476298
+con contenedor success; deploy33988521730 en curso.

@@ -1,16 +1,15 @@
 # Handoff activo
 
-**TASK-1836, 2026-09-05 — integridad aplicada; publicación en espera:** Codex terminó revisión
-independiente, migración CLI `20260905183812333` y reconciliación actual del piloto (1 binding/1 grant,
-gv 2 → 3; segunda revisión 0/0). Señales `unaudited_write` y `mixed_population` en cero; 118 unitarias,
-20 live de integridad y 1 live de recuperación pasaron. Emisor interno OFF confirmado en `00013-jhz`.
-El operador autorizó publicar el commit completo `7d704f483` (incluye Berel). Build bloqueado por
-`ICON_LOCK` faltante en WIP UI posterior de Claude; **operador decidió esperar a que Claude termine**,
-sin modificar su trabajo. Claude añadió luego el símbolo faltante; falta confirmar cierre UI y nuevo build.
-Smoke externo completo pasó, fixture revocada. Reparación aún sin push/release; canary humano/refresh/revocación/rollback
-pendientes. Estado y evidencia: [task](docs/tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md),
-[runbook](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md). Autorizaciones anteriores y
-contexto original: [handoff de integridad](docs/operations/TASK-1836_INTEGRITY_SESSION_HANDOFF_2026-09-05.md).
+**TASK-1836, 2026-09-05 — publicación reanudada:** Claude terminó la pasada UI autorizada
+(Nocturno editorial) y guardó la reparación de Codex en `0fc7a4bc5`; checkout limpio al retomar.
+Operador pidió revisar e integrar ese trabajo y avanzar con todo el rollout. 407 pruebas auth/identity
+pasaron y browser local 6/6 sin violaciones; build integrado exit0. Gateway `d7469d7` pusheado,
+CI/contenedor correctos y deploy33988521730 en curso. Emisor interno sigue OFF hasta readbacks.
+Migración `20260905183812333` y reconciliación ya aplicadas (gv3, segunda revisión0/0, ambas señales0);
+no repetir operaciones como si estuvieran pendientes. Sin canary humano/refresh/revocación/rollback
+todavía. [Task](docs/tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md) ·
+[Runbook](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md) ·
+[Autorizaciones originales](docs/operations/TASK-1836_INTEGRITY_SESSION_HANDOFF_2026-09-05.md).
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
