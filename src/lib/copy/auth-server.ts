@@ -12,6 +12,14 @@ export const GH_AUTH_SERVER = {
   login_methods_intro: 'Elige cómo acceder para continuar a la aplicación.',
   login_team_title: 'Equipo Efeonce',
   login_invitation_title: 'Acceso por invitación',
+  /** Separador entre los dos métodos de acceso; es decorativo (`aria-hidden`), nunca la única señal. */
+  login_methods_separator: 'o',
+  /** Ejemplo dentro del campo; la etiqueta visible sigue siendo `login_email_label` (WCAG 3.3.2). */
+  login_email_placeholder: 'nombre@empresa.com',
+  /** Panel de marca del acceso: dice QUÉ es esto y CÓMO funciona, sin promesas genéricas. */
+  login_rail_headline: 'Un solo acceso a lo que Efeonce opera contigo.',
+  login_rail_body: 'Efeonce ID es la identidad con la que entras a los espacios de trabajo y a las herramientas conectadas de tu organización.',
+  login_rail_trust: 'Enlace de un solo uso. Sin contraseñas que recordar.',
   scope_read_label: 'Lectura',
   scope_write_label: 'Escritura',
 
