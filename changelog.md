@@ -25,6 +25,10 @@ externo usado para organización interna; corrección local agrega proyección i
 selección/verificación explícita de población. Readback PG real y150pruebas correctos;
 publicación/token/canary final pendientes, emisorOFF rev22.
 
+Actualización22:19Z: consentimiento visible tras publicar reader. Envío del formulario
+rechazado por Origin:null bajo no-referrer, reproducido con navegador real. Corrección local
+HTMLstrict-origin conserva CSRF y no envía rutas/query en Referer; canarytoken pendiente.
+
 ## 2026-09-05 — TASK-1836: reparación de integridad aplicada en PG
 
 Migración CLI `20260905183812333` aplicada: población explícita e inmutable, verificación de evidencia

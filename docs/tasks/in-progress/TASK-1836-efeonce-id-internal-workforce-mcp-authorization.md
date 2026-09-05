@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `2026-09-05 22:04 UTC: SSO Microsoft correcto en runtime61d5fe1f0 (consume22:01:26.817Z success). Authorize posterior rechazado access_denied/consent_context_unavailable: reader externo filtra binding interno. Corrección local separa reader interno y verifica población; readback PG real correcto, 150 pruebas passed/22live omitidas. Emisor OFF GitHub/rev22-8n5 Ready100%. Helper backToLogin completado; tsc0 y117 pruebas de personas correctas. Sin token MCP; publicación y canary final pendientes.`
+- Status real: `2026-09-05: SSO y consentimiento visible resueltos en runtime ddbd011f5, deploy33995163892. POSTconsent rechazado invalid_request; reproducción browser prueba no-referrer produce Origin:null. Corrección local HTMLstrict-origin, conserva guardCSRF. Sin token MCP; publicación/canary y promoción final pendientes.`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -989,3 +989,12 @@ sin fallback cuando falta binding interno. Prueba dirigida26passed; suite150pass
 omitidas. Readback PG real con readers canónicos: externo rechaza interno, interno obtiene
 nombre presente, active=true, gv3. No modifica base, grants ni datos personales.
 Emisor desactivado rev22-8n5/GitHub false mientras se publica esta segunda corrección.
+
+## Follow-up 22:19 UTC — guard de origen y política de formulario
+
+Tras publicar ddbd011f5, authorize muestra Efeonce y permiso lectura con sesión existente.
+POSTconsent devuelve invalid_request; no registra token ni consentimiento. Reproducción local
+con navegador integrado y formulario nativo (no fetch): no-referrer da Origin opaque/null,
+SecFetchSite same-origin, decisionallow; strict-origin da Origin propio y Referer sólo origen.
+Cambio limitado a htmlResponse; JSON/redirect mantienen no-referrer y guardCSRF no cambia.
+Scriptbrowser canónico en preparación para Chromium/WebKit y controles adversarios.

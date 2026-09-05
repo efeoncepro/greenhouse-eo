@@ -213,3 +213,15 @@ el reader restringido a externos. Ambos verifican población, binding, organizac
 estado, revocación y gv. Un reader ausente o de otra población deniega, nunca elige fallback.
 El canary real detectó el antiguo uso del reader externo para internos después de un SSO
 correcto; la corrección no modifica la autoridad ni amplía el reader externo.
+
+### Formularios HTML y origen CSRF — 2026-09-05
+
+Las páginas HTML usan `Referrer-Policy: strict-origin`: no envían rutas ni queries como
+Referer y conservan Origin en POST HTTPS del formulario. JSON y redirecciones mantienen
+no-referrer. No se relaja el guard de origen ni se acepta Origin:null indiscriminadamente.
+Reproducción en navegador integrado: policy anterior produce Origin opaque/null con
+Sec-Fetch-Site same-origin y decision válida; strict-origin produce origen propio y Referer
+sólo origen. [Fetch Standard](https://fetch.spec.whatwg.org/#append-a-request-origin-header).
+La prueba de navegador canónica debe ejecutar el handler real, con controles negativo
+no-referrer y cross-origin; un test unitario con header Origin escrito a mano no reproduce
+la interacción del navegador y la política de respuesta.

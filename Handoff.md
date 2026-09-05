@@ -1,14 +1,14 @@
 # Handoff activo
 
-**TASK-1836, 2026-09-05 22:04 UTC — SSO resuelto, consentimiento en corrección:**
-Microsoft consume22:01:26.817Z success con61d5fe1f0; luego authorize access_denied /
-consent_context_unavailable. Causa: reader externo usado para binding interno. Corrección local
-reader interno mínimo + selección/verificación de población; readback PG real activo/gv3,
-150 pruebas passed/22live omitidas. Helper backToLogin completado; tsc0 y117 pruebas de personas correctas.
-Emisor OFF GitHub y auth-server-00022-8n5 Ready100%. Main d551cf368 último release certificado.
-Helper TTY10981 sin tokens ni transacción; reiniciar /start sólo tras publicación verificada.
-Siguiente: completar types/publicarfix, authorize/consent/token, allow/foreign/refresh/revoke/rollback
-y promoción final gobernada. UI ajena activa; preservar archivos.
+**TASK-1836, 2026-09-05 22:19 UTC — SSO y consentimiento visible correctos; POST en reparación:**
+Microsoft éxito22:01Z; reader consentimiento corregido y publicado ddbd011f5, deploy33995163892.
+Rev23/24 imagen73f272c7; pantalla Efeonce+lectura funciona con sesión existente, sin nueva MFA.
+POSTconsent invalid_request; reproducción navegador real confirma no-referrer→Origin:null;
+strict-origin preserva origen y no transmite path/query. Fixlocal sóloHTML, guardCSRF intacto.
+Emisor se apaga nuevamente mientras se publica. Helper10981 tiene transacción pendiente sin
+tokens: salir/reiniciar antes de nuevo /start. Probe local18745/TTY70210 sin credenciales.
+Main d551cf368 último release certificado. Pendientes publicación/canarytoken, allow/foreign/
+refresh/revoke/rollback y promoción final gobernada. UI ajena activa; no tocar sus archivos.
 [Task](docs/tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md) ·
 [Runbook](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md) ·
 [Autorizaciones](docs/operations/TASK-1836_INTEGRITY_SESSION_HANDOFF_2026-09-05.md).

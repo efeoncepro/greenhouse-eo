@@ -489,3 +489,13 @@ rechazó consent_context_unavailable porque usó reader externo para binding int
 Corrección local separa la proyección de nombre interna y comprueba población. Readback PG
 real y pruebas unitarias correctos; cero tokens MCP. Emisor OFF rev22-8n5/GitHub false.
 Publicación y nuevo authorize con sesión humana pendientes; no reutilizar el callback OAuth.
+
+## Follow-up 22:19 UTC — consentimiento visible, política del POST en corrección
+
+Deploy33995163892/buildadbe0456 correctos, SHA ddbd011f5 en rev23 y activación rev24.
+La sesión Microsoft se reutilizó: authorize muestra organización Efeonce y lectura sin
+contraseña nueva. POST Autorizar devuelve invalid_request; no hubo token. Diagnóstico
+local con formulario real en el mismo navegador confirma no-referrer→Origin:null,
+Sec-Fetch-Site same-origin y decisionallow. strict-origin produce origen propio y Referer
+sólo origen. Cambiar sólo respuestas HTML; conservar guardCSRF y no-referrer JSON/redirect.
+Reactivación suspendida mientras se publica; no reusar callback ni transacción abandonada.
