@@ -284,3 +284,9 @@ Para cortar a un solo cliente o persona sin apagar el emisor: revocar el consent
   `migrations/20260904130826694_task-1829-auth-oauth-tables.sql` · `scripts/auth-server/{rotate-signing-key,register-oauth-client,oauth-store-smoke,generate-brand-assets,register-issuer-environment}.ts`
 - Gates OAuth: `pnpm vitest run src/lib/auth-server` (68 tests, flujo completo in-process) · `pnpm auth-server:oauth-store:smoke` (PG real)
 - Tasks: `TASK-1828` (runtime + llaves) · `TASK-1829` (OAuth) en `docs/tasks/`
+
+## Rollout conjunto OAuth/personas autorizado 2026-09-04
+
+El servicio Cloud Run es único para staging y producción: un despliegue de staging cambia el mismo host público. La activación conjunta requiere llevar TASK-1830 al runtime, activar `efeonce-auth` por `pnpm auth-server:register-issuer-environment --status active` y declarar ambos flags en `deploy.sh`. El mailer necesita además `secretAccessor` del runtime sobre la referencia Resend; el deploy reconcilia ese permiso con `ensure_secret_accessor_binding`. Declarar la referencia no concede IAM.
+
+Evidencia y estado: [auditoría de rollout](../../audits/2026-09-04-epic-044-auth-rollout.md). La revisión de rollback inicial es `auth-server-00006-znf` (OAuth OFF, sin personas); no confundir readiness con un flujo autenticado.

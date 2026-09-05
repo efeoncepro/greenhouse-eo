@@ -186,7 +186,7 @@ ENV_VARS="${ENV_VARS},AUTH_SERVER_KMS_KEY=${AUTH_SERVER_KMS_KEY}"
 # TASK-1829 — superficie OAuth del emisor (metadata RFC 8414/OIDC, CIMD/DCR, /oauth/*).
 # OFF ⇒ los endpoints OAuth y la metadata responden 404; sólo /readyz y el JWKS siguen vivos.
 # Ledger: docs/operations/FEATURE_FLAG_STATE_LEDGER.md (runtime auth-server únicamente).
-ENV_VARS="${ENV_VARS},AUTH_SERVER_OAUTH_ENABLED=${AUTH_SERVER_OAUTH_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},AUTH_SERVER_OAUTH_ENABLED=${AUTH_SERVER_OAUTH_ENABLED:-true}"
 # environment_id del emisor en greenhouse_core.external_identity_environments (TASK-1631): la
 # llave durable con la que se resuelve (subject → identity_profile → bindings → gv). Nunca el issuer crudo.
 ENV_VARS="${ENV_VARS},AUTH_SERVER_ENVIRONMENT_ID=${AUTH_SERVER_ENVIRONMENT_ID:-efeonce-auth}"
@@ -196,7 +196,7 @@ ENV_VARS="${ENV_VARS},AUTH_SERVER_MCP_AUDIENCE=${AUTH_SERVER_MCP_AUDIENCE:-https
 # TOTP). OFF ⇒ `/login`, `/auth/*` y `/m/*` responden 404 y el `SubjectSessionPort` devuelve `null`,
 # así que `authorize` sigue en `login_required`. Ledger: docs/operations/FEATURE_FLAG_STATE_LEDGER.md
 # (runtime auth-server únicamente).
-ENV_VARS="${ENV_VARS},AUTH_SERVER_PERSON_AUTH_ENABLED=${AUTH_SERVER_PERSON_AUTH_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},AUTH_SERVER_PERSON_AUTH_ENABLED=${AUTH_SERVER_PERSON_AUTH_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},AUTH_SERVER_TOTP_KMS_KEY=${AUTH_SERVER_TOTP_KMS_KEY}"
 # Correo del magic link por el pipeline gobernado (`sendEmail`). Sin esto el enlace nunca sale y el
 # acceso queda muerto en silencio: la respuesta es idéntica por anti-enumeración y no puede avisar.
@@ -208,6 +208,8 @@ ENV_VARS="${ENV_VARS},SENTRY_ENVIRONMENT=${ENV}"
 
 SECRETS="GREENHOUSE_POSTGRES_PASSWORD=${PG_PASSWORD_REF}"
 ensure_secret_accessor_binding "${PG_PASSWORD_REF}"
+# El mailer resuelve esta referencia desde el runtime: declarar la env var no concede IAM.
+ensure_secret_accessor_binding "${RESEND_API_KEY_SECRET_REF}"
 
 SENTRY_DSN_SECRET_NAME="${SENTRY_DSN_SECRET_NAME:-greenhouse-sentry-dsn}"
 

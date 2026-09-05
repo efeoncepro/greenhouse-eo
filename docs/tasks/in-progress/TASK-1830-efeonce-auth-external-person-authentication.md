@@ -118,7 +118,9 @@ consumidor.
 - Status real: `code complete, rollout pendiente (2026-09-04, sesión greenhouse-eo-18). Los 4 slices implementados en develop (7459d96d4, 937087404, db2622ba9, 5b57b73f9): 8 tablas greenhouse_auth aplicadas y verificadas contra PG real, SubjectSessionPort real cableado, passkeys con ceremonia verificada, TOTP con llave KMS simétrica auth-server-totp-envelope CREADA y probada en vivo (round-trip + rechazo por AAD), recuperación por re-invitación, capability identity.auth_person.revoke + ruta admin, 3 señales. Flag AUTH_SERVER_PERSON_AUTH_ENABLED=false. FALTA rollout: prender el flag en staging (exige AUTH_SERVER_OAUTH_ENABLED=true + environment efeonce-auth active), verificar el correo REAL por Resend, y ejercitar passkey en dos navegadores`
 - Rank: `TBD`
 - Domain: `platform|identity`
-- Blocked by: `TASK-1631 (invitaciones y source links para ligar el subject; Slice 1 code complete + staging verificado 2026-09-04, producción con el próximo release)`
+- Blocked by: `none`
+
+**Dependencia verificada 2026-09-05 UTC:** TASK-1631 ya viajó en el release 9100bbd2765d; environment efeonce-auth presente en draft y tablas del emisor disponibles. La activación y el despliegue de personas son trabajo de este rollout.
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
