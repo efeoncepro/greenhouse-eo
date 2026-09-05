@@ -29,6 +29,11 @@ Actualización22:19Z: consentimiento visible tras publicar reader. Envío del fo
 rechazado por Origin:null bajo no-referrer, reproducido con navegador real. Corrección local
 HTMLstrict-origin conserva CSRF y no envía rutas/query en Referer; canarytoken pendiente.
 
+Actualización22:44Z: canary interno real completo con09def4fc4: Microsoft, consentimiento,
+token y lectura propia correctos, foreigndeny, refreshrotativo, revocacióntoken10.151s,
+retirogrant<=11s y gatewayOFFdeny<=20s. Piloto restauradoON, gv5 y expiración original;
+tokenspruebarevocados. Promociónformal main y matricesamplias externas/UI pendientes.
+
 ## 2026-09-05 — TASK-1836: reparación de integridad aplicada en PG
 
 Migración CLI `20260905183812333` aplicada: población explícita e inmutable, verificación de evidencia

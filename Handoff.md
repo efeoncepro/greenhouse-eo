@@ -1,16 +1,14 @@
 # Handoff activo
 
-**TASK-1836, 2026-09-05 22:19 UTC — SSO y consentimiento visible correctos; POST en reparación:**
-Microsoft éxito22:01Z; reader consentimiento corregido y publicado ddbd011f5, deploy33995163892.
-Rev23/24 imagen73f272c7; pantalla Efeonce+lectura funciona con sesión existente, sin nueva MFA.
-POSTconsent invalid_request; reproducción navegador real confirma no-referrer→Origin:null;
-strict-origin preserva origen y no transmite path/query. Además CSPconsent permite origen del
-callback prevalidado (self-only bloquea retorno trasPOST en Chromium). GuardCSRF intacto.
-229tests/tsc correctos, Chromium6/6 browserchecks; WebKit instalación pendiente.
-Emisor OFF rev25-gs5/GitHub false. Helper10981 y probe70210 cerrados sin tokens.
-Iniciar helper nuevo después de desplegar política corregida.
-Main d551cf368 último release certificado. Pendientes publicación/canarytoken, allow/foreign/
-refresh/revoke/rollback y promoción final gobernada. UI ajena activa; no tocar sus archivos.
+**TASK-1836, 2026-09-05 22:44 UTC — acceso interno verificado, promoción final pendiente:**
+Runtime09def4fc4: Microsoft→consentimiento→token→MCP Efeonce PASSED. Foreignorgdeny, refresh
+rotativo, revocacióntoken10.151s, retirogrant<=11s, gatewayOFFdeny<=20s; restore79s.
+PilotoON authrev29-tfx/gatewayrev35-bhd, GitHubtrue, grantoriginalvence2026-09-12T15:00Z, gv5.
+Todos los tokenscanaryrevocados, helperscerrados; integridadunaudited/mixed0.
+229unitpassed/4liveomitidas, Chromium6/6; WebKitinstalaciónfallida explícitamente pendiente.
+Main d551cf368 último release certificado; sync8d7b205ca conserva tree09def exacto (mainigual
+a ancestro25f3db5f9). Próximo: docs/gates, pushPRmain y release gobernado; no nueva MFA prevista.
+No cerrar matricesamplias de clientes externos, multicontexto ni UI (contraste pendiente).
 [Task](docs/tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md) ·
 [Runbook](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md) ·
 [Autorizaciones](docs/operations/TASK-1836_INTEGRITY_SESSION_HANDOFF_2026-09-05.md).

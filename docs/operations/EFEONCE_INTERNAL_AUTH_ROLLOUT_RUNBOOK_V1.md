@@ -510,3 +510,14 @@ Validación local de la corrección de formularios: 229 pruebas passed/4live omi
 `node scripts/auth-server/probe-form-origin.mjs --chromium-only`: 6/6 passed, sin requests
 externos. WebKit pendiente de instalación; no declarado correcto. El navegador integrado
 confirmó además Origin:null anterior y origen propio con Referer sólo origen al corregir.
+
+## Canary interno completado — 2026-09-05 22:44 UTC
+
+09def4fc4 desplegado (build31ccc5d7, run33996045509, imagen0dd44fc490ef). Consentimiento,
+token y lecturaMCP Efeonce exitosos; organización ajena denegada; refreshrotativo correcto.
+Revocación token→dispatchdenegado10.151s; retirogrant→deny cota11s; gatewayOFF→deny cota20s.
+Restore completo79s. AuthON rev29-tfx; gatewayON rev35-bhd; variablesdurablesGitHubtrue.
+ReaderVercelProduction permaneceON. Grantrestaurado expiryoriginal2026-09-12T15:00Z, gv5;
+tokenscanaryrevocados y helperscerrados. Señalesintegridad0. Detalle y timestamps enTASK1836.
+No equivale a certificación de clientes externos/Entra legado ni a cierre del siguiente
+release main (último certificado d551cf368). La promoción nueva sigue pendiente.

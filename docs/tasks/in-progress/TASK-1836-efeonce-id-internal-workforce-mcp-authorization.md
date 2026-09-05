@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `2026-09-05: SSO y consentimiento visible resueltos en runtime ddbd011f5, deploy33995163892. POSTconsent rechazado invalid_request; reproducción browser prueba no-referrer produce Origin:null. Corrección local HTMLstrict-origin, conserva guardCSRF. Sin token MCP; publicación/canary y promoción final pendientes.`
+- Status real: `2026-09-05 22:44 UTC: canary interno real PASSED en runtime09def4fc4. Microsoft+consentimiento+token+MCP lectura Efeonce correctos; foreign orgdenegada; refreshrotativo; revocacióntoken10.151s; retirogrant<=11s; gatewayOFFdeniega<=20s; emisorOFFdeniegarefresh. Piloto restauradoON authrev29-tfx/gatewayrev35-bhd, gv5, expiryoriginal2026-09-12T15:00Z; tokenspruebarevocados. Main d551cf368 sigue último release certificado; promoción formal nueva pendiente. Matrices amplias de clientes externos/WebKit yUI no declaradas completas.`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -587,7 +587,7 @@ interactivo del sujeto real cuando corresponda. No enviar correos ni mensajes si
 
 - [x] ADR aceptado define proveedor upstream, población y autoridad independientemente del issuer. `EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md`, D1–D7.
 - [x] Efeonce e identidad interna se resuelven canónicamente sin cambiar organización a cliente ni duplicar persona. Reader real devuelve perfil autorizado + EO-ORG-0007; test PG de enrolamiento usa clones temporales y rollback. Posteriormente se enroló el piloto real sobre esa identidad canónica; la prueba de login humano sigue pendiente.
-- [ ] Login corporativo produce sesión y token MCP nativo con audiencia, azp, scopes y gv correctos. Intento real21:15:25Z volvió de Microsoft y fue rechazado por jwtVerify (`jwt_validation_failed`). No se emitió token MCP; diagnóstico específico en preparación.
+- [x] Login corporativo produce sesión y token MCP nativo con audiencia, azp, scopes y gv correctos. Canary real22:38Z: consentimiento y token emitidos; gateway verifica y permite lectura propia, deniega otra organización. Véase evidencia22:44Z.
 - [ ] Refresh y revocación funcionan; baja efectiva en el source of truth o retiro de grant invalida autorización con token vigente en ≤60 s,
   verificado junto al gateway, sin afirmar cierre por expiración natural del token.
 - [ ] Token externo del mismo issuer, tenant desconocido y roles sin scopes no acceden a tools internas.
@@ -1005,3 +1005,32 @@ POST→authorize→callback en Chromium. htmlResponse permite opción de origen 
 para consentimiento; authorize la obtiene después de resolver redirect_uri contra el cliente.
 No cambia el guard de origen ni la validación exacta del redirect. Prueba del handler
 rechaza origen de callback no registrado antes de incorporarlo a CSP.
+
+## Evidencia de canary interno real — 2026-09-05 22:38–22:44 UTC
+
+Runtime auth09def4fc4, imagen0dd44fc490ef; deploy33996045509 correcto. La sesión Microsoft
+real22:01Z se reutilizó. Consent22:38:22.142Z, authorize22:38:22.598Z y token22:38:24.063Z
+auditados success. Helper mantuvo tokens exclusivamente en RAM; claim shape correcto no
+sustituye firma: la llamada real al gateway validó el token y permitió get_seo_entitlement
+para Efeonce (hasModuletrue, 3668ms). Foreign org denegada, lectura propia antes/después
+correcta (5875ms). Refreshrotativo963ms con identidad/contexto/auth_time/scope/gv estables.
+
+- Revocación familia/token: endpoint226ms; refresh posterior invalid_grant417ms; MCP denegado
+  con access aún vigente a10.151s de revocación (límite60s satisfecho).
+- Retiro canónico de grant: dry-run correcto; apply22:40:24→22:40:31Z; token aún vigente
+  denegado22:40:35Z (cota conservadora11s desde inicio del command). Restitución auditada con
+  expiryoriginal2026-09-12T15:00:00Z, sin ampliación; gv3→4→5. Grantprevio revocado permanece.
+- Gateway internoOFF: inicio22:41:31Z, rev34-fqb Ready100%; token vigente denegado22:41:51Z
+  (cota20s). Nativegeneral siguiótrue; health y metadata públicos correctos. Eso no sustituye
+  prueba humana de cliente externo ni tokenEntra legado, que permanece pendiente.
+- EmisorOFF rev28-6rv denegó refresh852ms. RestoregatewayON rev35-bhd Ready22:42:37.619Z;
+  authON rev29-tfx Ready22:42:49.990Z; ciclo apagado/restauración79s desde inicio. Nueva emisión
+  y lecturaMCP propia2875ms verificaron recuperación. Todos los tokens del helper se revocaron
+  antes de cerrar procesos; no quedaron tokens en disco.
+
+Readback:1enrollmentactivo,1grantactivo+1revocado, gv5 y expiración original; auditorías
+enrolled/granted/revoked/granted con actorcanónico yrazón. Señalesunaudited/mixed_population0.
+No se declara completa matriz multicontexto A/B, clientesexternos, WebKit o diseño UI.
+Merge main→develop8d7b205ca conserva árbol7728b56e8e638d3ce00770ef8e5e2d79a6173b46: main
+d551cf368 coincidebyte-for-byte con ancestro25f3db5f9 (tree2377b14a); conflictosresueltos
+conservando09def4fc4, sin descartar cambios exclusivos de main. Promociónformal pendiente.
