@@ -209,6 +209,13 @@ ENV_VARS="${ENV_VARS},SENTRY_ENVIRONMENT=${ENV}"
 SECRETS="GREENHOUSE_POSTGRES_PASSWORD=${PG_PASSWORD_REF}"
 ensure_secret_accessor_binding "${PG_PASSWORD_REF}"
 # El mailer resuelve esta referencia desde el runtime: declarar la env var no concede IAM.
+# 🔴 El secreto se MONTA, no basta con declarar la referencia. `sendEmail` usa el cliente SÍNCRONO
+# de Resend, que lee un secreto YA resuelto: el carril `*_SECRET_REF` sólo funciona donde algo lo
+# resuelve async primero, y acá nadie lo hace. Sin esta línea el magic link responde 202 igual —la
+# respuesta es idéntica por anti-enumeración— y el correo muere con «RESEND_API_KEY is not
+# configured» en `email_deliveries`, sin que nadie se entere. Detectado en vivo por
+# `pnpm auth-server:person-auth:canary` el 2026-09-05; mismo patrón que ops-worker.
+SECRETS="${SECRETS},RESEND_API_KEY=$(normalize_secret_ref_for_cloud_run "${RESEND_API_KEY_SECRET_REF}")"
 ensure_secret_accessor_binding "${RESEND_API_KEY_SECRET_REF}"
 
 SENTRY_DSN_SECRET_NAME="${SENTRY_DSN_SECRET_NAME:-greenhouse-sentry-dsn}"
