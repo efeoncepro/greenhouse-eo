@@ -90,7 +90,7 @@ contexto no puede clasificarse como interno por issuer, correo o roles.
 
 El reader existente `GET /api/platform/ecosystem/identity/binding` mantiene su autenticación de máquina
 con binding `internal` y parámetros environment, subject, clientId. Para V1 interno añade
-`authorizationContextId`, `contextVersion=1`, `audience`, `grantsVersion`. Rechaza contexto parcial,
+`authorizationContextId`, `contextVersion=1`, `audience`, `grantsVersion` y `jti` firmado. Rechaza contexto parcial,
 duplicados y números no canónicos. El issuer se obtiene de configuración confiable. Devuelve
 `population:internal`, `outcome:bound|denied`, `cacheTtlSeconds:0`; en bound, profileId, organizationId,
 bindingId, grantsVersion y capabilities efectivas. Una denegación interna nunca cae al reader externo.
@@ -239,3 +239,35 @@ main requiere revisar el delta completo del release; no está implícita en este
 Después: verificar revisions/reader, preparar configuración durable y cohorte, y ejecutar canary y
 rollback. El operador autorizó el rollout el 2026-09-05. Se inicia publicación con gates internos OFF;
 la UI completa conserva sus criterios pendientes. No solicitar otra aprobación para este mismo rollout.
+
+## Gate detectado al preparar el canary — revocación OAuth
+
+La preparación del canary detectó que revoke/retirar consentimiento invalida el ledger y refresh,
+pero un JWT vigente podía seguir pasando el reader que sólo revalidaba contexto y grants. La cohorte
+permanece OFF hasta desplegar y verificar el recheck por `jti` firmado en ese mismo reader. No sustituir
+esta prueba por un refresh rechazado: deben comprobarse ambos, refresh y dispatch MCP posteriores.
+El fix conserva familias independientes y no introduce introspección remota. Owner: TASK-1836/1831.
+
+## Primera publicación OFF autorizada — 2026-09-05
+
+Greenhouse `51e285bb3af36e9bf1cefeca7a0b46e9248265ad` publicado en develop; el merge de ancestría
+`1ba317fbba43e55e1b934c1579f2453d05b3d7a3` conserva el árbol idéntico. WIP Berel quedó sin stage.
+Readback Cloud Run: `auth-server-00008-zwh` y `ops-worker-00649-6sv`, ambos 100% tráfico con SHA51;
+flag interno del emisor false y flag GC del worker false. Runs: auth33974375630, ops33974375691.
+El gateway `93819fa349ea05f2b1c600491e734b3b3585bc01` desplegó por run33974235412 exitoso:
+`efeonce-mcp-gateway-00030-87s`, 100%, digest
+`sha256:091b650a8ead38ad5c1304f52fea35522617c49e5449e8363f81eb8ebcbc2357`, ambos gates nativos false.
+Health/discovery200 y MCPsin/invalidtoken401. No equivale a token corporativo real.
+
+Vercel Production tiene preparados issuer, environment, audiencia y flag interno false para su próximo
+build; no hubo aún promoción main. El gateway usará su consumer interno existente EO-SPK-0004 y
+binding EO-SPB-0004, verificados activos; no se amplían permisos ni se crea credencial. URLbase del
+reader y referencia del mismo Secret Manager preparadas en vars GitHub production.
+Dry-run de enrollment de la persona canónica: elegible, applied:false; todavía sin enrollment/grant.
+La activación queda retenida por la corrección de revocación por jti y el consumer Vercel pendiente.
+
+Corrección local verificada: reader consulta `OAuthStore.getAccessToken(jti)` y rechaza revocación,
+expiración o dimensiones ajenas antes de resolver contexto. Las pruebas usan los commands reales
+`revokeGrant` y `revokeClientConsent` sobre store de memoria; una familia distinta del mismo contexto
+permanece válida al revocar sólo la primera. Gateway exige jti firmado, su prueba HTTP confirma 401
+sin llamar al provider cuando el ledger niega. La prueba productiva sigue pendiente.

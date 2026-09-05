@@ -412,3 +412,11 @@ ahora envía `market` en query además del body, conforme al reader de Greenhous
 usa JWT ES256 y adapters reales para consultar entitlement propio con `hasModule=false` y rechazar
 organización ajena antes del provider. Binding y respuesta de Greenhouse son simulados: no acredita
 login, PG ni canary live; no compra datos. El contenedor anterior requiere rebuild con estos cambios.
+
+## Ajuste pre-cohorte: revocación por token — 2026-09-05
+
+El contexto vigente no basta: el gateway interno exige también `jti` firmado (base64url22 del emisor)
+y lo transmite al reader existente, que verifica ledger OAuth y dimensiones. No usa introspección ni
+cache positiva. Revocar familia/consent debe denegar dispatch, además de refresh, sin invalidar otra
+familia que comparte contexto. Pruebas HTTP locales verifican deny antes del provider; el canary real
+sigue pendiente y ambos flags se conservan OFF durante el despliegue de compatibilidad.

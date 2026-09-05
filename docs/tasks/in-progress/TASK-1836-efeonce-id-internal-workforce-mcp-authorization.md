@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `code complete, rollout pendiente (2026-09-05): backend verificado localmente. Tres migraciones aplicadas; persistencia/identidad/GC y UV ligado a sesión verificados en PG. App Entra, secreto y KMS preparados con cohorte upstream individual; pendiente despliegue y consumers 1831/1835/1832; sin habilitación interna ni enrolamiento real.`
+- Status real: `rollout en curso (2026-09-05): primer deploy OFF del emisor, gateway y GC realizado; consumer Vercel aún pendiente de promoción. Canary detectó gap de revocación OAuth por JWT vigente: fix jti verificado localmente, pendiente de despliegue antes de activar. Identidad elegible en dry-run, sin enrollment/grant ni token corporativo real. Ver runbook para SHA/revisiones.`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`

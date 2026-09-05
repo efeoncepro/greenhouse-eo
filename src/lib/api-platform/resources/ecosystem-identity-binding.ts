@@ -6,6 +6,8 @@ import { isExternalAccessError } from '@/lib/identity/external-access/errors'
 import { resolveExternalAccess } from '@/lib/identity/external-access/resolve-external-access'
 import { createRuntimeInternalContexts } from '@/lib/auth-server/internal/runtime'
 import { readAuthServerOAuthConfig } from '@/lib/auth-server/oauth/config'
+import { isCurrentInternalAccessToken } from '@/lib/auth-server/internal/access-token'
+import { PostgresOAuthStore } from '@/lib/auth-server/oauth/store/postgres-store'
 import type { ExternalAccessResolution } from '@/lib/identity/external-access/types'
 
 /**
@@ -24,11 +26,21 @@ import type { ExternalAccessResolution } from '@/lib/identity/external-access/ty
  */
 
 export type InternalIdentityBindingPayload = {
-  population: 'internal'; outcome: 'bound' | 'denied'; cacheTtlSeconds: 0
-  contextVersion: 1; authorizationContextId: string; reason?: string
-  profileId?: string; organizationId?: string; bindingId?: string; grantsVersion?: number; capabilities?: readonly string[]
+  population: 'internal'
+  outcome: 'bound' | 'denied'
+  cacheTtlSeconds: 0
+  contextVersion: 1
+  authorizationContextId: string
+  reason?: string
+  profileId?: string
+  organizationId?: string
+  bindingId?: string
+  grantsVersion?: number
+  capabilities?: readonly string[]
 }
-export type EcosystemIdentityBindingPayload = (ExternalAccessResolution & { cacheTtlSeconds: number }) | InternalIdentityBindingPayload
+export type EcosystemIdentityBindingPayload =
+  | (ExternalAccessResolution & { cacheTtlSeconds: number })
+  | InternalIdentityBindingPayload
 
 export const EXTERNAL_ACCESS_CACHE_TTL_SECONDS = 60
 
@@ -44,12 +56,17 @@ export const getEcosystemIdentityBindingPayload = async ({
   }
 
   const { searchParams } = new URL(request.url)
-  const contextKeys = ['authorizationContextId','contextVersion','grantsVersion','audience']
-  const allKeys = ['environment','subject','clientId',...contextKeys]
+  const contextKeys = ['authorizationContextId', 'contextVersion', 'grantsVersion', 'audience', 'jti']
+  const allKeys = ['environment', 'subject', 'clientId', ...contextKeys]
 
-  if (allKeys.some(key => searchParams.getAll(key).length > 1) ||
-    (!searchParams.has('authorizationContextId') && contextKeys.some(key => searchParams.has(key)))) {
-    throw new ApiPlatformError('Invalid authorization context parameters', {statusCode:400,errorCode:'bad_request'})
+  if (
+    allKeys.some(key => searchParams.getAll(key).length > 1) ||
+    (!searchParams.has('authorizationContextId') && contextKeys.some(key => searchParams.has(key)))
+  ) {
+    throw new ApiPlatformError('Invalid authorization context parameters', {
+      statusCode: 400,
+      errorCode: 'bad_request'
+    })
   }
 
   const environmentId = searchParams.get('environment')?.trim() ?? ''
@@ -73,23 +90,79 @@ export const getEcosystemIdentityBindingPayload = async ({
       const version = Number(rawVersion)
       const gv = Number(rawGv)
       const audience = searchParams.get('audience') ?? ''
+      const jti = searchParams.get('jti') ?? ''
 
-      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(contextId) ||
-        rawVersion !== '1' || !/^[1-9][0-9]*$/.test(rawGv) || version !== 1 || !Number.isSafeInteger(gv) || gv < 1 || !clientId ||
-        environmentId !== config.environmentId || audience !== config.mcpAudience) {
-        throw new ApiPlatformError('Invalid authorization context', {statusCode:400,errorCode:'bad_request'})
+      if (
+        !/^[A-Za-z0-9_-]{22}$/.test(jti) ||
+        !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(contextId) ||
+        rawVersion !== '1' ||
+        !/^[1-9][0-9]*$/.test(rawGv) ||
+        version !== 1 ||
+        !Number.isSafeInteger(gv) ||
+        gv < 1 ||
+        !clientId ||
+        environmentId !== config.environmentId ||
+        audience !== config.mcpAudience
+      ) {
+        throw new ApiPlatformError('Invalid authorization context', { statusCode: 400, errorCode: 'bad_request' })
       }
 
-      const {contexts} = createRuntimeInternalContexts()
-      const result = await contexts.resolve({id:contextId,version,issuer:config.issuer,environmentId,subject,clientId,audience,grantsVersion:gv})
+      // The trusted gateway supplies jti from its verified JWT. Never accept a live context alone.
+      // Issuer/audience/version/gv remain validated by config and the context resolver below.
+      const tokenCurrent = await isCurrentInternalAccessToken(
+        { jti, environmentId, subject, clientId, authorizationContextId: contextId },
+        new PostgresOAuthStore()
+      )
 
-      const data: InternalIdentityBindingPayload = result.allowed ? {
-        population:'internal',outcome:'bound',cacheTtlSeconds:0,contextVersion:1,authorizationContextId:contextId,
-        profileId:result.context.profileId,organizationId:result.context.organizationId,bindingId:result.context.bindingId,
-        grantsVersion:result.grantsVersion,capabilities:result.capabilities
-      } : {population:'internal',outcome:'denied',cacheTtlSeconds:0,contextVersion:1,authorizationContextId:contextId,reason:result.reason}
+      if (!tokenCurrent)
+        return {
+          data: {
+            population: 'internal',
+            outcome: 'denied',
+            cacheTtlSeconds: 0,
+            contextVersion: 1,
+            authorizationContextId: contextId,
+            reason: 'token_invalid'
+          },
+          cacheControl: 'private, no-store'
+        }
 
-      return {data,cacheControl:'private, no-store'}
+      const { contexts } = createRuntimeInternalContexts()
+
+      const result = await contexts.resolve({
+        id: contextId,
+        version,
+        issuer: config.issuer,
+        environmentId,
+        subject,
+        clientId,
+        audience,
+        grantsVersion: gv
+      })
+
+      const data: InternalIdentityBindingPayload = result.allowed
+        ? {
+            population: 'internal',
+            outcome: 'bound',
+            cacheTtlSeconds: 0,
+            contextVersion: 1,
+            authorizationContextId: contextId,
+            profileId: result.context.profileId,
+            organizationId: result.context.organizationId,
+            bindingId: result.context.bindingId,
+            grantsVersion: result.grantsVersion,
+            capabilities: result.capabilities
+          }
+        : {
+            population: 'internal',
+            outcome: 'denied',
+            cacheTtlSeconds: 0,
+            contextVersion: 1,
+            authorizationContextId: contextId,
+            reason: result.reason
+          }
+
+      return { data, cacheControl: 'private, no-store' }
     }
 
     const resolution = await resolveExternalAccess({ environmentId, subject, clientId })

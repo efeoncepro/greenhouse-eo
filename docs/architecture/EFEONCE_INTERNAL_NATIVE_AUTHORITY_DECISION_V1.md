@@ -75,3 +75,18 @@ legado y acceso externo mantienen sus contratos hasta la activación específica
 - Latencia del reader requiere caché: demostrar invalidación y ventana ≤60 s antes de introducirla.
 - Se requiere MFA upstream o APIs Graph: revisión separada de assurance/consentimiento y token custody.
 - No hay relación canónica verificable para una población: resolver política explícita, no bypass.
+
+## Aclaración de revocación por token — 2026-09-05
+
+El recheck interno valida también el `jti` firmado de cada access token contra el ledger OAuth.
+El gateway exige el identificador base64url de 22 caracteres que emite `generateOpaqueId(16)` y lo
+transporta como `jti` al reader de máquina existente. No consulta `/oauth/introspect` ni envía el
+bearer al provider. El ledger debe corresponder a environment, sujeto, cliente y contexto, estar
+sin revocar y no vencido; issuer, audiencia, versión y `gv` conservan sus verificaciones canónicas
+por contexto/configuración. No se introduce otra caché positiva ni una migración.
+
+Motivo: revocar consentimientos o familias ya invalida sus filas OAuth, pero el recheck limitado al
+contexto/grant no observaba esa invalidación. La lectura del token permite denegar la familia revocada
+sin revocar otras familias que comparten sesión/cliente/contexto. El acceso interno exige esta
+comprobación antes de activar la cohorte. Los bindings externos legacy sin contexto conservan su
+contrato; esta decisión no acredita una federación externa ni su revocación operativa completa.
