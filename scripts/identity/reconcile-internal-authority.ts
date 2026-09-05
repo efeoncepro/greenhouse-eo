@@ -3,6 +3,24 @@ import { parseArgs } from 'node:util'
 
 import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } from '../lib/load-greenhouse-tool-env'
 
+/**
+ * Error de INVOCACIÓN, distinto de un fallo de ejecución.
+ *
+ * La distinción es deliberada: el `catch` de abajo redacta cualquier fallo real porque este script
+ * toca identidad y su detalle puede arrastrar sujetos, bindings o razones a los logs. Pero una
+ * llamada mal escrita no tiene nada sensible que filtrar y sí necesita decir qué falta: si se redacta
+ * igual que lo demás, el operador se queda sin forma de corregirla.
+ */
+class UsageError extends Error {}
+
+const USAGE = `Uso: pnpm tsx scripts/identity/reconcile-internal-authority.ts \\
+  --binding-id <xob-...> --actor-id <user-...> --reason "<motivo, mínimo 10 caracteres>" [--apply]
+
+  --binding-id  binding de organización a reconciliar (obligatorio)
+  --actor-id    operador que responde por la acción; debe ser interno y tener la capability (obligatorio)
+  --reason      queda en la evidencia de auditoría (obligatorio)
+  --apply       ejecuta; sin este flag corre en dry-run y no escribe nada`
+
 async function main() {
   const args = process.argv.slice(2)
 
@@ -23,7 +41,14 @@ async function main() {
     actorId = values['actor-id'],
     reason = values.reason
 
-  if (!bindingId || !actorId || !reason) throw new Error('arguments')
+  const missing = [
+    bindingId ? null : '--binding-id',
+    actorId ? null : '--actor-id',
+    reason ? null : '--reason'
+  ].filter((flag): flag is string => flag !== null)
+
+  // La condición repite los tres valores para que TypeScript los estreche después del guard.
+  if (missing.length || !bindingId || !actorId || !reason) throw new UsageError(`Faltan parámetros obligatorios: ${missing.join(', ')}.\n\n${USAGE}`)
   loadGreenhouseToolEnv()
   applyGreenhousePostgresProfile('ops')
   const { getTenantAccessRecordFromPostgresByUserId } = await import('../../src/lib/tenant/access')
@@ -53,7 +78,13 @@ async function main() {
 
 main()
   .then(() => process.exit(0))
-  .catch(() => {
+  .catch((error: unknown) => {
+    // La invocación se explica entera; el fallo de ejecución sigue redactado (puede llevar identidad).
+    if (error instanceof UsageError) {
+      console.error(error.message)
+      process.exit(2)
+    }
+
     console.error('Internal authority reconciliation failed; details suppressed.')
     process.exit(1)
   })
