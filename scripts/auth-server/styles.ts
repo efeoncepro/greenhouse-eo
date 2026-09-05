@@ -153,7 +153,7 @@ button,input { font:inherit; color:inherit; }
 .id-surface > p { max-width:60ch; margin-block-end:${s(4)}; text-wrap:pretty; }
 .id-intro { color:var(--id-muted); margin-block-end:${s(7)}; }
 .id-section + .id-section { border-block-start:1px solid var(--id-border); padding-block-start:${s(6)}; margin-block-start:${s(6)}; }
-.id-section h2,.id-surface > h2 { font-size:${typographyScale.overline.fontSize}; font-weight:${fontWeights.semibold}; line-height:${typographyScale.overline.lineHeight}; text-transform:uppercase; letter-spacing:${letterSpacings.caps}; color:var(--id-muted); margin-block-end:${s(3)}; }
+.id-section h2,.id-surface > h2 { font-size:${typographyScale.bodySm.fontSize}; font-weight:${fontWeights.semibold}; line-height:${typographyScale.bodyMd.lineHeight}; letter-spacing:${letterSpacings.metadata}; color:var(--id-muted); margin-block-end:${s(3)}; }
 .id-section p { margin-block-end:${s(4)}; }
 .id-primary,.id-secondary,button.primary,button.secondary {
   display:inline-flex; align-items:center; justify-content:center; gap:${s(2)};
@@ -167,6 +167,13 @@ button,input { font:inherit; color:inherit; }
 .id-primary:hover,button.primary:hover { background:var(--id-accent-hover); border-color:var(--id-accent-hover); }
 .id-secondary:hover,button.secondary:hover { background:var(--id-hover); border-color:color-mix(in oklch, var(--id-text) 24%, transparent); }
 .id-primary:active,button.primary:active,.id-secondary:active,button.secondary:active { box-shadow:inset 0 1px 2px color-mix(in srgb, var(--id-shadow-color) 20%, transparent); }
+/* Deshabilitado: se apaga sin desaparecer y deja claro que no es un destino. */
+.id-primary[aria-disabled="true"],button.primary:disabled,.id-secondary[aria-disabled="true"],button.secondary:disabled {
+  cursor:not-allowed; box-shadow:none; background:var(--id-hover); color:${n.textDisabled}; border-color:var(--id-border); }
+/* En espera: el controlador de step-up marca el botón mientras la ceremonia corre. */
+button[aria-busy="true"] { cursor:progress; }
+/* El hover del secundario sobre la tarjeta clara era casi invisible; se apoya en el acento. */
+.id-secondary:hover,button.secondary:hover { background:color-mix(in oklch, var(--id-accent) 6%, var(--id-paper)); border-color:color-mix(in oklch, var(--id-accent) 34%, transparent); }
 .id-section > .id-primary,.id-section > .id-secondary,form .id-secondary { width:100%; }
 .id-icon { width:${s(5)}; height:${s(5)}; flex:none; }
 .id-icon-brand { width:${s(4)}; height:${s(4)}; }
@@ -187,6 +194,13 @@ form .id-actions { margin-block-start:${s(4)}; }
 .id-field input:hover { border-color:color-mix(in oklch, var(--id-text) 24%, transparent); }
 .id-field input:focus { outline:none; border-color:var(--id-accent); box-shadow:0 0 0 ${s(1)} var(--id-accent-ring); }
 .id-field input[aria-invalid="true"] { border-color:var(--id-danger); }
+.id-field input::placeholder { color:${n.textDisabled}; opacity:1; }
+.id-field input:disabled { background:var(--id-hover); color:${n.textDisabled}; cursor:not-allowed; }
+/* El autocompletado de Chrome pinta su propio amarillo encima de la tarjeta: se neutraliza con la
+   sombra interior, que es lo único que ese pseudo-elemento respeta. */
+.id-field input:-webkit-autofill,.id-field input:-webkit-autofill:hover,.id-field input:-webkit-autofill:focus {
+  -webkit-text-fill-color:var(--id-text); box-shadow:0 0 0 ${s(25)} var(--id-paper) inset; caret-color:var(--id-text); }
+.id-field input:-webkit-autofill:focus { box-shadow:0 0 0 ${s(25)} var(--id-paper) inset, 0 0 0 ${s(1)} var(--id-accent-ring); }
 .id-or { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:${s(3)}; margin-block:${s(6)}; font-size:${typographyScale.bodySm.fontSize}; color:var(--id-muted); }
 .id-or::before,.id-or::after { content:""; height:1px; background:var(--id-border); }
 /* El separador ya corta la lectura: la sección siguiente no repite la línea. */

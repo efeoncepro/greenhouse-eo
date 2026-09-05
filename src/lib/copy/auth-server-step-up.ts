@@ -3,7 +3,7 @@ export const AUTH_STEP_UP_COPY = {
   setupCode: 'Código de tu aplicación de autenticación',
   verify: 'Verificar código',
   passkey: 'Verificar con mi passkey',
-  enroll: 'Configurar una aplicación de autenticación',
+  enroll: 'Activar mi segundo factor',
   setup:
     'Escanea el QR o agrega esta clave a tu aplicación de autenticación y guarda los códigos de respaldo en un lugar seguro.',
   secret: 'Clave de configuración manual',
@@ -14,9 +14,9 @@ export const AUTH_STEP_UP_COPY = {
   cancel: 'Volver a la solicitud',
   pending: 'Verificando…',
   rejected: 'No pudimos verificar el código o la passkey. Vuelve a intentarlo.',
-  unavailable: 'La verificación no está disponible. Vuelve a intentarlo más tarde.',
+  unavailable: 'No podemos verificar tu identidad en este momento. Intenta de nuevo en unos minutos.',
   expired: 'Tu sesión venció o ya no está disponible. Vuelve a la solicitud para entrar de nuevo.',
-  limited: 'Has realizado varios intentos. Espera antes de volver a intentarlo.',
+  limited: 'Hiciste varios intentos seguidos. Espera un minuto y vuelve a intentarlo.',
   cancelled: 'Se canceló la verificación con passkey. Puedes intentarlo otra vez.',
   unsupported:
     'Este navegador no permite verificar con passkey. Usa un código o configura una aplicación de autenticación.',
