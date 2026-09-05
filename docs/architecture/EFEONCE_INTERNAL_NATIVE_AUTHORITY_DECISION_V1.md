@@ -225,3 +225,10 @@ sólo origen. [Fetch Standard](https://fetch.spec.whatwg.org/#append-a-request-o
 La prueba de navegador canónica debe ejecutar el handler real, con controles negativo
 no-referrer y cross-origin; un test unitario con header Origin escrito a mano no reproduce
 la interacción del navegador y la política de respuesta.
+
+La página de consentimiento permite además en form-action el origen del callback que
+authorize ya resolvió contra los redirects registrados del cliente. No toma ese origen
+directamente de la query ni amplía la CSP de otras páginas. La ruta POST→authorize→callback
+se prueba en navegador: self-only bloquea la redirección final en Chromium; permitir el
+origen validado conserva el flujo y sigue bloqueando destinos de otros orígenes. La CSP
+no sustituye la coincidencia exacta de redirect_uri realizada por el protocolo.

@@ -997,4 +997,11 @@ POSTconsent devuelve invalid_request; no registra token ni consentimiento. Repro
 con navegador integrado y formulario nativo (no fetch): no-referrer da Origin opaque/null,
 SecFetchSite same-origin, decisionallow; strict-origin da Origin propio y Referer sólo origen.
 Cambio limitado a htmlResponse; JSON/redirect mantienen no-referrer y guardCSRF no cambia.
-Scriptbrowser canónico en preparación para Chromium/WebKit y controles adversarios.
+Scriptbrowser canónico: Chromium6/6passed, WebKit instalación pendiente (no cuenta como passed).
+Suite229passed/4liveomitidas, tsc0. El navegador integrado reprodujo ambas políticas.
+
+Ampliación de la regresión browser: CSP form-action self-only bloquea la cadena
+POST→authorize→callback en Chromium. htmlResponse permite opción de origen de retorno sólo
+para consentimiento; authorize la obtiene después de resolver redirect_uri contra el cliente.
+No cambia el guard de origen ni la validación exacta del redirect. Prueba del handler
+rechaza origen de callback no registrado antes de incorporarlo a CSP.

@@ -15,7 +15,9 @@ import { fileURLToPath } from 'node:url'
 import { build } from 'esbuild'
 import { chromium, webkit } from 'playwright'
 
-if (process.argv.length !== 2) throw new Error('No remote targets or custom arguments supported')
+const chromiumOnly = process.argv.length === 3 && process.argv[2] === '--chromium-only'
+
+if (process.argv.length !== 2 && !chromiumOnly) throw new Error('Only --chromium-only is supported; no remote targets')
 const root = fileURLToPath(new URL('../../', import.meta.url))
 const temporary = await mkdtemp(join(tmpdir(), 'auth-form-origin-'))
 const servers = []
@@ -26,8 +28,8 @@ async function listen(handler) {
 
   servers.push(server)
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve))
-  
-return `http://127.0.0.1:${server.address().port}`
+
+  return `http://127.0.0.1:${server.address().port}`
 }
 
 try {
@@ -48,6 +50,9 @@ export { handleConsent } from './src/lib/auth-server/oauth/consent-endpoint';`,
   })
   const { htmlResponse, headersFromRecord, handleConsent } = createRequire(import.meta.url)(bundle)
   let observation
+  let callbackVisits = 0
+  let otherVisits = 0
+  let checks = 0
 
   const form = action => `<form action="${action}" method="post">
 <input type="hidden" name="client_id" value="fictional-local-client">
@@ -57,6 +62,22 @@ export { handleConsent } from './src/lib/auth-server/oauth/consent-endpoint';`,
 
   const issuer = await listen(async (req, res) => {
     try {
+      if (req.url.startsWith('/redirect-consent')) {
+        res.writeHead(302, { Location: `${issuer}/redirect-authorize${new URL(req.url, issuer).search}` })
+        res.end()
+
+return
+      }
+
+      if (req.url.startsWith('/redirect-authorize')) {
+        const target = new URL(req.url, issuer).searchParams.get('other') ? other : attacker
+
+        res.writeHead(302, { Location: `${target}/callback` })
+        res.end()
+
+return
+      }
+
       if (req.method === 'POST' && req.url === '/oauth/consent') {
         let body = ''
 
@@ -75,8 +96,8 @@ export { handleConsent } from './src/lib/auth-server/oauth/consent-endpoint';`,
             store: {
               getClient: async () => {
                 lookups++
-                
-return null
+
+                return null
               }
             },
             cimd: {}
@@ -91,12 +112,21 @@ return null
         }
         res.writeHead(result.status, result.headers)
         res.end(result.body)
-        
-return
+
+        return
       }
 
       const oldPolicy = req.url.startsWith('/negative')
-      const result = htmlResponse(200, form('/oauth/consent'), oldPolicy ? { 'Referrer-Policy': 'no-referrer' } : {})
+      const redirectTest = req.url.startsWith('/redirect-test')
+      const withClientOrigin = req.url.includes('registered=1')
+      const toOther = req.url.includes('other=1')
+
+      const result = htmlResponse(
+        200,
+        form(redirectTest ? `/redirect-consent${toOther ? '?other=1' : ''}` : '/oauth/consent'),
+        oldPolicy ? { 'Referrer-Policy': 'no-referrer' } : {},
+        withClientOrigin ? { formActionRedirectUri: `${attacker}/callback?fictional=query` } : {}
+      )
 
       res.writeHead(result.status, result.headers)
       res.end(result.body)
@@ -106,28 +136,38 @@ return
     }
   })
 
-  const attacker = await listen((_req, res) => {
+  const attacker = await listen((req, res) => {
+    if (req.url === '/callback') callbackVisits++
     res.writeHead(200, { 'Content-Type': 'text/html', 'Referrer-Policy': 'strict-origin' })
     res.end(form(`${issuer}/oauth/consent`))
   })
 
-  for (const [name, engine] of [
-    ['chromium', chromium],
-    ['webkit', webkit]
-  ]) {
+  const other = await listen((_req, res) => {
+    otherVisits++
+    res.writeHead(200, { 'Content-Type': 'text/plain' })
+    res.end('Fictional unregistered destination')
+  })
+
+  const engines = chromiumOnly
+    ? [['chromium', chromium]]
+    : [
+        ['chromium', chromium],
+        ['webkit', webkit]
+      ]
+
+  for (const [name, engine] of engines) {
     browser = await engine.launch({ headless: true })
     const context = await browser.newContext({ serviceWorkers: 'block' })
     let externalRequests = 0
 
     await context.route('**/*', route => {
-      if (![issuer, attacker].includes(new URL(route.request().url()).origin)) {
+      if (![issuer, attacker, other].includes(new URL(route.request().url()).origin)) {
         externalRequests++
-        
-return route.abort()
+
+        return route.abort()
       }
 
-      
-return route.continue()
+      return route.continue()
     })
     const page = await context.newPage()
 
@@ -153,6 +193,36 @@ return route.continue()
       if (scenario.name === 'real-policy') assert.equal(observation.origin, issuer)
       if (scenario.name === 'old-policy') assert.equal(observation.origin, 'null')
       if (scenario.name === 'cross-origin') assert.equal(observation.origin, attacker)
+      checks++
+      console.log(`${name}/${scenario.name}: passed`)
+    }
+
+    for (const scenario of [
+      { name: 'self-only-redirect-blocked', query: '', allowed: false },
+      { name: 'registered-redirect-allowed', query: '?registered=1', allowed: true },
+      { name: 'other-redirect-blocked', query: '?registered=1&other=1', allowed: false }
+    ]) {
+      callbackVisits = 0
+      otherVisits = 0
+      await page.goto(`${issuer}/redirect-test${scenario.query}`)
+
+      const blocked = page
+        .waitForEvent('console', { predicate: message => message.text().includes('form-action'), timeout: 5000 })
+        .then(
+          () => true,
+          () => false
+        )
+
+      const arrived = page.waitForURL(`${attacker}/callback`, { timeout: 5000 }).then(
+        () => true,
+        () => false
+      )
+
+      await page.getByRole('button', { name: 'Continue local test' }).click()
+      assert.equal(await (scenario.allowed ? arrived : blocked), true, `${name}/${scenario.name}: browser result`)
+      assert.equal(callbackVisits, scenario.allowed ? 1 : 0)
+      assert.equal(otherVisits, 0)
+      checks++
       console.log(`${name}/${scenario.name}: passed`)
     }
 
@@ -161,7 +231,9 @@ return route.continue()
     browser = undefined
   }
 
-  console.log('6 browser form-origin checks passed; no external requests')
+  console.log(
+    `${checks} browser form-origin/redirect checks passed; no external requests; engines=${engines.map(([name]) => name).join(',')}`
+  )
 } finally {
   await browser?.close()
   await Promise.all(servers.map(server => new Promise(resolve => server.close(resolve))))

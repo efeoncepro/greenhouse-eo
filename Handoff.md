@@ -4,9 +4,11 @@
 Microsoft éxito22:01Z; reader consentimiento corregido y publicado ddbd011f5, deploy33995163892.
 Rev23/24 imagen73f272c7; pantalla Efeonce+lectura funciona con sesión existente, sin nueva MFA.
 POSTconsent invalid_request; reproducción navegador real confirma no-referrer→Origin:null;
-strict-origin preserva origen y no transmite path/query. Fixlocal sóloHTML, guardCSRF intacto.
-Emisor se apaga nuevamente mientras se publica. Helper10981 tiene transacción pendiente sin
-tokens: salir/reiniciar antes de nuevo /start. Probe local18745/TTY70210 sin credenciales.
+strict-origin preserva origen y no transmite path/query. Además CSPconsent permite origen del
+callback prevalidado (self-only bloquea retorno trasPOST en Chromium). GuardCSRF intacto.
+229tests/tsc correctos, Chromium6/6 browserchecks; WebKit instalación pendiente.
+Emisor OFF rev25-gs5/GitHub false. Helper10981 y probe70210 cerrados sin tokens.
+Iniciar helper nuevo después de desplegar política corregida.
 Main d551cf368 último release certificado. Pendientes publicación/canarytoken, allow/foreign/
 refresh/revoke/rollback y promoción final gobernada. UI ajena activa; no tocar sus archivos.
 [Task](docs/tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md) ·

@@ -499,3 +499,14 @@ local con formulario real en el mismo navegador confirma no-referrer→Origin:nu
 Sec-Fetch-Site same-origin y decisionallow. strict-origin produce origen propio y Referer
 sólo origen. Cambiar sólo respuestas HTML; conservar guardCSRF y no-referrer JSON/redirect.
 Reactivación suspendida mientras se publica; no reusar callback ni transacción abandonada.
+
+La reproducción completa detecta también bloqueo CSP de POST→authorize→callback en
+Chromium con form-action self-only. El consentimiento añade sólo el origen del callback
+prevalidado del cliente; otras páginas mantienen self-only. Gate local:
+`node scripts/auth-server/probe-form-origin.mjs` (sin credenciales ni destinos externos).
+No reemplazarlo por fetch ni por tests que escriben el header Origin manualmente.
+
+Validación local de la corrección de formularios: 229 pruebas passed/4live omitidas y tsc0.
+`node scripts/auth-server/probe-form-origin.mjs --chromium-only`: 6/6 passed, sin requests
+externos. WebKit pendiente de instalación; no declarado correcto. El navegador integrado
+confirmó además Origin:null anterior y origen propio con Referer sólo origen al corregir.
