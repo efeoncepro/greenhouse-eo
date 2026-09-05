@@ -4,19 +4,30 @@ Owner: TASK-1836 / EPIC-044. Decisión: `EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECIS
 
 ## Estado verificado 2026-09-05
 
-Backend code complete, rollout pendiente: implementación local, todavía sin desplegar. Las migraciones
+Backend publicado parcialmente; promoción del reader y activación pendientes. Las migraciones
 `20260905124526557_task-1836-internal-authorization-contexts` y
 `20260905130319708_task-1836-auth-ephemeral-gc` y
 `20260905132652846_task-1836-session-bound-passkey-step-up` están aplicadas en la instancia compartida.
 Esto afecta al esquema común de staging/producción; no hay segunda instancia de pruebas.
-El runtime releído sigue en `auth-server-00007-cxb`, SHA `3f68e887546227c88dea031697dfc2a83bce4ad4`,
-100% tráfico. OAuth/personas ON; configuración interna nueva ausente. Ingress real:
+El runtime releído es `auth-server-00009-4tl`, SHA `a9f16b89393cfb19995baf07f48616a139f6bffb`,
+100% tráfico. OAuth/personas ON; configuración interna preparada pero OFF. Ingress real:
 `internal-and-cloud-load-balancing`.
 
 El reader de elegibilidad en PG devuelve el perfil canónico del caso autorizado `jreyes@efeoncepro.com`
 y la organización `EO-ORG-0007` (`org-2df565fb-98aa-42f7-b324-ea9a2209017f`). Su condición comercial
 `other/inactive` no es una condición de pertenencia laboral: la organización está activa y es entidad
-operativa. No se modificó la organización ni se enroló/otorgó acceso al usuario real en estas pruebas.
+operativa. No se modificó la organización. Tras autorización de rollout se aplicaron enrollment y grant
+`growth.seo.observation.read` por commands canónicos, con vencimiento `2026-09-12T15:00:00Z`.
+No se emitió todavía un token corporativo ni se completó el canary autenticado.
+
+Gateway `fa1ee2a05caf1adc66a034bdfe2e7db3ba4b103c`, revisión `efeonce-mcp-gateway-00031-xwx`,
+100% tráfico, contiene la validación jti; ambos flags nativos OFF. Vercel staging del SHA a9f16b893
+está READY y el smoke E2E `33975085336` terminó success. PR de promoción: #222, todavía sin merge.
+El preflight clasifica el batch `requires_break_glass`; la comprobación real de permisos deniega al
+actor ambas capabilities de excepción porque faltan los grants en el evaluador. Reparación concreta
+en [diagnóstico de autoridad](TASK-1836_RELEASE_AUTHORITY_GAP_2026-09-05.md), autorizada por el operador. Seis grants faltantes restaurados localmente y readback real permitido;
+pruebas de permisos 28 passed. Se integra la auditoría del motivo antes de publicar y usar la excepción.
+GC permanece OFF/PAUSED.
 
 ## Configuración del emisor
 

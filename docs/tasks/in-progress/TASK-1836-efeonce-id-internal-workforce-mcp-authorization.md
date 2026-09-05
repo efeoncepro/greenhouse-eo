@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `rollout en curso (2026-09-05): primer deploy OFF del emisor, gateway y GC realizado; consumer Vercel aún pendiente de promoción. Canary detectó gap de revocación OAuth por JWT vigente: fix jti verificado localmente, pendiente de despliegue antes de activar. Identidad elegible en dry-run, sin enrollment/grant ni token corporativo real. Ver runbook para SHA/revisiones.`
+- Status real: `rollout parcial (2026-09-05): emisor y gateway publicados OFF; fix jti publicado en develop a9f16b893 y gateway fa1ee2a. Staging READY y smoke E2E success; PR222 de promoción main preparado. Enrolamiento y grant de lectura del piloto aplicados por commands canónicos, vencimiento 2026-09-12T15:00:00Z; todavía sin token corporativo ni canary autenticado. Promoción detenida: can() deniega ambas capabilities de excepción de release, pese al contrato de EFEONCE_ADMIN. Reparación de permisos autorizada: seis grants faltantes restaurados localmente; readback real can() permitido por rol y 28 tests passed. Auditoría del motivo en integración antes de publicar. GC sigue OFF/PAUSED. Ver runbook y TASK-1836_RELEASE_AUTHORITY_GAP_2026-09-05.md.`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`

@@ -1957,6 +1957,21 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source: 'role'
     })
 
+    // TASK-848/849/850 + TASK-935: catálogo y registry no otorgan autoridad por sí
+    // solos. Completar el contrato explícito del rol existente; no inferir grants
+    // desde el prefijo platform.release ni desde el route group admin.
+    // Los commands conservan sus requisitos de motivo y auditoría para break-glass.
+    for (const [capability, action] of [
+      ['platform.release.rollback', 'rollback'],
+      ['platform.release.bypass_preflight', 'bypass_preflight'],
+      ['platform.release.watchdog.read', 'read'],
+      ['platform.release.preflight.execute', 'execute'],
+      ['platform.release.preflight.read_results', 'read'],
+      ['platform.release.preflight.override_batch_policy', 'update']
+    ] as const) {
+      addEntitlement(entries, { module: 'platform', capability, action, scope: 'all', source: 'role' })
+    }
+
     addEntitlement(entries, {
       module: 'platform',
       capability: 'platform.public_site.bridge.inspect',
@@ -3263,6 +3278,18 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       action: 'execute',
       scope: 'own',
       source
+    })
+  }
+
+  // TASK-850: Finance observa resultados de preflight, sin ejecutar releases ni
+  // recibir rollback o excepciones. Un route group finance no sustituye este rol.
+  if (hasRole(subject, ROLE_CODES.FINANCE_ADMIN) && !hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
+    addEntitlement(entries, {
+      module: 'platform',
+      capability: 'platform.release.preflight.read_results',
+      action: 'read',
+      scope: 'all',
+      source: 'role'
     })
   }
 

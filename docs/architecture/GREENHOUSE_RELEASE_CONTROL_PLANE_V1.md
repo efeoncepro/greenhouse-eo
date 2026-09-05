@@ -1066,7 +1066,7 @@ pnpm release:preflight --json --fail-on-error
 # exit 1 si readyToDeploy=false → degraded/unknown tambien frenan production
 
 # Break-glass operator
-pnpm release:preflight --override-batch-policy --fail-on-error
+pnpm release:preflight --override-batch-policy --override-reason="Motivo específico aprobado del release" --fail-on-error
 # Downgrade release_batch_policy errors a warnings (requiere capability + audit)
 ```
 

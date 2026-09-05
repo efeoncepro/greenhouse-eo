@@ -7,6 +7,8 @@ import { captureWithDomain } from '@/lib/observability/capture'
 import { EVENT_TYPES, AGGREGATE_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
+import { readPreflightOverrideAudit } from './preflight/override-audit'
+
 import {
   assertValidReleaseStateTransition,
   isActiveReleaseState,
@@ -134,12 +136,14 @@ const resolveNextAttemptN = async (
 export const recordReleaseStarted = async (
   input: RecordReleaseStartedInput
 ): Promise<ReleaseManifest> => {
+  const providedPreflight = input.preflightResult ?? {}
+  const override = readPreflightOverrideAudit(providedPreflight.override)
+  const preflightResult = { ...providedPreflight, ...(override ? { override } : {}) }
   const sourceBranch = input.sourceBranch ?? 'develop'
   const targetBranch = input.targetBranch ?? 'main'
   const releaseId = buildReleaseId(input.targetSha)
   const attemptN = await resolveNextAttemptN(input.targetSha, targetBranch)
   const startedAt = new Date().toISOString()
-  const preflightResult = input.preflightResult ?? {}
 
   return withTransaction(async (tx) => {
     // 1. INSERT manifest
@@ -184,7 +188,7 @@ export const recordReleaseStarted = async (
         input.triggeredBy,
         input.operatorMemberId ?? null,
         `Release iniciado: ${input.triggeredBy}`,
-        JSON.stringify({ attempt_n: attemptN, target_sha: input.targetSha }),
+        JSON.stringify({ attempt_n: attemptN, target_sha: input.targetSha, ...(override ? { override } : {}) }),
         startedAt
       ]
     )

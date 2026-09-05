@@ -162,7 +162,7 @@ pnpm release:preflight --json                # JSON machine-readable
 pnpm release:preflight --json --fail-on-error   # exit 1 si readyToDeploy=false
 
 # Break-glass (EFEONCE_ADMIN solo, requiere capability + audit)
-pnpm release:preflight --override-batch-policy --fail-on-error
+pnpm release:preflight --override-batch-policy --override-reason="Motivo específico aprobado del release" --fail-on-error
 ```
 
 Flags:
@@ -170,6 +170,12 @@ Flags:
 - `--target-sha=<sha>` (default git HEAD)
 - `--target-branch=<branch>` (default main)
 - `--json`, `--fail-on-error`, `--override-batch-policy`
+- `--override-reason=<motivo>` obligatorio con `--override-batch-policy` o
+  `--bypass-preflight-warnings`: al menos 20 caracteres después de trim. El motivo, las flags y el
+  actor declarado viajan en `preflight.override` y en `release_state_transitions.metadata_json.override`.
+  No equivalen a una comprobación automática de la capability humana: verificar el actor real y
+  conservar evidencia antes de usar la excepción. GitHub actor no se convierte implícitamente en
+  persona Greenhouse. El workflow mantiene sus approvals y permisos independientes.
 
 Output canonico: `ProductionPreflightV1` (versionado `contractVersion='production-preflight.v1'`). Operator decide en base a `readyToDeploy: SI | NO`; en modo `--fail-on-error`, cualquier `readyToDeploy=false` debe fallar el gate.
 
