@@ -464,7 +464,8 @@ isotipo Efeonce desde su propio origen. Fuente única: `efeonce-mcp:src/branding
    a mano reintroduce el cartel que miente.
 2. **Un ícono sólo se declara si sus bytes cargaron.** Asset ilegible ⇒ el gateway queda **sin** ese
    ícono + un `WARNING`, jamás una promesa que responde 404 y jamás una caída del gateway por un
-   asset cosmético. Falsificado quitando un PNG: el otro siguió sirviendo y el ausente no se declaró.
+   asset cosmético. Falsificado quitando el PNG: el gateway arrancó, sirvió todo lo demás y su
+   `icons[]` quedó vacío en vez de apuntar a una ruta muerta.
 3. **Las rutas del ícono son públicas por contrato del spec** (§`icons`: el cliente lo trae *sin*
    credenciales). No es una excepción abierta en una compuerta: el gateway no tiene hook de auth
    global — `/health` y los `/.well-known/*` ya son rutas públicas y la auth vive dentro del handler
@@ -488,6 +489,25 @@ resultado de `initialize` — ahí es donde se verificó que el cartel llega al 
 
 `version: '0.1.0'` sigue igual a propósito: cambiar la versión que el servidor declara es una
 decisión de operador, no un efecto colateral de ponerle ícono.
+
+**Qué asset, y por qué UNO SOLO (dirección elegida por el operador, 2026-09-05).** El primer corte
+declaraba dos PNG transparentes con `theme` light/dark; el estudio de contenedor mostró que el
+transparente sólo funciona sobre fondo claro, que es justo lo que no controlamos. El asset vigente es
+**el isotipo blanco sobre placa navy `#023C70` opaca de borde a borde** — 512×512, marca al 76% del
+ancho (safe area 12% por lado), **sin radio horneado**: el cliente que enmascara recortaría su arco
+contra el nuestro, y a sangre las dos superficies se ven correctas.
+
+**NUNCA declares `theme` en este ícono.** Tres razones, en orden de peso: la placa opaca se lee sobre
+cualquier superficie, así que la variante por tema no tiene función; el spec define `theme` de forma
+ambigua —«theme preference (light or dark) for the icon background», sin decir si es el fondo DEL
+ícono o el DEL cliente—; y como hoy ningún cliente renderiza `icons`, una lectura invertida **no se
+puede falsificar contra nada**. Un ícono que no depende del tema no puede leerse al revés. Por eso
+`icon-512-dark.png` y el campo `theme` completo se retiraron del contrato.
+
+El estudio de contenedor que sostiene la decisión (recomendación especificada, las tres alternativas
+descartadas con su motivo, y los cuatro tratamientos a 48/32/24 px sobre lista clara, lista oscura y
+fondo con color) vive como lienzo de diseño; el isotipo no se alteró en ninguno: la geometría se
+extrae de `isotipo-efeonce-negativo.svg` y se inyecta sin editar.
 
 ## References
 

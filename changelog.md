@@ -10,9 +10,12 @@
 ## 2026-09-05 — MCP gateway: cartel propio del servidor (title, websiteUrl, íconos Efeonce)
 
 El gateway se anunciaba como `efeonce-mcp 0.1.0` sin título, sitio ni ícono. Declara ahora su
-`Implementation` completo y sirve el isotipo Efeonce (light + dark, 512×512) desde su propio origen,
-con `src` derivados de `MCP_PUBLIC_URL` y nunca como `data:` URI (el SDK estampa el `serverInfo` en
-cada resultado del carril moderno). Un ícono sólo se declara si sus bytes cargaron: asset ausente
+`Implementation` completo y sirve el isotipo Efeonce desde su propio origen, con `src` derivados de
+`MCP_PUBLIC_URL` y nunca como `data:` URI (el SDK estampa el `serverInfo` en cada resultado del
+carril moderno). Tras el estudio de contenedor, el asset es UNO: isotipo blanco sobre placa navy
+opaca 512×512 (marca al 76%, safe area 12%, sin radio horneado). Se retiran la variante dark y el
+campo `theme` — la placa opaca no los necesita y el spec no define si `theme` describe el fondo del
+ícono o el del cliente, cosa que ningún cliente permite falsificar. Un ícono sólo se declara si sus bytes cargaron: asset ausente
 deja al gateway sin ícono + WARNING, nunca una promesa que responde 404. El `Dockerfile` copia
 `assets/` y un test lo afirma, porque ningún test de runtime ve el contenido de la imagen.
 `pnpm check` verde (131 tests) y ambas guardas falsificadas. Commit `acda2c7` en `efeonce-mcp`, sin
