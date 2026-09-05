@@ -340,6 +340,7 @@ const run = async () => {
       // falle: acá se ejercita su RECHAZO, no sólo el camino feliz. Un guard que nunca se ve
       // rechazar es una afirmación (misma disciplina que la señal de sesión huérfana).
       const noOrigin = await request('/auth/passkeys/authenticate/start', { method: 'POST', json: {}, origin: null })
+
       const foreignOrigin = await request('/auth/passkeys/authenticate/start', {
         method: 'POST',
         json: {},
