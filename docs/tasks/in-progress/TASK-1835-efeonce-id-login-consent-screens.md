@@ -27,6 +27,19 @@ diseño y quedó implementada en `develop`. Lo verificado, lo que falta y una tr
 El flujo interno depende del contrato backend de TASK-1836 (U11). Incluir entrada corporativa Microsoft, retorno OAuth, errores de elegibilidad y consentimiento con organización/permisos reales; actualizar wireframe/flow/motion antes de implementar ese slice. La UI no determina población por correo ni concede permisos. El flujo externo conserva su contrato.
 
 
+## Delta 2026-09-05 — el consentimiento debe mostrar el destino (TASK-1837)
+
+La pantalla de consentimiento muestra hoy `clientName` y `clientId`, y **no muestra el host del `redirect_uri`**
+(`renderConsentPage`, `src/lib/auth-server/oauth/pages/render.ts`). Es un MUST de la especificación de
+autorización MCP: quien autoriza tiene derecho a ver a dónde se envía el código, porque el nombre de la
+aplicación es auto-declarado y el destino no.
+
+`TASK-1837` aporta el **dato** (resuelve y valida el host, lo pasa al input de `renderConsentPage` y agrega el
+copy en `src/lib/copy/auth-server.ts`). El **tratamiento visual** —dónde vive dentro de la ficha de aplicación,
+su jerarquía frente a la marca verificada y al aviso de aplicación no verificada— sigue siendo de esta task.
+No es una línea decorativa: es la señal que impide que una aplicación con nombre creíble se lleve el código a
+un dominio ajeno.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
