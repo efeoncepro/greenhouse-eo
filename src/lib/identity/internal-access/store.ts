@@ -53,7 +53,7 @@ export const ELIGIBLE_IDENTITY_FROM = `
      WHERE lower(conflicting_user.microsoft_tenant_id)=lower(u.microsoft_tenant_id)
        AND lower(conflicting_user.microsoft_oid)=lower(u.microsoft_oid)
        AND conflicting_user.active=TRUE AND conflicting_user.identity_profile_id IS DISTINCT FROM p.profile_id)
-   AND o.active = TRUE AND o.is_operating_entity = TRUE
+   AND o.active = TRUE AND o.status='active' AND o.is_operating_entity = TRUE
    AND EXISTS (SELECT 1 FROM greenhouse_core.person_memberships pm
      WHERE pm.profile_id = p.profile_id AND pm.organization_id = o.organization_id
        AND pm.membership_type = 'team_member' AND pm.active = TRUE AND pm.status = 'active')
@@ -76,7 +76,7 @@ JOIN eligible p ON p.profile_id = e.profile_id AND p.upstream_link_id = e.upstre
  AND p.organization_id = (SELECT organization_id FROM greenhouse_core.external_organization_bindings WHERE binding_id=e.binding_id)
  AND lower(p.microsoft_tenant_id) = e.tenant_id::text AND lower(p.microsoft_oid) = e.object_id::text
 JOIN greenhouse_core.external_identity_environments env ON env.environment_id=e.environment_id AND env.status='active'
-JOIN greenhouse_core.external_organization_bindings b ON b.binding_id=e.binding_id AND b.environment_id=e.environment_id AND b.status='active'
+JOIN greenhouse_core.external_organization_bindings b ON b.binding_id=e.binding_id AND b.environment_id=e.environment_id AND b.status='active' AND b.population='internal'
 JOIN greenhouse_core.identity_profile_source_links n ON n.link_id=e.native_link_id AND n.profile_id=e.profile_id
  AND n.source_system='external_idp:' || e.environment_id AND n.source_object_type='subject'
  AND n.active=TRUE AND n.is_login_identity=TRUE

@@ -379,10 +379,18 @@ ningún secreto ni PII de terceros salga del dominio.
 - **NUNCA** escribir `external_identity_environments`, `external_organization_bindings`,
   `external_capability_grants`, `external_member_invitations` ni los `identity_profile_source_links` con
   `source_system LIKE 'external_idp:%'` fuera de los commands canónicos de
-  `src/lib/identity/external-access/commands.ts` (`upsertExternalIdentityEnvironment`,
-  `bindExternalOrganization`, `grantExternalCapability`, `issueExternalInvitation`, `acceptExternalInvitation`,
-  `revokeExternalAccess`). Cada uno es UNA transacción = estado + `external_identity_audit_log` + outbox; un
-  `UPDATE`/`INSERT` suelto deja estado sin audit, sin evento y sin bump de `grants_version`.
+  `src/lib/identity/external-access/commands.ts` y sus primitives transaccionales
+  `authority-transactions.ts`. Los wrappers de `identity/internal-access/commands.ts` componen ese mismo
+  núcleo dentro de SU transacción, con política interna explícita; no constituyen un segundo writer.
+  Cada mutación compartida = estado + `external_identity_audit_log` + outbox + versión cuando cambia
+  autoridad. El audit interno de enrollment es complementario, nunca sustituto. Contrato TASK-1836:
+  `EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md` §Delta de integridad y población.
+- **Población persistida e inmutable:** external conserva cliente activo + invitación `linked`; internal
+  exige organización propia activa como entidad operativa + enrollment y workforce elegibles. No inferir
+  población del issuer/email ni crear invitaciones ficticias. Recuperación/revocación externa no desactiva
+  source links internos. La reconciliación es actual, idempotente, con actor/razón y referencia a evidencia
+  original; nunca inventa timestamps históricos. Detector `identity.external_binding.unaudited_write`
+  steady 0 sobre bindings/grants vigentes con audit canónico aplicado y correlacionado.
 - **NUNCA** resolver la persona por `client_id`/`azp` ni por email en el gateway o en el resolver: la llave
   durable es `(environment_id, subject)` vía el source link activo. `clientId` sólo se registra en el
   resolution log. El email únicamente participa al ACEPTAR una invitación (match exacto y único en

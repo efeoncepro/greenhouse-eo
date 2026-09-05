@@ -80,6 +80,19 @@ manual sobre `greenhouse_auth.signing_keys`. Runbook: `docs/operations/runbooks/
 Flag: `AUTH_SERVER_ENABLED` (Cloud Run, SoT `deploy.sh`; ledger `FEATURE_FLAG_STATE_LEDGER.md`). Task dueña:
 `TASK-1828`.
 
+## Delta 2026-09-05 — TASK-1836: integridad de auditoría compartida
+
+`identity.external_binding.unaudited_write` se agrega al mismo grupo `externalIdentityBinding` del
+overview, module identity, kind data_quality, steady 0; cualquier anomalía es error. Cuenta bindings
+activos y grants activos no expirados sin audit aplicado de creación o reconciliación correlacionado.
+Reconciliación válida exige metadata `population=internal`, `reconciliationVersion=1` numérico; ni eventos
+ajenos, ni denegados, ni metadata incompleta satisfacen el contrato. Error de PG produce unknown.
+No sustituye orphan_grant: detecta integridad auditora aunque el contenedor de autoridad esté activo.
+
+Baseline read-only previo a reparación: 2 (binding y grant del piloto). Tests SQL TEMP+rollback verifican
+la omisión y su corrección sin tocar datos productivos. Regularización por command canónico con evidencia
+actual, nunca insertar historia falsa para silenciar la señal. Estado local hasta publicación TASK-1836.
+
 ## Delta 2026-09-04 — TASK-1631: 4 signals del binding de identidad externa (`identity.external_binding.*`)
 
 Cuatro señales nuevas, un solo reader

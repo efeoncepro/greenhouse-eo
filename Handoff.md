@@ -1,6 +1,11 @@
 # Handoff activo
 
-**EPIC-044 / TASK-1836, 2026-09-05:** rollout autorizado parcial, coordinador único Codex. PR #222 / main `1086fe40a55396fc199ef2e446391c14a69b665d` released por run `33978290957`, CI/Deep/E2E y watchdog 5/5 correctos. Auditoría de excepción releída en PG; seis permisos reparados por rol. Reader ON (`dpl_4Ytq4GHm6rCSoDXAxK2vM5Br6gQ9` READY), GC ON en ops `00652-x8t`, cron ENABLED y ejecución real 16:47:29 UTC: once tablas, cero borrados. Gateway ON en `00032-qm5`, commit `dd04f470`, run `33979635307` success: fix de reutilización de imagen por digest tras fallo de tag inmutable, 125 pruebas correctas y discovery ON. Login real de Julio completó Microsoft/MFA y llegó al callback, rechazado `upstream_rejected` dentro de vigencia, sin token emitido. Follow-up local: scopes `openid profile`, reloj JWT posterior al intercambio y diagnóstico seguro; 65 pruebas y typecheck correctos. Emisor interno apagado temporalmente (GitHub false, auth `00012-tvn`) durante publicación. Falta publicar ese fix, reactivar y probar lectura, aislamiento, revocación y rollback. Piloto enrolado con lectura hasta 2026-09-12T15:00:00Z, gv 2. Develop conserva cambio relacionado b0debc6ac; Berel WIP separado. [Runbook](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md) · [Reparación de release](docs/operations/TASK-1836_RELEASE_AUTHORITY_GAP_2026-09-05.md).
+**Traspaso TASK-1836, 2026-09-05:** el operador pidió nueva task de Codex con revisión inicial independiente.
+Sesión anterior y subagentes detenidos, reparación aún sin commit ni aplicación PG. Las tres observaciones
+de Claude siguen abiertas (outcome interno, detector de mezcla y migración por CLI). Continuar desde el
+[handoff de integridad](docs/operations/TASK-1836_INTEGRITY_SESSION_HANDOFF_2026-09-05.md); no activar el piloto.
+
+**EPIC-044 / TASK-1836:** PR #223 released (run `33982717767`, watchdog 5/5); reparación de integridad local incompleta, issuer interno OFF. No hay canary humano MCP exitoso. Detalle, autorizaciones y evidencia en el handoff de integridad enlazado arriba; operación en el [runbook](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 

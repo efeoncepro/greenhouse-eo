@@ -105,7 +105,7 @@ subtarea **en el mismo momento en que se crea**: una subtarea de banner sin fich
 | **→ Objetivo (permanencia)** | **comprender** · **retener y compartir** · **cerrar la emoción**. Campo obligatorio: si no cumple ninguna, la pieza sobra |
 | **→ Descripción detallada de la imagen** | **Dos bloques obligatorios.** *Qué debe verse:* la escena concreta —encuadre, luz, elementos, qué sí y qué no aparece— de modo que diseño pueda producirla **sin leer el artículo completo**. *Intención:* qué debe lograr en el lector y por qué esa sección del texto la necesita. Aquí se demuestra que el banner es contextual |
 | **→ Color pintura Berel** | Nombre + código alfanumérico de cada color. **Nunca** inventar HEX/RGB: si no hay acceso al catálogo, escribir "Tonos reales: Catálogo RGB interno" |
-| **→ Producto** | Sí / No. Si es sí: nombre y serie + enlace a la **ficha oficial** del sitio; nunca URLs del backend/CMS. Los datos técnicos salen de la ficha, no se estiman |
+| **→ Producto** | Sí / No. Si es sí: nombre y serie + enlace a la **página pública del producto**; nunca URLs del backend/CMS. Los datos técnicos salen de la ficha técnica, no se estiman |
 | **→ Texto en la imagen** | El texto literal a rotular (título y etiquetas), o "Sin texto". **Nada de párrafos dentro de la pieza** |
 | **→ Graficos adicionales en la imagen** | Iconografía, flechas, divisorias, muestrarios, tipografía de marca, o "Ninguno" |
 | **→ Estilo y paleta** | Línea visual y colores de marca, con la nota de **legibilidad en móvil** |
@@ -117,6 +117,14 @@ El cuerpo de la subtarea lleva **dos secciones**, cada una como encabezado 1 seg
 `# Referencias Visuales 👁️‍🗨️` (callout vacío para que diseño cargue sus referencias).
 
 → Plantilla copiable: [`../templates/ficha-banner.md`](../templates/ficha-banner.md)
+
+### Productos nuevos o de awareness
+
+Cuando el brief identifique un producto reciente o con baja notoriedad, al menos una pieza debe incluir
+el **render oficial del empaque**, sin recrearlo ni sustituirlo por un envase genérico. La ficha declara
+la fuente del asset, la versión confirmada y su ubicación; si falta el render oficial, la pieza queda
+`⚠️ Pendiente` y no se inventa. La escena puede contextualizar el producto, pero el empaque debe ser
+reconocible y coherente con la tabla/producto al que acompaña.
 
 ## 🔴 ALT, archivo y posición son una sola fuente de verdad
 
@@ -145,6 +153,7 @@ Corolarios que el origen declara explícitamente:
 - [ ] Imágenes del artículo en el tamaño estándar 1408 × 768 px
 - [ ] Formatos `.webp`, peso menos de 200 KB, lazy-load (LCP sin lazy)
 - [ ] Cada ficha declara su objetivo de permanencia y su justificación anti banner-blindness
+- [ ] Si el producto es nuevo/de awareness: render oficial del empaque incluido o bloqueo documentado
 - [ ] 🔴 Si la pieza es infografía: formato y variante declarados, y el acento usa Rojo Editorial `#B3153A` o la paleta complementaria, nunca el rojo corporativo
 
 ## Cross-links

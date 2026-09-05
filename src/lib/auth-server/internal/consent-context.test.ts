@@ -43,6 +43,7 @@ const context: InternalAuthorizationContext = {
 }
 
 const binding: ExternalOrganizationBinding = {
+  population: 'external',
   bindingId: 'binding-a',
   organizationId: 'org-a',
   organizationName: 'Efeonce',

@@ -118,7 +118,7 @@ Dentro del desplegable, **siempre en este orden**:
 | **Metadatos propuestos** | Title, meta description, slug y H1, cada uno con su **conteo de caracteres**. 🔴 **En viñetas, no en tabla** — el carácter de barra vertical parte la fila en Notion |
 | **Texto completo** | El artículo listo para maquetar: arco de cinco tiempos, tuteo, tablas, FAQ y firma de cierre |
 | **Especificación de banners** | Un **callout 🖼️ en la posición exacta del texto** donde va cada pieza, con archivo, medidas, peso, lazy sí/no y **ALT literal**. Es la fuente de verdad que después se copia a la ficha de la subtarea |
-| **Callout de pendientes ⚠️** | Todo lo que quedó sin verificar: fichas de producto sin URL pública, series por confirmar, datos que dependen del cliente. *Un pendiente declarado es gestionable; uno omitido se publica como error* |
+| **Callout de pendientes ⚠️** | Todo lo que quedó sin verificar: productos sin página pública, series por confirmar y datos que requieren fuente oficial. Este bloque es interno y no se copia al cuerpo público. *Un pendiente declarado es gestionable; uno omitido se publica como error* |
 
 → Plantilla copiable: [`../templates/bloque-reescritura.md`](../templates/bloque-reescritura.md)
 
@@ -133,11 +133,16 @@ Dentro del desplegable, **siempre en este orden**:
   en `sitemap-colores.xml` el 2026-08-25: `amarillos` `azules` `cafes` `grises` `morados` `naranjas`
   `pasteles` `rojos` `verdes`. **No hay ninguna otra.**
   🔴 **Nunca la búsqueda del sitio:** `robots.txt` trae `Disallow: /search` y `Disallow: /*?q=`.
-- **Productos enlazados a su ficha real** (`berel.com/productos/...`) o a la categoría; **nunca al
+- **Productos enlazados a su página pública** (`berel.com/productos/...`) o a la categoría; **nunca al
   Home, nunca a `/search?q=` y nunca a URLs del backend/CMS**. 🔴 Y a la **variante** correcta, no al
   nombre genérico → [§ Sufijos de variante](#-sufijos-de-variante-enlaza-al-acabado-no-al-nombre).
 - Siempre con **anchor descriptivo**; nunca la URL cruda como texto del enlace.
 - Incluir **FAQ**, **tabla comparativa** cuando aplique, y la **firma de cierre** de la marca.
+- En una tabla, usar encabezados que expliquen el dato (`Especificación` / `Dato`) y nombrar el producto
+  en cada columna comparativa. Si un criterio pertenece a un solo producto —por ejemplo, una garantía—,
+  explicarlo fuera de la comparación.
+- Si se recomienda consultar a un especialista, convertirlo en una salida accionable con anchor
+  descriptivo hacia `/contacto`.
 - **Especificar los banners dentro de la reescritura** siguiendo la Spec para imágenes: posición
   exacta anclada a una sección real del texto, nombre de archivo `.webp`, ALT exacto y **hero sin
   `lazy`** (es el LCP) → [`05_BANNERS_IMAGENES.md`](05_BANNERS_IMAGENES.md).
@@ -150,12 +155,31 @@ Dentro del desplegable, **siempre en este orden**:
   comprobar `title`, H1, cuerpo, canonical y schema en la ruta pública**.
 - Si el sitio **no confirma** la URL, enlazar la **familia de color** o la **categoría de producto**,
   y dejar el pendiente en el callout ⚠️. 🔴 **Nunca la búsqueda del sitio como respaldo.**
-- Si un **producto no tiene ficha pública localizable** —no aparece en `sitemap-productos.xml` y la
+- Si un **producto no tiene página pública localizable** —no aparece en `sitemap-productos.xml` y la
   candidata pesa como el control—: citarlo con su nombre y número de serie confirmados en el
   catálogo, enlazar el catálogo general y dejar el pendiente en el callout ⚠️. **Nunca inventar una
   URL de ficha**, ni deducir un sufijo de variante que no viste en el sitemap.
 - Si una fuente de la wiki está **vacía o sin permisos de lectura**, **decirlo explícitamente en el
-  entregable** en lugar de rellenar el hueco con supuestos.
+  bloque interno de pendientes** en lugar de rellenar el hueco con supuestos. El cuerpo público no lleva
+  disclaimers sobre la operación ni sobre verificaciones pendientes.
+
+### Producto nuevo o con baja notoriedad
+
+Cuando el cliente marque un producto como reciente o de awareness, no reciclar la arquitectura de una
+categoría consolidada:
+
+1. redactar para lectura simple y literal, sin presuponer que el lector conoce el producto;
+2. evitar títulos/H1 del tipo `Guía [Producto]`, salvo petición explícita;
+3. convertir el diferenciador indicado en el brief en el mensaje central y presentarlo temprano;
+4. ordenar la explicación desde beneficio/diferenciador hacia categoría, resina y aplicación;
+5. especificar al menos una imagen con el render oficial del empaque;
+6. mantener tono de acompañante experto: no vender de forma extrema ni usar preguntas
+   autorreferenciales como `¿Por qué decimos que...?`.
+
+En todo cuerpo público, retirar lenguaje de agencia o control interno: `el cliente`, `instrucción del
+cliente`, `posicionamiento editorial`, `la ficha declara`, referencias al CMS, extracción o verificación.
+La fuente puede vivir en procedencia/datos/pendientes internos; la frase pública habla directamente desde
+Berel. `Premium` describe una línea cuando la fuente lo respalda, nunca una `formulación premium`.
 
 ### Cuando los nombres de producto se traslapan
 

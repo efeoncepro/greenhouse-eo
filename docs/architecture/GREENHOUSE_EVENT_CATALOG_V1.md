@@ -26,6 +26,23 @@ Ningún consumer reactivo escucha estos seis todavía: la invalidación push de 
 `TASK-1831`; hoy el gateway compara `grantsVersion` por igualdad contra el reader ecosystem con TTL ≤ 60 s.
 Contrato: `EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md` §`Slice 1 binding foundation — applied`.
 
+## Delta 2026-09-05 — TASK-1836: población y reconciliación de autoridad
+
+El núcleo `identity/external-access/authority-transactions.ts` comparte la escritura canónica entre
+wrappers externos e internos en la misma transacción. Eventos bound/granted/revoked incorporan población
+explícita sin cambiar la semántica comercial del wrapper externo. Audit interno de enrollment se conserva.
+
+| Event | Trigger | Evidencia |
+|---|---|---|
+| `identity.internal_authority.member_enrolled` | Source link interno nuevo, también sobre binding existente | IDs de binding, enrollment, perfil y link, población y actor; sin subject ni claims. Audit compartido `internal_member_linked`; no inventa invitación. |
+| `identity.external_binding.reconciled` | Regularización canónica actual de binding interno con audit faltante | IDs, versión de grants, población interna, reconciliationVersion1 y referencias a audit interno original. No representa una creación histórica. |
+| `identity.external_grant.reconciled` | Regularización canónica actual de grant con audit faltante | Binding/grant y referencias de procedencia; mismo contrato de reconciliación. No amplía permisos ni rejuvenece vigencia. |
+
+El command idempotente no vuelve a emitir evidencia ya completa. Timestamps corresponden a la reparación,
+no al hecho original; actor/razón actuales quedan en audit append-only. Los consumers no deben interpretar
+reconciliación como una nueva concesión de autoridad. No publicar tokens, emails, subjects ni claims.
+Implementación y rollout gobernados por el ADR interno TASK-1836; no asumir regularización ya aplicada.
+
 ## Delta 2026-09-03 — TASK-1349: revisión de offboarding + writeback de lifecycle (0 events nuevos, 1 emisor nuevo)
 
 - `member.deactivated` (aggregate `member`, v1) gana un **segundo emisor**: el executor de offboarding

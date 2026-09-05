@@ -1,6 +1,6 @@
 # Fuentes — de dónde salió cada regla
 
-> **Última sincronización:** **2026-09-02** contra la Wiki viva de Berel en Notion.
+> **Última sincronización:** **2026-09-04** contra la Wiki viva de Berel en Notion.
 > Notion sigue siendo la fuente de verdad viva; el repo es una copia operativa. Cuando una petición
 > fechada del cliente o una spec específica contradice una regla más vieja, manda la fuente más
 > reciente/específica y se registra el drift.
@@ -50,6 +50,8 @@ Los números de las auditorías anteriores son históricos; consultar el mapa an
 |---|---|---|
 | 📘 **Playbook Producción** | `3b239c2fefe780ceb71dff4f5bed4646` | ciclo mensual, modalidades, `Formato`, estructura de artículo y Tutorial híbrido |
 | 5️⃣ **Recomendaciones Cliente** | `38239c2fefe780e0aeeae0ada3170d81` | peticiones fechadas, voz en primera persona, series, CTA, anchors, CMS |
+| **Reglas del cliente — Correcciones de Berel (septiembre 2026)** | `97285eabc83a4dec9965ba5eacb649d6` | correcciones permanentes de copy, productos de awareness, tablas, datos faltantes y CMS |
+| **Aprendizajes del feedback de Berel — Septiembre 2026** | `c0c3a9455a24484bae3e74397cfaf160` | causas de rechazo, criterios preventivos y pendientes técnicos del ciclo |
 | 🗣️ **6. Voz y Tono** | `33139c2fefe781ff9ae6f0b2cb8f0933` | estándar editorial general es-MX |
 | 📋 **Spec para imágenes** | `38f39c2fefe780aba8e3de74983a23d6` | campos, tamaños, ALT, peso y permanencia de banners |
 | 📣 **Playbook Derivados Sociales** | `f58f34efd1e04043b9982b932a034464` | atomización social por canal |
@@ -60,6 +62,29 @@ Los números de las auditorías anteriores son históricos; consultar el mapa an
 | 🖼️ **Formatos de infografía** | `collection://06d39c2f-efe7-82be-99f6-87b9e8e34745` | 5 formatos aprobados + paleta de acento |
 | 📆 **Content Hub** | `35f39c2fefe7808186efc6ec63475640` | planificación y propiedad `Formato` |
 | **Tareas** | `35c39c2fefe780c9bc37e811a7b95a7c` | ejecución, relaciones, estados e íconos |
+
+## Sincronización integral del Playbook y feedback — 2026-09-04
+
+Se leyó completo el **Playbook Producción** (`last_edited_time` observado:
+`2026-09-04T18:20:44.725Z`) y se contrastó con **Reglas del cliente**
+(`2026-09-04T18:20:56.542Z`), **Aprendizajes del feedback**
+(`2026-09-04T10:31:16.583Z`) y **Recomendaciones Cliente**
+(`2026-09-04T10:52:20.152Z`). Las reglas promovidas son:
+
+- voz pública siempre en primera persona plural y separación absoluta de notas internas;
+- vocabulario `ficha técnica` / `página pública del producto`, sin el término ambiguo anterior;
+- rama para productos nuevos o de awareness: diferenciador al frente, lectura simple y render oficial;
+- tono comercial moderado, `premium` limitado a la línea y `sin plomo` fuera del argumento de venta;
+- Kelvin normalizado, lenguaje literal es-MX, tablas con encabezados semánticos y CTA `/contacto`;
+- datos faltantes solo en pendientes internos; cinco familias de impermeabilización y Malla Kover como
+  complemento; pendientes de Kover Poliuretano, Malla Kover, rendimientos y primer lavado;
+- tagging obligatorio de productos aplicables y paridad entre tabla e imagen en Drupal;
+- corrección posterior a publicación registrada como pendiente CMS, no como publicación implícita.
+
+La sincronización **no** prueba que artículos, assets o Drupal hayan sido actualizados. Tampoco promueve
+estas líneas antiguas que aún sobreviven en el Playbook: modalidad inferida solo por `Enlace`, fallback a
+`/search?q=` y longitud de 900–1.200 palabras. Mandan respectivamente la verificación de contenido vivo,
+la prohibición de rutas bloqueadas por `robots.txt` y el contrato vigente de 3.000–5.000 palabras.
 
 ## Cambios promovidos en la sincronización 2026-09-02
 

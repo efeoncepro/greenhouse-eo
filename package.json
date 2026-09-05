@@ -47,6 +47,7 @@
     "workforce:offboarding:recovery": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/workforce/offboarding-recovery.ts",
     "payroll:exit-eligibility:smoke": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/payroll/exit-eligibility-smoke.ts",
     "hiring:publish-vacancy": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/hiring/publish-vacancy.ts",
+    "identity:internal-access:reconcile": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/identity/reconcile-internal-authority.ts",
     "identity:external-access:smoke": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/identity/external-access-smoke.ts",
     "email:resend:reconcile": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/email/reconcile-resend-deliveries.ts",
     "sister-platform:redirect": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/sister-platform-oauth-redirect-uris.ts",

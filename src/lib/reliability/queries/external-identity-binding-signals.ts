@@ -3,7 +3,7 @@ import { captureWithDomain } from '@/lib/observability/capture'
 import type { ReliabilitySignal, ReliabilitySeverity } from '@/types/reliability'
 
 /**
- * TASK-1631 — Las cuatro señales canónicas del binding de identidad externa (steady = 0).
+ * TASK-1631 — Las cinco señales canónicas del binding de identidad externa (steady = 0).
  *
  * Observan el schema de `src/lib/identity/external-access/**` desde Greenhouse, sin telemetría
  * cross-runtime: las dos primeras leen `external_access_resolution_log`, que el reader del gateway
@@ -21,7 +21,8 @@ import type { ReliabilitySignal, ReliabilitySeverity } from '@/types/reliability
  */
 
 export const EXTERNAL_BINDING_UNBOUND_DISPATCH_ATTEMPT_SIGNAL_ID = 'identity.external_binding.unbound_dispatch_attempt'
-export const EXTERNAL_BINDING_REVOKED_STILL_DISPATCHING_SIGNAL_ID = 'identity.external_binding.revoked_still_dispatching'
+export const EXTERNAL_BINDING_REVOKED_STILL_DISPATCHING_SIGNAL_ID =
+  'identity.external_binding.revoked_still_dispatching'
 export const EXTERNAL_BINDING_SUBJECT_COLLISION_SIGNAL_ID = 'identity.external_binding.subject_collision'
 export const EXTERNAL_BINDING_ORPHAN_GRANT_SIGNAL_ID = 'identity.external_binding.orphan_grant'
 
@@ -217,8 +218,10 @@ export const getExternalBindingSubjectCollisionSignal = async (): Promise<Reliab
       kind: 'data_quality',
       count,
       errorAt: 1,
-      summaryOk: 'Cada subject externo resuelve a una sola persona y cada persona tiene un solo subject por environment.',
-      summaryHit: n => `${n} colisiones: subject con más de un profile o persona con subjects divergentes en un environment.`,
+      summaryOk:
+        'Cada subject externo resuelve a una sola persona y cada persona tiene un solo subject por environment.',
+      summaryHit: n =>
+        `${n} colisiones: subject con más de un profile o persona con subjects divergentes en un environment.`,
       metricLabel: 'collision_count',
       sqlLabel: 'identity_profile_source_links external_idp: subject→N profiles ∪ profile→N subjects',
       observedAt
@@ -264,6 +267,66 @@ export const getExternalBindingOrphanGrantSignal = async (): Promise<Reliability
   }
 }
 
+/** TASK-1836 — active authority requires canonical creation or explicit current reconciliation evidence.
+ * Expired grants (including expires_at = NOW()) have no current authority and are excluded;
+ * NULL expiry remains active. Revoked bindings/grants remain in audit history, not this signal.
+ */
+export const EXTERNAL_BINDING_UNAUDITED_WRITE_SIGNAL_ID = 'identity.external_binding.unaudited_write'
+
+export const getExternalBindingUnauditedWriteSignal = async (): Promise<ReliabilitySignal> => {
+  const observedAt = new Date().toISOString()
+  const signalId = EXTERNAL_BINDING_UNAUDITED_WRITE_SIGNAL_ID
+  const source = 'getExternalBindingUnauditedWriteSignal'
+  const label = 'Bindings y grants vigentes sin auditoría canónica'
+
+  try {
+    const count = toCount(
+      await query<CountRow>(`
+      SELECT (
+        (SELECT COUNT(*) FROM greenhouse_core.external_organization_bindings b
+          WHERE b.status = 'active' AND NOT EXISTS (
+            SELECT 1 FROM greenhouse_core.external_identity_audit_log a
+             WHERE a.binding_id = b.binding_id
+               AND a.outcome = 'applied'
+               AND (a.event_type = 'organization_bound' OR (
+                 a.event_type = 'binding_reconciled' AND a.metadata_json @>
+                   '{"population":"internal","reconciliationVersion":1}'::jsonb
+               ))
+          )) +
+        (SELECT COUNT(*) FROM greenhouse_core.external_capability_grants g
+          WHERE g.status = 'active' AND (g.expires_at IS NULL OR g.expires_at > NOW())
+            AND NOT EXISTS (
+              SELECT 1 FROM greenhouse_core.external_identity_audit_log a
+               WHERE a.grant_id = g.grant_id AND a.binding_id = g.binding_id
+                 AND a.outcome = 'applied'
+                 AND (a.event_type = 'capability_granted' OR (
+                   a.event_type = 'grant_reconciled' AND a.metadata_json @>
+                     '{"population":"internal","reconciliationVersion":1}'::jsonb
+                 ))
+            ))
+      )::text AS n
+    `)
+    )
+
+    return buildSignal({
+      signalId,
+      source,
+      label,
+      kind: 'data_quality',
+      count,
+      errorAt: 1,
+      summaryOk: 'Todo binding activo y grant vigente tiene auditoría canónica de creación o conciliación.',
+      summaryHit: n => `${n} bindings o grants vigentes carecen de auditoría canónica de creación o conciliación.`,
+      metricLabel: 'unaudited_write_count',
+      sqlLabel:
+        'active bindings + active unexpired grants without matching applied creation or internal v1 reconciliation audit',
+      observedAt
+    })
+  } catch (error) {
+    return buildUnknownSignal({ signalId, source, label, kind: 'data_quality', observedAt, error })
+  }
+}
+
 export type ExternalIdentityBindingSignalReader = {
   readonly signalId: string
   readonly read: () => Promise<ReliabilitySignal>
@@ -271,10 +334,17 @@ export type ExternalIdentityBindingSignalReader = {
 
 /** SSOT del grupo: el test de contrato verifica unicidad y que cada reader devuelva su propio id. */
 export const EXTERNAL_IDENTITY_BINDING_SIGNAL_READERS: ReadonlyArray<ExternalIdentityBindingSignalReader> = [
-  { signalId: EXTERNAL_BINDING_UNBOUND_DISPATCH_ATTEMPT_SIGNAL_ID, read: getExternalBindingUnboundDispatchAttemptSignal },
-  { signalId: EXTERNAL_BINDING_REVOKED_STILL_DISPATCHING_SIGNAL_ID, read: getExternalBindingRevokedStillDispatchingSignal },
+  {
+    signalId: EXTERNAL_BINDING_UNBOUND_DISPATCH_ATTEMPT_SIGNAL_ID,
+    read: getExternalBindingUnboundDispatchAttemptSignal
+  },
+  {
+    signalId: EXTERNAL_BINDING_REVOKED_STILL_DISPATCHING_SIGNAL_ID,
+    read: getExternalBindingRevokedStillDispatchingSignal
+  },
   { signalId: EXTERNAL_BINDING_SUBJECT_COLLISION_SIGNAL_ID, read: getExternalBindingSubjectCollisionSignal },
-  { signalId: EXTERNAL_BINDING_ORPHAN_GRANT_SIGNAL_ID, read: getExternalBindingOrphanGrantSignal }
+  { signalId: EXTERNAL_BINDING_ORPHAN_GRANT_SIGNAL_ID, read: getExternalBindingOrphanGrantSignal },
+  { signalId: EXTERNAL_BINDING_UNAUDITED_WRITE_SIGNAL_ID, read: getExternalBindingUnauditedWriteSignal }
 ]
 
 export const getExternalIdentityBindingSignals = async (): Promise<ReliabilitySignal[]> => {

@@ -27,7 +27,7 @@
   enlaces, ALT, `title`, niveles de encabezado y marcado. **La ausencia en la extracción no es
   ausencia en la página.** (→ `02`)
 - 🔴 **Declarar que algo no existe porque no lo encontraste.** *Caso real:* se dio por hecho que un
-  producto no tenía ficha pública porque no aparecía en el listado del catálogo. **Sí existía, y el
+  producto no tenía página pública porque no aparecía en el listado del catálogo. **Sí existía, y el
   cliente tenía la URL a mano.** Un listado paginado **no es un índice completo**. (→ `01`)
 - **Dejar en el cuerpo una afirmación que la verificación ya desmintió.** Corregirla **en el cuerpo**,
   no solo anotarla al final. El documento no puede quedar con afirmaciones falsas. (→ `02`)
@@ -54,6 +54,14 @@
   confirmados en catálogo, enlace al catálogo general y **pendiente declarado**. (→ `03`)
 - **Omitir un pendiente.** *Un pendiente declarado es gestionable; uno omitido se publica como
   error.* (→ `03`)
+- 🔴 **Publicar el proceso interno como si fuera contenido.** `El cliente`, instrucciones, CMS,
+  extracción, posicionamiento o verificaciones viven en callouts internos, nunca en el cuerpo. (→ `03`, `09`)
+- **Dejar un dato faltante como disclaimer visible.** Se retira del cuerpo, se registra internamente y
+  se solicita la fuente oficial. (→ `03`, `09`)
+- **Tratar un producto nuevo como categoría consolidada.** Un title `Guía [Producto]`, diferenciadores
+  enterrados y un envase genérico fallan awareness y reconocimiento. (→ `03`, `05`, `09`)
+- **Llamar premium a la formulación o usar `sin plomo` como venta.** El primer término solo puede
+  describir la línea respaldada; el segundo no diferencia la categoría. (→ `09`)
 
 ## Distribución selectiva
 
@@ -233,6 +241,8 @@
 - **Subir contenido marcado como "no se publica"** en el documento de Notion. (→ `08`)
 - **Olvidar taguear "productos que aplican"**, o dejar que la tabla de productos no coincida con la
   imagen de producto de esa sección. (→ `09`)
+- **Dar por actualizado el sitio porque Notion quedó corregido.** Una pieza ya publicada necesita
+  pendiente CMS, autorización, publicación y lectura de la URL viva. (→ `08`)
 - 🔴 **Copiar las credenciales del CMS fuera de Notion** — a este repo, a un log, a un commit o a un
   prompt. **Nunca.** (→ `08`)
 

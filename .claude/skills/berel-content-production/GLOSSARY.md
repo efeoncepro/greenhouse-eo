@@ -14,6 +14,9 @@
 | **Color del Año** | 2026 = Pitaya 2-3605D; 2025 = Maíz 2-1403T |
 | **Catálogo RGB** | Base interna para diseño. RGB/HEX no salen al cuerpo publicable |
 | **Código alfanumérico** | Identificador público del color; se usa junto al nombre |
+| **Ficha técnica** | Documento técnico oficial que respalda prestaciones, condiciones y cifras; no es la URL editorial del producto |
+| **Página pública del producto** | URL navegable de berel.com para el producto; se verifica en sitemap y contra soft-404 |
+| **Producto de awareness** | Producto nuevo o de baja notoriedad que exige explicar primero su diferenciador e incluir el render oficial del empaque |
 
 ## Ciclo de producción
 

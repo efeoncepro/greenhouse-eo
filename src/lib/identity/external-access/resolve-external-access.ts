@@ -37,6 +37,7 @@ type EnvironmentRow = {
 type LinkRow = {
   profile_id: string
   link_active: boolean
+  internal_population: boolean
   profile_active: boolean
   profile_status: string
   merged_into_profile_id: string | null
@@ -114,7 +115,7 @@ const findLatestRevokedMembership = async (profileId: string, environmentId: str
        FROM greenhouse_core.external_member_invitations i
        JOIN greenhouse_core.external_organization_bindings b ON b.binding_id = i.binding_id
       WHERE i.profile_id = $1
-        AND b.environment_id = $2
+        AND b.environment_id = $2 AND b.population='external'
         AND i.status = 'revoked'
         AND i.linked_at IS NOT NULL
       ORDER BY i.revoked_at DESC NULLS LAST
@@ -133,7 +134,12 @@ export const resolveExternalAccess = async (input: ResolveExternalAccessInput): 
 
   const deny = async (
     outcome: Exclude<ExternalAccessResolutionOutcome, 'bound'>,
-    context: { issuerClass: ExternalIssuerClass | null; profileId: string | null; bindingId: string | null; grantsVersion: number | null }
+    context: {
+      issuerClass: ExternalIssuerClass | null
+      profileId: string | null
+      bindingId: string | null
+      grantsVersion: number | null
+    }
   ): Promise<ExternalAccessResolution> => {
     await recordDenial({
       environmentId,
@@ -181,7 +187,9 @@ export const resolveExternalAccess = async (input: ResolveExternalAccessInput): 
   // nada. La autorización sigue exigiendo link ACTIVO + membership ligada + binding activo.
   const linkRows = await query<LinkRow>(
     `SELECT l.profile_id, l.active AS link_active, p.active AS profile_active, p.status AS profile_status,
-            p.merged_into_profile_id
+            p.merged_into_profile_id,
+            EXISTS (SELECT 1 FROM greenhouse_core.internal_native_enrollments e
+                     WHERE e.native_link_id = l.link_id) AS internal_population
        FROM greenhouse_core.identity_profile_source_links l
        JOIN greenhouse_core.identity_profiles p ON p.profile_id = l.profile_id
       WHERE l.source_system = $1
@@ -193,11 +201,28 @@ export const resolveExternalAccess = async (input: ResolveExternalAccessInput): 
 
   const activeLinks = linkRows.filter(row => row.link_active)
 
+  // Ownership survives enrollment revocation. This classification never authorizes internally:
+  // that requires the separate context/token reader. Do not hide internal links before checking
+  // collisions: multiple active links remain ambiguous and fail closed as unbound.
+  const selectedLink = activeLinks.length === 1 ? activeLinks[0] : activeLinks.length === 0 ? linkRows[0] : null
+
+  if (selectedLink?.internal_population) {
+    return deny('internal_population', {
+      issuerClass: environment.issuer_class,
+      profileId: selectedLink.profile_id,
+      bindingId: null,
+      grantsVersion: null
+    })
+  }
+
   if (activeLinks.length !== 1) {
     // >1 activos = colisión (el índice único lo impide, pero fail-closed igual). 0 activos: si hubo
     // un link (hoy inactivo) con membership revocada en este environment, el outcome es `revoked`.
     const inactiveLink = activeLinks.length === 0 ? (linkRows[0] ?? null) : null
-    const latestRevoked = inactiveLink ? await findLatestRevokedMembership(inactiveLink.profile_id, environmentId) : null
+
+    const latestRevoked = inactiveLink
+      ? await findLatestRevokedMembership(inactiveLink.profile_id, environmentId)
+      : null
 
     return deny(latestRevoked ? 'revoked' : 'unbound', {
       issuerClass: environment.issuer_class,
@@ -225,7 +250,7 @@ export const resolveExternalAccess = async (input: ResolveExternalAccessInput): 
        JOIN greenhouse_core.external_organization_bindings b ON b.binding_id = i.binding_id
       WHERE i.profile_id = $1
         AND i.status = 'linked'
-        AND b.environment_id = $2
+        AND b.environment_id = $2 AND b.population='external'
       ORDER BY (b.status = 'active') DESC, b.bound_at DESC`,
     [link.profile_id, environmentId]
   )

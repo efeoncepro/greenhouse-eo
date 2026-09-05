@@ -32,6 +32,7 @@ export type ExternalInvitationStatus = (typeof EXTERNAL_INVITATION_STATUSES)[num
 export const EXTERNAL_ACCESS_RESOLUTION_OUTCOMES = [
   'bound',
   'unbound',
+  'internal_population',
   'revoked',
   'environment_inactive',
   'profile_inactive'
@@ -60,6 +61,7 @@ export type ExternalIdentityEnvironment = {
 }
 
 export type ExternalOrganizationBinding = {
+  population: 'external' | 'internal'
   bindingId: string
   organizationId: string
   organizationName: string | null

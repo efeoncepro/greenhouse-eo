@@ -90,7 +90,7 @@ Plantillas ......................................................... templates/
    existir en ficha/fuente del cliente. Si dos fuentes contradicen, ninguna entra al cuerpo.
 5. 🔴 **Nunca RGB/HEX de colores de pintura en texto público.** Nombre + código alfanumérico. HEX de
    paleta de acento sí puede vivir en una ficha de diseño.
-6. 🔴 **Nunca enlazar a `/search` ni `?q=`.** `robots.txt` los bloquea. Producto → ficha real o
+6. 🔴 **Nunca enlazar a `/search` ni `?q=`.** `robots.txt` los bloquea. Producto → página pública o
    categoría; color → paleta/artículo válido o `/colores/<familia>`.
 7. 🔴 **berel.com usa soft-404.** HTTP 200 no significa que la página exista. Verificar sitemap +
    control inventado + `title`/H1/cuerpo.
@@ -172,6 +172,24 @@ Plantillas ......................................................... templates/
 44. 🔴 **El informe rinde cuentas de nuestra gestión.** Leer auditorías anteriores y operación viva;
     asumir los pendientes de lo que redactamos/publicamos, distinguir estados y revisar toda la
     redacción, incluidas tablas, anexos y propiedades. Cierre con Notion + Markdown releídos: módulo 17.
+
+45. 🔴 **El cuerpo público nunca expone la operación interna.** Escribir siempre desde Berel en primera
+    persona plural y retirar referencias a `el cliente`, instrucciones, posicionamiento editorial,
+    extracción, CMS o validaciones internas. Usar **ficha técnica** para el documento y **página pública
+    del producto** para la URL de berel.com; no mezclar ambos conceptos.
+46. 🔴 **Producto nuevo o con baja notoriedad requiere una rama editorial propia.** No asumir
+    posicionamiento ni titular como `Guía [Producto]`: lectura simple, diferenciador del brief al frente
+    y render oficial del empaque dentro del sistema visual. `Premium` puede describir la línea, nunca la
+    formulación; `sin plomo` no es argumento comercial.
+47. 🔴 **Dato faltante no se publica como disclaimer.** Retirarlo del cuerpo, registrarlo en el callout
+    interno `⚠️` y solicitar la fuente oficial. En comparativas, cada columna nombra su producto y los
+    criterios exclusivos de uno solo quedan fuera de la tabla.
+48. 🔴 **CTA técnico con salida real.** Si el texto recomienda consultar a un especialista, debe enlazar
+    de forma descriptiva a `/contacto`. Las temperaturas de luz se expresan como `luz cálida (2700–3000 K)`,
+    `luz neutra (4000 K)` y `luz fría (5000 K o más)`; los watts miden consumo, no calidez.
+49. 🔴 **Notion aprobado/corregido no equivale a sitio actualizado.** Si la pieza ya estaba publicada,
+    registrar el cambio pendiente en Drupal, ejecutarlo solo con autorización y verificar después la URL
+    pública. Guardar en Notion, cargar en CMS, publicar y comprobar el runtime son estados distintos.
 
 ## Lo que no se toca
 

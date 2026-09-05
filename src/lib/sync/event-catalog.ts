@@ -1244,6 +1244,9 @@ export const EVENT_TYPES = {
   // emails de terceros, sin claims: sólo ids, capability, grants_version y actor.
   externalEnvironmentUpserted: 'identity.external_environment.upserted',
   externalBindingBound: 'identity.external_binding.bound',
+  internalAuthorityMemberEnrolled: 'identity.internal_authority.member_enrolled',
+  externalBindingReconciled: 'identity.external_binding.reconciled',
+  externalGrantReconciled: 'identity.external_grant.reconciled',
   externalGrantGranted: 'identity.external_grant.granted',
   externalInvitationIssued: 'identity.external_invitation.issued',
   externalInvitationLinked: 'identity.external_invitation.linked',

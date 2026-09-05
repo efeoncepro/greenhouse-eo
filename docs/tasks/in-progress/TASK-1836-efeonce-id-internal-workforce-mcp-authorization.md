@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `rollout parcial (2026-09-05): release main1086fe40 / run33978290957 completado, watchdog 5/5 correcto; GC ON y cron ejecutado. Reader Production ON; gateway dd04f470 / 00032-qm5 ON con discovery verificado. Login Microsoft completó MFA, pero callback rechazó upstream_rejected sin emitir token. Defectos de scope OIDC y reloj corregidos localmente con diagnóstico seguro; 65 pruebas y typecheck correctos, publicación pendiente. Emisor interno temporalmente OFF durable y revisión00012-tvn para evitar más intentos contra la versión anterior. Canary de lectura, revocación y rollback aún pendientes; no cerrar.`
+- Status real: `rollout detenido antes del piloto (2026-09-05): corrección OIDC y regresión CSRF promovidas por PR #223 a main a68662508b1d928bbb1b6d048215a970ff008d21; CI, Deep, smoke de staging y Vercel Production READY verificados. Orquestador33982717767 success, manifest a68662508b1d-750f5ab8-31c7-418d-a33c-9ea5b6871c1b released sin override, watchdog5/5 correcto; emisor interno permanece OFF. Hallazgo de integridad confirmado: writer interno sobre tablas compartidas sin audit/eventos externos canónicos y riesgo de recuperación cruzada. Sí existe audit/outbox interno; PG confirma cero access tokens del binding piloto. En corrección bajo decisión A: primitives transaccionales canónicas con población explícita, detector de escrituras sin audit y regularización trazable. No activar ni cerrar hasta pruebas live y canaries.`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -580,7 +580,7 @@ interactivo del sujeto real cuando corresponda. No enviar correos ni mensajes si
 
 - [ ] Cada caso de la matriz §8 tiene evidencia de comportamiento y outcome esperado/real; casos live sin ejecutar quedan pendientes, nunca verdes por skip.
 - [ ] Inventario de configuración Entra, redirects, secrets y flags verificado sin valores sensibles; callback real corresponde al runtime desplegado.
-- [x] Enrolamiento idempotente y auditado, con capability fina y camino programático; ningún vínculo nace por coincidencia de email. Commands/store y prueba PG `internal-access/commands.live.test.ts` verifican idempotencia y revocación; piloto real enrolado sobre identidad canónica, grant de lectura con vigencia y `gv=2`. El login humano permanece pendiente.
+- [ ] Enrolamiento idempotente y auditado, con capability fina y camino programático; ningún vínculo nace por coincidencia de email. **Reabierto 2026-09-05:** los tests actuales prueban idempotencia y audit/outbox internos, pero el piloto carece de audit y eventos canónicos de las tablas compartidas. Falta unificar writer/política de población, proteger recuperación cruzada y regularizar filas con evidencia explícita; no considerar este criterio satisfecho por el audit interno solamente.
 - [x] Consentimiento y refresh no permiten cambiar persona, contexto ni elevar permisos; tokens previos no adquieren autoridad interna por default. OAuth JWT ES256 y pruebas PG de consentimiento/rotación verificadas.
 - [ ] Baja remota y baja canónica tienen latencias declaradas separadamente; revocación multicontexto pasa el caso A=10/B=2->3.
 - [ ] Rollback ensayado registra duración real, revocación selectiva y comprobación de externos/Entra legado; no depende de apagar todo OAuth.
@@ -803,3 +803,28 @@ acredita causa exacta con ese código agregado. Se corrigieron dos defectos repr
 OIDC solicita `openid profile` para disponer de `oid`, y el reloj JWT se lee después del intercambio.
 Diagnósticos internos limitados a enum, sin datos secretos ni exposición HTTP adicional. 65 pruebas
 integradas y typecheck correctos; emisor OFF durante publicación, reader/gateway preparados.
+
+
+## Corrección de integridad del writer compartido — 2026-09-05
+
+Hallazgo comunicado por Claude TASK-1631/1831 y confirmado independientemente por Codex. El operador
+confirmó que Claude no modifica el módulo y asignó la corrección a Codex. Binding
+`xob-139e3fe2-f897-4eff-83c6-39c29193d934` y grant
+`xcg-a6de7627-f57f-4686-9d70-ef850b62a526` tienen cero audit externo canónico. Sí existen audit interno
+enrolled/capability_granted y ambos eventos internos publicados. Cero access tokens emitidos para el
+binding. No afirmar ausencia total de auditoría ni exposición demostrada.
+
+El detector nuevo, ejecutado read-only sobre PG antes de reconciliar, devuelve
+`identity.external_binding.unaudited_write`, severity error, `unaudited_write_count=2`.
+Tests focales: 9 unitarios y 1 live de SQL pasaron; el live usa tablas TEMP y rollback, no muta datos reales.
+La reconciliación válida exige evento aplicado, IDs correlacionados y metadata interna/version numérica1;
+auditoría ajena, denegada o metadata incorrecta no oculta la anomalía. Implementación local, aún no publicada.
+
+Decisión A registrada en ADR: primitives canónicas compartidas y población persistida; enrollment interno
+es la membership interna, `linked` se conserva para externos. No crear invitaciones ficticias ni cambiar
+lifecycle comercial de Efeonce. EO-ORG-0007 tiene `status=active`, `active=true`, `is_operating_entity=true`
+y `lifecycle_stage=inactive`; se exige también status activo para no ignorar una suspensión administrativa.
+
+Pendiente: finalizar y revisar migración/clasificación y command de reconciliación, comprobar atomicidad,
+recuperación cruzada y conflictos, aplicar con dry-run/evidencia, repetir smoke y live, publicar y recién
+entonces repetir login/MCP/revocación/rollback. El release OIDC223 completado no cierra esta corrección.

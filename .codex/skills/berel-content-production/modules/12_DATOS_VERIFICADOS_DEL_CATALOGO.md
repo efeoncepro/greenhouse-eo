@@ -3,6 +3,7 @@
 > **Fuente de verdad:** verificación en vivo del catálogo público de Berel y del payload de su CMS,
 > más un reporte de costos de mano de obra en México. Baseline extraído el **2026-08-25**.
 > **Corrección acotada 2026-09-03:** §3 y §3.1, con Wiki y ficha técnica de Berelex Semibrillante.
+> **Feedback del cliente 2026-09-04:** §1 queda bajo revalidación y §3.2 registra catálogo/pedidos abiertos.
 > El resto del baseline no se declara revalidado por esta actualización.
 
 ## Por qué existe este módulo
@@ -30,6 +31,11 @@ Si no se puede verificar, declarar el pendiente concreto; no inventar ni traslad
 | **Berelinte** (Mate, Serie 800) | `8 - 10 m²/L` | `> 60,000 ciclos` | `< 50 g/L` |
 | **Insignia** (Semimate) | `10 - 12 m2 /L` | `> 175,000 ciclos` | no reportado |
 | **Sellador** (Serie 580) | `3 - 5 m2 /L de la mezcla diluida` | no aplica | no reportado |
+
+⚠️ **Kalos Tone y Multitono Pro:** aunque la tabla conserva el baseline observado el 2026-08-25, el
+cliente dejó abierto el rendimiento oficial en m²/L el 2026-09-04. No reutilizar esos dos valores en
+una pieza nueva hasta revalidarlos contra la ficha técnica oficial vigente; mantener el pendiente fuera
+del cuerpo público.
 
 ⚠️ **La unidad se escribe inconsistente en el propio sitio**: `m²/L` en Berelinte, y `m2 /L` / `m2/L`
 en el resto. Está copiada tal cual arriba. Al citarla dentro de un artículo **se normaliza a `m²/L`**,
@@ -86,7 +92,7 @@ En diseño, el dato no resuelto conserva el literal
 ### 3.1 · Caso verificado: Berelex Semibrillante para N29 (2026-09-03)
 
 Fuentes: [Wiki de producto](https://www.notion.so/36c39c2fefe780d79d85c8eceefdd098),
-[ficha pública](https://berel.com/productos/arquitectonico/vinilacrilicas/berelex-semibrillante-2)
+[página pública del producto](https://berel.com/productos/arquitectonico/vinilacrilicas/berelex-semibrillante-2)
 y [PDF oficial R0-07/23](https://fs4inq5psfy6zdpxht.berel.com/sites/default/files/2024-07/FT_Berelex%20Semibrillante.pdf).
 El PDF es evidencia interna; el enlace público del artículo lleva a la ficha de berel.com.
 
@@ -110,6 +116,18 @@ no atribuir purificación del aire de otra línea.
 Cálculo de N29: 30 − 1,6 − 1,5 − 4 = 22,9 m²; a 8 m²/L, unos 2,9 L teóricos a dos manos.
 No duplicar litros por las dos manos ya incluidas ni garantizar que 4 L siempre alcancen.
 Este caso no prescribe Berelex para todos los tutoriales: volver a verificar la ficha elegida.
+
+### 3.2 · Catálogo y pendientes confirmados por el cliente (2026-09-04)
+
+- Impermeabilización se presenta en **cinco familias**, incluida la familia de poliuretano / **Kover
+  Poliuretano**. No omitirla al explicar el portafolio.
+- **Malla de Refuerzo Kover** es un complemento, no una familia de impermeabilizante. `Serie 510000`
+  queda como referencia interna; no va al cuerpo público.
+- Pendientes oficiales: ficha técnica y página pública de Kover Poliuretano; página pública de Malla de
+  Refuerzo Kover; rendimientos m²/L vigentes de Kalos Tone y Multitono Pro; tiempo oficial del primer
+  lavado de Berelex Semibrillante; teléfonos de soporte técnico si se pretende publicarlos.
+- En cocina N29, Berelex Semibrillante fue la selección confirmada para muros y techo. Es un caso
+  acotado y no se universaliza a todas las cocinas ni tutoriales.
 
 ## 4 · Descripciones de ficha citables (verbatim)
 

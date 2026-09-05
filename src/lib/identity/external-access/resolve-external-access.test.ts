@@ -74,6 +74,50 @@ describe('TASK-1631 — resolveExternalAccess (environment, subject)', () => {
     expect(denialLogCalls()).toHaveLength(1)
   })
 
+  // Unit tests exercise classification/precedence. The real EXISTS ownership predicate is
+  // verified with PostgreSQL in internal-access/commands.live.test.ts.
+  it.each([
+    { link_active: true, profile_active: true },
+    { link_active: false, profile_active: true },
+    { link_active: true, profile_active: false }
+  ])('denies internal_population for an enrollment-owned link (%j) without external authority lookup', async flags => {
+    route([
+      [/FROM greenhouse_core\.external_identity_environments/, () => [activeEnvironment]],
+      [/FROM greenhouse_core\.identity_profile_source_links l/, () => [{
+        profile_id: 'p-internal', ...flags, profile_status: 'active',
+        merged_into_profile_id: null, internal_population: true
+      }]],
+      [/INSERT INTO greenhouse_core\.external_access_resolution_log/, () => []]
+    ])
+
+    const result = await resolveExternalAccess({ environmentId: 'efeonce-auth', subject: 'internal-sub' })
+
+    expect(result.outcome).toBe('internal_population')
+    expect(result.profileId).toBe('p-internal')
+    expect(result.memberships).toEqual([])
+    expect(denialLogCalls()[0]?.[1]).toEqual([
+      expect.any(String), 'efeonce-auth', expect.stringMatching(/^[0-9a-f]{64}$/),
+      null, 'internal_population', null, 'p-internal', null
+    ])
+  })
+
+  it('does not hide an internal link when detecting an active source-link collision', async () => {
+    route([
+      [/FROM greenhouse_core\.external_identity_environments/, () => [activeEnvironment]],
+      [/FROM greenhouse_core\.identity_profile_source_links l/, () => [false, true].map(internal_population => ({
+        profile_id: internal_population ? 'p-internal' : 'p-external', link_active: true,
+        profile_active: true, profile_status: 'active', merged_into_profile_id: null, internal_population
+      }))],
+      [/INSERT INTO greenhouse_core\.external_access_resolution_log/, () => []]
+    ])
+
+    const result = await resolveExternalAccess({ environmentId: 'efeonce-auth', subject: 'collision-sub' })
+
+    expect(result.outcome).toBe('unbound')
+    expect(result.profileId).toBeNull()
+    expect(result.memberships).toEqual([])
+  })
+
   it('denies revoked (not unbound) when the only link is inactive and the person had a revoked membership', async () => {
     route([
       [/FROM greenhouse_core\.external_identity_environments/, () => [activeEnvironment]],
