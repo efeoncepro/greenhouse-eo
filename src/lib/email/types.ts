@@ -7,6 +7,7 @@ export type EmailType =
   | 'invitation'
   | 'verify_email'
   | 'magic_link'
+  | 'auth_server_magic_link'
   | 'payroll_export'
   | 'payroll_receipt'
   | 'payroll_liquidacion_v2'
@@ -60,6 +61,7 @@ export const TOKEN_SENSITIVE_EMAIL_TYPES = Object.freeze([
   'invitation',
   'verify_email',
   'magic_link',
+  'auth_server_magic_link',
   'hiring_assessment_assigned',
   'hiring_assessment_access_recovery',
   'hiring_talent_pool_verification'
@@ -76,6 +78,7 @@ export const isTokenSensitiveEmailType = (emailType: EmailType): boolean =>
 export const EMAIL_PRIORITY_MAP: Record<string, EmailPriority> = {
   password_reset: 'critical',
   magic_link: 'critical',
+  auth_server_magic_link: 'critical',
   verify_email: 'critical',
   invitation: 'transactional',
   leave_request_decision: 'transactional',

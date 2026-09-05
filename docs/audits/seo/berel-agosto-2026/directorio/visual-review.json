@@ -1,0 +1,41 @@
+{
+  "date": "2026-09-04",
+  "format": "A4 landscape",
+  "pages": 15,
+  "technology": "HTML/CSS + Chromium PDF via Artifact Composer",
+  "visual_review": {
+    "root": [
+      2,
+      3,
+      8,
+      9,
+      13,
+      14
+    ],
+    "independent_design": [
+      1,
+      6,
+      7,
+      10,
+      12
+    ],
+    "independent_charts": [
+      3,
+      4,
+      5,
+      11,
+      15
+    ],
+    "fixed_and_rechecked": [
+      5,
+      11
+    ]
+  },
+  "standalone_html": {
+    "frames": 15,
+    "missing_assets": 0,
+    "missing_styles": 0,
+    "horizontal_overflow": 0
+  },
+  "customer_visual_approval": false
+}

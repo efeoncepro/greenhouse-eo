@@ -162,7 +162,7 @@ pnpm release:preflight --json                # JSON machine-readable
 pnpm release:preflight --json --fail-on-error   # exit 1 si readyToDeploy=false
 
 # Break-glass (EFEONCE_ADMIN solo, requiere capability + audit)
-pnpm release:preflight --override-batch-policy --fail-on-error
+pnpm release:preflight --override-batch-policy --override-reason="Motivo específico aprobado del release" --fail-on-error
 ```
 
 Flags:
@@ -170,6 +170,12 @@ Flags:
 - `--target-sha=<sha>` (default git HEAD)
 - `--target-branch=<branch>` (default main)
 - `--json`, `--fail-on-error`, `--override-batch-policy`
+- `--override-reason=<motivo>` obligatorio con `--override-batch-policy` o
+  `--bypass-preflight-warnings`: al menos 20 caracteres después de trim. El motivo, las flags y el
+  actor declarado viajan en `preflight.override` y en `release_state_transitions.metadata_json.override`.
+  No equivalen a una comprobación automática de la capability humana: verificar el actor real y
+  conservar evidencia antes de usar la excepción. GitHub actor no se convierte implícitamente en
+  persona Greenhouse. El workflow mantiene sus approvals y permisos independientes.
 
 Output canonico: `ProductionPreflightV1` (versionado `contractVersion='production-preflight.v1'`). Operator decide en base a `readyToDeploy: SI | NO`; en modo `--fail-on-error`, cualquier `readyToDeploy=false` debe fallar el gate.
 
@@ -742,6 +748,13 @@ operativa: si hoy ves `severity=error` por `ops-worker` con diff runtime vacío,
 **no es el falso positivo histórico** — revisa que estés corriendo el reader del
 `main` actual antes de asumirlo benigno. El `git diff` de arriba sigue siendo la
 verificación que manda.
+
+**Delta 2026-09-04 (release `9100bbd2765d`): `auth-server` también es change-gated y el watchdog ya lo sabe.** El
+servicio quedó en `f6db4255a` (el push a `develop` lo había desplegado con el mismo árbol que el squash; diff completo
+vacío; `deploy_needed=false`) y el watchdog lo reportó como DRIFT porque su clasificador sólo conocía a `ops-worker`.
+Desde ese día `CHANGE_GATED_RUNTIME_PATHS` (`src/lib/reliability/queries/release-worker-revision-drift.ts`) es un espejo
+por servicio del array `WORKER_RUNTIME_PATHS=(` de cada workflow, sostenido por
+`release-worker-change-gate-parity.test.ts`. La verificación que manda sigue siendo el diff de árbol completo.
 
 ### 4.1.2. Transition final en cola tras runtime verde
 

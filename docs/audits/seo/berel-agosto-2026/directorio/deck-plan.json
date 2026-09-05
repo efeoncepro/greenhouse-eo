@@ -1,0 +1,413 @@
+{
+  "tenderId": "BEREL_DIRECTORIO_AGOSTO_2026_A4_HORIZONTAL",
+  "slides": [
+    {
+      "slideId": "portada",
+      "contentType": "cover",
+      "template": "BoardCover",
+      "slots": {
+        "eyebrow": "BEREL · INFORME AL DIRECTORIO",
+        "title": "Informe\nmensual",
+        "period": "Agosto",
+        "year": "2026",
+        "lead": "SEO / AEO · Desempeño del equipo"
+      }
+    },
+    {
+      "slideId": "balance",
+      "contentType": "metrics",
+      "template": "BoardMetrics",
+      "slots": {
+        "eyebrow": "RESULTADOS Y GESTIÓN / AGOSTO 2026",
+        "title": "Agosto avanzó en visitas y visibilidad, con retos de captación",
+        "lead": "El balance combina crecimiento orgánico y mayor exposición con menos clics desde Google.",
+        "insight": "El siguiente foco: facilitar la elección de productos y tiendas, y validar las acciones comerciales.",
+        "source": "Fuentes: GA4 y Search Console. Agosto frente a julio completos. Informe §§3, 8 y 9.",
+        "metrics": [
+          {
+            "value": "+2,73%",
+            "label": "Visitas desde buscadores",
+            "detail": "50.384 sesiones orgánicas en Analytics."
+          },
+          {
+            "value": "−7,02%",
+            "label": "Clics desde Google",
+            "detail": "34.257 clics en Search Console."
+          },
+          {
+            "value": "+11,01%",
+            "label": "Presencia generativa",
+            "detail": "180.696 impresiones en funciones de IA de Google."
+          }
+        ]
+      }
+    },
+    {
+      "slideId": "google",
+      "contentType": "chart",
+      "template": "BoardChart",
+      "slots": {
+        "eyebrow": "RESULTADOS Y GESTIÓN / AGOSTO 2026",
+        "title": "Google mostró más a Berel, pero generó menos clics",
+        "lead": "La exposición creció 8,01%: de 889.388 a 960.646 impresiones. El siguiente trabajo es mejorar la captación.",
+        "insight": "Más apariciones no garantizan más visitas: debemos revisar páginas, consultas y recorridos con caída.",
+        "source": "Fuente: Search Console, propiedad Berel. Julio y agosto 2026. Clics; escala desde cero. Informe §3.",
+        "bars": [
+          {
+            "label": "Julio",
+            "display": "36.845",
+            "amount": "36845",
+            "note": ""
+          },
+          {
+            "label": "Agosto",
+            "display": "34.257",
+            "amount": "34257",
+            "note": ""
+          }
+        ],
+        "heroValue": "−2.588",
+        "heroText": "clics en la propiedad frente a julio. Es una variación observada, no una causa diagnosticada."
+      }
+    },
+    {
+      "slideId": "editorial",
+      "contentType": "chart",
+      "template": "BoardChart",
+      "slots": {
+        "eyebrow": "RESULTADOS Y GESTIÓN / AGOSTO 2026",
+        "title": "El contenido editorial ganó clics y amplió su exposición",
+        "lead": "Los artículos registraron 93.672 impresiones, 55,8% más que en julio, en el desglose comparable.",
+        "insight": "La oportunidad está en optimizar las páginas que ya ganan exposición, manteniendo el programa editorial.",
+        "source": "Fuente: GSC, exportación consulta–URL bajo /articulos/. No es todo el tráfico editorial. Informe §3.",
+        "bars": [
+          {
+            "label": "Julio",
+            "display": "348",
+            "amount": "348",
+            "note": ""
+          },
+          {
+            "label": "Agosto",
+            "display": "408",
+            "amount": "408",
+            "note": ""
+          }
+        ],
+        "heroValue": "+17,2%",
+        "heroText": "clics al conjunto comparable de artículos. No se atribuyen sólo a las ocho piezas del ciclo."
+      }
+    },
+    {
+      "slideId": "comercial",
+      "contentType": "chart",
+      "template": "BoardChart",
+      "slots": {
+        "eyebrow": "RESULTADOS Y GESTIÓN / AGOSTO 2026",
+        "title": "Tiendas y madera requieren atención comercial prioritaria",
+        "lead": "Dos recorridos relevantes perdieron clics. El análisis debe identificar qué cambió antes de atribuir causas.",
+        "insight": "Priorizar acceso a tiendas, disponibilidad e información de producto puede mejorar la utilidad del recorrido.",
+        "source": "Fuente: GSC, exportación comparable por página, julio→agosto. Clics; escala común desde cero. Informe §3.",
+        "bars": [
+          {
+            "label": "Localizador · julio",
+            "display": "643",
+            "amount": "643",
+            "note": ""
+          },
+          {
+            "label": "Localizador · agosto",
+            "display": "105",
+            "amount": "105",
+            "note": ""
+          },
+          {
+            "label": "Madera · julio",
+            "display": "448",
+            "amount": "448",
+            "note": ""
+          },
+          {
+            "label": "Madera · agosto",
+            "display": "254",
+            "amount": "254",
+            "note": ""
+          }
+        ],
+        "heroValue": "2",
+        "heroText": "recorridos prioritarios: localizar tiendas y elegir soluciones para madera."
+      }
+    },
+    {
+      "slideId": "ia",
+      "contentType": "metrics",
+      "template": "BoardMetrics",
+      "slots": {
+        "eyebrow": "RESULTADOS Y GESTIÓN / AGOSTO 2026",
+        "title": "Berel amplió su presencia en las experiencias de IA",
+        "lead": "Google y Analytics muestran señales distintas de visibilidad y visitas. El Grader aporta una lectura complementaria.",
+        "insight": "El Grader reconoce a Berel al nombrarla; la medición de descubrimiento comercial continúa en calibración.",
+        "source": "Fuentes: Search Console y GA4, agosto/julio; AEO Grader del 3 de septiembre. Informe §8.",
+        "metrics": [
+          {
+            "value": "180.696",
+            "label": "Impresiones generativas",
+            "detail": "+11,01% en Google. No se suman a las impresiones web."
+          },
+          {
+            "value": "1.366",
+            "label": "Sesiones AI Assistant",
+            "detail": "+179,35% en GA4. Son visitas atribuidas, no contactos."
+          },
+          {
+            "value": "4",
+            "label": "Motores que reconocen a Berel",
+            "detail": "Los cuatro reconocieron a Berel en consultas que incluían su nombre."
+          }
+        ]
+      }
+    },
+    {
+      "slideId": "acumulado",
+      "contentType": "metrics",
+      "template": "BoardMetrics",
+      "slots": {
+        "eyebrow": "RESULTADOS Y GESTIÓN / AGOSTO 2026",
+        "title": "Una base editorial que ya está en producción",
+        "lead": "Producción acumulada al 4 de septiembre; incluye piezas preparadas para próximos ciclos.",
+        "insight": "Estas cifras describen trabajo desarrollado; no equivalen a publicaciones nuevas de agosto ni a ventas.",
+        "source": "Fuente: Content Hub y tareas de Berel, corte 4 de septiembre. Informe §6.2.",
+        "metrics": [
+          {
+            "value": "58",
+            "label": "Contenidos desarrollados",
+            "detail": "Artículos, reescrituras y tutoriales con una versión redactada."
+          },
+          {
+            "value": "154",
+            "label": "Entregables gráficos cerrados",
+            "detail": "116 banners y 38 paquetes sociales estáticos. No son archivos individuales."
+          }
+        ]
+      }
+    },
+    {
+      "slideId": "mes",
+      "contentType": "metrics",
+      "template": "BoardMetrics",
+      "slots": {
+        "eyebrow": "RESULTADOS Y GESTIÓN / AGOSTO 2026",
+        "title": "Agosto cerró 74 tareas del proyecto de producción",
+        "lead": "La operación del mes combina contenido editorial, diseño, video y publicación en el sitio.",
+        "insight": "Además: 2 cargas en el sitio. Son tareas operativas; no se contabilizan como piezas creativas adicionales.",
+        "source": "Fuente: tareas cerradas del proyecto Berel de agosto. 8 + 54 + 10 + 2 = 74. Informe §6.2.",
+        "metrics": [
+          {
+            "value": "8",
+            "label": "Tareas editoriales",
+            "detail": "Desarrollo del ciclo de artículos y tutoriales."
+          },
+          {
+            "value": "54",
+            "label": "Entregables gráficos",
+            "detail": "32 banners y 22 paquetes sociales estáticos."
+          },
+          {
+            "value": "10",
+            "label": "Tareas de video",
+            "detail": "Producción audiovisual registrada en el proyecto."
+          }
+        ]
+      }
+    },
+    {
+      "slideId": "puntualidad",
+      "contentType": "metrics",
+      "template": "BoardMetrics",
+      "slots": {
+        "eyebrow": "RESULTADOS Y GESTIÓN / AGOSTO 2026",
+        "title": "La puntualidad distingue envío y cierre",
+        "lead": "El envío a revisión y el cierre son momentos distintos del proceso de producción.",
+        "insight": "Los 19 cierres posteriores al plazo no demuestran 19 entregas tardías. Faltan fechas de primer envío en 11 tareas.",
+        "source": "Fuente: tareas de Berel de agosto. 74/74 cierres con fechas; 63/74 primeros envíos documentados. Informe §6.2.",
+        "metrics": [
+          {
+            "value": "74,3%",
+            "label": "Cierres dentro del plazo",
+            "detail": "55 de 74 tareas cerradas a tiempo."
+          },
+          {
+            "value": "63 / 63",
+            "label": "Envíos documentados a tiempo",
+            "detail": "El resultado sólo aplica a las tareas con fecha de primer envío."
+          },
+          {
+            "value": "85,1%",
+            "label": "Cobertura de fechas de envío",
+            "detail": "63 de 74 tareas tienen evidencia de ese momento."
+          }
+        ]
+      }
+    },
+    {
+      "slideId": "continuidad",
+      "contentType": "cards",
+      "template": "BoardCards",
+      "slots": {
+        "eyebrow": "RESULTADOS Y GESTIÓN / AGOSTO 2026",
+        "title": "La base técnica avanzó y conserva seguimiento histórico",
+        "lead": "La revisión mantiene los 33 hallazgos anteriores y distingue mejoras verificadas de pendientes.",
+        "insight": "Los 115 artículos revisados tienen título, encabezado principal y dirección principal coherentes.",
+        "source": "Fuente: revisión del sitio al 4 de septiembre y continuidad de auditorías de mayo/julio. Informe §§5 y 11.",
+        "cards": [
+          {
+            "tag": "ORGANIZACIÓN",
+            "heading": "Páginas organizadas para Google",
+            "body": "Existe un índice con siete componentes que organiza páginas, productos y contenidos."
+          },
+          {
+            "tag": "ACCESO",
+            "heading": "Acceso para buscadores e IA",
+            "body": "Las reglas permiten que buscadores y herramientas de IA consulten el sitio."
+          },
+          {
+            "tag": "INFORMACIÓN",
+            "heading": "Información disponible para IA",
+            "body": "El archivo informativo está disponible. Su existencia no garantiza citas ni posicionamiento."
+          }
+        ]
+      }
+    },
+    {
+      "slideId": "conexiones",
+      "contentType": "diagnostic",
+      "template": "BoardDiagnostic",
+      "slots": {
+        "eyebrow": "RESULTADOS Y GESTIÓN / AGOSTO 2026",
+        "title": "La próxima mejora es conectar mejor el contenido publicado",
+        "lead": "Cuatro controles sobre el censo de 115 artículos orientan la optimización editorial y de navegación.",
+        "insight": "Además, se identificaron 18 enlaces hacia 9 destinos vacíos. Efeonce completará las correcciones editoriales.",
+        "source": "Fuente: censo del 4 de septiembre. Grupos superpuestos; no se suman. Base 115 por barra. Informe §5.",
+        "bars": [
+          {
+            "label": "Sin subtítulos que organicen la lectura",
+            "display": "76",
+            "amount": "76",
+            "note": ""
+          },
+          {
+            "label": "Con enlaces hacia búsquedas internas",
+            "display": "63",
+            "amount": "63",
+            "note": ""
+          },
+          {
+            "label": "Sin enlace entrante desde otro artículo del censo",
+            "display": "80",
+            "amount": "80",
+            "note": ""
+          },
+          {
+            "label": "Sin enlace saliente hacia otro artículo del censo",
+            "display": "54",
+            "amount": "54",
+            "note": ""
+          }
+        ]
+      }
+    },
+    {
+      "slideId": "medicion",
+      "contentType": "cards",
+      "template": "BoardCards",
+      "slots": {
+        "eyebrow": "RESULTADOS Y GESTIÓN / AGOSTO 2026",
+        "title": "El crecimiento aún debe conectarse con resultados comerciales",
+        "lead": "Hoy los eventos clave registran visitas a secciones. Todavía no acreditan solicitudes, contactos ni ventas.",
+        "insight": "La siguiente etapa es validar acciones comerciales útiles y su medición, antes de presentar conversión o retorno.",
+        "source": "Fuente: GA4, eventos clave y revisión de medición. Informe §9. No se dispone de ventas atribuidas.",
+        "cards": [
+          {
+            "tag": "01 / OBSERVADO",
+            "heading": "Visitas a secciones",
+            "body": "Analytics registra accesos a colores, inspiración y localizador de tiendas."
+          },
+          {
+            "tag": "02 / POR VALIDAR",
+            "heading": "Acciones de intención",
+            "body": "Comprobar contactos, interacciones útiles y otros pasos relevantes del recorrido."
+          },
+          {
+            "tag": "03 / POR RELACIONAR",
+            "heading": "Resultado comercial",
+            "body": "Conectar la medición con objetivos del negocio sin inferir ventas a partir de visitas."
+          }
+        ]
+      }
+    },
+    {
+      "slideId": "ejecucion",
+      "contentType": "actions",
+      "template": "BoardActions",
+      "slots": {
+        "eyebrow": "RESULTADOS Y GESTIÓN / AGOSTO 2026",
+        "title": "El siguiente ciclo concentra el trabajo en tres frentes",
+        "lead": "El plan aprovecha contenido ya desarrollado y asigna responsabilidades para cerrar los pendientes.",
+        "insight": "Cada cierre necesita evidencia publicada y fecha del cambio para comparar posteriormente períodos equivalentes.",
+        "source": "Fuente: plan de trabajo y criterios de cierre del informe completo, §§10 y 11.",
+        "cards": [
+          {
+            "tag": "EFEONCE",
+            "heading": "Contenido y medición",
+            "body": "Actualizar enlaces y registros; optimizar artículos con exposición; completar fechas y calibración AEO."
+          },
+          {
+            "tag": "PROVEEDOR WEB + BEREL",
+            "heading": "Recorridos y estabilidad",
+            "body": "Coordinar redirecciones, archivo de artículos, familias de color y estabilidad visual de las páginas."
+          },
+          {
+            "tag": "LABORATORIO DE BEREL",
+            "heading": "Criterio de producto",
+            "body": "Unificar afirmaciones técnicas y validar usos, beneficios y pruebas que respaldan el contenido."
+          }
+        ]
+      }
+    },
+    {
+      "slideId": "decisiones",
+      "contentType": "actions",
+      "template": "BoardActions",
+      "slots": {
+        "eyebrow": "RESULTADOS Y GESTIÓN / AGOSTO 2026",
+        "title": "La coordinación permitirá convertir prioridades en cierres",
+        "lead": "Propuesta: alinear prioridad comercial, capacidad técnica y criterios de producto.",
+        "insight": "Próxima revisión prevista: 6 de octubre de 2026. Se presentarán cambios cerrados, pendientes y resultados comparables.",
+        "source": "Fuente: prioridades y ritmo de seguimiento del informe de agosto. Fechas de implementación por acordar. §10.",
+        "cards": [
+          {
+            "tag": "PRIORIDAD",
+            "heading": "Tiendas y productos",
+            "body": "Alinear el foco comercial en localizador, madera y páginas con demanda ya observada."
+          },
+          {
+            "tag": "CAPACIDAD",
+            "heading": "Ventana de desarrollo",
+            "body": "Coordinar con el proveedor web la ejecución y comprobación de los ajustes técnicos priorizados."
+          },
+          {
+            "tag": "VALIDACIÓN",
+            "heading": "Criterios y responsables",
+            "body": "Confirmar con el Laboratorio de Berel los criterios de producto y las acciones comerciales que se medirán."
+          }
+        ]
+      }
+    },
+    {
+      "slideId": "contraportada",
+      "contentType": "back-cover",
+      "template": "BackCoverFullA4",
+      "slots": {}
+    }
+  ]
+}

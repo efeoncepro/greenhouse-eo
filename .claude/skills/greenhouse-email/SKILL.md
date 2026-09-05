@@ -102,6 +102,16 @@ sí solo: identifica el consumidor real y documenta deploy, flag/DB kill switch,
 
 No ejecutes `services/ops-worker/deploy.sh` como consecuencia automática de editar un template.
 
+**Llevar `sendEmail` a un runtime NUEVO exige MONTAR `RESEND_API_KEY`, no declarar su `*_SECRET_REF`.**
+`sendEmail` resuelve el proveedor con el cliente **síncrono** `getResendClient()` (`src/lib/resend.ts`),
+que lee `process.env.RESEND_API_KEY` o una resolución ya cacheada; el carril `RESEND_API_KEY_SECRET_REF`
+lo puebla sólo el resolvedor **asíncrono**, y en un runtime nuevo nadie lo precalienta antes del primer
+envío. En Cloud Run eso significa montarlo con `--update-secrets` (`RESEND_API_KEY=<ref>`), como hace
+`services/ops-worker/deploy.sh`; declarar el ref y darle su binding IAM **no** lo sustituye —concede
+permiso para leer algo que nadie está leyendo—. Caso fuente 2026-09-05: `services/auth-server/deploy.sh`
+declaraba `RESEND_API_KEY_SECRET_REF` con su binding pero nunca montaba el secreto, y el magic link del
+authorization server llevaba días fallando en producción con `RESEND_API_KEY is not configured`.
+
 ## Verificación mínima
 
 Selecciona gates proporcionales al diff:
@@ -119,6 +129,13 @@ Para cambios de skill corre además:
 pnpm skills:mirrors
 node scripts/skills/validate-skill-routes.mjs --all
 ```
+
+**El único hecho observable de que un correo salió es su fila en
+`greenhouse_notifications.email_deliveries`** (`status`, `provider_status`, `error_message`). Un 2xx del
+endpoint que lo dispara no prueba nada —el envío es asíncrono respecto de esa respuesta— y menos si el
+endpoint es deliberadamente indistinguible: el de magic link responde 202 idéntico exista o no la cuenta,
+por anti-enumeración. Un correo muerto **no se reporta solo**; si tu verificación no lee esa fila, no
+verificaste el envío.
 
 Un email queda `code complete, rollout pendiente` mientras falten deploy del runtime dueño, habilitación,
 canary consentido o readback del provider.

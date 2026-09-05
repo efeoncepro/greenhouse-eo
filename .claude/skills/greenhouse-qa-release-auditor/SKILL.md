@@ -264,6 +264,28 @@ las tres se veían bien hasta que alguien miró el runtime. Búscalas en el paso
    destapó que otro test necesitaba `git init` para siquiera ejercitar el modo
    que decía probar.
 
+6. 🔴 **Un canary hecho de casos NEGATIVOS o ANÓNIMOS no verifica el carril
+   autenticado — y en verde se ve idéntico a uno que sí.** Caso fuente 2026-09-05
+   (activación del authorization server `auth.efeonce.org`): los canaries pasaron
+   **9/9** —metadata, 401s, códigos inválidos, DCR— mientras el correo del magic link
+   llevaba días fallando en producción con `RESEND_API_KEY is not configured`. Ninguno
+   tocaba el carril por donde entra una persona real. **Regla: clasifica los canaries
+   de una activación por lo que EJERCITAN, no los cuentes.** Si todos son negativos o
+   anónimos, la cobertura del camino feliz autenticado es **cero** y el veredicto no
+   puede ser `PASS`. ⚠️ Corolario: cuando el endpoint responde igual exista o no el
+   sujeto —el de magic link devuelve 202 idéntico por anti-enumeración—, su código HTTP
+   no es evidencia de nada; hay que leer el hecho observable aguas abajo (la fila de
+   `email_deliveries`, la sesión creada, el registro escrito).
+
+   Dos reglas más del mismo caso. **(a) Un canary con pasos OMITIDOS no es verde.** Dos
+   estados esconden la mitad del resultado; el canary de ese carril distingue tres —`0`
+   verde, `1` rojo, `2` INCOMPLETO— y nombra qué se saltó y por qué. Un `exit 0` con
+   pasos silenciosamente omitidos es la misma mentira que el gate elocuente de (4).
+   **(b) Un detector sólo está probado cuando se lo ve ENCENDERSE.** Verlo en `ok` no
+   prueba que funcione: prueba que hoy no hay nada que detectar. Ese canary revoca el
+   acceso a propósito y comprueba que la señal de sesión huérfana se prende — es (5),
+   falsificar el test, aplicado a un detector de runtime.
+
 ## CLI
 
 Use the repo helper. Running as Claude, always scope skill output with

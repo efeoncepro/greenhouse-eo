@@ -1,15 +1,21 @@
 # Efeonce Auth Server (`auth.efeonce.org`)
 
 > **Tipo de documento:** README del deployable (TASK-1828 + TASK-1829, EPIC-044)
-> **Versión:** 1.1
+> **Versión:** 1.2
 > **Creado:** 2026-09-04 por Claude (sesión `/implement-task 1828`)
-> **Última actualización:** 2026-09-04 por Claude (TASK-1829: superficie OAuth)
+> **Última actualización:** 2026-09-04 por Claude (release 9100bbd2765d: producción + environment del emisor)
 > **Documentación técnica:** [`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](../../docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) · contrato OAuth [`EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`](../../docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md)
 
 Authorization server propio de Efeonce. Cloud Run Service en `us-east4`, publicado como **segundo host del
 front door del gateway MCP** (mismo global LB, misma IP `34.111.78.237`, misma policy Cloud Armor). Emite
 tokens ES256 firmados con una llave asimétrica en **Cloud KMS con protección HSM**; la privada nunca sale del
 hardware.
+
+**Estado:** en **producción desde 2026-09-04** por el release `9100bbd2765d` (job `deploy-auth-server` del
+orquestador; revisión `auth-server-00005-pk8`, `GIT_SHA f6db4255a`; `/readyz` 200, JWKS con 2 `kid`,
+`/.well-known/oauth-authorization-server` 404 con el flag OAuth OFF). Environment del emisor `efeonce-auth`
+registrado en `draft` (`pnpm auth-server:register-issuer-environment`). `AUTH_SERVER_JWKS_URL` declarada en Vercel
+Production + staging.
 
 ## Qué hace hoy
 
@@ -56,7 +62,7 @@ La autenticación de personas (passkeys, magic link, TOTP) la entrega `TASK-1830
 | `AUTH_SERVER_ALLOWED_HOSTS` | `auth.efeonce.org` | Lista separada por comas. |
 | `AUTH_SERVER_KMS_KEY` | `projects/efeonce-group/locations/us-east4/keyRings/auth-server/cryptoKeys/auth-server-es256` | Nombre completo del recurso. |
 | `AUTH_SERVER_OAUTH_ENABLED` | `false` por defecto (TASK-1829) | Publica la metadata y `/oauth/*`. Prender sólo con la fila del environment `efeonce-auth` en `greenhouse_core.external_identity_environments` y metadata validada (runbook §`OAuth`). Ledger: `FEATURE_FLAG_STATE_LEDGER.md`. |
-| `AUTH_SERVER_ENVIRONMENT_ID` | `efeonce-auth` | `environment_id` del emisor en `external_identity_environments`; con él se resuelve `bound` y el claim `gv`. |
+| `AUTH_SERVER_ENVIRONMENT_ID` | `efeonce-auth` | `environment_id` del emisor en `external_identity_environments`; con él se resuelve `bound` y el claim `gv`. La fila existe en `draft` desde 2026-09-04 (ver §Scripts); pasa a `active` junto con el flip del flag OAuth. |
 | `AUTH_SERVER_MCP_AUDIENCE` | `https://mcp.efeonce.org/mcp` | `aud` de los access tokens y `resource` aceptado. |
 | `GREENHOUSE_POSTGRES_*` | Cloud SQL Connector | Igual que los workers; usuario `greenhouse_app`. |
 | `SENTRY_DSN` | secreto `greenhouse-sentry-dsn` | Opcional; degrada honesto. |
@@ -79,6 +85,16 @@ pnpm auth-server:rotate-key --retire <kid> --force  # sólo incidente; queda en 
 Después de retirar: deshabilitar la versión KMS vieja (`gcloud kms keys versions disable`) para volver a una
 sola versión facturable.
 
+## Scripts (`scripts/auth-server/`)
+
+| Comando | Script | Qué hace | Requiere |
+| --- | --- | --- | --- |
+| `pnpm auth-server:rotate-key` | `rotate-signing-key.ts` | Rota/registra/retira versiones de la llave KMS (`--status`, `--register <version>`, `--retire <kid> [--force]`) | `.env.local` + proxy PG + `AUTH_SERVER_KMS_KEY` + ADC propia |
+| `pnpm auth-server:register-client` | `register-oauth-client.ts` | Registra un cliente OAuth **confidencial** (`--name`, `--redirect`, `--auth-method`, `--scopes`, `--client-id`); secreto mostrado una sola vez | `.env.local` + proxy PG |
+| `pnpm auth-server:oauth-store:smoke` | `oauth-store-smoke.ts` | Smoke del store OAuth contra PostgreSQL real (single-use, rotación/reuso, revoke de familia, consent idempotente, trigger append-only) | `.env.local` + proxy PG |
+| `pnpm auth-server:register-issuer-environment` | `register-issuer-environment.ts` | Registra/actualiza la fila `efeonce-auth` de `greenhouse_core.external_identity_environments` por el command canónico de TASK-1631 (`upsertExternalIdentityEnvironment`: tx + audit + outbox; nunca SQL). `--status draft\|active`, `--environment-id`. Registrada en `draft` el 2026-09-04; `issuerClass` inmutable | `.env.local` + proxy PG (perfil ops, `127.0.0.1:15432`) |
+| `pnpm auth-server:brand-assets:generate` | `generate-brand-assets.ts` | Regenera `src/lib/auth-server/oauth/pages/efeonce-isotipo.generated.ts` desde el SSOT de marca | — |
+
 ## Deploy
 
 ```bash
@@ -88,8 +104,9 @@ ENV=production bash services/auth-server/deploy.sh
 
 Un solo servicio Cloud Run (`auth-server`) compartido por staging y production, como `ops-worker`; `ENV`
 selecciona el mínimo de instancias (production 1, staging 0). Workflow: `.github/workflows/auth-server-deploy.yml`
-(Slice 2). El host `auth.efeonce.org` se enruta desde `efeonce-mcp/infra/terraform/front_door.tf`
-(`enable_auth_host`).
+(Slice 2; staging en push a `develop`, producción sólo por `production-release.yml` job `deploy-auth-server`, deploy
+change-gated por rutas). Primer release de producción: `9100bbd2765d` (2026-09-04). El host `auth.efeonce.org` se
+enruta desde `efeonce-mcp/infra/terraform/front_door.tf` (`enable_auth_host`).
 
 ## Gates
 

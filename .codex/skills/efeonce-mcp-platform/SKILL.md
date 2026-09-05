@@ -77,9 +77,11 @@ If a source conflicts with remembered behavior, the verified runtime and its can
   rejected. Supporting CIMD requires ISSUING the tokens, i.e. being a real authorization server — forbidden for the
   gateway by the neutral-adapter rule. That issuer now exists as its own deployable: Efeonce's native authorization
   server in `services/auth-server` (EPIC-044; ADR `docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`,
-  Accepted 2026-09-03; `TASK-1828` bootstrap live 2026-09-04; `TASK-1829` OAuth metadata + CIMD as the primary client
-  mechanism with DCR only as compatibility fallback — **code complete on `develop` 2026-09-04 behind
-  `AUTH_SERVER_OAUTH_ENABLED=false`**, contract `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`, CIMD in
+  Accepted 2026-09-03; `TASK-1828` runtime **in production since 2026-09-04**, live revision
+  `auth-server-00007-cxb`; `TASK-1829` OAuth metadata + CIMD as the primary client
+  mechanism with DCR only as compatibility fallback — **the surface is ON in that live revision**
+  (`AUTH_SERVER_OAUTH_ENABLED` and `AUTH_SERVER_PERSON_AUTH_ENABLED` both default `true` in
+  `services/auth-server/deploy.sh`; issuer environment `efeonce-auth` `active`), contract `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`, CIMD in
   `src/lib/auth-server/oauth/cimd.ts`). CIMD work belongs to that domain; this evaluation was its input, never a
   parallel track. `TASK-1631` no longer owns CIMD — it delivered the Account 360 binding (see "External access binding" below).
 - ⚠️ **The clock that matters is the client's, not the spec's — and a nearer break is already written.** 2027-07-28
@@ -115,8 +117,9 @@ If a source conflicts with remembered behavior, the verified runtime and its can
   grants. The grant side ALREADY exists (`greenhouse_core.external_capability_grants`, revocable per organization and
   per person — `TASK-1631`, applied 2026-09-04); what closes this finding is the native issuer + multi-issuer gateway
   of EPIC-044 (`TASK-1829`/`1830`/`1831`/`1832`), where per-client identities get tokens carrying `gv` — `TASK-1829`
-  minting code is on `develop` (2026-09-04, flag OFF); no external token exists until the flag is on + `TASK-1830`
-  (session) + `TASK-1831` (gateway). Tracked as pending review, not an incident: no observed exploitation.
+  (issuer surface) and `TASK-1830` (person session) are both ON in the live revision `auth-server-00007-cxb`; no
+  external token exists yet because there is no eligible organization with an active binding, and `TASK-1831`
+  (gateway) has not landed. Tracked as pending review, not an incident: no observed exploitation.
   🚩 **And the name lies, which is what makes the above dangerous:** that app's Entra `displayName` is
   **"Efeonce MCP Local Canary Client"**, yet it IS the tenant-wide shared production client the shim hands to every
   standard MCP client. The real canary is `66985833-14e9-438e-add4-b740e84e9a64` ("Base-Only Canary Client", 2
@@ -134,18 +137,20 @@ If a source conflicts with remembered behavior, the verified runtime and its can
   create a permanent second customer credential. The convergence contract is APPLIED (`TASK-1631`, 2026-09-04): a
   customer resolves to one `identity_profile` through the source link `external_idp:<environment_id>` + `subject`,
   and to Account 360 through a `linked` invitation under an active binding — see "External access binding" below.
-  The browser login that produces that subject is the native issuer of EPIC-044 (`TASK-1830`).
+  The browser login that produces that subject is the native issuer of EPIC-044 (`TASK-1830`, live since 2026-09-05).
 - Greenhouse's existing NextAuth + sister-platform OAuth broker is a reusable identity foundation, not a public MCP
   authorization server. The WorkOS / native / hybrid comparison is CLOSED: ADR
   `docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md` (Accepted 2026-09-03) picks Efeonce's own
-  issuer at `auth.efeonce.org`, built as `services/auth-server` (`TASK-1828` bootstrap, live 2026-09-04; `TASK-1829`
-  OAuth metadata + CIMD/DCR + token issuance, code complete on `develop` 2026-09-04 behind
-  `AUTH_SERVER_OAUTH_ENABLED=false`; `TASK-1830` hosted login/consent that calls `acceptExternalInvitation` in-process,
+  issuer at `auth.efeonce.org`, built as `services/auth-server` (`TASK-1828` runtime in production since 2026-09-04;
+  `TASK-1829` OAuth metadata + CIMD/DCR + token issuance, **ON in the live revision `auth-server-00007-cxb`**;
+  `TASK-1830` hosted login/consent that calls `acceptExternalInvitation` in-process — **live: `/login` 200, own
+  session, magic link, passkeys and TOTP step-up verified against the real host 2026-09-05**;
   `TASK-1831` multi-issuer gateway with `gv` verification, `TASK-1832` client canaries, `TASK-1833` security
   posture). Never make the gateway own browser login or share a Greenhouse cookie/`NEXTAUTH_SECRET`, and never make
   a Greenhouse release the rollback boundary for external OAuth.
 - The gateway's front door serves a SECOND host, `auth.efeonce.org` — the native authorization server
-  (`services/auth-server`, `TASK-1828` / EPIC-044, live 2026-09-04). `efeonce-mcp/infra/terraform` (`6a144a5`,
+  (`services/auth-server`, `TASK-1828` / EPIC-044, in production since 2026-09-04 — live revision
+  `auth-server-00007-cxb`, single Cloud Run service shared by staging and production). `efeonce-mcp/infra/terraform` (`6a144a5`,
   `enable_auth_host` default `true`) adds a host rule → its own backend `efeonce-auth-server-backend` (serverless NEG,
   `us-east4`) under the SAME Cloud Armor policy, plus its own managed cert `efeonce-auth-server-cert` (ACTIVE) on the
   same forwarding IP `34.111.78.237`; plan was 3 add / 2 change / 0 destroy and `mcp.efeonce.org` stayed intact. The
@@ -156,10 +161,11 @@ If a source conflicts with remembered behavior, the verified runtime and its can
 - Customer access needs entitlements that issue and revoke access per tenant and capability — and those EXIST
   since `TASK-1631` (applied 2026-09-04): `greenhouse_core.external_capability_grants` under an Account 360 binding,
   revocable per organization and per person. Entra is the internal canary only. What is still missing for real
-  external access is switching on the issuer's OAuth surface (`TASK-1829`, code complete on `develop` 2026-09-04
-  behind `AUTH_SERVER_OAUTH_ENABLED=false`, CIMD primary / DCR compat), the hosted session (`TASK-1830`) and the
-  multi-issuer gateway (`TASK-1831`; canaries `TASK-1832`) — that is where tokens carrying `gv` get minted and
-  verified; no vendor gets provisioned (WorkOS was discarded by the native ADR).
+  external access is **no longer the issuer**: its OAuth surface (`TASK-1829`, CIMD primary / DCR compat) and the
+  hosted person session (`TASK-1830`) are both ON in the live revision `auth-server-00007-cxb`. What is missing is
+  (a) an **eligible organization with an active binding — there is none today**, which is why the token lane
+  (issuance, refresh, revocation, positive CIMD) is still unexercised, and (b) the multi-issuer gateway
+  (`TASK-1831`; canaries `TASK-1832`) — that is where tokens carrying `gv` get minted and verified; no vendor gets provisioned (WorkOS was discarded by the native ADR).
   The gateway declares five scopes when all gated providers are active: base `efeonce.mcp.read`,
   Globe reader `efeonce.mcp.globe.read`, the flag-gated internal write
   `efeonce.mcp.globe.credits.funding.ensure`, the flag-gated SEO write `efeonce.mcp.seo.write` (TASK-1308), and
@@ -188,7 +194,7 @@ If a source conflicts with remembered behavior, the verified runtime and its can
   by adding the scope to the shared public client.** The correct path is a client with a revocable, per-tenant,
   per-capability grant. The grant side EXISTS (`external_capability_grants`, `TASK-1631`, 2026-09-04); the token
   that carries it (`gv` claim minted by the native issuer, verified by the multi-issuer gateway) is EPIC-044
-  (`TASK-1829` minting code on `develop` 2026-09-04, flag OFF; `1830`/`1831`/`1832` pending). Until that lands write
+  (`TASK-1829`/`1830` ON in the live revision since 2026-09-05; `1831`/`1832` pending). Until that lands write
   tools stay federated and
   **fail-closed**: registered, verifiable, with no token that opens them. Verbatim rationale in the gateway ADR,
   §"El scope de escritura NO se cablea al cliente público compartido".
@@ -275,10 +281,16 @@ graph, because the gateway will resolve the caller against it:
   `acceptExternalInvitation` has no public route — the auth-server (`TASK-1830`) imports it in-process. Smoke after
   touching any of it: `pnpm identity:external-access:smoke`. Invariants: `IDENTITY_WORKFORCE_AGENT_INVARIANTS.md`
   §"External identity binding (TASK-1631)"; functional: `docs/documentation/identity/binding-identidad-externa-mcp.md`.
-- Still NOT here: the issuer's OAuth surface switched on (`TASK-1828` runtime is live; `TASK-1829` is code complete on
-  `develop` 2026-09-04 behind `AUTH_SERVER_OAUTH_ENABLED=false`, CIMD primary / DCR compat), hosted login
-  (`TASK-1830`), multi-issuer gateway (`TASK-1831`), client canaries (`TASK-1832`). Until the flag is on AND 1830 +
-  1831 land, no external token exists, so nothing external is reachable.
+- Already here: the issuer's OAuth surface (`TASK-1829`) and hosted person login (`TASK-1830`) are **ON** in the
+  live revision `auth-server-00007-cxb`, and the issuer environment `efeonce-auth` is `active` in
+  `greenhouse_core.external_identity_environments` (registered 2026-09-04 via
+  `pnpm auth-server:register-issuer-environment` → TASK-1631 command, never SQL; `issuerClass external` immutable;
+  the resolver answers `environment_inactive` while it is `draft`). `AUTH_SERVER_JWKS_URL=https://auth.efeonce.org/.well-known/jwks.json`
+  is set on Vercel Production + staging (signal `auth.issuer.jwks_unreachable` leaves `not_configured`).
+  Still NOT here: the multi-issuer gateway (`TASK-1831`) and client canaries (`TASK-1832`) — and **no eligible
+  organization with an active binding exists today**, so the token lane (issuance, refresh, revocation, positive
+  CIMD) has never been exercised. Until 1831 lands with a real binding, no external token exists, so nothing
+  external is reachable.
 
 ## Choose the route
 

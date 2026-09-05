@@ -1,0 +1,159 @@
+{
+  "pages": 15,
+  "all_checks_passed": true,
+  "checks": [
+    {
+      "page": 1,
+      "all_slot_text_present": true,
+      "missing": [],
+      "A4_landscape": true,
+      "contact_policy_correct": true,
+      "brand_images": 6,
+      "vector_paths": 11,
+      "url_bubble_link": true
+    },
+    {
+      "page": 2,
+      "all_slot_text_present": true,
+      "missing": [],
+      "A4_landscape": true,
+      "contact_policy_correct": true,
+      "brand_images": 5,
+      "vector_paths": 24,
+      "url_bubble_link": true
+    },
+    {
+      "page": 3,
+      "all_slot_text_present": true,
+      "missing": [],
+      "A4_landscape": true,
+      "contact_policy_correct": true,
+      "brand_images": 5,
+      "vector_paths": 23,
+      "url_bubble_link": true
+    },
+    {
+      "page": 4,
+      "all_slot_text_present": true,
+      "missing": [],
+      "A4_landscape": true,
+      "contact_policy_correct": true,
+      "brand_images": 5,
+      "vector_paths": 23,
+      "url_bubble_link": true
+    },
+    {
+      "page": 5,
+      "all_slot_text_present": true,
+      "missing": [],
+      "A4_landscape": true,
+      "contact_policy_correct": true,
+      "brand_images": 5,
+      "vector_paths": 34,
+      "url_bubble_link": true
+    },
+    {
+      "page": 6,
+      "all_slot_text_present": true,
+      "missing": [],
+      "A4_landscape": true,
+      "contact_policy_correct": true,
+      "brand_images": 12,
+      "vector_paths": 30,
+      "url_bubble_link": true
+    },
+    {
+      "page": 7,
+      "all_slot_text_present": true,
+      "missing": [],
+      "A4_landscape": true,
+      "contact_policy_correct": true,
+      "brand_images": 7,
+      "vector_paths": 14,
+      "url_bubble_link": true
+    },
+    {
+      "page": 8,
+      "all_slot_text_present": true,
+      "missing": [],
+      "A4_landscape": true,
+      "contact_policy_correct": true,
+      "brand_images": 5,
+      "vector_paths": 26,
+      "url_bubble_link": true
+    },
+    {
+      "page": 9,
+      "all_slot_text_present": true,
+      "missing": [],
+      "A4_landscape": true,
+      "contact_policy_correct": true,
+      "brand_images": 5,
+      "vector_paths": 22,
+      "url_bubble_link": true
+    },
+    {
+      "page": 10,
+      "all_slot_text_present": true,
+      "missing": [],
+      "A4_landscape": true,
+      "contact_policy_correct": true,
+      "brand_images": 5,
+      "vector_paths": 18,
+      "url_bubble_link": true
+    },
+    {
+      "page": 11,
+      "all_slot_text_present": true,
+      "missing": [],
+      "A4_landscape": true,
+      "contact_policy_correct": true,
+      "brand_images": 5,
+      "vector_paths": 26,
+      "url_bubble_link": true
+    },
+    {
+      "page": 12,
+      "all_slot_text_present": true,
+      "missing": [],
+      "A4_landscape": true,
+      "contact_policy_correct": true,
+      "brand_images": 5,
+      "vector_paths": 20,
+      "url_bubble_link": true
+    },
+    {
+      "page": 13,
+      "all_slot_text_present": true,
+      "missing": [],
+      "A4_landscape": true,
+      "contact_policy_correct": true,
+      "brand_images": 5,
+      "vector_paths": 23,
+      "url_bubble_link": true
+    },
+    {
+      "page": 14,
+      "all_slot_text_present": true,
+      "missing": [],
+      "A4_landscape": true,
+      "contact_policy_correct": true,
+      "brand_images": 5,
+      "vector_paths": 16,
+      "url_bubble_link": true
+    },
+    {
+      "page": 15,
+      "all_slot_text_present": true,
+      "missing": [],
+      "A4_landscape": true,
+      "contact_policy_correct": true,
+      "brand_images": 19,
+      "vector_paths": 26,
+      "url_bubble_link": true
+    }
+  ],
+  "embedded_fonts": 56,
+  "pdf_sha256": "016ac1f802cf5b7423298e887e95303441b9302698d530b7cf8b7becbe0f6582",
+  "accessibility": "Text, metadata, links and bookmarks checked; no PDF/UA conformity claim."
+}

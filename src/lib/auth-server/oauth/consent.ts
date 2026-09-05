@@ -17,6 +17,7 @@ import type { ClientConsentRecord, OAuthStorePort } from './store/port'
 export type ConsentActor = { actor: string; via: 'authorize_screen' | 'admin' | 'cli' | 'nexa' }
 
 export type GrantClientConsentInput = {
+  authorizationContextId?: string | null
   subject: string
   environmentId: string
   clientId: string
@@ -59,6 +60,7 @@ export const grantClientConsent = async (input: GrantClientConsentInput, deps: C
   const added = input.scopes.filter(scope => !known.has(scope))
 
   const consents = await deps.store.grantConsents({
+    authorizationContextId: input.authorizationContextId ?? null,
     subject: input.subject,
     environmentId: input.environmentId,
     clientId: input.clientId,

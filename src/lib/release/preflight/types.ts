@@ -235,7 +235,16 @@ export type PreflightOverallStatus = 'healthy' | 'degraded' | 'blocked' | 'unkno
  */
 export type PreflightConfidence = 'high' | 'medium' | 'low' | 'unknown'
 
+/** Declared workflow/CLI exception. Does not assert capability verification. */
+export interface PreflightOverrideAudit {
+  readonly reason: string
+  readonly overrideBatchPolicy: boolean
+  readonly bypassWarnings: boolean
+  readonly actor: string | null
+}
+
 export interface ProductionPreflightV1 {
+  readonly override?: PreflightOverrideAudit
   readonly contractVersion: PreflightContractVersion
   /** ISO 8601 timestamp at which the run started. */
   readonly startedAt: string
@@ -268,7 +277,7 @@ export interface ProductionPreflightV1 {
    *   - `overallStatus = 'healthy'` AND no degraded sources → `true`
    *   - else → `false`
    *
-   * Override is not encoded here; the orchestrator (TASK-851) is responsible
+   * This boolean is not changed by the declared override audit. The orchestrator is responsible
    * for accepting an override flag tied to `platform.release.preflight.override_batch_policy`
    * capability + reason audit.
    */

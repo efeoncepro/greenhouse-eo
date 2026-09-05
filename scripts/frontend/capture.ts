@@ -30,7 +30,7 @@ import { writeCaptureReport } from './lib/report'
 import { attachRuntimeCollectors, deriveRuntimeFindings } from './lib/runtime-collector'
 import { deriveAssetResponseFindings } from './lib/asset-integrity'
 import { applySecretMask, assertSafeOutputPath, enforceProductionGate } from './lib/safety'
-import type { CaptureScenario, CaptureViewportVariant } from './lib/scenario'
+import { resolveScenarioAuthentication, type CaptureScenario, type CaptureViewportVariant } from './lib/scenario'
 import { uploadCaptureToGcs } from './lib/upload'
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url))
@@ -169,6 +169,7 @@ const runOneCapture = async ({
 
   const session = await launchCaptureSession({
     envConfig,
+    authentication: resolveScenarioAuthentication(scenario),
     viewport,
     headed,
     deviceName,
@@ -198,12 +199,14 @@ const runOneCapture = async ({
       timeout: 60000
     })
 
-    try {
-      assertNotRedirectedToLogin(session.page, scenario.route)
-    } catch (redirectErr) {
-      PRINT(`  stale auth detectado, forzando refresh…`)
-      refreshStorageState(env, envConfig)
-      throw redirectErr
+    if (resolveScenarioAuthentication(scenario) !== 'anonymous') {
+      try {
+        assertNotRedirectedToLogin(session.page, scenario.route)
+      } catch (redirectErr) {
+        PRINT(`  stale auth detectado, forzando refresh…`)
+        refreshStorageState(env, envConfig)
+        throw redirectErr
+      }
     }
 
     await applySecretMask(session.page, scenario.extraMaskSelectors ?? [])
@@ -415,26 +418,31 @@ const main = async (): Promise<void> => {
     throw new Error('Provide either a <scenario-name> positional OR --route=<path>')
   }
 
-  let envConfig = resolveEnvConfig(env)
+  const scenario = scenarioName
+    ? await loadScenarioByName(scenarioName)
+    : buildInlineScenario(values.route as string, Number(values.hold), values.ready as string | undefined)
+
+  const authentication = resolveScenarioAuthentication(scenario)
+  let envConfig = resolveEnvConfig(env, authentication)
 
   PRINT(`▶ Capture canónica`)
   PRINT(`  env:      ${env}`)
   PRINT(`  baseUrl:  ${envConfig.baseUrl}`)
   PRINT(`  actor:    ${resolveActor()}`)
-  PRINT(`  auth:     checking storage state…`)
+  PRINT(
+    `  auth:     ${authentication === 'anonymous' ? 'anonymous (empty state, no credentials)' : 'checking storage state…'}`
+  )
 
-  try {
-    ensureStorageStateFresh(env, envConfig)
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err)
+  if (authentication === 'agent') {
+    try {
+      ensureStorageStateFresh(env, envConfig)
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err)
 
-    PRINT(`  ✗ auth refresh failed: ${message}`)
-    process.exit(1)
+      PRINT(`  ✗ auth refresh failed: ${message}`)
+      process.exit(1)
+    }
   }
-
-  const scenario = scenarioName
-    ? await loadScenarioByName(scenarioName)
-    : buildInlineScenario(values.route as string, Number(values.hold), values.ready as string | undefined)
 
   // Persona declarada por el scenario. Se aplica ANTES de tocar el browser: capturar una
   // superficie cliente con la sesión de operador no falla claro — renderiza el card de

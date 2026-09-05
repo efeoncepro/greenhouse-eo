@@ -1,5 +1,91 @@
 # TASK-1830 — Efeonce Auth External Person Authentication (passkeys, magic link, TOTP, recovery)
 
+## Delta 2026-09-05 — canary autenticado y correo MUERTO en vivo
+
+`pnpm auth-server:person-auth:canary` (nuevo, commit `38fbfaeeb`) ejercita contra el host REAL el
+carril que los canaries de la activación no tocaron: todos ellos fueron negativos o anónimos.
+
+**Primera corrida: 🔴 el correo del magic link estaba fallando en producción** con
+`RESEND_API_KEY is not configured`. Causa raíz mía: declaré `RESEND_API_KEY_SECRET_REF` como env var
+pero nunca monté `RESEND_API_KEY` como secreto. `sendEmail` usa el cliente SÍNCRONO de Resend, que
+lee un secreto ya resuelto; el carril `*_SECRET_REF` sólo sirve donde algo lo resuelve async primero.
+El ops-worker lo monta con `--update-secrets`; copié la mitad del patrón. Corregido en `deploy.sh`,
+**pendiente de redeploy del auth-server**.
+
+Es exactamente el modo de falla documentado y no visto: la respuesta es 202 idéntica por
+anti-enumeración, así que un correo muerto no se reporta solo. Sin el canary, esto se descubría
+cuando una persona real dijera «no me llega el enlace».
+
+**Verificado en vivo por primera vez** (22 ok, 0 fallidos): consumo del magic link y su uso único,
+sesión y su contexto sin filtrar el `sub`, registro y login por passkey con `uv` abriendo en
+`step_up`, enrolamiento TOTP con secreto cifrado por KMS, anti-replay del código, y la muerte de la
+sesión al revocar el source link. Además, tras revocar, se comprueba que la señal
+`auth.person.session_without_link` **se enciende**: un detector que nunca se ejercita es una
+afirmación. Las tres señales `auth.person.*` se leyeron por primera vez y responden.
+
+**Sigue pendiente:** redeploy para el correo, y el carril de tokens (emisión, refresh/revocación,
+CIMD positivo) que exige una organización elegible — decisión del operador, hoy en `TASK-1836`.
+
+## Delta 2026-09-04 (ejecución, sesión greenhouse-eo-18)
+
+**Estado: `runtime activado, verificación autenticada pendiente`.** Último readback y límites en `Status real` y auditoría de rollout; el bloque siguiente conserva el estado del cierre de implementación previo a la activación. Los 4 slices están en `develop` (`7459d96d4`,
+`937087404`, `db2622ba9`, `5b57b73f9`) detrás de `AUTH_SERVER_PERSON_AUTH_ENABLED=false`.
+
+**Tres desviaciones de la spec, decididas con `arch-architect` + `efeonce-mcp-platform` y
+autorizadas por el operador:**
+
+1. **El ledger de intentos NO va a `greenhouse_serving.auth_attempts`** sino a
+   `greenhouse_auth.person_auth_attempts`. Ese ledger es del portal y no admite este runtime sin
+   romperlo: `provider` y `stage` tienen CHECK cerrados de NextAuth (sin passkey ni TOTP),
+   `user_id_resolved` pertenece al espacio de `client_users` y su GRANT de INSERT es sólo para
+   `greenhouse_runtime`, mientras el emisor conecta como `greenhouse_app`. Además el `subject_hash`
+   de `oauth_audit_events` —la otra alternativa— no está indexado, así que un bloqueo progresivo por
+   sujeto allí sería un scan. El ADR aísla el RUNTIME del emisor aunque la identidad converja.
+2. **Los bearers se hashean con `sha256` + comparación en tiempo constante, no con bcrypt.** Sobre
+   256 bits de entropía un KDF lento no agrega resistencia y sí agrega 300-800 ms de CPU de un solo
+   hilo en un endpoint NO autenticado — un amplificador de DoS en la puerta de entrada. Además
+   unifica el esquema con codes/refresh/access del mismo dominio. Consecuencia de diseño: los
+   códigos de respaldo se hacen LARGOS (~127 bits) para no necesitar KDF. El shim de `bcryptjs` del
+   Dockerfile se queda, así que el Dockerfile no se tocó.
+3. **`passkey_challenges` y `totp_backup_codes` no estaban en la lista de 5 tablas de la spec** y
+   hacen falta: el reto de autenticación ocurre ANTES de que exista sesión (no puede colgarse de
+   ella) y el consumo único de un código de respaldo necesita su propia fila.
+
+**Infraestructura creada (2026-09-04):** llave KMS **simétrica** `auth-server-totp-envelope`
+(`us-east4/auth-server`, HSM, `ENCRYPT_DECRYPT`, rotación 90 d) + `cryptoKeyEncrypterDecrypter`
+para `auth-server@`. La existente `auth-server-es256` es EC de firma y no puede cifrar. Round-trip
+y rechazo por AAD verificados contra la llave real, y el smoke los vuelve a verificar en cada corrida.
+
+**Cuatro defectos encontrados por el trabajo, no por revisión:**
+
+- `verifyAuthenticationResponse` LANZA cuando el contador de un passkey retrocede, así que la
+  regresión llegaba como un "no verificó" cualquiera: **la credencial clonada se quedaba viva** y la
+  señal nunca se habría disparado. Se le pasa `counter: 0` (omite sólo ese chequeo) y la política se
+  aplica sobre datos ya verificados.
+- `deactivateOrphanSourceLinks` (TASK-1631) no se llama al aceptar y su condición es por PERFIL, así
+  que tras una re-invitación **el subject anterior seguía autenticando** y la recuperación no
+  recuperaba nada.
+- `epochTolerance` de `otplib` es opción de `verify`, no del constructor, y `epoch` va en SEGUNDOS.
+- `otplib` lanza con un token que no son 6 dígitos, y ahí llega cualquier cosa: un endpoint público
+  de autenticación respondía 500 en vez de rechazar.
+
+**Rollout pendiente (lo que falta para decir "listo"):** prender el flag en staging —exige
+`AUTH_SERVER_OAUTH_ENABLED=true` y el environment `efeonce-auth` en `active`, si no la sesión se
+crea pero `authorize` responde `environment_inactive`—, verificar que el correo sale de verdad por
+Resend (la respuesta es idéntica por anti-enumeración, así que un correo muerto NO se reporta solo)
+y ejercitar passkey en dos navegadores.
+
+**No implementado a propósito:** el evento outbox `auth.person.session_revoked` que la spec
+mencionaba. No tiene consumidor: el gateway re-chequea `gv` cada 60 s y la sesión muere en el emisor
+de inmediato. Publicar un evento que nadie lee es superficie sin dueño; se agrega cuando exista el
+consumidor.
+
+## Delta 2026-09-04 (TASK-1835)
+
+- La task `ui-ux` de login/consentimiento ya existe: `TASK-1835` (`docs/tasks/in-progress/TASK-1835-efeonce-id-login-consent-screens.md`), con wireframe, flow y motion.
+- El flujo maestro `docs/ui/flows/EPIC-044-auth-server-login-consent-UI-FLOW.md` (listado en `Files owned` de esta task) fue CREADO al autorar TASK-1835 con el inventario de superficies S0–S10 y los recorridos A–G: esta task lo **extiende** con el detalle de cada método (magic link, passkey, TOTP, rutas `/auth/*` y `/login*`), no lo recrea.
+- TASK-1835 consume de aquí: rutas HTML `/login*`/`/session`, DTOs de login/step-up/sesión, errores canónicos y el copy de métodos en `src/lib/copy/auth-server.ts`; TASK-1835 aporta el shell «Efeonce ID» y las plantillas.
+
 ## Delta 2026-09-04 (TASK-1829)
 
 - `TASK-1829` quedó `code complete, rollout pendiente` en `develop` (commits `263ee3a74`, `19d1658de`,
@@ -42,7 +128,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -55,10 +141,12 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-044`
-- Status real: `Especificación con runtime disponible (2026-09-04): auth.efeonce.org y schema greenhouse_auth entregados por TASK-1828 en staging; el auth server no tiene capa propia de autenticación de personas; falta una llave KMS simétrica para el envelope de secretos TOTP`
+- Status real: `runtime activado, verificación autenticada pendiente (2026-09-05T01:01Z). Auth Server Deploy 33934410457 success, revisión auth-server-00007-cxb, SHA 3f68e8875, 100% tráfico; OAuth y personas true; emisor active. Metadata/login y negativos públicos verificados (9/9). Falta identidad de canary indicada por operador, correo real, sesión, tokens/refresh/revocación y passkeys en dos navegadores. Deploy por staging sobre servicio compartido; no hay nuevo release main. Evidencia: docs/audits/2026-09-04-epic-044-auth-rollout.md`
 - Rank: `TBD`
 - Domain: `platform|identity`
-- Blocked by: `TASK-1631 (invitaciones y source links para ligar el subject; Slice 1 code complete + staging verificado 2026-09-04, producción con el próximo release)`
+- Blocked by: `none`
+
+**Dependencia verificada 2026-09-05 UTC:** TASK-1631 ya viajó en el release 9100bbd2765d; environment efeonce-auth presente en draft y tablas del emisor disponibles. La activación y el despliegue de personas son trabajo de este rollout.
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -237,12 +325,12 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio, en el mismo PR.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio, en el mismo PR — las 8 en `src/lib/auth-server/boundary-domain.test.ts`; el guard las atrapó dos veces durante la implementación.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk — 5 migraciones additive-only, todas con bloque DO anti pre-up-marker, aplicadas y verificadas contra PG real.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling — `pnpm auth-server:person-auth:smoke` ejercita el SQL y la llave KMS reales.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
 <!-- ZONE 2 — PLAN MODE: lo produce el agente que toma la task. -->
 
@@ -328,14 +416,14 @@ Reglas obligatorias:
 
 ## Acceptance Criteria
 
-- [ ] No existe columna ni tabla de contraseñas en `greenhouse_auth`.
-- [ ] Magic link: 15 min, un solo uso, bcrypt en reposo, cooldown 60 s por sujeto y 5/h por IP, consumo por POST.
-- [ ] Passkeys: registro y autenticación verificados en dos navegadores; contador que retrocede invalida la credencial.
-- [ ] TOTP: enrolamiento con secreto cifrado por KMS; consent de escritura exige `amr` con `totp` o passkey UV y `auth_time` < 10 min.
-- [ ] Una sesión cuyo source link se revoca deja de ser válida en el siguiente request.
-- [ ] Respuestas de "correo no existe" y "correo existe" son indistinguibles en cuerpo, código y tiempo (test).
-- [ ] `auth_attempts` registra cada intento sin PII adicional; ningún log contiene tokens ni secretos.
-- [ ] Flujo maestro UI publicado en `docs/ui/flows/EPIC-044-auth-server-login-consent-UI-FLOW.md` y copy en `src/lib/copy/auth-server.ts`.
+- [x] No existe columna ni tabla de contraseñas en `greenhouse_auth`. — 8 tablas nuevas revisadas; ninguna guarda un secreto reusable de la persona salvo el TOTP, y ése va cifrado por KMS.
+- [x] Magic link: 15 min, un solo uso (UPDATE condicional con `rowCount === 1` en transacción), cooldown 60 s por correo y 5/h por IP (`auth_rate_limits`, con bloqueo progresivo), consumo por POST con página intermedia. — **Desviación declarada: `sha256` + comparación en tiempo constante en vez de bcrypt.** Razón en el Delta de abajo; el criterio pedía bcrypt, la intención era "no reconstruible desde un dump" y sha256 sobre 256 bits la cumple mejor en este runtime. Tests `person-auth-flow.test.ts` + smoke contra PG real.
+- [ ] Passkeys: registro y autenticación **verificados en dos navegadores** — PENDIENTE de rollout: exige staging con el flag prendido. Lo que SÍ está verificado: la ceremonia completa contra `@simplewebauthn/server` con un autenticador de software que firma con P-256 real (`passkeys.test.ts`, 19 casos), y que un contador que retrocede invalida la credencial (ese caso encontró un defecto real: la librería lanzaba y la credencial clonada quedaba viva).
+- [x] TOTP: enrolamiento con secreto cifrado por KMS — llave simétrica `auth-server-totp-envelope` creada 2026-09-04 (HSM, rotación 90 d), round-trip y rechazo por AAD verificados contra la llave REAL en `pnpm auth-server:person-auth:smoke`. El consent de escritura exige `amr` con `totp` o passkey `uv` y factor reciente < 10 min (`resolveAuthLevel`, consumido por `authorize` vía `SubjectSessionPort`).
+- [x] Una sesión cuyo source link se revoca deja de ser válida en el siguiente request — y además queda revocada en el store, no sólo rechazada. Verificado por test y por mutación (quitar el chequeo pone 2 tests en rojo).
+- [x] Respuestas de "correo no existe" y "correo existe" indistinguibles en cuerpo, código, encabezados **y tiempo** — dos tests separados; quitar el piso de latencia o cambiar el cuerpo pone uno en rojo cada uno.
+- [x] Cada intento queda registrado sin PII adicional; ningún log contiene tokens ni secretos. — **Desviación declarada:** el ledger es `greenhouse_auth.person_auth_attempts`, no `greenhouse_serving.auth_attempts`. Razón en el Delta. Tests verifican que ni el correo, ni el sujeto crudo, ni el verificador llegan al ledger.
+- [x] Flujo maestro UI extendido en `docs/ui/flows/EPIC-044-auth-server-login-consent-UI-FLOW.md` (§5.bis, coordinado con `TASK-1835`) y copy en `src/lib/copy/auth-server.ts`.
 
 ## Verification
 

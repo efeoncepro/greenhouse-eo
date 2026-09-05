@@ -1,7 +1,7 @@
 # GREENHOUSE_AUTH_RESILIENCE_V1
 
 > **Tipo de documento:** Spec de arquitectura canónica
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-05-01 por Claude (TASK-742, ISSUE-061)
 > **Owner:** Identity domain
 > **Status:** active
@@ -194,6 +194,7 @@ Cada capa cubre un modo de falla distinto. Juntas garantizan: detección automá
 - **NUNCA** mutar callbacks `jwt`/`signIn` de NextAuth sin `try/catch` + `recordAuthAttempt`.
 - **NUNCA** computar SSO health en el cliente — leer `/api/auth/health`.
 - **NUNCA** persistir el raw token de un magic-link.
+- **NUNCA** diagnosticar «esta persona no pudo entrar» desde un solo ledger. Hay **dos**: `greenhouse_serving.auth_attempts` (portal, esta spec) y `greenhouse_auth.person_auth_attempts` (emisor `auth.efeonce.org`). Ver §Frontera con el emisor.
 - **NUNCA** crear un `client_users` row con `auth_mode='both'` sin `password_hash`. La CHECK constraint lo bloquea.
 - **NO** depender de `process.env.NEXTAUTH_SECRET` plano en producción si existe `NEXTAUTH_SECRET_SECRET_REF`. El resolver prefiere Secret Manager.
 
@@ -209,6 +210,40 @@ Cada capa cubre un modo de falla distinto. Juntas garantizan: detección automá
 | Sentry `domain=identity` | Errors estructurados de auth (signIn callback, jwt callback, magic-link, secret format) |
 | `pnpm auth:audit-azure-app` | On-demand audit de la Azure App Registration |
 | `pnpm secrets:audit` | On-demand audit de los 8 secretos críticos |
+
+---
+
+## Frontera con el emisor `auth.efeonce.org` — hay DOS ledgers, no uno
+
+Desde `TASK-1830` (`EPIC-044`) existe un segundo camino de autenticación en Efeonce, y por lo tanto un
+segundo ledger. Quien investigue «por qué esta persona no pudo entrar» tiene que saber que la respuesta
+puede estar en cualquiera de los dos, según por qué puerta entró.
+
+| Ledger | Puerta | Quién entra | Métodos registrados |
+|---|---|---|---|
+| `greenhouse_serving.auth_attempts` (Capa 3 de esta spec) | **portal** `greenhouse.efeoncepro.com` (NextAuth) | usuarios de `client_users` — Efeonce internal + clientes Globe | Microsoft SSO, credentials, magic-link de Capa 5 |
+| `greenhouse_auth.person_auth_attempts` | **emisor** `auth.efeonce.org` (Efeonce ID) | personas de clientes externos ligadas a un perfil del 360 | magic link propio del emisor, passkeys WebAuthn, TOTP step-up |
+
+**Por qué están separados y no es duplicación.** El ledger del portal **no admite** el runtime del emisor
+sin romperlo: `provider` y `stage` tienen CHECK cerrados de NextAuth (no existe passkey ni TOTP),
+`user_id_resolved` pertenece al espacio de `client_users` (una persona externa **no** es un `client_user`)
+y su GRANT de INSERT es sólo para `greenhouse_runtime`, mientras el emisor conecta como `greenhouse_app`.
+Meter los intentos del emisor ahí exigiría relajar las tres cosas a la vez. Además el emisor necesita
+`subject_hash` indexado para bloqueo progresivo por sujeto, que el portal no tiene. Los dos son
+append-only.
+
+**Lo que este ledger NO ve.** El emisor despacha su propio correo. Un magic link del emisor que nunca sale
+**no deja rastro en `auth_attempts`**: deja `status=failed` en `greenhouse_notifications.email_deliveries`,
+y ni siquiera se lo puede inferir de la respuesta HTTP, que es 202 idéntico exista o no el correo
+(anti-enumeración con piso de latencia). Caso fuente 2026-09-05: `RESEND_API_KEY is not configured` porque
+el secreto estaba declarado como `*_SECRET_REF` pero nunca montado en el runtime del emisor — el acceso
+quedó muerto en silencio mientras la persona leía «te enviamos un enlace». Señales del emisor:
+`auth.person.{magic_link_rate_limited,passkey_counter_regression,session_without_link}` (steady 0).
+
+> Invariantes completos del emisor: [`agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md`](agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md)
+> §«Autenticación de personas externas del emisor (TASK-1830)». ADR:
+> [`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md).
+> El login del portal **no cambia**: esta spec sigue siendo la autoridad de las 7 capas.
 
 ---
 
@@ -241,6 +276,7 @@ Cuando una causa raíz vive fuera del código (Azure config, GCP secrets, Vercel
 - ISSUE-061 — `docs/issues/resolved/ISSUE-061-microsoft-sso-callback-rejection-multitenant-drift.md`
 - Migrations: `migrations/20260501070728477_task-742-auth-attempts.sql`, `..862_task-742-auth-mode-check-and-normalize.sql`, `..29260_task-742-auth-magic-links.sql`
 - Spec parent: `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
+- Emisor propio (segundo ledger): `docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md` · `docs/architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` §Autenticación de personas externas del emisor
 - API Platform readiness contract: `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md` (sección Platform Health V1)
 - Reliability Control Plane: `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md`
 
@@ -248,4 +284,7 @@ Cuando una causa raíz vive fuera del código (Azure config, GCP secrets, Vercel
 
 ## Changelog
 
+- **1.1** — 2026-09-05 — §Frontera con el emisor `auth.efeonce.org`: el emisor tiene su propio ledger
+  `greenhouse_auth.person_auth_attempts` (TASK-1830), separado de `auth_attempts` por CHECK, espacio de
+  identidad y GRANT. Cierra la referencia cruzada que los invariantes de TASK-1830 prometían y no existía.
 - **1.0** — 2026-05-01 — Documento inicial post TASK-742 / ISSUE-061. Cierra el modo de falla "SSO se rompe silenciosamente" con 7 capas defensivas.

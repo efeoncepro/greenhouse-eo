@@ -1,0 +1,99 @@
+{
+  "version": "1.0",
+  "canvas": {
+    "width": 1123,
+    "height": 794
+  },
+  "contentTypeTaxonomy": [
+    "cover",
+    "metrics",
+    "cards",
+    "actions",
+    "chart",
+    "diagnostic",
+    "back-cover"
+  ],
+  "templates": [
+    {
+      "name": "BoardCover",
+      "kind": "full",
+      "contentTypes": [
+        "cover"
+      ],
+      "prototype": "cover.html",
+      "slotsRef": "cover.slots.json",
+      "status": "built"
+    },
+    {
+      "name": "BoardMetrics",
+      "kind": "full",
+      "contentTypes": [
+        "metrics"
+      ],
+      "prototype": "metrics.html",
+      "slotsRef": "metrics.slots.json",
+      "status": "built"
+    },
+    {
+      "name": "BoardCards",
+      "kind": "full",
+      "contentTypes": [
+        "cards"
+      ],
+      "prototype": "cards.html",
+      "slotsRef": "cards.slots.json",
+      "status": "built"
+    },
+    {
+      "name": "BoardActions",
+      "kind": "full",
+      "contentTypes": [
+        "actions"
+      ],
+      "prototype": "actions.html",
+      "slotsRef": "actions.slots.json",
+      "status": "built"
+    },
+    {
+      "name": "BoardChart",
+      "kind": "full",
+      "contentTypes": [
+        "chart"
+      ],
+      "prototype": "chart.html",
+      "slotsRef": "chart.slots.json",
+      "status": "built"
+    },
+    {
+      "name": "BoardDiagnostic",
+      "kind": "full",
+      "contentTypes": [
+        "diagnostic"
+      ],
+      "prototype": "diagnostic.html",
+      "slotsRef": "diagnostic.slots.json",
+      "status": "built"
+    },
+    {
+      "name": "BackCoverFullA4",
+      "kind": "full",
+      "contentTypes": [
+        "back-cover"
+      ],
+      "prototype": "back-cover.html",
+      "slotsRef": "back-cover.slots.json",
+      "status": "built"
+    }
+  ],
+  "selector": {
+    "map": {
+      "cover": "BoardCover",
+      "metrics": "BoardMetrics",
+      "cards": "BoardCards",
+      "actions": "BoardActions",
+      "chart": "BoardChart",
+      "diagnostic": "BoardDiagnostic",
+      "back-cover": "BackCoverFullA4"
+    }
+  }
+}

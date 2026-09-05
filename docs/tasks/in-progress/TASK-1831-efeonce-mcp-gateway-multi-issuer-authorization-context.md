@@ -1,5 +1,10 @@
 # TASK-1831 — Efeonce MCP Gateway Multi-Issuer Authorization Context
 
+## Delta 2026-09-04 — acceso interno nativo (TASK-1836)
+
+El slice interno nativo depende del contrato de TASK-1836 (U11). La policy actual que asocia toda autoridad interna exclusivamente con Entra debe revisarse mediante ADR antes de habilitar el emisor común. Validar población/autoridad procedentes del resolver confiable; aceptar el issuer nativo nunca basta para abrir herramientas internas. El slice externo puede avanzar sin esperar este slice interno.
+
+
 ## Delta 2026-09-04 (TASK-1829)
 
 - `TASK-1829` quedó `code complete, rollout pendiente` en `develop` (commits `263ee3a74`, `19d1658de`,
@@ -41,7 +46,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Medio`
@@ -54,10 +59,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Especificación; contrato AuthContext diseñado en TASK-1631 Slice 0 (2026-08-05), sin código; desde 2026-09-04 el issuer auth.efeonce.org publica JWKS real en staging (2 kid), el reader de binding de TASK-1631 está verificado en staging y TASK-1829 emite en código (develop) el JWT ES256 con sub/azp/scope/gv detrás de AUTH_SERVER_OAUTH_ENABLED=false; falta prender ese flag en staging`
+- Status real: `Integración local en curso (2026-09-05) como dependencia del goal TASK-1836: JWT multissuer, reader sin caché, 37 policies y guards de listado/dispatch implementados; 114 pruebas, typecheck y build pasan. Sin deploy ni activación nativa. Providers sin delegación compatible siguen denegados; canaries reales y rollback pendientes.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration`
-- Blocked by: `TASK-1829 (code complete en develop 2026-09-04: el access token ES256 con sub/azp/scope/gv ya existe en código; espera AUTH_SERVER_OAUTH_ENABLED=true en staging con el environment efeonce-auth registrado); TASK-1631 (reader de bindings y grants_version en producción)`
+- Blocked by: `none`
 - Branch: `efeonce-mcp main; Greenhouse develop para el lane de bindings; checkout compartido de cada repo; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -66,9 +71,9 @@
 
 Convertir el verificador single-issuer del gateway (`../efeonce-mcp/src/auth/token-verifier.ts`, 40 líneas,
 `clientId = azp ?? sub`, `scopes = scp ∪ scope ∪ roles`) en un resolver por issuer que produce el
-`AuthContext` de seis campos del ADR de federación, califica cada tool por `allowedIssuers` y clase de
+`AuthContext` del ADR de federación, ampliado por el contrato de contexto de TASK-1836, califica cada tool por `allowedIssuers` y clase de
 autoridad, resuelve la persona por `(issuer, subject)` a través del registry de environments y rechequea
-`grants_version` antes del dispatch. Entra sigue como issuer interno intacto; `auth.efeonce.org` entra como
+`grants_version` antes del dispatch. Entra directo conserva compatibilidad; `auth.efeonce.org` entra inicialmente como
 segundo issuer detrás de flag.
 
 ## Why This Task Exists
@@ -85,9 +90,11 @@ los materializa en el repo hermano.
   fallback ni fusión; issuer desconocido denegado antes de tocar JWKS.
 - Resolver por issuer con JWKS, audience y política propios; caché de JWKS con fallback a última copia buena.
 - Cada tool declara `allowedIssuers` y `authorityClass` (`delegated` | `roles` | `both`); internal-only
-  (incluido el write de fondeo) declara sólo Entra.
+  (incluido el write de fondeo) conserva Entra y sólo admite emisor nativo tras D1–D7 de TASK-1836,
+  contexto interno verificado y gate interno activo; issuer permitido nunca basta por sí solo.
 - Binding de persona por `(issuer, subject)` vía lane de Greenhouse (`external_identity_environments` +
-  `identity_profile_source_links`); recheck de `grants_version` con caché ≤ 60 s; revocación efectiva < 5 min.
+  `identity_profile_source_links`); recheck de permisos y `grants_version` por contexto; cohorte nativa interna sin caché positiva.
+  Cualquier caché posterior debe mantener revocación local efectiva ≤60 s (contrato TASK-1836).
 - Tres tests de regresión obligatorios: (a) token externo + scope string internal-only → deny; (b) `roles`
   con string de escritura sin scope delegado → deny, también en Entra; (c) grant revocado con token vigente → deny.
 
@@ -263,9 +270,17 @@ Reglas obligatorias:
 
 ## Detailed Spec
 
-- `config.issuers: Array<{ issuer, jwksUri, audience, environmentId, kind: 'internal'|'external' }>`.
-- Verificación: decodificar header → `iss` → buscar issuer → JWKS (`jose.createRemoteJWKSet` con caché) → `jwtVerify` con `audience` → construir `AuthContext`. Para `kind: external`, `gv` obligatorio.
-- Dispatch: `tool.allowedIssuers.includes(ctx.issuer)` ∧ autoridad según `authorityClass` ∧ (external ⇒ binding active ∧ `ctx.grantsVersion === binding.grantsVersion` ∧ capability de la tool ∈ grants).
+- Configuración por issuer conserva issuer/JWKS/audience/environmentId y perfil de verificación. La clase
+  de población interna/externa se resuelve por contexto; no derivarla del issuer nativo común ni redefinir
+  silenciosamente `issuer_class` persistido. Propuesta D3/D4 de TASK-1836, sujeta al mismo ADR.
+- Verificación: leer `iss` no confiable sólo para seleccionar una configuración allowlisted, sin fetch
+  arbitrario → verificar firma/issuer/audiencia/tiempos → construir contexto tipado. Tokens nativos
+  internos requieren referencia de contexto firmada y `gv`; resolver y cotejar persona/cliente/recurso
+  con el reader antes de dispatch. Tokens legacy sin contexto nunca se promueven a internos.
+- Dispatch nativo: issuer permitido ∧ scope delegado requerido ∧ clase de autoridad válida ∧ contexto
+  resuelto para persona/cliente/recurso ∧ relación elegible ∧ versión válida ∧ capability vigente del
+  provider. Para contexto interno, gate interno activo. Roles ni `gv` aislado sustituyen esta conjunción.
+  Carril Entra directo conserva su policy explícita sin mezclar roles con scopes.
 
 ## Rollout Plan & Risk Matrix
 
@@ -285,7 +300,7 @@ Reglas obligatorias:
 
 ### Feature flags / cutover
 
-- `OAUTH_EXTERNAL_ISSUER_ENABLED` (default `false`) declarado en `../efeonce-mcp/.github/workflows/deploy.yml`; fila en el ledger de Greenhouse con runtime `efeonce-mcp-gateway`.
+- `MCP_NATIVE_AUTH_ENABLED` y `MCP_NATIVE_INTERNAL_AUTH_ENABLED` (ambos default `false`) declarados en `../efeonce-mcp/.github/workflows/deploy.yml`. El segundo requiere el primero; OFF interno deniega tokens internos ya emitidos, conservando el carril externo permitido por su propia policy.
 
 ### Rollback plan per slice
 
@@ -310,6 +325,10 @@ Reglas obligatorias:
      ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
+
+- [ ] Auditoría MCP de TASK-1836 §12/14: verificar discovery root/path y 401 hacia issuer correcto, scopes mínimos/challenge 403, aislamiento concurrente de listado/dispatch/handles y rechazo del contexto nuevo por verifier viejo antes de activar.
+
+- [ ] Contexto interno nativo de TASK-1836 permite sólo tools autorizadas; un sujeto externo del mismo issuer queda denegado, y Entra directo mantiene compatibilidad.
 
 - [ ] `AuthContext` expone `issuer`, `subject`, `clientId`, `audience`, `delegatedScopes`, `roles`, `expiresAt`, `grantsVersion` sin fallback `azp ?? sub` ni fusión de `roles`.
 - [ ] Un token con issuer no configurado se rechaza sin ningún fetch de JWKS (test).
@@ -340,3 +359,64 @@ Reglas obligatorias:
 ## Open Questions
 
 - Si el manifest generado transporta `allowedIssuers` o si se declara sólo en el gateway.
+
+## Correction 2026-09-05 — contrato interno coherente
+
+El slice interno consume D1–D7 de TASK-1836: referencia firmada de contexto, reader con permisos efectivos,
+`gv` por contexto y gate de dispatch propio. No inferir población desde el issuer. La activación espera ADR
+común, emisor/reader/verifier/UI compatibles y readback; preservar el slice externo y el carril Entra directo.
+
+
+## Readback de dependencias — 2026-09-05
+
+El hook de ejecución detectó el blocker histórico de flags OFF. Se contrastó con runtime: `/readyz`
+200, `oauth:true`, postgres/kms/activeKey ok; Cloud Run declara OAuth/personas `true` en revisión
+`auth-server-00007-cxb`. El reader canónico PG devuelve `efeonce-auth`, `active`, issuer
+`https://auth.efeonce.org`, audiencia `https://mcp.efeonce.org/mcp`. Esos blockers ya no describen
+la preparación del backend; se conservan los deltas históricos como historia.
+
+Readback inicial del gateway, anterior a la implementación local descrita en Status real: `src/auth/token-verifier.ts` mezcla `scp`, `scope` y `roles`,
+y usa `azp ?? sub`. Discovery público mantiene endpoints de Entra. El contrato nativo no está integrado.
+Ese readback inicial no acredita el estado del código posterior ni su promoción.
+
+
+### Dependencias de rollout (no bloquean implementación local)
+
+El rollout interno exige desplegar reader/emisor TASK-1836, integración UI TASK-1835, credencial workload del reader y canaries TASK-1832; no habilitar emisión nativa antes del consumer compatible.
+
+
+## Evidencia local de integración — 2026-09-05
+
+`pnpm check`: 109 passed, cero skipped, formato/typecheck/tests/build exitosos. Prueba HTTP MCP con JWT
+ES256 firmado y reader simulado verifica aislamiento concurrente, organización ajena denegada, revocación
+de B sin afectar A y OFF con token vigente. La paridad introspecta las 37 tools registradas. Build Docker
+`efeonce-mcp:task1831-local` exitoso; smoke local health/discovery 200 y MCP sin token/token inválido 401. No hubo push ni deploy.
+
+Pruebas adicionales JWKS: 112 tests totales passed, typecheck/build correctos. Refresh a 5 minutos,
+última copia válida hasta 10 minutos desde descarga sólo ante red/timeout/5xx; sin extensión del TTL
+por fallos. Rotación exitosa reemplaza snapshot y no recupera claves retiradas desde snapshots previos.
+
+Pendientes: señales operativas de denegación, compatibilidad de providers
+que aún rechazan población nativa, reader/emisor desplegados, credencial workload gobernada, UI y
+canaries reales. La validación local no acredita la latencia de revocación en producción.
+
+Smoke repetido después del cambio JWKS sobre imagen reconstruida: health y protected-resource 200,
+MCP sin token/token inválido 401, issuer nativo primero y shim conservado con flags nativos ON en
+configuración sintética local. La prueba de metadata AS con tenant sintético devolvió 500 sanitizado
+porque no existe upstream OIDC; no se acredita como éxito de discovery AS. Esa separación de scopes
+sí está probada con upstream simulado en la prueba HTTP. Contenedor eliminado y Colima detenido al
+final, restaurando su estado inicial. `pnpm check` final: 112 passed, cero skipped, exit 0.
+
+Verificación posterior: 114 passed, cero skipped, formato/typecheck/build correctos. Discovery SEO
+ahora envía `market` en query además del body, conforme al reader de Greenhouse. Un test HTTP local
+usa JWT ES256 y adapters reales para consultar entitlement propio con `hasModule=false` y rechazar
+organización ajena antes del provider. Binding y respuesta de Greenhouse son simulados: no acredita
+login, PG ni canary live; no compra datos. El contenedor anterior requiere rebuild con estos cambios.
+
+## Ajuste pre-cohorte: revocación por token — 2026-09-05
+
+El contexto vigente no basta: el gateway interno exige también `jti` firmado (base64url22 del emisor)
+y lo transmite al reader existente, que verifica ledger OAuth y dimensiones. No usa introspección ni
+cache positiva. Revocar familia/consent debe denegar dispatch, además de refresh, sin invalidar otra
+familia que comparte contexto. Pruebas HTTP locales verifican deny antes del provider; el canary real
+sigue pendiente y ambos flags se conservan OFF durante el despliegue de compatibilidad.

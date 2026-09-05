@@ -1,0 +1,12 @@
+/* Approved Product Design direction 1, exact architectural plate + vector text/brands. */
+.editorial-cover{padding:0;background:#023c70;color:white;overflow:hidden;isolation:isolate}
+.editorial-cover .architecture{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-1}
+.editorial-cover .cover-client{position:absolute;left:55px;top:42px;width:91px;height:88px;object-fit:contain}
+.editorial-cover .agency-mark{position:absolute;right:67px;top:59px;width:160px;height:34px;object-fit:contain}
+.editorial-cover .cover-kicker{position:absolute;left:64px;top:150px;margin:0;color:#B3153A;font:600 10px/1.5 Geist;letter-spacing:2.3px}
+.editorial-cover h1{position:absolute;left:60px;top:322px;white-space:pre-line;margin:0;max-width:none;width:620px;color:white;font:600 128px/.85 Poppins;letter-spacing:-5px;padding-bottom:15px}
+.editorial-cover .edition{position:absolute;left:67px;top:571px;font:600 41px/1.4 Poppins;letter-spacing:-1.4px;color:white}
+.editorial-cover .cover-description{position:absolute;left:68px;top:635px;font:400 16px/1.5 Geist;color:white;margin:0}
+.editorial-cover .footer{left:64px;right:auto;bottom:51px;border:0;height:31px;padding:0;background:transparent}
+.editorial-cover .footer img{width:154px;height:31px;object-fit:contain;filter:brightness(0) invert(1)}
+@media print{.editorial-cover{break-after:page}}

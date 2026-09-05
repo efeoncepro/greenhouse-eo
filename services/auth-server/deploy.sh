@@ -66,9 +66,26 @@ DEFAULT_PG_INSTANCE="efeonce-group:us-east4:greenhouse-pg-dev"
 PG_PASSWORD_REF="${PG_PASSWORD_REF:-${DEFAULT_PG_PASSWORD_REF}}"
 PG_INSTANCE="${PG_INSTANCE:-${DEFAULT_PG_INSTANCE}}"
 
+DEFAULT_RESEND_API_KEY_SECRET_REF="greenhouse-resend-api-key-${ENV}"
+RESEND_API_KEY_SECRET_REF="${RESEND_API_KEY_SECRET_REF:-${DEFAULT_RESEND_API_KEY_SECRET_REF}}"
+EMAIL_FROM="${EMAIL_FROM:-Efeonce <greenhouse@efeoncepro.com>}"
+
 AUTH_SERVER_ISSUER="${AUTH_SERVER_ISSUER:-https://auth.efeonce.org}"
 AUTH_SERVER_ALLOWED_HOSTS="${AUTH_SERVER_ALLOWED_HOSTS:-auth.efeonce.org}"
 AUTH_SERVER_KMS_KEY="${AUTH_SERVER_KMS_KEY:-projects/${PROJECT_ID}/locations/${REGION}/keyRings/auth-server/cryptoKeys/auth-server-es256}"
+# Llave SIMÉTRICA del envelope de secretos TOTP (TASK-1830). Es OTRA llave: `auth-server-es256`
+# es EC de firma y no puede cifrar. Creada 2026-09-04 (HSM, ENCRYPT_DECRYPT, rotación 90 d) con
+# `cryptoKeyEncrypterDecrypter` para `auth-server@`.
+AUTH_SERVER_TOTP_KMS_KEY="${AUTH_SERVER_TOTP_KMS_KEY:-projects/${PROJECT_ID}/locations/${REGION}/keyRings/auth-server/cryptoKeys/auth-server-totp-envelope}"
+# TASK-1836: durable corporate references, shared by staging and production on this service.
+# Provisioning these dependencies does not activate login; activation remains a separate decision.
+AUTH_SERVER_INTERNAL_AUTH_ENABLED="${AUTH_SERVER_INTERNAL_AUTH_ENABLED:-false}"
+AUTH_SERVER_ENTRA_TENANT_ID="${AUTH_SERVER_ENTRA_TENANT_ID:-a80bf6c1-7c45-4d70-b043-51389622a0e4}"
+AUTH_SERVER_ENTRA_CLIENT_ID="${AUTH_SERVER_ENTRA_CLIENT_ID:-3a327355-b1a5-4de2-867b-08365c76fcd2}"
+AUTH_SERVER_INTERNAL_LOGIN_KMS_KEY="${AUTH_SERVER_INTERNAL_LOGIN_KMS_KEY:-projects/${PROJECT_ID}/locations/${REGION}/keyRings/auth-server/cryptoKeys/auth-server-internal-login-envelope}"
+AUTH_SERVER_ENTRA_CLIENT_SECRET_REF="${AUTH_SERVER_ENTRA_CLIENT_SECRET_REF:-auth-server-entra-client-secret:1}"
+AUTH_SERVER_ENTRA_CLIENT_SECRET_REF="$(normalize_secret_ref_for_cloud_run "${AUTH_SERVER_ENTRA_CLIENT_SECRET_REF}")"
+
 
 echo "=== $(printf "%s" "${ENV}" | tr "[:lower:]" "[:upper:]") deployment of ${SERVICE_NAME} (${REGION}) ==="
 
@@ -79,10 +96,51 @@ if ! gcloud kms keys describe "${AUTH_SERVER_KMS_KEY}" --project="${PROJECT_ID}"
   exit 1
 fi
 
+if ! gcloud kms keys describe "${AUTH_SERVER_TOTP_KMS_KEY}" --project="${PROJECT_ID}" >/dev/null 2>&1; then
+  echo "ERROR: TOTP envelope KMS key '${AUTH_SERVER_TOTP_KMS_KEY}' not found. Run TASK-1830 Slice 3 provisioning first."
+  exit 1
+fi
+
 if ! gcloud iam service-accounts describe "${SERVICE_ACCOUNT}" --project="${PROJECT_ID}" >/dev/null 2>&1; then
   echo "ERROR: runtime service account '${SERVICE_ACCOUNT}' not found. Run TASK-1828 Slice 0 first."
   exit 1
 fi
+
+# Validate configured corporate dependencies even while OFF, before paying for a build.
+if [[ "${AUTH_SERVER_INTERNAL_AUTH_ENABLED}" != "true" && "${AUTH_SERVER_INTERNAL_AUTH_ENABLED}" != "false" ]]; then
+  echo "ERROR: AUTH_SERVER_INTERNAL_AUTH_ENABLED must be true or false."
+  exit 1
+fi
+UUID_PATTERN='^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+if [[ ! "${AUTH_SERVER_ENTRA_TENANT_ID}" =~ ${UUID_PATTERN} || ! "${AUTH_SERVER_ENTRA_CLIENT_ID}" =~ ${UUID_PATTERN} ]]; then
+  echo "ERROR: corporate tenant and client must be UUIDs."
+  exit 1
+fi
+INTERNAL_KMS_PURPOSE="$(gcloud kms keys describe "${AUTH_SERVER_INTERNAL_LOGIN_KMS_KEY}" --project="${PROJECT_ID}" --format='value(purpose)' 2>/dev/null)" || {
+  echo "ERROR: corporate login envelope KMS key unavailable."
+  exit 1
+}
+if [ "${INTERNAL_KMS_PURPOSE}" != "ENCRYPT_DECRYPT" ]; then
+  echo "ERROR: corporate login envelope requires a symmetric ENCRYPT_DECRYPT key."
+  exit 1
+fi
+# Canonical IAM helper strips :latest only. Pass the unversioned name explicitly for numeric pins.
+if [[ "${AUTH_SERVER_ENTRA_CLIENT_SECRET_REF}" == projects/*/secrets/*/versions/* ]]; then
+  INTERNAL_SECRET_NAME="$(extract_secret_name "${AUTH_SERVER_ENTRA_CLIENT_SECRET_REF}")"
+  INTERNAL_SECRET_VERSION="${AUTH_SERVER_ENTRA_CLIENT_SECRET_REF##*/versions/}"
+else
+  INTERNAL_SECRET_NAME="${AUTH_SERVER_ENTRA_CLIENT_SECRET_REF%%:*}"
+  INTERNAL_SECRET_VERSION="${AUTH_SERVER_ENTRA_CLIENT_SECRET_REF##*:}"
+fi
+INTERNAL_SECRET_STATE="$(gcloud secrets versions describe "${INTERNAL_SECRET_VERSION}" --secret="${INTERNAL_SECRET_NAME}" --project="${PROJECT_ID}" --format='value(state)' 2>/dev/null)" || {
+  echo "ERROR: corporate client secret version unavailable."
+  exit 1
+}
+if [ "${INTERNAL_SECRET_STATE}" != "ENABLED" ]; then
+  echo "ERROR: corporate client secret version must be ENABLED."
+  exit 1
+fi
+ensure_secret_accessor_binding "${INTERNAL_SECRET_NAME}"
 
 # ─── Build (Cloud Build, inline config, async + poll) ───────────────────────
 
@@ -173,18 +231,44 @@ ENV_VARS="${ENV_VARS},AUTH_SERVER_KMS_KEY=${AUTH_SERVER_KMS_KEY}"
 # TASK-1829 — superficie OAuth del emisor (metadata RFC 8414/OIDC, CIMD/DCR, /oauth/*).
 # OFF ⇒ los endpoints OAuth y la metadata responden 404; sólo /readyz y el JWKS siguen vivos.
 # Ledger: docs/operations/FEATURE_FLAG_STATE_LEDGER.md (runtime auth-server únicamente).
-ENV_VARS="${ENV_VARS},AUTH_SERVER_OAUTH_ENABLED=${AUTH_SERVER_OAUTH_ENABLED:-false}"
+ENV_VARS="${ENV_VARS},AUTH_SERVER_OAUTH_ENABLED=${AUTH_SERVER_OAUTH_ENABLED:-true}"
 # environment_id del emisor en greenhouse_core.external_identity_environments (TASK-1631): la
 # llave durable con la que se resuelve (subject → identity_profile → bindings → gv). Nunca el issuer crudo.
 ENV_VARS="${ENV_VARS},AUTH_SERVER_ENVIRONMENT_ID=${AUTH_SERVER_ENVIRONMENT_ID:-efeonce-auth}"
 # Audiencia única del recurso MCP (nunca un alias).
 ENV_VARS="${ENV_VARS},AUTH_SERVER_MCP_AUDIENCE=${AUTH_SERVER_MCP_AUDIENCE:-https://mcp.efeonce.org/mcp}"
+# TASK-1830 — autenticación de personas (magic link, sesión propia `__Host-efeonce_auth`, passkeys,
+# TOTP). OFF ⇒ `/login`, `/auth/*` y `/m/*` responden 404 y el `SubjectSessionPort` devuelve `null`,
+# así que `authorize` sigue en `login_required`. Ledger: docs/operations/FEATURE_FLAG_STATE_LEDGER.md
+# (runtime auth-server únicamente).
+ENV_VARS="${ENV_VARS},AUTH_SERVER_PERSON_AUTH_ENABLED=${AUTH_SERVER_PERSON_AUTH_ENABLED:-true}"
+ENV_VARS="${ENV_VARS},AUTH_SERVER_TOTP_KMS_KEY=${AUTH_SERVER_TOTP_KMS_KEY}"
+# TASK-1836: independent corporate lane. Never implicitly turn it on with persons/OAuth.
+ENV_VARS="${ENV_VARS},AUTH_SERVER_INTERNAL_AUTH_ENABLED=${AUTH_SERVER_INTERNAL_AUTH_ENABLED}"
+ENV_VARS="${ENV_VARS},AUTH_SERVER_ENTRA_TENANT_ID=${AUTH_SERVER_ENTRA_TENANT_ID}"
+ENV_VARS="${ENV_VARS},AUTH_SERVER_ENTRA_CLIENT_ID=${AUTH_SERVER_ENTRA_CLIENT_ID}"
+ENV_VARS="${ENV_VARS},AUTH_SERVER_INTERNAL_LOGIN_KMS_KEY=${AUTH_SERVER_INTERNAL_LOGIN_KMS_KEY}"
+
+# Correo del magic link por el pipeline gobernado (`sendEmail`). Sin esto el enlace nunca sale y el
+# acceso queda muerto en silencio: la respuesta es idéntica por anti-enumeración y no puede avisar.
+ENV_VARS="${ENV_VARS},EMAIL_FROM=${EMAIL_FROM}"
+ENV_VARS="${ENV_VARS},RESEND_API_KEY_SECRET_REF=${RESEND_API_KEY_SECRET_REF}"
 ENV_VARS="${ENV_VARS},SENTRY_ENVIRONMENT=${ENV}"
 
 # ─── Secrets (Secret Manager → env) ─────────────────────────────────────────
 
 SECRETS="GREENHOUSE_POSTGRES_PASSWORD=${PG_PASSWORD_REF}"
 ensure_secret_accessor_binding "${PG_PASSWORD_REF}"
+SECRETS="${SECRETS},AUTH_SERVER_ENTRA_CLIENT_SECRET=${AUTH_SERVER_ENTRA_CLIENT_SECRET_REF}"
+# El mailer resuelve esta referencia desde el runtime: declarar la env var no concede IAM.
+# 🔴 El secreto se MONTA, no basta con declarar la referencia. `sendEmail` usa el cliente SÍNCRONO
+# de Resend, que lee un secreto YA resuelto: el carril `*_SECRET_REF` sólo funciona donde algo lo
+# resuelve async primero, y acá nadie lo hace. Sin esta línea el magic link responde 202 igual —la
+# respuesta es idéntica por anti-enumeración— y el correo muere con «RESEND_API_KEY is not
+# configured» en `email_deliveries`, sin que nadie se entere. Detectado en vivo por
+# `pnpm auth-server:person-auth:canary` el 2026-09-05; mismo patrón que ops-worker.
+SECRETS="${SECRETS},RESEND_API_KEY=$(normalize_secret_ref_for_cloud_run "${RESEND_API_KEY_SECRET_REF}")"
+ensure_secret_accessor_binding "${RESEND_API_KEY_SECRET_REF}"
 
 SENTRY_DSN_SECRET_NAME="${SENTRY_DSN_SECRET_NAME:-greenhouse-sentry-dsn}"
 

@@ -469,6 +469,39 @@ describe('TASK-1631 — acceptExternalInvitation', () => {
     ).rejects.toMatchObject({ code: 'identity_collision' })
   })
 
+  it('desactiva los subjects ANTERIORES de la misma persona y los devuelve (recuperación, TASK-1830)', async () => {
+    route([
+      [/WHERE token_hash = \$1\s+FOR UPDATE/, () => [invitationRow({ profile_id: 'p-1' })]],
+      [/WHERE b\.binding_id = \$1\s+FOR UPDATE OF b/, () => [bindingRow()]],
+      [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
+      [/SELECT profile_id FROM greenhouse_core\.identity_profile_source_links/, () => []],
+      [/SELECT active, status, merged_into_profile_id/, () => [{ active: true, status: 'active', merged_into_profile_id: null }]],
+      [/INSERT INTO greenhouse_core\.identity_profile_source_links/, () => []],
+      [/UPDATE greenhouse_core\.identity_profile_source_links/, () => [{ source_object_id: 'sub-viejo' }]],
+      [/revoke_reason = 'superseded_by_reinvitation'/, () => []],
+      [/SET status = 'linked'/, params => [
+        invitationRow({ status: 'linked', profile_id: params[1], link_id: params[2], linked_at: '2026-09-04T00:00:00Z', accepted_at: '2026-09-04T00:00:00Z' })
+      ]],
+      [/INSERT INTO greenhouse_core\.external_identity_audit_log/, () => []]
+    ])
+
+    const result = await acceptExternalInvitation(
+      { token: 'tok', environmentId: 'efeonce-auth', subject: 'sub-nuevo' },
+      authServer
+    )
+
+    // El emisor usa esta lista para matar sesión, passkeys y TOTP del subject viejo. Sin ella, quien
+    // tuviera el passkey anterior conservaría el acceso que la re-invitación pretende quitarle.
+    expect(result.supersededSubjects).toEqual(['sub-viejo'])
+
+    const params = calls(/UPDATE greenhouse_core\.identity_profile_source_links/)[0]?.[1] as unknown[]
+
+    // Sólo los OTROS subjects del mismo perfil y environment; el recién ligado no se toca.
+    expect(params[0]).toBe('p-1')
+    expect(params[1]).toBe('external_idp:efeonce-auth')
+    expect(params[3]).toBe('sub-nuevo')
+  })
+
   it('creates a new external_contact profile when nobody matches, links (environment, subject) and marks linked', async () => {
     route([
       [/WHERE token_hash = \$1\s+FOR UPDATE/, () => [invitationRow({ designated_admin: true })]],
@@ -478,6 +511,7 @@ describe('TASK-1631 — acceptExternalInvitation', () => {
       [/lower\(canonical_email\) = \$1/, () => []],
       [/INSERT INTO greenhouse_core\.identity_profiles/, () => []],
       [/INSERT INTO greenhouse_core\.identity_profile_source_links/, () => []],
+      [/UPDATE greenhouse_core\.identity_profile_source_links/, () => []],
       [/revoke_reason = 'superseded_by_reinvitation'/, () => []],
       [/SET status = 'linked'/, params => [
         invitationRow({ status: 'linked', profile_id: params[1], link_id: params[2], linked_at: '2026-09-04T00:00:00Z', accepted_at: '2026-09-04T00:00:00Z' })

@@ -7,6 +7,72 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-05 — TASK-1836: autoridad corporativa nativa y límites de autenticación
+
+Backend local con Entra OIDC, procedencia de sesión persistida, contexto delegado por cliente/binding,
+consentimiento aislado y refresh sin rejuvenecer auth_time. Enrolamiento interno gobernado sobre la
+persona y organización propias, grants personales con vigencia y reader sin caché positiva. Tres migraciones
+aplicadas en PG compartido; pruebas reales de persistencia/identidad/GC y UV ligado a sesión. Tras aviso de Claude se añaden
+límites passkey y limpieza SECURITY DEFINER acotada de estado vencido; auditoría y familias refresh vivas
+se conservan. App Entra, secreto y KMS dedicados preparados con cohorte upstream individual. Emisor
+y gateway publicados con gates internos OFF; sin acceso MCP interno real todavía. Gateway con 114 pruebas y JWKS acotado; first fold UI con
+GVC anónimo sin credenciales, pendiente aprobación visual. Consentimiento revalida binding/step-up
+y reader externo excluye grants vencidos. DTO canónico integrado en authorize, POST y renderer;
+permisos separados por organización y fallos sin fallback. Retorno OAuth/Microsoft conectado con flag y validación de URL; code/refresh revalidan scopes actuales del cliente. Guard de origen protege sesiones y factores, con regresiones de login CSRF; shell consume fuentes/licencias y CSS bajo CSP estricta; segundo factor TOTP/UV y alta con QR local integrados. Cuatro GVC desktop/móvil y seis checks de navegador pasan con factores ficticios. Primer despliegue autorizado con gates OFF; recheck por jti agrega revocación del token a la validación de contexto antes de activar la cohorte. El piloto ya tiene enrollment y grant de lectura temporal, por commands canónicos. Se restauran seis permisos release faltantes del rol administrador (execute ya existía), con negativos para los otros roles y Finance sólo lectura de resultados. CLI exige motivo para excepciones y lo conserva en manifest/auditoría; no inventa identidad Greenhouse desde GitHub actor. Pruebas focales 46 passed y typecheck correcto. Consumer productivo, UI completa/canaries y activación GC pendientes. [Runbook](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
+
+## 2026-09-04 — TASK-1830: autenticación de personas externas del emisor, sin contraseñas (viva desde el 05)
+
+**Delta 2026-09-05 — activada, y el correo del magic link estaba muerto.** El operador prendió ambos
+flags (revisión `auth-server-00007-cxb`) y la superficie quedó viva. El canary nuevo
+`pnpm auth-server:person-auth:canary` —que ejercita el contrato HTTP contra el host desplegado, no el
+SQL contra la base— encontró en su primera corrida que el enlace de acceso fallaba con
+`RESEND_API_KEY is not configured`: el `deploy.sh` declaraba el `*_SECRET_REF` sin montar el secreto,
+y `sendEmail` usa el cliente síncrono, que lee un secreto ya resuelto. Arreglado en `deploy.sh`,
+pendiente de redeploy.
+
+Nadie se habría enterado: la respuesta al pedir un enlace es 202 idéntica exista o no el correo, así
+que un correo muerto no se reporta solo (misma clase que `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED`). De
+ahí la regla generalizable: **toda superficie cuya respuesta es deliberadamente indistinguible
+necesita una verificación externa de su efecto**, porque por diseño renunció a reportarlo.
+
+Verificado en vivo por primera vez (22 ok / 0 fallidos): consumo del enlace y su uso único, sesión
+sin filtrar el sujeto, passkey con `uv` abriendo en `step_up`, TOTP con secreto cifrado por KMS,
+anti-replay y muerte de la sesión al revocar el link. El canary comprueba además que la señal de
+sesión huérfana **se enciende** al revocar —un detector que sólo se ve en `ok` es una afirmación— y
+distingue tres estados: verde, rojo e **incompleto**, porque un canary con pasos omitidos no es
+verde. Pendiente: redeploy, organización elegible para el carril de tokens, passkey en dos
+navegadores y el límite de tasa del reto de passkey anónimo.
+
+
+Cuatro slices en `develop` detrás de `AUTH_SERVER_PERSON_AUTH_ENABLED=false`: sesión propia
+(`__Host-efeonce_auth`) que implementa el `SubjectSessionPort` que dejaba a `authorize` en
+`login_required` desde TASK-1829; magic link con patrón selector/verificador (15 min, un uso, consumo
+por POST tras página intermedia porque los escáneres de correo abren los GET); passkeys con
+credenciales descubribles —sin `allowCredentials`, que sería un oráculo de existencia— y contador
+anti-clonación; TOTP de step-up cifrado con la llave KMS **simétrica** `auth-server-totp-envelope`
+creada el mismo día (la de firma es EC y no cifra), con AAD `<environment>|<subject>` verificada
+contra la llave real; recuperación por re-invitación auditada, sin self-service de reset.
+
+8 tablas `greenhouse_auth` aplicadas y verificadas contra PG real, capability
+`identity.auth_person.revoke` con su ruta admin por Full API Parity y 3 señales `auth.person.*`.
+Desviaciones declaradas: ledger propio `person_auth_attempts` (el del portal tiene CHECK cerrados de
+NextAuth y GRANT a otro rol) y `sha256`+timing-safe en vez de bcrypt (un KDF lento no agrega nada
+sobre 256 bits y sí 300-800 ms de CPU en un endpoint no autenticado).
+
+Cuatro defectos los encontró el trabajo, no una revisión: la librería de WebAuthn lanzaba al
+retroceder el contador y dejaba **viva** la credencial clonada; `deactivateOrphanSourceLinks` no se
+llamaba al aceptar una re-invitación, así que el subject anterior seguía autenticando y la
+recuperación no recuperaba nada; `epochTolerance` de `otplib` va en `verify` y el `epoch` en
+segundos; y un código mal formado hacía responder 500 a un endpoint público de autenticación.
+
+Falta rollout: prender el flag en staging (exige `AUTH_SERVER_OAUTH_ENABLED=true` + environment
+`efeonce-auth` en `active`), verificar que el correo sale de verdad por Resend y probar passkey en
+dos navegadores.
+
+## 2026-09-04 — Release `9100bbd2765d` a producción: EPIC-044 (auth-server + OAuth code complete) y TASK-1631
+
+PR #221 squash `9100bbd27`, orquestador `33893120972` (un run, sin retry), manifest `released` 16:39:40Z. `auth-server` en producción (`/readyz` 200, JWKS 2 kid, superficie OAuth 404 con `AUTH_SERVER_OAUTH_ENABLED=false`), TASK-1631 lane ecosystem verificado en prod, 4/4 workers + auth-server Ready (dos change-gated con árbol idéntico). Post-release: `AUTH_SERVER_JWKS_URL` en Vercel Production+staging con redeploy; environment `efeonce-auth` registrado `draft` por command (`pnpm auth-server:register-issuer-environment`). El watchdog aprendió el change-gate del `auth-server` (espejo por servicio + test de paridad con los workflows). Ledger de tiempos y de flags actualizados. Barrido documental del release: control plane, playbook (anti-patterns #17/#18), runbooks y manuales del orquestador/watchdog/auth-server, ADR nativo, contrato OAuth, `CLOUD_RUN.md`, EPIC-044, rule `auth-server` y skills `efeonce-mcp-platform` (+espejo Codex), `greenhouse-production-release` y `greenhouse-backend`.
+
 ## 2026-09-04 — TASK-1829 (EPIC-044 U02): superficie OAuth del emisor propio, code complete detrás de flag
 
 `auth.efeonce.org` gana su protocolo, detrás de `AUTH_SERVER_OAUTH_ENABLED=false` (`services/auth-server/deploy.sh`):
@@ -847,103 +913,3 @@ ráfagas el veredicto es del último push, y una alarma sostenida se normaliza h
 invisible. El skip de 44 s del ops-worker esta vez fue legítimo (árboles
 idénticos, diff completo vacío): mismo síntoma que el incidente anterior, causa opuesta — los
 distingue el diff, no el cronómetro.
-
-## 2026-08-29 — la cuarta llave invisible: el orden servido de la cola contradecía el rank persistido en banda 2
-
-Auditoría independiente post-release sobre el snapshot vigente: 54 de 55 items de banda 2 de
-`seot-efeonce-own-brand` salían fuera de su `rank_in_snapshot`. El comparador del materializador
-desempata esa banda por impresiones — un valor que no es columna — y el reader reconstruía el orden
-en SQL con las tres llaves que sí lo son; con el score NULL en toda la banda, colapsaba a orden
-alfabético. El test de paridad comparaba el **string** del SQL contra una constante, así que
-consagraba un modelo de tres llaves que el comparador no seguía y pasaba verde con el defecto
-puesto. Invisible en Berel (todo banda 1); total en la org sin curva — que es toda org nueva.
-
-El fix no agrega la columna que falta: **deja de reconstruir**. El reader sirve y pagina
-`rank_in_snapshot` (único, sin NULL, ahora con UNIQUE index estructural), y la coincidencia entre
-orden servido y persistido pasa a ser por construcción. Mueren de paso la disciplina `COLLATE "C"`
-del reader, el cursor expandido con NULLs y el test por string. Re-medido paginando la corrida real
-de punta a punta: 0 discrepancias en ambos targets, bandas 1 y 3 sin regresión. En el mismo tren se
-quemó la deuda de procedencia de `work-queue` (TASK-1785): fuente nueva `own_ctr_model` para el caso
-«insumos medidos, resultado estimado», censo en `emitted`. Queda con dueño el retiro post-release
-del índice de keyset huérfano. La bug class quedó documentada como la TERCERA de
-`SQL_DATE_MATH_AGENT_INVARIANTS` §"Orden y paginación", con el corolario de protocolo que la habría
-atrapado: la detección se corre sobre el dataset que EXHIBE cada estado, no sobre el más grande.
-
-## 2026-08-29 — el filtro que decide si un worker se despliega llevaba tiempo describiendo un bundle que ya no existía
-
-El release de `incremental-clicks-v2` cerró verde en todo: manifest `released`, Vercel READY,
-watchdog sin drift, tres de cuatro workers en el SHA. El `ops-worker` estaba sirviendo la versión
-**anterior** — o sea el predicado de canibalización que ese mismo release existía para corregir.
-Su job no falló: duró 46 segundos, se saltó el deploy solo y cerró `success`.
-
-La decisión de desplegar se tomaba contra `WORKER_RUNTIME_PATHS`, una lista de rutas mantenida a
-mano. Medido con el metafile de esbuild —el mismo bundle que arma el Dockerfile—, el `ops-worker`
-empaqueta **1449 archivos** y la lista cubría **24 prefijos**: **696 archivos invisibles**, entre
-ellos `src/lib/postgres`, casi todo `src/lib/finance` y todo `src/lib/growth/seo`. Como 1385 de los
-1449 vienen de `src/lib`, enumerar subdirectorios nunca iba a sostenerse.
-
-No era la primera vez. Los comentarios del propio workflow documentan **cinco** recurrencias
-(TASK-1210, 742, 1723, 1746, 1279) y cada una se cerró agregando una ruta más. La sexta habría sido
-`src/lib/growth/seo`.
-
-Ahora la declaración es la verdadera —gruesa a propósito, y sigue evitando el redeploy por cambios a
-`src/app/**`, `docs/**` o `tests/**`— y hay un gate, `pnpm worker:deploy-path-gate`, que la mantiene
-verdadera derivándola del árbol real del bundle en vez de la lista escrita. Corriéndolo aparecieron
-dos huecos más: `commercial-cost-worker` e `ico-batch` tampoco cubrían `services/_shared/sentry-init.ts`,
-que ambos bundlean.
-
-Con el worker ya en el SHA correcto, la cola se rematerializó **sin** `force`: el piso de recomputación
-filtra por versión, así que un snapshot v1 dejó de contar como reciente. En Berel MX `consolidation`
-cayó de 200 a 11 mientras `gsc_striking_distance` subía de 168 a 200 — reclasificación, no filtrado
-de más. Y el 200 de v1 era el tope de `maxItemsPerOrigin`, o sea que el número real estaba truncado:
-la mejora es mayor que la que muestra la resta.
-
-## 2026-08-29 — el detector de canibalización de la cola SEO detectaba marca, y de paso vaciaba media pantalla
-
-La cola priorizada decidía si una keyword era canibalización preguntando "¿aparece más de una página
-del sitio?". Medido contra berel.com sobre 28 días, eso no mide canibalización: la población no-marca
-tenía **80,7 %** de sus impresiones concentradas en su página principal y la de marca **34,2 %**. El
-predicado seleccionaba marca — donde el sitio ocupa legítimamente su propia SERP. El caso que lo
-retrata es la query de mayor demanda del sitio: `pinturas`, 41 páginas, **99,3 %** de las impresiones
-en una sola, y la cola proponiendo "fusiona 41 URLs" sobre el ítem #1.
-
-El daño mayor estaba en el otro lado. Como el colector de striking-distance excluía todo lo
-multi-página, sacaba **216 de 269** filas de su ventana: reconstruida la lente, el operador veía
-**92 keywords donde el reader anterior mostraba 269**. Al validar el cutover se verificó la dirección
-que agregaba filas y nunca la que las quitaba.
-
-`incremental-clicks-v2` corrige el predicado (no-marca ∧ concentración de la principal ≤ 70 % ∧ ≥2
-páginas fusionables), lo escribe en **un solo lugar** que los dos colectores importan —antes estaba
-escrito dos veces— y separa dos preguntas que parecían una: quién se queda con la query se mide sobre
-todas las páginas, home incluida; qué se puede fusionar excluye home, PDFs e imágenes. Mezclarlas
-invierte el veredicto, y lo destapó medir: al sacar la home también del denominador, `pinturas` cayó a
-13,2 % y volvió a salir canibalizada. La marca tolera un error de tipeo, que no era un lujo: `bereñ`
-con 38 páginas, `verel`, `berol`, `berrl`, `betel`, `berem`, `bere` — 16 queries de marca entraban
-como canibalización.
-
-De 400 candidatas, v1 llamaba canibalizadas 400 y v2 llama 11; la población real del sitio son 29.
-Quedan ~5 sub-marcas propias (`kover` son 19 fichas de una línea de producto) que no se detectan desde
-el dominio: es un límite declarado en la versión, no un pendiente silencioso, y cerrarlo exige una
-fuente de marca con autor.
-
-El bump destapó dos defectos latentes que sólo existen cuando hay más de una versión: el piso de
-recomputación reusaba snapshots de otra versión y devolvía la versión activa sobre ellos —un campo que
-miente—, y la huella congelada de parámetros no puede ver un cambio de fórmula. Lo primero ahora filtra
-por versión con su gate; lo segundo tiene vectores dorados que congelan la salida.
-
-## 2026-08-29 — La cola SEO empieza a correr sola, y un detector que avisaba a tiempo no llegaba a nadie
-
-Los dos schedulers del módulo quedaron activos: `ops-seo-work-queue-materialize` (`0 10 * * *`, tras
-corrida shadow con la identidad OIDC real y revisión fila por fila) y `ops-seo-competitor-coverage`
-(`0 9 18 * *`, ~USD 0,11/mes). Ambos despausados en el **SoT y en vivo**, porque
-`upsert_scheduler_job` re-aplica `pause`/`resume` en cada deploy y un resume suelto se revierte solo.
-
-El hallazgo del día no fue técnico sino de enrutamiento: la credencial AXIS que bloqueó el release
-**sí tenía detector, y avisó tres días antes** con el modo de falla exacto. Nadie lo leyó porque su
-único canal de salida era el color de su corrida, y ese color ya venía rojo por un bug ajeno. Un gate
-cuyo único canal es su propio color es un registro, no una alerta; y un detector con rojo crónico
-deja de ser un detector. `TASK-1794` recoge el arreglo, con el check de preflight primero — poner la
-medición donde alguien esté obligado a mirar.
-
-De paso: la arquitectura afirmaba en cuatro lugares que un scheduler estaba activo cuando estaba
-pausado, y el runbook de AXIS documentaba el `.npmrc` con una línea de menos.

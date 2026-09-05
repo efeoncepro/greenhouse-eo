@@ -405,9 +405,10 @@ const getPersistedAssignments = async () => {
   }
 }
 
-const getPersistedUserOverrides = async () => {
+const getPersistedUserOverrides = async ({ strict = false }: { strict?: boolean } = {}) => {
   try {
-    await expireStaleUserOverrides()
+    // Strict authorization reads expiry in SQL and never run best-effort cleanup/notification adapters.
+    if (!strict) await expireStaleUserOverrides()
 
     const rows = await runGreenhousePostgresQuery<UserOverrideRow>(
       `
@@ -1053,18 +1054,21 @@ export const resolveAuthorizedViewsForUser = async ({
   userId,
   roleCodes,
   tenantType,
-  fallbackRouteGroups
+  fallbackRouteGroups,
+  strict = false
 }: {
   userId?: string | null
   roleCodes: string[]
   tenantType: 'client' | 'efeonce_internal'
   fallbackRouteGroups: string[]
+  /** Auth authority: storage errors propagate; only successful empty reads use canonical defaults. */
+  strict?: boolean
 }): Promise<ResolvedUserViewAccess> => {
   try {
     const [persistedRows, persistedRegistryRows, persistedUserOverrides] = await Promise.all([
       getPersistedAssignments(),
-      getPersistedViewRegistry().catch(() => []),
-      getPersistedUserOverrides().catch(() => [])
+      strict ? getPersistedViewRegistry() : getPersistedViewRegistry().catch(() => []),
+      strict ? getPersistedUserOverrides({ strict: true }) : getPersistedUserOverrides().catch(() => [])
     ])
 
     const registryRows = toRegistryRows(persistedRegistryRows)
@@ -1092,7 +1096,7 @@ export const resolveAuthorizedViewsForUser = async ({
 
     // Layer 2 — Permission Sets (additive, TASK-263)
     const permissionSetViews = userId
-      ? await resolvePermissionSetViews(userId).catch(() => [] as string[])
+      ? await (strict ? resolvePermissionSetViews(userId) : resolvePermissionSetViews(userId).catch(() => [] as string[]))
       : []
 
     const overridesForUser = userId
@@ -1116,6 +1120,8 @@ export const resolveAuthorizedViewsForUser = async ({
       routeGroups: fallbackRouteGroups
     }
   } catch (error) {
+    if (strict) throw error
+
     if (error instanceof ViewAccessStoreError && error.code === 'SCHEMA_NOT_READY') {
       // TASK-1678 Slice 4 — un camino degradado nunca devuelve más permisos que el
       // camino feliz.

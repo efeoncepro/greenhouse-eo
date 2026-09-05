@@ -1,3 +1,6 @@
+import { createServer } from 'node:http'
+
+import { internalAuthEnabled } from '@/lib/auth-server/internal/config'
 /**
  * Efeonce Auth Server — Cloud Run Service (TASK-1828 runtime · TASK-1829 OAuth, EPIC-044)
  *
@@ -14,7 +17,6 @@
  * vive en Cloud KMS HSM; ningún error interno se devuelve al cliente en prosa.
  */
 
-import { createServer } from 'node:http'
 
 // TASK-844 — Sentry init must run BEFORE any function from @/lib/** is invoked.
 import { initSentryForService } from '../_shared/sentry-init'
@@ -31,9 +33,23 @@ import {
 import {
   createExternalAccessGrantsPort,
   PostgresOAuthStore,
-  readAuthServerOAuthConfig,
-  unauthenticatedSubjectPort
+  readAuthServerOAuthConfig
 } from '@/lib/auth-server/oauth'
+import {
+  createExternalInvitationAcceptancePort,
+  createGovernedMagicLinkMailer,
+  createPersonSubjectPort,
+  createCloudKmsTotpCipher,
+  createSourceLinkDirectoryPort,
+  deriveRpId,
+  expectedSourceSystemFor,
+  mintOpaqueSubject,
+  PostgresPersonAuthStore,
+  readAuthServerPersonAuthConfig
+} from '@/lib/auth-server/persons'
+import { createInternalAuthRuntime } from '@/lib/auth-server/internal/runtime'
+import { createNativeGrantsPort } from '@/lib/auth-server/internal/grants'
+import { captureWithDomain } from '@/lib/observability/capture'
 
 import { createAuthServerRequestHandler, SERVICE_NAME } from './app'
 
@@ -46,6 +62,7 @@ const AUTH_SERVER_ENABLED = process.env.AUTH_SERVER_ENABLED?.trim().toLowerCase(
 const ALLOWED_HOSTS = (process.env.AUTH_SERVER_ALLOWED_HOSTS ?? '').split(',')
 const GIT_SHA = process.env.GIT_SHA ?? 'unknown'
 const oauthConfig = readAuthServerOAuthConfig()
+const personAuthConfig = readAuthServerPersonAuthConfig()
 
 let kmsSigner: KmsSignerPort | null = null
 
@@ -56,6 +73,46 @@ const getSigner = (): KmsSignerPort => {
 }
 
 // ─── Wiring ─────────────────────────────────────────────────────────────────
+
+const personStore = new PostgresPersonAuthStore()
+const expectedSourceSystem = expectedSourceSystemFor(oauthConfig.environmentId)
+
+/** Deps compartidas por el router de personas y por el `SubjectSessionPort` que consume `authorize`. */
+const personDeps = {
+  internalLoginEnabled: () => internalAuthEnabled() && personAuthConfig.personAuthEnabled && oauthConfig.oauthEnabled,
+  store: personStore,
+  config: personAuthConfig,
+  directory: createSourceLinkDirectoryPort(),
+  mailer: createGovernedMagicLinkMailer(),
+  invitations: createExternalInvitationAcceptancePort(),
+  mintSubject: mintOpaqueSubject,
+  environmentId: oauthConfig.environmentId,
+  expectedSourceSystem,
+  issuer: oauthConfig.issuer,
+  // `rpId` es el HOST del emisor: `auth.efeonce.org`, sin esquema. Si no coincide exactamente con
+  // el origen que ve el navegador, la ceremonia WebAuthn falla del lado del cliente.
+  rpId: deriveRpId(oauthConfig.issuer),
+  onPasskeyCounterRegression: ({ credentialId }: { credentialId: string }) =>
+    console.warn(`[${SERVICE_NAME}] passkey counter regression — credential revoked: ${credentialId}`),
+  // Llave SIMÉTRICA propia (`auth-server-totp-envelope`): la de firma es EC y no puede cifrar.
+  totpCipher: createCloudKmsTotpCipher(),
+  onTotpEnvelopeUnavailable: () =>
+    console.error(`[${SERVICE_NAME}] TOTP envelope unavailable — step-up failing closed`),
+  now: () => new Date(),
+  onError: (error: unknown, context: Record<string, unknown>) =>
+    captureWithDomain(error, 'identity', { tags: { component: SERVICE_NAME, ...context } })
+}
+
+const baseSubject = createPersonSubjectPort({
+    store: personStore,
+    config: personAuthConfig,
+    environmentId: oauthConfig.environmentId,
+    expectedSourceSystem,
+    onInvalidSession: status =>
+      console.warn(`[${SERVICE_NAME}] session invalidated by source link: ${status}`)
+  })
+
+const internalAuth = createInternalAuthRuntime({oauthConfig,personConfig:personAuthConfig,personStore,baseSubject})
 
 const handler = createAuthServerRequestHandler({
   enabled: AUTH_SERVER_ENABLED,
@@ -70,10 +127,14 @@ const handler = createAuthServerRequestHandler({
   getSigner,
   signAccessToken: payload => signWithActiveKey({ signer: getSigner(), payload }),
   store: new PostgresOAuthStore(),
-  // TASK-1830 reemplaza este port por la sesión propia (`__Host-efeonce_auth`); hasta entonces
-  // `authorize` responde `login_required` y ningún code se emite.
-  subjectPort: unauthenticatedSubjectPort,
-  grantsPort: createExternalAccessGrantsPort(),
+  // TASK-1830 — la persona la resuelve la sesión propia (`__Host-efeonce_auth`). Con
+  // `AUTH_SERVER_PERSON_AUTH_ENABLED=false` el port devuelve `null` y `authorize` sigue
+  // respondiendo `login_required`: prender la superficie es un flag, no un deploy distinto.
+  subjectPort: internalAuth.subjectPort,
+  consentContextPort: internalAuth.consentContextPort,
+  internal: internalAuth.handler,
+  persons: personDeps,
+  grantsPort: createNativeGrantsPort({config:oauthConfig,internal:internalAuth.contexts,external:createExternalAccessGrantsPort()}),
   cimd: {}
 })
 
@@ -83,7 +144,7 @@ const server = createServer((req, res) => {
 
 server.listen(PORT, () => {
   console.log(
-    `[${SERVICE_NAME}] listening on :${PORT} enabled=${AUTH_SERVER_ENABLED} oauth=${oauthConfig.oauthEnabled} issuer=${oauthConfig.issuer} env=${oauthConfig.environmentId} hosts=${ALLOWED_HOSTS.map(h => h.trim()).filter(Boolean).join(',') || '*'} gitSha=${GIT_SHA}`
+    `[${SERVICE_NAME}] listening on :${PORT} enabled=${AUTH_SERVER_ENABLED} oauth=${oauthConfig.oauthEnabled} persons=${personAuthConfig.personAuthEnabled} issuer=${oauthConfig.issuer} env=${oauthConfig.environmentId} hosts=${ALLOWED_HOSTS.map(h => h.trim()).filter(Boolean).join(',') || '*'} gitSha=${GIT_SHA}`
   )
 
   if (AUTH_SERVER_ENABLED) {

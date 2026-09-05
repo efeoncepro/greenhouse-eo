@@ -49,11 +49,12 @@ resolver responde `revoked` leyendo el link inactivo; `issuer_class` inmutable p
 gateway en TASK-1831). Drift preexistente detectado por el test live de paridad registry↔catálogo (11 capabilities
 ajenas sin seed) → task aparte; las 6 de esta task están en sync.
 
-**Estado: `code complete, staging verificado, producción pendiente`** — push de `develop` (`02dc5d987`) coordinado con
-TASK-1828; en staging las 4 señales responden por `/api/admin/reliability`, `GET …/external-access/environments` y
-`/eligibility` devuelven datos reales y el lane ecosystem responde `401 missing_token` sin consumer. El release a `main`
-espera a TASK-1828 (decisión del operador). La baja end-to-end con token vigente y los canaries de cliente son evidencia
-de TASK-1831/1832.
+**Estado: `en producción (release 2026-09-04, run 33893120972)`** — canary del lane en prod con el token del gateway:
+sin params → `400`; `environment=efeonce-auth&subject=canary` → `200 environment_inactive` (la fila está en `draft`);
+sin token → `401`. El emisor `efeonce-auth` quedó registrado en `external_identity_environments` en `draft` por el command
+(CLI `pnpm auth-server:register-issuer-environment`, audit + outbox). Pendiente: leer las 4 señales en
+`/admin/operations` de producción con sesión humana (agent auth está deshabilitado en prod por diseño). La baja
+end-to-end con token vigente y los canaries de cliente son evidencia de TASK-1831/1832.
 
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
@@ -72,7 +73,7 @@ de TASK-1831/1832.
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Slice 1 (U04) code complete 2026-09-04: schema aditivo APLICADO en PG (2 migraciones), commands/readers/resolver, 6 capabilities, 7 rutas admin + reader ecosystem para el gateway, 4 señales cableadas, smoke live verde (bind → grant → invite → accept → resolve bound → revoke → resolve revoked). Staging verificado 2026-09-04 (develop 02dc5d987: 4 señales en /api/admin/reliability, rutas admin 200 con datos reales, lane ecosystem 401 sin consumer token); producción espera el release a main junto con TASK-1828; canaries y revocación end-to-end viven en TASK-1831/1832`
+- Status real: `Slice 1 (U04) code complete 2026-09-04: schema aditivo APLICADO en PG (2 migraciones), commands/readers/resolver, 6 capabilities, 7 rutas admin + reader ecosystem para el gateway, 4 señales cableadas, smoke live verde (bind → grant → invite → accept → resolve bound → revoke → resolve revoked). EN PRODUCCIÓN desde el release 2026-09-04 (run 33893120972): lane ecosystem canary 400/200 environment_inactive/401 en prod, emisor efeonce-auth registrado en draft; falta leer las 4 señales en /admin/operations prod con sesión humana; canaries y revocación end-to-end viven en TASK-1831/1832`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|agentic`
 - Blocked by: `none para el slice entregado; la verificación operativa exige deploy (release control plane) y la evidencia end-to-end (token vigente denegado tras revocación, canaries Claude/Codex/ChatGPT) depende de TASK-1829/1830/1831/1832 y de la task ui-ux de login`

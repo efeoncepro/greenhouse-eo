@@ -9,6 +9,8 @@
 import type { OAuthHttpRequest } from './http'
 
 export type AuthenticatedSubject = {
+  /** Server-resolved context, never read directly from a query parameter. */
+  authorizationContextId?: string | null
   /** Sujeto opaco y estable por persona dentro de este issuer (`sub`). */
   subject: string
   /** `environment_id` bajo el que se autenticó (debe coincidir con el del emisor). */
@@ -19,7 +21,7 @@ export type AuthenticatedSubject = {
 }
 
 export interface SubjectSessionPort {
-  resolve(request: OAuthHttpRequest): Promise<AuthenticatedSubject | null>
+  resolve(request: OAuthHttpRequest, authorization?: { clientId: string; audience: string }): Promise<AuthenticatedSubject | null>
 }
 
 export const unauthenticatedSubjectPort: SubjectSessionPort = {

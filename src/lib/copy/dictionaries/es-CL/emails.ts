@@ -34,6 +34,17 @@ export const emails: EmailsCopy = {
       fallback: 'Si el botón no funciona, copia y pega esta dirección en tu navegador:',
       previewText: expiresInMinutes => `Enlace de acceso mágico — válido por ${expiresInMinutes} minutos`
     },
+    authServerMagicLink: {
+      heading: 'Confirma tu acceso a Efeonce',
+      greeting: () => 'Hola,',
+      body: 'usa el botón de abajo para confirmar que eres tú y continuar. Este enlace funciona una sola vez y expira en',
+      validityBold: expiresInMinutes => `${expiresInMinutes} minutos`,
+      cta: 'Confirmar y continuar',
+      disclaimer:
+        'Si no pediste este acceso, ignora este correo: sin este enlace nadie puede entrar a tu cuenta.',
+      fallback: 'Si el botón no funciona, copia y pega esta dirección en tu navegador:',
+      previewText: expiresInMinutes => `Enlace de acceso a Efeonce — válido por ${expiresInMinutes} minutos`
+    },
     passwordReset: {
       heading: 'Restablece tu contraseña',
       greeting: name => name ? `Hola ${name.split(' ')[0]},` : 'Hola,',

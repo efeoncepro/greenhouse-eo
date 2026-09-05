@@ -25,6 +25,7 @@ import { argv, exit, stderr, stdout } from 'node:process'
 import { promisify } from 'node:util'
 
 import { githubRepoCoords } from '@/lib/release/github-helpers'
+import { buildPreflightOverrideAudit } from '@/lib/release/preflight/override-audit'
 import { shouldFailPreflightCommand } from '@/lib/release/preflight/exit-policy'
 import { formatPreflightAsHuman, formatPreflightAsJson } from '@/lib/release/preflight/output-formatters'
 import { PREFLIGHT_CHECK_REGISTRY } from '@/lib/release/preflight/registry'
@@ -36,6 +37,7 @@ interface CliOptions {
   json: boolean
   failOnError: boolean
   overrideBatchPolicy: boolean
+  overrideReason: string | null
   bypassWarnings: boolean
   targetSha: string | null
   targetBranch: string
@@ -48,6 +50,7 @@ const parseArgs = (args: readonly string[]): CliOptions => {
     failOnError: false,
     overrideBatchPolicy: false,
     bypassWarnings: false,
+    overrideReason: null,
     targetSha: null,
     targetBranch: 'main',
     outputFile: null
@@ -58,6 +61,7 @@ const parseArgs = (args: readonly string[]): CliOptions => {
     else if (arg === '--fail-on-error') options.failOnError = true
     else if (arg === '--override-batch-policy') options.overrideBatchPolicy = true
     else if (arg === '--bypass-preflight-warnings') options.bypassWarnings = true
+    else if (arg.startsWith('--override-reason=')) options.overrideReason = arg.slice('--override-reason='.length)
     else if (arg.startsWith('--target-sha=')) options.targetSha = arg.slice('--target-sha='.length)
     else if (arg.startsWith('--target-branch=')) options.targetBranch = arg.slice('--target-branch='.length)
     else if (arg.startsWith('--output-file=')) options.outputFile = arg.slice('--output-file='.length)
@@ -82,6 +86,7 @@ const parseArgs = (args: readonly string[]): CliOptions => {
           '                               (warnings/unknown) passes. Requires bypass_preflight_reason',
           '                               >=20 chars + capability platform.release.bypass_preflight.',
           '                               Audit row persisted by orchestrator.',
+          '  --override-reason=<text>     Required (>=20 trimmed chars) with either override flag.',
           '  --target-sha=<sha>           SHA to validate (default: git HEAD)',
           '  --target-branch=<branch>     Branch to promote to (default: main)',
           '  --help, -h                   This message',
@@ -118,6 +123,12 @@ const resolveTriggeredBy = (): string | null => {
 
 const main = async (): Promise<void> => {
   const options = parseArgs(argv.slice(2))
+  const triggeredBy = resolveTriggeredBy()
+
+  const override = buildPreflightOverrideAudit({
+    overrideBatchPolicy: options.overrideBatchPolicy, bypassWarnings: options.bypassWarnings,
+    reason: options.overrideReason, actor: triggeredBy
+  })
 
   let targetSha: string
 
@@ -131,10 +142,9 @@ const main = async (): Promise<void> => {
     exit(2)
   }
 
-  const triggeredBy = resolveTriggeredBy()
   const repo = githubRepoCoords()
 
-  const payload = await runPreflight({
+  const result = await runPreflight({
     audience: 'admin',
     input: {
       targetSha,
@@ -145,6 +155,8 @@ const main = async (): Promise<void> => {
     },
     checks: PREFLIGHT_CHECK_REGISTRY
   })
+
+  const payload = { ...result, ...(override ? { override } : {}) }
 
   // Output routing canonical:
   //   --output-file=<path>: escribe JSON al path (controlado por el CLI,

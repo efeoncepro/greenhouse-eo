@@ -10,12 +10,17 @@
  *   GET /.well-known/oauth-authorization-server      ┐
  *   GET /.well-known/openid-configuration            │ TASK-1829 — 404 mientras AUTH_SERVER_OAUTH_ENABLED=false
  *   /oauth/{authorize,token,register,revoke,introspect,consent} ┘
+ *   GET  /login · POST /auth/magic-link/{request,consume} · GET /m/<token>   ┐ TASK-1830 — 404 mientras
+ *   GET  /i/<token> · POST /auth/invitations/accept · /auth/session[/logout] ┘ AUTH_SERVER_PERSON_AUTH_ENABLED=false
  *
  * Invariantes: cookie/sesión/secretos propios (nunca NEXTAUTH_SECRET); la llave privada vive en
  * Cloud KMS HSM; ningún error interno se devuelve al cliente en prosa; `Host` fuera del allowlist → 421.
  */
 
 import type { IncomingMessage, ServerResponse } from 'node:http'
+import { isIP } from 'node:net'
+
+import type { ConsentContextPort } from '@/lib/auth-server/oauth/consent-context'
 
 import { captureWithDomain } from '@/lib/observability/capture'
 import { buildPublishedJwks, type KmsSignerPort, type SigningKeyRecord } from '@/lib/auth-server/keys'
@@ -30,8 +35,12 @@ import {
   type OAuthStorePort,
   type SubjectSessionPort
 } from '@/lib/auth-server/oauth'
+import { isInternalLoginPath } from '@/lib/auth-server/internal/login-http'
+import type { OAuthHttpResponse } from '@/lib/auth-server/oauth/http'
 import type { ClientResolverDeps } from '@/lib/auth-server/oauth/clients'
 import type { AccessTokenSigner } from '@/lib/auth-server/oauth/tokens'
+import { getAuthFontAsset } from '@/lib/auth-server/oauth/pages/assets'
+import { createPersonAuthHandler, isPersonAuthPath, type PersonAuthHandlerDeps } from '@/lib/auth-server/persons'
 
 export const SERVICE_NAME = 'auth-server'
 
@@ -52,8 +61,15 @@ export type AuthServerAppDeps = {
   signAccessToken: AccessTokenSigner
   store: OAuthStorePort
   subjectPort: SubjectSessionPort
+  consentContextPort: ConsentContextPort
   grantsPort: GrantsVersionPort
   cimd: ClientResolverDeps['cimd']
+  /**
+   * TASK-1830 — superficie de personas (login sin contraseña). `undefined` = no cableada; con el
+   * flag `AUTH_SERVER_PERSON_AUTH_ENABLED=false` el propio router responde 404.
+   */
+  internal?: (request: OAuthHttpRequest) => Promise<OAuthHttpResponse | null>
+  persons?: PersonAuthHandlerDeps
   now?: () => Date
 }
 
@@ -114,10 +130,13 @@ export const createAuthServerRequestHandler = (deps: AuthServerAppDeps): NodeReq
     signer: deps.signAccessToken,
     subjectPort: deps.subjectPort,
     grantsPort: deps.grantsPort,
+    consentContextPort: deps.consentContextPort,
     loadKeys: deps.getPublishableSigningKeys,
     cimd: deps.cimd,
     now
   })
+
+  const persons = deps.persons ? createPersonAuthHandler(deps.persons) : null
 
   const requestHost = (req: IncomingMessage) => (req.headers.host ?? '').split(':')[0]?.trim().toLowerCase() ?? ''
   const isAllowedHost = (req: IncomingMessage) => allowedHosts.length === 0 || allowedHosts.includes(requestHost(req))
@@ -138,6 +157,34 @@ export const createAuthServerRequestHandler = (deps: AuthServerAppDeps): NodeReq
         writeJson(res, 421, { error: 'misdirected_request' })
 
         return
+      }
+
+      if (deps.enabled && path.startsWith('/fonts/')) {
+        const asset = getAuthFontAsset(path)
+
+        if (!asset) {
+          writeJson(res, 404, { error: 'not_found' })
+
+return
+        }
+
+        if (method !== 'GET' && method !== 'HEAD') {
+          writeJson(res, 405, { error: 'method_not_allowed' }, { Allow: 'GET, HEAD' })
+
+return
+        }
+
+        res.writeHead(200, {
+          'Content-Type': asset.contentType,
+          'Content-Length': asset.body.byteLength,
+          'Cache-Control': 'public, max-age=3600',
+          'X-Content-Type-Options': 'nosniff',
+          'Cross-Origin-Resource-Policy': 'same-origin',
+          ETag: `"${asset.sha256}"`
+        })
+        res.end(method === 'HEAD' ? undefined : asset.body)
+
+return
       }
 
       if (method === 'GET' && path === '/readyz') {
@@ -187,7 +234,11 @@ export const createAuthServerRequestHandler = (deps: AuthServerAppDeps): NodeReq
         return
       }
 
-      if (deps.enabled && isOAuthPath(path)) {
+      const isProtocolPath = isOAuthPath(path)
+      const isPersonPath = Boolean(persons) && isPersonAuthPath(path)
+      const isInternalPath = Boolean(deps.internal) && isInternalLoginPath(path)
+
+      if (deps.enabled && (isProtocolPath || isPersonPath || isInternalPath)) {
         const body = method === 'GET' || method === 'HEAD' ? '' : await readBody(req)
 
         if (body === null) {
@@ -196,8 +247,21 @@ export const createAuthServerRequestHandler = (deps: AuthServerAppDeps): NodeReq
           return
         }
 
-        const request: OAuthHttpRequest = { method, url, headers: headersFromRecord(req.headers), body }
-        const response = await oauth(request)
+        // GCP external ALB appends client IP and LB IP after untrusted supplied values.
+        // https://docs.cloud.google.com/load-balancing/docs/https#x-forwarded-for_header
+        const rawHeaders = headersFromRecord(req.headers)
+        const chain = (rawHeaders.get('x-forwarded-for') ?? '').split(',').map(value => value.trim())
+        const clientIp = chain.length >= 2 ? chain[chain.length - 2] : ''
+
+        const headers = {get:(name:string) => {
+          if (name.toLowerCase() === 'x-real-ip') return null
+          if (name.toLowerCase() === 'x-forwarded-for') return isIP(clientIp) ? clientIp : null
+
+          return rawHeaders.get(name)
+        }}
+
+        const request: OAuthHttpRequest = { method, url, headers, body }
+        const response = isProtocolPath ? await oauth(request) : isInternalPath ? await deps.internal!(request) : await persons!(request)
 
         if (response) {
           res.writeHead(response.status, { ...response.headers, 'Content-Length': Buffer.byteLength(response.body) })

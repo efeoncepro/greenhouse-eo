@@ -3,7 +3,7 @@
 > **Audience:** EFEONCE_ADMIN + DEVOPS_OPERATOR
 > **Spec canónico:** [GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md](../../architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md) §2.9
 > **Source task:** TASK-849
-> **Last updated:** 2026-07-21
+> **Last updated:** 2026-09-04 (release `9100bbd2765d`: change-gate por servicio — `ops-worker` + `auth-server` — y 5 servicios mapeados)
 
 Este runbook opera el watchdog que detecta y alerta temprano sobre approvals obsoletos de Production, runs productivos sin jobs y drift de deploy de workers.
 
@@ -15,7 +15,7 @@ Este runbook opera el watchdog que detecta y alerta temprano sobre approvals obs
 |---|---|---|
 | `platform.release.stale_approval` | Run production en `status=waiting` con `pending_deployments[].environment.name == "Production"` y edad > umbral | warning >2h, error >24h, critical >7d |
 | `platform.release.pending_without_jobs` | Run en `queued|pending|in_progress` con `jobs.length === 0` y edad > umbral | warning >5min, error >30min |
-| `platform.release.worker_revision_drift` | Cloud Run latest ready revision SHA ≠ último workflow run success SHA | error si drift confirmado, warning si data missing |
+| `platform.release.worker_revision_drift` | Cloud Run latest ready revision SHA ≠ último workflow run success SHA, en los 5 servicios de `RELEASE_DEPLOY_WORKFLOWS` (`ops-worker`, `commercial-cost-worker`, `ico-batch-worker`, `hubspot-greenhouse-integration`, `auth-server`). Un SHA distinto en un servicio **change-gated** (`ops-worker`, `auth-server`) con diff vacío sobre sus rutas runtime cuenta como `synced` | error si drift confirmado (`DRIFT` en el `detail`), warning si data missing |
 
 ## 2. Cómo corre
 
@@ -42,10 +42,26 @@ Sin blockers detectados. Los 3 signals están en steady state. Operador no neces
 - **stale_approval >24h**: aprobación lleva un día completo sin acción. Operador debe revisar y decidir cancel/approve.
 - **pending_without_jobs >30min**: bug clase concurrency deadlock. Cancelar el run viejo bloqueante (ver §4 Stale approval recovery).
 - **worker_revision_drift confirmado**: revision Cloud Run no matchea el último deploy verde. Investigar deploy fallido o manual deployment.
-  - Excepción conocida: si el único hallazgo es `ops-worker`, el workflow
-    declaró `deploy_needed=false`, Cloud Run está `Ready=True` y el diff de
-    rutas runtime entre `GIT_SHA` servido y `target_sha` es vacío, tratarlo como
-    residual de label por change-gate. No redeployar solo para alinear el SHA.
+  - Cómo leer el `detail` de cada servicio (evidence `detail`, separado por ` | `):
+    `(synced)` = mismo SHA; `(change-gated — rutas runtime sin cambios; workflow
+    omitió deploy y servicio está Ready=True)` = SHA distinto pero legítimo, el
+    reader ya lo contó como synced; `(DRIFT — revision Cloud Run no matchea
+    ultimo deploy verde)` = el único caso que produce `error`; `(data missing …)`
+    = evidencia insuficiente. Sólo `DRIFT` autoriza a investigar un redeploy.
+  - Servicios change-gated que el reader conoce (desde 2026-09-04, release
+    `9100bbd2765d`): `ops-worker` y `auth-server`. Sus rutas viven en
+    `CHANGE_GATED_RUNTIME_PATHS` (`src/lib/reliability/queries/release-worker-revision-drift.ts`),
+    espejo por servicio del array `WORKER_RUNTIME_PATHS=(` de cada workflow de
+    deploy; `release-worker-change-gate-parity.test.ts` parsea los YAML reales y
+    falla si el espejo se desalinea. Antes de ese día el reader sólo conocía a
+    `ops-worker` y `auth-server` salió como DRIFT `error` con árbol idéntico al
+    target (`deploy_needed=false`, diff completo vacío). Si un servicio
+    change-gated nuevo aparece como DRIFT con diff vacío, primero revisa que
+    tenga su entrada espejo + su workflow en el test de paridad.
+  - Aun con `detail=change-gated`, la verificación que manda es el diff de
+    **árbol completo, sin `--`** entre `GIT_SHA` servido y `target_sha` (runbook
+    de release §4.1.1): el skip del gate sólo habla de las rutas declaradas. No
+    redeployar solo para alinear el SHA.
 
 ### `critical`
 - **stale_approval >7d**: aprobación abandonada. Cancelar inmediatamente. Es el síntoma del incidente histórico 2026-04-26 → 2026-05-09.
@@ -121,18 +137,23 @@ Cuando recibes alerta `[ERROR] Worker revision drift — <workflow>`:
    ```
 
 2. **Si difieren**: deploy reciente falló silente, el workflow salto deploy por creer que el runtime era equivalente, o alguien deployó manualmente sin pasar por workflow.
-   - Antes de re-disparar nada, comprobar si es el caso conocido
-     `ops-worker` change-gated:
+   - Antes de re-disparar nada, comprobar si es el caso conocido de un servicio
+     change-gated (`ops-worker`, `auth-server`) con el diff de **árbol completo**
+     (sin `--`: el skip del gate sólo prueba las rutas declaradas, no el bundle):
      ```bash
-     git diff --name-only <cloud_run_git_sha> <release_target_sha> -- \
-       package.json pnpm-lock.yaml tsconfig.json \
-       services/ops-worker scripts/ops-worker src/lib/ops src/lib/release
+     git diff --name-only <cloud_run_git_sha> <release_target_sha>
      ```
    - Si el diff no devuelve archivos, el run summary muestra
      `deploy_needed=false` y Cloud Run esta `Ready=True`, **parar**: no hay
-     cambio runtime pendiente. Documentar el residual en `Handoff.md` y en el
-     cierre del release. Este es un falso positivo operacional de la lectura V1
-     del watchdog, no una razón para quemar otro deploy.
+     cambio runtime pendiente. Desde 2026-09-04 el reader debería haberlo
+     etiquetado `change-gated` en el `detail` y contarlo como synced; si en ese
+     escenario dice `DRIFT`, el bug está en el clasificador (falta la entrada
+     espejo del servicio en `CHANGE_GATED_RUNTIME_PATHS` o el test de paridad no
+     lo cubre), no en el runtime. Documentar el residual en `Handoff.md` y en el
+     cierre del release; no quemar otro deploy.
+   - Si el diff devuelve archivos que el servicio bundlea, es drift real aunque el
+     job haya cerrado `success` con el step de deploy `skipped` (caso
+     `64bdd105c737`, Playbook §13): re-disparar el orquestador para el SHA.
    - Re-trigger workflow normal del servicio drifted con el SHA canonico del release.
    - Si el drift aparece despues de un `Production Release Orchestrator` exitoso, no cerrar el release todavia: preferir primero rerun del orquestador para el mismo `target_sha`; usar workflow individual solo como break-glass aprobado si el orquestador queda bloqueado.
    - Para `hubspot-greenhouse-integration`:
@@ -392,6 +413,7 @@ Subject canónico: `assertion.repository == 'efeoncepro/greenhouse-eo'`.
 - **NUNCA** introducir un signal coarse `platform.release.health` que lumpee los 3 failure modes. Greenhouse pattern (TASK-742, TASK-774, TASK-768) es 1 signal por failure mode.
 - **NUNCA** loggear payload completo de respuesta GitHub/Cloud Run sin pasar por `redactSensitive`. GitHub responses pueden incluir email del actor.
 - **SIEMPRE** que emerja un workflow nuevo de deploy production, agregarlo a `RELEASE_DEPLOY_WORKFLOWS` en `src/lib/release/workflow-allowlist.ts` ANTES del primer deploy. Sin esto, el watchdog NO lo detecta.
+- **SIEMPRE** que ese workflow sea change-gated (array `WORKER_RUNTIME_PATHS=(`), agregar en el mismo PR su entrada espejo en `CHANGE_GATED_RUNTIME_PATHS` y su workflow en `release-worker-change-gate-parity.test.ts`. Sin esto, el primer release en que el servicio salte el deploy sale como DRIFT `error` sobre un release sano (`auth-server`, 2026-09-04). **NUNCA** resolverlo leyendo el YAML con `node:fs` desde el reader: el módulo es alcanzable desde rutas y Turbopack trazaría el repo.
 - **SIEMPRE** que el detector cambie su contract JSON output, bumpear version + actualizar consumer en preflight CLI futuro (TASK-850).
 
 ## 11. Verificación post-deploy del watchdog
@@ -422,6 +444,7 @@ psql -c "SELECT COUNT(*) FROM greenhouse_sync.release_watchdog_alert_state"
 - CLI: [scripts/release/production-release-watchdog.ts](../../../scripts/release/production-release-watchdog.ts)
 - Dispatcher: [src/lib/release/watchdog-alerts-dispatcher.ts](../../../src/lib/release/watchdog-alerts-dispatcher.ts)
 - Readers reliability: `src/lib/reliability/queries/release-{stale-approval,pending-without-jobs,worker-revision-drift}.ts`
+- Change-gate por servicio: `CHANGE_GATED_RUNTIME_PATHS` en `release-worker-revision-drift.ts` + test de paridad `src/lib/reliability/queries/release-worker-change-gate-parity.test.ts` (parsea `WORKER_RUNTIME_PATHS=(` de `.github/workflows/{ops-worker,auth-server}-deploy.yml`)
 - Workflow: [.github/workflows/production-release-watchdog.yml](../../../.github/workflows/production-release-watchdog.yml)
 - Capability: `platform.release.watchdog.read` (`src/config/entitlements-catalog.ts`)
 - Helpers canónicos: `src/lib/release/{github-helpers,workflow-allowlist,severity-resolver}.ts`
@@ -432,6 +455,6 @@ psql -c "SELECT COUNT(*) FROM greenhouse_sync.release_watchdog_alert_state"
 V1 entrega watchdog + 3 signals + alerting end-to-end con dedup. Estado vigente 2026-05-24: schedule pausado hasta TASK-920, manual dispatch/CLI disponibles. V1.1 (TASK derivada conditional):
 
 - **Per-finding alerts** (vs aggregate signal alerts): cuando emerja necesidad operativa de saber QUE workflow + QUE run_id en cada alert (en lugar del summary del signal), expandir parser de evidence en CLI dispatch loop.
-- **CI gate workflow allowlist**: cuando un workflow nuevo emerge en `.github/workflows/*-deploy.yml` con `environment: production`, CI verifica que aparezca en `RELEASE_DEPLOY_WORKFLOWS`. Sin esto, un workflow nuevo queda invisible al watchdog.
+- **CI gate workflow allowlist**: cuando un workflow nuevo emerge en `.github/workflows/*-deploy.yml` con `environment: production`, CI verifica que aparezca en `RELEASE_DEPLOY_WORKFLOWS`. Sin esto, un workflow nuevo queda invisible al watchdog. La mitad change-gate ya existe desde 2026-09-04 (`release-worker-change-gate-parity.test.ts` falla si el espejo de rutas de un servicio conocido se desalinea de su YAML); lo que sigue pendiente es detectar un workflow change-gated que ni siquiera esté en el mapa.
 - **GH Actions schedule reliability monitor**: si el watchdog se salta runs por delay >30min sostenido (5+ skipped en 7d), agregar Health endpoint + reliability signal `platform.release.watchdog.run_lag`.
 - **Migración a Cloud Scheduler + ops-worker**: si GH Actions reliability resulta inadecuada y el caso es infrastructure-critical, migrar a Cloud Scheduler invocando endpoint en ops-worker.

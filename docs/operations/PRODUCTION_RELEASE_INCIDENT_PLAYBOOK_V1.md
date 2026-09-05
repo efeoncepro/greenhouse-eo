@@ -1,9 +1,9 @@
 # Production Release Incident Playbook V1
 
 > **Tipo de documento:** Playbook operativo canónico
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-05-12 por Claude Opus 4.7 (post incidente TASK-870)
-> **Ultima actualizacion:** 2026-09-03 por Codex (cancelaciones concurrentes y correlación de webhooks por SHA)
+> **Ultima actualizacion:** 2026-09-04 por Claude (anti-patterns #17 gate `Production` case-sensitive y #18 clasificador change-gate de un solo servicio; caso positivo `9100bbd2765d`, primer release con 5 servicios)
 > **Audience:** Cualquier agente AI (Claude, Codex, Cursor) y operadores humanos que enfrenten un `Production Release Orchestrator` fallando
 
 ---
@@ -581,6 +581,50 @@ con el mismo SHA, webhook tardío/cancelación de duplicado y ausencia de manife
 por delivery ID no prueba propiedad del intento. Hasta implementar y desplegar ese arreglo con pruebas,
 la coordinación serial es mitigación y el bug permanece abierto. Dueña del fix: `TASK-1815` (registro del run en `workflow_runs` al nacer el manifest, matching por run ID antes que por SHA, `foreign_workflow_run` nunca transiciona, test que reproduce este caso).
 
+### 17. Filtrar el gate de aprobación por `production` en minúscula y esperar en silencio
+
+**Release 2026-09-04, `9100bbd2765d`:** el loop de aprobación consultaba `pending_deployments` con
+`select(.environment.name=="production")`. La API de GitHub devuelve el environment como **`Production`**
+(mayúscula), así que el filtro nunca coincidió, el loop no aprobó nada y tampoco falló: el primer gate esperó
+**21 minutos** (`16:05`→`16:26Z`) con el orquestador en `waiting` y el operador creyendo que el gate aún no
+había emergido. Corregido con `(.environment.name|ascii_downcase)=="production"`, el segundo gate (Azure) se
+aprobó a los 2 segundos.
+
+La trampa es que existe el gotcha contrario y también es cierto: `vercel env add <FLAG> Production` falla con
+`api_error` porque Vercel exige `production` en minúscula (skill gotcha #14). Son dos APIs con convenciones
+opuestas; memorizar «va en minúscula» o «va en mayúscula» reproduce el error en la otra.
+
+**Regla:** en cualquier loop de gates, comparar `environment.name` **case-insensitive** y escribir **una línea
+visible por iteración** del poll (qué devolvió `pending_deployments`, cuántos, cuáles). Un loop que puede
+esperar sin imprimir nada convierte un filtro mal escrito en 20 minutos de espera indistinguibles de un gate
+que aún no existe. Los snippets canónicos ya están así en la skill (paso 6) y en el runbook.
+
+### 18. Un clasificador de change-gate que sólo conoce un servicio convierte el siguiente en falso DRIFT
+
+**Release 2026-09-04, `9100bbd2765d`:** primer release con cinco servicios Cloud Run — `auth-server`
+(TASK-1828) entró al orquestador con un workflow change-gated idéntico en forma al de `ops-worker`
+(`WORKER_RUNTIME_PATHS=(` + `git diff --quiet` + skip del deploy). El push a `develop` ya había desplegado
+ambos con el mismo árbol que el squash, así que los dos jobs cerraron `deploy_needed=false` y dejaron
+`GIT_SHA=f6db4255a` (diff completo contra el target: vacío). El watchdog reportó
+`platform.release.worker_revision_drift` en `error` — «1 worker con revision drift confirmado (auth-server)» —
+sobre un release sano, porque el reader (`src/lib/reliability/queries/release-worker-revision-drift.ts`)
+tenía **una** lista de rutas cableada para `ops-worker` y trataba cualquier otro servicio con SHA distinto como
+drift confirmado.
+
+**Fix (commit `1403d5a32`):** `CHANGE_GATED_RUNTIME_PATHS` es un mapa por servicio (`ops-worker`,
+`auth-server`), cada entrada un **espejo** del array `WORKER_RUNTIME_PATHS=(` de su workflow. No se lee el
+YAML con `node:fs` en runtime (el módulo es alcanzable desde rutas; Turbopack trazaría el repo entero), y la
+paridad la sostiene `release-worker-change-gate-parity.test.ts`, que parsea los workflows reales y falla si un
+espejo se desalinea. Tras el fix: `aggregateSeverity: ok`, `5/5 workers synced`, ambos servicios con `detail`
+`change-gated — rutas runtime sin cambios`.
+
+**Regla:** todo servicio Cloud Run change-gated nuevo entra en el mismo PR con (a) su fila en
+`RELEASE_DEPLOY_WORKFLOWS`, (b) su entrada espejo en `CHANGE_GATED_RUNTIME_PATHS` y (c) su workflow en el test de
+paridad. Y la verificación que manda sigue siendo la del §13: el **diff de árbol completo** entre el SHA servido y el
+target (`git diff --name-only <served_sha> <target_sha>` vacío); ni el skip del gate ni la etiqueta
+`change-gated` del watchdog lo reemplazan — la etiqueta sólo dice que las rutas *declaradas* no cambiaron. Un
+DRIFT `error` con diff completo vacío es un bug del clasificador, no una razón para redeployar.
+
 ## Caso positivo 2026-08-06 — el release que no generó incidente
 
 Hasta esta versión, este playbook sólo documentaba incidentes. Eso deja un sesgo:
@@ -748,6 +792,24 @@ documentales). Detalle de tiempos, fases y hallazgos laterales: `PRODUCTION_RELE
 las dos filas de 2026-08-09.
 
 ---
+
+## Caso positivo 2026-09-04 — cinco servicios, un solo intento
+
+El release `9100bbd2765d7906331f3ccfa6a680f16e98c2d0` (PR #221 squash; run `33893120972`; manifest
+`9100bbd2765d-d5fae366-3823-4186-9399-4722476a45d2` `released` a las `16:39:40Z`, `31m20s` desde
+`record-started`) fue el **primer release que corrió el orquestador con los cinco deployables Cloud Run** —
+`auth-server` incluido — y cerró en **un solo run, sin retry**. Llevaba dominio irreversible (6 migraciones +
+auth), así que el break-glass era parte del plan desde el principio (par del 2026-08-09): marker
+`[release-coupled: auth_access + cloud_release …]` en el squash para la mezcla, y `bypass_preflight_reason`
+redactada con hechos comprobables para `db_migrations` (las 6 ya aplicadas en la instancia única, §9). Antes del
+dispatch se consultó a las dos sesiones Claude vivas (ambas se retiraron) y `gh run list
+--workflow=production-release.yml` no mostraba ningún run para el SHA (§15/§16). Post-release: health 200, Vercel
+Production READY, 3 servicios en el target y `ops-worker` + `auth-server` change-gated con árbol idéntico.
+
+Lo que igual costó tiempo son los dos anti-patterns nuevos de arriba: 21 minutos del gate por el filtro en
+minúscula (§17) y el falso DRIFT del watchdog sobre `auth-server` (§18), corregido el mismo día con el mapa por
+servicio + test de paridad. Tiempo agente end-to-end ~2h30m; fases y números en
+`PRODUCTION_RELEASE_TIMING_LEDGER.md`, fila 2026-09-04.
 
 ## Decisión: ¿cuándo eliminar / relajar el preflight?
 

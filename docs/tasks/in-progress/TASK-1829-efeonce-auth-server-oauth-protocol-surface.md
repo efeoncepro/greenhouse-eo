@@ -71,7 +71,7 @@
 - Motion: `none`
 - Backend impact: `api`
 - Epic: `EPIC-044`
-- Status real: `code complete, rollout pendiente (2026-09-04, sesión greenhouse-eo-45; commits 263ee3a74 · 19d1658de · d31e6e913 en develop): dominio src/lib/auth-server/oauth/**, handler testeable, 7 tablas greenhouse_auth + 2 capabilities aplicadas en Cloud SQL, 68 tests + smoke PG real verdes; AUTH_SERVER_OAUTH_ENABLED=false en deploy.sh; falta release del runtime a main, fila del emisor en external_identity_environments, flag ON en staging con validación de metadata y flujo con persona real (TASK-1830)`
+- Status real: `runtime activado, verificación autenticada pendiente (2026-09-05T01:01Z). Auth Server Deploy 33934410457 success, revisión auth-server-00007-cxb, SHA 3f68e8875, 100% tráfico; OAuth y personas true; emisor active. Metadata/login y negativos públicos verificados (9/9). Falta identidad de canary indicada por operador, correo real, sesión, tokens/refresh/revocación y passkeys en dos navegadores. Deploy por staging sobre servicio compartido; no hay nuevo release main. Evidencia: docs/audits/2026-09-04-epic-044-auth-rollout.md`
 - Rank: `TBD`
 - Domain: `platform|identity|integration`
 - Blocked by: `none`

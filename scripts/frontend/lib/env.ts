@@ -39,7 +39,7 @@ const STAGING_VERCEL_URL = 'https://greenhouse-eo-env-staging-efeonce-7670142f.v
  * - production sin triple gate
  * - bypass secret ausente para staging
  */
-export const resolveEnvConfig = (env: CaptureEnv): EnvConfig => {
+export const resolveEnvConfig = (env: CaptureEnv, authentication: 'agent' | 'anonymous' = 'agent'): EnvConfig => {
   const agentEmail = process.env.AGENT_AUTH_EMAIL ?? 'agent@greenhouse.efeonce.org'
 
   switch (env) {
@@ -54,9 +54,9 @@ export const resolveEnvConfig = (env: CaptureEnv): EnvConfig => {
       }
 
     case 'staging': {
-      const bypassSecret = process.env.VERCEL_AUTOMATION_BYPASS_SECRET
+      const bypassSecret = authentication === 'anonymous' ? undefined : process.env.VERCEL_AUTOMATION_BYPASS_SECRET
 
-      if (!bypassSecret) {
+      if (authentication !== 'anonymous' && !bypassSecret) {
         throw new Error('VERCEL_AUTOMATION_BYPASS_SECRET ausente en .env.local — requerido para staging captures')
       }
 

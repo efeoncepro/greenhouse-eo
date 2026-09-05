@@ -1,0 +1,11 @@
+{
+  "selected_option": 1,
+  "selected_by": "user",
+  "source": "assets/cover-approved.png",
+  "clean_plate": "assets/cover-architecture-clean.png",
+  "tool": "image_gen.imagegen",
+  "operation": "Remove text and generated branding while preserving approved architectural scene; compose official brand assets and live typography separately.",
+  "date": "2026-09-04",
+  "artwork_type": "Generated conceptual architecture, not a documented Berel project",
+  "sha256": "954478c94766e1e93927387ce3de5cb99f0b598180632b332f2d1a5aa50a16f1"
+}

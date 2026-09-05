@@ -285,8 +285,155 @@ export const getAuthOAuthAbuseSignals = async (deps: AuthOAuthAbuseSignalDeps = 
   }
 }
 
-export const getAuthServerSignals = async (): Promise<ReliabilitySignal[]> => {
-  const [jwks, lifecycle, abuse] = await Promise.all([getAuthIssuerJwksSignal(), getAuthSigningKeysLifecycleSignal(), getAuthOAuthAbuseSignals()])
+/**
+ * TASK-1830 — Señales de la autenticación de PERSONAS (`greenhouse_auth.person_auth_attempts` y
+ * `sessions`). Las tres tienen steady = 0 y describen cosas que no deberían pasar nunca:
+ *
+ * 1. `auth.person.magic_link_rate_limited`: alguien está pidiendo enlaces en volumen. Warning, no
+ *    error — un cliente torpe también dispara esto, y confundirlo con un ataque gasta atención.
+ * 2. `auth.person.passkey_counter_regression`: un contador que retrocede significa DOS
+ *    autenticadores con la misma clave. La credencial ya quedó revocada; la señal existe para que
+ *    alguien mire, porque el sistema no puede decidir cuál de los dos es la persona.
+ * 3. `auth.person.session_without_link`: una sesión cuyo source link murió. El resolver la revoca
+ *    en el mismo request, así que un valor > 0 sostenido significa que la revocación de acceso NO
+ *    está llegando — el fallo silencioso más caro de este dominio.
+ */
 
-  return [jwks, lifecycle, ...abuse]
+export const AUTH_PERSON_MAGIC_LINK_RATE_LIMITED_SIGNAL_ID = 'auth.person.magic_link_rate_limited'
+export const AUTH_PERSON_PASSKEY_COUNTER_REGRESSION_SIGNAL_ID = 'auth.person.passkey_counter_regression'
+export const AUTH_PERSON_SESSION_WITHOUT_LINK_SIGNAL_ID = 'auth.person.session_without_link'
+
+const PERSON_AUTH_WINDOW_HOURS = 24
+
+type PersonAttemptRow = { reason_code: string | null; method: string; outcome: string; events: number }
+type OrphanSessionRow = { sessions: number }
+
+const PERSON_ATTEMPTS_SQL = `
+  SELECT method, outcome, reason_code, COUNT(*)::int AS events
+    FROM greenhouse_auth.person_auth_attempts
+   WHERE occurred_at >= now() - INTERVAL '${PERSON_AUTH_WINDOW_HOURS} hours'
+     AND (outcome = 'rate_limited' OR reason_code IN ('counter_regression', 'source_link_revoked'))
+   GROUP BY method, outcome, reason_code
+`
+
+/**
+ * Sesiones vivas cuyo link ya no está activo. El resolver las mata en el siguiente request, así que
+ * lo que esta consulta encuentra son sesiones que NADIE ha vuelto a usar desde la revocación — o,
+ * si el número no baja, una revocación que no está llegando.
+ */
+const ORPHAN_SESSIONS_SQL = `
+  SELECT COUNT(*)::int AS sessions
+    FROM greenhouse_auth.sessions s
+    JOIN greenhouse_core.identity_profile_source_links l ON l.link_id = s.link_id
+   WHERE s.revoked_at IS NULL
+     AND s.absolute_expires_at > now()
+     AND NOT l.active
+`
+
+export type AuthPersonSignalDeps = Readonly<{
+  loadAttempts?: () => Promise<PersonAttemptRow[]>
+  loadOrphanSessions?: () => Promise<OrphanSessionRow[]>
+}>
+
+const defaultLoadPersonAttempts = () => query<PersonAttemptRow>(PERSON_ATTEMPTS_SQL)
+const defaultLoadOrphanSessions = () => query<OrphanSessionRow>(ORPHAN_SESSIONS_SQL)
+
+export const getAuthPersonSignals = async (deps: AuthPersonSignalDeps = {}): Promise<ReliabilitySignal[]> => {
+  const observedAt = new Date().toISOString()
+
+  try {
+    const [attempts, orphans] = await Promise.all([
+      (deps.loadAttempts ?? defaultLoadPersonAttempts)(),
+      (deps.loadOrphanSessions ?? defaultLoadOrphanSessions)()
+    ])
+
+    const sum = (predicate: (row: PersonAttemptRow) => boolean) =>
+      attempts.filter(predicate).reduce((total, row) => total + Number(row.events), 0)
+
+    const rateLimited = sum(row => row.method === 'magic_link' && row.outcome === 'rate_limited')
+    const counterRegressions = sum(row => row.reason_code === 'counter_regression')
+    const orphanSessions = Number(orphans[0]?.sessions ?? 0)
+
+    return [
+      {
+        signalId: AUTH_PERSON_MAGIC_LINK_RATE_LIMITED_SIGNAL_ID,
+        moduleKey: 'identity' as const,
+        kind: 'incident' as const,
+        source: 'getAuthPersonSignals',
+        label: 'Magic links limitados por abuso',
+        observedAt,
+        severity: rateLimited > 0 ? ('warning' as const) : ('ok' as const),
+        summary:
+          rateLimited > 0
+            ? `${rateLimited} solicitud(es) de magic link bloqueadas por límite en ${PERSON_AUTH_WINDOW_HOURS} h.`
+            : 'Ninguna solicitud de magic link bloqueada por límite en 24 h.',
+        evidence: [
+          { kind: 'sql', label: 'Query', value: `greenhouse_auth.person_auth_attempts últimas ${PERSON_AUTH_WINDOW_HOURS} h` },
+          { kind: 'metric', label: 'rate_limited_24h', value: String(rateLimited) }
+        ]
+      },
+      {
+        signalId: AUTH_PERSON_PASSKEY_COUNTER_REGRESSION_SIGNAL_ID,
+        moduleKey: 'identity' as const,
+        kind: 'incident' as const,
+        source: 'getAuthPersonSignals',
+        label: 'Contador de passkey retrocedido',
+        observedAt,
+        severity: counterRegressions > 0 ? ('error' as const) : ('ok' as const),
+        summary:
+          counterRegressions > 0
+            ? `${counterRegressions} passkey(s) con contador retrocedido en 24 h: credencial revocada, revisar si hay clonación.`
+            : 'Ningún contador de passkey retrocedido en 24 h.',
+        evidence: [
+          { kind: 'metric', label: 'counter_regressions_24h', value: String(counterRegressions) }
+        ]
+      },
+      {
+        signalId: AUTH_PERSON_SESSION_WITHOUT_LINK_SIGNAL_ID,
+        moduleKey: 'identity' as const,
+        kind: 'data_quality' as const,
+        source: 'getAuthPersonSignals',
+        label: 'Sesiones sin source link activo',
+        observedAt,
+        severity: orphanSessions > 0 ? ('error' as const) : ('ok' as const),
+        summary:
+          orphanSessions > 0
+            ? `${orphanSessions} sesión(es) viva(s) con su source link revocado: el resolver las mata al próximo request, pero un valor sostenido significa que la revocación no está llegando.`
+            : 'Ninguna sesión viva con su source link revocado.',
+        evidence: [
+          { kind: 'sql', label: 'Query', value: 'greenhouse_auth.sessions JOIN identity_profile_source_links' },
+          { kind: 'metric', label: 'orphan_sessions', value: String(orphanSessions) }
+        ]
+      }
+    ]
+  } catch (error) {
+    captureWithDomain(error, 'identity', { tags: { source: 'reliability_signal_auth_person', component: 'auth-server' } })
+
+    return [
+      AUTH_PERSON_MAGIC_LINK_RATE_LIMITED_SIGNAL_ID,
+      AUTH_PERSON_PASSKEY_COUNTER_REGRESSION_SIGNAL_ID,
+      AUTH_PERSON_SESSION_WITHOUT_LINK_SIGNAL_ID
+    ].map(signalId => ({
+      signalId,
+      moduleKey: 'identity' as const,
+      kind: 'incident' as const,
+      source: 'getAuthPersonSignals',
+      label: signalId,
+      observedAt,
+      severity: 'error' as const,
+      summary: 'No se pudieron leer las señales de autenticación de personas.',
+      evidence: []
+    }))
+  }
+}
+
+export const getAuthServerSignals = async (): Promise<ReliabilitySignal[]> => {
+  const [jwks, lifecycle, abuse, person] = await Promise.all([
+    getAuthIssuerJwksSignal(),
+    getAuthSigningKeysLifecycleSignal(),
+    getAuthOAuthAbuseSignals(),
+    getAuthPersonSignals()
+  ])
+
+  return [jwks, lifecycle, ...abuse, ...person]
 }

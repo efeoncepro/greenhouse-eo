@@ -455,10 +455,12 @@ del dominio; el resto lo bundlea `services/auth-server`).
 > `docs/operations/runbooks/auth-server.md`; señales en `src/lib/reliability/queries/auth-server-signals.ts`.
 
 Es el emisor de tokens de Efeonce en `https://auth.efeonce.org`: Cloud Run `auth-server` (`us-east4`, un solo
-servicio para staging y production), segundo host del front door del gateway MCP, firma ES256 con la llave
+servicio para staging y production; **en producción desde 2026-09-04** por el release `9100bbd2765d`, revisión
+`auth-server-00005-pk8`), segundo host del front door del gateway MCP, firma ES256 con la llave
 `auth-server-es256` en Cloud KMS HSM y publica el JWKS. Expone `/healthz`, `/readyz` y `/.well-known/jwks.json`
-(TASK-1828) y, detrás de `AUTH_SERVER_OAUTH_ENABLED` (default `false`; `TASK-1829` code complete en `develop`
-2026-09-04, rollout pendiente), la superficie OAuth: metadata RFC 8414/OIDC, CIMD primario + DCR compat, PKCE S256,
+(TASK-1828; `AUTH_SERVER_JWKS_URL` ya declarada en Vercel Production y staging) y, detrás de
+`AUTH_SERVER_OAUTH_ENABLED` (default `false`; `TASK-1829` code complete, rollout pendiente: el runtime en producción
+sirve la superficie OAuth como 404; environment del emisor `efeonce-auth` registrado en `draft`), la superficie OAuth: metadata RFC 8414/OIDC, CIMD primario + DCR compat, PKCE S256,
 access JWT ES256 de 15 min con claim `gv`, refresh rotativo, revocación, introspección y consentimiento persistido.
 Personas (`TASK-1830`) y gateway multi-issuer (`TASK-1831`) llegan después. El login del portal no cambia.
 
@@ -524,6 +526,14 @@ Personas (`TASK-1830`) y gateway multi-issuer (`TASK-1831`) llegan después. El 
   `greenhouse_core.external_identity_environments` (`efeonce-auth`, `https://auth.efeonce.org`, `external`) ni sin
   validar la metadata; **NUNCA** emitir un code para una persona que este emisor no autenticó (hasta TASK-1830
   `authorize` responde `login_required`).
+- **Environment del emisor — sólo por command.** La fila `efeonce-auth` **ya existe en `draft`** (registrada el
+  2026-09-04 por `pnpm auth-server:register-issuer-environment`, que llama al command canónico de TASK-1631
+  `upsertExternalIdentityEnvironment`: tx + audit + outbox). **NUNCA** crearla, editarla ni activarla con SQL;
+  **NUNCA** cambiar `issuerClass` después de creada (es inmutable: el issuer es `https://auth.efeonce.org` exacto);
+  se pasa a `active` con `--status active` en el mismo momento en que se prende el flag OAuth en staging. Mientras
+  esté en `draft`, el resolver responde `environment_inactive` (verificado en producción por el lane ecosystem
+  `GET /api/platform/ecosystem/identity/binding?environment=efeonce-auth&subject=…` → 200 `environment_inactive`):
+  es fail-closed por diseño, no un bug.
 - **SIEMPRE** que se agregue un scope al gateway, agregarlo a `scopes.ts` (test de paridad con
   `efeonce-mcp/src/config.ts`) y a la copia es-CL de `src/lib/copy/auth-server.ts`. **NUNCA** editar
   `pages/efeonce-isotipo.generated.ts` a mano (`pnpm auth-server:brand-assets:generate`).
@@ -531,8 +541,120 @@ Personas (`TASK-1830`) y gateway multi-issuer (`TASK-1831`) llegan después. El 
 **Helpers canónicos**: `src/lib/auth-server/keys/index.ts` (`signWithActiveKey`, `registerSigningKeyVersion`,
 `retireSigningKey`, adapter KMS) · `src/lib/auth-server/oauth/**` (`registerConfidentialClient`,
 `grantClientConsent`, `revokeClientConsent`, store atómico, `cimd.ts`, `scopes.ts`) · CLIs
-`pnpm auth-server:rotate-key`, `pnpm auth-server:register-client`, `pnpm auth-server:oauth-store:smoke` · señales
-`auth.issuer.jwks_unreachable` (`runtime`), `auth.signing_keys.lifecycle` (`data_quality`) y
+`pnpm auth-server:rotate-key`, `pnpm auth-server:register-client`, `pnpm auth-server:oauth-store:smoke`,
+`pnpm auth-server:register-issuer-environment` (todos con `.env.local` + proxy PG) y
+`pnpm auth-server:brand-assets:generate` · señales `auth.issuer.jwks_unreachable` (`runtime`; reader en Vercel,
+`AUTH_SERVER_JWKS_URL` presente en Production y staging desde 2026-09-04), `auth.signing_keys.lifecycle` (`data_quality`) y
 `auth.oauth.{code_reuse_detected,refresh_reuse_detected,cimd_rejected}` (`incident`, 24 h, steady 0) · Sentry
 `captureWithDomain('identity')` con tag `component=auth-server` (`check=kms` reemplaza al contador
 `auth.kms.sign_failures`).
+
+## Autenticación de personas externas del emisor (TASK-1830)
+
+**Contexto.** `auth.efeonce.org` autentica personas EXTERNAS sin contraseñas: passkeys (método
+primario), magic link por Resend (alternativa), TOTP (step-up para escritura) y recuperación por
+re-invitación auditada. Vive en `src/lib/auth-server/persons/**`, detrás de
+`AUTH_SERVER_PERSON_AUTH_ENABLED` (default `false` ⇒ toda la superficie responde **404**, no 403:
+un 403 confirma que la ruta existe). Ocho tablas en `greenhouse_auth`: `sessions`,
+`magic_link_tokens`, `auth_rate_limits`, `person_auth_attempts`, `passkey_credentials`,
+`passkey_challenges`, `totp_enrollments`, `totp_backup_codes`. Gate contra PG real:
+`pnpm auth-server:person-auth:smoke`.
+
+**No hay password store y no debe haberlo.** La clase de ataque más frecuente contra un servicio de
+auth público —credential stuffing, phishing de contraseña, reset abusable— desaparece por diseño.
+Un flujo de recuperación self-service reintroduce exactamente esa puerta.
+
+### Reglas duras
+
+1. **NUNCA** escribir fuera de `greenhouse_auth` desde `src/lib/auth-server/**`. La única escritura
+   legítima en `greenhouse_core` —ligar la persona— se delega al command `acceptExternalInvitation`
+   de `TASK-1631`, que la ejecuta en su propia transacción con audit y outbox. El guard
+   `src/lib/auth-server/boundary-domain.test.ts` escanea el SQL literal del dominio.
+2. **NUNCA** mandar los intentos de persona a `greenhouse_serving.auth_attempts` (ledger TASK-742).
+   Ese ledger es del PORTAL y no admite este runtime sin romperlo: `provider` y `stage` tienen CHECK
+   cerrados de NextAuth (sin passkey ni TOTP), `user_id_resolved` pertenece al espacio de
+   `client_users` y su GRANT de INSERT es sólo para `greenhouse_runtime`, mientras el emisor conecta
+   como `greenhouse_app`. El ledger del emisor es `greenhouse_auth.person_auth_attempts`,
+   append-only por trigger, con `subject_hash` indexado (el de `oauth_audit_events` no lo está, así
+   que un bloqueo progresivo por sujeto allí sería un scan).
+3. **NUNCA** hashear un bearer del emisor con bcrypt. Todos —magic link, códigos de respaldo— usan
+   `sha256Hex` + `safeEquals`, igual que codes/refresh/access. Sobre 256 bits de entropía un KDF
+   lento no agrega resistencia y sí agrega 300-800 ms de CPU de un solo hilo en un endpoint NO
+   autenticado: es un amplificador de DoS en la puerta de entrada. El shim de `bcryptjs` del
+   Dockerfile del auth-server **se queda**. Corolario: un código de respaldo se hace LARGO
+   (~127 bits) para no necesitar KDF, no corto y luego protegido con uno.
+4. **NUNCA** guardar el secreto TOTP sin cifrar. Es la única excepción al punto anterior porque es
+   simétrico: el servidor debe poder leerlo. Va cifrado con la llave KMS **simétrica**
+   `auth-server-totp-envelope` (HSM, `ENCRYPT_DECRYPT`, rotación 90 d) y AAD
+   `<environment>|<subject>` — un ciphertext movido a la fila de otra persona NO descifra.
+   `auth-server-es256` es EC de firma y **no puede cifrar**; nunca intentes usarla para esto.
+5. **NUNCA** derivar `amr` de lo que declare el cliente. `uv` sale del flag REAL de la aserción
+   WebAuthn y `totp` de una verificación real. `authLevel = 'step_up'` exige factor fuerte **y**
+   reciente (< 10 min): en el lane ecosystem el actor es la máquina, así que este es el único gate
+   de toda la cadena que depende de QUIÉN es la persona. No existe «recordar este dispositivo».
+6. **NUNCA** dejar que la respuesta de pedir un magic link distinga si el correo existe: mismo
+   cuerpo, mismo código, mismos encabezados **y mismo tiempo** (hay un piso de latencia deliberado,
+   y el despacho del correo no se espera). El cuerpo idéntico sin el piso no cierra nada: el camino
+   "existe" hace INSERT y despacha correo.
+7. **NUNCA** consumir un magic link por GET. Los escáneres de correo abren los enlaces y quemarían
+   el acceso antes de que la persona llegue: el GET pinta una página intermedia y el consumo es POST
+   con verificación de `rowCount === 1` dentro de transacción.
+8. **NUNCA** pedir `allowCredentials` con el correo antes de autenticar por passkey: sería el
+   oráculo de existencia que la regla 6 evita. Se usan credenciales descubribles.
+9. **NUNCA** verificar una aserción WebAuthn pasándole a la librería el contador almacenado.
+   `verifyAuthenticationResponse` LANZA cuando el contador retrocede, y entonces la regresión llega
+   como un "no verificó" cualquiera: la credencial clonada se queda VIVA y la señal no se dispara.
+   Se le pasa `counter: 0` (omite sólo ese chequeo) y la política del contador se aplica sobre datos
+   YA verificados — revocar antes de verificar la firma sería un botón de denegación de servicio
+   para quien conozca un `credential_id`. Un contador que se queda en 0 **no** es regresión.
+10. **NUNCA** construir self-service de reset. Recuperar es re-invitar
+    (`issueExternalInvitation` con `reissue`); al aceptar, `acceptExternalInvitation` desactiva los
+    subjects anteriores del mismo perfil y environment —su `deactivateOrphanSourceLinks` NO cubre
+    esto, porque su condición es por perfil y tras una re-invitación siempre queda una membership
+    linked— y el emisor revoca sesión, passkeys y TOTP de esos subjects. Las dos mitades juntas:
+    sin la primera el passkey viejo abre sesión nueva; sin la segunda la sesión viva sobrevive
+    hasta su próximo request.
+11. **SIEMPRE** ligar la sesión a un source link ACTIVO resuelto en la MISMA consulta
+    (`getSessionWithLink`): resolverlos por separado abre una ventana donde la sesión sobrevive a la
+    revocación. Cuando el link murió, la sesión se revoca en el request que lo detecta, no se
+    responde 401 y se deja viva. Señal `auth.person.session_without_link`, steady 0.
+12. **SIEMPRE** que se agregue una tabla al dominio, declararla en el allowlist de
+    `boundary-domain.test.ts` en el mismo PR, y ejercitar su SQL en el smoke: los tests con mocks
+    ejercitan el TS, nunca el SQL (CHECK, `ON CONFLICT`, triggers, `BYTEA`, `BIGINT`).
+13. **NUNCA** dar por montado un secreto en un runtime nuevo porque se declaró su `*_SECRET_REF`.
+    Declarar la referencia —y hasta conceder el binding IAM con `ensure_secret_accessor_binding`— sólo
+    autoriza a leer algo que nadie está leyendo. Si el consumidor resuelve el secreto de forma
+    **SÍNCRONA**, hay que **MONTARLO** con `--update-secrets`. Caso fuente (commit `38fbfaeeb`,
+    2026-09-05): `services/auth-server/deploy.sh` declaraba `RESEND_API_KEY_SECRET_REF` como env var y
+    concedía el binding, pero nunca montaba `RESEND_API_KEY`; el correo del magic link moría en
+    producción con `RESEND_API_KEY is not configured` y la fila de
+    `greenhouse_notifications.email_deliveries` quedaba en `status=failed`. La razón exacta: `sendEmail`
+    (`src/lib/email/delivery.ts:898`) usa el cliente **síncrono** `getResendClient()`, que lee una
+    resolución CACHEADA que sólo puebla el resolvedor **asíncrono** `getResendClientAsync`, y en el
+    auth-server nadie precalienta el async. El `ops-worker` funciona porque SÍ lo monta
+    (`services/ops-worker/deploy.sh:1004`). Al portar a un runtime nuevo cualquier capacidad compartida
+    (correo, storage, providers), **SIEMPRE** verificar cómo RESUELVE el secreto el consumidor, no cómo
+    lo declara el deploy.
+14. **SIEMPRE** verificar por FUERA el efecto de una superficie cuya respuesta es deliberadamente
+    indistinguible. `POST /auth/magic-link/request` responde 202 idéntico exista o no el correo (regla
+    6): por diseño renunció a reportar su propio resultado, así que un correo muerto **no lo reporta
+    nadie** — la persona lee «te enviamos un enlace» y el acceso queda muerto en silencio. Es la misma
+    clase que `GROWTH_EBOOK_EMAIL_DELIVERY_ENABLED`, donde la success card prometía un correo que el
+    flag apagado nunca despachaba. La evidencia es el efecto real —la fila de `email_deliveries` en
+    `sent`—, **NUNCA** el 202.
+15. **NUNCA** declarar activada la superficie de personas con un canary compuesto sólo de casos
+    negativos y anónimos. Metadata, 401s y códigos inválidos no tocan el carril autenticado: la
+    activación de 2026-09-05 pasó **9/9 canaries públicos con el correo del magic link roto**. El gate
+    real es `pnpm auth-server:person-auth:canary`, que exige una persona y ejercita el contrato HTTP
+    contra el host DESPLEGADO — distinto de `pnpm auth-server:person-auth:smoke`, que ejercita el SQL
+    contra PG real; los dos hacen falta y ninguno sustituye al otro. **`exit 2` = INCOMPLETO**: un
+    canary con pasos omitidos no es verde, es una medición que no se hizo.
+16. **NUNCA** dar por probado un detector que sólo se vio en `ok`. Verlo apagado no distingue «no hay
+    nada que detectar» de «no detecta». Por eso el canary revoca el source link A PROPÓSITO y comprueba
+    que `auth.person.session_without_link` pasa de `ok` a `error` (y que la sesión se revoca en el
+    request que lo detecta, regla 11): un detector está probado cuando se lo ve **ENCENDERSE**.
+17. **Hueco conocido, NO resuelto:** `POST /auth/passkeys/authenticate/start` es anónimo y sin límite de
+    tasa, y cada llamada inserta una fila en `greenhouse_auth.passkey_challenges` sin recolección. Es
+    crecimiento no acotado disparable por un tercero anónimo. El GC (`pnpm auth:gc`) se está
+    construyendo aparte; hasta que exista y quede agendado, **NUNCA** registrar este endpoint como
+    cubierto por el anti-abuso de `auth_rate_limits`.

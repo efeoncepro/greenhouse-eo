@@ -6,7 +6,7 @@
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `ADR nativo aceptado 2026-09-03; TASK-1626 en curso (gateway vivo); U01 TASK-1828 code complete 2026-09-04 con staging vivo (Cloud Run auth-server rev 00003-jtf GIT_SHA 02dc5d987 por CI, https://auth.efeonce.org/readyz 200, JWKS con 2 kid, token ES256 del HSM verificado contra el JWKS remoto, front door compartido) — producción pendiente del próximo release a main; U04 TASK-1631 Slice 1 code complete + staging verificado 2026-09-04 (4 señales, rutas admin, lane ecosystem), producción con el mismo release; U02 TASK-1829 code complete, rollout pendiente 2026-09-04 (metadata RFC 8414/OIDC, CIMD primario, DCR compat, clientes confidenciales por command, PKCE S256, JWT ES256 15 min con gv, refresh rotativo con detección de reuso, revoke/introspect, consentimiento persistido, 7 tablas greenhouse_auth aplicadas, 3 señales; flag AUTH_SERVER_OAUTH_ENABLED=false hasta registrar el environment efeonce-auth y validar en staging); U03 TASK-1830 desbloqueada sobre el runtime y con el SubjectSessionPort de U02 como contrato (authorize responde login_required hasta entonces); U05 TASK-1831 ya tiene el token con sub/azp/scope/gv en código y espera el flag ON en staging; TASK-659 superseded en diseño por U02 (decisión de lifecycle al cerrar 1829); task ui-ux de login por crear al cerrar el contrato de diseño`
+- Status real: `En progreso. 2026-09-05T01:01Z: U01 runtime sano; U02 OAuth y U03 personas activados en auth-server-00007-cxb, SHA 3f68e8875, 100% tráfico, workflow staging 33934410457 success sobre servicio compartido. U04 environment efeonce-auth active. Nueve canaries públicos/negativos passed. Operador indicó identidad interna; su acceso nativo requiere U11 TASK-1836. Sesión, tokens/refresh/revocación y passkeys siguen sin canary autenticado completado. Sin nueva promoción main: riesgo de volver a OFF con el árbol anterior. U05 gateway multi-issuer, U06 pantallas TASK-1835, U07 clientes reales, U08 aseguramiento y U09 convergencia siguen pendientes. Evidencia e historia: docs/audits/2026-09-04-epic-044-auth-rollout.md`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
 - Owner: `Efeonce Platform / Identity`
@@ -77,18 +77,20 @@ KMS, los canaries de cliente, el aseguramiento y la convergencia del login del p
 | Unidad | Task | Entregable y límite de ownership | Depende de |
 |---|---|---|---|
 | **U00** | [TASK-1626](../../tasks/in-progress/TASK-1626-efeonce-mcp-platform-gateway.md) | Gateway neutral en `mcp.efeonce.org` y federación Globe (en curso). Conserva transporte, discovery, providers. No emite tokens. | — |
-| **U01** | [TASK-1828](../../tasks/in-progress/TASK-1828-efeonce-auth-server-runtime-deployable.md) | Runtime `auth.efeonce.org`: `services/auth-server/` en Cloud Run publicado como segundo host del front door del gateway (mismo LB, IP y Cloud Armor; decisión 2026-09-03, ≈ USD 15/mes adicionales), llave KMS HSM + JWKS, schema `greenhouse_auth`, session store y cookie propios, excepción EPIC-027. Sin flujos OAuth visibles todavía. **Code complete 2026-09-04, staging vivo:** Cloud Run `auth-server` (us-east4, rev `00003-jtf`, desplegado por CI con `AUTH_SERVER_ENABLED=true`), llave `auth-server-es256` HSM (v2 `active`, v1 `retiring`), `/.well-known/jwks.json` con 2 `kid`, `readyz` 200 (`postgres`, `kms`, `activeKey`), schema `greenhouse_auth` (`signing_keys` ≤1 active, `signing_key_events` append-only), front door compartido con cert ACTIVE, CLI `pnpm auth-server:rotate-key`, señales `auth.issuer.jwks_unreachable` y `auth.signing_keys.lifecycle`, runbook `docs/operations/runbooks/auth-server.md`, workflow + gates de release. Producción pendiente del próximo release. | — |
-| **U02** | [TASK-1829](../../tasks/in-progress/TASK-1829-efeonce-auth-server-oauth-protocol-surface.md) | Superficie OAuth/OIDC: metadata RFC 8414, CIMD, DCR compat, PKCE, access token ES256, refresh rotativo, revocación, introspección, consentimiento persistido. Extrae el broker sister-platform. **Code complete, rollout pendiente 2026-09-04** (`develop`, commits `263ee3a74`/`19d1658de`/`d31e6e913`): `issuer` idéntico al origen con `client_id_metadata_document_supported: true` y S256 único; CIMD (anti-SSRF, cache 24 h) primario, DCR sólo públicos, confidenciales por `pnpm auth-server:register-client` / `POST /api/admin/auth-server/oauth-clients`; JWT ES256 15 min con `sub/aud/azp/scope/gv/jti` firmado en KMS HSM; refresh opaco rotativo 30 d/90 d con revocación de familia por reuso; `revoke` RFC 7009, `introspect` RFC 7662 (confidenciales); consentimiento por `(subject, client, scope)` con revocación admin (`identity.auth_consent.revoke`); 7 tablas `greenhouse_auth` aplicadas; señales `auth.oauth.{code_reuse_detected,refresh_reuse_detected,cimd_rejected}`; loopback cualquier puerto para públicos, HTTPS exacto para confidenciales. Detrás de `AUTH_SERVER_OAUTH_ENABLED=false`; `authorize` responde `login_required` hasta U03. Contrato: `EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`. Broker sister-platform del portal intacto. | U01 |
-| **U03** | [TASK-1830](../../tasks/to-do/TASK-1830-efeonce-auth-external-person-authentication.md) | Autenticación de personas externas sin contraseña: passkeys, magic link, TOTP step-up, recuperación por re-invitación, anti-abuso. Sólo primitives y rutas; la UI es de U06. | U01 |
+| **U01** | [TASK-1828](../../tasks/in-progress/TASK-1828-efeonce-auth-server-runtime-deployable.md) | Runtime `auth.efeonce.org`: `services/auth-server/` en Cloud Run publicado como segundo host del front door del gateway (mismo LB, IP y Cloud Armor; decisión 2026-09-03, ≈ USD 15/mes adicionales), llave KMS HSM + JWKS, schema `greenhouse_auth`, session store y cookie propios, excepción EPIC-027. Sin flujos OAuth visibles todavía. **Code complete 2026-09-04, staging vivo:** Cloud Run `auth-server` (us-east4, rev `00003-jtf`, desplegado por CI con `AUTH_SERVER_ENABLED=true`), llave `auth-server-es256` HSM (v2 `active`, v1 `retiring`), `/.well-known/jwks.json` con 2 `kid`, `readyz` 200 (`postgres`, `kms`, `activeKey`), schema `greenhouse_auth` (`signing_keys` ≤1 active, `signing_key_events` append-only), front door compartido con cert ACTIVE, CLI `pnpm auth-server:rotate-key`, señales `auth.issuer.jwks_unreachable` y `auth.signing_keys.lifecycle`, runbook `docs/operations/runbooks/auth-server.md`, workflow + gates de release. **En producción desde 2026-09-04** (release `9100bbd2765d`, run `33893120972`, rev `auth-server-00005-pk8`, `GIT_SHA f6db4255a`; `AUTH_SERVER_JWKS_URL` en Vercel Production+staging). Pendiente: retiro de la llave v1. | — |
+| **U02** | [TASK-1829](../../tasks/in-progress/TASK-1829-efeonce-auth-server-oauth-protocol-surface.md) | Superficie OAuth/OIDC: metadata RFC 8414, CIMD, DCR compat, PKCE, access token ES256, refresh rotativo, revocación, introspección, consentimiento persistido. Extrae el broker sister-platform. **Code complete, rollout pendiente 2026-09-04** (`develop`, commits `263ee3a74`/`19d1658de`/`d31e6e913`): `issuer` idéntico al origen con `client_id_metadata_document_supported: true` y S256 único; CIMD (anti-SSRF, cache 24 h) primario, DCR sólo públicos, confidenciales por `pnpm auth-server:register-client` / `POST /api/admin/auth-server/oauth-clients`; JWT ES256 15 min con `sub/aud/azp/scope/gv/jti` firmado en KMS HSM; refresh opaco rotativo 30 d/90 d con revocación de familia por reuso; `revoke` RFC 7009, `introspect` RFC 7662 (confidenciales); consentimiento por `(subject, client, scope)` con revocación admin (`identity.auth_consent.revoke`); 7 tablas `greenhouse_auth` aplicadas; señales `auth.oauth.{code_reuse_detected,refresh_reuse_detected,cimd_rejected}`; loopback cualquier puerto para públicos, HTTPS exacto para confidenciales. Detrás de `AUTH_SERVER_OAUTH_ENABLED=false`; `authorize` responde `login_required` hasta U03. Contrato: `EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`. Broker sister-platform del portal intacto. **Rollout al 2026-09-04:** el código está en producción en la revisión `auth-server-00005-pk8` (release `9100bbd2765d`) con el flag OFF (metadata → 404 verificada); environment `efeonce-auth` registrado en `draft` por `pnpm auth-server:register-issuer-environment` (command U04, nunca SQL); siguen pendientes flag ON en staging + environment `active` + validación de metadata + clientes CIMD/DCR (U07). | U01 |
+| **U03** | [TASK-1830](../../tasks/in-progress/TASK-1830-efeonce-auth-external-person-authentication.md) | Autenticación de personas externas sin contraseña: passkeys, magic link, TOTP step-up, recuperación por re-invitación, anti-abuso. Sólo primitives y rutas; la UI es de U06. | U01 |
 | **U04** | [TASK-1631](../../tasks/in-progress/TASK-1631-efeonce-customer-identity-mcp-federation.md) | Re-alcance: binding Account 360, environments registry, invitaciones, grants, `grants_version`, eligibility reader, señales. Deja de poseer runtime y gateway. **Slice 1 code complete 2026-09-04:** schema aplicado, commands, `GET /api/platform/ecosystem/identity/binding` (contrato de U05), `acceptExternalInvitation` in-process (contrato de U03), 4 señales; rollout pendiente. | U02 en contrato; ejecutable en paralelo |
-| **U05** | [TASK-1831](../../tasks/to-do/TASK-1831-efeonce-mcp-gateway-multi-issuer-authorization-context.md) | Gateway multi-issuer en `efeonce-mcp`: `AuthContext` de seis campos, resolver por issuer, `allowedIssuers` + clase de autoridad por tool, recheck de `grants_version`, tres tests de regresión. | U02, U04 |
-| **U06** | task `ui-ux` por crear | Login, consentimiento y recuperación en `auth.efeonce.org`. Nace al cerrar el contrato de diseño de U03 con wireframe y flow reales (nunca stubs). Bloquea sólo U07. | U03 |
+| **U05** | [TASK-1831](../../tasks/in-progress/TASK-1831-efeonce-mcp-gateway-multi-issuer-authorization-context.md) | Gateway multi-issuer en `efeonce-mcp`: `AuthContext` de seis campos, resolver por issuer, `allowedIssuers` + clase de autoridad por tool, recheck de `grants_version`, tres tests de regresión. | U02, U04 |
+| **U06** | [TASK-1835](../../tasks/in-progress/TASK-1835-efeonce-id-login-consent-screens.md) | Login, consentimiento y recuperación en `auth.efeonce.org` («Efeonce ID»). Creada 2026-09-04 con wireframe, flow, motion y el flujo maestro `docs/ui/flows/EPIC-044-auth-server-login-consent-UI-FLOW.md`; shell HTML server-rendered con tokens del SSOT, consent honesto, harness local + GVC premium. Slice 1 (shell + consent) no bloqueado; Slices 2–3 (login, step-up, recuperación) esperan U03. Bloquea sólo U07. | U03 (Slices 2–3) |
 | **U07** | [TASK-1832](../../tasks/to-do/TASK-1832-efeonce-mcp-client-canaries-and-first-customer-cohort.md) | Matriz de tokens live, canaries Claude/Codex/ChatGPT en loopback y HTTPS hospedado, primera organización allowlisted, allow/deny/expiración/revocación, verificación de producción. | U02–U06 |
 | **U08** | [TASK-1833](../../tasks/to-do/TASK-1833-efeonce-auth-server-security-assurance-and-operations.md) | Red-team agéntico cruzado, pentest externo, rotación de llaves, señales de reliability, runbooks, postura Ley 21.719, retención. Gate previo al primer cliente pagando. | U02, U03 |
 | **U09** | [TASK-1834](../../tasks/to-do/TASK-1834-greenhouse-customer-login-convergence-native-issuer.md) | Portal Greenhouse agrega el emisor propio como provider OIDC de NextAuth sobre el mismo source link; rollback = retirar provider. Gate propio posterior a U07. | U07 |
 | **U10** | [TASK-1813](../../tasks/to-do/TASK-1813-efeonce-mcp-oauth-client-interoperability.md) | Interoperabilidad OAuth Codex/Claude del carril interno Entra (discovery, shim, scopes). Carril paralelo; no construye broker. | — |
 
-Una sola task ejecutable posee cada unidad. `TASK-659` y `TASK-658` se relacionan, no se absorben (ver
+| **U11** | [TASK-1836](../../tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md) | Acceso interno por Efeonce ID: autenticación corporativa, binding canónico y autoridad delegada. Backend; gateway/UI conservan U05/U06. Contrato ADR antes de código; implementación pendiente. | Contratos U02/U03/U04 |
+
+Una sola task ejecutable posee cada unidad. `TASK-1836` es U11; `TASK-659` y `TASK-658` permanecen relacionadas (ver
 *Existing Related Work*). El orden lo definen este epic y el `Rank`, no la antigüedad del ID.
 
 ## Execution Order
@@ -113,8 +115,8 @@ coordinación. Todo release a producción pasa por el control plane, una sesión
 ## Existing Related Work
 
 - [TASK-659](../../tasks/to-do/TASK-659-mcp-oauth-hosted-auth-model.md): modelo OAuth para el MCP interno
-  hosted de Greenhouse. El emisor propio lo cubre en diseño; su cierre por supersesión o re-alcance como
-  consumidor interno se decide con el operador al cerrar U02. No se duplica.
+  hosted de Greenhouse. Conserva su alcance histórico fuera del epic; el motor OAuth base lo cubre U02 y su
+  supersesión formal sigue pendiente. El nuevo acceso interno nativo tiene identidad propia: TASK-1836 (U11).
 - [TASK-658](../../tasks/to-do/TASK-658-api-platform-resource-authorization-bridge.md): bridge de autorización
   de resources API Platform; consumidor del `AuthContext` y de los grants, no hija.
 - [TASK-1804](../../tasks/complete/TASK-1804-greenhouse-skills-mcp-provider.md) y la nota del shim DCR en el
@@ -138,7 +140,9 @@ coordinación. Todo release a producción pasa por el control plane, una sesión
 - [ ] Pentest externo cerrado sin hallazgos críticos abiertos y runbooks de rotación, incidente y revocación masiva publicados.
 - [ ] Los writes federados de EPIC-011, EPIC-022 y EPIC-043 tienen grant delegado revocable disponible o una task propia declarada para su grant.
 - [ ] El login cliente de Greenhouse tiene el provider OIDC del emisor propio detrás de gate, con rollback probado.
-- [ ] `TASK-659` cerrada por supersesión o re-alcanzada, con decisión registrada.
+- [ ] `TASK-659` resuelta por supersesión formal de su diseño original; conserva alcance histórico, no es U11.
+- [x] Nueva `TASK-1836` registrada como U11 por solicitud explícita del operador; consumers y dependencias actualizados.
+- [ ] Personal Efeonce completa acceso MCP nativo con identidad canónica y grants revocables; externos del mismo issuer no acceden a tools internas (U11 -> U05/U06 -> U07).
 
 ## Non-goals
 
@@ -216,3 +220,37 @@ de federación siguen vigentes.
   staging; U07 (`TASK-1832`) puede planificar canaries con CIMD, DCR y un confidencial por CLI; `TASK-659`
   queda superseded en diseño por este epic (el emisor nativo cubre el OAuth hosted para clientes MCP) — la
   decisión final de lifecycle la registra la sesión principal al cerrar `TASK-1829`.
+
+## Delta 2026-09-04 (producción — release `9100bbd2765d`)
+
+- **U01 (`TASK-1828`) en producción.** El release `9100bbd2765d` (orquestador `production-release.yml`, run
+  `33893120972`, manifest `released` 16:39:40Z) ejecutó por primera vez `deploy-auth-server`: revisión
+  `auth-server-00005-pk8` (`GIT_SHA f6db4255a`, árbol byte-idéntico al target; deploy change-gated por rutas), un
+  solo servicio Cloud Run para staging y producción. Verificado en vivo: `/healthz` `{enabled:true, oauth:false}`,
+  `/readyz` 200 (`postgres`/`kms`/`activeKey` ok), JWKS con 2 `kid` (v2 `active`, v1 `retiring`),
+  `/.well-known/oauth-authorization-server` → 404 (flag OAuth OFF). Retiro de la llave v1 sigue pendiente (dueño:
+  sesión de `TASK-1828`).
+- **`AUTH_SERVER_JWKS_URL`** declarada en Vercel Production y staging el mismo día, con redeploy de ambos; la señal
+  `auth.issuer.jwks_unreachable` deja `not_configured`. Lectura en producción con sesión humana pendiente (el agent
+  auth está deshabilitado en producción por diseño).
+- **U02 (`TASK-1829`) sigue `code complete, rollout pendiente`**, ahora con el código en la revisión de
+  producción y el flag OFF. Precondición cumplida a medias: el environment del emisor `efeonce-auth` se registró
+  en `greenhouse_core.external_identity_environments` en **`draft`** por el command canónico de U04
+  (`upsertExternalIdentityEnvironment`, audit + outbox; nunca SQL) a través del CLI nuevo
+  `pnpm auth-server:register-issuer-environment` (`issuerUrl https://auth.efeonce.org`, `jwksUri` del JWKS,
+  `audience https://mcp.efeonce.org/mcp`, `issuerClass external` inmutable, `subjectType public`, actor
+  `cli:jreye`). En `draft` el resolver responde `environment_inactive` (verificado en producción por el lane
+  ecosystem `GET /api/platform/ecosystem/identity/binding?environment=efeonce-auth&subject=…` → 200). Pasa a
+  `active` con `--status active` exactamente cuando se prenda `AUTH_SERVER_OAUTH_ENABLED` en staging (default en
+  `deploy.sh` + `auth-server-deploy.yml`). Después: validar metadata, clientes CIMD + DCR de prueba (U07); flujo con
+  persona real exige U03.
+- **Scripts del dominio** (`scripts/auth-server/`): `register-issuer-environment.ts`, `register-oauth-client.ts`,
+  `oauth-store-smoke.ts` (los tres con `.env.local` + proxy PG), `generate-brand-assets.ts`.
+
+## Delta 2026-09-04 — U11 acceso interno nativo
+
+TASK-1836 es la nueva dueña del gap interno por solicitud del operador. Se retira la propuesta anterior
+de reasignar TASK-659, que conserva su historia fuera del epic. Orden: contrato/ADR U11 -> backend interno
+U11 -> integración interna U05/U06 -> canaries U07. El slice externo mantiene su secuencia. No se interpreta
+el issuer común como autoridad interna ni se cambia la clasificación comercial de Efeonce. Esta decisión
+es planificación; no acredita implementación ni login interno nativo operativo.

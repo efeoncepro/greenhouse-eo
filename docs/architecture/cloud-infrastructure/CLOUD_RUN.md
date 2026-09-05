@@ -1,6 +1,6 @@
 # Cloud Infrastructure — Cloud Run (services, Functions legacy, Jobs)
 
-> **Estado vigente** · Updated: 2026-09-04 (TASK-1828 — `auth-server` desplegado, JWKS vivo) · Cronología: [HISTORIAL.md](HISTORIAL.md)
+> **Estado vigente** · Updated: 2026-09-04 (TASK-1828 — `auth-server` en producción por el release `9100bbd2765d`, JWKS vivo) · Cronología: [HISTORIAL.md](HISTORIAL.md)
 > **SoT:** `services/<worker>/deploy.sh` (config declarativa) + `gcloud run services|jobs list`
 > (estado live). Inventario live completo auditado por última vez el 2026-04-23 (`13`
 > serverless: 5 Cloud Run custom + 8 Functions Gen 2); re-baseline pendiente (`TASK-127`).
@@ -15,7 +15,7 @@
 | `hubspot-greenhouse-integration` | `us-central1` | default compute SA | **public** (`allUsers`) | parcial | revisar si el exposure público es realmente el deseado |
 | `notion-bq-sync` | `us-central1` | default compute SA | **public** (`allUsers`) | Secret Manager | exposición pública innecesaria para un sync interno; `minScale=0` desde 2026-04-24 |
 | `clamav` | `us-east4` | `greenhouse-portal@...` | IAM only (ingress `all` + `--no-allow-unauthenticated`, invoker sólo `greenhouse-portal@`) | **ninguno** — no lee secretos ni toca PostgreSQL | Escáner de firmas de assets de candidato (TASK-1378). **PRODUCTIVO desde 2026-08-12**: `ASSET_MALWARE_SCAN_ENABLED=true` en staging Y producción de Vercel (ISSUE-150 resuelta). `mem=2Gi`, `cpu=1`, `min=1`, `max=3`, `concurrency=4`, `timeout=120s`, 3,6 M firmas. **Servicio ÚNICO para staging y producción** (ver abajo). ≈USD 19/mes |
-| `auth-server` | `us-east4` | `auth-server@efeonce-group` (SA propia: `roles/cloudkms.signerVerifier` **sólo** sobre la llave `auth-server-es256` + `roles/cloudsql.client`) | **LB + sin auth Cloud Run**: ingress `internal-and-cloud-load-balancing` + `--allow-unauthenticated`; entra únicamente por el front door **compartido** del gateway MCP como segundo host `auth.efeonce.org` (misma IP `34.111.78.237`, misma policy Cloud Armor) | Secret Manager; la llave privada de firma vive en **Cloud KMS (HSM)** y nunca sale | Authorization server propio de Efeonce (EPIC-044, TASK-1828). Imagen `gcr.io/efeonce-group/auth-server` (Cloud Build, `services/auth-server/Dockerfile`, esbuild `--packages=external`, Node 22-slim). `cpu=1`, `mem=512Mi`, `concurrency=80`, `timeout=30s`, `min=1` production / `0` staging. **Servicio ÚNICO compartido staging+producción** (como `ops-worker`). Flag `AUTH_SERVER_ENABLED` (SoT `services/auth-server/deploy.sh`, default `true` desde 2026-09-04). Revisión activa `auth-server-00003-jtf` (`GIT_SHA 02dc5d987`, CI/WIF run `33870746218`); producción pendiente del próximo release. ≈USD 15/mes (Cloud Run + KMS + front door). Ver §`auth-server` abajo |
+| `auth-server` | `us-east4` | `auth-server@efeonce-group` (SA propia: `roles/cloudkms.signerVerifier` **sólo** sobre la llave `auth-server-es256` + `roles/cloudsql.client`) | **LB + sin auth Cloud Run**: ingress `internal-and-cloud-load-balancing` + `--allow-unauthenticated`; entra únicamente por el front door **compartido** del gateway MCP como segundo host `auth.efeonce.org` (misma IP `34.111.78.237`, misma policy Cloud Armor) | Secret Manager; la llave privada de firma vive en **Cloud KMS (HSM)** y nunca sale | Authorization server propio de Efeonce (EPIC-044, TASK-1828). Imagen `gcr.io/efeonce-group/auth-server` (Cloud Build, `services/auth-server/Dockerfile`, esbuild `--packages=external`, Node 22-slim). `cpu=1`, `mem=512Mi`, `concurrency=80`, `timeout=30s`, `min=1` production / `0` staging. **Servicio ÚNICO compartido staging+producción** (como `ops-worker`). Flags `AUTH_SERVER_ENABLED` (default `true` desde 2026-09-04) y `AUTH_SERVER_OAUTH_ENABLED` (default `false`, TASK-1829) con SoT `services/auth-server/deploy.sh`. **En producción desde 2026-09-04** por el orquestador (`production-release.yml` job `deploy-auth-server`, release `9100bbd2765d`, run `33893120972`): revisión activa `auth-server-00005-pk8` (`GIT_SHA f6db4255a`, árbol idéntico al target; deploy change-gated por rutas). ≈USD 15/mes (Cloud Run + KMS + front door). Ver §`auth-server` abajo |
 
 ## Cloud Run Jobs
 
@@ -139,8 +139,9 @@ credencial (`GCP_AUTH_PREFERENCE=service_account_key` sin rama en el resolver de
   existe la capa de runtime + llaves: `/healthz` (200 siempre), `/readyz` (503 con
   `AUTH_SERVER_ENABLED=false`; 200 con PG + KMS + llave `active`), `/.well-known/jwks.json`
   (`active` + `retiring`, `Cache-Control: max-age=300`; 404 con flag OFF) y allowlist de `Host`
-  (`AUTH_SERVER_ALLOWED_HOSTS`, 421 fuera de ella). Los flujos OAuth (TASK-1829) y la autenticación
-  de personas (TASK-1830) llegan después; **hoy no emite tokens**.
+  (`AUTH_SERVER_ALLOWED_HOSTS`, 421 fuera de ella). Los flujos OAuth (TASK-1829) ya viajan en el mismo runtime
+  detrás de `AUTH_SERVER_OAUTH_ENABLED=false` (metadata y `/oauth/*` → 404); la autenticación de personas
+  (TASK-1830) llega después; **hoy no emite tokens**.
 - **Llave de firma — Cloud KMS HSM:** key ring `us-east4/auth-server`, llave `auth-server-es256`
   (`EC_SIGN_P256_SHA256`, nivel de protección HSM); al 2026-09-04 la versión `v2` está `active` y la
   `v1` en `retiring`. La firma ocurre dentro de KMS (`roles/cloudkms.signerVerifier` del SA, acotado a la
@@ -161,10 +162,19 @@ credencial (`GCP_AUTH_PREFERENCE=service_account_key` sin rama en el resolver de
   verificación de `GIT_SHA` en la revisión activa); registrado en `RELEASE_DEPLOY_WORKFLOWS` como
   `Auth Server Deploy` (`cloudRunService: auth-server`, `us-east4`) y como job `deploy-auth-server` de
   `production-release.yml`. Los tres gates de worker (`worker:build-contract-gate`,
-  `worker:runtime-deps-gate`, `worker:deploy-path-gate`) lo cubren.
-- **Señales:** `auth.issuer.jwks_unreachable` (`runtime`) y `auth.signing_keys.lifecycle`
+  `worker:runtime-deps-gate`, `worker:deploy-path-gate`) lo cubren. **Primer deploy a producción: release
+  `9100bbd2765d`** (2026-09-04, run `33893120972`, manifest `released` 16:39:40Z) → revisión `auth-server-00005-pk8`
+  (`GIT_SHA f6db4255a`); verificado en vivo `/readyz` 200 (`postgres`/`kms`/`activeKey` ok), JWKS con 2 `kid`,
+  `/.well-known/oauth-authorization-server` 404 (flag OAuth OFF). Como el servicio es único, el mismo deploy
+  sirve staging y producción; el deploy es change-gated (sólo se reconstruye si cambian sus rutas).
+- **Señales:** `auth.issuer.jwks_unreachable` (`runtime`; su reader corre en Vercel y necesita
+  `AUTH_SERVER_JWKS_URL=https://auth.efeonce.org/.well-known/jwks.json`, declarada en Production y staging el
+  2026-09-04 con redeploy — lectura en producción con sesión humana pendiente) y `auth.signing_keys.lifecycle`
   (`data_quality`) bajo el módulo `identity` (reader `src/lib/reliability/queries/auth-server-signals.ts`);
   los fallos de KMS se leen como incidentes Sentry con tag `component=auth-server` / `check=kms`.
+- **Environment del emisor:** fila `efeonce-auth` de `greenhouse_core.external_identity_environments` registrada
+  en `draft` el 2026-09-04 por `pnpm auth-server:register-issuer-environment` (command de TASK-1631, nunca SQL);
+  pasa a `active` cuando se prenda `AUTH_SERVER_OAUTH_ENABLED` en staging.
 - Runbook canónico: [`docs/operations/runbooks/auth-server.md`](../../operations/runbooks/auth-server.md).
   ADR: [`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](../EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md).
 

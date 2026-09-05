@@ -185,3 +185,7 @@ Plantillas ......................................................... templates/
 Una ejecución no termina porque una API respondió `success`. Termina cuando una **segunda lectura
 fresca** confirma contenido, relaciones, responsables, fechas, formato y estados guardados. En
 lotes: reportar listos, bloqueados con motivo y fuera de alcance.
+
+## Metodología de deck ejecutivo mensual
+
+Para resumir una auditoría o informe en un deck para directorio, cargar `docs/operations/EFEONCE_EXECUTIVE_REPORT_DECK_METHOD_V1.md`: continuidad de evidencia, producción mensual frente a acumulada, On-time con denominadores, narrativa ejecutiva, selección visual antes de implementación, marcas/pie/contraportada, HTML como insumo del PDF A4 y verificación del archivo final. El caso Berel conserva sus decisiones y límites; las cifras no se reutilizan entre meses.

@@ -1,0 +1,86 @@
+{
+  "template": "BoardCards",
+  "version": "1.0",
+  "viewport": {
+    "width": 1123,
+    "height": 794
+  },
+  "slots": {
+    "eyebrow": {
+      "selector": "[data-slot=\"eyebrow\"]",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 55,
+        "overflow": "reject"
+      }
+    },
+    "title": {
+      "selector": "[data-slot=\"title\"]",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 100,
+        "overflow": "reject"
+      }
+    },
+    "lead": {
+      "selector": "[data-slot=\"lead\"]",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 230,
+        "overflow": "reject"
+      }
+    },
+    "source": {
+      "selector": "[data-slot=\"source\"]",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 165,
+        "overflow": "reject"
+      }
+    },
+    "insight": {
+      "selector": "[data-slot=\"insight\"]",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 205,
+        "overflow": "reject"
+      }
+    },
+    "cards": {
+      "selector": "[data-slot=\"cards\"]",
+      "type": "array",
+      "required": true,
+      "itemSelector": ".card",
+      "constraints": {
+        "minItems": 3,
+        "maxItems": 3,
+        "overflow": "reject"
+      },
+      "item": {
+        "type": "object",
+        "shape": {
+          "tag": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 30
+          },
+          "heading": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 64
+          },
+          "body": {
+            "type": "string",
+            "required": true,
+            "maxCharacters": 240
+          }
+        }
+      }
+    }
+  }
+}

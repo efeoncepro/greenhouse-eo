@@ -14,7 +14,7 @@ Convención de esta skill: **[DOC]** = documentado por el proveedor · **[OBS]**
 documentación. Cuando algo es `[NO-DOC]`, la respuesta correcta es verificarlo empíricamente, no
 completarlo con intuición.
 
-## Los cinco invariantes que más caro cuestan
+## Los seis invariantes que más caro cuestan
 
 **NUNCA configures un `tracking_subdomain` en un dominio que emita links con secreto** (magic link,
 bearer de acceso, reset de contraseña). Con click tracking activo, Resend **reescribe todos los `<a
@@ -44,6 +44,15 @@ devuelve sólo `{object, id}` — no confirma el estado resultante. El `list` om
 **Verifica el dominio EXACTO del remitente.** Los subdominios son objetos `domain` independientes con
 tracking propio. Comprobar `efeoncepro.com` cuando el correo sale de `avisos.efeoncepro.com` da falso
 verde.
+
+**`RESEND_API_KEY_SECRET_REF` declarado NO es la API key disponible.** El envío pasa por el cliente
+**síncrono** `getResendClient()` (`src/lib/resend.ts`), que lee `process.env.RESEND_API_KEY` o una
+resolución ya cacheada; el carril `*_SECRET_REF` lo puebla sólo el resolvedor **asíncrono**, y en un
+runtime nuevo nadie lo precalienta antes del primer envío. En Cloud Run el secreto hay que **montarlo**
+(`--update-secrets RESEND_API_KEY=<ref>`), como hace `services/ops-worker/deploy.sh`. Caso fuente
+2026-09-05: el auth-server declaraba el ref y tenía su binding IAM, y el magic link de producción
+llevaba días fallando con `RESEND_API_KEY is not configured` — un fallo que no es del proveedor y que
+ningún readback contra Resend puede ver.
 
 **Un envío a una dirección suprimida puede quedar aceptado sin entrega** [OBS]: Greenhouse observó
 un ID de proveedor seguido de `email.suppressed`; la documentación confirma que Resend omite el
@@ -103,6 +112,12 @@ Canon del repo: `docs/operations/runbooks/resend-email-lifecycle-rollout.md` ·
 
 En este orden, porque cada paso descarta una clase entera:
 
+0. **¿El runtime tenía la API key?** Antes de mirar al proveedor, lee la fila de
+   `greenhouse_notifications.email_deliveries`: un `status=failed` con `RESEND_API_KEY is not
+   configured` significa que el correo nunca salió y no hay nada que diagnosticar en Resend. Esa fila
+   —`status`, `provider_status`, `error_message`— es la única evidencia observable del envío; el 2xx del
+   endpoint que lo dispara no prueba nada, y menos si es indistinguible por diseño (magic link: 202
+   idéntico exista o no la cuenta).
 1. **¿Está suprimida la dirección?** `GET /suppressions/{email}` (acepta email, no sólo id). Si lo
    está, ningún reintento va a funcionar y el envío devolvió éxito igual.
 2. **¿Qué dice el proveedor?** `GET /emails/{id}` → `last_event`. Ojo: es un **escalar**, no un

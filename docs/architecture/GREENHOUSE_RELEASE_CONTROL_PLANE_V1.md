@@ -4,7 +4,7 @@
 > **Owners:** Platform / DevOps
 > **Source task:** TASK-848
 > **Replaces:** N/A (no formal release contract pre-2026-05-10; lived as tribal knowledge in `Handoff.md`)
-> **Related:** TASK-849 (Production Release Watchdog Alerts), TASK-857 (GitHub Webhooks Release Event Ingestion), TASK-742 (Auth Resilience 7-layer), TASK-765 (payment_orders state machine), TASK-773 (outbox publisher cutover)
+> **Related:** TASK-849 (Production Release Watchdog Alerts), TASK-857 (GitHub Webhooks Release Event Ingestion), TASK-742 (Auth Resilience 7-layer), TASK-765 (payment_orders state machine), TASK-773 (outbox publisher cutover), TASK-1828 (`auth-server` como quinto deployable Cloud Run del control plane, 2026-09-04)
 
 ## Delta 2026-07-09 — Agent release operating discipline
 
@@ -17,10 +17,13 @@ Contrato operativo agregado:
 - Medir tiempos de release es obligatorio cuando el operador lo pide, pero la
   medicion no convierte approvals, workers lentos, Azure `no_infra_diff`,
   `ops-worker` change-gated o runner queue final en incidentes nuevos.
-- `ops-worker` puede conservar un `GIT_SHA` anterior si el workflow detecta
-  `deploy_needed=false`. Si el diff de rutas runtime entre Cloud Run `GIT_SHA`
-  y `target_sha` es vacio y el servicio esta `Ready=True`, el hallazgo es
-  residual de label y no debe forzar redeploy.
+- Un servicio change-gated (`ops-worker`; desde 2026-09-04 también
+  `auth-server`) puede conservar un `GIT_SHA` anterior si el workflow detecta
+  `deploy_needed=false`. Si el diff de árbol completo entre Cloud Run `GIT_SHA`
+  y `target_sha` es vacío y el servicio está `Ready=True`, el hallazgo es
+  residual de label y no debe forzar redeploy. Desde el release `9100bbd2765d`
+  el watchdog lo clasifica solo (`change-gated — rutas runtime sin cambios`),
+  ver Delta 2026-09-04 más abajo.
 - Si la transition final a `released` queda queued/stale tras runtime verde, el
   cierre solo puede hacerse por el CLI canonico
   `release:orchestrator-transition-state` con release ID y razon auditada; nunca
@@ -788,6 +791,46 @@ allowlist, nunca de un literal). Los tres gates de workers (`worker:build-contra
 defecto (ledger), y `/readyz` 503 con el flag OFF no es un deploy fallido. Runbook:
 `docs/operations/runbooks/auth-server.md`.
 
+## Delta 2026-09-04 — Release `9100bbd2765d`: primer release con 5 servicios, change-gate por servicio en el watchdog y gate `Production` case-sensitive
+
+Primer release que corrió el orquestador con los cinco deployables Cloud Run (PR #221 squash, run `33893120972`,
+un solo intento; manifest `9100bbd2765d-d5fae366-3823-4186-9399-4722476a45d2` `released` a las `16:39:40Z`,
+`31m20s` de manifest). Bypass con hechos por `db_migrations` (6 migraciones ya aplicadas en la instancia única) y
+marker `[release-coupled: auth_access + cloud_release …]` en el squash. Post-release: health 200, Vercel Production
+READY, 5 servicios `Ready`. Tres hechos cambian el contrato vigente:
+
+1. **El watchdog clasifica el change-gate por servicio, no sólo para `ops-worker`.** `commercial-cost-worker`,
+   `ico-batch-worker` y `hubspot-greenhouse-integration` quedaron en el target; `ops-worker` **y `auth-server`**
+   quedaron en `f6db4255a` (el push a `develop` los había desplegado con un árbol byte-idéntico al squash:
+   `git diff --name-only f6db4255a 9100bbd27` vacío, `deploy_needed=false` en ambos jobs). El reader
+   `src/lib/reliability/queries/release-worker-revision-drift.ts` sólo conocía la lista de rutas de `ops-worker`,
+   así que reportó `platform.release.worker_revision_drift` en `error` («1 worker con revision drift confirmado
+   (auth-server)») sobre un release sano. Fix (commit `1403d5a32` en `develop`): `CHANGE_GATED_RUNTIME_PATHS` es un
+   mapa **por servicio** (`ops-worker`, `auth-server`), cada entrada un **espejo** del array `WORKER_RUNTIME_PATHS=(`
+   de su workflow de deploy. No se lee el YAML con `node:fs` en runtime — el módulo es alcanzable desde rutas y
+   Turbopack trazaría el repo entero (mismo bug class del `node:fs` dinámico que infló una función Vercel a 397 MB, `GREENHOUSE_CANONICAL_PATTERNS_V1.md`) — y la paridad la sostiene
+   `src/lib/reliability/queries/release-worker-change-gate-parity.test.ts`, que parsea los workflows reales. Tras el
+   fix el watchdog devuelve `aggregateSeverity: ok`, `5/5 workers synced`, con ambos servicios en
+   `change-gated — rutas runtime sin cambios`. **Regla:** todo servicio Cloud Run change-gated nuevo entra con su
+   entrada espejo en ese mapa **y** su workflow en el test de paridad, en el mismo PR que lo suma a
+   `RELEASE_DEPLOY_WORKFLOWS`; la verificación que manda sigue siendo el diff de árbol completo
+   (`git diff --name-only <served_sha> <target_sha>` vacío), nunca el skip del gate (Playbook §13 y §18).
+2. **El environment se llama `Production` en la API de `pending_deployments`.** El primer gate esperó 21 minutos
+   (`16:05`→`16:26Z`) porque el loop de aprobación filtraba `select(.environment.name=="production")` en minúscula
+   mientras GitHub devuelve `Production`; corregido con `(.environment.name|ascii_downcase)=="production"`, el
+   segundo gate (Azure) se aprobó en segundos. Convive con el gotcha #14 de la skill (`vercel env add` exige
+   `production` en minúscula): son dos APIs con convenciones opuestas, ambas verdaderas. **Regla:** comparar el
+   nombre del environment case-insensitive y dejar una línea visible por iteración del poll (Playbook §17).
+3. **Coordinación previa al merge.** Dos sesiones Claude vivas fueron consultadas y se retiraron antes del merge;
+   `gh run list --workflow=production-release.yml` no mostraba ningún run para el SHA antes del dispatch
+   (runbook §0.1, Playbook §15/§16). Tiempo agente end-to-end ~2h30m; fases en
+   `docs/operations/PRODUCTION_RELEASE_TIMING_LEDGER.md`.
+
+Acciones post-release fuera del orquestador: `AUTH_SERVER_JWKS_URL=https://auth.efeonce.org/.well-known/jwks.json`
+en Vercel Production + staging con redeploy (para que `auth.issuer.jwks_unreachable` salga de `not_configured`) y
+environment `efeonce-auth` registrado en `draft` por el command canónico de TASK-1631
+(`pnpm auth-server:register-issuer-environment`).
+
 ## Invariantes operativos para agentes (TASK-848…871)
 
 > **Relocados de `CLAUDE.md` por TASK-1160 (2026-06-16), verbatim — cero cambio semántico.** Espejo operativo (NUNCA/SIEMPRE) que un agente carga al tocar el control plane de release; el contrato técnico vive arriba. Dedup con la prosa = TASK-1160 Slice 4.
@@ -858,7 +901,7 @@ Watchdog manual-only temporal (desde 2026-05-24 hasta TASK-920) que detecta los 
 
 - `src/lib/release/github-helpers.ts` — `resolveGithubToken` (async, GH App primary → PAT fallback), `resolveGithubTokenSync` (back-compat PAT-only), `buildGithubAuthHeaders`, `fetchGithubWithTimeout`, `githubRepoCoords`, `assertGithubResponseOk`, `githubFetchJson`. Single source of truth para todas las queries GitHub API observer-only.
 - `src/lib/release/github-app-token-resolver.ts` — `resolveGithubAppInstallationToken()` async con cache + JWT mint. Mint flow: cache hit → JWT firmado RS256 con private key → POST `/app/installations/<id>/access_tokens` → cache 1h con renovacion 5min antes expiry. Degradacion canonica: si GH App config faltante o JWT mint falla, retorna null y caller fallback a PAT.
-- `src/lib/release/workflow-allowlist.ts` — `RELEASE_DEPLOY_WORKFLOWS` canonical array (6 workflows + Cloud Run service mapping para drift detection). `RELEASE_DEPLOY_WORKFLOW_NAMES` set O(1) lookup. `WORKFLOWS_WITH_CLOUD_RUN_DRIFT_DETECTION` filtered subset (4 workflows). `findWorkflow()` lookup.
+- `src/lib/release/workflow-allowlist.ts` — `RELEASE_DEPLOY_WORKFLOWS` canonical array (6 workflows + Cloud Run service mapping para drift detection). `RELEASE_DEPLOY_WORKFLOW_NAMES` set O(1) lookup. `WORKFLOWS_WITH_CLOUD_RUN_DRIFT_DETECTION` filtered subset (4 workflows hasta 2026-09-04; 5 con `Auth Server Deploy`, TASK-1828 — el test deriva el denominador del allowlist, nunca de un literal). `findWorkflow()` lookup.
 - `src/lib/release/severity-resolver.ts` — `WatchdogSeverity` superset (`ok|warning|error|critical`), `WATCHDOG_THRESHOLDS` frozen, 3 resolvers per detector, `aggregateMaxSeverity`, `severityRank`, `isSeverityEscalation`, `watchdogSeverityToReliabilitySeverity` (collapse critical→error).
 - `src/lib/release/watchdog-alerts-dispatcher.ts` — `dispatchWatchdogAlert()` + `dispatchWatchdogRecovery()` con dedup atomic + at-least-once Teams delivery + `clearDedupRow()`.
 
@@ -866,7 +909,7 @@ Watchdog manual-only temporal (desde 2026-05-24 hasta TASK-920) que detecta los 
 
 - `platform.release.stale_approval` (TASK-848 V1.0) — runs `waiting` con Production approval. warning>24h, error>7d (reader); warning>2h, error>24h, critical>7d (watchdog).
 - `platform.release.pending_without_jobs` (TASK-848 V1.0) — runs queued/in_progress con `jobs.length === 0`. error>5min (reader); warning>5min, error>30min (watchdog).
-- `platform.release.worker_revision_drift` (TASK-849 V1.0) — Cloud Run latest revision SHA != ultimo workflow run success SHA. error si drift confirmado, warning si data_missing (NO falso positivo).
+- `platform.release.worker_revision_drift` (TASK-849 V1.0) — Cloud Run latest revision SHA != ultimo workflow run success SHA. error si drift confirmado, warning si data_missing (NO falso positivo). Desde 2026-09-04 un SHA distinto en un servicio change-gated (`ops-worker`, `auth-server`) con diff vacío sobre las rutas espejo de `CHANGE_GATED_RUNTIME_PATHS` cuenta como `synced` (`detail`: `change-gated — rutas runtime sin cambios`), no como drift; sólo `DRIFT` en el `detail` es drift.
 
 **Tabla dedup** `greenhouse_sync.release_watchdog_alert_state`:
 
@@ -903,6 +946,7 @@ Watchdog manual-only temporal (desde 2026-05-24 hasta TASK-920) que detecta los 
 - **NUNCA** crear PAT con scopes mas amplios que `Actions:read + Deployments:read + Metadata:read`. Si emerge necesidad de mas permisos, evaluar primero si GH App lo cubre (preferred).
 - **NUNCA** usar `resolveGithubTokenSync` en code paths nuevos. Es back-compat layer V1.0; nuevos consumers usan `resolveGithubToken` async para preferir GH App.
 - **SIEMPRE** que emerja un workflow nuevo de deploy production, agregarlo a `RELEASE_DEPLOY_WORKFLOWS` en `src/lib/release/workflow-allowlist.ts` ANTES del primer deploy. Sin esto el watchdog NO lo detecta.
+- **SIEMPRE** que el workflow nuevo sea change-gated (array `WORKER_RUNTIME_PATHS=(`), agregar en el mismo PR su entrada espejo en `CHANGE_GATED_RUNTIME_PATHS` (`release-worker-revision-drift.ts`) y su workflow en `release-worker-change-gate-parity.test.ts`. Sin esto el primer release en que el servicio salte el deploy sale como DRIFT `error` sobre un release sano (caso `auth-server`, `9100bbd2765d`). **NUNCA** leer el YAML con `node:fs` desde el reader (módulo alcanzable desde rutas; Turbopack traza el repo).
 - **SIEMPRE** que el dispatcher Teams falle, mantener at-least-once delivery: NO actualizar dedup state si Teams send failed. Aceptable: alert duplicado en re-try vs alert perdido.
 
 **Spec canónica**: TASK-849 → `docs/tasks/complete/TASK-849-production-release-watchdog-alerts.md`. Runbook operativo: `docs/operations/runbooks/production-release-watchdog.md`. Migration: `migrations/20260510122723670_task-849-watchdog-alert-state.sql`. CLI: `pnpm release:watchdog [--json|--fail-on-error|--enable-teams|--dry-run]`.
@@ -1022,7 +1066,7 @@ pnpm release:preflight --json --fail-on-error
 # exit 1 si readyToDeploy=false → degraded/unknown tambien frenan production
 
 # Break-glass operator
-pnpm release:preflight --override-batch-policy --fail-on-error
+pnpm release:preflight --override-batch-policy --override-reason="Motivo específico aprobado del release" --fail-on-error
 # Downgrade release_batch_policy errors a warnings (requiere capability + audit)
 ```
 
@@ -1092,7 +1136,7 @@ Pero la CLI sólo implementaba `--override-batch-policy` (downgrade `release_bat
 
 El workflow `production-release.yml` tiene environment `production` para 2 sets de jobs distintos:
 
-1. **First gate** (post Vercel ready): aprueba los **4 Cloud Run workers** (ops-worker + commercial-cost-worker + ico-batch-worker + hubspot-greenhouse-integration).
+1. **First gate** (post Vercel ready): aprueba los **Cloud Run workers** (ops-worker + commercial-cost-worker + ico-batch-worker + hubspot-greenhouse-integration; desde 2026-09-04 también `auth-server`, TASK-1828 — 5 servicios).
 2. **Second gate** (post worker deploys): aprueba los **2 Azure Bicep deploys** (Teams Notifications + Teams Bot).
 
 El operador debe aprobar la `Production` environment **DOS VECES** — primera para workers, segunda para Azure. Cada aprobación crea un `pending_deployment` separado.
@@ -1117,6 +1161,8 @@ gh api -X POST repos/<owner>/<repo>/actions/runs/<run_id>/pending_deployments \
 `environment_ids[]` apunta al mismo numeric ID del environment Production (`12831857432` en este repo). Cada gate genera deployment ID distinto (`4680795919` workers, `4680866226+4680866228` Azure).
 
 **⚠️ Regla dura**: **NUNCA** asumir que aprobar el environment Production una sola vez completa el release. Verificar `gh api repos/<owner>/<repo>/actions/runs/<run_id>/pending_deployments` post-workers; si retorna 1+ deployments pendientes, aprobar nuevamente.
+
+**⚠️ Regla dura (2026-09-04)**: en `pending_deployments` el environment se llama **`Production`** (mayúscula). Un loop que filtre `environment.name=="production"` no aprueba nada y espera en silencio (21 min en `9100bbd2765d`). Comparar siempre con `(.environment.name|ascii_downcase)=="production"` y loggear una línea por iteración del poll. Es la convención opuesta a `vercel env add`, que exige `production` en minúscula (skill gotcha #14).
 
 #### Lesson 5 — Path B "recovery + ship" requiere code-first cuando ambos usan el mismo bug class
 
@@ -1150,7 +1196,7 @@ Tiempo objetivo: **<30 min** para bundled releases típicos.
 [ ] 10. Approve second env gate via gh api (Azure Bicep)
 [ ] 11. WAIT for orchestrator transition_state → released SUCCESS
 [ ] 12. Dispatch watchdog: `gh workflow run production-release-watchdog.yml --ref main`
-[ ] 13. Verify all 4 Cloud Run GIT_SHAs match target_sha
+[ ] 13. Verify all 5 Cloud Run GIT_SHAs match target_sha (`pnpm release:workers --expected-sha=<sha>`; un SHA distinto en `ops-worker`/`auth-server` es change-gate legítimo sólo si el diff de árbol completo es vacío)
 [ ] 14. Move resolved issues + update Handoff/changelog + close tasks
 ```
 
@@ -1221,7 +1267,7 @@ arquitectura/runbooks/docs vivas aplicables.
 1. `preflight` — `pnpm release:preflight --json --fail-on-error`. `bypass_preflight_reason >=20 chars` → `--override-batch-policy` flag pass-through. Artifact `preflight-result.json` para audit.
 2. `record-started` — `pnpm release:orchestrator-record-started` (CLI Slice 0) → `release_id` stdout. Auth WIF + Cloud SQL Connector. Emite outbox `platform.release.started v1` + audit row en misma tx.
 3. `approval-gate` — `environment: production` (required reviewers en repo settings). Timeout 3 dias.
-4. `deploy-{ops-worker, commercial-cost-worker, ico-batch, hubspot-integration}` — parallel matrix `uses: ./.github/workflows/<worker>-deploy.yml@<sha>` con `expected_sha` + `environment` inputs.
+4. `deploy-{ops-worker, commercial-cost-worker, ico-batch, hubspot-integration, auth-server}` — parallel matrix `uses: ./.github/workflows/<worker>-deploy.yml@<sha>` con `expected_sha` + `environment` inputs (`deploy-auth-server` desde TASK-1828, 2026-09-04; primer release con los 5: `9100bbd2765d`).
 5. `wait-vercel` — poll Vercel API `/v6/deployments?target=production` hasta encontrar deployment con `meta.githubCommitSha === target_sha` y `state=READY`. Timeout 900s.
 6. `post-release-health` — ping `https://greenhouse.efeoncepro.com/api/auth/health`. Soft-fail (exit 78) → release `degraded` en lugar de `aborted`.
 7. `transition-released` — 4 state machine transitions (`preflight→ready→deploying→verifying→released|degraded`) via CLI Slice 0. Si post-release-health success → `released`, sino → `degraded`.
@@ -1313,7 +1359,7 @@ Los 2 workflows Azure (`azure-teams-deploy.yml` Logic Apps + `azure-teams-bot-de
 
 Verificación: `az ad app federated-credential list --id <AZURE_CLIENT_ID> -o table`. Adicion: `az ad app federated-credential create --id <AZURE_CLIENT_ID> --parameters <json>`.
 
-**Critical path en orchestrator**: los 2 jobs Azure corren en paralelo con los 4 workers Cloud Run para acortar duración total del release. `post-release-health.needs` espera por ambos antes de pingear `/api/auth/health`.
+**Critical path en orchestrator**: los 2 jobs Azure corren en paralelo con los 5 servicios Cloud Run (4 workers + `auth-server` desde 2026-09-04) para acortar duración total del release. `post-release-health.needs` espera por ambos antes de pingear `/api/auth/health`.
 
 **Reliability signals**: 0 nuevos en TASK-853. Los signals existentes del subsystem `Platform Release` cubren el flow.
 

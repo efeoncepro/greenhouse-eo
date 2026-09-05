@@ -15,6 +15,8 @@ Resuelve estos paths desde la raíz del repositorio, no desde esta carpeta. Si t
 
 ## Contrato obligatorio
 
+**Formato:** el pie completo aplica a informes escritos. En decks y presentaciones el pie lleva como máximo la URL bubble oficial, sin dirección, teléfonos, separador ni folio, incluso si el destino es PDF A4 horizontal. Usa Deck Studio para ese formato.
+
 1. Cada página, incluida la portada, lleva URL bubble, dirección y teléfono institucionales. Usa los campos vigentes del catálogo, no datos recordados ni una dirección encontrada en un documento antiguo.
 2. Incorpora el logo de Efeonce en la versión apropiada al fondo. Si el informe es para un cliente, incluye también su logo oficial. Respeta proporción, colores y área libre.
 3. Usa los colores y tipografías reales de marca. No añadas verde, serif u otra familia por asociarlos a sostenibilidad, pintura o una supuesta apariencia premium.

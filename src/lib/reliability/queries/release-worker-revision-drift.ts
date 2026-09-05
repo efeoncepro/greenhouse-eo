@@ -95,37 +95,47 @@ interface CanonicalReleaseSha {
   fullSha: string
 }
 
-// ops-worker puede conservar el GIT_SHA anterior cuando su workflow determina
-// que el release no cambió ninguna ruta de runtime del worker. Ese caso es
-// change-gated (y esperado), no drift: el workflow verificó Ready=True y saltó
-// el rebuild/deploy de forma explícita.
-const OPS_WORKER_RUNTIME_PATHS = [
-  'package.json',
-  'pnpm-lock.yaml',
-  'tsconfig.json',
-  'services/ops-worker',
-  'services/_shared',
-  'src/lib/sync',
-  'src/lib/nubox',
-  'src/lib/knowledge',
-  'src/lib/payroll',
-  'src/lib/finance/payroll-expense-reactive.ts',
-  'src/lib/finance/apply-payroll-reliquidation-delta.ts',
-  'src/lib/email',
-  'src/lib/integrations',
-  'src/lib/space-notion',
-  'src/lib/auth',
-  'src/lib/auth-secrets.ts',
-  'src/lib/secrets',
-  'src/lib/reliability',
-  'src/lib/notion-metrics',
-  'src/lib/growth/ai-visibility',
-  'src/lib/growth/forms',
-  'src/components/growth/ai-visibility',
-  'src/lib/hubspot',
-  'src/emails',
-  'src/lib/observability'
-] as const
+// Los servicios change-gated pueden conservar el GIT_SHA anterior cuando su workflow
+// determina que el release no cambió ninguna ruta de runtime del bundle. Ese caso es
+// change-gated (y esperado), no drift: el workflow verificó Ready=True y saltó el
+// rebuild/deploy de forma explícita.
+//
+// 🔴 Estas listas son un ESPEJO del array `WORKER_RUNTIME_PATHS=(` de cada workflow de deploy
+// (`.github/workflows/<service>-deploy.yml`). No se leen con `node:fs` en runtime porque este
+// módulo es alcanzable desde rutas y Turbopack traza el proyecto entero; la paridad la sostiene
+// `release-worker-change-gate-parity.test.ts`, que parsea los workflows reales. Caso fuente
+// 2026-09-04 (release `9100bbd2765d`): `auth-server` quedó change-gated con árbol idéntico al
+// target y el watchdog lo reportó como DRIFT porque sólo conocía a `ops-worker`.
+export const CHANGE_GATED_RUNTIME_PATHS: Readonly<Record<string, readonly string[]>> = {
+  'ops-worker': [
+    'package.json',
+    'pnpm-lock.yaml',
+    'tsconfig.json',
+    'services/ops-worker',
+    'services/_shared',
+    'src/lib',
+    'src/emails',
+    'src/types',
+    'src/config',
+    'src/components',
+    'src/i18n',
+    'src/@core'
+  ],
+  'auth-server': [
+    'package.json',
+    'pnpm-lock.yaml',
+    'tsconfig.json',
+    'services/auth-server',
+    'services/_shared',
+    'src/lib',
+    'src/emails',
+    'src/types',
+    'src/config',
+    'src/components',
+    'src/i18n',
+    'src/@core'
+  ]
+}
 
 const normalizeSha = (sha: string | null | undefined): string | null => {
   if (!sha) return null
@@ -388,19 +398,21 @@ const resolveCloudRunRevisionSha = async (
   }
 }
 
-const isOpsWorkerChangeGated = async (
+const isChangeGatedService = async (
   service: string,
   targetSha: string | null,
   runSha: string | null
 ): Promise<boolean> => {
-  if (service !== 'ops-worker' || !targetSha || !runSha || targetSha === runSha) return false
+  const runtimePaths = CHANGE_GATED_RUNTIME_PATHS[service]
+
+  if (!runtimePaths || !targetSha || !runSha || targetSha === runSha) return false
 
   try {
     await execFileAsync('git', ['cat-file', '-e', `${targetSha}^{commit}`], { timeout: 5_000 })
     await execFileAsync('git', ['cat-file', '-e', `${runSha}^{commit}`], { timeout: 5_000 })
     await execFileAsync(
       'git',
-      ['diff', '--quiet', `${targetSha}..${runSha}`, '--', ...OPS_WORKER_RUNTIME_PATHS],
+      ['diff', '--quiet', `${targetSha}..${runSha}`, '--', ...runtimePaths],
       { timeout: 10_000 }
     )
     
@@ -427,7 +439,7 @@ const checkWorker = async (
   const ghSha = canonicalSha?.compareSha ?? null
   const targetSha = canonicalSha?.fullSha ?? null
   const dataMissing = ghSha === null || runSha === null
-  const changeGated = await isOpsWorkerChangeGated(cloudRunService, targetSha, runSha)
+  const changeGated = await isChangeGatedService(cloudRunService, targetSha, runSha)
   const hasDrift = !dataMissing && ghSha !== runSha && !changeGated
 
   let detail: string

@@ -735,6 +735,13 @@ export type AcceptExternalInvitationResult = {
   bindingId: string
   organizationId: string
   profileCreated: boolean
+  /**
+   * Subjects ANTERIORES de esta misma persona en este environment que quedaron desactivados
+   * (recuperación por re-invitación, TASK-1830). El emisor revoca su sesión y sus credenciales:
+   * sin eso, quien tuviera el passkey viejo conservaría el acceso que la re-invitación pretende
+   * quitarle.
+   */
+  supersededSubjects: string[]
 }
 
 /**
@@ -910,6 +917,30 @@ export const acceptExternalInvitation = async (
       [linkId, profileId, sourceSystem, EXTERNAL_IDP_SOURCE_OBJECT_TYPE, subject, invitation.email, displayName]
     )
 
+    // Re-invitación (recuperación de TASK-1830): los subjects ANTERIORES de esta misma persona en
+    // este environment dejan de estar activos.
+    //
+    // `deactivateOrphanSourceLinks` NO cubre esto: su condición es por PERFIL —«¿le queda alguna
+    // membership linked?»— y tras una re-invitación la respuesta es sí, la nueva. Sin este UPDATE,
+    // el subject viejo seguiría autenticando y la recuperación no recuperaría nada: quien tuviera
+    // sus passkeys o su sesión conservaría el acceso.
+    //
+    // El índice único parcial de TASK-1631 garantiza un PERFIL por subject; esto garantiza lo
+    // recíproco, un subject vivo por perfil y environment.
+    const { rows: supersededLinkRows } = await client.query<{ source_object_id: string }>(
+      `UPDATE greenhouse_core.identity_profile_source_links
+          SET active = FALSE, is_login_identity = FALSE, updated_at = CURRENT_TIMESTAMP
+        WHERE profile_id = $1
+          AND source_system = $2
+          AND source_object_type = $3
+          AND source_object_id <> $4
+          AND active
+        RETURNING source_object_id`,
+      [profileId, sourceSystem, EXTERNAL_IDP_SOURCE_OBJECT_TYPE, subject]
+    )
+
+    const supersededSubjects = supersededLinkRows.map(row => row.source_object_id)
+
     // Re-invitación: la membership anterior de la misma persona en el mismo binding queda superseded.
     const { rows: supersededRows } = await client.query<{ invitation_id: string }>(
       `UPDATE greenhouse_core.external_member_invitations
@@ -982,7 +1013,8 @@ export const acceptExternalInvitation = async (
       linkId,
       bindingId: binding.bindingId,
       organizationId: binding.organizationId,
-      profileCreated
+      profileCreated,
+      supersededSubjects
     }
   })
 }

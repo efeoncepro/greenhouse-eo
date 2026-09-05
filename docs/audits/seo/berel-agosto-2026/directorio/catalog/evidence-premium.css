@@ -1,0 +1,32 @@
+/* Distinguish measured evidence, secondary attribution, and calibration by visual weight. */
+.evidence-ia .content.evidence-grid{display:grid;grid-template-columns:1.43fr 1fr;grid-template-rows:136px 150px;gap:16px 30px;min-height:0;margin-top:27px}
+.evidence-ia .metric{border:0;min-width:0;min-height:0;padding:0;background:transparent}
+.evidence-ia .metric.evidence-primary{grid-row:1 / 3;background:#023c70;padding:25px 29px;color:#fff;display:flex;flex-direction:column;justify-content:center}
+.evidence-ia .evidence-primary .value{font:500 91px/1.15 Geist;letter-spacing:-4px;color:#fff;padding-bottom:6px}
+.evidence-ia .evidence-primary .label{font:500 22px/1.25 Geist;color:#fff;margin:12px 0 16px}
+.evidence-ia .evidence-primary .detail{font:400 17px/1.45 Geist;color:#dce8f2;max-width:415px}
+.evidence-ia .metric.evidence-secondary{padding:1px 0 0}
+.evidence-ia .evidence-secondary .value{font:500 47px/1.12 Geist;letter-spacing:-2px;color:#023c70;padding-bottom:3px}
+.evidence-ia .evidence-secondary .label{font:600 18px/1.3 Geist;margin:8px 0;color:#023c70}
+.evidence-ia .evidence-secondary .detail{font:400 15px/1.45 Geist;color:#526174}
+.evidence-ia .metric.evidence-calibration{border-top:1px dashed #92a5b8;padding-top:16px;display:grid;grid-template-columns:28px 1fr;grid-template-rows:21px auto auto;column-gap:10px;align-content:start}
+.evidence-ia .calibration-state{grid-column:1 / 3;font:600 10px/1.4 Geist;letter-spacing:1.6px;color:#B3153A}
+.evidence-ia .evidence-calibration .value{font:500 24px/1.4 Geist;letter-spacing:0;color:#526174;padding:0}
+.evidence-ia .evidence-calibration .label{font:600 16px/1.4 Geist;color:#526174;margin:0;padding-top:3px}
+.evidence-ia .evidence-calibration .detail{grid-column:1 / 3;font:400 14px/1.45 Geist;color:#647184;margin-top:8px}
+.evidence-ia .insight{margin-top:22px;padding-top:14px;font-size:16px}
+
+/* A status register, not a conversion funnel: the dashed spine links review stages only. */
+.evidence-medicion .content.measurement-register{display:flex;flex-direction:column;gap:0;margin-top:26px;position:relative;min-height:0}
+.evidence-medicion .measurement-register:before{content:"";position:absolute;left:29px;top:44px;bottom:39px;border-left:1px dashed #91a5b9;z-index:0}
+.evidence-medicion .card.measurement-stage{position:relative;z-index:1;display:grid;grid-template-columns:40px 266px 1fr;gap:20px;align-items:center;border:0;padding:15px 19px;min-height:86px;margin:0;background:transparent}
+.evidence-medicion .card.measurement-stage.stage-observed{background:#023c70;color:#fff;margin-bottom:6px}
+.evidence-medicion .stage-marker{display:flex;width:23px;height:23px;justify-content:center;align-items:center;border-radius:50%;background:#fff;border:1px solid #91a5b9;font:500 10px/1 Geist;color:#647184}
+.evidence-medicion .stage-observed .stage-marker{border:0;background:#fff;color:#023c70;font-size:14px}
+.evidence-medicion .measurement-stage .tag{font:500 9px/1.4 Geist;letter-spacing:1.3px;color:#647184;margin:0 0 7px}
+.evidence-medicion .measurement-stage h2{font:600 20px/1.2 Poppins;letter-spacing:-.5px;margin:0;color:#023c70;padding-bottom:3px}
+.evidence-medicion .measurement-stage p{font:400 16px/1.4 Geist;color:#526174;margin:0}
+.evidence-medicion .stage-observed .tag{color:#c6dae9}
+.evidence-medicion .stage-observed h2,.evidence-medicion .stage-observed p{color:#fff}
+.evidence-medicion .stage-pending:last-child{border-top:1px solid #d5dfe7}
+.evidence-medicion .insight{margin-top:20px;padding-top:14px;font-size:16px}

@@ -176,10 +176,10 @@ jobs:
           #
           # Audit trail: bypass reason persisted via orchestrator-record-started
           # step in Job 2 (release_state_transitions.metadata_json).
-          OVERRIDE_FLAG=""
+          OVERRIDE_ARGS=()
           REASON_LENGTH=${#BYPASS_REASON}
           if [ ${REASON_LENGTH} -ge 20 ]; then
-            OVERRIDE_FLAG="--override-batch-policy --bypass-preflight-warnings"
+            OVERRIDE_ARGS=(--override-batch-policy --bypass-preflight-warnings "--override-reason=$BYPASS_REASON")
             echo "Bypass preflight reason accepted (length=${REASON_LENGTH}); both override flags active"
           elif [ ${REASON_LENGTH} -gt 0 ]; then
             echo "::error::bypass_preflight_reason length=${REASON_LENGTH} but >=20 chars required"
@@ -195,7 +195,7 @@ jobs:
             --json \
             --fail-on-error \
             --output-file=preflight-result.json \
-            ${OVERRIDE_FLAG} \
+            "${OVERRIDE_ARGS[@]}" \
             --target-sha=${TARGET_SHA} \
             --target-branch=main
           EXIT_CODE=$?

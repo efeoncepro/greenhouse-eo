@@ -153,6 +153,7 @@ import { isSeoModuleEnabled } from '@/lib/growth/seo/flags'
 import { drainAssessmentAiScoringRuns } from '@/lib/hiring/assessment/ai/scoring-run/execute'
 import { isHiringAssessmentAiRunEnqueueEnabled } from '@/lib/hiring/assessment/ai/scoring-run/config'
 import { isHiringAssessmentAiEnabled } from '@/lib/hiring/assessment/ai/config'
+import { runAuthGarbageCollection } from '@/lib/auth-server/maintenance/gc'
 import { purgeAssessmentPublicAccessRetention } from '@/lib/hiring/assessment/public-session/retention'
 
 // TASK-1303 — el rank capture pega familias DataForSEO que GASTAN: sin este side-effect
@@ -2571,6 +2572,29 @@ const handleTalentPoolReconcile = wrapCronHandler({
   run: async (): Promise<Record<string, unknown>> => runTalentPoolReconcile()
 })
 
+const handleAuthGarbageCollection = wrapCronHandler({
+  name: 'auth-ephemeral-gc',
+  domain: 'identity',
+  run: async (): Promise<Record<string, unknown>> => {
+    if (process.env.AUTH_SERVER_GC_ENABLED !== 'true') return { disabled: true }
+
+    const result = await runAuthGarbageCollection({ dryRun: false, batchSize: 500, retentionDays: 30 })
+
+    // Scheduler does not retain response bodies. Keep bounded aggregate evidence in Cloud Logging.
+    console.log(JSON.stringify({
+      severity: 'INFO',
+      event: 'auth_ephemeral_gc_completed',
+      dryRun: result.dryRun,
+      locked: result.locked,
+      cutoff: result.cutoff,
+      batchSize: result.batchSize,
+      counts: result.counts
+    }))
+
+    return { ...result }
+  }
+})
+
 const handleAssessmentPublicAccessRetention = wrapCronHandler({
   name: 'hiring-assessment-public-access-retention',
   domain: 'hiring',
@@ -3222,6 +3246,12 @@ const server = createServer(async (req, res) => {
 
     if (method === 'POST' && path === '/hiring/talent-pool/reconcile') {
       await handleTalentPoolReconcile(req, res)
+
+      return
+    }
+
+    if (method === 'POST' && path === '/auth/ephemeral-gc') {
+      await handleAuthGarbageCollection(req, res)
 
       return
     }

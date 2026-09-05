@@ -1,6 +1,15 @@
 # Handoff activo
 
+**EPIC-044 / TASK-1836, 2026-09-05:** rollout autorizado, parcialmente publicado. Auth `auth-server-00009-4tl`, SHA `a9f16b893`, 100%, interno OFF; gateway `fa1ee2a`, revisión `00031-xwx`, 100%, flags nativos OFF y validación jti desplegada. Ops/GC publicados OFF, scheduler PAUSED. Staging a9 READY, E2E33975085336 success; PR222 preparado, sin merge main ni orquestador. Enrolamiento y grant de lectura del piloto aplicados por commands, vencimiento 2026-09-12T15:00:00Z; readback dry-run idempotente. No token corporativo ni canary autenticado. Bloqueo real: preflight requiere excepción y `can()` deniega ambas capabilities; contrato TASK-935 asigna siete permisos release a EFEONCE_ADMIN, pero runtime sólo agrega execute. [Reparación propuesta](docs/operations/TASK-1836_RELEASE_AUTHORITY_GAP_2026-09-05.md) autorizada por el operador; seis grants restaurados localmente, readback real por rol permitido y 28 tests passed. Integrando persistencia del motivo antes de publicar; no se usó bypass. CI/deploys a9 todavía en observación; conservar IDs del PR y no duplicar runs. Berel WIP preservado. [Runbook](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
+
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
+
+**Berel, 2026-09-04:** Playbook Producción y feedback nuevo de septiembre leídos completos y promovidos a
+`berel-content-production` en los espejos Claude/Codex. La skill ahora distingue ficha técnica de página
+pública, elimina lenguaje interno del cuerpo, agrega la rama de awareness con render oficial, normaliza
+Kelvin/tablas/CTA y registra catálogo y pendientes técnicos. Se preservaron las reglas posteriores que
+superan líneas antiguas del Playbook. Alcance local documental: no se tocaron artículos, assets, Drupal ni
+el estado de publicación. Ver `SOURCES.md` de la skill para IDs, timestamps y drift.
 
 **SEO/AEO y Berel, 2026-09-04:** método de informes documentado en
 [modelo operativo](docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md) y skills espejo.
@@ -17,7 +26,13 @@ y skill `report-studio` creada para Claude/Codex: investigación primaria, siete
 Platform debe promoverla y medir ahorro. Reactivación/evidencia:
 [runbook TASK-1807](docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md).
 
-**TASK-1829 (EPIC-044 U02) — `code complete, rollout pendiente` (2026-09-04, sesión greenhouse-eo-45; commits `263ee3a74` · `19d1658de` · `d31e6e913` en develop).** Superficie OAuth del emisor detrás de `AUTH_SERVER_OAUTH_ENABLED=false` (`deploy.sh`; ledger al día): metadata RFC 8414/OIDC, CIMD primario + DCR compat, authorize/token/revoke/introspect/consent, JWT ES256 15 min con `gv`, refresh rotativo, 7 tablas `greenhouse_auth` y 2 capabilities APLICADAS en Cloud SQL, 3 señales `auth.oauth.*`, contrato `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`. Decisión del operador: `localhost` aceptado como loopback sólo para clientes públicos. **Pendientes inmediatos:** (1) release del runtime a `main` (control plane; el push a develop dispara `Auth Server Deploy` con el flag OFF); (2) registrar la fila del emisor en `external_identity_environments` (`efeonce-auth`, command de TASK-1631) ANTES de prender el flag; (3) flag ON en staging + validar metadata con curl/`oauth4webapi` + cliente CIMD y DCR de prueba; (4) flujo con persona real exige TASK-1830 (implementa `SubjectSessionPort` y agrega sus 5 tablas al boundary test). **Riesgo abierto:** el canary de Globe OAuth no se corrió (Globe hibernado); la extracción del broker sólo movió helpers puros con la suite 117/117 verde. `pnpm build` de producción NO se corrió en esta sesión (autorización del operador pendiente, memoria de consumo). Task sigue `in-progress` hasta el rollout.
+**RELEASE 2026-09-04 `9100bbd2765d` — `released`** (greenhouse-eo-45; run `33893120972`; PR #221; manifest `9100bbd2765d-d5fae366-…`). EPIC-044 en producción: `auth-server` vivo (readyz 200, JWKS 2 kid, rev `auth-server-00005-pk8`, `oauth:false`); lane 1631 verificado (200/400/401); Vercel READY; watchdog `ok` 5/5 (ops-worker y auth-server change-gated, árbol idéntico). Post-release: `AUTH_SERVER_JWKS_URL` en Vercel Production+staging + redeploy; environment `efeonce-auth` registrado `draft` (`pnpm auth-server:register-issuer-environment`). Fix en develop: el watchdog ya clasifica el change-gate del `auth-server` (espejo + test de paridad). Pendientes: señales `identity.external_binding.*` en prod con sesión humana; retiro de llave v1 (eo-0f); `AUTH_SERVER_OAUTH_ENABLED` ON en staging con environment `active`. Detalle: ledger de tiempos.
+
+🔴 **TASK-1830 — el correo del magic link está MUERTO en producción** (hallado 2026-09-05 por el canary nuevo): `RESEND_API_KEY is not configured`. Declaré el `*_SECRET_REF` sin montar el secreto, y `sendEmail` usa el cliente SÍNCRONO. Corregido en `services/auth-server/deploy.sh` (commit `38fbfaeeb`), **pendiente de redeploy del auth-server**. La respuesta HTTP es 202 idéntica por anti-enumeración, así que nadie se habría enterado hasta que una persona real reclamara. Gate nuevo: `pnpm auth-server:person-auth:canary` (22 ok en vivo; exit 2 = incompleto, 1 = rojo). El resto del carril autenticado quedó verificado en vivo por primera vez.
+
+**TASK-1830 (EPIC-044 U03) — `code complete, rollout pendiente`** (sesión greenhouse-eo-18, 2026-09-04, develop; commits `7459d96d4` · `937087404` · `db2622ba9` · `5b57b73f9`). Autenticación de personas externas sin contraseñas detrás de `AUTH_SERVER_PERSON_AUTH_ENABLED=false`: sesión propia `__Host-efeonce_auth` que implementa el `SubjectSessionPort` que dejaba a `authorize` en `login_required`, magic link (selector/verificador, 15 min, un uso, anti-enumeración con piso de latencia), passkeys (credenciales descubribles, contador anti-clonación), TOTP de step-up y recuperación por re-invitación. 8 tablas `greenhouse_auth` aplicadas y verificadas contra PG real; capability `identity.auth_person.revoke` + `POST /api/admin/auth-server/persons/revoke`; 3 señales `auth.person.*`. **Infra creada:** llave KMS simétrica `auth-server-totp-envelope` (HSM, rotación 90 d) — la de firma es EC y no cifra. **Desviaciones declaradas:** ledger propio `person_auth_attempts` (el del portal tiene CHECK de NextAuth y GRANT a otro rol) y `sha256`+timing-safe en vez de bcrypt (evita 300-800 ms de CPU en un endpoint no autenticado). **Próximo paso:** prender el flag en staging — exige `AUTH_SERVER_OAUTH_ENABLED=true` + environment `efeonce-auth` en `active`, si no la sesión se crea pero `authorize` responde `environment_inactive` — verificar que el correo sale de verdad por Resend (la respuesta es idéntica por anti-enumeración: un correo muerto NO se reporta solo) y ejercitar passkey en dos navegadores. Gate: `pnpm auth-server:person-auth:smoke`. TASK-1835 (pantallas Efeonce ID, sesión greenhouse-eo-45) consume el contrato del flujo maestro §5.bis.
+
+**TASK-1829 (EPIC-044 U02) — `code complete, rollout pendiente`** (greenhouse-eo-45; commits `263ee3a74` · `19d1658de` · `d31e6e913`). Superficie OAuth del emisor detrás de `AUTH_SERVER_OAUTH_ENABLED=false` (ya en producción por el release de arriba): metadata, CIMD primario + DCR compat, authorize/token/revoke/introspect/consent, JWT ES256 con `gv`, 7 tablas `greenhouse_auth` y 2 capabilities aplicadas, 3 señales `auth.oauth.*`; contrato `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`. Decisión del operador: `localhost` como loopback sólo para clientes públicos. Próximo paso: flag ON en staging (environment `efeonce-auth` a `active`, metadata validada, clientes CIMD/DCR de prueba); persona real exige TASK-1830 (`SubjectSessionPort`). `pnpm build` de producción no se corrió localmente (CI/Vercel lo construyeron). No se corrió el canary de Globe OAuth (hibernado).
 
 **EPIC-044 (2026-09-03) — authorization server PROPIO, decidido por el operador; WorkOS descartado.** ADR aceptado
 `docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`; epic `in-progress` con TASK-1626/1631/1813 y las
@@ -28,7 +43,7 @@ ADR Delta 2026-09-03, fila Accepted en DECISIONS_INDEX); **TASK-1828 EN EJECUCI�
 tener wireframe/flow reales. Siguiente ID libre `TASK-1835` / `EPIC-045`.
 **TASK-1631 (U04) Slice 1, 2026-09-04 — code complete, rollout pendiente.** Binding aplicado en PG, dominio
 `src/lib/identity/external-access/**`, rutas admin, reader del gateway `GET /api/platform/ecosystem/identity/binding` y 4
-señales; smoke `pnpm identity:external-access:smoke`. **Staging verificado 2026-09-04** (develop `02dc5d987` pusheado coordinado con TASK-1828): 4 señales en `/api/admin/reliability`, rutas admin 200, lane ecosystem 401 sin consumer. **Próximo paso:** release a `main` junto con TASK-1828 (decisión del operador); luego TASK-1831.
+señales; smoke `pnpm identity:external-access:smoke`. **Staging verificado 2026-09-04** (develop `02dc5d987` pusheado coordinado con TASK-1828): 4 señales en `/api/admin/reliability`, rutas admin 200, lane ecosystem 401 sin consumer. **En producción** desde el release 2026-09-04 (run 33893120972; canary del lane 400/200 `environment_inactive`/401; emisor `efeonce-auth` en `draft`). **Próximo paso:** operador lee las 4 señales en `/admin/operations` prod con sesión humana; TASK-1829 emite tokens y pasa el environment a `active`; TASK-1831 consume el reader.
 Paridad registry↔catálogo roja por 11 capabilities ajenas sin seed (task aparte).
 
 Maggie/María Fernanda: cierre 4/4, unresolved=0; agosto ready. Método documentado en runbook/manual y
@@ -468,53 +483,3 @@ Las tools read no compran datos on-read. Writes o gasto siguen bajo capability f
 `propose → confirm → execute`, presupuesto, idempotencia y audit; el cliente PKCE público nunca recibe write
 scope. El cierre requiere canaries allow/deny/fault y readback real del gateway. Cambio documental solamente:
 sin código, tools creadas, gasto, deploy ni runtime mutation todavía.
-
-## 2026-09-02 (2) — cinco endpoints Labs sin caller quedan repartidos en cuatro tasks
-
-El operador confirmó que quiere usar las cinco familias que `TASK-1805` había dejado
-`provider_supported_not_enabled`. Se registraron bajo `EPIC-022`: `TASK-1808` Category Market Intelligence
-(`categories_for_domain` + `domain_metrics_by_categories`), `TASK-1809` SERP competitor market SoV,
-`TASK-1810` Page Intersection y `TASK-1811` Historical Bulk. Todas son backend-critical, nacen sin UI y exigen
-Improved ETV explícito, persistence append-only, reader/API/MCP y gates de gasto/rollout.
-
-La taxonomía de DataForSEO es evidencia externa: nunca reemplaza ni crea `seo_topic_clusters`; cualquier binding
-usa `propose → confirm → execute`. `TASK-1314` conserva cero provider calls y compone los readers de 1808/1810.
-El runtime actual sigue con cero callers para estos cinco endpoints. Registrar las tasks no implementó código,
-schema, llamadas, gasto, flags, deploy ni cutover. Próximo ID libre: `TASK-1812`.
-
-## 2026-09-02 — DataForSEO confirma el corte irreversible de Improved ETV
-
-La respuesta contractual de DataForSEO cerró las preguntas de `TASK-1805/1806`: 14 familias ETV-capable,
-sin premium por improved, históricos recomputados completamente desde julio de 2026 y aproximados antes mediante
-el ratio de julio por dominio. El corte global es `2026-11-01T00:00:00Z`; desde entonces `false` se ignora y no
-existe fallback legacy. La respuesta no trae formula version, así que el contrato interno usa método solicitado,
-instante UTC, policy version y método efectivo derivado.
-
-`TASK-1805` queda P0 sin blocker contractual, target interno 2026-10-15. `TASK-1806` sube a P0 deadline-bound:
-shadow/decisión objetivo 2026-10-23 y cutover 2026-10-28T00:00:00Z. El repo llama nueve familias: seis familias/
-siete caminos consumen ETV, tres callers lo ignoran bajo guard y cinco familias permanecen no habilitadas.
-Rollback legacy sólo existe antes del corte; después el safe mode congela capturas y sirve la última serie
-coherente. Esta actualización fue documental: no hubo código, schema, llamadas, gasto, flags, deploy ni cutover.
-
-## 2026-09-01 (16) — Emma distribuye handoffs por intención y disponibilidad
-
-El Customer Agent `Emma` del portal ANAM `19893546` quedó conectado al workflow activo `1876744588`. La matriz
-publicada es cotización/nuevo negocio: Pablo Puga → Maria Paz Haeger; seguimiento: Marco Jiménez Venegas → Pablo
-Puga; Calidad, facturación y otros: Maria Paz Haeger → Marco Jiménez Venegas. El copy al visitante permanece
-neutral.
-
-La primera prueba pública (`48103382175`) encontró dos defectos: Emma ya era propietaria del ticket y bloqueaba
-las asignaciones sin sobrescritura; además `PRUEBA QA INTERNA` sesgó el clasificador hacia Calidad. Se restauró
-temporalmente el handoff directo a María Paz, se agregó el borrado de owner antes de la ramificación y se reforzó
-el prompt para ignorar metadatos de prueba. Después se reactivó y reconectó el workflow.
-
-La regresión E2E pasó con tickets reales de QA: `48103069613` cotización → Pablo; `48105602378` seguimiento →
-Marco no disponible → Pablo; `48094218332` Calidad → María Paz. Los widgets mostraron los propietarios finales,
-los action logs terminaron correctamente y los chats de prueba quedaron cerrados. Readback final: workflow activo,
-sin problemas y seleccionado por Emma. Evidencia: `docs/audits/ANAM_CUSTOMER_AGENT_HANDOFF_E2E_QA_2026-09-01.md`.
-
-La documentación separa ahora trigger, asignación y continuidad. La QA demostró routing y owner visible, pero no
-una respuesta humana ni una segunda reasignación en el mismo chat. En live handoff, el owner humano puede
-reasignar manualmente el ticket mientras el chat siga abierto; el workflow vigente no resuelve nombres escritos
-libremente. No se requirió ADR: se documentó el comportamiento existente sin modificar runtime, ownership ni
-arquitectura.

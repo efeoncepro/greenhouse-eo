@@ -49,6 +49,14 @@ SERVICE_NAME="ops-worker"
 SERVICE_ACCOUNT="greenhouse-portal@${PROJECT_ID}.iam.gserviceaccount.com"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# TASK-1836: one durable flag controls both worker execution and scheduler state.
+AUTH_SERVER_GC_ENABLED="${AUTH_SERVER_GC_ENABLED:-false}"
+case "${AUTH_SERVER_GC_ENABLED}" in
+  true) AUTH_SERVER_GC_PAUSED="false" ;;
+  false) AUTH_SERVER_GC_PAUSED="true" ;;
+  *) echo "ERROR: AUTH_SERVER_GC_ENABLED must be true or false."; exit 1 ;;
+esac
+
 source "${SCRIPT_DIR}/../_shared/gcloud-secret-iam.sh"
 
 # Cloud Run settings — enterprise tier (TASK-379 Slice 3)
@@ -984,6 +992,8 @@ ENV_VARS="${ENV_VARS},GROWTH_SEO_BACKLINK_DETAIL_ENABLED=${GROWTH_SEO_BACKLINK_D
 # Rollback (<5 min): `false` acá + redeploy + pausar el scheduler; los facts append-only quedan.
 GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED="${GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED:-true}"
 ENV_VARS="${ENV_VARS},GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED=${GROWTH_SEO_KEYWORD_DISCOVERY_ENABLED}"
+# TASK-1836: bounded security-definer cleanup; activation follows schema verification.
+ENV_VARS="${ENV_VARS},AUTH_SERVER_GC_ENABLED=${AUTH_SERVER_GC_ENABLED}"
 ENV_VARS="${ENV_VARS},OPENAI_API_KEY_SECRET_REF=${OPENAI_API_KEY_SECRET_REF}"
 ENV_VARS="${ENV_VARS},ANTHROPIC_API_KEY_SECRET_REF=${ANTHROPIC_API_KEY_SECRET_REF}"
 ENV_VARS="${ENV_VARS},PERPLEXITY_API_KEY_SECRET_REF=${PERPLEXITY_API_KEY_SECRET_REF}"
@@ -1780,6 +1790,14 @@ upsert_scheduler_job \
   "/email-delivery-retry" \
   '{}'
 echo "  -> ops-email-delivery-retry: */5 * * * * (failed email retry, TASK-775)"
+
+# TASK-1836 — retain 30 days after expiry; scheduler follows the explicit deployment flag.
+upsert_scheduler_job \
+  "ops-auth-ephemeral-gc" \
+  "13 * * * *" \
+  "/auth/ephemeral-gc" \
+  '{}' \
+  "${AUTH_SERVER_GC_PAUSED}"
 
 upsert_scheduler_job \
   "ops-hiring-assessment-public-access-retention" \

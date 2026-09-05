@@ -195,6 +195,8 @@ gh workflow run production-release.yml \
      -X POST -f state=approved -F "environment_ids[]=<env_id>" -f comment="<razon>"
    ```
 
+   ⚠️ **El entorno se llama `Production` con mayúscula en `pending_deployments`** (verificado 2026-09-04, release `9100bbd2765d`): un filtro `select(.environment.name=="production")` no aprueba nada y el gate espera en silencio (21 min ese día). Compara con `(.environment.name|ascii_downcase)=="production"`.
+
    ⚠️ **zsh:** en estos loops NUNCA nombres una variable `status` — choca con la variable read-only built-in de zsh y el loop muere con `read-only variable: status` sin traza útil (mató el loop de gates dos veces: 2026-07-17 y 2026-08-11/12). Usa `run_state`/`st_json` u otro nombre.
 7. Watch the orchestrator complete:
    - preflight
@@ -226,7 +228,7 @@ pnpm release:workers --expected-sha=<target_sha>
    - `commercial-cost-worker` in `us-east4`
    - `ico-batch-worker` in `us-east4`
    - `hubspot-greenhouse-integration` in `us-central1`
-   - `auth-server` in `us-east4` (TASK-1828 / EPIC-044 — authorization server propio; `AUTH_SERVER_ENABLED` default `true` en `deploy.sh` desde 2026-09-04; producción lo recibe con el próximo release)
+   - `auth-server` in `us-east4` (TASK-1828 / EPIC-044 — authorization server propio; **change-gated como `ops-worker`** desde el release `9100bbd2765d` del 2026-09-04: el watchdog lo clasifica por espejo del `WORKER_RUNTIME_PATHS` de su workflow, con test de paridad; `AUTH_SERVER_ENABLED` default `true` en `deploy.sh` desde 2026-09-04; producción lo recibe con el próximo release)
    Si el wrapper marca un SHA distinto, dice «NO es drift automáticamente: ver runbook §4.1». Lo que
    decide si ese no-op es legítimo es un **diff de árbol completo, sin `--`** — no el skip del
    change-gate, que sólo habla de las rutas declaradas (anti-patrón #4):

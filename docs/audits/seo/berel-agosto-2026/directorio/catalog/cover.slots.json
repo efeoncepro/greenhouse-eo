@@ -1,0 +1,55 @@
+{
+  "template": "BoardCover",
+  "version": "1.0",
+  "viewport": {
+    "width": 1123,
+    "height": 794
+  },
+  "slots": {
+    "eyebrow": {
+      "selector": "[data-slot=\"eyebrow\"]",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 55,
+        "overflow": "reject"
+      }
+    },
+    "title": {
+      "selector": "[data-slot=\"title\"]",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 100,
+        "overflow": "reject"
+      }
+    },
+    "lead": {
+      "selector": "[data-slot=\"lead\"]",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 230,
+        "overflow": "reject"
+      }
+    },
+    "period": {
+      "selector": "[data-slot=\"period\"]",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 15,
+        "overflow": "reject"
+      }
+    },
+    "year": {
+      "selector": "[data-slot=\"year\"]",
+      "type": "string",
+      "required": true,
+      "constraints": {
+        "maxCharacters": 4,
+        "overflow": "reject"
+      }
+    }
+  }
+}

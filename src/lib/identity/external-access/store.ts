@@ -1,5 +1,7 @@
 import { query } from '@/lib/db'
 
+import { buildExternalIdpSourceSystem, EXTERNAL_IDP_SOURCE_OBJECT_TYPE } from './ids'
+
 import type {
   EligibleClientOrganization,
   ExternalBindingStatus,
@@ -309,4 +311,101 @@ export const listExternalMemberInvitations = async (bindingId: string): Promise<
   )
 
   return rows.map(mapInvitationRow)
+}
+
+/**
+ * TASK-1830 — Source link `external_idp:<environment>` de una persona externa.
+ *
+ * Es el reader canónico que el authorization server consume para dos cosas distintas:
+ *
+ * 1. `getActiveExternalIdpLinkBySubject` — validez de la sesión EN CADA REQUEST. Una sesión vive
+ *    mientras su link siga `active`; si el operador revoca el acceso, la sesión muere en el
+ *    siguiente request (invariante de `TASK-1830`, no un job de limpieza).
+ * 2. `findActiveExternalIdpLinkByEmail` — resolución correo → `subject` para el magic link. El
+ *    `source_email` lo escribe `acceptExternalInvitation` desde la invitación del operador, nunca
+ *    desde input del usuario, así que es una llave confiable.
+ *
+ * NUNCA se resuelve una persona por `client_id` ni por email fuera de este camino, y el resultado
+ * jamás distingue "no existe" de "no autorizado" hacia afuera: eso lo decide el caller
+ * (anti-enumeración).
+ */
+
+export type ExternalIdpSourceLink = {
+  linkId: string
+  profileId: string
+  environmentId: string
+  subject: string
+  email: string | null
+  displayName: string | null
+  active: boolean
+}
+
+type SourceLinkRow = {
+  link_id: string
+  profile_id: string
+  source_object_id: string
+  source_email: string | null
+  source_display_name: string | null
+  active: boolean
+}
+
+const SOURCE_LINK_SELECT = `link_id, profile_id, source_object_id, source_email, source_display_name, active`
+
+const mapSourceLinkRow = (row: SourceLinkRow, environmentId: string): ExternalIdpSourceLink => ({
+  linkId: row.link_id,
+  profileId: row.profile_id,
+  environmentId,
+  subject: row.source_object_id,
+  email: row.source_email,
+  displayName: row.source_display_name,
+  active: row.active
+})
+
+export const getActiveExternalIdpLinkBySubject = async ({
+  environmentId,
+  subject
+}: {
+  environmentId: string
+  subject: string
+}): Promise<ExternalIdpSourceLink | null> => {
+  const rows = await query<SourceLinkRow>(
+    `SELECT ${SOURCE_LINK_SELECT}
+       FROM greenhouse_core.identity_profile_source_links
+      WHERE source_system = $1
+        AND source_object_type = $2
+        AND source_object_id = $3
+        AND active`,
+    [buildExternalIdpSourceSystem(environmentId), EXTERNAL_IDP_SOURCE_OBJECT_TYPE, subject]
+  )
+
+  return rows[0] ? mapSourceLinkRow(rows[0], environmentId) : null
+}
+
+/**
+ * El índice único parcial de `TASK-1631` garantiza un solo link ACTIVO por `(system, type, subject)`,
+ * pero NO por correo: una persona puede tener dos subjects históricos con el mismo correo si alguien
+ * la re-invitó. Por eso más de una coincidencia activa devuelve `null` en vez de elegir una — un
+ * login ambiguo se resuelve con una re-invitación auditada, nunca adivinando.
+ */
+export const findActiveExternalIdpLinkByEmail = async ({
+  environmentId,
+  email
+}: {
+  environmentId: string
+  email: string
+}): Promise<ExternalIdpSourceLink | null> => {
+  const rows = await query<SourceLinkRow>(
+    `SELECT ${SOURCE_LINK_SELECT}
+       FROM greenhouse_core.identity_profile_source_links
+      WHERE source_system = $1
+        AND source_object_type = $2
+        AND lower(source_email) = lower($3)
+        AND active
+      LIMIT 2`,
+    [buildExternalIdpSourceSystem(environmentId), EXTERNAL_IDP_SOURCE_OBJECT_TYPE, email]
+  )
+
+  if (rows.length !== 1) return null
+
+  return mapSourceLinkRow(rows[0], environmentId)
 }

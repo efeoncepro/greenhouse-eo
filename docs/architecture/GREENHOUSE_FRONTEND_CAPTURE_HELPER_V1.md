@@ -674,3 +674,17 @@ readiness: {
   absentSelectors: ['.MuiSkeleton-root', '[data-testid="login-card"]']
 }
 ```
+
+
+## Superficies públicas sin sesión — TASK-1835 (2026-09-05)
+
+Un scenario puede declarar `authentication: anonymous` para capturar login público o un harness
+anónimo. El default sigue siendo `agent`. El CLI carga el scenario antes del preflight de sesión;
+anonymous omite refresh inicial/reactivo y crea contexto con cookies y origins vacíos, sin cargar
+storage state existente ni enviar bypass de Vercel. `requiresStorageState` junto a anonymous falla
+antes de navegar. Los gates de producción y acciones mutating se conservan.
+
+Para una pantalla cuyo propósito es login, declarar además `quality.allowLogin: true`; esto cambia
+la expectativa visual del scenario, no autentica. No fabricar cookies para satisfacer el capturador.
+Pruebas de selección/auth y launch verifican que no se propagan credenciales al browser anónimo.
+Caso ejecutado: `task1835-efeonce-id`, harness local con fixtures, 1440/390, sin acceso productivo.

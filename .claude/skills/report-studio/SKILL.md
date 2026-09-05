@@ -87,3 +87,7 @@ No bloquees por preferencias menores que no afectan lectura, fidelidad ni exacti
 ## Compatibilidad y mantenimiento
 
 La skill funciona en Claude y Codex con `name` y `description` comunes. Los archivos compartidos se espejan; sólo `agents/openai.yaml` es local a Codex. La configuración institucional vive en sus dueños, no en una copia de datos dentro de esta skill. Verifica herramientas/documentación cambiante antes de depender de una versión. Los ejemplos son pruebas, no reglas de un cliente para todos.
+
+## Metodología de deck ejecutivo mensual
+
+Para resumir una auditoría o informe en un deck para directorio, cargar `docs/operations/EFEONCE_EXECUTIVE_REPORT_DECK_METHOD_V1.md`: continuidad de evidencia, producción mensual frente a acumulada, On-time con denominadores, narrativa ejecutiva, selección visual antes de implementación, marcas/pie/contraportada, HTML como insumo del PDF A4 y verificación del archivo final. El caso Berel conserva sus decisiones y límites; las cifras no se reutilizan entre meses.
