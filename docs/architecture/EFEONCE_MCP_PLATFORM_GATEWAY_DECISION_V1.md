@@ -10,6 +10,24 @@
 - **Implementation owner:** [`TASK-1626`](../tasks/in-progress/TASK-1626-efeonce-mcp-platform-gateway.md)
 - **First provider owner:** [`TASK-1473`](../tasks/in-progress/TASK-1473-globe-contract-packaging-parity-certification.md)
 
+## Contrato vigente de emisores y autoridad nativa
+
+TASK-1831 ya verifica Entra y Efeonce ID; TASK-1836 acreditó el piloto corporativo nativo. Esto reemplaza
+las afirmaciones históricas de los deltas sobre un único issuer o ausencia de emisión propia, sin retirar
+el carril Entra legado. El gateway sigue sin emitir tokens ni consultar introspección: verifica JWT/JWKS y
+resuelve autoridad mediante el reader confiable. Su policy por tool decide poblaciones, scopes, capabilities
+y organización; compartir issuer no abre tools internas.
+
+El contexto interno firmado fija sujeto/perfil, cliente, audiencia, organización, binding y procedencia;
+`gv` es el del binding seleccionado. El reader revalida ese contexto y el `jti` vigente del ledger antes de
+dispatch, con revocación local ≤60 s. No existe fallback desde el resolver externo `internal_population`.
+Los gates nativo e interno se verifican por separado; refresh/dispatch previos no eluden un gate apagado.
+Contrato especializado: [autoridad interna nativa](EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md).
+
+El [mapa consolidado](../audits/2026-09-06-task-1836-1831-consolidated-evidence.md) registra canary interno,
+rollbacks, revisiones y las matrices externas/multicontexto aún pendientes. No se declara cierre general de
+federación ni de clientes externos a partir del piloto. Los deltas siguientes conservan contexto histórico.
+
 ## Context
 
 Efeonce necesita un endpoint MCP estable que pueda crecer desde Globe hacia las demás capacidades del
@@ -412,8 +430,8 @@ Lo que **no** cambia, y es la frontera del ADR:
   (`/.well-known/jwks.json`); los flujos OAuth son TASK-1829 y la autenticación de personas TASK-1830. Por eso el
   disparador "emisor propio en runtime" del delta 2026-09-02 (deprecación de DCR) **aún no se cumple**: existe el
   runtime, no el emisor.
-- El gateway **todavía verifica un solo issuer** (Entra). El segundo issuer en el verificador llega con
-  TASK-1831 (gateway multi-issuer); hasta entonces un token firmado por `auth.efeonce.org` no abre `/mcp`.
+- En ese corte inicial el gateway verificaba sólo Entra. TASK-1831 ya añadió el segundo issuer;
+  el contrato vigente y su evidencia están al inicio de este documento.
 - El certificado del gateway no se toca: agregar `auth.efeonce.org` a sus `managed.domains` re-provisionaría
   `mcp.efeonce.org`. El rollback del host es `tofu apply -var enable_auth_host=false` (quita host rule, backend,
   NEG y cert; el gateway no cambia). Costo adicional ≈ USD 15/mes, todo en GCP.

@@ -1,13 +1,38 @@
 # Efeonce Native Authorization Server Decision V1
 
-> **Status:** `Accepted` (decisión del operador 2026-09-03; sin runtime autorizado hasta que cada task hija abra su gate — `TASK-1828` abrió el suyo el 2026-09-04: runtime, llaves y front door vivos en staging y, ese mismo día, **en producción** por el release `9100bbd2765d` (revisión `auth-server-00005-pk8`), con `AUTH_SERVER_JWKS_URL` declarada en Vercel; `TASK-1829` quedó `code complete, rollout pendiente` detrás de `AUTH_SERVER_OAUTH_ENABLED=false`, con el environment del emisor `efeonce-auth` registrado en `draft`; ver §Delta 2026-09-04, §Delta 2026-09-04 — TASK-1829 y §Delta 2026-09-04 — producción)
+> **Status:** `Accepted` (2026-09-03). Runtime y OAuth publicados; el carril corporativo de TASK-1836 y su consumo TASK-1831 tienen canary interno real. Las matrices externas/multicontexto y la promoción del fix posterior de entrada directa siguen abiertas; ver el contrato vigente y el mapa de evidencia.
 > **Date:** 2026-09-03
 > **Owner:** Efeonce Platform / Identity
-> **Scope:** authorization server propio en `auth.efeonce.org`, autenticación de personas externas, emisión y verificación de tokens para `mcp.efeonce.org`, binding con Account 360, convergencia del login cliente de Greenhouse
+> **Scope:** authorization server propio en `auth.efeonce.org`, autenticación de personas externas y corporativas por carriles separados, emisión y verificación de tokens para `mcp.efeonce.org`, binding con Account 360, convergencia del login cliente de Greenhouse
 > **Reversibility:** `one-way-but-bounded` — el binding provider-neutral de `TASK-1631` deja abierta la vuelta a un proveedor SaaS re-enlazando subjects; lo que no se revierte barato es la responsabilidad operativa asumida
 > **Confidence:** `high` en la composición; `medium` en el calendario
 > **Supersedes:** la sección `Proposed decision` + `Slice 0 recommendation` (WorkOS staging de gasto cero) de [`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md). **Siguen vigentes** de ese ADR: `Invariants`, `Required binding design`, `Slice 0 binding design proposal`, `Slice 0 gateway authorization-context contract`, `Slice 0 convergence contract`.
 > **Program:** [`EPIC-044`](../epics/in-progress/EPIC-044-efeonce-identity-authorization-server-and-mcp-federation.md)
+
+## Contrato vigente de acceso interno y federación
+
+Corte consolidado: [construcción, verificaciones y pendientes](../audits/2026-09-06-task-1836-1831-consolidated-evidence.md).
+
+TASK-1836 extiende este emisor con Entra como upstream de autenticación corporativa; los tokens del
+MCP los firma Efeonce ID. TASK-1831 consume el contexto nativo y aplica policy por tool. El contrato
+especializado está en [autoridad interna nativa](EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md),
+y prevalece sobre los estados históricos de los deltas de este documento para este carril:
+
+- `issuer_class` no determina población. El binding persiste `external | internal`; los internos
+  requieren enrollment elegible y grants personales con vencimiento. Los externos conservan su membership.
+- Sesión corporativa, contexto delegado, consentimiento y familia OAuth son objetos distintos. El contexto
+  fija organización, cliente, audiencia, sujeto, perfil, binding y procedencia. `gv` interno es el del binding
+  seleccionado, nunca el máximo entre organizaciones; refresh no amplía autoridad ni rejuvenece `auth_time`.
+- El gateway verifica firma/claims y reconsulta al reader confiable, incluyendo contexto y `jti` del ledger
+  de access tokens antes del dispatch. No usa introspección ni trata issuer nativo como autorización global.
+- `/login` ofrece Microsoft también sin conexión MCP pendiente. Ese acceso directo termina en una sesión,
+  no emite por sí solo tokens ni concede permisos a una aplicación; la entrada desde OAuth conserva su retorno.
+
+PR225 y el canary interno acreditan el carril real de emisión/lectura/revocación. La entrada directa se
+publicó después desde `develop` (`21aa12608`, auth revisión 30); visibilidad/click público verificados,
+recorrido humano directo completo pendiente. El registro detallado, matrices aún abiertas y promoción
+pendiente de PR226 viven en [TASK-1836](../tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md).
+No se declara aquí cierre de TASK-1831/1832 ni disponibilidad general para clientes externos.
 
 ## Context
 

@@ -668,3 +668,26 @@ Un flujo de recuperación self-service reintroduce exactamente esa puerta.
     crecimiento no acotado disparable por un tercero anónimo. El GC (`pnpm auth:gc`) se está
     construyendo aparte; hasta que exista y quede agendado, **NUNCA** registrar este endpoint como
     cubierto por el anti-abuso de `auth_rate_limits`.
+
+## Sesión corporativa y autoridad nativa (TASK-1836 / TASK-1831)
+
+Canon: [autoridad interna](../EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md) y
+[contrato OAuth](../EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md).
+
+- OIDC corporativo, sesión Efeonce ID y autorización MCP son fronteras distintas. Tenant + OID firmados
+  resuelven enrollment; no auto-merge por email, invitación externa ficticia ni cookie Greenhouse compartida.
+- `SubjectSessionPort.resolve` conserva procedencia. Población/binding/contexto verificables gobiernan
+  consentimiento y token; `authorizationContextId` fija el contexto y `gv` su versión, nunca un máximo
+  entre organizaciones. Un reader externo no sirve de fallback para un binding interno.
+- Refresh conserva identidad, contexto y `auth_time`; claims upstream de MFA no acreditan step-up local.
+  No imponer `auth_time <= iat` ni relajar `exp`: el callback valida frescura firmada frente a presente y
+  transacción, además de issuer/audiencia/firma/nonce/PKCE y consumo único.
+- El reader interno consulta autoridad y ledger por `jti` firmado antes de dispatch; revocar familia/token
+  no debe permitir uso hasta expiración ni revocar otra familia por compartir contexto. No caché positiva
+  de permisos en esta cohorte. JWKS y permisos tienen cachés/contratos diferentes.
+- `/login` directo y OAuth con retorno requieren pruebas distintas. Sólo retorno ausente selecciona el
+  landing fijo `/auth/session`; validar al inicio y callback, sin inventar contexto o token MCP. HTML/JSON
+  de sesión comparten resolver y revocación. Conservar botón/primitives existentes.
+- Publicar UI, activar flags, completar SSO y emitir/usar/revocar un token son evidencias distintas. Leer
+  runtime y medir deny con token vigente; preservar expiración/cohorte original al restaurar un canary.
+  Runbook: [rollout interno](../../operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).

@@ -1,5 +1,8 @@
 # TASK-1836 — Efeonce ID: acceso corporativo interno y autorización MCP delegada
 
+Mapa de construcción, pruebas y límites: [auditoría consolidada TASK-1836/1831](../../audits/2026-09-06-task-1836-1831-consolidated-evidence.md).
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -21,7 +24,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `2026-09-06: entrada directa /login corregida localmente, publicación pendiente; el botón existente estaba condicionado a retorno OAuth. Pruebas locales235/4omitidas y review correctos. Estado previo del carril MCP a00:30 UTC: release 08acfb2c6 publicado (PR225, run34000876213, manifest released sin override). Acceso Microsoft, consentimiento, token y lectura MCP interna verificados; canary final en gateway36: propia permitida, ajena denegada y revocación efectiva en 6.633 s. Refresh, retiro de grant y rollback medidos anteriormente. Piloto ON, gv5, vencimiento original 2026-09-12T15:00Z; integridad cero y tokens de prueba revocados. Watchdog 5/5, drift0. Matrices externas/multicontexto y UI/WebKit pendientes.`
+- Status real: `2026-09-06: entrada directa /login servida desde develop (21aa12608, auth-server-00030-rtm, deploy34002082020 success); botón existente visible a1440/390 y clic→Microsoft verificados. PR226 abierto, promoción main y nuevo canary humano directo pendientes. Pruebas locales235/4omitidas y review correctos. Estado previo del carril MCP a00:30 UTC: release 08acfb2c6 publicado (PR225, run34000876213, manifest released sin override). Acceso Microsoft, consentimiento, token y lectura MCP interna verificados; canary final en gateway36: propia permitida, ajena denegada y revocación efectiva en 6.633 s. Refresh, retiro de grant y rollback medidos anteriormente. Piloto ON, gv5, vencimiento original 2026-09-12T15:00Z; integridad cero y tokens de prueba revocados. Watchdog 5/5, drift0. Matrices externas/multicontexto y UI/WebKit pendientes.`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -115,7 +118,7 @@ coordinada con TASK-1831; no se cambia su semántica silenciosamente ni se marca
 
 ### Gap
 
-- No hay camino nativo interno normal probado de identidad corporativa a grants y tools MCP.
+- Camino corporativo → sesión → consentimiento → token → tool MCP interno verificado en el piloto. Pendientes: retorno humano de entrada directa, matrices externas/multicontexto y promoción PR226.
 - `issuer_class` por environment no basta para distinguir poblaciones bajo un mismo emisor.
 
 ## Modular Placement Contract
@@ -570,8 +573,8 @@ interactivo del sujeto real cuando corresponda. No enviar correos ni mensajes si
 ## Acceptance Criteria
 
 - [ ] D1–D7 del §2 formalizadas en ADR, con fixtures y contratos compartidos; ninguna queda sólo como “resolver después”.
-- [x] Contexto firmado de otra persona/cliente y token previo sin contexto no acceden a autoridad interna. Evidencia backend: OAuth flow, context, subject-port y ecosystem reader tests; dispatch real sigue pendiente en 1831.
-- [ ] Flag de gateway OFF deniega contextos internos nativos ya emitidos; flag de emisor OFF deniega login, authorize y refresh internos nuevos.
+- [x] Contexto firmado de otra persona/cliente y token previo sin contexto no acceden a autoridad interna. Evidencia backend: OAuth flow, context, subject-port y ecosystem reader tests; dispatch real interno permitido y aislamiento por organización verificados en gateway36; la matriz externa/concurrente completa sigue pendiente.
+- [x] Flag de gateway OFF deniega contextos internos nativos ya emitidos; flag de emisor OFF deniega login, authorize y refresh internos nuevos. Tests del guard interno y ensayo live: gateway OFF denegó en ≤20 s; emisor OFF rechazó refresh; restauración completa 79 s. No acredita rollback de toda la matriz externa/Entra.
 
 - [ ] Casos de auditoría §14 pasan; assurance Entra, procedencia de sesión y refresh no elevan autoridad implícitamente.
 - [ ] Discovery 401->issuer->OAuth y challenges de scopes funcionan en clientes reales según su revisión MCP, con evidencia de TASK-1831/1832.
@@ -586,10 +589,9 @@ interactivo del sujeto real cuando corresponda. No enviar correos ni mensajes si
 - [ ] Rollback ensayado registra duración real, revocación selectiva y comprobación de externos/Entra legado; no depende de apagar todo OAuth.
 
 - [x] ADR aceptado define proveedor upstream, población y autoridad independientemente del issuer. `EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md`, D1–D7.
-- [x] Efeonce e identidad interna se resuelven canónicamente sin cambiar organización a cliente ni duplicar persona. Reader real devuelve perfil autorizado + EO-ORG-0007; test PG de enrolamiento usa clones temporales y rollback. Posteriormente se enroló el piloto real sobre esa identidad canónica; la prueba de login humano sigue pendiente.
+- [x] Efeonce e identidad interna se resuelven canónicamente sin cambiar organización a cliente ni duplicar persona. Reader real devuelve perfil autorizado + EO-ORG-0007; test PG de enrolamiento usa clones temporales y rollback. Posteriormente se enroló el piloto real sobre esa identidad canónica; el login humano interno y token MCP se verificaron en el canary22:38Z; véase evidencia final.
 - [x] Login corporativo produce sesión y token MCP nativo con audiencia, azp, scopes y gv correctos. Canary real22:38Z: consentimiento y token emitidos; gateway verifica y permite lectura propia, deniega otra organización. Véase evidencia22:44Z.
-- [ ] Refresh y revocación funcionan; baja efectiva en el source of truth o retiro de grant invalida autorización con token vigente en ≤60 s,
-  verificado junto al gateway, sin afirmar cierre por expiración natural del token.
+- [x] Refresh y revocación funcionan; retiro del grant invalida autorización con token vigente en ≤60 s. Canary live: refresh rotativo conserva identidad/contexto/auth_time; retiro de grant ≤11 s; revocación OAuth final 6.633 s con token aún vigente. La baja remota y el caso multicontexto conservan su AC pendiente.
 - [ ] Token externo del mismo issuer, tenant desconocido y roles sin scopes no acceden a tools internas.
 - [ ] Tests cubren replay/callback, colisión de binding y límites de autorización; Entra directo sigue disponible.
 - [ ] Consumers TASK-1831/1835 reciben contrato estable y TASK-1832 registra prueba real interna y externa.
@@ -1094,4 +1096,31 @@ La dirección visual es reuse de «Nocturno editorial» de Claude, sin CSS ni pr
 Validación local:235 pruebas pasan/4 live omitidas, tipos y lint dirigido correctos. Chromium6/6
 para origen/CSP/redirect; renderers reales a1440px y390px con Microsoft visible, foco de teclado,
 sin overflow ni errores JS; fixtures visuales no sustituyen sesión real. Revisión independiente
-sin hallazgos de seguridad. Publicación y verificación de `/login` público todavía pendientes.
+sin hallazgos de seguridad. La publicación e inicio SSO públicos se verificaron posteriormente; el retorno humano directo continúa pendiente, según el estado vigente siguiente.
+
+## Estado vigente de la entrada directa — 2026-09-06
+
+La reparación `21aa12608` está servida desde `develop` en `auth-server-00030-rtm`,
+[deploy 34002082020](https://github.com/efeoncepro/greenhouse-eo/actions/runs/34002082020) exitoso.
+El servicio compartido ya muestra el botón Microsoft existente de Claude en `/login` sin `return_to`;
+se verificó a 1440 y 390 px y el clic llegó a Microsoft. No se diseñó otro botón.
+[PR #226](https://github.com/efeoncepro/greenhouse-eo/pull/226) sigue abierto: este cambio servido
+no equivale a una nueva promoción certificada a `main`. PR #225 sí tiene release certificado.
+No se completó un nuevo canary humano del retorno directo hasta `/auth/session`; no usar la prueba
+MCP anterior como evidencia de ese recorrido. La prueba pública acredita visibilidad e inicio SSO.
+
+Para verificar cada entrada por separado:
+
+1. Abrir `/login` sin parámetros: Microsoft visible con el flag interno ON; hacer clic y completar
+   Entra. El retorno fijo es `/auth/session`, sin cliente OAuth, audiencia, grant ni contexto inventados.
+2. Abrir el flujo de conexión de una aplicación MCP: conservar `/oauth/authorize` validado en
+   `return_to`, completar Microsoft, consentir y verificar code/token/dispatch en esa aplicación.
+3. Verificar sesión HTML autenticada y POST de logout; JSON de `/auth/session` conserva contrato.
+   Sesión revocada/anónima debe dar 401 y login, sin confirmar acceso. Destino directo vacío,
+   duplicado, con query/fragmento o ajeno debe rechazarse; sólo ausencia selecciona el destino fijo.
+4. Registrar revisión/SHA, viewport y outcome sin códigos, cookies ni tokens; un fixture visual,
+   un redirect a Microsoft o una pantalla de consentimiento no prueban emisión ni permiso MCP.
+
+La corrección usa el mismo `resolvePersonSession` y valida el destino al iniciar y consumir la
+transacción. Evidencia local: 235 pruebas passed, 4 live omitidas; tipos/lint/bundle correctos,
+Chromium 6/6 para origen/CSP/redirect y revisión independiente sin hallazgos. WebKit sigue omitido.

@@ -9,8 +9,11 @@
 
 ## 2026-09-05 — Efeonce ID: acceso Microsoft y publicación certificados
 
-Corrección posterior en curso: `/login` directo ocultaba el botón existente de Microsoft. Se reutiliza
-el botón de Claude y se añade retorno fijo a sesión autenticada;235 tests pasan, publicación pendiente.
+Corrección posterior `21aa12608` desplegada en auth `00030-rtm` (run `34002082020` success):
+`/login` directo reutiliza el botón de Claude y retorna a sesión autenticada; 235 pruebas pasan.
+Botón visible y clic hacia Microsoft verificados en público a1440/390; nuevo canary humano directo
+pendiente, PR226 aún abierto. Barrido de tres subagentes consolida TASK1836+1831 en ADRs, docs
+funcionales, manuales, runbook, tasks/epic, skills espejo e invariantes. [Evidencia y límites](docs/audits/2026-09-06-task-1836-1831-consolidated-evidence.md).
 
 PR225 integra las reparaciones OIDC, lector de consentimiento interno y origen/CSP del formulario.
 Release `08acfb2c6`, run `34000876213`, manifest `released` sin override. CI, Deep, smoke,

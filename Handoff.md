@@ -1,20 +1,18 @@
 # Handoff activo
 
-**TASK-1836 — corrección de entrada directa en curso, 2026-09-06:**
-El operador detectó que `/login` ocultaba Microsoft sin retorno OAuth. Botón existente reutilizado,
-retorno directo fijo a `/auth/session` autenticado;235 pruebas y review correctos. Publicación pendiente.
-Evidencia previa del carril MCP:
-PR225 publicado en `main` `08acfb2c6`; orquestador `34000876213` success, manifest
-`08acfb2c6992-ee142c2a-dda2-4d33-984b-f2207d8dbd49` released sin override. CI, Deep,
-smoke y Vercel exactos aprobados; health correcto y watchdog con perfil `ops`: 5/5, drift 0.
-Auth rev29-tfx conserva código `09def4fc4` (runtime sin cambios); gateway rev36-5wc `815df9b`.
-Ambos internos ON. Canary final: token emitido 00:24:04.575 UTC, lectura propia permitida,
-ajena denegada; revocación MCP efectiva en 6.633 s. Refresh, retiro de grant <=11 s,
-gateway OFF <=20 s y restore 79 s ya medidos. Helpers cerrados y tokens de prueba revocados.
-Piloto gv5, grant original vence 2026-09-12T15:00Z; integridad unaudited/mixed en cero.
-TASK-1836 sigue in-progress: matrices externas/multicontexto y pendientes UI/WebKit no cerrados.
-[Task](docs/tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md) ·
-[Runbook](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
+**TASK-1836 / TASK-1831 — evidencia consolidada, 2026-09-06:**
+Tres subagentes actualizaron contratos, funcionales, manuales, tasks/epic y skills espejo.
+[Mapa de construcción, pruebas y pendientes](docs/audits/2026-09-06-task-1836-1831-consolidated-evidence.md).
+PR225 está certificado: main `08acfb2c6`, run `34000876213`, manifest released sin override.
+Canary MCP real: emisión, lectura propia, aislamiento y revocación en 6.633 s; refresh y rollback
+medidos. Piloto gv5, vencimiento original 2026-09-12T15:00Z, señales unaudited/mixed cero.
+El fix directo `21aa12608` ya está servido: auth `00030-rtm`, deploy `34002082020` success,
+flags OAuth/personas/interno ON, Microsoft visible y clic correcto en `/login` público a1440/390.
+**PR226 sigue abierto:** no es promoción certificada a main ni nuevo canary humano directo completo.
+Gateway `00036-5wc` sigue Ready100%, nativo/interno ON. Próximos pasos: reconciliar alcance del PR
+antes de promover (Claude añadió TASK1837 después del corte21aa), probar retorno humano `/auth/session`
+y logout; completar matrices externas/multicontexto y WebKit con los owners. No extender el piloto.
+Este barrido es documental y sólo se commitea; no publica ni modifica autoridad o runtime.
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 

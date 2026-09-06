@@ -7,8 +7,8 @@
 
 ## Antes de probar
 
-Confirma que el cliente OAuth está registrado para el resource `https://mcp.efeonce.org/mcp` y que su usuario
-pertenece al tenant interno autorizado. No copies tokens en archivos, capturas ni tickets.
+Confirma que el cliente OAuth usa el resource `https://mcp.efeonce.org/mcp` y un emisor admitido.
+El piloto nativo requiere enrollment y grants personales vigentes; pertenecer al tenant no basta. No copies tokens en archivos, capturas ni tickets.
 
 El cliente compatible con Streamable HTTP debe usar el endpoint canónico y obtener su token mediante OAuth PKCE.
 No uses la URL `run.app`: el acceso público pasa por el front door y el hostname canónico.
@@ -32,8 +32,9 @@ No uses la URL `run.app`: el acceso público pasa por el front door y el hostnam
    de gateway, Globe y hiring), revisión activa `efeonce-mcp-gateway-00028-pmx`. La cifra se lee del server, no de
    este texto; si difiere, compara contra el manifiesto de Greenhouse antes de declarar drift.
 
-Si tu cliente MCP muestra el server como `Needs authentication` después de haber funcionado, el token Entra expiró
-(~1 hora): vuelve a autenticar (`claude mcp login efeonce-mcp` en Claude Code) y repite. No es una falla del gateway.
+Si aparece `Needs authentication`, distingue el emisor y el motivo antes de diagnosticar: puede haber
+expiración, revocación, un flag apagado o pérdida de autoridad. Reinicia OAuth desde el cliente autorizado;
+no reutilices un callback ni supongas que todo rechazo es un token Entra expirado.
 
 Para una prueba release-controlada desde el repo `efeonce-mcp`, usa `pnpm oauth:canary`. En macOS abre Google
 Chrome y debe ejecutarse con el perfil autenticado autorizado. Al terminar, cierra sólo la ventana de prueba; no
@@ -62,12 +63,27 @@ El entitlement por tenant/capability YA existe: el grant revocable por organizac
 `greenhouse_core.external_capability_grants` (TASK-1631, 2026-09-04) y se opera con el manual
 `docs/manual-de-uso/identity/operar-binding-identidad-externa.md` (environment → binding de la organización →
 grants → invitación → persona ligada por `subject`); el gateway lo consulta por
-`GET /api/platform/ecosystem/identity/binding`. Lo que todavía falta —y es la compuerta real— es el emisor propio
-y el gateway multi-issuer (EPIC-044: TASK-1829/1830/1831/1832), más una prueba real de persona base-only denegada
-para Globe. No entregues este endpoint a clientes hasta que eso exista. Al cliente interno actual se le entregan
+`GET /api/platform/ecosystem/identity/binding`. El emisor propio y el gateway multi-issuer ya están construidos y el piloto interno verificado; falta
+la matriz externa real, incluida una persona base-only denegada para Globe. No entregues acceso general
+a clientes dando por acreditada esa separación con un canary interno. Al cliente interno actual se le entregan
 hoy el scope base y el de lectura de Globe incluso si solicita sólo el base; por eso no prueba esa separación.
 
 Cuando revises los scopes soportados en el paso 2 de la verificación, ten presente que el gateway declara tres, no
 dos: el base, el de lectura de Globe y el de escritura interna de fondeo de créditos, que aparece sólo cuando su
 flag está encendido. Ese tercero se autoriza por separado y no queda demostrado por la entrega conjunta de los dos
 primeros; no lo uses como evidencia de nada.
+
+
+## Verificar el carril corporativo nativo
+
+Inicia la conexión desde la app para conservar su contexto OAuth. Abrir `/login` e iniciar Microsoft
+crea una sesión; no concede acceso a esa app. Verifica emisión, una lectura autorizada, otra organización
+denegada con lectura propia antes/después, refresh y revocación de familia con token aún vigente. El reader
+revalida contexto, `gv` y `jti`; el objetivo local de denegación tras revocar es ≤60 s. No pruebes sólo 401
+anónimos ni uses el canary Entra como evidencia del grant nativo.
+
+Los gates `AUTH_SERVER_INTERNAL_AUTH_ENABLED` y `MCP_NATIVE_INTERNAL_AUTH_ENABLED` son independientes.
+El rollback se ejecuta según el [runbook interno](../../operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md),
+con readback y restauración; no apagues providers ajenos ni amplíes permisos para obtener un resultado verde.
+Consulta [el mapa consolidado](../../audits/2026-09-06-task-1836-1831-consolidated-evidence.md) para separar
+pruebas ejecutadas y pendientes, revisión publicada y promoción formal.

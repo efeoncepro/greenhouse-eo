@@ -1,5 +1,14 @@
 # Operar el binding de identidad externa (MCP)
 
+## Frontera con el acceso corporativo
+
+Este manual opera bindings externos. Si el reader devuelve `internal_population`, no crees una invitación
+cliente ni reemplaces el source link: usa el [runbook corporativo](../../operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
+La [documentación del binding](../../documentation/identity/binding-identidad-externa-mcp.md#frontera-con-el-acceso-corporativo)
+explica población, audit/outbox compartidos, reconciliación y señales de integridad. Esas reparaciones
+conservan autoridad y vencimientos; nunca son una vía para ampliar permisos.
+
+
 > **Tipo de documento:** Manual de uso
 > **Version:** 1.0
 > **Creado:** 2026-09-04 por Claude

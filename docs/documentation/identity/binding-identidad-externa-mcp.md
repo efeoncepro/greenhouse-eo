@@ -1,5 +1,24 @@
 # Binding de Identidad Externa para el MCP
 
+## Frontera con el acceso corporativo
+
+Este documento describe la población externa. TASK-1836 añadió población persistida e inmutable
+`external | internal` sobre los bindings compartidos y centralizó sus mutaciones con audit/outbox
+canónicos; compartir tablas o emisor no comparte reglas de acceso. Los internos requieren enrollment
+y grants personales con vencimiento; no requieren invitaciones cliente ni convertir Efeonce en cliente.
+
+`internal_population` en el reader externo es una denegación esperada para una identidad propiedad del
+carril interno, incluso si su enrollment está revocado. No se arregla creando una invitación externa,
+reemplazando el source link o tratando ese outcome como `unbound`. El gateway elige el carril interno
+únicamente con contexto firmado y `jti` verificable; no por correo o `issuer_class`.
+
+Las señales `identity.external_binding.unaudited_write` y
+`identity.external_binding.mixed_population` vigilan integridad (normal: cero; error de consulta:
+`unknown`). La reconciliación conserva permisos y vigencia, y no sustituye un grant nuevo autorizado.
+Contrato: [autoridad interna nativa](../../architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md);
+operación corporativa: [runbook de cohorte](../../operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
+
+
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-09-04 por Claude

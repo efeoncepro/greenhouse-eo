@@ -24,3 +24,10 @@ customer payloads as evidence.
 5. A real authorized client completes MCP `initialize`; a dispatch-level missing-provider-scope test denies before
    downstream dispatch. Before customer access, repeat it with a client that can actually receive base-only access.
 6. Record revision/digest, auth result, DNS/TLS outcome, provider state and rollback target in the runbook/task.
+
+## Native issuer and corporate session
+
+For TASK-1836/TASK-1831 changes, apply [native-authority.md](native-authority.md): direct anonymous
+`/login` visibility/click/session and the client OAuth/MCP canary are distinct rows. Require context-bound
+allow/deny, refresh, token-family and grant revocation with an unexpired token, bounded OFF/restore and
+separate legacy/external regression evidence. Never substitute flags ON or metadata for authenticated dispatch.

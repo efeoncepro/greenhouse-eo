@@ -37,6 +37,13 @@ Read, in order:
 
 If a source conflicts with remembered behavior, the verified runtime and its canonical architecture win.
 
+## Native authority (TASK-1836 / TASK-1831)
+
+For Microsoft SSO, direct `/login`, native tokens, population/context, `gv`, token revocation or multi-issuer
+rollout, load [`references/native-authority.md`](references/native-authority.md). Corporate authentication,
+Efeonce ID session and MCP authorization are separate proofs. Current deployment/cohort evidence belongs
+to the internal rollout runbook and tasks, never to a cached revision in this skill.
+
 ## Hard rules
 
 - Keep `https://mcp.efeonce.org/mcp` as the single canonical resource. Do not create a second OAuth resource for an alias.
@@ -77,12 +84,10 @@ If a source conflicts with remembered behavior, the verified runtime and its can
   rejected. Supporting CIMD requires ISSUING the tokens, i.e. being a real authorization server — forbidden for the
   gateway by the neutral-adapter rule. That issuer now exists as its own deployable: Efeonce's native authorization
   server in `services/auth-server` (EPIC-044; ADR `docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`,
-  Accepted 2026-09-03; `TASK-1828` runtime **in production since 2026-09-04**, live revision
-  `auth-server-00007-cxb`; `TASK-1829` OAuth metadata + CIMD as the primary client
-  mechanism with DCR only as compatibility fallback — **the surface is ON in that live revision**
-  (`AUTH_SERVER_OAUTH_ENABLED` and `AUTH_SERVER_PERSON_AUTH_ENABLED` both default `true` in
-  `services/auth-server/deploy.sh`; issuer environment `efeonce-auth` `active`), contract `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`, CIMD in
-  `src/lib/auth-server/oauth/cimd.ts`). CIMD work belongs to that domain; this evaluation was its input, never a
+  Accepted 2026-09-03; `TASK-1828` runtime; `TASK-1829` OAuth metadata + CIMD as the primary client
+  mechanism with DCR only as compatibility fallback). Verify issuer environment, revision and flags via
+  the auth runbook; contract `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`, CIMD in
+  `src/lib/auth-server/oauth/cimd.ts`. CIMD work belongs to that domain; this evaluation was its input, never a
   parallel track. `TASK-1631` no longer owns CIMD — it delivered the Account 360 binding (see "External access binding" below).
 - ⚠️ **The clock that matters is the client's, not the spec's — and a nearer break is already written.** 2027-07-28
   only marks when DCR becomes *eligible* for removal from the spec; what actually kills the shim is Claude Code /
@@ -117,19 +122,15 @@ If a source conflicts with remembered behavior, the verified runtime and its can
   grants. The grant side ALREADY exists (`greenhouse_core.external_capability_grants`, revocable per organization and
   per person — `TASK-1631`, applied 2026-09-04); what closes this finding is the native issuer + multi-issuer gateway
   of EPIC-044 (`TASK-1829`/`1830`/`1831`/`1832`), where per-client identities get tokens carrying `gv` — `TASK-1829`
-  (issuer surface) and `TASK-1830` (person session) are both ON in the live revision `auth-server-00007-cxb`; no
-  external token exists yet because there is no eligible organization with an active binding, and `TASK-1831`
-  (gateway) has not landed. Tracked as pending review, not an incident: no observed exploitation.
-  🚩 **And the name lies, which is what makes the above dangerous:** that app's Entra `displayName` is
-  **"Efeonce MCP Local Canary Client"**, yet it IS the tenant-wide shared production client the shim hands to every
-  standard MCP client. The real canary is `66985833-14e9-438e-add4-b740e84e9a64` ("Base-Only Canary Client", 2
-  scopes), which the shim never returns. Verified with `az ad app show` 2026-09-02. ✅ **Renamed the same day**
-  (TASK-1804) to "Efeonce MCP Public Client (Claude Code, claude.ai, Claude Desktop)" via `az ad app update
-  --display-name`; readback: appId, 3 redirect URIs and 3 read scopes intact, no write scope. The loopback finding
-  above stays under review — never close it by narrowing `http://localhost`. Compound failure mode: whoever
-  opens Entra, reads "Local Canary" and assumes a toy blast radius is exactly whoever will not audit its redirect
-  URIs. **NEVER reason about this client's blast radius from its name — read `requiredResourceAccess` and
-  `publicClient.redirectUris`.** Renaming is cheap and touches neither `appId` nor consents.
+  (issuer surface) and `TASK-1830` (person session) own issuance and consent. The internal authority path
+  is implemented by `TASK-1836` with the `TASK-1831` consumer; external eligibility and client canaries
+  still require separate current evidence. The legacy shared-client finding remains under review.
+  **Never infer the client's blast radius from its display name.** Identify the configured public client
+  by appId and inspect `requiredResourceAccess`, `publicClient.redirectUris`, consent and assignment.
+  TASK-1804 recorded a rename on 2026-09-02 because the shared production client's former name suggested
+  a local canary; a rename changes neither authority nor redirect behavior. The separate base-only canary
+  has its own appId and must not be confused with the client returned by the compatibility shim. Read the
+  current configuration before drawing conclusions; the historical rename is not a live name/scope check.
 - Derive tenant/workspace from verified identity and provider policy. Never accept a free-form tenant boundary.
 - Treat `auth.efeonce.org` as session/runtime-isolated, not identity-isolated. Greenhouse, auth and MCP keep separate
   cookies, session secrets and token audiences, but an existing customer must resolve to one canonical
@@ -142,30 +143,29 @@ If a source conflicts with remembered behavior, the verified runtime and its can
   authorization server. The WorkOS / native / hybrid comparison is CLOSED: ADR
   `docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md` (Accepted 2026-09-03) picks Efeonce's own
   issuer at `auth.efeonce.org`, built as `services/auth-server` (`TASK-1828` runtime in production since 2026-09-04;
-  `TASK-1829` OAuth metadata + CIMD/DCR + token issuance, **ON in the live revision `auth-server-00007-cxb`**;
-  `TASK-1830` hosted login/consent that calls `acceptExternalInvitation` in-process — **live: `/login` 200, own
-  session, magic link, passkeys and TOTP step-up verified against the real host 2026-09-05**;
+  `TASK-1829` OAuth metadata + CIMD/DCR + token issuance;
+  `TASK-1830` hosted login/consent that calls `acceptExternalInvitation` in-process;
+  `TASK-1836` corporate OIDC and internal authority with a separate enrollment path;
   `TASK-1831` multi-issuer gateway with `gv` verification, `TASK-1832` client canaries, `TASK-1833` security
   posture). Never make the gateway own browser login or share a Greenhouse cookie/`NEXTAUTH_SECRET`, and never make
   a Greenhouse release the rollback boundary for external OAuth.
 - The gateway's front door serves a SECOND host, `auth.efeonce.org` — the native authorization server
-  (`services/auth-server`, `TASK-1828` / EPIC-044, in production since 2026-09-04 — live revision
-  `auth-server-00007-cxb`, single Cloud Run service shared by staging and production). `efeonce-mcp/infra/terraform` (`6a144a5`,
+  (`services/auth-server`, `TASK-1828` / EPIC-044; single Cloud Run service shared by staging and production,
+  so verify runtime impact before treating a staging deploy as isolated). `efeonce-mcp/infra/terraform` (`6a144a5`,
   `enable_auth_host` default `true`) adds a host rule → its own backend `efeonce-auth-server-backend` (serverless NEG,
   `us-east4`) under the SAME Cloud Armor policy, plus its own managed cert `efeonce-auth-server-cert` (ACTIVE) on the
   same forwarding IP `34.111.78.237`; plan was 3 add / 2 change / 0 destroy and `mcp.efeonce.org` stayed intact. The
-  gateway does NOT mint tokens and did not change; the second issuer reaches the verifier only with `TASK-1831`.
+  gateway does NOT mint tokens; native verification belongs to `TASK-1831`.
   **NEVER add the host by editing `managed.domains` of the gateway certificate** — that field is ForceNew and
   re-provisions `mcp.efeonce.org`. Runbook `docs/operations/runbooks/auth-server.md`; the service's own env vars,
   KMS signing key and rotation belong to `.claude/rules/auth-server.md` + `greenhouse-secret-hygiene`.
 - Customer access needs entitlements that issue and revoke access per tenant and capability — and those EXIST
   since `TASK-1631` (applied 2026-09-04): `greenhouse_core.external_capability_grants` under an Account 360 binding,
-  revocable per organization and per person. Entra is the internal canary only. What is still missing for real
-  external access is **no longer the issuer**: its OAuth surface (`TASK-1829`, CIMD primary / DCR compat) and the
-  hosted person session (`TASK-1830`) are both ON in the live revision `auth-server-00007-cxb`. What is missing is
-  (a) an **eligible organization with an active binding — there is none today**, which is why the token lane
-  (issuance, refresh, revocation, positive CIMD) is still unexercised, and (b) the multi-issuer gateway
-  (`TASK-1831`; canaries `TASK-1832`) — that is where tokens carrying `gv` get minted and verified; no vendor gets provisioned (WorkOS was discarded by the native ADR).
+  revocable per organization and per person. The native issuer (`TASK-1829`/`1830`) mints tokens; the
+  multi-issuer gateway (`TASK-1831`) verifies them. `TASK-1836` implements corporate internal authority,
+  which does not certify external client eligibility or canaries (`TASK-1832`). Determine those from
+  current canonical readers and the rollout record, not from the presence of an issuer or internal pilot.
+  No vendor gets provisioned: WorkOS was discarded by the native ADR.
   The gateway declares five scopes when all gated providers are active: base `efeonce.mcp.read`,
   Globe reader `efeonce.mcp.globe.read`, the flag-gated internal write
   `efeonce.mcp.globe.credits.funding.ensure`, the flag-gated SEO write `efeonce.mcp.seo.write` (TASK-1308), and
@@ -294,16 +294,12 @@ graph, because the gateway will resolve the caller against it:
   `acceptExternalInvitation` has no public route — the auth-server (`TASK-1830`) imports it in-process. Smoke after
   touching any of it: `pnpm identity:external-access:smoke`. Invariants: `IDENTITY_WORKFORCE_AGENT_INVARIANTS.md`
   §"External identity binding (TASK-1631)"; functional: `docs/documentation/identity/binding-identidad-externa-mcp.md`.
-- Already here: the issuer's OAuth surface (`TASK-1829`) and hosted person login (`TASK-1830`) are **ON** in the
-  live revision `auth-server-00007-cxb`, and the issuer environment `efeonce-auth` is `active` in
-  `greenhouse_core.external_identity_environments` (registered 2026-09-04 via
-  `pnpm auth-server:register-issuer-environment` → TASK-1631 command, never SQL; `issuerClass external` immutable;
-  the resolver answers `environment_inactive` while it is `draft`). `AUTH_SERVER_JWKS_URL=https://auth.efeonce.org/.well-known/jwks.json`
-  is set on Vercel Production + staging (signal `auth.issuer.jwks_unreachable` leaves `not_configured`).
-  Still NOT here: the multi-issuer gateway (`TASK-1831`) and client canaries (`TASK-1832`) — and **no eligible
-  organization with an active binding exists today**, so the token lane (issuance, refresh, revocation, positive
-  CIMD) has never been exercised. Until 1831 lands with a real binding, no external token exists, so nothing
-  external is reachable.
+- Native issuer (`TASK-1829`), person session (`TASK-1830`), multi-issuer consumer (`TASK-1831`) and internal
+  authority (`TASK-1836`) have separate contracts. Issuer environment activation uses
+  `pnpm auth-server:register-issuer-environment`, never direct SQL. Resolve current environment, binding
+  population, flags and external eligibility live; internal issuance is not evidence of an external cohort.
+  The binding endpoint described above is the external contract; native internal dispatch uses the
+  context/token-aware reader defined in the internal authority ADR. See `references/native-authority.md`.
 
 ## Choose the route
 

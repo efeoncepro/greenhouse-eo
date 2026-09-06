@@ -17,6 +17,20 @@ type: reference
 
 ---
 
+## Excepción: login público de Efeonce ID (TASK-1836)
+
+Para `auth.efeonce.org/login`, el objeto de prueba es la entrada anónima: no inyectes una cookie de
+agente/portal ni uses `noLoginRedirect` o ausencia de login-card como criterio de éxito. Captura `/login`
+sin query/sesión y el inicio OAuth con retorno por separado; el segundo no acredita visibilidad del botón
+en el primero. Conserva UI existente, prueba desktop + 390 px, teclado y click; distingue llegada a
+Microsoft de regreso humano completo y sesión válida. Un helper `/start` no es pantalla del producto.
+
+Usa el scenario GVC que represente esa superficie; si su autenticación/readiness no permite reproducirla,
+explica el límite y usa Playwright enfocado con artefactos sanitizados bajo `.captures/`. Para Origin/CSP
+nativos aplica `scripts/auth-server/probe-form-origin.mjs`, no fetch con headers fabricados. Nunca guardes
+cookies, tokens, códigos ni URLs OAuth completas en capturas/traces/logs. Contrato y matriz completa:
+`efeonce-mcp-platform/references/native-authority.md`.
+
 ## Regla #1 — Observa ANTES de autorar (aria snapshot). No adivines selectores.
 
 GVC (Capa 1, TASK-1097) escribe en **cada `mark`** un snapshot del **árbol de accesibilidad** de la región capturada:
@@ -171,7 +185,7 @@ jq '.qualityFindings, .runtimeSummary' .captures/<run>/manifest.json
   ```bash
   AGENT_AUTH_EMAIL=agent@greenhouse.efeonce.org node scripts/playwright-auth-setup.mjs
   ```
-  ⚠️ El script **EXIGE** `AGENT_AUTH_EMAIL` — **no tiene default** (aborta con `ERROR: AGENT_AUTH_EMAIL is required.`). Para que la expiración falle loud en vez de producir evidencia falsa, declara siempre `assertions: [{ kind: 'noLoginRedirect' }]` + `readiness.absentSelectors: ['[data-testid="login-card"]']`.
+  ⚠️ El script **EXIGE** `AGENT_AUTH_EMAIL` — **no tiene default** (aborta con `ERROR: AGENT_AUTH_EMAIL is required.`). Para que la expiración falle loud en vez de producir evidencia falsa, en rutas de contenido autenticado declara `assertions: [{ kind: 'noLoginRedirect' }]` + `readiness.absentSelectors: ['[data-testid="login-card"]']`.
 - **Auth**: no re-fumbles el setup. GVC resuelve agent-auth en `scripts/frontend/lib/auth.ts`; para ad-hoc, `node scripts/playwright-auth-setup.mjs` genera `.auth/storageState.json` (personas: superadmin / collaborator / client — usa la de menor privilegio que represente el caso).
 - **Superficie gateada por organización: la persona tiene que ser DE esa organización.** Una persona cliente genérica no la atraviesa — recibe la card de bloqueo, la captura muere en el marker y el gate reporta BLOCK como si fuera defecto de producto (mismo diagnóstico falso que capturar con sesión de operador). Declara la identidad en el scenario (`requiresStorageState: '.auth/storageState.<persona>.json'`) y emítela con el email correcto:
   ```bash

@@ -157,12 +157,13 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   mantienen cookies, sesiones y audiencias propias, pero resuelven un único `identity_profile` y la membresía de
   Account 360 mediante bindings auditados. La coexistencia inicial con el login cliente actual requiere una ruta
   de convergencia posterior al mismo plano de identidad externo; nunca una segunda identidad o contraseña permanente.
-- EPIC-044 (ADR nativo): emisor propio en `auth.efeonce.org`; **runtime vivo** (TASK-1828: Cloud Run
-  `auth-server`, KMS HSM, JWKS vivo; en producción desde el release `9100bbd2765d` del 2026-09-04). **Binding provider-neutral aplicado**
-  (TASK-1631, 2026-09-04): environments registry → bindings de organizaciones `active_client` (`grants_version`) →
-  grants por capability → invitaciones (`linked` = membership). El gateway resuelve por `(environment, subject)` en
-  `GET /api/platform/ecosystem/identity/binding`, nunca por `client_id` ni email.
-  OAuth del emisor code complete (TASK-1829, flag OFF): contrato `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`.
+- EPIC-044: emisor propio `auth.efeonce.org`, KMS/JWKS, OAuth y sesiones de personas; gateway multi-issuer.
+  Autoridad externa e interna separadas por población, binding y contexto; SSO no concede permisos MCP.
+  Grants personales, `gv` y ledger de tokens se revalidan antes del dispatch; estado/audit/outbox son atómicos.
+  Login directo y OAuth se verifican por separado. Contratos:
+  [`ADR nativo`](docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md),
+  [`autoridad interna`](docs/architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md).
+  Estado y pendientes: [`runbook`](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
 - La operación o evolución MCP se enruta por las skills espejo `.codex/skills/efeonce-mcp-platform/` y
   `.claude/skills/efeonce-mcp-platform/`; estas componen la skill dueña de cada provider y no duplican su policy.
   Las skills de arquitectura `software-architect-2026` y `arch-architect` deben cargar ese router antes de

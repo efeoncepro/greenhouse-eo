@@ -318,3 +318,16 @@ recogen"; hoy eso sólo es cierto para `get_greenhouse_skill`, que lo pide en ca
 - `src/lib/growth/seo/lens.ts` · `lens-coverage.ts` · `lens-surface-manifest.ts`
 - `docs/architecture/GREENHOUSE_MCP_TOOL_SELECTION_EVAL_V1.md` — baseline, delta medido y gate de selección
 - `src/lib/growth/seo/resolve-target.ts` — la negativa a elegir mercado callado, del lado del runtime
+
+## Autoridad nativa antes de dispatch (TASK-1831 / TASK-1836)
+
+La presencia de una tool no concede acceso. El gateway mantiene issuer, audiencia, scope, población y
+contexto verificados por request; los argumentos nunca eligen autoridad. Para el carril interno nativo,
+`gv` es del binding seleccionado y el `jti` firmado se comprueba contra el ledger vigente, sin caché
+positiva de autorización. Un token criptográficamente válido puede estar revocado.
+
+Prueba deny antes del provider para organización ajena y familia revocada, conservando controles
+positivos para otra familia/contexto. Un provider que aún rechaza población nativa no queda habilitado
+porque el verifier ya la acepte. Un login Microsoft no acredita token/dispatch, ni un canary interno
+acredita acceso externo. Canon: [autoridad interna](../EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md),
+[OAuth](../EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md) y skill `efeonce-mcp-platform/references/native-authority.md`.

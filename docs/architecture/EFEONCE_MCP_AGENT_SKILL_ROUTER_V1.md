@@ -20,12 +20,14 @@ The two versioned bundles are intentionally mirrored:
 `pnpm skills:mirrors` makes drift in the declared mirrors a failing local check.
 
 El gateway público ya opera el reader interno y read-only `globe.producer.fleet.list`. Eso no cambia la postura
-por defecto de una capacidad nueva ni autoriza acceso de clientes: Entra es sólo el canary interno. El binding
+por defecto de una capacidad nueva ni autoriza acceso de clientes. Entra legacy y autoridad nativa
+interna tienen pruebas separadas. El binding
 Account 360 y el grant revocable por organización y por persona ya existen
 (`greenhouse_core.external_capability_grants`, `TASK-1631`, 2026-09-04) según
 [`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md);
-el acceso B2B/multitenant real sigue cerrado hasta que el emisor propio y el gateway multi-issuer porten esos
-grants en un token (EPIC-044: `TASK-1829`/`TASK-1830`/`TASK-1831`/`TASK-1832`) (actualizado 2026-09-04, TASK-1631).
+el emisor nativo y el consumer multi-issuer se complementan con la autoridad interna de TASK-1836.
+El rollout interno no certifica acceso B2B: elegibilidad, cohorte y canaries externos tienen evidencia
+propia. Consulta el runbook vigente; no infieras habilitación por la existencia de un issuer.
 
 ## Invocation boundary
 
@@ -45,6 +47,7 @@ surface.
 | Globe provider or creative capability | `greenhouse-globe` + creative-rights governance when applicable | Globe API/SDK/policy; `TASK-1473` gates federation |
 | Hiring/ATS, Talent Pool, candidate review, assessment assignment or selection journey | `greenhouse-talent-people-operator` + identity/integrations owners | `TASK-1726` tiene live los readers internos `hiring.talent_pool.search` y `.profile.get`; TASK-1718 implementa `.review.list`/`.review_packet.get` pero permanece OFF hasta gate Privacy/Security; TASK-1719–1722 siguen separados |
 | HubSpot/CRM or Teams provider | owning HubSpot or Teams skill | provider contract, consent and tenancy |
+| Corporate OIDC, direct login, native context/token or multi-issuer verification | `efeonce-mcp-platform/references/native-authority.md` + `greenhouse-browser-diagnostics` + identity invariants | Native authority ADR; TASK-1836 issuer/reader and TASK-1831 gateway, independent from external rollout |
 | Release, rollback or live evidence | `greenhouse-production-release` and `greenhouse-qa-release-auditor` | release/runbook and evidence |
 | Task/ADR split, docs, skill evolution | `greenhouse-task-planner` and `greenhouse-documentation-governor` | Greenhouse control plane |
 
@@ -56,9 +59,8 @@ provider `greenhouse-hiring` y únicamente los readers `hiring.talent_pool.searc
 `hiring.talent_pool.profile.get`; allow search/profile `200` y deny base-only `403` fueron verificados el
 2026-08-16. No incluyen contacto, CV, documentos, URLs, notas ni acciones. El reader de
 Application 360 y el token one-shot de assessment siguen siendo contratos privados: `TASK-1718`–`TASK-1722`
-conservan sus propios gates; los writes y el acceso externo/B2B siguen cerrados hasta que el emisor propio y el
-gateway multi-issuer (EPIC-044: `TASK-1829`/`TASK-1831`/`TASK-1832`) porten los grants que `TASK-1631` ya
-materializó (2026-09-04) (actualizado 2026-09-04, TASK-1631).
+conservan sus propios gates; writes y acceso externo/B2B requieren sus respectivas decisiones de
+rollout y canaries. La autoridad interna TASK-1836 no sustituye esas pruebas.
 
 El código de TASK-1718 agrega `hiring.applications.review.list` y
 `hiring.application.review_packet.get` con OAuth interno separado, purpose cerrado y packet exacto por postulación.
