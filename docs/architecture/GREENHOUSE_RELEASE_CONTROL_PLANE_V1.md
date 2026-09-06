@@ -794,7 +794,9 @@ defecto (ledger), y `/readyz` 503 con el flag OFF no es un deploy fallido. Runbo
 **Delta 2026-09-06 — transporte de flags del emisor.** Los gates runtime que varían por environment deben pasar
 explícitamente desde `vars.*` en `auth-server-deploy.yml` hacia `deploy.sh`; declarar sólo el default en el script
 los dejaría permanentemente apagados. `EXTERNAL_IDENTITY_CANARY_ENABLED` sigue `false` por ausencia y se activa
-únicamente mediante la variable del GitHub Environment más un deploy, con readback de la revisión Cloud Run.
+únicamente mediante la variable del GitHub Environment más un deploy, con readback de la revisión Cloud Run. El
+change-gate incluye drift de `AUTH_SERVER_INTERNAL_AUTH_ENABLED` y `EXTERNAL_IDENTITY_CANARY_ENABLED`: una
+diferencia fuerza el deploy incluso si el diff del bundle es vacío.
 
 ## Delta 2026-09-04 — Release `9100bbd2765d`: primer release con 5 servicios, change-gate por servicio en el watchdog y gate `Production` case-sensitive
 

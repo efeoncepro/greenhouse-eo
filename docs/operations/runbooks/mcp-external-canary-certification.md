@@ -44,7 +44,9 @@ degradación aceptable; debe observarse como deny.
 El SoT del flag del emisor es la variable `EXTERNAL_IDENTITY_CANARY_ENABLED` del GitHub Environment elegido por
 `auth-server-deploy.yml`; el workflow la pasa explícitamente a `deploy.sh`, cuyo `--set-env-vars` vuelve a
 publicar el conjunto completo. Cambiarla sin ejecutar el workflow no modifica Cloud Run. Un deploy posterior con
-la variable ausente vuelve a `false` por diseño. El valor se acredita leyendo la revisión servida, no sólo GitHub.
+la variable ausente vuelve a `false` por diseño. El change-gate compara también ambos gates de identidad contra
+la revisión servida, por lo que una diferencia de configuración fuerza deploy aunque el bundle no haya cambiado.
+El valor se acredita leyendo la revisión servida, no sólo GitHub.
 
 Antes de crear datos deben cumplirse todos estos puntos:
 

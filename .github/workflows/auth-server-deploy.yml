@@ -172,6 +172,9 @@ jobs:
       - name: Check deployed revision drift
         id: worker-drift
         shell: bash
+        env:
+          DESIRED_AUTH_SERVER_INTERNAL_AUTH_ENABLED: ${{ vars.AUTH_SERVER_INTERNAL_AUTH_ENABLED || 'false' }}
+          DESIRED_EXTERNAL_IDENTITY_CANARY_ENABLED: ${{ vars.EXTERNAL_IDENTITY_CANARY_ENABLED || 'false' }}
         run: |
           set -euo pipefail
           WORKER_RUNTIME_PATHS=(
@@ -195,27 +198,42 @@ jobs:
             --format='value(status.latestReadyRevisionName)' 2>/dev/null || true)"
 
           CURRENT_GIT_SHA=""
+          CURRENT_AUTH_SERVER_INTERNAL_AUTH_ENABLED=""
+          CURRENT_EXTERNAL_IDENTITY_CANARY_ENABLED=""
           if [ -n "${CURRENT_REVISION}" ]; then
-            CURRENT_GIT_SHA="$(gcloud run revisions describe "${CURRENT_REVISION}" \
+            mapfile -t CURRENT_RUNTIME_STATE < <(gcloud run revisions describe "${CURRENT_REVISION}" \
               --project="${GCP_PROJECT_ID}" \
               --region="${GCP_REGION}" \
-              --format=json | python3 -c 'import json, sys; data = json.load(sys.stdin); print(next((env.get("value", "") for c in (data.get("spec", {}).get("containers", []) or []) for env in (c.get("env") or []) if env.get("name") == "GIT_SHA"), ""))' 2>/dev/null || true)"
+              --format=json | python3 -c 'import json, sys; data = json.load(sys.stdin); values = {env.get("name"): env.get("value", "") for container in data.get("spec", {}).get("containers", []) or [] for env in container.get("env") or []}; [print(values.get(name, "")) for name in ("GIT_SHA", "AUTH_SERVER_INTERNAL_AUTH_ENABLED", "EXTERNAL_IDENTITY_CANARY_ENABLED")]' 2>/dev/null || true)
+            CURRENT_GIT_SHA="${CURRENT_RUNTIME_STATE[0]:-}"
+            CURRENT_AUTH_SERVER_INTERNAL_AUTH_ENABLED="${CURRENT_RUNTIME_STATE[1]:-}"
+            CURRENT_EXTERNAL_IDENTITY_CANARY_ENABLED="${CURRENT_RUNTIME_STATE[2]:-}"
           fi
 
-          if [ "${CURRENT_GIT_SHA}" = "${EXPECTED_SHA}" ]; then
+          CONFIG_MATCHES="false"
+          if [ "${CURRENT_AUTH_SERVER_INTERNAL_AUTH_ENABLED}" = "${DESIRED_AUTH_SERVER_INTERNAL_AUTH_ENABLED}" ] \
+            && [ "${CURRENT_EXTERNAL_IDENTITY_CANARY_ENABLED}" = "${DESIRED_EXTERNAL_IDENTITY_CANARY_ENABLED}" ]; then
+            CONFIG_MATCHES="true"
+          fi
+
+          echo "auth-server config drift: internal_auth current=${CURRENT_AUTH_SERVER_INTERNAL_AUTH_ENABLED:-unset} desired=${DESIRED_AUTH_SERVER_INTERNAL_AUTH_ENABLED}; external_canary current=${CURRENT_EXTERNAL_IDENTITY_CANARY_ENABLED:-unset} desired=${DESIRED_EXTERNAL_IDENTITY_CANARY_ENABLED}"
+
+          if [ "${CURRENT_GIT_SHA}" = "${EXPECTED_SHA}" ] && [ "${CONFIG_MATCHES}" = "true" ]; then
             DEPLOY_NEEDED="false"
-            echo "auth-server already serves EXPECTED_SHA=${EXPECTED_SHA} at revision ${CURRENT_REVISION}; skipping build/deploy."
+            echo "auth-server already serves EXPECTED_SHA=${EXPECTED_SHA} with matching runtime config at revision ${CURRENT_REVISION}; skipping build/deploy."
           elif [ -n "${CURRENT_GIT_SHA}" ] \
+            && [ "${CONFIG_MATCHES}" = "true" ] \
             && git cat-file -e "${CURRENT_GIT_SHA}^{commit}" 2>/dev/null \
             && git diff --quiet "${EXPECTED_SHA}..${CURRENT_GIT_SHA}" -- "${WORKER_RUNTIME_PATHS[@]}"; then
             DEPLOY_NEEDED="false"
-            echo "auth-server serves ${CURRENT_GIT_SHA}; runtime paths unchanged since EXPECTED_SHA=${EXPECTED_SHA}; skipping build/deploy."
+            echo "auth-server serves ${CURRENT_GIT_SHA}; runtime paths and config are unchanged since EXPECTED_SHA=${EXPECTED_SHA}; skipping build/deploy."
           else
             DEPLOY_NEEDED="true"
-            echo "auth-server deploy required: current_revision=${CURRENT_REVISION:-none}, current_git_sha=${CURRENT_GIT_SHA:-none}, expected_sha=${EXPECTED_SHA}"
+            echo "auth-server deploy required: current_revision=${CURRENT_REVISION:-none}, current_git_sha=${CURRENT_GIT_SHA:-none}, expected_sha=${EXPECTED_SHA}, config_matches=${CONFIG_MATCHES}"
           fi
 
           echo "deploy_needed=${DEPLOY_NEEDED}" >> "${GITHUB_OUTPUT}"
+          echo "config_matches=${CONFIG_MATCHES}" >> "${GITHUB_OUTPUT}"
           echo "current_revision=${CURRENT_REVISION}" >> "${GITHUB_OUTPUT}"
           echo "current_git_sha=${CURRENT_GIT_SHA}" >> "${GITHUB_OUTPUT}"
 
