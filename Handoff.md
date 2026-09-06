@@ -13,6 +13,14 @@ revocación y evidencia redactada. No se implementó código/ADR, no se aplicó 
 cuentas, y no hubo commit/push/deploy. WIP de TASK-1835 preservado. Siguiente paso: checkpoint humano del plan;
 el apply queda además condicionado a organización canary exacta y cuentas M365/Google aprobadas.
 
+**Readback adicional TASK-1832 (14:57Z, sólo lectura):** los 30 perfiles `smoke_test` vigentes aparecen hoy en
+`greenhouse_serving.person_360`; ninguno tiene membership, `client_user` o contacto CRM. Los seis perfiles usados
+por smokes de identidad externa conservan history, pero tienen source link inactivo, invitación/binding revocados
+y sólo `efeonce.invalid`, sin entrega real: no hay cobertura M365/Google. El único candidato existente con nombre
+diagnóstico es `EO-ORG-0050` (`other`, `disqualified`, cero spaces/memberships/bindings), pero tiene historia de
+lifecycle/commercial party y no se seleccionó sin aprobación. Evidencia:
+`docs/audits/mcp/TASK-1832_PRE_IMPLEMENTATION_READBACK_2026-09-06.md`. Sin escrituras ni cambios runtime.
+
 **TASK-1835 (EPIC-044 U06) — `UI ready: yes`, code complete, SIN DESPLEGAR (Claude greenhouse-eo-06, 2026-09-06;
 commits `85c67e97d` · `4eb358d5b` · `b15b1690e`).** Efeonce ID queda enterprise-ready en local. Tres hallazgos que
 importan más que el trabajo planificado:

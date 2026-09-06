@@ -313,6 +313,8 @@ Reglas obligatorias:
 ## Audit record — 2026-09-06
 
 Plan completo: [`docs/tasks/plans/TASK-1832-plan.md`](../plans/TASK-1832-plan.md).
+Readback DB redactado:
+[`TASK-1832_PRE_IMPLEMENTATION_READBACK_2026-09-06.md`](../../audits/mcp/TASK-1832_PRE_IMPLEMENTATION_READBACK_2026-09-06.md).
 
 El preflight se ejecutó con `pnpm codex:task-hook TASK-1832 --develop`. Se confirmó `develop` con WIP ajeno
 de TASK-1835, que queda fuera del ownership y del staging de esta task. Readback live no mutante: emisor y
@@ -324,8 +326,14 @@ confirmó que `bindExternalOrganization` todavía protege la elegibilidad comerc
 La revisión de procedencia encontró que `identity_profiles.data_origin` ya modela `smoke_test`, pero
 `greenhouse_serving.person_360` y `searchProfiles` incluyen hoy todo perfil activo salvo los fusionados. Por
 eso el cierre no puede descansar sólo en «sin membership/CRM»: los readers 360 deben excluir explícitamente
-procedencia no-real y probar que una persona real permanece visible. Retención, consentimientos y revocación
+la procedencia `smoke_test` y probar que una persona real permanece visible. Retención, consentimientos y revocación
 siguen siendo ciegos a procedencia; el filtro sólo gobierna visibilidad.
+
+El readback con `greenhouse_ops` contó 30 perfiles `smoke_test`, y los 30 aparecen hoy en `person_360`; ninguno
+tiene membership organizacional, `client_user` o contacto CRM. Los seis perfiles de identidad externa tienen
+source link inactivo, invitación/binding revocados y sólo dominio `efeonce.invalid`, sin entrega real. El único
+candidato existente con nombre inequívocamente diagnóstico es `EO-ORG-0050`; tiene cero spaces/memberships/
+bindings, pero sí historia comercial/lifecycle, por lo que no se selecciona sin aprobación del operador.
 
 ## Plan pendiente de checkpoint
 

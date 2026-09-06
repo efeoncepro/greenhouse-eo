@@ -24,8 +24,13 @@ capturas con DTOs ficticios, migración registrada sin apply, push sin deploy o 
 | Gateway | `native-external` no despacha tools de negocio; status no prueba grants | Se agrega una excepción declarativa sólo para el tool read seguro. |
 | Auth server | Emite a partir de memberships resueltas por Greenhouse | El gate Greenhouse debe cortar también emisión, no sólo dispatch. |
 | `identity_profiles.data_origin` | Existe `real|synthetic_seed|smoke_test|demo`, default `real` | El canary declara `smoke_test` al nacer; nunca se deriva de email/nombre. |
-| Person/Account 360 | View y búsqueda incluyen perfiles `smoke_test` activos | Excluir sólo `smoke_test`, sin redefinir otros orígenes ni cambiar retención/compliance. |
+| Person/Account 360 | Readback DB: los 30 perfiles `smoke_test` aparecen en la view; ninguno tiene membership, client user ni contacto CRM | Excluir sólo `smoke_test`, sin redefinir otros orígenes ni cambiar retención/compliance. |
 | Runtime live | Issuer/gateway listos y flags nativo/interno ON | Es baseline actual, no evidencia de canary externo. Revalidar antes de rollout. |
+
+Evidencia redactada:
+[`TASK-1832_PRE_IMPLEMENTATION_READBACK_2026-09-06.md`](../../audits/mcp/TASK-1832_PRE_IMPLEMENTATION_READBACK_2026-09-06.md).
+Los seis smokes externos previos están revocados y usan sólo `efeonce.invalid`; no prueban M365/Google. El único
+candidato inequívocamente diagnóstico es `EO-ORG-0050`, todavía sin seleccionar por decisión del operador.
 
 ## Decisiones a aceptar en Delta ADR
 
