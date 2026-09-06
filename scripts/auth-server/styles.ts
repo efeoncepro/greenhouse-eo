@@ -271,6 +271,12 @@ form .id-actions { margin-block-start:${s(4)}; }
 .id-note .id-icon { color:var(--id-muted); }
 .id-actions { display:flex; gap:${s(3)}; margin-block-start:${s(7)}; }
 .id-actions > * { flex:1; }
+/* El pie vive FUERA de la tarjeta, sobre el lienzo azul: sus colores salen del lienzo, no del token
+   de la tarjeta. Al agregarlo heredó el gris y el azul de acento del papel y midió 3.28:1 — la
+   misma falla de clase compartida entre dos fondos opuestos que ya había costado el 1.53:1 de la
+   ficha de aplicación. La detectó pnpm auth-server:verify-contrast en la misma sesión. */
+.id-canvas .id-footer { color:color-mix(in oklch, ${n.bgWhite} 72%, transparent); }
+.id-canvas .id-footer a { color:${n.bgWhite}; }
 .id-muted,.id-footer,.id-preview-note { font-size:${typographyScale.bodyMd.fontSize}; color:var(--id-muted); }
 .id-preview-note { margin-block-end:${s(5)}; text-align:center; }
 .id-footer { text-align:center; margin-block-start:${s(7)}; font-size:${typographyScale.bodySm.fontSize}; color:${n.textDisabled}; }
@@ -303,6 +309,15 @@ form .id-actions { margin-block-start:${s(4)}; }
 .id-footer a + a { margin-inline-start:${s(4)}; }
 .id-surface summary,.id-footer summary { min-height:${s(8)}; cursor:pointer; }
 .id-footer a,.id-surface a:not(.id-primary):not(.id-secondary) { display:inline-flex; align-items:center; min-height:${s(8)}; }
+/* Dato que se muestra UNA sola vez (secreto TOTP y códigos de respaldo). Iba como texto suelto en
+   la única pantalla del emisor donde alguien ve algo que no volverá a ver; recibe el mismo
+   tratamiento de dato que el destino del consentimiento. */
+.id-secret { margin-block:${s(4)}; padding:${s(3)} ${s(4)}; border-radius:${r.md};
+  background:var(--id-bg); border:1px solid var(--id-border); }
+.id-secret .id-muted { display:block; font-size:${typographyScale.bodySm.fontSize}; }
+.id-secret pre { margin-block:${s(2)} 0; font-size:${typographyScale.bodyLg.fontSize};
+  font-weight:${fontWeights.semibold}; color:var(--id-text); font-variant-numeric:tabular-nums; }
+.id-secret .id-note-fine { margin-block-start:${s(3)}; text-align:start; }
 .id-surface pre { font-family:inherit; white-space:pre-wrap; overflow-wrap:anywhere; }
 .id-qr { width:${s(60)}; max-width:100%; height:auto; margin-block:${s(4)}; border:1px solid var(--id-border); border-radius:${r.md}; background:${n.bgWhite}; padding:${s(3)}; }
 .id-surface input[type="checkbox"] { width:${s(6)}; height:${s(6)}; vertical-align:middle; accent-color:var(--id-accent); }

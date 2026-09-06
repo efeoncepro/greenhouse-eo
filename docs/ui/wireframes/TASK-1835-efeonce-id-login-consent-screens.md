@@ -170,7 +170,7 @@ Propuestas para `src/lib/copy/auth-server.ts` (`GH_AUTH_SERVER`); los ids existe
 
 ## GVC Scenario Plan
 
-- Scenario file: `scripts/frontend/scenarios/task1835-efeonce-id.scenario.ts` (nuevo al implementar).
+- Scenario file: `scripts/frontend/scenarios/task1835-runtime-consent.scenario.ts` — raíz de la familia `task1835-runtime-*` (29 fixtures) contra el harness de renderers REALES; los otros 28 la extienden.
 - Route: harness local `pnpm auth-server:dev-ui` (`http://127.0.0.1:8787`) con `?fixture=consent|consent-write|login|magic-sent|magic-verify|passkey|step-up|recovery|denied|error|slow_down`; `[verificar]` soporte de base URL en `pnpm fe:capture --env=local`, si no Playwright directo con el mismo DSL.
 - Viewports: 1440×1000 y 390×844.
 - Quality profile: `premium`.
@@ -181,7 +181,7 @@ Propuestas para `src/lib/copy/auth-server.ts` (`GH_AUTH_SERVER`); los ids existe
 - Scroll-width checks: en las 22 capturas.
 - Accessibility/focus checks: orden de tabulación, `role=alert|status`, contraste ≥ 4.5:1, etiquetas y `autocomplete`.
 - Reduced-motion evidence: misma secuencia con la preferencia activada; entrada sin transición.
-- Review dossier: `pnpm fe:capture:review task1835-efeonce-id` obligatorio.
+- Review dossier: `pnpm fe:capture:review <capture-dir>` sobre las corridas de la familia `task1835-runtime-*`.
 - Baseline: baseline nuevo `efeonce-id` declarado en la dirección visual; sin surface ID de Figma (repo-native).
 
 ## Design Decision Log

@@ -2,10 +2,10 @@
   "taskId": "TASK-1835",
   "scenario": "efeonce-id-login-consent-screens",
   "reviewedAt": "2026-09-06",
-  "reviewer": "Claude (greenhouse-eo-06) · GVC premium 20 fixtures x 2 viewports + contraste medido sobre pixeles",
+  "reviewer": "Claude (greenhouse-eo-06) · GVC premium 29 fixtures x 2 viewports + contraste medido sobre pixeles + carril passkey en navegador real",
   "evidence": {
-    "desktop": ".captures/2026-09-06T14-39-10_task1835-runtime-consent/01-desktop/frames/01-runtime-consent.png",
-    "mobile": ".captures/2026-09-06T14-39-49_task1835-runtime-login/02-mobile/frames/01-runtime-login.png",
+    "desktop": ".captures/2026-09-06T21-11-06_task1835-runtime-consent/01-desktop/frames/01-runtime-consent.png",
+    "mobile": ".captures/2026-09-06T21-12-02_task1835-runtime-login/02-mobile/frames/01-runtime-login.png",
     "dossier": "docs/ui/reviews/TASK-1835-efeonce-id-login-consent-screens-review.md"
   },
   "dimensions": {
@@ -29,8 +29,8 @@
     },
     "density": {
       "score": 4.6,
-      "rationale": "El consentimiento expone organizacion, destino y permisos sin scroll interno y con el detalle de capacidades plegado; el login muestra dos metodos completos sin pedir eleccion previa.",
-      "evidence": "consent desktop con dos scopes y organizacion de nombre extenso",
+      "rationale": "El alta del segundo factor pasa de texto suelto a bloques de dato irrepetible con su aviso de unica vez; el consentimiento expone organizacion, destino y permisos sin scroll interno.",
+      "evidence": "runtime-enroll-secrets desktop y consent desktop",
       "nextAction": ""
     },
     "depth": {
@@ -59,7 +59,7 @@
     },
     "color": {
       "score": 4.8,
-      "rationale": "272 textos medidos sobre pixeles renderizados en 18 pantallas x 2 viewports: 0 bajo el piso WCAG 1.4.3. La medicion existe justamente porque axe no podia ver el degradado y reportaba cero sin medir.",
+      "rationale": "365 textos medidos sobre pixeles renderizados en 18 pantallas x 2 viewports: 0 bajo el piso WCAG 1.4.3. La medicion existe porque axe devolvia todo en incomplete sobre el degradado; encontro 1.53:1 en la ficha de aplicacion y 3.28:1 en el pie que se agrego en esta misma sesion.",
       "evidence": "pnpm auth-server:verify-contrast",
       "nextAction": ""
     },
@@ -83,7 +83,7 @@
     },
     "fidelity": {
       "score": 4.7,
-      "rationale": "Lo implementado corresponde a la direccion «Nocturno editorial» aprobada y al wireframe: passkey antes del correo, dos estados de fallo distintos, consentimiento sin autofoco en la accion afirmativa.",
+      "rationale": "Lo implementado corresponde a la direccion Nocturno editorial aprobada y al wireframe, y la matriz cubre ahora los 29 estados incluido el momento irreversible del alta que antes no se capturaba.",
       "evidence": "direccion visual versionada y wireframe",
       "nextAction": ""
     },

@@ -48,7 +48,6 @@ export const GH_AUTH_SERVER = {
 
   // Consentimiento
   consent_title: 'Autorizar acceso',
-  consent_intro: (clientName: string) => `${clientName} quiere acceder a tu cuenta de Efeonce con estos permisos:`,
   consent_scope_label: 'Permiso',
   consent_organizations_label: 'Organizaciones de este acceso',
   consent_organization_label: 'Organización de este acceso',
@@ -99,26 +98,34 @@ export const GH_AUTH_SERVER = {
 
   // Segundo factor (TOTP). El enrolamiento muestra el secreto y los códigos UNA sola vez: si la
   // persona cierra la pantalla sin guardarlos, el camino es re-enrolar, no recuperarlos.
-  totp_enroll_title: 'Activa tu segundo factor',
-  totp_enroll_body:
-    'Escanea el código con tu app de autenticación y escribe el número que te muestre. Recién entonces queda activo.',
-  totp_enroll_secret_label: 'Si no puedes escanear, escribe este código en tu app',
-  totp_enroll_code_label: 'Número que muestra tu app',
-  totp_enroll_submit_cta: 'Activar',
-  totp_backup_codes_title: 'Guarda tus códigos de respaldo',
+  //
+  // El copy de ESA pantalla vive en `auth-server-step-up.ts` porque viaja al navegador dentro del
+  // controlador. Acá existía un juego COMPLETO de ids paralelos (`totp_enroll_*`, `totp_backup_*`,
+  // `totp_verify_title/body/backup_hint`, `totp_invalid_code`, `totp_not_enrolled`,
+  // `totp_unavailable_*`) que no renderizaba nadie: dos textos es-CL para la misma pantalla y sólo
+  // uno visible. Retirados 2026-09-06 — un copy muerto no es inocuo, es el que alguien edita
+  // creyendo que cambia la pantalla. Sobrevive el único con consumidor real:
+  totp_verify_submit_cta: 'Verificar código',
+
+  // Códigos de respaldo gastándose. El servidor ya los CUENTA y los devuelve en la respuesta de
+  // `POST /auth/totp/verify` (`usedBackupCode`, `remainingBackupCodes`); hasta 2026-09-06 la
+  // pantalla los ignoraba, así que alguien podía quemar el último y enterarse el día que perdiera
+  // el teléfono. El aviso frena la navegación automática: si no se ve, no sirve de nada.
+  /**
+   * Aviso de la única vez. Estaba escrito y huérfano mientras la pantalla mostraba sólo «Códigos de
+   * respaldo»: el texto bueno existía y no lo veía nadie. Es la frase que decide si una persona los
+   * guarda o cierra la pestaña y se queda fuera el día que pierda el teléfono.
+   */
   totp_backup_codes_body:
     'Cada uno sirve una sola vez y te deja entrar si pierdes el teléfono. Esta es la única vez que los ves: guárdalos donde puedas encontrarlos después.',
-  totp_backup_codes_confirm_cta: 'Ya los guardé',
-  totp_verify_title: 'Confirma que eres tú',
-  totp_verify_body: 'Escribe el número que muestra tu app de autenticación.',
-  totp_verify_backup_hint: 'También puedes usar uno de tus códigos de respaldo.',
-  totp_verify_submit_cta: 'Verificar código',
-  totp_invalid_code: 'Ese número no es válido o ya se usó. Espera a que tu app muestre uno nuevo.',
-  totp_not_enrolled: 'Todavía no tienes un segundo factor activo. Actívalo para poder autorizar permisos de escritura.',
-  // El envelope caído no es «error de sistema»: es una degradación honesta con un límite claro.
-  totp_unavailable_title: 'No podemos verificar tu segundo factor ahora',
-  totp_unavailable_body:
-    'Vuelve a intentarlo en unos minutos. Mientras tanto puedes seguir usando tus permisos de lectura.',
+  totp_backup_used_title: 'Usaste un código de respaldo',
+  totp_backup_remaining: (remaining: number) =>
+    remaining === 0
+      ? 'Era el último que te quedaba. Activa de nuevo tu segundo factor para generar códigos nuevos, o no podrás entrar si pierdes el teléfono.'
+      : remaining === 1
+        ? 'Te queda 1 código de respaldo.'
+        : `Te quedan ${remaining} códigos de respaldo.`,
+  totp_backup_continue_cta: 'Entendido, continuar',
 
   // Confirmación del enlace (página intermedia; el consumo es por POST)
   confirm_title: 'Confirma tu acceso',

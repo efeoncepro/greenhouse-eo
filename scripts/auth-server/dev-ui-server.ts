@@ -8,11 +8,14 @@ import { getAuthFontAsset } from '../../src/lib/auth-server/oauth/pages/assets'
 import {
   renderConsentPage,
   renderErrorPage,
-  renderLoginRequiredPage
+  renderLoginRequiredPage,
+  renderStepUpRequiredPage
 } from '../../src/lib/auth-server/oauth/pages/render'
 import { renderStepUpPage } from '../../src/lib/auth-server/persons/step-up-page'
 import {
   renderAccessRevokedPage,
+  renderInvitationConfirmPage,
+  renderMagicLinkConfirmPage,
   renderInvitationAcceptedPage,
   renderLinkProblemPage,
   renderLoginPageResponse,
@@ -74,6 +77,13 @@ const renderers = new Map<string, () => string>([
       })
   ],
   ['/error/missing', () => renderLoginRequiredPage(returnTo)],
+  ['/error/step-up-required', () => renderStepUpRequiredPage(returnTo)],
+  ['/error/invalid-redirect', () => renderErrorPage('invalid_redirect_uri')],
+  ['/error/slow-down', () => renderErrorPage('slow_down')],
+  ['/magic-link/confirm', () => renderMagicLinkConfirmPage('token-ficticio-de-ejemplo')],
+  ['/magic-link/invalid', () => renderLinkProblemPage('invalid')],
+  ['/invitation/confirm', () => renderInvitationConfirmPage('token-ficticio-de-ejemplo')],
+  ['/session/started-direct', () => renderSessionStartedPage({ direct: true })],
   ['/error/invalid-client', () => renderErrorPage('invalid_client')],
   ['/error/access-denied', () => renderErrorPage('access_denied')],
   ['/error/unavailable', () => renderErrorPage('temporarily_unavailable')],
@@ -93,6 +103,36 @@ const server = createServer((request, response) => {
     response.end()
     
 return
+  }
+
+  /**
+   * El harness es de sólo lectura salvo por estas dos rutas. El alta del segundo factor revela su
+   * momento irreversible —secreto, códigos de respaldo, casilla de confirmación— sólo después de un
+   * POST, así que con GET únicamente esa pantalla NO SE PUEDE MIRAR: el fixture capturaba el botón
+   * previo y nada más. Devuelven una carga FIJA y ficticia; no tocan KMS, PG ni command alguno.
+   */
+  const enrollFixtures: Record<string, unknown> = {
+    '/auth/totp/enroll/start': {
+      status: 'ready',
+      secret: 'JBSWY3DPEHPK3PXPFICTICIO',
+      otpauthUri: 'otpauth://totp/Efeonce%20ID:persona@ejemplo.invalid?secret=JBSWY3DPEHPK3PXPFICTICIO&issuer=Efeonce',
+      backupCodes: ['1111-1111', '2222-2222', '3333-3333', '4444-4444', '5555-5555',
+        '6666-6666', '7777-7777', '8888-8888', '9999-9999', '0000-0000']
+    },
+    '/auth/totp/verify': { status: 'verified', usedBackupCode: true, remainingBackupCodes: 1 }
+  }
+
+  if (request.method === 'POST' && Object.hasOwn(enrollFixtures, request.url ?? '')) {
+    const body = JSON.stringify(enrollFixtures[request.url ?? ''])
+
+    response.writeHead(200, {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Cache-Control': 'no-store',
+      'X-Auth-UI-Harness': 'fictional-fixtures-no-authentication'
+    })
+    response.end(body)
+
+    return
   }
 
   if (request.method !== 'GET') {

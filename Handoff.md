@@ -56,9 +56,13 @@ importan más que el trabajo planificado:
    la ficha (sobre el azul) y el bloque del destino (dentro de la tarjeta) — un color cruzando fondos opuestos.
    Mecanismo nuevo `pnpm auth-server:verify-contrast` (muestrea píxeles): **272 textos, 0 bajo el piso WCAG**.
    *Aplica más allá de esta task: cualquier superficie con fondo compuesto tiene el mismo punto ciego.*
-3. 🔴 **Nadie puede tener una passkey.** `/auth/passkeys/register/*` existe y NO tiene superficie en ninguna parte;
-   el step-up sólo enrola TOTP. El botón nuevo es un camino inerte hasta que exista el alta, y `EPIC-044` tampoco
-   tiene nodo para eso. Hueco del programa → follow-up en la task.
+3. 🔴 **Ninguna PERSONA puede crear una passkey.** `/auth/passkeys/register/*` existe y no tiene superficie; el
+   step-up sólo enrola TOTP. **Corrección del operador:** dije que eso bloqueaba la certificación de U07 y es
+   falso — `scripts/auth-server/external-passkey-canary.ts` (TASK-1832, Codex) ya ejecuta registro y login con una
+   passkey de plataforma real en Chrome persistente, en el origen real, sin CDP ni autenticador de software. Falta
+   la PANTALLA, no la capacidad: quien recibe una invitación depende del correo en cada entrada. Registrado como
+   **`TASK-1842`** (`/account/credentials`, ui-ux, con el nodo S11 del flujo maestro y un gate de cobertura
+   endpoint→consumidor). Pesa sobre el primer piloto cliente (U16), no sobre el canary.
 
 Evidencia: GVC premium 20 fixtures × desktop 1440 y móvil 390 = 40 capturas 20/20; scorecard 4.63 / piso 4.5; los
 cuatro gates `ui:*` PASS; `pnpm test` 13896 passed; typecheck limpio; worker gates verdes. Patrón «runtime sin
@@ -428,20 +432,3 @@ Aprendizaje operativo del día: **dos sesiones recibieron el mismo mandato y nin
 de arrancar.** La colisión se detectó porque `origin/main` ganó un commit entre dos comandos consecutivos. Nadie
 tocó el control plane durante el solapamiento. Regla que queda: anunciar no es coordinar — hay que preguntar con
 `ListAgents` y esperar respuesta antes de tocar el árbol.
-
-## 2026-09-02 (7) — Salesforce ya tiene oferta canónica y task de landing, sin implementación
-
-La práctica Salesforce quedó canonizada por outcomes y lifecycle en cuatro fases: `Diagnose & Architect`,
-`Implement & Integrate`, `Activate & Adopt` y `Operate & Evolve`; seis solution lanes cubren Revenue/Sales,
-Service, Marketing/Lifecycle, Data/Identity/Consent, Agentforce/Automation y Experience/Integration/Analytics.
-El mapa previo conserva el routing de producto y separa CRM, Marketing Cloud Engagement y Marketing Cloud Next.
-
-Se registró `TASK-1812` para convertir esa oferta en una landing pública `Universo conectado`. Ya existen dirección
-visual, wireframe 1440/390, flujo installed-base/evaluation y motion contract. Efeonce lidera; Salesforce aporta
-reconocimiento referencial. Nubes/agentes son originales y cualquier logo, badge, screenshot, mascota o claim de
-partnership queda bloqueado hasta rights y readback contractual. `TASK-1404` sigue dueña de la comparación HubSpot
-vs Salesforce.
-
-Estado honesto: documentación y contrato UI listos; no hay implementación, WordPress postId, CMS save, publicación,
-cache purge, indexación, conversión ni live readback. La ejecución empieza con Discovery/VoC/SEO/rights/runtime,
-continúa con un first fold `noindex` y se detiene para `ACCEPT FIRST FOLD` antes del below-fold.

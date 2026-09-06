@@ -77,7 +77,7 @@ un dominio ajeno.
 - Motion: `docs/ui/motion/TASK-1835-efeonce-id-login-consent-screens-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-044`
-- Status real: `2026-09-06 (sesión greenhouse-eo-06): UI COMPLETA y verificada localmente. Carril de login por passkey implementado — no existía: el backend y el copy estaban desde el 2026-09-04 pero /login no ofrecía el método (hallazgo del operador). Controlador generado con drift guard, servido por nonce; renderLoginPageResponse exige el nonce en su tipo, así que el compilador impide servir la página sin script. Contraste: el gate de GVC reportaba violations:0 sin medir nada (axe devolvía todo en incomplete por el degradado del lienzo) y debajo había texto a 1.53:1 en la ficha de aplicación del consentimiento; causa raíz una clase compartida entre dos fondos opuestos, corregida en la causa. Mecanismo nuevo pnpm auth-server:verify-contrast: 272 textos, 18 pantallas x 2 viewports, 0 bajo el piso WCAG. Salidas agregadas a las pantallas terminales que instruían sin ofrecer control. GVC premium 20 fixtures x desktop 1440 y móvil 390 = 40 capturas, 20/20 verdes; scorecard 4.63 promedio / piso 4.5; los cuatro gates ui:* PASS; vitest src/lib/auth-server 423 passed; typecheck limpio. SIN DESPLEGAR: el push a develop dispara auth-server-deploy sobre el Cloud Run único que sirve auth.efeoncepro.org en vivo — el push ES el despliegue. PENDIENTE DE PROGRAMA (no de esta task): nadie puede tener una passkey todavía porque /auth/passkeys/register/* no tiene superficie en ninguna parte.`
+- Status real: `2026-09-06 (sesión greenhouse-eo-06): UI COMPLETA y verificada localmente. Carril de login por passkey implementado — no existía: el backend y el copy estaban desde el 2026-09-04 pero /login no ofrecía el método (hallazgo del operador). Controlador generado con drift guard, servido por nonce; renderLoginPageResponse exige el nonce en su tipo, así que el compilador impide servir la página sin script. Contraste: el gate de GVC reportaba violations:0 sin medir nada (axe devolvía todo en incomplete por el degradado del lienzo) y debajo había texto a 1.53:1 en la ficha de aplicación del consentimiento; causa raíz una clase compartida entre dos fondos opuestos, corregida en la causa. Mecanismo nuevo pnpm auth-server:verify-contrast: 272 textos, 18 pantallas x 2 viewports, 0 bajo el piso WCAG. Salidas agregadas a las pantallas terminales que instruían sin ofrecer control. GVC premium 20 fixtures x desktop 1440 y móvil 390 = 40 capturas, 20/20 verdes; scorecard 4.63 promedio / piso 4.5; los cuatro gates ui:* PASS; vitest src/lib/auth-server 423 passed; typecheck limpio. SIN DESPLEGAR: el push a develop dispara auth-server-deploy sobre el Cloud Run único que sirve auth.efeoncepro.org en vivo — el push ES el despliegue. PENDIENTE DE PROGRAMA (no de esta task): /auth/passkeys/register/* no tiene superficie, así que ninguna PERSONA puede crear una passkey y el botón nuevo de /login le queda inerte. CORRECCIÓN 2026-09-06: dije que eso bloqueaba la certificación de U07 y NO es cierto — scripts/auth-server/external-passkey-canary.ts (TASK-1832, Codex) ya ejecuta registro y login con una passkey de plataforma real en Chrome persistente, dentro del origen real y sin CDP ni autenticador de software. Lo que falta es la pantalla, no la capacidad. Registrado como TASK-1842.`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none`
@@ -193,7 +193,7 @@ Reglas obligatorias:
 - `src/lib/auth-server/oauth/pages/**` (shell, plantillas por pantalla, `styles.generated.ts`)
 - `scripts/auth-server/generate-brand-assets.ts` (extender: tokens → CSS generado)
 - `scripts/auth-server/dev-ui-server.ts` (nuevo: harness local con fixtures por estado para GVC)
-- `scripts/frontend/scenarios/task1835-efeonce-id.scenario.ts` (nuevo)
+- `scripts/frontend/scenarios/task1835-runtime-*.scenario.ts` (29 fixtures)
 - `src/lib/copy/auth-server.ts` (extender; TASK-1830 agrega el copy de métodos, esta task el de layout/estados)
 - `docs/ui/wireframes/TASK-1835-efeonce-id-login-consent-screens.md`
 - `docs/ui/flows/TASK-1835-efeonce-id-login-consent-screens-flow.md`
@@ -305,7 +305,7 @@ Reglas obligatorias:
 
 ### GVC scenario plan
 
-- Scenario file: familia `scripts/frontend/scenarios/task1835-runtime-*.scenario.ts` (20 fixtures) contra el harness de renderers REALES `pnpm auth-server:dev-ui` (127.0.0.1:19036). **Corregido 2026-09-06:** existía `task1835-efeonce-id.scenario.ts` apuntando al harness de PREVIEW (19035, renderers falsos) y haciendo click en `[data-capture="id-corporate-action"]`, un selector que sólo existe en `ui-preview-render.ts` y en NINGÚN renderer de producto. Ese escenario no acreditaba nada del runtime real: eliminado.
+- Scenario file: familia `scripts/frontend/scenarios/task1835-runtime-*.scenario.ts` (29 fixtures) contra el harness de renderers REALES `pnpm auth-server:dev-ui` (127.0.0.1:19036). **Corregido 2026-09-06:** existía `task1835-efeonce-id.scenario.ts` apuntando al harness de PREVIEW (19035, renderers falsos) y haciendo click en `[data-capture="id-corporate-action"]`, un selector que sólo existe en `ui-preview-render.ts` y en NINGÚN renderer de producto. Ese escenario no acreditaba nada del runtime real: eliminado.
 - Route: harness local `pnpm auth-server:dev-ui` en `http://127.0.0.1:8787` con fixtures `?fixture=consent|consent-write|login|magic-sent|magic-verify|passkey|step-up|recovery|denied|error|slow_down` `[verificar]` que `pnpm fe:capture --env=local` acepte base URL/puerto distinto de `localhost:3000`; si no, capturar con Playwright directo desde el mismo scenario DSL y documentarlo.
 - Viewports: 1440×1000 y 390×844
 - Quality profile: `premium`
@@ -315,7 +315,7 @@ Reglas obligatorias:
 - Assertions: `scrollWidth === clientWidth`; `Permitir` nunca tiene foco inicial; scopes de escritura marcados; ningún `sub`/token en el DOM; CSP sin `unsafe-inline` en `script-src`.
 - Scroll-width checks: en las 11 fixtures × 2 viewports.
 - Reduced-motion / focus evidence: misma secuencia con la preferencia activada y capturas del anillo de foco.
-- Review dossier: `pnpm fe:capture:review task1835-efeonce-id` obligatorio antes de `UI ready: yes`.
+- Review dossier: `pnpm fe:capture:review <capture-dir>` sobre las corridas de `task1835-runtime-*`.
 - Baseline decision / surface ID: baseline nuevo `efeonce-id` en `docs/ui/visual-directions/TASK-1835-efeonce-id-direction.md`; sin surface ID de Figma (dirección repo-native).
 
 ### Design decision log
@@ -328,9 +328,9 @@ Reglas obligatorias:
 
 ### Visual verification
 
-- GVC scenario: `task1835-efeonce-id`
+- GVC scenario: `task1835-runtime-consent` (raíz de la familia: los otros 28 la extienden; el gate mide la corrida de esta)
 - Viewports: 1440×1000 · 390×844
-- Required captures: 11 fixtures × 2 viewports + teclado + reduced-motion
+- Required captures: 29 fixtures × 2 viewports + teclado + reduced-motion (58 capturas, 116 frames)
 - Required `data-capture` markers: `id-shell`, `id-client`, `id-scopes`, `id-actions`, `id-status`, `id-form`
 - Scroll-width check: en todas las capturas
 - Accessibility/focus checks: orden de tabulación, foco inicial, `role=alert|status`, contraste ≥ 4.5:1 (axe), etiquetas de campos, `autocomplete` correctos
@@ -481,7 +481,7 @@ re-decidir:
 - [x] La pantalla de consentimiento muestra cliente (nombre + `client_id`), organización y cada scope con descripción es-CL; los scopes de escritura están marcados y `Permitir` nunca tiene foco inicial. **Delta 2026-09-05:** ese CTA ahora se llama `Autorizar acceso` (verbo + objeto, pasada de UX writing) y la fila de escritura se distingue por icono, palabra y tinte, no sólo por color; el consentimiento no lleva autofoco.
 - [x] `logo_uri` sólo se renderiza para clientes CIMD validados con esquema https y CSP por origen; en otro caso se muestra monograma. **Recalibrado 2026-09-06 — lo implementado es MÁS estricto que el criterio:** no se carga NINGÚN logo remoto. `client-marks.ts` resuelve el origen exacto del `client_id` https contra un allowlist curado (nunca por sufijo de dominio) y embebe un asset del repo; cualquier otro caso es monograma. Sin `img-src` de terceros, sin vector de tracking.
 - [x] Copy visible únicamente desde `src/lib/copy/auth-server.ts`, validado con `greenhouse-ux-writing`.
-- [ ] Los estados loading/error/degraded/denied/long content/mobile/keyboard/reduced-motion de cada pantalla están implementados y capturados. **2026-09-06:** 20 fixtures cubren la matriz; el login sumó su carril de passkey con los dos estados de fallo diferenciados (`unsupported` sin reintento, `failed` con reintento) y las terminales sumaron su salida. **Excepción declarada:** el pending del consentimiento no existe por diseño — el POST es nativo sin JS, así que no hay dónde colgar un estado intermedio. **DESTILDADO 2026-09-06 tras barrido con subagentes — afirmación mía de más:** falta capturar el momento IRREVERSIBLE del alta del segundo factor (secreto + 10 códigos de respaldo + confirmación «ya los guardé»). El fixture `-runtime-enroll` captura sólo el botón previo: la sección se revela por POST y el harness sólo sirve GET (`dev-ui-server.ts`). Es la pantalla donde una persona ve datos que no volverá a ver, y es justo la que no está mirada. También sin fixture: `magic_link_confirm`, `link_invalid`, `invitation_confirm`, `invalid_redirect_uri`, `slow_down`, `renderStepUpRequiredPage`, la variante `direct` de `session_started`, y los dos estados del passkey (`unsupported`/`failed`, que sólo existen en cliente).
+- [x] Los estados loading/error/degraded/denied/long content/mobile/keyboard/reduced-motion de cada pantalla están implementados y capturados. **Destildado y vuelto a cerrar el mismo día, 2026-09-06.** Lo tildé creyendo que 20 fixtures cubrían la matriz; un barrido con subagentes mostró que no. La matriz pasó a **29 fixtures × 2 viewports = 58 capturas, 116 frames, 29/29 verdes**. Lo que faltaba y ahora está: el momento IRREVERSIBLE del alta del segundo factor (secreto, QR, 10 códigos y la casilla de confirmación) —el harness ahora responde las dos rutas del enrolamiento con una carga fija y ficticia, porque esa sección sólo se revela por POST y con GET la pantalla era inmirable—; `magic_link_confirm`, `link_invalid`, `invitation_confirm`, `invalid_redirect_uri`, `slow_down`, el aviso de step-up requerido, la variante `direct` de sesión iniciada, y `passkey_failed`. `passkey_unsupported` no es capturable por GVC (habría que quitarle WebAuthn al navegador) y lo cubre `pnpm auth-server:verify-passkey`, 14/14 en navegador real. **Mirar esa pantalla pagó de inmediato:** tres defectos que nadie había visto — la instrucción se imprimía DOS veces seguidas, el aviso «esta es la única vez que los ves» estaba escrito y huérfano mientras la pantalla decía sólo «Códigos de respaldo», y el secreto y los códigos iban como texto suelto sin bloque. Corregidos. **Excepción declarada:** el pending del consentimiento no existe por diseño — el POST es nativo sin JS.
 - [x] CSP por página verificada por test: `default-src 'none'`, `script-src` sólo nonce (cuando hay WebAuthn), sin `unsafe-inline` en scripts. **2026-09-06:** `page-contract.test.ts` recorre las 22 páginas servidas y afirma además que TODO `<style>` del documento está en la lista de hashes —el modo de falla real: un estilo fuera de la lista deja la página desnuda con el build verde— y que cada respuesta de login trae un nonce distinto.
 - [x] Anti-enumeración: el copy de magic link enviado y de recuperación es idéntico exista o no la invitación (test de render). **2026-09-06:** garantía estructural — `renderMagicLinkSentPage` no recibe entrada (`.length === 0`), así que no puede variar; los tres desenlaces del enlace comparten título.
 - [x] GVC premium desktop 1440 + mobile 390 capturado y mirado para las 11 fixtures; dossier revisado; sin scroll horizontal; foco y reduced-motion evidenciados. **2026-09-06:** 20 fixtures (más que las 11 planificadas) × 2 viewports = 40 capturas, 80 frames, 20/20 verdes; dossier en `docs/ui/reviews/TASK-1835-…-review.md`.
@@ -494,7 +494,8 @@ re-decidir:
 - `pnpm lint`
 - `pnpm typecheck`
 - `pnpm vitest run src/lib/auth-server`
-- `pnpm auth-server:dev-ui` + `pnpm fe:capture task1835-efeonce-id --env=local` (o Playwright directo, ver `[verificar]`) + `pnpm fe:capture:review task1835-efeonce-id`
+- `pnpm auth-server:dev-ui` + `AGENT_AUTH_BASE_URL=http://127.0.0.1:19036 pnpm fe:capture task1835-runtime-<fixture> --env=local` (29 fixtures) + `pnpm fe:capture:review <capture-dir>`
+- `pnpm auth-server:verify-contrast` · `pnpm auth-server:verify-passkey`
 - `pnpm design-contract:lint --task TASK-1835` · `pnpm ui:code-lint --changed` · `pnpm ui:visual-gate --task TASK-1835` · `pnpm ui:quality --task TASK-1835`
 - `pnpm task:lint --task TASK-1835`
 
@@ -510,14 +511,16 @@ re-decidir:
 
 ## Follow-ups
 
-- 🔴 **Alta de passkey sin superficie (hallazgo 2026-09-06, task propia).** `POST /auth/passkeys/register/{start,finish}`
+- 🔴 **Alta de passkey sin superficie → `TASK-1842` (registrada 2026-09-06).** `POST /auth/passkeys/register/{start,finish}`
   existe y exige sesión, pero NINGUNA pantalla la ofrece: el step-up sólo enrola TOTP y el login sólo
   autentica. Con esta task, «Entrar con mi passkey» ya está en `/login` — y hoy fallaría para todo el
   mundo, porque nadie tiene una credencial registrada. El flujo maestro de `EPIC-044` tampoco tiene
   nodo para el alta (su S5 es sólo la ceremonia dentro de `/login`), así que es un hueco del programa,
   no de esta task. Mientras no exista, el carril de passkey queda como camino inerte y el enlace por
-  correo es el único que opera; conviene decidir si el alta vive en el step-up (donde ya hay sesión y
-  ya se enrola un factor) o en una pantalla propia de «tus dispositivos».
+  correo es el único que opera. **No bloquea la certificación**: el canary de `TASK-1832` ya ejercita
+  la ceremonia real en Chrome. Resuelto como `/account/credentials` en `TASK-1842`, no colgado del
+  step-up: atar la configuración al momento en que un scope de escritura ya frenó a la persona es
+  justo cuando no quiere configurar nada.
 - «Aplicaciones autorizadas» del usuario y gestión de consentimientos en Greenhouse (Admin Center) — task propia.
 - Versión en inglés del copy (`en-US`) cuando llegue el primer cliente fuera de LatAm.
 - Reutilizar el shell «Efeonce ID» en TASK-1834 (login del portal por el emisor).
