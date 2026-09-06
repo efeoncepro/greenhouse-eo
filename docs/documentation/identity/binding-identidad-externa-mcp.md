@@ -338,8 +338,12 @@ Conviene decirlo explícito, porque el nombre "identidad externa" invita a supon
   proyección a Account 360 es un follow-up declarado.
 - **La lane delegada todavía no está federada en el gateway.** Greenhouse la expone, pero `efeonce-mcp` aún no
   la llama con `environment` + `subject`; es follow-up de TASK-1831/1832. Mientras tanto el flag sigue apagado.
-- **Todo lo de TASK-1837 está `code complete, rollout pendiente`.** La migración no se aplicó en la instancia
-  compartida, los dos flags no están seteados y no hubo verificación en vivo. Ver el ledger de flags.
+- **Todo lo de TASK-1837 está `code complete; migración aplicada 2026-09-06; flags OFF; verificación viva
+  pendiente`.** La migración sí se aplicó en la instancia compartida y el smoke `--apply` ejercitó contra la base
+  real el reenvío, la revelación, el registro de entrega fallida y la lane delegada (evidencia en
+  `docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`). Lo que falta: los dos flags siguen
+  sin setear (default apagado), ningún correo real se ha enviado porque todavía no existe un binding externo, y la
+  lane delegada no está federada en el gateway. Ver el ledger de flags.
 - **La primera persona externa real sigue pendiente de decisión del operador** (qué organización y qué
   persona); esa decisión desbloquea TASK-1830/1832.
 

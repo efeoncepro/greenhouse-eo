@@ -1,25 +1,24 @@
 # Handoff activo
 
-**TASK-1837 (EPIC-044 U12) — `code complete, rollout pendiente`** (sesión greenhouse-eo-21, 2026-09-06, develop;
-commits `5518d868e` · `6cb8042a8` · `c9371b28f` · `4f03cdff6` · `189148c6e` + docs; **sin push**). El sistema
-entrega la invitación externa en el mismo acto que genera el token (post-commit, nunca por consumer reactivo: el
-outbox no lleva el secreto), la URL sale del `issuer_url` del environment (no de `NEXT_PUBLIC_APP_URL`), la ruta
-admin deja de devolver `token` con `EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED=true`, reenviar = rotar (3/cadena,
-20/binding/hora), revelar = excepción con capability + razón + 1 h + audit, rebote drenado por proyección sin flag
-(ops-worker), 3 señales `identity.external_invitation.*`, un solo admin designado vigente por binding, lane
-ecosystem delegada `GET/POST /api/platform/ecosystem/identity/invitations` (gateway-mediated por
-`environment`+`subject`; `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` OFF ⇒ 404) y el consentimiento muestra el
-host del `redirect_uri` (`redirectHost` obligatorio). Verificado: `pnpm test` completo 13.784 ✔, `pnpm typecheck` ✔,
-lint ✔, `task:lint` ✔; **`pnpm build` de producción NO corrido** (autorización del operador). **Riesgo de orden:**
-`INVITATION_SELECT` ya lee `delivery_*` → la migración `20260906004450748` (additive, NO aplicada) va **antes** del
-deploy; hasta entonces el reader de invitaciones y las 3 señales fallan (`unknown`) en la instancia compartida.
-**Próximo paso (exige confirmación):** `pnpm pg:connect:migrate` + `SELECT` de las 4 columnas → deploy con flags OFF +
-`pnpm identity:external-access:smoke` → verificar dominio remitente en Resend → flag de entrega en Vercel staging →
-correo real a casilla controlada → `/i/<token>` → `linked` → rebote forzado (señal `undelivered` ENCENDIDA) →
-reenvío/revelación → federar la lane delegada en `efeonce-mcp` (TASK-1831/1832) → producción con 24 h → primera
-persona externa real (decisión del operador; desbloquea el carril de tokens de TASK-1830 y la cohorte de
-TASK-1832). Detalle: [task](docs/tasks/in-progress/TASK-1837-efeonce-id-external-invitation-delivery-delegated-authority.md)
-§Plan de ejecución + §Desviaciones, [ledger](docs/operations/FEATURE_FLAG_STATE_LEDGER.md) § Pendientes.
+**TASK-1837 (EPIC-044 U12) — `code complete; migración APLICADA; flags OFF; correo real pendiente`** (sesión
+greenhouse-eo-21, 2026-09-06, develop; commits `5518d868e` · `6cb8042a8` · `c9371b28f` · `4f03cdff6` · `189148c6e` ·
+`db5a0adf3` + docs). El sistema entrega la invitación externa en el mismo acto que genera el token (post-commit, nunca
+por consumer reactivo), la URL sale del `issuer_url` del environment, la ruta admin deja de devolver `token` con
+`EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED=true`, reenviar = rotar, revelar = excepción auditada de 1 h, rebote por
+proyección sin flag, 3 señales `identity.external_invitation.*`, un solo admin designado vigente, lane ecosystem
+delegada (gateway-mediated; `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` OFF ⇒ 404) y consentimiento con host del
+`redirect_uri`. **Rollout ejecutado:** migración `20260906004450748` aplicada a la instancia compartida
+(2026-09-06T04:27Z) y verificada; smoke live `--apply` extendido verde contra PG real (reenvío rota, `failed`
+registrado, revelación 60 min, token viejo rechazado, delegada 201/422/403, admin cleared; `token_revealed` se vio
+ENCENDER ok→warning). `pnpm test` 13.784 ✔ · typecheck ✔ · local:check ✔ · **build de producción ✔ (79 s)**.
+**Límite honesto:** no existe binding externo (el único activo es `internal`, piloto TASK-1836) → sin correo real,
+sin rebote forzado, flags NOT SET. **Próximo paso:** el operador designa organización cliente + persona (bindea con
+`bindExternalOrganization`), se prende el flag de entrega en Vercel staging, correo real → `/i/<token>` → `linked`,
+rebote forzado (señal `undelivered` ENCENDIDA), federar la lane delegada en `efeonce-mcp` (TASK-1831/1832), producción
+con 24 h. Skills espejo actualizadas: `efeonce-mcp-platform` (lane delegada, matriz de verificación) y `greenhouse-qa-release-auditor/security-qa`.
+Evidencia: [audit](docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md);
+[task](docs/tasks/in-progress/TASK-1837-efeonce-id-external-invitation-delivery-delegated-authority.md);
+[ledger](docs/operations/FEATURE_FLAG_STATE_LEDGER.md) § Pendientes.
 
 **TASK-1836 / TASK-1831 — evidencia consolidada, 2026-09-06:**
 Tres subagentes actualizaron contratos, funcionales, manuales, tasks/epic y skills espejo.

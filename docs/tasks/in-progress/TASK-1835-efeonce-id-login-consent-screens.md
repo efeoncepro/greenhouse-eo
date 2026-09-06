@@ -2,8 +2,10 @@
 
 ## Delta 2026-09-06 — el dato del destino YA se renderiza en el consentimiento (TASK-1837 Slice 5a)
 
-`TASK-1837` (commits `5518d868e…189148c6e`; el host es `189148c6e`, code complete, rollout pendiente = deploy del
-auth-server) entregó lo que el delta del 2026-09-05 pedía como dato: `renderConsentPage`
+`TASK-1837` (commits `5518d868e…189148c6e`; el host es `189148c6e`; code complete, migración aplicada 2026-09-06
+—no afecta este slice—, flags OFF; lo que falta para este dato es el deploy del auth-server y la captura GVC —
+`docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`) entregó lo que el delta del
+2026-09-05 pedía como dato: `renderConsentPage`
 (`src/lib/auth-server/oauth/pages/render.ts`) ahora **exige** `redirectHost` (lanza si falta) y renderiza el
 bloque `data-capture="id-redirect-host"` con "Destino de la autorización: <host>" + la nota "El código de
 autorización se enviará a esta dirección." (`GH_AUTH_SERVER.consent_redirect_host_{label,hint}` en

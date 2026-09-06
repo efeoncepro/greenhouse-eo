@@ -31,3 +31,18 @@ For TASK-1836/TASK-1831 changes, apply [native-authority.md](native-authority.md
 `/login` visibility/click/session and the client OAuth/MCP canary are distinct rows. Require context-bound
 allow/deny, refresh, token-family and grant revocation with an unexpired token, bounded OFF/restore and
 separate legacy/external regression evidence. Never substitute flags ON or metadata for authenticated dispatch.
+
+## External invitation delivery and delegated authority (TASK-1837)
+
+Migration applied to the shared instance 2026-09-06; both flags OFF in every runtime. Status column as of
+2026-09-06 (smoke = `pnpm identity:external-access:smoke -- --apply` against real PG on the smoke fixture org).
+
+| Row | Minimum evidence | Status |
+| --- | --- | --- |
+| Invitation delivered by the system | `EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED` ON in staging, an external binding + controlled mailbox, email received from the Efeonce sender, `/i/<token>` on the issuer accepted → `linked` → magic link → session; admin response carries `delivery` and no `token` | pending — no external binding exists yet (operator decision); real email unverified |
+| Resend rotates | new row, previous one `revoked` (`resent`), old token rejected with `invitation_not_open`, cap 3 per chain → 429 | smoke live ✔ |
+| Reveal exception | capability `identity.external_invitation.reveal_token`, reason ≥10 chars, 1 h row without email, audit `invitation_token_revealed` with actor + reason and no token, signal `identity.external_invitation.token_revealed` ok → warning | smoke live ✔ (signal seen lighting) |
+| Delivery failure / bounce | `delivery_status` `failed`/`bounced` + audit + outbox `delivery_failed`; signal `undelivered` lights while the row stays open | smoke live ✔ for `failed`; forced real bounce pending |
+| Delegated lane, 4 negatives | via the gateway: flag OFF / consumer not internal → 404; foreign or unbound binding / non-admin subject → 403; `designatedAdmin: true` → 422; seat cap → 422; hourly cap → 429; response never carries the token | smoke live ✔ in-process (403, 422, delegated issue, own list); gateway federation pending (`TASK-1831`/`TASK-1832`) |
+| Designated admin clearing | revoking the admin member sets `designated_admin_profile_id = NULL` + audit `designated_admin_cleared`; a second `designated_admin` accept while one is `linked` → `conflict`, token not consumed | smoke live ✔ |
+| Consent shows redirect host | consent page renders the host of the validated `redirect_uri` (`data-capture="id-redirect-host"`) | render test ✔; real GVC pending |

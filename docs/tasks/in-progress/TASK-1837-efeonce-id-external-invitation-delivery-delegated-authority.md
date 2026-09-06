@@ -19,10 +19,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `code complete, rollout pendiente (2026-09-06). Slices 1-4 y 5a en develop local (commits 5518d868e · 6cb8042a8 · c9371b28f · 4f03cdff6 · 189148c6e, sin push): entrega por el sistema, ciclo de vida (migración additive NO aplicada a la instancia compartida), retiro del token + revelación gobernada, autoridad delegada (lane ecosystem; federación en efeonce-mcp pendiente) y host del redirect_uri en el consentimiento. Verificado con tests unitarios (mocks) + typecheck; pnpm build de producción NO corrido (autorización del operador). Flags OFF en todos los runtimes. Slice 5b (alta real) bloqueado por la decisión del operador (organización/persona) y por el rollout (migrate:up + flag en staging).`
+- Status real: `code complete; migración APLICADA a la instancia compartida 2026-09-06T04:27Z (verificada por information_schema/pg_constraint); flags OFF en todos los runtimes; verificación viva del correo pendiente. Slices 1-4 y 5a en develop (5518d868e…189148c6e + rollout), sin push al escribir esto. Verificado: pnpm test completo 13.784 ✔, typecheck ✔, local:check ✔, pnpm build de producción ✔ (79 s), smoke read-only + --apply extendido contra PG real (reenvío/revelación/entrega/delegada/admin cleared; token_revealed se vio encender ok→warning). No existe binding externo (el único activo es internal, piloto TASK-1836): el correo real, el rebote forzado y la primera persona externa esperan la decisión del operador (organización/persona) y el flag en staging. Federación de la lane delegada en efeonce-mcp pendiente (TASK-1831/1832). Evidencia: docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`
 - Rank: `TBD`
 - Domain: `identity|platform`
-- Blocked by: `rollout: pnpm pg:connect:migrate en la instancia compartida (confirmación del operador) + flags en staging; Slice 5b: decisión del operador sobre organización/persona de la primera invitación real; lane delegada: federación en efeonce-mcp (TASK-1831/1832)`
+- Blocked by: `Slice 5b: decisión del operador sobre organización cliente/persona de la primera invitación real (no existe binding externo) + flag de entrega en staging con casilla controlada; lane delegada: federación en efeonce-mcp (TASK-1831/1832)`
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -603,8 +603,8 @@ cambiar el esquema del token está resolviendo algo que no está roto.
 
 ### Production verification sequence
 
-1. `pnpm migrate:up` en staging + `SELECT` contra `information_schema.columns` confirmando las cuatro
-   columnas con su default. **Stop si falta una.**
+1. ✅ 2026-09-06 — `pnpm pg:connect:migrate` (instancia compartida) + `SELECT` contra `information_schema.columns`:
+   las cuatro columnas con su default, CHECKs, índice, capabilities y kill-switch presentes.
 2. Deploy a staging con ambos flags en `false` + `pnpm identity:external-access:smoke` verde: el
    comportamiento actual no cambió.
 3. Prender `EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED` en staging (Vercel **y** el worker para el
@@ -660,20 +660,21 @@ cambiar el esquema del token está resolviendo algo que no está roto.
       publica `identity.external_invitation.delivery_failed`; ninguna respuesta afirma entrega no
       ocurrida. *(`commands.test.ts` «a failed send leaves the invitation issued…»)*
 - [x] Reenviar genera un token nuevo y el anterior queda rechazado; el tope por invitación y por
-      binding/hora se aplica y se prueba. *(`commands.test.ts` bloque «resendExternalInvitation»: la fila anterior
-      queda `revoked` `resent` en la misma tx; topes 3/cadena y 20/binding/hora con `rate_limited` 429)*
+      binding/hora se aplica y se prueba. *(`commands.test.ts` bloque «resendExternalInvitation» + smoke live
+      2026-09-06: token rotado rechazado con `invitation_not_open` contra PG real; topes 3/cadena y 20/binding/hora
+      con `rate_limited` 429)*
 - [ ] Un rebote de Resend deja `delivery_status='bounced'` y **enciende**
       `identity.external_invitation.undelivered` (observado pasando de `ok` a alerta, no sólo en `ok`).
-      *(consumer + señal implementados y probados con mocks; el encendido ok→warning contra PG real exige el
-      rollout: migración aplicada + rebote forzado en staging)*
+      *(consumer + señal implementados y probados con mocks; la señal hermana `token_revealed` SÍ se vio encender
+      ok→warning en el smoke live; el rebote real exige flag en staging + casilla controlada + binding externo)*
 - [x] Revelar el token exige la capability `identity.external_invitation.reveal_token` y una razón de
       ≥10 caracteres; el acto queda auditado con actor, razón e `invitation_id`, y **sin** el valor del
       token; el enlace revelado caduca en 1 hora. *(`commands.test.ts` bloque «revealExternalInvitationToken»;
       ruta `reveal` con la capability)*
-- [ ] Las tres capabilities nuevas están en `capabilities_registry`, en el catálogo TS y granteadas a
+- [x] Las tres capabilities nuevas están en `capabilities_registry`, en el catálogo TS y granteadas a
       ≥1 rol real en el mismo PR; `capability-grant-coverage.test.ts` pasa. *(catálogo TS + grant `efeonce_admin` +
-      `capability-grants.test.ts` ✔; el seed de `capabilities_registry` vive en la migración `20260906004450748`,
-      NO aplicada todavía. Nota: son 2 capabilities nuevas —`reveal_token`, `issue_delegated`—; `issue` ya existía)*
+      `capability-grants.test.ts` ✔; seed aplicado 2026-09-06 y leído en `capabilities_registry`: `reveal_token`
+      (execute) e `issue_delegated` (create) activas —son 2 nuevas; `issue` ya existía)*
 - [x] Aceptar una invitación con `designated_admin: true` fija `designated_admin_profile_id` en el
       binding sólo si no hay otro activo; el conflicto da error explícito y auditado. *(`commands.test.ts`
       «acceptance with designated_admin fails closed»; el conflicto responde `conflict` 409 dentro de la tx —el

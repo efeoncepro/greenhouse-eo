@@ -738,9 +738,11 @@ invitaciones), sus 6 capabilities de `efeonce_admin`, el reader ecosystem
 están aplicados en PG; sigue sin haber login externo, cliente real ligado ni canary con cliente. El camino de
 soporte vive en [§Soporte: cliente externo que no puede entrar](#soporte-cliente-externo-que-no-puede-entrar-task-1631).
 
-**Delta 2026-09-06 (TASK-1837, code complete, rollout pendiente):** la invitación externa ahora la **envía el
-sistema** por correo (`/i/<token>` sobre el `issuer_url` del environment; flag `EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED`,
-hoy OFF) con estado de entrega, reenvío que rota el enlace y rebote drenado en el ops-worker. Existe además una
+**Delta 2026-09-06 (TASK-1837, code complete; migración aplicada 2026-09-06; flags OFF; verificación viva de correo
+pendiente — evidencia en `docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`):** la invitación
+externa ahora la **envía el sistema** por correo (`/i/<token>` sobre el `issuer_url` del environment; flag
+`EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED`, hoy NOT SET = OFF; ningún correo real enviado aún porque no existe
+binding externo) con estado de entrega, reenvío que rota el enlace y rebote drenado en el ops-worker. Existe además una
 **lane delegada** `GET/POST /api/platform/ecosystem/identity/invitations` para que el administrador designado del
 cliente invite a su propia gente: este gateway debe llamarla con `(environment, subject)` como hace con `identity/binding`
 (federación pendiente, TASK-1831/1832; flag `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` OFF ⇒ 404).

@@ -35,3 +35,25 @@ deny with positive controls. Claims and upstream MFA are not local step-up proof
 and redirect CSP in a real browser; never repair Origin failure by disabling CSRF. Report skipped engines
 and untested external/multicontext cases separately. Runtime flags/revisions and measured rollback go in
 the dated runbook; do not embed a moving pilot snapshot in skills.
+
+## Efeonce ID external invitation (TASK-1837)
+
+Check when `src/lib/identity/external-access/**`, the admin invitation routes, the ecosystem
+`identity/invitations` lane, the invitation email or the consent page are touched:
+
+- Token never in an HTTP response under system delivery (`token` only with `delivery.mode='manual'`); never
+  in outbox payloads, audit metadata, logs or Sentry — the email body is not persisted (token-sensitive type).
+- Acceptance URL comes from `external_identity_environments.issuer_url` (`/i/<token>`), never from
+  `NEXT_PUBLIC_APP_URL` or any env var.
+- Resend = rotate: previous row `revoked` (`resent`), old token rejected; cap 3 per chain + per-binding hourly cap.
+- Reveal requires capability `identity.external_invitation.reveal_token` + reason ≥10 chars; 1 h row; audit
+  `invitation_token_revealed` with actor + reason and without the token; signal `token_revealed` steady 0.
+- Designated admin is unique per binding (a second accept conflicts instead of overwriting; revoke clears it
+  with audit).
+- Delegated lane: 404 flag OFF / non-internal consumer, 403 non-admin or foreign binding, 422 self-elevation
+  or seat cap, 429 hourly cap; response without token; `Idempotency-Key` on POST.
+- Consent page shows the host of the validated `redirect_uri`; a missing host is a render error.
+- Rollout order: migration before the code deploy (the invitation SELECT reads the new columns).
+
+Blockers: a token-bearing response, outbox event or log line; an acceptance URL built from an env var;
+a resend that reuses the open token; a delegated path without the four denial cases tested.

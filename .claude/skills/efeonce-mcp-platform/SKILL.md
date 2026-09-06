@@ -300,6 +300,23 @@ graph, because the gateway will resolve the caller against it:
   population, flags and external eligibility live; internal issuance is not evidence of an external cohort.
   The binding endpoint described above is the external contract; native internal dispatch uses the
   context/token-aware reader defined in the internal authority ADR. See `references/native-authority.md`.
+- External invitation delivery & delegated authority (`TASK-1837`; migration applied 2026-09-06, both flags OFF):
+  with `EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED` ON the invitation email goes out from Greenhouse itself —
+  acceptance URL `<issuer origin>/i/<token>`, derived from `external_identity_environments.issuer_url` of the
+  binding's environment, never from an env var — and the admin response carries `delivery` but **no token**
+  (`token` exists only with `delivery.mode='manual'`, i.e. flag OFF). Resend = rotate (the open row becomes
+  `revoked`, the old token answers `invitation_not_open`); reveal is a governed exception (capability
+  `identity.external_invitation.reveal_token`, reason ≥10 chars, 1 h row, audit without the token). The gateway
+  is the ONLY caller of the delegated lane `GET/POST /api/platform/ecosystem/identity/invitations` (consumer
+  `internal`): pass `environment` + `subject` of the verified person JWT + `bindingId`; POST goes through the
+  command harness with `Idempotency-Key` and body `{ environment, subject, bindingId, email, reason?,
+  designatedAdmin? }`. Outcomes: 404 when `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` is OFF or the
+  consumer is not internal (anti-oracle); 403 `forbidden` when the subject is not the designated admin of that
+  binding (cause never distinguished); 422 on self-elevation (`designatedAdmin: true`) or seat cap; 429 on the
+  hourly cap; the response never contains the token. Federating it as an MCP tool in `efeonce-mcp` is pending
+  (`TASK-1831`/`TASK-1832`). Signals: the `identity.external_*` group is now 9, adding
+  `identity.external_invitation.{undelivered,expired_unaccepted,token_revealed}` (`token_revealed` steady 0 —
+  any value must carry actor + reason in the audit).
 
 ## Choose the route
 

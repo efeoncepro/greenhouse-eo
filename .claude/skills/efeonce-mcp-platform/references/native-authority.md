@@ -39,6 +39,19 @@ certifica flags, versiones desplegadas, elegibilidad de clientes ni finalizació
   separado. Un provider que rechaza población nativa necesita su propio contrato y pruebas; habilitar el
   verifier no lo vuelve compatible automáticamente.
 
+## Invitación externa entregada por el sistema (TASK-1837)
+
+- El gateway es el único llamador de la lane delegada `GET/POST /api/platform/ecosystem/identity/invitations`:
+  verifica el JWT de la persona y llama con `(environment, subject)` + `bindingId`, igual que en
+  `identity/binding`; el POST va por el command harness con `Idempotency-Key`. La autoridad la resuelve
+  Greenhouse (admin designado del binding): el gateway nunca acepta `bindingId` como autoridad venida del
+  cliente ni decide por argumentos. 404 con flag OFF o consumer no interno; 403 si el sujeto no es el admin
+  de ese binding; 422 auto-elevación o tope de asientos; 429 tope por hora.
+- La respuesta nunca expone el token: la invitación llega por correo desde Greenhouse a `/i/<token>` del
+  emisor (`issuer_url` del environment). Reenviar rota; revelar es excepción gobernada con audit sin token.
+- El consentimiento muestra el host del `redirect_uri` validado; su ausencia es error de render. Federar la
+  lane en `efeonce-mcp` sigue pendiente (TASK-1831/1832).
+
 ## Dos entradas de navegador, dos pruebas
 
 1. Abre `/login` sin query ni cookie previa: verifica el botón Microsoft existente, teclado, 390 px y

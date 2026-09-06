@@ -418,8 +418,12 @@ gateway, auth-server, UI — those live in `TASK-1828`/`1829`/`1830`/`1831`/`183
 
 ### Delta 2026-09-06 — TASK-1837: entrega gobernada de la invitación y autoridad delegada
 
-Estado: **`code complete, rollout pendiente`** (migración `20260906004450748_task-1837-external-invitation-delivery-lifecycle.sql`
-sin aplicar; flags sin setear; sin verificación viva). Cierra el ciclo de vida de `external_member_invitations`:
+Estado: **`code complete; migración aplicada 2026-09-06; flags OFF; verificación viva pendiente`** (migración
+`20260906004450748_task-1837-external-invitation-delivery-lifecycle.sql` aplicada a la instancia compartida y smoke
+`--apply` verde contra PG real — evidencia en
+`docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`; flags NOT SET en ningún runtime; sin
+correo real enviado porque no existe binding externo; federación de la lane delegada en `efeonce-mcp` pendiente).
+Cierra el ciclo de vida de `external_member_invitations`:
 
 - **Entrega por el sistema** (`EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED`, Vercel): el command envía el correo
   `external_access_invitation` post-commit y persiste `delivery_status`/`delivery_attempts`/`last_delivery_*` vía

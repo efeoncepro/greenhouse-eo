@@ -289,6 +289,15 @@ pnpm identity:external-access:smoke -- --apply # ciclo completo sobre el fixture
   fixture, no para clientes).
 - Usa el perfil `runtime` (por defecto): así verificas los GRANTs reales del runtime, no los del owner.
 - El smoke emite su invitación con `delivery: 'manual'` explícito: no manda correo aunque el flag esté encendido.
+- Desde TASK-1837 (migración aplicada 2026-09-06), `--apply` también ejercita el ciclo de entrega sobre el mismo
+  fixture: **reenvío** (rota el enlace; la invitación anterior queda `revoked`/`resent`), **registro de entrega
+  fallida** (`delivery_status='failed'` + audit + evento `delivery_failed`), **revelación gobernada** (fila nueva de
+  1 h, el token rotado se rechaza con `invitation_not_open`), aceptación como administrador designado y la **lane
+  delegada** in-process (positivo, auto-elevación 422, binding ajeno 403, lista propia) y la limpieza del
+  administrador al revocar. Deja `identity.external_invitation.token_revealed` en `warning` durante 24 h: es
+  esperado, igual que `unbound_dispatch_attempt`. Sigue sin enviar correo real; el ciclo de correo se verifica
+  aparte con el flag encendido y un binding externo real. Evidencia de la corrida del 2026-09-06:
+  `docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`.
 
 ### 9. El cliente invita a su gente (lane delegada)
 
@@ -440,7 +449,8 @@ Otros síntomas:
 - Migraciones: `migrations/20260904104914802_task-1631-external-identity-binding-foundation.sql`,
   `migrations/20260904110809060_task-1631-invitation-linked-check-one-directional.sql` y
   `migrations/20260906004450748_task-1837-external-invitation-delivery-lifecycle.sql` (columnas `delivery_*`,
-  tipos de audit, capabilities `reveal_token`/`issue_delegated`, `email_type_config`; **pendiente de aplicar**).
+  tipos de audit, capabilities `reveal_token`/`issue_delegated`, `email_type_config`; **aplicada 2026-09-06** a la
+  instancia compartida; pendientes los flags, el correo real y la federación de la lane delegada en el gateway).
 - Flags (`EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED`, `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED`) y knob
   `EXTERNAL_INVITATION_DELEGATED_SEAT_LIMIT`: estado por entorno y orden de rollout en
   [FEATURE_FLAG_STATE_LEDGER.md](../../operations/FEATURE_FLAG_STATE_LEDGER.md).

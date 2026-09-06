@@ -16,8 +16,11 @@ excepción auditada de 1 h con capability propia. El rebote de Resend deja `deli
 proyección reactiva y tres señales nuevas vuelven observable el ciclo de vida. `designated_admin` pasa a conferir
 autoridad real: un solo admin vigente por binding y una lane ecosystem para que invite a su propia gente (403/422
 fail-closed). El consentimiento muestra el host del `redirect_uri` (MUST del protocolo). Migración additive y dos
-flags default OFF: **code complete, rollout pendiente** (migración antes del deploy; primera persona real pendiente
-del operador). Commits `5518d868e…189148c6e`, sin push.
+flags default OFF. **Migración aplicada 2026-09-06 y verificada; smoke live `--apply` verde contra PG real
+(reenvío, revelación, entrega fallida, delegada, admin cleared; `token_revealed` encendida ok→warning); build de
+producción ✔.** Pendiente: binding externo real + flag en staging + correo real (decisión del operador) y
+federación de la lane delegada en el gateway. Skills actualizadas (espejo `.claude`/`.codex`): `efeonce-mcp-platform`
+(SKILL + native-authority + verification-matrix) y `greenhouse-qa-release-auditor/security-qa`. Commits `5518d868e…db5a0adf3`.
 
 ## 2026-09-05 — Efeonce ID: acceso Microsoft y publicación certificados
 

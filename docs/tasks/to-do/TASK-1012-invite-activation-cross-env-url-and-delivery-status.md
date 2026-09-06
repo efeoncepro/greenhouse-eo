@@ -2,7 +2,8 @@
 
 ## Delta 2026-09-06 — TASK-1837 resolvió ambos gaps PARA EL EMISOR (Efeonce ID), no para el portal
 
-- `TASK-1837` (commits `5518d868e…189148c6e`, code complete, rollout pendiente) cerró los dos gaps de esta task en la
+- `TASK-1837` (commits `5518d868e…189148c6e`; code complete, migración aplicada 2026-09-06, flags OFF, correo real
+  pendiente — `docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`) cerró los dos gaps de esta task en la
   invitación de **acceso externo al MCP** (`external_member_invitations`, aceptada en `auth.efeonce.org`):
   la URL de aceptación se deriva de `external_identity_environments.issuer_url` del environment del binding
   (`resolveInvitationAcceptanceUrl`, `src/lib/identity/external-access/delivery.ts`), **nunca** de

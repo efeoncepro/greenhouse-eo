@@ -5,7 +5,7 @@
 > Versión: `1.22`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-09-06` por TASK-1837 (3 signals del ciclo de vida de la invitación externa `identity.external_invitation.*` — `undelivered`, `expired_unaccepted`, `token_revealed` — en el mismo grupo `getExternalIdentityBindingSignals`, que pasa a 9 readers; code complete, rollout pendiente). Antes, `2026-09-04` por el release `9100bbd2765d` (semántica de `platform.release.worker_revision_drift`: change-gate por servicio — `ops-worker` + `auth-server` — con espejo de rutas y test de paridad; 5 servicios Cloud Run mapeados). Ese mismo día TASK-1829 agregó 3 signals `incident` de la superficie OAuth del emisor propio bajo el módulo `identity` (`auth.oauth.code_reuse_detected`, `auth.oauth.refresh_reuse_detected`, `auth.oauth.cimd_rejected`), TASK-1828 `auth.issuer.jwks_unreachable` + `auth.signing_keys.lifecycle` y TASK-1631 las 4 de `identity.external_binding.*` (TASK-1836 sumó `unaudited_write` + `mixed_population` el 2026-09-05).
+> Última actualización: `2026-09-06` por TASK-1837 (3 signals del ciclo de vida de la invitación externa `identity.external_invitation.*` — `undelivered`, `expired_unaccepted`, `token_revealed` — en el mismo grupo `getExternalIdentityBindingSignals`, que pasa a 9 readers; code complete, migración aplicada 2026-09-06, flags OFF, verificación viva de correo pendiente). Antes, `2026-09-04` por el release `9100bbd2765d` (semántica de `platform.release.worker_revision_drift`: change-gate por servicio — `ops-worker` + `auth-server` — con espejo de rutas y test de paridad; 5 servicios Cloud Run mapeados). Ese mismo día TASK-1829 agregó 3 signals `incident` de la superficie OAuth del emisor propio bajo el módulo `identity` (`auth.oauth.code_reuse_detected`, `auth.oauth.refresh_reuse_detected`, `auth.oauth.cimd_rejected`), TASK-1828 `auth.issuer.jwks_unreachable` + `auth.signing_keys.lifecycle` y TASK-1631 las 4 de `identity.external_binding.*` (TASK-1836 sumó `unaudited_write` + `mixed_population` el 2026-09-05).
 
 ## Delta 2026-09-04 — Release `9100bbd2765d`: `platform.release.worker_revision_drift` clasifica el change-gate por servicio
 
@@ -88,8 +88,11 @@ Tres señales nuevas en el mismo reader
 (4 de TASK-1631 + 2 de TASK-1836 + estas 3); `/admin/operations` ya las muestra sin cableado nuevo y
 `pnpm identity:external-access:smoke` (read-only) las lee. Observan la entrega gobernada de
 `external_member_invitations` (columnas `delivery_status`/`delivery_attempts`/`last_delivery_*` de la migración
-`20260906004450748`, **NO aplicada**: hasta el rollout el reader degrada a `unknown` + `captureWithDomain('identity')`
-sobre la instancia compartida). Estado: `code complete, rollout pendiente`.
+`20260906004450748`, **aplicada 2026-09-06** a la instancia compartida; las 9 señales leen contra PG real sin
+`unknown`, y `token_revealed` se vio encender ok→warning con el smoke `--apply` — evidencia en
+`docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`). Estado: `code complete; migración
+aplicada; flags OFF; verificación viva de correo pendiente` (correo real, rebote de Resend en vivo y federación de la
+lane delegada en el gateway siguen pendientes).
 
 | `signalId` | `kind` | Qué mide | Severidad | Steady |
 | --- | --- | --- | --- | --- |

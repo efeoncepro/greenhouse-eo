@@ -1,8 +1,9 @@
 # TASK-1832 — Efeonce MCP Client Canaries and First Customer Cohort Rollout
 
-## Delta 2026-09-06 — prerrequisitos de la cohorte que trae TASK-1837 (existen en código, rollout pendiente)
+## Delta 2026-09-06 — prerrequisitos de la cohorte que trae TASK-1837 (existen en código; migración aplicada; flags OFF)
 
-- `TASK-1837` (commits `5518d868e…189148c6e`, **code complete, rollout pendiente**) deja en código tres cosas que la primera
+- `TASK-1837` (commits `5518d868e…189148c6e`, **code complete; migración aplicada 2026-09-06; flags OFF; verificación
+  viva de correo pendiente** — `docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`) deja en código tres cosas que la primera
   cohorte necesita: entrega automática de la invitación por correo (flag
   `EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED`, reenvío/rebote/revelación gobernados), el host del `redirect_uri`
   visible en la pantalla de consentimiento (sin flag, aditivo) y la lane delegada por la que el administrador
@@ -13,8 +14,10 @@
   Greenhouse no conoce personas en ese harness. Sin esa federación (TASK-1831 + esta task) el cliente no puede
   invitar a nadie y toda invitación sigue pasando por un operador de Efeonce. Los 4 negativos en staging
   (binding ajeno 403, auto-elevación 422, tope de asientos 422, no-admin 403) se corren desde el gateway.
-- Antes de la cohorte: migración `20260906004450748_task-1837-…` aplicada, flags en staging → producción con
-  24 h, dominio remitente Efeonce verificado en Resend, y el consentimiento con host visible capturado (GVC).
+- Antes de la cohorte: migración `20260906004450748_task-1837-…` ✔ aplicada 2026-09-06 (smoke `--apply` verde
+  contra PG real; los 4 negativos de la lane delegada corrieron in-process, NO desde el gateway); faltan flags en
+  staging → producción con 24 h, dominio remitente Efeonce verificado en Resend, correo real a una persona externa
+  (no existe binding externo aún) y el consentimiento con host visible capturado (GVC).
 
 ## Delta 2026-09-04 — acceso interno nativo (TASK-1836)
 

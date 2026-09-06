@@ -468,10 +468,14 @@ del dominio; el resto lo bundlea `services/auth-server`).
 
 ## Entrega gobernada de la invitación externa y autoridad delegada (TASK-1837)
 
-> Estado 2026-09-06: **`code complete, rollout pendiente`** — migración
-> `20260906004450748_task-1837-external-invitation-delivery-lifecycle.sql` NO aplicada a la instancia compartida,
-> los dos flags sin setear en ningún runtime, sin verificación viva; la federación de la lane delegada en el gateway
-> (`efeonce-mcp`) es follow-up de `TASK-1831`/`TASK-1832`.
+> Estado 2026-09-06: **`code complete; migración aplicada 2026-09-06; flags OFF; verificación viva pendiente`** —
+> migración `20260906004450748_task-1837-external-invitation-delivery-lifecycle.sql` APLICADA a la instancia
+> compartida (`run_on 2026-09-06T04:27:58Z`; columnas, CHECKs, índice, capabilities y `email_type_config`
+> verificados) y smoke `--apply` verde contra PG real (evidencia:
+> `docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`). Pendiente: los dos flags NOT SET en
+> ningún runtime (default OFF), ningún correo real enviado (no existe binding externo), federación de la lane
+> delegada en el gateway (`efeonce-mcp`, follow-up de `TASK-1831`/`TASK-1832`) y primera persona externa real por
+> decisión del operador.
 
 Cierra el ciclo de vida de `external_member_invitations` que TASK-1631 dejó a mano: el sistema envía el correo de
 invitación (`EmailType` `external_access_invitation`, remitente Efeonce, cuerpo no persistido), registra la entrega en
