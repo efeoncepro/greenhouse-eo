@@ -21,11 +21,21 @@ vi.mock('@/lib/sync/publish-event', () => ({
   publishOutboxEvent: (...args: unknown[]) => publishMock(...args)
 }))
 
+const resolveExternalAccessMock = vi.fn()
+
+vi.mock('./resolve-external-access', () => ({
+  resolveExternalAccess: (...args: unknown[]) => resolveExternalAccessMock(...args)
+}))
+
+const { query: dbQueryMock } = (await import('@/lib/db')) as unknown as { query: ReturnType<typeof vi.fn> }
+
 const {
   acceptExternalInvitation,
   bindExternalOrganization,
   grantExternalCapability,
+  issueDelegatedExternalInvitation,
   issueExternalInvitation,
+  listDelegatedExternalInvitations,
   resendExternalInvitation,
   revealExternalInvitationToken,
   revokeExternalAccess,
@@ -751,6 +761,165 @@ describe('TASK-1837 — revealExternalInvitationToken (excepción gobernada)', (
     expect(JSON.stringify(auditParams)).not.toContain(result.token)
     expect(JSON.stringify(publishMock.mock.calls[0]?.[0])).not.toContain(result.token)
     expect(calls(/UPDATE greenhouse_core\.external_member_invitations i\s+SET delivery_status/)).toHaveLength(0)
+  })
+})
+
+describe('TASK-1837 — autoridad delegada del cliente', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  const bound = (memberships: Array<Partial<{ bindingId: string; designatedAdmin: boolean }>>) =>
+    resolveExternalAccessMock.mockResolvedValue({
+      outcome: 'bound',
+      environmentId: 'efeonce-auth',
+      issuerClass: 'external',
+      profileId: 'profile-admin',
+      memberships: memberships.map(m => ({
+        bindingId: 'xob-1',
+        organizationId: 'org-1',
+        externalOrganizationRef: 'ext-org-1',
+        grantsVersion: 1,
+        grants: [],
+        designatedAdmin: false,
+        ...m
+      })),
+      resolvedAt: '2026-09-05T00:00:00Z'
+    })
+
+  const delegatedInput = { environmentId: 'efeonce-auth', subject: 'sub-1', bindingId: 'xob-1', email: 'nuevo@cliente.cl' }
+
+  it('403 forbidden when the subject is not bound at all', async () => {
+    resolveExternalAccessMock.mockResolvedValue({ outcome: 'unbound', environmentId: 'efeonce-auth', issuerClass: 'external', profileId: null, memberships: [], resolvedAt: 'x' })
+
+    await expect(issueDelegatedExternalInvitation(delegatedInput)).rejects.toMatchObject({ code: 'forbidden', statusCode: 403 })
+  })
+
+  it('403 forbidden for a binding that is not the admin\'s own (binding ajeno)', async () => {
+    bound([{ bindingId: 'xob-1', designatedAdmin: true }])
+
+    await expect(issueDelegatedExternalInvitation({ ...delegatedInput, bindingId: 'xob-other' })).rejects.toMatchObject({
+      code: 'forbidden'
+    })
+  })
+
+  it('403 forbidden for a linked member who is not the designated admin', async () => {
+    bound([{ bindingId: 'xob-1', designatedAdmin: false }])
+
+    await expect(issueDelegatedExternalInvitation(delegatedInput)).rejects.toMatchObject({ code: 'forbidden' })
+  })
+
+  it('422 when the delegated admin tries to designate another admin (self-elevation)', async () => {
+    bound([{ bindingId: 'xob-1', designatedAdmin: true }])
+
+    await expect(issueDelegatedExternalInvitation({ ...delegatedInput, designatedAdmin: true })).rejects.toMatchObject({
+      code: 'invalid_request',
+      statusCode: 422,
+      details: { field: 'designatedAdmin' }
+    })
+    expect(resolveExternalAccessMock).not.toHaveBeenCalled()
+  })
+
+  it('422 limit_reached when the binding is at its seat cap', async () => {
+    bound([{ bindingId: 'xob-1', designatedAdmin: true }])
+    dbQueryMock.mockResolvedValueOnce([{ n: '25' }])
+
+    await expect(issueDelegatedExternalInvitation(delegatedInput)).rejects.toMatchObject({ code: 'limit_reached', statusCode: 422 })
+  })
+
+  it('issues for the own binding with designatedAdmin forced to false and actor external-admin:<profile>', async () => {
+    bound([{ bindingId: 'xob-1', designatedAdmin: true }])
+    dbQueryMock.mockResolvedValueOnce([{ n: '3' }])
+    route([
+      [/WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/, () => [bindingRow()]],
+      [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
+      [/status IN \('issued', 'accepted'\)\s+FOR UPDATE/, () => []],
+      [
+        /INSERT INTO greenhouse_core\.external_member_invitations/,
+        params => [invitationRow({ invitation_id: params[0], email: params[3] })]
+      ],
+      [/INSERT INTO greenhouse_core\.external_identity_audit_log/, () => []]
+    ])
+
+    const result = await issueDelegatedExternalInvitation({ ...delegatedInput, delivery: 'manual' })
+
+    expect(result.created).toBe(true)
+
+    const insertParams = calls(/INSERT INTO greenhouse_core\.external_member_invitations/)[0]?.[1] as unknown[]
+
+    expect(insertParams[1]).toBe('xob-1')
+    expect(insertParams[4]).toBe(false)
+    expect(insertParams[7]).toBe('external-admin:profile-admin')
+
+    const audit = calls(/INSERT INTO greenhouse_core\.external_identity_audit_log/)[0]?.[1] as unknown[]
+
+    expect(JSON.parse(String(audit[10]))).toMatchObject({ delegated: true, delegatedByProfileId: 'profile-admin' })
+  })
+
+  it('lists only the admin\'s own binding invitations', async () => {
+    bound([{ bindingId: 'xob-1', designatedAdmin: true }])
+    dbQueryMock.mockResolvedValueOnce([invitationRow()])
+
+    const result = await listDelegatedExternalInvitations({ environmentId: 'efeonce-auth', subject: 'sub-1', bindingId: 'xob-1' })
+
+    expect(result.bindingId).toBe('xob-1')
+    expect(result.items).toHaveLength(1)
+    expect(dbQueryMock.mock.calls[0]?.[1]).toEqual(['xob-1'])
+  })
+})
+
+describe('TASK-1837 — designated admin at accept + revoke', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it('acceptance with designated_admin fails closed (conflict, token NOT consumed) when another admin is still linked', async () => {
+    route([
+      [/WHERE token_hash = \$1\s+FOR UPDATE/, () => [invitationRow({ designated_admin: true })]],
+      [
+        /WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/,
+        () => [bindingRow({ designated_admin_profile_id: 'profile-old-admin' })]
+      ],
+      [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
+      [/identity_profile_source_links[\s\S]*WHERE source_system = \$1 AND source_object_type = \$2 AND source_object_id = \$3 AND active = TRUE/, () => []],
+      [/FROM greenhouse_core\.identity_profiles\s+WHERE lower\(canonical_email\)/, () => []],
+      [/INSERT INTO greenhouse_core\.identity_profiles/, () => []],
+      [/SELECT active, status, merged_into_profile_id FROM greenhouse_core\.identity_profiles/, () => [{ active: true, status: 'active', merged_into_profile_id: null }]],
+      [/INSERT INTO greenhouse_core\.identity_profile_source_links/, () => []],
+      [/UPDATE greenhouse_core\.identity_profile_source_links/, () => []],
+      [/revoke_reason = 'superseded_by_reinvitation'/, () => []],
+      [/SET status = 'linked'/, params => [invitationRow({ status: 'linked', profile_id: params[1], link_id: params[2], linked_at: 'now', designated_admin: true })]],
+      [/WHERE binding_id = \$1 AND profile_id = \$2 AND status = 'linked'/, () => [{ invitation_id: 'xmi-old-admin' }]]
+    ])
+
+    await expect(
+      acceptExternalInvitation({ token: 't'.repeat(40), environmentId: 'efeonce-auth', subject: 'sub-new' }, { actorId: 'auth-server' })
+    ).rejects.toMatchObject({ code: 'conflict' })
+
+    expect(calls(/SET designated_admin_profile_id = \$2/)).toHaveLength(0)
+  })
+
+  it('revoking the designated admin (member scope) clears designated_admin_profile_id and audits it', async () => {
+    route([
+      [
+        /WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/,
+        () => [bindingRow({ designated_admin_profile_id: 'profile-admin' })]
+      ],
+      [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
+      [
+        /UPDATE greenhouse_core\.external_member_invitations[\s\S]*RETURNING invitation_id, profile_id/,
+        () => [{ invitation_id: 'xmi-admin', profile_id: 'profile-admin' }]
+      ],
+      [/UPDATE greenhouse_core\.external_capability_grants[\s\S]*RETURNING grant_id/, () => []],
+      [/UPDATE greenhouse_core\.identity_profile_source_links l/, () => []],
+      [/SET designated_admin_profile_id = NULL/, () => []],
+      [/SET grants_version = grants_version \+ 1/, () => [{ grants_version: 2 }]],
+      [/INSERT INTO greenhouse_core\.external_identity_audit_log/, () => []]
+    ])
+
+    await revokeExternalAccess({ scope: 'member', bindingId: 'xob-1', profileId: 'profile-admin', reason: 'salida' }, actor)
+
+    expect(calls(/SET designated_admin_profile_id = NULL/)).toHaveLength(1)
+
+    const auditTypes = calls(/INSERT INTO greenhouse_core\.external_identity_audit_log/).map(call => (call[1] as unknown[])[1])
+
+    expect(auditTypes).toEqual(['designated_admin_cleared', 'member_revoked'])
   })
 })
 

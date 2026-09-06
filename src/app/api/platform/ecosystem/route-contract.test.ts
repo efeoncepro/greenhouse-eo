@@ -61,6 +61,14 @@ vi.mock('@/lib/api-platform/resources/ecosystem-growth-seo', () => ({
   getEcosystemSeoBacklinkProfilePayload: (...args: unknown[]) => mockGetSeoBacklinkProfile(...args)
 }))
 
+const mockListDelegatedInvitations = vi.fn()
+const mockCreateDelegatedInvitation = vi.fn()
+
+vi.mock('@/lib/api-platform/resources/ecosystem-identity-invitations', () => ({
+  listEcosystemDelegatedInvitations: (...args: unknown[]) => mockListDelegatedInvitations(...args),
+  createEcosystemDelegatedInvitation: (...args: unknown[]) => mockCreateDelegatedInvitation(...args)
+}))
+
 vi.mock('@/lib/api-platform/resources/events', () => ({
   listEventTypes: (...args: unknown[]) => mockListEventTypes(...args),
   listWebhookSubscriptions: (...args: unknown[]) => mockListWebhookSubscriptions(...args),
@@ -89,6 +97,7 @@ const seoEntitlementRoute = await import('./growth/seo/entitlement/route')
 const seoRankEvolutionRoute = await import('./growth/seo/rank-evolution/route')
 const seoSiteAuditReportRoute = await import('./growth/seo/site-audit-report/route')
 const seoBacklinkProfileRoute = await import('./growth/seo/backlink-profile/route')
+const identityInvitationsRoute = await import('./identity/invitations/route')
 
 describe('api platform ecosystem route contracts', () => {
   beforeEach(() => {
@@ -333,5 +342,39 @@ describe('api platform ecosystem route contracts', () => {
       'platform.ecosystem.webhook-subscriptions.update',
       'platform.ecosystem.webhook-deliveries.retry'
     ])
+  })
+
+  // TASK-1837 — lane delegada: GET por el read harness, POST por el command harness (idempotencia).
+  it('identity/invitations routes: list via read harness, create via command harness with 201', async () => {
+    mockListDelegatedInvitations.mockResolvedValue({ data: { bindingId: 'xob-1', count: 0, items: [] } })
+    mockCreateDelegatedInvitation.mockResolvedValue({
+      invitation: { invitationId: 'xmi-1' },
+      created: true,
+      delivery: { mode: 'system', status: 'sent', attempts: 1, recipientMasked: 'a***@c.cl', errorCode: null }
+    })
+
+    const listResponse = await identityInvitationsRoute.GET(
+      new Request('https://example.com/api/platform/ecosystem/identity/invitations?environment=e&subject=s&bindingId=b')
+    )
+
+    const listBody = await listResponse.json()
+
+    expect(listBody.routeKey).toBe('platform.ecosystem.identity.invitations.list')
+    expect(mockListDelegatedInvitations).toHaveBeenCalledWith({ context: expect.any(Object), request: expect.any(Request) })
+
+    const createResponse = await identityInvitationsRoute.POST(
+      new Request('https://example.com/api/platform/ecosystem/identity/invitations', {
+        method: 'POST',
+        body: JSON.stringify({ environment: 'e', subject: 's', bindingId: 'b', email: 'a@c.cl' })
+      })
+    )
+
+    const createBody = await createResponse.json()
+
+    expect(mockRunEcosystemCommandRoute).toHaveBeenCalledTimes(1)
+    expect(createBody.routeKey).toBe('platform.ecosystem.identity.invitations.create')
+    expect(createBody.result.status).toBe(201)
+    expect(JSON.stringify(createBody)).not.toContain('"token"')
+    expect(mockCreateDelegatedInvitation).toHaveBeenCalledWith({ context: expect.any(Object), body: expect.objectContaining({ email: 'a@c.cl' }) })
   })
 })

@@ -8,7 +8,7 @@ import {
   protectInternalSourceLinks
 } from './authority-transactions'
 
-import { withTransaction } from '@/lib/db'
+import { query, withTransaction } from '@/lib/db'
 import {
   buildIdentityProfileId,
   buildIdentityProfilePublicId,
@@ -35,11 +35,13 @@ import {
   generateInvitationToken,
   hashInvitationToken
 } from './ids'
+import { resolveExternalAccess } from './resolve-external-access'
 import {
   BINDING_SELECT,
   ENVIRONMENT_SELECT,
   GRANT_SELECT,
   INVITATION_SELECT,
+  listExternalMemberInvitations,
   mapBindingRow,
   mapEnvironmentRow,
   mapGrantRow,
@@ -47,6 +49,7 @@ import {
 } from './store'
 import type {
   ExternalAccessActor,
+  ExternalAccessMembership,
   ExternalCapabilityGrant,
   ExternalIdentityEnvironment,
   ExternalInvitationDelivery,
@@ -1101,6 +1104,114 @@ export const revealExternalInvitationToken = async (
   })
 }
 
+// ── Autoridad delegada del cliente (TASK-1837) ───────────────────────────────────────────────
+
+export type DelegatedAuthorityInput = {
+  environmentId: string
+  /** `sub` verificado por el emisor (lo verifica el gateway; Greenhouse resuelve por source link). */
+  subject: string
+  /** Binding pedido explícitamente por el cliente; debe ser uno donde la persona es admin designado. */
+  bindingId: string
+}
+
+export type DelegatedAuthority = {
+  membership: ExternalAccessMembership
+  profileId: string
+  actor: ExternalAccessActor
+}
+
+/**
+ * La capability `identity.external_invitation.issue_delegated` no la porta un rol: las personas
+ * externas no tienen ROLE_CODES. La materializa la MEMBERSHIP: la persona resuelta por
+ * `(environment, subject)` es `designatedAdmin` del binding pedido. Cualquier otra combinación —
+ * unbound, revocada, binding ajeno, miembro sin designación— es `forbidden` (403), sin distinguir
+ * por qué (anti-oráculo).
+ */
+export const resolveDelegatedAuthority = async (input: DelegatedAuthorityInput): Promise<DelegatedAuthority> => {
+  const bindingId = assertNonEmptyString(input.bindingId, 'bindingId', 128)
+  const resolution = await resolveExternalAccess({ environmentId: input.environmentId, subject: input.subject })
+
+  if (resolution.outcome !== 'bound' || !resolution.profileId) {
+    throw new ExternalAccessError('forbidden', 'subject is not bound', { bindingId })
+  }
+
+  const membership = resolution.memberships.find(item => item.bindingId === bindingId)
+
+  if (!membership || !membership.designatedAdmin) {
+    throw new ExternalAccessError('forbidden', 'subject is not the designated admin of this binding', { bindingId })
+  }
+
+  return {
+    membership,
+    profileId: resolution.profileId,
+    actor: { actorId: `external-admin:${resolution.profileId}` }
+  }
+}
+
+export type IssueDelegatedExternalInvitationInput = DelegatedAuthorityInput & {
+  email: string
+  reason?: string | null
+  /** Siempre rechazado en `true`: el delegado no se eleva ni eleva a nadie (422 explícito). */
+  designatedAdmin?: boolean
+  delivery?: ExternalInvitationDeliveryMode
+}
+
+/**
+ * El administrador designado invita a una persona de SU binding. Reusa `issueExternalInvitation`
+ * (misma entrega, mismo audit, mismo outbox) con `designatedAdmin` forzado a `false`, actor
+ * `external-admin:<profileId>` y tope de asientos (`limit_reached`, 422).
+ */
+export const issueDelegatedExternalInvitation = async (
+  input: IssueDelegatedExternalInvitationInput,
+  options: IssueExternalInvitationOptions = {}
+): Promise<IssueExternalInvitationResult> => {
+  if (input.designatedAdmin === true) {
+    throw new ExternalAccessError('invalid_request', 'a delegated admin cannot designate another admin', {
+      field: 'designatedAdmin'
+    })
+  }
+
+  const authority = await resolveDelegatedAuthority(input)
+  const config = readExternalInvitationConfig()
+
+  const seatRows = await query<{ n: string | number }>(
+    `SELECT COUNT(*)::text AS n
+       FROM greenhouse_core.external_member_invitations
+      WHERE binding_id = $1 AND status IN ('issued', 'accepted', 'linked')`,
+    [authority.membership.bindingId]
+  )
+
+  if (Number(seatRows[0]?.n ?? 0) >= config.delegatedSeatLimit) {
+    throw new ExternalAccessError('limit_reached', 'seat limit reached for this binding', {
+      bindingId: authority.membership.bindingId,
+      seatLimit: config.delegatedSeatLimit
+    })
+  }
+
+  return issueExternalInvitation(
+    {
+      bindingId: authority.membership.bindingId,
+      email: input.email,
+      designatedAdmin: false,
+      reason: input.reason ?? null,
+      delivery: input.delivery,
+      auditMetadata: { delegated: true, delegatedByProfileId: authority.profileId }
+    },
+    authority.actor,
+    options
+  )
+}
+
+/** El administrador ve a su propia gente y el estado de entrega; nunca `token_hash`, nunca otro binding. */
+export const listDelegatedExternalInvitations = async (
+  input: DelegatedAuthorityInput
+): Promise<{ bindingId: string; items: ExternalMemberInvitation[] }> => {
+  const authority = await resolveDelegatedAuthority(input)
+  const items = await listExternalMemberInvitations(authority.membership.bindingId)
+
+  return { bindingId: authority.membership.bindingId, items }
+}
+
 export type AcceptExternalInvitationInput = {
   /** Token en claro entregado por `issueExternalInvitation`; se compara por hash. */
   token: string
@@ -1357,13 +1468,31 @@ export const acceptExternalInvitation = async (
       [invitation.invitationId, profileId, linkId]
     )
 
+    // TASK-1837 — `designated_admin` sólo tiene efecto al aceptar y sólo si el binding no tiene ya
+    // OTRO administrador vigente (no hay dos dueños silenciosos). El conflicto lanza dentro de la
+    // transacción: revierte todo y el token NO se consume; se resuelve revocando al anterior.
     if (invitation.designatedAdmin) {
-      await client.query(
-        `UPDATE greenhouse_core.external_organization_bindings
-            SET designated_admin_profile_id = $2, updated_at = CURRENT_TIMESTAMP
-          WHERE binding_id = $1`,
-        [binding.bindingId, profileId]
-      )
+      await assertNoCompetingDesignatedAdmin(client, binding, profileId)
+
+      if (binding.designatedAdminProfileId !== profileId) {
+        await client.query(
+          `UPDATE greenhouse_core.external_organization_bindings
+              SET designated_admin_profile_id = $2, updated_at = CURRENT_TIMESTAMP
+            WHERE binding_id = $1`,
+          [binding.bindingId, profileId]
+        )
+
+        await appendAudit(client, {
+          eventType: 'designated_admin_assigned',
+          environmentId,
+          bindingId: binding.bindingId,
+          invitationId: invitation.invitationId,
+          organizationId: binding.organizationId,
+          profileId,
+          performedBy,
+          metadata: { previousDesignatedAdminProfileId: binding.designatedAdminProfileId }
+        })
+      }
     }
 
     await appendAudit(client, {
@@ -1679,6 +1808,26 @@ export const revokeExternalAccess = async (
       }
 
       await deactivateOrphanSourceLinks(client, binding.environmentId, profileId)
+
+      // TASK-1837 — revocar al administrador designado retira su autoridad delegada en el mismo acto.
+      if (binding.designatedAdminProfileId === profileId) {
+        await client.query(
+          `UPDATE greenhouse_core.external_organization_bindings
+              SET designated_admin_profile_id = NULL, updated_at = CURRENT_TIMESTAMP
+            WHERE binding_id = $1`,
+          [bindingId]
+        )
+
+        await appendAudit(client, {
+          eventType: 'designated_admin_cleared',
+          environmentId: binding.environmentId,
+          bindingId,
+          organizationId: binding.organizationId,
+          profileId,
+          performedBy,
+          reason
+        })
+      }
 
       const grantsVersion = await bumpGrantsVersion(client, bindingId)
 
