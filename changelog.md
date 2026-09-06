@@ -7,10 +7,50 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-06 — Efeonce ID: follow-ups de TASK-1837 cerrados y lane delegada federada en PR (gateway)
+
+Revocar un binding limpia y audita al administrador designado; el dominio `external-access` tiene boundary test
+de escrituras; el emisor declara el scope `efeonce.mcp.identity.write` (clase «administrar a las personas de mi
+organización», step-up); la lane delegada acepta `organizationId` y suma reenviar/revocar delegados (nunca a sí
+mismo; una persona ligada se revoca como miembro). En `efeonce-mcp` quedó abierto el PR #3 con las tools
+`identity.invitations.list` / `identity.invitation.create` (sólo issuer nativo, población externa). Tasks
+derivadas: TASK-1838 (consola del administrador del cliente) y TASK-1839 (convergencia con la invitación del
+portal). Producción sigue esperando el release.
+
+## 2026-09-06 — Efeonce ID: invitación externa verificada end-to-end en staging (TASK-1837)
+
+Con los flags ON en Vercel staging y un binding de prueba sobre el emisor real, el recorrido completo corrió sin que
+nadie tocara el token: correo real en Outlook, aceptación en `auth.efeonce.org`, persona externa nueva con admin
+designado, magic link y sesión viva; rebote forzado con `bounced@resend.dev` marcado `bounced` y la señal
+`identity.external_invitation.undelivered` observada encendiéndose; reenvío que rota, revelación de 1 h, y la lane
+delegada ejercitada con el token del gateway (200/403/422/201, correo real). Al cierre el binding se revocó y la
+sesión murió (401). Producción espera el release y el flip de flags; la federación de la lane en `efeonce-mcp` sigue
+pendiente. [Evidencia](docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md).
+
+## 2026-09-06 — Efeonce ID: el sistema entrega la invitación externa; autoridad delegada del cliente (TASK-1837)
+
+`issueExternalInvitation` envía el correo (`external_access_invitation`, token_sensitive, marca Efeonce) después
+de confirmar la transacción y devuelve `delivery` en vez de exponer el secreto; la URL de aceptación se deriva del
+`issuer_url` del environment (`/i/<token>`), nunca de una env var. Reenviar rota el token; revelarlo es una
+excepción auditada de 1 h con capability propia. El rebote de Resend deja `delivery_status='bounced'` por una
+proyección reactiva y tres señales nuevas vuelven observable el ciclo de vida. `designated_admin` pasa a conferir
+autoridad real: un solo admin vigente por binding y una lane ecosystem para que invite a su propia gente (403/422
+fail-closed). El consentimiento muestra el host del `redirect_uri` (MUST del protocolo). Migración additive y dos
+flags default OFF. **Migración aplicada 2026-09-06 y verificada; smoke live `--apply` verde contra PG real
+(reenvío, revelación, entrega fallida, delegada, admin cleared; `token_revealed` encendida ok→warning); build de
+producción ✔.** Pendiente: binding externo real + flag en staging + correo real (decisión del operador) y
+federación de la lane delegada en el gateway. Skills actualizadas (espejo `.claude`/`.codex`): `efeonce-mcp-platform`
+(SKILL + native-authority + verification-matrix) y `greenhouse-qa-release-auditor/security-qa`. Commits `5518d868e…db5a0adf3`.
+
 ## 2026-09-05 — Efeonce ID: acceso Microsoft y publicación certificados
 
-Corrección posterior en curso: `/login` directo ocultaba el botón existente de Microsoft. Se reutiliza
-el botón de Claude y se añade retorno fijo a sesión autenticada;235 tests pasan, publicación pendiente.
+Corrección posterior `21aa12608` promovida por PR226 a main `456d9accf`, auth `00032-h45` y
+manifest `456d9accffb6-3b09047e-c37f-4ac7-acbc-0e463e1610fd` released (run `34005056894` success):
+`/login` directo reutiliza el botón de Claude y retorna a sesión autenticada; 235 pruebas pasan.
+Botón visible y clic hacia Microsoft verificados en público a1440/390; nuevo canary humano directo
+pendiente. Un primer run quedó aborted por deploys concurrentes de develop; el retry cerró sin bypass,
+cinco servicios con el SHA exacto y watchdog `ok`. Barrido de tres subagentes consolida TASK1836+1831 en ADRs, docs
+funcionales, manuales, runbook, tasks/epic, skills espejo e invariantes. [Evidencia y límites](docs/audits/2026-09-06-task-1836-1831-consolidated-evidence.md).
 
 PR225 integra las reparaciones OIDC, lector de consentimiento interno y origen/CSP del formulario.
 Release `08acfb2c6`, run `34000876213`, manifest `released` sin override. CI, Deep, smoke,
@@ -809,86 +849,3 @@ doce archivos coinciden local/remoto. Subagente concilió planes, snapshots y ev
 Contratos técnico/funcional/manual y skills WordPress/copywriting espejadas actualizados;
 commit documental, sin runtime hermano ni WIP SEO previo. QA residual y TASK-1358 siguen abiertos.
 [Cierre y límites](docs/audits/public-site/2026-08-31-home-editorial-closure.md).
-
-## 2026-08-31 — TASK-1780: el inventario de tools MCP pasa a ser un manifiesto
-
-`src/mcp/greenhouse/tool-manifest.ts` es la fuente única del catálogo de tools MCP. `server.ts`
-registra recorriéndolo —definir una tool sin entrada rompe la construcción del servidor— y el `name`
-y las `instructions` que el cliente MCP lee se derivan de él, así que el servidor ya no puede
-anunciarse `greenhouse-read-only` mientras registra siete escrituras. Dos banderas ortogonales por
-tool: `writes` y `spendsProviderBudget`.
-
-El manual se renombró a `mcp-greenhouse-tool-inventory.md` y se corrigieron sus tres cifras en
-conflicto. Nuevo gate `pnpm mcp:manifest:check` en `ci.yml` sobre el artefacto generado que el
-gateway consumirá.
-
-Cambio de comportamiento verificado como nulo: el registro del SDK antes y después es idéntico byte a
-byte (43 tools, mismo orden y schemas), y el artefacto reproduce el espejo del gateway tool por tool.
-
-Cerrada y pusheada: Greenhouse `d2b3c0639` (9 workflows `success`) y gateway `efeonce-mcp` `e92961e`
-(CI `success`). El deploy del gateway es `workflow_dispatch` y sigue sin disparar, así que la revisión
-productiva no cambió — la verificación de esta task es de CI, no de runtime.
-
-Barrido documental con 4 subagentes: 8 skills, 5 specs de arquitectura, 9 docs funcionales/manuales,
-4 tasks vivas y un epic corregidos. Dos huecos sistémicos cerrados de paso: la rule auto-cargada de
-Growth/SEO instruía editar a mano el espejo retirado, y no existía ninguna rule para `src/mcp/**`
-(creada). `mcp:manifest:check` entró a `local:check` — antes el drift del artefacto sólo aparecía en CI.
-Fila nueva en `DECISIONS_INDEX.md`: la frontera "qué capacidades existen es conocimiento de producto,
-no de transporte" es la tercera arista del triángulo que ya fijaban las dos filas MCP existentes.
-
-## 2026-08-31 — Content Marketing: diseño aprobado publicado en Elementor
-
-Versionado local del runtime: `73493a8`; cambios Greenhouse acompañados en este cierre, sin push.
-
-Revisión documental delegada: arquitectura/funcional/manual, skills WordPress/Growth Forms e índices
-sincronizados con la entrega. Contratos UI distinguen plan de export publicado; task conserva sus
-pendientes. Se precisan rollback, empaquetado, orden visible del menú y riesgo del pin tras resize.
-Sin cambio de código ni nueva publicación durante esta revisión.
-
-Menú verificado: **Soluciones → Crecimiento Multicanal → Content Marketing**, item `242917`, sin duplicados ni cambio de orden.
-[Revisión editorial de ambas secciones](docs/audits/public-site/2026-08-31-content-marketing-editorial-copy.md): 118 campos publicados, siete pasos coherentes; diseño/SEO/shell intactos.
-[Segundo pase editorial](docs/audits/public-site/2026-08-31-content-marketing-hub-review-copy.md): hub y revisión creativa, 83 campos publicados; tres cortes y fichas de campaña revisados.
-[CMS y modos](docs/audits/public-site/2026-08-31-content-marketing-cms-modes.md): 53 textos y cuatro logos oficiales publicados; ocho controles nuevos, diseño general y SEO conservados.
-[Ecosistema y FAQ](docs/audits/public-site/2026-08-31-content-marketing-ecosystem-faq.md): 37 textos y seis URL publicados; tarjetas completas y ocho FAQ, sin cambios de diseño/SEO.
-[Marca en modalidades](docs/audits/public-site/2026-08-31-content-marketing-mode-logo.md): dos logos ampliados con CSS acotado, sin cambiar contenido ni SEO.
-[Indexabilidad del menú](docs/audits/public-site/2026-08-31-menu-indexability.md): 18/18 páginas habilitadas; sólo Redes Sociales requería quitar noindex. Canonical/sitemap verificados; indexación GSC no afirmada.
-[Cierre, caso interno y formulario](docs/audits/public-site/2026-08-31-content-marketing-business-conversion.md): 48 textos Elementor y copy de form v3 publicados; correo copiado coincide con lo visible, sin cambiar destino ni enviar leads. Ajuste posterior: cinco textos condensados para equilibrar las columnas, sin cambiar el formulario. Cierre documental con tres subagentes; runtime `f12dd64`, ocho archivos idénticos a producción, sin push.
-
-Trece widgets editables conservan composición, assets e interacciones de Content Ops; header/footer Ohio
-nativos. Captura canónica de dos pasos, select preseleccionado corregido, Yoast/meta/social/Service y URL
-original preservada. [QA y límites](docs/audits/public-site/2026-08-31-content-marketing-publication.md).
-
-## 2026-08-30 — Landing HubSpot: export aprobado publicado en Elementor
-
-2026-08-31: etiqueta del enlace de menú cambiada a «Servicios HubSpot» por pedido del operador; URL y jerarquía conservadas.
-
-2026-08-31: [auditoría SEO/AEO completa](docs/audits/public-site/2026-08-31-hubspot-seo-aeo.md):
-OG/Twitter y breadcrumb corregidos, Service conectado al grafo Yoast, enlace oficial del partner y HTTP→HTTPS
-301 sólo en la landing. Iconos 878 KB→2,4 KB y fuentes adelantadas; móvil LCP 16,3→8,6 s (lab; aún mejorable).
-Schema.org 0 errores/advertencias; GSC indexada, último crawl 27-08 anterior al rediseño. Header/footer intactos;
-persisten defectos globales del footer y falta respaldo localizado de las cifras 56%/76%. Snapshot SEO
-`_gh_hubspot_seo_20260831_093553`; hash Elementor sin cambios. Sin commit/push.
-Después se afinó la descripción SEO/social con `copywriting`, eliminando redundancia, sin cambiar title ni diseño.
-Por comentarios posteriores se restauró el timeline del diseño y se dejaron dos columnas de partner con badge mayor;
-[audit y rollback](docs/audits/public-site/2026-08-31-hubspot-timeline-partner-fix.md). SEO y datos Elementor intactos.
-Nueva revisión: [seis iconos oficiales HubSpot y logo ANAM](docs/audits/public-site/2026-08-31-hubspot-brand-assets.md);
-Media nativos, nota del caso identificada, SEO y shell conservados.
-Revisión siguiente: [isotipos en paneles, Smart CRM/Agent Hub y wordmark de licencias](docs/audits/public-site/2026-08-31-hubspot-product-marks.md);
-autorización del logo confirmada por operador, AEO sin símbolo propio identificado, sin cambios de copy/SEO.
-MCP suma [ChatGPT, Claude y Gemini reutilizados desde AEO](docs/audits/public-site/2026-08-31-hubspot-mcp-logos.md),
-en tarjeta y panel, tres Media nativos; AEO y contenido Elementor protegidos.
-Las cinco capacidades restantes suman [iconos semánticos azul claro](docs/audits/public-site/2026-08-31-hubspot-semantic-icons.md),
-diferenciados de las marcas oficiales, compartidos tarjeta/panel y editables.
-[Revisión editorial](docs/audits/public-site/2026-08-31-hubspot-editorial-copy.md): licencias, ANAM, partner y reunión;
-51 textos, sin «práctica» en la landing, sin cambios de diseño/SEO ni de otras páginas.
-Continuación: [industrias, primer paso y cinco etapas](docs/audits/public-site/2026-08-31-hubspot-industry-method-copy.md), solo copy en tres widgets.
-[Cierre documental delegado](docs/audits/public-site/2026-08-31-hubspot-documentation-closure.md): contratos, manual, skills y task reflejan publicación/alcance pendiente; Git acotado, sin push.
-
-
-Se reemplazó el cuerpo de `244079` por once widgets Elementor editables, con 23 paneles servidos por PHP,
-interacciones progresivas, CSS del diseño y header/footer nativos. URL e imagen destacada conservadas.
-Formulario real de tres pasos por Growth Forms, variante portable `hubspot_pillar`; desaparece el éxito
-simulado del export. Despliegue acotado por hashes, respaldo durable y verificación anónima responsive,
-teclado, reduced motion, rechazo de captcha y guardado nativo de Elementor. Sin commit/push.
-[Contrato](docs/architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md) ·
-[Audit](docs/audits/public-site/2026-08-30-hubspot-elementor-publication.md).

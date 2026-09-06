@@ -15,6 +15,10 @@ export type ExternalAccessErrorCode =
   | 'invitation_not_open'
   | 'invitation_expired'
   | 'identity_collision'
+  // TASK-1837 — autoridad delegada, topes de reenvío/asientos.
+  | 'forbidden'
+  | 'rate_limited'
+  | 'limit_reached'
 
 const STATUS_BY_CODE: Record<ExternalAccessErrorCode, number> = {
   invalid_request: 422,
@@ -25,7 +29,10 @@ const STATUS_BY_CODE: Record<ExternalAccessErrorCode, number> = {
   binding_not_active: 409,
   invitation_not_open: 409,
   invitation_expired: 410,
-  identity_collision: 409
+  identity_collision: 409,
+  forbidden: 403,
+  rate_limited: 429,
+  limit_reached: 422
 }
 
 export class ExternalAccessError extends Error {

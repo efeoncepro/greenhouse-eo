@@ -28,7 +28,10 @@ const CANONICAL_CODE_BY_DOMAIN_CODE: Record<ExternalAccessErrorCode, CanonicalEr
   binding_not_active: 'external_access_binding_not_active',
   invitation_not_open: 'external_access_invitation_not_open',
   invitation_expired: 'external_access_invitation_expired',
-  identity_collision: 'external_access_identity_collision'
+  identity_collision: 'external_access_identity_collision',
+  forbidden: 'forbidden',
+  rate_limited: 'rate_limited',
+  limit_reached: 'external_access_limit_reached'
 }
 
 export const externalAccessErrorResponse = (error: unknown, surface: string) => {

@@ -49,7 +49,8 @@ const renderers = new Map<string, () => string>([
           }
         ],
         returnTo,
-        actionPath: '/noop/consent'
+        actionPath: '/noop/consent',
+        redirectHost: 'application.example.invalid'
       })
   ],
   [
@@ -64,7 +65,8 @@ const renderers = new Map<string, () => string>([
           { organizationName: 'Organización de ejemplo B', capabilities: ['growth.seo.observation.read'] }
         ],
         returnTo,
-        actionPath: '/noop/consent'
+        actionPath: '/noop/consent',
+        redirectHost: 'application.example.invalid'
       })
   ],
   ['/error/missing', () => renderLoginRequiredPage(returnTo)],

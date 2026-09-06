@@ -4,6 +4,7 @@ import AiVisibilityGraderReportEmail, {
   type AiVisibilityReportEmailInsight
 } from '@/emails/AiVisibilityGraderReportEmail'
 import EbookDeliveryEmail from '@/emails/EbookDeliveryEmail'
+import ExternalAccessInvitationEmail from '@/emails/ExternalAccessInvitationEmail'
 import InvitationEmail from '@/emails/InvitationEmail'
 import LeaveRequestDecisionEmail from '@/emails/LeaveRequestDecisionEmail'
 import LeaveRequestPendingReviewEmail from '@/emails/LeaveRequestPendingReviewEmail'
@@ -314,6 +315,43 @@ registerTemplate(
           : [`Entra a Greenhouse. V\u00e1lido por ${minutes} minutos.`, '', `Enlace: ${context.magicLinkUrl}`].join(
               '\n'
             )
+    }
+  }
+)
+
+// TASK-1837 — Invitación a Efeonce ID enviada por el sistema (token_sensitive; marca Efeonce).
+registerTemplate(
+  'external_access_invitation',
+  (context: {
+    acceptanceUrl: string
+    issuerHost: string
+    organizationName?: string | null
+    expiresInHours?: number
+    locale?: 'es' | 'en'
+  }) => {
+    const locale = context.locale || 'es'
+    const hours = context.expiresInHours ?? 72
+
+    return {
+      subject:
+        locale === 'en'
+          ? `You've been invited to Efeonce \u2014 link valid ${hours} h`
+          : `Te invitaron a Efeonce \u2014 enlace v\u00e1lido ${hours} h`,
+      react: ExternalAccessInvitationEmail({
+        acceptanceUrl: context.acceptanceUrl,
+        issuerHost: context.issuerHost,
+        organizationName: context.organizationName ?? null,
+        expiresInHours: hours,
+        locale
+      }),
+      text:
+        locale === 'en'
+          ? [`You've been invited to Efeonce. The link works once and is valid ${hours} hours.`, '', `Link: ${context.acceptanceUrl}`].join('\n')
+          : [
+              `Te invitaron a Efeonce. El enlace funciona una sola vez y es v\u00e1lido por ${hours} horas.`,
+              '',
+              `Enlace: ${context.acceptanceUrl}`
+            ].join('\n')
     }
   }
 )
@@ -1574,6 +1612,25 @@ registerPreviewMeta('magic_link', {
     { key: 'userName', label: 'Nombre del destinatario', type: 'text' },
     { key: 'magicLinkUrl', label: 'URL de acceso', type: 'text' },
     { key: 'expiresInMinutes', label: 'Minutos de vigencia', type: 'number' }
+  ]
+})
+
+registerPreviewMeta('external_access_invitation', {
+  label: 'Invitación a Efeonce ID',
+  description: 'Email crítico de identidad: invitación enviada por el sistema a una persona externa (token de un solo uso; nunca se persiste el cuerpo)',
+  domain: 'identity',
+  supportsLocale: true,
+  defaultProps: {
+    acceptanceUrl: 'https://auth.efeonce.org/i/preview-token',
+    issuerHost: 'auth.efeonce.org',
+    organizationName: 'Cliente Uno',
+    expiresInHours: 72
+  },
+  propsSchema: [
+    { key: 'acceptanceUrl', label: 'URL de aceptación', type: 'text' },
+    { key: 'issuerHost', label: 'Host del emisor', type: 'text' },
+    { key: 'organizationName', label: 'Organización', type: 'text' },
+    { key: 'expiresInHours', label: 'Horas de vigencia', type: 'number' }
   ]
 })
 

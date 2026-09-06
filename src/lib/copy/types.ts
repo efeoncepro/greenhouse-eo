@@ -1714,6 +1714,21 @@ export interface MagicLinkEmailTemplateCopy {
 
 export type PasswordResetEmailTemplateCopy = VerifyEmailTemplateCopy
 
+/** TASK-1837 — Invitación a Efeonce ID enviada por el sistema (persona externa, marca Efeonce). */
+export interface ExternalAccessInvitationEmailTemplateCopy {
+  heading: string
+  greeting: string
+  body: (organizationName: string | null) => string
+  validityPrefix: string
+  validityBold: (expiresInHours: number) => string
+  cta: string
+  afterAccept: string
+  issuerNote: (issuerHost: string) => string
+  disclaimer: string
+  fallback: string
+  previewText: (expiresInHours: number) => string
+}
+
 export interface InvitationEmailTemplateCopy {
   heading: string
   greeting: (name?: string) => string
@@ -2042,6 +2057,7 @@ export interface EmailsCopy {
     verifyEmail: VerifyEmailTemplateCopy
     magicLink: MagicLinkEmailTemplateCopy
     authServerMagicLink: MagicLinkEmailTemplateCopy
+    externalAccessInvitation: ExternalAccessInvitationEmailTemplateCopy
     passwordReset: PasswordResetEmailTemplateCopy
     invitation: InvitationEmailTemplateCopy
   }

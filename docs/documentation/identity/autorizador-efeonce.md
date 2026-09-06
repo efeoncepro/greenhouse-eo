@@ -1,33 +1,26 @@
 # Autorizador de Efeonce (`auth.efeonce.org`)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.4
 > **Creado:** 2026-09-04 por Claude
-> **Ultima actualizacion:** 2026-09-04 por Claude (release 9100bbd2765d)
-> **Modulo:** Identidad y acceso (EPIC-044 · TASK-1828 · TASK-1829)
-> **Documentacion tecnica:** [EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) (ADR nativo; §Delta 2026-09-04 = lo implementado), [EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md](../../architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md) (contrato OAuth: endpoints, claims, tablas e invariantes de TASK-1829), [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md#authorization-server-propio-authefeonceorg--task-1828-2026-09-04), [EPIC-044](../../epics/in-progress/EPIC-044-efeonce-identity-authorization-server-and-mcp-federation.md)
+> **Ultima actualizacion:** 2026-09-06 por Claude (TASK-1837)
+> **Modulo:** Identidad y acceso (EPIC-044 · TASK-1828–1831 · TASK-1836)
+> **Documentacion tecnica:** [EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) (ADR nativo y contrato interno vigente), [EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md](../../architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md) (contrato OAuth: endpoints, claims, tablas e invariantes de TASK-1829), [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md#authorization-server-propio-authefeonceorg--task-1828-2026-09-04), [EPIC-044](../../epics/in-progress/EPIC-044-efeonce-identity-authorization-server-and-mcp-federation.md)
 > **Manual de uso:** [Operar el autorizador de Efeonce](../../manual-de-uso/identity/operar-autorizador-efeonce.md)
 
 ---
 
 ## La idea central
 
-Efeonce decidió tener su **propio autorizador**: un servicio que, con el tiempo, será la puerta por la que una
-persona de un cliente demuestra quién es y recibe un "pase" (un token) para usar el MCP de Efeonce. No se compró
-a un tercero; lo opera Efeonce en `https://auth.efeonce.org`.
-
-Piensa en él como una **oficina de pases** recién inaugurada. Hoy la oficina existe, tiene luz, la puerta abre y
-la máquina que sella los pases está instalada y probada. Desde `TASK-1829` también existe la **ventanilla para
-aplicaciones**: las reglas para que una app (Claude, Codex, ChatGPT) se presente, pida permiso y reciba un pase
-están escritas en código y probadas, aunque todavía detrás de un interruptor apagado. Lo que falta es la
-ventanilla para **personas**: nadie puede demostrar quién es todavía, porque el login se construye en
-`TASK-1830`. Y sin persona autenticada, la oficina no entrega ningún pase.
+Efeonce ID autentica a las personas y emite tokens propios para conectar aplicaciones al MCP de Efeonce.
+El acceso corporativo usa Microsoft como proveedor de login; la autoridad para cada aplicación y
+organización la resuelve Efeonce. Compartir un emisor no comparte permisos entre empleados y clientes.
 
 ## Qué hace hoy
 
-Lo entregado en `TASK-1828` es la base: el servicio corriendo, la llave con la que firma y la dirección pública.
-`TASK-1829` agregó encima la superficie OAuth (ver [Cómo se conecta una aplicación](#cómo-se-conecta-una-aplicación-oauth)),
-que hoy está en código pero con su propio interruptor apagado.
+La base de TASK-1828 (servicio, llaves y dirección pública), el OAuth de TASK-1829 y la autenticación de
+personas de TASK-1830 están integrados. TASK-1836 agrega el recorrido corporativo y TASK-1831 su consumo
+en el gateway. La cohorte interna está verificada; los límites y pendientes se detallan más abajo.
 
 | Pieza | Qué es, en simple | Estado |
 | --- | --- | --- |
@@ -37,7 +30,7 @@ que hoy está en código pero con su propio interruptor apagado.
 | **Registro de llaves** | Una tabla propia (`greenhouse_auth.signing_keys`) que dice qué versión de la llave está activa, cuál está en retiro y cuál ya se retiró, con un historial que no se puede borrar. Sólo guarda la parte **pública**. | Aplicado en la base de datos. |
 | **Interruptor** | El flag `AUTH_SERVER_ENABLED`: con OFF el servicio sólo responde "estoy vivo"; con ON publica también su estado de salud completo y sus llaves públicas. | ON desde 2026-09-04. |
 
-Concretamente, hoy responde tres cosas:
+La base de salud y llaves expone:
 
 | Ruta | Para qué | Qué esperar |
 | --- | --- | --- |
@@ -45,13 +38,9 @@ Concretamente, hoy responde tres cosas:
 | `GET /readyz` | "¿Está listo para trabajar?" — revisa base de datos, la llave en KMS y que exista una llave activa. | `200` con todo bien; `503` si el flag está OFF o alguna revisión falla (la respuesta dice cuál). |
 | `GET /.well-known/jwks.json` | Las **llaves públicas** con las que cualquiera puede verificar un pase firmado por Efeonce. | La llave activa y, durante una rotación, también la que se está retirando. `404` con el flag OFF. |
 
-Se verificó en vivo el 2026-09-04: `/readyz` respondió `200` con base de datos, KMS y llave activa en orden, y un
-token de prueba firmado por el hardware se validó correctamente contra esas llaves públicas — exactamente la
-comprobación que hará el MCP cuando empiece a aceptar estos pases. Ese mismo día el release de producción
-`9100bbd2765d` publicó el servicio en producción (revisión `auth-server-00005-pk8`): `/healthz` responde
-`{enabled:true, oauth:false}`, `/readyz` `200` y el JWKS publica las dos llaves; la "hoja informativa" OAuth
-responde `404` porque su interruptor sigue apagado. Además, Greenhouse ya sabe dónde leer esas llaves
-(`AUTH_SERVER_JWKS_URL` configurada en Vercel, producción y staging).
+El release inicial `9100bbd2765d` del 2026-09-04 publicó salud y JWKS. La superficie OAuth se activó
+después y el canary interno ya pasó firma/verificación y dispatch reales; el estado inicial OAuth OFF
+no es el estado vigente. Greenhouse tiene configurada la dirección JWKS para verificar las llaves.
 
 > Detalle técnico: rutas y flag en [`services/auth-server/server.ts`](../../../services/auth-server/server.ts) y
 > [`services/auth-server/README.md`](../../../services/auth-server/README.md); estado por entorno del flag en
@@ -78,10 +67,10 @@ responde `404` porque su interruptor sigue apagado. Además, Greenhouse ya sabe 
 
 ## Cómo se conecta una aplicación (OAuth)
 
-Esta parte la entregó `TASK-1829` (2026-09-04, `code complete, rollout pendiente`). Vive detrás del flag
-`AUTH_SERVER_OAUTH_ENABLED`, que está **apagado por defecto** en `services/auth-server/deploy.sh`: mientras siga
-apagado, todas las rutas de abajo responden `404` (salvo el JWKS, que depende del otro flag). El flujo, en simple,
-tiene cinco momentos.
+Esta parte la entregó `TASK-1829` y su activación ya permite el canary interno de TASK-1836. Vive detrás
+de `AUTH_SERVER_OAUTH_ENABLED`: cuando está apagado, las rutas OAuth responden `404` (el JWKS depende
+del flag general). Default, configuración desplegada y cohorte autorizada se verifican por separado.
+El flujo tiene cinco momentos.
 
 ### 1. La app lee las reglas (metadata)
 
@@ -107,29 +96,37 @@ redirigir a cualquier parte. La política de loopback en cualquier puerto es una
 ### 3. La persona dice que sí (consentimiento)
 
 `GET /oauth/authorize` es la ventanilla donde la persona ve qué app pide qué alcances y decide **permitir** o
-**rechazar**. La decisión se guarda por (persona, app, alcance): la próxima vez no se vuelve a preguntar, salvo
-que la app pida un alcance nuevo. Los alcances de escritura exigen además un **step-up** (segundo factor, lo trae
-`TASK-1830`). Hoy la pantalla es una página mínima con el isotipo de Efeonce; la task `ui-ux` la reemplazará sin
-cambiar el contrato.
+**rechazar**. La decisión queda ligada a persona, app y alcances y, en el carril interno, también al contexto
+de autorización: no se hereda un consentimiento de otra organización o contexto. Los alcances de escritura exigen además un **step-up** (segundo factor, lo trae
+`TASK-1830`). La UI de TASK-1835 presenta el consentimiento usando una lectura de nombres de su propia población,
+posterior a la comprobación de autoridad; una proyección ausente o incompatible deniega.
+
+Desde TASK-1837 la pantalla de consentimiento muestra además el bloque **"Destino de la autorización"** con el
+host al que se enviará el código de autorización (el del `redirect_uri` ya validado contra el cliente), con la
+nota "El código de autorización se enviará a esta dirección". Por qué: el nombre de la aplicación lo declara la
+propia aplicación y puede sonar creíble; el destino no se puede maquillar. Mostrarlo le permite a la persona
+detectar una app que quiere llevarse el código a un dominio ajeno y es un MUST de la especificación de
+autorización MCP. El emisor se niega a renderizar el consentimiento sin ese host (no hay pantalla "sin destino").
+El tratamiento visual del bloque dentro de la ficha de la aplicación es de TASK-1835.
 
 ### 4. La app recibe sus pases (`POST /oauth/token`)
 
 | Pase | Qué es | Cuánto dura | Qué pasa si se reusa |
 | --- | --- | --- | --- |
-| **Access token** | Un JWT firmado en el HSM (ES256) que dice quién es el emisor, la persona (`sub`), para qué recurso (`aud`, el MCP), qué app (`azp`), qué alcances (`scope`) y la versión de permisos de su organización (`gv`). | **15 minutos.** | Se verifica con las llaves públicas; cuando expira, la app usa el refresh. |
+| **Access token** | Un JWT firmado en el HSM (ES256) que dice quién es el emisor, la persona (`sub`), para qué recurso (`aud`, el MCP), qué app (`azp`), qué alcances (`scope`) y la versión de permisos (`gv`) y, para internos, el contexto de autorización firmado. | **15 minutos.** | Se verifica con las llaves públicas; cuando expira, la app usa el refresh. |
 | **Refresh token** | Una cadena opaca que sirve para pedir un access token nuevo. **Rota en cada uso**: el anterior deja de servir. | 30 días desde el último uso, con tope absoluto de 90 días. | Si alguien presenta un refresh ya usado (o un código de autorización ya canjeado), **se revoca toda la familia** de pases de esa app y persona, y salta una señal. |
 
-`gv` merece una explicación: es el número de versión de los permisos que la organización cliente le dio a esa
-persona (el binding de `TASK-1631`). Si nadie ligó a la persona a una organización, el emisor responde
-`access_denied` y no entrega nada. Cada vez que Efeonce revoca un grant, ese número sube, y el gateway lo
-compara en cada llamada.
+`gv` es la versión del binding que autoriza la operación. Para internos pertenece al binding seleccionado
+dentro del contexto; no se toma el máximo de otras organizaciones. Sin autoridad vigente, el emisor deniega.
+Revocar un grant aumenta esa versión y el gateway la contrasta antes de ejecutar. Refresh conserva el contexto,
+los scopes y el instante de autenticación: no renueva permisos ni hace más reciente un segundo factor.
 
 ### 5. Cancelar y consultar
 
 - `POST /oauth/revoke` (RFC 7009): la app o el operador cancela un pase; se cancela la familia completa.
 - `POST /oauth/introspect` (RFC 7662): un cliente confidencial pregunta si un pase sigue vivo. El gateway MCP
-  **no** usa esta ruta: verifica la firma con el JWKS y vuelve a comprobar `gv`, que es más rápido y no depende
-  de que el emisor esté disponible.
+  **no** usa esta ruta: verifica la firma con el JWKS y reconsulta al reader confiable. En internos también
+  exige contexto, sesión/procedencia y el `jti` vigente del ledger de access tokens. Si no puede verificar, deniega.
 - Revocar el **consentimiento** de una persona a una app (lo hace un administrador) cancela todas sus familias
   de pases vivas con esa app.
 
@@ -144,18 +141,24 @@ compara en cada llamada.
 > (`pnpm vitest run src/lib/auth-server`) más un smoke del store contra PostgreSQL real
 > (`pnpm auth-server:oauth-store:smoke`). Copy de la pantalla en `src/lib/copy/auth-server.ts`.
 
-## Qué pasa hoy si intentas autorizar
+## Entrar y autorizar hoy
 
-| Situación | Respuesta | Por qué |
-| --- | --- | --- |
-| Flag `AUTH_SERVER_OAUTH_ENABLED` apagado (estado actual en todos los entornos, incluida producción) | `404` en metadata y en `/oauth/*` | La superficie viaja en el runtime de producción pero no está publicada. Prenderla en staging exige pasar el emisor a `active` como environment (hoy registrado en `draft`) y validar la metadata (ver el manual). |
-| Flag prendido, una app lee la metadata o se registra por DCR | Funciona (`200` / `201`) | Estas rutas no necesitan a la persona. |
-| Flag prendido, una app manda a la persona a `/oauth/authorize` | **"Necesitas iniciar sesión"** (`login_required`; con `prompt=none`, redirect a la app con `error=login_required`). **No se emite ningún código.** | Todavía no existe quien autentique a la persona: el emisor no acepta la sesión del portal ni ninguna otra. `TASK-1830` trae passkeys, magic link y TOTP con su cookie propia `__Host-efeonce_auth`. |
-| Flag prendido, persona autenticada pero sin organización ligada | `access_denied` | Sin membership `bound` (`TASK-1631`) no hay `gv`, y sin `gv` no hay pase. |
+| Situación | Resultado |
+| --- | --- |
+| Abres `/login` directamente con acceso interno habilitado | Aparece **Continuar con Microsoft**. Tras autenticar, el destino es la confirmación de sesión; no se conceden permisos a una app. |
+| Una app inicia OAuth y no tienes sesión | Efeonce ID presenta login y conserva el retorno OAuth validado. Con `prompt=none`, devuelve `login_required`. |
+| Tienes sesión corporativa y enrollment/grants vigentes | Se resuelve el contexto del cliente y organización, se solicita el consentimiento que falte y se emite el token nativo. |
+| Tienes sesión pero falta autoridad, venció el permiso o el contexto es ajeno | Se deniega. El correo, un rol del portal o compartir emisor no sustituyen esos controles. |
+| Un flag del carril se apaga | El componente deniega el carril interno, incluido refresh o dispatch según el flag; no basta una sesión/token previamente emitido. |
 
-El flujo completo (metadata → registro → consentimiento → código → JWT verificado contra el JWKS → refresh →
-reuso → revocación → introspección) ya se prueba de punta a punta en tests dentro del proceso; lo que falta es
-correrlo en staging con el flag prendido y, para la parte de personas, `TASK-1830`.
+La entrada directa reutiliza el botón de Claude. Antes el código lo ocultaba si no había `return_to`,
+por eso el canary desde OAuth funcionaba sin acreditar la página `/login` normal. La corrección fue
+desplegada desde `develop` y su botón/click público están verificados; el nuevo recorrido humano directo
+completo sigue pendiente. Instrucciones: [Acceso corporativo a Efeonce ID](../../manual-de-uso/identity/efeonce-id-interno.md).
+
+El canary interno real sí verificó SSO, consentimiento, emisión, lectura propia, denegación de organización
+ajena, refresh y revocación antes de expirar el access token. El [mapa de evidencia](../../audits/2026-09-06-task-1836-1831-consolidated-evidence.md)
+separa ese resultado de las matrices externas/multicontexto pendientes y de la promoción de PR226.
 
 ## Permisos
 
@@ -171,36 +174,29 @@ Registrarse por CIMD o DCR no necesita permiso alguno: es la app la que se prese
 Todo evento del protocolo (autorizar, emitir, refrescar, revocar, registrar, rechazos CIMD, reusos) queda en
 una auditoría que no se puede editar ni borrar, con IPs, agentes y sujetos guardados como hashes.
 
-## Qué no hace todavía
+## Límites de la disponibilidad
 
-| Falta | Qué significa para una persona | Task |
-| --- | --- | --- |
-| Superficie OAuth **prendida** en un entorno real | Está en producción (release `9100bbd2765d`) y probada, pero `AUTH_SERVER_OAUTH_ENABLED` sigue apagado: ninguna app puede leer la metadata ni pedir un pase todavía. El emisor ya está registrado como environment `efeonce-auth` en **borrador** (`draft`, 2026-09-04); prender en staging exige pasarlo a `active`, validar la metadata y probar clientes CIMD/DCR. | `TASK-1829` (rollout pendiente) |
-| Pantalla de consentimiento definitiva | Hoy es una página mínima servida por el emisor; la task `ui-ux` la reemplaza sin cambiar rutas ni campos. | task `ui-ux` (U06) |
-| Login de personas (passkeys, magic link, TOTP, recuperación) | No hay pantalla donde alguien demuestre quién es. No habrá contraseñas. | `TASK-1830` |
-| Que el MCP acepte estos pases | El gateway sigue aceptando sólo la identidad interna (Entra). | `TASK-1831` |
-| Pruebas con clientes reales (canaries) | Primera cohorte de clientes. | `TASK-1832` |
-| Pentest y rotación programada | Aseguramiento antes de abrir a clientes. | `TASK-1833` |
-| Que el portal Greenhouse use este login | Convergencia del login de clientes del portal. | `TASK-1834` |
+El piloto interno no acredita disponibilidad general de clientes externos, la matriz completa multicontexto
+ni compatibilidad con todos los clientes MCP. Esas pruebas permanecen abiertas en TASK-1831/1832/1836.
+WebKit y otros pendientes de UI tienen evidencia separada; un test omitido no cuenta como aprobado.
+El aseguramiento de TASK-1833 y la convergencia del portal de TASK-1834 tampoco quedan cerrados por este canary.
+El trabajo posterior de invitaciones externas de TASK-1837 no forma parte de esta entrega documentada.
 
-**Importante:** el login de Greenhouse **no cambia**. Entrar al portal sigue siendo igual que antes; este servicio
-no comparte sesiones, cookies ni secretos con el portal.
+El login del portal Greenhouse conserva su contrato. Efeonce ID tiene cookie y sesión propias; no comparte
+`NEXTAUTH_SECRET` ni convierte una sesión del portal en autorización MCP.
 
 ## Cómo se relaciona con Greenhouse
 
 - Comparte la **base de datos** (`greenhouse-pg-dev`), pero en un esquema propio (`greenhouse_auth`) que guarda
   el registro de llaves y, desde `TASK-1829`, las siete tablas del protocolo OAuth (clientes, caché CIMD,
-  códigos, tokens, consentimientos y auditoría). No toca usuarios, roles ni sesiones del portal.
+  códigos, tokens, consentimientos y auditoría). La autoridad compartida se modifica por los commands canónicos de identidad; no reutiliza sesiones del portal.
 - El portal expone dos rutas de administración (registrar cliente confidencial, revocar consentimiento) que
   llaman a los **mismos commands** que usa el emisor; no hay lógica duplicada en la UI.
 - Comparte el **repositorio** (`services/auth-server/`) y el **carril de despliegue** de los workers Cloud Run:
   se despliega a staging al empujar a `develop` y a producción sólo por el release controlado (el primero fue
   `9100bbd2765d`, 2026-09-04). Como es un solo servicio, la misma revisión sirve staging y producción.
-- Para que una persona pueda algún día recibir un pase, el emisor tiene que figurar como **environment** en el
-  registro de identidades externas (ver [Binding de Identidad Externa para el MCP](binding-identidad-externa-mcp.md)).
-  Esa fila (`efeonce-auth`) ya existe desde el 2026-09-04, creada por el command canónico (nunca a mano en la base
-  de datos) y en estado **borrador**: mientras siga así, cualquier consulta responde "environment inactivo" y no
-  se liga a nadie. Se activa en el mismo momento en que se prenda la superficie OAuth en staging.
+- El emisor está registrado como environment `efeonce-auth`, activo para el piloto. Su `issuerClass`
+  no decide si la persona es interna o externa; el binding persistido y el resolver correspondiente lo hacen.
 - Usa las mismas piezas de **observabilidad**: incidentes en Sentry (dominio `identity`, componente
   `auth-server`) y cinco señales en `/admin/operations` (dos de llaves, tres del protocolo OAuth).
 - Está aislado a propósito: cookie propia, secretos propios, identidad propia en Google Cloud. Es una excepción
@@ -212,11 +208,11 @@ no comparte sesiones, cookies ni secretos con el portal.
   misma protección Cloud Armor. Se agregó un segundo "nombre de host" con su propio certificado; nada del gateway
   se destruyó ni se reemplazó. El interruptor de ese host vive en el Terraform del repo `efeonce-mcp`
   (`enable_auth_host`).
-- El plan es que el gateway MCP lea las llaves públicas de `auth.efeonce.org` y verifique cada pase con ellas,
-  además de comprobar el binding con la organización cliente (ver
-  [Binding de Identidad Externa para el MCP](binding-identidad-externa-mcp.md)). Eso se conecta en `TASK-1831`.
-- El pase que emite ya trae lo que el gateway necesita (`sub`, `azp`, `scope`, `gv`): `TASK-1831` sólo tiene que
-  verificar la firma con el JWKS y comparar `gv` con el binding. El gateway no consulta `introspect`.
+- TASK-1831 ya verifica tokens nativos con JWKS y construye el contexto de autorización por issuer. Las tools
+  tienen policy de población, scopes, capabilities y organización; aceptar el emisor no abre todas las tools.
+- El reader interno revalida contexto, `gv`, elegibilidad y ledger del access token antes del dispatch.
+  El retiro de una familia se observó sin esperar los 15 minutos de expiración. El carril externo mantiene
+  sus propios requisitos y no hereda ese canary interno como certificación.
 - Costo adicional estimado: unos **USD 15 al mes** (una instancia mínima en producción, la llave en hardware y
   menudencias). Sin balanceador ni protección nuevos.
 
@@ -248,6 +244,6 @@ la persona carezca de identidad ni justifica crearle una invitación cliente. El
 requiere su sesión y contexto propios, con permisos personales que tengan vencimiento.
 
 La recuperación de un acceso cliente no puede reemplazar el vínculo corporativo activo. Si soporte
-encuentra relaciones mezcladas o evidencia auditora incompleta, debe mantener apagado el piloto y
+encuentra relaciones mezcladas o evidencia auditora incompleta, debe detener la ampliación y aplicar el rollback de la cohorte afectada según el incidente, y
 seguir la [regularización gobernada](../../operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
 Esa reparación conserva permisos y vigencia; no es un mecanismo para conceder o renovar acceso.

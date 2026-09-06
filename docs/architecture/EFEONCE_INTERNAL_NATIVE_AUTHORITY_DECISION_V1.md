@@ -6,9 +6,22 @@
 - Scope: TASK-1836; auth-server, sesiones, OAuth, contexto delegado y reader del gateway.
 - Reversibility: two-way-but-slow
 - Confidence: medium
-- Validated as of: 2026-09-05, follow-up OIDC publicado; integridad del writer compartido en corrección y piloto interno OFF.
+- Validated as of: 2026-09-06, integridad publicada y piloto interno verificado; matrices amplias y recorrido humano de entrada directa pendientes.
 - Authorization: ejecución de TASK-1836 corregida D1–D7 solicitada por el operador y objetivo aprobado
   en esta conversación. El rollout posterior fue autorizado explícitamente por el operador el 2026-09-05.
+
+## Estado de implementación y evidencia
+
+Corte consolidado: [construcción, verificaciones y pendientes](../audits/2026-09-06-task-1836-1831-consolidated-evidence.md).
+
+El contrato interno está implementado en emisor, reader y gateway (TASK-1831). La reparación de
+población/audit/outbox se aplicó antes de activar el piloto. PR225 promovió el conjunto a `main`
+`08acfb2c6992`; el release `34000876213` terminó `released`. El canary con sesión corporativa real
+verificó emisión, lectura propia, denegación de organización ajena, refresh y revocación. La evidencia
+por etapa y sus cotas vive en [TASK-1836](../tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md#release-y-canary-final--2026-09-06-0030-utc-2026-09-05-en-chile).
+Las secciones fechadas siguientes conservan el razonamiento de cada corrección; sus bloqueos iniciales
+no describen el estado vigente. Las matrices externas/multicontexto, WebKit y la prueba humana completa
+de la entrada directa siguen abiertas; una sesión iniciada desde OAuth no acredita `/login` directo.
 
 ## Context
 
@@ -102,8 +115,8 @@ como claim ID esencial en la aplicación; la instancia Entra fue releída y cump
 La auditoría interna puede registrar una clasificación cerrada de la etapa que rechazó el login;
 no puede registrar URLs OAuth, códigos, tokens, valores de claims, cuerpos upstream ni mensajes
 crudos. La respuesta pública conserva el error genérico. El primer canary llegó desde Microsoft al
-callback pero fue rechazado; esta aclaración corrige el contrato documentado y no acredita aún un
-login operativo. [Contrato Microsoft](https://learn.microsoft.com/en-us/entra/identity-platform/id-token-claims-reference).
+callback pero fue rechazado; esa evidencia inicial no acreditaba un login operativo. El canary posterior
+sí completó el SSO corporativo y el protocolo MCP, según el estado de implementación anterior. [Contrato Microsoft](https://learn.microsoft.com/en-us/entra/identity-platform/id-token-claims-reference).
 
 El instante de validación del ID token se obtiene después de leer la respuesta del token endpoint,
 no al llegar el callback. La regresión con JWT firmado reproduce emisión en el segundo siguiente al
@@ -116,15 +129,16 @@ tolerancia al reloj, extensión de TTL ni fallback de identidad.
 La revisión arquitectónica de TASK-1836 confirma una desviación del writer único: el command interno
 escribió bindings, grants y source links compartidos con audit/outbox internos, pero sin el audit/outbox
 canónico de esas mutaciones. No constituye ausencia total de audit; sí rompe el contrato de ownership y
-la observabilidad compartida. El piloto permanece OFF y esta decisión exige reparación antes de activarlo.
+la observabilidad compartida. La decisión exigió mantener el piloto OFF hasta reparar ese contrato; la reparación y activación
+posteriores constan en el estado de implementación.
 
 Se adopta **A: núcleo transaccional canónico compartido**, descartando declarar permanentemente un
-segundo writer. Las primitives de `identity/external-access/authority-transactions.ts` poseerán las
+segundo writer. Las primitives de `identity/external-access/authority-transactions.ts` poseen las
 mutaciones compartidas, su audit, outbox y versión, usando la misma transacción del command llamador.
 Los wrappers externos e internos conservan sus capabilities y políticas; no se crean transacciones anidadas
 independientes. El audit interno de enrollment se conserva como evidencia complementaria.
 
-El binding tendrá población persistida e inmutable `external | internal`, distinta de `issuer_class`.
+El binding tiene población persistida e inmutable `external | internal`, distinta de `issuer_class`.
 La membership externa continúa siendo una invitación `linked` y exige cliente activo. La membership
 interna continúa siendo enrollment vigente más identidad, pertenencia y relación laboral canónicas;
 no se fabrican invitaciones ni se clasifica a Efeonce como cliente. La organización propia debe tener
@@ -145,7 +159,7 @@ ajeno o denegado no satisface el contrato. Fallar la consulta produce `unknown`,
 Aceptación: aislamiento de población y recuperación, organización suspendida denegada, ausencia de grants
 internos generales sin persona, atomicidad estado/audit/outbox/versiones, detector SQL real y smoke externo
 sin regresión. Secuencia: código y migración compatibles con gate OFF, regularización con evidencia,
-publicación gobernada y canaries reales. Esta decisión no declara esas verificaciones ya completadas.
+publicación gobernada y canaries reales. La decisión define los gates; el mapa de evidencia registra cuáles se completaron y cuáles permanecen abiertos.
 
 
 ### Resolución y diagnóstico por población
@@ -196,8 +210,8 @@ reconciliación actual, atómica e idempotente. No se reescriben los audits prev
 
 Se usa `prompt=login` en lugar de `max_age=0`: Microsoft permite solicitar credenciales
 explícitamente sin introducir el efecto de max_age corto sobre la duración del token.
-La evidencia real disponible es `jwt_expired`; la causalidad de max_age para este ID token
-queda pendiente del canary. Se conserva expiración estricta y auth_time obligatorio firmado,
+El rechazo observado fue `jwt_expired`; el canary posterior completó el SSO con este cambio.
+Ese resultado acredita el recorrido reparado, sin atribuir causalidad aislada a `max_age`. Se conserva expiración estricta y auth_time obligatorio firmado,
 no futuro, no anterior a now−600s ni al inicio server-side−60s. `auth_time<=iat` no es
 un requisito OIDC y se elimina; no se elimina ni sustituye auth_time. El navegador no puede
 eludir la frescura retirando prompt porque el callback la verifica contra la transacción.
@@ -247,11 +261,14 @@ la transacción. OAuth conserva su retorno validado y crea sus contextos y permi
 No se fabrica cliente, audiencia, grant ni contexto para iniciar una sesión directamente.
 
 `GET /auth/session` reutiliza `resolvePersonSession`: HTML explícito muestra la confirmación y
-logout; anónimo/revocado muestra login con401, sin afirmar sesión activa. JSON conserva su contrato,
+logout; anónimo/revocado muestra login con 401, sin afirmar sesión activa. JSON conserva su contrato,
 `Vary: Accept` y no-store. Copy directo en `src/lib/copy/auth-server.ts` distingue sesión de permisos.
 La dirección visual es reuse de «Nocturno editorial» de Claude, sin CSS ni primitive nuevos.
 
-Validación local:235 pruebas pasan/4 live omitidas, tipos y lint dirigido correctos. Chromium6/6
-para origen/CSP/redirect; renderers reales a1440px y390px con Microsoft visible, foco de teclado,
+Validación local: 235 pruebas pasan/4 live omitidas, tipos y lint dirigido correctos. Chromium 6/6
+para origen/CSP/redirect; renderers reales a 1440 px y 390 px con Microsoft visible, foco de teclado,
 sin overflow ni errores JS; fixtures visuales no sustituyen sesión real. Revisión independiente
-sin hallazgos de seguridad. Publicación y verificación de `/login` público todavía pendientes.
+sin hallazgos de seguridad. El fix `21aa12608` se publicó desde `develop` mediante el run
+`34002082020`, revisión `auth-server-00030-rtm`: `/login` público muestra el botón y su click
+inicia Microsoft a 1440/390 px. PR226 aún no está promovido a `main` en este corte. Falta completar
+una nueva autenticación humana desde esa entrada hasta `/auth/session`; el click no prueba ese cierre.

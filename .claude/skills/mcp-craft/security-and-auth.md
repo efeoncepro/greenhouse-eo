@@ -71,3 +71,15 @@ Con las sesiones eliminadas del protocolo, tu frontera de tenencia son los **han
 servidor. 🔴 **Vincúlalos al usuario del token verificado** (`<user_id>:<handle>`), **nunca** a un
 identificador que venga como argumento. Un handle es un nombre, no una capacidad: revalida la
 autorización del llamador en **cada** llamada.
+
+## Evidencia de autenticación frente a autorización
+
+Un login upstream correcto identifica a una persona; no demuestra consentimiento del cliente ni permisos
+en el resource server. Verifica por separado sesión, emisión del token para la audiencia, dispatch
+permitido y revocación efectiva con token aún vigente. La versión de permisos debe pertenecer al contexto
+seleccionado; un máximo agregado entre tenants puede ocultar una revocación. Validar claves desde JWKS
+no sustituye reevaluar autoridad. Son criterios de diseño y prueba, no nuevos requisitos del protocolo.
+
+El canary debe atravesar la entrada que usa la persona: una sesión reutilizada o un arranque OAuth con
+parámetros puede ocultar un botón ausente en el login directo. Prueba ambas entradas cuando existan.
+Registra etapas y tiempos; códigos, tokens, cookies y URLs de callback completas no son evidencia publicable.

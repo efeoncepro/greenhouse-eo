@@ -1,11 +1,11 @@
 # Operar el autorizador de Efeonce (`auth.efeonce.org`)
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-09-04 por Claude
-> **Ultima actualizacion:** 2026-09-04 por Claude (release 9100bbd2765d)
+> **Ultima actualizacion:** 2026-09-06 (TASK-1836 y contribuciones de TASK-1831)
 > **Modulo:** Identidad y acceso (EPIC-044 · TASK-1828 · TASK-1829)
-> **Ruta en portal:** sin UI; se opera con `curl`, `gcloud`, `pnpm auth-server:rotate-key`, `pnpm auth-server:register-client`, `pnpm auth-server:register-issuer-environment` y las rutas admin `POST /api/admin/auth-server/oauth-clients` y `POST /api/admin/auth-server/consents/revoke`. Señales en `/admin/operations`.
+> **Administración en portal:** operaciones programáticas; la UI pública de login vive en `auth.efeonce.org`. Se opera con `curl`, `gcloud`, `pnpm auth-server:rotate-key`, `pnpm auth-server:register-client`, `pnpm auth-server:register-issuer-environment` y las rutas admin `POST /api/admin/auth-server/oauth-clients` y `POST /api/admin/auth-server/consents/revoke`. Señales en `/admin/operations`.
 > **Documentacion relacionada:** [Autorizador de Efeonce](../../documentation/identity/autorizador-efeonce.md), [Runbook auth-server](../../operations/runbooks/auth-server.md), [EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md](../../architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md), [Operar el binding de identidad externa](operar-binding-identidad-externa.md), [EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md)
 
 ## Para que sirve
@@ -13,8 +13,8 @@
 Este manual te guía para operar el día a día del autorizador propio de Efeonce: comprobar que está sano,
 prenderlo o apagarlo, rotar la llave con la que firma y retirar la versión vieja, y leer sus señales. Cubre la
 capa entregada en `TASK-1828` (runtime, llaves y dirección pública) y, desde `TASK-1829`, la superficie OAuth:
-registrar un cliente confidencial, revocar el consentimiento de una persona y prender el flag en staging. Cuando
-exista el login de personas (`TASK-1830`) tendrá su propia sección.
+registrar un cliente confidencial, revocar el consentimiento de una persona y prender el flag en staging. El acceso corporativo de TASK-1836 se opera según
+[el manual interno](efeonce-id-interno.md) y su [runbook de cohorte](../../operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
 
 El despliegue y la publicación del host en el balanceador son operaciones de plataforma; están en el
 [runbook](../../operations/runbooks/auth-server.md) (§1 y §4) y no se repiten aquí.
@@ -25,15 +25,14 @@ El despliegue y la publicación del host en el balanceador son operaciones de pl
   proxy local (`pnpm pg:connect`, queda en `127.0.0.1:15432`).
 - Ten claro que es **un solo servicio** Cloud Run (`auth-server`, `us-east4`) compartido por staging y
   producción, igual que `ops-worker`. Lo que hagas afecta a ambos. Está **en producción desde el 2026-09-04**
-  (release `9100bbd2765d`, revisión `auth-server-00005-pk8`).
+  (release inicial `9100bbd2765d`). La revisión actual se relee antes de operar; no se toma ese SHA histórico como referencia de rollback.
 - La única dirección válida es `https://auth.efeonce.org`. La URL `.run.app` del servicio responde `421` a
   propósito.
 - Las variables del servicio viven en `services/auth-server/deploy.sh`. Cambiarlas a mano en Cloud Run no dura:
   el siguiente deploy las pisa.
 - Si el flag está apagado, `/readyz` responde `503` y el JWKS `404`. Eso es normal, no una falla.
-- La superficie OAuth tiene **su propio interruptor**, `AUTH_SERVER_OAUTH_ENABLED` (default `false` en
-  `deploy.sh`, independiente de `AUTH_SERVER_ENABLED`). Con OFF, la metadata y todo `/oauth/*` responden `404`;
-  el JWKS sigue publicándose. Hoy está apagado en todos los entornos.
+- La superficie OAuth tiene **su propio interruptor**, `AUTH_SERVER_OAUTH_ENABLED` (independiente de `AUTH_SERVER_ENABLED`). Con OFF, la metadata y todo `/oauth/*` responden `404`;
+  el JWKS sigue publicándose. La superficie está activa para el piloto documentado; verifica la revisión y los flags antes de actuar.
 - Las rutas de administración se llaman con `pnpm staging:request` y una sesión con rol `efeonce_admin` (son las
   únicas que tienen las capabilities `identity.auth_client.register` e `identity.auth_consent.revoke`).
 
@@ -47,9 +46,9 @@ curl -s -o /dev/null -w '%{http_code}\n' https://auth.efeonce.org/readyz
 curl -s https://auth.efeonce.org/.well-known/jwks.json
 ```
 
-Esperado con el flag ON: `healthz` → `200` (body `{enabled:true, oauth:false}` mientras OAuth siga apagado);
+Esperado con el flag ON: `healthz` → `200` (sus booleanos describen los flags efectivos);
 `readyz` → `200` con `postgres`, `kms` y `activeKey` en `ok`; el JWKS lista una llave `active` y, si hay rotación
-en curso, también la `retiring`. Así respondió producción el 2026-09-04 tras el release `9100bbd2765d`.
+en curso, también la `retiring`. El número de llaves depende de la rotación vigente, no de una captura histórica.
 
 Luego compara con el registro:
 
@@ -176,10 +175,11 @@ Efecto:
   pantalla de consentimiento.
 - **Todas** las familias de tokens vivas de `(persona, app)` quedan revocadas: el refresh deja de servir de
   inmediato y `introspect` responde `active: false`.
-- Un access token ya emitido puede seguir siendo aceptado por el gateway hasta que expire (**máximo 15 minutos**),
-  porque el gateway verifica la firma con el JWKS sin consultar al emisor. Si necesitas cortar antes, revoca el
-  grant o el binding de la persona ([manual de binding](operar-binding-identidad-externa.md)): eso sube `gv` y
-  el gateway rechaza el token en la siguiente llamada.
+- En el carril interno, TASK-1831/1836 revalida el `jti` del ledger antes del dispatch. Revocar la familia
+  invalida también access tokens aún no expirados, con objetivo local ≤60 s; el canary midió 6,633 s en
+  la comprobación final. No hay que esperar 15 minutos. Revocar grants/binding sigue siendo una operación
+  distinta, con impacto en todas las familias que dependan de esa autoridad.
+- No extrapoles esta medición a la cohorte externa: exige su propia prueba de revocación y scoping.
 
 ### 8. Registrar el environment del emisor
 
@@ -202,9 +202,9 @@ Lo que registra: `environmentId` `efeonce-auth` (debe ser **igual** a `AUTH_SERV
 `external` y `subjectType` `public`. `issuerClass` **no se puede cambiar después**; si te equivocas, es un
 environment nuevo.
 
-Estado actual: la fila **ya existe en `draft`** (registrada el 2026-09-04, actor `cli:jreye`). Se deja en borrador
-a propósito hasta el momento exacto en que se prenda `AUTH_SERVER_OAUTH_ENABLED` en staging (paso 9); ahí se corre
-el CLI con `--status active`.
+La fila `efeonce-auth` ya está activa para el piloto. Los comandos anteriores son procedimientos de
+alta/transición: no vuelvas a ejecutarlos como preflight ni la regreses a `draft` para repetir una prueba.
+Relee su estado con el reader administrativo antes de una mutación autorizada.
 
 Qué significa `environment_inactive`: mientras el environment siga en `draft`, cualquier consulta de binding para
 ese emisor (por ejemplo `pnpm staging:request "/api/platform/ecosystem/identity/binding?environment=efeonce-auth&subject=<sub>"`
@@ -214,11 +214,11 @@ sin parámetros, `401` sin token).
 
 ### 9. Prender la superficie OAuth en staging
 
-Hoy `AUTH_SERVER_OAUTH_ENABLED` está apagado en todos los entornos (el runtime de producción lo lleva apagado
-desde el release `9100bbd2765d`). Antes de prenderlo en staging, confirma:
+Este procedimiento sirve para una activación nueva, no describe el piloto ya activo. Como el servicio
+es compartido, el nombre `staging` del workflow no aísla el host público. Antes de activar, confirma:
 
 1. El runtime está sano (paso 1) con `AUTH_SERVER_ENABLED=true`.
-2. El emisor existe como environment en `greenhouse_core.external_identity_environments` (paso 8; hoy en `draft`)
+2. El emisor existe como environment en `greenhouse_core.external_identity_environments` (paso 8)
    con `environmentId` **igual** a `AUTH_SERVER_ENVIRONMENT_ID` (default `efeonce-auth`), `issuerUrl`
    `https://auth.efeonce.org` y `audience` `https://mcp.efeonce.org/mcp`. En el mismo momento del flip, pásalo a
    `active` con `pnpm auth-server:register-issuer-environment --status active`. Sin la fila `active`, toda
@@ -228,8 +228,8 @@ desde el release `9100bbd2765d`). Antes de prenderlo en staging, confirma:
 
 Prender:
 
-- **Durable:** en `services/auth-server/deploy.sh` cambia el default de
-  `AUTH_SERVER_OAUTH_ENABLED=${AUTH_SERVER_OAUTH_ENABLED:-false}` a `true`, haz commit y deja que el workflow
+- **Durable:** en `services/auth-server/deploy.sh` cambia el default
+  del flag a `true` sólo si ése es el mecanismo vigente, haz commit y deja que el workflow
   `.github/workflows/auth-server-deploy.yml` despliegue al empujar a `develop`.
 - **Puntual:** `AUTH_SERVER_OAUTH_ENABLED=true ENV=staging bash services/auth-server/deploy.sh`.
 
@@ -259,8 +259,9 @@ curl -s -X POST https://auth.efeonce.org/oauth/token \
 # → 400 {"error":"invalid_grant"}
 ```
 
-`GET /oauth/authorize` con ese cliente responde "Necesitas iniciar sesión" (`login_required`) hasta que
-`TASK-1830` esté en staging: es lo esperado, no una falla. Deja evidencia en la task y actualiza el ledger.
+El siguiente paso es iniciar el OAuth completo con sesión propia del emisor, consentimiento y PKCE.
+El canje inválido sólo verifica rechazo: no demuestra emisión ni acceso MCP. Deja evidencia por etapa
+en la task y actualiza el ledger si hubo un cambio efectivo de configuración.
 
 **Rollback:** vuelve el default a `false` (o corre el deploy puntual con `false`) y redespliega. La metadata y
 `/oauth/*` vuelven a `404`; los pases ya emitidos siguen siendo verificables con el JWKS hasta que expiren
@@ -304,7 +305,7 @@ no debería pasar nunca.
 - **No** borres ni edites filas de `oauth_audit_events` (es append-only, el trigger lo impide) ni "limpies"
   tokens o códigos con `DELETE` a mano: la revocación se hace por los commands (`revoke`, consentimiento).
 - **No** hagas que ningún consumidor (gateway, portal) dependa de `/oauth/introspect` para autorizar: se verifica
-  el JWT con el JWKS y se vuelve a comprobar `gv`.
+  el JWT con el JWKS y el reader revalida la autoridad; internos incluyen contexto y ledger `jti`.
 
 ## Problemas comunes
 
@@ -318,11 +319,11 @@ no debería pasar nunca.
 | El JWKS no muestra la llave nueva después de rotar | Caché (60 s en el servicio, 300 s en clientes) | Esperar hasta 5 minutos y repetir el paso 1 |
 | `421 misdirected_request` | Llamaste por la URL `.run.app` o con otro `Host` | Usar `https://auth.efeonce.org` |
 | `https://auth.efeonce.org` no responde | El certificado sigue `PROVISIONING` o el host no está publicado (`enable_auth_host=false`) | Runbook §4 (plataforma) |
-| La metadata y `/oauth/*` responden `404` con `AUTH_SERVER_ENABLED=true` | `AUTH_SERVER_OAUTH_ENABLED` está en `false` (estado actual, también en producción) | Esperado hasta prenderlo (paso 9); no es una falla |
+| La metadata y `/oauth/*` responden `404` con `AUTH_SERVER_ENABLED=true` | `AUTH_SERVER_OAUTH_ENABLED` está en `false` | Verificar si hubo rollback deliberado o drift; no reactivar sin comprobar la cohorte y el release |
 | Un cliente rechaza la metadata por «issuer mismatch» | `AUTH_SERVER_ISSUER` no es idéntico al origen (`https://auth.efeonce.org`, sin barra final, sin `http://`) | Revisar el valor en `services/auth-server/deploy.sh`, corregir y redesplegar |
 | `invalid_redirect_uri` al registrar o autorizar | La política de redirects: público = loopback `127.0.0.1`/`[::1]`/`localhost` en cualquier puerto con path y query exactos, o HTTPS exacto; confidencial = HTTPS exacto, `localhost` rechazado; nunca comodines | Corregir el redirect en la app o en el registro; no relajar la política |
-| `access_denied` (o `invalid_grant` al canjear un código válido) con una persona autenticada | La persona no tiene membership `bound` en el environment `efeonce-auth`, o el environment sigue en `draft` (`environment_inactive`) | Activar el environment (paso 8, `--status active`) y ligar a la persona ([manual de binding](operar-binding-identidad-externa.md)); no es un problema del emisor |
-| `/oauth/authorize` responde «Necesitas iniciar sesión» (`login_required`) | El emisor aún no autentica personas (`TASK-1830`) | Esperado; ningún código se emite hasta esa task |
+| `access_denied` (o `invalid_grant` al canjear un código válido) con una persona autenticada | Falta autoridad vigente de la población correcta, o el environment está inactivo | Identificar población; internos usan enrollment/contexto/grants vigentes, externos membership. No crear invitaciones cliente para arreglar autoridad corporativa ni activar el environment a ciegas |
+| `/oauth/authorize` responde «Necesitas iniciar sesión» (`login_required`) | No hay sesión propia válida del emisor | Iniciar sesión mediante el flujo que conserva el retorno; la cookie del portal no la sustituye |
 | `consent_required` con `prompt=none` | La persona nunca consintió esa app y ese scope | Repetir la autorización sin `prompt=none` para que vea la pantalla |
 | `429 slow_down` | Rate limit: `token` 60/min por IP y 120/min por cliente; `register` 10/min por IP | Esperar la ventana (60 s); si es un cliente legítimo en loop, revisar su implementación de refresh |
 | `auth.oauth.cimd_rejected` en `warning` | El documento CIMD de una app es inválido o apunta a una red privada | Leer el motivo en el evento `cimd_fetch` de `oauth_audit_events`; el rechazo se recuerda 15 min, luego reintenta |
@@ -331,7 +332,7 @@ no debería pasar nunca.
 ## Referencias tecnicas
 
 - Runbook operativo: [`docs/operations/runbooks/auth-server.md`](../../operations/runbooks/auth-server.md)
-- ADR nativo (§Delta 2026-09-04 = lo implementado): [`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md)
+- ADR nativo (contrato vigente y deltas históricos): [`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md)
 - Contrato OAuth (endpoints, claims, tablas, invariantes): [`EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`](../../architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md)
 - Invariantes para agentes: [`IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` §Auth server propio](../../architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md#auth-server-propio-task-1828)
 - Código: `services/auth-server/{server.ts,app.ts,deploy.sh,Dockerfile,README.md}` · `src/lib/auth-server/keys/**` ·
@@ -345,3 +346,24 @@ no debería pasar nunca.
 - Flags: [`FEATURE_FLAG_STATE_LEDGER.md`](../../operations/FEATURE_FLAG_STATE_LEDGER.md) (`AUTH_SERVER_ENABLED`, `AUTH_SERVER_OAUTH_ENABLED`)
 - Tasks: `docs/tasks/in-progress/TASK-1828-efeonce-auth-server-runtime-deployable.md` ·
   `docs/tasks/in-progress/TASK-1829-efeonce-auth-server-oauth-protocol-surface.md`
+
+
+## Diagnóstico del flujo Microsoft y evidencia de cierre
+
+- Si `/login` no muestra Microsoft, comprueba `AUTH_SERVER_INTERNAL_AUTH_ENABLED` y la revisión real. El
+  fix `21aa12608` quitó la condición que exigía un retorno OAuth para mostrar el botón existente.
+- La entrada directa usa `/auth/internal/login` sin `return_to` y termina en `/auth/session`; valores
+  explícitos vacíos, duplicados o inválidos se rechazan. Una app debe iniciar su propio OAuth para recibir tokens.
+- Un callback fallido requiere reiniciar el flujo, no recargar/canjear de nuevo el código. El diagnóstico
+  registra sólo etapas y motivos cerrados; no copies URL OAuth, tokens, cookies ni claims crudos.
+- `prompt=login` solicita autenticación reciente a Microsoft; el callback exige `auth_time` firmado y fresco,
+  además de firma, issuer, audience, tenant/oid, nonce, state y PKCE. No arregles expiración desactivando validación.
+- Un POST de consentimiento rechazado se investiga con el navegador real: HTML conserva `Origin` mediante
+  `Referrer-Policy: strict-origin`; el guard CSRF sigue activo. La CSP del consentimiento sólo permite además
+  el origen del callback ya validado contra el registro del cliente. No agregues comodines ni aceptes `Origin:null`.
+- Prueba por separado `/login` directo, OAuth desde una app, sesión confirmada, emisión, dispatch propio/ajeno,
+  refresh, revocación y rollback. Ver un botón, recibir 2xx o pasar un helper no acredita todas esas etapas.
+
+El [mapa consolidado](../../audits/2026-09-06-task-1836-1831-consolidated-evidence.md) distingue release PR225,
+publicación posterior del login directo desde `develop`, pruebas ejecutadas y pendientes. El runbook de cohorte
+posee los comandos de enrollment, grants, integridad y rollback; este manual no los duplica.

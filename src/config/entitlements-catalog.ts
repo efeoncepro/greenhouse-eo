@@ -1816,6 +1816,21 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['execute'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1837 — Entrega gobernada + autoridad delegada. Revelar el token es una EXCEPCIÓN (razón
+  // obligatoria, audit, TTL 1 h), no el flujo normal; la lane delegada la ejerce el administrador
+  // designado del cliente contra su propio binding (resuelta por membership, nunca por rol).
+  {
+    key: 'identity.external_invitation.reveal_token',
+    module: 'organization',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'identity.external_invitation.issue_delegated',
+    module: 'organization',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1836 — Internal enrollment, revocation and delegation are separate authorities.
   {
     key: 'identity.internal_access.enroll',

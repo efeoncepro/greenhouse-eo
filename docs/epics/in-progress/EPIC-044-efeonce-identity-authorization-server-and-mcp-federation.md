@@ -1,12 +1,15 @@
 # EPIC-044 — Efeonce Identity, Native Authorization Server and MCP Federation
 
+Mapa de construcción, pruebas y límites: [auditoría consolidada TASK-1836/1831](../../audits/2026-09-06-task-1836-1831-consolidated-evidence.md).
+
+
 ## Status
 
 - Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `2026-09-06T00:30Z: acceso corporativo interno de TASK-1836 verificado hasta token y lectura MCP, aislamiento y revocación; release PR225/main08acfb2c6 certificado sin override, watchdog5/5. Auth rev29 y gateway rev36 internos ON; piloto gv5 con vencimiento original. Evidencia detallada en TASK-1836 y su runbook. Las matrices de clientes externos/multicontexto, UI/WebKit y las unidades aún abiertas conservan sus pendientes; no se declara completo el epic.`
+- Status real: `2026-09-06T00:30Z: acceso corporativo interno de TASK-1836 verificado hasta token y lectura MCP, aislamiento y revocación; release PR225/main08acfb2c6 certificado sin override, watchdog5/5. Auth rev30 (fix directo21aa12608 servido desde develop, PR226 abierto, retorno humano directo pendiente) y gateway rev36 internos ON; piloto gv5 con vencimiento original. Evidencia detallada en TASK-1836 y su runbook. Las matrices de clientes externos/multicontexto, UI/WebKit y las unidades aún abiertas conservan sus pendientes; no se declara completo el epic.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
 - Owner: `Efeonce Platform / Identity`
@@ -88,10 +91,12 @@ KMS, los canaries de cliente, el aseguramiento y la convergencia del login del p
 | **U09** | [TASK-1834](../../tasks/to-do/TASK-1834-greenhouse-customer-login-convergence-native-issuer.md) | Portal Greenhouse agrega el emisor propio como provider OIDC de NextAuth sobre el mismo source link; rollback = retirar provider. Gate propio posterior a U07. | U07 |
 | **U10** | [TASK-1813](../../tasks/to-do/TASK-1813-efeonce-mcp-oauth-client-interoperability.md) | Interoperabilidad OAuth Codex/Claude del carril interno Entra (discovery, shim, scopes). Carril paralelo; no construye broker. | — |
 
-| **U11** | [TASK-1836](../../tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md) | Acceso interno por Efeonce ID: autenticación corporativa, binding canónico y autoridad delegada. Backend; gateway/UI conservan U05/U06. Contrato ADR antes de código; implementación pendiente. | Contratos U02/U03/U04 |
-| **U12** | [TASK-1837](../../tasks/to-do/TASK-1837-efeonce-id-external-invitation-delivery-delegated-authority.md) | Entrega gobernada de la invitación externa: el sistema envía el correo en el mismo acto que genera el token (el evento del outbox no lleva el secreto ni puede llevarlo), el token sale de la respuesta salvo excepción gobernada de 1 h, ciclo de vida observable (reenviar = rotar, rebote, caducidad, 3 señales), autoridad delegada del administrador del cliente por lane ecosystem, y host del `redirect_uri` en el consentimiento (MUST del protocolo hoy incumplido). Sin ella el último tramo del alta lo hace una persona copiando un secreto. Bloquea U07; desbloquea el carril de tokens de U03. | U02/U03/U04 |
+| **U11** | [TASK-1836](../../tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md) | Acceso interno por Efeonce ID: autenticación corporativa, binding canónico y autoridad delegada. Backend; gateway/UI conservan U05/U06. ADR, backend, integridad y canary interno publicados; refresh/revocación/rollback medidos. Entrada directa visible e inicio Microsoft verificados; matriz amplia y promoción PR226 pendientes. | Contratos U02/U03/U04 |
+| **U12** | [TASK-1837](../../tasks/in-progress/TASK-1837-efeonce-id-external-invitation-delivery-delegated-authority.md) | Entrega gobernada de la invitación externa: el sistema envía el correo en el mismo acto que genera el token (el evento del outbox no lleva el secreto ni puede llevarlo), el token sale de la respuesta salvo excepción gobernada de 1 h, ciclo de vida observable (reenviar = rotar, rebote, caducidad, 3 señales), autoridad delegada del administrador del cliente por lane ecosystem, y host del `redirect_uri` en el consentimiento (MUST del protocolo hoy incumplido). Sin ella el último tramo del alta lo hace una persona copiando un secreto. Bloquea U07; desbloquea el carril de tokens de U03. | U02/U03/U04 |
+| **U13** | [TASK-1838](../../tasks/to-do/TASK-1838-efeonce-id-client-admin-console.md) | Consola del administrador del cliente en Efeonce ID (`auth.efeonce.org/account/organization`, ui-ux, `UI impact: flow`): la persona designada ve a su gente con estado de entrega honesto, invita, reenvía (= rota) y revoca con confirmación, sobre los mismos commands delegados que la lane MCP, server-rendered bajo `__Host-efeonce_auth`, sin token en pantalla y fail-closed si la entrega del sistema no está habilitada en el emisor. Extiende las primitives de U06; prerrequisito en U12 (commands delegados de reenvío/revocación + flag de entrega en el runtime del emisor). Registrada 2026-09-06; `UI ready: no` hasta comparar la composición. | U12 en producción; U06 (primitives); U03 (sesión/CSRF) |
+| **U14** | [TASK-1839](../../tasks/to-do/TASK-1839-invitation-delivery-primitive-convergence.md) | Primitive única de «invitación entregada por el sistema con ciclo de vida» (`src/lib/identity/invitation-delivery/**`: origen desde registro configurado —nunca `NEXT_PUBLIC_APP_URL`—, contrato `delivery_*`, reenviar = rotar, rebote por registro de recorders), consumida por el emisor (U12, sin cambio de comportamiento) y por la invitación del portal (`inviteClientPortalUser`, TASK-1012 pasa a consumer; columnas additive en `client_users`, flag OFF, señal propia). No fusiona identidades ni toca los flujos de aceptación; U09 la hereda. Registrada 2026-09-06. | U12 en producción; decisión de TASK-1012 sobre el origen del portal |
 
-Una sola task ejecutable posee cada unidad. `TASK-1836` es U11 y `TASK-1837` es U12; `TASK-659` y `TASK-658` permanecen relacionadas (ver
+Una sola task ejecutable posee cada unidad. `TASK-1836` es U11, `TASK-1837` es U12, `TASK-1838` es U13 y `TASK-1839` es U14; `TASK-659` y `TASK-658` permanecen relacionadas (ver
 *Existing Related Work*). El orden lo definen este epic y el `Rank`, no la antigüedad del ID.
 
 ## Execution Order
@@ -136,14 +141,14 @@ coordinación. Todo release a producción pasa por el control plane, una sesión
 
 - [ ] `auth.efeonce.org` responde metadata RFC 8414 con `issuer` idéntico al origen y `client_id_metadata_document_supported: true`, firmando con una llave KMS HSM cuyo JWKS publica `kid` y rotación probada. *Parcial 2026-09-04: la llave KMS HSM, el JWKS con `kid` y la rotación (v1 → v2, v1 en `retiring`) ya existen en staging (U01); la metadata RFC 8414/OIDC y CIMD están en código (U02, `TASK-1829` code complete) y probadas in-process, pero siguen detrás de `AUTH_SERVER_OAUTH_ENABLED=false` — se tilda cuando la metadata responda en staging con el flag ON.*
 - [ ] Una persona de una organización cliente existente se autentica con passkey y con magic link, consiente un cliente y un scope, y ese consentimiento es revocable por el operador con efecto en menos de cinco minutos.
-- [ ] El gateway despacha una tool read-only con token del issuer propio y niega: token externo sobre tool internal-only, token con roles sin scope delegado, grant revocado con token vigente, issuer desconocido.
+- [ ] El gateway despacha una tool read-only con token del issuer propio y niega: token externo sobre tool internal-only, token con roles sin scope delegado, grant revocado con token vigente, issuer desconocido. **Parcial verificado:** canary interno TASK-1836 permite lectura propia, niega ajena y grant revocado ≤11 s; la matriz externa completa sigue pendiente.
 - [ ] Claude Code, Codex y ChatGPT completan OAuth/PKCE (loopback y HTTPS hospedado donde aplique) contra un cliente real allowlisted, con evidencia redactada de la matriz de tokens.
 - [ ] Pentest externo cerrado sin hallazgos críticos abiertos y runbooks de rotación, incidente y revocación masiva publicados.
 - [ ] Los writes federados de EPIC-011, EPIC-022 y EPIC-043 tienen grant delegado revocable disponible o una task propia declarada para su grant.
 - [ ] El login cliente de Greenhouse tiene el provider OIDC del emisor propio detrás de gate, con rollback probado.
 - [ ] `TASK-659` resuelta por supersesión formal de su diseño original; conserva alcance histórico, no es U11.
 - [x] Nueva `TASK-1836` registrada como U11 por solicitud explícita del operador; consumers y dependencias actualizados.
-- [ ] Personal Efeonce completa acceso MCP nativo con identidad canónica y grants revocables; externos del mismo issuer no acceden a tools internas (U11 -> U05/U06 -> U07).
+- [ ] Personal Efeonce completa acceso MCP nativo con identidad canónica y grants revocables; externos del mismo issuer no acceden a tools internas (U11 -> U05/U06 -> U07). **Parcial verificado:** login corporativo, consent, token, refresh y revocación internos probados en runtime; mantener sin tildar hasta cerrar el negativo externo live y matrices de U07.
 
 ## Non-goals
 
@@ -255,6 +260,39 @@ de reasignar TASK-659, que conserva su historia fuera del epic. Orden: contrato/
 U11 -> integración interna U05/U06 -> canaries U07. El slice externo mantiene su secuencia. No se interpreta
 el issuer común como autoridad interna ni se cambia la clasificación comercial de Efeonce. Esta decisión
 es planificación; no acredita implementación ni login interno nativo operativo.
+
+## Delta 2026-09-06 — U12 entrega gobernada de la invitación externa (TASK-1837)
+
+Estado de U12: **`verificado end-to-end en staging 2026-09-06 (flags ON en staging); producción pendiente de
+release`**. La migración `20260906004450748_task-1837-external-invitation-delivery-lifecycle` corrió en la
+instancia compartida (`run_on 2026-09-06T04:27:58Z`), el smoke `pnpm identity:external-access:smoke -- --apply`
+ejercitó contra PG real reenvío, fallo de entrega, revelación gobernada, aceptación como administrador designado,
+lane delegada in-process y limpieza del administrador al revocar, y después, con los dos flags
+`EXTERNAL_INVITATION_*` encendidos en Vercel staging, se recorrió el ciclo completo sobre un binding externo de
+prueba (organización fixture + casilla controlada): correo real de invitación sin token en la respuesta →
+`/i/<token>` → aceptar 202 → `linked` → magic link real → sesión 200 (reuso 400); rebote forzado con
+`identity.external_invitation.undelivered` observada encendiéndose ok→warning; reenvío; revelación gobernada
+(`token_revealed` en warning); lane delegada con el consumer del gateway (200/403/422/201 + correo real); y
+revocación del binding con la sesión muriendo (401). Quedan pendientes: promover a `main` y prender los flags en
+Vercel Production (el ops-worker y el auth-server toman el código nuevo en ese release), federación de la lane
+delegada en `efeonce-mcp` (U05/U07) y la primera persona externa de un CLIENTE real por decisión del operador.
+Evidencia:
+[2026-09-06-task-1837-external-invitation-delivery-evidence.md](../../audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md).
+Esta unidad no se declara completa ni mueve el epic.
+
+**Follow-ups cerrados sin release (2026-09-06 04:00–04:40Z, commits `149ff8934` + `1ddb5f92b` en `develop`):**
+revocar el binding limpia al administrador designado (audit `designated_admin_cleared`, causa `binding_revoked`);
+boundary test del dominio (`boundary-domain.test.ts`, allowlist de escrituras; `email_deliveries` y
+`outbox_events` prohibidas); scope OAuth nuevo `efeonce.mcp.identity.write` en el emisor (clase de escritura con
+step-up, copy de consentimiento, snapshot de paridad); la lane delegada acepta `organizationId` como alternativa a
+`bindingId`; y los verbos delegados `resend`/`revoke`
+(`POST /api/platform/ecosystem/identity/invitations/[invitationId]/{resend,revoke}`, nunca a sí mismo), que U13
+detectó como prerrequisito. En el gateway quedó **abierto** el PR #3 de `efeonce-mcp` (tools
+`identity.invitations.list` / `identity.invitation.create`, sólo issuer nativo y población `native-external`,
+`pnpm check` verde): se mergea después del release que lleve el scope a `main` y prenda el flag delegado en
+Production; `resend`/`revoke` delegados aún no federados. Derivadas registradas: U13 (`TASK-1838`, consola del
+administrador del cliente) y U14 (`TASK-1839`, primitive de entrega). Estado de U12 sin cambio: producción
+pendiente de release.
 
 ## Snapshot histórico anterior al cierre del acceso interno
 

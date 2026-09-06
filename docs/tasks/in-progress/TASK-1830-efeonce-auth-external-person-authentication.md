@@ -1,5 +1,24 @@
 # TASK-1830 — Efeonce Auth External Person Authentication (passkeys, magic link, TOTP, recovery)
 
+## Delta 2026-09-06 — el carril de tokens ya NO está bloqueado por el mecanismo de ENTREGA (TASK-1837)
+
+`TASK-1837` (commits `5518d868e…189148c6e`; migración aplicada 2026-09-06 y **verificado end-to-end en staging el
+2026-09-06 con los flags ON en staging** — `docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`)
+hace que el sistema envíe la invitación externa por correo con el enlace
+`https://<issuer_url del environment>/i/<token>` (la landing `PERSON_AUTH_PATHS.invitationLanding` de esta task),
+con estado de entrega persistido, reenvío que rota el enlace, rebote drenado en el ops-worker y una excepción
+gobernada de revelación. **Ya existe, como mecanismo probado, una persona externa real con sesión viva en el
+emisor**: en staging, una persona sintética (plus-address controlada del operador, organización fixture) recibió el
+correo real de invitación, pasó por `/i/<token>` → aceptar 202 → `linked` (identity profile `external_contact`
+nueva + source link `external_idp:efeonce-auth`), recibió el magic link real del auth-server, lo consumió (200 +
+cookie `__Host-efeonce_auth`), `GET /auth/session` devolvió `authenticated` con `amr: ['magic_link']`, el reuso
+del enlace dio 400 y, al revocar el binding, la sesión murió (401). Ningún operador copió un token a mano. El
+carril de tokens queda bloqueado **solo** por la decisión del operador de qué organización/persona de un CLIENTE
+real recibe la primera invitación (hoy en `TASK-1836`); del lado de `TASK-1837` sólo falta la promoción a `main`
+con los flags en Vercel Production (el auth-server no lee `EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED`; sólo
+sirve `/i/<token>`; la emisión y el correo de invitación salen del runtime Vercel, con remitente Efeonce verificado
+en Resend en esa misma corrida).
+
 ## Delta 2026-09-05 — canary autenticado y correo MUERTO en vivo
 
 `pnpm auth-server:person-auth:canary` (nuevo, commit `38fbfaeeb`) ejercita contra el host REAL el

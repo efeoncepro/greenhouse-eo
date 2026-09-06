@@ -24,3 +24,30 @@ customer payloads as evidence.
 5. A real authorized client completes MCP `initialize`; a dispatch-level missing-provider-scope test denies before
    downstream dispatch. Before customer access, repeat it with a client that can actually receive base-only access.
 6. Record revision/digest, auth result, DNS/TLS outcome, provider state and rollback target in the runbook/task.
+
+## Native issuer and corporate session
+
+For TASK-1836/TASK-1831 changes, apply [native-authority.md](native-authority.md): direct anonymous
+`/login` visibility/click/session and the client OAuth/MCP canary are distinct rows. Require context-bound
+allow/deny, refresh, token-family and grant revocation with an unexpired token, bounded OFF/restore and
+separate legacy/external regression evidence. Never substitute flags ON or metadata for authenticated dispatch.
+
+## External invitation delivery and delegated authority (TASK-1837)
+
+Migration applied to the shared instance 2026-09-06; verified end-to-end in staging 2026-09-06 with both flags
+ON in Vercel staging (Production NOT SET — the code is not in `main` yet, pending release). Status column as of
+2026-09-06 (smoke = `pnpm identity:external-access:smoke -- --apply` against real PG on the smoke fixture org;
+staging = live run through the admin routes on `dev` with a test external binding on the same fixture org,
+revoked at the end; evidence in `docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`).
+
+| Row | Minimum evidence | Status |
+| --- | --- | --- |
+| Invitation delivered by the system | `EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED` ON in staging, an external binding + controlled mailbox, email received from the Efeonce sender, `/i/<token>` on the issuer accepted → `linked` → magic link → session; admin response carries `delivery` and no `token` | staging ✔ 2026-09-06 — real email from `Efeonce <greenhouse@efeoncepro.com>` to a controlled mailbox, `/i/<token>` accept → `linked` → magic link → `/auth/session` 200; 201 response carried `delivery` and no `token`. Production flags NOT SET pending release |
+| Resend rotates | new row, previous one `revoked` (`resent`), old token rejected with `invitation_not_open`, cap 3 per chain → 429 | smoke live ✔ · staging ✔ (`…/resend` 201, new row `deliveryAttempts=2`, previous `revoked` `resent`) |
+| Reveal exception | capability `identity.external_invitation.reveal_token`, reason ≥10 chars, 1 h row without email, audit `invitation_token_revealed` with actor + reason and no token, signal `identity.external_invitation.token_revealed` ok → warning | smoke live ✔ · staging ✔ (`…/reveal` 201, 1 h row, `acceptanceUrl` on the issuer; signal seen lighting) |
+| Delivery failure / bounce | `delivery_status` `failed`/`bounced` + audit + outbox `delivery_failed`; signal `undelivered` lights while the row stays open | smoke live ✔ for `failed` · staging ✔ forced bounce (`bounced@resend.dev` → Resend webhook → projection → `bounced`, `bounce:Permanent`; signal `undelivered` seen ok → warning). Caveat: the reactive drain ran locally, scoped to the `notifications` handler, because the ops-worker still runs `main`; the worker picks the projection up on its next deploy |
+| Delegated lane, 4 negatives | via the gateway: flag OFF / consumer not internal → 404; foreign or unbound binding / non-admin subject → 403; `designatedAdmin: true` → 422; seat cap → 422; hourly cap → 429; response never carries the token | smoke live ✔ in-process · staging ✔ through the gateway consumer token + `environment`/`subject` (200 own list only, 403 foreign binding, 422 self-elevation, 201 delegated issue with real email, no token); MCP tool federation exists as `efeonce-mcp` PR #3 (open, not merged — see the gateway row) |
+| Delegated resend / revoke | Greenhouse lane `POST …/identity/invitations/[invitationId]/resend` (201) and `…/revoke` (200) with `Idempotency-Key`: resend rotates only within the own binding (foreign invitation → `not_found`); revoke takes scope `invitation` (open) or `member` (linked, `grants_version` bump); a delegated admin revoking themself → `invalid_request` | Greenhouse lane ✔ tests (focal suite 62 ✔, typecheck ✔); gateway federation pending (not in PR #3) |
+| Gateway tools `identity.invitations.list` / `identity.invitation.create` | `efeonce-mcp` PR #3 (`feat/task-1837-delegated-invitations`): read on the base scope, write on `efeonce.mcp.identity.write` (403 challenge naming the scope); policies native issuer + `native-external` population only, `organizationId` by membership; `token` never forwarded; live canary through `mcp.efeonce.org` | PR #3: `pnpm check` green (format, typecheck, 145 tests, build); live pending merge — which itself waits for the Greenhouse release (scope in `main`) + `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED=true` in Production; until then the tools answer `policy_blocked` |
+| Designated admin clearing | revoking the admin member sets `designated_admin_profile_id = NULL` + audit `designated_admin_cleared`; a second `designated_admin` accept while one is `linked` → `conflict`, token not consumed | smoke live ✔ |
+| Consent shows redirect host | consent page renders the host of the validated `redirect_uri` (`data-capture="id-redirect-host"`) | render test ✔ · dev-UI screenshots ✔ (1440/390, `docs/audits/evidence/2026-09-06-task-1837/`); live issuer pending release (`auth.efeonce.org` still runs `main`) |

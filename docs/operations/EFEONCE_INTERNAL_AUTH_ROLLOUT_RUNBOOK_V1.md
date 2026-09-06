@@ -1,6 +1,36 @@
 # Efeonce ID interno — operación y rollout
 
+Mapa de construcción, pruebas y límites: [auditoría consolidada TASK-1836/1831](../audits/2026-09-06-task-1836-1831-consolidated-evidence.md).
+
+
 Owner: TASK-1836 / EPIC-044. Decisión: `EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md`.
+
+## Estado vigente de la entrada directa — 2026-09-06
+
+La reparación `21aa12608` está servida desde `develop` en `auth-server-00030-rtm`,
+[deploy 34002082020](https://github.com/efeoncepro/greenhouse-eo/actions/runs/34002082020) exitoso.
+El servicio compartido ya muestra el botón Microsoft existente de Claude en `/login` sin `return_to`;
+se verificó a 1440 y 390 px y el clic llegó a Microsoft. No se diseñó otro botón.
+[PR #226](https://github.com/efeoncepro/greenhouse-eo/pull/226) sigue abierto: este cambio servido
+no equivale a una nueva promoción certificada a `main`. PR #225 sí tiene release certificado.
+No se completó un nuevo canary humano del retorno directo hasta `/auth/session`; no usar la prueba
+MCP anterior como evidencia de ese recorrido. La prueba pública acredita visibilidad e inicio SSO.
+
+Para verificar cada entrada por separado:
+
+1. Abrir `/login` sin parámetros: Microsoft visible con el flag interno ON; hacer clic y completar
+   Entra. El retorno fijo es `/auth/session`, sin cliente OAuth, audiencia, grant ni contexto inventados.
+2. Abrir el flujo de conexión de una aplicación MCP: conservar `/oauth/authorize` validado en
+   `return_to`, completar Microsoft, consentir y verificar code/token/dispatch en esa aplicación.
+3. Verificar sesión HTML autenticada y POST de logout; JSON de `/auth/session` conserva contrato.
+   Sesión revocada/anónima debe dar 401 y login, sin confirmar acceso. Destino directo vacío,
+   duplicado, con query/fragmento o ajeno debe rechazarse; sólo ausencia selecciona el destino fijo.
+4. Registrar revisión/SHA, viewport y outcome sin códigos, cookies ni tokens; un fixture visual,
+   un redirect a Microsoft o una pantalla de consentimiento no prueban emisión ni permiso MCP.
+
+La corrección usa el mismo `resolvePersonSession` y valida el destino al iniciar y consumir la
+transacción. Evidencia local: 235 pruebas passed, 4 live omitidas; tipos/lint/bundle correctos,
+Chromium 6/6 para origen/CSP/redirect y revisión independiente sin hallazgos. WebKit sigue omitido.
 
 ## Release y canary final — 2026-09-06 00:30 UTC (2026-09-05 en Chile)
 
@@ -40,7 +70,10 @@ omitido por falta de ejecutable. El release y el acceso interno están verificad
 permanece `in-progress` por las matrices amplias de clientes externos/multicontexto y los
 pendientes de UI/WebKit. No se amplía la cohorte ni se prolonga el permiso del piloto.
 
-## Readback de integridad 2026-09-05 — posterior a PR #223
+## Readback histórico de integridad 2026-09-05 — posterior a PR #223
+
+> Snapshot superado por el estado vigente al inicio. Los flags OFF, bloqueos y pendientes de
+> este apartado y de «Estado previo» describen ese corte; no son instrucciones para operar hoy.
 
 Migración `20260905183812333` aplicada por runner; población y tracking releídos. Piloto gv 2 → 3.
 Reconciliación canónica: revisión 1 binding/1 grant, apply 1/1 y revisión posterior 0/0; ambas señales
@@ -225,7 +258,7 @@ compatibilidad de clientes externos de TASK-1832 requieren su propia evidencia.
 
 ## Contrato del consumer TASK-1831
 
-Readback 2026-09-05 del despliegue Production `1086fe40a55396fc199ef2e446391c14a69b665d`:
+Readback histórico previo al canary del despliegue Production `1086fe40a55396fc199ef2e446391c14a69b665d`:
 reader sin credencial → 401 `invalid_token`; con credencial máquina existente y contexto sintético
 sin `jti` → 400 `bad_request`. Probe GET sin escrituras, exit 0. Esto verifica el contrato publicado,
 no acredita todavía una sesión corporativa ni el canary autenticado.
@@ -243,27 +276,27 @@ bindingId, grantsVersion y capabilities efectivas. Una denegación interna nunca
 No cachear resultados positivos en esta cohorte. El gateway debe aplicar su flag
 `MCP_NATIVE_INTERNAL_AUTH_ENABLED` por request/dispatch, incluso para tokens ya emitidos.
 
-Readback público renovado 2026-09-05 14:25 UTC: `/readyz` del emisor devuelve ready con PG/KMS/llave
+Snapshot histórico de discovery, anterior a la activación, 2026-09-05 14:25 UTC: `/readyz` del emisor devuelve ready con PG/KMS/llave
 activa correctos; `/.well-known/oauth-protected-resource` del gateway devuelve 200 y anuncia sólo
 `https://mcp.efeonce.org` como authorization server. Su metadata OAuth mantiene endpoints de Entra
-(`login.microsoftonline.com/<tenant>/oauth2/v2.0/*`) y `/register` del shim. La revisión pública no acredita compatibilidad interna nativa; el flag del emisor debe permanecer OFF
-hasta verificar los consumers desplegados. Este readback es
+(`login.microsoftonline.com/<tenant>/oauth2/v2.0/*`) y `/register` del shim. En ese corte la revisión pública no acreditaba compatibilidad interna nativa y el emisor permanecía OFF
+hasta verificar consumers; ese bloqueo fue superado por la activación y el canary documentados arriba. Este readback es
 de discovery; no prueba dispatch ni autorización de un token.
 
-La integración local posterior de TASK-1831 añade verificación ES256/RS256 separada, reader sin caché,
-37 policies explícitas y guards de listado/dispatch. `pnpm check` pasa 114 pruebas; el contenedor compilado
-previamente no incluye todavía la última corrección de transporte de `market` en discovery.
-Smoke local del contenedor: health/discovery 200, MCP sin token y token inválido 401; no acredita despliegue. La cohorte interna puede alcanzar únicamente las
+TASK-1831 publicó verificación ES256/RS256 separada, reader sin caché, policies explícitas
+y guards de listado/dispatch. La revisión36-5wc ya tiene canary interno autenticado; el smoke local
+anterior de health/discovery200 y token inválido401 se conserva como evidencia preliminar, no como
+prueba suficiente de autorización. Repetición dirigida 2026-09-06: 9 pruebas de verifier/callbacks SDK
+passed/0 skipped; cubre claims, issuer desconocido, kill switches, policies y aislamiento de listado. La cohorte interna puede alcanzar únicamente las
 tools cuyo provider/policy ya admite autoridad nativa; Globe, Hiring, skills y otras superficies sin
 adapter compatible permanecen denegadas. Los clientes externos no tienen aún federación de negocio
 completa. No conceder scopes adicionales para sortear esas denegaciones.
 
-Canary de lectura propuesto: `get_seo_entitlement` sobre la organización propia. Su handler devuelve
+Canary de lectura ejecutado (ver evidencia final arriba): `get_seo_entitlement` sobre la organización propia. Su handler devuelve
 estado de habilitación/cupo incluso con `hasModule=false`; no requiere crear target ni comprar datos.
-Verificar resultado de negocio y rechazo de otra organización con el token real antes de acreditarlo.
+El resultado de negocio propio y el rechazo de otra organización se verificaron con token real; repetirlos tras cambios de autoridad.
 El DTO de consentimiento ya está compuesto en el runtime y conserva autoridad por organización;
-authorize y POST lo revalidan, y el renderer muestra nombres escapados. La aprobación visual de
-TASK-1835 sigue pendiente; el rediseño completo y el recorrido real todavía no están verificados.
+authorize y POST lo revalidan, y el renderer muestra nombres escapados. La UI existente de TASK-1835 fue integrada; la entrada OAuth tiene canary real y la entrada directa tiene visibilidad/inicio SSO públicos, con retorno humano directo y QA amplio aún pendientes.
 
 Orden: consumers compatibles OFF -> verificar reader y denegación -> emisor/UI compatibles -> cohorte
 mínima -> canary real TASK-1832 -> rollback medido. No habilitar emisión contra el verifier anterior.
@@ -307,9 +340,11 @@ Apagar flags internos de emisor, reader y gateway; revocar cohorte por command; 
  y externos. Verificar que tokens existentes sean rechazados, no esperar su expiración. Para GC, flag OFF
  y job PAUSED declarativos. Las migraciones son aditivas y permanecen; no borrar evidencias al revertir código.
 
-Pendientes: aplicar configuración por runtime, despliegue de cambios, entrada UI 1835,
-verifier/policy gateway 1831, canaries reales 1832, latencia baja upstream separada de revocación local,
-rollback cronometrado y activación/readback del job GC. Ningún test unitario sustituye estas evidencias.
+Pendientes actuales: promoción de PR226 a main, retorno humano del login directo, matriz completa de
+clientes externos/multicontexto y WebKit, latencia de baja upstream separada de revocación local y
+rollback de compatibilidad externa/Entra. Configuración, emisión/refresh, dispatch interno, retiro del
+grant, rollback de flags y GC ya tienen evidencia fechada en este runbook; no reabrirlos a partir de
+snapshots anteriores. Ningún test unitario sustituye la cobertura live que aún falta.
 
 
 ## Guardas adicionales antes de consentimiento
@@ -339,7 +374,13 @@ ausencia de consumo/Set-Cookie y éxito posterior de la misma credencial desde e
 Revalidación local: 363 passed / 6 skipped y typecheck de 8 GB correcto. Bundle del emisor compilado
 con esbuild y las opciones/shims del Dockerfile; no equivale a un contenedor ejecutado o desplegado.
 
-## UI integrada localmente; recorrido operativo pendiente
+## Historia del despliegue y diagnóstico — cortes del 2026-09-05
+
+> Todos los apartados desde aquí hasta el final son registros cronológicos. Las frases «no reactivar»,
+> «pendiente», «OFF» o «en reparación» describen su hora de observación, no el estado vigente.
+> Para operar, usar el estado y los pendientes al inicio y «Rollback y pendientes de cierre».
+
+### UI integrada localmente; recorrido operativo pendiente
 
 `auth-server:brand-assets:generate` produce isotipo, CSS de tokens AXIS, fuentes con avisos OFL y
 controller de segundo factor. El renderer consume esos assets; las rutas exactas `/fonts/*.ttf`

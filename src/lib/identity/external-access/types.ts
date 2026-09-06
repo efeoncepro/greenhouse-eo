@@ -29,6 +29,27 @@ export type ExternalGrantStatus = (typeof EXTERNAL_GRANT_STATUSES)[number]
 export const EXTERNAL_INVITATION_STATUSES = ['issued', 'accepted', 'linked', 'revoked', 'expired'] as const
 export type ExternalInvitationStatus = (typeof EXTERNAL_INVITATION_STATUSES)[number]
 
+/**
+ * TASK-1837 — Estado de ENTREGA de la invitación (ortogonal a `status`, que es el estado de la
+ * autoridad). `not_attempted` = nadie envió (flag apagado, revelación manual); `sent` = Resend aceptó;
+ * `delivered`/`bounced` = lo dijo el webhook; `failed` = el envío no salió (respuesta honesta).
+ */
+export const EXTERNAL_INVITATION_DELIVERY_STATUSES = ['not_attempted', 'sent', 'delivered', 'bounced', 'failed'] as const
+export type ExternalInvitationDeliveryStatus = (typeof EXTERNAL_INVITATION_DELIVERY_STATUSES)[number]
+
+/** `system` = el correo lo manda Greenhouse en el mismo acto; `manual` = el token vuelve al llamador. */
+export type ExternalInvitationDeliveryMode = 'system' | 'manual'
+
+/** Resultado de entrega que reemplaza al `token` en las respuestas HTTP. Nunca lleva el secreto. */
+export type ExternalInvitationDelivery = {
+  mode: ExternalInvitationDeliveryMode
+  status: ExternalInvitationDeliveryStatus
+  attempts: number
+  /** `a***@cliente.cl` — el correo del invitado no viaja completo en respuestas ni logs. */
+  recipientMasked: string
+  errorCode: string | null
+}
+
 export const EXTERNAL_ACCESS_RESOLUTION_OUTCOMES = [
   'bound',
   'unbound',
@@ -93,7 +114,7 @@ export type ExternalCapabilityGrant = {
   revokeReason: string | null
 }
 
-/** Nunca expone `token_hash`: el token viaja una sola vez en el resultado del command que lo emite. */
+/** Nunca expone `token_hash`: el token viaja una sola vez en el resultado del command que lo emite y, con la entrega del sistema (TASK-1837), sólo en el cuerpo del correo. */
 export type ExternalMemberInvitation = {
   invitationId: string
   bindingId: string
@@ -111,6 +132,10 @@ export type ExternalMemberInvitation = {
   revokedBy: string | null
   revokedAt: string | null
   revokeReason: string | null
+  deliveryStatus: ExternalInvitationDeliveryStatus
+  deliveryAttempts: number
+  lastDeliveryAt: string | null
+  lastDeliveryErrorCode: string | null
 }
 
 export type EligibleClientOrganization = {

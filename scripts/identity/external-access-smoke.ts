@@ -9,9 +9,13 @@ import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } from '../lib/lo
  *   pnpm identity:external-access:smoke -- --apply # ciclo completo sobre el fixture de smoke
  *
  * Con `--apply` ejercita, en este orden y con filas etiquetadas como smoke:
- *   environment `smoke-task-1631` (active) → bind org fixture → grant → invitación → accept
- *   (persona `smoke_test`) → resolve = bound → revoke member → resolve = revoked → revoke binding
- *   → environment `retired`. El audit es append-only y queda como evidencia.
+ *   environment `smoke-task-1631` (active) → bind org fixture → grant → invitación (manual) →
+ *   reenvío (rota) → resultado de entrega `failed` → revelación (1 h) → token viejo rechazado →
+ *   accept con el token revelado (persona `smoke_test`) → resolve = bound (admin designado) →
+ *   invitación delegada por el admin (+ auto-elevación 422) → revoke member (limpia el admin) →
+ *   resolve = revoked → revoke binding → environment `retired`. El audit es append-only y queda
+ *   como evidencia. Efecto colateral esperado 24 h: `identity.external_invitation.token_revealed`
+ *   en `warning` (1) y `unbound_dispatch_attempt` en `warning`.
  *
  * Requiere el proxy Cloud SQL en 127.0.0.1:15432 (`pnpm pg:connect`) y `.env.local` con el
  * perfil `runtime` (verifica los GRANTs reales del runtime, no los del owner).
@@ -113,13 +117,57 @@ const main = async () => {
   )
 
   const invitation = await domain.issueExternalInvitation(
-    { bindingId: bound.binding.bindingId, email: EMAIL, designatedAdmin: true, profileId, reason: 'smoke', expiresInHours: 1 },
+    { bindingId: bound.binding.bindingId, email: EMAIL, designatedAdmin: true, profileId, reason: 'smoke', expiresInHours: 1, delivery: 'manual' },
     actor
   )
 
   if (!invitation.token) throw new Error('smoke: expected a token for a new invitation')
 
-  log('invitation', { id: invitation.invitation.invitationId, status: invitation.invitation.status })
+  log('invitation', { id: invitation.invitation.invitationId, status: invitation.invitation.status, delivery: invitation.delivery })
+
+  // TASK-1837 — reenviar = rotar: la abierta queda revoked (resent) y nace una fila con token nuevo.
+  const resent = await domain.resendExternalInvitation(
+    { invitationId: invitation.invitation.invitationId, bindingId: bound.binding.bindingId, reason: 'smoke resend', delivery: 'manual' },
+    actor
+  )
+
+  if (!resent.token || resent.token === invitation.token) throw new Error('smoke: resend must rotate the token')
+
+  log('invitation.resent', { id: resent.invitation.invitationId, attempts: resent.invitation.deliveryAttempts })
+
+  // TASK-1837 — resultado de entrega honesto (writer único de delivery_*): failed + audit + delivery_failed.
+  const failed = await domain.recordExternalInvitationDeliveryOutcome({
+    invitationId: resent.invitation.invitationId,
+    outcome: 'failed',
+    errorCode: 'smoke_failed',
+    countsAsAttempt: true,
+    actor
+  })
+
+  log('invitation.delivery.failed', { status: failed?.deliveryStatus, attempts: failed?.deliveryAttempts, error: failed?.lastDeliveryErrorCode })
+
+  // TASK-1837 — excepción gobernada: rota a 1 h sin correo; el token anterior deja de valer.
+  const revealed = await domain.revealExternalInvitationToken(
+    { invitationId: resent.invitation.invitationId, bindingId: bound.binding.bindingId, reason: 'smoke: revelación de prueba del ciclo de vida' },
+    actor
+  )
+
+  const ttlMinutes = Math.round((new Date(revealed.expiresAt).getTime() - Date.now()) / 60000)
+
+  if (ttlMinutes > 61 || ttlMinutes < 55) throw new Error(`smoke: revealed link must expire in ~1h, got ${ttlMinutes} min`)
+
+  log('invitation.revealed', { id: revealed.invitation.invitationId, ttlMinutes, url: revealed.acceptanceUrl?.replace(revealed.token, '<token>') })
+
+  const staleAccept = await domain
+    .acceptExternalInvitation({ token: resent.token, environmentId: ENVIRONMENT_ID, subject: SUBJECT }, { actorId: 'smoke:auth-server' })
+    .then(() => 'ACCEPTED (BUG)')
+    .catch(error => (domain.isExternalAccessError(error) ? error.code : 'unexpected'))
+
+  if (staleAccept !== 'invitation_not_open') throw new Error(`smoke: rotated token must be rejected, got ${staleAccept}`)
+
+  log('invitation.stale-token', staleAccept)
+
+  invitation.token = revealed.token
 
   const unboundBefore = await domain.resolveExternalAccess({ environmentId: ENVIRONMENT_ID, subject: SUBJECT, clientId: 'smoke-client' })
 
@@ -143,12 +191,50 @@ const main = async () => {
     throw new Error('smoke: expected bound resolution with the granted capability')
   }
 
+  if (!boundResolution.memberships[0]?.designatedAdmin) throw new Error('smoke: accepted designatedAdmin invitation must confer designated admin')
+
+  // TASK-1837 — autoridad delegada: el admin designado invita a su binding; no se eleva.
+  const delegated = await domain.issueDelegatedExternalInvitation({
+    environmentId: ENVIRONMENT_ID,
+    subject: SUBJECT,
+    bindingId: bound.binding.bindingId,
+    email: `smoke-task-1837+${Date.now()}@efeonce.invalid`,
+    reason: 'smoke delegated',
+    delivery: 'manual'
+  })
+
+  log('invitation.delegated', { id: delegated.invitation.invitationId, created: delegated.created, issuedBy: delegated.invitation.issuedBy })
+
+  const elevation = await domain
+    .issueDelegatedExternalInvitation({ environmentId: ENVIRONMENT_ID, subject: SUBJECT, bindingId: bound.binding.bindingId, email: EMAIL, designatedAdmin: true })
+    .then(() => 'ISSUED (BUG)')
+    .catch(error => (domain.isExternalAccessError(error) ? `${error.code}:${error.statusCode}` : 'unexpected'))
+
+  if (elevation !== 'invalid_request:422') throw new Error(`smoke: delegated self-elevation must be 422, got ${elevation}`)
+
+  const foreign = await domain
+    .listDelegatedExternalInvitations({ environmentId: ENVIRONMENT_ID, subject: SUBJECT, bindingId: 'xob-does-not-exist' })
+    .then(() => 'LISTED (BUG)')
+    .catch(error => (domain.isExternalAccessError(error) ? `${error.code}:${error.statusCode}` : 'unexpected'))
+
+  if (foreign !== 'forbidden:403') throw new Error(`smoke: foreign binding must be 403, got ${foreign}`)
+
+  const own = await domain.listDelegatedExternalInvitations({ environmentId: ENVIRONMENT_ID, subject: SUBJECT, bindingId: bound.binding.bindingId })
+
+  log('invitation.delegated.list', { count: own.items.length, elevation, foreign })
+
   const memberRevoked = await domain.revokeExternalAccess(
     { scope: 'member', bindingId: bound.binding.bindingId, profileId: accepted.profileId, reason: 'smoke revoke member' },
     actor
   )
 
   log('revoke.member', { changed: memberRevoked.changed, gv: memberRevoked.grantsVersion })
+
+  const afterAdminRevoke = await domain.getExternalOrganizationBinding(bound.binding.bindingId)
+
+  if (afterAdminRevoke?.designatedAdminProfileId !== null) throw new Error('smoke: revoking the designated admin must clear designated_admin_profile_id')
+
+  log('revoke.member.designated-admin-cleared', true)
 
   const afterMember = await domain.resolveExternalAccess({ environmentId: ENVIRONMENT_ID, subject: SUBJECT })
 

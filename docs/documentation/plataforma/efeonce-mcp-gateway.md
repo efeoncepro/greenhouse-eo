@@ -34,8 +34,10 @@ permiso base de conexión (`efeonce.mcp.read`). Con eso el gateway federa **36 t
 
 ## Cómo se comporta
 
-1. El cliente MCP se autentica con OAuth de Microsoft Entra y el resource canónico del gateway.
-2. El gateway valida issuer, audience y scope antes de despachar una tool.
+1. El cliente MCP obtiene un token para el resource canónico desde un emisor admitido: Entra legado o
+   Efeonce ID. En el carril corporativo nativo, Microsoft autentica y Efeonce ID emite el token.
+2. El gateway valida issuer, audience, firma, expiración y scopes, y aplica policy por tool. Los tokens
+   nativos requieren autoridad vigente del reader; los internos también contexto firmado y ledger `jti`.
 3. Para Globe obtiene una identidad de workload y llama el reader canónico de Globe.
 4. Globe deriva el workspace desde la identidad de servicio; el cliente no puede escoger otro workspace.
 5. La respuesta entrega disponibilidad de rutas y un correlation ID para observabilidad.
@@ -71,7 +73,7 @@ No disponible:
 
 ## Alcance de acceso
 
-El servicio está operativo sólo para el tenant interno de Entra. La autorización de Globe usa un principal con
+El servicio conserva Entra legado y tiene un piloto corporativo nativo verificado (TASK-1836/1831). La autorización de Globe usa un principal con
 una capability de lectura y un binding de workspace exacto. Esto evita que una conexión MCP sea un bypass de
 los permisos de Globe.
 
@@ -80,7 +82,8 @@ escritura interna para el fondeo de créditos, el permiso de escritura SEO (`efe
 de lectura de Hiring — cada permiso condicionado sólo se publica cuando su interruptor está encendido (detalle en
 el ADR de plataforma MCP).
 
-Antes de entregar acceso a clientes, Efeonce debe implementar entitlements por tenant/capability y demostrar una
+Los entitlements por organización/persona ya existen y el gateway multi-issuer está construido. Antes
+de entregar acceso general a clientes, falta certificar su matriz real y demostrar una
 identidad que reciba sólo el permiso base cuando no tiene Globe. Al cliente Entra interno actual se le entregan
 hoy los dos primeros permisos —el base y el de lectura de Globe— incluso si pide sólo el base; por eso no
 representa aún una prueba válida de segmentación comercial. El permiso de escritura tiene su propia autorización
@@ -95,3 +98,17 @@ Los manuales son el mismo primitive en los dos bordes: el MCP de Greenhouse los 
 `skill://efeonce/{name}/SKILL.md`, el gateway sólo como tool, y ambos leen la misma lane. Un guard del gateway
 (`EXPECTED_GREENHOUSE_PLATFORM_TOOLS`) vigila que las tools de plataforma federadas —las que no son SEO— sigan
 declaradas con razón, porque el guard de paridad SEO está anclado a ese dominio y no las veía.
+
+
+## Autoridad nativa y límites del piloto
+
+Compartir `auth.efeonce.org` no convierte clientes en empleados. El binding conserva población
+`external | internal`; las tools evalúan población, scopes, capabilities y organización. Los internos requieren
+un contexto ligado a cliente/organización y grants personales con vencimiento. `gv` pertenece al binding
+seleccionado; refresh no amplía contexto ni rejuvenece autenticación. La revocación de familia se revalida
+mediante `jti` antes del dispatch, sin esperar la expiración ni llamar a introspección.
+
+El canary interno probó lectura propia, denegación de organización ajena, refresh y revocación. No certifica
+clientes externos, todas las tools ni la matriz multicontexto. La sesión directa desde `/login` tampoco
+conecta por sí sola una app. [Mapa de evidencia y pendientes](../../audits/2026-09-06-task-1836-1831-consolidated-evidence.md)
+y [contrato interno](../../architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md).

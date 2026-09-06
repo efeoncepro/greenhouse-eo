@@ -1,6 +1,25 @@
 # TASK-1831 — Efeonce MCP Gateway Multi-Issuer Authorization Context
 
-## Delta 2026-09-05 — runtime desplegado y activo; verificación de autorización aún pendiente
+Mapa de construcción, pruebas y límites: [auditoría consolidada TASK-1836/1831](../../audits/2026-09-06-task-1836-1831-consolidated-evidence.md).
+
+
+## Evidencia vigente compartida con TASK-1836 — 2026-09-06
+
+Gateway `efeonce-mcp-gateway-00036-5wc` (`815df9b`) con ambos flags nativos ON: el canary
+interno autenticado ya emitió tokens, permitió `get_seo_entitlement` propio y negó organización
+ajena antes/después de una lectura propia. Refresh rotativo verificado; retiro de grant ≤11 s;
+revocación final 6.633 s con access token no expirado. Gateway OFF negó en ≤20 s y los controles
+se restauraron en 79 s. Piloto gv5, vencimiento original 2026-09-12T15:00Z; pruebas revocadas.
+
+La evidencia y el release PR225/main08acfb2c6 están en
+[el runbook compartido](../../operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
+El arreglo directo de `/login` (21aa12608, auth rev30) ya está servido; PR226 y el retorno humano
+directo siguen pendientes. Esa UI no modifica el contrato de autorización del gateway.
+Los snapshots siguientes son historia: `access_tokens=0`, flag emisor OFF y ausencia de auditoría
+del piloto dejaron de ser bloqueos vigentes tras canaries, migración y reconciliación canónica.
+La matriz externa/multicontexto y el canary Entra completo no se declaran aprobados por inferencia.
+
+## Snapshot histórico 2026-09-05 17:01 UTC — anterior al canary autenticado
 
 Medido en runtime por la sesión `greenhouse-eo-8d`, contrastado con `greenhouse-eo-45` (TASK-1829/1835),
 `greenhouse-eo-89` (TASK-1631), `greenhouse-eo-0f` (TASK-1828) y `greenhouse-eo-18` (TASK-1830/1836).
@@ -120,7 +139,7 @@ El slice interno nativo depende del contrato de TASK-1836 (U11). La policy actua
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Desplegado y ACTIVO en producción (2026-09-05), sin verificación de autorización real. Gateway efeonce-mcp-gateway-00032-qm5 (SHA dd04f47, deploy run 33979635307), MCP_NATIVE_AUTH_ENABLED y MCP_NATIVE_INTERNAL_AUTH_ENABLED ON, ambos en el ledger; sondas negativas OK (protected-resource 200, MCP sin token 401). Grafo listo por el carril interno: environment active, binding Efeonce EO-ORG-0007, enrollment active y resolveInternalAuthority eligible con growth.seo.observation.read (vence 2026-09-12). SIN canary autenticado: greenhouse_auth.access_tokens = 0, el emisor nunca emitió un token, y por eso el recheck de grants_version antes del dispatch y el rollback siguen sin probarse. Gate único: el emisor tiene AUTH_SERVER_INTERNAL_AUTH_ENABLED=false (revisión viva y default en main) — decisión de operador sobre servicio compartido. Providers sin delegación compatible siguen denegados.`
+- Status real: `Gateway multi-issuer desplegado y canary interno autenticado verificado, revisión36-5wc SHA815df9b, flags nativo/interno ON. TASK-1836 prueba token, lectura propia, rechazo ajeno, refresh, retiro de grant ≤11 s, revocación OAuth 6.633 s y rollback de flags medido. Release PR225 certificado. Ya no aplica access_tokens=0 ni emisor OFF. Pendientes: matriz externa/multicontexto, discovery/challenges por cliente real y nueva comprobación Entra completa; providers sin delegación compatible siguen denegados.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration`
 - Blocked by: `none`
@@ -211,14 +230,14 @@ Reglas obligatorias:
 - `../efeonce-mcp/src/config.ts` (lista de issuers)
 - `../efeonce-mcp/src/providers/types.ts` (`allowedIssuers`, `authorityClass`)
 - `../efeonce-mcp/src/providers/*.ts` (declaración por tool)
-- `../efeonce-mcp/test/auth/**` (nuevo)
+- `../efeonce-mcp/test/auth-verifier.test.ts`, `test/authorized-tools.test.ts`, `test/binding-resolver.test.ts`
 - `src/mcp/greenhouse/tool-manifest.ts` (campo `allowedIssuers` si el manifest generado lo transporta `[verificar]`)
 
 ## Current Repo State
 
 ### Already exists
 
-- Verificador single-issuer y `AuthInfo = { token, clientId, scopes, expiresAt }` (verificado 2026-08-05).
+- Verificador multi-issuer en `src/auth/token-verifier.ts`, contexto tipado y policies en `src/auth/tool-policy.ts`; la interfaz single-issuer de agosto es antecedente histórico.
 - Gate HTTP de scopes por tool derivado de `GREENHOUSE_SEO_WRITE_TOOLS`; guard de paridad bidireccional.
 - Shim DCR y cliente público compartido en el carril Entra (ADR gateway §Delta 2026-08-06/09-02).
 - **Desde `TASK-1828` (2026-09-04):** JWKS real del issuer externo en `https://auth.efeonce.org/.well-known/jwks.json`
@@ -228,9 +247,9 @@ Reglas obligatorias:
 
 ### Gap
 
-- Sin resolver por issuer, sin `AuthContext`, sin `allowedIssuers`, sin recheck de grants.
-- El issuer externo aún no emite access tokens con `sub`/`azp`/`scope`/`gv` (`TASK-1829`); sólo JWKS.
-- Reader de binding sin release a producción y sin credencial workload del gateway hacia el lane.
+- Resolver, contexto tipado, policies por tool y reader de bindings ya están implementados y publicados.
+- El carril nativo interno tiene canary real; falta completar la matriz externa, clientes y concurrencia.
+- Providers sin adapter delegado permanecen fail-closed; aceptar el issuer no amplía su compatibilidad.
 
 ## Modular Placement Contract
 
@@ -256,7 +275,7 @@ Reglas obligatorias:
 
 - Contrato existente a respetar: `AuthInfo` actual mientras el flag esté OFF; scopes de `config.ts`; manifest generado
 - Contrato nuevo o modificado: `AuthContext` (ADR federación), `ToolRegistration.allowedIssuers` + `authorityClass`, endpoint reader `GET …/ecosystem/identity/binding?environment=…&subject=…` `[verificar en TASK-1631]`
-- Backward compatibility: `gated` (`OAUTH_EXTERNAL_ISSUER_ENABLED`); con OFF el comportamiento Entra es byte-idéntico salvo la eliminación del fallback `azp ?? sub`, que se prueba como no-regresión
+- Backward compatibility: `gated` (`MCP_NATIVE_AUTH_ENABLED`); con OFF el comportamiento Entra es byte-idéntico salvo la eliminación del fallback `azp ?? sub`, que se prueba como no-regresión
 - Full API parity: n/a (transporte/autorización); la capability de grants es de `TASK-1631`
 
 ### Data model and invariants
@@ -269,13 +288,13 @@ Reglas obligatorias:
   - `Un grants_version menor al vigente en el reader deniega aunque el token sea válido.`
 - Write-target allowlist: `N/A — sin escrituras`
 - Tenant/space boundary: organización derivada del binding, nunca de un claim autoafirmado
-- Idempotency/concurrency: lectura; caché de binding por `(issuer, subject)` con TTL 60 s y invalidación por `gv`
+- Idempotency/concurrency: lectura; reader fresco por request, sin caché positiva; igualdad de `gv` y ledger `jti` antes de dispatch
 - Audit/outbox/history: señales redactadas `mcp.auth.external_token_on_internal_tool`, `mcp.auth.revoked_still_dispatching`, `mcp.auth.unknown_issuer`
 
 ### Migration, backfill and rollout
 
 - Migration posture: `none`
-- Default state: `OAUTH_EXTERNAL_ISSUER_ENABLED=false`
+- Default state: `MCP_NATIVE_AUTH_ENABLED=false`
 - Backfill plan: none
 - Rollback path: flag OFF + revisión anterior de Cloud Run (< 5 min)
 - External coordination: env vars del gateway en `deploy.yml`; URL del reader y credencial workload
@@ -391,12 +410,12 @@ Reglas obligatorias:
 
 - [ ] Contexto interno nativo de TASK-1836 permite sólo tools autorizadas; un sujeto externo del mismo issuer queda denegado, y Entra directo mantiene compatibilidad.
 
-- [ ] `AuthContext` expone `issuer`, `subject`, `clientId`, `audience`, `delegatedScopes`, `roles`, `expiresAt`, `grantsVersion` sin fallback `azp ?? sub` ni fusión de `roles`.
-- [ ] Un token con issuer no configurado se rechaza sin ningún fetch de JWKS (test).
-- [ ] Todas las tools registradas declaran `allowedIssuers` y `authorityClass`; el arranque falla si falta.
+- [x] `AuthContext` expone `issuer`, `subject`, `clientId`, `audience`, `delegatedScopes`, `roles`, `expiresAt`, `grantsVersion` sin fallback `azp ?? sub` ni fusión de `roles`. Evidencia: `auth-verifier.test.ts` + `authorized-tools.test.ts`, repetición 2026-09-06: 9 passed/0 skipped.
+- [x] Un token con issuer no configurado se rechaza sin ningún fetch de JWKS (test). Evidencia: `auth-verifier.test.ts` + `authorized-tools.test.ts`, repetición 2026-09-06: 9 passed/0 skipped.
+- [x] Todas las tools registradas declaran `allowedIssuers` y `authorityClass`; el arranque falla si falta. Evidencia: `auth-verifier.test.ts` + `authorized-tools.test.ts`, repetición 2026-09-06: 9 passed/0 skipped.
 - [ ] Test (a): token externo con scope string internal-only → deny en dispatch con señal redactada.
 - [ ] Test (b): `roles` con string de escritura y sin scope delegado → deny, también en el issuer Entra.
-- [ ] Test (c): grant revocado con token vigente → deny por `grants_version` en ≤ 60 s.
+- [x] Test (c): grant revocado con token vigente → deny por `grants_version` en ≤60 s. Canary interno TASK-1836: retiro selectivo del grant ≤11 s, restituido con vencimiento original; ver runbook.
 - [ ] El canary interno `globe.producer.fleet.list` con Entra no cambia de comportamiento.
 - [ ] Persona externa resuelta sólo por `(issuer, subject)` vía registry; ninguna búsqueda por `client_id` ni email.
 
@@ -415,7 +434,7 @@ Reglas obligatorias:
 
 ## Follow-ups
 
-- Invalidación push de `gv` (evento outbox → gateway) si el TTL de 60 s resulta insuficiente.
+- Mantener reader fresco sin caché positiva. Cualquier futura caché exige demostrar revocación ≤60 s; no está habilitada como optimización por defecto.
 
 ## Open Questions
 

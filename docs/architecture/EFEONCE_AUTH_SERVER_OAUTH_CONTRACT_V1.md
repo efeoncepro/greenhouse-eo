@@ -2,11 +2,9 @@
 
 > **Tipo:** contrato técnico (endpoints, claims, tablas, invariantes) del authorization server propio
 > `https://auth.efeonce.org` — **TASK-1829** (EPIC-044 U02).
-> **Estado:** `code complete, rollout pendiente` (2026-09-04): flag `AUTH_SERVER_OAUTH_ENABLED=false` en
-> `services/auth-server/deploy.sh`; migrations aplicadas en Cloud SQL; el runtime está **en producción** desde el
-> release `9100bbd2765d` (revisión `auth-server-00005-pk8`, servicio único staging+producción) y sirve sólo
-> `/readyz` + JWKS hasta prender el flag (`/.well-known/oauth-authorization-server` → 404 verificado en vivo);
-> environment del emisor `efeonce-auth` registrado en **`draft`** el 2026-09-04 (`pnpm auth-server:register-issuer-environment`).
+> **Estado:** OAuth y personas activos; emisión/refresh/revocación internos verificados por TASK-1836 y
+> consumo multi-issuer por TASK-1831. El environment `efeonce-auth` está activo para la cohorte controlada.
+> Las matrices externas/multicontexto siguen abiertas. [Mapa de evidencia](../audits/2026-09-06-task-1836-1831-consolidated-evidence.md).
 > ADR gobernante:
 > [`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md).
 > Contrato de federación: [`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md).
@@ -66,10 +64,19 @@ Errores: cuerpo `{ error, error_description? }` (RFC 6749 §5.2); `invalid_clien
 ```
 
 `scopes_supported` publica el **mínimo** (lecturas). Los scopes de escritura
-(`efeonce.mcp.globe.credits.funding.ensure`, `efeonce.mcp.seo.write`) existen, exigen consentimiento
-explícito + step-up y llegan por el `403 insufficient_scope` del recurso, nunca por el mínimo publicado
-(mcp-craft §security). La lista es un espejo de `../efeonce-mcp/src/config.ts` con test de paridad
-(`src/lib/auth-server/oauth/scopes.test.ts`).
+(`efeonce.mcp.globe.credits.funding.ensure`, `efeonce.mcp.seo.write`, `efeonce.mcp.identity.write`) existen,
+exigen consentimiento explícito + step-up y llegan por el `403 insufficient_scope` del recurso, nunca por el
+mínimo publicado (mcp-craft §security). La lista es un espejo de `../efeonce-mcp/src/config.ts` con test de
+paridad (`src/lib/auth-server/oauth/scopes.test.ts`).
+
+`efeonce.mcp.identity.write` (TASK-1837, 2026-09-06; `EFEONCE_MCP_WRITE_SCOPES` en
+`src/lib/auth-server/oauth/scopes.ts`) es la clase «administrar a las personas de mi organización»: invitar,
+reenviar y revocar por la lane delegada `/api/platform/ecosystem/identity/invitations`. Es clase de escritura
+(step-up), se emite sólo por el issuer nativo a población externa y su copy de consentimiento es
+`'Invitar y administrar a las personas de tu organización en Efeonce'` (`src/lib/copy/auth-server.ts`). El scope
+responde si ESTE cliente puede pedir esa clase de acción; la autoridad real la decide Greenhouse por la
+membership `designatedAdmin` del binding. Lo consume la tool `identity.invitation.create` del gateway
+(`efeonce-mcp`, PR #3 abierto; merge tras el release que lleve el scope a `main`).
 
 ## 3. Clientes
 
@@ -120,13 +127,17 @@ Header `{ "alg": "ES256", "kid": "<RFC 7638 thumbprint>", "typ": "JWT" }` — fi
 }
 ```
 
-- `gv` = `max(grantsVersion)` de las memberships **`bound`** del sujeto en
-  `external_organization_bindings` (vía `resolveExternalAccess({ environmentId: AUTH_SERVER_ENVIRONMENT_ID, subject })`);
-  sin membership `bound` → `access_denied` / `invalid_grant` (fail-closed). Se re-resuelve en cada
-  emisión (code y refresh). El gateway (TASK-1831) compara por igualdad estricta con el reader de
-  bindings; cualquier revoke bumpea la versión.
-- El `jti` se registra en `greenhouse_auth.access_tokens` (revocación + introspección). El gateway
-  verifica con el JWKS **sin** llamar a introspección (recomendación del ADR).
+- El resolver de grants revalida autoridad en cada emisión (code y refresh). Para el carril externo legacy
+  sin contexto se conserva la resolución de memberships `bound`. Para internos, `gv` es exactamente la
+  versión del binding seleccionado por el contexto, nunca el máximo entre organizaciones.
+- Los access tokens internos incluyen `authorization_context_id` y `authorization_context_version=1`
+  firmados. El contexto liga sujeto/perfil, cliente, audiencia, organización, binding, environment y sesión
+  corporativa. Ausencia, versión no soportada o dimensiones ajenas deniegan; no hay fallback por issuer/email.
+- El `jti` se registra en `greenhouse_auth.access_tokens`. TASK-1831 verifica JWT/JWKS y el reader interno
+  revalida también ese ledger antes del dispatch: mismo sujeto, cliente, entorno y contexto, sin revocar ni
+  expirar. Revocar la familia retira tokens aún vigentes dentro de la cota local de 60 s; no usa introspección.
+- La población persistida `external | internal` es independiente de `issuer_class`. Contrato completo:
+  [autoridad interna nativa](EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md).
 
 ### 4.2 Refresh token
 
@@ -135,6 +146,8 @@ Opaco `efr_<base64url(32 bytes)>`; se persiste sólo `sha256`; familia = `grant_
 `SELECT … FOR UPDATE`. Reuso (token ya rotado o revocado, o presentado por otro cliente) ⇒ se revoca
 **toda la familia** (refresh + access vigentes) + audit `refresh_reuse` (RFC 6819 §5.2.2.3). Un
 `scope` en el refresh sólo puede **estrechar** el original (`invalid_scope` si excede).
+El contexto, la procedencia de sesión y `auth_time` se preservan: la rotación no rejuvenece autenticación
+ni amplía organización, cliente o permisos. El gate interno OFF deniega también refresh.
 
 ### 4.3 Authorization code
 
@@ -172,6 +185,14 @@ copy en `src/lib/copy/auth-server.ts`) con un `<form method="post" action="/oaut
 campos `client_id`, `scope` (space-delimited), `return_to` (path+query del authorize original) y
 `decision` (`allow` | `deny`). La task ui-ux reemplaza la vista; el contrato de campos y rutas se
 mantiene. `deny` redirige al cliente con `error=access_denied&state&iss`.
+
+- **Host del `redirect_uri` visible (desde TASK-1837, 2026-09-06).** La pantalla revela a la persona el destino
+  de la autorización: `renderConsentPage` exige `redirectHost` (lanza si falta) y muestra "Destino de la
+  autorización: `<host>`" + "El código de autorización se enviará a esta dirección." (copy
+  `GH_AUTH_SERVER.consent_redirect_host_{label,hint}`, bloque `data-capture="id-redirect-host"`).
+  `authorize.ts` pasa `new URL(redirectUri).host` del `redirect_uri` ya validado contra el registro del cliente.
+  Es un MUST del protocolo (el usuario debe poder ver a quién autoriza), aditivo y sin flag; la vista ui-ux que
+  reemplace esta página conserva la revelación.
 
 ## 6. Persona autenticada (`SubjectSessionPort`)
 
@@ -219,9 +240,9 @@ ventana 24 h, steady 0): `auth.oauth.code_reuse_detected` (error), `auth.oauth.r
 
 | Env | Default | Efecto |
 |---|---|---|
-| `AUTH_SERVER_OAUTH_ENABLED` | `false` | OFF ⇒ metadata y `/oauth/*` 404 |
+| `AUTH_SERVER_OAUTH_ENABLED` | `true` en deploy al corte `21aa12608`; verificar override del workflow | OFF ⇒ metadata y `/oauth/*` 404 |
 | `AUTH_SERVER_ISSUER` | `https://auth.efeonce.org` | `issuer` publicado (origen https sin query/fragment) |
-| `AUTH_SERVER_ENVIRONMENT_ID` | `efeonce-auth` | `environment_id` del emisor en `external_identity_environments` (debe existir `active` para que haya `bound`; **existe en `draft` desde 2026-09-04**, ver abajo) |
+| `AUTH_SERVER_ENVIRONMENT_ID` | `efeonce-auth` | `environment_id` del emisor en `external_identity_environments` (debe existir `active` para que haya `bound`; activo para el piloto; ver abajo) |
 | `AUTH_SERVER_MCP_AUDIENCE` | `https://mcp.efeonce.org/mcp` | `aud` de los access tokens y `resource` aceptado |
 
 TTLs y límites: `AUTH_SERVER_OAUTH_DEFAULTS` (`config.ts`) — code 300 s, access 900 s, refresh 30 d /
@@ -233,7 +254,7 @@ La fila `efeonce-auth` de `greenhouse_core.external_identity_environments` se re
 command canónico de TASK-1631 (`upsertExternalIdentityEnvironment`: tx + audit + outbox), nunca por SQL, a través
 de `pnpm auth-server:register-issuer-environment` (`scripts/auth-server/register-issuer-environment.ts`; lee
 `.env.local`, perfil ops, proxy `127.0.0.1:15432`; `--status draft|active`, `--environment-id`). Registrada el
-2026-09-04 en **`draft`**: `displayName` «Efeonce Auth», provider `efeonce_auth`, `issuerUrl`
+2026-09-04 en `draft` y activada posteriormente para el piloto: `displayName` «Efeonce Auth», provider `efeonce_auth`, `issuerUrl`
 `https://auth.efeonce.org`, `jwksUri` `https://auth.efeonce.org/.well-known/jwks.json`, `audience`
 `https://mcp.efeonce.org/mcp`, `issuerClass external` (**inmutable** después), `subjectType public`. En `draft`
 el resolver responde `environment_inactive` y ningún sujeto es `bound`; se pasa a `active` con `--status active`
@@ -247,12 +268,12 @@ en el mismo momento en que se prende `AUTH_SERVER_OAUTH_ENABLED` en staging (pre
 - **NUNCA** redirigir con un `client_id` o `redirect_uri` no validados; `localhost` por nombre sólo
   como alias de loopback de clientes **públicos**, nunca para hospedados/confidenciales.
 - **NUNCA** emitir un access token sin fila `active` en `client_consents` para **cada** scope ni sin
-  membership `bound` (gv fresco); un scope de escritura exige además `step_up`.
+  autoridad vigente de la población correspondiente (`gv` fresco y contexto para internos); un scope de escritura exige además `step_up`.
 - **NUNCA** consumir un code ni rotar un refresh fuera del `SELECT … FOR UPDATE` del store; el reuso
   revoca la familia completa y emite señal.
 - **NUNCA** persistir ni loggear tokens, codes, `code_verifier`, secrets, IP, UA o `sub` en claro
   (sólo hashes); el audit es append-only.
-- **NUNCA** hacer que el gateway dependa de `introspect` para autorizar: JWT + JWKS + recheck de `gv`.
+- **NUNCA** hacer que el gateway dependa de `introspect` para autorizar: JWT + JWKS + reader de autoridad; internos incluyen contexto y ledger `jti`.
 - **NUNCA** resolver un cliente CIMD sin el guard anti-SSRF ni cachear un documento más de 24 h.
 - **SIEMPRE** que se agregue un scope al gateway, agregarlo a `scopes.ts` (test de paridad) y a la
   descripción es-CL de `src/lib/copy/auth-server.ts`.
@@ -269,15 +290,34 @@ en el mismo momento en que se prende `AUTH_SERVER_OAUTH_ENABLED` en staging (pre
   `/.well-known/jwks.json` con 2 `kid`; `/.well-known/oauth-authorization-server` → 404 (esperado con el flag
   OFF). Environment `efeonce-auth` en `draft`: `GET /api/platform/ecosystem/identity/binding?environment=efeonce-auth&subject=…`
   con el token consumer del gateway → 200 `outcome: environment_inactive` (400 sin parámetros, 401 sin token).
-- Staging (flag ON, pendiente): environment a `active` (`pnpm auth-server:register-issuer-environment --status active`);
+- Procedimiento de activación/canary (la activación interna ya tiene evidencia en el mapa citado): environment a `active` (`pnpm auth-server:register-issuer-environment --status active`);
   `curl https://auth.efeonce.org/.well-known/oauth-authorization-server` con `issuer` idéntico;
   `POST /oauth/register` 201; `POST /oauth/token` con code inválido ⇒ `invalid_grant`; clientes CIMD + DCR de
-  prueba (TASK-1832); flujo con persona real cuando TASK-1830 esté en staging.
+  prueba (TASK-1832). El flujo corporativo con persona real ya está verificado; quedan las matrices
+  de clientes externos/multicontexto, no un bloqueo general por falta de autenticación TASK-1830.
 
 ## 12. Fuera de alcance / follow-ups
 
 - `private_key_jwt` para confidenciales; ID tokens OIDC (`openid` no se emite como id_token).
 - Migración de los sister-platform consumers internos al nuevo emisor (task propia).
-- Limpieza programada de codes/tokens expirados (command `oauth-gc` + Cloud Scheduler) — hoy las filas
-  expiradas no se sirven pero no se borran.
+- La limpieza efímera ya está construida y tiene ejecución real documentada: `pnpm auth:gc`, función
+  `greenhouse_auth.gc_ephemeral_state`, handler `POST /auth/ephemeral-gc` y job `ops-auth-ephemeral-gc`.
+  Retención, límites, flag `AUTH_SERVER_GC_ENABLED`, readback y rollback pertenecen al
+  [runbook interno](../operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md). No borres auditoría ni
+  tokens manualmente; la evidencia del GC no cierra las matrices de acceso pendientes.
 - Decisión `TASK-659`: ver el cierre de TASK-1829.
+
+
+## 13. Navegador, sesión directa y consentimiento
+
+`/login` puede iniciar Microsoft sin un cliente OAuth pendiente: sólo la ausencia de `return_to` lleva a
+`/auth/session` exacto. No emite un token ni crea un contexto OAuth. La entrada desde una app conserva el
+retorno `/oauth/authorize` validado. El callback OIDC consume una transacción de un uso ligada al navegador,
+con state, nonce y PKCE, y exige `auth_time` firmado/fresco aun si se modifica `prompt=login` en el navegador.
+
+El consentimiento interno resuelve su proyección de población después de verificar autoridad; no reutiliza
+el reader externo para nombres. HTML usa `Referrer-Policy: strict-origin` para conservar el Origin del POST;
+JSON y redirects mantienen `no-referrer`. El guard CSRF no acepta indiscriminadamente Origin:null. La CSP
+`form-action` de consentimiento añade únicamente el origen del callback ya validado por authorize contra el
+registro del cliente; no sustituye la coincidencia exacta del redirect. La prueba real Chromium del handler
+cubre origen, negativos cross-origin y la cadena POST→authorize→callback; WebKit omitido no cuenta como passed.

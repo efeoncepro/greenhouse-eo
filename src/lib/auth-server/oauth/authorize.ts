@@ -182,7 +182,9 @@ export const handleAuthorize = async (request: OAuthHttpRequest, deps: Authorize
             clientId: client.clientId,
             scopes,
             returnTo: `${url.pathname}${url.search}`,
-            actionPath: OAUTH_ENDPOINT_PATHS.consent
+            actionPath: OAUTH_ENDPOINT_PATHS.consent,
+            // TASK-1837 — ya validado contra el redirect registrado del cliente (arriba).
+            redirectHost: new URL(redirectUri).host
           }),
           {},
           // Already matched against this client's registered redirect before rendering consent.

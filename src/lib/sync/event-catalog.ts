@@ -1250,6 +1250,8 @@ export const EVENT_TYPES = {
   externalGrantGranted: 'identity.external_grant.granted',
   externalInvitationIssued: 'identity.external_invitation.issued',
   externalInvitationLinked: 'identity.external_invitation.linked',
+  /** TASK-1837 — el correo de invitación no salió o rebotó. IDs + código; nunca el token ni el email. */
+  externalInvitationDeliveryFailed: 'identity.external_invitation.delivery_failed',
   externalAccessRevoked: 'identity.external_access.revoked',
 
   // TASK-1836 — audit/observability only; dispatch rechecks authority directly, without an async cache.

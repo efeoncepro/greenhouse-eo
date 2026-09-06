@@ -18,12 +18,14 @@ token. El outbox se replica a BigQuery; lo que entra acá sale del control del d
 | `identity.external_environment.upserted` | `upsertExternalIdentityEnvironment` (creación o cambio real; no-op no emite) | `{ environmentId, issuerUrl, issuerClass, status, previousIssuerUrl, changedByUserId }` — `previousIssuerUrl` es la traza de una rotación de issuer |
 | `identity.external_binding.bound` | `bindExternalOrganization` (creación; el re-bind idempotente no emite) | `{ bindingId, organizationId, environmentId, grantsVersion, designatedAdminProfileId, changedByUserId }` |
 | `identity.external_grant.granted` | `grantExternalCapability` (creación; bump de `grants_version`) | `{ bindingId, grantId, organizationId, environmentId, capability, profileId, grantsVersion, changedByUserId }` — `profileId: null` = grant binding-wide; set = grant per-persona |
-| `identity.external_invitation.issued` | `issueExternalInvitation` (emisión nueva o `reissue: true`) | `{ bindingId, invitationId, organizationId, environmentId, designatedAdmin, profileId, reissue, changedByUserId }` — SIN token, SIN email |
+| `identity.external_invitation.issued` | `issueExternalInvitation` (emisión nueva o `reissue: true`; desde TASK-1837 también `resendExternalInvitation` y `revealExternalInvitationToken`) | `{ bindingId, invitationId, organizationId, environmentId, designatedAdmin, profileId, reissue, deliveryMode, resendOfInvitationId?, revealedFromInvitationId?, changedByUserId }` — SIN token, SIN email |
 | `identity.external_invitation.linked` | `acceptExternalInvitation` (consumer in-process del auth-server, TASK-1830) | `{ bindingId, invitationId, organizationId, environmentId, profileId, linkId, profileCreated, designatedAdmin, changedByUserId }` — SIN subject; `profileCreated` distingue persona nueva (`external_contact`) de persona existente enlazada |
 | `identity.external_access.revoked` | `revokeExternalAccess` con `scope` `binding` \| `grant` \| `member` \| `invitation` (sólo cuando `changed=true`) | `{ scope, bindingId, grantId?, invitationId?, profileId?, organizationId, environmentId, capability?, grantsVersion, revokedGrantIds?, revokedProfileIds?, changedByUserId }` — `grantsVersion` ya bumpeado salvo `scope='invitation'` |
 
-Ningún consumer reactivo escucha estos seis todavía: la invalidación push de `grantsVersion` hacia el gateway es
-`TASK-1831`; hoy el gateway compara `grantsVersion` por igualdad contra el reader ecosystem con TTL ≤ 60 s.
+Ningún consumer reactivo escucha estos seis todavía (tampoco el séptimo, `delivery_failed`, del delta 2026-09-06):
+la invalidación push de `grantsVersion` hacia el gateway es `TASK-1831`; hoy el gateway compara `grantsVersion`
+por igualdad contra el reader ecosystem con TTL ≤ 60 s. El único consumer reactivo del dominio escucha
+`email_delivery.bounced`, no un evento de identity.
 Contrato: `EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md` §`Slice 1 binding foundation — applied`.
 
 ## Delta 2026-09-05 — TASK-1836: población y reconciliación de autoridad
@@ -42,6 +44,30 @@ El command idempotente no vuelve a emitir evidencia ya completa. Timestamps corr
 no al hecho original; actor/razón actuales quedan en audit append-only. Los consumers no deben interpretar
 reconciliación como una nueva concesión de autoridad. No publicar tokens, emails, subjects ni claims.
 Implementación y rollout gobernados por el ADR interno TASK-1836; no asumir regularización ya aplicada.
+
+## Delta 2026-09-06 — TASK-1837: entrega de la invitación externa (1 event nuevo, 1 payload ampliado, 1 consumer reactivo nuevo)
+
+Mismo aggregate `external_identity_binding`. Estado `code complete, rollout pendiente` (migración sin aplicar, flags
+OFF). El contrato de payload de TASK-1631 se mantiene intacto: **NUNCA token, email ni subject** — la entrega del
+correo **no** viaja por el outbox justamente porque el evento `issued` no lleva el secreto; el envío ocurre
+post-commit dentro del command y sólo su RESULTADO se publica.
+
+| Event | Trigger | Payload |
+|---|---|---|
+| `identity.external_invitation.delivery_failed` | `recordExternalInvitationDeliveryOutcome` (`identity/external-access/delivery.ts`) cuando la entrega termina en `failed` (envío post-commit falló) o `bounced` (consumer del rebote); UPDATE de `delivery_*` + audit `invitation_delivery_failed`/`_bounced` + outbox en una transacción | `{ schemaVersion: 1, bindingId, invitationId, organizationId, environmentId, deliveryStatus, errorCode, attempts, changedByUserId }` — SIN token, SIN email; `errorCode` es `bounce:<type>` en el rebote |
+
+- `identity.external_invitation.issued` suma `deliveryMode` (`system` \| `manual`) y, cuando la fila nace de un
+  reenvío o de una revelación, `reissue: true` + `resendOfInvitationId` / `revealedFromInvitationId` (la fila anterior
+  queda `revoked` con `revoke_reason` `resent` / `revealed`); `resendOfInvitationId` también llega desde el reenvío
+  delegado (`resendDelegatedExternalInvitation` → `resendExternalInvitation`, actor `external-admin:<profileId>`), sin
+  evento nuevo.
+- **Consumer reactivo nuevo sobre un evento EXISTENTE:** `external_invitation_delivery_bounced`
+  (`src/lib/sync/projections/external-invitation-delivery-bounced.ts`, domain `notifications`, trigger
+  `email_delivery.bounced`, scope `email_delivery:<deliveryId>`, lane `ops-reactive-notifications` cada 2 min,
+  sin flag) re-lee `email_deliveries` por id y, si `email_type='external_access_invitation'` con correlación
+  `source_entity='external_member_invitations'` + `source_event_id=<invitation_id>`, registra `bounced` vía el
+  mismo helper. Hasta hoy `email_delivery.bounced` no tenía consumidores.
+- `delivery_failed` no tiene consumer reactivo: lo lee la señal `identity.external_invitation.undelivered`.
 
 ## Delta 2026-09-03 — TASK-1349: revisión de offboarding + writeback de lifecycle (0 events nuevos, 1 emisor nuevo)
 
@@ -883,11 +909,12 @@ Invariants:
 | `external_identity_binding` | `identity.external_environment.upserted` | `identity/external-access/commands.ts` (`upsertExternalIdentityEnvironment`) | `{ environmentId, issuerUrl, issuerClass, status, previousIssuerUrl, changedByUserId }` | — (TASK-1831) |
 | `external_identity_binding` | `identity.external_binding.bound` | `identity/external-access/commands.ts` (`bindExternalOrganization`) | `{ bindingId, organizationId, environmentId, grantsVersion, designatedAdminProfileId, changedByUserId }` | — (TASK-1831) |
 | `external_identity_binding` | `identity.external_grant.granted` | `identity/external-access/commands.ts` (`grantExternalCapability`) | `{ bindingId, grantId, organizationId, environmentId, capability, profileId, grantsVersion, changedByUserId }` | — (TASK-1831) |
-| `external_identity_binding` | `identity.external_invitation.issued` | `identity/external-access/commands.ts` (`issueExternalInvitation`) | `{ bindingId, invitationId, organizationId, environmentId, designatedAdmin, profileId, reissue, changedByUserId }` — nunca token ni email | — (TASK-1831) |
+| `external_identity_binding` | `identity.external_invitation.issued` | `identity/external-access/commands.ts` (`issueExternalInvitation`, `resendExternalInvitation`, `revealExternalInvitationToken`) | `{ bindingId, invitationId, organizationId, environmentId, designatedAdmin, profileId, reissue, deliveryMode, resendOfInvitationId?, revealedFromInvitationId?, changedByUserId }` — nunca token ni email | — (TASK-1831) |
 | `external_identity_binding` | `identity.external_invitation.linked` | `identity/external-access/commands.ts` (`acceptExternalInvitation`) | `{ bindingId, invitationId, organizationId, environmentId, profileId, linkId, profileCreated, designatedAdmin, changedByUserId }` — nunca subject | — (TASK-1831) |
 | `external_identity_binding` | `identity.external_access.revoked` | `identity/external-access/commands.ts` (`revokeExternalAccess`) | `{ scope, bindingId, grantId?, invitationId?, profileId?, organizationId, environmentId, capability?, grantsVersion, revokedGrantIds?, revokedProfileIds?, changedByUserId }` | — (TASK-1831) |
+| `external_identity_binding` | `identity.external_invitation.delivery_failed` | `identity/external-access/delivery.ts` (`recordExternalInvitationDeliveryOutcome`, TASK-1837) | `{ schemaVersion: 1, bindingId, invitationId, organizationId, environmentId, deliveryStatus, errorCode, attempts, changedByUserId }` — nunca token ni email | — (observabilidad; señal `identity.external_invitation.undelivered`) |
 
-Regla del aggregate `external_identity_binding` (TASK-1631): los seis payloads llevan sólo IDs y metadatos de autoridad —
+Regla del aggregate `external_identity_binding` (TASK-1631, extendida por TASK-1837): los payloads llevan sólo IDs y metadatos de autoridad —
 **NUNCA** el token de invitación (ni su hash), el email de un tercero, el `subject` del IdP ni claims del token. Detalle
 en el delta `2026-09-04` al inicio de este catálogo.
 
@@ -930,7 +957,11 @@ en el delta `2026-09-04` al inicio de este catálogo.
 | `email_delivery` | `email_delivery.undeliverable_marked` | Hard bounce → client_users.email_undeliverable = true | `{ recipientEmail, userId, reason }`                 |
 
 Publisher: `src/app/api/webhooks/resend/route.ts` (bounce/complaint), `src/lib/email/delivery.ts` (rate_limited)
-Consumer: none yet (future: admin alerts, delivery health metrics)
+Consumer: `email_delivery.bounced` → proyección reactiva `external_invitation_delivery_bounced` (domain
+`notifications`, `src/lib/sync/projections/external-invitation-delivery-bounced.ts`, TASK-1837): re-lee
+`email_deliveries` por id y sólo actúa si `email_type='external_access_invitation'` con correlación a
+`external_member_invitations` (marca `delivery_status='bounced'` vía `recordExternalInvitationDeliveryOutcome`).
+El resto sigue sin consumer (future: admin alerts, delivery health metrics).
 
 ### Hiring — Recuperación de acceso a un assessment (TASK-1746 / TASK-1757)
 

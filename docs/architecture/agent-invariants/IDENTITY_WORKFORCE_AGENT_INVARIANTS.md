@@ -417,9 +417,12 @@ ningún secreto ni PII de terceros salga del dominio.
   SQL: la migración 1 pasó todos los tests y el CHECK bidireccional sólo lo atrapó el smoke `--apply`. Efecto
   colateral esperado de un apply: `identity.external_binding.unbound_dispatch_attempt` en `warning` 24 h.
 - **NUNCA** exponer `token_hash`, el token de invitación, el `subject` ni el email de un tercero en respuestas
-  de API, payloads de outbox, evidencia de señales, Sentry ni logs. El token se devuelve UNA vez desde
-  `issueExternalInvitation` y no vuelve a existir en claro; el detalle del binding (`GET .../bindings/[id]`)
-  lista invitaciones sin `token_hash`; el reader ecosystem responde IDs + `grants[]`, nunca el subject.
+  de API, payloads de outbox, evidencia de señales, Sentry ni logs. El token existe en claro UNA sola vez: el
+  resultado in-process de `issueExternalInvitation` lo conserva sólo para consumidores del mismo proceso (smoke,
+  revelación gobernada); con entrega del sistema (TASK-1837, flag `EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED`)
+  la respuesta HTTP **nunca** lo lleva — sólo con `delivery.mode='manual'` (flag OFF) la ruta admin lo devuelve,
+  y `route.test.ts` lo protege. El detalle del binding (`GET .../bindings/[id]`) lista invitaciones sin
+  `token_hash`; el reader ecosystem responde IDs + `grants[]`, nunca el subject.
 - **SIEMPRE** una capability dedicada por command (`identity.external_environment.manage`,
   `identity.external_binding.read` / `.bind`, `identity.external_grant.issue`,
   `identity.external_invitation.issue`, `identity.external_access.revoke`; módulo `organization`, scope
@@ -441,21 +444,166 @@ ningún secreto ni PII de terceros salga del dominio.
   binding desactiva el source link únicamente si la persona no conserva otra membership activa en el mismo
   environment; el auth-server (`TASK-1830`) lee ese link. Verificar con `resolveExternalAccess` que el outcome
   sea `revoked`, no asumirlo.
-- **NUNCA** agregar un `*_ENABLED` en Greenhouse para este dominio sin pasar por el ledger: hoy no hay flag
-  propio a propósito — los commands los gatea la capability admin, el reader ecosystem sólo responde a bindings
-  `internal` (404 anti-oráculo para el resto) y el uso externo lo gatea `OAUTH_EXTERNAL_ISSUER_ENABLED` del
-  gateway (`TASK-1831`).
+- **NUNCA** agregar un `*_ENABLED` en Greenhouse para este dominio sin pasar por el ledger. Hasta TASK-1631 no
+  había flag propio a propósito; TASK-1837 introdujo dos, ambos default OFF, leídos sólo en Vercel y registrados
+  en `FEATURE_FLAG_STATE_LEDGER.md`: `EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED` (emisión: el sistema envía el
+  correo y retira el token de la respuesta) y `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` (lane ecosystem
+  delegada; OFF ⇒ 404 anti-oráculo). El consumer reactivo del rebote (ops-worker) **no** tiene flag: sólo actúa
+  sobre entregas que ya existen, y un flag ahí reintroduciría el riesgo multi-runtime del ledger. Los commands los
+  sigue gateando la capability admin, el reader ecosystem sólo responde a bindings `internal` (404 anti-oráculo
+  para el resto) y el uso externo lo gatea `OAUTH_EXTERNAL_ISSUER_ENABLED` del gateway (`TASK-1831`).
 
 **Helpers canónicos**: `resolveExternalAccess({ environmentId, subject, clientId? })`
 (`resolve-external-access.ts`) · readers en `store.ts` · `ExternalAccessError` + códigos en `errors.ts` (mapean a
 `external_access_*` en `canonical-error-response.ts`) · adapter Next en `http.ts` (el único archivo `server-only`
 del dominio; el resto lo bundlea `services/auth-server`).
 
-**Observability**: 4 señales `identity.external_binding.*` (`unbound_dispatch_attempt`,
-`revoked_still_dispatching`, `subject_collision`, `orphan_grant`) en
-`src/lib/reliability/queries/external-identity-binding-signals.ts`, steady 0 · Sentry `domain=identity`
+**Observability**: 9 señales en `src/lib/reliability/queries/external-identity-binding-signals.ts` (grupo
+`getExternalIdentityBindingSignals`): 4 de TASK-1631 `identity.external_binding.*` (`unbound_dispatch_attempt`,
+`revoked_still_dispatching`, `subject_collision`, `orphan_grant`), 2 de TASK-1836 (`unaudited_write`,
+`mixed_population`) y 3 de TASK-1837 `identity.external_invitation.*` (`undelivered`, `expired_unaccepted`,
+`token_revealed`); steady 0 salvo `expired_unaccepted` (informativa) · Sentry `domain=identity`
 (`captureWithDomain('identity')`) · `external_identity_audit_log` (qué se hizo) + `external_access_resolution_log`
 (qué se negó).
+
+## Entrega gobernada de la invitación externa y autoridad delegada (TASK-1837)
+
+> Estado 2026-09-06: **`verificado end-to-end en staging (flags ON en staging); follow-ups cerrados sin release;
+> producción pendiente de release; PR #3 del gateway abierto`** — migración
+> `20260906004450748_task-1837-external-invitation-delivery-lifecycle.sql` APLICADA a la instancia compartida
+> (`run_on 2026-09-06T04:27:58Z`), smoke `--apply` verde contra PG real y, con los dos flags encendidos en Vercel
+> staging, recorrido vivo completo sobre un binding externo de prueba (organización fixture + casilla controlada):
+> emisión sin token en la respuesta, correo real de invitación, `/i/<token>` → aceptar 202 → `linked` → magic link
+> real → sesión 200 y reuso 400, rebote forzado con `identity.external_invitation.undelivered` observada
+> encendiéndose (ok → warning), reenvío, revelación gobernada (`token_revealed` en warning) y la lane delegada con
+> el consumer del gateway (200/403/422/201 + correo real). Después (04:00–04:40Z, commits `149ff8934` +
+> `1ddb5f92b`, sólo en `develop`) se cerraron los follow-ups: revocar el binding limpia al admin designado,
+> boundary test del dominio, scope `efeonce.mcp.identity.write`, `organizationId` en la lane y los verbos delegados
+> `resend`/`revoke`; en el gateway `efeonce-mcp` quedó ABIERTO el PR #3 (tools `identity.invitations.list` /
+> `identity.invitation.create`, merge tras el release). Evidencia:
+> `docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`. Pendiente: promoción a producción +
+> los dos flags en Vercel Production (hoy NOT SET; el ops-worker y el auth-server toman el código nuevo en ese
+> release), merge de PR #3 y federación de `resend`/`revoke` delegados, y primera persona externa de un CLIENTE
+> real por decisión del operador (el mecanismo ya está probado).
+
+Cierra el ciclo de vida de `external_member_invitations` que TASK-1631 dejó a mano: el sistema envía el correo de
+invitación (`EmailType` `external_access_invitation`, remitente Efeonce, cuerpo no persistido), registra la entrega en
+`delivery_status`/`delivery_attempts`/`last_delivery_at`/`last_delivery_error_code`, permite reenviar, revelar el token
+como excepción gobernada, y habilita que el admin designado del cliente invite a su propia organización por la lane
+ecosystem. Todo lo que sigue protege lo mismo que TASK-1631 — que el secreto no salga del dominio — más una cosa
+nueva: que la autoridad delegada nunca crezca sola.
+
+**⚠️ Reglas duras**:
+
+- **NUNCA** el token de invitación en el outbox, en logs, en Sentry ni en la respuesta HTTP cuando la entrega es del
+  sistema. El command `issueExternalInvitation` conserva `token` en su resultado sólo para consumidores in-process
+  (smoke con `delivery: 'manual'`, revelación); la ruta admin
+  `POST /api/admin/identity/external-access/bindings/[bindingId]/invitations` lo retira del body y sólo lo expone
+  con `delivery.mode='manual'` (flag OFF) — `route.test.ts` es el guard, y la lane ecosystem no lo devuelve nunca.
+  El evento `identity.external_invitation.delivery_failed` lleva IDs y `errorCode`, sin token ni email.
+- **NUNCA** mover el envío del correo a un consumer reactivo del outbox: el evento `issued` no lleva el secreto (por
+  contrato del catálogo) y un consumer no podría reconstruirlo. El envío ocurre post-commit dentro del command, en
+  el runtime que emitió (Vercel), y su resultado se persiste con `recordExternalInvitationDeliveryOutcome`
+  (Detailed Spec §1 de `TASK-1837`). Lo único reactivo es el rebote: la proyección
+  `external_invitation_delivery_bounced` (domain `notifications`, trigger `email_delivery.bounced`, ops-worker)
+  re-lee `email_deliveries` por id y sólo actúa si `email_type='external_access_invitation'` y la correlación
+  `source_entity='external_member_invitations'` + `source_event_id=<invitation_id>` existe.
+- **SIEMPRE** derivar la URL de aceptación con `resolveInvitationAcceptanceUrl(environment, token)` →
+  `${origin(issuer_url)}/i/<token>` desde `external_identity_environments.issuer_url` del environment del binding.
+  **NUNCA** `NEXT_PUBLIC_APP_URL` ni otra env var (contrato en `delivery.test.ts`): el emisor es un dato del
+  environment, no del runtime. Sólo el provider `efeonce_auth` tiene landing (`PERSON_AUTH_PATHS.invitationLanding`,
+  TASK-1830); otro provider ⇒ `landing_unavailable`.
+- **Reenviar = rotar, NUNCA reexpedir.** `resendExternalInvitation` deja la abierta `revoked` con
+  `revoke_reason='resent'` y crea una fila nueva que hereda `delivery_attempts`; el token anterior deja de valer.
+  Sólo sobre `issued` (`invitation_not_open` 409); topes: 3 reenvíos por cadena (`rate_limited` 429) y 20
+  emisiones+reenvíos+revelaciones por binding y hora. Audit `invitation_resent`; outbox `issued` con
+  `reissue: true, resendOfInvitationId`.
+- **La revelación del token es una excepción gobernada, no un camino.** `revealExternalInvitationToken` exige la
+  capability `identity.external_invitation.reveal_token` (execute) + `reason` ≥10 chars, rota a una fila nueva de
+  **1 h** sin correo (`revoke_reason='revealed'`), escribe audit `invitation_token_revealed` con actor y razón
+  (**NUNCA** el token) y devuelve `{ invitation, token, acceptanceUrl, expiresAt }` una sola vez. La señal
+  `identity.external_invitation.token_revealed` es steady 0: cualquier valor exige actor + razón en el audit.
+- **Fallo de envío = respuesta honesta.** Si el correo no sale, la invitación queda `issued` con
+  `delivery_status='failed'`, audit `invitation_delivery_failed` y evento `delivery_failed`; la respuesta lo dice
+  (`delivery.status`, `errorCode`). **NUNCA** responder "listo" sin correo enviado: la señal
+  `identity.external_invitation.undelivered` cuenta exactamente esas filas.
+- **UN admin designado vigente por binding.** `acceptExternalInvitation` con `designated_admin=true` fija
+  `designated_admin_profile_id` sólo si el binding no tiene otro admin cuya membership siga `linked`; si lo tiene
+  ⇒ `conflict` dentro de la tx (revierte, el token NO se consume). Audit `designated_admin_assigned`. Revocar al
+  admin (`revokeExternalAccess` scope `member`) limpia la columna + audit `designated_admin_cleared`; **revocar el
+  binding también limpia al admin designado** (scope `binding` ⇒ `designated_admin_profile_id = NULL` + audit
+  `designated_admin_cleared` con metadata `{ cause: 'binding_revoked' }`, follow-up `149ff8934`). **NUNCA** dejar
+  un `designated_admin_profile_id` inerte en un binding o membership revocados.
+- **El admin delegado NUNCA se revoca a sí mismo.** `revokeDelegatedExternalInvitation` sobre una invitación
+  `linked` cuyo `profileId` es el del propio admin ⇒ `invalid_request` (quitarse la membership dejaría la
+  organización sin administrador por un acto propio; eso lo hace Efeonce). Sobre una invitación abierta ⇒
+  `revokeExternalAccess` scope `invitation`; sobre otra persona ligada ⇒ scope `member` con bump de
+  `grants_version`. `resendDelegatedExternalInvitation` reenvía (= rota) sólo invitaciones del propio binding; una
+  ajena responde `not_found` anti-oráculo (indistinguible de inexistente). Lane:
+  `POST /api/platform/ecosystem/identity/invitations/[invitationId]/{resend,revoke}` (command harness +
+  `Idempotency-Key`; routeKeys `platform.ecosystem.identity.invitations.{resend,revoke}`).
+- **El delegado NUNCA se eleva ni invita fuera de su binding.** `issueDelegatedExternalInvitation` con
+  `designatedAdmin: true` ⇒ `invalid_request` 422; binding ajeno, `unbound` o membership sin `designatedAdmin`
+  ⇒ `forbidden` 403 sin distinguir causa; tope de asientos (`issued`+`accepted`+`linked` del binding ≥
+  `EXTERNAL_INVITATION_DELEGATED_SEAT_LIMIT`, default 25) ⇒ `limit_reached` 422. Actor
+  `external-admin:<profileId>`; audit metadata `{ delegated: true, delegatedByProfileId }`.
+  `listDelegatedExternalInvitations` lista sólo el binding propio. La capability
+  `identity.external_invitation.issue_delegated` la materializa la membership (las personas externas no tienen
+  ROLE_CODES); el grant a `efeonce_admin` en `runtime.ts` existe por parity/cobertura.
+- **La lane delegada es gateway-mediated por `(environment, subject)`.** `GET|POST
+  /api/platform/ecosystem/identity/invitations` (consumer `internal`; flag delegada OFF ⇒ 404) resuelve la
+  autoridad con `resolveDelegatedAuthority` a partir de `environment` + `subject` verificados por el gateway;
+  el `bindingId` del body es el objetivo a validar, **NUNCA** la fuente de autoridad. **La lane acepta
+  `organizationId` (lo que el gateway resuelve por membership) o `bindingId`**: exactamente uno de los dos
+  (`invalid_request` 422 si faltan ambos); si vienen ambos deben apuntar a la misma membership. Sin piso de
+  latencia a propósito: es una lane máquina y `created true/false` sobre la propia org es una respuesta legítima.
+- **`efeonce.mcp.identity.write` es una clase de blast-radius propia.** Scope de escritura del emisor
+  (`src/lib/auth-server/oauth/scopes.ts`, `EFEONCE_MCP_WRITE_SCOPES`; copy de consentimiento en
+  `src/lib/copy/auth-server.ts`): «administrar a las personas de mi organización» — invitar/reenviar/revocar por la
+  lane delegada. Exige consentimiento explícito + step-up, se emite sólo por el issuer nativo a población externa
+  y **NUNCA** aparece en el `scopes_supported` mínimo (llega por el `403 insufficient_scope` del recurso). El scope
+  responde si ESTE cliente puede pedir esa clase de acción; la autoridad real la sigue decidiendo Greenhouse por la
+  membership `designatedAdmin`. **NUNCA** un scope por capability ni reusar `efeonce.mcp.seo.write` para esto.
+- **Boundary test del dominio.** `src/lib/identity/external-access/boundary-domain.test.ts` es la allowlist de
+  destinos de escritura (`external_*`, `external_access_resolution_log`, `identity_profiles`,
+  `identity_profile_source_links`) y prohíbe escribir `greenhouse_notifications.email_deliveries` (la escribe
+  `sendEmail`) y `greenhouse_sync.outbox_events` (se publica por `publishOutboxEvent`). Una escritura nueva en el
+  dominio se declara ahí o no entra.
+- **SIEMPRE** mostrar el host del `redirect_uri` validado en la pantalla de consentimiento del auth-server:
+  `renderConsentPage` exige `redirectHost` y lanza si falta; `authorize.ts` pasa `new URL(redirectUri).host`
+  (ya validado contra el registro del cliente). Sin flag: aditivo y cierra un MUST del protocolo.
+- **NUNCA** escribir `delivery_status`/`delivery_attempts`/`last_delivery_at`/`last_delivery_error_code` fuera del
+  INSERT de `insertInvitationRow` y de `recordExternalInvitationDeliveryOutcome` (UPDATE + audit
+  `invitation_delivery_failed`/`_bounced` + outbox `delivery_failed` en una transacción). Es el único writer de
+  `delivery_*`; el consumer del rebote también pasa por él.
+- **Rollout: migración ANTES del deploy del código.** `INVITATION_SELECT` ya lee las 4 columnas nuevas; un
+  deploy sin la migración rompe todo reader de invitaciones. Orden: `pnpm pg:connect:migrate` (instancia
+  compartida, exige confirmación) + `SELECT` sobre `information_schema.columns` → deploy con flags OFF + smoke
+  verde → prender `EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED` en staging → prueba viva de correo, rebote,
+  reenvío y revelación → lane delegada → producción.
+
+**Helpers canónicos**: `readExternalInvitationConfig(env)` (`config.ts`: flags, seat limit, topes y TTL) ·
+`resolveInvitationAcceptanceUrl`, `sendInvitationEmailViaPlatform` (import dinámico de `@/lib/email/delivery`),
+`maskEmail`, `recordExternalInvitationDeliveryOutcome` (`delivery.ts`) · `resendExternalInvitation`,
+`revealExternalInvitationToken`, `resolveDelegatedAuthority` (`bindingId` | `organizationId`),
+`issueDelegatedExternalInvitation`, `listDelegatedExternalInvitations`, `resendDelegatedExternalInvitation`,
+`revokeDelegatedExternalInvitation` (`commands.ts`) · scope `efeonce.mcp.identity.write`
+(`src/lib/auth-server/oauth/scopes.ts`) · boundary test `boundary-domain.test.ts` · códigos `forbidden` (403), `rate_limited` (429),
+`limit_reached` (422 → `external_access_limit_reached`) en `errors.ts`/`http.ts` · resource ecosystem
+`src/lib/api-platform/resources/ecosystem-identity-invitations.ts` · plantilla
+`src/emails/ExternalAccessInvitationEmail.tsx` + copy `emails.auth.externalAccessInvitation` · kill-switch
+`greenhouse_notifications.email_type_config('external_access_invitation')`.
+
+**Observability**: 3 señales `identity.external_invitation.*` en el mismo reader del grupo (9 en total):
+`undelivered` (incident; `issued` no caducadas con `delivery_status IN ('failed','bounced')`; warning ≥1, error ≥5;
+steady 0), `expired_unaccepted` (data_quality; vencidas sin `accepted_at` en 7 días; warning ≥1, NUNCA error) y
+`token_revealed` (incident; audit `invitation_token_revealed` en 24 h; warning ≥1, error ≥5; steady 0) · 6 tipos de
+audit nuevos en `external_identity_audit_log`: `invitation_resent`, `invitation_token_revealed`,
+`invitation_delivery_failed`, `invitation_delivery_bounced`, `designated_admin_assigned`, `designated_admin_cleared`
+· evento outbox nuevo `identity.external_invitation.delivery_failed` (sin consumer reactivo; observabilidad) ·
+`identity.external_invitation.issued` suma `deliveryMode` y, en reenvío/revelación, `reissue: true` +
+`resendOfInvitationId` / `revealedFromInvitationId` · smoke `pnpm identity:external-access:smoke` (read-only) lee
+las 9 señales.
 
 ## Auth server propio (TASK-1828 / TASK-1829)
 
@@ -668,3 +816,26 @@ Un flujo de recuperación self-service reintroduce exactamente esa puerta.
     crecimiento no acotado disparable por un tercero anónimo. El GC (`pnpm auth:gc`) se está
     construyendo aparte; hasta que exista y quede agendado, **NUNCA** registrar este endpoint como
     cubierto por el anti-abuso de `auth_rate_limits`.
+
+## Sesión corporativa y autoridad nativa (TASK-1836 / TASK-1831)
+
+Canon: [autoridad interna](../EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md) y
+[contrato OAuth](../EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md).
+
+- OIDC corporativo, sesión Efeonce ID y autorización MCP son fronteras distintas. Tenant + OID firmados
+  resuelven enrollment; no auto-merge por email, invitación externa ficticia ni cookie Greenhouse compartida.
+- `SubjectSessionPort.resolve` conserva procedencia. Población/binding/contexto verificables gobiernan
+  consentimiento y token; `authorizationContextId` fija el contexto y `gv` su versión, nunca un máximo
+  entre organizaciones. Un reader externo no sirve de fallback para un binding interno.
+- Refresh conserva identidad, contexto y `auth_time`; claims upstream de MFA no acreditan step-up local.
+  No imponer `auth_time <= iat` ni relajar `exp`: el callback valida frescura firmada frente a presente y
+  transacción, además de issuer/audiencia/firma/nonce/PKCE y consumo único.
+- El reader interno consulta autoridad y ledger por `jti` firmado antes de dispatch; revocar familia/token
+  no debe permitir uso hasta expiración ni revocar otra familia por compartir contexto. No caché positiva
+  de permisos en esta cohorte. JWKS y permisos tienen cachés/contratos diferentes.
+- `/login` directo y OAuth con retorno requieren pruebas distintas. Sólo retorno ausente selecciona el
+  landing fijo `/auth/session`; validar al inicio y callback, sin inventar contexto o token MCP. HTML/JSON
+  de sesión comparten resolver y revocación. Conservar botón/primitives existentes.
+- Publicar UI, activar flags, completar SSO y emitir/usar/revocar un token son evidencias distintas. Leer
+  runtime y medir deny con token vigente; preservar expiración/cohorte original al restaurar un canary.
+  Runbook: [rollout interno](../../operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).

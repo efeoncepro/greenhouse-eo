@@ -1,5 +1,21 @@
 # TASK-1835 — Efeonce ID: pantallas de login, consentimiento y recuperación en `auth.efeonce.org`
 
+## Delta 2026-09-06 — el dato del destino YA se renderiza en el consentimiento (TASK-1837 Slice 5a)
+
+`TASK-1837` (commits `5518d868e…189148c6e`; el host es `189148c6e`; code complete, migración aplicada 2026-09-06
+—no afecta este slice—, flags OFF; lo que falta para este dato es el deploy del auth-server y la captura GVC —
+`docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`) entregó lo que el delta del
+2026-09-05 pedía como dato: `renderConsentPage`
+(`src/lib/auth-server/oauth/pages/render.ts`) ahora **exige** `redirectHost` (lanza si falta) y renderiza el
+bloque `data-capture="id-redirect-host"` con "Destino de la autorización: <host>" + la nota "El código de
+autorización se enviará a esta dirección." (`GH_AUTH_SERVER.consent_redirect_host_{label,hint}` en
+`src/lib/copy/auth-server.ts`), usando las clases existentes `id-context` / `id-muted` / `code`; `authorize.ts`
+pasa `new URL(redirectUri).host` ya validado contra el cliente; `scripts/auth-server/dev-ui-server.ts` y
+`render.test.ts` actualizados. Sin flag (aditivo, cierra un MUST de la spec MCP). **Esta task conserva el
+tratamiento visual** del bloque (posición en la ficha de aplicación, jerarquía frente a la marca verificada y al
+aviso de app no verificada, captura GVC claro/oscuro/390px). La pregunta abierta del `consent_footer` («desde
+Efeonce» sin decir a dónde) sigue siendo de esta task.
+
 ## Delta 2026-09-05 — dirección aprobada, implementada y pendiente de build
 
 El operador eligió la dirección **A · «Nocturno editorial»** entre tres exploradas en un lienzo de

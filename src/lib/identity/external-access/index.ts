@@ -8,6 +8,15 @@
 
 export * from './types'
 export * from './errors'
+export { readExternalInvitationConfig, type ExternalInvitationConfig } from './config'
+export {
+  buildInvitationDelivery,
+  maskEmail,
+  recordExternalInvitationDeliveryOutcome,
+  resolveInvitationAcceptanceUrl,
+  EXTERNAL_INVITATION_EMAIL_TYPE,
+  EXTERNAL_INVITATION_SOURCE_ENTITY
+} from './delivery'
 export {
   buildExternalIdpSourceSystem,
   EXTERNAL_IDP_SOURCE_OBJECT_TYPE,
@@ -30,15 +39,29 @@ export {
   acceptExternalInvitation,
   bindExternalOrganization,
   grantExternalCapability,
+  issueDelegatedExternalInvitation,
   issueExternalInvitation,
+  listDelegatedExternalInvitations,
+  resendDelegatedExternalInvitation,
+  resendExternalInvitation,
+  resolveDelegatedAuthority,
+  revokeDelegatedExternalInvitation,
+  revealExternalInvitationToken,
   revokeExternalAccess,
   upsertExternalIdentityEnvironment,
   type AcceptExternalInvitationInput,
   type AcceptExternalInvitationResult,
   type BindExternalOrganizationInput,
   type GrantExternalCapabilityInput,
+  type DelegatedAuthorityInput,
+  type DelegatedInvitationTargetInput,
+  type IssueDelegatedExternalInvitationInput,
   type IssueExternalInvitationInput,
+  type IssueExternalInvitationOptions,
   type IssueExternalInvitationResult,
+  type ResendExternalInvitationInput,
+  type RevealExternalInvitationTokenInput,
+  type RevealExternalInvitationTokenResult,
   type RevokeExternalAccessInput,
   type RevokeExternalAccessResult,
   type UpsertExternalIdentityEnvironmentInput

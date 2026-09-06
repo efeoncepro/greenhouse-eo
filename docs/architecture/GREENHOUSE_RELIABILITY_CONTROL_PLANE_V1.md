@@ -5,7 +5,7 @@
 > Versión: `1.22`
 > Estado: `vigente`
 > Creada: `2026-04-25` por TASK-600
-> Última actualización: `2026-09-04` por el release `9100bbd2765d` (semántica de `platform.release.worker_revision_drift`: change-gate por servicio — `ops-worker` + `auth-server` — con espejo de rutas y test de paridad; 5 servicios Cloud Run mapeados). Ese mismo día TASK-1829 agregó 3 signals `incident` de la superficie OAuth del emisor propio bajo el módulo `identity` (`auth.oauth.code_reuse_detected`, `auth.oauth.refresh_reuse_detected`, `auth.oauth.cimd_rejected`), TASK-1828 `auth.issuer.jwks_unreachable` + `auth.signing_keys.lifecycle` y TASK-1631 las 4 de `identity.external_binding.*`.
+> Última actualización: `2026-09-06` por TASK-1837 (3 signals del ciclo de vida de la invitación externa `identity.external_invitation.*` — `undelivered`, `expired_unaccepted`, `token_revealed` — en el mismo grupo `getExternalIdentityBindingSignals`, que pasa a 9 readers; verificado end-to-end en staging el 2026-09-06 con `undelivered` y `token_revealed` observadas encendiéndose; producción pendiente de release). Antes, `2026-09-04` por el release `9100bbd2765d` (semántica de `platform.release.worker_revision_drift`: change-gate por servicio — `ops-worker` + `auth-server` — con espejo de rutas y test de paridad; 5 servicios Cloud Run mapeados). Ese mismo día TASK-1829 agregó 3 signals `incident` de la superficie OAuth del emisor propio bajo el módulo `identity` (`auth.oauth.code_reuse_detected`, `auth.oauth.refresh_reuse_detected`, `auth.oauth.cimd_rejected`), TASK-1828 `auth.issuer.jwks_unreachable` + `auth.signing_keys.lifecycle` y TASK-1631 las 4 de `identity.external_binding.*` (TASK-1836 sumó `unaudited_write` + `mixed_population` el 2026-09-05).
 
 ## Delta 2026-09-04 — Release `9100bbd2765d`: `platform.release.worker_revision_drift` clasifica el change-gate por servicio
 
@@ -79,6 +79,38 @@ manual sobre `greenhouse_auth.signing_keys`. Runbook: `docs/operations/runbooks/
 [`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md).
 Flag: `AUTH_SERVER_ENABLED` (Cloud Run, SoT `deploy.sh`; ledger `FEATURE_FLAG_STATE_LEDGER.md`). Task dueña:
 `TASK-1828`.
+
+## Delta 2026-09-06 — TASK-1837: 3 señales del ciclo de vida de la invitación externa (`identity.external_invitation.*`)
+
+Tres señales nuevas en el mismo reader
+[`external-identity-binding-signals.ts`](../../src/lib/reliability/queries/external-identity-binding-signals.ts),
+`moduleKey='identity'`, compuestas en el grupo `getExternalIdentityBindingSignals` que pasa de 6 a **9 readers**
+(4 de TASK-1631 + 2 de TASK-1836 + estas 3); `/admin/operations` ya las muestra sin cableado nuevo y
+`pnpm identity:external-access:smoke` (read-only) las lee. Observan la entrega gobernada de
+`external_member_invitations` (columnas `delivery_status`/`delivery_attempts`/`last_delivery_*` de la migración
+`20260906004450748`, **aplicada 2026-09-06** a la instancia compartida; las 9 señales leen contra PG real sin
+`unknown`; `token_revealed` se vio encender ok→warning con el smoke `--apply` y, en la verificación viva en
+staging del 2026-09-06 con los flags ON, **`undelivered` se observó encendiéndose ok→warning** ante un rebote real
+de Resend (`bounced@resend.dev` → `delivery_status='bounced'`, `bounce:Permanent`) y **`token_revealed`** volvió a
+encenderse con la revelación gobernada en staging (2 en 24 h) — evidencia en
+`docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`). Estado: `verificado end-to-end en
+staging (flags ON en staging); producción pendiente de release` (la proyección del rebote se drenó localmente
+porque el ops-worker corre `main`; la federación de la lane delegada en el gateway sigue pendiente).
+
+| `signalId` | `kind` | Qué mide | Severidad | Steady |
+| --- | --- | --- | --- | --- |
+| `identity.external_invitation.undelivered` | `incident` | Invitaciones `issued` no caducadas con `delivery_status IN ('failed','bounced')`: el operador emitió, el sistema prometió el correo y la persona no lo tiene — el envío post-commit falló o Resend rebotó (consumer `external_invitation_delivery_bounced`). Recuperación: reenviar (`POST …/invitations/[id]/resend`, rota el token) o corregir el correo con una emisión nueva | `0 → ok`; `1-4 → warning`; `≥5 → error` | **0** |
+| `identity.external_invitation.expired_unaccepted` | `data_quality` | Invitaciones `expired`, o `issued` ya vencidas, sin `accepted_at` en los últimos 7 días: fricción de adopción (nadie abrió el link a tiempo), no un incidente | `0 → ok`; `≥1 → warning`; **nunca** `error` (informativa) | 0 deseable; >0 tolerado |
+| `identity.external_invitation.token_revealed` | `incident` | Filas `invitation_token_revealed` del `external_identity_audit_log` en 24 h: un operador sacó el token en claro por la excepción gobernada (`revealExternalInvitationToken`, capability `identity.external_invitation.reveal_token`, razón ≥10 chars, fila de 1 h). Cualquier valor exige actor + razón en el audit; el token nunca está en la evidencia | `0 → ok`; `1-4 → warning`; `≥5 → error` | **0** |
+
+Recuperación siempre por los commands canónicos de `src/lib/identity/external-access/commands.ts` y el helper
+`recordExternalInvitationDeliveryOutcome` (`delivery.ts`, único writer de `delivery_*`) — **nunca** UPDATE manual de
+`delivery_status` ni INSERT en el audit para silenciar `token_revealed`. Sin flag para las señales (los dos flags de
+TASK-1837 gatean la emisión y la lane delegada, no la observación). Contrato: invariantes en
+[`agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md`](agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md)
+§`Entrega gobernada de la invitación externa y autoridad delegada (TASK-1837)`; evento
+`identity.external_invitation.delivery_failed` en `GREENHOUSE_EVENT_CATALOG_V1.md` (delta 2026-09-06). Task dueña:
+`TASK-1837`.
 
 ## Delta 2026-09-05 — TASK-1836: integridad de auditoría compartida
 

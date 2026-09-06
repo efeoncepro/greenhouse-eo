@@ -1,5 +1,23 @@
 # TASK-1012 — Invitación al portal: URL de activación cross-env + sync de estado de entrega (Resend)
 
+## Delta 2026-09-06 — TASK-1837 resolvió ambos gaps PARA EL EMISOR (Efeonce ID), no para el portal
+
+- `TASK-1837` (commits `5518d868e…189148c6e`; code complete, migración aplicada 2026-09-06, flags OFF, correo real
+  pendiente — `docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`) cerró los dos gaps de esta task en la
+  invitación de **acceso externo al MCP** (`external_member_invitations`, aceptada en `auth.efeonce.org`):
+  la URL de aceptación se deriva de `external_identity_environments.issuer_url` del environment del binding
+  (`resolveInvitationAcceptanceUrl`, `src/lib/identity/external-access/delivery.ts`), **nunca** de
+  `NEXT_PUBLIC_APP_URL` ni de env vars (test de contrato); y el estado de entrega se persiste en la propia
+  invitación (`delivery_status`, `delivery_attempts`, `last_delivery_at`, `last_delivery_error_code`) con un
+  consumer reactivo del evento `email_delivery.bounced` en el ops-worker
+  (`src/lib/sync/projections/external-invitation-delivery-bounced.ts`) y la señal
+  `identity.external_invitation.undelivered`.
+- **La invitación al portal cliente (`inviteClientPortalUser`, `invite-client-portal-user.ts`) sigue siendo de
+  esta task**: mantiene `NEXT_PUBLIC_APP_URL` y `email_deliveries` sin sync de bounce. Converger ambas en una
+  primitive de invitación (URL derivada del emisor + entrega persistida + consumer de rebote) es un follow-up a
+  declarar aquí; el consumer de rebote y `durableSensitiveSource` (`source_entity` + `source_event_id`) ya son
+  reutilizables como patrón.
+
 > **Lifecycle:** to-do
 > **Type:** implementation
 > **Priority:** P2

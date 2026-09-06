@@ -120,9 +120,19 @@ export type ConsentPageInput = {
   /** Path + query del authorize original (mismo origen) al que se vuelve tras consentir. */
   returnTo: string
   actionPath: string
+  /**
+   * TASK-1837 — HOST del `redirect_uri` ya validado contra el cliente (host, no la URL completa: la
+   * query puede llevar `state`). Obligatorio: el consentimiento NUNCA se renderiza sin decir a dónde
+   * va el código (MUST del protocolo MCP/OAuth; `render.test.ts`).
+   */
+  redirectHost: string
 }
 
 export const renderConsentPage = (input: ConsentPageInput): string => {
+  if (typeof input.redirectHost !== 'string' || input.redirectHost.trim().length === 0) {
+    throw new Error('renderConsentPage requires redirectHost: consent must disclose the authorization destination')
+  }
+
   const organizationItems = input.organizations.map(organization => `<li>
     ${ICON_BUILDING}
     <strong>${escapeHtml(organization.organizationName)}</strong>
@@ -146,6 +156,7 @@ export const renderConsentPage = (input: ConsentPageInput): string => {
     GH_AUTH_SERVER.consent_title,
     `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.consent_title)}</h1>
   <p>${escapeHtml(GH_AUTH_SERVER.consent_context_intro(input.organizations.length))}</p>
+  <p class="id-context" data-capture="id-redirect-host"><span class="id-muted">${escapeHtml(GH_AUTH_SERVER.consent_redirect_host_label)}</span> <code class="code">${escapeHtml(input.redirectHost.trim())}</code> <span class="id-muted">${escapeHtml(GH_AUTH_SERVER.consent_redirect_host_hint)}</span></p>
   <h2 class="id-muted">${escapeHtml(input.organizations.length === 1 ? GH_AUTH_SERVER.consent_organization_label : GH_AUTH_SERVER.consent_organizations_label)}</h2>
   <ul class="id-organizations" aria-label="${escapeHtml(GH_AUTH_SERVER.consent_organizations_label)}">${organizationItems}</ul>
   <ul class="id-permissions" aria-label="${escapeHtml(GH_AUTH_SERVER.consent_scope_label)}">

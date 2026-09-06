@@ -1488,6 +1488,24 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       scope: 'tenant',
       source: 'role'
     })
+
+    // TASK-1837 — excepción gobernada de revelación y emisión delegada (operador de Efeonce;
+    // en la lane ecosystem la capability se sintetiza desde la membership designada).
+    addEntitlement(entries, {
+      module: 'organization',
+      capability: 'identity.external_invitation.reveal_token',
+      action: 'execute',
+      scope: 'tenant',
+      source: 'role'
+    })
+
+    addEntitlement(entries, {
+      module: 'organization',
+      capability: 'identity.external_invitation.issue_delegated',
+      action: 'create',
+      scope: 'tenant',
+      source: 'role'
+    })
   }
 
   // TASK-1836 — Fine-grained internal authority, granted only to the canonical operator role.

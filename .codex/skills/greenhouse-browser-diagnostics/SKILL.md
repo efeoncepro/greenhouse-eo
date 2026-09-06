@@ -16,7 +16,8 @@ When the user asks to inspect a Greenhouse route, do not ask them to remind you 
 - Playwright with Chromium or the Chrome/Playwright MCP tools available in the session
 - the canonical staging `.vercel.app` URL plus Vercel automation bypass when the target is protected
 
-Do not use anonymous navigation as the first diagnostic path. Do not silence UI errors. Treat visible reliability, warning, or error states as product signals and investigate their underlying API, data, env, queue, or platform cause.
+For authenticated portal routes, do not use anonymous navigation as the first diagnostic path. Public
+identity/login routes are the explicit exception described in §Public identity entry below. Do not silence UI errors. Treat visible reliability, warning, or error states as product signals and investigate their underlying API, data, env, queue, or platform cause.
 
 ## Visual UI Verification Hook
 
@@ -99,3 +100,17 @@ Report:
 - what remains unresolved
 
 Prefer root-cause fixes over hiding or muting UI signals.
+
+## Public identity entry (TASK-1836)
+
+The authenticated portal default above does not apply to public `auth.efeonce.org` login diagnostics.
+Inspect plain `/login` anonymously, without `return_to`, and the OAuth-context entry separately. An agent
+portal cookie, reused Efeonce ID session or local `/start` harness cannot prove the missing-button case.
+Reuse existing UI; capture desktop/390 px, keyboard and the actual click destination. State explicitly
+whether only redirect to Microsoft or the full human return/session was verified.
+
+For native auth form failures use `scripts/auth-server/probe-form-origin.mjs` with a real browser: Origin,
+Referrer-Policy and CSP form-action across the redirect chain are not reproduced by a synthetic fetch.
+Do not loosen CSRF or accept null Origin. Load `efeonce-mcp-platform/references/native-authority.md` for
+return-target constraints and layered OAuth proof. Suppress codes, tokens, cookies and full callback URLs
+from traces/screenshots/tool output; record safe stages and closed diagnostics instead.

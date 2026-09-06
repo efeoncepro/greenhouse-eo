@@ -27,6 +27,12 @@ export const EXTERNAL_BINDING_REVOKED_STILL_DISPATCHING_SIGNAL_ID =
 export const EXTERNAL_BINDING_SUBJECT_COLLISION_SIGNAL_ID = 'identity.external_binding.subject_collision'
 export const EXTERNAL_BINDING_ORPHAN_GRANT_SIGNAL_ID = 'identity.external_binding.orphan_grant'
 
+// TASK-1837 — ciclo de vida de la invitación (entrega, caducidad, excepción de revelación).
+export const EXTERNAL_INVITATION_UNDELIVERED_SIGNAL_ID = 'identity.external_invitation.undelivered'
+export const EXTERNAL_INVITATION_EXPIRED_UNACCEPTED_SIGNAL_ID = 'identity.external_invitation.expired_unaccepted'
+export const EXTERNAL_INVITATION_TOKEN_REVEALED_SIGNAL_ID = 'identity.external_invitation.token_revealed'
+const EXPIRED_WINDOW_DAYS = 7
+
 const WINDOW_HOURS = 24
 const REVOCATION_GRACE_MINUTES = 5
 
@@ -394,6 +400,126 @@ export const getExternalBindingMixedPopulationSignal = async (): Promise<Reliabi
   }
 }
 
+/**
+ * TASK-1837 — undelivered: invitación ABIERTA (`issued`, no caducada) cuyo correo falló o rebotó.
+ * Steady 0. Es la diferencia entre "no llegó" y "llegó y no la usó": el operador reenvía (rota).
+ */
+export const getExternalInvitationUndeliveredSignal = async (): Promise<ReliabilitySignal> => {
+  const observedAt = new Date().toISOString()
+  const signalId = EXTERNAL_INVITATION_UNDELIVERED_SIGNAL_ID
+  const source = 'greenhouse_core.external_member_invitations'
+  const label = 'Invitaciones externas sin entregar'
+
+  try {
+    const count = toCount(
+      await query<CountRow>(
+        `SELECT COUNT(*)::text AS n
+           FROM greenhouse_core.external_member_invitations
+          WHERE status = 'issued'
+            AND expires_at > NOW()
+            AND delivery_status IN ('failed', 'bounced')`
+      )
+    )
+
+    return buildSignal({
+      signalId,
+      source,
+      label,
+      kind: 'incident',
+      count,
+      errorAt: 5,
+      summaryOk: 'Toda invitación externa abierta tiene su correo entregado o pendiente de confirmar.',
+      summaryHit: n => `${n} invitaciones externas abiertas con correo fallido o rebotado; reenviar (rota el token).`,
+      metricLabel: 'undelivered_count',
+      sqlLabel: 'open invitations with delivery_status failed/bounced',
+      observedAt
+    })
+  } catch (error) {
+    return buildUnknownSignal({ signalId, source, label, kind: 'incident', observedAt, error })
+  }
+}
+
+/**
+ * TASK-1837 — expired_unaccepted: invitaciones que caducaron sin aceptarse en los últimos 7 días
+ * (incluye las `issued` vencidas que nadie marcó todavía: el estado `expired` se fija al intentar
+ * aceptar). Informativa: nunca escala a error; señala fricción de adopción, no un incidente.
+ */
+export const getExternalInvitationExpiredUnacceptedSignal = async (): Promise<ReliabilitySignal> => {
+  const observedAt = new Date().toISOString()
+  const signalId = EXTERNAL_INVITATION_EXPIRED_UNACCEPTED_SIGNAL_ID
+  const source = 'greenhouse_core.external_member_invitations'
+  const label = 'Invitaciones externas caducadas sin aceptar'
+
+  try {
+    const count = toCount(
+      await query<CountRow>(
+        `SELECT COUNT(*)::text AS n
+           FROM greenhouse_core.external_member_invitations
+          WHERE (status = 'expired' OR (status = 'issued' AND expires_at <= NOW()))
+            AND accepted_at IS NULL
+            AND expires_at >= NOW() - ($1::text || ' days')::interval`,
+        [String(EXPIRED_WINDOW_DAYS)]
+      )
+    )
+
+    return buildSignal({
+      signalId,
+      source,
+      label,
+      kind: 'data_quality',
+      count,
+      errorAt: Number.POSITIVE_INFINITY,
+      summaryOk: 'Ninguna invitación externa caducó sin aceptarse en los últimos 7 días.',
+      summaryHit: n => `${n} invitaciones externas caducaron sin aceptarse en 7 días; revisar entrega y reenviar si corresponde.`,
+      metricLabel: 'expired_unaccepted_count',
+      sqlLabel: 'invitations expired without acceptance (7 days)',
+      observedAt
+    })
+  } catch (error) {
+    return buildUnknownSignal({ signalId, source, label, kind: 'data_quality', observedAt, error })
+  }
+}
+
+/**
+ * TASK-1837 — token_revealed: usos de la excepción gobernada (`invitation_token_revealed` en el
+ * audit) en 24 h. Steady 0: cualquier valor > 0 exige que el audit tenga actor y razón registrados;
+ * ≥ 5 es la excepción convirtiéndose en el camino normal.
+ */
+export const getExternalInvitationTokenRevealedSignal = async (): Promise<ReliabilitySignal> => {
+  const observedAt = new Date().toISOString()
+  const signalId = EXTERNAL_INVITATION_TOKEN_REVEALED_SIGNAL_ID
+  const source = 'greenhouse_core.external_identity_audit_log'
+  const label = 'Tokens de invitación revelados'
+
+  try {
+    const count = toCount(
+      await query<CountRow>(
+        `SELECT COUNT(*)::text AS n
+           FROM greenhouse_core.external_identity_audit_log
+          WHERE event_type = 'invitation_token_revealed'
+            AND created_at >= NOW() - ($1::text || ' hours')::interval`,
+        [String(WINDOW_HOURS)]
+      )
+    )
+
+    return buildSignal({
+      signalId,
+      source,
+      label,
+      kind: 'incident',
+      count,
+      errorAt: 5,
+      summaryOk: 'Nadie usó la excepción de revelación del token de invitación en 24 h.',
+      summaryHit: n => `${n} revelaciones de token de invitación en 24 h; verificar actor y razón en el audit.`,
+      metricLabel: 'token_revealed_count',
+      sqlLabel: 'audit rows invitation_token_revealed (24h)',
+      observedAt
+    })
+  } catch (error) {
+    return buildUnknownSignal({ signalId, source, label, kind: 'incident', observedAt, error })
+  }
+}
+
 export type ExternalIdentityBindingSignalReader = {
   readonly signalId: string
   readonly read: () => Promise<ReliabilitySignal>
@@ -412,7 +538,10 @@ export const EXTERNAL_IDENTITY_BINDING_SIGNAL_READERS: ReadonlyArray<ExternalIde
   { signalId: EXTERNAL_BINDING_SUBJECT_COLLISION_SIGNAL_ID, read: getExternalBindingSubjectCollisionSignal },
   { signalId: EXTERNAL_BINDING_ORPHAN_GRANT_SIGNAL_ID, read: getExternalBindingOrphanGrantSignal },
   { signalId: EXTERNAL_BINDING_UNAUDITED_WRITE_SIGNAL_ID, read: getExternalBindingUnauditedWriteSignal },
-  { signalId: EXTERNAL_BINDING_MIXED_POPULATION_SIGNAL_ID, read: getExternalBindingMixedPopulationSignal }
+  { signalId: EXTERNAL_BINDING_MIXED_POPULATION_SIGNAL_ID, read: getExternalBindingMixedPopulationSignal },
+  { signalId: EXTERNAL_INVITATION_UNDELIVERED_SIGNAL_ID, read: getExternalInvitationUndeliveredSignal },
+  { signalId: EXTERNAL_INVITATION_EXPIRED_UNACCEPTED_SIGNAL_ID, read: getExternalInvitationExpiredUnacceptedSignal },
+  { signalId: EXTERNAL_INVITATION_TOKEN_REVEALED_SIGNAL_ID, read: getExternalInvitationTokenRevealedSignal }
 ]
 
 export const getExternalIdentityBindingSignals = async (): Promise<ReliabilitySignal[]> => {

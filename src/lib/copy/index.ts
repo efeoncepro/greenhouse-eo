@@ -137,6 +137,7 @@ export type {
   LoadingCopy,
   Locale,
   MagicLinkEmailTemplateCopy,
+  ExternalAccessInvitationEmailTemplateCopy,
   MicrocopyDictionary,
   MicrocopyNamespace,
   AiVisibilityGraderReportEmailTemplateCopy,

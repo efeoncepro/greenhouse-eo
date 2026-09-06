@@ -1,5 +1,29 @@
 # TASK-1832 — Efeonce MCP Client Canaries and First Customer Cohort Rollout
 
+## Delta 2026-09-06 — prerrequisitos de la cohorte que trae TASK-1837 (verificados en staging; queda release a producción + federación en el gateway)
+
+- `TASK-1837` (commits `5518d868e…189148c6e`, **migración aplicada 2026-09-06 y verificado end-to-end en staging el
+  2026-09-06 con los dos flags ON en staging** — `docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`)
+  deja probadas tres cosas que la primera cohorte necesita: entrega automática de la invitación por correo (flag
+  `EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED`, reenvío/rebote/revelación gobernados), el host del `redirect_uri`
+  visible en la pantalla de consentimiento (sin flag, aditivo) y la lane delegada por la que el administrador
+  designado del cliente invita a su propia gente (`GET/POST /api/platform/ecosystem/identity/invitations`, flag
+  `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED`, OFF ⇒ 404).
+- **Dependencia nueva para la cohorte:** la lane delegada exige federación en `efeonce-mcp` — el gateway verifica
+  el JWT de la persona y llama a Greenhouse con `(environment, subject)` como ya hace para `identity/binding`;
+  Greenhouse no conoce personas en ese harness. Sin esa federación (TASK-1831 + esta task) el cliente no puede
+  invitar a nadie desde un cliente MCP y toda invitación sigue pasando por un operador de Efeonce. La lane ya
+  respondió correcto en staging al token del consumer del gateway (`efeonce-mcp-gateway-greenhouse-token`) con el
+  `subject` de una persona externa real: lista del binding propio 200, binding ajeno 403, auto-elevación 422 e
+  invitación delegada 201 con correo real recibido; falta la tool MCP que la llame con el JWT de la persona.
+- Antes de la cohorte, verificado en staging el 2026-09-06: migración `20260906004450748_task-1837-…` ✔ aplicada;
+  flags ON en staging; remitente Efeonce funcionando en Resend (correo real de invitación y magic link recibidos);
+  persona externa de prueba con sesión viva en `auth.efeonce.org` y muerta al revocar el binding; rebote forzado
+  con `undelivered` encendiéndose; consentimiento con host del `redirect_uri` capturado en dev-UI (1440/390).
+  Quedan sólo: promoción de `develop` → `main` con los flags en Vercel Production (24 h de observación) y la
+  federación de la lane delegada en el gateway; la primera persona de un CLIENTE real sigue siendo decisión del
+  operador.
+
 ## Delta 2026-09-04 — acceso interno nativo (TASK-1836)
 
 La matriz incorpora empleados Efeonce por emisor nativo además de clientes externos y carril Entra existente. El canary interno depende de TASK-1836 + integración TASK-1831/1835; usar la identidad real indicada por operador y organización canónica, sin reclasificar Efeonce ni crear excepciones de prueba.

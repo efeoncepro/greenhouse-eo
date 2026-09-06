@@ -45,6 +45,23 @@ export const emails: EmailsCopy = {
       fallback: 'Si el botón no funciona, copia y pega esta dirección en tu navegador:',
       previewText: expiresInMinutes => `Enlace de acceso a Efeonce — válido por ${expiresInMinutes} minutos`
     },
+    // TASK-1837 — invitación enviada por el sistema; la persona es externa y conoce a Efeonce, no al portal.
+    externalAccessInvitation: {
+      heading: 'Te invitaron a Efeonce',
+      greeting: 'Hola,',
+      body: organizationName =>
+        organizationName
+          ? `recibiste una invitación para acceder a Efeonce en nombre de ${organizationName}. Con este acceso podrás autorizar aplicaciones que trabajan con tu organización.`
+          : 'recibiste una invitación para acceder a Efeonce. Con este acceso podrás autorizar aplicaciones que trabajan con tu organización.',
+      validityPrefix: 'Este enlace funciona una sola vez y expira en',
+      validityBold: expiresInHours => `${expiresInHours} horas`,
+      cta: 'Aceptar invitación',
+      afterAccept: 'Al aceptar te enviaremos un enlace de acceso a este mismo correo para confirmar que eres tú.',
+      issuerNote: issuerHost => `Este enlace te lleva a ${issuerHost}, el servicio de identidad de Efeonce.`,
+      disclaimer: 'Si no esperabas esta invitación, ignora este correo: nadie puede entrar sin este enlace.',
+      fallback: 'Si el botón no funciona, copia y pega esta dirección en tu navegador:',
+      previewText: expiresInHours => `Te invitaron a Efeonce — enlace válido por ${expiresInHours} horas`
+    },
     passwordReset: {
       heading: 'Restablece tu contraseña',
       greeting: name => name ? `Hola ${name.split(' ')[0]},` : 'Hola,',

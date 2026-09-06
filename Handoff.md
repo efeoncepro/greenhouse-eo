@@ -1,20 +1,39 @@
 # Handoff activo
 
-**TASK-1836 — corrección de entrada directa en curso, 2026-09-06:**
-El operador detectó que `/login` ocultaba Microsoft sin retorno OAuth. Botón existente reutilizado,
-retorno directo fijo a `/auth/session` autenticado;235 pruebas y review correctos. Publicación pendiente.
-Evidencia previa del carril MCP:
-PR225 publicado en `main` `08acfb2c6`; orquestador `34000876213` success, manifest
-`08acfb2c6992-ee142c2a-dda2-4d33-984b-f2207d8dbd49` released sin override. CI, Deep,
-smoke y Vercel exactos aprobados; health correcto y watchdog con perfil `ops`: 5/5, drift 0.
-Auth rev29-tfx conserva código `09def4fc4` (runtime sin cambios); gateway rev36-5wc `815df9b`.
-Ambos internos ON. Canary final: token emitido 00:24:04.575 UTC, lectura propia permitida,
-ajena denegada; revocación MCP efectiva en 6.633 s. Refresh, retiro de grant <=11 s,
-gateway OFF <=20 s y restore 79 s ya medidos. Helpers cerrados y tokens de prueba revocados.
-Piloto gv5, grant original vence 2026-09-12T15:00Z; integridad unaudited/mixed en cero.
-TASK-1836 sigue in-progress: matrices externas/multicontexto y pendientes UI/WebKit no cerrados.
-[Task](docs/tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md) ·
-[Runbook](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
+**TASK-1837 (EPIC-044 U12) — `VERIFICADO END-TO-END EN STAGING 2026-09-06; producción pendiente de release`**
+(sesión greenhouse-eo-21; commits `5518d868e…` + rollout `db5a0adf3` + docs; develop pusheado hasta `2654f16eb`,
+cierre final commiteado sin push). Migración aplicada; flags `EXTERNAL_INVITATION_{SYSTEM_DELIVERY,DELEGATED_AUTHORITY}_ENABLED`
+**ON en Vercel staging** (redeploy `greenhouse-6u3f57s4p`), **NOT SET en Production** (el código no está en `main`).
+Recorrido vivo con binding de prueba (org fixture → `efeonce-auth`) y persona `jreyes+task1837@` (Outlook real):
+invitación 201 sin token → correo en 37 s → `/i/<token>` → accept 202 → `external_contact` nueva + admin designado →
+magic link → sesión `auth.efeonce.org` 200 (`amr magic_link`, reuso 400) → rebote `bounced@resend.dev` → `bounced` +
+señal `undelivered` ENCENDIDA ok→warning (drenaje local acotado: el ops-worker corre `main`) → reenvío 201 → revelación
+201 (1 h) → lane delegada con token del gateway 200/403/422/201 + correo real → revoke binding → sesión 401. Consent
+con host: capturas dev-UI. **Próximo paso:** release develop→main (coordinar con `production-release.yml`; el push a
+develop de las 01:43 rompió el release #226 y hubo que relanzarlo) + prender ambos flags en Vercel Production; federar la
+lane delegada en `efeonce-mcp` (TASK-1831/1832); primera persona de un CLIENTE real = decisión comercial. **Follow-ups cerrados (04:00–04:40Z, sin release):** revoke por binding limpia al admin designado (+audit);
+boundary test del dominio; scope `efeonce.mcp.identity.write` en el emisor (paridad con el gateway); lane acepta
+`organizationId`; verbos delegados `resend`/`revoke` + rutas `…/invitations/[id]/{resend,revoke}`; federación en el
+gateway = `efeonce-mcp` **PR #3** (`feat/task-1837-delegated-invitations`, tools `identity.invitations.list` /
+`identity.invitation.create`, `pnpm check` verde, **sin merge** hasta el release + flag en Production); tasks derivadas
+`TASK-1838` (consola del admin del cliente, wireframe+flow reales) y `TASK-1839` (convergencia con la invitación del
+portal). Evidencia:
+[audit](docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md) · [task](docs/tasks/in-progress/TASK-1837-efeonce-id-external-invitation-delivery-delegated-authority.md) · [ledger](docs/operations/FEATURE_FLAG_STATE_LEDGER.md).
+
+**TASK-1836 / TASK-1831 — evidencia consolidada, 2026-09-06:**
+Tres subagentes actualizaron contratos, funcionales, manuales, tasks/epic y skills espejo.
+[Mapa de construcción, pruebas y pendientes](docs/audits/2026-09-06-task-1836-1831-consolidated-evidence.md).
+PR225 está certificado: main `08acfb2c6`, run `34000876213`, manifest released sin override.
+Canary MCP real: emisión, lectura propia, aislamiento y revocación en 6.633 s; refresh y rollback
+medidos. Piloto gv5, vencimiento original 2026-09-12T15:00Z, señales unaudited/mixed cero.
+El fix directo quedó promovido por PR226 a main `456d9accf`: release `456d9accffb6-3b09047e-c37f-4ac7-acbc-0e463e1610fd`,
+run `34005056894` success, auth `00032-h45` Ready100% y cinco servicios con el SHA exacto.
+Flags OAuth/personas/interno ON; Microsoft visible y clic correcto en `/login` público a1440/390.
+Gateway `00036-5wc` sigue Ready100%, nativo/interno ON. Próximos pasos: reconciliar alcance del PR
+antes de promover (Claude añadió TASK1837 después del corte21aa), probar retorno humano `/auth/session`
+y logout; completar matrices externas/multicontexto y WebKit con los owners. No extender el piloto.
+El primer run `34004535327` quedó aborted por un deploy concurrente de develop; el retry se hizo sin bypass
+tras drenar esa carrera. No existe todavía un nuevo canary humano directo completo.
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
@@ -434,64 +453,3 @@ uso del patrón manifiesto+artefacto+hash), `docs/api` (pointer), arquitectura S
 task), manuales de uso del inventario/gateway/provider SEO, doc funcional SV360 por MCP, skills
 `dataforseo-operator` y `seo-aeo-practice` (espejadas), README y AGENTS del repo `efeonce-mcp` (cifras 28/36/6).
 Regla auto-cargada `.claude/rules/mcp-tool-surface.md` gana el invariante de manuales.
-
-## 2026-09-02 (5) — TASK-1784: el eval de selección MCP refutó su propia hipótesis, y eso es el entregable
-
-Se midió la selección de tools SEO antes de tocar una descripción: **tool 94.5% / mercado 98.2% / gasto 100%**
-sobre 55 preguntas de operador en los cinco mercados productivos, con piso de ruido cero (dos corridas
-idénticas). Después se probaron cuatro variantes de descripción, cada una determinista.
-
-🔴 **Los bloques de ruteo `Use when · Prefer X if · Do NOT use for` NO mejoraron la selección de tool.** La
-banda 92.7–96.4% no tiene dirección, y una variante hizo regresar a `prepare_seo_grounded_queries`, una tool que
-nadie tocó: alargar siete descripciones degrada la selección de sus vecinas. Se aplicó la variante SIN bloques.
-
-Lo que sí movió el número fue corregir dos afirmaciones falsas. La cláusula de mercado decía *"pass market when
-the organization has more than one"* —una instrucción de elegir—, y el modelo la obedecía justificándose con
-*"the operator is in Santiago"*: `ISSUE-152` en su propio razonamiento. Ahora nombra la clase de señal que NO es
-una declaración. **Mercado 98.2% → 100%.** Tool bajó a 92.7% y se reporta sin declarar mejora: su regresión es
-léxica y ninguna descripción le gana al nombre de su propia tool.
-
-**Hallazgo lateral, el más caro:** al hacer que el guard de paridad comparara `description`, aparecieron
-**21 de 27 tools federadas ya divergentes** — el gateway servía, entre otras, la instrucción que causa
-`ISSUE-152`. Se cerró **derivando** el texto del artefacto (`greenhouseToolDescription`) en vez de copiarlo.
-
-✅ **Gateway desplegado.** `mcp.efeonce.org` corre la revisión `efeonce-mcp-gateway-00027-6pj` desde el commit
-`3d09e152`, con la postura intacta (`internal-and-cloud-load-balancing` + invoker `allUsers`), `health=200` y
-`/mcp` desafiando 401. En ese commit hay **cero** ocurrencias de la instrucción vieja. Lo que NO se verificó:
-leer el `tools/list` servido exige login Entra interactivo y no es automatizable — la cadena
-commit→imagen→revisión es fuerte, pero no reemplaza leer el texto servido.
-
-⚠️ **Corrección: la "otra superficie" NO existe.** Se afirmó acá que la ruta `/api/mcp/greenhouse`
-(Vercel) seguía sirviendo las descripciones viejas. Es **falso**: su token
-`GREENHOUSE_MCP_REMOTE_GATEWAY_TOKEN` no existe en ningún environment (`vercel env ls`) y la ruta responde
-`404 — "Greenhouse MCP remote gateway is not configured."`, comprobado en vivo contra staging. No sirve
-texto viejo porque no sirve nada. **El gateway era la única superficie MCP viva y ya está corregida.**
-
-`develop` empujado (`0a68d92c`) con los 9 workflows en `success` — CI, Playwright E2E smoke y los cuatro
-deploys de workers Cloud Run incluidos. Producción queda pendiente del release `develop→main`, que no
-cambia nada servido por MCP. Único seguimiento real: `seo_provider_spend_daily` a 7 días — la disciplina de
-gasto dio 100% en el eval, pero eso se confirma en la factura, no en la medición.
-
-## 2026-09-02 (4) — Globe queda en hibernación profunda, reversible y documentada
-
-Por decisión del operador, Globe dejó de consumir trabajo productivo mientras todavía no genera ingresos. El
-estado live verificado a `2026-09-02T10:30:38Z` es: Cloud SQL `globe-pg` `STOPPED/NEVER`; schedulers Producer,
-Media y Governance `PAUSED`; cero ejecuciones activas; API `00216-wmm` y Studio `00150-m2m` listas, con
-`minInstances=0` y `GLOBE_PRODUCTIVE_LANES_ENABLED=false`. Se preservaron el disco SQL con deletion protection,
-backups/PITR, 10 buckets, 17 secretos, Artifact Registry, servicios/jobs, IAM, front door, budgets,
-observabilidad y Terraform. Ningún apply destruyó o reemplazó recursos; el post-plan quedó `No changes`.
-
-El Terraform de `efeonce-globe` gobierna ahora `active -> draining -> hibernated`. `draining` es obligatorio en
-ambos sentidos: mantiene SQL encendido mientras publica y verifica revisiones fail-closed. Un primer apply dejó
-una revisión API sin startup al apagar SQL demasiado pronto; la revisión anterior conservó tráfico, SQL se
-restauró temporalmente y se corrigió la secuencia antes del stop final, sin pérdida de datos.
-
-Baseline previo: ~CLP 348.152 netos/30 días. Residual hibernado modelado: CLP 20.000–30.000; reducción modelada:
-CLP 318.000–328.000. No es ahorro realizado hasta Billing Export a 24 h, 7 días y cierre mensual. Encender de
-nuevo requiere autorización explícita de gasto y seguir sin saltos
-`docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md`: `hibernated -> draining`, integridad y
-readback no facturable, luego `draining -> active`; ante falla se vuelve primero a `draining`.
-
-Las skills espejo `greenhouse-globe` y `greenhouse-globe-model-fleet` ya bloquean deploys, migraciones,
-generaciones, canarios y promociones mientras el estado siga hibernado. El ledger de modelos conserva evidencia
-histórica de integración, pero deja explícito que `available` no significa ejecutable durante la hibernación.
