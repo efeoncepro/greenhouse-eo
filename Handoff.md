@@ -1,5 +1,29 @@
 # Handoff activo
 
+**TASK-1835 (EPIC-044 U06) — `UI ready: yes`, code complete, SIN DESPLEGAR (Claude greenhouse-eo-06, 2026-09-06;
+commits `85c67e97d` · `4eb358d5b` · `b15b1690e`).** Efeonce ID queda enterprise-ready en local. Tres hallazgos que
+importan más que el trabajo planificado:
+
+1. **El login por passkey no existía.** Backend (`/auth/passkeys/authenticate/*`) y copy estaban desde el
+   2026-09-04, pero `/login` no ofrecía el método: los cuatro ids `login_passkey_*` llevaban dos días huérfanos.
+   Hallazgo del operador. Implementado con el patrón del step-up; `renderLoginPageResponse` exige el nonce en su
+   TIPO, así que el compilador —no la disciplina— impide servir la página sin script.
+2. 🔴 **`violations: 0` de axe era una medición vacía.** En las 40 capturas del emisor axe devolvía las 24 filas de
+   texto de cada página en `incomplete` («background could not be determined due to a pseudo element»): el lienzo
+   pinta su azul con degradado y `::after`. Nunca midió una. Debajo del cero, la ficha de aplicación y el aviso
+   «no verificada» del consentimiento estaban a **1.53:1**. Causa raíz: `.id-context`/`.id-muted` compartidas entre
+   la ficha (sobre el azul) y el bloque del destino (dentro de la tarjeta) — un color cruzando fondos opuestos.
+   Mecanismo nuevo `pnpm auth-server:verify-contrast` (muestrea píxeles): **272 textos, 0 bajo el piso WCAG**.
+   *Aplica más allá de esta task: cualquier superficie con fondo compuesto tiene el mismo punto ciego.*
+3. 🔴 **Nadie puede tener una passkey.** `/auth/passkeys/register/*` existe y NO tiene superficie en ninguna parte;
+   el step-up sólo enrola TOTP. El botón nuevo es un camino inerte hasta que exista el alta, y `EPIC-044` tampoco
+   tiene nodo para eso. Hueco del programa → follow-up en la task.
+
+Evidencia: GVC premium 20 fixtures × desktop 1440 y móvil 390 = 40 capturas 20/20; scorecard 4.63 / piso 4.5; los
+cuatro gates `ui:*` PASS; `pnpm test` 13896 passed; typecheck limpio; worker gates verdes. Patrón «runtime sin
+React» registrado en `PATTERNS.md`. **Próximo paso: NO empujar sin decidirlo** — `auth-server-deploy.yml` dispara
+con `src/lib/**` sobre el Cloud Run único que sirve `auth.efeonce.org` en vivo: el push ES el despliegue.
+
 **TASK-1832 / TASK-1841 — certificación sintética separada del piloto cliente (Codex, 2026-09-06):** U07 ya no
 usa una organización cliente real para probar la tecnología. TASK-1832 certifica el camino productivo completo
 con cuentas M365/Google controladas por Efeonce, personas `data_origin='smoke_test'`, organización canary no cliente,
