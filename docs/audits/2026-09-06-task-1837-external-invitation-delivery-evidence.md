@@ -3,7 +3,7 @@
 > **Tipo de documento:** Evidencia de rollout / auditoría de verificación
 > **Fecha:** 2026-09-06
 > **Task dueña:** `TASK-1837` (EPIC-044 U12) — `docs/tasks/in-progress/TASK-1837-efeonce-id-external-invitation-delivery-delegated-authority.md`
-> **Estado que acredita:** `verificado end-to-end en staging 2026-09-06 (flags ON en staging); producción pendiente de promoción a main`
+> **Estado que acredita:** `verificado end-to-end en staging 2026-09-06 (flags ON en staging); follow-ups cerrados sin release (04:00–04:40Z); producción pendiente de promoción a main; PR #3 del gateway abierto`
 
 ## Alcance y autorización
 
@@ -11,7 +11,8 @@ Checkout compartido `develop`. Commits de la task: `5518d868e` (Slice 1 entrega)
 de vida), `c9371b28f` (Slice 3 revelación + capabilities), `4f03cdff6` (Slice 4 autoridad delegada),
 `189148c6e` (Slice 5a host del `redirect_uri` en el consentimiento). Eran locales al momento de la migración y
 del smoke; la verificación viva de la sección siguiente corrió sobre el deploy de staging `greenhouse-6u3f57s4p`,
-que ya los sirve. El código sigue fuera de `main`.
+que ya los sirve. Los follow-ups posteriores (`149ff8934`, `1ddb5f92b`) se documentan en su propia sección y NO
+formaron parte del deploy verificado. El código sigue fuera de `main`.
 
 Este documento registra lo que SÍ se ejecutó contra la instancia PostgreSQL compartida (dev/staging/prod),
 contra el smoke live y, en la sección siguiente, contra **staging desplegado** con los dos flags encendidos, y
@@ -101,6 +102,60 @@ real**: es una persona sintética en una organización fixture, revocada al cier
     cookie todavía viva → **401** (la sesión muere con el source link) ✔. La persona sintética queda como
     `external_contact` con source link inactivo (sin membership). Dev-UI temporal apagado; scripts temporales
     borrados.
+
+## Follow-ups cerrados sin release (2026-09-06 04:00–04:40Z)
+
+Después de la verificación viva se cerraron en `develop` los follow-ups que la evidencia de arriba dejó abiertos
+(commit `149ff8934` "follow-ups — scope identity.write, organizationId en la lane delegada, revoke limpia admin,
+boundary test" + commit `1ddb5f92b` "verbos delegados resend/revoke en la lane ecosystem"). Ninguno está en `main`
+todavía; todos quedan verificados por tests con mocks, smoke `--apply` contra PG real y `pnpm typecheck`.
+
+- **Revocar el binding limpia al administrador designado.** `revokeExternalAccess` con scope `binding`
+  (`src/lib/identity/external-access/commands.ts`) ahora pone `designated_admin_profile_id = NULL` y escribe audit
+  `designated_admin_cleared` con metadata `{ cause: 'binding_revoked' }`, igual que ya hacía scope `member`. Smoke
+  `pnpm identity:external-access:smoke -- --apply` verde contra PG real: audit `designated_admin_cleared` ×2 por
+  corrida (miembro + binding). Cierra el "detalle menor" del paso 10.
+- **Boundary test del dominio.** `src/lib/identity/external-access/boundary-domain.test.ts`: allowlist de destinos
+  de escritura del dominio (`external_identity_environments`, `external_organization_bindings`,
+  `external_capability_grants`, `external_member_invitations`, `external_identity_audit_log`,
+  `external_access_resolution_log`, `identity_profiles`, `identity_profile_source_links`) y prohibición explícita
+  de `greenhouse_notifications.email_deliveries` (la escribe `sendEmail`) y `greenhouse_sync.outbox_events` (se
+  publica por `publishOutboxEvent`). Cierra el follow-up "boundary test de destinos de escritura".
+- **Scope OAuth nuevo del emisor: `efeonce.mcp.identity.write`.** Clase «administrar a las personas de mi
+  organización» en `src/lib/auth-server/oauth/scopes.ts` (`EFEONCE_MCP_WRITE_SCOPES`: consentimiento explícito +
+  step-up; nunca en el `scopes_supported` mínimo), snapshot del test de paridad `scopes.test.ts` y copy de
+  consentimiento `'Invitar y administrar a las personas de tu organización en Efeonce'` en
+  `src/lib/copy/auth-server.ts`. Greenhouse sigue decidiendo la autoridad real por la membership `designatedAdmin`;
+  el scope sólo dice si ESE cliente puede pedir esa clase de acción.
+- **La lane delegada acepta `organizationId` como alternativa a `bindingId`.** `resolveDelegatedAuthority`
+  exige exactamente uno de los dos (`invalid_request` 422 si faltan ambos); si vienen ambos deben apuntar a la
+  misma membership. El gateway resuelve la ORGANIZACIÓN de la persona por membership, no el binding.
+- **Verbos delegados nuevos (prerrequisito que `TASK-1838` detectó).** `resendDelegatedExternalInvitation`
+  (reenviar = rotar, sólo invitaciones del propio binding; una ajena responde `not_found` anti-oráculo) y
+  `revokeDelegatedExternalInvitation` (invitación abierta ⇒ scope `invitation`; persona ya ligada ⇒ scope `member`
+  con bump de `grants_version`; **nunca a sí mismo** ⇒ `invalid_request`). Rutas
+  `POST /api/platform/ecosystem/identity/invitations/[invitationId]/resend` (201) y `…/revoke` (200) por el command
+  harness con `Idempotency-Key`; routeKeys `platform.ecosystem.identity.invitations.{resend,revoke}`; resource
+  `src/lib/api-platform/resources/ecosystem-identity-invitations.ts`; contract test
+  `src/app/api/platform/ecosystem/route-contract.test.ts`.
+- **Gates:** `pnpm test` completo 13.802 ✔ (antes de los verbos delegados); focales 62 ✔ después de ellos;
+  `pnpm typecheck` ✔.
+- **Federación en el gateway (`efeonce-mcp`, PR #3 abierto, NO mergeado):** rama
+  `feat/task-1837-delegated-invitations`, commit `39fb736`, <https://github.com/efeoncepro/efeonce-mcp/pull/3>.
+  `src/providers/greenhouse-identity.ts` es un adapter sobre la lane (misma config/consumer que el provider SEO):
+  manda `environment` + `subject` del token nativo —sólo persona nativa EXTERNA—, `organizationId` resuelta por la
+  policy, descarta cualquier campo `token` y traduce errores sólo por clase (404 ⇒ `policy_blocked`, 403 ⇒
+  `forbidden`, 400/409/422 ⇒ `invalid_request`, 429 ⇒ `rate_limited`, 5xx ⇒ `upstream_unavailable`). Tools
+  `identity.invitations.list` (read; scope base) e `identity.invitation.create` (write; scope
+  `efeonce.mcp.identity.write`, challenge 403 con el scope; `scopes_supported` lo anuncia con el provider ecosystem
+  prendido). Policies: sólo issuer nativo, población `native-external`, organización por membership. `pnpm check`
+  verde en el gateway (format, typecheck, 145 tests, build). Los verbos delegados de reenvío/revocación NO están
+  federados todavía. El merge exige el scope en `main` de Greenhouse (release) +
+  `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED=true` en Production; hasta entonces las tools devuelven
+  `policy_blocked`.
+- **Tasks derivadas (to-do):** `TASK-1838` consola del administrador del cliente (ui-ux,
+  `auth.efeonce.org/account/organization`; EPIC-044 U13) y `TASK-1839` convergencia invitación del portal ↔
+  primitive de entrega (backend-data; U14). Siguiente ID libre en el registry: `TASK-1840`.
 
 ## Migración aplicada a la instancia compartida
 
@@ -192,12 +247,18 @@ pendiente, honesto:
   Production (hoy NOT SET). El ops-worker y el auth-server toman el código nuevo en ese mismo release: la
   proyección de rebote (hoy drenada localmente, paso 5), el guard/audit `designated_admin_assigned` (paso 3) y
   el host del `redirect_uri` en el consentimiento real (paso 9) sólo quedan operativos en producción con él.
-- **Federación de la lane delegada en `efeonce-mcp`** (`TASK-1831`/`TASK-1832`): la lane responde correcto al
-  consumer del gateway (paso 8), pero todavía no existe la tool MCP que la llame con el JWT de la persona.
+- **Federación de la lane delegada en `efeonce-mcp`: PR #3 abierto, merge tras el release.** Las tools
+  `identity.invitations.list` / `identity.invitation.create` existen en la rama
+  `feat/task-1837-delegated-invitations` (<https://github.com/efeoncepro/efeonce-mcp/pull/3>, `pnpm check` verde),
+  pero el merge exige el scope `efeonce.mcp.identity.write` en `main` de Greenhouse y el flag delegado ON en
+  Production; hasta entonces responderían `policy_blocked`. Falta repetir desde el gateway, con el JWT de la
+  persona, el positivo y los negativos del paso 8.
+- **`resend`/`revoke` delegados aún no federados en el gateway.** Las rutas
+  `POST /api/platform/ecosystem/identity/invitations/[invitationId]/{resend,revoke}` existen en Greenhouse
+  (`1ddb5f92b`), pero PR #3 sólo federa listar y crear; la federación de reenviar/revocar es follow-up del PR o de
+  `TASK-1838`.
 - **Primera persona externa de un CLIENTE real** (no fixture): decisión comercial del operador; el mecanismo ya
   está probado de punta a punta.
-- **Detalle menor (follow-up cosmético):** `revokeExternalAccess` con scope `binding` no limpia
-  `designated_admin_profile_id` (queda inerte en un binding revocado); scope `member` sí lo limpia.
 
 ## Próximos pasos
 
@@ -205,10 +266,10 @@ pendiente, honesto:
    del ops-worker y del auth-server que tomaron el código nuevo (rebote drenado por el worker, guard de admin,
    host en el consentimiento real).
 2. Producción con 24 h de observación de las 9 señales del grupo (`undelivered`, `token_revealed` en steady 0).
-3. Federar la lane delegada en `efeonce-mcp` y repetir desde el gateway el positivo y los negativos del paso 8
-   (`TASK-1831`/`TASK-1832`).
+3. Mergear PR #3 de `efeonce-mcp` después del release (scope en `main` + flag delegado ON en Production) y
+   repetir desde el gateway, con el JWT de la persona, el positivo y los negativos del paso 8
+   (`TASK-1831`/`TASK-1832`); después federar `resend`/`revoke` delegados.
 4. Primera persona externa de un cliente real → nueva evidencia en `docs/audits/` → `TASK-1830`/`TASK-1832`.
-5. Follow-up cosmético: limpiar `designated_admin_profile_id` también en la revocación con scope `binding`.
 
 ## Referencias
 

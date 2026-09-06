@@ -19,10 +19,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `VERIFICADO END-TO-END EN STAGING 2026-09-06 (03:26–03:40Z). Migración aplicada; flags ON en Vercel staging (redeploy greenhouse-6u3f57s4p); binding externo real de prueba (org fixture ZZZ Q2C Smoke Fixture → efeonce-auth): invitación 201 sin token → correo real en Outlook (37 s) → /i/<token> → accept 202 → persona external_contact nueva + admin designado → magic link real → sesión en auth.efeonce.org (200, amr magic_link; reuso 400) → rebote forzado bounced@resend.dev con señal undelivered ENCENDIDA ok→warning (drenaje local acotado; el ops-worker corre main) → reenvío 201 (attempts 2) → revelación 201 (1 h) → lane delegada con token del gateway 200/403/422/201 + correo real → revoke binding → sesión 401. Capturas del consentimiento con host (dev-UI 1440/390). Evidencia: docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md. PENDIENTE: promover a main + flags en Production; federar la lane en efeonce-mcp; primera persona de un CLIENTE real (decisión comercial).`
+- Status real: `VERIFICADO END-TO-END EN STAGING 2026-09-06 (03:26–03:40Z) + FOLLOW-UPS CERRADOS (04:00–04:40Z). Migración aplicada; flags ON en Vercel staging; recorrido vivo completo con binding de prueba (correo real, accept, magic link, sesión, rebote con señal encendida, reenvío, revelación, lane delegada 200/403/422/201, revoke, sesión 401). Follow-ups: revoke por binding limpia al admin; boundary test del dominio; scope efeonce.mcp.identity.write en el emisor; lane acepta organizationId; verbos delegados resend/revoke + rutas; federación en el gateway como PR #3 de efeonce-mcp (pnpm check verde, sin merge); TASK-1838 (consola) y TASK-1839 (convergencia portal) creadas. pnpm test 13.802 ✔. PENDIENTE (requiere release o decisión): promover a main + flags en Production; merge de PR #3; federar resend/revoke en el gateway; primer CLIENTE real.`
 - Rank: `TBD`
 - Domain: `identity|platform`
-- Blocked by: `producción: release develop→main + flags en Vercel Production (control plane); lane delegada como tool MCP: federación en efeonce-mcp (TASK-1831/1832); primera persona de un CLIENTE real: decisión comercial del operador`
+- Blocked by: `producción: release develop→main + flags en Vercel Production (control plane) → merge de efeonce-mcp PR #3; primera persona de un CLIENTE real: decisión comercial del operador`
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -741,6 +741,17 @@ cambiar el esquema del token está resolviendo algo que no está roto.
 - **Convergencia con la invitación del portal** (`TASK-1012`): dos caminos de invitación con el mismo
   bug cross-env; evaluar un primitive único después de que este cierre.
 - **Caducidad configurable por binding** en vez de las 72 horas fijas, si algún cliente lo pide.
+- **Derivadas registradas 2026-09-06:** la consola del administrador del cliente es `TASK-1838`
+  (`docs/tasks/to-do/TASK-1838-efeonce-id-client-admin-console.md`, ui-ux, con wireframe y flow reales) y la
+  convergencia con la invitación del portal es `TASK-1839`
+  (`docs/tasks/to-do/TASK-1839-invitation-delivery-primitive-convergence.md`, backend-data). **Prerrequisito que
+  queda en ESTA task** (dueña de `src/lib/identity/external-access/**`) antes de que 1838 pinte acciones: commands
+  delegados `resendDelegatedExternalInvitation` y `revokeDelegatedExternalInvitation` (envoltorios de
+  `resendExternalInvitation` / `revokeExternalAccess` detrás de `resolveDelegatedAuthority`, con
+  `invitation.bindingId === authority.membership.bindingId`, actor `external-admin:<profileId>`, audit con
+  `delegated:true`) + sus verbos en la lane ecosystem, y la declaración de `EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED`
+  en `services/auth-server/deploy.sh` (hoy es Vercel-only; la consola corre en el emisor y debe fallar cerrada).
+  Ninguno de los dos existe todavía.
 
 ## Open Questions
 

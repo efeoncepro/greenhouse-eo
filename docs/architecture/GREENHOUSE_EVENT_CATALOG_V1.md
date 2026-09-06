@@ -58,7 +58,9 @@ post-commit dentro del command y sólo su RESULTADO se publica.
 
 - `identity.external_invitation.issued` suma `deliveryMode` (`system` \| `manual`) y, cuando la fila nace de un
   reenvío o de una revelación, `reissue: true` + `resendOfInvitationId` / `revealedFromInvitationId` (la fila anterior
-  queda `revoked` con `revoke_reason` `resent` / `revealed`).
+  queda `revoked` con `revoke_reason` `resent` / `revealed`); `resendOfInvitationId` también llega desde el reenvío
+  delegado (`resendDelegatedExternalInvitation` → `resendExternalInvitation`, actor `external-admin:<profileId>`), sin
+  evento nuevo.
 - **Consumer reactivo nuevo sobre un evento EXISTENTE:** `external_invitation_delivery_bounced`
   (`src/lib/sync/projections/external-invitation-delivery-bounced.ts`, domain `notifications`, trigger
   `email_delivery.bounced`, scope `email_delivery:<deliveryId>`, lane `ops-reactive-notifications` cada 2 min,

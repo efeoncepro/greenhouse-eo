@@ -313,14 +313,29 @@ graph, because the gateway will resolve the caller against it:
   is the ONLY caller of the delegated lane `GET/POST /api/platform/ecosystem/identity/invitations` (consumer
   `internal`): pass `environment` + `subject` of the verified person JWT + `bindingId`; POST goes through the
   command harness with `Idempotency-Key` and body `{ environment, subject, bindingId, email, reason?,
-  designatedAdmin? }`. Outcomes: 404 when `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` is OFF or the
+  designatedAdmin? }` — `organizationId` is accepted as an alternative to `bindingId` (the gateway resolves the
+  person's ORGANIZATION by membership, not the binding; 422 when both are missing, and when both are present
+  they must match). Outcomes: 404 when `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` is OFF or the
   consumer is not internal (anti-oracle); 403 `forbidden` when the subject is not the designated admin of that
   binding (cause never distinguished); 422 on self-elevation (`designatedAdmin: true`) or seat cap; 429 on the
   hourly cap; the response never contains the token. Canonical staging recipe for the delegated lane:
   `Authorization: Bearer <gateway consumer token>` (Secret Manager `efeonce-mcp-gateway-greenhouse-token`) +
   `externalScopeType=other&externalScopeId=efeonce-mcp-gateway` + `environment` + `subject` + `bindingId`; the
-  POST also needs `Idempotency-Key`. Federating it as an MCP tool in `efeonce-mcp` is pending
-  (`TASK-1831`/`TASK-1832`). Signals: the `identity.external_*` group is now 9, adding
+  POST also needs `Idempotency-Key`. Greenhouse also exposes the delegated `resend`/`revoke` lanes
+  (`POST …/identity/invitations/[invitationId]/resend` 201 and `…/revoke` 200, command harness with
+  `Idempotency-Key`, routeKeys `platform.ecosystem.identity.invitations.{resend,revoke}`): resend = rotate within
+  the own binding only (a foreign invitation answers `not_found`, anti-oracle); revoke takes scope `invitation`
+  for an open invitation or scope `member` (with `grants_version` bump) for a linked person, and a delegated
+  admin can **never** revoke themself (`invalid_request`). Gateway federation exists as **PR #3** of
+  `efeonce-mcp` (branch `feat/task-1837-delegated-invitations`, open, NOT merged): provider
+  `src/providers/greenhouse-identity.ts` over the lane, tools `identity.invitations.list` (read, base scope) and
+  `identity.invitation.create` (write, scope `efeonce.mcp.identity.write` — 403 challenge naming the scope;
+  announced in `scopes_supported` when the ecosystem provider is on); policies native issuer only, population
+  `native-external` only, `organizationId` by membership; any `token` field is discarded; `pnpm check` green.
+  Merge it only AFTER the Greenhouse release (the scope must be in `main`) and
+  `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED=true` in Production — until then the tools answer
+  `policy_blocked`. The delegated `resend`/`revoke` lanes are NOT federated yet (PR #3 follow-up / `TASK-1838`).
+  Signals: the `identity.external_*` group is now 9, adding
   `identity.external_invitation.{undelivered,expired_unaccepted,token_revealed}` (`token_revealed` steady 0 —
   any value must carry actor + reason in the audit).
 

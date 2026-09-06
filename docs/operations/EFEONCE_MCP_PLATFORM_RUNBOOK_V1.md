@@ -752,6 +752,26 @@ verificada en staging con el token del consumer `efeonce-mcp-gateway-greenhouse-
 ajeno 403, auto-elevación 422, invitación delegada 201 con correo real); falta la tool MCP que la federe
 (TASK-1831/1832; flag `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` ON en staging, OFF ⇒ 404 en producción).
 
+**Delta 2026-09-06 04:00–04:40Z (TASK-1837 follow-ups; PR #3 del gateway ABIERTO, no mergeado):** la federación
+de la lane delegada ya existe como
+[PR #3 de `efeonce-mcp`](https://github.com/efeoncepro/efeonce-mcp/pull/3) (rama
+`feat/task-1837-delegated-invitations`, commit `39fb736`, `pnpm check` verde): provider
+`src/providers/greenhouse-identity.ts` + tools `identity.invitations.list` (scope base) e
+`identity.invitation.create` (scope nuevo **`efeonce.mcp.identity.write`**, clase «administrar a las personas de
+mi organización», escritura con step-up; declarado en paridad en `src/lib/auth-server/oauth/scopes.ts` de
+Greenhouse, commit `149ff8934`). Policy: sólo issuer nativo, población `native-external`, `organizationId`
+resuelta por membership (la lane acepta `organizationId` o `bindingId`). **No mergear hasta** que el release lleve
+el scope a `main` de Greenhouse y `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED=true` esté en Production;
+hasta entonces las tools devuelven `policy_blocked`. **Qué verificar después del merge:** (1) `scopes_supported`
+del emisor NO publica `efeonce.mcp.identity.write` y la tool `identity.invitation.create` responde
+`403 insufficient_scope` con ese scope a un token sin él; (2) con el JWT de una persona externa designada
+administradora, `identity.invitations.list` devuelve sólo su organización y `identity.invitation.create` responde
+`created` sin ningún campo `token` y con correo real; (3) los negativos del paso 8 del audit desde el gateway
+(organización ajena ⇒ `forbidden`, `designatedAdmin: true` ⇒ `invalid_request`, flag OFF ⇒ `policy_blocked`);
+(4) el guard de paridad no-SEO del gateway declara las dos tools con razón. Los verbos delegados de reenviar y
+revocar (`POST /api/platform/ecosystem/identity/invitations/[invitationId]/{resend,revoke}`, commit `1ddb5f92b`)
+existen en Greenhouse pero **no están federados**: follow-up del PR #3 o de `TASK-1838`.
+
 ## Superficie operable por un cliente MCP — snapshot 2026-08-28
 
 Esta sección responde la pregunta del operador *"¿qué puedo hacer hoy con el MCP conectado?"*. Es un **snapshot

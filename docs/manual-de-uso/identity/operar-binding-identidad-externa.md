@@ -270,7 +270,10 @@ pnpm staging:request POST /api/admin/identity/external-access/revoke \
 
 Qué esperar: `changed: true` la primera vez y `false` si repites; `grantsVersion` nuevo salvo en `invitation`;
 listas `revokedGrantIds` / `revokedProfileIds` / `revokedInvitationIds` con lo que cayó en cadena. Un binding
-revocado no se reactiva: si el cliente vuelve, se crea un binding nuevo.
+revocado no se reactiva: si el cliente vuelve, se crea un binding nuevo. Revocar al administrador designado
+(scope `member`) o el binding completo (scope `binding`) deja `designated_admin_profile_id` en NULL y escribe
+audit `designated_admin_cleared` (en el binding, con causa `binding_revoked`): si después vuelves a invitar con
+`designatedAdmin: true`, no habrá conflicto con el anterior.
 
 ### 8. Verificar con el smoke
 
@@ -327,37 +330,62 @@ leer el correo (aceptar, magic link) usa una casilla real que controles, nunca l
 
 ### 9. El cliente invita a su gente (lane delegada)
 
-La persona que aceptó como **administrador designado** de un binding puede listar e invitar personas de su
-propia organización. No llama a Greenhouse directo: habla con el gateway MCP, que verifica su token y llama a
-la lane ecosystem con `environment` + `subject` (consumer `internal`). Hoy el flag
-`EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` está **encendido en staging** (la lane se verificó allí el
-2026-09-06 con el token del consumer del gateway: 200/403/422/201 y correo real; ver 8b) y **apagado en
-producción** hasta el release (allí la lane responde 404); el gateway aún no federa la lane como tool MCP
-(TASK-1831/1832). Las llamadas siguientes describen el contrato tal como se ejercitó.
+La persona que aceptó como **administrador designado** de un binding puede listar, invitar, reenviar y revocar
+personas de su propia organización. No llama a Greenhouse directo: habla con el gateway MCP, que verifica su
+token y llama a la lane ecosystem con `environment` + `subject` (consumer `internal`) más la organización que
+resolvió por su membresía. Hoy el flag `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` está **encendido en
+staging** (la lane se verificó allí el 2026-09-06 con el token del consumer del gateway: 200/403/422/201 y correo
+real; ver 8b) y **apagado en producción** hasta el release (allí la lane responde 404). Las llamadas siguientes
+describen el contrato tal como se ejercitó.
+
+**Identificar el binding:** cada llamada trae `bindingId` **o** `organizationId` (la organización de Account 360
+que el gateway resolvió por la membresía de la persona). Exactamente uno; si van los dos deben coincidir; sin
+ninguno responde 422.
 
 ```bash
-# Listar las invitaciones del binding propio
+# Listar las invitaciones del binding propio (por binding o por organización)
 GET /api/platform/ecosystem/identity/invitations?environment=efeonce-auth-prod&subject=<sub>&bindingId=xob-<uuid>
+GET /api/platform/ecosystem/identity/invitations?environment=efeonce-auth-prod&subject=<sub>&organizationId=org-<uuid>
 # → { "bindingId": "xob-…", "count": 3, "items": [ … ] }
 
 # Invitar a una persona de la misma organización (Idempotency-Key obligatorio)
 POST /api/platform/ecosystem/identity/invitations
-{ "environment": "efeonce-auth-prod", "subject": "<sub>", "bindingId": "xob-<uuid>",
+{ "environment": "efeonce-auth-prod", "subject": "<sub>", "organizationId": "org-<uuid>",
   "email": "analista@acme.example", "reason": "Analista del equipo de datos." }
 # → { "invitation": { … }, "created": true, "delivery": { … } }   (nunca token)
+
+# Reenviar (= rotar) una invitación abierta de su gente (Idempotency-Key obligatorio) → 201
+POST /api/platform/ecosystem/identity/invitations/xmi-<uuid>/resend
+{ "environment": "efeonce-auth-prod", "subject": "<sub>", "organizationId": "org-<uuid>",
+  "reason": "El correo fue a spam." }
+# → { "invitation": { … nueva … }, "created": true, "delivery": { … } }   (la anterior queda revoked/resent)
+
+# Revocar a alguien de su gente (Idempotency-Key obligatorio) → 200
+POST /api/platform/ecosystem/identity/invitations/xmi-<uuid>/revoke
+{ "environment": "efeonce-auth-prod", "subject": "<sub>", "organizationId": "org-<uuid>",
+  "reason": "Salió del equipo." }
+# → invitación abierta: se cierra (scope invitation) · persona ya ligada: se revoca como miembro (scope member,
+#   sube grants_version y el gateway deja de aceptar su token)
 ```
 
 Qué significan las respuestas:
 
 | HTTP | `code` | Qué pasó |
 | --- | --- | --- |
-| 404 | — | Flag apagado, o el consumer no es el interno del gateway. Sin pistas a propósito. |
-| 403 | `forbidden` | La identidad no está `bound`, el `bindingId` no es el suyo o no es el administrador designado. No se distingue la causa. |
-| 422 | `external_access_invalid_request` | Pidió `designatedAdmin: true` (no puede designar administradores) o el body es inválido. |
+| 404 | — | Flag apagado, o el consumer no es el interno del gateway. Sin pistas a propósito. En `resend`/`revoke`, también una invitación que no es de su binding: indistinguible de una inexistente. |
+| 403 | `forbidden` | La identidad no está `bound`, el `bindingId`/`organizationId` no es el suyo o no es el administrador designado. No se distingue la causa. |
+| 422 | `external_access_invalid_request` | Pidió `designatedAdmin: true` (no puede designar administradores), intentó **revocarse a sí mismo** (eso lo hace Efeonce), faltan `bindingId` y `organizationId` a la vez, o el body es inválido. |
 | 422 | `external_access_limit_reached` | El binding llegó al tope de asientos (25 por defecto: `issued` + `accepted` + `linked`). Lo amplía Efeonce, no el cliente. |
-| 429 | `rate_limited` | Tope de 20 operaciones por binding por hora. |
+| 409 | `external_access_invitation_not_open` | Intentó reenviar una invitación que ya no está `issued`. |
+| 429 | `rate_limited` | Tope de 20 operaciones por binding por hora, o 3 reenvíos por cadena. |
 
 Cada invitación delegada queda auditada con actor `external-admin:<perfil>` y metadata `delegated: true`.
+
+**Por MCP (gateway `efeonce-mcp`, PR #3 abierto, pendiente de merge tras el release):** las tools son
+`identity.invitations.list` (scope base) e `identity.invitation.create` (scope `efeonce.mcp.identity.write`,
+que la persona consiente en el emisor como «Invitar y administrar a las personas de tu organización en
+Efeonce»). Hasta el merge, y mientras el flag esté apagado en producción, responden `policy_blocked`. Reenviar y
+revocar todavía no tienen tool (follow-up del PR #3 o de `TASK-1838`, la consola del administrador del cliente).
 
 ## Que significan los estados y señales
 
@@ -469,7 +497,10 @@ Otros síntomas:
   `http.ts`, y desde TASK-1837 `delivery.ts` + `config.ts`); rutas `src/app/api/admin/identity/external-access/**`
   (incluye `invitations/[invitationId]/{resend,reveal}`); reader del gateway
   `src/lib/api-platform/resources/ecosystem-identity-binding.ts` y lane delegada
-  `src/lib/api-platform/resources/ecosystem-identity-invitations.ts`; errores canónicos
+  `src/lib/api-platform/resources/ecosystem-identity-invitations.ts` (listar, crear y
+  `invitations/[invitationId]/{resend,revoke}`); scope `efeonce.mcp.identity.write` en
+  `src/lib/auth-server/oauth/scopes.ts`; tools del gateway en el PR #3 de `efeonce-mcp`
+  (<https://github.com/efeoncepro/efeonce-mcp/pull/3>, pendiente); errores canónicos
   `src/lib/api/canonical-error-response.ts`; señales `src/lib/reliability/queries/external-identity-binding-signals.ts`;
   rebote `src/lib/sync/projections/external-invitation-delivery-bounced.ts` (ops-worker); correo
   `src/emails/ExternalAccessInvitationEmail.tsx` + `src/lib/email/templates.ts`; smoke

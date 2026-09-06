@@ -49,8 +49,13 @@ certifica flags, versiones desplegadas, elegibilidad de clientes ni finalizació
   de ese binding; 422 auto-elevación o tope de asientos; 429 tope por hora.
 - La respuesta nunca expone el token: la invitación llega por correo desde Greenhouse a `/i/<token>` del
   emisor (`issuer_url` del environment). Reenviar rota; revelar es excepción gobernada con audit sin token.
-- El consentimiento muestra el host del `redirect_uri` validado; su ausencia es error de render. Federar la
-  lane en `efeonce-mcp` sigue pendiente (TASK-1831/1832).
+- Scope de escritura nuevo del emisor: `efeonce.mcp.identity.write` (clase «administrar a las personas de mi
+  organización»; consentimiento explícito + step-up, nunca en el `scopes_supported` mínimo). Las tools
+  `identity.*` del gateway deniegan a Entra y a la población interna: sólo issuer nativo y persona
+  `native-external`, con la organización resuelta por membership.
+- El consentimiento muestra el host del `redirect_uri` validado; su ausencia es error de render. La federación
+  de la lane vive en `efeonce-mcp` PR #3 (abierto, sin merge; espera el release de Greenhouse + flag en
+  Production); `resend`/`revoke` delegados aún no están federados.
 
 ## Dos entradas de navegador, dos pruebas
 

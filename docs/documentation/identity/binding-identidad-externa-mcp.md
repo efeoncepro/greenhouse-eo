@@ -194,7 +194,7 @@ dice: `changed: false`).
 
 | Alcance | Qué revoca en cadena | `grants_version` |
 | --- | --- | --- |
-| **Binding** | El binding, todos sus grants activos, todas sus membresías `linked` y las invitaciones abiertas. Desactiva los vínculos de identidad que quedan huérfanos. | Sube |
+| **Binding** | El binding, todos sus grants activos, todas sus membresías `linked` y las invitaciones abiertas. Desactiva los vínculos de identidad que quedan huérfanos y limpia al administrador designado (queda auditado como `designated_admin_cleared`, causa `binding_revoked`). | Sube |
 | **Grant** | Solo ese grant. | Sube |
 | **Persona (member)** | Sus invitaciones/membresías en ese binding y sus grants personales. Si la persona no conserva otra membresía activa en el mismo environment, su vínculo de identidad se desactiva y **su sesión en el emisor muere**. | Sube |
 | **Invitación** | Solo una invitación abierta (`issued`/`accepted`). No toca personas ya ligadas. | No cambia |
@@ -266,29 +266,42 @@ su misma organización sin pasar por Efeonce. Es una autoridad acotada a propós
 | Regla | Qué significa |
 | --- | --- |
 | **Quién** | Solo la persona cuya membresía `linked` en ese binding tiene `designatedAdmin = true`. Se resuelve por su identidad (environment + subject), nunca por lo que diga el cuerpo de la petición. Quien no cumpla recibe 403 sin distinguir la causa. |
-| **Solo su binding** | Puede listar e invitar únicamente sobre el binding del que es administrador. Un `bindingId` ajeno responde 403. |
+| **Solo su binding** | Puede listar, invitar, reenviar y revocar únicamente sobre el binding del que es administrador. Un `bindingId` ajeno responde 403; una invitación ajena al reenviar o revocar responde 404 (indistinguible de una inexistente). |
 | **Nunca designa administradores** | Si pide `designatedAdmin: true`, la API responde 422: no hay auto-elevación ni cadena de administradores. Un administrador nuevo solo lo designa Efeonce. |
+| **Puede reenviar (= rotar)** | Reenviar una invitación abierta de su gente hace lo mismo que cuando lo hace Efeonce: la anterior queda `revoked` (`resent`), sale una nueva con enlace nuevo y el enlace anterior deja de valer. Mismos topes (3 por cadena, 20 por hora). |
+| **Puede revocar, nunca a sí mismo** | Sobre una invitación abierta la cierra; sobre una persona ya ligada la revoca como miembro (sube `grants_version`, el gateway deja de aceptar su token). Si intenta revocarse a sí mismo responde 422: quitarse la membresía dejaría a la organización sin administrador por un acto propio; eso lo hace Efeonce. |
+| **Se identifica por organización o por binding** | La petición trae `organizationId` (lo que el gateway resolvió por su membresía) o `bindingId`: exactamente uno; si trae ambos deben coincidir. Sin ninguno, 422. |
 | **Tope de asientos** | El binding no puede pasar de 25 personas (invitaciones `issued` + `accepted` + `linked`) por defecto (`EXTERNAL_INVITATION_DELEGATED_SEAT_LIMIT`). Al llegar, 422. |
 | **Tope por hora** | Comparte el tope de 20 operaciones por binding cada hora; al pasarlo, 429. |
 | **Queda auditado como delegado** | La invitación registra que fue emitida por delegación y por qué perfil (`delegated: true`, `delegatedByProfileId`); el actor en el audit es `external-admin:<perfil>`. |
 | **Sin token en la respuesta** | La lane delegada **nunca** devuelve el token: la entrega es por correo del sistema. |
 
 Cómo llega la petición: la persona no llama a Greenhouse directo. Habla con el **gateway MCP**, que verifica su
-token y llama a Greenhouse por la lane ecosystem (`/api/platform/ecosystem/identity/invitations`) pasando
-`environment` + `subject`, igual que hace hoy para resolver el acceso. Greenhouse resuelve desde ahí que esa
-identidad es el administrador designado del binding pedido.
+token y llama a Greenhouse por la lane ecosystem (`/api/platform/ecosystem/identity/invitations`, y
+`…/invitations/<invitación>/resend` y `…/revoke` para reenviar y revocar) pasando `environment` + `subject`,
+igual que hace hoy para resolver el acceso, más la `organizationId` que resolvió por su membresía (o el
+`bindingId`). Greenhouse resuelve desde ahí que esa identidad es el administrador designado del binding pedido.
+
+Por MCP, las tools que el gateway expone son `identity.invitations.list` (leer a su gente; scope base) e
+`identity.invitation.create` (invitar; scope de escritura `efeonce.mcp.identity.write`, que la persona consiente
+explícitamente en el emisor como «Invitar y administrar a las personas de tu organización en Efeonce»). Esas dos
+tools viven en el PR #3 de `efeonce-mcp`, **abierto y pendiente** hasta el release de producción; reenviar y
+revocar todavía no tienen tool.
 
 Estado hoy: el flag `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` está **encendido en staging** desde el
 2026-09-06 (la lane se verificó allí con el consumer del gateway: lista del binding propio 200, binding ajeno 403,
 auto-elevación 422, invitación delegada 201 con correo real recibido; ver el audit) y **apagado en producción**
-hasta el release (allí la lane responde 404, sin pistas). El gateway todavía no federa esta lane como tool MCP
-(follow-up de TASK-1831/1832). La consola para que el administrador del cliente lo haga desde una pantalla es un
-follow-up aparte; hoy es solo programático.
+hasta el release (allí la lane responde 404, sin pistas). La federación en el gateway es el PR #3 (pendiente de
+merge tras el release). La consola para que el administrador del cliente lo haga desde una pantalla es
+`TASK-1838` (to-do); hoy es solo programático.
 
-> Detalle técnico: `resolveDelegatedAuthority`, `issueDelegatedExternalInvitation` y
-> `listDelegatedExternalInvitations` en `src/lib/identity/external-access/commands.ts`; resource
-> `src/lib/api-platform/resources/ecosystem-identity-invitations.ts`; flags y knob en
-> `src/lib/identity/external-access/config.ts`; estado por entorno en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
+> Detalle técnico: `resolveDelegatedAuthority` (`bindingId` | `organizationId`), `issueDelegatedExternalInvitation`,
+> `listDelegatedExternalInvitations`, `resendDelegatedExternalInvitation` y `revokeDelegatedExternalInvitation` en
+> `src/lib/identity/external-access/commands.ts`; resource
+> `src/lib/api-platform/resources/ecosystem-identity-invitations.ts`; scope en
+> `src/lib/auth-server/oauth/scopes.ts`; flags y knob en `src/lib/identity/external-access/config.ts`; estado por
+> entorno en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`; gateway: PR #3 de `efeonce-mcp`
+> (`src/providers/greenhouse-identity.ts`).
 
 ## Qué ve la persona al autorizar
 
@@ -329,7 +342,8 @@ sesión pero sin la capability, 403.
 Conviene decirlo explícito, porque el nombre "identidad externa" invita a suponer más de lo que hay:
 
 - **No hay pantalla de administración.** Todo se opera por API (ver el manual). La consola para el operador de
-  Efeonce y la consola para el administrador del cliente son tasks aparte.
+  Efeonce es una task aparte; la del administrador del cliente es `TASK-1838` (to-do, sobre los mismos commands
+  delegados).
 - **No hay autoregistro (signup).** Una persona entra solo por invitación de un operador de Efeonce o, cuando
   la lane delegada esté encendida, del administrador designado de su organización.
 - **No hay SCIM ni contraseñas.** La persona externa entra por invitación y accede sin contraseña (magic link,

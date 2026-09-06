@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-06 — Efeonce ID: follow-ups de TASK-1837 cerrados y lane delegada federada en PR (gateway)
+
+Revocar un binding limpia y audita al administrador designado; el dominio `external-access` tiene boundary test
+de escrituras; el emisor declara el scope `efeonce.mcp.identity.write` (clase «administrar a las personas de mi
+organización», step-up); la lane delegada acepta `organizationId` y suma reenviar/revocar delegados (nunca a sí
+mismo; una persona ligada se revoca como miembro). En `efeonce-mcp` quedó abierto el PR #3 con las tools
+`identity.invitations.list` / `identity.invitation.create` (sólo issuer nativo, población externa). Tasks
+derivadas: TASK-1838 (consola del administrador del cliente) y TASK-1839 (convergencia con la invitación del
+portal). Producción sigue esperando el release.
+
 ## 2026-09-06 — Efeonce ID: invitación externa verificada end-to-end en staging (TASK-1837)
 
 Con los flags ON en Vercel staging y un binding de prueba sobre el emisor real, el recorrido completo corrió sin que
@@ -839,29 +849,3 @@ doce archivos coinciden local/remoto. Subagente concilió planes, snapshots y ev
 Contratos técnico/funcional/manual y skills WordPress/copywriting espejadas actualizados;
 commit documental, sin runtime hermano ni WIP SEO previo. QA residual y TASK-1358 siguen abiertos.
 [Cierre y límites](docs/audits/public-site/2026-08-31-home-editorial-closure.md).
-
-## 2026-08-31 — TASK-1780: el inventario de tools MCP pasa a ser un manifiesto
-
-`src/mcp/greenhouse/tool-manifest.ts` es la fuente única del catálogo de tools MCP. `server.ts`
-registra recorriéndolo —definir una tool sin entrada rompe la construcción del servidor— y el `name`
-y las `instructions` que el cliente MCP lee se derivan de él, así que el servidor ya no puede
-anunciarse `greenhouse-read-only` mientras registra siete escrituras. Dos banderas ortogonales por
-tool: `writes` y `spendsProviderBudget`.
-
-El manual se renombró a `mcp-greenhouse-tool-inventory.md` y se corrigieron sus tres cifras en
-conflicto. Nuevo gate `pnpm mcp:manifest:check` en `ci.yml` sobre el artefacto generado que el
-gateway consumirá.
-
-Cambio de comportamiento verificado como nulo: el registro del SDK antes y después es idéntico byte a
-byte (43 tools, mismo orden y schemas), y el artefacto reproduce el espejo del gateway tool por tool.
-
-Cerrada y pusheada: Greenhouse `d2b3c0639` (9 workflows `success`) y gateway `efeonce-mcp` `e92961e`
-(CI `success`). El deploy del gateway es `workflow_dispatch` y sigue sin disparar, así que la revisión
-productiva no cambió — la verificación de esta task es de CI, no de runtime.
-
-Barrido documental con 4 subagentes: 8 skills, 5 specs de arquitectura, 9 docs funcionales/manuales,
-4 tasks vivas y un epic corregidos. Dos huecos sistémicos cerrados de paso: la rule auto-cargada de
-Growth/SEO instruía editar a mano el espejo retirado, y no existía ninguna rule para `src/mcp/**`
-(creada). `mcp:manifest:check` entró a `local:check` — antes el drift del artefacto sólo aparecía en CI.
-Fila nueva en `DECISIONS_INDEX.md`: la frontera "qué capacidades existen es conocimiento de producto,
-no de transporte" es la tercera arista del triángulo que ya fijaban las dos filas MCP existentes.

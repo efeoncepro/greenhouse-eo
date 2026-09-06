@@ -11,8 +11,13 @@ señal `undelivered` ENCENDIDA ok→warning (drenaje local acotado: el ops-worke
 201 (1 h) → lane delegada con token del gateway 200/403/422/201 + correo real → revoke binding → sesión 401. Consent
 con host: capturas dev-UI. **Próximo paso:** release develop→main (coordinar con `production-release.yml`; el push a
 develop de las 01:43 rompió el release #226 y hubo que relanzarlo) + prender ambos flags en Vercel Production; federar la
-lane delegada en `efeonce-mcp` (TASK-1831/1832); primera persona de un CLIENTE real = decisión comercial. Follow-up
-menor: `revokeExternalAccess` scope `binding` no limpia `designated_admin_profile_id` (inerte). Evidencia:
+lane delegada en `efeonce-mcp` (TASK-1831/1832); primera persona de un CLIENTE real = decisión comercial. **Follow-ups cerrados (04:00–04:40Z, sin release):** revoke por binding limpia al admin designado (+audit);
+boundary test del dominio; scope `efeonce.mcp.identity.write` en el emisor (paridad con el gateway); lane acepta
+`organizationId`; verbos delegados `resend`/`revoke` + rutas `…/invitations/[id]/{resend,revoke}`; federación en el
+gateway = `efeonce-mcp` **PR #3** (`feat/task-1837-delegated-invitations`, tools `identity.invitations.list` /
+`identity.invitation.create`, `pnpm check` verde, **sin merge** hasta el release + flag en Production); tasks derivadas
+`TASK-1838` (consola del admin del cliente, wireframe+flow reales) y `TASK-1839` (convergencia con la invitación del
+portal). Evidencia:
 [audit](docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md) · [task](docs/tasks/in-progress/TASK-1837-efeonce-id-external-invitation-delivery-delegated-authority.md) · [ledger](docs/operations/FEATURE_FLAG_STATE_LEDGER.md).
 
 **TASK-1836 / TASK-1831 — evidencia consolidada, 2026-09-06:**

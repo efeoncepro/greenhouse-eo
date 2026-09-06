@@ -750,3 +750,40 @@ hashes y manifiesto al cargar. El smoke compara la cuenta EXACTA del catálogo. 
 lectura pura), sin Entra (scope base), sin persistencia.
 
 Invariantes operativos: `agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md` §8.
+
+### Delta 2026-09-06 — TASK-1837: tools delegadas de Efeonce ID en el gateway (PR #3)
+
+§10.3 dejó al gateway resolviendo el binding de una persona externa por `(environment, subject)`. TASK-1837
+agrega, sobre esa misma forma, la **autoridad delegada** del administrador designado del cliente: la lane
+`GET|POST /api/platform/ecosystem/identity/invitations` (consumer `internal` del gateway; flag
+`EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` OFF ⇒ `404` anti-oráculo) y su federación en `efeonce-mcp`,
+que quedó **abierta como PR #3** (rama `feat/task-1837-delegated-invitations`, commit `39fb736`,
+<https://github.com/efeoncepro/efeonce-mcp/pull/3>; `pnpm check` verde: format, typecheck, 145 tests, build).
+**No está mergeado**: exige el scope en `main` de Greenhouse (release) y el flag delegado ON en Production; hasta
+entonces las tools responden `policy_blocked`.
+
+- **Tools:** `identity.invitations.list` (lectura; scope base `efeonce.mcp.read`) e `identity.invitation.create`
+  (escritura; scope `efeonce.mcp.identity.write`, challenge `403 insufficient_scope` con el scope;
+  `scopes_supported` lo anuncia sólo con el provider ecosystem prendido). Provider
+  `src/providers/greenhouse-identity.ts` del gateway: adapter sobre la lane con la misma config/consumer que el
+  provider SEO.
+- **Scope:** `efeonce.mcp.identity.write` es una clase de blast-radius propia («administrar a las personas de mi
+  organización»), declarada en paridad en `src/lib/auth-server/oauth/scopes.ts` de Greenhouse
+  (`EFEONCE_MCP_WRITE_SCOPES`: consentimiento explícito + step-up; nunca en el mínimo publicado). El scope dice si
+  el cliente puede pedir esa clase de acción; la autoridad real la decide Greenhouse por la membership
+  `designatedAdmin` (`resolveDelegatedAuthority`). Un scope por clase, nunca por capability (§18).
+- **Policy:** sólo issuer nativo (`auth.efeonce.org`) y población `native-external`; el gateway manda
+  `environment` + `subject` del token nativo y resuelve la **`organizationId` por membership** de la persona (la
+  lane acepta `organizationId` o `bindingId`, exactamente uno; ambos ⇒ deben coincidir). Descarta cualquier campo
+  `token` que pudiera venir del upstream y traduce errores sólo por clase: 404 ⇒ `policy_blocked`, 403 ⇒
+  `forbidden`, 400/409/422 ⇒ `invalid_request`, 429 ⇒ `rate_limited`, 5xx ⇒ `upstream_unavailable`.
+- **Lo que existe en Greenhouse pero NO está federado todavía:** los verbos delegados de reenviar (= rotar) y
+  revocar — `POST /api/platform/ecosystem/identity/invitations/[invitationId]/{resend,revoke}` (command harness +
+  `Idempotency-Key`; routeKeys `platform.ecosystem.identity.invitations.{resend,revoke}`;
+  `resendDelegatedExternalInvitation` / `revokeDelegatedExternalInvitation`, nunca a sí mismo). Su federación es
+  follow-up del PR #3 o de `TASK-1838` (consola del administrador del cliente, que consume los mismos commands).
+- **Verificación:** la lane se ejercitó en staging con el token del consumer `efeonce-mcp-gateway-greenhouse-token`
+  (lista propia 200, binding ajeno 403, auto-elevación 422, invitación delegada 201 con correo real); desde el
+  gateway, con el JWT de la persona, se repite tras el merge. Evidencia:
+  `docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`. Invariantes:
+  `agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` §TASK-1837.

@@ -52,6 +52,12 @@ Check when `src/lib/identity/external-access/**`, the admin invitation routes, t
   with audit).
 - Delegated lane: 404 flag OFF / non-internal consumer, 403 non-admin or foreign binding, 422 self-elevation
   or seat cap, 429 hourly cap; response without token; `Idempotency-Key` on POST.
+- Delegated `resend`/`revoke`: a delegated admin can never revoke themself (`invalid_request`); a foreign
+  invitation answers `not_found` (anti-oracle); binding-scope revoke clears the designated admin
+  (`designated_admin_profile_id = NULL` + audit `designated_admin_cleared`, `cause: 'binding_revoked'`), same as
+  member scope; the write-boundary test exists (`src/lib/identity/external-access/boundary-domain.test.ts` —
+  allowlist `external_*`, `identity_profiles`, `identity_profile_source_links`; `email_deliveries` and
+  `outbox_events` forbidden) and must stay green.
 - Consent page shows the host of the validated `redirect_uri`; a missing host is a render error.
 - Evidence hint: Resend test addresses `bounced@resend.dev` / `delivered@resend.dev` force a real bounce /
   delivery through the webhook → outbox → projection path (`delivery_status` `bounced` with `bounce:Permanent`

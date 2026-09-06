@@ -64,10 +64,19 @@ Errores: cuerpo `{ error, error_description? }` (RFC 6749 §5.2); `invalid_clien
 ```
 
 `scopes_supported` publica el **mínimo** (lecturas). Los scopes de escritura
-(`efeonce.mcp.globe.credits.funding.ensure`, `efeonce.mcp.seo.write`) existen, exigen consentimiento
-explícito + step-up y llegan por el `403 insufficient_scope` del recurso, nunca por el mínimo publicado
-(mcp-craft §security). La lista es un espejo de `../efeonce-mcp/src/config.ts` con test de paridad
-(`src/lib/auth-server/oauth/scopes.test.ts`).
+(`efeonce.mcp.globe.credits.funding.ensure`, `efeonce.mcp.seo.write`, `efeonce.mcp.identity.write`) existen,
+exigen consentimiento explícito + step-up y llegan por el `403 insufficient_scope` del recurso, nunca por el
+mínimo publicado (mcp-craft §security). La lista es un espejo de `../efeonce-mcp/src/config.ts` con test de
+paridad (`src/lib/auth-server/oauth/scopes.test.ts`).
+
+`efeonce.mcp.identity.write` (TASK-1837, 2026-09-06; `EFEONCE_MCP_WRITE_SCOPES` en
+`src/lib/auth-server/oauth/scopes.ts`) es la clase «administrar a las personas de mi organización»: invitar,
+reenviar y revocar por la lane delegada `/api/platform/ecosystem/identity/invitations`. Es clase de escritura
+(step-up), se emite sólo por el issuer nativo a población externa y su copy de consentimiento es
+`'Invitar y administrar a las personas de tu organización en Efeonce'` (`src/lib/copy/auth-server.ts`). El scope
+responde si ESTE cliente puede pedir esa clase de acción; la autoridad real la decide Greenhouse por la
+membership `designatedAdmin` del binding. Lo consume la tool `identity.invitation.create` del gateway
+(`efeonce-mcp`, PR #3 abierto; merge tras el release que lleve el scope a `main`).
 
 ## 3. Clientes
 
