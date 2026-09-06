@@ -738,6 +738,13 @@ invitaciones), sus 6 capabilities de `efeonce_admin`, el reader ecosystem
 están aplicados en PG; sigue sin haber login externo, cliente real ligado ni canary con cliente. El camino de
 soporte vive en [§Soporte: cliente externo que no puede entrar](#soporte-cliente-externo-que-no-puede-entrar-task-1631).
 
+**Delta 2026-09-06 (TASK-1837, code complete, rollout pendiente):** la invitación externa ahora la **envía el
+sistema** por correo (`/i/<token>` sobre el `issuer_url` del environment; flag `EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED`,
+hoy OFF) con estado de entrega, reenvío que rota el enlace y rebote drenado en el ops-worker. Existe además una
+**lane delegada** `GET/POST /api/platform/ecosystem/identity/invitations` para que el administrador designado del
+cliente invite a su propia gente: este gateway debe llamarla con `(environment, subject)` como hace con `identity/binding`
+(federación pendiente, TASK-1831/1832; flag `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` OFF ⇒ 404).
+
 ## Superficie operable por un cliente MCP — snapshot 2026-08-28
 
 Esta sección responde la pregunta del operador *"¿qué puedo hacer hoy con el MCP conectado?"*. Es un **snapshot
@@ -923,7 +930,13 @@ el diagnóstico lo hace el operador con lo que sigue.
 4. **Señales en `/admin/operations` → Identity:** `identity.external_binding.unbound_dispatch_attempt`,
    `revoked_still_dispatching`, `subject_collision`, `orphan_grant`. `subject_collision` u `orphan_grant` en error
    indican datos inconsistentes (identidad duplicada o escritura fuera de los commands) y van antes que cualquier
-   reemisión.
+   reemisión. Desde TASK-1837 se suman tres de entrega de invitaciones:
+   `identity.external_invitation.undelivered` (invitación abierta con correo `bounced`/`failed`: la persona nunca
+   recibió nada; corregir casilla y reenviar), `identity.external_invitation.expired_unaccepted` (vencidas sin
+   aceptar en 7 días; informativa, nunca error) y `identity.external_invitation.token_revealed` (revelaciones del
+   enlace en 24 h; cada una debe tener actor y motivo en el audit). En el detalle del binding, cada invitación trae
+   `deliveryStatus` (`not_attempted|sent|delivered|bounced|failed`): un `issued` con `bounced` o `failed` explica
+   por sí solo el «no me llegó».
 
 ### Qué evidencia se comparte (siempre redactada)
 
@@ -938,7 +951,10 @@ en claro ni su hash, los claims del token, la lista de correos de terceros de la
 
 | Diagnóstico | Acción del operador |
 | --- | --- |
-| Invitación `issued`/`expired`/token perdido | `POST .../bindings/<id>/invitations` con `reissue: true` (misma persona, token nuevo por canal seguro). |
+| Invitación `issued`/`expired`/token perdido | `POST .../bindings/<id>/invitations` con `reissue: true` (misma persona, token nuevo). Con la entrega por sistema, preferir `POST .../invitations/<invitationId>/resend` (rota el enlace y reenvía el correo; 3 por cadena, 20 por binding/hora). |
+| Invitación `issued` con `deliveryStatus` `bounced`/`failed` (señal `undelivered`) | Confirmar la casilla con el administrador del cliente, corregirla y reenviar; si el correo era otro, revocar la invitación y emitir una nueva. |
+| Persona sin casilla operativa | Excepción gobernada `POST .../invitations/<invitationId>/reveal` con `reason` ≥10 caracteres (capability `identity.external_invitation.reveal_token`; enlace de 1 h, auditado, enciende `token_revealed`). Nunca como rutina. |
+| Segundo administrador designado (409 `external_access_conflict`) | Un binding tiene UN administrador designado vigente: revocar al anterior (scope `member`) antes de emitir o aceptar el nuevo. |
 | Persona `linked` pero la tool deniega | Falta el grant: `POST .../bindings/<id>/grants` con la capability (binding-wide o `profileId`). El gateway lo toma en el siguiente recheck (≤ 60 s de caché + comparación de `grantsVersion`). |
 | Binding `revoked` | No se reactiva. Si el cliente vuelve, `POST .../bindings` nuevo (mismo trío org/env/ref permitido tras la revocación) y reinvitar. |
 | Environment `draft`/`suspended` | Activarlo por `POST .../environments` solo si el emisor está verificado; si está `retired`, registrar otro. |

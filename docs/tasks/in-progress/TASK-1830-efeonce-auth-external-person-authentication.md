@@ -1,5 +1,18 @@
 # TASK-1830 — Efeonce Auth External Person Authentication (passkeys, magic link, TOTP, recovery)
 
+## Delta 2026-09-06 — el carril de tokens ya NO está bloqueado por el mecanismo de ENTREGA (TASK-1837)
+
+`TASK-1837` (commits `5518d868e…189148c6e`, code complete, rollout pendiente) hace que el sistema envíe la invitación
+externa por correo con el enlace `https://<issuer_url del environment>/i/<token>` (la landing
+`PERSON_AUTH_PATHS.invitationLanding` de esta task), con estado de entrega persistido, reenvío que rota el
+enlace, rebote drenado en el ops-worker y una excepción gobernada de revelación. Ya no hace falta que un
+operador copie un token a mano para que una persona real llegue a `/i/<token>` → aceptar → `linked` → magic
+link → sesión. El carril de tokens queda bloqueado **solo** por (a) la decisión del operador de qué
+organización/persona recibe la primera invitación real (hoy en `TASK-1836`) y (b) el rollout de `TASK-1837`:
+migración `20260906004450748_task-1837-…` en la instancia compartida + `EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED`
+en Vercel (el auth-server no lee ese flag; sólo sirve `/i/<token>`). Verificar además el dominio remitente
+Efeonce en Resend: el correo de invitación sale del runtime Vercel, distinto del magic link del auth-server.
+
 ## Delta 2026-09-05 — canary autenticado y correo MUERTO en vivo
 
 `pnpm auth-server:person-auth:canary` (nuevo, commit `38fbfaeeb`) ejercita contra el host REAL el

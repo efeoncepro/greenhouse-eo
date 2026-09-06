@@ -7,6 +7,18 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-06 — Efeonce ID: el sistema entrega la invitación externa; autoridad delegada del cliente (TASK-1837)
+
+`issueExternalInvitation` envía el correo (`external_access_invitation`, token_sensitive, marca Efeonce) después
+de confirmar la transacción y devuelve `delivery` en vez de exponer el secreto; la URL de aceptación se deriva del
+`issuer_url` del environment (`/i/<token>`), nunca de una env var. Reenviar rota el token; revelarlo es una
+excepción auditada de 1 h con capability propia. El rebote de Resend deja `delivery_status='bounced'` por una
+proyección reactiva y tres señales nuevas vuelven observable el ciclo de vida. `designated_admin` pasa a conferir
+autoridad real: un solo admin vigente por binding y una lane ecosystem para que invite a su propia gente (403/422
+fail-closed). El consentimiento muestra el host del `redirect_uri` (MUST del protocolo). Migración additive y dos
+flags default OFF: **code complete, rollout pendiente** (migración antes del deploy; primera persona real pendiente
+del operador). Commits `5518d868e…189148c6e`, sin push.
+
 ## 2026-09-05 — Efeonce ID: acceso Microsoft y publicación certificados
 
 Corrección posterior `21aa12608` desplegada en auth `00030-rtm` (run `34002082020` success):
@@ -860,38 +872,3 @@ Menú verificado: **Soluciones → Crecimiento Multicanal → Content Marketing*
 Trece widgets editables conservan composición, assets e interacciones de Content Ops; header/footer Ohio
 nativos. Captura canónica de dos pasos, select preseleccionado corregido, Yoast/meta/social/Service y URL
 original preservada. [QA y límites](docs/audits/public-site/2026-08-31-content-marketing-publication.md).
-
-## 2026-08-30 — Landing HubSpot: export aprobado publicado en Elementor
-
-2026-08-31: etiqueta del enlace de menú cambiada a «Servicios HubSpot» por pedido del operador; URL y jerarquía conservadas.
-
-2026-08-31: [auditoría SEO/AEO completa](docs/audits/public-site/2026-08-31-hubspot-seo-aeo.md):
-OG/Twitter y breadcrumb corregidos, Service conectado al grafo Yoast, enlace oficial del partner y HTTP→HTTPS
-301 sólo en la landing. Iconos 878 KB→2,4 KB y fuentes adelantadas; móvil LCP 16,3→8,6 s (lab; aún mejorable).
-Schema.org 0 errores/advertencias; GSC indexada, último crawl 27-08 anterior al rediseño. Header/footer intactos;
-persisten defectos globales del footer y falta respaldo localizado de las cifras 56%/76%. Snapshot SEO
-`_gh_hubspot_seo_20260831_093553`; hash Elementor sin cambios. Sin commit/push.
-Después se afinó la descripción SEO/social con `copywriting`, eliminando redundancia, sin cambiar title ni diseño.
-Por comentarios posteriores se restauró el timeline del diseño y se dejaron dos columnas de partner con badge mayor;
-[audit y rollback](docs/audits/public-site/2026-08-31-hubspot-timeline-partner-fix.md). SEO y datos Elementor intactos.
-Nueva revisión: [seis iconos oficiales HubSpot y logo ANAM](docs/audits/public-site/2026-08-31-hubspot-brand-assets.md);
-Media nativos, nota del caso identificada, SEO y shell conservados.
-Revisión siguiente: [isotipos en paneles, Smart CRM/Agent Hub y wordmark de licencias](docs/audits/public-site/2026-08-31-hubspot-product-marks.md);
-autorización del logo confirmada por operador, AEO sin símbolo propio identificado, sin cambios de copy/SEO.
-MCP suma [ChatGPT, Claude y Gemini reutilizados desde AEO](docs/audits/public-site/2026-08-31-hubspot-mcp-logos.md),
-en tarjeta y panel, tres Media nativos; AEO y contenido Elementor protegidos.
-Las cinco capacidades restantes suman [iconos semánticos azul claro](docs/audits/public-site/2026-08-31-hubspot-semantic-icons.md),
-diferenciados de las marcas oficiales, compartidos tarjeta/panel y editables.
-[Revisión editorial](docs/audits/public-site/2026-08-31-hubspot-editorial-copy.md): licencias, ANAM, partner y reunión;
-51 textos, sin «práctica» en la landing, sin cambios de diseño/SEO ni de otras páginas.
-Continuación: [industrias, primer paso y cinco etapas](docs/audits/public-site/2026-08-31-hubspot-industry-method-copy.md), solo copy en tres widgets.
-[Cierre documental delegado](docs/audits/public-site/2026-08-31-hubspot-documentation-closure.md): contratos, manual, skills y task reflejan publicación/alcance pendiente; Git acotado, sin push.
-
-
-Se reemplazó el cuerpo de `244079` por once widgets Elementor editables, con 23 paneles servidos por PHP,
-interacciones progresivas, CSS del diseño y header/footer nativos. URL e imagen destacada conservadas.
-Formulario real de tres pasos por Growth Forms, variante portable `hubspot_pillar`; desaparece el éxito
-simulado del export. Despliegue acotado por hashes, respaldo durable y verificación anónima responsive,
-teclado, reduced motion, rechazo de captcha y guardado nativo de Elementor. Sin commit/push.
-[Contrato](docs/architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md) ·
-[Audit](docs/audits/public-site/2026-08-30-hubspot-elementor-publication.md).

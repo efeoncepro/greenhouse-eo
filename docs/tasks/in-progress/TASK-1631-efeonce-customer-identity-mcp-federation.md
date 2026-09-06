@@ -1,5 +1,23 @@
 # TASK-1631 — Efeonce Customer Identity and MCP Federation Foundation
 
+## Delta 2026-09-06 — TASK-1837 EXTIENDE el contrato de invitación (code complete, rollout pendiente)
+
+`TASK-1837` (commits `5518d868e…189148c6e`, sin push) extiende lo que esta task dejó en Slice 1, sin romper el modelo:
+`issueExternalInvitation` devuelve además `delivery: { mode, status, attempts, recipientMasked, errorCode }` y la
+ruta admin `POST .../bindings/[id]/invitations` **deja de devolver `token`** cuando
+`EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED=true` (breaking para quien emita por curl/smoke esperando el token;
+el smoke `external-access-smoke.ts` pasa `delivery: 'manual'` y sigue consumiendo el `token` del command
+in-process). Commands nuevos: `resendExternalInvitation` (rota, 3/cadena), `revealExternalInvitationToken`
+(excepción, 1 h, motivo ≥10) y `resolveDelegatedAuthority` + `issueDelegatedExternalInvitation` +
+`listDelegatedExternalInvitations` (lane ecosystem `GET/POST /api/platform/ecosystem/identity/invitations`,
+flag `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED`, OFF ⇒ 404). Migración
+`20260906004450748_task-1837-…` (NO aplicada): 4 columnas `delivery_*` en `external_member_invitations`, 6
+`event_type` nuevos en `external_identity_audit_log`, 2 capabilities (`reveal_token`, `issue_delegated`) y
+`email_type_config('external_access_invitation')`. Señales: el grupo pasa de 6 a 9
+(`identity.external_invitation.{undelivered,expired_unaccepted,token_revealed}`). El guard de único
+administrador designado vigente ahora corre al emitir y al aceptar (`conflict` 409) y se limpia al revocar.
+Estado: **code complete, rollout pendiente** (migración, flags y verificación viva en el ledger de flags).
+
 ## Delta 2026-09-03 — Composición decidida: authorization server PROPIO (EPIC-044, re-alcance)
 
 El operador decidió construir y operar el emisor de Efeonce; no se compra WorkOS ni otro IdP. ADR aceptado:

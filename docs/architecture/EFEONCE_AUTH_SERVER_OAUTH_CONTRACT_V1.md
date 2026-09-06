@@ -177,6 +177,14 @@ campos `client_id`, `scope` (space-delimited), `return_to` (path+query del autho
 `decision` (`allow` | `deny`). La task ui-ux reemplaza la vista; el contrato de campos y rutas se
 mantiene. `deny` redirige al cliente con `error=access_denied&state&iss`.
 
+- **Host del `redirect_uri` visible (desde TASK-1837, 2026-09-06).** La pantalla revela a la persona el destino
+  de la autorización: `renderConsentPage` exige `redirectHost` (lanza si falta) y muestra "Destino de la
+  autorización: `<host>`" + "El código de autorización se enviará a esta dirección." (copy
+  `GH_AUTH_SERVER.consent_redirect_host_{label,hint}`, bloque `data-capture="id-redirect-host"`).
+  `authorize.ts` pasa `new URL(redirectUri).host` del `redirect_uri` ya validado contra el registro del cliente.
+  Es un MUST del protocolo (el usuario debe poder ver a quién autoriza), aditivo y sin flag; la vista ui-ux que
+  reemplace esta página conserva la revelación.
+
 ## 6. Persona autenticada (`SubjectSessionPort`)
 
 ```ts

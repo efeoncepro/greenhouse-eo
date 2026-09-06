@@ -19,10 +19,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Diseño. Investigación de mercado de 4 frentes cerrada 2026-09-05 (anexo en Detailed Spec). Ningún slice iniciado.`
+- Status real: `code complete, rollout pendiente (2026-09-06). Slices 1-4 y 5a en develop local (commits 5518d868e · 6cb8042a8 · c9371b28f · 4f03cdff6 · 189148c6e, sin push): entrega por el sistema, ciclo de vida (migración additive NO aplicada a la instancia compartida), retiro del token + revelación gobernada, autoridad delegada (lane ecosystem; federación en efeonce-mcp pendiente) y host del redirect_uri en el consentimiento. Verificado con tests unitarios (mocks) + typecheck; pnpm build de producción NO corrido (autorización del operador). Flags OFF en todos los runtimes. Slice 5b (alta real) bloqueado por la decisión del operador (organización/persona) y por el rollout (migrate:up + flag en staging).`
 - Rank: `TBD`
 - Domain: `identity|platform`
-- Blocked by: `none`
+- Blocked by: `rollout: pnpm pg:connect:migrate en la instancia compartida (confirmación del operador) + flags en staging; Slice 5b: decisión del operador sobre organización/persona de la primera invitación real; lane delegada: federación en efeonce-mcp (TASK-1831/1832)`
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -367,6 +367,24 @@ Reglas obligatorias:
      plan.md segun TASK_PROCESS.md. No llenar al crear la task.
      ═══════════════════════════════════════════════════════════ -->
 
+## Plan de ejecución (2026-09-06, sesión greenhouse-eo-21)
+
+- S1 entrega (`5518d868e`): `config.ts` (flags), `delivery.ts` (URL desde `issuer_url` del environment, envío
+  post-commit por import dinámico, registro de resultado), `issueExternalInvitation` devuelve `delivery`, EmailType
+  `external_access_invitation` token_sensitive + plantilla + copy, evento `delivery_failed`, migración additive
+  (columnas `delivery_*`, CHECK del audit, seeds de capabilities y `email_type_config`), ruta admin sin `token`.
+- S2 ciclo de vida (`6cb8042a8`): `resendExternalInvitation` (rota, topes), ruta `resend`, consumer de rebote
+  `external_invitation_delivery_bounced` (sin flag), 3 señales, smoke con `delivery:'manual'`.
+- S3 retiro + excepción (`c9371b28f`): `revealExternalInvitationToken` (1 h, razón, audit), ruta `reveal`,
+  capabilities en catálogo + grant `efeonce_admin` + test focal de cobertura.
+- S4 autoridad delegada (`4f03cdff6`): guard de admin único al aceptar + limpieza al revocar,
+  `resolveDelegatedAuthority`/`issueDelegatedExternalInvitation`/`listDelegatedExternalInvitations`, lane ecosystem
+  GET/POST (consumer interno, flag OFF ⇒ 404), 4 negativos.
+- S5a consentimiento (`189148c6e`): `redirectHost` obligatorio en `renderConsentPage`, copy, test.
+- S6 docs + gates: ledger, catálogo de eventos, control plane, invariantes, funcional, manual, Deltas cruzados.
+- Rollout (fuera de esta sesión, exige confirmación): migrate:up compartido → deploy OFF + smoke → flag staging →
+  correo real → rebote → reenvío/revelación → S4 en staging vía gateway → consentimiento → producción → S5b.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
      ═══════════════════════════════════════════════════════════ -->
@@ -506,6 +524,32 @@ invitado, se consume una sola vez y la aceptación con correo distinto revierte 
 quemarlo. **El problema nunca fue la criptografía: es el recorrido.** Cualquier plan que proponga
 cambiar el esquema del token está resolviendo algo que no está roto.
 
+### 4. Desviaciones de ejecución respecto al diseño (2026-09-06)
+
+1. La tabla de audit es `greenhouse_core.external_identity_audit_log` (no `external_access_audit_log`); su CHECK de
+   `event_type` se amplió con 6 tipos (`invitation_resent`, `invitation_token_revealed`, `invitation_delivery_failed`,
+   `invitation_delivery_bounced`, `designated_admin_assigned`, `designated_admin_cleared`).
+2. `designated_admin` de la invitación **ya se escribía** al aceptar (`commands.ts`, `UPDATE … designated_admin_profile_id`),
+   sin guard ni audit. Lo nuevo es el guard de único admin vigente (conflict fail-closed, token no consumido), el
+   audit y la limpieza al revocar al admin. El §Why This Task Exists estaba desactualizado en ese punto.
+3. El origen del emisor no es una env var (`AUTH_SERVER_PUBLIC_ORIGIN` no existe; Vercel no tiene `AUTH_SERVER_ISSUER`):
+   es el DATO `external_identity_environments.issuer_url` del environment del binding, hecho para absorber la
+   rotación de issuer. Cero env vars; test de contrato en `delivery.test.ts`.
+4. El drenaje del rebote (ops-worker) **no lleva flag**: sólo actúa sobre entregas que existen, así que es inerte
+   mientras nadie envía; gatearlo habría creado el riesgo multi-runtime del ledger sin proteger nada. El flag de
+   entrega se lee sólo en Vercel.
+5. La lane delegada es gateway-mediated: el harness ecosystem autentica consumers máquina (sister-platform) y ningún
+   runtime de este repo verifica el JWT del emisor. Como `identity/binding`, el gateway (consumer `internal`) verifica
+   el token de la persona y llama con `(environment, subject)`; Greenhouse resuelve la membership y exige
+   `designatedAdmin` sobre el `bindingId` pedido. La capability `issue_delegated` la materializa la membership (las
+   personas externas no tienen `ROLE_CODES`); el grant a `efeonce_admin` cubre la parity. Federación en
+   `efeonce-mcp` = TASK-1831/1832.
+6. `identity.external_invitation.expired_unaccepted` es informativa: warning ≥1, nunca error.
+7. Sin piso de latencia en la lane delegada: es una lane máquina detrás del gateway con rate limit propio, y las
+   respuestas son legítimamente distintas (`created` true/false sobre la propia organización).
+8. El command `issueExternalInvitation` conserva `token` en su resultado para consumidores in-process (smoke,
+   revelación); es la RUTA HTTP la que lo retira con entrega del sistema (guard `route.test.ts`).
+
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
@@ -598,43 +642,65 @@ cambiar el esquema del token está resolviendo algo que no está roto.
 
 ## Acceptance Criteria
 
-- [ ] Emitir una invitación desde la ruta admin envía un correo al invitado sin que ninguna persona de
-      Efeonce vea el token, y la respuesta **no** contiene el campo `token`.
-- [ ] Existe un test que falla si el payload del evento `identity.external_invitation.issued` incluye
-      el token.
-- [ ] Existe un test que falla si la respuesta de la ruta de emisión vuelve a incluir el token.
-- [ ] La URL de aceptación se deriva del origen configurado del emisor; un test falla si se arma con
-      `NEXT_PUBLIC_APP_URL`.
-- [ ] El correo del invitado está registrado como `token_sensitive` y su cuerpo no queda persistido en
-      `email_deliveries`.
-- [ ] Un fallo de envío deja la invitación con `delivery_status='failed'`, lo dice en la respuesta y
+- [x] Emitir una invitación desde la ruta admin envía un correo al invitado sin que ninguna persona de
+      Efeonce vea el token, y la respuesta **no** contiene el campo `token`. *(código + tests: `commands.test.ts`
+      «with system delivery sends the email AFTER the transaction», `route.test.ts`; correo real pendiente de
+      rollout con el flag en staging)*
+- [x] Existe un test que falla si el payload del evento `identity.external_invitation.issued` incluye
+      el token. *(`commands.test.ts` «never puts the token in the outbox payload»)*
+- [x] Existe un test que falla si la respuesta de la ruta de emisión vuelve a incluir el token.
+      *(`bindings/[bindingId]/invitations/route.test.ts`)*
+- [x] La URL de aceptación se deriva del origen configurado del emisor; un test falla si se arma con
+      `NEXT_PUBLIC_APP_URL`. *(`delivery.test.ts`: origen = `issuer_url` del environment; el módulo no referencia
+      ninguna env var `*URL`)*
+- [x] El correo del invitado está registrado como `token_sensitive` y su cuerpo no queda persistido en
+      `email_deliveries`. *(`TOKEN_SENSITIVE_EMAIL_TYPES` + `persistence.mode='token_sensitive'` con `safeContext`
+      acotado)*
+- [x] Un fallo de envío deja la invitación con `delivery_status='failed'`, lo dice en la respuesta y
       publica `identity.external_invitation.delivery_failed`; ninguna respuesta afirma entrega no
-      ocurrida.
-- [ ] Reenviar genera un token nuevo y el anterior queda rechazado; el tope por invitación y por
-      binding/hora se aplica y se prueba.
+      ocurrida. *(`commands.test.ts` «a failed send leaves the invitation issued…»)*
+- [x] Reenviar genera un token nuevo y el anterior queda rechazado; el tope por invitación y por
+      binding/hora se aplica y se prueba. *(`commands.test.ts` bloque «resendExternalInvitation»: la fila anterior
+      queda `revoked` `resent` en la misma tx; topes 3/cadena y 20/binding/hora con `rate_limited` 429)*
 - [ ] Un rebote de Resend deja `delivery_status='bounced'` y **enciende**
       `identity.external_invitation.undelivered` (observado pasando de `ok` a alerta, no sólo en `ok`).
-- [ ] Revelar el token exige la capability `identity.external_invitation.reveal_token` y una razón de
+      *(consumer + señal implementados y probados con mocks; el encendido ok→warning contra PG real exige el
+      rollout: migración aplicada + rebote forzado en staging)*
+- [x] Revelar el token exige la capability `identity.external_invitation.reveal_token` y una razón de
       ≥10 caracteres; el acto queda auditado con actor, razón e `invitation_id`, y **sin** el valor del
-      token; el enlace revelado caduca en 1 hora.
+      token; el enlace revelado caduca en 1 hora. *(`commands.test.ts` bloque «revealExternalInvitationToken»;
+      ruta `reveal` con la capability)*
 - [ ] Las tres capabilities nuevas están en `capabilities_registry`, en el catálogo TS y granteadas a
-      ≥1 rol real en el mismo PR; `capability-grant-coverage.test.ts` pasa.
-- [ ] Aceptar una invitación con `designated_admin: true` fija `designated_admin_profile_id` en el
-      binding sólo si no hay otro activo; el conflicto da error explícito y auditado.
+      ≥1 rol real en el mismo PR; `capability-grant-coverage.test.ts` pasa. *(catálogo TS + grant `efeonce_admin` +
+      `capability-grants.test.ts` ✔; el seed de `capabilities_registry` vive en la migración `20260906004450748`,
+      NO aplicada todavía. Nota: son 2 capabilities nuevas —`reveal_token`, `issue_delegated`—; `issue` ya existía)*
+- [x] Aceptar una invitación con `designated_admin: true` fija `designated_admin_profile_id` en el
+      binding sólo si no hay otro activo; el conflicto da error explícito y auditado. *(`commands.test.ts`
+      «acceptance with designated_admin fails closed»; el conflicto responde `conflict` 409 dentro de la tx —el
+      token NO se consume— y el intento queda en el ledger del emisor vía `rejected: conflict`; la asignación
+      exitosa audita `designated_admin_assigned`)*
 - [ ] Un administrador delegado puede invitar a una persona de su propio binding desde
-      `POST /api/platform/ecosystem/identity/invitations` usando su propio token.
-- [ ] Los cuatro negativos del Slice 4 responden como se especifica: binding ajeno 403, auto-elevación
-      422, tope superado 429/422, capability ausente 403.
-- [ ] La pantalla de consentimiento muestra el **host** del `redirect_uri`, y un test falla si se
-      renderiza sin él.
-- [ ] Aceptar con un correo verificado distinto al de la invitación **no** consume el token (test de
-      regresión sobre el comportamiento actual verificado).
-- [ ] Ambos flags tienen fila en `FEATURE_FLAG_STATE_LEDGER.md` con su runtime declarado, y
-      `pnpm docs:closure-check` pasa.
+      `POST /api/platform/ecosystem/identity/invitations` usando su propio token. *(lane implementada y probada
+      con mocks; el token de la persona lo verifica el gateway, cuya federación de esta lane es follow-up en
+      `efeonce-mcp` (TASK-1831/1832); flag OFF)*
+- [x] Los cuatro negativos del Slice 4 responden como se especifica: binding ajeno 403, auto-elevación
+      422, tope superado 429/422, capability ausente 403. *(`commands.test.ts` bloque «autoridad delegada» +
+      `ecosystem-identity-invitations.test.ts`: 403 forbidden, 422 invalid_request, 422 limit_reached, 429
+      rate_limited)*
+- [x] La pantalla de consentimiento muestra el **host** del `redirect_uri`, y un test falla si se
+      renderiza sin él. *(`oauth/pages/render.test.ts`; `renderConsentPage` lanza sin `redirectHost`)*
+- [x] Aceptar con un correo verificado distinto al de la invitación **no** consume el token (test de
+      regresión sobre el comportamiento actual verificado). *(`commands.test.ts` «rejects a verified email that
+      differs from the invited email»: el throw ocurre dentro de la tx, antes de cualquier UPDATE)*
+- [x] Ambos flags tienen fila en `FEATURE_FLAG_STATE_LEDGER.md` con su runtime declarado, y
+      `pnpm docs:closure-check` pasa. *(filas en § Pendientes, § Snapshot e § Inventario; `pnpm flags:audit
+      --strict --no-vercel` ✔)*
 - [ ] Existe una persona externa real, dada de alta de punta a punta sin intervención humana en la
-      entrega, con evidencia fechada en `docs/audits/`.
-- [ ] `TASK-1830` y `TASK-1832` quedan actualizadas con el desbloqueo, y `TASK-1631`, `TASK-1012` y
-      `TASK-1835` con su `## Delta`.
+      entrega, con evidencia fechada en `docs/audits/`. *(bloqueado: decisión del operador sobre organización y
+      persona + rollout)*
+- [x] `TASK-1830` y `TASK-1832` quedan actualizadas con el desbloqueo, y `TASK-1631`, `TASK-1012` y
+      `TASK-1835` con su `## Delta`. *(`## Delta 2026-09-06` en las cinco; TASK-1012 sigue `legacy` por formato
+      previo, no por este cambio)*
 
 ## Verification
 

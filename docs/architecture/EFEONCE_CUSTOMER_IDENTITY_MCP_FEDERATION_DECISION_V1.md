@@ -413,7 +413,34 @@ gateway, auth-server, UI — those live in `TASK-1828`/`1829`/`1830`/`1831`/`183
 7. The subprocessor gate (S0.3) does not block (native issuer); the security posture is audited in `TASK-1833`.
 8. No new Greenhouse feature flag: commands are gated by admin capability; the gateway reader only answers
    `internal` bindings; external usage is gated by the gateway's `OAUTH_EXTERNAL_ISSUER_ENABLED` (`TASK-1831`).
-   No new `*_ENABLED` ⇒ the flag ledger is unchanged.
+   No new `*_ENABLED` ⇒ the flag ledger is unchanged (superseded for the invitation lifecycle by the
+   TASK-1837 delta below: two flags, both default OFF, both in the ledger).
+
+### Delta 2026-09-06 — TASK-1837: entrega gobernada de la invitación y autoridad delegada
+
+Estado: **`code complete, rollout pendiente`** (migración `20260906004450748_task-1837-external-invitation-delivery-lifecycle.sql`
+sin aplicar; flags sin setear; sin verificación viva). Cierra el ciclo de vida de `external_member_invitations`:
+
+- **Entrega por el sistema** (`EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED`, Vercel): el command envía el correo
+  `external_access_invitation` post-commit y persiste `delivery_status`/`delivery_attempts`/`last_delivery_*` vía
+  `recordExternalInvitationDeliveryOutcome` (único writer; también lo usa el consumer del rebote en ops-worker). La URL
+  de aceptación es `${origin(issuer_url del environment)}/i/<token>` — nunca una env var.
+- **Token fuera de la respuesta HTTP** con entrega del sistema (sólo `delivery.mode='manual'` lo devuelve); fallo de
+  envío = `delivery_status='failed'` + audit + evento `identity.external_invitation.delivery_failed`, nunca "listo".
+- **Reenviar = rotar** (la abierta queda `revoked`, `revoke_reason='resent'`; 3 por cadena, 20 por binding/hora) y
+  **revelar = excepción gobernada** (capability `identity.external_invitation.reveal_token`, razón ≥10, fila nueva de
+  1 h, audit con actor/razón sin token, señal `token_revealed` steady 0).
+- **Autoridad delegada**: un solo admin designado vigente por binding (conflicto ⇒ token no consumido; revocarlo limpia
+  la columna); el admin invita a su propia organización por la lane ecosystem
+  `GET|POST /api/platform/ecosystem/identity/invitations` (`EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED`, OFF ⇒ 404),
+  gateway-mediated por `(environment, subject)`, sin auto-elevación (422), tope de asientos (default 25), 403 opaco fuera
+  de su binding. Federación en `efeonce-mcp`: `TASK-1831`/`TASK-1832`.
+- **Consentimiento**: la pantalla del auth-server muestra el host del `redirect_uri` validado (`redirectHost`
+  obligatorio en `renderConsentPage`).
+
+Invariantes: `agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` §"Entrega gobernada de la invitación externa y
+autoridad delegada (TASK-1837)"; señales en `GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` (delta 2026-09-06); eventos
+en `GREENHOUSE_EVENT_CATALOG_V1.md` (delta 2026-09-06).
 
 ### Slice 0 gateway authorization-context contract (2026-08-05)
 

@@ -1,9 +1,9 @@
 # Autorizador de Efeonce (`auth.efeonce.org`)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-09-04 por Claude
-> **Ultima actualizacion:** 2026-09-06 (TASK-1836 y contribuciones de TASK-1831)
+> **Ultima actualizacion:** 2026-09-06 por Claude (TASK-1837)
 > **Modulo:** Identidad y acceso (EPIC-044 · TASK-1828–1831 · TASK-1836)
 > **Documentacion tecnica:** [EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) (ADR nativo y contrato interno vigente), [EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md](../../architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md) (contrato OAuth: endpoints, claims, tablas e invariantes de TASK-1829), [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md#authorization-server-propio-authefeonceorg--task-1828-2026-09-04), [EPIC-044](../../epics/in-progress/EPIC-044-efeonce-identity-authorization-server-and-mcp-federation.md)
 > **Manual de uso:** [Operar el autorizador de Efeonce](../../manual-de-uso/identity/operar-autorizador-efeonce.md)
@@ -100,6 +100,14 @@ redirigir a cualquier parte. La política de loopback en cualquier puerto es una
 de autorización: no se hereda un consentimiento de otra organización o contexto. Los alcances de escritura exigen además un **step-up** (segundo factor, lo trae
 `TASK-1830`). La UI de TASK-1835 presenta el consentimiento usando una lectura de nombres de su propia población,
 posterior a la comprobación de autoridad; una proyección ausente o incompatible deniega.
+
+Desde TASK-1837 la pantalla de consentimiento muestra además el bloque **"Destino de la autorización"** con el
+host al que se enviará el código de autorización (el del `redirect_uri` ya validado contra el cliente), con la
+nota "El código de autorización se enviará a esta dirección". Por qué: el nombre de la aplicación lo declara la
+propia aplicación y puede sonar creíble; el destino no se puede maquillar. Mostrarlo le permite a la persona
+detectar una app que quiere llevarse el código a un dominio ajeno y es un MUST de la especificación de
+autorización MCP. El emisor se niega a renderizar el consentimiento sin ese host (no hay pantalla "sin destino").
+El tratamiento visual del bloque dentro de la ficha de la aplicación es de TASK-1835.
 
 ### 4. La app recibe sus pases (`POST /oauth/token`)
 

@@ -158,12 +158,12 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   Account 360 mediante bindings auditados. La coexistencia inicial con el login cliente actual requiere una ruta
   de convergencia posterior al mismo plano de identidad externo; nunca una segunda identidad o contraseña permanente.
 - EPIC-044: emisor propio `auth.efeonce.org`, KMS/JWKS, OAuth y sesiones de personas; gateway multi-issuer.
-  Autoridad externa e interna separadas por población, binding y contexto; SSO no concede permisos MCP.
-  Grants personales, `gv` y ledger de tokens se revalidan antes del dispatch; estado/audit/outbox son atómicos.
-  Login directo y OAuth se verifican por separado. Contratos:
-  [`ADR nativo`](docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md),
-  [`autoridad interna`](docs/architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md).
-  Estado y pendientes: [`runbook`](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
+  Autoridad externa e interna separadas por población/binding/contexto; SSO no concede permisos MCP.
+  Grants, `gv` y ledger de tokens se revalidan antes del dispatch; estado/audit/outbox atómicos.
+  [`ADR nativo`](docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) ·
+  [`autoridad interna`](docs/architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md) ·
+  [`runbook`](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md) ·
+  TASK-1837: invitación externa por el sistema + autoridad delegada (code complete, rollout pendiente).
 - La operación o evolución MCP se enruta por las skills espejo `.codex/skills/efeonce-mcp-platform/` y
   `.claude/skills/efeonce-mcp-platform/`; estas componen la skill dueña de cada provider y no duplican su policy.
   Las skills de arquitectura `software-architect-2026` y `arch-architect` deben cargar ese router antes de

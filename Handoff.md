@@ -1,5 +1,26 @@
 # Handoff activo
 
+**TASK-1837 (EPIC-044 U12) — `code complete, rollout pendiente`** (sesión greenhouse-eo-21, 2026-09-06, develop;
+commits `5518d868e` · `6cb8042a8` · `c9371b28f` · `4f03cdff6` · `189148c6e` + docs; **sin push**). El sistema
+entrega la invitación externa en el mismo acto que genera el token (post-commit, nunca por consumer reactivo: el
+outbox no lleva el secreto), la URL sale del `issuer_url` del environment (no de `NEXT_PUBLIC_APP_URL`), la ruta
+admin deja de devolver `token` con `EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED=true`, reenviar = rotar (3/cadena,
+20/binding/hora), revelar = excepción con capability + razón + 1 h + audit, rebote drenado por proyección sin flag
+(ops-worker), 3 señales `identity.external_invitation.*`, un solo admin designado vigente por binding, lane
+ecosystem delegada `GET/POST /api/platform/ecosystem/identity/invitations` (gateway-mediated por
+`environment`+`subject`; `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` OFF ⇒ 404) y el consentimiento muestra el
+host del `redirect_uri` (`redirectHost` obligatorio). Verificado: `pnpm test` completo 13.784 ✔, `pnpm typecheck` ✔,
+lint ✔, `task:lint` ✔; **`pnpm build` de producción NO corrido** (autorización del operador). **Riesgo de orden:**
+`INVITATION_SELECT` ya lee `delivery_*` → la migración `20260906004450748` (additive, NO aplicada) va **antes** del
+deploy; hasta entonces el reader de invitaciones y las 3 señales fallan (`unknown`) en la instancia compartida.
+**Próximo paso (exige confirmación):** `pnpm pg:connect:migrate` + `SELECT` de las 4 columnas → deploy con flags OFF +
+`pnpm identity:external-access:smoke` → verificar dominio remitente en Resend → flag de entrega en Vercel staging →
+correo real a casilla controlada → `/i/<token>` → `linked` → rebote forzado (señal `undelivered` ENCENDIDA) →
+reenvío/revelación → federar la lane delegada en `efeonce-mcp` (TASK-1831/1832) → producción con 24 h → primera
+persona externa real (decisión del operador; desbloquea el carril de tokens de TASK-1830 y la cohorte de
+TASK-1832). Detalle: [task](docs/tasks/in-progress/TASK-1837-efeonce-id-external-invitation-delivery-delegated-authority.md)
+§Plan de ejecución + §Desviaciones, [ledger](docs/operations/FEATURE_FLAG_STATE_LEDGER.md) § Pendientes.
+
 **TASK-1836 / TASK-1831 — evidencia consolidada, 2026-09-06:**
 Tres subagentes actualizaron contratos, funcionales, manuales, tasks/epic y skills espejo.
 [Mapa de construcción, pruebas y pendientes](docs/audits/2026-09-06-task-1836-1831-consolidated-evidence.md).
@@ -432,64 +453,3 @@ uso del patrón manifiesto+artefacto+hash), `docs/api` (pointer), arquitectura S
 task), manuales de uso del inventario/gateway/provider SEO, doc funcional SV360 por MCP, skills
 `dataforseo-operator` y `seo-aeo-practice` (espejadas), README y AGENTS del repo `efeonce-mcp` (cifras 28/36/6).
 Regla auto-cargada `.claude/rules/mcp-tool-surface.md` gana el invariante de manuales.
-
-## 2026-09-02 (5) — TASK-1784: el eval de selección MCP refutó su propia hipótesis, y eso es el entregable
-
-Se midió la selección de tools SEO antes de tocar una descripción: **tool 94.5% / mercado 98.2% / gasto 100%**
-sobre 55 preguntas de operador en los cinco mercados productivos, con piso de ruido cero (dos corridas
-idénticas). Después se probaron cuatro variantes de descripción, cada una determinista.
-
-🔴 **Los bloques de ruteo `Use when · Prefer X if · Do NOT use for` NO mejoraron la selección de tool.** La
-banda 92.7–96.4% no tiene dirección, y una variante hizo regresar a `prepare_seo_grounded_queries`, una tool que
-nadie tocó: alargar siete descripciones degrada la selección de sus vecinas. Se aplicó la variante SIN bloques.
-
-Lo que sí movió el número fue corregir dos afirmaciones falsas. La cláusula de mercado decía *"pass market when
-the organization has more than one"* —una instrucción de elegir—, y el modelo la obedecía justificándose con
-*"the operator is in Santiago"*: `ISSUE-152` en su propio razonamiento. Ahora nombra la clase de señal que NO es
-una declaración. **Mercado 98.2% → 100%.** Tool bajó a 92.7% y se reporta sin declarar mejora: su regresión es
-léxica y ninguna descripción le gana al nombre de su propia tool.
-
-**Hallazgo lateral, el más caro:** al hacer que el guard de paridad comparara `description`, aparecieron
-**21 de 27 tools federadas ya divergentes** — el gateway servía, entre otras, la instrucción que causa
-`ISSUE-152`. Se cerró **derivando** el texto del artefacto (`greenhouseToolDescription`) en vez de copiarlo.
-
-✅ **Gateway desplegado.** `mcp.efeonce.org` corre la revisión `efeonce-mcp-gateway-00027-6pj` desde el commit
-`3d09e152`, con la postura intacta (`internal-and-cloud-load-balancing` + invoker `allUsers`), `health=200` y
-`/mcp` desafiando 401. En ese commit hay **cero** ocurrencias de la instrucción vieja. Lo que NO se verificó:
-leer el `tools/list` servido exige login Entra interactivo y no es automatizable — la cadena
-commit→imagen→revisión es fuerte, pero no reemplaza leer el texto servido.
-
-⚠️ **Corrección: la "otra superficie" NO existe.** Se afirmó acá que la ruta `/api/mcp/greenhouse`
-(Vercel) seguía sirviendo las descripciones viejas. Es **falso**: su token
-`GREENHOUSE_MCP_REMOTE_GATEWAY_TOKEN` no existe en ningún environment (`vercel env ls`) y la ruta responde
-`404 — "Greenhouse MCP remote gateway is not configured."`, comprobado en vivo contra staging. No sirve
-texto viejo porque no sirve nada. **El gateway era la única superficie MCP viva y ya está corregida.**
-
-`develop` empujado (`0a68d92c`) con los 9 workflows en `success` — CI, Playwright E2E smoke y los cuatro
-deploys de workers Cloud Run incluidos. Producción queda pendiente del release `develop→main`, que no
-cambia nada servido por MCP. Único seguimiento real: `seo_provider_spend_daily` a 7 días — la disciplina de
-gasto dio 100% en el eval, pero eso se confirma en la factura, no en la medición.
-
-## 2026-09-02 (4) — Globe queda en hibernación profunda, reversible y documentada
-
-Por decisión del operador, Globe dejó de consumir trabajo productivo mientras todavía no genera ingresos. El
-estado live verificado a `2026-09-02T10:30:38Z` es: Cloud SQL `globe-pg` `STOPPED/NEVER`; schedulers Producer,
-Media y Governance `PAUSED`; cero ejecuciones activas; API `00216-wmm` y Studio `00150-m2m` listas, con
-`minInstances=0` y `GLOBE_PRODUCTIVE_LANES_ENABLED=false`. Se preservaron el disco SQL con deletion protection,
-backups/PITR, 10 buckets, 17 secretos, Artifact Registry, servicios/jobs, IAM, front door, budgets,
-observabilidad y Terraform. Ningún apply destruyó o reemplazó recursos; el post-plan quedó `No changes`.
-
-El Terraform de `efeonce-globe` gobierna ahora `active -> draining -> hibernated`. `draining` es obligatorio en
-ambos sentidos: mantiene SQL encendido mientras publica y verifica revisiones fail-closed. Un primer apply dejó
-una revisión API sin startup al apagar SQL demasiado pronto; la revisión anterior conservó tráfico, SQL se
-restauró temporalmente y se corrigió la secuencia antes del stop final, sin pérdida de datos.
-
-Baseline previo: ~CLP 348.152 netos/30 días. Residual hibernado modelado: CLP 20.000–30.000; reducción modelada:
-CLP 318.000–328.000. No es ahorro realizado hasta Billing Export a 24 h, 7 días y cierre mensual. Encender de
-nuevo requiere autorización explícita de gasto y seguir sin saltos
-`docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md`: `hibernated -> draining`, integridad y
-readback no facturable, luego `draining -> active`; ante falla se vuelve primero a `draining`.
-
-Las skills espejo `greenhouse-globe` y `greenhouse-globe-model-fleet` ya bloquean deploys, migraciones,
-generaciones, canarios y promociones mientras el estado siga hibernado. El ledger de modelos conserva evidencia
-histórica de integración, pero deja explícito que `available` no significa ejecutable durante la hibernación.
