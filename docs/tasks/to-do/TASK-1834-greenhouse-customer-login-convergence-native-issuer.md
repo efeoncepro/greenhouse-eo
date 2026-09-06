@@ -140,7 +140,7 @@ Reglas obligatorias:
 
 - `docs/tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md`
 - `docs/tasks/in-progress/TASK-1835-efeonce-id-login-consent-screens.md`
-- `docs/tasks/to-do/TASK-1832-efeonce-mcp-client-canaries-and-first-customer-cohort.md`
+- `docs/tasks/in-progress/TASK-1832-efeonce-mcp-client-canaries-and-first-customer-cohort.md`
 - `docs/tasks/to-do/TASK-1833-efeonce-auth-server-security-assurance-and-operations.md`
 - `docs/tasks/to-do/TASK-1839-invitation-delivery-primitive-convergence.md`
 - `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md`

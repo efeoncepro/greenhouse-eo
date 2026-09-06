@@ -133,7 +133,7 @@ Reglas obligatorias:
   la invitación y los grants. Esta task **extiende su contrato, no lo reemplaza**.
 - `docs/tasks/in-progress/TASK-1830-efeonce-auth-external-person-authentication.md` — dueña de la
   autenticación de la persona una vez que acepta.
-- `docs/tasks/to-do/TASK-1832-efeonce-mcp-client-canaries-and-first-customer-cohort.md` — consumidora:
+- `docs/tasks/in-progress/TASK-1832-efeonce-mcp-client-canaries-and-first-customer-cohort.md` — consumidora:
   la cohorte no abre sin esta task.
 - `docs/tasks/to-do/TASK-1012-invite-activation-cross-env-url-and-delivery-status.md` — ya declaró dos
   gaps idénticos para el portal (URL de activación cross-env y sync de estado de entrega con Resend).

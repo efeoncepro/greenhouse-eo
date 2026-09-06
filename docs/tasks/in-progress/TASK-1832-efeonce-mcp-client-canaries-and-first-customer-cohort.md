@@ -112,7 +112,7 @@ organización cliente real, sí**.
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -125,10 +125,10 @@ organización cliente real, sí**.
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-044`
-- Status real: `Diseno actualizado 2026-09-06: OAuth/personas y TASK-1837 ya están activos; la implementación pendiente es un carril canary externo explícito, la matriz live con clientes MCP reales usando personas smoke_test y la certificación allow/deny/refresh/revocación. No se incorpora un cliente real; ese piloto pertenece a TASK-1841.`
+- Status real: `Ownership tomado 2026-09-06: goal confirmado, pnpm codex:task-hook TASK-1832 --develop verde, auditoría de código/schema/runtime completada y plan versionado en docs/tasks/plans/TASK-1832-plan.md. No hay implementación, migración aplicada, datos canary, flags, push ni deploy de esta ejecución; el checkpoint humano P0/Alto está pendiente antes de código. El apply exige además que el operador apruebe la organización canary exacta y las cuentas M365/Google controladas.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
-- Blocked by: `none`
+- Blocked by: `checkpoint humano del plan para iniciar código; organización canary exacta y cuentas M365/Google para apply y matriz live`
 - Branch: `Greenhouse develop; efeonce-mcp main; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -206,6 +206,12 @@ Reglas obligatorias:
 
 - `src/lib/identity/external-access/**` (primitive/command/store canary y boundary tests)
 - `migrations/<timestamp>_task-1832-external-canary-binding-purpose.sql`
+- `src/app/api/admin/identity/external-access/canaries/**` y capacidades runtime/registry correspondientes
+- `src/lib/account-360/organization-store.ts` y la definición vigente de `greenhouse_serving.person_360`
+  únicamente para excluir `data_origin='smoke_test'` de los readers 360; sin cambiar la raíz de identidad
+- `services/auth-server/**` y su workflow sólo para el gate canary fail-closed en emisión
+- `/Users/jreye/Documents/efeonce-mcp/src/**` y workflow de deploy sólo para contrato/policy/gate del gateway;
+  cualquier commit, push, PR o deploy en el repo hermano conserva autorización separada
 - `docs/operations/runbooks/mcp-external-canary-certification.md` (nuevo)
 - `docs/audits/mcp/EFEONCE_MCP_CLIENT_TOKEN_MATRIX_<fecha>.md` (nuevo, redactado)
 - `scripts/mcp/external-client-canary.mjs` (nuevo: flujo PKCE automatizable con cliente CIMD de prueba)
@@ -235,8 +241,8 @@ Reglas obligatorias:
 - Current home: `src/lib/identity/external-access/**`, `services/auth-server/**`, `scripts/mcp/**` y gateway `efeonce-mcp`
 - Future candidate home: `domain-package`
 - Boundary: primitive transaccional común; command canary separado; emisor/gateway/clientes consumen sólo contracts gobernados
-- Server/browser split: n/a
-- Build impact: none
+- Server/browser split: `commands, registry, resolución, emisión, policy y cleanup son server-only; el browser sólo participa en login/consentimiento/PKCE mediante superficies OAuth existentes y Playwright, sin recibir reglas de elegibilidad ni secretos`
+- Build impact: `Greenhouse/Vercel + auth-server Cloud Run + efeonce-mcp gateway; no crea un deployable nuevo`
 - Extraction blocker: transacción de binding/grant/audit en Greenhouse y policy de dispatch en el gateway
 
 ## Backend/Data Contract
@@ -300,7 +306,60 @@ Reglas obligatorias:
 - [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
 - [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
-<!-- ZONE 2 — PLAN MODE: lo produce el agente que toma la task. -->
+<!-- ═══════════════════════════════════════════════════════════
+     ZONE 2 — PLAN MODE
+     ═══════════════════════════════════════════════════════════ -->
+
+## Audit record — 2026-09-06
+
+Plan completo: [`docs/tasks/plans/TASK-1832-plan.md`](../plans/TASK-1832-plan.md).
+
+El preflight se ejecutó con `pnpm codex:task-hook TASK-1832 --develop`. Se confirmó `develop` con WIP ajeno
+de TASK-1835, que queda fuera del ownership y del staging de esta task. Readback live no mutante: emisor y
+gateway responden, los flags nativo/interno vigentes están ON y el gateway servido es compatible con el
+emisor nativo, pero el carril canary externo no existe ni está acreditado por esos GET. La auditoría de código
+confirmó que `bindExternalOrganization` todavía protege la elegibilidad comercial, que el gateway deniega hoy
+`native-external` en tools de negocio y que la resolución no transporta purpose/vencimiento.
+
+La revisión de procedencia encontró que `identity_profiles.data_origin` ya modela `smoke_test`, pero
+`greenhouse_serving.person_360` y `searchProfiles` incluyen hoy todo perfil activo salvo los fusionados. Por
+eso el cierre no puede descansar sólo en «sin membership/CRM»: los readers 360 deben excluir explícitamente
+procedencia no-real y probar que una persona real permanece visible. Retención, consentimientos y revocación
+siguen siendo ciegos a procedencia; el filtro sólo gobierna visibilidad.
+
+## Plan pendiente de checkpoint
+
+1. Aceptar un Delta ADR que haga `binding_purpose` explícito y mutuamente excluyente: `customer` para bindings
+   externos comerciales, `canary` sólo para una registración externa exacta, y `NULL` para población interna.
+   Purpose, registro y vencimiento son inmutables; renovar crea una nueva registración/binding.
+2. Agregar una migración aditiva con registry canary vacío, FK a organización/environment/capability,
+   vencimiento obligatorio, estado/revocación, checks de propósito y nuevas capabilities administrativas
+   finas. La única capability de negocio permitida en V1 será `growth.seo.observation.read`.
+3. Implementar `registerExternalCanaryOrganization`, `bindExternalCanaryOrganization` y revocación dedicada
+   sobre la transacción/audit/outbox canónicos. `bindExternalOrganization` conserva su semántica: sigue
+   exigiendo `client|both` + `active_client` y escribe purpose `customer` explícito.
+4. Endurecer invitación/grant/resolución: un binding canary sólo acepta perfiles `smoke_test`, nunca
+   `designated_admin`, no fusiona por correo con perfiles reales, exige expiración y rechaza cualquier
+   capability fuera de la allowlist. Los commands delegados siguen exclusivos de purpose `customer`.
+5. Excluir `data_origin='smoke_test'` de `person_360` y de la búsqueda de Account 360, con tests positivos y
+   negativos. No se borra el perfil, no se redefine el tratamiento de `demo|synthetic_seed` ni se alteran
+   compliance, retención o auditoría.
+6. Agregar gates independientes default OFF en Greenhouse/auth-server y gateway. OFF debe impedir emisión y
+   dispatch; el gateway sólo permitirá purpose `canary` en `get_seo_entitlement`. Customer externo continúa
+   fail-closed hasta TASK-1841 y todos los writes/internal-only quedan denegados.
+7. Construir pruebas locales/live, script PKCE sin persistir secretos, runbook y matriz redactada. Después se
+   secuencia migración aditiva, consumers compatibles con flags OFF, staging, aprobación del fixture exacto,
+   producción, cleanup y siete días de señales. Un `skipped`, GET de metadata o status tool no cuenta como
+   certificación.
+
+### Checkpoint humano P0/Alto
+
+- `pendiente`: aprobar este diseño antes del primer cambio de código o ADR.
+- La aprobación del plan autoriza sólo cambios locales reversibles y su verificación; no autoriza commit/push
+  al repo hermano, PR, apply de migración, creación/reutilización de organización, cuentas, invitaciones,
+  flags, deploy ni sesiones interactivas.
+- Antes del apply, el operador debe identificar y aprobar por ID la organización canary no-cliente y las
+  cuentas M365/Google controladas. No se inferirá Efeonce ni se creará una organización por conveniencia.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -489,5 +548,5 @@ internos OFF, después cohorte y readbacks; no sustituir configuración declarat
 Referencias: [runbook interno](../../operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md),
 [ADR interno](../../architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md),
 [review UI local](../../ui/reviews/TASK-1835-first-fold-review.md). Capturas con DTOs ficticios y tests
-locales no acreditan autenticación real, deploy ni consentimiento persistido. Lifecycle continúa
-`to-do`; todos los acceptance criteria de canary permanecen sin marcar.
+locales no acreditan autenticación real, deploy ni consentimiento persistido. En ese readback, Lifecycle
+continuaba `to-do`; todos los acceptance criteria de canary permanecían sin marcar.

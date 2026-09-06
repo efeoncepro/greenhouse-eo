@@ -84,7 +84,7 @@ Reglas obligatorias:
 
 - `docs/operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md`
 - `docs/operations/EFEONCE_CUSTOMER_IDENTITY_PRIVACY_REVIEW_V1.md`
-- `docs/tasks/to-do/TASK-1832-efeonce-mcp-client-canaries-and-first-customer-cohort.md`
+- `docs/tasks/in-progress/TASK-1832-efeonce-mcp-client-canaries-and-first-customer-cohort.md`
 - `docs/tasks/to-do/TASK-1833-efeonce-auth-server-security-assurance-and-operations.md`
 - `docs/tasks/in-progress/TASK-1835-efeonce-id-login-consent-screens.md`
 - `docs/tasks/complete/TASK-1837-efeonce-id-external-invitation-delivery-delegated-authority.md`

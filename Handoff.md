@@ -1,5 +1,18 @@
 # Handoff activo
 
+**TASK-1832 — ownership y plan P0/Alto, checkpoint pendiente (Codex, 2026-09-06):** goal confirmado y
+`pnpm codex:task-hook TASK-1832 --develop` verde. La task pasó a `in-progress` y el plan quedó en
+`docs/tasks/plans/TASK-1832-plan.md`. Auditoría de código/schema/runtime confirmó tres fronteras: el command
+comercial conserva `client|both` + `active_client`; el gateway actual no autoriza tools de negocio a
+`native-external`; y `person_360`/la búsqueda 360 todavía incluyen perfiles `smoke_test`, por lo que el plan
+agrega una exclusión específica para esa procedencia sin redefinir `demo|synthetic_seed`. Diseño propuesto:
+registry exacto vacío, purpose canary inmutable, TTL, una sola capability read-only
+(`growth.seo.observation.read`), perfiles exclusivamente `smoke_test`, sin
+designated admin, gates independientes default OFF en emisor/gateway, allow sólo de `get_seo_entitlement`,
+revocación y evidencia redactada. No se implementó código/ADR, no se aplicó migración, no se crearon datos ni
+cuentas, y no hubo commit/push/deploy. WIP de TASK-1835 preservado. Siguiente paso: checkpoint humano del plan;
+el apply queda además condicionado a organización canary exacta y cuentas M365/Google aprobadas.
+
 **TASK-1835 (EPIC-044 U06) — `UI ready: yes`, code complete, SIN DESPLEGAR (Claude greenhouse-eo-06, 2026-09-06;
 commits `85c67e97d` · `4eb358d5b` · `b15b1690e`).** Efeonce ID queda enterprise-ready en local. Tres hallazgos que
 importan más que el trabajo planificado:
