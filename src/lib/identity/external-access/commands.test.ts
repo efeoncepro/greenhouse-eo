@@ -27,6 +27,7 @@ const {
   grantExternalCapability,
   issueExternalInvitation,
   resendExternalInvitation,
+  revealExternalInvitationToken,
   revokeExternalAccess,
   upsertExternalIdentityEnvironment
 } = await import('./commands')
@@ -701,6 +702,55 @@ describe('TASK-1837 — resendExternalInvitation (reenviar = rotar)', () => {
     await expect(
       resendExternalInvitation({ invitationId: 'xmi-1', bindingId: 'xob-other', delivery: 'manual' }, actor)
     ).rejects.toMatchObject({ code: 'not_found' })
+  })
+})
+
+describe('TASK-1837 — revealExternalInvitationToken (excepción gobernada)', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  const revealRoute = () =>
+    route([
+      [/FROM greenhouse_core\.external_member_invitations\s+WHERE invitation_id = \$1\s+FOR UPDATE/, () => [invitationRow()]],
+      [/WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/, () => [bindingRow()]],
+      [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
+      [/SET status = 'revoked'[\s\S]*revoke_reason = 'revealed'/, () => []],
+      [
+        /INSERT INTO greenhouse_core\.external_member_invitations/,
+        params => [invitationRow({ invitation_id: params[0], expires_at: '2026-09-05T01:00:00Z' })]
+      ],
+      [/INSERT INTO greenhouse_core\.external_identity_audit_log/, () => []]
+    ])
+
+  it('requires a reason of at least 10 characters', async () => {
+    await expect(
+      revealExternalInvitationToken({ invitationId: 'xmi-1', reason: 'corto' }, actor)
+    ).rejects.toMatchObject({ code: 'invalid_request', details: { field: 'reason' } })
+  })
+
+  it('rotates to a 1-hour link, audits actor + reason WITHOUT the token, and sends no email', async () => {
+    revealRoute()
+
+    const result = await revealExternalInvitationToken(
+      { invitationId: 'xmi-1', reason: 'Persona sin correo operativo; entrega por Teams verificada' },
+      actor
+    )
+
+    expect(result.token).toMatch(/^[A-Za-z0-9_-]{40,}$/)
+    expect(result.acceptanceUrl).toBe(`https://auth.efeonce.org/i/${encodeURIComponent(result.token)}`)
+
+    const insertParams = calls(/INSERT INTO greenhouse_core\.external_member_invitations/)[0]?.[1] as unknown[]
+
+    expect(insertParams[8]).toBe(1)
+
+    const auditCalls = calls(/INSERT INTO greenhouse_core\.external_identity_audit_log/)
+    const auditParams = auditCalls[0]?.[1] as unknown[]
+
+    expect(auditParams[1]).toBe('invitation_token_revealed')
+    expect(auditParams[8]).toBe('user-admin-1')
+    expect(auditParams[9]).toContain('Persona sin correo')
+    expect(JSON.stringify(auditParams)).not.toContain(result.token)
+    expect(JSON.stringify(publishMock.mock.calls[0]?.[0])).not.toContain(result.token)
+    expect(calls(/UPDATE greenhouse_core\.external_member_invitations i\s+SET delivery_status/)).toHaveLength(0)
   })
 })
 

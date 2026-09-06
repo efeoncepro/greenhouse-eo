@@ -41,6 +41,7 @@ export {
   grantExternalCapability,
   issueExternalInvitation,
   resendExternalInvitation,
+  revealExternalInvitationToken,
   revokeExternalAccess,
   upsertExternalIdentityEnvironment,
   type AcceptExternalInvitationInput,
@@ -51,6 +52,8 @@ export {
   type IssueExternalInvitationOptions,
   type IssueExternalInvitationResult,
   type ResendExternalInvitationInput,
+  type RevealExternalInvitationTokenInput,
+  type RevealExternalInvitationTokenResult,
   type RevokeExternalAccessInput,
   type RevokeExternalAccessResult,
   type UpsertExternalIdentityEnvironmentInput

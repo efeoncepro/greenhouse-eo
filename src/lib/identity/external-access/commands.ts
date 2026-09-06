@@ -21,6 +21,7 @@ import { readExternalInvitationConfig } from './config'
 import {
   buildInvitationDelivery,
   recordExternalInvitationDeliveryOutcome,
+  resolveInvitationAcceptanceUrl,
   sendInvitationEmailViaPlatform,
   type InvitationEmailSender
 } from './delivery'
@@ -966,6 +967,138 @@ export const resendExternalInvitation = async (
   const delivered = await deliverIssuedInvitation(committed, actor, options.sender ?? sendInvitationEmailViaPlatform)
 
   return { invitation: delivered, token: committed.token, created: true, delivery: buildInvitationDelivery(delivered, 'system') }
+}
+
+export type RevealExternalInvitationTokenInput = {
+  invitationId: string
+  bindingId?: string | null
+  /** Obligatoria, ≥ 10 caracteres. Se audita; el valor del token NUNCA. */
+  reason: string
+}
+
+export type RevealExternalInvitationTokenResult = {
+  invitation: ExternalMemberInvitation
+  /** Enlace de 1 hora. Existe sólo en esta respuesta. */
+  token: string
+  acceptanceUrl: string | null
+  expiresAt: string
+}
+
+const REVEAL_REASON_MIN_LENGTH = 10
+
+/**
+ * TASK-1837 — Excepción gobernada: para la persona sin correo operativo. NO reexpone el secreto
+ * (no existe en claro): ROTA la invitación abierta a una nueva de 1 hora sin enviar correo, y
+ * devuelve ese token UNA vez. Capability `identity.external_invitation.reveal_token`, razón
+ * obligatoria, audit `invitation_token_revealed` (actor + razón + invitation_id; jamás el token),
+ * señal `identity.external_invitation.token_revealed` steady 0.
+ */
+export const revealExternalInvitationToken = async (
+  input: RevealExternalInvitationTokenInput,
+  actor: ExternalAccessActor
+): Promise<RevealExternalInvitationTokenResult> => {
+  const invitationId = assertNonEmptyString(input.invitationId, 'invitationId', 128)
+  const expectedBindingId = optionalString(input.bindingId, 'bindingId', 128)
+  const reason = assertNonEmptyString(input.reason, 'reason', 2000)
+  const performedBy = actorId(actor)
+  const config = readExternalInvitationConfig()
+
+  if (reason.length < REVEAL_REASON_MIN_LENGTH) {
+    throw new ExternalAccessError('invalid_request', 'reason must have at least 10 characters', {
+      field: 'reason',
+      minLength: REVEAL_REASON_MIN_LENGTH
+    })
+  }
+
+  return withTransaction(async client => {
+    const { rows } = await client.query<Parameters<typeof mapInvitationRow>[0]>(
+      `SELECT ${INVITATION_SELECT}
+         FROM greenhouse_core.external_member_invitations
+        WHERE invitation_id = $1
+        FOR UPDATE`,
+      [invitationId]
+    )
+
+    const previous = rows[0] ? mapInvitationRow(rows[0]) : null
+
+    if (!previous || (expectedBindingId && previous.bindingId !== expectedBindingId)) {
+      throw new ExternalAccessError('not_found', 'invitation not found', { invitationId })
+    }
+
+    if (previous.status !== 'issued') {
+      throw new ExternalAccessError('invitation_not_open', 'only an issued invitation can be revealed', {
+        invitationId,
+        status: previous.status
+      })
+    }
+
+    const binding = await requireActiveBinding(client, previous.bindingId)
+    const environment = await loadEnvironmentForUpdate(client, binding.environmentId)
+
+    await assertBindingIssueRate(client, binding.bindingId, config.issueLimitPerBindingPerHour)
+
+    await client.query(
+      `UPDATE greenhouse_core.external_member_invitations
+          SET status = 'revoked', revoked_at = CURRENT_TIMESTAMP, revoked_by = $2,
+              revoke_reason = 'revealed', updated_at = CURRENT_TIMESTAMP
+        WHERE invitation_id = $1`,
+      [previous.invitationId, performedBy]
+    )
+
+    const { invitation, token } = await insertInvitationRow(client, {
+      bindingId: binding.bindingId,
+      profileId: previous.profileId,
+      email: previous.email,
+      designatedAdmin: previous.designatedAdmin,
+      reason: previous.reason,
+      performedBy,
+      expiresInHours: config.revealedLinkTtlHours,
+      deliveryAttempts: previous.deliveryAttempts
+    })
+
+    await appendAudit(client, {
+      eventType: 'invitation_token_revealed',
+      environmentId: binding.environmentId,
+      bindingId: binding.bindingId,
+      invitationId: invitation.invitationId,
+      organizationId: binding.organizationId,
+      profileId: previous.profileId,
+      performedBy,
+      reason,
+      metadata: { previousInvitationId: previous.invitationId, ttlHours: config.revealedLinkTtlHours }
+    })
+
+    await publishOutboxEvent(
+      {
+        aggregateType: AGGREGATE_TYPES.externalIdentityBinding,
+        aggregateId: binding.bindingId,
+        eventType: EVENT_TYPES.externalInvitationIssued,
+        payload: {
+          schemaVersion: 1,
+          bindingId: binding.bindingId,
+          invitationId: invitation.invitationId,
+          organizationId: binding.organizationId,
+          environmentId: binding.environmentId,
+          designatedAdmin: previous.designatedAdmin,
+          profileId: previous.profileId,
+          reissue: true,
+          revealedFromInvitationId: previous.invitationId,
+          deliveryMode: 'manual',
+          changedByUserId: performedBy
+        }
+      },
+      client
+    )
+
+    const resolved = environment ? resolveInvitationAcceptanceUrl(environment, token) : null
+
+    return {
+      invitation,
+      token,
+      acceptanceUrl: resolved?.ok ? resolved.url : null,
+      expiresAt: invitation.expiresAt
+    }
+  })
 }
 
 export type AcceptExternalInvitationInput = {
