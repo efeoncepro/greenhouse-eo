@@ -13,7 +13,6 @@ import type { OAuthErrorCode } from '../errors'
 import { EFEONCE_ISOTIPO_SVG, EFEONCE_LOGOTYPE_NEGATIVE_SVG } from './efeonce-isotipo.generated'
 import { renderClientMark } from './client-marks'
 import { ICON_ALERT, ICON_ARROW_RIGHT, ICON_BUILDING, ICON_EYE, ICON_LOCK, ICON_PENCIL, ICON_SHIELD_CHECK } from './icons'
-import { AUTH_FONT_LICENSES } from './fonts.generated'
 import { AUTH_SERVER_STYLES } from './styles.generated'
 import { isWriteScope } from '../scopes'
 
@@ -61,21 +60,6 @@ const clientContext = (clientName: string, clientId: string): string => {
     </div>`
 }
 
-/**
- * Pie con las licencias OFL de las fuentes embebidas.
- *
- * Los .txt ya se servían desde el propio emisor y el copy `font_licenses_label` estaba escrito, pero
- * NINGUNA página los enlazaba: la obligación de la SIL OFL se cumplía con archivos que nadie podía
- * alcanzar, y el id de copy llevaba meses huérfano delatando el enlace que faltaba.
- */
-const fontLicenses = (): string => {
-  const links = Object.keys(AUTH_FONT_LICENSES)
-    .map(path => `<a href="${escapeHtml(path)}">${escapeHtml(path.split('/').pop()?.replace('-OFL.txt', '') ?? path)}</a>`)
-    .join('')
-
-  return `<footer class="id-footer"><span>${escapeHtml(GH_AUTH_SERVER.font_licenses_label)}:</span> ${links}</footer>`
-}
-
 export const layout = (
   title: string,
   body: string,
@@ -99,7 +83,6 @@ export const layout = (
     <header class="id-brand" aria-label="${escapeHtml(EFEONCE_BRAND_NAME)}">${EFEONCE_ISOTIPO_SVG}<span>${escapeHtml(GH_AUTH_SERVER.brand_title)}</span></header>
     ${options.clientName ? clientContext(options.clientName, options.clientId ?? '') : ''}
     <div class="id-surface">${body}</div>
-    ${fontLicenses()}
   </main>
   ${state === 'login' ? brandRail() : ''}
 </div>

@@ -271,12 +271,6 @@ form .id-actions { margin-block-start:${s(4)}; }
 .id-note .id-icon { color:var(--id-muted); }
 .id-actions { display:flex; gap:${s(3)}; margin-block-start:${s(7)}; }
 .id-actions > * { flex:1; }
-/* El pie vive FUERA de la tarjeta, sobre el lienzo azul: sus colores salen del lienzo, no del token
-   de la tarjeta. Al agregarlo heredó el gris y el azul de acento del papel y midió 3.28:1 — la
-   misma falla de clase compartida entre dos fondos opuestos que ya había costado el 1.53:1 de la
-   ficha de aplicación. La detectó pnpm auth-server:verify-contrast en la misma sesión. */
-.id-canvas .id-footer { color:color-mix(in oklch, ${n.bgWhite} 72%, transparent); }
-.id-canvas .id-footer a { color:${n.bgWhite}; }
 .id-muted,.id-footer,.id-preview-note { font-size:${typographyScale.bodyMd.fontSize}; color:var(--id-muted); }
 .id-preview-note { margin-block-end:${s(5)}; text-align:center; }
 .id-footer { text-align:center; margin-block-start:${s(7)}; font-size:${typographyScale.bodySm.fontSize}; color:${n.textDisabled}; }

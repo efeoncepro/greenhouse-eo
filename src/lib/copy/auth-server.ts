@@ -7,7 +7,6 @@
 export const GH_AUTH_SERVER = {
   brand_title: 'Efeonce ID',
   page_lang: 'es-CL',
-  font_licenses_label: 'Licencias de fuentes',
   application_context_label: 'Aplicación',
   /**
    * Señal de la ficha de aplicación. Se muestra cuando el `client_id` NO es un origen comprobable:
