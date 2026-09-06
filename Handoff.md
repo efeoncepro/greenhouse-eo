@@ -16,6 +16,14 @@ sin rebote forzado, flags NOT SET. **Próximo paso:** el operador designa organi
 `bindExternalOrganization`), se prende el flag de entrega en Vercel staging, correo real → `/i/<token>` → `linked`,
 rebote forzado (señal `undelivered` ENCENDIDA), federar la lane delegada en `efeonce-mcp` (TASK-1831/1832), producción
 con 24 h. Skills espejo actualizadas: `efeonce-mcp-platform` (lane delegada, matriz de verificación) y `greenhouse-qa-release-auditor/security-qa`.
+**Push a develop `21aa12608..4e81e371a` (2026-09-06 01:43Z): CI y 8 deploys verdes; staging READY y sondeado (detalle de
+binding devuelve `deliveryStatus`, `reveal` responde 422 canónico, lane delegada desplegada).** ⚠️ **Incidente de
+coordinación:** el push cayó en medio del Production Release de PR #226 (`456d9acc`, orquestador 01:41); los deploys
+de develop pisaron los Cloud Run compartidos (`commercial-cost-worker` `00558` de develop sobre la `00557` del release)
+→ `GIT_SHA mismatch`, manifest a `failure`; `ICO Batch Worker Deploy` de develop falló por el mismo choque. El operador
+relanzó el orquestador (01:53) y cerró `released` con todo en success; los cuatro workers quedaron en `456d9acc`.
+Regla nueva (memoria): antes de pushear develop, `gh run list --workflow production-release.yml` + PRs mergeados a
+main; no pushear con un release en vuelo.
 Evidencia: [audit](docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md);
 [task](docs/tasks/in-progress/TASK-1837-efeonce-id-external-invitation-delivery-delegated-authority.md);
 [ledger](docs/operations/FEATURE_FLAG_STATE_LEDGER.md) § Pendientes.
