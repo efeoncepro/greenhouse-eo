@@ -1111,7 +1111,12 @@ export type DelegatedAuthorityInput = {
   /** `sub` verificado por el emisor (lo verifica el gateway; Greenhouse resuelve por source link). */
   subject: string
   /** Binding pedido explícitamente por el cliente; debe ser uno donde la persona es admin designado. */
-  bindingId: string
+  bindingId?: string | null
+  /**
+   * Alternativa al `bindingId`: la organización (Account 360) que el gateway ya resolvió para la persona.
+   * Se exige exactamente uno de los dos; ambos presentes deben apuntar a la misma membership.
+   */
+  organizationId?: string | null
 }
 
 export type DelegatedAuthority = {
@@ -1128,17 +1133,28 @@ export type DelegatedAuthority = {
  * por qué (anti-oráculo).
  */
 export const resolveDelegatedAuthority = async (input: DelegatedAuthorityInput): Promise<DelegatedAuthority> => {
-  const bindingId = assertNonEmptyString(input.bindingId, 'bindingId', 128)
+  const bindingId = optionalString(input.bindingId, 'bindingId', 128)
+  const organizationId = optionalString(input.organizationId, 'organizationId', 128)
+
+  if (!bindingId && !organizationId) {
+    throw new ExternalAccessError('invalid_request', 'bindingId or organizationId is required', { field: 'bindingId' })
+  }
+
   const resolution = await resolveExternalAccess({ environmentId: input.environmentId, subject: input.subject })
 
   if (resolution.outcome !== 'bound' || !resolution.profileId) {
-    throw new ExternalAccessError('forbidden', 'subject is not bound', { bindingId })
+    throw new ExternalAccessError('forbidden', 'subject is not bound', { bindingId, organizationId })
   }
 
-  const membership = resolution.memberships.find(item => item.bindingId === bindingId)
+  const membership = resolution.memberships.find(
+    item => (bindingId ? item.bindingId === bindingId : true) && (organizationId ? item.organizationId === organizationId : true)
+  )
 
   if (!membership || !membership.designatedAdmin) {
-    throw new ExternalAccessError('forbidden', 'subject is not the designated admin of this binding', { bindingId })
+    throw new ExternalAccessError('forbidden', 'subject is not the designated admin of this binding', {
+      bindingId,
+      organizationId
+    })
   }
 
   return {
@@ -1660,6 +1676,29 @@ export const revokeExternalAccess = async (
 
       for (const profileId of revokedProfileIds) {
         await deactivateOrphanSourceLinks(client, binding.environmentId, profileId)
+      }
+
+      // TASK-1837 follow-up — un binding revocado no conserva a su administrador designado: la columna
+      // quedaba inerte pero VISIBLE (detalle/resolver) y confundía a quien leía «admin: X» sobre un
+      // binding muerto. Se limpia y audita como en el scope `member`.
+      if (binding.designatedAdminProfileId) {
+        await client.query(
+          `UPDATE greenhouse_core.external_organization_bindings
+              SET designated_admin_profile_id = NULL, updated_at = CURRENT_TIMESTAMP
+            WHERE binding_id = $1`,
+          [bindingId]
+        )
+
+        await appendAudit(client, {
+          eventType: 'designated_admin_cleared',
+          environmentId: binding.environmentId,
+          bindingId,
+          organizationId: binding.organizationId,
+          profileId: binding.designatedAdminProfileId,
+          performedBy,
+          reason,
+          metadata: { cause: 'binding_revoked' }
+        })
       }
 
       const grantsVersion = await bumpGrantsVersion(client, bindingId)

@@ -17,8 +17,17 @@ export const EFEONCE_MCP_READ_SCOPES = [
   'efeonce.mcp.hiring.read'
 ] as const
 
-/** Scopes de escritura: exigen consentimiento explícito + step-up (`TASK-1830`) y NUNCA se publican como mínimo. */
-export const EFEONCE_MCP_WRITE_SCOPES = ['efeonce.mcp.globe.credits.funding.ensure', 'efeonce.mcp.seo.write'] as const
+/**
+ * Scopes de escritura: exigen consentimiento explícito + step-up (`TASK-1830`) y NUNCA se publican como mínimo.
+ * `efeonce.mcp.identity.write` (TASK-1837): clase «administrar a las personas de mi organización» — invitar/reenviar
+ * por la lane delegada; la autoridad real la decide Greenhouse por la membership `designatedAdmin`, el scope sólo
+ * responde si ESTE cliente puede pedir esa clase de acción.
+ */
+export const EFEONCE_MCP_WRITE_SCOPES = [
+  'efeonce.mcp.globe.credits.funding.ensure',
+  'efeonce.mcp.seo.write',
+  'efeonce.mcp.identity.write'
+] as const
 
 export const EFEONCE_MCP_SCOPES = [...EFEONCE_MCP_READ_SCOPES, ...EFEONCE_MCP_WRITE_SCOPES] as const
 

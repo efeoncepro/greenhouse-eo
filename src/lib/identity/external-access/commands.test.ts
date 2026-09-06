@@ -854,6 +854,22 @@ describe('TASK-1837 — autoridad delegada del cliente', () => {
     expect(JSON.parse(String(audit[10]))).toMatchObject({ delegated: true, delegatedByProfileId: 'profile-admin' })
   })
 
+  it('resolves the binding by organizationId when the gateway passes the organization instead of the binding', async () => {
+    bound([{ bindingId: 'xob-1', designatedAdmin: true }])
+    dbQueryMock.mockResolvedValueOnce([invitationRow()])
+
+    const result = await listDelegatedExternalInvitations({ environmentId: 'efeonce-auth', subject: 'sub-1', organizationId: 'org-1' })
+
+    expect(result.bindingId).toBe('xob-1')
+  })
+
+  it('422 when neither bindingId nor organizationId is given', async () => {
+    await expect(listDelegatedExternalInvitations({ environmentId: 'efeonce-auth', subject: 'sub-1' })).rejects.toMatchObject({
+      code: 'invalid_request'
+    })
+    expect(resolveExternalAccessMock).not.toHaveBeenCalled()
+  })
+
   it('lists only the admin\'s own binding invitations', async () => {
     bound([{ bindingId: 'xob-1', designatedAdmin: true }])
     dbQueryMock.mockResolvedValueOnce([invitationRow()])
@@ -868,6 +884,34 @@ describe('TASK-1837 — autoridad delegada del cliente', () => {
 
 describe('TASK-1837 — designated admin at accept + revoke', () => {
   beforeEach(() => vi.clearAllMocks())
+
+  it('revoking the whole binding clears designated_admin_profile_id and audits it before binding_revoked', async () => {
+    route([
+      [
+        /WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/,
+        () => [bindingRow({ designated_admin_profile_id: 'profile-admin' })]
+      ],
+      [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
+      [/UPDATE greenhouse_core\.external_capability_grants[\s\S]*RETURNING grant_id/, () => [{ grant_id: 'xcg-1' }]],
+      [
+        /UPDATE greenhouse_core\.external_member_invitations[\s\S]*RETURNING invitation_id, profile_id/,
+        () => [{ invitation_id: 'xmi-admin', profile_id: 'profile-admin' }]
+      ],
+      [/UPDATE greenhouse_core\.external_organization_bindings\s+SET status = 'revoked'/, () => []],
+      [/UPDATE greenhouse_core\.identity_profile_source_links l/, () => []],
+      [/SET designated_admin_profile_id = NULL/, () => []],
+      [/SET grants_version = grants_version \+ 1/, () => [{ grants_version: 2 }]],
+      [/INSERT INTO greenhouse_core\.external_identity_audit_log/, () => []]
+    ])
+
+    await revokeExternalAccess({ scope: 'binding', bindingId: 'xob-1', reason: 'cierre de cuenta' }, actor)
+
+    expect(calls(/SET designated_admin_profile_id = NULL/)).toHaveLength(1)
+
+    const auditTypes = calls(/INSERT INTO greenhouse_core\.external_identity_audit_log/).map(call => (call[1] as unknown[])[1])
+
+    expect(auditTypes).toEqual(['designated_admin_cleared', 'binding_revoked'])
+  })
 
   it('acceptance with designated_admin fails closed (conflict, token NOT consumed) when another admin is still linked', async () => {
     route([

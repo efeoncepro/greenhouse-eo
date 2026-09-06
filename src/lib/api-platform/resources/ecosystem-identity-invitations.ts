@@ -15,8 +15,8 @@ import { isExternalAccessError } from '@/lib/identity/external-access/errors'
 /**
  * TASK-1837 — Lane ecosystem de la AUTORIDAD DELEGADA del cliente.
  *
- *   GET  /api/platform/ecosystem/identity/invitations?environment=&subject=&bindingId=
- *   POST /api/platform/ecosystem/identity/invitations   { environment, subject, bindingId, email, reason? }
+ *   GET  /api/platform/ecosystem/identity/invitations?environment=&subject=&(bindingId=|organizationId=)
+ *   POST /api/platform/ecosystem/identity/invitations   { environment, subject, bindingId|organizationId, email, reason? }
  *
  * Mismo patrón que `identity/binding` (TASK-1631): el gateway (consumer con binding de scope
  * `internal`) verifica el JWT de la persona y llama acá con `(environment, subject)`; Greenhouse
@@ -71,6 +71,9 @@ const assertLaneAvailable = (context: ApiPlatformRequestContext) => {
   }
 }
 
+const optionalStringParam = (value: unknown): string | null =>
+  typeof value === 'string' && value.trim().length > 0 ? value.trim() : null
+
 const requiredString = (value: unknown, field: string): string => {
   if (typeof value !== 'string' || value.trim().length === 0) {
     throw new ApiPlatformError(`Missing ${field}`, { statusCode: 400, errorCode: 'bad_request', details: { field } })
@@ -94,7 +97,8 @@ export const listEcosystemDelegatedInvitations = async ({
     const result = await listDelegatedExternalInvitations({
       environmentId: requiredString(searchParams.get('environment'), 'environment'),
       subject: requiredString(searchParams.get('subject'), 'subject'),
-      bindingId: requiredString(searchParams.get('bindingId'), 'bindingId')
+      bindingId: optionalStringParam(searchParams.get('bindingId')),
+      organizationId: optionalStringParam(searchParams.get('organizationId'))
     })
 
     return { data: { bindingId: result.bindingId, count: result.items.length, items: result.items } }
@@ -118,7 +122,8 @@ export const createEcosystemDelegatedInvitation = async ({
     const result = await issueDelegatedExternalInvitation({
       environmentId: requiredString(input.environment, 'environment'),
       subject: requiredString(input.subject, 'subject'),
-      bindingId: requiredString(input.bindingId, 'bindingId'),
+      bindingId: optionalStringParam(input.bindingId),
+      organizationId: optionalStringParam(input.organizationId),
       email: requiredString(input.email, 'email'),
       reason: typeof input.reason === 'string' ? input.reason : null,
       designatedAdmin: input.designatedAdmin === true

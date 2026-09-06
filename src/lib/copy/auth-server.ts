@@ -70,7 +70,8 @@ export const GH_AUTH_SERVER = {
     'efeonce.mcp.globe.read': 'Leer tus espacios y activos de Efeonce Globe',
     'efeonce.mcp.hiring.read': 'Leer información de procesos de selección',
     'efeonce.mcp.globe.credits.funding.ensure': 'Cargar créditos de Globe. Esta acción mueve dinero real.',
-    'efeonce.mcp.seo.write': 'Modificar la configuración SEO de tus organizaciones'
+    'efeonce.mcp.seo.write': 'Modificar la configuración SEO de tus organizaciones',
+    'efeonce.mcp.identity.write': 'Invitar y administrar a las personas de tu organización en Efeonce'
   } as Record<string, string>,
   scope_description_fallback: (scope: string) => `Permiso ${scope}`,
 
