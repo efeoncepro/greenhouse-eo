@@ -310,6 +310,42 @@ recogen"; hoy eso sólo es cierto para `get_greenhouse_skill`, que lo pide en ca
 
 ---
 
+## 9. La versión del servidor es la única palanca, y su gate tiene que medir TODA la superficie
+
+El protocolo cerró tres propuestas de versionar POR TOOL: el versionado pertenece al **servidor**.
+Así que `Implementation.version` del gateway es el único lugar donde se puede declarar que la
+superficie cambió, y por eso `efeonce-mcp` tiene un gate que exige moverla cuando la superficie se
+mueve.
+
+**Ese gate midió durante un tiempo sólo la mitad de lo que decía proteger.** Comparaba el hash del
+manifiesto FEDERADO desde Greenhouse, así que las tools que el gateway define por su cuenta
+(`registerTool` en su `mcp.ts`) no lo movían. Medido el 2026-09-06 con `TASK-1837`: dos tools propias
+llevaron el servidor de **37 a 39** con el hash idéntico, la suite en verde y `version` congelada en
+`1.0.0`.
+
+- **NUNCA** asumas que un gate de superficie cubre la superficie entera porque su nombre lo sugiera:
+  lee **qué compara**. Un gate que mide una parte y se lee como si midiera el todo es peor que no
+  tenerlo, porque su verde se cita como prueba.
+- **NUNCA** midas la superficie leyendo archivos con expresiones regulares. Se mide sobre el
+  **servidor construido**, que es lo único que cuenta lo que de verdad se registra, incluida
+  cualquier tool futura venga de donde venga.
+- **SIEMPRE** construye esa medición con todos los providers habilitados. Si dependiera de las
+  variables de entorno de la máquina, el mismo commit daría hashes distintos según quién corra el
+  gate, y un gate no determinista se pone rojo solo hasta que alguien lo apaga.
+- **SIEMPRE** incluye las **descripciones** en el digest: editar una descripción es un cambio
+  rompiente para un agente, porque cambia qué decide llamar e invalida el caché de prompt del
+  cliente. Es la regla que casi nadie trata como tal.
+- **SIEMPRE** haz que el mensaje del gate nombre el delta (qué entró, qué salió, o si sólo se editó
+  una descripción) y de qué lado vino, federación o gateway. Un gate que sólo dice «cambió» obliga a
+  reconstruir a mano lo que él ya sabía.
+- **SIEMPRE** ve el detector **encenderse** antes de darlo por bueno: agregar una tool de mentira y
+  editar una descripción, y comprobar que falla en ambos casos. Verlo en verde no prueba nada.
+
+Cerrado en `efeonce-mcp` con `src/surface.ts` (medición compartida por el gate y por el actualizador
+del baseline, para que no puedan discrepar) y `surface-baseline.json`, que además guarda los nombres
+para poder nombrar el delta. El hash del manifiesto federado se conserva, ya no como gate sino como
+diagnóstico del origen del cambio.
+
 ## Documentación relacionada
 
 - `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §5 (contrato de honestidad `●`/`◑`) y §7 (Full API Parity)
