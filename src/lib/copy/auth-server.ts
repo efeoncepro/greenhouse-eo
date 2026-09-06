@@ -60,6 +60,9 @@ export const GH_AUTH_SERVER = {
   consent_deny_cta: 'Cancelar',
   consent_footer: 'Puedes revocar este acceso en cualquier momento desde Efeonce.',
   consent_client_id_label: 'Identificador de la aplicación',
+  // TASK-1837 — MUST del protocolo: la persona ve A DÓNDE se envía el código antes de autorizar.
+  consent_redirect_host_label: 'Destino de la autorización',
+  consent_redirect_host_hint: 'El código de autorización se enviará a esta dirección.',
 
   // Descripciones de scopes (mismos strings que el gateway)
   scope_descriptions: {

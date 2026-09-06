@@ -64,7 +64,8 @@ describe('auth-server brand assets', () => {
       clientId: 'https://client.example/cimd.json',
       scopes: ['efeonce.mcp.read', 'efeonce.mcp.seo.write'],
       returnTo: '/oauth/authorize?client_id=x&state="y"',
-      actionPath: '/oauth/consent'
+      actionPath: '/oauth/consent',
+      redirectHost: 'client.example'
     })
 
     expect(consent).toContain('&lt;Org&gt;')
