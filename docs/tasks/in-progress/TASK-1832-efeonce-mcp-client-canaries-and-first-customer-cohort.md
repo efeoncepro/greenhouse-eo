@@ -124,7 +124,7 @@ organización cliente real, sí**.
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-044`
-- Status real: `Code complete local; rollout autorizado y en curso. El operador decidió conservar el schema aditivo ya aplicado y autorizó commit/push, promoción, deploys, gates, fixture dedicado, buzones controlados y sesiones canary el 2026-09-06. El baseline previo al rollout conserva registry=0, canary_bindings=0, drift de purpose=0 y smoke_test en person_360=0. Consumers, fixture, flags y pruebas runtime aún no están acreditados; la task permanece rollout pendiente hasta matriz, cleanup y siete días de señales estables.`
+- Status real: `Rollout autorizado y en curso. Schema y consumers compatibles están desplegados con gates OFF; existe un único fixture no comercial documentado. M365 y Gmail personal autorizado completaron invitación, delivery, POST scanner-safe, profile smoke_test, sesión y logout; passkey real pasó en Chrome y Safari. La organización conserva unexpected_refs=0 y cero contaminación 360/comercial. Falta activar gates coordinados, completar OAuth/MCP y negativas, promover Greenhouse, observar siete días y ejecutar cleanup/readback.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
 - Blocked by: `none`
@@ -194,8 +194,8 @@ Reglas obligatorias:
 
 - `TASK-1829` (emisor activo), `TASK-1830` (autenticación activa), `TASK-1631` (binding/invitación/grant),
   `TASK-1831` (gateway multi-issuer) y `TASK-1837` (entrega/autoridad delegada en producción).
-- Buzones y cuentas de prueba gobernadas por Efeonce para Microsoft 365 y Google; plus-addressing sólo amplía
-  casos, no sustituye una segunda infraestructura de correo/identidad.
+- Buzón M365 gobernado por Efeonce y Gmail personal que el operador autorizó expresamente para esta corrida;
+  plus-addressing aísla el fixture dentro de la segunda infraestructura y no acredita ownership corporativo.
 
 ### Blocks / Impacts
 
@@ -287,7 +287,7 @@ Reglas obligatorias:
 - Backfill plan: default/constraint verificados; cero reclasificación de organizaciones o personas reales
 - Rollback path: revocar binding/grants/consents/sesiones canary + gate canary OFF; luego cleanup gobernado por
   `canary_registration_id`, con dry-run y manifest; conservar audit y columnas
-- External coordination: buzones M365/Google de prueba controlados por Efeonce; ninguna persona cliente
+- External coordination: buzón M365 controlado por Efeonce y Gmail personal autorizado; ninguna persona cliente
 
 ### Security and access
 
@@ -426,8 +426,11 @@ organización dedicada creada sólo después de una autorización específica.
 
 ### Slice 2 — Buzones, limpieza y canary automatizable
 
-- Provisionar buzones de prueba M365 y Google controlados por Efeonce; plus-addressing sirve para aislar corridas,
-  no como sustituto de otro proveedor. Incluir bounce/suppression y scanner-safe POST del magic link.
+- Provisionar un buzón M365 controlado por Efeonce y una segunda infraestructura Google. El 2026-09-06 el
+  operador confirmó que Efeonce no opera Gmail corporativo y autorizó `j***@gmail.com`, cuenta personal
+  preexistente del operador, sólo para esta canary. No se documenta como asset Efeonce y el cleanup elimina sus
+  artefactos de identidad, no el buzón. Plus-addressing no sustituye otro proveedor. Incluir bounce/suppression y
+  scanner-safe POST del magic link.
 - `external-client-canary.mjs` + Playwright ejecutan invitación, email, magic link, passkey Chrome/Safari,
   consentimiento, PKCE, token, refresh, revocación y cleanup. Cada corrida usa correlation/idempotency y TTL.
 - Antes de provisionar, copiar y completar
@@ -528,7 +531,10 @@ organización dedicada creada sólo después de una autorización específica.
       reporta `deletion_ready`, `unexpected_refs=0`, lifecycle history cero y ningún intento de borrar assets shared.
 - [ ] Todos los profiles del canary tienen `data_origin='smoke_test'`; no se fusionan con personas reales y el
       cleanup/revocación queda probado sin borrar audit.
-- [ ] Correo/invitación/magic link se verifican en buzones M365 y Google controlados, con bounce y scanner-safe POST.
+- [x] Correo/invitación/magic link se verifican en M365 corporativo y Gmail personal del operador autorizado,
+      con delivery/bounce y scanner-safe POST; el expediente distingue ownership y no acredita control Efeonce
+      sobre Gmail. Evidencia: invitaciones `xmi-b7cfc54e…` y `xmi-0b307567…`; deliveries exactos y perfiles
+      `EO-ID0651/EO-ID0652` en el manifest; ambas sesiones terminaron revocadas por logout.
 - [ ] Passkey real pasa en Chrome y Safari/WebKit con la misma persona canary.
 - [ ] Las cinco pruebas negativas pasan en producción con evidencia redactada.
 - [ ] Prueba base-only pendiente de `TASK-1626` cerrada y referenciada en su task.

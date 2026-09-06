@@ -1,5 +1,6 @@
 import type { PoolClient } from 'pg'
 
+import { deleteExternalCanaryAuthArtifacts } from '@/lib/auth-server/maintenance/external-canary-cleanup'
 import { query, withTransaction } from '@/lib/db'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
@@ -975,64 +976,15 @@ export const cleanupExternalCanaryFixture = async (
             )
           ).rows.map(item => item.source_object_id)
 
-    // Artefactos del protocolo: hijos antes que contextos/clientes; factores y sesiones antes que
-    // el source link. Los ledgers append-only quedan fuera a propósito y sólo conservan hashes.
-    if (plan.oauthClientIds.length > 0) {
-      await client.query(`DELETE FROM greenhouse_auth.access_tokens WHERE client_id=ANY($1::text[])`, [
-        plan.oauthClientIds
-      ])
-      await client.query(`DELETE FROM greenhouse_auth.refresh_tokens WHERE client_id=ANY($1::text[])`, [
-        plan.oauthClientIds
-      ])
-      await client.query(`DELETE FROM greenhouse_auth.authorization_codes WHERE client_id=ANY($1::text[])`, [
-        plan.oauthClientIds
-      ])
-      await client.query(`DELETE FROM greenhouse_auth.client_consents WHERE client_id=ANY($1::text[])`, [
-        plan.oauthClientIds
-      ])
-    }
-
-    if (plan.oauthClientIds.length > 0 || plan.bindingIds.length > 0) {
-      await client.query(
-        `DELETE FROM greenhouse_auth.authorization_contexts
-          WHERE client_id=ANY($1::text[]) OR binding_id=ANY($2::text[])`,
-        [plan.oauthClientIds, plan.bindingIds]
-      )
-    }
-
-    if (plan.oauthClientIds.length > 0) {
-      await client.query(`DELETE FROM greenhouse_auth.oauth_clients WHERE client_id=ANY($1::text[])`, [
-        plan.oauthClientIds
-      ])
-    }
-
-    if (ownedSubjects.length > 0) {
-      await client.query(
-        `DELETE FROM greenhouse_auth.passkey_challenges
-          WHERE environment_id=$1 AND (subject=ANY($2::text[]) OR correlation_id=$3)`,
-        [plan.environmentId, ownedSubjects, plan.runId]
-      )
-      await client.query(
-        `DELETE FROM greenhouse_auth.totp_backup_codes WHERE environment_id=$1 AND subject=ANY($2::text[])`,
-        [plan.environmentId, ownedSubjects]
-      )
-      await client.query(
-        `DELETE FROM greenhouse_auth.totp_enrollments WHERE environment_id=$1 AND subject=ANY($2::text[])`,
-        [plan.environmentId, ownedSubjects]
-      )
-      await client.query(
-        `DELETE FROM greenhouse_auth.passkey_credentials WHERE environment_id=$1 AND subject=ANY($2::text[])`,
-        [plan.environmentId, ownedSubjects]
-      )
-      await client.query(
-        `DELETE FROM greenhouse_auth.magic_link_tokens WHERE environment_id=$1 AND subject=ANY($2::text[])`,
-        [plan.environmentId, ownedSubjects]
-      )
-      await client.query(`DELETE FROM greenhouse_auth.sessions WHERE environment_id=$1 AND subject=ANY($2::text[])`, [
-        plan.environmentId,
-        ownedSubjects
-      ])
-    }
+    // El dominio de auth elimina sus artefactos antes de que identidad retire los source links.
+    // Los ledgers append-only quedan fuera a propósito y sólo conservan hashes.
+    await deleteExternalCanaryAuthArtifacts(client, {
+      environmentId: plan.environmentId,
+      subjects: ownedSubjects,
+      runId: plan.runId,
+      bindingIds: plan.bindingIds,
+      oauthClientIds: plan.oauthClientIds
+    })
 
     if (plan.bindingIds.length > 0) {
       await client.query(`DELETE FROM greenhouse_core.external_capability_grants WHERE binding_id=ANY($1::text[])`, [

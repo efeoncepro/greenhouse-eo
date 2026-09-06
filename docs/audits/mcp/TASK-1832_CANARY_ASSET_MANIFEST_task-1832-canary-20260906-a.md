@@ -8,7 +8,7 @@ no contiene correos completos, tokens, códigos, cookies, verifiers, hashes de s
 - `run_id`: `task-1832-canary-20260906-a`
 - `canary_registration_id`: `xcr-48dacd1f-ad4b-4a73-b454-3d94574e7d09`
 - `environment`: `efeonce-auth` — asset compartido, nunca eliminar
-- `state`: `browser_certified`; autoridad canary todavía activa para la matriz OAuth/MCP
+- `state`: `mail_and_browser_certified`; autoridad canary todavía activa para la matriz OAuth/MCP
 - `created_at`: `2026-09-06T19:43:30Z`
 - `created_by`: `jreye` mediante sesión admin gobernada
 - `reason`: `TASK-1832 external MCP compatibility certification`
@@ -50,20 +50,27 @@ que el command gobernado lo devuelva. Un asset no previsto deja la corrida `bloc
 | `greenhouse_core.external_member_invitations` | `xmi-b7cfc54e-ba90-402d-8eeb-bea047ea6da5` | `run_owned` | `linked`, M365 definitivo | revocar y eliminar | alias `m***@efeoncepro.com`; proveedor `delivered` 2026-09-06T20:03:02Z; aceptación scanner-safe por POST 2026-09-06T20:15:37Z |
 | `greenhouse_core.identity_profiles` | `identity-external-idp-efeonce-auth-subject-s-hgu2lxgqznnz2zl8-p6pwro-petyd`; public ID `EO-ID0651` | `run_owned` | `active`, `external_contact`, `data_origin=smoke_test` | desactivar y eliminar | creado por aceptación 2026-09-06T20:15:37Z; agregado global smoke `31`; Person 360 `0` |
 | `greenhouse_core.identity_profile_source_links` | `identity-link-identity-external-idp-efeonce-auth-subject-s-hgu2lxgqznnz2zl8-p6pwro-petyd-external-idp-efeonce-auth-subject-s-hgu2lxgqznnz2zl8-p6pwro-petyd` | `run_owned` | `active`, login identity | desactivar y eliminar | creado por aceptación 2026-09-06T20:15:37Z; environment `efeonce-auth` |
+| `greenhouse_core.external_member_invitations` | `xmi-57f6a062-f880-4a4c-9fc3-59c4ebd371f9`; `xmi-1c3108fe-cfb9-491b-bdbe-cbdbf783aaa7` | `run_owned` | `revoked`, preparaciones Gmail con delivery fallido | eliminar | el proceso local no tenía `RESEND_API_KEY` montada; sin aceptación ni perfil |
+| `greenhouse_core.external_member_invitations` | `xmi-0b307567-2021-4f33-b8ea-48598a34c39d` | `run_owned` | `linked`, Gmail definitivo | revocar y eliminar | alias plus del buzón personal autorizado; aceptación scanner-safe por POST 2026-09-06T21:39:23Z |
+| `greenhouse_core.identity_profiles` | `identity-external-idp-efeonce-auth-subject-ndbbfxl3ak35xuutezx-9rhdc8gskvxp`; public ID `EO-ID0652` | `run_owned` | `active`, `external_contact`, `data_origin=smoke_test` | desactivar y eliminar | creado por aceptación Gmail; Person/Account 360 y referencias compartidas `0` |
+| `greenhouse_core.identity_profile_source_links` | `identity-link-identity-external-idp-efeonce-auth-subject-ndbbfxl3ak35xuutezx-9rhdc8gskvxp-external-idp-efeonce-auth-subject-ndbbfxl3ak35xuutezx-9rhdc8gskvxp` | `run_owned` | `active`, login identity | desactivar y eliminar | environment `efeonce-auth`; sesión Gmail revocada por logout |
 | `greenhouse_auth.oauth_clients` | DCR de esta corrida; selector exacto `metadata_json.dcr.software_id=run_id`; ID `PENDIENTE DE DCR` | `run_owned` | `planned` | retirar después de hijos; eliminar sólo si el selector y todos sus artefactos son exclusivos | `0 antes del write`; helper exige `--run-id` |
 | `greenhouse_auth.authorization_contexts` | cliente + organización exactos; `PENDIENTE` | `run_owned` | `planned` | revocar y eliminar | `0 antes del write` |
 | `greenhouse_auth.client_consents` | cliente + perfil canary; `PENDIENTE` | `run_owned` | `planned` | revocar y eliminar | `0 antes del write` |
 | `greenhouse_auth.authorization_codes` | corrida exacta; conteo sin hash | `run_owned` | `planned` | expirar/eliminar | `0 antes del write` |
 | `greenhouse_auth.refresh_tokens` | familia de esta corrida; conteo sin hash | `run_owned` | `planned` | revocar/eliminar | `0 antes del write` |
 | `greenhouse_auth.access_tokens` | familia de esta corrida; conteo sin `jti` | `run_owned` | `planned` | revocar/eliminar | `0 antes del write` |
-| `greenhouse_auth.sessions` | environment + subject del source link exacto; conteo sin hash | `run_owned` | `8`, todas revocadas/cerradas | eliminar antes del source link | Chrome y Safari cerraron sesión; activas `0` a 2026-09-06T21:16Z |
-| `greenhouse_auth.magic_link_tokens` | environment + subject exactos; conteo sin token/hash | `run_owned` | `6`, consumidos o vencibles | eliminar antes del source link | incluye bootstrap de certificación; ninguno se persiste en evidencia |
+| `greenhouse_auth.sessions` | environment + subjects de los dos source links exactos; conteo sin hash | `run_owned` | `9`, todas revocadas/cerradas | eliminar antes del source link | Chrome, Safari y Gmail cerraron sesión; la última quedó `revoked_at=2026-09-06T21:42:11Z`, razón `logout` |
+| `greenhouse_auth.magic_link_tokens` | environment + subjects exactos; conteo sin token/hash | `run_owned` | `7`, consumidos o vencibles | eliminar antes del source link | incluye bootstrap y Gmail; ningún token/hash se persiste en evidencia |
 | `greenhouse_auth.passkey_credentials` | environment + subject exactos; IDs nunca documentados | `run_owned` | `2`: una revocada tras intento incompleto y una activa para la ventana canary | revocar y eliminar antes del source link | credencial activa fingerprint `89864e99148e470e`; attachment `platform`; transports `hybrid,internal` |
 | `greenhouse_auth.passkey_challenges` | subject o `correlation_id=run_id`; conteo sin challenge/hash | `run_owned` | `5`, consumidos | eliminar antes del source link | registro, login y step-up reales ejercitados |
 | perfil local de Chrome | `.auth/passkey-task-1832-canary-20260906-a` | `run_owned_local` | activo durante la ventana canary | borrar sólo después de revocar/eliminar la credencial servidor | permisos `0700`; ignorado por Git |
 | buzón M365 controlado | alias preexistente `m***@efeoncepro.com` | `shared` | `delivery verified` | conservar; no se creó alias | accesible como buzón compartido desde la cuenta del operador; mensaje visible 2026-09-06T20:03Z |
 | `greenhouse_notifications.email_deliveries` | `2108c319-c433-4c82-90e0-e5304b6fde5c` | `retained_audit` | `delivered`, `auth_server_magic_link` | conservar sin PII en este manifest | enviado y entregado 2026-09-06T20:44:46Z; sin bounce/error; consumido en Chrome 2026-09-06T20:49:06Z |
-| buzón Google controlado | alias/ID redactado; `PENDIENTE` | `shared` | `planned` | retirar alias si se crea | `no almacenar correo completo` |
+| buzón Gmail personal del operador | cuenta preexistente `j***@gmail.com` | `operator_owned`, no Efeonce | `delivery_and_login_verified` | conservar; eliminar sólo artefactos canary asociados | autorizado por el operador; plus-address aislado, invitación y magic link visibles y consumidos 2026-09-06 |
+| `greenhouse_notifications.email_deliveries` | `0741cdf1-4a43-4f04-9119-e4ae099a49a6`; `58d2d0f1-9214-4b92-ac34-e5e96d038196` | `retained_audit` | `failed`, `external_access_invitation` | conservar sin PII | dos intentos locales fallaron antes de montar el secreto por referencia; ningún token consumido |
+| `greenhouse_notifications.email_deliveries` | `20e4396f-642c-44a7-89e4-dcc35a25b461`; `9a338ba2-74a3-4b7d-a048-56e793b9e4b4` | `retained_audit` | `delivered`, invitación + magic link Gmail | conservar sin PII | provider `delivered` a 2026-09-06T21:35:17Z y 21:39:26Z; sin bounce/error |
+| `gs://efeonce-group-greenhouse-public-media-dev/emails/efeonce-wordmark-white.png` | objeto compartido de marca; 4099 bytes | `shared`, no run-owned | `active`, reparado | conservar; nunca incluir en cleanup canary | el objeto faltaba (404) y el correo mostraba imagen rota; se subió desde el asset versionado, HTTP 200 `image/png` y Gmail revalidado visualmente 2026-09-06 |
 | audit append-only identidad/OAuth | `run_id` + rango temporal | `retained_audit` | `planned` | conservar sin FK | `PENDIENTE` |
 
 ## Preflight y retiro
@@ -92,9 +99,17 @@ que el command gobernado lo devuelva. Un asset no previsto deja la corrida `bloc
       `2` credenciales passkey y `5` challenges. El único `active_auth` es la credencial activa que se conserva
       deliberadamente durante la matriz; el plan se niega por `registration_active`, `active_authority` y
       `active_auth`, sin mutar.
+- [x] Gmail autorizado: el correo base preexistente se rechazó como colisión y no produjo write; el alias plus
+      dedicado quedó ligado a `EO-ID0652` con `data_origin=smoke_test`. Invitación y magic link tuvieron provider
+      `delivered`, ambos se consumieron mediante confirmación POST y la sesión `amr=magic_link` quedó revocada por
+      logout. El wordmark roto se corrigió en el bucket público compartido y se verificó en el mismo mensaje.
+- [x] Cleanup dry-run post-Gmail: dos profiles/source links, cinco invitaciones, `9` sesiones, `7` magic links,
+      `2` passkeys y `5` challenges; `unexpectedRefs=0`. Los blockers siguen siendo los tres esperados durante
+      la ventana (`registration_active|active_authority|active_auth`) y no hubo mutación.
 - [ ] Greenhouse promovido a `main` y Vercel Production `READY`.
-- [ ] Buzones controlados verificados y profiles `smoke_test` creados sin colisión — M365 completo y profile
-      exacto creado; Google todavía pendiente y no se sustituirá por Gmail personal.
+- [x] Dos infraestructuras de correo verificadas y profiles `smoke_test` creados sin colisión — M365 corporativo
+      y Gmail personal del operador autorizado. Gmail no se presenta como buzón controlado por Efeonce ni como
+      evidencia comercial.
 - [ ] Gates coordinados ON; revisión y comportamiento real verificados.
 - [ ] Matriz, negativas, refresh y revocación completados.
 - [ ] Cleanup dry-run: `deletionReady=true`, `unexpectedRefs=0`, sin blockers/shared delete attempts.
@@ -103,7 +118,7 @@ que el command gobernado lo devuelva. Un asset no previsto deja la corrida `bloc
 
 ## Registro de retiro
 
-- `dry_run_at`: `2026-09-06T21:16Z`, inspección post-browser; no es el preflight final de borrado
+- `dry_run_at`: `2026-09-06T21:45Z`, inspección post-Gmail; no es el preflight final de borrado
 - `dry_run_result`: `deletionReady=false`, `unexpectedRefs=0`, blockers esperados
   `registration_active|active_authority|active_auth`; sin intento de apply
 - `apply_at`: `PENDIENTE`
