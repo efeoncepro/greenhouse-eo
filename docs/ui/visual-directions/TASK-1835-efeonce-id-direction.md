@@ -215,3 +215,72 @@ proporciones finales, empaquetado tipográfico y comprensión de permisos con da
 autocrítica principal es que dos entradas en una sola página pueden confundir a una persona con
 ambos accesos. La revisión debe comprobar comprensión de las etiquetas antes de añadir controles
 o pasos. La dirección es reversible hasta esa revisión y no permite afirmar aprobación visual.
+
+## Decision
+
+Dirección **B · «Nocturno editorial»**, seleccionada por el operador el 2026-09-05 entre las tres
+comparadas arriba y ya implementada en `develop`. Una columna centrada sobre un campo azul
+institucional; la marca queda en el lienzo y la decisión en una tarjeta clara despegada de él.
+
+Lo que decide esta dirección, y por qué:
+
+- **El contexto vive fuera de la tarjeta y la decisión dentro.** Quién pide acceso, si su origen es
+  verificable y a dónde viaja el código son *contexto*: van sobre el lienzo, encima de la tarjeta.
+  La tarjeta contiene sólo lo que la persona concede y las dos acciones. Esa frontera es lo que
+  permite que una pantalla de identidad se lea en tres segundos.
+- **El login gana un panel editorial desde 64rem** con el logotipo institucional en negativo — es la
+  primera pantalla que ve alguien de fuera de Efeonce. El consentimiento no lo lleva: ahí la marca
+  ya no es lo que hay que decidir.
+- **Sin promesas que los metadatos no sostienen.** Nada de sellos de «verificado» genéricos, escudos
+  ni claims de seguridad. La única afirmación de confianza que se muestra es comprobable: el origen
+  del `client_id`, y cuando no lo es, se dice.
+
+## Desktop target
+
+1440×1000. Login en dos columnas `5fr / 6fr`: panel de marca a la izquierda (logotipo en negativo,
+titular en dos líneas con acento, línea de confianza con candado) y tarjeta de acceso a la derecha,
+máximo ~440 px de medida legible. Consentimiento en una sola columna centrada: isotipo + wordmark,
+ficha de la aplicación con su marca o monograma, aviso de no verificada cuando corresponde, y la
+tarjeta con destino, organización, permisos y las dos acciones. Ninguna pantalla necesita scroll
+interno; la tarjeta crece con su contenido.
+
+## Mobile target
+
+390×844. El panel editorial desaparece (`display:none`) y el isotipo vuelve a la cabecera de la
+tarjeta: en móvil la marca no compite con la tarea. Tarjeta a ancho completo con márgenes de 16 px,
+CTAs apilados a ancho completo con el primario arriba, campo de correo con `inputmode=email` y el
+código de segundo factor con `inputmode=numeric` + `autocomplete=one-time-code`.
+`scrollWidth === clientWidth` verificado en las 40 capturas de la matriz GVC.
+
+## Token mapping
+
+Ver la tabla de **Mapping de tokens verificables** más arriba, que es la fuente. En síntesis: el CSS
+se **genera** desde el SSOT (`scripts/auth-server/styles.ts` → `styles.generated.ts`) con drift test;
+color y neutrales desde `axis-tokens`, Poppins para display y Geist para texto desde
+`typography-tokens`, espaciado por `spacing(factor)` en escala 4n. Ningún valor literal en las
+plantillas — verificado por grep y por el drift test, no por costumbre.
+
+## Anti-patterns
+
+Los tres primeros se midieron en esta superficie; no son advertencias teóricas.
+
+- **Una clase de texto compartida entre dos fondos opuestos.** El shell tiene lienzo oscuro y tarjeta
+  clara. `.id-context` y `.id-muted` servían a ambos, y la regla escrita para el bloque de la tarjeta
+  le impuso su color a la ficha sobre el azul: **1.53:1 medido**, en el aviso de aplicación no
+  verificada. Cada superficie lleva su clase.
+- **Leer un `violations: 0` de axe como evidencia de contraste.** Con un fondo en degradado, axe
+  devuelve todo en `incomplete` y el gate lo informa como cero. El mecanismo real es
+  `pnpm auth-server:verify-contrast`, que muestrea los píxeles renderizados.
+- **Dos acciones primarias compitiendo.** El login llegó a tener «Entrar con mi passkey» y
+  «Enviarme el enlace» ambos en azul. Un método es el primario y el otro es el fallback; si los dos
+  pesan igual, la pantalla no está eligiendo por la persona.
+- **Instruir sin ofrecer el control.** «Pide uno nuevo desde el inicio de sesión» en una página sin
+  botón obliga a escribir la URL a mano. Toda pantalla ofrece su salida, o se declara terminal con
+  su razón.
+- **Prestarle a un cliente la confianza de una marca ajena.** El `client_name` lo declara el propio
+  cliente y el registro dinámico es auto-servicio. El logotipo sólo sale de un origen `https`
+  verificado contra un allowlist exacto — nunca por sufijo de dominio, nunca redibujado a mano.
+- **Un `<style>` embebido dentro de un SVG de marca.** La CSP del emisor permite estilos por hash y
+  lo bloquea: la figura sale negra con el build verde. Los assets se normalizan a `currentColor`.
+- **Chrome de portal en un emisor de identidad.** Sin sidebar, sin navegación, sin tarjetas
+  analíticas, sin ilustración decorativa. La interrupción dura menos de un minuto.

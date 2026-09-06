@@ -29,6 +29,70 @@ const domFixture = (options = { ...model }) => {
   return { dom, root, fetcher, navigate, response }
 }
 
+/**
+ * TASK-1835 — Gastar un código de respaldo tiene que DECIRSE, y decirse a tiempo.
+ *
+ * El servidor ya contaba los códigos abiertos y devolvía `usedBackupCode` y `remainingBackupCodes`
+ * (`routes.ts`); la pantalla los ignoraba y navegaba igual. Una persona podía quemar el último y
+ * enterarse el día que perdiera el teléfono. Mostrar el aviso mientras la página se va no es
+ * mostrarlo: por eso el contrato es que la navegación SE FRENA hasta que la persona confirme.
+ *
+ * Vive acá, en la suite, y no en un script suelto: un mecanismo que hay que acordarse de correr es un
+ * mecanismo apagado.
+ */
+describe('TASK-1835 — aviso al gastar un código de respaldo', () => {
+  it('frena la navegación, dice cuántos quedan y sólo sigue cuando la persona confirma', async () => {
+    const f = domFixture()
+
+    f.fetcher.mockResolvedValueOnce(reply({ status: 'verified', usedBackupCode: true, remainingBackupCodes: 1 }))
+    f.root.querySelector<HTMLInputElement>('[name="code"]')!.value = '11111111'
+    f.root.querySelector<HTMLFormElement>('[data-step-code]')!.dispatchEvent(new f.dom.window.Event('submit'))
+    await flush()
+
+    const notice = f.root.querySelector<HTMLElement>('[data-step-backup-notice]')!
+
+    expect(notice.hidden).toBe(false)
+    expect(f.root.querySelector<HTMLElement>('[data-step-backup-remaining]')!.textContent).toContain('1 código')
+    // Lo que había que evitar: irse sin decir nada.
+    expect(f.navigate).not.toHaveBeenCalled()
+    // El formulario del código se retira: la decisión pendiente es leer el aviso, no reintentar.
+    expect(f.root.querySelector<HTMLFormElement>('[data-step-code]')!.hidden).toBe(true)
+
+    f.root.querySelector<HTMLButtonElement>('[data-step-backup-continue]')!.dispatchEvent(
+      new f.dom.window.Event('click')
+    )
+    await flush()
+    expect(f.navigate).toHaveBeenCalledTimes(1)
+  })
+
+  it('cuando era el ÚLTIMO, el aviso dice qué hacer en vez de sólo contar cero', async () => {
+    const f = domFixture()
+
+    f.fetcher.mockResolvedValueOnce(reply({ status: 'verified', usedBackupCode: true, remainingBackupCodes: 0 }))
+    f.root.querySelector<HTMLInputElement>('[name="code"]')!.value = '22222222'
+    f.root.querySelector<HTMLFormElement>('[data-step-code]')!.dispatchEvent(new f.dom.window.Event('submit'))
+    await flush()
+
+    const text = f.root.querySelector<HTMLElement>('[data-step-backup-remaining]')!.textContent ?? ''
+
+    expect(text).toContain('último')
+    expect(text).toMatch(/activa de nuevo/i)
+    expect(f.navigate).not.toHaveBeenCalled()
+  })
+
+  it('un código normal NO interrumpe: el aviso es para el respaldo, no para cada verificación', async () => {
+    const f = domFixture()
+
+    f.fetcher.mockResolvedValueOnce(reply({ status: 'verified', usedBackupCode: false, remainingBackupCodes: 10 }))
+    f.root.querySelector<HTMLInputElement>('[name="code"]')!.value = '123456'
+    f.root.querySelector<HTMLFormElement>('[data-step-code]')!.dispatchEvent(new f.dom.window.Event('submit'))
+    await flush()
+
+    expect(f.root.querySelector<HTMLElement>('[data-step-backup-notice]')!.hidden).toBe(true)
+    expect(f.navigate).toHaveBeenCalledTimes(1)
+  })
+})
+
 describe('step-up browser behavior', () => {
   it('verifies alphanumeric backup code and returns only after verified status', async () => {
     const f = domFixture()

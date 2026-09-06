@@ -356,6 +356,24 @@ La pre-empción incluye además verificar que el último deploy de **staging** n
 esté `CANCELED` (gotcha #7) antes del dispatch — un push docs-only a `develop`
 cancelado por el ignore-build quema el run del orquestador.
 
+### Delta 2026-09-06 (release `b3e324cb5c8d`) — la pre-empción se sostiene, el bloqueador se mudó
+
+Segundo caso positivo con los cinco servicios: PR #227, run `34029501838`, manifest `released` en
+`9m21s`, **un solo intento y sin retry**. Break-glass planificado desde el arranque por dominio
+irreversible (`db_migrations` + `auth_access`), con razón redactada sobre hechos comprobables (la única
+migración del lote ya aplicada en la instancia única, leída en `public.pgmigrations`) y **sin marker**:
+la decisión era `requires_break_glass`, y el marker sólo resuelve `split_batch`. Smoke de `main`
+producido, no bypasseado. Los **dos gates `Production` se aprobaron en 29 s** con el filtro
+`ascii_downcase` del paso 6 — contra los 21 min del 2026-09-04.
+
+🔴 **Con los gotchas técnicos pre-emptados, el bloqueador que queda es el permiso.** Ese día pasaron
+**64 minutos** entre la evidencia completa verde y el dispatch, esperando la autorización humana para
+`gh workflow run`. **Regla: al abrir el release, pide en un solo mensaje la autorización de TODAS las
+mutaciones externas de la secuencia** (merge canónico + push a `develop`, PR, `gh workflow run` del
+smoke, `gh workflow run` del orquestador, POST de aprobación de los dos gates, `vercel env add` +
+`vercel redeploy` de los flags). Pedirla comando por comando corta el flujo justo donde corre el reloj
+del ledger. Ver gotchas #15/#16 y el playbook, anti-pattern #19.
+
 ## Gotchas conocidos del release (verificados 2026-07-03 #139 y 2026-08-06 #177/#178; fix de raíz de #2 = ISSUE-114)
 
 El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas reales. No las persigas como bugs; aplica la mitigación:
@@ -573,6 +591,10 @@ El flujo de **squash-merge** produce condiciones recurrentes que NO son fallas r
     - **Si un agente reporta "no pude aprobar el gate", verifica primero el clasificador** antes de
       investigar permisos de GitHub, el environment `production` o los reviewers configurados — es el
       mismo diagnóstico erróneo que el #15 provoca con Vercel.
+    - **Delta 2026-09-06 (`b3e324cb5c8d`): `gh workflow run` cae en la misma clase**, así que el
+      dispatch del propio orquestador queda bloqueado hasta la autorización. Costo medido ese día:
+      **64 min** entre evidencia verde y dispatch. Pedir la autorización completa por adelantado no es
+      cortesía, es el ítem más caro del release cuando todo lo demás salió a la primera.
 
 17. **Tres delta del release `e1718a359575` (2026-08-29, 4.º del día).** (a) "Confirmar `develop`
     verde" se verifica sobre el run del **HEAD actual Y los rojos/cancelados de la ráfaga**:

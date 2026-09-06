@@ -197,6 +197,9 @@ export const enrollInternalNativeIdentity = async (
         environmentId: input.environmentId,
         externalOrganizationRef: `internal:${candidate.organization_id}`,
         population: 'internal',
+        bindingPurpose: null,
+        canaryRegistrationId: null,
+        expiresAt: null,
         actorId: input.actorId,
         reason: input.reason
       })

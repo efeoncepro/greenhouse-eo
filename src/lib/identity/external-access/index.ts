@@ -8,7 +8,7 @@
 
 export * from './types'
 export * from './errors'
-export { readExternalInvitationConfig, type ExternalInvitationConfig } from './config'
+export { isExternalIdentityCanaryEnabled, readExternalInvitationConfig, type ExternalInvitationConfig } from './config'
 export {
   buildInvitationDelivery,
   maskEmail,
@@ -27,14 +27,28 @@ export {
   findActiveExternalIdpLinkByEmail,
   getActiveExternalIdpLinkBySubject,
   getExternalIdentityEnvironment,
+  getExternalCanaryRegistration,
   getExternalOrganizationBinding,
   listEligibleClientOrganizations,
   listExternalCapabilityGrants,
   listExternalIdentityEnvironments,
+  listExternalCanaryRegistrations,
   listExternalMemberInvitations,
   listExternalOrganizationBindings,
   type ExternalIdpSourceLink
 } from './store'
+export {
+  bindExternalCanaryOrganization,
+  cleanupExternalCanaryFixture,
+  createExternalCanaryFixture,
+  inspectExternalCanaryCleanup,
+  planExternalCanaryFixture,
+  revokeExternalCanaryFixture,
+  type BindExternalCanaryOrganizationInput,
+  type CreateExternalCanaryFixtureInput,
+  type ExternalCanaryCleanupPlan,
+  type PlannedExternalCanaryFixture
+} from './canary'
 export {
   acceptExternalInvitation,
   bindExternalOrganization,

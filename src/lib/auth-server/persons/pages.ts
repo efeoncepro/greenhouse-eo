@@ -10,13 +10,24 @@
  * antes de que la persona lo abriera. Por eso el GET sólo pinta un formulario y el consumo es POST.
  */
 
+import { randomBytes } from 'node:crypto'
+
 import { GH_AUTH_SERVER } from '@/lib/copy/auth-server'
 
-import { ICON_ALERT, ICON_CLOCK, ICON_MAIL, MICROSOFT_MARK_SVG } from '../oauth/pages/icons'
+import { htmlResponse } from '../oauth/http'
+import { ICON_ALERT, ICON_CLOCK, ICON_KEY, ICON_MAIL, MICROSOFT_MARK_SVG } from '../oauth/pages/icons'
 import { escapeHtml, layout } from '../oauth/pages/render'
+import { LOGIN_CONTROLLER_SCRIPT } from './login-controller.generated'
 
 const backToLogin = (): string =>
-  `<div class="id-actions"><a class="id-primary" href="/login">${escapeHtml(GH_AUTH_SERVER.login_continue_cta)}</a></div>`
+  `<div class="id-actions" data-capture="id-actions"><a class="id-primary" href="/login">${escapeHtml(GH_AUTH_SERVER.login_continue_cta)}</a></div>`
+
+/**
+ * TASK-1835 — Salida de una pantalla terminal. El copy de estas páginas manda a «pedir uno nuevo
+ * desde el inicio de sesión»: sin este control, la instrucción no tiene dónde ejecutarse.
+ */
+const exitToLogin = (label: string): string =>
+  `<div class="id-actions" data-capture="id-actions"><a class="id-primary" href="/login">${escapeHtml(label)}</a></div>`
 
 export const PERSON_AUTH_PATHS = {
   login: '/login',
@@ -42,9 +53,29 @@ export const PERSON_AUTH_PATHS = {
 const hiddenField = (name: string, value: string | null): string =>
   value ? `<input type="hidden" name="${escapeHtml(name)}" value="${escapeHtml(value)}">` : ''
 
-/** Formulario de inicio de sesión por correo. Un solo campo: no hay contraseña que pedir. */
-export const renderLoginPage = (input: { returnTo: string | null; internalLoginUrl?: string | null; error?: 'invalid_email' | null }): string => {
+export type LoginPageInput = {
+  returnTo: string | null
+  internalLoginUrl?: string | null
+  error?: 'invalid_email' | null
+  /**
+   * Nonce del módulo WebAuthn del login. Obligatorio: sin él la página se serviría sin el botón de
+   * passkey y sin `script-src`, y el carril quedaría muerto EN SILENCIO. `renderLoginPageResponse`
+   * es la forma canónica de servirla; este campo obliga a que ningún callsite se lo salte.
+   */
+  passkeyNonce: string
+}
+
+/**
+ * Inicio de sesión. Dos carriles: passkey (ceremonia WebAuthn, sin correo) y enlace por correo.
+ * El passkey va PRIMERO porque usa credenciales descubribles y no necesita que la persona escriba
+ * nada; el campo de correo es el fallback. No hay contraseña que pedir en ninguno.
+ */
+export const renderLoginPage = (input: LoginPageInput): string => {
   const invalidEmail = input.error === 'invalid_email'
+
+  if (typeof input.passkeyNonce !== 'string' || input.passkeyNonce.length === 0) {
+    throw new Error('renderLoginPage requires passkeyNonce: the passkey lane must never render unscripted')
+  }
 
   /**
    * Jerarquía deliberada: el enlace por correo es la puerta de la gente invitada —la mayoría— así
@@ -61,10 +92,16 @@ export const renderLoginPage = (input: { returnTo: string | null; internalLoginU
     GH_AUTH_SERVER.login_title,
     `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.login_title)}</h1>
   <p class="id-intro">${escapeHtml(input.internalLoginUrl ? GH_AUTH_SERVER.login_methods_intro : GH_AUTH_SERVER.login_intro)}</p>
-  ${invalidEmail ? `<p class="id-alert" id="email-error" role="alert">${ICON_ALERT}<span>${escapeHtml(GH_AUTH_SERVER.login_invalid_email)}</span></p>` : ''}
+  ${invalidEmail ? `<p class="id-alert" id="email-error" role="alert" data-capture="id-status">${ICON_ALERT}<span>${escapeHtml(GH_AUTH_SERVER.login_invalid_email)}</span></p>` : ''}
   ${internalMethod}
   <section class="id-section"><h2>${escapeHtml(GH_AUTH_SERVER.login_invitation_title)}</h2>
-  <form method="post" action="${escapeHtml(PERSON_AUTH_PATHS.magicLinkRequest)}">
+  <div data-capture="id-passkey">
+    ${hiddenField('return_to', input.returnTo)}
+    <div class="id-actions"><button type="button" class="id-primary" data-login-passkey hidden>${ICON_KEY}${escapeHtml(GH_AUTH_SERVER.login_passkey_cta)}</button></div>
+    <p class="id-note-fine" data-login-status role="status" aria-live="polite"></p>
+    <p class="id-note-fine">${escapeHtml(GH_AUTH_SERVER.login_email_fallback_hint)}</p>
+  </div>
+  <form method="post" action="${escapeHtml(PERSON_AUTH_PATHS.magicLinkRequest)}" data-capture="id-form">
     ${hiddenField('return_to', input.returnTo)}
     <ul>
       <li class="id-field">
@@ -73,12 +110,31 @@ export const renderLoginPage = (input: { returnTo: string | null; internalLoginU
       </li>
     </ul>
     <div class="actions">
-      <button class="primary" type="submit">${ICON_MAIL}${escapeHtml(GH_AUTH_SERVER.login_submit_cta)}</button>
+      <button class="secondary" type="submit">${ICON_MAIL}${escapeHtml(GH_AUTH_SERVER.login_submit_cta)}</button>
     </div>
   </form>
-  <p class="id-note-fine">${escapeHtml(GH_AUTH_SERVER.login_card_note)}</p></section>`,
+  <p class="id-note-fine">${escapeHtml(GH_AUTH_SERVER.login_card_note)}</p></section>
+  <script nonce="${escapeHtml(input.passkeyNonce)}">${LOGIN_CONTROLLER_SCRIPT}</script>`,
     { state: 'login' }
   )
+}
+
+/**
+ * Forma canónica de servir `/login`: genera el nonce, lo pasa a la plantilla y lo declara en la CSP.
+ * Construir la respuesta a mano deja el `script-src` fuera y el navegador bloquea el controlador sin
+ * decir nada — la página se vería bien y el botón de passkey no haría nada.
+ */
+export const renderLoginPageResponse = (
+  status: number,
+  input: Omit<LoginPageInput, 'passkeyNonce'>,
+  headers: Record<string, string> = {}
+) => {
+  const nonce = randomBytes(24).toString('base64')
+  const response = htmlResponse(status, renderLoginPage({ ...input, passkeyNonce: nonce }), headers)
+
+  response.headers['Content-Security-Policy'] += `; script-src 'nonce-${nonce}'; connect-src 'self'`
+
+  return response
 }
 
 export const renderMagicLinkSentPage = (): string =>
@@ -86,14 +142,15 @@ export const renderMagicLinkSentPage = (): string =>
     GH_AUTH_SERVER.login_sent_title,
     `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.login_sent_title)}</h1>
   <p>${escapeHtml(GH_AUTH_SERVER.login_sent_body)}</p>
-  <p class="id-note">${ICON_MAIL}<span>${escapeHtml(GH_AUTH_SERVER.login_sent_hint)}</span></p>`
+  <p class="id-note" data-capture="id-status" role="status">${ICON_MAIL}<span>${escapeHtml(GH_AUTH_SERVER.login_sent_hint)}</span></p>`
   )
 
 export const renderRateLimitedPage = (): string =>
   layout(
     GH_AUTH_SERVER.login_rate_limited_title,
     `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.login_rate_limited_title)}</h1>
-  <p class="id-note">${ICON_CLOCK}<span>${escapeHtml(GH_AUTH_SERVER.login_rate_limited_body)}</span></p>`
+  <p class="id-note" data-capture="id-status" role="status">${ICON_CLOCK}<span>${escapeHtml(GH_AUTH_SERVER.login_rate_limited_body)}</span></p>
+  ${exitToLogin(GH_AUTH_SERVER.login_back_cta)}`
   )
 
 /** Página intermedia del magic link: el token viaja en un campo oculto y se consume por POST. */
@@ -146,7 +203,8 @@ export const renderLinkProblemPage = (kind: 'invalid' | 'expired' | 'already_use
   return layout(
     GH_AUTH_SERVER.link_invalid_title,
     `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.link_invalid_title)}</h1>
-  <p>${escapeHtml(body)}</p>`
+  <p data-capture="id-status">${escapeHtml(body)}</p>
+  ${exitToLogin(GH_AUTH_SERVER.link_request_new_cta)}`
   )
 }
 

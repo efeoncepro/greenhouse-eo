@@ -42,8 +42,35 @@ vi.mock('./get-organization-operational-serving', () => ({
   getOrganizationOperationalServing: vi.fn()
 }))
 
-const { getOrganizationMemberships, ensureOrganizationContactMembership, createIdentityProfile } =
+const { getOrganizationMemberships, ensureOrganizationContactMembership, createIdentityProfile, searchProfiles } =
   await import('./organization-store')
+
+describe('searchProfiles — aislamiento canary TASK-1832', () => {
+  beforeEach(() => {
+    mockQuery.mockReset()
+  })
+
+  it('conserva perfiles reales y oculta smoke_test incluso si el adapter devuelve una fila fuera de policy', async () => {
+    mockQuery.mockResolvedValueOnce([
+      {
+        profile_id: 'profile-real',
+        full_name: 'Persona Real',
+        canonical_email: 'real@example.com',
+        data_origin: 'real'
+      },
+      {
+        profile_id: 'profile-smoke',
+        full_name: 'Canary',
+        canonical_email: 'canary@example.invalid',
+        data_origin: 'smoke_test'
+      }
+    ])
+
+    await expect(searchProfiles('Persona')).resolves.toEqual([
+      { profileId: 'profile-real', fullName: 'Persona Real', canonicalEmail: 'real@example.com' }
+    ])
+  })
+})
 
 describe('getOrganizationMemberships', () => {
   beforeEach(() => {
@@ -195,7 +222,12 @@ describe('createIdentityProfile — semántica de full_name (TASK-1736 Slice 2)'
 
   it('la rama email-first devuelve el perfil previo SIN escribir (el display no se toca acá)', async () => {
     mockQuery.mockResolvedValueOnce([
-      { profile_id: 'prof-existing', full_name: 'Nombre Vigente', canonical_email: 'valentina@example.com' }
+      {
+        profile_id: 'prof-existing',
+        full_name: 'Nombre Vigente',
+        canonical_email: 'valentina@example.com',
+        data_origin: 'real'
+      }
     ])
 
     const profileId = await createIdentityProfile({
@@ -208,5 +240,29 @@ describe('createIdentityProfile — semántica de full_name (TASK-1736 Slice 2)'
 
     expect(profileId).toBe('prof-existing')
     expect(mockQuery).toHaveBeenCalledTimes(1)
+  })
+
+  it('no reutiliza un perfil smoke_test para una ingesta comercial/HubSpot', async () => {
+    mockQuery
+      .mockResolvedValueOnce([
+        {
+          profile_id: 'prof-canary',
+          full_name: 'Canary',
+          canonical_email: 'contact@example.com',
+          data_origin: 'smoke_test'
+        }
+      ])
+      .mockResolvedValueOnce([])
+
+    const profileId = await createIdentityProfile({
+      sourceSystem: 'hubspot',
+      sourceObjectType: 'contact',
+      sourceObjectId: '12345',
+      fullName: 'Contacto Real',
+      canonicalEmail: 'contact@example.com'
+    })
+
+    expect(profileId).toBe('identity-hubspot-contact-12345')
+    expect(mockQuery).toHaveBeenCalledTimes(2)
   })
 })

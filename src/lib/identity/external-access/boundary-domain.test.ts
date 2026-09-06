@@ -39,6 +39,9 @@ const ALLOWED_WRITE_TARGETS = new Set([
   'greenhouse_core.external_member_invitations',
   'greenhouse_core.external_identity_audit_log',
   'greenhouse_core.external_access_resolution_log',
+  // TASK-1832 — única excepción: el dominio crea y elimina SU fixture organizacional dedicado.
+  'greenhouse_core.external_canary_registrations',
+  'greenhouse_core.organizations',
   // Aceptar liga la persona: perfil nuevo `external_contact` + source link `external_idp:<env>`.
   'greenhouse_core.identity_profiles',
   'greenhouse_core.identity_profile_source_links'

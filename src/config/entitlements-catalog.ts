@@ -1816,6 +1816,25 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
     actions: ['execute'] as const,
     defaultScope: 'tenant'
   },
+  // TASK-1832 — registry, binding y retiro del fixture canary son autoridades separadas.
+  {
+    key: 'identity.external_canary.register',
+    module: 'organization',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'identity.external_canary.bind',
+    module: 'organization',
+    actions: ['create'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'identity.external_canary.revoke',
+    module: 'organization',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1837 — Entrega gobernada + autoridad delegada. Revelar el token es una EXCEPCIÓN (razón
   // obligatoria, audit, TTL 1 h), no el flujo normal; la lane delegada la ejerce el administrador
   // designado del cliente contra su propio binding (resuelta por membership, nunca por rol).
@@ -2315,7 +2334,12 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // propose → confirm → execute; el LLM propone y NUNCA escribe. Grant: set operador growth
   // (mismo que target.configure — quien opera el servicio decide qué se trabaja).
   { key: 'growth.seo.work_queue.decide', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
-  { key: 'growth.seo.prospect_diagnostic.run', module: 'growth', actions: ['execute'] as const, defaultScope: 'tenant' },
+  {
+    key: 'growth.seo.prospect_diagnostic.run',
+    module: 'growth',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
   { key: 'growth.seo.prospect_diagnostic.read', module: 'growth', actions: ['read'] as const, defaultScope: 'tenant' },
   // TASK-353 — Hiring / ATS domain foundation. 8 capabilities V1 del dominio de
   // fulfillment de talento. `publish` y `decide` se modelan como verbo `execute`
@@ -2364,11 +2388,26 @@ export const ENTITLEMENT_CAPABILITY_CATALOG = [
   // contenido; conceder una adaptación es una decisión de People sobre una persona concreta, con
   // trazabilidad de quién y cuándo. Grant tier gobernanza role-only. El MOTIVO del ajuste nunca
   // se persiste (categoría protegida) — ver `src/lib/hiring/assessment/accommodations.ts`.
-  { key: 'hiring.assessment.grant_accommodation', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
+  {
+    key: 'hiring.assessment.grant_accommodation',
+    module: 'hiring',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1746 — Recovery divide dispatch y reveal: enviar un email transaccional y revelar
   // un bearer a un humano tienen radios distintos aunque hoy compartan el tier de roles.
-  { key: 'hiring.assessment.recover_access_email', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
-  { key: 'hiring.assessment.reveal_access_link', module: 'hiring', actions: ['execute'] as const, defaultScope: 'tenant' },
+  {
+    key: 'hiring.assessment.recover_access_email',
+    module: 'hiring',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
+  {
+    key: 'hiring.assessment.reveal_access_link',
+    module: 'hiring',
+    actions: ['execute'] as const,
+    defaultScope: 'tenant'
+  },
   // TASK-1365 — aggregate-only fairness reader. More restricted than assessment.read.
   { key: 'hiring.assessment.fairness_read', module: 'hiring', actions: ['read'] as const, defaultScope: 'tenant' },
   // TASK-1714 — revelar el valor completo del documento de identidad de un CANDIDATO.

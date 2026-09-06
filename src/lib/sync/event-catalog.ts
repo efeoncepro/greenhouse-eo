@@ -96,6 +96,8 @@ export const AGGREGATE_TYPES = {
   asset: 'asset',
   // TASK-1631 — external identity binding (Account 360 ↔ environment externo; provider-neutral).
   externalIdentityBinding: 'external_identity_binding',
+  // TASK-1832 — fixture sintético efímero; nunca representa una organización cliente.
+  externalCanaryRegistration: 'external_canary_registration',
   // TASK-1836 — opaque enrollment is the aggregate; person/organization remain canonical references.
   internalNativeEnrollment: 'internal_native_enrollment',
 
@@ -1253,6 +1255,10 @@ export const EVENT_TYPES = {
   /** TASK-1837 — el correo de invitación no salió o rebotó. IDs + código; nunca el token ni el email. */
   externalInvitationDeliveryFailed: 'identity.external_invitation.delivery_failed',
   externalAccessRevoked: 'identity.external_access.revoked',
+  // TASK-1832 — sólo IDs/TTL/estado; nunca correo, subject, token o código OAuth.
+  externalCanaryRegistered: 'identity.external_canary.registered',
+  externalCanaryRevoked: 'identity.external_canary.revoked',
+  externalCanaryCleanupCompleted: 'identity.external_canary.cleanup_completed',
 
   // TASK-1836 — audit/observability only; dispatch rechecks authority directly, without an async cache.
   // Payloads contain opaque enrollment and actor IDs only, never upstream tokens or identity claims.

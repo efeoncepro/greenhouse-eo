@@ -24,7 +24,8 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `identity|ui`
-- Blocked by: `TASK-1837 en producción (release develop→main + flags en Vercel Production); commands delegados de reenvío y revocación (Delta de TASK-1837, dueña de src/lib/identity/external-access/**); comparación de dirección de la composición (Slice 1 de esta task)`
+- Blocked by: `comparación de dirección de la composición (Slice 1 de esta task)`
+- Desbloqueo 2026-09-06: la lane delegada está en producción (release `b3e324cb5c8d`, ambos flags ON) y sus commands de reenvío y revocación ya están mergeados.
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

@@ -101,8 +101,9 @@ export const renderStepUpPage = (model: StepUpPageModel) => {
       ${model.hasPasskey ? `<div class="id-actions"><button type="button" class="id-secondary" data-step-passkey>${ICON_KEY}${escapeHtml(copy.passkey)}</button></div>
       <p class="id-or" aria-hidden="true"><span>${escapeHtml(GH_AUTH_SERVER.login_methods_separator)}</span></p>` : ''}
       <section data-step-setup class="id-section" hidden>
-        <p>${escapeHtml(copy.setup)}</p><img data-step-qr class="id-qr" alt="${escapeHtml(copy.qr)}" hidden><p>${escapeHtml(copy.secret)}</p><pre data-step-secret></pre>
-        <p>${escapeHtml(copy.backups)}</p><pre data-step-backups></pre>
+        <p>${escapeHtml(copy.setup)}</p><img data-step-qr class="id-qr" alt="${escapeHtml(copy.qr)}" hidden><div class="id-secret"><span class="id-muted">${escapeHtml(copy.secret)}</span><pre data-step-secret></pre></div>
+        <div class="id-secret"><span class="id-muted">${escapeHtml(copy.backups)}</span><pre data-step-backups></pre>
+          <p class="id-note-fine" data-step-backups-warning></p></div>
         <label><input type="checkbox" name="saved"> ${escapeHtml(copy.saved)}</label>
       </section>
       <form data-step-code class="id-section" ${model.hasTotp ? '' : 'hidden'}>
@@ -110,6 +111,11 @@ export const renderStepUpPage = (model: StepUpPageModel) => {
         <div class="id-actions"><button class="id-primary" data-step-submit type="submit">${escapeHtml(copy.verify)}</button></div>
       </form>
       ${!model.hasTotp ? `<div class="id-actions"><button type="button" class="id-secondary" data-step-enroll>${escapeHtml(copy.enroll)}</button></div>` : ''}
+      <section data-step-backup-notice class="id-section" hidden role="status">
+        <h2>${escapeHtml(copy.backupUsedTitle)}</h2>
+        <p data-step-backup-remaining></p>
+        <div class="id-actions"><button type="button" class="id-primary" data-step-backup-continue>${escapeHtml(copy.backupContinue)}</button></div>
+      </section>
       <p><a data-step-cancel href="${escapeHtml(model.returnTo)}">${escapeHtml(copy.cancel)}</a></p>
       <noscript>${escapeHtml(copy.javascript)}</noscript>
     </section><script nonce="${nonce}">${script}</script>`

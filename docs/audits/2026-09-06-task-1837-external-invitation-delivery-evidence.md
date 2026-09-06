@@ -280,3 +280,74 @@ pendiente, honesto:
 - Estado de flags: `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` (filas `EXTERNAL_INVITATION_*`).
 - Manual: `docs/manual-de-uso/identity/operar-binding-identidad-externa.md` §8.
 - Evidencia previa del epic: `docs/audits/2026-09-04-epic-044-auth-rollout.md`.
+
+## Paso a producción — 2026-09-06
+
+Release `b3e324cb5c8d-3cfce865-236f-4e4e-b128-8e144de193cf`, orquestador run `34029501838`,
+target `b3e324cb5c8d7cb4b903ae43b263cf2aa736bcd8` (PR #227). Manifest `released` a las `11:23:09Z`,
+**un solo intento, sin retry**. Break-glass declarado con hechos: la única migración del lote
+(`20260906004450748`) ya estaba aplicada en la instancia única, verificado en `public.pgmigrations`
+con `run_on 2026-09-06T04:27:58Z`.
+
+### Evidencia producida, no bypasseada
+
+| Pieza | Resultado |
+|---|---|
+| CI / CI Deep / Playwright smoke sobre el SHA de `main` | los tres `success` (el smoke se disparó a propósito sobre `main`, 3 min) |
+| Vercel Production | `READY` antes del dispatch y confirmado por el orquestador |
+| Cinco servicios Cloud Run | `commercial-cost-worker`, `ico-batch-worker`, `hubspot-greenhouse-integration` en el target; `ops-worker` y `auth-server` change-gated |
+| Azure | `no_infra_diff`, no-op esperado |
+| Salud post-release | `success` |
+| Watchdog | `drift_count=0`, `data_missing_count=0` |
+
+**Los dos servicios change-gated se validaron por identidad de árbol, no por el change-gate:**
+`git diff --name-only 2b385284d594 b3e324cb5c8d` vacío y ambos árboles con el mismo hash
+`d3a1432a1f719c5dee3aa6aa51b708c75458bf70`. Sirven exactamente el mismo código que el target.
+
+### Flags en Production
+
+Ambos se encendieron después del release, con el código lector ya en `main` (regla de `ISSUE-150`
+verificada archivo por archivo con `git show origin/main:`), valor live leído con `vercel env pull`
+—no con `env ls`, que sólo lista presencia— y **redeploy obligatorio** `greenhouse-j7aix61yk`
+porque Vercel congela las variables al construir el build.
+
+### Canary de contrato contra producción
+
+La misma llamada a la lane delegada, con la credencial del consumer del gateway, antes y después:
+
+| Momento | Llamada | Respuesta |
+|---|---|---|
+| Pre-flip | `?environment=efeonce-auth&subject=canary-preflip` | `404 not_found` (anti-oráculo) |
+| Post-flip | idéntica | `422 invalid_request`, `field=bindingId` |
+| Post-flip | la anterior más `organizationId` | `403 forbidden` |
+| Post-flip | sin parámetros de scope | `400 missing_external_scope_type` |
+
+El 422 y el 403 son algo que **sólo el contrato nuevo puede producir**: la lane no solo existe,
+ejecuta la resolución de autoridad delegada y niega a quien no es administrador designado.
+
+### Federación del gateway
+
+PR #3 de `efeonce-mcp` mergeado (`65ae1d5`) y desplegado por dispatch —ese repo **no** despliega en
+push a `main`—, revisión `efeonce-mcp-gateway-00038-8jj` con `GATEWAY_BUILD_SHA=65ae1d55`. Las tools
+consumen `GREENHOUSE_ECOSYSTEM_API_URL`, que apunta a producción.
+
+**Hallazgo del gate de versión del gateway:** `test/version.test.ts` compara
+`GREENHOUSE_TOOL_MANIFEST_HASH`, que cubre sólo las tools *federadas desde Greenhouse*. Las dos
+tools nuevas las define el gateway, así que el hash quedó idéntico y el gate pasaba en verde con la
+superficie creciendo de 37 a 39 y la versión clavada en `1.0.0`. Se subió a `1.1.0` (aditivo) y se
+actualizó la foto. **El punto ciego sigue abierto**: la próxima tool propia del gateway volverá a
+pasar sin bump.
+
+### Señales, medidas contra la base real a las 11:40Z
+
+`identity.external_invitation.undelivered` = 0 y `expired_unaccepted` = 0, ambas en su estado
+estable. `token_revealed` = 3, **encendida a propósito** por las revelaciones de prueba de esta
+task; se apaga sola al vencer su ventana de 24 h. Verla encendida es la prueba de que el detector
+opera.
+
+### Lo que no se verificó
+
+No existe todavía una persona **cliente real** invitada en producción: esa es una decisión
+comercial. Por lo tanto no se ejercitó el flujo delegado de punta a punta con un administrador
+designado real ni las dos tools del gateway bajo un token de persona; ambos quedaron probados en
+staging y, del lado de producción, con los negativos del canary.

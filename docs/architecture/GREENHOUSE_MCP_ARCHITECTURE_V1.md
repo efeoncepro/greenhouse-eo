@@ -751,20 +751,28 @@ lectura pura), sin Entra (scope base), sin persistencia.
 
 Invariantes operativos: `agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md` §8.
 
-### Delta 2026-09-06 — TASK-1837: tools delegadas de Efeonce ID en el gateway (PR #3)
+## 24. Delta 2026-09-06 — TASK-1837: tools delegadas de Efeonce ID en el gateway (PR #3, mergeado)
 
 §10.3 dejó al gateway resolviendo el binding de una persona externa por `(environment, subject)`. TASK-1837
 agrega, sobre esa misma forma, la **autoridad delegada** del administrador designado del cliente: la lane
 `GET|POST /api/platform/ecosystem/identity/invitations` (consumer `internal` del gateway; flag
 `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` OFF ⇒ `404` anti-oráculo) y su federación en `efeonce-mcp`,
-que quedó **abierta como PR #3** (rama `feat/task-1837-delegated-invitations`, commit `39fb736`,
-<https://github.com/efeoncepro/efeonce-mcp/pull/3>; `pnpm check` verde: format, typecheck, 145 tests, build).
-**No está mergeado**: exige el scope en `main` de Greenhouse (release) y el flag delegado ON en Production; hasta
-entonces las tools responden `policy_blocked`.
+que entró por el **PR #3** (<https://github.com/efeoncepro/efeonce-mcp/pull/3>), **mergeado a `main` como
+`65ae1d5`** una vez que el scope viajó a `main` de Greenhouse (release `b3e324cb5c8d`) y los dos flags quedaron
+`true` en Production. Con el flag delegado apagado las tools responden `policy_blocked`; con él prendido, quien no
+es administrador designado recibe `forbidden`.
 
+- **Son tools PROPIAS del gateway, no federadas desde el manifiesto de Greenhouse.** §22 dejó
+  `src/mcp/greenhouse/tool-manifest.ts` como fuente única de lo que EXISTE adentro; estas dos no están ahí porque
+  no existen como tool interna: el provider `greenhouse-identity` resuelve contra la ruta HTTP del lane, igual que
+  `get_seo_provider_spend`. La frontera se sostiene: el manifiesto sigue sin campo de federación y el gateway sigue
+  decidiendo qué cruza. Consecuencia medida: la superficie del servidor construido pasó de **37 a 39 tools** con el
+  `manifestHash` de Greenhouse IDÉNTICO — el punto ciego que cerró el gate de superficie del PR #4 (ver
+  `agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md` §9). Versión del gateway: **`1.1.0`** (aditivo).
 - **Tools:** `identity.invitations.list` (lectura; scope base `efeonce.mcp.read`) e `identity.invitation.create`
   (escritura; scope `efeonce.mcp.identity.write`, challenge `403 insufficient_scope` con el scope;
-  `scopes_supported` lo anuncia sólo con el provider ecosystem prendido). Provider
+  `scopes_supported` lo anuncia sólo con el provider ecosystem prendido — ver la asimetría medida entre la lista
+  cualificada y la del emisor nativo en el runbook, §`Deploy del gateway`). Provider
   `src/providers/greenhouse-identity.ts` del gateway: adapter sobre la lane con la misma config/consumer que el
   provider SEO.
 - **Scope:** `efeonce.mcp.identity.write` es una clase de blast-radius propia («administrar a las personas de mi

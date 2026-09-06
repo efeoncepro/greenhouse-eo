@@ -153,8 +153,8 @@ servidor, nunca el navegador.
 
 ## GVC Scenario Plan
 
-- Scenario: task1835-efeonce-id.
-- Scenario file: `scripts/frontend/scenarios/task1835-efeonce-id.scenario.ts`, declarado en el wireframe.
+- Scenario: familia `task1835-runtime-*` (29 fixtures, raíz `task1835-runtime-consent`).
+- Scenario file: `scripts/frontend/scenarios/task1835-runtime-consent.scenario.ts`, declarado en el wireframe.
 - Route: harness local `pnpm auth-server:dev-ui` con `?fixture=`.
 - Viewports: 1440×1000 y 390px.
 - Required steps: la secuencia del Flow Map con allow pending, deny, magic sent/expired, step-up error/ok, denied, error y slow_down.

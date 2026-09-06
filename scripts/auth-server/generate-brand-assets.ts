@@ -12,6 +12,7 @@ import { sanitizeBrandSvg } from './brand-svg'
 import { createAuthServerStyles } from './styles'
 import { renderAuthFontAssetsModule } from './generate-font-assets'
 import { generateStepUpController } from './step-up-controller-build'
+import { generateLoginController } from './login-controller-build'
 
 const ROOT = process.cwd()
 const SOURCE = join(ROOT, 'public/branding/SVG/isotipo-full-efeonce.svg')
@@ -100,5 +101,10 @@ console.log(`[auth-server] fonts and licenses generated → ${fontsTarget}`)
 
 void generateStepUpController().catch(() => {
   console.error('[auth-server] step-up controller generation failed')
+  process.exitCode = 1
+})
+
+void generateLoginController().catch(() => {
+  console.error('[auth-server] login controller generation failed')
   process.exitCode = 1
 })

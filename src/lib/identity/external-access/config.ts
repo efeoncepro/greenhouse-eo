@@ -30,6 +30,10 @@ export type ExternalInvitationConfig = {
 
 const parseFlag = (value: string | undefined): boolean => value?.trim().toLowerCase() === 'true'
 
+/** Gate independiente del carril canary. Default OFF en todo runtime. */
+export const isExternalIdentityCanaryEnabled = (env: NodeJS.ProcessEnv = process.env): boolean =>
+  parseFlag(env.EXTERNAL_IDENTITY_CANARY_ENABLED)
+
 const parsePositiveInt = (value: string | undefined, fallback: number): number => {
   const parsed = Number(value)
 

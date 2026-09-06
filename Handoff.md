@@ -1,24 +1,124 @@
 # Handoff activo
 
-**TASK-1837 (EPIC-044 U12) — `VERIFICADO END-TO-END EN STAGING 2026-09-06; producción pendiente de release`**
-(sesión greenhouse-eo-21; commits `5518d868e…` + rollout `db5a0adf3` + docs; develop pusheado hasta `2654f16eb`,
-cierre final commiteado sin push). Migración aplicada; flags `EXTERNAL_INVITATION_{SYSTEM_DELIVERY,DELEGATED_AUTHORITY}_ENABLED`
-**ON en Vercel staging** (redeploy `greenhouse-6u3f57s4p`), **NOT SET en Production** (el código no está en `main`).
-Recorrido vivo con binding de prueba (org fixture → `efeonce-auth`) y persona `jreyes+task1837@` (Outlook real):
-invitación 201 sin token → correo en 37 s → `/i/<token>` → accept 202 → `external_contact` nueva + admin designado →
-magic link → sesión `auth.efeonce.org` 200 (`amr magic_link`, reuso 400) → rebote `bounced@resend.dev` → `bounced` +
-señal `undelivered` ENCENDIDA ok→warning (drenaje local acotado: el ops-worker corre `main`) → reenvío 201 → revelación
-201 (1 h) → lane delegada con token del gateway 200/403/422/201 + correo real → revoke binding → sesión 401. Consent
-con host: capturas dev-UI. **Próximo paso:** release develop→main (coordinar con `production-release.yml`; el push a
-develop de las 01:43 rompió el release #226 y hubo que relanzarlo) + prender ambos flags en Vercel Production; federar la
-lane delegada en `efeonce-mcp` (TASK-1831/1832); primera persona de un CLIENTE real = decisión comercial. **Follow-ups cerrados (04:00–04:40Z, sin release):** revoke por binding limpia al admin designado (+audit);
-boundary test del dominio; scope `efeonce.mcp.identity.write` en el emisor (paridad con el gateway); lane acepta
-`organizationId`; verbos delegados `resend`/`revoke` + rutas `…/invitations/[id]/{resend,revoke}`; federación en el
-gateway = `efeonce-mcp` **PR #3** (`feat/task-1837-delegated-invitations`, tools `identity.invitations.list` /
-`identity.invitation.create`, `pnpm check` verde, **sin merge** hasta el release + flag en Production); tasks derivadas
-`TASK-1838` (consola del admin del cliente, wireframe+flow reales) y `TASK-1839` (convergencia con la invitación del
-portal). Evidencia:
-[audit](docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md) · [task](docs/tasks/in-progress/TASK-1837-efeonce-id-external-invitation-delivery-delegated-authority.md) · [ledger](docs/operations/FEATURE_FLAG_STATE_LEDGER.md).
+**TASK-1832 — rollout oscuro desplegado; fixture root + M365 provisionados, gates OFF (Codex,
+2026-09-06):** Consumers compatibles desplegados con gates independientes OFF: auth-server `dbeaef62de54` /
+`00034-85c`; gateway `8438c5fa87ed` / `00041-7dq` (152/152); Vercel staging READY. El manifiesto versionado
+registra la organización dedicada, registry y binding canary creados por commands. Readback: `1/1`, purpose drift
+`0/0`, Person 360 `0`; el primer cleanup dry-run sólo encontró referencias esperadas y se negó por authority
+activa. IDs completos, postura y contrato de retiro:
+`docs/audits/mcp/TASK-1832_CANARY_ASSET_MANIFEST_task-1832-canary-20260906-a.md`.
+
+**Cohorte M365 ligada; sesión aún pendiente:** el operador eligió el alias preexistente
+`m***@efeoncepro.com`, accesible como buzón compartido. La invitación `xmi-b7cfc54e-…` se entregó, quedó visible y
+se aceptó mediante el POST scanner-safe a 20:15:37Z. Creó exclusivamente el profile `EO-ID0651`,
+`data_origin=smoke_test`, y su source link; el agregado subió a 31 mientras Person 360 permaneció en `0`. El magic
+link quedó `delivered` a 20:15:46Z, pero el Mac se bloqueó antes de abrirlo. El grant personal exacto
+`xcg-4e5b6ad7-…` para `growth.seo.observation.read` quedó activo; binding gv `2` y audit presente. La
+invitación plus-address previa `xmi-697bc1d8-…` sigue revocada sin aceptación. Google sigue separado:
+`greenhouse.cl` anuncia MX de Google, pero Admin exige reautenticación antes de confirmar o provisionar el buzón
+gobernado. Gates siguen OFF; producción no se promueve hasta cerrar el gate de staging.
+La CI de `6634c3973` falló sólo porque el smoke OAuth nuevo usaba `page.goto` directo; el fix local usa
+`gotoWithTransientRetries` y su gate focal está verde, todavía sin push. Higiene: `vercel list` imprimió un cursor
+sensible; no se reutilizó ni se documentó su valor y debe rotarse si Vercel confirma que es credencial
+reutilizable.
+
+**Excepción operativa resuelta; rollout autorizado:** `pnpm pg:connect:migrate` se usó por error como comando de proxy y
+aplicó las dos migraciones aunque la aprobación excluía el apply. Readback 18:49:53Z: `registrations=0`,
+`canary_bindings=0`, drift de purpose externo/interno=0, 30 perfiles `smoke_test` preservados y 0 visibles en
+Person 360. No se crearon organización, cuentas, invitaciones, grants, sesiones, consentimientos o tokens; no se
+configuraron flags, no hubo push/deploy. Evidencia:
+`docs/audits/mcp/TASK-1832_SCHEMA_APPLY_READBACK_2026-09-06.md`. El operador decidió conservar el schema y autorizó
+el rollout completo el 2026-09-06: commit/push, promoción, deploys, gates, fixture dedicado, buzones controlados,
+sesiones, revocación y cleanup. El alcance sigue limitado a una organización sintética read-only; clientes y
+writes permanecen fuera.
+
+**Readback anterior a la migración TASK-1832 (14:57Z, sólo lectura; supersedido por el readback 18:49Z):** los
+30 perfiles `smoke_test` vigentes aparecían entonces en
+`greenhouse_serving.person_360`; ninguno tiene membership, `client_user` o contacto CRM. Los seis perfiles usados
+por smokes de identidad externa conservan history, pero tienen source link inactivo, invitación/binding revocados
+y sólo `efeonce.invalid`, sin entrega real: no hay cobertura M365/Google. El único candidato existente con nombre
+diagnóstico es `EO-ORG-0050` (`other`, `disqualified`, cero spaces/memberships/bindings), pero tiene historia de
+lifecycle/commercial party y queda descartado porque no es eliminable sin destruir evidencia append-only. Evidencia:
+`docs/audits/mcp/TASK-1832_PRE_IMPLEMENTATION_READBACK_2026-09-06.md`. Sin escrituras ni cambios runtime.
+
+**TASK-1835 (EPIC-044 U06) — `COMPLETE` y EN PRODUCCIÓN 2026-09-06 (Claude greenhouse-eo-06, 2026-09-06;
+commits `85c67e97d` · `4eb358d5b` · `b15b1690e`).** Efeonce ID queda enterprise-ready en local. Tres hallazgos que
+importan más que el trabajo planificado:
+
+1. **El login por passkey no existía.** Backend (`/auth/passkeys/authenticate/*`) y copy estaban desde el
+   2026-09-04, pero `/login` no ofrecía el método: los cuatro ids `login_passkey_*` llevaban dos días huérfanos.
+   Hallazgo del operador. Implementado con el patrón del step-up; `renderLoginPageResponse` exige el nonce en su
+   TIPO, así que el compilador —no la disciplina— impide servir la página sin script.
+2. 🔴 **`violations: 0` de axe era una medición vacía.** En las 40 capturas del emisor axe devolvía las 24 filas de
+   texto de cada página en `incomplete` («background could not be determined due to a pseudo element»): el lienzo
+   pinta su azul con degradado y `::after`. Nunca midió una. Debajo del cero, la ficha de aplicación y el aviso
+   «no verificada» del consentimiento estaban a **1.53:1**. Causa raíz: `.id-context`/`.id-muted` compartidas entre
+   la ficha (sobre el azul) y el bloque del destino (dentro de la tarjeta) — un color cruzando fondos opuestos.
+   Mecanismo nuevo `pnpm auth-server:verify-contrast` (muestrea píxeles): **272 textos, 0 bajo el piso WCAG**.
+   *Aplica más allá de esta task: cualquier superficie con fondo compuesto tiene el mismo punto ciego.*
+3. 🔴 **Ninguna PERSONA puede crear una passkey.** `/auth/passkeys/register/*` existe y no tiene superficie; el
+   step-up sólo enrola TOTP. **Corrección del operador:** dije que eso bloqueaba la certificación de U07 y es
+   falso — `scripts/auth-server/external-passkey-canary.ts` (TASK-1832, Codex) ya ejecuta registro y login con una
+   passkey de plataforma real en Chrome persistente, en el origen real, sin CDP ni autenticador de software. Falta
+   la PANTALLA, no la capacidad: quien recibe una invitación depende del correo en cada entrada. Registrado como
+   **`TASK-1842`** (`/account/credentials`, ui-ux, con el nodo S11 del flujo maestro y un gate de cobertura
+   endpoint→consumidor). Pesa sobre el primer piloto cliente (U16), no sobre el canary.
+
+Evidencia: GVC premium **29 fixtures** × desktop 1440 y móvil 390 = 58 capturas 29/29; scorecard 4.63 / piso 4.5;
+los cuatro gates `ui:*` PASS; suite del emisor 427; typecheck y lint limpios. Patrón «runtime sin React» en
+`PATTERNS.md`. **Desplegado y verificado en vivo** (deploy `auth-server` 21:49 `success`): botón de passkey, pie de
+licencias y arreglo de contraste sirviendo en `auth.efeonce.org`.
+
+**Para quien siga:** el aviso de códigos de respaldo quedó con tres tests en la suite —vistos ponerse ROJOS al
+quitar el comportamiento, no sólo verdes—, porque un script suelto que hay que acordarse de correr es un mecanismo
+apagado. Y ojo con `auth-server-deploy.yml`: dispara con `src/lib/**` sobre el Cloud Run ÚNICO que sirve
+`auth.efeonce.org` en vivo — el push ES el despliegue, incluso si el push lo hace otra sesión sobre la rama
+compartida (pasó hoy: Codex empujó y se llevó estos commits).
+
+**TASK-1832 / TASK-1841 — certificación sintética separada del piloto cliente (Codex, 2026-09-06):** U07 ya no
+usa una organización cliente real para probar la tecnología. TASK-1832 certifica el camino productivo completo
+con cuentas M365/Google controladas por Efeonce, personas `data_origin='smoke_test'`, organización canary no cliente,
+binding de propósito explícito, Claude/Codex/ChatGPT y Chrome/Safari; un verde acredita preparación técnica, no
+adopción ni usabilidad cliente. TASK-1841 (U16) reserva el primer uso real para una organización ya existente en
+Account 360, un administrador consentido y una capability read-only vigente, sólo después de TASK-1832/1833/1835,
+con acompañamiento y observación por siete días. El cliente nunca actúa como tester ni comparte tokens o logs.
+Este cambio es sólo de tasks/registry/README/epic/handoff/changelog: no crea cuentas, bindings, migraciones, flags,
+invitaciones, implementación, push ni rollout. Siguiente ID libre: TASK-1842.
+
+**TASK-1840 — logout multiproducto registrado, sin implementación (Codex, 2026-09-06):** unidad backend-critical
+separada de TASK-1834 para tres operaciones distintas: salir sólo del producto, cerrar la sesión Efeonce ID del
+navegador actual y cerrar todas las sesiones. El contrato exige `sid` opaco, RP-Initiated/Back-Channel Logout,
+ledger/tombstone server-side por RP, fan-out durable, revalidación, auditoría, señales, conformance multi-RP y
+rollback. No revoca consentimientos, roles, entitlements, memberships, `gv`, factores ni upstream Microsoft/Google.
+TASK-1834 y Globe quedan como consumers separados. Sólo task/registry/README/epic/handoff; sin código, migración,
+flag, push, deploy ni modificación de TASK-1834. Siguiente paso: Slice 0/Delta ADR con checkpoint humano.
+
+**TASK-1834 — especificación corregida, sin implementación (Codex, 2026-09-06):** auditoría paralela contra
+código/ADRs confirmó que `auth.efeonce.org` aún no entrega OIDC utilizable por NextAuth (sin `openid`/`id_token`/
+`userinfo`, access token con audiencia MCP) y que source link + binding no bastan sin `client_users`/acceso vigente.
+Una segunda auditoría de autorización confirmó que Efeonce Auth debe probar identidad, no emitir permisos del portal:
+OIDC Greenhouse queda separado de scopes/consentimiento/`gv`/grants MCP, mientras Greenhouse conserva roles, route
+groups, vistas internas, módulos cliente, entitlements, `can()` y scopes de datos. La task ahora cubre clientes +
+internos mediante Delta ADR, OIDC de audiencia Greenhouse, resolvers separados hasta `TenantAccessRecord`, ledger,
+UI/flow/motion y rollout por población; preserva Microsoft, Google, credenciales y magic link. También deja como gates
+de activación la sesión que hoy conserva claims al quedar inactivo el principal, el drift de vigencia de roles PG/BQ,
+la selección multicontexto no determinista y la posible diferencia entre permisos del Admin Center y enforcement
+`can()`. TASK-1832/1833 gatean activación, no dark deploy. Sólo docs locales; sin código, commit, push ni deploy.
+**Dirección adicional del operador:** Efeonce ID será la identidad humana canónica de todos los productos Efeonce
+para clientes e internos; Greenhouse es el primer relying party, no el dueño permanente del login. Cada producto
+mantiene cliente/audiencia/cookie/sesión y autorización propios; una identidad con varias relaciones selecciona un
+contexto sin sumar permisos. Auditoría Globe: hoy usa el broker Greenhouse, acepta sólo internos y conserva tenancy
+en transición, por lo que su adopción requiere unidad y Delta propios coordinados con TASK-1480/TASK-1511. TASK-1834
+ahora exige Delta ADR multiproducto, foundation OIDC reusable, conformance cruzada y registro de esas unidades antes
+de implementar. Siguiente paso: plan/ADR de Slice 0 con checkpoint humano antes del primer cambio de código.
+
+**TASK-1837 (EPIC-044 U12) — `EN PRODUCCIÓN 2026-09-06, COMPLETE`.** Release `b3e324cb5c8d-3cfce865-236f-4e4e-b128-8e144de193cf` (run `34029501838`, PR #227, target `b3e324cb5c8d`), manifest `released` 11:23:09Z en un solo intento. Break-glass con hechos (la migración `20260906004450748` ya estaba aplicada en la instancia única, `run_on 04:27:58Z`); el smoke de `main` se PRODUJO en vez de bypassearse. Cinco servicios Cloud Run OK: `ops-worker` y `auth-server` quedaron en `2b385284d594` con **hash de árbol IDÉNTICO** al target (`d3a1432a1f71`) — no-op legítimo probado por identidad de árbol, no por el change-gate; watchdog `drift_count=0`. Ambos flags `EXTERNAL_INVITATION_*` ON en Production (valor live leído con `vercel env pull`) + redeploy obligatorio `greenhouse-j7aix61yk`. **Canary de contrato contra producción**: la misma llamada a la lane delegada pasó de `404` anti-oráculo a `422 field=bindingId`, y con `organizationId` a `403 forbidden` — la lane ejecuta la resolución de autoridad, no sólo existe. Federación mergeada en `efeonce-mcp` (PR #3 → `65ae1d5`, revisión `00038-8jj`); ese repo **NO** despliega en push a `main`, va por dispatch de `deploy.yml`.
+
+**Pendiente real (no bloqueante):** (1) la **primera persona CLIENTE real** es decisión comercial tuya — hasta que exista, el flujo delegado de punta a punta y las dos tools del gateway sólo están probados en staging y por los negativos del canary; (2) la señal `identity.external_invitation.token_revealed` marca 3 por las revelaciones de prueba y **se apaga sola** al vencer su ventana de 24 h; (3) **punto ciego abierto en el gate de versión del gateway**: `test/version.test.ts` sólo compara el hash de las tools FEDERADAS desde Greenhouse, así que las tools propias del gateway crecieron la superficie de 37 a 39 con el test verde y `version` congelada — se subió a `1.1.0` a mano, pero la próxima volverá a pasar sin bump.
+
+**Barrido documental del 2026-09-06 (posterior al release).** Tres agentes disjuntos actualizaron identidad, MCP/gateway y control plane de release: los dos docs funcionales y el manual de identidad pasan a estado de producción, el runbook del MCP documenta por primera vez que **el gateway se despliega por dispatch manual, nunca por push a `main`**, que su servicio Cloud Run vive en `southamerica-west1`, y la diferencia entre `GREENHOUSE_ECOSYSTEM_API_URL` (producción, la que usan los providers) y `GREENHOUSE_API_URL` (dev-greenhouse, fondeo Globe). El playbook de release suma el caso positivo del día y dos anti-patterns: pedir la autorización de mutaciones externas al EMPEZAR (costó 64 min con la evidencia ya verde) y no leer como drift un SHA distinto cuando los ÁRBOLES son idénticos.
+
+**Dos defectos encontrados por la verificación cruzada, ambos cerrados el mismo día.** (1) El gate de versión del gateway medía sólo las tools federadas: `efeonce-mcp` PR #4 (`5c28a7a`) lo cambia a medir el servidor construido; visto encenderse en los dos casos. (2) Al agregar `efeonce.mcp.identity.write` se cubrió el documento del RECURSO pero no el bloque del emisor NATIVO, así que el scope salía sólo cualificado y un cliente que armara su authorize desde discovery nunca lo habría pedido: `efeonce-mcp` PR #5, abierto, con test de regresión visto fallar sin el arreglo. ⚠️ Ese fix **no** agrega el scope a Entra, que el ADR del gateway prohíbe explícitamente.
 
 **TASK-1836 / TASK-1831 — evidencia consolidada, 2026-09-06:**
 Tres subagentes actualizaron contratos, funcionales, manuales, tasks/epic y skills espejo.
@@ -338,118 +438,3 @@ Aprendizaje operativo del día: **dos sesiones recibieron el mismo mandato y nin
 de arrancar.** La colisión se detectó porque `origin/main` ganó un commit entre dos comandos consecutivos. Nadie
 tocó el control plane durante el solapamiento. Regla que queda: anunciar no es coordinar — hay que preguntar con
 `ListAgents` y esperar respuesta antes de tocar el árbol.
-
-## 2026-09-02 (7) — Salesforce ya tiene oferta canónica y task de landing, sin implementación
-
-La práctica Salesforce quedó canonizada por outcomes y lifecycle en cuatro fases: `Diagnose & Architect`,
-`Implement & Integrate`, `Activate & Adopt` y `Operate & Evolve`; seis solution lanes cubren Revenue/Sales,
-Service, Marketing/Lifecycle, Data/Identity/Consent, Agentforce/Automation y Experience/Integration/Analytics.
-El mapa previo conserva el routing de producto y separa CRM, Marketing Cloud Engagement y Marketing Cloud Next.
-
-Se registró `TASK-1812` para convertir esa oferta en una landing pública `Universo conectado`. Ya existen dirección
-visual, wireframe 1440/390, flujo installed-base/evaluation y motion contract. Efeonce lidera; Salesforce aporta
-reconocimiento referencial. Nubes/agentes son originales y cualquier logo, badge, screenshot, mascota o claim de
-partnership queda bloqueado hasta rights y readback contractual. `TASK-1404` sigue dueña de la comparación HubSpot
-vs Salesforce.
-
-Estado honesto: documentación y contrato UI listos; no hay implementación, WordPress postId, CMS save, publicación,
-cache purge, indexación, conversión ni live readback. La ejecución empieza con Discovery/VoC/SEO/rights/runtime,
-continúa con un first fold `noindex` y se detiene para `ACCEPT FIRST FOLD` antes del below-fold.
-
-## 2026-09-02 (6) — ANAM recibe un cierre documental premium y un soporte acotado a tres meses
-
-El cierre de Emma quedó consolidado en dos entregables externos de cinco páginas: especificación técnica y guía
-funcional. El sistema visual usa Poppins para display y Geist para lectura; Efeonce predomina como proveedor,
-HubSpot aparece como partnership y ANAM como cliente. Los PDF son el master de envío, los HTML/CSS la fuente
-editable y diez capturas rasterizadas la evidencia de revisión. Todos los pies incluyen sitio, correo, teléfono y
-dirección de Efeonce. Las versiones Word supersedidas quedaron fuera del paquete versionado.
-
-El correo para Óscar, María Paz, Pablo y Marco quedó listo, pero **no enviado**. Explica el rediseño de la landing,
-la corrección generativa del bordado `ANÁLISIS AMBIENTALES S.A.`, la identidad live de Emma, la matriz de handoff,
-las tres pruebas E2E y las validaciones humanas todavía pendientes. La captura final de la landing también quedó
-versionada como adjunto. El SharePoint consolidado es un compromiso para esta semana y permanece pendiente hasta
-verificar el enlace compartido.
-
-El soporte quedó explícito para Customer Agent y KPI: **tres meses, del 2026-08-13 al 2026-11-12 inclusive**.
-Cubre incidentes, correcciones, dudas operativas, comportamientos inesperados, recuperación de configuración y
-documentación derivada de una corrección. No cubre nuevas funcionalidades, KPI, workflows, automatizaciones,
-integraciones, rediseños ni innovación; toda evolución requiere alcance y aprobación separados. Este cierre sólo
-actualiza documentación y entregables; no mutó HubSpot, no envió correo, no creó SharePoint y no hizo push.
-
-## 2026-09-02 (6) — TASK-1804: el manual de uso viaja por el protocolo — code complete, rollout pendiente
-
-Tres slices en Greenhouse (`ec89014e4`, `12c0ea85d`, `5a6ae57f4`) y uno en `efeonce-mcp` (`c588a1b`,
-**local, sin push**: `main` auto-despliega a Cloud Run). Manifiesto de manuales
-(`src/mcp/greenhouse/skill-manifest.ts`) + reader canónico + tres `SKILL.md` en `docs/mcp/skills/`
-escritos de cero para el consumidor MCP; tool `get_greenhouse_skill` (44 tools en el artefacto),
-recurso `skill://efeonce/<name>/SKILL.md`, lane `/api/platform/ecosystem/mcp/skills[/{name}]` con
-404 anti-oráculo para bindings no-internal; las `instructions` rutean al manual en vez de contener
-el procedimiento. Test de fuga sobre todo `docs/mcp/skills/**`. `next.config.ts` declara los `.md`
-como `outputFileTracingIncludes` (primer uso en el repo).
-
-🔴 **Pendiente de runtime, en este orden:** (1) push de `develop` y verificar la lane en staging con
-binding real — `count` **exactamente 3**, cuerpo con frontmatter, `404` inexistente, `401` sin token,
-catálogo `[]` + `404` con binding de cliente; (2) release a producción y repetir; (3) push del commit
-local de `efeonce-mcp` → deploy de Cloud Run → `scripts/greenhouse-seo-canary.mjs` (ya trae los
-asserts de skills). Sin Entra, flag ni secreto nuevos. `pnpm build` de producción no se corrió en
-local (cuelga la máquina): lo prueba Vercel o se corre con autorización.
-
-⚠️ El guard de paridad del gateway está anclado al dominio SEO y no veía una tool `platform`: nació
-`EXPECTED_GREENHOUSE_PLATFORM_TOOLS` + `computeFederatedNonSeoToolFindings` (test con regresiones).
-
-**Actualización (misma task, más tarde ese día):** el SHA `eed9992d5` rompió el build de staging —
-*"api/mcp/greenhouse is 397.29mb (limit 250mb)"*. No era el tamaño de los manuales (el glob resuelve 3
-archivos; `@vercel/nft` traza la ruta en 2,6 MB): una ruta con `outputFileTracingIncludes` propio deja de
-agruparse y su función sola supera el techo. Se cerró la clase: `skill-catalog.generated.json` generado desde
-`docs/mcp/skills/**` con `pnpm mcp:skills:generate`, gate `pnpm mcp:skills:check` en `local:check` y CI,
-hashes re-verificados al cargar, cero `fs` en runtime, tracing retirado de `next.config.ts`.
-🔴 **Decisión del operador: sin release a `main` en esta ventana; sólo el gateway.** `efeonce-mcp`
-`c588a1b` desplegado (revisión `efeonce-mcp-gateway-00028-pmx`, CI + Deploy Cloud Run success, front door
-200/200/401). Consecuencia declarada: `get_greenhouse_skill` responde `not_found` desde producción hasta que la
-lane llegue a `main`. Pendiente: lane verificada en staging con el SHA nuevo de `develop` + canary del gateway
-contra staging.
-
-**Cierre de la ventana (verificado):** el build de staging `greenhouse-jr9hmjido` quedó **Ready** con
-`4620875eb`: la causa real era el análisis estático de `fs` de Turbopack (no nft ni el tracing) —
-`skill-catalog.ts` conservaba `readdirSync`/`readFileSync` alcanzables desde tres rutas y Turbopack incluía el
-proyecto entero (397 MB). Todo `node:fs` vive ahora en `skill-catalog-fs.ts` (sólo generador y tests).
-**Lane verificada en staging** con el binding interno del consumer del gateway: `count=3` exacto, ETag/304,
-tres cuerpos byte-idénticos al artefacto, `404` inexistente, `401` sin token; canary del provider del gateway
-contra staging 5/5. Contra producción el gateway responde `not_found` (la lane espera el release). Pendientes
-reales: release `develop→main` (decisión del operador) y el camino de negación con binding de cliente en
-runtime. ⚠️ `4620875eb` arrastró archivos que otra sesión tenía en el índice compartido (`mcp-craft/**`,
-`.claude/rules/mcp-tool-surface.md`); esa sesión lo registró en `bd112e66a`.
-
-**Cierre definitivo (21:27Z):** la lane salió a producción en el release `375f56e24` (release_id
-`375f56e24187-546f452b-…`, run `33683893124`, llevado por `greenhouse-eo-ac`); canary de contrato contra
-producción post-`released` verde (count=3 exacto, cuerpos byte-idénticos, ETag/304, 404/401, provider del
-gateway 5/5). TASK-1804 → `complete`. Sin evidencia runtime: `tools/call` por el front door OAuth (login
-Entra interactivo) y la negación con binding de cliente (sin consumer de cliente con token).
-
-**Higiene Entra (21:40Z):** el cliente PKCE público `32617b87…` dejó de llamarse "Local Canary Client" y ahora es
-"Efeonce MCP Public Client (Claude Code, claude.ai, Claude Desktop)"; sólo `displayName`, readback con redirect
-URIs y scopes intactos. Queda abierta la revisión del loopback `http://localhost` sin puerto (ADR del gateway).
-
-**Follow-up (22:10Z):** (a) evidencia por el front door: `claude mcp login efeonce-mcp` → `✔ Connected` y un
-agente `claude -p` en sesión nueva llamó `get_greenhouse_skill` por `mcp.efeonce.org` con token Entra real, listó
-el catálogo y resumió bien el manual de gasto — cerrado el único hueco de evidencia. (b) El catálogo pasa de 3 a 6
-manuales, todos SEO federado (`seo-discovery-to-tracking`, `seo-technical-health`, `seo-prospect-diagnostic`); la
-`description` de la tool no cambia (nombra el manual de gasto y remite al catálogo), así que el gateway no se
-redespliega: los nuevos aparecen tras el release. Hiring/Globe quedan fuera: sus tools no están en el manifiesto de
-Greenhouse y el contrato de manuales sólo gobierna ése. Techo "revisar al pasar de 6" alcanzado: la próxima adición
-particiona por dominio.
-
-**Segundo release del día (23:19Z), llevado por esta sesión:** PR #216 → `4379c495013f`, run `33693657365`
-success, release_id `4379c495013f-2493cf4b-…`, manifest `released`; canary post-released: catálogo `count=6`,
-cuerpos byte-idénticos, 304/404/401, provider del gateway 6/6; watchdog ok, 4/4 workers (ops-worker
-change-gated con diff de árbol vacío). Incluyó TASK-1805 Slices 1–3 (sin flag; migración expand ya aplicada,
-único bypass) y la reconciliación de **10 commits que `cesargrowth11` empujó directo a `main`** (skill Berel,
-22:06–22:10Z) por cherry-pick + `-s ours`. Playbook gana el anti-patrón #15. Ledger de tiempos actualizado.
-
-**Barrido documental por subagentes (23:45Z):** dos agentes actualizaron lo que el cierre manual no cubría —
-`api-platform-ecosystem.md` (lane de manuales), `efeonce-mcp-gateway.md` (provider `greenhouse-skills`, 36 tools),
-arquitectura API Platform (delta), ADR del gateway (delta provider + guard no-SEO), patrones canónicos (segundo
-uso del patrón manifiesto+artefacto+hash), `docs/api` (pointer), arquitectura SEO §7 (manuales obligatorios por
-task), manuales de uso del inventario/gateway/provider SEO, doc funcional SV360 por MCP, skills
-`dataforseo-operator` y `seo-aeo-practice` (espejadas), README y AGENTS del repo `efeonce-mcp` (cifras 28/36/6).
-Regla auto-cargada `.claude/rules/mcp-tool-surface.md` gana el invariante de manuales.

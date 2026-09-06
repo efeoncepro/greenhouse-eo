@@ -23,6 +23,15 @@ export type ExternalSubjectType = (typeof EXTERNAL_SUBJECT_TYPES)[number]
 export const EXTERNAL_BINDING_STATUSES = ['active', 'revoked'] as const
 export type ExternalBindingStatus = (typeof EXTERNAL_BINDING_STATUSES)[number]
 
+export const EXTERNAL_BINDING_PURPOSES = ['customer', 'canary'] as const
+export type ExternalBindingPurpose = (typeof EXTERNAL_BINDING_PURPOSES)[number]
+
+export const EXTERNAL_CANARY_REGISTRATION_STATUSES = ['active', 'revoked'] as const
+export type ExternalCanaryRegistrationStatus = (typeof EXTERNAL_CANARY_REGISTRATION_STATUSES)[number]
+
+/** Única capability de negocio admitida por el carril canary V1. */
+export const EXTERNAL_CANARY_CAPABILITY = 'growth.seo.observation.read' as const
+
 export const EXTERNAL_GRANT_STATUSES = ['active', 'revoked'] as const
 export type ExternalGrantStatus = (typeof EXTERNAL_GRANT_STATUSES)[number]
 
@@ -34,7 +43,13 @@ export type ExternalInvitationStatus = (typeof EXTERNAL_INVITATION_STATUSES)[num
  * autoridad). `not_attempted` = nadie envió (flag apagado, revelación manual); `sent` = Resend aceptó;
  * `delivered`/`bounced` = lo dijo el webhook; `failed` = el envío no salió (respuesta honesta).
  */
-export const EXTERNAL_INVITATION_DELIVERY_STATUSES = ['not_attempted', 'sent', 'delivered', 'bounced', 'failed'] as const
+export const EXTERNAL_INVITATION_DELIVERY_STATUSES = [
+  'not_attempted',
+  'sent',
+  'delivered',
+  'bounced',
+  'failed'
+] as const
 export type ExternalInvitationDeliveryStatus = (typeof EXTERNAL_INVITATION_DELIVERY_STATUSES)[number]
 
 /** `system` = el correo lo manda Greenhouse en el mismo acto; `manual` = el token vuelve al llamador. */
@@ -56,7 +71,10 @@ export const EXTERNAL_ACCESS_RESOLUTION_OUTCOMES = [
   'internal_population',
   'revoked',
   'environment_inactive',
-  'profile_inactive'
+  'profile_inactive',
+  'canary_disabled',
+  'canary_not_registered',
+  'canary_expired'
 ] as const
 export type ExternalAccessResolutionOutcome = (typeof EXTERNAL_ACCESS_RESOLUTION_OUTCOMES)[number]
 
@@ -83,6 +101,10 @@ export type ExternalIdentityEnvironment = {
 
 export type ExternalOrganizationBinding = {
   population: 'external' | 'internal'
+  /** `null` sólo para población internal. */
+  bindingPurpose: ExternalBindingPurpose | null
+  canaryRegistrationId: string | null
+  expiresAt: string | null
   bindingId: string
   organizationId: string
   organizationName: string | null
@@ -109,6 +131,27 @@ export type ExternalCapabilityGrant = {
   reason: string | null
   grantedBy: string
   grantedAt: string
+  expiresAt: string | null
+  revokedBy: string | null
+  revokedAt: string | null
+  revokeReason: string | null
+}
+
+/** Allowlist exacta de un único fixture canary. No representa una party comercial. */
+export type ExternalCanaryRegistration = {
+  canaryRegistrationId: string
+  runId: string
+  organizationId: string
+  organizationPublicId: string | null
+  organizationName: string
+  environmentId: string
+  externalOrganizationRef: string
+  capability: typeof EXTERNAL_CANARY_CAPABILITY
+  status: ExternalCanaryRegistrationStatus
+  reason: string
+  registeredBy: string
+  registeredAt: string
+  expiresAt: string
   revokedBy: string | null
   revokedAt: string | null
   revokeReason: string | null
@@ -153,6 +196,9 @@ export type ExternalAccessMembership = {
   bindingId: string
   organizationId: string
   externalOrganizationRef: string
+  bindingPurpose: ExternalBindingPurpose
+  canaryRegistrationId: string | null
+  expiresAt: string | null
   grantsVersion: number
   /** Capabilities namespaceadas resueltas para ESTA persona (grants del binding ∪ grants per-persona). */
   grants: string[]

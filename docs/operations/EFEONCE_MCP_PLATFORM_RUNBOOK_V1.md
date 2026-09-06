@@ -36,7 +36,9 @@ Un front door con DNS publicado pero certificado no `ACTIVE` no califica como `p
 rollout TLS pendiente. No presentar `private_canary`, `edge_ready` ni ese estado transitorio como producción
 pública.
 
-**Estado vigente:** `public_read_only`, con OAuth obligatorio y tres providers read-only federados:
+**Estado vigente:** `public_read_only`, con OAuth obligatorio y cuatro providers habilitados (tres read-only
+federados más el de identidad delegada, que agrega una escritura fail-closed — ver el punto de identidad al final
+de la lista):
 
 - Globe, con el reader `globe.producer.fleet.list`, limitado al workspace interno exacto;
 - Greenhouse-SEO, habilitado el 2026-08-06 y acotado por el entitlement per-org del módulo SEO de Greenhouse.
@@ -48,10 +50,19 @@ pública.
   `hiring.application.review_packet.get`. Candidate review exige application exacta y purpose, devuelve solo CV
   minimizado/redactado/chunked ligado a hash y conserva audit; no expone PDF crudo, contacto, notas ni atributos
   protegidos.
+- Greenhouse Identity (autoridad delegada, TASK-1837), habilitado el 2026-09-06 con el MISMO interruptor y
+  consumer que el provider SEO (`GREENHOUSE_SEO_PROVIDER_ENABLED`; no hay flag ni secreto propio):
+  `identity.invitations.list` (lectura) e `identity.invitation.create` (**escritura**, scope
+  `efeonce.mcp.identity.write`). Sólo emisor nativo (`auth.efeonce.org`) y población `native-external`; el gateway
+  no decide autoridad — manda `environment` + `subject` y Greenhouse re-exige `designatedAdmin`. El token de
+  invitación nunca vuelve al agente: el provider descarta cualquier campo `token` del upstream. Hoy no existe
+  todavía una persona cliente real habilitada (decisión comercial, no técnica), así que la escritura está probada
+  por los negativos del canary de producción y por staging, no por un caso de punta a punta en producción.
 
 Este estado no habilita clientes externos ni multitenancy. El adjetivo `read_only` describe lo que hoy es
-**alcanzable por un token real**, no lo que está cableado: mientras `efeonce.mcp.seo.write` no lo tenga ningún
-cliente, ninguna escritura es ejecutable por el borde público.
+**alcanzable por un token real**, no lo que está cableado: mientras `efeonce.mcp.seo.write` y
+`efeonce.mcp.identity.write` no los tenga ningún cliente con consentimiento vigente, ninguna escritura es
+ejecutable por el borde público.
 
 **Hiring está federado en producción interna.** `TASK-1726` publica los dos readers del Talent Pool y `TASK-1718`
 los dos readers exactos de candidate review. El 2026-08-16 el canary
@@ -96,7 +107,7 @@ sus gates. TASK-1718 conserva firmas y pruebas revoked/base-only/rollback como d
 | `GREENHOUSE_API_URL` | no | origin Greenhouse exacto para el command de funding |
 | `GREENHOUSE_TOKEN_EXCHANGE_URL` | no | endpoint RFC 8693 exacto y audience del ID token WIF |
 | `GREENHOUSE_VERCEL_BYPASS_SECRET` | sí | inyectado desde `greenhouse-vercel-automation-bypass` en GCP Secret Manager; nunca GitHub var/env file. Es sólo bypass de transporte para el hop interno exacto token-exchange/command; nunca identidad/autorización, discovery, respuesta MCP, cliente o provider externo. |
-| `GREENHOUSE_SEO_PROVIDER_ENABLED` | no | default `false`; `true` sólo con lane Greenhouse verde y canary aprobado |
+| `GREENHOUSE_SEO_PROVIDER_ENABLED` | no | default `false`; `true` sólo con lane Greenhouse verde y canary aprobado. **Gobierna tres providers, no uno**: SEO, `greenhouse-skills` (manuales) y `greenhouse-identity` (invitaciones delegadas, TASK-1837) comparten interruptor, config y consumer porque son la MISMA lane ecosystem. Apagarlo por un incidente de SEO también apaga los manuales y la identidad delegada |
 | `GREENHOUSE_ECOSYSTEM_API_URL` | no | origin Greenhouse exacto del lane ecosystem; en producción `https://greenhouse.efeoncepro.com` |
 | `GREENHOUSE_ECOSYSTEM_TOKEN` | sí | inyectado desde `efeonce-mcp-gateway-greenhouse-token` en GCP Secret Manager; nunca valor plano en `vars`, workflow ni env file |
 | `GREENHOUSE_HIRING_PROVIDER_ENABLED` | no | default `false`; sólo `true` después de Greenhouse `HIRING_TALENT_POOL_SEARCH_ENABLED` + `HIRING_TALENT_POOL_MCP_ENABLED`, grant Entra y canary aprobados |
@@ -123,6 +134,106 @@ tofu apply tfplan
 
 Después del apply, configura en GitHub sólo el resource name del WIF provider y variables no secretas. No crees
 service-account keys.
+
+## Deploy del gateway — dispatch manual, nunca por push
+
+> Verificado 2026-09-06 contra `origin/main` de `efeonce-mcp` (`5c28a7a`) y la revisión activa del servicio.
+
+**El gateway NO se despliega solo.** `.github/workflows/deploy.yml` es `workflow_dispatch` **puro**: no tiene
+trigger `push`. Mergear a `main` deja el commit sin desplegar y **sin ninguna señal roja** — el repo queda verde y
+la revisión sirviendo el código anterior. Es la trampa más cara de este runtime y ya se pagó una vez
+(§`Drift de rollout detectado 2026-08-28`).
+
+```bash
+gh workflow run deploy.yml --repo efeoncepro/efeonce-mcp --ref main \
+  -f exposure=public-oauth \
+  -f ingress=internal-and-cloud-load-balancing
+```
+
+Los dos inputs son obligatorios y **no tienen valor seguro por omisión**: `exposure=private` deja el servicio
+IAM-privado (front door caído) e `ingress=all` lo saca de detrás del balanceador. Los valores de producción son
+exactamente los de arriba.
+
+**Servicio y región canónicos: `efeonce-mcp-gateway` en `southamerica-west1`.** No es `us-east4` — ahí viven los
+workers de Greenhouse y el `auth-server`. Un `gcloud run services describe` sin `--region` correcta responde
+"not found" y se lee como si el servicio no existiera.
+
+Verificación de que lo desplegado ES lo mergeado (el único assert que vale; la cuenta de commits no lo mide):
+
+```bash
+gcloud run services describe efeonce-mcp-gateway \
+  --region=southamerica-west1 --project=efeonce-group \
+  --format='value(status.latestReadyRevisionName)'
+
+gcloud run services describe efeonce-mcp-gateway \
+  --region=southamerica-west1 --project=efeonce-group \
+  --format='value(spec.template.spec.containers[0].env.filter("name:GATEWAY_BUILD_SHA").extract(value))'
+
+git -C ~/Documents/efeonce-mcp rev-parse origin/main
+```
+
+`GATEWAY_BUILD_SHA` de la revisión activa debe **coincidir con el HEAD de `origin/main`**. Si difiere, hay commits
+mergeados sin desplegar: dispara el workflow, no interpretes el verde de CI como rollout.
+
+Estado as-of 2026-09-06: revisión activa `efeonce-mcp-gateway-00039-gz4`, `GATEWAY_BUILD_SHA`
+`5c28a7afe66231fd7a20be2e7e37bbd50c00d2c1` = HEAD de `main`, 100% del tráfico. Front door verde:
+`.well-known/oauth-protected-resource` 200 y `POST /mcp` sin token 401 (fail-closed).
+
+### Dos orígenes de Greenhouse que se parecen y no son lo mismo
+
+| Variable | Valor live 2026-09-06 | Quién la usa |
+| --- | --- | --- |
+| `GREENHOUSE_ECOSYSTEM_API_URL` | `https://greenhouse.efeoncepro.com` | providers `greenhouse-seo`, `greenhouse-skills` y `greenhouse-identity` (misma config, mismo consumer) |
+| `GREENHOUSE_HIRING_API_URL` | `https://greenhouse.efeoncepro.com` | provider Hiring |
+| `MCP_IDENTITY_BINDING_URL` | `https://greenhouse.efeoncepro.com` | resolución del binding de la persona externa |
+| `GREENHOUSE_API_URL` | `https://dev-greenhouse.efeoncepro.com` | **sólo** el command de fondeo de créditos Globe (`/api/platform/app/globe/credit-funding/ensure`), y sólo se lee con `GLOBE_CREDIT_FUNDING_WRITE_ENABLED=true` |
+| `GREENHOUSE_TOKEN_EXCHANGE_URL` | `https://dev-greenhouse.efeoncepro.com/...` | el token exchange de ese mismo command |
+
+⚠️ **`GREENHOUSE_API_URL` NO es el origen de las lecturas ni de identidad.** Apunta a `dev-greenhouse` y sólo la
+toca el carril de fondeo Globe. Cambiarla creyendo que redirige el provider SEO o el de identidad no hace nada
+visible: esos leen `GREENHOUSE_ECOSYSTEM_API_URL`. Y al revés, tocar `GREENHOUSE_ECOSYSTEM_API_URL` no mueve el
+fondeo. Verificar cuál lee cada provider antes de tocar cualquiera de las dos.
+
+### Bump de versión y foto de superficie
+
+El servidor declara su `version` (hoy `1.1.0`) y CI exige que `surface-baseline.json` esté al día. El orden es
+**decidir el bump primero y refrescar la foto después**:
+
+```bash
+cd ~/Documents/efeonce-mcp
+# 1) mover "version" en package.json según el cambio de superficie
+# 2) refrescar la foto (version + manifestHash + surfaceHash + tools[])
+pnpm surface:baseline
+pnpm check
+```
+
+Clase del bump: **agregar una tool = minor**; **renombrar, quitar o reescribir una descripción = major** (editar
+una descripción cambia qué decide llamar el agente e invalida su caché de prompt).
+
+`pnpm surface:baseline` **no decide** el bump: sólo fotografía la superficie del servidor construido (federadas +
+propias) con todos los providers habilitados a propósito. Correrlo antes de mover `version` congela la foto con la
+versión vieja y el gate pasa en verde mintiendo. Protocolo completo y el punto ciego que lo originó:
+`docs/architecture/agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md` §9 y la skill `efeonce-mcp-platform`
+(«Paso 7 del protocolo»).
+
+### `scopes_supported`: son DOS documentos distintos, y no dicen lo mismo (medido 2026-09-06)
+
+No confundir el discovery del **authorization server** con el del **recurso**:
+
+- `GET https://auth.efeonce.org/.well-known/oauth-authorization-server` publica el **mínimo**: sólo lecturas
+  (`efeonce.mcp.read`, `efeonce.mcp.globe.read`, `efeonce.mcp.hiring.read`). Contrato en
+  `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`; las clases de escritura llegan por el
+  `403 insufficient_scope` del recurso, no por acá.
+- `GET https://mcp.efeonce.org/.well-known/oauth-protected-resource` —del gateway— publica los scopes **dos veces**:
+  la lista cualificada con el resource URI (la que Entra puede pedir, por AADSTS650053) y, con el emisor nativo
+  prendido, la lista pelada. Ahí **sí** aparecen las escrituras cualificadas, `efeonce.mcp.identity.write`
+  incluida.
+
+⚠️ Asimetría medida dentro de ese segundo documento: `efeonce.mcp.identity.write` sale **sólo en la lista
+cualificada**. El bloque del emisor nativo de `src/app.ts` agrega `SEO_WRITE_SCOPE` y `HIRING_READ_SCOPE`, pero no
+el de identidad. Como las tools delegadas exigen precisamente token del emisor nativo, anotarlo acá evita
+diagnosticar como "el scope no existe" lo que es una lista incompleta. No se corrige desde Greenhouse: vive en
+`efeonce-mcp`.
 
 ## Deploy private canary
 
@@ -646,7 +757,11 @@ tokens de este issuer, así que retirar el host no afecta ninguna sesión MCP.
 
 ## Rollback
 
-- Provider defectuoso: `GLOBE_PROVIDER_ENABLED=false` y deploy; no retires todo el gateway.
+- Provider defectuoso: `GLOBE_PROVIDER_ENABLED=false` y deploy; no retires todo el gateway. ⚠️
+  `GREENHOUSE_SEO_PROVIDER_ENABLED=false` **no es un rollback acotado a SEO**: apaga además los manuales
+  (`greenhouse-skills`) y la identidad delegada (`greenhouse-identity`), que cuelgan del mismo interruptor.
+- Cambio de variable o de interruptor: hay que **redesplegar por dispatch**, el gateway no toma env vars en
+  caliente ni se despliega solo al mergear (§`Deploy del gateway — dispatch manual, nunca por push`).
 - Revisión defectuosa: mueve 100% del tráfico a la revisión previa verificada.
 - Auth defectuoso: fail-closed, revoca cliente/consentimiento y restaura issuer/audience previos.
 - Edge defectuoso: conserva DNS con respuesta segura `503` o revierte el record exacto; considera TTL.
@@ -772,11 +887,13 @@ administradora, `identity.invitations.list` devuelve sólo su organización y `i
 revocar (`POST /api/platform/ecosystem/identity/invitations/[invitationId]/{resend,revoke}`, commit `1ddb5f92b`)
 existen en Greenhouse pero **no están federados**: follow-up del PR #3 o de `TASK-1838`.
 
-## Superficie operable por un cliente MCP — snapshot 2026-08-28
+## Superficie operable por un cliente MCP — snapshot 2026-09-06
 
 Esta sección responde la pregunta del operador *"¿qué puedo hacer hoy con el MCP conectado?"*. Es un **snapshot
-fechado**, no un contrato: la fuente de verdad del inventario es `registerTool` en `efeonce-mcp/src/mcp.ts` para lo
-federado y `src/mcp/greenhouse/server.ts` para lo interno de Greenhouse.
+fechado**, no un contrato: la fuente de verdad del inventario es `surface-baseline.json` de `efeonce-mcp` —la foto
+del servidor construido, federadas + propias, que CI exige al día— para el gateway, y
+`src/mcp/greenhouse/tool-manifest.ts` para lo interno de Greenhouse (desde TASK-1780 el manifiesto es el dueño, no
+los `registerTool` sueltos).
 
 ### Conectar un cliente (operador, Claude Code)
 
@@ -802,23 +919,39 @@ Tres cosas que cuestan una sesión si no se saben:
 Las tools **no aparecen en la sesión que autenticó** — los MCP se cargan al iniciar sesión. `✔ Connected` en el health
 check es la evidencia válida; la ausencia de tools en esa sesión no es un fallo.
 
-### Inventario federado — 36 tools
+### Inventario del servidor — 39 tools (as-of 2026-09-06)
+
+Cifra **medida**, no contada a mano: sale de `surface-baseline.json` en `origin/main` de `efeonce-mcp` (`5c28a7a`),
+que fotografía la superficie del servidor **construido** con todos los providers habilitados a propósito. Es el
+techo del catálogo, no lo que ve un token concreto: lo alcanzable depende del emisor, los scopes y los flags.
 
 | Grupo | Nº | Tools |
 | --- | --- | --- |
 | Gateway | 1 | `efeonce.gateway.status` |
-| Plataforma Greenhouse | 1 | `get_greenhouse_skill` (TASK-1804 — manuales de uso bajo demanda; provider `greenhouse-skills`, desplegado en `00028-pmx`) |
+| Plataforma Greenhouse | 1 | `get_greenhouse_skill` (TASK-1804 — manuales de uso bajo demanda; provider `greenhouse-skills`) |
 | Globe | 3 | `globe.capabilities.list`, `globe.producer.fleet.list`, `globe.credits.funding.ensure` (write) |
 | Hiring | 4 | `hiring.talent_pool.search`, `hiring.talent_pool.profile.get`, `hiring.applications.review.list`, `hiring.application.review_packet.get` |
-| SEO / Search Visibility 360 | 27 | 20 reads + 7 writes (detalle en §Provider Greenhouse-SEO) |
+| Identidad delegada (TASK-1837) | 2 | `identity.invitations.list`, `identity.invitation.create` (write, scope `efeonce.mcp.identity.write`) |
+| SEO / Search Visibility 360 | 28 | reads + writes (detalle en §Provider Greenhouse-SEO) |
 
-En la práctica el gateway es hoy **un operador de SEO con anexos de Hiring y Globe**. Los dos scopes de escritura
-(`efeonce.mcp.seo.write`, `efeonce.mcp.globe.credits.funding.ensure`) siguen **live-but-fail-closed**: registrados y
-verificables, sin token que los abra, hasta EPIC-044 (TASK-1829/1831/1832: emisor propio + gateway multi-issuer; el grant revocable ya existe desde TASK-1631, 2026-09-04).
+Las **dos de identidad son propias del gateway**, no federadas desde el manifiesto de Greenhouse: no existen como
+tool interna y el provider `greenhouse-identity` resuelve contra la ruta HTTP del lane, igual que
+`get_seo_provider_spend`. No traen interruptor ni secreto nuevo — se registran con el **mismo**
+`GREENHOUSE_SEO_PROVIDER_ENABLED` y el mismo consumer, porque es la misma lane ecosystem. Consecuencia que ya
+mordió: llevaron el servidor de 37 a 39 con el `manifestHash` de Greenhouse IDÉNTICO, así que el gate viejo —
+anclado a ese hash — las dejó pasar con `version` congelada. Lo cierra `src/surface.ts` (§`Bump de versión`).
+
+En la práctica el gateway es hoy **un operador de SEO con anexos de Hiring, Globe e identidad delegada**. Los tres
+scopes de escritura (`efeonce.mcp.seo.write`, `efeonce.mcp.globe.credits.funding.ensure`,
+`efeonce.mcp.identity.write`) siguen **live-but-fail-closed**: registrados y verificables, sin token que los abra.
+Para los dos primeros, hasta EPIC-044 (TASK-1829/1831/1832: emisor propio + gateway multi-issuer; el grant
+revocable ya existe desde TASK-1631, 2026-09-04). Para el de identidad, hasta que exista la primera persona de un
+cliente real —decisión comercial, no técnica—, porque sólo la alcanza una persona `native-external` que además sea
+administrador designado.
 
 ### Cobertura de federación vs el MCP interno de Greenhouse
 
-`src/mcp/greenhouse/tool-manifest.ts` declara **44 tools** (as-of 2026-09-02; la cifra se lee del manifiesto, nunca de acá); el gateway federa 36 en código. El delta no es homogéneo:
+`src/mcp/greenhouse/tool-manifest.ts` declara **44 tools** (as-of 2026-09-02; la cifra se lee del manifiesto, nunca de acá); el gateway registra **39** (as-of 2026-09-06, medidas de `surface-baseline.json`). Comparar las dos cifras de frente no significa nada: 2 de las 39 —las de identidad delegada— **no salen del manifiesto**, exactamente como `get_seo_provider_spend`. El delta no es homogéneo:
 
 - **Dominio SEO: paridad completa.** Las 26 SEO internas están federadas, con el guard bidireccional de `TASK-1658`
   vigilándolo y `GREENHOUSE_SEO_TOOL_EXCLUSIONS` vacío (ninguna exclusión declarada).
@@ -877,10 +1010,11 @@ guard contra el estado real sin esa declaración, emite exactamente un finding �
 
 ### Drift de rollout detectado 2026-08-28
 
-La revisión productiva es `efeonce-mcp-gateway-00026-ctp` (SHA `e92961e`, desplegada el 2026-09-01
-con el manifiesto canónico de `TASK-1780`; la anterior era `efeonce-mcp-gateway-00024-8b8`, SHA
-`92e7197`). Canary del provider Greenhouse-SEO **verde de punta a punta contra producción** tras ese
-deploy: lecturas OK, deny `404` anti-oracle en todas, escrituras respondiendo honestamente en su
+⚠️ **Revisión productiva vigente: `efeonce-mcp-gateway-00039-gz4` (SHA `5c28a7afe662`, 2026-09-06).** El resto de
+esta sección es histórico: `00026-ctp` (SHA `e92961e`, 2026-09-01, manifiesto canónico de `TASK-1780`) y
+`00024-8b8` (SHA `92e7197`) fueron las anteriores; entre medio pasaron `00028-pmx` (TASK-1804) y el deploy de
+TASK-1837. Canary del provider Greenhouse-SEO **verde de punta a punta contra producción** tras el deploy de
+`00026-ctp`: lecturas OK, deny `404` anti-oracle en todas, escrituras respondiendo honestamente en su
 gate sin escribir.
 
 ✅ **El drift de rollout que esta sección declaraba quedó cerrado.** Decía que `807fb76`

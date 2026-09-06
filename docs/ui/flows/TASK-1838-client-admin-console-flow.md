@@ -149,7 +149,7 @@ promete un correo que no salió.
 - Alternatives considered: consola en el portal Greenhouse (rechazada: segunda identidad); SPA sobre la lane del gateway (rechazada: JS, CSP laxa, salto innecesario); confirmación en modal (rechazada: sin JS por CSP; «una decisión por pantalla»); acciones por `GET` (rechazada: un escáner de correo o un prefetch revocaría a alguien).
 - Why this pattern: cero secretos en el navegador, cada estado es una URL verificable, mismo contrato que la lane MCP (paridad real), y recargar nunca repite un envío.
 - Reuse / extend / new primitive: `extend` (kinds `IdInvitationRow`, `IdSeatMeter`; variante `IdCard wide`).
-- Open risks: los commands delegados de reenvío/revocación viven en TASK-1837 y deben existir antes del Slice 3; el flag de entrega es Vercel-only y la consola corre en el auth-server (declararlo en `services/auth-server/deploy.sh` + ledger); administradores internos (TASK-1836) podrían resolver como `designatedAdmin` con otra población — decidir en Slice 1 si la consola los sirve o los excluye.
+- Open risks: los commands delegados de reenvío/revocación viven en TASK-1837 y **ya existen y están en producción** desde el 2026-09-06 (release `b3e324cb5c8d-3cfce865-236f-4e4e-b128-8e144de193cf`), así que el Slice 3 ya no está bloqueado por ellos; el flag de entrega es Vercel-only y la consola corre en el auth-server (declararlo en `services/auth-server/deploy.sh` + ledger); administradores internos (TASK-1836) podrían resolver como `designatedAdmin` con otra población — decidir en Slice 1 si la consola los sirve o los excluye.
 - Follow-up: agregar S11 al flujo maestro EPIC-044 en el Slice 1; alinear con TASK-1836 la población admitida.
 
 ## Acceptance Checklist

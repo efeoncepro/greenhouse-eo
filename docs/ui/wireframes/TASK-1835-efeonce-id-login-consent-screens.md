@@ -29,7 +29,7 @@ lo escrito arriba, que describía la tarjeta centrada sobre fondo claro:
 
 - Status: `draft`
 - Owner task: TASK-1835
-- Product Design asset: dirección visual «Efeonce ID» propuesta, pendiente de revisión visual, documentada en `docs/ui/visual-directions/TASK-1835-efeonce-id-direction.md` (Slice 1) comparando 2–3 direcciones; evidencia de partida: página mínima actual en `src/lib/auth-server/oauth/pages/render.ts` (isotipo del SSOT, tarjeta única) y contrato §5.1 de `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`.
+- Product Design asset: docs/ui/visual-directions/TASK-1835-efeonce-id-direction.md — dirección «Nocturno editorial» (A), elegida por el operador entre tres exploradas y **aprobada el 2026-09-05**. Evidencia de partida: la página mínima previa en `src/lib/auth-server/oauth/pages/render.ts` y el contrato §5.1 de `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`.
 - Visual direction mode: `repo-native-benchmark`
 - Intended consumers: personas de organizaciones cliente que conectan Claude / ChatGPT / Codex al MCP de Efeonce; operador Efeonce en pruebas y canaries (TASK-1832).
 - Copy source: `src/lib/copy/auth-server.ts` (`GH_AUTH_SERVER`).
@@ -170,7 +170,7 @@ Propuestas para `src/lib/copy/auth-server.ts` (`GH_AUTH_SERVER`); los ids existe
 
 ## GVC Scenario Plan
 
-- Scenario file: `scripts/frontend/scenarios/task1835-efeonce-id.scenario.ts` (nuevo al implementar).
+- Scenario file: `scripts/frontend/scenarios/task1835-runtime-consent.scenario.ts` — raíz de la familia `task1835-runtime-*` (29 fixtures) contra el harness de renderers REALES; los otros 28 la extienden.
 - Route: harness local `pnpm auth-server:dev-ui` (`http://127.0.0.1:8787`) con `?fixture=consent|consent-write|login|magic-sent|magic-verify|passkey|step-up|recovery|denied|error|slow_down`; `[verificar]` soporte de base URL en `pnpm fe:capture --env=local`, si no Playwright directo con el mismo DSL.
 - Viewports: 1440×1000 y 390×844.
 - Quality profile: `premium`.
@@ -181,7 +181,7 @@ Propuestas para `src/lib/copy/auth-server.ts` (`GH_AUTH_SERVER`); los ids existe
 - Scroll-width checks: en las 22 capturas.
 - Accessibility/focus checks: orden de tabulación, `role=alert|status`, contraste ≥ 4.5:1, etiquetas y `autocomplete`.
 - Reduced-motion evidence: misma secuencia con la preferencia activada; entrada sin transición.
-- Review dossier: `pnpm fe:capture:review task1835-efeonce-id` obligatorio.
+- Review dossier: `pnpm fe:capture:review <capture-dir>` sobre las corridas de la familia `task1835-runtime-*`.
 - Baseline: baseline nuevo `efeonce-id` declarado en la dirección visual; sin surface ID de Figma (repo-native).
 
 ## Design Decision Log

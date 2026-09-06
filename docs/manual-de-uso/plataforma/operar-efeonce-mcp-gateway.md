@@ -28,9 +28,15 @@ No uses la URL `run.app`: el acceso público pasa por el front door y el hostnam
    la cuenta exacta la fija `src/mcp/greenhouse/skill-manifest.ts` en Greenhouse). Con `{ "name": "seo-spend-discipline" }`
    debe volver el manual completo como texto, empezando por su frontmatter. Un catálogo vacío con la revisión
    correcta desplegada significa que el binding no es `internal` o que el provider está apagado — nunca "no hay manuales".
-8. Cuenta `tools/list`: **36 tools federadas al 2026-09-02** (28 del provider SEO + `get_greenhouse_skill` + las nativas
-   de gateway, Globe y hiring), revisión activa `efeonce-mcp-gateway-00028-pmx`. La cifra se lee del server, no de
-   este texto; si difiere, compara contra el manifiesto de Greenhouse antes de declarar drift.
+8. Cuenta `tools/list`: **39 tools al 2026-09-06** (28 del provider SEO + `get_greenhouse_skill` + las 2 de
+   identidad delegada + las nativas de gateway, Globe y Hiring), revisión activa `efeonce-mcp-gateway-00039-gz4`.
+   La cifra se lee del server, no de este texto; si difiere, compara contra `surface-baseline.json` de
+   `efeonce-mcp` **y** contra el manifiesto de Greenhouse antes de declarar drift: son dos fuentes distintas y las
+   tools propias del gateway (identidad delegada, `get_seo_provider_spend`) sólo salen en la primera.
+9. Verifica que lo desplegado sea lo mergeado. **El gateway no se despliega en push a `main`**: su workflow es
+   `workflow_dispatch` puro, así que un merge sin dispatch deja la revisión vieja sirviendo, en verde y sin aviso.
+   Comando de dispatch, verificación de `GATEWAY_BUILD_SHA` contra el HEAD de `main` y región correcta
+   (`southamerica-west1`, no `us-east4`) en el runbook, §`Deploy del gateway — dispatch manual, nunca por push`.
 
 Si aparece `Needs authentication`, distingue el emisor y el motivo antes de diagnosticar: puede haber
 expiración, revocación, un flag apagado o pérdida de autoridad. Reinicia OAuth desde el cliente autorizado;
@@ -44,9 +50,11 @@ cierres la sesión compartida del perfil.
 
 - La capacidad actual es lectura interna más 7 escrituras federadas y fail-closed por scope. No habilites tools de runs, assets, review, delivery, créditos o writes
   como parte de una prueba de acceso.
-- El provider `greenhouse-skills` (manuales de uso, `get_greenhouse_skill`) **no tiene interruptor propio**: se prende y se
-  apaga con `GREENHOUSE_SEO_PROVIDER_ENABLED`, porque es la misma lane ecosystem y la misma identidad de servicio.
-  Apagar el SEO apaga también los manuales (responden `policy_blocked`), y eso es lo esperado.
+- Los providers `greenhouse-skills` (manuales de uso, `get_greenhouse_skill`) y `greenhouse-identity` (invitaciones
+  delegadas, `identity.invitations.list` / `identity.invitation.create`) **no tienen interruptor propio**: se
+  prenden y se apagan con `GREENHOUSE_SEO_PROVIDER_ENABLED`, porque son la misma lane ecosystem y la misma
+  identidad de servicio. Apagar el SEO apaga también los manuales y la identidad delegada, y eso es lo esperado —
+  pero tenlo presente antes de usar ese interruptor como rollback "sólo de SEO".
 - Mantén Cloud Run en `concurrency=80` y `maxScale=5` mientras no haya una decisión explícita de capacidad.
 - Ante una falla de un provider, conserva OAuth y el gateway; deshabilita sólo ese provider y redespliega
   siguiendo el runbook (`GLOBE_PROVIDER_ENABLED=false` o `GREENHOUSE_SEO_PROVIDER_ENABLED=false`, según el caso).

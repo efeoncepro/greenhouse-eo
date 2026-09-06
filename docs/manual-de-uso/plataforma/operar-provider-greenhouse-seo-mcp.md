@@ -1,9 +1,10 @@
 # Operar el provider Greenhouse-SEO del MCP
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.5
+> **Version:** 1.6
 > **Creado:** 2026-08-06 por Claude (TASK-1647)
-> **Ultima actualizacion:** 2026-09-02 por Claude (TASK-1804: el provider hermano `greenhouse-skills` sirve los manuales de uso con la MISMA configuración; 36 tools federadas en total — 28 SEO + `get_greenhouse_skill` + nativas — revisión `efeonce-mcp-gateway-00028-pmx`; delta previo 2026-08-28 TASK-1662+1699: 27 tools federadas, revisión `efeonce-mcp-gateway-00024-8b8`)
+> **Ultima actualizacion:** 2026-09-06 por Claude (TASK-1837: un TERCER provider hermano, `greenhouse-identity`, comparte esta misma configuración; el servidor pasa a 39 tools, revisión `efeonce-mcp-gateway-00039-gz4`)
+> **Actualizacion previa:** 2026-09-02 por Claude (TASK-1804: el provider hermano `greenhouse-skills` sirve los manuales de uso con la MISMA configuración; 36 tools federadas en total — 28 SEO + `get_greenhouse_skill` + nativas — revisión `efeonce-mcp-gateway-00028-pmx`; delta previo 2026-08-28 TASK-1662+1699: 27 tools federadas, revisión `efeonce-mcp-gateway-00024-8b8`)
 > **Endpoint canonico:** `https://mcp.efeonce.org/mcp`
 > **Documentacion funcional:** [Search Visibility 360 por MCP](../../documentation/growth/search-visibility-360-por-mcp.md)
 > **Runbook tecnico:** [Efeonce MCP Platform Runbook](../../operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md) §Provider Greenhouse-SEO
@@ -74,6 +75,18 @@ estos docs listaban como pendiente **ya se ejecutó**; no queda ninguna tool esp
   ya existía, así que siguen live-but-fail-closed igual que las demás (el grant revocable por organización y por
   persona ya existe —TASK-1631, 2026-09-04—; el acceso externo real espera al emisor propio y al gateway
   multi-issuer, EPIC-044 TASK-1829/1830/1831/1832).
+
+✅ **Delta 2026-09-06 (TASK-1837): un TERCER provider cuelga de esta misma configuración; el servidor queda en 39
+tools.** Revisión activa `efeonce-mcp-gateway-00039-gz4` (`GATEWAY_BUILD_SHA` = HEAD de `main`, verificado con
+`gcloud run services describe` en `southamerica-west1`). Las dos tools nuevas —`identity.invitations.list` e
+`identity.invitation.create`, invitaciones delegadas de Efeonce ID— las sirve `greenhouse-identity`
+(`src/providers/greenhouse-identity.ts` en `efeonce-mcp`), que **comparte interruptor, origen y consumer con este
+provider** (`GREENHOUSE_SEO_PROVIDER_ENABLED`, `GREENHOUSE_ECOSYSTEM_API_URL`, `GREENHOUSE_ECOSYSTEM_TOKEN`): no hay
+variable nueva que verificar en el Nivel 2. ⚠️ Consecuencia operativa directa: **apagar este provider como rollback
+"sólo de SEO" apaga también los manuales y la identidad delegada.** A diferencia de las SEO, estas dos NO son
+federadas desde el manifiesto de Greenhouse —no existen como tool interna—, así que el guard de paridad SEO no las
+ve: quien cuente `tools/list` contra el manifiesto encontrará una diferencia legítima de 2. La foto que sí las
+cubre es `surface-baseline.json` del gateway.
 
 ✅ **Delta 2026-09-02 (TASK-1804): 36 tools federadas en total; el manual de uso viaja con ellas.** Revisión activa
 `efeonce-mcp-gateway-00028-pmx` (verificada con `gcloud run services describe`, 100% del tráfico). La cuenta de

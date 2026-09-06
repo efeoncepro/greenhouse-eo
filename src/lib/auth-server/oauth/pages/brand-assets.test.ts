@@ -9,6 +9,7 @@ import { createAuthServerStyles } from '../../../../../scripts/auth-server/style
 import { buildAuthFontAssets } from '../../../../../scripts/auth-server/generate-font-assets'
 import { AUTH_FONT_ASSETS, AUTH_FONT_LICENSES } from './fonts.generated'
 import { generateStepUpController } from '../../../../../scripts/auth-server/step-up-controller-build'
+import { generateLoginController } from '../../../../../scripts/auth-server/login-controller-build'
 import { sanitizeBrandSvg } from '../../../../../scripts/auth-server/brand-svg'
 import { escapeHtml, renderConsentPage, renderErrorPage, renderLoginRequiredPage } from './render'
 
@@ -19,6 +20,14 @@ import { escapeHtml, renderConsentPage, renderErrorPage, renderLoginRequiredPage
 describe('auth-server brand assets', () => {
   it('browser controller artifact matches its build-time sources', async () => {
     await generateStepUpController(true)
+  })
+  /**
+   * TASK-1835 — El controlador de login se sirve desde un artefacto generado. Si alguien edita
+   * `login-controller.ts` y no regenera, el navegador seguiría ejecutando el bundle viejo con el
+   * build verde. Mecanismo: `pnpm auth-server:brand-assets:generate` (nunca editar el generado).
+   */
+  it('login controller artifact matches its build-time sources', async () => {
+    await generateLoginController(true)
   })
   it('bundled fonts and notices match the canonical local assets', () => {
     const generated = buildAuthFontAssets(process.cwd())

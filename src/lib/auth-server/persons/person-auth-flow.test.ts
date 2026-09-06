@@ -681,7 +681,9 @@ describe('ergonomía del navegador', () => {
     expect(page?.status).toBe(200)
     expect(page?.body).toContain('href="/auth/internal/login"')
     expect(page?.body).toContain('Continuar con Microsoft')
-    expect(page?.body).not.toContain('name="return_to"')
+    // El campo, no la cadena: el controlador de passkey lleva el selector `[name="return_to"]` en su
+    // script, y buscar el texto suelto daba un falso positivo. Lo que no debe existir es el INPUT.
+    expect(page?.body).not.toContain('<input type="hidden" name="return_to"')
     expect((await buildHarness().handler(request('GET', '/login')))?.body).not.toContain('/auth/internal/login')
   })
 

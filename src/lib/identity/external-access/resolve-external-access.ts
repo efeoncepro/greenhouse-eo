@@ -1,6 +1,8 @@
 import { query } from '@/lib/db'
 import { captureWithDomain } from '@/lib/observability/capture'
 
+import { isExternalIdentityCanaryEnabled } from './config'
+
 import {
   buildExternalIdpSourceSystem,
   buildExternalResolutionId,
@@ -13,6 +15,7 @@ import type {
   ExternalAccessResolutionOutcome,
   ExternalIssuerClass
 } from './types'
+import { EXTERNAL_CANARY_CAPABILITY } from './types'
 import { assertEnvironmentId, assertNonEmptyString, optionalString } from './validation'
 
 /**
@@ -41,6 +44,7 @@ type LinkRow = {
   profile_active: boolean
   profile_status: string
   merged_into_profile_id: string | null
+  data_origin: string
 }
 
 type MembershipRow = {
@@ -51,6 +55,12 @@ type MembershipRow = {
   grants_version: number | string
   designated_admin_profile_id: string | null
   revoked_at: string | Date | null
+  binding_purpose: 'customer' | 'canary' | null
+  canary_registration_id: string | null
+  binding_expires_at: string | Date | null
+  registration_status: string | null
+  registration_expires_at: string | Date | null
+  registration_matches: boolean
 }
 
 type GrantRow = {
@@ -187,7 +197,7 @@ export const resolveExternalAccess = async (input: ResolveExternalAccessInput): 
   // nada. La autorización sigue exigiendo link ACTIVO + membership ligada + binding activo.
   const linkRows = await query<LinkRow>(
     `SELECT l.profile_id, l.active AS link_active, p.active AS profile_active, p.status AS profile_status,
-            p.merged_into_profile_id,
+            p.merged_into_profile_id,p.data_origin,
             EXISTS (SELECT 1 FROM greenhouse_core.internal_native_enrollments e
                      WHERE e.native_link_id = l.link_id) AS internal_population
        FROM greenhouse_core.identity_profile_source_links l
@@ -245,9 +255,16 @@ export const resolveExternalAccess = async (input: ResolveExternalAccessInput): 
 
   const membershipRows = await query<MembershipRow>(
     `SELECT b.binding_id, b.organization_id, b.external_organization_ref, b.status AS binding_status,
-            b.grants_version, b.designated_admin_profile_id, b.revoked_at
+            b.grants_version, b.designated_admin_profile_id, b.revoked_at,b.binding_purpose,
+            b.canary_registration_id,b.expires_at AS binding_expires_at,r.status AS registration_status,
+            r.expires_at AS registration_expires_at,
+            (r.organization_id=b.organization_id AND r.environment_id=b.environment_id
+              AND r.external_organization_ref=b.external_organization_ref
+              AND r.expires_at=b.expires_at) AS registration_matches
        FROM greenhouse_core.external_member_invitations i
        JOIN greenhouse_core.external_organization_bindings b ON b.binding_id = i.binding_id
+       LEFT JOIN greenhouse_core.external_canary_registrations r
+         ON r.canary_registration_id=b.canary_registration_id
       WHERE i.profile_id = $1
         AND i.status = 'linked'
         AND b.environment_id = $2 AND b.population='external'
@@ -255,12 +272,49 @@ export const resolveExternalAccess = async (input: ResolveExternalAccessInput): 
     [link.profile_id, environmentId]
   )
 
-  const activeMemberships = membershipRows.filter(row => row.binding_status === 'active')
+  const canaryEnabled = isExternalIdentityCanaryEnabled()
+  const now = Date.now()
+
+  const activeMemberships = membershipRows.filter(row => {
+    if (row.binding_status !== 'active') return false
+
+    if (row.binding_purpose !== 'canary') {
+      return row.binding_purpose === 'customer' && link.data_origin !== 'smoke_test'
+    }
+
+    return (
+      canaryEnabled &&
+      link.data_origin === 'smoke_test' &&
+      row.registration_matches &&
+      row.registration_status === 'active' &&
+      !!row.binding_expires_at &&
+      !!row.registration_expires_at &&
+      new Date(row.binding_expires_at).getTime() > now &&
+      new Date(row.registration_expires_at).getTime() > now
+    )
+  })
 
   if (activeMemberships.length === 0) {
     const latestRevoked = membershipRows[0] ?? null
 
-    return deny(latestRevoked ? 'revoked' : 'unbound', {
+    if (latestRevoked?.binding_status === 'active' && latestRevoked.binding_purpose === 'canary') {
+      const outcome = !canaryEnabled
+        ? 'canary_disabled'
+        : !latestRevoked.registration_matches ||
+            latestRevoked.registration_status === null ||
+            link.data_origin !== 'smoke_test'
+          ? 'canary_not_registered'
+          : 'canary_expired'
+
+      return deny(outcome, {
+        issuerClass: environment.issuer_class,
+        profileId: link.profile_id,
+        bindingId: latestRevoked.binding_id,
+        grantsVersion: Number(latestRevoked.grants_version)
+      })
+    }
+
+    return deny(latestRevoked?.binding_status === 'revoked' ? 'revoked' : 'unbound', {
       issuerClass: environment.issuer_class,
       profileId: link.profile_id,
       bindingId: latestRevoked?.binding_id ?? null,
@@ -286,9 +340,17 @@ export const resolveExternalAccess = async (input: ResolveExternalAccessInput): 
     bindingId: row.binding_id,
     organizationId: row.organization_id,
     externalOrganizationRef: row.external_organization_ref,
+    bindingPurpose: row.binding_purpose as 'customer' | 'canary',
+    canaryRegistrationId: row.canary_registration_id,
+    expiresAt: row.binding_expires_at ? new Date(row.binding_expires_at).toISOString() : null,
     grantsVersion: Number(row.grants_version),
     grants: Array.from(
-      new Set(grantRows.filter(grant => grant.binding_id === row.binding_id).map(grant => grant.capability))
+      new Set(
+        grantRows
+          .filter(grant => grant.binding_id === row.binding_id)
+          .filter(grant => row.binding_purpose !== 'canary' || grant.capability === EXTERNAL_CANARY_CAPABILITY)
+          .map(grant => grant.capability)
+      )
     ),
     designatedAdmin: row.designated_admin_profile_id === link.profile_id
   }))

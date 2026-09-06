@@ -102,9 +102,28 @@ export function installStepUpController(
       })
 
       if (data.status !== 'verified') throw new Error('rejected')
+
+      /**
+       * El servidor ya CUENTA los códigos de respaldo abiertos y los devuelve
+       * (`usedBackupCode`, `remainingBackupCodes`). Hasta 2026-09-06 esta pantalla los ignoraba y
+       * navegaba: alguien podía quemar el último y enterarse el día que perdiera el teléfono. Si se
+       * gastó uno, el aviso FRENA la navegación — mostrarlo mientras la página se va no es mostrarlo.
+       */
+      if (data.usedBackupCode === true) {
+        const remaining = typeof data.remainingBackupCodes === 'number' ? data.remainingBackupCodes : 0
+
+        root.querySelector<HTMLElement>('[data-step-backup-remaining]')!.textContent = copy.backupRemaining(remaining)
+        root.querySelector<HTMLFormElement>('[data-step-code]')!.hidden = true
+        root.querySelector<HTMLElement>('[data-step-backup-notice]')!.hidden = false
+        status.textContent = ''
+
+        return
+      }
+
       finish()
     })
   })
+  root.querySelector('[data-step-backup-continue]')?.addEventListener('click', () => finish())
   root.querySelector('[data-step-enroll]')?.addEventListener(
     'click',
     () =>
@@ -121,6 +140,7 @@ export function installStepUpController(
         enrolled = true
         root.querySelector<HTMLElement>('[data-step-secret]')!.textContent = data.secret
         root.querySelector<HTMLElement>('[data-step-backups]')!.textContent = data.backupCodes.join('\n')
+        root.querySelector<HTMLElement>('[data-step-backups-warning]')!.textContent = copy.backupsWarning
 
         if (deps.renderQr && typeof data.otpauthUri === 'string' && data.otpauthUri.startsWith('otpauth://totp/')) {
           const source = await deps.renderQr(data.otpauthUri)
@@ -137,7 +157,9 @@ export function installStepUpController(
         root.querySelector<HTMLElement>('[data-step-code-label]')!.textContent = copy.setupCode
         root.querySelector<HTMLButtonElement>('[data-step-submit]')!.textContent = copy.confirm
         root.querySelector<HTMLButtonElement>('[data-step-enroll]')!.hidden = true
-        status.textContent = copy.setup
+        // La instrucción ya vive en el <p> de la sección revelada; repetirla acá la imprimía DOS
+        // veces seguidas en pantalla. La región de estado queda para lo que cambia, no para lo fijo.
+        status.textContent = ''
       })
   )
 

@@ -76,7 +76,13 @@ reenviar y revocar por la lane delegada `/api/platform/ecosystem/identity/invita
 `'Invitar y administrar a las personas de tu organización en Efeonce'` (`src/lib/copy/auth-server.ts`). El scope
 responde si ESTE cliente puede pedir esa clase de acción; la autoridad real la decide Greenhouse por la
 membership `designatedAdmin` del binding. Lo consume la tool `identity.invitation.create` del gateway
-(`efeonce-mcp`, PR #3 abierto; merge tras el release que lleve el scope a `main`).
+(`efeonce-mcp`), federada y desplegada desde el 2026-09-06. **Vigente en producción** desde el release
+`b3e324cb5c8d-3cfce865-236f-4e4e-b128-8e144de193cf`: el scope está en `main`, en `EFEONCE_MCP_WRITE_SCOPES` y,
+como toda clase de escritura, **no** aparece en el `scopes_supported` que publica ESTE emisor
+(`auth.efeonce.org/.well-known/oauth-authorization-server` sólo anuncia las lecturas, por
+`PUBLISHED_SCOPES_SUPPORTED`). ⚠️ No confundir con el documento del RECURSO que publica el gateway
+(`mcp.efeonce.org/.well-known/oauth-protected-resource`), donde sí aparece: son dos discovery
+distintos, y medirlos como si fueran uno lleva a diagnosticar un hueco que no existe.
 
 ## 3. Clientes
 
@@ -192,7 +198,8 @@ mantiene. `deny` redirige al cliente con `error=access_denied&state&iss`.
   `GH_AUTH_SERVER.consent_redirect_host_{label,hint}`, bloque `data-capture="id-redirect-host"`).
   `authorize.ts` pasa `new URL(redirectUri).host` del `redirect_uri` ya validado contra el registro del cliente.
   Es un MUST del protocolo (el usuario debe poder ver a quién autoriza), aditivo y sin flag; la vista ui-ux que
-  reemplace esta página conserva la revelación.
+  reemplace esta página conserva la revelación. **Vigente en producción** desde el release
+  `b3e324cb5c8d-3cfce865-236f-4e4e-b128-8e144de193cf` (2026-09-06): al no llevar flag, entró con el despliegue.
 
 ## 6. Persona autenticada (`SubjectSessionPort`)
 

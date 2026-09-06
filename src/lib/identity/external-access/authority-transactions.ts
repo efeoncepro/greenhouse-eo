@@ -33,6 +33,10 @@ export type AuditEventType =
   | 'invitation_delivery_bounced'
   | 'designated_admin_assigned'
   | 'designated_admin_cleared'
+  // TASK-1832 — lifecycle del fixture canary; audit desacoplado sobrevive al cleanup.
+  | 'canary_registered'
+  | 'canary_revoked'
+  | 'canary_cleanup_completed'
 
 export type AuditInput = {
   eventType: AuditEventType
@@ -85,6 +89,9 @@ export const insertAuthorityBinding = async (
   client: PoolClient,
   input: AuthorityBinding & {
     externalOrganizationRef: string
+    bindingPurpose: 'customer' | 'canary' | null
+    canaryRegistrationId: string | null
+    expiresAt: Date | null
     actorId: string
     reason: string | null
     designatedAdminProfileId?: string | null
@@ -92,14 +99,18 @@ export const insertAuthorityBinding = async (
 ) => {
   await client.query(
     `INSERT INTO greenhouse_core.external_organization_bindings
-    (binding_id,organization_id,environment_id,external_organization_ref,population,status,grants_version,reason,bound_by,designated_admin_profile_id)
-    VALUES ($1,$2,$3,$4,$5,'active',1,$6,$7,$8)`,
+    (binding_id,organization_id,environment_id,external_organization_ref,population,binding_purpose,
+     canary_registration_id,expires_at,status,grants_version,reason,bound_by,designated_admin_profile_id)
+    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'active',1,$9,$10,$11)`,
     [
       input.bindingId,
       input.organizationId,
       input.environmentId,
       input.externalOrganizationRef,
       input.population,
+      input.bindingPurpose,
+      input.canaryRegistrationId,
+      input.expiresAt,
       input.reason,
       input.actorId,
       input.designatedAdminProfileId ?? null
@@ -113,7 +124,14 @@ export const insertAuthorityBinding = async (
     profileId: input.designatedAdminProfileId,
     performedBy: input.actorId,
     reason: input.reason,
-    metadata: { population: input.population, externalOrganizationRef: input.externalOrganizationRef, grantsVersion: 1 }
+    metadata: {
+      population: input.population,
+      bindingPurpose: input.bindingPurpose,
+      canaryRegistrationId: input.canaryRegistrationId,
+      expiresAt: input.expiresAt?.toISOString() ?? null,
+      externalOrganizationRef: input.externalOrganizationRef,
+      grantsVersion: 1
+    }
   })
   await publishOutboxEvent(
     {
@@ -126,6 +144,9 @@ export const insertAuthorityBinding = async (
         organizationId: input.organizationId,
         environmentId: input.environmentId,
         population: input.population,
+        bindingPurpose: input.bindingPurpose,
+        canaryRegistrationId: input.canaryRegistrationId,
+        expiresAt: input.expiresAt?.toISOString() ?? null,
         grantsVersion: 1,
         designatedAdminProfileId: input.designatedAdminProfileId ?? null,
         changedByUserId: input.actorId
@@ -225,8 +246,8 @@ export const insertAuthorityGrant = async (
     },
     client
   )
-  
-return grantsVersion
+
+  return grantsVersion
 }
 
 export const revokeAuthorityGrant = async (

@@ -118,6 +118,26 @@ const bindingRow = (overrides: Record<string, unknown> = {}) => ({
   ...overrides
 })
 
+const canaryBindingRow = (overrides: Record<string, unknown> = {}) =>
+  bindingRow({
+    organization_id: 'org-canary',
+    organization_name: 'Efeonce MCP Canary',
+    external_organization_ref: 'canary-ref',
+    binding_purpose: 'canary',
+    canary_registration_id: 'xcr-00000000-0000-4000-8000-000000000001',
+    expires_at: '2099-01-01T00:00:00Z',
+    ...overrides
+  })
+
+const canaryRegistrationAuthorityRow = (overrides: Record<string, unknown> = {}) => ({
+  status: 'active',
+  expires_at: '2099-01-01T00:00:00Z',
+  organization_id: 'org-canary',
+  environment_id: 'efeonce-auth',
+  external_organization_ref: 'canary-ref',
+  ...overrides
+})
+
 const grantRow = (overrides: Record<string, unknown> = {}) => ({
   grant_id: 'xcg-1',
   binding_id: 'xob-1',
@@ -412,6 +432,19 @@ describe('TASK-1631 — grantExternalCapability', () => {
     })
     expect(clientQueryMock).not.toHaveBeenCalled()
   })
+
+  it('limits canary bindings to the single read capability', async () => {
+    route([
+      [/WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/, () => [canaryBindingRow()]],
+      [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
+      [/FROM greenhouse_core\.external_canary_registrations/, () => [canaryRegistrationAuthorityRow()]]
+    ])
+
+    await expect(
+      grantExternalCapability({ bindingId: 'xob-1', capability: 'growth.ai_visibility.prompt_set.manage' }, actor)
+    ).rejects.toMatchObject({ code: 'capability_not_allowed' })
+    expect(calls(/INSERT INTO greenhouse_core\.external_capability_grants/)).toHaveLength(0)
+  })
 })
 
 describe('TASK-1631 — issueExternalInvitation', () => {
@@ -481,7 +514,9 @@ describe('TASK-1631 — issueExternalInvitation', () => {
     expect(result.created).toBe(true)
     expect(result.token).not.toBeNull()
 
-    const auditTypes = calls(/INSERT INTO greenhouse_core\.external_identity_audit_log/).map(call => (call[1] as unknown[])[1])
+    const auditTypes = calls(/INSERT INTO greenhouse_core\.external_identity_audit_log/).map(
+      call => (call[1] as unknown[])[1]
+    )
 
     expect(auditTypes).toEqual(['invitation_revoked', 'invitation_issued'])
   })
@@ -499,6 +534,45 @@ describe('TASK-1631 — issueExternalInvitation', () => {
         code: 'binding_not_active'
       }
     )
+  })
+
+  it('does not allow a canary invitation to create delegated authority', async () => {
+    route([
+      [/WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/, () => [canaryBindingRow()]],
+      [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
+      [/FROM greenhouse_core\.external_canary_registrations/, () => [canaryRegistrationAuthorityRow()]]
+    ])
+
+    await expect(
+      issueExternalInvitation({ bindingId: 'xob-1', email: 'canary@efeonce.invalid', designatedAdmin: true }, actor)
+    ).rejects.toMatchObject({ code: 'capability_not_allowed' })
+    expect(calls(/INSERT INTO greenhouse_core\.external_member_invitations/)).toHaveLength(0)
+  })
+
+  it('does not attach a customer binding to a smoke_test profile', async () => {
+    route([
+      [/WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/, () => [bindingRow()]],
+      [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
+      [
+        /FROM greenhouse_core\.identity_profiles WHERE profile_id = \$1/,
+        () => [
+          {
+            active: true,
+            status: 'active',
+            merged_into_profile_id: null,
+            data_origin: 'smoke_test'
+          }
+        ]
+      ]
+    ])
+
+    await expect(
+      issueExternalInvitation(
+        { bindingId: 'xob-1', email: 'canary@efeonce.invalid', profileId: 'profile-canary' },
+        actor
+      )
+    ).rejects.toMatchObject({ code: 'identity_collision' })
+    expect(calls(/INSERT INTO greenhouse_core\.external_member_invitations/)).toHaveLength(0)
   })
 })
 
@@ -658,7 +732,10 @@ describe('TASK-1837 — resendExternalInvitation (reenviar = rotar)', () => {
 
   const resendRoute = (previous: Record<string, unknown> = {}) =>
     route([
-      [/FROM greenhouse_core\.external_member_invitations\s+WHERE invitation_id = \$1\s+FOR UPDATE/, () => [invitationRow({ delivery_status: 'failed', delivery_attempts: 1, ...previous })]],
+      [
+        /FROM greenhouse_core\.external_member_invitations\s+WHERE invitation_id = \$1\s+FOR UPDATE/,
+        () => [invitationRow({ delivery_status: 'failed', delivery_attempts: 1, ...previous })]
+      ],
       [/WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/, () => [bindingRow()]],
       [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
       [/SET status = 'revoked'[\s\S]*revoke_reason = 'resent'/, () => []],
@@ -715,6 +792,31 @@ describe('TASK-1837 — resendExternalInvitation (reenviar = rotar)', () => {
       resendExternalInvitation({ invitationId: 'xmi-1', bindingId: 'xob-other', delivery: 'manual' }, actor)
     ).rejects.toMatchObject({ code: 'not_found' })
   })
+
+  it('does not rotate a canary invitation past the binding expiry', async () => {
+    const expiresAt = new Date(Date.now() + 30 * 60 * 1000).toISOString()
+
+    route([
+      [
+        /FROM greenhouse_core\.external_member_invitations\s+WHERE invitation_id = \$1\s+FOR UPDATE/,
+        () => [invitationRow()]
+      ],
+      [
+        /WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/,
+        () => [canaryBindingRow({ expires_at: expiresAt })]
+      ],
+      [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
+      [
+        /FROM greenhouse_core\.external_canary_registrations/,
+        () => [canaryRegistrationAuthorityRow({ expires_at: expiresAt })]
+      ]
+    ])
+
+    await expect(
+      resendExternalInvitation({ invitationId: 'xmi-1', delivery: 'manual', expiresInHours: 1 }, actor)
+    ).rejects.toMatchObject({ code: 'canary_expired' })
+    expect(calls(/revoke_reason = 'resent'/)).toHaveLength(0)
+  })
 })
 
 describe('TASK-1837 — revealExternalInvitationToken (excepción gobernada)', () => {
@@ -722,7 +824,10 @@ describe('TASK-1837 — revealExternalInvitationToken (excepción gobernada)', (
 
   const revealRoute = () =>
     route([
-      [/FROM greenhouse_core\.external_member_invitations\s+WHERE invitation_id = \$1\s+FOR UPDATE/, () => [invitationRow()]],
+      [
+        /FROM greenhouse_core\.external_member_invitations\s+WHERE invitation_id = \$1\s+FOR UPDATE/,
+        () => [invitationRow()]
+      ],
       [/WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/, () => [bindingRow()]],
       [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
       [/SET status = 'revoked'[\s\S]*revoke_reason = 'revealed'/, () => []],
@@ -787,20 +892,37 @@ describe('TASK-1837 — autoridad delegada del cliente', () => {
       resolvedAt: '2026-09-05T00:00:00Z'
     })
 
-  const delegatedInput = { environmentId: 'efeonce-auth', subject: 'sub-1', bindingId: 'xob-1', email: 'nuevo@cliente.cl' }
+  const delegatedInput = {
+    environmentId: 'efeonce-auth',
+    subject: 'sub-1',
+    bindingId: 'xob-1',
+    email: 'nuevo@cliente.cl'
+  }
 
   it('403 forbidden when the subject is not bound at all', async () => {
-    resolveExternalAccessMock.mockResolvedValue({ outcome: 'unbound', environmentId: 'efeonce-auth', issuerClass: 'external', profileId: null, memberships: [], resolvedAt: 'x' })
+    resolveExternalAccessMock.mockResolvedValue({
+      outcome: 'unbound',
+      environmentId: 'efeonce-auth',
+      issuerClass: 'external',
+      profileId: null,
+      memberships: [],
+      resolvedAt: 'x'
+    })
 
-    await expect(issueDelegatedExternalInvitation(delegatedInput)).rejects.toMatchObject({ code: 'forbidden', statusCode: 403 })
+    await expect(issueDelegatedExternalInvitation(delegatedInput)).rejects.toMatchObject({
+      code: 'forbidden',
+      statusCode: 403
+    })
   })
 
-  it('403 forbidden for a binding that is not the admin\'s own (binding ajeno)', async () => {
+  it("403 forbidden for a binding that is not the admin's own (binding ajeno)", async () => {
     bound([{ bindingId: 'xob-1', designatedAdmin: true }])
 
-    await expect(issueDelegatedExternalInvitation({ ...delegatedInput, bindingId: 'xob-other' })).rejects.toMatchObject({
-      code: 'forbidden'
-    })
+    await expect(issueDelegatedExternalInvitation({ ...delegatedInput, bindingId: 'xob-other' })).rejects.toMatchObject(
+      {
+        code: 'forbidden'
+      }
+    )
   })
 
   it('403 forbidden for a linked member who is not the designated admin', async () => {
@@ -824,7 +946,10 @@ describe('TASK-1837 — autoridad delegada del cliente', () => {
     bound([{ bindingId: 'xob-1', designatedAdmin: true }])
     dbQueryMock.mockResolvedValueOnce([{ n: '25' }])
 
-    await expect(issueDelegatedExternalInvitation(delegatedInput)).rejects.toMatchObject({ code: 'limit_reached', statusCode: 422 })
+    await expect(issueDelegatedExternalInvitation(delegatedInput)).rejects.toMatchObject({
+      code: 'limit_reached',
+      statusCode: 422
+    })
   })
 
   it('issues for the own binding with designatedAdmin forced to false and actor external-admin:<profile>', async () => {
@@ -860,13 +985,19 @@ describe('TASK-1837 — autoridad delegada del cliente', () => {
     bound([{ bindingId: 'xob-1', designatedAdmin: true }])
     dbQueryMock.mockResolvedValueOnce([invitationRow()])
 
-    const result = await listDelegatedExternalInvitations({ environmentId: 'efeonce-auth', subject: 'sub-1', organizationId: 'org-1' })
+    const result = await listDelegatedExternalInvitations({
+      environmentId: 'efeonce-auth',
+      subject: 'sub-1',
+      organizationId: 'org-1'
+    })
 
     expect(result.bindingId).toBe('xob-1')
   })
 
   it('422 when neither bindingId nor organizationId is given', async () => {
-    await expect(listDelegatedExternalInvitations({ environmentId: 'efeonce-auth', subject: 'sub-1' })).rejects.toMatchObject({
+    await expect(
+      listDelegatedExternalInvitations({ environmentId: 'efeonce-auth', subject: 'sub-1' })
+    ).rejects.toMatchObject({
       code: 'invalid_request'
     })
     expect(resolveExternalAccessMock).not.toHaveBeenCalled()
@@ -877,7 +1008,13 @@ describe('TASK-1837 — autoridad delegada del cliente', () => {
     dbQueryMock.mockResolvedValueOnce([{ binding_id: 'xob-other', status: 'issued', profile_id: null }])
 
     await expect(
-      resendDelegatedExternalInvitation({ environmentId: 'efeonce-auth', subject: 'sub-1', bindingId: 'xob-1', invitationId: 'xmi-9', delivery: 'manual' })
+      resendDelegatedExternalInvitation({
+        environmentId: 'efeonce-auth',
+        subject: 'sub-1',
+        bindingId: 'xob-1',
+        invitationId: 'xmi-9',
+        delivery: 'manual'
+      })
     ).rejects.toMatchObject({ code: 'not_found' })
   })
 
@@ -886,15 +1023,24 @@ describe('TASK-1837 — autoridad delegada del cliente', () => {
     dbQueryMock.mockResolvedValueOnce([{ binding_id: 'xob-1', status: 'linked', profile_id: 'profile-admin' }])
 
     await expect(
-      revokeDelegatedExternalInvitation({ environmentId: 'efeonce-auth', subject: 'sub-1', bindingId: 'xob-1', invitationId: 'xmi-self' })
+      revokeDelegatedExternalInvitation({
+        environmentId: 'efeonce-auth',
+        subject: 'sub-1',
+        bindingId: 'xob-1',
+        invitationId: 'xmi-self'
+      })
     ).rejects.toMatchObject({ code: 'invalid_request', details: { field: 'invitationId' } })
   })
 
-  it('lists only the admin\'s own binding invitations', async () => {
+  it("lists only the admin's own binding invitations", async () => {
     bound([{ bindingId: 'xob-1', designatedAdmin: true }])
     dbQueryMock.mockResolvedValueOnce([invitationRow()])
 
-    const result = await listDelegatedExternalInvitations({ environmentId: 'efeonce-auth', subject: 'sub-1', bindingId: 'xob-1' })
+    const result = await listDelegatedExternalInvitations({
+      environmentId: 'efeonce-auth',
+      subject: 'sub-1',
+      bindingId: 'xob-1'
+    })
 
     expect(result.bindingId).toBe('xob-1')
     expect(result.items).toHaveLength(1)
@@ -928,7 +1074,9 @@ describe('TASK-1837 — designated admin at accept + revoke', () => {
 
     expect(calls(/SET designated_admin_profile_id = NULL/)).toHaveLength(1)
 
-    const auditTypes = calls(/INSERT INTO greenhouse_core\.external_identity_audit_log/).map(call => (call[1] as unknown[])[1])
+    const auditTypes = calls(/INSERT INTO greenhouse_core\.external_identity_audit_log/).map(
+      call => (call[1] as unknown[])[1]
+    )
 
     expect(auditTypes).toEqual(['designated_admin_cleared', 'binding_revoked'])
   })
@@ -941,19 +1089,39 @@ describe('TASK-1837 — designated admin at accept + revoke', () => {
         () => [bindingRow({ designated_admin_profile_id: 'profile-old-admin' })]
       ],
       [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
-      [/identity_profile_source_links[\s\S]*WHERE source_system = \$1 AND source_object_type = \$2 AND source_object_id = \$3 AND active = TRUE/, () => []],
+      [
+        /identity_profile_source_links[\s\S]*WHERE source_system = \$1 AND source_object_type = \$2 AND source_object_id = \$3 AND active = TRUE/,
+        () => []
+      ],
       [/FROM greenhouse_core\.identity_profiles\s+WHERE lower\(canonical_email\)/, () => []],
       [/INSERT INTO greenhouse_core\.identity_profiles/, () => []],
-      [/SELECT active, status, merged_into_profile_id FROM greenhouse_core\.identity_profiles/, () => [{ active: true, status: 'active', merged_into_profile_id: null }]],
+      [
+        /SELECT active, status, merged_into_profile_id FROM greenhouse_core\.identity_profiles/,
+        () => [{ active: true, status: 'active', merged_into_profile_id: null }]
+      ],
       [/INSERT INTO greenhouse_core\.identity_profile_source_links/, () => []],
       [/UPDATE greenhouse_core\.identity_profile_source_links/, () => []],
       [/revoke_reason = 'superseded_by_reinvitation'/, () => []],
-      [/SET status = 'linked'/, params => [invitationRow({ status: 'linked', profile_id: params[1], link_id: params[2], linked_at: 'now', designated_admin: true })]],
+      [
+        /SET status = 'linked'/,
+        params => [
+          invitationRow({
+            status: 'linked',
+            profile_id: params[1],
+            link_id: params[2],
+            linked_at: 'now',
+            designated_admin: true
+          })
+        ]
+      ],
       [/WHERE binding_id = \$1 AND profile_id = \$2 AND status = 'linked'/, () => [{ invitation_id: 'xmi-old-admin' }]]
     ])
 
     await expect(
-      acceptExternalInvitation({ token: 't'.repeat(40), environmentId: 'efeonce-auth', subject: 'sub-new' }, { actorId: 'auth-server' })
+      acceptExternalInvitation(
+        { token: 't'.repeat(40), environmentId: 'efeonce-auth', subject: 'sub-new' },
+        { actorId: 'auth-server' }
+      )
     ).rejects.toMatchObject({ code: 'conflict' })
 
     expect(calls(/SET designated_admin_profile_id = \$2/)).toHaveLength(0)
@@ -977,11 +1145,16 @@ describe('TASK-1837 — designated admin at accept + revoke', () => {
       [/INSERT INTO greenhouse_core\.external_identity_audit_log/, () => []]
     ])
 
-    await revokeExternalAccess({ scope: 'member', bindingId: 'xob-1', profileId: 'profile-admin', reason: 'salida' }, actor)
+    await revokeExternalAccess(
+      { scope: 'member', bindingId: 'xob-1', profileId: 'profile-admin', reason: 'salida' },
+      actor
+    )
 
     expect(calls(/SET designated_admin_profile_id = NULL/)).toHaveLength(1)
 
-    const auditTypes = calls(/INSERT INTO greenhouse_core\.external_identity_audit_log/).map(call => (call[1] as unknown[])[1])
+    const auditTypes = calls(/INSERT INTO greenhouse_core\.external_identity_audit_log/).map(
+      call => (call[1] as unknown[])[1]
+    )
 
     expect(auditTypes).toEqual(['designated_admin_cleared', 'member_revoked'])
   })
@@ -1028,6 +1201,60 @@ describe('TASK-1631 — acceptExternalInvitation', () => {
       acceptExternalInvitation({ token: 'tok', environmentId: 'efeonce-auth', subject: 'sub-1' }, authServer)
     ).rejects.toMatchObject({ code: 'identity_collision' })
     expect(calls(/INSERT INTO greenhouse_core\.identity_profile_source_links/)).toHaveLength(0)
+  })
+
+  it('does not reuse a real profile when accepting a canary invitation', async () => {
+    route([
+      [/WHERE token_hash = \$1\s+FOR UPDATE/, () => [invitationRow({ email: 'canary@efeonce.invalid' })]],
+      [/WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/, () => [canaryBindingRow()]],
+      [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
+      [/FROM greenhouse_core\.external_canary_registrations/, () => [canaryRegistrationAuthorityRow()]],
+      [/SELECT profile_id FROM greenhouse_core\.identity_profile_source_links/, () => []],
+      [/lower\(canonical_email\) = \$1/, () => [{ profile_id: 'profile-real', data_origin: 'real' }]]
+    ])
+
+    await expect(
+      acceptExternalInvitation({ token: 'tok', environmentId: 'efeonce-auth', subject: 'canary-subject' }, authServer)
+    ).rejects.toMatchObject({ code: 'identity_collision' })
+    expect(calls(/INSERT INTO greenhouse_core\.identity_profiles/)).toHaveLength(0)
+  })
+
+  it('marks a newly accepted canary profile as smoke_test', async () => {
+    route([
+      [/WHERE token_hash = \$1\s+FOR UPDATE/, () => [invitationRow({ email: 'canary@efeonce.invalid' })]],
+      [/WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/, () => [canaryBindingRow()]],
+      [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
+      [/FROM greenhouse_core\.external_canary_registrations/, () => [canaryRegistrationAuthorityRow()]],
+      [/SELECT profile_id FROM greenhouse_core\.identity_profile_source_links/, () => []],
+      [/lower\(canonical_email\) = \$1/, () => []],
+      [/INSERT INTO greenhouse_core\.identity_profiles/, () => []],
+      [/INSERT INTO greenhouse_core\.identity_profile_source_links/, () => []],
+      [/UPDATE greenhouse_core\.identity_profile_source_links/, () => []],
+      [/revoke_reason = 'superseded_by_reinvitation'/, () => []],
+      [
+        /SET status = 'linked'/,
+        params => [
+          invitationRow({
+            status: 'linked',
+            profile_id: params[1],
+            link_id: params[2],
+            linked_at: '2026-09-06T00:00:00Z',
+            accepted_at: '2026-09-06T00:00:00Z'
+          })
+        ]
+      ],
+      [/INSERT INTO greenhouse_core\.external_identity_audit_log/, () => []]
+    ])
+
+    const result = await acceptExternalInvitation(
+      { token: 'tok', environmentId: 'efeonce-auth', subject: 'canary-subject' },
+      authServer
+    )
+
+    expect(result.profileCreated).toBe(true)
+    const profileParams = calls(/INSERT INTO greenhouse_core\.identity_profiles/)[0]?.[1] as unknown[]
+
+    expect(profileParams[7]).toBe('smoke_test')
   })
 
   it('fails closed when the subject is already linked to a different profile than the invited one', async () => {

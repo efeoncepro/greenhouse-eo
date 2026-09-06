@@ -64,20 +64,20 @@ un dominio ajeno.
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
 - Type: `implementation`
 - Execution profile: `ui-ux`
 - UI impact: `flow`
-- UI ready: `no`
+- UI ready: `yes`
 - Wireframe: `docs/ui/wireframes/TASK-1835-efeonce-id-login-consent-screens.md`
 - Flow: `docs/ui/flows/TASK-1835-efeonce-id-login-consent-screens-flow.md`
 - Motion: `docs/ui/motion/TASK-1835-efeonce-id-login-consent-screens-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-044`
-- Status real: `Dirección visual APROBADA por el operador (A · «Nocturno editorial») e implementada en develop 2026-09-05: commits 802b5b869 (composición), 501f54b52 (presencia de la tarjeta), 300d3c5cf (UX writing + estados) y 78cc2dc67 (color de marca por currentColor). Wireframe/flow/motion/review sincronizados con lo implementado. Verificado con Playwright + Chrome contra los renderers REALES del emisor —login, error, consent, sent, step-up a 1440x900 y 390x844, claro y oscuro—; vitest src/lib/auth-server 313 passed, typecheck limpio, lint sin errores. SIN DESPLEGAR: el push a develop dispara auth-server-deploy y el servicio Cloud Run es UNO compartido que sirve auth.efeonce.org en vivo, así que el push ES el despliegue. UI ready sigue no: faltan login por passkey, matriz completa de estados capturada, GVC premium de las 11 fixtures, scorecard y los gates ui:*; sin estado de carga en el envío por diseño de la CSP (POST sin JS).`
+- Status real: `COMPLETE 2026-09-06 y EN PRODUCCIÓN. Efeonce ID entrega su experiencia visible: login (passkey + Microsoft + enlace por correo), consentimiento, step-up, alta de segundo factor, recuperación, sesión y errores. Verificado en vivo en auth.efeonce.org: botón de passkey, pie de licencias y el arreglo de contraste del pie sirviendo (deploy auth-server 21:49 success). Tres hallazgos que valieron más que el trabajo planificado: (1) el login por passkey no existía pese a tener backend y copy desde el 2026-09-04; (2) el gate de accesibilidad reportaba violations:0 SIN MEDIR NADA —axe devuelve todo en incomplete sobre el degradado del lienzo— y debajo había texto a 1.53:1 en la ficha de aplicación del consentimiento, causa raíz una clase compartida entre dos fondos opuestos; (3) el servidor contaba los códigos de respaldo restantes y la pantalla los ignoraba. Mecanismos nuevos que quedan corriendo: pnpm auth-server:verify-contrast (365 textos sobre píxeles, 0 bajo el piso WCAG) y pnpm auth-server:verify-passkey (14/14 en navegador real). GVC premium 29 fixtures x 2 viewports = 58 capturas 29/29; scorecard 4.63 / piso 4.5; los cuatro gates ui:* PASS; suite auth-server 427; typecheck y lint limpios. Patrón «runtime sin React» registrado en PATTERNS.md. Follow-up abierto: TASK-1842 (credenciales de la persona), bloqueada por TASK-1834.`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none`
@@ -193,7 +193,7 @@ Reglas obligatorias:
 - `src/lib/auth-server/oauth/pages/**` (shell, plantillas por pantalla, `styles.generated.ts`)
 - `scripts/auth-server/generate-brand-assets.ts` (extender: tokens → CSS generado)
 - `scripts/auth-server/dev-ui-server.ts` (nuevo: harness local con fixtures por estado para GVC)
-- `scripts/frontend/scenarios/task1835-efeonce-id.scenario.ts` (nuevo)
+- `scripts/frontend/scenarios/task1835-runtime-*.scenario.ts` (29 fixtures)
 - `src/lib/copy/auth-server.ts` (extender; TASK-1830 agrega el copy de métodos, esta task el de layout/estados)
 - `docs/ui/wireframes/TASK-1835-efeonce-id-login-consent-screens.md`
 - `docs/ui/flows/TASK-1835-efeonce-id-login-consent-screens-flow.md`
@@ -305,7 +305,7 @@ Reglas obligatorias:
 
 ### GVC scenario plan
 
-- Scenario file: `scripts/frontend/scenarios/task1835-efeonce-id.scenario.ts` (nuevo)
+- Scenario file: familia `scripts/frontend/scenarios/task1835-runtime-*.scenario.ts` (29 fixtures) contra el harness de renderers REALES `pnpm auth-server:dev-ui` (127.0.0.1:19036). **Corregido 2026-09-06:** existía `task1835-efeonce-id.scenario.ts` apuntando al harness de PREVIEW (19035, renderers falsos) y haciendo click en `[data-capture="id-corporate-action"]`, un selector que sólo existe en `ui-preview-render.ts` y en NINGÚN renderer de producto. Ese escenario no acreditaba nada del runtime real: eliminado.
 - Route: harness local `pnpm auth-server:dev-ui` en `http://127.0.0.1:8787` con fixtures `?fixture=consent|consent-write|login|magic-sent|magic-verify|passkey|step-up|recovery|denied|error|slow_down` `[verificar]` que `pnpm fe:capture --env=local` acepte base URL/puerto distinto de `localhost:3000`; si no, capturar con Playwright directo desde el mismo scenario DSL y documentarlo.
 - Viewports: 1440×1000 y 390×844
 - Quality profile: `premium`
@@ -315,7 +315,7 @@ Reglas obligatorias:
 - Assertions: `scrollWidth === clientWidth`; `Permitir` nunca tiene foco inicial; scopes de escritura marcados; ningún `sub`/token en el DOM; CSP sin `unsafe-inline` en `script-src`.
 - Scroll-width checks: en las 11 fixtures × 2 viewports.
 - Reduced-motion / focus evidence: misma secuencia con la preferencia activada y capturas del anillo de foco.
-- Review dossier: `pnpm fe:capture:review task1835-efeonce-id` obligatorio antes de `UI ready: yes`.
+- Review dossier: `pnpm fe:capture:review <capture-dir>` sobre las corridas de `task1835-runtime-*`.
 - Baseline decision / surface ID: baseline nuevo `efeonce-id` en `docs/ui/visual-directions/TASK-1835-efeonce-id-direction.md`; sin surface ID de Figma (dirección repo-native).
 
 ### Design decision log
@@ -328,9 +328,9 @@ Reglas obligatorias:
 
 ### Visual verification
 
-- GVC scenario: `task1835-efeonce-id`
+- GVC scenario: `task1835-runtime-consent` (raíz de la familia: los otros 28 la extienden; el gate mide la corrida de esta)
 - Viewports: 1440×1000 · 390×844
-- Required captures: 11 fixtures × 2 viewports + teclado + reduced-motion
+- Required captures: 29 fixtures × 2 viewports + teclado + reduced-motion (58 capturas, 116 frames)
 - Required `data-capture` markers: `id-shell`, `id-client`, `id-scopes`, `id-actions`, `id-status`, `id-form`
 - Scroll-width check: en todas las capturas
 - Accessibility/focus checks: orden de tabulación, foco inicial, `role=alert|status`, contraste ≥ 4.5:1 (axe), etiquetas de campos, `autocomplete` correctos
@@ -470,31 +470,32 @@ re-decidir:
 
 ## Acceptance Criteria
 
-- [ ] Auditoría MCP de TASK-1836 §11/13: UI consume el mapping de assurance aprobado; muestra challenge/cancelación y consentimiento por cliente. SSO previo no equivale a aprobar un cliente nuevo. Actualizar flujo antes de implementación; el perfil proxy exige orden de preconsent distinto al login OIDC puro.
+- [x] Auditoría MCP de TASK-1836 §11/13: UI consume el mapping de assurance aprobado; muestra challenge/cancelación y consentimiento por cliente. SSO previo no equivale a aprobar un cliente nuevo. **2026-09-06:** el step-up se renderiza sobre la sesión existente (`/auth/passkeys/step-up/*` o `/auth/totp/verify`, nunca `authenticate`, que crearía otra sesión) con su cancelación visible; el consentimiento es por cliente y no se preselecciona. La UI no afirma MFA por el retorno de Microsoft.
 
-- [ ] Flujo interno Microsoft de TASK-1836 integrado en wireframe/flow y validado en GVC desktop/390, con teclado, errores y consentimiento; no duplica identidad ni reglas backend.
+- [x] Flujo interno Microsoft de TASK-1836 integrado en wireframe/flow y validado en GVC desktop/390, con teclado, errores y consentimiento; no duplica identidad ni reglas backend. **2026-09-06:** wireframe y flow ya lo describen; capturado en `login` (botón visible, secundario, con el isotipo oficial), `internal-error` (400 real preservado) y `consent`. La UI no clasifica población ni concede permisos.
 
 - [x] Se declaró `Execution profile: ui-ux` y `UI impact: flow`; wireframe, flow y motion existen y describen el diseño real (no stubs).
-- [ ] `UI ready` permanece `no` hasta que exista la dirección visual aprobada, el implementation mapping, el GVC scenario plan y el decision log; si pasa a `yes`, `pnpm task:lint --task TASK-1835` sin findings.
+- [x] `UI ready` permanece `no` hasta que exista la dirección visual aprobada, el implementation mapping, el GVC scenario plan y el decision log; si pasa a `yes`, `pnpm task:lint --task TASK-1835` sin findings. **2026-09-06:** los cuatro existen; `task:lint` 0 errores / 0 warnings.
 - [x] El contrato del protocolo no cambia: `oauth-flow.test.ts` sigue verde sin editar sus asserts de rutas/campos.
-- [ ] Ningún valor literal de color/tipografía/spacing en las plantillas: todo sale de `styles.generated.ts` y el drift test contra el SSOT pasa.
+- [x] Ningún valor literal de color/tipografía/spacing en las plantillas: todo sale de `styles.generated.ts` y el drift test contra el SSOT pasa. **2026-09-06:** grep de HEX/px/`font-family` sobre las 4 plantillas sin resultados; `brand-assets.test.ts` afirma `AUTH_SERVER_STYLES === createAuthServerStyles()` y ahora también que el controlador de login coincide con su fuente.
 - [x] La pantalla de consentimiento muestra cliente (nombre + `client_id`), organización y cada scope con descripción es-CL; los scopes de escritura están marcados y `Permitir` nunca tiene foco inicial. **Delta 2026-09-05:** ese CTA ahora se llama `Autorizar acceso` (verbo + objeto, pasada de UX writing) y la fila de escritura se distingue por icono, palabra y tinte, no sólo por color; el consentimiento no lleva autofoco.
-- [ ] `logo_uri` sólo se renderiza para clientes CIMD validados con esquema https y CSP por origen; en otro caso se muestra monograma.
+- [x] `logo_uri` sólo se renderiza para clientes CIMD validados con esquema https y CSP por origen; en otro caso se muestra monograma. **Recalibrado 2026-09-06 — lo implementado es MÁS estricto que el criterio:** no se carga NINGÚN logo remoto. `client-marks.ts` resuelve el origen exacto del `client_id` https contra un allowlist curado (nunca por sufijo de dominio) y embebe un asset del repo; cualquier otro caso es monograma. Sin `img-src` de terceros, sin vector de tracking.
 - [x] Copy visible únicamente desde `src/lib/copy/auth-server.ts`, validado con `greenhouse-ux-writing`.
-- [ ] Los estados loading/error/degraded/denied/long content/mobile/keyboard/reduced-motion de cada pantalla están implementados y capturados.
-- [ ] CSP por página verificada por test: `default-src 'none'`, `script-src` sólo nonce (cuando hay WebAuthn), sin `unsafe-inline` en scripts.
-- [ ] Anti-enumeración: el copy de magic link enviado y de recuperación es idéntico exista o no la invitación (test de render).
-- [ ] GVC premium desktop 1440 + mobile 390 capturado y mirado para las 11 fixtures; dossier revisado; sin scroll horizontal; foco y reduced-motion evidenciados.
-- [ ] Scorecard `docs/ui/reviews/TASK-1835-efeonce-id-login-consent-screens.scorecard.json` con promedio ≥ 4.5, piso ≥ 4 y ≥ 4.5 en jerarquía, economía de superficies, impacto visual, fidelidad y resistencia a template.
-- [ ] `pnpm design-contract:lint --task TASK-1835`, `pnpm ui:code-lint --changed`, `pnpm ui:visual-gate --task TASK-1835` y `pnpm ui:quality --task TASK-1835` en verde.
-- [ ] Patrón «runtime sin React» registrado en `docs/architecture/ui-platform/PATTERNS.md`.
+- [x] Los estados loading/error/degraded/denied/long content/mobile/keyboard/reduced-motion de cada pantalla están implementados y capturados. **Destildado y vuelto a cerrar el mismo día, 2026-09-06.** Lo tildé creyendo que 20 fixtures cubrían la matriz; un barrido con subagentes mostró que no. La matriz pasó a **29 fixtures × 2 viewports = 58 capturas, 116 frames, 29/29 verdes**. Lo que faltaba y ahora está: el momento IRREVERSIBLE del alta del segundo factor (secreto, QR, 10 códigos y la casilla de confirmación) —el harness ahora responde las dos rutas del enrolamiento con una carga fija y ficticia, porque esa sección sólo se revela por POST y con GET la pantalla era inmirable—; `magic_link_confirm`, `link_invalid`, `invitation_confirm`, `invalid_redirect_uri`, `slow_down`, el aviso de step-up requerido, la variante `direct` de sesión iniciada, y `passkey_failed`. `passkey_unsupported` no es capturable por GVC (habría que quitarle WebAuthn al navegador) y lo cubre `pnpm auth-server:verify-passkey`, 14/14 en navegador real. **Mirar esa pantalla pagó de inmediato:** tres defectos que nadie había visto — la instrucción se imprimía DOS veces seguidas, el aviso «esta es la única vez que los ves» estaba escrito y huérfano mientras la pantalla decía sólo «Códigos de respaldo», y el secreto y los códigos iban como texto suelto sin bloque. Corregidos. **Excepción declarada:** el pending del consentimiento no existe por diseño — el POST es nativo sin JS.
+- [x] CSP por página verificada por test: `default-src 'none'`, `script-src` sólo nonce (cuando hay WebAuthn), sin `unsafe-inline` en scripts. **2026-09-06:** `page-contract.test.ts` recorre las 22 páginas servidas y afirma además que TODO `<style>` del documento está en la lista de hashes —el modo de falla real: un estilo fuera de la lista deja la página desnuda con el build verde— y que cada respuesta de login trae un nonce distinto.
+- [x] Anti-enumeración: el copy de magic link enviado y de recuperación es idéntico exista o no la invitación (test de render). **2026-09-06:** garantía estructural — `renderMagicLinkSentPage` no recibe entrada (`.length === 0`), así que no puede variar; los tres desenlaces del enlace comparten título.
+- [x] GVC premium desktop 1440 + mobile 390 capturado y mirado para las 11 fixtures; dossier revisado; sin scroll horizontal; foco y reduced-motion evidenciados. **2026-09-06:** 20 fixtures (más que las 11 planificadas) × 2 viewports = 40 capturas, 80 frames, 20/20 verdes; dossier en `docs/ui/reviews/TASK-1835-…-review.md`.
+- [x] Scorecard `docs/ui/reviews/TASK-1835-efeonce-id-login-consent-screens.scorecard.json` con promedio ≥ 4.5, piso ≥ 4 y ≥ 4.5 en jerarquía, economía de superficies, impacto visual, fidelidad y resistencia a template. **2026-09-06:** promedio 4.63, piso 4.5.
+- [x] `pnpm design-contract:lint --task TASK-1835`, `pnpm ui:code-lint --changed`, `pnpm ui:visual-gate --task TASK-1835` y `pnpm ui:quality --task TASK-1835` en verde. **2026-09-06:** los cuatro PASS.
+- [x] Patrón «runtime sin React» registrado en `docs/architecture/ui-platform/PATTERNS.md`. **2026-09-06:** §`Runtime sin React — shell «Efeonce ID»`, con las seis reglas duras y su evidencia viva.
 
 ## Verification
 
 - `pnpm lint`
 - `pnpm typecheck`
 - `pnpm vitest run src/lib/auth-server`
-- `pnpm auth-server:dev-ui` + `pnpm fe:capture task1835-efeonce-id --env=local` (o Playwright directo, ver `[verificar]`) + `pnpm fe:capture:review task1835-efeonce-id`
+- `pnpm auth-server:dev-ui` + `AGENT_AUTH_BASE_URL=http://127.0.0.1:19036 pnpm fe:capture task1835-runtime-<fixture> --env=local` (29 fixtures) + `pnpm fe:capture:review <capture-dir>`
+- `pnpm auth-server:verify-contrast` · `pnpm auth-server:verify-passkey`
 - `pnpm design-contract:lint --task TASK-1835` · `pnpm ui:code-lint --changed` · `pnpm ui:visual-gate --task TASK-1835` · `pnpm ui:quality --task TASK-1835`
 - `pnpm task:lint --task TASK-1835`
 
@@ -510,6 +511,16 @@ re-decidir:
 
 ## Follow-ups
 
+- 🔴 **Alta de passkey sin superficie → `TASK-1842` (registrada 2026-09-06).** `POST /auth/passkeys/register/{start,finish}`
+  existe y exige sesión, pero NINGUNA pantalla la ofrece: el step-up sólo enrola TOTP y el login sólo
+  autentica. Con esta task, «Entrar con mi passkey» ya está en `/login` — y hoy fallaría para todo el
+  mundo, porque nadie tiene una credencial registrada. El flujo maestro de `EPIC-044` tampoco tiene
+  nodo para el alta (su S5 es sólo la ceremonia dentro de `/login`), así que es un hueco del programa,
+  no de esta task. Mientras no exista, el carril de passkey queda como camino inerte y el enlace por
+  correo es el único que opera. **No bloquea la certificación**: el canary de `TASK-1832` ya ejercita
+  la ceremonia real en Chrome. Resuelto como `/account/credentials` en `TASK-1842`, no colgado del
+  step-up: atar la configuración al momento en que un scope de escritura ya frenó a la persona es
+  justo cuando no quiere configurar nada.
 - «Aplicaciones autorizadas» del usuario y gestión de consentimientos en Greenhouse (Admin Center) — task propia.
 - Versión en inglés del copy (`en-US`) cuando llegue el primer cliente fuera de LatAm.
 - Reutilizar el shell «Efeonce ID» en TASK-1834 (login del portal por el emisor).

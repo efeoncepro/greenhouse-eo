@@ -58,6 +58,7 @@ import type {
   ExternalOrganizationBinding,
   ExternalRevocationScope
 } from './types'
+import { EXTERNAL_CANARY_CAPABILITY } from './types'
 import {
   assertCapability,
   assertEnvironmentId,
@@ -141,7 +142,59 @@ const requireActiveBinding = async (client: PoolClient, bindingId: string): Prom
     })
   }
 
+  if (binding.bindingPurpose === 'canary') {
+    if (!binding.canaryRegistrationId || !binding.expiresAt) {
+      throw new ExternalAccessError('canary_not_registered', 'canary binding has no registration', { bindingId })
+    }
+
+    const { rows } = await client.query<{
+      status: string
+      expires_at: string | Date
+      organization_id: string
+      environment_id: string
+      external_organization_ref: string
+    }>(
+      `SELECT status,expires_at,organization_id,environment_id,external_organization_ref
+         FROM greenhouse_core.external_canary_registrations
+        WHERE canary_registration_id=$1 FOR SHARE`,
+      [binding.canaryRegistrationId]
+    )
+
+    const registration = rows[0]
+
+    if (
+      !registration ||
+      registration.organization_id !== binding.organizationId ||
+      registration.environment_id !== binding.environmentId ||
+      registration.external_organization_ref !== binding.externalOrganizationRef
+    ) {
+      throw new ExternalAccessError('canary_not_registered', 'canary binding does not match its registration', {
+        bindingId
+      })
+    }
+
+    if (
+      registration.status !== 'active' ||
+      new Date(registration.expires_at).getTime() <= Date.now() ||
+      new Date(binding.expiresAt).getTime() <= Date.now()
+    ) {
+      throw new ExternalAccessError('canary_expired', 'canary binding is revoked or expired', { bindingId })
+    }
+  }
+
   return binding
+}
+
+const assertInvitationWithinCanaryExpiry = (binding: ExternalOrganizationBinding, expiresInHours: number) => {
+  if (binding.bindingPurpose !== 'canary' || !binding.expiresAt) return
+
+  const invitationExpiresAt = Date.now() + expiresInHours * 60 * 60 * 1000
+
+  if (invitationExpiresAt >= new Date(binding.expiresAt).getTime()) {
+    throw new ExternalAccessError('canary_expired', 'invitation would outlive the canary binding', {
+      bindingId: binding.bindingId
+    })
+  }
 }
 
 /**
@@ -434,6 +487,9 @@ export const bindExternalOrganization = async (
       environmentId,
       externalOrganizationRef,
       population: 'external',
+      bindingPurpose: 'customer',
+      canaryRegistrationId: null,
+      expiresAt: null,
       reason,
       actorId: performedBy,
       designatedAdminProfileId
@@ -467,6 +523,20 @@ export const grantExternalCapability = async (
   return withTransaction(async client => {
     const binding = await requireActiveBinding(client, bindingId)
 
+    if (binding.bindingPurpose === 'canary' && capability !== EXTERNAL_CANARY_CAPABILITY) {
+      throw new ExternalAccessError('capability_not_allowed', 'capability is not allowed for a canary binding', {
+        bindingId,
+        capability
+      })
+    }
+
+    if (binding.bindingPurpose === 'canary' && !profileId) {
+      throw new ExternalAccessError('invalid_request', 'canary grants must target one linked smoke_test profile', {
+        field: 'profileId',
+        bindingId
+      })
+    }
+
     if (profileId) {
       const { rows } = await client.query<{ invitation_id: string }>(
         `SELECT invitation_id FROM greenhouse_core.external_member_invitations
@@ -479,6 +549,20 @@ export const grantExternalCapability = async (
           field: 'profileId',
           bindingId
         })
+      }
+
+      if (binding.bindingPurpose === 'canary') {
+        const profileRows = await client.query<{ data_origin: string }>(
+          `SELECT data_origin FROM greenhouse_core.identity_profiles WHERE profile_id=$1`,
+          [profileId]
+        )
+
+        if (profileRows.rows[0]?.data_origin !== 'smoke_test') {
+          throw new ExternalAccessError('identity_collision', 'canary grant target is not a smoke_test profile', {
+            bindingId,
+            profileId
+          })
+        }
       }
     }
 
@@ -505,7 +589,8 @@ export const grantExternalCapability = async (
       capability,
       profileId,
       reason,
-      actorId: performedBy
+      actorId: performedBy,
+      expiresAt: binding.bindingPurpose === 'canary' && binding.expiresAt ? new Date(binding.expiresAt) : null
     })
 
     const { rows } = await client.query<Parameters<typeof mapGrantRow>[0]>(
@@ -513,8 +598,7 @@ export const grantExternalCapability = async (
       [grantId]
     )
 
-
-return { grant: mapGrantRow(rows[0]!), created: true, grantsVersion }
+    return { grant: mapGrantRow(rows[0]!), created: true, grantsVersion }
   })
 }
 
@@ -650,7 +734,12 @@ const resolveDeliveryMode = (requested: ExternalInvitationDeliveryMode | undefin
  * jamás se responde "listo" sin correo.
  */
 const deliverIssuedInvitation = async (
-  issued: { invitation: ExternalMemberInvitation; token: string; environment: ExternalIdentityEnvironment; organizationName: string | null },
+  issued: {
+    invitation: ExternalMemberInvitation
+    token: string
+    environment: ExternalIdentityEnvironment
+    organizationName: string | null
+  },
   actor: ExternalAccessActor,
   sender: InvitationEmailSender
 ): Promise<ExternalMemberInvitation> => {
@@ -698,9 +787,23 @@ export const issueExternalInvitation = async (
     const binding = await requireActiveBinding(client, bindingId)
     const environment = await loadEnvironmentForUpdate(client, binding.environmentId)
 
+    if (binding.bindingPurpose === 'canary' && designatedAdmin) {
+      throw new ExternalAccessError('capability_not_allowed', 'canary invitations cannot designate an administrator', {
+        bindingId,
+        field: 'designatedAdmin'
+      })
+    }
+
+    assertInvitationWithinCanaryExpiry(binding, expiresInHours)
+
     if (profileId) {
-      const { rows } = await client.query<{ active: boolean; status: string; merged_into_profile_id: string | null }>(
-        `SELECT active, status, merged_into_profile_id FROM greenhouse_core.identity_profiles WHERE profile_id = $1`,
+      const { rows } = await client.query<{
+        active: boolean
+        status: string
+        merged_into_profile_id: string | null
+        data_origin: string
+      }>(
+        `SELECT active, status, merged_into_profile_id, data_origin FROM greenhouse_core.identity_profiles WHERE profile_id = $1`,
         [profileId]
       )
 
@@ -708,6 +811,20 @@ export const issueExternalInvitation = async (
 
       if (!profile || !profile.active || profile.status !== 'active' || profile.merged_into_profile_id) {
         throw new ExternalAccessError('invalid_request', 'profileId is not an active profile', { field: 'profileId' })
+      }
+
+      if (binding.bindingPurpose === 'canary' && profile.data_origin !== 'smoke_test') {
+        throw new ExternalAccessError('identity_collision', 'canary invitation target is not a smoke_test profile', {
+          field: 'profileId',
+          bindingId
+        })
+      }
+
+      if (binding.bindingPurpose === 'customer' && profile.data_origin === 'smoke_test') {
+        throw new ExternalAccessError('identity_collision', 'customer invitation cannot target a smoke_test profile', {
+          field: 'profileId',
+          bindingId
+        })
       }
     }
 
@@ -769,7 +886,13 @@ export const issueExternalInvitation = async (
       profileId,
       performedBy,
       reason,
-      metadata: { designatedAdmin, expiresInHours, reissue: open !== null, deliveryMode, ...(input.auditMetadata ?? {}) }
+      metadata: {
+        designatedAdmin,
+        expiresInHours,
+        reissue: open !== null,
+        deliveryMode,
+        ...(input.auditMetadata ?? {})
+      }
     })
 
     await publishOutboxEvent(
@@ -820,11 +943,7 @@ export const issueExternalInvitation = async (
     }
   }
 
-  const delivered = await deliverIssuedInvitation(
-    committed,
-    actor,
-    options.sender ?? sendInvitationEmailViaPlatform
-  )
+  const delivered = await deliverIssuedInvitation(committed, actor, options.sender ?? sendInvitationEmailViaPlatform)
 
   return {
     invitation: delivered,
@@ -894,6 +1013,8 @@ export const resendExternalInvitation = async (
 
     const binding = await requireActiveBinding(client, previous.bindingId)
     const environment = await loadEnvironmentForUpdate(client, binding.environmentId)
+
+    assertInvitationWithinCanaryExpiry(binding, expiresInHours)
 
     await assertBindingIssueRate(client, binding.bindingId, config.issueLimitPerBindingPerHour)
 
@@ -969,7 +1090,12 @@ export const resendExternalInvitation = async (
 
   const delivered = await deliverIssuedInvitation(committed, actor, options.sender ?? sendInvitationEmailViaPlatform)
 
-  return { invitation: delivered, token: committed.token, created: true, delivery: buildInvitationDelivery(delivered, 'system') }
+  return {
+    invitation: delivered,
+    token: committed.token,
+    created: true,
+    delivery: buildInvitationDelivery(delivered, 'system')
+  }
 }
 
 export type RevealExternalInvitationTokenInput = {
@@ -1037,6 +1163,8 @@ export const revealExternalInvitationToken = async (
 
     const binding = await requireActiveBinding(client, previous.bindingId)
     const environment = await loadEnvironmentForUpdate(client, binding.environmentId)
+
+    assertInvitationWithinCanaryExpiry(binding, config.revealedLinkTtlHours)
 
     await assertBindingIssueRate(client, binding.bindingId, config.issueLimitPerBindingPerHour)
 
@@ -1147,10 +1275,12 @@ export const resolveDelegatedAuthority = async (input: DelegatedAuthorityInput):
   }
 
   const membership = resolution.memberships.find(
-    item => (bindingId ? item.bindingId === bindingId : true) && (organizationId ? item.organizationId === organizationId : true)
+    item =>
+      (bindingId ? item.bindingId === bindingId : true) &&
+      (organizationId ? item.organizationId === organizationId : true)
   )
 
-  if (!membership || !membership.designatedAdmin) {
+  if (!membership || membership.bindingPurpose === 'canary' || !membership.designatedAdmin) {
     throw new ExternalAccessError('forbidden', 'subject is not the designated admin of this binding', {
       bindingId,
       organizationId
@@ -1226,7 +1356,11 @@ export type DelegatedInvitationTargetInput = DelegatedAuthorityInput & {
 const loadDelegatedTarget = async (authority: DelegatedAuthority, invitationId: string) => {
   const id = assertNonEmptyString(invitationId, 'invitationId', 128)
 
-  const rows = await query<{ binding_id: string; status: ExternalMemberInvitation['status']; profile_id: string | null }>(
+  const rows = await query<{
+    binding_id: string
+    status: ExternalMemberInvitation['status']
+    profile_id: string | null
+  }>(
     `SELECT binding_id, status, profile_id FROM greenhouse_core.external_member_invitations WHERE invitation_id = $1`,
     [id]
   )
@@ -1280,7 +1414,10 @@ export const revokeDelegatedExternalInvitation = async (
       })
     }
 
-    if (!target.profileId) throw new ExternalAccessError('conflict', 'linked invitation without profile', { invitationId: target.invitationId })
+    if (!target.profileId)
+      throw new ExternalAccessError('conflict', 'linked invitation without profile', {
+        invitationId: target.invitationId
+      })
 
     return revokeExternalAccess(
       { scope: 'member', bindingId: authority.membership.bindingId, profileId: target.profileId, reason },
@@ -1394,6 +1531,7 @@ export const acceptExternalInvitation = async (
     }
 
     const binding = await requireActiveBinding(client, invitation.bindingId)
+    const isCanary = binding.bindingPurpose === 'canary'
 
     if (binding.environmentId !== environmentId) {
       throw new ExternalAccessError('invalid_request', 'invitation belongs to another environment', {
@@ -1433,21 +1571,29 @@ export const acceptExternalInvitation = async (
     let profileCreated = false
 
     if (!profileId) {
-      const { rows: emailRows } = await client.query<{ profile_id: string }>(
-        `SELECT profile_id FROM greenhouse_core.identity_profiles
+      const { rows: emailRows } = await client.query<{ profile_id: string; data_origin: string }>(
+        `SELECT profile_id,data_origin FROM greenhouse_core.identity_profiles
           WHERE lower(canonical_email) = $1 AND active = TRUE AND status = 'active' AND merged_into_profile_id IS NULL
           ORDER BY created_at ASC`,
         [invitation.email.toLowerCase()]
       )
 
-      if (emailRows.length > 1) {
-        throw new ExternalAccessError('identity_collision', 'more than one active profile matches the invited email', {
-          invitationId: invitation.invitationId,
-          matches: emailRows.length
+      if (isCanary && emailRows.some(row => row.data_origin !== 'smoke_test')) {
+        throw new ExternalAccessError('identity_collision', 'canary email collides with a non-smoke profile', {
+          invitationId: invitation.invitationId
         })
       }
 
-      profileId = emailRows[0]?.profile_id ?? null
+      const eligibleEmailRows = isCanary ? emailRows.filter(row => row.data_origin === 'smoke_test') : emailRows
+
+      if (eligibleEmailRows.length > 1) {
+        throw new ExternalAccessError('identity_collision', 'more than one active profile matches the invited email', {
+          invitationId: invitation.invitationId,
+          matches: eligibleEmailRows.length
+        })
+      }
+
+      profileId = eligibleEmailRows[0]?.profile_id ?? null
     }
 
     if (!profileId) {
@@ -1458,8 +1604,8 @@ export const acceptExternalInvitation = async (
       await client.query(
         `INSERT INTO greenhouse_core.identity_profiles (
            profile_id, public_id, profile_type, canonical_email, full_name, status, active,
-           primary_source_system, primary_source_object_type, primary_source_object_id
-         ) VALUES ($1, $2, 'external_contact', $3, $4, 'active', TRUE, $5, $6, $7)`,
+           primary_source_system, primary_source_object_type, primary_source_object_id, data_origin
+         ) VALUES ($1, $2, 'external_contact', $3, $4, 'active', TRUE, $5, $6, $7, $8)`,
         [
           profileId,
           buildIdentityProfilePublicId(sourceInput),
@@ -1467,7 +1613,8 @@ export const acceptExternalInvitation = async (
           displayName ?? invitation.email,
           sourceSystem,
           EXTERNAL_IDP_SOURCE_OBJECT_TYPE,
-          subject
+          subject,
+          isCanary ? 'smoke_test' : 'real'
         ]
       )
       profileCreated = true
@@ -1476,8 +1623,9 @@ export const acceptExternalInvitation = async (
         active: boolean
         status: string
         merged_into_profile_id: string | null
+        data_origin: string
       }>(
-        `SELECT active, status, merged_into_profile_id FROM greenhouse_core.identity_profiles WHERE profile_id = $1 FOR UPDATE`,
+        `SELECT active, status, merged_into_profile_id, data_origin FROM greenhouse_core.identity_profiles WHERE profile_id = $1 FOR UPDATE`,
         [profileId]
       )
 
@@ -1485,6 +1633,20 @@ export const acceptExternalInvitation = async (
 
       if (!profile || !profile.active || profile.status !== 'active' || profile.merged_into_profile_id) {
         throw new ExternalAccessError('conflict', 'target profile is not active', { profileId })
+      }
+
+      if (isCanary && profile.data_origin !== 'smoke_test') {
+        throw new ExternalAccessError('identity_collision', 'canary subject resolves to a non-smoke profile', {
+          invitationId: invitation.invitationId,
+          profileId
+        })
+      }
+
+      if (!isCanary && profile.data_origin === 'smoke_test') {
+        throw new ExternalAccessError('identity_collision', 'customer subject resolves to a smoke_test profile', {
+          invitationId: invitation.invitationId,
+          profileId
+        })
       }
     }
 

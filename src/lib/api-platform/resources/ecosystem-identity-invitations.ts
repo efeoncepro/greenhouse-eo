@@ -50,6 +50,10 @@ const CODE_MAP: Record<ExternalAccessErrorCode, { status: number; code: ApiPlatf
   invitation_not_open: { status: 409, code: 'bad_request' },
   invitation_expired: { status: 410, code: 'bad_request' },
   identity_collision: { status: 409, code: 'bad_request' },
+  canary_not_registered: { status: 404, code: 'not_found' },
+  canary_expired: { status: 410, code: 'binding_not_active' },
+  capability_not_allowed: { status: 403, code: 'forbidden' },
+  canary_cleanup_blocked: { status: 409, code: 'bad_request' },
   forbidden: { status: 403, code: 'forbidden' },
   rate_limited: { status: 429, code: 'rate_limited' },
   limit_reached: { status: 422, code: 'bad_request' }

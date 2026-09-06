@@ -7,6 +7,105 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-06 — TASK-1835 completa: Efeonce ID tiene cara, y el gate de accesibilidad estaba ciego
+
+`auth.efeonce.org` sirve su experiencia visible: login con passkey, Microsoft y enlace por correo;
+consentimiento que dice a qué dominio viaja el código; step-up, alta de segundo factor, recuperación,
+sesión y errores. Desplegado y verificado en vivo.
+
+Tres hallazgos valieron más que el trabajo planificado:
+
+- **El login por passkey no existía.** Backend completo y copy escrito desde el 2026-09-04, con los
+  cuatro ids `login_passkey_*` huérfanos: ninguna pantalla ofrecía el método.
+- 🔴 **El gate de accesibilidad reportaba `violations: 0` sin medir nada.** axe devuelve todo en
+  `incomplete` cuando el fondo es un degradado con pseudo-elemento, y el gate lo informaba como cero.
+  Debajo había texto a **1.53:1** en la ficha de aplicación del consentimiento — justo lo que tiene
+  que leerse. Causa raíz: una clase de texto compartida entre el lienzo oscuro y la tarjeta clara.
+  **Aplica a cualquier superficie con fondo compuesto, no sólo al emisor.**
+- **El servidor contaba los códigos de respaldo restantes y la pantalla los ignoraba.** Alguien podía
+  quemar el último y enterarse el día que perdiera el teléfono.
+
+Un cuarto hallazgo fue mío y lo corregí el mismo día: agregué al pie de todas las pantallas un enlace
+a las licencias de las fuentes, porque su id de copy estaba huérfano. Construir una interfaz para
+justificar un copy muerto es el razonamiento al revés —el copy se borra—, y encima el lugar era la
+pantalla donde alguien decide si confía para entrar. Retirado; los `.txt` se siguen sirviendo, que es
+donde la licencia se cumple.
+
+Mecanismos que quedan corriendo: `pnpm auth-server:verify-contrast` (mide sobre los píxeles
+renderizados; 365 textos, 0 bajo el piso WCAG) y `pnpm auth-server:verify-passkey` (14/14 en navegador
+real). El patrón «runtime sin React» queda registrado en `ui-platform/PATTERNS.md` para que ningún
+otro servicio Efeonce arranque un segundo sistema visual.
+
+GVC premium 29 fixtures × 2 viewports (58 capturas); scorecard 4.63 / piso 4.5; los cuatro gates
+`ui:*` PASS; suite del emisor 427.
+
+Follow-up abierto: **`TASK-1842`** — ninguna persona puede crear una passkey todavía, así que el botón
+nuevo le queda inerte y cada entrada sigue siendo un correo. Bloqueada por `TASK-1834`.
+
+## 2026-09-06 — TASK-1832: schema canary aplicado fuera del checkpoint, sin fixture
+
+`pnpm pg:connect:migrate` se ejecutó por error como si sólo levantara el proxy y aplicó las dos migraciones de
+TASK-1832. El readback inmediato confirmó registry/bindings canary en cero, purpose sin drift y los 30 perfiles
+`smoke_test` preservados en identidad pero excluidos de Person 360. No se crearon organización, cuentas, grants,
+sesiones ni tokens; flags OFF/default, sin push/deploy. Se detuvieron nuevas mutaciones externas y quedó
+documentada la decisión pendiente de conservar el schema adelantado o autorizar una migración compensatoria.
+La implementación local pasó 144/144 tests focales, typecheck, lint sin errores y build; el gateway hermano pasó
+152/152 tests sin skips y build. `secrets:audit` local no acredita runtime: 6/8 saludables, con `NEXTAUTH_URL`
+local inválida y `CRON_SECRET` ausente; TASK-1832 no cambió secretos.
+[Evidencia](docs/audits/mcp/TASK-1832_SCHEMA_APPLY_READBACK_2026-09-06.md).
+
+**Decisión posterior:** el operador resolvió conservar el schema aditivo y autorizó completar el rollout
+sintético: commit/push, promoción, deploys, gates, fixture dedicado, buzones controlados, sesiones canary,
+revocación y cleanup. La autorización no incorpora clientes ni habilita writes; la task sigue pendiente hasta
+matriz runtime, retiro demostrable y siete días de señales estables.
+
+## 2026-09-06 — TASK-1832: carril oscuro desplegado y fixture removible iniciado
+
+Greenhouse `develop` y el gateway MCP ya sirven consumers compatibles con los dos gates canary apagados. El
+auth-server quedó en `auth-server-00034-85c` y el gateway en `efeonce-mcp-gateway-00041-7dq`; metadata/readyz y
+los SHAs servidos fueron releídos. Antes del primer write se versionó el manifiesto con IDs exactos. Después, los
+commands crearon una organización dedicada `inactive/other/disqualified`, su registro temporal y un binding
+`canary`; el readback da `1/1`, purpose drift cero y ninguna persona `smoke_test` visible en Person 360. El dry-run
+de retiro encontró sólo las referencias esperadas y se negó mientras root/authority siguen activos.
+
+Para M365, el operador eligió un alias preexistente compartido. No colisiona con perfiles; la invitación definitiva
+fue entregada, quedó visible y se aceptó mediante el POST scanner-safe. El profile resultante es exclusivamente
+`smoke_test`, permanece fuera de Person 360 y recibió el único grant read-only permitido, personal y expirante con
+el binding. El magic link también fue entregado, pero no se consumió todavía porque el Mac quedó bloqueado. Una
+invitación preparatoria a plus-address se revocó sin aceptación y permanece inventariada para el cleanup. El gate
+sigue OFF y producción no se promueve antes de completar correo Google, sesión/passkey y negativas en staging. La
+primera CI del commit falló en el gate de navegación porque el smoke OAuth usaba `page.goto` directo; el fix local
+ya usa el helper transitorio compartido y pasa el gate focal. Durante una consulta, el CLI de Vercel imprimió un
+cursor sensible: no se reutilizó ni se conserva en evidencia; su posible rotación queda como acción de higiene.
+
+## 2026-09-06 — La certificación sintética se separa del primer piloto cliente
+
+TASK-1832 ya no usa a una organización cliente real para descubrir defectos. La certificación técnica externa
+se ejecutará con cuentas controladas por Efeonce, personas marcadas `smoke_test`, una organización canary no
+cliente y un binding de propósito explícito, recorriendo el mismo issuer, invitación, sesión, consentimiento,
+PKCE, token, gateway y autorización que producción. La matriz conserva clientes MCP reales, M365/Google,
+Chrome/Safari y casos negativos; su resultado demuestra preparación técnica, no adopción comercial.
+
+TASK-1841 queda como unidad separada para el primer piloto consentido: una organización ya existente en Account
+360, un administrador y una capability read-only vigente, sólo después de cerrar certificación, assurance y UI.
+El cliente recibe onboarding y soporte normales, no tareas de QA, y nunca debe entregar tokens o logs. Esa
+decisión documental inicial no creó correos, cuentas, bindings, migraciones, invitaciones, flags ni rollout; el
+apply de schema posterior queda registrado por separado en la entrada anterior.
+
+## 2026-09-06 — El gate de versión del gateway medía media superficie, y el scope nuevo no se anunciaba entero
+
+Dos defectos que sólo aparecieron al revisar lo construido, y que compartían la misma forma: un mecanismo que protegía menos de lo que su nombre sugería.
+
+El gate que obliga a mover la versión del gateway cuando cambia su lista de herramientas comparaba únicamente las que vienen federadas desde Greenhouse. Las que el gateway define por su cuenta no lo movían, así que dos herramientas nuevas crecieron el servidor con el gate en verde y la versión congelada. Ahora la medición se toma del servidor construido y cubre nombres y descripciones, porque editar una descripción cambia qué decide llamar un agente. Se probó viéndolo fallar en los dos casos, no viéndolo pasar.
+
+El segundo: al agregar el permiso para administrar personas de una organización, quedó anunciado sólo en una de sus dos formas. La que faltaba es justamente la que otorga el emisor propio, del que dependen las herramientas delegadas, así que un cliente que armara su solicitud desde el descubrimiento nunca habría pedido el permiso.
+
+## 2026-09-06 — Efeonce ID: la invitación externa y la autoridad delegada del cliente, en producción
+
+Quien invita a una persona externa ya no le pasa el enlace a mano: el sistema manda el correo en el mismo acto en que genera el token, la respuesta deja de traerlo salvo una revelación gobernada de una hora que queda auditada, y el ciclo de vida es observable (reenviar rota el token anterior, el rebote se registra, la caducidad se ve, tres señales nuevas). El administrador designado de una organización cliente pasa a tener autoridad real sobre su propia gente por una lane del ecosistema, mediada por el gateway y decidida siempre por Greenhouse, nunca por lo que diga la llamada. La página de consentimiento del autorizador ahora muestra a qué host va a volver la persona.
+
+Release `b3e324cb5c8d-3cfce865`, un solo intento. Ambos flags encendidos en producción con redeploy, y un canary contra la superficie real: la misma llamada pasó de responder «no existe» a pedir el binding y a negar por falta de autoridad. La federación de las dos herramientas nuevas quedó desplegada en el gateway, que subió a la versión 1.1.0.
+
 ## 2026-09-06 — Efeonce ID: follow-ups de TASK-1837 cerrados y lane delegada federada en PR (gateway)
 
 Revocar un binding limpia y audita al administrador designado; el dominio `external-access` tiene boundary test
@@ -785,67 +884,3 @@ instruía al canary a normalizar un `disabled` — que hoy sería una regresión
 
 Tier `prospect` documentado: se resuelve sin `module_assignments` y su gasto es presupuesto de
 adquisición de Efeonce, nunca costo de cliente.
-
-## 2026-09-01 — TASK-1699 cerrada, y `task:lint` gana la regla `stale-progress`
-
-El top-N del SERP quedó `complete`: serie viva desde el 2026-08-29 (766 · 775 · 762 · 778 filas en
-4 días) con costo marginal CERO medido, y su señal de cobertura convergió sola a `ok`/`uncovered=0`
-sin tocar el umbral.
-
-Se re-ejecutó cinco veces sin cerrar por un defecto de **registro**, no técnico: 46 checkboxes sin
-tildar y `Status real: Diseno` hacían que cada sesión la leyera como no empezada, mientras el trabajo
-quedaba anotado sólo en prosa.
-
-Regla nueva `stale-progress` en `task:lint`: avisa cuando el estado declarado contradice la historia
-de commits, y cuando una task se cierra sin tildar una sola evidencia. Warning por diseño y por
-medición (414 de 975 completas están así); acotada a las que tienen commits de implementación, la
-señal cae a 28 tasks.
-
-## 2026-08-31 — Blog WordPress sanea categorías y abre una copia gobernada de Demo 35
-
-La taxonomía live quedó reducida a 13 categorías reales: AEO y SEO son raíces;
-Diseño Web depende de Diseño y Redes Sociales de Marketing Digital. Se
-reclasificaron 11 posts reales, se enviaron 20 posts Ohio demo a papelera, se
-retiraron 15 categorías descartadas y Marketing Digital quedó como default.
-Los cambios de URL tienen redirects explícitos y los demo retirados, `410`.
-
-La copia `251875` de Demo 35 está publicada con `noindex` como superficie de
-trabajo; la fuente `225984` y `/blog/` permanecen sin cutover. PDR, contrato,
-manual y skills WordPress Codex/Claude fijan que jerarquía no equivale a
-prominencia y que los 15 widgets deben reconectarse a contenido real antes de
-publicar. [Estado y pendientes](docs/audits/public-site/2026-08-31-blog-taxonomy-demo35-work-copy.md).
-
-## 2026-08-31 — Las páginas misceláneas dejan de ser “una 404” y ganan ownership
-
-Discovery live confirmó que Ohio padre gobierna 404, búsqueda/no-results y archivos; Elementor Theme Builder
-no tiene templates/conditions especiales activos. Se creó el contrato child-theme-first, el comportamiento
-funcional, el runbook, el registro de primitive propuesto y las rutas en skills WordPress/SEO. La política separa
-recovery, búsqueda, archivos editoriales y chrome global, con HTTP/robots/canonical por query type. No hubo
-mutación ni publicación. Persisten P0: contenido público `(Borrador)`, search vacío con 154 resultados y enlaces
-demo/rotos globales. [Discovery y límites](docs/audits/public-site/2026-08-31-wordpress-miscellaneous-surfaces-discovery.md).
-
-## 2026-08-31 — Content Marketing: cierre técnico focal en producción
-
-El stage ya aplica el mismo gate de alto/ancho al cargar y redimensionar; 1440×650 conserva los
-siete capítulos en flujo. Se corrigieron contrastes de estados y badges con variantes de la paleta
-aprobada. Despliegue WordPress limitado a JS/CSS con backup, hashes y readback de documento intacto.
-Nuevo verificador recorre pin, capítulos, tabs/cortes, mobile/reduced-motion/JS-off y contraste;
-smoke seguro separa rechazos reales, ledger vacío y un evento GA4 explícitamente sintético.
-[Evidencia y límite Turnstile/Realtime](docs/audits/public-site/2026-08-31-content-marketing-technical-closure.md).
-
-## 2026-08-31 — Cobertura Efeonce incorpora Estados Unidos y Contacto corrige su fuente institucional
-
-La cobertura vigente queda en Chile, Estados Unidos, Colombia, México y Perú, sin inferir oficina ni entidad
-legal por mercado. Contexto de negocio, posicionamiento público, primitives y skills espejadas apuntan al
-mismo estado. El brief de Contacto usa la dirección y los dos teléfonos de la contraportada canónica y marca
-como desactualizados Las Bellotas, el teléfono público anterior y las listas de cuatro mercados. `TASK-1801` quedó registrada con contratos visual/flow/motion, routing, privacidad, Meetings y rollout; esta edición no publicó WordPress ni amplió métricas históricas de clientes.
-[Brief y límites](docs/public-site/CONTACT_PAGE_REBUILD_BRIEF_V1.md).
-
-## 2026-08-31 — Home: cierre editorial y mantenimiento nativo
-
-Ocho revisiones publicadas: hero desafiante, beneficios concretos, comparación cualitativa, FAQ
-con jerarquía tipográfica y encabezado Con + logo. Readback 17 widgets/407 campos/seis repeaters;
-doce archivos coinciden local/remoto. Subagente concilió planes, snapshots y evidencia.
-Contratos técnico/funcional/manual y skills WordPress/copywriting espejadas actualizados;
-commit documental, sin runtime hermano ni WIP SEO previo. QA residual y TASK-1358 siguen abiertos.
-[Cierre y límites](docs/audits/public-site/2026-08-31-home-editorial-closure.md).

@@ -49,6 +49,8 @@
     "hiring:publish-vacancy": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/hiring/publish-vacancy.ts",
     "identity:internal-access:reconcile": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/identity/reconcile-internal-authority.ts",
     "identity:external-access:smoke": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/identity/external-access-smoke.ts",
+    "identity:external-canary:cleanup": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/identity/external-canary-cleanup.ts",
+    "identity:external-canary:readback": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/identity/external-canary-readback.ts",
     "email:resend:reconcile": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/email/reconcile-resend-deliveries.ts",
     "sister-platform:redirect": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/sister-platform-oauth-redirect-uris.ts",
     "globe:oauth-grants": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/update-globe-producer-oauth-grants.ts",
@@ -137,9 +139,11 @@
     "worker:deploy-path-gate": "node scripts/ci/worker-deploy-path-coverage-gate.mjs",
     "worker:build-contract-gate:test": "node --test scripts/ci/__tests__/worker-build-contract-gate.test.mjs",
     "auth-server:brand-assets:generate": "npx tsx scripts/auth-server/generate-brand-assets.ts",
+    "auth-server:dev-ui": "npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/dev-ui-server.ts",
     "auth-server:oauth-store:smoke": "npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/oauth-store-smoke.ts",
     "auth-server:register-client": "npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/register-oauth-client.ts",
     "auth-server:person-auth:canary": "npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/person-auth-canary.ts",
+    "auth-server:external-passkey:canary": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/external-passkey-canary.ts",
     "auth-server:person-auth:smoke": "npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/person-auth-smoke.ts",
     "auth-server:register-issuer-environment": "npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/register-issuer-environment.ts",
     "auth-server:rotate-key": "npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/rotate-signing-key.ts",
@@ -346,7 +350,9 @@
     "mcp:manifest:check": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ci/mcp-tool-manifest-artifact.ts",
     "mcp:skills:generate": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ci/mcp-skill-catalog-artifact.ts --write",
     "mcp:skills:check": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ci/mcp-skill-catalog-artifact.ts",
-    "mcp:selection-eval": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/mcp/tool-selection-eval.ts"
+    "mcp:selection-eval": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/mcp/tool-selection-eval.ts",
+    "auth-server:verify-contrast": "node scripts/auth-server/verify-contrast.mjs",
+    "auth-server:verify-passkey": "node scripts/auth-server/verify-passkey-lane.mjs"
   },
   "lint-staged": {
     "*.{ts,tsx,mjs,mts,js,jsx}": [

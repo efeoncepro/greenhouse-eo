@@ -1,4 +1,14 @@
+import { GH_AUTH_SERVER } from './auth-server'
+
 export const AUTH_STEP_UP_COPY = {
+  /**
+   * TASK-1835 — Aviso al gastar un código de respaldo. Derivado del SSOT (`auth-server.ts`), no
+   * transcrito: este archivo ya arrastraba un juego de textos paralelo al del emisor y de ahí salió
+   * un copy muerto que nadie renderizaba.
+   */
+  backupUsedTitle: GH_AUTH_SERVER.totp_backup_used_title,
+  backupRemaining: GH_AUTH_SERVER.totp_backup_remaining,
+  backupContinue: GH_AUTH_SERVER.totp_backup_continue_cta,
   codeLabel: 'Código de tu aplicación o código de respaldo',
   setupCode: 'Código de tu aplicación de autenticación',
   verify: 'Verificar código',
@@ -9,6 +19,7 @@ export const AUTH_STEP_UP_COPY = {
   secret: 'Clave de configuración manual',
   qr: 'Código QR para tu aplicación de autenticación',
   backups: 'Códigos de respaldo',
+  backupsWarning: GH_AUTH_SERVER.totp_backup_codes_body,
   saved: 'Guardé mis códigos de respaldo',
   confirm: 'Confirmar configuración',
   cancel: 'Volver a la solicitud',

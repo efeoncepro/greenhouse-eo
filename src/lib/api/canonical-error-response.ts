@@ -65,6 +65,10 @@ export type CanonicalErrorCode =
   | 'external_access_invitation_expired'
   | 'external_access_identity_collision'
   | 'external_access_limit_reached'
+  | 'external_canary_not_registered'
+  | 'external_canary_expired'
+  | 'external_canary_capability_not_allowed'
+  | 'external_canary_cleanup_blocked'
   | 'auth_server_invalid_request'
   // Design System Figma node linking (TASK-1072).
   | 'invalid_figma_url'
@@ -303,7 +307,29 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   // TASK-1837 — topes de reenvío por cadena y de asientos del administrador delegado.
   external_access_limit_reached: {
     status: 422,
-    message: 'Se alcanzó el tope de invitaciones para esta organización. Revisa las invitaciones abiertas o pide a Efeonce que amplíe el cupo.',
+    message:
+      'Se alcanzó el tope de invitaciones para esta organización. Revisa las invitaciones abiertas o pide a Efeonce que amplíe el cupo.',
+    actionable: false
+  },
+  // TASK-1832 — errores fail-closed del fixture sintético; nunca revelan subject, correo o token.
+  external_canary_not_registered: {
+    status: 404,
+    message: 'No existe una registración canary exacta para esta operación.',
+    actionable: false
+  },
+  external_canary_expired: {
+    status: 410,
+    message: 'La registración canary está revocada o vencida. Crea un fixture nuevo si corresponde.',
+    actionable: false
+  },
+  external_canary_capability_not_allowed: {
+    status: 403,
+    message: 'La capability solicitada no está permitida para el carril canary.',
+    actionable: false
+  },
+  external_canary_cleanup_blocked: {
+    status: 409,
+    message: 'El fixture canary conserva referencias o autoridad y todavía no se puede eliminar.',
     actionable: false
   },
   // TASK-1829 — Commands del authorization server propio (clientes OAuth, consentimientos).
@@ -813,7 +839,8 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   // al proveedor. Reintentar no resuelve (el tope es configuración, no un blip).
   seo_prospect_cost_blocked: {
     status: 429,
-    message: 'El costo previsto del diagnóstico supera el tope autorizado. No se realizó ninguna consulta al proveedor.',
+    message:
+      'El costo previsto del diagnóstico supera el tope autorizado. No se realizó ninguna consulta al proveedor.',
     actionable: false
   },
   seo_prospect_diagnostic_not_found: {

@@ -19,6 +19,9 @@ export const buildExternalGrantId = () => `xcg-${randomUUID()}`
 export const buildExternalInvitationId = () => `xmi-${randomUUID()}`
 export const buildExternalAuditId = () => `xal-${randomUUID()}`
 export const buildExternalResolutionId = () => `xrl-${randomUUID()}`
+export const buildExternalCanaryRegistrationId = () => `xcr-${randomUUID()}`
+export const buildExternalCanaryOrganizationId = () => `org-${randomUUID()}`
+export const buildExternalCanaryOrganizationPublicId = () => `EO-CANARY-${randomUUID()}`
 
 export const sha256Hex = (value: string) => createHash('sha256').update(value).digest('hex')
 
