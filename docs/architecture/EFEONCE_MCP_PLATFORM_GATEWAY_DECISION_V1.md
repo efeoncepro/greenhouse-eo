@@ -534,6 +534,37 @@ descartadas con su motivo, y los cuatro tratamientos a 48/32/24 px sobre lista c
 fondo con color) vive como lienzo de diseño; el isotipo no se alteró en ninguno: la geometría se
 extrae de `isotipo-efeonce-negativo.svg` y se inyecta sin editar.
 
+### Delta 2026-09-06 — `efeonce.mcp.identity.write`: el primer scope que Entra NO emite
+
+`TASK-1837` federó la lane de identidad delegada: `identity.invitation.create` (write) e
+`identity.invitations.list` (read). El provider monta sobre la config del provider SEO — misma lane
+ecosystem, misma identidad de servicio — igual que `greenhouse-skills`; Greenhouse gatea la lane con
+`EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` (404 anti-oráculo ⇒ `policy_blocked` en el gateway).
+
+El scope `efeonce.mcp.identity.write` se anuncia en `scopes_supported` y **no existe en la app de
+recurso de Entra**. Verificado el 2026-09-06 con `az ad app show`: esa app define cinco scopes y ése
+no está entre ellos.
+
+**Eso es correcto, no drift.** Lo acuña el **emisor nativo** (`auth.efeonce.org`), que lo declara en
+su catálogo (`src/lib/auth-server/oauth/scopes.ts`) junto a los otros writes. La clase que representa
+es «administrar a las personas de MI organización», y su sujeto es una persona externa del cliente
+que se autentica contra Efeonce ID — no contra el tenant de Entra. Es el primer caso donde **el
+emisor decide qué clase de actor puede ejercer una capacidad**: Entra es el carril interno, el nativo
+el del cliente externo. El string del scope es el mismo en ambos lados a propósito (el gateway
+verifica un solo nombre), pero sólo uno de los dos emisores puede emitirlo.
+
+🔴 **NUNCA lo "arregles" agregándolo a Entra.** Quien compare `scopes_supported` contra la app de
+recurso va a ver un hueco y va a querer cerrarlo. Cerrarlo por ahí significa crear un scope que
+ningún token interno debería portar o —peor— cablearlo al cliente público compartido, que es lo que
+prohíbe la sección de arriba. Verificado el mismo día: ese cliente sigue con exactamente **tres
+scopes de lectura** (`efeonce.mcp.read`, `globe.read`, `hiring.read`) y ningún write.
+
+La versión del gateway, su composición `semver+<sha>` y el gate que exige moverla cuando la
+superficie cambia NO se repiten acá: viven en
+[`MCP_TOOL_SURFACE_INVARIANTS.md`](agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md) §9 y, del lado
+operativo, en el runbook (`GATEWAY_BUILD_SHA` de la revisión activa debe coincidir con el HEAD de
+`origin/main`, o hay commits mergeados sin desplegar).
+
 ## References
 
 - [MCP Specification 2026-07-28](https://modelcontextprotocol.io/specification/2026-07-28)
