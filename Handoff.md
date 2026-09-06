@@ -34,13 +34,14 @@ Tres subagentes actualizaron contratos, funcionales, manuales, tasks/epic y skil
 PR225 está certificado: main `08acfb2c6`, run `34000876213`, manifest released sin override.
 Canary MCP real: emisión, lectura propia, aislamiento y revocación en 6.633 s; refresh y rollback
 medidos. Piloto gv5, vencimiento original 2026-09-12T15:00Z, señales unaudited/mixed cero.
-El fix directo `21aa12608` ya está servido: auth `00030-rtm`, deploy `34002082020` success,
-flags OAuth/personas/interno ON, Microsoft visible y clic correcto en `/login` público a1440/390.
-**PR226 sigue abierto:** no es promoción certificada a main ni nuevo canary humano directo completo.
+El fix directo quedó promovido por PR226 a main `456d9accf`: release `456d9accffb6-3b09047e-c37f-4ac7-acbc-0e463e1610fd`,
+run `34005056894` success, auth `00032-h45` Ready100% y cinco servicios con el SHA exacto.
+Flags OAuth/personas/interno ON; Microsoft visible y clic correcto en `/login` público a1440/390.
 Gateway `00036-5wc` sigue Ready100%, nativo/interno ON. Próximos pasos: reconciliar alcance del PR
 antes de promover (Claude añadió TASK1837 después del corte21aa), probar retorno humano `/auth/session`
 y logout; completar matrices externas/multicontexto y WebKit con los owners. No extender el piloto.
-Este barrido es documental y sólo se commitea; no publica ni modifica autoridad o runtime.
+El primer run `34004535327` quedó aborted por un deploy concurrente de develop; el retry se hizo sin bypass
+tras drenar esa carrera. No existe todavía un nuevo canary humano directo completo.
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 

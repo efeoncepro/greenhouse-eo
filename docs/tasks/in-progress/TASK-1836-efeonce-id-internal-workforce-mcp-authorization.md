@@ -1100,12 +1100,15 @@ sin hallazgos de seguridad. La publicación e inicio SSO públicos se verificaro
 
 ## Estado vigente de la entrada directa — 2026-09-06
 
-La reparación `21aa12608` está servida desde `develop` en `auth-server-00030-rtm`,
-[deploy 34002082020](https://github.com/efeoncepro/greenhouse-eo/actions/runs/34002082020) exitoso.
+La reparación `21aa12608` fue promovida por PR226 a main `456d9accf` y está servida en
+`auth-server-00032-h45`, Ready100% con `GIT_SHA=456d9accffb69458f43a3336dcfec3d068d18cd1`.
 El servicio compartido ya muestra el botón Microsoft existente de Claude en `/login` sin `return_to`;
 se verificó a 1440 y 390 px y el clic llegó a Microsoft. No se diseñó otro botón.
-[PR #226](https://github.com/efeoncepro/greenhouse-eo/pull/226) sigue abierto: este cambio servido
-no equivale a una nueva promoción certificada a `main`. PR #225 sí tiene release certificado.
+[PR #226](https://github.com/efeoncepro/greenhouse-eo/pull/226) quedó fusionado y certificado por el
+[run 34005056894](https://github.com/efeoncepro/greenhouse-eo/actions/runs/34005056894), manifest
+`456d9accffb6-3b09047e-c37f-4ac7-acbc-0e463e1610fd` en `released`, cinco servicios sincronizados y watchdog `ok`.
+El primer run `34004535327` preserva estado aborted: un push concurrente a develop reemplazó revisiones y
+el verificador de `GIT_SHA` bloqueó el cierre; el retry se ejecutó sin bypass después de drenar la carrera.
 No se completó un nuevo canary humano del retorno directo hasta `/auth/session`; no usar la prueba
 MCP anterior como evidencia de ese recorrido. La prueba pública acredita visibilidad e inicio SSO.
 

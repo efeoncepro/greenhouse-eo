@@ -24,10 +24,12 @@ federación de la lane delegada en el gateway. Skills actualizadas (espejo `.cla
 
 ## 2026-09-05 — Efeonce ID: acceso Microsoft y publicación certificados
 
-Corrección posterior `21aa12608` desplegada en auth `00030-rtm` (run `34002082020` success):
+Corrección posterior `21aa12608` promovida por PR226 a main `456d9accf`, auth `00032-h45` y
+manifest `456d9accffb6-3b09047e-c37f-4ac7-acbc-0e463e1610fd` released (run `34005056894` success):
 `/login` directo reutiliza el botón de Claude y retorna a sesión autenticada; 235 pruebas pasan.
 Botón visible y clic hacia Microsoft verificados en público a1440/390; nuevo canary humano directo
-pendiente, PR226 aún abierto. Barrido de tres subagentes consolida TASK1836+1831 en ADRs, docs
+pendiente. Un primer run quedó aborted por deploys concurrentes de develop; el retry cerró sin bypass,
+cinco servicios con el SHA exacto y watchdog `ok`. Barrido de tres subagentes consolida TASK1836+1831 en ADRs, docs
 funcionales, manuales, runbook, tasks/epic, skills espejo e invariantes. [Evidencia y límites](docs/audits/2026-09-06-task-1836-1831-consolidated-evidence.md).
 
 PR225 integra las reparaciones OIDC, lector de consentimiento interno y origen/CSP del formulario.
