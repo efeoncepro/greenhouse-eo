@@ -1,27 +1,22 @@
 # Handoff activo
 
 **TASK-1832 — rollout oscuro desplegado; fixture root + M365 provisionados, gates OFF (Codex,
-2026-09-06):** Greenhouse implementa purpose `customer|canary`, registry temporal, guards DB/commands, APIs,
-gates default OFF, perfiles exclusivamente `smoke_test`, exclusión de Person/Account 360, refresh/introspection
-con revalidación y cleanup con censo dinámico de FKs + migrator + readback cero. El gateway hermano tiene cambios
-desplegados para admitir canary sólo en `get_seo_entitlement`, con gate independiente: commit `8438c5fa87ed`,
-revisión `efeonce-mcp-gateway-00041-7dq`, CI 152/152 sin skips, `MCP_NATIVE_EXTERNAL_CANARY_ENABLED=false`.
-Auth-server compatible `dbeaef62de54`, revisión `auth-server-00034-85c`, gate `false`; staging Vercel compatible
-READY. El manifiesto se versionó antes del primer write; organización dedicada
-`org-602d7057-7fd5-47e7-b73b-21892e3f06e7`, registro `xcr-48dacd1f-…` y binding canary `xob-cd920afa-…` nacieron
-por commands. Readback agregado: registry/binding `1/1`, purpose drift `0/0`, Person 360 `0`; cleanup dry-run
-contó sólo referencias esperadas y se negó correctamente por root/authority activos.
+2026-09-06):** Consumers compatibles desplegados con gates independientes OFF: auth-server `dbeaef62de54` /
+`00034-85c`; gateway `8438c5fa87ed` / `00041-7dq` (152/152); Vercel staging READY. El manifiesto versionado
+registra la organización dedicada, registry y binding canary creados por commands. Readback: `1/1`, purpose drift
+`0/0`, Person 360 `0`; el primer cleanup dry-run sólo encontró referencias esperadas y se negó por authority
+activa. IDs completos, postura y contrato de retiro:
+`docs/audits/mcp/TASK-1832_CANARY_ASSET_MANIFEST_task-1832-canary-20260906-a.md`.
 
 **Cohorte M365 ligada; sesión aún pendiente:** el operador eligió el alias preexistente
 `m***@efeoncepro.com`, accesible como buzón compartido. La invitación `xmi-b7cfc54e-…` se entregó, quedó visible y
 se aceptó mediante el POST scanner-safe a 20:15:37Z. Creó exclusivamente el profile `EO-ID0651`,
-`data_origin=smoke_test`, y su source link de login; el agregado subió de 30 a 31 perfiles smoke mientras Person
-360 permaneció en `0`. El magic link `auth_server_magic_link` quedó `delivered` a 20:15:46Z, pero la sesión aún no
-se creó porque el Mac se bloqueó antes de abrirlo. El grant personal exacto `xcg-4e5b6ad7-…` para
-`growth.seo.observation.read` fue creado por el command canónico; binding gv `2`, audit append-only presente. La
+`data_origin=smoke_test`, y su source link; el agregado subió a 31 mientras Person 360 permaneció en `0`. El magic
+link quedó `delivered` a 20:15:46Z, pero el Mac se bloqueó antes de abrirlo. El grant personal exacto
+`xcg-4e5b6ad7-…` para `growth.seo.observation.read` quedó activo; binding gv `2` y audit presente. La
 invitación plus-address previa `xmi-697bc1d8-…` sigue revocada sin aceptación. Google sigue separado:
 `greenhouse.cl` anuncia MX de Google, pero Admin exige reautenticación antes de confirmar o provisionar el buzón
-gobernado. Gates siguen OFF; producción no se promueve hasta cerrar staging conforme al orden duro de la task.
+gobernado. Gates siguen OFF; producción no se promueve hasta cerrar el gate de staging.
 La CI de `6634c3973` falló sólo porque el smoke OAuth nuevo usaba `page.goto` directo; el fix local usa
 `gotoWithTransientRetries` y su gate focal está verde, todavía sin push. Higiene: `vercel list` imprimió un cursor
 sensible; no se reutilizó ni se documentó su valor y debe rotarse si Vercel confirma que es credencial

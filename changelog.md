@@ -864,17 +864,3 @@ Regla nueva `stale-progress` en `task:lint`: avisa cuando el estado declarado co
 de commits, y cuando una task se cierra sin tildar una sola evidencia. Warning por diseño y por
 medición (414 de 975 completas están así); acotada a las que tienen commits de implementación, la
 señal cae a 28 tasks.
-
-## 2026-08-31 — Blog WordPress sanea categorías y abre una copia gobernada de Demo 35
-
-La taxonomía live quedó reducida a 13 categorías reales: AEO y SEO son raíces;
-Diseño Web depende de Diseño y Redes Sociales de Marketing Digital. Se
-reclasificaron 11 posts reales, se enviaron 20 posts Ohio demo a papelera, se
-retiraron 15 categorías descartadas y Marketing Digital quedó como default.
-Los cambios de URL tienen redirects explícitos y los demo retirados, `410`.
-
-La copia `251875` de Demo 35 está publicada con `noindex` como superficie de
-trabajo; la fuente `225984` y `/blog/` permanecen sin cutover. PDR, contrato,
-manual y skills WordPress Codex/Claude fijan que jerarquía no equivale a
-prominencia y que los 15 widgets deben reconectarse a contenido real antes de
-publicar. [Estado y pendientes](docs/audits/public-site/2026-08-31-blog-taxonomy-demo35-work-copy.md).
