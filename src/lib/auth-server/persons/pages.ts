@@ -157,11 +157,12 @@ export const renderAccessRevokedPage = (): string =>
   <p>${escapeHtml(GH_AUTH_SERVER.link_access_revoked_body)}</p>`
   )
 
-export const renderSessionStartedPage = (): string =>
+export const renderSessionStartedPage = (input: { direct?: boolean } = {}): string =>
   layout(
     GH_AUTH_SERVER.session_started_title,
     `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.session_started_title)}</h1>
-  <p>${escapeHtml(GH_AUTH_SERVER.session_started_body)}</p>`
+  <p>${escapeHtml(input.direct ? GH_AUTH_SERVER.session_direct_body : GH_AUTH_SERVER.session_started_body)}</p>
+  ${input.direct ? `<form method="post" action="${PERSON_AUTH_PATHS.logout}"><div class="id-actions"><button class="id-secondary" type="submit">${escapeHtml(GH_AUTH_SERVER.session_logout_cta)}</button></div></form>` : ''}`
   )
 
 export const renderSessionClosedPage = (): string =>

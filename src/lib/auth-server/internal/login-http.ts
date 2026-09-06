@@ -1,3 +1,4 @@
+import { INTERNAL_LOGIN_SESSION_PATH } from './login-target'
 import { internalLoginFailureResponse } from './login-error-page'
 /** TASK-1836 — browser-bound corporate login; identity/session writes belong to the injected command. */
 import { jsonResponse, redirectResponse, type OAuthHttpRequest, type OAuthHttpResponse } from '../oauth/http'
@@ -71,7 +72,7 @@ export const createInternalLoginHandler =
       }
 
       if (request.url.pathname === '/auth/internal/login') {
-        const start = await deps.flow.start(singleParam(request.url.searchParams, 'return_to'))
+        const start = await deps.flow.start(request.url.searchParams.has('return_to') ? singleParam(request.url.searchParams, 'return_to') : INTERNAL_LOGIN_SESSION_PATH)
         const response = redirectResponse(start.location)
 
         response.headers['Set-Cookie'] =

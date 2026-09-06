@@ -7,6 +7,19 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-05 — Efeonce ID: acceso Microsoft y publicación certificados
+
+Corrección posterior en curso: `/login` directo ocultaba el botón existente de Microsoft. Se reutiliza
+el botón de Claude y se añade retorno fijo a sesión autenticada;235 tests pasan, publicación pendiente.
+
+PR225 integra las reparaciones OIDC, lector de consentimiento interno y origen/CSP del formulario.
+Release `08acfb2c6`, run `34000876213`, manifest `released` sin override. CI, Deep, smoke,
+Vercel Production y health aprobados; watchdog operativo 5/5, drift0. Canary final sobre gateway36:
+emisión de token, lectura propia, rechazo de otra organización y revocación efectiva en6.633s.
+El piloto conserva gv5 y su vencimiento original; todos los tokens de prueba quedaron revocados.
+No se declaran completas las matrices externas/multicontexto ni UI/WebKit. Evidencia:
+[TASK-1836](docs/tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md).
+
 ## 2026-09-05 — MCP gateway: cartel propio del servidor (title, websiteUrl, íconos Efeonce)
 
 El gateway se anunciaba como `efeonce-mcp 0.1.0` sin título, sitio ni ícono. Declara ahora su
@@ -879,44 +892,3 @@ simulado del export. Despliegue acotado por hashes, respaldo durable y verificac
 teclado, reduced motion, rechazo de captcha y guardado nativo de Elementor. Sin commit/push.
 [Contrato](docs/architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md) ·
 [Audit](docs/audits/public-site/2026-08-30-hubspot-elementor-publication.md).
-
-## 2026-08-30 — TASK-1358: Home modular Elementor promovida con respaldo
-
-Revisión SEO/AEO: título/descripción y OG/Twitter propios en Yoast, dos Media HTTP → HTTPS;
-grafo existente conservado sin duplicaciones. [Audit y límites](docs/audits/public-site/2026-08-30-home-seo-aeo.md).
-Aprendizajes consolidados en skills SEO/AEO y WordPress, espejadas Codex/Claude: metadatos sin forzar H1,
-dueño único de grafo, retiro de FAQ rich results, alcance llms.txt y pruebas CMS/HTML/GSC diferenciadas.
-
-Por instrucción posterior del operador, la página `251731` ya sirve `/`: menu Home y SEO/canonical/index
-actualizados, diseño/copy/header/footer intactos; antigua Home `2791` conservada noindex. Snapshot
-`_gh_home_cutover_20260830_162109`. Se aplicaron después los seis comentarios visuales: contraste corregido,
-10 piezas recuperadas, isotipo HubSpot de Simple Icons, Logo Marquee compartido y agenda horizontal sin
-formulario, enlazada al calendario vigente. QA 1280/890/390; copy/claims/editor UI siguen pendientes.
-[Evidencia](docs/audits/public-site/2026-08-30-home-visual-review.md).
-Segunda revisión: contraste de Ecosistema, CTA teal editable, FAQ con CTA integrado y layout tablet
-sin sticky, e isotipo correcto también en Respaldo oficial. Sin reescribir documento ni header/footer.
-Tercera revisión: hover nativo Ohio sin cubrir el CTA, FAQ sin mail, cierre de tabla moderado, sprocket CRM,
-halos sin cortes e isotipo hero proporcional. Cambios de contenido guardados vía Elementor; QA responsive/hover PASS.
-Cuarta revisión: HubSpot CRM teal con hover blanco; isotipos oficiales negativos de Greenhouse/Globe mediante
-Media nativo. Tres comentarios publicados y comprobados en 390/890/1280; copys y header/footer sin cambios.
-Quinta revisión: Kortex/Wave oficiales, Verk retirado y aviso oculto; logos reales del hero con microinteracción
-original restaurada, y bucle de trabajos con cobertura por viewport. Snapshot `190751`; 415 campos/7 repeaters.
-Rótulos narrativos: «El costo de trabajar por separado» y «Un equipo. Una misma dirección.» sustituyen notas
-del wireframe en dos controles Elementor; snapshot `192130`, resto del contenido y estilo intactos.
-Servicios enlaza cuatro landings verificadas mediante URL nativa por fila; ocho tarjetas siguen estáticas.
-Snapshot `192809`; reparación del default URL, pruebas de renderer y navegación real documentadas en audit.
-Casos se convierte en CTA navy compacto → `/portafolio/`, cinco campos nativos; tarjetas/cifras retiradas.
-Snapshot `194253`, backup runtime `194241`; 415 campos/6 repeaters; hover, móvil y clic verificados.
-Hero «Mira cómo operamos» abre showreel YouTube en dialog navy responsive; URL nativa, carga sólo al clic,
-destrucción del player al cerrar, alternativa YouTube. Snapshot `195821`, backup `195756`; 414 campos.
-Reproducción live, cierre X/exterior, foco de retorno y reduced motion verificados; teclado del iframe no certificado.
-
-Consolidación documental con tres subagentes: contrato técnico, funcional, manual y skills espejadas;
-task/índices/contexto reconciliados con PDR-010 y la Home actual. Plan y handoff previos preservados como
-historia, no instrucciones vigentes. Readback independiente 17 widgets/414 campos raíz/6 repeaters,
-tests PHP/lifecycle/geometría PASS; QA del editor, teclado del player y claims globales siguen abiertos.
-Sin cambios live en esta consolidación. [Audit](docs/audits/public-site/2026-08-30-home-documentation-consolidation.md).
-
-Checkpoint de construcción anterior a la promoción:
-
-Se auditó el ZIP y se portó el cuerpo de Claude Design a `https://efeoncepro.com/home-claude-design-preview/` (`251731`, noindex), preservando el header/footer Ohio y Home `2791`. Tras la corrección solicitada por el operador, usa 17 widgets semánticos Elementor con controles editables y siete repeaters, **cero widgets HTML**. Assets condicionales y ciclo de vida idempotente; adaptación móvil del motor sin superposiciones. Tests PHP/JS y frontend 1440/390, reduced motion, filtros/FAQ/modal/foco pasan. Editor visual save/reload pendiente de login; media de 12 slots, copy/claims, captación y cutover siguen pendientes. [Contrato y manuales](docs/architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md).

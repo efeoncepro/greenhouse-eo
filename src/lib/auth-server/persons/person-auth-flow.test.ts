@@ -127,12 +127,13 @@ const buildHarness = (
 const request = (
   method: string,
   path: string,
-  options: { body?: string; form?: boolean; cookie?: string; ip?: string } = {}
+  options: { body?: string; form?: boolean; cookie?: string; ip?: string; accept?: string } = {}
 ): OAuthHttpRequest => ({
   method,
   url: new URL(path, ISSUER),
   headers: headersFromRecord({
     origin: ISSUER,
+    accept: options.accept ?? 'application/json',
     'content-type': options.form ? 'application/x-www-form-urlencoded' : 'application/json',
     'x-forwarded-for': options.ip ?? '203.0.113.10',
     ...(options.cookie ? { cookie: options.cookie } : {})
@@ -435,6 +436,39 @@ describe('sesión — vida y muerte', () => {
     expect(body.subjectRef).toBe(sha256(SUBJECT).slice(0, 32))
   })
 
+  it.each(['magic_link', 'entra_oidc'] as const)('shows the authenticated HTML landing and logout for %s', async method => {
+    const harness = buildHarness({ internalLoginEnabled: true })
+    const cookie = await openSession(harness)
+
+    for (const session of harness.store.sessions.values()) session.amr = [method]
+    const page = await harness.handler(request('GET', '/auth/session', { cookie, accept: 'text/html' }))
+
+    expect(page?.status).toBe(200)
+    expect(page?.headers['Content-Type']).toContain('text/html')
+    expect(page?.headers.Vary).toBe('Accept')
+    expect(page?.body).toContain('Tu sesión de Efeonce ID está activa')
+    expect(page?.body).toContain('action="/auth/session/logout"')
+    expect(page?.body).not.toContain(SUBJECT)
+    expect(page?.body).not.toContain('subjectRef')
+    const api = await harness.handler(request('GET', '/auth/session', { cookie, accept: 'text/html;q=0,application/json' }))
+
+    expect(JSON.parse(api!.body).status).toBe('authenticated')
+    await harness.handler(request('POST', '/auth/session/logout', { cookie, form: true }))
+    const revoked = await harness.handler(request('GET', '/auth/session', { cookie, accept: 'text/html' }))
+
+    expect(revoked?.status).toBe(401)
+    expect(revoked?.body).toContain('Continuar con Microsoft')
+    expect(revoked?.body).not.toContain('Tu sesión de Efeonce ID está activa')
+  })
+
+  it('never displays an active session for an anonymous browser', async () => {
+    const page = await buildHarness({ internalLoginEnabled: true }).handler(request('GET', '/auth/session', { accept: 'text/html' }))
+
+    expect(page?.status).toBe(401)
+    expect(page?.body).not.toContain('Tu sesión de Efeonce ID está activa')
+    expect(page?.body).toContain('href="/auth/internal/login"')
+  })
+
   it('revocar el source link mata la sesión EN EL SIGUIENTE request', async () => {
     const harness = buildHarness()
     const cookie = await openSession(harness)
@@ -639,6 +673,16 @@ describe('ergonomía del navegador', () => {
     expect(response?.headers['Content-Type']).toContain('text/html')
     expect(response?.body).toContain('method="post"')
     expect([...harness.store.magicLinks.values()][0]?.consumedAt).toBeNull()
+  })
+
+  it('offers Microsoft on direct login without inventing an OAuth client or return', async () => {
+    const page = await buildHarness({ internalLoginEnabled: true }).handler(request('GET', '/login'))
+
+    expect(page?.status).toBe(200)
+    expect(page?.body).toContain('href="/auth/internal/login"')
+    expect(page?.body).toContain('Continuar con Microsoft')
+    expect(page?.body).not.toContain('name="return_to"')
+    expect((await buildHarness().handler(request('GET', '/login')))?.body).not.toContain('/auth/internal/login')
   })
 
   it('offers corporate login only when enabled with a safe OAuth return, preserving all parameters', async () => {

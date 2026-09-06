@@ -6,6 +6,8 @@ import { randomBytes } from 'node:crypto'
 
 import { createRemoteJWKSet, errors, jwtVerify, type JWTVerifyGetKey } from 'jose'
 
+import { internalLoginReturnTarget } from './login-target'
+
 import { sha256Hex, safeEquals } from '../oauth/primitives'
 
 export type EntraOidcConfig = { tenantId: string; clientId: string; issuer: string; redirectUri: string }
@@ -276,25 +278,9 @@ export const createInternalLoginFlow = (deps: {
 }) => ({
   start: async (returnTo: string) => {
     if (!deps.enabled()) throw new InternalLoginError('configuration_invalid')
-    let url: URL
+    const target = internalLoginReturnTarget(returnTo, deps.issuer)
 
-    try {
-      url = new URL(returnTo, deps.issuer)
-    } catch {
-      throw new InternalLoginError('transaction_invalid')
-    }
-
-    if (returnTo.length > 8192) throw new InternalLoginError('transaction_invalid')
-
-    if (
-      url.origin !== new URL(deps.issuer).origin ||
-      url.pathname !== '/oauth/authorize' ||
-      url.hash ||
-      url.username ||
-      url.password
-    ) {
-      throw new InternalLoginError('transaction_invalid')
-    }
+    if (!target) throw new InternalLoginError('transaction_invalid')
 
     const now = (deps.now ?? (() => new Date()))()
     const browserBinding = randomBytes(32).toString('base64url')
@@ -304,7 +290,7 @@ export const createInternalLoginFlow = (deps: {
       browserBindingHash: sha256Hex(browserBinding),
       nonce: randomBytes(32).toString('base64url'),
       codeVerifier: randomBytes(32).toString('base64url'),
-      returnTo: url.pathname + url.search,
+      returnTo: target,
       createdAt: now,
       expiresAt: new Date(now.getTime() + 600000)
     }
@@ -351,22 +337,9 @@ export const createInternalLoginFlow = (deps: {
       !safeEquals(transaction.browserBindingHash, sha256Hex(input.browserBinding))
     )
       throw new InternalLoginError('transaction_invalid')
-    let returnUrl: URL
+    const target = internalLoginReturnTarget(transaction.returnTo, deps.issuer)
 
-    try {
-      returnUrl = new URL(transaction.returnTo, deps.issuer)
-    } catch {
-      throw new InternalLoginError('transaction_invalid')
-    }
-
-    if (
-      returnUrl.origin !== new URL(deps.issuer).origin ||
-      returnUrl.pathname !== '/oauth/authorize' ||
-      returnUrl.hash ||
-      returnUrl.username ||
-      returnUrl.password
-    )
-      throw new InternalLoginError('transaction_invalid')
+    if (!target) throw new InternalLoginError('transaction_invalid')
 
     const identity = await deps.upstream.exchange({
       code: input.code,
@@ -384,6 +357,6 @@ export const createInternalLoginFlow = (deps: {
       throw new InternalLoginError('upstream_rejected', 'authentication_stale')
     if (!deps.enabled()) throw new InternalLoginError('configuration_invalid')
 
-    return { identity, returnTo: returnUrl.pathname + returnUrl.search }
+    return { identity, returnTo: target }
   }
 })

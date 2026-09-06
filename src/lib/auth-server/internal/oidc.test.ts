@@ -348,8 +348,12 @@ describe('corporate upstream identity', () => {
     transaction!.createdAt = new Date('invalid')
     await expect(flow.complete(input)).rejects.toThrow('transaction_invalid')
     input = await begin()
-    transaction!.returnTo = 'https://attacker.example/oauth/authorize'
-    await expect(flow.complete(input)).rejects.toThrow('transaction_invalid')
+
+    for (const unsafe of ['https://attacker.example/oauth/authorize', '/auth/session?next=/oauth/authorize', '/auth/session#x', '/auth/session/logout']) {
+      transaction!.returnTo = unsafe
+      await expect(flow.complete(input)).rejects.toThrow('transaction_invalid')
+    }
+
     expect(exchange).not.toHaveBeenCalled()
     input = await begin()
     authTime = new Date(NOW.getTime() - 61000)
@@ -364,7 +368,7 @@ describe('corporate upstream identity', () => {
     await expect(flow.start('/oauth/authorize')).rejects.toThrow('configuration_invalid')
   })
 
-  it('binds callback to browser, consumes once and prevents open redirects', async () => {
+  it.each(['/oauth/authorize?client_id=client-A', '/auth/session'])('binds %s callback to browser and consumes once', async target => {
     const records = new Map<string, InternalLoginTransaction>()
 
     const exchange = vi.fn(async () => ({
@@ -394,8 +398,11 @@ describe('corporate upstream identity', () => {
       upstream: { authorizationUrl: ({ state }) => `https://login.example?state=${state}`, exchange }
     })
 
-    await expect(flow.start('https://attacker.example/oauth/authorize')).rejects.toThrow('transaction_invalid')
-    const started = await flow.start('/oauth/authorize?client_id=client-A')
+    for (const unsafe of ['https://attacker.example/oauth/authorize', '/auth/session?next=/oauth/authorize', '/auth/session#x', 'https://auth.example/auth/session', '/auth/session/', '/auth/session/logout', '']) {
+      await expect(flow.start(unsafe)).rejects.toThrow('transaction_invalid')
+    }
+
+    const started = await flow.start(target)
     const state = new URL(started.location).searchParams.get('state')!
     const transaction = records.get(state)!
 
@@ -411,5 +418,6 @@ describe('corporate upstream identity', () => {
 
     expect(results.filter(r => r.status === 'fulfilled')).toHaveLength(1)
     expect(exchange).toHaveBeenCalledTimes(1)
+    expect(results.find(result => result.status === 'fulfilled')).toMatchObject({ value: { returnTo: target } })
   })
 })

@@ -54,6 +54,20 @@ describe('corporate login HTTP boundary', () => {
     expect(response?.headers['Cache-Control']).toBe('no-store')
   })
 
+  it('defaults only an absent continuation to the fixed session landing', async () => {
+    const f = fixture()
+
+    expect((await f.request('/auth/internal/login'))?.status).toBe(302)
+    expect(f.flow.start).toHaveBeenCalledWith('/auth/session')
+    f.flow.start.mockClear()
+
+    for (const query of ['return_to=', 'return_to=/auth/session&return_to=/oauth/authorize']) {
+      expect((await f.request('/auth/internal/login?' + query))?.status).toBe(400)
+    }
+
+    expect(f.flow.start).not.toHaveBeenCalled()
+  })
+
   it('uses only the stored return target and session command result', async () => {
     const f = fixture()
     const response = await f.request('/auth/internal/callback?state=state&code=code&return_to=https://attacker.example')
