@@ -791,6 +791,11 @@ allowlist, nunca de un literal). Los tres gates de workers (`worker:build-contra
 defecto (ledger), y `/readyz` 503 con el flag OFF no es un deploy fallido. Runbook:
 `docs/operations/runbooks/auth-server.md`.
 
+**Delta 2026-09-06 — transporte de flags del emisor.** Los gates runtime que varían por environment deben pasar
+explícitamente desde `vars.*` en `auth-server-deploy.yml` hacia `deploy.sh`; declarar sólo el default en el script
+los dejaría permanentemente apagados. `EXTERNAL_IDENTITY_CANARY_ENABLED` sigue `false` por ausencia y se activa
+únicamente mediante la variable del GitHub Environment más un deploy, con readback de la revisión Cloud Run.
+
 ## Delta 2026-09-04 — Release `9100bbd2765d`: primer release con 5 servicios, change-gate por servicio en el watchdog y gate `Production` case-sensitive
 
 Primer release que corrió el orquestador con los cinco deployables Cloud Run (PR #221 squash, run `33893120972`,

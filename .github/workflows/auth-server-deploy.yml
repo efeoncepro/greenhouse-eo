@@ -226,6 +226,7 @@ jobs:
         env:
           ENV: ${{ env.ENV }}
           AUTH_SERVER_INTERNAL_AUTH_ENABLED: ${{ vars.AUTH_SERVER_INTERNAL_AUTH_ENABLED || 'false' }}
+          EXTERNAL_IDENTITY_CANARY_ENABLED: ${{ vars.EXTERNAL_IDENTITY_CANARY_ENABLED || 'false' }}
           EXPECTED_SHA: ${{ steps.resolve-sha.outputs.expected_sha }}
 
       - name: Verify deployment health

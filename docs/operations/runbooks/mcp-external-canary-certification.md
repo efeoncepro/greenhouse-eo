@@ -41,6 +41,11 @@ Los dos gates son independientes y nacen `false`:
 El registry vacío conserva el carril cerrado aunque un gate se configure mal. Encender uno solo nunca es una
 degradación aceptable; debe observarse como deny.
 
+El SoT del flag del emisor es la variable `EXTERNAL_IDENTITY_CANARY_ENABLED` del GitHub Environment elegido por
+`auth-server-deploy.yml`; el workflow la pasa explícitamente a `deploy.sh`, cuyo `--set-env-vars` vuelve a
+publicar el conjunto completo. Cambiarla sin ejecutar el workflow no modifica Cloud Run. Un deploy posterior con
+la variable ausente vuelve a `false` por diseño. El valor se acredita leyendo la revisión servida, no sólo GitHub.
+
 Antes de crear datos deben cumplirse todos estos puntos:
 
 1. ADR aceptado, migraciones aplicadas y consumers compatibles desplegados con ambos gates OFF. El schema ya
