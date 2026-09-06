@@ -41,11 +41,11 @@ Una fila por asset. Los identificadores son IDs públicos/primarios no secretos.
 lo usa pero nunca lo elimina; `run_owned` significa que el command puede retirarlo sólo mediante este registro.
 
 | Sistema/tabla                                    | ID exacto                                   | Ownership        | Relación con la corrida  | Estado            | Acción de retiro      | Readback                            |
-| ------------------------------------------------ | ------------------------------------------- | ---------------- | ------------------------ | ----------------- | --------------------- | ----------------------------------- | ----------- |
+| ------------------------------------------------ | ------------------------------------------- | ---------------- | ------------------------ | ----------------- | --------------------- | ----------------------------------- |
 | `greenhouse_core.organizations`                  | `PENDIENTE`                                 | `run_owned`      | organización canary      | `planned`         | hard delete al final  | `PENDIENTE`                         |
 | `greenhouse_core.organization_lifecycle_history` | `conteo esperado: 0`                        | `forbidden`      | bloqueo de borrado       | `planned`         | nunca crear/borrar    | `PENDIENTE`                         |
 | `greenhouse_core.external_canary_registrations`  | `PENDIENTE`                                 | `run_owned`      | raíz del fixture         | `planned`         | revocar y eliminar    | `PENDIENTE`                         |
-| `greenhouse_core.external_identity_environments` | `PENDIENTE`                                 | `shared          | run_owned`               | issuer externo    | `planned`             | conservar salvo ownership exclusivo | `PENDIENTE` |
+| `greenhouse_core.external_identity_environments` | `PENDIENTE`                                 | `shared`         | issuer externo compartido | `planned`         | conservar             | `PENDIENTE`                         |
 | `greenhouse_core.external_organization_bindings` | `PENDIENTE`                                 | `run_owned`      | binding purpose canary   | `planned`         | revocar y eliminar    | `PENDIENTE`                         |
 | `greenhouse_core.external_capability_grants`     | `PENDIENTE`                                 | `run_owned`      | capability read-only     | `planned`         | revocar y eliminar    | `PENDIENTE`                         |
 | `greenhouse_core.external_member_invitations`    | `PENDIENTE`                                 | `run_owned`      | alta sintética           | `planned`         | revocar y eliminar    | `PENDIENTE`                         |
@@ -57,7 +57,7 @@ lo usa pero nunca lo elimina; `run_owned` significa que el command puede retirar
 | `greenhouse_auth.authorization_codes`            | `conteo; sin hash`                          | `run_owned`      | code PKCE                | `planned`         | expirar/eliminar      | `PENDIENTE`                         |
 | `greenhouse_auth.refresh_tokens`                 | `conteo; sin hash`                          | `run_owned`      | familia refresh          | `planned`         | revocar/eliminar      | `PENDIENTE`                         |
 | `greenhouse_auth.access_tokens`                  | `conteo; sin jti`                           | `run_owned`      | access tokens            | `planned`         | revocar/eliminar      | `PENDIENTE`                         |
-| sesiones/evidencia upstream                      | `conteo; sin hash`                          | `run_owned       | shared`                  | autenticación     | `planned`             | cerrar; proteger sesión compartida  | `PENDIENTE` |
+| sesiones/evidencia upstream                      | `conteo; sin hash`                          | `run_owned|shared` | autenticación           | `planned`         | cerrar; proteger sesión compartida  | `PENDIENTE` |
 | audit append-only identidad/OAuth                | `rango temporal + correlation_id redactado` | `retained_audit` | evidencia                | `planned`         | conservar sin FK      | `PENDIENTE`                         |
 
 Agregar cualquier asset descubierto antes de continuar. Un asset no inventariado deja el manifiesto en
