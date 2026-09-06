@@ -312,8 +312,10 @@ introspección runtime del server. El espejo **dejó de existir** (`TASK-1780`, 
 - **El deploy ya ocurrió.** `origin/main` de `efeonce-mcp` pasó de `8f1ae34` a `92e7197` (los dos
   commits que estaban locales sin pushear: `8215ab5` de TASK-1662 y `92e7197` de TASK-1699), CI
   verde, workflow "Deploy Cloud Run" run `33180234265` en `success` y sin compuerta de aprobación.
-- **Revisión activa: `efeonce-mcp-gateway-00024-8b8`** (`Ready=True`, 100% del tráfico, imagen
-  taggeada al SHA exacto `92e71971899c6468fc111f7614b89ea6602ac0aa`). Reemplaza a
+- **Revisión activa EN ESE MOMENTO: `efeonce-mcp-gateway-00024-8b8`** (`Ready=True`, 100% del tráfico, imagen
+  taggeada al SHA exacto `92e71971899c6468fc111f7614b89ea6602ac0aa`). ⚠️ Histórico: la vigente al 2026-09-06 es
+  `efeonce-mcp-gateway-00039-gz4`; la revisión del día se verifica siempre contra el servicio, nunca acá
+  (runbook §`Deploy del gateway — dispatch manual, nunca por push`). Reemplaza a
   `efeonce-mcp-gateway-00023-zt2`, que servía 21. La diferencia son exactamente 6 tools:
   `get_seo_provider_spend`, `get_seo_keyword_gap`, `declare_seo_competitors`,
   `retire_seo_competitors`, `get_seo_serp_top_results`, `get_seo_competitor_candidates`.

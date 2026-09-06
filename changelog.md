@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-06 — El gate de versión del gateway medía media superficie, y el scope nuevo no se anunciaba entero
+
+Dos defectos que sólo aparecieron al revisar lo construido, y que compartían la misma forma: un mecanismo que protegía menos de lo que su nombre sugería.
+
+El gate que obliga a mover la versión del gateway cuando cambia su lista de herramientas comparaba únicamente las que vienen federadas desde Greenhouse. Las que el gateway define por su cuenta no lo movían, así que dos herramientas nuevas crecieron el servidor con el gate en verde y la versión congelada. Ahora la medición se toma del servidor construido y cubre nombres y descripciones, porque editar una descripción cambia qué decide llamar un agente. Se probó viéndolo fallar en los dos casos, no viéndolo pasar.
+
+El segundo: al agregar el permiso para administrar personas de una organización, quedó anunciado sólo en una de sus dos formas. La que faltaba es justamente la que otorga el emisor propio, del que dependen las herramientas delegadas, así que un cliente que armara su solicitud desde el descubrimiento nunca habría pedido el permiso.
+
 ## 2026-09-06 — Efeonce ID: la invitación externa y la autoridad delegada del cliente, en producción
 
 Quien invita a una persona externa ya no le pasa el enlace a mano: el sistema manda el correo en el mismo acto en que genera el token, la respuesta deja de traerlo salvo una revelación gobernada de una hora que queda auditada, y el ciclo de vida es observable (reenviar rota el token anterior, el rebote se registra, la caducidad se ve, tres señales nuevas). El administrador designado de una organización cliente pasa a tener autoridad real sobre su propia gente por una lane del ecosistema, mediada por el gateway y decidida siempre por Greenhouse, nunca por lo que diga la llamada. La página de consentimiento del autorizador ahora muestra a qué host va a volver la persona.
@@ -838,11 +846,3 @@ aprobada. Despliegue WordPress limitado a JS/CSS con backup, hashes y readback d
 Nuevo verificador recorre pin, capítulos, tabs/cortes, mobile/reduced-motion/JS-off y contraste;
 smoke seguro separa rechazos reales, ledger vacío y un evento GA4 explícitamente sintético.
 [Evidencia y límite Turnstile/Realtime](docs/audits/public-site/2026-08-31-content-marketing-technical-closure.md).
-
-## 2026-08-31 — Cobertura Efeonce incorpora Estados Unidos y Contacto corrige su fuente institucional
-
-La cobertura vigente queda en Chile, Estados Unidos, Colombia, México y Perú, sin inferir oficina ni entidad
-legal por mercado. Contexto de negocio, posicionamiento público, primitives y skills espejadas apuntan al
-mismo estado. El brief de Contacto usa la dirección y los dos teléfonos de la contraportada canónica y marca
-como desactualizados Las Bellotas, el teléfono público anterior y las listas de cuatro mercados. `TASK-1801` quedó registrada con contratos visual/flow/motion, routing, privacidad, Meetings y rollout; esta edición no publicó WordPress ni amplió métricas históricas de clientes.
-[Brief y límites](docs/public-site/CONTACT_PAGE_REBUILD_BRIEF_V1.md).

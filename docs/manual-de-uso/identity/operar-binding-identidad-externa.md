@@ -10,9 +10,9 @@ conservan autoridad y vencimientos; nunca son una vía para ampliar permisos.
 
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-09-04 por Claude
-> **Ultima actualizacion:** 2026-09-06 por Claude (TASK-1837)
+> **Ultima actualizacion:** 2026-09-06 por Claude (TASK-1837 en produccion)
 > **Modulo:** Identidad y acceso (EPIC-044 U04 · TASK-1631 · U12 · TASK-1837)
 > **Ruta en portal:** sin UI en este slice; se opera por API bajo `/api/admin/identity/external-access/*` (y, para el administrador del cliente, `/api/platform/ecosystem/identity/invitations` vía gateway)
 > **Documentacion relacionada:** [Binding de Identidad Externa para el MCP](../../documentation/identity/binding-identidad-externa-mcp.md), [EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md](../../architecture/EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md), [Runbook del gateway MCP — soporte a cliente externo](../../operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md#soporte-cliente-externo-que-no-puede-entrar-task-1631)
@@ -28,6 +28,21 @@ lane delegada por la que el administrador del cliente invita a su propia gente.
 No cubre el login de la persona ni la pantalla de administración: en este slice no existen (ver
 [qué no hace este slice](../../documentation/identity/binding-identidad-externa-mcp.md#qué-no-hace-este-slice)).
 
+## Estado hoy (2026-09-06)
+
+Todo lo que describe este manual está **vivo en producción** desde el 2026-09-06 (release
+`b3e324cb5c8d-3cfce865-236f-4e4e-b128-8e144de193cf`): la entrega del correo por el sistema, el reenvío, la
+revelación gobernada, el registro del rebote por el ops-worker y la lane delegada del administrador del cliente.
+Los dos flags (`EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED` y
+`EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED`) están encendidos en producción y en staging.
+
+Consecuencia práctica para ti: **ya no transportas el enlace de invitación a mano**. Emites y el correo sale
+solo; tu trabajo pasa a ser mirar el estado de entrega y actuar sobre él (paso 5, 5b y 5d).
+
+Lo único que falta no es técnico: la primera persona de un cliente real todavía no se ha invitado, porque es una
+decisión comercial. Hasta que ocurra, el recorrido humano completo está probado en staging y, en producción, por
+las llamadas negativas de contrato desde el consumer real del gateway.
+
 ## Antes de empezar
 
 Necesitas:
@@ -42,11 +57,13 @@ Necesitas:
   (Entra de Efeonce) o **externo**.
 - El **`organizationId`** de la organización cliente en Account 360 (formato `org-<uuid>`). Si no la tienes,
   la consulta de elegibilidad del paso 2 la busca por nombre.
-- Saber si el flag `EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED` está encendido en el entorno donde operas
-  (hoy está **encendido en staging** desde el 2026-09-06 y **apagado en producción** hasta el release; ver
-  `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`). Con el flag encendido el
-  sistema envía el correo y la respuesta no trae `token`; apagado, el token vuelve en la respuesta y lo entregas
-  tú por un canal seguro (nunca un ticket ni un chat abierto).
+- Saber cómo está el flag `EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED` en el entorno donde operas. **Hoy está
+  encendido en producción y en staging** (producción desde el 2026-09-06, release
+  `b3e324cb5c8d-3cfce865-236f-4e4e-b128-8e144de193cf`); el estado vigente por entorno vive en
+  `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`. Con el flag encendido —el caso normal hoy— **el sistema envía
+  el correo, la respuesta no trae `token` y tú ya no transportas el enlace a mano**. Solo si el flag se apagara,
+  o si pides entrega manual explícita, el token vuelve en la respuesta y lo entregas tú por un canal seguro
+  (nunca un ticket ni un chat abierto).
 
 Todas las respuestas de error siguen el contrato canónico: `{ error, code, actionable }` con `error` en
 español listo para leer. La tabla de códigos está al final.
@@ -161,7 +178,7 @@ La respuesta trae `invitation`, `created` y `delivery`:
     qué: proveedor, configuración, plantilla). No le digas al cliente que "ya está": revisa la causa (Sentry,
     dominio remitente en Resend, kill-switch `email_type_config('external_access_invitation')`) y **reenvía** (5b).
   - `not_attempted`: pediste entrega manual (`"delivery": "manual"` en el body) o el flag está apagado.
-- **Con el flag apagado** (comportamiento previo) la respuesta incluye `token` **una sola vez** y
+- **Si el flag estuviera apagado** (hoy no lo está en ningún entorno) la respuesta incluye `token` **una sola vez** y
   `delivery.mode = "manual"`. Greenhouse guarda únicamente su hash. Cópialo al canal seguro y no lo pegues en
   tickets, Teams abierto, commits ni logs.
 - `expiresInHours`: 72 por defecto, máximo 720 (30 días).
@@ -222,8 +239,9 @@ pnpm staging:request POST /api/admin/identity/external-access/bindings/xob-<uuid
 ### 5d. Qué hacer cuando el correo rebota
 
 El proveedor de correo avisa el rebote por webhook; el ops-worker lo recibe y marca la invitación con
-`deliveryStatus: "bounced"` (evento `email_delivery.bounced`, sin flag). Verificado en staging el 2026-09-06 con
-un rebote real de Resend (ver el audit en 8b). Lo ves así:
+`deliveryStatus: "bounced"` (evento `email_delivery.bounced`, sin flag). Ese consumer corre en el ops-worker,
+no lleva flag y está vivo también en producción desde el 2026-09-06; se verificó con un rebote real de Resend en
+staging (ver el audit en 8b). Lo ves así:
 
 1. La señal `identity.external_invitation.undelivered` pasa a `warning` en `/admin/operations` → Identity.
 2. En `GET .../bindings/xob-<uuid>` la invitación sigue `issued` pero con `deliveryStatus: "bounced"` y
@@ -315,7 +333,9 @@ respuesta → correo real de invitación → `/i/<token>` → aceptar (202) → 
 (200/403/422/201 y correo real) → revocación del binding con la sesión muriendo (401). Paso a paso, con
 timestamps y estados en PG:
 `docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`
-§"Verificación viva end-to-end en staging". Producción queda pendiente del release.
+§"Verificación viva end-to-end en staging". En producción, además, el mismo contrato se comprobó desde el
+consumer real del gateway con llamadas negativas (422 por `bindingId`, 403 por organización ajena, 400 sin scope
+externo) — ver §"Paso a producción — 2026-09-06" del mismo audit.
 
 Para repetirlo en staging sin inventar casillas, usa las direcciones de prueba de Resend, que son el camino
 canónico para forzar cada resultado:
@@ -334,9 +354,10 @@ La persona que aceptó como **administrador designado** de un binding puede list
 personas de su propia organización. No llama a Greenhouse directo: habla con el gateway MCP, que verifica su
 token y llama a la lane ecosystem con `environment` + `subject` (consumer `internal`) más la organización que
 resolvió por su membresía. Hoy el flag `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` está **encendido en
-staging** (la lane se verificó allí el 2026-09-06 con el token del consumer del gateway: 200/403/422/201 y correo
-real; ver 8b) y **apagado en producción** hasta el release (allí la lane responde 404). Las llamadas siguientes
-describen el contrato tal como se ejercitó.
+producción y en staging**. En staging la lane se ejercitó de punta a punta el 2026-09-06 con el token del
+consumer del gateway (200/403/422/201 y correo real; ver 8b); en producción se comprobó con las llamadas
+negativas del mismo consumer, que solo el contrato nuevo puede producir. Las llamadas siguientes describen ese
+contrato.
 
 **Identificar el binding:** cada llamada trae `bindingId` **o** `organizationId` (la organización de Account 360
 que el gateway resolvió por la membresía de la persona). Exactamente uno; si van los dos deben coincidir; sin
@@ -381,11 +402,11 @@ Qué significan las respuestas:
 
 Cada invitación delegada queda auditada con actor `external-admin:<perfil>` y metadata `delegated: true`.
 
-**Por MCP (gateway `efeonce-mcp`, PR #3 abierto, pendiente de merge tras el release):** las tools son
-`identity.invitations.list` (scope base) e `identity.invitation.create` (scope `efeonce.mcp.identity.write`,
-que la persona consiente en el emisor como «Invitar y administrar a las personas de tu organización en
-Efeonce»). Hasta el merge, y mientras el flag esté apagado en producción, responden `policy_blocked`. Reenviar y
-revocar todavía no tienen tool (follow-up del PR #3 o de `TASK-1838`, la consola del administrador del cliente).
+**Por MCP (gateway `efeonce-mcp`):** las tools `identity.invitations.list` (scope base) e
+`identity.invitation.create` (scope `efeonce.mcp.identity.write`, que la persona consiente en el emisor como
+«Invitar y administrar a las personas de tu organización en Efeonce») están **federadas y desplegadas** desde el
+2026-09-06 y llaman a Greenhouse en producción. Reenviar y revocar todavía no tienen tool: se operan por la lane
+ecosystem de arriba (follow-up de `TASK-1838`, la consola del administrador del cliente).
 
 ## Que significan los estados y señales
 
@@ -401,7 +422,7 @@ Resumen operativo; el detalle está en la [documentación funcional](../../docum
 | Invitación | `issued` | Abierta; el correo salió (o el token se entregó a mano). Mira `deliveryStatus`. |
 | Invitación | `linked` | Es la membresía; la persona puede resolver `bound`. |
 | Invitación | `revoked` / `expired` | Emitir una nueva (o `reissue`/reenvío si estaba abierta). Motivos `resent`/`revealed` = fue rotada por un reenvío o una revelación. |
-| Entrega | `not_attempted` | Sin correo: flag apagado o entrega manual. Tú entregas el enlace. |
+| Entrega | `not_attempted` | Sin correo: pediste entrega manual (o el flag está apagado, que hoy no es el caso). Tú entregas el enlace. |
 | Entrega | `sent` / `delivered` | El proveedor aceptó / confirmó la entrega. |
 | Entrega | `bounced` | La casilla rechazó el correo. Corregir casilla y reenviar (5d). |
 | Entrega | `failed` | No salió. La invitación existe pero nadie la recibió: revisar causa y reenviar (5b). |
@@ -477,9 +498,9 @@ Otros síntomas:
   existe, 5c.
 - **409 `external_access_conflict` al emitir o aceptar con `designatedAdmin: true`:** ya hay un administrador
   designado vigente. Revoca al anterior (scope `member`) antes de emitir o de que la persona nueva acepte.
-- **404 en la lane delegada (`/api/platform/ecosystem/identity/invitations`):** el flag
-  `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` está apagado o el consumer no es el interno del gateway. No
-  es un bug: es el 404 anti-oráculo.
+- **404 en la lane delegada (`/api/platform/ecosystem/identity/invitations`):** el consumer no es el interno del
+  gateway, o el flag `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` está apagado en ese entorno (hoy está
+  encendido en producción y staging). No es un bug: es el 404 anti-oráculo.
 - **El cliente sigue entrando después de revocar:** el gateway rechequea con `grantsVersion` en menos de 5
   minutos. Si pasa más, mira `identity.external_binding.revoked_still_dispatching` y sigue el
   [runbook de soporte](../../operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md#soporte-cliente-externo-que-no-puede-entrar-task-1631).
@@ -499,8 +520,8 @@ Otros síntomas:
   `src/lib/api-platform/resources/ecosystem-identity-binding.ts` y lane delegada
   `src/lib/api-platform/resources/ecosystem-identity-invitations.ts` (listar, crear y
   `invitations/[invitationId]/{resend,revoke}`); scope `efeonce.mcp.identity.write` en
-  `src/lib/auth-server/oauth/scopes.ts`; tools del gateway en el PR #3 de `efeonce-mcp`
-  (<https://github.com/efeoncepro/efeonce-mcp/pull/3>, pendiente); errores canónicos
+  `src/lib/auth-server/oauth/scopes.ts`; tools del gateway (`identity.invitations.list`,
+  `identity.invitation.create`) ya federadas y desplegadas en `efeonce-mcp`; errores canónicos
   `src/lib/api/canonical-error-response.ts`; señales `src/lib/reliability/queries/external-identity-binding-signals.ts`;
   rebote `src/lib/sync/projections/external-invitation-delivery-bounced.ts` (ops-worker); correo
   `src/emails/ExternalAccessInvitationEmail.tsx` + `src/lib/email/templates.ts`; smoke
@@ -510,7 +531,7 @@ Otros síntomas:
   `migrations/20260906004450748_task-1837-external-invitation-delivery-lifecycle.sql` (columnas `delivery_*`,
   tipos de audit, capabilities `reveal_token`/`issue_delegated`, `email_type_config`; **aplicada 2026-09-06** a la
   instancia compartida; correo real, rebote y lane delegada **verificados en staging el 2026-09-06** — ver 8b y el
-  audit; pendientes el release a producción con sus flags y la federación de la lane delegada en el gateway).
+  audit; **en producción desde el 2026-09-06** con los dos flags encendidos y las tools del gateway federadas).
 - Flags (`EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED`, `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED`) y knob
   `EXTERNAL_INVITATION_DELEGATED_SEAT_LIMIT`: estado por entorno y orden de rollout en
   [FEATURE_FLAG_STATE_LEDGER.md](../../operations/FEATURE_FLAG_STATE_LEDGER.md).

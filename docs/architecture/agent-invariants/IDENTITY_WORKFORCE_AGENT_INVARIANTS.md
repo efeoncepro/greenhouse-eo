@@ -445,7 +445,8 @@ ningún secreto ni PII de terceros salga del dominio.
   environment; el auth-server (`TASK-1830`) lee ese link. Verificar con `resolveExternalAccess` que el outcome
   sea `revoked`, no asumirlo.
 - **NUNCA** agregar un `*_ENABLED` en Greenhouse para este dominio sin pasar por el ledger. Hasta TASK-1631 no
-  había flag propio a propósito; TASK-1837 introdujo dos, ambos default OFF, leídos sólo en Vercel y registrados
+  había flag propio a propósito; TASK-1837 introdujo dos, ambos default OFF **en código** (hoy ON en Vercel
+  Production y staging desde el 2026-09-06), leídos sólo en Vercel y registrados
   en `FEATURE_FLAG_STATE_LEDGER.md`: `EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED` (emisión: el sistema envía el
   correo y retira el token de la respuesta) y `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` (lane ecosystem
   delegada; OFF ⇒ 404 anti-oráculo). El consumer reactivo del rebote (ops-worker) **no** tiene flag: sólo actúa
@@ -468,23 +469,35 @@ del dominio; el resto lo bundlea `services/auth-server`).
 
 ## Entrega gobernada de la invitación externa y autoridad delegada (TASK-1837)
 
-> Estado 2026-09-06: **`verificado end-to-end en staging (flags ON en staging); follow-ups cerrados sin release;
-> producción pendiente de release; PR #3 del gateway abierto`** — migración
-> `20260906004450748_task-1837-external-invitation-delivery-lifecycle.sql` APLICADA a la instancia compartida
-> (`run_on 2026-09-06T04:27:58Z`), smoke `--apply` verde contra PG real y, con los dos flags encendidos en Vercel
-> staging, recorrido vivo completo sobre un binding externo de prueba (organización fixture + casilla controlada):
-> emisión sin token en la respuesta, correo real de invitación, `/i/<token>` → aceptar 202 → `linked` → magic link
-> real → sesión 200 y reuso 400, rebote forzado con `identity.external_invitation.undelivered` observada
-> encendiéndose (ok → warning), reenvío, revelación gobernada (`token_revealed` en warning) y la lane delegada con
-> el consumer del gateway (200/403/422/201 + correo real). Después (04:00–04:40Z, commits `149ff8934` +
-> `1ddb5f92b`, sólo en `develop`) se cerraron los follow-ups: revocar el binding limpia al admin designado,
-> boundary test del dominio, scope `efeonce.mcp.identity.write`, `organizationId` en la lane y los verbos delegados
-> `resend`/`revoke`; en el gateway `efeonce-mcp` quedó ABIERTO el PR #3 (tools `identity.invitations.list` /
-> `identity.invitation.create`, merge tras el release). Evidencia:
-> `docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`. Pendiente: promoción a producción +
-> los dos flags en Vercel Production (hoy NOT SET; el ops-worker y el auth-server toman el código nuevo en ese
-> release), merge de PR #3 y federación de `resend`/`revoke` delegados, y primera persona externa de un CLIENTE
-> real por decisión del operador (el mecanismo ya está probado).
+> Estado 2026-09-06: **`EN PRODUCCIÓN — flags ON en Vercel Production y staging; gateway federado`**. Release
+> `b3e324cb5c8d-3cfce865-236f-4e4e-b128-8e144de193cf` (`released`, target SHA `b3e324cb5c8d`, PR #227), con los
+> cinco servicios Cloud Run en el target (`ops-worker` y `auth-server` quedaron change-gated en `2b385284d594`,
+> validados por identidad de árbol: `git diff --name-only` vacío y mismo hash de árbol; watchdog `drift_count=0`).
+> Migración `20260906004450748_task-1837-external-invitation-delivery-lifecycle.sql` aplicada a la instancia
+> compartida (`run_on 2026-09-06T04:27:58Z`). Flags con valor live leído por `vercel env pull`:
+> `EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED=true` y `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED=true`
+> (Vercel únicamente; el consumer del rebote vive en el ops-worker y no lleva flag), con redeploy obligatorio
+> `greenhouse-j7aix61yk` porque Vercel congela las env vars al construir el build.
+>
+> Evidencia de comportamiento: en staging se recorrió el ciclo humano completo sobre un binding externo de prueba
+> (emisión sin token en la respuesta, correo real, `/i/<token>` → aceptar 202 → `linked` → magic link → sesión 200
+> y reuso 400, rebote forzado con `identity.external_invitation.undelivered` observada encendiéndose, reenvío,
+> revelación gobernada y la lane delegada con el consumer del gateway 200/403/422/201). En **producción** el
+> contrato se comprobó con el consumer real del gateway contra
+> `GET https://greenhouse.efeoncepro.com/api/platform/ecosystem/identity/invitations`: antes del flip `404`
+> anti-oráculo; después, `422 invalid_request field=bindingId`, `403 forbidden` con `organizationId=EO-ORG-0007` y
+> `400 missing_external_scope_type` sin scope params — respuestas que **sólo el contrato nuevo puede producir** y
+> que prueban que la lane ejecuta la resolución de autoridad delegada, no que sólo enruta. Señales contra la base
+> real: `undelivered=0`, `expired_unaccepted=0`, `token_revealed=3` (encendida a propósito por las revelaciones de
+> prueba; se apaga sola al vencer su ventana de 24 h). Gateway `efeonce-mcp`: PR #3 mergeado (`65ae1d5`) con las
+> tools `identity.invitations.list` / `identity.invitation.create`, desplegado en la revisión
+> `efeonce-mcp-gateway-00039-gz4`. Evidencia:
+> `docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md` §"Paso a producción — 2026-09-06".
+>
+> Pendiente ÚNICO y **no técnico**: la primera persona externa de un CLIENTE real es decisión comercial del
+> operador. Hasta que exista, el recorrido delegado de punta a punta en producción está probado por los negativos
+> del canary, no por una aceptación real. Sin federar todavía: los verbos delegados `resend`/`revoke` como tools
+> MCP (se operan por la lane ecosystem).
 
 Cierra el ciclo de vida de `external_member_invitations` que TASK-1631 dejó a mano: el sistema envía el correo de
 invitación (`EmailType` `external_access_invitation`, remitente Efeonce, cuerpo no persistido), registra la entrega en

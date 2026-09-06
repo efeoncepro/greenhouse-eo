@@ -551,6 +551,42 @@ gh api "repos/efeoncepro/greenhouse-eo/actions/runs/<run_id>/pending_deployments
   --jq '.[] | {env:.environment.name, id:.environment.id, canApprove:.current_user_can_approve}'
 ```
 
+⚠️ **Compara el nombre del entorno de forma insensible a mayúsculas.** La API devuelve
+`Production` con mayúscula; un `select(.environment.name=="production")` no aprueba nada
+y el gate espera **en silencio** (21 min el 2026-09-04, release `9100bbd2765d`; playbook
+anti-pattern #17). Y la convención opuesta también es cierta en la otra API: `vercel env add`
+exige `production` en minúscula. Memorizar una sola de las dos reproduce el error en la otra.
+
+Loop que funcionó el 2026-09-06 (`b3e324cb5c8d`: los dos gates aprobados en **29 s**) — imprime
+una línea por iteración, para que una espera nunca sea indistinguible de un filtro mal escrito:
+
+```bash
+RUN_ID=<run_id>
+REASON="<razon del release>"
+for _ in $(seq 1 120); do
+  PENDING=$(gh api "repos/efeoncepro/greenhouse-eo/actions/runs/$RUN_ID/pending_deployments" \
+    --jq '.[] | select((.environment.name|ascii_downcase)=="production") | .environment.id')
+  echo "$(date -u +%H:%M:%SZ) pending=[${PENDING:-none}]"
+  for ENV_ID in $PENDING; do
+    gh api "repos/efeoncepro/greenhouse-eo/actions/runs/$RUN_ID/pending_deployments" \
+      -X POST -f state=approved -F "environment_ids[]=$ENV_ID" -f comment="$REASON"
+  done
+  RUN_STATE=$(gh run view "$RUN_ID" --json status --jq .status)
+  [ "$RUN_STATE" = "completed" ] && break
+  sleep 15
+done
+```
+
+⚠️ **zsh:** nunca nombres `status` a una variable de este loop — choca con la built-in read-only
+de zsh y el loop muere sin traza útil (mató el loop de gates el 2026-07-17 y el 2026-08-11/12).
+⚠️ **Para el clasificador de permisos del agente, ese bloque entero es una sola mutación**: lleva
+el POST de aprobación adentro, así que se bloquea completo hasta que el operador autorice (skill,
+gotchas #15/#16). Dos salidas: autorizarlo por adelantado, o partirlo —polear sólo la lectura y
+disparar el POST como llamada suelta cuando aparezca el `environment.id`—. Y la regla general: pide
+la autorización de **todas** las mutaciones externas al abrir el release, no cuando el gate ya está
+esperando. El 2026-09-06 pedirla tarde costó **64 minutos** con la evidencia completa ya verde
+(playbook anti-pattern #19).
+
 #### Paso F — Post-release: flags nuevos exigen redeploy, no sólo `env add`
 
 Vercel **congela las env vars al crear el build**: un flag agregado después del
@@ -705,7 +741,13 @@ no puede refutarlo. Corre siempre, primero, el diff sin `--`:
 
 ```bash
 git diff --name-only <cloud_run_git_sha> <release_target_sha>   # vacío ⇒ árboles idénticos ⇒ skip legítimo
+git rev-parse "<cloud_run_git_sha>^{tree}" "<release_target_sha>^{tree}"   # deben imprimir el MISMO hash
 ```
+
+El `rev-parse ^{tree}` responde la misma pregunta por identidad en vez de por ausencia, y deja en la
+evidencia un valor positivo que se puede pegar en el Handoff. Caso verificado el 2026-09-06 (release
+`b3e324cb5c8d`): `ops-worker` y `auth-server` sirviendo `2b385284d594`, diff completo vacío y ambos
+árboles en `d3a1432a1f71` — watchdog `drift_count=0`.
 
 - **Vacío** ⇒ el no-op es legítimo sin depender de ninguna lista, y de paso confirma que los dos SHA
   resolvieron (un diff vacío por SHA inválido se ve idéntico a uno vacío por falta de drift). Caso

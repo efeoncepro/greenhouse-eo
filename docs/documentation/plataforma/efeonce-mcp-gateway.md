@@ -16,7 +16,7 @@ Globe para el workspace interno autorizado. El gateway no recrea catálogo, rout
 
 Desde el 6 de agosto de 2026 hay una **segunda capacidad federada**: Search Visibility 360 de Greenhouse. Partió
 con tres consultas de solo lectura y creció hasta federar **28 tools SEO** (al 2026-08-31). ⚠️ Federado e interno NO son el mismo conjunto por construcción —el gateway resuelve contra rutas HTTP del lane—: `get_seo_work_queue` existe adentro y está excluida con razón, y `get_seo_provider_spend` está federada sin contraparte interna. Desde el 28 de agosto de 2026 esas 27 están **efectivamente
-desplegadas** en la revisión productiva del gateway (`efeonce-mcp-gateway-00028-pmx`, desde el 2026-09-02; antes `00026-ctp` del 2026-09-01 y `00024-8b8`), que reemplazó a la del 27
+desplegadas** en la revisión productiva del gateway (`efeonce-mcp-gateway-00039-gz4`, desde el 2026-09-06; antes `00028-pmx` del 2026-09-02, `00026-ctp` del 2026-09-01 y `00024-8b8`), que reemplazó a la del 27
 de agosto (servía 21). Ya no queda ninguna tool esperando despliegue. Igual que con Globe, el gateway no recrea
 lógica: transporta la pregunta y Greenhouse decide qué se puede ver. El inventario vigente y su estado de
 despliegue viven en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-tool-inventory.md) §8; detalle
@@ -28,9 +28,22 @@ de la superficie Greenhouse (`TASK-1804`). El provider `greenhouse-skills` expon
 texto), y delega cada llamada a la lane `GET /api/platform/ecosystem/mcp/skills[/{name}]` de Greenhouse. No embebe
 contenido: si Greenhouse cambia un manual, el gateway lo sirve sin redeploy. Comparte interruptor e identidad con el
 provider SEO (`GREENHOUSE_SEO_PROVIDER_ENABLED`, mismo consumer token) y no agregó permisos en Entra: basta el
-permiso base de conexión (`efeonce.mcp.read`). Con eso el gateway federa **36 tools** (28 SEO +
-`get_greenhouse_skill` + las nativas del propio gateway). Detalle funcional en
+permiso base de conexión (`efeonce.mcp.read`). Detalle funcional en
 [Manuales MCP servidos por el protocolo](./manuales-mcp-servidos-por-el-protocolo.md).
+
+Desde el 6 de septiembre de 2026 hay una **cuarta capacidad**: la **identidad delegada** de Efeonce ID
+(`TASK-1837`). El administrador designado de una organización cliente puede, desde su cliente MCP,
+listar a las personas invitadas de su organización (`identity.invitations.list`) e invitar a una nueva
+(`identity.invitation.create`). Son las primeras tools **propias del gateway** en este dominio: no existen como
+tool interna de Greenhouse; el gateway resuelve contra la ruta HTTP del lane. El gateway **no decide quién manda**:
+envía la identidad verificada de la persona y Greenhouse vuelve a exigir que sea administrador designado, o
+responde "prohibido". Invitar exige un permiso propio (`efeonce.mcp.identity.write`) que la persona consiente
+aparte del permiso base. El **token de la invitación nunca vuelve al agente**: se entrega por correo. Comparte
+interruptor, identidad y consumer con los providers SEO y de manuales, porque es la misma lane.
+
+Con eso el servidor declara **39 tools** en total (28 SEO + `get_greenhouse_skill` + 2 de identidad delegada + las
+nativas de gateway, Globe y Hiring). Es el techo del catálogo: lo que ve un cliente concreto depende de su emisor,
+sus permisos y los interruptores de cada provider.
 
 ## Cómo se comporta
 
@@ -62,6 +75,12 @@ Disponible hoy:
   pista de que el dato está ahí. Inventario exacto en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-tool-inventory.md) §8.
 - `get_greenhouse_skill` para leer los manuales de uso de esa superficie (hoy seis, todos internos). Una conexión
   que no sea interna recibe un catálogo vacío y un "no existe" por nombre, nunca un "prohibido".
+- `identity.invitations.list` e `identity.invitation.create` para que el administrador designado de una
+  organización cliente administre a las personas de su propia organización con Efeonce ID. Sólo responden a una
+  persona externa autenticada con Efeonce ID: una conexión Entra interna no las alcanza. Con el interruptor de la
+  invitación delegada apagado en Greenhouse responden "no habilitado", nunca una pista de que existe. Todavía no
+  hay una primera organización cliente real habilitada —es una decisión comercial, no técnica—, así que hoy sólo
+  están probadas en staging y por los rechazos verificados contra producción.
 
 No disponible:
 
@@ -77,9 +96,10 @@ El servicio conserva Entra legado y tiene un piloto corporativo nativo verificad
 una capability de lectura y un binding de workspace exacto. Esto evita que una conexión MCP sea un bypass de
 los permisos de Globe.
 
-El gateway maneja cinco permisos: el permiso base de conexión, el permiso de lectura de Globe, el permiso de
-escritura interna para el fondeo de créditos, el permiso de escritura SEO (`efeonce.mcp.seo.write`) y el permiso
-de lectura de Hiring — cada permiso condicionado sólo se publica cuando su interruptor está encendido (detalle en
+El gateway maneja seis permisos: el permiso base de conexión, el permiso de lectura de Globe, el permiso de
+escritura interna para el fondeo de créditos, el permiso de escritura SEO (`efeonce.mcp.seo.write`), el permiso de
+lectura de Hiring y el permiso de escritura de identidad (`efeonce.mcp.identity.write`, para invitar personas a la
+propia organización) — cada permiso condicionado sólo se publica cuando su interruptor está encendido (detalle en
 el ADR de plataforma MCP).
 
 Los entitlements por organización/persona ya existen y el gateway multi-issuer está construido. Antes

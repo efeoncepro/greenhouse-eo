@@ -23,6 +23,10 @@ de implementar. Siguiente paso: plan/ADR de Slice 0 con checkpoint humano antes 
 
 **Pendiente real (no bloqueante):** (1) la **primera persona CLIENTE real** es decisión comercial tuya — hasta que exista, el flujo delegado de punta a punta y las dos tools del gateway sólo están probados en staging y por los negativos del canary; (2) la señal `identity.external_invitation.token_revealed` marca 3 por las revelaciones de prueba y **se apaga sola** al vencer su ventana de 24 h; (3) **punto ciego abierto en el gate de versión del gateway**: `test/version.test.ts` sólo compara el hash de las tools FEDERADAS desde Greenhouse, así que las tools propias del gateway crecieron la superficie de 37 a 39 con el test verde y `version` congelada — se subió a `1.1.0` a mano, pero la próxima volverá a pasar sin bump.
 
+**Barrido documental del 2026-09-06 (posterior al release).** Tres agentes disjuntos actualizaron identidad, MCP/gateway y control plane de release: los dos docs funcionales y el manual de identidad pasan a estado de producción, el runbook del MCP documenta por primera vez que **el gateway se despliega por dispatch manual, nunca por push a `main`**, que su servicio Cloud Run vive en `southamerica-west1`, y la diferencia entre `GREENHOUSE_ECOSYSTEM_API_URL` (producción, la que usan los providers) y `GREENHOUSE_API_URL` (dev-greenhouse, fondeo Globe). El playbook de release suma el caso positivo del día y dos anti-patterns: pedir la autorización de mutaciones externas al EMPEZAR (costó 64 min con la evidencia ya verde) y no leer como drift un SHA distinto cuando los ÁRBOLES son idénticos.
+
+**Dos defectos encontrados por la verificación cruzada, ambos cerrados el mismo día.** (1) El gate de versión del gateway medía sólo las tools federadas: `efeonce-mcp` PR #4 (`5c28a7a`) lo cambia a medir el servidor construido; visto encenderse en los dos casos. (2) Al agregar `efeonce.mcp.identity.write` se cubrió el documento del RECURSO pero no el bloque del emisor NATIVO, así que el scope salía sólo cualificado y un cliente que armara su authorize desde discovery nunca lo habría pedido: `efeonce-mcp` PR #5, abierto, con test de regresión visto fallar sin el arreglo. ⚠️ Ese fix **no** agrega el scope a Entra, que el ADR del gateway prohíbe explícitamente.
+
 **TASK-1836 / TASK-1831 — evidencia consolidada, 2026-09-06:**
 Tres subagentes actualizaron contratos, funcionales, manuales, tasks/epic y skills espejo.
 [Mapa de construcción, pruebas y pendientes](docs/audits/2026-09-06-task-1836-1831-consolidated-evidence.md).
@@ -358,101 +362,3 @@ vs Salesforce.
 Estado honesto: documentación y contrato UI listos; no hay implementación, WordPress postId, CMS save, publicación,
 cache purge, indexación, conversión ni live readback. La ejecución empieza con Discovery/VoC/SEO/rights/runtime,
 continúa con un first fold `noindex` y se detiene para `ACCEPT FIRST FOLD` antes del below-fold.
-
-## 2026-09-02 (6) — ANAM recibe un cierre documental premium y un soporte acotado a tres meses
-
-El cierre de Emma quedó consolidado en dos entregables externos de cinco páginas: especificación técnica y guía
-funcional. El sistema visual usa Poppins para display y Geist para lectura; Efeonce predomina como proveedor,
-HubSpot aparece como partnership y ANAM como cliente. Los PDF son el master de envío, los HTML/CSS la fuente
-editable y diez capturas rasterizadas la evidencia de revisión. Todos los pies incluyen sitio, correo, teléfono y
-dirección de Efeonce. Las versiones Word supersedidas quedaron fuera del paquete versionado.
-
-El correo para Óscar, María Paz, Pablo y Marco quedó listo, pero **no enviado**. Explica el rediseño de la landing,
-la corrección generativa del bordado `ANÁLISIS AMBIENTALES S.A.`, la identidad live de Emma, la matriz de handoff,
-las tres pruebas E2E y las validaciones humanas todavía pendientes. La captura final de la landing también quedó
-versionada como adjunto. El SharePoint consolidado es un compromiso para esta semana y permanece pendiente hasta
-verificar el enlace compartido.
-
-El soporte quedó explícito para Customer Agent y KPI: **tres meses, del 2026-08-13 al 2026-11-12 inclusive**.
-Cubre incidentes, correcciones, dudas operativas, comportamientos inesperados, recuperación de configuración y
-documentación derivada de una corrección. No cubre nuevas funcionalidades, KPI, workflows, automatizaciones,
-integraciones, rediseños ni innovación; toda evolución requiere alcance y aprobación separados. Este cierre sólo
-actualiza documentación y entregables; no mutó HubSpot, no envió correo, no creó SharePoint y no hizo push.
-
-## 2026-09-02 (6) — TASK-1804: el manual de uso viaja por el protocolo — code complete, rollout pendiente
-
-Tres slices en Greenhouse (`ec89014e4`, `12c0ea85d`, `5a6ae57f4`) y uno en `efeonce-mcp` (`c588a1b`,
-**local, sin push**: `main` auto-despliega a Cloud Run). Manifiesto de manuales
-(`src/mcp/greenhouse/skill-manifest.ts`) + reader canónico + tres `SKILL.md` en `docs/mcp/skills/`
-escritos de cero para el consumidor MCP; tool `get_greenhouse_skill` (44 tools en el artefacto),
-recurso `skill://efeonce/<name>/SKILL.md`, lane `/api/platform/ecosystem/mcp/skills[/{name}]` con
-404 anti-oráculo para bindings no-internal; las `instructions` rutean al manual en vez de contener
-el procedimiento. Test de fuga sobre todo `docs/mcp/skills/**`. `next.config.ts` declara los `.md`
-como `outputFileTracingIncludes` (primer uso en el repo).
-
-🔴 **Pendiente de runtime, en este orden:** (1) push de `develop` y verificar la lane en staging con
-binding real — `count` **exactamente 3**, cuerpo con frontmatter, `404` inexistente, `401` sin token,
-catálogo `[]` + `404` con binding de cliente; (2) release a producción y repetir; (3) push del commit
-local de `efeonce-mcp` → deploy de Cloud Run → `scripts/greenhouse-seo-canary.mjs` (ya trae los
-asserts de skills). Sin Entra, flag ni secreto nuevos. `pnpm build` de producción no se corrió en
-local (cuelga la máquina): lo prueba Vercel o se corre con autorización.
-
-⚠️ El guard de paridad del gateway está anclado al dominio SEO y no veía una tool `platform`: nació
-`EXPECTED_GREENHOUSE_PLATFORM_TOOLS` + `computeFederatedNonSeoToolFindings` (test con regresiones).
-
-**Actualización (misma task, más tarde ese día):** el SHA `eed9992d5` rompió el build de staging —
-*"api/mcp/greenhouse is 397.29mb (limit 250mb)"*. No era el tamaño de los manuales (el glob resuelve 3
-archivos; `@vercel/nft` traza la ruta en 2,6 MB): una ruta con `outputFileTracingIncludes` propio deja de
-agruparse y su función sola supera el techo. Se cerró la clase: `skill-catalog.generated.json` generado desde
-`docs/mcp/skills/**` con `pnpm mcp:skills:generate`, gate `pnpm mcp:skills:check` en `local:check` y CI,
-hashes re-verificados al cargar, cero `fs` en runtime, tracing retirado de `next.config.ts`.
-🔴 **Decisión del operador: sin release a `main` en esta ventana; sólo el gateway.** `efeonce-mcp`
-`c588a1b` desplegado (revisión `efeonce-mcp-gateway-00028-pmx`, CI + Deploy Cloud Run success, front door
-200/200/401). Consecuencia declarada: `get_greenhouse_skill` responde `not_found` desde producción hasta que la
-lane llegue a `main`. Pendiente: lane verificada en staging con el SHA nuevo de `develop` + canary del gateway
-contra staging.
-
-**Cierre de la ventana (verificado):** el build de staging `greenhouse-jr9hmjido` quedó **Ready** con
-`4620875eb`: la causa real era el análisis estático de `fs` de Turbopack (no nft ni el tracing) —
-`skill-catalog.ts` conservaba `readdirSync`/`readFileSync` alcanzables desde tres rutas y Turbopack incluía el
-proyecto entero (397 MB). Todo `node:fs` vive ahora en `skill-catalog-fs.ts` (sólo generador y tests).
-**Lane verificada en staging** con el binding interno del consumer del gateway: `count=3` exacto, ETag/304,
-tres cuerpos byte-idénticos al artefacto, `404` inexistente, `401` sin token; canary del provider del gateway
-contra staging 5/5. Contra producción el gateway responde `not_found` (la lane espera el release). Pendientes
-reales: release `develop→main` (decisión del operador) y el camino de negación con binding de cliente en
-runtime. ⚠️ `4620875eb` arrastró archivos que otra sesión tenía en el índice compartido (`mcp-craft/**`,
-`.claude/rules/mcp-tool-surface.md`); esa sesión lo registró en `bd112e66a`.
-
-**Cierre definitivo (21:27Z):** la lane salió a producción en el release `375f56e24` (release_id
-`375f56e24187-546f452b-…`, run `33683893124`, llevado por `greenhouse-eo-ac`); canary de contrato contra
-producción post-`released` verde (count=3 exacto, cuerpos byte-idénticos, ETag/304, 404/401, provider del
-gateway 5/5). TASK-1804 → `complete`. Sin evidencia runtime: `tools/call` por el front door OAuth (login
-Entra interactivo) y la negación con binding de cliente (sin consumer de cliente con token).
-
-**Higiene Entra (21:40Z):** el cliente PKCE público `32617b87…` dejó de llamarse "Local Canary Client" y ahora es
-"Efeonce MCP Public Client (Claude Code, claude.ai, Claude Desktop)"; sólo `displayName`, readback con redirect
-URIs y scopes intactos. Queda abierta la revisión del loopback `http://localhost` sin puerto (ADR del gateway).
-
-**Follow-up (22:10Z):** (a) evidencia por el front door: `claude mcp login efeonce-mcp` → `✔ Connected` y un
-agente `claude -p` en sesión nueva llamó `get_greenhouse_skill` por `mcp.efeonce.org` con token Entra real, listó
-el catálogo y resumió bien el manual de gasto — cerrado el único hueco de evidencia. (b) El catálogo pasa de 3 a 6
-manuales, todos SEO federado (`seo-discovery-to-tracking`, `seo-technical-health`, `seo-prospect-diagnostic`); la
-`description` de la tool no cambia (nombra el manual de gasto y remite al catálogo), así que el gateway no se
-redespliega: los nuevos aparecen tras el release. Hiring/Globe quedan fuera: sus tools no están en el manifiesto de
-Greenhouse y el contrato de manuales sólo gobierna ése. Techo "revisar al pasar de 6" alcanzado: la próxima adición
-particiona por dominio.
-
-**Segundo release del día (23:19Z), llevado por esta sesión:** PR #216 → `4379c495013f`, run `33693657365`
-success, release_id `4379c495013f-2493cf4b-…`, manifest `released`; canary post-released: catálogo `count=6`,
-cuerpos byte-idénticos, 304/404/401, provider del gateway 6/6; watchdog ok, 4/4 workers (ops-worker
-change-gated con diff de árbol vacío). Incluyó TASK-1805 Slices 1–3 (sin flag; migración expand ya aplicada,
-único bypass) y la reconciliación de **10 commits que `cesargrowth11` empujó directo a `main`** (skill Berel,
-22:06–22:10Z) por cherry-pick + `-s ours`. Playbook gana el anti-patrón #15. Ledger de tiempos actualizado.
-
-**Barrido documental por subagentes (23:45Z):** dos agentes actualizaron lo que el cierre manual no cubría —
-`api-platform-ecosystem.md` (lane de manuales), `efeonce-mcp-gateway.md` (provider `greenhouse-skills`, 36 tools),
-arquitectura API Platform (delta), ADR del gateway (delta provider + guard no-SEO), patrones canónicos (segundo
-uso del patrón manifiesto+artefacto+hash), `docs/api` (pointer), arquitectura SEO §7 (manuales obligatorios por
-task), manuales de uso del inventario/gateway/provider SEO, doc funcional SV360 por MCP, skills
-`dataforseo-operator` y `seo-aeo-practice` (espejadas), README y AGENTS del repo `efeonce-mcp` (cifras 28/36/6).
-Regla auto-cargada `.claude/rules/mcp-tool-surface.md` gana el invariante de manuales.

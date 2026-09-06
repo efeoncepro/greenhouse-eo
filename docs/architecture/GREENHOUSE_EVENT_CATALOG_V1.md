@@ -47,8 +47,9 @@ Implementación y rollout gobernados por el ADR interno TASK-1836; no asumir reg
 
 ## Delta 2026-09-06 — TASK-1837: entrega de la invitación externa (1 event nuevo, 1 payload ampliado, 1 consumer reactivo nuevo)
 
-Mismo aggregate `external_identity_binding`. Estado `code complete, rollout pendiente` (migración sin aplicar, flags
-OFF). El contrato de payload de TASK-1631 se mantiene intacto: **NUNCA token, email ni subject** — la entrega del
+Mismo aggregate `external_identity_binding`. Estado: **en producción desde el 2026-09-06** (release
+`b3e324cb5c8d-3cfce865-236f-4e4e-b128-8e144de193cf`; migración aplicada a la instancia compartida y los dos flags
+`EXTERNAL_INVITATION_*` encendidos en Vercel Production). El contrato de payload de TASK-1631 se mantiene intacto: **NUNCA token, email ni subject** — la entrega del
 correo **no** viaja por el outbox justamente porque el evento `issued` no lleva el secreto; el envío ocurre
 post-commit dentro del command y sólo su RESULTADO se publica.
 

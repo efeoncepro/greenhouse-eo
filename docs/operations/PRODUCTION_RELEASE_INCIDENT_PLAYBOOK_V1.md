@@ -1,9 +1,9 @@
 # Production Release Incident Playbook V1
 
 > **Tipo de documento:** Playbook operativo canónico
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-05-12 por Claude Opus 4.7 (post incidente TASK-870)
-> **Ultima actualizacion:** 2026-09-04 por Claude (anti-patterns #17 gate `Production` case-sensitive y #18 clasificador change-gate de un solo servicio; caso positivo `9100bbd2765d`, primer release con 5 servicios)
+> **Ultima actualizacion:** 2026-09-06 por Claude (anti-patterns #19 autorizacion de mutaciones externas pedida tarde y #20 arboles identicos vs SHA distinto; caso positivo `b3e324cb5c8d`)
 > **Audience:** Cualquier agente AI (Claude, Codex, Cursor) y operadores humanos que enfrenten un `Production Release Orchestrator` fallando
 
 ---
@@ -625,6 +625,41 @@ target (`git diff --name-only <served_sha> <target_sha>` vacío); ni el skip del
 `change-gated` del watchdog lo reemplazan — la etiqueta sólo dice que las rutas *declaradas* no cambiaron. Un
 DRIFT `error` con diff completo vacío es un bug del clasificador, no una razón para redeployar.
 
+### 19. Pedir la autorización de las mutaciones externas cuando el gate ya está listo, en vez de al empezar
+
+**Release 2026-09-06, `b3e324cb5c8d`:** la evidencia del SHA de `main` quedó completa y verde a las
+`10:07Z`, y el dispatch del orquestador ocurrió a las `11:11Z`. Son **64 minutos de reloj** que no
+consumió ningún sistema: fue la espera de la autorización humana para ejecutar `gh workflow run`. Con
+todo lo demás verde, ese fue el bloqueador más caro del release — y el único enteramente evitable.
+
+El clasificador de permisos del agente ya está documentado en los gotchas #15 y #16 de la skill
+(`vercel env add`, `vercel redeploy`, `git merge`, `git push`, `gh pr create/merge`, el `gh api -X POST`
+que aprueba los gates). El aporte de este release no es descubrirlo: es el **costo medido**, y que el
+dispatch del orquestador (`gh workflow run`) cae en la misma clase.
+
+**Regla:** al abrir el release, enumerar en un solo mensaje **todas** las mutaciones externas que la
+secuencia va a necesitar —merge canónico y push a `develop`, creación y merge del PR, `gh workflow run`
+del smoke sobre `main`, `gh workflow run` del orquestador, el POST de aprobación de los dos gates, y los
+`vercel env add` + `vercel redeploy` de los flags— y pedir la autorización **completa por adelantado**.
+Pedirla comando por comando corta el flujo exactamente donde corre el reloj del ledger de tiempos.
+
+### 20. Leer un SHA distinto en un worker change-gated como drift, sin comparar los árboles
+
+**Release 2026-09-06, `b3e324cb5c8d`:** `ops-worker` y `auth-server` cerraron sirviendo `2b385284d594`,
+que no es el target, y el release estaba sano. Los dos discriminadores dieron lo mismo:
+`git diff --name-only 2b385284d594 b3e324cb5c8d` (sin `--`) vacío, y `git rev-parse <sha>^{tree}`
+devolviendo `d3a1432a1f71` para **ambos** commits. Watchdog: `drift_count=0`, `data_missing_count=0`.
+
+Esto no repite el §13 ni el §18 —el diff de árbol completo ya es ahí la verificación que manda, y el
+clasificador por servicio ya está corregido—. Lo que agrega es el **segundo discriminador**: comparar el
+hash de árbol de cada commit responde la misma pregunta por identidad en vez de por ausencia, y deja en
+la evidencia un valor positivo que se puede pegar en el Handoff, en lugar de "el comando no imprimió
+nada".
+
+**Regla:** un SHA distinto del target en un servicio change-gated no es evidencia de nada por sí solo.
+Árboles idénticos cierran el caso sin depender de ninguna lista de rutas; árboles distintos lo abren
+aunque el gate haya reportado `deploy_needed=false`.
+
 ## Caso positivo 2026-08-06 — el release que no generó incidente
 
 Hasta esta versión, este playbook sólo documentaba incidentes. Eso deja un sesgo:
@@ -810,6 +845,36 @@ Lo que igual costó tiempo son los dos anti-patterns nuevos de arriba: 21 minuto
 minúscula (§17) y el falso DRIFT del watchdog sobre `auth-server` (§18), corregido el mismo día con el mapa por
 servicio + test de paridad. Tiempo agente end-to-end ~2h30m; fases y números en
 `PRODUCTION_RELEASE_TIMING_LEDGER.md`, fila 2026-09-04.
+
+## Caso positivo 2026-09-06 — un solo intento, y el único bloqueador fue humano
+
+El release `b3e324cb5c8d7cb4b903ae43b263cf2aa736bcd8` (PR #227 squash; run `34029501838`; manifest
+`b3e324cb5c8d-3cfce865-236f-4e4e-b128-8e144de193cf` `released`, `9m21s` desde `record-started`,
+`11:13:48Z`→`11:23:09Z`; dispatch `11:11:00Z`, workflow ~12m30s) cerró en **un solo run, sin retry**.
+
+Lo que salió bien, en orden:
+
+- **Break-glass planificado, no sorpresa.** El batch llevaba dominio irreversible (`db_migrations` +
+  `auth_access`), así que `release_batch_policy` iba a pedir `requires_break_glass` desde el principio
+  (par del 2026-08-09). La razón se redactó con hechos comprobables (§9): la única migración del lote
+  (`…_task-1837-external-invitation-delivery-lifecycle`) ya estaba aplicada en la instancia única,
+  verificado en `public.pgmigrations` con su `run_on` del mismo día. **No se usó el marker
+  `[release-coupled:]`**: la decisión era `requires_break_glass`, y el marker sólo resuelve
+  `split_batch`.
+- **Smoke de `main` producido, no bypasseado** (gotcha #3 de la skill): `gh workflow run playwright.yml --ref main`
+  y esperar verde. Junto con CI, CI Deep Verification, Task Contract, Agent Context Governance y el
+  gate de CLAUDE.md, toda la evidencia quedó `success` sobre el SHA exacto de `main`.
+- **Los dos gates `Production` se aprobaron en 29 segundos** con el loop que compara
+  `(.environment.name|ascii_downcase)=="production"` (§17). Contra los 21 minutos del 2026-09-04, es la
+  medida de cuánto costaba el filtro en minúscula.
+- **Merge canónico `-s ours`** con V1 = sólo el squash del release anterior: diff del merge vacío y cero
+  archivos exclusivos de `main`.
+- **Cierre limpio:** tres servicios Cloud Run en el target, `ops-worker` y `auth-server` change-gated
+  con árbol idéntico (§20) y watchdog `drift_count=0`.
+
+**Lo que costó tiempo fue una sola cosa, y no fue técnica:** 64 minutos esperando la autorización humana
+para el dispatch con toda la evidencia ya verde (§19). Fases y números:
+`PRODUCTION_RELEASE_TIMING_LEDGER.md`, fila 2026-09-06.
 
 ## Decisión: ¿cuándo eliminar / relajar el preflight?
 
