@@ -300,7 +300,10 @@ graph, because the gateway will resolve the caller against it:
   population, flags and external eligibility live; internal issuance is not evidence of an external cohort.
   The binding endpoint described above is the external contract; native internal dispatch uses the
   context/token-aware reader defined in the internal authority ADR. See `references/native-authority.md`.
-- External invitation delivery & delegated authority (`TASK-1837`; migration applied 2026-09-06, both flags OFF):
+- External invitation delivery & delegated authority (`TASK-1837`; migration applied 2026-09-06; verified
+  end-to-end in staging 2026-09-06 — real email, accept, magic link, session, forced bounce, resend, reveal and
+  delegated lane — audit `docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`; both flags
+  ON in Vercel staging, Production pending release):
   with `EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED` ON the invitation email goes out from Greenhouse itself —
   acceptance URL `<issuer origin>/i/<token>`, derived from `external_identity_environments.issuer_url` of the
   binding's environment, never from an env var — and the admin response carries `delivery` but **no token**
@@ -313,7 +316,10 @@ graph, because the gateway will resolve the caller against it:
   designatedAdmin? }`. Outcomes: 404 when `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` is OFF or the
   consumer is not internal (anti-oracle); 403 `forbidden` when the subject is not the designated admin of that
   binding (cause never distinguished); 422 on self-elevation (`designatedAdmin: true`) or seat cap; 429 on the
-  hourly cap; the response never contains the token. Federating it as an MCP tool in `efeonce-mcp` is pending
+  hourly cap; the response never contains the token. Canonical staging recipe for the delegated lane:
+  `Authorization: Bearer <gateway consumer token>` (Secret Manager `efeonce-mcp-gateway-greenhouse-token`) +
+  `externalScopeType=other&externalScopeId=efeonce-mcp-gateway` + `environment` + `subject` + `bindingId`; the
+  POST also needs `Idempotency-Key`. Federating it as an MCP tool in `efeonce-mcp` is pending
   (`TASK-1831`/`TASK-1832`). Signals: the `identity.external_*` group is now 9, adding
   `identity.external_invitation.{undelivered,expired_unaccepted,token_revealed}` (`token_revealed` steady 0 —
   any value must carry actor + reason in the audit).

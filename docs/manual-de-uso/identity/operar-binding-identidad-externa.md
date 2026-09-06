@@ -43,7 +43,8 @@ Necesitas:
 - El **`organizationId`** de la organización cliente en Account 360 (formato `org-<uuid>`). Si no la tienes,
   la consulta de elegibilidad del paso 2 la busca por nombre.
 - Saber si el flag `EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED` está encendido en el entorno donde operas
-  (hoy está **apagado** en todos; ver `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`). Con el flag encendido el
+  (hoy está **encendido en staging** desde el 2026-09-06 y **apagado en producción** hasta el release; ver
+  `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`). Con el flag encendido el
   sistema envía el correo y la respuesta no trae `token`; apagado, el token vuelve en la respuesta y lo entregas
   tú por un canal seguro (nunca un ticket ni un chat abierto).
 
@@ -221,7 +222,8 @@ pnpm staging:request POST /api/admin/identity/external-access/bindings/xob-<uuid
 ### 5d. Qué hacer cuando el correo rebota
 
 El proveedor de correo avisa el rebote por webhook; el ops-worker lo recibe y marca la invitación con
-`deliveryStatus: "bounced"` (evento `email_delivery.bounced`, sin flag). Lo ves así:
+`deliveryStatus: "bounced"` (evento `email_delivery.bounced`, sin flag). Verificado en staging el 2026-09-06 con
+un rebote real de Resend (ver el audit en 8b). Lo ves así:
 
 1. La señal `identity.external_invitation.undelivered` pasa a `warning` en `/admin/operations` → Identity.
 2. En `GET .../bindings/xob-<uuid>` la invitación sigue `issued` pero con `deliveryStatus: "bounced"` y
@@ -295,17 +297,43 @@ pnpm identity:external-access:smoke -- --apply # ciclo completo sobre el fixture
   1 h, el token rotado se rechaza con `invitation_not_open`), aceptación como administrador designado y la **lane
   delegada** in-process (positivo, auto-elevación 422, binding ajeno 403, lista propia) y la limpieza del
   administrador al revocar. Deja `identity.external_invitation.token_revealed` en `warning` durante 24 h: es
-  esperado, igual que `unbound_dispatch_attempt`. Sigue sin enviar correo real; el ciclo de correo se verifica
-  aparte con el flag encendido y un binding externo real. Evidencia de la corrida del 2026-09-06:
+  esperado, igual que `unbound_dispatch_attempt`. Sigue sin enviar correo real; el ciclo de correo se verificó
+  aparte en staging el 2026-09-06, con el flag encendido y un binding externo de prueba sobre el mismo fixture
+  (ver 8b). Evidencia de la corrida del 2026-09-06:
   `docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`.
+
+### 8b. Cómo se verificó el ciclo de correo (staging, 2026-09-06)
+
+El recorrido completo se ejercitó contra **staging desplegado** con los dos flags encendidos, sobre un binding
+externo de prueba de la organización fixture y una casilla controlada del operador: emisión sin `token` en la
+respuesta → correo real de invitación → `/i/<token>` → aceptar (202) → `linked` → magic link real → sesión
+(200) y un solo uso del enlace (400) → rebote forzado con la señal `undelivered` encendiéndose (ok → warning)
+→ reenvío (`deliveryAttempts` 2) → revelación gobernada (1 h) → lane delegada con el consumer del gateway
+(200/403/422/201 y correo real) → revocación del binding con la sesión muriendo (401). Paso a paso, con
+timestamps y estados en PG:
+`docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`
+§"Verificación viva end-to-end en staging". Producción queda pendiente del release.
+
+Para repetirlo en staging sin inventar casillas, usa las direcciones de prueba de Resend, que son el camino
+canónico para forzar cada resultado:
+
+| Casilla | Qué fuerza | Qué esperas ver |
+| --- | --- | --- |
+| `bounced@resend.dev` | Un rebote permanente del proveedor. | `deliveryStatus: "bounced"`, `lastDeliveryErrorCode: "bounce:Permanent"`, audit `invitation_delivery_bounced` y la señal `identity.external_invitation.undelivered` en `warning`. |
+| `delivered@resend.dev` | Una entrega confirmada sin casilla humana. | `deliveryStatus: "sent"` → `delivered`; sirve para probar el reenvío (5b) sin molestar a nadie. |
+
+Ambas quedan como invitaciones reales del binding: revócalas al terminar (paso 7). Para el tramo que necesita
+leer el correo (aceptar, magic link) usa una casilla real que controles, nunca la de un cliente.
 
 ### 9. El cliente invita a su gente (lane delegada)
 
 La persona que aceptó como **administrador designado** de un binding puede listar e invitar personas de su
 propia organización. No llama a Greenhouse directo: habla con el gateway MCP, que verifica su token y llama a
 la lane ecosystem con `environment` + `subject` (consumer `internal`). Hoy el flag
-`EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` está **apagado** (la lane responde 404) y el gateway aún no
-federa la lane (TASK-1831/1832); las llamadas siguientes describen el contrato para cuando esté encendido.
+`EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` está **encendido en staging** (la lane se verificó allí el
+2026-09-06 con el token del consumer del gateway: 200/403/422/201 y correo real; ver 8b) y **apagado en
+producción** hasta el release (allí la lane responde 404); el gateway aún no federa la lane como tool MCP
+(TASK-1831/1832). Las llamadas siguientes describen el contrato tal como se ejercitó.
 
 ```bash
 # Listar las invitaciones del binding propio
@@ -450,7 +478,8 @@ Otros síntomas:
   `migrations/20260904110809060_task-1631-invitation-linked-check-one-directional.sql` y
   `migrations/20260906004450748_task-1837-external-invitation-delivery-lifecycle.sql` (columnas `delivery_*`,
   tipos de audit, capabilities `reveal_token`/`issue_delegated`, `email_type_config`; **aplicada 2026-09-06** a la
-  instancia compartida; pendientes los flags, el correo real y la federación de la lane delegada en el gateway).
+  instancia compartida; correo real, rebote y lane delegada **verificados en staging el 2026-09-06** — ver 8b y el
+  audit; pendientes el release a producción con sus flags y la federación de la lane delegada en el gateway).
 - Flags (`EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED`, `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED`) y knob
   `EXTERNAL_INVITATION_DELEGATED_SEAT_LIMIT`: estado por entorno y orden de rollout en
   [FEATURE_FLAG_STATE_LEDGER.md](../../operations/FEATURE_FLAG_STATE_LEDGER.md).

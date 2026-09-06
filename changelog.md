@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-06 — Efeonce ID: invitación externa verificada end-to-end en staging (TASK-1837)
+
+Con los flags ON en Vercel staging y un binding de prueba sobre el emisor real, el recorrido completo corrió sin que
+nadie tocara el token: correo real en Outlook, aceptación en `auth.efeonce.org`, persona externa nueva con admin
+designado, magic link y sesión viva; rebote forzado con `bounced@resend.dev` marcado `bounced` y la señal
+`identity.external_invitation.undelivered` observada encendiéndose; reenvío que rota, revelación de 1 h, y la lane
+delegada ejercitada con el token del gateway (200/403/422/201, correo real). Al cierre el binding se revocó y la
+sesión murió (401). Producción espera el release y el flip de flags; la federación de la lane en `efeonce-mcp` sigue
+pendiente. [Evidencia](docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md).
+
 ## 2026-09-06 — Efeonce ID: el sistema entrega la invitación externa; autoridad delegada del cliente (TASK-1837)
 
 `issueExternalInvitation` envía el correo (`external_access_invitation`, token_sensitive, marca Efeonce) después
@@ -855,25 +865,3 @@ Growth/SEO instruía editar a mano el espejo retirado, y no existía ninguna rul
 (creada). `mcp:manifest:check` entró a `local:check` — antes el drift del artefacto sólo aparecía en CI.
 Fila nueva en `DECISIONS_INDEX.md`: la frontera "qué capacidades existen es conocimiento de producto,
 no de transporte" es la tercera arista del triángulo que ya fijaban las dos filas MCP existentes.
-
-## 2026-08-31 — Content Marketing: diseño aprobado publicado en Elementor
-
-Versionado local del runtime: `73493a8`; cambios Greenhouse acompañados en este cierre, sin push.
-
-Revisión documental delegada: arquitectura/funcional/manual, skills WordPress/Growth Forms e índices
-sincronizados con la entrega. Contratos UI distinguen plan de export publicado; task conserva sus
-pendientes. Se precisan rollback, empaquetado, orden visible del menú y riesgo del pin tras resize.
-Sin cambio de código ni nueva publicación durante esta revisión.
-
-Menú verificado: **Soluciones → Crecimiento Multicanal → Content Marketing**, item `242917`, sin duplicados ni cambio de orden.
-[Revisión editorial de ambas secciones](docs/audits/public-site/2026-08-31-content-marketing-editorial-copy.md): 118 campos publicados, siete pasos coherentes; diseño/SEO/shell intactos.
-[Segundo pase editorial](docs/audits/public-site/2026-08-31-content-marketing-hub-review-copy.md): hub y revisión creativa, 83 campos publicados; tres cortes y fichas de campaña revisados.
-[CMS y modos](docs/audits/public-site/2026-08-31-content-marketing-cms-modes.md): 53 textos y cuatro logos oficiales publicados; ocho controles nuevos, diseño general y SEO conservados.
-[Ecosistema y FAQ](docs/audits/public-site/2026-08-31-content-marketing-ecosystem-faq.md): 37 textos y seis URL publicados; tarjetas completas y ocho FAQ, sin cambios de diseño/SEO.
-[Marca en modalidades](docs/audits/public-site/2026-08-31-content-marketing-mode-logo.md): dos logos ampliados con CSS acotado, sin cambiar contenido ni SEO.
-[Indexabilidad del menú](docs/audits/public-site/2026-08-31-menu-indexability.md): 18/18 páginas habilitadas; sólo Redes Sociales requería quitar noindex. Canonical/sitemap verificados; indexación GSC no afirmada.
-[Cierre, caso interno y formulario](docs/audits/public-site/2026-08-31-content-marketing-business-conversion.md): 48 textos Elementor y copy de form v3 publicados; correo copiado coincide con lo visible, sin cambiar destino ni enviar leads. Ajuste posterior: cinco textos condensados para equilibrar las columnas, sin cambiar el formulario. Cierre documental con tres subagentes; runtime `f12dd64`, ocho archivos idénticos a producción, sin push.
-
-Trece widgets editables conservan composición, assets e interacciones de Content Ops; header/footer Ohio
-nativos. Captura canónica de dos pasos, select preseleccionado corregido, Yoast/meta/social/Service y URL
-original preservada. [QA y límites](docs/audits/public-site/2026-08-31-content-marketing-publication.md).

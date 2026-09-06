@@ -261,15 +261,20 @@ es planificación; no acredita implementación ni login interno nativo operativo
 
 ## Delta 2026-09-06 — U12 entrega gobernada de la invitación externa (TASK-1837)
 
-Estado de U12: **`code complete; migración aplicada 2026-09-06; flags OFF; verificación viva pendiente`**.
-La migración `20260906004450748_task-1837-external-invitation-delivery-lifecycle` corrió en la instancia
-compartida (`run_on 2026-09-06T04:27:58Z`) y el smoke `pnpm identity:external-access:smoke -- --apply`
-ejercitó contra PG real reenvío, fallo de entrega, revelación gobernada (la señal
-`identity.external_invitation.token_revealed` se vio encender ok→warning), aceptación como administrador
-designado, lane delegada in-process (positivo + 3 negativos) y limpieza del administrador al revocar.
-Quedan pendientes: los dos flags `EXTERNAL_INVITATION_*` NOT SET en Vercel, ningún correo real enviado (no
-existe binding externo; sólo el interno `xob-139e…` de U11), federación de la lane delegada en `efeonce-mcp`
-(U05/U07) y la primera persona externa real por decisión del operador. Evidencia:
+Estado de U12: **`verificado end-to-end en staging 2026-09-06 (flags ON en staging); producción pendiente de
+release`**. La migración `20260906004450748_task-1837-external-invitation-delivery-lifecycle` corrió en la
+instancia compartida (`run_on 2026-09-06T04:27:58Z`), el smoke `pnpm identity:external-access:smoke -- --apply`
+ejercitó contra PG real reenvío, fallo de entrega, revelación gobernada, aceptación como administrador designado,
+lane delegada in-process y limpieza del administrador al revocar, y después, con los dos flags
+`EXTERNAL_INVITATION_*` encendidos en Vercel staging, se recorrió el ciclo completo sobre un binding externo de
+prueba (organización fixture + casilla controlada): correo real de invitación sin token en la respuesta →
+`/i/<token>` → aceptar 202 → `linked` → magic link real → sesión 200 (reuso 400); rebote forzado con
+`identity.external_invitation.undelivered` observada encendiéndose ok→warning; reenvío; revelación gobernada
+(`token_revealed` en warning); lane delegada con el consumer del gateway (200/403/422/201 + correo real); y
+revocación del binding con la sesión muriendo (401). Quedan pendientes: promover a `main` y prender los flags en
+Vercel Production (el ops-worker y el auth-server toman el código nuevo en ese release), federación de la lane
+delegada en `efeonce-mcp` (U05/U07) y la primera persona externa de un CLIENTE real por decisión del operador.
+Evidencia:
 [2026-09-06-task-1837-external-invitation-delivery-evidence.md](../../audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md).
 Esta unidad no se declara completa ni mueve el epic.
 

@@ -1,32 +1,19 @@
 # Handoff activo
 
-**TASK-1837 (EPIC-044 U12) — `code complete; migración APLICADA; flags OFF; correo real pendiente`** (sesión
-greenhouse-eo-21, 2026-09-06, develop; commits `5518d868e` · `6cb8042a8` · `c9371b28f` · `4f03cdff6` · `189148c6e` ·
-`db5a0adf3` + docs). El sistema entrega la invitación externa en el mismo acto que genera el token (post-commit, nunca
-por consumer reactivo), la URL sale del `issuer_url` del environment, la ruta admin deja de devolver `token` con
-`EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED=true`, reenviar = rotar, revelar = excepción auditada de 1 h, rebote por
-proyección sin flag, 3 señales `identity.external_invitation.*`, un solo admin designado vigente, lane ecosystem
-delegada (gateway-mediated; `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` OFF ⇒ 404) y consentimiento con host del
-`redirect_uri`. **Rollout ejecutado:** migración `20260906004450748` aplicada a la instancia compartida
-(2026-09-06T04:27Z) y verificada; smoke live `--apply` extendido verde contra PG real (reenvío rota, `failed`
-registrado, revelación 60 min, token viejo rechazado, delegada 201/422/403, admin cleared; `token_revealed` se vio
-ENCENDER ok→warning). `pnpm test` 13.784 ✔ · typecheck ✔ · local:check ✔ · **build de producción ✔ (79 s)**.
-**Límite honesto:** no existe binding externo (el único activo es `internal`, piloto TASK-1836) → sin correo real,
-sin rebote forzado, flags NOT SET. **Próximo paso:** el operador designa organización cliente + persona (bindea con
-`bindExternalOrganization`), se prende el flag de entrega en Vercel staging, correo real → `/i/<token>` → `linked`,
-rebote forzado (señal `undelivered` ENCENDIDA), federar la lane delegada en `efeonce-mcp` (TASK-1831/1832), producción
-con 24 h. Skills espejo actualizadas: `efeonce-mcp-platform` (lane delegada, matriz de verificación) y `greenhouse-qa-release-auditor/security-qa`.
-**Push a develop `21aa12608..4e81e371a` (2026-09-06 01:43Z): CI y 8 deploys verdes; staging READY y sondeado (detalle de
-binding devuelve `deliveryStatus`, `reveal` responde 422 canónico, lane delegada desplegada).** ⚠️ **Incidente de
-coordinación:** el push cayó en medio del Production Release de PR #226 (`456d9acc`, orquestador 01:41); los deploys
-de develop pisaron los Cloud Run compartidos (`commercial-cost-worker` `00558` de develop sobre la `00557` del release)
-→ `GIT_SHA mismatch`, manifest a `failure`; `ICO Batch Worker Deploy` de develop falló por el mismo choque. El operador
-relanzó el orquestador (01:53) y cerró `released` con todo en success; los cuatro workers quedaron en `456d9acc`.
-Regla nueva (memoria): antes de pushear develop, `gh run list --workflow production-release.yml` + PRs mergeados a
-main; no pushear con un release en vuelo.
-Evidencia: [audit](docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md);
-[task](docs/tasks/in-progress/TASK-1837-efeonce-id-external-invitation-delivery-delegated-authority.md);
-[ledger](docs/operations/FEATURE_FLAG_STATE_LEDGER.md) § Pendientes.
+**TASK-1837 (EPIC-044 U12) — `VERIFICADO END-TO-END EN STAGING 2026-09-06; producción pendiente de release`**
+(sesión greenhouse-eo-21; commits `5518d868e…` + rollout `db5a0adf3` + docs; develop pusheado hasta `2654f16eb`,
+cierre final commiteado sin push). Migración aplicada; flags `EXTERNAL_INVITATION_{SYSTEM_DELIVERY,DELEGATED_AUTHORITY}_ENABLED`
+**ON en Vercel staging** (redeploy `greenhouse-6u3f57s4p`), **NOT SET en Production** (el código no está en `main`).
+Recorrido vivo con binding de prueba (org fixture → `efeonce-auth`) y persona `jreyes+task1837@` (Outlook real):
+invitación 201 sin token → correo en 37 s → `/i/<token>` → accept 202 → `external_contact` nueva + admin designado →
+magic link → sesión `auth.efeonce.org` 200 (`amr magic_link`, reuso 400) → rebote `bounced@resend.dev` → `bounced` +
+señal `undelivered` ENCENDIDA ok→warning (drenaje local acotado: el ops-worker corre `main`) → reenvío 201 → revelación
+201 (1 h) → lane delegada con token del gateway 200/403/422/201 + correo real → revoke binding → sesión 401. Consent
+con host: capturas dev-UI. **Próximo paso:** release develop→main (coordinar con `production-release.yml`; el push a
+develop de las 01:43 rompió el release #226 y hubo que relanzarlo) + prender ambos flags en Vercel Production; federar la
+lane delegada en `efeonce-mcp` (TASK-1831/1832); primera persona de un CLIENTE real = decisión comercial. Follow-up
+menor: `revokeExternalAccess` scope `binding` no limpia `designated_admin_profile_id` (inerte). Evidencia:
+[audit](docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md) · [task](docs/tasks/in-progress/TASK-1837-efeonce-id-external-invitation-delivery-delegated-authority.md) · [ledger](docs/operations/FEATURE_FLAG_STATE_LEDGER.md).
 
 **TASK-1836 / TASK-1831 — evidencia consolidada, 2026-09-06:**
 Tres subagentes actualizaron contratos, funcionales, manuales, tasks/epic y skills espejo.

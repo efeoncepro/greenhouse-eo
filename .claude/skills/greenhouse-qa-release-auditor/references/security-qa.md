@@ -53,6 +53,11 @@ Check when `src/lib/identity/external-access/**`, the admin invitation routes, t
 - Delegated lane: 404 flag OFF / non-internal consumer, 403 non-admin or foreign binding, 422 self-elevation
   or seat cap, 429 hourly cap; response without token; `Idempotency-Key` on POST.
 - Consent page shows the host of the validated `redirect_uri`; a missing host is a render error.
+- Evidence hint: Resend test addresses `bounced@resend.dev` / `delivered@resend.dev` force a real bounce /
+  delivery through the webhook → outbox → projection path (`delivery_status` `bounced` with `bounce:Permanent`
+  and the `undelivered` signal lighting is the proof, not the 201).
+- Evidence hint: a live issuer session must die — `/auth/session` answers 401 — after `revokeExternalAccess`
+  revokes the scope binding; a session that survives the revoke is a blocker.
 - Rollout order: migration before the code deploy (the invitation SELECT reads the new columns).
 
 Blockers: a token-bearing response, outbox event or log line; an acceptance URL built from an env var;

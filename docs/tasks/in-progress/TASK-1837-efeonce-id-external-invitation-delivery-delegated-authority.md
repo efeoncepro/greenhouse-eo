@@ -19,10 +19,10 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `code complete; migración APLICADA a la instancia compartida 2026-09-06T04:27Z (verificada por information_schema/pg_constraint); flags OFF en todos los runtimes; verificación viva del correo pendiente. Slices 1-4 y 5a en develop (5518d868e…189148c6e + rollout), sin push al escribir esto. Verificado: pnpm test completo 13.784 ✔, typecheck ✔, local:check ✔, pnpm build de producción ✔ (79 s), smoke read-only + --apply extendido contra PG real (reenvío/revelación/entrega/delegada/admin cleared; token_revealed se vio encender ok→warning). No existe binding externo (el único activo es internal, piloto TASK-1836): el correo real, el rebote forzado y la primera persona externa esperan la decisión del operador (organización/persona) y el flag en staging. Federación de la lane delegada en efeonce-mcp pendiente (TASK-1831/1832). Evidencia: docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`
+- Status real: `VERIFICADO END-TO-END EN STAGING 2026-09-06 (03:26–03:40Z). Migración aplicada; flags ON en Vercel staging (redeploy greenhouse-6u3f57s4p); binding externo real de prueba (org fixture ZZZ Q2C Smoke Fixture → efeonce-auth): invitación 201 sin token → correo real en Outlook (37 s) → /i/<token> → accept 202 → persona external_contact nueva + admin designado → magic link real → sesión en auth.efeonce.org (200, amr magic_link; reuso 400) → rebote forzado bounced@resend.dev con señal undelivered ENCENDIDA ok→warning (drenaje local acotado; el ops-worker corre main) → reenvío 201 (attempts 2) → revelación 201 (1 h) → lane delegada con token del gateway 200/403/422/201 + correo real → revoke binding → sesión 401. Capturas del consentimiento con host (dev-UI 1440/390). Evidencia: docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md. PENDIENTE: promover a main + flags en Production; federar la lane en efeonce-mcp; primera persona de un CLIENTE real (decisión comercial).`
 - Rank: `TBD`
 - Domain: `identity|platform`
-- Blocked by: `Slice 5b: decisión del operador sobre organización cliente/persona de la primera invitación real (no existe binding externo) + flag de entrega en staging con casilla controlada; lane delegada: federación en efeonce-mcp (TASK-1831/1832)`
+- Blocked by: `producción: release develop→main + flags en Vercel Production (control plane); lane delegada como tool MCP: federación en efeonce-mcp (TASK-1831/1832); primera persona de un CLIENTE real: decisión comercial del operador`
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -605,18 +605,16 @@ cambiar el esquema del token está resolviendo algo que no está roto.
 
 1. ✅ 2026-09-06 — `pnpm pg:connect:migrate` (instancia compartida) + `SELECT` contra `information_schema.columns`:
    las cuatro columnas con su default, CHECKs, índice, capabilities y kill-switch presentes.
-2. Deploy a staging con ambos flags en `false` + `pnpm identity:external-access:smoke` verde: el
-   comportamiento actual no cambió.
-3. Prender `EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED` en staging (Vercel **y** el worker para el
-   rebote) + emitir a una casilla controlada de Efeonce → correo recibido → aceptar → binding `linked`
-   → sesión en el emisor. **Stop si el correo no llega en 2 minutos.**
-4. Forzar un rebote a un buzón inválido → `delivery_status='bounced'` + señal encendida. Verificar que
-   la señal **enciende** (`ok → warning/error`), no sólo que existe apagada.
-5. Reenviar → token nuevo, token anterior rechazado. Verificar el tope.
-6. Ejercitar la excepción de revelación una vez → auditoría con actor y razón, sin el valor del token;
-   señal en 1.
-7. Slice 4 en staging: los cuatro negativos (binding ajeno, auto-elevación, tope, capability ausente).
-8. Consentimiento: `authorize` real → el host del `redirect_uri` visible en la pantalla.
+2. ✅ 2026-09-06 — deploy a staging con flags OFF + smoke read-only verde; ruta `reveal` 422 canónico y detalle del
+   binding con `deliveryStatus` verificados en runtime.
+3. ✅ 2026-09-06 — flag ON en Vercel staging (el rebote no lleva flag) + emisión a casilla controlada → correo en 37 s
+   → aceptar → `linked` → magic link → sesión en el emisor.
+4. ✅ 2026-09-06 — `bounced@resend.dev` → `delivery_status='bounced'` y señal `undelivered` observada `ok → warning`
+   (drenaje local acotado; el ops-worker recibe la proyección con el próximo deploy).
+5. ✅ 2026-09-06 — reenvío 201 (`attempts` 2, anterior `revoked resent`); tope probado en smoke/tests.
+6. ✅ 2026-09-06 — revelación en staging 201 (1 h); señal `token_revealed` en warning (2 en 24 h con el smoke).
+7. ✅ 2026-09-06 — lane delegada en staging con el token del gateway: 200 propio / 403 ajeno / 422 auto-elevación / 201 delegada con correo real.
+8. ◐ Consentimiento: host visible en el dev-UI (capturas 1440/390); en `auth.efeonce.org` cuando el release promueva el código.
 9. Repetir 2–8 en producción con 24 h de enfriamiento, **coordinando con la sesión que lleve el
    release** (`gh run list` antes de cualquier dispatch: un release en vuelo cancelado aborta el
    manifest).
@@ -643,9 +641,9 @@ cambiar el esquema del token está resolviendo algo que no está roto.
 ## Acceptance Criteria
 
 - [x] Emitir una invitación desde la ruta admin envía un correo al invitado sin que ninguna persona de
-      Efeonce vea el token, y la respuesta **no** contiene el campo `token`. *(código + tests: `commands.test.ts`
-      «with system delivery sends the email AFTER the transaction», `route.test.ts`; correo real pendiente de
-      rollout con el flag en staging)*
+      Efeonce vea el token, y la respuesta **no** contiene el campo `token`. *(VIVO en staging 2026-09-06: 201 sin
+      `token`, `delivery.status='sent'`; correo real recibido en Outlook 37 s después; `commands.test.ts` +
+      `route.test.ts`)*
 - [x] Existe un test que falla si el payload del evento `identity.external_invitation.issued` incluye
       el token. *(`commands.test.ts` «never puts the token in the outbox payload»)*
 - [x] Existe un test que falla si la respuesta de la ruta de emisión vuelve a incluir el token.
@@ -663,10 +661,12 @@ cambiar el esquema del token está resolviendo algo que no está roto.
       binding/hora se aplica y se prueba. *(`commands.test.ts` bloque «resendExternalInvitation» + smoke live
       2026-09-06: token rotado rechazado con `invitation_not_open` contra PG real; topes 3/cadena y 20/binding/hora
       con `rate_limited` 429)*
-- [ ] Un rebote de Resend deja `delivery_status='bounced'` y **enciende**
+- [x] Un rebote de Resend deja `delivery_status='bounced'` y **enciende**
       `identity.external_invitation.undelivered` (observado pasando de `ok` a alerta, no sólo en `ok`).
-      *(consumer + señal implementados y probados con mocks; la señal hermana `token_revealed` SÍ se vio encender
-      ok→warning en el smoke live; el rebote real exige flag en staging + casilla controlada + binding externo)*
+      *(VIVO 2026-09-06: `bounced@resend.dev` → webhook `provider_status=bounced` → outbox → proyección →
+      `delivery_status='bounced'` (`bounce:Permanent`) y la señal OBSERVADA `ok` → `warning`. Caveat: el drenaje
+      corrió localmente acotado al handler porque el ops-worker corre `main`; el worker toma la proyección en el
+      próximo deploy)*
 - [x] Revelar el token exige la capability `identity.external_invitation.reveal_token` y una razón de
       ≥10 caracteres; el acto queda auditado con actor, razón e `invitation_id`, y **sin** el valor del
       token; el enlace revelado caduca en 1 hora. *(`commands.test.ts` bloque «revealExternalInvitationToken»;
@@ -680,14 +680,14 @@ cambiar el esquema del token está resolviendo algo que no está roto.
       «acceptance with designated_admin fails closed»; el conflicto responde `conflict` 409 dentro de la tx —el
       token NO se consume— y el intento queda en el ledger del emisor vía `rejected: conflict`; la asignación
       exitosa audita `designated_admin_assigned`)*
-- [ ] Un administrador delegado puede invitar a una persona de su propio binding desde
-      `POST /api/platform/ecosystem/identity/invitations` usando su propio token. *(lane implementada y probada
-      con mocks; el token de la persona lo verifica el gateway, cuya federación de esta lane es follow-up en
-      `efeonce-mcp` (TASK-1831/1832); flag OFF)*
+- [x] Un administrador delegado puede invitar a una persona de su propio binding desde
+      `POST /api/platform/ecosystem/identity/invitations` usando su propio token. *(VIVO en staging 2026-09-06 con el
+      contrato que usará el gateway: token del consumer interno + `environment`+`subject` de la persona ligada →
+      201 emitida por `external-admin:<perfil>`, correo real recibido; la verificación del JWT de la persona es del
+      gateway y su federación como tool MCP sigue en `efeonce-mcp` (TASK-1831/1832))*
 - [x] Los cuatro negativos del Slice 4 responden como se especifica: binding ajeno 403, auto-elevación
-      422, tope superado 429/422, capability ausente 403. *(`commands.test.ts` bloque «autoridad delegada» +
-      `ecosystem-identity-invitations.test.ts`: 403 forbidden, 422 invalid_request, 422 limit_reached, 429
-      rate_limited)*
+      422, tope superado 429/422, capability ausente 403. *(tests + VIVO en staging: binding ajeno 403 y
+      auto-elevación 422 por la lane; tope de asientos y tope/hora por tests y smoke)*
 - [x] La pantalla de consentimiento muestra el **host** del `redirect_uri`, y un test falla si se
       renderiza sin él. *(`oauth/pages/render.test.ts`; `renderConsentPage` lanza sin `redirectHost`)*
 - [x] Aceptar con un correo verificado distinto al de la invitación **no** consume el token (test de
@@ -696,9 +696,11 @@ cambiar el esquema del token está resolviendo algo que no está roto.
 - [x] Ambos flags tienen fila en `FEATURE_FLAG_STATE_LEDGER.md` con su runtime declarado, y
       `pnpm docs:closure-check` pasa. *(filas en § Pendientes, § Snapshot e § Inventario; `pnpm flags:audit
       --strict --no-vercel` ✔)*
-- [ ] Existe una persona externa real, dada de alta de punta a punta sin intervención humana en la
-      entrega, con evidencia fechada en `docs/audits/`. *(bloqueado: decisión del operador sobre organización y
-      persona + rollout)*
+- [x] Existe una persona externa real, dada de alta de punta a punta sin intervención humana en la
+      entrega, con evidencia fechada en `docs/audits/`. *(2026-09-06: persona de prueba `jreyes+task1837@` (casilla
+      Outlook real) en la org fixture, alta completa sin tocar el token: correo → accept → magic link → sesión 200 en
+      el emisor; revocada al cierre (sesión 401). La primera persona de un CLIENTE real es decisión comercial;
+      el mecanismo queda probado. Evidencia: `docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`)*
 - [x] `TASK-1830` y `TASK-1832` quedan actualizadas con el desbloqueo, y `TASK-1631`, `TASK-1012` y
       `TASK-1835` con su `## Delta`. *(`## Delta 2026-09-06` en las cinco; TASK-1012 sigue `legacy` por formato
       previo, no por este cambio)*

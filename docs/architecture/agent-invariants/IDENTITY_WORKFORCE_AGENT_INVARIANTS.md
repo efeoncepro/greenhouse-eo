@@ -468,14 +468,19 @@ del dominio; el resto lo bundlea `services/auth-server`).
 
 ## Entrega gobernada de la invitación externa y autoridad delegada (TASK-1837)
 
-> Estado 2026-09-06: **`code complete; migración aplicada 2026-09-06; flags OFF; verificación viva pendiente`** —
-> migración `20260906004450748_task-1837-external-invitation-delivery-lifecycle.sql` APLICADA a la instancia
-> compartida (`run_on 2026-09-06T04:27:58Z`; columnas, CHECKs, índice, capabilities y `email_type_config`
-> verificados) y smoke `--apply` verde contra PG real (evidencia:
-> `docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`). Pendiente: los dos flags NOT SET en
-> ningún runtime (default OFF), ningún correo real enviado (no existe binding externo), federación de la lane
-> delegada en el gateway (`efeonce-mcp`, follow-up de `TASK-1831`/`TASK-1832`) y primera persona externa real por
-> decisión del operador.
+> Estado 2026-09-06: **`verificado end-to-end en staging (flags ON en staging); producción pendiente de
+> promoción a main`** — migración `20260906004450748_task-1837-external-invitation-delivery-lifecycle.sql`
+> APLICADA a la instancia compartida (`run_on 2026-09-06T04:27:58Z`), smoke `--apply` verde contra PG real y, con
+> los dos flags encendidos en Vercel staging, recorrido vivo completo sobre un binding externo de prueba
+> (organización fixture + casilla controlada): emisión sin token en la respuesta, correo real de invitación,
+> `/i/<token>` → aceptar 202 → `linked` → magic link real → sesión 200 y reuso 400, rebote forzado con
+> `identity.external_invitation.undelivered` observada encendiéndose (ok → warning), reenvío, revelación gobernada
+> (`token_revealed` en warning) y la lane delegada con el consumer del gateway (200/403/422/201 + correo real);
+> evidencia: `docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`. Pendiente: promoción a
+> producción + los dos flags en Vercel Production (hoy NOT SET; el ops-worker y el auth-server toman el código
+> nuevo en ese release), federación de la lane delegada en el gateway (`efeonce-mcp`, `TASK-1831`/`TASK-1832`) y
+> primera persona externa de un CLIENTE real por decisión del operador (el mecanismo ya está probado). Detalle
+> menor: `revokeExternalAccess` scope `binding` no limpia `designated_admin_profile_id` (scope `member` sí).
 
 Cierra el ciclo de vida de `external_member_invitations` que TASK-1631 dejó a mano: el sistema envía el correo de
 invitación (`EmailType` `external_access_invitation`, remitente Efeonce, cuerpo no persistido), registra la entrega en

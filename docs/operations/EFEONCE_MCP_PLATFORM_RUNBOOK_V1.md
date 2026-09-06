@@ -738,14 +738,19 @@ invitaciones), sus 6 capabilities de `efeonce_admin`, el reader ecosystem
 están aplicados en PG; sigue sin haber login externo, cliente real ligado ni canary con cliente. El camino de
 soporte vive en [§Soporte: cliente externo que no puede entrar](#soporte-cliente-externo-que-no-puede-entrar-task-1631).
 
-**Delta 2026-09-06 (TASK-1837, code complete; migración aplicada 2026-09-06; flags OFF; verificación viva de correo
-pendiente — evidencia en `docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`):** la invitación
-externa ahora la **envía el sistema** por correo (`/i/<token>` sobre el `issuer_url` del environment; flag
-`EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED`, hoy NOT SET = OFF; ningún correo real enviado aún porque no existe
-binding externo) con estado de entrega, reenvío que rota el enlace y rebote drenado en el ops-worker. Existe además una
-**lane delegada** `GET/POST /api/platform/ecosystem/identity/invitations` para que el administrador designado del
-cliente invite a su propia gente: este gateway debe llamarla con `(environment, subject)` como hace con `identity/binding`
-(federación pendiente, TASK-1831/1832; flag `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` OFF ⇒ 404).
+**Delta 2026-09-06 (TASK-1837, verificado end-to-end en staging 2026-09-06 con los dos flags ON en staging;
+producción pendiente de release — evidencia en
+`docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`):** la invitación externa ahora la
+**envía el sistema** por correo (`/i/<token>` sobre el `issuer_url` del environment; flag
+`EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED`, ON en staging, NOT SET = OFF en producción hasta la promoción a
+`main`) con estado de entrega, reenvío que rota el enlace y rebote drenado en el ops-worker; en staging se recorrió
+con correo real: emisión sin token → correo → aceptar → `linked` → magic link → sesión, rebote forzado con
+`identity.external_invitation.undelivered` encendiéndose, reenvío y revelación. Existe además una **lane delegada**
+`GET/POST /api/platform/ecosystem/identity/invitations` para que el administrador designado del cliente invite a su
+propia gente: este gateway debe llamarla con `(environment, subject)` como hace con `identity/binding` — ya
+verificada en staging con el token del consumer `efeonce-mcp-gateway-greenhouse-token` (lista propia 200, binding
+ajeno 403, auto-elevación 422, invitación delegada 201 con correo real); falta la tool MCP que la federe
+(TASK-1831/1832; flag `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` ON en staging, OFF ⇒ 404 en producción).
 
 ## Superficie operable por un cliente MCP — snapshot 2026-08-28
 

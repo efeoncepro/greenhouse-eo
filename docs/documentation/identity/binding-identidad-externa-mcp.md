@@ -128,9 +128,10 @@ Una organización solo puede tener **una invitación abierta por correo** a la v
 Antes, el token de la invitación volvía en la respuesta al operador y él tenía que hacérselo llegar a la persona
 por un canal seguro. Ahora **el sistema envía el correo** con el enlace de aceptación (`https://<emisor>/i/<token>`,
 donde el emisor es el `issuer_url` del environment del binding, nunca una variable de entorno) en el mismo acto en
-que emite la invitación. Esto se activa con el flag `EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED` (hoy apagado
-en todos los entornos; con el flag apagado el comportamiento es el anterior: el token vuelve en la respuesta y no
-sale correo). **Con entrega por sistema, el token nunca aparece en la respuesta.** El correo sale con remitente
+que emite la invitación. Esto se activa con el flag `EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED` (encendido en
+staging desde el 2026-09-06 y verificado allí con correo real, aceptación, magic link y sesión — ver el audit
+`docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`; apagado en producción hasta el
+release; con el flag apagado el comportamiento es el anterior: el token vuelve en la respuesta y no sale correo). **Con entrega por sistema, el token nunca aparece en la respuesta.** El correo sale con remitente
 Efeonce, muestra el host del emisor, tiene un botón "Aceptar invitación", indica la vigencia y avisa que al
 aceptar llegará un enlace de acceso (magic link) al mismo correo.
 
@@ -141,7 +142,7 @@ Cada invitación lleva ahora un **estado de entrega** (`delivery_status`) separa
 | `not_attempted` | No se intentó enviar: el flag está apagado o el operador pidió entrega manual (`delivery: 'manual'`). | Entregar el enlace por canal seguro (comportamiento previo). |
 | `sent` | El proveedor de correo aceptó el mensaje. Todavía no confirma que llegó. | Esperar; si la persona no lo ve, revisar spam y reenviar. |
 | `delivered` | El proveedor confirmó la entrega en la casilla. | Nada. |
-| `bounced` | La casilla rechazó el correo (no existe, llena, bloqueada). Lo registra el ops-worker al recibir el rebote del proveedor. | Corregir la casilla con el cliente y **reenviar** (ver abajo). Enciende la señal `undelivered`. |
+| `bounced` | La casilla rechazó el correo (no existe, llena, bloqueada). Lo registra el ops-worker al recibir el rebote del proveedor (verificado en staging el 2026-09-06 con un rebote real de Resend; ver audit). | Corregir la casilla con el cliente y **reenviar** (ver abajo). Enciende la señal `undelivered` (se la vio encender ok → warning en esa verificación). |
 | `failed` | El envío falló antes de salir (proveedor caído, configuración, plantilla). La invitación **sí quedó emitida**, pero nadie la recibió. | Reintentar con un **reenvío**. La respuesta nunca dice "listo" si el correo no salió. |
 
 También se guardan cuántos intentos hubo (`delivery_attempts`, que un reenvío hereda), cuándo fue el último y el
@@ -277,9 +278,12 @@ token y llama a Greenhouse por la lane ecosystem (`/api/platform/ecosystem/ident
 `environment` + `subject`, igual que hace hoy para resolver el acceso. Greenhouse resuelve desde ahí que esa
 identidad es el administrador designado del binding pedido.
 
-Estado hoy: el flag `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` está **apagado** en todos los entornos (la
-lane responde 404, sin pistas), y el gateway todavía no federa esta lane (follow-up de TASK-1831/1832). La consola
-para que el administrador del cliente lo haga desde una pantalla es un follow-up aparte; hoy es solo programático.
+Estado hoy: el flag `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` está **encendido en staging** desde el
+2026-09-06 (la lane se verificó allí con el consumer del gateway: lista del binding propio 200, binding ajeno 403,
+auto-elevación 422, invitación delegada 201 con correo real recibido; ver el audit) y **apagado en producción**
+hasta el release (allí la lane responde 404, sin pistas). El gateway todavía no federa esta lane como tool MCP
+(follow-up de TASK-1831/1832). La consola para que el administrador del cliente lo haga desde una pantalla es un
+follow-up aparte; hoy es solo programático.
 
 > Detalle técnico: `resolveDelegatedAuthority`, `issueDelegatedExternalInvitation` y
 > `listDelegatedExternalInvitations` en `src/lib/identity/external-access/commands.ts`; resource
@@ -336,16 +340,20 @@ Conviene decirlo explícito, porque el nombre "identidad externa" invita a supon
   su propio runtime.
 - **No proyecta la membresía a `person_memberships`.** La fila `linked` es la membresía de acceso externo; la
   proyección a Account 360 es un follow-up declarado.
-- **La lane delegada todavía no está federada en el gateway.** Greenhouse la expone, pero `efeonce-mcp` aún no
-  la llama con `environment` + `subject`; es follow-up de TASK-1831/1832. Mientras tanto el flag sigue apagado.
-- **Todo lo de TASK-1837 está `code complete; migración aplicada 2026-09-06; flags OFF; verificación viva
-  pendiente`.** La migración sí se aplicó en la instancia compartida y el smoke `--apply` ejercitó contra la base
-  real el reenvío, la revelación, el registro de entrega fallida y la lane delegada (evidencia en
-  `docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`). Lo que falta: los dos flags siguen
-  sin setear (default apagado), ningún correo real se ha enviado porque todavía no existe un binding externo, y la
-  lane delegada no está federada en el gateway. Ver el ledger de flags.
-- **La primera persona externa real sigue pendiente de decisión del operador** (qué organización y qué
-  persona); esa decisión desbloquea TASK-1830/1832.
+- **La lane delegada todavía no está federada en el gateway.** Greenhouse la expone y responde correcto al
+  consumer del gateway (verificado en staging el 2026-09-06), pero `efeonce-mcp` aún no la llama con
+  `environment` + `subject` desde una tool MCP; es follow-up de TASK-1831/1832.
+- **Todo lo de TASK-1837 está `verificado end-to-end en staging (2026-09-06); producción pendiente de
+  release`.** La migración está aplicada en la instancia compartida, el smoke `--apply` ejercitó el ciclo contra
+  la base real y, con los dos flags encendidos en staging, se recorrió de punta a punta con una casilla
+  controlada: correo real de invitación, aceptación en el emisor, magic link, sesión, rebote forzado con la señal
+  `undelivered` encendiéndose, reenvío, revelación gobernada y la lane delegada (evidencia en
+  `docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`). Lo que falta: promover a
+  producción y prender allí los dos flags (hoy apagados en producción), y federar la lane delegada en el
+  gateway. Ver el ledger de flags.
+- **La primera persona externa de un cliente real sigue pendiente de decisión del operador** (qué organización
+  y qué persona); el mecanismo ya está probado con una persona sintética en la organización fixture. Esa decisión
+  desbloquea TASK-1830/1832.
 
 > Detalle técnico: alcance y follow-ups en
 > [TASK-1631](../../tasks/in-progress/TASK-1631-efeonce-customer-identity-mcp-federation.md), en

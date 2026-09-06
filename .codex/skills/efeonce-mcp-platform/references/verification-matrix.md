@@ -34,15 +34,18 @@ separate legacy/external regression evidence. Never substitute flags ON or metad
 
 ## External invitation delivery and delegated authority (TASK-1837)
 
-Migration applied to the shared instance 2026-09-06; both flags OFF in every runtime. Status column as of
-2026-09-06 (smoke = `pnpm identity:external-access:smoke -- --apply` against real PG on the smoke fixture org).
+Migration applied to the shared instance 2026-09-06; verified end-to-end in staging 2026-09-06 with both flags
+ON in Vercel staging (Production NOT SET — the code is not in `main` yet, pending release). Status column as of
+2026-09-06 (smoke = `pnpm identity:external-access:smoke -- --apply` against real PG on the smoke fixture org;
+staging = live run through the admin routes on `dev` with a test external binding on the same fixture org,
+revoked at the end; evidence in `docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`).
 
 | Row | Minimum evidence | Status |
 | --- | --- | --- |
-| Invitation delivered by the system | `EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED` ON in staging, an external binding + controlled mailbox, email received from the Efeonce sender, `/i/<token>` on the issuer accepted → `linked` → magic link → session; admin response carries `delivery` and no `token` | pending — no external binding exists yet (operator decision); real email unverified |
-| Resend rotates | new row, previous one `revoked` (`resent`), old token rejected with `invitation_not_open`, cap 3 per chain → 429 | smoke live ✔ |
-| Reveal exception | capability `identity.external_invitation.reveal_token`, reason ≥10 chars, 1 h row without email, audit `invitation_token_revealed` with actor + reason and no token, signal `identity.external_invitation.token_revealed` ok → warning | smoke live ✔ (signal seen lighting) |
-| Delivery failure / bounce | `delivery_status` `failed`/`bounced` + audit + outbox `delivery_failed`; signal `undelivered` lights while the row stays open | smoke live ✔ for `failed`; forced real bounce pending |
-| Delegated lane, 4 negatives | via the gateway: flag OFF / consumer not internal → 404; foreign or unbound binding / non-admin subject → 403; `designatedAdmin: true` → 422; seat cap → 422; hourly cap → 429; response never carries the token | smoke live ✔ in-process (403, 422, delegated issue, own list); gateway federation pending (`TASK-1831`/`TASK-1832`) |
+| Invitation delivered by the system | `EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED` ON in staging, an external binding + controlled mailbox, email received from the Efeonce sender, `/i/<token>` on the issuer accepted → `linked` → magic link → session; admin response carries `delivery` and no `token` | staging ✔ 2026-09-06 — real email from `Efeonce <greenhouse@efeoncepro.com>` to a controlled mailbox, `/i/<token>` accept → `linked` → magic link → `/auth/session` 200; 201 response carried `delivery` and no `token`. Production flags NOT SET pending release |
+| Resend rotates | new row, previous one `revoked` (`resent`), old token rejected with `invitation_not_open`, cap 3 per chain → 429 | smoke live ✔ · staging ✔ (`…/resend` 201, new row `deliveryAttempts=2`, previous `revoked` `resent`) |
+| Reveal exception | capability `identity.external_invitation.reveal_token`, reason ≥10 chars, 1 h row without email, audit `invitation_token_revealed` with actor + reason and no token, signal `identity.external_invitation.token_revealed` ok → warning | smoke live ✔ · staging ✔ (`…/reveal` 201, 1 h row, `acceptanceUrl` on the issuer; signal seen lighting) |
+| Delivery failure / bounce | `delivery_status` `failed`/`bounced` + audit + outbox `delivery_failed`; signal `undelivered` lights while the row stays open | smoke live ✔ for `failed` · staging ✔ forced bounce (`bounced@resend.dev` → Resend webhook → projection → `bounced`, `bounce:Permanent`; signal `undelivered` seen ok → warning). Caveat: the reactive drain ran locally, scoped to the `notifications` handler, because the ops-worker still runs `main`; the worker picks the projection up on its next deploy |
+| Delegated lane, 4 negatives | via the gateway: flag OFF / consumer not internal → 404; foreign or unbound binding / non-admin subject → 403; `designatedAdmin: true` → 422; seat cap → 422; hourly cap → 429; response never carries the token | smoke live ✔ in-process · staging ✔ through the gateway consumer token + `environment`/`subject` (200 own list only, 403 foreign binding, 422 self-elevation, 201 delegated issue with real email, no token); MCP tool federation still pending (`TASK-1831`/`TASK-1832`) |
 | Designated admin clearing | revoking the admin member sets `designated_admin_profile_id = NULL` + audit `designated_admin_cleared`; a second `designated_admin` accept while one is `linked` → `conflict`, token not consumed | smoke live ✔ |
-| Consent shows redirect host | consent page renders the host of the validated `redirect_uri` (`data-capture="id-redirect-host"`) | render test ✔; real GVC pending |
+| Consent shows redirect host | consent page renders the host of the validated `redirect_uri` (`data-capture="id-redirect-host"`) | render test ✔ · dev-UI screenshots ✔ (1440/390, `docs/audits/evidence/2026-09-06-task-1837/`); live issuer pending release (`auth.efeonce.org` still runs `main`) |
