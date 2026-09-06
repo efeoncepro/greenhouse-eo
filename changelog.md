@@ -24,6 +24,25 @@ sintético: commit/push, promoción, deploys, gates, fixture dedicado, buzones c
 revocación y cleanup. La autorización no incorpora clientes ni habilita writes; la task sigue pendiente hasta
 matriz runtime, retiro demostrable y siete días de señales estables.
 
+## 2026-09-06 — TASK-1832: carril oscuro desplegado y fixture removible iniciado
+
+Greenhouse `develop` y el gateway MCP ya sirven consumers compatibles con los dos gates canary apagados. El
+auth-server quedó en `auth-server-00034-85c` y el gateway en `efeonce-mcp-gateway-00041-7dq`; metadata/readyz y
+los SHAs servidos fueron releídos. Antes del primer write se versionó el manifiesto con IDs exactos. Después, los
+commands crearon una organización dedicada `inactive/other/disqualified`, su registro temporal y un binding
+`canary`; el readback da `1/1`, purpose drift cero y ninguna persona `smoke_test` visible en Person 360. El dry-run
+de retiro encontró sólo las referencias esperadas y se negó mientras root/authority siguen activos.
+
+Para M365, el operador eligió un alias preexistente compartido. No colisiona con perfiles; la invitación definitiva
+fue entregada, quedó visible y se aceptó mediante el POST scanner-safe. El profile resultante es exclusivamente
+`smoke_test`, permanece fuera de Person 360 y recibió el único grant read-only permitido, personal y expirante con
+el binding. El magic link también fue entregado, pero no se consumió todavía porque el Mac quedó bloqueado. Una
+invitación preparatoria a plus-address se revocó sin aceptación y permanece inventariada para el cleanup. El gate
+sigue OFF y producción no se promueve antes de completar correo Google, sesión/passkey y negativas en staging. La
+primera CI del commit falló en el gate de navegación porque el smoke OAuth usaba `page.goto` directo; el fix local
+ya usa el helper transitorio compartido y pasa el gate focal. Durante una consulta, el CLI de Vercel imprimió un
+cursor sensible: no se reutilizó ni se conserva en evidencia; su posible rotación queda como acción de higiene.
+
 ## 2026-09-06 — La certificación sintética se separa del primer piloto cliente
 
 TASK-1832 ya no usa a una organización cliente real para descubrir defectos. La certificación técnica externa

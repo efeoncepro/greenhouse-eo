@@ -1,7 +1,8 @@
 import { createHash, randomBytes } from 'node:crypto'
 
-import { expect, test } from '@playwright/test'
 import { createRemoteJWKSet, jwtVerify } from 'jose'
+
+import { expect, gotoWithTransientRetries, test } from '../fixtures/auth'
 
 const ENABLED = process.env.EXTERNAL_CANARY_E2E_ENABLED === 'true'
 const ISSUER = process.env.AUTH_SERVER_CANARY_ISSUER ?? ''
@@ -80,7 +81,7 @@ test.describe('TASK-1832 external OAuth canary', () => {
     })
 
     try {
-      await page.goto(authorize.toString())
+      await gotoWithTransientRetries(page, authorize.toString())
 
       const allow = page.locator('button[name="decision"][value="allow"]')
 
