@@ -1218,6 +1218,79 @@ export const issueDelegatedExternalInvitation = async (
   )
 }
 
+export type DelegatedInvitationTargetInput = DelegatedAuthorityInput & {
+  invitationId: string
+  reason?: string | null
+}
+
+const loadDelegatedTarget = async (authority: DelegatedAuthority, invitationId: string) => {
+  const id = assertNonEmptyString(invitationId, 'invitationId', 128)
+
+  const rows = await query<{ binding_id: string; status: ExternalMemberInvitation['status']; profile_id: string | null }>(
+    `SELECT binding_id, status, profile_id FROM greenhouse_core.external_member_invitations WHERE invitation_id = $1`,
+    [id]
+  )
+
+  const target = rows[0]
+
+  // Anti-oráculo: una invitación de otro binding es indistinguible de una inexistente.
+  if (!target || target.binding_id !== authority.membership.bindingId) {
+    throw new ExternalAccessError('not_found', 'invitation not found', { invitationId: id })
+  }
+
+  return { invitationId: id, status: target.status, profileId: target.profile_id }
+}
+
+/** El administrador reenvía (= rota) una invitación abierta de su binding; misma entrega que emitir. */
+export const resendDelegatedExternalInvitation = async (
+  input: DelegatedInvitationTargetInput & { delivery?: ExternalInvitationDeliveryMode },
+  options: IssueExternalInvitationOptions = {}
+): Promise<IssueExternalInvitationResult> => {
+  const authority = await resolveDelegatedAuthority(input)
+  const target = await loadDelegatedTarget(authority, input.invitationId)
+
+  return resendExternalInvitation(
+    {
+      invitationId: target.invitationId,
+      bindingId: authority.membership.bindingId,
+      reason: input.reason ?? null,
+      delivery: input.delivery
+    },
+    authority.actor,
+    options
+  )
+}
+
+/**
+ * El administrador revoca a alguien de su binding: una invitación abierta (scope `invitation`) o una
+ * persona ya ligada (scope `member`, con bump de `grants_version`). Nunca a sí mismo: quitarse la
+ * membership dejaría la organización sin administrador por un acto propio; eso lo hace Efeonce.
+ */
+export const revokeDelegatedExternalInvitation = async (
+  input: DelegatedInvitationTargetInput
+): Promise<RevokeExternalAccessResult> => {
+  const authority = await resolveDelegatedAuthority(input)
+  const target = await loadDelegatedTarget(authority, input.invitationId)
+  const reason = assertNonEmptyString(input.reason ?? 'revoked by the designated admin', 'reason', 2000)
+
+  if (target.status === 'linked') {
+    if (target.profileId === authority.profileId) {
+      throw new ExternalAccessError('invalid_request', 'a delegated admin cannot revoke their own membership', {
+        field: 'invitationId'
+      })
+    }
+
+    if (!target.profileId) throw new ExternalAccessError('conflict', 'linked invitation without profile', { invitationId: target.invitationId })
+
+    return revokeExternalAccess(
+      { scope: 'member', bindingId: authority.membership.bindingId, profileId: target.profileId, reason },
+      authority.actor
+    )
+  }
+
+  return revokeExternalAccess({ scope: 'invitation', invitationId: target.invitationId, reason }, authority.actor)
+}
+
 /** El administrador ve a su propia gente y el estado de entrega; nunca `token_hash`, nunca otro binding. */
 export const listDelegatedExternalInvitations = async (
   input: DelegatedAuthorityInput

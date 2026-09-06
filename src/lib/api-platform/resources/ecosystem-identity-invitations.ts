@@ -6,6 +6,8 @@ import {
   issueDelegatedExternalInvitation,
   listDelegatedExternalInvitations,
   readExternalInvitationConfig,
+  resendDelegatedExternalInvitation,
+  revokeDelegatedExternalInvitation,
   type ExternalAccessErrorCode,
   type ExternalInvitationDelivery,
   type ExternalMemberInvitation
@@ -17,6 +19,8 @@ import { isExternalAccessError } from '@/lib/identity/external-access/errors'
  *
  *   GET  /api/platform/ecosystem/identity/invitations?environment=&subject=&(bindingId=|organizationId=)
  *   POST /api/platform/ecosystem/identity/invitations   { environment, subject, bindingId|organizationId, email, reason? }
+ *   POST /api/platform/ecosystem/identity/invitations/[invitationId]/resend   { environment, subject, bindingId|organizationId, reason? }
+ *   POST /api/platform/ecosystem/identity/invitations/[invitationId]/revoke   { environment, subject, bindingId|organizationId, reason? }
  *
  * Mismo patrón que `identity/binding` (TASK-1631): el gateway (consumer con binding de scope
  * `internal`) verifica el JWT de la persona y llama acá con `(environment, subject)`; Greenhouse
@@ -132,6 +136,65 @@ export const createEcosystemDelegatedInvitation = async ({
     // El token NUNCA sale por esta lane: con entrega del sistema viajó en el correo; sin ella, el
     // administrador delegado no tiene derecho a verlo (sólo la excepción admin de Efeonce lo revela).
     return { invitation: result.invitation, created: result.created, delivery: result.delivery }
+  } catch (error) {
+    return toApiPlatformError(error)
+  }
+}
+
+const delegatedTarget = (body: unknown, invitationId: string) => {
+  const input = body && typeof body === 'object' && !Array.isArray(body) ? (body as Record<string, unknown>) : {}
+
+  return {
+    environmentId: requiredString(input.environment, 'environment'),
+    subject: requiredString(input.subject, 'subject'),
+    bindingId: optionalStringParam(input.bindingId),
+    organizationId: optionalStringParam(input.organizationId),
+    invitationId: requiredString(invitationId, 'invitationId'),
+    reason: typeof input.reason === 'string' ? input.reason : null
+  }
+}
+
+/** Reenviar = rotar: el enlace anterior muere en el mismo commit; el nuevo sale por correo. */
+export const resendEcosystemDelegatedInvitation = async ({
+  context,
+  body,
+  invitationId
+}: {
+  context: ApiPlatformRequestContext
+  body: unknown
+  invitationId: string
+}): Promise<EcosystemDelegatedInvitationPayload> => {
+  assertLaneAvailable(context)
+
+  try {
+    const result = await resendDelegatedExternalInvitation(delegatedTarget(body, invitationId))
+
+    return { invitation: result.invitation, created: result.created, delivery: result.delivery }
+  } catch (error) {
+    return toApiPlatformError(error)
+  }
+}
+
+/** Revoca una invitación abierta o a una persona ya ligada del propio binding; nunca al propio admin. */
+export const revokeEcosystemDelegatedInvitation = async ({
+  context,
+  body,
+  invitationId
+}: {
+  context: ApiPlatformRequestContext
+  body: unknown
+  invitationId: string
+}): Promise<{ scope: 'invitation' | 'member'; changed: boolean; revokedInvitationIds: string[] }> => {
+  assertLaneAvailable(context)
+
+  try {
+    const result = await revokeDelegatedExternalInvitation(delegatedTarget(body, invitationId))
+
+    return {
+      scope: result.scope === 'member' ? 'member' : 'invitation',
+      changed: result.changed,
+      revokedInvitationIds: result.revokedInvitationIds
+    }
   } catch (error) {
     return toApiPlatformError(error)
   }

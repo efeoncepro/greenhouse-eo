@@ -63,10 +63,14 @@ vi.mock('@/lib/api-platform/resources/ecosystem-growth-seo', () => ({
 
 const mockListDelegatedInvitations = vi.fn()
 const mockCreateDelegatedInvitation = vi.fn()
+const mockResendDelegatedInvitation = vi.fn()
+const mockRevokeDelegatedInvitation = vi.fn()
 
 vi.mock('@/lib/api-platform/resources/ecosystem-identity-invitations', () => ({
   listEcosystemDelegatedInvitations: (...args: unknown[]) => mockListDelegatedInvitations(...args),
-  createEcosystemDelegatedInvitation: (...args: unknown[]) => mockCreateDelegatedInvitation(...args)
+  createEcosystemDelegatedInvitation: (...args: unknown[]) => mockCreateDelegatedInvitation(...args),
+  resendEcosystemDelegatedInvitation: (...args: unknown[]) => mockResendDelegatedInvitation(...args),
+  revokeEcosystemDelegatedInvitation: (...args: unknown[]) => mockRevokeDelegatedInvitation(...args)
 }))
 
 vi.mock('@/lib/api-platform/resources/events', () => ({
@@ -98,6 +102,8 @@ const seoRankEvolutionRoute = await import('./growth/seo/rank-evolution/route')
 const seoSiteAuditReportRoute = await import('./growth/seo/site-audit-report/route')
 const seoBacklinkProfileRoute = await import('./growth/seo/backlink-profile/route')
 const identityInvitationsRoute = await import('./identity/invitations/route')
+const identityInvitationResendRoute = await import('./identity/invitations/[invitationId]/resend/route')
+const identityInvitationRevokeRoute = await import('./identity/invitations/[invitationId]/revoke/route')
 
 describe('api platform ecosystem route contracts', () => {
   beforeEach(() => {
@@ -371,7 +377,30 @@ describe('api platform ecosystem route contracts', () => {
 
     const createBody = await createResponse.json()
 
-    expect(mockRunEcosystemCommandRoute).toHaveBeenCalledTimes(1)
+    mockResendDelegatedInvitation.mockResolvedValue({ invitation: { invitationId: 'xmi-2' }, created: true, delivery: {} })
+    mockRevokeDelegatedInvitation.mockResolvedValue({ scope: 'invitation', changed: true, revokedInvitationIds: ['xmi-1'] })
+
+    const resendResponse = await identityInvitationResendRoute.POST(
+      new Request('https://example.com/api/platform/ecosystem/identity/invitations/xmi-1/resend', {
+        method: 'POST',
+        body: JSON.stringify({ environment: 'e', subject: 's', organizationId: 'o' })
+      }),
+      { params: Promise.resolve({ invitationId: 'xmi-1' }) }
+    )
+
+    const revokeResponse = await identityInvitationRevokeRoute.POST(
+      new Request('https://example.com/api/platform/ecosystem/identity/invitations/xmi-1/revoke', {
+        method: 'POST',
+        body: JSON.stringify({ environment: 'e', subject: 's', organizationId: 'o' })
+      }),
+      { params: Promise.resolve({ invitationId: 'xmi-1' }) }
+    )
+
+    expect((await resendResponse.json()).routeKey).toBe('platform.ecosystem.identity.invitations.resend')
+    expect((await revokeResponse.json()).routeKey).toBe('platform.ecosystem.identity.invitations.revoke')
+    expect(mockResendDelegatedInvitation).toHaveBeenCalledWith(expect.objectContaining({ invitationId: 'xmi-1' }))
+    expect(mockRevokeDelegatedInvitation).toHaveBeenCalledWith(expect.objectContaining({ invitationId: 'xmi-1' }))
+    expect(mockRunEcosystemCommandRoute).toHaveBeenCalledTimes(3)
     expect(createBody.routeKey).toBe('platform.ecosystem.identity.invitations.create')
     expect(createBody.result.status).toBe(201)
     expect(JSON.stringify(createBody)).not.toContain('"token"')

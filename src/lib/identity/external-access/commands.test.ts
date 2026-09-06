@@ -36,7 +36,9 @@ const {
   issueDelegatedExternalInvitation,
   issueExternalInvitation,
   listDelegatedExternalInvitations,
+  resendDelegatedExternalInvitation,
   resendExternalInvitation,
+  revokeDelegatedExternalInvitation,
   revealExternalInvitationToken,
   revokeExternalAccess,
   upsertExternalIdentityEnvironment
@@ -868,6 +870,24 @@ describe('TASK-1837 — autoridad delegada del cliente', () => {
       code: 'invalid_request'
     })
     expect(resolveExternalAccessMock).not.toHaveBeenCalled()
+  })
+
+  it('delegated resend rotates only an invitation of the own binding; a foreign one is not_found', async () => {
+    bound([{ bindingId: 'xob-1', designatedAdmin: true }])
+    dbQueryMock.mockResolvedValueOnce([{ binding_id: 'xob-other', status: 'issued', profile_id: null }])
+
+    await expect(
+      resendDelegatedExternalInvitation({ environmentId: 'efeonce-auth', subject: 'sub-1', bindingId: 'xob-1', invitationId: 'xmi-9', delivery: 'manual' })
+    ).rejects.toMatchObject({ code: 'not_found' })
+  })
+
+  it('delegated revoke refuses to revoke the admin themself and maps linked members to scope member', async () => {
+    bound([{ bindingId: 'xob-1', designatedAdmin: true }])
+    dbQueryMock.mockResolvedValueOnce([{ binding_id: 'xob-1', status: 'linked', profile_id: 'profile-admin' }])
+
+    await expect(
+      revokeDelegatedExternalInvitation({ environmentId: 'efeonce-auth', subject: 'sub-1', bindingId: 'xob-1', invitationId: 'xmi-self' })
+    ).rejects.toMatchObject({ code: 'invalid_request', details: { field: 'invitationId' } })
   })
 
   it('lists only the admin\'s own binding invitations', async () => {
