@@ -765,6 +765,23 @@ La migración del enum/check de `auth_attempts` es expand-only y puede permanece
 - [ ] `pnpm task:lint --task TASK-1834`, QA/docs/context gates aplicables pasan.
 - [ ] No se afirma cutover, retiro de provider ni convergencia final sin task/ADR y evidencia separadas.
 
+## Delta 2026-09-06 — un consumer nuevo que esta task no sabía que tenía
+
+`TASK-1842` (credenciales de la persona: alta de passkey y dispositivos) **queda bloqueada por esta
+task**, y por una razón que conviene tener presente al secuenciarla.
+
+La pantalla de credenciales vive en el emisor —`/auth/passkeys/*` exige `__Host-efeonce_auth`, cookie
+que por regla del navegador sólo existe en `auth.efeonce.org`— pero su puerta va en `/my/profile` de
+Greenhouse. Hoy las dos sesiones están separadas (`next-auth` vs `__Host-efeonce_auth`, verificado
+2026-09-06), así que cruzar esa puerta manda a autenticarse en el emisor **con un enlace por correo**:
+pedir un correo para configurar la forma de no pedir correos.
+
+Lo que `TASK-1842` necesita **no es una cookie compartida** —esta task declara explícitamente que
+Greenhouse conserva «token family, cookie, sesión, logout y rollback propios»—, sino el efecto de que
+el login de Greenhouse PASE POR el emisor: esa ida y vuelta deja viva la sesión del emisor y la puerta
+funciona sin fricción. Si el alcance de esta task cambiara y ese efecto se perdiera, `TASK-1842` deja
+de tener recorrido.
+
 ## Follow-ups
 
 - Registrar la foundation reusable de Efeonce ID multiproducto: registry/policy de relying parties, conformance,

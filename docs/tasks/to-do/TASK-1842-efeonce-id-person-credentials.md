@@ -21,10 +21,10 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-044`
-- Status real: `Registrada 2026-09-06 por el barrido de superficie de EPIC-044 (sesión greenhouse-eo-06, durante TASK-1835). Backend completo desde 2026-09-04 y sin ninguna superficie. NO bloquea la certificación: scripts/auth-server/external-passkey-canary.ts (TASK-1832) ya ejecuta registro y login con una passkey de plataforma real en Chrome persistente, dentro del origen real y sin CDP ni autenticador de software; ese runner declara en su cabecera que existe así porque la superficie de alta no existe. Lo que bloquea es el uso por una PERSONA. Corregida el mismo día tras la pregunta del operador: la primera versión describía sólo la pantalla del emisor, sin puerta desde Greenhouse — una capacidad inalcanzable, el mismo error que esta task existe para cerrar. El alcance ahora incluye la sección Cómo entras en /my/profile. La ruta del emisor deja de llamarse /account/* (colisionaba con TASK-1838, que usa esa palabra para la organización) y pasa a /credentials. UI ready: no hasta acordar con TASK-1838 la composición del área autenticada del emisor. NADA IMPLEMENTADO: los commits que mencionan esta task (da4a6db0a y siguientes) sólo la CREAN y la corrigen; por eso el lint avisa de progreso stale y por eso ningún checkbox está tildado. Es correcto.`
+- Status real: `Registrada 2026-09-06 por el barrido de superficie de EPIC-044 (sesión greenhouse-eo-06, durante TASK-1835). Backend completo desde 2026-09-04 y sin ninguna superficie. NO bloquea la certificación: scripts/auth-server/external-passkey-canary.ts (TASK-1832) ya ejecuta registro y login con una passkey de plataforma real en Chrome persistente, dentro del origen real y sin CDP ni autenticador de software; ese runner declara en su cabecera que existe así porque la superficie de alta no existe. Lo que bloquea es el uso por una PERSONA. Corregida el mismo día tras la pregunta del operador: la primera versión describía sólo la pantalla del emisor, sin puerta desde Greenhouse — una capacidad inalcanzable, el mismo error que esta task existe para cerrar. El alcance ahora incluye la sección Cómo entras en /my/profile. La ruta del emisor deja de llamarse /account/* (colisionaba con TASK-1838, que usa esa palabra para la organización) y pasa a /credentials. Blocked by TASK-1834: hoy Greenhouse y el emisor tienen sesiones separadas, así que sin la convergencia del login la primera passkey se configura pidiendo un correo. UI ready: no hasta acordar con TASK-1838 la composición del área autenticada del emisor. NADA IMPLEMENTADO: los commits que mencionan esta task (da4a6db0a y siguientes) sólo la CREAN y la corrigen; por eso el lint avisa de progreso stale y por eso ningún checkbox está tildado. Es correcto.`
 - Rank: `TBD`
 - Domain: `identity`
-- Blocked by: `none`
+- Blocked by: `TASK-1834` (para el recorrido sin fricción; ver `## Dependencies & Impact`)
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -118,6 +118,15 @@ Reglas obligatorias:
 - `TASK-1830`: `/auth/passkeys/{register,authenticate}/*`, `GET /auth/passkeys`, sesión `__Host-efeonce_auth`.
 - `TASK-1835`: shell, primitives, `styles.generated.ts`, harness `pnpm auth-server:dev-ui`,
   `pnpm auth-server:verify-contrast`, `pnpm auth-server:verify-passkey`.
+- 🔴 **`TASK-1834` (`to-do`) para que el recorrido tenga sentido.** Hoy Greenhouse y el emisor tienen
+  sesiones separadas —`next-auth` y `__Host-efeonce_auth`, verificado 2026-09-06—, así que estar
+  dentro de Greenhouse NO significa tener sesión en el emisor. Sin `TASK-1834`, tocar «Gestionar»
+  manda a la persona a autenticarse en el emisor **con un enlace por correo**: *revisa tu correo para
+  configurar la forma de no revisar tu correo*. La pantalla funcionaría; el recorrido sería absurdo.
+  **Precisión sobre qué aporta 1834:** no unifica cookies —esa task declara que Greenhouse conserva
+  «token family, cookie, sesión, logout y rollback propios»—. Lo que hace es que el login de
+  Greenhouse PASE POR el emisor (OIDC), y esa ida y vuelta es la que deja viva la sesión del emisor.
+  El efecto que esta task necesita es ése, no una cookie compartida.
 
 ### Blocks / Impacts
 
@@ -322,6 +331,11 @@ capacidades de esa clase en EPIC-044.
 
 ### Slice ordering hard rule
 
+**Antes del Slice 1: `TASK-1834`.** Sin la convergencia del login, el recorrido pide un correo para
+configurar la forma de no pedir correos. Si el operador decide adelantar igual, la sección «Cómo
+entras» debe **decir** que habrá un paso extra — nunca esconderlo detrás de un botón que promete algo
+directo.
+
 Slice 1 → 2 → 3. El alta no se construye antes de que la lectura esté capturada: sin la lista, el
 alta no tiene dónde mostrar su resultado. `UI ready: yes` sólo al cerrar Slice 3.
 
@@ -333,6 +347,7 @@ alta no tiene dónde mostrar su resultado. `UI ready: yes` sólo al cerrar Slice
 | Clase de texto compartida entre lienzo y tarjeta rompe contraste | UI / a11y | medium | `pnpm auth-server:verify-contrast` sobre píxeles; ya atrapó 1.53:1 y 3.28:1 | gate rojo |
 | El retiro deja a la persona sin ninguna forma de entrar | identity | medium | La confirmación advierte cuando es la última; el correo sigue disponible siempre | señal de persona sin credenciales `[verificar]` |
 | Colisión de composición con `TASK-1838` en el área autenticada del emisor | UI | medium | Acordar el shell del área antes de Slice 1 | revisión cruzada |
+| Se construye antes de `TASK-1834` y la primera passkey exige un correo para configurarse | identity / UX | **high** | Declarado en `Blocked by`; si el operador decide adelantarlo, la puerta en Greenhouse debe advertir el paso extra en vez de esconderlo | abandono en el paso «Gestionar» |
 | La pantalla del emisor se construye sin la puerta y queda inalcanzable | UI | **high** | La puerta es Slice 1 y criterio de aceptación, no un detalle; `pnpm route-reachability-gate` cubre el lado Greenhouse | la pantalla existe y nadie la usa |
 | `credentialId` expuesto en el DOM | identity | low | Assertion de captura + revisión | GVC rojo |
 
