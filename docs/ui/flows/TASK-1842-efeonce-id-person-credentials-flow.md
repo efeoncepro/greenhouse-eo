@@ -14,9 +14,14 @@ convierte una sesión existente en una forma de volver a entrar.
 
 | Nodo | Entrada | Salida |
 |---|---|---|
-| Desde la sesión (`GET /auth/session` HTML) | enlace «Tus formas de entrar» | `/account/credentials` |
-| Tras entrar por magic link sin `return_to` | la pantalla de sesión iniciada ofrece el enlace | `/account/credentials` |
+| **`/my/profile` en Greenhouse → «Cómo entras»** | **la puerta principal**: donde la persona ya va | `/credentials` en el emisor, y vuelve |
+| Desde la sesión del emisor (`GET /auth/session` HTML) | enlace «Tus formas de entrar» | `/credentials` |
+| Tras entrar por magic link sin `return_to` | la pantalla de sesión iniciada ofrece el enlace | `/credentials` |
 | Desde `/login` | **no**: sin sesión no hay alta posible (`register/*` la exige) | — |
+
+**El recorrido cruza dos hosts y la persona no debería notarlo.** Greenhouse es donde empieza; el
+emisor es donde ocurre; Greenhouse es donde vuelve. Quien implemente esto construye la puerta antes
+que la pantalla: al revés se obtiene una página correcta que nadie encuentra.
 
 **Regla dura del recorrido:** el alta **nunca** se ofrece dentro de `/oauth/authorize` ni del
 step-up. Interrumpir una autorización en curso para configurar credenciales es exactamente lo que
@@ -24,7 +29,7 @@ hace hoy el step-up con el TOTP, y es la fricción que esta task no debe replica
 
 ## Recorridos
 
-1. **Primera passkey.** Sesión activa → `/account/credentials` (estado vacío) → «Agregar una
+1. **Primera passkey.** Sesión activa → `/credentials` (estado vacío) → «Agregar una
    passkey» → ceremonia WebAuthn → la lista pasa de vacía a una fila → confirmación en `role=status`.
    Desde la próxima entrada, `/login` ofrece un camino que funciona.
 2. **Ceremonia fallida o cancelada.** Mensaje **con** reintento; la lista no cambia.

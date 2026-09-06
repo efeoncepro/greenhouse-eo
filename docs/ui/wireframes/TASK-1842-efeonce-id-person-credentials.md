@@ -25,6 +25,31 @@ registrar su passkey, así que depende del correo en **cada** entrada, y el bot�
 sirve nunca. Eso pesa sobre el primer piloto cliente (U16, `TASK-1841`) y sobre la promesa del
 producto —«sin contraseñas»—, no sobre el canary.
 
+## La puerta está en Greenhouse
+
+**Dos superficies, un recorrido.** La pantalla vive en el emisor porque el dato no puede vivir en otro
+lado: `/auth/passkeys/*` exige la cookie `__Host-efeonce_auth`, que por regla del navegador sólo
+existe en `auth.efeonce.org`, y una passkey autentica a la **identidad** —sirve igual para Greenhouse,
+Globe y el MCP—, no a un producto.
+
+Pero la persona **no empieza ahí**. Empieza en `/my/profile` de Greenhouse, que ya existe, ya está
+protegida por la vista `mi_ficha.mi_perfil` y ya es alcanzable desde el avatar
+(`route-reachability-manifest.ts:497`). Ahí va una sección **«Cómo entras»**:
+
+```
+Mi perfil  ›  Cómo entras
+  Correo          nombre@empresa.com        · siempre disponible
+  Passkey         2 dispositivos             [ Gestionar ]  →  emisor
+```
+
+`Gestionar` lleva a `auth.efeonce.org/credentials` y la pantalla del emisor devuelve a Greenhouse al
+terminar. Es el patrón de la cuenta de Google: vive en otro sitio, se llega desde el producto, nadie
+teclea la dirección.
+
+**Sin esa sección, esta pantalla no existe para nadie.** Construir sólo el lado del emisor sería
+repetir el error que esta task viene a cerrar. Los dos lados usan stacks distintos —MUI/Composition
+Shell en Greenhouse, shell HTML en el emisor— y **no comparten componentes**: comparten el recorrido.
+
 ## Desktop Target
 
 1440×1000. Una tarjeta centrada sobre el campo azul, sin panel editorial (ese es sólo de `/login`).
@@ -110,7 +135,7 @@ sola región viva; foco visible; ceremonia anunciada por texto, nunca sólo por 
 
 ## Implementation mapping
 
-- Ruta: `GET /account/credentials` en el emisor, detrás de sesión `__Host-efeonce_auth`.
+- Ruta: `GET /credentials` en el emisor, detrás de sesión `__Host-efeonce_auth`.
 - Renderer: `src/lib/auth-server/persons/pages.ts` (o un módulo hermano), server-rendered.
 - Controlador de navegador: artefacto generado con drift guard y servido por nonce, igual que
   `login-controller` y `step-up-controller`. La forma canónica de servir la página **exige el nonce
@@ -138,5 +163,5 @@ sola región viva; foco visible; ceremonia anunciada por texto, nunca sólo por 
 - **Alternativas descartadas**: (a) colgar el alta del step-up — lo ata al momento en que un scope de
   escritura ya frenó a la persona, que es justo cuando no quiere configurar nada; (b) meterlo en la
   consola del administrador de TASK-1838 — esa es de la organización, ésta es de la persona.
-- **Riesgo abierto**: `/account/organization` (TASK-1838) y `/account/credentials` comparten área;
-  las dos tasks deben acordar el shell del área antes de que la segunda empiece.
+- **Riesgo abierto**: `TASK-1838` y esta comparten el área autenticada del emisor;
+  las dos deben acordar su shell antes de que la segunda empiece.

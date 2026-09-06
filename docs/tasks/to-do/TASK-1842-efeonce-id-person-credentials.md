@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-044`
-- Status real: `Registrada 2026-09-06 por el barrido de superficie de EPIC-044 (sesión greenhouse-eo-06, durante TASK-1835). Backend completo desde 2026-09-04 y sin ninguna superficie. NO bloquea la certificación: scripts/auth-server/external-passkey-canary.ts (TASK-1832) ya ejecuta registro y login con una passkey de plataforma real en Chrome persistente, dentro del origen real y sin CDP ni autenticador de software; ese runner declara en su cabecera que existe así porque la superficie de alta no existe. Lo que bloquea es el uso por una PERSONA. UI ready: no hasta comparar composición del área /account/* con TASK-1838.`
+- Status real: `Registrada 2026-09-06 por el barrido de superficie de EPIC-044 (sesión greenhouse-eo-06, durante TASK-1835). Backend completo desde 2026-09-04 y sin ninguna superficie. NO bloquea la certificación: scripts/auth-server/external-passkey-canary.ts (TASK-1832) ya ejecuta registro y login con una passkey de plataforma real en Chrome persistente, dentro del origen real y sin CDP ni autenticador de software; ese runner declara en su cabecera que existe así porque la superficie de alta no existe. Lo que bloquea es el uso por una PERSONA. Corregida el mismo día tras la pregunta del operador: la primera versión describía sólo la pantalla del emisor, sin puerta desde Greenhouse — una capacidad inalcanzable, el mismo error que esta task existe para cerrar. El alcance ahora incluye la sección Cómo entras en /my/profile. La ruta del emisor deja de llamarse /account/* (colisionaba con TASK-1838, que usa esa palabra para la organización) y pasa a /credentials. UI ready: no hasta acordar con TASK-1838 la composición del área autenticada del emisor. NADA IMPLEMENTADO: los commits que mencionan esta task (da4a6db0a y siguientes) sólo la CREAN y la corrigen; por eso el lint avisa de progreso stale y por eso ningún checkbox está tildado. Es correcto.`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -31,9 +31,17 @@
 
 ## Summary
 
-Construir la superficie donde una persona externa **crea y retira sus propias credenciales** en
-`auth.efeonce.org`: alta de passkey y listado de dispositivos con su retiro. Es el único tramo del
-recorrido de EPIC-044 que permite dejar de depender del correo para volver a entrar.
+Construir la superficie donde una persona **crea y retira sus propias credenciales**: alta de passkey
+y listado de dispositivos con su retiro. Es el único tramo del recorrido de EPIC-044 que permite
+dejar de depender del correo para volver a entrar.
+
+**Son dos piezas, no una.** La pantalla vive en el emisor (`auth.efeonce.org/credentials`) porque el
+dato no puede vivir en otro lado: `/auth/passkeys/*` exige la cookie `__Host-efeonce_auth`, que por
+regla del navegador sólo existe en ese host, y una passkey autentica a la **identidad**, no a un
+producto — la misma sirve para Greenhouse, para Globe y para el MCP. Pero **la puerta está en
+Greenhouse**, dentro de `/my/profile`, que es donde la persona ya va. Dónde se guarda el dato y dónde
+empieza la persona no son la misma pregunta; construir sólo la pantalla del emisor deja una página
+que nadie encuentra.
 
 ## Why This Task Exists
 
@@ -49,10 +57,17 @@ declaran `UI impact: none`. Toda capacidad visible que no entró en el `## Scope
 `TASK-1838` quedó sin dueño por construcción. Esta task cierra el caso más caro de esa clase y
 registra el nodo que faltaba.
 
+**Y por poco lo repite.** La primera versión de esta task describía sólo la pantalla del emisor, sin
+ninguna puerta desde Greenhouse: exactamente una capacidad sin forma de llegar a ella. Lo detectó el
+operador preguntando «si el perfil de usuario está en Greenhouse, ¿por qué esto va fuera?». Por eso
+el punto de entrada es parte del alcance y de los criterios, no un detalle de implementación.
+
 ## Goal
 
-- `/account/credentials` server-rendered bajo `__Host-efeonce_auth`, en el shell «Efeonce ID», donde
-  la persona agrega una passkey, ve sus dispositivos y retira el que quiera.
+- Sección **«Cómo entras»** en `/my/profile` de Greenhouse: muestra el estado de acceso de la
+  persona y la lleva a gestionarlo. Es el punto de entrada; sin él la pantalla del emisor es inalcanzable.
+- `auth.efeonce.org/credentials` server-rendered bajo `__Host-efeonce_auth`, en el shell «Efeonce ID»,
+  donde la persona agrega una passkey, ve sus dispositivos y retira el que quiera, y vuelve a Greenhouse.
 - Command canónico de retiro por credencial con audit — hoy sólo existe el corte de emergencia por
   admin, que no es autoservicio.
 - Nodo `S11 · Credenciales de la persona` incorporado al flujo maestro de `EPIC-044`.
@@ -107,11 +122,13 @@ Reglas obligatorias:
 ### Blocks / Impacts
 
 - `TASK-1841` (U16, primer piloto cliente): sin esta superficie la persona depende del correo en cada entrada.
-- `TASK-1838` (consola del administrador del cliente): comparte el área `/account/*`; **acordar el shell del área antes de que la segunda empiece**.
+- `TASK-1838` (consola del administrador del cliente): comparte el área autenticada del emisor; **acordar el shell del área antes de que la segunda empiece**.
 - `TASK-1832`: **no la bloquea** — su canary ya ejercita la ceremonia real en Chrome.
 
 ### Files owned
 
+- `src/views/greenhouse/my/MyProfileView.tsx` (sección «Cómo entras» — lado Greenhouse)
+- `src/lib/copy/` del lado Greenhouse para esa sección (dominio `my`), separado del copy del emisor
 - `src/lib/auth-server/persons/pages.ts` (extender) y su controlador de navegador nuevo + artefacto generado
 - `src/lib/auth-server/persons/routes.ts` (ruta y command de retiro)
 - `src/lib/copy/auth-server.ts` (ids `credentials_*`) + módulo derivado para el navegador
@@ -137,8 +154,8 @@ Reglas obligatorias:
 
 ## Modular Placement Contract
 
-- Topology impact: `worker`
-- Current home: `src/lib/auth-server/persons/**`, servido por `services/auth-server/**`
+- Topology impact: `cross-runtime`
+- Current home: **dos deployables**. La puerta en el app Next de Greenhouse (`src/views/greenhouse/my/**`, MUI/Composition Shell); la pantalla en `src/lib/auth-server/persons/**`, servida por `services/auth-server/**` (shell HTML propio, sin React). **Dos stacks de UI distintos en una sola task** — quien la tome no debe intentar compartir componentes entre ambos lados: comparten el recorrido, no el código
 - Future candidate home: `worker`
 - Boundary: la plantilla recibe DTOs ya resueltos; jamás lee store, KMS ni sesión
 - Server/browser split: server-rendered; el único JS es el controlador WebAuthn generado y servido por nonce
@@ -158,8 +175,9 @@ Reglas obligatorias:
 
 ### Surface & system decision
 
-- Surface: `GET /account/credentials` en `auth.efeonce.org`
-- Nav placement: `none` en Greenhouse; dentro del emisor se alcanza desde la pantalla de sesión
+- Surface: sección en `/my/profile` (Greenhouse) → `GET /credentials` en `auth.efeonce.org` → vuelta a Greenhouse
+- Nav placement (Greenhouse): dentro de `/my/profile`, ya alcanzable desde el avatar (`route-reachability-manifest.ts:497`); no agrega destino nuevo al sidebar
+- Nav placement (emisor): se alcanza desde Greenhouse y desde la pantalla de sesión; no es un destino que se teclee
 - Composition Shell: `no aplica` — shell HTML propio de TASK-1835
 - Primitive decision: `reuse` (`.id-surface`, `.id-section`, `.id-organizations`, `.id-primary/.id-secondary`)
 - Adaptive density / The Seam: `no aplica`
@@ -203,7 +221,8 @@ Mensajes por `role=alert` (errores) y `role=status` (confirmaciones), una sola r
 
 ### Design decision log
 
-- Decisión: área autenticada `/account/*` en el shell existente, sin dirección visual nueva.
+- Decisión: dos superficies conectadas — puerta en `/my/profile` (Greenhouse, MUI/Composition Shell) y pantalla en `auth.efeonce.org/credentials` (shell HTML del emisor). Sin dirección visual nueva en ninguna de las dos.
+- Descartado: llamar `/account/*` a la ruta del emisor. `TASK-1838` usa esa palabra para la ORGANIZACIÓN del cliente; la misma palabra para «tus llaves» y «tu empresa» confundió al operador en la primera lectura, que es exactamente lo que una pantalla de identidad no puede permitirse.
 - Alternativas descartadas: colgar el alta del step-up (ata la configuración al peor momento) y meterla en la consola de TASK-1838 (esa es de la organización, ésta es de la persona).
 - Reuse / extend / new: `reuse` de primitives; clase nueva sólo si se genera desde el SSOT.
 - Riesgo abierto: composición del área compartida con `TASK-1838`.
@@ -259,10 +278,14 @@ Mensajes por `role=alert` (errores) y `role=status` (confirmaciones), una sola r
 
 ## Scope
 
-### Slice 1 — Lectura: la pantalla y sus dispositivos
+### Slice 1 — La puerta en Greenhouse y la lectura en el emisor
 
-Ruta `/account/credentials` bajo sesión, renderer server-side, lista desde `GET /auth/passkeys`,
-estado vacío, enlace desde la pantalla de sesión, fixtures y capturas GVC de los estados de lectura.
+Sección **«Cómo entras»** en `/my/profile` (`src/views/greenhouse/my/MyProfileView.tsx`): dice con qué
+puede entrar la persona hoy y lleva al emisor. Se construye PRIMERO, porque una pantalla sin puerta es
+una pantalla que nadie encuentra.
+
+En el emisor: ruta `/credentials` bajo sesión, renderer server-side, lista desde `GET /auth/passkeys`,
+estado vacío, retorno a Greenhouse, fixtures y capturas GVC de los estados de lectura.
 
 ### Slice 2 — Alta de la passkey
 
@@ -309,7 +332,8 @@ alta no tiene dónde mostrar su resultado. `UI ready: yes` sólo al cerrar Slice
 | El controlador se sirve sin nonce y queda muerto en silencio | identity / UI | medium | El nonce es campo obligatorio del tipo de entrada (patrón `renderLoginPageResponse`); test de CSP por página | test de CSP rojo |
 | Clase de texto compartida entre lienzo y tarjeta rompe contraste | UI / a11y | medium | `pnpm auth-server:verify-contrast` sobre píxeles; ya atrapó 1.53:1 y 3.28:1 | gate rojo |
 | El retiro deja a la persona sin ninguna forma de entrar | identity | medium | La confirmación advierte cuando es la última; el correo sigue disponible siempre | señal de persona sin credenciales `[verificar]` |
-| Colisión de composición con `TASK-1838` en `/account/*` | UI | medium | Acordar el shell del área antes de Slice 1 | revisión cruzada |
+| Colisión de composición con `TASK-1838` en el área autenticada del emisor | UI | medium | Acordar el shell del área antes de Slice 1 | revisión cruzada |
+| La pantalla del emisor se construye sin la puerta y queda inalcanzable | UI | **high** | La puerta es Slice 1 y criterio de aceptación, no un detalle; `pnpm route-reachability-gate` cubre el lado Greenhouse | la pantalla existe y nadie la usa |
 | `credentialId` expuesto en el DOM | identity | low | Assertion de captura + revisión | GVC rojo |
 
 ### Feature flags / cutover
@@ -334,7 +358,7 @@ que sirve `auth.efeonce.org` en vivo — el push ES el despliegue.
 
 ### Out-of-band coordination required
 
-- Acuerdo de composición del área `/account/*` con `TASK-1838`.
+- Acuerdo de composición del área autenticada del emisor con `TASK-1838`.
 - Coordinación con `TASK-1832` para no pisar su canary de passkey mientras corre.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -346,7 +370,9 @@ que sirve `auth.efeonce.org` en vivo — el push ES el despliegue.
 
 ## Acceptance Criteria
 
-- [ ] Una persona con sesión puede crear su primera passkey desde `/account/credentials` y volver a entrar con ella sin recibir ningún correo, verificado en Chrome **y** en Safari/WebKit contra el emisor desplegado.
+- [ ] **La persona llega sin escribir ninguna dirección a mano**: desde `/my/profile` en Greenhouse ve «Cómo entras», llega a la pantalla del emisor y vuelve. Verificado en el recorrido completo, no por partes.
+- [ ] Una persona con sesión puede crear su primera passkey desde `/credentials` y volver a entrar con ella sin recibir ningún correo, verificado en Chrome **y** en Safari/WebKit contra el emisor desplegado.
+- [ ] `pnpm route-reachability-gate` en verde con la sección nueva de Greenhouse.
 - [ ] La lista muestra nombre, tipo, alta y último uso de cada credencial, y ningún `credentialId` crudo aparece en el DOM.
 - [ ] El retiro pasa por un command con audit; retirar dos veces es idempotente; la fila desaparece y la credencial deja de autenticar.
 - [ ] La confirmación de retiro nombra el dispositivo, y cuando es la última advierte que se vuelve a depender del correo.
@@ -390,5 +416,5 @@ que sirve `auth.efeonce.org` en vivo — el push ES el despliegue.
 
 - ¿Existe un command de retiro por credencial o hay que construirlo? `revokePersonAuthState` es corte
   de emergencia por admin, no autoservicio. **Resolver en Discovery antes de Slice 3.**
-- ¿El área `/account/*` la compone esta task o `TASK-1838`? La primera que llegue define el shell del
+- ¿El área autenticada del emisor la compone esta task o `TASK-1838`? La primera que llegue define el shell del
   área; hay que acordarlo, no descubrirlo al segundo intento.
