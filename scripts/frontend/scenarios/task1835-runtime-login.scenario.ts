@@ -5,6 +5,6 @@ export const scenario: CaptureScenario = {
   ...consent,
   name: 'task1835-runtime-login',
   route: '/login',
-  quality: { ...consent.quality, enterpriseRubric: { ...consent.quality?.enterpriseRubric, expectedDataCaptureRegions: ['id-shell'] } },
+  quality: { ...consent.quality, enterpriseRubric: { ...consent.quality?.enterpriseRubric, expectedDataCaptureRegions: ['id-shell', 'id-passkey', 'id-form'] } },
   steps: [{ kind: 'mark', label: 'runtime-login', fullPage: true, note: 'Renderer real; credenciales y acciones del harness son ficticias.' }]
 }

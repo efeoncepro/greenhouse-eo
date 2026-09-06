@@ -156,7 +156,7 @@ export const renderConsentPage = (input: ConsentPageInput): string => {
     GH_AUTH_SERVER.consent_title,
     `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.consent_title)}</h1>
   <p>${escapeHtml(GH_AUTH_SERVER.consent_context_intro(input.organizations.length))}</p>
-  <p class="id-context" data-capture="id-redirect-host"><span class="id-muted">${escapeHtml(GH_AUTH_SERVER.consent_redirect_host_label)}</span> <code class="code">${escapeHtml(input.redirectHost.trim())}</code> <span class="id-muted">${escapeHtml(GH_AUTH_SERVER.consent_redirect_host_hint)}</span></p>
+  <p class="id-destination" data-capture="id-redirect-host"><span class="id-muted">${escapeHtml(GH_AUTH_SERVER.consent_redirect_host_label)}</span> <code class="code">${escapeHtml(input.redirectHost.trim())}</code> <span class="id-muted">${escapeHtml(GH_AUTH_SERVER.consent_redirect_host_hint)}</span></p>
   <h2 class="id-muted">${escapeHtml(input.organizations.length === 1 ? GH_AUTH_SERVER.consent_organization_label : GH_AUTH_SERVER.consent_organizations_label)}</h2>
   <ul class="id-organizations" aria-label="${escapeHtml(GH_AUTH_SERVER.consent_organizations_label)}">${organizationItems}</ul>
   <ul class="id-permissions" data-capture="id-scopes" aria-label="${escapeHtml(GH_AUTH_SERVER.consent_scope_label)}">

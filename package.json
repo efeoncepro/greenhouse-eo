@@ -347,7 +347,8 @@
     "mcp:manifest:check": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ci/mcp-tool-manifest-artifact.ts",
     "mcp:skills:generate": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ci/mcp-skill-catalog-artifact.ts --write",
     "mcp:skills:check": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ci/mcp-skill-catalog-artifact.ts",
-    "mcp:selection-eval": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/mcp/tool-selection-eval.ts"
+    "mcp:selection-eval": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/mcp/tool-selection-eval.ts",
+    "auth-server:verify-contrast": "node scripts/auth-server/verify-contrast.mjs"
   },
   "lint-staged": {
     "*.{ts,tsx,mjs,mts,js,jsx}": [

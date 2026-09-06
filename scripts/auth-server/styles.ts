@@ -164,6 +164,9 @@ button,input { font:inherit; color:inherit; }
 .id-brand svg { color:var(--id-mark); }
 .id-context { text-align:center; margin-block-end:${s(6)}; overflow-wrap:anywhere; font-size:${typographyScale.bodyMd.fontSize}; color:color-mix(in oklch, ${n.bgWhite} 66%, transparent); }
 .id-context strong { color:${n.bgWhite}; }
+/* La ficha vive sobre el lienzo azul: sus textos heredan el color del lienzo, no el token de la
+   tarjeta. La clase id-muted resuelve el gris de la tarjeta y acá medía 1.98:1 sobre el azul. */
+.id-context .id-muted { color:inherit; }
 .id-client { display:flex; align-items:center; justify-content:center; gap:${s(2)}; margin-block-start:${s(2)}; }
 .id-client strong { margin:0; font-size:${typographyScale.bodyLg.fontSize}; }
 /* Ficha de la aplicación: identifica sin suplantar. El asset verificado (cuando exista) sustituye
@@ -186,7 +189,17 @@ button,input { font:inherit; color:inherit; }
   box-shadow:inset 0 0 0 1px color-mix(in oklch, ${axisMain.warning} 46%, transparent); }
 .id-unverified strong { display:inline; color:${n.bgWhite}; font-weight:${fontWeights.semibold}; }
 .id-unverified .id-icon { color:${axisRamp.warning[300]}; margin-block-start:${s(0.5)}; }
-.id-context strong { display:block; margin-block-start:${s(1)}; font-size:${body.fontSize}; color:var(--id-text); font-weight:${fontWeights.semibold}; }
+/* El destino de la autorización vive DENTRO de la tarjeta blanca y la ficha de la aplicación
+   FUERA, sobre el lienzo azul. Compartían la clase id-context, así que la regla escrita para el
+   destino le imponía al nombre de la aplicación el color de la tarjeta: texto oscuro sobre azul,
+   1.53:1 medido. Cada superficie tiene su clase; el color no se hereda entre fondos opuestos. */
+.id-destination { margin-block:${s(4)} ${s(6)}; padding:${s(3)} ${s(4)}; border-radius:${r.md};
+  background:var(--id-bg); border:1px solid var(--id-border); text-align:start; overflow-wrap:anywhere; }
+.id-destination .id-muted { display:block; font-size:${typographyScale.bodySm.fontSize}; }
+/* El host es el dato que impide que una aplicación con nombre creíble se lleve el código a un
+   dominio ajeno: se lee como dato, no como nota al pie. */
+.id-destination .code { display:block; margin-block:${s(1)}; font-size:${typographyScale.bodyLg.fontSize};
+  font-weight:${fontWeights.semibold}; color:var(--id-text); }
 .id-surface { background:var(--id-paper); border:1px solid var(--id-border); border-radius:${r.lg}; padding:${s(9)} ${s(8)} ${s(8)}; box-shadow:var(--id-shadow); }
 /* Presencia de la tarjeta sobre el campo: más superficie, radio y sombra derivados del sistema, y
    un filo interior de 1px que la despega del azul en vez de apoyarla sobre él. */
@@ -296,7 +309,7 @@ form .id-actions { margin-block-start:${s(4)}; }
 [hidden] { display:none!important; }
 @media(max-width:40rem) {
   .id-page { padding:${s(8)} ${s(4)}; }
-  .id-context strong { display:block; margin-block-start:${s(1)}; font-weight:${fontWeights.semibold}; }
+  .id-destination { padding:${s(3)}; }
   .id-surface { padding:${s(6)}; }
   .id-canvas[data-state="login"] .id-surface { padding:${s(8)} ${s(6)} ${s(7)}; border-radius:${r.lg}; }
   .id-canvas[data-state="login"] .id-title { font-size:${typographyScale.surfaceHeroTitle.mobileFontSize}; }
