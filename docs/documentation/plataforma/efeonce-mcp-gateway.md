@@ -58,6 +58,90 @@ sus permisos y los interruptores de cada provider.
 El gateway rechaza requests anónimos. Un provider con problemas falla cerrado y devuelve un error sanitizado, sin
 filtrar credenciales ni detalles internos.
 
+## Cómo se presenta ante el cliente
+
+Cuando un cliente MCP conecta, el servidor le entrega una tarjeta de identidad con cinco datos: el nombre
+técnico (`efeonce-mcp`), un título legible (`Efeonce MCP`), el sitio de la marca, un ícono y la versión.
+Esa tarjeta viaja en el saludo inicial de la conexión, y es lo que un cliente usa para mostrar el servidor
+en su lista de conectores.
+
+El ícono es **uno solo**: el isotipo Efeonce en blanco sobre una placa azul institucional opaca, de 512×512,
+servido por el propio dominio del gateway (`/icon-512.png`) sin pedir credenciales. Tres decisiones detrás,
+todas por la misma razón — la superficie donde nos dibujan no la controlamos:
+
+- **Placa opaca en vez de fondo transparente.** Un ícono transparente sólo se ve bien sobre fondo claro; sobre
+  una lista oscura el azul institucional se hunde. La placa garantiza contraste sobre cualquier fondo y hace
+  que la marca se reconozca por color antes que por forma, que es lo único que sobrevive a 24 píxeles.
+- **Sin esquinas redondeadas propias.** Muchos clientes recortan el ícono con su propia forma. Si el asset ya
+  viniera redondeado, se vería un arco recortado contra otro arco. A sangre, el que redondea redondea y el
+  que no recibe un cuadrado limpio.
+- **Sin variante por tema.** La placa opaca no necesita una versión clara y otra oscura. Además, la
+  especificación no define si "tema claro" describe el fondo *del ícono* o el *del cliente*, y como hoy ningún
+  cliente los dibuja, una lectura invertida no se podría detectar contra nada. Un ícono que no depende del
+  tema no puede leerse al revés.
+
+**Advertencia honesta:** hoy **ningún cliente Claude dibuja estos íconos**. claude.ai los ignora en conectores
+personalizados (hay un reporte abierto que además descartó las alternativas: favicon, ícono incrustado y
+etiqueta HTML), y en Claude Code el pedido equivalente se cerró como "no planificado". La tarjeta se declara
+porque es correcta y porque el día que un cliente la lea aparece sola, no porque se vea ahora.
+
+> Detalle técnico: `efeonce-mcp/src/branding.ts` (fuente única de la tarjeta) ·
+> [ADR de plataforma MCP](../../architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md) §Delta 2026-09-05.
+
+## Cómo se versiona, y por qué eso importa
+
+El protocolo MCP decidió que **el versionado pertenece al servidor, no a las tools**: se propusieron tres veces
+mecanismos para versionar tools individuales y las tres se cerraron con ese argumento. La consecuencia práctica
+es que la versión del servidor es el **único** lugar donde se puede declarar que la superficie cambió. No es un
+dato decorativo: es la señal.
+
+Esa versión se compone de dos mitades con dueños distintos:
+
+| Mitad | Quién la decide | Qué responde |
+| --- | --- | --- |
+| El número (`1.1.0`) | Una persona, al clasificar el cambio | ¿Qué clase de cambio hubo? |
+| El sufijo (`+5c28a7a`) | El despliegue, automáticamente | ¿Qué build está sirviendo ahora? |
+
+**Qué cuenta como cambio depende de a quién le rompe.** Para un agente que ya aprendió la superficie, no es lo
+mismo que para un programa con tipos:
+
+- **Rompe:** renombrar o quitar una tool, quitar un campo de respuesta que el flujo usaba, cambiar el
+  significado de un argumento sin cambiarle el nombre y —la contraintuitiva— **editar la descripción de una
+  tool**. La descripción es lo que el agente lee para decidir qué llamar: cambiarla cambia su decisión y además
+  invalida la caché de prompt del cliente. Casi nadie la trata como cambio rompiente.
+- **No rompe:** agregar una tool, agregar un campo opcional, agregar un valor de enumeración que el agente no
+  tiene que enumerar.
+
+Para que esa decisión humana ocurra de verdad y no quede en buena intención, hay un control automático: el
+repositorio guarda una **foto de la superficie** (qué tools existen y con qué descripciones) junto a la versión
+que la declaró. Si la superficie se mueve y la versión no, el control falla y nombra exactamente qué entró, qué
+salió, o si sólo se editó una descripción. La foto **se exige y nunca se crea sola**: una línea base que se
+repara a sí misma pasa para siempre y no detecta nada.
+
+### El control midió durante un tiempo sólo la mitad
+
+Vale documentarlo porque es la clase de falla que se ve fácil en retrospectiva y es invisible mientras ocurre.
+
+El control comparaba el inventario de tools **federado desde Greenhouse**. Pero el gateway también define tools
+propias, que no pasan por ese inventario. Resultado: esas tools podían aparecer sin mover nada. El 2026-09-06,
+durante el trabajo de invitación delegada, se midió el efecto real: **la superficie pasó de 37 a 39 tools con el
+inventario federado idéntico, la suite de pruebas en verde y la versión congelada**. La mitad que no se medía
+era el 5% de las tools y el 100% de las que crecían ese día.
+
+Un control que mide una parte y se lee como si midiera el todo es peor que no tenerlo, porque su verde se cita
+como prueba. Se cerró midiendo la superficie del **servidor ya construido** —lo único que cuenta lo que de
+verdad se registra, venga de la federación o del propio gateway—, incluyendo las descripciones en la
+comparación y forzando todos los providers a "encendido" durante la medición, para que el mismo código no dé
+resultados distintos según qué variables tenga la máquina que corre el control.
+
+**Cómo saber qué está sirviendo:** el sufijo de la versión y el identificador de build de la revisión activa
+deben coincidir con el último commit publicado. Si difieren, hay trabajo mergeado sin desplegar — y el verde de
+la integración continua no es prueba de despliegue.
+
+> Detalle técnico: [invariantes de superficie MCP](../../architecture/agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md) §9 ·
+> [manual de operación](../../manual-de-uso/plataforma/operar-efeonce-mcp-gateway.md) ·
+> `efeonce-mcp/src/surface.ts` y `surface-baseline.json`.
+
 ## Qué está disponible y qué no
 
 Disponible hoy:
@@ -108,6 +192,29 @@ identidad que reciba sólo el permiso base cuando no tiene Globe. Al cliente Ent
 hoy los dos primeros permisos —el base y el de lectura de Globe— incluso si pide sólo el base; por eso no
 representa aún una prueba válida de segmentación comercial. El permiso de escritura tiene su propia autorización
 aparte y no forma parte de lo comprobado en ese comportamiento.
+
+### Por qué un permiso puede existir sin que Entra lo emita
+
+Los seis permisos no salen todos del mismo emisor, y eso es deliberado. Entra es el carril **interno** —personas
+del tenant corporativo—; Efeonce ID es el carril del **cliente externo**. Un permiso vive donde vive la clase de
+actor que puede ejercerlo.
+
+El caso concreto es el permiso de escritura de identidad (`efeonce.mcp.identity.write`): el gateway lo anuncia
+entre los permisos que acepta, pero **no existe en la aplicación de recurso de Entra**. Verificado el 2026-09-06
+contra el directorio real: esa aplicación define cinco permisos y ése no está entre ellos. No es un descuadre.
+Lo emite Efeonce ID, porque su sujeto es una persona externa del cliente administrando a las personas de su
+propia organización — algo que ninguna credencial del tenant corporativo debería poder hacer en nombre de un
+cliente. El nombre del permiso es el mismo string en ambos lados a propósito, para que el gateway verifique uno
+solo; pero sólo uno de los dos emisores puede acuñarlo.
+
+**Qué NO hacer con esa asimetría.** Quien compare la lista de permisos anunciados contra Entra va a ver un hueco
+y va a querer cerrarlo creando el permiso allí. Ese camino termina en una de dos: un permiso que ninguna
+credencial interna debería portar, o —peor— cablearlo al cliente público compartido, que es la puerta que todo
+el modelo evita. Ese cliente sigue teniendo exactamente **tres permisos, los tres de lectura**, y ninguno de
+escritura; se verificó el mismo día. La forma correcta de cerrar el hueco es no cerrarlo.
+
+> Detalle técnico: [ADR de plataforma MCP](../../architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md)
+> §Delta 2026-09-06 y §"El scope de escritura NO se cablea al cliente público compartido".
 
 ## Relación con otros MCP
 
