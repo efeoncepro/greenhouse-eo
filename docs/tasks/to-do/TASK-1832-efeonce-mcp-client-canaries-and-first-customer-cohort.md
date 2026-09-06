@@ -114,7 +114,8 @@ organización cliente real, sí**.
 - Status real: `Canaries reales pendientes; task to-do. Readback 2026-09-05T15:02:44Z: auth readyz 200 y metadata del gateway 200, authorization_servers=[https://mcp.efeonce.org]. OAuth/personas ON consta en readback anterior del runbook; estos GET no verifican flags actuales ni compatibilidad nativa. TASK-1836 y gateway/UI tienen integración local; faltan deploy/config coherentes, enrollment/grant real, selección del emisor nativo y canary refresh/revocación/rollback.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
-- Blocked by: `TASK-1829 (code complete en develop 2026-09-04; espera AUTH_SERVER_OAUTH_ENABLED=true en staging con el environment efeonce-auth registrado), TASK-1830, TASK-1631 (producción), TASK-1831 y la task ui-ux de login/consentimiento, TASK-1837 (entrega de la invitación externa; sin ella la cohorte real exige que un operador transporte el token a mano y el consentimiento incumple el MUST del `redirect_uri`)`
+- Blocked by: `TASK-1829 (code complete en develop 2026-09-04; espera AUTH_SERVER_OAUTH_ENABLED=true en staging con el environment efeonce-auth registrado), TASK-1830, TASK-1631 (producción), TASK-1831 y la task ui-ux de login/consentimiento`
+- Desbloqueo 2026-09-06: la entrega de la invitación externa y el host de retorno en el consentimiento ya están en producción (release `b3e324cb5c8d`), así que la cohorte real no necesita que un operador transporte el token a mano.
 - Branch: `Greenhouse develop; efeonce-mcp main; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

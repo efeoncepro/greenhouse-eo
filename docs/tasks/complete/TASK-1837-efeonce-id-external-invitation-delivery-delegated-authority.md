@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -719,18 +719,21 @@ cambiar el esquema del token está resolviendo algo que no está roto.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] `IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` recoge los invariantes nuevos (token fuera del outbox,
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` recoge los invariantes nuevos (token fuera del outbox,
       reenviar es rotar, el delegado no se eleva, el consentimiento muestra el destino)
-- [ ] Documentación funcional en `docs/documentation/identity/` y manual en
+- [x] Documentación funcional en `docs/documentation/identity/` y manual en
       `docs/manual-de-uso/identity/` explicando cómo se invita, cómo se reenvía, qué significa cada
       estado de entrega y qué hacer cuando un correo rebota
-- [ ] Las tres señales nuevas están visibles en `/admin/operations` con su estado estable declarado
+- [x] Las tres señales nuevas están visibles en `/admin/operations` con su estado estable declarado —
+      evaluadas contra la base real el 2026-09-06 11:40Z: `undelivered`=0 y `expired_unaccepted`=0 (estable);
+      `token_revealed`=3 **encendida a propósito por las revelaciones de prueba de esta task**, se apaga sola
+      al vencer su ventana de 24 h. Verla ENCENDERSE es la prueba de que el detector opera.
 
 ## Follow-ups
 

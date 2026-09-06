@@ -1,24 +1,21 @@
 # Handoff activo
 
-**TASK-1837 (EPIC-044 U12) — `VERIFICADO END-TO-END EN STAGING 2026-09-06; producción pendiente de release`**
-(sesión greenhouse-eo-21; commits `5518d868e…` + rollout `db5a0adf3` + docs; develop pusheado hasta `2654f16eb`,
-cierre final commiteado sin push). Migración aplicada; flags `EXTERNAL_INVITATION_{SYSTEM_DELIVERY,DELEGATED_AUTHORITY}_ENABLED`
-**ON en Vercel staging** (redeploy `greenhouse-6u3f57s4p`), **NOT SET en Production** (el código no está en `main`).
-Recorrido vivo con binding de prueba (org fixture → `efeonce-auth`) y persona `jreyes+task1837@` (Outlook real):
-invitación 201 sin token → correo en 37 s → `/i/<token>` → accept 202 → `external_contact` nueva + admin designado →
-magic link → sesión `auth.efeonce.org` 200 (`amr magic_link`, reuso 400) → rebote `bounced@resend.dev` → `bounced` +
-señal `undelivered` ENCENDIDA ok→warning (drenaje local acotado: el ops-worker corre `main`) → reenvío 201 → revelación
-201 (1 h) → lane delegada con token del gateway 200/403/422/201 + correo real → revoke binding → sesión 401. Consent
-con host: capturas dev-UI. **Próximo paso:** release develop→main (coordinar con `production-release.yml`; el push a
-develop de las 01:43 rompió el release #226 y hubo que relanzarlo) + prender ambos flags en Vercel Production; federar la
-lane delegada en `efeonce-mcp` (TASK-1831/1832); primera persona de un CLIENTE real = decisión comercial. **Follow-ups cerrados (04:00–04:40Z, sin release):** revoke por binding limpia al admin designado (+audit);
-boundary test del dominio; scope `efeonce.mcp.identity.write` en el emisor (paridad con el gateway); lane acepta
-`organizationId`; verbos delegados `resend`/`revoke` + rutas `…/invitations/[id]/{resend,revoke}`; federación en el
-gateway = `efeonce-mcp` **PR #3** (`feat/task-1837-delegated-invitations`, tools `identity.invitations.list` /
-`identity.invitation.create`, `pnpm check` verde, **sin merge** hasta el release + flag en Production); tasks derivadas
-`TASK-1838` (consola del admin del cliente, wireframe+flow reales) y `TASK-1839` (convergencia con la invitación del
-portal). Evidencia:
-[audit](docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md) · [task](docs/tasks/in-progress/TASK-1837-efeonce-id-external-invitation-delivery-delegated-authority.md) · [ledger](docs/operations/FEATURE_FLAG_STATE_LEDGER.md).
+**TASK-1834 — especificación corregida, sin implementación (Codex, 2026-09-06):** auditoría paralela contra
+código/ADRs confirmó que `auth.efeonce.org` aún no entrega OIDC utilizable por NextAuth (sin `openid`/`id_token`/
+`userinfo`, access token con audiencia MCP) y que source link + binding no bastan sin `client_users`/acceso vigente.
+Una segunda auditoría de autorización confirmó que Efeonce Auth debe probar identidad, no emitir permisos del portal:
+OIDC Greenhouse queda separado de scopes/consentimiento/`gv`/grants MCP, mientras Greenhouse conserva roles, route
+groups, vistas internas, módulos cliente, entitlements, `can()` y scopes de datos. La task ahora cubre clientes +
+internos mediante Delta ADR, OIDC de audiencia Greenhouse, resolvers separados hasta `TenantAccessRecord`, ledger,
+UI/flow/motion y rollout por población; preserva Microsoft, Google, credenciales y magic link. También deja como gates
+de activación la sesión que hoy conserva claims al quedar inactivo el principal, el drift de vigencia de roles PG/BQ,
+la selección multicontexto no determinista y la posible diferencia entre permisos del Admin Center y enforcement
+`can()`. TASK-1832/1833 gatean activación, no dark deploy. Sólo docs locales; sin código, commit, push ni deploy.
+Siguiente paso: plan/ADR de Slice 0 con checkpoint humano antes del primer cambio de código.
+
+**TASK-1837 (EPIC-044 U12) — `EN PRODUCCIÓN 2026-09-06, COMPLETE`.** Release `b3e324cb5c8d-3cfce865-236f-4e4e-b128-8e144de193cf` (run `34029501838`, PR #227, target `b3e324cb5c8d`), manifest `released` 11:23:09Z en un solo intento. Break-glass con hechos (la migración `20260906004450748` ya estaba aplicada en la instancia única, `run_on 04:27:58Z`); el smoke de `main` se PRODUJO en vez de bypassearse. Cinco servicios Cloud Run OK: `ops-worker` y `auth-server` quedaron en `2b385284d594` con **hash de árbol IDÉNTICO** al target (`d3a1432a1f71`) — no-op legítimo probado por identidad de árbol, no por el change-gate; watchdog `drift_count=0`. Ambos flags `EXTERNAL_INVITATION_*` ON en Production (valor live leído con `vercel env pull`) + redeploy obligatorio `greenhouse-j7aix61yk`. **Canary de contrato contra producción**: la misma llamada a la lane delegada pasó de `404` anti-oráculo a `422 field=bindingId`, y con `organizationId` a `403 forbidden` — la lane ejecuta la resolución de autoridad, no sólo existe. Federación mergeada en `efeonce-mcp` (PR #3 → `65ae1d5`, revisión `00038-8jj`); ese repo **NO** despliega en push a `main`, va por dispatch de `deploy.yml`.
+
+**Pendiente real (no bloqueante):** (1) la **primera persona CLIENTE real** es decisión comercial tuya — hasta que exista, el flujo delegado de punta a punta y las dos tools del gateway sólo están probados en staging y por los negativos del canary; (2) la señal `identity.external_invitation.token_revealed` marca 3 por las revelaciones de prueba y **se apaga sola** al vencer su ventana de 24 h; (3) **punto ciego abierto en el gate de versión del gateway**: `test/version.test.ts` sólo compara el hash de las tools FEDERADAS desde Greenhouse, así que las tools propias del gateway crecieron la superficie de 37 a 39 con el test verde y `version` congelada — se subió a `1.1.0` a mano, pero la próxima volverá a pasar sin bump.
 
 **TASK-1836 / TASK-1831 — evidencia consolidada, 2026-09-06:**
 Tres subagentes actualizaron contratos, funcionales, manuales, tasks/epic y skills espejo.

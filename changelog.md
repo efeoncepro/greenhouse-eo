@@ -7,6 +7,12 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-06 — Efeonce ID: la invitación externa y la autoridad delegada del cliente, en producción
+
+Quien invita a una persona externa ya no le pasa el enlace a mano: el sistema manda el correo en el mismo acto en que genera el token, la respuesta deja de traerlo salvo una revelación gobernada de una hora que queda auditada, y el ciclo de vida es observable (reenviar rota el token anterior, el rebote se registra, la caducidad se ve, tres señales nuevas). El administrador designado de una organización cliente pasa a tener autoridad real sobre su propia gente por una lane del ecosistema, mediada por el gateway y decidida siempre por Greenhouse, nunca por lo que diga la llamada. La página de consentimiento del autorizador ahora muestra a qué host va a volver la persona.
+
+Release `b3e324cb5c8d-3cfce865`, un solo intento. Ambos flags encendidos en producción con redeploy, y un canary contra la superficie real: la misma llamada pasó de responder «no existe» a pedir el binding y a negar por falta de autoridad. La federación de las dos herramientas nuevas quedó desplegada en el gateway, que subió a la versión 1.1.0.
+
 ## 2026-09-06 — Efeonce ID: follow-ups de TASK-1837 cerrados y lane delegada federada en PR (gateway)
 
 Revocar un binding limpia y audita al administrador designado; el dominio `external-access` tiene boundary test
@@ -840,12 +846,3 @@ legal por mercado. Contexto de negocio, posicionamiento público, primitives y s
 mismo estado. El brief de Contacto usa la dirección y los dos teléfonos de la contraportada canónica y marca
 como desactualizados Las Bellotas, el teléfono público anterior y las listas de cuatro mercados. `TASK-1801` quedó registrada con contratos visual/flow/motion, routing, privacidad, Meetings y rollout; esta edición no publicó WordPress ni amplió métricas históricas de clientes.
 [Brief y límites](docs/public-site/CONTACT_PAGE_REBUILD_BRIEF_V1.md).
-
-## 2026-08-31 — Home: cierre editorial y mantenimiento nativo
-
-Ocho revisiones publicadas: hero desafiante, beneficios concretos, comparación cualitativa, FAQ
-con jerarquía tipográfica y encabezado Con + logo. Readback 17 widgets/407 campos/seis repeaters;
-doce archivos coinciden local/remoto. Subagente concilió planes, snapshots y evidencia.
-Contratos técnico/funcional/manual y skills WordPress/copywriting espejadas actualizados;
-commit documental, sin runtime hermano ni WIP SEO previo. QA residual y TASK-1358 siguen abiertos.
-[Cierre y límites](docs/audits/public-site/2026-08-31-home-editorial-closure.md).

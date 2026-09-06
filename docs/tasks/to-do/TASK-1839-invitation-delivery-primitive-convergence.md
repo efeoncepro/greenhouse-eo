@@ -24,7 +24,8 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `identity|platform`
-- Blocked by: `TASK-1837 en producción (la primitive de entrega que se generaliza es su SoT); decisión de TASK-1012 sobre el origen del portal (opción A request-origin allowlisted, B env var por entorno, o ambas)`
+- Blocked by: `decisión de TASK-1012 sobre el origen del portal (opción A request-origin allowlisted, B env var por entorno, o ambas)`
+- Desbloqueo 2026-09-06: la primitive de entrega que se generaliza ya está en producción (release `b3e324cb5c8d`) y su contrato quedó estable.
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
