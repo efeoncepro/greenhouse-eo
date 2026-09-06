@@ -24,7 +24,7 @@
 - Status real: `Especificación registrada 2026-09-06; sin organización elegida, invitación, grant, tratamiento cliente, rollout ni evidencia. Empieza sólo después de la certificación sintética TASK-1832, assurance TASK-1833 y cierre de las pantallas TASK-1835.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops|customer`
-- Blocked by: `TASK-1832, TASK-1833, TASK-1835`
+- Blocked by: `TASK-1832, TASK-1833`
 - Branch: `Greenhouse develop; efeonce-mcp main; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -327,6 +327,24 @@ Reglas obligatorias:
 - [ ] `Handoff.md` y `changelog.md` registran únicamente estado/evidencia vigente
 - [ ] se ejecutó chequeo de impacto cruzado sobre TASK-1631/1831/1832/1833/1834/1835/1837/1838
 - [ ] documentación funcional y manual de onboarding/soporte reflejan la experiencia real y su rollback
+
+## Delta 2026-09-06 — TASK-1835 cerrada; queda una fricción conocida para la primera persona
+
+`TASK-1835` está `complete` y en producción: la persona del piloto ya se encuentra con pantallas
+reales de login, consentimiento, step-up y recuperación en `auth.efeonce.org`. Se retira de
+`Blocked by`.
+
+Dos cosas que conviene saber ANTES de sentar a alguien real frente a esto:
+
+- **Sólo podrá volver a entrar por correo.** El botón «Entrar con mi passkey» ya está en `/login`,
+  pero **ninguna persona puede crear una passkey**: `/auth/passkeys/register/*` existe y no tiene
+  superficie. Cada entrada será un enlace al correo. Lo cierra `TASK-1842`, a su vez bloqueada por
+  `TASK-1834` (hoy Greenhouse y el emisor tienen sesiones separadas, así que configurar la passkey
+  pediría… un correo).
+- **Si el scope pedido fuera de escritura**, la persona tendrá que montar su segundo factor **en
+  medio** del flujo de autorización: `/login/step-up` sólo acepta volver a `/oauth/authorize`, así
+  que no puede prepararlo antes. Es fricción conocida, no un defecto — pero conviene acompañarla en
+  ese momento en vez de descubrirlo con el cliente en la llamada.
 
 ## Follow-ups
 

@@ -7,6 +7,41 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-06 — TASK-1835 completa: Efeonce ID tiene cara, y el gate de accesibilidad estaba ciego
+
+`auth.efeonce.org` sirve su experiencia visible: login con passkey, Microsoft y enlace por correo;
+consentimiento que dice a qué dominio viaja el código; step-up, alta de segundo factor, recuperación,
+sesión y errores. Desplegado y verificado en vivo.
+
+Tres hallazgos valieron más que el trabajo planificado:
+
+- **El login por passkey no existía.** Backend completo y copy escrito desde el 2026-09-04, con los
+  cuatro ids `login_passkey_*` huérfanos: ninguna pantalla ofrecía el método.
+- 🔴 **El gate de accesibilidad reportaba `violations: 0` sin medir nada.** axe devuelve todo en
+  `incomplete` cuando el fondo es un degradado con pseudo-elemento, y el gate lo informaba como cero.
+  Debajo había texto a **1.53:1** en la ficha de aplicación del consentimiento — justo lo que tiene
+  que leerse. Causa raíz: una clase de texto compartida entre el lienzo oscuro y la tarjeta clara.
+  **Aplica a cualquier superficie con fondo compuesto, no sólo al emisor.**
+- **El servidor contaba los códigos de respaldo restantes y la pantalla los ignoraba.** Alguien podía
+  quemar el último y enterarse el día que perdiera el teléfono.
+
+Un cuarto hallazgo fue mío y lo corregí el mismo día: agregué al pie de todas las pantallas un enlace
+a las licencias de las fuentes, porque su id de copy estaba huérfano. Construir una interfaz para
+justificar un copy muerto es el razonamiento al revés —el copy se borra—, y encima el lugar era la
+pantalla donde alguien decide si confía para entrar. Retirado; los `.txt` se siguen sirviendo, que es
+donde la licencia se cumple.
+
+Mecanismos que quedan corriendo: `pnpm auth-server:verify-contrast` (mide sobre los píxeles
+renderizados; 365 textos, 0 bajo el piso WCAG) y `pnpm auth-server:verify-passkey` (14/14 en navegador
+real). El patrón «runtime sin React» queda registrado en `ui-platform/PATTERNS.md` para que ningún
+otro servicio Efeonce arranque un segundo sistema visual.
+
+GVC premium 29 fixtures × 2 viewports (58 capturas); scorecard 4.63 / piso 4.5; los cuatro gates
+`ui:*` PASS; suite del emisor 427.
+
+Follow-up abierto: **`TASK-1842`** — ninguna persona puede crear una passkey todavía, así que el botón
+nuevo le queda inerte y cada entrada sigue siendo un correo. Bloqueada por `TASK-1834`.
+
 ## 2026-09-06 — TASK-1832: schema canary aplicado fuera del checkpoint, sin fixture
 
 `pnpm pg:connect:migrate` se ejecutó por error como si sólo levantara el proxy y aplicó las dos migraciones de
@@ -849,18 +884,3 @@ instruía al canary a normalizar un `disabled` — que hoy sería una regresión
 
 Tier `prospect` documentado: se resuelve sin `module_assignments` y su gasto es presupuesto de
 adquisición de Efeonce, nunca costo de cliente.
-
-## 2026-09-01 — TASK-1699 cerrada, y `task:lint` gana la regla `stale-progress`
-
-El top-N del SERP quedó `complete`: serie viva desde el 2026-08-29 (766 · 775 · 762 · 778 filas en
-4 días) con costo marginal CERO medido, y su señal de cobertura convergió sola a `ok`/`uncovered=0`
-sin tocar el umbral.
-
-Se re-ejecutó cinco veces sin cerrar por un defecto de **registro**, no técnico: 46 checkboxes sin
-tildar y `Status real: Diseno` hacían que cada sesión la leyera como no empezada, mientras el trabajo
-quedaba anotado sólo en prosa.
-
-Regla nueva `stale-progress` en `task:lint`: avisa cuando el estado declarado contradice la historia
-de commits, y cuando una task se cierra sin tildar una sola evidencia. Warning por diseño y por
-medición (414 de 975 completas están así); acotada a las que tienen commits de implementación, la
-señal cae a 28 tasks.

@@ -41,7 +41,7 @@ diagnóstico es `EO-ORG-0050` (`other`, `disqualified`, cero spaces/memberships/
 lifecycle/commercial party y queda descartado porque no es eliminable sin destruir evidencia append-only. Evidencia:
 `docs/audits/mcp/TASK-1832_PRE_IMPLEMENTATION_READBACK_2026-09-06.md`. Sin escrituras ni cambios runtime.
 
-**TASK-1835 (EPIC-044 U06) — `UI ready: yes`, code complete, SIN DESPLEGAR (Claude greenhouse-eo-06, 2026-09-06;
+**TASK-1835 (EPIC-044 U06) — `COMPLETE` y EN PRODUCCIÓN 2026-09-06 (Claude greenhouse-eo-06, 2026-09-06;
 commits `85c67e97d` · `4eb358d5b` · `b15b1690e`).** Efeonce ID queda enterprise-ready en local. Tres hallazgos que
 importan más que el trabajo planificado:
 
@@ -64,10 +64,16 @@ importan más que el trabajo planificado:
    **`TASK-1842`** (`/account/credentials`, ui-ux, con el nodo S11 del flujo maestro y un gate de cobertura
    endpoint→consumidor). Pesa sobre el primer piloto cliente (U16), no sobre el canary.
 
-Evidencia: GVC premium 20 fixtures × desktop 1440 y móvil 390 = 40 capturas 20/20; scorecard 4.63 / piso 4.5; los
-cuatro gates `ui:*` PASS; `pnpm test` 13896 passed; typecheck limpio; worker gates verdes. Patrón «runtime sin
-React» registrado en `PATTERNS.md`. **Próximo paso: NO empujar sin decidirlo** — `auth-server-deploy.yml` dispara
-con `src/lib/**` sobre el Cloud Run único que sirve `auth.efeonce.org` en vivo: el push ES el despliegue.
+Evidencia: GVC premium **29 fixtures** × desktop 1440 y móvil 390 = 58 capturas 29/29; scorecard 4.63 / piso 4.5;
+los cuatro gates `ui:*` PASS; suite del emisor 427; typecheck y lint limpios. Patrón «runtime sin React» en
+`PATTERNS.md`. **Desplegado y verificado en vivo** (deploy `auth-server` 21:49 `success`): botón de passkey, pie de
+licencias y arreglo de contraste sirviendo en `auth.efeonce.org`.
+
+**Para quien siga:** el aviso de códigos de respaldo quedó con tres tests en la suite —vistos ponerse ROJOS al
+quitar el comportamiento, no sólo verdes—, porque un script suelto que hay que acordarse de correr es un mecanismo
+apagado. Y ojo con `auth-server-deploy.yml`: dispara con `src/lib/**` sobre el Cloud Run ÚNICO que sirve
+`auth.efeonce.org` en vivo — el push ES el despliegue, incluso si el push lo hace otra sesión sobre la rama
+compartida (pasó hoy: Codex empujó y se llevó estos commits).
 
 **TASK-1832 / TASK-1841 — certificación sintética separada del piloto cliente (Codex, 2026-09-06):** U07 ya no
 usa una organización cliente real para probar la tecnología. TASK-1832 certifica el camino productivo completo

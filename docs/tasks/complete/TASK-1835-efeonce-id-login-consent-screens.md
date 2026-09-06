@@ -64,7 +64,7 @@ un dominio ajeno.
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -77,7 +77,7 @@ un dominio ajeno.
 - Motion: `docs/ui/motion/TASK-1835-efeonce-id-login-consent-screens-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-044`
-- Status real: `2026-09-06 (sesión greenhouse-eo-06): UI COMPLETA y verificada localmente. Carril de login por passkey implementado — no existía: el backend y el copy estaban desde el 2026-09-04 pero /login no ofrecía el método (hallazgo del operador). Controlador generado con drift guard, servido por nonce; renderLoginPageResponse exige el nonce en su tipo, así que el compilador impide servir la página sin script. Contraste: el gate de GVC reportaba violations:0 sin medir nada (axe devolvía todo en incomplete por el degradado del lienzo) y debajo había texto a 1.53:1 en la ficha de aplicación del consentimiento; causa raíz una clase compartida entre dos fondos opuestos, corregida en la causa. Mecanismo nuevo pnpm auth-server:verify-contrast: 272 textos, 18 pantallas x 2 viewports, 0 bajo el piso WCAG. Salidas agregadas a las pantallas terminales que instruían sin ofrecer control. GVC premium 20 fixtures x desktop 1440 y móvil 390 = 40 capturas, 20/20 verdes; scorecard 4.63 promedio / piso 4.5; los cuatro gates ui:* PASS; vitest src/lib/auth-server 423 passed; typecheck limpio. SIN DESPLEGAR: el push a develop dispara auth-server-deploy sobre el Cloud Run único que sirve auth.efeoncepro.org en vivo — el push ES el despliegue. PENDIENTE DE PROGRAMA (no de esta task): /auth/passkeys/register/* no tiene superficie, así que ninguna PERSONA puede crear una passkey y el botón nuevo de /login le queda inerte. CORRECCIÓN 2026-09-06: dije que eso bloqueaba la certificación de U07 y NO es cierto — scripts/auth-server/external-passkey-canary.ts (TASK-1832, Codex) ya ejecuta registro y login con una passkey de plataforma real en Chrome persistente, dentro del origen real y sin CDP ni autenticador de software. Lo que falta es la pantalla, no la capacidad. Registrado como TASK-1842.`
+- Status real: `COMPLETE 2026-09-06 y EN PRODUCCIÓN. Efeonce ID entrega su experiencia visible: login (passkey + Microsoft + enlace por correo), consentimiento, step-up, alta de segundo factor, recuperación, sesión y errores. Verificado en vivo en auth.efeonce.org: botón de passkey, pie de licencias y el arreglo de contraste del pie sirviendo (deploy auth-server 21:49 success). Tres hallazgos que valieron más que el trabajo planificado: (1) el login por passkey no existía pese a tener backend y copy desde el 2026-09-04; (2) el gate de accesibilidad reportaba violations:0 SIN MEDIR NADA —axe devuelve todo en incomplete sobre el degradado del lienzo— y debajo había texto a 1.53:1 en la ficha de aplicación del consentimiento, causa raíz una clase compartida entre dos fondos opuestos; (3) el servidor contaba los códigos de respaldo restantes y la pantalla los ignoraba. Mecanismos nuevos que quedan corriendo: pnpm auth-server:verify-contrast (365 textos sobre píxeles, 0 bajo el piso WCAG) y pnpm auth-server:verify-passkey (14/14 en navegador real). GVC premium 29 fixtures x 2 viewports = 58 capturas 29/29; scorecard 4.63 / piso 4.5; los cuatro gates ui:* PASS; suite auth-server 427; typecheck y lint limpios. Patrón «runtime sin React» registrado en PATTERNS.md. Follow-up abierto: TASK-1842 (credenciales de la persona), bloqueada por TASK-1834.`
 - Rank: `TBD`
 - Domain: `ui`
 - Blocked by: `none`
