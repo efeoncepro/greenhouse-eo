@@ -2,6 +2,44 @@
 
 Owner: TASK-1836 / EPIC-044. Decisión: `EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md`.
 
+## Release y canary final — 2026-09-06 00:30 UTC (2026-09-05 en Chile)
+
+PR [#225](https://github.com/efeoncepro/greenhouse-eo/pull/225) integrado a `main` como
+`08acfb2c6992251063044583e5a7642d37d9ed52` a las 23:53:15 UTC. CI `33999842879`, Deep
+`33999842871`, smoke `33999850040` y Vercel Production `dpl_4E9q6hjbgSZdWcGewmCGBNHAQC2z`
+aprobados sobre ese SHA antes del despacho. Preflight sin warnings ni excepciones.
+[Orquestador 34000876213](https://github.com/efeoncepro/greenhouse-eo/actions/runs/34000876213)
+`success`; manifest `08acfb2c6992-ee142c2a-dda2-4d33-984b-f2207d8dbd49` releído en `released`
+(00:28:46.029 UTC), `override=null`, sin otro manifest activo.
+
+Health pasó a las 00:27:30 UTC. Watchdog con el perfil PostgreSQL `ops` a las 00:30:17 UTC:
+5/5 servicios sincronizados, drift 0, approvals stale 0 y pending-without-jobs 0; no envió Teams.
+Un primer wrapper local sin aplicar el perfil operativo tomó una referencia obsoleta de julio;
+no se modificó producción ni se suprimió la señal: la repetición con el loader/perfil canónico
+resolvió el manifest actual. Ops y auth conservan `09def4fc4` porque el diff completo posterior
+sólo contiene documentación y el probe de navegador, sin cambios en sus rutas de runtime.
+
+Auth `auth-server-00029-tfx` Ready, 100% tráfico, interno ON, imagen
+`sha256:0dd44fc490ef4d0ee5ec59a84fcb08992ab5f180919bb1f5d90123c3f8820afa`.
+Gateway `efeonce-mcp-gateway-00036-5wc` Ready, 100%, nativo e interno ON, commit `815df9b`,
+imagen `sha256:90e3e109b9100e12c69ff9edcacfe0483b5e86db47cc62fa336ed23b6f826338`.
+Su cambio de presentación fue revisado sin diferencias en la lógica de autorización.
+
+Canary final con la sesión corporativa existente: `authorize` 00:24:03.624 y `token`
+00:24:04.575 UTC en audit; emisión 954 ms, lectura MCP propia 5442 ms, organización ajena
+denegada 6391 ms con lectura propia antes/después. Revocación auditada a las 00:24:47.251,
+aceptada en 788 ms; MCP rechazó el access token aún no expirado a los 6633 ms desde revocar.
+Helper cerrado, todos los tokens de prueba revocados y sólo mantenidos en RAM mientras duró
+la prueba. Integridad: una enrollment activa, gv 5, grant original vigente hasta
+2026-09-12T15:00:00Z, grant anterior revocado conservado, actores/razones canónicos presentes,
+`unaudited_write_count=0` y `mixed_population_count=0`.
+
+Se conserva la evidencia anterior de refresh rotativo, retiro de grant <=11 s, gateway OFF
+<=20 s y restauración completa en 79 s. Chromium 6/6; el probe actualizado declara WebKit
+omitido por falta de ejecutable. El release y el acceso interno están verificados; TASK-1836
+permanece `in-progress` por las matrices amplias de clientes externos/multicontexto y los
+pendientes de UI/WebKit. No se amplía la cohorte ni se prolonga el permiso del piloto.
+
 ## Readback de integridad 2026-09-05 — posterior a PR #223
 
 Migración `20260905183812333` aplicada por runner; población y tracking releídos. Piloto gv 2 → 3.

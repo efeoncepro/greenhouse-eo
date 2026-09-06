@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `2026-09-05 22:44 UTC: canary interno real PASSED en runtime09def4fc4. Microsoft+consentimiento+token+MCP lectura Efeonce correctos; foreign orgdenegada; refreshrotativo; revocacióntoken10.151s; retirogrant<=11s; gatewayOFFdeniega<=20s; emisorOFFdeniegarefresh. Piloto restauradoON authrev29-tfx/gatewayrev35-bhd, gv5, expiryoriginal2026-09-12T15:00Z; tokenspruebarevocados. Main d551cf368 sigue último release certificado; promoción formal nueva pendiente. Matrices amplias de clientes externos/WebKit yUI no declaradas completas.`
+- Status real: `2026-09-06 00:30 UTC: release 08acfb2c6 publicado (PR225, run34000876213, manifest released sin override). Acceso Microsoft, consentimiento, token y lectura MCP interna verificados; canary final en gateway36: propia permitida, ajena denegada y revocación efectiva en 6.633 s. Refresh, retiro de grant y rollback medidos anteriormente. Piloto ON, gv5, vencimiento original 2026-09-12T15:00Z; integridad cero y tokens de prueba revocados. Watchdog 5/5, drift0. Matrices externas/multicontexto y UI/WebKit pendientes.`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -1034,3 +1034,41 @@ No se declara completa matriz multicontexto A/B, clientesexternos, WebKit o dise
 Merge main→develop8d7b205ca conserva árbol7728b56e8e638d3ce00770ef8e5e2d79a6173b46: main
 d551cf368 coincidebyte-for-byte con ancestro25f3db5f9 (tree2377b14a); conflictosresueltos
 conservando09def4fc4, sin descartar cambios exclusivos de main. Promociónformal pendiente.
+
+## Release y canary final — 2026-09-06 00:30 UTC (2026-09-05 en Chile)
+
+PR [#225](https://github.com/efeoncepro/greenhouse-eo/pull/225) integrado a `main` como
+`08acfb2c6992251063044583e5a7642d37d9ed52` a las 23:53:15 UTC. CI `33999842879`, Deep
+`33999842871`, smoke `33999850040` y Vercel Production `dpl_4E9q6hjbgSZdWcGewmCGBNHAQC2z`
+aprobados sobre ese SHA antes del despacho. Preflight sin warnings ni excepciones.
+[Orquestador 34000876213](https://github.com/efeoncepro/greenhouse-eo/actions/runs/34000876213)
+`success`; manifest `08acfb2c6992-ee142c2a-dda2-4d33-984b-f2207d8dbd49` releído en `released`
+(00:28:46.029 UTC), `override=null`, sin otro manifest activo.
+
+Health pasó a las 00:27:30 UTC. Watchdog con el perfil PostgreSQL `ops` a las 00:30:17 UTC:
+5/5 servicios sincronizados, drift 0, approvals stale 0 y pending-without-jobs 0; no envió Teams.
+Un primer wrapper local sin aplicar el perfil operativo tomó una referencia obsoleta de julio;
+no se modificó producción ni se suprimió la señal: la repetición con el loader/perfil canónico
+resolvió el manifest actual. Ops y auth conservan `09def4fc4` porque el diff completo posterior
+sólo contiene documentación y el probe de navegador, sin cambios en sus rutas de runtime.
+
+Auth `auth-server-00029-tfx` Ready, 100% tráfico, interno ON, imagen
+`sha256:0dd44fc490ef4d0ee5ec59a84fcb08992ab5f180919bb1f5d90123c3f8820afa`.
+Gateway `efeonce-mcp-gateway-00036-5wc` Ready, 100%, nativo e interno ON, commit `815df9b`,
+imagen `sha256:90e3e109b9100e12c69ff9edcacfe0483b5e86db47cc62fa336ed23b6f826338`.
+Su cambio de presentación fue revisado sin diferencias en la lógica de autorización.
+
+Canary final con la sesión corporativa existente: `authorize` 00:24:03.624 y `token`
+00:24:04.575 UTC en audit; emisión 954 ms, lectura MCP propia 5442 ms, organización ajena
+denegada 6391 ms con lectura propia antes/después. Revocación auditada a las 00:24:47.251,
+aceptada en 788 ms; MCP rechazó el access token aún no expirado a los 6633 ms desde revocar.
+Helper cerrado, todos los tokens de prueba revocados y sólo mantenidos en RAM mientras duró
+la prueba. Integridad: una enrollment activa, gv 5, grant original vigente hasta
+2026-09-12T15:00:00Z, grant anterior revocado conservado, actores/razones canónicos presentes,
+`unaudited_write_count=0` y `mixed_population_count=0`.
+
+Se conserva la evidencia anterior de refresh rotativo, retiro de grant <=11 s, gateway OFF
+<=20 s y restauración completa en 79 s. Chromium 6/6; el probe actualizado declara WebKit
+omitido por falta de ejecutable. El release y el acceso interno están verificados; TASK-1836
+permanece `in-progress` por las matrices amplias de clientes externos/multicontexto y los
+pendientes de UI/WebKit. No se amplía la cohorte ni se prolonga el permiso del piloto.

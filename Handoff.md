@@ -1,17 +1,18 @@
 # Handoff activo
 
-**TASK-1836, 2026-09-05 22:44 UTC — acceso interno verificado, promoción final pendiente:**
-Runtime09def4fc4: Microsoft→consentimiento→token→MCP Efeonce PASSED. Foreignorgdeny, refresh
-rotativo, revocacióntoken10.151s, retirogrant<=11s, gatewayOFFdeny<=20s; restore79s.
-PilotoON authrev29-tfx/gatewayrev35-bhd, GitHubtrue, grantoriginalvence2026-09-12T15:00Z, gv5.
-Todos los tokenscanaryrevocados, helperscerrados; integridadunaudited/mixed0.
-229unitpassed/4liveomitidas, Chromium6/6; WebKitinstalaciónfallida explícitamente pendiente.
-Main d551cf368 último release certificado; sync8d7b205ca conserva tree09def exacto (mainigual
-a ancestro25f3db5f9). Próximo: docs/gates, pushPRmain y release gobernado; no nueva MFA prevista.
-No cerrar matricesamplias de clientes externos, multicontexto ni UI (contraste pendiente).
+**TASK-1836 — acceso interno y release verificados, 2026-09-06 00:30 UTC:**
+PR225 publicado en `main` `08acfb2c6`; orquestador `34000876213` success, manifest
+`08acfb2c6992-ee142c2a-dda2-4d33-984b-f2207d8dbd49` released sin override. CI, Deep,
+smoke y Vercel exactos aprobados; health correcto y watchdog con perfil `ops`: 5/5, drift 0.
+Auth rev29-tfx conserva código `09def4fc4` (runtime sin cambios); gateway rev36-5wc `815df9b`.
+Ambos internos ON. Canary final: token emitido 00:24:04.575 UTC, lectura propia permitida,
+ajena denegada; revocación MCP efectiva en 6.633 s. Refresh, retiro de grant <=11 s,
+gateway OFF <=20 s y restore 79 s ya medidos. Helpers cerrados y tokens de prueba revocados.
+Piloto gv5, grant original vence 2026-09-12T15:00Z; integridad unaudited/mixed en cero.
+TASK-1836 sigue in-progress: matrices externas/multicontexto y pendientes UI/WebKit no cerrados.
+Los pushes concurrentes reiniciaron CI varias veces; operador confirmó pausarlos hasta el release.
 [Task](docs/tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md) ·
-[Runbook](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md) ·
-[Autorizaciones](docs/operations/TASK-1836_INTEGRITY_SESSION_HANDOFF_2026-09-05.md).
+[Runbook](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
 
 > Historial rotado: [Handoff.archive.md](Handoff.archive.md)
 
