@@ -40,6 +40,7 @@ export {
   bindExternalOrganization,
   grantExternalCapability,
   issueExternalInvitation,
+  resendExternalInvitation,
   revokeExternalAccess,
   upsertExternalIdentityEnvironment,
   type AcceptExternalInvitationInput,
@@ -49,6 +50,7 @@ export {
   type IssueExternalInvitationInput,
   type IssueExternalInvitationOptions,
   type IssueExternalInvitationResult,
+  type ResendExternalInvitationInput,
   type RevokeExternalAccessInput,
   type RevokeExternalAccessResult,
   type UpsertExternalIdentityEnvironmentInput

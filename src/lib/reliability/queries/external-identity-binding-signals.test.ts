@@ -24,7 +24,10 @@ const {
   getExternalBindingRevokedStillDispatchingSignal,
   getExternalBindingSubjectCollisionSignal,
   getExternalBindingUnboundDispatchAttemptSignal,
-  getExternalIdentityBindingSignals
+  getExternalIdentityBindingSignals,
+  getExternalInvitationExpiredUnacceptedSignal,
+  getExternalInvitationTokenRevealedSignal,
+  getExternalInvitationUndeliveredSignal
 } = await import('./external-identity-binding-signals')
 
 /**
@@ -40,17 +43,20 @@ describe('TASK-1631 — external identity binding reliability signals', () => {
     vi.clearAllMocks()
   })
 
-  it('declares the six canonical signal ids exactly once and each reader returns its own id', async () => {
+  it('declares the nine canonical signal ids exactly once and each reader returns its own id', async () => {
     const ids = EXTERNAL_IDENTITY_BINDING_SIGNAL_READERS.map(reader => reader.signalId)
 
-    expect(new Set(ids).size).toBe(6)
+    expect(new Set(ids).size).toBe(9)
     expect(ids).toEqual([
       'identity.external_binding.unbound_dispatch_attempt',
       'identity.external_binding.revoked_still_dispatching',
       'identity.external_binding.subject_collision',
       'identity.external_binding.orphan_grant',
       'identity.external_binding.unaudited_write',
-      'identity.external_binding.mixed_population'
+      'identity.external_binding.mixed_population',
+      'identity.external_invitation.undelivered',
+      'identity.external_invitation.expired_unaccepted',
+      'identity.external_invitation.token_revealed'
     ])
 
     queryMock.mockResolvedValue([{ n: '0' }])
@@ -154,5 +160,33 @@ describe('TASK-1631 — external identity binding reliability signals', () => {
     expect(signals.map(signal => signal.signalId)).toEqual(
       EXTERNAL_IDENTITY_BINDING_SIGNAL_READERS.map(r => r.signalId)
     )
+  })
+
+  // TASK-1837
+  it('undelivered is a warning on the first open invitation with a failed/bounced email and error at 5', async () => {
+    queryMock.mockResolvedValueOnce([{ n: '1' }])
+    expect((await getExternalInvitationUndeliveredSignal()).severity).toBe('warning')
+    queryMock.mockResolvedValueOnce([{ n: '5' }])
+    expect((await getExternalInvitationUndeliveredSignal()).severity).toBe('error')
+  })
+
+  it('expired_unaccepted is informative: never escalates to error', async () => {
+    queryMock.mockResolvedValueOnce([{ n: '40' }])
+
+    const signal = await getExternalInvitationExpiredUnacceptedSignal()
+
+    expect(signal.kind).toBe('data_quality')
+    expect(signal.severity).toBe('warning')
+    expect(queryMock.mock.calls[0]?.[1]).toEqual(['7'])
+  })
+
+  it('token_revealed reads the audit log over 24h and is steady 0', async () => {
+    queryMock.mockResolvedValueOnce([{ n: '1' }])
+
+    const signal = await getExternalInvitationTokenRevealedSignal()
+
+    expect(signal.severity).toBe('warning')
+    expect(String(queryMock.mock.calls[0]?.[0])).toContain("invitation_token_revealed")
+    expect(queryMock.mock.calls[0]?.[1]).toEqual(['24'])
   })
 })

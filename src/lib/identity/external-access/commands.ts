@@ -830,6 +830,144 @@ export const issueExternalInvitation = async (
   }
 }
 
+export type ResendExternalInvitationInput = {
+  invitationId: string
+  /** Contexto de la ruta: si viene y no coincide con el binding de la invitación ⇒ `not_found` (anti-oráculo). */
+  bindingId?: string | null
+  reason?: string | null
+  expiresInHours?: number | null
+  delivery?: ExternalInvitationDeliveryMode
+}
+
+/**
+ * TASK-1837 — Reenviar es ROTAR, nunca reexpedir el mismo secreto (Ory/FusionAuth hacen lo mismo).
+ * La invitación abierta queda `revoked` (`resent`), nace una fila nueva con token nuevo que hereda
+ * el conteo de intentos de la cadena; el enlace anterior deja de valer en el mismo commit. Topes:
+ * `resendLimitPerChain` (429) y el tope por binding/hora (429). Sólo una invitación `issued` se
+ * reenvía: aceptada/ligada/revocada/expirada ⇒ `invitation_not_open`.
+ */
+export const resendExternalInvitation = async (
+  input: ResendExternalInvitationInput,
+  actor: ExternalAccessActor,
+  options: IssueExternalInvitationOptions = {}
+): Promise<IssueExternalInvitationResult> => {
+  const invitationId = assertNonEmptyString(input.invitationId, 'invitationId', 128)
+  const expectedBindingId = optionalString(input.bindingId, 'bindingId', 128)
+  const reason = optionalString(input.reason, 'reason')
+  const expiresInHours = assertPositiveInteger(input.expiresInHours, 'expiresInHours', 72, 24 * 30)
+  const performedBy = actorId(actor)
+  const deliveryMode = resolveDeliveryMode(input.delivery)
+  const config = readExternalInvitationConfig()
+
+  const committed = await withTransaction(async client => {
+    const { rows } = await client.query<Parameters<typeof mapInvitationRow>[0]>(
+      `SELECT ${INVITATION_SELECT}
+         FROM greenhouse_core.external_member_invitations
+        WHERE invitation_id = $1
+        FOR UPDATE`,
+      [invitationId]
+    )
+
+    const previous = rows[0] ? mapInvitationRow(rows[0]) : null
+
+    if (!previous || (expectedBindingId && previous.bindingId !== expectedBindingId)) {
+      throw new ExternalAccessError('not_found', 'invitation not found', { invitationId })
+    }
+
+    if (previous.status !== 'issued') {
+      throw new ExternalAccessError('invitation_not_open', 'only an issued invitation can be resent', {
+        invitationId,
+        status: previous.status
+      })
+    }
+
+    if (previous.deliveryAttempts >= config.resendLimitPerChain) {
+      throw new ExternalAccessError('rate_limited', 'resend limit reached for this invitation', {
+        invitationId,
+        limit: config.resendLimitPerChain
+      })
+    }
+
+    const binding = await requireActiveBinding(client, previous.bindingId)
+    const environment = await loadEnvironmentForUpdate(client, binding.environmentId)
+
+    await assertBindingIssueRate(client, binding.bindingId, config.issueLimitPerBindingPerHour)
+
+    await client.query(
+      `UPDATE greenhouse_core.external_member_invitations
+          SET status = 'revoked', revoked_at = CURRENT_TIMESTAMP, revoked_by = $2,
+              revoke_reason = 'resent', updated_at = CURRENT_TIMESTAMP
+        WHERE invitation_id = $1`,
+      [previous.invitationId, performedBy]
+    )
+
+    const { invitation, token } = await insertInvitationRow(client, {
+      bindingId: binding.bindingId,
+      profileId: previous.profileId,
+      email: previous.email,
+      designatedAdmin: previous.designatedAdmin,
+      reason: reason ?? previous.reason,
+      performedBy,
+      expiresInHours,
+      deliveryAttempts: previous.deliveryAttempts
+    })
+
+    await appendAudit(client, {
+      eventType: 'invitation_resent',
+      environmentId: binding.environmentId,
+      bindingId: binding.bindingId,
+      invitationId: invitation.invitationId,
+      organizationId: binding.organizationId,
+      profileId: previous.profileId,
+      performedBy,
+      reason,
+      metadata: {
+        previousInvitationId: previous.invitationId,
+        previousDeliveryStatus: previous.deliveryStatus,
+        inheritedAttempts: previous.deliveryAttempts,
+        deliveryMode
+      }
+    })
+
+    await publishOutboxEvent(
+      {
+        aggregateType: AGGREGATE_TYPES.externalIdentityBinding,
+        aggregateId: binding.bindingId,
+        eventType: EVENT_TYPES.externalInvitationIssued,
+        payload: {
+          schemaVersion: 1,
+          bindingId: binding.bindingId,
+          invitationId: invitation.invitationId,
+          organizationId: binding.organizationId,
+          environmentId: binding.environmentId,
+          designatedAdmin: previous.designatedAdmin,
+          profileId: previous.profileId,
+          reissue: true,
+          resendOfInvitationId: previous.invitationId,
+          deliveryMode,
+          changedByUserId: performedBy
+        }
+      },
+      client
+    )
+
+    return { invitation, token, environment: environment!, organizationName: binding.organizationName }
+  })
+
+  if (deliveryMode === 'manual') {
+    return {
+      invitation: committed.invitation,
+      token: committed.token,
+      created: true,
+      delivery: buildInvitationDelivery(committed.invitation, 'manual')
+    }
+  }
+
+  const delivered = await deliverIssuedInvitation(committed, actor, options.sender ?? sendInvitationEmailViaPlatform)
+
+  return { invitation: delivered, token: committed.token, created: true, delivery: buildInvitationDelivery(delivered, 'system') }
+}
+
 export type AcceptExternalInvitationInput = {
   /** Token en claro entregado por `issueExternalInvitation`; se compara por hash. */
   token: string

@@ -26,6 +26,7 @@ const {
   bindExternalOrganization,
   grantExternalCapability,
   issueExternalInvitation,
+  resendExternalInvitation,
   revokeExternalAccess,
   upsertExternalIdentityEnvironment
 } = await import('./commands')
@@ -636,6 +637,70 @@ describe('TASK-1837 — issueExternalInvitation delivery', () => {
         actor
       )
     ).rejects.toMatchObject({ code: 'conflict' })
+  })
+})
+
+describe('TASK-1837 — resendExternalInvitation (reenviar = rotar)', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  const resendRoute = (previous: Record<string, unknown> = {}) =>
+    route([
+      [/FROM greenhouse_core\.external_member_invitations\s+WHERE invitation_id = \$1\s+FOR UPDATE/, () => [invitationRow({ delivery_status: 'failed', delivery_attempts: 1, ...previous })]],
+      [/WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/, () => [bindingRow()]],
+      [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
+      [/SET status = 'revoked'[\s\S]*revoke_reason = 'resent'/, () => []],
+      [
+        /INSERT INTO greenhouse_core\.external_member_invitations/,
+        params => [invitationRow({ invitation_id: params[0], delivery_attempts: params[9] })]
+      ],
+      [/INSERT INTO greenhouse_core\.external_identity_audit_log/, () => []]
+    ])
+
+  it('revokes the open invitation (resent), issues a NEW token and inherits the attempt count', async () => {
+    resendRoute()
+
+    const result = await resendExternalInvitation({ invitationId: 'xmi-1', delivery: 'manual' }, actor)
+
+    expect(result.created).toBe(true)
+    expect(result.token).toMatch(/^[A-Za-z0-9_-]{40,}$/)
+    expect(calls(/revoke_reason = 'resent'/)).toHaveLength(1)
+
+    const insertParams = calls(/INSERT INTO greenhouse_core\.external_member_invitations/)[0]?.[1] as unknown[]
+
+    expect(insertParams[0]).not.toBe('xmi-1')
+    expect(insertParams[9]).toBe(1)
+
+    const auditTypes = calls(/INSERT INTO greenhouse_core\.external_identity_audit_log/).map(
+      call => (call[1] as unknown[])[1]
+    )
+
+    expect(auditTypes).toEqual(['invitation_resent'])
+    expect(JSON.stringify(publishMock.mock.calls[0]?.[0])).not.toContain(result.token)
+  })
+
+  it('refuses to resend an invitation that is not open', async () => {
+    resendRoute({ status: 'linked', linked_at: '2026-09-04T00:00:00Z', profile_id: 'p', link_id: 'l' })
+
+    await expect(resendExternalInvitation({ invitationId: 'xmi-1', delivery: 'manual' }, actor)).rejects.toMatchObject({
+      code: 'invitation_not_open'
+    })
+  })
+
+  it('refuses to resend past the per-chain limit (3)', async () => {
+    resendRoute({ delivery_attempts: 3 })
+
+    await expect(resendExternalInvitation({ invitationId: 'xmi-1', delivery: 'manual' }, actor)).rejects.toMatchObject({
+      code: 'rate_limited',
+      statusCode: 429
+    })
+  })
+
+  it('responds not_found when the route binding does not match the invitation (anti-oracle)', async () => {
+    resendRoute()
+
+    await expect(
+      resendExternalInvitation({ invitationId: 'xmi-1', bindingId: 'xob-other', delivery: 'manual' }, actor)
+    ).rejects.toMatchObject({ code: 'not_found' })
   })
 })
 

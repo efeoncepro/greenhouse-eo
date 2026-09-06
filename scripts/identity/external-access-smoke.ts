@@ -113,7 +113,7 @@ const main = async () => {
   )
 
   const invitation = await domain.issueExternalInvitation(
-    { bindingId: bound.binding.bindingId, email: EMAIL, designatedAdmin: true, profileId, reason: 'smoke', expiresInHours: 1 },
+    { bindingId: bound.binding.bindingId, email: EMAIL, designatedAdmin: true, profileId, reason: 'smoke', expiresInHours: 1, delivery: 'manual' },
     actor
   )
 
