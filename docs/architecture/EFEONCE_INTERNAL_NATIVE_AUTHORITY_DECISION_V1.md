@@ -232,3 +232,26 @@ directamente de la query ni amplía la CSP de otras páginas. La ruta POST→aut
 se prueba en navegador: self-only bloquea la redirección final en Chromium; permitir el
 origen validado conserva el flujo y sigue bloqueando destinos de otros orígenes. La CSP
 no sustituye la coincidencia exacta de redirect_uri realizada por el protocolo.
+
+## Entrada directa a Microsoft — 2026-09-06
+
+Hallazgo del operador posterior a PR225: el botón de Claude existía pero `corporateLoginUrl`
+lo ocultaba en `/login` sin `return_to`. El canary anterior inició desde OAuth y no acreditaba
+la entrada directa. La corrección reutiliza el mismo botón, icono, shell y estilos; no es un rediseño.
+
+Flujo directo: `/login` → botón Microsoft → `/auth/internal/login` → Entra → callback protegido
+→ `/auth/session` HTML autenticado, con salida por el POST de logout existente. Sólo la ausencia
+de `return_to` selecciona ese destino fijo; vacío/duplicado/inválido se rechaza. El único destino
+adicional admitido es `/auth/session` exacto, sin query/fragmento; se valida al iniciar y al consumir
+la transacción. OAuth conserva su retorno validado y crea sus contextos y permisos por su carril.
+No se fabrica cliente, audiencia, grant ni contexto para iniciar una sesión directamente.
+
+`GET /auth/session` reutiliza `resolvePersonSession`: HTML explícito muestra la confirmación y
+logout; anónimo/revocado muestra login con401, sin afirmar sesión activa. JSON conserva su contrato,
+`Vary: Accept` y no-store. Copy directo en `src/lib/copy/auth-server.ts` distingue sesión de permisos.
+La dirección visual es reuse de «Nocturno editorial» de Claude, sin CSS ni primitive nuevos.
+
+Validación local:235 pruebas pasan/4 live omitidas, tipos y lint dirigido correctos. Chromium6/6
+para origen/CSP/redirect; renderers reales a1440px y390px con Microsoft visible, foco de teclado,
+sin overflow ni errores JS; fixtures visuales no sustituyen sesión real. Revisión independiente
+sin hallazgos de seguridad. Publicación y verificación de `/login` público todavía pendientes.

@@ -136,6 +136,8 @@ export const GH_AUTH_SERVER = {
     'Tu acceso a Efeonce fue retirado. Si crees que es un error, escríbele a la persona de Efeonce que te invitó.',
   session_started_title: 'Listo, ya entraste',
   session_started_body: 'Puedes volver a la aplicación que pidió el acceso.',
+  session_direct_body: 'Tu sesión de Efeonce ID está activa. Puedes continuar desde la aplicación que quieras conectar. Cada aplicación solicitará los permisos que necesite.',
+  session_logout_cta: 'Cerrar sesión',
   session_closed_title: 'Cerraste tu sesión',
   session_closed_body: 'Puedes cerrar esta pestaña.',
 

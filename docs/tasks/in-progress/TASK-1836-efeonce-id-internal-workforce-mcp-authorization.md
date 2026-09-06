@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `2026-09-06 00:30 UTC: release 08acfb2c6 publicado (PR225, run34000876213, manifest released sin override). Acceso Microsoft, consentimiento, token y lectura MCP interna verificados; canary final en gateway36: propia permitida, ajena denegada y revocación efectiva en 6.633 s. Refresh, retiro de grant y rollback medidos anteriormente. Piloto ON, gv5, vencimiento original 2026-09-12T15:00Z; integridad cero y tokens de prueba revocados. Watchdog 5/5, drift0. Matrices externas/multicontexto y UI/WebKit pendientes.`
+- Status real: `2026-09-06: entrada directa /login corregida localmente, publicación pendiente; el botón existente estaba condicionado a retorno OAuth. Pruebas locales235/4omitidas y review correctos. Estado previo del carril MCP a00:30 UTC: release 08acfb2c6 publicado (PR225, run34000876213, manifest released sin override). Acceso Microsoft, consentimiento, token y lectura MCP interna verificados; canary final en gateway36: propia permitida, ajena denegada y revocación efectiva en 6.633 s. Refresh, retiro de grant y rollback medidos anteriormente. Piloto ON, gv5, vencimiento original 2026-09-12T15:00Z; integridad cero y tokens de prueba revocados. Watchdog 5/5, drift0. Matrices externas/multicontexto y UI/WebKit pendientes.`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -1072,3 +1072,26 @@ Se conserva la evidencia anterior de refresh rotativo, retiro de grant <=11 s, g
 omitido por falta de ejecutable. El release y el acceso interno están verificados; TASK-1836
 permanece `in-progress` por las matrices amplias de clientes externos/multicontexto y los
 pendientes de UI/WebKit. No se amplía la cohorte ni se prolonga el permiso del piloto.
+
+## Entrada directa a Microsoft — 2026-09-06
+
+Hallazgo del operador posterior a PR225: el botón de Claude existía pero `corporateLoginUrl`
+lo ocultaba en `/login` sin `return_to`. El canary anterior inició desde OAuth y no acreditaba
+la entrada directa. La corrección reutiliza el mismo botón, icono, shell y estilos; no es un rediseño.
+
+Flujo directo: `/login` → botón Microsoft → `/auth/internal/login` → Entra → callback protegido
+→ `/auth/session` HTML autenticado, con salida por el POST de logout existente. Sólo la ausencia
+de `return_to` selecciona ese destino fijo; vacío/duplicado/inválido se rechaza. El único destino
+adicional admitido es `/auth/session` exacto, sin query/fragmento; se valida al iniciar y al consumir
+la transacción. OAuth conserva su retorno validado y crea sus contextos y permisos por su carril.
+No se fabrica cliente, audiencia, grant ni contexto para iniciar una sesión directamente.
+
+`GET /auth/session` reutiliza `resolvePersonSession`: HTML explícito muestra la confirmación y
+logout; anónimo/revocado muestra login con401, sin afirmar sesión activa. JSON conserva su contrato,
+`Vary: Accept` y no-store. Copy directo en `src/lib/copy/auth-server.ts` distingue sesión de permisos.
+La dirección visual es reuse de «Nocturno editorial» de Claude, sin CSS ni primitive nuevos.
+
+Validación local:235 pruebas pasan/4 live omitidas, tipos y lint dirigido correctos. Chromium6/6
+para origen/CSP/redirect; renderers reales a1440px y390px con Microsoft visible, foco de teclado,
+sin overflow ni errores JS; fixtures visuales no sustituyen sesión real. Revisión independiente
+sin hallazgos de seguridad. Publicación y verificación de `/login` público todavía pendientes.

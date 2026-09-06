@@ -1,3 +1,4 @@
+import { internalLoginReturnTarget } from '../internal/login-target'
 import { handleStepUpPage, STEP_UP_PAGE_PATH } from './step-up-page'
 /**
  * Router de la superficie de personas del emisor (TASK-1830).
@@ -25,6 +26,7 @@ import { handleStepUpPage, STEP_UP_PAGE_PATH } from './step-up-page'
 import { buildRequestAuditContext } from '../oauth/audit'
 import {
   htmlResponse,
+  acceptsHtml,
   isFormContentType,
   jsonResponse,
   parseFormBody,
@@ -89,21 +91,14 @@ export type PersonAuthHandlerDeps = Omit<MagicLinkDeps, 'store' | 'config'> & {
   onTotpEnvelopeUnavailable?: () => void
 }
 
-/** Same-origin authorize only; the corporate login transaction validates this again. */
+/** Direct entry is available when enabled; explicit continuations remain issuer-local and validated. */
 const corporateLoginUrl = (deps: PersonAuthHandlerDeps, rawReturnTo: string | null): string | null => {
-  const returnTo = sanitizeReturnTo(rawReturnTo)
+  if (!deps.internalLoginEnabled()) return null
+  if (rawReturnTo === null) return '/auth/internal/login'
 
-  if (!deps.internalLoginEnabled() || !returnTo) return null
+  const target = internalLoginReturnTarget(rawReturnTo, deps.issuer)
 
-  try {
-    const url = new URL(returnTo, deps.issuer)
-
-    if (url.origin !== new URL(deps.issuer).origin || url.pathname !== '/oauth/authorize' || url.hash || url.username || url.password) return null
-
-    return '/auth/internal/login?' + new URLSearchParams({ return_to: url.pathname + url.search })
-  } catch {
-    return null
-  }
+  return target ? '/auth/internal/login?' + new URLSearchParams({ return_to: target }) : null
 }
 
 const BROWSER_MUTATION_PATHS = new Set<string>([
@@ -757,6 +752,9 @@ export const createPersonAuthHandler = (deps: PersonAuthHandlerDeps): PersonAuth
     if (path === PERSON_AUTH_PATHS.session) {
       if (request.method !== 'GET') return methodNotAllowed('GET')
 
+      const wantsHtml = acceptsHtml(request)
+      const responseHeaders = { Vary: 'Accept' }
+
       const resolution = await resolvePersonSession({
         store: deps.store,
         config: deps.config,
@@ -767,12 +765,14 @@ export const createPersonAuthHandler = (deps: PersonAuthHandlerDeps): PersonAuth
       })
 
       if (resolution.status !== 'active') {
-        return jsonResponse(
-          401,
-          { status: 'unauthenticated' },
-          { 'Set-Cookie': buildSessionClearCookie(deps.config.sessionCookieName) }
-        )
+        const headers = { ...responseHeaders, 'Set-Cookie': buildSessionClearCookie(deps.config.sessionCookieName) }
+
+        return wantsHtml
+          ? htmlResponse(401, renderLoginPage({ returnTo: null, internalLoginUrl: corporateLoginUrl(deps, null) }), headers)
+          : jsonResponse(401, { status: 'unauthenticated' }, headers)
       }
+
+      if (wantsHtml) return htmlResponse(200, renderSessionStartedPage({ direct: true }), responseHeaders)
 
       // El `sub` crudo NO sale al cliente: la sesión se identifica por su hash truncado.
       return jsonResponse(200, {
@@ -783,7 +783,7 @@ export const createPersonAuthHandler = (deps: PersonAuthHandlerDeps): PersonAuth
         amr: resolution.session.amr,
         authTime: resolution.session.authTime.toISOString(),
         expiresAt: resolution.session.expiresAt.toISOString()
-      })
+      }, responseHeaders)
     }
 
     // ─── Cierre de sesión ────────────────────────────────────────────────────

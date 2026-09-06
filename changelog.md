@@ -9,6 +9,9 @@
 
 ## 2026-09-05 — Efeonce ID: acceso Microsoft y publicación certificados
 
+Corrección posterior en curso: `/login` directo ocultaba el botón existente de Microsoft. Se reutiliza
+el botón de Claude y se añade retorno fijo a sesión autenticada;235 tests pasan, publicación pendiente.
+
 PR225 integra las reparaciones OIDC, lector de consentimiento interno y origen/CSP del formulario.
 Release `08acfb2c6`, run `34000876213`, manifest `released` sin override. CI, Deep, smoke,
 Vercel Production y health aprobados; watchdog operativo 5/5, drift0. Canary final sobre gateway36:

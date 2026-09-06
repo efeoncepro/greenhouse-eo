@@ -153,3 +153,17 @@ export const requestOrigin = (request: OAuthHttpRequest): string | null => {
     return null
   }
 }
+
+/** Explicit HTML content negotiation; wildcard and q=0 keep the JSON API representation. */
+export const acceptsHtml = (request: OAuthHttpRequest): boolean =>
+request.method === 'GET' &&
+    (request.headers.get('accept') ?? '').split(',').some(range => {
+      const [media, ...parameters] = range.trim().toLowerCase().split(';')
+
+      const quality = parameters
+        .find(parameter => parameter.trim().startsWith('q='))
+        ?.trim()
+        .slice(2)
+
+      return media?.trim() === 'text/html' && (quality === undefined || (Number(quality) > 0 && Number(quality) <= 1))
+    })

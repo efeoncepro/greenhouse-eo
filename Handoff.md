@@ -1,6 +1,9 @@
 # Handoff activo
 
-**TASK-1836 — acceso interno y release verificados, 2026-09-06 00:30 UTC:**
+**TASK-1836 — corrección de entrada directa en curso, 2026-09-06:**
+El operador detectó que `/login` ocultaba Microsoft sin retorno OAuth. Botón existente reutilizado,
+retorno directo fijo a `/auth/session` autenticado;235 pruebas y review correctos. Publicación pendiente.
+Evidencia previa del carril MCP:
 PR225 publicado en `main` `08acfb2c6`; orquestador `34000876213` success, manifest
 `08acfb2c6992-ee142c2a-dda2-4d33-984b-f2207d8dbd49` released sin override. CI, Deep,
 smoke y Vercel exactos aprobados; health correcto y watchdog con perfil `ops`: 5/5, drift 0.
@@ -10,7 +13,6 @@ ajena denegada; revocación MCP efectiva en 6.633 s. Refresh, retiro de grant <=
 gateway OFF <=20 s y restore 79 s ya medidos. Helpers cerrados y tokens de prueba revocados.
 Piloto gv5, grant original vence 2026-09-12T15:00Z; integridad unaudited/mixed en cero.
 TASK-1836 sigue in-progress: matrices externas/multicontexto y pendientes UI/WebKit no cerrados.
-Los pushes concurrentes reiniciaron CI varias veces; operador confirmó pausarlos hasta el release.
 [Task](docs/tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md) ·
 [Runbook](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
 
