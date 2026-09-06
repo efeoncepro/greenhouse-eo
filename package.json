@@ -137,6 +137,7 @@
     "worker:deploy-path-gate": "node scripts/ci/worker-deploy-path-coverage-gate.mjs",
     "worker:build-contract-gate:test": "node --test scripts/ci/__tests__/worker-build-contract-gate.test.mjs",
     "auth-server:brand-assets:generate": "npx tsx scripts/auth-server/generate-brand-assets.ts",
+    "auth-server:dev-ui": "npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/dev-ui-server.ts",
     "auth-server:oauth-store:smoke": "npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/oauth-store-smoke.ts",
     "auth-server:register-client": "npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/register-oauth-client.ts",
     "auth-server:person-auth:canary": "npx tsx --require ./scripts/lib/server-only-shim.cjs scripts/auth-server/person-auth-canary.ts",

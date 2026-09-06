@@ -89,6 +89,8 @@ export const GH_AUTH_SERVER = {
   // arriba del campo. Los dos fallbacks son distintos a propósito: «no hay soporte» es del
   // dispositivo y «no resultó» es de la ceremonia; mezclarlos manda a la persona a revisar lo que no es.
   login_passkey_cta: 'Entrar con mi passkey',
+  /** Estado vivo de la ceremonia WebAuthn; mismo registro que el «Verificando…» del step-up. */
+  login_passkey_pending: 'Verificando tu passkey…',
   login_passkey_unsupported: 'Este dispositivo no admite passkeys. Usa el enlace por correo.',
   login_passkey_failed: 'No resultó el acceso con passkey. Puedes intentarlo de nuevo o usar el enlace por correo.',
   login_email_fallback_hint: 'O entra con un enlace por correo:',
@@ -135,6 +137,13 @@ export const GH_AUTH_SERVER = {
   link_invalid_body: 'El enlace es inválido o ya fue usado. Pide uno nuevo desde el inicio de sesión.',
   link_expired_body: 'El enlace expiró. Pide uno nuevo desde el inicio de sesión.',
   link_used_body: 'Este enlace ya se usó. Pide uno nuevo desde el inicio de sesión.',
+  /**
+   * TASK-1835 — La salida existe SIEMPRE. Estas pantallas decían «pide uno nuevo desde el inicio de
+   * sesión» sin ofrecer cómo llegar ahí: la instrucción sin el control es un callejón sin salida
+   * (misma clase de bug que el 401 sin acción que corrigió `23904cf0d`).
+   */
+  link_request_new_cta: 'Pedir un enlace nuevo',
+  login_back_cta: 'Volver al inicio de sesión',
   link_access_revoked_title: 'Tu acceso ya no está activo',
   link_access_revoked_body:
     'Tu acceso a Efeonce fue retirado. Si crees que es un error, escríbele a la persona de Efeonce que te invitó.',

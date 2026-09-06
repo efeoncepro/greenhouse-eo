@@ -45,7 +45,7 @@ import {
   renderInvitationAcceptedPage,
   renderInvitationConfirmPage,
   renderLinkProblemPage,
-  renderLoginPage,
+  renderLoginPageResponse,
   renderMagicLinkConfirmPage,
   renderMagicLinkSentPage,
   renderAccessRevokedPage,
@@ -280,10 +280,10 @@ export const createPersonAuthHandler = (deps: PersonAuthHandlerDeps): PersonAuth
     if (path === PERSON_AUTH_PATHS.login) {
       if (request.method !== 'GET') return methodNotAllowed('GET')
 
-      return htmlResponse(
-        200,
-        renderLoginPage({ returnTo: sanitizeReturnTo(request.url.searchParams.get('return_to')), internalLoginUrl: corporateLoginUrl(deps, request.url.searchParams.get('return_to')) })
-      )
+      return renderLoginPageResponse(200, {
+        returnTo: sanitizeReturnTo(request.url.searchParams.get('return_to')),
+        internalLoginUrl: corporateLoginUrl(deps, request.url.searchParams.get('return_to'))
+      })
     }
 
     // ─── Emisión del magic link ──────────────────────────────────────────────
@@ -309,7 +309,11 @@ export const createPersonAuthHandler = (deps: PersonAuthHandlerDeps): PersonAuth
 
       if (result.status === 'invalid_email') {
         return wantsHtml
-          ? htmlResponse(400, renderLoginPage({ returnTo: sanitizeReturnTo(readField(request, 'return_to')), internalLoginUrl: corporateLoginUrl(deps, readField(request, 'return_to')), error: 'invalid_email' }))
+          ? renderLoginPageResponse(400, {
+              returnTo: sanitizeReturnTo(readField(request, 'return_to')),
+              internalLoginUrl: corporateLoginUrl(deps, readField(request, 'return_to')),
+              error: 'invalid_email'
+            })
           : jsonResponse(400, { status: 'invalid_email' })
       }
 
@@ -768,7 +772,7 @@ export const createPersonAuthHandler = (deps: PersonAuthHandlerDeps): PersonAuth
         const headers = { ...responseHeaders, 'Set-Cookie': buildSessionClearCookie(deps.config.sessionCookieName) }
 
         return wantsHtml
-          ? htmlResponse(401, renderLoginPage({ returnTo: null, internalLoginUrl: corporateLoginUrl(deps, null) }), headers)
+          ? renderLoginPageResponse(401, { returnTo: null, internalLoginUrl: corporateLoginUrl(deps, null) }, headers)
           : jsonResponse(401, { status: 'unauthenticated' }, headers)
       }
 

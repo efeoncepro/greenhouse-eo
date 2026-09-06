@@ -15,7 +15,7 @@ import {
   renderAccessRevokedPage,
   renderInvitationAcceptedPage,
   renderLinkProblemPage,
-  renderLoginPage,
+  renderLoginPageResponse,
   renderMagicLinkSentPage,
   renderRateLimitedPage,
   renderSessionClosedPage,
@@ -28,13 +28,17 @@ const authority = `${host}:${port}`
 // This return path is inert: the harness has no OAuth route or command handler.
 const returnTo = '/oauth/authorize?client_id=visual-fixture&scope=efeonce.mcp.read'
 
-const renderers = new Map<string, () => string>([
-  ['/login', () => renderLoginPage({ returnTo, internalLoginUrl: '/noop/microsoft' })],
-  ['/login/external', () => renderLoginPage({ returnTo })],
+/** `/login` se sirve por el constructor canónico: su nonce y su `script-src` son los reales. */
+const loginFixtures = new Map<string, () => ReturnType<typeof renderLoginPageResponse>>([
+  ['/login', () => renderLoginPageResponse(200, { returnTo, internalLoginUrl: '/noop/microsoft' })],
+  ['/login/external', () => renderLoginPageResponse(200, { returnTo })],
   [
     '/login/invalid-email',
-    () => renderLoginPage({ returnTo, internalLoginUrl: '/noop/microsoft', error: 'invalid_email' })
-  ],
+    () => renderLoginPageResponse(400, { returnTo, internalLoginUrl: '/noop/microsoft', error: 'invalid_email' })
+  ]
+])
+
+const renderers = new Map<string, () => string>([
   [
     '/consent',
     () =>
@@ -117,6 +121,20 @@ return
     response.end(result.body)
     
 return
+  }
+
+  const loginFixture = loginFixtures.get(path)
+
+  if (loginFixture) {
+    const result = loginFixture()
+
+    response.writeHead(result.status, {
+      ...result.headers,
+      'X-Auth-UI-Harness': 'fictional-fixtures-no-authentication'
+    })
+    response.end(result.body)
+
+    return
   }
 
   if (path === '/step-up' || path === '/step-up/enroll') {

@@ -101,7 +101,7 @@ export const renderLoginRequiredPage = (returnTo?: string): string =>
     `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.login_required_title)}</h1>
   <p>${escapeHtml(GH_AUTH_SERVER.login_required_body)}</p>
   <p class="muted">${escapeHtml(GH_AUTH_SERVER.login_required_hint)}</p>
-  <div class="id-actions"><a class="id-primary" href="${escapeHtml(returnTo ? '/login?' + new URLSearchParams({ return_to: returnTo }) : '/login')}">${ICON_ARROW_RIGHT}${escapeHtml(GH_AUTH_SERVER.login_continue_cta)}</a></div>`
+  <div class="id-actions" data-capture="id-actions"><a class="id-primary" href="${escapeHtml(returnTo ? '/login?' + new URLSearchParams({ return_to: returnTo }) : '/login')}">${ICON_ARROW_RIGHT}${escapeHtml(GH_AUTH_SERVER.login_continue_cta)}</a></div>`
   )
 
 export const renderStepUpRequiredPage = (returnTo?: string): string =>
@@ -109,7 +109,7 @@ export const renderStepUpRequiredPage = (returnTo?: string): string =>
     GH_AUTH_SERVER.step_up_required_title,
     `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.step_up_required_title)}</h1>
   <p>${escapeHtml(GH_AUTH_SERVER.step_up_required_body)}</p>
-  <div class="id-actions"><a class="id-primary" href="${escapeHtml(returnTo ? '/login/step-up?' + new URLSearchParams({ return_to: returnTo }) : '/login/step-up')}">${ICON_SHIELD_CHECK}${escapeHtml(GH_AUTH_SERVER.totp_verify_submit_cta)}</a></div>`
+  <div class="id-actions" data-capture="id-actions"><a class="id-primary" href="${escapeHtml(returnTo ? '/login/step-up?' + new URLSearchParams({ return_to: returnTo }) : '/login/step-up')}">${ICON_SHIELD_CHECK}${escapeHtml(GH_AUTH_SERVER.totp_verify_submit_cta)}</a></div>`
   )
 
 export type ConsentPageInput = {
@@ -159,14 +159,14 @@ export const renderConsentPage = (input: ConsentPageInput): string => {
   <p class="id-context" data-capture="id-redirect-host"><span class="id-muted">${escapeHtml(GH_AUTH_SERVER.consent_redirect_host_label)}</span> <code class="code">${escapeHtml(input.redirectHost.trim())}</code> <span class="id-muted">${escapeHtml(GH_AUTH_SERVER.consent_redirect_host_hint)}</span></p>
   <h2 class="id-muted">${escapeHtml(input.organizations.length === 1 ? GH_AUTH_SERVER.consent_organization_label : GH_AUTH_SERVER.consent_organizations_label)}</h2>
   <ul class="id-organizations" aria-label="${escapeHtml(GH_AUTH_SERVER.consent_organizations_label)}">${organizationItems}</ul>
-  <ul class="id-permissions" aria-label="${escapeHtml(GH_AUTH_SERVER.consent_scope_label)}">
+  <ul class="id-permissions" data-capture="id-scopes" aria-label="${escapeHtml(GH_AUTH_SERVER.consent_scope_label)}">
     ${scopeItems}
   </ul>
-  <form method="post" action="${escapeHtml(input.actionPath)}">
+  <form method="post" action="${escapeHtml(input.actionPath)}" data-capture="id-form">
     <input type="hidden" name="client_id" value="${escapeHtml(input.clientId)}">
     <input type="hidden" name="scope" value="${escapeHtml(input.scopes.join(' '))}">
     <input type="hidden" name="return_to" value="${escapeHtml(input.returnTo)}">
-    <div class="actions">
+    <div class="actions" data-capture="id-actions">
       <button class="secondary" type="submit" name="decision" value="deny">${escapeHtml(GH_AUTH_SERVER.consent_deny_cta)}</button>
       <button class="primary" type="submit" name="decision" value="allow">${escapeHtml(GH_AUTH_SERVER.consent_allow_cta)}</button>
     </div>
@@ -188,6 +188,6 @@ export const renderErrorPage = (code: OAuthErrorCode): string =>
   layout(
     GH_AUTH_SERVER.error_title,
     `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.error_title)}</h1>
-  <p class="id-alert" role="alert">${ICON_ALERT}<span>${escapeHtml(ERROR_BODIES[code] ?? GH_AUTH_SERVER.error_generic_body)}</span></p>
+  <p class="id-alert" role="alert" data-capture="id-status">${ICON_ALERT}<span>${escapeHtml(ERROR_BODIES[code] ?? GH_AUTH_SERVER.error_generic_body)}</span></p>
   <p class="code">${escapeHtml(GH_AUTH_SERVER.error_code_label)}: ${escapeHtml(code)}</p>`
   )
