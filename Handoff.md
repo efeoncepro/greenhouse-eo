@@ -1,5 +1,13 @@
 # Handoff activo
 
+**TASK-1840 — logout multiproducto registrado, sin implementación (Codex, 2026-09-06):** unidad backend-critical
+separada de TASK-1834 para tres operaciones distintas: salir sólo del producto, cerrar la sesión Efeonce ID del
+navegador actual y cerrar todas las sesiones. El contrato exige `sid` opaco, RP-Initiated/Back-Channel Logout,
+ledger/tombstone server-side por RP, fan-out durable, revalidación, auditoría, señales, conformance multi-RP y
+rollback. No revoca consentimientos, roles, entitlements, memberships, `gv`, factores ni upstream Microsoft/Google.
+TASK-1834 y Globe quedan como consumers separados. Sólo task/registry/README/epic/handoff; sin código, migración,
+flag, push, deploy ni modificación de TASK-1834. Siguiente paso: Slice 0/Delta ADR con checkpoint humano.
+
 **TASK-1834 — especificación corregida, sin implementación (Codex, 2026-09-06):** auditoría paralela contra
 código/ADRs confirmó que `auth.efeonce.org` aún no entrega OIDC utilizable por NextAuth (sin `openid`/`id_token`/
 `userinfo`, access token con audiencia MCP) y que source link + binding no bastan sin `client_users`/acceso vigente.
