@@ -8,7 +8,7 @@ no contiene correos completos, tokens, códigos, cookies, verifiers, hashes de s
 - `run_id`: `task-1832-canary-20260906-a`
 - `canary_registration_id`: `xcr-48dacd1f-ad4b-4a73-b454-3d94574e7d09`
 - `environment`: `efeonce-auth` — asset compartido, nunca eliminar
-- `state`: `planned`
+- `state`: `provisioned`
 - `created_at`: `2026-09-06T19:43:30Z`
 - `created_by`: `jreye` mediante sesión admin gobernada
 - `reason`: `TASK-1832 external MCP compatibility certification`
@@ -20,7 +20,7 @@ no contiene correos completos, tokens, códigos, cookies, verifiers, hashes de s
 
 - `organization_id`: `org-602d7057-7fd5-47e7-b73b-21892e3f06e7`
 - `public_id`: `EO-CANARY-d3bbbff7-0f75-40a2-bc1b-93a2b91e8ca2`
-- `organization_name`: `TASK-1832 canary task-1832-canary-20260906-a`
+- `organization_name`: `Efeonce MCP Canary — task-1832-canary-20260906-a`
 - `external_organization_ref`: `task-1832:task-1832-canary-20260906-a`
 - `active`: `false`
 - `status`: `inactive`
@@ -40,11 +40,11 @@ que el command gobernado lo devuelva. Un asset no previsto deja la corrida `bloc
 
 | Sistema/tabla | ID exacto o selector run-owned | Ownership | Estado | Retiro | Readback |
 | --- | --- | --- | --- | --- | --- |
-| `greenhouse_core.organizations` | `org-602d7057-7fd5-47e7-b73b-21892e3f06e7` | `run_owned` | `planned` | hard delete final | `0 antes del write` |
-| `greenhouse_core.organization_lifecycle_history` | organización exacta; conteo esperado `0` | `forbidden` | `planned` | nunca crear/borrar | `0 antes del write` |
-| `greenhouse_core.external_canary_registrations` | `xcr-48dacd1f-ad4b-4a73-b454-3d94574e7d09` | `run_owned` | `planned` | revocar y eliminar | `0 antes del write` |
+| `greenhouse_core.organizations` | `org-602d7057-7fd5-47e7-b73b-21892e3f06e7` | `run_owned` | `provisioned` | hard delete final | postura no comercial; FKs inesperadas `0` |
+| `greenhouse_core.organization_lifecycle_history` | organización exacta; conteo esperado `0` | `forbidden` | `absent` | nunca crear/borrar | `0` en censo 2026-09-06T19:54Z |
+| `greenhouse_core.external_canary_registrations` | `xcr-48dacd1f-ad4b-4a73-b454-3d94574e7d09` | `run_owned` | `active` | revocar y eliminar | creado 2026-09-06T19:53:50Z; expira 2026-09-14T19:43:30Z |
 | `greenhouse_core.external_identity_environments` | `efeonce-auth` | `shared` | `active preexistente` | conservar | `verificación pendiente` |
-| `greenhouse_core.external_organization_bindings` | `PENDIENTE DE COMMAND` | `run_owned` | `planned` | revocar y eliminar | `0 antes del write` |
+| `greenhouse_core.external_organization_bindings` | `xob-cd920afa-b667-47b7-8293-3c60e3b83630` | `run_owned` | `active`, purpose `canary`, gv `1` | revocar y eliminar | creado 2026-09-06T19:53:56Z; designated admin `null` |
 | `greenhouse_core.external_capability_grants` | `PENDIENTE DE COMMAND`; sólo `growth.seo.observation.read` | `run_owned` | `planned` | revocar y eliminar | `0 antes del write` |
 | `greenhouse_core.external_member_invitations` | `PENDIENTE DE COMMAND` | `run_owned` | `planned` | revocar y eliminar | `0 antes del write` |
 | `greenhouse_core.identity_profiles` | `PENDIENTE DE ACCEPT`; sólo `smoke_test` | `run_owned` | `planned` | desactivar y eliminar | `0 antes del write` |
@@ -66,6 +66,10 @@ que el command gobernado lo devuelva. Un asset no previsto deja la corrida `bloc
 - [x] Gateway compatible desplegado con gate canary `false`: SHA `8438c5fa87ed`, rev `00041-7dq`.
 - [x] Auth-server compatible desplegado con gate canary `false`: SHA `dbeaef62de54`, rev `00034-85c`.
 - [x] Vercel staging compatible y `READY`: `dpl_CqFcRkQCqJYa2aShQRYabqCV29h2`.
+- [x] Registry + organización + binding creados por commands; aggregate readback `1/1`, purpose drift `0/0` y
+      `smoke_in_person_360=0` a 2026-09-06T19:54:31Z.
+- [x] Censo dinámico post-provisioning: `unexpectedRefs=0`; sólo registro/binding esperados. El dry-run se negó
+      correctamente por `registration_active` + `active_authority`, sin mutar.
 - [ ] Greenhouse promovido a `main` y Vercel Production `READY`.
 - [ ] Buzones controlados verificados y profiles `smoke_test` creados sin colisión.
 - [ ] Gates coordinados ON; revisión y comportamiento real verificados.
