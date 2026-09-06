@@ -18,12 +18,14 @@ Mapa de construcción, pruebas y límites: [auditoría consolidada TASK-1836/183
 
 ## Summary
 
-Coordinar la construcción y operación del **authorization server propio de Efeonce** en `auth.efeonce.org`,
-la identidad de personas externas sin contraseñas, el binding gobernado con Account 360 y la federación
-multi-issuer del gateway `mcp.efeonce.org`, de modo que organizaciones cliente existentes se autentiquen en
-Claude, Codex y ChatGPT con grants revocables por capability. Decisión de composición:
+Coordinar la construcción y operación de **Efeonce ID** en `auth.efeonce.org` como autoridad canónica de
+autenticación humana para todos los productos Efeonce, tanto para clientes como para colaboradores internos. Cada
+producto —Greenhouse, Globe y los futuros— usa un relying party, audiencia, cookie y sesión propios, resuelve la
+misma identidad canónica y conserva su autorización local. El programa también entrega el binding gobernado con
+Account 360 y la federación multi-issuer de `mcp.efeonce.org`, de modo que organizaciones cliente existentes se
+autentiquen en Claude, Codex y ChatGPT con grants revocables por capability. Decisión de composición vigente:
 [`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md)
-(nativo, no se compra a un tercero).
+(nativo, no se compra a un tercero); la dirección multiproducto del 2026-09-06 requiere Delta ADR antes de código.
 
 No se implementa directamente este epic. Cada unidad se ejecuta como task propia con plan, gates y cierre
 operativo. Crear el epic no autoriza DNS, secretos, llaves KMS, deploys, registros de clientes ni acceso de
@@ -46,11 +48,21 @@ Cloud Run con excepción de EPIC-027, la superficie OAuth completa (metadata, CI
 revocación, consentimiento), la autenticación de personas (passkeys, magic link, TOTP), la llave en Cloud
 KMS, los canaries de cliente, el aseguramiento y la convergencia del login del portal.
 
+La dirección del operador del 2026-09-06 amplía el límite original MCP + Greenhouse: Efeonce ID debe ser la
+cuenta humana común de Globe y de cualquier producto futuro. Eso no convierte al emisor en autoridad global de
+acceso. `identity_profile` sigue siendo la raíz humana, Account 360 la raíz organizacional y cada producto decide
+memberships, roles, workspaces, entitlements, capabilities, créditos, derechos y scopes desde su control plane.
+La misma persona puede tener varias relaciones; cada sesión selecciona un contexto y nunca suma sus permisos.
+
 ## Outcome
 
 - `auth.efeonce.org` opera como authorization server propio, aislado del portal y del gateway en runtime, IAM,
   cookies, secretos y audiencia (comparte sólo el front door del gateway), con llave de firma en Cloud KMS HSM,
   metadata conforme y CIMD como registro primario.
+- Efeonce ID autentica una sola cuenta humana para clientes e internos en todos los productos Efeonce; Microsoft,
+  Google, passkey y magic link actúan como métodos upstream vinculados, no como nuevas identidades de producto.
+- Cada producto registra un cliente/audiencia/redirect y conserva cookie, sesión, contexto y autorización propios;
+  un token o cookie de un producto no es válido en otro y tener Efeonce ID no aprovisiona acceso.
 - Personas de organizaciones cliente existentes se autentican sin contraseñas y consienten por cliente y por
   scope; el operador las invita, liga y revoca por commands canónicos auditados sobre Account 360.
 - `mcp.efeonce.org` valida dos issuers con `AuthContext` separado, tools calificadas por issuer y clase de
@@ -58,7 +70,8 @@ KMS, los canaries de cliente, el aseguramiento y la convergencia del login del p
   dejan de estar bloqueados por falta de identidad delegada.
 - Claude, Codex y ChatGPT completan OAuth/PKCE en loopback y HTTPS hospedado contra un cliente real, con
   allow, base-only deny, expiración y revocación probados.
-- El login cliente de Greenhouse tiene un camino de convergencia gateado sobre el mismo emisor.
+- Greenhouse es el primer relying party de referencia; Globe y cada producto posterior convergen mediante unidades
+  propias sobre el mismo perfil OIDC reusable, con rollout y rollback independientes.
 
 ## Architecture Alignment
 
@@ -88,7 +101,7 @@ KMS, los canaries de cliente, el aseguramiento y la convergencia del login del p
 | **U06** | [TASK-1835](../../tasks/in-progress/TASK-1835-efeonce-id-login-consent-screens.md) | Login, consentimiento y recuperación en `auth.efeonce.org` («Efeonce ID»). Creada 2026-09-04 con wireframe, flow, motion y el flujo maestro `docs/ui/flows/EPIC-044-auth-server-login-consent-UI-FLOW.md`; shell HTML server-rendered con tokens del SSOT, consent honesto, harness local + GVC premium. Slice 1 (shell + consent) no bloqueado; Slices 2–3 (login, step-up, recuperación) esperan U03. Bloquea sólo U07. | U03 (Slices 2–3) |
 | **U07** | [TASK-1832](../../tasks/to-do/TASK-1832-efeonce-mcp-client-canaries-and-first-customer-cohort.md) | Matriz de tokens live, canaries Claude/Codex/ChatGPT en loopback y HTTPS hospedado, primera organización allowlisted, allow/deny/expiración/revocación, verificación de producción. | U02–U06 |
 | **U08** | [TASK-1833](../../tasks/to-do/TASK-1833-efeonce-auth-server-security-assurance-and-operations.md) | Red-team agéntico cruzado, pentest externo, rotación de llaves, señales de reliability, runbooks, postura Ley 21.719, retención. Gate previo al primer cliente pagando. | U02, U03 |
-| **U09** | [TASK-1834](../../tasks/to-do/TASK-1834-greenhouse-customer-login-convergence-native-issuer.md) | Portal Greenhouse agrega el emisor propio como provider OIDC de NextAuth sobre el mismo source link; rollback = retirar provider. Gate propio posterior a U07. | U07 |
+| **U09** | [TASK-1834](../../tasks/to-do/TASK-1834-greenhouse-customer-login-convergence-native-issuer.md) | Greenhouse se convierte en el primer relying party de Efeonce ID para clientes e internos: consume el perfil OIDC multiproducto, usa audiencia/sesión propias, resuelve identidad canónica y un contexto Greenhouse hasta `TenantAccessRecord`, conserva su autorización, UI y rollout. Slice 0 registra las unidades separadas de foundation reusable y adopción Globe; los providers actuales permanecen y U07/U08 gatean activación, no construcción oscura. | U03, U04, U11; U07/U08 sólo para activación |
 | **U10** | [TASK-1813](../../tasks/to-do/TASK-1813-efeonce-mcp-oauth-client-interoperability.md) | Interoperabilidad OAuth Codex/Claude del carril interno Entra (discovery, shim, scopes). Carril paralelo; no construye broker. | — |
 
 | **U11** | [TASK-1836](../../tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md) | Acceso interno por Efeonce ID: autenticación corporativa, binding canónico y autoridad delegada. Backend; gateway/UI conservan U05/U06. ADR, backend, integridad y canary interno publicados; refresh/revocación/rollback medidos. Entrada directa visible e inicio Microsoft verificados; matriz amplia y promoción PR226 pendientes. | Contratos U02/U03/U04 |

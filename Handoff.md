@@ -11,7 +11,13 @@ UI/flow/motion y rollout por población; preserva Microsoft, Google, credenciale
 de activación la sesión que hoy conserva claims al quedar inactivo el principal, el drift de vigencia de roles PG/BQ,
 la selección multicontexto no determinista y la posible diferencia entre permisos del Admin Center y enforcement
 `can()`. TASK-1832/1833 gatean activación, no dark deploy. Sólo docs locales; sin código, commit, push ni deploy.
-Siguiente paso: plan/ADR de Slice 0 con checkpoint humano antes del primer cambio de código.
+**Dirección adicional del operador:** Efeonce ID será la identidad humana canónica de todos los productos Efeonce
+para clientes e internos; Greenhouse es el primer relying party, no el dueño permanente del login. Cada producto
+mantiene cliente/audiencia/cookie/sesión y autorización propios; una identidad con varias relaciones selecciona un
+contexto sin sumar permisos. Auditoría Globe: hoy usa el broker Greenhouse, acepta sólo internos y conserva tenancy
+en transición, por lo que su adopción requiere unidad y Delta propios coordinados con TASK-1480/TASK-1511. TASK-1834
+ahora exige Delta ADR multiproducto, foundation OIDC reusable, conformance cruzada y registro de esas unidades antes
+de implementar. Siguiente paso: plan/ADR de Slice 0 con checkpoint humano antes del primer cambio de código.
 
 **TASK-1837 (EPIC-044 U12) — `EN PRODUCCIÓN 2026-09-06, COMPLETE`.** Release `b3e324cb5c8d-3cfce865-236f-4e4e-b128-8e144de193cf` (run `34029501838`, PR #227, target `b3e324cb5c8d`), manifest `released` 11:23:09Z en un solo intento. Break-glass con hechos (la migración `20260906004450748` ya estaba aplicada en la instancia única, `run_on 04:27:58Z`); el smoke de `main` se PRODUJO en vez de bypassearse. Cinco servicios Cloud Run OK: `ops-worker` y `auth-server` quedaron en `2b385284d594` con **hash de árbol IDÉNTICO** al target (`d3a1432a1f71`) — no-op legítimo probado por identidad de árbol, no por el change-gate; watchdog `drift_count=0`. Ambos flags `EXTERNAL_INVITATION_*` ON en Production (valor live leído con `vercel env pull`) + redeploy obligatorio `greenhouse-j7aix61yk`. **Canary de contrato contra producción**: la misma llamada a la lane delegada pasó de `404` anti-oráculo a `422 field=bindingId`, y con `organizationId` a `403 forbidden` — la lane ejecuta la resolución de autoridad, no sólo existe. Federación mergeada en `efeonce-mcp` (PR #3 → `65ae1d5`, revisión `00038-8jj`); ese repo **NO** despliega en push a `main`, va por dispatch de `deploy.yml`.
 
