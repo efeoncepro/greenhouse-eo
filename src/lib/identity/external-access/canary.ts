@@ -451,7 +451,7 @@ export const revokeExternalCanaryFixture = async (
 }
 
 type ForeignKeyReference = {
-  target: 'organization' | 'binding' | 'profile' | 'source_link' | 'registration'
+  target: 'organization' | 'binding' | 'profile' | 'source_link' | 'registration' | 'session' | 'oauth_client'
   sourceSchema: string
   sourceTable: string
   sourceColumn: string
@@ -462,12 +462,17 @@ type ForeignKeyReference = {
 export type ExternalCanaryCleanupPlan = {
   canaryRegistrationId: string
   runId: string
+  environmentId: string
   organizationId: string
   bindingIds: string[]
   profileIds: string[]
   sourceLinkIds: string[]
+  oauthClientIds: string[]
+  subjectCount: number
   registrationRevoked: boolean
   activeAuthorityCount: number
+  activeAuthCount: number
+  authArtifacts: Record<string, number>
   foreignKeyReferences: ForeignKeyReference[]
   logicalBlockers: string[]
   unexpectedRefs: number
@@ -484,9 +489,33 @@ const EXPECTED_FK_SOURCES = new Set([
   'profile:greenhouse_core.external_capability_grants.profile_id',
   'profile:greenhouse_core.external_member_invitations.profile_id',
   'profile:greenhouse_core.identity_profile_source_links.profile_id',
+  'profile:greenhouse_auth.authorization_contexts.profile_id',
   'source_link:greenhouse_core.external_member_invitations.link_id',
+  'source_link:greenhouse_auth.sessions.link_id',
+  'source_link:greenhouse_auth.authorization_contexts.upstream_link_id',
+  'organization:greenhouse_auth.authorization_contexts.organization_id',
+  'binding:greenhouse_auth.authorization_contexts.binding_id',
+  'oauth_client:greenhouse_auth.authorization_codes.client_id',
+  'oauth_client:greenhouse_auth.refresh_tokens.client_id',
+  'oauth_client:greenhouse_auth.access_tokens.client_id',
+  'oauth_client:greenhouse_auth.client_consents.client_id',
+  'oauth_client:greenhouse_auth.authorization_contexts.client_id',
   'registration:greenhouse_core.external_organization_bindings.canary_registration_id'
 ])
+
+const EMPTY_AUTH_ARTIFACTS = {
+  sessions: 0,
+  magicLinks: 0,
+  passkeyCredentials: 0,
+  passkeyChallenges: 0,
+  totpEnrollments: 0,
+  authorizationCodes: 0,
+  refreshTokens: 0,
+  accessTokens: 0,
+  clientConsents: 0,
+  authorizationContexts: 0,
+  oauthClients: 0
+} as const
 
 const censusForeignKeys = async (
   client: PoolClient,
@@ -617,10 +646,22 @@ const buildCleanupPlan = async (
   const links =
     profileIds.length === 0 && invitationLinkIds.length === 0
       ? {
-          rows: [] as Array<{ link_id: string; source_system: string; source_object_type: string; data_origin: string }>
+          rows: [] as Array<{
+            link_id: string
+            source_system: string
+            source_object_type: string
+            source_object_id: string
+            data_origin: string
+          }>
         }
-      : await client.query<{ link_id: string; source_system: string; source_object_type: string; data_origin: string }>(
-          `SELECT l.link_id,l.source_system,l.source_object_type,p.data_origin
+      : await client.query<{
+          link_id: string
+          source_system: string
+          source_object_type: string
+          source_object_id: string
+          data_origin: string
+        }>(
+          `SELECT l.link_id,l.source_system,l.source_object_type,l.source_object_id,p.data_origin
            FROM greenhouse_core.identity_profile_source_links l
            JOIN greenhouse_core.identity_profiles p ON p.profile_id=l.profile_id
           WHERE l.profile_id=ANY($1::text[]) OR l.link_id=ANY($2::text[])`,
@@ -628,6 +669,7 @@ const buildCleanupPlan = async (
         )
 
   const sourceLinkIds = links.rows.map(item => item.link_id)
+  const subjectIds = Array.from(new Set(links.rows.map(item => item.source_object_id)))
   const logicalBlockers: string[] = []
 
   if (row.status !== 'revoked') logicalBlockers.push('registration_active')
@@ -670,6 +712,107 @@ const buildCleanupPlan = async (
 
   if (activeAuthorityCount > 0) logicalBlockers.push('active_authority')
 
+  // A DCR creado por el canary se marca con `software_id=run_id`. La unión con los artefactos del
+  // sujeto detecta un cliente que hubiera omitido esa marca; en ese caso el plan se niega a asumir
+  // ownership y `oauth_client_not_run_owned` bloquea el borrado.
+  const oauthClients = await client.query<{ client_id: string }>(
+    `SELECT DISTINCT owned.client_id
+       FROM (
+         SELECT client_id FROM greenhouse_auth.oauth_clients
+          WHERE registration_kind='dcr' AND metadata_json #>> '{dcr,software_id}'=$1
+         UNION ALL
+         SELECT client_id FROM greenhouse_auth.authorization_codes WHERE environment_id=$2 AND subject=ANY($3::text[])
+         UNION ALL
+         SELECT client_id FROM greenhouse_auth.refresh_tokens WHERE environment_id=$2 AND subject=ANY($3::text[])
+         UNION ALL
+         SELECT client_id FROM greenhouse_auth.access_tokens WHERE environment_id=$2 AND subject=ANY($3::text[])
+         UNION ALL
+         SELECT client_id FROM greenhouse_auth.client_consents WHERE environment_id=$2 AND subject=ANY($3::text[])
+         UNION ALL
+         SELECT client_id FROM greenhouse_auth.authorization_contexts WHERE environment_id=$2 AND subject=ANY($3::text[])
+       ) owned
+      ORDER BY owned.client_id`,
+    [row.run_id, row.environment_id, subjectIds]
+  )
+
+  const oauthClientIds = oauthClients.rows.map(item => item.client_id)
+
+  type AuthInventoryRow = {
+    sessions: string
+    magic_links: string
+    passkey_credentials: string
+    passkey_challenges: string
+    totp_enrollments: string
+    authorization_codes: string
+    refresh_tokens: string
+    access_tokens: string
+    client_consents: string
+    authorization_contexts: string
+    oauth_clients: string
+    active_auth: string
+    unsafe_oauth_clients: string
+  }
+
+  const authInventory = await client.query<AuthInventoryRow>(
+    `SELECT
+      (SELECT count(*)::text FROM greenhouse_auth.sessions WHERE environment_id=$1 AND subject=ANY($2::text[])) AS sessions,
+      (SELECT count(*)::text FROM greenhouse_auth.magic_link_tokens WHERE environment_id=$1 AND subject=ANY($2::text[])) AS magic_links,
+      (SELECT count(*)::text FROM greenhouse_auth.passkey_credentials WHERE environment_id=$1 AND subject=ANY($2::text[])) AS passkey_credentials,
+      (SELECT count(*)::text FROM greenhouse_auth.passkey_challenges WHERE environment_id=$1 AND (subject=ANY($2::text[]) OR correlation_id=$3)) AS passkey_challenges,
+      (SELECT count(*)::text FROM greenhouse_auth.totp_enrollments WHERE environment_id=$1 AND subject=ANY($2::text[])) AS totp_enrollments,
+      (SELECT count(*)::text FROM greenhouse_auth.authorization_codes WHERE client_id=ANY($4::text[])) AS authorization_codes,
+      (SELECT count(*)::text FROM greenhouse_auth.refresh_tokens WHERE client_id=ANY($4::text[])) AS refresh_tokens,
+      (SELECT count(*)::text FROM greenhouse_auth.access_tokens WHERE client_id=ANY($4::text[])) AS access_tokens,
+      (SELECT count(*)::text FROM greenhouse_auth.client_consents WHERE client_id=ANY($4::text[])) AS client_consents,
+      (SELECT count(*)::text FROM greenhouse_auth.authorization_contexts WHERE client_id=ANY($4::text[]) OR binding_id=ANY($5::text[])) AS authorization_contexts,
+      (SELECT count(*)::text FROM greenhouse_auth.oauth_clients WHERE client_id=ANY($4::text[])) AS oauth_clients,
+      ((SELECT count(*) FROM greenhouse_auth.sessions WHERE environment_id=$1 AND subject=ANY($2::text[]) AND revoked_at IS NULL AND expires_at>NOW()) +
+       (SELECT count(*) FROM greenhouse_auth.magic_link_tokens WHERE environment_id=$1 AND subject=ANY($2::text[]) AND consumed_at IS NULL AND expires_at>NOW()) +
+       (SELECT count(*) FROM greenhouse_auth.passkey_credentials WHERE environment_id=$1 AND subject=ANY($2::text[]) AND revoked_at IS NULL) +
+       (SELECT count(*) FROM greenhouse_auth.passkey_challenges WHERE environment_id=$1 AND (subject=ANY($2::text[]) OR correlation_id=$3) AND consumed_at IS NULL AND expires_at>NOW()) +
+       (SELECT count(*) FROM greenhouse_auth.totp_enrollments WHERE environment_id=$1 AND subject=ANY($2::text[]) AND status<>'revoked') +
+       (SELECT count(*) FROM greenhouse_auth.authorization_codes WHERE client_id=ANY($4::text[]) AND consumed_at IS NULL AND expires_at>NOW()) +
+       (SELECT count(*) FROM greenhouse_auth.refresh_tokens WHERE client_id=ANY($4::text[]) AND status='active' AND expires_at>NOW()) +
+       (SELECT count(*) FROM greenhouse_auth.access_tokens WHERE client_id=ANY($4::text[]) AND revoked_at IS NULL AND expires_at>NOW()) +
+       (SELECT count(*) FROM greenhouse_auth.client_consents WHERE client_id=ANY($4::text[]) AND status='active') +
+       (SELECT count(*) FROM greenhouse_auth.authorization_contexts WHERE (client_id=ANY($4::text[]) OR binding_id=ANY($5::text[])) AND revoked_at IS NULL AND expires_at>NOW()) +
+       (SELECT count(*) FROM greenhouse_auth.oauth_clients WHERE client_id=ANY($4::text[]) AND status='active'))::text AS active_auth,
+      ((SELECT count(*) FROM greenhouse_auth.oauth_clients
+         WHERE client_id=ANY($4::text[]) AND NOT (
+           registration_kind='dcr' AND created_by='dcr' AND metadata_json #>> '{dcr,software_id}'=$3
+         )) +
+       (SELECT count(*) FROM greenhouse_auth.authorization_codes WHERE client_id=ANY($4::text[]) AND (environment_id<>$1 OR NOT (subject=ANY($2::text[])))) +
+       (SELECT count(*) FROM greenhouse_auth.refresh_tokens WHERE client_id=ANY($4::text[]) AND (environment_id<>$1 OR NOT (subject=ANY($2::text[])))) +
+       (SELECT count(*) FROM greenhouse_auth.access_tokens WHERE client_id=ANY($4::text[]) AND (environment_id<>$1 OR NOT (subject=ANY($2::text[])))) +
+       (SELECT count(*) FROM greenhouse_auth.client_consents WHERE client_id=ANY($4::text[]) AND (environment_id<>$1 OR NOT (subject=ANY($2::text[])))) +
+       (SELECT count(*) FROM greenhouse_auth.authorization_contexts WHERE client_id=ANY($4::text[]) AND (environment_id<>$1 OR NOT (subject=ANY($2::text[])))))::text AS unsafe_oauth_clients`,
+    [row.environment_id, subjectIds, row.run_id, oauthClientIds, bindingIds]
+  )
+
+  const inventory = authInventory.rows[0]
+
+  const authArtifacts = inventory
+    ? {
+        sessions: Number(inventory.sessions),
+        magicLinks: Number(inventory.magic_links),
+        passkeyCredentials: Number(inventory.passkey_credentials),
+        passkeyChallenges: Number(inventory.passkey_challenges),
+        totpEnrollments: Number(inventory.totp_enrollments),
+        authorizationCodes: Number(inventory.authorization_codes),
+        refreshTokens: Number(inventory.refresh_tokens),
+        accessTokens: Number(inventory.access_tokens),
+        clientConsents: Number(inventory.client_consents),
+        authorizationContexts: Number(inventory.authorization_contexts),
+        oauthClients: Number(inventory.oauth_clients)
+      }
+    : { ...EMPTY_AUTH_ARTIFACTS }
+
+  const activeAuthCount = Number(inventory?.active_auth ?? 0)
+  const unsafeOAuthClientCount = Number(inventory?.unsafe_oauth_clients ?? 0)
+
+  if (activeAuthCount > 0) logicalBlockers.push('active_auth')
+  if (unsafeOAuthClientCount > 0) logicalBlockers.push('oauth_client_not_run_owned')
+
   const shared = await client.query<{ total: string }>(
     `SELECT (
       (SELECT count(*) FROM greenhouse_core.external_organization_bindings
@@ -687,29 +830,32 @@ const buildCleanupPlan = async (
 
   if (sharedReferenceCount > 0) logicalBlockers.push('shared_canary_graph')
 
-  const foreignKeyReferences = (
-    await Promise.all([
-      censusForeignKeys(client, 'organization', 'greenhouse_core.organizations', 'organization_id', [
-        row.organization_id
-      ]),
-      censusForeignKeys(client, 'binding', 'greenhouse_core.external_organization_bindings', 'binding_id', bindingIds),
-      censusForeignKeys(client, 'profile', 'greenhouse_core.identity_profiles', 'profile_id', profileIds),
-      censusForeignKeys(
-        client,
-        'source_link',
-        'greenhouse_core.identity_profile_source_links',
-        'link_id',
-        sourceLinkIds
-      ),
-      censusForeignKeys(
-        client,
-        'registration',
-        'greenhouse_core.external_canary_registrations',
-        'canary_registration_id',
-        [canaryRegistrationId]
-      )
-    ])
-  ).flat()
+  const sessions = await client.query<{ session_hash: string }>(
+    `SELECT session_hash FROM greenhouse_auth.sessions
+      WHERE environment_id=$1 AND subject=ANY($2::text[])
+      ORDER BY session_hash`,
+    [row.environment_id, subjectIds]
+  )
+
+  const sessionHashes = sessions.rows.map(item => item.session_hash)
+
+  // `pg` serializa consultas por conexión. Mantener este censo secuencial evita lanzar consultas
+  // simultáneas sobre el mismo cliente transaccional (comportamiento deprecado en pg@9).
+  const foreignKeyReferences: ForeignKeyReference[] = []
+
+  const censusTargets: Array<[ForeignKeyReference['target'], string, string, string[]]> = [
+    ['organization', 'greenhouse_core.organizations', 'organization_id', [row.organization_id]],
+    ['binding', 'greenhouse_core.external_organization_bindings', 'binding_id', bindingIds],
+    ['profile', 'greenhouse_core.identity_profiles', 'profile_id', profileIds],
+    ['source_link', 'greenhouse_core.identity_profile_source_links', 'link_id', sourceLinkIds],
+    ['registration', 'greenhouse_core.external_canary_registrations', 'canary_registration_id', [canaryRegistrationId]],
+    ['session', 'greenhouse_auth.sessions', 'session_hash', sessionHashes],
+    ['oauth_client', 'greenhouse_auth.oauth_clients', 'client_id', oauthClientIds]
+  ]
+
+  for (const [target, relation, targetColumn, values] of censusTargets) {
+    foreignKeyReferences.push(...(await censusForeignKeys(client, target, relation, targetColumn, values)))
+  }
 
   const unexpectedRefs = foreignKeyReferences
     .filter(reference => !reference.expected)
@@ -718,12 +864,17 @@ const buildCleanupPlan = async (
   return {
     canaryRegistrationId,
     runId: row.run_id,
+    environmentId: row.environment_id,
     organizationId: row.organization_id,
     bindingIds,
     profileIds,
     sourceLinkIds,
+    oauthClientIds,
+    subjectCount: subjectIds.length,
     registrationRevoked: row.status === 'revoked',
     activeAuthorityCount,
+    activeAuthCount,
+    authArtifacts,
     foreignKeyReferences,
     logicalBlockers,
     unexpectedRefs,
@@ -811,6 +962,78 @@ export const cleanupExternalCanaryFixture = async (
       client
     )
 
+    const ownedSubjects =
+      plan.sourceLinkIds.length === 0
+        ? []
+        : (
+            await client.query<{ source_object_id: string }>(
+              `SELECT DISTINCT source_object_id
+                 FROM greenhouse_core.identity_profile_source_links
+                WHERE link_id=ANY($1::text[])
+                ORDER BY source_object_id`,
+              [plan.sourceLinkIds]
+            )
+          ).rows.map(item => item.source_object_id)
+
+    // Artefactos del protocolo: hijos antes que contextos/clientes; factores y sesiones antes que
+    // el source link. Los ledgers append-only quedan fuera a propósito y sólo conservan hashes.
+    if (plan.oauthClientIds.length > 0) {
+      await client.query(`DELETE FROM greenhouse_auth.access_tokens WHERE client_id=ANY($1::text[])`, [
+        plan.oauthClientIds
+      ])
+      await client.query(`DELETE FROM greenhouse_auth.refresh_tokens WHERE client_id=ANY($1::text[])`, [
+        plan.oauthClientIds
+      ])
+      await client.query(`DELETE FROM greenhouse_auth.authorization_codes WHERE client_id=ANY($1::text[])`, [
+        plan.oauthClientIds
+      ])
+      await client.query(`DELETE FROM greenhouse_auth.client_consents WHERE client_id=ANY($1::text[])`, [
+        plan.oauthClientIds
+      ])
+    }
+
+    if (plan.oauthClientIds.length > 0 || plan.bindingIds.length > 0) {
+      await client.query(
+        `DELETE FROM greenhouse_auth.authorization_contexts
+          WHERE client_id=ANY($1::text[]) OR binding_id=ANY($2::text[])`,
+        [plan.oauthClientIds, plan.bindingIds]
+      )
+    }
+
+    if (plan.oauthClientIds.length > 0) {
+      await client.query(`DELETE FROM greenhouse_auth.oauth_clients WHERE client_id=ANY($1::text[])`, [
+        plan.oauthClientIds
+      ])
+    }
+
+    if (ownedSubjects.length > 0) {
+      await client.query(
+        `DELETE FROM greenhouse_auth.passkey_challenges
+          WHERE environment_id=$1 AND (subject=ANY($2::text[]) OR correlation_id=$3)`,
+        [plan.environmentId, ownedSubjects, plan.runId]
+      )
+      await client.query(
+        `DELETE FROM greenhouse_auth.totp_backup_codes WHERE environment_id=$1 AND subject=ANY($2::text[])`,
+        [plan.environmentId, ownedSubjects]
+      )
+      await client.query(
+        `DELETE FROM greenhouse_auth.totp_enrollments WHERE environment_id=$1 AND subject=ANY($2::text[])`,
+        [plan.environmentId, ownedSubjects]
+      )
+      await client.query(
+        `DELETE FROM greenhouse_auth.passkey_credentials WHERE environment_id=$1 AND subject=ANY($2::text[])`,
+        [plan.environmentId, ownedSubjects]
+      )
+      await client.query(
+        `DELETE FROM greenhouse_auth.magic_link_tokens WHERE environment_id=$1 AND subject=ANY($2::text[])`,
+        [plan.environmentId, ownedSubjects]
+      )
+      await client.query(`DELETE FROM greenhouse_auth.sessions WHERE environment_id=$1 AND subject=ANY($2::text[])`, [
+        plan.environmentId,
+        ownedSubjects
+      ])
+    }
+
     if (plan.bindingIds.length > 0) {
       await client.query(`DELETE FROM greenhouse_core.external_capability_grants WHERE binding_id=ANY($1::text[])`, [
         plan.bindingIds
@@ -852,6 +1075,17 @@ export const cleanupExternalCanaryFixture = async (
       invitations: string
       profiles: string
       source_links: string
+      sessions: string
+      magic_links: string
+      passkey_credentials: string
+      passkey_challenges: string
+      totp_enrollments: string
+      authorization_codes: string
+      refresh_tokens: string
+      access_tokens: string
+      client_consents: string
+      authorization_contexts: string
+      oauth_clients: string
     }>(
       `SELECT
         (SELECT count(*)::text FROM greenhouse_core.organizations WHERE organization_id=$1) AS organizations,
@@ -860,8 +1094,29 @@ export const cleanupExternalCanaryFixture = async (
         (SELECT count(*)::text FROM greenhouse_core.external_capability_grants WHERE binding_id=ANY($3::text[])) AS grants,
         (SELECT count(*)::text FROM greenhouse_core.external_member_invitations WHERE binding_id=ANY($3::text[])) AS invitations,
         (SELECT count(*)::text FROM greenhouse_core.identity_profiles WHERE profile_id=ANY($4::text[])) AS profiles,
-        (SELECT count(*)::text FROM greenhouse_core.identity_profile_source_links WHERE link_id=ANY($5::text[])) AS source_links`,
-      [plan.organizationId, canaryRegistrationId, plan.bindingIds, plan.profileIds, plan.sourceLinkIds]
+        (SELECT count(*)::text FROM greenhouse_core.identity_profile_source_links WHERE link_id=ANY($5::text[])) AS source_links,
+        (SELECT count(*)::text FROM greenhouse_auth.sessions WHERE environment_id=$6 AND subject=ANY($7::text[])) AS sessions,
+        (SELECT count(*)::text FROM greenhouse_auth.magic_link_tokens WHERE environment_id=$6 AND subject=ANY($7::text[])) AS magic_links,
+        (SELECT count(*)::text FROM greenhouse_auth.passkey_credentials WHERE environment_id=$6 AND subject=ANY($7::text[])) AS passkey_credentials,
+        (SELECT count(*)::text FROM greenhouse_auth.passkey_challenges WHERE environment_id=$6 AND (subject=ANY($7::text[]) OR correlation_id=$8)) AS passkey_challenges,
+        (SELECT count(*)::text FROM greenhouse_auth.totp_enrollments WHERE environment_id=$6 AND subject=ANY($7::text[])) AS totp_enrollments,
+        (SELECT count(*)::text FROM greenhouse_auth.authorization_codes WHERE client_id=ANY($9::text[])) AS authorization_codes,
+        (SELECT count(*)::text FROM greenhouse_auth.refresh_tokens WHERE client_id=ANY($9::text[])) AS refresh_tokens,
+        (SELECT count(*)::text FROM greenhouse_auth.access_tokens WHERE client_id=ANY($9::text[])) AS access_tokens,
+        (SELECT count(*)::text FROM greenhouse_auth.client_consents WHERE client_id=ANY($9::text[])) AS client_consents,
+        (SELECT count(*)::text FROM greenhouse_auth.authorization_contexts WHERE client_id=ANY($9::text[]) OR binding_id=ANY($3::text[])) AS authorization_contexts,
+        (SELECT count(*)::text FROM greenhouse_auth.oauth_clients WHERE client_id=ANY($9::text[])) AS oauth_clients`,
+      [
+        plan.organizationId,
+        canaryRegistrationId,
+        plan.bindingIds,
+        plan.profileIds,
+        plan.sourceLinkIds,
+        plan.environmentId,
+        ownedSubjects,
+        plan.runId,
+        plan.oauthClientIds
+      ]
     )
 
     const raw = readbackRows.rows[0]!

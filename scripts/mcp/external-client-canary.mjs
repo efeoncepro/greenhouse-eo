@@ -42,12 +42,14 @@ const parseArgs = argv => {
 const usage = () => `
 Uso:
   node scripts/mcp/external-client-canary.mjs --env=staging \\
-    --issuer=https://auth.example.org --resource=https://mcp.example.org/mcp
+    --issuer=https://auth.example.org --resource=https://mcp.example.org/mcp \\
+    --run-id=task-1832-canary-yyyymmdd-a
 
 Opciones:
   --issuer        Issuer OAuth exacto. También MCP_CANARY_<ENV>_ISSUER.
   --resource      URL MCP exacta. También MCP_CANARY_<ENV>_RESOURCE_URL.
   --scope         Default: ${BASE_SCOPE}.
+  --run-id        ID exacto del manifest. Obligatorio fuera de --preflight; marca el DCR para cleanup.
   --timeout-ms    Espera máxima del callback loopback. Default: 300000.
   --no-open       No abre el navegador; muestra la URL de autorización.
   --preflight     Sólo valida metadata, JWKS y protected-resource.
@@ -273,10 +275,15 @@ const main = async () => {
   const issuer = normalizeOrigin(requireHttpsOrigin(issuerInput, 'issuer'))
   const resource = requireHttpsOrigin(resourceInput, 'resource').toString()
   const scope = values.get('scope') ?? BASE_SCOPE
+  const runId = values.get('run-id') ?? null
   const timeoutMs = Number(values.get('timeout-ms') ?? 300_000)
 
   if (!Number.isInteger(timeoutMs) || timeoutMs < 10_000 || timeoutMs > 900_000) {
     throw new Error('--timeout-ms must be an integer between 10000 and 900000')
+  }
+
+  if (!switches.has('preflight') && (!runId || !/^[a-z0-9][a-z0-9_-]{2,127}$/.test(runId))) {
+    throw new Error('--run-id must match the exact canary manifest run_id')
   }
 
   const discovery = await validateDiscovery({ issuer, resource })
@@ -311,6 +318,8 @@ const main = async () => {
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({
           client_name: `TASK-1832 ${environment.toLowerCase()} canary`,
+          software_id: runId,
+          software_version: 'task-1832-v1',
           redirect_uris: [receiver.redirectUri],
           grant_types: ['authorization_code', 'refresh_token'],
           token_endpoint_auth_method: 'none'
@@ -437,6 +446,7 @@ const main = async () => {
         {
           ok: true,
           mode: 'interactive',
+          runId,
           environment: environment.toLowerCase(),
           issuer,
           audience: resource,

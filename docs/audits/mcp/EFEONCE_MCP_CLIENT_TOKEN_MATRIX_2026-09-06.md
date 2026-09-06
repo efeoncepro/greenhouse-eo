@@ -1,6 +1,6 @@
 # Efeonce MCP — matriz de clientes y tokens del canary externo
 
-> TASK-1832 · fecha de apertura: 2026-09-06 · estado: **plantilla publicada; ejecución runtime pendiente**.
+> TASK-1832 · fecha de apertura: 2026-09-06 · estado: **fixture y navegadores certificados; matriz OAuth/MCP pendiente**.
 
 ## Alcance y regla de evidencia
 
@@ -8,11 +8,11 @@ Esta matriz se completa con una organización canary dedicada y personas `smoke_
 No contiene tokens, codes, cookies, verifier, secretos, correo completo ni `sub` crudo. Un verde prueba
 compatibilidad técnica; no prueba adopción, usabilidad ni experiencia de una organización cliente.
 
-Al 2026-09-06 están implementados y probados localmente el contrato de propósito/TTL, los gates fail-closed,
-la allowlist de una tool, el aislamiento de 360 y el cleanup. El schema se aplicó accidentalmente fuera del
-checkpoint y el [readback](TASK-1832_SCHEMA_APPLY_READBACK_2026-09-06.md) confirmó registry/bindings canary en
-cero; no se creó el fixture, no se encendieron flags y no se ejecutaron sesiones de cliente. Por eso todas las
-filas runtime siguen `PENDIENTE`.
+Al 2026-09-06 están implementados el contrato de propósito/TTL, los gates fail-closed, la allowlist de una tool,
+el aislamiento de 360 y el cleanup. Existe un único fixture registrado y documentado en su manifiesto; M365,
+magic link, sesión, passkey real en Chrome, reutilización en Safari, step-up UV y logout tienen readback. Los
+gates canary siguen OFF y todavía no se ejecutó el flujo OAuth/MCP de las filas siguientes; esas celdas permanecen
+`PENDIENTE` hasta contar con evidencia del issuer y gateway, no por inferencia desde la sesión.
 
 Evidencia local que no sustituye runtime:
 
@@ -24,16 +24,26 @@ Evidencia local que no sustituye runtime:
 
 ## Identidad de la corrida
 
-- `run_id`: `PENDIENTE`
-- `canary_registration_id`: `PENDIENTE`
-- `manifest`: `PENDIENTE`
+- `run_id`: `task-1832-canary-20260906-a`
+- `canary_registration_id`: `xcr-48dacd1f-ad4b-4a73-b454-3d94574e7d09`
+- `manifest`: `TASK-1832_CANARY_ASSET_MANIFEST_task-1832-canary-20260906-a.md`
 - `environment`: `staging → production`
-- `organization`: `PENDIENTE` (registrar ID, nunca inferir por nombre)
-- `profiles`: `PENDIENTE` (conteo + fingerprint, sin correo/sub)
-- `expires_at`: `PENDIENTE`
+- `organization`: `org-602d7057-7fd5-47e7-b73b-21892e3f06e7` (dedicada, no cliente)
+- `profiles`: `1`, `data_origin=smoke_test`, Person 360 `0` (IDs exactos sólo en el manifest)
+- `expires_at`: `2026-09-14T19:43:30Z`
 - `served Greenhouse SHA/revision`: `PENDIENTE`
 - `served auth-server SHA/revision`: `PENDIENTE`
 - `served gateway SHA/revision`: `PENDIENTE`
+
+## Matriz de correo, sesión y passkey
+
+| Superficie | Evidencia | Resultado |
+| --- | --- | --- |
+| M365 compartido | mensaje visible en `Creative - Efeonce`; delivery `2108c319-c433-4c82-90e0-e5304b6fde5c`, estado `delivered` | `PASS` |
+| Magic link Chrome | consumo scanner-safe por POST; sesión `amr=magic_link`; cierre/revocación leídos en DB | `PASS` |
+| Passkey Chrome | plataforma real; registro + login descubrible `primary` + step-up explícito `passkey,uv`; logout, activas `0` | `PASS` |
+| Passkey Safari | misma credencial descubrible; login real `amr=passkey`; terminal visible y logout con razón `logout` | `PASS` |
+| Google controlado | no provisionado; Gmail personal se excluye como evidencia laboral | `PENDIENTE` |
 
 ## Matriz de compatibilidad
 

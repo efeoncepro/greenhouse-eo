@@ -117,10 +117,17 @@ Este conteo agregado complementa, pero no reemplaza, el readback por todos los I
 8. Ejecutar flujo browser/PKCE y clientes de la matriz. Repetir en producción sólo después del cleanup verde de
    staging y la autorización de rollout.
 
-El helper `node scripts/mcp/external-client-canary.mjs` usa DCR público, loopback `127.0.0.1`, PKCE S256,
+El helper `node scripts/mcp/external-client-canary.mjs` exige `--run-id`, lo persiste como
+`metadata_json.dcr.software_id` del DCR y usa DCR público, loopback `127.0.0.1`, PKCE S256,
 consentimiento real, firma/JWKS, `tools/list`, `get_seo_entitlement`, refresh rotativo y revocación de la familia
 OAuth. Mantiene códigos, verifier y tokens sólo en memoria. La revocación OAuth no sustituye el retiro de
 authority: el binding/grant se revoca por su command y el gateway debe denegar el access token todavía vigente.
+
+La passkey real se certifica en dos carriles distintos. El login normal puede crear una sesión `primary` con
+`amr=passkey`; no se eleva por inferencia. El step-up explícito usa `/auth/passkeys/step-up/start|finish`, exige
+UV real y actualiza esa misma sesión a `amr=passkey,uv` sin cambiar cookie ni `auth_time`. El runner
+`pnpm auth-server:external-passkey:canary` valida registro, login, step-up, logout y readback sin emitir datos
+biométricos, subject, cookies, credenciales WebAuthn ni challenges.
 
 ## Matriz de verificación mínima
 
@@ -158,12 +165,15 @@ certificación runtime.
    `deletionReady=true`.
 3. Revisar el censo dinámico de FKs. Toda referencia no allowlisted bloquea; nunca se desactiva una FK o trigger.
 4. Ejecutar apply con el ID confirmado exactamente.
-5. El command elimina, en orden: grants → invitations → source links → profiles `smoke_test` → bindings →
-   registro → organización.
-6. El mismo transaction relee `organizations`, `registrations`, `bindings`, `profiles` y `source_links`; todos
-   deben ser `0`, o hace rollback.
-7. Releer aparte OAuth/sesiones/consents y superficies 360; actualizar el manifiesto a `deleted` sólo cuando todo
-   el inventario run-owned quede en cero.
+5. El command elimina primero los artefactos auth/OAuth run-owned en orden de dependencias: access/refresh/code
+   → consents/contextos → cliente DCR marcado con `software_id=run_id` → challenges/TOTP/passkeys/magic links/
+   sesiones. Después elimina grants → invitations → source links → profiles `smoke_test` → bindings → registro
+   → organización. Un cliente observado por la persona pero no marcado con el `run_id` bloquea el apply; no se
+   presume ownership.
+6. El mismo transaction relee organización, registro, bindings, perfiles, links y todos los artefactos
+   auth/OAuth anteriores; cualquier conteo distinto de `0` hace rollback.
+7. Releer aparte superficies 360 y actualizar el manifiesto a `deleted` sólo cuando todo el inventario run-owned
+   quede en cero. El audit append-only desacoplado se conserva.
 
 Audit y outbox se retienen de forma desacoplada. No se borran para forzar el cleanup. Los environments,
 clientes OAuth o sesiones compartidas marcados `shared` tampoco se eliminan.
@@ -172,9 +182,10 @@ clientes OAuth o sesiones compartidas marcados `shared` tampoco se eliminan.
 
 El apply se niega sin mutar cuando aparece cualquiera de estos estados:
 
-- registro aún activo, authority activa o postura de organización modificada;
+- registro aún activo, authority/auth activa o postura de organización modificada;
 - lifecycle history, space, membership, tax ID, HubSpot o referencia comercial;
 - perfil no `smoke_test`, source link de otro environment o asset compartido;
+- cliente OAuth no DCR, sin `software_id=run_id` o usado por otro environment/subject;
 - FK nueva/no inventariada con conteo positivo;
 - rol DB distinto de migrator;
 - readback final distinto de cero.

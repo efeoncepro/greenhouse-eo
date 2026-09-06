@@ -112,6 +112,23 @@ const cleanupRegistration = () =>
     hubspot_company_id: null
   })
 
+const emptyAuthInventory = (overrides: Record<string, string> = {}) => ({
+  sessions: '0',
+  magic_links: '0',
+  passkey_credentials: '0',
+  passkey_challenges: '0',
+  totp_enrollments: '0',
+  authorization_codes: '0',
+  refresh_tokens: '0',
+  access_tokens: '0',
+  client_consents: '0',
+  authorization_contexts: '0',
+  oauth_clients: '0',
+  active_auth: '0',
+  unsafe_oauth_clients: '0',
+  ...overrides
+})
+
 describe('TASK-1832 — external canary lifecycle', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -233,7 +250,10 @@ describe('TASK-1832 — external canary lifecycle', () => {
     route([
       [/FROM greenhouse_core\.external_canary_registrations r/, () => [cleanupRegistration()]],
       [/SELECT binding_id,status FROM greenhouse_core\.external_organization_bindings/, () => []],
+      [/SELECT DISTINCT owned\.client_id/, () => []],
+      [/AS active_auth,/, () => [emptyAuthInventory()]],
       [/canary_registration_id IS DISTINCT FROM \$2/, () => [{ total: '0' }]],
+      [/SELECT session_hash FROM greenhouse_auth\.sessions/, () => []],
       [
         /FROM pg_constraint fk/,
         params =>
@@ -268,7 +288,10 @@ describe('TASK-1832 — external canary lifecycle', () => {
     route([
       [/FROM greenhouse_core\.external_canary_registrations r/, () => [cleanupRegistration()]],
       [/SELECT binding_id,status FROM greenhouse_core\.external_organization_bindings/, () => []],
+      [/SELECT DISTINCT owned\.client_id/, () => []],
+      [/AS active_auth,/, () => [emptyAuthInventory()]],
       [/canary_registration_id IS DISTINCT FROM \$2/, () => [{ total: '0' }]],
+      [/SELECT session_hash FROM greenhouse_auth\.sessions/, () => []],
       [/FROM pg_constraint fk/, () => []],
       [
         /pg_has_role\(current_user,'greenhouse_migrator','member'\)/,
@@ -347,6 +370,12 @@ describe('TASK-1832 — external canary lifecycle', () => {
               source_table: 'external_member_invitations',
               source_column: 'link_id',
               columns: 1
+            },
+            {
+              source_schema: 'greenhouse_auth',
+              source_table: 'sessions',
+              source_column: 'link_id',
+              columns: 1
             }
           ]
         case 'greenhouse_core.external_canary_registrations':
@@ -355,6 +384,34 @@ describe('TASK-1832 — external canary lifecycle', () => {
               source_schema: 'greenhouse_core',
               source_table: 'external_organization_bindings',
               source_column: 'canary_registration_id',
+              columns: 1
+            }
+          ]
+        case 'greenhouse_auth.oauth_clients':
+          return [
+            {
+              source_schema: 'greenhouse_auth',
+              source_table: 'authorization_codes',
+              source_column: 'client_id',
+              columns: 1
+            },
+            {
+              source_schema: 'greenhouse_auth',
+              source_table: 'refresh_tokens',
+              source_column: 'client_id',
+              columns: 1
+            },
+            { source_schema: 'greenhouse_auth', source_table: 'access_tokens', source_column: 'client_id', columns: 1 },
+            {
+              source_schema: 'greenhouse_auth',
+              source_table: 'client_consents',
+              source_column: 'client_id',
+              columns: 1
+            },
+            {
+              source_schema: 'greenhouse_auth',
+              source_table: 'authorization_contexts',
+              source_column: 'client_id',
               columns: 1
             }
           ]
@@ -378,18 +435,38 @@ describe('TASK-1832 — external canary lifecycle', () => {
             link_id: 'link-canary',
             source_system: 'external_idp:efeonce-auth',
             source_object_type: 'subject',
+            source_object_id: 'subject-canary',
             data_origin: 'smoke_test'
           }
         ]
       ],
+      [/SELECT DISTINCT owned\.client_id/, () => [{ client_id: 'dcr-canary' }]],
+      [
+        /AS active_auth,/,
+        () => [
+          emptyAuthInventory({
+            sessions: '1',
+            magic_links: '1',
+            passkey_credentials: '1',
+            passkey_challenges: '2',
+            authorization_codes: '1',
+            refresh_tokens: '2',
+            access_tokens: '2',
+            client_consents: '1',
+            oauth_clients: '1'
+          })
+        ]
+      ],
       [/SELECT \([\s\S]*external_organization_bindings WHERE binding_id=ANY/, () => [{ total: '0' }]],
       [/canary_registration_id IS DISTINCT FROM \$2/, () => [{ total: '0' }]],
+      [/SELECT session_hash FROM greenhouse_auth\.sessions/, () => [{ session_hash: 'session-canary' }]],
       [/FROM pg_constraint fk/, params => expectedCatalog(params[0])],
       [/SELECT count\(\*\)::text AS total FROM/, () => [{ total: '1' }]],
       [
         /pg_has_role\(current_user,'greenhouse_migrator','member'\)/,
         () => [{ current_user: 'greenhouse_migrator_user', migrator: true }]
       ],
+      [/SELECT DISTINCT source_object_id/, () => [{ source_object_id: 'subject-canary' }]],
       [/^\s*DELETE FROM/, () => []],
       [
         /AS organizations,[\s\S]*AS source_links/,
@@ -401,7 +478,18 @@ describe('TASK-1832 — external canary lifecycle', () => {
             grants: '0',
             invitations: '0',
             profiles: '0',
-            source_links: '0'
+            source_links: '0',
+            sessions: '0',
+            magic_links: '0',
+            passkey_credentials: '0',
+            passkey_challenges: '0',
+            totp_enrollments: '0',
+            authorization_codes: '0',
+            refresh_tokens: '0',
+            access_tokens: '0',
+            client_consents: '0',
+            authorization_contexts: '0',
+            oauth_clients: '0'
           }
         ]
       ]
@@ -421,7 +509,10 @@ describe('TASK-1832 — external canary lifecycle', () => {
         grants: 0,
         invitations: 0,
         profiles: 0,
-        source_links: 0
+        source_links: 0,
+        sessions: 0,
+        passkey_credentials: 0,
+        oauth_clients: 0
       }
     })
 
@@ -430,6 +521,18 @@ describe('TASK-1832 — external canary lifecycle', () => {
       .filter(Boolean)
 
     expect(deleteTargets).toEqual([
+      'greenhouse_auth.access_tokens',
+      'greenhouse_auth.refresh_tokens',
+      'greenhouse_auth.authorization_codes',
+      'greenhouse_auth.client_consents',
+      'greenhouse_auth.authorization_contexts',
+      'greenhouse_auth.oauth_clients',
+      'greenhouse_auth.passkey_challenges',
+      'greenhouse_auth.totp_backup_codes',
+      'greenhouse_auth.totp_enrollments',
+      'greenhouse_auth.passkey_credentials',
+      'greenhouse_auth.magic_link_tokens',
+      'greenhouse_auth.sessions',
       'greenhouse_core.external_capability_grants',
       'greenhouse_core.external_member_invitations',
       'greenhouse_core.identity_profile_source_links',

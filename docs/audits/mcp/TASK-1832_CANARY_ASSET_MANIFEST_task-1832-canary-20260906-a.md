@@ -8,7 +8,7 @@ no contiene correos completos, tokens, códigos, cookies, verifiers, hashes de s
 - `run_id`: `task-1832-canary-20260906-a`
 - `canary_registration_id`: `xcr-48dacd1f-ad4b-4a73-b454-3d94574e7d09`
 - `environment`: `efeonce-auth` — asset compartido, nunca eliminar
-- `state`: `provisioned`
+- `state`: `browser_certified`; autoridad canary todavía activa para la matriz OAuth/MCP
 - `created_at`: `2026-09-06T19:43:30Z`
 - `created_by`: `jreye` mediante sesión admin gobernada
 - `reason`: `TASK-1832 external MCP compatibility certification`
@@ -50,15 +50,19 @@ que el command gobernado lo devuelva. Un asset no previsto deja la corrida `bloc
 | `greenhouse_core.external_member_invitations` | `xmi-b7cfc54e-ba90-402d-8eeb-bea047ea6da5` | `run_owned` | `linked`, M365 definitivo | revocar y eliminar | alias `m***@efeoncepro.com`; proveedor `delivered` 2026-09-06T20:03:02Z; aceptación scanner-safe por POST 2026-09-06T20:15:37Z |
 | `greenhouse_core.identity_profiles` | `identity-external-idp-efeonce-auth-subject-s-hgu2lxgqznnz2zl8-p6pwro-petyd`; public ID `EO-ID0651` | `run_owned` | `active`, `external_contact`, `data_origin=smoke_test` | desactivar y eliminar | creado por aceptación 2026-09-06T20:15:37Z; agregado global smoke `31`; Person 360 `0` |
 | `greenhouse_core.identity_profile_source_links` | `identity-link-identity-external-idp-efeonce-auth-subject-s-hgu2lxgqznnz2zl8-p6pwro-petyd-external-idp-efeonce-auth-subject-s-hgu2lxgqznnz2zl8-p6pwro-petyd` | `run_owned` | `active`, login identity | desactivar y eliminar | creado por aceptación 2026-09-06T20:15:37Z; environment `efeonce-auth` |
-| `greenhouse_auth.oauth_clients` | DCR de esta corrida; `PENDIENTE DE DCR` | `run_owned` | `planned` | retirar; eliminar si exclusivo | `0 antes del write` |
+| `greenhouse_auth.oauth_clients` | DCR de esta corrida; selector exacto `metadata_json.dcr.software_id=run_id`; ID `PENDIENTE DE DCR` | `run_owned` | `planned` | retirar después de hijos; eliminar sólo si el selector y todos sus artefactos son exclusivos | `0 antes del write`; helper exige `--run-id` |
 | `greenhouse_auth.authorization_contexts` | cliente + organización exactos; `PENDIENTE` | `run_owned` | `planned` | revocar y eliminar | `0 antes del write` |
 | `greenhouse_auth.client_consents` | cliente + perfil canary; `PENDIENTE` | `run_owned` | `planned` | revocar y eliminar | `0 antes del write` |
 | `greenhouse_auth.authorization_codes` | corrida exacta; conteo sin hash | `run_owned` | `planned` | expirar/eliminar | `0 antes del write` |
 | `greenhouse_auth.refresh_tokens` | familia de esta corrida; conteo sin hash | `run_owned` | `planned` | revocar/eliminar | `0 antes del write` |
 | `greenhouse_auth.access_tokens` | familia de esta corrida; conteo sin `jti` | `run_owned` | `planned` | revocar/eliminar | `0 antes del write` |
-| sesiones del emisor | perfiles canary; conteo sin hash | `run_owned` | `planned` | cerrar | `0 antes del write` |
+| `greenhouse_auth.sessions` | environment + subject del source link exacto; conteo sin hash | `run_owned` | `8`, todas revocadas/cerradas | eliminar antes del source link | Chrome y Safari cerraron sesión; activas `0` a 2026-09-06T21:16Z |
+| `greenhouse_auth.magic_link_tokens` | environment + subject exactos; conteo sin token/hash | `run_owned` | `6`, consumidos o vencibles | eliminar antes del source link | incluye bootstrap de certificación; ninguno se persiste en evidencia |
+| `greenhouse_auth.passkey_credentials` | environment + subject exactos; IDs nunca documentados | `run_owned` | `2`: una revocada tras intento incompleto y una activa para la ventana canary | revocar y eliminar antes del source link | credencial activa fingerprint `89864e99148e470e`; attachment `platform`; transports `hybrid,internal` |
+| `greenhouse_auth.passkey_challenges` | subject o `correlation_id=run_id`; conteo sin challenge/hash | `run_owned` | `5`, consumidos | eliminar antes del source link | registro, login y step-up reales ejercitados |
+| perfil local de Chrome | `.auth/passkey-task-1832-canary-20260906-a` | `run_owned_local` | activo durante la ventana canary | borrar sólo después de revocar/eliminar la credencial servidor | permisos `0700`; ignorado por Git |
 | buzón M365 controlado | alias preexistente `m***@efeoncepro.com` | `shared` | `delivery verified` | conservar; no se creó alias | accesible como buzón compartido desde la cuenta del operador; mensaje visible 2026-09-06T20:03Z |
-| `greenhouse_notifications.email_deliveries` | `9db2cfca-25f5-42ce-80b1-0f726a96c1ee` | `retained_audit` | `delivered`, `auth_server_magic_link` | conservar sin PII en este manifest | entregado 2026-09-06T20:15:46Z; sin bounce/error; enlace pendiente de consumo |
+| `greenhouse_notifications.email_deliveries` | `2108c319-c433-4c82-90e0-e5304b6fde5c` | `retained_audit` | `delivered`, `auth_server_magic_link` | conservar sin PII en este manifest | enviado y entregado 2026-09-06T20:44:46Z; sin bounce/error; consumido en Chrome 2026-09-06T20:49:06Z |
 | buzón Google controlado | alias/ID redactado; `PENDIENTE` | `shared` | `planned` | retirar alias si se crea | `no almacenar correo completo` |
 | audit append-only identidad/OAuth | `run_id` + rango temporal | `retained_audit` | `planned` | conservar sin FK | `PENDIENTE` |
 
@@ -75,9 +79,22 @@ que el command gobernado lo devuelva. Un asset no previsto deja la corrida `bloc
 - [x] Buzón M365 definitivo elegido por el operador: cero colisión de profile, invitación emitida al alias
       preexistente, webhook `delivered` y mensaje visible. La invitación plus-address preparatoria se revocó antes
       de aceptar y queda inventariada para cleanup.
+- [x] Magic link M365 consumido con POST scanner-safe en Chrome; sesión `amr=magic_link` persistida y luego
+      revocada. Evidencia de entrega exacta: `2108c319-c433-4c82-90e0-e5304b6fde5c`.
+- [x] Passkey de plataforma real registrada en Chrome, visible por el reader, usada para login descubrible y
+      para step-up UV explícito sobre la misma sesión. `loginAuthLevel=primary` es el contrato esperado del login
+      normal; el step-up dejó `amr=passkey,uv` y `step_up_at` real. Logout con sesiones activas `0`. Evidencia
+      redactada local: `.captures/task-1832-passkey-2026-09-06T21-14-29Z/summary.json`.
+- [x] Safari reutilizó la misma passkey descubrible en `https://auth.efeonce.org/login`, abrió sesión real
+      `amr=passkey` a 2026-09-06T21:15:57Z y mostró la terminal de sesión; logout desde la UI dejó la fila
+      revocada con razón `logout` y sesiones activas `0`.
+- [x] Cleanup dry-run ampliado a auth/OAuth: `unexpectedRefs=0`; inventaría `8` sesiones, `6` magic links,
+      `2` credenciales passkey y `5` challenges. El único `active_auth` es la credencial activa que se conserva
+      deliberadamente durante la matriz; el plan se niega por `registration_active`, `active_authority` y
+      `active_auth`, sin mutar.
 - [ ] Greenhouse promovido a `main` y Vercel Production `READY`.
 - [ ] Buzones controlados verificados y profiles `smoke_test` creados sin colisión — M365 completo y profile
-      exacto creado; Google todavía pendiente.
+      exacto creado; Google todavía pendiente y no se sustituirá por Gmail personal.
 - [ ] Gates coordinados ON; revisión y comportamiento real verificados.
 - [ ] Matriz, negativas, refresh y revocación completados.
 - [ ] Cleanup dry-run: `deletionReady=true`, `unexpectedRefs=0`, sin blockers/shared delete attempts.
@@ -86,8 +103,9 @@ que el command gobernado lo devuelva. Un asset no previsto deja la corrida `bloc
 
 ## Registro de retiro
 
-- `dry_run_at`: `PENDIENTE`
-- `dry_run_result`: `PENDIENTE`
+- `dry_run_at`: `2026-09-06T21:16Z`, inspección post-browser; no es el preflight final de borrado
+- `dry_run_result`: `deletionReady=false`, `unexpectedRefs=0`, blockers esperados
+  `registration_active|active_authority|active_auth`; sin intento de apply
 - `apply_at`: `PENDIENTE`
 - `apply_actor`: `PENDIENTE`
 - `apply_result`: `PENDIENTE`
