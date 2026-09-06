@@ -2961,6 +2961,8 @@ export interface GreenhouseCoreExternalMemberInvitations {
   accepted_at: Timestamp | null;
   binding_id: string;
   created_at: Generated<Timestamp>;
+  delivery_attempts: Generated<number>;
+  delivery_status: Generated<string>;
   designated_admin: Generated<boolean>;
   email: string;
   email_normalized: string;
@@ -2968,6 +2970,8 @@ export interface GreenhouseCoreExternalMemberInvitations {
   invitation_id: string;
   issued_at: Generated<Timestamp>;
   issued_by: string;
+  last_delivery_at: Timestamp | null;
+  last_delivery_error_code: string | null;
   link_id: string | null;
   linked_at: Timestamp | null;
   profile_id: string | null;
