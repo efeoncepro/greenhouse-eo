@@ -1,5 +1,15 @@
 # Handoff activo
 
+**TASK-1832 / TASK-1841 — certificación sintética separada del piloto cliente (Codex, 2026-09-06):** U07 ya no
+usa una organización cliente real para probar la tecnología. TASK-1832 certifica el camino productivo completo
+con cuentas M365/Google controladas por Efeonce, personas `data_origin='smoke_test'`, organización canary no cliente,
+binding de propósito explícito, Claude/Codex/ChatGPT y Chrome/Safari; un verde acredita preparación técnica, no
+adopción ni usabilidad cliente. TASK-1841 (U16) reserva el primer uso real para una organización ya existente en
+Account 360, un administrador consentido y una capability read-only vigente, sólo después de TASK-1832/1833/1835,
+con acompañamiento y observación por siete días. El cliente nunca actúa como tester ni comparte tokens o logs.
+Este cambio es sólo de tasks/registry/README/epic/handoff/changelog: no crea cuentas, bindings, migraciones, flags,
+invitaciones, implementación, push ni rollout. Siguiente ID libre: TASK-1842.
+
 **TASK-1840 — logout multiproducto registrado, sin implementación (Codex, 2026-09-06):** unidad backend-critical
 separada de TASK-1834 para tres operaciones distintas: salir sólo del producto, cerrar la sesión Efeonce ID del
 navegador actual y cerrar todas las sesiones. El contrato exige `sid` opaco, RP-Initiated/Back-Channel Logout,

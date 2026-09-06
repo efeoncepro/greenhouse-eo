@@ -7,6 +7,19 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-06 — La certificación sintética se separa del primer piloto cliente
+
+TASK-1832 ya no usa a una organización cliente real para descubrir defectos. La certificación técnica externa
+se ejecutará con cuentas controladas por Efeonce, personas marcadas `smoke_test`, una organización canary no
+cliente y un binding de propósito explícito, recorriendo el mismo issuer, invitación, sesión, consentimiento,
+PKCE, token, gateway y autorización que producción. La matriz conserva clientes MCP reales, M365/Google,
+Chrome/Safari y casos negativos; su resultado demuestra preparación técnica, no adopción comercial.
+
+TASK-1841 queda como unidad separada para el primer piloto consentido: una organización ya existente en Account
+360, un administrador y una capability read-only vigente, sólo después de cerrar certificación, assurance y UI.
+El cliente recibe onboarding y soporte normales, no tareas de QA, y nunca debe entregar tokens o logs. Este cambio
+documenta el contrato; no creó correos, cuentas, bindings, migraciones, invitaciones, flags ni rollout.
+
 ## 2026-09-06 — El gate de versión del gateway medía media superficie, y el scope nuevo no se anunciaba entero
 
 Dos defectos que sólo aparecieron al revisar lo construido, y que compartían la misma forma: un mecanismo que protegía menos de lo que su nombre sugería.
@@ -837,12 +850,3 @@ funcional, el runbook, el registro de primitive propuesto y las rutas en skills 
 recovery, búsqueda, archivos editoriales y chrome global, con HTTP/robots/canonical por query type. No hubo
 mutación ni publicación. Persisten P0: contenido público `(Borrador)`, search vacío con 154 resultados y enlaces
 demo/rotos globales. [Discovery y límites](docs/audits/public-site/2026-08-31-wordpress-miscellaneous-surfaces-discovery.md).
-
-## 2026-08-31 — Content Marketing: cierre técnico focal en producción
-
-El stage ya aplica el mismo gate de alto/ancho al cargar y redimensionar; 1440×650 conserva los
-siete capítulos en flujo. Se corrigieron contrastes de estados y badges con variantes de la paleta
-aprobada. Despliegue WordPress limitado a JS/CSS con backup, hashes y readback de documento intacto.
-Nuevo verificador recorre pin, capítulos, tabs/cortes, mobile/reduced-motion/JS-off y contraste;
-smoke seguro separa rechazos reales, ledger vacío y un evento GA4 explícitamente sintético.
-[Evidencia y límite Turnstile/Realtime](docs/audits/public-site/2026-08-31-content-marketing-technical-closure.md).

@@ -1,4 +1,18 @@
-# TASK-1832 — Efeonce MCP Client Canaries and First Customer Cohort Rollout
+# TASK-1832 — Efeonce MCP Synthetic External Canaries and Client Compatibility Certification
+
+## Delta 2026-09-06 — certificación sintética separada del piloto con cliente real
+
+Por decisión del operador, ninguna persona cliente participa en el QA técnico del emisor, el gateway o los
+clientes MCP. Esta task conserva la matriz real de Claude Code, Claude Desktop/web, Codex y ChatGPT, pero la
+ejecuta con una población externa sintética controlada por Efeonce. La primera organización cliente consentida
+sale a `TASK-1841`, después de que esta task y `TASK-1833` cierren.
+
+La separación es de evidencia, no un bypass: el canary sintético debe atravesar el mismo issuer, invitación,
+sesión, consentimiento, code + PKCE, access/refresh token, gateway y policy que usaría un cliente. Para no
+contaminar Person 360 ni Account 360 comercial, las personas llevan `data_origin='smoke_test'`, la organización
+canary no se reclasifica como `client|both`, y el binding usa un propósito `canary` explícito, con vencimiento,
+capabilities read-only, auditoría y revocación. Un resultado verde prueba readiness técnica para piloto; nunca
+se presenta como adopción, usabilidad o validación de un cliente real.
 
 ## Delta 2026-09-06 — prerrequisitos de la cohorte que trae TASK-1837 (verificados en staging; queda release a producción + federación en el gateway)
 
@@ -101,7 +115,7 @@ organización cliente real, sí**.
 - Lifecycle: `to-do`
 - Priority: `P0`
 - Impact: `Muy alto`
-- Effort: `Medio`
+- Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `backend-data`
 - UI impact: `none`
@@ -109,42 +123,38 @@ organización cliente real, sí**.
 - Wireframe: `none`
 - Flow: `none`
 - Motion: `none`
-- Backend impact: `integration`
+- Backend impact: `migration`
 - Epic: `EPIC-044`
-- Status real: `Canaries reales pendientes; task to-do. Readback 2026-09-05T15:02:44Z: auth readyz 200 y metadata del gateway 200, authorization_servers=[https://mcp.efeonce.org]. OAuth/personas ON consta en readback anterior del runbook; estos GET no verifican flags actuales ni compatibilidad nativa. TASK-1836 y gateway/UI tienen integración local; faltan deploy/config coherentes, enrollment/grant real, selección del emisor nativo y canary refresh/revocación/rollback.`
+- Status real: `Diseno actualizado 2026-09-06: OAuth/personas y TASK-1837 ya están activos; la implementación pendiente es un carril canary externo explícito, la matriz live con clientes MCP reales usando personas smoke_test y la certificación allow/deny/refresh/revocación. No se incorpora un cliente real; ese piloto pertenece a TASK-1841.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
-- Blocked by: `TASK-1829 (code complete en develop 2026-09-04; espera AUTH_SERVER_OAUTH_ENABLED=true en staging con el environment efeonce-auth registrado), TASK-1830, TASK-1631 (producción), TASK-1831 y la task ui-ux de login/consentimiento`
-- Desbloqueo 2026-09-06: la entrega de la invitación externa y el host de retorno en el consentimiento ya están en producción (release `b3e324cb5c8d`), así que la cohorte real no necesita que un operador transporte el token a mano.
+- Blocked by: `none`
 - Branch: `Greenhouse develop; efeonce-mcp main; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
 
 ## Summary
 
-Probar el emisor propio contra los clientes MCP reales y habilitar la primera organización cliente: matriz
-de tokens live redactada por cliente (Claude Code, claude.ai/Desktop, Codex, ChatGPT), OAuth/PKCE en las
-dos formas de redirect (loopback con puerto efímero y HTTPS hospedado), CIMD y DCR según lo que cada cliente
-soporte, allowlist de una organización Account 360 existente con administrador designado, una capability
-read-only, y la secuencia de verificación de producción con allow, base-only deny, expiración y revocación.
-Cierra de paso la prueba base-only pendiente de `TASK-1626`.
+Certificar el emisor propio y el gateway contra clientes MCP reales usando exclusivamente una organización
+canary y personas sintéticas controladas por Efeonce. La matriz cubre loopback y HTTPS hospedado, CIMD/DCR/
+pre-registro, correo real, passkeys, consentimiento, tokens, allow/deny, expiración, refresh y revocación sin
+incorporar ni afectar a un cliente. Cierra la prueba base-only de `TASK-1626` y habilita `TASK-1841`.
 
 ## Why This Task Exists
 
-Un authorization server correcto en el papel no prueba nada hasta que un cliente real lo atraviesa. Los
-clientes divergen en discovery, registro y redirects, y la única forma de saberlo es el flujo completo con
-cada uno. Además, este es el primer momento en que una persona de una organización cliente toca la
-plataforma por MCP: el rollout debe ser una organización, una persona, una capability, con revocación
-probada antes de ampliar.
+Un authorization server correcto en el papel no prueba interoperabilidad. Los clientes divergen en discovery,
+registro y redirects, y los mocks no ejercitan correo, navegador, cookies, consentimientos, tokens ni dispatch.
+Esa prueba no necesita trasladar riesgo técnico a una persona cliente: una población `smoke_test` puede recorrer
+el contrato productivo completo si su procedencia, authority boundary, vencimiento y limpieza son explícitos.
 
 ## Goal
 
 - Matriz de tokens redactada por cliente: `iss`, `aud`, `sub`, `azp`, `scope`, `gv`, `exp`, forma de redirect, mecanismo de registro (CIMD/DCR/pre-registrado), resultado.
 - Confirmación de que el mismo `sub` se obtiene desde loopback y desde hospedado para la misma persona.
-- Primera organización allowlisted por `bindExternalOrganization`, administrador invitado por
-  `issueExternalInvitation`, grant de una capability read-only por command auditado.
+- Carril canary externo gobernado: organización no-cliente, binding `canary`, perfiles `smoke_test`,
+  capabilities read-only, vencimiento, auditoría y revocación por commands.
 - Pruebas negativas: base-only deny, token expirado, grant revocado, cliente no consentido, issuer externo sobre tool interna.
-- Runbook de onboarding de una organización cliente para el operador.
+- Expediente de readiness técnica para que `TASK-1841` pueda elegir un cliente sin pedirle hacer QA.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -161,10 +171,15 @@ Revisar y respetar:
 
 Reglas obligatorias:
 
-- La cohorte externa es una organización cliente EXISTENTE en Account 360; NUNCA un cliente sintético ni match por dominio. El canary interno TASK-1836 usa la organización operativa canónica y no la reclasifica como cliente.
-- Una capability read-only primero; ninguna escritura, gasto ni derecho sensible en esta task.
+- Un canary NUNCA se clasifica como cliente, prospecto, contrato o ingreso. La procedencia no se infiere por
+  dominio, nombre ni plus-addressing.
+- `bindExternalOrganization` conserva intacta su elegibilidad `client|both` + `active_client`; el canary usa un
+  command separado sobre la misma primitive transaccional y no introduce un bypass en el command comercial.
+- Una capability read-only; ninguna escritura de negocio, gasto, dato cliente ni derecho sensible.
 - Evidencia siempre redactada: nunca pegar tokens, códigos ni correos completos en docs o Handoff.
-- `agent@…` y personas agente NO son la cohorte; sirven sólo para el smoke previo.
+- Personas `smoke_test` y buzones controlados por Efeonce prueban el mecanismo, nunca una cohorte.
+- Antes de implementar `binding_purpose` y el registro canary, aceptar un Delta del ADR de identidad/federación
+  que fije la separación `customer|canary`, su retención y sus consumers.
 
 ## Normative Docs
 
@@ -176,18 +191,22 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `TASK-1829` (emisor), `TASK-1830` (autenticación), task ui-ux (pantallas), `TASK-1631` (commands de binding/invitación/grant), `TASK-1831` (gateway multi-issuer).
-- Sesiones interactivas del operador con cada cliente y una persona real de la organización elegida.
+- `TASK-1829` (emisor activo), `TASK-1830` (autenticación activa), `TASK-1631` (binding/invitación/grant),
+  `TASK-1831` (gateway multi-issuer) y `TASK-1837` (entrega/autoridad delegada en producción).
+- Buzones y cuentas de prueba gobernadas por Efeonce para Microsoft 365 y Google; plus-addressing sólo amplía
+  casos, no sustituye una segunda infraestructura de correo/identidad.
 
 ### Blocks / Impacts
 
-- Habilita los writes federados de EPIC-011/022/043 a pedir su propio gate.
-- `TASK-1834` (convergencia del login) requiere una cohorte MCP viva.
-- `TASK-1833`: el pentest externo debe cerrarse antes de la primera organización pagando.
+- Habilita `TASK-1841`, que posee el primer piloto consentido con una organización cliente existente.
+- Aporta evidencia técnica a `TASK-1834` y al cierre de `TASK-1829/1830/1831`, sin sustituir sus gates propios.
+- Los writes federados conservan tasks y gates por dominio; esta task no los habilita.
 
 ### Files owned
 
-- `docs/operations/runbooks/mcp-customer-organization-onboarding.md` (nuevo)
+- `src/lib/identity/external-access/**` (primitive/command/store canary y boundary tests)
+- `migrations/<timestamp>_task-1832-external-canary-binding-purpose.sql`
+- `docs/operations/runbooks/mcp-external-canary-certification.md` (nuevo)
 - `docs/audits/mcp/EFEONCE_MCP_CLIENT_TOKEN_MATRIX_<fecha>.md` (nuevo, redactado)
 - `scripts/mcp/external-client-canary.mjs` (nuevo: flujo PKCE automatizable con cliente CIMD de prueba)
 - `tests/e2e/smoke/auth-server-oauth.spec.ts` (nuevo)
@@ -198,71 +217,76 @@ Reglas obligatorias:
 
 - Canary interno Entra y prueba manual con Claude Code (ADR gateway §Delta 2026-08-06).
 - Commands de binding de `TASK-1631` (Slice 1 code complete + staging verificado 2026-09-04); señales `unbound_dispatch_attempt`, `revoked_still_dispatching`, `subject_collision`, `orphan_grant`.
-- Personas agente para smoke (`agent-client@greenhouse.efeonce.org`).
-- **Desde `TASK-1828` (2026-09-04):** emisor `https://auth.efeonce.org` vivo en staging (`readyz`, JWKS con 2
-  `kid`, front door compartido con el gateway); sin metadata OAuth, CIMD/DCR ni tokens todavía.
+- `identity_profiles.data_origin` ya distingue `real`, `synthetic_seed`, `smoke_test` y `demo`.
+- `TASK-1837` probó invitación, correo, aceptación, magic link, sesión y revocación con una persona externa
+  sintética; el release `b3e324cb5c8d` dejó entrega y autoridad delegada en producción.
+- El emisor sirve metadata/JWKS y los carriles OAuth/personas están activos; TASK-1836 probó token, refresh y
+  revocación con población interna, no la matriz externa.
 
 ### Gap
 
-- Ninguna organización cliente ligada; ningún cliente externo probado contra un emisor propio; matriz de tokens sin ejecutar.
+- No existe un propósito de binding canary separado del binding comercial. El command actual rechaza correctamente
+  cualquier organización que no sea `client|both` + `active_client`; no debe relajarse.
+- Falta la matriz externa completa con clientes MCP reales y buzones/personas `smoke_test`.
 
 ## Modular Placement Contract
 
-- Topology impact: `tooling`
-- Current home: `scripts/mcp/**`, `tests/e2e/smoke/**`, runbooks y auditorías
-- Future candidate home: `remain-shared`
-- Boundary: los scripts consumen sólo endpoints públicos del emisor y del gateway y los commands canónicos de `TASK-1631` por API
+- Topology impact: `cross-runtime`
+- Current home: `src/lib/identity/external-access/**`, `services/auth-server/**`, `scripts/mcp/**` y gateway `efeonce-mcp`
+- Future candidate home: `domain-package`
+- Boundary: primitive transaccional común; command canary separado; emisor/gateway/clientes consumen sólo contracts gobernados
 - Server/browser split: n/a
 - Build impact: none
-- Extraction blocker: none
+- Extraction blocker: transacción de binding/grant/audit en Greenhouse y policy de dispatch en el gateway
 
 ## Backend/Data Contract
 
 ### Backend/data brief
 
 - Backend rigor: `backend-critical`
-- Impacto principal: `integration`
-- Source of truth afectado: filas reales en `external_organization_bindings`, `external_member_invitations`, `external_capability_grants` (primera organización)
+- Impacto principal: `migration`
+- Source of truth afectado: `external_organization_bindings`, registro canary gobernado, `identity_profiles.data_origin`, audit y grants
 - Consumidores afectados: gateway, clientes MCP, operador
 - Runtime target: `production` (con paso previo en staging)
 
 ### Contract surface
 
 - Contrato existente a respetar: commands de `TASK-1631`; metadata y tokens de `TASK-1829`; `AuthContext` de `TASK-1831`
-- Contrato nuevo o modificado: ninguno; esta task ejercita contratos existentes y produce evidencia
-- Backward compatibility: `not applicable`
-- Full API parity: el onboarding se ejecuta sólo por commands canónicos (CLI/Admin/Nexa), nunca por SQL
+- Contrato nuevo o modificado: `binding_purpose='customer'|'canary'` (default `customer`), registro de organizaciones canary y command `bindExternalCanaryOrganization`
+- Backward compatibility: `compatible` — columna additive con default; `bindExternalOrganization` no cambia
+- Full API parity: el alta/revocación canary usa commands canónicos; scripts y MCP nunca escriben SQL
 
 ### Data model and invariants
 
-- Entidades/tablas/views afectadas: las tres tablas de binding (escritura por command)
+- Entidades/tablas/views afectadas: `external_organization_bindings`, nueva allowlist/registry canary y `identity_profiles`
 - Invariantes que no se pueden romper:
-  - `Una sola organización, un administrador y una capability read-only hasta que todas las pruebas negativas pasen.`
-  - `Toda fila creada tiene actor operador, invitación auditada y revocación probada.`
-- Write-target allowlist: `N/A — no crea tablas`
-- Tenant/space boundary: organización elegida explícitamente por el operador
+  - `Un binding canary nunca vuelve elegible a la organización como cliente ni puede recibir capabilities fuera de la allowlist read-only.`
+  - `Toda persona canary tiene data_origin=smoke_test; merge, CRM y métricas comerciales la excluyen.`
+  - `Toda fila canary tiene actor, razón, expires_at, audit y revocación probada.`
+- Write-target allowlist: declarar la nueva tabla/registry y el binding en `src/lib/identity/external-access/boundary-domain.test.ts`
+- Tenant/space boundary: organización exacta del registry canary; sin match por dominio/correo
 - Idempotency/concurrency: commands idempotentes de `TASK-1631`
-- Audit/outbox/history: audit de cada command; señales de reliability observadas durante 7 días
+- Audit/outbox/history: audit de alta/uso/expiración/revocación; outbox sin tokens; señales separadas de cliente
 
 ### Migration, backfill and rollout
 
-- Migration posture: `none`
-- Default state: flags de `TASK-1829/1830/1831` ON sólo para la organización allowlisted
-- Backfill plan: none
-- Rollback path: `revokeExternalAccess` (binding) + flag externo del gateway OFF; < 5 min
-- External coordination: persona real de la organización; sesiones interactivas por cliente
+- Migration posture: `additive`
+- Default state: bindings existentes reciben `customer`; registry canary vacío y carril OFF
+- Backfill plan: default/constraint verificados; cero reclasificación de organizaciones o personas reales
+- Rollback path: revocar binding/grants/consents/sesiones canary + gate canary OFF; conservar audit y columnas
+- External coordination: buzones M365/Google de prueba controlados por Efeonce; ninguna persona cliente
 
 ### Security and access
 
-- Auth/access gate: commands con capabilities dedicadas de `TASK-1631`
-- Sensitive data posture: evidencia redactada; sin tokens en repos
-- Error contract: n/a (consume)
-- Abuse/rate-limit posture: n/a (consume)
+- Auth/access gate: capability dedicada para registrar/ligar canaries; dispatch exige purpose, vigencia y capability read-only permitida
+- Sensitive data posture: emails sintéticos; evidencia redactada; sin tokens/códigos/cookies en disco o docs
+- Error contract: errores canónicos fail-closed (`canary_not_registered`, `canary_expired`, `capability_not_allowed`)
+- Abuse/rate-limit posture: un binding activo, TTL obligatorio, límites existentes de invitación/auth y kill switch
 
 ### Runtime evidence
 
 - Local checks: `pnpm playwright test tests/e2e/smoke/auth-server-oauth.spec.ts`
-- DB/runtime checks: lectura de las filas de binding/grant y de `auth_attempts` tras cada prueba
+- DB/runtime checks: lectura de purpose/origin/expiry, binding/grant/session/consent y auditoría antes/después
 - Integration checks: flujo completo por cliente; matriz de tokens
 - Reliability signals/logs: las cuatro señales de `TASK-1631` + `mcp.auth.*` de `TASK-1831` steady = 0 salvo pruebas negativas esperadas
 - Production verification sequence: ver Rollout
@@ -271,7 +295,7 @@ Reglas obligatorias:
 
 - [ ] Source of truth, contract surface and consumers are named with real paths or objects.
 - [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Toda tabla nueva queda declarada en el allowlist — N/A, sin tablas nuevas.
+- [ ] Toda tabla nueva queda declarada y justificada en el boundary test del dominio.
 - [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
 - [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
 - [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
@@ -284,33 +308,49 @@ Reglas obligatorias:
 
 ## Scope
 
-### Slice 1 — Canary automatizable y smoke con persona agente
+### Slice 1 — Decisión y frontera canary explícita
 
-- `external-client-canary.mjs` (cliente CIMD de prueba, PKCE, loopback) y spec Playwright; smoke en staging con `agent-client@…` ligada a una organización de prueba interna.
+- Aceptar un Delta del ADR de identidad/federación que separe `customer|canary`, retención, exclusiones y
+  evidencia válida. Migración additive para `binding_purpose` y registry/allowlist canary vacío por default.
+- `bindExternalCanaryOrganization` reutiliza la transacción canónica sin relajar `bindExternalOrganization`;
+  exige organización exacta registrada, profiles `smoke_test`, TTL, capability dedicada y allowlist read-only.
 
-### Slice 2 — Matriz de tokens con clientes reales
+### Slice 2 — Buzones, limpieza y canary automatizable
 
-- Sesiones interactivas: Claude Code, claude.ai/Desktop, Codex, ChatGPT; loopback y hospedado; registro por CIMD/DCR/pre-registro según soporte; auditoría redactada.
+- Provisionar buzones de prueba M365 y Google controlados por Efeonce; plus-addressing sirve para aislar corridas,
+  no como sustituto de otro proveedor. Incluir bounce/suppression y scanner-safe POST del magic link.
+- `external-client-canary.mjs` + Playwright ejecutan invitación, email, magic link, passkey Chrome/Safari,
+  consentimiento, PKCE, token, refresh, revocación y cleanup. Cada corrida usa correlation/idempotency y TTL.
 
-### Slice 3 — Primera organización cliente
+### Slice 3 — Matriz con clientes MCP reales sobre población sintética
 
-- Allowlist + invitación + grant read-only por commands; pruebas positivas y negativas en producción; runbook de onboarding; 7 días de señales.
+- Sesiones interactivas operadas por Efeonce en Claude Code, Claude Desktop/web, Codex y ChatGPT; loopback y
+  hospedado; CIMD/DCR/pre-registro según soporte. Ningún cliente participa.
+- Ejecutar allow y las cinco negaciones en producción, revocar todo, publicar matriz redactada y observar
+  señales 7 días. Entregar verdict `técnicamente certificado para piloto` a TASK-1841.
 
 ## Out of Scope
 
-- Segunda organización o segunda capability; cualquier escritura; autoadministración del cliente.
+- Cualquier organización/persona cliente real, validación de usabilidad o adopción: `TASK-1841`.
+- Segunda organización canary, cualquier escritura de negocio, gasto o autoadministración.
 - Corregir defectos del emisor o del gateway (se abren issues y vuelven a su task dueña).
 
 ## Detailed Spec
 
 - Pruebas negativas mínimas por cliente: (1) token base-only sobre tool con scope superior → deny; (2) token expirado → 401 con `WWW-Authenticate` correcto; (3) grant revocado con token vigente → deny ≤ 60 s; (4) cliente sin consent → `authorize` exige consentimiento; (5) token externo sobre tool internal-only → deny.
 - Matriz de tokens: una fila por (cliente, forma de redirect, registro) con claims redactados (`sub` truncado, sin tokens).
+- Persona canary: `data_origin='smoke_test'`, nombre no humano, mailbox controlado, sin merge automático; cleanup
+  revoca primero y archiva/purga después según la policy de procedencia.
+- Organización canary: no cambia a `client|both` ni `active_client`; su elegibilidad existe únicamente mediante
+  el registry + purpose canary. Readers comerciales y métricas deben ignorarla por construcción.
 
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
 
-- Slice 1 → Slice 2 → Slice 3. Slice 3 no inicia sin todas las filas de la matriz en verde para al menos Claude Code y Codex, y sin el pentest de `TASK-1833` cerrado si la organización es un cliente pagando.
+- Slice 1 → Slice 2 → Slice 3. La migration/command no se implementa con el ADR todavía `Proposed`. Producción
+  no inicia hasta que staging cierre cleanup, passkeys en Chrome/Safari y las cinco negaciones. TASK-1841 no
+  inicia hasta que esta task y TASK-1833 estén completas.
 
 ### Risk matrix
 
@@ -318,33 +358,37 @@ Reglas obligatorias:
 |---|---|---|---|---|
 | Un cliente no soporta CIMD ni DCR conforme | clientes MCP | medium | pre-registro confidencial por command; documentar por cliente | fila roja en la matriz |
 | `sub` distinto entre loopback y hospedado | identity | low | `subject_types_supported: public`; test explícito | `subject_collision` |
-| Persona real ve un error sin recuperación | customer experience | medium | canary con persona interna primero; runbook de soporte | `auth_attempts` fallidos |
+| Canary contamina Person 360/Account 360/CRM | identity/data | high | `smoke_test`, purpose explícito, exclusiones y cleanup verificado | señal canary fuera de boundary |
+| Bypass canary concede autoridad comercial | identity/MCP | high | command separado, registry exacto, TTL y capability allowlist read-only | `canary_capability_rejected` |
 | Revocación no efectiva a tiempo | identity / MCP | low | prueba de revocación antes de dar acceso | `revoked_still_dispatching` |
 
 ### Feature flags / cutover
 
-- Sin flag propio; usa `OAUTH_EXTERNAL_ISSUER_ENABLED` (gateway) y los flags del emisor; allowlist por organización es el cutover real.
+- Gate canary nuevo default OFF en Greenhouse/gateway; no modifica flags globales del emisor ni la elegibilidad
+  comercial. El registry vacío mantiene el path fail-closed aunque el flag esté mal configurado.
 
 ### Rollback plan per slice
 
 | Slice | Rollback | Tiempo | Reversible? |
 |---|---|---|---|
-| Slice 1 | borrar cliente de prueba y binding interno | < 10 min | sí |
-| Slice 2 | revocar consents/clients de prueba por command | < 10 min | sí |
-| Slice 3 | `revokeExternalAccess` + flag externo OFF | < 5 min | sí |
+| Slice 1 | gate canary OFF + revert de code; columnas/registry se conservan | < 10 min | sí |
+| Slice 2 | revocar sesiones/invitaciones/consents/grants/binding por commands; archivar profiles smoke_test | < 10 min | sí |
+| Slice 3 | gate canary OFF en gateway/Greenhouse + revocación de todos los artefactos de la corrida | < 5 min | sí |
 
 ### Production verification sequence
 
-1. Nada cambia con flags OFF (comportamiento interno intacto).
-2. Organización elegida por el operador; binding, administrador e invitación por command; evidencia de audit.
-3. OAuth/PKCE + MCP initialize desde cada cliente objetivo.
-4. Allow de la tool read-only; deny base-only; deny expirado; deny revocado; deny issuer externo sobre interna.
-5. Revalidación de organización/workspace/capability en el provider; telemetría redactada.
-6. Señales steady durante 7 días antes de proponer una segunda organización.
+1. Migración en staging: bindings existentes = `customer`, registry vacío y command comercial sin cambios.
+2. Registrar organización canary por command, crear profile `smoke_test`, invitar y verificar audit/outbox.
+3. Correo → sesión → passkeys Chrome/Safari → consentimiento → OAuth/PKCE → MCP en staging; cleanup completo.
+4. Repetir en producción con una capability read-only sin datos cliente; clientes objetivo operados por Efeonce.
+5. Allow + deny base-only/expirado/revocado/sin consent/internal-only; verificar revalidación provider.
+6. Revocar y releer que ninguna sesión/token/grant/binding sigue autorizando; conservar audit redactado.
+7. Siete días steady; emitir readiness técnica. La invitación de un cliente pertenece a TASK-1841.
 
 ### Out-of-band coordination required
 
-- Operador: sesiones interactivas con cada cliente; contacto con la organización cliente y su administrador.
+- Operador: aprobar organización canary exacta y cuentas M365/Google de prueba; sesiones interactivas en los
+  clientes MCP. No hay contacto ni tratamiento de datos de una organización cliente.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -354,37 +398,45 @@ Reglas obligatorias:
 
 - [ ] Auditoría MCP de TASK-1836 §14: registrar cliente y revisión reales, discovery desde URL canónica, login, consentimiento por cliente y revocación; no sustituir el flujo por inyección manual de token.
 
-- [ ] Cliente MCP real completa login interno, token nativo, llamada autorizada, refresh y revocación; externo del mismo issuer no puede ejecutar tools internas. Evidencia de cada cliente y limitación registrada.
+- [ ] Cada cliente MCP real completa login con persona externa `smoke_test`, token nativo, llamada autorizada,
+  refresh y revocación; el mismo issuer nunca permite tools internas. Evidencia por cliente y revisión registradas.
 
 - [ ] Matriz de tokens publicada con al menos Claude Code, Codex y un cliente hospedado, sin tokens crudos.
 - [ ] El mismo `sub` para la misma persona en loopback y hospedado (evidencia).
-- [ ] Una organización Account 360 existente ligada, con administrador invitado y capability read-only, todo por commands auditados.
+- [ ] Organización canary no-cliente registrada y ligada por command dedicado; `bindExternalOrganization`
+  continúa rechazándola y los readers/KPI comerciales no la presentan como cliente.
+- [ ] Todos los profiles del canary tienen `data_origin='smoke_test'`; no se fusionan con personas reales y el
+  cleanup/revocación queda probado sin borrar audit.
+- [ ] Correo/invitación/magic link se verifican en buzones M365 y Google controlados, con bounce y scanner-safe POST.
+- [ ] Passkey real pasa en Chrome y Safari/WebKit con la misma persona canary.
 - [ ] Las cinco pruebas negativas pasan en producción con evidencia redactada.
 - [ ] Prueba base-only pendiente de `TASK-1626` cerrada y referenciada en su task.
-- [ ] Runbook de onboarding de organización publicado.
+- [ ] Runbook de certificación canary y expediente de readiness para TASK-1841 publicados.
 - [ ] Siete días de señales steady registrados en Handoff.
 
 ## Verification
 
 - `pnpm playwright test tests/e2e/smoke/auth-server-oauth.spec.ts`
 - `node scripts/mcp/external-client-canary.mjs --env=staging`
-- sesiones interactivas por cliente (evidencia en la auditoría)
+- sesiones interactivas por cliente MCP operadas por Efeonce (evidencia redactada en la auditoría)
 
 ## Closing Protocol
 
 - [ ] `Lifecycle` sincronizado y archivo en la carpeta correcta
 - [ ] `docs/tasks/README.md`, `Handoff.md` y `changelog.md` actualizados
-- [ ] chequeo de impacto cruzado sobre `TASK-1626`, `TASK-1720`, `TASK-1722`, `TASK-1824`, EPIC-022
-- [ ] manual de uso `docs/manual-de-uso/identity/conectar-cliente-mcp-organizacion.md` publicado
+- [ ] chequeo de impacto cruzado sobre `TASK-1626`, `TASK-1829`, `TASK-1830`, `TASK-1831`, `TASK-1833`, `TASK-1841`
+- [ ] manual de uso `docs/manual-de-uso/identity/certificar-cliente-mcp-con-canary-sintetico.md` publicado
 
 ## Follow-ups
 
-- Segunda organización y segunda capability, cada una con gate propio.
+- `TASK-1841`: primera organización cliente consentida, sin trasladarle QA técnico.
+- Segunda organización canary sólo si una nueva forma de identidad/protocolo exige cobertura independiente.
 - Writes federados por epic dueño.
 
 ## Open Questions
 
-- Qué organización cliente será la primera; decisión comercial del operador.
+- Organización operacional exacta que se registrará como canary; debe ser no-cliente y quedar aprobada antes
+  del apply. La task no autoriza crearla o reutilizar Efeonce por inferencia.
 
 ## Correction 2026-09-05 — TASK-1836
 
