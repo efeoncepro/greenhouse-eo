@@ -125,10 +125,10 @@ organización cliente real, sí**.
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-044`
-- Status real: `Ownership tomado 2026-09-06: goal confirmado, pnpm codex:task-hook TASK-1832 --develop verde, auditoría de código/schema/runtime completada y plan versionado en docs/tasks/plans/TASK-1832-plan.md. No hay implementación, migración aplicada, datos canary, flags, push ni deploy de esta ejecución; el checkpoint humano P0/Alto está pendiente antes de código. El apply exige además que el operador apruebe la organización canary exacta y las cuentas M365/Google controladas.`
+- Status real: `Ownership tomado 2026-09-06: goal confirmado, pnpm codex:task-hook TASK-1832 --develop verde, auditoría de código/schema/runtime completada y plan versionado en docs/tasks/plans/TASK-1832-plan.md. El operador exigió que la organización canary quede documentada y sea eliminable; el plan ahora descarta EO-ORG-0050, exige fixture dedicado, manifiesto por corrida, cleanup dry-run/apply y readback cero. No hay implementación, migración aplicada, datos canary, flags, push ni deploy de esta ejecución; el checkpoint humano P0/Alto está pendiente antes de código. El apply exige aprobación específica para crear la organización dedicada y para las cuentas M365/Google controladas.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
-- Blocked by: `checkpoint humano del plan para iniciar código; organización canary exacta y cuentas M365/Google para apply y matriz live`
+- Blocked by: `checkpoint humano del plan para iniciar código; aprobación de creación del fixture canary dedicado y cuentas M365/Google para apply y matriz live`
 - Branch: `Greenhouse develop; efeonce-mcp main; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -173,6 +173,8 @@ Reglas obligatorias:
 
 - Un canary NUNCA se clasifica como cliente, prospecto, contrato o ingreso. La procedencia no se infiere por
   dominio, nombre ni plus-addressing.
+- La organización canary es dedicada y efímera: nace inactiva/disqualified, sin historia comercial, y cada
+  referencia queda en un manifiesto por corrida. No se reutiliza una party existente.
 - `bindExternalOrganization` conserva intacta su elegibilidad `client|both` + `active_client`; el canary usa un
   command separado sobre la misma primitive transaccional y no introduce un bypass en el command comercial.
 - Una capability read-only; ninguna escritura de negocio, gasto, dato cliente ni derecho sensible.
@@ -214,6 +216,7 @@ Reglas obligatorias:
   cualquier commit, push, PR o deploy en el repo hermano conserva autorización separada
 - `docs/operations/runbooks/mcp-external-canary-certification.md` (nuevo)
 - `docs/audits/mcp/EFEONCE_MCP_CLIENT_TOKEN_MATRIX_<fecha>.md` (nuevo, redactado)
+- `docs/audits/mcp/TASK-1832_CANARY_ASSET_MANIFEST_TEMPLATE.md` y un manifest por `run_id`
 - `scripts/mcp/external-client-canary.mjs` (nuevo: flujo PKCE automatizable con cliente CIMD de prueba)
 - `tests/e2e/smoke/auth-server-oauth.spec.ts` (nuevo)
 
@@ -251,14 +254,17 @@ Reglas obligatorias:
 
 - Backend rigor: `backend-critical`
 - Impacto principal: `migration`
-- Source of truth afectado: `external_organization_bindings`, registro canary gobernado, `identity_profiles.data_origin`, audit y grants
+- Source of truth afectado: `organizations`, `external_organization_bindings`, registro canary gobernado,
+  `identity_profiles.data_origin`, audit y grants
 - Consumidores afectados: gateway, clientes MCP, operador
 - Runtime target: `production` (con paso previo en staging)
 
 ### Contract surface
 
 - Contrato existente a respetar: commands de `TASK-1631`; metadata y tokens de `TASK-1829`; `AuthContext` de `TASK-1831`
-- Contrato nuevo o modificado: `binding_purpose='customer'|'canary'` (default `customer`), registro de organizaciones canary y command `bindExternalCanaryOrganization`
+- Contrato nuevo o modificado: `binding_purpose='customer'|'canary'` (default `customer`), registro de
+  organizaciones canary y commands `createExternalCanaryFixture`, `bindExternalCanaryOrganization` y
+  `cleanupExternalCanaryFixture`
 - Backward compatibility: `compatible` — columna additive con default; `bindExternalOrganization` no cambia
 - Full API parity: el alta/revocación canary usa commands canónicos; scripts y MCP nunca escriben SQL
 
@@ -269,6 +275,7 @@ Reglas obligatorias:
   - `Un binding canary nunca vuelve elegible a la organización como cliente ni puede recibir capabilities fuera de la allowlist read-only.`
   - `Toda persona canary tiene data_origin=smoke_test; merge, CRM y métricas comerciales la excluyen.`
   - `Toda fila canary tiene actor, razón, expires_at, audit y revocación probada.`
+  - `La organización canary no tiene lifecycle history ni referencias comerciales; el cleanup se niega a borrar si el catálogo descubre una referencia inesperada.`
 - Write-target allowlist: declarar la nueva tabla/registry y el binding en `src/lib/identity/external-access/boundary-domain.test.ts`
 - Tenant/space boundary: organización exacta del registry canary; sin match por dominio/correo
 - Idempotency/concurrency: commands idempotentes de `TASK-1631`
@@ -279,7 +286,8 @@ Reglas obligatorias:
 - Migration posture: `additive`
 - Default state: bindings existentes reciben `customer`; registry canary vacío y carril OFF
 - Backfill plan: default/constraint verificados; cero reclasificación de organizaciones o personas reales
-- Rollback path: revocar binding/grants/consents/sesiones canary + gate canary OFF; conservar audit y columnas
+- Rollback path: revocar binding/grants/consents/sesiones canary + gate canary OFF; luego cleanup gobernado por
+  `canary_registration_id`, con dry-run y manifest; conservar audit y columnas
 - External coordination: buzones M365/Google de prueba controlados por Efeonce; ninguna persona cliente
 
 ### Security and access
@@ -331,9 +339,11 @@ siguen siendo ciegos a procedencia; el filtro sólo gobierna visibilidad.
 
 El readback con `greenhouse_ops` contó 30 perfiles `smoke_test`, y los 30 aparecen hoy en `person_360`; ninguno
 tiene membership organizacional, `client_user` o contacto CRM. Los seis perfiles de identidad externa tienen
-source link inactivo, invitación/binding revocados y sólo dominio `efeonce.invalid`, sin entrega real. El único
-candidato existente con nombre inequívocamente diagnóstico es `EO-ORG-0050`; tiene cero spaces/memberships/
-bindings, pero sí historia comercial/lifecycle, por lo que no se selecciona sin aprobación del operador.
+source link inactivo, invitación/binding revocados y sólo dominio `efeonce.invalid`, sin entrega real. El
+candidato existente con nombre inequívocamente diagnóstico, `EO-ORG-0050`, tiene cero spaces/memberships/
+bindings, pero sí tax ID, commercial party e historia de lifecycle append-only. La FK `ON DELETE RESTRICT` y
+los triggers inmutables impiden garantizar su eliminación, por lo que queda descartado. El fixture debe ser una
+organización dedicada creada sólo después de una autorización específica.
 
 ## Plan pendiente de checkpoint
 
@@ -343,9 +353,12 @@ bindings, pero sí historia comercial/lifecycle, por lo que no se selecciona sin
 2. Agregar una migración aditiva con registry canary vacío, FK a organización/environment/capability,
    vencimiento obligatorio, estado/revocación, checks de propósito y nuevas capabilities administrativas
    finas. La única capability de negocio permitida en V1 será `growth.seo.observation.read`.
-3. Implementar `registerExternalCanaryOrganization`, `bindExternalCanaryOrganization` y revocación dedicada
-   sobre la transacción/audit/outbox canónicos. `bindExternalOrganization` conserva su semántica: sigue
-   exigiendo `client|both` + `active_client` y escribe purpose `customer` explícito.
+3. Implementar `createExternalCanaryFixture`, `bindExternalCanaryOrganization`, revocación y
+   `cleanupExternalCanaryFixture` sobre transacción/audit/outbox canónicos. El alta crea una organización
+   dedicada inactiva/disqualified, sin historia comercial, y una registración raíz. El cleanup hace dry-run,
+   enumera FKs actuales, protege assets compartidos y sólo aplica con `unexpected_refs=0`.
+   `bindExternalOrganization` conserva su semántica: sigue exigiendo `client|both` + `active_client` y escribe
+   purpose `customer` explícito.
 4. Endurecer invitación/grant/resolución: un binding canary sólo acepta perfiles `smoke_test`, nunca
    `designated_admin`, no fusiona por correo con perfiles reales, exige expiración y rechaza cualquier
    capability fuera de la allowlist. Los commands delegados siguen exclusivos de purpose `customer`.
@@ -355,8 +368,9 @@ bindings, pero sí historia comercial/lifecycle, por lo que no se selecciona sin
 6. Agregar gates independientes default OFF en Greenhouse/auth-server y gateway. OFF debe impedir emisión y
    dispatch; el gateway sólo permitirá purpose `canary` en `get_seo_entitlement`. Customer externo continúa
    fail-closed hasta TASK-1841 y todos los writes/internal-only quedan denegados.
-7. Construir pruebas locales/live, script PKCE sin persistir secretos, runbook y matriz redactada. Después se
-   secuencia migración aditiva, consumers compatibles con flags OFF, staging, aprobación del fixture exacto,
+7. Construir pruebas locales/live, script PKCE sin persistir secretos, template/manifiesto de assets, runbook y
+   matriz redactada. Después se secuencia migración aditiva, consumers compatibles con flags OFF, staging,
+   aprobación del fixture exacto,
    producción, cleanup y siete días de señales. Un `skipped`, GET de metadata o status tool no cuenta como
    certificación.
 
@@ -366,8 +380,9 @@ bindings, pero sí historia comercial/lifecycle, por lo que no se selecciona sin
 - La aprobación del plan autoriza sólo cambios locales reversibles y su verificación; no autoriza commit/push
   al repo hermano, PR, apply de migración, creación/reutilización de organización, cuentas, invitaciones,
   flags, deploy ni sesiones interactivas.
-- Antes del apply, el operador debe identificar y aprobar por ID la organización canary no-cliente y las
-  cuentas M365/Google controladas. No se inferirá Efeonce ni se creará una organización por conveniencia.
+- Antes del apply, el operador debe aprobar explícitamente la creación del fixture dedicado y las cuentas
+  M365/Google controladas. Los IDs se generan y registran antes del primer write; no se inferirá ni reutilizará
+  una organización existente.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -381,6 +396,8 @@ bindings, pero sí historia comercial/lifecycle, por lo que no se selecciona sin
   evidencia válida. Migración additive para `binding_purpose` y registry/allowlist canary vacío por default.
 - `bindExternalCanaryOrganization` reutiliza la transacción canónica sin relajar `bindExternalOrganization`;
   exige organización exacta registrada, profiles `smoke_test`, TTL, capability dedicada y allowlist read-only.
+- `createExternalCanaryFixture` genera organización + registro raíz y manifiesto; `cleanupExternalCanaryFixture`
+  ofrece dry-run/apply, consulta el catálogo de FKs y se niega a eliminar lifecycle, evidencia o assets shared.
 
 ### Slice 2 — Buzones, limpieza y canary automatizable
 
@@ -388,6 +405,9 @@ bindings, pero sí historia comercial/lifecycle, por lo que no se selecciona sin
   no como sustituto de otro proveedor. Incluir bounce/suppression y scanner-safe POST del magic link.
 - `external-client-canary.mjs` + Playwright ejecutan invitación, email, magic link, passkey Chrome/Safari,
   consentimiento, PKCE, token, refresh, revocación y cleanup. Cada corrida usa correlation/idempotency y TTL.
+- Antes de provisionar, copiar y completar
+  [`TASK-1832_CANARY_ASSET_MANIFEST_TEMPLATE.md`](../../audits/mcp/TASK-1832_CANARY_ASSET_MANIFEST_TEMPLATE.md);
+  el estado `deleted` sólo se usa después del readback cero.
 
 ### Slice 3 — Matriz con clientes MCP reales sobre población sintética
 
@@ -409,7 +429,11 @@ bindings, pero sí historia comercial/lifecycle, por lo que no se selecciona sin
 - Persona canary: `data_origin='smoke_test'`, nombre no humano, mailbox controlado, sin merge automático; cleanup
   revoca primero y archiva/purga después según la policy de procedencia.
 - Organización canary: no cambia a `client|both` ni `active_client`; su elegibilidad existe únicamente mediante
-  el registry + purpose canary. Readers comerciales y métricas deben ignorarla por construcción.
+  el registry + purpose canary. Es una fila dedicada inactiva/disqualified, sin lifecycle history ni referencias
+  comerciales. Readers comerciales y métricas deben ignorarla por construcción.
+- Manifiesto: registra desde antes del alta `run_id`, `canary_registration_id`, organización, profiles, links,
+  environment/client ownership, binding, grants, invitaciones, contextos/consents y conteos de sesiones/tokens;
+  nunca secretos o hashes. El cleanup usa el registro exacto, no nombre, correo o ventana temporal.
 
 ## Rollout Plan & Risk Matrix
 
@@ -427,6 +451,7 @@ bindings, pero sí historia comercial/lifecycle, por lo que no se selecciona sin
 | `sub` distinto entre loopback y hospedado | identity | low | `subject_types_supported: public`; test explícito | `subject_collision` |
 | Canary contamina Person 360/Account 360/CRM | identity/data | high | `smoke_test`, purpose explícito, exclusiones y cleanup verificado | señal canary fuera de boundary |
 | Bypass canary concede autoridad comercial | identity/MCP | high | command separado, registry exacto, TTL y capability allowlist read-only | `canary_capability_rejected` |
+| Fixture no puede eliminarse o borra un asset compartido | identity/data | high | organización dedicada, manifest, FK census, dry-run y refusal con referencias inesperadas | `canary_cleanup_blocked` |
 | Revocación no efectiva a tiempo | identity / MCP | low | prueba de revocación antes de dar acceso | `revoked_still_dispatching` |
 
 ### Feature flags / cutover
@@ -439,23 +464,25 @@ bindings, pero sí historia comercial/lifecycle, por lo que no se selecciona sin
 | Slice | Rollback | Tiempo | Reversible? |
 |---|---|---|---|
 | Slice 1 | gate canary OFF + revert de code; columnas/registry se conservan | < 10 min | sí |
-| Slice 2 | revocar sesiones/invitaciones/consents/grants/binding por commands; archivar profiles smoke_test | < 10 min | sí |
+| Slice 2 | revocar sesiones/invitaciones/consents/grants/binding por commands; cleanup dry-run; eliminar sólo assets run-owned sin blockers | < 10 min | sí |
 | Slice 3 | gate canary OFF en gateway/Greenhouse + revocación de todos los artefactos de la corrida | < 5 min | sí |
 
 ### Production verification sequence
 
 1. Migración en staging: bindings existentes = `customer`, registry vacío y command comercial sin cambios.
-2. Registrar organización canary por command, crear profile `smoke_test`, invitar y verificar audit/outbox.
+2. Crear manifiesto; provisionar organización canary dedicada por command, crear profile `smoke_test`, invitar y verificar audit/outbox.
 3. Correo → sesión → passkeys Chrome/Safari → consentimiento → OAuth/PKCE → MCP en staging; cleanup completo.
 4. Repetir en producción con una capability read-only sin datos cliente; clientes objetivo operados por Efeonce.
 5. Allow + deny base-only/expirado/revocado/sin consent/internal-only; verificar revalidación provider.
-6. Revocar y releer que ninguna sesión/token/grant/binding sigue autorizando; conservar audit redactado.
-7. Siete días steady; emitir readiness técnica. La invitación de un cliente pertenece a TASK-1841.
+6. Revocar y releer que ninguna sesión/token/grant/binding sigue autorizando; ejecutar cleanup dry-run y
+   demostrar `deletion_ready`; conservar audit redactado.
+7. Siete días steady; emitir readiness técnica. Cuando corresponda el retiro, ejecutar cleanup apply y releer
+   cero referencias antes de marcar el manifest `deleted`. La invitación de un cliente pertenece a TASK-1841.
 
 ### Out-of-band coordination required
 
-- Operador: aprobar organización canary exacta y cuentas M365/Google de prueba; sesiones interactivas en los
-  clientes MCP. No hay contacto ni tratamiento de datos de una organización cliente.
+- Operador: aprobar la creación del fixture canary dedicado y cuentas M365/Google de prueba; sesiones
+  interactivas en los clientes MCP. No hay contacto ni tratamiento de datos de una organización cliente.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -472,6 +499,8 @@ bindings, pero sí historia comercial/lifecycle, por lo que no se selecciona sin
 - [ ] El mismo `sub` para la misma persona en loopback y hospedado (evidencia).
 - [ ] Organización canary no-cliente registrada y ligada por command dedicado; `bindExternalOrganization`
   continúa rechazándola y los readers/KPI comerciales no la presentan como cliente.
+- [ ] Manifiesto de assets creado antes del primer write y completo con IDs/ownership/TTL; cleanup dry-run
+  reporta `deletion_ready`, `unexpected_refs=0`, lifecycle history cero y ningún intento de borrar assets shared.
 - [ ] Todos los profiles del canary tienen `data_origin='smoke_test'`; no se fusionan con personas reales y el
   cleanup/revocación queda probado sin borrar audit.
 - [ ] Correo/invitación/magic link se verifican en buzones M365 y Google controlados, con bounce y scanner-safe POST.
@@ -502,8 +531,8 @@ bindings, pero sí historia comercial/lifecycle, por lo que no se selecciona sin
 
 ## Open Questions
 
-- Organización operacional exacta que se registrará como canary; debe ser no-cliente y quedar aprobada antes
-  del apply. La task no autoriza crearla o reutilizar Efeonce por inferencia.
+- Autorización específica para crear la organización canary dedicada antes del apply. La task no autoriza
+  crearla todavía ni reutilizar Efeonce u otra party; los IDs exactos se generan y documentan al provisionar.
 
 ## Correction 2026-09-05 — TASK-1836
 

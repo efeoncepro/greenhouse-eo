@@ -10,15 +10,19 @@ registry exacto vacío, purpose canary inmutable, TTL, una sola capability read-
 (`growth.seo.observation.read`), perfiles exclusivamente `smoke_test`, sin
 designated admin, gates independientes default OFF en emisor/gateway, allow sólo de `get_seo_entitlement`,
 revocación y evidencia redactada. No se implementó código/ADR, no se aplicó migración, no se crearon datos ni
-cuentas, y no hubo commit/push/deploy. WIP de TASK-1835 preservado. Siguiente paso: checkpoint humano del plan;
-el apply queda además condicionado a organización canary exacta y cuentas M365/Google aprobadas.
+cuentas, y no hubo push/deploy. WIP de TASK-1835 preservado. Siguiente paso: checkpoint humano del plan;
+el apply queda además condicionado a autorización para crear un fixture canary dedicado y cuentas M365/Google.
+Por instrucción posterior del operador, la organización debe poder eliminarse: `EO-ORG-0050` queda descartada
+porque su lifecycle append-only bloquea hard delete. El plan exige organización inactiva/disqualified sin historia
+comercial, manifest exacto por corrida, cleanup dry-run/apply, protección de assets compartidos y readback cero;
+template en `docs/audits/mcp/TASK-1832_CANARY_ASSET_MANIFEST_TEMPLATE.md`.
 
 **Readback adicional TASK-1832 (14:57Z, sólo lectura):** los 30 perfiles `smoke_test` vigentes aparecen hoy en
 `greenhouse_serving.person_360`; ninguno tiene membership, `client_user` o contacto CRM. Los seis perfiles usados
 por smokes de identidad externa conservan history, pero tienen source link inactivo, invitación/binding revocados
 y sólo `efeonce.invalid`, sin entrega real: no hay cobertura M365/Google. El único candidato existente con nombre
 diagnóstico es `EO-ORG-0050` (`other`, `disqualified`, cero spaces/memberships/bindings), pero tiene historia de
-lifecycle/commercial party y no se seleccionó sin aprobación. Evidencia:
+lifecycle/commercial party y queda descartado porque no es eliminable sin destruir evidencia append-only. Evidencia:
 `docs/audits/mcp/TASK-1832_PRE_IMPLEMENTATION_READBACK_2026-09-06.md`. Sin escrituras ni cambios runtime.
 
 **TASK-1835 (EPIC-044 U06) — `UI ready: yes`, code complete, SIN DESPLEGAR (Claude greenhouse-eo-06, 2026-09-06;

@@ -29,8 +29,10 @@ capturas con DTOs ficticios, migración registrada sin apply, push sin deploy o 
 
 Evidencia redactada:
 [`TASK-1832_PRE_IMPLEMENTATION_READBACK_2026-09-06.md`](../../audits/mcp/TASK-1832_PRE_IMPLEMENTATION_READBACK_2026-09-06.md).
-Los seis smokes externos previos están revocados y usan sólo `efeonce.invalid`; no prueban M365/Google. El único
-candidato inequívocamente diagnóstico es `EO-ORG-0050`, todavía sin seleccionar por decisión del operador.
+Los seis smokes externos previos están revocados y usan sólo `efeonce.invalid`; no prueban M365/Google.
+`EO-ORG-0050` queda descartada: aunque su nombre es diagnóstico, ya posee commercial party e historia de
+lifecycle append-only, por lo que no cumple el nuevo requisito de eliminación completa. El fixture deberá ser
+una organización dedicada, creada sólo tras aprobación específica y registrada desde antes de su primer write.
 
 ## Decisiones a aceptar en Delta ADR
 
@@ -49,6 +51,16 @@ candidato inequívocamente diagnóstico es `EO-ORG-0050`, todavía sin seleccion
    usan procedencia como bypass. `demo|synthetic_seed` quedan fuera de esta decisión.
 7. Dos gates independientes, default OFF: `EXTERNAL_IDENTITY_CANARY_ENABLED` en Greenhouse/auth-server y
    `MCP_NATIVE_EXTERNAL_CANARY_ENABLED` en el gateway. OFF bloquea emisión y dispatch incluso si existen filas.
+8. La organización canary es un asset efímero, no una party comercial reutilizada. Nace `active=false`,
+   `status='inactive'`, `organization_type='other'` y `lifecycle_stage='disqualified'`, sin tax ID, HubSpot,
+   spaces, memberships, clientes, contratos, ingresos ni fila en `organization_lifecycle_history`. Cada corrida
+   crea antes del primer write un manifiesto redactado con `canary_registration_id`, `run_id`, IDs exactos,
+   ownership, TTL, dependencias y estado de retiro. Audit OAuth/identidad permanece append-only como evidencia
+   desacoplada; ninguna tabla retenida conserva FK que impida borrar la organización.
+9. El retiro tiene dos fases: revocación inmediata de autoridad y eliminación posterior del fixture. Un command
+   dedicado hace primero dry-run, enumera FKs reales desde catálogo y se niega a mutar si encuentra lifecycle,
+   datos comerciales, assets compartidos o referencias fuera de su allowlist. Sólo con `unexpected_refs=0`
+   elimina por `canary_registration_id` y relee cero organización, perfiles y referencias operativas.
 
 ## Slices y ownership
 
@@ -58,6 +70,9 @@ candidato inequívocamente diagnóstico es `EO-ORG-0050`, todavía sin seleccion
 - Crear migración additive con registry, columnas/constraints/índices/grants y capabilities administrativas
   `identity.external_canary.register`, `.bind` y `.revoke` en registry/runtime.
 - Implementar routes y commands con idempotencia, actor/razón, errors canónicos y audit/outbox sin PII/secrets.
+- Implementar alta y retiro del fixture como commands canónicos. El alta crea la organización dedicada en la
+  misma transacción que el registro canary y rechaza cualquier identidad comercial. El retiro expone `dry-run`
+  y `apply`, usa el ID de registro exacto, protege assets compartidos y conserva audit append-only sin FK.
 - Escribir purpose `customer` explícito en el command existente y pruebas que demuestren semántica sin cambio.
 - Agregar purpose/expiry al DTO del reader ecosystem con contrato backward-compatible sólo después de coordinar
   consumer. Ningún SQL manual desde scripts o gateway.
@@ -83,19 +98,25 @@ candidato inequívocamente diagnóstico es `EO-ORG-0050`, todavía sin seleccion
   ChatGPT; CIMD/DCR/pre-registro; M365/Google; Chrome/Safari/WebKit.
 - Probar cinco negativos: scope base insuficiente, token expirado, grant revocado con token vigente, cliente sin
   consentimiento y token externo sobre tool internal-only. Medir rechazo de revocación en ≤60 s.
-- Revocar sesiones, consents, grants, binding y registry antes de archivar/purgar profiles; releer que no quedan
-  dispatches ni superficies 360/CRM. Conservar audit redactado.
+- Crear `TASK-1832_CANARY_ASSET_MANIFEST_<run_id>.md` desde el template versionado antes del fixture y actualizarlo
+  después de cada fase. Revocar sesiones, consents, grants, binding y registry antes de archivar/purgar profiles;
+  releer que no quedan dispatches ni superficies 360/CRM. Conservar audit redactado.
+- Antes de producción, ejecutar el cleanup en `dry-run` y demostrar `deletion_ready`. Tras la ventana de siete
+  días —o cuando el operador ordene el retiro— ejecutar `apply`, si corresponde, y registrar readback final. La
+  eliminación real no se infiere de la revocación ni de una fila marcada `deleted` en el manifiesto.
 - Observar siete días las señales de identidad/MCP. Sólo entonces emitir readiness técnica a TASK-1841.
 
 ## Secuencia de migración y rollout
 
 1. Código/tests locales y Delta ADR aceptado; consumers preparados para contrato extendido, flags OFF.
-2. Checkpoint específico de mutaciones: organización canary exacta y buzones aprobados; estado live revalidado.
+2. Checkpoint específico de mutaciones: autorización para crear la organización canary dedicada y buzones
+   aprobados; estado live revalidado. No se reutiliza ninguna organización existente.
 3. Migración aditiva sobre la instancia compartida mediante tooling canónico; readback de defaults, constraints,
    registry vacío, capabilities y command comercial sin cambio. No dejar migración estacionada sin aplicar.
 4. Desplegar consumers compatibles con flags OFF siguiendo sus release controls: Greenhouse/auth-server y luego
    gateway. Confirmar SHA/revisión/config servidos y denegación OFF en ambos extremos.
-5. Activar sólo staging; registrar fixture por command, ejecutar matriz/negativos/cleanup y verificar señales.
+5. Activar sólo staging; crear manifiesto, registrar fixture por command, ejecutar matriz/negativos, revocar,
+   verificar `deletion_ready` por dry-run y comprobar señales.
 6. Promover mediante procesos canónicos y repetir en producción. No push/PR/deploy sin autorización explícita.
 7. Apagar gates y revocar inmediatamente ante fuga 360/CRM, capability inesperada, subject collision, token
    vigente autorizado tras revocación o ausencia de audit.
@@ -109,7 +130,7 @@ candidato inequívocamente diagnóstico es `EO-ORG-0050`, todavía sin seleccion
   que inyecte `greenhouse-qa-release-auditor`.
 - Repo gateway: `pnpm check`, auth-negative/integration, policy parity y surface-version gate.
 - Runtime: metadata, issuer/aud/azp/sub/scope/gv/exp redactados; DB/audit antes/después; policy allow/deny;
-  flags y revisiones servidas; cleanup; señales steady.
+  flags y revisiones servidas; manifest completo; cleanup dry-run/apply; señales steady.
 
 ## Checkpoints y autorizaciones
 
@@ -117,8 +138,9 @@ candidato inequívocamente diagnóstico es `EO-ORG-0050`, todavía sin seleccion
 - **Antes de editar el repo hermano:** confirmar ownership local y preservar cualquier WIP; commit/push/PR
   requieren alcance explícito y revisión independiente.
 - **Antes de migration/data/flags/deploy:** autorización específica, readback de Platform Health y estado live.
-- **Antes del fixture:** ID exacto de organización no-cliente y cuentas M365/Google aprobadas. No inferir ni
-  crear valores.
+- **Antes del fixture:** aprobación específica para crear una organización canary dedicada y cuentas
+  M365/Google aprobadas. El command genera los IDs exactos y el manifiesto los registra; no se reutiliza ni se
+  infiere una organización existente.
 - **Cierre:** nunca marcar complete sin matriz productiva, cleanup y siete días de señales estables.
 
 ## Siguiente acción tras aprobar

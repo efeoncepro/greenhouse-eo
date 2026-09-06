@@ -33,16 +33,27 @@ reutilizarse como fixture. El único candidato con nombre explícitamente diagn�
 |---|---|---|---|---|---:|---:|---:|
 | `EO-ORG-0050` | `ZZ Diagnostico (descartable - ignorar)` | `other` | `disqualified` | `manual` | 0 | 0 | 0 |
 
-No es una fila vacía: ya tiene identificador tributario, commercial party y tres referencias de lifecycle.
-Reutilizarla evita crear otra organización en Account 360, pero exige aprobación explícita del operador y el
-registry/purpose canary debe impedir que adquiera elegibilidad comercial. No se seleccionó ni modificó.
+No es una fila vacía: ya tiene identificador tributario, commercial party y tres referencias de lifecycle. La
+tabla `organization_lifecycle_history` tiene FK `ON DELETE RESTRICT` y triggers que impiden `UPDATE/DELETE`, por
+lo que esta fila **queda descartada** bajo el requisito de poder eliminar el canary después. No se seleccionó ni
+modificó.
+
+El fixture elegible debe ser una organización dedicada creada después de este checkpoint, inactiva, no-cliente,
+sin tax ID, HubSpot, spaces, memberships, commercial facts ni historia de lifecycle. El audit append-only de
+identidad externa usa IDs desacoplados y no tiene FK a la organización, por lo que puede preservarse después del
+hard delete. El test live de persistencia de TASK-1836 ya demuestra que una organización aislada e inactiva sin
+historia puede eliminarse cuando primero se limpian sus referencias exactas; TASK-1832 debe convertir ese patrón
+de fixture en command gobernado, dry-run y manifiesto, no copiar SQL de test a un script operativo.
 
 ## Decisiones pendientes
 
 1. Aprobar el plan P0/Alto de `docs/tasks/plans/TASK-1832-plan.md` para iniciar ADR/código local.
-2. Aprobar o rechazar `EO-ORG-0050` como organización canary exacta. Crear otra organización no está autorizado
-   por inferencia y además necesitaría resolver su visibilidad en Account 360.
+2. Aprobar específicamente la creación futura de una organización canary dedicada. `EO-ORG-0050` queda
+   rechazada por no ser eliminable sin destruir historia append-only. La aprobación del plan no crea la fila.
 3. Identificar las dos cuentas controladas para la matriz: una Microsoft 365 y una Google. Plus-addressing no
    sustituye la segunda infraestructura.
+
+El template que deberá completarse antes del primer write es
+[`TASK-1832_CANARY_ASSET_MANIFEST_TEMPLATE.md`](TASK-1832_CANARY_ASSET_MANIFEST_TEMPLATE.md).
 
 Ninguna de estas decisiones autoriza por sí sola migration apply, datos, flags, push, PR o deploy.
