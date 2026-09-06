@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { issueExternalInvitation } from '@/lib/identity/external-access'
+import { issueExternalInvitation, type IssueExternalInvitationResult } from '@/lib/identity/external-access'
 import {
   externalAccessErrorResponse,
   readJsonBody,
@@ -10,9 +10,31 @@ import {
 export const dynamic = 'force-dynamic'
 
 /**
+ * Contrato de respuesta de la emisión (TASK-1837). Con entrega del sistema (`delivery.mode='system'`)
+ * el campo `token` NO EXISTE: el secreto viajó una vez en el correo y nadie de Efeonce lo ve. Sólo con
+ * el flag apagado (`mode='manual'`, comportamiento previo) el token vuelve al operador.
+ * Guard de regresión: `route.test.ts`.
+ */
+export type IssueExternalInvitationResponse = {
+  invitation: IssueExternalInvitationResult['invitation']
+  created: boolean
+  delivery: IssueExternalInvitationResult['delivery']
+  token?: string | null
+}
+
+export const buildIssueExternalInvitationResponse = (
+  result: IssueExternalInvitationResult
+): IssueExternalInvitationResponse => {
+  const base = { invitation: result.invitation, created: result.created, delivery: result.delivery }
+
+  return result.delivery.mode === 'manual' ? { ...base, token: result.token } : base
+}
+
+/**
  * TASK-1631 — Emitir una invitación auditada a una persona de la organización ligada.
- * `identity.external_invitation.issue`. El token viaja UNA vez en esta respuesta (`token`) y nunca se
- * persiste en claro; con una invitación abierta ya existente responde 200 sin token salvo `reissue`.
+ * `identity.external_invitation.issue`. TASK-1837: el sistema entrega el correo en el mismo acto y la
+ * respuesta describe la ENTREGA (`delivery`), nunca el secreto; un envío fallido responde honesto
+ * (`delivery.status='failed'`) en vez de "listo".
  */
 export async function POST(request: Request, { params }: { params: Promise<{ bindingId: string }> }) {
   const { operator, response } = await requireExternalAccessOperator('identity.external_invitation.issue', 'create')
@@ -36,7 +58,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ bin
       operator.actor
     )
 
-    return NextResponse.json(result, { status: result.created ? 201 : 200 })
+    return NextResponse.json(buildIssueExternalInvitationResponse(result), { status: result.created ? 201 : 200 })
   } catch (error) {
     return externalAccessErrorResponse(error, 'admin.external-access.invitations.issue')
   }

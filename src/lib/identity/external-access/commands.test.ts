@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import type { InvitationEmailSender } from './delivery'
+
 type Handler = (params: unknown[], sql: string) => unknown[] | { rows: unknown[] }
 
 const clientQueryMock = vi.fn()
@@ -43,6 +45,11 @@ const route = (handlers: Array<[RegExp, Handler]>) => {
     if (!match && /SELECT binding_id FROM greenhouse_core.external_organization_bindings/.test(sql))
       return Promise.resolve({ rows: [{ binding_id: params[0] }] })
     if (!match && /SELECT enrollment_id FROM greenhouse_core.internal_native_enrollments/.test(sql))
+      return Promise.resolve({ rows: [] })
+    // TASK-1837 — tope por binding/hora (audit) y admin designado vigente: por defecto sin filas.
+    if (!match && /COUNT\(\*\)::text AS n[\s\S]*external_identity_audit_log/.test(sql))
+      return Promise.resolve({ rows: [{ n: '0' }] })
+    if (!match && /WHERE binding_id = \$1 AND profile_id = \$2 AND status = 'linked'/.test(sql))
       return Promise.resolve({ rows: [] })
     if (!match && /SELECT[\s\S]*external_capability_grants WHERE grant_id=\$1/.test(sql))
       return Promise.resolve({ rows: [grantRow({ grant_id: params[0] })] })
@@ -118,6 +125,10 @@ const invitationRow = (overrides: Record<string, unknown> = {}) => ({
   profile_id: null,
   email: 'ana@cliente.cl',
   designated_admin: false,
+  delivery_status: 'not_attempted',
+  delivery_attempts: 0,
+  last_delivery_at: null,
+  last_delivery_error_code: null,
   status: 'issued',
   reason: null,
   issued_by: 'user-admin-1',
@@ -456,7 +467,7 @@ describe('TASK-1631 — issueExternalInvitation', () => {
     expect(result.created).toBe(true)
     expect(result.token).not.toBeNull()
 
-    const auditTypes = calls(/external_identity_audit_log/).map(call => (call[1] as unknown[])[1])
+    const auditTypes = calls(/INSERT INTO greenhouse_core\.external_identity_audit_log/).map(call => (call[1] as unknown[])[1])
 
     expect(auditTypes).toEqual(['invitation_revoked', 'invitation_issued'])
   })
@@ -474,6 +485,157 @@ describe('TASK-1631 — issueExternalInvitation', () => {
         code: 'binding_not_active'
       }
     )
+  })
+})
+
+describe('TASK-1837 — issueExternalInvitation delivery', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  const issueRoute = () =>
+    route([
+      [/WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/, () => [bindingRow()]],
+      [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
+      [/status IN \('issued', 'accepted'\)\s+FOR UPDATE/, () => []],
+      [
+        /INSERT INTO greenhouse_core\.external_member_invitations/,
+        params => [invitationRow({ invitation_id: params[0] })]
+      ],
+      [/INSERT INTO greenhouse_core\.external_identity_audit_log/, () => []],
+      [
+        /UPDATE greenhouse_core\.external_member_invitations i\s+SET delivery_status = \$2/,
+        params => [
+          {
+            ...invitationRow({
+              invitation_id: params[0],
+              delivery_status: params[1],
+              delivery_attempts: params[2],
+              last_delivery_error_code: params[3]
+            }),
+            environment_id: 'efeonce-auth',
+            organization_id: 'org-1'
+          }
+        ]
+      ]
+    ])
+
+  it('with system delivery sends the email AFTER the transaction and reports delivery instead of the secret', async () => {
+    issueRoute()
+
+    const sender = vi.fn<InvitationEmailSender>(async () => ({ status: 'sent' as const, deliveryId: 'del-1' }))
+
+    const result = await issueExternalInvitation(
+      { bindingId: 'xob-1', email: 'ana@cliente.cl', delivery: 'system' },
+      actor,
+      { sender }
+    )
+
+    expect(sender).toHaveBeenCalledTimes(1)
+    expect(sender.mock.calls[0]?.[0]).toMatchObject({
+      environment: expect.objectContaining({ issuerUrl: 'https://auth.efeonce.org' }),
+      organizationName: 'Cliente Uno'
+    })
+    expect(sender.mock.calls[0]?.[0].token).toBe(result.token)
+    expect(result.delivery).toEqual({
+      mode: 'system',
+      status: 'sent',
+      attempts: 1,
+      recipientMasked: 'a***@cliente.cl',
+      errorCode: null
+    })
+    expect(JSON.stringify(result.delivery)).not.toContain(result.token)
+    expect(publishMock.mock.calls.map(call => (call[0] as { eventType: string }).eventType)).toEqual([
+      'identity.external_invitation.issued'
+    ])
+  })
+
+  it('never puts the token in the outbox payload, not even with system delivery', async () => {
+    issueRoute()
+
+    const result = await issueExternalInvitation(
+      { bindingId: 'xob-1', email: 'ana@cliente.cl', delivery: 'system' },
+      actor,
+      { sender: async () => ({ status: 'sent', deliveryId: null }) }
+    )
+
+    for (const call of publishMock.mock.calls) {
+      const serialized = JSON.stringify(call[0])
+
+      expect(serialized).not.toContain(result.token)
+      expect(serialized).not.toContain('token')
+    }
+  })
+
+  it('a failed send leaves the invitation issued with delivery_status=failed, says so, and publishes delivery_failed', async () => {
+    issueRoute()
+
+    const result = await issueExternalInvitation(
+      { bindingId: 'xob-1', email: 'ana@cliente.cl', delivery: 'system' },
+      actor,
+      { sender: async () => ({ status: 'failed', errorCode: 'provider_rejected' }) }
+    )
+
+    expect(result.created).toBe(true)
+    expect(result.delivery.status).toBe('failed')
+    expect(result.delivery.errorCode).toBe('provider_rejected')
+
+    const auditTypes = calls(/INSERT INTO greenhouse_core\.external_identity_audit_log/).map(
+      call => (call[1] as unknown[])[1]
+    )
+
+    expect(auditTypes).toEqual(['invitation_issued', 'invitation_delivery_failed'])
+    expect(publishMock.mock.calls.map(call => (call[0] as { eventType: string }).eventType)).toEqual([
+      'identity.external_invitation.issued',
+      'identity.external_invitation.delivery_failed'
+    ])
+    expect(JSON.stringify(publishMock.mock.calls[1]?.[0])).not.toContain('ana@cliente.cl')
+  })
+
+  it('manual delivery keeps the previous contract: token returned, no email sent', async () => {
+    issueRoute()
+
+    const sender = vi.fn()
+
+    const result = await issueExternalInvitation(
+      { bindingId: 'xob-1', email: 'ana@cliente.cl', delivery: 'manual' },
+      actor,
+      { sender }
+    )
+
+    expect(sender).not.toHaveBeenCalled()
+    expect(result.token).toMatch(/^[A-Za-z0-9_-]{40,}$/)
+    expect(result.delivery).toMatchObject({ mode: 'manual', status: 'not_attempted', attempts: 0 })
+  })
+
+  it('refuses to issue when the binding hit its hourly issue cap (rate_limited)', async () => {
+    route([
+      [/WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/, () => [bindingRow()]],
+      [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
+      [/status IN \('issued', 'accepted'\)\s+FOR UPDATE/, () => []],
+      [/COUNT\(\*\)::text AS n[\s\S]*external_identity_audit_log/, () => [{ n: '20' }]]
+    ])
+
+    await expect(
+      issueExternalInvitation({ bindingId: 'xob-1', email: 'ana@cliente.cl', delivery: 'manual' }, actor)
+    ).rejects.toMatchObject({ code: 'rate_limited', statusCode: 429 })
+  })
+
+  it('refuses a designatedAdmin invitation while another designated admin is still linked (conflict)', async () => {
+    route([
+      [
+        /WHERE b\.binding_id = \$1 AND b\.population='external'\s+FOR UPDATE OF b/,
+        () => [bindingRow({ designated_admin_profile_id: 'profile-admin-1' })]
+      ],
+      [/FROM greenhouse_core\.external_identity_environments/, () => [environmentRow()]],
+      [/status IN \('issued', 'accepted'\)\s+FOR UPDATE/, () => []],
+      [/WHERE binding_id = \$1 AND profile_id = \$2 AND status = 'linked'/, () => [{ invitation_id: 'xmi-admin' }]]
+    ])
+
+    await expect(
+      issueExternalInvitation(
+        { bindingId: 'xob-1', email: 'otro@cliente.cl', designatedAdmin: true, delivery: 'manual' },
+        actor
+      )
+    ).rejects.toMatchObject({ code: 'conflict' })
   })
 })
 

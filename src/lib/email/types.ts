@@ -8,6 +8,7 @@ export type EmailType =
   | 'verify_email'
   | 'magic_link'
   | 'auth_server_magic_link'
+  | 'external_access_invitation'
   | 'payroll_export'
   | 'payroll_receipt'
   | 'payroll_liquidacion_v2'
@@ -62,6 +63,7 @@ export const TOKEN_SENSITIVE_EMAIL_TYPES = Object.freeze([
   'verify_email',
   'magic_link',
   'auth_server_magic_link',
+  'external_access_invitation',
   'hiring_assessment_assigned',
   'hiring_assessment_access_recovery',
   'hiring_talent_pool_verification'
@@ -79,6 +81,7 @@ export const EMAIL_PRIORITY_MAP: Record<string, EmailPriority> = {
   password_reset: 'critical',
   magic_link: 'critical',
   auth_server_magic_link: 'critical',
+  external_access_invitation: 'critical',
   verify_email: 'critical',
   invitation: 'transactional',
   leave_request_decision: 'transactional',
@@ -243,6 +246,8 @@ export const CANDIDATE_REPLY_TO_EMAIL_TYPES: ReadonlySet<EmailType> = new Set<Em
 ])
 export const AGENCY_BRANDED_EMAIL_TYPES: ReadonlySet<EmailType> = new Set<EmailType>([
   'ai_visibility_grader_report',
+  // TASK-1837 — la persona invitada a Efeonce ID es externa (cliente): conoce a Efeonce, no al portal.
+  'external_access_invitation',
   'growth_ebook_delivery',
   // TASK-1689 — candidate-facing hiring: el candidato es externo y conoce a Efeonce, no al
   // portal. Los avisos internos a People NO van acá: usan el sender plataforma.

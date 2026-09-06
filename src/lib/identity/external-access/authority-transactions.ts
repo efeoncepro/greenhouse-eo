@@ -26,6 +26,13 @@ export type AuditEventType =
   | 'grant_revoked'
   | 'member_revoked'
   | 'invitation_revoked'
+  // TASK-1837 — ciclo de vida de la entrega + autoridad delegada.
+  | 'invitation_resent'
+  | 'invitation_token_revealed'
+  | 'invitation_delivery_failed'
+  | 'invitation_delivery_bounced'
+  | 'designated_admin_assigned'
+  | 'designated_admin_cleared'
 
 export type AuditInput = {
   eventType: AuditEventType

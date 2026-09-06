@@ -83,6 +83,10 @@ type InvitationRow = {
   revoked_by: string | null
   revoked_at: string | Date | null
   revoke_reason: string | null
+  delivery_status: ExternalMemberInvitation['deliveryStatus']
+  delivery_attempts: number | string
+  last_delivery_at: string | Date | null
+  last_delivery_error_code: string | null
 }
 
 type EligibleOrganizationRow = {
@@ -115,7 +119,8 @@ export const GRANT_SELECT = `
 
 export const INVITATION_SELECT = `
   invitation_id, binding_id, profile_id, email, designated_admin, status, reason, issued_by, issued_at,
-  expires_at, accepted_at, linked_at, link_id, revoked_by, revoked_at, revoke_reason
+  expires_at, accepted_at, linked_at, link_id, revoked_by, revoked_at, revoke_reason,
+  delivery_status, delivery_attempts, last_delivery_at, last_delivery_error_code
 `
 
 export const mapEnvironmentRow = (row: EnvironmentRow): ExternalIdentityEnvironment => ({
@@ -184,7 +189,11 @@ export const mapInvitationRow = (row: InvitationRow): ExternalMemberInvitation =
   linkId: row.link_id,
   revokedBy: row.revoked_by,
   revokedAt: isoOrNull(row.revoked_at),
-  revokeReason: row.revoke_reason
+  revokeReason: row.revoke_reason,
+  deliveryStatus: row.delivery_status ?? 'not_attempted',
+  deliveryAttempts: Number(row.delivery_attempts ?? 0),
+  lastDeliveryAt: isoOrNull(row.last_delivery_at ?? null),
+  lastDeliveryErrorCode: row.last_delivery_error_code ?? null
 })
 
 export const listExternalIdentityEnvironments = async (): Promise<ExternalIdentityEnvironment[]> => {

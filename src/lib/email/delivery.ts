@@ -80,6 +80,7 @@ const durableSubject = (emailType: EmailType, subject: string, persistence: Send
 const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}'
 const OUTBOX_EVENT_ID = new RegExp(`^outbox-${UUID}$`, 'i')
 const ASSESSMENT_ID = new RegExp(`^asmt-${UUID}$`, 'i')
+const EXTERNAL_INVITATION_ID = /^xmi-[0-9a-f-]{36}$/
 const TALENT_CONSENT_ID = new RegExp(`^tlpc-${UUID}$`, 'i')
 const ASSESSMENT_RECOVERY_EVENT_ID = /^assessment-access-recovery:[a-f0-9]{64}$/
 
@@ -91,6 +92,15 @@ const durableSensitiveSource = (
   if (emailType === 'password_reset' && sourceEntity === 'auth_tokens') return { sourceEntity }
   if (emailType === 'invitation' && sourceEntity === 'client_users') return { sourceEntity }
   if (emailType === 'verify_email' && sourceEntity === 'email_verification') return { sourceEntity }
+
+  // TASK-1837 — la invitación externa correlaciona por `invitation_id` (xmi-…): el consumer del
+  // rebote lo necesita para marcar `delivery_status='bounced'` sin buscar por email.
+  if (emailType === 'external_access_invitation' && sourceEntity === 'external_member_invitations') {
+    return {
+      sourceEntity,
+      ...(sourceEventId && EXTERNAL_INVITATION_ID.test(sourceEventId) ? { sourceEventId } : {})
+    }
+  }
 
   if (emailType === 'hiring_assessment_assigned' && sourceEntity && ASSESSMENT_ID.test(sourceEntity)) {
     const canonicalFallback = `hiring-assessment-assigned:${sourceEntity}`

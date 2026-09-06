@@ -64,6 +64,7 @@ export type CanonicalErrorCode =
   | 'external_access_invitation_not_open'
   | 'external_access_invitation_expired'
   | 'external_access_identity_collision'
+  | 'external_access_limit_reached'
   | 'auth_server_invalid_request'
   // Design System Figma node linking (TASK-1072).
   | 'invalid_figma_url'
@@ -297,6 +298,12 @@ const CANONICAL_ERRORS: Record<CanonicalErrorCode, CanonicalErrorDefinition> = {
   external_access_identity_collision: {
     status: 409,
     message: 'La persona no se pudo resolver de forma única. Requiere revisión manual de identidad.',
+    actionable: false
+  },
+  // TASK-1837 — topes de reenvío por cadena y de asientos del administrador delegado.
+  external_access_limit_reached: {
+    status: 422,
+    message: 'Se alcanzó el tope de invitaciones para esta organización. Revisa las invitaciones abiertas o pide a Efeonce que amplíe el cupo.',
     actionable: false
   },
   // TASK-1829 — Commands del authorization server propio (clientes OAuth, consentimientos).
