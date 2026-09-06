@@ -42,7 +42,6 @@ se presenta como adopción, usabilidad o validación de un cliente real.
 
 La matriz incorpora empleados Efeonce por emisor nativo además de clientes externos y carril Entra existente. El canary interno depende de TASK-1836 + integración TASK-1831/1835; usar la identidad real indicada por operador y organización canónica, sin reclasificar Efeonce ni crear excepciones de prueba.
 
-
 ## Delta 2026-09-04 (TASK-1835)
 
 - Las pantallas que los canaries y la primera cohorte verán (consentimiento, login, step-up, recuperación) son `TASK-1835` (EPIC-044 U06); esta task queda bloqueada también por ella para la cohorte real (los canaries de protocolo con `prompt=none` o clientes de prueba no la necesitan).
@@ -54,7 +53,7 @@ el estado posterior. Ver actualización de readiness del 2026-09-05 al final.
 
 - `TASK-1829` quedó `code complete, rollout pendiente` en `develop` (commits `263ee3a74`, `19d1658de`,
   `d31e6e913`): metadata RFC 8414/OIDC (`issuer` idéntico al origen, `client_id_metadata_document_supported:
-  true`, S256 único), CIMD como registro primario, DCR (`POST /oauth/register`) como compatibilidad para
+true`, S256 único), CIMD como registro primario, DCR (`POST /oauth/register`) como compatibilidad para
   públicos, clientes confidenciales por command, `authorize`/`token`/`revoke`/`introspect` y consentimiento
   persistido, todo detrás de `AUTH_SERVER_OAUTH_ENABLED=false`; contrato en
   `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md` — cerrado por trabajo en `TASK-1829`.
@@ -125,10 +124,10 @@ organización cliente real, sí**.
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-044`
-- Status real: `Ownership tomado 2026-09-06: goal confirmado, pnpm codex:task-hook TASK-1832 --develop verde, auditoría de código/schema/runtime completada y plan versionado en docs/tasks/plans/TASK-1832-plan.md. El operador exigió que la organización canary quede documentada y sea eliminable; el plan ahora descarta EO-ORG-0050, exige fixture dedicado, manifiesto por corrida, cleanup dry-run/apply y readback cero. No hay implementación, migración aplicada, datos canary, flags, push ni deploy de esta ejecución; el checkpoint humano P0/Alto está pendiente antes de código. El apply exige aprobación específica para crear la organización dedicada y para las cuentas M365/Google controladas.`
+- Status real: `Code complete local; rollout autorizado y en curso. El operador decidió conservar el schema aditivo ya aplicado y autorizó commit/push, promoción, deploys, gates, fixture dedicado, buzones controlados y sesiones canary el 2026-09-06. El baseline previo al rollout conserva registry=0, canary_bindings=0, drift de purpose=0 y smoke_test en person_360=0. Consumers, fixture, flags y pruebas runtime aún no están acreditados; la task permanece rollout pendiente hasta matriz, cleanup y siete días de señales estables.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
-- Blocked by: `checkpoint humano del plan para iniciar código; aprobación de creación del fixture canary dedicado y cuentas M365/Google para apply y matriz live`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; efeonce-mcp main; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -307,12 +306,12 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Toda tabla nueva queda declarada y justificada en el boundary test del dominio.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects. Evidencia: ADR, plan y runbook técnico.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit. Evidencia: ADR + migration guards + `canary.test.ts`.
+- [x] Toda tabla nueva queda declarada y justificada en el boundary test del dominio. Evidencia: `external_canary_registrations` en `boundary-domain.test.ts`.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk. Evidencia: migrations forward-only, gates OFF y contrato de cleanup/compensación documentado.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling. Evidencia: readbacks pre-implementación y apply de schema enlazados en esta task.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks. Evidencia: errors HTTP/API, audit/outbox, helpers redactados y tests focales.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -331,21 +330,23 @@ emisor nativo, pero el carril canary externo no existe ni está acreditado por e
 confirmó que `bindExternalOrganization` todavía protege la elegibilidad comercial, que el gateway deniega hoy
 `native-external` en tools de negocio y que la resolución no transporta purpose/vencimiento.
 
-La revisión de procedencia encontró que `identity_profiles.data_origin` ya modela `smoke_test`, pero
-`greenhouse_serving.person_360` y `searchProfiles` incluyen hoy todo perfil activo salvo los fusionados. Por
-eso el cierre no puede descansar sólo en «sin membership/CRM»: los readers 360 deben excluir explícitamente
-la procedencia `smoke_test` y probar que una persona real permanece visible. Retención, consentimientos y revocación
-siguen siendo ciegos a procedencia; el filtro sólo gobierna visibilidad.
+La revisión de procedencia previa a la implementación encontró que `identity_profiles.data_origin` ya modelaba
+`smoke_test`, pero `greenhouse_serving.person_360` y `searchProfiles` incluían todo perfil activo salvo los
+fusionados. Por eso el cierre no podía descansar sólo en «sin membership/CRM»: los readers 360 debían excluir
+explícitamente la procedencia `smoke_test` y probar que una persona real permaneciera visible. Retención,
+consentimientos y revocación siguen siendo ciegos a procedencia; el filtro sólo gobierna visibilidad.
 
-El readback con `greenhouse_ops` contó 30 perfiles `smoke_test`, y los 30 aparecen hoy en `person_360`; ninguno
-tiene membership organizacional, `client_user` o contacto CRM. Los seis perfiles de identidad externa tienen
+El readback de partida con `greenhouse_ops` contó 30 perfiles `smoke_test`, y los 30 aparecían entonces en
+`person_360`; después del apply accidental, el readback de las 18:49:53Z conserva los 30 perfiles y confirma
+`smoke_in_person_360=0`. Ninguno tiene membership organizacional, `client_user` o contacto CRM. Los seis
+perfiles de identidad externa tienen
 source link inactivo, invitación/binding revocados y sólo dominio `efeonce.invalid`, sin entrega real. El
 candidato existente con nombre inequívocamente diagnóstico, `EO-ORG-0050`, tiene cero spaces/memberships/
 bindings, pero sí tax ID, commercial party e historia de lifecycle append-only. La FK `ON DELETE RESTRICT` y
 los triggers inmutables impiden garantizar su eliminación, por lo que queda descartado. El fixture debe ser una
 organización dedicada creada sólo después de una autorización específica.
 
-## Plan pendiente de checkpoint
+## Plan aprobado
 
 1. Aceptar un Delta ADR que haga `binding_purpose` explícito y mutuamente excluyente: `customer` para bindings
    externos comerciales, `canary` sólo para una registración externa exacta, y `NULL` para población interna.
@@ -376,13 +377,37 @@ organización dedicada creada sólo después de una autorización específica.
 
 ### Checkpoint humano P0/Alto
 
-- `pendiente`: aprobar este diseño antes del primer cambio de código o ADR.
+- `aprobado 2026-09-06`: implementación local del diseño, incluido el contrato de retiro del fixture.
 - La aprobación del plan autoriza sólo cambios locales reversibles y su verificación; no autoriza commit/push
   al repo hermano, PR, apply de migración, creación/reutilización de organización, cuentas, invitaciones,
   flags, deploy ni sesiones interactivas.
 - Antes del apply, el operador debe aprobar explícitamente la creación del fixture dedicado y las cuentas
   M365/Google controladas. Los IDs se generan y registran antes del primer write; no se inferirá ni reutilizará
   una organización existente.
+
+### Autorización de rollout 2026-09-06
+
+- El operador decidió **conservar** el schema aditivo aplicado y autorizó completar el rollout de TASK-1832:
+  commit/push enfocados, promoción por el control plane, deploy del gateway, configuración coordinada de gates,
+  organización canary dedicada, buzones M365/Google controlados, sesiones interactivas, revocación, cleanup y
+  seguimiento restante.
+- Esta autorización no habilita una organización cliente, una segunda organización canary, writes de negocio ni
+  ampliar la capability `growth.seo.observation.read`. Los IDs exactos y el manifiesto versionado siguen siendo
+  precondición del primer write.
+
+### Implementación y excepción operativa 2026-09-06
+
+- Greenhouse local: propósito `customer|canary`, registry temporal, guards DB/commands, capabilities admin,
+  resolver/emisión/refresh/introspection fail-closed, exclusión `smoke_test` de 360, APIs, cleanup con censo de
+  FKs + migrator + readback cero, scripts y documentación triple.
+- Gateway `efeonce-mcp` local: gate independiente default OFF; sólo `get_seo_entitlement` acepta canary; list y
+  dispatch revalidan el gate. `pnpm check`: 152 passed, 0 failed, 0 skipped, build verde.
+- Greenhouse: 144 tests focales, typecheck y `mcp:manifest:check` verdes. El Playwright live no se ejecutó porque
+  no existe fixture/sesión; el test es opt-in y un skip no se cuenta como evidencia.
+- Excepción: `pnpm pg:connect:migrate` aplicó las dos migraciones fuera del checkpoint al confundirse con el
+  comando de proxy. [Readback exacto](../../audits/mcp/TASK-1832_SCHEMA_APPLY_READBACK_2026-09-06.md): registry y
+  canary bindings en cero, purposes sin drift, 30 perfiles `smoke_test` preservados y cero en Person 360. No se
+  creó el fixture ni se prendieron flags. No se ejecutará otra mutación externa sin nueva instrucción.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -445,14 +470,14 @@ organización dedicada creada sólo después de una autorización específica.
 
 ### Risk matrix
 
-| Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
-|---|---|---|---|---|
-| Un cliente no soporta CIMD ni DCR conforme | clientes MCP | medium | pre-registro confidencial por command; documentar por cliente | fila roja en la matriz |
-| `sub` distinto entre loopback y hospedado | identity | low | `subject_types_supported: public`; test explícito | `subject_collision` |
-| Canary contamina Person 360/Account 360/CRM | identity/data | high | `smoke_test`, purpose explícito, exclusiones y cleanup verificado | señal canary fuera de boundary |
-| Bypass canary concede autoridad comercial | identity/MCP | high | command separado, registry exacto, TTL y capability allowlist read-only | `canary_capability_rejected` |
-| Fixture no puede eliminarse o borra un asset compartido | identity/data | high | organización dedicada, manifest, FK census, dry-run y refusal con referencias inesperadas | `canary_cleanup_blocked` |
-| Revocación no efectiva a tiempo | identity / MCP | low | prueba de revocación antes de dar acceso | `revoked_still_dispatching` |
+| Riesgo                                                  | Sistema        | Probabilidad | Mitigation                                                                                | Signal de alerta               |
+| ------------------------------------------------------- | -------------- | ------------ | ----------------------------------------------------------------------------------------- | ------------------------------ |
+| Un cliente no soporta CIMD ni DCR conforme              | clientes MCP   | medium       | pre-registro confidencial por command; documentar por cliente                             | fila roja en la matriz         |
+| `sub` distinto entre loopback y hospedado               | identity       | low          | `subject_types_supported: public`; test explícito                                         | `subject_collision`            |
+| Canary contamina Person 360/Account 360/CRM             | identity/data  | high         | `smoke_test`, purpose explícito, exclusiones y cleanup verificado                         | señal canary fuera de boundary |
+| Bypass canary concede autoridad comercial               | identity/MCP   | high         | command separado, registry exacto, TTL y capability allowlist read-only                   | `canary_capability_rejected`   |
+| Fixture no puede eliminarse o borra un asset compartido | identity/data  | high         | organización dedicada, manifest, FK census, dry-run y refusal con referencias inesperadas | `canary_cleanup_blocked`       |
+| Revocación no efectiva a tiempo                         | identity / MCP | low          | prueba de revocación antes de dar acceso                                                  | `revoked_still_dispatching`    |
 
 ### Feature flags / cutover
 
@@ -461,11 +486,11 @@ organización dedicada creada sólo después de una autorización específica.
 
 ### Rollback plan per slice
 
-| Slice | Rollback | Tiempo | Reversible? |
-|---|---|---|---|
-| Slice 1 | gate canary OFF + revert de code; columnas/registry se conservan | < 10 min | sí |
-| Slice 2 | revocar sesiones/invitaciones/consents/grants/binding por commands; cleanup dry-run; eliminar sólo assets run-owned sin blockers | < 10 min | sí |
-| Slice 3 | gate canary OFF en gateway/Greenhouse + revocación de todos los artefactos de la corrida | < 5 min | sí |
+| Slice   | Rollback                                                                                                                         | Tiempo   | Reversible? |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| Slice 1 | gate canary OFF + revert de code; columnas/registry se conservan                                                                 | < 10 min | sí          |
+| Slice 2 | revocar sesiones/invitaciones/consents/grants/binding por commands; cleanup dry-run; eliminar sólo assets run-owned sin blockers | < 10 min | sí          |
+| Slice 3 | gate canary OFF en gateway/Greenhouse + revocación de todos los artefactos de la corrida                                         | < 5 min  | sí          |
 
 ### Production verification sequence
 
@@ -493,16 +518,16 @@ organización dedicada creada sólo después de una autorización específica.
 - [ ] Auditoría MCP de TASK-1836 §14: registrar cliente y revisión reales, discovery desde URL canónica, login, consentimiento por cliente y revocación; no sustituir el flujo por inyección manual de token.
 
 - [ ] Cada cliente MCP real completa login con persona externa `smoke_test`, token nativo, llamada autorizada,
-  refresh y revocación; el mismo issuer nunca permite tools internas. Evidencia por cliente y revisión registradas.
+      refresh y revocación; el mismo issuer nunca permite tools internas. Evidencia por cliente y revisión registradas.
 
 - [ ] Matriz de tokens publicada con al menos Claude Code, Codex y un cliente hospedado, sin tokens crudos.
 - [ ] El mismo `sub` para la misma persona en loopback y hospedado (evidencia).
 - [ ] Organización canary no-cliente registrada y ligada por command dedicado; `bindExternalOrganization`
-  continúa rechazándola y los readers/KPI comerciales no la presentan como cliente.
+      continúa rechazándola y los readers/KPI comerciales no la presentan como cliente.
 - [ ] Manifiesto de assets creado antes del primer write y completo con IDs/ownership/TTL; cleanup dry-run
-  reporta `deletion_ready`, `unexpected_refs=0`, lifecycle history cero y ningún intento de borrar assets shared.
+      reporta `deletion_ready`, `unexpected_refs=0`, lifecycle history cero y ningún intento de borrar assets shared.
 - [ ] Todos los profiles del canary tienen `data_origin='smoke_test'`; no se fusionan con personas reales y el
-  cleanup/revocación queda probado sin borrar audit.
+      cleanup/revocación queda probado sin borrar audit.
 - [ ] Correo/invitación/magic link se verifican en buzones M365 y Google controlados, con bounce y scanner-safe POST.
 - [ ] Passkey real pasa en Chrome y Safari/WebKit con la misma persona canary.
 - [ ] Las cinco pruebas negativas pasan en producción con evidencia redactada.
@@ -512,16 +537,25 @@ organización dedicada creada sólo después de una autorización específica.
 
 ## Verification
 
-- `pnpm playwright test tests/e2e/smoke/auth-server-oauth.spec.ts`
-- `node scripts/mcp/external-client-canary.mjs --env=staging`
-- sesiones interactivas por cliente MCP operadas por Efeonce (evidencia redactada en la auditoría)
+- [x] `pnpm exec vitest run <7 archivos focales>` — 144/144, 0 failed.
+- [x] `pnpm exec tsc --noEmit --pretty false`.
+- [x] `pnpm lint` — exit 0, 0 errores; 26 warnings UI fuera del alcance.
+- [x] `pnpm build` — artefacto Next.js y rutas canary generados.
+- [x] `pnpm mcp:manifest:check`, rutas/workers/crons, ops/task lint y `git diff --check`.
+- [x] Gateway hermano `pnpm check` — 152/152, 0 skipped, build verde.
+- [ ] `pnpm playwright test tests/e2e/smoke/auth-server-oauth.spec.ts` — no ejecutar sin fixture/sesión autorizados;
+      un skip no se acepta como evidencia.
+- [ ] `node scripts/mcp/external-client-canary.mjs --env=staging` — pendiente de deploy, gates y fixture.
+- [ ] Sesiones interactivas por cliente MCP operadas por Efeonce y registradas en la matriz redactada.
+- `pnpm secrets:audit` local: 6/8 saludables; `NEXTAUTH_URL` local con shape inválida y `CRON_SECRET` ausente.
+  No es evidencia de runtime y TASK-1832 no modifica secretos.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` sincronizado y archivo en la carpeta correcta
-- [ ] `docs/tasks/README.md`, `Handoff.md` y `changelog.md` actualizados
-- [ ] chequeo de impacto cruzado sobre `TASK-1626`, `TASK-1829`, `TASK-1830`, `TASK-1831`, `TASK-1833`, `TASK-1841`
-- [ ] manual de uso `docs/manual-de-uso/identity/certificar-cliente-mcp-con-canary-sintetico.md` publicado
+- [x] `Lifecycle` sincronizado y archivo conservado en `in-progress`
+- [x] `docs/tasks/README.md`, `Handoff.md` y `changelog.md` actualizados
+- [x] chequeo de impacto cruzado sobre `TASK-1626`, `TASK-1829`, `TASK-1830`, `TASK-1831`, `TASK-1833`, `TASK-1841`
+- [x] manual de uso `docs/manual-de-uso/identity/certificar-cliente-mcp-con-canary-sintetico.md` publicado
 
 ## Follow-ups
 
@@ -531,13 +565,12 @@ organización dedicada creada sólo después de una autorización específica.
 
 ## Open Questions
 
-- Autorización específica para crear la organización canary dedicada antes del apply. La task no autoriza
-  crearla todavía ni reutilizar Efeonce u otra party; los IDs exactos se generan y documentan al provisionar.
+- No quedan decisiones de autorización para el rollout sintético aprobado. Cualquier expansión a clientes,
+  writes, una segunda organización canary o assets compartidos requiere un checkpoint nuevo.
 
 ## Correction 2026-09-05 — TASK-1836
 
 Probar D1–D7 de TASK-1836 con contexto firmado ligado a persona/cliente/recurso; el rollback debe rechazar también el token interno emitido antes de apagar el gate del gateway.
-
 
 ## Readiness actualizada — 2026-09-05
 

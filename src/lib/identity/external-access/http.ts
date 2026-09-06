@@ -29,6 +29,10 @@ const CANONICAL_CODE_BY_DOMAIN_CODE: Record<ExternalAccessErrorCode, CanonicalEr
   invitation_not_open: 'external_access_invitation_not_open',
   invitation_expired: 'external_access_invitation_expired',
   identity_collision: 'external_access_identity_collision',
+  canary_not_registered: 'external_canary_not_registered',
+  canary_expired: 'external_canary_expired',
+  capability_not_allowed: 'external_canary_capability_not_allowed',
+  canary_cleanup_blocked: 'external_canary_cleanup_blocked',
   forbidden: 'forbidden',
   rate_limited: 'rate_limited',
   limit_reached: 'external_access_limit_reached'

@@ -2,7 +2,13 @@
 
 Goal confirmado por el operador y `pnpm codex:task-hook TASK-1832 --develop` ejecutado. Trabajo en el checkout
 compartido, sin subagentes ni worktrees. El WIP visible de TASK-1835 queda fuera del ownership y nunca se incluye
-en staging. Este documento es el checkpoint P0/Alto previo a implementación: está pendiente de aprobación.
+en staging. Este documento es el checkpoint P0/Alto previo a implementación: aprobado por el operador el
+2026-09-06, incluida la exigencia de que el fixture canary sea documentado y eliminable.
+
+**Excepción posterior:** durante la verificación se ejecutó por error `pnpm pg:connect:migrate`, que además de
+levantar el proxy aplica migraciones. El schema quedó aplicado fuera de la autorización del checkpoint; no se
+crearon datos ni flags y el registry permaneció vacío. Evidencia y decisión pendiente:
+[`TASK-1832_SCHEMA_APPLY_READBACK_2026-09-06.md`](../../audits/mcp/TASK-1832_SCHEMA_APPLY_READBACK_2026-09-06.md).
 
 ## Resultado y evidencia admisible
 
@@ -17,15 +23,15 @@ capturas con DTOs ficticios, migración registrada sin apply, push sin deploy o 
 
 ## Auditoría de partida
 
-| Frontera | Estado verificado | Consecuencia del plan |
-|---|---|---|
-| `bindExternalOrganization` | Requiere organización `client|both` + lifecycle `active_client` | No se relaja. El canary usa command y registry separados. |
-| Resolver externo | Devuelve binding/grants sin purpose ni vencimiento de binding | El contrato añade ambos y falla cerrado por flag/expiry/revocation. |
-| Gateway | `native-external` no despacha tools de negocio; status no prueba grants | Se agrega una excepción declarativa sólo para el tool read seguro. |
-| Auth server | Emite a partir de memberships resueltas por Greenhouse | El gate Greenhouse debe cortar también emisión, no sólo dispatch. |
-| `identity_profiles.data_origin` | Existe `real|synthetic_seed|smoke_test|demo`, default `real` | El canary declara `smoke_test` al nacer; nunca se deriva de email/nombre. |
-| Person/Account 360 | Readback DB: los 30 perfiles `smoke_test` aparecen en la view; ninguno tiene membership, client user ni contacto CRM | Excluir sólo `smoke_test`, sin redefinir otros orígenes ni cambiar retención/compliance. |
-| Runtime live | Issuer/gateway listos y flags nativo/interno ON | Es baseline actual, no evidencia de canary externo. Revalidar antes de rollout. |
+| Frontera                        | Estado verificado                                                                                                    | Consecuencia del plan                                                                    |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------- |
+| `bindExternalOrganization`      | Requiere organización `client                                                                                        | both`+ lifecycle`active_client`                                                          | No se relaja. El canary usa command y registry separados. |
+| Resolver externo                | Devuelve binding/grants sin purpose ni vencimiento de binding                                                        | El contrato añade ambos y falla cerrado por flag/expiry/revocation.                      |
+| Gateway                         | `native-external` no despacha tools de negocio; status no prueba grants                                              | Se agrega una excepción declarativa sólo para el tool read seguro.                       |
+| Auth server                     | Emite a partir de memberships resueltas por Greenhouse                                                               | El gate Greenhouse debe cortar también emisión, no sólo dispatch.                        |
+| `identity_profiles.data_origin` | Existe `real                                                                                                         | synthetic_seed                                                                           | smoke_test                                                | demo`, default `real` | El canary declara `smoke_test` al nacer; nunca se deriva de email/nombre. |
+| Person/Account 360              | Readback DB: los 30 perfiles `smoke_test` aparecen en la view; ninguno tiene membership, client user ni contacto CRM | Excluir sólo `smoke_test`, sin redefinir otros orígenes ni cambiar retención/compliance. |
+| Runtime live                    | Issuer/gateway listos y flags nativo/interno ON                                                                      | Es baseline actual, no evidencia de canary externo. Revalidar antes de rollout.          |
 
 Evidencia redactada:
 [`TASK-1832_PRE_IMPLEMENTATION_READBACK_2026-09-06.md`](../../audits/mcp/TASK-1832_PRE_IMPLEMENTATION_READBACK_2026-09-06.md).
@@ -134,16 +140,21 @@ una organización dedicada, creada sólo tras aprobación específica y registra
 
 ## Checkpoints y autorizaciones
 
-- **Ahora — pendiente:** aprobación humana de estas siete decisiones y del plan antes de código.
+- **Aprobado 2026-09-06:** implementación local de estas nueve decisiones y del plan.
 - **Antes de editar el repo hermano:** confirmar ownership local y preservar cualquier WIP; commit/push/PR
   requieren alcance explícito y revisión independiente.
 - **Antes de migration/data/flags/deploy:** autorización específica, readback de Platform Health y estado live.
 - **Antes del fixture:** aprobación específica para crear una organización canary dedicada y cuentas
   M365/Google aprobadas. El command genera los IDs exactos y el manifiesto los registra; no se reutiliza ni se
   infiere una organización existente.
+- **Aprobado 2026-09-06 para rollout:** conservar el schema ya aplicado y ejecutar commit/push, promoción,
+  deploys, gates, fixture dedicado, buzones controlados, sesiones canary, revocación y cleanup. La autorización
+  sigue limitada a una organización sintética, read-only y eliminable; no cubre clientes ni writes.
 - **Cierre:** nunca marcar complete sin matriz productiva, cleanup y siete días de señales estables.
 
-## Siguiente acción tras aprobar
+## Primera acción aprobada y estado posterior
 
-Formalizar el Delta ADR y escribir primero tests rojos de invariantes/schema/policy. No aplicar migración, no
-crear fixture y no tocar runtime en ese slice.
+El Delta ADR y los tests de invariantes/schema/policy se implementaron localmente. La indicación original era
+no aplicar migraciones ni tocar runtime en ese slice; la excepción del apply accidental está registrada al
+inicio de este plan y en su readback dedicado. No se creó el fixture ni se tocó configuración runtime. La
+siguiente mutación permanece detenida hasta una instrucción nueva del operador.

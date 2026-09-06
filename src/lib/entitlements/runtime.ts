@@ -570,7 +570,12 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
   ) {
     const hiringSource: TenantEntitlementSource = hasRouteGroup(subject, 'internal') ? 'route_group' : 'role'
 
-    const HIRING_READ_CAPS = ['hiring.demand.read', 'hiring.opening.read', 'hiring.application.read', 'hiring.opening.capacity.read'] as const
+    const HIRING_READ_CAPS = [
+      'hiring.demand.read',
+      'hiring.opening.read',
+      'hiring.application.read',
+      'hiring.opening.capacity.read'
+    ] as const
 
     for (const capability of HIRING_READ_CAPS) {
       addEntitlement(entries, { module: 'hiring', capability, action: 'read', scope: 'tenant', source: hiringSource })
@@ -1489,6 +1494,24 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source: 'role'
     })
 
+    for (const capability of ['identity.external_canary.register', 'identity.external_canary.bind'] as const) {
+      addEntitlement(entries, {
+        module: 'organization',
+        capability,
+        action: 'create',
+        scope: 'tenant',
+        source: 'role'
+      })
+    }
+
+    addEntitlement(entries, {
+      module: 'organization',
+      capability: 'identity.external_canary.revoke',
+      action: 'execute',
+      scope: 'tenant',
+      source: 'role'
+    })
+
     // TASK-1837 — excepción gobernada de revelación y emisión delegada (operador de Efeonce;
     // en la lane ecosystem la capability se sintetiza desde la membership designada).
     addEntitlement(entries, {
@@ -1510,8 +1533,18 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
 
   // TASK-1836 — Fine-grained internal authority, granted only to the canonical operator role.
   if (hasRole(subject, ROLE_CODES.EFEONCE_ADMIN)) {
-    for (const capability of ['identity.internal_access.enroll', 'identity.internal_access.revoke', 'identity.internal_access.grant'] as const) {
-      addEntitlement(entries, { module: 'organization', capability, action: 'execute', scope: 'tenant', source: 'role' })
+    for (const capability of [
+      'identity.internal_access.enroll',
+      'identity.internal_access.revoke',
+      'identity.internal_access.grant'
+    ] as const) {
+      addEntitlement(entries, {
+        module: 'organization',
+        capability,
+        action: 'execute',
+        scope: 'tenant',
+        source: 'role'
+      })
     }
   }
 

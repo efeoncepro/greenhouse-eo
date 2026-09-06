@@ -2906,6 +2906,25 @@ export interface GreenhouseCoreExternalAccessResolutionLog {
   subject_hash: string;
 }
 
+export interface GreenhouseCoreExternalCanaryRegistrations {
+  canary_registration_id: string;
+  capability: string;
+  created_at: Generated<Timestamp>;
+  environment_id: string;
+  expires_at: Timestamp;
+  external_organization_ref: string;
+  organization_id: string;
+  reason: string;
+  registered_at: Generated<Timestamp>;
+  registered_by: string;
+  revoke_reason: string | null;
+  revoked_at: Timestamp | null;
+  revoked_by: string | null;
+  run_id: string;
+  status: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface GreenhouseCoreExternalCapabilityGrants {
   binding_id: string;
   capability: string;
@@ -2986,11 +3005,14 @@ export interface GreenhouseCoreExternalMemberInvitations {
 
 export interface GreenhouseCoreExternalOrganizationBindings {
   binding_id: string;
+  binding_purpose: Generated<string | null>;
   bound_at: Generated<Timestamp>;
   bound_by: string;
+  canary_registration_id: string | null;
   created_at: Generated<Timestamp>;
   designated_admin_profile_id: string | null;
   environment_id: string;
+  expires_at: Timestamp | null;
   external_organization_ref: string;
   grants_version: Generated<number>;
   organization_id: string;
@@ -13380,6 +13402,7 @@ export interface DB {
   "greenhouse_core.entitlement_governance_audit_log": GreenhouseCoreEntitlementGovernanceAuditLog;
   "greenhouse_core.entity_source_links": GreenhouseCoreEntitySourceLinks;
   "greenhouse_core.external_access_resolution_log": GreenhouseCoreExternalAccessResolutionLog;
+  "greenhouse_core.external_canary_registrations": GreenhouseCoreExternalCanaryRegistrations;
   "greenhouse_core.external_capability_grants": GreenhouseCoreExternalCapabilityGrants;
   "greenhouse_core.external_identity_audit_log": GreenhouseCoreExternalIdentityAuditLog;
   "greenhouse_core.external_identity_environments": GreenhouseCoreExternalIdentityEnvironments;

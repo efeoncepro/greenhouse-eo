@@ -40,25 +40,25 @@ de lifecycle append-only.
 Una fila por asset. Los identificadores son IDs públicos/primarios no secretos. `shared` significa que la corrida
 lo usa pero nunca lo elimina; `run_owned` significa que el command puede retirarlo sólo mediante este registro.
 
-| Sistema/tabla | ID exacto | Ownership | Relación con la corrida | Estado | Acción de retiro | Readback |
-|---|---|---|---|---|---|---|
-| `greenhouse_core.organizations` | `PENDIENTE` | `run_owned` | organización canary | `planned` | hard delete al final | `PENDIENTE` |
-| `greenhouse_core.organization_lifecycle_history` | `conteo esperado: 0` | `forbidden` | bloqueo de borrado | `planned` | nunca crear/borrar | `PENDIENTE` |
-| `greenhouse_core.external_canary_registrations` | `PENDIENTE` | `run_owned` | raíz del fixture | `planned` | revocar y eliminar | `PENDIENTE` |
-| `greenhouse_core.external_identity_environments` | `PENDIENTE` | `shared|run_owned` | issuer externo | `planned` | conservar salvo ownership exclusivo | `PENDIENTE` |
-| `greenhouse_core.external_organization_bindings` | `PENDIENTE` | `run_owned` | binding purpose canary | `planned` | revocar y eliminar | `PENDIENTE` |
-| `greenhouse_core.external_capability_grants` | `PENDIENTE` | `run_owned` | capability read-only | `planned` | revocar y eliminar | `PENDIENTE` |
-| `greenhouse_core.external_member_invitations` | `PENDIENTE` | `run_owned` | alta sintética | `planned` | revocar y eliminar | `PENDIENTE` |
-| `greenhouse_core.identity_profiles` | `PENDIENTE` | `run_owned` | persona `smoke_test` | `planned` | desactivar y eliminar | `PENDIENTE` |
-| `greenhouse_core.identity_profile_source_links` | `PENDIENTE` | `run_owned` | identidad login | `planned` | desactivar y eliminar | `PENDIENTE` |
-| `greenhouse_auth.oauth_clients` | `PENDIENTE` | `shared|run_owned` | cliente de prueba | `planned` | retirar; eliminar sólo si exclusivo | `PENDIENTE` |
-| `greenhouse_auth.authorization_contexts` | `PENDIENTE` | `run_owned` | contexto server-selected | `planned` | revocar y eliminar | `PENDIENTE` |
-| `greenhouse_auth.client_consents` | `PENDIENTE` | `run_owned` | consentimiento | `planned` | revocar y eliminar | `PENDIENTE` |
-| `greenhouse_auth.authorization_codes` | `conteo; sin hash` | `run_owned` | code PKCE | `planned` | expirar/eliminar | `PENDIENTE` |
-| `greenhouse_auth.refresh_tokens` | `conteo; sin hash` | `run_owned` | familia refresh | `planned` | revocar/eliminar | `PENDIENTE` |
-| `greenhouse_auth.access_tokens` | `conteo; sin jti` | `run_owned` | access tokens | `planned` | revocar/eliminar | `PENDIENTE` |
-| sesiones/evidencia upstream | `conteo; sin hash` | `run_owned|shared` | autenticación | `planned` | cerrar; proteger sesión compartida | `PENDIENTE` |
-| audit append-only identidad/OAuth | `rango temporal + correlation_id redactado` | `retained_audit` | evidencia | `planned` | conservar sin FK | `PENDIENTE` |
+| Sistema/tabla                                    | ID exacto                                   | Ownership        | Relación con la corrida  | Estado            | Acción de retiro      | Readback                            |
+| ------------------------------------------------ | ------------------------------------------- | ---------------- | ------------------------ | ----------------- | --------------------- | ----------------------------------- | ----------- |
+| `greenhouse_core.organizations`                  | `PENDIENTE`                                 | `run_owned`      | organización canary      | `planned`         | hard delete al final  | `PENDIENTE`                         |
+| `greenhouse_core.organization_lifecycle_history` | `conteo esperado: 0`                        | `forbidden`      | bloqueo de borrado       | `planned`         | nunca crear/borrar    | `PENDIENTE`                         |
+| `greenhouse_core.external_canary_registrations`  | `PENDIENTE`                                 | `run_owned`      | raíz del fixture         | `planned`         | revocar y eliminar    | `PENDIENTE`                         |
+| `greenhouse_core.external_identity_environments` | `PENDIENTE`                                 | `shared          | run_owned`               | issuer externo    | `planned`             | conservar salvo ownership exclusivo | `PENDIENTE` |
+| `greenhouse_core.external_organization_bindings` | `PENDIENTE`                                 | `run_owned`      | binding purpose canary   | `planned`         | revocar y eliminar    | `PENDIENTE`                         |
+| `greenhouse_core.external_capability_grants`     | `PENDIENTE`                                 | `run_owned`      | capability read-only     | `planned`         | revocar y eliminar    | `PENDIENTE`                         |
+| `greenhouse_core.external_member_invitations`    | `PENDIENTE`                                 | `run_owned`      | alta sintética           | `planned`         | revocar y eliminar    | `PENDIENTE`                         |
+| `greenhouse_core.identity_profiles`              | `PENDIENTE`                                 | `run_owned`      | persona `smoke_test`     | `planned`         | desactivar y eliminar | `PENDIENTE`                         |
+| `greenhouse_core.identity_profile_source_links`  | `PENDIENTE`                                 | `run_owned`      | identidad login          | `planned`         | desactivar y eliminar | `PENDIENTE`                         |
+| `greenhouse_auth.oauth_clients`                  | `PENDIENTE`                                 | `shared          | run_owned`               | cliente de prueba | `planned`             | retirar; eliminar sólo si exclusivo | `PENDIENTE` |
+| `greenhouse_auth.authorization_contexts`         | `PENDIENTE`                                 | `run_owned`      | contexto server-selected | `planned`         | revocar y eliminar    | `PENDIENTE`                         |
+| `greenhouse_auth.client_consents`                | `PENDIENTE`                                 | `run_owned`      | consentimiento           | `planned`         | revocar y eliminar    | `PENDIENTE`                         |
+| `greenhouse_auth.authorization_codes`            | `conteo; sin hash`                          | `run_owned`      | code PKCE                | `planned`         | expirar/eliminar      | `PENDIENTE`                         |
+| `greenhouse_auth.refresh_tokens`                 | `conteo; sin hash`                          | `run_owned`      | familia refresh          | `planned`         | revocar/eliminar      | `PENDIENTE`                         |
+| `greenhouse_auth.access_tokens`                  | `conteo; sin jti`                           | `run_owned`      | access tokens            | `planned`         | revocar/eliminar      | `PENDIENTE`                         |
+| sesiones/evidencia upstream                      | `conteo; sin hash`                          | `run_owned       | shared`                  | autenticación     | `planned`             | cerrar; proteger sesión compartida  | `PENDIENTE` |
+| audit append-only identidad/OAuth                | `rango temporal + correlation_id redactado` | `retained_audit` | evidencia                | `planned`         | conservar sin FK      | `PENDIENTE`                         |
 
 Agregar cualquier asset descubierto antes de continuar. Un asset no inventariado deja el manifiesto en
 `blocked`; nunca se corrige omitiéndolo del readback.
@@ -81,9 +81,15 @@ Agregar cualquier asset descubierto antes de continuar. Un asset no inventariado
 El wrapper sólo invoca el command server-side; no contiene SQL ni borra por nombre/correo.
 
 ```text
-pnpm identity:external-canary:cleanup -- --registration-id <id> --dry-run
-pnpm identity:external-canary:cleanup -- --registration-id <id> --apply
+pnpm identity:external-canary:readback
+pnpm identity:external-canary:cleanup -- --registration <id> --reason "TASK-1832 inspección de retiro"
+pnpm identity:external-canary:cleanup -- --registration <id> --reason "TASK-1832 retiro aprobado" --apply --confirm-registration <mismo-id>
+pnpm identity:external-canary:readback
 ```
+
+El primer y el último comando son readbacks agregados de sólo lectura. El primer cleanup es dry-run por defecto;
+el segundo sólo puede aplicar con el perfil DB migrator y exige que la confirmación coincida byte por byte con
+el registro. El endpoint admin de cleanup no tiene autoridad para hard delete bajo el rol runtime.
 
 - `dry_run_at`: `PENDIENTE`
 - `dry_run_result`: `PENDIENTE`

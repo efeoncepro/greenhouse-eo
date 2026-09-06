@@ -89,6 +89,9 @@ const fixture = () => {
         bindingId: 'binding-a',
         organizationId: 'org-a',
         externalOrganizationRef: 'external-a',
+        bindingPurpose: 'customer',
+        canaryRegistrationId: null,
+        expiresAt: null,
         grantsVersion: 3,
         grants: ['capability.a'],
         designatedAdmin: false

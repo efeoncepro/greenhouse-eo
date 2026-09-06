@@ -15,6 +15,10 @@ export type ExternalAccessErrorCode =
   | 'invitation_not_open'
   | 'invitation_expired'
   | 'identity_collision'
+  | 'canary_not_registered'
+  | 'canary_expired'
+  | 'capability_not_allowed'
+  | 'canary_cleanup_blocked'
   // TASK-1837 — autoridad delegada, topes de reenvío/asientos.
   | 'forbidden'
   | 'rate_limited'
@@ -30,6 +34,10 @@ const STATUS_BY_CODE: Record<ExternalAccessErrorCode, number> = {
   invitation_not_open: 409,
   invitation_expired: 410,
   identity_collision: 409,
+  canary_not_registered: 404,
+  canary_expired: 410,
+  capability_not_allowed: 403,
+  canary_cleanup_blocked: 409,
   forbidden: 403,
   rate_limited: 429,
   limit_reached: 422

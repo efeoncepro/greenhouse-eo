@@ -6,6 +6,7 @@ import type {
   EligibleClientOrganization,
   ExternalBindingStatus,
   ExternalCapabilityGrant,
+  ExternalCanaryRegistration,
   ExternalIdentityEnvironment,
   ExternalMemberInvitation,
   ExternalOrganizationBinding
@@ -36,6 +37,9 @@ type EnvironmentRow = {
 
 type BindingRow = {
   population: ExternalOrganizationBinding['population']
+  binding_purpose: ExternalOrganizationBinding['bindingPurpose']
+  canary_registration_id: string | null
+  expires_at: string | Date | null
   binding_id: string
   organization_id: string
   organization_name: string | null
@@ -61,6 +65,26 @@ type GrantRow = {
   reason: string | null
   granted_by: string
   granted_at: string | Date
+  expires_at: string | Date | null
+  revoked_by: string | null
+  revoked_at: string | Date | null
+  revoke_reason: string | null
+}
+
+export type CanaryRegistrationRow = {
+  canary_registration_id: string
+  run_id: string
+  organization_id: string
+  public_id: string | null
+  organization_name: string
+  environment_id: string
+  external_organization_ref: string
+  capability: ExternalCanaryRegistration['capability']
+  status: ExternalCanaryRegistration['status']
+  reason: string
+  registered_by: string
+  registered_at: string | Date
+  expires_at: string | Date
   revoked_by: string | null
   revoked_at: string | Date | null
   revoke_reason: string | null
@@ -99,7 +123,7 @@ type EligibleOrganizationRow = {
 }
 
 const iso = (value: string | Date) => (value instanceof Date ? value.toISOString() : new Date(value).toISOString())
-const isoOrNull = (value: string | Date | null) => (value === null ? null : iso(value))
+const isoOrNull = (value: string | Date | null | undefined) => (value == null ? null : iso(value))
 
 export const ENVIRONMENT_SELECT = `
   environment_id, display_name, provider, provider_environment_ref, issuer_url, jwks_uri, audience,
@@ -108,13 +132,20 @@ export const ENVIRONMENT_SELECT = `
 
 export const BINDING_SELECT = `
   b.binding_id, b.organization_id, o.organization_name, b.environment_id, b.external_organization_ref,
-  b.population, b.status, b.grants_version, b.designated_admin_profile_id, b.reason, b.bound_by, b.bound_at,
+  b.population, b.binding_purpose, b.canary_registration_id, b.expires_at,
+  b.status, b.grants_version, b.designated_admin_profile_id, b.reason, b.bound_by, b.bound_at,
   b.revoked_by, b.revoked_at, b.revoke_reason
 `
 
 export const GRANT_SELECT = `
   grant_id, binding_id, capability, profile_id, status, reason, granted_by, granted_at,
-  revoked_by, revoked_at, revoke_reason
+  expires_at, revoked_by, revoked_at, revoke_reason
+`
+
+export const CANARY_REGISTRATION_SELECT = `
+  r.canary_registration_id, r.run_id, r.organization_id, o.public_id, o.organization_name,
+  r.environment_id, r.external_organization_ref, r.capability, r.status, r.reason,
+  r.registered_by, r.registered_at, r.expires_at, r.revoked_by, r.revoked_at, r.revoke_reason
 `
 
 export const INVITATION_SELECT = `
@@ -144,6 +175,9 @@ export const mapEnvironmentRow = (row: EnvironmentRow): ExternalIdentityEnvironm
 export const mapBindingRow = (row: BindingRow): ExternalOrganizationBinding => ({
   bindingId: row.binding_id,
   population: row.population,
+  bindingPurpose: row.binding_purpose ?? (row.population === 'external' ? 'customer' : null),
+  canaryRegistrationId: row.canary_registration_id ?? null,
+  expiresAt: isoOrNull(row.expires_at),
   organizationId: row.organization_id,
   organizationName: row.organization_name,
   environmentId: row.environment_id,
@@ -168,6 +202,26 @@ export const mapGrantRow = (row: GrantRow): ExternalCapabilityGrant => ({
   reason: row.reason,
   grantedBy: row.granted_by,
   grantedAt: iso(row.granted_at),
+  expiresAt: isoOrNull(row.expires_at),
+  revokedBy: row.revoked_by,
+  revokedAt: isoOrNull(row.revoked_at),
+  revokeReason: row.revoke_reason
+})
+
+export const mapCanaryRegistrationRow = (row: CanaryRegistrationRow): ExternalCanaryRegistration => ({
+  canaryRegistrationId: row.canary_registration_id,
+  runId: row.run_id,
+  organizationId: row.organization_id,
+  organizationPublicId: row.public_id,
+  organizationName: row.organization_name,
+  environmentId: row.environment_id,
+  externalOrganizationRef: row.external_organization_ref,
+  capability: row.capability,
+  status: row.status,
+  reason: row.reason,
+  registeredBy: row.registered_by,
+  registeredAt: iso(row.registered_at),
+  expiresAt: iso(row.expires_at),
   revokedBy: row.revoked_by,
   revokedAt: isoOrNull(row.revoked_at),
   revokeReason: row.revoke_reason
@@ -272,6 +326,40 @@ export const getExternalOrganizationBinding = async (
   )
 
   return rows[0] ? mapBindingRow(rows[0]) : null
+}
+
+export const getExternalCanaryRegistration = async (
+  canaryRegistrationId: string
+): Promise<ExternalCanaryRegistration | null> => {
+  const rows = await query<CanaryRegistrationRow>(
+    `SELECT ${CANARY_REGISTRATION_SELECT}
+       FROM greenhouse_core.external_canary_registrations r
+       JOIN greenhouse_core.organizations o ON o.organization_id = r.organization_id
+      WHERE r.canary_registration_id = $1`,
+    [canaryRegistrationId]
+  )
+
+  return rows[0] ? mapCanaryRegistrationRow(rows[0]) : null
+}
+
+export const listExternalCanaryRegistrations = async ({
+  status = null,
+  limit = 100
+}: {
+  status?: ExternalCanaryRegistration['status'] | null
+  limit?: number
+} = {}): Promise<ExternalCanaryRegistration[]> => {
+  const rows = await query<CanaryRegistrationRow>(
+    `SELECT ${CANARY_REGISTRATION_SELECT}
+       FROM greenhouse_core.external_canary_registrations r
+       JOIN greenhouse_core.organizations o ON o.organization_id = r.organization_id
+      WHERE ($1::text IS NULL OR r.status = $1)
+      ORDER BY r.registered_at DESC, r.canary_registration_id COLLATE "C"
+      LIMIT $2`,
+    [status, limit]
+  )
+
+  return rows.map(mapCanaryRegistrationRow)
 }
 
 export const listExternalOrganizationBindings = async ({

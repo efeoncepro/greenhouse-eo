@@ -3,7 +3,6 @@ import type { PoolClient } from 'pg'
 
 import { resolveOrganizationLogoUrl } from '@/lib/account-360/resolve-organization-logo'
 
-
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 import { generateMembershipId, nextPublicId } from '@/lib/account-360/id-generation'
 import { sanitizeSnapshotForPresentation } from '@/lib/finance/client-economics-presentation'
@@ -19,11 +18,7 @@ import type { OrganizationClientFinance, OrganizationFinanceSummary } from '@/vi
  * pool runner. Backward compat 100% — existing callers pass no `client` and
  * behave identically to pre-TASK-872.
  */
-const runQueryWithClient = async <T = unknown>(
-  text: string,
-  params: unknown[],
-  client?: PoolClient
-): Promise<T[]> => {
+const runQueryWithClient = async <T = unknown>(text: string, params: unknown[], client?: PoolClient): Promise<T[]> => {
   if (client) {
     const result = await client.query<T extends Record<string, unknown> ? T : never>(text, params)
 
@@ -227,11 +222,13 @@ const normalizeDetail = (r: OrgDetailRow): OrganizationDetail => ({
   taxId: r.tax_id,
   taxIdType: r.tax_id_type,
   notes: r.notes,
-  spaces: Array.isArray(r.spaces) ? r.spaces as OrganizationSpace[] : null,
-  people: Array.isArray(r.people) ? (r.people as OrganizationPerson[]).map(person => ({
-    ...person,
-    assignedFte: toNullableNum(person.assignedFte)
-  })) : null
+  spaces: Array.isArray(r.spaces) ? (r.spaces as OrganizationSpace[]) : null,
+  people: Array.isArray(r.people)
+    ? (r.people as OrganizationPerson[]).map(person => ({
+        ...person,
+        assignedFte: toNullableNum(person.assignedFte)
+      }))
+    : null
 })
 
 const normalizeMembership = (r: MembershipRow): OrganizationPerson => ({
@@ -258,7 +255,7 @@ const normalizePersonMembership = (r: MembershipRow): PersonMembership => ({
   organizationId: r.organization_id,
   organizationName: r.organization_name || '',
   spaceId: r.space_id,
-  clientId: (r as Record<string, unknown>).client_id as string | null ?? null,
+  clientId: ((r as Record<string, unknown>).client_id as string | null) ?? null,
   membershipType: r.membership_type,
   roleLabel: r.role_label,
   department: r.department,
@@ -302,11 +299,14 @@ export const getOrganizationList = async (params: {
     queryParams.push(params.type)
   }
 
-  const countRows = await runGreenhousePostgresQuery<CountRow>(`
+  const countRows = await runGreenhousePostgresQuery<CountRow>(
+    `
     SELECT COUNT(*)::text AS total
     FROM greenhouse_serving.organization_360 o
     WHERE TRUE ${filters}
-  `, queryParams)
+  `,
+    queryParams
+  )
 
   const total = toNum(countRows[0]?.total)
 
@@ -316,7 +316,8 @@ export const getOrganizationList = async (params: {
   paramIdx++
   const offsetParam = paramIdx
 
-  const rows = await runGreenhousePostgresQuery<OrgListRow>(`
+  const rows = await runGreenhousePostgresQuery<OrgListRow>(
+    `
     SELECT
       organization_id, public_id, organization_name, legal_name,
       organization_type, industry, country, hubspot_company_id, logo_asset_id, website_url, is_operating_entity, status, active,
@@ -326,7 +327,9 @@ export const getOrganizationList = async (params: {
     WHERE TRUE ${filters}
     ORDER BY organization_name
     LIMIT $${limitParam} OFFSET $${offsetParam}
-  `, [...queryParams, pageSize, offset])
+  `,
+    [...queryParams, pageSize, offset]
+  )
 
   return {
     items: rows.map(normalizeListItem),
@@ -337,7 +340,8 @@ export const getOrganizationList = async (params: {
 }
 
 export const getOrganizationDetail = async (id: string): Promise<OrganizationDetail | null> => {
-  const rows = await runGreenhousePostgresQuery<OrgDetailRow>(`
+  const rows = await runGreenhousePostgresQuery<OrgDetailRow>(
+    `
     SELECT
       organization_id, public_id, organization_name, legal_name,
       organization_type, tax_id, tax_id_type, industry, country, hubspot_company_id,
@@ -348,7 +352,9 @@ export const getOrganizationDetail = async (id: string): Promise<OrganizationDet
     FROM greenhouse_serving.organization_360
     WHERE organization_id = $1 OR public_id = $1
     LIMIT 1
-  `, [id])
+  `,
+    [id]
+  )
 
   return rows.length > 0 ? normalizeDetail(rows[0]) : null
 }
@@ -356,7 +362,6 @@ export const getOrganizationDetail = async (id: string): Promise<OrganizationDet
 export const getOrganizationOperationalMetrics = async (organizationId: string) => {
   return getOrganizationOperationalServing(organizationId)
 }
-
 
 export const updateOrganization = async (
   id: string,
@@ -402,24 +407,31 @@ export const updateOrganization = async (
 
   updates.push('updated_at = CURRENT_TIMESTAMP')
 
-  await runGreenhousePostgresQuery(`
+  await runGreenhousePostgresQuery(
+    `
     UPDATE greenhouse_core.organizations
     SET ${updates.join(', ')}
     WHERE organization_id = $1
-  `, params)
+  `,
+    params
+  )
 
   await publishOutboxEvent({
     aggregateType: AGGREGATE_TYPES.organization,
     aggregateId: id,
     eventType: EVENT_TYPES.organizationUpdated,
-    payload: { organizationId: id, updatedFields: Object.keys(data).filter(k => data[k as keyof typeof data] !== undefined) }
+    payload: {
+      organizationId: id,
+      updatedFields: Object.keys(data).filter(k => data[k as keyof typeof data] !== undefined)
+    }
   })
 
   return { updated: true }
 }
 
 export const getOrganizationMemberships = async (orgId: string): Promise<OrganizationPerson[]> => {
-  const rows = await runGreenhousePostgresQuery<MembershipRow>(`
+  const rows = await runGreenhousePostgresQuery<MembershipRow>(
+    `
     SELECT
       pm.membership_id, pm.public_id, pm.profile_id,
       pm.organization_id,
@@ -457,15 +469,14 @@ export const getOrganizationMemberships = async (orgId: string): Promise<Organiz
     ) assignment_summary ON TRUE
     WHERE pm.organization_id = $1 AND pm.active = TRUE
     ORDER BY pm.is_primary DESC, ip.full_name NULLS LAST
-  `, [orgId])
+  `,
+    [orgId]
+  )
 
   return rows.map(normalizeMembership)
 }
 
-export const createMembership = async (
-  input: CreateMembershipInput,
-  options: { client?: PoolClient } = {}
-) => {
+export const createMembership = async (input: CreateMembershipInput, options: { client?: PoolClient } = {}) => {
   const membershipId = generateMembershipId()
   const publicId = await nextPublicId('EO-MBR')
 
@@ -496,7 +507,12 @@ export const createMembership = async (
       aggregateType: AGGREGATE_TYPES.membership,
       aggregateId: membershipId,
       eventType: EVENT_TYPES.membershipCreated,
-      payload: { membershipId, profileId: input.profileId, organizationId: input.organizationId, spaceId: input.spaceId ?? null }
+      payload: {
+        membershipId,
+        profileId: input.profileId,
+        organizationId: input.organizationId,
+        spaceId: input.spaceId ?? null
+      }
     },
     options.client
   )
@@ -538,11 +554,14 @@ export const updateMembership = async (
 
   updates.push('updated_at = CURRENT_TIMESTAMP')
 
-  await runGreenhousePostgresQuery(`
+  await runGreenhousePostgresQuery(
+    `
     UPDATE greenhouse_core.person_memberships
     SET ${updates.join(', ')}
     WHERE membership_id = $1
-  `, params)
+  `,
+    params
+  )
 
   await publishOutboxEvent({
     aggregateType: AGGREGATE_TYPES.membership,
@@ -554,10 +573,7 @@ export const updateMembership = async (
   return { updated: true }
 }
 
-export const deactivateMembership = async (
-  membershipId: string,
-  options: { client?: PoolClient } = {}
-) => {
+export const deactivateMembership = async (membershipId: string, options: { client?: PoolClient } = {}) => {
   await runQueryWithClient(
     `UPDATE greenhouse_core.person_memberships
      SET active = FALSE, status = 'inactive', updated_at = CURRENT_TIMESTAMP
@@ -604,7 +620,8 @@ export const getOrganizationFinanceSummary = async (
   month: number
 ): Promise<OrganizationFinanceSummary> => {
   const queryRows = () =>
-    runGreenhousePostgresQuery<OrgFinanceRow>(`
+    runGreenhousePostgresQuery<OrgFinanceRow>(
+      `
       SELECT
         ce.client_id, ce.client_name,
         ce.total_revenue_clp, COALESCE(ce.labor_cost_clp, 0) AS labor_cost_clp,
@@ -620,16 +637,14 @@ export const getOrganizationFinanceSummary = async (
             AND (cp.client_id = ce.client_id OR cp.organization_id = ce.client_id)
         )
       ORDER BY ce.total_revenue_clp DESC
-    `, [orgId, year, month])
+    `,
+      [orgId, year, month]
+    )
 
   let rows = await queryRows()
 
   if (rows.length === 0) {
-    await computeClientEconomicsSnapshots(
-      year,
-      month,
-      `Auto-computed on organization finance access for org ${orgId}`
-    )
+    await computeClientEconomicsSnapshots(year, month, `Auto-computed on organization finance access for org ${orgId}`)
     rows = await queryRows()
   }
 
@@ -666,11 +681,15 @@ export const getOrganizationFinanceSummary = async (
   const validNetRevenue = validForNet.reduce((sum, client) => sum + client.totalRevenueClp, 0)
 
   if (validGrossRevenue > 0) {
-    avgGross = validForGross.reduce((sum, client) => sum + (client.grossMarginPercent ?? 0) * client.totalRevenueClp, 0) / validGrossRevenue
+    avgGross =
+      validForGross.reduce((sum, client) => sum + (client.grossMarginPercent ?? 0) * client.totalRevenueClp, 0) /
+      validGrossRevenue
   }
 
   if (validNetRevenue > 0) {
-    avgNet = validForNet.reduce((sum, client) => sum + (client.netMarginPercent ?? 0) * client.totalRevenueClp, 0) / validNetRevenue
+    avgNet =
+      validForNet.reduce((sum, client) => sum + (client.netMarginPercent ?? 0) * client.totalRevenueClp, 0) /
+      validNetRevenue
   }
 
   return {
@@ -695,32 +714,50 @@ interface ProfileRow extends Record<string, unknown> {
   profile_id: string
   full_name: string | null
   canonical_email: string | null
+  data_origin?: string
 }
 
-export const findProfileByEmail = async (email: string): Promise<{ profileId: string; fullName: string | null } | null> => {
-  const rows = await runGreenhousePostgresQuery<ProfileRow>(`
-    SELECT profile_id, full_name, canonical_email
+export const findProfileByEmail = async (
+  email: string
+): Promise<{ profileId: string; fullName: string | null } | null> => {
+  const rows = await runGreenhousePostgresQuery<ProfileRow>(
+    `
+    SELECT profile_id, full_name, canonical_email, data_origin
     FROM greenhouse_core.identity_profiles
-    WHERE LOWER(canonical_email) = LOWER($1) AND active = TRUE
+    WHERE LOWER(canonical_email) = LOWER($1)
+      AND active = TRUE
+      AND data_origin IS DISTINCT FROM 'smoke_test'
     LIMIT 1
-  `, [email])
+  `,
+    [email]
+  )
 
-  if (rows.length === 0) return null
+  const visible = rows.find(row => row.data_origin !== 'smoke_test')
 
-  return { profileId: rows[0].profile_id, fullName: rows[0].full_name ?? null }
+  if (!visible) return null
+
+  return { profileId: visible.profile_id, fullName: visible.full_name ?? null }
 }
 
 export const membershipExists = async (profileId: string, organizationId: string): Promise<boolean> => {
-  const rows = await runGreenhousePostgresQuery<Record<string, unknown>>(`
+  const rows = await runGreenhousePostgresQuery<Record<string, unknown>>(
+    `
     SELECT 1 FROM greenhouse_core.person_memberships
     WHERE profile_id = $1 AND organization_id = $2 AND active = TRUE
     LIMIT 1
-  `, [profileId, organizationId])
+  `,
+    [profileId, organizationId]
+  )
 
   return rows.length > 0
 }
 
-const normalizeToken = (v: string) => v.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+const normalizeToken = (v: string) =>
+  v
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
 
 const buildIdentityProfileId = (source: { sourceSystem: string; sourceObjectType: string; sourceObjectId: string }) =>
   `identity-${normalizeToken(source.sourceSystem)}-${normalizeToken(source.sourceObjectType)}-${normalizeToken(source.sourceObjectId)}`
@@ -753,7 +790,8 @@ export const createIdentityProfile = async (data: {
 
   const profileId = buildIdentityProfileId(data)
 
-  await runGreenhousePostgresQuery(`
+  await runGreenhousePostgresQuery(
+    `
     INSERT INTO greenhouse_core.identity_profiles (
       profile_id, full_name, canonical_email, profile_type,
       primary_source_system, primary_source_object_type, primary_source_object_id,
@@ -765,14 +803,9 @@ export const createIdentityProfile = async (data: {
       canonical_email = COALESCE(EXCLUDED.canonical_email, greenhouse_core.identity_profiles.canonical_email),
       updated_at = CURRENT_TIMESTAMP,
       active = TRUE
-  `, [
-    profileId,
-    data.fullName,
-    canonicalEmail,
-    data.sourceSystem,
-    data.sourceObjectType,
-    data.sourceObjectId
-  ])
+  `,
+    [profileId, data.fullName, canonicalEmail, data.sourceSystem, data.sourceObjectType, data.sourceObjectId]
+  )
 
   return profileId
 }
@@ -819,22 +852,31 @@ export const ensureOrganizationContactMembership = async (data: {
 
 // ── People search ──────────────────────────────────────────────────────
 
-export const searchProfiles = async (query: string): Promise<Array<{ profileId: string; fullName: string | null; canonicalEmail: string | null }>> => {
+export const searchProfiles = async (
+  query: string
+): Promise<Array<{ profileId: string; fullName: string | null; canonicalEmail: string | null }>> => {
   const pattern = `%${query}%`
 
-  const rows = await runGreenhousePostgresQuery<ProfileRow>(`
-    SELECT profile_id, full_name, canonical_email
+  const rows = await runGreenhousePostgresQuery<ProfileRow>(
+    `
+    SELECT profile_id, full_name, canonical_email, data_origin
     FROM greenhouse_core.identity_profiles
-    WHERE (full_name ILIKE $1 OR canonical_email ILIKE $1) AND active = TRUE
+    WHERE (full_name ILIKE $1 OR canonical_email ILIKE $1)
+      AND active = TRUE
+      AND data_origin IS DISTINCT FROM 'smoke_test'
     ORDER BY full_name NULLS LAST
     LIMIT 10
-  `, [pattern])
+  `,
+    [pattern]
+  )
 
-  return rows.map(r => ({
-    profileId: r.profile_id,
-    fullName: r.full_name ?? null,
-    canonicalEmail: r.canonical_email ?? null
-  }))
+  return rows
+    .filter(r => r.data_origin !== 'smoke_test')
+    .map(r => ({
+      profileId: r.profile_id,
+      fullName: r.full_name ?? null,
+      canonicalEmail: r.canonical_email ?? null
+    }))
 }
 
 // ── Organization search ───────────────────────────────────────────────
@@ -849,16 +891,21 @@ interface SpaceClientIdRow extends Record<string, unknown> {
   client_id: string | null
 }
 
-export const searchOrganizations = async (query: string): Promise<Array<{ organizationId: string; organizationName: string; publicId: string }>> => {
+export const searchOrganizations = async (
+  query: string
+): Promise<Array<{ organizationId: string; organizationName: string; publicId: string }>> => {
   const pattern = `%${query}%`
 
-  const rows = await runGreenhousePostgresQuery<OrgSearchRow>(`
+  const rows = await runGreenhousePostgresQuery<OrgSearchRow>(
+    `
     SELECT organization_id, organization_name, public_id
     FROM greenhouse_core.organizations
     WHERE (organization_name ILIKE $1 OR legal_name ILIKE $1) AND active = TRUE
     ORDER BY organization_name
     LIMIT 10
-  `, [pattern])
+  `,
+    [pattern]
+  )
 
   return rows.map(r => ({
     organizationId: r.organization_id,
@@ -868,24 +915,26 @@ export const searchOrganizations = async (query: string): Promise<Array<{ organi
 }
 
 export const getOrganizationClientIds = async (organizationId: string): Promise<string[]> => {
-  const rows = await runGreenhousePostgresQuery<SpaceClientIdRow>(`
+  const rows = await runGreenhousePostgresQuery<SpaceClientIdRow>(
+    `
     SELECT DISTINCT s.client_id
     FROM greenhouse_core.spaces s
     WHERE s.organization_id = $1
       AND s.active = TRUE
       AND s.client_id IS NOT NULL
     ORDER BY s.client_id
-  `, [organizationId])
+  `,
+    [organizationId]
+  )
 
-  return rows
-    .map(row => (typeof row.client_id === 'string' ? row.client_id.trim() : ''))
-    .filter(Boolean)
+  return rows.map(row => (typeof row.client_id === 'string' ? row.client_id.trim() : '')).filter(Boolean)
 }
 
 // ── Person memberships ─────────────────────────────────────────────────
 
 export const getPersonMemberships = async (profileId: string): Promise<PersonMembership[]> => {
-  const rows = await runGreenhousePostgresQuery<MembershipRow>(`
+  const rows = await runGreenhousePostgresQuery<MembershipRow>(
+    `
     SELECT
       pm.membership_id, pm.public_id,
       pm.profile_id,
@@ -905,7 +954,9 @@ export const getPersonMemberships = async (profileId: string): Promise<PersonMem
     LEFT JOIN greenhouse_core.spaces s ON s.space_id = pm.space_id
     WHERE pm.profile_id = $1 AND pm.active = TRUE
     ORDER BY pm.is_primary DESC, o.organization_name
-  `, [profileId])
+  `,
+    [profileId]
+  )
 
   return rows.map(normalizePersonMembership)
 }

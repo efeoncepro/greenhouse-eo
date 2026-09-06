@@ -18,12 +18,11 @@ Las señales `identity.external_binding.unaudited_write` y
 Contrato: [autoridad interna nativa](../../architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md);
 operación corporativa: [runbook de cohorte](../../operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
 
-
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-09-04 por Claude
-> **Ultima actualizacion:** 2026-09-06 por Claude (TASK-1837 en produccion)
-> **Modulo:** Identidad y acceso (EPIC-044 U04 · TASK-1631 · U12 · TASK-1837)
+> **Ultima actualizacion:** 2026-09-06 por Codex (TASK-1832 canary externo eliminable, code complete)
+> **Modulo:** Identidad y acceso (EPIC-044 U04 · TASK-1631 · U07 · TASK-1832 · U12 · TASK-1837)
 > **Documentacion tecnica:** [EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md](../../architecture/EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md), [EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md), [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md), [EPIC-044](../../epics/in-progress/EPIC-044-efeonce-identity-authorization-server-and-mcp-federation.md), [TASK-1631](../../tasks/in-progress/TASK-1631-efeonce-customer-identity-mcp-federation.md)
 > **Manual de uso:** [Operar el binding de identidad externa](../../manual-de-uso/identity/operar-binding-identidad-externa.md)
 
@@ -35,9 +34,9 @@ Hoy el gateway MCP de Efeonce (`mcp.efeonce.org`) solo deja entrar a personas de
 persona de un **cliente** pueda usar el MCP con su propia identidad, Greenhouse necesita saber tres cosas antes
 de que exista cualquier login:
 
-1. **De qué emisor de identidad** viene esa persona (el *environment*).
-2. **A qué organización cliente** de Account 360 pertenece (el *binding*).
-3. **Qué puede hacer** ahí y **quién la invitó** (los *grants* y la *invitación*).
+1. **De qué emisor de identidad** viene esa persona (el _environment_).
+2. **A qué organización cliente** de Account 360 pertenece (el _binding_).
+3. **Qué puede hacer** ahí y **quién la invitó** (los _grants_ y la _invitación_).
 
 El **binding de identidad externa** es ese grafo. Es la fundación de datos y de reglas que después consumirán el
 emisor propio de Efeonce (`auth.efeonce.org`) y el gateway MCP. Este slice construye el grafo y las decisiones;
@@ -46,9 +45,31 @@ no construye el login ni la pantalla.
 La regla que gobierna todo: **nadie entra por ser quien dice ser; entra porque una organización cliente activa lo
 ligó y una persona autorizada lo invitó.** Un correo con dominio del cliente no vale nada por sí solo.
 
+## Excepción controlada: canary externo, no cliente
+
+TASK-1832 agrega una segunda finalidad externa sin relajar la regla comercial. Un binding normal tiene propósito
+`customer` y continúa exigiendo una organización `client|both` en `active_client`. Un binding de propósito
+`canary` sólo puede existir para una registración temporal exacta, con vencimiento, creada por un command
+separado. Nunca vuelve elegible a esa organización como cliente.
+
+La organización canary es dedicada y eliminable: nace inactiva, `other`, `disqualified`, sin tax ID, HubSpot,
+spaces, memberships ni historia de lifecycle. Sus personas son exclusivamente `smoke_test` y no aparecen en
+Person 360 ni en la búsqueda de Account 360. No se reutiliza una party existente; el candidato `EO-ORG-0050`
+quedó descartado porque su historia append-only impediría garantizar el retiro.
+
+El canary sólo puede recibir `growth.seo.observation.read`, nunca un administrador designado ni una invitación
+delegada. En el gateway, esa finalidad sólo habilita `get_seo_entitlement`. Dos gates independientes, apagados
+por defecto, cortan emisión/resolución y dispatch. Esto permite probar discovery, consentimiento, PKCE, refresh y
+revocación sin writes, gasto ni datos de clientes.
+
+Cada corrida comienza con un manifiesto que registra los IDs antes del primer write. El retiro ocurre en dos
+fases: primero se revoca authority; después un cleanup con censo dinámico de FKs borra únicamente el grafo
+run-owned si `unexpected_refs=0`. Audit/outbox se conservan desacoplados y el estado `deleted` sólo se declara con
+readback cero. Detalle operativo: [certificar un cliente MCP con canary sintético](../../manual-de-uso/identity/certificar-cliente-mcp-con-canary-sintetico.md).
+
 > Detalle técnico: ADR de federación [EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md](../../architecture/EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md);
 > dominio en `src/lib/identity/external-access/` (`index.ts`, `types.ts`, `commands.ts`, `store.ts`,
-> `resolve-external-access.ts`).
+> `resolve-external-access.ts` y `canary.ts`).
 
 ## El grafo: organización → environment → binding → grants → personas
 
@@ -64,14 +85,14 @@ Account 360
         └── invitaciones  → personas invitadas; la que queda `linked` ES la membresía de acceso externo
 ```
 
-| Pieza | Qué representa | Quién la crea |
-| --- | --- | --- |
-| **Organización** | Una empresa cliente que ya existe en Account 360. Nunca se crea desde aquí. | Lifecycle de cliente (wizard canónico) |
-| **Environment** | Un emisor de identidad concreto: la URL del issuer, dónde están sus llaves públicas (JWKS), la audiencia esperada y si es un emisor **interno** (Entra de Efeonce) o **externo** (el emisor propio para clientes u otro). | Operador (`efeonce_admin`) |
-| **Binding** | La relación "esta organización usa este environment con esta referencia externa". Es el eje del grafo: de él cuelgan grants e invitaciones. | Operador |
-| **Grant** | Una capability con nombre (por ejemplo `globe.producer.fleet.read`) otorgada a todo el binding o a una sola persona ya ligada. | Operador |
-| **Invitación** | El camino por el que una persona concreta entra. Lleva el correo invitado, si será administrador designado y una fecha de expiración. Cuando la persona la acepta y queda `linked`, esa fila es su membresía. | Operador (emite) · Persona (acepta, en TASK-1830) |
-| **Persona** | Una `identity_profile` de Greenhouse. Si no existía, se crea como contacto externo al aceptar. Una identidad externa activa apunta a UNA sola persona. | Aceptación de la invitación |
+| Pieza            | Qué representa                                                                                                                                                                                                            | Quién la crea                                     |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| **Organización** | Una empresa cliente que ya existe en Account 360. Nunca se crea desde aquí.                                                                                                                                               | Lifecycle de cliente (wizard canónico)            |
+| **Environment**  | Un emisor de identidad concreto: la URL del issuer, dónde están sus llaves públicas (JWKS), la audiencia esperada y si es un emisor **interno** (Entra de Efeonce) o **externo** (el emisor propio para clientes u otro). | Operador (`efeonce_admin`)                        |
+| **Binding**      | La relación "esta organización usa este environment con esta referencia externa". Es el eje del grafo: de él cuelgan grants e invitaciones.                                                                               | Operador                                          |
+| **Grant**        | Una capability con nombre (por ejemplo `globe.producer.fleet.read`) otorgada a todo el binding o a una sola persona ya ligada.                                                                                            | Operador                                          |
+| **Invitación**   | El camino por el que una persona concreta entra. Lleva el correo invitado, si será administrador designado y una fecha de expiración. Cuando la persona la acepta y queda `linked`, esa fila es su membresía.             | Operador (emite) · Persona (acepta, en TASK-1830) |
+| **Persona**      | Una `identity_profile` de Greenhouse. Si no existía, se crea como contacto externo al aceptar. Una identidad externa activa apunta a UNA sola persona.                                                                    | Aceptación de la invitación                       |
 
 Nada se identifica por la URL del emisor en crudo: el environment tiene su propio ID y rotar el issuer es una
 actualización auditada, no una fila nueva.
@@ -85,39 +106,39 @@ actualización auditada, no una fila nueva.
 
 ### Environment
 
-| Estado | Qué significa | Qué permite |
-| --- | --- | --- |
-| `draft` | Registrado pero todavía no confiable. Estado por defecto al crearlo. | Ligar organizaciones y preparar grants. **No** acepta invitaciones ni resuelve acceso. |
-| `active` | El emisor está verificado y en uso. | Todo: ligar, otorgar, invitar, aceptar y resolver acceso. |
-| `suspended` | Pausa temporal (incidente, rotación, sospecha). | Nada nuevo. El gateway responde `environment_inactive` a cualquier token de ese emisor. |
-| `retired` | Cerrado de forma definitiva. | Nada. Libera la URL del issuer para un environment futuro. |
+| Estado      | Qué significa                                                        | Qué permite                                                                             |
+| ----------- | -------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `draft`     | Registrado pero todavía no confiable. Estado por defecto al crearlo. | Ligar organizaciones y preparar grants. **No** acepta invitaciones ni resuelve acceso.  |
+| `active`    | El emisor está verificado y en uso.                                  | Todo: ligar, otorgar, invitar, aceptar y resolver acceso.                               |
+| `suspended` | Pausa temporal (incidente, rotación, sospecha).                      | Nada nuevo. El gateway responde `environment_inactive` a cualquier token de ese emisor. |
+| `retired`   | Cerrado de forma definitiva.                                         | Nada. Libera la URL del issuer para un environment futuro.                              |
 
 La **clase** del environment (`internal` o `external`) se fija al crearlo y **no se puede cambiar**: si un emisor
 cambia de naturaleza, se retira y se registra otro.
 
 ### Binding
 
-| Estado | Qué significa |
-| --- | --- |
-| `active` | La organización está ligada al environment. Sus grants e invitaciones son válidos. |
+| Estado    | Qué significa                                                                                                                                                 |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `active`  | La organización está ligada al environment. Sus grants e invitaciones son válidos.                                                                            |
 | `revoked` | Se cortó la relación. Todo lo que colgaba (grants, membresías) quedó revocado en la misma operación. No se reactiva: si hace falta, se crea un binding nuevo. |
 
 ### Grant
 
-| Estado | Qué significa |
-| --- | --- |
-| `active` | La capability está otorgada. Si el grant no tiene persona, aplica a todas las membresías ligadas del binding; si tiene persona, solo a ella. |
-| `revoked` | Ya no aplica. Queda como historial. |
+| Estado    | Qué significa                                                                                                                                |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `active`  | La capability está otorgada. Si el grant no tiene persona, aplica a todas las membresías ligadas del binding; si tiene persona, solo a ella. |
+| `revoked` | Ya no aplica. Queda como historial.                                                                                                          |
 
 ### Invitación (y membresía)
 
-| Estado | Qué significa | Qué sigue |
-| --- | --- | --- |
-| `issued` | Se emitió y está abierta, con fecha de expiración (72 h por defecto, máximo 30 días). Con la entrega por sistema, el correo con el enlace sale en el mismo acto. | Esperar a que la persona acepte; si el correo no llegó, reenviar. |
-| `accepted` | Estado intermedio de la aceptación. | Se completa en la misma transacción hacia `linked`. |
-| `linked` | La persona aceptó, quedó unida a su identidad externa y **esta fila es su membresía de acceso**. | Ya puede resolver acceso `bound` en el gateway. |
-| `revoked` | La invitación (abierta o ya ligada) se cerró por decisión del operador, por reemisión, reenvío o revelación, o porque se revocó a la persona o al binding. | Si corresponde, emitir una nueva. |
-| `expired` | Venció sin aceptarse. | Emitir una nueva. |
+| Estado     | Qué significa                                                                                                                                                    | Qué sigue                                                         |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `issued`   | Se emitió y está abierta, con fecha de expiración (72 h por defecto, máximo 30 días). Con la entrega por sistema, el correo con el enlace sale en el mismo acto. | Esperar a que la persona acepte; si el correo no llegó, reenviar. |
+| `accepted` | Estado intermedio de la aceptación.                                                                                                                              | Se completa en la misma transacción hacia `linked`.               |
+| `linked`   | La persona aceptó, quedó unida a su identidad externa y **esta fila es su membresía de acceso**.                                                                 | Ya puede resolver acceso `bound` en el gateway.                   |
+| `revoked`  | La invitación (abierta o ya ligada) se cerró por decisión del operador, por reemisión, reenvío o revelación, o porque se revocó a la persona o al binding.       | Si corresponde, emitir una nueva.                                 |
+| `expired`  | Venció sin aceptarse.                                                                                                                                            | Emitir una nueva.                                                 |
 
 Una organización solo puede tener **una invitación abierta por correo** a la vez. Si el token se perdió, no se
 "recupera": se **rota** (la abierta se revoca y sale una nueva con enlace nuevo), ya sea por reemisión
@@ -139,13 +160,13 @@ aceptar llegará un enlace de acceso (magic link) al mismo correo.
 
 Cada invitación lleva ahora un **estado de entrega** (`delivery_status`) separado del estado de la invitación:
 
-| Estado de entrega | Qué significa | Qué hacer |
-| --- | --- | --- |
-| `not_attempted` | No se intentó enviar: el flag está apagado o el operador pidió entrega manual (`delivery: 'manual'`). | Entregar el enlace por canal seguro (comportamiento previo). |
-| `sent` | El proveedor de correo aceptó el mensaje. Todavía no confirma que llegó. | Esperar; si la persona no lo ve, revisar spam y reenviar. |
-| `delivered` | El proveedor confirmó la entrega en la casilla. | Nada. |
-| `bounced` | La casilla rechazó el correo (no existe, llena, bloqueada). Lo registra el ops-worker al recibir el rebote del proveedor; ese consumer corre sin flag y está vivo también en producción desde el 2026-09-06 (verificado con un rebote real de Resend en staging; ver audit). | Corregir la casilla con el cliente y **reenviar** (ver abajo). Enciende la señal `undelivered` (se la vio encender ok → warning en esa verificación). |
-| `failed` | El envío falló antes de salir (proveedor caído, configuración, plantilla). La invitación **sí quedó emitida**, pero nadie la recibió. | Reintentar con un **reenvío**. La respuesta nunca dice "listo" si el correo no salió. |
+| Estado de entrega | Qué significa                                                                                                                                                                                                                                                                | Qué hacer                                                                                                                                             |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `not_attempted`   | No se intentó enviar: el flag está apagado o el operador pidió entrega manual (`delivery: 'manual'`).                                                                                                                                                                        | Entregar el enlace por canal seguro (comportamiento previo).                                                                                          |
+| `sent`            | El proveedor de correo aceptó el mensaje. Todavía no confirma que llegó.                                                                                                                                                                                                     | Esperar; si la persona no lo ve, revisar spam y reenviar.                                                                                             |
+| `delivered`       | El proveedor confirmó la entrega en la casilla.                                                                                                                                                                                                                              | Nada.                                                                                                                                                 |
+| `bounced`         | La casilla rechazó el correo (no existe, llena, bloqueada). Lo registra el ops-worker al recibir el rebote del proveedor; ese consumer corre sin flag y está vivo también en producción desde el 2026-09-06 (verificado con un rebote real de Resend en staging; ver audit). | Corregir la casilla con el cliente y **reenviar** (ver abajo). Enciende la señal `undelivered` (se la vio encender ok → warning en esa verificación). |
+| `failed`          | El envío falló antes de salir (proveedor caído, configuración, plantilla). La invitación **sí quedó emitida**, pero nadie la recibió.                                                                                                                                        | Reintentar con un **reenvío**. La respuesta nunca dice "listo" si el correo no salió.                                                                 |
 
 También se guardan cuántos intentos hubo (`delivery_attempts`, que un reenvío hereda), cuándo fue el último y el
 código del último error.
@@ -194,12 +215,12 @@ hace que la revocación sea rápida sin tener que perseguir tokens.
 Toda revocación exige un **motivo** escrito, queda en el audit y es idempotente (repetirla no cambia nada y lo
 dice: `changed: false`).
 
-| Alcance | Qué revoca en cadena | `grants_version` |
-| --- | --- | --- |
-| **Binding** | El binding, todos sus grants activos, todas sus membresías `linked` y las invitaciones abiertas. Desactiva los vínculos de identidad que quedan huérfanos y limpia al administrador designado (queda auditado como `designated_admin_cleared`, causa `binding_revoked`). | Sube |
-| **Grant** | Solo ese grant. | Sube |
-| **Persona (member)** | Sus invitaciones/membresías en ese binding y sus grants personales. Si la persona no conserva otra membresía activa en el mismo environment, su vínculo de identidad se desactiva y **su sesión en el emisor muere**. | Sube |
-| **Invitación** | Solo una invitación abierta (`issued`/`accepted`). No toca personas ya ligadas. | No cambia |
+| Alcance              | Qué revoca en cadena                                                                                                                                                                                                                                                     | `grants_version` |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------- |
+| **Binding**          | El binding, todos sus grants activos, todas sus membresías `linked` y las invitaciones abiertas. Desactiva los vínculos de identidad que quedan huérfanos y limpia al administrador designado (queda auditado como `designated_admin_cleared`, causa `binding_revoked`). | Sube             |
+| **Grant**            | Solo ese grant.                                                                                                                                                                                                                                                          | Sube             |
+| **Persona (member)** | Sus invitaciones/membresías en ese binding y sus grants personales. Si la persona no conserva otra membresía activa en el mismo environment, su vínculo de identidad se desactiva y **su sesión en el emisor muere**.                                                    | Sube             |
+| **Invitación**       | Solo una invitación abierta (`issued`/`accepted`). No toca personas ya ligadas.                                                                                                                                                                                          | No cambia        |
 
 Nada se borra: los estados pasan a `revoked` y las filas quedan como historial.
 
@@ -213,13 +234,13 @@ El gateway no lee las tablas. Pregunta a Greenhouse por un lector de solo lectur
 este subject (la identidad que trae el token), ¿qué acceso hay?". La respuesta tiene un **outcome** y, solo cuando
 es `bound`, la lista de membresías con sus grants y su `grants_version`.
 
-| Outcome | Qué significa | Cómo lo vive el cliente |
-| --- | --- | --- |
-| `bound` | Environment activo, subject ligado a una persona activa, con al menos una membresía `linked` bajo un binding activo. | Entra; puede usar las tools que sus grants permitan. |
-| `unbound` | Nadie con esa identidad fue invitado ni ligado nunca en ese environment. | Deny genérico. |
-| `revoked` | La identidad estuvo ligada y fue revocada (persona o binding). | Deny genérico. Para soporte, se distingue de `unbound`: "fue alguien y ya no". |
-| `environment_inactive` | El environment está en `draft`, `suspended` o `retired`. | Deny genérico. Afecta a todas las personas de ese emisor. |
-| `profile_inactive` | La persona existe pero está inactiva o fue fusionada con otra. | Deny genérico. |
+| Outcome                | Qué significa                                                                                                        | Cómo lo vive el cliente                                                        |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `bound`                | Environment activo, subject ligado a una persona activa, con al menos una membresía `linked` bajo un binding activo. | Entra; puede usar las tools que sus grants permitan.                           |
+| `unbound`              | Nadie con esa identidad fue invitado ni ligado nunca en ese environment.                                             | Deny genérico.                                                                 |
+| `revoked`              | La identidad estuvo ligada y fue revocada (persona o binding).                                                       | Deny genérico. Para soporte, se distingue de `unbound`: "fue alguien y ya no". |
+| `environment_inactive` | El environment está en `draft`, `suspended` o `retired`.                                                             | Deny genérico. Afecta a todas las personas de ese emisor.                      |
+| `profile_inactive`     | La persona existe pero está inactiva o fue fusionada con otra.                                                       | Deny genérico.                                                                 |
 
 Toda denegación queda registrada (con el subject **hasheado**, nunca en claro) para que soporte pueda
 reconstruir qué pasó. Los accesos correctos no se registran uno por uno; son el caso normal.
@@ -238,20 +259,20 @@ hoy 9 señales: las 4 originales del binding (tabla siguiente), las 2 de integri
 TASK-1836 (`unaudited_write`, `mixed_population`, descritas al inicio de este documento) y las 3 de entrega de
 invitaciones de TASK-1837 (segunda tabla).
 
-| Señal | Qué detecta | Ventana | Lectura |
-| --- | --- | --- | --- |
-| `identity.external_binding.unbound_dispatch_attempt` | Tokens válidos del emisor que llegaron sin binding, sin persona activa o con environment inactivo. | 24 h | `warning` desde 1, `error` desde 20. Uno o dos suelen ser una invitación mal entregada o un environment en `draft`; muchos, un emisor mal configurado o alguien probando. El smoke `--apply` deja 4 durante 24 h: es esperado. |
-| `identity.external_binding.revoked_still_dispatching` | Identidades revocadas hace más de 5 minutos que siguen intentando entrar. | 24 h | `warning` desde 1, `error` desde 10. El deny funciona (por eso se ve); lo que preocupa es que el cliente no fue avisado o hay un agente automatizado reintentando. |
-| `identity.external_binding.subject_collision` | Un subject externo que apunta a más de una persona, o una persona con más de un subject activo en el mismo environment. | Estado actual | `error` desde 1. Requiere revisión manual de identidad; nunca se resuelve con un merge automático. |
-| `identity.external_binding.orphan_grant` | Grants activos colgando de un binding revocado o de un environment suspendido/retirado. | Estado actual | `error` desde 1. Señala drift: alguien tocó datos fuera de los commands. |
+| Señal                                                 | Qué detecta                                                                                                             | Ventana       | Lectura                                                                                                                                                                                                                        |
+| ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `identity.external_binding.unbound_dispatch_attempt`  | Tokens válidos del emisor que llegaron sin binding, sin persona activa o con environment inactivo.                      | 24 h          | `warning` desde 1, `error` desde 20. Uno o dos suelen ser una invitación mal entregada o un environment en `draft`; muchos, un emisor mal configurado o alguien probando. El smoke `--apply` deja 4 durante 24 h: es esperado. |
+| `identity.external_binding.revoked_still_dispatching` | Identidades revocadas hace más de 5 minutos que siguen intentando entrar.                                               | 24 h          | `warning` desde 1, `error` desde 10. El deny funciona (por eso se ve); lo que preocupa es que el cliente no fue avisado o hay un agente automatizado reintentando.                                                             |
+| `identity.external_binding.subject_collision`         | Un subject externo que apunta a más de una persona, o una persona con más de un subject activo en el mismo environment. | Estado actual | `error` desde 1. Requiere revisión manual de identidad; nunca se resuelve con un merge automático.                                                                                                                             |
+| `identity.external_binding.orphan_grant`              | Grants activos colgando de un binding revocado o de un environment suspendido/retirado.                                 | Estado actual | `error` desde 1. Señala drift: alguien tocó datos fuera de los commands.                                                                                                                                                       |
 
 ### Las 3 señales de entrega de invitaciones (TASK-1837)
 
-| Señal | Qué detecta | Ventana | Lectura |
-| --- | --- | --- | --- |
-| `identity.external_invitation.undelivered` | Invitaciones abiertas (`issued`, no vencidas) cuyo correo rebotó o falló al salir (`delivery_status` en `bounced` o `failed`). | Estado actual | `warning` desde 1, `error` desde 5. Es la señal de "el operador cree que invitó, pero nadie recibió nada". Qué hacer: mirar el detalle del binding, corregir la casilla con el cliente si rebotó (o revisar el proveedor de correo si falló) y **reenviar**. Baja sola cuando la nueva invitación sale bien o la vieja se revoca. |
-| `identity.external_invitation.expired_unaccepted` | Invitaciones que vencieron sin aceptarse en los últimos 7 días (`expired`, o `issued` ya pasadas de fecha sin `accepted_at`). | 7 días | Informativa: `warning` desde 1 y **nunca** `error`. Suele ser una persona que no alcanzó a entrar o un correo que fue a spam. Qué hacer: confirmar con el administrador del cliente y emitir una nueva, ajustando la vigencia si el cliente tarda. |
-| `identity.external_invitation.token_revealed` | Revelaciones del enlace (audit `invitation_token_revealed`). | 24 h | `warning` desde 1, `error` desde 5. Cualquier valor distinto de 0 debe corresponder a una excepción justificada: en el audit tiene que estar quién reveló y por qué. Qué hacer: revisar que cada revelación tenga motivo válido; varias en un día indican que se está usando como vía normal y hay que corregir el proceso (o el correo que no llega). |
+| Señal                                             | Qué detecta                                                                                                                    | Ventana       | Lectura                                                                                                                                                                                                                                                                                                                                                |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `identity.external_invitation.undelivered`        | Invitaciones abiertas (`issued`, no vencidas) cuyo correo rebotó o falló al salir (`delivery_status` en `bounced` o `failed`). | Estado actual | `warning` desde 1, `error` desde 5. Es la señal de "el operador cree que invitó, pero nadie recibió nada". Qué hacer: mirar el detalle del binding, corregir la casilla con el cliente si rebotó (o revisar el proveedor de correo si falló) y **reenviar**. Baja sola cuando la nueva invitación sale bien o la vieja se revoca.                      |
+| `identity.external_invitation.expired_unaccepted` | Invitaciones que vencieron sin aceptarse en los últimos 7 días (`expired`, o `issued` ya pasadas de fecha sin `accepted_at`).  | 7 días        | Informativa: `warning` desde 1 y **nunca** `error`. Suele ser una persona que no alcanzó a entrar o un correo que fue a spam. Qué hacer: confirmar con el administrador del cliente y emitir una nueva, ajustando la vigencia si el cliente tarda.                                                                                                     |
+| `identity.external_invitation.token_revealed`     | Revelaciones del enlace (audit `invitation_token_revealed`).                                                                   | 24 h          | `warning` desde 1, `error` desde 5. Cualquier valor distinto de 0 debe corresponder a una excepción justificada: en el audit tiene que estar quién reveló y por qué. Qué hacer: revisar que cada revelación tenga motivo válido; varias en un día indican que se está usando como vía normal y hay que corregir el proceso (o el correo que no llega). |
 
 Si PostgreSQL no responde, la señal aparece como `unknown` en lugar de mentir con un 0.
 
@@ -265,18 +286,18 @@ Hasta TASK-1837, toda invitación la emitía un operador de Efeonce. Ahora exist
 persona que aceptó la invitación como **administrador designado** de un binding puede invitar a otras personas de
 su misma organización sin pasar por Efeonce. Es una autoridad acotada a propósito:
 
-| Regla | Qué significa |
-| --- | --- |
-| **Quién** | Solo la persona cuya membresía `linked` en ese binding tiene `designatedAdmin = true`. Se resuelve por su identidad (environment + subject), nunca por lo que diga el cuerpo de la petición. Quien no cumpla recibe 403 sin distinguir la causa. |
-| **Solo su binding** | Puede listar, invitar, reenviar y revocar únicamente sobre el binding del que es administrador. Un `bindingId` ajeno responde 403; una invitación ajena al reenviar o revocar responde 404 (indistinguible de una inexistente). |
-| **Nunca designa administradores** | Si pide `designatedAdmin: true`, la API responde 422: no hay auto-elevación ni cadena de administradores. Un administrador nuevo solo lo designa Efeonce. |
-| **Puede reenviar (= rotar)** | Reenviar una invitación abierta de su gente hace lo mismo que cuando lo hace Efeonce: la anterior queda `revoked` (`resent`), sale una nueva con enlace nuevo y el enlace anterior deja de valer. Mismos topes (3 por cadena, 20 por hora). |
-| **Puede revocar, nunca a sí mismo** | Sobre una invitación abierta la cierra; sobre una persona ya ligada la revoca como miembro (sube `grants_version`, el gateway deja de aceptar su token). Si intenta revocarse a sí mismo responde 422: quitarse la membresía dejaría a la organización sin administrador por un acto propio; eso lo hace Efeonce. |
-| **Se identifica por organización o por binding** | La petición trae `organizationId` (lo que el gateway resolvió por su membresía) o `bindingId`: exactamente uno; si trae ambos deben coincidir. Sin ninguno, 422. |
-| **Tope de asientos** | El binding no puede pasar de 25 personas (invitaciones `issued` + `accepted` + `linked`) por defecto (`EXTERNAL_INVITATION_DELEGATED_SEAT_LIMIT`). Al llegar, 422. |
-| **Tope por hora** | Comparte el tope de 20 operaciones por binding cada hora; al pasarlo, 429. |
-| **Queda auditado como delegado** | La invitación registra que fue emitida por delegación y por qué perfil (`delegated: true`, `delegatedByProfileId`); el actor en el audit es `external-admin:<perfil>`. |
-| **Sin token en la respuesta** | La lane delegada **nunca** devuelve el token: la entrega es por correo del sistema. |
+| Regla                                            | Qué significa                                                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Quién**                                        | Solo la persona cuya membresía `linked` en ese binding tiene `designatedAdmin = true`. Se resuelve por su identidad (environment + subject), nunca por lo que diga el cuerpo de la petición. Quien no cumpla recibe 403 sin distinguir la causa.                                                                  |
+| **Solo su binding**                              | Puede listar, invitar, reenviar y revocar únicamente sobre el binding del que es administrador. Un `bindingId` ajeno responde 403; una invitación ajena al reenviar o revocar responde 404 (indistinguible de una inexistente).                                                                                   |
+| **Nunca designa administradores**                | Si pide `designatedAdmin: true`, la API responde 422: no hay auto-elevación ni cadena de administradores. Un administrador nuevo solo lo designa Efeonce.                                                                                                                                                         |
+| **Puede reenviar (= rotar)**                     | Reenviar una invitación abierta de su gente hace lo mismo que cuando lo hace Efeonce: la anterior queda `revoked` (`resent`), sale una nueva con enlace nuevo y el enlace anterior deja de valer. Mismos topes (3 por cadena, 20 por hora).                                                                       |
+| **Puede revocar, nunca a sí mismo**              | Sobre una invitación abierta la cierra; sobre una persona ya ligada la revoca como miembro (sube `grants_version`, el gateway deja de aceptar su token). Si intenta revocarse a sí mismo responde 422: quitarse la membresía dejaría a la organización sin administrador por un acto propio; eso lo hace Efeonce. |
+| **Se identifica por organización o por binding** | La petición trae `organizationId` (lo que el gateway resolvió por su membresía) o `bindingId`: exactamente uno; si trae ambos deben coincidir. Sin ninguno, 422.                                                                                                                                                  |
+| **Tope de asientos**                             | El binding no puede pasar de 25 personas (invitaciones `issued` + `accepted` + `linked`) por defecto (`EXTERNAL_INVITATION_DELEGATED_SEAT_LIMIT`). Al llegar, 422.                                                                                                                                                |
+| **Tope por hora**                                | Comparte el tope de 20 operaciones por binding cada hora; al pasarlo, 429.                                                                                                                                                                                                                                        |
+| **Queda auditado como delegado**                 | La invitación registra que fue emitida por delegación y por qué perfil (`delegated: true`, `delegatedByProfileId`); el actor en el audit es `external-admin:<perfil>`.                                                                                                                                            |
+| **Sin token en la respuesta**                    | La lane delegada **nunca** devuelve el token: la entrega es por correo del sistema.                                                                                                                                                                                                                               |
 
 Cómo llega la petición: la persona no llama a Greenhouse directo. Habla con el **gateway MCP**, que verifica su
 token y llama a Greenhouse por la lane ecosystem (`/api/platform/ecosystem/identity/invitations`, y
@@ -326,16 +347,16 @@ dominio ajeno. El tratamiento visual de ese bloque es de TASK-1835.
 Solo el rol interno **`efeonce_admin`**, y solo a través de las rutas admin. Cada acción tiene su capability
 dedicada, de modo que un permiso de lectura no habilita escribir ni revocar:
 
-| Capability | Acción | Ruta |
-| --- | --- | --- |
-| `identity.external_binding.read` | Listar y ver environments, elegibilidad, bindings y su detalle | `GET .../environments`, `.../eligibility`, `.../bindings`, `.../bindings/[id]` |
-| `identity.external_environment.manage` | Registrar o actualizar un environment | `POST .../environments` |
-| `identity.external_binding.bind` | Ligar una organización | `POST .../bindings` |
-| `identity.external_grant.issue` | Otorgar una capability | `POST .../bindings/[id]/grants` |
-| `identity.external_invitation.issue` | Invitar a una persona y reenviar una invitación | `POST .../bindings/[id]/invitations`, `POST .../bindings/[id]/invitations/[invitationId]/resend` |
-| `identity.external_invitation.reveal_token` | Revelar el enlace de una invitación (excepción gobernada, 1 h, con motivo) | `POST .../bindings/[id]/invitations/[invitationId]/reveal` |
-| `identity.external_invitation.issue_delegated` | Invitar por delegación (la ejerce el administrador designado del cliente; el grant a `efeonce_admin` existe por paridad) | `GET/POST /api/platform/ecosystem/identity/invitations` (lane ecosystem, vía gateway) |
-| `identity.external_access.revoke` | Revocar binding, grant, persona o invitación | `POST .../revoke` |
+| Capability                                     | Acción                                                                                                                   | Ruta                                                                                             |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| `identity.external_binding.read`               | Listar y ver environments, elegibilidad, bindings y su detalle                                                           | `GET .../environments`, `.../eligibility`, `.../bindings`, `.../bindings/[id]`                   |
+| `identity.external_environment.manage`         | Registrar o actualizar un environment                                                                                    | `POST .../environments`                                                                          |
+| `identity.external_binding.bind`               | Ligar una organización                                                                                                   | `POST .../bindings`                                                                              |
+| `identity.external_grant.issue`                | Otorgar una capability                                                                                                   | `POST .../bindings/[id]/grants`                                                                  |
+| `identity.external_invitation.issue`           | Invitar a una persona y reenviar una invitación                                                                          | `POST .../bindings/[id]/invitations`, `POST .../bindings/[id]/invitations/[invitationId]/resend` |
+| `identity.external_invitation.reveal_token`    | Revelar el enlace de una invitación (excepción gobernada, 1 h, con motivo)                                               | `POST .../bindings/[id]/invitations/[invitationId]/reveal`                                       |
+| `identity.external_invitation.issue_delegated` | Invitar por delegación (la ejerce el administrador designado del cliente; el grant a `efeonce_admin` existe por paridad) | `GET/POST /api/platform/ecosystem/identity/invitations` (lane ecosystem, vía gateway)            |
+| `identity.external_access.revoke`              | Revocar binding, grant, persona o invitación                                                                             | `POST .../revoke`                                                                                |
 
 Prefijo común de las rutas: `/api/admin/identity/external-access`. Un usuario sin sesión admin recibe 401; con
 sesión pero sin la capability, 403.

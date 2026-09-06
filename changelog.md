@@ -7,6 +7,23 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-06 — TASK-1832: schema canary aplicado fuera del checkpoint, sin fixture
+
+`pnpm pg:connect:migrate` se ejecutó por error como si sólo levantara el proxy y aplicó las dos migraciones de
+TASK-1832. El readback inmediato confirmó registry/bindings canary en cero, purpose sin drift y los 30 perfiles
+`smoke_test` preservados en identidad pero excluidos de Person 360. No se crearon organización, cuentas, grants,
+sesiones ni tokens; flags OFF/default, sin push/deploy. Se detuvieron nuevas mutaciones externas y quedó
+documentada la decisión pendiente de conservar el schema adelantado o autorizar una migración compensatoria.
+La implementación local pasó 144/144 tests focales, typecheck, lint sin errores y build; el gateway hermano pasó
+152/152 tests sin skips y build. `secrets:audit` local no acredita runtime: 6/8 saludables, con `NEXTAUTH_URL`
+local inválida y `CRON_SECRET` ausente; TASK-1832 no cambió secretos.
+[Evidencia](docs/audits/mcp/TASK-1832_SCHEMA_APPLY_READBACK_2026-09-06.md).
+
+**Decisión posterior:** el operador resolvió conservar el schema aditivo y autorizó completar el rollout
+sintético: commit/push, promoción, deploys, gates, fixture dedicado, buzones controlados, sesiones canary,
+revocación y cleanup. La autorización no incorpora clientes ni habilita writes; la task sigue pendiente hasta
+matriz runtime, retiro demostrable y siete días de señales estables.
+
 ## 2026-09-06 — La certificación sintética se separa del primer piloto cliente
 
 TASK-1832 ya no usa a una organización cliente real para descubrir defectos. La certificación técnica externa
@@ -17,8 +34,9 @@ Chrome/Safari y casos negativos; su resultado demuestra preparación técnica, n
 
 TASK-1841 queda como unidad separada para el primer piloto consentido: una organización ya existente en Account
 360, un administrador y una capability read-only vigente, sólo después de cerrar certificación, assurance y UI.
-El cliente recibe onboarding y soporte normales, no tareas de QA, y nunca debe entregar tokens o logs. Este cambio
-documenta el contrato; no creó correos, cuentas, bindings, migraciones, invitaciones, flags ni rollout.
+El cliente recibe onboarding y soporte normales, no tareas de QA, y nunca debe entregar tokens o logs. Esa
+decisión documental inicial no creó correos, cuentas, bindings, migraciones, invitaciones, flags ni rollout; el
+apply de schema posterior queda registrado por separado en la entrada anterior.
 
 ## 2026-09-06 — El gate de versión del gateway medía media superficie, y el scope nuevo no se anunciaba entero
 
@@ -841,12 +859,3 @@ trabajo; la fuente `225984` y `/blog/` permanecen sin cutover. PDR, contrato,
 manual y skills WordPress Codex/Claude fijan que jerarquía no equivale a
 prominencia y que los 15 widgets deben reconectarse a contenido real antes de
 publicar. [Estado y pendientes](docs/audits/public-site/2026-08-31-blog-taxonomy-demo35-work-copy.md).
-
-## 2026-08-31 — Las páginas misceláneas dejan de ser “una 404” y ganan ownership
-
-Discovery live confirmó que Ohio padre gobierna 404, búsqueda/no-results y archivos; Elementor Theme Builder
-no tiene templates/conditions especiales activos. Se creó el contrato child-theme-first, el comportamiento
-funcional, el runbook, el registro de primitive propuesto y las rutas en skills WordPress/SEO. La política separa
-recovery, búsqueda, archivos editoriales y chrome global, con HTTP/robots/canonical por query type. No hubo
-mutación ni publicación. Persisten P0: contenido público `(Borrador)`, search vacío con 154 resultados y enlaces
-demo/rotos globales. [Discovery y límites](docs/audits/public-site/2026-08-31-wordpress-miscellaneous-surfaces-discovery.md).

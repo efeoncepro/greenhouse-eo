@@ -242,6 +242,9 @@ ENV_VARS="${ENV_VARS},AUTH_SERVER_MCP_AUDIENCE=${AUTH_SERVER_MCP_AUDIENCE:-https
 # así que `authorize` sigue en `login_required`. Ledger: docs/operations/FEATURE_FLAG_STATE_LEDGER.md
 # (runtime auth-server únicamente).
 ENV_VARS="${ENV_VARS},AUTH_SERVER_PERSON_AUTH_ENABLED=${AUTH_SERVER_PERSON_AUTH_ENABLED:-true}"
+# TASK-1832 — emisión para población external+canary. OFF conserva customer externo e internal sin
+# cambios y hace que el resolver deniegue canary aunque existan filas. Dual-runtime con Vercel.
+ENV_VARS="${ENV_VARS},EXTERNAL_IDENTITY_CANARY_ENABLED=${EXTERNAL_IDENTITY_CANARY_ENABLED:-false}"
 ENV_VARS="${ENV_VARS},AUTH_SERVER_TOTP_KMS_KEY=${AUTH_SERVER_TOTP_KMS_KEY}"
 # TASK-1836: independent corporate lane. Never implicitly turn it on with persons/OAuth.
 ENV_VARS="${ENV_VARS},AUTH_SERVER_INTERNAL_AUTH_ENABLED=${AUTH_SERVER_INTERNAL_AUTH_ENABLED}"

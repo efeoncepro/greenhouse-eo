@@ -75,9 +75,19 @@ const createHarness = async (overrides: Partial<AuthServerOAuthConfig> = {}): Pr
   const clock = { now: new Date('2026-09-04T12:00:00Z') }
   let subject: AuthenticatedSubject | null = null
 
-  const grants = { result: { bound: true, grantsVersion: 3, profileId: 'prof-1', memberships: 1 } as Awaited<ReturnType<GrantsVersionPort['resolve']>> }
+  const grants = {
+    result: { bound: true, grantsVersion: 3, profileId: 'prof-1', memberships: 1 } as Awaited<
+      ReturnType<GrantsVersionPort['resolve']>
+    >
+  }
 
-  const consentContext = { result: { outcome: 'resolved', population: 'external', organizations: [{ organizationName: 'Test organization', capabilities: ['test.read'] }] } as ConsentContextResolution }
+  const consentContext = {
+    result: {
+      outcome: 'resolved',
+      population: 'external',
+      organizations: [{ organizationName: 'Test organization', capabilities: ['test.read'] }]
+    } as ConsentContextResolution
+  }
 
   const handler = createOAuthHandler({
     store,
@@ -109,10 +119,16 @@ const createHarness = async (overrides: Partial<AuthServerOAuthConfig> = {}): Pr
   return { handler, store, keys, publicKey, grants, consentContext, setSubject: next => (subject = next), clock }
 }
 
-const request = (method: string, path: string, options: { headers?: Record<string, string>; body?: string } = {}): OAuthHttpRequest => ({
+const request = (
+  method: string,
+  path: string,
+  options: { headers?: Record<string, string>; body?: string } = {}
+): OAuthHttpRequest => ({
   method,
   url: new URL(path, ISSUER),
-  headers: headersFromRecord(Object.fromEntries(Object.entries(options.headers ?? {}).map(([k, v]) => [k.toLowerCase(), v]))),
+  headers: headersFromRecord(
+    Object.fromEntries(Object.entries(options.headers ?? {}).map(([k, v]) => [k.toLowerCase(), v]))
+  ),
   body: options.body ?? ''
 })
 
@@ -122,7 +138,12 @@ const FORM_HEADERS = { 'content-type': 'application/x-www-form-urlencoded', 'x-f
 
 const json = (response: OAuthHttpResponse | null) => JSON.parse(response!.body)
 
-const PERSON: AuthenticatedSubject = { subject: 'sub-opaque-1', environmentId: 'efeonce-auth', authLevel: 'primary', authTime: new Date('2026-09-04T11:59:00Z') }
+const PERSON: AuthenticatedSubject = {
+  subject: 'sub-opaque-1',
+  environmentId: 'efeonce-auth',
+  authLevel: 'primary',
+  authTime: new Date('2026-09-04T11:59:00Z')
+}
 
 describe('auth-server OAuth flow (in-process)', () => {
   let h: Harness
@@ -134,12 +155,26 @@ describe('auth-server OAuth flow (in-process)', () => {
   it('renders canonical organizations and rechecks context before displaying or accepting consent', async () => {
     h.setSubject(PERSON)
     const clientId = 'https://client.example/context-client.json'
-    const authorizeUrl = '/oauth/authorize?' + new URLSearchParams({ response_type: 'code', client_id: clientId, redirect_uri: 'https://client.example/cb', scope: 'efeonce.mcp.read', code_challenge: pkce().challenge, code_challenge_method: 'S256' })
 
-    h.consentContext.result = { outcome: 'resolved', population: 'external', organizations: [
-      { organizationName: '<Org A>', capabilities: ['a.read'] },
-      { organizationName: 'Org B', capabilities: ['b.read'] }
-    ] }
+    const authorizeUrl =
+      '/oauth/authorize?' +
+      new URLSearchParams({
+        response_type: 'code',
+        client_id: clientId,
+        redirect_uri: 'https://client.example/cb',
+        scope: 'efeonce.mcp.read',
+        code_challenge: pkce().challenge,
+        code_challenge_method: 'S256'
+      })
+
+    h.consentContext.result = {
+      outcome: 'resolved',
+      population: 'external',
+      organizations: [
+        { organizationName: '<Org A>', capabilities: ['a.read'] },
+        { organizationName: 'Org B', capabilities: ['b.read'] }
+      ]
+    }
     const shown = await h.handler(request('GET', authorizeUrl))
 
     expect(shown?.status).toBe(200)
@@ -148,8 +183,9 @@ describe('auth-server OAuth flow (in-process)', () => {
     expect(shown?.body).not.toContain(PERSON.subject)
     // Browser enforcement is exercised by scripts/auth-server/probe-form-origin.mjs;
     // this contract checks that only the already-registered callback reaches that policy.
-    expect(shown?.headers['Content-Security-Policy'].split(';').map(part => part.trim()))
-      .toContain("form-action 'self' https://client.example")
+    expect(shown?.headers['Content-Security-Policy'].split(';').map(part => part.trim())).toContain(
+      "form-action 'self' https://client.example"
+    )
     const forged = new URL(authorizeUrl, ISSUER)
 
     forged.searchParams.set('redirect_uri', 'https://unregistered.example/cb')
@@ -162,9 +198,17 @@ describe('auth-server OAuth flow (in-process)', () => {
       h.consentContext.result = { outcome }
       const denied = await h.handler(request('GET', authorizeUrl))
 
-      expect(new URL(denied!.headers.Location).searchParams.get('error')).toBe(outcome === 'denied' ? 'access_denied' : 'temporarily_unavailable')
+      expect(new URL(denied!.headers.Location).searchParams.get('error')).toBe(
+        outcome === 'denied' ? 'access_denied' : 'temporarily_unavailable'
+      )
       expect(denied?.body).not.toContain('name="decision"')
-      const submitted = await h.handler(request('POST', '/oauth/consent', { headers: { ...FORM_HEADERS, origin: ISSUER }, body: form({ client_id: clientId, scope: 'efeonce.mcp.read', return_to: authorizeUrl, decision: 'allow' }) }))
+
+      const submitted = await h.handler(
+        request('POST', '/oauth/consent', {
+          headers: { ...FORM_HEADERS, origin: ISSUER },
+          body: form({ client_id: clientId, scope: 'efeonce.mcp.read', return_to: authorizeUrl, decision: 'allow' })
+        })
+      )
 
       expect(submitted?.status).toBe(outcome === 'denied' ? 403 : 503)
       expect(h.store.consents).toEqual([])
@@ -172,7 +216,17 @@ describe('auth-server OAuth flow (in-process)', () => {
   })
 
   it('links unauthenticated authorize to login with the original validated OAuth request', async () => {
-    const params = new URLSearchParams({ response_type: 'code', client_id: 'https://client.example/login-client.json', redirect_uri: 'https://client.example/cb', scope: 'efeonce.mcp.read', state: 'state&"value', resource: AUDIENCE, code_challenge: pkce().challenge, code_challenge_method: 'S256' })
+    const params = new URLSearchParams({
+      response_type: 'code',
+      client_id: 'https://client.example/login-client.json',
+      redirect_uri: 'https://client.example/cb',
+      scope: 'efeonce.mcp.read',
+      state: 'state&"value',
+      resource: AUDIENCE,
+      code_challenge: pkce().challenge,
+      code_challenge_method: 'S256'
+    })
+
     const path = '/oauth/authorize?' + params
     const response = await h.handler(request('GET', path))
     const href = response!.body.match(/href="([^"]*\/login\?[^"]*)"/)?.[1]
@@ -211,7 +265,10 @@ describe('auth-server OAuth flow (in-process)', () => {
     const off = await createHarness({ oauthEnabled: false })
 
     expect((await off.handler(request('GET', '/.well-known/oauth-authorization-server')))!.status).toBe(404)
-    expect((await off.handler(request('POST', '/oauth/token', { headers: FORM_HEADERS, body: form({ grant_type: 'x' }) })))!.status).toBe(404)
+    expect(
+      (await off.handler(request('POST', '/oauth/token', { headers: FORM_HEADERS, body: form({ grant_type: 'x' }) })))!
+        .status
+    ).toBe(404)
     expect(await off.handler(request('GET', '/healthz'))).toBeNull()
   })
 
@@ -262,7 +319,13 @@ describe('auth-server OAuth flow (in-process)', () => {
     const token = await h.handler(
       request('POST', '/oauth/token', {
         headers: FORM_HEADERS,
-        body: form({ grant_type: 'authorization_code', client_id: clientId, code, redirect_uri: location.origin + location.pathname, code_verifier: verifier })
+        body: form({
+          grant_type: 'authorization_code',
+          client_id: clientId,
+          code,
+          redirect_uri: location.origin + location.pathname,
+          code_verifier: verifier
+        })
       })
     )
 
@@ -275,7 +338,12 @@ describe('auth-server OAuth flow (in-process)', () => {
     const registered = await h.handler(
       request('POST', '/oauth/register', {
         headers: { 'content-type': 'application/json', 'x-forwarded-for': '198.51.100.7' },
-        body: JSON.stringify({ client_name: 'Claude Code', redirect_uris: ['http://localhost/callback'], grant_types: ['authorization_code', 'refresh_token'], token_endpoint_auth_method: 'none' })
+        body: JSON.stringify({
+          client_name: 'Claude Code',
+          redirect_uris: ['http://localhost/callback'],
+          grant_types: ['authorization_code', 'refresh_token'],
+          token_endpoint_auth_method: 'none'
+        })
       })
     )
 
@@ -300,7 +368,12 @@ describe('auth-server OAuth flow (in-process)', () => {
 
     // Verificación con el JWKS publicado (mismo camino que el gateway en TASK-1831).
     const jwks = createLocalJWKSet(buildPublishedJwks(h.keys))
-    const verified = await jwtVerify(body.access_token, jwks, { issuer: ISSUER, audience: AUDIENCE, currentDate: h.clock.now })
+
+    const verified = await jwtVerify(body.access_token, jwks, {
+      issuer: ISSUER,
+      audience: AUDIENCE,
+      currentDate: h.clock.now
+    })
 
     expect(verified.protectedHeader.alg).toBe('ES256')
     expect(verified.protectedHeader.kid).toBe('test-kid')
@@ -313,7 +386,10 @@ describe('auth-server OAuth flow (in-process)', () => {
 
     // Refresh rota; el anterior queda inservible y su reuso revoca la familia.
     const refreshed = await h.handler(
-      request('POST', '/oauth/token', { headers: FORM_HEADERS, body: form({ grant_type: 'refresh_token', client_id: dcr.client_id, refresh_token: body.refresh_token }) })
+      request('POST', '/oauth/token', {
+        headers: FORM_HEADERS,
+        body: form({ grant_type: 'refresh_token', client_id: dcr.client_id, refresh_token: body.refresh_token })
+      })
     )
 
     expect(refreshed!.status).toBe(200)
@@ -323,7 +399,10 @@ describe('auth-server OAuth flow (in-process)', () => {
     expect(second.refresh_token).not.toBe(body.refresh_token)
 
     const reuse = await h.handler(
-      request('POST', '/oauth/token', { headers: FORM_HEADERS, body: form({ grant_type: 'refresh_token', client_id: dcr.client_id, refresh_token: body.refresh_token }) })
+      request('POST', '/oauth/token', {
+        headers: FORM_HEADERS,
+        body: form({ grant_type: 'refresh_token', client_id: dcr.client_id, refresh_token: body.refresh_token })
+      })
     )
 
     expect(reuse!.status).toBe(400)
@@ -332,7 +411,10 @@ describe('auth-server OAuth flow (in-process)', () => {
 
     // Familia entera revocada: el refresh nuevo también murió.
     const afterReuse = await h.handler(
-      request('POST', '/oauth/token', { headers: FORM_HEADERS, body: form({ grant_type: 'refresh_token', client_id: dcr.client_id, refresh_token: second.refresh_token }) })
+      request('POST', '/oauth/token', {
+        headers: FORM_HEADERS,
+        body: form({ grant_type: 'refresh_token', client_id: dcr.client_id, refresh_token: second.refresh_token })
+      })
     )
 
     expect(json(afterReuse).error).toBe('invalid_grant')
@@ -348,21 +430,56 @@ describe('auth-server OAuth flow (in-process)', () => {
     const { token } = await runCodeFlow(clientId, 'https://client.example/cb')
     const first = json(token)
     const jwks = createLocalJWKSet(buildPublishedJwks(h.keys))
-    const verify = async (value: string) => (await jwtVerify(value, jwks, { issuer: ISSUER, audience: AUDIENCE, currentDate: h.clock.now })).payload
 
-    expect(await verify(first.access_token)).toMatchObject({ authorization_context_id: contextA, authorization_context_version: 1, auth_time: PERSON.authTime.getTime() / 1000 })
+    const verify = async (value: string) =>
+      (await jwtVerify(value, jwks, { issuer: ISSUER, audience: AUDIENCE, currentDate: h.clock.now })).payload
+
+    expect(await verify(first.access_token)).toMatchObject({
+      authorization_context_id: contextA,
+      authorization_context_version: 1,
+      auth_time: PERSON.authTime.getTime() / 1000
+    })
     expect(h.store.consents.map(c => c.authorizationContextId)).toEqual([contextA])
-    expect(await h.store.listActiveConsents({ subject: PERSON.subject, environmentId: PERSON.environmentId, clientId })).toEqual([])
-    expect(await h.store.listActiveConsents({ subject: PERSON.subject, environmentId: PERSON.environmentId, clientId, authorizationContextId: contextB })).toEqual([])
+    expect(
+      await h.store.listActiveConsents({ subject: PERSON.subject, environmentId: PERSON.environmentId, clientId })
+    ).toEqual([])
+    expect(
+      await h.store.listActiveConsents({
+        subject: PERSON.subject,
+        environmentId: PERSON.environmentId,
+        clientId,
+        authorizationContextId: contextB
+      })
+    ).toEqual([])
 
     // Switching the browser session cannot move an already consented refresh family.
     h.setSubject({ ...PERSON, authorizationContextId: contextB })
     h.clock.now = new Date(h.clock.now.getTime() + 30 * 60_000)
-    const refresh = await h.handler(request('POST', '/oauth/token', { headers: FORM_HEADERS, body: form({ grant_type: 'refresh_token', client_id: clientId, refresh_token: first.refresh_token, authorization_context_id: contextB }) }))
+
+    const refresh = await h.handler(
+      request('POST', '/oauth/token', {
+        headers: FORM_HEADERS,
+        body: form({
+          grant_type: 'refresh_token',
+          client_id: clientId,
+          refresh_token: first.refresh_token,
+          authorization_context_id: contextB
+        })
+      })
+    )
 
     expect(refresh!.status).toBe(200)
-    expect(await verify(json(refresh).access_token)).toMatchObject({ authorization_context_id: contextA, authorization_context_version: 1, auth_time: PERSON.authTime.getTime() / 1000, iat: h.clock.now.getTime() / 1000 })
-    expect([...h.store.refreshTokens.values()].every(r => r.authorizationContextId === contextA && r.authTime?.getTime() === PERSON.authTime.getTime())).toBe(true)
+    expect(await verify(json(refresh).access_token)).toMatchObject({
+      authorization_context_id: contextA,
+      authorization_context_version: 1,
+      auth_time: PERSON.authTime.getTime() / 1000,
+      iat: h.clock.now.getTime() / 1000
+    })
+    expect(
+      [...h.store.refreshTokens.values()].every(
+        r => r.authorizationContextId === contextA && r.authTime?.getTime() === PERSON.authTime.getTime()
+      )
+    ).toBe(true)
 
     // A second context still needs its own explicit consent for exactly the same client/scopes.
     const second = await runCodeFlow(clientId, 'https://client.example/cb')
@@ -375,20 +492,46 @@ describe('auth-server OAuth flow (in-process)', () => {
   it('denies internal refresh and introspection when current authority is disabled; revocation still works', async () => {
     h.setSubject({ ...PERSON, authorizationContextId: '3aedb21a-5e89-4fde-91ac-16e204b64ce7' })
     const { registerConfidentialClient } = await import('./clients')
-    const confidential = await registerConfidentialClient({ clientName: 'Internal', redirectUris: ['https://chat.example/cb'], actor: 'test' }, { store: h.store, config })
-    const basic = 'Basic ' + Buffer.from(`${confidential.client.clientId}:${confidential.clientSecret}`).toString('base64')
+
+    const confidential = await registerConfidentialClient(
+      { clientName: 'Internal', redirectUris: ['https://chat.example/cb'], actor: 'test' },
+      { store: h.store, config }
+    )
+
+    const basic =
+      'Basic ' + Buffer.from(`${confidential.client.clientId}:${confidential.clientSecret}`).toString('base64')
+
     const { token } = await runCodeFlowConfidential(h, confidential.client.clientId, basic)
     const body = json(token)
-    const introspect = () => h.handler(request('POST', '/oauth/introspect', { headers: { ...FORM_HEADERS, authorization: basic }, body: form({ token: body.access_token }) }))
+
+    const introspect = () =>
+      h.handler(
+        request('POST', '/oauth/introspect', {
+          headers: { ...FORM_HEADERS, authorization: basic },
+          body: form({ token: body.access_token })
+        })
+      )
 
     expect(json(await introspect()).active).toBe(true)
     h.grants.result = { bound: false, profileId: null, outcome: 'internal_disabled' }
     expect(json(await introspect())).toEqual({ active: false })
-    const refresh = await h.handler(request('POST', '/oauth/token', { headers: { ...FORM_HEADERS, authorization: basic }, body: form({ grant_type: 'refresh_token', refresh_token: body.refresh_token }) }))
+
+    const refresh = await h.handler(
+      request('POST', '/oauth/token', {
+        headers: { ...FORM_HEADERS, authorization: basic },
+        body: form({ grant_type: 'refresh_token', refresh_token: body.refresh_token })
+      })
+    )
 
     expect(json(refresh).error).toBe('invalid_grant')
     expect(h.store.refreshTokens.size).toBe(1)
-    const revoke = await h.handler(request('POST', '/oauth/revoke', { headers: { ...FORM_HEADERS, authorization: basic }, body: form({ token: body.access_token }) }))
+
+    const revoke = await h.handler(
+      request('POST', '/oauth/revoke', {
+        headers: { ...FORM_HEADERS, authorization: basic },
+        body: form({ token: body.access_token })
+      })
+    )
 
     expect(revoke!.status).toBe(200)
     expect([...h.store.refreshTokens.values()][0].status).toBe('revoked')
@@ -399,10 +542,17 @@ describe('auth-server OAuth flow (in-process)', () => {
     const clientId = 'https://client.example/oauth/client-metadata.json'
     const { challenge } = pkce()
 
-    const url = '/oauth/authorize?' + new URLSearchParams({
-      client_id: clientId, redirect_uri: 'https://client.example/cb', scope: 'efeonce.mcp.read',
-      response_type: 'code', code_challenge: challenge, code_challenge_method: 'S256', state: 'binding-check'
-    })
+    const url =
+      '/oauth/authorize?' +
+      new URLSearchParams({
+        client_id: clientId,
+        redirect_uri: 'https://client.example/cb',
+        scope: 'efeonce.mcp.read',
+        response_type: 'code',
+        code_challenge: challenge,
+        code_challenge_method: 'S256',
+        state: 'binding-check'
+      })
 
     h.grants.result = { bound: false, outcome: 'revoked', profileId: 'prof-1' }
     const denied = await h.handler(request('GET', url))
@@ -423,10 +573,28 @@ describe('auth-server OAuth flow (in-process)', () => {
   it('rejects consent form client/scope substitution before creating any consent', async () => {
     h.setSubject({ ...PERSON, authorizationContextId: '3aedb21a-5e89-4fde-91ac-16e204b64ce7' })
     const clientId = 'https://client.example/oauth/client-metadata.json'
-    const returnTo = '/oauth/authorize?' + new URLSearchParams({ client_id: clientId, redirect_uri: 'https://client.example/cb', scope: 'efeonce.mcp.read' })
 
-    for (const change of [{ scope: 'efeonce.mcp.read efeonce.mcp.seo.write' }, { client_id: 'https://other.example/metadata.json' }, { decision: 'unexpected' }]) {
-      const result = await h.handler(request('POST', '/oauth/consent', { headers: { ...FORM_HEADERS, origin: ISSUER }, body: form({ client_id: clientId, scope: 'efeonce.mcp.read', decision: 'allow', return_to: returnTo, ...change }) }))
+    const returnTo =
+      '/oauth/authorize?' +
+      new URLSearchParams({ client_id: clientId, redirect_uri: 'https://client.example/cb', scope: 'efeonce.mcp.read' })
+
+    for (const change of [
+      { scope: 'efeonce.mcp.read efeonce.mcp.seo.write' },
+      { client_id: 'https://other.example/metadata.json' },
+      { decision: 'unexpected' }
+    ]) {
+      const result = await h.handler(
+        request('POST', '/oauth/consent', {
+          headers: { ...FORM_HEADERS, origin: ISSUER },
+          body: form({
+            client_id: clientId,
+            scope: 'efeonce.mcp.read',
+            decision: 'allow',
+            return_to: returnTo,
+            ...change
+          })
+        })
+      )
 
       expect(result!.status).toBe(400)
       expect(h.store.consents).toEqual([])
@@ -446,7 +614,13 @@ describe('auth-server OAuth flow (in-process)', () => {
     const replay = await h.handler(
       request('POST', '/oauth/token', {
         headers: FORM_HEADERS,
-        body: form({ grant_type: 'authorization_code', client_id: clientId, code, redirect_uri: redirectUri, code_verifier: verifier })
+        body: form({
+          grant_type: 'authorization_code',
+          client_id: clientId,
+          code,
+          redirect_uri: redirectUri,
+          code_verifier: verifier
+        })
       })
     )
 
@@ -462,17 +636,32 @@ describe('auth-server OAuth flow (in-process)', () => {
     const clientId = 'https://client.example/oauth/client-metadata.json'
     const base = { response_type: 'code', client_id: clientId, state: 's', code_challenge: challenge }
 
-    const plain = await h.handler(request('GET', `/oauth/authorize?${new URLSearchParams({ ...base, redirect_uri: 'https://client.example/cb', code_challenge_method: 'plain' })}`))
+    const plain = await h.handler(
+      request(
+        'GET',
+        `/oauth/authorize?${new URLSearchParams({ ...base, redirect_uri: 'https://client.example/cb', code_challenge_method: 'plain' })}`
+      )
+    )
 
     expect(plain!.status).toBe(302)
     expect(new URL(plain!.headers.Location).searchParams.get('error')).toBe('invalid_request')
 
-    const nonExact = await h.handler(request('GET', `/oauth/authorize?${new URLSearchParams({ ...base, redirect_uri: 'https://client.example/cb/', code_challenge_method: 'S256' })}`))
+    const nonExact = await h.handler(
+      request(
+        'GET',
+        `/oauth/authorize?${new URLSearchParams({ ...base, redirect_uri: 'https://client.example/cb/', code_challenge_method: 'S256' })}`
+      )
+    )
 
     expect(nonExact!.status).toBe(400)
     expect(nonExact!.headers['Content-Type']).toContain('text/html')
 
-    const unknown = await h.handler(request('GET', `/oauth/authorize?${new URLSearchParams({ ...base, client_id: 'nope', redirect_uri: 'https://client.example/cb', code_challenge_method: 'S256' })}`))
+    const unknown = await h.handler(
+      request(
+        'GET',
+        `/oauth/authorize?${new URLSearchParams({ ...base, client_id: 'nope', redirect_uri: 'https://client.example/cb', code_challenge_method: 'S256' })}`
+      )
+    )
 
     expect(unknown!.status).toBe(401)
 
@@ -480,7 +669,10 @@ describe('auth-server OAuth flow (in-process)', () => {
     const { registerConfidentialClient } = await import('./clients')
 
     await expect(
-      registerConfidentialClient({ clientName: 'Hosted', redirectUris: ['http://localhost:3000/cb'], actor: 'test' }, { store: h.store, config })
+      registerConfidentialClient(
+        { clientName: 'Hosted', redirectUris: ['http://localhost:3000/cb'], actor: 'test' },
+        { store: h.store, config }
+      )
     ).rejects.toMatchObject({ code: 'invalid_redirect_uri' })
   })
 
@@ -495,12 +687,28 @@ describe('auth-server OAuth flow (in-process)', () => {
     // Revocar el consentimiento mata las familias vivas; un code nuevo sin consent no se canjea.
     const { revokeClientConsent } = await import('./consent')
 
-    await revokeClientConsent({ subject: PERSON.subject, environmentId: 'efeonce-auth', clientId, scopes: null, reason: 'test revoke', actor: 'admin', via: 'admin' }, { store: h.store })
+    await revokeClientConsent(
+      {
+        subject: PERSON.subject,
+        environmentId: 'efeonce-auth',
+        clientId,
+        scopes: null,
+        reason: 'test revoke',
+        actor: 'admin',
+        via: 'admin'
+      },
+      { store: h.store }
+    )
 
     expect(h.store.consents.every(c => c.status === 'revoked')).toBe(true)
 
     // Sin consent activo el store no devuelve nada → authorize vuelve a mostrar consentimiento.
-    const again = await h.handler(request('GET', `/oauth/authorize?${new URLSearchParams({ response_type: 'code', client_id: clientId, redirect_uri: 'http://127.0.0.1:4444/callback', scope: 'efeonce.mcp.read', state: 's', code_challenge: pkce().challenge, code_challenge_method: 'S256' })}`))
+    const again = await h.handler(
+      request(
+        'GET',
+        `/oauth/authorize?${new URLSearchParams({ response_type: 'code', client_id: clientId, redirect_uri: 'http://127.0.0.1:4444/callback', scope: 'efeonce.mcp.read', state: 's', code_challenge: pkce().challenge, code_challenge_method: 'S256' })}`
+      )
+    )
 
     expect(again!.status).toBe(200)
     expect(again!.body).toContain('action="/oauth/consent"')
@@ -527,14 +735,28 @@ describe('auth-server OAuth flow (in-process)', () => {
     })
 
     const noConsent = await h.handler(
-      request('POST', '/oauth/token', { headers: FORM_HEADERS, body: form({ grant_type: 'authorization_code', client_id: clientId, code: 'efc_manual', redirect_uri: redirectUri, code_verifier: verifier }) })
+      request('POST', '/oauth/token', {
+        headers: FORM_HEADERS,
+        body: form({
+          grant_type: 'authorization_code',
+          client_id: clientId,
+          code: 'efc_manual',
+          redirect_uri: redirectUri,
+          code_verifier: verifier
+        })
+      })
     )
 
     expect(json(noConsent).error).toBe('invalid_grant')
     expect(code).toBeTruthy()
 
     // Scope de escritura con authLevel primary → step-up (403) antes del consentimiento.
-    const stepUp = await h.handler(request('GET', `/oauth/authorize?${new URLSearchParams({ response_type: 'code', client_id: clientId, redirect_uri: 'http://127.0.0.1:4444/callback', scope: 'efeonce.mcp.read efeonce.mcp.seo.write', state: 's', code_challenge: pkce().challenge, code_challenge_method: 'S256' })}`))
+    const stepUp = await h.handler(
+      request(
+        'GET',
+        `/oauth/authorize?${new URLSearchParams({ response_type: 'code', client_id: clientId, redirect_uri: 'http://127.0.0.1:4444/callback', scope: 'efeonce.mcp.read efeonce.mcp.seo.write', state: 's', code_challenge: pkce().challenge, code_challenge_method: 'S256' })}`
+      )
+    )
 
     expect(stepUp!.status).toBe(403)
   })
@@ -545,39 +767,103 @@ describe('auth-server OAuth flow (in-process)', () => {
     const { registerConfidentialClient } = await import('./clients')
 
     const confidential = await registerConfidentialClient(
-      { clientName: 'ChatGPT connector', redirectUris: ['https://chat.example/cb'], actor: 'test', tokenEndpointAuthMethod: 'client_secret_basic' },
+      {
+        clientName: 'ChatGPT connector',
+        redirectUris: ['https://chat.example/cb'],
+        actor: 'test',
+        tokenEndpointAuthMethod: 'client_secret_basic'
+      },
       { store: h.store, config }
     )
 
-    const basic = 'Basic ' + Buffer.from(`${confidential.client.clientId}:${confidential.clientSecret}`).toString('base64')
+    const basic =
+      'Basic ' + Buffer.from(`${confidential.client.clientId}:${confidential.clientSecret}`).toString('base64')
+
     const { token } = await runCodeFlowConfidential(h, confidential.client.clientId, basic)
     const body = json(token)
 
-    const active = await h.handler(request('POST', '/oauth/introspect', { headers: { ...FORM_HEADERS, authorization: basic }, body: form({ token: body.access_token }) }))
+    const active = await h.handler(
+      request('POST', '/oauth/introspect', {
+        headers: { ...FORM_HEADERS, authorization: basic },
+        body: form({ token: body.access_token })
+      })
+    )
 
-    expect(json(active)).toMatchObject({ active: true, sub: PERSON.subject, client_id: confidential.client.clientId, gv: 3 })
+    expect(json(active)).toMatchObject({
+      active: true,
+      sub: PERSON.subject,
+      client_id: confidential.client.clientId,
+      gv: 3
+    })
 
-    const revoked = await h.handler(request('POST', '/oauth/revoke', { headers: { ...FORM_HEADERS, authorization: basic }, body: form({ token: body.access_token, token_type_hint: 'access_token' }) }))
+    // La autoridad externa/canary se revalida aunque no tenga authorization_context_id interno.
+    h.grants.result = { bound: false, outcome: 'revoked', profileId: 'prof-1' }
+
+    const authorityInactive = await h.handler(
+      request('POST', '/oauth/introspect', {
+        headers: { ...FORM_HEADERS, authorization: basic },
+        body: form({ token: body.access_token })
+      })
+    )
+
+    const refreshAuthorityInactive = await h.handler(
+      request('POST', '/oauth/introspect', {
+        headers: { ...FORM_HEADERS, authorization: basic },
+        body: form({ token: body.refresh_token })
+      })
+    )
+
+    expect(json(authorityInactive)).toEqual({ active: false })
+    expect(json(refreshAuthorityInactive)).toEqual({ active: false })
+    h.grants.result = { bound: true, grantsVersion: 3, profileId: 'prof-1', memberships: 1 }
+
+    const revoked = await h.handler(
+      request('POST', '/oauth/revoke', {
+        headers: { ...FORM_HEADERS, authorization: basic },
+        body: form({ token: body.access_token, token_type_hint: 'access_token' })
+      })
+    )
 
     expect(revoked!.status).toBe(200)
 
-    const inactive = await h.handler(request('POST', '/oauth/introspect', { headers: { ...FORM_HEADERS, authorization: basic }, body: form({ token: body.access_token }) }))
+    const inactive = await h.handler(
+      request('POST', '/oauth/introspect', {
+        headers: { ...FORM_HEADERS, authorization: basic },
+        body: form({ token: body.access_token })
+      })
+    )
 
     expect(json(inactive)).toEqual({ active: false })
 
-    const refreshInactive = await h.handler(request('POST', '/oauth/introspect', { headers: { ...FORM_HEADERS, authorization: basic }, body: form({ token: body.refresh_token }) }))
+    const refreshInactive = await h.handler(
+      request('POST', '/oauth/introspect', {
+        headers: { ...FORM_HEADERS, authorization: basic },
+        body: form({ token: body.refresh_token })
+      })
+    )
 
     expect(json(refreshInactive)).toEqual({ active: false })
 
     // Secret incorrecto → invalid_client con WWW-Authenticate.
     const badSecret = 'Basic ' + Buffer.from(`${confidential.client.clientId}:wrong`).toString('base64')
-    const denied = await h.handler(request('POST', '/oauth/introspect', { headers: { ...FORM_HEADERS, authorization: badSecret }, body: form({ token: body.access_token }) }))
+
+    const denied = await h.handler(
+      request('POST', '/oauth/introspect', {
+        headers: { ...FORM_HEADERS, authorization: badSecret },
+        body: form({ token: body.access_token })
+      })
+    )
 
     expect(denied!.status).toBe(401)
     expect(denied!.headers['WWW-Authenticate']).toContain('Basic')
 
     // Cliente público → no puede introspectar.
-    const publicDenied = await h.handler(request('POST', '/oauth/introspect', { headers: FORM_HEADERS, body: form({ token: body.access_token, client_id: 'https://client.example/oauth/client-metadata.json' }) }))
+    const publicDenied = await h.handler(
+      request('POST', '/oauth/introspect', {
+        headers: FORM_HEADERS,
+        body: form({ token: body.access_token, client_id: 'https://client.example/oauth/client-metadata.json' })
+      })
+    )
 
     expect(json(publicDenied).error).toBe('invalid_client')
   })
@@ -586,21 +872,40 @@ describe('auth-server OAuth flow (in-process)', () => {
     h.setSubject(null)
 
     const clientId = 'https://client.example/oauth/client-metadata.json'
-    const params = { response_type: 'code', client_id: clientId, redirect_uri: 'https://client.example/cb', scope: 'efeonce.mcp.read', state: 's', code_challenge: pkce().challenge, code_challenge_method: 'S256' }
+
+    const params = {
+      response_type: 'code',
+      client_id: clientId,
+      redirect_uri: 'https://client.example/cb',
+      scope: 'efeonce.mcp.read',
+      state: 's',
+      code_challenge: pkce().challenge,
+      code_challenge_method: 'S256'
+    }
 
     const page = await h.handler(request('GET', `/oauth/authorize?${new URLSearchParams(params)}`))
 
     expect(page!.status).toBe(401)
     expect(page!.body).toContain('<svg')
 
-    const none = await h.handler(request('GET', `/oauth/authorize?${new URLSearchParams({ ...params, prompt: 'none' })}`))
+    const none = await h.handler(
+      request('GET', `/oauth/authorize?${new URLSearchParams({ ...params, prompt: 'none' })}`)
+    )
 
     expect(new URL(none!.headers.Location).searchParams.get('error')).toBe('login_required')
 
     const unbound = await createHarness()
 
     unbound.setSubject(PERSON)
-    await unbound.store.grantConsents({ subject: PERSON.subject, environmentId: 'efeonce-auth', clientId, scopes: ['efeonce.mcp.read'], grantedVia: 'admin', grantedBy: 'test', now: new Date() })
+    await unbound.store.grantConsents({
+      subject: PERSON.subject,
+      environmentId: 'efeonce-auth',
+      clientId,
+      scopes: ['efeonce.mcp.read'],
+      grantedVia: 'admin',
+      grantedBy: 'test',
+      now: new Date()
+    })
 
     const grantsDenied = createOAuthHandler({
       store: unbound.store,
@@ -610,7 +915,15 @@ describe('auth-server OAuth flow (in-process)', () => {
       subjectPort: createStaticSubjectPort(PERSON),
       grantsPort: createStaticGrantsPort({ bound: false, outcome: 'unbound', profileId: null }),
       loadKeys: async () => unbound.keys,
-      cimd: { resolveAddresses: async () => ['203.0.113.10'], fetcher: async url => ({ status: 200, etag: null, contentType: 'application/json', body: JSON.stringify({ client_id: url, redirect_uris: ['https://client.example/cb'] }) }) }
+      cimd: {
+        resolveAddresses: async () => ['203.0.113.10'],
+        fetcher: async url => ({
+          status: 200,
+          etag: null,
+          contentType: 'application/json',
+          body: JSON.stringify({ client_id: url, redirect_uris: ['https://client.example/cb'] })
+        })
+      }
     })
 
     const deniedRedirect = await grantsDenied(request('GET', `/oauth/authorize?${new URLSearchParams(params)}`))
@@ -620,7 +933,20 @@ describe('auth-server OAuth flow (in-process)', () => {
 
   it('rate-limits the token endpoint per IP after the configured burst', async () => {
     const tight = await createHarness({ tokenRateLimitPerIp: 2 })
-    const hit = () => tight.handler(request('POST', '/oauth/token', { headers: FORM_HEADERS, body: form({ grant_type: 'authorization_code', client_id: 'nope', code: 'x', redirect_uri: 'y', code_verifier: 'z' }) }))
+
+    const hit = () =>
+      tight.handler(
+        request('POST', '/oauth/token', {
+          headers: FORM_HEADERS,
+          body: form({
+            grant_type: 'authorization_code',
+            client_id: 'nope',
+            code: 'x',
+            redirect_uri: 'y',
+            code_verifier: 'z'
+          })
+        })
+      )
 
     expect((await hit())!.status).toBe(401)
     expect((await hit())!.status).toBe(401)
@@ -634,13 +960,26 @@ const runCodeFlowConfidential = async (h: Harness, clientId: string, basic: stri
   const { verifier, challenge } = pkce()
   const authorizeUrl = `/oauth/authorize?${new URLSearchParams({ response_type: 'code', client_id: clientId, redirect_uri: 'https://chat.example/cb', scope: 'efeonce.mcp.read', state: 's', code_challenge: challenge, code_challenge_method: 'S256' })}`
 
-  await h.handler(request('POST', '/oauth/consent', { headers: { ...FORM_HEADERS, origin: ISSUER }, body: form({ client_id: clientId, scope: 'efeonce.mcp.read', return_to: authorizeUrl, decision: 'allow' }) }))
+  await h.handler(
+    request('POST', '/oauth/consent', {
+      headers: { ...FORM_HEADERS, origin: ISSUER },
+      body: form({ client_id: clientId, scope: 'efeonce.mcp.read', return_to: authorizeUrl, decision: 'allow' })
+    })
+  )
 
   const redirect = await h.handler(request('GET', authorizeUrl))
   const code = new URL(redirect!.headers.Location).searchParams.get('code')!
 
   const token = await h.handler(
-    request('POST', '/oauth/token', { headers: { ...FORM_HEADERS, authorization: basic }, body: form({ grant_type: 'authorization_code', code, redirect_uri: 'https://chat.example/cb', code_verifier: verifier }) })
+    request('POST', '/oauth/token', {
+      headers: { ...FORM_HEADERS, authorization: basic },
+      body: form({
+        grant_type: 'authorization_code',
+        code,
+        redirect_uri: 'https://chat.example/cb',
+        code_verifier: verifier
+      })
+    })
   )
 
   return { token }

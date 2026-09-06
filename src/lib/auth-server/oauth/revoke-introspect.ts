@@ -32,8 +32,31 @@ export type RevokeIntrospectDeps = {
 const looksLikeJwt = (token: string): boolean => token.split('.').length === 3
 
 type LocatedToken =
-  | { authorizationContextId: string | null; environmentId: string; kind: 'access'; grantId: string; subject: string; clientId: string; active: boolean; scope: string; exp: number; iat: number; jti: string; gv: number }
-  | { authorizationContextId: string | null; environmentId: string; kind: 'refresh'; grantId: string; subject: string; clientId: string; active: boolean; scopes: string[]; exp: number }
+  | {
+      authorizationContextId: string | null
+      environmentId: string
+      kind: 'access'
+      grantId: string
+      subject: string
+      clientId: string
+      active: boolean
+      scope: string
+      exp: number
+      iat: number
+      jti: string
+      gv: number
+    }
+  | {
+      authorizationContextId: string | null
+      environmentId: string
+      kind: 'refresh'
+      grantId: string
+      subject: string
+      clientId: string
+      active: boolean
+      scopes: string[]
+      exp: number
+    }
   | null
 
 const locateToken = async (token: string, deps: RevokeIntrospectDeps, now: Date): Promise<LocatedToken> => {
@@ -44,8 +67,13 @@ const locateToken = async (token: string, deps: RevokeIntrospectDeps, now: Date)
 
     const record = await deps.store.getAccessToken(verified.jti)
 
-    if (!record || record.subject !== verified.sub || record.clientId !== verified.azp ||
-        (record.authorizationContextId ?? null) !== verified.authorizationContextId) return null
+    if (
+      !record ||
+      record.subject !== verified.sub ||
+      record.clientId !== verified.azp ||
+      (record.authorizationContextId ?? null) !== verified.authorizationContextId
+    )
+      return null
 
     return {
       authorizationContextId: record.authorizationContextId ?? null,
@@ -83,7 +111,11 @@ const locateToken = async (token: string, deps: RevokeIntrospectDeps, now: Date)
 }
 
 const errorResponse = (error: OAuthProtocolError): OAuthHttpResponse =>
-  jsonResponse(error.statusCode, error.toBody(), error.code === 'invalid_client' ? { 'WWW-Authenticate': 'Basic realm="oauth"' } : {})
+  jsonResponse(
+    error.statusCode,
+    error.toBody(),
+    error.code === 'invalid_client' ? { 'WWW-Authenticate': 'Basic realm="oauth"' } : {}
+  )
 
 const withClient = async (
   request: OAuthHttpRequest,
@@ -93,7 +125,8 @@ const withClient = async (
   const client = await authenticateTokenEndpointClient(request, form, deps)
   const token = form.get('token')
 
-  if (!token) throw new OAuthProtocolError('invalid_request', { description: 'token required', reason: 'token_missing' })
+  if (!token)
+    throw new OAuthProtocolError('invalid_request', { description: 'token required', reason: 'token_missing' })
 
   const hint = form.get('token_type_hint')
 
@@ -104,7 +137,10 @@ const withClient = async (
   return { form, client, token }
 }
 
-export const handleRevoke = async (request: OAuthHttpRequest, deps: RevokeIntrospectDeps): Promise<OAuthHttpResponse> => {
+export const handleRevoke = async (
+  request: OAuthHttpRequest,
+  deps: RevokeIntrospectDeps
+): Promise<OAuthHttpResponse> => {
   const now = (deps.now ?? (() => new Date()))()
   const audit = buildRequestAuditContext(request.headers)
 
@@ -114,7 +150,11 @@ export const handleRevoke = async (request: OAuthHttpRequest, deps: RevokeIntros
 
     // RFC 7009 §2.2: token inexistente o ajeno ⇒ 200 sin revelar nada.
     if (located && located.clientId === client.clientId && located.active) {
-      const revoked = await deps.store.revokeGrant({ grantId: located.grantId, now, reason: `client_revoke:${located.kind}` })
+      const revoked = await deps.store.revokeGrant({
+        grantId: located.grantId,
+        now,
+        reason: `client_revoke:${located.kind}`
+      })
 
       await recordOAuthAudit(deps.store, audit, {
         eventType: 'revoke',
@@ -126,13 +166,27 @@ export const handleRevoke = async (request: OAuthHttpRequest, deps: RevokeIntros
         details: { kind: located.kind, ...revoked }
       })
     } else {
-      await recordOAuthAudit(deps.store, audit, { eventType: 'revoke', outcome: 'success', clientId: client.clientId, grantId: null, errorCode: null, details: { noop: true } })
+      await recordOAuthAudit(deps.store, audit, {
+        eventType: 'revoke',
+        outcome: 'success',
+        clientId: client.clientId,
+        grantId: null,
+        errorCode: null,
+        details: { noop: true }
+      })
     }
 
     return jsonResponse(200, {})
   } catch (error) {
     if (isOAuthProtocolError(error)) {
-      await recordOAuthAudit(deps.store, audit, { eventType: 'revoke', outcome: 'rejected', clientId: null, grantId: null, errorCode: error.code, details: { reason: error.reason } })
+      await recordOAuthAudit(deps.store, audit, {
+        eventType: 'revoke',
+        outcome: 'rejected',
+        clientId: null,
+        grantId: null,
+        errorCode: error.code,
+        details: { reason: error.reason }
+      })
 
       return errorResponse(error)
     }
@@ -141,7 +195,10 @@ export const handleRevoke = async (request: OAuthHttpRequest, deps: RevokeIntros
   }
 }
 
-export const handleIntrospect = async (request: OAuthHttpRequest, deps: RevokeIntrospectDeps): Promise<OAuthHttpResponse> => {
+export const handleIntrospect = async (
+  request: OAuthHttpRequest,
+  deps: RevokeIntrospectDeps
+): Promise<OAuthHttpResponse> => {
   const now = (deps.now ?? (() => new Date()))()
   const audit = buildRequestAuditContext(request.headers)
 
@@ -149,18 +206,29 @@ export const handleIntrospect = async (request: OAuthHttpRequest, deps: RevokeIn
     const { client, token } = await withClient(request, deps)
 
     if (client.clientType !== 'confidential') {
-      throw new OAuthProtocolError('invalid_client', { description: 'introspection requires a confidential client', reason: 'public_client' })
+      throw new OAuthProtocolError('invalid_client', {
+        description: 'introspection requires a confidential client',
+        reason: 'public_client'
+      })
     }
 
     const located = await locateToken(token, deps, now)
 
-    // Context revocation, disabled lane and workforce/grant changes invalidate introspection too.
-    // Revoke deliberately uses stored liveness only, so it remains available when authority is off.
-    if (located?.active && located.authorizationContextId) {
+    // Context revocation, disabled lanes and workforce/grant changes invalidate introspection too,
+    // for both internal and external populations. Revoke deliberately uses stored liveness only,
+    // so it remains available when authority is off.
+    if (located?.active && deps.grantsPort) {
       try {
-        const authority = await deps.grantsPort?.resolve({ environmentId: located.environmentId, subject: located.subject, clientId: located.clientId, authorizationContextId: located.authorizationContextId })
+        const authority = await deps.grantsPort.resolve({
+          environmentId: located.environmentId,
+          subject: located.subject,
+          clientId: located.clientId,
+          authorizationContextId: located.authorizationContextId
+        })
 
-        located.active = Boolean(authority?.bound && (located.kind !== 'access' || authority.grantsVersion === located.gv))
+        located.active = Boolean(
+          authority?.bound && (located.kind !== 'access' || authority.grantsVersion === located.gv)
+        )
       } catch {
         located.active = false
       }
@@ -181,7 +249,9 @@ export const handleIntrospect = async (request: OAuthHttpRequest, deps: RevokeIn
     if (located.kind === 'access') {
       return jsonResponse(200, {
         active: true,
-        ...(located.authorizationContextId ? { authorization_context_id: located.authorizationContextId, authorization_context_version: 1 } : {}),
+        ...(located.authorizationContextId
+          ? { authorization_context_id: located.authorizationContextId, authorization_context_version: 1 }
+          : {}),
         token_type: 'Bearer',
         scope: located.scope,
         client_id: located.clientId,
@@ -206,7 +276,14 @@ export const handleIntrospect = async (request: OAuthHttpRequest, deps: RevokeIn
     })
   } catch (error) {
     if (isOAuthProtocolError(error)) {
-      await recordOAuthAudit(deps.store, audit, { eventType: 'introspect', outcome: 'rejected', clientId: null, grantId: null, errorCode: error.code, details: { reason: error.reason } })
+      await recordOAuthAudit(deps.store, audit, {
+        eventType: 'introspect',
+        outcome: 'rejected',
+        clientId: null,
+        grantId: null,
+        errorCode: error.code,
+        details: { reason: error.reason }
+      })
 
       return errorResponse(error)
     }

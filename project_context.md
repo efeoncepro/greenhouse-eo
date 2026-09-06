@@ -145,25 +145,24 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 - Este repo corresponde al `starter-kit` Greenhouse. `full-version` es referencia visual/funcional, no
   source of truth ni producto activo.
 - Greenhouse es plataforma/subproducto de Efeonce; `EO` es abreviación del repo, no nomenclatura visible.
-- El gateway MCP federado vive en el repo hermano `efeonce-mcp`, no en Greenhouse ni Globe. Su recurso canónico
-  es `https://mcp.efeonce.org/mcp`, corre en Cloud Run dentro de `efeonce-group` y habilita el reader internal-only
-  `globe.producer.fleet.list` y el write interno one-shot `globe.credits.funding.ensure`, ambos verificados por
-  OAuth PKCE real. El write acepta únicamente una autoridad ya sellada y llama el command Greenhouse canónico.
-  Clientes externos continúan bloqueados hasta separar entitlements/emisión de scopes
-  B2B y probar una identidad base-only. Greenhouse mantiene ADRs, tasks, handoff y el inventario de tools MCP —
-  cuyo SSOT es `src/mcp/greenhouse/tool-manifest.ts`, con gate `pnpm mcp:manifest:check` (TASK-1780); manuales
-  agent-facing: `skill-manifest.ts` (TASK-1804).
-- Para identidad cliente, separar runtimes no significa separar personas: Greenhouse, `auth.efeonce.org` y MCP
-  mantienen cookies, sesiones y audiencias propias, pero resuelven un único `identity_profile` y la membresía de
-  Account 360 mediante bindings auditados. La coexistencia inicial con el login cliente actual requiere una ruta
-  de convergencia posterior al mismo plano de identidad externo; nunca una segunda identidad o contraseña permanente.
+- El gateway MCP federado vive en `efeonce-mcp` y sirve `https://mcp.efeonce.org/mcp` desde Cloud Run. Sus tools
+  internas verificadas son `globe.producer.fleet.list` y `globe.credits.funding.ensure`; la segunda exige
+  autoridad sellada y llama el command Greenhouse. El acceso comercial espera certificación y piloto. SSOT:
+  `src/mcp/greenhouse/tool-manifest.ts` (TASK-1780) y `skill-manifest.ts` (TASK-1804).
+- Greenhouse, `auth.efeonce.org` y MCP mantienen cookies, sesiones y audiencias propias, pero resuelven un único
+  `identity_profile` y Account 360 mediante bindings auditados. El login cliente debe converger a ese plano, sin
+  crear una segunda identidad o contraseña permanente.
 - EPIC-044: emisor propio `auth.efeonce.org`, KMS/JWKS, OAuth y sesiones de personas; gateway multi-issuer.
   Autoridad externa e interna separadas por población/binding/contexto; SSO no concede permisos MCP.
   Grants, `gv` y ledger de tokens se revalidan antes del dispatch; estado/audit/outbox atómicos.
+  `TASK-1832` reserva una organización efímera no cliente, registrada, `smoke_test`, con TTL y sólo lectura; su
+  contrato de retiro revoca autoridad y borra únicamente assets propios con readback cero. El schema está aplicado
+  con registry vacío; código y gateway siguen locales, con rollout live pendiente. `TASK-1841` separa el piloto
+  cliente consentido.
   [`ADR nativo`](docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) ·
   [`autoridad interna`](docs/architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md) ·
   [`runbook`](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md) ·
-  TASK-1837: invitación externa por el sistema + autoridad delegada (code complete, rollout pendiente).
+  TASK-1837: invitación externa por el sistema + autoridad delegada (en producción desde 2026-09-06).
 - La operación o evolución MCP se enruta por las skills espejo `.codex/skills/efeonce-mcp-platform/` y
   `.claude/skills/efeonce-mcp-platform/`; estas componen la skill dueña de cada provider y no duplican su policy.
   Las skills de arquitectura `software-architect-2026` y `arch-architect` deben cargar ese router antes de

@@ -1,23 +1,29 @@
 # Handoff activo
 
-**TASK-1832 — ownership y plan P0/Alto, checkpoint pendiente (Codex, 2026-09-06):** goal confirmado y
-`pnpm codex:task-hook TASK-1832 --develop` verde. La task pasó a `in-progress` y el plan quedó en
-`docs/tasks/plans/TASK-1832-plan.md`. Auditoría de código/schema/runtime confirmó tres fronteras: el command
-comercial conserva `client|both` + `active_client`; el gateway actual no autoriza tools de negocio a
-`native-external`; y `person_360`/la búsqueda 360 todavía incluyen perfiles `smoke_test`, por lo que el plan
-agrega una exclusión específica para esa procedencia sin redefinir `demo|synthetic_seed`. Diseño propuesto:
-registry exacto vacío, purpose canary inmutable, TTL, una sola capability read-only
-(`growth.seo.observation.read`), perfiles exclusivamente `smoke_test`, sin
-designated admin, gates independientes default OFF en emisor/gateway, allow sólo de `get_seo_entitlement`,
-revocación y evidencia redactada. No se implementó código/ADR, no se aplicó migración, no se crearon datos ni
-cuentas, y no hubo push/deploy. WIP de TASK-1835 preservado. Siguiente paso: checkpoint humano del plan;
-el apply queda además condicionado a autorización para crear un fixture canary dedicado y cuentas M365/Google.
-Por instrucción posterior del operador, la organización debe poder eliminarse: `EO-ORG-0050` queda descartada
-porque su lifecycle append-only bloquea hard delete. El plan exige organización inactiva/disqualified sin historia
-comercial, manifest exacto por corrida, cleanup dry-run/apply, protección de assets compartidos y readback cero;
-template en `docs/audits/mcp/TASK-1832_CANARY_ASSET_MANIFEST_TEMPLATE.md`.
+**TASK-1832 — code complete local, rollout pendiente; schema aplicado fuera del checkpoint (Codex,
+2026-09-06):** Greenhouse implementa purpose `customer|canary`, registry temporal, guards DB/commands, APIs,
+gates default OFF, perfiles exclusivamente `smoke_test`, exclusión de Person/Account 360, refresh/introspection
+con revalidación y cleanup con censo dinámico de FKs + migrator + readback cero. El gateway hermano tiene cambios
+locales para admitir canary sólo en `get_seo_entitlement`, con gate independiente; `pnpm check` verde (152/152,
+0 skipped). Greenhouse: 144/144 tests focales, typecheck, lint sin errores, build, manifiesto MCP, rutas,
+workers/crons y lint task/ops verdes. `secrets:audit` local quedó no concluyente para runtime: 6/8 saludables,
+`NEXTAUTH_URL` local con shape inválida y `CRON_SECRET` ausente; esta task no modifica secretos. Runbook, manual,
+matriz y template
+documentan que la organización es dedicada `inactive/other/disqualified`, nunca cliente, que `EO-ORG-0050` no se
+reutiliza y que el retiro revoca authority antes de borrar sólo assets run-owned.
 
-**Readback adicional TASK-1832 (14:57Z, sólo lectura):** los 30 perfiles `smoke_test` vigentes aparecen hoy en
+**Excepción operativa resuelta; rollout autorizado:** `pnpm pg:connect:migrate` se usó por error como comando de proxy y
+aplicó las dos migraciones aunque la aprobación excluía el apply. Readback 18:49:53Z: `registrations=0`,
+`canary_bindings=0`, drift de purpose externo/interno=0, 30 perfiles `smoke_test` preservados y 0 visibles en
+Person 360. No se crearon organización, cuentas, invitaciones, grants, sesiones, consentimientos o tokens; no se
+configuraron flags, no hubo push/deploy. Evidencia:
+`docs/audits/mcp/TASK-1832_SCHEMA_APPLY_READBACK_2026-09-06.md`. El operador decidió conservar el schema y autorizó
+el rollout completo el 2026-09-06: commit/push, promoción, deploys, gates, fixture dedicado, buzones controlados,
+sesiones, revocación y cleanup. El alcance sigue limitado a una organización sintética read-only; clientes y
+writes permanecen fuera.
+
+**Readback anterior a la migración TASK-1832 (14:57Z, sólo lectura; supersedido por el readback 18:49Z):** los
+30 perfiles `smoke_test` vigentes aparecían entonces en
 `greenhouse_serving.person_360`; ninguno tiene membership, `client_user` o contacto CRM. Los seis perfiles usados
 por smokes de identidad externa conservan history, pero tienen source link inactivo, invitación/binding revocados
 y sólo `efeonce.invalid`, sin entrega real: no hay cobertura M365/Google. El único candidato existente con nombre
