@@ -1,0 +1,98 @@
+{
+  "taskId": "TASK-1835",
+  "scenario": "efeonce-id-login-consent-screens",
+  "reviewedAt": "2026-09-06",
+  "reviewer": "Claude (greenhouse-eo-06) · GVC premium 20 fixtures x 2 viewports + contraste medido sobre pixeles",
+  "evidence": {
+    "desktop": ".captures/2026-09-06T14-39-10_task1835-runtime-consent/01-desktop/frames/01-runtime-consent.png",
+    "mobile": ".captures/2026-09-06T14-39-49_task1835-runtime-login/02-mobile/frames/01-runtime-login.png",
+    "dossier": "docs/ui/reviews/TASK-1835-efeonce-id-login-consent-screens-review.md"
+  },
+  "dimensions": {
+    "hierarchy": {
+      "score": 4.7,
+      "rationale": "Cada pantalla tiene un solo orden de lectura: quien pide acceso, a donde va el codigo, que se concede, y recien entonces la decision. El login corrigio los dos primarios que competian y dejo passkey primario con el correo como fallback.",
+      "evidence": "consent desktop y login mobile",
+      "nextAction": ""
+    },
+    "proportions": {
+      "score": 4.6,
+      "rationale": "Tarjeta unica centrada con maximo de medida legible; el login gana su panel de marca desde 64rem sin que la tarjeta cambie de rol. Las terminales conservan la misma caja aunque lleven tres lineas.",
+      "evidence": "login desktop 1440 y magic-link-expired mobile",
+      "nextAction": ""
+    },
+    "rhythm": {
+      "score": 4.6,
+      "rationale": "Espaciado derivado de la escala 4n del SSOT; secciones separadas por el mismo intervalo y un solo separador entre carriles de acceso tras retirar el duplicado.",
+      "evidence": "login desktop y consent desktop",
+      "nextAction": ""
+    },
+    "density": {
+      "score": 4.6,
+      "rationale": "El consentimiento expone organizacion, destino y permisos sin scroll interno y con el detalle de capacidades plegado; el login muestra dos metodos completos sin pedir eleccion previa.",
+      "evidence": "consent desktop con dos scopes y organizacion de nombre extenso",
+      "nextAction": ""
+    },
+    "depth": {
+      "score": 4.6,
+      "rationale": "Dos planos honestos: lienzo azul para el contexto de quien pide y tarjeta clara para la decision. La correccion de contraste hizo explicito que son dos superficies y no una.",
+      "evidence": "consent desktop antes y despues del fix de .id-context",
+      "nextAction": ""
+    },
+    "surfaceEconomy": {
+      "score": 4.6,
+      "rationale": "Una tarjeta por pantalla. Los bloques internos —destino, organizacion, permisos— existen porque agrupan datos distintos, no por repetir contenedor; no hay card sobre card ni contenido flotando en el lienzo salvo la ficha de aplicacion, que es contexto y no decision.",
+      "evidence": "rubrica enterprise verde en 40 capturas",
+      "nextAction": ""
+    },
+    "visualImpact": {
+      "score": 4.6,
+      "rationale": "El campo azul con el logotipo institucional en negativo y la tarjeta despegada dan una identidad reconocible como Efeonce en el momento de mayor desconfianza; no parece un formulario de plantilla.",
+      "evidence": "login desktop 1440",
+      "nextAction": ""
+    },
+    "typography": {
+      "score": 4.7,
+      "rationale": "Poppins para display y Geist para texto desde el SSOT, sin un solo valor literal en las plantillas; el host del destino subio a cuerpo grande semibold porque es dato, no nota al pie.",
+      "evidence": "consent desktop, bloque id-destination",
+      "nextAction": ""
+    },
+    "color": {
+      "score": 4.8,
+      "rationale": "272 textos medidos sobre pixeles renderizados en 18 pantallas x 2 viewports: 0 bajo el piso WCAG 1.4.3. La medicion existe justamente porque axe no podia ver el degradado y reportaba cero sin medir.",
+      "evidence": "pnpm auth-server:verify-contrast",
+      "nextAction": ""
+    },
+    "iconography": {
+      "score": 4.5,
+      "rationale": "Iconos de trazo propios y consistentes; el candado, la llave y el ojo/lapiz de lectura-escritura apoyan la lectura sin cargar de ornamento. La marca del cliente sale de un registro curado por origen verificado, nunca redibujada.",
+      "evidence": "consent desktop y login desktop",
+      "nextAction": ""
+    },
+    "responsive": {
+      "score": 4.7,
+      "rationale": "El login pasa de dos columnas con panel de marca a una tarjeta a ancho completo con CTAs apilados sin perder jerarquia; scrollWidth === clientWidth en las 40 capturas.",
+      "evidence": "login mobile 390 y gate de layout",
+      "nextAction": ""
+    },
+    "motion": {
+      "score": 4.5,
+      "rationale": "Entrada breve de la tarjeta por tokens de motion del SSOT y estados de la ceremonia comunicados por texto en una region role=status, no por animacion; reduced-motion ejercitado en las 40 capturas.",
+      "evidence": "capturas con prefers-reduced-motion",
+      "nextAction": ""
+    },
+    "fidelity": {
+      "score": 4.7,
+      "rationale": "Lo implementado corresponde a la direccion «Nocturno editorial» aprobada y al wireframe: passkey antes del correo, dos estados de fallo distintos, consentimiento sin autofoco en la accion afirmativa.",
+      "evidence": "direccion visual versionada y wireframe",
+      "nextAction": ""
+    },
+    "genericTemplateResistance": {
+      "score": 4.6,
+      "rationale": "La ficha de la aplicacion con aviso de no verificada, el bloque de destino de la autorizacion y el panel editorial de marca componen una pantalla de identidad especifica de Efeonce; ningun login generico muestra a donde viaja el codigo.",
+      "evidence": "consent desktop y login desktop",
+      "nextAction": ""
+    }
+  },
+  "verdict": "pass"
+}

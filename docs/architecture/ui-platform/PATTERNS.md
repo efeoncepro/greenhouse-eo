@@ -489,3 +489,43 @@ No usar el mockup como prueba de retrieval real: usa data tipada. Para evidencia
 `ConversationalEvidencePacket` (`src/lib/nexa/conversational-evidence.ts`) es el view-model común para evidence conversacional. V1 deriva desde `knowledge-search.v1` y preserva query, confidence, freshness, denied/filtered count, source URLs/human URLs, citation labels, scores y target de feedback. La UI no re-lee tablas ni re-ejecuta tools: `NexaToolRenderers` y `NexaKnowledgeAnswerSurface` consumen el mismo packet y lo renderizan con `NexaEvidencePanel`.
 
 Los threads históricos rehidratados vuelven con tool-calls cuando `greenhouse_ai.nexa_messages.tool_invocations` trae payload seguro; si un thread antiguo no tiene evidence, el runtime conserva el texto y degrada sin romper la conversación.
+
+## Runtime sin React — shell «Efeonce ID» (TASK-1835)
+
+Patrón para una superficie de producto que **no puede ejecutar el DS del portal**: el authorization
+server (`services/auth-server`) corre sobre `node:http`, sin React, sin Next y sin MUI, y sirve HTML
+compuesto como strings bajo una CSP `default-src 'none'` con estilos por hash.
+
+Se registra acá para que **no nazcan copias**: cualquier otro servicio Efeonce que necesite pintar
+una pantalla fuera del portal usa este patrón, no un segundo sistema visual.
+
+### Reglas
+
+- **Los tokens se generan, no se transcriben.** `scripts/auth-server/styles.ts` deriva el CSS desde
+  el SSOT (AXIS + `typography-tokens`) hacia `styles.generated.ts`, con drift test
+  (`brand-assets.test.ts`) que compara el artefacto contra el generador. **NUNCA** un HEX, un px o
+  un `font-family` literal en las plantillas.
+- **Los assets de marca se bundlean normalizados.** SVG institucionales pasan por `sanitizeBrandSvg`
+  a `fill="currentColor"`: un `<style>` embebido dentro del SVG lo bloquea la CSP por hash y la
+  figura sale negra con el build verde.
+- **Una clase, una superficie.** El shell tiene dos fondos opuestos —lienzo oscuro y tarjeta clara—
+  y una clase compartida entre ambos arrastra el color del otro. Costó un texto a 1.53:1 en el
+  consentimiento (TASK-1835): `.id-context` servía a la ficha sobre el azul y al bloque del destino
+  dentro de la tarjeta. **NUNCA** reusar una clase de texto entre dos fondos distintos.
+- **El contraste se mide sobre píxeles.** axe no puede resolver un fondo con degradado o
+  pseudo-elemento: devuelve `incomplete`, y el gate lo lee como `violations: 0`. El mecanismo real
+  es `pnpm auth-server:verify-contrast`, que muestrea la captura. **NUNCA** leer un cero de axe como
+  evidencia de contraste en una superficie con fondo compuesto.
+- **El JS del navegador es un artefacto generado y servido por nonce.** Fuente en
+  `src/lib/auth-server/persons/*-controller.ts`, bundle por esbuild con drift guard, `<script nonce>`
+  y `script-src 'nonce-…'` añadido a la CSP de ESA respuesta. La forma canónica de servir una página
+  con controlador (`renderLoginPageResponse`) exige el nonce en su tipo de entrada: sin eso el
+  navegador bloquea el script **en silencio** y el control queda pintado pero muerto.
+- **Ninguna pantalla es un callejón sin salida.** Toda página ofrece una acción, salvo las
+  declaradas terminales con su razón. `page-contract.test.ts` lo afirma pantalla por pantalla, junto
+  con la CSP de cada una y la anti-enumeración.
+
+### Evidencia viva
+
+`src/lib/auth-server/oauth/pages/**` · `src/lib/auth-server/persons/pages.ts` ·
+`docs/ui/reviews/TASK-1835-efeonce-id-login-consent-screens-review.md`

@@ -134,9 +134,11 @@ export const GH_AUTH_SERVER = {
 
   // Resultados del consumo
   link_invalid_title: 'Este enlace ya no es válido',
-  link_invalid_body: 'El enlace es inválido o ya fue usado. Pide uno nuevo desde el inicio de sesión.',
-  link_expired_body: 'El enlace expiró. Pide uno nuevo desde el inicio de sesión.',
-  link_used_body: 'Este enlace ya se usó. Pide uno nuevo desde el inicio de sesión.',
+  // Con el botón presente, el cuerpo dice el HECHO; instruir «pide uno nuevo desde el inicio de
+  // sesión» repetía en prosa lo que el control ya hace.
+  link_invalid_body: 'El enlace es inválido o ya fue usado. Los enlaces duran 15 minutos y funcionan una sola vez.',
+  link_expired_body: 'El enlace expiró. Los enlaces duran 15 minutos desde que te los enviamos.',
+  link_used_body: 'Este enlace ya se usó. Cada enlace funciona una sola vez.',
   /**
    * TASK-1835 — La salida existe SIEMPRE. Estas pantallas decían «pide uno nuevo desde el inicio de
    * sesión» sin ofrecer cómo llegar ahí: la instrucción sin el control es un callejón sin salida
