@@ -75,7 +75,7 @@ El assessment de este slice consume su ADR y código; no bloquea el diseño inic
 ## Summary
 
 Asegurar y hacer operable el authorization server antes del primer cliente pagando: red-team agéntico
-cruzado (Fable 5.1 y GPT 5.6 High con roles adversarios sobre la superficie real en staging), pentest externo
+cruzado (Fable 5.1 y GPT-6 Astra con roles adversarios sobre la superficie real en staging; ver §Pareo de modelos), pentest externo
 con hallazgos críticos cerrados, rotación de llaves KMS ejercitada y programada, señales de reliability
 completas, runbooks de incidente, revocación masiva y recuperación, retención y postura frente a la Ley
 21.719 (vigente 2026-12-01). El ADR nativo asumió la operación permanente; esta task es donde esa
@@ -280,6 +280,27 @@ Reglas obligatorias:
 - Red-team: cada agente recibe la superficie (metadata, endpoints, contratos) y un objetivo por caso; la
   evidencia es un request reproducible; el otro agente intenta refutar el hallazgo antes de aceptarlo
   (los hallazgos de subagentes fallan hacia el daño máximo).
+### Pareo de modelos del red-team (actualizado 2026-09-06)
+
+`GPT-6 Astra` reemplaza a `GPT 5.6 High` en el carril adversario. Astra se publicó el 2026-09-03 y es el primer
+modelo de OpenAI en alcanzar el nivel **Critical** de capacidad en ciberseguridad bajo su Preparedness Framework:
+con herramientas y acceso encuentra fallas desconocidas y desarrolla formas de explotarlas sin guía paso a paso.
+
+Tres condiciones que no se pueden saltar:
+
+- **Mantener los dos proveedores.** El diseño exige que un agente refute al otro antes de aceptar un hallazgo. Si
+  ambos carriles son Astra, un punto ciego compartido pasa desapercibido. `Fable 5.1` contra `GPT-6 Astra` conserva
+  la independencia de la refutación.
+- **La capacidad ofensiva está gated.** La versión menos restringida para defensores vive en el programa
+  `Daybreak` / `Daybreak Blue` de OpenAI, en alpha con un grupo reducido. Con la API normal Astra rechaza parte del
+  trabajo. Verificar cobertura real contra un caso del catálogo ANTES de comprometer el plan del Slice 1; si
+  rechaza, degradar el carril a otro modelo y dejarlo escrito, nunca reformular el caso para esquivar el rechazo.
+- **Sólo staging, sólo superficie propia.** Nunca producción, nunca un host de terceros. Es uso defensivo sobre
+  infraestructura propia; cualquier otra cosa sale del alcance de esta task.
+
+Costo a considerar en el Slice 1: la API de Astra cobra USD 10 por millón de tokens de entrada y USD 50 por millón
+de salida — órdenes de magnitud bajo el pentest del Slice 4, pero no trivial en corridas agénticas largas.
+
 - Rotación: `registerSigningKeyVersion` → verificación de JWKS con dos `kid` → espera ≥ `SIGNING_KEY_MIN_OVERLAP_MS` (1 h, mayor que el TTL del access token) → `retireSigningKey` del viejo.
 
 ## Rollout Plan & Risk Matrix
