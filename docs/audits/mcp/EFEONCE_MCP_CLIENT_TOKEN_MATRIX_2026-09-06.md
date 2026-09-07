@@ -50,7 +50,16 @@ elevación ni exposición; el carril canary quedó temporalmente indisponible. E
 `auth-server-00043-ndg`, el gate `true`, 100 % de tráfico y `Ready=True`. `readyz` respondió 200 y el preflight
 OAuth/MCP confirmó metadata, issuer nativo y dos llaves JWKS. Como ambos environments de GitHub despliegan el
 servicio único, se eliminaron sus overrides y quedó una sola variable de repositorio en `true`; esto no cambia
-Vercel staging, que permanece OFF. El retiro debe cambiar esa variable de repositorio a `false`.
+Vercel staging. Una lectura posterior del control plane de Vercel encontró que la variable de staging estaba
+incorrectamente en `true`, aunque el ledger la declaraba OFF. Se corrigió el valor exacto del environment custom
+a `false` y se reconstruyó staging: deployment `dpl_6UUXxsT7eS4EL44kkLWuDrHFqKDT`, READY desde
+`2026-09-07T01:49:32.824Z`. Operación desde el checkout compartido `develop`, team
+`efeonce-7670142f`, proyecto `greenhouse-eo` (`prj_d9v6gihlDq4k1EXazPvzWhSU0qbl`), target `staging`, URL
+`greenhouse-k0mlnpml6-efeonce-7670142f.vercel.app`; los aliases
+`greenhouse-eo-env-staging-efeonce-7670142f.vercel.app` y `dev-greenhouse.efeoncepro.com` apuntan al deployment.
+`vercel curl /api/auth/session` respondió 200 sobre la URL del deployment. El redeploy no publicó `gitSource`;
+Production conservó `true` y no se redeployó. Esta evidencia confirma configuración, build y salud mínima, no
+una prueba flow-level del carril apagado. El retiro debe cambiar también la variable GitHub a `false`.
 
 ## Matriz de correo, sesión y passkey
 
@@ -75,7 +84,9 @@ Vercel staging, que permanece OFF. El retiro debe cambiar esa variable de reposi
 
 En Codex el callback local termina visualmente en `ERR_BLOCKED_BY_CLIENT` dentro del Chrome controlado por
 ChatGPT. El listener ya había recibido el code: el CLI reportó `Successfully logged in` y una sesión nueva
-completó la lectura. Es una deuda de cierre visual del cliente local, no un fallo OAuth del emisor.
+completó la lectura. Recargar no lo corrige porque el listener efímero ya cerró. Es una deuda de cierre visual
+del cliente local, no un fallo OAuth del emisor. Un cliente hospedado debe volver a su callback HTTPS y no se
+puede certificar con esta pantalla.
 
 La fila Claude permanece roja. No se amplió la allowlist ni se autorizó ningún write para forzar un verde. El
 hallazgo vuelve a `TASK-1813`, dueña de interoperabilidad de clientes.

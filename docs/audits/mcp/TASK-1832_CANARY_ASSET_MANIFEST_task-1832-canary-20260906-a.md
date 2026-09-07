@@ -145,6 +145,13 @@ que el command gobernado lo devuelva. Un asset no previsto deja la corrida `bloc
 | Muestra UTC | Estado canary | Frontera | Señales | Dry-run | Resultado |
 | --- | --- | --- | --- | --- | --- |
 | 2026-09-07T01:27:22Z | `registrations=1`, `canary_bindings=1`, registro activo | drift externo/interno `0/0`; `smoke_profiles=32` globales, de los cuales 2 pertenecen a esta corrida; `smoke_in_person_360=0` | 7 `ok`; 2 warnings de 24 h explicados por smokes anteriores al registro. Desde 19:43:30Z: unbound `0`, token revealed `0` | 14 DCR; auth/authority sin cambios; `unexpectedRefs=0`; no apply | `steady`; baseline posterior a la restauración |
+| 2026-09-07T01:43:51Z | `registrations=1`, `canary_bindings=1`, registro activo | drift externo/interno `0/0`; `smoke_profiles=32`; `smoke_in_person_360=0` | 7 `ok`; permanecen los 2 warnings históricos de 24 h, sin señal canary nueva | 14 DCR; 2 profiles/links, 12 sesiones, 8 magic links, 2 passkeys, 5 challenges, 13 codes/consents, 18 refresh/access, 4 contexts y 3 grants; `unexpectedRefs=0`; no apply | `steady`; `deletionReady=false` sólo por actividad esperada durante la ventana |
+
+Control de gates a `2026-09-07T01:48:54.971Z`: Vercel Production `true`; el environment custom staging se
+encontró indebidamente en `true`, se corrigió a `false` y se redeployó sin mover Production. El deployment
+staging `dpl_6UUXxsT7eS4EL44kkLWuDrHFqKDT` quedó READY desde `2026-09-07T01:49:32.824Z` y el alias canónico
+apunta a él; `/api/auth/session` respondió 200 mediante `vercel curl`. Es evidencia de control plane, build y
+salud mínima; la prueba flow-level fail-closed de staging queda pendiente.
 
 ## Registro de retiro
 

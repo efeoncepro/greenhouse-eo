@@ -39,6 +39,12 @@ fijado al SHA released `fb5fc082aa92`, restauró `auth-server-00043-ndg`, 100 % 
 staging/production y quedó una sola variable GitHub de repositorio en `true`; Vercel staging continúa OFF. El
 cleanup final debe apagar esa variable y Vercel Production antes del readback de gates.
 
+Una lectura posterior del control plane mostró que esa última afirmación documental era falsa: la variable
+Vercel del environment custom staging estaba en `true`. Se corrigió su valor exacto a `false` y se reconstruyó
+staging en `dpl_6UUXxsT7eS4EL44kkLWuDrHFqKDT`, READY desde `2026-09-07T01:49:32.824Z`, con el alias canónico
+apuntando al nuevo deployment. Production permaneció `true` y no se redeployó. La evidencia cubre config/build;
+el deny flow-level de staging no se infiere.
+
 ## 2026-09-06 — TASK-1835 completa: Efeonce ID tiene cara, y el gate de accesibilidad estaba ciego
 
 `auth.efeonce.org` sirve su experiencia visible: login con passkey, Microsoft y enlace por correo;
