@@ -13,9 +13,10 @@ HTTPS. ChatGPT anuncia refresh grant pero no `offline_access`; exige ceremonia y
 El workflow staging `34071542507` apagó el gate fail-closed en el Cloud Run único entre 01:07:25Z y 01:15:47Z.
 Production `34072064873` restauró `00043-ndg`, SHA released, Ready/100 % y preflight verde. Las variables GitHub
 por environment se eliminaron y quedó una sola variable de repositorio ON para el Cloud Run compartido. Una
-lectura live posterior detectó Vercel staging en `true`, contra el ledger; se corrigió a `false` y se reconstruyó
-en `dpl_6UUXxsT7eS4EL44kkLWuDrHFqKDT` (READY, alias canónico actualizado) sin tocar Production. Es evidencia de
-config/build, no deny flow-level. El retiro apaga la variable GitHub y Vercel Production.
+lectura live posterior detectó Vercel staging en `true`, contra el ledger; se corrigió a `false`. La build final
+de `develop@c75a07f`, `dpl_D9mkjQLE1a26H4TXQ2HX7wXWMpLf`, quedó READY, tomó los aliases y respondió 200 en
+`/api/auth/session`, sin tocar Production. Es evidencia de config/build, no deny flow-level. El retiro apaga la
+variable GitHub y Vercel Production.
 
 El dry-run inventaría 2 profiles/links, 5 invitaciones, 3 grants, 14 DCR y sus hijos OAuth; sesiones activas `0`,
 passkey activa conservada y cero referencias inesperadas. `deletionReady=false` es correcto por

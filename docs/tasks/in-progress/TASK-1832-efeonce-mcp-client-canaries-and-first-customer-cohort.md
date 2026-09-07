@@ -29,10 +29,12 @@ alta como una renovación posterior al TTL; si ChatGPT solicita el scope, el emi
 la corrección pertenece a `TASK-1813` como interoperabilidad OAuth, sin convertirlo en capability del gateway.
 
 El control plane de Vercel contradijo el ledger durante la observación: staging tenía el gate canary en `true`.
-Se corrigió a `false` en el environment custom y se reconstruyó staging en
-`dpl_6UUXxsT7eS4EL44kkLWuDrHFqKDT` (READY desde `2026-09-07T01:49:32.824Z`, alias canónico actualizado), sin
-modificar ni redeployar Production. La evidencia confirma configuración y build; el deny flow-level de staging
-queda pendiente. El auth-server compartido continúa gobernado por una sola variable GitHub de repositorio ON.
+Se corrigió a `false` en el environment custom y se reconstruyó staging inicialmente en
+`dpl_6UUXxsT7eS4EL44kkLWuDrHFqKDT`. La build final de `develop@c75a07f` quedó READY como
+`dpl_D9mkjQLE1a26H4TXQ2HX7wXWMpLf` desde `2026-09-07T02:03:16.160Z`, tomó los aliases de staging y respondió
+200 en `/api/auth/session`, sin modificar ni redeployar Production. La evidencia confirma configuración y build;
+el deny flow-level de staging queda pendiente. El auth-server compartido continúa gobernado por una sola
+variable GitHub de repositorio ON.
 
 ## Delta 2026-09-06 — certificación sintética separada del piloto con cliente real
 

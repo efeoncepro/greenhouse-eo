@@ -52,13 +52,14 @@ OAuth/MCP confirmó metadata, issuer nativo y dos llaves JWKS. Como ambos enviro
 servicio único, se eliminaron sus overrides y quedó una sola variable de repositorio en `true`; esto no cambia
 Vercel staging. Una lectura posterior del control plane de Vercel encontró que la variable de staging estaba
 incorrectamente en `true`, aunque el ledger la declaraba OFF. Se corrigió el valor exacto del environment custom
-a `false` y se reconstruyó staging: deployment `dpl_6UUXxsT7eS4EL44kkLWuDrHFqKDT`, READY desde
-`2026-09-07T01:49:32.824Z`. Operación desde el checkout compartido `develop`, team
-`efeonce-7670142f`, proyecto `greenhouse-eo` (`prj_d9v6gihlDq4k1EXazPvzWhSU0qbl`), target `staging`, URL
-`greenhouse-k0mlnpml6-efeonce-7670142f.vercel.app`; los aliases
-`greenhouse-eo-env-staging-efeonce-7670142f.vercel.app` y `dev-greenhouse.efeoncepro.com` apuntan al deployment.
-`vercel curl /api/auth/session` respondió 200 sobre la URL del deployment. El redeploy no publicó `gitSource`;
-Production conservó `true` y no se redeployó. Esta evidencia confirma configuración, build y salud mínima, no
+a `false` y se reconstruyó staging inicialmente en `dpl_6UUXxsT7eS4EL44kkLWuDrHFqKDT`. La posterior build de
+`develop@c75a07f` quedó READY como `dpl_D9mkjQLE1a26H4TXQ2HX7wXWMpLf` desde
+`2026-09-07T02:03:16.160Z`. Operación desde el checkout compartido `develop`, team `efeonce-7670142f`, proyecto
+`greenhouse-eo` (`prj_d9v6gihlDq4k1EXazPvzWhSU0qbl`), target `staging`, URL
+`greenhouse-9x1o1j4gn-efeonce-7670142f.vercel.app`; los aliases
+`greenhouse-eo-env-staging-efeonce-7670142f.vercel.app` y `dev-greenhouse.efeoncepro.com` apuntan a este último
+deployment. `vercel curl /api/auth/session` respondió 200 sobre su URL. Production conservó `true` y no se
+redeployó. Esta evidencia confirma configuración, build y salud mínima, no
 una prueba flow-level del carril apagado. El retiro debe cambiar también la variable GitHub a `false`.
 
 ## Matriz de correo, sesión y passkey
