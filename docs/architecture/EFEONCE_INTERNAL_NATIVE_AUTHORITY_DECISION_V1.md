@@ -270,5 +270,5 @@ para origen/CSP/redirect; renderers reales a 1440 px y 390 px con Microsoft visi
 sin overflow ni errores JS; fixtures visuales no sustituyen sesión real. Revisión independiente
 sin hallazgos de seguridad. El fix `21aa12608` se publicó desde `develop` mediante el run
 `34002082020`, revisión `auth-server-00030-rtm`: `/login` público muestra el botón y su click
-inicia Microsoft a 1440/390 px. PR226 aún no está promovido a `main` en este corte. Falta completar
+inicia Microsoft a 1440/390 px. PR226 quedó promovido a `main` `456d9accf` el 2026-09-06, posterior a ese corte. Falta completar
 una nueva autenticación humana desde esa entrada hasta `/auth/session`; el click no prueba ese cierre.

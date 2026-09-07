@@ -11,8 +11,11 @@ La reparación `21aa12608` está servida desde `develop` en `auth-server-00030-r
 [deploy 34002082020](https://github.com/efeoncepro/greenhouse-eo/actions/runs/34002082020) exitoso.
 El servicio compartido ya muestra el botón Microsoft existente de Claude en `/login` sin `return_to`;
 se verificó a 1440 y 390 px y el clic llegó a Microsoft. No se diseñó otro botón.
-[PR #226](https://github.com/efeoncepro/greenhouse-eo/pull/226) sigue abierto: este cambio servido
-no equivale a una nueva promoción certificada a `main`. PR #225 sí tiene release certificado.
+[PR #226](https://github.com/efeoncepro/greenhouse-eo/pull/226) quedó fusionado a `main` `456d9accf`
+el 2026-09-06, certificado por el [run 34005056894](https://github.com/efeoncepro/greenhouse-eo/actions/runs/34005056894)
+con manifest `456d9accffb6-3b09047e-c37f-4ac7-acbc-0e463e1610fd` en `released`, cinco servicios
+sincronizados, watchdog `ok` y `auth-server-00032-h45` sirviendo ese `GIT_SHA`. PR #225 conserva su
+release certificado anterior.
 No se completó un nuevo canary humano del retorno directo hasta `/auth/session`; no usar la prueba
 MCP anterior como evidencia de ese recorrido. La prueba pública acredita visibilidad e inicio SSO.
 
@@ -340,7 +343,7 @@ Apagar flags internos de emisor, reader y gateway; revocar cohorte por command; 
  y externos. Verificar que tokens existentes sean rechazados, no esperar su expiración. Para GC, flag OFF
  y job PAUSED declarativos. Las migraciones son aditivas y permanecen; no borrar evidencias al revertir código.
 
-Pendientes actuales: promoción de PR226 a main, retorno humano del login directo, matriz completa de
+Pendientes actuales: retorno humano del login directo, matriz completa de
 clientes externos/multicontexto y WebKit, latencia de baja upstream separada de revocación local y
 rollback de compatibilidad externa/Entra. Configuración, emisión/refresh, dispatch interno, retiro del
 grant, rollback de flags y GC ya tienen evidencia fechada en este runbook; no reabrirlos a partir de

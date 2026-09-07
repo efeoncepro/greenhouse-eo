@@ -13,8 +13,8 @@ se restauraron en 79 s. Piloto gv5, vencimiento original 2026-09-12T15:00Z; prue
 
 La evidencia y el release PR225/main08acfb2c6 están en
 [el runbook compartido](../../operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
-El arreglo directo de `/login` (21aa12608, auth rev30) ya está servido; PR226 y el retorno humano
-directo siguen pendientes. Esa UI no modifica el contrato de autorización del gateway.
+El arreglo directo de `/login` (21aa12608, auth rev30) ya está servido y quedó promovido a `main`
+`456d9accf` por PR226 el 2026-09-06; el retorno humano directo sigue pendiente. Esa UI no modifica el contrato de autorización del gateway.
 Los snapshots siguientes son historia: `access_tokens=0`, flag emisor OFF y ausencia de auditoría
 del piloto dejaron de ser bloqueos vigentes tras canaries, migración y reconciliación canónica.
 La matriz externa/multicontexto y el canary Entra completo no se declaran aprobados por inferencia.

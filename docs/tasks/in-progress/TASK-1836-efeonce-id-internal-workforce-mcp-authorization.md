@@ -24,7 +24,7 @@ Mapa de construcción, pruebas y límites: [auditoría consolidada TASK-1836/183
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `2026-09-06: entrada directa /login servida desde develop (21aa12608, auth-server-00030-rtm, deploy34002082020 success); botón existente visible a1440/390 y clic→Microsoft verificados. PR226 abierto, promoción main y nuevo canary humano directo pendientes. Pruebas locales235/4omitidas y review correctos. Estado previo del carril MCP a00:30 UTC: release 08acfb2c6 publicado (PR225, run34000876213, manifest released sin override). Acceso Microsoft, consentimiento, token y lectura MCP interna verificados; canary final en gateway36: propia permitida, ajena denegada y revocación efectiva en 6.633 s. Refresh, retiro de grant y rollback medidos anteriormente. Piloto ON, gv5, vencimiento original 2026-09-12T15:00Z; integridad cero y tokens de prueba revocados. Watchdog 5/5, drift0. Matrices externas/multicontexto y UI/WebKit pendientes.`
+- Status real: `2026-09-06: entrada directa /login servida desde develop (21aa12608, auth-server-00030-rtm, deploy34002082020 success); botón existente visible a1440/390 y clic→Microsoft verificados. PR226 fusionada a main 456d9accf el 2026-09-06 (run 34005056894, manifest 456d9accffb6-3b09047e released, watchdog ok, auth-server-00032-h45 con ese GIT_SHA); nuevo canary humano directo pendiente. Pruebas locales235/4omitidas y review correctos. Estado previo del carril MCP a00:30 UTC: release 08acfb2c6 publicado (PR225, run34000876213, manifest released sin override). Acceso Microsoft, consentimiento, token y lectura MCP interna verificados; canary final en gateway36: propia permitida, ajena denegada y revocación efectiva en 6.633 s. Refresh, retiro de grant y rollback medidos anteriormente. Piloto ON, gv5, vencimiento original 2026-09-12T15:00Z; integridad cero y tokens de prueba revocados. Watchdog 5/5, drift0. Matrices externas/multicontexto y UI/WebKit pendientes.`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -118,7 +118,7 @@ coordinada con TASK-1831; no se cambia su semántica silenciosamente ni se marca
 
 ### Gap
 
-- Camino corporativo → sesión → consentimiento → token → tool MCP interno verificado en el piloto. Pendientes: retorno humano de entrada directa, matrices externas/multicontexto y promoción PR226.
+- Camino corporativo → sesión → consentimiento → token → tool MCP interno verificado en el piloto. Promoción PR226 a `main` `456d9accf` cerrada el 2026-09-06 (ver «Estado vigente de la entrada directa»). Pendientes: retorno humano de entrada directa y matrices externas/multicontexto.
 - `issuer_class` por environment no basta para distinguir poblaciones bajo un mismo emisor.
 
 ## Modular Placement Contract

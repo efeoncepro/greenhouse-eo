@@ -251,4 +251,4 @@ Estas decisiones existen en runtime o docs, pero pueden merecer ADR mas explicit
 
 ## 2026-09-05 — autoridad interna Efeonce ID
 
-- [Efeonce internal native authority](EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md) — Accepted; TASK-1836, D1–D7: upstream OIDC, contexto delegado, assurance local y rollout multicomponente. Implementación y canary interno certificados; entrada directa desplegada desde develop, promoción PR226 y matrices amplias pendientes. [Evidencia](../audits/2026-09-06-task-1836-1831-consolidated-evidence.md).
+- [Efeonce internal native authority](EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md) — Accepted; TASK-1836, D1–D7: upstream OIDC, contexto delegado, assurance local y rollout multicomponente. Implementación y canary interno certificados; entrada directa promovida a `main` `456d9accf` por PR226 (2026-09-06); retorno humano directo y matrices amplias pendientes. [Evidencia](../audits/2026-09-06-task-1836-1831-consolidated-evidence.md).
