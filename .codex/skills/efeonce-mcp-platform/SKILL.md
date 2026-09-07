@@ -169,10 +169,15 @@ to the internal rollout runbook and tasks, never to a cached revision in this sk
   which does not certify external client eligibility or canaries (`TASK-1832`). Determine those from
   current canonical readers and the rollout record, not from the presence of an issuer or internal pilot.
   No vendor gets provisioned: WorkOS was discarded by the native ADR.
-  The gateway declares five scopes when all gated providers are active: base `efeonce.mcp.read`,
+  The gateway declares **six** scopes when all gated providers are active: base `efeonce.mcp.read`,
   Globe reader `efeonce.mcp.globe.read`, the flag-gated internal write
-  `efeonce.mcp.globe.credits.funding.ensure`, the flag-gated SEO write `efeonce.mcp.seo.write` (TASK-1308), and
+  `efeonce.mcp.globe.credits.funding.ensure`, the flag-gated SEO write `efeonce.mcp.seo.write` (TASK-1308),
+  the flag-gated identity write `efeonce.mcp.identity.write` (TASK-1837), and
   the flag-gated Hiring reader `efeonce.mcp.hiring.read`.
+  ⚠️ **Read this count from the front door, never from here.** Verified live 2026-09-06:
+  `curl -s https://mcp.efeonce.org/.well-known/oauth-protected-resource` returns those six qualified plus the
+  bare forms the native issuer needs — and `globe.credits.funding.ensure` appears qualified only. The number
+  moved from five to six the day `identity.write` shipped, and this line was stale within hours.
   Scope granularity is **one scope per blast-radius class, never one per capability**: a per-capability list turns
   Entra into a hand-edited mirror of Greenhouse's `capabilities_registry`, the two drift, and a drifted
   authorization mirror is worse than none — it also makes the gateway an authorization authority, which rule 1
@@ -329,15 +334,16 @@ graph, because the gateway will resolve the caller against it:
   `Idempotency-Key`, routeKeys `platform.ecosystem.identity.invitations.{resend,revoke}`): resend = rotate within
   the own binding only (a foreign invitation answers `not_found`, anti-oracle); revoke takes scope `invitation`
   for an open invitation or scope `member` (with `grants_version` bump) for a linked person, and a delegated
-  admin can **never** revoke themself (`invalid_request`). Gateway federation exists as **PR #3** of
-  `efeonce-mcp` (branch `feat/task-1837-delegated-invitations`, open, NOT merged): provider
+  admin can **never** revoke themself (`invalid_request`). Gateway federation shipped as **PR #3** of
+  `efeonce-mcp` (**MERGED 2026-09-06 11:32Z**, followed by #4 and #5; `main` is at `8438c5f`, `version` 1.1.0,
+  productive revision `efeonce-mcp-gateway-00044-4kj`): provider
   `src/providers/greenhouse-identity.ts` over the lane, tools `identity.invitations.list` (read, base scope) and
   `identity.invitation.create` (write, scope `efeonce.mcp.identity.write` — 403 challenge naming the scope;
   announced in `scopes_supported` when the ecosystem provider is on); policies native issuer only, population
   `native-external` only, `organizationId` by membership; any `token` field is discarded; `pnpm check` green.
-  Merge it only AFTER the Greenhouse release (the scope must be in `main`) and
-  `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED=true` in Production — until then the tools answer
-  `policy_blocked`. The delegated `resend`/`revoke` lanes are NOT federated yet (PR #3 follow-up / `TASK-1838`).
+  The merge condition (Greenhouse release carrying the scope + `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED=true`
+  in Production) was satisfied before merging; it is kept here as the rule for the NEXT federated write, not as a
+  pending step. The delegated `resend`/`revoke` lanes are NOT federated yet (PR #3 follow-up / `TASK-1838`).
   Signals: the `identity.external_*` group is now 9, adding
   `identity.external_invitation.{undelivered,expired_unaccepted,token_revealed}` (`token_revealed` steady 0 —
   any value must carry actor + reason in the audit).
