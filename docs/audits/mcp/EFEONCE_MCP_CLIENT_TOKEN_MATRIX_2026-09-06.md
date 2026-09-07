@@ -11,7 +11,7 @@ prueba adopción, usabilidad ni experiencia de una organización cliente.
 
 La release productiva `fb5fc082aa92-3f2c8706-24fa-452d-be8f-6feea7b8cdd9` quedó `released`. El reader
 Vercel sirve el SHA `fb5fc082aa92f6b65d0be0ff9e519ce648752f2f`; el emisor sirve ese SHA en
-`auth-server-00041-ltv`; el gateway sirve `8438c5fa87ed3386d5fc3f6752ac24573e2a3af3` en
+`auth-server-00043-ndg`; el gateway sirve `8438c5fa87ed3386d5fc3f6752ac24573e2a3af3` en
 `efeonce-mcp-gateway-00044-4kj`. Ambos gates canary están `true` y el watchdog quedó `ok`; tres señales de
 GitHub quedaron `unknown` por falta de `GITHUB_RELEASE_OBSERVER_TOKEN`, no verdes por inferencia.
 
@@ -37,9 +37,20 @@ aceptar el recorrido. Sus DCR y artefactos OAuth fallidos siguen marcados con el
 - `expires_at`: `2026-09-14T19:43:30Z`
 - `delete_after`: `2026-09-13T19:43:30Z`, tras siete días de señales y preflight final verde
 - `served Greenhouse SHA`: `fb5fc082aa92f6b65d0be0ff9e519ce648752f2f`
-- `served auth-server revision`: `auth-server-00041-ltv`
+- `served auth-server revision`: `auth-server-00043-ndg`
 - `served gateway SHA/revision`: `8438c5fa87ed3386d5fc3f6752ac24573e2a3af3` /
   `efeonce-mcp-gateway-00044-4kj`
+
+### Incidente fail-closed del runtime compartido
+
+El push `b69f5297d` activó el workflow staging `34071542507`, que desplegó el mismo Cloud Run con
+`EXTERNAL_IDENTITY_CANARY_ENABLED=false`: `auth-server-00042-hp5` sirvió 100 % desde 01:07:25Z. No hubo
+elevación ni exposición; el carril canary quedó temporalmente indisponible. El dispatch production
+`34072064873`, fijado al SHA released `fb5fc082aa92`, restauró a las 01:15:47Z la revisión
+`auth-server-00043-ndg`, el gate `true`, 100 % de tráfico y `Ready=True`. `readyz` respondió 200 y el preflight
+OAuth/MCP confirmó metadata, issuer nativo y dos llaves JWKS. Como ambos environments de GitHub despliegan el
+servicio único, sus variables de despliegue canary quedaron alineadas en `true`; esto no cambia Vercel staging,
+que permanece OFF. El retiro debe devolver ambas a `false`.
 
 ## Matriz de correo, sesión y passkey
 

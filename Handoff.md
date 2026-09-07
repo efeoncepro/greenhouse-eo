@@ -1,14 +1,20 @@
 # Handoff activo
 
 **TASK-1832 — canary productivo en observación; retiro después del 2026-09-13 19:43Z (Codex,
-2026-09-06):** release `fb5fc082aa92-3f2c8706-24fa-452d-be8f-6feea7b8cdd9` `released`; Vercel/auth-server
-sirven `fb5fc082aa92` y gateway `8438c5fa87ed`; ambos gates siguen ON. El fixture dedicado conserva dos profiles
+2026-09-06):** release `fb5fc082aa92-3f2c8706-24fa-452d-be8f-6feea7b8cdd9` `released`; Vercel y el auth-server
+restaurado en `auth-server-00043-ndg` sirven `fb5fc082aa92`, y el gateway sirve `8438c5fa87ed`; ambos gates
+siguen ON. El fixture dedicado conserva dos profiles
 `smoke_test`, un grant read-only, cero 360/comercial y `unexpectedRefs=0`. M365, Gmail autorizado, magic link,
 passkey real Chrome/Safari, Codex 0.153.4, helper y las cinco negativas tienen evidencia live. Expiración natural:
 `401 invalid_token` después de `899 s`, antes de revocar la familia; authority revocada: deny en `19.272 s`.
 La guarda nueva confirmó el `organization_id` exacto. Claude Code 2.1.186 falla cerrado por scopes desconocidos/
 write; Claude Desktop/web y ChatGPT siguen abiertos en `TASK-1813`. El callback Codex puede mostrar
 `ERR_BLOCKED_BY_CLIENT` bajo Chrome depurado después de que el CLI ya recibió el code.
+
+El workflow staging `34071542507` apagó el gate fail-closed en el Cloud Run único entre 01:07:25Z y 01:15:47Z.
+Production `34072064873` restauró `00043-ndg`, SHA released, Ready/100 % y preflight verde. Las variables GitHub
+staging/production quedaron ON porque despliegan el mismo servicio; Vercel staging sigue OFF. El retiro apaga
+las dos variables GitHub y Vercel Production. Detalle en la matriz MCP.
 
 El dry-run inventaría 2 profiles/links, 5 invitaciones, 3 grants, 14 DCR y sus hijos OAuth; sesiones humanas
 activas `0`, passkey activa conservada, ownership inequívoco y cero referencias inesperadas. Los DCR usados con

@@ -80,7 +80,9 @@ que el command gobernado lo devuelva. Un asset no previsto deja la corrida `bloc
 - [x] Gateway productivo compatible y gate canary `true`: SHA `8438c5fa87ed`, rev
       `efeonce-mcp-gateway-00044-4kj`, Ready/100 %.
 - [x] Auth-server productivo compatible y gate canary `true`: SHA `fb5fc082aa92`, rev
-      `auth-server-00041-ltv`, Ready/100 %.
+      `auth-server-00043-ndg`, Ready/100 %. El workflow staging `34071542507` lo apagó fail-closed en
+      `00042-hp5` entre 01:07:25Z y 01:15:47Z; production `34072064873` restauró el SHA released y el gate.
+      Las variables GitHub staging/production quedaron alineadas en `true` mientras dure la observación.
 - [x] Vercel Production sirve `fb5fc082aa92`; release
       `fb5fc082aa92-3f2c8706-24fa-452d-be8f-6feea7b8cdd9` en estado `released`.
 - [x] Registry + organización + binding creados por commands; aggregate readback `1/1`, purpose drift `0/0` y

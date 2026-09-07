@@ -27,6 +27,14 @@ fixture. El readback dejó las sesiones humanas canary activas en cero y conserv
 la observación. Quedó activa una automatización diaria silenciosa para vigilar la ventana y ejecutar el retiro
 sólo desde `delete_after` con todas las precondiciones verdes.
 
+El push de endurecimiento `b69f5297d` mostró una colisión real del entorno compartido: el workflow staging
+`34071542507` desplegó `auth-server-00042-hp5` con el gate canary OFF sobre el Cloud Run único. El intervalo
+fail-closed duró desde 01:07:25Z hasta 01:15:47Z y no concedió acceso. El dispatch production `34072064873`,
+fijado al SHA released `fb5fc082aa92`, restauró `auth-server-00043-ndg`, 100 % de tráfico, `Ready=True`, gate ON;
+`readyz` y preflight OAuth/MCP pasaron. Para evitar repetición durante la observación, la variable GitHub de
+despliegue quedó `true` tanto en staging como en production; Vercel staging continúa OFF. El cleanup final debe
+apagar las dos variables GitHub y Vercel Production antes del readback de gates.
+
 ## 2026-09-06 — TASK-1835 completa: Efeonce ID tiene cara, y el gate de accesibilidad estaba ciego
 
 `auth.efeonce.org` sirve su experiencia visible: login con passkey, Microsoft y enlace por correo;
