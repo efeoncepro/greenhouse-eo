@@ -21,7 +21,8 @@ organización la resuelve Efeonce. Compartir un emisor no comparte permisos entr
 La base de TASK-1828 (servicio, llaves y dirección pública), el OAuth de TASK-1829 y la autenticación de
 personas de TASK-1830 están integrados. TASK-1836 agrega el recorrido corporativo y TASK-1831 su consumo
 en el gateway. La cohorte interna y una certificación externa sintética están activas; esto no abre clientes
-reales. Codex y ChatGPT hospedado están verdes; Claude `2.1.263` tiene preflight mínimo y ceremonia pendiente.
+reales. Codex, ChatGPT hospedado, Claude Code `2.1.263`, Claude.ai y Claude Desktop `1.46388.4` están verdes;
+los clientes OAuth Claude renovaron post-TTL sin ampliar scopes.
 
 | Pieza | Qué es, en simple | Estado |
 | --- | --- | --- |

@@ -1,22 +1,37 @@
 # TASK-1832 — Efeonce MCP Synthetic External Canaries and Client Compatibility Certification
 
-## Delta 2026-09-07 — Claude Code actualizado; preflight mínimo verde, ceremonia pendiente
+## Delta 2026-09-07 — Claude Code y Claude.ai completan la ceremonia real
 
 La causa del fallo histórico quedó acotada al cliente Claude Code `2.1.186`: antes de `2.1.196`, Claude podía
 solicitar el catálogo completo descubierto y provocar `invalid_scope`. El runtime local se actualizó mediante
 Volta a `2.1.263` y el servidor `efeonce-mcp` quedó configurado con el recurso canónico y
-`oauth.scopes="efeonce.mcp.read"`, sin `authServerMetadataUrl` ni scopes de escritura. El preflight del login
-generó una autorización con un único scope base, PKCE S256 y `resource=https://mcp.efeonce.org/mcp`; esto corrige
-el bootstrap, pero no acredita todavía consentimiento, token ni dispatch.
+`oauth.scopes="efeonce.mcp.read"`, sin `authServerMetadataUrl` ni scopes de escritura. Un login nuevo completó
+PKCE S256, consentimiento visible sobre la organización canary exacta y emisión de token. Una sesión aislada,
+sin herramientas ajenas al MCP Efeonce, vio exactamente `efeonce_gateway_status|get_seo_entitlement`, ejecutó
+la segunda y obtuvo `no_entitlement`; `track_seo_keywords` no estuvo disponible. El warning local SEP-2352 sobre
+una credencial todavía sin sello `issuer` queda como observación del cliente, no como fallo del servidor: la
+conexión y el dispatch funcionaron.
 
-Para conservar el contrato de borrado se registró un DCR público exclusivo de la corrida,
+Para conservar el contrato de borrado se registró un DCR público exclusivo de la corrida local,
 `dcr-ErE3ZSUXL7ENeJh61BEWDw`, con `software_id=task-1832-canary-20260906-a`, callback fijo
 `http://localhost:18432/callback` y allowlist sólo de lectura. Se descartó usar el client ID CIMD compartido de
 Anthropic: un cliente compartido no es run-owned y no se debe borrar por haber sido observado por un sujeto
-canary. El dry-run posterior incorporó el DCR exacto (`21` clientes), conservó `unexpectedRefs=0` y no encontró
-nuevos codes, consentimientos ni tokens porque la autenticación se canceló antes del consentimiento. La Mac
-estaba bloqueada; quedan pendientes el login visible, una lectura real, el negativo de write, refresh post-TTL,
-revocación y las superficies hospedadas Claude.ai/Desktop. La fila `2.1.186 FAIL` se conserva como historia.
+canary. Claude.ai se agregó como custom connector remoto y se configuró deliberadamente con otro DCR público
+run-owned, `dcr-mLTiqIJmBQyvdQOtKRpdVw`, callback exacto `https://claude.ai/api/mcp/auth_callback`,
+`software_id=run_id`, secret vacío, OAuth siempre requerido y Streamable HTTP. El consentimiento hospedado mostró
+la misma organización y el único scope base; el catálogo visible tuvo las mismas dos tools read-only y una
+invocación aprobada de SEO devolvió `no_entitlement` con todos los contadores en cero. No se usó el cliente CIMD
+detectado porque no es borrable por esta corrida.
+
+El dry-run posterior incorporó ambos DCR (`22` clientes), `21` codes/consents y, tras las renovaciones,
+`29` refresh/access tokens,
+`18` sesiones, `14` magic links, `2` passkeys, `5` challenges y `4` contexts. Conserva
+`unexpectedRefs=0`; sus únicos blockers son los esperados
+`registration_active|active_authority|active_auth`. Claude Code y Claude.ai repitieron la lectura después del
+TTL: cada cliente quedó con dos access/refresh, un refresh rotado y uno activo, siempre base-only. La aplicación
+nativa Claude Desktop `1.46388.4` abrió el chat remoto sincronizado, solicitó aprobación propia y ejecutó la
+misma lectura desde su UI; comparte el DCR hospedado y no crea un tercer cliente OAuth. La fila `2.1.186 FAIL`
+se conserva como historia y nunca se amplió la allowlist para convertirla en verde.
 
 ## Delta 2026-09-07 — ChatGPT hospedado verde y gateway MCP v2 endurecido
 
@@ -214,7 +229,7 @@ organización cliente real, sí**.
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-044`
-- Status real: `Rollout productivo activo y en observación. Greenhouse/Vercel y auth-server 00043-ndg sirven fb5fc082aa92; gateway v1.1.2, SHA 171965c99034, revisión 00046-6n2, sirve 100 % y ambos gates canary están ON. M365 y Gmail autorizado, sesión, passkey Chrome/Safari, helper OAuth, E2E Playwright 1/1, Codex y ChatGPT hospedado están verificados. ChatGPT importó sólo dos tools read-only, ejecutó ambas y rotó refresh dos veces post-TTL con scope base único. El probe JSON vacío ya responde 401/400 canónico en vez de 500. Claude Code 2.1.186 falla cerrado por interoperabilidad y vuelve a TASK-1813; Claude Desktop/web no está certificado. unexpected_refs=0, sin contaminación 360/comercial. Faltan siete días, cleanup/readback cero y apagar ambos gates.`
+- Status real: `Rollout productivo activo y en observación. Greenhouse/Vercel y auth-server 00043-ndg sirven fb5fc082aa92; gateway v1.1.2, SHA 171965c99034, revisión 00046-6n2, sirve 100 % y ambos gates canary están ON. M365 y Gmail autorizado, sesión, passkey Chrome/Safari, helper OAuth, E2E Playwright 1/1, Codex, ChatGPT hospedado, Claude Code 2.1.263, Claude.ai y Claude Desktop 1.46388.4 están verificados. ChatGPT rotó refresh dos veces; Claude Code y Claude.ai rotaron una vez post-TTL, siempre base-only. Desktop ejecutó la lectura desde la app nativa sobre el conector remoto. El probe JSON vacío ya responde 401/400 canónico en vez de 500. La fila Claude Code 2.1.186 permanece FAIL histórico. unexpected_refs=0, sin contaminación 360/comercial. La matriz cliente está completa; faltan siete días, cleanup/readback cero y apagar ambos gates.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
 - Blocked by: `none`
@@ -326,15 +341,9 @@ Reglas obligatorias:
 
 ### Gap
 
-- Completar Claude Code `2.1.263` desde consentimiento hasta dispatch, refresh post-TTL y revocación; después
-  certificar el custom connector hospedado en Claude.ai y una invocación desde Desktop.
 - Mantener siete días de señales estables, ejecutar cleanup/readback cero desde `delete_after` y apagar ambos
-  gates. El DCR Claude está inventariado; el CIMD compartido no se usa como asset run-owned.
+  gates. Los dos DCR Claude están inventariados; el CIMD compartido no se usa como asset run-owned.
 - Mantener el primer cliente consentido fuera de esta task (`TASK-1841`).
-
-- No existe un propósito de binding canary separado del binding comercial. El command actual rechaza correctamente
-  cualquier organización que no sea `client|both` + `active_client`; no debe relajarse.
-- Falta la matriz externa completa con clientes MCP reales y buzones/personas `smoke_test`.
 
 ## Modular Placement Contract
 
@@ -667,9 +676,10 @@ organización dedicada creada sólo después de una autorización específica.
       `--wait-expiry` obtuvo `401` después de `899 s` antes de revocar la familia.
 - [ ] Sesiones interactivas por cliente MCP registradas: Codex y ChatGPT hospedado verdes; ChatGPT importó sólo
       `efeonce.gateway.status|get_seo_entitlement`, ejecutó ambas sin write y rotó refresh dos veces post-TTL.
-      Claude Code `2.1.186` conserva su FAIL; `2.1.263` tiene scope mínimo y DCR run-owned, pero falta completar
-      consentimiento/dispatch/refresh/revoke. Claude Desktop/web no está certificado. El criterio permanece
-      abierto porque exige cada cliente de la matriz.
+      Claude Code `2.1.186` conserva su FAIL histórico; `2.1.263` completó consentimiento, catálogo exacto,
+      lectura y refresh post-TTL con scope base único. Claude.ai completó el mismo recorrido y refresh; Desktop
+      `1.46388.4` ejecutó la lectura desde la app nativa sobre el conector remoto. La compatibilidad de todos los
+      clientes declarados está verde; el criterio permanece abierto sólo por la revocación/cleanup final.
 - `pnpm secrets:audit` en el shell final: 0/8, todos `unconfigured` porque el comando no cargó un entorno local.
   No es evidencia de runtime; los valores productivos se verificaron por Vercel/Cloud Run y TASK-1832 no
   modifica secretos.

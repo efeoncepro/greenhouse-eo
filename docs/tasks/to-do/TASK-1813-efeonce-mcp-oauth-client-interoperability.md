@@ -1,19 +1,28 @@
 # TASK-1813 — Compatibilidad OAuth del MCP Efeonce con Codex y Claude
 
-## Delta 2026-09-07 — causa upstream identificada y cliente local corregido
+## Delta 2026-09-07 — Claude Code y Claude.ai certificados en la ruta base
 
 La incompatibilidad de Claude Code quedó versionada: `2.1.186` solicitaba el catálogo completo descubierto;
 Anthropic corrigió ese comportamiento desde `2.1.196`. El CLI local fue actualizado a `2.1.263` y el servidor
-`efeonce-mcp` quedó con `oauth.scopes="efeonce.mcp.read"`, sin override de metadata. Un preflight nuevo confirmó
-una solicitud con scope base único, PKCE S256, recurso canónico y callback fijo. La ceremonia se canceló antes
-del consentimiento porque la Mac estaba bloqueada, por lo que Claude sigue pendiente de login, lectura,
-refresh post-TTL y revocación. TASK-1832 registró un DCR run-owned para completar esa prueba sin comprometer el
-cleanup.
+`efeonce-mcp` quedó con `oauth.scopes="efeonce.mcp.read"`, sin override de metadata. Un login nuevo completó
+PKCE S256, consentimiento para la organización canary exacta, emisión y dispatch. La sesión aislada sólo vio
+`efeonce_gateway_status|get_seo_entitlement`, ejecutó la lectura SEO con `no_entitlement` y no expuso
+`track_seo_keywords`. El warning SEP-2352 sobre una credencial local sin sello `issuer` queda como observación
+de compatibilidad del cliente; no impidió conexión ni lectura.
+
+Claude.ai también completó el custom connector remoto, pero mediante un DCR público propio de TASK-1832 y no
+con el CIMD compartido detectado por Anthropic. El callback hospedado exacto, el secret vacío, OAuth siempre
+requerido y Streamable HTTP produjeron consentimiento base-only, las mismas dos tools read-only y una llamada
+SEO real sin gasto. Esa evidencia acredita Claude.ai web; una ejecución posterior desde Claude Desktop
+`1.46388.4` abrió el chat remoto en `Claude.app`, pidió aprobación propia y repitió la lectura. Ambos DCR están
+ligados al `software_id=run_id` y al cleanup exacto del canary; Desktop reutiliza el hospedado.
 
 ChatGPT ya no está bloqueado por la ausencia de `offline_access`: el cliente hospedado rotó dos veces su refresh
 después del TTL manteniendo únicamente `efeonce.mcp.read`. Codex `0.153.4` también completó login y lectura real.
-No se amplían scopes ni grants; la deuda restante de esta task es la regresión Claude local/hospedada y, como
-hardening separado sujeto a ADR, retirar la ambigüedad del catálogo mixto Entra+nativo.
+No se amplían scopes ni grants. Claude Code y Claude.ai repitieron la lectura después del TTL; cada DCR quedó
+con dos access/refresh, un refresh rotado y uno activo, siempre `efeonce.mcp.read`. Claude Desktop `1.46388.4`
+ejecutó otra lectura desde la app nativa sobre el mismo conector remoto. Como hardening separado sujeto a ADR
+permanece retirar la ambigüedad del catálogo mixto Entra+nativo y reconciliar el cierre formal de esta task.
 
 ## Delta 2026-09-06 — hallazgos de clientes reales durante TASK-1832
 
@@ -65,7 +74,7 @@ La task pasa a `EPIC-044`. El emisor propio (`TASK-1828`/`TASK-1829`) es quien r
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Fallo histórico reproducido con Claude Code 2.1.186 y corregido upstream desde 2.1.196. CLI local actualizado a 2.1.263, scope base fijado y preflight mínimo verde; login/dispatch/refresh/revocación aún pendientes. Codex 0.153.4 y ChatGPT hospedado están certificados por TASK-1832, incluido refresh real sin offline_access.`
+- Status real: `Fallo histórico reproducido con Claude Code 2.1.186 y corregido upstream desde 2.1.196. Claude Code 2.1.263 y Claude.ai completaron login, consentimiento base-only, catálogo de dos tools read-only, lectura y refresh post-TTL; el write quedó oculto. Claude Desktop 1.46388.4 ejecutó la lectura desde su UI nativa sobre el conector remoto. Codex 0.153.4 y ChatGPT hospedado también están certificados por TASK-1832. La compatibilidad cliente objetivo está verde; queda reconciliar el hardening/cierre formal de esta task sin cambiar el runtime por inferencia.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
 - Blocked by: `none`
@@ -453,8 +462,10 @@ deploy y cambios Entra si el plan los justifica. Coordinar ediciones compartidas
 - [ ] Configuración efectiva de deploy prueba que OFF no reactiva shim con variable vacía/ausente y preserva flags ajenos.
 - [ ] Negativos issuer/audience/expiración/base-scope/write-scope y OAuth ausente mantienen 401/403/503 y cero dispatch indebido.
 - [ ] Codex: login fresco + tools visibles en sesión nueva + lectura real sin gasto, con versión y evidencia sanitizada.
-- [ ] Claude Code: mismo recorrido fresco y reconexión; continuidad de renovación probada si se emite refresh token.
-- [ ] claude.ai/Desktop activos tienen evidencia propia o decisión explícita sobre no certificación antes de cutover.
+- [x] Claude Code 2.1.263: recorrido fresco, reconexión y renovación post-TTL; dos access/refresh, uno rotado y
+      uno activo, siempre con `efeonce.mcp.read`. La fila 2.1.186 permanece FAIL histórico.
+- [x] Claude.ai y Claude Desktop 1.46388.4 tienen evidencia propia: web renovó post-TTL y Desktop ejecutó la
+      lectura desde la app nativa sobre el mismo conector remoto.
 - [ ] Callbacks efectivos verificados por host/puerto/path; no ampliación indiscriminada de redirects ni secretos copiados.
 - [ ] Canary directo y prueba de discovery se reportan separados; no `skipped` ni configuración `enabled` como éxito.
 - [ ] Rollout autorizado, SHA/revisión/config readback y rollback ensayado dentro del objetivo quedan registrados.

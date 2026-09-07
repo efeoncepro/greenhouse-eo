@@ -11,10 +11,10 @@ Efeonce MCP Gateway es el punto de acceso federado para que un cliente MCP use c
 mediante una URL estable: `https://mcp.efeonce.org/mcp`. No vive en Greenhouse ni Globe: es un servicio
 independiente que autentica al cliente y delega cada lectura al producto dueño.
 
-Desde TASK-1832, ChatGPT hospedado y Codex están certificados sobre Efeonce ID con una organización sintética
-eliminable. Claude Code `2.1.263` tiene bootstrap de scope mínimo corregido pero la ceremonia completa sigue
-pendiente; Claude hospedado no está certificado. Las dos tools visibles en ChatGPT son su vista autorizada, no el
-inventario total. El gateway usa MCP SDK v2 y conserva schemas, `structuredContent`, annotations y security
+Desde TASK-1832, ChatGPT hospedado, Codex, Claude Code `2.1.263`, Claude.ai y Claude Desktop `1.46388.4` están
+certificados sobre Efeonce ID con una organización sintética eliminable. Code y web renovaron post-TTL sin
+widening; Desktop ejecutó desde la app nativa sobre el conector remoto. Las dos tools visibles en los clientes
+externos son su vista autorizada, no el inventario total. El gateway usa MCP SDK v2 y conserva schemas, `structuredContent`, annotations y security
 metadata observables; un probe JSON vacío anónimo recibe 401 antes de validar el body.
 
 La primera capacidad activa fue `globe.producer.fleet.list`. Permite consultar las rutas de modelos disponibles de

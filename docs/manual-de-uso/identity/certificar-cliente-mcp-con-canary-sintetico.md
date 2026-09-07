@@ -185,8 +185,10 @@ separado la evidencia histórica de cada versión del cliente.
 Claude.ai, Claude Desktop, Cowork y mobile usan el conector remoto hospedado de Anthropic; no se certifican con el
 CLI local. Agrega `https://mcp.efeonce.org/mcp` como custom connector y valida el callback HTTPS oficial
 `https://claude.ai/api/mcp/auth_callback`. En Team/Enterprise el alta la hace un Owner y cada persona conecta su
-cuenta; Pro/Max permite alta individual. Ejecuta una llamada en Claude.ai y otra desde Desktop antes de afirmar
-compatibilidad de ambas superficies.
+cuenta; Pro/Max permite alta individual. Para un canary eliminable elige **Usa tu propio cliente OAuth**, registra
+un DCR público con `software_id=run_id` y ese callback, deja el secreto vacío y conserva **Siempre requerido** con
+**HTTP transmisible**. El CIMD que Claude detecta automáticamente es compartido y no entra al cleanup. Ejecuta
+una llamada en Claude.ai y otra desde Desktop antes de afirmar compatibilidad de ambas superficies.
 
 ### ChatGPT y metadata visible
 

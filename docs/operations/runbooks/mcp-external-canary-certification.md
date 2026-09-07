@@ -1,9 +1,10 @@
 # Runbook técnico — certificación MCP con canary externo eliminable
 
 > TASK-1832 · owner: Identity + MCP Platform · estado al 2026-09-07: **rollout productivo en observación**.
-> Corrida activa `task-1832-canary-20260906-a`; helper, Playwright, Codex y ChatGPT hospedado verdes. Claude
-> Code `2.1.263` tiene bootstrap mínimo corregido, pero la ceremonia sigue pendiente; Claude Desktop/web no está
-> certificado. La matriz y el manifiesto acreditan el runtime; este runbook define el procedimiento.
+> Corrida activa `task-1832-canary-20260906-a`; helper, Playwright, Codex, ChatGPT hospedado, Claude Code
+> `2.1.263`, Claude.ai y Claude Desktop `1.46388.4` están verdes. Code y web renovaron post-TTL sin widening;
+> Desktop ejecutó desde la app nativa sobre el conector remoto. La matriz y el manifiesto acreditan el runtime;
+> este runbook define el procedimiento.
 
 ## Objetivo y frontera
 
@@ -160,7 +161,9 @@ certificación runtime.
   `authServerMetadataUrl`. Para un canary eliminable registra DCR propio con `software_id=run_id` y callback fijo.
   Un CIMD compartido por el vendor se conserva como `shared` y bloquea cualquier intento de borrarlo.
 - **Claude hospedado:** Claude.ai, Desktop, Cowork y mobile comparten infraestructura cloud, pero cada superficie
-  visible conserva una fila de ejecución. Usa el callback exacto `https://claude.ai/api/mcp/auth_callback`.
+  visible conserva una fila de ejecución. Usa el callback exacto `https://claude.ai/api/mcp/auth_callback`. Para
+  un canary eliminable selecciona **Usa tu propio cliente OAuth**, aporta el DCR público run-owned, deja el secreto
+  vacío y conserva **Siempre requerido** + **HTTP transmisible**; no adoptes el CIMD detectado como run-owned.
 - **Codex local:** el callback puede mostrar `ERR_BLOCKED_BY_CLIENT` después de entregar el code. Sólo cuenta si
   el CLI confirma login y una sesión nueva hace la lectura.
 - **ChatGPT hospedado:** la importación debe dejar visibles schemas, `structuredContent`, cuatro annotations y el

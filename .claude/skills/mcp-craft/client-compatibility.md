@@ -38,7 +38,9 @@ autorización server-side.
 - Claude Code `>=2.1.196` permite fijar `oauth.scopes` y dejó de solicitar automáticamente todo el catálogo del
   authorization server. No uses `authServerMetadataUrl` sin revisar que no ensanche scopes.
 - Claude.ai/Desktop/Cowork/mobile usan infraestructura hospedada; el callback documentado es
-  `https://claude.ai/api/mcp/auth_callback`. Una prueba CLI local no certifica ese carril.
+  `https://claude.ai/api/mcp/auth_callback`. Una prueba CLI local no certifica ese carril. Si el fixture debe
+  borrarse, usa en la UI de Claude un cliente OAuth propio, DCR público marcado con el `run_id` y secreto vacío;
+  el CIMD detectado por Claude es compartido y no pertenece al cleanup.
 - En OpenAI verifica schemas, annotations y security metadata visibles en la app hospedada, una acción real y
   continuidad post-TTL.
 

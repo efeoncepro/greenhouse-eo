@@ -7,19 +7,28 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-## 2026-09-07 — TASK-1832: Claude Code actualizado y contrato cross-client consolidado
+## 2026-09-07 — TASK-1832: Claude Code y Claude.ai completan OAuth y lectura real
 
 La falla de Claude Code quedó atribuida a `2.1.186`: esa versión pedía el catálogo completo descubierto.
 Anthropic corrigió el comportamiento desde `2.1.196`; el CLI local quedó en `2.1.263` con
-`oauth.scopes="efeonce.mcp.read"`. Un preflight nuevo produjo sólo el scope base, PKCE S256 y el resource
-canónico. La Mac estaba bloqueada y la ceremonia se canceló antes del consentimiento, por lo que aún no hay
-token, dispatch, refresh ni certificación hospedada de Claude.
+`oauth.scopes="efeonce.mcp.read"`. Un login nuevo completó PKCE S256, consentimiento de la organización canary,
+catálogo de dos tools read-only y `get_seo_entitlement=no_entitlement`; el write no estuvo disponible. Una
+repetición posterior al TTL rotó la familia sin widening: dos access/refresh, uno rotado y uno activo. El warning
+SEP-2352 del cliente sobre una credencial aún sin sello `issuer` se conserva como observación no bloqueante.
 
-Para no comprometer el retiro se creó un DCR público exclusivo con `software_id=run_id`, callback fijo y
-allowlist read-only. El dry-run lo incorporó al grafo: 21 DCR, sin nuevos codes/consents/tokens y
-`unexpectedRefs=0`. La documentación y las skills MCP ahora distinguen versión/local/hospedado, DCR run-owned
-frente a CIMD compartido, serialización observable de schemas/annotations/security, probe vacío 401/400 y
-refresh real post-TTL. TASK-1832 continúa en observación y no se cierra antes del cleanup/readback cero.
+Claude.ai agregó el custom connector remoto con un segundo DCR público exclusivo, `software_id=run_id`, callback
+hospedado exacto, secret vacío, OAuth siempre requerido y Streamable HTTP. Se eligió el cliente propio en vez del
+CIMD compartido detectado por Anthropic para preservar el contrato de borrado. El consentimiento fue base-only,
+las mismas dos tools quedaron visibles y una llamada aprobada devolvió `no_entitlement` con todos los contadores
+en cero. La repetición post-TTL rotó una vez y conservó el scope. Claude Desktop `1.46388.4` abrió el chat desde
+la app nativa, pidió aprobación propia y ejecutó la misma lectura sobre el conector remoto.
+
+El dry-run incorporó ambos DCR: 22 clientes, 21 codes/consents, 29 access/refresh, 18 sesiones, 14 magic links,
+2 passkeys, 5 challenges y 4 contexts; `unexpectedRefs=0`. La documentación y las skills MCP ahora distinguen
+versión/local/hospedado, DCR run-owned frente a CIMD compartido, serialización observable de
+schemas/annotations/security, probe vacío 401/400 y refresh real post-TTL. TASK-1832 continúa en observación y no
+se cierra antes del cleanup/readback cero. La matriz técnica cliente quedó completa; sólo siguen abiertos la
+ventana de observación y el retiro controlado.
 
 ## 2026-09-07 — TASK-1832: ChatGPT completa el OAuth hospedado y el gateway endurece el probe vacío
 

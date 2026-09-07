@@ -10,11 +10,14 @@ ChatGPT hospedado está verde: organización exacta, scope único `efeonce.mcp.r
 rotaciones refresh post-TTL. El probe JSON vacío ya responde 401/400 canónico en vez de 500. M365/Gmail,
 passkey Chrome/Safari, helper, Playwright `1/1`, Codex y cinco negativas siguen verdes; el fixture mantiene 2
 profiles `smoke_test`, cero 360/comercial y `unexpectedRefs=0`. Claude Code `2.1.186` conserva su FAIL histórico;
-el CLI se actualizó a `2.1.263`, fijó sólo `efeonce.mcp.read` y el preflight OAuth ya es mínimo. La Mac bloqueada
-impidió consentimiento/dispatch, así que Claude local y Claude Desktop/web siguen sin certificar.
+`2.1.263` completó login, consentimiento exacto, catálogo de dos tools read-only, lectura y refresh post-TTL:
+dos access/refresh, uno rotado y uno activo, siempre base-only. Claude.ai completó el mismo recorrido hasta una
+lectura SEO real mediante un DCR público run-owned y rotó una vez post-TTL con la misma postura. Claude Desktop
+`1.46388.4` abrió el chat sincronizado desde `Claude.app`, solicitó aprobación propia y ejecutó la lectura sobre
+el mismo conector remoto. La matriz técnica de clientes está completa.
 
-El DCR exclusivo de Claude está marcado con el `run_id`; no se usó el CIMD compartido. Dry-run actual: 21 DCR,
-19 codes/consents, 25 refresh/access y blockers esperados
+Los dos DCR exclusivos de Claude están marcados con el `run_id`; no se usó el CIMD compartido. Dry-run
+post-refresh: 22 DCR, 21 codes/consents, 29 refresh/access y blockers esperados
 `registration_active|active_authority|active_auth`. No ejecutar `--apply` antes de
 `2026-09-13T19:43:30Z`; entonces cortar authority, medir deny, exigir `deletionReady=true`, aplicar con el xcr
 exacto, releer cero y apagar ambos gates. La automatización diaria sólo retira desde esa fecha con precondiciones

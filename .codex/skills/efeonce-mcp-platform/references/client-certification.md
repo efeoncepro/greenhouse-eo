@@ -27,7 +27,9 @@ demás.
 - La versión histórica `2.1.186` pidió el catálogo completo y falló cerrado. Conserva esa fila al repetir con una
   versión nueva.
 - Claude.ai/Desktop/Cowork/mobile usan el conector remoto hospedado y callback
-  `https://claude.ai/api/mcp/auth_callback`; un login CLI no certifica ese carril.
+  `https://claude.ai/api/mcp/auth_callback`; un login CLI no certifica ese carril. Para una corrida eliminable,
+  elige **Usa tu propio cliente OAuth**, registra un DCR público con `software_id=run_id`, deja el secreto vacío,
+  conserva **Siempre requerido** + **HTTP transmisible** y no aceptes el CIMD detectado como asset de la corrida.
 - Certifica consentimiento de la organización exacta, sólo lectura, una tool permitida, write denegado, refresh
   post-TTL sin widening, rotación, revocación y readback.
 

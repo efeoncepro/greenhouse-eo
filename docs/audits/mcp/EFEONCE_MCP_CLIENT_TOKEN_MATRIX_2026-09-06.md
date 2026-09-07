@@ -1,9 +1,8 @@
 # Efeonce MCP — matriz de clientes y tokens del canary externo
 
-> TASK-1832 · abierta 2026-09-06 · estado: **canary productivo en observación; helper, Playwright, Codex y
-> ChatGPT hospedado certificados; Claude Code `2.1.263` tiene bootstrap corregido pero ceremonia pendiente,
-> Claude Desktop/web no certificado
-> y retiro pendiente**.
+> TASK-1832 · abierta 2026-09-06 · estado: **canary productivo en observación; helper, Playwright, Codex,
+> ChatGPT hospedado, Claude Code `2.1.263`, Claude.ai y Claude Desktop `1.46388.4` certificados; sólo quedan
+> observación y retiro**.
 
 ## Alcance y regla de evidencia
 
@@ -82,8 +81,9 @@ una prueba flow-level del carril apagado. El retiro debe cambiar también la var
 | helper TASK-1832   | `task-1832-v1`                                   | loopback dinámico `/callback`            | DCR públicos `dcr-UObj…` y `dcr-KyB…` | metadata/JWKS/PRM live                     | organización exacta, sólo `efeonce.mcp.read`; la guarda confirmó `organizationIdMatches=true`                                   | `iss`/`aud`/`azp` válidos; fingerprint `75eb972f8b2f1eae`; `gv=6`; `exp` presente     | `get_seo_entitlement`                                                           | refresh rotó; familia revocada; refresh posterior `invalid_grant`               | `PASS`             |
 | Playwright Chrome  | `task-1832-playwright-v1`                        | loopback dinámico con listener HTTP real | DCR público con `software_id=run_id`  | metadata/JWKS/PRM live                     | storage state efímera de `EO-ID0651`; consentimiento visible con host exacto y scope base                                       | JWT `iss`/`aud`/`azp`/`gv` verificado; fingerprint sólo en attachment local redactado | `initialize`, `tools/list`, `get_seo_entitlement`                               | refresh rotó; familia revocada; refresh posterior `invalid_grant`; logout `401` | `PASS — 1/1`       |
 | Claude Code        | `2.1.186`                                        | `http://127.0.0.1:18432/callback`        | pre-registrado DCR `dcr-PUG…`         | descubrió PRM/AS                           | no llegó al consentimiento: solicitó catálogo completo, scopes cualificados duplicados y writes; emisor rechazó `invalid_scope` | no emitidos                                                                           | no ejecutado                                                                    | no emitidos                                                                     | `FAIL — TASK-1813` |
-| Claude Code        | `2.1.263`                                        | `http://localhost:18432/callback`        | DCR run-owned `dcr-ErE…`, scope base  | PRM/AS live; solicitud mínima              | preflight generó sólo `efeonce.mcp.read`; cancelado antes del consentimiento porque la Mac estaba bloqueada                     | no emitidos                                                                           | pendiente                                                                        | no emitidos                                                                     | `PREFLIGHT PASS`    |
-| Claude Desktop/web | no operado                                       | HTTPS hospedado                          | no verificado                         | no verificado                              | no verificado                                                                                                                   | no emitidos                                                                           | no ejecutado                                                                    | no emitidos                                                                     | `PENDIENTE`        |
+| Claude Code        | `2.1.263`                                        | `http://localhost:18432/callback`        | DCR run-owned `dcr-ErE…`, scope base  | PRM/AS live; solicitud mínima              | organización exacta; consentimiento único `efeonce.mcp.read`; login nuevo completado                                            | token aceptado; sin exponer token/subject                                              | catálogo exacto de 2 read-only; SEO `no_entitlement`; write oculto              | post-TTL: 2 access/refresh, 1 rotado y 1 activo; scope base único                | `PASS`              |
+| Claude.ai web      | custom connector, 2026-09-07                     | `https://claude.ai/api/mcp/auth_callback` | DCR público run-owned `dcr-mLT…`     | PRM/AS live; Streamable HTTP                | organización exacta; consentimiento único `efeonce.mcp.read`; OAuth siempre requerido                                          | token aceptado; sin exponer token/subject                                              | catálogo exacto de 2 read-only; SEO `no_entitlement`, contadores `0`            | post-TTL: 2 access/refresh, 1 rotado y 1 activo; scope base único                | `PASS`              |
+| Claude Desktop     | app `1.46388.4`, UI nativa                       | conector remoto vinculado a la cuenta    | reutiliza DCR hospedado `dcr-mLT…`    | infraestructura hospedada compartida        | chat sincronizado abierto desde `Claude.app`; aprobación propia de una sola invocación                                          | mismo contexto hospedado; sin exponer token/subject                                    | SEO `no_entitlement`, contadores `0`, ejecutado desde Desktop                    | usa la familia hospedada ya renovada                                             | `PASS`              |
 | Codex              | `0.153.4`                                        | `http://127.0.0.1:<dinámico>/callback`   | DCR público limitado `dcr-BUH…`       | PRM/AS live                                | intento descubierto con scopes extra rechazado; retry sin scopes mostró la organización exacta y sólo lectura; autorizado       | token aceptado por gateway; sin exponer token/subject                                 | sesión nueva listó e invocó `get_seo_entitlement`; `no_entitlement`, cero gasto | OAuth del cliente válido; rotación/revocación cubierta por helper               | `PASS`             |
 | ChatGPT            | app `asdk_app_6a9e…`, versión `asdk_app_v_6a9e…` | HTTPS hospedado                          | DCR `dcr-c5TpuN…`                     | PRM/AS live; exactamente 2 tools read-only | organización canary exacta; consentimiento único `efeonce.mcp.read`; sin `offline_access`                                       | mismo subject/fingerprint redactado que loopback; issuer/audience válidos             | `get_seo_entitlement` → `no_entitlement`; `efeonce.gateway.status` → `ready`    | dos rotaciones post-TTL; 3 refresh, 2 usados y 1 activo; scope base único       | `PASS`             |
 
@@ -100,9 +100,19 @@ la corrida verde están inventariados. Los cinco consentimientos y las dos famil
 se revocaron con el store canónico; ninguna storage state ni token quedó persistida.
 
 La fila histórica Claude `2.1.186` permanece roja. En `2.1.263` el bootstrap queda corregido y fijado al scope
-base, pero un preflight no es certificación: faltan consentimiento, lectura, refresh post-TTL y revocación. No
-se amplió la allowlist ni se autorizó ningún write para forzar un verde. El DCR nuevo está marcado con el
-`run_id` y forma parte del cleanup; un client ID CIMD compartido no se considera run-owned.
+base; el login nuevo completó consentimiento y dispatch real. Una sesión mínima vio sólo las dos tools de
+lectura, devolvió `no_entitlement` y no expuso el write. Después del TTL, la misma llamada rotó la familia:
+dos access/refresh totales, un refresh rotado y uno activo, siempre con `efeonce.mcp.read`. El warning SEP-2352
+del cliente sobre una credencial sin sello `issuer` se conserva como observación de compatibilidad, pero no
+impidió conexión, llamada ni renovación.
+
+Claude.ai agregó el mismo resource como custom connector remoto. Para preservar el retiro se eligió «usar tu
+propio cliente OAuth» y un DCR público con `software_id=run_id`, callback hospedado exacto y secret vacío, en
+vez del CIMD compartido detectado por Anthropic. El consentimiento mostró sólo la organización canary y el scope
+base; una invocación aprobada una vez devolvió el mismo `no_entitlement` y cero gasto. Después del TTL, otra
+invocación dejó dos access/refresh, un refresh rotado y uno activo, sin ampliar el scope. La app nativa Claude
+Desktop `1.46388.4` abrió el chat sincronizado, pidió una aprobación propia y ejecutó una tercera lectura con el
+mismo resultado. Desktop comparte la infraestructura y el DCR hospedados; no se inventa una tercera familia.
 
 ChatGPT cerró la incertidumbre con evidencia del cliente hospedado. La app `Efeonce`
 (`asdk_app_6a9e8978ca2081919753589005e001bf`, versión
@@ -166,6 +176,7 @@ los buzones, deliveries/audit y el wordmark público son compartidos o evidencia
 
 ## Veredicto
 
-`NO CERTIFICADO AÚN — runtime productivo, helper/Playwright/Codex/ChatGPT hospedado y las cinco negativas están
-verdes; Claude Code tiene bootstrap mínimo corregido pero ceremonia pendiente, Claude Desktop/web no está
-certificado, y siguen abiertos siete días de observación más cleanup/readback final.`
+`CERTIFICACIÓN TÉCNICA DE CLIENTES PASS — runtime productivo, helper/Playwright/Codex/ChatGPT hospedado, Claude
+Code 2.1.263, Claude.ai web, Claude Desktop 1.46388.4 y las cinco negativas están verdes. Los dos clientes OAuth
+Claude renovaron post-TTL sin widening; Desktop ejecutó sobre el conector remoto. Permanecen abiertos siete días
+de observación y el cleanup/readback final; TASK-1832 no está completa.`
