@@ -14,18 +14,22 @@ sigue fuera de Account/Person 360 y de toda superficie comercial. Vercel/auth-se
 gateway sirve `8438c5fa87ed`; ambos gates canary están ON. M365, Gmail personal autorizado, magic link, passkey
 Chrome/Safari, consentimiento, PKCE, refresh, revocación de familia, base-only, internal-only y revocación de
 authority en `19.272 s` tienen evidencia live. Codex 0.153.4 completó una lectura MCP real sin gasto.
+El E2E Playwright productivo pasó `1/1` en Chrome con listener loopback real: DCR+PKCE, consentimiento, JWT,
+MCP initialize/list/call, refresh, revocación y logout `401`, sin persistir storage state ni tokens.
 
 Claude Code 2.1.186 pidió scopes desconocidos y de escritura antes del consentimiento; el emisor lo rechazó y
 el defecto volvió a TASK-1813. No se amplió la allowlist. La expiración natural recibió `401 invalid_token`
 después de `899 s`, antes de rotar o revocar la familia; otra ceremonia exigió el `organization_id` exacto y
 confirmó el fixture servido. Los clientes hospedados siguen abiertos, igual que siete días de observación y el
-cleanup final. El dry-run post-clientes enumera 14 DCR y todo el grafo auth/identity, con
+cleanup final. El dry-run post-Playwright enumera 19 DCR y todo el grafo auth/identity, con
 `unexpectedRefs=0`; se niega correctamente mientras authority/auth están activas. Los cuatro DCR usados por
 error con una sesión interna siguen siendo run-owned y el cleanup conserva esa identidad compartida. El wordmark
 ausente del correo se restauró como asset público compartido y quedó visible en Gmail; no se eliminará con el
 fixture. El readback dejó las sesiones humanas canary activas en cero y conserva sólo la passkey necesaria para
 la observación. Quedó activa una automatización diaria silenciosa para vigilar la ventana y ejecutar el retiro
 sólo desde `delete_after` con todas las precondiciones verdes.
+Los cinco consentimientos Playwright y las dos familias emitidas durante los intentos se revocaron por el store
+canónico; los cinco DCR quedaron en el manifest para el cleanup final.
 
 El preflight del cliente hospedado agregó un riesgo específico a TASK-1813: el emisor anuncia y entrega refresh
 tokens rotativos, pero discovery no publica `offline_access`, recomendado por OpenAI para conservar la conexión.

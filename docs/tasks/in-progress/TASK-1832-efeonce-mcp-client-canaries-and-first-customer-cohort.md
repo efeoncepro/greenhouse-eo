@@ -6,9 +6,11 @@ La organización dedicada `task-1832-canary-20260906-a` está activa exclusivame
 Greenhouse/Vercel y el auth-server sirven `fb5fc082aa92`; el gateway sirve `8438c5fa87ed` en la revisión
 `00044-4kj`; ambos gates canary están `true`. Invitación, M365, Gmail autorizado, magic link, sesiones,
 passkey real Chrome/Safari, consentimiento, PKCE, refresh, revocación de familia, base-only, internal-only y
-revocación de authority en `19.272 s` tienen evidencia live. Codex `0.153.4` completó OAuth y una lectura real
-sin gasto. Claude Code `2.1.186` quedó fail-closed antes del consentimiento por pedir scopes desconocidos y
-writes; el defecto vuelve a `TASK-1813` y no se corrige ampliando la allowlist.
+revocación de authority en `19.272 s` tienen evidencia live. El E2E Playwright productivo pasó `1/1` con un
+listener loopback real, DCR+PKCE, consentimiento, JWT, MCP initialize/list/call, refresh, revocación y logout
+`401`; Codex `0.153.4` completó OAuth y una lectura real sin gasto. Claude Code `2.1.186` quedó fail-closed antes
+del consentimiento por pedir scopes desconocidos y writes; el defecto vuelve a `TASK-1813` y no se corrige
+ampliando la allowlist.
 
 El helper exige además el `organization_id` exacto y valida el sujeto devuelto. Esta guarda nació al detectar
 que una cookie interna persistente podía recorrer readers de Efeonce: la ceremonia fue rechazada como canary,
@@ -160,7 +162,7 @@ organización cliente real, sí**.
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-044`
-- Status real: `Rollout productivo activo y en observación. Greenhouse/Vercel y auth-server 00043-ndg sirven fb5fc082aa92; gateway 8438c5fa87ed/00044-4kj; ambos gates canary ON. Un deploy staging sobre el Cloud Run compartido apagó el canary fail-closed por 8m22s y production 34072064873 lo restauró; el auth-server ya consume una sola variable GitHub de repositorio, sin overrides de environment. M365 y Gmail autorizado, sesión, passkey Chrome/Safari, helper OAuth, Codex real, refresh/revocación y las cinco negativas están verificados. Claude Code 2.1.186 falla cerrado por interoperabilidad y vuelve a TASK-1813. unexpected_refs=0, sin contaminación 360/comercial. Faltan clientes hospedados o decisión explícita, siete días y cleanup/readback cero.`
+- Status real: `Rollout productivo activo y en observación. Greenhouse/Vercel y auth-server 00043-ndg sirven fb5fc082aa92; gateway 8438c5fa87ed/00044-4kj; ambos gates canary ON. Un deploy staging sobre el Cloud Run compartido apagó el canary fail-closed por 8m22s y production 34072064873 lo restauró; el auth-server ya consume una sola variable GitHub de repositorio, sin overrides de environment. M365 y Gmail autorizado, sesión, passkey Chrome/Safari, helper OAuth, E2E Playwright 1/1, Codex real, refresh/revocación y las cinco negativas están verificados. Claude Code 2.1.186 falla cerrado por interoperabilidad y vuelve a TASK-1813. unexpected_refs=0, sin contaminación 360/comercial. Faltan clientes hospedados o decisión explícita, siete días y cleanup/readback cero.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
 - Blocked by: `none`
@@ -589,8 +591,11 @@ organización dedicada creada sólo después de una autorización específica.
 - [x] `pnpm build` — artefacto Next.js y rutas canary generados.
 - [x] `pnpm mcp:manifest:check`, rutas/workers/crons, ops/task lint y `git diff --check`.
 - [x] Gateway hermano `pnpm check` — 152/152, 0 skipped, build verde.
-- [ ] `pnpm playwright test tests/e2e/smoke/auth-server-oauth.spec.ts` — no ejecutar sin fixture/sesión autorizados;
-      un skip no se acepta como evidencia.
+- [x] `pnpm playwright test tests/e2e/smoke/auth-server-oauth.spec.ts --project=chromium --workers=1` — `1/1`
+      en producción con Chrome, profile autorizado `EO-ID0651`, storage state efímera `0600` y listener loopback
+      real; DCR+PKCE, consentimiento, JWT, MCP initialize/list/call, refresh, revocación y logout/readback `401`.
+      No se persistieron tokens, cookies ni el archivo de sesión. Los cinco consentimientos creados durante los
+      intentos diagnósticos y la corrida verde, más las dos familias emitidas, se revocaron después del test.
 - [x] `node scripts/mcp/external-client-canary.mjs --env=production --issuer=https://auth.efeonce.org
       --resource=https://mcp.efeonce.org/mcp --run-id=task-1832-canary-20260906-a
       --organization-id=org-602d7057-7fd5-47e7-b73b-21892e3f06e7` — discovery, PKCE,

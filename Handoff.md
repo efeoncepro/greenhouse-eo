@@ -4,8 +4,9 @@
 2026-09-06):** release `fb5fc082aa92-3f2c8706-24fa-452d-be8f-6feea7b8cdd9` `released`; Vercel/auth-server
 `00043-ndg` sirven `fb5fc082aa92` y gateway `00044-4kj` sirve `8438c5fa87ed`, con gates productivos ON. El
 fixture conserva 2 profiles `smoke_test`, un grant read-only, cero 360/comercial y `unexpectedRefs=0`. M365,
-Gmail autorizado, magic link, passkey Chrome/Safari, helper, Codex 0.153.4 y cinco negativas tienen evidencia
-live: expiración `401` tras `899 s` y deny de authority en `19.272 s`. Claude Code falla cerrado y los clientes
+Gmail autorizado, magic link, passkey Chrome/Safari, helper, Playwright Chrome `1/1`, Codex 0.153.4 y cinco
+negativas tienen evidencia live: expiración `401` tras `899 s` y deny de authority en `19.272 s`. Claude Code
+falla cerrado y los clientes
 hospedados siguen abiertos en `TASK-1813`. El callback loopback de Codex puede mostrar
 `ERR_BLOCKED_BY_CLIENT` después de que el CLI recibió el code; recargar no sirve y un hospedado debe volver por
 HTTPS. ChatGPT anuncia refresh grant pero no `offline_access`; exige ceremonia y renovación post-TTL.
@@ -18,7 +19,7 @@ de `develop@c75a07f`, `dpl_D9mkjQLE1a26H4TXQ2HX7wXWMpLf`, quedó READY, tomó lo
 `/api/auth/session`, sin tocar Production. Es evidencia de config/build, no deny flow-level. El retiro apaga la
 variable GitHub y Vercel Production.
 
-El dry-run inventaría 2 profiles/links, 5 invitaciones, 3 grants, 14 DCR y sus hijos OAuth; sesiones activas `0`,
+El dry-run inventaría 2 profiles/links, 5 invitaciones, 3 grants, 19 DCR y sus hijos OAuth; sesiones activas `0`,
 passkey activa conservada y cero referencias inesperadas. `deletionReady=false` es correcto por
 `registration_active|active_authority|active_auth`. No ejecutar `--apply` antes de
 `2026-09-13T19:43:30Z`; entonces cortar authority, medir deny, exigir `deletionReady=true`, aplicar con el xcr
