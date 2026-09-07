@@ -82,7 +82,8 @@ que el command gobernado lo devuelva. Un asset no previsto deja la corrida `bloc
 - [x] Auth-server productivo compatible y gate canary `true`: SHA `fb5fc082aa92`, rev
       `auth-server-00043-ndg`, Ready/100 %. El workflow staging `34071542507` lo apagó fail-closed en
       `00042-hp5` entre 01:07:25Z y 01:15:47Z; production `34072064873` restauró el SHA released y el gate.
-      Las variables GitHub staging/production quedaron alineadas en `true` mientras dure la observación.
+      Una sola variable GitHub de repositorio queda en `true`; los environments staging/production no tienen
+      overrides del mismo nombre.
 - [x] Vercel Production sirve `fb5fc082aa92`; release
       `fb5fc082aa92-3f2c8706-24fa-452d-be8f-6feea7b8cdd9` en estado `released`.
 - [x] Registry + organización + binding creados por commands; aggregate readback `1/1`, purpose drift `0/0` y
@@ -137,6 +138,12 @@ que el command gobernado lo devuelva. Un asset no previsto deja la corrida `bloc
       y sólo puede iniciar el retiro desde `delete_after` con todas las precondiciones verdes.
 - [ ] Siete días steady o aprobación explícita de retiro anticipado.
 - [ ] Cleanup apply y readback cero de todos los IDs exactos.
+
+## Registro de observación
+
+| Muestra UTC | Estado canary | Frontera | Señales | Dry-run | Resultado |
+| --- | --- | --- | --- | --- | --- |
+| 2026-09-07T01:27:22Z | `registrations=1`, `canary_bindings=1`, registro activo | drift externo/interno `0/0`; `smoke_profiles=32` globales, de los cuales 2 pertenecen a esta corrida; `smoke_in_person_360=0` | 7 `ok`; 2 warnings de 24 h explicados por smokes anteriores al registro. Desde 19:43:30Z: unbound `0`, token revealed `0` | 14 DCR; auth/authority sin cambios; `unexpectedRefs=0`; no apply | `steady`; baseline posterior a la restauración |
 
 ## Registro de retiro
 

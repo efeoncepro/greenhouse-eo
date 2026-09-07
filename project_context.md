@@ -158,7 +158,7 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   `TASK-1832` mantiene hasta `2026-09-13T19:43:30Z` una única organización efímera no cliente, registrada,
   con dos perfiles `smoke_test`, TTL y sólo lectura. Ambos gates están ON; helper y Codex tienen evidencia live,
   Claude Code vuelve a `TASK-1813` y `unexpected_refs=0`. El auth-server `00043-ndg` está restaurado; sus
-  variables GitHub staging/production están alineadas por ser un servicio único. El retiro revoca autoridad,
+  workflows consumen una sola variable GitHub de repositorio por ser un servicio único. El retiro revoca autoridad,
   borra sólo assets run-owned y exige readback cero. `TASK-1841` separa el piloto cliente consentido.
   [`ADR nativo`](docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) ·
   [`autoridad interna`](docs/architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md) ·

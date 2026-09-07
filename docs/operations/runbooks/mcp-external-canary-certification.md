@@ -41,12 +41,14 @@ Los dos gates son independientes y nacen `false`:
 El registry vacío conserva el carril cerrado aunque un gate se configure mal. Encender uno solo nunca es una
 degradación aceptable; debe observarse como deny.
 
-El SoT del flag del emisor es la variable `EXTERNAL_IDENTITY_CANARY_ENABLED` del GitHub Environment elegido por
-`auth-server-deploy.yml`; el workflow la pasa explícitamente a `deploy.sh`, cuyo `--set-env-vars` vuelve a
-publicar el conjunto completo. Cambiarla sin ejecutar el workflow no modifica Cloud Run. Un deploy posterior con
-la variable ausente vuelve a `false` por diseño. El change-gate compara también ambos gates de identidad contra
-la revisión servida, por lo que una diferencia de configuración fuerza deploy aunque el bundle no haya cambiado.
-El valor se acredita leyendo la revisión servida, no sólo GitHub.
+El SoT del flag del emisor es la variable GitHub de **repositorio** `EXTERNAL_IDENTITY_CANARY_ENABLED`.
+`auth-server-deploy.yml` la pasa a `deploy.sh`, cuyo `--set-env-vars` vuelve a publicar el conjunto completo.
+No debe existir un override del mismo nombre en los environments staging o production: ambos workflows apuntan
+al mismo Cloud Run y valores distintos hacen que el último deploy reconfigure el runtime compartido. Esta regla
+se comprobó cuando staging apagó el canary fail-closed en `auth-server-00042-hp5`; production lo restauró en
+`00043-ndg`. Cambiar la variable sin ejecutar el workflow no modifica Cloud Run. Ausencia vuelve a `false` por
+diseño. El change-gate compara la configuración servida y fuerza deploy ante drift. El valor se acredita leyendo
+la revisión, no sólo GitHub. Vercel mantiene variables separadas porque sí tiene deployments por environment.
 
 Antes de crear datos en una corrida nueva deben cumplirse todos estos puntos:
 

@@ -31,9 +31,9 @@ El push de endurecimiento `b69f5297d` mostró una colisión real del entorno com
 `34071542507` desplegó `auth-server-00042-hp5` con el gate canary OFF sobre el Cloud Run único. El intervalo
 fail-closed duró desde 01:07:25Z hasta 01:15:47Z y no concedió acceso. El dispatch production `34072064873`,
 fijado al SHA released `fb5fc082aa92`, restauró `auth-server-00043-ndg`, 100 % de tráfico, `Ready=True`, gate ON;
-`readyz` y preflight OAuth/MCP pasaron. Para evitar repetición durante la observación, la variable GitHub de
-despliegue quedó `true` tanto en staging como en production; Vercel staging continúa OFF. El cleanup final debe
-apagar las dos variables GitHub y Vercel Production antes del readback de gates.
+`readyz` y preflight OAuth/MCP pasaron. Para evitar repetición durante la observación, se eliminaron los overrides
+staging/production y quedó una sola variable GitHub de repositorio en `true`; Vercel staging continúa OFF. El
+cleanup final debe apagar esa variable y Vercel Production antes del readback de gates.
 
 ## 2026-09-06 — TASK-1835 completa: Efeonce ID tiene cara, y el gate de accesibilidad estaba ciego
 

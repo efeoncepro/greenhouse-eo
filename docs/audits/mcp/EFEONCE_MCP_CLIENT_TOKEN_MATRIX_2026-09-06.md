@@ -49,8 +49,8 @@ elevación ni exposición; el carril canary quedó temporalmente indisponible. E
 `34072064873`, fijado al SHA released `fb5fc082aa92`, restauró a las 01:15:47Z la revisión
 `auth-server-00043-ndg`, el gate `true`, 100 % de tráfico y `Ready=True`. `readyz` respondió 200 y el preflight
 OAuth/MCP confirmó metadata, issuer nativo y dos llaves JWKS. Como ambos environments de GitHub despliegan el
-servicio único, sus variables de despliegue canary quedaron alineadas en `true`; esto no cambia Vercel staging,
-que permanece OFF. El retiro debe devolver ambas a `false`.
+servicio único, se eliminaron sus overrides y quedó una sola variable de repositorio en `true`; esto no cambia
+Vercel staging, que permanece OFF. El retiro debe cambiar esa variable de repositorio a `false`.
 
 ## Matriz de correo, sesión y passkey
 

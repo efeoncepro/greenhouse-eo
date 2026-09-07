@@ -13,8 +13,8 @@ write; Claude Desktop/web y ChatGPT siguen abiertos en `TASK-1813`. El callback 
 
 El workflow staging `34071542507` apagó el gate fail-closed en el Cloud Run único entre 01:07:25Z y 01:15:47Z.
 Production `34072064873` restauró `00043-ndg`, SHA released, Ready/100 % y preflight verde. Las variables GitHub
-staging/production quedaron ON porque despliegan el mismo servicio; Vercel staging sigue OFF. El retiro apaga
-las dos variables GitHub y Vercel Production. Detalle en la matriz MCP.
+por environment se eliminaron y quedó una sola variable de repositorio ON, porque ambos workflows despliegan el
+mismo servicio; Vercel staging sigue OFF. El retiro apaga esa variable y Vercel Production. Detalle en la matriz MCP.
 
 El dry-run inventaría 2 profiles/links, 5 invitaciones, 3 grants, 14 DCR y sus hijos OAuth; sesiones humanas
 activas `0`, passkey activa conservada, ownership inequívoco y cero referencias inesperadas. Los DCR usados con

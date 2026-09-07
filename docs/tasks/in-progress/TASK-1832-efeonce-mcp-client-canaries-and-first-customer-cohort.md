@@ -146,7 +146,7 @@ organización cliente real, sí**.
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-044`
-- Status real: `Rollout productivo activo y en observación. Greenhouse/Vercel y auth-server 00043-ndg sirven fb5fc082aa92; gateway 8438c5fa87ed/00044-4kj; ambos gates canary ON. Un deploy staging sobre el Cloud Run compartido apagó el canary fail-closed por 8m22s y production 34072064873 lo restauró; variables GitHub staging/production ya están alineadas. M365 y Gmail autorizado, sesión, passkey Chrome/Safari, helper OAuth, Codex real, refresh/revocación y las cinco negativas están verificados. Claude Code 2.1.186 falla cerrado por interoperabilidad y vuelve a TASK-1813. unexpected_refs=0, sin contaminación 360/comercial. Faltan clientes hospedados o decisión explícita, siete días y cleanup/readback cero.`
+- Status real: `Rollout productivo activo y en observación. Greenhouse/Vercel y auth-server 00043-ndg sirven fb5fc082aa92; gateway 8438c5fa87ed/00044-4kj; ambos gates canary ON. Un deploy staging sobre el Cloud Run compartido apagó el canary fail-closed por 8m22s y production 34072064873 lo restauró; el auth-server ya consume una sola variable GitHub de repositorio, sin overrides de environment. M365 y Gmail autorizado, sesión, passkey Chrome/Safari, helper OAuth, Codex real, refresh/revocación y las cinco negativas están verificados. Claude Code 2.1.186 falla cerrado por interoperabilidad y vuelve a TASK-1813. unexpected_refs=0, sin contaminación 360/comercial. Faltan clientes hospedados o decisión explícita, siete días y cleanup/readback cero.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
 - Blocked by: `none`
