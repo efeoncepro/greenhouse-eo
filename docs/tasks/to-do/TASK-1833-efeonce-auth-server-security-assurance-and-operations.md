@@ -1,5 +1,22 @@
 # TASK-1833 — Efeonce Auth Server Security Assurance and Operations
 
+## Delta 2026-09-06 — el red-team cierra los dos tests abiertos de TASK-1831
+
+Dos abuse cases de esta task —**token del issuer externo sobre tool interna** y **confused deputy por
+cliente**— son, palabra por palabra, los criterios de aceptación (a) y (b) que `TASK-1831` dejó abiertos:
+
+- (a) token externo con scope string internal-only → deny en dispatch con señal redactada
+- (b) `roles` con string de escritura y sin scope delegado → deny, también en el issuer Entra
+
+`TASK-1831` está desplegada con el carril interno verificado, pero esos dos tests siguen sin tildar porque no
+existe membership externa real; el "rechazo ajeno" que sí se probó es interno contra interno. El Slice 1 de
+esta task los ejercita sintéticamente contra staging, sin esperar a un cliente externo.
+
+**Contrato entre ambas tasks:** el red-team produce el request reproducible y la refutación cruzada; el fix, si
+lo hay, y el tilde del criterio son de `TASK-1831`, que es la dueña del verifier en `../efeonce-mcp`. Ninguna de
+las dos ejecuta el caso dos veces. Coordinar antes de correr el Slice 1.
+
+
 ## Delta 2026-09-04 — acceso interno nativo (TASK-1836)
 
 Incluir en aseguramiento la frontera de autoridad introducida por TASK-1836: sujetos internos y externos
@@ -237,6 +254,9 @@ Reglas obligatorias:
 ### Slice 1 — Red-team agéntico y fixes
 
 - Catálogo de abuse cases; ejecución cruzada por dos agentes con rol adversario sobre staging; fixes en las tasks dueñas o aquí si son de hardening.
+- Los casos *externo sobre interno* (token del issuer externo sobre tool interna, confused deputy por cliente)
+  se ejecutan contra el gateway y su evidencia se entrega a `TASK-1831` para tildar sus criterios (a) y (b);
+  el fix del verifier es de esa task, no de esta.
 
 ### Slice 2 — Señales, rotación y retención
 
@@ -311,6 +331,8 @@ Reglas obligatorias:
 - [ ] Cambio de frontera de TASK-1836 cubierto por assurance: externo del mismo issuer sin autoridad interna, binding no derivado de email y revocación con token vigente.
 
 - [ ] Catálogo de abuse cases con ≥ 10 casos ejecutados, cada uno con resultado y refutación cruzada.
+- [ ] Evidencia reproducible de los casos externo-sobre-interno entregada a `TASK-1831`, con sus criterios (a) y (b)
+      tildados allá o el bloqueo declarado con razón.
 - [ ] Pentest externo con alcance documentado y sin críticos/altos abiertos.
 - [ ] Rotación de llave ejercitada en staging y producción; scheduler trimestral activo con verificación.
 - [ ] Señales del dominio registradas en el control plane con steady y severidad.
