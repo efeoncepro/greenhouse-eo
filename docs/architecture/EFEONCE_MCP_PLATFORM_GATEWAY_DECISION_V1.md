@@ -6,7 +6,7 @@
 - **Scope:** repositorio `efeonce-mcp`, transporte MCP remoto, autenticación, federación de productos, Cloud Run, front door y dominio público
 - **Reversibility:** two-way-but-slow
 - **Confidence:** high para boundary, hosting, hostname, authorization server y el primer reader Globe después del canary PKCE real
-- **Validated as of:** 2026-09-02 (delta deprecación DCR en la revisión MCP `2026-07-28`; shim verificado en vivo; base 2026-08-01)
+- **Validated as of:** 2026-09-07 (emisor nativo, canary externo sintético, ChatGPT hospedado y gateway MCP v2)
 - **Implementation owner:** [`TASK-1626`](../tasks/in-progress/TASK-1626-efeonce-mcp-platform-gateway.md)
 - **First provider owner:** [`TASK-1473`](../tasks/in-progress/TASK-1473-globe-contract-packaging-parity-certification.md)
 
@@ -23,6 +23,13 @@ El contexto interno firmado fija sujeto/perfil, cliente, audiencia, organizació
 dispatch, con revocación local ≤60 s. No existe fallback desde el resolver externo `internal_population`.
 Los gates nativo e interno se verifican por separado; refresh/dispatch previos no eluden un gate apagado.
 Contrato especializado: [autoridad interna nativa](EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md).
+
+El gateway productivo usa los paquetes estables MCP v2 y serializa schemas, `structuredContent`, cuatro
+annotations y el mirror `_meta.securitySchemes` desde una policy única. El probe `POST /mcp` con JSON vacío se
+autentica antes de validar el body: anónimo responde `401` con challenge; autenticado puede responder
+`400 invalid_request`; nunca `500`. TASK-1832 acreditó ChatGPT hospedado con dos tools read-only y refresh real
+post-TTL. Claude Code se certifica por versión: `2.1.186` falló por scopes amplios; `2.1.263` tiene bootstrap
+mínimo corregido, todavía sin ceremonia completa. La certificación sintética no abre customer access.
 
 El [mapa consolidado](../audits/2026-09-06-task-1836-1831-consolidated-evidence.md) registra canary interno,
 rollbacks, revisiones y las matrices externas/multicontexto aún pendientes. No se declara cierre general de
@@ -57,8 +64,8 @@ duplica lógica de negocio.
    audience, expiración y scopes, y responde con challenges estándar. Microsoft Entra ID del tenant Efeonce
    es el authorization server inicial. El resource parameter canónico es `https://mcp.efeonce.org/mcp`; Entra
    v2 representa ese recurso en el claim `aud` mediante el App ID exacto de la aplicación recurso. Si la
-   configuración falta o no pasa el canary, `/mcp` falla cerrado. El gateway declara **cinco** scopes cuando los
-   providers correspondientes están activos: el
+   configuración falta o no pasa el canary, `/mcp` falla cerrado. El inventario de scopes se deriva de las
+   clases activas y puede crecer; nunca se congela como cifra en este ADR. Incluye el
    base `efeonce.mcp.read`, el reader Globe `efeonce.mcp.globe.read`, el write interno
    `efeonce.mcp.globe.credits.funding.ensure` del punto 12, que sólo aparece en `scopes_supported` cuando su flag
    `globeCreditFunding.enabled` está en ON, y el write SEO `efeonce.mcp.seo.write` (TASK-1308), que sólo aparece

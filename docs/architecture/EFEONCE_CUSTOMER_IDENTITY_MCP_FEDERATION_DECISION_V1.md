@@ -6,10 +6,13 @@
 > **Scope:** customer identity, B2B federation, MCP OAuth, Account 360 organization binding and Globe access
 > **Reversibility:** `two-way-but-slow`
 > **Confidence:** `medium`
-> **Validated as of:** 2026-08-02 — gateway MCP, Entra canary, current Greenhouse NextAuth/session resolution and Account 360 contracts verified; WorkOS has a staging project with MCP discovery configuration only. There is no external customer binding, public login, production domain, production secret, Greenhouse customer-login convergence or customer access. **Slice 1 binding foundation applied 2026-09-04** (`TASK-1631`): schema, commands, gateway reader and the four reliability signals are live in `greenhouse-pg-dev`; still no external issuer registered, no real customer binding, no UI (see `Slice 1 binding foundation — applied`); the auth-server exists as runtime + JWKS only since 2026-09-04 (see the line below).
+> **Validated as of:** 2026-09-07 — la composición WorkOS quedó superseded por el emisor nativo. Binding,
+> login, OAuth, tokens y gateway multi-issuer están operativos; TASK-1832 mantiene una organización sintética
+> eliminable en observación. Esto no es customer access: el primer cliente consentido sigue cerrado por TASK-1841.
 > **Implementation:** [`TASK-1631`](../tasks/in-progress/TASK-1631-efeonce-customer-identity-mcp-federation.md) · programa [`EPIC-044`](../epics/in-progress/EPIC-044-efeonce-identity-authorization-server-and-mcp-federation.md)
 > **Superseded by (composición):** `EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md` — 2026-09-03, decisión del operador: authorization server propio; no se compra a un tercero.
-> **Runtime del emisor propio:** existe desde 2026-09-04 (`TASK-1828`) — Cloud Run `auth-server` (`us-east4`) publicado como segundo host del front door del gateway en `https://auth.efeonce.org`, con `/healthz`, `/readyz` y JWKS ES256 firmado en Cloud KMS HSM; todavía sin endpoints OAuth ni login de personas (`TASK-1829`/`TASK-1830`) y sin cambios en el login de Greenhouse. Detalle: [`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md` §Delta 2026-09-04](EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md#delta-2026-09-04--task-1828-ejecutada-runtime-llaves-front-door).
+> **Runtime del emisor propio:** `https://auth.efeonce.org` sirve OAuth y login de personas; TASK-1829/1830/1831
+> cerraron emisión y consumo multi-issuer. La evidencia viva y el retiro temporal pertenecen a TASK-1832.
 
 ## Delta aceptado 2026-09-06 — TASK-1832: canary externo sintético, temporal y eliminable
 
@@ -584,9 +587,10 @@ secrets are an irreversible operational commitment and require explicit operator
    the Greenhouse deployable remains an identity/data dependency, not the OAuth runtime.
 4. Add the gateway's gated dual-issuer validation and provider entitlement revalidation; retain the Entra internal
    canary unchanged.
-5. Run Claude, Codex and ChatGPT compatibility canaries with one allowlisted customer organization, one
-   base-only denial and an explicit revocation test.
-6. Only after those are green, allow the first read-only Globe capability for that organization. Writes, spending,
+5. Ejecutar Claude, Codex y ChatGPT con una organización **sintética, dedicada y eliminable**, una negativa
+   base-only y revocación explícita. La certificación preserva mismo sujeto, refresh post-TTL y cleanup exacto.
+6. Sólo después de la certificación técnica y la aprobación de TASK-1841, abrir la primera organización cliente
+   read-only. Writes, spending,
    approvals and rights-sensitive tools each require their own ADR/task gate.
 
 ## Revisit when

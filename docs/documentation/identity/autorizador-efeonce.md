@@ -1,9 +1,9 @@
 # Autorizador de Efeonce (`auth.efeonce.org`)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-09-04 por Claude
-> **Ultima actualizacion:** 2026-09-06 por Claude (TASK-1837)
+> **Ultima actualizacion:** 2026-09-07 por Codex (TASK-1832)
 > **Modulo:** Identidad y acceso (EPIC-044 · TASK-1828–1831 · TASK-1836)
 > **Documentacion tecnica:** [EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) (ADR nativo y contrato interno vigente), [EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md](../../architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md) (contrato OAuth: endpoints, claims, tablas e invariantes de TASK-1829), [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md#authorization-server-propio-authefeonceorg--task-1828-2026-09-04), [EPIC-044](../../epics/in-progress/EPIC-044-efeonce-identity-authorization-server-and-mcp-federation.md)
 > **Manual de uso:** [Operar el autorizador de Efeonce](../../manual-de-uso/identity/operar-autorizador-efeonce.md)
@@ -20,7 +20,8 @@ organización la resuelve Efeonce. Compartir un emisor no comparte permisos entr
 
 La base de TASK-1828 (servicio, llaves y dirección pública), el OAuth de TASK-1829 y la autenticación de
 personas de TASK-1830 están integrados. TASK-1836 agrega el recorrido corporativo y TASK-1831 su consumo
-en el gateway. La cohorte interna está verificada; los límites y pendientes se detallan más abajo.
+en el gateway. La cohorte interna y una certificación externa sintética están activas; esto no abre clientes
+reales. Codex y ChatGPT hospedado están verdes; Claude `2.1.263` tiene preflight mínimo y ceremonia pendiente.
 
 | Pieza | Qué es, en simple | Estado |
 | --- | --- | --- |

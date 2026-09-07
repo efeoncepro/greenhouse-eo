@@ -1,8 +1,9 @@
 # Runbook técnico — certificación MCP con canary externo eliminable
 
-> TASK-1832 · owner: Identity + MCP Platform · estado al 2026-09-06: **rollout productivo en observación**.
-> Corrida activa `task-1832-canary-20260906-a`; helper y Codex verdes, Claude Code bloqueado por
-> interoperabilidad. La matriz y el manifiesto acreditan el runtime; este runbook define el procedimiento.
+> TASK-1832 · owner: Identity + MCP Platform · estado al 2026-09-07: **rollout productivo en observación**.
+> Corrida activa `task-1832-canary-20260906-a`; helper, Playwright, Codex y ChatGPT hospedado verdes. Claude
+> Code `2.1.263` tiene bootstrap mínimo corregido, pero la ceremonia sigue pendiente; Claude Desktop/web no está
+> certificado. La matriz y el manifiesto acreditan el runtime; este runbook define el procedimiento.
 
 ## Objetivo y frontera
 
@@ -152,6 +153,33 @@ Por cliente/redirect/registro registrar, sin tokens:
 
 `skipped`, metadata 200, DCR 201, una captura, un token inyectado o una suite unitaria verde no cuentan como
 certificación runtime.
+
+### Perfiles de cliente que no se deben mezclar
+
+- **Claude Code local:** versión mínima verificada `2.1.196`; fija `oauth.scopes` al scope base y no uses
+  `authServerMetadataUrl`. Para un canary eliminable registra DCR propio con `software_id=run_id` y callback fijo.
+  Un CIMD compartido por el vendor se conserva como `shared` y bloquea cualquier intento de borrarlo.
+- **Claude hospedado:** Claude.ai, Desktop, Cowork y mobile comparten infraestructura cloud, pero cada superficie
+  visible conserva una fila de ejecución. Usa el callback exacto `https://claude.ai/api/mcp/auth_callback`.
+- **Codex local:** el callback puede mostrar `ERR_BLOCKED_BY_CLIENT` después de entregar el code. Sólo cuenta si
+  el CLI confirma login y una sesión nueva hace la lectura.
+- **ChatGPT hospedado:** la importación debe dejar visibles schemas, `structuredContent`, cuatro annotations y el
+  mirror `_meta.securitySchemes`; además se ejecuta una lectura real y refresh post-TTL.
+
+La versión exacta del cliente es parte de la evidencia. Conserva FAIL y PASS como filas distintas: nunca
+reescribas una falla de una versión antigua como si no hubiera ocurrido.
+
+### Transporte y serialización observables
+
+Además de `tools/list`, inspecciona la respuesta serializada que ve el cliente. Debe incluir `inputSchema`,
+`outputSchema`, `structuredContent` y las cuatro annotations explícitas; `content` de texto es un mirror de
+compatibilidad, no una segunda verdad. `_meta.securitySchemes` se deriva de la policy canónica para clientes que
+lo requieren y no crea autorización nueva.
+
+El probe de bootstrap `POST /mcp` con JSON vacío debe cruzar autenticación antes de validación: anónimo devuelve
+`401` con el challenge canónico; autenticado puede devolver `400 invalid_request`; `500` es regresión. La
+renovación se prueba después del TTL y debe conservar el scope original cuando el cliente omite `scope`, rotar el
+refresh e invalidar el anterior.
 
 ## Retiro en dos fases
 

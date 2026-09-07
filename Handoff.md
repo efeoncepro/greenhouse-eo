@@ -9,10 +9,12 @@ ChatGPT hospedado está verde: organización exacta, scope único `efeonce.mcp.r
 `efeonce.gateway.status|get_seo_entitlement`, ambas lecturas sin gasto/write, mismo subject que Codex y dos
 rotaciones refresh post-TTL. El probe JSON vacío ya responde 401/400 canónico en vez de 500. M365/Gmail,
 passkey Chrome/Safari, helper, Playwright `1/1`, Codex y cinco negativas siguen verdes; el fixture mantiene 2
-profiles `smoke_test`, cero 360/comercial y `unexpectedRefs=0`. Claude Code 2.1.186 falla cerrado en `TASK-1813`;
-Claude Desktop/web no está certificado.
+profiles `smoke_test`, cero 360/comercial y `unexpectedRefs=0`. Claude Code `2.1.186` conserva su FAIL histórico;
+el CLI se actualizó a `2.1.263`, fijó sólo `efeonce.mcp.read` y el preflight OAuth ya es mínimo. La Mac bloqueada
+impidió consentimiento/dispatch, así que Claude local y Claude Desktop/web siguen sin certificar.
 
-Dry-run actual: 20 DCR, 19 codes/consents, 25 refresh/access y blockers esperados
+El DCR exclusivo de Claude está marcado con el `run_id`; no se usó el CIMD compartido. Dry-run actual: 21 DCR,
+19 codes/consents, 25 refresh/access y blockers esperados
 `registration_active|active_authority|active_auth`. No ejecutar `--apply` antes de
 `2026-09-13T19:43:30Z`; entonces cortar authority, medir deny, exigir `deletionReady=true`, aplicar con el xcr
 exacto, releer cero y apagar ambos gates. La automatización diaria sólo retira desde esa fecha con precondiciones

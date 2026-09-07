@@ -155,11 +155,11 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 - EPIC-044: emisor propio `auth.efeonce.org`, KMS/JWKS, OAuth y sesiones de personas; gateway multi-issuer.
   Autoridad externa e interna separadas por población/binding/contexto; SSO no concede permisos MCP.
   Grants, `gv` y ledger de tokens se revalidan antes del dispatch; estado/audit/outbox atómicos.
-  `TASK-1832` mantiene hasta `2026-09-13T19:43:30Z` una única organización efímera no cliente, registrada,
-  con dos perfiles `smoke_test`, TTL y sólo lectura. Ambos gates están ON; helper y Codex tienen evidencia live,
-  Claude Code vuelve a `TASK-1813` y `unexpected_refs=0`. El auth-server `00043-ndg` está restaurado; sus
-  workflows consumen una sola variable GitHub de repositorio por ser un servicio único. El retiro revoca autoridad,
-  borra sólo assets run-owned y exige readback cero. `TASK-1841` separa el piloto cliente consentido.
+  `TASK-1832` mantiene hasta `2026-09-13T19:43:30Z` una organización efímera no cliente, dos perfiles
+  `smoke_test` y sólo lectura. Ambos gates están ON; helper, Playwright, Codex y ChatGPT hospedado están verdes.
+  Claude Code `2.1.263` tiene bootstrap mínimo, sin ceremonia; Claude hospedado sigue pendiente.
+  `unexpected_refs=0`; DCR canary run-owned y clients compartidos no borrables. El retiro revoca autoridad,
+  borra el grafo exacto y exige readback cero. `TASK-1841` separa el piloto cliente.
   [`ADR nativo`](docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) ·
   [`autoridad interna`](docs/architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md) ·
   [`runbook`](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md) ·

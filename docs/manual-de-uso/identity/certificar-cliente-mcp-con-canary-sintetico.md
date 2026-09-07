@@ -169,6 +169,33 @@ se pudo verificar el deny. Un `ERR_BLOCKED_BY_CLIENT` visible después del callb
 solo el flujo: confirma primero que el CLI recibió el code y que una sesión nueva pudo invocar la lectura. Si no,
 la fila queda roja.
 
+### Claude Code y conectores hospedados
+
+Para Claude Code usa una versión `>=2.1.196`; la corrida vigente usa `2.1.263`. Fija
+`oauth.scopes="efeonce.mcp.read"` y no declares `authServerMetadataUrl`: versiones anteriores podían pedir todo
+el catálogo y provocar `invalid_scope`. Durante una corrida eliminable registra un DCR público propio con
+`software_id=run_id`, callback loopback fijo y allowlist base. No uses el client ID CIMD compartido de Anthropic
+como asset del canary: se puede observar, pero no borrar ni reclamar como run-owned.
+
+El preflight de la URL de autorización sólo acredita bootstrap. La fila pasa cuando el consentimiento muestra la
+organización exacta y sólo lectura, una sesión nueva invoca una tool read-only, el write falla cerrado, el refresh
+posterior al TTL conserva el scope y rota la familia, y la revocación invalida el token anterior. Conserva por
+separado la evidencia histórica de cada versión del cliente.
+
+Claude.ai, Claude Desktop, Cowork y mobile usan el conector remoto hospedado de Anthropic; no se certifican con el
+CLI local. Agrega `https://mcp.efeonce.org/mcp` como custom connector y valida el callback HTTPS oficial
+`https://claude.ai/api/mcp/auth_callback`. En Team/Enterprise el alta la hace un Owner y cada persona conecta su
+cuenta; Pro/Max permite alta individual. Ejecuta una llamada en Claude.ai y otra desde Desktop antes de afirmar
+compatibilidad de ambas superficies.
+
+### ChatGPT y metadata visible
+
+Después de crear o actualizar la app, relee el catálogo hospedado: una definición importada no prueba que las
+tools se serializaron. Para cada tool exige `inputSchema`, `outputSchema`, `structuredContent`, las cuatro
+annotations explícitas y el mirror `_meta.securitySchemes` derivado de la misma policy. Ejecuta una lectura real
+y espera al menos una renovación post-TTL. Un probe `POST /mcp` con JSON vacío y sin bearer debe recibir el
+challenge `401`; con bearer válido puede recibir `400 invalid_request`, pero nunca `500`.
+
 ## 6. Revoca antes de borrar
 
 Primero revoca la familia OAuth, consentimientos, contextos y sesiones. Después revoca invitaciones, grants y el

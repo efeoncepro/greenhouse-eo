@@ -830,6 +830,26 @@ Un flujo de recuperación self-service reintroduce exactamente esa puerta.
     construyendo aparte; hasta que exista y quede agendado, **NUNCA** registrar este endpoint como
     cubierto por el anti-abuso de `auth_rate_limits`.
 
+## Canary externo eliminable (TASK-1832)
+
+- El fixture nace de un registro exacto y vigente, con organización dedicada no comercial,
+  `data_origin=smoke_test`, purpose `canary` inmutable, TTL y una capability read-only. Nunca reutiliza una party
+  con historia append-only ni aparece en Person/Account 360.
+- Los gates del emisor y gateway nacen OFF y son independientes. La allowlist vacía preserva el deny aunque una
+  variable se configure mal.
+- Cada DCR run-owned lleva `software_id=run_id`. CIMD, buzones, environments, assets de marca y clientes
+  compartidos se inventarían como `shared` y nunca se eliminan.
+- El retiro revoca primero familia OAuth, consentimientos, contextos, sesiones, grants y binding; mide deny con
+  token todavía vigente. Sólo entonces un censo dinámico de FKs puede autorizar hard delete.
+- `unexpectedRefs=0` y `deletionReady=true` son precondiciones, no resultados que se asumen. Busca y borra por IDs
+  exactos del manifiesto, nunca por nombre, correo, fecha o prefijo.
+- Audit/outbox redactado se retiene fuera del grafo borrable. El cero final cubre organización, registro, binding,
+  profiles, links, invitaciones, auth/OAuth y superficies 360/comerciales; luego se apagan ambos gates.
+- Una certificación sintética prueba readiness técnica, no adopción ni consentimiento de un cliente real.
+
+Canon: [runbook canary](../../operations/runbooks/mcp-external-canary-certification.md) y
+[ADR de federación](../EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md).
+
 ## Sesión corporativa y autoridad nativa (TASK-1836 / TASK-1831)
 
 Canon: [autoridad interna](../EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md) y

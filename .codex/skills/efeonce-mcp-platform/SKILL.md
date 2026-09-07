@@ -38,6 +38,10 @@ Read, in order:
 3. The provider's canonical architecture, task and live runtime handoff.
 4. The smallest reference below that matches the work.
 
+For ChatGPT, Claude Code, Claude hosted connectors, Codex or any external client matrix, load
+[`references/client-certification.md`](references/client-certification.md). Client version and local-versus-hosted
+surface are part of the evidence.
+
 If a source conflicts with remembered behavior, the verified runtime and its canonical architecture win.
 
 ## Native authority (TASK-1836 / TASK-1831)
@@ -50,8 +54,8 @@ to the internal rollout runbook and tasks, never to a cached revision in this sk
 ## Hard rules
 
 - Keep `https://mcp.efeonce.org/mcp` as the single canonical resource. Do not create a second OAuth resource for an alias.
-- Default every provider or capability to disabled, read-only and fail-closed. The only enabled initial exception is
-  internal `globe.producer.fleet.list`; it is not a customer-access precedent. An absent or degraded provider must
+- Default every provider or capability to disabled, read-only and fail-closed. Enabled internal providers and the
+  dedicated synthetic external canary are not customer-access precedents. An absent or degraded provider must
   not expose data, execute a tool or make discovery fail for healthy providers.
 - A tool delegates only to a provider's canonical API, reader or command. Never add domain business logic, direct DB,
   storage or creative-provider SDK access to the gateway.
@@ -69,8 +73,8 @@ to the internal rollout runbook and tasks, never to a cached revision in this sk
   (`AADSTS650053`); the token's `scp` claim still arrives bare, so the verifier and per-tool checks did not
   change. The shim does **not** turn the gateway into an authorization authority — it only re-announces discovery
   metadata and one fixed client; Entra keeps issuing and validating every token, so the gateway remains a neutral
-  adapter. Verified live with the real client: Claude Code authenticated and connected. This broadens internal
-  tenant connectivity only; external/B2B access stays gated. Formalization pending as `TASK-1654`.
+  adapter. The historical Entra lane was verified with Claude Code; that does not certify the native issuer nor a
+  current Claude version. External/B2B access stays gated. Formalization pending as `TASK-1654`.
 - 🔴 **DCR is DEPRECATED as of MCP revision `2026-07-28` — the shim stays, but do NOT read it as the mechanism
   the protocol is heading toward.** Registered 2026-09-02 against the live spec. The
   [deprecated registry](https://modelcontextprotocol.io/specification/2026-07-28/deprecated) lists Dynamic Client
@@ -279,7 +283,8 @@ to the internal rollout runbook and tasks, never to a cached revision in this sk
 ## External access binding (TASK-1631, applied 2026-09-04)
 
 The Account 360 binding for external identities is LIVE in `greenhouse_core` (one Cloud SQL instance; both
-migrations applied; no client grants issued yet). Anyone federating a tool that a customer will call must know this
+migrations applied). A synthetic read-only canary now has temporary grants; no real customer grant has been issued.
+Anyone federating a tool that a customer will call must know this
 graph, because the gateway will resolve the caller against it:
 
 - `external_identity_environments` (an issuer: `issuer_class` internal|external, `status` draft|active|suspended|

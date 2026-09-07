@@ -4,7 +4,8 @@
 > `https://auth.efeonce.org` — **TASK-1829** (EPIC-044 U02).
 > **Estado:** OAuth y personas activos; emisión/refresh/revocación internos verificados por TASK-1836 y
 > consumo multi-issuer por TASK-1831. El environment `efeonce-auth` está activo para la cohorte controlada.
-> Las matrices externas/multicontexto siguen abiertas. [Mapa de evidencia](../audits/2026-09-06-task-1836-1831-consolidated-evidence.md).
+> La matriz externa está parcialmente certificada por TASK-1832: helper, Playwright, Codex y ChatGPT hospedado
+> verdes; Claude local/hospedado y cleanup final siguen abiertos. [Matriz](../audits/mcp/EFEONCE_MCP_CLIENT_TOKEN_MATRIX_2026-09-06.md).
 > ADR gobernante:
 > [`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md).
 > Contrato de federación: [`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md).
@@ -284,6 +285,9 @@ en el mismo momento en que se prende `AUTH_SERVER_OAUTH_ENABLED` en staging (pre
 - **NUNCA** resolver un cliente CIMD sin el guard anti-SSRF ni cachear un documento más de 24 h.
 - **SIEMPRE** que se agregue un scope al gateway, agregarlo a `scopes.ts` (test de paridad) y a la
   descripción es-CL de `src/lib/copy/auth-server.ts`.
+- `offline_access` no es una capability y su ausencia no prueba continuidad ni bloqueo. La renovación se
+  certifica observando refresh real después del TTL, mismo scope, rotación y revocación. Si el request de refresh
+  omite `scope`, conserva el conjunto original y nunca amplía al catálogo.
 
 ## 11. Verificación
 

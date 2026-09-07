@@ -1,5 +1,8 @@
 # Binding de Identidad Externa para el MCP
 
+> **Estado 2026-09-07:** binding/login/token nativos operativos. TASK-1832 mantiene un canary externo sintético,
+> no comercial y eliminable; el primer cliente real continúa separado en TASK-1841.
+
 ## Frontera con el acceso corporativo
 
 Este documento describe la población externa. TASK-1836 añadió población persistida e inmutable

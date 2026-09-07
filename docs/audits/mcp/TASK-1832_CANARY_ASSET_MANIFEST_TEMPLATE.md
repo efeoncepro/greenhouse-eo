@@ -51,7 +51,7 @@ lo usa pero nunca lo elimina; `run_owned` significa que el command puede retirar
 | `greenhouse_core.external_member_invitations`    | `PENDIENTE`                                 | `run_owned`      | alta sintética           | `planned`         | revocar y eliminar    | `PENDIENTE`                         |
 | `greenhouse_core.identity_profiles`              | `PENDIENTE`                                 | `run_owned`      | persona `smoke_test`     | `planned`         | desactivar y eliminar | `PENDIENTE`                         |
 | `greenhouse_core.identity_profile_source_links`  | `PENDIENTE`                                 | `run_owned`      | identidad login          | `planned`         | desactivar y eliminar | `PENDIENTE`                         |
-| `greenhouse_auth.oauth_clients`                  | `PENDIENTE`                                 | `shared          | run_owned`               | cliente de prueba | `planned`             | retirar; eliminar sólo si exclusivo | `PENDIENTE` |
+| `greenhouse_auth.oauth_clients`                  | `PENDIENTE`                                 | `shared|run_owned` | cliente por producto/versión | `planned`      | eliminar sólo DCR exclusivo | `PENDIENTE`                    |
 | `greenhouse_auth.authorization_contexts`         | `PENDIENTE`                                 | `run_owned`      | contexto server-selected | `planned`         | revocar y eliminar    | `PENDIENTE`                         |
 | `greenhouse_auth.client_consents`                | `PENDIENTE`                                 | `run_owned`      | consentimiento           | `planned`         | revocar y eliminar    | `PENDIENTE`                         |
 | `greenhouse_auth.authorization_codes`            | `conteo; sin hash`                          | `run_owned`      | code PKCE                | `planned`         | expirar/eliminar      | `PENDIENTE`                         |
@@ -62,6 +62,17 @@ lo usa pero nunca lo elimina; `run_owned` significa que el command puede retirar
 
 Agregar cualquier asset descubierto antes de continuar. Un asset no inventariado deja el manifiesto en
 `blocked`; nunca se corrige omitiéndolo del readback.
+
+## Evidencia por cliente
+
+Una fila por `producto + versión + local|hospedado`:
+
+| Cliente/revisión | Redirect | Registro/ownership | Metadata visible | Tools permitidas | Probe vacío | Refresh post-TTL | Mismo subject | Resultado |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `PENDIENTE` | `PENDIENTE` | DCR run-owned, CIMD shared o pre-registrado | schemas + 4 annotations + security | `PENDIENTE` | `401/400; nunca 500` | `PENDIENTE` | fingerprint truncado | `PENDIENTE` |
+
+El logo del correo y el icono MCP son assets distintos. El primero se prueba en el mensaje recibido; el segundo
+depende de la metadata serializada y de que el cliente lo renderice. No marques uno verde con evidencia del otro.
 
 ## Preflight de eliminación
 

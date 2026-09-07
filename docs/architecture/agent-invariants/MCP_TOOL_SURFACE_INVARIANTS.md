@@ -346,6 +346,22 @@ del baseline, para que no puedan discrepar) y `surface-baseline.json`, que adem�
 para poder nombrar el delta. El hash del manifiesto federado se conserva, ya no como gate sino como
 diagnóstico del origen del cambio.
 
+## 10. La compatibilidad se verifica en la superficie serializada y por versión de cliente
+
+- **SIEMPRE** registra `producto + versión + local|hospedado`; actualizar un cliente agrega una fila, no borra
+  la falla histórica.
+- **SIEMPRE** inspecciona el `tools/list` que ve el cliente: `inputSchema`, `outputSchema`,
+  `structuredContent` y las cuatro annotations deben cruzar el transporte. Un registry interno correcto no
+  acredita esa serialización.
+- `_meta.securitySchemes` es un mirror de compatibilidad de OpenAI. Se deriva de la misma policy canónica y
+  nunca concede acceso ni sustituye el enforcement server-side.
+- Un probe JSON vacío anónimo debe recibir el challenge `401` antes de la validación del body; autenticado puede
+  recibir `400 invalid_request`; `500` es una regresión de transporte.
+- Un badge de conexión, DCR o import no acredita uso. Exige consentimiento, token para el resource exacto,
+  llamada permitida, negativa, refresh post-TTL sin widening y revocación.
+- Cliente CIMD/DCR compartido por un vendor es `shared`. Un cleanup canary nunca lo borra por sujeto; usa un DCR
+  con `software_id=run_id` cuando necesites ownership eliminable.
+
 ## Documentación relacionada
 
 - `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §5 (contrato de honestidad `●`/`◑`) y §7 (Full API Parity)
@@ -353,6 +369,7 @@ diagnóstico del origen del cambio.
 - `docs/architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md` (gateway, scopes, federación)
 - `src/lib/growth/seo/lens.ts` · `lens-coverage.ts` · `lens-surface-manifest.ts`
 - `docs/architecture/GREENHOUSE_MCP_TOOL_SELECTION_EVAL_V1.md` — baseline, delta medido y gate de selección
+- `docs/operations/runbooks/mcp-external-canary-certification.md` — matriz cross-client y cleanup
 - `src/lib/growth/seo/resolve-target.ts` — la negativa a elegir mercado callado, del lado del runtime
 
 ## Autoridad nativa antes de dispatch (TASK-1831 / TASK-1836)

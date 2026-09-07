@@ -6,6 +6,12 @@
 > **Runtime repo:** `efeoncepro/efeonce-mcp`
 > **Canonical resource:** `https://mcp.efeonce.org/mcp`
 
+> **Estado externo 2026-09-07:** el emisor nativo y el gateway están productivos. TASK-1832 certificó helper,
+> Playwright, Codex y ChatGPT hospedado con una organización sintética eliminable; Claude Code `2.1.263` tiene
+> bootstrap mínimo corregido y ceremonia pendiente. No es customer access. El runtime usa MCP SDK v2; el probe
+> JSON vacío responde 401/400 y nunca 500. Matriz y retiro:
+> [`mcp-external-canary-certification.md`](runbooks/mcp-external-canary-certification.md).
+
 ## Runtime inventory
 
 | Resource | Canonical value |
@@ -19,7 +25,7 @@
 | Public hostname | `mcp.efeonce.org` |
 | Global front-door IP | `34.111.78.237` |
 | DNS authority | HostGator (`ns24.hostgator.cl`, `ns25.hostgator.cl`) |
-| OAuth issuer | Microsoft Entra tenant `a80bf6c1-7c45-4d70-b043-51389622a0e4` |
+| OAuth issuers | Efeonce ID nativo `https://auth.efeonce.org` + Microsoft Entra legado |
 | OAuth resource app ID / JWT audience | `c5363215-b9a6-4bf1-bb1c-e61963b37dac` |
 | Second front-door host | `auth.efeonce.org` → Cloud Run `auth-server` (`us-east4`, repo Greenhouse; variable `enable_auth_host`, ver §`Segundo host del front door`) |
 

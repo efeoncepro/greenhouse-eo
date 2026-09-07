@@ -1,5 +1,20 @@
 # TASK-1813 — Compatibilidad OAuth del MCP Efeonce con Codex y Claude
 
+## Delta 2026-09-07 — causa upstream identificada y cliente local corregido
+
+La incompatibilidad de Claude Code quedó versionada: `2.1.186` solicitaba el catálogo completo descubierto;
+Anthropic corrigió ese comportamiento desde `2.1.196`. El CLI local fue actualizado a `2.1.263` y el servidor
+`efeonce-mcp` quedó con `oauth.scopes="efeonce.mcp.read"`, sin override de metadata. Un preflight nuevo confirmó
+una solicitud con scope base único, PKCE S256, recurso canónico y callback fijo. La ceremonia se canceló antes
+del consentimiento porque la Mac estaba bloqueada, por lo que Claude sigue pendiente de login, lectura,
+refresh post-TTL y revocación. TASK-1832 registró un DCR run-owned para completar esa prueba sin comprometer el
+cleanup.
+
+ChatGPT ya no está bloqueado por la ausencia de `offline_access`: el cliente hospedado rotó dos veces su refresh
+después del TTL manteniendo únicamente `efeonce.mcp.read`. Codex `0.153.4` también completó login y lectura real.
+No se amplían scopes ni grants; la deuda restante de esta task es la regresión Claude local/hospedada y, como
+hardening separado sujeto a ADR, retirar la ambigüedad del catálogo mixto Entra+nativo.
+
 ## Delta 2026-09-06 — hallazgos de clientes reales durante TASK-1832
 
 La certificación canary productiva reabrió esta unidad con versiones actuales, sin cambiar el runtime:
@@ -50,7 +65,7 @@ La task pasa a `EPIC-044`. El emisor propio (`TASK-1828`/`TASK-1829`) es quien r
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Defecto reproducido en producción con Claude Code 2.1.186; Codex 0.153.4 funciona sólo tras retry de scopes mínimos y sin duplicar resource. ChatGPT hospedado tiene preflight discovery incompleto para continuidad: refresh grant disponible, offline_access no anunciado. Sin fix de runtime en esta corrida; evidencia y límites registrados por TASK-1832.`
+- Status real: `Fallo histórico reproducido con Claude Code 2.1.186 y corregido upstream desde 2.1.196. CLI local actualizado a 2.1.263, scope base fijado y preflight mínimo verde; login/dispatch/refresh/revocación aún pendientes. Codex 0.153.4 y ChatGPT hospedado están certificados por TASK-1832, incluido refresh real sin offline_access.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
 - Blocked by: `none`

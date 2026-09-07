@@ -5,6 +5,11 @@
 > **Documentación funcional:** [Efeonce MCP Gateway](../../documentation/plataforma/efeonce-mcp-gateway.md)
 > **Runbook técnico:** [Efeonce MCP Platform Runbook](../../operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md)
 
+> **Compatibilidad externa 2026-09-07:** Codex y ChatGPT hospedado están certificados con el canary sintético;
+> Claude Code `2.1.263` tiene preflight mínimo y ceremonia pendiente. Sigue la
+> [matriz/runbook externo](../../operations/runbooks/mcp-external-canary-certification.md); no uses una conexión
+> visible como sustituto de login, dispatch, refresh y revoke.
+
 ## Antes de probar
 
 Confirma que el cliente OAuth usa el resource `https://mcp.efeonce.org/mcp` y un emisor admitido.
@@ -18,7 +23,7 @@ No uses la URL `run.app`: el acceso público pasa por el front door y el hostnam
 1. Abre `https://mcp.efeonce.org/health`: debe devolver estado saludable y confirmar OAuth configurado.
 2. Consulta `https://mcp.efeonce.org/.well-known/oauth-protected-resource`: debe declarar el resource y los
    scopes soportados.
-3. Con un cliente OAuth autorizado, ejecuta `initialize`.
+3. Con un cliente OAuth autorizado, ejecuta el handshake que soporte su versión y relee `tools/list` serializado.
 4. Ejecuta `globe.capabilities.list` y luego `globe.producer.fleet.list` sin argumentos.
 5. Confirma que la respuesta contiene rutas, disponibilidad y correlation ID, pero no house, provider slug,
    costo de vendor ni margen.

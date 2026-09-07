@@ -7,6 +7,20 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-07 — TASK-1832: Claude Code actualizado y contrato cross-client consolidado
+
+La falla de Claude Code quedó atribuida a `2.1.186`: esa versión pedía el catálogo completo descubierto.
+Anthropic corrigió el comportamiento desde `2.1.196`; el CLI local quedó en `2.1.263` con
+`oauth.scopes="efeonce.mcp.read"`. Un preflight nuevo produjo sólo el scope base, PKCE S256 y el resource
+canónico. La Mac estaba bloqueada y la ceremonia se canceló antes del consentimiento, por lo que aún no hay
+token, dispatch, refresh ni certificación hospedada de Claude.
+
+Para no comprometer el retiro se creó un DCR público exclusivo con `software_id=run_id`, callback fijo y
+allowlist read-only. El dry-run lo incorporó al grafo: 21 DCR, sin nuevos codes/consents/tokens y
+`unexpectedRefs=0`. La documentación y las skills MCP ahora distinguen versión/local/hospedado, DCR run-owned
+frente a CIMD compartido, serialización observable de schemas/annotations/security, probe vacío 401/400 y
+refresh real post-TTL. TASK-1832 continúa en observación y no se cierra antes del cleanup/readback cero.
+
 ## 2026-09-07 — TASK-1832: ChatGPT completa el OAuth hospedado y el gateway endurece el probe vacío
 
 ChatGPT ya funciona de punta a punta con el authorization server y el gateway productivos. La app hospedada
@@ -917,15 +931,3 @@ para el 1-nov.
 ## 2026-09-01 — TeamBot completa el ciclo mensual del Performance Report
 
 Nexa publicó el resumen de agosto en `EO Team` con cuatro menciones verificadas y envió cuatro lecturas personales 1:1, todas auditadas como `succeeded`. El runbook, la arquitectura, el manual y las skills espejadas ahora exigen separar cifras de interpretación: volumen no prueba sobrecarga, los atrasos heredados se contextualizan y una muestra de onboarding no se presenta como tendencia. También fijan la jerarquía de evidencia para menciones y el uso de Object ID Entra revalidado cuando un correo escrito contiene un typo. [Evidencia y límites](docs/audits/communications/2026-09-01-performance-report-teambot.md).
-
-## 2026-09-01 — 15 cierres del barrido y dos defectos de task:lint corregidos
-
-Quedaron `complete` con evidencia por criterio: 1036, 1040, 1090, 1113, 1209, 1210, 1225, 1253, 1282,
-1321, 1330, 1335, 1430, 1431 y 1747. Desbloqueadas 1246, 1254, 1255 y 1336.
-
-`TASK-1078` NO se cerró pese a estar desplegada: es UI sin `Wireframe:` declarado y no se le inventa
-uno para pasar el gate. Queda como decisión de política para las tasks de UI previas a esa regla.
-
-Dos defectos de `task:lint`, ambos de mensajes que prometían lo que el mecanismo no honraba:
-`ui-wireframe-contract` ignoraba el `UI impact: none` explícito por inferir desde `Domain`, y se
-rompía cuando el autor agregaba la razón que la plantilla exige.
