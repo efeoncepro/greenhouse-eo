@@ -3,22 +3,18 @@
 **TASK-1832 — canary productivo en observación; retiro después del 2026-09-13 19:43Z (Codex,
 2026-09-07):** release Greenhouse `fb5fc082aa92-3f2c8706-24fa-452d-be8f-6feea7b8cdd9` `released`;
 Vercel/auth-server `00043-ndg` sirven `fb5fc082aa92`; gateway `v1.1.2`/`171965c99034`/`00046-6n2` sirve 100 %,
-con gates ON, MCP v2 `2.0.0`, CI `34111553554` y deploy `34111643880` verdes.
+con gates ON, MCP v2 `2.0.0`, CI/deploy verdes. Readback `2026-09-07T12:20:25Z`: Ready/100 %, SHA alineados con
+`origin/main`, health/metadata 200, MCP anónimo 401, producción ON y Vercel staging OFF; cero mutaciones.
 
-ChatGPT hospedado está verde: organización exacta, scope único `efeonce.mcp.read`, sólo
-`efeonce.gateway.status|get_seo_entitlement`, ambas lecturas sin gasto/write, mismo subject que Codex y dos
-rotaciones refresh post-TTL. El probe JSON vacío ya responde 401/400 canónico en vez de 500. M365/Gmail,
-passkey Chrome/Safari, helper, Playwright `1/1`, Codex y cinco negativas siguen verdes; el fixture mantiene 2
-profiles `smoke_test`, cero 360/comercial y `unexpectedRefs=0`. Claude Code `2.1.186` conserva su FAIL histórico;
-`2.1.263` completó login, consentimiento exacto, catálogo de dos tools read-only, lectura y refresh post-TTL:
-dos access/refresh, uno rotado y uno activo, siempre base-only. Claude.ai completó el mismo recorrido hasta una
-lectura SEO real mediante un DCR público run-owned y rotó una vez post-TTL con la misma postura. Claude Desktop
-`1.46388.4` abrió el chat sincronizado desde `Claude.app`, solicitó aprobación propia y ejecutó la lectura sobre
-el mismo conector remoto. La matriz técnica de clientes está completa.
+ChatGPT hospedado está verde con scope único `efeonce.mcp.read`, dos tools read-only y refresh post-TTL sin
+widening; Codex, correo, passkeys, Playwright y negativas siguen verdes. Claude Code `2.1.263`, Claude.ai y
+Desktop `1.46388.4` completaron login/consentimiento, lectura y renovación base-only; `2.1.186` queda como
+baseline histórico fallido. La matriz técnica de clientes está completa.
 
-Los dos DCR exclusivos de Claude están marcados con el `run_id`; no se usó el CIMD compartido. Dry-run
-post-refresh: 22 DCR, 21 codes/consents, 29 refresh/access y blockers esperados
-`registration_active|active_authority|active_auth`. No ejecutar `--apply` antes de
+Muestra read-only `2026-09-07T12:09:54Z`: registro/binding `1/1`, drift `0/0`, sólo 2 perfiles run-owned,
+cero Person 360, `activeAuthCount=56`, `unexpectedRefs=0` y blockers esperados. Nueve señales están `ok`; los
+seis `refresh_reuse` son negativos inventariados, run-owned y sin eventos nuevos. No hubo apply.
+No ejecutar `--apply` antes de
 `2026-09-13T19:43:30Z`; entonces cortar authority, medir deny, exigir `deletionReady=true`, aplicar con el xcr
 exacto, releer cero y apagar ambos gates. La automatización diaria sólo retira desde esa fecha con precondiciones
 verdes. Fuente viva: `docs/audits/mcp/TASK-1832_CANARY_ASSET_MANIFEST_task-1832-canary-20260906-a.md` y matriz

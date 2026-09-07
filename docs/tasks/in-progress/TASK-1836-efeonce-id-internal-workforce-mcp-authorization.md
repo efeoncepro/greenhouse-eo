@@ -24,7 +24,7 @@ Mapa de construcción, pruebas y límites: [auditoría consolidada TASK-1836/183
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `2026-09-06: entrada directa /login servida desde develop (21aa12608, auth-server-00030-rtm, deploy34002082020 success); botón existente visible a1440/390 y clic→Microsoft verificados. PR226 fusionada a main 456d9accf el 2026-09-06 (run 34005056894, manifest 456d9accffb6-3b09047e released, watchdog ok, auth-server-00032-h45 con ese GIT_SHA); nuevo canary humano directo pendiente. Pruebas locales235/4omitidas y review correctos. Estado previo del carril MCP a00:30 UTC: release 08acfb2c6 publicado (PR225, run34000876213, manifest released sin override). Acceso Microsoft, consentimiento, token y lectura MCP interna verificados; canary final en gateway36: propia permitida, ajena denegada y revocación efectiva en 6.633 s. Refresh, retiro de grant y rollback medidos anteriormente. Piloto ON, gv5, vencimiento original 2026-09-12T15:00Z; integridad cero y tokens de prueba revocados. Watchdog 5/5, drift0. Matrices externas/multicontexto y UI/WebKit pendientes.`
+- Status real: `Acceso corporativo interno productivo y verificado: entrada Microsoft, consentimiento, token, lectura MCP propia, rechazo ajeno, refresh, retiro de grant y revocación efectiva en 6.633 s; integridad reconciliada y tokens de prueba revocados. TASK-1832 completó además la matriz técnica externa sintética con clientes Codex/ChatGPT/Claude base-only, sin convertirla en evidencia de cliente real. Permanecen pendientes el retorno humano directo propio de esta task, la matriz multicontexto, la repetición Entra completa, UI/WebKit y el cierre formal. Revisión y SHA se resuelven en runtime; snapshot 2026-09-07T12:20:25Z: auth-server 00043-ndg Ready/100 % con SHA igual a origin/main.`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -118,7 +118,7 @@ coordinada con TASK-1831; no se cambia su semántica silenciosamente ni se marca
 
 ### Gap
 
-- Camino corporativo → sesión → consentimiento → token → tool MCP interno verificado en el piloto. Promoción PR226 a `main` `456d9accf` cerrada el 2026-09-06 (ver «Estado vigente de la entrada directa»). Pendientes: retorno humano de entrada directa y matrices externas/multicontexto.
+- Camino corporativo → sesión → consentimiento → token → tool MCP interno verificado en el piloto. Promoción PR226 a `main` `456d9accf` cerrada el 2026-09-06 (ver «Estado vigente de la entrada directa»). TASK-1832 cerró la matriz externa sintética; pendientes propios: retorno humano de entrada directa, multicontexto y repetición Entra completa.
 - `issuer_class` por environment no basta para distinguir poblaciones bajo un mismo emisor.
 
 ## Modular Placement Contract
@@ -573,7 +573,7 @@ interactivo del sujeto real cuando corresponda. No enviar correos ni mensajes si
 ## Acceptance Criteria
 
 - [ ] D1–D7 del §2 formalizadas en ADR, con fixtures y contratos compartidos; ninguna queda sólo como “resolver después”.
-- [x] Contexto firmado de otra persona/cliente y token previo sin contexto no acceden a autoridad interna. Evidencia backend: OAuth flow, context, subject-port y ecosystem reader tests; dispatch real interno permitido y aislamiento por organización verificados en gateway36; la matriz externa/concurrente completa sigue pendiente.
+- [x] Contexto firmado de otra persona/cliente y token previo sin contexto no acceden a autoridad interna. Evidencia backend: OAuth flow, context, subject-port y ecosystem reader tests; dispatch real interno permitido y aislamiento por organización verificados. TASK-1832 completó la matriz externa sintética; la matriz concurrente/multicontexto sigue pendiente.
 - [x] Flag de gateway OFF deniega contextos internos nativos ya emitidos; flag de emisor OFF deniega login, authorize y refresh internos nuevos. Tests del guard interno y ensayo live: gateway OFF denegó en ≤20 s; emisor OFF rechazó refresh; restauración completa 79 s. No acredita rollback de toda la matriz externa/Entra.
 
 - [ ] Casos de auditoría §14 pasan; assurance Entra, procedencia de sesión y refresh no elevan autoridad implícitamente.

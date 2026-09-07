@@ -41,8 +41,21 @@ autorización server-side.
   `https://claude.ai/api/mcp/auth_callback`. Una prueba CLI local no certifica ese carril. Si el fixture debe
   borrarse, usa en la UI de Claude un cliente OAuth propio, DCR público marcado con el `run_id` y secreto vacío;
   el CIMD detectado por Claude es compartido y no pertenece al cleanup.
+- Las superficies hospedadas de Claude comparten el conector y su identidad OAuth. Probar Desktop después de web
+  certifica otra UI, no demuestra ni exige un DCR adicional: el inventario de clientes se obtiene del emisor, no
+  del número de superficies probadas.
 - En OpenAI verifica schemas, annotations y security metadata visibles en la app hospedada, una acción real y
   continuidad post-TTL.
+
+## Observación y retiro
+
+- Un monitor de estabilidad reutiliza el cliente existente y sólo ejecuta discovery, estado y tools de lectura. No
+  registra clientes, abre consentimientos, reenvía invitaciones, ejecuta writes ni consume presupuesto proveedor.
+- Un warning heurístico de `issuer` no sustituye la prueba runtime. Si discovery, authorization code + PKCE, token
+  ligado al resource, dispatch y refresh pasan con validación real, conserva el warning como seguimiento no
+  bloqueante; nunca falsees `issuer` para silenciarlo.
+- El cleanup de un fixture temporal es dry-run hasta `delete_after`. Sólo después de esa barrera se corta authority,
+  se prueba deny, se revocan hijos run-owned, se exige readback cero y se apagan los gates correspondientes.
 
 Fuentes oficiales:
 

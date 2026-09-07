@@ -1,6 +1,6 @@
 # TASK-1626 — Efeonce MCP Platform Gateway and Globe Federation
 
-## Delta 2026-09-06 — medición contra runtime: qué queda abierto de verdad
+## Delta 2026-09-06 — snapshot histórico de runtime: qué quedó abierto
 
 La sección de rollout de abajo quedó congelada el 2026-08-01 y describe un gateway que ya no existe. Medido
 contra el runtime hoy:
@@ -68,7 +68,7 @@ datos. Clientes externos requieren además identidad y entitlements verificables
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `code complete, rollout pendiente (medido contra runtime 2026-09-06). El gateway opera en producción: revisión efeonce-mcp-gateway-00044-4kj en southamerica-west1 con 100% del tráfico, maxScale=20, Cloud Armor 600/60 s, 39 tools, version 1.1.0, dos emisores anunciados (auth.efeonce.org + mcp.efeonce.org) y seis scopes; front door verificado 200/401/200. Criterios principales 7 de 8. El único abierto —smokes de CARGA MÍNIMA y ROLLBACK— pasa a TASK-1843 para ejecución: hoy no existe mecanismo de carga en el repo hermano (grep de load-test/autocannon/k6/artillery sobre scripts, test y .github devuelve cero) y el rollback está documentado sin ejercitar, con el marcador [verificar] literal en el runbook. El gate de Full API Parity se traspasa a TASK-1473, su dueña real. La sección Estado de rollout de abajo quedó congelada el 2026-08-01; vale el Delta 2026-09-06, no ella.`
+- Status real: `code complete, rollout pendiente. El gateway opera en producción; revisión, SHA, versión, superficie y tráfico vigentes se leen del runtime y surface-baseline, no de este documento. Snapshot 2026-09-07T12:20:25Z: efeonce-mcp-gateway-00046-6n2 Ready/100 %, SHA 171965c99034 igual a origin/main y front door 200/401. Criterios principales 7 de 8. El único abierto —smokes de CARGA MÍNIMA y ROLLBACK— pertenece a TASK-1843: no existe mecanismo de carga en el repo hermano y el rollback está documentado sin ejercitar. Full API Parity pertenece a TASK-1473. La sección Estado de rollout de abajo quedó congelada el 2026-08-01 y el Delta 2026-09-06 es sólo un snapshot histórico.`
 - Rank: `TBD`
 - Domain: `platform|agentic|integration|cloud|identity`
 - Blocked by: `none`
@@ -381,8 +381,9 @@ DNS en HostGator requieren acceso del operador. No se sustituyen con tokens est�
 - Los smokes públicos aprobaron: health `200`, metadata OAuth `200`, `POST /mcp` sin token `401` con challenge,
   OAuth PKCE autenticado, discovery y `globe.producer.fleet.list` por el hostname canónico.
 - Hardening posterior: Cloud Armor quedó adjunto al backend con throttle aproximado de 600 requests/minuto por
-  IP; la revisión `efeonce-mcp-gateway-00009-9c6` restringe host/origin a `mcp.efeonce.org`, tiene tráfico 100%
-  y `maxScale=5` efectivo. No sustituye las cuotas, entitlements ni límites de gasto de los products providers.
+  IP; la revisión histórica `efeonce-mcp-gateway-00009-9c6` restringía host/origin a `mcp.efeonce.org`, tenía
+  tráfico 100% y `maxScale=5`. El readback live de TASK-1832 del 2026-09-07 verificó `maxScale=20`; ningún valor
+  histórico sustituye las cuotas, entitlements ni límites de gasto de los products providers.
 - El primer callback localhost venció con un listener de 180 segundos; el canary ahora admite una ventana de 10
   minutos configurable. Su override DNS se usa sólo para diagnóstico, conserva SNI público y no modifica runtime.
 - Límite actual: auth de tenant único y un reader Globe read-only. El cliente PKCE interno recibe base + reader

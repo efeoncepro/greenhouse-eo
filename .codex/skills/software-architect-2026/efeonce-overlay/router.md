@@ -75,11 +75,14 @@ discovery, routing, redaction and provider isolation; the provider remains owner
 policy, tenancy, data, provider credentials and domain audit. Architecture proposals must preserve that split and
 must not add direct database, storage, creative-provider or free-form workspace access to the gateway.
 
-The current operational exception is only internal read-only `globe.producer.fleet.list`, delegated to Globe's
-canonical fleet reader. Treat any new reader as disabled until its provider contract, least-privilege binding,
-allow/deny/fault/redaction evidence and public-gateway canary pass. Customer B2B/multitenant access is a separate
-decision: require tenant/capability entitlements with revocation plus a real base-only identity that proves Globe
-denial; the current internal Entra client receives base + reader (`efeonce.mcp.read` and `efeonce.mcp.globe.read`)
-even when it requests only the base, so it cannot establish that proof. The gateway declares a third scope, the
-flag-gated internal write `efeonce.mcp.globe.credits.funding.ensure`; whether that same client also receives it is
-not verified and follows its own consent flow.
+The gateway now operates several federated providers behind per-tool policy; resolve the current surface, scopes,
+flags and served revision from the runtime/baseline rather than freezing an inventory here. Treat any new reader
+as disabled until its provider contract, least-privilege binding, allow/deny/fault/redaction evidence and public
+gateway canary pass.
+
+TASK-1832 proved the external path with a dedicated synthetic organization and base-only identities in Codex,
+ChatGPT and Claude surfaces, including higher-scope/internal-tool denials and revocation. That is technical
+certification, not Customer B2B adoption or a reusable cohort. Customer access remains a separate decision:
+require a consented real organization, its tenant/capability entitlements and revocation evidence under TASK-1841.
+Every write scope keeps its own consent, authority, spend/step-up and rollback gates; never expose one by widening a
+shared public client.

@@ -17,7 +17,9 @@ El arreglo directo de `/login` (21aa12608, auth rev30) ya está servido y quedó
 `456d9accf` por PR226 el 2026-09-06; el retorno humano directo sigue pendiente. Esa UI no modifica el contrato de autorización del gateway.
 Los snapshots siguientes son historia: `access_tokens=0`, flag emisor OFF y ausencia de auditoría
 del piloto dejaron de ser bloqueos vigentes tras canaries, migración y reconciliación canónica.
-La matriz externa/multicontexto y el canary Entra completo no se declaran aprobados por inferencia.
+TASK-1832 completó después la matriz técnica externa sintética —incluidos el deny de scope superior y de tool
+internal-only— sin ampliar grants. Eso no acredita todavía la matriz multicontexto ni una repetición Entra
+completa, que permanecen separadas.
 
 ## Snapshot histórico 2026-09-05 17:01 UTC — anterior al canary autenticado
 
@@ -139,7 +141,7 @@ El slice interno nativo depende del contrato de TASK-1836 (U11). La policy actua
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Gateway multi-issuer desplegado con el carril INTERNO verificado y el carril EXTERNO sin probar (2026-09-06). Revisión 36-5wc, SHA 815df9b, flags nativo/interno ON; release PR225 certificado. Verificado por TASK-1836: token, lectura propia, rechazo ajeno entre dos sujetos INTERNOS, refresh, retiro de grant ≤11 s, revocación OAuth 6.633 s y rollback de flags. Ya no aplica access_tokens=0 ni emisor OFF. Criterios: 4 de 9 tildados. ABIERTOS los dos tests centrales del confused deputy — (a) token externo con scope string internal-only → deny en dispatch con señal redactada, y (b) roles con string de escritura y sin scope delegado → deny, también en Entra. Ninguno de los dos está cubierto por el canary interno: el rechazo ajeno probado es interno contra interno, no externo contra tool interna, que es el escenario que motivó esta task. Causa del bloqueo: no existe membership externa real (la misma que bloquea el carril de tokens de TASK-1830 y que TASK-1832 está resolviendo con población sintética). El red-team de TASK-1833 Slice 1 los ejercita sintéticamente contra staging — sus abuse cases token del issuer externo sobre tool interna y confused deputy por cliente son estos mismos tests. Pendientes además: matriz externa/multicontexto, discovery/challenges por cliente real y nueva comprobación Entra completa; providers sin delegación compatible siguen denegados.`
+- Status real: `Gateway multi-issuer desplegado. TASK-1836 verificó el carril interno: token, lectura propia, rechazo ajeno, refresh, retiro de grant ≤11 s, revocación OAuth 6.633 s y rollback de flags. TASK-1832 verificó el carril externo sintético en producción con helper, Playwright, Codex, ChatGPT, Claude Code 2.1.263, Claude.ai y Claude Desktop 1.46388.4; scope superior y tool internal-only quedaron denegados, siempre base-only. Esto no acredita un cliente real. Permanecen abiertas la matriz multicontexto, roles sin scopes/Entra equivalente, repetición Entra completa y los casos de concurrencia/revocación remota que esta task enumera. Las revisiones y SHA mutables se leen del runtime; snapshot TASK-1832 2026-09-07T12:20:25Z: gateway 00046-6n2 Ready/100 % y SHA igual a origin/main.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration`
 - Blocked by: `none`

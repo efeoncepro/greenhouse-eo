@@ -30,6 +30,9 @@ demás.
   `https://claude.ai/api/mcp/auth_callback`; un login CLI no certifica ese carril. Para una corrida eliminable,
   elige **Usa tu propio cliente OAuth**, registra un DCR público con `software_id=run_id`, deja el secreto vacío,
   conserva **Siempre requerido** + **HTTP transmisible** y no aceptes el CIMD detectado como asset de la corrida.
+- Esas superficies hospedadas comparten la infraestructura de conexión y la identidad OAuth del conector. Una
+  invocación adicional desde Desktop certifica esa UI, pero no implica por sí sola un tercer DCR: reconcilia los
+  clientes realmente persistidos y nunca inventes un asset de cleanup por contar superficies.
 - Certifica consentimiento de la organización exacta, sólo lectura, una tool permitida, write denegado, refresh
   post-TTL sin widening, rotación, revocación y readback.
 
@@ -43,9 +46,19 @@ demás.
   de la policy. Dos tools visibles a un cliente no reducen el inventario total del gateway.
 - El probe JSON vacío anónimo responde `401`, y autenticado puede responder `400`; nunca `500`.
 
+## Observación y señales
+
+- El monitor de la ventana usa exclusivamente discovery, estado y tools de lectura con los clientes ya registrados.
+  No abre nuevos consentimientos, no crea DCR, no reenvía invitaciones y no ejecuta writes ni gasto.
+- Un warning heurístico de `issuer` se conserva como observación, pero no bloquea por sí solo cuando el flujo runtime
+  completo valida discovery, autorización, token ligado al resource, dispatch y refresh. Tampoco autoriza a falsear
+  `issuer` para apagar el warning: registra herramienta/versión y conserva el seguimiento.
+- Antes de `delete_after`, el cleanup sólo corre en dry-run. Ningún resultado verde, revocación aislada o fin del
+  smoke adelanta la fecha mínima de retiro.
+
 ## Cierre
 
-Tras la ventana: corta authority, mide deny con token vigente, revoca familias/consents/sesiones, exige
+Sólo después de `delete_after`: corta authority, mide deny con token vigente, revoca familias/consents/sesiones, exige
 `unexpectedRefs=0` y `deletionReady=true`, aplica con el registration ID exacto, relee cero y apaga ambos gates.
 Audit/outbox y assets compartidos de marca/correo se conservan.
 

@@ -4,8 +4,9 @@
 > `https://auth.efeonce.org` — **TASK-1829** (EPIC-044 U02).
 > **Estado:** OAuth y personas activos; emisión/refresh/revocación internos verificados por TASK-1836 y
 > consumo multi-issuer por TASK-1831. El environment `efeonce-auth` está activo para la cohorte controlada.
-> La matriz externa está parcialmente certificada por TASK-1832: helper, Playwright, Codex y ChatGPT hospedado
-> verdes; Claude local/hospedado y cleanup final siguen abiertos. [Matriz](../audits/mcp/EFEONCE_MCP_CLIENT_TOKEN_MATRIX_2026-09-06.md).
+> La matriz técnica externa de TASK-1832 está certificada con helper, Playwright, Codex, ChatGPT, Claude Code,
+> Claude.ai y Claude Desktop. El fixture sigue en observación y su cleanup final permanece abierto; esto no es
+> customer access. [Matriz](../audits/mcp/EFEONCE_MCP_CLIENT_TOKEN_MATRIX_2026-09-06.md).
 > ADR gobernante:
 > [`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md).
 > Contrato de federación: [`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md).

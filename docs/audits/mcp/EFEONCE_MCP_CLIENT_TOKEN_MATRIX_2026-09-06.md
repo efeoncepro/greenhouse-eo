@@ -156,11 +156,14 @@ Readback PostgreSQL del 2026-09-07: cada cliente tuvo un único subject y la com
 
 ## Cleanup y observación
 
-Dry-run post-clientes, sin mutación:
+El inventario mutable del cleanup vive únicamente en el
+[manifiesto de la corrida](TASK-1832_CANARY_ASSET_MANIFEST_task-1832-canary-20260906-a.md). La muestra
+read-only de `2026-09-07T12:09:54Z` conserva `unexpectedRefs=0`, los dos profiles/source links exactos y los
+22 DCR run-owned; no se ejecutó apply. Esta matriz no duplica los conteos auth porque cambian con cada
+ceremonia y expiración.
 
-- grafo exacto: `2` profiles, `2` source links, `5` invitaciones y `20` clientes DCR run-owned;
-- auth: `18` sesiones, `14` magic links, `2` passkeys, `5` challenges, `19` codes/consents, `25` refresh,
-  `25` access tokens y `4` contexts client-scoped;
+- grafo: organización, registro, binding, 2 profiles/source links, invitaciones, grants y clientes DCR exactos
+  inventariados en el manifest;
 - la sesión/consentimiento ChatGPT y la credencial passkey se conservan para la ventana;
 - authority: tres grants inventariados, dos revocados y uno activo read-only; binding `gv=6`;
 - `unexpectedRefs=0`; lifecycle/comercial/360/hiring/finance y demás FKs no esperadas en `0`;

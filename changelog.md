@@ -30,6 +30,12 @@ schemas/annotations/security, probe vacío 401/400 y refresh real post-TTL. TASK
 se cierra antes del cleanup/readback cero. La matriz técnica cliente quedó completa; sólo siguen abiertos la
 ventana de observación y el retiro controlado.
 
+Un barrido documental posterior eliminó estados vivos que todavía presentaban Claude, el emisor o la
+federación como pendientes y dejó los detalles mutables en el manifest. Las skills espejadas ahora exigen
+monitoreo read-only, distinguen superficies Claude compartidas de clientes OAuth persistidos y prohíben
+adelantar el cleanup antes de `delete_after`. La muestra de observación de 12:09:54Z mantuvo `unexpectedRefs=0`,
+cero contaminación 360/comercial y sólo los blockers esperados de la ventana; no cambió runtime ni flags.
+
 ## 2026-09-07 — TASK-1832: ChatGPT completa el OAuth hospedado y el gateway endurece el probe vacío
 
 ChatGPT ya funciona de punta a punta con el authorization server y el gateway productivos. La app hospedada

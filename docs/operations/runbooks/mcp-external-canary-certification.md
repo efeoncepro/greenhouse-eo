@@ -184,6 +184,23 @@ El probe de bootstrap `POST /mcp` con JSON vacío debe cruzar autenticación ant
 renovación se prueba después del TTL y debe conservar el scope original cuando el cliente omite `scope`, rotar el
 refresh e invalidar el anterior.
 
+## Observación diaria y clasificación de señales
+
+Cada muestra diaria es read-only y registra en el manifiesto, sin identificadores personales ni secretos:
+
+1. `identity:external-canary:readback` y cleanup dry-run contra el registration ID exacto;
+2. revisión Ready, tráfico, SHA servido y flags de Cloud Run, GitHub y Vercel para auth-server y gateway;
+3. las nueve señales de binding/invitación y las señales OAuth de code reuse, CIMD rechazado y refresh reuse;
+4. cualquier cambio en blockers lógicos, referencias inesperadas o contaminación 360.
+
+Un negativo deliberado de reutilización puede mantener `auth.oauth.refresh_reuse_detected` en rojo durante su ventana de
+24 horas. No lo renombres `ok`: atribúyelo por timestamp y DCR marcado con el `run_id`, confirma que la familia
+quedó revocada y que no aparecieron eventos posteriores al baseline. Un evento nuevo, una familia no revocada o
+un cliente que no sea run-owned es drift no explicado y bloquea el retiro.
+
+La observación no crea clientes, consentimientos, grants, sesiones ni tokens. `delete_after` es sólo la fecha
+mínima: el apply también exige siete días estables, precondiciones de retiro y aprobación explícita.
+
 ## Retiro en dos fases
 
 ### Fase A — cortar autoridad

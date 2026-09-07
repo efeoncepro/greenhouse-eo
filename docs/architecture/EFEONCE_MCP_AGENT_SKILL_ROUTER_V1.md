@@ -75,8 +75,9 @@ rollout, no una invitación a usar browser, SQL o buckets.
 2. For each capability, record scope, verified tenant boundary, canonical downstream reader/command/API, redaction,
    timeout, concurrency, error contract, evidence and rollback.
 3. Keep every provider o capability nueva `OFF`, read-only and fail-closed until package/API version, IAM allowlist,
-   allow/deny, fault isolation and provider canary pass. La excepción operativa actual es sólo
-   `globe.producer.fleet.list`, interno; mantenerla habilitada exige conservar esa evidencia, no extenderla.
+   allow/deny, fault isolation and provider canary pass. El carril interno y el canary externo sintético ya tienen
+   evidencia propia; esa certificación no autoriza una organización cliente, un scope de escritura ni otra
+   capability. El piloto real sigue cerrado hasta TASK-1841.
 4. Keep OAuth caller identity separate from downstream workload identity. Never log bearer tokens, auth codes,
    sensitive prompts, raw payloads or upstream errors.
 5. Treat writes, approvals, spend, rights-sensitive actions, new auth surfaces and webhooks as independent

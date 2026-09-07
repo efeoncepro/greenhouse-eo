@@ -638,8 +638,10 @@ sirve `true`, mientras Vercel staging permanece `false`. El push `b69f5297d` dem
 staging distinta cambia el mismo servicio: `00042-hp5` dejó el gate OFF entre 01:07:25Z y 01:15:47Z, sin elevar
 acceso; production `34072064873` restauró el SHA released y el gate. Los overrides por environment se eliminaron;
 una sola variable GitHub de repositorio queda en `true` durante la observación y vuelve a `false` tras el cleanup. El
-gateway único sirve `MCP_NATIVE_EXTERNAL_CANARY_ENABLED=true` en `efeonce-mcp-gateway-00044-4kj`; ambos se
-apagan después del cleanup final, sin tocar los flags nativos generales. El de personas arrastra además
+gateway único sirve `MCP_NATIVE_EXTERNAL_CANARY_ENABLED=true`; la revisión vigente, el SHA y su tráfico se leen
+en Cloud Run y se registran en el manifiesto TASK-1832 (snapshot `2026-09-07T12:20:25Z`:
+`efeonce-mcp-gateway-00046-6n2`, Ready/100 %, SHA igual a `origin/main`). Ambos gates se apagan después del
+cleanup final, sin tocar los flags nativos generales. El de personas arrastra además
 `EMAIL_FROM` y `RESEND_API_KEY_SECRET_REF` en el mismo archivo: sin ellos el magic link no sale y el acceso
 muere en silencio. **Entrega de la invitación externa (TASK-1837, runtime Vercel únicamente):**
 `EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED` (el sistema manda el correo en el mismo acto que genera el token y

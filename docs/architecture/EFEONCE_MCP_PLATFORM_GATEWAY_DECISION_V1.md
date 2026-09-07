@@ -29,11 +29,14 @@ annotations y el mirror `_meta.securitySchemes` desde una policy única. El prob
 autentica antes de validar el body: anónimo responde `401` con challenge; autenticado puede responder
 `400 invalid_request`; nunca `500`. TASK-1832 acreditó ChatGPT hospedado con dos tools read-only y refresh real
 post-TTL. Claude Code se certifica por versión: `2.1.186` falló por scopes amplios; `2.1.263` tiene bootstrap
-mínimo corregido, todavía sin ceremonia completa. La certificación sintética no abre customer access.
+mínimo corregido y completó consentimiento, dispatch y refresh post-TTL. Claude.ai y Desktop también pasaron
+por el conector remoto, sin ampliar scopes. La certificación sintética no abre customer access.
 
-El [mapa consolidado](../audits/2026-09-06-task-1836-1831-consolidated-evidence.md) registra canary interno,
-rollbacks, revisiones y las matrices externas/multicontexto aún pendientes. No se declara cierre general de
-federación ni de clientes externos a partir del piloto. Los deltas siguientes conservan contexto histórico.
+El [mapa consolidado](../audits/2026-09-06-task-1836-1831-consolidated-evidence.md) registra el canary interno y
+sus rollbacks. La [matriz TASK-1832](../audits/mcp/EFEONCE_MCP_CLIENT_TOKEN_MATRIX_2026-09-06.md) acredita los
+clientes externos sintéticos; las pruebas multicontexto, el retiro del fixture y el primer cliente consentido
+conservan gates propios. No se declara cierre general de federación ni customer access. Los deltas siguientes
+conservan contexto histórico.
 
 ## Context
 

@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Especificación. Medido contra runtime el 2026-09-06: el gateway sirve en producción (revisión efeonce-mcp-gateway-00044-4kj, southamerica-west1, 100% del tráfico, maxScale=20) pero NO existe mecanismo de prueba de carga en el repo hermano — grep de load-test/autocannon/k6/artillery sobre scripts, test y .github devuelve cero — y el rollback está documentado sin ejercitar, con el marcador [verificar] literal en el runbook`
+- Status real: `Especificación. El gateway sirve en producción; la revisión, el SHA, el tráfico y la capacidad deben resolverse al ejecutar la task. Snapshot 2026-09-07T12:20:25Z: efeonce-mcp-gateway-00046-6n2 Ready/100 % y SHA igual a origin/main. No existe mecanismo de prueba de carga en el repo hermano — grep de load-test/autocannon/k6/artillery sobre scripts, test y .github devuelve cero — y el rollback está documentado sin ejercitar, con el marcador [verificar] literal en el runbook.`
 - Rank: `TBD`
 - Domain: `platform|ops`
 - Blocked by: `none`
@@ -98,8 +98,8 @@ Reglas obligatorias:
 
 ### Depends on
 
-- Gateway desplegado y sano en producción — cumplido: revisión `efeonce-mcp-gateway-00044-4kj`,
-  `southamerica-west1`, 100% del tráfico.
+- Gateway desplegado y sano en producción — cumplido en el snapshot 2026-09-07T12:20:25Z; vuelve a resolver
+  revisión Ready, SHA, región y tráfico antes del ensayo.
 - Acceso `gcloud run` al proyecto `efeonce-group` para el traffic split del ensayo.
 - Un token Entra real si la carga incluye superficie autenticada (el canario OAuth ya requiere login humano).
 
@@ -125,8 +125,8 @@ Reglas obligatorias:
 - Front door verificado el 2026-09-06: `oauth-protected-resource` 200, `POST /mcp` sin token 401, `health` 200.
 - Política Cloud Armor `efeonce-mcp-gateway-edge` con throttle 600/60 s confirmado por `gcloud`.
 - Procedimiento de rollback descrito en el runbook (mover tráfico a revisión previa verificada).
-- `surface-baseline.json` con 39 tools y `surfaceHash`, que permite verificar que una revisión destino sirve
-  la misma superficie antes de rodar hacia atrás.
+- `surface-baseline.json` con el inventario y `surfaceHash` vigentes, que permite verificar que una revisión
+  destino sirve la misma superficie antes de rodar hacia atrás.
 
 ### Gap
 
@@ -157,7 +157,8 @@ Reglas obligatorias:
 
 ### Contract surface
 
-- Contrato existente a respetar: superficie declarada en `surface-baseline.json` (39 tools, `surfaceHash`);
+- Contrato existente a respetar: superficie declarada en `surface-baseline.json` (cuenta dinámica y
+  `surfaceHash`);
   la revisión destino del rollback debe servir la misma o el ensayo se declara no ejecutable
 - Contrato nuevo o modificado: ninguno — no se agregan tools, scopes ni endpoints
 - Backward compatibility: `not applicable`
@@ -183,8 +184,8 @@ Reglas obligatorias:
 - Migration posture: `none`
 - Default state: el script nace fuera de CI, de ejecución manual y explícita
 - Backfill plan: `none`
-- Rollback path: para el propio ensayo, volver el tráfico a la revisión vigente `00044-4kj` (o la que esté al
-  momento); para el script, revert del PR
+- Rollback path: antes del ensayo, captura la revisión Ready vigente y su `surfaceHash`; vuelve exactamente a
+  ella sólo si sigue compatible. Para el script, revert del PR.
 - External coordination: ventana acordada con el operador antes del ensayo de rollback, por ser una
   degradación deliberada de una superficie pública
 

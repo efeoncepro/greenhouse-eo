@@ -7,9 +7,10 @@
 > **Canonical resource:** `https://mcp.efeonce.org/mcp`
 
 > **Estado externo 2026-09-07:** el emisor nativo y el gateway están productivos. TASK-1832 certificó helper,
-> Playwright, Codex y ChatGPT hospedado con una organización sintética eliminable; Claude Code `2.1.263` tiene
-> bootstrap mínimo corregido y ceremonia pendiente. No es customer access. El runtime usa MCP SDK v2; el probe
-> JSON vacío responde 401/400 y nunca 500. Matriz y retiro:
+> Playwright, Codex, ChatGPT hospedado, Claude Code `2.1.263`, Claude.ai y Claude Desktop `1.46388.4` con una
+> organización sintética eliminable; las renovaciones post-TTL conservaron el scope base y las escrituras
+> permanecieron ocultas o fail-closed. No es customer access. El runtime usa MCP SDK v2; el probe JSON vacío
+> responde 401/400 y nunca 500. Matriz y retiro:
 > [`mcp-external-canary-certification.md`](runbooks/mcp-external-canary-certification.md).
 
 ## Runtime inventory
@@ -48,9 +49,9 @@ de la lista):
 
 - Globe, con el reader `globe.producer.fleet.list`, limitado al workspace interno exacto;
 - Greenhouse-SEO, habilitado el 2026-08-06 y acotado por el entitlement per-org del módulo SEO de Greenhouse.
-  Sus tools de **lectura** están federadas y en producción; sus **dos tools de escritura** (TASK-1308) están
-  federadas **en el repo pero sin desplegar** y, aun desplegadas, nacen fail-closed por falta de un cliente que
-  pueda emitir su scope (ver la sección del provider).
+  Sus tools de **lectura** y sus **siete tools de escritura** están federadas y desplegadas; para el canary
+  externo las escrituras permanecen fail-closed porque el consentimiento y grant sólo entregan
+  `efeonce.mcp.read` (ver la sección del provider).
 - Greenhouse Hiring, habilitado internal-only para `hiring.talent_pool.search`,
   `hiring.talent_pool.profile.get`, `hiring.applications.review.list` y
   `hiring.application.review_packet.get`. Candidate review exige application exacta y purpose, devuelve solo CV
@@ -65,7 +66,7 @@ de la lista):
   todavía una persona cliente real habilitada (decisión comercial, no técnica), así que la escritura está probada
   por los negativos del canary de producción y por staging, no por un caso de punta a punta en producción.
 
-Este estado no habilita clientes externos ni multitenancy. El adjetivo `read_only` describe lo que hoy es
+Este estado no habilita organizaciones cliente reales ni multitenancy amplio. El adjetivo `read_only` describe lo que hoy es
 **alcanzable por un token real**, no lo que está cableado: mientras `efeonce.mcp.seo.write` y
 `efeonce.mcp.identity.write` no los tenga ningún cliente con consentimiento vigente, ninguna escritura es
 ejecutable por el borde público.
@@ -181,9 +182,11 @@ git -C ~/Documents/efeonce-mcp rev-parse origin/main
 `GATEWAY_BUILD_SHA` de la revisión activa debe **coincidir con el HEAD de `origin/main`**. Si difiere, hay commits
 mergeados sin desplegar: dispara el workflow, no interpretes el verde de CI como rollout.
 
-Estado as-of 2026-09-06: revisión activa `efeonce-mcp-gateway-00039-gz4`, `GATEWAY_BUILD_SHA`
-`5c28a7afe66231fd7a20be2e7e37bbd50c00d2c1` = HEAD de `main`, 100% del tráfico. Front door verde:
-`.well-known/oauth-protected-resource` 200 y `POST /mcp` sin token 401 (fail-closed).
+La revisión y el SHA productivos son datos mutables: léelos siempre con los comandos anteriores y compáralos
+con `origin/main`. La observación TASK-1832 de `2026-09-07T12:20:25Z` encontró gateway
+`efeonce-mcp-gateway-00046-6n2`, `GATEWAY_BUILD_SHA=171965c99034…`, Ready y con 100 % del tráfico, coincidente
+con el repo hermano; el front door respondió 200 a metadata y 401 al MCP anónimo. La evidencia acumulada y el
+readback de retiro viven en el manifiesto canónico de la corrida, no en este snapshot.
 
 ### Dos orígenes de Greenhouse que se parecen y no son lo mismo
 
@@ -482,23 +485,20 @@ esta org?"* y ya se enforcea abajo: binding `internal` en el lane + entitlement 
 command. Corolario operativo: **federar la escritura N+1 de un dominio que ya tiene su scope no requiere tocar
 Entra**, y por lo tanto no puede quedar bloqueada por eso.
 
-Con esto el gateway declara **cinco** scopes cuando todos los providers gateados están activos: `efeonce.mcp.read`, `efeonce.mcp.globe.read`,
+Con esto el gateway declara **seis** scopes cuando todos los providers gateados están activos: `efeonce.mcp.read`, `efeonce.mcp.globe.read`,
 `efeonce.mcp.globe.credits.funding.ensure` (sólo con `globeCreditFunding.enabled` ON) y `efeonce.mcp.seo.write`
-(sólo con `greenhouseSeo.enabled` ON), más `efeonce.mcp.hiring.read` (sólo con `greenhouseHiring.enabled` ON).
+(sólo con `greenhouseSeo.enabled` ON), `efeonce.mcp.hiring.read` (sólo con `greenhouseHiring.enabled` ON) y
+`efeonce.mcp.identity.write` para la lane delegada.
 
 El cliente público compartido `32617b87-e7ef-493a-838f-1ff3f0213b93` solicita base + Globe read + Hiring read.
 El cliente canario base-only `66985833-14e9-438e-add4-b740e84e9a64` conserva únicamente base + Globe read y existe
 para probar el deny real de Hiring; no es el cliente que devuelve el shim DCR.
 
-⚠️ **Estado de rollout de las dos tools de escritura (al 2026-08-07, verificar antes de operar):**
-
-1. Los commits que las federan **siguen sin push** en `efeonce-mcp` (`cb316cc`, `41dca07` y el refactor de
-   nombre del scope `bfbdf3a`), así que la revisión desplegada todavía no las expone. El repo tiene deploy
-   productivo en push: empujar es desplegar.
-2. `efeonce.mcp.seo.write` **existe** en la app de Entra `Efeonce MCP Resource` (`type: Admin`, `isEnabled:
-   true`), pero **deliberadamente NO está cableado al cliente PKCE público compartido**
-   `32617b87-e7ef-493a-838f-1ff3f0213b93` que el shim DCR entrega a Claude Code / claude.ai / Claude Desktop.
-   Misma postura que `efeonce.mcp.globe.credits.funding.ensure`.
+⚠️ **El incidente de rollout del 2026-08-07 está resuelto:** las siete tools SEO de escritura están federadas y
+desplegadas. El deploy actual del gateway es `workflow_dispatch`, no ocurre por push. `efeonce.mcp.seo.write`
+existe pero deliberadamente no se entrega al cliente Entra público compartido ni a los DCR base-only de
+TASK-1832; la misma postura aplica a `efeonce.mcp.globe.credits.funding.ensure` y
+`efeonce.mcp.identity.write`.
 
 🔴 **NUNCA cierres un `insufficient_scope` de una tool de escritura agregando el scope al cliente público
 compartido.** En el lane ecosystem el actor es la máquina (`mcp:<consumer>`), no la persona, así que ahí no hay
@@ -693,8 +693,10 @@ por minuto por IP** y respuesta `429` al excederlo. Cloud Armor protege el serve
 no reemplaza OAuth, entitlements, cuotas por workspace ni límites de gasto. Es un control de abuso y continuidad,
 por lo que no debe usarse para cobrar, licenciar o decidir autorización de un cliente.
 
-Cloud Run mantiene `concurrency=80` y `maxScale=5` efectivo inicialmente. Esa capacidad sirve al tráfico de transporte; cada provider
-debe declarar sus propios límites de concurrencia, cuotas y circuit breakers antes de exponer trabajo de dominio.
+Cloud Run nació con `concurrency=80` y `maxScale=5`; el readback live de TASK-1832 del 2026-09-07 verificó
+`maxScale=20`. Resuelve ambos valores en la revisión Ready antes de cada prueba o rollback: el documento no es
+fuente de verdad de capacidad. Esa capacidad sirve al tráfico de transporte; cada provider debe declarar sus
+propios límites de concurrencia, cuotas y circuit breakers antes de exponer trabajo de dominio.
 
 ### Segundo host del front door — `auth.efeonce.org` (2026-09-04)
 
@@ -758,8 +760,9 @@ tofu apply -input=false -var enable_auth_host=false
 ```
 
 Retira host rule, backend, NEG y certificado en menos de diez minutos; el Cloud Run `auth-server` sigue vivo
-(sin tráfico público) y se apaga desde su propio runbook si hace falta. Hasta TASK-1831 el gateway no verifica
-tokens de este issuer, así que retirar el host no afecta ninguna sesión MCP.
+(sin tráfico público) y se apaga desde su propio runbook si hace falta. Como TASK-1831 ya está activo, retirar
+el host bloquea login y refresh del emisor nativo y puede cortar clientes MCP conectados; coordina revocación,
+ventana y verificación fail-closed antes de aplicar este rollback.
 
 ## Rollback
 
@@ -831,7 +834,7 @@ Cada promoción registra:
 - Canary: el flujo Entra authorization-code + PKCE real pasó en Chrome autenticado; `initialize`, discovery y
   fleet reader devolvieron `200`. Health y protected-resource metadata siguen `200`; request anónimo a `/mcp`
   sigue `401`.
-- Capacidad: `concurrency=80`, `maxScale=5` efectivo. Rollback del gateway: `00008-fwj` o provider OFF y
+- Capacidad histórica de esa revisión: `concurrency=80`, `maxScale=5`. Rollback histórico del gateway: `00008-fwj` o provider OFF y
   deploy. Rollback de Globe: revisión previa `globe-api-internal-00178-f5s`.
 - Límite conocido: el cliente interno Entra recibe base + reader (`efeonce.mcp.read` y `efeonce.mcp.globe.read`)
   aunque solicite sólo el base; no habilites clientes hasta separar la emisión de scope/entitlement y repetir el
@@ -839,59 +842,27 @@ Cada promoción registra:
   `efeonce.mcp.globe.credits.funding.ensure` gateado por `globeCreditFunding.enabled`, tiene su propio
   consentimiento/asignación y no forma parte de lo verificado en esta co-emisión.
 
-### Identidad cliente externa — propuesta; sin acceso cliente activo
+### Identidad externa sintética activa; acceso cliente aún cerrado
 
-Entra permanece como identidad del canary interno. No crees usuarios cliente en ese tenant ni expongas una
-capacidad Globe por haber pasado el canary. WorkOS tiene sólo una configuración de staging para discovery MCP; no
-hay cliente, binding, secreto productivo ni login público operativo. La propuesta de un issuer B2B con UI propia
-de Efeonce en `auth.efeonce.org`, el binding con la organización de Account 360 y el rollout
-allow/base-only/revoke viven en
-[`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](../architecture/EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md)
-y [`TASK-1631`](../tasks/in-progress/TASK-1631-efeonce-customer-identity-mcp-federation.md). La primera cohorte será
-por invitación de organizaciones cliente ya existentes y explícitamente allowlisted en Account 360: un email o
-dominio no basta. Hasta la aceptación explícita del ADR y el plan de proveedor, no hay DNS productivo, secreto,
-binding ni acceso cliente que configurar.
+Efeonce ID, el binding con Account 360, el login sin contraseña y la resolución multi-issuer del gateway están
+productivos. TASK-1832 usa una organización sintética dedicada, dos perfiles `data_origin='smoke_test'`, purpose
+`canary`, un grant read-only y clientes OAuth DCR públicos marcados con el `run_id`; ese grafo es eliminable y no
+es una organización cliente. Entra conserva el canary interno independiente. No crees usuarios cliente en ese
+tenant ni presentes la certificación sintética como adopción comercial.
 
-**Delta 2026-09-04 (TASK-1631, EPIC-044 U04):** WorkOS quedó descartado; el emisor será propio
-(`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1`). El grafo de binding (environment → binding → grants →
-invitaciones), sus 6 capabilities de `efeonce_admin`, el reader ecosystem
-`GET /api/platform/ecosystem/identity/binding` para este gateway y las 4 señales ya existen en Greenhouse y
-están aplicados en PG; sigue sin haber login externo, cliente real ligado ni canary con cliente. El camino de
-soporte vive en [§Soporte: cliente externo que no puede entrar](#soporte-cliente-externo-que-no-puede-entrar-task-1631).
+La matriz técnica externa está verde para helper, Playwright, Codex, ChatGPT hospedado, Claude Code `2.1.263`,
+Claude.ai y Claude Desktop `1.46388.4`. Verifica cada cliente, renovación y negativo en
+[`mcp-external-canary-certification.md`](runbooks/mcp-external-canary-certification.md), y conserva ownership,
+observación y cleanup en el manifiesto TASK-1832. El primer piloto con una organización real pertenece a
+[`TASK-1841`](../tasks/to-do/TASK-1841-efeonce-id-first-consented-customer-pilot.md) y no comienza por inferencia.
 
-**Delta 2026-09-06 (TASK-1837, verificado end-to-end en staging 2026-09-06 con los dos flags ON en staging;
-producción pendiente de release — evidencia en
-`docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`):** la invitación externa ahora la
-**envía el sistema** por correo (`/i/<token>` sobre el `issuer_url` del environment; flag
-`EXTERNAL_INVITATION_SYSTEM_DELIVERY_ENABLED`, ON en staging, NOT SET = OFF en producción hasta la promoción a
-`main`) con estado de entrega, reenvío que rota el enlace y rebote drenado en el ops-worker; en staging se recorrió
-con correo real: emisión sin token → correo → aceptar → `linked` → magic link → sesión, rebote forzado con
-`identity.external_invitation.undelivered` encendiéndose, reenvío y revelación. Existe además una **lane delegada**
-`GET/POST /api/platform/ecosystem/identity/invitations` para que el administrador designado del cliente invite a su
-propia gente: este gateway debe llamarla con `(environment, subject)` como hace con `identity/binding` — ya
-verificada en staging con el token del consumer `efeonce-mcp-gateway-greenhouse-token` (lista propia 200, binding
-ajeno 403, auto-elevación 422, invitación delegada 201 con correo real); falta la tool MCP que la federe
-(TASK-1831/1832; flag `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED` ON en staging, OFF ⇒ 404 en producción).
-
-**Delta 2026-09-06 04:00–04:40Z (TASK-1837 follow-ups; PR #3 del gateway ABIERTO, no mergeado):** la federación
-de la lane delegada ya existe como
-[PR #3 de `efeonce-mcp`](https://github.com/efeoncepro/efeonce-mcp/pull/3) (rama
-`feat/task-1837-delegated-invitations`, commit `39fb736`, `pnpm check` verde): provider
-`src/providers/greenhouse-identity.ts` + tools `identity.invitations.list` (scope base) e
-`identity.invitation.create` (scope nuevo **`efeonce.mcp.identity.write`**, clase «administrar a las personas de
-mi organización», escritura con step-up; declarado en paridad en `src/lib/auth-server/oauth/scopes.ts` de
-Greenhouse, commit `149ff8934`). Policy: sólo issuer nativo, población `native-external`, `organizationId`
-resuelta por membership (la lane acepta `organizationId` o `bindingId`). **No mergear hasta** que el release lleve
-el scope a `main` de Greenhouse y `EXTERNAL_INVITATION_DELEGATED_AUTHORITY_ENABLED=true` esté en Production;
-hasta entonces las tools devuelven `policy_blocked`. **Qué verificar después del merge:** (1) `scopes_supported`
-del emisor NO publica `efeonce.mcp.identity.write` y la tool `identity.invitation.create` responde
-`403 insufficient_scope` con ese scope a un token sin él; (2) con el JWT de una persona externa designada
-administradora, `identity.invitations.list` devuelve sólo su organización y `identity.invitation.create` responde
-`created` sin ningún campo `token` y con correo real; (3) los negativos del paso 8 del audit desde el gateway
-(organización ajena ⇒ `forbidden`, `designatedAdmin: true` ⇒ `invalid_request`, flag OFF ⇒ `policy_blocked`);
-(4) el guard de paridad no-SEO del gateway declara las dos tools con razón. Los verbos delegados de reenviar y
-revocar (`POST /api/platform/ecosystem/identity/invitations/[invitationId]/{resend,revoke}`, commit `1ddb5f92b`)
-existen en Greenhouse pero **no están federados**: follow-up del PR #3 o de `TASK-1838`.
+TASK-1837 está completa y productiva; su federación quedó mergeada mediante el PR #3 de `efeonce-mcp`.
+`identity.invitations.list` exige el scope base. `identity.invitation.create` exige
+`efeonce.mcp.identity.write`, step-up y autoridad `designatedAdmin`; el gateway vuelve a resolver la organización
+y Greenhouse vuelve a autorizarla. El token de invitación nunca vuelve al agente. El canary TASK-1832 sólo tiene
+scope base, por lo que la escritura permanece fail-closed. Los verbos delegados de reenviar y revocar todavía no
+están federados y pertenecen a TASK-1838. El camino de soporte vive en
+[§Soporte: cliente externo que no puede entrar](#soporte-cliente-externo-que-no-puede-entrar-task-1631).
 
 ## Superficie operable por un cliente MCP — snapshot 2026-09-06
 
@@ -1016,8 +987,9 @@ guard contra el estado real sin esa declaración, emite exactamente un finding �
 
 ### Drift de rollout detectado 2026-08-28
 
-⚠️ **Revisión productiva vigente: `efeonce-mcp-gateway-00039-gz4` (SHA `5c28a7afe662`, 2026-09-06).** El resto de
-esta sección es histórico: `00026-ctp` (SHA `e92961e`, 2026-09-01, manifiesto canónico de `TASK-1780`) y
+⚠️ **Bloque histórico:** resuelve la revisión productiva vigente y su `GATEWAY_BUILD_SHA` con el readback de
+Cloud Run descrito arriba; no uses una revisión copiada desde este runbook como rollback. `00026-ctp` (SHA
+`e92961e`, 2026-09-01, manifiesto canónico de `TASK-1780`) y
 `00024-8b8` (SHA `92e7197`) fueron las anteriores; entre medio pasaron `00028-pmx` (TASK-1804) y el deploy de
 TASK-1837. Canary del provider Greenhouse-SEO **verde de punta a punta contra producción** tras el deploy de
 `00026-ctp`: lecturas OK, deny `404` anti-oracle en todas, escrituras respondiendo honestamente en su

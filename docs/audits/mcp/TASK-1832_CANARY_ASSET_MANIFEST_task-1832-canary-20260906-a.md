@@ -178,6 +178,14 @@ que el command gobernado lo devuelva. Un asset no previsto deja la corrida `bloc
 | 2026-09-07T10:32:00Z | `registrations=1`, `canary_bindings=1`, registro activo | mismo profile/organización canary en ChatGPT; catálogo hospedado limitado a 2 tools read-only                                 | dos llamadas hospedadas 200; dos rotaciones refresh post-TTL; probe JSON vacío 401, sin nuevos 500                        | 20 DCR, 2 profiles/links, 18 sesiones, 14 magic links, 2 passkeys, 5 challenges, 19 codes/consents, 25 refresh/access, 4 contexts y 3 grants; `unexpectedRefs=0`; no apply                        | `steady`; ChatGPT certificado, scope único y cero writes                                   |
 | 2026-09-07T11:10:05Z | `registrations=1`, `canary_bindings=1`, registro activo | Claude Code local actualizado a 2.1.263; DCR exclusivo con scope base y callback fijo                                         | preflight OAuth mínimo; cancelado antes de consentimiento por Mac bloqueada; cero token nuevo                              | 21 DCR, 2 profiles/links, 18 sesiones, 14 magic links, 2 passkeys, 5 challenges, 19 codes/consents, 25 refresh/access, 4 contexts; `unexpectedRefs=0`; no apply                         | `steady`; ownership preservado, certificación Claude pendiente                             |
 | 2026-09-07T12:03:40Z | `registrations=1`, `canary_bindings=1`, registro activo | Claude Code 2.1.263 y Claude.ai sobre la organización exacta; Desktop 1.46388.4 usa el mismo conector remoto                  | ambos DCR completaron lectura y una rotación post-TTL base-only; Desktop ejecutó después desde la UI nativa                 | 22 DCR, 2 profiles/links, 18 sesiones, 14 magic links, 2 passkeys, 5 challenges, 21 codes/consents, 29 refresh/access, 4 contexts; `unexpectedRefs=0`; no apply                         | `steady`; matriz cliente completa, cero writes y ownership preservado                      |
+| 2026-09-07T12:09:54Z | `registrations=1`, `canary_bindings=1`, registro activo | drift externo/interno `0/0`; `smoke_profiles=32`; 2 run-owned; `smoke_in_person_360=0`                                        | 9 señales binding/invitación `ok`; code reuse y CIMD `ok`. Los 6 `refresh_reuse` son negativos run-owned esperados, el último a 02:32:18Z; cero eventos posteriores | 22 DCR, 2 profiles/links, 18 sesiones, 14 magic links, 2 passkeys, 5 challenges, 21 codes/consents, 29 refresh/access, 4 contexts; `activeAuthCount=56`; `unexpectedRefs=0`; no apply | `steady`; blockers sólo `registration_active|active_authority|active_auth`, sin drift nuevo |
+
+Readback de control plane a `2026-09-07T12:20:25Z`: auth-server `auth-server-00043-ndg`, SHA
+`fb5fc082aa92…`, y gateway `efeonce-mcp-gateway-00046-6n2`, SHA `171965c99034…`, seguían Ready, 100 % y
+coincidentes con sus `origin/main`. Ambos gates canary productivos estaban `true`; GitHub no tenía override de
+environment para el flag de auth-server, Vercel Production estaba `true` y staging `false`. Health/readiness y
+protected-resource metadata respondieron 200; MCP anónimo siguió 401. El chequeo de staging fue de control
+plane/build/alias y no se presenta como repetición del deny funcional.
 
 Control de gates a `2026-09-07T01:48:54.971Z`: Vercel Production `true`; el environment custom staging se
 encontró indebidamente en `true`, se corrigió a `false` y se redeployó sin mover Production. El primer
@@ -206,11 +214,11 @@ incluye sin referencias inesperadas.
 
 ## Registro de retiro
 
-- `dry_run_at`: `2026-09-07T12:03:40Z`, inspección post-refresh y post-Desktop; no es el preflight final de borrado
+- `dry_run_at`: `2026-09-07T12:09:54Z`, observación read-only posterior a la matriz; no es el preflight final de borrado
 - `dry_run_result`: `deletionReady=false`, `unexpectedRefs=0`, blockers esperados
   `registration_active|active_authority|active_auth`; 2 profiles/links, 5 invitaciones, 3 grants, 22 DCR,
   18 sesiones, 14 magic links, 2 passkeys, 5 challenges, 21 codes/consents, 29 refresh/access tokens y 4
-  authorization contexts; `activeAuthorityCount=4`, `activeAuthCount=57`, sin intento de apply
+  authorization contexts; `activeAuthorityCount=4`, `activeAuthCount=56`, sin intento de apply
 - `apply_at`: `PENDIENTE`
 - `apply_actor`: `PENDIENTE`
 - `apply_result`: `PENDIENTE`

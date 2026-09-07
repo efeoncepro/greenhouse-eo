@@ -84,11 +84,15 @@ La task pasa a `EPIC-044`. El emisor propio (`TASK-1828`/`TASK-1829`) es quien r
 
 ## Summary
 
+> Baseline histórico; el estado vigente está en el Delta 2026-09-07 y en `Status real`.
+
 Corregir la interoperabilidad OAuth del gateway existente `mcp.efeonce.org`: Codex rechaza su discovery antes
 de autenticar. Entregar configuración y pruebas de conexión nueva en Codex y Claude Code, con scopes mínimos,
 callbacks válidos, rollout reversible y evidencia de lectura real. No construye otro broker ni habilita B2B.
 
 ## Why This Task Exists
+
+> Diagnóstico histórico; la compatibilidad cliente objetivo ya fue medida por TASK-1832.
 
 El protected-resource anuncia al gateway como authorization server, pero su metadata devuelve el issuer de
 Entra. El intento con Codex `0.152.0` falla con `OAuth authorization server issuer does not match authorization
@@ -461,7 +465,8 @@ deploy y cambios Entra si el plan los justifica. Coordinar ediciones compartidas
 - [ ] Bootstrap no solicita automáticamente scopes de escritura; permisos efectivos del cliente público permanecen de lectura.
 - [ ] Configuración efectiva de deploy prueba que OFF no reactiva shim con variable vacía/ausente y preserva flags ajenos.
 - [ ] Negativos issuer/audience/expiración/base-scope/write-scope y OAuth ausente mantienen 401/403/503 y cero dispatch indebido.
-- [ ] Codex: login fresco + tools visibles en sesión nueva + lectura real sin gasto, con versión y evidencia sanitizada.
+- [x] Codex 0.153.4: login fresco, tools visibles en sesión nueva y lectura real sin gasto, con evidencia
+      sanitizada en la matriz TASK-1832.
 - [x] Claude Code 2.1.263: recorrido fresco, reconexión y renovación post-TTL; dos access/refresh, uno rotado y
       uno activo, siempre con `efeonce.mcp.read`. La fila 2.1.186 permanece FAIL histórico.
 - [x] Claude.ai y Claude Desktop 1.46388.4 tienen evidencia propia: web renovó post-TTL y Desktop ejecutó la
@@ -497,14 +502,12 @@ deploy y cambios Entra si el plan los justifica. Coordinar ediciones compartidas
 
 ## Open Questions
 
-- ¿Qué productos/versiones Claude usa activamente el operador, además del Claude Code documentado?
-- ¿Hay lane previo compatible con el resource canónico o se requiere aprobar un canary productivo controlado?
-- ¿Codex instalado acepta el fixture conforme? Parcialmente respondido 2026-09-03 leyendo `rmcp 3.1.3`: descubre Entra
-  por OIDC path-append y tolera la ausencia de `code_challenge_methods_supported` (sólo `warn!`). Queda por probar en vivo
-  el recorrido completo: scopes cualificados en el challenge, callback `127.0.0.1/callback/<id>` aceptado por Entra y token
-  con `scp` válido. El reporte upstream #40885 sigue sin reproducirse.
+- ¿Conviene retirar mediante ADR la ambigüedad del catálogo mixto Entra+nativo ahora que los clientes objetivo
+  pasan con scope base explícito, o conservarla como compatibilidad histórica?
+- ¿Qué parte del cierre pendiente pertenece todavía a esta task y cuál ya quedó satisfecha por la evidencia
+  TASK-1832, sin duplicar ownership ni cambiar el runtime por inferencia?
 - ¿Entra ignora el puerto también para redirects `http://127.0.0.1/...` (no sólo `localhost`)? Determina si basta registrar
   `http://127.0.0.1/callback/boTaDHiFl7aq` o si Codex necesita `oauth.callback_port` fijo. Verificar con readback, no con docs.
 
-Estas preguntas condicionan la ejecución/cutover, no impiden registrar la unidad. Ningún criterio de
-implementación está tildado: el trabajo realizado hasta ahora es investigación y planificación.
+Estas preguntas condicionan el hardening/cierre, no la compatibilidad técnica ya probada. Los criterios de
+cliente certificados están tildados; los controles de diseño, rollout y rollback no se infieren de esa matriz.

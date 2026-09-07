@@ -161,7 +161,13 @@ coordinación. Todo release a producción pasa por el control plane, una sesión
 
 - [ ] `auth.efeonce.org` responde metadata RFC 8414 con `issuer` idéntico al origen y `client_id_metadata_document_supported: true`, firmando con una llave KMS HSM cuyo JWKS publica `kid` y rotación probada. *Parcial 2026-09-04: la llave KMS HSM, el JWKS con `kid` y la rotación (v1 → v2, v1 en `retiring`) ya existen en staging (U01); la metadata RFC 8414/OIDC y CIMD están en código (U02, `TASK-1829` code complete) y probadas in-process, pero siguen detrás de `AUTH_SERVER_OAUTH_ENABLED=false` — se tilda cuando la metadata responda en staging con el flag ON.*
 - [ ] Una persona sintética externa controlada por Efeonce se autentica con passkey y magic link, consiente un cliente y un scope, y ese consentimiento es revocable por el operador con efecto en menos de cinco minutos, sin crear una relación comercial falsa ni contaminar Account 360 (U07).
-- [ ] El gateway despacha una tool read-only con token del issuer propio y niega: token externo sobre tool internal-only, token con roles sin scope delegado, grant revocado con token vigente, issuer desconocido. **Parcial verificado:** canary interno TASK-1836 permite lectura propia, niega ajena y grant revocado ≤11 s; la matriz externa completa sigue pendiente.
+- [x] El gateway despacha una tool read-only con token del issuer propio y niega token externo sobre tool
+      internal-only, grant revocado con token vigente e issuer desconocido. **Verificado:** TASK-1836 cubre el
+      carril interno; TASK-1832 acreditó población externa sintética, allow read-only, internal-only
+      oculto/denegado, scope superior `403`, issuer inválido, expiración y authority revocada en `19.272 s`.
+      No acredita un cliente real.
+- [ ] El caso equivalente de token con `roles` sin scope delegado se verifica y documenta sin mezclar roles con
+      scopes; permanece en TASK-1831.
 - [x] Claude Code, Claude.ai/Desktop, Codex y ChatGPT completan OAuth/PKCE o consumen el conector remoto hospedado
       donde aplica contra la población canary sintética, por el mismo camino productivo y con evidencia redactada
       de la matriz de tokens (U07).

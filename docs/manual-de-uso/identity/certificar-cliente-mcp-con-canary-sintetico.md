@@ -198,7 +198,20 @@ annotations explícitas y el mirror `_meta.securitySchemes` derivado de la misma
 y espera al menos una renovación post-TTL. Un probe `POST /mcp` con JSON vacío y sin bearer debe recibir el
 challenge `401`; con bearer válido puede recibir `400 invalid_request`, pero nunca `500`.
 
-## 6. Revoca antes de borrar
+## 6. Observa sin crear actividad nueva
+
+Una vez certificada la matriz, la muestra diaria es sólo lectura: ejecuta el readback agregado y el cleanup
+dry-run del registro exacto; relee revisiones Ready, tráfico, SHA y flags en Cloud Run, GitHub y Vercel; y revisa
+las nueve señales de binding/invitación más code reuse, CIMD rechazado y refresh reuse. Registra el resultado
+redactado en el manifiesto.
+
+Un negativo de refresh reuse ejecutado por la propia corrida puede mantener esa señal roja durante 24 horas.
+Clasifícalo por timestamp y DCR run-owned, confirma familia revocada y ausencia de eventos posteriores. No lo
+marques `ok`, pero tampoco lo declares drift inexplicado si cumple esas tres condiciones. Cualquier evento nuevo,
+cliente ajeno o familia activa bloquea el retiro. No abras nuevos consentimientos, clientes o sesiones sólo para
+mantener viva la observación.
+
+## 7. Revoca antes de borrar
 
 Primero revoca la familia OAuth, consentimientos, contextos y sesiones. Después revoca invitaciones, grants y el
 registro:
@@ -213,7 +226,7 @@ Content-Type: application/json
 Con un access token emitido antes del corte, verifica que el gateway deniega en ≤60 s. Si sigue despachando,
 apaga ambos gates, conserva la evidencia y trata el caso como incidente; no avances al delete.
 
-## 7. Prueba que se puede eliminar
+## 8. Prueba que se puede eliminar
 
 El dry-run es el modo por defecto:
 

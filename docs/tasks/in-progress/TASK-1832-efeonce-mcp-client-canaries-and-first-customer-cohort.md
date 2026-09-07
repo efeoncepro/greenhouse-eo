@@ -229,7 +229,7 @@ organización cliente real, sí**.
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-044`
-- Status real: `Rollout productivo activo y en observación. Greenhouse/Vercel y auth-server 00043-ndg sirven fb5fc082aa92; gateway v1.1.2, SHA 171965c99034, revisión 00046-6n2, sirve 100 % y ambos gates canary están ON. M365 y Gmail autorizado, sesión, passkey Chrome/Safari, helper OAuth, E2E Playwright 1/1, Codex, ChatGPT hospedado, Claude Code 2.1.263, Claude.ai y Claude Desktop 1.46388.4 están verificados. ChatGPT rotó refresh dos veces; Claude Code y Claude.ai rotaron una vez post-TTL, siempre base-only. Desktop ejecutó la lectura desde la app nativa sobre el conector remoto. El probe JSON vacío ya responde 401/400 canónico en vez de 500. La fila Claude Code 2.1.186 permanece FAIL histórico. unexpected_refs=0, sin contaminación 360/comercial. La matriz cliente está completa; faltan siete días, cleanup/readback cero y apagar ambos gates.`
+- Status real: `Rollout productivo activo y en observación. Greenhouse/Vercel y auth-server 00043-ndg sirven fb5fc082aa92; gateway v1.1.2, SHA 171965c99034, revisión 00046-6n2, sirve 100 % y ambos gates canary están ON. M365 y Gmail autorizado, sesión, passkey Chrome/Safari, helper OAuth, E2E Playwright 1/1, Codex, ChatGPT hospedado, Claude Code 2.1.263, Claude.ai y Claude Desktop 1.46388.4 están verificados. ChatGPT rotó refresh dos veces; Claude Code y Claude.ai rotaron una vez post-TTL, siempre base-only. Desktop ejecutó la lectura desde la app nativa sobre el conector remoto. El probe JSON vacío ya responde 401/400 canónico en vez de 500. La fila Claude Code 2.1.186 permanece FAIL histórico. La muestra live más reciente vive en el manifest: 2026-09-07T12:09:54Z, unexpected_refs=0, sin contaminación 360/comercial ni drift nuevo. La matriz cliente está completa; faltan siete días, cleanup/readback cero y apagar ambos gates.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
 - Blocked by: `none`
@@ -674,6 +674,11 @@ organización dedicada creada sólo después de una autorización específica.
   --organization-id=org-602d7057-7fd5-47e7-b73b-21892e3f06e7` — discovery, PKCE,
       consentimiento, claims, organización exacta, allow, refresh y revocación verdes; `--negative` pasó y
       `--wait-expiry` obtuvo `401` después de `899 s` antes de revocar la familia.
+- [x] Observación read-only `2026-09-07T12:09:54Z`: readback agregado `1/1`, drift externo/interno `0/0`,
+      `smoke_profiles=32`, `smoke_in_person_360=0`; dry-run exacto con `unexpectedRefs=0`, 22 DCR y blockers
+      únicamente `registration_active|active_authority|active_auth`. Las 9 señales de binding/invitación están
+      `ok`; los 6 eventos `refresh_reuse` de 24 h corresponden a negativos run-owned ya inventariados, el último
+      ocurrió a 02:32:18Z y no apareció uno nuevo.
 - [ ] Sesiones interactivas por cliente MCP registradas: Codex y ChatGPT hospedado verdes; ChatGPT importó sólo
       `efeonce.gateway.status|get_seo_entitlement`, ejecutó ambas sin write y rotó refresh dos veces post-TTL.
       Claude Code `2.1.186` conserva su FAIL histórico; `2.1.263` completó consentimiento, catálogo exacto,
