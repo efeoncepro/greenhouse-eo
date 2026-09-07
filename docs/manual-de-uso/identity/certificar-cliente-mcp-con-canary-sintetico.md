@@ -1,8 +1,8 @@
 # Certificar un cliente MCP con un canary sintético
 
-> Manual operativo · TASK-1832 · estado al 2026-09-06: **code complete, rollout pendiente**.
-> El schema quedó aplicado accidentalmente fuera del checkpoint, con registry vacío; no existe todavía una
-> organización canary creada por esta ejecución.
+> Manual operativo · TASK-1832 · estado al 2026-09-06: **rollout productivo en observación**.
+> Corrida activa: `task-1832-canary-20260906-a`; no crees una segunda. Su retiro no empieza antes de
+> `2026-09-13T19:43:30Z` y exige dry-run verde más readback cero.
 
 Este procedimiento comprueba que Claude, Codex o ChatGPT pueden usar Efeonce ID y el gateway MCP sin pedirle a
 un cliente real que haga QA. El resultado es readiness técnica para un piloto; no es validación de usabilidad,
@@ -37,13 +37,14 @@ correo, token, code, cookie, verifier, hash de sesión o secreto en el manifiest
 
 ## 1. Planea los IDs antes del primer write
 
-Elige un `run_id` no humano, por ejemplo `task-1832-staging-20260906-a`, y llama:
+Elige un `run_id` no humano; en la corrida activa es `task-1832-canary-20260906-a`. Para una corrida futura,
+llama:
 
 ```http
 POST /api/admin/identity/external-access/canaries/plan
 Content-Type: application/json
 
-{"runId":"task-1832-staging-20260906-a"}
+{"runId":"<run_id-nuevo>"}
 ```
 
 Copia el template a `docs/audits/mcp/TASK-1832_CANARY_ASSET_MANIFEST_<run_id>.md` y registra allí los cuatro
@@ -97,19 +98,49 @@ Comprueba antes de OAuth:
 
 ## 4. Prueba navegador y PKCE
 
-Configura los hosts sin guardar secretos:
+Pasa los hosts explícitos sin guardar secretos. Para la corrida productiva activa:
 
 ```bash
-export MCP_CANARY_STAGING_ISSUER=https://<issuer-aprobado>
-export MCP_CANARY_STAGING_RESOURCE_URL=https://<gateway-aprobado>/mcp
-node scripts/mcp/external-client-canary.mjs --env=staging --preflight
-node scripts/mcp/external-client-canary.mjs --env=staging
+node scripts/mcp/external-client-canary.mjs \
+  --env=production \
+  --issuer=https://auth.efeonce.org \
+  --resource=https://mcp.efeonce.org/mcp \
+  --run-id=task-1832-canary-20260906-a \
+  --organization-id=org-602d7057-7fd5-47e7-b73b-21892e3f06e7 \
+  --preflight
+
+node scripts/mcp/external-client-canary.mjs \
+  --env=production \
+  --issuer=https://auth.efeonce.org \
+  --resource=https://mcp.efeonce.org/mcp \
+  --run-id=task-1832-canary-20260906-a \
+  --organization-id=org-602d7057-7fd5-47e7-b73b-21892e3f06e7 \
+  --negative
 ```
 
 El segundo comando abre un loopback en `127.0.0.1`, registra un cliente público por DCR, genera PKCE S256,
 espera login/consentimiento, valida el JWT con JWKS, llama `get_seo_entitlement`, rota refresh y revoca la familia
 OAuth. No imprime tokens. Si usas `--no-open`, copia sólo la URL de autorización al navegador de la persona
 canary; no la pegues en tickets o documentos.
+
+Ejecuta las dos negativas temporales en ceremonias independientes:
+
+```bash
+# Espera la expiración natural del access token; puede tardar hasta 16 minutos.
+node scripts/mcp/external-client-canary.mjs --env=production \
+  --issuer=https://auth.efeonce.org --resource=https://mcp.efeonce.org/mcp \
+  --run-id=task-1832-canary-20260906-a \
+  --organization-id=org-602d7057-7fd5-47e7-b73b-21892e3f06e7 --negative --wait-expiry
+
+# Mientras el script espera, revoca por command el grant exacto; exige deny en 60 s.
+node scripts/mcp/external-client-canary.mjs --env=production \
+  --issuer=https://auth.efeonce.org --resource=https://mcp.efeonce.org/mcp \
+  --run-id=task-1832-canary-20260906-a \
+  --organization-id=org-602d7057-7fd5-47e7-b73b-21892e3f06e7 --negative --wait-grant-revocation
+```
+
+No combines ambos `--wait-*`. Un timeout causado porque el command de revocación no se ejecutó a tiempo no
+cuenta; reotorga únicamente la capability base mediante el command canary y repite una ceremonia nueva.
 
 La suite Playwright es opt-in y exige una sesión canary preautorizada:
 
@@ -134,7 +165,9 @@ Opera Claude Code, Claude Desktop/web, Codex y ChatGPT con el mismo fixture. Par
 - refresh, revocación y tiempo hasta deny.
 
 Una fila queda `pending` si requirió inyección manual de token, no llegó al consentimiento, omitió refresh o no
-se pudo verificar el deny.
+se pudo verificar el deny. Un `ERR_BLOCKED_BY_CLIENT` visible después del callback loopback no invalida por sí
+solo el flujo: confirma primero que el CLI recibió el code y que una sesión nueva pudo invocar la lectura. Si no,
+la fila queda roja.
 
 ## 6. Revoca antes de borrar
 
@@ -197,6 +230,6 @@ conteo agregado no sustituye las consultas por los IDs exactos de la corrida.
 
 ## Criterio de cierre
 
-El trabajo queda técnicamente certificado sólo con matriz completa, cleanup de staging probado, producción
-allow/deny/revocación acreditada y siete días de señales estables. Hasta entonces el estado correcto es
-`code complete, rollout pendiente`.
+El trabajo queda técnicamente certificado sólo con matriz completa, producción allow/deny/revocación
+acreditada, siete días de señales estables y cleanup/readback final cero. Durante la ventana el estado correcto
+es `rollout productivo en observación`.

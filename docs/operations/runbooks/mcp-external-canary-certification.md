@@ -1,8 +1,8 @@
 # Runbook técnico — certificación MCP con canary externo eliminable
 
-> TASK-1832 · owner: Identity + MCP Platform · estado: **code complete, rollout pendiente** al 2026-09-06.
-> Schema aplicado fuera del checkpoint por error operativo; registry vacío. Este documento no acredita flags
-> activos, fixture creado ni certificación runtime. Readback: `TASK-1832_SCHEMA_APPLY_READBACK_2026-09-06.md`.
+> TASK-1832 · owner: Identity + MCP Platform · estado al 2026-09-06: **rollout productivo en observación**.
+> Corrida activa `task-1832-canary-20260906-a`; helper y Codex verdes, Claude Code bloqueado por
+> interoperabilidad. La matriz y el manifiesto acreditan el runtime; este runbook define el procedimiento.
 
 ## Objetivo y frontera
 
@@ -48,10 +48,9 @@ la variable ausente vuelve a `false` por diseño. El change-gate compara tambié
 la revisión servida, por lo que una diferencia de configuración fuerza deploy aunque el bundle no haya cambiado.
 El valor se acredita leyendo la revisión servida, no sólo GitHub.
 
-Antes de crear datos deben cumplirse todos estos puntos:
+Antes de crear datos en una corrida nueva deben cumplirse todos estos puntos:
 
-1. ADR aceptado, migraciones aplicadas y consumers compatibles desplegados con ambos gates OFF. El schema ya
-   quedó aplicado accidentalmente; todavía faltan los consumers y la decisión del operador sobre conservarlo.
+1. ADR aceptado, migraciones aplicadas y consumers compatibles desplegados con ambos gates OFF.
 2. `external_canary_registrations` vacío o sin otra fila activa.
 3. aprobación específica del operador para el fixture y para los buzones M365/Google controlados.
 4. `run_id`, `canary_registration_id`, `organization_id` y `public_id` generados por
@@ -59,7 +58,9 @@ Antes de crear datos deben cumplirse todos estos puntos:
 5. copia del template completada y versionada **antes del primer write**.
 6. TTL entre 1 hora y 30 días, environment externo activo y external organization ref exacta.
 
-La aprobación de implementación local de TASK-1832 no satisface los puntos 1–3.
+La aprobación de implementación local de TASK-1832 no satisface los puntos 1–3. La corrida activa sí los
+cumplió antes del primer write y quedó documentada con registro
+`xcr-48dacd1f-ad4b-4a73-b454-3d94574e7d09`; no se crea otra mientras ésta siga activa.
 
 ## Plano de control
 
@@ -118,10 +119,14 @@ Este conteo agregado complementa, pero no reemplaza, el readback por todos los I
    staging y la autorización de rollout.
 
 El helper `node scripts/mcp/external-client-canary.mjs` exige `--run-id`, lo persiste como
-`metadata_json.dcr.software_id` del DCR y usa DCR público, loopback `127.0.0.1`, PKCE S256,
+`metadata_json.dcr.software_id` del DCR, y exige `--organization-id` para comparar el sujeto solicitado y el
+servido antes de aceptar la corrida. Usa DCR público, loopback `127.0.0.1`, PKCE S256,
 consentimiento real, firma/JWKS, `tools/list`, `get_seo_entitlement`, refresh rotativo y revocación de la familia
 OAuth. Mantiene códigos, verifier y tokens sólo en memoria. La revocación OAuth no sustituye el retiro de
 authority: el binding/grant se revoca por su command y el gateway debe denegar el access token todavía vigente.
+`--negative` prueba base-only e internal-only; `--wait-expiry` espera la expiración natural y exige
+`401 invalid_token`; `--wait-grant-revocation` abre una ventana de 60 s para ejecutar el command de revocación y
+medir el deny. Los dos modos de espera se ejecutan en ceremonias separadas.
 
 La passkey real se certifica en dos carriles distintos. El login normal puede crear una sesión `primary` con
 `amr=passkey`; no se eleva por inferencia. El step-up explícito usa `/auth/passkeys/step-up/start|finish`, exige
@@ -169,7 +174,9 @@ certificación runtime.
    → consents/contextos → cliente DCR marcado con `software_id=run_id` → challenges/TOTP/passkeys/magic links/
    sesiones. Después elimina grants → invitations → source links → profiles `smoke_test` → bindings → registro
    → organización. Un cliente observado por la persona pero no marcado con el `run_id` bloquea el apply; no se
-   presume ownership.
+   presume ownership. En cambio, los hijos OAuth de un DCR correctamente marcado siguen el ownership del
+   cliente aunque un diagnóstico haya usado otro sujeto: se eliminan por `client_id` sin borrar la sesión ni la
+   identidad compartida de ese sujeto.
 6. El mismo transaction relee organización, registro, bindings, perfiles, links y todos los artefactos
    auth/OAuth anteriores; cualquier conteo distinto de `0` hace rollback.
 7. Releer aparte superficies 360 y actualizar el manifiesto a `deleted` sólo cuando todo el inventario run-owned
@@ -185,7 +192,7 @@ El apply se niega sin mutar cuando aparece cualquiera de estos estados:
 - registro aún activo, authority/auth activa o postura de organización modificada;
 - lifecycle history, space, membership, tax ID, HubSpot o referencia comercial;
 - perfil no `smoke_test`, source link de otro environment o asset compartido;
-- cliente OAuth no DCR, sin `software_id=run_id` o usado por otro environment/subject;
+- cliente OAuth observado por el canary que no sea DCR o no tenga `software_id=run_id`;
 - FK nueva/no inventariada con conteo positivo;
 - rol DB distinto de migrator;
 - readback final distinto de cero.
@@ -205,5 +212,6 @@ Una corrida deja:
 6. cleanup dry-run y, al retiro, apply + readback cero;
 7. siete días de señales estables.
 
-Hasta completar esos siete puntos, TASK-1832 permanece `code complete, rollout pendiente`; nunca se presenta
-como piloto ni adopción de cliente.
+Hasta completar esos siete puntos, TASK-1832 permanece `rollout productivo en observación`; nunca se presenta
+como piloto ni adopción de cliente. Para la corrida activa, `delete_after=2026-09-13T19:43:30Z`: antes de esa
+fecha el dry-run debe negarse por authority/auth activas y `--apply` no se ejecuta.

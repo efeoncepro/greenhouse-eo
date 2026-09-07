@@ -1,26 +1,24 @@
 # Handoff activo
 
-**TASK-1832 — rollout oscuro desplegado; fixture root + M365 provisionados, gates OFF (Codex,
-2026-09-06):** Consumers compatibles desplegados con gates independientes OFF: auth-server `dbeaef62de54` /
-`00034-85c`; gateway `8438c5fa87ed` / `00041-7dq` (152/152); Vercel staging READY. El manifiesto versionado
-registra la organización dedicada, registry y binding canary creados por commands. Readback: `1/1`, purpose drift
-`0/0`, Person 360 `0`; el primer cleanup dry-run sólo encontró referencias esperadas y se negó por authority
-activa. IDs completos, postura y contrato de retiro:
-`docs/audits/mcp/TASK-1832_CANARY_ASSET_MANIFEST_task-1832-canary-20260906-a.md`.
+**TASK-1832 — canary productivo en observación; retiro después del 2026-09-13 19:43Z (Codex,
+2026-09-06):** release `fb5fc082aa92-3f2c8706-24fa-452d-be8f-6feea7b8cdd9` `released`; Vercel/auth-server
+sirven `fb5fc082aa92` y gateway `8438c5fa87ed`; ambos gates siguen ON. El fixture dedicado conserva dos profiles
+`smoke_test`, un grant read-only, cero 360/comercial y `unexpectedRefs=0`. M365, Gmail autorizado, magic link,
+passkey real Chrome/Safari, Codex 0.153.4, helper y las cinco negativas tienen evidencia live. Expiración natural:
+`401 invalid_token` después de `899 s`, antes de revocar la familia; authority revocada: deny en `19.272 s`.
+La guarda nueva confirmó el `organization_id` exacto. Claude Code 2.1.186 falla cerrado por scopes desconocidos/
+write; Claude Desktop/web y ChatGPT siguen abiertos en `TASK-1813`. El callback Codex puede mostrar
+`ERR_BLOCKED_BY_CLIENT` bajo Chrome depurado después de que el CLI ya recibió el code.
 
-**Cohorte M365 ligada; sesión aún pendiente:** el operador eligió el alias preexistente
-`m***@efeoncepro.com`, accesible como buzón compartido. La invitación `xmi-b7cfc54e-…` se entregó, quedó visible y
-se aceptó mediante el POST scanner-safe a 20:15:37Z. Creó exclusivamente el profile `EO-ID0651`,
-`data_origin=smoke_test`, y su source link; el agregado subió a 31 mientras Person 360 permaneció en `0`. El magic
-link quedó `delivered` a 20:15:46Z, pero el Mac se bloqueó antes de abrirlo. El grant personal exacto
-`xcg-4e5b6ad7-…` para `growth.seo.observation.read` quedó activo; binding gv `2` y audit presente. La
-invitación plus-address previa `xmi-697bc1d8-…` sigue revocada sin aceptación. Google sigue separado:
-`greenhouse.cl` anuncia MX de Google, pero Admin exige reautenticación antes de confirmar o provisionar el buzón
-gobernado. Gates siguen OFF; producción no se promueve hasta cerrar el gate de staging.
-La CI de `6634c3973` falló sólo porque el smoke OAuth nuevo usaba `page.goto` directo; el fix local usa
-`gotoWithTransientRetries` y su gate focal está verde, todavía sin push. Higiene: `vercel list` imprimió un cursor
-sensible; no se reutilizó ni se documentó su valor y debe rotarse si Vercel confirma que es credencial
-reutilizable.
+El dry-run inventaría 2 profiles/links, 5 invitaciones, 3 grants, 14 DCR y sus hijos OAuth; sesiones humanas
+activas `0`, passkey activa conservada, ownership inequívoco y cero referencias inesperadas. Los DCR usados con
+la sesión interna accidental borran sólo hijos por `client_id`, no la identidad compartida. `deletionReady=false`
+es correcto por `registration_active|active_authority|active_auth`. No ejecutar `--apply` antes de
+`2026-09-13T19:43:30Z`; entonces cortar authority, medir deny, exigir `deletionReady=true`, aplicar con el xcr
+exacto, releer cero y apagar ambos gates. Fuente viva:
+`docs/audits/mcp/TASK-1832_CANARY_ASSET_MANIFEST_task-1832-canary-20260906-a.md` y matriz MCP del mismo directorio.
+La automatización diaria `task-1832-observaci-n-y-retiro-canary` relee señales y permanece silenciosa sin
+cambios; desde `delete_after` sólo ejecuta el retiro si todas las precondiciones siguen verdes.
 
 **Excepción operativa resuelta; rollout autorizado:** `pnpm pg:connect:migrate` se usó por error como comando de proxy y
 aplicó las dos migraciones aunque la aprobación excluía el apply. Readback 18:49:53Z: `registrations=0`,

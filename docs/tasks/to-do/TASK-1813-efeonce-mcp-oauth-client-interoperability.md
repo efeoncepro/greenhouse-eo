@@ -1,5 +1,23 @@
 # TASK-1813 — Compatibilidad OAuth del MCP Efeonce con Codex y Claude
 
+## Delta 2026-09-06 — hallazgos de clientes reales durante TASK-1832
+
+La certificación canary productiva reabrió esta unidad con versiones actuales, sin cambiar el runtime:
+
+- **Codex 0.153.4:** el bootstrap inicial pidió `efeonce.mcp.read`, Globe y Hiring aun cuando el DCR estaba
+  limitado a base read; el emisor rechazó `invalid_scope`. El retry automático sin scopes sí llegó al
+  consentimiento, mostró sólo `efeonce.mcp.read`, completó login y una sesión nueva invocó
+  `get_seo_entitlement` sin gasto. Al declarar manualmente `--oauth-resource`, Codex duplicó `resource` y el
+  emisor rechazó `invalid_request`; sin ese override el flujo funciona. El callback local termina visualmente
+  en `ERR_BLOCKED_BY_CLIENT` bajo Chrome depurado, aunque el listener ya recibió el code y el CLI queda logueado.
+- **Claude Code 2.1.186:** con client ID público pre-registrado y callback exacto pidió el catálogo anunciado,
+  incluidas formas resource-qualified duplicadas y scopes de escritura; el emisor rechazó `invalid_scope`
+  antes del consentimiento. La configuración soportada por esa versión no permitió fijar un scope mínimo desde
+  `claude mcp login`. No se ampliaron scopes ni grants para forzar el recorrido.
+
+TASK-1832 registra el resultado en su matriz y conserva la organización canary aislada. Esta task sigue siendo
+la dueña de normalizar scopes/resource por cliente y de decidir la versión mínima soportada de Claude Code.
+
 ## Delta 2026-09-03 — EPIC-044 (U10, carril interno)
 
 La task pasa a `EPIC-044`. El emisor propio (`TASK-1828`/`TASK-1829`) es quien resolverá de raíz el desajuste de `issuer` y CIMD; esta task conserva su alcance interno Entra (discovery, shim, scopes) y no construye broker. Coordinar con `TASK-1831` antes de editar `app.ts`/config del gateway.
@@ -25,7 +43,7 @@ La task pasa a `EPIC-044`. El emisor propio (`TASK-1828`/`TASK-1829`) es quien r
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Diseno`
+- Status real: `Defecto reproducido en producción con Claude Code 2.1.186; Codex 0.153.4 funciona sólo tras retry de scopes mínimos y sin duplicar resource. Sin fix de runtime en esta corrida; evidencia y límites registrados por TASK-1832.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
 - Blocked by: `none`

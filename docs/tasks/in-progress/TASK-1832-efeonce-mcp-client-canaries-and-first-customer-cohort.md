@@ -1,5 +1,27 @@
 # TASK-1832 — Efeonce MCP Synthetic External Canaries and Client Compatibility Certification
 
+## Delta 2026-09-06 — producción activa, Codex verde y retiro programado
+
+La organización dedicada `task-1832-canary-20260906-a` está activa exclusivamente como canary productivo.
+Greenhouse/Vercel y el auth-server sirven `fb5fc082aa92`; el gateway sirve `8438c5fa87ed` en la revisión
+`00044-4kj`; ambos gates canary están `true`. Invitación, M365, Gmail autorizado, magic link, sesiones,
+passkey real Chrome/Safari, consentimiento, PKCE, refresh, revocación de familia, base-only, internal-only y
+revocación de authority en `19.272 s` tienen evidencia live. Codex `0.153.4` completó OAuth y una lectura real
+sin gasto. Claude Code `2.1.186` quedó fail-closed antes del consentimiento por pedir scopes desconocidos y
+writes; el defecto vuelve a `TASK-1813` y no se corrige ampliando la allowlist.
+
+El helper exige además el `organization_id` exacto y valida el sujeto devuelto. Esta guarda nació al detectar
+que una cookie interna persistente podía recorrer readers de Efeonce: la ceremonia fue rechazada como canary,
+la sesión se cerró y la repetición por magic link M365 mostró el fixture correcto. No hubo writes ni gasto.
+La ceremonia reforzada confirmó `organizationIdMatches=true`; una corrida independiente esperó `899 s` y
+obtuvo `401 invalid_token` por expiración natural antes de rotar o revocar la familia OAuth.
+
+El dry-run post-clientes conserva `unexpectedRefs=0` y enumera todo el grafo run-owned. `deletionReady=false`
+es correcto durante la ventana porque registro, authority y auth siguen activos. Los DCR diagnósticos usados
+por error con la sesión interna también llevan el `run_id`; su cleanup es client-scoped y conserva la sesión e
+identidad compartidas. El cierre permanece abierto hasta clientes hospedados o decisión explícita de no
+certificarlos, siete días de señales y cleanup/readback cero después de `2026-09-13T19:43:30Z`.
+
 ## Delta 2026-09-06 — certificación sintética separada del piloto con cliente real
 
 Por decisión del operador, ninguna persona cliente participa en el QA técnico del emisor, el gateway o los
@@ -124,7 +146,7 @@ organización cliente real, sí**.
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-044`
-- Status real: `Rollout autorizado y en curso. Schema y consumers compatibles están desplegados con gates OFF; existe un único fixture no comercial documentado. M365 y Gmail personal autorizado completaron invitación, delivery, POST scanner-safe, profile smoke_test, sesión y logout; passkey real pasó en Chrome y Safari. La organización conserva unexpected_refs=0 y cero contaminación 360/comercial. Falta activar gates coordinados, completar OAuth/MCP y negativas, promover Greenhouse, observar siete días y ejecutar cleanup/readback.`
+- Status real: `Rollout productivo activo y en observación. Greenhouse/Vercel y auth-server sirven fb5fc082aa92; gateway 8438c5fa87ed/00044-4kj; ambos gates canary ON. M365 y Gmail autorizado, sesión, passkey Chrome/Safari, helper OAuth, Codex real, refresh/revocación y las cinco negativas están verificados. Claude Code 2.1.186 falla cerrado por interoperabilidad y vuelve a TASK-1813. unexpected_refs=0, sin contaminación 360/comercial. Faltan clientes hospedados o decisión explícita, siete días y cleanup/readback cero.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
 - Blocked by: `none`
@@ -525,7 +547,7 @@ organización dedicada creada sólo después de una autorización específica.
 
 - [ ] Matriz de tokens publicada con al menos Claude Code, Codex y un cliente hospedado, sin tokens crudos.
 - [ ] El mismo `sub` para la misma persona en loopback y hospedado (evidencia).
-- [ ] Organización canary no-cliente registrada y ligada por command dedicado; `bindExternalOrganization`
+- [x] Organización canary no-cliente registrada y ligada por command dedicado; `bindExternalOrganization`
       continúa rechazándola y los readers/KPI comerciales no la presentan como cliente.
 - [ ] Manifiesto de assets creado antes del primer write y completo con IDs/ownership/TTL; cleanup dry-run
       reporta `deletion_ready`, `unexpected_refs=0`, lifecycle history cero y ningún intento de borrar assets shared.
@@ -535,10 +557,14 @@ organización dedicada creada sólo después de una autorización específica.
       con delivery/bounce y scanner-safe POST; el expediente distingue ownership y no acredita control Efeonce
       sobre Gmail. Evidencia: invitaciones `xmi-b7cfc54e…` y `xmi-0b307567…`; deliveries exactos y perfiles
       `EO-ID0651/EO-ID0652` en el manifest; ambas sesiones terminaron revocadas por logout.
-- [ ] Passkey real pasa en Chrome y Safari/WebKit con la misma persona canary.
-- [ ] Las cinco pruebas negativas pasan en producción con evidencia redactada.
-- [ ] Prueba base-only pendiente de `TASK-1626` cerrada y referenciada en su task.
-- [ ] Runbook de certificación canary y expediente de readiness para TASK-1841 publicados.
+- [x] Passkey real pasa en Chrome y Safari/WebKit con la misma persona canary.
+- [x] Las cinco pruebas negativas pasan en producción con evidencia redactada: base-only `403`, expirado
+      natural `401`, authority revocada `401` en `19.272 s`, consentimiento explícito e internal-only oculto/
+      denegado.
+- [x] Prueba base-only pendiente de `TASK-1626` cerrada: write oculto y llamada directa `403
+      insufficient_scope` con challenge canónico; referenciar en su cierre documental.
+- [x] Runbook de certificación canary y expediente de readiness para TASK-1841 publicados; el expediente
+      conserva veredicto no certificado mientras existan filas/pasos abiertos.
 - [ ] Siete días de señales steady registrados en Handoff.
 
 ## Verification
@@ -551,10 +577,16 @@ organización dedicada creada sólo después de una autorización específica.
 - [x] Gateway hermano `pnpm check` — 152/152, 0 skipped, build verde.
 - [ ] `pnpm playwright test tests/e2e/smoke/auth-server-oauth.spec.ts` — no ejecutar sin fixture/sesión autorizados;
       un skip no se acepta como evidencia.
-- [ ] `node scripts/mcp/external-client-canary.mjs --env=staging` — pendiente de deploy, gates y fixture.
-- [ ] Sesiones interactivas por cliente MCP operadas por Efeonce y registradas en la matriz redactada.
-- `pnpm secrets:audit` local: 6/8 saludables; `NEXTAUTH_URL` local con shape inválida y `CRON_SECRET` ausente.
-  No es evidencia de runtime y TASK-1832 no modifica secretos.
+- [x] `node scripts/mcp/external-client-canary.mjs --env=production --issuer=https://auth.efeonce.org
+      --resource=https://mcp.efeonce.org/mcp --run-id=task-1832-canary-20260906-a
+      --organization-id=org-602d7057-7fd5-47e7-b73b-21892e3f06e7` — discovery, PKCE,
+      consentimiento, claims, organización exacta, allow, refresh y revocación verdes; `--negative` pasó y
+      `--wait-expiry` obtuvo `401` después de `899 s` antes de revocar la familia.
+- [ ] Sesiones interactivas por cliente MCP registradas: Codex verde, Claude Code rojo fail-closed; Desktop/web
+      y ChatGPT hospedado aún no operados.
+- `pnpm secrets:audit` en el shell final: 0/8, todos `unconfigured` porque el comando no cargó un entorno local.
+  No es evidencia de runtime; los valores productivos se verificaron por Vercel/Cloud Run y TASK-1832 no
+  modifica secretos.
 
 ## Closing Protocol
 

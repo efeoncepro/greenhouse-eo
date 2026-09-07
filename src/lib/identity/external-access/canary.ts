@@ -715,7 +715,9 @@ const buildCleanupPlan = async (
 
   // A DCR creado por el canary se marca con `software_id=run_id`. La unión con los artefactos del
   // sujeto detecta un cliente que hubiera omitido esa marca; en ese caso el plan se niega a asumir
-  // ownership y `oauth_client_not_run_owned` bloquea el borrado.
+  // ownership y `oauth_client_not_run_owned` bloquea el borrado. Un DCR correctamente marcado sigue
+  // siendo run-owned aunque una ceremonia diagnóstica haya usado por error otro sujeto: el cleanup
+  // elimina sólo sus hijos client-scoped, nunca la sesión ni la identidad de ese otro sujeto.
   const oauthClients = await client.query<{ client_id: string }>(
     `SELECT DISTINCT owned.client_id
        FROM (
@@ -778,15 +780,10 @@ const buildCleanupPlan = async (
        (SELECT count(*) FROM greenhouse_auth.client_consents WHERE client_id=ANY($4::text[]) AND status='active') +
        (SELECT count(*) FROM greenhouse_auth.authorization_contexts WHERE (client_id=ANY($4::text[]) OR binding_id=ANY($5::text[])) AND revoked_at IS NULL AND expires_at>NOW()) +
        (SELECT count(*) FROM greenhouse_auth.oauth_clients WHERE client_id=ANY($4::text[]) AND status='active'))::text AS active_auth,
-      ((SELECT count(*) FROM greenhouse_auth.oauth_clients
-         WHERE client_id=ANY($4::text[]) AND NOT (
-           registration_kind='dcr' AND created_by='dcr' AND metadata_json #>> '{dcr,software_id}'=$3
-         )) +
-       (SELECT count(*) FROM greenhouse_auth.authorization_codes WHERE client_id=ANY($4::text[]) AND (environment_id<>$1 OR NOT (subject=ANY($2::text[])))) +
-       (SELECT count(*) FROM greenhouse_auth.refresh_tokens WHERE client_id=ANY($4::text[]) AND (environment_id<>$1 OR NOT (subject=ANY($2::text[])))) +
-       (SELECT count(*) FROM greenhouse_auth.access_tokens WHERE client_id=ANY($4::text[]) AND (environment_id<>$1 OR NOT (subject=ANY($2::text[])))) +
-       (SELECT count(*) FROM greenhouse_auth.client_consents WHERE client_id=ANY($4::text[]) AND (environment_id<>$1 OR NOT (subject=ANY($2::text[])))) +
-       (SELECT count(*) FROM greenhouse_auth.authorization_contexts WHERE client_id=ANY($4::text[]) AND (environment_id<>$1 OR NOT (subject=ANY($2::text[])))))::text AS unsafe_oauth_clients`,
+      (SELECT count(*)::text FROM greenhouse_auth.oauth_clients
+        WHERE client_id=ANY($4::text[]) AND NOT (
+          registration_kind='dcr' AND created_by='dcr' AND metadata_json #>> '{dcr,software_id}'=$3
+        )) AS unsafe_oauth_clients`,
     [row.environment_id, subjectIds, row.run_id, oauthClientIds, bindingIds]
   )
 

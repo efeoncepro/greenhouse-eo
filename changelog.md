@@ -7,6 +7,26 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-06 — TASK-1832 entra en observación productiva con retiro verificable
+
+La organización canary dedicada ya recorre el mismo emisor y gateway productivos que usaría un cliente, pero
+sigue fuera de Account/Person 360 y de toda superficie comercial. Vercel/auth-server sirven `fb5fc082aa92`; el
+gateway sirve `8438c5fa87ed`; ambos gates canary están ON. M365, Gmail personal autorizado, magic link, passkey
+Chrome/Safari, consentimiento, PKCE, refresh, revocación de familia, base-only, internal-only y revocación de
+authority en `19.272 s` tienen evidencia live. Codex 0.153.4 completó una lectura MCP real sin gasto.
+
+Claude Code 2.1.186 pidió scopes desconocidos y de escritura antes del consentimiento; el emisor lo rechazó y
+el defecto volvió a TASK-1813. No se amplió la allowlist. La expiración natural recibió `401 invalid_token`
+después de `899 s`, antes de rotar o revocar la familia; otra ceremonia exigió el `organization_id` exacto y
+confirmó el fixture servido. Los clientes hospedados siguen abiertos, igual que siete días de observación y el
+cleanup final. El dry-run post-clientes enumera 14 DCR y todo el grafo auth/identity, con
+`unexpectedRefs=0`; se niega correctamente mientras authority/auth están activas. Los cuatro DCR usados por
+error con una sesión interna siguen siendo run-owned y el cleanup conserva esa identidad compartida. El wordmark
+ausente del correo se restauró como asset público compartido y quedó visible en Gmail; no se eliminará con el
+fixture. El readback dejó las sesiones humanas canary activas en cero y conserva sólo la passkey necesaria para
+la observación. Quedó activa una automatización diaria silenciosa para vigilar la ventana y ejecutar el retiro
+sólo desde `delete_after` con todas las precondiciones verdes.
+
 ## 2026-09-06 — TASK-1835 completa: Efeonce ID tiene cara, y el gate de accesibilidad estaba ciego
 
 `auth.efeonce.org` sirve su experiencia visible: login con passkey, Microsoft y enlace por correo;
@@ -874,13 +894,3 @@ valor. Ahora hace `vercel env pull` y compara: 24 filas declaran `prod: OFF` con
 Del barrido de 27 tasks salen `ISSUE-165` (writer de organizaciones fuera del SSOT en
 `/api/admin/spaces`, impacto latente) e `ISSUE-166` (el CTA de Nexa abre el chat sin anclar el insight
 ni enviar la pregunta).
-
-## 2026-09-01 — TASK-1709 cerrada y la doc que la daba por apagada
-
-El carril de diagnóstico de prospecto llevaba **5 días desplegado** (flag ON en Vercel Production
-desde el 27-ago, corrida real sobre `skyairline.com`) mientras cuatro skills, el runbook del gateway
-MCP, dos manuales y la doc funcional decían "flag OFF en todos los ambientes". El runbook incluso
-instruía al canary a normalizar un `disabled` — que hoy sería una regresión. Corregido en 9 archivos.
-
-Tier `prospect` documentado: se resuelve sin `module_assignments` y su gasto es presupuesto de
-adquisición de Efeonce, nunca costo de cliente.

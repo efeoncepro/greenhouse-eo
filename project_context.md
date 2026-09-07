@@ -155,10 +155,11 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 - EPIC-044: emisor propio `auth.efeonce.org`, KMS/JWKS, OAuth y sesiones de personas; gateway multi-issuer.
   Autoridad externa e interna separadas por población/binding/contexto; SSO no concede permisos MCP.
   Grants, `gv` y ledger de tokens se revalidan antes del dispatch; estado/audit/outbox atómicos.
-  `TASK-1832` reserva una organización efímera no cliente, registrada, `smoke_test`, con TTL y sólo lectura; su
-  contrato de retiro revoca autoridad y borra únicamente assets propios con readback cero. El schema está aplicado
-  con registry vacío; código y gateway siguen locales, con rollout live pendiente. `TASK-1841` separa el piloto
-  cliente consentido.
+  `TASK-1832` mantiene hasta `2026-09-13T19:43:30Z` una única organización efímera no cliente, registrada,
+  con dos perfiles `smoke_test`, TTL y sólo lectura. El rollout productivo está activo con los dos gates canary;
+  helper y Codex tienen evidencia live, Claude Code conserva un defecto de interoperabilidad en `TASK-1813`, y
+  `unexpected_refs=0`. Su contrato de retiro revoca autoridad, borra únicamente assets run-owned y exige
+  readback cero; no se ejecuta antes de cerrar la observación. `TASK-1841` separa el piloto cliente consentido.
   [`ADR nativo`](docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) ·
   [`autoridad interna`](docs/architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md) ·
   [`runbook`](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md) ·
