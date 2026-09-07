@@ -95,6 +95,23 @@ Canonical shape:
 - Adaptive Sidecar official variants are `inspector`, `composer`, `assistant`, `reconciler`, `evidence`, and `runbook`; domain kinds such as `form`, `review`, `preview`, reconciliation, provenance/evidence, or guided operations must map to one of those variants.
 - Tables: use when comparison and scanning matter; pair with inspector for actions that require context.
 
+## Una clase de texto no se comparte entre dos fondos opuestos (2026-09-06)
+
+Los dos contrastes rotos del login del emisor —**1.53:1** y después **3.28:1**— tuvieron la MISMA
+causa raíz: una sola regla de texto (clase, `styled`, fragmento de `sx` o variante compartida) servía
+a la vez a una tira sobre el lienzo oscuro y a un bloque dentro de una tarjeta clara. La regla estaba
+escrita pensando en una de las dos superficies y le imponía su color a la otra. El segundo caso
+apareció recién al arreglar el primero: nunca fueron dos bugs, fue un acoplamiento con dos síntomas.
+
+**No se arregla moviendo especificidad** —ni con un selector más largo, ni anidando bajo el
+contenedor, ni con `!important`—: eso deja el acoplamiento intacto y traslada el daño al próximo
+consumidor. **Cada superficie lleva su propia clase/variante**, y el color del texto sale del token de
+contraste **de esa superficie**, no de un default heredado del ancestro que quedó más cerca.
+
+Chequeo antes de reusar una regla de texto: ¿sobre cuántos fondos se pinta hoy? Si la lista incluye un
+fondo claro y uno oscuro, ya son dos reglas. Y el veredicto se cierra con contraste **medido sobre
+píxeles**, no con un `violations: 0` de axe (ver `greenhouse-gvc-playwright`, corolario de Regla #3).
+
 ## Hard Rules
 
 - Do not introduce a parallel design system.
@@ -108,6 +125,7 @@ Canonical shape:
   flat export tables.
 - Do not create `FooDrawer`, `FooInspector`, and `FooAssistant` as separate components when one primitive plus functional variants covers the family.
 - Do not add a variant that only changes color, radius, shadow, or icon.
+- Do not let one text class/variant/`sx` fragment serve two opposite backgrounds (dark-canvas strip and light card); split it per surface instead of raising specificity.
 
 ## Output Contract
 

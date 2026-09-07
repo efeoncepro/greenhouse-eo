@@ -53,6 +53,17 @@ Score 1-5:
   data — carries no on-surface declaration of that difference, so adjacent figures read as
   a contradiction or as precision the product does not have.
 - Important state is color-only.
+- Text contrast is claimed from an automated accessibility run reporting zero
+  violations on a surface whose background is not flat (gradient, `::before`/`::after`,
+  image, `backdrop-filter`, blend mode). axe returns those text nodes as `incomplete`
+  ("background color could not be determined due to a pseudo element") and GVC never
+  writes that list to disk, so the zero means "could not look", not "passes". It hid
+  1.53:1 and 3.28:1 across 40 captures on 2026-09-06. Measure pixels
+  (`scripts/auth-server/verify-contrast.mjs`, `pnpm auth-server:verify-contrast`) or
+  report the contrast as unmeasured.
+- One text class/variant serves two opposite backgrounds (a dark-canvas strip and a
+  light card), so its color comes from whichever surface the rule was written for.
+  Splitting the class per surface is the fix; raising specificity is not.
 - UI is generic template composition rather than task-native.
 - The first fold is card wallpaper: repeated contained surfaces, card-on-card
   nesting, or identical rounded panels without a spatial hierarchy.
@@ -88,6 +99,9 @@ mobile. Automated PASS cannot override screenshot review.
 - `CONDITIONAL PASS`: only for low-risk rollout/evidence follow-ups external to
   visual quality. It cannot waive a score threshold or aesthetic blocker.
 - `BLOCK`: any blocker or any threshold failure.
+- A green automated accessibility gate is not contrast evidence on a non-flat
+  background: with no pixel measurement, accessibility cues cannot be scored above 3
+  and the missing measurement is named in the verdict.
 
 ## Figma Implementation Contract (gate)
 

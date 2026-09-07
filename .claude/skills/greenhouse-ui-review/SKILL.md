@@ -103,7 +103,16 @@ Every finding is one of:
 - [ ] Primary + tonal secondary for multiple parallel CTAs
 - [ ] No hex colors inline (`#7367F0`, `#bb1954`). Use palette tokens.
 - [ ] Text colors: `text.primary`, `text.secondary`, `text.disabled` — NO raw grays.
-- [ ] Contrast verified in both light AND dark themes (if surface is in both)
+- [ ] Contrast **measured**, light AND dark (if surface is in both). On a non-flat background
+      (gradient, `::before`/`::after`, image, `backdrop-filter`, blend mode) an axe run with
+      `violations: 0` proves nothing: axe returns those text nodes as `incomplete`
+      ("background color could not be determined due to a pseudo element"), and GVC's
+      `analyzeAccessibility` returns early without writing the `.axe.json`, so `incomplete`
+      never reaches disk. Sample pixels instead — `scripts/auth-server/verify-contrast.mjs`
+      (`pnpm auth-server:verify-contrast`) is the reference implementation — or report the
+      contrast as unmeasured. Real cost: 1.53:1 shipped under a green gate (2026-09-06).
+- [ ] No text class/variant/`sx` fragment serves two opposite backgrounds (dark strip + light
+      card). Split it per surface; raising specificity only moves the bug to the next consumer.
 
 ### §7 — Component primitives
 
@@ -211,6 +220,9 @@ When invoked, produce:
 
 ## Version
 
+- **v1.3** — 2026-09-06 — §6 exige contraste MEDIDO sobre píxeles (un `violations: 0`
+  de axe sobre fondo no plano es una medición vacía) y prohíbe que una clase de texto
+  sirva a dos fondos opuestos.
 - **v1.2** — 2026-08-08 — TASK-1309: §12 gana honestidad del dato (no calculado ≠ 0,
   job limpio ≠ fallido, alcance con techo ≠ total, estimación declarada, cifras
   vecinas con instrumento distinto explicadas en pantalla).

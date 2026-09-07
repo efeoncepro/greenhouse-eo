@@ -3,7 +3,7 @@
 Status: accepted
 Owner: Platform / Product Design
 Adoption: `TASK-1453` and every later new `ui-standard`/`ui-platform` task
-Last updated: 2026-08-08
+Last updated: 2026-09-06
 
 ## Purpose
 
@@ -122,7 +122,10 @@ pending/result feedback, preview replacement and focus restoration.
 Motion is interruptible, localized, tokenized and compositor-conscious. Reduced
 motion preserves final state and meaning. Every intermediate frame preserves
 text/status contrast: never fade live state-copy below AA; prefer transform,
-clip or a persistent base layer and audit transition frames with GVC/axe.
+clip or a persistent base layer and audit transition frames with GVC/axe —
+over a composed background (gradient, image, pseudo-element, translucency) axe
+cannot resolve contrast and reports nothing, so those frames need a pixel
+measurement instead (see «Un cero de axe en contraste…» below).
 Ambient loops, decorative parallax, bounce/shake errors and local timing/easing
 are not enterprise motion.
 
@@ -231,6 +234,34 @@ each derived its own verdict rule; two branched on `null` and one did not.
 - When the same model feeds several renders (web, print, dashboard), **derive the sentence once** and
   let every render consume it. A rule duplicated per render is a contradiction waiting for the render
   nobody re-read.
+
+### Un cero de axe en contraste no es evidencia cuando el fondo es compuesto
+
+`axe` **no falla** el contraste que no puede calcular: lo manda a `results.incomplete`, y el
+analizador del GVC corta con `if (!violations.length) return findings`
+(`scripts/frontend/lib/quality.ts:87`) sin emitir finding ni escribir el artefacto `.axe.json`. Sobre
+cualquier superficie cuyo fondo detrás del texto no sea un color plano —degradado, imagen,
+pseudo-elemento, translucidez, `color-mix`— el gate reporta un verde que **no acredita contraste**.
+
+- Precedente `TASK-1835` (2026-09-06): `violations: 0` en **40 capturas** del emisor Efeonce ID,
+  con las **24 filas de texto de cada página** en `incomplete`. Debajo de ese cero había texto a
+  **1.53:1** (el aviso «Aplicación no verificada» del consentimiento) y a **3.28:1** en el pie. Lo
+  reportó el operador mirando la pantalla. Antecedente independiente: el share board de Globe
+  (2026-07-25), donde se rompió un token a propósito y axe siguió devolviendo 0 violations.
+- **La dimensión `Color` del scorecard no se puntúa sobre un cero de axe.** En una superficie de fondo
+  compuesto, el contraste se mide **sobre los píxeles de la captura**; sin esa medición la dimensión
+  se declara *no medida*, no se puntúa por defecto. Implementación de referencia:
+  `scripts/auth-server/verify-contrast.mjs` (365 textos, 18 pantallas × 2 viewports, 0 bajo el piso
+  WCAG 1.4.3). El medidor tiene dos trampas propias documentadas en su cabecera, y las dos fallan
+  hacia el falso verde: muestrear **fuera** de la caja da «blanco sobre blanco» en cada CTA, y tomar el
+  color **más frecuente** hace que en un titular blanco de 46px ganen los glifos.
+- **Causa raíz de los dos defectos: una clase de texto compartida entre dos fondos opuestos.** Una
+  regla escrita para la tarjeta clara le impuso su color al texto que vive sobre el lienzo oscuro.
+  Ninguna superficie premium comparte clase/módulo CSS/`sx` de texto entre un fondo claro y uno
+  oscuro; el color de texto pertenece a su fondo, no al componente que lo reusa.
+
+Contrato completo: [`UI_PLATFORM_AGENT_INVARIANTS.md` § Contraste sobre fondo compuesto](../architecture/agent-invariants/UI_PLATFORM_AGENT_INVARIANTS.md#contraste-sobre-fondo-compuesto-un-cero-de-axe-no-es-evidencia-task-1835-medido-2026-09-06)
+· límite del gate en [`GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md` § Delta 2026-09-06](../architecture/GREENHOUSE_FRONTEND_CAPTURE_HELPER_V1.md#delta-2026-09-06--el-gate-de-accesibilidad-no-mide-contraste-sobre-fondo-compuesto-v112-task-1835).
 
 ### Chrome budget and spatial composition
 

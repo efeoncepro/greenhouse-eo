@@ -7,7 +7,7 @@ Nombre canonico de producto interno: **Greenhouse Visual Capture** (`GVC`).
 ## Status
 
 - Estado: `accepted`
-- Version: `1.11`
+- Version: `1.12`
 - Fecha V1.0: `2026-05-12 mañana` — Slice 0-3 (CLI + scenario + recorder + docs)
 - Fecha V1.1: `2026-05-12 tarde` — Delta OQ-1..OQ-6 (upload, device, diff, capability, reliability, ui-review scaffolding)
 - Fecha V1.2: `2026-05-29` — Hook operativo para verificación visual UI obligatoria vía `pnpm fe:capture` y comandos relacionados
@@ -21,6 +21,7 @@ Nombre canonico de producto interno: **Greenhouse Visual Capture** (`GVC`).
 - Fecha V1.9: `2026-06-12` — explore de microinteracciones (TASK-1099): `fe:capture:explore --route=X --interaction '<hover|focus|click>:<selector>'` performa la acción (read-only — rechaza fill/press) y observa `before`/`feedback`/`settled`; `promote` auto-emite un step `interaction` (V2) válido (frames + keyboardEquivalent + `reducedMotion:'capture'`). Lleva el loop observe→author a la coreografía. Hallazgo: la readiness auto de promote, anclada a un heading con copy dinámico, es flaky → revisar/preferir marker estable.
 - Fecha V1.10: `2026-06-12` — explore mide los timings reales de la microinteracción (TASK-1100): tras la acción muestrea el clip del target cada 50ms hasta `--interaction-window` (default 1000) y deriva `feedback`/`settled` por pixel-diff (`detectInteractionTimings` + `lib/visual-diff`). Mide cualquier motion (CSS/framer-motion/GSAP). `measuredTimings:false` + fallback honesto si no hay cambio visible. `promote` emite el step `interaction` con los `atMs` medidos.
 - Fecha V1.11: `2026-08-07` — hallazgos operativos verificados en TASK-1306 (cockpit SEO Overview): `fullPage` incompatible con superficies que tienen charts que miden su contenedor; `qualityProfile: 'standard'` como gate real (no adorno) y cómo leer su salida en el manifest; falso positivo conocido `layout_element_overflow` sobre tablas `sr-only`; `visual_timeout` en local suele ser compilación Turbopack; expiración de `.auth/storageState.json`. Ver § Delta 2026-08-07.
+- Fecha V1.12: `2026-09-06` — límite conocido del gate de accesibilidad (TASK-1835): axe manda a `incomplete` el contraste que no puede calcular sobre un fondo compuesto, y `analyzeAccessibility` corta con `violations: 0` sin emitir finding ni artefacto. El cero **no** acredita contraste. Ver § Delta 2026-09-06.
 - Owner: `Claude / Greenhouse frontend tooling`
 - Relacionado con:
   - `scripts/frontend/` (implementación canónica)
@@ -355,6 +356,7 @@ Append-only JSONL en `.captures/audit.jsonl`. Cada run agrega: timestamp, route,
 - **NUNCA** usar `scrollY` como unica forma de llegar a una sección estable si existe un selector posible.
 - **NUNCA** combinar `fullPage` y `clipSelector` en el mismo `mark`.
 - **NUNCA** usar `mark fullPage` en una superficie que renderiza charts que miden su contenedor (Recharts `ResponsiveContainer`, ApexCharts). El screenshot fullPage de Playwright redimensiona el viewport para hacer el stitch y el chart re-mide a tamaño 0 → la evidencia sale con las cards **vacías** y parece un bug de producto que NO existe (TASK-1306, 2026-08-07). Cubrir con el frame del viewport real + `clipSelector` por región; en mobile, `scroll` + un `mark` por zona.
+- **NUNCA** leer un `violations: 0` de axe como evidencia de **contraste** cuando el fondo detrás del texto es compuesto (degradado, imagen, pseudo-elemento, translucidez, `color-mix`): axe devuelve `color-contrast` en `results.incomplete` y el gate corta antes de mirarlo, así que no hay ni finding ni artefacto. Ese cero dice «no pude mirar». Medir sobre los píxeles de la captura (§ Delta 2026-09-06).
 - **NUNCA** cerrar una verificación visual mirando solo el PNG cuando el scenario declara `qualityProfile`. El diagnóstico vive en `manifest.qualityFindings[]` + `manifest.runtimeSummary`, no en el frame ni en el log de consola: hay clases enteras de defecto (excepciones de runtime, violaciones axe, overflow, targets <24px) que el ojo no ve.
 - **NUNCA** usar `mark fullPage` para LEER el detalle de una sección cuando la pantalla tiene un sidebar `position: fixed` — el stitch de fullPage repite el elemento fijo a cada altura de scroll y el escalado vuelve el texto ilegible (TASK-1006, 2026-06-04). Para leer detalle/copy: `data-capture` en la sección + `scroll selector` + `mark clipSelector` (crisp, resolución real). `fullPage` es para "ver el largo total", no para auditar detalle.
 - **NUNCA** committear `.captures/` ni `.auth/` — ambos en `.gitignore`.
@@ -688,3 +690,70 @@ Para una pantalla cuyo propósito es login, declarar además `quality.allowLogin
 la expectativa visual del scenario, no autentica. No fabricar cookies para satisfacer el capturador.
 Pruebas de selección/auth y launch verifican que no se propagan credenciales al browser anónimo.
 Caso ejecutado: `task1835-efeonce-id`, harness local con fixtures, 1440/390, sin acceso productivo.
+
+## Delta 2026-09-06 — el gate de accesibilidad no mide contraste sobre fondo compuesto (V1.12, TASK-1835)
+
+Límite conocido del gate, no un bug de una superficie. Se documenta acá porque **el punto ciego vive
+en el gate**: cualquier ruta de Greenhouse cuyo fondo detrás del texto no sea un color plano
+—degradado, imagen, pseudo-elemento, translucidez, `color-mix` sobre otra capa— recibe hoy un verde
+que no acredita contraste.
+
+### Qué pasa
+
+axe **no falla** el contraste que no puede calcular: lo manda a `results.incomplete` con
+«Element's background color could not be determined due to a pseudo element», **no** a
+`results.violations`. Y `analyzeAccessibility` (`scripts/frontend/lib/quality.ts:87`) corta antes:
+
+```ts
+const violations = results.violations
+
+if (!violations.length) return findings   // ← el incomplete muere acá
+```
+
+Con cero violaciones **no se emite finding y tampoco se escribe el artefacto `frames/<label>.axe.json`**
+—`writeAxeArtifact` sólo corre después de ese `return`—, así que `results.incomplete` queda
+**estructuralmente invisible**: no está en el manifest, no está en el log, no está en disco. No es
+que el operador no lo lea; es que no existe en la evidencia.
+
+### Medido dos veces, las dos con el gate en verde
+
+| Fecha | Superficie | Fondo | Resultado de axe | Realidad |
+|---|---|---|---|---|
+| 2026-07-25 | Globe share board | tres degradados apilados | `0 violations` · `color-contrast` incomplete en **22 nodos** | `--muted` movido **a propósito** muy por debajo de 4.5:1, con el token servido en el HTML |
+| 2026-09-06 | Efeonce ID (auth-server) | degradado + `::after` | `0 violations` en **40 capturas** · **24 filas de texto por página** en incomplete | texto real a **1.53:1** (aviso «Aplicación no verificada» del consentimiento) y a **3.28:1** (pie) |
+
+El caso de Globe fue una comprobación deliberada: se rompió el token y el gate siguió verde. El caso
+de Efeonce ID lo reportó el operador **mirando la pantalla** — la única capa que sí estaba midiendo.
+El canary de Globe ya imprime sus `incomplete` como «NO VERIFICADO MECÁNICAMENTE» por esta razón
+(`scripts/frontend/globe-share-board-canary.mjs:232-247`); es la mitigación local, no el arreglo.
+
+### Cómo se mide de verdad
+
+Leer el CSS no sustituye la medición: subir el árbol buscando `background-color` **salta el degradado**
+y aterriza en el `body`, que puede ser del color opuesto. El contraste no es propiedad del código sino
+del **par renderizado**. La única medición que ve lo que ve una persona es muestrear los píxeles de la
+captura alrededor de cada texto.
+
+Implementación de referencia: `scripts/auth-server/verify-contrast.mjs` (`pnpm auth-server:verify-contrast`)
+— **365 textos** en 18 pantallas × 2 viewports, 0 bajo el piso WCAG 1.4.3 (4.5:1 normal · 3:1 para
+≥24px o ≥18.66px bold). Está acotada al emisor por su lista de rutas: es el patrón a copiar, no una
+primitive compartida del GVC.
+
+**Dos trampas del propio medidor, ambas fallan hacia el falso verde** — quien copie el patrón las
+hereda si no las replica:
+
+1. **Muestrear fuera de la caja del texto** parece más limpio (ahí no hay glifos), pero en un botón
+   cae en la tarjeta que está detrás, no en el relleno del botón: daba «blanco sobre blanco» en cada
+   CTA. Se muestrea una rejilla **interior**.
+2. **Tomar el color más frecuente** de esa rejilla falla justo donde más importa: en un titular blanco
+   de 46px sobre azul **ganan los glifos** y vuelve el «blanco sobre blanco». El fondo es el más
+   frecuente **entre los que no se parecen al color del texto**.
+
+### Regla
+
+Un `violations: 0` de axe sobre fondo compuesto significa «no pude mirar», no «pasa». Mientras el gate
+no reporte `results.incomplete`, la superficie se trata como **no medida** y el cierre exige la
+medición sobre píxeles. Invariante domain-free en
+[`UI_PLATFORM_AGENT_INVARIANTS.md` § Contraste sobre fondo compuesto](agent-invariants/UI_PLATFORM_AGENT_INVARIANTS.md#contraste-sobre-fondo-compuesto-un-cero-de-axe-no-es-evidencia-task-1835-medido-2026-09-06);
+causa raíz de los dos defectos de Efeonce ID (una clase de texto compartida entre dos fondos opuestos)
+en [`PATTERNS.md` § Runtime sin React](ui-platform/PATTERNS.md#runtime-sin-react--shell-efeonce-id-task-1835).
