@@ -153,6 +153,7 @@ que el command gobernado lo devuelva. Un asset no previsto deja la corrida `bloc
 | 2026-09-07T01:43:51Z | `registrations=1`, `canary_bindings=1`, registro activo | drift externo/interno `0/0`; `smoke_profiles=32`; `smoke_in_person_360=0`                                                     | 7 `ok`; permanecen los 2 warnings históricos de 24 h, sin señal canary nueva                                              | 14 DCR; 2 profiles/links, 12 sesiones, 8 magic links, 2 passkeys, 5 challenges, 13 codes/consents, 18 refresh/access, 4 contexts y 3 grants; `unexpectedRefs=0`; no apply                         | `steady`; `deletionReady=false` sólo por actividad esperada durante la ventana             |
 | 2026-09-07T02:15:14Z | `registrations=1`, `canary_bindings=1`, registro activo | drift externo/interno `0/0`; `smoke_profiles=32`; `smoke_in_person_360=0`                                                     | 7 `ok`; permanecen los 2 warnings históricos de 24 h, sin señal canary nueva                                              | inventario sin cambios: 14 DCR, 2 profiles/links, 12 sesiones, 8 magic links, 2 passkeys, 5 challenges, 13 codes/consents, 18 refresh/access, 4 contexts y 3 grants; `unexpectedRefs=0`; no apply | `steady`; sin contaminación comercial ni cambio de frontera                                |
 | 2026-09-07T02:37:50Z | `registrations=1`, `canary_bindings=1`, registro activo | drift externo/interno `0/0`; `smoke_profiles=32`; `smoke_in_person_360=0`                                                     | E2E Playwright `1/1`; cinco consentimientos y dos familias Playwright revocados después del test                          | 19 DCR, 2 profiles/links, 17 sesiones, 13 magic links, 2 passkeys, 5 challenges, 18 codes/consents, 22 refresh/access, 4 contexts y 3 grants; `unexpectedRefs=0`; no apply                        | `steady`; sesiones activas `0`, `activeAuthCount=45`; artifacts diagnósticos inventariados |
+| 2026-09-07T03:05:09Z | `registrations=1`, `canary_bindings=1`, registro activo | drift externo/interno `0/0`; `smoke_profiles=32`; `smoke_in_person_360=0`                                                     | 7 `ok`; permanecen los 2 warnings históricos de 24 h, sin señal canary nueva                                              | 19 DCR, 2 profiles/links, 17 sesiones, 13 magic links, 2 passkeys, 5 challenges, 18 codes/consents, 22 refresh/access, 4 contexts y 3 grants; `unexpectedRefs=0`; no apply                        | `steady`; Cloud Run releído directo y ambos gates canary siguen ON                         |
 
 Control de gates a `2026-09-07T01:48:54.971Z`: Vercel Production `true`; el environment custom staging se
 encontró indebidamente en `true`, se corrigió a `false` y se redeployó sin mover Production. El primer
@@ -167,12 +168,15 @@ Readback de seguimiento a `2026-09-07T02:19:22Z`: `auth.efeonce.org/healthz` res
 `EXTERNAL_IDENTITY_CANARY_ENABLED=true` y cero overrides homónimos en `staging|production`; `vercel env pull`
 releyó Production `true` y staging `false`. El watchdog local no encontró errores, pero sus tres readers de
 GitHub quedaron `unknown` por ausencia de `GITHUB_RELEASE_OBSERVER_TOKEN`; no se presentan como verdes. La
-revisión Cloud Run exacta del gateway no pudo releerse directamente mientras la sesión local de Gcloud requiere
-reauth interactiva; permanece como evidencia vigente la última lectura acreditada, no como confirmación nueva.
+sesión local de Gcloud se renovó con el runner Playwright canónico a `2026-09-07T03:06:17Z`; CLI y ADC quedaron
+vigentes para `efeonce-group`. La lectura directa confirmó `auth-server-00043-ndg` y
+`efeonce-mcp-gateway-00044-4kj` con 100 % del tráfico, SHA exactos `fb5fc082aa92`/`8438c5fa87ed` y gates
+`EXTERNAL_IDENTITY_CANARY_ENABLED=true`/`MCP_NATIVE_EXTERNAL_CANARY_ENABLED=true`. El SHA del gateway coincide
+con `origin/main` y el SHA del auth-server resuelve al commit release.
 
 ## Registro de retiro
 
-- `dry_run_at`: `2026-09-07T02:37Z`, inspección post-Playwright y post-revocación; no es el preflight final de borrado
+- `dry_run_at`: `2026-09-07T03:05Z`, inspección de seguimiento post-Playwright y post-revocación; no es el preflight final de borrado
 - `dry_run_result`: `deletionReady=false`, `unexpectedRefs=0`, blockers esperados
   `registration_active|active_authority|active_auth`; 2 profiles/links, 5 invitaciones, 3 grants, 19 DCR,
   17 sesiones, 13 magic links, 2 passkeys, 5 challenges, 18 codes/consents, 22 refresh/access tokens y 4
