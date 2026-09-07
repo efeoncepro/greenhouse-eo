@@ -26,8 +26,9 @@ dos no, y no por falta de evidencia sino de mecanismo:
 - **Carga mínima**: `grep -rilE "load.?test|autocannon|k6|artillery"` sobre `scripts/`, `test/` y `.github/`
   de `efeonce-mcp` devuelve **cero**. No hay con qué medir — y el número a validar se movió solo cuando
   `maxScale` pasó de 5 a 20 sin que nadie midiera qué aguanta.
-- **Rollback**: documentado en el runbook, **nunca ejercitado**; la línea 646 trae el marcador `**[verificar]**`
-  literal, o sea el propio documento declara ese paso sin comprobar.
+- **Rollback**: TASK-1813 ejercitó después el rollback acotado de compatibilidad discovery
+  `1.2.0/00047 → 1.1.2/00046 → 1.2.0/00047`. Sigue faltando el rollback operacional general sobre la misma
+  superficie y junto al baseline de carga exigido por esta task.
 
 Ambos pasan a `TASK-1843`, que los ejecuta y devuelve el criterio tildado. Esta task conserva su ownership del
 criterio; no se duplica.

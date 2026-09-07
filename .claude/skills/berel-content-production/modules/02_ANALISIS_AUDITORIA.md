@@ -1,7 +1,7 @@
 # 02 · Análisis SEO/AEO y análisis de contenido (Fases 3 y 4)
 
 > Solo aplica a la **Modalidad A · Reescritura**. En Modalidad B no hay página publicada que
-> auditar: la arquitectura se **decide** en el `🧭 Plan editorial y SEO`
+> auditar: la arquitectura se **decide** en el `🧭 Plan editorial y SEO` privado
 > (→ [`01_CICLO_MENSUAL.md`](01_CICLO_MENSUAL.md), Fase B3).
 
 Para el **informe periódico dirigido a Berel**, cargar
@@ -25,8 +25,9 @@ escribir.**
 
 ## Fase 3 · Análisis SEO/AEO
 
-En la página del artículo, un encabezado desplegable 1 titulado `Análisis SEO/AEO` con un análisis
-profundo que cubra:
+En una tarea o página **privada de Efeonce**, crear un análisis profundo titulado `Análisis SEO/AEO`.
+Nunca insertarlo como toggle, callout o comentario dentro de la página del artículo compartida con Berel.
+Debe cubrir:
 
 - **Keyword** principal y secundarias; intención de búsqueda y volumen estimado.
 - **Title, meta description, H1–H3, slug/URL.**
@@ -64,13 +65,16 @@ titulada `Verificación en la URL publicada`, **con la fecha de auditoría**:
 
 ## Fase 4 · Análisis de contenido
 
-Otro encabezado desplegable 1 titulado `Análisis de contenido`, con el mismo rigor:
+En la misma superficie privada, agregar `Análisis de contenido`, con el mismo rigor:
 
 - **Estructura narrativa y arco**: apertura emocional → desarrollo → resolución → cierre → CTA.
 - **Ajuste a la guía de Voz y Tono**: acompañante experto, tuteo al lector, "nosotros" para la
   marca, léxico local → [`04_VOZ_Y_TONO_BEREL.md`](04_VOZ_Y_TONO_BEREL.md).
 - **Profundidad y vacíos** de contenido frente a la intención de búsqueda.
-- **Longitud** frente a la guía editorial (**900–1.200+ palabras**) y frente a la competencia.
+- **Coherencia encabezado → intención:** cada sección debe responder la pregunta de su encabezado. Marcar
+  contenido útil que pertenezca a otra intención para reubicarlo bajo un encabezado propio, no para eliminarlo.
+- **Longitud** frente al contrato editorial vigente (**3.000–5.000 palabras**, salvo excepción explícita del
+  formato/brief) y frente a la competencia. No sumar historia, metadatos ni versiones paralelas.
 - Presencia de **FAQ (4–6 preguntas)**, **tabla comparativa** y datos concretos.
 - Cierre con **recomendaciones priorizadas**.
 

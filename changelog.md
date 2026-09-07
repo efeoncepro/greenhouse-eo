@@ -7,6 +7,61 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-07 — Berel formaliza la revisión de comentarios y la costura editorial
+
+La skill espejo `berel-content-production` incorpora el delta completo del Playbook vivo: claridad antes que
+ingenio, una sección por intención, reubicación sin perder cobertura SEO/AEO, línea puente obligatoria, contenido
+evergreen sin etiquetas de temporada y un método de diez pasos para inventariar, evaluar, editar, responder y
+cerrar comentarios. `Atendido` queda separado de `resolved`: Efeonce prueba decisión/cambio + respuesta + readback,
+pero el cliente cierra el hilo. También se corrigieron los drifts locales de modalidad por `Enlace` y longitud
+histórica. `Aprendizajes del feedback` y `Recomendaciones Cliente` se actualizaron y releyeron en Notion; no se
+modificaron artículos, estados, comentarios ni Drupal.
+
+Una revisión posterior del artículo de herrería reveló un defecto grave en el propio contrato de la skill:
+procedencia, pendientes, specs visuales y notas CMS/Dev se mezclaban dentro del bloque que leía el cliente.
+La regla queda reemplazada por una sola `Versión vigente para revisión` con material aprobable/publicable;
+toda operación interna pasa a superficies privadas de Efeonce. Una fuga ahora es incidente centinela y exige
+barrido de la página completa. Se agregó un gate fail-closed para marcadores internos, lectura incompleta,
+múltiples versiones vigentes y pérdida de tabuladores en toggles. Los espejos Claude/Codex incluyen el mismo
+contrato, plantillas, antipatrones y validador. Esta actualización documental no demuestra que otros artículos
+estén limpios ni modifica Drupal.
+
+## 2026-09-07 — TASK-1813 despliega discovery OAuth nativo/base-only y ensaya rollback
+
+`efeonce-mcp` `1.2.0` deja Efeonce ID como único authorization server anunciado cuando el carril nativo está
+activo, fija el bootstrap en `efeonce.mcp.read` y entrega scopes adicionales por challenge 403. Retira el shim
+DCR/metadata AS del gateway, `OAUTH_PUBLIC_CLIENT_ID` y `MCP_REQUIRED_SCOPES` como controles de deploy, sin
+retirar validación Entra legacy ni modificar grants, providers o tool surface. El harness conductual pasa
+154/154 sin omitidos; CI `34162827740` construyó además el contenedor. El deploy manual `34162885950` dejó
+`cd229069` en `efeonce-mcp-gateway-00047-8b5` / `sha256:608a4789…b29e`, 100 % Ready. El canary productivo
+confirmó PRM root/path base-only, shim `404`, `/register` `404` y MCP anónimo `401`. El rollback movió 100 % a
+`00046-6n2`, reprodujo el contrato anterior, restauró 100 % a `00047-8b5` y repitió los asserts nuevos.
+Claude Code `2.1.263` refrescó con scope base único e invocó una lectura sin gasto. Codex `0.153.4` canary emitió
+un token CIMD externo sólo con `efeonce.mcp.read` y ejecutó status + lectura SEO sin gasto; Claude.ai repitió una
+lectura hospedada base-only con `no_entitlement` y uso cero. Claude Desktop `1.46388.4` y ChatGPT hospedado
+repitieron `get_seo_entitlement` post-cutover: respuesta visible `ok=true`, `no_entitlement`, allowance/presupuesto
+cero; sus familias renovaron con scope único y Cloud Run correlacionó `POST /mcp` 200 contra `00047-8b5`. En un
+flujo separado, `jreyes@efeoncepro.com` autenticó con Microsoft y llegó al consentimiento corporativo sólo para
+`Efeonce`; el code expiró sin intercambio, token ni dispatch. La autoridad interna multiorganización queda en
+TASK-1844/U19. No hubo cambios Entra ni widening. La skill MCP y sus referencias Claude/Codex quedaron alineadas
+con el rollout servido y ese límite. [Task y evidencia](docs/tasks/complete/TASK-1813-efeonce-mcp-oauth-client-interoperability.md).
+
+## 2026-09-07 — EPIC-044 asume entrada multiproducto y consentimiento por relying party
+
+La dirección descubierta en TASK-1834 dejó de ser un supuesto local de Greenhouse. El nuevo ADR Accepted
+`EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md` fija el contrato de EPIC-044: cada producto conserva
+URL, contexto, destino, sesión y autorización; una cohorte first-party habilitada redirige server-side al único
+login visible de Efeonce ID y puede usar fast path si la sesión satisface assurance. Sólo una clasificación
+`first_party_sign_in` registrada y server-owned omite consentimiento delegado para establecer identidad. MCP y
+terceros conservan consentimiento por cliente/scope, step-up, grants y tokens/audiencias propios.
+
+EPIC-044 y TASK-1829/1830/1831/1833/1834/1840/1841/1842 quedaron sincronizadas según su ownership; TASK-1834
+permanece como primer consumer Greenhouse y no como dueña de la policy transversal. Las skills MCP y Design
+Studio apuntan al ADR y preservan las prohibiciones de iframe, quinto provider, vestíbulo y contexto controlado
+por el browser. El ADR nativo anterior mantiene su historia y sólo agrega un delta fechado. Este cambio es
+documental: no implementa OIDC first-party, no cambia login, flags, datos ni runtime, y no hizo commit, push ni
+deploy.
+
 ## 2026-09-07 — TASK-1832: Claude Code y Claude.ai completan OAuth y lectura real
 
 La falla de Claude Code quedó atribuida a `2.1.186`: esa versión pedía el catálogo completo descubierto.
@@ -917,32 +972,3 @@ quedó en `CLAUDE.md`, `AGENTS.md`, el harness `implement-task`, `GREENHOUSE_OPE
 `TASK_UI_UX_ADDENDUM.md` documenta la severidad foco-vs-incidental de los gates de UI y el protocolo
 de contrato retroactivo. El `greenhouse-qa-release-auditor` suma tres defectos de gate nuevos y la
 regla de falsificar todo test contra su propio arreglo.
-
-## 2026-09-01 — barrido `stale-progress`: el registro se pone al día en 16 tasks
-
-12 de 16 dejaron de reportar el aviso. Ninguna cerró: ninguna estaba terminada. Se tildó solo lo que
-la evidencia respalda y se dejó por escrito la razón de cada criterio sin tildar.
-
-Tres defectos del propio detector, corregidos con test falsable: `stale-blocker` disparaba cuando el
-campo decía `none` seguido de la explicación que nombra al blocker cerrado; `ui-flow-contract` rompía
-el gate por deuda previa al tocar una task de `to-do` incidentalmente; y un commit de scope `docs`
-contaba como implementación. Se documentó por qué NO se filtran los `TASK-###` entre paréntesis.
-
-`TASK-1259` recibió wireframe y flow retroactivos, construidos desde el manual del runtime: estaba
-`in-progress` con UI ya implementada en el repo de WordPress y sin contratos declarados.
-
-## 2026-09-01 — DataForSEO ETV deja de ser una cifra sin versión
-
-El anuncio de ETV improved fue contrastado con la documentación pública y con siete consumers Greenhouse.
-Las skills DataForSEO/SEO, el dossier Labs, manuales y auditoría ahora distinguen legacy/improved,
-`use_improved_etv` de `include_clickstream_data`, y prohíben interpretar el cambio de modelo como performance.
-También se incorporó `dataforseo-operator` al gate de mirrors y se corrigieron sus pointers canónicos. No hubo
-cambio de runtime. Se registraron el ADR formula-aware, `TASK-1805` para la foundation, `TASK-1806` para
-evaluación/cutover, el runbook y un correo de diez preguntas en borrador/no enviado. El cutover queda bloqueado por
-aclaración del proveedor, foundation completa, shadow aprobado y decisión histórica antes del default anunciado
-para el 1-nov.
-[Auditoría](docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md).
-
-## 2026-09-01 — TeamBot completa el ciclo mensual del Performance Report
-
-Nexa publicó el resumen de agosto en `EO Team` con cuatro menciones verificadas y envió cuatro lecturas personales 1:1, todas auditadas como `succeeded`. El runbook, la arquitectura, el manual y las skills espejadas ahora exigen separar cifras de interpretación: volumen no prueba sobrecarga, los atrasos heredados se contextualizan y una muestra de onboarding no se presenta como tendencia. También fijan la jerarquía de evidencia para menciones y el uso de Object ID Entra revalidado cuando un correo escrito contiene un typo. [Evidencia y límites](docs/audits/communications/2026-09-01-performance-report-teambot.md).

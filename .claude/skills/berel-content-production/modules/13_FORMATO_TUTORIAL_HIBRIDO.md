@@ -29,12 +29,12 @@ Antes de redactar, completar [el control técnico](../templates/control-tecnico-
 
 ## Dónde vive en Notion
 
-En la misma página del Content Hub, al final:
+En la misma página del Content Hub, como única zona activa:
 
-`🔁 Reescritura en formato Tutorial (híbrido) — [Artículo]`
+`✍️ Versión vigente para revisión — Tutorial híbrido`
 
-No crear subpágina. No borrar Brief/Plan ni V1. Identificar una única revisión vigente y rotular
-las anteriores como historial. Corregir la revisión propia vigente sólo cuando el operador autorice
+No crear subpágina. No borrar versiones anteriores: rotularlas como `Histórico`. El Brief/Plan y las
+notas de implementación viven en el sistema privado de Efeonce. Corregir la revisión propia vigente solo cuando el operador autorice
 el ajuste, con lectura fresca y reemplazos acotados; nunca sobrescribir originales ajenos.
 Una referencia eliminada/archivada no se restaura automáticamente: resolver la página vigente.
 
@@ -49,33 +49,32 @@ ranking son evidencia contextual, no promesa de resultado.
 
 ## Estructura obligatoria del híbrido
 
-1. **Callout de procedencia**
-   - por qué es híbrido;
-   - referencia de formato;
-   - regla una intención = una URL;
-   - notas de carga CMS.
-2. **Metadatos en viñetas**
+La versión vigente del híbrido es una **zona de lectura del cliente**. Contiene solo el contenido
+aprobable/publicable; la procedencia, la justificación del formato, las notas CMS y los pendientes viven en
+el sistema privado de Efeonce.
+
+1. **Metadatos en viñetas**
    - title;
    - meta description;
    - slug;
-   - schema recomendado: `Article`, `FAQPage`, `BreadcrumbList`; `HowTo` cuando el Paso a Paso
-     cumple la estructura visible.
-3. **Intro corta**
+2. **Intro corta**
    - subtítulo/promesa;
    - cápsula autocontenida de 20–25 palabras;
    - gancho breve con producto/datos verificados.
-4. **Paso a Paso — 4 pasos**
+3. **Paso a Paso — 4 pasos**
    - `1. Limpieza y preparación de la superficie`
    - `2. Aplicación de sellador`
    - `3. Primera capa`
    - `4. Segunda capa y revisión del acabado`
-5. **Productos Berel**
-6. **Materiales y Herramientas**
-7. **Colores sugeridos**
-8. **Preguntas frecuentes**
-9. **Toques finales + BerelTip de Don Bere**
-10. **Cierre**
-11. **Callout ⚠️ de pendientes**
+4. **Productos Berel**
+5. **Materiales y Herramientas**
+6. **Colores sugeridos**
+7. **Preguntas frecuentes**
+8. **Toques finales + BerelTip de Don Bere**
+9. **Cierre**
+
+La tarea privada de implementación conserva el schema recomendado: `Article`, `FAQPage`,
+`BreadcrumbList` y `HowTo` cuando el Paso a Paso cumple la estructura visible.
 
 El corte de 4 pasos es el canónico del template actual. Solo se cambia si el cliente/template lo
 pide explícitamente. Son **macropasos de presentación, no sólo cuatro operaciones**. No eliminar
@@ -98,7 +97,7 @@ como “cualquier mancha sale” sin respaldo.
 
 ## Fotos 📸 del Paso a Paso
 
-Antes de cada paso insertar un callout `📸 Foto del paso N` con:
+En la tarea privada de la secuencia, crear una fila `Foto del paso N` por cada paso con:
 
 - descripción literal de lo que debe verse;
 - archivo `.webp` descriptivo, minúsculas y guiones;
@@ -106,12 +105,13 @@ Antes de cada paso insertar un callout `📸 Foto del paso N` con:
 - `loading="lazy"`;
 - ALT literal entre comillas;
 - proporción 1:1;
-- medida CMS final pendiente de Dev cuando aplique.
+- medida CMS final; si falta confirmación, registrar el bloqueo en la tarea privada.
 
 Para diseño, la entrega de cada foto es **1:1 de 500 px**, sin texto, logo ni gráficos adicionales.
 Todas las fotos deben compartir espacio, luz y muro para continuidad visual.
 
-🔴 Estas fotos **no son** los banners N1–N4.
+🔴 Estas fotos **no son** los banners N1–N4. La versión que revisa el cliente no muestra briefs,
+archivos, ALT, medidas ni instrucciones de implementación intercaladas entre los pasos.
 
 ## Tarea única de diseño para la secuencia
 
@@ -155,7 +155,8 @@ La tarea replica la **Ficha Tutoriales** y debe incluir:
 - notas generales;
 - tabla `Paso · Nombre de archivo · Descripción · Referencia visual · Notas para diseño`.
 
-Las descripciones se copian de los callouts 📸 del híbrido. No se reescriben.
+Las descripciones se redactan y gobiernan en esta tabla. Si hace falta comprobar la ubicación, se anclan
+al número y título del paso; no se copian a un callout dentro del híbrido.
 
 ## Bloque `Tutorial Contenido` en Drupal
 
@@ -169,7 +170,8 @@ Tabla:
 `Producto · Dónde va · Dato clave de ficha · Enlace`
 
 - URL solo si está verificada;
-- si falta: `URL de ficha por definir (pendiente)`;
+- si falta una URL pública, usar una categoría verificada o dejar el producto sin enlace en el texto;
+  registrar el pendiente solo en el sistema privado;
 - nunca inventar una ruta.
 
 ### Materiales y Herramientas
@@ -219,9 +221,8 @@ CTA nunca al Home.
 
 ## Banners heredados del V1
 
-Los banners del artículo original **viajan completos** al híbrido.
-
-Cada callout 🖼️ conserva:
+Los banners del artículo original conservan su especificación completa en las tareas visuales asociadas al
+híbrido. Cada ficha conserva:
 
 - número/rol;
 - ubicación exacta;
@@ -236,16 +237,14 @@ Cada callout 🖼️ conserva:
 - lazy sí/no;
 - anti banner-blindness.
 
-🔴 No usar un puntero tipo “ver ficha en V1”.
+🔴 No usar un puntero tipo “ver ficha en V1” dentro de una tarea que deba ser autosuficiente. Tampoco
+copiar la ficha ni sus instrucciones a la versión que lee el cliente.
 
 ### Fuente única de verdad
 
-ALT + archivo + posición se conservan iguales entre:
-
-- revisión vigente del híbrido;
-- subtarea de banner/fotos;
-- notas para Dev;
-- cada par social afectado (tarea + subítem), según su canal.
+ALT + archivo + posición se conservan iguales entre la subtarea de banner/fotos, las notas privadas para
+Dev y cada par social afectado (tarea + subítem), según su canal. La revisión vigente conserva la sección
+editorial de destino o el arte final, no la especificación operativa.
 
 El V1 preservado puede contener datos supersedidos: marcarlo como historial, no exigir modificarlo
 para fingir paridad. Si cambia el corte o un dato, registrar la adaptación y copiar desde la revisión
@@ -293,17 +292,19 @@ Un cambio como N29 Berelinte → Berelex Semibrillante no se ejecuta con reempla
 - [ ] Híbrido vive en la misma página del Content Hub
 - [ ] Metadatos no se reinventaron
 - [ ] 4 pasos canónicos o excepción documentada
-- [ ] 1 foto 📸 por paso
+- [ ] 1 foto 📸 por paso, especificada en la tarea privada y no dentro de la lectura
 - [ ] Fotos ≠ banners
 - [ ] Tarea única de secuencia creada solo después del híbrido
 - [ ] La tarea tiene `Tipo de pieza = Estatico` y `Canal de pieza = Blog`, releídos; no dividirla por foto
 - [ ] Productos/Materiales/Colores mapeados a `Tutorial Contenido`
 - [ ] Ningún `/search?q=`
 - [ ] FAQ visible = schema
-- [ ] Banners heredados copiados completos
+- [ ] Banners heredados conservados completos en sus tareas visuales
 - [ ] ALT/archivo/posición mantienen paridad
-- [ ] Pendientes propios del formato declarados
+- [ ] Pendientes propios del formato declarados en el sistema privado, sin disclaimers en la página del cliente
 - [ ] Cambio de producto conciliado con cada destino o pendiente de distribución explícito
 - [ ] Assets existentes revisados o declarados no verificados; no confundir brief con arte
-- [ ] Segunda lectura fresca confirma contenido, tarea, relaciones, responsables, fechas y estado
+- [ ] Una sola versión vigente; procedencia, specs, QA, CMS/Dev y pendientes ausentes de toda superficie del cliente
+- [ ] Gate `client-visible-copy-gate.mjs` y lectura humana de cliente aprobados sobre export fresco
+- [ ] Segunda lectura fresca confirma contenido, jerarquía/tabuladores, tarea, relaciones, responsables, fechas y estado
 - [ ] Control técnico adjunto con evidencia; estos checks no se tildan por cumplir sólo la plantilla

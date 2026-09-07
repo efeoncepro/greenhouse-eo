@@ -5,7 +5,7 @@
 - Runtime inspeccionado: `https://mcp.efeonce.org/mcp`.
 - Código inspeccionado: checkout compartido `../efeonce-mcp`, HEAD `58517f00e550748e271c9b2138970d32290e0c80`, limpio al comprobarlo. Este SHA identifica código local, **no acredita la revisión desplegada**.
 - Cliente observado: Codex CLI `0.152.0`, distribuido en `/Applications/ChatGPT.app/Contents/Resources/codex`.
-- Seguimiento: [TASK-1813](../tasks/to-do/TASK-1813-efeonce-mcp-oauth-client-interoperability.md).
+- Seguimiento: [TASK-1813](../tasks/complete/TASK-1813-efeonce-mcp-oauth-client-interoperability.md).
 
 ## Conclusión
 

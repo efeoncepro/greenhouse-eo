@@ -27,29 +27,23 @@ La propiedad `Formato` decide **la estructura CMS**, no si la pieza es nueva o r
 
 ## 1 · Orden canónico dentro de la página del Content Hub
 
+La página compartida con Berel conserva historia y una sola zona activa de lectura. Los análisis, briefs,
+decisiones SEO, discrepancias, pendientes y handoff CMS se producen en una tarea/página privada de Efeonce;
+no se agregan como toggles al Content Hub del cliente.
+
 ### Modalidad A
 
-1. `Contenido anterior del artículo`
-2. `Análisis SEO/AEO`
-3. `Análisis de contenido`
-4. `✍️ Reescritura V1`
-5. Si `Formato = Tutorial`: `🔁 Reescritura en formato Tutorial (híbrido) — [Artículo]`
+1. `🗂️ Histórico — Contenido anterior del artículo`, si existe.
+2. `✍️ Versión vigente para revisión`.
+3. Si `Formato = Tutorial`, el híbrido sustituye la zona activa; la versión previa pasa a `Histórico`.
 
 ### Modalidad B
 
-Si la pieza se investiga desde cero:
+1. `✍️ Versión vigente para revisión`.
+2. Si `Formato = Tutorial`, el híbrido se convierte en esa única versión activa.
 
-1. `🧭 Plan editorial y SEO`
-2. `✍️ Artículo V1`
-3. Si `Formato = Tutorial`: híbrido al final
-
-Si ya llega con brief aguas arriba:
-
-1. `📋 Brief SEO/AEO — [tema]`
-2. `✍️ Artículo V1`
-3. Si `Formato = Tutorial`: híbrido al final
-
-🔴 No duplicar `Plan editorial y SEO` si ya existe `📋 Brief SEO/AEO`.
+El `🧭 Plan editorial y SEO` o `📋 Brief SEO/AEO` vive en el sistema privado. No duplicarlo si ya
+existe aguas arriba y nunca copiarlo a la página compartida como material de trabajo.
 
 ## 2 · Fase 1 — Identificar el lote
 
@@ -63,7 +57,7 @@ Si ya llega con brief aguas arriba:
 ## 3 · Fase 2 — Rescatar contenido anterior (solo A)
 
 - Abrir una URL a la vez con extracción completa.
-- Agregar `Contenido anterior del artículo` sin borrar ni modificar lo previo.
+- Preservar el contenido anterior sin modificarlo y rotularlo `Histórico`.
 - Esa copia es texto plano: no sirve para afirmar enlaces, ALT, `title`, jerarquías o schema.
 
 ## 4 · Fases 3 y 4 — Análisis
@@ -77,9 +71,10 @@ Regla central: todo hallazgo técnico se verifica contra HTML/URL viva y termina
 
 → `03_REDACCION_ARTICULO.md`
 
-Al terminar el V1:
+Al terminar la versión:
 
-- mover Content Hub a `En revisión`;
+- releer la página completa como cliente y ejecutar `client-visible-copy-gate.mjs` sobre un export fresco;
+- mover Content Hub a `En revisión` solo si esos gates pasan;
 - si `Formato = Artículo`, continuar a producción visual;
 - si `Formato = Tutorial`, **todavía no crear la tarea de fotos de pasos**: primero producir el
   híbrido con `13_FORMATO_TUTORIAL_HIBRIDO.md`.
@@ -92,7 +87,7 @@ Antes de idear:
 
 - buscar qué pidió el cliente en Teams;
 - buscar fichas/material oficial en SharePoint;
-- registrar literalmente el pedido y los assets pendientes;
+- registrar literalmente el pedido y los assets pendientes en el sistema privado;
 - no declarar que algo “no existe” solo porque no apareció en un listado paginado.
 
 ### B2 · Decidir el ángulo

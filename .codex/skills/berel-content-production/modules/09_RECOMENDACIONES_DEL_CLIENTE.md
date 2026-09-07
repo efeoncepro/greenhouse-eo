@@ -25,7 +25,7 @@ resuelvas en silencio a favor del documento más viejo.
   persona por SEO/AEO.
 - 🔴 **Nada de lenguaje interno en el cuerpo público.** Retirar `el cliente`, instrucciones recibidas,
   posicionamiento editorial, referencias a extracción/CMS/verificación y fórmulas como `la ficha
-  declara`. Esas evidencias pertenecen a procedencia, datos verificados y pendientes internos.
+  declara`. Esas evidencias pertenecen al registro privado de procedencia, datos verificados y pendientes.
 - **Dos objetos distintos:** `ficha técnica` es el documento técnico; `página pública del producto` es
   la URL de berel.com. No usar una expresión ambigua para ambos.
 
@@ -46,9 +46,11 @@ resuelvas en silencio a favor del documento más viejo.
   ("los tonos terracota (Huarache)").
 - **Color del Año Berel:** **2026 = Pitaya 2-3605D** · **2025 = Maíz 2-1403T**. Al recomendarlos,
   destacar **en voz de marca** que es *nuestro* Color del Año.
-- **Paletas de temporada:** **no mencionar los meses exactos de vigencia** en el cuerpo. Referirlas
-  por su relación con el Color del Año ("la última paleta de temporada de nuestro Color del Año
-  2026, Pitaya 2-3605D"). Crea expectativa del siguiente color y **mantiene el contenido evergreen**.
+- **Paletas y cuerpo evergreen — regla actualizada el 2026-09-07:** no mencionar meses, vigencia,
+  trimestre ni etiquetas como `última paleta de temporada`, `paleta vigente` o `temporada actual`.
+  Nombrar los colores por nombre + código, sin convertir su temporada en atributo permanente. Una página
+  hija temporal puede nombrar su paleta/año cuando esa sea la intención explícita. La redacción histórica
+  que recomendaba “la última paleta de temporada…” queda **superada** por esta petición posterior.
 - **Garantía de 10 años:** la indicación histórica de mayo de 2026 pedía llamarla **"nueva garantía"**
   para el producto de ese anuncio. No extenderla a todas las líneas; confirmar variante, vigencia,
   términos y fuente antes de citar años. “Calidad” y “garantía” no son sinónimos.
@@ -107,7 +109,7 @@ quedó desactualizada en ese punto y hay que corregirla en Notion.
   (2700–3000 K)*, *luz neutra (4000 K)* y *luz fría (5000 K o más)*. Los watts indican consumo,
   nunca temperatura o calidez. La fórmula repetida de forma idéntica mejora la extracción AEO.
 
-### Correcciones permanentes del 3–4 de septiembre de 2026
+### Correcciones permanentes del 3–4 y 7 de septiembre de 2026
 
 - **Producto nuevo o de awareness:** lectura simple; no asumir posicionamiento ni usar por defecto
   `Guía [Producto]` en title/H1; el diferenciador indicado en el brief es el mensaje central y aparece
@@ -120,13 +122,23 @@ quedó desactualizada en ese punto y hay que corregirla en Notion.
 - **Tablas:** encabezados semánticos como `Especificación` / `Dato`; en comparativas, cada columna nombra
   el producto. Un criterio exclusivo de una alternativa —por ejemplo, garantía— se explica fuera.
 - **CTA:** toda recomendación de consultar a un especialista lleva un anchor descriptivo a `/contacto`.
-- **Datos faltantes:** retirar del cuerpo público, registrar en callout interno `⚠️` y solicitar fuente
-  oficial. No publicar el disclaimer ni explicar al lector el proceso de verificación.
+- **Datos faltantes:** retirar del cuerpo público, registrar en el sistema privado de Efeonce y solicitar
+  fuente oficial. No publicar el disclaimer, explicar el proceso ni dejar el pendiente en un callout de la
+  página compartida.
 - **Español de México, literal y simple:** `pintura en buen estado`, `ajusta el horario`, `haz el cálculo
   exacto`, describir aplicación con cubeta/brocha/rodillo y decir `que la pintura se desprenda o
   descarapele`. Evitar `pintura sana`, `muévele la hora`, `la cuenta fina`, `aplicados en frío`, `que la
   pintura pele` y frases literarias que obliguen a interpretar.
 - **Firma confirmada:** `Pinta con Confianza. Pinta con Berel.`
+- **Claridad antes que ingenio:** todo remate o frase compacta debe entenderse a la primera lectura. Si
+  exige releerse, se reescribe en lenguaje directo.
+- **Una sección, una intención:** cada sección responde a su encabezado. El contenido de otra intención se
+  reubica bajo un encabezado propio para preservar claridad y cobertura SEO/AEO; no se elimina.
+- **Costura obligatoria:** todo bloque reubicado lleva una línea puente que lo conecte con la sección anterior.
+- **Sustancia, no literalidad:** una redacción sugerida por el cliente se valida contra léxico, evidencia e
+  hilo conductor; no introducir `ideal` u otro comodín vetado por aceptar la frase al pie de la letra.
+- **Comentarios:** Efeonce inventaría, atiende y responde cada hilo, pero no lo marca como resuelto. El
+  procedimiento y sus estados operativos viven en el módulo 18.
 
 ### ⚠️ Choque 2 — cuánta metáfora aguanta el texto
 
@@ -236,5 +248,7 @@ los textos no afectados. La preferencia de producto no valida prestaciones ni ot
 
 - Voz, arco y léxico (lo que estas peticiones refinan) → [`04_VOZ_Y_TONO_BEREL.md`](04_VOZ_Y_TONO_BEREL.md)
 - Cómo se aplica al redactar → [`03_REDACCION_ARTICULO.md`](03_REDACCION_ARTICULO.md)
+- Cómo se atienden los comentarios sin apropiarse del cierre del cliente →
+  [`18_REVISION_COMENTARIOS_CLIENTE.md`](18_REVISION_COMENTARIOS_CLIENTE.md)
 - Tagging de productos y aviso de carga → [`08_PUBLICACION_CMS_DRUPAL.md`](08_PUBLICACION_CMS_DRUPAL.md)
 - CTA y cortinillas en piezas sociales → [`06_DERIVADOS_SOCIALES.md`](06_DERIVADOS_SOCIALES.md)

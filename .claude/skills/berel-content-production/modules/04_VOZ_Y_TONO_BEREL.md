@@ -41,6 +41,10 @@ desarrollan en clave técnica (cómo, cuánto, con qué) y cierran de nuevo en e
 transición debe ser suave:** el dato técnico siempre va envuelto en lenguaje cálido y conectado con
 el motivo emocional de la pieza.
 
+Si un bloque se reubica porque respondía otra intención, el encabezado nuevo no basta: agregar una
+**línea puente** que lo conecte con la sección anterior. Cada sección debe cumplir la promesa de su
+encabezado; una costura ausente hace que el bloque siga sintiéndose insertado aunque esté mejor clasificado.
+
 ## El arco de cinco tiempos
 
 No es plantilla rígida: es la columna vertebral que hace que una pieza "se sienta Berel".
@@ -69,10 +73,11 @@ el lector sienta un recorrido y no bloques sueltos.
 para la voz de Berel ("nuestro catálogo", "nuestro artículo"). Lo que se evita es **dirigirse al
 lector en "nosotros"**, no la primera persona de marca.
 
-🔴 **El texto público no narra el proceso interno.** Efeonce, `el cliente`, instrucciones recibidas,
-posicionamiento editorial, CMS, extracción y verificaciones quedan en callouts internos. En público,
-Berel afirma lo respaldado directamente. Distinguir siempre **ficha técnica** (documento) de **página
-pública del producto** (URL de berel.com).
+🔴 **La superficie del cliente no narra el proceso interno.** Efeonce, `el cliente`, instrucciones
+recibidas, posicionamiento editorial, CMS, extracción y verificaciones quedan en el sistema privado de
+Efeonce, nunca en callouts/toggles de la página compartida. En público, Berel afirma lo respaldado
+directamente. Distinguir siempre **ficha técnica** (documento) de **página pública del producto** (URL de
+berel.com).
 
 ## Anatomía del artículo
 
@@ -174,6 +179,12 @@ cálido, fresco, auténtico.
 🔴 **Palabras vetadas como comodín sin dato detrás:** *ideal · perfecto · impecable · profesional ·
 la mejor opción*.
 
+### Prueba anti-ingenio
+
+La frase breve no gana por sonar ingeniosa si obliga a descifrarla. Leer cada remate en voz alta: si
+requiere una segunda pasada para entenderse, reescribirlo en llano. Esto aplica también a una propuesta
+literal del cliente: se toma la sustancia y se vuelve a validar contra voz, léxico e hilo conductor.
+
 ### Léxico mexicano (usar / evitar)
 
 Usa el término local y evita el que no es común en MX:
@@ -251,6 +262,10 @@ detectadas al auditar un texto que "sonaba bien":
 | Superlativos encubiertos | "La que más rinde", "la mejor relación": comparaciones sin dato. **Sustituir por un hecho verificable** |
 | Dosis del nombre del producto | El nombre completo va **una sola vez**; después "la pintura", "el esmalte". **Contarlo antes de cerrar, incluido el CTA** |
 | Definición extractable | Secciones que abren con un fragmento suelto en vez de **una frase que se pueda citar sola** |
+| Primera lectura | Un remate compacto exige releerse para entenderse; **claridad antes que ingenio** |
+| Encabezado e intención | La sección promete resistencia, pero desarrolla color, precio u otra pregunta |
+| Costura | El contenido se movió bajo un encabezado propio, pero falta una línea puente desde la sección anterior |
+| Feedback literal | La frase sugerida introduce una palabra vetada o rompe el hilo; **tomar la sustancia, no la letra** |
 
 ### El cierre mecánico: lo que se revisa con grep, no a ojo
 
@@ -273,7 +288,7 @@ releyendo.
 | **5 · Enlaces prohibidos** | `grep -nE "/search\|\?q=" ARCHIVO` | Cualquier hallazgo es falla: `robots.txt` bloquea esas rutas |
 | **6 · Dosis del nombre de producto** | `for p in Berelinte "Kalos Tone" "Multitono Pro" Insignia "Esmalte Summa" Berelex; do echo -n "$p: "; grep -oi "$p" ARCHIVO \| wc -l; done` | El nombre completo va **una sola vez** y después "la pintura" o "el esmalte". ⚠️ **Descuenta las apariciones dentro de una URL y dentro de una tabla de datos** — una fila comparativa no es repetición promocional. Cuenta las visibles en prosa |
 | **7 · Extensión real del cuerpo** | El conteo debe **excluir callouts, tablas y el bloque de metadatos** | Con `wc -w` sobre el archivo completo el resultado **miente**: infla el número y te hace creer que llegaste al piso |
-| **8 · Lenguaje interno expuesto** | `grep -niE "el cliente\|instrucción del cliente\|posicionamiento editorial\|la ficha declara\|extracción\|CMS" ARCHIVO` | Revisar cada hallazgo; cualquiera que narre la operación interna dentro del cuerpo público es falla |
+| **8 · Lenguaje interno expuesto** | `grep -niE "el cliente\|instrucción del cliente\|posicionamiento editorial\|la ficha declara\|extracción\|CMS" ARCHIVO` | Revisar cada hallazgo; cualquiera que narre la operación interna en una superficie del cliente es falla. Aplicar además `client-visible-copy-gate.mjs` sobre la página fresca completa |
 | **9 · Giros corregidos por el cliente** | `grep -niE "pintura sana\|muévele la hora\|la cuenta fina\|aplicados en frío\|pintura pele\|formulación premium" ARCHIVO` | Sustituir por lenguaje literal es-MX o retirar el claim; no son fórmulas públicas aprobadas |
 
 **10 · Lo que se verifica mirando, porque ningún grep lo ve:**
@@ -323,6 +338,9 @@ grep -niE "pintura sana|muévele la hora|la cuenta fina|aplicados en frío|pintu
 - [ ] Gancho con micro-escena que nombra el deseo o miedo del lector
 - [ ] Respuesta directa (TL;DR) en las primeras líneas
 - [ ] Hilo conductor declarado y sostenido hasta el cierre
+- [ ] Cada sección responde solo a la intención de su encabezado
+- [ ] Todo bloque reubicado tiene encabezado propio y línea puente
+- [ ] Remates y frases compactas se entienden en la primera lectura
 - [ ] Tuteo al lector y "nosotros/nuestro" solo para la voz de marca
 - [ ] Sin lenguaje de cliente/agencia/CMS/verificación dentro del cuerpo público
 - [ ] Definición extractable al abrir cada sección
@@ -344,6 +362,8 @@ grep -niE "pintura sana|muévele la hora|la cuenta fina|aplicados en frío|pintu
 ## Cross-links
 
 - Cómo se aplica al redactar → [`03_REDACCION_ARTICULO.md`](03_REDACCION_ARTICULO.md)
+- Cómo se revisan y responden comentarios del cliente →
+  [`18_REVISION_COMENTARIOS_CLIENTE.md`](18_REVISION_COMENTARIOS_CLIENTE.md)
 - Cómo modula por red social → [`06_DERIVADOS_SOCIALES.md`](06_DERIVADOS_SOCIALES.md)
 - 🔴 **Peticiones del cliente que refinan y en dos puntos corrigen esta guía** →
   [`09_RECOMENDACIONES_DEL_CLIENTE.md`](09_RECOMENDACIONES_DEL_CLIENTE.md)

@@ -1,5 +1,13 @@
 # TASK-1840 — Efeonce ID: logout multiproducto y revocación coordinada de sesiones
 
+## Delta 2026-09-07 — relación con entry y consentimiento por RP
+
+`docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md` confirma el aislamiento que esta
+task implementará: cada RP conserva sesión/logout propios aunque comparta la sesión SSO del issuer. Omitir
+consentimiento en un first-party sign-in no convierte el logout en revocación de consentimiento; los consents MCP
+y de terceros permanecen hasta su operación explícita. Esta task sigue siendo la dueña exclusiva de `sid`,
+RP-Initiated/Back-Channel Logout y fan-out; el ADR de entry no declara ninguna de esas piezas implementada.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -84,6 +92,7 @@ debe quedar enterrado dentro de TASK-1834, que sólo adopta Efeonce ID en Greenh
 Revisar y respetar:
 
 - `docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`
+- `docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md`
 - `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`
 - `docs/architecture/EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`
 - `docs/architecture/GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`
@@ -101,6 +110,7 @@ Reglas obligatorias:
    rollback propios. Nunca se comparte una cookie entre `auth.efeonce.org`, Greenhouse y Globe.
 3. Logout, revocación OAuth, revocación de consentimiento, baja de membresía, cambio de entitlements y
    desactivación de credenciales son operaciones distintas. Una no implica otra salvo contrato explícito.
+   La excepción first-party de presentación nunca revoca ni concede consents MCP/terceros.
 4. `gv`, roles, vistas, módulos, workspaces, capacidades, créditos y derechos no versionan sesiones. No se
    incrementan ni revocan para simular logout.
 5. Un cierre nunca une permisos de relaciones internas, externas o multiorganización. El `sid` identifica una

@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Especificación. El gateway sirve en producción; la revisión, el SHA, el tráfico y la capacidad deben resolverse al ejecutar la task. Snapshot 2026-09-07T12:20:25Z: efeonce-mcp-gateway-00046-6n2 Ready/100 % y SHA igual a origin/main. No existe mecanismo de prueba de carga en el repo hermano — grep de load-test/autocannon/k6/artillery sobre scripts, test y .github devuelve cero — y el rollback está documentado sin ejercitar, con el marcador [verificar] literal en el runbook.`
+- Status real: `Especificación. El gateway sirve en producción; la revisión, el SHA, el tráfico y la capacidad deben resolverse al ejecutar la task. TASK-1813 ejercitó el rollback de compatibilidad discovery 1.2.0/00047 → 1.1.2/00046 → 1.2.0/00047. Esta task permanece abierta porque no existe mecanismo de prueba de carga en el repo hermano — grep de load-test/autocannon/k6/artillery sobre scripts, test y .github devuelve cero — y falta el rollback operacional general sobre la misma superficie junto a ese baseline.`
 - Rank: `TBD`
 - Domain: `platform|ops`
 - Blocked by: `none`

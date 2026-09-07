@@ -64,8 +64,10 @@ El dry-run posterior a ChatGPT conserva `unexpectedRefs=0` y agrega el DCR hospe
 `19` codes/consents, `25` access/refresh tokens, `18` sesiones, `14` magic links, `2` passkeys, `5` challenges y
 `4` contexts. Los únicos blockers siguen siendo los deliberados de la ventana
 `registration_active|active_authority|active_auth`. TASK-1832 continúa en observación hasta completar siete
-días, ejecutar cleanup/readback cero desde `2026-09-13T19:43:30Z` y apagar ambos gates. Claude Code sigue
-fail-closed en `TASK-1813`; Claude Desktop/web no está certificado.
+días, ejecutar cleanup/readback cero desde `2026-09-13T19:43:30Z` y apagar ambos gates. TASK-1813 cerró después
+el hardening `1.2.0` y la matriz post-cutover: Claude Code, Codex, Claude.ai, Claude Desktop y ChatGPT quedaron
+verdes base-only. TASK-1832 permanece abierta sólo por observación, cleanup/readback cero y gates OFF; esa
+certificación no acredita un cliente real ni autoridad multiorganización.
 
 ## Delta 2026-09-06 — producción activa, Codex verde y retiro programado
 
@@ -229,7 +231,7 @@ organización cliente real, sí**.
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-044`
-- Status real: `Rollout productivo activo y en observación. Greenhouse/Vercel y auth-server 00043-ndg sirven fb5fc082aa92; gateway v1.1.2, SHA 171965c99034, revisión 00046-6n2, sirve 100 % y ambos gates canary están ON. M365 y Gmail autorizado, sesión, passkey Chrome/Safari, helper OAuth, E2E Playwright 1/1, Codex, ChatGPT hospedado, Claude Code 2.1.263, Claude.ai y Claude Desktop 1.46388.4 están verificados. ChatGPT rotó refresh dos veces; Claude Code y Claude.ai rotaron una vez post-TTL, siempre base-only. Desktop ejecutó la lectura desde la app nativa sobre el conector remoto. El probe JSON vacío ya responde 401/400 canónico en vez de 500. La fila Claude Code 2.1.186 permanece FAIL histórico. La muestra live más reciente vive en el manifest: 2026-09-07T12:09:54Z, unexpected_refs=0, sin contaminación 360/comercial ni drift nuevo. La matriz cliente está completa; faltan siete días, cleanup/readback cero y apagar ambos gates.`
+- Status real: `Rollout productivo activo y en observación. Greenhouse/Vercel y auth-server 00043-ndg sirven fb5fc082aa92; TASK-1813 actualizó el gateway a v1.2.0, SHA cd229069, revisión 00047-8b5, 100 % Ready; ambos gates canary siguen ON. M365 y Gmail autorizado, sesión, passkey Chrome/Safari, helper OAuth, E2E Playwright 1/1, Codex, ChatGPT hospedado, Claude Code 2.1.263, Claude.ai y Claude Desktop 1.46388.4 están verificados. La matriz post-cutover está completa: ChatGPT conserva cuatro access/refresh, tres rotados y uno activo; Desktop seis access/refresh, cinco rotados y uno activo; ambos base-only y con lectura sin gasto. El probe JSON vacío responde 401/400 canónico. La fila Claude Code 2.1.186 permanece FAIL histórico. La muestra run-owned más reciente del manifest conserva unexpected_refs=0, sin contaminación 360/comercial ni drift nuevo. Faltan siete días, cleanup/readback cero y apagar ambos gates.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
 - Blocked by: `none`

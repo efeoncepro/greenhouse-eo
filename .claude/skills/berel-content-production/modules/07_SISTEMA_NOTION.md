@@ -43,7 +43,7 @@ un conjunto de tareas planas sin proyecto **no constituye el ciclo mensual**.
 | `Responsable` | person | — |
 | `Fecha de publicación` | date | filtro de la Fase 1 |
 | `Fecha límite` | date | — |
-| `Enlace` | url | **la URL publicada**: es lo que decide Modalidad A vs B |
+| `Enlace` | url | URL publicada o canónica planificada; **nunca decide Modalidad A/B** sin verificar contenido vivo |
 | `Revisión Banners` | url | — |
 | `Multimedia` | file | portada de las vistas board |
 | `Resumen de IA` | text | — |
@@ -256,6 +256,13 @@ además de su `Tarea principal`.
 
 ## Formato en Notion (reglas que evitan pérdida de texto)
 
+🔴 **Una página compartida con Berel no contiene rincones privados.** Callouts, toggles colapsados,
+comentarios, versiones anteriores y bloques al final siguen siendo visibles para el cliente. No guardar
+allí notas internas, prompts, razonamiento, QA, pendientes, instrucciones de montaje ni mensajes entre
+agentes. Esos registros viven en una tarea o página de Efeonce con acceso privado comprobado. No asumir que
+una subpágina, base, propiedad o toggle dentro del workspace del cliente es privado; si la frontera no se
+puede verificar, usar Greenhouse u otro sistema interno y no escribir el dato en Notion de Berel.
+
 - 🔴 **Nunca usar el carácter de barra vertical dentro de una celda de tabla:** **parte la fila y se
   pierde el texto que va después**. Por eso los titles del tipo `Tema` + separador + `Marca` van en
   viñetas, no en tabla.
@@ -270,7 +277,8 @@ además de su `Tarea principal`.
 - 🔴 **El tabulador es load-bearing.** Un tabulador que se pierde **saca del desplegable todo lo que
   viene después** —queda suelto al final de la página— **y la edición reporta éxito igual**. Aplica
   también a los **hijos de un `<callout>`**. Nadie te va a avisar: la única defensa es releer el
-  render y confirmar que el contenido sigue dentro del toggle.
+  markdown guardado y el render, y confirmar que el contenido sigue dentro del toggle. En reemplazos
+  anclados, la línea nueva debe conservar explícitamente el tabulador de la línea reemplazada.
 - **Notion canoniza parte del formato al guardar** (tablas, autolinks, escapes, negritas pegadas a
   código o a enlaces — inventario abajo). Son cosméticos **para el lector, NO para el editor**:
   🔴 **el texto guardado ≠ el texto que enviaste.** **Antes de cualquier edición
@@ -285,6 +293,29 @@ además de su `Tarea principal`.
   necesita la URL del anterior.
 - 🔴 **No borrar nunca contenido existente.** Los análisis, el contenido rescatado y las
   reescrituras se **agregan** como secciones desplegables nuevas.
+
+## Revisión de comentarios en páginas de artículos
+
+La revisión de comentarios es la excepción acotada al patrón de solo agregar: puede corregir mediante
+reemplazos pequeños el bloque vigente que el cliente está revisando, sin borrar historia ni reescribir la página.
+
+1. Leer la página con indicadores de discusión y luego obtener el inventario completo de comentarios y
+   respuestas, incluidos los resueltos. Los previews del body sirven para ubicar hilos, no para probar cobertura.
+2. Clasificar cada hilo como `nuevo`, `atendido`, `bloqueado` o `fuera de alcance`. El estado nativo
+   `resolved` se conserva separado: **Efeonce no resuelve los hilos del cliente**.
+3. Editar con el menor ancla literal posible, tomada del estado recién leído.
+4. Si el comentario revela lenguaje interno, tratarlo como incidente centinela: revisar toda la versión
+   vigente, todos los callouts/toggles/comentarios visibles y los bloques hermanos de la página. No limitar
+   el saneamiento a la frase anclada.
+5. Después de guardar, releer el bloque completo y sus transiciones; la edición puede corregir una frase,
+   perder el tabulador y expulsarla del toggle, o crear una costura abrupta/remate duplicado.
+6. Ejecutar `node scripts/client-visible-copy-gate.mjs <export.md>` desde la raíz de la skill sobre una
+   exportación fresca completa. El gate automatizado complementa, no sustituye, la lectura humana del render.
+7. Responder en el hilo con observación, acción y razón. Si el bloque anclado desapareció y el hilo quedó
+   huérfano, dejar un comentario de página que mencione la observación y a su autor; no resolver el original.
+
+El contrato completo y el criterio `atendido ≠ resolved` viven en
+[`18_REVISION_COMENTARIOS_CLIENTE.md`](18_REVISION_COMENTARIOS_CLIENTE.md).
 
 ### Los artefactos de serialización, uno por uno
 
@@ -305,11 +336,11 @@ enlace `http://`**.
 🔴 **Conclusión operativa: un `diff` byte a byte contra lo que enviaste va a mostrar diferencias
 aunque no se haya perdido nada.** No verifiques igualdad de markdown — **verifica el contenido
 renderizado**: que las tablas estén completas, que los callouts conserven sus hijos, que nada haya
-quedado fuera del desplegable.
+quedado fuera del desplegable y que no exista operación interna en ninguna superficie visible.
 
-## ⚠️ Deriva observada: el esqueleto real del artículo no es el documentado
+## 🗂️ Estructura histórica observada — no reutilizar
 
-El artículo más completo de la base —"Impermeabilizante para azotea: cómo elegir el correcto"
+Antes del incidente del 2026-09-07, el artículo más completo de la base —"Impermeabilizante para azotea: cómo elegir el correcto"
 (`3a639c2fefe78087a9f6fd5eae3a8e5e`)— tiene **tres** toggles de primer nivel:
 
 ```
@@ -318,19 +349,21 @@ El artículo más completo de la base —"Impermeabilizante para azotea: cómo e
 # ✍️ Artículo V1          {toggle="true"}
 ```
 
-El Playbook documenta **cuatro** toggles para Modalidad A y **dos** para Modalidad B
-(`🧭 Plan editorial y SEO` + `✍️ Artículo V1`). El artículo observado es una Modalidad B **con un
-toggle `Research` extra**, y el nombre del plan tampoco coincide literalmente.
+El Playbook documentaba **cuatro** toggles para Modalidad A y **dos** para Modalidad B
+(`🧭 Plan editorial y SEO` + `✍️ Artículo V1`). Esa estructura mezclaba artefactos de trabajo con la
+lectura del cliente y queda **superada** por el contrato del incidente: una sola `Versión vigente para
+revisión` en la página compartida; research, plan, auditoría y handoff en una superficie privada de Efeonce.
+No copiar el esqueleto observado ni usarlo como precedente para nuevas piezas.
 
-🔴 **No resuelvas esta divergencia en silencio.** Puede ser evolución no documentada del proceso o
-una excepción de esa pieza. **Pregunta cuál rige**; si el `Research` separado ya es la práctica,
-hay que actualizar el Playbook, no seguir produciendo con dos esqueletos en paralelo.
-
-Misma advertencia con la **longitud**: la guía editorial dice **900–1.200+ palabras** y ese artículo
-declara **1.400–1.800** (entregó ~1.500).
+Misma advertencia con la **longitud**: el Playbook y piezas históricas conservan referencias a
+**900–1.200+** y **1.400–1.800** palabras, pero ninguna gobierna nuevas ejecuciones. El contrato vigente
+comunicado por el operador el 2026-09-03 es **3.000–5.000 palabras**, salvo excepción explícita del
+formato/brief y sin rellenar con contenido inventado.
 
 ## Cross-links
 
 - Qué se llena en cada fase → [`01_CICLO_MENSUAL.md`](01_CICLO_MENSUAL.md)
+- Cómo inventariar, editar y responder comentarios →
+  [`18_REVISION_COMENTARIOS_CLIENTE.md`](18_REVISION_COMENTARIOS_CLIENTE.md)
 - Oficio Notion (API, webhooks, sync, writeback, límites) → skill `notion-platform`
 - Contrato de métricas `[GH]` y frontera Notion↔Greenhouse → skill `greenhouse-ico`

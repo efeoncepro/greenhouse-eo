@@ -1,6 +1,8 @@
 # Plantilla — 🧭 Plan editorial y SEO (Modalidad B)
 
-> Único desplegable donde vive **todo el trabajo previo a la escritura** de un artículo nuevo.
+> Plantilla para una tarea o página **privada de Efeonce** donde vive todo el trabajo previo a la
+> escritura de un artículo nuevo. 🔴 Nunca copiar este bloque, sus callouts ni sus pendientes a la página
+> compartida con Berel.
 > Norma: `../modules/01_CICLO_MENSUAL.md` (Fases B1-B4).
 > *No es burocracia: es lo que evita escribir mil cuatrocientas palabras alrededor de un ángulo
 > equivocado.*

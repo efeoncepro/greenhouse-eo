@@ -32,8 +32,8 @@
 | **Ficha de contenido** | Ficha de 13 campos para banner fotográfico |
 | **Ficha de producción de infografía** | Ficha de 9 secciones + tabla modular para cualquier pieza que sea infografía |
 | **Derivado social** | Pieza atomizada por canal; vive como subítem en Content Hub y subtarea en Tareas |
-| **Callout de procedencia** | Explica fuentes, análisis y convenciones que originan el V1/híbrido |
-| **Callout de pendientes ⚠️** | Cierre obligatorio con todo dato/URL/asset/capacidad CMS no confirmada |
+| **Registro privado de procedencia** | Fuentes, análisis y decisiones que originan la versión; vive fuera de la página compartida con Berel |
+| **Pendiente interno** | Dato, URL, asset o capacidad CMS no confirmada; vive en el sistema privado de Efeonce con owner y siguiente paso |
 | **Verificación en la URL publicada** | Sección fechada que documenta lo comprobado contra HTML real |
 
 ## Formato Tutorial híbrido
@@ -42,7 +42,7 @@
 |---|---|
 | **Tutorial híbrido** | Versión de carga CMS que reestructura el V1 cuando `Formato = Tutorial`; no crea una segunda URL |
 | **Una intención = una URL** | Regla anti-canibalización: no publicar artículo y tutorial separados para la misma keyword |
-| **`🔁 Reescritura en formato Tutorial (híbrido)`** | Toggle final dentro de la misma página del Content Hub |
+| **Versión vigente — Tutorial híbrido** | Única zona activa cuando `Formato = Tutorial`; la versión previa queda como historial |
 | **Paso a Paso** | Estructura canónica de 4 pasos del template Tutorial actual |
 | **Foto 📸 de paso** | Imagen 1:1 asociada a un paso. No es banner |
 | **Secuencia Paso a Paso** | Una sola tarea de diseño que agrupa las fotos del tutorial |
@@ -62,7 +62,14 @@
 | **`Artículo (Content Hub)`** | Relación que une ejecución con planificación |
 | **`[GH] RpA v2`** | Writeback de Greenhouse; read-only desde Notion |
 | **Encabezado desplegable** | Toggle usado para estructurar la página del artículo |
+| **Zona de lectura del cliente** | Única `Versión vigente para revisión`; contiene solo metadatos aprobables y copy público exacto |
+| **Superficie del cliente** | Toda página, toggle, callout, comentario o bloque accesible por Berel; ninguno se presume privado |
+| **Nota interna** | Razonamiento, prompt, QA, pendiente, spec o instrucción operativa; nunca vive en una superficie del cliente |
+| **Incidente centinela** | Una fuga interna detectada en un punto que obliga a revisar la versión y la página completas |
 | **Canonización** | Normalización de formato que Notion aplica al guardar; obliga a releer antes de editar por texto |
+| **Hilo de comentario** | Comentario inicial más todas sus respuestas; se evalúa completo, nunca desde una réplica aislada |
+| **Atendido** | Estado operativo Efeonce: existe decisión, cambio cuando aplica, respuesta y readback fresco |
+| **Resuelto** | Estado nativo que cierra el hilo en Notion; pertenece al cliente y no equivale a `atendido` |
 
 ## Voz y estructura editorial
 
@@ -73,6 +80,9 @@
 | **Respuesta directa** | Cápsula extractable que responde la pregunta sin depender del resto |
 | **Definición extractable** | Primera frase de sección que puede citarse sola |
 | **Hilo conductor** | Criterio que ordena la pieza de principio a fin |
+| **Una sección, una intención** | El contenido bajo un encabezado responde únicamente la pregunta que ese encabezado promete |
+| **Costura / línea puente** | Transición que conecta un bloque reubicado con la sección anterior para que no se sienta insertado |
+| **Regla anti-ingenio** | Claridad en primera lectura; si una frase compacta exige releerse, se redacta en llano |
 | **Dosis del producto** | Control de cuánto y dónde aparece el producto |
 | **CTA triple** | Explorar/calcular · comprar/ubicar · seguir leyendo |
 | **Dos registros** | Inspiracional/editorial y técnico/tutorial |

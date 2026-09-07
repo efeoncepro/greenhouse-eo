@@ -20,6 +20,20 @@ demás.
 - El cleanup borra hijos del DCR run-owned por `client_id`; no debe barrer un cliente compartido por sujeto,
   correo o fecha. Todo cliente no marcado bloquea el apply.
 
+## Discovery después de TASK-1813
+
+- Con auth nativo ON, los dos PRM del gateway deben ser equivalentes y anunciar sólo
+  `https://auth.efeonce.org` + `efeonce.mcp.read`. Los scopes superiores llegan sólo por el challenge `403`.
+- La metadata del authorization server y el DCR/CIMD se leen en `auth.efeonce.org`. Las rutas AS y `/register`
+  del gateway deben responder `404`; `OAUTH_PUBLIC_CLIENT_ID` no configura comportamiento.
+- TASK-1813 cerró sólo después de verificar `1.2.0` en producción, el rollback y el regreso a la revisión Ready,
+  más login/renovación post-cutover y lectura real base-only en Claude Code, Codex, Claude.ai, Claude Desktop y
+  ChatGPT. En cada rollout posterior repite login fresco, sesión nueva, lectura real, negativo write y refresh
+  post-TTL por cliente; una pantalla de callback o un conector visible no sustituyen ese recorrido.
+- Una certificación base-only prueba interoperabilidad del cliente, no autoridad multiorganización. Esa capacidad
+  interna pertenece a TASK-1844 y debe elegir una organización objetivo por llamada contra el reader canónico,
+  sin listas o comodines en el JWT ni widening del scope de bootstrap.
+
 ## Claude
 
 - Claude Code mínimo `2.1.196`; fija `oauth.scopes="efeonce.mcp.read"`. No uses

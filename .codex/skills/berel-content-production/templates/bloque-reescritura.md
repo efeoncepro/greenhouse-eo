@@ -1,17 +1,12 @@
 # Plantilla — Bloque de reescritura / artículo
 
-> Desplegable `✍️ Reescritura V1` (modalidad A) o `✍️ Artículo V1` (modalidad B), **debajo** de lo
-> que ya exista y **sin borrar nada**. Norma: `../modules/03_REDACCION_ARTICULO.md`.
-> 🔴 Los cinco bloques van **siempre en este orden**.
+> Crear un único desplegable `✍️ Versión vigente para revisión`, **debajo** de lo que ya exista y
+> sin borrar historia. Renombrar las versiones anteriores como `🗂️ Histórico — ...` cuando haga falta
+> distinguirlas. Norma: `../modules/03_REDACCION_ARTICULO.md`.
+> 🔴 La zona vigente contiene solo metadatos aprobables y copy público final.
 
 ```markdown
-# ✍️ Reescritura V1 {toggle="true"}
-
-	[callout 📄 Procedencia]
-	Esta versión sale de: [Análisis SEO/AEO del <fecha>] + [Análisis de contenido] +
-	[6. Voz y Tono] + [Recomendaciones Cliente] + [paleta vigente / keywords].
-	Convención de niveles: `##` = H2 del artículo · `###` = H3.
-	(No confundir los encabezados de Notion con los del CMS.)
+# ✍️ Versión vigente para revisión {toggle="true"}
 
 	## Metadatos propuestos
 	  ← EN VIÑETAS, NUNCA EN TABLA: la barra vertical parte la fila
@@ -35,15 +30,11 @@
 	[Cierre que retoma la escena de apertura + CTA triple]
 	[Firma de cierre de la marca]
 
-		[callout 🖼️ Banner N# — va exactamente aquí]
-		Archivo: nombre-descriptivo.webp · 1408 × 768 px · menos de 200 KB · lazy: sí/no
-		ALT: "..."
-	  ← el callout se inserta EN LA POSICIÓN EXACTA del texto donde va la pieza
-
-	[callout ⚠️ Pendientes]
-		- [producto sin página pública / serie por confirmar / dato que requiere fuente oficial]
-	- [pendientes de schema y dominio para Dev]
 ```
+
+La procedencia, el mapa de banners, ALT/archivo/medidas, schema, decisiones y pendientes se guardan en
+una tarea o documento privado de Efeonce. **No agregarlos debajo, dentro de otro toggle o como comentario**
+en la página compartida. Antes de pasar a revisión, sustituir todos los placeholders de esta plantilla.
 
 ## Antes de cerrar
 
@@ -54,10 +45,17 @@
 - [ ] Temperatura de luz con la fórmula **adjetivo + Kelvin** en **todas** las menciones
 - [ ] Nombre completo del producto **una sola vez**, contado incluido el CTA
 - [ ] Marca en **primera persona del plural**, lector en tú
-- [ ] Sin lenguaje interno (`el cliente`, instrucciones, CMS, extracción o verificación) en el cuerpo público
+- [ ] Cada sección responde solo a la intención prometida por su encabezado
+- [ ] Todo bloque reubicado conserva cobertura, tiene encabezado propio y línea puente
+- [ ] Remates y frases compactas se entienden en la primera lectura
+- [ ] Sin `paleta vigente`, `temporada actual`, `última paleta`, trimestre u otra ancla temporal en cuerpo evergreen
+- [ ] Sin lenguaje interno, briefs, pendientes, QA, CMS/Dev ni mensajes entre agentes en toda la página compartida
 - [ ] Tablas con encabezados semánticos; cada columna comparativa nombra su producto
 - [ ] Si se recomienda un especialista: CTA descriptivo a `/contacto`
 - [ ] Si es producto de awareness: diferenciador temprano y render oficial del empaque especificado
 - [ ] **Auditoría de voz corrida** contra la lista de fallas típicas (módulo `04`)
 - [ ] Releído: sin erratas en nombres de producto ni de color
-- [ ] `Estado` del artículo movido a `En revisión`
+- [ ] Una sola `Versión vigente para revisión`; las anteriores están rotuladas `Histórico`
+- [ ] Desde la raíz de la skill, export fresco validado con `node scripts/client-visible-copy-gate.mjs <export.md>`
+- [ ] Readback confirma que todos los hijos conservan tabulador y siguen dentro del toggle
+- [ ] Solo después de esos gates, `Estado` del artículo movido a `En revisión`

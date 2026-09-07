@@ -1,5 +1,14 @@
 # TASK-1833 — Efeonce Auth Server Security Assurance and Operations
 
+## Delta 2026-09-07 — assurance de entry, RP y consentimiento
+
+El ADR `docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md` agrega casos obligatorios al
+aseguramiento previo a Production: spoofing de contexto/marca RP, degradación de un cliente delegado a first-party,
+reuso cross-RP de code/token/cookie/session, open redirect y loops de legacy/recovery. Debe probarse además que una
+sesión suficiente permite fast path first-party sin consentimiento, mientras un cliente MCP nuevo, scopes elevados o
+una operación que exige step-up conservan autorización explícita. Estas pruebas cubren el contrato transversal y
+TASK-1834 como primer consumer; no declaran la convergencia implementada ni reabren la certificación ya observada.
+
 ## Delta 2026-09-06 — el red-team cierra los dos tests abiertos de TASK-1831
 
 Dos abuse cases de esta task —**token del issuer externo sobre tool interna** y **confused deputy por
@@ -92,7 +101,8 @@ un subprocesador externo y debe reescribirse para un tratamiento propio.
 
 - Red-team agéntico: catálogo de abuse cases (CIMD SSRF, PKCE downgrade, reuso de código/refresh, open
   redirect, enumeración, brute force TOTP, replay de challenge WebAuthn, confused deputy por cliente,
-  token del issuer externo sobre tool interna, JWKS poisoning) con resultado por caso y fix aplicado.
+  spoofing/degradación de clase RP, cross-RP code/token/session, loops de recovery, token del issuer externo sobre
+  tool interna, JWKS poisoning) con resultado por caso y fix aplicado.
 - Pentest externo contratado sobre staging con alcance documentado; hallazgos críticos y altos cerrados.
 - Rotación de llave ejercitada en staging y producción; programación trimestral por Cloud Scheduler
   (`ops-auth-key-rotate`) con verificación post-rotación.
@@ -111,6 +121,7 @@ un subprocesador externo y debe reescribirse para un tratamiento propio.
 Revisar y respetar:
 
 - `docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md` (§4-pillar scoring, §Hard rules)
+- `docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md`
 - `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md`
 - `docs/architecture/GREENHOUSE_AUTH_RESILIENCE_V1.md`
 - `docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md`
@@ -257,6 +268,10 @@ Reglas obligatorias:
 - Los casos *externo sobre interno* (token del issuer externo sobre tool interna, confused deputy por cliente)
   se ejecutan contra el gateway y su evidencia se entrega a `TASK-1831` para tildar sus criterios (a) y (b);
   el fix del verifier es de esa task, no de esta.
+- Los casos de relying party prueban en el emisor y el primer consumer que presentación/return/mode vienen del
+  registro/transacción, que un RP no reutiliza artefactos de otro y que recovery/legacy no forman un redirect loop.
+- La matriz de consentimiento contrasta fast path first-party con cliente MCP nuevo, scope elevado y escritura con
+  step-up; omitir UI de login nunca equivale a autorizar al cliente delegado.
 
 ### Slice 2 — Señales, rotación y retención
 
@@ -352,6 +367,10 @@ de salida — órdenes de magnitud bajo el pentest del Slice 4, pero no trivial 
 - [ ] Cambio de frontera de TASK-1836 cubierto por assurance: externo del mismo issuer sin autoridad interna, binding no derivado de email y revocación con token vigente.
 
 - [ ] Catálogo de abuse cases con ≥ 10 casos ejecutados, cada uno con resultado y refutación cruzada.
+- [ ] Un cliente o parámetro no confiable no puede inyectar marca/return ni autodeclararse `first_party_sign_in`;
+      code, token, cookie y sesión de RP A fallan en RP B.
+- [ ] Fast path first-party sin UI y recovery/legacy sin loops están ejercitados; la misma sesión no omite el
+      consentimiento de un cliente MCP nuevo, scopes elevados ni el step-up de escritura.
 - [ ] Evidencia reproducible de los casos externo-sobre-interno entregada a `TASK-1831`, con sus criterios (a) y (b)
       tildados allá o el bloqueo declarado con razón.
 - [ ] Pentest externo con alcance documentado y sin críticos/altos abiertos.

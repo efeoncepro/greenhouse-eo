@@ -9,10 +9,13 @@
 > certificados con el canary sintético. Sigue la
 > [matriz/runbook externo](../../operations/runbooks/mcp-external-canary-certification.md); no uses una conexión
 > visible como sustituto de login, dispatch, refresh y revoke.
+> `efeonce-mcp` `1.2.0` sirve 100 % Ready en `00047-8b5`: discovery nativo/base-only y shim retirado. El rollback
+> `00047→00046→00047` y la matriz post-cutover completa quedaron verificados sin ampliar permisos.
 
 ## Antes de probar
 
-Confirma que el cliente OAuth usa el resource `https://mcp.efeonce.org/mcp` y un emisor admitido.
+Confirma que el cliente OAuth usa el resource `https://mcp.efeonce.org/mcp`. Las conexiones nuevas deben
+descubrir Efeonce ID; Entra queda sólo para sesiones legacy ya gobernadas.
 El piloto nativo requiere enrollment y grants personales vigentes; pertenecer al tenant no basta. No copies tokens en archivos, capturas ni tickets.
 
 El cliente compatible con Streamable HTTP debe usar el endpoint canónico y obtener su token mediante OAuth PKCE.
@@ -21,14 +24,17 @@ No uses la URL `run.app`: el acceso público pasa por el front door y el hostnam
 ## Verificación operativa
 
 1. Abre `https://mcp.efeonce.org/health`: debe devolver estado saludable y confirmar OAuth configurado.
-2. Consulta `https://mcp.efeonce.org/.well-known/oauth-protected-resource`: debe declarar el resource y los
-   scopes soportados.
+2. Consulta `https://mcp.efeonce.org/.well-known/oauth-protected-resource` y la variante `/mcp`. Desde `1.2.0`
+   deben ser equivalentes, declarar sólo `https://auth.efeonce.org` y `efeonce.mcp.read`. Las rutas
+   `/.well-known/oauth-authorization-server` y `/register` del gateway deben responder `404`.
 3. Con un cliente OAuth autorizado, ejecuta el handshake que soporte su versión y relee `tools/list` serializado.
 4. Ejecuta `globe.capabilities.list` y luego `globe.producer.fleet.list` sin argumentos.
 5. Confirma que la respuesta contiene rutas, disponibilidad y correlation ID, pero no house, provider slug,
    costo de vendor ni margen.
 6. Para el provider Greenhouse-SEO, sigue su manual dedicado:
-   [Operar el provider Greenhouse-SEO del MCP](operar-provider-greenhouse-seo-mcp.md). Sus tools de lectura viven en el permiso base `efeonce.mcp.read` y las 7 de escritura bajo `efeonce.mcp.seo.write`; el permiso base, se verifican con dos canaries distintos y tienen su propio interruptor de rollback.
+   [Operar el provider Greenhouse-SEO del MCP](operar-provider-greenhouse-seo-mcp.md). Sus tools de lectura viven
+   en el permiso base `efeonce.mcp.read` y las siete de escritura bajo `efeonce.mcp.seo.write`; se verifican con
+   canaries distintos y tienen su propio interruptor de rollback.
 7. Ejecuta `get_greenhouse_skill` sin argumentos: debe devolver el catálogo de manuales de uso (seis al 2026-09-02,
    la cuenta exacta la fija `src/mcp/greenhouse/skill-manifest.ts` en Greenhouse). Con `{ "name": "seo-spend-discipline" }`
    debe volver el manual completo como texto, empezando por su frontmatter. Un catálogo vacío con la revisión
@@ -66,6 +72,8 @@ cierres la sesión compartida del perfil.
 - Ante una falla de un provider, conserva OAuth y el gateway; deshabilita sólo ese provider y redespliega
   siguiendo el runbook (`GLOBE_PROVIDER_ENABLED=false` o `GREENHOUSE_SEO_PROVIDER_ENABLED=false`, según el caso).
   El rollback de revisión no se sustituye con acceso anónimo.
+- Ante una regresión de discovery `1.2.0`, restaura 100 % del tráfico a la revisión capturada antes del deploy.
+  No agregues `OAUTH_PUBLIC_CLIENT_ID`: el código nuevo la ignora y reintroducir el shim exige otra decisión.
 - Los secretos del gateway van todos en la **misma** bandera `--set-secrets` del `deploy.yml`: esa bandera es
   destructiva y reemplaza el conjunto completo. Un secreto aplicado fuera del workflow desaparece en el próximo
   deploy, en silencio.
@@ -83,9 +91,10 @@ canary sintético externo completó la matriz técnica base-only y confirmó que
 cruzan. No entregues acceso general a clientes: la primera organización consentida tiene su task, grant y
 observación propios.
 
-Cuando revises scopes, no uses una cifra congelada: el catálogo se deriva de las clases activas y mezcla formas
-cualificadas del emisor legado con formas bare del emisor nativo. El challenge inicial del canary debe solicitar
-sólo `efeonce.mcp.read`; cada scope superior se autoriza por separado y nunca se infiere por aparecer en metadata.
+Cuando revises scopes, el PRM de `1.2.0` tiene una cifra deliberadamente fija: sólo `efeonce.mcp.read`. Los scopes
+de dominio o escritura aparecen de forma incremental en el challenge `403` de una tool y nunca se infieren por
+estar habilitados en el servidor. En modo legacy-only, el challenge los cualifica para Entra; con Efeonce ID son
+bare. Ninguna de esas formas sustituye capabilities, grants o autoridad downstream.
 
 
 ## Verificar el carril corporativo nativo

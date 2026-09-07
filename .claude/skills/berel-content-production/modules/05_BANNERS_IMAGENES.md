@@ -128,9 +128,9 @@ reconocible y coherente con la tabla/producto al que acompaña.
 
 ## 🔴 ALT, archivo y posición son una sola fuente de verdad
 
-Los tres se especifican **una vez**, en la reescritura del artículo (módulo `03`), dentro del
-callout 🖼️ que va en la posición exacta del texto. La ficha de la subtarea los **copia**; no los
-reinventa.
+Los tres se especifican **una vez**, en la ficha de la subtarea visual, y se anclan al encabezado o
+identificador de la sección pública donde irá la imagen. Esa ficha es la fuente de verdad. No se inserta un
+callout de producción dentro de la versión que lee el cliente.
 
 Corolarios que el origen declara explícitamente:
 
@@ -154,12 +154,13 @@ Corolarios que el origen declara explícitamente:
 - [ ] Formatos `.webp`, peso menos de 200 KB, lazy-load (LCP sin lazy)
 - [ ] Cada ficha declara su objetivo de permanencia y su justificación anti banner-blindness
 - [ ] Si el producto es nuevo/de awareness: render oficial del empaque incluido o bloqueo documentado
+- [ ] Ningún brief, ALT de control, archivo, medida, lazy-load ni nota para Dev está dentro de la lectura del cliente
 - [ ] 🔴 Si la pieza es infografía: formato y variante declarados, y el acento usa Rojo Editorial `#B3153A` o la paleta complementaria, nunca el rojo corporativo
 
 ## Cross-links
 
 - Dónde y cuándo se crea la subtarea → [`01_CICLO_MENSUAL.md`](01_CICLO_MENSUAL.md) (Fase 8)
-- Dónde se especifica el banner dentro del texto → [`03_REDACCION_ARTICULO.md`](03_REDACCION_ARTICULO.md)
+- Cómo anclar el banner a una sección sin contaminar el texto → [`03_REDACCION_ARTICULO.md`](03_REDACCION_ARTICULO.md)
 - Qué pasa con la pieza 🔁 después → [`06_DERIVADOS_SOCIALES.md`](06_DERIVADOS_SOCIALES.md)
 - Excepción de lenguaje en fichas de banner → [`04_VOZ_Y_TONO_BEREL.md`](04_VOZ_Y_TONO_BEREL.md)
 - 🔴 **Los formatos con los que diseño produce una infografía** →

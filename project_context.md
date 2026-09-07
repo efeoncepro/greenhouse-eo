@@ -147,16 +147,18 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 - Greenhouse es plataforma/subproducto de Efeonce; `EO` es abreviación del repo, no nomenclatura visible.
 - El gateway MCP federado vive en `efeonce-mcp` y sirve `https://mcp.efeonce.org/mcp` desde Cloud Run. Cada
   provider conserva policy y contratos; los manifiestos Greenhouse de tools/skills son sus SSOT (TASK-1780/1804).
-- Greenhouse, `auth.efeonce.org` y MCP mantienen cookies, sesiones y audiencias propias, pero resuelven un único
-  `identity_profile` y Account 360 mediante bindings auditados. El login cliente debe converger a ese plano, sin
-  crear una segunda identidad o contraseña permanente.
+- Greenhouse, `auth.efeonce.org` y MCP aíslan cookies, sesiones y audiencias, pero resuelven un `identity_profile`
+  y Account 360 mediante bindings auditados. Cada producto entra en su contexto: un first-party puede reutilizar
+  sesión con assurance; MCP y terceros conservan consentimiento por cliente/scope y step-up. No nace otra identidad.
 - EPIC-044: emisor propio `auth.efeonce.org`, KMS/JWKS, OAuth y sesiones de personas; gateway multi-issuer.
   Autoridad externa e interna separadas por población/binding/contexto; SSO no concede permisos MCP.
   Grants, `gv` y ledger de tokens se revalidan antes del dispatch; estado/audit/outbox atómicos.
-  `TASK-1832` mantiene hasta `2026-09-13T19:43:30Z` una organización efímera no cliente, dos perfiles
-  `smoke_test` y sólo lectura. ChatGPT, Claude Code/ai/Desktop, Codex y Playwright están certificados; el retiro
-  revoca autoridad, borra sólo el grafo manifestado y exige readback cero. `TASK-1841` separa el piloto real.
+  `TASK-1813` cerró `1.2.0`: Efeonce ID/base-only, shim retirado, rollback y matriz post-cutover completos. Un token
+  resuelve un contexto; `TASK-1844` selecciona organización por llamada vía Greenhouse, sin claims wildcard.
+  `TASK-1832` mantiene hasta `2026-09-13T19:43:30Z` el canary sintético read-only; ChatGPT, Claude Code/ai/Desktop,
+  Codex y Playwright están certificados. Su retiro exige readback cero; `TASK-1841` separa el piloto real.
   [`ADR nativo`](docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) ·
+  [`entrada y consentimiento por RP`](docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md) ·
   [`autoridad interna`](docs/architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md) ·
   [`runbook`](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md) ·
   TASK-1837: invitación externa por el sistema + autoridad delegada (en producción desde 2026-09-06).

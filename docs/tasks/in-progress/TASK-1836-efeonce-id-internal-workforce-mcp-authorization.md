@@ -24,7 +24,7 @@ Mapa de construcción, pruebas y límites: [auditoría consolidada TASK-1836/183
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Acceso corporativo interno productivo y verificado: entrada Microsoft, consentimiento, token, lectura MCP propia, rechazo ajeno, refresh, retiro de grant y revocación efectiva en 6.633 s; integridad reconciliada y tokens de prueba revocados. TASK-1832 completó además la matriz técnica externa sintética con clientes Codex/ChatGPT/Claude base-only, sin convertirla en evidencia de cliente real. Permanecen pendientes el retorno humano directo propio de esta task, la matriz multicontexto, la repetición Entra completa, UI/WebKit y el cierre formal. Revisión y SHA se resuelven en runtime; snapshot 2026-09-07T12:20:25Z: auth-server 00043-ndg Ready/100 % con SHA igual a origin/main.`
+- Status real: `Acceso corporativo interno productivo y verificado para un contexto: entrada Microsoft, consentimiento, token, lectura MCP propia, rechazo ajeno, refresh, retiro de grant y revocación efectiva en 6.633 s; integridad reconciliada y tokens de prueba revocados. TASK-1832 completó además la matriz técnica externa sintética con clientes Codex/ChatGPT/Claude base-only, sin convertirla en evidencia de cliente real. Follow-up 2026-09-07: jreyes@efeoncepro.com completó en Codex consentimiento interno sólo para Efeonce; el code no se consumió y expiró, sin access/refresh token ni dispatch. El requisito personal multiorganización se derivó a TASK-1844; esta task conserva su foundation uniorganización y sus pendientes originales de retorno humano directo, repetición Entra completa, UI/WebKit y cierre formal. Revisión y SHA se resuelven en runtime; snapshot 2026-09-07T12:20:25Z: auth-server 00043-ndg Ready/100 % con SHA igual a origin/main.`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -1127,3 +1127,34 @@ Para verificar cada entrada por separado:
 La corrección usa el mismo `resolvePersonSession` y valida el destino al iniciar y consumir la
 transacción. Evidencia local: 235 pruebas passed, 4 live omitidas; tipos/lint/bundle correctos,
 Chromium 6/6 para origen/CSP/redirect y revisión independiente sin hallazgos. WebKit sigue omitido.
+
+## Follow-up 2026-09-07 — Codex corporativo y requisito multiorganización
+
+Codex `0.153.4` inició OAuth con la identidad indicada por el operador, `jreyes@efeoncepro.com`, completó la
+autenticación corporativa en Microsoft y llegó al consentimiento nativo. La pantalla ofreció `Efeonce` como único
+contexto de organización y `growth.seo.observation.read` como única capability efectiva. El consentimiento se
+completó a las `2026-09-07T21:52:31Z` y produjo un code interno a las `21:52:32Z`. El listener local ya no completó
+el intercambio: el code quedó sin consumir, expiró y no produjo access token, refresh token, `tools/list` ni
+dispatch. El readback PG de las `22:00:13Z` distingue ese contexto interno de los tokens externos del canary.
+
+El comportamiento es fail-closed y coincide con D3: el contrato vigente opera un contexto por token y no agrega
+permisos de otras organizaciones. Sin embargo, no satisface el requisito explícito del operador para su Codex
+personal: poder operar todas las organizaciones que su autoridad Greenhouse ya le permita, sin convertir el scope
+OAuth base en permiso organizacional. La dirección mínima propuesta conserva el contexto Efeonce como ancla del
+actor y exige `organizationId` explícito en cada tool org-scoped; un reader machine-only de Greenhouse debe autorizar
+en cada llamada la combinación exacta `contexto + capability + organización objetivo`, y el gateway sólo puede
+aceptar ese objetivo después del readback. El provider conserva su recheck de módulo, entitlement y regla de
+negocio. Esta evolución requiere Delta ADR y pruebas antes de repetir la ceremonia. Quedan prohibidos el wildcard
+o una lista de organizaciones en el JWT, la inferencia por correo/dominio/rol, la suma implícita de memberships y
+cualquier ampliación del grant canary.
+
+Transferencia de ownership: `TASK-1844` resuelve el nuevo contrato multiorganización, su reader, consentimiento,
+listado, llamada directa, organización ajena, concurrencia, revocación y matriz real. `TASK-1836` conserva la
+foundation de identidad/sesión/contexto interno uniorganización y `TASK-1831` el gateway multi-issuer ya
+implementado; ambas son dependencias e historia, no dueñas de ese delta. El canary sintético externo de
+TASK-1813/TASK-1832 es evidencia separada y no autoriza ni bloquea este diseño.
+
+Pruebas mínimas para aceptar el cambio: el mismo token base permite A/B autorizadas y deniega C antes del provider;
+objetivo ausente o ambiguo falla cerrado; revocar capability del actor deniega A/B; retirar acceso o módulo de B no
+afecta A; concurrencia A/B no cruza argumentos, resultados ni handles; y un consentimiento anterior no adquiere
+autoridad multiorganización silenciosamente.

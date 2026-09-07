@@ -2,8 +2,8 @@
 name: berel-content-production
 description: >-
   Producción editorial de Pinturas Berel (México) de punta a punta: ciclo mensual en Notion,
-  reescrituras y artículos nuevos, formato Tutorial híbrido, auditoría SEO/AEO contra URL viva,
-  voz de marca es-MX, banners, derivados sociales y handoff/carga en Drupal. Continúa el flujo
+  reescrituras y artículos nuevos, revisión de comentarios del cliente, formato Tutorial híbrido,
+  auditoría SEO/AEO contra URL viva, voz de marca es-MX, banners, derivados sociales y handoff/carga en Drupal. Continúa el flujo
   research → brief y ejecuta brief → pieza publicada → átomos sociales. Invoca copywriting,
   seo-aeo, content-marketing-studio, social-media-studio, notion-platform y greenhouse-ico cuando
   corresponde. Usar para cualquier producción mensual, artículo, tutorial, banner, derivado social,
@@ -49,6 +49,8 @@ de reporting; los pasos siguientes gobiernan la producción de piezas.
    - B · Artículo nuevo: no hay URL viva o la canónica planificada devuelve el shell soft-404.
 3. Cargar solo los módulos de la fase solicitada. Para tutoriales, leer también el módulo 12 y
    completar `templates/control-tecnico-tutorial.md`: la estructura no sustituye la validación del sistema.
+   Para comentarios o feedback sobre un artículo, cargar el módulo 18 junto con los módulos 03, 04,
+   07 y 09; cargar el 08 solo cuando la pieza ya esté publicada.
 4. Aplicar las reglas duras.
 5. Cerrar con artefacto/tarea/estado verificado en una lectura fresca de Notion.
 
@@ -68,6 +70,7 @@ Selección de canales, capacidad y exclusiones reversibles .......... modules/15
 Sistema Notion, propiedades y relaciones ........................... modules/07_SISTEMA_NOTION.md
 CMS Drupal ........................................................ modules/08_PUBLICACION_CMS_DRUPAL.md
 Correcciones y pedidos fechados del cliente ........................ modules/09_RECOMENDACIONES_DEL_CLIENTE.md
+Revisión y respuesta de comentarios del cliente .................... modules/18_REVISION_COMENTARIOS_CLIENTE.md
 Formatos de infografía ............................................. modules/10_FORMATOS_DE_INFOGRAFIA.md
 Ficha de producción de infografía ................................. modules/11_FICHA_DE_PRODUCCION_INFOGRAFIA.md
 Datos verificados de catálogo ...................................... modules/12_DATOS_VERIFICADOS_DEL_CATALOGO.md
@@ -84,8 +87,11 @@ Plantillas ......................................................... templates/
    debe estar escrito antes de crear la tarea de fotos del Paso a Paso.
 2. 🔴 **Nada técnico se afirma sin abrir la URL viva.** La extracción de texto plano no prueba
    enlaces, ALT, `title`, jerarquías ni schema.
-3. 🔴 **No borrar contenido existente del Content Hub.** Agregar nuevos desplegables al final.
-   Las revisiones autorizadas del informe de auditoría se integran en la misma página (módulo 17).
+3. 🔴 **No borrar historia del Content Hub.** Agregar versiones nuevas al final y rotular las anteriores
+   como `Histórico`. Una revisión de comentarios autorizada usa reemplazos pequeños. Si aparece operación
+   interna dentro de una superficie visible para el cliente, el alcance se amplía al saneamiento completo de
+   la versión vigente y sus bloques visibles relacionados; se preserva la historia, no la fuga. Las revisiones
+   autorizadas del informe de auditoría se integran en la misma página (módulo 17).
 4. 🔴 **Nada se promete sin respaldo documental.** Claims, garantías, rendimientos y cifras deben
    existir en ficha/fuente del cliente. Si dos fuentes contradicen, ninguna entra al cuerpo.
 5. 🔴 **Nunca RGB/HEX de colores de pintura en texto público.** Nombre + código alfanumérico. HEX de
@@ -103,13 +109,15 @@ Plantillas ......................................................... templates/
 12. 🔴 **Sin series de producto en cuerpo público**, incluidas tablas, materiales y CTA. Las series
     quedan en fichas técnicas/notas para Dev.
 13. 🔴 **CTA nunca al Home.** Siempre al destino específico de la intención.
-14. 🔴 **ALT, archivo y posición se declaran una vez y se copian.** No reinventarlos entre artículo,
-    ficha, híbrido y notas para Dev.
+14. 🔴 **ALT, archivo y posición se declaran una vez y se copian.** La fuente vive en la tarea/ficha
+    visual interna, vinculada a la sección pública por su encabezado; no se incrusta como instrucción dentro
+    de la lectura del artículo.
 15. 🔴 **Spec para imágenes manda sobre el Playbook** si difieren.
 16. 🔴 **Verificado ≠ estimado.** Volumen, competencia o cifras sin herramienta se etiquetan como
     estimación.
-17. 🔴 **Pendientes visibles:** todo dato, URL, asset o capacidad CMS no confirmada queda en callout
-    `⚠️`; un pendiente omitido se convierte en error de publicación.
+17. 🔴 **Pendientes internos y privados:** todo dato, URL, asset o capacidad CMS no confirmada queda en
+    una tarea o página privada de Efeonce, con owner y siguiente paso. Nunca se deja en la página del cliente,
+    aunque esté dentro de un callout o toggle. Del texto público se retira el dato no confirmado.
 18. 🔴 **No declarar inexistencia por ausencia en un listado paginado.** Probar sitemap/patrón,
     búsqueda de navegación y luego preguntar al cliente.
 19. 🔴 **Avance en tres grupos:** listos · bloqueados con motivo · fuera de alcance.
@@ -137,7 +145,9 @@ Plantillas ......................................................... templates/
     cada paso lleva foto 📸, y esas fotos no son los banners horizontales.
 33. 🔴 **Fotos de tutorial:** una sola tarea de diseño por secuencia, 1:1 de 500 px, sin texto/logo,
     coherencia de espacio/luz/muro. La tarea nace solo cuando el híbrido ya existe.
-34. 🔴 **Banners heredados viajan completos al híbrido.** No poner un simple puntero al V1.
+34. 🔴 **Banners heredados conservan su especificación completa en la tarea visual.** El híbrido
+    conserva el lugar editorial y el arte final cuando exista, pero nunca expone briefs, ALT de control,
+    nombres de archivo, lazy-load, medidas ni instrucciones para Dev dentro de la lectura del cliente.
 35. 🔴 **Canónica planificada soft-404 puede vivir como metadata**, pero no activa enlaces entrantes
     ni derivados hasta QA live de `title`, H1, cuerpo, canonical y schema.
 36. 🔴 **Cuatro macropasos no permiten omitir operaciones.** Preparación, compatibilidad, mezcla,
@@ -173,16 +183,17 @@ Plantillas ......................................................... templates/
     asumir los pendientes de lo que redactamos/publicamos, distinguir estados y revisar toda la
     redacción, incluidas tablas, anexos y propiedades. Cierre con Notion + Markdown releídos: módulo 17.
 
-45. 🔴 **El cuerpo público nunca expone la operación interna.** Escribir siempre desde Berel en primera
-    persona plural y retirar referencias a `el cliente`, instrucciones, posicionamiento editorial,
-    extracción, CMS o validaciones internas. Usar **ficha técnica** para el documento y **página pública
-    del producto** para la URL de berel.com; no mezclar ambos conceptos.
+45. 🔴 **Toda página de Notion compartida con Berel es visible para el cliente de extremo a extremo.**
+    Un callout, toggle colapsado, comentario, bloque histórico o texto bajo el artículo no es privado. No
+    guardar ahí razonamiento, prompts, auditoría, QA, instrucciones, pendientes, CMS/Dev ni mensajes entre
+    agentes. La operación interna vive exclusivamente en una superficie de Efeonce cuyo acceso privado esté
+    comprobado. Una subpágina, base, propiedad o toggle dentro del workspace del cliente no se presume privada.
 46. 🔴 **Producto nuevo o con baja notoriedad requiere una rama editorial propia.** No asumir
     posicionamiento ni titular como `Guía [Producto]`: lectura simple, diferenciador del brief al frente
     y render oficial del empaque dentro del sistema visual. `Premium` puede describir la línea, nunca la
     formulación; `sin plomo` no es argumento comercial.
-47. 🔴 **Dato faltante no se publica como disclaimer.** Retirarlo del cuerpo, registrarlo en el callout
-    interno `⚠️` y solicitar la fuente oficial. En comparativas, cada columna nombra su producto y los
+47. 🔴 **Dato faltante no se publica como disclaimer.** Retirarlo del cuerpo, registrarlo en el sistema
+    privado de Efeonce y solicitar la fuente oficial. En comparativas, cada columna nombra su producto y los
     criterios exclusivos de uno solo quedan fuera de la tabla.
 48. 🔴 **CTA técnico con salida real.** Si el texto recomienda consultar a un especialista, debe enlazar
     de forma descriptiva a `/contacto`. Las temperaturas de luz se expresan como `luz cálida (2700–3000 K)`,
@@ -190,19 +201,50 @@ Plantillas ......................................................... templates/
 49. 🔴 **Notion aprobado/corregido no equivale a sitio actualizado.** Si la pieza ya estaba publicada,
     registrar el cambio pendiente en Drupal, ejecutarlo solo con autorización y verificar después la URL
     pública. Guardar en Notion, cargar en CMS, publicar y comprobar el runtime son estados distintos.
+50. 🔴 **Revisar comentarios empieza por inventariar todos los hilos.** Una vista parcial o un marcador
+    visible no prueba cobertura. Leer comentarios nuevos y anteriores, incluidas sus respuestas, y separar
+    `nuevo`, `atendido`, `bloqueado` y `fuera de alcance`. `Atendido` nunca significa `resolved`.
+51. 🔴 **Separar diagnóstico de remedio.** El cliente puede identificar correctamente el problema sin que
+    su frase propuesta sea la mejor solución. Tomar la sustancia, no la letra; explicar con respeto cualquier
+    alternativa y sostenerla con una regla editorial, un dato o evidencia SEO/AEO.
+52. 🔴 **Claridad antes que ingenio; una sección, una intención.** Si una frase requiere una segunda lectura,
+    se reescribe en llano. El contenido bajo un encabezado que no responde su pregunta se reubica, no se pierde:
+    recibe encabezado propio y una línea puente que lo cosa al hilo. En cuerpo evergreen, nunca usar etiquetas
+    de temporada, trimestre o vigencia; color = nombre + código.
+53. 🔴 **Cada hilo atendido recibe respuesta y queda abierto para el cliente.** Indicar qué se aceptó, qué se
+    cambió de otra manera y por qué. Efeonce no marca hilos como resueltos. El cierre exige edición o decisión,
+    respuesta y lectura fresca; el contador de hilos abiertos no es una métrica de deuda de la agencia.
+54. 🔴 **Un comentario que crea doctrina se captura el mismo día.** Actualizar `Aprendizajes del feedback` y
+    el Playbook; reportar hallazgos fuera de alcance aparte. Si la pieza ya está publicada, abrir además el
+    pendiente CMS sin confundir la corrección en Notion con el sitio actualizado. Detalle: módulo 18.
+55. 🔴 **Una sola zona vigente y limpia para revisión.** Debe titularse inequívocamente `Versión vigente
+    para revisión` y contener solo metadatos aprobables y el texto exacto que podría publicarse. Procedencia,
+    decisiones, specs visuales, controles y pendientes no se mezclan con la lectura.
+56. 🔴 **Una fuga interna es un incidente centinela, no una corrección de una frase.** Si el cliente la
+    señala en un punto, releer y sanear toda la versión vigente, los callouts, toggles y comentarios visibles
+    de esa página antes de responder. Reportar por separado otras páginas potencialmente afectadas.
+57. 🔴 **`success` de Notion no prueba estructura.** Tras cada reemplazo, releer el markdown guardado y el
+    render; confirmar que cada hijo conserva su tabulador y sigue dentro del toggle correcto. Texto expulsado
+    al final de la página deja la corrección incompleta aunque la API responda correctamente.
+58. 🔴 **Gate fail-closed antes de `En revisión` o aviso al cliente.** Ejecutar
+    `node scripts/client-visible-copy-gate.mjs <export.md>` sobre la página fresca y completar la lectura humana
+    de cliente. Si la lectura está truncada, contiene bloques desconocidos, hay más de una versión vigente o el
+    gate detecta una señal interna, no declarar la pieza lista.
 
 ## Lo que no se toca
 
 - Fórmulas y automatizaciones de `Tareas`, incluido `[GH] RpA v2`.
 - Credenciales de `Accesos CMS`: nunca se copian a repo, log, commit ni prompt.
 - Alias de URL de artículos existentes salvo instrucción explícita y plan de redirección.
-- Contenido previo de páginas del Content Hub.
+- Contenido histórico o ajeno al bloque vigente bajo revisión, salvo rotularlo inequívocamente como
+  `Histórico` o retirar una fuga interna que siga visible al cliente. Nunca borrar versiones ni historia.
 
 ## Criterio de cierre
 
 Una ejecución no termina porque una API respondió `success`. Termina cuando una **segunda lectura
-fresca** confirma contenido, relaciones, responsables, fechas, formato y estados guardados. En
-lotes: reportar listos, bloqueados con motivo y fuera de alcance.
+fresca** confirma contenido, relaciones, responsables, fechas, formato, estados, jerarquía de toggles y
+ausencia de operación interna en toda superficie del cliente. En lotes: reportar listos, bloqueados con
+motivo y fuera de alcance.
 
 ## Metodología de deck ejecutivo mensual
 

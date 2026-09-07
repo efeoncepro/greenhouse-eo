@@ -16,12 +16,13 @@
 - Execution profile: `backend-data`
 - UI impact: `flow`
 - UI ready: `no`
+- Visual direction: `docs/ui/visual-directions/TASK-1834-greenhouse-login-convergence-native-issuer.md`
 - Wireframe: `docs/ui/wireframes/TASK-1834-greenhouse-login-convergence-native-issuer.md`
 - Flow: `docs/ui/flows/TASK-1834-greenhouse-login-convergence-native-issuer-flow.md`
 - Motion: `docs/ui/motion/TASK-1834-greenhouse-login-convergence-native-issuer-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Especificación corregida el 2026-09-06 contra código real y ampliada por dirección del operador: Efeonce ID será la identidad humana canónica de todos los productos para clientes e internos. Sin implementación; el emisor aún no ofrece un contrato OIDC reusable y la dirección multiproducto requiere Delta ADR más unidades dueñas antes del primer cambio de código.`
+- Status real: `Dirección v2 de producto/identidad aprobada el 2026-09-07 y elevada a ADR transversal de EPIC-044: para una cohorte habilitada, /login de Greenhouse orquesta un redirect server-side sin pantalla intermedia y Efeonce ID presenta el único login visible, contextualizado como Greenhouse; una sesión suficiente del issuer puede completar el flujo sin mostrar login. El first-party sign-in no presenta consentimiento delegado. TASK-1834 queda como primer consumer Greenhouse. Sin implementación, flags, migración ni rollout; UI ready permanece no hasta first fold, GVC y scorecard. La foundation OIDC/resolver puede construirse en oscuro antes de TASK-1833, pero la activación externa y el retiro de métodos conservan gates independientes.`
 - Rank: `TBD`
 - Domain: `platform|identity|ui`
 - Blocked by: `none`
@@ -36,9 +37,16 @@ colaboradores internos, y convertir Greenhouse en su primer relying party de ref
 futuro debe autenticar la misma cuenta Efeonce mediante un cliente OIDC propio, pero conservar audiencia, cookie,
 sesión y autorización de producto separadas.
 
-Esta task integra Greenhouse de forma aditiva. Debe consumir un contrato OIDC reusable, separado de los access
-tokens MCP, resolver la identidad canónica y después un único contexto de sesión Greenhouse vigente en Person 360 /
-Account 360 hasta un `TenantAccessRecord`. No implementa el runtime de Globe ni de productos futuros.
+Esta task integra Greenhouse mediante un **first-party sign-in contextual directo**. Greenhouse conserva la URL de
+entrada, la promesa del producto y la autorización, pero para cohortes habilitadas `/login` no renderiza un segundo
+login: crea la transacción OIDC y redirige inmediatamente. Efeonce ID autentica a la persona en la única pantalla
+visible, representando Greenhouse sólo desde un relying party registrado. Efeonce ID no se presenta como quinto
+provider ni existe un vestíbulo `Continuar` antes del issuer.
+
+La integración debe consumir un contrato OIDC reusable, separado de los access tokens MCP, resolver la identidad
+canónica y después uno de los contextos de sesión Greenhouse vigentes en Person 360 / Account 360 hasta un
+`TenantAccessRecord`. Cero contextos falla cerrado; múltiples contextos exigen selección explícita dentro de
+Greenhouse; nunca se elige la primera fila. La task no implementa el runtime de Globe ni de productos futuros.
 
 Esta task entrega coexistencia segura y medible y prueba el patrón del primer producto. No declara convergencia
 final del ecosistema ni autoriza retirar métodos; cada producto requiere adopción, paridad, assurance, rollout y
@@ -56,22 +64,35 @@ intentaba ocultarlo por organización antes de conocerla y trataba TASK-1832/TAS
 vez de gates de activación. Esta revisión corrige esas contradicciones.
 
 La dirección del operador del 2026-09-06 amplía el objetivo: Greenhouse no puede ser el dueño permanente del login
-de Globe ni un producto nuevo puede crear otra cuenta humana. Efeonce ID será el front door común; Microsoft,
-Google, passkey y magic link son métodos upstream vinculados a la misma persona, no identidades separadas. Una
-identidad común tampoco concede acceso universal: cada producto y organización continúan resolviendo su contexto y
-aplicando su autoridad local.
+de Globe ni un producto nuevo puede crear otra cuenta humana. Efeonce ID será la **autoridad común de identidad**;
+Microsoft, Google, passkey y magic link son métodos vinculados a la misma persona, no identidades separadas. Esto
+no convierte el host del issuer en la portada de cada producto: la persona entra a Greenhouse desde Greenhouse, a
+Globe desde Globe y a una integración externa desde su consentimiento Efeonce ID.
+
+La revisión UI/UX del 2026-09-07 detectó primero que agregar `Continuar con Efeonce ID` como quinto método mezclaba
+tres capas distintas —producto, servicio de identidad y método de verificación—. Una segunda revisión detectó que
+reemplazarlo por un CTA genérico `Continuar` todavía creaba un “login antes del login” sin aportar una decisión real.
+La dirección v2 conserva la entrada Greenhouse como orquestación no visual, lleva directamente al único login
+contextual del issuer y mantiene el camino legado/recovery separado, medible y reversible. Una identidad común
+tampoco concede acceso universal: cada producto y organización resuelve su contexto y autoridad local.
 
 ## Goal
 
-- Formalizar por Delta ADR a Efeonce ID como autoridad canónica de autenticación humana multiproducto, separando
-  issuer, método upstream, relaciones/poblaciones, contexto seleccionado y autoridad efectiva.
+- Consumir `EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md`, que formaliza a Efeonce ID como autoridad
+  canónica de autenticación humana multiproducto y separa issuer, método upstream, relaciones/poblaciones,
+  contexto seleccionado y autoridad efectiva. Esta task no vuelve a decidir ese contrato.
 - Consumir un perfil OIDC first-party reusable y registrar Greenhouse como cliente de referencia con audiencia
   propia; nunca adaptar un access token MCP como identidad del portal ni incrustar conceptos Greenhouse en el
   contrato base del emisor.
 - Resolver el sujeto nativo a una identidad canónica y después a exactamente un contexto Greenhouse elegible con
   sus claims Person 360 / Account 360 actuales, sin búsqueda, merge ni provisión por correo ni unión de permisos.
-- Exponer Efeonce ID de forma aditiva en `/login`, preservar todos los métodos actuales y probar rollout,
-  revocación y rollback por población.
+- Mantener Greenhouse como entrada y destino sin agregar una pantalla: para cohortes habilitadas, `/login` crea la
+  transacción y redirige server-side; el issuer representa `Greenhouse` desde metadata confiable del RP y ofrece
+  allí los métodos de autenticación elegibles.
+- Tratar Greenhouse como `first_party_sign_in`: una sesión suficiente del issuer puede volver sin UI y, cuando se
+  autentica, no aparece consentimiento delegado; el consentimiento de clientes MCP/terceros no cambia.
+- Preservar Microsoft, Google, credenciales y magic link durante la migración en el login legado para cohortes no
+  habilitadas y en una recovery explícita sin auto-redirect; medir su uso y probar rollback antes de retirarlos.
 - Dejar registrado el contrato de onboarding/conformance para nuevos relying parties y las unidades separadas que
   migrarán Globe y cualquier otro producto; TASK-1834 no implementa esos consumers.
 
@@ -87,6 +108,7 @@ aplicando su autoridad local.
 Revisar y respetar:
 
 - `docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`
+- `docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md`
 - `docs/architecture/EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`
 - `docs/architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md`
 - `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`
@@ -101,12 +123,28 @@ Reglas obligatorias:
 - **Una cuenta Efeonce, varios productos.** Efeonce ID es la autoridad canónica de autenticación humana para
   Greenhouse, Globe y todo producto Efeonce futuro, tanto para clientes como para internos. Los upstreams
   Microsoft, Google, passkey y magic link se vinculan a esa cuenta; nunca crean identidades de producto paralelas.
+- **El producto conserva entrada y destino, no una pantalla redundante.** Greenhouse `/login` inicia la transacción
+  server-side y redirige sin render intermedio para la cohorte habilitada. Efeonce ID es la autoridad de identidad y
+  el único login visible del flujo nuevo, contextualizado como Greenhouse; no es un producto alternativo ni un
+  quinto provider.
+- **Tres capas, tres responsabilidades.** Producto = destino/contexto; Efeonce ID = autenticación; Microsoft,
+  Google, passkey y correo = métodos. La UI no presenta objetos de capas distintas como opciones equivalentes.
 - **Una identidad no implica una sola relación.** La misma persona puede ser interna, cliente y miembro de varias
   organizaciones simultáneamente. Después de autenticar se selecciona exactamente un contexto válido por
   producto/organización; nunca se unen roles, workspaces, módulos, capabilities o entitlements entre relaciones.
 - **Cada relying party queda aislado.** Cada producto usa `client_id`, audiencia, redirects, política de assurance,
   token family, cookie, sesión, logout y rollback propios. Un code/token/cookie emitido o guardado para Greenhouse
   se rechaza en Globe y viceversa; sólo la sesión SSO del issuer puede facilitar reautenticación.
+- **El contexto visible del issuer es confiable.** `Greenhouse`, su retorno y cualquier marca del RP se derivan
+  server-side de la transacción y registro OIDC validados; nunca de `app`, `client_name`, logo o URL libres del browser.
+- **Login directo neutral.** `/login` de `auth.efeonce.org` sin transacción OIDC válida conserva `Entra a Efeonce`;
+  sólo una transacción Greenhouse registrada puede producir `Entra a Greenhouse`.
+- **First-party no es consentimiento delegado.** El cliente Greenhouse usa una clase/mode server-owned
+  `first_party_sign_in`: si la sesión Efeonce ID satisface assurance, vuelve sin UI; si debe autenticar, muestra los
+  métodos pero no una pantalla de consentimiento. Esta excepción de presentación nunca se extiende a MCP o terceros.
+- **Legacy y recovery rompen loops.** Una cohorte no habilitada ve sólo el login actual; una ruta/estado de recovery
+  evita el redirect automático hasta que la persona reintenta explícitamente. Nunca se renderiza legacy para luego
+  reemplazarlo client-side por el issuer.
 - **Tener Efeonce ID no aprovisiona acceso.** Un producto nuevo resuelve `subject -> identity_profile -> contextos
   elegibles -> contexto seleccionado -> autorización local`; ausencia o ambigüedad falla cerrada.
 - **Issuer no determina población.** El mismo issuer puede autenticar a una persona interna o externa; la
@@ -132,17 +170,22 @@ Reglas obligatorias:
 - NUNCA hacer fallback por email o dominio, fusionar perfiles, crear `identity_profile`, `client_users`,
   `members`, `person_memberships`, source links, bindings o roles desde el callback.
 - El camino externo usa TASK-1631; el interno reutiliza TASK-1836. Nunca probar uno como fallback del otro.
-- Microsoft, Google, credenciales y magic link del portal permanecen disponibles durante esta task. La
-  contraseña no se copia ni se reimplementa en Efeonce Auth.
+- Microsoft, Google, credenciales y magic link del portal permanecen disponibles durante la migración para cohortes
+  legacy y en recovery gobernada. No son cinco pares visuales permanentes, no aparecen antes del issuer en el flujo
+  habilitado y la contraseña no se copia ni se reimplementa en Efeonce Auth.
 - La revocación/expiración debe negar acceso efectivo; no basta ocultar el botón ni comparar una versión.
 
 ## Normative Docs
 
 - `docs/tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md`
-- `docs/tasks/in-progress/TASK-1835-efeonce-id-login-consent-screens.md`
+- `docs/tasks/complete/TASK-1835-efeonce-id-login-consent-screens.md`
 - `docs/tasks/in-progress/TASK-1832-efeonce-mcp-client-canaries-and-first-customer-cohort.md`
 - `docs/tasks/to-do/TASK-1833-efeonce-auth-server-security-assurance-and-operations.md`
 - `docs/tasks/to-do/TASK-1839-invitation-delivery-primitive-convergence.md`
+- `docs/tasks/to-do/TASK-1840-efeonce-id-multiproduct-logout-session-revocation.md`
+- `docs/tasks/to-do/TASK-1841-efeonce-id-first-consented-customer-pilot.md`
+- `docs/tasks/to-do/TASK-1842-efeonce-id-person-credentials.md`
+- `docs/ui/visual-directions/TASK-1834-greenhouse-login-convergence-native-issuer.md`
 - `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1.md`
 - `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`
 - `docs/documentation/identity/sistema-identidad-roles-acceso.md`
@@ -156,10 +199,14 @@ Reglas obligatorias:
 - TASK-1836: enrollment, contexto y elegibilidad workforce para la población interna.
 - `src/lib/auth.ts`, `src/lib/tenant/access.ts`, `src/lib/tenant/identity-store.ts` y
   `greenhouse_serving.session_360` como shape de sesión del portal.
-- Aprobación del Delta ADR del Slice 0 antes de cambiar código.
+- ADR transversal de entry/consentimiento aceptado; su aceptación habilita planificación, no acredita que el
+  perfil OIDC, el entry Greenhouse o su rollout estén implementados.
 
-TASK-1832 y TASK-1833 **no bloquean** dark deploy ni pruebas locales/staging de esta task. Sí bloquean la
-activación externa en Production y cualquier cutover/retiro de métodos, respectivamente.
+TASK-1832 y TASK-1833 **no bloquean** la foundation OIDC, el resolver, el dark deploy ni pruebas locales/staging
+con flags OFF. TASK-1833 bloquea activar el nuevo camino en Production. La activación externa además exige la
+evidencia técnica aplicable de TASK-1832 y el piloto consentido de TASK-1841; ningún cliente se usa como tester
+técnico. El cutover amplio/retiro de métodos exige también recuperación/credenciales de TASK-1842, onboarding sin
+duplicación de TASK-1839 y semántica de logout de TASK-1840.
 
 ### Blocks / Impacts
 
@@ -171,6 +218,10 @@ activación externa en Production y cualquier cutover/retiro de métodos, respec
 - Contrato de onboarding/conformance para relying parties futuros, sin código ad hoc por producto en el issuer.
 - TASK-1835 si una decisión posterior agrega Microsoft cliente o Google como upstreams visibles del emisor.
 - TASK-1839 para provisionar un principal de portal; TASK-1834 sólo consume principals existentes.
+- TASK-1840 para que `salir de Greenhouse`, `cerrar la sesión Efeonce ID de este dispositivo` y `cerrar todas las
+  sesiones` no se confundan durante el cutover.
+- TASK-1842 para que una persona pueda enrolar passkey antes de presentarla como método primario general.
+- TASK-1841 para que la primera activación externa sea un piloto comercial consentido, separado del canary sintético.
 
 ### Files owned
 
@@ -183,6 +234,7 @@ activación externa en Production y cualquier cutover/retiro de métodos, respec
 - `docs/ui/wireframes/TASK-1834-greenhouse-login-convergence-native-issuer.md`.
 - `docs/ui/flows/TASK-1834-greenhouse-login-convergence-native-issuer-flow.md`.
 - `docs/ui/motion/TASK-1834-greenhouse-login-convergence-native-issuer-motion.md`.
+- `docs/ui/visual-directions/TASK-1834-greenhouse-login-convergence-native-issuer.md`.
 
 ## Current Repo State
 
@@ -190,8 +242,9 @@ activación externa en Production y cualquier cutover/retiro de métodos, respec
 
 - Greenhouse ofrece Microsoft, Google, credenciales y magic link en el mismo login; los callbacks terminan en
   un `TenantAccessRecord` y la sesión incluye `organizationId`, `memberId` e `identityProfileId`.
-- Efeonce Auth ofrece magic link externo, Microsoft Entra tenant-pinned para internos y APIs de passkey/TOTP.
-  El botón passkey todavía no está expuesto en `/login` y no existe upstream Google o Microsoft cliente.
+- Efeonce Auth ofrece magic link externo, Microsoft Entra tenant-pinned para internos y passkey en `/login` cuando
+  el browser soporta WebAuthn, además de APIs passkey/TOTP. No existe aún superficie personal de enrollment/listado
+  y retiro de passkeys (TASK-1842), ni upstream Google o Microsoft cliente.
 - Globe autentica hoy contra el broker sister-platform de Greenhouse, conserva cookie propia y restringe el
   callback a identidades internas; no consume Efeonce ID y su tenancy autoritativa aún está en transición.
 - TASK-1631 liga el subject externo a `identity_profile` y Account 360, pero su membership MCP `linked` no es
@@ -227,8 +280,26 @@ activación externa en Production y cualquier cutover/retiro de métodos, respec
   y entitlements; clientes usan módulos vigentes y vetos personales mediante un primitive cacheado, además de
   scopes de filas en sus readers.
 - `greenhouse_serving.auth_attempts.provider` no admite `efeonce-auth`; la task requiere migración aditiva.
-- El login anónimo no conoce organización. La decisión de esta task es botón global gated + resolución y deny
-  anti-enumeración después del callback, no discovery por correo.
+- El renderer de personas del auth-server no recibe hoy un contexto de aplicación confiable: `LoginPageInput`
+  sólo contiene retorno interno/error/nonce y `/login` siempre presenta `Entra a Efeonce`. Existe `clientContext`
+  en las páginas OAuth, pero aún no está unido a la transacción de login.
+- El login actual de Greenhouse presenta cuatro métodos al mismo nivel. Agregar Efeonce ID como quinto provider
+  crearía una taxonomía irracional y reemplazarlo por un CTA `Continuar` todavía crearía un vestíbulo redundante. La
+  dirección seleccionada exige una entrada Greenhouse no renderizada y los métodos únicamente en el issuer.
+- No existe todavía la orquestación server-side de cohorte/readiness/recovery que permita responder `/login` con un
+  redirect inmediato sin flash del formulario legado, ni una ruta/estado de recovery que rompa loops.
+- El pipeline de autorización no distingue aún `first_party_sign_in` de delegación OAuth: sin esa clase confiable
+  podría mostrar consentimiento Greenhouse innecesario o, peor, omitirlo también para MCP/terceros.
+- El login anónimo no conoce organización. La decisión es resolver `0 | 1 | many` contextos después del callback;
+  `many` abre un selector Greenhouse con contextos server-authorized, nunca discovery por correo ni primer row.
+- El issuer muestra passkey, pero TASK-1842 documenta que no existe superficie personal de enrollment. No puede
+  convertirse en método primario general antes de que una persona pueda crear y administrar su credencial.
+- Invitación/activación del portal y aceptación de identidad todavía son recorridos separados; TASK-1839 debe
+  evitar duplicación operativa antes del cutover amplio.
+- Logout local, logout Efeonce ID del dispositivo y cierre total todavía no tienen experiencia convergente;
+  TASK-1840 es gate de promesa multiproducto, no blocker de la foundation oscura.
+- No existe baseline de funnel para entry routing, sesión reutilizada/login visible, recovery, callback, contexto y sesión creada. Sin esa medición no se
+  puede retirar un método legado ni concluir que el modelo seleccionado reduce fricción.
 
 ## Modular Placement Contract
 
@@ -247,17 +318,25 @@ activación externa en Production y cualquier cutover/retiro de métodos, respec
 
 - UI rigor: `ui-standard`
 - Usuario / rol: cliente externo o colaborador interno con identidad Efeonce ID ya enlazada y principal de portal activo.
-- Momento del flujo: entrada a `/login`, salida a `auth.efeonce.org`, retorno al callback y apertura del home autorizado.
-- Resultado perceptible esperado: elegir Efeonce ID sin perder Microsoft, Google, contraseña o magic link; entender y recuperar fallos sin revelar si una cuenta existe.
-- Friccion que debe reducir: ausencia del nuevo método, confusión entre invitación y login, y errores que no ofrecen alternativa segura.
-- No-goals UX: signup público, selector de organización por email, rediseño completo del login, provisión de personas o retiro de métodos.
+- Momento del flujo: entrada no visual a `/login`, autenticación contextual cuando sea necesaria en
+  `auth.efeonce.org`, retorno al callback y apertura del home autorizado.
+- Trabajo real: entrar a Greenhouse; la persona no debe decidir entre producto, issuer y métodos como si fueran pares.
+- Resultado perceptible esperado: existe como máximo una pantalla de login. Efeonce ID confirma `Entra a
+  Greenhouse`, permite verificar identidad si la sesión no basta y devuelve al contexto autorizado; con SSO
+  suficiente, vuelve sin mostrar login.
+- Fricción que debe reducir: provider soup, “login antes del login”, pérdida de contexto al cambiar de host,
+  fallback opaco, ambigüedad multiorganización y errores sin alternativa segura.
+- No-goals UX: signup público, selector de organización por email, quinta opción Efeonce ID, CTA-vestíbulo,
+  iframe/widget del issuer, consentimiento delegado first-party, provisión de personas o retiro inmediato de métodos.
 
 ### Surface & system decision
 
-- Surface: `/login` y sus estados de retorno de provider.
+- Surface: Greenhouse `/login` como entry server-side, login directo/contextual de `auth.efeonce.org`, recovery,
+  callback y selector Greenhouse.
 - Nav placement: `none` — no agrega destino de navegación.
 - Composition Shell: `no aplica` — reutiliza la composición de autenticación existente.
-- Primitive decision: `reuse` — mismo patrón/button de providers existente, sin primitive nueva.
+- Primitive decision: `reuse/extend` — auth shell TASK-1835, estados de método, recovery y `clientContext`
+  existentes; lookup obligatorio de la lista de contextos antes de JSX; ninguna primitive nueva está aprobada aún.
 - Adaptive density / The Seam: `no aplica`.
 - Floating/Sidecar/Dialog decision: ninguno.
 - Copy source: `src/lib/copy/*`.
@@ -265,81 +344,105 @@ activación externa en Production y cualquier cutover/retiro de métodos, respec
 
 ### State inventory
 
-- Default: Efeonce ID visible detrás de flag junto a todos los métodos actuales.
-- Loading: provider readiness y redirect pending sin doble submit.
-- Empty: no aplica.
-- Error: provider unavailable, identity unlinked, access inactive, ambiguous principal y session revoked con copy no enumerable.
-- Degraded / partial: Efeonce ID degradado no bloquea métodos clásicos.
+- Entry routing: `/login` decide cohorte/readiness/recovery server-side; el flujo habilitado devuelve redirect sin
+  documento intermedio ni flash del login legado.
+- Legacy: una cohorte no habilitada ve sólo el login Greenhouse vigente.
+- Issuer session fast path: sesión/assurance suficiente; retorno al callback sin login ni consentimiento.
+- Issuer contextual: `Greenhouse` + `Entra a Greenhouse` derivados del RP validado; métodos elegibles del issuer.
+- Issuer method pending: sólo el método invocado expone un estado honesto y `aria-busy`.
+- Issuer directo: `Entra a Efeonce`, sin contexto Greenhouse fabricado.
+- Returning: validación de protocolo/autoridad sin prometer éxito antes del servidor.
+- Context required: selector Greenhouse para más de un contexto elegible; cero contextos deniega.
+- Error: issuer unavailable, identity unlinked, access inactive, population mismatch y session revoked con copy no enumerable.
+- Recovery: superficie Greenhouse estable, sin auto-redirect; permite reintento explícito o fallback gobernado.
 - Permission denied: misma respuesta pública para missing/inactive/mismatch; diagnóstico detallado sólo en señal sanitizada.
 - Long content: nombres de método y mensajes no rompen la composición.
 - Mobile / compact: paridad a 390 px sin scroll horizontal.
-- Keyboard / focus: provider accesible por teclado; retorno de error restaura foco al resumen y mantiene alternativas.
+- Keyboard / focus: métodos/selector/recovery accesibles; error restaura foco al resumen y mantiene alternativas.
 - Reduced motion: feedback conserva significado sin animación.
 
 ### Interaction contract
 
-- Primary interaction: `Continuar con Efeonce ID` inicia el provider; los métodos existentes conservan su jerarquía actual.
-- Hover / focus / active: reutilizar estados del botón provider.
-- Pending / disabled: sólo la acción elegida queda pending; evitar doble redirect.
+- Primary interaction: elegir un método de verificación en el issuer cuando la sesión Efeonce ID no sea suficiente.
+- Entry interaction: ninguna; `/login` habilitado navega por redirect server-side sin pedir un clic inútil.
+- Trust cue: `Identidad protegida por Efeonce ID` explica la infraestructura sin convertirse en una acción.
+- Safe exit: `Volver a Greenhouse` lleva a una recovery registrada que no reenvía automáticamente.
+- Context interaction: seleccionar sólo un contexto elegible; el servidor revalida antes de crear sesión.
+- Hover / focus / active: reutilizar estados canónicos de método, enlace y selector.
+- Pending / disabled: sólo la acción elegida queda pending; evitar doble submit.
 - Escape / click-away: no aplica.
-- Focus restore: al resumen de error; siguiente tab entra en la primera alternativa disponible.
-- Latency feedback: estado inmediato y error recuperable si discovery/callback falla.
+- Focus restore: al resumen de error o heading de contexto; siguiente tab entra en la primera alternativa válida.
+- Latency feedback: el redirect no se disfraza con una pantalla de carga; una falla produce recovery estable.
 - Toast / alert behavior: alerta inline, sin raw OAuth error ni identificadores.
 
 ### Motion & microinteractions
 
-- Motion primitive: `none`
-- Enter / exit: conservar comportamiento existente.
+- Motion primitive: estados existentes del método, alert y selector; la entrada no tiene motion.
+- Enter / exit: redirect server-side inmediato, sin splash, fake success ni transición decorativa.
 - Layout morph: none.
 - Stagger: none.
 - Timing / easing token: none.
 - Reduced-motion fallback: resultado inmediato equivalente.
-- Non-goal motion: no introducir motion nueva.
+- Non-goal motion: no fabricar continuidad entre hosts, retrasar protocolo por animación ni auto-redirigir recovery.
 
 ### Implementation mapping
 
-- Route / surface: `/login`, NextAuth provider/callback y error return existente.
-- Primitive / variant / kind: provider button existente.
-- Component candidates: `src/views/Login.tsx` y page server que entrega provider readiness.
+- Route / surface: Greenhouse `/login` server-side, legacy/recovery, NextAuth provider/callback, issuer login
+  directo/contextual y selector.
+- Primitive / variant / kind: auth shell, method states y alertas existentes; extender `clientContext`; lista por lookup.
+- Component candidates: `src/views/Login.tsx` sólo para legacy/recovery, page server de readiness/cohorte,
+  `src/lib/auth-server/persons/pages.ts` y renderer OAuth que ya posee `clientContext`.
 - Copy source: `src/lib/copy/*`.
 - Data reader / command: resolver server-side de identidad/acceso; UI no consulta DB ni bindings.
 - API parity: autenticación de sesión; autoridad se resuelve en el mismo primitive server-side para callback y revalidación.
 - Access / capability: roles/views vigentes del `TenantAccessRecord`; ningún grant nace en UI.
-- States to implement: default, pending, degraded, denied y callback error.
+- Trusted DTO: el auth-server recibe contexto RP y modo `first_party_sign_in` sólo desde una authorization
+  transaction/client validados; no consume labels, logos, mode o return URLs libres desde el browser.
+- States to implement: entry routing, legacy, issuer session fast path, issuer direct/contextual/method pending,
+  returning, recovery, denied y `0 | 1 | many` contextos.
 
 ### GVC scenario plan
 
 - Scenario file: `scripts/frontend/scenarios/task1834-greenhouse-login-convergence.scenario.ts`.
-- Route: `/login`.
+- Routes: Greenhouse `/login` habilitado/legacy, recovery, issuer `/login` directo y login ligado a una transacción
+  Greenhouse válida.
 - Viewports: 1440x900 y 390x844.
 - Quality profile: `premium`.
-- Required steps: default; foco Efeonce ID; pending; provider degraded; callback denied; métodos clásicos presentes.
+- Required steps: entry habilitado sin render intermedio; Greenhouse legacy/recovery; issuer session fast path;
+  issuer directo/contextual/pending; callback denied; cero/uno/múltiples contextos.
 - Required captures: cada estado en desktop/mobile y evidencia de teclado/reduced motion.
-- Required `data-capture` markers: login surface, provider list, Efeonce ID action y error summary.
-- Assertions: los cinco métodos declarados por el portal siguen alcanzables según configuración; sin PII/raw errors; sin doble submit.
+- Required `data-capture` markers: legacy/recovery surface, issuer app context, method list, error summary y context selector.
+- Assertions: `/login` habilitado sin documento/flash/CTA intermedio; recovery alcanzable sin loop; first-party sin
+  consentimiento delegado; sin quinto provider, PII/raw errors, contexto forjable ni doble submit.
 - Scroll-width checks: `scrollWidth === clientWidth` en ambos viewports.
 - Reduced-motion / focus evidence: foco visible y resultado equivalente.
 - Review dossier: requerido antes de `UI ready: yes`.
-- Baseline decision / surface ID: baseline runtime actual de `/login`; no se promueve una dirección nueva.
+- Baseline decision / surface ID: login Greenhouse actual + issuer directo actual, capturados antes del first fold
+  contextual del issuer.
 
 ### Design decision log
 
-- Decision: integración visual aditiva dentro del provider list existente; botón global gated y autorización post-callback.
-- Alternatives considered: ocultar por organización antes de login; discovery email-first; URL tenant-scoped.
-- Why this pattern: el login anónimo no conoce organización y el email no es autoridad; el deny post-callback evita una segunda pantalla y mantiene rollback simple.
-- Reuse / extend / new primitive: `reuse`.
-- Open risks: jerarquía exacta y copy requieren revisión visual; `UI ready` permanece `no` hasta completar wireframe/GVC.
+- Decision v2: entrada Greenhouse no visual + login Efeonce ID contextual directo; Efeonce ID autentica y Greenhouse
+  autoriza.
+- Alternatives considered: fifth peer provider (rejected), visible `Continuar` vestibule (superseded), iframe/widget
+  (rejected), email/org discovery (rejected).
+- Why this pattern: preserves product context without duplicating screens, removes a click without decision, keeps
+  trusted server-side resolution and supports a measured rollback without claiming ecosystem-wide convergence.
+- Reuse / extend / new primitive: `reuse/extend`; no new primitive approved.
+- Direction artifact: `docs/ui/visual-directions/TASK-1834-greenhouse-login-convergence-native-issuer.md`.
+- Open risks: first-fold primitive lookup, upstream parity and fallback retirement evidence; `UI ready: no`.
 
 ### Visual verification
 
 - GVC scenario: `task1834-greenhouse-login-convergence`.
 - Viewports: 1440x900 y 390x844.
-- Required captures: default, pending, degraded y denied.
-- Required `data-capture` markers: login/provider/action/error.
+- Required captures: Greenhouse legacy/recovery; issuer direct/contextual/pending; denied y multicontexto.
+- Required `data-capture` markers: legacy/recovery/app-context/method/error/context-selector.
 - Scroll-width check: obligatorio.
 - Accessibility/focus checks: teclado, foco visible, summary de error y nombres accesibles.
-- Before/after evidence: login actual vs provider adicional.
-- Known visual debt: dirección detallada y scorecard pendientes; por eso `UI ready: no`.
+- Before/after evidence: login actual vs redirect sin pantalla intermedia + issuer contextual.
+- Known visual debt: first fold, GVC y scorecard pendientes; la dirección detallada ya está seleccionada, pero
+  no equivale a readiness ni implementación.
 - Visual scorecard: `docs/ui/reviews/TASK-1834-greenhouse-login-convergence-native-issuer.scorecard.json`.
 - Quality threshold: `average >= 4.5; floor >= 4; hierarchy/surface economy/visual impact/fidelity/template resistance >= 4.5`.
 
@@ -413,10 +516,20 @@ activación externa en Production y cualquier cutover/retiro de métodos, respec
 
 ## Hybrid Execution Justification
 
-- Why not split: issuer, resolver, callback y experiencia forman un único contrato vertical de login; separarlos sin un gate E2E permitiría que metadata/tokens, sesión y UI diverjan. Microsoft cliente y Google upstream sí quedan fuera como tasks propias.
+- Why not split: TASK-1834 es la primera adopción de un relying party y su gate E2E; issuer, resolver, callback y
+  experiencia deben cerrar un único contrato verificable. Separarlos aquí permitiría declarar un provider listo
+  sin identidad contextual o una UI lista sin autoridad fail-closed. La ejecución sí se separa en dos checkpoints
+  internos: `foundation dark` y `experience activation`.
 - Primary execution profile: `backend-data`.
-- Contract boundary: OIDC Greenhouse -> subject opaco -> resolver canónico -> `TenantAccessRecord` -> sesión NextAuth; la UI sólo inicia y representa estados.
-- Risk controls: Slice 0 ADR, flags separados, providers clásicos intactos, implementación por slices, canaries por población, assurance antes de Production y rollback sin mutar identidad.
+- Contract boundary: OIDC Greenhouse -> subject opaco -> resolver canónico -> `TenantAccessRecord` -> sesión NextAuth;
+  la entrada orquesta server-side y la UI sólo representa estados estables.
+- Foundation checkpoint: Slices 0–3 pueden avanzar con flags visibles OFF; no cambian el primer fold ni cohortes.
+- Experience checkpoint: Slice 4 no comienza hasta que provider/resolver fail-closed pase local/staging y exista
+  aprobación humana del primer fold contra la dirección visual seleccionada.
+- Risk controls: ADR, flags separados, recovery clásica, implementación por slices, canaries por población,
+  assurance antes de Production y rollback sin mutar identidad.
+- Split trigger: si el selector multicontexto o la migración visual exceden el boundary documentado, registrar una
+  task UI propia antes de ampliar archivos; no abrirla preventivamente ni esconder el crecimiento en esta task.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -433,29 +546,49 @@ activación externa en Production y cualquier cutover/retiro de métodos, respec
 
 ## Scope
 
-### Slice 0 — Delta ADR multiproducto, ownership y matriz de transición
+### Slice 0 — Adopción del ADR multiproducto y matriz Greenhouse
 
-- Formalizar que Efeonce ID es la única autoridad de autenticación humana de los productos Efeonce para internos y
+Este slice ya no decide el contrato transversal: lo consume desde
+`EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md` y aterriza únicamente decisiones, gaps y evidencia del
+primer RP Greenhouse. Cualquier cambio material al contrato común vuelve al ADR/EPIC, no se esconde aquí.
+
+- Aplicar que Efeonce ID es la única autoridad de autenticación humana de los productos Efeonce para internos y
   externos, sin inferir población, organización ni acceso por issuer.
-- Decidir el perfil OIDC first-party reusable: registro de aplicaciones, strategy de `sub` y privacidad/correlación,
+- Aplicar que cada producto conserva URL de entrada, contexto y destino, no una pantalla redundante: Greenhouse
+  `/login` orquesta server-side y autoriza; Efeonce ID es el único login visible del flujo nuevo; Microsoft, Google,
+  passkey y correo son métodos, no productos ni identidades paralelas.
+- Consumir la alternativa C v2 aceptada, `login contextual directo`; rechazar el quinto provider, el vestíbulo `Continuar` y
+  el iframe/widget. La expansión global del redirect sigue siendo una decisión futura basada en evidencia, pero la
+  cohorte habilitada entra directamente desde el inicio.
+- Aplicar el perfil OIDC first-party reusable: registro de aplicaciones, strategy de `sub` y privacidad/correlación,
   account/factor linking, claims mínimos, audiences, assurance por app, sesión SSO del issuer, logout/revocación de
   relying parties y matriz de métodos upstream.
-- Registrar una unidad backend-critical dueña de esa foundation reusable y otra unidad de adopción de Globe bajo
-  EPIC-028, coordinada con TASK-1480/TASK-1511. TASK-1834 permanece como primer consumer Greenhouse.
+- Respetar el ownership del epic: U02 conserva protocolo/registro/policy de consentimiento, U03 sesión y métodos,
+  U15 logout y U09 la adopción Greenhouse. La adopción de Globe sigue como unidad propia bajo EPIC-028,
+  coordinada con TASK-1480/TASK-1511; TASK-1834 permanece como primer consumer.
 - Documentar la matriz de autoridades y enforcement points: autenticación Efeonce Auth; delegación OAuth;
   gateway MCP; autorización de negocio del provider; principal/sesión portal; navegación; vistas internas;
   vistas cliente; entitlements/actions; scopes de datos.
-- Aprobar una matriz de revocación por evento, mecanismo, cache/SLA y evidencia para source link/binding,
+- Aterrizar para Greenhouse la matriz de revocación por evento, mecanismo, cache/SLA y evidencia para source link/binding,
   principal, enrollment/relación workforce, rol, permission set, user override, módulo, entitlement override,
   scopes de datos, sesión upstream, sesión Efeonce Auth y sesión NextAuth.
 - Decidir un mecanismo provider-neutral para invalidar sesiones NextAuth cuando el principal Greenhouse queda
   inactivo o desaparece; no crear semánticas de autorización distintas para cada método de login.
 - Decidir `invited` vs `active` para cada método. El callback permanece read-only y no activa principals.
 - Decidir selección de contexto cuando una identidad tenga simultáneamente relaciones internas, externas o
-  multiorganización: selección autoritativa post-auth o deny `context_required/ambiguous`, nunca unión de permisos.
+  multiorganización: `0 = deny`, `1 = resolver`, `many = selector Greenhouse server-authorized`; nunca unión de
+  permisos, primer row ni selección por browser/email.
+- Congelar contrato de contexto RP: nombre, marca y return route se derivan del cliente/transacción registrada;
+  visita directa al issuer permanece neutral y un cliente desconocido nunca obtiene branding Greenhouse.
+- Congelar la clase `first_party_sign_in`: sesión suficiente produce fast path sin UI; autenticación requerida
+  muestra métodos sin consentimiento delegado; no cambia el consentimiento obligatorio de MCP/terceros.
+- Definir entry routing, recovery sin auto-redirect y prueba de ausencia de documento/flash intermedio.
+- Definir fases de migración, recovery clásica, medición y retiro; el fallback no es permanente ni desaparece por
+  intuición. La aceptación del ADR cumple el checkpoint de dirección; cualquier desviación material requiere nueva
+  aprobación antes de código.
 - Resolver en esta task o registrar como blocker de activación los drifts `session_360` PG↔BigQuery y Admin Center
   overlays↔`can()`; ninguna captura del panel sustituye una prueba del guard runtime.
-- Registrar tasks separadas para Microsoft cliente y Google upstream si se decide llevarlos al emisor; no
+- Mantener tasks separadas para Microsoft cliente y Google upstream si se decide llevarlos al emisor; no
   bloquear la integración aditiva mientras los providers directos sigan disponibles.
 
 ### Slice 1 — Consumir el perfil OIDC reusable y registrar Greenhouse
@@ -470,7 +603,15 @@ activación externa en Production y cualquier cutover/retiro de métodos, respec
   drift de metadata que hoy anuncia firma de ID token sin emitirlo.
 - Mantener separados cliente, audiencia, consentimientos, revocación y token families MCP/OIDC; metadata y
   comportamiento deben coincidir y sus registries no contaminarse.
+- Registrar el cliente Greenhouse con modo server-owned `first_party_sign_in`; omitir únicamente su pantalla de
+  consentimiento delegado, sin ampliar la excepción a clientes MCP o terceros.
 - Registrar cliente confidencial y redirect exacto por environment mediante el command gobernado.
+- Extender la authorization transaction con un contexto de RP confiable apto para el renderer de login; reutilizar
+  el `clientContext` existente o su successor sin aceptar application label/logo/return URL del query string.
+- El login directo sin transacción válida conserva `Entra a Efeonce`; sólo el cliente Greenhouse registrado produce
+  `Greenhouse`, `Entra a Greenhouse` y `Volver a Greenhouse`.
+- Si una sesión Efeonce ID vigente satisface assurance, completar la autorización y volver sin renderizar login ni
+  consentimiento; si no, renderizar exactamente una pantalla contextual de métodos.
 - Ejecutar conformance con un segundo relying party sintético: code, token, redirect, secreto y audiencia de un
   cliente nunca son aceptados por el otro. No requiere activar ni modificar Globe.
 
@@ -483,7 +624,8 @@ activación externa en Production y cualquier cutover/retiro de métodos, respec
 - Contexto interno: reutilizar enrollment/contexto TASK-1836 -> profile -> principal -> member -> organización
   operativa -> membership/relación workforce vigentes -> `session_360`.
 - Si ambos contextos o varias organizaciones son válidos, exigir selección autoritativa aprobada en Slice 0 o
-  devolver `context_required/ambiguous`; nunca usar uno como fallback del otro ni sumar su autoridad.
+  devolver `context_required`; el selector vive en Greenhouse, enumera sólo opciones elegibles y revalida la
+  elección. Colisión/población ambigua sigue siendo deny; nunca usar un path como fallback ni sumar autoridad.
 - Resolver el `TenantAccessRecord` completo con roles vigentes, route groups, vistas internas, permission sets,
   overrides, scopes de filas, flags y startup policy. No sustituir page guards, entitlement checks ni filtros de
   query con claims del provider.
@@ -509,10 +651,18 @@ activación externa en Production y cualquier cutover/retiro de métodos, respec
 
 ### Slice 4 — Exposición UI y recuperación
 
-- Mostrar `Continuar con Efeonce ID` globalmente sólo cuando el flag/readiness lo permite, junto a Microsoft,
-  Google, credenciales y magic link.
-- Representar pending/degraded/denied sin enumeración y conservar alternativas si el issuer falla.
-- Completar wireframe/flow, GVC 1440/390, teclado, reduced-motion, scorecard y `UI ready: yes` antes de JSX.
+- Implementar entry routing server-side: cohorte habilitada + issuer healthy + entrada normal produce un redirect
+  inmediato sin HTML, flash del formulario legado ni CTA intermedio; cohorte no habilitada ve sólo el login actual.
+- Implementar una recovery estable que omite el auto-redirect, permite reintento explícito y conserva los métodos
+  Greenhouse anteriores según la fase; nunca mostrar primero legacy y luego reemplazarlo client-side.
+- Extender el login del issuer con contexto Greenhouse derivado del RP validado, métodos elegibles, trust cue y
+  `Volver a Greenhouse`; preservar la variante directa neutral.
+- Implementar fast path de sesión suficiente y suprimir consentimiento delegado sólo para `first_party_sign_in`.
+- Implementar estados entry routing, legacy, issuer session fast path, issuer direct/contextual/method pending,
+  returning, recovery, denied y `0 | 1 | many` contextos sin enumeración ni loops.
+- Realizar primero el first fold mínimo detrás de flags OFF y checkpoint humano. Después completar GVC 1440/390,
+  teclado, zoom, reduced-motion, ausencia de pantalla intermedia, scorecard y readiness; sólo entonces promover
+  `UI ready: yes`.
 
 ### Slice 5 — Canaries, rollout y rollback
 
@@ -523,14 +673,24 @@ activación externa en Production y cualquier cutover/retiro de métodos, respec
   role-like falsificados no cambian autoridad; ocultar menú/botón no cuenta como deny sin atacar URL/API directa.
 - Comparar el resultado real de `getTenantContext`, `getTenantEntitlements`/`can()`, el primitive de módulos/vetos
   cliente y los filtros de scopes; el JWT o el panel de gobernanza por sí solos no prueban acceso efectivo.
-- Dark deploy; piloto interno y cohorte externa independientes. TASK-1833 gatea Production y TASK-1832 gatea
-  activación externa; ninguna gatea la construcción detrás de flags OFF.
+- Dark deploy y piloto interno separados. TASK-1833 gatea activar en Production; TASK-1832 aporta evidencia técnica
+  externa y TASK-1841 autoriza el primer piloto real consentido; ninguna gatea construcción detrás de flags OFF.
+- No retirar ni esconder permanentemente métodos directos hasta probar upstream/recovery, invitaciones TASK-1839,
+  credenciales TASK-1842 y logout TASK-1840, más uso del fallback por debajo del umbral aprobado.
 - Probar rollback con sesiones Efeonce ID ya emitidas y confirmar que los providers clásicos siguen operativos.
 - Publicar el conformance/runbook de onboarding de relying parties y probar que un producto nuevo puede registrarse
   sin agregar lógica Greenhouse-specific al issuer ni tocar el catálogo MCP.
 
 ## Out of Scope
 
+- Agregar `Continuar con Efeonce ID` como botón hermano de Microsoft/Google en Greenhouse.
+- Renderizar un CTA `Continuar` o cualquier vestíbulo Greenhouse antes del login contextual.
+- Redirigir globalmente todo `/login` sin cohorte, readiness, recovery y rollback; la dirección aprobada sí exige
+  redirect directo para cada cohorte explícitamente habilitada.
+- Embeber el issuer mediante iframe/widget o simular que sus cookies/passkeys pertenecen al origen Greenhouse.
+- Omitir consentimiento para clientes MCP/terceros; sólo `first_party_sign_in` Greenhouse evita esa pantalla.
+- Confiar nombre de aplicación, branding, organización o return URL desde parámetros del browser.
+- Mantener para siempre un catálogo Greenhouse de providers; los métodos anteriores son login legacy/recovery transitoria.
 - Retirar Microsoft, Google, credenciales o magic link del portal.
 - Crear un password store en Efeonce Auth o copiar hashes/credenciales del portal.
 - Implementar Microsoft cliente o Google como upstreams externos dentro de esta task.
@@ -539,12 +699,54 @@ activación externa en Production y cualquier cutover/retiro de métodos, respec
 - Migrar el runtime, callback, sesión, tenancy o UI de Globe; corresponde a una unidad propia bajo EPIC-028.
 - Implementar todos los productos futuros o concederles acceso por existir una cuenta Efeonce ID.
 - Unificar cookies, sesiones, logout, roles, entitlements, workspaces, capabilities, créditos o derechos entre
-  productos. Universal logout/device management queda sujeto al Delta ADR y a una unidad propia si se selecciona.
+  productos. Logout multiproducto pertenece a TASK-1840 y device management/passkey a TASK-1842.
 - Rediseñar globalmente la gobernanza de entitlements. El drift preexistente Admin Center overlays↔`can()` debe
   cerrarse en esta task o quedar en una unidad dueña que bloquee activación, sin ampliar silenciosamente el scope.
 - Declarar convergencia final o cutover sólo porque el provider nuevo funcione.
 
 ## Detailed Spec
+
+### Contrato de entrada de producto
+
+| Capa | Pregunta de la persona | Owner | Representación visible |
+|---|---|---|---|
+| Producto | ¿A dónde estoy entrando? | Greenhouse | `Greenhouse` en el issuer contextual y en el destino; `/login` inicia sin render intermedio |
+| Identidad | ¿Quién verifica quién soy? | Efeonce ID | confianza y shell del issuer |
+| Método | ¿Cómo lo demuestro ahora? | issuer/upstream | Microsoft, passkey o correo dentro del issuer |
+| Contexto | ¿Qué espacio puedo abrir? | Greenhouse | selector post-auth sólo si hay más de uno |
+| Autorización | ¿Qué puedo ver/hacer? | Greenhouse | sesión, guards, readers y scopes locales |
+
+Greenhouse no pregunta por organización antes de conocer la identidad ni obliga a confirmar que se quiere entrar
+después de haber elegido entrar. Efeonce ID no decide el tenant ni representa
+autoridad de producto. Un tercero como Claude/ChatGPT sí puede mostrar Efeonce ID como el servicio al que delega,
+porque no es un producto Efeonce; esa relación no justifica mostrar el issuer como quinto método dentro de Greenhouse.
+
+### Copy mínimo de la experiencia
+
+| Estado | Copy |
+|---|---|
+| Issuer context/title | `Greenhouse` / `Entra a Greenhouse` |
+| Issuer support | `Elige cómo quieres verificar tu identidad.` |
+| Issuer methods | `Continuar con Microsoft` / `Usar mi passkey` / `Recibir un enlace por correo` |
+| Issuer trust | `Identidad protegida por Efeonce ID` |
+| Issuer return | `Volver a Greenhouse` |
+| Greenhouse recovery | `No pudimos abrir el acceso seguro.` / `Intentar de nuevo` / fallback gobernado |
+| Context title | `Elige el espacio que quieres abrir` |
+| Closed error | `No pudimos completar el acceso. Inténtalo otra vez o usa otra opción.` |
+
+El copy final se centraliza en `src/lib/copy/*`, conserva nombres accesibles y se valida en desktop/mobile. No
+expone si existe una cuenta, cuál vínculo falló ni el nombre de una organización no autorizada.
+
+### Fases de migración de experiencia
+
+| Fase | Primer fold | Recovery | Gate de salida |
+|---|---|---|---|
+| 0 — dark | experiencia actual | experiencia actual | OIDC/resolver/contexto RP con flags OFF |
+| 1 — interna | `/login` redirige directo para allowlist; issuer contextual si requiere auth | ruta estable con métodos anteriores | paridad, no-flash, revocación y rollback internos |
+| 2 — sintética externa | sin público real | recovery completa | TASK-1832 + assurance TASK-1833 |
+| 3 — piloto consentido | redirect directo para cohorte nominada | recovery completa y soporte | TASK-1841 + evidencia de funnel/fallos |
+| 4 — expansión | redirect directo por cohorte | recovery medida | invitación, credenciales y logout listos |
+| 5 — cutover futuro | por decidir | por decidir | nueva decisión explícita; no pertenece al cierre automático |
 
 ### Matriz normativa de autoridades
 
@@ -570,10 +772,10 @@ pero las relaciones, contextos y autoridades efectivas continúan separadas.
 
 ### Matriz transicional obligatoria
 
-| Población | Métodos Greenhouse preservados | Método Efeonce ID de esta task | Autoridad efectiva |
+| Población | Recovery Greenhouse durante migración | Métodos en Efeonce ID | Autoridad efectiva |
 |---|---|---|---|
-| Cliente externo | Microsoft, Google, credenciales, magic link | magic link y passkey cuando TASK-1835 lo exponga; upstreams sociales fuera de scope | source link + invitation linked + binding Account 360 + `client_users`/roles vigentes |
-| Colaborador interno | Microsoft Entra directo; Google/credenciales sólo si ya son elegibles por la política vigente | Microsoft Entra upstream de TASK-1836; step-up local cuando aplique | enrollment + profile + principal + member + organización + relación workforce + roles vigentes |
+| Cliente externo | Microsoft, Google, credenciales y magic link actuales sólo en login legacy o recovery mientras su cohorte los necesite | magic link; passkey sólo para personas enroladas hasta TASK-1842; upstreams cliente fuera de scope | source link + invitation linked + binding Account 360 + `client_users`/roles vigentes |
+| Colaborador interno | Microsoft Entra directo y cualquier método adicional elegible, sólo en login legacy o recovery temporal | Microsoft Entra upstream de TASK-1836; passkey enrolada y step-up local cuando aplique | enrollment + profile + principal + member + organización + relación workforce + roles vigentes |
 
 La contraseña permanece temporalmente sólo en Greenhouse. Su retiro exige una task/ADR posterior con adopción de
 magic link/passkey, recuperación y soporte probados; no es criterio de cierre de TASK-1834.
@@ -620,7 +822,10 @@ Estado base que la implementación debe corregir o preservar de forma honesta:
 
 - Slice 0 aprobado -> Slice 1 -> Slice 2 -> Slice 3 -> Slice 4 -> Slice 5.
 - Ninguna exposición visible precede al provider+resolver fail-closed.
-- Ningún rollout externo en Production precede a TASK-1833 y al gate aplicable de TASK-1832.
+- Checkpoint `foundation dark`: Slice 0 aprobado y Slices 1–3 verificadas con experiencia OFF.
+- Checkpoint `experience activation`: first fold aprobado, GVC/scorecard, recovery y resolver E2E antes de cohorte.
+- Ningún rollout externo en Production precede a TASK-1833, evidencia aplicable de TASK-1832 y TASK-1841.
+- Ningún retiro amplio de recovery precede a TASK-1839, TASK-1840 y TASK-1842.
 
 ### Risk matrix
 
@@ -640,14 +845,31 @@ Estado base que la implementación debe corregir o preservar de forma honesta:
 | Role future-dated/no-active aparece vigente | access | medium/high impact | paridad lifecycle PG/BQ antes de rollout | role resolution drift |
 | Contexto multiorganización elige primer row | tenancy | medium/critical impact | match único binding↔organization o ambiguous | nondeterministic tenant |
 | Admin muestra deny/grant distinto de `can()` | entitlement | medium/high impact | prueba hot-path y owner/blocker explícito | governance-runtime drift |
-| Nuevo issuer bloquea login clásico | UX | medium | provider aditivo y fault isolation | classic provider regression |
+| Quinto provider confunde producto con identidad | UX | high | entry directo; métodos viven sólo en issuer | provider soup / abandono inicial |
+| Vestíbulo `Continuar` crea un login antes del login | UX | high | redirect server-side sin documento intermedio | clic redundante / doble pantalla |
+| Login legado aparece antes del redirect | UX/runtime | medium | routing server-side + GVC no-flash | form flash / layout shift |
+| Recovery rebota de nuevo al issuer | UX/reliability | medium/high impact | ruta/estado no-auto-redirect + prueba de loop | redirect loop |
+| First-party muestra consentimiento innecesario | UX/auth | medium | client mode registrado + test negativo/positivo | consent screen en login Greenhouse |
+| Excepción first-party elimina consent de terceros | auth | low/critical impact | policy por client/transaction + tests MCP/third-party | delegated consent bypass |
+| Contexto Greenhouse forjable en issuer | auth/UX | low/critical impact | metadata sólo desde RP/transacción registrados | untrusted application context |
+| Passkey primaria sin enrollment | UX/access | high | TASK-1842 antes de promoción general | passkey dead end / dependencia correo |
+| Fallback temporal se vuelve permanente | UX/ops | medium | instrumentación + umbral/owner de retiro | legacy usage sin descenso |
+| Nuevo issuer bloquea acceso | UX | medium | entry routing gated, fault isolation y recovery clásica | current-method regression |
+| Logout cierra más sesiones que lo comunicado | session/UX | medium/high impact | TASK-1840 + copy de alcance | unexpected cross-product logout |
+| Invitación de identidad y portal se duplican | onboarding | medium | TASK-1839 antes de expansión | doble correo / principal incompleto |
 
 ### Feature flags / cutover
 
-- Definir dos flags OFF por default: contrato OIDC del issuer y provider visible/aceptado por Greenhouse.
-- Si la infraestructura de flags soporta cohortes por población, separar interno/externo; si no, el resolver debe
-  aplicar allowlist server-side post-callback sin enumeración.
-- No existe cutover de métodos en esta task.
+- Definir roles de flag OFF por default, con nombres exactos congelados antes de Slice 1:
+  - carril OIDC first-party del issuer;
+  - contexto RP en login del issuer;
+  - clase `first_party_sign_in` y supresión de consentimiento limitada a clientes registrados;
+  - aceptación callback/session Greenhouse;
+  - entry routing directo de Greenhouse por cohorte;
+  - login legacy/recovery de métodos anteriores y su modo `legacy | recovery | retired`.
+- Cohortes internas/externas se resuelven server-side. La UI no decide elegibilidad ni recibe una lista que permita
+  enumerar organizaciones antes de autenticar.
+- `retired` no se activa dentro del cierre automático de esta task; requiere decisión de cutover y evidencia.
 
 ### Rollback plan per slice
 
@@ -655,7 +877,7 @@ Estado base que la implementación debe corregir o preservar de forma honesta:
 |---|---|---|---|
 | 1 | flag issuer OFF; conservar OAuth/MCP existente | < 10 min | sí |
 | 2–3 | provider portal OFF + redeploy; invalidar/revocar sesiones Efeonce ID | < 15 min | sí |
-| 4 | ocultar acción por flag sin tocar providers clásicos | < 10 min | sí |
+| 4 | desactivar entry routing directo, restaurar login actual y conservar recovery no-loop | < 10 min | sí |
 | 5 | retirar cohorte por población y confirmar deny | < 15 min | sí |
 
 La migración del enum/check de `auth_attempts` es expand-only y puede permanecer tras rollback.
@@ -668,14 +890,18 @@ La migración del enum/check de `auth_attempts` es expand-only y puede permanece
 3. Staging externo: mismo user/profile/org/roles que método clásico; casos missing/mismatch/revoked denegados.
 4. Staging interno: mismo principal/member/org/roles que Entra directo; baja/revocación deniega.
 5. Assurance incremental de callback, account linking, token substitution, CSRF/state/nonce y enumeración.
-6. Piloto Production interno; luego cohorte externa autorizada; observar antes de ampliar.
-7. Rollback completo con sesión vigente y control positivo de providers clásicos.
-8. Publicar conformance/onboarding; la adopción real de Globe permanece cerrada hasta su unidad y gates propios.
+6. First fold interno con redirect sin pantalla + issuer contextual; GVC no-flash, teclado, reduced motion,
+   context selector, first-party sin consent y recovery medida.
+7. Piloto Production interno; después TASK-1841 con una cohorte externa explícitamente consentida.
+8. Rollback completo con sesión vigente y control positivo de recovery clásica.
+9. Verificar onboarding TASK-1839, passkey/credenciales TASK-1842 y alcance de logout TASK-1840 antes de expansión.
+10. Publicar conformance/onboarding; Globe permanece cerrada hasta su unidad y gates propios.
 
 ### Out-of-band coordination required
 
 - Delta ADR aprobado; cliente/audiencia/redirects; secrets y env vars por target; deploy auth-server; Vercel
-  config/redeploy; cohortes nominadas; owner de assurance y soporte.
+  config/redeploy; cohortes nominadas; owners de assurance, soporte, onboarding y fallback retirement.
+- Aprobación humana del first fold antes de exposición y consentimiento del piloto separado para el primer cliente real.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 4 — VERIFICATION & CLOSING
@@ -684,24 +910,42 @@ La migración del enum/check de `auth_attempts` es expand-only y puede permanece
 
 ## Acceptance Criteria
 
-- [ ] Delta ADR aprobado declara Efeonce ID como única autoridad de autenticación humana de productos Efeonce para
-      clientes e internos; separa issuer, upstream, relaciones/poblaciones, contexto y autoridad, y actualiza los
-      límites previos de MCP/Greenhouse/Entra.
-- [ ] El Delta ADR fija la estrategia de `sub`, account/factor linking, privacidad/correlación, sesión SSO,
+- [x] Dirección v2 de producto/UI seleccionada por el operador el 2026-09-07: Greenhouse conserva URL/contexto de
+      entrada sin render intermedio, Efeonce ID autentica en la única pantalla visible del flujo nuevo, se rechazan
+      quinto provider, CTA-vestíbulo e iframe y se documentan alternativas, copy, estados, responsive, accessibility
+      y GVC en
+      `docs/ui/visual-directions/TASK-1834-greenhouse-login-convergence-native-issuer.md`.
+- [x] ADR aceptado declara Efeonce ID como única autoridad de autenticación humana de productos Efeonce para
+      clientes e internos; declara que cada producto conserva su entrada; separa issuer, upstream,
+      relaciones/poblaciones, contexto y autoridad; y actualiza los límites previos de MCP/Greenhouse/Entra.
+      Evidencia documental: `EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md`; no acredita implementación.
+- [ ] El implementation contract fija la estrategia de `sub`, account/factor linking, privacidad/correlación, sesión SSO,
       assurance y revocación/logout por relying party sin compartir cookies o tokens entre productos.
-- [ ] Existe una unidad backend-critical dueña del perfil OIDC/registry/conformance/onboarding reusable y una unidad
-      separada de adopción Globe coordinada con TASK-1480/TASK-1511; TASK-1834 no declara implementadas esas unidades.
-- [ ] El Delta ADR incluye la matriz de autoridades/no-transferencia y la matriz de revocación por mecanismo,
-      cache, SLA y evidencia; la convergencia de login no cambia quién autoriza el portal.
+- [x] El epic declara ownership reusable sin crear una task duplicada: U02 protocolo/registro/consentimiento, U03
+      sesión/métodos, U05 autorización MCP y U15 logout; U09 es primer consumer Greenhouse. La adopción Globe sigue
+      separada bajo EPIC-028/TASK-1480/TASK-1511. Es un cierre de ownership documental, no de implementación.
+- [ ] Esta task aterriza para Greenhouse la matriz de autoridades/no-transferencia y la matriz de revocación por
+      mecanismo, cache, SLA y evidencia; la convergencia de login no cambia quién autoriza el portal.
 - [ ] `auth.efeonce.org` ofrece un OIDC coherente para Greenhouse; `openid` produce `id_token` con nonce y
       `aud=client_id` Greenhouse, fuera de `EFEONCE_MCP_SCOPES` y sin reutilizar `GrantsVersionPort`, `gv`,
       consentimientos o access token MCP.
 - [ ] El perfil OIDC reusable permite registrar un segundo RP sintético sin branch Greenhouse-specific ni cambio al
       catálogo MCP; code/token/redirect/secret/audience de un RP son rechazados por el otro.
+- [ ] El contexto de aplicación del issuer proviene exclusivamente del RP/transacción registrados: un request
+      Greenhouse válido muestra `Entra a Greenhouse`, una visita directa muestra `Entra a Efeonce` y parámetros
+      libres no pueden inyectar nombre, logo ni return URL.
+- [ ] `/login` de una cohorte habilitada crea la transacción y redirige server-side sin documento, formulario legacy,
+      flash ni CTA intermedio; una cohorte no habilitada ve únicamente el login actual.
+- [ ] Una sesión Efeonce ID que satisface assurance completa el retorno sin login ni consentimiento; cuando requiere
+      autenticación, existe una sola pantalla contextual con métodos elegibles.
+- [ ] Greenhouse `first_party_sign_in` no muestra consentimiento delegado y pruebas negativas confirman que clientes
+      MCP/terceros siguen exigiendo su consentimiento normal.
+- [ ] Recovery usa una ruta/estado estable que omite auto-redirect, permite reintento explícito y no entra en loop.
 - [ ] El resolver obtiene una identidad canónica y exactamente un contexto Greenhouse/`TenantAccessRecord`, o
       outcome cerrado, sin email/domain fallback, elección arbitraria ni unión de permisos.
 - [ ] La misma identidad puede sostener relaciones internas, externas y multiorganización; `context_required` o
-      `ambiguous` bloquea la sesión hasta una selección autoritativa y ninguna relación amplía a otra.
+      `ambiguous` bloquea la sesión hasta una selección autoritativa. `many` usa un selector Greenhouse con opciones
+      elegibles y revalidación server-side; ninguna relación amplía a otra.
 - [ ] Cliente externo nunca recibe autoridad interna y una relación interna no hereda módulos, entitlements o
       workspaces de una relación cliente sólo por compartir identidad.
 - [ ] Perfil sin `client_users`, principal/profile inactivo, múltiples principals, organization mismatch,
@@ -730,13 +974,24 @@ La migración del enum/check de `auth_attempts` es expand-only y puede permanece
 - [ ] Claims `roles`, `groups`, `scp`, `scope`, `gv`, tenant/org/member/view/capability falsificados en el ID token
       no alteran la sesión ni el acceso resuelto; las pruebas atacan URL/API directa, no sólo visibilidad UI.
 - [ ] Person 360 conserva el mismo perfil/link y Account 360 la misma organización; no se presenta invitation linked como `person_memberships`.
-- [ ] Microsoft, Google, credenciales y magic link vigentes siguen funcionando con flags ON y OFF; una falla de Efeonce ID no los bloquea.
+- [ ] Microsoft, Google, credenciales y magic link vigentes siguen funcionando con flags ON y OFF; durante la
+      migración son alcanzables sólo en cohortes legacy/recovery y una falla de Efeonce ID no los bloquea.
 - [ ] La contraseña permanece sólo en Greenhouse; no se crea password store ni se copian hashes al emisor.
-- [ ] La UI usa botón global gated, no descubre organización por email, no enumera cuentas y pasa wireframe/flow/readiness/GVC desktop-mobile/teclado/reduced-motion.
+- [ ] La UI no muestra Efeonce ID como botón hermano de Microsoft/Google ni un `Continuar` previo; el issuer
+      contextual presenta Greenhouse como destino, ofrece sólo métodos de autenticación, permite volver y conserva
+      su variante directa neutral.
+- [ ] Entry routing, legacy, issuer session fast path, direct/contextual/pending issuer, returning, recovery, denied y
+      `0 | 1 | many` pasan wireframe/flow/motion/readiness/GVC desktop-mobile/teclado/zoom/reduced-motion sin scroll
+      horizontal ni pantalla intermedia.
+- [ ] El funnel mide entry routing, sesión reutilizada/login mostrado, callback, resolución, sesión creada, recovery y
+      errores por cohorte sin PII; ningún método se retira sin umbral, owner y evidencia aprobados.
 - [ ] `auth_attempts` admite el provider nuevo mediante migración aditiva y registra outcomes sanitizados sin PII/tokens/raw errors.
 - [ ] Revocación de cada autoridad relevante deniega una sesión vigente dentro del SLA medido y no afecta otra población/principal.
 - [ ] Rollback por población invalida/deniega sesiones Efeonce ID y mantiene intactos vínculos, perfiles y providers clásicos.
-- [ ] TASK-1833 cubre el delta OIDC/callback antes de Production; TASK-1832 autoriza la cohorte externa antes de activarla.
+- [ ] TASK-1833 cubre OIDC/callback antes de activar en Production; TASK-1832 aporta evidencia técnica externa y
+      TASK-1841 autoriza el primer piloto real consentido. El cliente no actúa como tester técnico.
+- [ ] TASK-1839 evita onboarding duplicado, TASK-1842 permite enrolar/administrar passkey y TASK-1840 fija el alcance
+      de logout antes del cutover amplio o retiro permanente de recovery.
 - [ ] Microsoft cliente y Google upstream quedan en tasks separadas antes de cualquier retiro de sus providers directos.
 - [ ] Un producto futuro puede aplicar el runbook de onboarding y resolver el mismo `identity_profile` sin crear
       cuenta humana, password store, lógica ad hoc en el issuer ni autorización cross-product.
@@ -784,8 +1039,8 @@ de tener recorrido.
 
 ## Follow-ups
 
-- Registrar la foundation reusable de Efeonce ID multiproducto: registry/policy de relying parties, conformance,
-  onboarding, revocación/logout y observabilidad, como unidad backend-critical de EPIC-044.
+- Mantener el contrato reusable en los owners existentes del epic: U02 protocolo/registro/consentimiento, U03
+  sesión/métodos, U05 autorización MCP y U15 logout. TASK-1834 sólo implementa el primer consumer Greenhouse.
 - Registrar la adopción de Efeonce ID por Globe como unidad propia de EPIC-028, sucesora del broker vigente y
   coordinada con TASK-1480/TASK-1511; preservar cookie/sesión y autorización Globe.
 - Upstream Microsoft para clientes en Efeonce ID, si el Delta ADR lo selecciona.
@@ -795,8 +1050,14 @@ de tener recorrido.
 
 ## Open Questions
 
-- La estrategia de subject del perfil first-party (`public` estable vigente vs pairwise) debe decidirse en el Delta
-  ADR con su impacto de privacidad, linking, auditoría y migración; nunca se cambia silenciosamente.
-- Universal logout/device management y un password propio no están decididos. El ADR vigente es passwordless; si se
-  exige contraseña en Efeonce ID, requiere decisión explícita y nunca importación de hashes Greenhouse.
-- Los nombres finales de flags, SLA de revocación e IDs de las unidades nuevas se fijan antes de Slice 1.
+- La estrategia de subject del perfil first-party (`public` estable vigente vs pairwise) debe decidirse en el
+  implementation contract de esta task —o por Delta ADR si cambia la decisión transversal— con su impacto de
+  privacidad, linking, auditoría y migración; nunca se cambia silenciosamente.
+- TASK-1840 ya separa logout local, sesión Efeonce ID del dispositivo y todas las sesiones; falta decidir qué
+  affordance y default consume Greenhouse en cada fase. TASK-1842 es el owner de dispositivos/passkeys.
+- El ADR vigente es passwordless; si se exige contraseña en Efeonce ID, requiere decisión explícita y nunca
+  importación de hashes Greenhouse.
+- Falta decidir si Microsoft/Google cliente deben existir como upstreams de Efeonce ID antes del retiro de sus
+  providers directos; hasta entonces permanecen como recovery Greenhouse.
+- Los nombres finales de flags, SLA de revocación, umbral/ventana de retiro del fallback e IDs de las unidades
+  nuevas se fijan antes de Slice 1.

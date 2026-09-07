@@ -1,9 +1,16 @@
 # Handoff activo
 
+**TASK-1813 — COMPLETE:** `efeonce-mcp` `1.2.0`/`00047-8b5` sirve 100 % Ready. Discovery base-only, rollback y
+matriz post-cutover están verificados. Claude Code, Codex, Claude.ai, Claude Desktop y ChatGPT leyeron sin gasto;
+Desktop/ChatGPT renovaron con `efeonce.mcp.read`. Docs/skills están alineados; sin widening ni cambios Entra.
+Multi-org queda en TASK-1844/U19.
+[Task](docs/tasks/complete/TASK-1813-efeonce-mcp-oauth-client-interoperability.md) ·
+[auditoría](docs/audits/mcp/TASK-1813_OAUTH_HARDENING_QA_2026-09-07.md).
+
 **TASK-1832 — canary productivo en observación; retiro después del 2026-09-13 19:43Z (Codex,
 2026-09-07):** release Greenhouse `fb5fc082aa92-3f2c8706-24fa-452d-be8f-6feea7b8cdd9` `released`;
-Vercel/auth-server `00043-ndg` sirven `fb5fc082aa92`; gateway `v1.1.2`/`171965c99034`/`00046-6n2` sirve 100 %,
-con gates ON, MCP v2 `2.0.0`, CI/deploy verdes. Readback `2026-09-07T12:20:25Z`: Ready/100 %, SHA alineados con
+Vercel/auth-server `00043-ndg` sirven `fb5fc082aa92`; gateway `1.2.0`/`00047-8b5` está 100 % Ready. Gates ON,
+MCP v2 `2.0.0` y CI/deploy verdes. Readback `2026-09-07T12:20:25Z`: Ready/100 %, SHA alineados con
 `origin/main`, health/metadata 200, MCP anónimo 401, producción ON y Vercel staging OFF; cero mutaciones.
 
 ChatGPT hospedado está verde con scope único `efeonce.mcp.read`, dos tools read-only y refresh post-TTL sin
@@ -92,24 +99,30 @@ rollback. No revoca consentimientos, roles, entitlements, memberships, `gv`, fac
 TASK-1834 y Globe quedan como consumers separados. Sólo task/registry/README/epic/handoff; sin código, migración,
 flag, push, deploy ni modificación de TASK-1834. Siguiente paso: Slice 0/Delta ADR con checkpoint humano.
 
-**TASK-1834 — especificación corregida, sin implementación (Codex, 2026-09-06):** auditoría paralela contra
-código/ADRs confirmó que `auth.efeonce.org` aún no entrega OIDC utilizable por NextAuth (sin `openid`/`id_token`/
-`userinfo`, access token con audiencia MCP) y que source link + binding no bastan sin `client_users`/acceso vigente.
-Una segunda auditoría de autorización confirmó que Efeonce Auth debe probar identidad, no emitir permisos del portal:
-OIDC Greenhouse queda separado de scopes/consentimiento/`gv`/grants MCP, mientras Greenhouse conserva roles, route
-groups, vistas internas, módulos cliente, entitlements, `can()` y scopes de datos. La task ahora cubre clientes +
-internos mediante Delta ADR, OIDC de audiencia Greenhouse, resolvers separados hasta `TenantAccessRecord`, ledger,
-UI/flow/motion y rollout por población; preserva Microsoft, Google, credenciales y magic link. También deja como gates
-de activación la sesión que hoy conserva claims al quedar inactivo el principal, el drift de vigencia de roles PG/BQ,
-la selección multicontexto no determinista y la posible diferencia entre permisos del Admin Center y enforcement
-`can()`. TASK-1832/1833 gatean activación, no dark deploy. Sólo docs locales; sin código, commit, push ni deploy.
-**Dirección adicional del operador:** Efeonce ID será la identidad humana canónica de todos los productos Efeonce
-para clientes e internos; Greenhouse es el primer relying party, no el dueño permanente del login. Cada producto
-mantiene cliente/audiencia/cookie/sesión y autorización propios; una identidad con varias relaciones selecciona un
-contexto sin sumar permisos. Auditoría Globe: hoy usa el broker Greenhouse, acepta sólo internos y conserva tenancy
-en transición, por lo que su adopción requiere unidad y Delta propios coordinados con TASK-1480/TASK-1511. TASK-1834
-ahora exige Delta ADR multiproducto, foundation OIDC reusable, conformance cruzada y registro de esas unidades antes
-de implementar. Siguiente paso: plan/ADR de Slice 0 con checkpoint humano antes del primer cambio de código.
+**TASK-1834 — dirección v2 de login único Greenhouse/Efeonce ID aprobada, sin implementación (Codex,
+2026-09-07):** después de revisar la UI real, se rechazaron dos modelos: `Continuar con Efeonce ID` como quinto
+provider mezclaba producto, autoridad y método; un CTA genérico `Continuar` todavía creaba un login antes del login.
+La decisión vigente mantiene Greenhouse como URL/contexto de entrada y autoridad de producto, pero `/login` de una
+cohorte habilitada crea la transacción y redirige server-side sin pantalla ni flash intermedio. Efeonce ID muestra el
+único login visible, `Entra a Greenhouse`, desde un RP/transacción registrados y ofrece Microsoft/passkey/correo. Si
+la sesión del issuer satisface assurance, vuelve sin mostrar login; el first-party sign-in tampoco muestra
+consentimiento delegado. Login MCP/terceros conserva consentimiento. El login directo mantiene `Entra a Efeonce`.
+
+La decisión transversal ya no vive en TASK-1834: EPIC-044 y el ADR Accepted
+`EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md` son dueños de entry, RP confiable, fast path,
+aislamiento y frontera de consentimiento. TASK-1834 queda como primer consumer Greenhouse. EPIC-044 y
+TASK-1829/1830/1831/1833/1834/1840/1841/1842 quedaron sincronizadas; las skills `efeonce-mcp-platform` y
+`greenhouse-ai-design-studio` cargan el ADR. El ADR nativo previo conserva su historia y suma sólo un delta.
+
+El resolver trata `0 | 1 | many`: deny, contexto único o selector Greenhouse server-authorized; nunca email,
+query param, `LIMIT 1` ni suma de permisos. La foundation OIDC/resolver puede construirse en oscuro antes de
+TASK-1833. Activar externos exige assurance TASK-1833, evidencia sintética TASK-1832 y piloto consentido TASK-1841;
+el cutover amplio además espera invitaciones TASK-1839, logout TASK-1840 y credenciales/passkey TASK-1842. Cohortes
+no habilitadas ven sólo el login vigente; recovery usa una ruta/estado sin auto-redirect para evitar loops. `UI
+ready: no` hasta first fold contextual, checkpoint humano, GVC no-flash y scorecard. No hubo código, migración,
+flag, commit, push ni deploy. Siguiente paso si se ejecuta: confirmar `/goal`, correr
+`pnpm codex:task-hook TASK-1834` y planificar Slice 0; Slices 1–3 detrás de flags OFF antes de cualquier first fold
+visible.
 
 **TASK-1837 (EPIC-044 U12) — `EN PRODUCCIÓN 2026-09-06, COMPLETE`.** Release `b3e324cb5c8d-3cfce865-236f-4e4e-b128-8e144de193cf` (run `34029501838`, PR #227, target `b3e324cb5c8d`), manifest `released` 11:23:09Z en un solo intento. Break-glass con hechos (la migración `20260906004450748` ya estaba aplicada en la instancia única, `run_on 04:27:58Z`); el smoke de `main` se PRODUJO en vez de bypassearse. Cinco servicios Cloud Run OK: `ops-worker` y `auth-server` quedaron en `2b385284d594` con **hash de árbol IDÉNTICO** al target (`d3a1432a1f71`) — no-op legítimo probado por identidad de árbol, no por el change-gate; watchdog `drift_count=0`. Ambos flags `EXTERNAL_INVITATION_*` ON en Production (valor live leído con `vercel env pull`) + redeploy obligatorio `greenhouse-j7aix61yk`. **Canary de contrato contra producción**: la misma llamada a la lane delegada pasó de `404` anti-oráculo a `422 field=bindingId`, y con `organizationId` a `403 forbidden` — la lane ejecuta la resolución de autoridad, no sólo existe. Federación mergeada en `efeonce-mcp` (PR #3 → `65ae1d5`, revisión `00038-8jj`); ese repo **NO** despliega en push a `main`, va por dispatch de `deploy.yml`.
 
@@ -238,7 +251,7 @@ root integró identidad, arquitectura, tareas e índices. [Cobertura y límites]
 Bug independiente de correlación de releases por SHA/run ID sigue pendiente; el runbook documenta mitigación
 con un coordinador y lectura de intentos/eventos, sin declararlo corregido.
 
-Seguimiento OAuth (2026-09-02): [TASK-1813](docs/tasks/to-do/TASK-1813-efeonce-mcp-oauth-client-interoperability.md)
+Seguimiento OAuth (2026-09-02): [TASK-1813](docs/tasks/complete/TASK-1813-efeonce-mcp-oauth-client-interoperability.md)
 creada `to-do`, sin implementar. Codex 0.152.0 rechazó discovery; metadata pública revalidada a las 22:51Z.
 La [auditoría](docs/audits/EFEONCE_MCP_CODEX_OAUTH_INTEROPERABILITY_2026-09-02.md) identifica scopes sin cualificar
 al apagar shim, fallback de deploy que lo reactiva y canary directo que no prueba discovery. El plan B histórico

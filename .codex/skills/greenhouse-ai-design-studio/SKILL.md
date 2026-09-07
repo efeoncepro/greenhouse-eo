@@ -40,6 +40,15 @@ Runtime wins over stale prose. Greenhouse uses Geist for product UI, Poppins for
 display headings through theme variants, AXIS/MUI tokens, Composition Shell,
 The Seam and canonical motion wrappers.
 
+For login, issuer or authorization-consent surfaces, also read
+[`EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md`](../../../docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md)
+before selecting a direction. A registered Efeonce first-party product may use a contextual server redirect so
+the issuer is the only visible login, and an existing issuer session may avoid that UI entirely. Never design an
+iframe, a fifth-provider option, a click-only vestibule or delegated consent for that first-party transaction;
+the client and presentation context must come from the issuer's validated registration/transaction, not arbitrary
+query copy. This visual convergence does not remove MCP/third-party consent, step-up, scopes, audience or token
+separation, and an issuer session never grants product or MCP access by itself.
+
 ## Specialist lanes — available skills only
 
 Use the minimum lanes that apply:

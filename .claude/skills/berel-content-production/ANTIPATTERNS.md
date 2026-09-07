@@ -4,6 +4,20 @@
 > documentados en su propia wiki. El resto son reglas que el cliente marcó en revisión, algunas más
 > de una vez.
 
+## 🔴 Exposición de operación interna al cliente — incidente 2026-09-07
+
+- **Tratar un callout o toggle colapsado como privado.** En Notion compartido, todo lo accesible en la
+  página es superficie del cliente. Procedencia, prompts, QA, pendientes, specs, CMS/Dev y mensajes entre
+  agentes viven fuera, en el sistema privado de Efeonce. (→ `03`, `07`, `18`)
+- **Mezclar el artículo con su brief de producción.** La versión vigente contiene solo metadatos aprobables
+  y copy público; banners, ALT, archivos, medidas, lazy-load y montaje se gobiernan en tareas visuales. (→ `03`, `05`, `13`)
+- **Corregir solo la frase que el cliente marcó.** Una nota interna detectada es un incidente centinela:
+  exige barrido de toda la versión, callouts, toggles, comentarios y bloques visibles relacionados. (→ `18`)
+- **Confiar en `success` después de un reemplazo.** Un reemplazo puede perder el tabulador, expulsar el texto
+  del toggle y quedar guardado sin error. Comparar sangría, releer markdown y render. (→ `07`, `18`)
+- **Mover notas internas a un bloque llamado `Histórico` y darlas por resueltas.** El rótulo ordena versiones;
+  no vuelve privada una fuga todavía visible ni sustituye la revisión de la versión activa. (→ `03`, `18`)
+
 ## Tutoriales: regresiones detectadas el 2026-09-03
 
 - **Confundir cuatro encabezados con un procedimiento completo.** Cada operación necesaria debe
@@ -33,8 +47,8 @@
   no solo anotarla al final. El documento no puede quedar con afirmaciones falsas. (→ `02`)
 - **Presentar una estimación como dato medido.** Volúmenes de búsqueda y comparaciones de competencia
   sin herramienta van marcados como **estimación**. (→ `02`)
-- **Elegir una fuente cuando dos se contradicen.** Ninguna entra: van al callout de discrepancia y se
-  reportan al cliente. (→ `01`)
+- **Elegir una fuente cuando dos se contradicen.** Ninguna entra: van al registro privado de discrepancias
+  y se reportan al cliente por el canal apropiado. (→ `01`)
 - 🔴 **Tomar el brief como verificado.** *Caso real:* un brief de septiembre 2026 afirmaba que el COV
   de Berelinte se declara *"menor a 50 g/L"* cuando la ficha dice `< 50 g/L`, con símbolo; daba por
   buena una cita de ficha que todavía había que confirmar y proponía enlaces a fichas de producto
@@ -55,7 +69,8 @@
 - **Omitir un pendiente.** *Un pendiente declarado es gestionable; uno omitido se publica como
   error.* (→ `03`)
 - 🔴 **Publicar el proceso interno como si fuera contenido.** `El cliente`, instrucciones, CMS,
-  extracción, posicionamiento o verificaciones viven en callouts internos, nunca en el cuerpo. (→ `03`, `09`)
+  extracción, posicionamiento o verificaciones no viven en ningún punto de la página compartida, ni
+  siquiera en callouts o toggles; se registran en el sistema privado de Efeonce. (→ `03`, `07`, `09`, `18`)
 - **Dejar un dato faltante como disclaimer visible.** Se retira del cuerpo, se registra internamente y
   se solicita la fuente oficial. (→ `03`, `09`)
 - **Tratar un producto nuevo como categoría consolidada.** Un title `Guía [Producto]`, diferenciadores
@@ -130,6 +145,13 @@
 - **Plantear una metáfora en el título y abandonarla a mitad del texto.** (→ `04`)
 - **Pasarse de metáfora.** El cliente pidió lenguaje más plano en agosto 2026: *"los tres frentes"*,
   *"ya tomó la pared"* → *"orígenes"*, *"manchas que reaparecen"*. **Ante la duda, más plano.** (→ `09`)
+- **Confundir ingenio con claridad.** Si un remate exige una segunda lectura para entenderse, se reescribe
+  en llano aunque suene memorable. (→ `04`, `18`)
+- **Desarrollar otra intención bajo el encabezado equivocado.** Color bajo resistencia, precio bajo
+  inspiración o cualquier sección que no cumpla su promesa. Reubicar con encabezado propio y línea puente;
+  no borrar cobertura útil. (→ `03`, `04`, `18`)
+- **Copiar literalmente la solución sugerida por el cliente sin validarla.** El diagnóstico puede ser correcto
+  y la frase introducir `ideal`, romper el hilo o debilitar SEO/AEO. Tomar la sustancia, no la letra. (→ `18`)
 - **Culpar al lector** ("la pintura equivocada") o denigrar el resultado ("se ve cansada"). La
   tensión se plantea en términos técnicos. (→ `09`)
 - **Repetir el nombre completo del producto.** Una vez y después genérico; **contarlo antes de
@@ -222,6 +244,16 @@
 - 🔴 **Dar por buena la respuesta de escritura sin una segunda lectura.** Automatizaciones de Notion
   pueden sobrescribir fecha o estado después del alta. La evidencia de cierre es una consulta fresca
   del lote completo, no el payload aceptado. (→ `01`, `07`)
+- 🔴 **Responder comentarios desde previews parciales.** Los indicadores del body pueden omitir respuestas;
+  inventariar todos los hilos antes de editar o contestar. (→ `18`)
+- 🔴 **Marcar como resuelto un hilo del cliente.** Efeonce atiende y responde; el cierre nativo pertenece a
+  quien comentó o a su contacto del lado del cliente. (→ `18`)
+- **Tratar `resolved=false` como deuda pendiente de Efeonce.** `Atendido` se prueba con decisión, cambio cuando
+  aplica, respuesta y readback; es independiente del estado de resolución del cliente. (→ `18`)
+- **Responder `listo` o `corregido` sin explicar la decisión.** Cada respuesta declara qué se aceptó, qué se
+  cambió de otra manera y la regla o dato que lo sostiene. (→ `18`)
+- **Mezclar hallazgos fuera de alcance dentro del hilo.** Reportarlos aparte; si la pieza ya está publicada,
+  abrir también el pendiente Drupal sin afirmar que el sitio cambió. (→ `08`, `18`)
 - 🔴 **Clasificar como reescritura una canónica planificada porque devuelve HTTP 200.** En Berel una
   ruta inexistente responde con shell vacío; sin `title`, H1 y cuerpo sigue siendo Modalidad B y sus
   enlaces entrantes/sociales permanecen bloqueados hasta QA live. (→ `01`, `03`)
