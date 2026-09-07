@@ -10,6 +10,9 @@ passkey real Chrome/Safari, Codex 0.153.4, helper y las cinco negativas tienen e
 La guarda nueva confirmó el `organization_id` exacto. Claude Code 2.1.186 falla cerrado por scopes desconocidos/
 write; Claude Desktop/web y ChatGPT siguen abiertos en `TASK-1813`. El callback Codex puede mostrar
 `ERR_BLOCKED_BY_CLIENT` bajo Chrome depurado después de que el CLI ya recibió el code.
+ChatGPT: discovery live anuncia refresh grant y entrega refresh rotativo, pero no `offline_access`; OpenAI lo
+recomienda para continuidad. La fila hospedada debe medir renovación post-TTL; resolver en `TASK-1813` sin
+ampliar capabilities.
 
 El workflow staging `34071542507` apagó el gate fail-closed en el Cloud Run único entre 01:07:25Z y 01:15:47Z.
 Production `34072064873` restauró `00043-ndg`, SHA released, Ready/100 % y preflight verde. Las variables GitHub

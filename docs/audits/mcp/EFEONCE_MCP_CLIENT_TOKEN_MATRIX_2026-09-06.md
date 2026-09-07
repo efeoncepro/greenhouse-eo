@@ -71,7 +71,7 @@ Vercel staging, que permanece OFF. El retiro debe cambiar esa variable de reposi
 | Claude Code | `2.1.186` | `http://127.0.0.1:18432/callback` | pre-registrado DCR `dcr-PUG…` | descubrió PRM/AS | no llegó al consentimiento: solicitó catálogo completo, scopes cualificados duplicados y writes; emisor rechazó `invalid_scope` | no emitidos | no ejecutado | no emitidos | `FAIL — TASK-1813` |
 | Claude Desktop/web | no operado | HTTPS hospedado | no verificado | no verificado | no verificado | no emitidos | no ejecutado | no emitidos | `PENDIENTE` |
 | Codex | `0.153.4` | `http://127.0.0.1:<dinámico>/callback` | DCR público limitado `dcr-BUH…` | PRM/AS live | intento descubierto con scopes extra rechazado; retry sin scopes mostró la organización exacta y sólo lectura; autorizado | token aceptado por gateway; sin exponer token/subject | sesión nueva listó e invocó `get_seo_entitlement`; `no_entitlement`, cero gasto | OAuth del cliente válido; rotación/revocación cubierta por helper | `PASS` |
-| ChatGPT | no operado | HTTPS hospedado | no verificado | no verificado | no verificado | no emitidos | no ejecutado | no emitidos | `PENDIENTE` |
+| ChatGPT | preflight oficial vigente; ceremonia no operada | HTTPS hospedado | no verificado | PRM/AS live; `refresh_token` anunciado, `offline_access` ausente | no verificado | no emitidos | no ejecutado | emisor soporta refresh rotativo; continuidad del cliente tras TTL no verificada | `PENDIENTE — TASK-1813` |
 
 En Codex el callback local termina visualmente en `ERR_BLOCKED_BY_CLIENT` dentro del Chrome controlado por
 ChatGPT. El listener ya había recibido el code: el CLI reportó `Successfully logged in` y una sesión nueva
@@ -79,6 +79,11 @@ completó la lectura. Es una deuda de cierre visual del cliente local, no un fal
 
 La fila Claude permanece roja. No se amplió la allowlist ni se autorizó ningún write para forzar un verde. El
 hallazgo vuelve a `TASK-1813`, dueña de interoperabilidad de clientes.
+
+Para ChatGPT, la [guía oficial de apps MCP](https://help.openai.com/es-419/articles/12584461-modo-desarrollador-y-apps-de-mcp-en-chatgpt-beta)
+indica que `offline_access` (o equivalente) debe anunciarse para mantener la renovación. El emisor live ya
+entrega refresh tokens sin ese scope, de modo que el riesgo es continuidad, no una falla inicial demostrada.
+La fila sólo puede pasar con ceremonia hospedada y renovación observada después del TTL.
 
 ## Pruebas negativas de protocolo y policy
 

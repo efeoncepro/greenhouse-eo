@@ -14,6 +14,13 @@ La certificación canary productiva reabrió esta unidad con versiones actuales,
   incluidas formas resource-qualified duplicadas y scopes de escritura; el emisor rechazó `invalid_scope`
   antes del consentimiento. La configuración soportada por esa versión no permitió fijar un scope mínimo desde
   `claude mcp login`. No se ampliaron scopes ni grants para forzar el recorrido.
+- **ChatGPT hospedado (preflight, aún sin ceremonia):** la documentación oficial vigente de OpenAI pide que
+  discovery anuncie `offline_access` (o equivalente) para mantener la renovación. El emisor nativo live anuncia
+  `grant_types_supported=[authorization_code, refresh_token]` y ya emite refresh opaco rotativo, pero sus
+  `scopes_supported` no incluyen `offline_access`. Esto no demuestra que el alta inicial falle; sí impide dar por
+  certificada la continuidad hospedada hasta medir una renovación posterior al TTL. Si el cliente efectivamente
+  solicita ese scope, hoy el emisor lo rechaza como desconocido. La corrección debe modelarlo como control de
+  ciclo de vida OAuth, nunca como capability del gateway ni como permiso de lectura/escritura.
 
 TASK-1832 registra el resultado en su matriz y conserva la organización canary aislada. Esta task sigue siendo
 la dueña de normalizar scopes/resource por cliente y de decidir la versión mínima soportada de Claude Code.
@@ -43,7 +50,7 @@ La task pasa a `EPIC-044`. El emisor propio (`TASK-1828`/`TASK-1829`) es quien r
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Defecto reproducido en producción con Claude Code 2.1.186; Codex 0.153.4 funciona sólo tras retry de scopes mínimos y sin duplicar resource. Sin fix de runtime en esta corrida; evidencia y límites registrados por TASK-1832.`
+- Status real: `Defecto reproducido en producción con Claude Code 2.1.186; Codex 0.153.4 funciona sólo tras retry de scopes mínimos y sin duplicar resource. ChatGPT hospedado tiene preflight discovery incompleto para continuidad: refresh grant disponible, offline_access no anunciado. Sin fix de runtime en esta corrida; evidencia y límites registrados por TASK-1832.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
 - Blocked by: `none`

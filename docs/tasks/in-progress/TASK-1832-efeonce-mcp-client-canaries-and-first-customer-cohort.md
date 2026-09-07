@@ -22,6 +22,12 @@ por error con la sesión interna también llevan el `run_id`; su cleanup es clie
 identidad compartidas. El cierre permanece abierto hasta clientes hospedados o decisión explícita de no
 certificarlos, siete días de señales y cleanup/readback cero después de `2026-09-13T19:43:30Z`.
 
+El preflight de ChatGPT hospedado encontró una diferencia que se debe medir, no ocultar: el discovery live
+ofrece `refresh_token`, y el emisor ya entrega refresh rotativo, pero no publica `offline_access`. OpenAI lo
+recomienda para conservar la conexión después del vencimiento. La ceremonia hospedada debe registrar tanto el
+alta como una renovación posterior al TTL; si ChatGPT solicita el scope, el emisor hoy lo rechaza fail-closed y
+la corrección pertenece a `TASK-1813` como interoperabilidad OAuth, sin convertirlo en capability del gateway.
+
 ## Delta 2026-09-06 — certificación sintética separada del piloto con cliente real
 
 Por decisión del operador, ninguna persona cliente participa en el QA técnico del emisor, el gateway o los
@@ -583,7 +589,8 @@ organización dedicada creada sólo después de una autorización específica.
       consentimiento, claims, organización exacta, allow, refresh y revocación verdes; `--negative` pasó y
       `--wait-expiry` obtuvo `401` después de `899 s` antes de revocar la familia.
 - [ ] Sesiones interactivas por cliente MCP registradas: Codex verde, Claude Code rojo fail-closed; Desktop/web
-      y ChatGPT hospedado aún no operados.
+      y ChatGPT hospedado aún no operados. Para ChatGPT, el preflight discovery registró refresh grant sin
+      `offline_access`; la certificación exige observar una renovación posterior al TTL, no sólo el login.
 - `pnpm secrets:audit` en el shell final: 0/8, todos `unconfigured` porque el comando no cargó un entorno local.
   No es evidencia de runtime; los valores productivos se verificaron por Vercel/Cloud Run y TASK-1832 no
   modifica secretos.

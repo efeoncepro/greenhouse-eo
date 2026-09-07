@@ -27,6 +27,10 @@ fixture. El readback dejó las sesiones humanas canary activas en cero y conserv
 la observación. Quedó activa una automatización diaria silenciosa para vigilar la ventana y ejecutar el retiro
 sólo desde `delete_after` con todas las precondiciones verdes.
 
+El preflight del cliente hospedado agregó un riesgo específico a TASK-1813: el emisor anuncia y entrega refresh
+tokens rotativos, pero discovery no publica `offline_access`, recomendado por OpenAI para conservar la conexión.
+No se alteró runtime ni se amplió el catálogo; la fila ChatGPT exige ceremonia hospedada y renovación post-TTL.
+
 El push de endurecimiento `b69f5297d` mostró una colisión real del entorno compartido: el workflow staging
 `34071542507` desplegó `auth-server-00042-hp5` con el gate canary OFF sobre el Cloud Run único. El intervalo
 fail-closed duró desde 01:07:25Z hasta 01:15:47Z y no concedió acceso. El dispatch production `34072064873`,

@@ -131,7 +131,8 @@ que el command gobernado lo devuelva. Un asset no previsto deja la corrida `bloc
       evidencia comercial.
 - [x] Gates coordinados ON; revisiones, SHA, reader y comportamiento real verificados.
 - [ ] Matriz parcial: helper y Codex `PASS`; Claude Code 2.1.186 `FAIL` registrado en `TASK-1813` y clientes
-      hospedados pendientes. Las cinco negativas, incluidos TTL natural `401 invalid_token`, refresh/familia y
+      hospedados pendientes. El preflight ChatGPT registró refresh grant sin `offline_access`; exige ceremonia
+      y renovación post-TTL. Las cinco negativas, incluidos TTL natural `401 invalid_token`, refresh/familia y
       authority revocada en `19.272 s`, ya pasaron.
 - [ ] Cleanup dry-run: `deletionReady=true`, `unexpectedRefs=0`, sin blockers/shared delete attempts.
 - [x] Observación diaria programada en `task-1832-observaci-n-y-retiro-canary`; permanece silenciosa sin drift
