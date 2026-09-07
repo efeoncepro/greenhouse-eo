@@ -7,6 +7,28 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-07 — TASK-1832: ChatGPT completa el OAuth hospedado y el gateway endurece el probe vacío
+
+ChatGPT ya funciona de punta a punta con el authorization server y el gateway productivos. La app hospedada
+`Efeonce` se registró por DCR, mostró la organización canary exacta y autorizó sólo `efeonce.mcp.read`. Tras
+actualizar su definición importó exactamente dos tools read-only —estado del gateway y entitlement SEO— y
+ejecutó ambas: `ready` y `no_entitlement` con presupuesto cero, sin ninguna escritura. La familia OAuth rotó dos
+veces después del TTL inicial y mantuvo siempre el scope base; el cliente terminó con dos refresh usados y uno
+activo. Esto sustituye la hipótesis de que la ausencia de `offline_access` impediría continuidad: el
+comportamiento hospedado real no lo solicitó ni lo necesitó.
+
+La primera actualización de ChatGPT reveló un borde de protocolo: su `POST /mcp` con JSON vacío fallaba en el
+parser de Fastify antes de autenticar y el handler global lo convertía en 500. El gateway `v1.1.2`, commit
+`171965c99034`, ahora autentica primero ese probe y devuelve 401 con el challenge canónico sin bearer, o 400
+`invalid_request` con bearer válido. `pnpm check` pasó 153/153, CI `34111553554` y deploy `34111643880`
+terminaron verdes; `efeonce-mcp-gateway-00046-6n2` sirve 100 % y la repetición hospedada respondió 200 sin nuevos 500. El gateway usa los paquetes MCP v2 estables `2.0.0`; no se hizo downgrade al paquete monolítico v1.
+
+El dry-run posterior agregó el DCR de ChatGPT al contrato de retiro: 20 clientes, 19 codes/consents, 25
+access/refresh tokens, 18 sesiones, 14 magic links, 2 passkeys, 5 challenges y 4 contexts;
+`unexpectedRefs=0`, sin contaminación comercial/360. Claude Code continúa fail-closed por scopes adicionales y
+de escritura en `TASK-1813`; Claude Desktop/web no está certificado. TASK-1832 sigue en observación hasta los
+siete días, cleanup/readback cero desde `2026-09-13T19:43:30Z` y apagado de ambos gates.
+
 ## 2026-09-06 — TASK-1832 entra en observación productiva con retiro verificable
 
 La organización canary dedicada ya recorre el mismo emisor y gateway productivos que usaría un cliente, pero
@@ -306,7 +328,6 @@ distingue tres estados: verde, rojo e **incompleto**, porque un canary con pasos
 verde. Pendiente: redeploy, organización elegible para el carril de tokens, passkey en dos
 navegadores y el límite de tasa del reto de passkey anónimo.
 
-
 Cuatro slices en `develop` detrás de `AUTH_SERVER_PERSON_AUTH_ENABLED=false`: sesión propia
 (`__Host-efeonce_auth`) que implementa el `SubjectSessionPort` que dejaba a `authorize` en
 `login_required` desde TASK-1829; magic link con patrón selector/verificador (15 min, un uso, consumo
@@ -508,7 +529,8 @@ Playbooks Social/Producción en Notion alineados, Instagram Story corregido, con
 de 3.000–5.000 palabras/50 gráficas/3 videos y cortesía extendida a nov/dic registrados. Octubre
 excluido. Aclaración: 50 incluyen blog/RRSS; Blog/Facebook/Instagram/Pinterest. Priorización N52→Navidad
 aprobada: 4 banners N52 fuera del paquete, 4 banners y 2 sociales N59 creados. Distribución 50 gráficas
-+ 3 videos por mes, con reservas técnicas/editoriales; 193 páginas modificadas releídas, sin pérdida de historial.
+
+- 3 videos por mes, con reservas técnicas/editoriales; 193 páginas modificadas releídas, sin pérdida de historial.
 
 Corrección de numeración verificada: [mapa por ID y readback 179/179](docs/audits/seo/BEREL_EDITORIAL_NUMBERING_2026-09-03.md).
 Skill Berel módulo 16: bloques mensuales completos, reserva de slots, cambios coordinados y aliases
@@ -540,8 +562,8 @@ parqueado hasta el release. Estado: code complete, rollout pendiente; Improved E
 La revisión Current del protocolo marcó Dynamic Client Registration como `Deprecated` (PR #2858),
 migración a Client ID Metadata Documents, retiro más temprano en la primera revisión publicada en o
 después de 2027-07-28. El shim se mantiene porque la excepción está redactada para nuestro caso exacto:
-DCR se retiene *"for backwards compatibility with authorization servers that do not support Client ID
-Metadata Documents"*, y Entra no soporta ninguno de los dos — su única vía oficial es el pre-registro,
+DCR se retiene _"for backwards compatibility with authorization servers that do not support Client ID
+Metadata Documents"_, y Entra no soporta ninguno de los dos — su única vía oficial es el pre-registro,
 que es justo lo que `POST /register` devuelve.
 
 Lo que cierra la pregunta de fondo: **CIMD no es implementable en la capa del shim.** Es capacidad del
@@ -907,13 +929,3 @@ uno para pasar el gate. Queda como decisión de política para las tasks de UI p
 Dos defectos de `task:lint`, ambos de mensajes que prometían lo que el mecanismo no honraba:
 `ui-wireframe-contract` ignoraba el `UI impact: none` explícito por inferir desde `Domain`, y se
 rompía cuando el autor agregaba la razón que la plantilla exige.
-
-## 2026-09-01 — El auditor de flags detecta el drift ledger↔live, y dos defectos quedan registrados
-
-`pnpm flags:audit` era ciego al drift más caro del ledger porque `vercel env ls` lista presencia, no
-valor. Ahora hace `vercel env pull` y compara: 24 filas declaran `prod: OFF` con el valor live en
-`true`. Ese drift es lo que hace que un agente lea "rollout pendiente" y re-ejecute trabajo hecho.
-
-Del barrido de 27 tasks salen `ISSUE-165` (writer de organizaciones fuera del SSOT en
-`/api/admin/spaces`, impacto latente) e `ISSUE-166` (el CTA de Nexa abre el chat sin anclar el insight
-ni enviar la pregunta).

@@ -1,5 +1,39 @@
 # TASK-1832 — Efeonce MCP Synthetic External Canaries and Client Compatibility Certification
 
+## Delta 2026-09-07 — ChatGPT hospedado verde y gateway MCP v2 endurecido
+
+ChatGPT quedó certificado de punta a punta sobre la misma organización canary. La app `Efeonce`
+(`asdk_app_6a9e8978ca2081919753589005e001bf`, versión
+`asdk_app_v_6a9e8978ca2c8191b8bf92f0cf449988`) se registró por DCR como
+`dcr-c5TpuN-SiPzBfm0fhTXcsA`, autenticó contra `auth.efeonce.org`, mostró la organización exacta y autorizó
+únicamente `efeonce.mcp.read`. Después de actualizar la definición importó exactamente dos tools, ambas
+read-only: `efeonce.gateway.status` y `get_seo_entitlement`. Las dos llamadas hospedadas respondieron desde el
+gateway productivo; SEO devolvió `no_entitlement`, cero auditorías y presupuesto cero. No se importó ni ejecutó
+ningún write.
+
+La continuidad real reemplaza la hipótesis anterior sobre `offline_access`: el emisor rotó la familia de refresh
+de ChatGPT dos veces después del TTL inicial. El readback final del cliente mostró tres access tokens, tres
+refresh tokens, dos refresh usados/rotados y uno activo, siempre con el scope exacto
+`efeonce.mcp.read`. El mismo profile externo `smoke_test` y el mismo `sub` redactado se observaron en loopback y
+en el cliente hospedado.
+
+La integración de OpenAI expuso además un probe `POST /mcp` con cuerpo JSON vacío. Fastify lo rechazaba antes de
+la autenticación y el error global lo convertía en `500`. El gateway `v1.1.2`, commit
+`171965c9903490fe6fa6fde17f3c15e9646b149f`, autentica primero ese caso: sin bearer responde el challenge
+canónico `401`; con bearer válido y cuerpo vacío responde `400 invalid_request`. `pnpm check` pasó `153/153`,
+CI `34111553554` y deploy `34111643880` terminaron verdes; producción sirve la revisión
+`efeonce-mcp-gateway-00046-6n2`, 100 % del tráfico y SHA exacto. El gateway ya usa los paquetes estables MCP v2
+`@modelcontextprotocol/server`, `@modelcontextprotocol/node` y `@modelcontextprotocol/fastify` `2.0.0`; no usa
+el paquete monolítico v1 en mantenimiento. La metadata de tools sigue el contrato oficial de OpenAI con schemas,
+annotations y el espejo de compatibilidad `_meta.securitySchemes`, sin ampliar scopes.
+
+El dry-run posterior a ChatGPT conserva `unexpectedRefs=0` y agrega el DCR hospedado al grafo: `20` clientes,
+`19` codes/consents, `25` access/refresh tokens, `18` sesiones, `14` magic links, `2` passkeys, `5` challenges y
+`4` contexts. Los únicos blockers siguen siendo los deliberados de la ventana
+`registration_active|active_authority|active_auth`. TASK-1832 continúa en observación hasta completar siete
+días, ejecutar cleanup/readback cero desde `2026-09-13T19:43:30Z` y apagar ambos gates. Claude Code sigue
+fail-closed en `TASK-1813`; Claude Desktop/web no está certificado.
+
 ## Delta 2026-09-06 — producción activa, Codex verde y retiro programado
 
 La organización dedicada `task-1832-canary-20260906-a` está activa exclusivamente como canary productivo.
@@ -24,11 +58,11 @@ por error con la sesión interna también llevan el `run_id`; su cleanup es clie
 identidad compartidas. El cierre permanece abierto hasta clientes hospedados o decisión explícita de no
 certificarlos, siete días de señales y cleanup/readback cero después de `2026-09-13T19:43:30Z`.
 
-El preflight de ChatGPT hospedado encontró una diferencia que se debe medir, no ocultar: el discovery live
-ofrece `refresh_token`, y el emisor ya entrega refresh rotativo, pero no publica `offline_access`. OpenAI lo
-recomienda para conservar la conexión después del vencimiento. La ceremonia hospedada debe registrar tanto el
-alta como una renovación posterior al TTL; si ChatGPT solicita el scope, el emisor hoy lo rechaza fail-closed y
-la corrección pertenece a `TASK-1813` como interoperabilidad OAuth, sin convertirlo en capability del gateway.
+El preflight de ChatGPT hospedado encontró una diferencia que se debía medir, no ocultar: el discovery live
+ofrece `refresh_token`, y el emisor entrega refresh rotativo, pero no publica `offline_access`. La ceremonia
+hospedada y dos renovaciones reales posteriores al TTL, registradas el 2026-09-07, demostraron que el cliente
+mantiene continuidad sin solicitar ese scope. La evidencia observada sustituye la hipótesis; no se cambió el
+emisor ni se convirtió `offline_access` en capability del gateway.
 
 El control plane de Vercel contradijo el ledger durante la observación: staging tenía el gate canary en `true`.
 Se corrigió a `false` en el environment custom y se reconstruyó staging inicialmente en
@@ -162,7 +196,7 @@ organización cliente real, sí**.
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-044`
-- Status real: `Rollout productivo activo y en observación. Greenhouse/Vercel y auth-server 00043-ndg sirven fb5fc082aa92; gateway 8438c5fa87ed/00044-4kj; ambos gates canary ON. Un deploy staging sobre el Cloud Run compartido apagó el canary fail-closed por 8m22s y production 34072064873 lo restauró; el auth-server ya consume una sola variable GitHub de repositorio, sin overrides de environment. M365 y Gmail autorizado, sesión, passkey Chrome/Safari, helper OAuth, E2E Playwright 1/1, Codex real, refresh/revocación y las cinco negativas están verificados. Claude Code 2.1.186 falla cerrado por interoperabilidad y vuelve a TASK-1813. unexpected_refs=0, sin contaminación 360/comercial. Faltan clientes hospedados o decisión explícita, siete días y cleanup/readback cero.`
+- Status real: `Rollout productivo activo y en observación. Greenhouse/Vercel y auth-server 00043-ndg sirven fb5fc082aa92; gateway v1.1.2, SHA 171965c99034, revisión 00046-6n2, sirve 100 % y ambos gates canary están ON. M365 y Gmail autorizado, sesión, passkey Chrome/Safari, helper OAuth, E2E Playwright 1/1, Codex y ChatGPT hospedado están verificados. ChatGPT importó sólo dos tools read-only, ejecutó ambas y rotó refresh dos veces post-TTL con scope base único. El probe JSON vacío ya responde 401/400 canónico en vez de 500. Claude Code 2.1.186 falla cerrado por interoperabilidad y vuelve a TASK-1813; Claude Desktop/web no está certificado. unexpected_refs=0, sin contaminación 360/comercial. Faltan siete días, cleanup/readback cero y apagar ambos gates.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
 - Blocked by: `none`
@@ -556,13 +590,15 @@ organización dedicada creada sólo después de una autorización específica.
 
 ## Acceptance Criteria
 
-- [ ] Auditoría MCP de TASK-1836 §14: registrar cliente y revisión reales, discovery desde URL canónica, login, consentimiento por cliente y revocación; no sustituir el flujo por inyección manual de token.
+- [x] Auditoría MCP de TASK-1836 §14: clientes/revisiones reales, discovery desde URL canónica, login,
+      consentimiento por cliente y revocación/rotación observados en Codex y ChatGPT; no se inyectó ningún token.
 
 - [ ] Cada cliente MCP real completa login con persona externa `smoke_test`, token nativo, llamada autorizada,
       refresh y revocación; el mismo issuer nunca permite tools internas. Evidencia por cliente y revisión registradas.
 
-- [ ] Matriz de tokens publicada con al menos Claude Code, Codex y un cliente hospedado, sin tokens crudos.
-- [ ] El mismo `sub` para la misma persona en loopback y hospedado (evidencia).
+- [x] Matriz de tokens publicada con Claude Code, Codex y ChatGPT hospedado, sin tokens crudos.
+- [x] El mismo `sub` para la misma persona `smoke_test` en loopback y ChatGPT hospedado; sólo se conserva el
+      fingerprint redactado. Readback PostgreSQL: un subject por cliente y `same_subject=true`, sin imprimirlo.
 - [x] Organización canary no-cliente registrada y ligada por command dedicado; `bindExternalOrganization`
       continúa rechazándola y los readers/KPI comerciales no la presentan como cliente.
 - [ ] Manifiesto de assets creado antes del primer write y completo con IDs/ownership/TTL; cleanup dry-run
@@ -578,7 +614,7 @@ organización dedicada creada sólo después de una autorización específica.
       natural `401`, authority revocada `401` en `19.272 s`, consentimiento explícito e internal-only oculto/
       denegado.
 - [x] Prueba base-only pendiente de `TASK-1626` cerrada: write oculto y llamada directa `403
-      insufficient_scope` con challenge canónico; referenciar en su cierre documental.
+  insufficient_scope` con challenge canónico; referenciar en su cierre documental.
 - [x] Runbook de certificación canary y expediente de readiness para TASK-1841 publicados; el expediente
       conserva veredicto no certificado mientras existan filas/pasos abiertos.
 - [ ] Siete días de señales steady registrados en Handoff.
@@ -590,20 +626,22 @@ organización dedicada creada sólo después de una autorización específica.
 - [x] `pnpm lint` — exit 0, 0 errores; 26 warnings UI fuera del alcance.
 - [x] `pnpm build` — artefacto Next.js y rutas canary generados.
 - [x] `pnpm mcp:manifest:check`, rutas/workers/crons, ops/task lint y `git diff --check`.
-- [x] Gateway hermano `pnpm check` — 152/152, 0 skipped, build verde.
+- [x] Gateway hermano `pnpm check` — `153/153`, 0 skipped, build verde en `v1.1.2`; CI `34111553554` y deploy
+      `34111643880` verdes; revisión productiva `efeonce-mcp-gateway-00046-6n2` con SHA `171965c99034`.
 - [x] `pnpm playwright test tests/e2e/smoke/auth-server-oauth.spec.ts --project=chromium --workers=1` — `1/1`
       en producción con Chrome, profile autorizado `EO-ID0651`, storage state efímera `0600` y listener loopback
       real; DCR+PKCE, consentimiento, JWT, MCP initialize/list/call, refresh, revocación y logout/readback `401`.
       No se persistieron tokens, cookies ni el archivo de sesión. Los cinco consentimientos creados durante los
       intentos diagnósticos y la corrida verde, más las dos familias emitidas, se revocaron después del test.
 - [x] `node scripts/mcp/external-client-canary.mjs --env=production --issuer=https://auth.efeonce.org
-      --resource=https://mcp.efeonce.org/mcp --run-id=task-1832-canary-20260906-a
-      --organization-id=org-602d7057-7fd5-47e7-b73b-21892e3f06e7` — discovery, PKCE,
+  --resource=https://mcp.efeonce.org/mcp --run-id=task-1832-canary-20260906-a
+  --organization-id=org-602d7057-7fd5-47e7-b73b-21892e3f06e7` — discovery, PKCE,
       consentimiento, claims, organización exacta, allow, refresh y revocación verdes; `--negative` pasó y
       `--wait-expiry` obtuvo `401` después de `899 s` antes de revocar la familia.
-- [ ] Sesiones interactivas por cliente MCP registradas: Codex verde, Claude Code rojo fail-closed; Desktop/web
-      y ChatGPT hospedado aún no operados. Para ChatGPT, el preflight discovery registró refresh grant sin
-      `offline_access`; la certificación exige observar una renovación posterior al TTL, no sólo el login.
+- [ ] Sesiones interactivas por cliente MCP registradas: Codex y ChatGPT hospedado verdes; ChatGPT importó sólo
+      `efeonce.gateway.status|get_seo_entitlement`, ejecutó ambas sin write y rotó refresh dos veces post-TTL.
+      Claude Code continúa rojo fail-closed por scopes adicionales y de escritura (`TASK-1813`); Claude
+      Desktop/web no está certificado. El criterio permanece abierto porque exige cada cliente de la matriz.
 - `pnpm secrets:audit` en el shell final: 0/8, todos `unconfigured` porque el comando no cargó un entorno local.
   No es evidencia de runtime; los valores productivos se verificaron por Vercel/Cloud Run y TASK-1832 no
   modifica secretos.

@@ -1,7 +1,8 @@
 # Efeonce MCP — matriz de clientes y tokens del canary externo
 
-> TASK-1832 · abierta 2026-09-06 · estado: **canary productivo en observación; helper, Playwright y Codex
-> certificados, Claude Code bloqueado por interoperabilidad; clientes hospedados y retiro pendientes**.
+> TASK-1832 · abierta 2026-09-06 · estado: **canary productivo en observación; helper, Playwright, Codex y
+> ChatGPT hospedado certificados; Claude Code bloqueado por interoperabilidad, Claude Desktop/web no certificado
+> y retiro pendiente**.
 
 ## Alcance y regla de evidencia
 
@@ -11,8 +12,8 @@ prueba adopción, usabilidad ni experiencia de una organización cliente.
 
 La release productiva `fb5fc082aa92-3f2c8706-24fa-452d-be8f-6feea7b8cdd9` quedó `released`. El reader
 Vercel sirve el SHA `fb5fc082aa92f6b65d0be0ff9e519ce648752f2f`; el emisor sirve ese SHA en
-`auth-server-00043-ndg`; el gateway sirve `8438c5fa87ed3386d5fc3f6752ac24573e2a3af3` en
-`efeonce-mcp-gateway-00044-4kj`. Ambos gates canary están `true` y el watchdog quedó `ok`; tres señales de
+`auth-server-00043-ndg`; el gateway sirve `171965c9903490fe6fa6fde17f3c15e9646b149f` en
+`efeonce-mcp-gateway-00046-6n2`. Ambos gates canary están `true` y el watchdog quedó `ok`; tres señales de
 GitHub quedaron `unknown` por falta de `GITHUB_RELEASE_OBSERVER_TOKEN`, no verdes por inferencia.
 
 El primer intento OAuth se ejecutó antes de que el reader productivo sirviera metadata canary: el gateway
@@ -38,8 +39,8 @@ aceptar el recorrido. Sus DCR y artefactos OAuth fallidos siguen marcados con el
 - `delete_after`: `2026-09-13T19:43:30Z`, tras siete días de señales y preflight final verde
 - `served Greenhouse SHA`: `fb5fc082aa92f6b65d0be0ff9e519ce648752f2f`
 - `served auth-server revision`: `auth-server-00043-ndg`
-- `served gateway SHA/revision`: `8438c5fa87ed3386d5fc3f6752ac24573e2a3af3` /
-  `efeonce-mcp-gateway-00044-4kj`
+- `served gateway version/SHA/revision`: `1.1.2` / `171965c9903490fe6fa6fde17f3c15e9646b149f` /
+  `efeonce-mcp-gateway-00046-6n2`
 
 ### Incidente fail-closed del runtime compartido
 
@@ -75,14 +76,14 @@ una prueba flow-level del carril apagado. El retiro debe cambiar también la var
 
 ## Matriz de compatibilidad
 
-| Cliente            | Revisión                                        | Redirect                                 | Registro                              | Discovery                                                        | Login + consentimiento                                                                                                          | Claims redactados                                                                     | Allow read                                                                      | Refresh / revocación                                                            | Resultado               |
-| ------------------ | ----------------------------------------------- | ---------------------------------------- | ------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ----------------------- |
-| helper TASK-1832   | `task-1832-v1`                                  | loopback dinámico `/callback`            | DCR públicos `dcr-UObj…` y `dcr-KyB…` | metadata/JWKS/PRM live                                           | organización exacta, sólo `efeonce.mcp.read`; la guarda confirmó `organizationIdMatches=true`                                   | `iss`/`aud`/`azp` válidos; fingerprint `75eb972f8b2f1eae`; `gv=6`; `exp` presente     | `get_seo_entitlement`                                                           | refresh rotó; familia revocada; refresh posterior `invalid_grant`               | `PASS`                  |
-| Playwright Chrome  | `task-1832-playwright-v1`                       | loopback dinámico con listener HTTP real | DCR público con `software_id=run_id`  | metadata/JWKS/PRM live                                           | storage state efímera de `EO-ID0651`; consentimiento visible con host exacto y scope base                                       | JWT `iss`/`aud`/`azp`/`gv` verificado; fingerprint sólo en attachment local redactado | `initialize`, `tools/list`, `get_seo_entitlement`                               | refresh rotó; familia revocada; refresh posterior `invalid_grant`; logout `401` | `PASS — 1/1`            |
-| Claude Code        | `2.1.186`                                       | `http://127.0.0.1:18432/callback`        | pre-registrado DCR `dcr-PUG…`         | descubrió PRM/AS                                                 | no llegó al consentimiento: solicitó catálogo completo, scopes cualificados duplicados y writes; emisor rechazó `invalid_scope` | no emitidos                                                                           | no ejecutado                                                                    | no emitidos                                                                     | `FAIL — TASK-1813`      |
-| Claude Desktop/web | no operado                                      | HTTPS hospedado                          | no verificado                         | no verificado                                                    | no verificado                                                                                                                   | no emitidos                                                                           | no ejecutado                                                                    | no emitidos                                                                     | `PENDIENTE`             |
-| Codex              | `0.153.4`                                       | `http://127.0.0.1:<dinámico>/callback`   | DCR público limitado `dcr-BUH…`       | PRM/AS live                                                      | intento descubierto con scopes extra rechazado; retry sin scopes mostró la organización exacta y sólo lectura; autorizado       | token aceptado por gateway; sin exponer token/subject                                 | sesión nueva listó e invocó `get_seo_entitlement`; `no_entitlement`, cero gasto | OAuth del cliente válido; rotación/revocación cubierta por helper               | `PASS`                  |
-| ChatGPT            | preflight oficial vigente; ceremonia no operada | HTTPS hospedado                          | no verificado                         | PRM/AS live; `refresh_token` anunciado, `offline_access` ausente | no verificado                                                                                                                   | no emitidos                                                                           | no ejecutado                                                                    | emisor soporta refresh rotativo; continuidad del cliente tras TTL no verificada | `PENDIENTE — TASK-1813` |
+| Cliente            | Revisión                                         | Redirect                                 | Registro                              | Discovery                                  | Login + consentimiento                                                                                                          | Claims redactados                                                                     | Allow read                                                                      | Refresh / revocación                                                            | Resultado          |
+| ------------------ | ------------------------------------------------ | ---------------------------------------- | ------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------ |
+| helper TASK-1832   | `task-1832-v1`                                   | loopback dinámico `/callback`            | DCR públicos `dcr-UObj…` y `dcr-KyB…` | metadata/JWKS/PRM live                     | organización exacta, sólo `efeonce.mcp.read`; la guarda confirmó `organizationIdMatches=true`                                   | `iss`/`aud`/`azp` válidos; fingerprint `75eb972f8b2f1eae`; `gv=6`; `exp` presente     | `get_seo_entitlement`                                                           | refresh rotó; familia revocada; refresh posterior `invalid_grant`               | `PASS`             |
+| Playwright Chrome  | `task-1832-playwright-v1`                        | loopback dinámico con listener HTTP real | DCR público con `software_id=run_id`  | metadata/JWKS/PRM live                     | storage state efímera de `EO-ID0651`; consentimiento visible con host exacto y scope base                                       | JWT `iss`/`aud`/`azp`/`gv` verificado; fingerprint sólo en attachment local redactado | `initialize`, `tools/list`, `get_seo_entitlement`                               | refresh rotó; familia revocada; refresh posterior `invalid_grant`; logout `401` | `PASS — 1/1`       |
+| Claude Code        | `2.1.186`                                        | `http://127.0.0.1:18432/callback`        | pre-registrado DCR `dcr-PUG…`         | descubrió PRM/AS                           | no llegó al consentimiento: solicitó catálogo completo, scopes cualificados duplicados y writes; emisor rechazó `invalid_scope` | no emitidos                                                                           | no ejecutado                                                                    | no emitidos                                                                     | `FAIL — TASK-1813` |
+| Claude Desktop/web | no operado                                       | HTTPS hospedado                          | no verificado                         | no verificado                              | no verificado                                                                                                                   | no emitidos                                                                           | no ejecutado                                                                    | no emitidos                                                                     | `PENDIENTE`        |
+| Codex              | `0.153.4`                                        | `http://127.0.0.1:<dinámico>/callback`   | DCR público limitado `dcr-BUH…`       | PRM/AS live                                | intento descubierto con scopes extra rechazado; retry sin scopes mostró la organización exacta y sólo lectura; autorizado       | token aceptado por gateway; sin exponer token/subject                                 | sesión nueva listó e invocó `get_seo_entitlement`; `no_entitlement`, cero gasto | OAuth del cliente válido; rotación/revocación cubierta por helper               | `PASS`             |
+| ChatGPT            | app `asdk_app_6a9e…`, versión `asdk_app_v_6a9e…` | HTTPS hospedado                          | DCR `dcr-c5TpuN…`                     | PRM/AS live; exactamente 2 tools read-only | organización canary exacta; consentimiento único `efeonce.mcp.read`; sin `offline_access`                                       | mismo subject/fingerprint redactado que loopback; issuer/audience válidos             | `get_seo_entitlement` → `no_entitlement`; `efeonce.gateway.status` → `ready`    | dos rotaciones post-TTL; 3 refresh, 2 usados y 1 activo; scope base único       | `PASS`             |
 
 En Codex el callback local termina visualmente en `ERR_BLOCKED_BY_CLIENT` dentro del Chrome controlado por
 ChatGPT. El listener ya había recibido el code: el CLI reportó `Successfully logged in` y una sesión nueva
@@ -99,10 +100,21 @@ se revocaron con el store canónico; ninguna storage state ni token quedó persi
 La fila Claude permanece roja. No se amplió la allowlist ni se autorizó ningún write para forzar un verde. El
 hallazgo vuelve a `TASK-1813`, dueña de interoperabilidad de clientes.
 
-Para ChatGPT, la [guía oficial de apps MCP](https://help.openai.com/es-419/articles/12584461-modo-desarrollador-y-apps-de-mcp-en-chatgpt-beta)
-indica que `offline_access` (o equivalente) debe anunciarse para mantener la renovación. El emisor live ya
-entrega refresh tokens sin ese scope, de modo que el riesgo es continuidad, no una falla inicial demostrada.
-La fila sólo puede pasar con ceremonia hospedada y renovación observada después del TTL.
+ChatGPT cerró la incertidumbre con evidencia del cliente hospedado. La app `Efeonce`
+(`asdk_app_6a9e8978ca2081919753589005e001bf`, versión
+`asdk_app_v_6a9e8978ca2c8191b8bf92f0cf449988`) importó exactamente `efeonce.gateway.status` y
+`get_seo_entitlement`, ambas marcadas `readOnlyHint=true` y protegidas únicamente por `efeonce.mcp.read`. Tras
+el login/consentimiento real ejecutó ambas sin write; la familia de tokens rotó dos veces después del TTL
+inicial y mantuvo un único refresh activo. La ausencia de `offline_access` no impidió la continuidad observada,
+por lo que no se amplió discovery ni scopes. La metadata sigue la [referencia oficial de plugins de
+OpenAI](https://developers.openai.com/plugins/reference) y su [guía de autenticación
+OAuth](https://developers.openai.com/plugins/build/auth).
+
+La primera actualización de ChatGPT envió un `POST /mcp` con JSON vacío. Fastify lo rechazó antes de la ruta y
+el handler global devolvía `500`. El gateway `v1.1.2` (`171965c99034`, CI `34111553554`, deploy `34111643880`)
+autentica ese probe primero: `401` con challenge sin bearer y `400 invalid_request` con bearer válido. La llamada
+hospedada posterior sobre `efeonce-mcp-gateway-00046-6n2` respondió 200 y no dejó nuevos 500. El servidor usa
+los paquetes estables MCP v2 `2.0.0`; no se hizo downgrade al SDK monolítico v1.
 
 ## Pruebas negativas de protocolo y policy
 
@@ -121,18 +133,21 @@ punta; sólo la segunda medición de `19.272 s` cuenta.
 
 ## Igualdad de sujeto
 
-| Persona `smoke_test` | Fingerprint loopback | Fingerprint hospedado | Resultado                                                 |
-| -------------------- | -------------------- | --------------------- | --------------------------------------------------------- |
-| M365 canary          | `75eb972f8b2f1eae`   | no operado            | `PENDIENTE`: no se infiere igualdad sin cliente hospedado |
+| Persona `smoke_test` | Fingerprint loopback | Fingerprint hospedado              | Resultado                                           |
+| -------------------- | -------------------- | ---------------------------------- | --------------------------------------------------- |
+| M365 canary          | `75eb972f8b2f1eae`   | mismo subject redactado en ChatGPT | `PASS`: mismo profile externo y organización exacta |
+
+Readback PostgreSQL del 2026-09-07: cada cliente tuvo un único subject y la comparación directa devolvió
+`same_subject=true`; la consulta no imprimió el identificador.
 
 ## Cleanup y observación
 
 Dry-run post-clientes, sin mutación:
 
-- grafo exacto: `2` profiles, `2` source links, `5` invitaciones y `19` clientes DCR run-owned;
-- auth: `17` sesiones, `13` magic links, `2` passkeys, `5` challenges, `18` codes/consents, `22` refresh,
-  `22` access tokens y `4` contexts client-scoped;
-- sesiones humanas canary activas `0`; la credencial passkey activa se conserva para la ventana;
+- grafo exacto: `2` profiles, `2` source links, `5` invitaciones y `20` clientes DCR run-owned;
+- auth: `18` sesiones, `14` magic links, `2` passkeys, `5` challenges, `19` codes/consents, `25` refresh,
+  `25` access tokens y `4` contexts client-scoped;
+- la sesión/consentimiento ChatGPT y la credencial passkey se conservan para la ventana;
 - authority: tres grants inventariados, dos revocados y uno activo read-only; binding `gv=6`;
 - `unexpectedRefs=0`; lifecycle/comercial/360/hiring/finance y demás FKs no esperadas en `0`;
 - los cuatro DCR usados durante el diagnóstico de la sesión interna y los cinco de Playwright están enumerados
@@ -147,5 +162,6 @@ los buzones, deliveries/audit y el wordmark público son compartidos o evidencia
 
 ## Veredicto
 
-`NO CERTIFICADO AÚN — runtime productivo, helper/Playwright/Codex y las cinco negativas están verdes; Claude Code,
-clientes hospedados, siete días de observación y cleanup/readback final siguen abiertos.`
+`NO CERTIFICADO AÚN — runtime productivo, helper/Playwright/Codex/ChatGPT hospedado y las cinco negativas están
+verdes; Claude Code falla cerrado, Claude Desktop/web no está certificado, y siguen abiertos siete días de
+observación más cleanup/readback final.`

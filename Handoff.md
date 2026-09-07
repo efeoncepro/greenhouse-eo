@@ -1,32 +1,24 @@
 # Handoff activo
 
 **TASK-1832 — canary productivo en observación; retiro después del 2026-09-13 19:43Z (Codex,
-2026-09-06):** release `fb5fc082aa92-3f2c8706-24fa-452d-be8f-6feea7b8cdd9` `released`; Vercel/auth-server
-`00043-ndg` sirven `fb5fc082aa92` y gateway `00044-4kj` sirve `8438c5fa87ed`, con gates productivos ON. El
-fixture conserva 2 profiles `smoke_test`, un grant read-only, cero 360/comercial y `unexpectedRefs=0`. M365,
-Gmail autorizado, magic link, passkey Chrome/Safari, helper, Playwright Chrome `1/1`, Codex 0.153.4 y cinco
-negativas tienen evidencia live: expiración `401` tras `899 s` y deny de authority en `19.272 s`. Claude Code
-falla cerrado y los clientes
-hospedados siguen abiertos en `TASK-1813`. El callback loopback de Codex puede mostrar
-`ERR_BLOCKED_BY_CLIENT` después de que el CLI recibió el code; recargar no sirve y un hospedado debe volver por
-HTTPS. ChatGPT anuncia refresh grant pero no `offline_access`; exige ceremonia y renovación post-TTL.
+2026-09-07):** release Greenhouse `fb5fc082aa92-3f2c8706-24fa-452d-be8f-6feea7b8cdd9` `released`;
+Vercel/auth-server `00043-ndg` sirven `fb5fc082aa92`; gateway `v1.1.2`/`171965c99034`/`00046-6n2` sirve 100 %,
+con gates ON, MCP v2 `2.0.0`, CI `34111553554` y deploy `34111643880` verdes.
 
-El workflow staging `34071542507` apagó el gate fail-closed en el Cloud Run único entre 01:07:25Z y 01:15:47Z.
-Production `34072064873` restauró `00043-ndg`, SHA released, Ready/100 % y preflight verde. Las variables GitHub
-por environment se eliminaron y quedó una sola variable de repositorio ON para el Cloud Run compartido. Una
-lectura live posterior detectó Vercel staging en `true`, contra el ledger; se corrigió a `false`. La build final
-de `develop@c75a07f`, `dpl_D9mkjQLE1a26H4TXQ2HX7wXWMpLf`, quedó READY, tomó los aliases y respondió 200 en
-`/api/auth/session`, sin tocar Production. Es evidencia de config/build, no deny flow-level. El retiro apaga la
-variable GitHub y Vercel Production.
+ChatGPT hospedado está verde: organización exacta, scope único `efeonce.mcp.read`, sólo
+`efeonce.gateway.status|get_seo_entitlement`, ambas lecturas sin gasto/write, mismo subject que Codex y dos
+rotaciones refresh post-TTL. El probe JSON vacío ya responde 401/400 canónico en vez de 500. M365/Gmail,
+passkey Chrome/Safari, helper, Playwright `1/1`, Codex y cinco negativas siguen verdes; el fixture mantiene 2
+profiles `smoke_test`, cero 360/comercial y `unexpectedRefs=0`. Claude Code 2.1.186 falla cerrado en `TASK-1813`;
+Claude Desktop/web no está certificado.
 
-El dry-run inventaría 2 profiles/links, 5 invitaciones, 3 grants, 19 DCR y sus hijos OAuth; sesiones activas `0`,
-passkey activa conservada y cero referencias inesperadas. `deletionReady=false` es correcto por
+Dry-run actual: 20 DCR, 19 codes/consents, 25 refresh/access y blockers esperados
 `registration_active|active_authority|active_auth`. No ejecutar `--apply` antes de
 `2026-09-13T19:43:30Z`; entonces cortar authority, medir deny, exigir `deletionReady=true`, aplicar con el xcr
-exacto, releer cero y apagar ambos gates. Fuente viva:
-`docs/audits/mcp/TASK-1832_CANARY_ASSET_MANIFEST_task-1832-canary-20260906-a.md` y matriz MCP del mismo directorio.
-La automatización diaria `task-1832-observaci-n-y-retiro-canary` relee señales y permanece silenciosa sin
-cambios; desde `delete_after` sólo ejecuta el retiro si todas las precondiciones siguen verdes.
+exacto, releer cero y apagar ambos gates. La automatización diaria sólo retira desde esa fecha con precondiciones
+verdes. Fuente viva: `docs/audits/mcp/TASK-1832_CANARY_ASSET_MANIFEST_task-1832-canary-20260906-a.md` y matriz
+MCP del mismo directorio. El incidente staging que apagó el Cloud Run compartido quedó resuelto: variable
+GitHub única ON, Vercel staging OFF y build `dpl_D9mkjQLE1a26H4TXQ2HX7wXWMpLf` READY.
 
 **Excepción operativa resuelta; rollout autorizado:** `pnpm pg:connect:migrate` se usó por error como comando de proxy y
 aplicó las dos migraciones aunque la aprobación excluía el apply. Readback 18:49:53Z: `registrations=0`,
@@ -61,7 +53,7 @@ importan más que el trabajo planificado:
    «no verificada» del consentimiento estaban a **1.53:1**. Causa raíz: `.id-context`/`.id-muted` compartidas entre
    la ficha (sobre el azul) y el bloque del destino (dentro de la tarjeta) — un color cruzando fondos opuestos.
    Mecanismo nuevo `pnpm auth-server:verify-contrast` (muestrea píxeles): **272 textos, 0 bajo el piso WCAG**.
-   *Aplica más allá de esta task: cualquier superficie con fondo compuesto tiene el mismo punto ciego.*
+   _Aplica más allá de esta task: cualquier superficie con fondo compuesto tiene el mismo punto ciego._
 3. 🔴 **Ninguna PERSONA puede crear una passkey.** `/auth/passkeys/register/*` existe y no tiene superficie; el
    step-up sólo enrola TOTP. **Corrección del operador:** dije que eso bloqueaba la certificación de U07 y es
    falso — `scripts/auth-server/external-passkey-canary.ts` (TASK-1832, Codex) ya ejecuta registro y login con una
@@ -169,7 +161,6 @@ y repetir medición sigue pendiente; este cambio solo documenta el método y el 
 [Informe PDF A4](docs/audits/seo/berel-agosto-2026/BEREL_INFORME_AGOSTO_2026_A4.pdf): 55 páginas revisadas,
 desempeño de Berel y pie institucional completo. [Estándar de informes](docs/operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md)
 y skill `report-studio` creada para Claude/Codex: investigación primaria, siete módulos, plantillas y preflight probado. HTML queda como insumo; cobertura On-time explícita y exportación reproducible. Entrega local, sin envío al cliente.
-
 
 **Globe, 2026-09-03:** caller externo pausado; protección deploy sólo local, sin commit/push/deploy.
 Platform debe promoverla y medir ahorro. Reactivación/evidencia:
@@ -368,31 +359,31 @@ Evaluación de impacto pedida por el operador, **sin migración**. Verificada co
 Ya en producción vía release `375f56e24187` (commits `7788c8626` + `b4135f287`, verificados por blob
 contra `origin/main`). **Cero cambios de código.**
 
-**Veredicto:** el shim DCR sigue siendo correcto y no por inercia. La spec retiene DCR *"for backwards
-compatibility with authorization servers that do not support Client ID Metadata Documents"* — que es
+**Veredicto:** el shim DCR sigue siendo correcto y no por inercia. La spec retiene DCR _"for backwards
+compatibility with authorization servers that do not support Client ID Metadata Documents"_ — que es
 literalmente Entra, que no soporta **ni CIMD ni RFC 7591**. El shim es pre-registro (prioridad 1 de la
 spec) por el único canal que los clientes MCP estándar consumen sin configuración manual. Earliest
 removal de DCR: primera revisión publicada en o después de **2027-07-28**.
 
-**Hallazgo estructural:** *"migrar el gateway a CIMD" no existe como trabajo.* CIMD es capacidad del
+**Hallazgo estructural:** _"migrar el gateway a CIMD" no existe como trabajo._ CIMD es capacidad del
 **authorization server**; el nuestro es Entra y el gateway **espeja** `authorize`/`token` en vez de
 proxearlos. Soportarlo exige emitir los tokens = el broker de `TASK-1631`, cuyos invariantes **ya** lo
 exigían al proveedor. No se abrió task paralela; esta evaluación es insumo de esa task.
 
-**🔴 Riesgo más cercano que la deprecación, en la misma revisión:** la página nueva *Authorization
-Server Discovery* (no existía en `2025-11-25`) exige `issuer` **idéntico** al identificador usado para
+**🔴 Riesgo más cercano que la deprecación, en la misma revisión:** la página nueva _Authorization
+Server Discovery_ (no existía en `2025-11-25`) exige `issuer` **idéntico** al identificador usado para
 construir la well-known URL. **Los nuestros difieren** desde que el shim existe. Funciona sólo porque
 los clientes todavía no lo aplican — empírico, no garantizado. **No se parchea** reclamando issuer
-propio: rompería la validación `iss` de RFC 9207, que hoy pasamos *porque* espejamos el de Entra.
+propio: rompería la validación `iss` de RFC 9207, que hoy pasamos _porque_ espejamos el de Entra.
 
 **Dos hallazgos que salieron de coordinar con otras sesiones, no de la evaluación:**
 
-1. *Confused deputy* (aporte de `greenhouse-eo-1e`, adoptado a medias tras verificar): la letra del
+1. _Confused deputy_ (aporte de `greenhouse-eo-1e`, adoptado a medias tras verificar): la letra del
    `MUST` no ata —no reenviamos— y el modo de la cookie de consentimiento quedó **refutado** leyendo
    `src/app.ts`. Pero el riesgo está por construcción: `client_id` estático compartido +
    `http://localhost` **sin puerto** + consentimiento cacheado por Entra = un proceso local toma un
    código en silencio. Acotado a lectura porque ese cliente **no lleva scopes de escritura**.
-2. *La etiqueta miente:* `32617b87-…` se llama **"Efeonce MCP Local Canary Client"** siendo el cliente
+2. _La etiqueta miente:_ `32617b87-…` se llama **"Efeonce MCP Local Canary Client"** siendo el cliente
    compartido de producción; el canary real es `66985833-…`. Quien lee "Local Canary" y asume radio de
    juguete es quien no auditará las redirect URIs.
 
