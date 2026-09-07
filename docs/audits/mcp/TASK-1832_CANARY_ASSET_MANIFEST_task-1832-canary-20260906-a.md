@@ -146,6 +146,7 @@ que el command gobernado lo devuelva. Un asset no previsto deja la corrida `bloc
 | --- | --- | --- | --- | --- | --- |
 | 2026-09-07T01:27:22Z | `registrations=1`, `canary_bindings=1`, registro activo | drift externo/interno `0/0`; `smoke_profiles=32` globales, de los cuales 2 pertenecen a esta corrida; `smoke_in_person_360=0` | 7 `ok`; 2 warnings de 24 h explicados por smokes anteriores al registro. Desde 19:43:30Z: unbound `0`, token revealed `0` | 14 DCR; auth/authority sin cambios; `unexpectedRefs=0`; no apply | `steady`; baseline posterior a la restauración |
 | 2026-09-07T01:43:51Z | `registrations=1`, `canary_bindings=1`, registro activo | drift externo/interno `0/0`; `smoke_profiles=32`; `smoke_in_person_360=0` | 7 `ok`; permanecen los 2 warnings históricos de 24 h, sin señal canary nueva | 14 DCR; 2 profiles/links, 12 sesiones, 8 magic links, 2 passkeys, 5 challenges, 13 codes/consents, 18 refresh/access, 4 contexts y 3 grants; `unexpectedRefs=0`; no apply | `steady`; `deletionReady=false` sólo por actividad esperada durante la ventana |
+| 2026-09-07T02:15:14Z | `registrations=1`, `canary_bindings=1`, registro activo | drift externo/interno `0/0`; `smoke_profiles=32`; `smoke_in_person_360=0` | 7 `ok`; permanecen los 2 warnings históricos de 24 h, sin señal canary nueva | inventario sin cambios: 14 DCR, 2 profiles/links, 12 sesiones, 8 magic links, 2 passkeys, 5 challenges, 13 codes/consents, 18 refresh/access, 4 contexts y 3 grants; `unexpectedRefs=0`; no apply | `steady`; sin contaminación comercial ni cambio de frontera |
 
 Control de gates a `2026-09-07T01:48:54.971Z`: Vercel Production `true`; el environment custom staging se
 encontró indebidamente en `true`, se corrigió a `false` y se redeployó sin mover Production. El primer
@@ -154,9 +155,18 @@ READY como `dpl_D9mkjQLE1a26H4TXQ2HX7wXWMpLf` desde `2026-09-07T02:03:16.160Z` y
 apuntan a este último. `/api/auth/session` respondió 200 mediante `vercel curl`. Es evidencia de control plane,
 build y salud mínima; la prueba flow-level fail-closed de staging queda pendiente.
 
+Readback de seguimiento a `2026-09-07T02:19:22Z`: `auth.efeonce.org/healthz` respondió 200 con
+`status=ok`, `enabled=true`, `oauth=true` y SHA `fb5fc082aa92`; gateway `/health` y PRM respondieron 200, y
+`POST /mcp` anónimo respondió 401. GitHub conserva una sola variable de repositorio
+`EXTERNAL_IDENTITY_CANARY_ENABLED=true` y cero overrides homónimos en `staging|production`; `vercel env pull`
+releyó Production `true` y staging `false`. El watchdog local no encontró errores, pero sus tres readers de
+GitHub quedaron `unknown` por ausencia de `GITHUB_RELEASE_OBSERVER_TOKEN`; no se presentan como verdes. La
+revisión Cloud Run exacta del gateway no pudo releerse directamente mientras la sesión local de Gcloud requiere
+reauth interactiva; permanece como evidencia vigente la última lectura acreditada, no como confirmación nueva.
+
 ## Registro de retiro
 
-- `dry_run_at`: `2026-09-07T00:50Z`, inspección post-clientes; no es el preflight final de borrado
+- `dry_run_at`: `2026-09-07T02:15Z`, inspección de observación; no es el preflight final de borrado
 - `dry_run_result`: `deletionReady=false`, `unexpectedRefs=0`, blockers esperados
   `registration_active|active_authority|active_auth`; 2 profiles/links, 5 invitaciones, 3 grants, 14 DCR,
   12 sesiones, 8 magic links, 2 passkeys, 5 challenges, 13 codes/consents, 18 refresh/access tokens y 4
