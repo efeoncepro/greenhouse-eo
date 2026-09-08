@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-1835-efeonce-id-login-consent-screens-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `2026-09-08: code complete, rollout pendiente. Contrato v2 implementado en Greenhouse y gateway 1.3.0, con actor/targets separados, permisos efectivos por snapshot, consentimiento fresco y refresh sin promoción. 528 pruebas focales Greenhouse, 158 gateway y 2 PG live passed; build/tipos y GVC desktop/390 px correctos. Lint sin errores, 26 warnings UI previos. SQL expand/contract pendientes; schema compartido sigue v1. Gates default OFF; faltan release, apply, cohorte/fixtures runtime, Codex/Claude reales y rollback servido. QA y runbook enlazados abajo.`
+- Status real: `2026-09-08: code complete, rollout pendiente. Contrato v2 implementado en Greenhouse y gateway 1.3.0, con actor/targets separados, permisos efectivos por snapshot, consentimiento fresco y refresh sin promoción. 528 pruebas focales Greenhouse, 158 gateway y 2 PG live passed; build/tipos y GVC desktop/390 px correctos. Lint sin errores, 26 warnings UI previos. Rollout autorizado y en ejecución. Expand 20260908184942851 aplicado: CHECK 1/2, ambos índices y trigger verificados; seis filas v1 conservadas. Contract pendiente de writers compatibles. Gates OFF; faltan release, cohorte/fixtures runtime, Codex/Claude reales y rollback servido. QA y runbook enlazados abajo.`
 - Rank: `Después del cierre de TASK-1813; antes del uso interno multiorganización en Codex o Claude`
 - Domain: `identity|platform`
 - Blocked by: `none`
@@ -260,7 +260,7 @@ Se descarta un selector que altere el target del token y una lista estática pre
 
 ### Migration, backfill and rollout
 
-- Migration posture: `expand/contract` preparada: CHECK 1/2 e índice versionado, writer compatible y retiro posterior del índice anterior tras readback; SQL pendientes, sin borrar datos ni backfill de permisos
+- Migration posture: `expand/contract` preparada: CHECK 1/2 e índice versionado, writer compatible y retiro posterior del índice anterior tras readback; expand aplicado 20260908184942851; contract pendiente de writers compatibles, sin borrar datos ni backfill de permisos
 - Default state: `flags nuevas OFF para issuer/reader y gateway; v1 sigue siendo el fallback explícito mientras v2 no esté activa`
 - Backfill plan: `sin backfill de consentimiento; los clientes internos reautorizan y crean autoridad v2 de forma explícita`
 - Rollback path: `apagar primero emisión v2, luego consumo v2 en gateway; tokens/consentimientos v2 quedan denegados y v1 uniorganización sigue disponible sólo si la policy de rollback lo autoriza`
@@ -276,7 +276,7 @@ Se descarta un selector que altere el target del token y una lista estática pre
 ### Runtime evidence
 
 - Local checks: `tests focales de auth-server/identity/API Platform + pnpm mcp:manifest:check; pnpm check en ../efeonce-mcp`
-- DB/runtime checks: `SQL y readers probados con tablas TEMP en PG real mediante pnpm test:live; apply y readback del schema/contexto/token servido siguen pendientes`
+- DB/runtime checks: `SQL y readers probados con tablas TEMP en PG real mediante pnpm test:live; expand aplicado y schema releído; contract y contexto/token servido siguen pendientes`
 - Integration checks: `un token interno v2 permite A/B y deniega C antes del provider; missing/ambiguous fail-closed; external/Entra regresión verde`
 - Reliability signals/logs: `deny por organización, context/version drift, revocación aún despachando y reader unavailable; nombres exactos se fijan en el Delta ADR`
 - Production verification sequence: `flags OFF -> deploy compatible Greenhouse -> deploy gateway compatible -> canary interno v2 -> reconsentimiento Codex/Claude -> revocación y rollback -> flags finales/readback`
@@ -309,7 +309,7 @@ Se descarta un selector que altere el target del token y una lista estática pre
 - [Plan y auditoría TASK-1844](../plans/TASK-1844-plan.md), 2026-09-08.
 - Goal, plan y Delta ADR **aprobados por el operador el 2026-09-08** («Aprobado»).
 - Estrategia `sequential`, sin subagentes; Greenhouse develop y gateway main, checkouts compartidos.
-- Implementación secuencial local verificada. Apply y rollout preparados en el runbook para aprobación final.
+- Implementación secuencial local verificada. Rollout completo autorizado («Avanza con todo lo pendiente»); expansión aplicada y readback correcto, publicación en ejecución según runbook.
 - Baseline completo y precisión del enlace GET/POST del consentimiento registrados en
   [el plan](../plans/TASK-1844-plan.md#baseline-completo-previo-a-implementación--2026-09-08).
 

@@ -1,9 +1,18 @@
 # TASK-1844 — Rollout de autoridad interna multiorganización
 
-Estado 2026-09-08: **code complete, rollout pendiente**. El operador aprobó goal, diseño e implementación;
-push, promoción, apply y activación conservan la aprobación final del [plan](../tasks/plans/TASK-1844-plan.md).
+Estado 2026-09-08: **code complete, rollout en ejecución**. El operador autorizó todos los pendientes
+(«Avanza con todo lo pendiente»): publicación, promoción, apply, activación controlada, certificación y rollback.
+Se mantienen los límites del [plan](../tasks/plans/TASK-1844-plan.md).
 [Contrato D8–D11](../architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md#d8--actor-y-objetivo-tienen-autoridad-distinta)
 · [QA y evidencia local](../audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md).
+
+## Avance verificado
+
+- Inicio del cronómetro de release: **2026-09-08T18:44:53Z**.
+- Expansión aplicada mediante `pnpm migrate:up`: [`20260908184942851`](../../migrations/20260908184942851_task-1844-internal-context-version-expand.sql). Readback 18:50:19Z: CHECK validado 1/2, ambos índices únicos, trigger habilitado y las seis filas existentes conservadas en v1. Tipos regenerados sin diff.
+- Template expand/contract validado con PostgreSQL TEMP después de añadir guards DDL: 1 passed, 0 skipped. Contract aún pendiente de todos los writers servidos compatibles.
+- Cloud Run previo: `auth-server-00043-ndg` y `efeonce-mcp-gateway-00047-8b5`, 100% de tráfico. Gates internos/canary previos ON; multiorganización ausente/OFF. Vercel Production leído por env pull: reader multiorganización ausente/OFF.
+- Preflight local inicial **blocked** por configuración del observador local y staging CANCELED; se corrige la configuración y se produce evidencia nueva antes de promoción. No se considera verde.
 
 ## Paquete y fronteras
 
@@ -19,8 +28,8 @@ push, promoción, apply y activación conservan la aprobación final del [plan](
 
 | Variable | Dueño/configuración durable | Primer despliegue | Activación controlada |
 | --- | --- | --- | --- |
-| `AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED` | Environment GitHub consumido por `auth-server-deploy.yml`; Cloud Run compartido | `false` | `true`, último gate |
-| `AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS` | Mismo environment; CSV de IDs exactos, sin wildcard | vacío | cohorte verificada y registrada antes del flip |
+| `AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED` | Variables de repositorio GitHub consumidas por `auth-server-deploy.yml`; Cloud Run compartido | `false` | `true`, último gate |
+| `AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS` | Mismo repositorio; CSV de IDs exactos, sin wildcard | vacío | cohorte verificada y registrada antes del flip |
 | `IDENTITY_INTERNAL_MULTI_ORG_ENABLED` | Vercel, environments de cada reader | `false` | `true`, primer gate |
 | `MCP_NATIVE_INTERNAL_MULTI_ORG_ENABLED` | Environment GitHub del gateway; Cloud Run | `false` | `true`, segundo gate |
 
