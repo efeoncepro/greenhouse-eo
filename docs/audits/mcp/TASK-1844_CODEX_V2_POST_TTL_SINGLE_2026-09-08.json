@@ -1,0 +1,10 @@
+{
+  "client": "codex",
+  "label": "task1844-codex-v2-post-ttl-single",
+  "startedAt": "2026-09-08T20:29:04.968076+00:00",
+  "completedAt": "2026-09-08T20:29:15.772313+00:00",
+  "exitCode": 0,
+  "evidenceSource": "actual native client tool events, not assistant summaries",
+  "calls": [],
+  "certificationStatus": "not counted: zero actual tool dispatch; native token issuance is recorded separately"
+}

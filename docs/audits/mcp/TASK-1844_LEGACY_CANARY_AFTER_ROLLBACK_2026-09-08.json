@@ -1,0 +1,34 @@
+{
+  "observedAt": "2026-09-08T21:15:29.705898+00:00",
+  "entraGrantUnchanged": {
+    "clientId": "dcf4bb39-2806-4f0a-a9ec-ce42143881ed",
+    "consentType": "AllPrincipals",
+    "id": "Obv03AYoCk-p7M5CFDiB7cKONpIIJCJClWvzum1nAH8",
+    "resourceId": "92368ec2-2408-4222-956b-f3ba6d67007f",
+    "scope": "efeonce.mcp.read efeonce.mcp.globe.read efeonce.mcp.hiring.read efeonce.mcp.globe.credits.funding.ensure efeonce.mcp.seo.write"
+  },
+  "canary": {
+    "observedAt": "2026-09-08T21:14:49.426Z",
+    "registration": [
+      {
+        "run_id": "task-1832-canary-20260906-a",
+        "status": "active",
+        "expires_at": "2026-09-14T19:43:30.000Z",
+        "revoked_at": null
+      }
+    ],
+    "client": [
+      {
+        "client_id": "dcr-mLTiqIJmBQyvdQOtKRpdVw",
+        "status": "active",
+        "software_id": null
+      }
+    ],
+    "family": [
+      {
+        "unrevoked_current_refreshes": 0
+      }
+    ]
+  },
+  "boundary": "Only former hosted Claude connection family retired; canary registration and expiry retained; external connector actual dispatch in EXTERNAL_AFTER_ROLLBACK."
+}

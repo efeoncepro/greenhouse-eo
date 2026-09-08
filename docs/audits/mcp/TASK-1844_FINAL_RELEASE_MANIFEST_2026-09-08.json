@@ -1,0 +1,35 @@
+{
+  "observedAt": "2026-09-08T21:44:56.351Z",
+  "releases": [
+    {
+      "releaseId": "45f6910e3ae3-418c7895-89ad-4373-a21e-34a8bfe91929",
+      "targetSha": "45f6910e3ae35cad5d775eaabf9ce6e15d156d6e",
+      "state": "released",
+      "startedAt": "2026-09-08T21:35:13.125Z",
+      "completedAt": "2026-09-08T21:44:22.158Z",
+      "vercelDeploymentUrl": null,
+      "workerRevisions": {},
+      "postReleaseHealth": {}
+    },
+    {
+      "releaseId": "741e3a045cc2-1898ddd1-8bb1-42dc-b308-321c0dca743a",
+      "targetSha": "741e3a045cc2c98d32d4c75d46b6563c4466cac8",
+      "state": "released",
+      "startedAt": "2026-09-08T20:02:16.001Z",
+      "completedAt": "2026-09-08T20:12:00.831Z",
+      "vercelDeploymentUrl": null,
+      "workerRevisions": {},
+      "postReleaseHealth": {}
+    },
+    {
+      "releaseId": "fb5fc082aa92-3f2c8706-24fa-452d-be8f-6feea7b8cdd9",
+      "targetSha": "fb5fc082aa92f6b65d0be0ff9e519ce648752f2f",
+      "state": "released",
+      "startedAt": "2026-09-06T23:26:04.867Z",
+      "completedAt": "2026-09-06T23:35:34.129Z",
+      "vercelDeploymentUrl": null,
+      "workerRevisions": {},
+      "postReleaseHealth": {}
+    }
+  ]
+}

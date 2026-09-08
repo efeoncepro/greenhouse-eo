@@ -1,0 +1,78 @@
+{
+  "client": "Claude hosted / shared Desktop connector",
+  "connector": "Efeonce MCP",
+  "endpoint": "https://mcp.efeonce.org/mcp",
+  "observedAt": "2026-09-08T21:09:45.268501+00:00",
+  "source": "Actual first four request/response code blocks in final Claude conversation article; account ledger readback",
+  "conversation": "https://claude.ai/chat/7003de2a-c11a-42cd-9f35-b64647cc101f",
+  "ledgerObservedAt": "2026-09-08T21:01:07.621Z",
+  "context": {
+    "context_id": "b52891e9-9f10-4718-b1bb-cda1c65ed6c3",
+    "client_id": "https://claude.ai/oauth/mcp-oauth-client-metadata",
+    "context_version": 2,
+    "organization_id": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+    "created_at": "2026-09-08T21:00:34.902Z",
+    "expires_at": "2026-09-15T19:32:25.352Z",
+    "revoked_at": null,
+    "access_rows": 1,
+    "access_lifecycle": [
+      {
+        "issuedAt": "2026-09-08T21:00:44+00:00",
+        "expiresAt": "2026-09-08T21:15:44+00:00",
+        "revokedAt": null,
+        "grantId": "grt-qVui3kaYDgz0pHxR"
+      }
+    ],
+    "refresh_lifecycle": [
+      {
+        "createdAt": "2026-09-08T21:00:44.166+00:00",
+        "usedAt": null,
+        "status": "active",
+        "grantId": "grt-qVui3kaYDgz0pHxR"
+      }
+    ],
+    "active_access": 1,
+    "all_access_base_only": true,
+    "refresh_rows": 1,
+    "active_refresh": 1
+  },
+  "retiredPreviousTestFamily": {
+    "observedAt": "2026-09-08T21:00:32.375Z",
+    "startedAt": "2026-09-08T21:00:31.746Z",
+    "action": "family",
+    "contextId": "d2fc3f78-abda-4d10-b501-354e003658bb",
+    "clientId": "https://claude.ai/oauth/mcp-oauth-client-metadata",
+    "version": 2,
+    "grantIds": [
+      "grt-i3RfGGBU4WpopBjB"
+    ],
+    "result": [
+      {
+        "grantId": "grt-i3RfGGBU4WpopBjB",
+        "refreshRevoked": 2,
+        "accessRevoked": 1
+      }
+    ]
+  },
+  "actualCalls": [
+    {
+      "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975",
+      "ok": true,
+      "hasModule": false,
+      "blockedReason": "no_entitlement",
+      "budgetUsedUsd": 0
+    },
+    {
+      "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3",
+      "ok": true,
+      "hasModule": false,
+      "blockedReason": "no_entitlement",
+      "budgetUsedUsd": 0
+    }
+  ],
+  "limits": [
+    "OAuth popup completed before the agent could inspect it; no claim of a new manual Authorize click. Fresh version 2 context and grant verified by ledger.",
+    "These two calls happened before rollback; observed again from their actual tool details after restoration.",
+    "Assistant narrative is excluded."
+  ]
+}

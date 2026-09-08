@@ -276,9 +276,9 @@ una nueva autenticación humana desde esa entrada hasta `/auth/session`; el clic
 ## Delta TASK-1844 — Autoridad interna multiorganización (Accepted)
 
 - Fecha: 2026-09-08. Estado: **Accepted; aprobado por el operador («Aprobado»)**.
-- Owner: [TASK-1844](../tasks/in-progress/TASK-1844-efeonce-mcp-internal-multi-organization-authority.md).
+- Owner: [TASK-1844](../tasks/complete/TASK-1844-efeonce-mcp-internal-multi-organization-authority.md).
 - Contrato, discovery, archivos, migración y evidencia: [plan TASK-1844](../tasks/plans/TASK-1844-plan.md).
-- Diseño aceptado e implementación local verificada; no modifica la historia v1 ni afirma activación de v2. [QA](../audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md) y [runbook](../operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md). Apply y rollout conservan su aprobación final.
+- Diseño aceptado, migraciones aplicadas y v2 productiva para una identidad interna desde 2026-09-08; historia v1 conservada. Codex/Claude, refresh, revocación, rollback y retiro de fixtures verificados. [QA](../audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md) y [runbook](../operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md); ampliación de cohorte requiere aprobación y observabilidad proporcional.
 
 ### D8 — Actor y objetivo tienen autoridad distinta
 

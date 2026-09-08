@@ -43,5 +43,42 @@
     },
     "contract": "Only authorization_code and refresh_token become effective grants; advertised jwt-bearer remains unsupported with no token issuance"
   },
-  "productionFixStatus": "pending publication"
+  "productionFixStatus": "pending publication",
+  "reviewFollowup": {
+    "commit": "76ed9ca20b3630a4888ddd7ca09153f50ab3e324",
+    "policy": "Reject grant identifiers containing whitespace before calculating supported intersection; no silent refresh removal or normalization of malformed identifiers.",
+    "oauthTests": {
+      "passed": 150,
+      "skipped": 0
+    },
+    "lint": "0 errors, 26 pre-existing UI warnings",
+    "typecheck": "passed in pre-push check",
+    "migrationChange": "Comment only: applied migration retains its timestamp; SQL unchanged.",
+    "servedReadback": {
+      "observedAt": "2026-09-08T20:56:09.899533+00:00",
+      "service": "auth-server",
+      "revisions": [
+        {
+          "revision": "auth-server-00048-4vq",
+          "trafficPercent": 100,
+          "ready": true,
+          "sha": "76ed9ca20b3630a4888ddd7ca09153f50ab3e324",
+          "digest": "gcr.io/efeonce-group/auth-server@sha256:1a427177af458c8f775c3bf91fc3007594e72c5d081cb3739aeb559a457fbf58",
+          "flags": {
+            "AUTH_SERVER_INTERNAL_AUTH_ENABLED": "true",
+            "AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED": "true",
+            "AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS": "identity-greenhouse-auth-client-user-user-efeonce-admin-julio-reyes",
+            "EXTERNAL_IDENTITY_CANARY_ENABLED": "true"
+          }
+        }
+      ]
+    }
+  },
+  "hostedOutcome": {
+    "consentVersion": 2,
+    "scope": "efeonce.mcp.read",
+    "toolCount": 21,
+    "actualMatrixCalls": 9,
+    "evidence": "TASK-1844_CLAUDE_HOSTED_MATRIX_2026-09-08.json"
+  }
 }

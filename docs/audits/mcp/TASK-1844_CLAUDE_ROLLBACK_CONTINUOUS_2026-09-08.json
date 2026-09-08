@@ -1,0 +1,129 @@
+{
+  "label": "task1844-claude-rollback-continuous",
+  "client": "claude",
+  "startedAt": "2026-09-08T21:02:54.389262+00:00",
+  "completedAt": "2026-09-08T21:09:44.298473+00:00",
+  "exitCode": 0,
+  "rounds": 3,
+  "continuousSession": true,
+  "evidenceSource": "actual native client tool events, not assistant summaries",
+  "calls": [
+    {
+      "server": "efeonce-internal",
+      "tool": "mcp__efeonce-internal__get_seo_entitlement",
+      "arguments": {
+        "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3"
+      },
+      "startedAt": "2026-09-08T21:02:59.585895+00:00",
+      "completedAt": "2026-09-08T21:03:00.731646+00:00",
+      "status": "completed",
+      "result": {
+        "provider": "greenhouse-seo",
+        "data": {
+          "ok": true,
+          "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3",
+          "hasModule": false,
+          "tier": null,
+          "allowanceCap": 0,
+          "allowanceUsed": 0,
+          "allowanceRemaining": 0,
+          "budgetCapUsd": 0,
+          "budgetUsedUsd": 0,
+          "budgetRemainingUsd": 0,
+          "periodResetAt": "2026-10-01T00:00:00.000Z",
+          "blockedReason": "no_entitlement"
+        }
+      },
+      "clientObservedDurationMs": 1145.751
+    },
+    {
+      "server": "efeonce-internal",
+      "tool": "mcp__efeonce-internal__get_seo_entitlement",
+      "arguments": {
+        "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975"
+      },
+      "startedAt": "2026-09-08T21:03:03.342210+00:00",
+      "completedAt": "2026-09-08T21:03:04.429140+00:00",
+      "status": "completed",
+      "result": {
+        "provider": "greenhouse-seo",
+        "data": {
+          "ok": true,
+          "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975",
+          "hasModule": false,
+          "tier": null,
+          "allowanceCap": 0,
+          "allowanceUsed": 0,
+          "allowanceRemaining": 0,
+          "budgetCapUsd": 0,
+          "budgetUsedUsd": 0,
+          "budgetRemainingUsd": 0,
+          "periodResetAt": "2026-10-01T00:00:00.000Z",
+          "blockedReason": "no_entitlement"
+        }
+      },
+      "clientObservedDurationMs": 1086.93
+    },
+    {
+      "server": "efeonce-internal",
+      "tool": "mcp__efeonce-internal__get_seo_entitlement",
+      "arguments": {
+        "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975"
+      },
+      "startedAt": "2026-09-08T21:08:07.481462+00:00",
+      "completedAt": "2026-09-08T21:08:08.068502+00:00",
+      "status": "failed",
+      "result": {
+        "textLength": 71,
+        "authorizationDenied": false
+      },
+      "clientObservedDurationMs": 587.04
+    },
+    {
+      "server": "efeonce-internal",
+      "tool": "mcp__efeonce-internal__get_seo_entitlement",
+      "arguments": {
+        "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3"
+      },
+      "startedAt": "2026-09-08T21:08:07.675766+00:00",
+      "completedAt": "2026-09-08T21:08:08.221533+00:00",
+      "status": "failed",
+      "result": {
+        "textLength": 71,
+        "authorizationDenied": false
+      },
+      "clientObservedDurationMs": 545.767
+    },
+    {
+      "server": "efeonce-internal",
+      "tool": "mcp__efeonce-internal__get_seo_entitlement",
+      "arguments": {
+        "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975"
+      },
+      "startedAt": "2026-09-08T21:09:33.379156+00:00",
+      "completedAt": "2026-09-08T21:09:33.430770+00:00",
+      "status": "failed",
+      "result": {
+        "textLength": 71,
+        "authorizationDenied": false
+      },
+      "clientObservedDurationMs": 51.614
+    },
+    {
+      "server": "efeonce-internal",
+      "tool": "mcp__efeonce-internal__get_seo_entitlement",
+      "arguments": {
+        "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3"
+      },
+      "startedAt": "2026-09-08T21:09:33.695264+00:00",
+      "completedAt": "2026-09-08T21:09:33.769034+00:00",
+      "status": "failed",
+      "result": {
+        "textLength": 71,
+        "authorizationDenied": false
+      },
+      "clientObservedDurationMs": 73.77
+    }
+  ],
+  "protocolObservation": "OFF and same-process restored rounds both report MCP server requires re-authorization (token expired); do not interpret as four MCP authorization_denied payloads. Access JWT was actually valid to 21:16:25Z; this is client auth state."
+}

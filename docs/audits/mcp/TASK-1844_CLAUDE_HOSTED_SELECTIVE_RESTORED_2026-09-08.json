@@ -1,0 +1,57 @@
+{
+  "evidence": "local canonical reader against shared PG; not served JWT or MCP proof",
+  "observedAt": "2026-09-08T20:50:51.887Z",
+  "runId": "task-1844-runtime-20260908-a",
+  "expiresAt": "2026-09-09T00:00:00Z",
+  "mutation": {
+    "action": "restore-b",
+    "startedAt": "2026-09-08T20:50:42.293Z",
+    "committedBefore": "2026-09-08T20:50:43.671Z"
+  },
+  "retired": false,
+  "targets": [
+    {
+      "label": "A",
+      "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975",
+      "clientId": "task-1844-runtime-20260908-a-a",
+      "spaceId": "spc-task-1844-runtime-20260908-a-a",
+      "outcome": "resolved"
+    },
+    {
+      "label": "B",
+      "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3",
+      "clientId": "task-1844-runtime-20260908-a-b",
+      "spaceId": "spc-task-1844-runtime-20260908-a-b",
+      "outcome": "resolved"
+    },
+    {
+      "label": "C",
+      "organizationId": "org-56b1a2d6-fc83-4639-adeb-59e0b20f5127",
+      "clientId": "task-1844-runtime-20260908-a-c",
+      "spaceId": "spc-task-1844-runtime-20260908-a-c",
+      "outcome": "denied"
+    }
+  ],
+  "client": "Claude.ai",
+  "toolDetailsObservedAt": "2026-09-08T20:52:11.484Z",
+  "reconnected": false,
+  "calls": [
+    {
+      "tool": "get_seo_entitlement",
+      "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3",
+      "ok": true,
+      "hasModule": false,
+      "budgetUsedUsd": 0,
+      "blockedReason": "no_entitlement"
+    },
+    {
+      "tool": "get_seo_entitlement",
+      "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975",
+      "ok": true,
+      "hasModule": false,
+      "budgetUsedUsd": 0,
+      "blockedReason": "no_entitlement"
+    }
+  ],
+  "interpretation": "Canonical command intentionally revoked and then restored B. The assistant speculation about instability is excluded; actual tool payloads and mutation audit establish controlled authorization changes."
+}

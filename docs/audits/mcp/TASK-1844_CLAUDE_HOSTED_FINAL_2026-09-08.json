@@ -1,0 +1,24 @@
+{
+  "submittedAt": "2026-09-08T21:37:25.699Z",
+  "observedAt": "2026-09-08T21:39:05.699Z",
+  "source": "Actual Request/Response details in final hosted Claude article; excludes assistant narrative",
+  "conversation": "https://claude.ai/chat/7003de2a-c11a-42cd-9f35-b64647cc101f",
+  "noOAuthReconnect": true,
+  "calls": [
+    {
+      "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975",
+      "ok": true,
+      "hasModule": false,
+      "blockedReason": "no_entitlement",
+      "budgetUsedUsd": 0
+    },
+    {
+      "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3",
+      "ok": true,
+      "hasModule": false,
+      "blockedReason": "no_entitlement",
+      "budgetUsedUsd": 0
+    }
+  ],
+  "boundary": "After relevant auth/Vercel deploy jobs passed; remaining release worker jobs were still in progress."
+}

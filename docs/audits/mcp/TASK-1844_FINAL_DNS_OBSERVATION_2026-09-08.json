@@ -1,0 +1,41 @@
+{
+  "observedAt": "2026-09-08T21:38:17.960357+00:00",
+  "results": [
+    {
+      "url": "https://mcp.efeonce.org/.well-known/oauth-protected-resource",
+      "errorType": "URLError",
+      "status": null,
+      "reason": "<urlopen error [Errno 8] nodename nor servname provided, or not known>"
+    },
+    {
+      "url": "https://auth.efeonce.org/.well-known/oauth-authorization-server",
+      "status": 200,
+      "length": 1107,
+      "contentType": "application/json; charset=utf-8"
+    },
+    {
+      "url": "https://auth.efeonce.org/readyz",
+      "status": 200,
+      "length": 149,
+      "contentType": "application/json; charset=utf-8"
+    },
+    {
+      "url": "https://mcp.efeonce.org/health",
+      "errorType": "URLError",
+      "status": null,
+      "reason": "<urlopen error [Errno 8] nodename nor servname provided, or not known>"
+    }
+  ],
+  "recoveredAt": "2026-09-08T21:39:23.876552+00:00",
+  "systemResolvedAddresses": [
+    "34.111.78.237"
+  ],
+  "publicResolverObservations": {
+    "default": "NOERROR A 34.111.78.237",
+    "1.1.1.1": "NOERROR A 34.111.78.237",
+    "8.8.8.8": "NOERROR A 34.111.78.237",
+    "AAAA": "NOERROR NODATA; SOA present"
+  },
+  "metadataRecoveredStatus": 200,
+  "boundary": "Transient local system DNS resolution failure. Public resolvers answered correctly; system getaddrinfo recovered before dscacheutil cache flush. No DNS records, hosts file, credentials or scopes changed. Hosted Claude completed both requests independently. No causal claim that cache flush repaired it."
+}

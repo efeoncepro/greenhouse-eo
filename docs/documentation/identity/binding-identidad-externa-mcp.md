@@ -407,5 +407,17 @@ La conexión interna v2 puede listar organizaciones autorizadas con `efeonce.org
 sin reconectar si cambian esos permisos. La transición desde v1 sí exige autorizar de nuevo una vez en cada
 cliente; no convierte una conexión anterior de forma silenciosa. El alcance inicial es lectura SEO base-only.
 
-Estado 2026-09-08: código verificado localmente, rollout pendiente. Esta capacidad no está habilitada para
-clientes externos y no cambia sus bindings. [Plan de activación interna](../../operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md).
+Estado 2026-09-08: activada para una identidad interna, con consentimiento, lecturas, refresh, revocación y
+rollback/restore verificados en Codex, Claude Code y Claude hospedado/Desktop. Esta capacidad no está habilitada
+para clientes externos y no cambia sus bindings. [Runbook de operación interna](../../operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md).
+
+Para operar, consulta `efeonce.organizations.list`, elige el ID canónico autorizado y pásalo como
+`organizationId` en cada lectura. Una revocación de una organización no requiere reconectar: deja de aparecer
+o se deniega al solicitarla. `no_entitlement` con `hasModule=false` significa que el módulo SEO no está
+asignado; no concede presupuesto ni habilita operaciones pagadas.
+
+Después de un rollback de los gates, Claude Code puede mantener `needs-auth` incluso tras reiniciarlo.
+Con los servicios restaurados, ejecuta `claude mcp login efeonce-internal` en una terminal interactiva y
+completa OAuth; verifica una lectura real después. No copies tokens ni amplíes scopes para recuperar acceso.
+El [ensayo documentado](../../audits/mcp/TASK-1844_ROLLBACK_RESTORE_2026-09-08.json) distingue esa recuperación
+de Codex, que conservó su familia. La conexión hospedada `Efeonce MCP` es compartida por web y Desktop.

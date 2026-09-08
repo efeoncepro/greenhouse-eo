@@ -1,0 +1,18 @@
+{
+  "observedAt": "2026-09-08T20:34:28.741Z",
+  "startedAt": "2026-09-08T20:34:28.124Z",
+  "action": "family",
+  "contextId": "f5c479f9-33ed-4ea9-b653-9e97358f9a4f",
+  "clientId": "https://chatgpt.com/oauth/codex/client.json",
+  "version": 1,
+  "grantIds": [
+    "grt-o8tkdkv6CKw5f5me"
+  ],
+  "result": [
+    {
+      "grantId": "grt-o8tkdkv6CKw5f5me",
+      "refreshRevoked": 2,
+      "accessRevoked": 0
+    }
+  ]
+}

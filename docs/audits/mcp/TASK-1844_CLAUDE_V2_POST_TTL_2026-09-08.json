@@ -1,0 +1,106 @@
+{
+  "label": "task1844-claude-v2-post-ttl",
+  "evidenceSource": "actual native client tool events, not assistant summaries",
+  "calls": [
+    {
+      "server": "efeonce-internal",
+      "tool": "mcp__efeonce-internal__efeonce_gateway_status",
+      "arguments": {},
+      "startedAt": "2026-09-08T20:28:26.169066+00:00",
+      "completedAt": "2026-09-08T20:28:27.421352+00:00",
+      "status": "completed",
+      "result": {
+        "gateway": "ready",
+        "protocol": "2026-07-28",
+        "providers": [
+          {
+            "providerId": "globe",
+            "contractVersion": "v1",
+            "state": "enabled"
+          },
+          {
+            "providerId": "greenhouse-globe-credit-funding",
+            "contractVersion": "v1",
+            "state": "enabled"
+          },
+          {
+            "providerId": "greenhouse-seo",
+            "contractVersion": "task-1645",
+            "state": "enabled"
+          },
+          {
+            "providerId": "greenhouse-hiring",
+            "contractVersion": "task-1726-v1",
+            "state": "enabled"
+          },
+          {
+            "providerId": "greenhouse-skills",
+            "contractVersion": "task-1804",
+            "state": "enabled"
+          }
+        ]
+      },
+      "clientObservedDurationMs": 1252.286
+    },
+    {
+      "server": "efeonce-internal",
+      "tool": "mcp__efeonce-internal__get_seo_entitlement",
+      "arguments": {
+        "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3"
+      },
+      "startedAt": "2026-09-08T20:28:30.018714+00:00",
+      "completedAt": "2026-09-08T20:28:31.256390+00:00",
+      "status": "completed",
+      "result": {
+        "provider": "greenhouse-seo",
+        "data": {
+          "ok": true,
+          "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3",
+          "hasModule": false,
+          "tier": null,
+          "allowanceCap": 0,
+          "allowanceUsed": 0,
+          "allowanceRemaining": 0,
+          "budgetCapUsd": 0,
+          "budgetUsedUsd": 0,
+          "budgetRemainingUsd": 0,
+          "periodResetAt": "2026-10-01T00:00:00.000Z",
+          "blockedReason": "no_entitlement"
+        }
+      },
+      "clientObservedDurationMs": 1237.676
+    },
+    {
+      "server": "efeonce-internal",
+      "tool": "mcp__efeonce-internal__get_seo_entitlement",
+      "arguments": {
+        "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975"
+      },
+      "startedAt": "2026-09-08T20:28:30.310728+00:00",
+      "completedAt": "2026-09-08T20:28:31.691655+00:00",
+      "status": "completed",
+      "result": {
+        "provider": "greenhouse-seo",
+        "data": {
+          "ok": true,
+          "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975",
+          "hasModule": false,
+          "tier": null,
+          "allowanceCap": 0,
+          "allowanceUsed": 0,
+          "allowanceRemaining": 0,
+          "budgetCapUsd": 0,
+          "budgetUsedUsd": 0,
+          "budgetRemainingUsd": 0,
+          "periodResetAt": "2026-10-01T00:00:00.000Z",
+          "blockedReason": "no_entitlement"
+        }
+      },
+      "clientObservedDurationMs": 1380.927
+    }
+  ],
+  "client": "claude",
+  "startedAt": "2026-09-08T20:28:17.470221+00:00",
+  "completedAt": "2026-09-08T20:28:44.098983+00:00",
+  "exitCode": 0
+}

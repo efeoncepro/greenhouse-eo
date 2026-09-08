@@ -1,0 +1,69 @@
+{
+  "observedAt": "2026-09-08T21:44:55.991Z",
+  "manifests": [
+    {
+      "release_id": "45f6910e3ae3-418c7895-89ad-4373-a21e-34a8bfe91929",
+      "target_sha": "45f6910e3ae35cad5d775eaabf9ce6e15d156d6e",
+      "state": "released",
+      "declared_override": {
+        "actor": "cesargrowth11",
+        "reason": "TASK-1844 aprobada por operador: correccion CIMD acoplada al emisor y migracion contract ya aplicada; rollback compatible y clientes verificados, sin widening de cohorte ni scopes.",
+        "bypassWarnings": true,
+        "overrideBatchPolicy": true
+      }
+    }
+  ],
+  "audit": [
+    {
+      "from_state": "unknown_legacy",
+      "to_state": "preflight",
+      "actor_kind": "member",
+      "actor_label": "cesargrowth11",
+      "reason": "Release iniciado: cesargrowth11",
+      "declared_override": {
+        "actor": "cesargrowth11",
+        "reason": "TASK-1844 aprobada por operador: correccion CIMD acoplada al emisor y migracion contract ya aplicada; rollback compatible y clientes verificados, sin widening de cohorte ni scopes.",
+        "bypassWarnings": true,
+        "overrideBatchPolicy": true
+      },
+      "transitioned_at": "2026-09-08T21:35:13.125Z"
+    },
+    {
+      "from_state": "preflight",
+      "to_state": "ready",
+      "actor_kind": "cli",
+      "actor_label": "orchestrator-workflow",
+      "reason": "Approval gate cleared (orchestrator workflow 34281143424)",
+      "declared_override": null,
+      "transitioned_at": "2026-09-08T21:44:09.644Z"
+    },
+    {
+      "from_state": "ready",
+      "to_state": "deploying",
+      "actor_kind": "cli",
+      "actor_label": "orchestrator-workflow",
+      "reason": "Workers deploy started (orchestrator workflow 34281143424)",
+      "declared_override": null,
+      "transitioned_at": "2026-09-08T21:44:13.854Z"
+    },
+    {
+      "from_state": "deploying",
+      "to_state": "verifying",
+      "actor_kind": "cli",
+      "actor_label": "orchestrator-workflow",
+      "reason": "Workers deploy completed (orchestrator workflow 34281143424)",
+      "declared_override": null,
+      "transitioned_at": "2026-09-08T21:44:17.893Z"
+    },
+    {
+      "from_state": "verifying",
+      "to_state": "released",
+      "actor_kind": "cli",
+      "actor_label": "orchestrator-workflow",
+      "reason": "Post-release health verified (orchestrator workflow 34281143424)",
+      "declared_override": null,
+      "transitioned_at": "2026-09-08T21:44:22.158Z"
+    }
+  ],
+  "boundary": "Declared exception and actor audited; this is not independent verification of a human capability or GitHub-to-person identity mapping."
+}

@@ -526,9 +526,12 @@ cache positiva. Revocar familia/consent debe denegar dispatch, además de refres
 familia que comparte contexto. Pruebas HTTP locales verifican deny antes del provider; el canary real
 sigue pendiente y ambos flags se conservan OFF durante el despliegue de compatibilidad.
 
-## Delta local TASK-1844 — 2026-09-08
+## Delta TASK-1844 — 2026-09-08
 
-TASK-1844 implementa autoridad interna v2 por target y consentimiento nuevo, detrás de gates OFF.
+TASK-1844 activó autoridad interna v2 por target y consentimiento nuevo para una identidad interna.
+Codex y Claude Code verificaron A/B concurrentes, negativos, refresh y revocación selectiva/global;
+Claude hospedado/Desktop y rollback/restore también verificados; PR 230/main `45f6910e3`, orquestador
+`34281143424` success, manifest released y watchdog 5/5. TASK-1844 completa, fixtures retiradas y conexiones definitivas conservadas.
 Esta task conserva su entrega uniorganización original. El delta no reabre TASK-1813 ni amplía el canary
-TASK-1832 o el piloto TASK-1841. [QA local](../../audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md) ·
-[rollout y clientes pendientes](../../operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md).
+TASK-1832 o el piloto TASK-1841. [QA y runtime](../../audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md) ·
+[rollout y evidencia de clientes](../../operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md).

@@ -1,0 +1,35 @@
+{
+  "mutation": {
+    "observedAt": "2026-09-08T20:31:37.332Z",
+    "startedAt": "2026-09-08T20:31:36.710Z",
+    "action": "family",
+    "contextId": "23b9f0e7-f020-4cdd-8c4c-776f548c23ab",
+    "clientId": "https://chatgpt.com/oauth/codex/client.json",
+    "version": 2,
+    "grantIds": [
+      "grt-Spa6agckVsmIqH7J"
+    ],
+    "result": [
+      {
+        "grantId": "grt-Spa6agckVsmIqH7J",
+        "refreshRevoked": 2,
+        "accessRevoked": 1
+      }
+    ]
+  },
+  "jwtExpiresAt": "2026-09-08T20:43:17Z",
+  "nativeProbe": {
+    "client": "codex",
+    "label": "task1844-codex-family-denied",
+    "startedAt": "2026-09-08T20:32:04.716713+00:00",
+    "completedAt": "2026-09-08T20:32:07.446628+00:00",
+    "exitCode": 1
+  },
+  "observed": {
+    "accessRejected": "invalid_token",
+    "refreshRejected": "invalid_grant",
+    "phase": "native MCP initialize; required server prevents model session start",
+    "toolDispatchCount": 0
+  },
+  "limit": "Authorization fails before catalog/tool dispatch; no invented A/B tool errors."
+}

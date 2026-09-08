@@ -1,0 +1,144 @@
+{
+  "observedAt": "2026-09-08T20:45:17.655024+00:00",
+  "source": "Actual Claude.ai UI tool Request/Response/Error details read through browser DOM; not assistant prose",
+  "chatUrl": "https://claude.ai/chat/7003de2a-c11a-42cd-9f35-b64647cc101f",
+  "connector": "Efeonce MCP",
+  "toolCount": 21,
+  "context": {
+    "context_id": "d2fc3f78-abda-4d10-b501-354e003658bb",
+    "client_id": "https://claude.ai/oauth/mcp-oauth-client-metadata",
+    "context_version": 2,
+    "organization_id": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+    "created_at": "2026-09-08T20:39:23.689Z",
+    "expires_at": "2026-09-15T19:32:25.352Z",
+    "revoked_at": null,
+    "access_rows": 1,
+    "access_lifecycle": [
+      {
+        "issuedAt": "2026-09-08T20:42:23+00:00",
+        "expiresAt": "2026-09-08T20:57:23+00:00",
+        "revokedAt": null,
+        "grantId": "grt-i3RfGGBU4WpopBjB"
+      }
+    ],
+    "refresh_lifecycle": [
+      {
+        "createdAt": "2026-09-08T20:42:23.846+00:00",
+        "usedAt": null,
+        "status": "active",
+        "grantId": "grt-i3RfGGBU4WpopBjB"
+      }
+    ],
+    "active_access": 1,
+    "all_access_base_only": true,
+    "refresh_rows": 1,
+    "active_refresh": 1
+  },
+  "consent": {
+    "fresh": true,
+    "version": 2,
+    "scope": "efeonce.mcp.read",
+    "AandBListed": true,
+    "CAbsent": true
+  },
+  "calls": [
+    {
+      "tool": "efeonce.gateway.status",
+      "response": {
+        "gateway": "ready",
+        "protocol": "2026-07-28",
+        "providersEnabled": 5
+      }
+    },
+    {
+      "tool": "efeonce.organizations.list",
+      "arguments": {
+        "limit": 2
+      },
+      "organizationIds": [
+        "org-03993839-8aab-479b-aeeb-a4e96a044dd6",
+        "org-0bff3c10-c165-425b-8139-e26a1dde5c29"
+      ],
+      "nextAfterOrganizationId": "org-0bff3c10-c165-425b-8139-e26a1dde5c29"
+    },
+    {
+      "tool": "efeonce.organizations.list",
+      "arguments": {
+        "limit": 2,
+        "afterOrganizationId": "org-0bff3c10-c165-425b-8139-e26a1dde5c29"
+      },
+      "organizationIds": [
+        "org-125fe6b3-eae2-4cc9-9f8a-4bec01945131",
+        "org-1b77dd57-5c83-4046-9262-36933686ea3e"
+      ],
+      "nextAfterOrganizationId": "org-1b77dd57-5c83-4046-9262-36933686ea3e"
+    },
+    {
+      "tool": "get_seo_entitlement",
+      "arguments": {
+        "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975"
+      },
+      "response": {
+        "ok": true,
+        "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975",
+        "hasModule": false,
+        "budgetCapUsd": 0,
+        "budgetUsedUsd": 0,
+        "blockedReason": "no_entitlement"
+      }
+    },
+    {
+      "tool": "get_seo_entitlement",
+      "arguments": {
+        "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3"
+      },
+      "response": {
+        "ok": true,
+        "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3",
+        "hasModule": false,
+        "budgetCapUsd": 0,
+        "budgetUsedUsd": 0,
+        "blockedReason": "no_entitlement"
+      }
+    },
+    {
+      "tool": "get_seo_entitlement",
+      "arguments": {
+        "organizationId": "org-56b1a2d6-fc83-4639-adeb-59e0b20f5127"
+      },
+      "error": "authorization_denied"
+    },
+    {
+      "tool": "get_seo_entitlement",
+      "arguments": {},
+      "error": "authorization_denied",
+      "requestEvidence": "UI shows no Request payload for this invocation, followed by actual tool error; missing arguments also independently verified by native Codex."
+    },
+    {
+      "tool": "get_seo_entitlement",
+      "arguments": {
+        "organizationId": "invalid"
+      },
+      "error": "authorization_denied"
+    },
+    {
+      "tool": "get_seo_entitlement",
+      "arguments": {
+        "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975"
+      },
+      "response": {
+        "ok": true,
+        "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975",
+        "hasModule": false,
+        "budgetCapUsd": 0,
+        "budgetUsedUsd": 0,
+        "blockedReason": "no_entitlement"
+      }
+    }
+  ],
+  "limits": [
+    "UI does not expose dispatch timestamps or prove A/B overlap; native client event evidence provides concurrency proof.",
+    "Names from discovery omitted from durable record.",
+    "Connected state alone is not counted as certification."
+  ]
+}

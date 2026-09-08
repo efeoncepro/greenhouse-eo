@@ -47,14 +47,15 @@ ADR y arquitectura fijan dominio Greenhouse + Artifact Worker, tres salidas de p
 API/UI/MCP, co-branding y grants revocables. TASK-1672/1673 conservan integración de auditoría técnica SEO.
 Sólo planificación autorizada; sin implementación, emisión de reportes ni rollout.
 
-## 2026-09-08 — TASK-1844: autoridad interna multiorganización implementada
+## 2026-09-08 — TASK-1844: autoridad interna multiorganización activada
 
-Greenhouse resuelve targets por snapshot de roles, relaciones y permisos efectivos; el contexto v2 conserva
-el actor y exige consentimiento fresco. Gateway 1.3.0 agrega discovery minimizado y autorización exacta por
-llamada, sin tenants en JWT ni ampliar scope. Refresh conserva versión y contexto. Writer compatible y SQL
-expand/contract preparados, gates OFF. 528 pruebas Greenhouse, 158 gateway y 2 PG live passed; build/tipos y
-GVC desktop/390 px correctos. Lint conserva 26 warnings previos. [QA](docs/audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md).
-**Code complete, rollout pendiente:** sin apply, push, deploy ni reautorización de clientes en esta entrega.
+Greenhouse resuelve autoridad por objetivo con consentimiento v2; gateway 1.3.0 descubre organizaciones
+permitidas y revalida cada llamada sin ampliar `efeonce.mcp.read`. Expand/contract aplicadas y cohorte de
+una persona ON. Codex, Claude Code, Claude hospedado/Desktop: A/B, negativos, refresh y revocación verificados.
+Rollback/restore servido probado; Claude Code requiere login tras OFF. CIMD extendido de Claude admite
+PKCE/refresh y rechaza JWT bearer; OAuth 150 passed. PR 230/main `45f6910e3`, orquestador `34281143424`
+success, manifest released, Vercel exacto y watchdog 5/5. Fixtures retiradas; conexiones definitivas conservadas.
+[QA y límites](docs/audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md).
 
 ## 2026-09-08 — Berel cierra la doctrina de recuperación y QA editorial preventivo
 

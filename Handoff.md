@@ -11,17 +11,17 @@ calculadora de costo por imagen, así que la reserva previa de créditos de Glob
 NO está deprecado. Detalle:
 [matriz](docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md).
 
-**TASK-1844 (2026-09-08):** code complete, rollout pendiente. V2 actor/targets y consentimiento fresco
-verificados localmente, gateway 1.3.0. SQL expand/contract pendientes; schema compartido sigue v1.
-[QA](docs/audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md) ·
-[rollout](docs/operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md). Falta aprobación de push/apply/release,
-fixtures y clientes reales. Preservar EPIC-045.
+**TASK-1844 COMPLETE (2026-09-08):** producción ON para una identidad; SQL aplicada y fixtures retiradas.
+Codex y Claude Code/hospedado/Desktop certificados, rollback probado (Claude Code exige login tras OFF).
+PR 230/main `45f6910e3`, checks/orquestador `34281143424` success, manifest released y watchdog 5/5.
+Conexiones definitivas conservadas; sólo se sustituyó Claude hospedado del canary bajo autorización.
+[QA](docs/audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md) · [runbook](docs/operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md).
 
 **Berel (2026-09-08):** [cadencia mensual](docs/operations/BEREL_CLIENT_COLLABORATION_OPERATING_MODEL_V1.md)
 aprobada internamente y skill espejo alineada. Activar sólo tras aceptación de Anel, Fer y Marce; no se envió
 correo ni cambió Notion/calendario.
 
-**TASK-1813 — COMPLETE:** `efeonce-mcp` `1.2.0`/`00047-8b5` sirve discovery base-only y lecturas sin gasto en la
+**TASK-1813 — COMPLETE:** cierre histórico en `1.2.0`/`00047-8b5`, discovery base-only y lecturas sin gasto en la
 matriz de clientes; sin widening ni cambios Entra. Multi-org queda en TASK-1844/U19.
 [Task](docs/tasks/complete/TASK-1813-efeonce-mcp-oauth-client-interoperability.md) ·
 [auditoría](docs/audits/mcp/TASK-1813_OAUTH_HARDENING_QA_2026-09-07.md).

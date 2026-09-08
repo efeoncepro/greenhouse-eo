@@ -1,0 +1,8 @@
+{
+  "observedAt": "2026-09-08T20:35:44.898Z",
+  "status": 200,
+  "query": "source:internal_multi_org_reader lastSeen:-2h",
+  "verified": true,
+  "issues": [],
+  "limit": "Issue lifetime counts are not a request-level error rate; absence is not a measured zero of provider dispatch."
+}

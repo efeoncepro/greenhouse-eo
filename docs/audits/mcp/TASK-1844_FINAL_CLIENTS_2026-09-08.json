@@ -1,0 +1,425 @@
+{
+  "observedAt": "2026-09-08T21:41:10.700850+00:00",
+  "ledgerObservedAt": "2026-09-08T21:40:37.983Z",
+  "activeFamilies": [
+    "grt-EJRfTe6tHpNp3dPi",
+    "grt-QTvZvJsiM6oj5GMv",
+    "grt-qVui3kaYDgz0pHxR"
+  ],
+  "activeContexts": [
+    {
+      "context_id": "23b9f0e7-f020-4cdd-8c4c-776f548c23ab",
+      "client_id": "https://chatgpt.com/oauth/codex/client.json",
+      "context_version": 2,
+      "organization_id": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+      "created_at": "2026-09-08T20:12:53.112Z",
+      "expires_at": "2026-09-15T19:32:25.352Z",
+      "revoked_at": null,
+      "access_rows": 6,
+      "access_lifecycle": [
+        {
+          "issuedAt": "2026-09-08T20:13:14+00:00",
+          "expiresAt": "2026-09-08T20:28:14+00:00",
+          "revokedAt": null,
+          "grantId": "grt-Spa6agckVsmIqH7J"
+        },
+        {
+          "issuedAt": "2026-09-08T20:28:17+00:00",
+          "expiresAt": "2026-09-08T20:43:17+00:00",
+          "revokedAt": "2026-09-08T20:31:36.71+00:00",
+          "grantId": "grt-Spa6agckVsmIqH7J"
+        },
+        {
+          "issuedAt": "2026-09-08T20:32:29+00:00",
+          "expiresAt": "2026-09-08T20:47:29+00:00",
+          "revokedAt": null,
+          "grantId": "grt-EJRfTe6tHpNp3dPi"
+        },
+        {
+          "issuedAt": "2026-09-08T20:54:34+00:00",
+          "expiresAt": "2026-09-08T21:09:34+00:00",
+          "revokedAt": null,
+          "grantId": "grt-EJRfTe6tHpNp3dPi"
+        },
+        {
+          "issuedAt": "2026-09-08T21:09:31+00:00",
+          "expiresAt": "2026-09-08T21:24:31+00:00",
+          "revokedAt": null,
+          "grantId": "grt-EJRfTe6tHpNp3dPi"
+        },
+        {
+          "issuedAt": "2026-09-08T21:39:22+00:00",
+          "expiresAt": "2026-09-08T21:54:22+00:00",
+          "revokedAt": null,
+          "grantId": "grt-EJRfTe6tHpNp3dPi"
+        }
+      ],
+      "refresh_lifecycle": [
+        {
+          "createdAt": "2026-09-08T20:13:14.719+00:00",
+          "usedAt": "2026-09-08T20:28:17.233+00:00",
+          "status": "revoked",
+          "grantId": "grt-Spa6agckVsmIqH7J"
+        },
+        {
+          "createdAt": "2026-09-08T20:28:17.233+00:00",
+          "usedAt": null,
+          "status": "revoked",
+          "grantId": "grt-Spa6agckVsmIqH7J"
+        },
+        {
+          "createdAt": "2026-09-08T20:32:29.289+00:00",
+          "usedAt": "2026-09-08T20:54:34.339+00:00",
+          "status": "rotated",
+          "grantId": "grt-EJRfTe6tHpNp3dPi"
+        },
+        {
+          "createdAt": "2026-09-08T20:54:34.339+00:00",
+          "usedAt": "2026-09-08T21:09:31.049+00:00",
+          "status": "rotated",
+          "grantId": "grt-EJRfTe6tHpNp3dPi"
+        },
+        {
+          "createdAt": "2026-09-08T21:09:31.049+00:00",
+          "usedAt": "2026-09-08T21:39:22.436+00:00",
+          "status": "rotated",
+          "grantId": "grt-EJRfTe6tHpNp3dPi"
+        },
+        {
+          "createdAt": "2026-09-08T21:39:22.436+00:00",
+          "usedAt": null,
+          "status": "active",
+          "grantId": "grt-EJRfTe6tHpNp3dPi"
+        }
+      ],
+      "active_access": 1,
+      "all_access_base_only": true,
+      "refresh_rows": 6,
+      "active_refresh": 1
+    },
+    {
+      "context_id": "b3d56bd2-6026-4483-a3c2-b6f886699118",
+      "client_id": "https://claude.ai/oauth/claude-code-client-metadata",
+      "context_version": 2,
+      "organization_id": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+      "created_at": "2026-09-08T20:31:34.415Z",
+      "expires_at": "2026-09-15T19:32:25.352Z",
+      "revoked_at": null,
+      "access_rows": 4,
+      "access_lifecycle": [
+        {
+          "issuedAt": "2026-09-08T20:31:46+00:00",
+          "expiresAt": "2026-09-08T20:46:46+00:00",
+          "revokedAt": null,
+          "grantId": "grt-m603lxgv3P9hVx7C"
+        },
+        {
+          "issuedAt": "2026-09-08T21:01:25+00:00",
+          "expiresAt": "2026-09-08T21:16:25+00:00",
+          "revokedAt": "2026-09-08T21:12:58.396+00:00",
+          "grantId": "grt-m603lxgv3P9hVx7C"
+        },
+        {
+          "issuedAt": "2026-09-08T21:11:45+00:00",
+          "expiresAt": "2026-09-08T21:26:45+00:00",
+          "revokedAt": null,
+          "grantId": "grt-QTvZvJsiM6oj5GMv"
+        },
+        {
+          "issuedAt": "2026-09-08T21:37:28+00:00",
+          "expiresAt": "2026-09-08T21:52:28+00:00",
+          "revokedAt": null,
+          "grantId": "grt-QTvZvJsiM6oj5GMv"
+        }
+      ],
+      "refresh_lifecycle": [
+        {
+          "createdAt": "2026-09-08T20:31:46.478+00:00",
+          "usedAt": "2026-09-08T21:01:25.534+00:00",
+          "status": "revoked",
+          "grantId": "grt-m603lxgv3P9hVx7C"
+        },
+        {
+          "createdAt": "2026-09-08T21:01:25.534+00:00",
+          "usedAt": null,
+          "status": "revoked",
+          "grantId": "grt-m603lxgv3P9hVx7C"
+        },
+        {
+          "createdAt": "2026-09-08T21:11:45.165+00:00",
+          "usedAt": "2026-09-08T21:37:28.674+00:00",
+          "status": "rotated",
+          "grantId": "grt-QTvZvJsiM6oj5GMv"
+        },
+        {
+          "createdAt": "2026-09-08T21:37:28.674+00:00",
+          "usedAt": null,
+          "status": "active",
+          "grantId": "grt-QTvZvJsiM6oj5GMv"
+        }
+      ],
+      "active_access": 1,
+      "all_access_base_only": true,
+      "refresh_rows": 4,
+      "active_refresh": 1
+    },
+    {
+      "context_id": "b52891e9-9f10-4718-b1bb-cda1c65ed6c3",
+      "client_id": "https://claude.ai/oauth/mcp-oauth-client-metadata",
+      "context_version": 2,
+      "organization_id": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+      "created_at": "2026-09-08T21:00:34.902Z",
+      "expires_at": "2026-09-15T19:32:25.352Z",
+      "revoked_at": null,
+      "access_rows": 2,
+      "access_lifecycle": [
+        {
+          "issuedAt": "2026-09-08T21:00:44+00:00",
+          "expiresAt": "2026-09-08T21:15:44+00:00",
+          "revokedAt": null,
+          "grantId": "grt-qVui3kaYDgz0pHxR"
+        },
+        {
+          "issuedAt": "2026-09-08T21:37:29+00:00",
+          "expiresAt": "2026-09-08T21:52:29+00:00",
+          "revokedAt": null,
+          "grantId": "grt-qVui3kaYDgz0pHxR"
+        }
+      ],
+      "refresh_lifecycle": [
+        {
+          "createdAt": "2026-09-08T21:00:44.166+00:00",
+          "usedAt": "2026-09-08T21:37:29.741+00:00",
+          "status": "rotated",
+          "grantId": "grt-qVui3kaYDgz0pHxR"
+        },
+        {
+          "createdAt": "2026-09-08T21:37:29.741+00:00",
+          "usedAt": null,
+          "status": "active",
+          "grantId": "grt-qVui3kaYDgz0pHxR"
+        }
+      ],
+      "active_access": 1,
+      "all_access_base_only": true,
+      "refresh_rows": 2,
+      "active_refresh": 1
+    }
+  ],
+  "clients": {
+    "codex": {
+      "client": "codex",
+      "label": "task1844-codex-final-retry",
+      "startedAt": "2026-09-08T21:39:21.475327+00:00",
+      "completedAt": "2026-09-08T21:40:08.220743+00:00",
+      "exitCode": 0,
+      "evidenceSource": "actual native client tool events, not assistant summaries",
+      "calls": [
+        {
+          "server": "efeonce",
+          "tool": "efeonce.organizations.list",
+          "arguments": {
+            "limit": 2
+          },
+          "startedAt": "2026-09-08T21:39:35.409133+00:00",
+          "completedAt": "2026-09-08T21:39:36.481549+00:00",
+          "status": "completed",
+          "result": {
+            "organizations": [
+              {
+                "organizationId": "org-03993839-8aab-479b-aeeb-a4e96a044dd6",
+                "capabilities": [
+                  {
+                    "textLength": 27,
+                    "authorizationDenied": false
+                  }
+                ]
+              },
+              {
+                "organizationId": "org-0bff3c10-c165-425b-8139-e26a1dde5c29",
+                "capabilities": [
+                  {
+                    "textLength": 27,
+                    "authorizationDenied": false
+                  }
+                ]
+              }
+            ],
+            "nextAfterOrganizationId": "org-0bff3c10-c165-425b-8139-e26a1dde5c29"
+          },
+          "clientObservedDurationMs": 1072.416
+        },
+        {
+          "server": "efeonce",
+          "tool": "get_seo_entitlement",
+          "arguments": {
+            "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975"
+          },
+          "startedAt": "2026-09-08T21:39:40.055694+00:00",
+          "completedAt": "2026-09-08T21:39:41.144367+00:00",
+          "status": "completed",
+          "result": {
+            "provider": "greenhouse-seo",
+            "data": {
+              "ok": true,
+              "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975",
+              "hasModule": false,
+              "tier": null,
+              "allowanceCap": 0,
+              "allowanceUsed": 0,
+              "allowanceRemaining": 0,
+              "budgetCapUsd": 0,
+              "budgetUsedUsd": 0,
+              "budgetRemainingUsd": 0,
+              "periodResetAt": "2026-10-01T00:00:00.000Z",
+              "blockedReason": "no_entitlement"
+            }
+          },
+          "clientObservedDurationMs": 1088.673
+        },
+        {
+          "server": "efeonce",
+          "tool": "get_seo_entitlement",
+          "arguments": {
+            "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3"
+          },
+          "startedAt": "2026-09-08T21:39:45.384202+00:00",
+          "completedAt": "2026-09-08T21:39:46.724699+00:00",
+          "status": "completed",
+          "result": {
+            "provider": "greenhouse-seo",
+            "data": {
+              "ok": true,
+              "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3",
+              "hasModule": false,
+              "tier": null,
+              "allowanceCap": 0,
+              "allowanceUsed": 0,
+              "allowanceRemaining": 0,
+              "budgetCapUsd": 0,
+              "budgetUsedUsd": 0,
+              "budgetRemainingUsd": 0,
+              "periodResetAt": "2026-10-01T00:00:00.000Z",
+              "blockedReason": "no_entitlement"
+            }
+          },
+          "clientObservedDurationMs": 1340.497
+        }
+      ]
+    },
+    "claudeCode": {
+      "client": "claude",
+      "label": "task1844-claude-final-retry",
+      "startedAt": "2026-09-08T21:39:22.643773+00:00",
+      "completedAt": "2026-09-08T21:39:47.797219+00:00",
+      "exitCode": 0,
+      "evidenceSource": "actual native client tool events, not assistant summaries",
+      "calls": [
+        {
+          "server": "efeonce-internal",
+          "tool": "mcp__efeonce-internal__get_seo_entitlement",
+          "arguments": {
+            "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3"
+          },
+          "startedAt": "2026-09-08T21:39:27.462371+00:00",
+          "completedAt": "2026-09-08T21:39:28.696933+00:00",
+          "status": "completed",
+          "result": {
+            "provider": "greenhouse-seo",
+            "data": {
+              "ok": true,
+              "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3",
+              "hasModule": false,
+              "tier": null,
+              "allowanceCap": 0,
+              "allowanceUsed": 0,
+              "allowanceRemaining": 0,
+              "budgetCapUsd": 0,
+              "budgetUsedUsd": 0,
+              "budgetRemainingUsd": 0,
+              "periodResetAt": "2026-10-01T00:00:00.000Z",
+              "blockedReason": "no_entitlement"
+            }
+          },
+          "clientObservedDurationMs": 1234.562
+        },
+        {
+          "server": "efeonce-internal",
+          "tool": "mcp__efeonce-internal__get_seo_entitlement",
+          "arguments": {
+            "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975"
+          },
+          "startedAt": "2026-09-08T21:39:30.906359+00:00",
+          "completedAt": "2026-09-08T21:39:32.061816+00:00",
+          "status": "completed",
+          "result": {
+            "provider": "greenhouse-seo",
+            "data": {
+              "ok": true,
+              "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975",
+              "hasModule": false,
+              "tier": null,
+              "allowanceCap": 0,
+              "allowanceUsed": 0,
+              "allowanceRemaining": 0,
+              "budgetCapUsd": 0,
+              "budgetUsedUsd": 0,
+              "budgetRemainingUsd": 0,
+              "periodResetAt": "2026-10-01T00:00:00.000Z",
+              "blockedReason": "no_entitlement"
+            }
+          },
+          "clientObservedDurationMs": 1155.457
+        }
+      ]
+    },
+    "claudeHosted": {
+      "submittedAt": "2026-09-08T21:37:25.699Z",
+      "observedAt": "2026-09-08T21:39:05.699Z",
+      "source": "Actual Request/Response details in final hosted Claude article; excludes assistant narrative",
+      "conversation": "https://claude.ai/chat/7003de2a-c11a-42cd-9f35-b64647cc101f",
+      "noOAuthReconnect": true,
+      "calls": [
+        {
+          "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975",
+          "ok": true,
+          "hasModule": false,
+          "blockedReason": "no_entitlement",
+          "budgetUsedUsd": 0
+        },
+        {
+          "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3",
+          "ok": true,
+          "hasModule": false,
+          "blockedReason": "no_entitlement",
+          "budgetUsedUsd": 0
+        }
+      ],
+      "boundary": "After relevant auth/Vercel deploy jobs passed; remaining release worker jobs were still in progress."
+    }
+  },
+  "authBeforeClients": {
+    "observedAt": "2026-09-08T21:37:18.666405+00:00",
+    "service": "auth-server",
+    "revisions": [
+      {
+        "revision": "auth-server-00048-4vq",
+        "trafficPercent": 100,
+        "ready": true,
+        "sha": "76ed9ca20b3630a4888ddd7ca09153f50ab3e324",
+        "digest": "gcr.io/efeonce-group/auth-server@sha256:1a427177af458c8f775c3bf91fc3007594e72c5d081cb3739aeb559a457fbf58",
+        "flags": {
+          "AUTH_SERVER_INTERNAL_AUTH_ENABLED": "true",
+          "AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED": "true",
+          "AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS": "identity-greenhouse-auth-client-user-user-efeonce-admin-julio-reyes",
+          "EXTERNAL_IDENTITY_CANARY_ENABLED": "true"
+        }
+      }
+    ]
+  },
+  "scope": "efeonce.mcp.read",
+  "boundary": "Final relevant auth/Vercel deployment already verified; other workflow workers were finishing. Failed DNS rounds preserved separately and excluded.",
+  "afterWorkflowIdentityConfirmedAt": "2026-09-08T21:45:09.580369+00:00",
+  "sameAuthArtifactAfterWorkflow": true,
+  "productionReaderVerifiedGitSha": "45f6910e3ae35cad5d775eaabf9ce6e15d156d6e"
+}

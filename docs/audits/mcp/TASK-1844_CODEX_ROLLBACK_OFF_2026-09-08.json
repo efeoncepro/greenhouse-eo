@@ -1,0 +1,15 @@
+{
+  "client": "codex",
+  "label": "task1844-codex-rollback-off",
+  "startedAt": "2026-09-08T21:08:05.115005+00:00",
+  "completedAt": "2026-09-08T21:08:07.194126+00:00",
+  "exitCode": 1,
+  "evidenceSource": "actual native client tool events, not assistant summaries",
+  "calls": [],
+  "certificationStatus": "no MCP dispatch; excluded from successful tool matrix",
+  "protocolObservation": {
+    "source": "actual native stderr",
+    "result": "initialize invalid_token and refresh invalid_grant: no organization binding; required MCP server prevents session start",
+    "accessTokenUnexpiredAtDenial": true
+  }
+}

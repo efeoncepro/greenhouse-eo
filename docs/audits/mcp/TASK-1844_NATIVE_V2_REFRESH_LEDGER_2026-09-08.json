@@ -1,0 +1,55 @@
+{
+  "observedAt": "2026-09-08T20:28:45.336Z",
+  "clients": [
+    {
+      "clientId": "https://claude.ai/oauth/claude-code-client-metadata",
+      "contextId": "e765c05f-e2b6-4d2f-853f-d64df310ccb8",
+      "contextVersion": 2,
+      "grantId": "grt-XUqLBIQxUqcotw26",
+      "originalAccessExpiresAt": "2026-09-08T20:27:41+00:00",
+      "renewedAccessIssuedAt": "2026-09-08T20:24:22+00:00",
+      "renewedAccessExpiresAt": "2026-09-08T20:39:22+00:00",
+      "refreshLifecycle": [
+        {
+          "createdAt": "2026-09-08T20:12:41.787+00:00",
+          "usedAt": "2026-09-08T20:24:22.054+00:00",
+          "status": "rotated",
+          "grantId": "grt-XUqLBIQxUqcotw26"
+        },
+        {
+          "createdAt": "2026-09-08T20:24:22.054+00:00",
+          "usedAt": null,
+          "status": "active",
+          "grantId": "grt-XUqLBIQxUqcotw26"
+        }
+      ],
+      "baseOnly": true,
+      "rotationTiming": "native proactive rotation before initial TTL; subsequent calls after initial TTL"
+    },
+    {
+      "clientId": "https://chatgpt.com/oauth/codex/client.json",
+      "contextId": "23b9f0e7-f020-4cdd-8c4c-776f548c23ab",
+      "contextVersion": 2,
+      "grantId": "grt-Spa6agckVsmIqH7J",
+      "originalAccessExpiresAt": "2026-09-08T20:28:14+00:00",
+      "renewedAccessIssuedAt": "2026-09-08T20:28:17+00:00",
+      "renewedAccessExpiresAt": "2026-09-08T20:43:17+00:00",
+      "refreshLifecycle": [
+        {
+          "createdAt": "2026-09-08T20:13:14.719+00:00",
+          "usedAt": "2026-09-08T20:28:17.233+00:00",
+          "status": "rotated",
+          "grantId": "grt-Spa6agckVsmIqH7J"
+        },
+        {
+          "createdAt": "2026-09-08T20:28:17.233+00:00",
+          "usedAt": null,
+          "status": "active",
+          "grantId": "grt-Spa6agckVsmIqH7J"
+        }
+      ],
+      "baseOnly": true,
+      "rotationTiming": "after initial access TTL"
+    }
+  ]
+}
