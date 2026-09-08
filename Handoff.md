@@ -1,10 +1,10 @@
 # Handoff activo
 
-**TASK-1844 — discovery/plan, checkpoint P1/Alto pendiente (2026-09-08):** goal confirmado;
-[plan](docs/tasks/plans/TASK-1844-plan.md) y ADR Proposed: actor/target,
-consentimiento v2 y migración compatible de unicidad. PG real sólo admite v1; baseline focal 52 passed.
-Sin código, apply, cambio de permisos ni deploy. Checkouts compartidos Greenhouse develop/gateway main,
-sin worktrees/subagentes. Próximo paso: aprobación del plan y ADR antes de implementar con gates OFF.
+**TASK-1844 (2026-09-08):** goal confirmado; [plan](docs/tasks/plans/TASK-1844-plan.md) y ADR Accepted
+aprobados; inicia implementación. PG sólo admite v1. Baseline: 52 pruebas focales y 154 gateway passed;
+tipos/build correctos, lint sin errores y 26 warnings UI previos. Consentimiento GET/POST precisado en el plan.
+Sin código v2, apply ni rollout. Implementar con gates OFF; checkouts compartidos,
+Greenhouse develop/gateway main, sin worktrees/subagentes.
 
 **Berel (2026-09-08):** [cadencia mensual](docs/operations/BEREL_CLIENT_COLLABORATION_OPERATING_MODEL_V1.md)
 aprobada internamente y skill espejo alineada. Activar sólo tras aceptación de Anel, Fer y Marce; no se envió

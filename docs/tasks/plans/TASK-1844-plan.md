@@ -1,13 +1,13 @@
 # Plan — TASK-1844: autoridad interna multiorganización
 
 - Fecha: 2026-09-08.
-- Estado: **propuesto; checkpoint humano P1/Alto pendiente**. Discovery terminado; sin implementación.
+- Estado: **aprobado por el operador el 2026-09-08**. Discovery y baseline completos; inicia implementación.
 - Goal: confirmado por el operador («Ok vamos»). Implementación y evidencia A/B/C, revocación,
   concurrencia, refresh y rollback en Greenhouse y efeonce-mcp; clientes Codex/Claude reales para cierre.
 - Checkout: Greenhouse `develop`, gateway `main`, ambos compartidos; sin worktrees ni subagentes.
 - Límite: scope base, externos/canary y Entra sin ampliación. Rollout preparado para aprobación final.
 - [Task](../in-progress/TASK-1844-efeonce-mcp-internal-multi-organization-authority.md) ·
-  [Delta ADR propuesto](../../architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md#delta-task-1844--autoridad-interna-multiorganización-proposed).
+  [Delta ADR propuesto](../../architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md#delta-task-1844--autoridad-interna-multiorganización-accepted).
 
 ## Discovery summary
 
@@ -132,9 +132,12 @@ de lectura ya soportada por el gateway. No se habilitan nuevas escrituras ni pro
   una columna de versión en `client_consents`, códigos o refresh si se deriva del contexto inmutable.
 - Propagar versión desde el contexto a subject/grants, token builder/verifier, introspection y resource;
   no escribir constantes `1` ni inferirla a partir de una flag al refrescar una familia existente.
-- La transacción de consentimiento vincula GET y POST al contexto/versión mostrado usando el mecanismo
-  server-side protegido existente. Un cambio de flag o de contexto entre ambas peticiones obliga a
-  reiniciar la ceremonia; un campo oculto del browser no es fuente de autoridad.
+- El formulario actual no lleva context ID/versión: agregar ambos como expectativas del contexto
+  mostrado en GET y compararlos exactamente con el contexto resuelto desde la sesión/DB en POST,
+  además de las comprobaciones vigentes de origen, cliente, scope y retorno. Los campos del browser
+  no eligen ni conceden autoridad. Un cambio de flag, sesión o contexto obliga a reiniciar la ceremonia;
+  un formulario legacy sin estos campos nunca puede aprobar v2. No se asume una transacción de
+  consentimiento persistida que el código actual no posee ni se añade una tabla sólo para este enlace.
 - El texto v2 explica acceso a organizaciones que Greenhouse autorice mientras el permiso esté activo,
   y presenta las actuales como fotografía, no como lista fija. Nuevas clases de scopes/authority requieren
   nuevo consentimiento; alta/baja de targets dentro de esa clase no requiere reconectar.
@@ -276,7 +279,7 @@ El cierre documental termina con `pnpm docs:closure-check`, rotación si se requ
 
 ## Open questions
 
-Decisiones de diseño resueltas en esta propuesta; falta aceptación humana por prioridad y esfuerzo.
+Diseño y checkpoint P1/Alto aprobados por el operador («Aprobado»), 2026-09-08.
 Antes de la aprobación final de rollout se presentará la cohorte/fixture exacta y el manifiesto de cambios
 con comandos, recursos y rollback. No se requieren IDs de clientes ni permisos nuevos para empezar el código.
 
@@ -287,3 +290,24 @@ sin warnings. La primera pasada de ops lint terminó sin errores y señaló 13 a
 en otros epics y una advertencia heurística de motion en esta task; se enlazó el contrato existente
 de TASK-1835 para declarar su reutilización, sin agregar motion al alcance. Los resultados finales
 de task/ops/context se comprueban después de esta edición y antes del commit del plan.
+
+### Baseline completo previo a implementación — 2026-09-08
+
+Ejecutado sobre Greenhouse `4b57716c9` y gateway `cd229069ee9e7f0d1f75d56d08d9dd93833eadd1`,
+sin cambios de producto. Son verificaciones del comportamiento v1 existente; no acreditan v2.
+
+| Comando | Resultado |
+|---|---|
+| Greenhouse `pnpm lint` | Exit 0; 0 errores y 26 warnings previos `greenhouse/no-opacity-on-text`, en 15 archivos UI fuera del ownership de TASK-1844 |
+| Greenhouse `pnpm typecheck` | Exit 0; TypeScript sin errores |
+| Gateway `pnpm check` | Exit 0; Prettier, tipos, 154 pruebas passed / 0 skipped y build correctos |
+
+Los warnings de opacidad están en Nexa, primitives/Lab, NotAuthorized, Globe credits, mockups,
+agency/sample-sprints, Finance, CTA y Hiring/People; no se corrigen dentro de esta task. El prelint
+regeneró el CSS de iconos sin producir cambios versionados. Tampoco el build del gateway dejó diff.
+
+La revisión adicional de `oauth/consent-endpoint.ts` confirmó que el formulario actual sólo trae
+cliente/scopes/retorno/decisión y no posee una transacción persistida GET/POST de consentimiento.
+Se precisó el plan: agregar ID/versión mostrados como expectativas y compararlos con la autoridad
+server-side resuelta en POST; campos ausentes o contexto cambiado nunca pueden consentir v2.
+El operador aprobó el plan después de este baseline; el ajuste pasa al slice de implementación.

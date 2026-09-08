@@ -273,12 +273,12 @@ sin hallazgos de seguridad. El fix `21aa12608` se publicó desde `develop` media
 inicia Microsoft a 1440/390 px. PR226 quedó promovido a `main` `456d9accf` el 2026-09-06, posterior a ese corte. Falta completar
 una nueva autenticación humana desde esa entrada hasta `/auth/session`; el click no prueba ese cierre.
 
-## Delta TASK-1844 — Autoridad interna multiorganización (Proposed)
+## Delta TASK-1844 — Autoridad interna multiorganización (Accepted)
 
-- Fecha: 2026-09-08. Estado: **Proposed; aprobación humana pendiente**.
+- Fecha: 2026-09-08. Estado: **Accepted; aprobado por el operador («Aprobado»)**.
 - Owner: [TASK-1844](../tasks/in-progress/TASK-1844-efeonce-mcp-internal-multi-organization-authority.md).
 - Contrato, discovery, archivos, migración y evidencia: [plan TASK-1844](../tasks/plans/TASK-1844-plan.md).
-- Este delta no modifica la aceptación histórica de v1 ni afirma implementación/activación de v2.
+- Aceptación del diseño; no modifica la historia v1 ni afirma implementación/activación de v2. Apply y rollout conservan su aprobación final.
 
 ### D8 — Actor y objetivo tienen autoridad distinta
 
@@ -314,8 +314,10 @@ ni adapters pendientes de otros providers. V1, externos/canary y Entra conservan
 Un contexto v2 tiene ID distinto, versión inmutable y unicidad que incluye esa versión. El FK existente
 de consentimiento separa la nueva aprobación; no se promueve un consentimiento/code/refresh v1 a v2.
 La versión se propaga desde el contexto por emisión, verificación, introspection y reader. GET/POST
-del consentimiento deben quedar ligados al contexto y clase mostrados; cambiar flags no cambia lo
-que la persona aprobó. El texto v2 presenta las organizaciones actuales y explica que el acceso sigue
+del consentimiento deben quedar ligados al contexto y clase mostrados. El formulario declara ID/versión
+como expectativas, comparadas con sesión/contexto server-side; no los usa como fuente de autoridad y
+un formulario legacy nunca aprueba v2. Cambiar flags no cambia lo que la persona aprobó. El texto v2
+presenta las organizaciones actuales y explica que el acceso sigue
 los permisos vigentes mientras la autorización permanezca activa.
 
 El PG real admite únicamente v1 y el writer depende del índice sin versión. La transición requiere

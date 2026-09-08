@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-1835-efeonce-id-login-consent-screens-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `2026-09-08: goal confirmado; discovery y plan completos, checkpoint humano P1/Alto pendiente. PG real exige context_version=1 y unicidad sin versión; el plan propone transición coordinada y permisos efectivos por target. Baseline focal: 52 pruebas passed. Delta ADR Proposed. Sin código v2, migración, cambio de permisos, deploy ni activación.`
+- Status real: `2026-09-08: goal confirmado; discovery, plan y checkpoint humano P1/Alto aprobados; inicia implementación. PG real exige context_version=1 y unicidad sin versión; el plan propone transición coordinada y permisos efectivos por target. Baseline: 52 pruebas focales passed; tipos y lint sin errores (26 warnings UI previos); gateway check con 154 passed, 0 skipped y build correcto. Delta ADR Accepted. Sin código v2, migración, cambio de permisos, deploy ni activación.`
 - Rank: `Después del cierre de TASK-1813; antes del uso interno multiorganización en Codex o Claude`
 - Domain: `identity|platform`
 - Blocked by: `none`
@@ -308,9 +308,11 @@ Se descarta un selector que altere el target del token y una lista estática pre
 ## Execution Plan
 
 - [Plan y auditoría TASK-1844](../plans/TASK-1844-plan.md), 2026-09-08.
-- Goal aprobado; plan y Delta ADR **pendientes de aprobación humana P1/Alto**.
+- Goal, plan y Delta ADR **aprobados por el operador el 2026-09-08** («Aprobado»).
 - Estrategia `sequential`, sin subagentes; Greenhouse develop y gateway main, checkouts compartidos.
-- No se ha iniciado código. Próximo paso: aceptar plan/ADR y ejecutar slices con gates OFF.
+- Se inicia ejecución secuencial con gates OFF. Apply y rollout se preparan para aprobación final.
+- Baseline completo y precisión del enlace GET/POST del consentimiento registrados en
+  [el plan](../plans/TASK-1844-plan.md#baseline-completo-previo-a-implementación--2026-09-08).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -482,7 +484,7 @@ reales internos, revocación y rollback.
 
 ## Acceptance Criteria
 
-- [ ] Delta ADR aceptado separa contexto actor y organización objetivo; JWT/scopes permanecen sin wildcard ni lista de tenants.
+- [x] Delta ADR aceptado separa contexto actor y organización objetivo; JWT/scopes permanecen sin wildcard ni lista de tenants. Evidencia: D8–D11 y aprobación del operador 2026-09-08; implementación por verificar.
 - [ ] Consentimiento/contexto v2 son explícitos y un consentimiento v1 no puede emitir ni refrescar autoridad multiorganización.
 - [ ] Reader machine-only devuelve sólo organizaciones vigentes que el actor puede operar y capability efectiva por target.
 - [ ] Gateway consume N memberships internas sin convertir la versión del ancla en permiso de otra organización.

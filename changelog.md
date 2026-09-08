@@ -12,7 +12,9 @@
 La auditoría de código, PostgreSQL y Cloud Run deja un [plan revisable](docs/tasks/plans/TASK-1844-plan.md)
 y un Delta ADR Proposed: separar actor/target, componer permisos efectivos, consentimiento v2 y migrar la
 unicidad sin romper writers anteriores. Se corrigió la ruta del test focal; cinco archivos, 52 pruebas passed.
-La task pasa a in-progress en planificación, pendiente de checkpoint humano P1/Alto. Sin implementación,
+Baseline completo: tipos/lint Greenhouse sin errores (26 warnings UI previos), gateway check con 154 passed
+y build correcto. El plan precisa el enlace de ID/versión entre la pantalla y el POST de consentimiento.
+El operador aprobó plan/ADR tras el baseline; la task inicia implementación con gates OFF. Sin
 migración aplicada, cambio de permisos, reconexión ni rollout.
 
 ## 2026-09-08 — Berel cierra la doctrina de recuperación y QA editorial preventivo
