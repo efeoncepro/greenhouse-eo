@@ -16,6 +16,7 @@ Codex y Claude Code/hospedado/Desktop certificados, rollback probado (Claude Cod
 PR 230/main `45f6910e3`, checks/orquestador `34281143424` success, manifest released y watchdog 5/5.
 Conexiones definitivas conservadas; sólo se sustituyó Claude hospedado del canary bajo autorización.
 Docs/skills reconciliados con tres subagentes; [manual de uso](docs/manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md) y [cobertura](docs/audits/mcp/TASK-1844_DOCUMENTATION_SKILLS_CLOSURE_2026-09-08.md).
+Push documental disparó auth deploy por su README: run `34284610774` cancelado, sin nuevo build/revisión; tráfico conserva `00048-4vq`. Efecto y prevención documentados en runbook/skills.
 [QA](docs/audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md) · [runbook](docs/operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md).
 
 **Berel (2026-09-08):** [cadencia mensual](docs/operations/BEREL_CLIENT_COLLABORATION_OPERATING_MODEL_V1.md)

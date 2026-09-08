@@ -12,7 +12,8 @@ trabajaron en los checkouts compartidos, con ámbitos de escritura separados y s
 TASK-1844 conserva `complete`. Esta revisión no reabre el hook de implementación de una task cerrada:
 documenta la entrega ya ejecutada y corrige instrucciones operativas que quedaron desactualizadas.
 No cambia código ejecutable, permisos, flags, cohortes, migraciones, tokens ni runtime; no repite login,
-revocación, canaries, carga o despliegues. Las consultas `--help` sólo validan sintaxis de los CLIs.
+revocación, canaries o carga. No se solicitó otro despliegue; el intento automático disparado por publicar
+el README y su cancelación se registran abajo. Las consultas `--help` sólo validan sintaxis de los CLIs.
 
 El contrato se contrastó con reader/roles/relaciones/entitlements, contexto/consentimiento/CIMD, policy y
 resolver del gateway, deploy scripts y evidencia productiva de esta misma sesión:
@@ -112,3 +113,34 @@ epics no señalan archivos modificados por esta entrega.
 
 La prueba funcional/productiva se reutiliza del cierre enlazado. Estos controles verifican documentación,
 contrato e integridad del catálogo; no son una nueva certificación runtime ni otro despliegue productivo.
+
+## Publicación y control del workflow automático
+
+- Greenhouse: commit documental `3bf82dca5195f6d6ac6c0e29cc87b58e7840c5cc` publicado en `develop`.
+  Pre-push completo correcto (NUL, espejos, manifiesto de 44 tools, seis manuales MCP, lint sin errores y
+  TypeScript); lint conserva 26 advertencias fuera del cambio. Checks remotos de docs/tasks, CLAUDE,
+  context-governance y Vercel Preview Comments finalizaron en success.
+- Gateway: commit `028f495e1946ee36c82ae3ac6ebf98c7e66f86b7`, [PR 8](https://github.com/efeoncepro/efeonce-mcp/pull/8)
+  merged en `f89344a4010b7958909b01e8cec64f5283e11aec`; CI de PR y de main en success. Checkout compartido
+  actualizado por fast-forward, sin cambio de branch ni despliegue.
+- El path `services/auth-server/**` incluye README y disparó automáticamente
+  [Auth Server Deploy 34284610774](https://github.com/efeoncepro/greenhouse-eo/actions/runs/34284610774),
+  pese a ser documental. El job usa environment staging, pero el servicio Cloud Run es compartido.
+  La cancelación normal no fue inmediata; se solicitó force-cancel y terminó `cancelled` el
+  `2026-09-08T22:13:10Z`. No se presenta esa ejecución como un check exitoso.
+- El step `Deploy auth-server` alcanzó preflight e inició el empaquetado/subida del source archive;
+  fue cancelado a las `22:13:06Z`, antes de entregar un build ID. Se inspeccionó Cloud Build global:
+  ningún build nuevo de este intento; el último auth build sigue siendo `c91952ab-ccd5-4dac-b404-756708c539e3`
+  de las `20:47:17Z`. Los pasos de health, Ready y registro de deployment quedaron skipped.
+- Readback Cloud Run posterior: `status.traffic` conserva `auth-server-00048-4vq` al 100 %;
+  `latestCreatedRevisionName` y `latestReadyRevisionName` son la misma revisión. No se creó ni promovió
+  una revisión por este intento. La revisión conserva SHA `76ed9ca20b3630a4888ddd7ca09153f50ab3e324`,
+  digest `sha256:1a427177af458c8f775c3bf91fc3007594e72c5d081cb3739aeb559a457fbf58`, gates internos/multiorg
+  `true` y cohorte exactamente igual a TASK-1844. Es verificación defensiva de publicación, no otra matriz OAuth.
+
+El runbook y ambos espejos de production-release incorporan el hallazgo: revisar filtros de workflows
+antes de publicar documentación dentro de árboles desplegables y verificar el efecto real de una
+cancelación. No se modificaron workflows ni se declara resuelta la amplitud de su filtro de paths.
+La continuidad ya registrada en el primer commit se amplía en Handoff; project_context y los índices
+siguen apuntando a los mismos dueños. Las advertencias heurísticas de registro al revisar sólo este
+follow-up no representan una skill nueva ni un cambio de lifecycle.

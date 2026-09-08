@@ -61,6 +61,11 @@ If rollback, watchdog, Azure, Vercel, or HubSpot is involved, also read:
 ## Hard Rules
 
 - Never treat a push to `main` as a completed production release.
+- Before publishing documentation inside deployable trees, inspect the actual workflow branch/path triggers:
+  `services/auth-server/**` also matches its README. A docs-only diff can start a deploy, and staging may
+  serve the same runtime as production. Do not infer isolation from the filename or environment label.
+  If an unintended run is cancelled, verify the job/step reached, any Cloud Build started, created revisions,
+  and the revision/digest/flags with serving traffic. A cancelled workflow alone does not prove no change.
 - Never approve individual worker production gates as the normal path.
 - Never reintroduce worker production deploys on `push:main`; workers deploy to
   production through the orchestrator `workflow_call` path, with

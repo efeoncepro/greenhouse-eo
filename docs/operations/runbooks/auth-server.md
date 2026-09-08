@@ -48,6 +48,14 @@ Cloud Build construye `gcr.io/efeonce-group/auth-server` (~6 min) y despliega co
 activa sirva `GIT_SHA=EXPECTED_SHA`. En CI lo hace `.github/workflows/auth-server-deploy.yml` (staging en
 push a `develop`; producción sólo vía `production-release.yml`).
 
+El filtro de push incluye `services/auth-server/**`, también su README: un cambio documental dentro del
+servicio puede iniciar el workflow. Su etiqueta staging no aísla el Cloud Run compartido de producción.
+Antes de publicar documentación en esas rutas, revisar ese efecto y el plan de publicación. Una cancelación
+no se considera efectiva por aceptar la solicitud: comprobar estado final del job, builds pendientes y
+revisión con tráfico. El step `Deploy auth-server` incluye preflight antes del build; haberlo iniciado no
+demuestra que haya creado una revisión. La publicación documental de TASK-1844 registró este caso y su
+readback en el [expediente](../../audits/mcp/TASK-1844_DOCUMENTATION_SKILLS_CLOSURE_2026-09-08.md).
+
 ### 2. Verificar
 
 ```bash
@@ -67,8 +75,9 @@ Evidencia de producción (2026-09-04, release `9100bbd2765d`, run `33893120972`)
 `auth-server-00005-pk8` (`GIT_SHA f6db4255a`, árbol idéntico al target; deploy change-gated); `/healthz`
 `{enabled:true, oauth:false}`; `/readyz` 200 con `postgres`, `kms` y `activeKey` en `ok`; JWKS con 2 `kid` (v2
 `active` `xjjMaYxidu3Vk57K5py6w6WGDN41T0WMeOtHMEyppKc`, v1 `retiring` `VjbDUgwc5bd1zj5olC8VndMXKk_G60tLF8xRw945nI8`);
-`/.well-known/oauth-authorization-server` → 404 (flag OAuth OFF, esperado). La revisión activa se lee con
-`gcloud run services describe auth-server --region us-east4 --format='value(status.latestReadyRevisionName)'`.
+`/.well-known/oauth-authorization-server` → 404 (flag OAuth OFF, esperado en ese snapshot). Para una lectura
+actual, comenzar por `status.traffic` del servicio y revisar cada revisión con tráfico; `latestReadyRevisionName`
+por sí sola no demuestra qué revisión recibe solicitudes. Contrastar después SHA/digest/flags de esa revisión.
 `AUTH_SERVER_JWKS_URL` quedó declarada en Vercel Production y staging el mismo día (señal
 `auth.issuer.jwks_unreachable` fuera de `not_configured`; lectura humana en producción pendiente).
 
