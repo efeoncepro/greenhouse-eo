@@ -2176,6 +2176,18 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 | `TASK-1849` | `to-do` | **Efeonce Insights: biblioteca, creación y experiencia web compartida.** EPIC-045; P1/Alto/Alto; ui-ux, UI flow, backend none. Sólo planificación; contrato en arquitectura Insights. | `docs/tasks/to-do/TASK-1849-efeonce-insights-library-builder-and-shared-web.md` |
 
+| `TASK-1850` | `to-do` | **Habilitar la familia GPT Image 2.5 en el helper canónico OpenAI y medir su costo real.** P2/Medio/Medio; backend-data (`integration`), backend-critical, UI none. `src/lib/ai/openai-image.ts` no reconoce `gpt-image-2.5-sunburst`/`-flare` y los degrada en SILENCIO por dos caminos: por env var cae al default `gpt-image-2` sin avisar, y por flag CLI el modelo sí viaja pero la resolución cae a la rama legacy y se inyecta `input_fidelity`, que la guía de OpenAI excluye de Sunburst/Flare. Extiende el contrato (tipos, `xhigh`/`max`, tamaños por capacidad y no por literal), hace ruidosas ambas puertas, y produce la evidencia que OpenAI NO publica: la tabla de consumo real por `quality × size` medida con `usage`, porque la calculadora de GPT Image 2 no estima 2.5. Esa medición levanta el bloqueador de reserva de créditos de Globe. NO crea rutas Globe ni migra el command de logo de organización. | `docs/tasks/to-do/TASK-1850-openai-gpt-image-2-5-helper-enablement.md` |
+
+> Nota 2026-09-08 (2) (GPT Image 2.5): `TASK-1850` reservada tras **barrido por dominio y superficie, no por
+> título**, sobre `openai-image.ts`, `ai:image`, `gpt-image` y `generate-image.ts`. `TASK-1553` (in-progress)
+> posee el catálogo Globe, `ref/still/openai-v2`, `openai-adapter.ts` y el allowlist del endpoint: esta task NO
+> lo duplica ni le invade la superficie, le ENTREGA la medición de `usage` que hoy le impide reservar créditos
+> para cualquier ruta 2.5, y la decisión de abrir `ref/still/openai-2-5-*` sigue siendo suya. `TASK-278` (P3,
+> `to-do`, `Status real: Diseno`) es el generador Imagen 3 + Gemini SVG original y no posee el proveedor OpenAI.
+> `TASK-999` consume `gpt-image-2` en el command de logo de organización y conserva ese pin. Ninguna task viva
+> poseía el contrato del helper Greenhouse ni el CLI. Sólo registro: sin implementación, sin canary, sin gasto y
+> sin rollout. Siguiente ID libre `TASK-1851`.
+
 > Nota 2026-09-08 (Efeonce Insights): TASK-1845–TASK-1849 reservadas tras barrido por dominio/superficie y
 > verificación de filas, notas y filesystem. Cinco unidades: evidencia/adapters/API-MCP; render worker;
 > catálogos deck/A4; grants/correo/recurrencia; experiencia portal/web. TASK-1672/1673 mantienen integración
