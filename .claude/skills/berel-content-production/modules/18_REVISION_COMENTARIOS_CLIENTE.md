@@ -13,26 +13,30 @@ se explica con respeto. **Nunca aceptar por aceptar ni discutir por defender el 
 
 ## Incidente grave: notas internas visibles
 
-La página de un artículo compartida con Berel se trata completa como **superficie del cliente**. Un toggle
-colapsado, callout, comentario o bloque histórico no vuelve privado el contenido. Está prohibido dejar ahí
-razonamiento de agentes, prompts, procedencia, auditorías, QA, controles de corrección, pendientes, schema,
-montaje CMS/Dev o instrucciones de diseño.
+La página completa es visible para Berel, pero el Playbook exige separar funciones. Los toggles hermanos de
+Research, análisis SEO/AEO, análisis de contenido y Plan/Brief permanecen como evidencia profesional. El
+incidente ocurre cuando notas de agente, razonamiento operativo, QA, pendientes o montaje CMS/Dev se cuelan en
+el toggle de artículo, reescritura o tutorial y rompen la narrativa. Prompts, secretos, credenciales y
+conversación cruda no pertenecen a ningún punto de la página. **Las fichas N1–N4 y fotos de paso son parte
+obligatoria del entregable editorial y no se retiran durante el saneamiento.**
 
 Un comentario que detecta una fuga es un **incidente centinela**:
 
 1. detener la declaración de `En revisión` o cualquier aviso de pieza lista;
-2. inventariar el hilo y también toda la versión vigente, sus callouts, toggles y comentarios visibles;
-3. retirar la operación interna de la superficie del cliente y trasladar lo necesario a una tarea/página
-   privada de Efeonce;
-4. dejar una sola `Versión vigente para revisión`, con metadatos aprobables y copy público exacto;
+2. inventariar el hilo y la página completa para reconocer toggles de evidencia, versiones y zona editorial;
+3. retirar del toggle editorial la operación ajena a la narrativa y trasladar cada dato a su toggle de evidencia
+   o, si es sensible, a una tarea/página privada de Efeonce, sin mover ni reescribir N1–N4;
+4. dejar una sola zona editorial vigente con metadatos aprobables, copy público exacto y las cuatro fichas
+   visuales distribuidas junto a sus secciones; conservar intactos los toggles de evidencia;
 5. rotular versiones anteriores como `Histórico` sin fingir que ese rótulo vuelve aceptable una fuga activa;
-6. ejecutar el gate automatizado y leer el render completo como cliente;
+6. ejecutar el gate automatizado sobre el export completo y leer el render del toggle editorial como cliente;
 7. responder el hilo sin narrar herramientas ni detalles internos del incidente.
 
 Señales de alto riesgo incluyen `Dónde vive`, `Regla SEO`, `Montaje CMS`, `Schema para Dev`, `Nota de
 adaptación`, `Nota de montaje`, `Pendientes antes de publicar`, `Control de corrección`, `no cargar al CMS`,
 `pendiente de confirmación`, `la ficha declara` y cualquier mensaje dirigido a quien maquete o a otro agente.
-La lista ayuda a detectar; **no reemplaza la lectura semántica**.
+ALT, archivo, formato, lazy-load y posición son correctos **dentro de una ficha N1–N4 completa**; fuera de ella
+pueden revelar una nota operativa. La lista ayuda a detectar; **no reemplaza la lectura semántica**.
 
 ## Antes de editar: inventario completo
 
@@ -53,6 +57,39 @@ La lista ayuda a detectar; **no reemplaza la lectura semántica**.
 `resolved` es una decisión del cliente y un dato separado. **No usarlo para inferir si Efeonce atendió el
 hilo ni intentar llevar el contador de abiertos a cero.**
 
+### Baseline de integridad de comentarios
+
+Antes de cualquier edición, registrar por separado:
+
+- número de **observaciones del cliente**, atribuidas por autor;
+- conjunto de identificadores de discusión;
+- número total de comentarios, incluidas las respuestas de Efeonce;
+- estado `resolved` de cada hilo y tipo de ancla (`inline`, bloque o página).
+
+Estos números no son intercambiables. Una observación puede compartir hilo con respuestas; un bloque eliminado
+puede hacer desaparecer el ancla del inventario visible; una respuesta nueva aumenta comentarios sin aumentar
+observaciones del cliente. El cierre compara identidad y estado de los hilos, no solo un total.
+
+## Recuperación segura desde el historial de Notion
+
+Usar el historial únicamente cuando una edición comprobada haya dañado la estructura, el contenido vigente o
+las anclas. No recorrer versiones para “ver cuál funciona”.
+
+1. Detener nuevas escrituras y conservar el baseline anterior a la falla.
+2. Identificar por fecha y vista previa la última versión conocida que contenga el artículo correcto y las
+   anclas esperadas.
+3. Restaurar **una sola vez** esa versión.
+4. Releer página y comentarios inmediatamente. La recuperación solo queda probada si reaparecen los
+   identificadores esperados, sus autores y su estado `resolved`; el mensaje de éxito de Notion no basta.
+5. Si el conjunto no coincide, detenerse: otra restauración a ciegas puede empeorar el incidente.
+6. Con la base íntegra, aplicar reemplazos pequeños conservando los spans o `discussion-urls` existentes, las
+   fichas N1–N4 y sus posiciones; releer los hilos y comparar las fichas carácter por carácter después de cada fase.
+
+Si el cliente pidió retirar un bloque completo, el ancla puede desaparecer legítimamente. En ese caso se
+conserva la observación y la decisión en un comentario de página apto para el cliente, se explica el criterio y
+el hilo queda sin resolver por Efeonce. Eliminar el bloque no convierte automáticamente la observación en
+cerrada.
+
 ## Método de resolución, hilo por hilo
 
 1. **Inventariar:** distinguir comentarios nuevos de los ya atendidos y confirmar que ninguno quedó fuera.
@@ -68,7 +105,9 @@ hilo ni intentar llevar el contador de abiertos a cero.**
 6. **Editar con reemplazos pequeños:** anclar en texto copiado del estado guardado y no reescribir la página.
    Si la corrección mueve un bloque, agregar una línea puente; un encabezado correcto sin transición todavía
    se siente insertado. Excepción: una fuga interna amplía el saneamiento a toda la versión vigente y sus
-   superficies visibles relacionadas; conservar historia nunca exige conservar la fuga.
+   superficies visibles relacionadas; conservar historia nunca exige conservar la fuga. Antes de editar,
+   congelar la lista de fichas N1–N4 y comprobar después que composición, copy, ALT, archivo y posición siguen
+   idénticos. Si diseño ya produjo el asset, cualquier diferencia detiene el cierre.
 7. **Releer el bloque completo:** comprobar que la corrección no creó transición abrupta, remate duplicado,
    cambio de persona, palabra vetada, pérdida de intención o una frase que requiere segunda lectura.
 8. **Responder en el mismo hilo:** explicar qué se aceptó, qué se resolvió de otra manera y por qué, citando
@@ -102,6 +141,32 @@ hilo ni intentar llevar el contador de abiertos a cero.**
   `combinación vigente de la temporada`, `paleta del trimestre` ni equivalentes.
 - Nombrar cada color por nombre y código. Una página hija temporal puede nombrar su paleta/año cuando esa sea
   su intención; esa excepción no convierte el hub evergreen en contenido de temporada.
+
+## Taxonomía de comentarios y aprendizaje del lote de octubre
+
+Para aprender del feedback sin contar dos veces una misma observación, asignar **una causa primaria** y, cuando
+ayude, una causa secundaria. La causa primaria describe por qué el texto debía cambiar:
+
+| Causa primaria | Pregunta de diagnóstico |
+|---|---|
+| `claridad y estructura` | ¿El lector entiende a la primera quién hace qué, qué significa la frase y por qué el bloque está ahí? Incluye títulos, subtítulos, continuidad, encabezados y presentación de enlaces. |
+| `precisión de producto` | ¿Se nombra el producto o acabado exacto y la recomendación corresponde a su uso, superficie y nivel de exigencia? |
+| `voz y localización` | ¿La frase suena a Berel en español de México, con primera persona de marca y sin giros extraños o negativos? |
+| `alcance editorial o de negocio` | ¿La marca quiere incluir ese tema, producto, precio o enfoque en esta pieza? |
+
+SEO/AEO, evidencia y cobertura suelen actuar como **restricciones del remedio**, no necesariamente como la causa
+del comentario. Por ejemplo, retirar una sección por decisión de negocio puede perder una intención de búsqueda;
+se aplica el alcance pedido y se documenta el costo, sin presentar SEO como origen de la observación.
+
+En el barrido de octubre de 2026 se revisaron 25 observaciones del cliente en tres artículos. Distribución por
+causa primaria: 10 de claridad y estructura (40 %), 7 de precisión de producto (28 %), 5 de voz y localización
+(20 %) y 3 de alcance editorial o de negocio (12 %). Es un caso de aprendizaje, no una cuota para lotes futuros.
+
+La señal dominante fue la **comprensión en primera lectura**: sujetos omitidos, referentes ambiguos, frases que
+sonaban raras, títulos repetitivos y encabezados poco informativos. La prevención prioritaria es releer el texto
+completo como consumidor y comprobar continuidad entre oraciones antes de optimizar detalles más sofisticados.
+La segunda señal fue producto: categorías genéricas no sustituyen el nombre exacto, el acabado ni la explicación
+de cuándo corresponde cada sistema.
 
 ## Contrato de respuesta
 
@@ -137,8 +202,11 @@ No responder con `listo`, `corregido` o `de acuerdo` sin explicar el resultado.
 - [ ] Cada cambio fue releído en su bloque y en la transición con sus vecinos.
 - [ ] Cada hilo atendido tiene respuesta con observación, acción y razón.
 - [ ] Ningún hilo fue marcado como resuelto por Efeonce.
-- [ ] Una sola versión vigente está rotulada con claridad; las anteriores dicen `Histórico`.
-- [ ] No hay notas internas, QA, pendientes, specs, CMS/Dev ni mensajes entre agentes en toda la página compartida.
+- [ ] Una sola zona vigente está rotulada con claridad; las anteriores se distinguen como historial.
+- [ ] Los toggles de análisis/evidencia requeridos permanecen completos y separados de la zona editorial.
+- [ ] No hay notas internas, QA, pendientes editoriales, CMS/Dev ni mensajes entre agentes en la zona vigente.
+- [ ] Las cuatro fichas N1–N4 permanecen en contexto y coinciden literalmente con sus tareas visuales.
+- [ ] Si existe arte producido, ninguna corrección cambió composición, copy, ALT, archivo, formato ni posición.
 - [ ] El export fresco pasó `client-visible-copy-gate.mjs` y la lectura humana del render.
 - [ ] Todos los hijos conservan tabulador y siguen dentro del toggle correcto.
 - [ ] Las reglas nuevas quedaron en Aprendizajes y Playbook.

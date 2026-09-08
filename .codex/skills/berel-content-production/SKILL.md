@@ -109,15 +109,19 @@ Plantillas ......................................................... templates/
 12. 🔴 **Sin series de producto en cuerpo público**, incluidas tablas, materiales y CTA. Las series
     quedan en fichas técnicas/notas para Dev.
 13. 🔴 **CTA nunca al Home.** Siempre al destino específico de la intención.
-14. 🔴 **ALT, archivo y posición se declaran una vez y se copian.** La fuente vive en la tarea/ficha
-    visual interna, vinculada a la sección pública por su encabezado; no se incrusta como instrucción dentro
-    de la lectura del artículo.
+14. 🔴 **ALT, archivo y posición se declaran una vez y se copian.** La fuente editorial vive en la
+    ficha contextual N1–N4 dentro de la versión vigente del artículo; la tarea visual debe copiarla de forma
+    literal. La ficha acompaña la sección que representa y no se agrupa al principio ni al final. Si diseño ya
+    produjo el asset, composición, copy, ALT, archivo y posición quedan congelados hasta una conciliación de
+    cambio explícita con el equipo de diseño.
 15. 🔴 **Spec para imágenes manda sobre el Playbook** si difieren.
 16. 🔴 **Verificado ≠ estimado.** Volumen, competencia o cifras sin herramienta se etiquetan como
     estimación.
-17. 🔴 **Pendientes internos y privados:** todo dato, URL, asset o capacidad CMS no confirmada queda en
-    una tarea o página privada de Efeonce, con owner y siguiente paso. Nunca se deja en la página del cliente,
-    aunque esté dentro de un callout o toggle. Del texto público se retira el dato no confirmado.
+17. 🔴 **Dato no confirmado fuera de la narrativa; brecha trazable en evidencia.** Un dato, URL, asset o
+    capacidad CMS no confirmada no se publica como hecho ni disclaimer dentro del toggle editorial. Cuando
+    afecta el análisis o la decisión, se documenta profesionalmente en el toggle de evidencia correspondiente
+    con fuente, alcance, owner y siguiente paso; credenciales, prompts, conversación entre agentes y operación
+    sensible permanecen en el sistema privado de Efeonce.
 18. 🔴 **No declarar inexistencia por ausencia en un listado paginado.** Probar sitemap/patrón,
     búsqueda de navegación y luego preguntar al cliente.
 19. 🔴 **Avance en tres grupos:** listos · bloqueados con motivo · fuera de alcance.
@@ -144,10 +148,12 @@ Plantillas ......................................................... templates/
 32. 🔴 **Tutorial Paso a Paso = 4 pasos canónicos** salvo instrucción expresa del cliente/template;
     cada paso lleva foto 📸, y esas fotos no son los banners horizontales.
 33. 🔴 **Fotos de tutorial:** una sola tarea de diseño por secuencia, 1:1 de 500 px, sin texto/logo,
-    coherencia de espacio/luz/muro. La tarea nace solo cuando el híbrido ya existe.
-34. 🔴 **Banners heredados conservan su especificación completa en la tarea visual.** El híbrido
-    conserva el lugar editorial y el arte final cuando exista, pero nunca expone briefs, ALT de control,
-    nombres de archivo, lazy-load, medidas ni instrucciones para Dev dentro de la lectura del cliente.
+    coherencia de espacio/luz/muro. Cada ficha se conserva junto a su paso y se copia literalmente a la
+    tarea, que nace solo cuando el híbrido ya existe. Si el arte ya fue producido, la spec queda congelada.
+34. 🔴 **Banners heredados conservan su especificación completa y contextual.** El híbrido incluye las
+    fichas N1–N4 en sus posiciones editoriales y la tarea visual conserva una copia literal. El arte final,
+    cuando exista, manda sobre cualquier mejora no solicitada: no cambiar brief, copy, ALT, archivo, medida,
+    lazy-load ni posición sin reconciliar el asset ya producido.
 35. 🔴 **Canónica planificada soft-404 puede vivir como metadata**, pero no activa enlaces entrantes
     ni derivados hasta QA live de `title`, H1, cuerpo, canonical y schema.
 36. 🔴 **Cuatro macropasos no permiten omitir operaciones.** Preparación, compatibilidad, mezcla,
@@ -183,18 +189,20 @@ Plantillas ......................................................... templates/
     asumir los pendientes de lo que redactamos/publicamos, distinguir estados y revisar toda la
     redacción, incluidas tablas, anexos y propiedades. Cierre con Notion + Markdown releídos: módulo 17.
 
-45. 🔴 **Toda página de Notion compartida con Berel es visible para el cliente de extremo a extremo.**
-    Un callout, toggle colapsado, comentario, bloque histórico o texto bajo el artículo no es privado. No
-    guardar ahí razonamiento, prompts, auditoría, QA, instrucciones, pendientes, CMS/Dev ni mensajes entre
-    agentes. La operación interna vive exclusivamente en una superficie de Efeonce cuyo acceso privado esté
-    comprobado. Una subpágina, base, propiedad o toggle dentro del workspace del cliente no se presume privada.
+45. 🔴 **Toda página de Notion compartida con Berel es visible, pero cumple dos funciones que no se mezclan.**
+    Los toggles de `Research`, análisis SEO/AEO, análisis de contenido y Plan/Brief son evidencia profesional
+    obligatoria del trabajo y permanecen en la página. El toggle de artículo, reescritura o tutorial contiene
+    únicamente la narrativa final, sus metadatos aprobables y las specs contextuales requeridas. Nunca dejar
+    dentro de ese toggle notas de agente, razonamiento operativo, QA, pendientes, CMS/Dev ni mensajes entre
+    agentes. En ningún punto de la página se copian prompts, secretos, credenciales o conversación cruda.
+    **Las fichas contextuales N1–N4 y las fotos de paso no son notas internas:** son parte del entregable.
 46. 🔴 **Producto nuevo o con baja notoriedad requiere una rama editorial propia.** No asumir
     posicionamiento ni titular como `Guía [Producto]`: lectura simple, diferenciador del brief al frente
     y render oficial del empaque dentro del sistema visual. `Premium` puede describir la línea, nunca la
     formulación; `sin plomo` no es argumento comercial.
-47. 🔴 **Dato faltante no se publica como disclaimer.** Retirarlo del cuerpo, registrarlo en el sistema
-    privado de Efeonce y solicitar la fuente oficial. En comparativas, cada columna nombra su producto y los
-    criterios exclusivos de uno solo quedan fuera de la tabla.
+47. 🔴 **Dato faltante no se publica como disclaimer.** Retirarlo del cuerpo, registrarlo con impacto y
+    siguiente paso en el toggle de evidencia —o en privado si es sensible— y solicitar la fuente oficial. En
+    comparativas, cada columna nombra su producto y los criterios exclusivos de uno solo quedan fuera de la tabla.
 48. 🔴 **CTA técnico con salida real.** Si el texto recomienda consultar a un especialista, debe enlazar
     de forma descriptiva a `/contacto`. Las temperaturas de luz se expresan como `luz cálida (2700–3000 K)`,
     `luz neutra (4000 K)` y `luz fría (5000 K o más)`; los watts miden consumo, no calidez.
@@ -217,34 +225,45 @@ Plantillas ......................................................... templates/
 54. 🔴 **Un comentario que crea doctrina se captura el mismo día.** Actualizar `Aprendizajes del feedback` y
     el Playbook; reportar hallazgos fuera de alcance aparte. Si la pieza ya está publicada, abrir además el
     pendiente CMS sin confundir la corrección en Notion con el sitio actualizado. Detalle: módulo 18.
-55. 🔴 **Una sola zona vigente y limpia para revisión.** Debe titularse inequívocamente `Versión vigente
-    para revisión` y contener solo metadatos aprobables y el texto exacto que podría publicarse. Procedencia,
-    decisiones, specs visuales, controles y pendientes no se mezclan con la lectura.
-56. 🔴 **Una fuga interna es un incidente centinela, no una corrección de una frase.** Si el cliente la
-    señala en un punto, releer y sanear toda la versión vigente, los callouts, toggles y comentarios visibles
-    de esa página antes de responder. Reportar por separado otras páginas potencialmente afectadas.
+55. 🔴 **Una sola zona editorial vigente y limpia para revisión.** Debe estar identificada inequívocamente y
+    contener metadatos aprobables, texto público y las cuatro fichas visuales contextuales N1–N4. Los toggles
+    de evidencia permanecen como hermanos separados; su análisis, fuentes, limitaciones y decisiones no se
+    intercalan dentro de la narrativa editorial.
+56. 🔴 **Una fuga dentro del toggle editorial es un incidente centinela, no una corrección de una frase.** Si
+    el cliente la señala en un punto, inventariar la página completa para reconocer fronteras y luego releer y
+    sanear la zona editorial vigente y sus callouts. No borrar ni convertir en fuga los toggles hermanos de
+    análisis/evidencia ni los comentarios; el saneamiento es quirúrgico, preserva N1–N4, fotos de paso, anclas
+    y el copy que sustenta arte producido. Reportar aparte otras páginas potencialmente afectadas.
 57. 🔴 **`success` de Notion no prueba estructura.** Tras cada reemplazo, releer el markdown guardado y el
     render; confirmar que cada hijo conserva su tabulador y sigue dentro del toggle correcto. Texto expulsado
     al final de la página deja la corrección incompleta aunque la API responda correctamente.
 58. 🔴 **Gate fail-closed antes de `En revisión` o aviso al cliente.** Ejecutar
     `node scripts/client-visible-copy-gate.mjs <export.md>` sobre la página fresca y completar la lectura humana
-    de cliente. Si la lectura está truncada, contiene bloques desconocidos, hay más de una versión vigente o el
-    gate detecta una señal interna, no declarar la pieza lista.
+    de cliente. Si la lectura está truncada, contiene bloques desconocidos, faltan fichas N1–N4 o el gate detecta
+    operación interna en el toggle editorial fuera de esas fichas, no declarar la pieza lista.
+59. 🔴 **El historial de versiones es recuperación, no exploración.** Si una edición daña estructura o anclas,
+    capturar primero el inventario de discusiones, restaurar una sola versión conocida y comprobar los mismos
+    `discussion id`, autores y estados antes de volver a editar. No recorrer versiones a prueba y error ni tomar
+    el botón `Restaurar` como evidencia de que los hilos sobrevivieron. Después, solo reemplazos pequeños que
+    preserven las anclas; conteo de observaciones del cliente, discusiones, comentarios y respuestas son métricas
+    distintas. Protocolo y taxonomía: módulo 18.
 
 ## Lo que no se toca
 
 - Fórmulas y automatizaciones de `Tareas`, incluido `[GH] RpA v2`.
 - Credenciales de `Accesos CMS`: nunca se copian a repo, log, commit ni prompt.
 - Alias de URL de artículos existentes salvo instrucción explícita y plan de redirección.
-- Contenido histórico o ajeno al bloque vigente bajo revisión, salvo rotularlo inequívocamente como
-  `Histórico` o retirar una fuga interna que siga visible al cliente. Nunca borrar versiones ni historia.
+- Contenido histórico, toggles de análisis/evidencia o material ajeno al bloque editorial vigente, salvo
+  rotular versiones editoriales anteriores inequívocamente como `Histórico`. Nunca borrar evidencia, versiones
+  ni historia para sanear la narrativa.
 
 ## Criterio de cierre
 
 Una ejecución no termina porque una API respondió `success`. Termina cuando una **segunda lectura
-fresca** confirma contenido, relaciones, responsables, fechas, formato, estados, jerarquía de toggles y
-ausencia de operación interna en toda superficie del cliente. En lotes: reportar listos, bloqueados con
-motivo y fuera de alcance.
+fresca** confirma contenido, relaciones, responsables, fechas, formato, estados y jerarquía de toggles; los
+toggles de análisis/evidencia siguen presentes y separados; la zona editorial no contiene notas de agente ni
+operación ajena a la narrativa; N1–N4 permanecen contextuales y en paridad literal con las tareas visuales. En
+lotes: reportar listos, bloqueados con motivo y fuera de alcance.
 
 ## Metodología de deck ejecutivo mensual
 

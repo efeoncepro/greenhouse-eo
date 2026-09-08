@@ -33,8 +33,9 @@ Primero se sanea la versión vigente completa y se relee la página; no se respo
 frase. La respuesta al cliente describe el resultado editorial sin repetir ni justificar el proceso interno:
 
 ```text
-Tomamos la observación. Revisamos la versión vigente completa y retiramos los elementos que no formaban
-parte de la lectura del artículo. El contenido para revisión quedó separado y releído de principio a fin.
+Tomamos la observación. Revisamos la versión vigente completa y retiramos del artículo los elementos que no
+formaban parte de su narrativa. La evidencia de análisis y el contenido para revisión quedaron separados y
+releídos de principio a fin.
 ```
 
 ## Control antes de enviar

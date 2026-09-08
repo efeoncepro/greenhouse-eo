@@ -25,7 +25,8 @@ resuelvas en silencio a favor del documento más viejo.
   persona por SEO/AEO.
 - 🔴 **Nada de lenguaje interno en el cuerpo público.** Retirar `el cliente`, instrucciones recibidas,
   posicionamiento editorial, referencias a extracción/CMS/verificación y fórmulas como `la ficha
-  declara`. Esas evidencias pertenecen al registro privado de procedencia, datos verificados y pendientes.
+  declara`. Esas evidencias pertenecen al toggle hermano de análisis/plan o, si son sensibles, al registro
+  privado; nunca al cuerpo narrativo.
 - **Dos objetos distintos:** `ficha técnica` es el documento técnico; `página pública del producto` es
   la URL de berel.com. No usar una expresión ambigua para ambos.
 
@@ -122,9 +123,9 @@ quedó desactualizada en ese punto y hay que corregirla en Notion.
 - **Tablas:** encabezados semánticos como `Especificación` / `Dato`; en comparativas, cada columna nombra
   el producto. Un criterio exclusivo de una alternativa —por ejemplo, garantía— se explica fuera.
 - **CTA:** toda recomendación de consultar a un especialista lleva un anchor descriptivo a `/contacto`.
-- **Datos faltantes:** retirar del cuerpo público, registrar en el sistema privado de Efeonce y solicitar
-  fuente oficial. No publicar el disclaimer, explicar el proceso ni dejar el pendiente en un callout de la
-  página compartida.
+- **Datos faltantes:** retirar del cuerpo público y solicitar fuente oficial. Registrar la brecha, su impacto y
+  el siguiente paso en el toggle de evidencia; si contiene información sensible, usar el sistema privado de
+  Efeonce. No publicar el disclaimer ni dejarlo dentro del toggle editorial.
 - **Español de México, literal y simple:** `pintura en buen estado`, `ajusta el horario`, `haz el cálculo
   exacto`, describir aplicación con cubeta/brocha/rodillo y decir `que la pintura se desprenda o
   descarapele`. Evitar `pintura sana`, `muévele la hora`, `la cuenta fina`, `aplicados en frío`, `que la

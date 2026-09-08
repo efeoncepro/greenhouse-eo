@@ -24,7 +24,7 @@
 - Status real: `Diseño; sin implementación ni runtime verificado en esta task`
 - Rank: `9`
 - Domain: `hr|payroll|platform`
-- Blocked by: `TASK-1820, TASK-1821, TASK-1822, TASK-1823, TASK-1813; hito de delegación interna Payroll coordinado con TASK-1631`
+- Blocked by: `TASK-1820, TASK-1821, TASK-1822, TASK-1823; hito de delegación interna Payroll coordinado con TASK-1631`
 - Branch: `Greenhouse develop; checkout compartido actual; sin worktrees ni cambio de branch automático`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -80,7 +80,7 @@ Las referencias al baseline son evidencia fechada; revalidar código/runtime al 
 
 ### Depends on
 
-- TASK-1820, TASK-1821, TASK-1822, TASK-1823 y TASK-1813, más hito de identidad delegada interna Payroll coordinado con el owner TASK-1631. No se exige completar su programa B2B/WorkOS/Globe: se exige contrato verificable de actor interno, scope, revocación y decisión de acceso aprobada antes de writes. Integrar sólo contratos ya entregados y verificados; diseño/mocks no cierran dependencia de runtime.
+- TASK-1820, TASK-1821, TASK-1822 y TASK-1823, más hito de identidad delegada interna Payroll coordinado con el owner TASK-1631. TASK-1813 ya entregó la interoperabilidad OAuth y deja de bloquear esta unidad. No se exige completar su programa B2B/WorkOS/Globe: se exige contrato verificable de actor interno, scope, revocación y decisión de acceso aprobada antes de writes. Integrar sólo contratos ya entregados y verificados; diseño/mocks no cierran dependencia de runtime.
 - Identidad/grants TASK-1631 y recurso TASK-658 cuando corresponda; OAuth TASK-1813 no se duplica aquí.
 
 ### Blocks / Impacts

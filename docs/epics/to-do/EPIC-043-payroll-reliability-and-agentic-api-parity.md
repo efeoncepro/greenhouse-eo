@@ -128,7 +128,7 @@ cambios de branch, worktrees ni despliegues como mecanismo de coordinación.
   permanecen intactos; aquí son integración/relación, no hijas nuevas.
 - `TASK-759d` y `TASK-759f`: timeline y señales de delivery; `TASK-1142`: prompts contextuales Nexa;
   `EPIC-042`: presentación de emails. No duplicar componentes, señales o branding.
-- [TASK-1813](../../tasks/in-progress/TASK-1813-efeonce-mcp-oauth-client-interoperability.md): compatibilidad OAuth
+- [TASK-1813](../../tasks/complete/TASK-1813-efeonce-mcp-oauth-client-interoperability.md): compatibilidad OAuth
   Codex/Claude. `TASK-1631`: identidad/broker/grants; `TASK-658`: resource authorization bridge. Dependencias
   compartidas externas a las doce tareas. El hito obligatorio es delegación interna Payroll verificable
   (actor, scope, revocación y decisión de acceso), no el rollout B2B/WorkOS/Globe completo de TASK-1631.

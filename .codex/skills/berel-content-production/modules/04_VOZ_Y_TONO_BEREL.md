@@ -73,11 +73,11 @@ el lector sienta un recorrido y no bloques sueltos.
 para la voz de Berel ("nuestro catálogo", "nuestro artículo"). Lo que se evita es **dirigirse al
 lector en "nosotros"**, no la primera persona de marca.
 
-🔴 **La superficie del cliente no narra el proceso interno.** Efeonce, `el cliente`, instrucciones
-recibidas, posicionamiento editorial, CMS, extracción y verificaciones quedan en el sistema privado de
-Efeonce, nunca en callouts/toggles de la página compartida. En público, Berel afirma lo respaldado
-directamente. Distinguir siempre **ficha técnica** (documento) de **página pública del producto** (URL de
-berel.com).
+🔴 **La narrativa editorial no narra el proceso interno.** Efeonce, `el cliente`, instrucciones recibidas,
+posicionamiento editorial, CMS, extracción y verificaciones no se cuelan en el toggle de artículo,
+reescritura o tutorial. Los toggles hermanos de análisis sí conservan las fuentes, verificaciones y decisiones
+como evidencia profesional. En la narrativa, Berel afirma directamente lo respaldado. Distinguir siempre
+**ficha técnica** (documento) de **página pública del producto** (URL de berel.com).
 
 ## Anatomía del artículo
 
@@ -288,7 +288,7 @@ releyendo.
 | **5 · Enlaces prohibidos** | `grep -nE "/search\|\?q=" ARCHIVO` | Cualquier hallazgo es falla: `robots.txt` bloquea esas rutas |
 | **6 · Dosis del nombre de producto** | `for p in Berelinte "Kalos Tone" "Multitono Pro" Insignia "Esmalte Summa" Berelex; do echo -n "$p: "; grep -oi "$p" ARCHIVO \| wc -l; done` | El nombre completo va **una sola vez** y después "la pintura" o "el esmalte". ⚠️ **Descuenta las apariciones dentro de una URL y dentro de una tabla de datos** — una fila comparativa no es repetición promocional. Cuenta las visibles en prosa |
 | **7 · Extensión real del cuerpo** | El conteo debe **excluir callouts, tablas y el bloque de metadatos** | Con `wc -w` sobre el archivo completo el resultado **miente**: infla el número y te hace creer que llegaste al piso |
-| **8 · Lenguaje interno expuesto** | `grep -niE "el cliente\|instrucción del cliente\|posicionamiento editorial\|la ficha declara\|extracción\|CMS" ARCHIVO` | Revisar cada hallazgo; cualquiera que narre la operación interna en una superficie del cliente es falla. Aplicar además `client-visible-copy-gate.mjs` sobre la página fresca completa |
+| **8 · Lenguaje interno expuesto** | `grep -niE "el cliente\|instrucción del cliente\|posicionamiento editorial\|la ficha declara\|extracción\|CMS" ARCHIVO` | Revisar cada hallazgo dentro del toggle editorial; cualquiera que rompa la narrativa es falla. En toggles de evidencia, comprobar que sea documentación profesional y necesaria. Aplicar además `client-visible-copy-gate.mjs` sobre la página fresca completa |
 | **9 · Giros corregidos por el cliente** | `grep -niE "pintura sana\|muévele la hora\|la cuenta fina\|aplicados en frío\|pintura pele\|formulación premium" ARCHIVO` | Sustituir por lenguaje literal es-MX o retirar el claim; no son fórmulas públicas aprobadas |
 
 **10 · Lo que se verifica mirando, porque ningún grep lo ve:**

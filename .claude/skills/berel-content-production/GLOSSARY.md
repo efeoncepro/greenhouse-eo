@@ -31,9 +31,11 @@
 | **🔁** | Imagen base de adaptación social. Una sola por artículo |
 | **Ficha de contenido** | Ficha de 13 campos para banner fotográfico |
 | **Ficha de producción de infografía** | Ficha de 9 secciones + tabla modular para cualquier pieza que sea infografía |
+| **Ficha visual contextual** | Especificación de un banner N1–N4 o foto de paso que acompaña el texto que representa y se copia literalmente a la tarea de diseño; es parte del entregable, no una nota interna |
 | **Derivado social** | Pieza atomizada por canal; vive como subítem en Content Hub y subtarea en Tareas |
-| **Registro privado de procedencia** | Fuentes, análisis y decisiones que originan la versión; vive fuera de la página compartida con Berel |
-| **Pendiente interno** | Dato, URL, asset o capacidad CMS no confirmada; vive en el sistema privado de Efeonce con owner y siguiente paso |
+| **Toggle de evidencia** | Research, análisis SEO/AEO, análisis de contenido o Plan/Brief que documenta fuentes, método, hallazgos, limitaciones y decisiones; permanece en la página como prueba del trabajo y no forma parte de la narrativa editorial |
+| **Registro privado sensible** | Credenciales, secretos, prompts, conversación cruda, datos restringidos u operación que no debe exponerse en el Content Hub |
+| **Pendiente trazable** | Dato, URL, asset o capacidad CMS no confirmada; se documenta con fuente, impacto, owner y siguiente paso en evidencia, o en privado si es sensible; nunca se publica como hecho en la narrativa |
 | **Verificación en la URL publicada** | Sección fechada que documenta lo comprobado contra HTML real |
 
 ## Formato Tutorial híbrido
@@ -44,7 +46,7 @@
 | **Una intención = una URL** | Regla anti-canibalización: no publicar artículo y tutorial separados para la misma keyword |
 | **Versión vigente — Tutorial híbrido** | Única zona activa cuando `Formato = Tutorial`; la versión previa queda como historial |
 | **Paso a Paso** | Estructura canónica de 4 pasos del template Tutorial actual |
-| **Foto 📸 de paso** | Imagen 1:1 asociada a un paso. No es banner |
+| **Foto 📸 de paso** | Imagen 1:1 asociada a un paso. No es banner; su ficha contextual se conserva junto al paso y se replica en la tarea de secuencia |
 | **Secuencia Paso a Paso** | Una sola tarea de diseño que agrupa las fotos del tutorial |
 | **`N##_PASO-X`** | Nomenclatura de archivo de diseño para fotos de pasos |
 | **`Tutorial Contenido`** | Bloque Drupal donde se montan Productos Berel, Materiales/Herramientas y Colores sugeridos |
@@ -62,10 +64,10 @@
 | **`Artículo (Content Hub)`** | Relación que une ejecución con planificación |
 | **`[GH] RpA v2`** | Writeback de Greenhouse; read-only desde Notion |
 | **Encabezado desplegable** | Toggle usado para estructurar la página del artículo |
-| **Zona de lectura del cliente** | Única `Versión vigente para revisión`; contiene solo metadatos aprobables y copy público exacto |
+| **Zona editorial vigente** | Único toggle de artículo, reescritura o tutorial identificado para revisión; contiene metadatos aprobables, copy público y fichas visuales contextuales |
 | **Superficie del cliente** | Toda página, toggle, callout, comentario o bloque accesible por Berel; ninguno se presume privado |
-| **Nota interna** | Razonamiento, prompt, QA, pendiente, spec o instrucción operativa; nunca vive en una superficie del cliente |
-| **Incidente centinela** | Una fuga interna detectada en un punto que obliga a revisar la versión y la página completas |
+| **Nota interna de agente** | Prompt, chain-of-thought, mensaje entre agentes, QA operativo o instrucción ajena a la narrativa. Nunca vive dentro de la zona editorial; material sensible no vive en ningún punto de la página. No incluye toggles de evidencia ni fichas visuales contextuales |
+| **Incidente centinela** | Una fuga interna detectada en la zona editorial que obliga a inventariar la página y revisar por completo ese toggle y sus callouts |
 | **Canonización** | Normalización de formato que Notion aplica al guardar; obliga a releer antes de editar por texto |
 | **Hilo de comentario** | Comentario inicial más todas sus respuestas; se evalúa completo, nunca desde una réplica aislada |
 | **Atendido** | Estado operativo Efeonce: existe decisión, cambio cuando aplica, respuesta y readback fresco |

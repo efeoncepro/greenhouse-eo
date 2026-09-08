@@ -1,6 +1,7 @@
 # Plantilla · Matriz de distribución social
 
-Agregar como sección/toggle interno en el plan del artículo; no crear propiedades en la base.
+Agregar como sección del toggle de evidencia del plan del artículo; no crear propiedades en la base ni moverla
+al toggle editorial.
 
 - Ciclo de producción / ventana de uso sugerida (no comprometida):
 - Audiencia / intención / objetivo:

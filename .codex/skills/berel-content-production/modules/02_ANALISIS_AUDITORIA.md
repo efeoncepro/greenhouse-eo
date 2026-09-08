@@ -1,7 +1,7 @@
 # 02 · Análisis SEO/AEO y análisis de contenido (Fases 3 y 4)
 
 > Solo aplica a la **Modalidad A · Reescritura**. En Modalidad B no hay página publicada que
-> auditar: la arquitectura se **decide** en el `🧭 Plan editorial y SEO` privado
+> auditar: la arquitectura se **decide** en el toggle de evidencia `🧭 Plan editorial y SEO`
 > (→ [`01_CICLO_MENSUAL.md`](01_CICLO_MENSUAL.md), Fase B3).
 
 Para el **informe periódico dirigido a Berel**, cargar
@@ -25,9 +25,8 @@ escribir.**
 
 ## Fase 3 · Análisis SEO/AEO
 
-En una tarea o página **privada de Efeonce**, crear un análisis profundo titulado `Análisis SEO/AEO`.
-Nunca insertarlo como toggle, callout o comentario dentro de la página del artículo compartida con Berel.
-Debe cubrir:
+En la página del artículo del Content Hub, crear y conservar un toggle hermano titulado
+`🔎 Análisis SEO/AEO`. Es evidencia obligatoria del trabajo que sustenta la reescritura y debe cubrir:
 
 - **Keyword** principal y secundarias; intención de búsqueda y volumen estimado.
 - **Title, meta description, H1–H3, slug/URL.**
@@ -65,7 +64,7 @@ titulada `Verificación en la URL publicada`, **con la fecha de auditoría**:
 
 ## Fase 4 · Análisis de contenido
 
-En la misma superficie privada, agregar `Análisis de contenido`, con el mismo rigor:
+En un segundo toggle hermano, agregar `🧩 Análisis de contenido`, con el mismo rigor:
 
 - **Estructura narrativa y arco**: apertura emocional → desarrollo → resolución → cierre → CTA.
 - **Ajuste a la guía de Voz y Tono**: acompañante experto, tuteo al lector, "nosotros" para la
@@ -83,6 +82,11 @@ En la misma superficie privada, agregar `Análisis de contenido`, con el mismo r
 **Distinguir siempre lo verificado de lo estimado.** Los volúmenes de búsqueda y las comparaciones
 de competencia **sin herramienta de datos van marcados como estimación**. No conviertas una
 impresión en un número.
+
+Estos toggles son visibles para Berel y por eso deben ser legibles, sustentados y profesionales: pueden
+documentar fuentes, método, discrepancias, limitaciones y decisiones, pero nunca prompts, credenciales,
+chain-of-thought, conversación entre agentes ni secretos operativos. Su contenido no se copia dentro del
+toggle de artículo/reescritura/tutorial.
 
 ## Cross-links
 

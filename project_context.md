@@ -124,6 +124,8 @@ Informes: skill `report-studio` (Claude/Codex), evidencia, diseño y QA PDF.
 Berel: `berel-content-production` ·
 [plan](docs/operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md) ·
 [informes](docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md).
+Contrato: preservar análisis/evidencia; solo el toggle editorial excluye notas de agente. N1–N4 quedan
+contextuales y el arte producido, congelado hasta conciliación.
 
 WordPress/Ohio: skill `efeonce-public-site-wordpress`; contratos [Home](docs/architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md),
 [HubSpot](docs/architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md) y [misceláneas](docs/architecture/public-site/PUBLIC_MISCELLANEOUS_SURFACES_V1.md).

@@ -1,8 +1,8 @@
 # 03 · Redacción del artículo (Fase 5 / Fase B5)
 
 > Vale para las dos modalidades. En ambas, la única zona activa se llama
-> `✍️ Versión vigente para revisión`; la modalidad se registra en el sistema privado y no cambia el
-> título que ve el cliente.
+> `✍️ Versión vigente para revisión`; los toggles hermanos de análisis/plan conservan la evidencia de
+> modalidad y decisiones, sin cambiar el título de la zona editorial.
 
 ## Cómo se monta
 
@@ -55,7 +55,7 @@ compara la extracción completa:
 
 Medidos el 2026-08-25: la ficha de Berelinte trae **4.699 caracteres**; el tutorial de baño, **5.231**.
 Si la candidata no trae `<title>` propio y pesa lo mismo que el control, **no existe**: sustitúyela
-por una alternativa verificada y registra el pendiente en el sistema privado de Efeonce.
+por una alternativa verificada y registra el pendiente en el toggle de evidencia.
 
 ### URLs verificadas el 2026-08-25 — listas para reusar
 
@@ -113,19 +113,23 @@ verificación para los tres artículos de sala en septiembre 2026.
 
 ## Estructura obligatoria de la versión vigente
 
-La página compartida con Berel es una superficie del cliente completa: **ningún callout o toggle se
-considera privado**. Debe existir un solo desplegable titulado inequívocamente `✍️ Versión vigente para
-revisión`, con este contenido y nada más:
+La página compartida con Berel contiene toggles hermanos de evidencia y una sola **zona editorial vigente**.
+En el toggle de artículo/reescritura/tutorial debe existir únicamente este contenido:
 
 | Bloque | Qué lleva |
 |---|---|
 | **Metadatos propuestos** | Title, meta description, slug y H1, cada uno con su **conteo de caracteres**. Son aprobables por el cliente. 🔴 **En viñetas, no en tabla** — el carácter de barra vertical parte la fila en Notion |
 | **Texto público completo** | El artículo listo para maquetar: arco de cinco tiempos, tuteo, tablas, FAQ y firma de cierre. Debe poder copiarse a Drupal sin retirar notas, placeholders ni instrucciones |
+| **Fichas visuales N1–N4** | Cuatro especificaciones completas, distribuidas junto a la sección que cada imagen representa. Incluyen composición, copy de arte, ALT, archivo, formato/carga y posición exacta según el módulo 05 |
 
-Fuera de la página del cliente, una tarea o documento **privado de Efeonce** conserva procedencia,
-fuentes, decisiones, pendientes, mapa de banners, ALT, archivos, medidas, lazy-load, schema y notas de carga.
-El mapa visual se ancla por encabezado o identificador de sección, no mediante callouts intercalados en el
-artículo. Las versiones anteriores se conservan con un título `Histórico`; nunca compiten con la vigente.
+`Keyword principal`, `Intención`, `Delimitación de cluster`, decisiones de research y controles de publicación
+pertenecen a los toggles hermanos de evidencia; no son metadatos aprobables ni narrativa del artículo.
+
+Los toggles hermanos de análisis/research/plan conservan fuentes, decisiones, discrepancias, limitaciones y
+verificaciones como prueba del trabajo. Una tarea privada de Efeonce conserva secretos, credenciales,
+conversación cruda y operación sensible. La tarea visual replica literalmente las fichas N1–N4 del artículo;
+no las sustituye. Las versiones editoriales anteriores se conservan como historial y nunca compiten con la
+vigente.
 
 → Plantilla copiable: [`../templates/bloque-reescritura.md`](../templates/bloque-reescritura.md)
 
@@ -156,10 +160,14 @@ artículo. Las versiones anteriores se conservan con un título `Histórico`; nu
   no se elimina cobertura SEO/AEO útil. Toda reubicación lleva una línea puente.
 - **Tomar la sustancia, no la letra.** Una frase propuesta por el cliente se valida contra voz, léxico,
   evidencia e hilo conductor antes de incorporarla; no introducir `ideal` u otro comodín vetado.
-- **Especificar los banners en su tarea/ficha visual privada** siguiendo la Spec para imágenes: posición
-  exacta anclada por el encabezado de una sección real, nombre de archivo `.webp`, ALT exacto y **hero sin
-  `lazy`** (es el LCP). No insertar el brief en la lectura del artículo →
+- **Especificar los banners contextualmente dentro del artículo** siguiendo la Spec para imágenes: posición
+  exacta junto a una sección real, nombre de archivo `.webp`, ALT exacto y **hero sin `lazy`** (es el LCP).
+  Copiar después la ficha completa a la tarea visual. Un brief N1–N4 es entregable de producción; una nota de
+  auditoría, CMS, QA o agente no lo es →
   [`05_BANNERS_IMAGENES.md`](05_BANNERS_IMAGENES.md).
+- **Contrato de asset producido:** si diseño ya trabajó desde una ficha, no cambiar composición, copy, ALT,
+  archivo, formato ni posición como efecto lateral de una corrección editorial. Cualquier cambio requiere
+  inventario del asset, razón explícita, conciliación con diseño y actualización coordinada de artículo+tarea.
 
 ### Cuando el dato no está firme
 
@@ -168,14 +176,14 @@ artículo. Las versiones anteriores se conservan con un título `Histórico`; nu
   soft-404, mantener un gate literal: **no activar enlaces entrantes ni programar derivados hasta
   comprobar `title`, H1, cuerpo, canonical y schema en la ruta pública**.
 - Si el sitio **no confirma** la URL, enlazar la **familia de color** o la **categoría de producto**,
-  y dejar el pendiente en el sistema privado. 🔴 **Nunca la búsqueda del sitio como respaldo.**
+  y dejar el pendiente en el toggle de evidencia. 🔴 **Nunca la búsqueda del sitio como respaldo.**
 - Si un **producto no tiene página pública localizable** —no aparece en `sitemap-productos.xml` y la
   candidata pesa como el control—: citarlo con su nombre y número de serie confirmados en el
-  catálogo, enlazar el catálogo general y dejar el pendiente en el sistema privado. **Nunca inventar una
+  catálogo, enlazar el catálogo general y dejar el pendiente en el toggle de evidencia. **Nunca inventar una
   URL de ficha**, ni deducir un sufijo de variante que no viste en el sitemap.
-- Si una fuente de la wiki está **vacía o sin permisos de lectura**, registrarlo en el sistema privado en
-  lugar de rellenar el hueco con supuestos. El cuerpo público no lleva disclaimers sobre la operación ni
-  sobre verificaciones pendientes.
+- Si una fuente de la wiki está **vacía o sin permisos de lectura**, registrarlo como limitación en el toggle
+  de evidencia en lugar de rellenar el hueco con supuestos. El cuerpo público no lleva disclaimers sobre la
+  operación ni sobre verificaciones pendientes.
 
 ### Producto nuevo o con baja notoriedad
 
@@ -192,8 +200,9 @@ categoría consolidada:
 
 En todo cuerpo público, retirar lenguaje de agencia o control interno: `el cliente`, `instrucción del
 cliente`, `posicionamiento editorial`, `la ficha declara`, referencias al CMS, extracción o verificación.
-La fuente vive en el registro privado de procedencia/datos/pendientes; la frase pública habla directamente
-desde Berel. `Premium` describe una línea cuando la fuente lo respalda, nunca una `formulación premium`.
+La fuente y la decisión viven en el toggle hermano de evidencia; la frase del toggle editorial habla
+directamente desde Berel. `Premium` describe una línea cuando la fuente lo respalda, nunca una
+`formulación premium`.
 
 ### Cuando los nombres de producto se traslapan
 
@@ -201,7 +210,7 @@ No asumir que `vinílica`, `acrílica` y `esmalte` son tres cajas excluyentes. A
 comparativa, abrir las fichas concretas y separar cuatro preguntas: **qué superficie declara, qué
 exposición admite, qué función cumple y qué preparación exige**. Una resina o una base no sustituyen
 la aplicación declarada. Si la clasificación inicial del brief contradice las fichas, corregir el
-brief y explicar el cambio en el registro privado de decisión.
+brief y explicar el cambio en el toggle de evidencia correspondiente.
 
 ## Estándares on-page que la pieza debe cumplir
 

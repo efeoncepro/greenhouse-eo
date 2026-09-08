@@ -6,17 +6,24 @@
 
 ## 🔴 Exposición de operación interna al cliente — incidente 2026-09-07
 
-- **Tratar un callout o toggle colapsado como privado.** En Notion compartido, todo lo accesible en la
-  página es superficie del cliente. Procedencia, prompts, QA, pendientes, specs, CMS/Dev y mensajes entre
-  agentes viven fuera, en el sistema privado de Efeonce. (→ `03`, `07`, `18`)
-- **Mezclar el artículo con su brief de producción.** La versión vigente contiene solo metadatos aprobables
-  y copy público; banners, ALT, archivos, medidas, lazy-load y montaje se gobiernan en tareas visuales. (→ `03`, `05`, `13`)
-- **Corregir solo la frase que el cliente marcó.** Una nota interna detectada es un incidente centinela:
-  exige barrido de toda la versión, callouts, toggles, comentarios y bloques visibles relacionados. (→ `18`)
+- **Confundir evidencia visible con narrativa editorial.** Research, análisis SEO/AEO, análisis de contenido y
+  Plan/Brief deben permanecer en toggles hermanos como prueba profesional del trabajo. Lo que nunca entra al
+  toggle editorial son notas de agente, QA operativo, pendientes, CMS/Dev o mensajes entre agentes; prompts,
+  secretos, credenciales y conversación cruda no van en ningún punto de la página. (→ `02`, `03`, `07`, `18`)
+- 🔴 **Confundir una ficha visual N1–N4 con una nota interna y retirarla.** El Playbook exige las cuatro
+  especificaciones dentro de la versión vigente, distribuidas junto al texto que representan. La tarea visual
+  conserva una copia literal; no sustituye la ficha contextual. (→ `03`, `05`, `13`, `18`)
+- 🔴 **Cambiar una ficha después de que diseño produjo el asset.** Una corrección editorial no autoriza
+  cambiar composición, copy, ALT, archivo, formato, carga ni posición. Conciliar y versionar el cambio con
+  diseño antes de tocar cualquiera de sus consumidores. (→ `05`, `13`, `18`)
+- **Corregir solo la frase que el cliente marcó.** Una fuga dentro del toggle editorial es un incidente
+  centinela: exige inventariar la página completa y barrer toda la zona editorial y sus callouts, sin retirar
+  los toggles hermanos de evidencia. (→ `18`)
 - **Confiar en `success` después de un reemplazo.** Un reemplazo puede perder el tabulador, expulsar el texto
   del toggle y quedar guardado sin error. Comparar sangría, releer markdown y render. (→ `07`, `18`)
-- **Mover notas internas a un bloque llamado `Histórico` y darlas por resueltas.** El rótulo ordena versiones;
-  no vuelve privada una fuga todavía visible ni sustituye la revisión de la versión activa. (→ `03`, `18`)
+- **Mover una nota de agente a un bloque llamado `Histórico` y darla por resuelta.** El rótulo ordena versiones;
+  no corrige una fuga narrativa. Tampoco autoriza borrar análisis legítimos: se distingue evidencia profesional
+  de conversación o razonamiento operativo del agente. (→ `03`, `18`)
 
 ## Tutoriales: regresiones detectadas el 2026-09-03
 
@@ -47,8 +54,8 @@
   no solo anotarla al final. El documento no puede quedar con afirmaciones falsas. (→ `02`)
 - **Presentar una estimación como dato medido.** Volúmenes de búsqueda y comparaciones de competencia
   sin herramienta van marcados como **estimación**. (→ `02`)
-- **Elegir una fuente cuando dos se contradicen.** Ninguna entra: van al registro privado de discrepancias
-  y se reportan al cliente por el canal apropiado. (→ `01`)
+- **Elegir una fuente cuando dos se contradicen.** Ninguna entra a la narrativa: la discrepancia queda trazada
+  en el toggle de evidencia —o en privado si es sensible— y se reporta por el canal apropiado. (→ `01`)
 - 🔴 **Tomar el brief como verificado.** *Caso real:* un brief de septiembre 2026 afirmaba que el COV
   de Berelinte se declara *"menor a 50 g/L"* cuando la ficha dice `< 50 g/L`, con símbolo; daba por
   buena una cita de ficha que todavía había que confirmar y proponía enlaces a fichas de producto
@@ -68,9 +75,9 @@
   confirmados en catálogo, enlace al catálogo general y **pendiente declarado**. (→ `03`)
 - **Omitir un pendiente.** *Un pendiente declarado es gestionable; uno omitido se publica como
   error.* (→ `03`)
-- 🔴 **Publicar el proceso interno como si fuera contenido.** `El cliente`, instrucciones, CMS,
-  extracción, posicionamiento o verificaciones no viven en ningún punto de la página compartida, ni
-  siquiera en callouts o toggles; se registran en el sistema privado de Efeonce. (→ `03`, `07`, `09`, `18`)
+- 🔴 **Publicar el proceso interno como si fuera narrativa.** `El cliente`, instrucciones, CMS, extracción,
+  posicionamiento o verificaciones no viven dentro del toggle editorial. Cuando son evidencia pertinente se
+  documentan de forma profesional en el toggle de análisis/plan; si son sensibles, en privado. (→ `03`, `07`, `09`, `18`)
 - **Dejar un dato faltante como disclaimer visible.** Se retira del cuerpo, se registra internamente y
   se solicita la fuente oficial. (→ `03`, `09`)
 - **Tratar un producto nuevo como categoría consolidada.** Un title `Guía [Producto]`, diferenciadores
@@ -180,7 +187,8 @@
 - **Amontonar las imágenes al principio.** Acompañan el avance del artículo. (→ `05`)
 - 🔴 **ALT con el nombre de archivo, con la URL o con una etiqueta interna.** Errores reales
   detectados en auditoría. (→ `02`, `05`)
-- **ALT del banner distinto al de las notas para Dev.** Una sola fuente de verdad. (→ `05`)
+- **ALT, archivo o posición distintos entre artículo y tarea visual.** Una sola fuente de verdad contextual,
+  copiada de forma literal. (→ `05`)
 - **Listar en notas para Dev imágenes que no existen como banner especificado** (imágenes fantasma).
   (→ `05`)
 - **Poner `loading="lazy"` en el hero.** Es el LCP. (→ `05`)
@@ -246,6 +254,14 @@
   del lote completo, no el payload aceptado. (→ `01`, `07`)
 - 🔴 **Responder comentarios desde previews parciales.** Los indicadores del body pueden omitir respuestas;
   inventariar todos los hilos antes de editar o contestar. (→ `18`)
+- 🔴 **Recorrer versiones de Notion a prueba y error.** El historial solo recupera una versión conocida después
+  de capturar el baseline; una restauración queda validada por los mismos identificadores, autores y estados de
+  discusión, no por el mensaje de éxito. (→ `18`)
+- **Confundir observaciones, discusiones, comentarios y respuestas.** Reportar un solo total oculta hilos
+  perdidos o duplica feedback. Separar autor, identidad del hilo, respuestas y `resolved`. (→ `18`)
+- **Borrar un bloque comentado y asumir que su observación quedó cerrada.** Si el ancla desaparece por una
+  eliminación necesaria, conservar la decisión en un comentario de página apto para el cliente y dejar el cierre
+  al cliente. (→ `18`)
 - 🔴 **Marcar como resuelto un hilo del cliente.** Efeonce atiende y responde; el cierre nativo pertenece a
   quien comentó o a su contacto del lado del cliente. (→ `18`)
 - **Tratar `resolved=false` como deuda pendiente de Efeonce.** `Atendido` se prueba con decisión, cambio cuando

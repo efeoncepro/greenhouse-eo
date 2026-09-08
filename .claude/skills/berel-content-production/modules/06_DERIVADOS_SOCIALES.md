@@ -26,8 +26,8 @@ Modelo de handoff completo: `content-marketing-studio/modules/05_DISTRIBUTION_AM
 
 ## Prerrequisito obligatorio
 
-El artículo debe tener una **Versión vigente para revisión** limpia y su **Banner N2 🔁 especificado**
-en la tarea visual privada.
+El artículo debe tener una **Versión vigente para revisión** limpia y su **Banner N2 🔁 especificado en
+contexto dentro del artículo y copiado literalmente en la tarea visual**.
 **Sin texto no hay copy:** el gancho, los datos y el visual salen del artículo, no se inventan.
 
 Se ejecuta una vez por mes de producción, **después** de la Fase 5 (reescritura) y de la Fase 8

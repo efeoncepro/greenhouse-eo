@@ -256,12 +256,13 @@ además de su `Tarea principal`.
 
 ## Formato en Notion (reglas que evitan pérdida de texto)
 
-🔴 **Una página compartida con Berel no contiene rincones privados.** Callouts, toggles colapsados,
-comentarios, versiones anteriores y bloques al final siguen siendo visibles para el cliente. No guardar
-allí notas internas, prompts, razonamiento, QA, pendientes, instrucciones de montaje ni mensajes entre
-agentes. Esos registros viven en una tarea o página de Efeonce con acceso privado comprobado. No asumir que
-una subpágina, base, propiedad o toggle dentro del workspace del cliente es privado; si la frontera no se
-puede verificar, usar Greenhouse u otro sistema interno y no escribir el dato en Notion de Berel.
+🔴 **Una página compartida con Berel no contiene rincones privados, pero sí capas explícitas.** Callouts,
+toggles colapsados, comentarios, versiones anteriores y bloques al final siguen siendo visibles para el
+cliente. Los toggles de Research, análisis SEO/AEO, análisis de contenido y Plan/Brief son evidencia
+obligatoria y permanecen como hermanos del toggle editorial. Deben ser profesionales y trazables; nunca
+contienen prompts, credenciales, chain-of-thought, secretos ni conversación cruda. El toggle de artículo,
+reescritura o tutorial contiene solo narrativa final, metadatos y specs visuales contextuales. La operación
+sensible vive en Efeonce con acceso privado comprobado.
 
 - 🔴 **Nunca usar el carácter de barra vertical dentro de una celda de tabla:** **parte la fila y se
   pierde el texto que va después**. Por eso los titles del tipo `Tema` + separador + `Marca` van en
@@ -304,9 +305,9 @@ reemplazos pequeños el bloque vigente que el cliente está revisando, sin borra
 2. Clasificar cada hilo como `nuevo`, `atendido`, `bloqueado` o `fuera de alcance`. El estado nativo
    `resolved` se conserva separado: **Efeonce no resuelve los hilos del cliente**.
 3. Editar con el menor ancla literal posible, tomada del estado recién leído.
-4. Si el comentario revela lenguaje interno, tratarlo como incidente centinela: revisar toda la versión
-   vigente, todos los callouts/toggles/comentarios visibles y los bloques hermanos de la página. No limitar
-   el saneamiento a la frase anclada.
+4. Si el comentario revela lenguaje interno dentro del toggle editorial, tratarlo como incidente centinela:
+   inventariar la página completa para fijar fronteras y revisar toda la zona editorial vigente y sus callouts.
+   No limitar el saneamiento a la frase anclada ni borrar toggles hermanos de evidencia.
 5. Después de guardar, releer el bloque completo y sus transiciones; la edición puede corregir una frase,
    perder el tabulador y expulsarla del toggle, o crear una costura abrupta/remate duplicado.
 6. Ejecutar `node scripts/client-visible-copy-gate.mjs <export.md>` desde la raíz de la skill sobre una
@@ -336,11 +337,12 @@ enlace `http://`**.
 🔴 **Conclusión operativa: un `diff` byte a byte contra lo que enviaste va a mostrar diferencias
 aunque no se haya perdido nada.** No verifiques igualdad de markdown — **verifica el contenido
 renderizado**: que las tablas estén completas, que los callouts conserven sus hijos, que nada haya
-quedado fuera del desplegable y que no exista operación interna en ninguna superficie visible.
+quedado fuera del desplegable, que los toggles de evidencia sigan presentes y que no exista operación
+interna mezclada dentro de la zona editorial.
 
-## 🗂️ Estructura histórica observada — no reutilizar
+## Estructura canónica de evidencia + producción
 
-Antes del incidente del 2026-09-07, el artículo más completo de la base —"Impermeabilizante para azotea: cómo elegir el correcto"
+El artículo —"Impermeabilizante para azotea: cómo elegir el correcto"
 (`3a639c2fefe78087a9f6fd5eae3a8e5e`)— tiene **tres** toggles de primer nivel:
 
 ```
@@ -349,11 +351,11 @@ Antes del incidente del 2026-09-07, el artículo más completo de la base —"Im
 # ✍️ Artículo V1          {toggle="true"}
 ```
 
-El Playbook documentaba **cuatro** toggles para Modalidad A y **dos** para Modalidad B
-(`🧭 Plan editorial y SEO` + `✍️ Artículo V1`). Esa estructura mezclaba artefactos de trabajo con la
-lectura del cliente y queda **superada** por el contrato del incidente: una sola `Versión vigente para
-revisión` en la página compartida; research, plan, auditoría y handoff en una superficie privada de Efeonce.
-No copiar el esqueleto observado ni usarlo como precedente para nuevas piezas.
+El Playbook documenta **cuatro** toggles para Modalidad A y **dos** para Modalidad B (`🧭 Plan editorial y
+SEO` + `✍️ Artículo V1`). Esa separación es correcta y obligatoria: Research/análisis/plan prueban el trabajo;
+el último toggle editorial contiene el artículo publicable y sus specs contextuales, sin notas de agente. Los
+títulos exactos pueden variar por modalidad, pero no se fusionan las capas ni se elimina la evidencia durante
+un saneamiento.
 
 Misma advertencia con la **longitud**: el Playbook y piezas históricas conservan referencias a
 **900–1.200+** y **1.400–1.800** palabras, pero ninguna gobierna nuevas ejecuciones. El contrato vigente

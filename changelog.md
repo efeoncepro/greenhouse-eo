@@ -7,24 +7,35 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-## 2026-09-07 — Berel formaliza la revisión de comentarios y la costura editorial
+## 2026-09-07 — Berel: comentarios, recuperación de octubre y contrato visual corregido
 
-La skill espejo `berel-content-production` incorpora el delta completo del Playbook vivo: claridad antes que
-ingenio, una sección por intención, reubicación sin perder cobertura SEO/AEO, línea puente obligatoria, contenido
-evergreen sin etiquetas de temporada y un método de diez pasos para inventariar, evaluar, editar, responder y
-cerrar comentarios. `Atendido` queda separado de `resolved`: Efeonce prueba decisión/cambio + respuesta + readback,
-pero el cliente cierra el hilo. También se corrigieron los drifts locales de modalidad por `Enlace` y longitud
-histórica. `Aprendizajes del feedback` y `Recomendaciones Cliente` se actualizaron y releyeron en Notion; no se
-modificaron artículos, estados, comentarios ni Drupal.
+La skill espejo `berel-content-production` incorpora el delta del Playbook vivo para comentarios: claridad antes
+que ingenio, una sección por intención, reubicación con costura, contenido evergreen y evaluación del diagnóstico
+del cliente sin aceptar mecánicamente su remedio. `Atendido` queda separado de `resolved`; Efeonce prueba
+decisión/cambio + respuesta + readback y el cliente cierra el hilo. Las 25 observaciones del lote se clasificaron
+por causa primaria: claridad/estructura 10, precisión de producto 7, voz/localización 5 y alcance editorial 3.
 
-Una revisión posterior del artículo de herrería reveló un defecto grave en el propio contrato de la skill:
-procedencia, pendientes, specs visuales y notas CMS/Dev se mezclaban dentro del bloque que leía el cliente.
-La regla queda reemplazada por una sola `Versión vigente para revisión` con material aprobable/publicable;
-toda operación interna pasa a superficies privadas de Efeonce. Una fuga ahora es incidente centinela y exige
-barrido de la página completa. Se agregó un gate fail-closed para marcadores internos, lectura incompleta,
-múltiples versiones vigentes y pérdida de tabuladores en toggles. Los espejos Claude/Codex incluyen el mismo
-contrato, plantillas, antipatrones y validador. Esta actualización documental no demuestra que otros artículos
-estén limpios ni modifica Drupal.
+El barrido preventivo de los diez artículos de octubre reveló una regresión propia: al retirar notas internas se
+habían eliminado fichas visuales contextuales y reescrito copy no solicitado. Se restauraron byte a byte los siete
+artículos sin comentarios; en los tres comentados se recuperaron historia y fichas sin deshacer títulos ni cambios
+justificados. La lectura final de esos diez y del artículo centinela de herrería confirmó 44 fichas N1–N4 intactas,
+30 hilos conservados y 59 comentarios, incluida la respuesta que faltaba. De las zonas editoriales se retiraron
+solo notas de agente y operación ajena a la narrativa; no se modificaron assets, Frame.io ni Drupal.
+
+Aclaración del operador del 2026-09-08: los toggles de Research/análisis/plan son evidencia obligatoria y siempre
+permanecen en la página. La limpieza se limita al toggle editorial de artículo, reescritura o tutorial, donde no
+pueden colarse notas de agente o texto ajeno a la narrativa. Skills y gate se alinearon con esta frontera; las
+specs contextuales siguen protegidas y el análisis no se vuelve a tratar como fuga.
+
+Segunda revisión preventiva: 11/11 páginas conservaron evidencia, 44 fichas N1–N4 y 12 fotos de paso; 30 hilos
+y 59 comentarios permanecieron íntegros. Se corrigieron ocho fragmentos de planificación fuera de lugar en Día
+de Muertos, Psicología del color y App Color Berel mediante reemplazos quirúrgicos; la delimitación de cluster
+se movió al análisis. Gate final 11/11, sin cambios en arte, tareas, estados, Frame.io ni Drupal.
+
+La causa raíz también quedó cerrada en los espejos Claude/Codex: las fichas N1–N4 son parte obligatoria del
+artículo y se copian literalmente a las tareas visuales. Una vez producido el arte, composición, copy, ALT,
+archivo, formato y posición quedan congelados hasta una conciliación explícita con diseño. El gate distingue
+fichas de notas internas, exige exactamente N1–N4 completas y conserva la jerarquía de toggles.
 
 ## 2026-09-07 — TASK-1813 despliega discovery OAuth nativo/base-only y ensaya rollback
 

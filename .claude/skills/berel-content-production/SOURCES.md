@@ -1,6 +1,7 @@
 # Fuentes — de dónde salió cada regla
 
-> **Última sincronización:** **2026-09-07** contra la Wiki viva de Berel en Notion.
+> **Última actualización:** **2026-09-08** por aclaración expresa del operador; última sincronización
+> integral contra la Wiki viva de Berel en Notion: **2026-09-07**.
 > Notion sigue siendo la fuente de verdad viva; el repo es una copia operativa. Cuando una petición
 > fechada del cliente o una spec específica contradice una regla más vieja, manda la fuente más
 > reciente/específica y se registra el drift.
@@ -90,28 +91,76 @@ La pieza estaba `En revisión`; esta evidencia no prueba publicación ni actuali
 Petición expresa del operador después de revisar **Cómo pintar herrería y proteger el metal del óxido**
 (`3a639c2fefe7804cad1bde303b8ee2bb`). La versión vigente contenía operación interna dentro de la lectura
 del cliente: procedencia, reglas SEO, montaje CMS, schema/Dev, adaptaciones, pendientes y controles de
-corrección. Se atendieron y respondieron los diez comentarios del artículo; el readback posterior confirmó
-la versión vigente limpia, el historial rotulado y la jerarquía corregida. Los hilos quedaron abiertos para
-el cliente y el estado siguió `En revisión`; no hubo cambio ni verificación en Drupal.
+corrección. Se atendieron y respondieron los diez comentarios del artículo; el primer readback confirmó que
+esas notas ya no aparecían y que la jerarquía estaba dentro del toggle, pero fue insuficiente: no comparó las
+fichas visuales contra la captura previa. Los hilos quedaron abiertos para el cliente y el estado siguió
+`En revisión`; no hubo cambio ni verificación en Drupal.
 
-Este incidente corrige una contradicción de la copia operativa anterior: las instrucciones que colocaban
-procedencia, pendientes y fichas de banners dentro del mismo toggle del artículo quedan superadas. Toda
-página compartida con Berel es superficie del cliente; la versión vigente contiene solo material aprobable
-y publicable. La operación interna vive en una superficie privada de Efeonce. Un reemplazo guardado también
-llegó a perder el tabulador y expulsó texto del toggle pese a reportar éxito; por eso el cierre exige readback
-estructural y render, además del gate automatizado.
+La primera reparación agrupó incorrectamente las fichas de banners con la operación interna y las retiró.
+El barrido posterior de octubre —documentado abajo— protegió las fichas visuales, pero todavía dejó una regla
+demasiado amplia al expulsar también los análisis de la página. La aclaración del operador del 2026-09-08 fija
+la frontera correcta: Research, análisis SEO/AEO, análisis de contenido y Plan/Brief permanecen en toggles
+hermanos como prueba del trabajo; solo el toggle de artículo, reescritura o tutorial debe quedar libre de notas
+de agente y operación ajena a la narrativa. Un reemplazo guardado también llegó a perder el
+tabulador y expulsó texto del toggle pese a reportar éxito; por eso el cierre exige comparación de specs,
+readback estructural y render, además del gate automatizado.
 
-El operador indicó que el problema apareció en varios artículos. Esta evidencia **no demuestra que los demás
-estén limpios**: exige auditoría retroactiva separada cuando se autorice ese alcance.
+El operador indicó que el problema apareció en varios artículos. En ese momento, esta evidencia no demostraba
+que los demás estuvieran limpios; la auditoría retroactiva y su reparación se ejecutaron después, como registra
+la sección siguiente.
 
 Como parte de la sincronización documental, se completó **Aprendizajes del feedback** con costura y evergreen
 (`last_edited_time` de readback `2026-09-07T21:56:39.830Z`) y se marcó como superada la pauta estacional antigua
 en **Recomendaciones Cliente** (`2026-09-07T21:56:38.878Z`). El Playbook ya contenía ambas reglas y no se editó.
 
-También se revisaron los módulos 01, 05, 06, 13, 14 y 15. No requieren cambios: este delta no altera el ciclo
-mensual, las especificaciones visuales, los formatos sociales, el Tutorial híbrido, la planeación temática ni
-la selección de canales. Las skills generales de copywriting, SEO/AEO, content marketing, social y Notion ya
-cubren sus principios de oficio; la especialización y el ownership del cierre pertenecen al overlay Berel.
+La primera pasada no cambió los módulos 05 y 13 porque todavía no había detectado la pérdida de las fichas.
+El barrido posterior sí los corrigió para proteger N1–N4 y las fotos de paso contextuales. Los módulos 01, 06,
+14 y 15 no requirieron cambios. La especialización y el ownership del cierre pertenecen al overlay Berel.
+
+## Barrido de octubre, recuperación y contrato visual — 2026-09-07
+
+Se revisaron los diez artículos de octubre y el artículo centinela de herrería. Una limpieza equivocada había
+tratado las fichas de imagen como notas internas y había reescrito contenido fuera del alcance de los comentarios.
+La fuente viva corrigió esa lectura: el Playbook y `Spec para imágenes` exigen N1–N4 **dentro del artículo,
+distribuidas junto al texto**, y la tarea visual debe reflejar ALT, archivo y posición de forma literal.
+
+La reparación restauró byte a byte los siete artículos preventivos desde la captura anterior al incidente. En
+los tres artículos con feedback se recuperaron historia y fichas sin deshacer las correcciones justificadas del
+cliente. La verificación final comparó 44 fichas contextuales —cuatro en cada uno de los once artículos— y no
+detectó diferencias en composición, copy, ALT, archivo, formato o posición. También conservó los 30 hilos y 59
+comentarios inventariados en los cuatro artículos comentados; se añadió una sola respuesta que faltaba.
+
+Las notas de agente y operación ajena a la narrativa se retiraron de las zonas editoriales vigentes mediante
+cambios quirúrgicos. Los toggles hermanos de análisis/evidencia permanecen, al igual que N1–N4; no se modificó Drupal,
+Frame.io ni ningún asset. Desde este incidente, el gate distingue las fichas visuales de la operación interna,
+exige una N1, N2, N3 y N4 completas, y falla si falta alguna o si aparecen notas operativas fuera de ellas.
+
+El inventario de feedback reunió 25 observaciones del cliente en tres artículos: 10 de claridad y estructura,
+7 de precisión de producto, 5 de voz/localización es-MX y 3 de alcance editorial o de negocio. SEO/AEO operó
+principalmente como restricción para aplicar los cambios sin perder cobertura ni introducir claims, no como
+causa dominante del feedback. Historial, comentarios, copy, fichas y assets son capas distintas: `Restaurar` no
+prueba por sí solo que los hilos sobrevivieron, y una ficha guardada no autoriza cambiar arte ya producido.
+
+## Aclaración de frontera y segunda revisión preventiva — 2026-09-08
+
+El operador precisó el contrato después de la recuperación: los toggles de Research, análisis SEO/AEO,
+análisis de contenido y Plan/Brief deben permanecer siempre porque son la prueba del trabajo. La prohibición se
+aplica al toggle editorial de artículo, reescritura o tutorial: ahí no se cuelan notas de agente, metadata de
+planificación, controles ni texto ajeno a la narrativa. Las fichas visuales y fotos de paso siguen siendo
+entregables contextuales obligatorios.
+
+Con esa frontera se hizo una lectura fresca de los diez artículos de octubre y el centinela de herrería. Los
+once conservan toggles de evidencia; sus zonas editoriales contienen exactamente 44 fichas N1–N4 y los tres
+tutoriales conservan 12 fichas de fotos de paso. Todas las specs compararon idénticas contra el baseline previo.
+El inventario completo de comentarios mantuvo 30 discusiones y 59 comentarios; seis hilos resueltos y 24
+abiertos, sin alterar su estado.
+
+La revisión encontró ocho fragmentos fuera de lugar en tres piezas: keyword e intención duplicadas en Día de
+Muertos, keyword/intención/delimitación de cluster en Psicología del color y keyword/intención más una
+instrucción de control de capturas en App Color Berel. Se retiraron los duplicados del toggle editorial, la
+delimitación se trasladó al análisis y la instrucción se convirtió en una recomendación útil para quien usa la
+app. Fueron reemplazos pequeños, sin comentarios anclados en esos bloques. El readback final y el gate ampliado
+pasaron 11/11; no se modificaron estados, Drupal, Frame.io, tareas ni assets.
 
 ## Sincronización integral del Playbook y feedback — 2026-09-04
 
@@ -126,8 +175,9 @@ Se leyó completo el **Playbook Producción** (`last_edited_time` observado:
 - rama para productos nuevos o de awareness: diferenciador al frente, lectura simple y render oficial;
 - tono comercial moderado, `premium` limitado a la línea y `sin plomo` fuera del argumento de venta;
 - Kelvin normalizado, lenguaje literal es-MX, tablas con encabezados semánticos y CTA `/contacto`;
-- datos faltantes solo en pendientes internos; cinco familias de impermeabilización y Malla Kover como
-  complemento; pendientes de Kover Poliuretano, Malla Kover, rendimientos y primer lavado;
+- datos faltantes fuera del cuerpo y en pendientes trazables —evidencia visible o registro privado si es
+  sensible—; cinco familias de impermeabilización y Malla Kover como complemento; pendientes de Kover
+  Poliuretano, Malla Kover, rendimientos y primer lavado;
 - tagging obligatorio de productos aplicables y paridad entre tabla e imagen en Drupal;
 - corrección posterior a publicación registrada como pendiente CMS, no como publicación implícita.
 
@@ -152,9 +202,9 @@ la prohibición de rutas bloqueadas por `robots.txt` y el contrato vigente de 3.
    - 1:1 de 500 px para diseño;
    - sin texto/logo;
    - coherencia visual entre pasos.
-4. **Regla histórica, superada el 2026-09-07:** los banners del V1 viajaban completos dentro del híbrido.
-   La especificación completa ahora vive en la tarea visual; la lectura del cliente conserva solo el destino
-   editorial o el arte final.
+4. **Regla vigente, reafirmada el 2026-09-08:** los banners del V1 viajan completos dentro del híbrido, en
+   contexto, y su tarea visual conserva una copia literal. Los toggles de análisis/evidencia también permanecen
+   como hermanos; no se confunden con el tutorial ni con notas de agente.
 5. **Links del handoff CMS en ruta relativa** cuando corresponde; anchor siempre descriptivo.
 6. **La modalidad sigue determinándose por contenido vivo**, no por `Enlace` ni HTTP 200.
 7. **Instagram = Story**, decisión posterior del cliente; la mención antigua a post estático queda

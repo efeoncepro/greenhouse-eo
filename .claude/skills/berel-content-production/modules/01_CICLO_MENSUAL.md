@@ -27,23 +27,29 @@ La propiedad `Formato` decide **la estructura CMS**, no si la pieza es nueva o r
 
 ## 1 · Orden canónico dentro de la página del Content Hub
 
-La página compartida con Berel conserva historia y una sola zona activa de lectura. Los análisis, briefs,
-decisiones SEO, discrepancias, pendientes y handoff CMS se producen en una tarea/página privada de Efeonce;
-no se agregan como toggles al Content Hub del cliente.
+La página compartida con Berel conserva la evidencia del trabajo y una sola **zona editorial activa**. Los
+toggles de análisis, research y plan/brief son prueba obligatoria del proceso que fundamenta el artículo; se
+mantienen separados del toggle editorial y se redactan como evidencia profesional, no como conversación cruda
+del agente. Prompts, secretos, credenciales y operación sensible sí permanecen fuera del Content Hub.
 
 ### Modalidad A
 
 1. `🗂️ Histórico — Contenido anterior del artículo`, si existe.
-2. `✍️ Versión vigente para revisión`.
-3. Si `Formato = Tutorial`, el híbrido sustituye la zona activa; la versión previa pasa a `Histórico`.
+2. `🔎 Análisis SEO/AEO`, incluida la verificación fechada de la URL viva.
+3. `🧩 Análisis de contenido`.
+4. `✍️ Versión vigente para revisión`.
+5. Si `Formato = Tutorial`, el híbrido sustituye la zona editorial activa; la versión previa pasa a
+   `Histórico`, sin retirar los análisis.
 
 ### Modalidad B
 
-1. `✍️ Versión vigente para revisión`.
-2. Si `Formato = Tutorial`, el híbrido se convierte en esa única versión activa.
+1. `🧭 Plan editorial y SEO` o `📋 Brief SEO/AEO`, con research, fuentes, decisiones y limitaciones.
+2. `✍️ Versión vigente para revisión`.
+3. Si `Formato = Tutorial`, el híbrido se convierte en la única zona editorial activa; el plan permanece.
 
-El `🧭 Plan editorial y SEO` o `📋 Brief SEO/AEO` vive en el sistema privado. No duplicarlo si ya
-existe aguas arriba y nunca copiarlo a la página compartida como material de trabajo.
+Si el plan ya existe aguas arriba, sintetizarlo en el toggle de evidencia del artículo con enlaces a las
+fuentes, sin duplicar contenido sensible. El toggle demuestra qué se evaluó y decidió; no reproduce prompts,
+chain-of-thought, credenciales ni conversación entre agentes.
 
 ## 2 · Fase 1 — Identificar el lote
 
@@ -73,7 +79,8 @@ Regla central: todo hallazgo técnico se verifica contra HTML/URL viva y termina
 
 Al terminar la versión:
 
-- releer la página completa como cliente y ejecutar `client-visible-copy-gate.mjs` sobre un export fresco;
+- confirmar que los toggles de evidencia siguen presentes, releer como cliente el toggle editorial completo y
+  ejecutar `client-visible-copy-gate.mjs` sobre un export fresco;
 - mover Content Hub a `En revisión` solo si esos gates pasan;
 - si `Formato = Artículo`, continuar a producción visual;
 - si `Formato = Tutorial`, **todavía no crear la tarea de fotos de pasos**: primero producir el
@@ -87,7 +94,8 @@ Antes de idear:
 
 - buscar qué pidió el cliente en Teams;
 - buscar fichas/material oficial en SharePoint;
-- registrar literalmente el pedido y los assets pendientes en el sistema privado;
+- registrar el pedido, fuentes y assets pendientes en el toggle de plan/brief, con redacción profesional y
+  sin datos sensibles;
 - no declarar que algo “no existe” solo porque no apareció en un listado paginado.
 
 ### B2 · Decidir el ángulo
