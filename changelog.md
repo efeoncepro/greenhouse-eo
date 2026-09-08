@@ -10,27 +10,31 @@
 ## 2026-09-08 — GPT Image 2.5 entra a la doc como capacidad de proveedor, no como camino disponible
 
 OpenAI publicó `gpt-image-2.5-sunburst` y `gpt-image-2.5-flare`. La matriz de capacidades, la spec del
-generador visual, el doc operativo de la skill, el ledger de la flota Globe y las cuatro skills espejadas
-quedaron al día contra la doc oficial, no contra la prensa.
+generador visual, el doc operativo, el ledger de la flota Globe y cuatro skills espejadas quedaron al
+día contra la doc oficial, no contra la prensa.
 
-Lo que cambia el trabajo real, más allá de "hay modelo nuevo": OpenAI declara que **la calculadora de GPT Image
-2 no estima el consumo de 2.5** y que tarifas por token iguales no implican costo por imagen igual. Eso rompe
-la estimación previa al gasto — el compiler de Globe reserva créditos ANTES de generar, y con 2.5 esa reserva
-no tiene fuente documentada. Quedó registrado como bloqueador de integración, no como detalle de pricing.
-Tampoco hay Batch ni rate limits publicados, así que `gpt-image-2` no se retira: no está deprecado y sigue
-siendo lo correcto cuando hace falta cualquiera de esas tres cosas.
+Lo que cambia el trabajo real: OpenAI declara que **la calculadora de GPT Image 2 no estima el consumo
+de 2.5** y que tarifas por token iguales no implican costo por imagen igual. Eso rompe la estimación
+previa al gasto — el compiler de Globe reserva créditos ANTES de generar, y con 2.5 esa reserva no
+tiene fuente documentada. Quedó registrado como bloqueador de integración, no como detalle de pricing.
+Tampoco hay Batch ni rate limits publicados, así que `gpt-image-2` no se retira.
 
 Se documentaron dos trampas silenciosas del helper local, verificadas leyendo el código: por env var,
-`OPENAI_IMAGE_MODEL=gpt-image-2.5-*` no pasa el allowlist y cae a `gpt-image-2` sin avisar; por flag CLI,
-`--model` se castea sin validar, así que el modelo sí viaja pero la resolución se degrada a la rama legacy y se
-inyecta `input_fidelity` — parámetro que la guía de OpenAI excluye explícitamente de Sunburst y Flare. Ninguno
-de los dos caminos falla ruidosamente, que es justo por lo que había que escribirlos.
+`OPENAI_IMAGE_MODEL=gpt-image-2.5-*` no pasa el allowlist y cae a `gpt-image-2` sin avisar; por flag
+CLI, `--model` se castea sin validar, así que el modelo sí viaja pero la resolución se degrada a la
+rama legacy y se inyecta `input_fidelity`, que la guía de OpenAI excluye de Sunburst y Flare.
 
-También quedó por escrito lo que 2.5 **no** mejora, para que no entre a un brief: OpenAI no afirma mejora de
-tipografía ni de texto multilingüe, y las cuatro limitaciones declaradas (texto, consistencia de personaje,
-control de composición, latencia de 2 min) siguen vigentes. El system card mide una mejora de seguridad que
-**no alcanza significancia estadística** y una categoría, Abuse, que empeora respecto a Images 2.0: no es
-argumento comercial.
+Inventariando el dominio apareció un tercer defecto de la misma forma: `DEFAULT_IMAGE_PROVIDER` apunta
+a `imagen-4.0-generate-001`, que la arquitectura declara bloqueado. `TASK-1850` se creó y se supersedió
+el mismo día por `TASK-1851`, que toma el contrato entero: partirlo habría dejado el mismo archivo con
+dos dueños y el mismo invariante declarado en dos lugares. El hallazgo del auditor de flags —ciego a
+`ENABLE_ASSET_GENERATOR` porque su patrón exige sufijo `_ENABLED` y éste lleva prefijo `ENABLE_`— NO
+generó task: `TASK-1782` ya posee ese bug class y recibió un Delta. `TASK-278` recibió otro: sus
+entregables existen en el repo con 0 de 11 criterios tildados.
+
+También quedó por escrito lo que 2.5 NO mejora: OpenAI no afirma mejora de tipografía ni de texto
+multilingüe, las cuatro limitaciones declaradas siguen vigentes, y el system card mide una mejora de
+seguridad sin significancia estadística con Abuse peor que 2.0.
 
 ## 2026-09-08 — Efeonce Insights: arquitectura y programa multiformato
 

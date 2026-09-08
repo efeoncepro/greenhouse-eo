@@ -1,5 +1,21 @@
 # TASK-1782 — El auditor de flags no ve los flags que se leen por constante
 
+## Delta 2026-09-08
+
+Instancia nueva del **Eje 2**, con una forma que los ejemplos actuales no cubren: **prefijo**, no sufijo.
+`ENABLE_ASSET_GENERATOR` decide si `/api/internal/generate-image` responde en producción
+(`src/app/api/internal/generate-image/route.ts:30`) y es invisible para el detector, porque
+`FLAG_RE` exige que el nombre **termine** en `_ENABLED` y éste **empieza** con `ENABLE_`.
+
+Importa para el alcance de esta task: los ejemplos del Eje 2 hoy son todos variaciones de sufijo
+(`_ENFORCED`, `_DISABLED`, `_MODE`, `_DRY_RUN`). Un fix que sólo amplíe la lista de sufijos aceptados
+seguiría sin ver éste. Al definir la frontera entre **flag** y **knob**, considerar también la familia
+`ENABLE_*` / `DISABLE_*`.
+
+Detectado inventariando el dominio de generación de imágenes; la fila del ledger para ese flag la
+registra `TASK-1851`, que posee esa superficie. Esta task conserva el detector.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

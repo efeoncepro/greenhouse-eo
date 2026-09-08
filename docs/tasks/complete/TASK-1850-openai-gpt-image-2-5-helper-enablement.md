@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `complete`
 - Priority: `P2`
 - Impact: `Medio`
 - Effort: `Medio`
@@ -20,13 +20,30 @@
 - Flow: `none`
 - Motion: `none`
 - Backend impact: `integration`
-- Status real: `Diseno`
+- Status real: `Supersedida por TASK-1851 — cerrada sin ejecutar`
 - Rank: `TBD`
 - Domain: `platform`
 - Blocked by: `none`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: —
 - GitHub Issue: —
+
+## Delta 2026-09-08 — SUPERSEDIDA por TASK-1851
+
+**Cerrada sin ejecutar, por instrucción del operador.** No hubo cambio de código, canary ni gasto. El
+scope está absorbido por [`TASK-1851`](../to-do/TASK-1851-openai-image-provider-contract-consolidation.md),
+que toma el contrato de proveedores de imagen entero en vez de sólo la mitad OpenAI.
+
+Razón de la consolidación: al inventariar el dominio apareció un segundo defecto de la misma forma —el
+default de `generateImage()` apunta a `imagen-4.0-generate-001`, declarado bloqueado por la
+arquitectura— y partirlos habría dejado el mismo archivo compartido con dos dueños y el mismo invariante
+("ningún identificador desconocido degrada en silencio") declarado en dos lugares.
+
+Nada se perdió: los criterios de aceptación, la risk matrix y la medición de `usage` viven verbatim en
+TASK-1851, Slices 1, 2, 4 y 5.
+
+**Por qué los criterios de abajo siguen sin tildar:** porque no se ejecutaron. Tildarlos sería inventar
+evidencia. Los únicos ítems tildados son los del cierre documental, que sí ocurrió.
 
 ## Summary
 
@@ -393,6 +410,9 @@ mergear, no después.
 
 ## Acceptance Criteria
 
+> **Transferidos a `TASK-1851`. Ninguno se ejecutó acá.** Su versión viva y verificable está en esa task.
+
+
 - [ ] `isOpenAIImageModel('gpt-image-2.5-flare')` y `isOpenAIImageModel('gpt-image-2.5-sunburst')` devuelven `true`.
 - [ ] `getOpenAIImageModel({ OPENAI_IMAGE_MODEL: 'modelo-inexistente' })` **lanza** en vez de devolver `gpt-image-2`.
 - [ ] `pnpm ai:image --model modelo-inexistente` aborta antes de cualquier I/O con mensaje que nombra el valor recibido y los válidos.
@@ -420,13 +440,13 @@ mergear, no después.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
-- [ ] `TASK-1553` recibió un `## Delta` que nombra la evidencia de `usage` disponible y su path
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real — `complete` por supersesión, no por ejecución
+- [x] el archivo vive en la carpeta correcta (`complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado
+- [x] `changelog.md` quedo actualizado
+- [x] se ejecuto chequeo de impacto cruzado: `TASK-1782` posee la ceguera del auditor de flags, `TASK-278` está stale con sus entregables ya en el repo, `TASK-1553` conserva el carril Globe
+- [ ] `TASK-1553` recibió un `## Delta` — **transferido a TASK-1851**; no aplica acá porque no se produjo evidencia
 
 ## Follow-ups
 

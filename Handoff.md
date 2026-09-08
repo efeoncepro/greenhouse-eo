@@ -2,10 +2,13 @@
 
 EPIC-045: diseño.
 
-**GPT Image 2.5 (2026-09-08):** doc y skills al día; sólo documentación, cero código y cero llamadas al
-proveedor. Dos pendientes de decisión: el helper `src/lib/ai/openai-image.ts` no transporta 2.5 y falla en
-silencio por dos caminos, y 2.5 no tiene calculadora de costo por imagen (rompe la reserva previa de créditos
-de Globe). `gpt-image-2` NO está deprecado. Detalle y checklist:
+**GPT Image 2.5 + contrato de proveedores de imagen (2026-09-08):** doc y skills al día; sólo documentación,
+cero código y cero llamadas al proveedor. El trabajo quedó en
+[`TASK-1851`](docs/tasks/to-do/TASK-1851-openai-image-provider-contract-consolidation.md), que supersede a
+`TASK-1850` (cerrada sin ejecutar) y suma el segundo defecto de la misma forma: `DEFAULT_IMAGE_PROVIDER`
+apunta a `imagen-4.0-generate-001`, declarado bloqueado. Bloqueador que decide el diseño: 2.5 no tiene
+calculadora de costo por imagen, así que la reserva previa de créditos de Globe no tiene fuente. `gpt-image-2`
+NO está deprecado. Detalle:
 [matriz](docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md).
 
 **TASK-1844 (2026-09-08):** code complete, rollout pendiente. V2 actor/targets y consentimiento fresco
