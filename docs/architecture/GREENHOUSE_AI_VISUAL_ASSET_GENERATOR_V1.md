@@ -51,6 +51,7 @@ git add + commit → asset servido por Vercel CDN
 | Imágenes rasterizadas legacy | Imagen 4 | `imagen-4.0-generate-001` — **deprecated/bloqueado para trabajo nuevo** | PNG/WebP | Migrar a provider Gemini Image `generateContent`; no sustituir sólo el ID |
 | Imagenes rasterizadas opt-in | OpenAI GPT Image | `gpt-image-2` (configurable via `OPENAI_IMAGE_MODEL`) | PNG/WebP/JPEG | Assets de mayor fidelidad, composicion y adherencia a prompts |
 | Imagenes transparentes | OpenAI GPT Image | `gpt-image-2`, capacidad provider en preview | PNG/WebP con alfa | Helper/CLI locales conservan GPT Image 2 y rechazan JPEG; aceptar el asset exige QA de alfa |
+| GPT Image 2.5 (Sunburst/Flare) | OpenAI GPT Image | `gpt-image-2.5-sunburst` · `gpt-image-2.5-flare` — **provider-supported desde 2026-09-08, NO transportado por el helper** | — | Frontera del proveedor. El helper no la reconoce: ver la trampa silenciosa abajo antes de intentar usarla |
 | Animaciones SVG | Gemini | Resuelto via `resolveNexaModel()` | SVG con CSS keyframes | Loading spinners, iconos animados, empty states, micro-interacciones |
 | Produccion still hibrida out-of-band | Fal Seedream 5 Lite/Pro + OpenAI GPT Image 2 | Slugs verificados en el catalogo Fal y adapter OpenAI server-only | PNG/JPEG de trabajo; export gobernado posterior | Campanas multi-formato: exploracion/materialidad en Seedream, estructura/reparacion/adaptacion en GPT |
 
@@ -128,6 +129,29 @@ OpenAI documenta PNG/WebP transparente nativo en `gpt-image-2` como preview. El 
 rechaza `transparent + jpeg` antes de red y no usa `gpt-image-1.5` como fallback. La aceptación del asset verifica
 el canal alfa desde bytes decodificados. Matriz completa:
 `creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`.
+
+### Delta 2026-09-08 — GPT Image 2.5 es provider-supported, NO está transportado
+
+OpenAI publicó `gpt-image-2.5-sunburst` y `gpt-image-2.5-flare` (snapshots `…-2026-09-08`): calidad `xhigh`/`max`
+nuevas, transparencia con soporte pleno, hasta 16 referencias por edit, sin Batch y sin rate limits publicados.
+`gpt-image-2` **no** quedó deprecado y sigue siendo el único de la familia con Batch y con costo por imagen
+estimable antes de gastar — OpenAI declara explícitamente que la calculadora de GPT Image 2 **no** estima el
+consumo de 2.5.
+
+🔴 **`src/lib/ai/openai-image.ts` no conoce la familia 2.5 y falla en silencio de dos formas distintas:**
+
+1. **Por env var → degradación de modelo.** `OPENAI_IMAGE_MODEL=gpt-image-2.5-flare` no pasa el allowlist de
+   `getOpenAIImageModel()`, que devuelve el default `gpt-image-2` sin advertir.
+2. **Por flag CLI → degradación de resolución + parámetro fuera de contrato.** `--model gpt-image-2.5-flare`
+   se castea sin validar, así que el modelo viaja al API; pero `resolveOpenAIImageSize()` ramifica por
+   `model === 'gpt-image-2'` y manda 2.5 a la rama legacy (default por aspect ratio `2048x1152` → `1536x1024`;
+   `--size` moderno → `auto`), y `editOpenAIImage()` inyecta `input_fidelity`, que la guía de OpenAI excluye
+   explícitamente de Sunburst y Flare.
+
+**NUNCA** usar ninguno de los dos caminos para "probar 2.5". Habilitar la familia exige, en el mismo cambio:
+extender `OpenAIImageModel` y su allowlist, extender `OpenAIImageQuality` con `xhigh`/`max` gated a 2.5, mover
+2.5 a la rama moderna de `resolveOpenAIImageSize`, dejar de inyectar `input_fidelity`, y **un canary facturable
+con readback de `usage` real** — porque el costo por imagen de 2.5 no se puede estimar antes de gastarlo.
 
 ### `generateAnimation(prompt, options)`
 

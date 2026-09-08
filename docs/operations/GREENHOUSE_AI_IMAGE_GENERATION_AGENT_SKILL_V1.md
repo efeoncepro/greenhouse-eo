@@ -32,7 +32,20 @@ Facts operativos vigentes al 2026-06-01:
 - OpenAI expone dos carriles para imagenes: Image API para una generacion/edicion directa, y Responses API con `image_generation` para flujos conversacionales o multi-step.
 - Image API es la opcion preferida para un asset puntual desde un prompt o una edicion acotada.
 - Responses API es la opcion preferida para iterar sobre una imagen, usar contexto conversacional, o forzar `action: "generate" | "edit" | "auto"`.
-- `gpt-image-2` es el modelo OpenAI mas reciente documentado para generacion/edicion, con tamanos flexibles y buen seguimiento de instrucciones.
+- **Delta 2026-09-08 — la familia `gpt-image-2.5` (Sunburst y Flare) es la frontera del proveedor.** Trae los
+  niveles de calidad `xhigh` y `max` (antes el techo era `high`), transparencia con soporte pleno y hasta 16
+  referencias por edit. **No** soporta Batch, **no** publica rate limits y su costo por imagen **no es
+  estimable**: OpenAI declara que la calculadora de GPT Image 2 no aplica a 2.5 y que la única fuente es `usage`
+  de la respuesta real. **NUNCA enviar `input_fidelity` a un modelo 2.5** — la guía lo excluye explícitamente.
+  Contrato completo: `docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`.
+- 🔴 **La familia 2.5 NO está transportada por el helper Greenhouse.** `OPENAI_IMAGE_MODEL=gpt-image-2.5-*` cae
+  en silencio a `gpt-image-2`; `pnpm ai:image --model gpt-image-2.5-*` sí manda el modelo pero degrada la
+  resolución y agrega `input_fidelity`. No usar ninguno de los dos caminos hasta que el helper se actualice.
+- `gpt-image-2` **no** quedó deprecado: sigue siendo el reemplazo recomendado en la tabla de deprecations, es el
+  único de la familia con Batch y con costo por imagen estimable antes de gastar, y hoy es lo único que el
+  helper Greenhouse transporta de verdad.
+- `gpt-image-1` se apaga el **2026-10-23**; `gpt-image-1.5`, `gpt-image-1-mini` y `chatgpt-image-latest` el
+  **2026-12-01**. No rutear trabajo nuevo a ninguno.
 - `gpt-image-2` soporta `background: "transparent"` en preview con PNG o WebP. El helper local conserva la
   identidad pedida, rechaza JPEG transparente antes de red y nunca cambia silenciosamente a `gpt-image-1.5`.
 - Transparencia solo es compatible con formatos que soportan alpha, principalmente `png` y `webp`.
@@ -40,6 +53,14 @@ Facts operativos vigentes al 2026-06-01:
 - GPT Image puede tardar hasta unos minutos con prompts complejos. No marcar fallo prematuro si el helper tiene timeout largo y progreso claro.
 - La generacion puede fallar por filtros de seguridad/moderacion. Reescribir el prompt hacia el resultado visual permitido, no intentar bypassear.
 - Las imagenes de entrada cuentan como tokens/costo. En `gpt-image-2`, las referencias se procesan en alta fidelidad automaticamente, asi que editar con muchas referencias puede costar mas.
+- **Limitaciones que 2.5 NO cerro** (siguen vigentes en la doc de OpenAI): el modelo "can still struggle with
+  precise text placement and clarity"; puede fallar la consistencia visual de personajes o elementos de marca
+  recurrentes; y tiene dificultad para ubicar elementos con precision en composiciones sensibles al layout.
+  Un entregable con texto pequeno, sistema de personaje o jerarquia fija **sigue exigiendo QA humano por pieza**.
+- **OpenAI no afirma mejora de tipografia ni de texto multilingue en 2.5.** No prometerlo en un brief.
+- **Provenance:** las imagenes de 2.5 salen con C2PA Content Credentials + SynthID. El C2PA **se puede perder**
+  al convertir o recomprimir el archivo; verificar en `openai.com/verify` antes de prometerle a un cliente que
+  el entregable final llega firmado.
 - Para edicion con mascara, la mascara guia al modelo pero no garantiza una geometria exacta pixel-perfect.
 - Las keys de API son secreto de servidor. Nunca escribir `sk-*` en codigo, docs, logs, tests, prompts commiteados ni env examples con valor real.
 
@@ -47,6 +68,9 @@ Facts operativos vigentes al 2026-06-01:
 
 | Necesidad | Carril canonico | Opciones |
 |---|---|---|
+| Edicion de precision o pieza final de campana (fuera de banda) | `gpt-image-2.5-sunburst` por Image API | OpenAI lo posiciona para "workflows where editing precision matters most"; el helper aun no lo transporta |
+| Generacion cotidiana / volumen / social (fuera de banda) | `gpt-image-2.5-flare` por Image API | "default choice for most applications"; el helper aun no lo transporta |
+| Batch, presupuesto por imagen estimable, o rate limits conocidos | `gpt-image-2` | 2.5 no tiene Batch, ni calculadora de costo, ni rate limits publicados |
 | Icono raster, sticker, elemento UI aislado | GPT Image 2 por Image API | `format: "png"`, `background: "transparent"`, `quality: "high"`; el helper conserva GPT Image 2 y falla cerrado para JPEG |
 | Lote de PNG transparentes | GPT Image 2 por Image API | Usar nombres deterministas, validar alfa real y controlar costo con lotes pequeños |
 | Banner, hero, thumbnail, empty state ilustrado | `generateImage()` | OpenAI para fidelidad/composicion, Imagen para continuidad con assets existentes |

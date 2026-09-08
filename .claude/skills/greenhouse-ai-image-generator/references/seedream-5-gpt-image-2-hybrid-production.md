@@ -98,6 +98,15 @@ Fuentes:
 
 ### GPT Image 2
 
+> **Delta 2026-09-08 — existe GPT Image 2.5.** OpenAI publicó `gpt-image-2.5-sunburst` y `gpt-image-2.5-flare`.
+> Para el tramo GPT de una campaña nueva, la elección por defecto pasa a **Flare** (rápido, cotidiano) y
+> **Sunburst** (precisión de edición, pieza final). `gpt-image-2` **no** quedó deprecado y sigue siendo la
+> elección correcta cuando el flujo necesita **Batch** o **costo por imagen estimable antes de gastar** — 2.5 no
+> tiene ninguno de los dos, y OpenAI declara que su costo por imagen sólo se conoce midiendo `usage` real.
+> Dos reglas duras para 2.5: **nunca enviar `input_fidelity`** (la guía lo excluye de Sunburst/Flare) y **nunca
+> presupuestar una campaña con una tabla de costo por imagen**. Contrato completo y trampas del helper local:
+> `docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`.
+
 Modelo y APIs:
 
 - Modelo: `gpt-image-2`; snapshot publicado `gpt-image-2-2026-04-21`.
@@ -108,7 +117,8 @@ Hechos operativos:
 
 - `quality`: `low | medium | high | auto`.
 - Ambos ejes deben ser múltiplos de 16; lado máximo 3840; ratio máximo 3:1; área entre 655.360 y 8.294.400 píxeles.
-- Outputs sobre 3.686.400 píxeles se documentan como experimentales.
+- Outputs sobre 3.686.400 píxeles se documentan como experimentales. **Delta 2026-09-08:** la guía vigente
+  fija ese borde experimental en `2560x1440`, no en 3.686.400 píxeles.
 - Formatos: PNG, JPEG y WebP. GPT Image 2 admite `background: transparent` en preview con PNG o WebP; JPEG no
   preserva alfa. La capacidad oficial no demuestra que el helper local ni Globe la transporten.
 - Todas las referencias se procesan a alta fidelidad; no enviar `input_fidelity` para este modelo.
