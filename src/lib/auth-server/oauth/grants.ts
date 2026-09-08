@@ -10,7 +10,7 @@
 import { resolveExternalAccess } from '@/lib/identity/external-access'
 
 export type GrantsVersionResolution =
-  | { bound: true; grantsVersion: number; profileId: string | null; memberships: number }
+  | { bound: true; grantsVersion: number; profileId: string | null; memberships: number; authorizationContextVersion?: 1 | 2 }
   | { bound: false; outcome: string; profileId: string | null }
 
 export interface GrantsVersionPort {

@@ -1,5 +1,13 @@
 # TASK-1841 — Efeonce ID First Consented Customer Pilot
 
+## Delta 2026-09-07 — la sesión puede reutilizarse; el consentimiento MCP no
+
+El ADR `docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md` aclara el recorrido del
+piloto. Si la persona ya tiene una sesión Efeonce ID con assurance suficiente, puede no volver a ver el login; eso
+no autoriza al cliente MCP. La aplicación externa sigue mostrando y registrando consentimiento por `client_id` y
+scope, y cualquier scope de escritura futuro conserva step-up. Este piloto continúa limitado a una capability
+read-only y no usa la entrada first-party de Greenhouse como evidencia de autorización MCP.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -48,7 +56,8 @@ operativa explícita: sólo comienza con readiness técnica y security assurance
 - Invitar a un administrador real con información previa, consentimiento y canal de soporte; nunca pedirle
   ejecutar una matriz técnica ni compartir códigos, tokens, capturas sensibles o logs.
 - Otorgar una sola capability read-only existente, ligada a su organización y útil para el piloto.
-- Verificar login, consentimiento, lectura propia, aislamiento y revocación mediante observación de Efeonce.
+- Verificar sesión/login cuando corresponda, consentimiento MCP, lectura propia, aislamiento y revocación mediante
+  observación de Efeonce.
 - Completar 7 días de señales estables y una revisión conjunta antes de proponer segunda organización/capability.
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -63,6 +72,7 @@ operativa explícita: sólo comienza con readiness técnica y security assurance
 Revisar y respetar:
 
 - `docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`
+- `docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md`
 - `docs/architecture/EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`
 - `docs/architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md`
 - `docs/architecture/GREENHOUSE_ACCOUNT_COMPLETE_360_V1.md`
@@ -78,6 +88,8 @@ Reglas obligatorias:
 - Una capability read-only, sin writes, gasto, administración amplia ni datos de otras organizaciones.
 - Identidad, Person 360, Account 360, binding, grants y entitlements siguen siendo fuentes separadas y
   canónicas; autenticarse no concede permisos.
+- Una sesión Efeonce ID previa puede omitir autenticación, nunca el consentimiento del cliente MCP nuevo. Cambiar
+  `client_id`, redirect o scopes exige la policy de consentimiento vigente; escritura además exige step-up.
 - Evidencia redactada: nunca tokens, códigos, cookies, secretos, correo completo o datos cliente en repo/logs.
 
 ## Normative Docs
@@ -304,7 +316,8 @@ Reglas obligatorias:
 - [ ] Organización existente `client|both` + `active_client` elegida explícitamente; no se creó/reclasificó para el piloto.
 - [ ] Organización y administrador aceptaron alcance, datos, duración, soporte, revocación y privacidad.
 - [ ] Una sola capability read-only fue otorgada por command auditado; no existen writes ni grants implícitos.
-- [ ] Invitación, login y consentimiento se completaron sin transportar ni registrar secretos.
+- [ ] Invitación, sesión/login cuando corresponda y consentimiento MCP se completaron sin transportar ni registrar
+      secretos; si el login se omite por sesión suficiente, existe evidencia de que el consentimiento no se omitió.
 - [ ] Cliente accede sólo a su organización; contexto ajeno e internal-only permanecen denegados.
 - [ ] Revocación/rollback fue probado antes de la invitación y queda ejecutable en < 5 min durante el piloto.
 - [ ] Siete días de señales y readbacks diarios no muestran acceso huérfano, revocado o cross-tenant.

@@ -24,7 +24,7 @@
 - Status real: `Diseño; sin implementación ni runtime verificado en esta task`
 - Rank: `12`
 - Domain: `hr|payroll|platform`
-- Blocked by: `TASK-1816, TASK-1817, TASK-1818, TASK-1819, TASK-1820, TASK-1821, TASK-1822, TASK-1823, TASK-1824, TASK-1825, TASK-1826, TASK-1813`
+- Blocked by: `TASK-1816, TASK-1817, TASK-1818, TASK-1819, TASK-1820, TASK-1821, TASK-1822, TASK-1823, TASK-1824, TASK-1825, TASK-1826`
 - Branch: `Greenhouse develop; checkout compartido actual; sin worktrees ni cambio de branch automático`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -81,7 +81,7 @@ Las referencias al baseline son evidencia fechada; revalidar código/runtime al 
 
 ### Depends on
 
-- TASK-1816, TASK-1817, TASK-1818, TASK-1819, TASK-1820, TASK-1821, TASK-1822, TASK-1823, TASK-1824, TASK-1825, TASK-1826, TASK-1813. Integrar sólo contratos ya entregados y verificados; diseño/mocks no cierran dependencia de runtime.
+- TASK-1816, TASK-1817, TASK-1818, TASK-1819, TASK-1820, TASK-1821, TASK-1822, TASK-1823, TASK-1824, TASK-1825 y TASK-1826. TASK-1813 ya entregó la interoperabilidad OAuth y deja de bloquear esta unidad. Integrar sólo contratos ya entregados y verificados; diseño/mocks no cierran dependencia de runtime.
 - Identidad/grants TASK-1631 y recurso TASK-658 cuando corresponda; OAuth TASK-1813 no se duplica aquí.
 
 ### Blocks / Impacts

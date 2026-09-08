@@ -1,5 +1,14 @@
 # TASK-1831 — Efeonce MCP Gateway Multi-Issuer Authorization Context
 
+## Delta 2026-09-07 — Efeonce ID SSO no es autorización MCP
+
+El ADR `docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md` confirma que una sesión
+Efeonce ID puede evitar repetir autenticación humana, pero no transfiere autorización entre relying parties. El
+gateway conserva exactamente su frontera: sólo acepta access tokens destinados al resource MCP, con cliente,
+audiencia, scopes consentidos, contexto, grants y step-up aplicables. Un `id_token` con audiencia Greenhouse, una
+cookie de producto o la clasificación `first_party_sign_in` no llegan al gateway ni satisfacen ninguna tool. Este
+delta amplía conformance/negativos; no cambia el estado runtime declarado.
+
 Mapa de construcción, pruebas y límites: [auditoría consolidada TASK-1836/1831](../../audits/2026-09-06-task-1836-1831-consolidated-evidence.md).
 
 
@@ -13,11 +22,21 @@ se restauraron en 79 s. Piloto gv5, vencimiento original 2026-09-12T15:00Z; prue
 
 La evidencia y el release PR225/main08acfb2c6 están en
 [el runbook compartido](../../operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
-El arreglo directo de `/login` (21aa12608, auth rev30) ya está servido; PR226 y el retorno humano
-directo siguen pendientes. Esa UI no modifica el contrato de autorización del gateway.
+El arreglo directo de `/login` (21aa12608, auth rev30) ya está servido y quedó promovido a `main`
+`456d9accf` por PR226 el 2026-09-06; el retorno humano directo sigue pendiente. Esa UI no modifica el contrato de autorización del gateway.
 Los snapshots siguientes son historia: `access_tokens=0`, flag emisor OFF y ausencia de auditoría
 del piloto dejaron de ser bloqueos vigentes tras canaries, migración y reconciliación canónica.
-La matriz externa/multicontexto y el canary Entra completo no se declaran aprobados por inferencia.
+TASK-1832 completó después la matriz técnica externa sintética —incluidos el deny de scope superior y de tool
+internal-only— sin ampliar grants. Eso no acredita todavía la matriz multicontexto ni una repetición Entra
+completa, que permanecen separadas.
+
+Follow-up 2026-09-07: Codex corporativo autenticó `jreyes@efeoncepro.com` y completó consentimiento para `Efeonce`
+como único contexto visible. PG registra el consentimiento activo y un code interno no consumido que ya expiró;
+no hubo access/refresh token ni tráfico nuevo al gateway. El multi-issuer original de esta task ya está
+implementado y desplegado; no se reabre. `TASK-1844` posee el nuevo delta de una conexión interna que opera varias
+organizaciones por objetivo explícito, usando esta task como foundation. Mantiene el contexto como ancla del actor,
+exige que el reader machine-only de Greenhouse autorice `contexto + capability + organización` en cada llamada y
+prohíbe scope OAuth más amplio, wildcard/lista en JWT o agregación implícita de memberships.
 
 ## Snapshot histórico 2026-09-05 17:01 UTC — anterior al canary autenticado
 
@@ -139,7 +158,7 @@ El slice interno nativo depende del contrato de TASK-1836 (U11). La policy actua
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Gateway multi-issuer desplegado y canary interno autenticado verificado, revisión36-5wc SHA815df9b, flags nativo/interno ON. TASK-1836 prueba token, lectura propia, rechazo ajeno, refresh, retiro de grant ≤11 s, revocación OAuth 6.633 s y rollback de flags medido. Release PR225 certificado. Ya no aplica access_tokens=0 ni emisor OFF. Pendientes: matriz externa/multicontexto, discovery/challenges por cliente real y nueva comprobación Entra completa; providers sin delegación compatible siguen denegados.`
+- Status real: `Gateway multi-issuer desplegado. TASK-1836 verificó el carril interno: token, lectura propia, rechazo ajeno, refresh, retiro de grant ≤11 s, revocación OAuth 6.633 s y rollback de flags. TASK-1832 verificó el carril externo sintético en producción con helper, Playwright, Codex, ChatGPT, Claude Code 2.1.263, Claude.ai y Claude Desktop 1.46388.4; scope superior y tool internal-only quedaron denegados, siempre base-only. Esto no acredita un cliente real. El nuevo requisito de una conexión interna con autoridad multiorganización pertenece a TASK-1844 y no reabre este multi-issuer. Aquí permanecen roles sin scopes/Entra equivalente, repetición Entra completa y los casos originales de concurrencia/revocación remota. Las revisiones y SHA mutables se leen del runtime; readback post-TASK-1813: gateway 1.2.0/00047-8b5 Ready/100 %, SHA cd229069.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration`
 - Blocked by: `none`
@@ -188,6 +207,7 @@ Revisar y respetar:
 
 - `docs/architecture/EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md` (§Slice 0 gateway authorization-context contract)
 - `docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`
+- `docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md`
 - `docs/architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md`
 - `docs/architecture/agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md`
 - `docs/architecture/EFEONCE_MCP_AGENT_SKILL_ROUTER_V1.md`
@@ -199,6 +219,8 @@ Reglas obligatorias:
 - NUNCA `clientId = azp ?? sub`; NUNCA fusionar `roles` en scopes.
 - NUNCA despachar una tool sin `allowedIssuers` declarado; un registro sin el campo falla el arranque.
 - El scope de escritura NUNCA se cablea al cliente público compartido (regla TASK-1308).
+- El fast path o la omisión de consentimiento de un RP first-party no se heredan en MCP: cada cliente MCP conserva
+  consentimiento por cliente/scope y step-up; el gateway rechaza tokens con otra audiencia aunque compartan `sub`.
 - Skills: `efeonce-mcp-platform` + `mcp-craft`; leer `../efeonce-mcp/AGENTS.md` antes de editar.
 
 ## Normative Docs
@@ -206,7 +228,7 @@ Reglas obligatorias:
 - `../efeonce-mcp/AGENTS.md`
 - `docs/operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md`
 - `docs/tasks/in-progress/TASK-1626-efeonce-mcp-platform-gateway.md`
-- `docs/tasks/to-do/TASK-1813-efeonce-mcp-oauth-client-interoperability.md` (carril interno paralelo)
+- `docs/tasks/complete/TASK-1813-efeonce-mcp-oauth-client-interoperability.md` (carril interno paralelo cerrado)
 
 ## Dependencies & Impact
 
@@ -418,6 +440,9 @@ Reglas obligatorias:
 - [x] Test (c): grant revocado con token vigente → deny por `grants_version` en ≤60 s. Canary interno TASK-1836: retiro selectivo del grant ≤11 s, restituido con vencimiento original; ver runbook.
 - [ ] El canary interno `globe.producer.fleet.list` con Entra no cambia de comportamiento.
 - [ ] Persona externa resuelta sólo por `(issuer, subject)` vía registry; ninguna búsqueda por `client_id` ni email.
+- [ ] Un `id_token` first-party con `aud=Greenhouse`, un access token de producto y un token MCP emitido para otro
+      `client_id`/audiencia quedan denegados antes del dispatch; tener sesión Efeonce ID no sustituye el
+      consentimiento MCP ni el step-up exigible.
 
 ## Verification
 
@@ -500,3 +525,10 @@ y lo transmite al reader existente, que verifica ledger OAuth y dimensiones. No 
 cache positiva. Revocar familia/consent debe denegar dispatch, además de refresh, sin invalidar otra
 familia que comparte contexto. Pruebas HTTP locales verifican deny antes del provider; el canary real
 sigue pendiente y ambos flags se conservan OFF durante el despliegue de compatibilidad.
+
+## Delta local TASK-1844 — 2026-09-08
+
+TASK-1844 implementa autoridad interna v2 por target y consentimiento nuevo, detrás de gates OFF.
+Esta task conserva su entrega uniorganización original. El delta no reabre TASK-1813 ni amplía el canary
+TASK-1832 o el piloto TASK-1841. [QA local](../../audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md) ·
+[rollout y clientes pendientes](../../operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md).

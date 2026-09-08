@@ -1,5 +1,15 @@
 # TASK-1829 — Efeonce Auth Server OAuth Protocol Surface (metadata, CIMD, tokens, consent)
 
+## Delta 2026-09-07 — frontera first-party vs autorización delegada
+
+El contrato transversal queda gobernado por
+`docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md`. Esta task conserva como default el
+consentimiento por `(subject, client, scope)` para MCP y terceros, incluido step-up cuando la autoridad lo exige.
+La omisión de consentimiento sólo puede aplicarse a un RP first-party registrado con clasificación server-owned;
+nunca se activa por query string, nombre, redirect o elección del browser. El perfil OIDC de producto, su `id_token`
+y el entry directo se materializan desde `TASK-1834` como primer consumer; este delta no declara esa extensión
+implementada ni cambia el rollout pendiente de esta task.
+
 ## Delta 2026-09-04 — recalibración de baseline pre-ejecución (sesión greenhouse-eo-45)
 
 - **Tablas: 5 → 7.** Los invariantes «el segundo uso de un code revoca los tokens del primero» y «un token revocado
@@ -108,7 +118,8 @@ ese emisor.
   rotativo con detección de reuso, revocación de token y de familia, introspección para consumidores que no
   verifican JWT.
 - Consentimiento: tabla `greenhouse_auth.client_consents` por `(subject, client_id, scope)`, requerido para
-  cada cliente nuevo; commands `grantClientConsent`/`revokeClientConsent` idempotentes y auditados.
+  cada cliente MCP/tercero nuevo; commands `grantClientConsent`/`revokeClientConsent` idempotentes y auditados.
+  La clase first-party es una excepción tipada y registrada, no un parámetro de la solicitud.
 - El broker legacy en el portal queda como consumidor interno hasta su retiro (feature flag).
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -120,6 +131,7 @@ ese emisor.
 Revisar y respetar:
 
 - `docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`
+- `docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md`
 - `docs/architecture/EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md` (§gateway authorization-context contract)
 - `docs/architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md` (§Delta 2026-09-02)
 - `docs/architecture/GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`
@@ -133,6 +145,8 @@ Reglas obligatorias:
 - Loopback: `http://127.0.0.1:<any>` y `http://[::1]:<any>` sólo para clientes públicos; `localhost` por
   nombre rechazado; HTTPS exacto para clientes hospedados.
 - Un scope de escritura NUNCA se concede sin consentimiento explícito por cliente y step-up (`TASK-1830`).
+- Una sesión Efeonce ID previa puede ahorrar autenticación, pero nunca concede consentimiento a un cliente MCP o
+  tercero ni permite aceptar un `id_token` first-party como access token MCP.
 - Códigos de autorización de un solo uso bajo `SELECT FOR UPDATE`; reuso de refresh revoca la familia.
 - NUNCA loggear tokens, códigos, `code_verifier` ni cuerpos crudos.
 
@@ -291,9 +305,11 @@ Reglas obligatorias:
 
 - Access JWT ES256 vía `signWithActiveKey`/`signCompactJws` de `src/lib/auth-server/keys/` (KMS, ya entregados por `TASK-1828`); refresh rotativo; `revoke`; `introspect`; `gv` desde `TASK-1631`.
 
-### Slice 4 — Consentimiento
+### Slice 4 — Consentimiento delegado
 
-- `client_consents` + commands + capability + check en `authorize`; contrato para la pantalla de consentimiento (task ui-ux).
+- `client_consents` + commands + capability + check en `authorize` para MCP/terceros; contrato para la pantalla de
+  consentimiento (task ui-ux). La excepción first-party queda fuera del default y sólo entra por clasificación
+  server-owned conforme al ADR.
 
 ## Out of Scope
 
@@ -365,7 +381,8 @@ Reglas obligatorias:
 - [x] `code_challenge_method=plain`, redirect `http://localhost` por nombre y redirect HTTPS no exacto son rechazados. — `plain` → `invalid_request`; HTTPS no exacto → página 400; `localhost` por nombre rechazado para clientes **confidenciales/hospedados** (`registerConfidentialClient` → `invalid_redirect_uri`). **Delta de decisión 2026-09-04:** para clientes **públicos** `localhost` se acepta como alias de loopback (Claude Code lo usa), documentado en el contrato §3.
 - [x] Reuso de código y reuso de refresh revocan los tokens/familia y emiten señal. — tests «code reuse revokes…» y «reuse revokes the family»; audit `code_reuse`/`refresh_reuse` → señales `auth.oauth.*_reuse_detected`.
 - [x] `revoke` e `introspect` funcionan; un token revocado introspecta `active: false`. — test «revoke + introspect…».
-- [x] Ningún token se emite sin fila `client_consents` active; el test negativo existe. — test «never issues a token without an active consent row…» (code manual sin consent → `invalid_grant`).
+- [x] Ningún access token MCP/delegado se emite sin fila `client_consents` active; el test negativo existe. — test
+  «never issues a token without an active consent row…» (code manual sin consent → `invalid_grant`).
 - [x] La suite de `src/lib/sister-platforms` sigue verde y el canary de Globe OAuth no cambia. — 117/117 tras la extracción (Slice 1); **el canary de Globe Producer no se ejecutó** (Globe hibernado; `oauth-broker.ts` sólo cambió helpers puros con wrappers equivalentes).
 - [x] Contrato `EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md` publicado con claims y endpoints.
 

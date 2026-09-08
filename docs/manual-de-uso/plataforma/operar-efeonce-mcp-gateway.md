@@ -5,9 +5,17 @@
 > **Documentación funcional:** [Efeonce MCP Gateway](../../documentation/plataforma/efeonce-mcp-gateway.md)
 > **Runbook técnico:** [Efeonce MCP Platform Runbook](../../operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md)
 
+> **Compatibilidad externa 2026-09-07:** Codex, ChatGPT, Claude Code `2.1.263`, Claude.ai y Claude Desktop están
+> certificados con el canary sintético. Sigue la
+> [matriz/runbook externo](../../operations/runbooks/mcp-external-canary-certification.md); no uses una conexión
+> visible como sustituto de login, dispatch, refresh y revoke.
+> `efeonce-mcp` `1.2.0` sirve 100 % Ready en `00047-8b5`: discovery nativo/base-only y shim retirado. El rollback
+> `00047→00046→00047` y la matriz post-cutover completa quedaron verificados sin ampliar permisos.
+
 ## Antes de probar
 
-Confirma que el cliente OAuth usa el resource `https://mcp.efeonce.org/mcp` y un emisor admitido.
+Confirma que el cliente OAuth usa el resource `https://mcp.efeonce.org/mcp`. Las conexiones nuevas deben
+descubrir Efeonce ID; Entra queda sólo para sesiones legacy ya gobernadas.
 El piloto nativo requiere enrollment y grants personales vigentes; pertenecer al tenant no basta. No copies tokens en archivos, capturas ni tickets.
 
 El cliente compatible con Streamable HTTP debe usar el endpoint canónico y obtener su token mediante OAuth PKCE.
@@ -16,21 +24,24 @@ No uses la URL `run.app`: el acceso público pasa por el front door y el hostnam
 ## Verificación operativa
 
 1. Abre `https://mcp.efeonce.org/health`: debe devolver estado saludable y confirmar OAuth configurado.
-2. Consulta `https://mcp.efeonce.org/.well-known/oauth-protected-resource`: debe declarar el resource y los
-   scopes soportados.
-3. Con un cliente OAuth autorizado, ejecuta `initialize`.
+2. Consulta `https://mcp.efeonce.org/.well-known/oauth-protected-resource` y la variante `/mcp`. Desde `1.2.0`
+   deben ser equivalentes, declarar sólo `https://auth.efeonce.org` y `efeonce.mcp.read`. Las rutas
+   `/.well-known/oauth-authorization-server` y `/register` del gateway deben responder `404`.
+3. Con un cliente OAuth autorizado, ejecuta el handshake que soporte su versión y relee `tools/list` serializado.
 4. Ejecuta `globe.capabilities.list` y luego `globe.producer.fleet.list` sin argumentos.
 5. Confirma que la respuesta contiene rutas, disponibilidad y correlation ID, pero no house, provider slug,
    costo de vendor ni margen.
 6. Para el provider Greenhouse-SEO, sigue su manual dedicado:
-   [Operar el provider Greenhouse-SEO del MCP](operar-provider-greenhouse-seo-mcp.md). Sus tools de lectura viven en el permiso base `efeonce.mcp.read` y las 7 de escritura bajo `efeonce.mcp.seo.write`; el permiso base, se verifican con dos canaries distintos y tienen su propio interruptor de rollback.
+   [Operar el provider Greenhouse-SEO del MCP](operar-provider-greenhouse-seo-mcp.md). Sus tools de lectura viven
+   en el permiso base `efeonce.mcp.read` y las siete de escritura bajo `efeonce.mcp.seo.write`; se verifican con
+   canaries distintos y tienen su propio interruptor de rollback.
 7. Ejecuta `get_greenhouse_skill` sin argumentos: debe devolver el catálogo de manuales de uso (seis al 2026-09-02,
    la cuenta exacta la fija `src/mcp/greenhouse/skill-manifest.ts` en Greenhouse). Con `{ "name": "seo-spend-discipline" }`
    debe volver el manual completo como texto, empezando por su frontmatter. Un catálogo vacío con la revisión
    correcta desplegada significa que el binding no es `internal` o que el provider está apagado — nunca "no hay manuales".
-8. Cuenta `tools/list`: **39 tools al 2026-09-06** (28 del provider SEO + `get_greenhouse_skill` + las 2 de
-   identidad delegada + las nativas de gateway, Globe y Hiring), revisión activa `efeonce-mcp-gateway-00039-gz4`.
-   La cifra se lee del server, no de este texto; si difiere, compara contra `surface-baseline.json` de
+8. Cuenta `tools/list` y compáralo con `surface-baseline.json`; el snapshot del 2026-09-06 tenía 39 tools, pero
+   la cifra y revisión vigentes se leen del servidor, no de este texto. Si difiere, compara además contra
+   `surface-baseline.json` de
    `efeonce-mcp` **y** contra el manifiesto de Greenhouse antes de declarar drift: son dos fuentes distintas y las
    tools propias del gateway (identidad delegada, `get_seo_provider_spend`) sólo salen en la primera.
 9. Verifica que lo desplegado sea lo mergeado. **El gateway no se despliega en push a `main`**: su workflow es
@@ -48,17 +59,21 @@ cierres la sesión compartida del perfil.
 
 ## Operación segura
 
-- La capacidad actual es lectura interna más 7 escrituras federadas y fail-closed por scope. No habilites tools de runs, assets, review, delivery, créditos o writes
+- La superficie federada incluye siete escrituras SEO, además de las escrituras de Globe e identidad; la vista
+  efectiva de cada cliente depende de issuer, scope, population, grant y flags. No habilites tools de runs, assets, review, delivery, créditos o writes
   como parte de una prueba de acceso.
 - Los providers `greenhouse-skills` (manuales de uso, `get_greenhouse_skill`) y `greenhouse-identity` (invitaciones
   delegadas, `identity.invitations.list` / `identity.invitation.create`) **no tienen interruptor propio**: se
   prenden y se apagan con `GREENHOUSE_SEO_PROVIDER_ENABLED`, porque son la misma lane ecosystem y la misma
   identidad de servicio. Apagar el SEO apaga también los manuales y la identidad delegada, y eso es lo esperado —
   pero tenlo presente antes de usar ese interruptor como rollback "sólo de SEO".
-- Mantén Cloud Run en `concurrency=80` y `maxScale=5` mientras no haya una decisión explícita de capacidad.
+- Mantén `concurrency=80`; resuelve `maxScale` en Cloud Run antes de operar (snapshot 2026-09-07: `20`) y no lo
+  cambies sin una decisión explícita de capacidad.
 - Ante una falla de un provider, conserva OAuth y el gateway; deshabilita sólo ese provider y redespliega
   siguiendo el runbook (`GLOBE_PROVIDER_ENABLED=false` o `GREENHOUSE_SEO_PROVIDER_ENABLED=false`, según el caso).
   El rollback de revisión no se sustituye con acceso anónimo.
+- Ante una regresión de discovery `1.2.0`, restaura 100 % del tráfico a la revisión capturada antes del deploy.
+  No agregues `OAUTH_PUBLIC_CLIENT_ID`: el código nuevo la ignora y reintroducir el shim exige otra decisión.
 - Los secretos del gateway van todos en la **misma** bandera `--set-secrets` del `deploy.yml`: esa bandera es
   destructiva y reemplaza el conjunto completo. Un secreto aplicado fuera del workflow desaparece en el próximo
   deploy, en silencio.
@@ -71,15 +86,15 @@ El entitlement por tenant/capability YA existe: el grant revocable por organizac
 `greenhouse_core.external_capability_grants` (TASK-1631, 2026-09-04) y se opera con el manual
 `docs/manual-de-uso/identity/operar-binding-identidad-externa.md` (environment → binding de la organización →
 grants → invitación → persona ligada por `subject`); el gateway lo consulta por
-`GET /api/platform/ecosystem/identity/binding`. El emisor propio y el gateway multi-issuer ya están construidos y el piloto interno verificado; falta
-la matriz externa real, incluida una persona base-only denegada para Globe. No entregues acceso general
-a clientes dando por acreditada esa separación con un canary interno. Al cliente interno actual se le entregan
-hoy el scope base y el de lectura de Globe incluso si solicita sólo el base; por eso no prueba esa separación.
+`GET /api/platform/ecosystem/identity/binding`. El emisor propio y el gateway multi-issuer están construidos; el
+canary sintético externo completó la matriz técnica base-only y confirmó que las tools fuera de su authority no
+cruzan. No entregues acceso general a clientes: la primera organización consentida tiene su task, grant y
+observación propios.
 
-Cuando revises los scopes soportados en el paso 2 de la verificación, ten presente que el gateway declara tres, no
-dos: el base, el de lectura de Globe y el de escritura interna de fondeo de créditos, que aparece sólo cuando su
-flag está encendido. Ese tercero se autoriza por separado y no queda demostrado por la entrega conjunta de los dos
-primeros; no lo uses como evidencia de nada.
+Cuando revises scopes, el PRM de `1.2.0` tiene una cifra deliberadamente fija: sólo `efeonce.mcp.read`. Los scopes
+de dominio o escritura aparecen de forma incremental en el challenge `403` de una tool y nunca se infieren por
+estar habilitados en el servidor. En modo legacy-only, el challenge los cualifica para Entra; con Efeonce ID son
+bare. Ninguna de esas formas sustituye capabilities, grants o autoridad downstream.
 
 
 ## Verificar el carril corporativo nativo

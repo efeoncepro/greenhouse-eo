@@ -4,6 +4,27 @@
 > documentados en su propia wiki. El resto son reglas que el cliente marcó en revisión, algunas más
 > de una vez.
 
+## 🔴 Exposición de operación interna al cliente — incidente 2026-09-07
+
+- **Confundir evidencia visible con narrativa editorial.** Research, análisis SEO/AEO, análisis de contenido y
+  Plan/Brief deben permanecer en toggles hermanos como prueba profesional del trabajo. Lo que nunca entra al
+  toggle editorial son notas de agente, QA operativo, pendientes, CMS/Dev o mensajes entre agentes; prompts,
+  secretos, credenciales y conversación cruda no van en ningún punto de la página. (→ `02`, `03`, `07`, `18`)
+- 🔴 **Confundir una ficha visual N1–N4 con una nota interna y retirarla.** El Playbook exige las cuatro
+  especificaciones dentro de la versión vigente, distribuidas junto al texto que representan. La tarea visual
+  conserva una copia literal; no sustituye la ficha contextual. (→ `03`, `05`, `13`, `18`)
+- 🔴 **Cambiar una ficha después de que diseño produjo el asset.** Una corrección editorial no autoriza
+  cambiar composición, copy, ALT, archivo, formato, carga ni posición. Conciliar y versionar el cambio con
+  diseño antes de tocar cualquiera de sus consumidores. (→ `05`, `13`, `18`)
+- **Corregir solo la frase que el cliente marcó.** Una fuga dentro del toggle editorial es un incidente
+  centinela: exige inventariar la página completa y barrer toda la zona editorial y sus callouts, sin retirar
+  los toggles hermanos de evidencia. (→ `18`)
+- **Confiar en `success` después de un reemplazo.** Un reemplazo puede perder el tabulador, expulsar el texto
+  del toggle y quedar guardado sin error. Comparar sangría, releer markdown y render. (→ `07`, `18`)
+- **Mover una nota de agente a un bloque llamado `Histórico` y darla por resuelta.** El rótulo ordena versiones;
+  no corrige una fuga narrativa. Tampoco autoriza borrar análisis legítimos: se distingue evidencia profesional
+  de conversación o razonamiento operativo del agente. (→ `03`, `18`)
+
 ## Tutoriales: regresiones detectadas el 2026-09-03
 
 - **Confundir cuatro encabezados con un procedimiento completo.** Cada operación necesaria debe
@@ -33,8 +54,8 @@
   no solo anotarla al final. El documento no puede quedar con afirmaciones falsas. (→ `02`)
 - **Presentar una estimación como dato medido.** Volúmenes de búsqueda y comparaciones de competencia
   sin herramienta van marcados como **estimación**. (→ `02`)
-- **Elegir una fuente cuando dos se contradicen.** Ninguna entra: van al callout de discrepancia y se
-  reportan al cliente. (→ `01`)
+- **Elegir una fuente cuando dos se contradicen.** Ninguna entra a la narrativa: la discrepancia queda trazada
+  en el toggle de evidencia —o en privado si es sensible— y se reporta por el canal apropiado. (→ `01`)
 - 🔴 **Tomar el brief como verificado.** *Caso real:* un brief de septiembre 2026 afirmaba que el COV
   de Berelinte se declara *"menor a 50 g/L"* cuando la ficha dice `< 50 g/L`, con símbolo; daba por
   buena una cita de ficha que todavía había que confirmar y proponía enlaces a fichas de producto
@@ -54,8 +75,9 @@
   confirmados en catálogo, enlace al catálogo general y **pendiente declarado**. (→ `03`)
 - **Omitir un pendiente.** *Un pendiente declarado es gestionable; uno omitido se publica como
   error.* (→ `03`)
-- 🔴 **Publicar el proceso interno como si fuera contenido.** `El cliente`, instrucciones, CMS,
-  extracción, posicionamiento o verificaciones viven en callouts internos, nunca en el cuerpo. (→ `03`, `09`)
+- 🔴 **Publicar el proceso interno como si fuera narrativa.** `El cliente`, instrucciones, CMS, extracción,
+  posicionamiento o verificaciones no viven dentro del toggle editorial. Cuando son evidencia pertinente se
+  documentan de forma profesional en el toggle de análisis/plan; si son sensibles, en privado. (→ `03`, `07`, `09`, `18`)
 - **Dejar un dato faltante como disclaimer visible.** Se retira del cuerpo, se registra internamente y
   se solicita la fuente oficial. (→ `03`, `09`)
 - **Tratar un producto nuevo como categoría consolidada.** Un title `Guía [Producto]`, diferenciadores
@@ -130,6 +152,21 @@
 - **Plantear una metáfora en el título y abandonarla a mitad del texto.** (→ `04`)
 - **Pasarse de metáfora.** El cliente pidió lenguaje más plano en agosto 2026: *"los tres frentes"*,
   *"ya tomó la pared"* → *"orígenes"*, *"manchas que reaparecen"*. **Ante la duda, más plano.** (→ `09`)
+- **Confundir ingenio con claridad.** Si un remate exige una segunda lectura para entenderse, se reescribe
+  en llano aunque suene memorable. (→ `04`, `18`)
+- **Desarrollar otra intención bajo el encabezado equivocado.** Color bajo resistencia, precio bajo
+  inspiración o cualquier sección que no cumpla su promesa. Reubicar con encabezado propio y línea puente;
+  no borrar cobertura útil. (→ `03`, `04`, `18`)
+- **Copiar literalmente la solución sugerida por el cliente sin validarla.** Separar diagnóstico, remedio y
+  fundamento: las decisiones de marca o negocio se aplican; una solución de estilo, SEO/AEO o técnica se
+  contrasta con léxico, evidencia e intención. Si introduce `ideal`, rompe el hilo o debilita SEO/AEO,
+  conservar el diagnóstico, escribir una solución mejor y explicar por qué en la respuesta. (→ `09`, `18`)
+- **Afirmar que `sana` no se usa en México para justificar el cambio de `pintura sana`.** El término sí existe;
+  la colocación se evita en copy de consumo porque es ambigua y describe peor el estado del recubrimiento.
+  Preferir `pintura en buen estado` o una condición física explícita. (→ `04`, `09`, `18`)
+- **Corregir una duplicación mediante un barrido indiscriminado.** `segunda segunda` y `segundasegunda` son
+  errores reales, pero el detector entrega candidatas: revisar contexto y corregir solo la repetición
+  confirmada, sin alterar pretéritos, conjugaciones ni términos legítimos. (→ `04`, `18`)
 - **Culpar al lector** ("la pintura equivocada") o denigrar el resultado ("se ve cansada"). La
   tensión se plantea en términos técnicos. (→ `09`)
 - **Repetir el nombre completo del producto.** Una vez y después genérico; **contarlo antes de
@@ -158,7 +195,8 @@
 - **Amontonar las imágenes al principio.** Acompañan el avance del artículo. (→ `05`)
 - 🔴 **ALT con el nombre de archivo, con la URL o con una etiqueta interna.** Errores reales
   detectados en auditoría. (→ `02`, `05`)
-- **ALT del banner distinto al de las notas para Dev.** Una sola fuente de verdad. (→ `05`)
+- **ALT, archivo o posición distintos entre artículo y tarea visual.** Una sola fuente de verdad contextual,
+  copiada de forma literal. (→ `05`)
 - **Listar en notas para Dev imágenes que no existen como banner especificado** (imágenes fantasma).
   (→ `05`)
 - **Poner `loading="lazy"` en el hero.** Es el LCP. (→ `05`)
@@ -222,6 +260,24 @@
 - 🔴 **Dar por buena la respuesta de escritura sin una segunda lectura.** Automatizaciones de Notion
   pueden sobrescribir fecha o estado después del alta. La evidencia de cierre es una consulta fresca
   del lote completo, no el payload aceptado. (→ `01`, `07`)
+- 🔴 **Responder comentarios desde previews parciales.** Los indicadores del body pueden omitir respuestas;
+  inventariar todos los hilos antes de editar o contestar. (→ `18`)
+- 🔴 **Recorrer versiones de Notion a prueba y error.** El historial solo recupera una versión conocida después
+  de capturar el baseline; una restauración queda validada por los mismos identificadores, autores y estados de
+  discusión, no por el mensaje de éxito. (→ `18`)
+- **Confundir observaciones, discusiones, comentarios y respuestas.** Reportar un solo total oculta hilos
+  perdidos o duplica feedback. Separar autor, identidad del hilo, respuestas y `resolved`. (→ `18`)
+- **Borrar un bloque comentado y asumir que su observación quedó cerrada.** Si el ancla desaparece por una
+  eliminación necesaria, conservar la decisión en un comentario de página apto para el cliente y dejar el cierre
+  al cliente. (→ `18`)
+- 🔴 **Marcar como resuelto un hilo del cliente.** Efeonce atiende y responde; el cierre nativo pertenece a
+  quien comentó o a su contacto del lado del cliente. (→ `18`)
+- **Tratar `resolved=false` como deuda pendiente de Efeonce.** `Atendido` se prueba con decisión, cambio cuando
+  aplica, respuesta y readback; es independiente del estado de resolución del cliente. (→ `18`)
+- **Responder `listo` o `corregido` sin explicar la decisión.** Cada respuesta declara qué se aceptó, qué se
+  cambió de otra manera y la regla o dato que lo sostiene. (→ `18`)
+- **Mezclar hallazgos fuera de alcance dentro del hilo.** Reportarlos aparte; si la pieza ya está publicada,
+  abrir también el pendiente Drupal sin afirmar que el sitio cambió. (→ `08`, `18`)
 - 🔴 **Clasificar como reescritura una canónica planificada porque devuelve HTTP 200.** En Berel una
   ruta inexistente responde con shell vacío; sin `title`, H1 y cuerpo sigue siendo Modalidad B y sus
   enlaces entrantes/sociales permanecen bloqueados hasta QA live. (→ `01`, `03`)

@@ -1,5 +1,8 @@
 # Binding de Identidad Externa para el MCP
 
+> **Estado 2026-09-07:** binding/login/token nativos operativos. TASK-1832 mantiene un canary externo sintético,
+> no comercial y eliminable; el primer cliente real continúa separado en TASK-1841.
+
 ## Frontera con el acceso corporativo
 
 Este documento describe la población externa. TASK-1836 añadió población persistida e inmutable
@@ -396,3 +399,13 @@ Conviene decirlo explícito, porque el nombre "identidad externa" invita a supon
 > [TASK-1631](../../tasks/in-progress/TASK-1631-efeonce-customer-identity-mcp-federation.md), en
 > [EPIC-044](../../epics/in-progress/EPIC-044-efeonce-identity-authorization-server-and-mcp-federation.md) y en
 > el estado de rollout de `docs/operations/FEATURE_FLAG_STATE_LEDGER.md` (filas `EXTERNAL_INVITATION_*`).
+
+## Personal interno y varias organizaciones — TASK-1844
+
+La conexión interna v2 puede listar organizaciones autorizadas con `efeonce.organizations.list` y elegir el
+`organizationId` de cada lectura. Greenhouse verifica permisos actuales por llamada. La lista puede cambiar
+sin reconectar si cambian esos permisos. La transición desde v1 sí exige autorizar de nuevo una vez en cada
+cliente; no convierte una conexión anterior de forma silenciosa. El alcance inicial es lectura SEO base-only.
+
+Estado 2026-09-08: código verificado localmente, rollout pendiente. Esta capacidad no está habilitada para
+clientes externos y no cambia sus bindings. [Plan de activación interna](../../operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md).

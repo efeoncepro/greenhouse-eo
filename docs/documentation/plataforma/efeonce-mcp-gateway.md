@@ -1,7 +1,7 @@
 # Efeonce MCP Gateway
 
 > **Tipo de documento:** Documentación funcional
-> **Estado:** operativo internal-only
+> **Estado:** operativo; acceso comercial cerrado, canary externo sintético read-only en observación
 > **Documentación técnica:** [ADR de plataforma MCP](../../architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md)
 > **Operación:** [runbook](../../operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md)
 
@@ -11,13 +11,24 @@ Efeonce MCP Gateway es el punto de acceso federado para que un cliente MCP use c
 mediante una URL estable: `https://mcp.efeonce.org/mcp`. No vive en Greenhouse ni Globe: es un servicio
 independiente que autentica al cliente y delega cada lectura al producto dueño.
 
+Desde TASK-1832, ChatGPT hospedado, Codex, Claude Code `2.1.263`, Claude.ai y Claude Desktop `1.46388.4` están
+certificados sobre Efeonce ID con una organización sintética eliminable. Code y web renovaron post-TTL sin
+widening; Desktop ejecutó desde la app nativa sobre el conector remoto. Las dos tools visibles en los clientes
+externos son su vista autorizada, no el inventario total. El gateway usa MCP SDK v2 y conserva schemas, `structuredContent`, annotations y security
+metadata observables; un probe JSON vacío anónimo recibe 401 antes de validar el body.
+
+TASK-1813 desplegó `efeonce-mcp` `1.2.0`: Efeonce ID es el único emisor anunciado, discovery pide sólo lectura
+base y el shim Entra quedó retirado. La revisión `00047-8b5` sirve 100 % Ready; rollback y repeticiones
+post-cutover de Claude Code, Codex, Claude.ai, Claude Desktop y ChatGPT quedaron verificadas sin widening.
+Entra sigue aceptado para validar sesiones legacy, sin ser bootstrap de conexiones nuevas.
+
 La primera capacidad activa fue `globe.producer.fleet.list`. Permite consultar las rutas de modelos disponibles de
 Globe para el workspace interno autorizado. El gateway no recrea catálogo, routing ni reglas de Globe.
 
 Desde el 6 de agosto de 2026 hay una **segunda capacidad federada**: Search Visibility 360 de Greenhouse. Partió
-con tres consultas de solo lectura y creció hasta federar **28 tools SEO** (al 2026-08-31). ⚠️ Federado e interno NO son el mismo conjunto por construcción —el gateway resuelve contra rutas HTTP del lane—: `get_seo_work_queue` existe adentro y está excluida con razón, y `get_seo_provider_spend` está federada sin contraparte interna. Desde el 28 de agosto de 2026 esas 27 están **efectivamente
-desplegadas** en la revisión productiva del gateway (`efeonce-mcp-gateway-00039-gz4`, desde el 2026-09-06; antes `00028-pmx` del 2026-09-02, `00026-ctp` del 2026-09-01 y `00024-8b8`), que reemplazó a la del 27
-de agosto (servía 21). Ya no queda ninguna tool esperando despliegue. Igual que con Globe, el gateway no recrea
+con tres consultas de solo lectura y creció hasta federar **28 tools SEO** (al 2026-08-31). ⚠️ Federado e interno NO son el mismo conjunto por construcción —el gateway resuelve contra rutas HTTP del lane—: `get_seo_work_queue` existe adentro y está excluida con razón, y `get_seo_provider_spend` está federada sin contraparte interna. Las 28 están **efectivamente
+desplegadas**; la revisión vigente y su SHA se resuelven en Cloud Run y se contrastan con `origin/main`, no se
+copian desde este documento. Ya no queda ninguna tool esperando despliegue. Igual que con Globe, el gateway no recrea
 lógica: transporta la pregunta y Greenhouse decide qué se puede ver. El inventario vigente y su estado de
 despliegue viven en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-tool-inventory.md) §8; detalle
 funcional en [Search Visibility 360 por MCP](../growth/search-visibility-360-por-mcp.md).
@@ -47,8 +58,8 @@ sus permisos y los interruptores de cada provider.
 
 ## Cómo se comporta
 
-1. El cliente MCP obtiene un token para el resource canónico desde un emisor admitido: Entra legado o
-   Efeonce ID. En el carril corporativo nativo, Microsoft autentica y Efeonce ID emite el token.
+1. Una conexión nueva descubre Efeonce ID y pide `efeonce.mcp.read`. Una sesión Entra legacy puede seguir
+   presentando su token; no se anuncia como segundo authorization server cuando el carril nativo está activo.
 2. El gateway valida issuer, audience, firma, expiración y scopes, y aplica policy por tool. Los tokens
    nativos requieren autoridad vigente del reader; los internos también contexto firmado y ledger `jti`.
 3. Para Globe obtiene una identidad de workload y llama el reader canónico de Globe.
@@ -99,7 +110,7 @@ Esa versión se compone de dos mitades con dueños distintos:
 
 | Mitad | Quién la decide | Qué responde |
 | --- | --- | --- |
-| El número (`1.1.0`) | Una persona, al clasificar el cambio | ¿Qué clase de cambio hubo? |
+| El número (`1.2.0`) | Una persona, al clasificar el cambio | ¿Qué clase de cambio hubo? |
 | El sufijo (`+5c28a7a`) | El despliegue, automáticamente | ¿Qué build está sirviendo ahora? |
 
 **Qué cuenta como cambio depende de a quién le rompe.** Para un agente que ya aprendió la superficie, no es lo
@@ -183,15 +194,13 @@ los permisos de Globe.
 El gateway maneja seis permisos: el permiso base de conexión, el permiso de lectura de Globe, el permiso de
 escritura interna para el fondeo de créditos, el permiso de escritura SEO (`efeonce.mcp.seo.write`), el permiso de
 lectura de Hiring y el permiso de escritura de identidad (`efeonce.mcp.identity.write`, para invitar personas a la
-propia organización) — cada permiso condicionado sólo se publica cuando su interruptor está encendido (detalle en
-el ADR de plataforma MCP).
+propia organización). El PRM publica sólo el permiso base; los demás se descubren en el `403 insufficient_scope`
+de la tool exacta y siguen sujetos a sus flags, policy, capability y autoridad downstream.
 
-Los entitlements por organización/persona ya existen y el gateway multi-issuer está construido. Antes
-de entregar acceso general a clientes, falta certificar su matriz real y demostrar una
-identidad que reciba sólo el permiso base cuando no tiene Globe. Al cliente Entra interno actual se le entregan
-hoy los dos primeros permisos —el base y el de lectura de Globe— incluso si pide sólo el base; por eso no
-representa aún una prueba válida de segmentación comercial. El permiso de escritura tiene su propia autorización
-aparte y no forma parte de lo comprobado en ese comportamiento.
+Los entitlements por organización/persona ya existen, el gateway multi-issuer está construido y la matriz
+técnica sintética demostró sesiones base-only sin Globe ni writes. Antes de acceso comercial falta el piloto
+consentido de TASK-1841 y sus gates; la certificación sintética no lo reemplaza. El cliente Entra interno
+histórico puede conservar lectura de Globe, pero ya no representa el bootstrap soportado para clientes nuevos.
 
 ### Por qué un permiso puede existir sin que Entra lo emita
 
@@ -199,8 +208,9 @@ Los seis permisos no salen todos del mismo emisor, y eso es deliberado. Entra es
 del tenant corporativo—; Efeonce ID es el carril del **cliente externo**. Un permiso vive donde vive la clase de
 actor que puede ejercerlo.
 
-El caso concreto es el permiso de escritura de identidad (`efeonce.mcp.identity.write`): el gateway lo anuncia
-entre los permisos que acepta, pero **no existe en la aplicación de recurso de Entra**. Verificado el 2026-09-06
+El caso concreto es el permiso de escritura de identidad (`efeonce.mcp.identity.write`): el gateway lo acepta
+en la policy de la tool, pero no lo anuncia en bootstrap y **no existe en la aplicación de recurso de Entra**.
+Verificado el 2026-09-06
 contra el directorio real: esa aplicación define cinco permisos y ése no está entre ellos. No es un descuadre.
 Lo emite Efeonce ID, porque su sujeto es una persona externa del cliente administrando a las personas de su
 propia organización — algo que ninguna credencial del tenant corporativo debería poder hacer en nombre de un

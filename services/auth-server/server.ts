@@ -47,7 +47,7 @@ import {
   PostgresPersonAuthStore,
   readAuthServerPersonAuthConfig
 } from '@/lib/auth-server/persons'
-import { createInternalAuthRuntime } from '@/lib/auth-server/internal/runtime'
+import { createInternalAuthRuntime, createRuntimeMultiOrgGrantsResolver } from '@/lib/auth-server/internal/runtime'
 import { createNativeGrantsPort } from '@/lib/auth-server/internal/grants'
 import { captureWithDomain } from '@/lib/observability/capture'
 
@@ -134,7 +134,7 @@ const handler = createAuthServerRequestHandler({
   consentContextPort: internalAuth.consentContextPort,
   internal: internalAuth.handler,
   persons: personDeps,
-  grantsPort: createNativeGrantsPort({config:oauthConfig,internal:internalAuth.contexts,external:createExternalAccessGrantsPort()}),
+  grantsPort: createNativeGrantsPort({config:oauthConfig,internal:internalAuth.contexts,external:createExternalAccessGrantsPort(),resolveMultiOrganization:createRuntimeMultiOrgGrantsResolver(oauthConfig)}),
   cimd: {}
 })
 

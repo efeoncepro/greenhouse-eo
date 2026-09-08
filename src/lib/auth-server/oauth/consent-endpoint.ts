@@ -17,7 +17,7 @@ import type { GrantsVersionPort } from './grants'
 import { htmlResponse, isFormContentType, parseFormBody, redirectResponse, requestOrigin, type OAuthHttpRequest, type OAuthHttpResponse } from './http'
 import { OAUTH_ENDPOINT_PATHS } from './metadata'
 import { renderErrorPage, renderLoginRequiredPage, renderStepUpRequiredPage } from './pages/render'
-import { isKnownScope, isWriteScope } from './scopes'
+import { areInternalContextScopesAllowed, isKnownScope, isWriteScope } from './scopes'
 import type { OAuthStorePort } from './store/port'
 import type { SubjectSessionPort } from './subject'
 
@@ -94,6 +94,19 @@ export const handleConsent = async (request: OAuthHttpRequest, deps: ConsentEndp
 
     if (!subject || subject.environmentId !== deps.config.environmentId) return htmlResponse(401, renderLoginRequiredPage())
 
+    if (!areInternalContextScopesAllowed(subject.authorizationContextVersion, scopes)) {
+      throw new OAuthProtocolError('invalid_scope', { reason: 'internal_context_scope_class', redirectable: true })
+    }
+
+    const expectedContextId = form.get('authorization_context_id')
+    const expectedVersion = form.get('authorization_context_version')
+
+    if ((subject.authorizationContextVersion === 2 || expectedContextId !== undefined || expectedVersion !== undefined) &&
+        (!subject.authorizationContextId || expectedContextId !== subject.authorizationContextId ||
+          expectedVersion !== String(subject.authorizationContextVersion ?? 1))) {
+      throw new OAuthProtocolError('invalid_request', { reason: 'consent_context_changed' })
+    }
+
     if (decision === 'allow') {
       // Revalidate the factor at submission: the consent screen may outlive its freshness.
       if (scopes.some(isWriteScope) && subject.authLevel !== 'step_up') {
@@ -112,6 +125,7 @@ export const handleConsent = async (request: OAuthHttpRequest, deps: ConsentEndp
       }
 
       const consentContext = await deps.consentContextPort.resolve({
+        authorizationContextVersion: subject.authorizationContextVersion,
         environmentId: subject.environmentId,
         subject: subject.subject,
         clientId: client.clientId,
@@ -119,7 +133,8 @@ export const handleConsent = async (request: OAuthHttpRequest, deps: ConsentEndp
         authorizationContextId: subject.authorizationContextId
       }).catch(() => ({ outcome: 'unavailable' as const }))
 
-      if (consentContext.outcome !== 'resolved' || consentContext.organizations.length === 0) {
+      if (consentContext.outcome !== 'resolved' || consentContext.organizations.length === 0 ||
+        (subject.authorizationContextVersion === 2 && consentContext.authorityClass !== 'internal_multi_org')) {
         throw new OAuthProtocolError(consentContext.outcome === 'unavailable' ? 'temporarily_unavailable' : 'access_denied', {
           reason: 'consent_context_unavailable'
         })

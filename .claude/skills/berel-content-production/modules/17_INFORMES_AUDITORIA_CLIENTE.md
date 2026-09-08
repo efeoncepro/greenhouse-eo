@@ -124,6 +124,16 @@ El cierre exige lectura fresca de Notion y de la copia local: comprobar seccione
 identificadores, enlaces y propiedades. Una escritura aceptada no basta. Si no se pudo guardar o
 verificar una superficie, informar exactamente cuál; nunca declarar ambas actualizadas por inferencia.
 
+## 7. Cadencia mensual propuesta desde septiembre de 2026
+
+La decisión interna del 2026-09-08 propone sustituir la reportería/reunión frecuente por un informe mensual y
+una reunión de 45 minutos dentro de los primeros siete días hábiles posteriores al cierre. El informe de
+septiembre se presentaría en octubre dentro de esa ventana. Notion conserva el informe y la evidencia; el correo
+formaliza la entrega; la reunión concentra resultados, decisiones y prioridades del siguiente ciclo.
+
+Esta cadencia requiere aceptación de Berel. Hasta registrarla, conservar cualquier obligación contractual previa
+y no describir la propuesta como vigente. Aplicar el contrato completo del módulo 19.
+
 ## Caso fechado
 
 [Auditoría de agosto de 2026](../../../../docs/audits/seo/BEREL_AUDITORIA_SEO_AEO_AGOSTO_2026.md):

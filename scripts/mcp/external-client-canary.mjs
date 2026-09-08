@@ -4,6 +4,7 @@ import { createHash, randomBytes } from 'node:crypto'
 import { spawn } from 'node:child_process'
 import http from 'node:http'
 import process from 'node:process'
+import { setTimeout as delay } from 'node:timers/promises'
 
 import { createRemoteJWKSet, jwtVerify } from 'jose'
 
@@ -43,16 +44,22 @@ const usage = () => `
 Uso:
   node scripts/mcp/external-client-canary.mjs --env=staging \\
     --issuer=https://auth.example.org --resource=https://mcp.example.org/mcp \\
-    --run-id=task-1832-canary-yyyymmdd-a
+    --run-id=task-1832-canary-yyyymmdd-a --organization-id=org-canary-exacta
 
 Opciones:
   --issuer        Issuer OAuth exacto. También MCP_CANARY_<ENV>_ISSUER.
   --resource      URL MCP exacta. También MCP_CANARY_<ENV>_RESOURCE_URL.
   --scope         Default: ${BASE_SCOPE}.
   --run-id        ID exacto del manifest. Obligatorio fuera de --preflight; marca el DCR para cleanup.
+  --organization-id
+                  Organización exacta del manifest. Obligatoria fuera de --preflight.
   --timeout-ms    Espera máxima del callback loopback. Default: 300000.
   --no-open       No abre el navegador; muestra la URL de autorización.
   --preflight     Sólo valida metadata, JWKS y protected-resource.
+  --negative      Verifica deny base-only e internal-only con el token real.
+  --wait-expiry   Espera la expiración del access token y verifica 401 invalid_token.
+  --wait-grant-revocation
+                  Espera hasta 60 s una revocación externa del grant y verifica deny.
 
 El script usa DCR público + PKCE S256, conserva code/verifier/tokens sólo en memoria y nunca los imprime.
 `
@@ -216,7 +223,7 @@ const parseMcpBody = async response => {
 
 let rpcId = 0
 
-const mcpCall = async (resource, accessToken, method, params) => {
+const mcpRequest = async (resource, accessToken, method, params) => {
   rpcId += 1
 
   const response = await fetch(resource, {
@@ -229,13 +236,129 @@ const mcpCall = async (resource, accessToken, method, params) => {
     body: JSON.stringify({ jsonrpc: '2.0', id: rpcId, method, params })
   })
 
-  if (response.status !== 200) throw new Error(`MCP ${method} returned HTTP ${response.status}`)
+  return { response, body: await parseMcpBody(response) }
+}
 
-  const body = await parseMcpBody(response)
+const mcpCall = async (resource, accessToken, method, params) => {
+  const { response, body } = await mcpRequest(resource, accessToken, method, params)
+
+  if (response.status !== 200) throw new Error(`MCP ${method} returned HTTP ${response.status}`)
 
   if (!body || body.error) throw new Error(`MCP ${method} returned a JSON-RPC error`)
 
   return body.result
+}
+
+const verifyNegativeToolPolicy = async ({ resource, accessToken, listedTools, organizationId }) => {
+  const writeTool = 'track_seo_keywords'
+  const internalOnlyTool = 'get_seo_keyword_opportunities'
+
+  const visibleDeniedTools = listedTools
+    .map(tool => tool.name)
+    .filter(name => name === writeTool || name === internalOnlyTool)
+
+  const write = await mcpRequest(resource, accessToken, 'tools/call', {
+    name: writeTool,
+    arguments: { organizationId }
+  })
+
+  const writeChallenge = write.response.headers.get('www-authenticate') ?? ''
+
+  if (
+    write.response.status !== 403 ||
+    write.body?.error !== 'insufficient_scope' ||
+    !writeChallenge.includes('error="insufficient_scope"') ||
+    !writeChallenge.includes('efeonce.mcp.seo.write')
+  ) {
+    throw new Error('Base-only token did not receive the canonical write-scope denial')
+  }
+
+  const internalOnly = await mcpRequest(resource, accessToken, 'tools/call', {
+    name: internalOnlyTool,
+    arguments: { organizationId }
+  })
+
+  const internalOnlyDenied =
+    internalOnly.response.status === 200 &&
+    (Boolean(internalOnly.body?.error) ||
+      (internalOnly.body?.result?.isError === true &&
+        internalOnly.body.result.content?.some(item => item?.type === 'text' && item.text === 'authorization_denied')))
+
+  if (!internalOnlyDenied) {
+    throw new Error(
+      `External canary internal-only response was not the canonical denial: HTTP ${internalOnly.response.status}, ` +
+        `jsonRpcError=${Boolean(internalOnly.body?.error)}, resultIsError=${String(internalOnly.body?.result?.isError)}`
+    )
+  }
+
+  if (visibleDeniedTools.length > 0) {
+    throw new Error(`An external canary token can list non-canary tools: ${visibleDeniedTools.join(', ')}`)
+  }
+
+  return {
+    baseOnlyWriteDenied: true,
+    baseOnlyWriteStatus: write.response.status,
+    baseOnlyChallengeAdvertisesRequiredScope: true,
+    internalOnlyHidden: true,
+    internalOnlyDirectCallDenied: true
+  }
+}
+
+const verifyExpiredToken = async ({ resource, accessToken, expiresAt }) => {
+  const waitMs = expiresAt * 1000 - Date.now() + 1500
+
+  if (!Number.isFinite(waitMs) || waitMs < 0 || waitMs > 16 * 60_000) {
+    throw new Error('Access token expiry is outside the bounded live-test window')
+  }
+
+  console.error(`Esperando ${Math.ceil(waitMs / 1000)} s para verificar expiración real del access token.`)
+  await delay(waitMs)
+
+  const expired = await mcpRequest(resource, accessToken, 'tools/list', {})
+  const challenge = expired.response.headers.get('www-authenticate') ?? ''
+
+  if (
+    expired.response.status !== 401 ||
+    expired.body?.error !== 'invalid_token' ||
+    !challenge.includes('error="invalid_token"')
+  ) {
+    throw new Error('Expired access token did not receive the canonical invalid_token denial')
+  }
+
+  return { expiredTokenDenied: true, expiredTokenStatus: expired.response.status }
+}
+
+const verifyGrantRevocation = async ({ resource, accessToken }) => {
+  const startedAt = Date.now()
+  const deadline = startedAt + 60_000
+
+  console.error('AUTHORITY_REVOCATION_READY: revoca ahora el grant canary exacto; se medirá el deny por 60 s.')
+
+  while (Date.now() < deadline) {
+    const revoked = await mcpRequest(resource, accessToken, 'tools/list', {})
+
+    if (revoked.response.status === 401) {
+      const challenge = revoked.response.headers.get('www-authenticate') ?? ''
+
+      if (revoked.body?.error !== 'invalid_token' || !challenge.includes('error="invalid_token"')) {
+        throw new Error('Revoked grant returned a non-canonical denial')
+      }
+
+      return {
+        revokedGrantDenied: true,
+        revokedGrantStatus: revoked.response.status,
+        revokedGrantPropagationMs: Date.now() - startedAt
+      }
+    }
+
+    if (revoked.response.status !== 200) {
+      throw new Error(`Unexpected HTTP ${revoked.response.status} while waiting for grant revocation`)
+    }
+
+    await delay(1000)
+  }
+
+  throw new Error('Grant revocation was not enforced within 60 seconds')
 }
 
 const validateAccessToken = async ({ token, metadata, issuer, resource, clientId }) => {
@@ -276,14 +399,26 @@ const main = async () => {
   const resource = requireHttpsOrigin(resourceInput, 'resource').toString()
   const scope = values.get('scope') ?? BASE_SCOPE
   const runId = values.get('run-id') ?? null
+  const organizationId = values.get('organization-id') ?? null
   const timeoutMs = Number(values.get('timeout-ms') ?? 300_000)
+  const negative = switches.has('negative')
+  const waitExpiry = switches.has('wait-expiry')
+  const waitGrantRevocation = switches.has('wait-grant-revocation')
 
   if (!Number.isInteger(timeoutMs) || timeoutMs < 10_000 || timeoutMs > 900_000) {
     throw new Error('--timeout-ms must be an integer between 10000 and 900000')
   }
 
+  if (waitExpiry && waitGrantRevocation) {
+    throw new Error('--wait-expiry and --wait-grant-revocation must run in separate ceremonies')
+  }
+
   if (!switches.has('preflight') && (!runId || !/^[a-z0-9][a-z0-9_-]{2,127}$/.test(runId))) {
     throw new Error('--run-id must match the exact canary manifest run_id')
+  }
+
+  if (!switches.has('preflight') && (!organizationId || organizationId.length > 128)) {
+    throw new Error('--organization-id must match the exact canary manifest organization_id')
   }
 
   const discovery = await validateDiscovery({ issuer, resource })
@@ -393,7 +528,35 @@ const main = async () => {
       throw new Error(`The canary tool ${CANARY_TOOL} is not visible to the issued token`)
     }
 
-    await mcpCall(resource, initial.access_token, 'tools/call', { name: CANARY_TOOL, arguments: {} })
+    const canaryResult = await mcpCall(resource, initial.access_token, 'tools/call', {
+      name: CANARY_TOOL,
+      arguments: { organizationId }
+    })
+
+    if (canaryResult.structuredContent?.data?.organizationId !== organizationId) {
+      throw new Error('The canary read did not return the exact manifest organization')
+    }
+
+    const negativeToolPolicy = negative
+      ? await verifyNegativeToolPolicy({
+          resource,
+          accessToken: initial.access_token,
+          listedTools: tools.tools,
+          organizationId
+        })
+      : {}
+
+    const grantRevocation = waitGrantRevocation
+      ? await verifyGrantRevocation({ resource, accessToken: initial.access_token })
+      : {}
+
+    const tokenExpiry = waitExpiry
+      ? await verifyExpiredToken({
+          resource,
+          accessToken: initial.access_token,
+          expiresAt: Number(initialClaims.exp)
+        })
+      : {}
 
     const { body: refreshed } = await postForm(discovery.metadata.token_endpoint, {
       grant_type: 'refresh_token',
@@ -463,6 +626,10 @@ const main = async () => {
             expPresent: typeof initialClaims.exp === 'number'
           },
           canaryTool: CANARY_TOOL,
+          organizationIdMatches: true,
+          ...negativeToolPolicy,
+          ...grantRevocation,
+          ...tokenExpiry,
           refreshRotated: true,
           oauthFamilyRevoked: true,
           authorityRevocationRequiredSeparately: true

@@ -206,6 +206,18 @@ Prefer:
 
 Treat `insert_content` and `replace_content_range` as legacy. Never enable `allow_deleting_content` without explicitly checking for child pages/databases and obtaining destructive intent.
 
+### Pages with anchored comments or protected blocks
+
+Before a broad edit, record discussion IDs, authors, `resolved` state, anchor type, toggle hierarchy and the
+exact protected blocks/specs that must survive. Prefer the smallest unambiguous `update_content`; a full
+`replace_content` is not a cleanup primitive for a single section.
+
+If a proven bad edit requires history recovery, restore one known-good version only. Re-read immediately and
+compare the same discussion identities, states, hierarchy and protected content. A successful restore/update
+response proves acceptance, not preservation. If the comparison fails, stop instead of trying successive
+versions. When a necessary deletion removes an anchor, preserve the decision in an appropriate page comment;
+do not infer that the original discussion is resolved.
+
 ## 5. Unsupported and read-only representations
 
 Bookmark, embed, link preview, breadcrumb, template button and unknown block types render as `<unknown url="..." alt="block_type"/>`. Use the Block API when fidelity is required.
@@ -236,4 +248,5 @@ Additional cautions:
 - [ ] Tables contain rich text only.
 - [ ] No H1 duplicates a data-source title property.
 - [ ] Read/update paths handle truncation and concurrent edits.
+- [ ] Pages with anchored comments have a pre-edit baseline and post-edit identity/structure readback.
 - [ ] Runtime writes use the canonical SDK wrapper, idempotency and audit.

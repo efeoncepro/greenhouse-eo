@@ -1,8 +1,10 @@
 # Runbook técnico — certificación MCP con canary externo eliminable
 
-> TASK-1832 · owner: Identity + MCP Platform · estado: **code complete, rollout pendiente** al 2026-09-06.
-> Schema aplicado fuera del checkpoint por error operativo; registry vacío. Este documento no acredita flags
-> activos, fixture creado ni certificación runtime. Readback: `TASK-1832_SCHEMA_APPLY_READBACK_2026-09-06.md`.
+> TASK-1832 · owner: Identity + MCP Platform · estado al 2026-09-07: **rollout productivo en observación**.
+> Corrida activa `task-1832-canary-20260906-a`; helper, Playwright, Codex, ChatGPT hospedado, Claude Code
+> `2.1.263`, Claude.ai y Claude Desktop `1.46388.4` están verdes. Code y web renovaron post-TTL sin widening;
+> Desktop ejecutó desde la app nativa sobre el conector remoto. La matriz y el manifiesto acreditan el runtime;
+> este runbook define el procedimiento.
 
 ## Objetivo y frontera
 
@@ -41,17 +43,18 @@ Los dos gates son independientes y nacen `false`:
 El registry vacío conserva el carril cerrado aunque un gate se configure mal. Encender uno solo nunca es una
 degradación aceptable; debe observarse como deny.
 
-El SoT del flag del emisor es la variable `EXTERNAL_IDENTITY_CANARY_ENABLED` del GitHub Environment elegido por
-`auth-server-deploy.yml`; el workflow la pasa explícitamente a `deploy.sh`, cuyo `--set-env-vars` vuelve a
-publicar el conjunto completo. Cambiarla sin ejecutar el workflow no modifica Cloud Run. Un deploy posterior con
-la variable ausente vuelve a `false` por diseño. El change-gate compara también ambos gates de identidad contra
-la revisión servida, por lo que una diferencia de configuración fuerza deploy aunque el bundle no haya cambiado.
-El valor se acredita leyendo la revisión servida, no sólo GitHub.
+El SoT del flag del emisor es la variable GitHub de **repositorio** `EXTERNAL_IDENTITY_CANARY_ENABLED`.
+`auth-server-deploy.yml` la pasa a `deploy.sh`, cuyo `--set-env-vars` vuelve a publicar el conjunto completo.
+No debe existir un override del mismo nombre en los environments staging o production: ambos workflows apuntan
+al mismo Cloud Run y valores distintos hacen que el último deploy reconfigure el runtime compartido. Esta regla
+se comprobó cuando staging apagó el canary fail-closed en `auth-server-00042-hp5`; production lo restauró en
+`00043-ndg`. Cambiar la variable sin ejecutar el workflow no modifica Cloud Run. Ausencia vuelve a `false` por
+diseño. El change-gate compara la configuración servida y fuerza deploy ante drift. El valor se acredita leyendo
+la revisión, no sólo GitHub. Vercel mantiene variables separadas porque sí tiene deployments por environment.
 
-Antes de crear datos deben cumplirse todos estos puntos:
+Antes de crear datos en una corrida nueva deben cumplirse todos estos puntos:
 
-1. ADR aceptado, migraciones aplicadas y consumers compatibles desplegados con ambos gates OFF. El schema ya
-   quedó aplicado accidentalmente; todavía faltan los consumers y la decisión del operador sobre conservarlo.
+1. ADR aceptado, migraciones aplicadas y consumers compatibles desplegados con ambos gates OFF.
 2. `external_canary_registrations` vacío o sin otra fila activa.
 3. aprobación específica del operador para el fixture y para los buzones M365/Google controlados.
 4. `run_id`, `canary_registration_id`, `organization_id` y `public_id` generados por
@@ -59,7 +62,9 @@ Antes de crear datos deben cumplirse todos estos puntos:
 5. copia del template completada y versionada **antes del primer write**.
 6. TTL entre 1 hora y 30 días, environment externo activo y external organization ref exacta.
 
-La aprobación de implementación local de TASK-1832 no satisface los puntos 1–3.
+La aprobación de implementación local de TASK-1832 no satisface los puntos 1–3. La corrida activa sí los
+cumplió antes del primer write y quedó documentada con registro
+`xcr-48dacd1f-ad4b-4a73-b454-3d94574e7d09`; no se crea otra mientras ésta siga activa.
 
 ## Plano de control
 
@@ -118,10 +123,14 @@ Este conteo agregado complementa, pero no reemplaza, el readback por todos los I
    staging y la autorización de rollout.
 
 El helper `node scripts/mcp/external-client-canary.mjs` exige `--run-id`, lo persiste como
-`metadata_json.dcr.software_id` del DCR y usa DCR público, loopback `127.0.0.1`, PKCE S256,
+`metadata_json.dcr.software_id` del DCR, y exige `--organization-id` para comparar el sujeto solicitado y el
+servido antes de aceptar la corrida. Usa DCR público, loopback `127.0.0.1`, PKCE S256,
 consentimiento real, firma/JWKS, `tools/list`, `get_seo_entitlement`, refresh rotativo y revocación de la familia
 OAuth. Mantiene códigos, verifier y tokens sólo en memoria. La revocación OAuth no sustituye el retiro de
 authority: el binding/grant se revoca por su command y el gateway debe denegar el access token todavía vigente.
+`--negative` prueba base-only e internal-only; `--wait-expiry` espera la expiración natural y exige
+`401 invalid_token`; `--wait-grant-revocation` abre una ventana de 60 s para ejecutar el command de revocación y
+medir el deny. Los dos modos de espera se ejecutan en ceremonias separadas.
 
 La passkey real se certifica en dos carriles distintos. El login normal puede crear una sesión `primary` con
 `amr=passkey`; no se eleva por inferencia. El step-up explícito usa `/auth/passkeys/step-up/start|finish`, exige
@@ -146,6 +155,52 @@ Por cliente/redirect/registro registrar, sin tokens:
 `skipped`, metadata 200, DCR 201, una captura, un token inyectado o una suite unitaria verde no cuentan como
 certificación runtime.
 
+### Perfiles de cliente que no se deben mezclar
+
+- **Claude Code local:** versión mínima verificada `2.1.196`; fija `oauth.scopes` al scope base y no uses
+  `authServerMetadataUrl`. Para un canary eliminable registra DCR propio con `software_id=run_id` y callback fijo.
+  Un CIMD compartido por el vendor se conserva como `shared` y bloquea cualquier intento de borrarlo.
+- **Claude hospedado:** Claude.ai, Desktop, Cowork y mobile comparten infraestructura cloud, pero cada superficie
+  visible conserva una fila de ejecución. Usa el callback exacto `https://claude.ai/api/mcp/auth_callback`. Para
+  un canary eliminable selecciona **Usa tu propio cliente OAuth**, aporta el DCR público run-owned, deja el secreto
+  vacío y conserva **Siempre requerido** + **HTTP transmisible**; no adoptes el CIMD detectado como run-owned.
+- **Codex local:** el callback puede mostrar `ERR_BLOCKED_BY_CLIENT` después de entregar el code. Sólo cuenta si
+  el CLI confirma login y una sesión nueva hace la lectura.
+- **ChatGPT hospedado:** la importación debe dejar visibles schemas, `structuredContent`, cuatro annotations y el
+  mirror `_meta.securitySchemes`; además se ejecuta una lectura real y refresh post-TTL.
+
+La versión exacta del cliente es parte de la evidencia. Conserva FAIL y PASS como filas distintas: nunca
+reescribas una falla de una versión antigua como si no hubiera ocurrido.
+
+### Transporte y serialización observables
+
+Además de `tools/list`, inspecciona la respuesta serializada que ve el cliente. Debe incluir `inputSchema`,
+`outputSchema`, `structuredContent` y las cuatro annotations explícitas; `content` de texto es un mirror de
+compatibilidad, no una segunda verdad. `_meta.securitySchemes` se deriva de la policy canónica para clientes que
+lo requieren y no crea autorización nueva.
+
+El probe de bootstrap `POST /mcp` con JSON vacío debe cruzar autenticación antes de validación: anónimo devuelve
+`401` con el challenge canónico; autenticado puede devolver `400 invalid_request`; `500` es regresión. La
+renovación se prueba después del TTL y debe conservar el scope original cuando el cliente omite `scope`, rotar el
+refresh e invalidar el anterior.
+
+## Observación diaria y clasificación de señales
+
+Cada muestra diaria es read-only y registra en el manifiesto, sin identificadores personales ni secretos:
+
+1. `identity:external-canary:readback` y cleanup dry-run contra el registration ID exacto;
+2. revisión Ready, tráfico, SHA servido y flags de Cloud Run, GitHub y Vercel para auth-server y gateway;
+3. las nueve señales de binding/invitación y las señales OAuth de code reuse, CIMD rechazado y refresh reuse;
+4. cualquier cambio en blockers lógicos, referencias inesperadas o contaminación 360.
+
+Un negativo deliberado de reutilización puede mantener `auth.oauth.refresh_reuse_detected` en rojo durante su ventana de
+24 horas. No lo renombres `ok`: atribúyelo por timestamp y DCR marcado con el `run_id`, confirma que la familia
+quedó revocada y que no aparecieron eventos posteriores al baseline. Un evento nuevo, una familia no revocada o
+un cliente que no sea run-owned es drift no explicado y bloquea el retiro.
+
+La observación no crea clientes, consentimientos, grants, sesiones ni tokens. `delete_after` es sólo la fecha
+mínima: el apply también exige siete días estables, precondiciones de retiro y aprobación explícita.
+
 ## Retiro en dos fases
 
 ### Fase A — cortar autoridad
@@ -169,7 +224,9 @@ certificación runtime.
    → consents/contextos → cliente DCR marcado con `software_id=run_id` → challenges/TOTP/passkeys/magic links/
    sesiones. Después elimina grants → invitations → source links → profiles `smoke_test` → bindings → registro
    → organización. Un cliente observado por la persona pero no marcado con el `run_id` bloquea el apply; no se
-   presume ownership.
+   presume ownership. En cambio, los hijos OAuth de un DCR correctamente marcado siguen el ownership del
+   cliente aunque un diagnóstico haya usado otro sujeto: se eliminan por `client_id` sin borrar la sesión ni la
+   identidad compartida de ese sujeto.
 6. El mismo transaction relee organización, registro, bindings, perfiles, links y todos los artefactos
    auth/OAuth anteriores; cualquier conteo distinto de `0` hace rollback.
 7. Releer aparte superficies 360 y actualizar el manifiesto a `deleted` sólo cuando todo el inventario run-owned
@@ -185,7 +242,7 @@ El apply se niega sin mutar cuando aparece cualquiera de estos estados:
 - registro aún activo, authority/auth activa o postura de organización modificada;
 - lifecycle history, space, membership, tax ID, HubSpot o referencia comercial;
 - perfil no `smoke_test`, source link de otro environment o asset compartido;
-- cliente OAuth no DCR, sin `software_id=run_id` o usado por otro environment/subject;
+- cliente OAuth observado por el canary que no sea DCR o no tenga `software_id=run_id`;
 - FK nueva/no inventariada con conteo positivo;
 - rol DB distinto de migrator;
 - readback final distinto de cero.
@@ -205,5 +262,6 @@ Una corrida deja:
 6. cleanup dry-run y, al retiro, apply + readback cero;
 7. siete días de señales estables.
 
-Hasta completar esos siete puntos, TASK-1832 permanece `code complete, rollout pendiente`; nunca se presenta
-como piloto ni adopción de cliente.
+Hasta completar esos siete puntos, TASK-1832 permanece `rollout productivo en observación`; nunca se presenta
+como piloto ni adopción de cliente. Para la corrida activa, `delete_after=2026-09-13T19:43:30Z`: antes de esa
+fecha el dry-run debe negarse por authority/auth activas y `--apply` no se ejecuta.

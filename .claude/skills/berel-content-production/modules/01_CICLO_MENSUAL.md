@@ -27,29 +27,29 @@ La propiedad `Formato` decide **la estructura CMS**, no si la pieza es nueva o r
 
 ## 1 · Orden canónico dentro de la página del Content Hub
 
+La página compartida con Berel conserva la evidencia del trabajo y una sola **zona editorial activa**. Los
+toggles de análisis, research y plan/brief son prueba obligatoria del proceso que fundamenta el artículo; se
+mantienen separados del toggle editorial y se redactan como evidencia profesional, no como conversación cruda
+del agente. Prompts, secretos, credenciales y operación sensible sí permanecen fuera del Content Hub.
+
 ### Modalidad A
 
-1. `Contenido anterior del artículo`
-2. `Análisis SEO/AEO`
-3. `Análisis de contenido`
-4. `✍️ Reescritura V1`
-5. Si `Formato = Tutorial`: `🔁 Reescritura en formato Tutorial (híbrido) — [Artículo]`
+1. `🗂️ Histórico — Contenido anterior del artículo`, si existe.
+2. `🔎 Análisis SEO/AEO`, incluida la verificación fechada de la URL viva.
+3. `🧩 Análisis de contenido`.
+4. `✍️ Versión vigente para revisión`.
+5. Si `Formato = Tutorial`, el híbrido sustituye la zona editorial activa; la versión previa pasa a
+   `Histórico`, sin retirar los análisis.
 
 ### Modalidad B
 
-Si la pieza se investiga desde cero:
+1. `🧭 Plan editorial y SEO` o `📋 Brief SEO/AEO`, con research, fuentes, decisiones y limitaciones.
+2. `✍️ Versión vigente para revisión`.
+3. Si `Formato = Tutorial`, el híbrido se convierte en la única zona editorial activa; el plan permanece.
 
-1. `🧭 Plan editorial y SEO`
-2. `✍️ Artículo V1`
-3. Si `Formato = Tutorial`: híbrido al final
-
-Si ya llega con brief aguas arriba:
-
-1. `📋 Brief SEO/AEO — [tema]`
-2. `✍️ Artículo V1`
-3. Si `Formato = Tutorial`: híbrido al final
-
-🔴 No duplicar `Plan editorial y SEO` si ya existe `📋 Brief SEO/AEO`.
+Si el plan ya existe aguas arriba, sintetizarlo en el toggle de evidencia del artículo con enlaces a las
+fuentes, sin duplicar contenido sensible. El toggle demuestra qué se evaluó y decidió; no reproduce prompts,
+chain-of-thought, credenciales ni conversación entre agentes.
 
 ## 2 · Fase 1 — Identificar el lote
 
@@ -63,7 +63,7 @@ Si ya llega con brief aguas arriba:
 ## 3 · Fase 2 — Rescatar contenido anterior (solo A)
 
 - Abrir una URL a la vez con extracción completa.
-- Agregar `Contenido anterior del artículo` sin borrar ni modificar lo previo.
+- Preservar el contenido anterior sin modificarlo y rotularlo `Histórico`.
 - Esa copia es texto plano: no sirve para afirmar enlaces, ALT, `title`, jerarquías o schema.
 
 ## 4 · Fases 3 y 4 — Análisis
@@ -77,9 +77,11 @@ Regla central: todo hallazgo técnico se verifica contra HTML/URL viva y termina
 
 → `03_REDACCION_ARTICULO.md`
 
-Al terminar el V1:
+Al terminar la versión:
 
-- mover Content Hub a `En revisión`;
+- confirmar que los toggles de evidencia siguen presentes, releer como cliente el toggle editorial completo y
+  ejecutar `client-visible-copy-gate.mjs` sobre un export fresco;
+- mover Content Hub a `En revisión` solo si esos gates pasan;
 - si `Formato = Artículo`, continuar a producción visual;
 - si `Formato = Tutorial`, **todavía no crear la tarea de fotos de pasos**: primero producir el
   híbrido con `13_FORMATO_TUTORIAL_HIBRIDO.md`.
@@ -92,7 +94,8 @@ Antes de idear:
 
 - buscar qué pidió el cliente en Teams;
 - buscar fichas/material oficial en SharePoint;
-- registrar literalmente el pedido y los assets pendientes;
+- registrar el pedido, fuentes y assets pendientes en el toggle de plan/brief, con redacción profesional y
+  sin datos sensibles;
 - no declarar que algo “no existe” solo porque no apareció en un listado paginado.
 
 ### B2 · Decidir el ángulo
@@ -249,6 +252,18 @@ Definir `P` principales editoriales (artículos + tutoriales), `B` tareas de ban
 🔴 Hacer **segunda lectura fresca** tras automatizaciones de Notion: fechas, estados, relaciones,
 responsables, `Formato` y contenido guardado.
 
+### Barrido preventivo del mes
+
+Antes de cerrar un mes, revisar **todas** las filas editoriales del ciclo, aunque no tengan comentarios. Para
+cada página: confirmar una sola `✍️ Versión vigente para revisión`, conservar los toggles hermanos de evidencia,
+comparar N1–N4 y fotos de paso contra su baseline, leer el toggle vigente como cliente y ejecutar el gate sobre
+un export fresco. Clasificar el resultado como `sin cambios`, `corrección quirúrgica` o `bloqueado`; no editar
+una página que no tenga un defecto confirmado.
+
+Una fuga centinela amplía la **auditoría de lectura** al resto del mes objetivo, no autoriza un reemplazo masivo.
+Cada corrección sigue necesitando ancla fresca, alcance exacto y readback propio. Comentarios ausentes no prueban
+calidad, y comentarios presentes no sustituyen la revisión completa de la zona editorial.
+
 ## 13 · Reporte de avance
 
 Siempre tres grupos:
@@ -277,5 +292,7 @@ Siempre tres grupos:
 - [ ] ALT/archivo/posición conservan una sola fuente de verdad
 - [ ] Cada tarea visual, incluidas las bloqueadas, tiene tipo y canal verificados según módulo 07
 - [ ] Segunda lectura fresca confirma propiedades guardadas
+- [ ] Barrido preventivo completado sobre todas las páginas del mes, incluidas las que no tienen comentarios
+- [ ] Cada zona vigente pasó gate + lectura humana o quedó bloqueada con motivo; páginas sanas no se reescribieron
 - [ ] Conteo `P + B + T + S` conciliado; históricos separados y cupos/archivos/entregas diferenciados
 - [ ] Reporte final separa listos · bloqueados · fuera de alcance

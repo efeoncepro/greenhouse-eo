@@ -1,5 +1,10 @@
 # Berel — Producción editorial de noviembre y diciembre 2026 — Auditoría 2026-08-26
 
+> **Actualización 2026-09-08:** la numeración y el alcance crecieron después de este corte —noviembre N43–N51 y
+> diciembre N52–N59— y ambos meses recibieron un barrido preventivo de fugas editoriales. Ver la
+> [auditoría de recuperación](BEREL_CONTENT_HUB_EDITORIAL_LEAK_RECOVERY_2026-09-08.md). Los inventarios N43–N50
+> de abajo son históricos, no el lote vigente completo.
+
 ## Estado y alcance
 
 - Tipo: auditoría operativa de reescritura, producción creativa y derivados sociales en Notion.

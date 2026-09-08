@@ -2,10 +2,11 @@
 import { randomUUID } from 'node:crypto'
 
 export const AUTHORIZATION_CONTEXT_VERSION = 1 as const
+export type InternalContextVersion = 1 | 2
 
 export type InternalAuthorizationContext = {
   id: string
-  version: typeof AUTHORIZATION_CONTEXT_VERSION
+  version: InternalContextVersion
   issuer: string
   environmentId: string
   subject: string
@@ -64,6 +65,7 @@ export interface InternalAuthorityPort {
     subject: string
     profileId: string
     bindingId: string
+    version?: InternalContextVersion
   }): Promise<InternalAuthorityFacts | null>
   getCorporateSession(sessionHash: string): Promise<CorporateSessionEvidence | null>
 }
@@ -96,6 +98,7 @@ export const createInternalContextService = (deps: {
   enabled: () => boolean
   store: InternalContextStorePort
   authority: InternalAuthorityPort
+  allowMultiOrganization?: (profileId: string) => boolean
   now?: () => Date
 }) => {
   const now = () => (deps.now ?? (() => new Date()))()
@@ -109,8 +112,9 @@ export const createInternalContextService = (deps: {
 
       if (
         !context ||
-        request.version !== AUTHORIZATION_CONTEXT_VERSION ||
+        (request.version !== 1 && request.version !== 2) ||
         context.version !== request.version ||
+        (context.version === 2 && !deps.allowMultiOrganization?.(context.profileId)) ||
         context.issuer !== request.issuer ||
         context.environmentId !== request.environmentId ||
         context.subject !== request.subject ||
@@ -166,6 +170,10 @@ export const createInternalContextService = (deps: {
         return { allowed: false, reason: 'version_stale' }
       }
 
+      if (!deps.enabled() || (context.version === 2 && !deps.allowMultiOrganization?.(context.profileId))) {
+        return { allowed: false, reason: 'disabled' }
+      }
+
       return { allowed: true, context, grantsVersion: facts.grantsVersion, capabilities: [...facts.capabilities] }
     } catch {
       return { allowed: false, reason: 'unavailable' }
@@ -173,6 +181,7 @@ export const createInternalContextService = (deps: {
   }
 
   const create = async (input: {
+    version?: InternalContextVersion
     issuer: string
     environmentId: string
     subject: string
@@ -190,6 +199,7 @@ export const createInternalContextService = (deps: {
 
       if (
         !session ||
+        (input.version === 2 && !deps.allowMultiOrganization?.(session.profileId)) ||
         session.provenance !== 'entra_oidc' ||
         session.sessionHash !== input.sessionHash ||
         session.environmentId !== input.environmentId ||
@@ -225,7 +235,7 @@ export const createInternalContextService = (deps: {
 
       const context: InternalAuthorizationContext = {
         id: randomUUID(),
-        version: AUTHORIZATION_CONTEXT_VERSION,
+        version: input.version ?? AUTHORIZATION_CONTEXT_VERSION,
         issuer: input.issuer,
         environmentId: input.environmentId,
         subject: input.subject,
@@ -251,5 +261,16 @@ export const createInternalContextService = (deps: {
     }
   }
 
-  return { create, resolve }
+  /** Grant/code/refresh persistence stores the immutable context ID; derive its version server-side. */
+  const resolveStored = async (request: Omit<InternalContextRequest, 'version'>): Promise<InternalContextResolution> => {
+    try {
+      const context = await deps.store.get(request.id)
+
+      return context ? resolve({ ...request, version: context.version }) : { allowed: false, reason: 'context_invalid' }
+    } catch {
+      return { allowed: false, reason: 'unavailable' }
+    }
+  }
+
+  return { create, resolve, resolveStored }
 }

@@ -19,15 +19,16 @@ The two versioned bundles are intentionally mirrored:
 
 `pnpm skills:mirrors` makes drift in the declared mirrors a failing local check.
 
-El gateway público ya opera el reader interno y read-only `globe.producer.fleet.list`. Eso no cambia la postura
-por defecto de una capacidad nueva ni autoriza acceso de clientes. Entra legacy y autoridad nativa
-interna tienen pruebas separadas. El binding
+El gateway público opera providers internos y una certificación externa **sintética** read-only. Eso no cambia
+la postura por defecto de una capacidad nueva ni autoriza acceso comercial. Entra legacy, autoridad nativa
+interna y clientes externos tienen pruebas separadas. El binding
 Account 360 y el grant revocable por organización y por persona ya existen
 (`greenhouse_core.external_capability_grants`, `TASK-1631`, 2026-09-04) según
 [`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md);
 el emisor nativo y el consumer multi-issuer se complementan con la autoridad interna de TASK-1836.
-El rollout interno no certifica acceso B2B: elegibilidad, cohorte y canaries externos tienen evidencia
-propia. Consulta el runbook vigente; no infieras habilitación por la existencia de un issuer.
+El rollout interno no certifica acceso B2B, y el canary sintético tampoco acredita un cliente real: elegibilidad,
+cohorte y clientes tienen evidencia propia. Consulta el runbook vigente; no infieras habilitación por la
+existencia de un issuer. Para ChatGPT/Claude/Codex carga la referencia `client-certification.md` de la skill.
 
 ## Invocation boundary
 
@@ -74,8 +75,9 @@ rollout, no una invitación a usar browser, SQL o buckets.
 2. For each capability, record scope, verified tenant boundary, canonical downstream reader/command/API, redaction,
    timeout, concurrency, error contract, evidence and rollback.
 3. Keep every provider o capability nueva `OFF`, read-only and fail-closed until package/API version, IAM allowlist,
-   allow/deny, fault isolation and provider canary pass. La excepción operativa actual es sólo
-   `globe.producer.fleet.list`, interno; mantenerla habilitada exige conservar esa evidencia, no extenderla.
+   allow/deny, fault isolation and provider canary pass. El carril interno y el canary externo sintético ya tienen
+   evidencia propia; esa certificación no autoriza una organización cliente, un scope de escritura ni otra
+   capability. El piloto real sigue cerrado hasta TASK-1841.
 4. Keep OAuth caller identity separate from downstream workload identity. Never log bearer tokens, auth codes,
    sensitive prompts, raw payloads or upstream errors.
 5. Treat writes, approvals, spend, rights-sensitive actions, new auth surfaces and webhooks as independent

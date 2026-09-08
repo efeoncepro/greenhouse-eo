@@ -160,8 +160,8 @@ export const resolveInternalAuthority = async (input: {
   subject: string
   profileId: string
   bindingId: string
-}) => {
-  const rows = await query<Row>(
+}, readQuery = query) => {
+  const rows = await readQuery<Row>(
     `${AUTHORITY} AND e.environment_id=$1 AND n.source_object_id=$2 AND e.profile_id=$3 AND e.binding_id=$4`,
     [input.environmentId, input.subject, input.profileId, input.bindingId]
   )

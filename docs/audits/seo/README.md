@@ -22,6 +22,10 @@ Auditorías de búsqueda orgánica y AEO — de Efeonce y de clientes a los que 
 
 ## Auditorías
 
+- [Berel — recuperación de fugas editoriales en Content Hub — 2026-09-08](BEREL_CONTENT_HUB_EDITORIAL_LEAK_RECOVERY_2026-09-08.md) —
+  incidente centinela, recuperación de octubre y barridos preventivos de noviembre/diciembre; preserva análisis,
+  comentarios y specs, formaliza edición quirúrgica y separa readback de Notion, arte y publicación Drupal.
+
 - [Berel — auditoría SEO/AEO de agosto 2026](BEREL_AUDITORIA_SEO_AEO_AGOSTO_2026.md) — revisión del 4 de septiembre,
   continuidad de mayo/julio, GSC/GA4/DataForSEO y contenido redactado/publicado por Efeonce. Incorpora el Grader
   del 3 de septiembre con límites de categoría y falsos positivos; no acredita corrección del instrumento.

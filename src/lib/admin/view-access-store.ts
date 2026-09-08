@@ -380,9 +380,9 @@ const resolvePersistedOrFallbackRoleAccess = ({
   }
 }
 
-const getPersistedAssignments = async () => {
+const getPersistedAssignments = async (readQuery = runGreenhousePostgresQuery) => {
   try {
-    const rows = await runGreenhousePostgresQuery<RoleAssignmentRow>(
+    const rows = await readQuery<RoleAssignmentRow>(
       `
         SELECT
           role_code,
@@ -405,12 +405,12 @@ const getPersistedAssignments = async () => {
   }
 }
 
-const getPersistedUserOverrides = async ({ strict = false }: { strict?: boolean } = {}) => {
+const getPersistedUserOverrides = async ({ strict = false, userId = null, readQuery = runGreenhousePostgresQuery }: { strict?: boolean; userId?: string | null; readQuery?: typeof runGreenhousePostgresQuery } = {}) => {
   try {
     // Strict authorization reads expiry in SQL and never run best-effort cleanup/notification adapters.
     if (!strict) await expireStaleUserOverrides()
 
-    const rows = await runGreenhousePostgresQuery<UserOverrideRow>(
+    const rows = await readQuery<UserOverrideRow>(
       `
         SELECT
           user_id,
@@ -419,8 +419,8 @@ const getPersistedUserOverrides = async ({ strict = false }: { strict?: boolean 
           reason,
           expires_at
         FROM greenhouse_core.user_view_overrides
-        WHERE expires_at IS NULL OR expires_at > now()
-      `
+        WHERE (expires_at IS NULL OR expires_at > now()) AND ($1::text IS NULL OR user_id=$1)
+      `, [userId]
     )
 
     return rows
@@ -703,9 +703,9 @@ export const syncViewRegistryCatalog = async (actorUserId = 'system') => {
   }
 }
 
-export const getPersistedViewRegistry = async () => {
+export const getPersistedViewRegistry = async (readQuery = runGreenhousePostgresQuery) => {
   try {
-    const rows = await runGreenhousePostgresQuery<ViewRegistryRow>(
+    const rows = await readQuery<ViewRegistryRow>(
       `
         SELECT
           view_code,
@@ -1055,7 +1055,8 @@ export const resolveAuthorizedViewsForUser = async ({
   roleCodes,
   tenantType,
   fallbackRouteGroups,
-  strict = false
+  strict = false,
+  readQuery = runGreenhousePostgresQuery
 }: {
   userId?: string | null
   roleCodes: string[]
@@ -1063,12 +1064,14 @@ export const resolveAuthorizedViewsForUser = async ({
   fallbackRouteGroups: string[]
   /** Auth authority: storage errors propagate; only successful empty reads use canonical defaults. */
   strict?: boolean
+  /** Optional transaction query keeps authorization facts in the caller snapshot. */
+  readQuery?: typeof runGreenhousePostgresQuery
 }): Promise<ResolvedUserViewAccess> => {
   try {
     const [persistedRows, persistedRegistryRows, persistedUserOverrides] = await Promise.all([
-      getPersistedAssignments(),
-      strict ? getPersistedViewRegistry() : getPersistedViewRegistry().catch(() => []),
-      strict ? getPersistedUserOverrides({ strict: true }) : getPersistedUserOverrides().catch(() => [])
+      getPersistedAssignments(readQuery),
+      strict ? getPersistedViewRegistry(readQuery) : getPersistedViewRegistry(readQuery).catch(() => []),
+      strict ? getPersistedUserOverrides({ strict: true, userId, readQuery }) : getPersistedUserOverrides({ readQuery }).catch(() => [])
     ])
 
     const registryRows = toRegistryRows(persistedRegistryRows)
@@ -1096,7 +1099,7 @@ export const resolveAuthorizedViewsForUser = async ({
 
     // Layer 2 — Permission Sets (additive, TASK-263)
     const permissionSetViews = userId
-      ? await (strict ? resolvePermissionSetViews(userId) : resolvePermissionSetViews(userId).catch(() => [] as string[]))
+      ? await (strict ? resolvePermissionSetViews(userId, readQuery) : resolvePermissionSetViews(userId, readQuery).catch(() => [] as string[]))
       : []
 
     const overridesForUser = userId

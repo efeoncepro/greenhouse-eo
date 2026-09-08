@@ -1,6 +1,9 @@
 # Efeonce Native Authorization Server Decision V1
 
-> **Status:** `Accepted` (2026-09-03). Runtime y OAuth publicados; el carril corporativo de TASK-1836 y su consumo TASK-1831 tienen canary interno real. Las matrices externas/multicontexto y la promoción del fix posterior de entrada directa siguen abiertas; ver el contrato vigente y el mapa de evidencia.
+> **Status:** `Accepted` (2026-09-03). Runtime, OAuth y entrada directa publicados; TASK-1836/TASK-1831 tienen
+> canary interno real y TASK-1832 completó la matriz técnica externa sintética. Siguen abiertos su observación y
+> retiro, el delta interno multiorganización de TASK-1844 y el primer cliente consentido; ver contratos y expedientes
+> vigentes.
 > **Date:** 2026-09-03
 > **Owner:** Efeonce Platform / Identity
 > **Scope:** authorization server propio en `auth.efeonce.org`, autenticación de personas externas y corporativas por carriles separados, emisión y verificación de tokens para `mcp.efeonce.org`, binding con Account 360, convergencia del login cliente de Greenhouse
@@ -28,11 +31,10 @@ y prevalece sobre los estados históricos de los deltas de este documento para e
 - `/login` ofrece Microsoft también sin conexión MCP pendiente. Ese acceso directo termina en una sesión,
   no emite por sí solo tokens ni concede permisos a una aplicación; la entrada desde OAuth conserva su retorno.
 
-PR225 y el canary interno acreditan el carril real de emisión/lectura/revocación. La entrada directa se
-publicó después desde `develop` (`21aa12608`, auth revisión 30); visibilidad/click público verificados,
-recorrido humano directo completo pendiente. El registro detallado, matrices aún abiertas y promoción
-pendiente de PR226 viven en [TASK-1836](../tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md).
-No se declara aquí cierre de TASK-1831/1832 ni disponibilidad general para clientes externos.
+PR225 y el canary interno acreditan el carril real de emisión/lectura/revocación. La entrada directa y las
+pantallas Efeonce ID quedaron publicadas y verificadas; el estado mutable de revisión vive en Handoff y en las
+tasks, no en este ADR. TASK-1832 acreditó clientes externos sintéticos, pero su cleanup y la primera cohorte real
+siguen separados. No se declara aquí cierre de TASK-1831/1832 ni disponibilidad general para clientes externos.
 
 ## Context
 
@@ -244,7 +246,7 @@ primer cliente: 5 a 7 semanas por los gates humanos.
 - [`EFEONCE_CUSTOMER_IDENTITY_PRIVACY_REVIEW_V1.md`](../operations/EFEONCE_CUSTOMER_IDENTITY_PRIVACY_REVIEW_V1.md)
 - [`GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md`](GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md) §Delta 2026-07-12 (patrón de excepción)
 - [`GREENHOUSE_360_OBJECT_MODEL_V1.md`](GREENHOUSE_360_OBJECT_MODEL_V1.md) · [`GREENHOUSE_IDENTITY_ACCESS_V2.md`](GREENHOUSE_IDENTITY_ACCESS_V2.md)
-- [`TASK-1631`](../tasks/in-progress/TASK-1631-efeonce-customer-identity-mcp-federation.md) · [`TASK-1626`](../tasks/in-progress/TASK-1626-efeonce-mcp-platform-gateway.md) · [`TASK-1813`](../tasks/to-do/TASK-1813-efeonce-mcp-oauth-client-interoperability.md)
+- [`TASK-1631`](../tasks/in-progress/TASK-1631-efeonce-customer-identity-mcp-federation.md) · [`TASK-1626`](../tasks/in-progress/TASK-1626-efeonce-mcp-platform-gateway.md) · [`TASK-1813`](../tasks/complete/TASK-1813-efeonce-mcp-oauth-client-interoperability.md)
 - Cloud KMS pricing (vigente 2025-03-17): https://cloud.google.com/kms/pricing
 
 ## Delta 2026-09-03 — costo en Google Cloud y front door compartido
@@ -476,3 +478,13 @@ tasa, y cada llamada inserta una fila en `greenhouse_auth.passkey_challenges` si
 no acotado disparable por un tercero anónimo. El GC (`pnpm auth:gc`) se construye aparte; hasta que exista
 y quede agendado, el endpoint **no** está cubierto por el anti-abuso de `auth_rate_limits`. Entra al
 alcance de aseguramiento de U08 (`TASK-1833`).
+
+## Delta 2026-09-07 — entrada multiproducto y consentimiento first-party
+
+La convergencia resumida en el punto 8 queda refinada, sin reescribir su registro histórico, por
+[`EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md`](EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md).
+Ese ADR es el canon especializado para entry routing server-side sin pantalla intermedia, login contextual
+único de Efeonce ID, fast path de sesión, clase registrada `first_party_sign_in`, separación de consentimiento
+MCP/terceros, autorización local del producto y migración legacy/recovery sin loops. `TASK-1834` es su primer
+consumidor. La decisión está Accepted; su implementación y verificación runtime permanecen gateadas por las
+tasks del programa.

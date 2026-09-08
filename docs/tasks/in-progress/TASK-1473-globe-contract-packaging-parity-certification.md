@@ -1,5 +1,22 @@
 # TASK-1473 — Globe Contract Packaging, SDK/MCP Adapters and Parity Certification
 
+## Delta 2026-09-06 — recibe el gate de Full API Parity de TASK-1626
+
+`TASK-1626` (U00 de `EPIC-044`) tenía colgado el bloque `Capability Definition of Done — Full API Parity gate`
+con sus tres criterios en cero, pero no puede cerrarlos: la paridad amplia de capabilities Globe salió de su
+alcance y vive acá. Se traspasan a esta task —
+
+- cada tool/resource de Globe mapea a un reader/command canónico y conserva sus errores/policy;
+- el coverage machine-readable distingue `enabled`, `policy-blocked`, `unavailable` y `not-applicable`;
+- el gateway no crea capabilities de negocio ni una ruta especial sólo para un cliente MCP.
+
+— y `TASK-1626` los conserva sólo como referencia histórica. Contexto medido el 2026-09-06: el gateway sirve
+39 tools en producción (revisión `efeonce-mcp-gateway-00044-4kj`), de las cuales Globe aporta tres
+(`globe.capabilities.list`, `globe.credits.funding.ensure`, `globe.producer.fleet.list`). El resto del
+inventario es SEO, Hiring, identidad y plataforma. Esa distancia entre 3 y el catálogo Globe completo es,
+literalmente, el trabajo que esta task mide.
+
+
 <!-- ZONE 0 — IDENTITY & TRIAGE -->
 
 ## Status

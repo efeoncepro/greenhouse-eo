@@ -270,5 +270,76 @@ para origen/CSP/redirect; renderers reales a 1440 px y 390 px con Microsoft visi
 sin overflow ni errores JS; fixtures visuales no sustituyen sesión real. Revisión independiente
 sin hallazgos de seguridad. El fix `21aa12608` se publicó desde `develop` mediante el run
 `34002082020`, revisión `auth-server-00030-rtm`: `/login` público muestra el botón y su click
-inicia Microsoft a 1440/390 px. PR226 aún no está promovido a `main` en este corte. Falta completar
+inicia Microsoft a 1440/390 px. PR226 quedó promovido a `main` `456d9accf` el 2026-09-06, posterior a ese corte. Falta completar
 una nueva autenticación humana desde esa entrada hasta `/auth/session`; el click no prueba ese cierre.
+
+## Delta TASK-1844 — Autoridad interna multiorganización (Accepted)
+
+- Fecha: 2026-09-08. Estado: **Accepted; aprobado por el operador («Aprobado»)**.
+- Owner: [TASK-1844](../tasks/in-progress/TASK-1844-efeonce-mcp-internal-multi-organization-authority.md).
+- Contrato, discovery, archivos, migración y evidencia: [plan TASK-1844](../tasks/plans/TASK-1844-plan.md).
+- Diseño aceptado e implementación local verificada; no modifica la historia v1 ni afirma activación de v2. [QA](../audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md) y [runbook](../operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md). Apply y rollout conservan su aprobación final.
+
+### D8 — Actor y objetivo tienen autoridad distinta
+
+V2 mantiene contexto/sesión corporativa/enrollment/binding como ancla del actor y conserva el `gv`
+firmado para validarla. Cada llamada org-scoped exige `organizationId` explícita. Greenhouse resuelve
+relación y capability efectiva sobre ese objetivo antes del dispatch y el provider conserva su recheck.
+No se derivan targets por email, dominio, un rol aislado ni la primera membership; no se agregan tenants
+al JWT ni scopes por organización. No se crean grants de targets en `external_capability_grants`.
+
+El reader compone las fuentes canónicas sin caché positiva: usuario interno único/activo, roles activos
+en fecha y alcance, relación vigente con la organización, catálogo de capabilities y permisos efectivos
+`base -> role defaults -> approved user overrides`. Se extrae el merger de governance para que admin y
+reader no implementen precedencias diferentes. Un permiso de un space no concede lectura agregada de
+otro space de la organización. Los casos ambiguos o sin contrato de módulo suficiente deniegan.
+
+### D9 — Contrato v2 y discovery minimizado
+
+El resource machine-only existente admite intenciones `catalog`, `target` y `organizations`, todas con
+ledger/token/contexto vigentes. Catálogo controla visibilidad, target autoriza el objetivo exacto, y
+organizations lista sólo IDs/nombres/capabilities autorizados. El DTO v2 discrimina actor ancla y targets;
+no representa cada target mediante un binding externo ficticio. Una revisión opaca por target describe
+sus hechos efectivos y no se compara con el `gv` del actor ni funciona como credencial cacheable.
+
+El gateway agrega `efeonce.organizations.list`, interna v2, read-only/base-only, schema estricto y
+respuesta estructurada. Página máxima 50, sin total global; keyset sobre un ID ya autorizado que se
+revalida, sin exponer IDs de candidatos ocultos. La tool requiere actualización de policy, annotations,
+baseline y versión minor. La lista nunca sustituye la autorización fresca de una llamada posterior.
+V2 inicial delega únicamente la lectura existente `growth.seo.observation.read`; no incorpora escrituras
+ni adapters pendientes de otros providers. V1, externos/canary y Entra conservan sus contratos.
+
+### D10 — Consentimiento fresco y migración compatible
+
+Un contexto v2 tiene ID distinto, versión inmutable y unicidad que incluye esa versión. El FK existente
+de consentimiento separa la nueva aprobación; no se promueve un consentimiento/code/refresh v1 a v2.
+La versión se propaga desde el contexto por emisión, verificación, introspection y reader. GET/POST
+del consentimiento deben quedar ligados al contexto y clase mostrados. El formulario declara ID/versión
+como expectativas, comparadas con sesión/contexto server-side; no los usa como fuente de autoridad y
+un formulario legacy nunca aprueba v2. Cambiar flags no cambia lo que la persona aprobó. El texto v2
+presenta las organizaciones actuales y explica que el acceso sigue
+los permisos vigentes mientras la autorización permanezca activa.
+
+El PG real admite únicamente v1 y el writer depende del índice sin versión. La transición requiere
+expansión CHECK/índice nuevo, writer compatible con ambos índices y, sólo después de readback de todos
+los writers, retiro del índice viejo. Los SQL se mantienen pendientes hasta apply gobernado. No hay
+backfill de permisos ni consentimiento. Tras retirar el índice anterior, rollback sólo hacia binarios
+con writer compatible; no se revierte schema borrando evidencia ni se restaura una unicidad incompatible.
+
+### D11 — Revocación, rollout y prueba proporcional
+
+Gates default OFF: `AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED`, `IDENTITY_INTERNAL_MULTI_ORG_ENABLED`
+y `MCP_NATIVE_INTERNAL_MULTI_ORG_ENABLED`. La cohorte inicial del issuer usa
+`AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS`, explícita y vacía por defecto. Activar una flag no
+concede autoridad ni sustituye consentimiento. Rollback detiene emisión/refresh, luego gateway y reader;
+restore sigue reader, gateway e issuer. La instancia compartida de auth-server requiere coordinación.
+
+Una resolución nueva posterior al commit de revocación debe denegar, sin caché positiva, y demostrar
+una cota de 60 s como máximo; no se promete cancelar retroactivamente una llamada autorizada antes.
+Señales sanitizadas: `internal_target_denied`, `internal_reader_unavailable`,
+`internal_context_version_drift`; el harness mide `internal_revoked_still_dispatching`, sin reportar
+cero cuando no fue ejecutado. Concurrencia no comparte estado de autoridad entre requests.
+
+Aceptación exige mismo token A/B allow, C/missing deny, revocación selectiva B con A vigente, revocación
+global, refresh, aislamiento concurrente, PG real, clientes Codex/Claude y rollback/readback productivos.
+Código verde con gates OFF se informa como `code complete, rollout pendiente`, nunca como cierre formal.

@@ -112,18 +112,19 @@ el worker Cloud Run compartido materializa `seo_gsc_daily`, sin flip aislado de 
 [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) e
 [`OPS_RELIABILITY_AGENT_INVARIANTS.md`](docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md).
 
-ETV de DataForSEO Labs se versiona por metodología. DataForSEO confirmó 14 familias y corte obligatorio
-`2026-11-01T00:00:00Z` sin fallback legacy; la versión no viene en la respuesta. No se activa ni mezcla improved
-antes de persistir provenance, separar idempotencia y medir shadow contra GSC. Contrato confirmado:
-[auditoría ETV 2026-09-01/02](docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md). La decisión aceptada es
-[`GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md`](docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md)
-entregado en `TASK-1805`/`TASK-1806`: desde 2026-09-03 producción sirve `improved_layout_clickstream_v2`
-(rebaseline); legacy sólo como rollback pre-corte.
+ETV de DataForSEO Labs se versiona por metodología; desde 2026-09-03 producción sirve
+`improved_layout_clickstream_v2` y legacy queda sólo como rollback pre-corte. Contrato, corte y provenance:
+[`GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md`](docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md) ·
+[auditoría](docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md).
+
+Efeonce Insights: [arquitectura](docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md), EPIC-045.
+Diseño de deck/A4/web por edición; implementación pendiente en TASK-1845–1849.
 
 Informes: skill `report-studio` (Claude/Codex), evidencia, diseño y QA PDF.
-Berel: `berel-content-production` ·
-[plan](docs/operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md) ·
-[informes](docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md).
+Berel: `berel-content-production` · [plan](docs/operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md) ·
+[informes](docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md) ·
+[colaboración](docs/operations/BEREL_CLIENT_COLLABORATION_OPERATING_MODEL_V1.md). Preservar análisis, N1–N4 y
+arte producido; la cadencia mensual requiere aceptación del cliente.
 
 WordPress/Ohio: skill `efeonce-public-site-wordpress`; contratos [Home](docs/architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md),
 [HubSpot](docs/architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md) y [misceláneas](docs/architecture/public-site/PUBLIC_MISCELLANEOUS_SURFACES_V1.md).
@@ -145,28 +146,27 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
 - Este repo corresponde al `starter-kit` Greenhouse. `full-version` es referencia visual/funcional, no
   source of truth ni producto activo.
 - Greenhouse es plataforma/subproducto de Efeonce; `EO` es abreviación del repo, no nomenclatura visible.
-- El gateway MCP federado vive en `efeonce-mcp` y sirve `https://mcp.efeonce.org/mcp` desde Cloud Run. Sus tools
-  internas verificadas son `globe.producer.fleet.list` y `globe.credits.funding.ensure`; la segunda exige
-  autoridad sellada y llama el command Greenhouse. El acceso comercial espera certificación y piloto. SSOT:
-  `src/mcp/greenhouse/tool-manifest.ts` (TASK-1780) y `skill-manifest.ts` (TASK-1804).
-- Greenhouse, `auth.efeonce.org` y MCP mantienen cookies, sesiones y audiencias propias, pero resuelven un único
-  `identity_profile` y Account 360 mediante bindings auditados. El login cliente debe converger a ese plano, sin
-  crear una segunda identidad o contraseña permanente.
+- El gateway MCP federado vive en `efeonce-mcp` y sirve `https://mcp.efeonce.org/mcp` desde Cloud Run. Cada
+  provider conserva policy y contratos; los manifiestos Greenhouse de tools/skills son sus SSOT (TASK-1780/1804).
+- Greenhouse, `auth.efeonce.org` y MCP aíslan cookies, sesiones y audiencias, pero resuelven un `identity_profile`
+  y Account 360 mediante bindings auditados. Cada producto entra en su contexto: un first-party puede reutilizar
+  sesión con assurance; MCP y terceros conservan consentimiento por cliente/scope y step-up. No nace otra identidad.
 - EPIC-044: emisor propio `auth.efeonce.org`, KMS/JWKS, OAuth y sesiones de personas; gateway multi-issuer.
   Autoridad externa e interna separadas por población/binding/contexto; SSO no concede permisos MCP.
   Grants, `gv` y ledger de tokens se revalidan antes del dispatch; estado/audit/outbox atómicos.
-  `TASK-1832` reserva una organización efímera no cliente, registrada, `smoke_test`, con TTL y sólo lectura; su
-  contrato de retiro revoca autoridad y borra únicamente assets propios con readback cero. El schema está aplicado
-  con registry vacío; código y gateway siguen locales, con rollout live pendiente. `TASK-1841` separa el piloto
-  cliente consentido.
+  `TASK-1813` cerró `1.2.0`: Efeonce ID/base-only, shim retirado, rollback y matriz post-cutover completos. Un token
+  resuelve un contexto; `TASK-1844` implementa v2 con selección por llamada, sin claims wildcard; código listo,
+  rollout pendiente según su [runbook](docs/operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md).
+  `TASK-1832` mantiene hasta `2026-09-13T19:43:30Z` el canary sintético read-only; ChatGPT, Claude Code/ai/Desktop,
+  Codex y Playwright están certificados. Su retiro exige readback cero; `TASK-1841` separa el piloto real.
   [`ADR nativo`](docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) ·
+  [`entrada y consentimiento por RP`](docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md) ·
   [`autoridad interna`](docs/architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md) ·
   [`runbook`](docs/operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md) ·
   TASK-1837: invitación externa por el sistema + autoridad delegada (en producción desde 2026-09-06).
-- La operación o evolución MCP se enruta por las skills espejo `.codex/skills/efeonce-mcp-platform/` y
-  `.claude/skills/efeonce-mcp-platform/`; estas componen la skill dueña de cada provider y no duplican su policy.
-  Las skills de arquitectura `software-architect-2026` y `arch-architect` deben cargar ese router antes de
-  proponer una nueva surface, OAuth o binding cross-runtime.
+- La operación MCP se enruta por las skills espejo `efeonce-mcp-platform`, que componen la skill de cada provider.
+  Una superficie hospedada puede compartir DCR/familia; la observación es read-only y atribuye negativos por
+  timestamp + DCR run-owned + familia revocada. Arquitectura debe cargar ese router antes de cambiar OAuth.
 - Hiring/ATS separa **etapa** (¿dónde está?) de **desenlace** (¿cómo terminó?) y ésos son ejes ortogonales,
   atados por el `CHECK` `(stage='closed') = (decision IS NOT NULL)`. `TASK-1754` dejó el vocabulario de etapas
   en **seis** (`sourced`, `screening`, `shortlisted`, `interview`, `decision_pending`, `closed`) y `TASK-1765`

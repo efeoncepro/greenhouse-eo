@@ -1,5 +1,15 @@
 # TASK-1830 — Efeonce Auth External Person Authentication (passkeys, magic link, TOTP, recovery)
 
+## Delta 2026-09-07 — sesión común, presentación contextual y recovery
+
+`docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md` eleva a EPIC-044 el contrato que
+TASK-1834 descubrió. La sesión `__Host-efeonce_auth` pertenece sólo al issuer: puede habilitar un fast path cuando
+una transacción RP válida ya satisface assurance, pero no se comparte con Greenhouse/Globe ni concede autorización
+de producto o MCP. Si hace falta autenticar, los renderers muestran métodos dentro del contexto RP validado; la
+marca y el retorno nunca vienen de parámetros libres. Recovery y legacy deben disponer de un estado/ruta que evite
+el auto-redirect y los loops. TASK-1834 sigue siendo el primer consumer Greenhouse y la dueña de su entry; este
+delta no declara cambios de código ni rollout adicionales en TASK-1830.
+
 ## Delta 2026-09-06 — el carril de tokens ya NO está bloqueado por el mecanismo de ENTREGA (TASK-1837)
 
 `TASK-1837` (commits `5518d868e…189148c6e`; migración aplicada 2026-09-06 y **verificado end-to-end en staging el
@@ -209,6 +219,7 @@ tiene superficies acotadas y verificables.
 Revisar y respetar:
 
 - `docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`
+- `docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md`
 - `docs/architecture/EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md` (§Invariants: una persona = un `identity_profile`)
 - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md`
 - `docs/architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` (§Auth resilience, capas TASK-742)
@@ -221,6 +232,10 @@ Reglas obligatorias:
 - NUNCA revelar si un correo existe (respuestas idénticas en tiempo y forma); anti-enumeración obligatoria.
 - NUNCA loggear tokens de magic link, secretos TOTP, challenges WebAuthn ni ids de sesión crudos.
 - SIEMPRE ligar la sesión a un source link verificado `(environment, subject)`; sin invitación aceptada no hay sesión.
+- La cookie/sesión del issuer nunca es cookie ni autorización de un RP. Una sesión suficiente puede evitar repetir
+  autenticación, pero el producto vuelve a resolver su contexto y MCP conserva consentimiento/autorización propios.
+- El contexto visible del login se deriva exclusivamente de una transacción y RP registrados; recovery/legacy no
+  se auto-redirigen de vuelta al mismo flujo fallido.
 - SIEMPRE registrar en `auth_attempts` (ledger TASK-742) cada intento con resultado, sin PII adicional.
 - Copy visible SOLO desde `src/lib/copy/auth-server.ts` validado con `greenhouse-ux-writing`.
 

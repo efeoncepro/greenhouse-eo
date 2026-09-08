@@ -194,6 +194,11 @@
 - ✅ Inferir solo con evidencia unívoca; si quedan varios spaces, preguntar una vez
 - **Por qué**: una operación válida en el workspace equivocado sigue siendo pérdida de integridad
 
+### AP-36: Reemplazar todo el body para limpiar un fragmento comentado
+- ❌ Full-body replace o recorrido de versiones sin inventariar discusiones, jerarquía y bloques protegidos
+- ✅ Baseline pre-edit → reemplazo mínimo sobre el estado fresco → readback de IDs/autores/`resolved`/estructura
+- **Por qué**: una edición aceptada puede borrar anclas, aplanar toggles o retirar contenido válido sin avisar
+
 ## 8. Cross-refs
 
 Todos los anti-patterns están cross-referenced con:

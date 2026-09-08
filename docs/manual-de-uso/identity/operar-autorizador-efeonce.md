@@ -1,9 +1,9 @@
 # Operar el autorizador de Efeonce (`auth.efeonce.org`)
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-09-04 por Claude
-> **Ultima actualizacion:** 2026-09-06 (TASK-1836 y contribuciones de TASK-1831)
+> **Ultima actualizacion:** 2026-09-07 (TASK-1832)
 > **Modulo:** Identidad y acceso (EPIC-044 · TASK-1828 · TASK-1829)
 > **Administración en portal:** operaciones programáticas; la UI pública de login vive en `auth.efeonce.org`. Se opera con `curl`, `gcloud`, `pnpm auth-server:rotate-key`, `pnpm auth-server:register-client`, `pnpm auth-server:register-issuer-environment` y las rutas admin `POST /api/admin/auth-server/oauth-clients` y `POST /api/admin/auth-server/consents/revoke`. Señales en `/admin/operations`.
 > **Documentacion relacionada:** [Autorizador de Efeonce](../../documentation/identity/autorizador-efeonce.md), [Runbook auth-server](../../operations/runbooks/auth-server.md), [EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md](../../architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md), [Operar el binding de identidad externa](operar-binding-identidad-externa.md), [EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md)
@@ -15,6 +15,10 @@ prenderlo o apagarlo, rotar la llave con la que firma y retirar la versión viej
 capa entregada en `TASK-1828` (runtime, llaves y dirección pública) y, desde `TASK-1829`, la superficie OAuth:
 registrar un cliente confidencial, revocar el consentimiento de una persona y prender el flag en staging. El acceso corporativo de TASK-1836 se opera según
 [el manual interno](efeonce-id-interno.md) y su [runbook de cohorte](../../operations/EFEONCE_INTERNAL_AUTH_ROLLOUT_RUNBOOK_V1.md).
+
+Para clientes MCP externos usa el [manual del canary](certificar-cliente-mcp-con-canary-sintetico.md). ChatGPT
+hospedado se registró como cliente público DCR, no como confidential. Claude Code se prueba con versión
+`>=2.1.196`, scope base fijado y DCR run-owned; un CIMD compartido no se incluye en el hard delete.
 
 El despliegue y la publicación del host en el balanceador son operaciones de plataforma; están en el
 [runbook](../../operations/runbooks/auth-server.md) (§1 y §4) y no se repiten aquí.

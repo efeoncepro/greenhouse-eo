@@ -17,6 +17,9 @@ certifica flags, versiones desplegadas, elegibilidad de clientes ni finalizació
 - El contexto seleccionado fija organización, población y binding. `gv` pertenece a ese contexto,
   nunca al máximo de versiones entre organizaciones. Consentimiento, token, refresh y gateway deben
   conservarlo y reevaluar elegibilidad y permisos vigentes; igualdad de `gv` sola no concede acceso.
+- El carril interno multiorganización de TASK-1844 conserva ese token de contexto único y selecciona una
+  organización objetivo por llamada; Greenhouse la autoriza con el reader canónico. No serialices todas las
+  organizaciones en claims, no uses comodines y no sumes permisos entre contextos.
 - La sesión corporativa no hereda step-up local desde `amr`/`acr` upstream. Refresh conserva `auth_time`;
   no puede volver reciente una autenticación antigua. El callback valida firma, tenant/issuer, audiencia,
   expiración, nonce, PKCE, transacción de un uso y frescura firmada de `auth_time`. La solicitud usa
@@ -54,8 +57,9 @@ certifica flags, versiones desplegadas, elegibilidad de clientes ni finalizació
   `identity.*` del gateway deniegan a Entra y a la población interna: sólo issuer nativo y persona
   `native-external`, con la organización resuelta por membership.
 - El consentimiento muestra el host del `redirect_uri` validado; su ausencia es error de render. La federación
-  de la lane vive en `efeonce-mcp` PR #3 (abierto, sin merge; espera el release de Greenhouse + flag en
-  Production); `resend`/`revoke` delegados aún no están federados.
+  inicial de la lane de invitaciones de `efeonce-mcp` PR #3 fue integrada después del release Greenhouse y del
+  flag de Production; cualquier afirmación sobre la revisión servida requiere readback live. `resend`/`revoke`
+  delegados aún no están federados.
 
 ## Dos entradas de navegador, dos pruebas
 

@@ -6,7 +6,7 @@
 - **Scope:** repositorio `efeonce-mcp`, transporte MCP remoto, autenticación, federación de productos, Cloud Run, front door y dominio público
 - **Reversibility:** two-way-but-slow
 - **Confidence:** high para boundary, hosting, hostname, authorization server y el primer reader Globe después del canary PKCE real
-- **Validated as of:** 2026-09-02 (delta deprecación DCR en la revisión MCP `2026-07-28`; shim verificado en vivo; base 2026-08-01)
+- **Validated as of:** 2026-09-07 (emisor nativo, canary externo sintético, ChatGPT hospedado y gateway MCP v2)
 - **Implementation owner:** [`TASK-1626`](../tasks/in-progress/TASK-1626-efeonce-mcp-platform-gateway.md)
 - **First provider owner:** [`TASK-1473`](../tasks/in-progress/TASK-1473-globe-contract-packaging-parity-certification.md)
 
@@ -18,15 +18,32 @@ el carril Entra legado. El gateway sigue sin emitir tokens ni consultar introspe
 resuelve autoridad mediante el reader confiable. Su policy por tool decide poblaciones, scopes, capabilities
 y organización; compartir issuer no abre tools internas.
 
+TASK-1813 fija además el discovery vigente: con auth nativo habilitado, el PRM anuncia sólo Efeonce ID y
+`efeonce.mcp.read`. Los scopes de dominio/escritura se descubren incrementalmente ante el `403` de la tool
+exacta. El shim Entra de TASK-1654, `/register`, la metadata AS espejada y `OAUTH_PUBLIC_CLIENT_ID` quedan
+retirados del contrato soportado. Entra sigue configurado como trust lane para validar tokens legacy, no como
+segundo bootstrap. Esta decisión sirve en producción desde `efeonce-mcp` `1.2.0`, revisión `00047-8b5`, con
+rollback y matriz post-cutover de clientes verificados.
+
 El contexto interno firmado fija sujeto/perfil, cliente, audiencia, organización, binding y procedencia;
 `gv` es el del binding seleccionado. El reader revalida ese contexto y el `jti` vigente del ledger antes de
 dispatch, con revocación local ≤60 s. No existe fallback desde el resolver externo `internal_population`.
 Los gates nativo e interno se verifican por separado; refresh/dispatch previos no eluden un gate apagado.
 Contrato especializado: [autoridad interna nativa](EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md).
 
-El [mapa consolidado](../audits/2026-09-06-task-1836-1831-consolidated-evidence.md) registra canary interno,
-rollbacks, revisiones y las matrices externas/multicontexto aún pendientes. No se declara cierre general de
-federación ni de clientes externos a partir del piloto. Los deltas siguientes conservan contexto histórico.
+El gateway productivo usa los paquetes estables MCP v2 y serializa schemas, `structuredContent`, cuatro
+annotations y el mirror `_meta.securitySchemes` desde una policy única. El probe `POST /mcp` con JSON vacío se
+autentica antes de validar el body: anónimo responde `401` con challenge; autenticado puede responder
+`400 invalid_request`; nunca `500`. TASK-1832 acreditó ChatGPT hospedado con dos tools read-only y refresh real
+post-TTL. Claude Code se certifica por versión: `2.1.186` falló por scopes amplios; `2.1.263` tiene bootstrap
+mínimo corregido y completó consentimiento, dispatch y refresh post-TTL. Claude.ai y Desktop también pasaron
+por el conector remoto, sin ampliar scopes. La certificación sintética no abre customer access.
+
+El [mapa consolidado](../audits/2026-09-06-task-1836-1831-consolidated-evidence.md) registra el canary interno y
+sus rollbacks. La [matriz TASK-1832](../audits/mcp/EFEONCE_MCP_CLIENT_TOKEN_MATRIX_2026-09-06.md) acredita los
+clientes externos sintéticos; las pruebas multicontexto, el retiro del fixture y el primer cliente consentido
+conservan gates propios. No se declara cierre general de federación ni customer access. Los deltas siguientes
+conservan contexto histórico.
 
 ## Context
 
@@ -57,8 +74,8 @@ duplica lógica de negocio.
    audience, expiración y scopes, y responde con challenges estándar. Microsoft Entra ID del tenant Efeonce
    es el authorization server inicial. El resource parameter canónico es `https://mcp.efeonce.org/mcp`; Entra
    v2 representa ese recurso en el claim `aud` mediante el App ID exacto de la aplicación recurso. Si la
-   configuración falta o no pasa el canary, `/mcp` falla cerrado. El gateway declara **cinco** scopes cuando los
-   providers correspondientes están activos: el
+   configuración falta o no pasa el canary, `/mcp` falla cerrado. El inventario de scopes se deriva de las
+   clases activas y puede crecer; nunca se congela como cifra en este ADR. Incluye el
    base `efeonce.mcp.read`, el reader Globe `efeonce.mcp.globe.read`, el write interno
    `efeonce.mcp.globe.credits.funding.ensure` del punto 12, que sólo aparece en `scopes_supported` cuando su flag
    `globeCreditFunding.enabled` está en ON, y el write SEO `efeonce.mcp.seo.write` (TASK-1308), que sólo aparece
@@ -564,6 +581,47 @@ superficie cambia NO se repiten acá: viven en
 [`MCP_TOOL_SURFACE_INVARIANTS.md`](agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md) §9 y, del lado
 operativo, en el runbook (`GATEWAY_BUILD_SHA` de la revisión activa debe coincidir con el HEAD de
 `origin/main`, o hay commits mergeados sin desplegar).
+
+### Delta 2026-09-07 — retiro del shim Entra y bootstrap nativo mínimo (TASK-1813)
+
+**Disparador cumplido.** El emisor propio ya opera OAuth completo con metadata coherente, DCR/CIMD, PKCE S256,
+refresh rotativo y consentimiento. El gateway ya es multi-issuer. TASK-1832 certificó Codex `0.153.4`, Claude
+Code `2.1.263`, Claude.ai, Claude Desktop `1.46388.4` y ChatGPT hospedado con Efeonce ID, lectura real y scopes
+base-only; el FAIL de Claude Code `2.1.186` se conserva como historia. Se cumplió el disparador explícito del
+delta 2026-09-02 para reabrir la decisión del shim.
+
+**Decisión.** El gateway deja de presentarse como authorization server y deja de distribuir el cliente público
+Entra. Con `MCP_NATIVE_AUTH_ENABLED=true`, ambos PRM (`/.well-known/oauth-protected-resource` y su variante
+`/mcp`) son equivalentes y anuncian exclusivamente `MCP_NATIVE_ISSUER`; `scopes_supported` contiene sólo
+`efeonce.mcp.read`. El emisor nativo publica su propia metadata y registra clientes. En el gateway:
+
+- `/.well-known/oauth-authorization-server`, su variante `/mcp` y `POST /register` dejan de existir;
+- `OAUTH_PUBLIC_CLIENT_ID` y el fallback del workflow dejan de configurar comportamiento;
+- `MCP_REQUIRED_SCOPES` deja de ser una palanca: el bootstrap queda fijado a lectura base;
+- Globe, Hiring, SEO e Identity conservan scopes propios, pero se comunican sólo mediante el challenge
+  `WWW-Authenticate` de un `403 insufficient_scope` para la tool pedida;
+- un challenge nativo usa scopes bare. En modo legacy-only Entra se cualifican contra el resource canónico;
+  los claims ya verificados continúan bare para policy y dispatch;
+- `OAUTH_ISSUER`, `OAUTH_JWKS_URI` y `OAUTH_AUDIENCE` permanecen como trust lane. Un JWT Entra válido sigue
+  aceptado; activar el carril nativo no publica Entra ni suma emisores en discovery.
+
+Esto cierra la causa del mismatch: un resource server puede vivir en `mcp.efeonce.org` y su authorization
+server en `auth.efeonce.org`; lo que no puede hacer es servir metadata bajo el primer issuer declarando el
+segundo. El harness de TASK-1813 prueba conductualmente ambos casos y no reemplaza la verificación de clientes.
+
+**Sin ampliación de permisos.** No se modifica ningún app registration, redirect URI, grant, capability,
+membership, audience ni policy downstream. Ningún write aparece en bootstrap. Los tests exigen cero dispatch
+ante issuer, audience, expiración, falta de scope base, falta de scope de dominio/write u OAuth ausente. El
+scope de identidad descrito en el delta 2026-09-06 sigue existiendo y sigue siendo nativo, pero ya no se anuncia
+en el PRM inicial.
+
+**Rollout y rollback.** `efeonce-mcp` `1.2.0`, SHA `cd229069`, sirve 100 % en `00047-8b5`. El readback confirmó
+SHA/digest/revisión, ausencia de las variables retiradas, PRM nativo base-only, rutas del shim `404`, `/health`
+`200`, MCP anónimo `401` y trust lane Entra preservada. El ensayo movió 100 % a `00046-6n2`, reprodujo el contrato
+anterior y restauró `00047-8b5` con los asserts nuevos. Claude Code, Codex, Claude.ai, Claude Desktop y ChatGPT
+repitieron lecturas post-cutover; los dos hosted finales renovaron con scope único `efeonce.mcp.read`, sin writes ni
+gasto. Ante una regresión futura se restaura 100 % a la revisión capturada; no se reintroduce el shim mediante una
+variable silenciosa. Un retorno permanente del shim exigiría otro Delta y nueva evidencia de clientes.
 
 ## References
 

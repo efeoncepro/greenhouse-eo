@@ -12,7 +12,7 @@ const now = new Date('2026-09-05T12:00:00Z')
 const read = 'efeonce.mcp.read'
 const write = 'efeonce.mcp.seo.write'
 
-async function submit(authLevel: 'primary' | 'step_up', scopes: string[], decision = 'allow', bound = true) {
+async function submit(authLevel: 'primary' | 'step_up', scopes: string[], decision = 'allow', bound = true, v2?: { fields: Record<string, string>; projection?: boolean }) {
   const store = new InMemoryOAuthStore()
   const clientId = 'registered-client'
 
@@ -58,11 +58,12 @@ async function submit(authLevel: 'primary' | 'step_up', scopes: string[], decisi
         client_id: clientId,
         scope: scopes.join(' '),
         return_to: returnTo,
-        decision
+        decision,
+        ...v2?.fields
       }).toString()
     },
     {
-      consentContextPort: { resolve: async () => ({ outcome: 'resolved', population: 'internal', organizations: [{ organizationName: 'Test org', capabilities: [] }] }) },
+      consentContextPort: { resolve: async () => ({ outcome: 'resolved', population: 'internal', ...(v2 && v2.projection !== false ? { authorityClass: 'internal_multi_org' as const } : {}), organizations: [{ organizationName: 'Test org', capabilities: [] }] }) },
       grantsPort: createStaticGrantsPort(
         bound
           ? { bound: true, grantsVersion: 2, profileId: 'profile', memberships: 1 }
@@ -81,6 +82,7 @@ async function submit(authLevel: 'primary' | 'step_up', scopes: string[], decisi
         subject: 'person',
         environmentId: 'native',
         authLevel,
+        ...(v2 ? { authorizationContextVersion: 2 as const } : {}),
         authTime: now,
         authorizationContextId: '550e8400-e29b-41d4-a716-446655440000'
       }),
@@ -155,5 +157,37 @@ describe('consent POST requires fresh local step-up before accepting write scope
     expect(new URL(response.headers.Location!).searchParams.get('error')).toBe('access_denied')
     expect(store.consents).toEqual([])
     expect(grant).not.toHaveBeenCalled()
+  })
+})
+
+
+describe('TASK-1844 consent binds the displayed context and class', () => {
+  const fields = { authorization_context_id: '550e8400-e29b-41d4-a716-446655440000', authorization_context_version: '2' }
+
+  it('accepts only the current v2 form with the matching dynamic authority projection', async () => {
+    const allowed = await submit('primary', [read], 'allow', true, { fields })
+
+    expect(allowed.response.status).toBe(302)
+    expect(allowed.grant).toHaveBeenCalledOnce()
+
+    for (const variant of [{}, { ...fields, authorization_context_version: '1' },
+      { ...fields, authorization_context_id: '550e8400-e29b-41d4-a716-446655440001' }]) {
+      const rejected = await submit('primary', [read], 'allow', true, { fields: variant })
+
+      expect(rejected.response.status).toBe(400)
+      expect(rejected.grant).not.toHaveBeenCalled()
+    }
+
+    const staleProjection = await submit('primary', [read], 'allow', true, { fields, projection: false })
+
+    expect(staleProjection.response.status).toBe(403)
+    expect(staleProjection.grant).not.toHaveBeenCalled()
+  })
+
+  it('never broadens v2 via another client or step-up', async () => {
+    const result = await submit('step_up', [read, write], 'allow', true, { fields })
+
+    expect(result.response.status).toBe(400)
+    expect(result.grant).not.toHaveBeenCalled()
   })
 })

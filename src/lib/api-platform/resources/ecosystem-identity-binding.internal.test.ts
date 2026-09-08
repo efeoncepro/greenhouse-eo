@@ -6,7 +6,7 @@ import { revokeClientConsent } from '@/lib/auth-server/oauth/consent'
 import type { ApiPlatformRequestContext } from '../core/context'
 import { getEcosystemIdentityBindingPayload } from './ecosystem-identity-binding'
 
-const mocks = vi.hoisted(() => ({ resolve: vi.fn(), external: vi.fn(), runtime: vi.fn(), getAccessToken: vi.fn() }))
+const mocks = vi.hoisted(() => ({ resolve: vi.fn(), external: vi.fn(), runtime: vi.fn(), multiOrg: vi.fn(), getAccessToken: vi.fn() }))
 
 vi.mock('@/lib/auth-server/oauth/store/postgres-store', () => ({
   PostgresOAuthStore: class {
@@ -15,7 +15,7 @@ vi.mock('@/lib/auth-server/oauth/store/postgres-store', () => ({
 }))
 
 vi.mock('server-only', () => ({}))
-vi.mock('@/lib/auth-server/internal/runtime', () => ({ createRuntimeInternalContexts: mocks.runtime }))
+vi.mock('@/lib/auth-server/internal/runtime', () => ({ createRuntimeInternalContexts: mocks.runtime, resolveRuntimeInternalMultiOrg: mocks.multiOrg }))
 vi.mock('@/lib/identity/external-access/resolve-external-access', () => ({ resolveExternalAccess: mocks.external }))
 vi.mock('@/lib/auth-server/oauth/config', () => ({
   readAuthServerOAuthConfig: () => ({
@@ -311,6 +311,54 @@ describe('internal binding token revocation ledger', () => {
     mocks.getAccessToken.mockRejectedValueOnce(new Error('ledger unavailable'))
     await expect(invoke()).rejects.toThrow('ledger unavailable')
     expect(mocks.resolve).not.toHaveBeenCalled()
+    expect(mocks.external).not.toHaveBeenCalled()
+  })
+})
+
+
+describe('TASK-1844 machine-only v2 projection', () => {
+  const v2 = { ...params, contextVersion: '2', intent: 'target', organizationId: 'org-B', capability: 'growth.seo.observation.read' }
+
+  it('passes the exact signed actor dimensions and target to one snapshot and returns only authorized data', async () => {
+    const target = { organizationId: 'org-B', organizationName: 'Organization B', capabilities: [v2.capability], authorityRevision: 'a'.repeat(43) }
+
+    mocks.multiOrg.mockResolvedValue({ allowed: true, context: { profileId: 'profile-A', organizationId: 'anchor', bindingId: 'binding-A' },
+      grantsVersion: 3, targets: { targets: [target], capabilities: [v2.capability], nextAfterOrganizationId: null } })
+    const result = await invoke(v2)
+
+    expect(mocks.multiOrg).toHaveBeenCalledExactlyOnceWith({ surface: 'reader', jti: params.jti,
+      context: { id: ID, version: 2, issuer: 'https://auth.example', environmentId: params.environment, subject: params.subject,
+        clientId: params.clientId, audience: params.audience, grantsVersion: 3 },
+      target: { intent: 'target', organizationId: 'org-B', capability: v2.capability } })
+    expect(result).toEqual({ cacheControl: 'private, no-store', data: { population: 'internal', outcome: 'bound', cacheTtlSeconds: 0,
+      contextVersion: 2, authorizationContextId: ID,
+      actor: { profileId: 'profile-A', organizationId: 'anchor', bindingId: 'binding-A', grantsVersion: 3 },
+      targets: [target], capabilities: [v2.capability], nextAfterOrganizationId: null } })
+    expect(mocks.resolve).not.toHaveBeenCalled()
+    expect(mocks.external).not.toHaveBeenCalled()
+  })
+
+  it('rejects empty/unknown/duplicated targets, unsupported classes and excess pages before reading', async () => {
+    for (const override of ([{ organizationId: '' }, { organizationId: '*' }, { intent: 'target', capability: 'growth.seo.target.configure' },
+      { intent: 'organizations', organizationId: '' }, { intent: 'catalog', organizationId: '' }, { intent: 'organizations', limit: '51' }] as Record<string, string>[])) {
+      await expect(invoke({ ...v2, ...override })).rejects.toMatchObject({ statusCode: 400 })
+    }
+
+    await expect(getEcosystemIdentityBindingPayload({ context: context(), request: new Request(
+      `https://greenhouse.example/binding?${new URLSearchParams(v2)}&organizationId=org-C`) })).rejects.toMatchObject({ statusCode: 400 })
+    await expect(invoke(v2, 'organization')).rejects.toMatchObject({ statusCode: 404 })
+    await expect(invoke({ ...v2, contextVersion: '1' })).rejects.toMatchObject({ statusCode: 400 })
+    expect(mocks.multiOrg).not.toHaveBeenCalled()
+  })
+
+  it('denies unavailable/revoked authority without projecting any actor or organization', async () => {
+    for (const reason of ['unavailable', 'organization_denied', 'disabled', 'context_invalid']) {
+      mocks.multiOrg.mockResolvedValue({ allowed: false, reason })
+      const result = await invoke(v2)
+
+      expect(result.data).toEqual({ population: 'internal', outcome: 'denied', contextVersion: 2, authorizationContextId: ID, cacheTtlSeconds: 0, reason })
+    }
+
     expect(mocks.external).not.toHaveBeenCalled()
   })
 })

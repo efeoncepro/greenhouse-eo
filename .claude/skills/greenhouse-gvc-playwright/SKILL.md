@@ -154,6 +154,46 @@ jq '.qualityFindings, .runtimeSummary' .captures/<run>/manifest.json
 
 **Nunca cierres una verificación mirando el PNG cuando el scenario declara `qualityProfile`.**
 
+### Corolario — un `violations: 0` de axe puede ser una medición VACÍA (2026-09-06)
+
+`analyzeAccessibility` (`scripts/frontend/lib/quality.ts`) construye el `AxeBuilder` con los tags
+`wcag2a…wcag22aa` —o sea, `color-contrast` está en el alcance— pero después lee **sólo
+`results.violations`** y hace `if (!violations.length) return findings` **antes** de escribir el
+artefacto. Consecuencia dura: **cuando axe no encuentra violaciones no se escribe ningún `.axe.json`**,
+y `results.incomplete` —la lista de lo que axe miró y **no pudo decidir**— no llega nunca al disco. En
+el manifest, «axe pasó» y «axe se abstuvo» son exactamente el mismo dato: cero. Lo único que sí se
+reporta aparte es que axe **reviente** (`axe_run_failed`); que corra y no concluya, no.
+
+Caso 2026-09-06, pantallas del emisor Efeonce ID: **40 capturas con `violations: 0`**. Las filas de
+texto —24 por página— habían salido todas en `incomplete` con «Element's background color could not be
+determined due to a pseudo element»: el lienzo pinta su azul con un degradado y un `::after`, y axe se
+niega a razonar sobre eso. **No midió ni un solo texto.** Debajo de ese cero había un texto a
+**1.53:1** y, tras arreglar ese, otro a **3.28:1** (pisos WCAG 1.4.3: 4.5:1, o 3:1 si el texto es
+≥24px, o ≥18.66px en negrita).
+
+**Leer el CSS tampoco alcanza:** subir por `background-color` salta el degradado y aterriza en el
+`body`, que es claro. El único medidor honesto son los píxeles renderizados.
+
+**Lo que sí mide:** `pnpm auth-server:verify-contrast` → `scripts/auth-server/verify-contrast.mjs`
+(exige el harness en `127.0.0.1:19036`, lo levanta `pnpm auth-server:dev-ui`). Toma la captura y
+muestrea píxeles alrededor de cada texto en las 18 rutas del emisor, en desktop 1440 y móvil 390.
+Para cualquier otra superficie con fondo no plano —degradado, `::before`/`::after`, imagen,
+`backdrop-filter`, `mix-blend-mode`— ese archivo es la **implementación de referencia a copiar**, no
+un script de un solo dominio.
+
+**Dos trampas del propio medidor** (van comentadas en el script porque costaron encontrarlas):
+
+1. **Muestrear FUERA de la caja del elemento** parece lo limpio —ahí no hay glifos— pero en un botón
+   cae en la tarjeta que está detrás, no en el relleno del botón: daba «texto blanco sobre blanco» en
+   cada CTA. Se muestrea una rejilla **interior** a la caja.
+2. **Tomar el color más frecuente a secas** falla justo en el caso que importa: en un titular blanco
+   de 46px sobre azul los glifos ganan la votación y el fondo «resulta» blanco. El fondo es el más
+   frecuente **entre los píxeles que NO son casi el color del texto**. Y el texto semitransparente se
+   compone contra su propio fondo antes de comparar, o el ratio miente hacia arriba.
+
+**Regla:** si la superficie que capturas tiene fondo no plano, `violations: 0` **no acredita
+contraste**. O mides píxeles, o el reporte dice que el contraste quedó **sin medir** — nunca «cumple».
+
 ---
 
 ## Regla #4 — Las sondas de calidad corren DESPUÉS de todos los steps (TASK-1715)

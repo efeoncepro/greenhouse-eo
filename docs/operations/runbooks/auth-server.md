@@ -252,8 +252,35 @@ Para cortar a un solo cliente o persona sin apagar el emisor: revocar el consent
 | Incidentes `identity` con tag `component=auth-server` | 0 | Fallos de KMS (`check=kms`), de PG o del handler; sustituyen a un contador `auth.kms.sign_failures` propio |
 | `auth.oauth.code_reuse_detected` · `auth.oauth.refresh_reuse_detected` · `auth.oauth.cimd_rejected` (`incident`) | 0 | Ver §`OAuth` → *Señales OAuth* (ventana 24 h sobre `oauth_audit_events`) |
 
+## Verificar las pantallas antes de tocarlas (TASK-1835)
+
+El emisor sirve HTML propio, sin React ni bundle de cliente. Tres comandos lo verifican en local; los
+tres exigen el harness levantado.
+
+```bash
+pnpm auth-server:dev-ui          # renderers REALES con DTOs ficticios, 127.0.0.1:19036, sólo lectura
+pnpm auth-server:verify-contrast # contraste medido sobre los PÍXELES de la captura
+pnpm auth-server:verify-passkey  # el carril de passkey del login en un navegador real
+```
+
+**Por qué el contraste se mide sobre píxeles y no con axe.** El gate de accesibilidad de GVC corre
+axe y llegó a reportar `violations: 0` en 40 capturas del emisor. Ese cero no decía «pasa», decía «no
+pude mirar»: con el fondo en degradado y un `::after`, axe devuelve TODAS las filas de texto en
+`incomplete`. Debajo de ese cero había texto a 1.53:1 en la ficha de aplicación del consentimiento.
+**Un cero de axe no es evidencia de contraste en este servicio.**
+
+Capturas de las 29 pantallas: `AGENT_AUTH_BASE_URL=http://127.0.0.1:19036 pnpm fe:capture
+task1835-runtime-<fixture> --env=local` (la lista sale de `scripts/frontend/scenarios/`).
+
 ## Qué no hacer
 
+- **No confiar en un `violations: 0` de axe** como prueba de contraste acá: ver la sección anterior.
+- **No reusar una clase de texto entre el lienzo y la tarjeta.** Son fondos opuestos; la regla escrita
+  para uno le impone su color al otro. Costó 1.53:1 y 3.28:1 en la misma sesión.
+- **No editar los `*.generated.ts`.** El CSS, los assets de marca y los controladores del navegador se
+  generan con `pnpm auth-server:brand-assets:generate`; hay drift tests que fallan si se editan a mano.
+- **No escribir backticks dentro de los comentarios CSS de `scripts/auth-server/styles.ts`.** El CSS
+  vive en un template literal: un backtick cierra la plantilla y el generador aborta.
 - No compartir `NEXTAUTH_SECRET`, cookies ni sesión del portal con este servicio.
 - No exportar ni copiar la llave privada: no existe fuera del HSM.
 - No editar `managed.domains` del certificado del gateway para agregar `auth.efeonce.org`: re-provisiona

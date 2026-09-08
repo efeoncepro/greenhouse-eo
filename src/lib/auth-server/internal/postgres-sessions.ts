@@ -44,8 +44,8 @@ export const insertCorporateSession = async (
   })
 }
 
-export const getCorporateSessionEvidence = async (sessionHash: string): Promise<CorporateSessionEvidence | null> => {
-  const rows = await query<{
+export const getCorporateSessionEvidence = async (sessionHash: string, readQuery = query): Promise<CorporateSessionEvidence | null> => {
+  const rows = await readQuery<{
     session_hash: string
     environment_id: string
     subject: string

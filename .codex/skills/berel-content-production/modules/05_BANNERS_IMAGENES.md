@@ -32,9 +32,10 @@ saber qué imagen es la adecuada.
 - Si por planeación hay que reservarlas antes de tiempo: `Estado` = `Bloqueado`,
   `Resumen` = "Pendiente de la reescritura del artículo", **sin ficha de contenido**. La ficha se
   escribe cuando exista el texto.
-- Si quedaron banners creados antes de la reescritura, al terminar el artículo hay que
-  **revisar y reescribir su ficha** contra el texto final: escena, dato de la infografía,
-  comparativa, cierre, ALT, nombre de archivo y posición.
+- Si quedaron **reservas o placeholders sin arte producido** creados antes de la reescritura, al terminar el
+  artículo hay que revisar y completar su ficha contra el texto final: escena, dato de la infografía,
+  comparativa, cierre, ALT, nombre de archivo y posición. Si diseño ya produjo o entregó el asset, no se
+  reescribe: gobierna el contrato de congelamiento y cualquier cambio se concilia y versiona con diseño.
 
 > Un banner creado antes del artículo es un **placeholder**, no un brief.
 
@@ -128,38 +129,48 @@ reconocible y coherente con la tabla/producto al que acompaña.
 
 ## 🔴 ALT, archivo y posición son una sola fuente de verdad
 
-Los tres se especifican **una vez**, en la reescritura del artículo (módulo `03`), dentro del
-callout 🖼️ que va en la posición exacta del texto. La ficha de la subtarea los **copia**; no los
-reinventa.
+Los tres se especifican **una vez en contexto**, dentro de la ficha N1–N4 que acompaña la sección pública
+donde irá la imagen. Esa ficha del artículo es la fuente editorial de verdad y la subtarea visual conserva una
+copia literal y autosuficiente. El Playbook exige que las imágenes acompañen el texto; no se agrupan en un anexo
+ni se retiran para “limpiar” la lectura.
 
 Corolarios que el origen declara explícitamente:
 
-- Los **ALT escritos en cada banner** deben coincidir **exactamente** con los ALT listados en las
-  notas para diseño/Dev. Una sola fuente de verdad.
-- Las notas para Dev listan **solo imágenes que existen** como banner especificado. Nada de
-  imágenes fantasma.
+- Los **ALT, archivos y posiciones** del artículo y de cada tarea de diseño coinciden exactamente.
+- Las notas privadas para Dev listan **solo imágenes que existen** como banner especificado. Nada de imágenes
+  fantasma, y nunca sustituyen la ficha contextual.
 - ALT descriptivo y específico al contenido; **nunca la URL ni el nombre de archivo**.
 - La imagen principal (LCP) se sirve **sin** `loading="lazy"`; el resto, con lazy.
+
+### Contrato de congelamiento del arte
+
+Desde que diseño produce o entrega un asset, su ficha queda congelada: composición, texto sobre la imagen,
+paleta, ALT, archivo, formato, carga y posición no cambian por una revisión de copy ni por un saneamiento de
+notas internas. Si un comentario obliga a cambiar el hecho representado, detener la edición, inventariar el
+asset y su tarea, explicar el impacto y coordinar una nueva versión. Nunca “mejorar” la ficha a espaldas del arte.
 
 ## Checklist antes de pasar a diseño
 
 - [ ] Cada imagen está anclada a una sección/tabla/paso/concepto real del artículo
+- [ ] Las cuatro fichas N1–N4 están intercaladas en la versión vigente y no agrupadas como anexo
 - [ ] La composición refleja el contenido específico, no es stock genérico
 - [ ] Cada tarea de banner tiene `Tipo de pieza = Estatico` y `Canal de pieza = Blog`, confirmados por lectura fresca
 - [ ] Banners numerados por orden de lectura
 - [ ] Todos los campos de la ficha están completos en cada imagen
 - [ ] Una imagen marcada con 🔁 como base de adaptación social, con sus variantes seleccionadas según el módulo 15
-- [ ] Los ALT del banner y de las notas para Dev coinciden exactamente
+- [ ] ALT, archivo y posición coinciden exactamente entre artículo y tarea visual
 - [ ] Imágenes del artículo en el tamaño estándar 1408 × 768 px
 - [ ] Formatos `.webp`, peso menos de 200 KB, lazy-load (LCP sin lazy)
 - [ ] Cada ficha declara su objetivo de permanencia y su justificación anti banner-blindness
 - [ ] Si el producto es nuevo/de awareness: render oficial del empaque incluido o bloqueo documentado
+- [ ] Ninguna nota de agente, auditoría, QA, pendiente editorial o instrucción CMS/Dev se confundió con las fichas N1–N4
+- [ ] Si ya existe arte, el saneamiento o corrección no modificó ningún campo de su ficha
 - [ ] 🔴 Si la pieza es infografía: formato y variante declarados, y el acento usa Rojo Editorial `#B3153A` o la paleta complementaria, nunca el rojo corporativo
 
 ## Cross-links
 
 - Dónde y cuándo se crea la subtarea → [`01_CICLO_MENSUAL.md`](01_CICLO_MENSUAL.md) (Fase 8)
-- Dónde se especifica el banner dentro del texto → [`03_REDACCION_ARTICULO.md`](03_REDACCION_ARTICULO.md)
+- Cómo anclar el banner a una sección y distinguirlo de una nota interna → [`03_REDACCION_ARTICULO.md`](03_REDACCION_ARTICULO.md)
 - Qué pasa con la pieza 🔁 después → [`06_DERIVADOS_SOCIALES.md`](06_DERIVADOS_SOCIALES.md)
 - Excepción de lenguaje en fichas de banner → [`04_VOZ_Y_TONO_BEREL.md`](04_VOZ_Y_TONO_BEREL.md)
 - 🔴 **Los formatos con los que diseño produce una infografía** →

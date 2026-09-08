@@ -11,6 +11,7 @@ import type { AuthServerOAuthConfig } from './config'
 
 export type VerifiedAccessToken = {
   authorizationContextId: string | null
+  authorizationContextVersion: 1 | 2 | null
   jti: string
   sub: string
   azp: string
@@ -61,8 +62,8 @@ export const verifyIssuedAccessToken = async (
   const contextVersion = payload.authorization_context_version
 
   if ((contextId !== undefined || contextVersion !== undefined) &&
-      (typeof contextId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(contextId) || contextVersion !== 1)) return null
+      (typeof contextId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(contextId) || (contextVersion !== 1 && contextVersion !== 2))) return null
   if (!Number.isSafeInteger(payload.gv) || payload.gv < 0) return null
 
-  return { authorizationContextId: typeof contextId === 'string' ? contextId : null, jti, sub, azp, scope, gv: payload.gv, exp: payload.exp, iat: payload.iat, aud, iss: payload.iss }
+  return { authorizationContextId: typeof contextId === 'string' ? contextId : null, authorizationContextVersion: contextVersion === 1 || contextVersion === 2 ? contextVersion : null, jti, sub, azp, scope, gv: payload.gv, exp: payload.exp, iat: payload.iat, aud, iss: payload.iss }
 }

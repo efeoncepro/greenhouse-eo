@@ -1,3 +1,4 @@
+import { areInternalContextScopesAllowed } from './scopes'
 /**
  * `POST /oauth/token` (TASK-1829): grants `authorization_code` (PKCE S256) y `refresh_token` (rotación
  * con detección de reuso). Autenticación de cliente: `none` (públicos) o `client_secret_basic` /
@@ -13,7 +14,7 @@ import { assertScopesAllowedForClient, authenticateClient, parseClientCredential
 import type { AuthServerOAuthConfig } from './config'
 import { missingConsentScopes } from './consent'
 import { OAuthProtocolError, isOAuthProtocolError } from './errors'
-import type { GrantsVersionPort } from './grants'
+import type { GrantsVersionPort, GrantsVersionResolution } from './grants'
 import { isFormContentType, jsonResponse, parseFormBody, type OAuthHttpRequest, type OAuthHttpResponse } from './http'
 import { sha256Hex, verifyPkceS256 } from './primitives'
 import type { OAuthClientRecord, OAuthStorePort } from './store/port'
@@ -68,7 +69,7 @@ export const parseTokenForm = (request: OAuthHttpRequest): Map<string, string> =
 const assertConsentAndBinding = async (
   deps: TokenDeps,
   input: { client: OAuthClientRecord; subject: string; environmentId: string; scopes: readonly string[]; authorizationContextId?: string | null }
-): Promise<number> => {
+): Promise<Extract<GrantsVersionResolution, { bound: true }>> => {
   // A previously granted scope does not bypass the client's current issuance policy.
   assertScopesAllowedForClient(input.client, input.scopes)
 
@@ -82,7 +83,11 @@ const assertConsentAndBinding = async (
 
   if (!grants.bound) throw new OAuthProtocolError('invalid_grant', { description: 'no organization binding', reason: `unbound:${grants.outcome}` })
 
-  return grants.grantsVersion
+  if (!areInternalContextScopesAllowed(grants.authorizationContextVersion, input.scopes)) {
+    throw new OAuthProtocolError('invalid_scope', { reason: 'internal_context_scope_class' })
+  }
+
+  return grants
 }
 
 const handleAuthorizationCodeGrant = async (
@@ -130,10 +135,11 @@ const handleAuthorizationCodeGrant = async (
   if (record.redirectUri !== redirectUri) throw new OAuthProtocolError('invalid_grant', { description: 'redirect_uri mismatch', reason: 'redirect_mismatch' })
   if (!verifyPkceS256(codeVerifier, record.codeChallenge)) throw new OAuthProtocolError('invalid_grant', { description: 'PKCE verification failed', reason: 'pkce_mismatch' })
 
-  const grantsVersion = await assertConsentAndBinding(deps, { client, subject: record.subject, environmentId: record.environmentId, scopes: record.scopes, authorizationContextId: record.authorizationContextId })
+  const { grantsVersion, authorizationContextVersion } = await assertConsentAndBinding(deps, { client, subject: record.subject, environmentId: record.environmentId, scopes: record.scopes, authorizationContextId: record.authorizationContextId })
 
   const tokens = await issueInitialTokenSet(deps, {
     authorizationContextId: record.authorizationContextId ?? null,
+    authorizationContextVersion,
     client,
     subject: record.subject,
     environmentId: record.environmentId,
@@ -195,10 +201,11 @@ const handleRefreshTokenGrant = async (
     scopes = narrowed
   }
 
-  const grantsVersion = await assertConsentAndBinding(deps, { client, subject: previous.subject, environmentId: previous.environmentId, scopes, authorizationContextId: previous.authorizationContextId })
+  const { grantsVersion, authorizationContextVersion } = await assertConsentAndBinding(deps, { client, subject: previous.subject, environmentId: previous.environmentId, scopes, authorizationContextId: previous.authorizationContextId })
 
   const prepared = await prepareTokenSet(deps.config, deps.signer, {
     authorizationContextId: previous.authorizationContextId ?? null,
+    authorizationContextVersion,
     client,
     subject: previous.subject,
     environmentId: previous.environmentId,

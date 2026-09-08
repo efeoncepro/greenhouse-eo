@@ -9,7 +9,7 @@ import {
 
 const NOW = new Date('2026-09-05T12:00:00Z')
 
-const setup = () => {
+const setup = (multiOrg = false) => {
   const records = new Map<string, InternalAuthorizationContext>()
   let enabled = true
 
@@ -42,12 +42,14 @@ const setup = () => {
 
   const service = createInternalContextService({
     enabled: () => enabled,
+    allowMultiOrganization: () => multiOrg,
     now: () => NOW,
     store: {
       insert: async c => {
         const existing = [...records.values()].find(
           r =>
             r.revokedAt === null &&
+            r.version === c.version &&
             r.sessionHash === c.sessionHash &&
             r.clientId === c.clientId &&
             r.bindingId === c.bindingId &&
@@ -213,5 +215,30 @@ describe('internal context authorization boundary', () => {
     facts.population = 'internal'
     facts.grantsVersion = NaN
     expect((await service.create(input)).allowed).toBe(false)
+  })
+})
+
+
+describe('TASK-1844 context version isolation', () => {
+  it('requires explicit v2 eligibility and creates a distinct immutable consent anchor', async () => {
+    const denied = setup()
+
+    expect((await denied.service.create({ ...denied.input, version: 2 })).allowed).toBe(false)
+    const { service, input, records } = setup(true)
+    const a = await service.create({ ...input, version: 1 })
+    const b = await service.create({ ...input, version: 2 })
+
+    if (!a.allowed || !b.allowed) throw new Error('fixture denied')
+    expect(a.context.id).not.toBe(b.context.id)
+    expect(records.size).toBe(2)
+
+    for (const version of [1, 2] as const) {
+      const original = version === 1 ? a : b
+      const repeated = await service.create({ ...input, version })
+
+      expect(repeated).toMatchObject({ allowed: true, context: { id: original.context.id, version } })
+      expect(await service.resolve({ ...input, id: original.context.id, version: version === 1 ? 2 : 1 })).toMatchObject({ allowed: false })
+      expect(await service.resolveStored({ ...input, id: original.context.id })).toMatchObject({ allowed: true, context: { version } })
+    }
   })
 })

@@ -184,6 +184,12 @@ The domain does not impose a depth cap, but traversals must remain iterative, de
 ### EC-42: `last_edited_time` is not progress history
 It can change for body edits or unrelated properties. Re-fetch governed fields and compare against an append-only observation ledger.
 
+### EC-43: Full-body edits and restores can orphan anchored discussions
+A page can save successfully while comment anchors disappear or toggle children become flat. Before a broad edit,
+record discussion IDs, authors, states, anchor types and protected blocks. Prefer a small exact update. If recovery
+is required, restore one known version and compare the same identities and structure immediately; never search
+versions by repeated restores. A removed anchor does not mean the discussion is resolved.
+
 ## 9. Cross-refs
 
 - `anti-patterns-catalog.md` — patterns prohibidos

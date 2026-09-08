@@ -70,3 +70,78 @@
 - **NUNCA** cambiar `disabled` → `readOnly` sin agregar la regla `:read-only` que repone la señal visual: el estilo que desaparece lo ponía el navegador, no el módulo.
 - **NUNCA** usar `disabled` en un campo cuyo valor el usuario deba poder releer o copiar; **NUNCA** "unificar" a `readOnly` un `checkbox`/`radio` (la spec HTML no lo soporta) — declarar la asimetría.
 - **NUNCA** ofrecer deshabilitada una acción imposible (CTA de envío bloqueado por estado, "Reintentar" sobre un error estructural): el control no se renderiza y el mensaje dice qué hacer en su lugar.
+
+---
+
+## Contraste sobre fondo compuesto: un cero de axe no es evidencia (TASK-1835, medido 2026-09-06)
+
+
+> **Esto es una RECURRENCIA, no un hallazgo.** El mismo comportamiento se midió el **2026-07-25** en el
+> share board de Globe: con `--muted` movido a propósito a un valor muy por debajo de 4.5:1, axe
+> devolvió **0 violations** y `color-contrast` en `incomplete` sobre 22 nodos
+> (`scripts/frontend/globe-share-board-canary.mjs:232-247`, con el caso escrito en su propio comentario).
+> Ese canary hasta dejó nombrado el follow-up de la medición real —`TASK-1558`, todavía
+> `in-progress`—. Seis semanas después la misma laguna escondió un texto a 1.53:1 en otra superficie,
+> porque la lección vivía en el comentario de UN script y no en un invariante que alguien cargue antes
+> de tocar UI. Por eso está acá.
+
+> **Un punto ciego de MEDICIÓN, no un defecto de una superficie.** Aplica a cualquier interfaz de
+> Greenhouse cuyo fondo detrás del texto no sea un color plano: degradado, imagen, pseudo-elemento,
+> translucidez o `color-mix` sobre otra capa. Medido dos veces de forma independiente —Globe share
+> board el 2026-07-25 y Efeonce ID el 2026-09-06—, las dos con el gate en verde. Patrón de la
+> superficie de origen: [`PATTERNS.md` § Runtime sin React](../ui-platform/PATTERNS.md#runtime-sin-react--shell-efeonce-id-task-1835).
+
+- 🔴 **axe no falla el contraste que no puede calcular: lo manda a `incomplete`, y el gate lee eso
+  como `violations: 0`.** Cuando axe no logra resolver el color de fondo real de un texto devuelve
+  `color-contrast` en `results.incomplete` con el mensaje «Element's background color could not be
+  determined due to a pseudo element» — **no** en `results.violations`. Y el analizador canónico del
+  GVC corta antes de mirarlo: `analyzeAccessibility` hace `if (!violations.length) return findings`
+  (`scripts/frontend/lib/quality.ts:87`), así que con cero violaciones **ni emite finding ni escribe
+  el artefacto `.axe.json`** — el `incomplete` queda estructuralmente invisible, no sólo silencioso.
+  En Efeonce ID eso dio `violations: 0` en **40 capturas** mientras las **24 filas de texto de cada
+  página** salían en `incomplete`: el gate nunca midió una sola. Debajo de ese cero había texto real a
+  **1.53:1** (el aviso «Aplicación no verificada» del consentimiento) y, en la misma sesión, otro a
+  **3.28:1** en el pie. Lo reportó el operador mirando la pantalla.
+- **No es un caso raro de una superficie: es la forma del error, y ya se había medido.** El 2026-07-25,
+  en el share board de Globe (tres degradados apilados), se movió `--muted` a propósito a un valor muy
+  por debajo de 4.5:1, con el token efectivamente presente en el HTML servido: axe devolvió **0
+  violations** y `color-contrast` en `incomplete` sobre **22 nodos**. El canary lo imprime como «no
+  verificado mecánicamente» justamente para que nadie lea ese verde como comprobado
+  (`scripts/frontend/globe-share-board-canary.mjs:232-247`).
+- **Leer el CSS tampoco alcanza como sustituto.** Subir el árbol buscando `background-color` salta el
+  degradado y aterriza en el `body`, que puede ser del color opuesto. **El contraste no es una
+  propiedad del código sino del par renderizado**: sólo existe una vez que el navegador pintó ambos
+  extremos. La única medición que ve lo que ve una persona es **muestrear los píxeles de la captura**
+  alrededor de cada texto. Implementación de referencia:
+  `scripts/auth-server/verify-contrast.mjs` (`pnpm auth-server:verify-contrast`) — **365 textos** en
+  18 pantallas × 2 viewports, 0 bajo el piso WCAG 1.4.3 (4.5:1 normal · 3:1 en ≥24px o ≥18.66px bold).
+  Hoy está acotada al emisor por su lista de rutas; es el patrón a copiar, no una primitive compartida.
+- **El medidor tiene dos trampas propias, y ambas fallan hacia el falso verde.** (1) Muestrear **fuera**
+  de la caja del texto parece más limpio —ahí no hay glifos— pero en un botón cae en la tarjeta que
+  está detrás, no en el relleno del botón: daba «blanco sobre blanco» en **cada CTA**. Se muestrea una
+  rejilla **interior**. (2) Tomar el color **más frecuente** de esa rejilla falla justo donde más
+  importa: en un titular blanco de 46px sobre azul, **los glifos ganan la votación** y el resultado
+  vuelve a ser «blanco sobre blanco». El fondo es el más frecuente **entre los que no se parecen al
+  color del texto**. Quien copie el patrón hereda las dos trampas si no las replica.
+- **Causa raíz de los dos defectos: una clase de texto compartida entre dos fondos opuestos.**
+  `.id-context` servía a la ficha de la aplicación —**fuera** de la tarjeta, sobre el lienzo azul— y
+  también al bloque del destino —**dentro** de la tarjeta blanca—. La regla escrita para el segundo le
+  impuso al primero el color de la tarjeta: texto oscuro sobre azul. **No se arregla moviendo
+  especificidad** (eso deja la bomba armada para el siguiente lector): cada superficie recibe su
+  propia clase y el texto hereda el color de su lienzo. Evidencia: `scripts/auth-server/styles.ts:192-195`.
+
+**Reglas duras:**
+
+- **NUNCA** leer un `violations: 0` de axe como evidencia de contraste en una superficie cuyo fondo
+  detrás del texto sea compuesto (degradado, imagen, pseudo-elemento, translucidez, `color-mix`). Ese
+  cero dice «no pude mirar», no «pasa». **SIEMPRE** inspeccionar `results.incomplete` antes de
+  declarar el contraste verificado; si la superficie no puede reportarlo, tratarla como **no medida**.
+- **NUNCA** cerrar una superficie de fondo compuesto sin una medición **sobre píxeles renderizados**
+  de la captura, ni sustituirla por lectura de CSS o por el token que "debería" estar aplicado.
+- **NUNCA** compartir una clase, un módulo CSS o un `sx` de texto entre dos superficies con fondos
+  opuestos (lienzo oscuro ↔ tarjeta clara, immersive ↔ contained, banda de marca ↔ paper). **SIEMPRE**
+  una clase por superficie: el color de texto pertenece a su fondo, no al componente que lo reusa.
+- **NUNCA** resolver un contraste roto por herencia subiendo especificidad sobre la clase compartida;
+  **SIEMPRE** separar las clases, o el defecto vuelve con el siguiente consumer del otro fondo.
+- **SIEMPRE** que un medidor propio muestree píxeles, muestrear **dentro** de la caja del elemento y
+  descartar los píxeles que se parecen al color del texto: las dos trampas fallan hacia el falso verde.

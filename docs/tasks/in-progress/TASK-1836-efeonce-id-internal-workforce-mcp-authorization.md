@@ -24,7 +24,7 @@ Mapa de construcción, pruebas y límites: [auditoría consolidada TASK-1836/183
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `2026-09-06: entrada directa /login servida desde develop (21aa12608, auth-server-00030-rtm, deploy34002082020 success); botón existente visible a1440/390 y clic→Microsoft verificados. PR226 abierto, promoción main y nuevo canary humano directo pendientes. Pruebas locales235/4omitidas y review correctos. Estado previo del carril MCP a00:30 UTC: release 08acfb2c6 publicado (PR225, run34000876213, manifest released sin override). Acceso Microsoft, consentimiento, token y lectura MCP interna verificados; canary final en gateway36: propia permitida, ajena denegada y revocación efectiva en 6.633 s. Refresh, retiro de grant y rollback medidos anteriormente. Piloto ON, gv5, vencimiento original 2026-09-12T15:00Z; integridad cero y tokens de prueba revocados. Watchdog 5/5, drift0. Matrices externas/multicontexto y UI/WebKit pendientes.`
+- Status real: `Acceso corporativo interno productivo y verificado para un contexto: entrada Microsoft, consentimiento, token, lectura MCP propia, rechazo ajeno, refresh, retiro de grant y revocación efectiva en 6.633 s; integridad reconciliada y tokens de prueba revocados. TASK-1832 completó además la matriz técnica externa sintética con clientes Codex/ChatGPT/Claude base-only, sin convertirla en evidencia de cliente real. Follow-up 2026-09-07: jreyes@efeoncepro.com completó en Codex consentimiento interno sólo para Efeonce; el code no se consumió y expiró, sin access/refresh token ni dispatch. El requisito personal multiorganización se derivó a TASK-1844; esta task conserva su foundation uniorganización y sus pendientes originales de retorno humano directo, repetición Entra completa, UI/WebKit y cierre formal. Revisión y SHA se resuelven en runtime; snapshot 2026-09-07T12:20:25Z: auth-server 00043-ndg Ready/100 % con SHA igual a origin/main.`
 - Rank: `TBD`
 - Domain: `identity`
 - Blocked by: `none`
@@ -118,7 +118,7 @@ coordinada con TASK-1831; no se cambia su semántica silenciosamente ni se marca
 
 ### Gap
 
-- Camino corporativo → sesión → consentimiento → token → tool MCP interno verificado en el piloto. Pendientes: retorno humano de entrada directa, matrices externas/multicontexto y promoción PR226.
+- Camino corporativo → sesión → consentimiento → token → tool MCP interno verificado en el piloto. Promoción PR226 a `main` `456d9accf` cerrada el 2026-09-06 (ver «Estado vigente de la entrada directa»). TASK-1832 cerró la matriz externa sintética; pendientes propios: retorno humano de entrada directa, multicontexto y repetición Entra completa.
 - `issuer_class` por environment no basta para distinguir poblaciones bajo un mismo emisor.
 
 ## Modular Placement Contract
@@ -573,7 +573,7 @@ interactivo del sujeto real cuando corresponda. No enviar correos ni mensajes si
 ## Acceptance Criteria
 
 - [ ] D1–D7 del §2 formalizadas en ADR, con fixtures y contratos compartidos; ninguna queda sólo como “resolver después”.
-- [x] Contexto firmado de otra persona/cliente y token previo sin contexto no acceden a autoridad interna. Evidencia backend: OAuth flow, context, subject-port y ecosystem reader tests; dispatch real interno permitido y aislamiento por organización verificados en gateway36; la matriz externa/concurrente completa sigue pendiente.
+- [x] Contexto firmado de otra persona/cliente y token previo sin contexto no acceden a autoridad interna. Evidencia backend: OAuth flow, context, subject-port y ecosystem reader tests; dispatch real interno permitido y aislamiento por organización verificados. TASK-1832 completó la matriz externa sintética; la matriz concurrente/multicontexto sigue pendiente.
 - [x] Flag de gateway OFF deniega contextos internos nativos ya emitidos; flag de emisor OFF deniega login, authorize y refresh internos nuevos. Tests del guard interno y ensayo live: gateway OFF denegó en ≤20 s; emisor OFF rechazó refresh; restauración completa 79 s. No acredita rollback de toda la matriz externa/Entra.
 
 - [ ] Casos de auditoría §14 pasan; assurance Entra, procedencia de sesión y refresh no elevan autoridad implícitamente.
@@ -1127,3 +1127,41 @@ Para verificar cada entrada por separado:
 La corrección usa el mismo `resolvePersonSession` y valida el destino al iniciar y consumir la
 transacción. Evidencia local: 235 pruebas passed, 4 live omitidas; tipos/lint/bundle correctos,
 Chromium 6/6 para origen/CSP/redirect y revisión independiente sin hallazgos. WebKit sigue omitido.
+
+## Follow-up 2026-09-07 — Codex corporativo y requisito multiorganización
+
+Codex `0.153.4` inició OAuth con la identidad indicada por el operador, `jreyes@efeoncepro.com`, completó la
+autenticación corporativa en Microsoft y llegó al consentimiento nativo. La pantalla ofreció `Efeonce` como único
+contexto de organización y `growth.seo.observation.read` como única capability efectiva. El consentimiento se
+completó a las `2026-09-07T21:52:31Z` y produjo un code interno a las `21:52:32Z`. El listener local ya no completó
+el intercambio: el code quedó sin consumir, expiró y no produjo access token, refresh token, `tools/list` ni
+dispatch. El readback PG de las `22:00:13Z` distingue ese contexto interno de los tokens externos del canary.
+
+El comportamiento es fail-closed y coincide con D3: el contrato vigente opera un contexto por token y no agrega
+permisos de otras organizaciones. Sin embargo, no satisface el requisito explícito del operador para su Codex
+personal: poder operar todas las organizaciones que su autoridad Greenhouse ya le permita, sin convertir el scope
+OAuth base en permiso organizacional. La dirección mínima propuesta conserva el contexto Efeonce como ancla del
+actor y exige `organizationId` explícito en cada tool org-scoped; un reader machine-only de Greenhouse debe autorizar
+en cada llamada la combinación exacta `contexto + capability + organización objetivo`, y el gateway sólo puede
+aceptar ese objetivo después del readback. El provider conserva su recheck de módulo, entitlement y regla de
+negocio. Esta evolución requiere Delta ADR y pruebas antes de repetir la ceremonia. Quedan prohibidos el wildcard
+o una lista de organizaciones en el JWT, la inferencia por correo/dominio/rol, la suma implícita de memberships y
+cualquier ampliación del grant canary.
+
+Transferencia de ownership: `TASK-1844` resuelve el nuevo contrato multiorganización, su reader, consentimiento,
+listado, llamada directa, organización ajena, concurrencia, revocación y matriz real. `TASK-1836` conserva la
+foundation de identidad/sesión/contexto interno uniorganización y `TASK-1831` el gateway multi-issuer ya
+implementado; ambas son dependencias e historia, no dueñas de ese delta. El canary sintético externo de
+TASK-1813/TASK-1832 es evidencia separada y no autoriza ni bloquea este diseño.
+
+Pruebas mínimas para aceptar el cambio: el mismo token base permite A/B autorizadas y deniega C antes del provider;
+objetivo ausente o ambiguo falla cerrado; revocar capability del actor deniega A/B; retirar acceso o módulo de B no
+afecta A; concurrencia A/B no cruza argumentos, resultados ni handles; y un consentimiento anterior no adquiere
+autoridad multiorganización silenciosamente.
+
+## Delta local TASK-1844 — 2026-09-08
+
+TASK-1844 implementa autoridad interna v2 por target y consentimiento nuevo, detrás de gates OFF.
+Esta task conserva su entrega uniorganización original. El delta no reabre TASK-1813 ni amplía el canary
+TASK-1832 o el piloto TASK-1841. [QA local](../../audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md) ·
+[rollout y clientes pendientes](../../operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md).

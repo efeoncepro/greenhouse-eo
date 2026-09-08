@@ -1,9 +1,9 @@
 # Autorizador de Efeonce (`auth.efeonce.org`)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.4
+> **Version:** 1.5
 > **Creado:** 2026-09-04 por Claude
-> **Ultima actualizacion:** 2026-09-06 por Claude (TASK-1837)
+> **Ultima actualizacion:** 2026-09-07 por Codex (TASK-1832)
 > **Modulo:** Identidad y acceso (EPIC-044 · TASK-1828–1831 · TASK-1836)
 > **Documentacion tecnica:** [EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) (ADR nativo y contrato interno vigente), [EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md](../../architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md) (contrato OAuth: endpoints, claims, tablas e invariantes de TASK-1829), [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md#authorization-server-propio-authefeonceorg--task-1828-2026-09-04), [EPIC-044](../../epics/in-progress/EPIC-044-efeonce-identity-authorization-server-and-mcp-federation.md)
 > **Manual de uso:** [Operar el autorizador de Efeonce](../../manual-de-uso/identity/operar-autorizador-efeonce.md)
@@ -20,7 +20,9 @@ organización la resuelve Efeonce. Compartir un emisor no comparte permisos entr
 
 La base de TASK-1828 (servicio, llaves y dirección pública), el OAuth de TASK-1829 y la autenticación de
 personas de TASK-1830 están integrados. TASK-1836 agrega el recorrido corporativo y TASK-1831 su consumo
-en el gateway. La cohorte interna está verificada; los límites y pendientes se detallan más abajo.
+en el gateway. La cohorte interna y una certificación externa sintética están activas; esto no abre clientes
+reales. Codex, ChatGPT hospedado, Claude Code `2.1.263`, Claude.ai y Claude Desktop `1.46388.4` están verdes;
+los clientes OAuth Claude renovaron post-TTL sin ampliar scopes.
 
 | Pieza | Qué es, en simple | Estado |
 | --- | --- | --- |
@@ -87,7 +89,7 @@ escritura existen pero se piden explícitamente y exigen un segundo factor.
 | --- | --- | --- | --- |
 | **CIMD** (la principal) | El identificador de la app es la **URL de un documento** que la describe. El emisor lo descarga, lo valida (redirects, sin secretos, host con nombre real, nunca una IP privada) y lo recuerda 24 horas. Si el documento no cumple, se rechaza y queda una señal. | Apps públicas modernas (Claude Code, claude.ai). | Loopback `127.0.0.1` / `[::1]` / `localhost` en **cualquier puerto**, o HTTPS exacto. |
 | **DCR** (compatibilidad) | La app se registra sola con `POST /oauth/register` y recibe un identificador `dcr-…`. Sólo para apps **públicas** (sin secreto). Máximo 10 registros por minuto por IP. | Apps que todavía no hablan CIMD. | Igual que CIMD. |
-| **Cliente pre-registrado** (confidencial) | Lo registra un administrador de Efeonce por command (ruta admin o CLI) y recibe un **secreto que se muestra una sola vez**. | Conectores hospedados que pueden guardar un secreto (por ejemplo, un connector de ChatGPT). | Sólo HTTPS exacto; `localhost` por nombre se rechaza. |
+| **Cliente pre-registrado** (confidencial) | Lo registra un administrador de Efeonce por command (ruta admin o CLI) y recibe un **secreto que se muestra una sola vez**. | Integraciones propias que realmente custodien un secreto; no el canary público de ChatGPT/Claude. | Sólo HTTPS exacto; `localhost` por nombre se rechaza. |
 
 Nunca hay comodines en los redirects, y el emisor valida el `client_id` y el `redirect_uri` **antes** de
 redirigir a cualquier parte. La política de loopback en cualquier puerto es una decisión del operador del
@@ -156,9 +158,11 @@ por eso el canary desde OAuth funcionaba sin acreditar la página `/login` norma
 desplegada desde `develop` y su botón/click público están verificados; el nuevo recorrido humano directo
 completo sigue pendiente. Instrucciones: [Acceso corporativo a Efeonce ID](../../manual-de-uso/identity/efeonce-id-interno.md).
 
-El canary interno real sí verificó SSO, consentimiento, emisión, lectura propia, denegación de organización
-ajena, refresh y revocación antes de expirar el access token. El [mapa de evidencia](../../audits/2026-09-06-task-1836-1831-consolidated-evidence.md)
-separa ese resultado de las matrices externas/multicontexto pendientes y de la promoción de PR226.
+El canary interno real verificó SSO, consentimiento, emisión, lectura propia, denegación de organización ajena,
+refresh y revocación antes de expirar el access token. TASK-1832 verificó por separado la matriz técnica externa
+sintética en Codex, ChatGPT y Claude. El [mapa interno](../../audits/2026-09-06-task-1836-1831-consolidated-evidence.md)
+y la [matriz externa](../../audits/mcp/EFEONCE_MCP_CLIENT_TOKEN_MATRIX_2026-09-06.md) mantienen esas pruebas
+separadas; multicontexto, cleanup y customer access conservan gates propios.
 
 ## Permisos
 
@@ -176,11 +180,12 @@ una auditoría que no se puede editar ni borrar, con IPs, agentes y sujetos guar
 
 ## Límites de la disponibilidad
 
-El piloto interno no acredita disponibilidad general de clientes externos, la matriz completa multicontexto
-ni compatibilidad con todos los clientes MCP. Esas pruebas permanecen abiertas en TASK-1831/1832/1836.
-WebKit y otros pendientes de UI tienen evidencia separada; un test omitido no cuenta como aprobado.
+Ni el piloto interno ni el canary externo sintético acreditan disponibilidad general para clientes. La matriz
+técnica de clientes MCP objetivo está verde, pero multicontexto, cleanup de TASK-1832 y la primera cohorte
+consentida de TASK-1841 siguen abiertos. Un test omitido nunca cuenta como aprobado.
 El aseguramiento de TASK-1833 y la convergencia del portal de TASK-1834 tampoco quedan cerrados por este canary.
-El trabajo posterior de invitaciones externas de TASK-1837 no forma parte de esta entrega documentada.
+La invitación externa de TASK-1837 está productiva, pero su escritura delegada no se habilita al canary
+read-only ni se usa como evidencia de customer access.
 
 El login del portal Greenhouse conserva su contrato. Efeonce ID tiene cookie y sesión propias; no comparte
 `NEXTAUTH_SECRET` ni convierte una sesión del portal en autorización MCP.

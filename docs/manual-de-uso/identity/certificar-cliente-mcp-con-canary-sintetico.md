@@ -1,8 +1,8 @@
 # Certificar un cliente MCP con un canary sintético
 
-> Manual operativo · TASK-1832 · estado al 2026-09-06: **code complete, rollout pendiente**.
-> El schema quedó aplicado accidentalmente fuera del checkpoint, con registry vacío; no existe todavía una
-> organización canary creada por esta ejecución.
+> Manual operativo · TASK-1832 · estado al 2026-09-06: **rollout productivo en observación**.
+> Corrida activa: `task-1832-canary-20260906-a`; no crees una segunda. Su retiro no empieza antes de
+> `2026-09-13T19:43:30Z` y exige dry-run verde más readback cero.
 
 Este procedimiento comprueba que Claude, Codex o ChatGPT pueden usar Efeonce ID y el gateway MCP sin pedirle a
 un cliente real que haga QA. El resultado es readiness técnica para un piloto; no es validación de usabilidad,
@@ -37,13 +37,14 @@ correo, token, code, cookie, verifier, hash de sesión o secreto en el manifiest
 
 ## 1. Planea los IDs antes del primer write
 
-Elige un `run_id` no humano, por ejemplo `task-1832-staging-20260906-a`, y llama:
+Elige un `run_id` no humano; en la corrida activa es `task-1832-canary-20260906-a`. Para una corrida futura,
+llama:
 
 ```http
 POST /api/admin/identity/external-access/canaries/plan
 Content-Type: application/json
 
-{"runId":"task-1832-staging-20260906-a"}
+{"runId":"<run_id-nuevo>"}
 ```
 
 Copia el template a `docs/audits/mcp/TASK-1832_CANARY_ASSET_MANIFEST_<run_id>.md` y registra allí los cuatro
@@ -97,19 +98,49 @@ Comprueba antes de OAuth:
 
 ## 4. Prueba navegador y PKCE
 
-Configura los hosts sin guardar secretos:
+Pasa los hosts explícitos sin guardar secretos. Para la corrida productiva activa:
 
 ```bash
-export MCP_CANARY_STAGING_ISSUER=https://<issuer-aprobado>
-export MCP_CANARY_STAGING_RESOURCE_URL=https://<gateway-aprobado>/mcp
-node scripts/mcp/external-client-canary.mjs --env=staging --preflight
-node scripts/mcp/external-client-canary.mjs --env=staging
+node scripts/mcp/external-client-canary.mjs \
+  --env=production \
+  --issuer=https://auth.efeonce.org \
+  --resource=https://mcp.efeonce.org/mcp \
+  --run-id=task-1832-canary-20260906-a \
+  --organization-id=org-602d7057-7fd5-47e7-b73b-21892e3f06e7 \
+  --preflight
+
+node scripts/mcp/external-client-canary.mjs \
+  --env=production \
+  --issuer=https://auth.efeonce.org \
+  --resource=https://mcp.efeonce.org/mcp \
+  --run-id=task-1832-canary-20260906-a \
+  --organization-id=org-602d7057-7fd5-47e7-b73b-21892e3f06e7 \
+  --negative
 ```
 
 El segundo comando abre un loopback en `127.0.0.1`, registra un cliente público por DCR, genera PKCE S256,
 espera login/consentimiento, valida el JWT con JWKS, llama `get_seo_entitlement`, rota refresh y revoca la familia
 OAuth. No imprime tokens. Si usas `--no-open`, copia sólo la URL de autorización al navegador de la persona
 canary; no la pegues en tickets o documentos.
+
+Ejecuta las dos negativas temporales en ceremonias independientes:
+
+```bash
+# Espera la expiración natural del access token; puede tardar hasta 16 minutos.
+node scripts/mcp/external-client-canary.mjs --env=production \
+  --issuer=https://auth.efeonce.org --resource=https://mcp.efeonce.org/mcp \
+  --run-id=task-1832-canary-20260906-a \
+  --organization-id=org-602d7057-7fd5-47e7-b73b-21892e3f06e7 --negative --wait-expiry
+
+# Mientras el script espera, revoca por command el grant exacto; exige deny en 60 s.
+node scripts/mcp/external-client-canary.mjs --env=production \
+  --issuer=https://auth.efeonce.org --resource=https://mcp.efeonce.org/mcp \
+  --run-id=task-1832-canary-20260906-a \
+  --organization-id=org-602d7057-7fd5-47e7-b73b-21892e3f06e7 --negative --wait-grant-revocation
+```
+
+No combines ambos `--wait-*`. Un timeout causado porque el command de revocación no se ejecutó a tiempo no
+cuenta; reotorga únicamente la capability base mediante el command canary y repite una ceremonia nueva.
 
 La suite Playwright es opt-in y exige una sesión canary preautorizada:
 
@@ -134,9 +165,53 @@ Opera Claude Code, Claude Desktop/web, Codex y ChatGPT con el mismo fixture. Par
 - refresh, revocación y tiempo hasta deny.
 
 Una fila queda `pending` si requirió inyección manual de token, no llegó al consentimiento, omitió refresh o no
-se pudo verificar el deny.
+se pudo verificar el deny. Un `ERR_BLOCKED_BY_CLIENT` visible después del callback loopback no invalida por sí
+solo el flujo: confirma primero que el CLI recibió el code y que una sesión nueva pudo invocar la lectura. Si no,
+la fila queda roja.
 
-## 6. Revoca antes de borrar
+### Claude Code y conectores hospedados
+
+Para Claude Code usa una versión `>=2.1.196`; la corrida vigente usa `2.1.263`. Fija
+`oauth.scopes="efeonce.mcp.read"` y no declares `authServerMetadataUrl`: versiones anteriores podían pedir todo
+el catálogo y provocar `invalid_scope`. Durante una corrida eliminable registra un DCR público propio con
+`software_id=run_id`, callback loopback fijo y allowlist base. No uses el client ID CIMD compartido de Anthropic
+como asset del canary: se puede observar, pero no borrar ni reclamar como run-owned.
+
+El preflight de la URL de autorización sólo acredita bootstrap. La fila pasa cuando el consentimiento muestra la
+organización exacta y sólo lectura, una sesión nueva invoca una tool read-only, el write falla cerrado, el refresh
+posterior al TTL conserva el scope y rota la familia, y la revocación invalida el token anterior. Conserva por
+separado la evidencia histórica de cada versión del cliente.
+
+Claude.ai, Claude Desktop, Cowork y mobile usan el conector remoto hospedado de Anthropic; no se certifican con el
+CLI local. Agrega `https://mcp.efeonce.org/mcp` como custom connector y valida el callback HTTPS oficial
+`https://claude.ai/api/mcp/auth_callback`. En Team/Enterprise el alta la hace un Owner y cada persona conecta su
+cuenta; Pro/Max permite alta individual. Para un canary eliminable elige **Usa tu propio cliente OAuth**, registra
+un DCR público con `software_id=run_id` y ese callback, deja el secreto vacío y conserva **Siempre requerido** con
+**HTTP transmisible**. El CIMD que Claude detecta automáticamente es compartido y no entra al cleanup. Ejecuta
+una llamada en Claude.ai y otra desde Desktop antes de afirmar compatibilidad de ambas superficies.
+
+### ChatGPT y metadata visible
+
+Después de crear o actualizar la app, relee el catálogo hospedado: una definición importada no prueba que las
+tools se serializaron. Para cada tool exige `inputSchema`, `outputSchema`, `structuredContent`, las cuatro
+annotations explícitas y el mirror `_meta.securitySchemes` derivado de la misma policy. Ejecuta una lectura real
+y espera al menos una renovación post-TTL. Un probe `POST /mcp` con JSON vacío y sin bearer debe recibir el
+challenge `401`; con bearer válido puede recibir `400 invalid_request`, pero nunca `500`.
+
+## 6. Observa sin crear actividad nueva
+
+Una vez certificada la matriz, la muestra diaria es sólo lectura: ejecuta el readback agregado y el cleanup
+dry-run del registro exacto; relee revisiones Ready, tráfico, SHA y flags en Cloud Run, GitHub y Vercel; y revisa
+las nueve señales de binding/invitación más code reuse, CIMD rechazado y refresh reuse. Registra el resultado
+redactado en el manifiesto.
+
+Un negativo de refresh reuse ejecutado por la propia corrida puede mantener esa señal roja durante 24 horas.
+Clasifícalo por timestamp y DCR run-owned, confirma familia revocada y ausencia de eventos posteriores. No lo
+marques `ok`, pero tampoco lo declares drift inexplicado si cumple esas tres condiciones. Cualquier evento nuevo,
+cliente ajeno o familia activa bloquea el retiro. No abras nuevos consentimientos, clientes o sesiones sólo para
+mantener viva la observación.
+
+## 7. Revoca antes de borrar
 
 Primero revoca la familia OAuth, consentimientos, contextos y sesiones. Después revoca invitaciones, grants y el
 registro:
@@ -151,7 +226,7 @@ Content-Type: application/json
 Con un access token emitido antes del corte, verifica que el gateway deniega en ≤60 s. Si sigue despachando,
 apaga ambos gates, conserva la evidencia y trata el caso como incidente; no avances al delete.
 
-## 7. Prueba que se puede eliminar
+## 8. Prueba que se puede eliminar
 
 El dry-run es el modo por defecto:
 
@@ -197,6 +272,6 @@ conteo agregado no sustituye las consultas por los IDs exactos de la corrida.
 
 ## Criterio de cierre
 
-El trabajo queda técnicamente certificado sólo con matriz completa, cleanup de staging probado, producción
-allow/deny/revocación acreditada y siete días de señales estables. Hasta entonces el estado correcto es
-`code complete, rollout pendiente`.
+El trabajo queda técnicamente certificado sólo con matriz completa, producción allow/deny/revocación
+acreditada, siete días de señales estables y cleanup/readback final cero. Durante la ventana el estado correcto
+es `rollout productivo en observación`.

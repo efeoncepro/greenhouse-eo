@@ -1,5 +1,47 @@
 # TASK-1626 — Efeonce MCP Platform Gateway and Globe Federation
 
+## Delta 2026-09-06 — snapshot histórico de runtime: qué quedó abierto
+
+La sección de rollout de abajo quedó congelada el 2026-08-01 y describe un gateway que ya no existe. Medido
+contra el runtime hoy:
+
+| Qué | Runtime 2026-09-06 | Lo que decía esta task |
+|---|---|---|
+| Revisión productiva | `efeonce-mcp-gateway-00044-4kj`, 100% del tráfico | `00009-9c6` / `00029-bwg` |
+| Región | `southamerica-west1` | no declarada |
+| `maxScale` | **20** | «`maxScale=5` efectivo» |
+| Cloud Armor | 600 req / 60 s | coincide |
+| `authorization_servers` | **dos**: `auth.efeonce.org` + `mcp.efeonce.org` | uno |
+| Scopes anunciados | **seis** (entró `efeonce.mcp.identity.write`) | «auth de tenant único» |
+| Superficie | 39 tools, `version` 1.1.0, `surfaceHash` fijado | un reader Globe read-only |
+
+El emisor nativo de `EPIC-044` ya se anuncia en el front door y la lane delegada de `TASK-1837` está federada
+(PR #3 de `efeonce-mcp`, mergeado 2026-09-06). Front door verificado el mismo día: `oauth-protected-resource`
+200, `POST /mcp` sin token 401, `health` 200.
+
+**Los dos criterios que faltan del smoke live, verificados uno por uno:** protocolo, auth, provider y DNS/cert
+están cubiertos por `oauth-canary.mjs`, `greenhouse-seo-canary.mjs` y `greenhouse-hiring-canary.mjs`. Los otros
+dos no, y no por falta de evidencia sino de mecanismo:
+
+- **Carga mínima**: `grep -rilE "load.?test|autocannon|k6|artillery"` sobre `scripts/`, `test/` y `.github/`
+  de `efeonce-mcp` devuelve **cero**. No hay con qué medir — y el número a validar se movió solo cuando
+  `maxScale` pasó de 5 a 20 sin que nadie midiera qué aguanta.
+- **Rollback**: TASK-1813 ejercitó después el rollback acotado de compatibilidad discovery
+  `1.2.0/00047 → 1.1.2/00046 → 1.2.0/00047`. Sigue faltando el rollback operacional general sobre la misma
+  superficie y junto al baseline de carga exigido por esta task.
+
+Ambos pasan a `TASK-1843`, que los ejecuta y devuelve el criterio tildado. Esta task conserva su ownership del
+criterio; no se duplica.
+
+**El gate `Capability Definition of Done — Full API Parity` se traspasa a `TASK-1473`**, que es su dueña real:
+la paridad amplia de capabilities Globe salió del alcance de esta task hace tiempo y aquí quedaba colgando un
+gate que no puede cerrar por sí misma.
+
+Con eso, el estado honesto de esta task es **`code complete, rollout pendiente`**: el gateway opera en
+producción, y lo que falta para declararla `complete` es la evidencia de `TASK-1843` más los gates de QA y
+documentación de su Closing Protocol.
+
+
 ## Delta 2026-09-03 — EPIC-044 (U00)
 
 La task pasa a `EPIC-044`. Decisión del operador: Efeonce opera su propio authorization server (`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`). El gateway sigue siendo adapter neutral y NO emite tokens; el segundo issuer y el `AuthContext` de seis campos los materializa `TASK-1831`, y la prueba base-only pendiente de esta task la cierra `TASK-1832`.
@@ -27,7 +69,7 @@ datos. Clientes externos requieren además identidad y entitlements verificables
 - Motion: `none`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `gateway público y fleet reader Globe verificados; write interno de fondeo en ejecución, acceso externo B2B/multitenant sigue gated`
+- Status real: `code complete, rollout pendiente. El gateway opera en producción; revisión, SHA, versión, superficie y tráfico vigentes se leen del runtime y surface-baseline, no de este documento. Snapshot 2026-09-07T12:20:25Z: efeonce-mcp-gateway-00046-6n2 Ready/100 %, SHA 171965c99034 igual a origin/main y front door 200/401. Criterios principales 7 de 8. El único abierto —smokes de CARGA MÍNIMA y ROLLBACK— pertenece a TASK-1843: no existe mecanismo de carga en el repo hermano y el rollback está documentado sin ejercitar. Full API Parity pertenece a TASK-1473. La sección Estado de rollout de abajo quedó congelada el 2026-08-01 y el Delta 2026-09-06 es sólo un snapshot histórico.`
 - Rank: `TBD`
 - Domain: `platform|agentic|integration|cloud|identity`
 - Blocked by: `none`
@@ -210,6 +252,10 @@ Reglas obligatorias:
 
 ### Capability Definition of Done — Full API Parity gate
 
+> **Traspasado a `TASK-1473` el 2026-09-06.** La paridad amplia de capabilities Globe es suya; esta task
+> conserva sólo `globe.producer.fleet.list` como capacidad read-only real. Los tres criterios de abajo se cierran
+> allá, no acá — quedan como referencia histórica.
+
 - [ ] Cada tool/resource de Globe mapea a un reader/command canónico y conserva sus errores/policy.
 - [ ] Coverage machine-readable distingue `enabled`, `policy-blocked`, `unavailable` y `not-applicable`.
 - [ ] El gateway no crea capabilities de negocio ni una ruta especial sólo para un cliente MCP.
@@ -318,8 +364,9 @@ DNS en HostGator requieren acceso del operador. No se sustituyen con tokens est�
 - [x] `efeoncepro/efeonce-mcp` existe como repo privado independiente con CI y container reproducibles.
 - [x] `https://mcp.efeonce.org/mcp` sirve Streamable HTTP sobre TLS y discovery OAuth correcto.
 - [x] Requests sin token fallan en el hostname público antes de ejecutar tools; los casos de expiración,
-      audience y scope se cubren antes del dispatch en la suite del gateway. La prueba live de una identidad
-      base-only permanece pendiente hasta separar la emisión de scopes de Entra.
+      audience y scope se cubren antes del dispatch en la suite del gateway. TASK-1832 cerró la prueba live
+      base-only en producción: write oculto y llamada directa `403 insufficient_scope` con challenge para
+      `efeonce.mcp.seo.write`, sin dispatch ni ampliación de permisos.
 - [x] Runtime usa service account dedicada y WIF; no hay keys persistentes ni roles de datos de Globe.
 - [x] Globe aporta `globe.producer.fleet.list` como capacidad read-only real mediante `TASK-1473`, con
       redacción y canary de cliente MCP. La paridad amplia de las demás capabilities sigue en `TASK-1473`.
@@ -335,8 +382,9 @@ DNS en HostGator requieren acceso del operador. No se sustituyen con tokens est�
 - Los smokes públicos aprobaron: health `200`, metadata OAuth `200`, `POST /mcp` sin token `401` con challenge,
   OAuth PKCE autenticado, discovery y `globe.producer.fleet.list` por el hostname canónico.
 - Hardening posterior: Cloud Armor quedó adjunto al backend con throttle aproximado de 600 requests/minuto por
-  IP; la revisión `efeonce-mcp-gateway-00009-9c6` restringe host/origin a `mcp.efeonce.org`, tiene tráfico 100%
-  y `maxScale=5` efectivo. No sustituye las cuotas, entitlements ni límites de gasto de los products providers.
+  IP; la revisión histórica `efeonce-mcp-gateway-00009-9c6` restringía host/origin a `mcp.efeonce.org`, tenía
+  tráfico 100% y `maxScale=5`. El readback live de TASK-1832 del 2026-09-07 verificó `maxScale=20`; ningún valor
+  histórico sustituye las cuotas, entitlements ni límites de gasto de los products providers.
 - El primer callback localhost venció con un listener de 180 segundos; el canary ahora admite una ventana de 10
   minutos configurable. Su override DNS se usa sólo para diagnóstico, conserva SNI público y no modifica runtime.
 - Límite actual: auth de tenant único y un reader Globe read-only. El cliente PKCE interno recibe base + reader

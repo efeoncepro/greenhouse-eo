@@ -285,6 +285,13 @@ const revokeWhere = async (
 
 const plain: Queryable = { query: async (text, values) => ({ rows: (await query(text, values)) as unknown[] }) }
 
+/** Canonical token ledger read, optionally within the caller's authority snapshot. */
+export const readAccessTokenRecord = async (jti: string, readQuery = query): Promise<AccessTokenRecord | null> => {
+  const rows = await readQuery<AccessRow>(`SELECT ${ACCESS_COLUMNS} FROM greenhouse_auth.access_tokens WHERE jti = $1`, [jti])
+
+  return rows.length === 1 ? mapAccess(rows[0]) : null
+}
+
 export class PostgresOAuthStore implements OAuthStorePort {
   async getClient(clientId: string) {
     const rows = (await query(`SELECT ${CLIENT_COLUMNS} FROM greenhouse_auth.oauth_clients WHERE client_id = $1`, [
@@ -481,9 +488,7 @@ export class PostgresOAuthStore implements OAuthStorePort {
   }
 
   async getAccessToken(jti: string) {
-    const rows = (await query(`SELECT ${ACCESS_COLUMNS} FROM greenhouse_auth.access_tokens WHERE jti = $1`, [jti])) as AccessRow[]
-
-    return rows[0] ? mapAccess(rows[0]) : null
+    return readAccessTokenRecord(jti)
   }
 
   async revokeGrant({ grantId, now, reason }: { grantId: string; now: Date; reason: string }) {

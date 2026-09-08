@@ -103,6 +103,10 @@ publicado, registrar un pendiente CMS con alcance, responsable y evidencia esper
 solo con autorización de publicación; después guardar, publicar y verificar la URL viva. No cerrar el
 pendiente con el éxito del guardado ni con el estado de Notion.
 
+Cuando el cambio nace en un comentario, atender y responder el hilo mediante el
+[`módulo 18`](18_REVISION_COMENTARIOS_CLIENTE.md), pero mantener el pendiente Drupal como registro separado.
+El hilo atendido no autoriza por sí mismo una carga, guardado ni publicación en el CMS.
+
 ## Por qué el `title` se audita después
 
 El comportamiento por defecto del CMS **antepone la marca al title**, y eso consume los primeros

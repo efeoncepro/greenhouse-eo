@@ -1,10 +1,11 @@
 # Plantilla · Matriz de distribución social
 
-Agregar como sección/toggle interno en el plan del artículo; no crear propiedades en la base.
+Agregar como sección del toggle de evidencia del plan del artículo; no crear propiedades en la base ni moverla
+al toggle editorial.
 
 - Ciclo de producción / ventana de uso sugerida (no comprometida):
 - Audiencia / intención / objetivo:
-- Artículo V1 e imagen N2 fuente:
+- Versión vigente para revisión e imagen N2 fuente:
 - Criterio: hipótesis editorial, no desempeño medido.
 - Histórico consultado: fuente, período, muestra comparable, señal, aprendizaje y limitaciones;
   si no está disponible, declararlo e identificar responsable de seguimiento.

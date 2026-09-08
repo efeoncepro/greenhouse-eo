@@ -4,7 +4,9 @@
 > `https://auth.efeonce.org` — **TASK-1829** (EPIC-044 U02).
 > **Estado:** OAuth y personas activos; emisión/refresh/revocación internos verificados por TASK-1836 y
 > consumo multi-issuer por TASK-1831. El environment `efeonce-auth` está activo para la cohorte controlada.
-> Las matrices externas/multicontexto siguen abiertas. [Mapa de evidencia](../audits/2026-09-06-task-1836-1831-consolidated-evidence.md).
+> La matriz técnica externa de TASK-1832 está certificada con helper, Playwright, Codex, ChatGPT, Claude Code,
+> Claude.ai y Claude Desktop. El fixture sigue en observación y su cleanup final permanece abierto; esto no es
+> customer access. [Matriz](../audits/mcp/EFEONCE_MCP_CLIENT_TOKEN_MATRIX_2026-09-06.md).
 > ADR gobernante:
 > [`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md).
 > Contrato de federación: [`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md).
@@ -136,14 +138,29 @@ Header `{ "alg": "ES256", "kid": "<RFC 7638 thumbprint>", "typ": "JWT" }` — fi
 - El resolver de grants revalida autoridad en cada emisión (code y refresh). Para el carril externo legacy
   sin contexto se conserva la resolución de memberships `bound`. Para internos, `gv` es exactamente la
   versión del binding seleccionado por el contexto, nunca el máximo entre organizaciones.
-- Los access tokens internos incluyen `authorization_context_id` y `authorization_context_version=1`
-  firmados. El contexto liga sujeto/perfil, cliente, audiencia, organización, binding, environment y sesión
+- Los access tokens internos incluyen `authorization_context_id` y `authorization_context_version=1|2`
+  firmados. V2 está implementado con gates default OFF en TASK-1844; activación pendiente. El contexto liga sujeto/perfil, cliente, audiencia, organización, binding, environment y sesión
   corporativa. Ausencia, versión no soportada o dimensiones ajenas deniegan; no hay fallback por issuer/email.
 - El `jti` se registra en `greenhouse_auth.access_tokens`. TASK-1831 verifica JWT/JWKS y el reader interno
   revalida también ese ledger antes del dispatch: mismo sujeto, cliente, entorno y contexto, sin revocar ni
   expirar. Revocar la familia retira tokens aún vigentes dentro de la cota local de 60 s; no usa introspección.
 - La población persistida `external | internal` es independiente de `issuer_class`. Contrato completo:
   [autoridad interna nativa](EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md).
+
+### TASK-1844 — Contexto interno v2
+
+La versión nace del contexto persistido e inmutable. V2 exige otro context ID y consentimiento fresco por
+cliente; los campos ID/versión del formulario son expectativas del GET, contrastadas con la sesión/DB en POST.
+Un formulario legacy, código o refresh v1 nunca obtiene autoridad v2. V2 inicial sólo admite el scope exacto
+`efeonce.mcp.read`. El JWT mantiene el actor/ancla y `gv`, sin nombres ni lista de organizaciones.
+
+Issuer/consentimiento y el reader machine-only usan `resolveRuntimeInternalMultiOrg`: snapshot consistente,
+roles/relación/entitlements vigentes y targets independientes. El API acepta `intent=catalog|target|organizations`;
+target requiere ID y capability exactos; discovery usa limit 1–50 (default 20), cursor autorizado, `no-store`
+y máximo 128 KiB. El DTO v2 separa `actor` de `targets` con `authorityRevision` opaca, nunca comparada con `gv`.
+La incorporación/retiro de targets se refleja sin reconectar dentro de la misma clase; otras clases requieren
+nuevo consentimiento. [ADR](EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md#d9--contrato-v2-y-discovery-minimizado)
+· [rollout expand/contract](../operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md).
 
 ### 4.2 Refresh token
 
@@ -284,6 +301,9 @@ en el mismo momento en que se prende `AUTH_SERVER_OAUTH_ENABLED` en staging (pre
 - **NUNCA** resolver un cliente CIMD sin el guard anti-SSRF ni cachear un documento más de 24 h.
 - **SIEMPRE** que se agregue un scope al gateway, agregarlo a `scopes.ts` (test de paridad) y a la
   descripción es-CL de `src/lib/copy/auth-server.ts`.
+- `offline_access` no es una capability y su ausencia no prueba continuidad ni bloqueo. La renovación se
+  certifica observando refresh real después del TTL, mismo scope, rotación y revocación. Si el request de refresh
+  omite `scope`, conserva el conjunto original y nunca amplía al catálogo.
 
 ## 11. Verificación
 

@@ -1,19 +1,13 @@
 ---
 name: mcp-craft
 description: >-
-  Skill del OFICIO de construir y mantener superficies MCP —domain-free, agnóstica de nuestro
-  gateway—: diseño de tools para agentes (granularidad, presupuesto de contexto, naming,
-  descripciones, forma de respuesta, errores), ciclo de vida de una superficie viva (versionado,
-  deprecación, drift, gates baratos), primitivas del protocolo más allá de tools, seguridad y
-  autorización, evaluación de la superficie, y un RADAR fechado del spec y del ecosistema. Úsala
-  al diseñar una tool nueva, al discutir cuántas tools exponer, al escribir o revisar una
-  descripción, al retirar o renombrar una capacidad publicada, al elegir entre tool/resource/
-  prompt/elicitation, al montar un eval de superficie, o antes de afirmar qué dice el spec.
-  Triggers - MCP, Model Context Protocol, tool surface, tools/list, inputSchema, outputSchema,
-  structuredContent, annotations, readOnlyHint, elicitation, resource_link, server/discover,
-  MRTR, tool budget, tool search, code mode, presupuesto de contexto, deprecar una tool.
-  Para NUESTRO gateway (mcp.efeonce.org, federación, scopes Entra, Cloud Run) la dueña es
-  `efeonce-mcp-platform`: esta skill es su base de oficio, no su reemplazo.
+  Oficio domain-free para construir y mantener superficies MCP: granularidad y selección de
+  tools, presupuesto de contexto, naming, descripciones, schemas, annotations, respuestas,
+  errores, seguridad, autorización, compatibilidad de clientes, evaluación, versionado,
+  deprecación, drift y radar fechado del protocolo. Úsala al diseñar, publicar, probar, cambiar o
+  retirar tools/resources/prompts/elicitation; al revisar tools/list, inputSchema, outputSchema,
+  structuredContent, securitySchemes o readOnlyHint; y antes de afirmar qué soporta el spec o un
+  cliente. Para mcp.efeonce.org carga además `efeonce-mcp-platform`, dueña del gateway.
 ---
 
 # MCP Craft — el oficio de una superficie agéntica mantenible
@@ -25,6 +19,9 @@ gateway, sus scopes, su federación y su runtime viven en `efeonce-mcp-platform`
 > **Fechado a 2026-09-02.** El protocolo se mueve rápido: entre mayo y julio de 2026 hubo una
 > revisión que eliminó el handshake. Nada de lo que digas sobre el spec vale por memoria. Lee
 > `protocol-radar.md` y, si la decisión es cara, **verifica contra la fuente antes de afirmar**.
+
+Para comportamiento OAuth por cliente, prueba local frente a hospedada, refresh y serialización observable,
+lee también `client-compatibility.md`. Un indicador `connected` nunca basta como evidencia.
 
 ---
 
@@ -103,6 +100,9 @@ puedes consolidar**, y choca de frente con el consejo genérico de "consolida to
 
 ⚠️ Declararlas no basta: hay que **emitirlas al cliente**. Un servidor público las definió durante
 meses sin que llegaran en la respuesta (`registerTool` las recibía y no las propagaba).
+
+La misma regla aplica a `inputSchema`, `outputSchema`, `structuredContent` y mirrors de compatibilidad como
+`_meta.securitySchemes`: prueba el `tools/list` serializado que recibió el cliente, no sólo el objeto interno.
 
 ### 5. Clasifica por EFECTO AGUAS ABAJO, no por lo que la tool hace en su propia llamada
 

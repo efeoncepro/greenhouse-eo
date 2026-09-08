@@ -1,6 +1,8 @@
 # Plantilla — 🧭 Plan editorial y SEO (Modalidad B)
 
-> Único desplegable donde vive **todo el trabajo previo a la escritura** de un artículo nuevo.
+> Plantilla para el toggle de evidencia que permanece en la página del artículo del Content Hub y prueba el
+> trabajo previo a una pieza nueva. Es visible para Berel: escribir conclusiones, fuentes, limitaciones y
+> decisiones profesionales; nunca prompts, credenciales, chain-of-thought, secretos ni conversación cruda.
 > Norma: `../modules/01_CICLO_MENSUAL.md` (Fases B1-B4).
 > *No es burocracia: es lo que evita escribir mil cuatrocientas palabras alrededor de un ángulo
 > equivocado.*
@@ -67,6 +69,7 @@ CTA, señal y gates. No crear tareas por defecto ni cambiar formatos/cuotas/fór
 - [ ] Tabla de datos cerrada, con discrepancias anotadas y reportadas
 - [ ] Ningún claim sin respaldo documental
 - [ ] Si es awareness: diferenciador al frente, sin `Guía [Producto]` por defecto y render oficial previsto
-- [ ] Datos faltantes fuera del cuerpo y registrados en pendientes internos
+- [ ] Datos faltantes fuera del cuerpo y registrados en evidencia trazable, o en privado si son sensibles
 - [ ] Plan de enlaces entrantes hecho
 - [ ] Fila del Content Hub renombrada si traía "(por desarrollar)"
+- [ ] Toggle conservado como hermano del artículo; ningún bloque de análisis se mezcló con la narrativa final

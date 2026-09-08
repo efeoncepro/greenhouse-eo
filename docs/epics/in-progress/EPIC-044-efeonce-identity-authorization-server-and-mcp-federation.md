@@ -9,7 +9,7 @@ Mapa de construcción, pruebas y límites: [auditoría consolidada TASK-1836/183
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `2026-09-06T00:30Z: acceso corporativo interno de TASK-1836 verificado hasta token y lectura MCP, aislamiento y revocación; release PR225/main08acfb2c6 certificado sin override, watchdog5/5. Auth rev30 (fix directo21aa12608 servido desde develop, PR226 abierto, retorno humano directo pendiente) y gateway rev36 internos ON; piloto gv5 con vencimiento original. Evidencia detallada en TASK-1836 y su runbook. Las matrices de clientes externos/multicontexto, UI/WebKit y las unidades aún abiertas conservan sus pendientes; no se declara completo el epic.`
+- Status real: `2026-09-07: emisor nativo y gateway multi-issuer productivos. TASK-1813 está completa: hardening 1.2.0 en 00047-8b5, rollback ensayado y Claude Code/Codex/Claude.ai/Claude Desktop/ChatGPT verdes post-cutover, base-only y sin gasto. TASK-1832 continúa su observación sintética hasta cleanup/readback cero y gates OFF; el primer cliente real permanece en TASK-1841. TASK-1844/U19 tiene implementación local verificada (528 Greenhouse + 158 gateway + 2 PG live); code complete, rollout pendiente: SQL expand/contract, gates, clientes reales y rollback por certificar. El epic sigue abierto.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
 - Owner: `Efeonce Platform / Identity`
@@ -25,7 +25,9 @@ misma identidad canónica y conserva su autorización local. El programa tambié
 Account 360 y la federación multi-issuer de `mcp.efeonce.org`, de modo que organizaciones cliente existentes se
 autentiquen en Claude, Codex y ChatGPT con grants revocables por capability. Decisión de composición vigente:
 [`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md)
-(nativo, no se compra a un tercero); la dirección multiproducto del 2026-09-06 requiere Delta ADR antes de código.
+(nativo, no se compra a un tercero). La entrada, aislamiento y consentimiento por relying party se rigen por
+[`EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md`](../../architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md);
+`TASK-1834` deja de ser la dueña de esos supuestos transversales y queda como primer consumer Greenhouse.
 
 No se implementa directamente este epic. Cada unidad se ejecuta como task propia con plan, gates y cierre
 operativo. Crear el epic no autoriza DNS, secretos, llaves KMS, deploys, registros de clientes ni acceso de
@@ -36,7 +38,8 @@ ningún cliente.
 La identidad cliente y el emisor de tokens son una fundación de plataforma con cuatro epics consumidores y
 ninguna dueña: EPIC-011 (writes MCP de Hiring fail-closed hasta el grant revocable), EPIC-012 (clientes
 externos del cotizador), EPIC-022 (dos tools de grounded queries devolviendo `aeo_forbidden`) y EPIC-043
-(actor, scope y revocación para Payroll). `TASK-1626`, `TASK-1631` y `TASK-1813` viven con `Epic: none`.
+(actor, scope y revocación para Payroll). `TASK-1626`, `TASK-1631` y `TASK-1813` quedaron incorporadas como
+unidades de este epic sin perder sus límites propios.
 
 Además, el gateway necesita un emisor propio aunque nunca hubiera clientes externos: la auditoría del
 2026-09-02 mostró que CIMD sólo lo puede ofrecer el authorization server, que el `issuer` del shim de Entra
@@ -54,6 +57,11 @@ acceso. `identity_profile` sigue siendo la raíz humana, Account 360 la raíz or
 memberships, roles, workspaces, entitlements, capabilities, créditos, derechos y scopes desde su control plane.
 La misma persona puede tener varias relaciones; cada sesión selecciona un contexto y nunca suma sus permisos.
 
+La decisión de entrada v2 del 2026-09-07 separa además tres capas sin crear dos pantallas: cada producto conserva URL,
+contexto y destino; para una cohorte habilitada, su entry crea la transacción y redirige server-side sin vestíbulo.
+Efeonce ID es el único login visible, contextualizado desde el RP registrado, y Microsoft/Google/passkey/correo son
+métodos. Una sesión suficiente puede volver sin UI y el first-party sign-in no muestra consentimiento delegado.
+
 ## Outcome
 
 - `auth.efeonce.org` opera como authorization server propio, aislado del portal y del gateway en runtime, IAM,
@@ -63,8 +71,13 @@ La misma persona puede tener varias relaciones; cada sesión selecciona un conte
   Google, passkey y magic link actúan como métodos upstream vinculados, no como nuevas identidades de producto.
 - Cada producto registra un cliente/audiencia/redirect y conserva cookie, sesión, contexto y autorización propios;
   un token o cookie de un producto no es válido en otro y tener Efeonce ID no aprovisiona acceso.
-- Personas de organizaciones cliente existentes se autentican sin contraseñas y consienten por cliente y por
-  scope; el operador las invita, liga y revoca por commands canónicos auditados sobre Account 360.
+- Cada producto conserva URL/contexto de entrada y autorización, sin exigir una pantalla propia. El issuer usa
+  contexto RP registrado, mantiene login directo neutral y omite consentimiento delegado sólo para first-party;
+  ninguna etiqueta, mode o return URL de aplicación se confía desde el browser.
+- Personas de organizaciones cliente existentes se autentican sin contraseñas; clientes MCP y terceros conservan
+  consentimiento por cliente y scope, con step-up cuando la autoridad lo exige. El operador las invita, liga y
+  revoca por commands canónicos auditados sobre Account 360. El acceso first-party de producto no reutiliza ni
+  concede ese consentimiento delegado.
 - `mcp.efeonce.org` valida dos issuers con `AuthContext` separado, tools calificadas por issuer y clase de
   autoridad, y rechequeo de `grants_version`; los writes federados de Hiring, SEO/AEO, Finance y Payroll
   dejan de estar bloqueados por falta de identidad delegada.
@@ -76,9 +89,12 @@ La misma persona puede tener varias relaciones; cada sesión selecciona un conte
 ## Architecture Alignment
 
 - `docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md` — composición aceptada
+- `docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md` — entrada first-party,
+  contexto RP confiable, aislamiento, fast path y frontera de consentimiento
 - `docs/architecture/EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md` — invariantes, binding, contrato
   del gateway y convergencia (siguen vigentes)
-- `docs/architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md` — gateway neutral, shim DCR, delta 2026-09-02
+- `docs/architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md` — gateway neutral; historia del shim DCR y
+  Delta 2026-09-07 que lo retira del camino soportado
 - `docs/architecture/GREENHOUSE_360_OBJECT_MODEL_V1.md` y `docs/architecture/GREENHOUSE_ACCOUNT_COMPLETE_360_V1.md`
 - `docs/architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md` y
   `docs/architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md`
@@ -94,24 +110,27 @@ La misma persona puede tener varias relaciones; cada sesión selecciona un conte
 |---|---|---|---|
 | **U00** | [TASK-1626](../../tasks/in-progress/TASK-1626-efeonce-mcp-platform-gateway.md) | Gateway neutral en `mcp.efeonce.org` y federación Globe (en curso). Conserva transporte, discovery, providers. No emite tokens. | — |
 | **U01** | [TASK-1828](../../tasks/in-progress/TASK-1828-efeonce-auth-server-runtime-deployable.md) | Runtime `auth.efeonce.org`: `services/auth-server/` en Cloud Run publicado como segundo host del front door del gateway (mismo LB, IP y Cloud Armor; decisión 2026-09-03, ≈ USD 15/mes adicionales), llave KMS HSM + JWKS, schema `greenhouse_auth`, session store y cookie propios, excepción EPIC-027. Sin flujos OAuth visibles todavía. **Code complete 2026-09-04, staging vivo:** Cloud Run `auth-server` (us-east4, rev `00003-jtf`, desplegado por CI con `AUTH_SERVER_ENABLED=true`), llave `auth-server-es256` HSM (v2 `active`, v1 `retiring`), `/.well-known/jwks.json` con 2 `kid`, `readyz` 200 (`postgres`, `kms`, `activeKey`), schema `greenhouse_auth` (`signing_keys` ≤1 active, `signing_key_events` append-only), front door compartido con cert ACTIVE, CLI `pnpm auth-server:rotate-key`, señales `auth.issuer.jwks_unreachable` y `auth.signing_keys.lifecycle`, runbook `docs/operations/runbooks/auth-server.md`, workflow + gates de release. **En producción desde 2026-09-04** (release `9100bbd2765d`, run `33893120972`, rev `auth-server-00005-pk8`, `GIT_SHA f6db4255a`; `AUTH_SERVER_JWKS_URL` en Vercel Production+staging). Pendiente: retiro de la llave v1. | — |
-| **U02** | [TASK-1829](../../tasks/in-progress/TASK-1829-efeonce-auth-server-oauth-protocol-surface.md) | Superficie OAuth/OIDC: metadata RFC 8414, CIMD, DCR compat, PKCE, access token ES256, refresh rotativo, revocación, introspección, consentimiento persistido. Extrae el broker sister-platform. **Code complete, rollout pendiente 2026-09-04** (`develop`, commits `263ee3a74`/`19d1658de`/`d31e6e913`): `issuer` idéntico al origen con `client_id_metadata_document_supported: true` y S256 único; CIMD (anti-SSRF, cache 24 h) primario, DCR sólo públicos, confidenciales por `pnpm auth-server:register-client` / `POST /api/admin/auth-server/oauth-clients`; JWT ES256 15 min con `sub/aud/azp/scope/gv/jti` firmado en KMS HSM; refresh opaco rotativo 30 d/90 d con revocación de familia por reuso; `revoke` RFC 7009, `introspect` RFC 7662 (confidenciales); consentimiento por `(subject, client, scope)` con revocación admin (`identity.auth_consent.revoke`); 7 tablas `greenhouse_auth` aplicadas; señales `auth.oauth.{code_reuse_detected,refresh_reuse_detected,cimd_rejected}`; loopback cualquier puerto para públicos, HTTPS exacto para confidenciales. Detrás de `AUTH_SERVER_OAUTH_ENABLED=false`; `authorize` responde `login_required` hasta U03. Contrato: `EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`. Broker sister-platform del portal intacto. **Rollout al 2026-09-04:** el código está en producción en la revisión `auth-server-00005-pk8` (release `9100bbd2765d`) con el flag OFF (metadata → 404 verificada); environment `efeonce-auth` registrado en `draft` por `pnpm auth-server:register-issuer-environment` (command U04, nunca SQL); siguen pendientes flag ON en staging + environment `active` + validación de metadata + clientes CIMD/DCR (U07). | U01 |
+| **U02** | [TASK-1829](../../tasks/in-progress/TASK-1829-efeonce-auth-server-oauth-protocol-surface.md) | Superficie OAuth/OIDC: metadata RFC 8414, CIMD, DCR compat, PKCE, access token ES256, refresh rotativo, revocación, introspección y policy de consentimiento. Conserva consentimiento por `(subject, client, scope)` para MCP/terceros; la clase first-party es server-owned y no puede degradar ese carril. Extrae el broker sister-platform. **Code complete, rollout pendiente 2026-09-04** (`develop`, commits `263ee3a74`/`19d1658de`/`d31e6e913`): `issuer` idéntico al origen con `client_id_metadata_document_supported: true` y S256 único; CIMD (anti-SSRF, cache 24 h) primario, DCR sólo públicos, confidenciales por `pnpm auth-server:register-client` / `POST /api/admin/auth-server/oauth-clients`; JWT ES256 15 min con `sub/aud/azp/scope/gv/jti` firmado en KMS HSM; refresh opaco rotativo 30 d/90 d con revocación de familia por reuso; `revoke` RFC 7009, `introspect` RFC 7662 (confidenciales); revocación admin `identity.auth_consent.revoke`; 7 tablas `greenhouse_auth` aplicadas; señales `auth.oauth.{code_reuse_detected,refresh_reuse_detected,cimd_rejected}`; loopback cualquier puerto para públicos, HTTPS exacto para confidenciales. Detrás de `AUTH_SERVER_OAUTH_ENABLED=false`; `authorize` responde `login_required` hasta U03. Contrato: `EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`. Broker sister-platform del portal intacto. **Rollout al 2026-09-04:** el código está en producción en la revisión `auth-server-00005-pk8` (release `9100bbd2765d`) con el flag OFF (metadata → 404 verificada); environment `efeonce-auth` registrado en `draft` por `pnpm auth-server:register-issuer-environment` (command U04, nunca SQL); siguen pendientes flag ON en staging + environment `active` + validación de metadata + clientes CIMD/DCR (U07). | U01 |
 | **U03** | [TASK-1830](../../tasks/in-progress/TASK-1830-efeonce-auth-external-person-authentication.md) | Autenticación de personas externas sin contraseña: passkeys, magic link, TOTP step-up, recuperación por re-invitación, anti-abuso. Sólo primitives y rutas; la UI es de U06. | U01 |
 | **U04** | [TASK-1631](../../tasks/in-progress/TASK-1631-efeonce-customer-identity-mcp-federation.md) | Re-alcance: binding Account 360, environments registry, invitaciones, grants, `grants_version`, eligibility reader, señales. Deja de poseer runtime y gateway. **Slice 1 code complete 2026-09-04:** schema aplicado, commands, `GET /api/platform/ecosystem/identity/binding` (contrato de U05), `acceptExternalInvitation` in-process (contrato de U03), 4 señales; rollout pendiente. | U02 en contrato; ejecutable en paralelo |
 | **U05** | [TASK-1831](../../tasks/in-progress/TASK-1831-efeonce-mcp-gateway-multi-issuer-authorization-context.md) | Gateway multi-issuer en `efeonce-mcp`: `AuthContext` de seis campos, resolver por issuer, `allowedIssuers` + clase de autoridad por tool, recheck de `grants_version`, tres tests de regresión. | U02, U04 |
-| **U06** | [TASK-1835](../../tasks/in-progress/TASK-1835-efeonce-id-login-consent-screens.md) | Login, consentimiento y recuperación en `auth.efeonce.org` («Efeonce ID»). Creada 2026-09-04 con wireframe, flow, motion y el flujo maestro `docs/ui/flows/EPIC-044-auth-server-login-consent-UI-FLOW.md`; shell HTML server-rendered con tokens del SSOT, consent honesto, harness local + GVC premium. Slice 1 (shell + consent) no bloqueado; Slices 2–3 (login, step-up, recuperación) esperan U03. Bloquea sólo U07. | U03 (Slices 2–3) |
-| **U07** | [TASK-1832](../../tasks/in-progress/TASK-1832-efeonce-mcp-client-canaries-and-first-customer-cohort.md) | **En ejecución desde 2026-09-06; checkpoint del plan pendiente antes de código.** Certificación técnica externa con población sintética controlada por Efeonce: personas `smoke_test`, organización canary no cliente y binding de propósito explícito recorren invitación, sesión, consentimiento, PKCE, token, gateway y policy reales. Matriz live Claude/Codex/ChatGPT, M365/Google, Chrome/Safari y negativos; prueba preparación técnica, no adopción comercial. | U02–U06, U12 |
+| **U06** | [TASK-1835](../../tasks/complete/TASK-1835-efeonce-id-login-consent-screens.md) | **Completa y en producción desde 2026-09-06.** Login Efeonce ID con passkey, Microsoft y enlace por correo; consentimiento, step-up, alta de segundo factor, recuperación, sesión y errores. GVC premium 29/29, scorecard 4.63/piso 4.5 y gates UI en verde. U09 extiende su login con contexto de RP confiable; no reabre la dirección visual base ni confunde autenticación con autorización Greenhouse. | U03; consumer U09 |
+| **U07** | [TASK-1832](../../tasks/in-progress/TASK-1832-efeonce-mcp-client-canaries-and-first-customer-cohort.md) | **En observación productiva desde 2026-09-06.** Población sintética controlada; helper/Playwright/Codex/ChatGPT hospedado/Claude Code 2.1.263/Claude.ai/Claude Desktop 1.46388.4 verdes. La matriz cliente está completa; siguen abiertos siete días, cleanup/readback cero y gates OFF. Prueba preparación técnica, no adopción comercial. | U02–U06, U12 |
 | **U08** | [TASK-1833](../../tasks/to-do/TASK-1833-efeonce-auth-server-security-assurance-and-operations.md) | Red-team agéntico cruzado, pentest externo, rotación de llaves, señales de reliability, runbooks, postura Ley 21.719, retención. Gate previo al primer cliente pagando. | U02, U03 |
-| **U09** | [TASK-1834](../../tasks/to-do/TASK-1834-greenhouse-customer-login-convergence-native-issuer.md) | Greenhouse se convierte en el primer relying party de Efeonce ID para clientes e internos: consume el perfil OIDC multiproducto, usa audiencia/sesión propias, resuelve identidad canónica y un contexto Greenhouse hasta `TenantAccessRecord`, conserva su autorización, UI y rollout. Slice 0 registra las unidades separadas de foundation reusable y adopción Globe; los providers actuales permanecen y U07/U08 gatean activación, no construcción oscura. | U03, U04, U11; U07/U08 sólo para activación |
-| **U10** | [TASK-1813](../../tasks/to-do/TASK-1813-efeonce-mcp-oauth-client-interoperability.md) | Interoperabilidad OAuth Codex/Claude del carril interno Entra (discovery, shim, scopes). Carril paralelo; no construye broker. | — |
+| **U09** | [TASK-1834](../../tasks/to-do/TASK-1834-greenhouse-customer-login-convergence-native-issuer.md) | Greenhouse se convierte en el primer relying party de Efeonce ID para clientes e internos: `/login` orquesta un redirect directo por cohorte sin pantalla intermedia; Efeonce ID es el único login visible, contextualizado y first-party sin consentimiento delegado —no quinto provider ni vestíbulo—. Consume el perfil OIDC multiproducto, usa audiencia/sesión propias, resuelve identidad canónica y `0 | 1 | many` contextos Greenhouse hasta `TenantAccessRecord`, y conserva autorización local. Foundation oscura puede avanzar; U07/U08/U16 gatean activación externa y U14/U15/U17 el cutover amplio. | U03, U04, U11; U07/U08/U16 para activación externa; U14/U15/U17 para cutover |
+| **U10** | [TASK-1813](../../tasks/complete/TASK-1813-efeonce-mcp-oauth-client-interoperability.md) | **Complete.** `efeonce-mcp` `1.2.0` sirve en `00047-8b5`: Efeonce ID único en discovery, bootstrap base-only, scopes incrementales por 403 y shim retirado, con verificación Entra legacy preservada. Harness 154/154, rollback `00047→00046→00047` y Claude Code/Codex/Claude.ai/Claude Desktop/ChatGPT post-cutover verificados sin widening ni gasto. No construye broker. | U07 aporta matriz cliente; rollout cerrado |
 
-| **U11** | [TASK-1836](../../tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md) | Acceso interno por Efeonce ID: autenticación corporativa, binding canónico y autoridad delegada. Backend; gateway/UI conservan U05/U06. ADR, backend, integridad y canary interno publicados; refresh/revocación/rollback medidos. Entrada directa visible e inicio Microsoft verificados; matriz amplia y promoción PR226 pendientes. | Contratos U02/U03/U04 |
+| **U11** | [TASK-1836](../../tasks/in-progress/TASK-1836-efeonce-id-internal-workforce-mcp-authorization.md) | Acceso interno por Efeonce ID: autenticación corporativa, binding canónico y autoridad delegada. Backend; gateway/UI conservan U05/U06. ADR, backend, integridad y canary interno publicados; refresh/revocación/rollback medidos. Entrada directa visible e inicio Microsoft verificados y promovidos a `main` `456d9accf` por PR226 (2026-09-06); matriz amplia y retorno humano directo pendientes. | Contratos U02/U03/U04 |
 | **U12** | [TASK-1837](../../tasks/complete/TASK-1837-efeonce-id-external-invitation-delivery-delegated-authority.md) | **Completa y en producción desde el 2026-09-06** (release `b3e324cb5c8d-3cfce865-236f-4e4e-b128-8e144de193cf`, ambos flags encendidos, tools del gateway federadas). Entrega gobernada de la invitación externa: el sistema envía el correo en el mismo acto que genera el token (el evento del outbox no lleva el secreto ni puede llevarlo), el token sale de la respuesta salvo excepción gobernada de 1 h, ciclo de vida observable (reenviar = rotar, rebote, caducidad, 3 señales), autoridad delegada del administrador del cliente por lane ecosystem, y host del `redirect_uri` en el consentimiento (MUST del protocolo hoy incumplido). Sin ella el último tramo del alta lo hace una persona copiando un secreto. Bloquea U07; desbloquea el carril de tokens de U03. | U02/U03/U04 |
 | **U13** | [TASK-1838](../../tasks/to-do/TASK-1838-efeonce-id-client-admin-console.md) | Consola del administrador del cliente en Efeonce ID (`auth.efeonce.org/account/organization`, ui-ux, `UI impact: flow`): la persona designada ve a su gente con estado de entrega honesto, invita, reenvía (= rota) y revoca con confirmación, sobre los mismos commands delegados que la lane MCP, server-rendered bajo `__Host-efeonce_auth`, sin token en pantalla y fail-closed si la entrega del sistema no está habilitada en el emisor. Extiende las primitives de U06; prerrequisito en U12 (commands delegados de reenvío/revocación + flag de entrega en el runtime del emisor). Registrada 2026-09-06; `UI ready: no` hasta comparar la composición. | U12 en producción; U06 (primitives); U03 (sesión/CSRF) |
 | **U14** | [TASK-1839](../../tasks/to-do/TASK-1839-invitation-delivery-primitive-convergence.md) | Primitive única de «invitación entregada por el sistema con ciclo de vida» (`src/lib/identity/invitation-delivery/**`: origen desde registro configurado —nunca `NEXT_PUBLIC_APP_URL`—, contrato `delivery_*`, reenviar = rotar, rebote por registro de recorders), consumida por el emisor (U12, sin cambio de comportamiento) y por la invitación del portal (`inviteClientPortalUser`, TASK-1012 pasa a consumer; columnas additive en `client_users`, flag OFF, señal propia). No fusiona identidades ni toca los flujos de aceptación; U09 la hereda. Registrada 2026-09-06. | U12 en producción; decisión de TASK-1012 sobre el origen del portal |
 | **U15** | [TASK-1840](../../tasks/to-do/TASK-1840-efeonce-id-multiproduct-logout-session-revocation.md) | Foundation backend-critical de logout multiproducto: separa salir sólo del RP, cerrar la sesión Efeonce ID del navegador actual y cerrar todas las sesiones; agrega `sid` opaco, RP-Initiated/Back-Channel Logout, ledger/tombstone por RP, fan-out durable, revalidación, señales, conformance y rollback. No revoca consentimientos, roles, entitlements, memberships, `gv`, factores ni upstream Microsoft/Google. U09 y la adopción Globe son consumers separados. Registrada 2026-09-06; sin implementación ni rollout. | U02, U03, U11; U08 antes de Production |
 | **U16** | [TASK-1841](../../tasks/to-do/TASK-1841-efeonce-id-first-consented-customer-pilot.md) | Primer piloto consentido con una organización cliente existente en Account 360, un administrador y una capability read-only ya vigente. Recorre el onboarding normal una vez certificada la tecnología, con soporte y observación por siete días; el cliente no actúa como tester ni comparte tokens/logs. No abre una cohorte ni crea contratos de identidad alternos. | U07, U08, U06 |
+| **U17** | [TASK-1842](../../tasks/to-do/TASK-1842-efeonce-id-person-credentials.md) | Superficie de credenciales de la persona: alta de passkey y listado/retiro de dispositivos. El backend existe desde 2026-09-04 sin ninguna superficie, así que hoy nadie puede crear una credencial y toda entrada depende del correo. Bloqueada por U09: sin la convergencia del login, la primera passkey se configuraría pidiendo un enlace por correo. | `TASK-1834` (U09); U03 (endpoints), U06 (primitives) |
+| **U18** | [TASK-1843](../../tasks/to-do/TASK-1843-mcp-gateway-load-smoke-and-rollback-drill.md) | Carga mínima y rollback ejercitado del gateway, últimos dos smokes abiertos de U00. Medido contra runtime el 2026-09-06: no existe mecanismo de carga en `efeonce-mcp` y el rollback está documentado con `[verificar]` literal. Ejecuta y devuelve el criterio tildado a `TASK-1626`, que conserva su ownership; `TASK-1833` hereda la línea base. | U00 desplegado (cumplido) |
+| **U19** | [TASK-1844](../../tasks/in-progress/TASK-1844-efeonce-mcp-internal-multi-organization-authority.md) | Autoridad interna multiorganización por objetivo explícito. Extiende U11/U05 ya productivas sin reimplementarlas: contexto como ancla del actor, reader Greenhouse por request, consentimiento v2 sin elevación silenciosa y matriz A/B permitidas, C denegada, revocación y concurrencia. Sin wildcard/lista en JWT ni scope por organización. | U11/U05 desplegadas; U10 no bloquea la implementación, pero cierra antes del rollout interno |
 
-Una sola task ejecutable posee cada unidad. `TASK-1836` es U11, `TASK-1837` es U12, `TASK-1838` es U13, `TASK-1839` es U14, `TASK-1840` es U15 y `TASK-1841` es U16; `TASK-659` y `TASK-658` permanecen relacionadas (ver
+Una sola task ejecutable posee cada unidad. `TASK-1836` es U11, `TASK-1837` es U12, `TASK-1838` es U13, `TASK-1839` es U14, `TASK-1840` es U15, `TASK-1841` es U16, `TASK-1842` es U17, `TASK-1843` es U18 y `TASK-1844` es U19; `TASK-659` y `TASK-658` permanecen relacionadas (ver
 *Existing Related Work*). El orden lo definen este epic y el `Rank`, no la antigüedad del ID.
 
 ## Execution Order
@@ -130,7 +149,10 @@ Una sola task ejecutable posee cada unidad. `TASK-1836` es U11, `TASK-1837` es U
    el final de U02/U03. Ningún cliente real participa en QA.
 6. **U16 pilota con una sola organización cliente consentida** únicamente después de U07, U08 y U06; usa una
    capability read-only ya gobernada, acompañamiento y observación, sin pedir al cliente evidencia técnica.
-7. **U09 al final**, con su propio gate; puede construirse en oscuro antes, pero no se activa por población sin
+7. **U19 extiende sólo el carril interno** sobre U11/U05 ya productivas. Puede construirse sin reabrir U05 y sin
+   esperar el cierre de U10; su activación espera que U10 cierre, exige consentimiento fresco y certifica una
+   conexión interna real en Codex y Claude con A/B permitidas, C denegada, revocación y concurrencia aislada.
+8. **U09 al final**, con su propio gate; puede construirse en oscuro antes, pero no se activa por población sin
    la certificación y los gates que declara su task.
 
 Subagentes sólo con alcance independiente; sin cambios de branch, worktrees ni despliegues como mecanismo de
@@ -159,15 +181,29 @@ coordinación. Todo release a producción pasa por el control plane, una sesión
 
 - [ ] `auth.efeonce.org` responde metadata RFC 8414 con `issuer` idéntico al origen y `client_id_metadata_document_supported: true`, firmando con una llave KMS HSM cuyo JWKS publica `kid` y rotación probada. *Parcial 2026-09-04: la llave KMS HSM, el JWKS con `kid` y la rotación (v1 → v2, v1 en `retiring`) ya existen en staging (U01); la metadata RFC 8414/OIDC y CIMD están en código (U02, `TASK-1829` code complete) y probadas in-process, pero siguen detrás de `AUTH_SERVER_OAUTH_ENABLED=false` — se tilda cuando la metadata responda en staging con el flag ON.*
 - [ ] Una persona sintética externa controlada por Efeonce se autentica con passkey y magic link, consiente un cliente y un scope, y ese consentimiento es revocable por el operador con efecto en menos de cinco minutos, sin crear una relación comercial falsa ni contaminar Account 360 (U07).
-- [ ] El gateway despacha una tool read-only con token del issuer propio y niega: token externo sobre tool internal-only, token con roles sin scope delegado, grant revocado con token vigente, issuer desconocido. **Parcial verificado:** canary interno TASK-1836 permite lectura propia, niega ajena y grant revocado ≤11 s; la matriz externa completa sigue pendiente.
-- [ ] Claude Code, Codex y ChatGPT completan OAuth/PKCE (loopback y HTTPS hospedado donde aplique) contra la población canary sintética, por el mismo camino productivo y con evidencia redactada de la matriz de tokens (U07).
+- [x] El gateway despacha una tool read-only con token del issuer propio y niega token externo sobre tool
+      internal-only, grant revocado con token vigente e issuer desconocido. **Verificado:** TASK-1836 cubre el
+      carril interno; TASK-1832 acreditó población externa sintética, allow read-only, internal-only
+      oculto/denegado, scope superior `403`, issuer inválido, expiración y authority revocada en `19.272 s`.
+      No acredita un cliente real.
+- [ ] El caso equivalente de token con `roles` sin scope delegado se verifica y documenta sin mezclar roles con
+      scopes; permanece en TASK-1831.
+- [x] Claude Code, Claude.ai/Desktop, Codex y ChatGPT completan OAuth/PKCE o consumen el conector remoto hospedado
+      donde aplica contra la población canary sintética, por el mismo camino productivo y con evidencia redactada
+      de la matriz de tokens (U07).
 - [ ] Una organización cliente existente, seleccionada y consentida, completa el onboarding normal con una capability read-only vigente y siete días de observación sin actuar como QA ni compartir material sensible (U16).
 - [ ] Pentest externo cerrado sin hallazgos críticos abiertos y runbooks de rotación, incidente y revocación masiva publicados.
 - [ ] Los writes federados de EPIC-011, EPIC-022 y EPIC-043 tienen grant delegado revocable disponible o una task propia declarada para su grant.
-- [ ] El login cliente de Greenhouse tiene el provider OIDC del emisor propio detrás de gate, con rollback probado.
+- [ ] El login de Greenhouse conserva URL/contexto de entrada, redirige server-side sin pantalla intermedia para la
+      cohorte habilitada y tiene recovery/rollback sin loops; el issuer obtiene `Greenhouse` y `first_party_sign_in`
+      del RP registrado, es el único login visible y no debilita consentimiento MCP/terceros.
+- [x] La decisión transversal de entrada, aislamiento y consentimiento ya no vive implícita en U09: está aceptada
+      en `EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md`; U09 permanece como primer consumer y esta
+      aceptación documental no declara implementación ni rollout.
 - [ ] `TASK-659` resuelta por supersesión formal de su diseño original; conserva alcance histórico, no es U11.
 - [x] Nueva `TASK-1836` registrada como U11 por solicitud explícita del operador; consumers y dependencias actualizados.
 - [ ] Personal Efeonce completa acceso MCP nativo con identidad canónica y grants revocables; externos del mismo issuer no acceden a tools internas (U11 -> U05/U06 -> U07). **Parcial verificado:** login corporativo, consent, token, refresh y revocación internos probados en runtime; mantener sin tildar hasta cerrar el negativo externo live y matrices de U07.
+- [ ] Una misma conexión interna, tras consentimiento fresco, descubre sólo las organizaciones autorizadas y opera A/B por `organizationId` explícita mientras C, objetivo ausente/ambiguo y autoridad revocada fallan antes del provider; revocar B no afecta A y dos llamadas concurrentes no cruzan tenant, argumentos ni resultados (U19).
 
 ## Non-goals
 
@@ -279,6 +315,21 @@ de reasignar TASK-659, que conserva su historia fuera del epic. Orden: contrato/
 U11 -> integración interna U05/U06 -> canaries U07. El slice externo mantiene su secuencia. No se interpreta
 el issuer común como autoridad interna ni se cambia la clasificación comercial de Efeonce. Esta decisión
 es planificación; no acredita implementación ni login interno nativo operativo.
+
+## Delta 2026-09-07 — contrato transversal de relying parties
+
+La decisión que nació durante el rediseño de U09 pasa a ser supuesto de todo EPIC-044. Efeonce ID autentica una
+cuenta humana común, pero cada RP conserva `client_id`, audiencia, redirects, cookie, sesión, logout, contexto y
+autorización propios. Un entry first-party habilitado inicia y redirige server-side sin vestíbulo; el issuer obtiene
+la presentación desde la transacción/registro confiables, puede completar fast path con sesión suficiente y omite
+consentimiento delegado sólo para esa clase server-owned. MCP y terceros mantienen consentimiento por cliente/scope
+y step-up; una sesión o ID token de producto nunca autoriza el gateway.
+
+Ownership vigente: U02 conserva protocolo, registro de clientes y policy de consentimiento; U03 conserva sesión y
+métodos de autenticación del issuer; U05 conserva autorización MCP; U15 conserva logout multiproducto; U09 consume
+el contrato como primer RP Greenhouse y resuelve `0 | 1 | many` más autorización local. Legacy y recovery son
+carriles explícitos sin auto-redirect para impedir loops. Este delta y el ADR son diseño aceptado: no prueban
+código, flags, migraciones, canary ni rollout.
 
 ## Delta 2026-09-06 — U12 entrega gobernada de la invitación externa (TASK-1837)
 

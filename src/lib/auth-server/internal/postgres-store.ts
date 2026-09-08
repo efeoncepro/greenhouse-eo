@@ -57,7 +57,7 @@ export class PostgresInternalLoginTransactions implements InternalLoginTransacti
 
 type ContextRow = {
   context_id: string
-  context_version: 1
+  context_version: 1 | 2
   issuer: string
   environment_id: string
   subject: string
@@ -75,14 +75,15 @@ type ContextRow = {
 }
 
 export class PostgresInternalContextStore implements InternalContextStorePort {
+  constructor(private readonly readQuery = query) {}
+
   async insert(c: InternalAuthorizationContext): Promise<InternalAuthorizationContext> {
-    const rows = await query<{ context_id: string }>(
+    const rows = await this.readQuery<{ context_id: string }>(
       `INSERT INTO greenhouse_auth.authorization_contexts
         (context_id, context_version, issuer, environment_id, subject, profile_id, client_id, audience,
          organization_id, binding_id, session_hash, upstream_link_id, auth_time, created_at, expires_at, revoked_at)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
-       ON CONFLICT (session_hash, client_id, binding_id, issuer, audience) WHERE revoked_at IS NULL
-       DO UPDATE SET context_id = greenhouse_auth.authorization_contexts.context_id
+       ON CONFLICT DO NOTHING
        RETURNING context_id`,
       [
         c.id,
@@ -104,7 +105,15 @@ export class PostgresInternalContextStore implements InternalContextStorePort {
       ]
     )
 
-    const persisted = rows[0] ? await this.get(rows[0].context_id) : null
+    // Works with both old and versioned unique indexes. Never adopt the other version on conflict.
+    const existing = rows.length ? rows : await this.readQuery<{ context_id: string }>(
+      `SELECT context_id FROM greenhouse_auth.authorization_contexts
+        WHERE session_hash=$1 AND client_id=$2 AND binding_id=$3 AND issuer=$4 AND audience=$5
+          AND context_version=$6 AND revoked_at IS NULL`,
+      [c.sessionHash, c.clientId, c.bindingId, c.issuer, c.audience, c.version]
+    )
+
+    const persisted = existing.length === 1 ? await this.get(existing[0].context_id) : null
 
     if (!persisted) throw new Error('context_persistence_unavailable')
 
@@ -112,7 +121,7 @@ export class PostgresInternalContextStore implements InternalContextStorePort {
   }
 
   async get(id: string): Promise<InternalAuthorizationContext | null> {
-    const rows = await query<ContextRow>(
+    const rows = await this.readQuery<ContextRow>(
       `SELECT context_id, context_version, issuer, environment_id, subject, profile_id, client_id, audience,
               organization_id, binding_id, session_hash, upstream_link_id, auth_time, created_at, expires_at, revoked_at
          FROM greenhouse_auth.authorization_contexts WHERE context_id = $1`,
@@ -146,7 +155,7 @@ export class PostgresInternalContextStore implements InternalContextStorePort {
   async revoke(input: { id: string; now: Date; reason: string }): Promise<boolean> {
     if (!input.reason.trim()) throw new Error('revocation_reason_required')
 
-    const rows = await query<{ context_id: string }>(
+    const rows = await this.readQuery<{ context_id: string }>(
       `UPDATE greenhouse_auth.authorization_contexts SET revoked_at = $2, revoke_reason = $3
         WHERE context_id = $1 AND revoked_at IS NULL RETURNING context_id`,
       [input.id, input.now, input.reason]

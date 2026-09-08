@@ -1,5 +1,13 @@
 # TASK-1842 — Efeonce ID: credenciales de la persona (alta de passkey y dispositivos)
 
+## Delta 2026-09-07 — fast path sin compartir sesión
+
+`docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md` formaliza la precondición de este
+recorrido. TASK-1834 entra por Efeonce ID y deja disponible la sesión propia del issuer; al cruzar desde
+`/my/profile` a `/credentials`, esa sesión puede evitar pedir otro correo. No hay cookie compartida, y la passkey
+sólo autentica la identidad: cada producto vuelve a resolver su autorización y cualquier conexión MCP conserva
+consentimiento/scopes propios. Este delta no declara implementada la convergencia ni la superficie de credenciales.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -85,6 +93,7 @@ el punto de entrada es parte del alcance y de los criterios, no un detalle de im
 
 - `docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`
 - `docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`
+- `docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md`
 - `docs/architecture/ui-platform/PATTERNS.md` → §`Runtime sin React — shell «Efeonce ID»` (TASK-1835)
 - `docs/architecture/agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md`
 - `docs/ui/GREENHOUSE_PREMIUM_UI_DELIVERY_STANDARD_V1.md`
@@ -126,7 +135,8 @@ Reglas obligatorias:
   **Precisión sobre qué aporta 1834:** no unifica cookies —esa task declara que Greenhouse conserva
   «token family, cookie, sesión, logout y rollback propios»—. Lo que hace es que el login de
   Greenhouse PASE POR el emisor (OIDC), y esa ida y vuelta es la que deja viva la sesión del emisor.
-  El efecto que esta task necesita es ése, no una cookie compartida.
+  El efecto que esta task necesita es ése, no una cookie compartida. Esa sesión tampoco autoriza por sí sola a
+  Greenhouse, Globe o MCP: cada consumer conserva contexto, consentimientos y enforcement propios.
 
 ### Blocks / Impacts
 

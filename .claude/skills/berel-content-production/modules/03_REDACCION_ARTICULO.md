@@ -1,23 +1,26 @@
 # 03 · Redacción del artículo (Fase 5 / Fase B5)
 
-> Vale para las dos modalidades. En **A** el bloque se llama `✍️ Reescritura V1`; en **B**,
-> `✍️ Artículo V1`. La estructura interna y las reglas editoriales son **idénticas**.
+> Vale para las dos modalidades. En ambas, la única zona activa se llama
+> `✍️ Versión vigente para revisión`; los toggles hermanos de análisis/plan conservan la evidencia de
+> modalidad y decisiones, sin cambiar el título de la zona editorial.
 
 ## Cómo se monta
 
 1. **Debajo** del contenido existente y **sin borrar nada**, agregar un encabezado desplegable 1
    para la reescritura.
 2. Basarla en: el contenido anterior + las recomendaciones de ambos análisis + la guía de Voz y Tono
-   y demás páginas de la wiki (paleta vigente, keywords, recomendaciones SEO).
+   y demás páginas de la wiki (brief de color, nombres/códigos, keywords, recomendaciones SEO).
 3. **Verificar cada enlace** antes de dejarlo en el texto, con el protocolo de dos pasos
    (sitemap → ruta de control) → [§ Verificación de enlaces](#verificación-de-enlaces). 🔴 **El sitio
    NUNCA devuelve 404**, así que el código de estado no prueba nada.
 4. Controlar la longitud contra la guía y el plan SEO; si excede mucho, **proponer** qué recortar
    (FAQ redundantes, pasos fusionables) **sin ejecutarlo salvo pedido**.
-5. **Releer antes de cerrar.** Una errata en el cuerpo publicable obliga a una edición extra y le
+5. **Comprobar intención y costura.** Cada sección responde solo a su encabezado; si se reubica contenido
+   útil, recibe encabezado propio y una línea puente desde la sección anterior.
+6. **Releer antes de cerrar.** Una errata en el cuerpo publicable obliga a una edición extra y le
    resta credibilidad al entregable; revisar sobre todo **nombres de producto, de color y
    tecnicismos**.
-6. Al terminar, `Estado` del artículo a **`En revisión`**.
+7. Al terminar, `Estado` del artículo a **`En revisión`**.
 
 ## Verificación de enlaces
 
@@ -52,7 +55,7 @@ compara la extracción completa:
 
 Medidos el 2026-08-25: la ficha de Berelinte trae **4.699 caracteres**; el tutorial de baño, **5.231**.
 Si la candidata no trae `<title>` propio y pesa lo mismo que el control, **no existe**: sustitúyela
-por una alternativa verificada y deja el pendiente en el callout ⚠️.
+por una alternativa verificada y registra el pendiente en el toggle de evidencia.
 
 ### URLs verificadas el 2026-08-25 — listas para reusar
 
@@ -108,17 +111,25 @@ con mirar `title`, `H1` y `meta description`: la frase puede estar enterrada en 
 **frase literal en todo el HTML** de cada página candidata, **con y sin tilde**. Así se cerró esa
 verificación para los tres artículos de sala en septiembre 2026.
 
-## Estructura obligatoria del bloque
+## Estructura obligatoria de la versión vigente
 
-Dentro del desplegable, **siempre en este orden**:
+La página compartida con Berel contiene toggles hermanos de evidencia y una sola **zona editorial vigente**.
+En el toggle de artículo/reescritura/tutorial debe existir únicamente este contenido:
 
 | Bloque | Qué lleva |
 |---|---|
-| **Callout de procedencia** | De qué análisis y qué fuentes de la wiki sale esta versión, más la convención de niveles usada (`##` = H2 del artículo, `###` = H3), para que **quien maquete no confunda los encabezados de Notion con los del CMS** |
-| **Metadatos propuestos** | Title, meta description, slug y H1, cada uno con su **conteo de caracteres**. 🔴 **En viñetas, no en tabla** — el carácter de barra vertical parte la fila en Notion |
-| **Texto completo** | El artículo listo para maquetar: arco de cinco tiempos, tuteo, tablas, FAQ y firma de cierre |
-| **Especificación de banners** | Un **callout 🖼️ en la posición exacta del texto** donde va cada pieza, con archivo, medidas, peso, lazy sí/no y **ALT literal**. Es la fuente de verdad que después se copia a la ficha de la subtarea |
-| **Callout de pendientes ⚠️** | Todo lo que quedó sin verificar: productos sin página pública, series por confirmar y datos que requieren fuente oficial. Este bloque es interno y no se copia al cuerpo público. *Un pendiente declarado es gestionable; uno omitido se publica como error* |
+| **Metadatos propuestos** | Title, meta description, slug y H1, cada uno con su **conteo de caracteres**. Son aprobables por el cliente. 🔴 **En viñetas, no en tabla** — el carácter de barra vertical parte la fila en Notion |
+| **Texto público completo** | El artículo listo para maquetar: arco de cinco tiempos, tuteo, tablas, FAQ y firma de cierre. Debe poder copiarse a Drupal sin retirar notas, placeholders ni instrucciones |
+| **Fichas visuales N1–N4** | Cuatro especificaciones completas, distribuidas junto a la sección que cada imagen representa. Incluyen composición, copy de arte, ALT, archivo, formato/carga y posición exacta según el módulo 05 |
+
+`Keyword principal`, `Intención`, `Delimitación de cluster`, decisiones de research y controles de publicación
+pertenecen a los toggles hermanos de evidencia; no son metadatos aprobables ni narrativa del artículo.
+
+Los toggles hermanos de análisis/research/plan conservan fuentes, decisiones, discrepancias, limitaciones y
+verificaciones como prueba del trabajo. Una tarea privada de Efeonce conserva secretos, credenciales,
+conversación cruda y operación sensible. La tarea visual replica literalmente las fichas N1–N4 del artículo;
+no las sustituye. Las versiones editoriales anteriores se conservan como historial y nunca compiten con la
+vigente.
 
 → Plantilla copiable: [`../templates/bloque-reescritura.md`](../templates/bloque-reescritura.md)
 
@@ -136,6 +147,10 @@ Dentro del desplegable, **siempre en este orden**:
 - **Productos enlazados a su página pública** (`berel.com/productos/...`) o a la categoría; **nunca al
   Home, nunca a `/search?q=` y nunca a URLs del backend/CMS**. 🔴 Y a la **variante** correcta, no al
   nombre genérico → [§ Sufijos de variante](#-sufijos-de-variante-enlaza-al-acabado-no-al-nombre).
+- 🔴 **Un enlace de `app.notion.com`, `notion.so`, una tarea o un brief nunca es destino público del artículo.**
+  Esas URLs pueden vivir como evidencia trazable en Research/Análisis/Plan, pero no como anchor del copy que se
+  entrega a Drupal. En la zona editorial, cada enlace visible debe resolver a una URL pública pertinente —por
+  regla general `berel.com`— y pasar la verificación de sitemap + control descrita arriba.
 - Siempre con **anchor descriptivo**; nunca la URL cruda como texto del enlace.
 - Incluir **FAQ**, **tabla comparativa** cuando aplique, y la **firma de cierre** de la marca.
 - En una tabla, usar encabezados que expliquen el dato (`Especificación` / `Dato`) y nombrar el producto
@@ -143,25 +158,39 @@ Dentro del desplegable, **siempre en este orden**:
   explicarlo fuera de la comparación.
 - Si se recomienda consultar a un especialista, convertirlo en una salida accionable con anchor
   descriptivo hacia `/contacto`.
-- **Especificar los banners dentro de la reescritura** siguiendo la Spec para imágenes: posición
-  exacta anclada a una sección real del texto, nombre de archivo `.webp`, ALT exacto y **hero sin
-  `lazy`** (es el LCP) → [`05_BANNERS_IMAGENES.md`](05_BANNERS_IMAGENES.md).
+- **Claridad antes que ingenio.** Todo remate o frase compacta debe entenderse a la primera lectura. Leerlo
+  en voz alta: si pide una segunda pasada, reescribirlo en lenguaje directo.
+- **Una sección, una intención.** El contenido que responde otra pregunta se reubica bajo un H2/H3 propio;
+  no se elimina cobertura SEO/AEO útil. Toda reubicación lleva una línea puente.
+- **Tomar la sustancia, no la letra.** Una frase propuesta por el cliente se valida contra voz, léxico,
+  evidencia e hilo conductor antes de incorporarla; no introducir `ideal` u otro comodín vetado.
+- **Verificar lo que se reporta.** Si una supuesta errata aparece en un mensaje o resumen del agente pero no en
+  la lectura fresca de Notion, corregir el reporte y no tocar el artículo. El caso `segundasegunda capa` fue un
+  error de redacción del agente; la fuente guardada decía `Segunda capa para un acabado uniforme`.
+- **Especificar los banners contextualmente dentro del artículo** siguiendo la Spec para imágenes: posición
+  exacta junto a una sección real, nombre de archivo `.webp`, ALT exacto y **hero sin `lazy`** (es el LCP).
+  Copiar después la ficha completa a la tarea visual. Un brief N1–N4 es entregable de producción; una nota de
+  auditoría, CMS, QA o agente no lo es →
+  [`05_BANNERS_IMAGENES.md`](05_BANNERS_IMAGENES.md).
+- **Contrato de asset producido:** si diseño ya trabajó desde una ficha, no cambiar composición, copy, ALT,
+  archivo, formato ni posición como efecto lateral de una corrección editorial. Cualquier cambio requiere
+  inventario del asset, razón explícita, conciliación con diseño y actualización coordinada de artículo+tarea.
 
 ### Cuando el dato no está firme
 
-- Una **canónica planificada** puede declararse en los metadatos del artículo nuevo y en el callout
-  de procedencia de sus derivados, pero no se trata como página publicada. Si devuelve el shell de
+- Una **canónica planificada** puede declararse en los metadatos del artículo nuevo y en la tarea privada
+  de sus derivados, pero no se trata como página publicada. Si devuelve el shell de
   soft-404, mantener un gate literal: **no activar enlaces entrantes ni programar derivados hasta
   comprobar `title`, H1, cuerpo, canonical y schema en la ruta pública**.
 - Si el sitio **no confirma** la URL, enlazar la **familia de color** o la **categoría de producto**,
-  y dejar el pendiente en el callout ⚠️. 🔴 **Nunca la búsqueda del sitio como respaldo.**
+  y dejar el pendiente en el toggle de evidencia. 🔴 **Nunca la búsqueda del sitio como respaldo.**
 - Si un **producto no tiene página pública localizable** —no aparece en `sitemap-productos.xml` y la
   candidata pesa como el control—: citarlo con su nombre y número de serie confirmados en el
-  catálogo, enlazar el catálogo general y dejar el pendiente en el callout ⚠️. **Nunca inventar una
+  catálogo, enlazar el catálogo general y dejar el pendiente en el toggle de evidencia. **Nunca inventar una
   URL de ficha**, ni deducir un sufijo de variante que no viste en el sitemap.
-- Si una fuente de la wiki está **vacía o sin permisos de lectura**, **decirlo explícitamente en el
-  bloque interno de pendientes** en lugar de rellenar el hueco con supuestos. El cuerpo público no lleva
-  disclaimers sobre la operación ni sobre verificaciones pendientes.
+- Si una fuente de la wiki está **vacía o sin permisos de lectura**, registrarlo como limitación en el toggle
+  de evidencia en lugar de rellenar el hueco con supuestos. El cuerpo público no lleva disclaimers sobre la
+  operación ni sobre verificaciones pendientes.
 
 ### Producto nuevo o con baja notoriedad
 
@@ -178,8 +207,9 @@ categoría consolidada:
 
 En todo cuerpo público, retirar lenguaje de agencia o control interno: `el cliente`, `instrucción del
 cliente`, `posicionamiento editorial`, `la ficha declara`, referencias al CMS, extracción o verificación.
-La fuente puede vivir en procedencia/datos/pendientes internos; la frase pública habla directamente desde
-Berel. `Premium` describe una línea cuando la fuente lo respalda, nunca una `formulación premium`.
+La fuente y la decisión viven en el toggle hermano de evidencia; la frase del toggle editorial habla
+directamente desde Berel. `Premium` describe una línea cuando la fuente lo respalda, nunca una
+`formulación premium`.
 
 ### Cuando los nombres de producto se traslapan
 
@@ -187,7 +217,7 @@ No asumir que `vinílica`, `acrílica` y `esmalte` son tres cajas excluyentes. A
 comparativa, abrir las fichas concretas y separar cuatro preguntas: **qué superficie declara, qué
 exposición admite, qué función cumple y qué preparación exige**. Una resina o una base no sustituyen
 la aplicación declarada. Si la clasificación inicial del brief contradice las fichas, corregir el
-brief y explicar el cambio en la procedencia del artículo.
+brief y explicar el cambio en el toggle de evidencia correspondiente.
 
 ## Estándares on-page que la pieza debe cumplir
 
@@ -207,7 +237,7 @@ Del estándar editorial de la marca (→ [`04_VOZ_Y_TONO_BEREL.md`](04_VOZ_Y_TON
 - **AEO:** definiciones canónicas "X es Y" en la primera frase de cada sección · FAQ con respuesta
   directa en la primera línea · tablas comparativas y listas reales (los LLM las extraen con
   facilidad) · datos verificables y citables.
-- **Datos estructurados (pendiente para Dev, se anota en el callout ⚠️):** `Article` completo
+- **Datos estructurados (tarea privada para Dev):** `Article` completo
   (`description`, `author`, `datePublished`/`dateModified`, `image`) · `FAQPage` para las preguntas ·
   `HowTo` para guías paso a paso · `BreadcrumbList` para la migaja. **El texto del schema debe
   coincidir exactamente con el visible.** Unificar dominio a `berel.com` **sin www** entre canónica
@@ -217,8 +247,16 @@ Del estándar editorial de la marca (→ [`04_VOZ_Y_TONO_BEREL.md`](04_VOZ_Y_TON
 (colores del año, tendencias): una **pillar page atemporal** que acumula ("Colores de Temporada") y
 **páginas hijas** por paleta/año ("Paraíso Mexicano 2026"). El hub captura keywords genéricas; cada
 hija, las específicas. Enlazado bidireccional y **sin canibalizar preguntas entre ambos**. 🔴 En
-piezas evergreen **evita frases dependientes del momento** ("paleta vigente", "temporada actual",
-"este año"): rompen la atemporalidad del hub.
+piezas evergreen **no usar anclas dependientes del momento**: `paleta vigente`, `temporada actual`,
+`última paleta de temporada`, `combinación vigente de la temporada`, `paleta del trimestre`, `este año`
+ni equivalentes. Nombrar el color por nombre + código, sin etiqueta estacional. Una página hija puede
+nombrar su paleta/año cuando esa temporalidad sea su intención explícita.
+
+## Revisión por comentarios del cliente
+
+La revisión no es una reescritura libre. Inventariar hilos, separar diagnóstico de remedio, editar con
+reemplazos pequeños, responder con la razón editorial y dejar el cierre al cliente. Procedimiento completo:
+[`18_REVISION_COMENTARIOS_CLIENTE.md`](18_REVISION_COMENTARIOS_CLIENTE.md).
 
 ## Anatomía esperada del texto
 

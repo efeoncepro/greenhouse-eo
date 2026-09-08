@@ -59,6 +59,8 @@ Registro canónico de asignación de IDs `EPIC-###` para evitar colisiones y ren
 | `EPIC-043` | `to-do` | `docs/epics/to-do/EPIC-043-payroll-reliability-and-agentic-api-parity.md` |
 | `EPIC-044` | `in-progress` | `docs/epics/in-progress/EPIC-044-efeonce-identity-authorization-server-and-mcp-federation.md` |
 
+| `EPIC-045` | `to-do` | `docs/epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md` |
+
 ## Siguiente ID disponible
 
-- `EPIC-045`
+- `EPIC-046`

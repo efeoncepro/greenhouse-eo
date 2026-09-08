@@ -36,6 +36,7 @@ type LocatedToken =
       authorizationContextId: string | null
       environmentId: string
       kind: 'access'
+      authorizationContextVersion: 1 | 2 | null
       grantId: string
       subject: string
       clientId: string
@@ -79,6 +80,7 @@ const locateToken = async (token: string, deps: RevokeIntrospectDeps, now: Date)
       authorizationContextId: record.authorizationContextId ?? null,
       environmentId: record.environmentId,
       kind: 'access',
+      authorizationContextVersion: verified.authorizationContextVersion,
       grantId: record.grantId,
       subject: record.subject,
       clientId: record.clientId,
@@ -227,7 +229,8 @@ export const handleIntrospect = async (
         })
 
         located.active = Boolean(
-          authority?.bound && (located.kind !== 'access' || authority.grantsVersion === located.gv)
+          authority?.bound && (located.kind !== 'access' || (authority.grantsVersion === located.gv &&
+            (!located.authorizationContextId || (authority.authorizationContextVersion ?? 1) === located.authorizationContextVersion)))
         )
       } catch {
         located.active = false
@@ -250,7 +253,7 @@ export const handleIntrospect = async (
       return jsonResponse(200, {
         active: true,
         ...(located.authorizationContextId
-          ? { authorization_context_id: located.authorizationContextId, authorization_context_version: 1 }
+          ? { authorization_context_id: located.authorizationContextId, authorization_context_version: located.authorizationContextVersion }
           : {}),
         token_type: 'Bearer',
         scope: located.scope,

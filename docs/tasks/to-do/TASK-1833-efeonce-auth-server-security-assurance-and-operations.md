@@ -1,5 +1,31 @@
 # TASK-1833 — Efeonce Auth Server Security Assurance and Operations
 
+## Delta 2026-09-07 — assurance de entry, RP y consentimiento
+
+El ADR `docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md` agrega casos obligatorios al
+aseguramiento previo a Production: spoofing de contexto/marca RP, degradación de un cliente delegado a first-party,
+reuso cross-RP de code/token/cookie/session, open redirect y loops de legacy/recovery. Debe probarse además que una
+sesión suficiente permite fast path first-party sin consentimiento, mientras un cliente MCP nuevo, scopes elevados o
+una operación que exige step-up conservan autorización explícita. Estas pruebas cubren el contrato transversal y
+TASK-1834 como primer consumer; no declaran la convergencia implementada ni reabren la certificación ya observada.
+
+## Delta 2026-09-06 — el red-team cierra los dos tests abiertos de TASK-1831
+
+Dos abuse cases de esta task —**token del issuer externo sobre tool interna** y **confused deputy por
+cliente**— son, palabra por palabra, los criterios de aceptación (a) y (b) que `TASK-1831` dejó abiertos:
+
+- (a) token externo con scope string internal-only → deny en dispatch con señal redactada
+- (b) `roles` con string de escritura y sin scope delegado → deny, también en el issuer Entra
+
+`TASK-1831` está desplegada con el carril interno verificado, pero esos dos tests siguen sin tildar porque no
+existe membership externa real; el "rechazo ajeno" que sí se probó es interno contra interno. El Slice 1 de
+esta task los ejercita sintéticamente contra staging, sin esperar a un cliente externo.
+
+**Contrato entre ambas tasks:** el red-team produce el request reproducible y la refutación cruzada; el fix, si
+lo hay, y el tilde del criterio son de `TASK-1831`, que es la dueña del verifier en `../efeonce-mcp`. Ninguna de
+las dos ejecuta el caso dos veces. Coordinar antes de correr el Slice 1.
+
+
 ## Delta 2026-09-04 — acceso interno nativo (TASK-1836)
 
 Incluir en aseguramiento la frontera de autoridad introducida por TASK-1836: sujetos internos y externos
@@ -58,7 +84,7 @@ El assessment de este slice consume su ADR y código; no bloquea el diseño inic
 ## Summary
 
 Asegurar y hacer operable el authorization server antes del primer cliente pagando: red-team agéntico
-cruzado (Fable 5.1 y GPT 5.6 High con roles adversarios sobre la superficie real en staging), pentest externo
+cruzado (Fable 5.1 y GPT-6 Astra con roles adversarios sobre la superficie real en staging; ver §Pareo de modelos), pentest externo
 con hallazgos críticos cerrados, rotación de llaves KMS ejercitada y programada, señales de reliability
 completas, runbooks de incidente, revocación masiva y recuperación, retención y postura frente a la Ley
 21.719 (vigente 2026-12-01). El ADR nativo asumió la operación permanente; esta task es donde esa
@@ -75,7 +101,8 @@ un subprocesador externo y debe reescribirse para un tratamiento propio.
 
 - Red-team agéntico: catálogo de abuse cases (CIMD SSRF, PKCE downgrade, reuso de código/refresh, open
   redirect, enumeración, brute force TOTP, replay de challenge WebAuthn, confused deputy por cliente,
-  token del issuer externo sobre tool interna, JWKS poisoning) con resultado por caso y fix aplicado.
+  spoofing/degradación de clase RP, cross-RP code/token/session, loops de recovery, token del issuer externo sobre
+  tool interna, JWKS poisoning) con resultado por caso y fix aplicado.
 - Pentest externo contratado sobre staging con alcance documentado; hallazgos críticos y altos cerrados.
 - Rotación de llave ejercitada en staging y producción; programación trimestral por Cloud Scheduler
   (`ops-auth-key-rotate`) con verificación post-rotación.
@@ -94,6 +121,7 @@ un subprocesador externo y debe reescribirse para un tratamiento propio.
 Revisar y respetar:
 
 - `docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md` (§4-pillar scoring, §Hard rules)
+- `docs/architecture/EFEONCE_ID_RELYING_PARTY_ENTRY_AND_CONSENT_DECISION_V1.md`
 - `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md`
 - `docs/architecture/GREENHOUSE_AUTH_RESILIENCE_V1.md`
 - `docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md`
@@ -237,6 +265,13 @@ Reglas obligatorias:
 ### Slice 1 — Red-team agéntico y fixes
 
 - Catálogo de abuse cases; ejecución cruzada por dos agentes con rol adversario sobre staging; fixes en las tasks dueñas o aquí si son de hardening.
+- Los casos *externo sobre interno* (token del issuer externo sobre tool interna, confused deputy por cliente)
+  se ejecutan contra el gateway y su evidencia se entrega a `TASK-1831` para tildar sus criterios (a) y (b);
+  el fix del verifier es de esa task, no de esta.
+- Los casos de relying party prueban en el emisor y el primer consumer que presentación/return/mode vienen del
+  registro/transacción, que un RP no reutiliza artefactos de otro y que recovery/legacy no forman un redirect loop.
+- La matriz de consentimiento contrasta fast path first-party con cliente MCP nuevo, scope elevado y escritura con
+  step-up; omitir UI de login nunca equivale a autorizar al cliente delegado.
 
 ### Slice 2 — Señales, rotación y retención
 
@@ -260,6 +295,27 @@ Reglas obligatorias:
 - Red-team: cada agente recibe la superficie (metadata, endpoints, contratos) y un objetivo por caso; la
   evidencia es un request reproducible; el otro agente intenta refutar el hallazgo antes de aceptarlo
   (los hallazgos de subagentes fallan hacia el daño máximo).
+### Pareo de modelos del red-team (actualizado 2026-09-06)
+
+`GPT-6 Astra` reemplaza a `GPT 5.6 High` en el carril adversario. Astra se publicó el 2026-09-03 y es el primer
+modelo de OpenAI en alcanzar el nivel **Critical** de capacidad en ciberseguridad bajo su Preparedness Framework:
+con herramientas y acceso encuentra fallas desconocidas y desarrolla formas de explotarlas sin guía paso a paso.
+
+Tres condiciones que no se pueden saltar:
+
+- **Mantener los dos proveedores.** El diseño exige que un agente refute al otro antes de aceptar un hallazgo. Si
+  ambos carriles son Astra, un punto ciego compartido pasa desapercibido. `Fable 5.1` contra `GPT-6 Astra` conserva
+  la independencia de la refutación.
+- **La capacidad ofensiva está gated.** La versión menos restringida para defensores vive en el programa
+  `Daybreak` / `Daybreak Blue` de OpenAI, en alpha con un grupo reducido. Con la API normal Astra rechaza parte del
+  trabajo. Verificar cobertura real contra un caso del catálogo ANTES de comprometer el plan del Slice 1; si
+  rechaza, degradar el carril a otro modelo y dejarlo escrito, nunca reformular el caso para esquivar el rechazo.
+- **Sólo staging, sólo superficie propia.** Nunca producción, nunca un host de terceros. Es uso defensivo sobre
+  infraestructura propia; cualquier otra cosa sale del alcance de esta task.
+
+Costo a considerar en el Slice 1: la API de Astra cobra USD 10 por millón de tokens de entrada y USD 50 por millón
+de salida — órdenes de magnitud bajo el pentest del Slice 4, pero no trivial en corridas agénticas largas.
+
 - Rotación: `registerSigningKeyVersion` → verificación de JWKS con dos `kid` → espera ≥ `SIGNING_KEY_MIN_OVERLAP_MS` (1 h, mayor que el TTL del access token) → `retireSigningKey` del viejo.
 
 ## Rollout Plan & Risk Matrix
@@ -311,6 +367,12 @@ Reglas obligatorias:
 - [ ] Cambio de frontera de TASK-1836 cubierto por assurance: externo del mismo issuer sin autoridad interna, binding no derivado de email y revocación con token vigente.
 
 - [ ] Catálogo de abuse cases con ≥ 10 casos ejecutados, cada uno con resultado y refutación cruzada.
+- [ ] Un cliente o parámetro no confiable no puede inyectar marca/return ni autodeclararse `first_party_sign_in`;
+      code, token, cookie y sesión de RP A fallan en RP B.
+- [ ] Fast path first-party sin UI y recovery/legacy sin loops están ejercitados; la misma sesión no omite el
+      consentimiento de un cliente MCP nuevo, scopes elevados ni el step-up de escritura.
+- [ ] Evidencia reproducible de los casos externo-sobre-interno entregada a `TASK-1831`, con sus criterios (a) y (b)
+      tildados allá o el bloqueo declarado con razón.
 - [ ] Pentest externo con alcance documentado y sin críticos/altos abiertos.
 - [ ] Rotación de llave ejercitada en staging y producción; scheduler trimestral activo con verificación.
 - [ ] Señales del dominio registradas en el control plane con steady y severidad.

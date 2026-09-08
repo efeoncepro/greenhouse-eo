@@ -17,6 +17,10 @@ conservan autoridad y vencimientos; nunca son una vía para ampliar permisos.
 > **Ruta en portal:** sin UI en este slice; se opera por API bajo `/api/admin/identity/external-access/*` (y, para el administrador del cliente, `/api/platform/ecosystem/identity/invitations` vía gateway)
 > **Documentacion relacionada:** [Binding de Identidad Externa para el MCP](../../documentation/identity/binding-identidad-externa-mcp.md), [EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md](../../architecture/EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md), [Runbook del gateway MCP — soporte a cliente externo](../../operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md#soporte-cliente-externo-que-no-puede-entrar-task-1631)
 
+> Para una certificación sintética no sigas el alta de cliente de este manual. Usa el
+> [canary eliminable](certificar-cliente-mcp-con-canary-sintetico.md): purpose `canary`, organización no
+> comercial, capability read-only, DCR run-owned y cleanup por IDs exactos.
+
 ## Para que sirve
 
 Este manual te guía para preparar, paso a paso y sin tocar la base de datos, el acceso de una organización

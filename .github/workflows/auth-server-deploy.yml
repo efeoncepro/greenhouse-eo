@@ -174,6 +174,8 @@ jobs:
         shell: bash
         env:
           DESIRED_AUTH_SERVER_INTERNAL_AUTH_ENABLED: ${{ vars.AUTH_SERVER_INTERNAL_AUTH_ENABLED || 'false' }}
+          DESIRED_AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED: ${{ vars.AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED || 'false' }}
+          DESIRED_AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS: ${{ vars.AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS || '' }}
           DESIRED_EXTERNAL_IDENTITY_CANARY_ENABLED: ${{ vars.EXTERNAL_IDENTITY_CANARY_ENABLED || 'false' }}
         run: |
           set -euo pipefail
@@ -200,19 +202,26 @@ jobs:
           CURRENT_GIT_SHA=""
           CURRENT_AUTH_SERVER_INTERNAL_AUTH_ENABLED=""
           CURRENT_EXTERNAL_IDENTITY_CANARY_ENABLED=""
+          CURRENT_AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED=""
+          CURRENT_AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS=""
           if [ -n "${CURRENT_REVISION}" ]; then
-            mapfile -t CURRENT_RUNTIME_STATE < <(gcloud run revisions describe "${CURRENT_REVISION}" \
+            CURRENT_RUNTIME_STATE=()
+            while IFS= read -r runtime_value; do CURRENT_RUNTIME_STATE+=("${runtime_value}"); done < <(gcloud run revisions describe "${CURRENT_REVISION}" \
               --project="${GCP_PROJECT_ID}" \
               --region="${GCP_REGION}" \
-              --format=json | python3 -c 'import json, sys; data = json.load(sys.stdin); values = {env.get("name"): env.get("value", "") for container in data.get("spec", {}).get("containers", []) or [] for env in container.get("env") or []}; [print(values.get(name, "")) for name in ("GIT_SHA", "AUTH_SERVER_INTERNAL_AUTH_ENABLED", "EXTERNAL_IDENTITY_CANARY_ENABLED")]' 2>/dev/null || true)
+              --format=json | python3 -c 'import json, sys; data = json.load(sys.stdin); values = {env.get("name"): env.get("value", "") for container in data.get("spec", {}).get("containers", []) or [] for env in container.get("env") or []}; [print(values.get(name, "")) for name in ("GIT_SHA", "AUTH_SERVER_INTERNAL_AUTH_ENABLED", "EXTERNAL_IDENTITY_CANARY_ENABLED", "AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED", "AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS")]' 2>/dev/null || true)
             CURRENT_GIT_SHA="${CURRENT_RUNTIME_STATE[0]:-}"
             CURRENT_AUTH_SERVER_INTERNAL_AUTH_ENABLED="${CURRENT_RUNTIME_STATE[1]:-}"
             CURRENT_EXTERNAL_IDENTITY_CANARY_ENABLED="${CURRENT_RUNTIME_STATE[2]:-}"
+            CURRENT_AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED="${CURRENT_RUNTIME_STATE[3]:-false}"
+            CURRENT_AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS="${CURRENT_RUNTIME_STATE[4]:-}"
           fi
 
           CONFIG_MATCHES="false"
           if [ "${CURRENT_AUTH_SERVER_INTERNAL_AUTH_ENABLED}" = "${DESIRED_AUTH_SERVER_INTERNAL_AUTH_ENABLED}" ] \
-            && [ "${CURRENT_EXTERNAL_IDENTITY_CANARY_ENABLED}" = "${DESIRED_EXTERNAL_IDENTITY_CANARY_ENABLED}" ]; then
+            && [ "${CURRENT_EXTERNAL_IDENTITY_CANARY_ENABLED}" = "${DESIRED_EXTERNAL_IDENTITY_CANARY_ENABLED}" ] \
+            && [ "${CURRENT_AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED}" = "${DESIRED_AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED}" ] \
+            && [ "${CURRENT_AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS}" = "${DESIRED_AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS}" ]; then
             CONFIG_MATCHES="true"
           fi
 
@@ -244,6 +253,8 @@ jobs:
         env:
           ENV: ${{ env.ENV }}
           AUTH_SERVER_INTERNAL_AUTH_ENABLED: ${{ vars.AUTH_SERVER_INTERNAL_AUTH_ENABLED || 'false' }}
+          AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED: ${{ vars.AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED || 'false' }}
+          AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS: ${{ vars.AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS || '' }}
           EXTERNAL_IDENTITY_CANARY_ENABLED: ${{ vars.EXTERNAL_IDENTITY_CANARY_ENABLED || 'false' }}
           EXPECTED_SHA: ${{ steps.resolve-sha.outputs.expected_sha }}
 

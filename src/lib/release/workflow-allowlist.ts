@@ -55,6 +55,7 @@ export const RELEASE_DEPLOY_WORKFLOWS: readonly ReleaseDeployWorkflow[] = [
     // Registrado ANTES del primer deploy production, como exige la regla dura del
     // control plane. Con cloudRunService: el orquestador lo despliega vía workflow_call
     // y el watchdog compara su GIT_SHA (deploy change-gated como los demás workers).
+    // TASK-1844: same workflow/service; its change-gate also compares multi-org flag/cohort.
     workflowName: 'Auth Server Deploy',
     cloudRunService: 'auth-server',
     cloudRunRegion: 'us-east4'
