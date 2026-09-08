@@ -1,0 +1,124 @@
+{
+  "runId": "task-1844-runtime-20260908-a",
+  "mutation": {
+    "action": "revoke-b",
+    "startedAt": "2026-09-08T20:26:21.668Z",
+    "committedBefore": "2026-09-08T20:26:23.353Z"
+  },
+  "readerAfterCommit": [
+    {
+      "label": "A",
+      "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975",
+      "clientId": "task-1844-runtime-20260908-a-a",
+      "spaceId": "spc-task-1844-runtime-20260908-a-a",
+      "outcome": "resolved"
+    },
+    {
+      "label": "B",
+      "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3",
+      "clientId": "task-1844-runtime-20260908-a-b",
+      "spaceId": "spc-task-1844-runtime-20260908-a-b",
+      "outcome": "denied"
+    },
+    {
+      "label": "C",
+      "organizationId": "org-56b1a2d6-fc83-4639-adeb-59e0b20f5127",
+      "clientId": "task-1844-runtime-20260908-a-c",
+      "spaceId": "spc-task-1844-runtime-20260908-a-c",
+      "outcome": "denied"
+    }
+  ],
+  "bound": "Conservative duration from before canonical mutation to completed deny; actual commit is within the recorded interval.",
+  "clients": [
+    {
+      "client": "CODEX",
+      "denyUpperBoundSeconds": 20.008,
+      "B": {
+        "server": "efeonce",
+        "tool": "get_seo_entitlement",
+        "arguments": {
+          "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3"
+        },
+        "startedAt": "2026-09-08T20:26:40.722076+00:00",
+        "completedAt": "2026-09-08T20:26:41.675757+00:00",
+        "status": "failed",
+        "result": [
+          "authorization_denied"
+        ],
+        "clientObservedDurationMs": 953.681
+      },
+      "A": {
+        "server": "efeonce",
+        "tool": "get_seo_entitlement",
+        "arguments": {
+          "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975"
+        },
+        "startedAt": "2026-09-08T20:26:45.503572+00:00",
+        "completedAt": "2026-09-08T20:26:46.615853+00:00",
+        "status": "completed",
+        "result": {
+          "provider": "greenhouse-seo",
+          "data": {
+            "ok": true,
+            "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975",
+            "hasModule": false,
+            "tier": null,
+            "allowanceCap": 0,
+            "allowanceUsed": 0,
+            "allowanceRemaining": 0,
+            "budgetCapUsd": 0,
+            "budgetUsedUsd": 0,
+            "budgetRemainingUsd": 0,
+            "periodResetAt": "2026-10-01T00:00:00.000Z",
+            "blockedReason": "no_entitlement"
+          }
+        },
+        "clientObservedDurationMs": 1112.281
+      }
+    },
+    {
+      "client": "CLAUDE",
+      "denyUpperBoundSeconds": 14.208,
+      "B": {
+        "server": "efeonce-internal",
+        "tool": "mcp__efeonce-internal__get_seo_entitlement",
+        "arguments": {
+          "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3"
+        },
+        "startedAt": "2026-09-08T20:26:34.719217+00:00",
+        "completedAt": "2026-09-08T20:26:35.875972+00:00",
+        "status": "failed",
+        "result": "authorization_denied",
+        "clientObservedDurationMs": 1156.755
+      },
+      "A": {
+        "server": "efeonce-internal",
+        "tool": "mcp__efeonce-internal__get_seo_entitlement",
+        "arguments": {
+          "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975"
+        },
+        "startedAt": "2026-09-08T20:26:34.906471+00:00",
+        "completedAt": "2026-09-08T20:26:36.334430+00:00",
+        "status": "completed",
+        "result": {
+          "provider": "greenhouse-seo",
+          "data": {
+            "ok": true,
+            "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975",
+            "hasModule": false,
+            "tier": null,
+            "allowanceCap": 0,
+            "allowanceUsed": 0,
+            "allowanceRemaining": 0,
+            "budgetCapUsd": 0,
+            "budgetUsedUsd": 0,
+            "budgetRemainingUsd": 0,
+            "periodResetAt": "2026-10-01T00:00:00.000Z",
+            "blockedReason": "no_entitlement"
+          }
+        },
+        "clientObservedDurationMs": 1427.959
+      }
+    }
+  ]
+}

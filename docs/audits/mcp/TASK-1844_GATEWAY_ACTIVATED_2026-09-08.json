@@ -1,0 +1,15 @@
+{
+  "observedAt": "2026-09-08T19:59:15.982104+00:00",
+  "runId": 34271986264,
+  "revision": "efeonce-mcp-gateway-00050-wlk",
+  "trafficPercent": 100,
+  "ready": true,
+  "sha": "45ade9373b58c3a8a3d66912c5db76cbd59c5fc5",
+  "digest": "southamerica-west1-docker.pkg.dev/efeonce-group/efeonce-mcp/gateway@sha256:6a85733a6cb7faeca65d8cfbc8ff2199f652f95b47c8e021d0a3bc91380e06c8",
+  "flags": {
+    "MCP_NATIVE_AUTH_ENABLED": "true",
+    "MCP_NATIVE_INTERNAL_AUTH_ENABLED": "true",
+    "MCP_NATIVE_INTERNAL_MULTI_ORG_ENABLED": "true",
+    "MCP_NATIVE_EXTERNAL_CANARY_ENABLED": "true"
+  }
+}

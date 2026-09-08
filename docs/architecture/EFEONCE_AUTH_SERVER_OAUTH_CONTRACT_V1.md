@@ -105,8 +105,11 @@ Política de `redirect_uri` (decisión 2026-09-04, `AuthServerOAuthConfig.allowL
 
 CIMD (`cimd.ts`): `client_id` https con path, sin fragmento/userinfo, host con nombre (no IP literal,
 no `localhost`/`.local`), `href` normalizado; el documento debe traer `client_id` igual a la URL,
-`redirect_uris` válidas, `token_endpoint_auth_method: none`, `grant_types ⊆ {authorization_code,
-refresh_token}` con `authorization_code`, `response_types ∋ code`. Anti-SSRF: DNS resuelto antes del
+`redirect_uris` válidas, `token_endpoint_auth_method: none`, `grant_types` como array de strings no vacíos
+con `authorization_code`, `response_types ∋ code`. El registro efectivo conserva sólo la intersección
+`{authorization_code, refresh_token}`; un grant adicional anunciado por el vendor no invalida el flujo
+compatible ni habilita su intercambio. `/oauth/token` sigue rechazándolo con `unsupported_grant_type`.
+Anti-SSRF: DNS resuelto antes del
 socket y rechazado si alguna dirección cae en rangos privados/loopback/link-local/CGNAT/metadata; sin
 redirects; timeout 3 s; 64 KB máx. Cache `greenhouse_auth.cimd_cache` con TTL 24 h (`≤ 24 h` por
 CHECK) + `etag` (`If-None-Match` → 304 renueva); un rechazo se cachea 15 min. Todo rechazo produce
@@ -348,3 +351,20 @@ JSON y redirects mantienen `no-referrer`. El guard CSRF no acepta indiscriminada
 `form-action` de consentimiento añade únicamente el origen del callback ya validado por authorize contra el
 registro del cliente; no sustituye la coincidencia exacta del redirect. La prueba real Chromium del handler
 cubre origen, negativos cross-origin y la cadena POST→authorize→callback; WebKit omitido no cuenta como passed.
+
+### Compatibilidad CIMD comprobada en TASK-1844 — 2026-09-08
+
+El documento público [Claude hospedado](https://claude.ai/oauth/mcp-oauth-client-metadata) anuncia
+`authorization_code`, `refresh_token` y `urn:ietf:params:oauth:grant-type:jwt-bearer`. El validador anterior
+rechazaba el documento completo con `invalid_client`/`grant_types`, aunque el cliente pedía PKCE y scope base.
+La corrección intersecta capacidades declaradas con los dos grants soportados por este emisor.
+No cambia métodos de autenticación, redirects, scope, consentimiento ni autoridad; no implementa JWT bearer.
+El caso de `oauth-flow.test.ts` reproduce el rechazo anterior, completa consentimiento/PKCE/refresh con
+la declaración extendida y prueba que un intercambio del grant extra no emite tokens. Arrays malformados
+o sin `authorization_code` siguen rechazados. La certificación hospedada productiva se registra por separado
+en [la evidencia de TASK-1844](../audits/mcp/TASK-1844_PRODUCTION_RELEASE_2026-09-08.md).
+
+La decisión aplica el contrato de metadata extensible de
+[OAuth Client ID Metadata Document §4.1](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-client-id-metadata-document-00#section-4.1)
+a la política local del emisor. Es una decisión de interoperabilidad de Efeonce; no afirma que el draft
+obligue a aceptar cualquier grant ni modifica la frontera DCR del canary.

@@ -52,7 +52,10 @@ type Harness = {
   clock: { now: Date }
 }
 
-const createHarness = async (overrides: Partial<AuthServerOAuthConfig> = {}): Promise<Harness> => {
+const createHarness = async (
+  overrides: Partial<AuthServerOAuthConfig> = {},
+  cimdMetadata: Record<string, unknown> = {}
+): Promise<Harness> => {
   const { privateKey, publicKey } = await generateKeyPair('ES256')
   const jwk = await exportJWK(publicKey)
   const kid = 'test-kid'
@@ -109,7 +112,8 @@ const createHarness = async (overrides: Partial<AuthServerOAuthConfig> = {}): Pr
           redirect_uris: ['http://127.0.0.1/callback', 'https://client.example/cb'],
           token_endpoint_auth_method: 'none',
           grant_types: ['authorization_code', 'refresh_token'],
-          response_types: ['code']
+          response_types: ['code'],
+          ...cimdMetadata
         })
       })
     },
@@ -627,6 +631,68 @@ describe('auth-server OAuth flow (in-process)', () => {
     expect(json(replay).error).toBe('invalid_grant')
     expect(h.store.audit.some(e => e.eventType === 'code_reuse')).toBe(true)
     expect([...h.store.accessTokens.values()].every(t => t.revokedAt !== null)).toBe(true)
+  })
+
+  it('uses only supported CIMD grants while rejecting an advertised JWT bearer exchange', async () => {
+    const extraGrant = 'urn:ietf:params:oauth:grant-type:jwt-bearer'
+
+    h = await createHarness({}, { grant_types: ['authorization_code', 'refresh_token', extraGrant] })
+    h.setSubject(PERSON)
+    const clientId = 'https://client.example/oauth/client-metadata.json'
+    const { token } = await runCodeFlow(clientId, 'https://client.example/cb')
+
+    expect(token!.status).toBe(200)
+    expect(h.store.clients.get(clientId)?.grantTypes).toEqual(['authorization_code', 'refresh_token'])
+    expect(json(token).scope).toBe('efeonce.mcp.read')
+
+    const refreshed = await h.handler(
+      request('POST', '/oauth/token', {
+        headers: FORM_HEADERS,
+        body: form({ grant_type: 'refresh_token', client_id: clientId, refresh_token: json(token).refresh_token })
+      })
+    )
+
+    expect(refreshed!.status).toBe(200)
+    expect(json(refreshed).scope).toBe('efeonce.mcp.read')
+    const before = { access: h.store.accessTokens.size, refresh: h.store.refreshTokens.size }
+
+    const rejected = await h.handler(
+      request('POST', '/oauth/token', {
+        headers: FORM_HEADERS,
+        body: form({ grant_type: extraGrant, client_id: clientId, assertion: 'unsupported-test-assertion' })
+      })
+    )
+
+    expect(json(rejected).error).toBe('unsupported_grant_type')
+    expect({ access: h.store.accessTokens.size, refresh: h.store.refreshTokens.size }).toEqual(before)
+  })
+
+  it.each(
+    [null, 'authorization_code', [], ['refresh_token'], ['authorization_code', 7]].map(grantTypes => ({ grantTypes }))
+  )('rejects malformed or authorization-code-free CIMD grants: %j', async ({ grantTypes }) => {
+    h = await createHarness({}, { grant_types: grantTypes })
+    h.setSubject(PERSON)
+
+    const response = await h.handler(
+      request(
+        'GET',
+        '/oauth/authorize?' +
+          new URLSearchParams({
+            client_id: 'https://client.example/oauth/client-metadata.json',
+            redirect_uri: 'https://client.example/cb',
+            response_type: 'code',
+            scope: 'efeonce.mcp.read',
+            code_challenge: pkce().challenge,
+            code_challenge_method: 'S256'
+          })
+      )
+    )
+
+    expect(response!.status).toBe(401)
+    expect(h.store.clients.size).toBe(0)
+    expect(h.store.consents).toEqual([])
+    expect(h.store.accessTokens.size).toBe(0)
+    expect(h.store.refreshTokens.size).toBe(0)
   })
 
   it('rejects plain PKCE, localhost for hosted clients, non-exact https and unknown clients before redirecting', async () => {

@@ -1,0 +1,55 @@
+{
+  "observedAt": "2026-09-08T19:21:53.154147+00:00",
+  "task": "TASK-1844",
+  "phase": "compatible-gates-off",
+  "services": [
+    {
+      "service": "efeonce-mcp-gateway",
+      "revision": "efeonce-mcp-gateway-00049-fv7",
+      "trafficPercent": 100,
+      "imageDigest": "southamerica-west1-docker.pkg.dev/efeonce-group/efeonce-mcp/gateway@sha256:6a85733a6cb7faeca65d8cfbc8ff2199f652f95b47c8e021d0a3bc91380e06c8",
+      "ready": true,
+      "configuration": {
+        "GATEWAY_BUILD_SHA": "45ade9373b58c3a8a3d66912c5db76cbd59c5fc5",
+        "MCP_NATIVE_AUTH_ENABLED": "true",
+        "MCP_NATIVE_INTERNAL_AUTH_ENABLED": "true",
+        "MCP_NATIVE_INTERNAL_MULTI_ORG_ENABLED": "false",
+        "MCP_NATIVE_EXTERNAL_CANARY_ENABLED": "true"
+      }
+    },
+    {
+      "service": "auth-server",
+      "revision": "auth-server-00045-t6r",
+      "trafficPercent": 100,
+      "imageDigest": "gcr.io/efeonce-group/auth-server@sha256:13e29a617825a7fe1e251f8d31e45e92f949d5439c05fd81ad008be3a979402a",
+      "ready": true,
+      "configuration": {
+        "GIT_SHA": "0720eb968b820ad2fc3512678a593ec3e10149f3",
+        "AUTH_SERVER_INTERNAL_AUTH_ENABLED": "true",
+        "AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED": "false",
+        "AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS": null,
+        "EXTERNAL_IDENTITY_CANARY_ENABLED": "true"
+      }
+    }
+  ],
+  "gatewayDeploys": [
+    {
+      "conclusion": "success",
+      "created_at": "2026-09-08T18:53:28Z",
+      "head_sha": "53a14b7cd96e5ccaea60bc95258285f117f98b86",
+      "html_url": "https://github.com/efeoncepro/efeonce-mcp/actions/runs/34265724918",
+      "id": 34265724918,
+      "run_started_at": "2026-09-08T18:53:28Z",
+      "updated_at": "2026-09-08T18:55:15Z"
+    },
+    {
+      "conclusion": "success",
+      "created_at": "2026-09-08T19:00:46Z",
+      "head_sha": "45ade9373b58c3a8a3d66912c5db76cbd59c5fc5",
+      "html_url": "https://github.com/efeoncepro/efeonce-mcp/actions/runs/34266442254",
+      "id": 34266442254,
+      "run_started_at": "2026-09-08T19:00:46Z",
+      "updated_at": "2026-09-08T19:02:59Z"
+    }
+  ]
+}

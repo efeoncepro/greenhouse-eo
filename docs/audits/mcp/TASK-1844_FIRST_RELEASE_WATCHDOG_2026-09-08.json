@@ -1,0 +1,75 @@
+{
+  "observedAt": "2026-09-08T20:24:09.516Z",
+  "aggregateSeverity": "ok",
+  "exitCode": 0,
+  "teamsDispatched": false,
+  "teamsSkippedReason": "no findings con severity > ok",
+  "signals": [
+    {
+      "signalId": "platform.release.stale_approval",
+      "severity": "ok",
+      "summary": "Sin runs production esperando approval > 24h. Workflows allowlist limpios.",
+      "evidence": [
+        {
+          "kind": "metric",
+          "label": "count",
+          "value": "0"
+        },
+        {
+          "kind": "doc",
+          "label": "Spec",
+          "value": "docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md \u00a72.9"
+        }
+      ]
+    },
+    {
+      "signalId": "platform.release.pending_without_jobs",
+      "severity": "ok",
+      "summary": "Sin runs pending > 5min con jobs vacios. Concurrency fix Opcion A (Slice 3) operando.",
+      "evidence": [
+        {
+          "kind": "metric",
+          "label": "count",
+          "value": "0"
+        },
+        {
+          "kind": "doc",
+          "label": "Spec",
+          "value": "docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md \u00a72.9"
+        }
+      ]
+    },
+    {
+      "signalId": "platform.release.worker_revision_drift",
+      "severity": "ok",
+      "summary": "5/5 workers synced. Cloud Run revision matchea ultimo workflow run success.",
+      "evidence": [
+        {
+          "kind": "metric",
+          "label": "workers_checked",
+          "value": "5"
+        },
+        {
+          "kind": "metric",
+          "label": "drift_count",
+          "value": "0"
+        },
+        {
+          "kind": "metric",
+          "label": "data_missing_count",
+          "value": "0"
+        },
+        {
+          "kind": "metric",
+          "label": "detail",
+          "value": "ops-worker: gh=741e3a045cc2 != run=0720eb968b82 (change-gated \u2014 rutas runtime sin cambios; workflow omiti\u00f3 deploy y servicio est\u00e1 Ready=True) | commercial-cost-worker: gh=741e3a045cc2 == run=741e3a045cc2 (synced) | ico-batch-worker: gh=741e3a045cc2 == run=741e3a045cc2 (synced) | hubspot-greenhouse-integration: gh=741e3a045cc2 == run=741e3a045cc2 (synced) | auth-server: gh=741e3a045cc2 != run=741e3a045cc2 (change-gated \u2014 rutas runtime sin cambios; workflow omiti\u00f3 deploy y servicio est\u00e1 Ready=True)"
+        },
+        {
+          "kind": "doc",
+          "label": "Spec",
+          "value": "docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md \u00a72.9"
+        }
+      ]
+    }
+  ]
+}

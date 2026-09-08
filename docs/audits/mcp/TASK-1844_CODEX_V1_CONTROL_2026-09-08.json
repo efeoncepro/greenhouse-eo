@@ -1,0 +1,74 @@
+{
+  "observedAt": "2026-09-08T19:47:17.405515+00:00",
+  "client": "Codex CLI 0.153.4",
+  "mode": "actual native CLI login and ephemeral client invocation, existing OAuth credential; focused MCP-only config and same configured model",
+  "consent": "v1, single Efeonce organization, efeonce.mcp.read, hosted Codex CIMD",
+  "result": {
+    "id": "item_2",
+    "type": "mcp_tool_call",
+    "server": "efeonce",
+    "tool": "efeonce.gateway.status",
+    "arguments": {},
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"gateway\":\"ready\",\"protocol\":\"2026-07-28\",\"providers\":[{\"providerId\":\"globe\",\"contractVersion\":\"v1\",\"state\":\"enabled\"},{\"providerId\":\"greenhouse-globe-credit-funding\",\"contractVersion\":\"v1\",\"state\":\"enabled\"},{\"providerId\":\"greenhouse-seo\",\"contractVersion\":\"task-1645\",\"state\":\"enabled\"},{\"providerId\":\"greenhouse-hiring\",\"contractVersion\":\"task-1726-v1\",\"state\":\"enabled\"},{\"providerId\":\"greenhouse-skills\",\"contractVersion\":\"task-1804\",\"state\":\"enabled\"}]}"
+        }
+      ],
+      "structured_content": {
+        "gateway": "ready",
+        "protocol": "2026-07-28",
+        "providers": [
+          {
+            "providerId": "globe",
+            "contractVersion": "v1",
+            "state": "enabled"
+          },
+          {
+            "providerId": "greenhouse-globe-credit-funding",
+            "contractVersion": "v1",
+            "state": "enabled"
+          },
+          {
+            "providerId": "greenhouse-seo",
+            "contractVersion": "task-1645",
+            "state": "enabled"
+          },
+          {
+            "providerId": "greenhouse-hiring",
+            "contractVersion": "task-1726-v1",
+            "state": "enabled"
+          },
+          {
+            "providerId": "greenhouse-skills",
+            "contractVersion": "task-1804",
+            "state": "enabled"
+          }
+        ]
+      }
+    },
+    "error": null,
+    "status": "completed"
+  },
+  "ledger": {
+    "observedAt": "2026-09-08T19:46:28.466Z",
+    "contexts": [
+      {
+        "context_id": "f5c479f9-33ed-4ea9-b653-9e97358f9a4f",
+        "client_id": "https://chatgpt.com/oauth/codex/client.json",
+        "context_version": 1,
+        "organization_id": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+        "created_at": "2026-09-08T19:43:34.268Z",
+        "expires_at": "2026-09-15T19:32:25.352Z",
+        "revoked_at": null,
+        "access_rows": 1,
+        "active_access": 1,
+        "all_access_base_only": true,
+        "refresh_rows": 1,
+        "active_refresh": 1
+      }
+    ]
+  },
+  "limitations": "Two initial probes did not locate an invocable tool and made no MCP call. The positive probe used focused MCP-only configuration and allowed lazy tool discovery; it invoked the real tool once. This is v1 control, not v2 certification."
+}

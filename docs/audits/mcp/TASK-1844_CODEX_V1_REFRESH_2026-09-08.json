@@ -1,0 +1,99 @@
+{
+  "observedAt": "2026-09-08T20:11:02.731Z",
+  "contexts": [
+    {
+      "context_id": "f5c479f9-33ed-4ea9-b653-9e97358f9a4f",
+      "client_id": "https://chatgpt.com/oauth/codex/client.json",
+      "context_version": 1,
+      "organization_id": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+      "created_at": "2026-09-08T19:43:34.268Z",
+      "expires_at": "2026-09-15T19:32:25.352Z",
+      "revoked_at": null,
+      "access_rows": 2,
+      "access_lifecycle": [
+        {
+          "issuedAt": "2026-09-08T19:43:51+00:00",
+          "expiresAt": "2026-09-08T19:58:51+00:00",
+          "revokedAt": null,
+          "grantId": "grt-o8tkdkv6CKw5f5me"
+        },
+        {
+          "issuedAt": "2026-09-08T20:10:34+00:00",
+          "expiresAt": "2026-09-08T20:25:34+00:00",
+          "revokedAt": null,
+          "grantId": "grt-o8tkdkv6CKw5f5me"
+        }
+      ],
+      "refresh_lifecycle": [
+        {
+          "createdAt": "2026-09-08T19:43:51.542+00:00",
+          "usedAt": "2026-09-08T20:10:34.493+00:00",
+          "status": "rotated",
+          "grantId": "grt-o8tkdkv6CKw5f5me"
+        },
+        {
+          "createdAt": "2026-09-08T20:10:34.493+00:00",
+          "usedAt": null,
+          "status": "active",
+          "grantId": "grt-o8tkdkv6CKw5f5me"
+        }
+      ],
+      "active_access": 1,
+      "all_access_base_only": true,
+      "refresh_rows": 2,
+      "active_refresh": 1
+    }
+  ],
+  "clientDispatch": [
+    {
+      "id": "item_2",
+      "type": "mcp_tool_call",
+      "server": "efeonce",
+      "tool": "efeonce.gateway.status",
+      "arguments": {},
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"gateway\":\"ready\",\"protocol\":\"2026-07-28\",\"providers\":[{\"providerId\":\"globe\",\"contractVersion\":\"v1\",\"state\":\"enabled\"},{\"providerId\":\"greenhouse-globe-credit-funding\",\"contractVersion\":\"v1\",\"state\":\"enabled\"},{\"providerId\":\"greenhouse-seo\",\"contractVersion\":\"task-1645\",\"state\":\"enabled\"},{\"providerId\":\"greenhouse-hiring\",\"contractVersion\":\"task-1726-v1\",\"state\":\"enabled\"},{\"providerId\":\"greenhouse-skills\",\"contractVersion\":\"task-1804\",\"state\":\"enabled\"}]}"
+          }
+        ],
+        "structured_content": {
+          "gateway": "ready",
+          "protocol": "2026-07-28",
+          "providers": [
+            {
+              "providerId": "globe",
+              "contractVersion": "v1",
+              "state": "enabled"
+            },
+            {
+              "providerId": "greenhouse-globe-credit-funding",
+              "contractVersion": "v1",
+              "state": "enabled"
+            },
+            {
+              "providerId": "greenhouse-seo",
+              "contractVersion": "task-1645",
+              "state": "enabled"
+            },
+            {
+              "providerId": "greenhouse-hiring",
+              "contractVersion": "task-1726-v1",
+              "state": "enabled"
+            },
+            {
+              "providerId": "greenhouse-skills",
+              "contractVersion": "task-1804",
+              "state": "enabled"
+            }
+          ]
+        }
+      },
+      "error": null,
+      "status": "completed"
+    }
+  ],
+  "result": "PASS: native client refresh post original TTL preserves v1, same grant and base-only scope; real native gateway.status succeeds; v2 discovery unavailable.",
+  "harnessCorrection": "Earlier post-activation dispatch selected hosted codex_apps despite native refresh occurring. Excluded that dispatch from native proof; disabled apps/plugins only for the isolated probe and repeated against actual server efeonce."
+}

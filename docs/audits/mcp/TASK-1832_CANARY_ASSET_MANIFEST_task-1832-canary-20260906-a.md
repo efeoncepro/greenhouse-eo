@@ -212,6 +212,28 @@ Readback posterior a la certificación hospedada: `efeonce-mcp-gateway-00046-6n2
 MCP respondió 200 y no produjo `500`. El DCR de ChatGPT queda run-owned en este manifiesto y el dry-run lo
 incluye sin referencias inesperadas.
 
+## Retiro parcial autorizado de Claude hospedado — 2026-09-08
+
+Durante TASK-1844, Claude bloqueó una segunda conexión al mismo endpoint. El operador autorizó
+explícitamente «Reemplazar sólo la conexión de Claude». Se eliminó de Claude el conector
+`Efeonce TASK-1832 Canary` y se creó `Efeonce MCP` con OAuth obligatorio y CIMD de Anthropic,
+pendiente de consentimiento interno fresco. La sustitución afecta también a la superficie Desktop
+que comparte esa conexión hospedada; no cambia la configuración de Claude Code ni los otros clientes.
+
+A `19:41:17Z`, `revokeClientConsent` retiró únicamente el consentimiento y las familias del cliente
+`dcr-mLTiqIJmBQyvdQOtKRpdVw`, después de verificar su único sujeto `smoke_test`: 1 consentimiento,
+10 filas refresh y 1 access afectados; readback de 0 consents y 0 refresh activos. A `19:41:49Z`,
+el registro canary seguía `active`, sin revocación, y el cliente DCR seguía presente para el cleanup
+gobernado posterior. No se eliminaron organización, registro, binding, perfiles, grants ni auditoría.
+
+La certificación histórica de Claude.ai/Desktop se conserva. Su observación continua terminó por
+esta decisión explícita; no se debe presentar como siete días ininterrumpidos ni volver a conectar
+ese DCR para el uso interno. El resto de la observación y `delete_after` permanecen vigentes.
+La lectura del canary desde ChatGPT pasó después de la sustitución (gateway ready y SEO
+`no_entitlement`, sin gasto), como regresión del carril externo, no certificación interna v2.
+[Readback del retiro parcial](TASK-1844_CLAUDE_HOSTED_REPLACEMENT_2026-09-08.json)
+· [Regresión externa](TASK-1844_EXTERNAL_REGRESSION_2026-09-08.json).
+
 ## Registro de retiro
 
 - `dry_run_at`: `2026-09-07T12:09:54Z`, observación read-only posterior a la matriz; no es el preflight final de borrado

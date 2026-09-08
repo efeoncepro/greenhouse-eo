@@ -1,0 +1,15 @@
+{
+  "observedAt": "2026-09-08T20:24:11.833Z",
+  "releases": [
+    {
+      "releaseId": "741e3a045cc2-1898ddd1-8bb1-42dc-b308-321c0dca743a",
+      "targetSha": "741e3a045cc2c98d32d4c75d46b6563c4466cac8",
+      "state": "released",
+      "startedAt": "2026-09-08T20:02:16.001Z",
+      "completedAt": "2026-09-08T20:12:00.831Z",
+      "vercelDeploymentUrl": null,
+      "workerRevisions": {},
+      "postReleaseHealth": {}
+    }
+  ]
+}

@@ -10,7 +10,7 @@ Se mantienen los límites del [plan](../tasks/plans/TASK-1844-plan.md).
 
 - Inicio del cronómetro de release: **2026-09-08T18:44:53Z**.
 - Expansión aplicada mediante `pnpm migrate:up`: [`20260908184942851`](../../migrations/20260908184942851_task-1844-internal-context-version-expand.sql). Readback 18:50:19Z: CHECK validado 1/2, ambos índices únicos, trigger habilitado y las seis filas existentes conservadas en v1. Tipos regenerados sin diff.
-- Template expand/contract validado con PostgreSQL TEMP después de añadir guards DDL: 1 passed, 0 skipped. Contract aún pendiente de todos los writers servidos compatibles.
+- Template expand/contract validado con PostgreSQL TEMP después de añadir guards DDL: 1 passed, 0 skipped. Contract `20260908194829159` aplicado tras readback de writers compatibles; índice viejo retirado y siete contextos v1 conservados.
 - Cloud Run previo: `auth-server-00043-ndg` y `efeonce-mcp-gateway-00047-8b5`, 100% de tráfico. Gates internos/canary previos ON; multiorganización ausente/OFF. Vercel Production leído por env pull: reader multiorganización ausente/OFF.
 - Preflight local inicial **blocked** por configuración del observador local y staging CANCELED; se corrige la configuración y se produce evidencia nueva antes de promoción. No se considera verde.
 
@@ -26,7 +26,7 @@ Se mantienen los límites del [plan](../tasks/plans/TASK-1844-plan.md).
 - Gateway: checkout compartido `../efeonce-mcp`, branch `main`, versión de paquete `1.3.0`; reader v2,
   autorización por objetivo y `efeonce.organizations.list`. Publicación según su workflow y revisión del diff.
 - Capability inicial única: `growth.seo.observation.read`; scope único: `efeonce.mcp.read`.
-- No se modifican permisos de clientes, Entra, redirects, grants externos ni el canary TASK-1832/EO-ORG-0050.
+- No se modifican permisos de clientes, Entra, redirects ni grants externos. Excepción precisa aprobada por el operador: sustituir únicamente la conexión hospedada Claude del canary TASK-1832 y revocar su familia; registro/grants/otros clientes/ventana global se conservan. No se usa EO-ORG-0050.
 - No se crean tokens, contextos ni consentimientos v2 por migración. El consentimiento nuevo es por cliente.
 - Los cambios ajenos de EPIC-045 en el checkout Greenhouse pertenecen a su owner; no se reescriben.
 
@@ -122,3 +122,26 @@ Revocar familias y retirar fixtures run-owned mediante sus commands y manifiesto
 SHAs/revisiones, resultados cliente, latencia de revocación, rollback real y estado final de flags. Actualizar
 TASK-1831/1836, TASK-1844, EPIC-044 y timings sin reinterpretar la certificación histórica de TASK-1813.
 Sólo entonces se puede cerrar formalmente TASK-1844; hoy esos pasos siguen pendientes.
+
+
+## Ensayo controlado de rollback de flags — plan 2026-09-08
+
+Este ensayo de TASK-1844 revierte sólo los tres gates de autoridad y luego restaura los artefactos del release.
+No revierte el release completo ni toca los demás workers. Se ejecuta una vez terminado el orquestador,
+con familia v2 vigente y evidencia A/B/C previa. La autorización «Avanza con todo lo pendiente» cubre este ensayo.
+El mecanismo combina configuración durable de los owners de flags y revisiones inmutables compatibles;
+no se despacha un deploy individual Greenhouse ni se crea un binario fuera del orquestador.
+
+1. Capturar revisión/digest/cohorte ON del emisor y confirmar que el orquestador terminó. Guardar el plan exacto.
+2. Emisor OFF: variables GitHub del emisor OFF/cohorte vacía; tráfico a `auth-server-00045-t6r`.
+   Su árbol `0720eb968` es idéntico al main `741e3a045`; writer compatible con contract, gate v2 OFF.
+3. Gateway OFF: variable GitHub de environment OFF; tráfico a `efeonce-mcp-gateway-00049-fv7`,
+   SHA `45ade9373`, mismo digest compatible, gate v2 OFF. Medir denegación de la conexión v2 vigente.
+4. Reader OFF: `vercel env update IDENTITY_INTERNAL_MULTI_ORG_ENABLED production --value false --yes`;
+   rollback al deployment compatible `dpl_sZEnysX9o2HPTNR1JAAStchLPa5T` (main `741e3a045`, flag ausente/OFF).
+5. Leer tráfico, flags de las revisiones efectivamente servidas, health y contexto PG. No recrear índices ni borrar filas.
+6. Restaurar en orden inverso: reader durable ON y `vercel promote dpl_FW2Aepwn7pWxw4AQYCaZC4MTAqpL`;
+   gateway durable ON/tráfico `00050-wlk`; emisor durable ON/cohorte exacta y tráfico a la revisión ON
+   capturada en el paso 1. Verificar A/B otra vez con la misma familia, sin reconexión.
+7. Registrar tiempos, estados y límites. Si aparece una revisión ajena o un nuevo release activo, no cambiar tráfico
+   hasta reconciliar ownership; nunca asumir que `latestReadyRevisionName` es la revisión servida.
