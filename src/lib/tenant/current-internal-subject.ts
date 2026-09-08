@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { query } from '@/lib/db'
+import { ROLE_PRIORITY } from '@/config/role-codes'
 import { resolveAuthorizedViewsForUser } from '@/lib/admin/view-access-store'
 import type { TenantEntitlementSubject } from '@/lib/entitlements/types'
 import { getCurrentInternalRoleAuthority } from './current-role-assignments'
@@ -39,7 +40,7 @@ export const getCurrentInternalEntitlementSubject = async (
     memberId: user.member_id!,
     tenantType: 'efeonce_internal',
     roleCodes: roles.roleCodes,
-    primaryRoleCode: roles.roleCodes[0] ?? 'unknown',
+    primaryRoleCode: ROLE_PRIORITY.find(role => roles.roleCodes.includes(role)) ?? roles.roleCodes[0] ?? 'unknown',
     routeGroups: views.routeGroups,
     authorizedViews: views.authorizedViews
   }
