@@ -203,7 +203,11 @@ export const validateCimdDocument = (clientId: string, raw: unknown): CimdValida
 
   const grantTypes = doc.grant_types === undefined ? ['authorization_code'] : asStringArray(doc.grant_types)
 
-  if (!grantTypes || !grantTypes.includes('authorization_code') || grantTypes.some(grant => !grant.trim())) {
+  if (
+    !grantTypes ||
+    !grantTypes.includes('authorization_code') ||
+    grantTypes.some(grant => !grant || /\s/.test(grant))
+  ) {
     return { ok: false, reason: 'grant_types' }
   }
 

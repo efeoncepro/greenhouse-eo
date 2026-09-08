@@ -668,7 +668,16 @@ describe('auth-server OAuth flow (in-process)', () => {
   })
 
   it.each(
-    [null, 'authorization_code', [], ['refresh_token'], ['authorization_code', 7]].map(grantTypes => ({ grantTypes }))
+    [
+      null,
+      'authorization_code',
+      [],
+      ['refresh_token'],
+      ['authorization_code', 7],
+      ['authorization_code', 'refresh_token '],
+      ['authorization_code', ' refresh_token'],
+      ['authorization_code', 'refresh\ttoken']
+    ].map(grantTypes => ({ grantTypes }))
   )('rejects malformed or authorization-code-free CIMD grants: %j', async ({ grantTypes }) => {
     h = await createHarness({}, { grant_types: grantTypes })
     h.setSubject(PERSON)

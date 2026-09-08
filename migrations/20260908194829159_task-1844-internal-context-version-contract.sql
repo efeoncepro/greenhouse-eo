@@ -1,5 +1,5 @@
 -- TASK-1844 phase 2: execute ONLY after all writers use version-aware ON CONFLICT DO NOTHING.
--- Reintroduce with pnpm migrate:create and a fresh timestamp after verified phase-1 rollout.
+-- Applied 2026-09-08 after verified phase-1 rollout; retain this timestamp and do not recreate it.
 -- Up Migration
 SET search_path = greenhouse_auth, greenhouse_core, public;
 DO $$ BEGIN
