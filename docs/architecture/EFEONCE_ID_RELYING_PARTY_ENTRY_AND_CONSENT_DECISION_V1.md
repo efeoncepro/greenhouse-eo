@@ -217,6 +217,13 @@ opción visible ni apaga el issuer para MCP.
 5. El issuer emite tokens para la audiencia MCP, separados de la sesión y tokens de producto.
 6. El gateway verifica token, audiencia, contexto, grants y policy de la tool antes del dispatch.
 
+En el carril interno v2 de TASK-1844, el consentimiento es por persona/cliente/clase de autoridad, con
+organizaciones actuales como explicación del alcance dinámico. No hay un consentimiento por organización ni
+un cambio de contexto al alternar A/B: cada tool exige su objetivo y Greenhouse reautoriza sus permisos.
+Un contexto v1 no gana v2 por refresh; requiere autorización fresca. Este contrato de MCP no cambia el
+selector de sesión del producto descrito arriba ni da por entregado el carril first-party de TASK-1834.
+[Autoridad v2](EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md#d10--consentimiento-fresco-y-migración-compatible).
+
 ## Security and trust boundaries
 
 | Frontera | Fuente confiable | Regla fail-closed |

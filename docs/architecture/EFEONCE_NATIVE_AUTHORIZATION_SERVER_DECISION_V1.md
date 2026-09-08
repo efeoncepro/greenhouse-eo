@@ -2,8 +2,8 @@
 
 > **Status:** `Accepted` (2026-09-03). Runtime, OAuth y entrada directa publicados; TASK-1836/TASK-1831 tienen
 > canary interno real y TASK-1832 completó la matriz técnica externa sintética. Siguen abiertos su observación y
-> retiro, el delta interno multiorganización de TASK-1844 y el primer cliente consentido; ver contratos y expedientes
-> vigentes.
+> retiro y el primer cliente consentido. TASK-1844 certificó v2 para una identidad interna el 2026-09-08;
+> ampliación de cohorte y acceso externo conservan sus gates. Ver contratos y expedientes vigentes.
 > **Date:** 2026-09-03
 > **Owner:** Efeonce Platform / Identity
 > **Scope:** authorization server propio en `auth.efeonce.org`, autenticación de personas externas y corporativas por carriles separados, emisión y verificación de tokens para `mcp.efeonce.org`, binding con Account 360, convergencia del login cliente de Greenhouse
@@ -24,8 +24,9 @@ y prevalece sobre los estados históricos de los deltas de este documento para e
 - `issuer_class` no determina población. El binding persiste `external | internal`; los internos
   requieren enrollment elegible y grants personales con vencimiento. Los externos conservan su membership.
 - Sesión corporativa, contexto delegado, consentimiento y familia OAuth son objetos distintos. El contexto
-  fija organización, cliente, audiencia, sujeto, perfil, binding y procedencia. `gv` interno es el del binding
-  seleccionado, nunca el máximo entre organizaciones; refresh no amplía autoridad ni rejuvenece `auth_time`.
+  fija ancla, cliente, audiencia, sujeto, perfil, binding y procedencia. V1 limita el target al ancla;
+  TASK-1844 v2 resuelve cada `organizationId` desde permisos vigentes, sin lista ni wildcard en JWT. `gv`
+  interno es el del binding ancla, nunca la revisión de otro target; refresh conserva la clase y `auth_time`.
 - El gateway verifica firma/claims y reconsulta al reader confiable, incluyendo contexto y `jti` del ledger
   de access tokens antes del dispatch. No usa introspección ni trata issuer nativo como autorización global.
 - `/login` ofrece Microsoft también sin conexión MCP pendiente. Ese acceso directo termina en una sesión,

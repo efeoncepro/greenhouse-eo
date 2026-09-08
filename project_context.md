@@ -156,8 +156,8 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   Autoridad externa e interna separadas por población/binding/contexto; SSO no concede permisos MCP.
   Grants, `gv` y ledger de tokens se revalidan antes del dispatch; estado/audit/outbox atómicos.
   `TASK-1813` cerró `1.2.0`: Efeonce ID/base-only, shim retirado, rollback y matriz post-cutover completos. Un token
-  resuelve un contexto; `TASK-1844` completa: v2 para una identidad, sin wildcard; SQL/clientes verificados y fixtures
-  retiradas. Estado y límites en su [runbook](docs/operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md).
+  resuelve un contexto; `TASK-1844`: v2 interna y altas elegibles sin reconectar;
+  [manual y límites](docs/manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md).
   `TASK-1832` mantiene hasta `2026-09-13T19:43:30Z` el canary sintético read-only; ChatGPT, Claude Code/ai/Desktop,
   Codex y Playwright están certificados. Su retiro exige readback cero; `TASK-1841` separa el piloto real.
   [`ADR nativo`](docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) ·

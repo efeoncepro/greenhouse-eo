@@ -25,7 +25,9 @@ interna y clientes externos tienen pruebas separadas. El binding
 Account 360 y el grant revocable por organización y por persona ya existen
 (`greenhouse_core.external_capability_grants`, `TASK-1631`, 2026-09-04) según
 [`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md);
-el emisor nativo y el consumer multi-issuer se complementan con la autoridad interna de TASK-1836.
+el emisor nativo y el consumer multi-issuer se complementan con la autoridad interna de TASK-1836 y
+el delta TASK-1844: contexto v2 estable y objetivos reautorizados por llamada, sin reconexión por alta de
+organización. Su adapter inicial sólo cubre `growth.seo.observation.read`, con una identidad certificada.
 El rollout interno no certifica acceso B2B, y el canary sintético tampoco acredita un cliente real: elegibilidad,
 cohorte y clientes tienen evidencia propia. Consulta el runbook vigente; no infieras habilitación por la
 existencia de un issuer. Para ChatGPT/Claude/Codex carga la referencia `client-certification.md` de la skill.
@@ -48,7 +50,7 @@ surface.
 | Globe provider or creative capability | `greenhouse-globe` + creative-rights governance when applicable | Globe API/SDK/policy; `TASK-1473` gates federation |
 | Hiring/ATS, Talent Pool, candidate review, assessment assignment or selection journey | `greenhouse-talent-people-operator` + identity/integrations owners | `TASK-1726` tiene live los readers internos `hiring.talent_pool.search` y `.profile.get`; TASK-1718 implementa `.review.list`/`.review_packet.get` pero permanece OFF hasta gate Privacy/Security; TASK-1719–1722 siguen separados |
 | HubSpot/CRM or Teams provider | owning HubSpot or Teams skill | provider contract, consent and tenancy |
-| Corporate OIDC, direct login, native context/token or multi-issuer verification | `efeonce-mcp-platform/references/native-authority.md` + `greenhouse-browser-diagnostics` + identity invariants | Native authority ADR; TASK-1836 issuer/reader and TASK-1831 gateway, independent from external rollout |
+| Corporate OIDC, direct login, native context/token, per-call organization authority or multi-issuer verification | `efeonce-mcp-platform/references/native-authority.md` + `greenhouse-browser-diagnostics` + identity invariants | Native authority ADR; TASK-1836 issuer/reader and TASK-1831 gateway, independent from external rollout; TASK-1844 owns internal v2 targets, pagination, consent and revocation |
 | Release, rollback or live evidence | `greenhouse-production-release` and `greenhouse-qa-release-auditor` | release/runbook and evidence |
 | Task/ADR split, docs, skill evolution | `greenhouse-task-planner` and `greenhouse-documentation-governor` | Greenhouse control plane |
 

@@ -1,5 +1,18 @@
 # GREENHOUSE ORGANIZATION WORKSPACE PROJECTION V1
 
+## Relación compartida con autoridad MCP interna
+
+TASK-1844 reutiliza `resolveSubjectOrganizationRelations` del resolver canónico, con `readQuery` inyectado
+por el snapshot de autoridad y cada `spaceId` activo explícito. La lectura agregada sólo admite
+`internal_admin` o `assigned_member` vigentes y exige entitlements suficientes en **todos** los spaces
+activos de la organización, cada uno con su cliente resoluble. No elige el primer space ni suma una
+relación permitida para esconder otra denegada.
+
+La proyección UI de este documento conserva su cache/entrypoints; su resultado no autoriza llamadas MCP.
+El reader delegado reconsulta los hechos, sin cache positiva entre requests, y devuelve sólo targets ya
+autorizados. Alta/baja de relaciones u organizaciones cambia el próximo resultado sin cambiar la conexión
+OAuth. [Contrato de autoridad](EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md#d8--actor-y-objetivo-tienen-autoridad-distinta).
+
 > **Tipo de documento:** Spec de arquitectura canónica
 > **Versión:** 1.1
 > **Creado:** 2026-05-07 por arch-architect (skill) — anclado a EPIC-008
@@ -867,8 +880,8 @@ Cache TTL 30s propaga automáticamente. User-scope para Julio + agente preservad
 
 Tests canónicos creados en TASK-612/613 V1.1:
 
-- [`tests/e2e/smoke/finance-clients-v2-shell-validation.spec.ts`](tests/e2e/smoke/finance-clients-v2-shell-validation.spec.ts) — 2 tests: V2 shell rendering + anti-legacy.
-- [`tests/e2e/smoke/agency-organizations-v2-shell-validation.spec.ts`](tests/e2e/smoke/agency-organizations-v2-shell-validation.spec.ts) — 2 tests: V2 shell rendering + anti-legacy 4-tab.
+- [`tests/e2e/smoke/finance-clients-v2-shell-validation.spec.ts`](../../tests/e2e/smoke/finance-clients-v2-shell-validation.spec.ts) — 2 tests: V2 shell rendering + anti-legacy.
+- [`tests/e2e/smoke/agency-organizations-v2-shell-validation.spec.ts`](../../tests/e2e/smoke/agency-organizations-v2-shell-validation.spec.ts) — 2 tests: V2 shell rendering + anti-legacy 4-tab.
 
 Los 2 tests verifican:
 

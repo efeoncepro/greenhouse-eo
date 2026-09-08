@@ -30,3 +30,15 @@ Reglas duras:
 
 17. **TASK-1836 — autenticación, sesión y autorización separadas.** Tenant/OID firmados resuelven enrollment, nunca email ni invitaciones externas ficticias. Población persistida y `authorizationContextId` gobiernan consentimiento, token y reader; `gv` no es el máximo entre organizaciones. El gateway interno entrega `jti` firmado para consultar ledger vigente antes de dispatch, sin caché positiva de autorización. Refresh conserva `auth_time`; upstream MFA no acredita step-up local. Valida frescura firmada frente al presente y la transacción; no impongas `auth_time <= iat` ni relajes `exp`.
 18. **TASK-1836 — entrada y formulario reales.** Prueba `/login` anónimo sin query y OAuth con retorno por separado; conserva el botón existente. Sólo retorno ausente elige `/auth/session`, validado al iniciar y completar; no inventa contexto/token MCP. HTML/JSON comparten resolver/revocación. Usa `scripts/auth-server/probe-form-origin.mjs`: `Referrer-Policy: strict-origin` en HTML conserva Origin sin filtrar query; CSP `form-action` permite sólo self y origen del callback registrado validado. Nunca aceptar Origin null ni desactivar CSRF. Visibilidad/click a Microsoft no acredita retorno humano completo; flags ON no acreditan token/dispatch. Evidencia por etapas y enums, sin códigos, cookies, tokens, claims o errores JOSE crudos.
+
+
+### TASK-1844 — consentimiento v2 y autoridad dinámica
+
+Cargar `docs/architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md` D8–D11 y
+`docs/manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md`. V2 está entregada para una cohorte exacta;
+v1 nunca se promueve por refresh/flags. Nuevas organizaciones elegibles se leen sin reconectar y sin lista
+de tenants en JWT; la autoridad efectiva pertenece al reader Greenhouse. Expand/contract ya aplicadas:
+rollback sólo compatible, no recrear índice viejo ni consentimientos. En CIMD, grants adicionales no
+habilitan flujos: registrar sólo intersección soportada; espacios o vacío son inválidos. Las familias de un
+contexto pueden ser distintas: retirar una familia exige grant exacto. Caso cliente verificado: Claude Code
+necesitó login tras rollback OFF; no confundirlo con una nueva organización o un refresh normal.

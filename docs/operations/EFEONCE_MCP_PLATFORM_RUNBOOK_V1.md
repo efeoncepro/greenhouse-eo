@@ -19,6 +19,19 @@
 > Claude.ai, Claude Desktop y ChatGPT leyeron base-only; Desktop y ChatGPT renovaron sin widening. Usa el readback
 > de Cloud Run y los probes públicos, nunca esta nota fechada, como prueba del runtime actual.
 
+## Operación interna multiorganización — TASK-1844
+
+Entrega completa y certificada el 2026-09-08 para una identidad interna. [Manual de uso](../manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md) · [Funcional](../documentation/identity/acceso-mcp-interno-multiorganizacion.md) · [Rollout y rollback](TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md) · [Evidencia final](../audits/mcp/TASK-1844_FINAL_RUNTIME_2026-09-08.json). Este readback sirve gateway 1.3.0 en `00050-wlk`; las notas de versiones anteriores conservan su fecha.
+
+- V1 permanece uniorganización. V2 conserva un actor/contexto y valida organización y capability antes de cada llamada; no hay lista de tenants en JWT ni caché positiva de autoridad.
+- `efeonce.organizations.list` devuelve sólo organizaciones autorizadas, 20 por defecto y hasta 50 por página. Una página completa no es el catálogo completo; seguir el cursor devuelto y reiniciar listado si ese cursor perdió autoridad.
+- Una organización nueva elegible aparece al volver a listar, sin reconectar ni repetir consentimiento. Crear la organización no concede permisos: relación, estado, espacios y permisos efectivos deben permitirla.
+- V2 inicial sólo delega `growth.seo.observation.read`, con scope base. Las tools registradas, un rol admin o el scope por sí solos no acreditan autorización de otros dominios/escrituras.
+- Codex y Claude Code mantienen familias separadas; Claude web/Desktop comparten la hospedada. Después del rollback OFF, Claude Code necesitó login estándar para recuperar acceso; no copiar tokens ni ampliar scopes.
+- La sustitución autorizada de la conexión hospedada Claude del canary TASK-1832 no autoriza borrar el registro canary retenido, los clientes CIMD compartidos, otras familias o fixtures, ni adelantar el cleanup global. La observación de esa conexión antigua terminó; no afirmar siete días ininterrumpidos hospedados.
+
+El listado final observó 14 organizaciones, no un límite ni un allowlist estático. La ampliación a más personas/tráfico exige medir el reader antes de aumentar la cohorte.
+
 ## Runtime inventory
 
 | Resource | Canonical value |
@@ -72,7 +85,7 @@ de la lista):
   todavía una persona cliente real habilitada (decisión comercial, no técnica), así que la escritura está probada
   por los negativos del canary de producción y por staging, no por un caso de punta a punta en producción.
 
-Este estado no habilita organizaciones cliente reales ni multitenancy amplio. El adjetivo `read_only` describe lo que hoy es
+Este estado no habilita automáticamente personas cliente externas ni multitenancy externo amplio. El acceso del personal interno a organizaciones que Greenhouse le autoriza se rige por TASK-1844, incluso si esas organizaciones son clientes reales. El adjetivo `read_only` describe lo que hoy es
 **alcanzable por un token real**, no lo que está cableado: mientras `efeonce.mcp.seo.write` y
 `efeonce.mcp.identity.write` no los tenga ningún cliente con consentimiento vigente, ninguna escritura es
 ejecutable por el borde público.
@@ -171,28 +184,24 @@ exactamente los de arriba.
 workers de Greenhouse y el `auth-server`. Un `gcloud run services describe` sin `--region` correcta responde
 "not found" y se lee como si el servicio no existiera.
 
-Verificación de que lo desplegado ES lo mergeado (el único assert que vale; la cuenta de commits no lo mide):
+Verificación de la revisión **con tráfico** (Ready del servicio o el template más reciente no bastan):
 
 ```bash
 gcloud run services describe efeonce-mcp-gateway \
   --region=southamerica-west1 --project=efeonce-group \
-  --format='value(status.latestReadyRevisionName)'
+  --format='json(status.traffic,status.latestReadyRevisionName)'
 
-gcloud run services describe efeonce-mcp-gateway \
+# Sustituye el placeholder por la revisión que recibe tráfico, no por latestReady a ciegas.
+gcloud run revisions describe <revision-con-trafico> \
   --region=southamerica-west1 --project=efeonce-group \
-  --format='value(spec.template.spec.containers[0].env.filter("name:GATEWAY_BUILD_SHA").extract(value))'
+  --format='json(metadata.name,status.imageDigest,status.conditions,spec.containers[0].env.filter("name:GATEWAY_BUILD_SHA"))'
 
 git -C ~/Documents/efeonce-mcp rev-parse origin/main
 ```
 
-`GATEWAY_BUILD_SHA` de la revisión activa debe **coincidir con el HEAD de `origin/main`**. Si difiere, hay commits
-mergeados sin desplegar: dispara el workflow, no interpretes el verde de CI como rollout.
+El workflow crea candidata sin tráfico, verifica SHA/digest/Ready, promueve esa revisión exacta y relee el 100 %. TASK-1844 corrigió la falsa confirmación que podía dejar tráfico en la revisión anterior. Compara el SHA servido con el candidato aprobado; si `origin/main` avanzó sólo en docs, comprueba el diff completo antes de concluir que falta runtime o disparar otro deploy. Un CI verde o `latestReadyRevisionName` nuevo no prueba promoción.
 
-La revisión y el SHA productivos son datos mutables: léelos siempre con los comandos anteriores y compáralos
-con `origin/main`. La observación TASK-1832 de `2026-09-07T12:20:25Z` encontró gateway
-`efeonce-mcp-gateway-00046-6n2`, `GATEWAY_BUILD_SHA=171965c99034…`, Ready y con 100 % del tráfico, coincidente
-con el repo hermano; el front door respondió 200 a metadata y 401 al MCP anónimo. La evidencia acumulada y el
-readback de retiro viven en el manifiesto canónico de la corrida, no en este snapshot.
+El [readback final TASK-1844](../audits/mcp/TASK-1844_FINAL_RUNTIME_2026-09-08.json) conserva SHA, digest y flags servidos a las 21:45Z del 2026-09-08. El [canary externo](../audits/mcp/TASK-1844_LEGACY_CANARY_AFTER_ROLLBACK_2026-09-08.json) tiene evidencia separada. No usar revisiones copiadas de snapshots como receta de rollback futura.
 
 ### Dos orígenes de Greenhouse que se parecen y no son lo mismo
 
@@ -845,29 +854,28 @@ los `registerTool` sueltos).
 
 ### Conectar un cliente (operador, Claude Code)
 
+Para uso interno v2, sigue el [manual específico](../manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md). Los nombres locales identifican configuraciones, no roles ni organizaciones. En la certificación se conservó `efeonce-mcp` para otro carril y se usó `efeonce-internal`; no sobrescribir una conexión existente por copiar este ejemplo. No reconectar para actualizar la lista de organizaciones.
+
 Desde `1.2.0` el flujo estándar descubre Efeonce ID, registra un cliente público y pide únicamente el scope base.
 La versión mínima soportada de Claude Code es `2.1.196`; la certificada es `2.1.263`:
 
 ```bash
 claude mcp add --transport http efeonce-mcp https://mcp.efeonce.org/mcp -s user
 claude mcp login efeonce-mcp
-claude mcp get efeonce-mcp   # debe decir ✔ Connected
+claude mcp get efeonce-mcp   # inspección de configuración; completar con una llamada real
 ```
 
 Tres cosas que cuestan una sesión si no se saben:
 
 - **`claude mcp login` exige un TTY.** Ejecutado desde un agente por Bash aborta con *"stdin isn't a terminal"* y
   sugiere `ssh -t`, lo que hace creer que el operador tiene que hacerlo a mano. No es así: basta un pty —
-  `nohup script -q /dev/null claude mcp login efeonce-mcp > /tmp/login.log 2>&1 &`. Abre el navegador, y si ya hay
-  sesión Efeonce ID puede completar el fast path; se lee el resultado del log. El agente nunca escribe
-  credenciales.
+  usar la terminal interactiva o un PTY de la herramienta. Si se captura salida, guardarla en un archivo privado `0600`, ignorado; nunca publicar URLs OAuth, códigos ni tokens. La sesión Efeonce ID puede evitar repetir autenticación; verificar la finalización en el cliente y una llamada real.
 - **El scope del registro importa.** Con `-s local` el servidor sólo existe dentro de ese proyecto y `claude mcp login`
   ejecutado desde otro directorio responde *"No MCP server named …"*. Para uso transversal, `-s user`.
 - **Los tokens OAuth se guardan por endpoint pero no sobreviven a un cambio de scope**: mover un servidor de `local`
   a `user` con la MISMA URL obliga a re-autenticar.
 
-Las tools **no aparecen en la sesión que autenticó** — los MCP se cargan al iniciar sesión. `✔ Connected` en el health
-check es la evidencia válida; la ausencia de tools en esa sesión no es un fallo.
+Si el proceso conserva un catálogo anterior, abrir una sesión nueva del cliente y comprobar sus eventos de herramientas. `Connected`, exit 0 o una respuesta del modelo no acreditan dispatch: verificar nombre, argumentos y Request/Response/Error reales. La ronda TASK-1844 con cero calls por DNS local no se contó como certificación. Una lista antigua puede requerir nueva consulta o proceso, sin repetir OAuth por cada organización.
 
 ### Inventario del servidor — 39 tools (as-of 2026-09-06)
 

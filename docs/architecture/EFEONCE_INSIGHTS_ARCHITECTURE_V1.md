@@ -177,8 +177,10 @@ manifest_drift, expired/revoked/not_found y delivery_failed; integración con er
 Views, entitlement Insights y grants de módulos son planos distintos. Revalidar actor/org/módulos al crear,
 ejecutar, emitir y distribuir. MCP hereda consentimiento efectivo; base-only read no autoriza create, issue
 ni send. Nuevas tools se registran en el manifest Greenhouse, se sincronizan en el gateway por su workflow y
-se prueban allow/deny/revocación. TASK-1844 es dependencia condicional para selección multiorganización desde
-una misma conexión interna; no bloquea el primer flujo uniorganización ni se reimplementa.
+se prueban allow/deny/revocación. TASK-1844 completó la base de selección multiorganización interna; su
+adapter inicial sólo delega `growth.seo.observation.read`, por lo que **no autoriza capabilities Insights**.
+Insights debe incorporar su contrato y policy de target propios al federarse, reutilizando ese reader y
+sin reimplementar OAuth. No bloquea el primer flujo uniorganización ni acredita sus writes.
 
 ## 8. Acceso web compartido
 

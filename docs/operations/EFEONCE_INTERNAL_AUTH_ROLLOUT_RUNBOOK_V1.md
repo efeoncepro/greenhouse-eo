@@ -3,9 +3,22 @@
 Mapa de construcción, pruebas y límites: [auditoría consolidada TASK-1836/1831](../audits/2026-09-06-task-1836-1831-consolidated-evidence.md).
 
 
-Owner: TASK-1836 / EPIC-044. Decisión: `EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md`.
+Owner: Identity / Platform; foundation TASK-1836 y delta multiorganización TASK-1844, EPIC-044. Decisión: `EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md`.
 
-## Estado vigente de la entrada directa — 2026-09-06
+## Estado de referencia posterior a TASK-1844 — 2026-09-08
+
+TASK-1844 está completa: v2 productiva para una identidad interna, scope base `efeonce.mcp.read` y capability inicial `growth.seo.observation.read`. La evidencia fechada acredita Codex, Claude Code y Claude hospedado/Desktop, refresh/revocación, rollback/restore y retiro de fixtures; no amplía el canary externo ni el piloto comercial.
+
+- [Manual de uso](../manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md): conexión, selección de organización, nuevas organizaciones y diagnóstico.
+- [Documentación funcional](../documentation/identity/acceso-mcp-interno-multiorganizacion.md): identidad, permisos, capacidades y consentimiento separados.
+- [Rollout v2](TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md): flags durables, cohorte, migraciones aplicadas y rollback compatible.
+- [Readback final](../audits/mcp/TASK-1844_FINAL_RUNTIME_2026-09-08.json) y [QA](../audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md). Las revisiones son una observación fechada; releerlas antes de operar.
+
+Agregar una organización no requiere otro OAuth ni otro permiso del issuer: debe estar activa, tener espacios/clientes válidos y cumplir tu relación y permisos efectivos de Greenhouse. El listado se vuelve a consultar y cada llamada autoriza el objetivo. Agregar otra persona a la cohorte sí requiere aprobación, enrollment/grant elegibles, flags coherentes y consentimiento propio; no se deduce del alta de una organización.
+
+Las secciones fechadas siguientes conservan la historia de TASK-1836. Sus estados OFF, revisiones y canaries pendientes no son instrucciones para repetir despliegues o migraciones hoy. Los pendientes originales de retorno directo/UI/WebKit no quedan cerrados por la certificación MCP v2.
+
+## Evidencia histórica de la entrada directa — 2026-09-06
 
 La reparación `21aa12608` está servida desde `develop` en `auth-server-00030-rtm`,
 [deploy 34002082020](https://github.com/efeoncepro/greenhouse-eo/actions/runs/34002082020) exitoso.
@@ -231,7 +244,7 @@ nunca del cuerpo de la petición. Primero ejecutar con `dryRun:true` y revisar e
 
 El callback sólo usa enrolamientos existentes: genera sesión primary y evidencia corporativa atómicas.
 El login programático es `GET /auth/internal/login?return_to=<authorize-path>`; UI/consent visible pertenece
- a TASK-1835. Contexto estable por sesión/cliente/binding; cambiar cliente no hereda consentimiento.
+ a TASK-1835. Contexto estable por sesión/cliente/binding/versión; cambiar cliente o migrar de v1 a v2 no hereda consentimiento.
 El contexto vence como máximo con el límite absoluto de la sesión y no se rejuvenece al reutilizarlo.
 Una sesión web expirada no termina por sí sola una familia ya consentida; revocar la sesión sí invalida
 su contexto. Al vencer el contexto se requiere nueva autenticación/consentimiento.
@@ -248,12 +261,10 @@ procedimiento con su identidad canónica:
 3. Ejecutar `enroll` primero con `dryRun:true`, revisar y aplicar con un actor autorizado.
 4. Otorgar sólo las capabilities necesarias mediante `grant`, con vencimiento explícito y dry-run previo.
    El colaborador debe tener esos permisos vigentes en Greenhouse; enrolar no los concede por sí solo.
-5. Completar su autenticación Microsoft y consentimiento en el cliente MCP. Verificar una lectura
-   permitida, una operación fuera de alcance denegada y la revocación antes de ampliar permisos.
+5. Para v2, aprobar la incorporación del perfil exacto a `AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS`, verificar capacidad/latencia del reader y aplicar el rollout gobernado. No usar wildcard ni tocar el canary externo.
+6. Completar su autenticación Microsoft y consentimiento propio en cada cliente OAuth. Verificar listado, lectura permitida, negativa y revocación. Web/Desktop hospedados comparten familia, Codex y Claude Code mantienen familias separadas.
 
-No se requiere modificar código por cada incorporación. El grant del piloto vence el 2026-09-12 a las
-15:00 UTC; una renovación requiere el mismo command y una nueva vigencia explícita, no una extensión
-automática. La asignación Microsoft, el enrolamiento y los permisos son controles independientes.
+No se requiere modificar código por cada incorporación. Consultar la vigencia del grant real antes de renovar; el vencimiento 2026-09-12T15:00Z del piloto original es evidencia histórica, no un valor universal. Una renovación requiere command y vigencia explícita. Asignación Microsoft, enrollment, grant, cohorte y permisos efectivos son controles independientes. Una nueva organización para una persona ya habilitada no repite este onboarding personal.
 
 Los clientes siguen el acceso externo B2B de TASK-1631 y EPIC-044, con su organización y grants
 correspondientes; no deben convertirse en workforce interno para poder usar MCP. El rollout y la
@@ -266,7 +277,7 @@ reader sin credencial → 401 `invalid_token`; con credencial máquina existente
 sin `jti` → 400 `bad_request`. Probe GET sin escrituras, exit 0. Esto verifica el contrato publicado,
 no acredita todavía una sesión corporativa ni el canary autenticado.
 
-El JWT nativo interno añade `authorization_context_id` y `authorization_context_version:1`.
+El JWT nativo interno añade `authorization_context_id` y `authorization_context_version` (`1` para autoridad uniorganización; `2` para actor con objetivo por llamada). El contrato escalar siguiente corresponde a v1; v2 usa `actor`/`targets` e intenciones `catalog`, `organizations` o `target`, según el [ADR D8–D11](../architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md#d8--actor-y-objetivo-tienen-autoridad-distinta).
 Issuer, audiencia, azp, scopes, firma, expiración y `gv` conservan validación obligatoria. Un token sin
 contexto no puede clasificarse como interno por issuer, correo o roles.
 

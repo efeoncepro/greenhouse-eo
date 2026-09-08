@@ -558,11 +558,18 @@ components:
           nullable: true
     ExternalAccessMembership:
       type: object
+      additionalProperties: false
       required: [bindingId, organizationId, externalOrganizationRef, grantsVersion, grants, designatedAdmin]
       properties:
         bindingId: { type: string }
         organizationId: { type: string }
         externalOrganizationRef: { type: string }
+        bindingPurpose:
+          type: string
+          enum: [customer, canary]
+          description: Optional legacy-compatible population purpose; consumer defaults missing values to customer.
+        canaryRegistrationId: { type: string, nullable: true }
+        expiresAt: { type: string, format: date-time, nullable: true }
         grantsVersion:
           type: integer
           minimum: 1
@@ -574,11 +581,12 @@ components:
         designatedAdmin: { type: boolean }
     ExternalAccessResolution:
       type: object
+      additionalProperties: false
       required: [outcome, environmentId, issuerClass, profileId, memberships, resolvedAt, cacheTtlSeconds]
       properties:
         outcome:
           type: string
-          enum: [bound, unbound, revoked, environment_inactive, profile_inactive]
+          enum: [bound, unbound, internal_population, revoked, environment_inactive, profile_inactive, canary_disabled, canary_not_registered, canary_expired]
           description: Only `bound` authorizes; every other outcome is a deny and is appended to `external_access_resolution_log`.
         environmentId: { type: string }
         issuerClass:
@@ -590,6 +598,7 @@ components:
           nullable: true
         memberships:
           type: array
+          maxItems: 128
           items:
             $ref: '#/components/schemas/ExternalAccessMembership'
         resolvedAt:
@@ -597,7 +606,110 @@ components:
           format: date-time
         cacheTtlSeconds:
           type: integer
+          minimum: 0
+          maximum: 60
           description: Upper bound for gateway-side caching of this resolution (60).
+    InternalAuthorityTarget:
+      type: object
+      additionalProperties: false
+      required: [organizationId, organizationName, capabilities, authorityRevision]
+      properties:
+        organizationId:
+          type: string
+          pattern: '^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$'
+        organizationName: { type: string, minLength: 1, maxLength: 1024 }
+        capabilities:
+          type: array
+          maxItems: 1
+          items: { type: string, enum: [growth.seo.observation.read] }
+        authorityRevision:
+          type: string
+          pattern: '^[A-Za-z0-9_-]{43}$'
+          description: Opaque revision of effective target facts; not a credential or the actor gv.
+    InternalIdentityBindingV1:
+      type: object
+      additionalProperties: false
+      required: [population, outcome, contextVersion, authorizationContextId, cacheTtlSeconds]
+      properties:
+        population: { type: string, enum: [internal] }
+        outcome: { type: string, enum: [bound, denied] }
+        contextVersion: { type: integer, enum: [1] }
+        authorizationContextId: { type: string, format: uuid }
+        cacheTtlSeconds: { type: integer, enum: [0] }
+        reason: { type: string, maxLength: 128 }
+        profileId: { type: string, minLength: 1, maxLength: 1024 }
+        organizationId: { type: string, minLength: 1, maxLength: 1024 }
+        bindingId: { type: string, minLength: 1, maxLength: 1024 }
+        grantsVersion: { type: integer, minimum: 1, maximum: 9007199254740991 }
+        capabilities:
+          type: array
+          maxItems: 512
+          items: { type: string, minLength: 1, maxLength: 256 }
+      oneOf:
+        - properties:
+            outcome: { type: string, enum: [bound] }
+          required: [profileId, organizationId, bindingId, grantsVersion, capabilities]
+        - properties:
+            outcome: { type: string, enum: [denied] }
+          not:
+            anyOf:
+              - required: [profileId]
+              - required: [organizationId]
+              - required: [bindingId]
+              - required: [grantsVersion]
+              - required: [capabilities]
+          description: Denials omit profileId, organizationId, bindingId, grantsVersion and capabilities.
+    InternalMultiOrgBindingV2:
+      type: object
+      additionalProperties: false
+      required: [population, outcome, contextVersion, authorizationContextId, cacheTtlSeconds]
+      properties:
+        population: { type: string, enum: [internal] }
+        outcome: { type: string, enum: [bound, denied] }
+        contextVersion: { type: integer, enum: [2] }
+        authorizationContextId: { type: string, format: uuid }
+        cacheTtlSeconds: { type: integer, enum: [0] }
+        reason: { type: string, maxLength: 128 }
+        actor:
+          type: object
+          additionalProperties: false
+          required: [profileId, organizationId, bindingId, grantsVersion]
+          properties:
+            profileId: { type: string, pattern: '^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$' }
+            organizationId: { type: string, pattern: '^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$' }
+            bindingId: { type: string, pattern: '^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$' }
+            grantsVersion:
+              type: integer
+              minimum: 1
+              maximum: 9007199254740991
+              description: Version of the actor anchor; must equal the signed gv.
+        targets:
+          type: array
+          maxItems: 50
+          items:
+            $ref: '#/components/schemas/InternalAuthorityTarget'
+        capabilities:
+          type: array
+          maxItems: 1
+          items: { type: string, enum: [growth.seo.observation.read] }
+        nextAfterOrganizationId:
+          type: string
+          nullable: true
+          pattern: '^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$'
+          description: Previously authorized organization ID; revalidated on the next page. Null outside pagination or at its end.
+      oneOf:
+        - properties:
+            outcome: { type: string, enum: [bound] }
+          required: [actor, targets, capabilities, nextAfterOrganizationId]
+        - properties:
+            outcome: { type: string, enum: [denied] }
+          not:
+            anyOf:
+              - required: [actor]
+              - required: [targets]
+              - required: [capabilities]
+              - required: [nextAfterOrganizationId]
+          description: Denials omit actor, targets, capabilities and nextAfterOrganizationId; never authorize dispatch.
     WebhookSubscriptionRequest:
       type: object
       required: [targetUrl, eventFilters]
@@ -764,22 +876,34 @@ paths:
           description: Not modified
   /api/platform/ecosystem/identity/binding:
     get:
-      summary: Resolve external access for (environment, subject) — MCP gateway reader
+      summary: Resolve external or internal v1/v2 authority — MCP gateway reader
       description: |
-        TASK-1631 (EPIC-044 U04). Reader consumed by the MCP gateway (TASK-1831) to resolve a
-        token subject into canonical organization memberships and namespaced capability grants.
-        The gateway resolves issuer → environment with its own config, calls this route with
-        `subject` and compares the returned `grantsVersion` by strict equality against the `gv`
-        claim of the token. Never SQL from the gateway.
+        Canonical machine-only authority reader (TASK-1631/1836/1844). The gateway verifies
+        issuer/JWT/audience/claims and supplies those verified dimensions; Greenhouse decides
+        authority. Never SQL or a human bearer token from the gateway to a provider.
 
-        Only a consumer whose sister-platform binding has scope `internal` (the gateway) may
-        resolve people: any other binding receives `404` (anti-oracle, same contract as the MCP
-        skill catalog). The response never includes the subject nor the email.
+        Only a consumer whose sister-platform binding has scope `internal` may resolve people;
+        every other binding receives 404 anti-oracle. Responses omit subject and email.
+        HTTP responses are always `Cache-Control: private, no-store`.
 
-        Every non-`bound` outcome is a deny and is appended to
-        `greenhouse_core.external_access_resolution_log` (subject hashed). The gateway may cache
-        the resolution for at most `cacheTtlSeconds` (60); the HTTP response itself is
-        `Cache-Control: private, no-store`.
+        Without authorizationContextId, external authority resolves by (environment, subject),
+        returns memberships/grants and declares cacheTtlSeconds=60. Only bound authorizes;
+        denials retain the external resolution log, including internal_population (no fallback).
+
+        Internal contexts require clientId, authorizationContextId, contextVersion, grantsVersion,
+        audience and jti. Version 1 returns one anchor; version 2 requires intent and separates
+        actor from targets. Internals always declare cacheTtlSeconds=0 and recheck token ledger,
+        context, eligibility and permissions. The actor grantsVersion matches signed gv;
+        target authorityRevision is neither that version nor a reusable credential.
+
+        V2 intent=catalog accepts no target parameters; intent=target requires organizationId and
+        capability and forbids pagination; intent=organizations accepts optional capability,
+        afterOrganizationId and limit. Its 1–50 limit (default 20) is per page, not a total cap.
+        A revoked cursor denies the page; restart without a cursor. Only growth.seo.observation.read
+        is supported initially. Context parameters are forbidden on the external lane, and v2
+        intent parameters are forbidden on v1. Recognized duplicate/empty/invalid or incompatible
+        parameters return 400. An internal 200 response with outcome=denied does not authorize.
+        The v2 reader budget is 4 seconds and maximum payload size is 128 KiB; failure denies.
       security:
         - ecosystemBearer: []
         - sisterPlatformKey: []
@@ -803,9 +927,49 @@ paths:
         - in: query
           name: clientId
           required: false
-          description: Token `azp`; recorded with denials for support triage.
+          description: Verified token `azp`; optional diagnostic on external lane, required and authority-bound for internal contexts.
           schema:
             type: string
+        - in: query
+          name: authorizationContextId
+          description: Required for internal authority; absent for external authority. Other context fields must accompany it.
+          schema: { type: string, format: uuid }
+        - in: query
+          name: contextVersion
+          description: Required with authorizationContextId; no promotion of v1 grants or consent to v2.
+          schema: { type: integer, enum: [1, 2] }
+        - in: query
+          name: grantsVersion
+          description: Required with authorizationContextId; the signed actor-anchor gv.
+          schema: { type: integer, minimum: 1, maximum: 9007199254740991 }
+        - in: query
+          name: audience
+          description: Required with authorizationContextId; must equal the configured MCP audience.
+          schema: { type: string }
+        - in: query
+          name: jti
+          description: Required with authorizationContextId; verified access-token ID checked against the live ledger.
+          schema: { type: string, pattern: '^[A-Za-z0-9_-]{22}$' }
+        - in: query
+          name: intent
+          description: Required only on v2. Selects catalog visibility, one target or organization discovery.
+          schema: { type: string, enum: [catalog, target, organizations] }
+        - in: query
+          name: organizationId
+          description: Required only for intent=target; no implicit or anchor fallback.
+          schema: { type: string, pattern: '^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$' }
+        - in: query
+          name: capability
+          description: Required for target, optional for organizations, forbidden for catalog.
+          schema: { type: string, enum: [growth.seo.observation.read] }
+        - in: query
+          name: afterOrganizationId
+          description: Optional only for organizations; previously returned authorized ID, revalidated on every continuation.
+          schema: { type: string, pattern: '^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$' }
+        - in: query
+          name: limit
+          description: Optional only for organizations; page size, not a total-organization limit.
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
       responses:
         '200':
           description: Resolution (authorizes only when `outcome` is `bound`)
@@ -822,9 +986,12 @@ paths:
                   - type: object
                     properties:
                       data:
-                        $ref: '#/components/schemas/ExternalAccessResolution'
+                        oneOf:
+                          - $ref: '#/components/schemas/ExternalAccessResolution'
+                          - $ref: '#/components/schemas/InternalIdentityBindingV1'
+                          - $ref: '#/components/schemas/InternalMultiOrgBindingV2'
         '400':
-          description: '`bad_request` — missing `environment`/`subject`, or invalid environment id / subject shape'
+          description: '`bad_request` — missing identity/context fields, recognized duplicates, invalid values or incompatible intent parameters'
           content:
             application/json:
               schema:

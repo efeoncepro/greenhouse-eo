@@ -1,17 +1,27 @@
 # Runbook — Efeonce Auth Server (`auth.efeonce.org`)
 
 > **Tipo de documento:** Runbook operativo
-> **Versión:** 1.2
+> **Versión:** 1.3
 > **Creado:** 2026-09-04 por Claude (TASK-1828, EPIC-044)
-> **Última actualización:** 2026-09-04 por Claude (release 9100bbd2765d: producción + environment del emisor)
+> **Última actualización:** 2026-09-08 por Codex (TASK-1844: v2, configuración durable, CIMD y rollback compatible)
 > **Documentación técnica:** [`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) · [`EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`](../../architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md) · [`services/auth-server/README.md`](../../../services/auth-server/README.md)
 
 ## Para qué sirve
 
 Operar el authorization server propio de Efeonce: desplegarlo, prender/apagar su flag, verificar que firma
 con la llave de Cloud KMS, rotar esa llave, y volver atrás en menos de diez minutos. Cubre la capa de runtime y
-llaves (TASK-1828) y la superficie OAuth detrás de su propio flag (TASK-1829, §`OAuth`). La autenticación de
-personas (TASK-1830) agrega su sección cuando exista.
+llaves (TASK-1828) y la superficie OAuth detrás de su propio flag (TASK-1829, §`OAuth`). La autenticación de personas externas pertenece a TASK-1830; la entrada corporativa, a TASK-1836; la autoridad interna multiorganización v2, a TASK-1844.
+
+## Autoridad interna v2 y operación diaria
+
+TASK-1844 está desplegada para la cohorte interna exacta. [Manual](../../manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md) · [Funcional](../../documentation/identity/acceso-mcp-interno-multiorganizacion.md) · [Rollout/rollback](../TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md). Scope base y capability SEO de lectura; cada organización se autoriza en Greenhouse, no en una lista del JWT. Altas/bajas elegibles posteriores no exigen reconectar.
+
+- Emisión/refresh v2 requiere `AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED` y perfil exacto en `AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS`, además de los gates internos previos. El reader Vercel y gateway tienen gates independientes; configurar uno no activa los demás.
+- Expand `20260908184942851` y contract `20260908194829159` están aplicadas. No repetirlas ni restaurar el índice antiguo; rollback sólo hacia writer compatible, conservando versiones, consentimientos y auditoría.
+- CIMD admite un documento con grants adicionales, pero registra únicamente la intersección soportada `authorization_code`/`refresh_token`; vacío o identificador con whitespace se rechaza. Esto no habilita token exchange JWT-bearer. DCR conserva su validación propia; no alterar scopes por compatibilidad.
+- Las flags internas/multiorg y la cohorte del servicio compartido se transportan desde variables del repositorio GitHub; otros defaults pertenecen a deploy.sh y se verifican por separado. El change-gate compara valores además del código. OFF/restore debe alcanzar configuración durable y revisión servida; un override efímero será reemplazado por el deploy siguiente.
+- Revocar un contexto corta todas sus familias. Para retirar sólo una familia de prueba, seleccionar el grant exacto y comprobar que la familia definitiva sigue vigente; no confundir contexto compartido con ownership eliminable.
+- El rollout verificó refresh real y revocación con JWT vigente. Claude Code necesitó login estándar tras OFF/restore; no repetir login por agregar una organización ni declarar recovery por estado Connected.
 
 ## Antes de empezar
 
@@ -31,10 +41,7 @@ personas (TASK-1830) agrega su sección cuando exista.
 
 ### 1. Desplegar
 
-```bash
-ENV=staging    bash services/auth-server/deploy.sh
-ENV=production bash services/auth-server/deploy.sh
-```
+Seguir el [runbook de release](production-release.md): preflight, candidato aprobado y orquestador `production-release.yml` con `target_sha` exacto. El workflow del emisor consume gates/cohorte desde GitHub. No copiar una invocación local con sólo `ENV`: `deploy.sh --set-env-vars` reemplaza configuración y los defaults multiorg false/cohorte vacía apagarían la autoridad existente. Uso directo sólo bajo break-glass autorizado, con todos los valores actuales preservados explícitamente y readback posterior.
 
 Cloud Build construye `gcr.io/efeonce-group/auth-server` (~6 min) y despliega con
 `--ingress=internal-and-cloud-load-balancing --allow-unauthenticated`. El script verifica que la revisión
@@ -68,15 +75,9 @@ Evidencia de producción (2026-09-04, release `9100bbd2765d`, run `33893120972`)
 ### 3. Prender o apagar el flag
 
 `AUTH_SERVER_ENABLED` vive en `deploy.sh` (default `true` desde 2026-09-04; con ON el servicio expone `/readyz`,
-el JWKS y, sólo si además `AUTH_SERVER_OAUTH_ENABLED=true`, la superficie OAuth). Para apagarlo de forma durable, cambiar el default en `deploy.sh` y redeployar; para un
-apagado puntual:
+el JWKS y, sólo si además `AUTH_SERVER_OAUTH_ENABLED=true`, la superficie OAuth). El gate maestro afecta también a los carriles externos: no usarlo como rollback selectivo de v2. Para v2 seguir [OFF/restore por componentes](../TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md), actualizando las variables durables de emisión/cohorte y los gates separados de gateway/reader.
 
-```bash
-AUTH_SERVER_ENABLED=false ENV=staging bash services/auth-server/deploy.sh
-```
-
-Nunca `gcloud run services update --update-env-vars` a mano: el próximo deploy lo borra en silencio.
-Actualizar la fila del ledger (`docs/operations/FEATURE_FLAG_STATE_LEDGER.md`).
+Cualquier apagado del maestro necesita alcance explícito y publicación gobernada de su fuente efectiva. No ejecutar un deploy local con una sola variable ni presentar un override Cloud Run como durable: el próximo deploy lo reemplaza. Preservar el resto de configuración y actualizar `FEATURE_FLAG_STATE_LEDGER.md` con readback.
 
 ### 4. Publicar el host en el front door (una sola vez)
 
@@ -149,29 +150,23 @@ por **CIMD** (primario: `client_id` = URL https del documento; anti-SSRF, cache 
 (compat, sólo públicos) o pre-registrados como confidenciales (abajo). Tablas en `greenhouse_auth` (migration
 `20260904130826694_task-1829-auth-oauth-tables.sql`): `oauth_clients`, `cimd_cache`, `authorization_codes`,
 `refresh_tokens`, `access_tokens`, `client_consents`, `oauth_audit_events` (append-only; el rate limit cuenta
-sobre ella, sin tabla extra). Access token: JWT ES256 de 15 min firmado por `signWithActiveKey`, claim `gv` =
-`max(grantsVersion)` de las memberships `bound` del sujeto; sin membership `bound` → `access_denied`.
+sobre ella, sin tabla extra). Access token: JWT ES256 de 15 min firmado por `signWithActiveKey`. El carril externo conserva su resolución de memberships/binding y versión de grants; la fórmula histórica `max(grantsVersion)` no se aplica a contextos internos. En v1/v2 interno, `gv` valida el ancla firmada; v2 reautoriza cada target con su propia revisión, nunca con el máximo entre organizaciones. Sin autoridad vigente en la población/contexto correspondiente, se deniega.
 
 ### Prender en staging
 
 Precondiciones, en este orden:
 
-1. Runtime desplegado con el código de TASK-1829 (`GIT_SHA` ≥ `d31e6e913` en la revisión activa; lo hace
+1. Runtime desplegado con el código de TASK-1829 (verificar contenido del candidato aprobado y SHA servido, no ordenar SHAs lexicográficamente; lo hace
    `auth-server-deploy.yml` en el push a `develop`).
 2. Fila del emisor en `greenhouse_core.external_identity_environments`: `environment_id=efeonce-auth`
    (= `AUTH_SERVER_ENVIRONMENT_ID`), `issuer_url=https://auth.efeonce.org`, `issuer_class=external`, `status=active`.
-   La fila **ya existe en `draft`** (2026-09-04); pasarla a `active` con
+   La fila se creó en `draft` el 2026-09-04 y el bootstrap posterior la activó. Si se incorpora otro environment bajo autorización, usar
    `pnpm auth-server:register-issuer-environment --status active` (command de TASK-1631,
    `src/lib/identity/external-access`), nunca con `UPDATE` a mano. Sin la fila `active` ningún sujeto resuelve
    `bound` y todo `token` termina en `access_denied` (fail-closed por diseño, no bug).
 3. Fila de `AUTH_SERVER_OAUTH_ENABLED` al día en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
 
-Prender (durable): cambiar el default en `services/auth-server/deploy.sh` (`AUTH_SERVER_OAUTH_ENABLED:-true`) y
-dejar que `.github/workflows/auth-server-deploy.yml` lo despliegue en el push a `develop`. Puntual desde local:
-
-```bash
-AUTH_SERVER_OAUTH_ENABLED=true ENV=staging bash services/auth-server/deploy.sh
-```
+Este bootstrap se ejecutó durante el rollout nativo; no volver a activar el environment o a publicar por leer este apartado. Para un cambio posterior, verificar primero configuración durable/servida y usar el orquestador. El default OAuth del script es true, pero no representa los demás gates: una invocación local incompleta puede apagar interno/v2/canary. Preservar sus valores y la cohorte exacta bajo el procedimiento de cambio autorizado.
 
 `AUTH_SERVER_ENVIRONMENT_ID` (default `efeonce-auth`) y `AUTH_SERVER_MCP_AUDIENCE` (default
 `https://mcp.efeonce.org/mcp`, el `aud` de los access tokens) también viven en `deploy.sh`. Nunca

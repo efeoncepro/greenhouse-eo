@@ -9,6 +9,20 @@
 > **Documentacion funcional:** [Search Visibility 360 por MCP](../../documentation/growth/search-visibility-360-por-mcp.md)
 > **Runbook tecnico:** [Efeonce MCP Platform Runbook](../../operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md) §Provider Greenhouse-SEO
 
+## Alcance del acceso interno v2
+
+El catálogo SEO de este manual no equivale a los permisos de cada conexión. TASK-1844 certificó el
+2026-09-08 una identidad interna con `growth.seo.observation.read`: el gateway lista sus organizaciones
+vigentes y exige `organizationId` en cada lectura. Las cuentas nuevas elegibles no requieren reconectar.
+El [manual diario Codex/Claude](../identity/usar-mcp-interno-multiorganizacion.md) explica conexión y diagnóstico;
+el [runbook TASK-1844](../../operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md) gobierna ampliación y rollback.
+La presencia de tools de escritura o gasto abajo no las habilita para esa conexión. Un `no_entitlement` del
+reader de módulo sigue siendo un resultado válido sobre una organización autorizada.
+
+Las revisiones y smokes fechados en este manual conservan evidencia histórica del provider. Para saber qué
+sirve ahora, toma un readback según el runbook; el cierre TASK-1844 está en
+[runtime final](../../audits/mcp/TASK-1844_FINAL_RUNTIME_2026-09-08.json).
+
 ## Para que sirve
 
 Este manual es para el operador que necesita **verificar, diagnosticar o apagar** el provider `greenhouse-seo`

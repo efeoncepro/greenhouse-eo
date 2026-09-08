@@ -41,6 +41,18 @@ Cada persona tiene uno o mas **roles** asignados. Piensa en ellos como sombreros
 | **Cliente Manager**      | El marketing manager — ve mas detalle operativo, proyectos, sprints |
 | **Cliente Especialista** | Acceso limitado a proyectos o campanas especificas                  |
 
+### Personal interno por MCP
+
+TASK-1844 permite a una persona interna habilitada consultar varias organizaciones desde una conexión v2,
+eligiendo el ID en cada lectura y revalidando permisos actuales. Ser administrador no evita los controles de
+vigencia y permisos: la lectura agregada requiere autoridad suficiente en todos los espacios activos de la
+organización. Un miembro asignado sólo accede a las cuentas cubiertas por su relación y sus permisos.
+
+Las cuentas nuevas elegibles aparecen al refrescar el listado sin repetir OAuth. Incorporar personas o clases
+de acciones distintas conserva sus propios gates y consentimiento. La certificación del 2026-09-08 cubre una
+identidad y lectura SEO, sin gasto: [explicación funcional](acceso-mcp-interno-multiorganizacion.md) y
+[manual](../../manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md).
+
 ### Clientes externos por MCP (sin entrar al portal)
 
 Un cliente tambien puede usar Greenhouse desde su asistente de IA, sin abrir el portal. Para eso no se le crea un usuario ni se le asigna un rol: se le abre una **puerta por organizacion**, en cuatro pasos y siempre desde Efeonce:
@@ -65,7 +77,7 @@ Los roles se combinan. Algunos ejemplos reales:
 - **Account Lead:** Colaborador + Lider de Cuenta + Lectura de Personas — experiencia personal + gestion de cuentas + consulta de equipo
 - **Junior Designer:** Solo Colaborador — ve su perfil, permisos, asistencia, nomina y herramientas
 
-> **Detalle tecnico:** Los role codes y su mapping a route groups estan definidos en [`src/config/role-codes.ts`](../../src/config/role-codes.ts) y [`src/lib/tenant/role-route-mapping.ts`](../../src/lib/tenant/role-route-mapping.ts). La spec completa esta en [GREENHOUSE_IDENTITY_ACCESS_V2.md §Role Catalog](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md).
+> **Detalle tecnico:** Los role codes y su mapping a route groups estan definidos en [`src/config/role-codes.ts`](../../../src/config/role-codes.ts) y [`src/lib/tenant/role-route-mapping.ts`](../../../src/lib/tenant/role-route-mapping.ts). La spec completa esta en [GREENHOUSE_IDENTITY_ACCESS_V2.md §Role Catalog](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md).
 
 ---
 
@@ -173,7 +185,7 @@ Cada vista individual del portal esta registrada en un catalogo. Si tu rol no te
 
 > **Detalle tecnico:** Los datos de perfil fluyen desde Microsoft Graph → `client_users` + `identity_profiles` → VIEW `person_360` → `toPersonProfileSummary()`. El avatar se almacena en GCS como `client_users.avatar_url` (`gs://...`), `person_360.resolved_avatar_url` lo proyecta y las surfaces UI deben pasar por `resolveAvatarUrl()` para servirlo via `/api/media/users/{id}/avatar`. Ese proxy resuelve Postgres/Person 360 primero y usa BigQuery solo como mirror legacy. El cron de Entra sync corre diariamente a las 8:00 UTC (`src/app/api/cron/entra-profile-sync/route.ts`). Spec: [GREENHOUSE_IDENTITY_ACCESS_V2.md](../../architecture/GREENHOUSE_IDENTITY_ACCESS_V2.md).
 
-> **Detalle tecnico:** El catalogo de vistas esta en [`src/lib/admin/view-access-catalog.ts`](../../src/lib/admin/view-access-catalog.ts). La matriz completa rol-route groups esta en [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md §1.5](../../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md). El fallback de perfil usa `toPersonProfileSummaryFromSession()` en [`src/lib/person-360/get-person-profile.ts`](../../src/lib/person-360/get-person-profile.ts).
+> **Detalle tecnico:** El catalogo de vistas esta en [`src/lib/admin/view-access-catalog.ts`](../../../src/lib/admin/view-access-catalog.ts). La matriz completa rol-route groups esta en [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md §1.5](../../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md). El fallback de perfil usa `toPersonProfileSummaryFromSession()` en [`src/lib/person-360/get-person-profile.ts`](../../../src/lib/person-360/get-person-profile.ts).
 
 ---
 
@@ -346,7 +358,7 @@ El sistema tiene protecciones automaticas que no se pueden saltar:
 | **Un solo responsable primario por tipo**  | Si asignas un nuevo Lider de Cuenta para Acme, el anterior se desplaza automaticamente           |
 | **Fechas validas en responsabilidades**    | No puedes asignar una responsabilidad donde la fecha de inicio es posterior a la de fin          |
 
-> **Detalle tecnico:** Los guardrails estan implementados en [`src/lib/admin/role-management.ts`](../../src/lib/admin/role-management.ts) con `RoleGuardrailError` y transacciones con `FOR UPDATE`. Documentado en [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md Delta TASK-247](../../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md).
+> **Detalle tecnico:** Los guardrails estan implementados en [`src/lib/admin/role-management.ts`](../../../src/lib/admin/role-management.ts) con `RoleGuardrailError` y transacciones con `FOR UPDATE`. Documentado en [GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md Delta TASK-247](../../architecture/GREENHOUSE_INTERNAL_ROLES_HIERARCHIES_V1.md).
 
 ---
 

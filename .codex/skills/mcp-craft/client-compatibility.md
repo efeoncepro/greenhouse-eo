@@ -11,7 +11,10 @@ CLI, web, desktop y runtime cloud se certifican por separado aunque compartan ma
 
 Un badge `connected`, DCR `201`, metadata `200`, catálogo importado o URL OAuth bien formada sólo acreditan una
 etapa. La certificación exige consentimiento visible, token para el resource exacto, `tools/list`, una llamada
-permitida, una negativa y revocación efectiva.
+permitida, una negativa y revocación efectiva. Cuenta eventos de tools o Request/Response/Error reales:
+`exit=0` con cero llamadas, el resumen del modelo o una integración marcada Connected no prueban dispatch.
+Un rechazo de inicialización/refresh puede demostrar corte previo al dispatch; no lo rotules como payload de
+una tool. Conserva las rondas sin llamadas y los reintentos por separado.
 
 ## OAuth y refresh
 
@@ -25,6 +28,20 @@ permitida, una negativa y revocación efectiva.
   entrega el catálogo completo ni eleva permisos. Verifica rotación, invalida el refresh anterior y prueba revoke.
 - DCR/CIMD/pre-registro identifican al cliente, no autorizan al usuario. En fixtures eliminables, un client ID
   compartido por el vendor es `shared`: no se borra por haber sido observado.
+
+## Cambios de autoridad detrás de una conexión estable
+
+Si el contrato separa identidad consentida de targets resueltos por llamada, incorporar un target autorizado
+no requiere crear otro cliente ni copiar permisos al JWT. El listado es discovery: pagina, revalida el cursor
+y autoriza de nuevo el target antes de ejecutar. Prueba retirada selectiva con otro target aún válido y
+restauración sin reconectar. Un cambio material de scopes/clase de autoridad conserva su nuevo consentimiento.
+Este patrón no permite prometer acceso automático a todo target nuevo ni omitir el recheck del provider.
+
+Para metadata extensible, distingue lo anunciado por el cliente de lo soportado y registrado por el emisor.
+No habilites un grant desconocido para aceptar su documento, ni rechaces un flujo compatible únicamente por
+un grant extra cuando el contrato permite intersección. Valida el shape completo y prueba que el endpoint
+rechaza el intercambio no soportado. Evidencia de implementación, no regla universal del protocolo:
+`efeonce-mcp-platform/references/client-certification.md` (TASK-1844, 2026-09-08).
 
 ## Superficie observable
 

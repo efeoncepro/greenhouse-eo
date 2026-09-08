@@ -18,6 +18,17 @@ Greenhouse separa dos planos:
 
 Ver una pantalla no implica poder mutar datos.
 
+## Acceso MCP interno multiorganización
+
+Desde TASK-1844, el carril nativo v2 consulta la identidad y los permisos efectivos de Greenhouse en cada
+llamada para la organización elegida. Los roles vigentes y overrides aprobados siguen siendo la fuente;
+mostrar una vista no concede acceso MCP, y una cuenta nueva no exige rehacer OAuth cuando los permisos ya
+la cubren. Deben autorizar la lectura todos los espacios activos del objetivo.
+
+La certificación del 2026-09-08 cubre una identidad y lectura SEO; no abre el acceso a toda la plantilla ni a
+otros dominios. [Reglas funcionales](acceso-mcp-interno-multiorganizacion.md) ·
+[Manual de uso](../../manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md).
+
 ## Evidencia revisada
 
 Codigo y rutas:

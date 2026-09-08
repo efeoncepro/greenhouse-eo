@@ -1,5 +1,21 @@
 # Greenhouse Internal Roles & Hierarchies V1
 
+## Roles vigentes para autoridad MCP interna
+
+TASK-1844 resuelve roles delegables mediante `src/lib/tenant/current-role-assignments.ts`, leyendo las
+asignaciones canónicas en fecha y scope. Exige asignación `active=true`, `status=active`, role code conocido
+y tenant interno; `effective_from <= now < effective_to` cuando esos límites existen. Un rol scoped a
+cliente sólo aplica al cliente exacto; asignaciones por proyecto/campaña y scope explícito desconocido no
+se convierten en autoridad agregada de organización. El `scope_level=NULL` histórico conserva el scope
+implícito de su `client_id`, sin promoverlo a global.
+
+`getCurrentInternalEntitlementSubject` exige un usuario interno activo único ligado al perfil y al member,
+resuelve vistas en modo estricto y obtiene el rol principal desde `ROLE_PRIORITY`. No reutiliza el agregado
+legacy del login para permisos frescos ni restaura roles vencidos mediante un route-group fallback. La
+capability efectiva, relación con la organización y espacios siguen siendo requisitos adicionales: el rol
+no equivale a acceso MCP. [Autoridad interna](EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md#d8--actor-y-objetivo-tienen-autoridad-distinta)
+· [entitlements](GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md#lectura-efectiva-para-autoridad-mcp-interna).
+
 ## Purpose
 
 Definir el contrato canónico para roles internos y jerarquías en Greenhouse.

@@ -37,6 +37,18 @@ repetir el acceso. Si falla el callback, vuelve a iniciar desde la aplicación o
 reutilices la URL de callback ni compartas códigos/cookies. El error público es deliberadamente genérico;
 soporte dispone de clasificaciones auditadas sin tokens ni claims crudos.
 
+## Elegir organizaciones desde la misma conexión
+
+TASK-1844 certificó el contexto interno v2 el 2026-09-08 para una identidad. Con él, cada lectura SEO indica su
+organización y revalida permisos actuales. Una cuenta nueva cubierta por esos permisos aparece al actualizar
+`efeonce.organizations.list`; no requiere otro consentimiento ni otra conexión. Un alta de persona sí requiere
+enrollment y ampliación de cohorte gobernada. Pasar una conexión v1 a v2 exige autorizarla de nuevo una vez.
+
+Sigue [el manual multiorganización](usar-mcp-interno-multiorganizacion.md) para conectar Codex/Claude, paginar
+el listado y diagnosticar denegaciones o `no_entitlement`. Los nombres locales usados en las pruebas no son
+obligatorios. Claude hospedado y Desktop comparten el conector remoto. La recuperación tras rollback OFF
+puede exigir login otra vez en Claude Code; ese caso no equivale a incorporar una organización.
+
 ## Ampliar el acceso al equipo y a clientes
 
 La asignación inicial de Entra a un solo usuario es una cohorte de verificación, no un límite del producto.
@@ -48,7 +60,7 @@ mediante el command/API del runbook; no se afirma que exista una pantalla admini
 Los clientes usan el recorrido externo de Efeonce ID y su propia organización, bindings y permisos.
 No se les asigna la aplicación corporativa ni se los convierte en empleados de Efeonce. Compartir emisor
 no comparte autoridad: la organización o el dominio de correo por sí solos no conceden acceso MCP.
-La ampliación real espera consumers compatibles, el canary de la cohorte y la prueba de revocación.
+La cohorte inicial v2 ya cuenta con la matriz de TASK-1844; ampliar a otras personas requiere su elegibilidad, consentimiento y verificación proporcional, además de medir latencia y errores del reader según el runbook multiorganización.
 
 
 ## Integridad del acceso corporativo

@@ -56,6 +56,7 @@ Rollback/restore servido probado; Claude Code requiere login tras OFF. CIMD exte
 PKCE/refresh y rechaza JWT bearer; OAuth 150 passed. PR 230/main `45f6910e3`, orquestador `34281143424`
 success, manifest released, Vercel exacto y watchdog 5/5. Fixtures retiradas; conexiones definitivas conservadas.
 [QA y límites](docs/audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md).
+Manual interno, documentación funcional/técnica, API, runbooks y skills Codex/Claude reconciliados; [cobertura](docs/audits/mcp/TASK-1844_DOCUMENTATION_SKILLS_CLOSURE_2026-09-08.md).
 
 ## 2026-09-08 — Berel cierra la doctrina de recuperación y QA editorial preventivo
 

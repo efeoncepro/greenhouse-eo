@@ -1,9 +1,10 @@
 # MCP Greenhouse — Inventario de Tools
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 3.1
+> **Version:** 3.2
 > **Creado:** 2026-04-30 por Codex
 > **Ultima actualizacion:** 2026-09-02 por Claude (TASK-1804: la superficie sirve sus propios manuales de uso — tool `get_greenhouse_skill` + recurso `skill://efeonce/{name}/SKILL.md`, §9; 44 tools medidas en el manifiesto; delta previo 2026-08-31 TASK-1780: el archivo dejó de llamarse read-only porque el servidor no lo es; las cifras de superficie se leen del manifiesto, no de este texto)
+> **Actualización de acceso:** 2026-09-08, TASK-1844: Efeonce ID, lectura interna v2 por objetivo y manual diario canónico.
 > **Modulo:** plataforma / MCP
 > **Ruta en portal:** `N/A` (server MCP local `stdio` o remoto HTTP)
 > **Documentacion relacionada:** [API Platform Ecosystem](../../documentation/plataforma/api-platform-ecosystem.md), [Platform Health API](../../documentation/plataforma/platform-health-api.md), [GREENHOUSE_MCP_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_MCP_ARCHITECTURE_V1.md)
@@ -102,24 +103,22 @@ El modo remoto V1 es stateless. Eso significa:
 
 Este diseño es intencional para V1: permite publicar una URL operable sin confundirla con hosted auth multiusuario.
 
-### Conectarse con tu propio cliente (Claude Code / claude.ai)
+### Conectarse con tu propio cliente (Codex / Claude)
 
-Desde el 2026-08-06 el gateway público `mcp.efeonce.org` acepta **clientes MCP estándar con login de usuario** (cuenta corporativa Entra del tenant Efeonce). Para las tools federadas no necesitas token de consumer ni levantar este server: el gateway autentica a la persona y transporta la consulta hasta Greenhouse.
+El gateway público `https://mcp.efeonce.org/mcp` autentica a la persona mediante Efeonce ID. Para el acceso
+interno nuevo se requiere enrollment, permisos vigentes y cohorte habilitada; pertenecer al tenant Entra no
+basta. Las sesiones Entra legacy conservan su contrato, pero no son el bootstrap de conexiones nuevas.
 
-**Claude Code:**
+Sigue [Usar MCP interno con varias organizaciones](../identity/usar-mcp-interno-multiorganizacion.md) para alta,
+login y uso diario de Codex, Claude Code o Claude hospedado/Desktop. La conexión v2 certificada en TASK-1844
+permite lectura SEO para organizaciones autorizadas por llamada; renovar su token no exige intervención
+normalmente y agregar una organización elegible no requiere reconectar. Tras un rollback OFF, Claude Code
+puede requerir login nuevamente, según el ensayo fechado del manual.
 
-```bash
-claude mcp add --transport http efeonce-mcp https://mcp.efeonce.org/mcp -s user
-claude mcp login efeonce-mcp
-```
-
-El `login` abre el login Entra en el navegador (necesita una terminal real; desde una sesión no interactiva se envuelve en `script -q /dev/null`). Alternativa en sesión interactiva: `/mcp`, elegir el server y usar `Authenticate`. Al volver, el server queda `connected` con las tools SEO federadas (inventario exacto y estado de despliegue en el §8), el manual de uso de la superficie (`get_greenhouse_skill`, §9) y el lector de Globe. **El token Entra expira en ~1 hora:** cuando el server aparece como `Needs authentication`, repite `claude mcp login efeonce-mcp`; no es una falla del gateway.
-
-Primer paso recomendado con el server conectado, verificado el 2026-09-02 con un agente `claude -p` real: pedir `get_greenhouse_skill` **sin argumentos** (devuelve el catálogo de manuales) y luego con `name` (devuelve el manual como texto) antes de tocar cualquier tool que comprometa gasto.
-
-**claude.ai / Claude Desktop:** `Settings` → `Connectors` → `Add custom connector` con la URL `https://mcp.efeonce.org/mcp`, y autentica con la misma cuenta Entra.
-
-Recuerda que los conectores se cargan al **iniciar** la sesión: un conector agregado con una sesión ya abierta no aparece hasta abrir una nueva.
+El inventario de este documento describe herramientas existentes, no los permisos de toda conexión. V2 inicial
+no concede writes, gasto, Globe ni acceso universal a manuales internos. Verifica `tools/list` y la autoridad
+vigente antes de elegir una herramienta. La tool de selección de objetivos v2 es **`efeonce.organizations.list`**
+y es propia del gateway: no se confunde con `list_organizations` del MCP privado descrito abajo.
 
 ## Que puede hacer hoy
 

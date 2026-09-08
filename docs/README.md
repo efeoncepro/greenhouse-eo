@@ -49,6 +49,8 @@ Indice maestro de la documentacion no operativa del repo.
 
 ### Architecture
 
+- [MCP interno multiorganización — contrato v2](architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md#d8--actor-y-objetivo-tienen-autoridad-distinta) · [Documentación funcional](documentation/identity/acceso-mcp-interno-multiorganizacion.md) · [Manual de uso](manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md). Nuevas organizaciones elegibles sin reconectar; alcance inicial de lectura SEO.
+
 - [Reingreso Workforce: contrato y recuperación](architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md) · [Runbook](operations/runbooks/workforce-reentry-recovery.md)
 
 - [Architecture Decisions Index](architecture/DECISIONS_INDEX.md)
@@ -174,8 +176,9 @@ Indice maestro de la documentacion no operativa del repo.
 ### Audits
 
 - [Audits Index](audits/README.md)
+- [TASK-1844 — producción y clientes internos certificados](audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md) · [Cobertura documental y skills](audits/mcp/TASK-1844_DOCUMENTATION_SKILLS_CLOSURE_2026-09-08.md).
 - [Efeonce MCP — interoperabilidad OAuth Codex/Claude — 2026-09-02](audits/EFEONCE_MCP_CODEX_OAUTH_INTEROPERABILITY_2026-09-02.md)
-- [Efeonce MCP — matriz de clientes y tokens del canary externo — 2026-09-06](audits/mcp/EFEONCE_MCP_CLIENT_TOKEN_MATRIX_2026-09-06.md) — plantilla redactada de TASK-1832; implementación local completa, ejecución runtime y certificación todavía pendientes.
+- [Efeonce MCP — matriz de clientes y tokens del canary externo — 2026-09-06](audits/mcp/EFEONCE_MCP_CLIENT_TOKEN_MATRIX_2026-09-06.md) — certificación sintética con evidencia fechada y retiro bajo su propio runbook; no equivale a acceso de clientes reales.
 - Regla de uso: las auditorias deben consumirse frecuentemente cuando el trabajo toque esa zona, pero siempre revalidando si sus hallazgos siguen vigentes o si hace falta una auditoria nueva/refresh.
 - [Globe UI competitive benchmark — Higgsfield y Magnific — 2026-08-05](audits/competitive-ui/GLOBE_COMPETITIVE_BENCHMARK_HIGGSFIELD_MAGNIFIC_2026-08-05.md)
 - [ICO Audits](audits/ico/README.md)

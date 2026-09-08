@@ -526,6 +526,14 @@ reales internos, revocación y rollback.
 - [x] Producción y clientes verificados; nueve filas de fixtures preservadas e inactivas, sin overrides residuales. Tres familias internas definitivas permanecen activas.
 - [x] Limitación Claude Code tras rollback OFF y observabilidad necesaria antes de ampliar cohorte registradas en QA/runbook.
 
+## Documentación posterior al cierre — 2026-09-08
+
+El operador solicitó revisión completa con subagentes. Tres ámbitos independientes reconciliaron skills, arquitectura/API y documentación funcional/manuales; el coordinador integró runbooks, invariantes, routers, índices y documentación del gateway. TASK-1844 conserva lifecycle complete: esta ampliación documenta comportamiento ya implementado, sin reabrir migraciones ni activar nuevas personas/proveedores.
+
+- [Manual de uso](../../manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md) y [documentación funcional](../../documentation/identity/acceso-mcp-interno-multiorganizacion.md).
+- [Cobertura y validación documental](../../audits/mcp/TASK-1844_DOCUMENTATION_SKILLS_CLOSURE_2026-09-08.md).
+- Altas de organizaciones elegibles sin reconexión, recuperación por cliente, permisos dinámicos y límites de cohort/tráfico documentados en sus fuentes canónicas.
+
 ## Follow-ups
 
 - La autoridad multiorganización para personas externas queda fuera de alcance y requiere una decisión separada si aparece un caso real.

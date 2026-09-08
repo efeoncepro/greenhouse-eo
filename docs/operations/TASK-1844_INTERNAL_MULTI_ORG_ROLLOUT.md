@@ -8,6 +8,12 @@ Se mantienen los límites del [plan](../tasks/plans/TASK-1844-plan.md).
 
 PR 230/main `45f6910e3`, orquestador `34281143424` success y manifest released. Flags durables/servidos ON para el perfil exacto; Preview reader OFF. Codex, Claude Code y Claude hospedado/Desktop certificados; fixtures retiradas, familias definitivas conservadas. [Runtime final](../audits/mcp/TASK-1844_FINAL_RUNTIME_2026-09-08.json) · [clientes](../audits/mcp/TASK-1844_FINAL_CLIENTS_2026-09-08.json) · [retiro](../audits/mcp/TASK-1844_FIXTURES_RETIRED_2026-09-08.json). Claude Code requiere login tras rollback OFF; receta abajo. Antes de ampliar la cohorte, medir latencia/error rate del reader. Las secciones de avance siguientes conservan la cronología; no son pendientes actuales.
 
+## Entrada operativa y mantenimiento
+
+Para uso diario, conexión y nuevas organizaciones, seguir el [manual interno](../manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md) y la [documentación funcional](../documentation/identity/acceso-mcp-interno-multiorganizacion.md). Este runbook conserva el orden de rollout y sus pruebas históricas; no se repite por cada organización nueva. Las organizaciones elegibles se descubren de forma dinámica. Otro colaborador o nueva capability requiere permisos/cohorte y su verificación propios.
+
+La [auditoría documental](../audits/mcp/TASK-1844_DOCUMENTATION_SKILLS_CLOSURE_2026-09-08.md) registra contratos, manuales, APIs, runbooks y skills sincronizados después del cierre.
+
 ## Avance verificado
 
 - Inicio del cronómetro de release: **2026-09-08T18:44:53Z**.

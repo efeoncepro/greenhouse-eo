@@ -3,10 +3,10 @@
 - Status: Accepted
 - Date: 2026-09-05
 - Owner: Identity / MCP Platform
-- Scope: TASK-1836; auth-server, sesiones, OAuth, contexto delegado y reader del gateway.
+- Scope: TASK-1836 y delta TASK-1844; auth-server, sesiones, OAuth, contexto delegado, objetivos por llamada y reader del gateway.
 - Reversibility: two-way-but-slow
 - Confidence: medium
-- Validated as of: 2026-09-06, integridad publicada y piloto interno verificado; matrices amplias y recorrido humano de entrada directa pendientes.
+- Validated as of: 2026-09-08, piloto v1 y delta v2 certificados; v2 productiva para una identidad interna. Ampliación de cohorte y pendientes propios de TASK-1836 conservan sus gates.
 - Authorization: ejecución de TASK-1836 corregida D1–D7 solicitada por el operador y objetivo aprobado
   en esta conversación. El rollout posterior fue autorizado explícitamente por el operador el 2026-09-05.
 
@@ -38,7 +38,8 @@ rompería fronteras. La auditoría TASK-1836 A1–A7 mostró también gaps de as
 3. Cada autorización interna usa un contexto server-side ligado a issuer/environment, subject, perfil,
    cliente, audiencia, organización, binding interno y sesión corporativa de procedencia. La población
    no se infiere de `issuer_class`; el registro externo actual conserva sus invariantes comerciales.
-4. Token nativo interno incluye `authorization_context_id` y `authorization_context_version=1` firmados.
+4. El contrato inicial v1 incluye `authorization_context_id` y `authorization_context_version=1` firmados;
+   D8–D11 amplían explícitamente este contrato con v2 sin promover autorizaciones anteriores.
    Reader revalida las mismas dimensiones, elegibilidad, grants, revocación y versión. Contexto ajeno o
    ausente no autoriza. `gv` es la versión del binding seleccionado, no máximo entre organizaciones.
 5. Login Entra crea nivel primary. V1 no traduce MFA upstream; step-up usa TOTP/passkey UV real y reciente
@@ -303,11 +304,26 @@ no representa cada target mediante un binding externo ficticio. Una revisión op
 sus hechos efectivos y no se compara con el `gv` del actor ni funciona como credencial cacheable.
 
 El gateway agrega `efeonce.organizations.list`, interna v2, read-only/base-only, schema estricto y
-respuesta estructurada. Página máxima 50, sin total global; keyset sobre un ID ya autorizado que se
+respuesta estructurada. Página máxima 50 (20 por defecto), sin máximo de 50 organizaciones totales ni total global publicado; keyset sobre un ID ya autorizado que se
 revalida, sin exponer IDs de candidatos ocultos. La tool requiere actualización de policy, annotations,
-baseline y versión minor. La lista nunca sustituye la autorización fresca de una llamada posterior.
+baseline y versión minor. La lista nunca sustituye la autorización fresca de una llamada posterior. Si el cursor dejó de estar autorizado,
+se reinicia sin cursor; no se revelan candidatos ocultos ni se conserva una autorización positiva entre páginas.
 V2 inicial delega únicamente la lectura existente `growth.seo.observation.read`; no incorpora escrituras
 ni adapters pendientes de otros providers. V1, externos/canary y Entra conservan sus contratos.
+
+### Incorporación de organizaciones y continuidad del cliente
+
+La conexión v2 pertenece a persona, cliente OAuth y contexto; las organizaciones no son cupos almacenados
+en el token. Un alta posterior aparece al volver a listar cuando la organización y sus spaces están activos,
+la relación canónica es válida y los entitlements efectivos autorizan todos los spaces de la lectura agregada.
+Crear sólo una organización no concede acceso. Retirar la relación o un permiso vuelve a denegar el objetivo
+en la siguiente resolución; no obliga a reconectar los demás objetivos. Cambiar scopes o clase de autoridad
+sí requiere autorización nueva.
+
+La página acotada no certifica capacidad ilimitada: el snapshot tiene presupuesto de 4 s y la respuesta del
+reader máximo 128 KiB; el reader también rechaza un lote con más de 500 spaces. Son presupuestos de
+resolución, no cupos comerciales. Ante indisponibilidad deniega. Antes de ampliar personas/tráfico se mide latencia y
+capacidad con la observabilidad del runbook. Uso diario y resolución de nombres: [manual](../manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md).
 
 ### D10 — Consentimiento fresco y migración compatible
 
@@ -320,11 +336,15 @@ un formulario legacy nunca aprueba v2. Cambiar flags no cambia lo que la persona
 presenta las organizaciones actuales y explica que el acceso sigue
 los permisos vigentes mientras la autorización permanezca activa.
 
-El PG real admite únicamente v1 y el writer depende del índice sin versión. La transición requiere
-expansión CHECK/índice nuevo, writer compatible con ambos índices y, sólo después de readback de todos
-los writers, retiro del índice viejo. Los SQL se mantienen pendientes hasta apply gobernado. No hay
-backfill de permisos ni consentimiento. Tras retirar el índice anterior, rollback sólo hacia binarios
-con writer compatible; no se revierte schema borrando evidencia ni se restaura una unicidad incompatible.
+El baseline previo a TASK-1844 admitía únicamente v1 y dependía del índice sin versión. La transición
+expand/contract se **aplicó el 2026-09-08**: migración `20260908184942851` amplió CHECK/índice/trigger;
+tras publicar y verificar los writers compatibles, `20260908194829159` retiró el índice anterior.
+El schema conserva versiones 1 y 2, trigger de versión inmutable y unicidad activa
+`authorization_contexts_session_client_version_uidx`; `authorization_contexts_session_client_uidx` ya no existe.
+El [readback de rollback](../audits/mcp/TASK-1844_ROLLBACK_RESTORE_2026-09-08.json) conservó siete filas v1 y
+cinco v2: es un corte de evidencia, no un conteo esperado permanente. No hubo backfill de permisos ni
+consentimientos. No se recrean ni reaplican esos SQL. Rollback sólo hacia binarios con writer compatible;
+no se revierte schema borrando evidencia ni se restaura una unicidad incompatible.
 
 ### D11 — Revocación, rollout y prueba proporcional
 
@@ -343,3 +363,8 @@ cero cuando no fue ejecutado. Concurrencia no comparte estado de autoridad entre
 Aceptación exige mismo token A/B allow, C/missing deny, revocación selectiva B con A vigente, revocación
 global, refresh, aislamiento concurrente, PG real, clientes Codex/Claude y rollback/readback productivos.
 Código verde con gates OFF se informa como `code complete, rollout pendiente`, nunca como cierre formal.
+La certificación del 2026-09-08 cumplió estos gates para una identidad interna, retiró las fixtures y conservó
+tres familias OAuth definitivas (Codex, Claude Code y Claude hospedado; Desktop comparte la hospedada).
+En el rollback OFF/restore Codex continuó con su familia; Claude Code requirió login estándar para recuperar
+el cliente. Esto no afecta a las altas/bajas ordinarias de objetivos, probadas sin reconexión. Los tiempos,
+revisiones y límites de evidencia permanecen en la [QA](../audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md).

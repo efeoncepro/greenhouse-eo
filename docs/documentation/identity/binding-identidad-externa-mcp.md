@@ -402,22 +402,16 @@ Conviene decirlo explícito, porque el nombre "identidad externa" invita a supon
 
 ## Personal interno y varias organizaciones — TASK-1844
 
-La conexión interna v2 puede listar organizaciones autorizadas con `efeonce.organizations.list` y elegir el
-`organizationId` de cada lectura. Greenhouse verifica permisos actuales por llamada. La lista puede cambiar
-sin reconectar si cambian esos permisos. La transición desde v1 sí exige autorizar de nuevo una vez en cada
-cliente; no convierte una conexión anterior de forma silenciosa. El alcance inicial es lectura SEO base-only.
+El personal interno usa autoridad y enrollment propios. Desde la certificación del 2026-09-08, una identidad
+habilitada puede elegir organizaciones por llamada sin reconectar cuando cambian sus permisos. La organización
+objetivo no se fija en el token ni se representa con un binding externo nuevo. La entrega inicial es lectura
+SEO y conserva el recorrido externo de este documento.
 
-Estado 2026-09-08: activada para una identidad interna, con consentimiento, lecturas, refresh, revocación y
-rollback/restore verificados en Codex, Claude Code y Claude hospedado/Desktop. Esta capacidad no está habilitada
-para clientes externos y no cambia sus bindings. [Runbook de operación interna](../../operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md).
+El contrato funcional completo vive en [Acceso MCP interno multiorganización](acceso-mcp-interno-multiorganizacion.md)
+y el paso a paso en [Usar MCP interno con varias organizaciones](../../manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md).
+Allí se distinguen alta de organizaciones y enrollment de personas, permisos por espacio, renovación, denegación
+y recuperación de Claude Code tras rollback. [Runbook de operación](../../operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md).
 
-Para operar, consulta `efeonce.organizations.list`, elige el ID canónico autorizado y pásalo como
-`organizationId` en cada lectura. Una revocación de una organización no requiere reconectar: deja de aparecer
-o se deniega al solicitarla. `no_entitlement` con `hasModule=false` significa que el módulo SEO no está
-asignado; no concede presupuesto ni habilita operaciones pagadas.
-
-Después de un rollback de los gates, Claude Code puede mantener `needs-auth` incluso tras reiniciarlo.
-Con los servicios restaurados, ejecuta `claude mcp login efeonce-internal` en una terminal interactiva y
-completa OAuth; verifica una lectura real después. No copies tokens ni amplíes scopes para recuperar acceso.
-El [ensayo documentado](../../audits/mcp/TASK-1844_ROLLBACK_RESTORE_2026-09-08.json) distingue esa recuperación
-de Codex, que conservó su familia. La conexión hospedada `Efeonce MCP` es compartida por web y Desktop.
+La sustitución autorizada en TASK-1844 afectó sólo al conector Claude hospedado del canary. No retiró el resto de
+los activos ni adelantó el cleanup global de TASK-1832; tampoco acredita una observación ininterrumpida de
+siete días de aquella conexión hospedada.

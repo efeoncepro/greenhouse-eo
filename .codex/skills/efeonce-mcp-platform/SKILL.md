@@ -46,10 +46,11 @@ surface are part of the evidence.
 
 If a source conflicts with remembered behavior, the verified runtime and its canonical architecture win.
 
-## Native authority (TASK-1836 / TASK-1831)
+## Native authority (TASK-1836 / TASK-1831 / TASK-1844)
 
 For Microsoft SSO, direct `/login`, native tokens, population/context, `gv`, token revocation or multi-issuer
-rollout, load [`references/native-authority.md`](references/native-authority.md). Corporate authentication,
+rollout or adding organizations to an existing internal connection, load
+[`references/native-authority.md`](references/native-authority.md). Corporate authentication,
 Efeonce ID session and MCP authorization are separate proofs. Current deployment/cohort evidence belongs
 to the internal rollout runbook and tasks, never to a cached revision in this skill.
 
@@ -91,11 +92,14 @@ The relying-party boundary is fixed by
   Code `2.1.263` (minimum fixed version `2.1.196`), Claude.ai, Claude Desktop `1.46388.4` and ChatGPT hosted
   against Efeonce ID with base-only tokens. Claude Code `2.1.186` remains a historical FAIL. Repeat fresh login,
   new-session dispatch and refresh after any discovery rollout; a visible connector alone is not proof.
-- A corporate login, consent or token is bound to one resolved authorization context. It does not grant every
-  organization the person can access. Internal multi-organization operation belongs to `TASK-1844`: the caller
-  selects a target organization per call and Greenhouse authorizes it through the canonical reader. Never encode
-  an organization list or wildcard in the JWT, infer authority from email/domain, widen bootstrap scopes, or sum
-  grants across contexts to make Codex or Claude appear multi-organization.
+- Internal v1 binds one organization; TASK-1844 v2 binds the actor's anchor and resolves an exact target per
+  call through Greenhouse. V2 requires fresh consent per client once; later organization/capability changes
+  are read dynamically without reconnecting while the consented scope/authority class stays unchanged.
+  Discover authorized IDs with paginated `efeonce.organizations.list`, then pass the exact `organizationId`.
+  Creating an organization alone grants nothing. Never encode targets/wildcards in JWTs, infer authority
+  from email/domain, cache positive authorization, or widen bootstrap scopes. Initial v2 is base-only SEO
+  read; its one-person certification is not general rollout or support for other providers. See the
+  [operating manual](../../../docs/manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md).
 - Derive tenant/workspace from verified identity and provider policy. Never accept a free-form tenant boundary.
 - Treat `auth.efeonce.org` as session/runtime-isolated, not identity-isolated. Greenhouse, auth and MCP keep separate
   cookies, session secrets and token audiences, but an existing customer must resolve to one canonical
