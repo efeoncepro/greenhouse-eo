@@ -8,20 +8,20 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
 - Type: `implementation`
 - Execution profile: `backend-data`
-- UI impact: `none`
-- UI ready: `n/a`
-- Wireframe: `none`
-- Flow: `none`
-- Motion: `none`
+- UI impact: `copy`
+- UI ready: `no`
+- Wireframe: `docs/ui/wireframes/TASK-1835-efeonce-id-login-consent-screens.md`
+- Flow: `docs/ui/flows/TASK-1835-efeonce-id-login-consent-screens-flow.md`
+- Motion: `docs/ui/motion/TASK-1835-efeonce-id-login-consent-screens-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `Especificación. TASK-1836 y TASK-1831 ya sirven autoridad interna productiva para un contexto y una organización por token. El gateway ya exige organizationId cuando corresponde, pero su resolver interno colapsa la respuesta a una sola membership. El requisito de que una misma conexión interna opere todas las organizaciones autorizadas todavía no está implementado ni desplegado.`
+- Status real: `2026-09-08: goal confirmado; discovery y plan completos, checkpoint humano P1/Alto pendiente. PG real exige context_version=1 y unicidad sin versión; el plan propone transición coordinada y permisos efectivos por target. Baseline focal: 52 pruebas passed. Delta ADR Proposed. Sin código v2, migración, cambio de permisos, deploy ni activación.`
 - Rank: `Después del cierre de TASK-1813; antes del uso interno multiorganización en Codex o Claude`
 - Domain: `identity|platform`
 - Blocked by: `none`
@@ -141,6 +141,11 @@ Reglas obligatorias:
 - `../efeonce-mcp/src/mcp.ts` y tests/surface baseline sólo si el plan confirma una tool de descubrimiento propia
 - documentación, tests y runbooks directamente afectados por `TASK-1844`
 
+Ampliación propuesta por discovery: merger efectivo en `src/lib/entitlements`, su consumer
+`src/lib/admin/entitlements-governance.ts`, readers estrictos de tenant/relationship, verifier/context
+del gateway, config/flags, SQL pendientes y copy/renderer del consentimiento. Detalle y límites en
+[Files to modify del plan](../plans/TASK-1844-plan.md#files-to-modify); sujetos a aceptación del plan.
+
 ## Current Repo State
 
 ### Already exists
@@ -167,6 +172,51 @@ Reglas obligatorias:
 - No hay prueba real de una misma familia/token llamando A y B, denegando C y observando revocación selectiva.
 - El agente necesita una forma read-only y minimizada de descubrir IDs/nombres autorizados; la superficie exacta
   debe decidirse en el Delta ADR antes de agregar una tool.
+
+### Discovery 2026-09-08
+
+El [plan](../plans/TASK-1844-plan.md#discovery-summary) registra lectura real de PG/Cloud Run y cinco
+archivos de pruebas existentes (52 passed). La unicidad PG no incluye versión y el writer depende de
+ese índice; la transición exige expansión, writer compatible y retiro gobernado del índice anterior.
+El reader de delegación actual usa sólo permisos base y la proyección de roles omite parte de su vigencia.
+El texto de consentimiento también requiere un delta `ui-lite`: no puede presentar la lista actual como
+alcance fijo si v2 permite altas/bajas autorizadas sin reconectar. No hay implementación v2 todavía.
+
+## Hybrid Execution Justification
+
+- Why not split: `el único consumer visible es el copy de la ceremonia OAuth existente; separarlo permitiría emitir una clase de autoridad cuyo alcance no se explica. No hay nueva composición ni selector. El cambio de schema pertenece íntegramente al backend y no habilita trabajo UI adicional.`
+- Primary execution profile: `backend-data`; UI `ui-lite` limitada a copy/DTO del consentimiento.
+- Contract boundary: `contexto server-owned v2 -> ConsentContextResolution -> renderer existente; sin stores/tokens en browser`.
+- Risk controls: `aprobar primero ADR/plan; backend y migración preparados antes del delta UI; GVC del renderer y prueba GET/POST antes de emitir v2; ningún rediseño de TASK-1835`.
+
+## UI/UX Contract
+
+- Rigor: `ui-lite`; la estructura de TASK-1835 se reutiliza. `UI ready: no` hasta aceptar y completar
+  el delta de copy/mapping antes del slice 3. Los contratos históricos enlazados son referencia, no prueba v2.
+- Flow/motion: se conservan los contratos de TASK-1835; esta task no añade navegación ni animaciones.
+- Primitive decision: `reuse`; `renderConsentPage`, shell, lista de organizaciones/permisos y botones existentes.
+- Estados: v1/externo conserva presentación; v2 muestra clase dinámica y organizaciones actuales; actor
+  sin autoridad/reader no disponible no presenta nombres ni ofrece un consentimiento engañoso.
+
+### Implementation mapping
+
+`src/lib/auth-server/internal/consent-context.ts` entrega contexto/versión y nombres autorizados;
+`src/lib/auth-server/oauth/pages/render.ts` consume ese DTO; el nuevo texto vive en
+`src/lib/copy/auth-server.ts`. No se toca CSS, composición, tokens ni navegación. GET/POST conserva
+la clase de autoridad presentada, además de las protecciones de origen y retorno existentes.
+
+### GVC scenario plan
+
+Quality profile: premium. Renderer real en desktop y 390 px, nombres largos, 1/N organizaciones,
+v1/v2 y estados de deny. Revisar capturas, teclado y `scrollWidth === clientWidth`; no confundir
+fixtures visuales con tokens o clientes reales. Reutilizar el harness de consentimiento de TASK-1835
+y registrar el delta de scenario/dossier antes de declarar UI ready.
+
+### Design decision log
+
+2026-09-08, propuesto: conservar pantalla y jerarquía actuales; explicar que el acceso sigue las
+organizaciones autorizadas mientras permanezca activo y rotular la lista como estado actual.
+Se descarta un selector que altere el target del token y una lista estática presentada como alcance fijo.
 
 ## Modular Placement Contract
 
@@ -211,7 +261,7 @@ Reglas obligatorias:
 
 ### Migration, backfill and rollout
 
-- Migration posture: `additive` si el Delta ADR exige versión persistida; ninguna migración destructiva ni backfill de permisos
+- Migration posture: `expand/contract` propuesta: CHECK 1/2 e índice versionado, writer compatible y retiro posterior del índice anterior tras readback; SQL pendientes, sin borrar datos ni backfill de permisos
 - Default state: `flags nuevas OFF para issuer/reader y gateway; v1 sigue siendo el fallback explícito mientras v2 no esté activa`
 - Backfill plan: `sin backfill de consentimiento; los clientes internos reautorizan y crean autoridad v2 de forma explícita`
 - Rollback path: `apagar primero emisión v2, luego consumo v2 en gateway; tokens/consentimientos v2 quedan denegados y v1 uniorganización sigue disponible sólo si la policy de rollback lo autoriza`
@@ -227,18 +277,18 @@ Reglas obligatorias:
 ### Runtime evidence
 
 - Local checks: `tests focales de auth-server/identity/API Platform + pnpm mcp:manifest:check; pnpm check en ../efeonce-mcp`
-- DB/runtime checks: `migración additive y readers contra PG real mediante pnpm test:live; readback de consentimiento/contexto/token sin exponer secretos`
+- DB/runtime checks: `transición compatible y readers contra PG real mediante pnpm test:live tras apply aprobado; readback de consentimiento/contexto/token sin exponer secretos`
 - Integration checks: `un token interno v2 permite A/B y deniega C antes del provider; missing/ambiguous fail-closed; external/Entra regresión verde`
 - Reliability signals/logs: `deny por organización, context/version drift, revocación aún despachando y reader unavailable; nombres exactos se fijan en el Delta ADR`
 - Production verification sequence: `flags OFF -> deploy compatible Greenhouse -> deploy gateway compatible -> canary interno v2 -> reconsentimiento Codex/Claude -> revocación y rollback -> flags finales/readback`
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects. Evidencia: [plan propuesto 2026-09-08](../plans/TASK-1844-plan.md#backenddata-contract); implementación/aceptación pendientes.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit. Evidencia: [plan propuesto 2026-09-08](../plans/TASK-1844-plan.md#backenddata-contract); implementación/aceptación pendientes.
 - [ ] Toda tabla nueva queda declarada con su justificación en `src/lib/auth-server/boundary-domain.test.ts` en el mismo PR.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for every contract change beyond docs.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk. Evidencia: [plan propuesto 2026-09-08](../plans/TASK-1844-plan.md#backenddata-contract); implementación/aceptación pendientes.
+- [x] Runtime or DB evidence is listed for every contract change beyond docs. Evidencia: [plan propuesto 2026-09-08](../plans/TASK-1844-plan.md#backenddata-contract); implementación/aceptación pendientes.
 - [ ] Errores, audit y señales no exponen PII, tokens, cookies, upstream claims ni organizaciones no autorizadas.
 
 ## Capability Definition of Done — Full API Parity gate
@@ -254,6 +304,13 @@ Reglas obligatorias:
      El agente que toma esta task ejecuta Discovery y produce
      plan.md segun TASK_PROCESS.md. No llenar al crear la task.
      ═══════════════════════════════════════════════════════════ -->
+
+## Execution Plan
+
+- [Plan y auditoría TASK-1844](../plans/TASK-1844-plan.md), 2026-09-08.
+- Goal aprobado; plan y Delta ADR **pendientes de aprobación humana P1/Alto**.
+- Estrategia `sequential`, sin subagentes; Greenhouse develop y gateway main, checkouts compartidos.
+- No se ha iniciado código. Próximo paso: aceptar plan/ADR y ejecutar slices con gates OFF.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -361,7 +418,8 @@ reales internos, revocación y rollback.
 - Slice 1 -> Slice 2 -> Slice 3 -> Slice 4 -> Slice 5 -> Slice 6.
 - El reader/DTO compatible de Slice 2 debe desplegarse antes que el gateway consuma v2.
 - El gateway compatible debe desplegarse con su flag OFF antes que el emisor produzca autoridad v2.
-- Ninguna flag productiva se activa antes del canary completo y del consentimiento fresco.
+- Ninguna activación interna general precede al canary completo y al consentimiento fresco; la prueba
+  inicial usa exclusivamente la cohorte explícita del plan y requiere aprobación de rollout.
 - El rollback apaga primero emisión v2 y luego consumo v2; no deja tokens v2 con un reader permisivo o ausente.
 
 ### Risk matrix
@@ -378,7 +436,9 @@ reales internos, revocación y rollback.
 ### Feature flags / cutover
 
 - Greenhouse/auth-server: nueva flag `AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED`, default `false`.
+- Greenhouse reader: `IDENTITY_INTERNAL_MULTI_ORG_ENABLED`, default `false`.
 - Gateway: nueva flag `MCP_NATIVE_INTERNAL_MULTI_ORG_ENABLED`, default `false`.
+- Cohorte inicial: `AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS`, vacía por defecto; sin wildcard.
 - Las flags no sustituyen el consentimiento versionado ni el reader. Activarlas sin authority v2 válida debe
   denegar, no caer al carril externo ni sumar memberships.
 - Los nombres definitivos quedan ratificados en el Delta ADR y registrados en el ledger antes del primer deploy.
@@ -388,7 +448,7 @@ reales internos, revocación y rollback.
 | Slice | Rollback | Tiempo | Reversible? |
 |---|---|---|---|
 | 1 | revert documental antes de Accepted; después, nueva enmienda | <1 día | sí antes de aceptación |
-| 2 | flag reader OFF + revert del release compatible | <15 min | sí |
+| 2 | flag reader OFF + revert sólo hacia writer compatible con ambos índices; conservar schema/auditoría | <15 min | sí, con revisión compatible preparada |
 | 3 | flag de emisión OFF; denegar creación/refresh v2 | <15 min | sí, sin backfill |
 | 4 | flag gateway OFF + tráfico a revisión compatible anterior | <15 min | sí |
 | 5 | cortar cohorte v2, revocar familias de prueba y reconectar v1 sólo si la policy lo autoriza | <30 min | sí |
@@ -440,7 +500,7 @@ reales internos, revocación y rollback.
 ## Verification
 
 - `pnpm task:lint --task TASK-1844`
-- `pnpm vitest run src/lib/auth-server src/lib/identity/internal-access src/lib/api-platform/resources/ecosystem-identity-binding.test.ts`
+- `pnpm vitest run src/lib/auth-server src/lib/identity/internal-access src/lib/api-platform/resources/ecosystem-identity-binding.internal.test.ts`
 - `pnpm test:live` (serializado; nunca exportar `.env.local` completo)
 - `pnpm mcp:manifest:check`
 - `pnpm check` en `../efeonce-mcp`

@@ -1,5 +1,11 @@
 # Handoff activo
 
+**TASK-1844 — discovery/plan, checkpoint P1/Alto pendiente (2026-09-08):** goal confirmado;
+[plan](docs/tasks/plans/TASK-1844-plan.md) y ADR Proposed: actor/target,
+consentimiento v2 y migración compatible de unicidad. PG real sólo admite v1; baseline focal 52 passed.
+Sin código, apply, cambio de permisos ni deploy. Checkouts compartidos Greenhouse develop/gateway main,
+sin worktrees/subagentes. Próximo paso: aprobación del plan y ADR antes de implementar con gates OFF.
+
 **Berel (2026-09-08):** [cadencia mensual](docs/operations/BEREL_CLIENT_COLLABORATION_OPERATING_MODEL_V1.md)
 aprobada internamente y skill espejo alineada. Activar sólo tras aceptación de Anel, Fer y Marce; no se envió
 correo ni cambió Notion/calendario.
@@ -40,14 +46,10 @@ el rollout completo el 2026-09-06: commit/push, promoción, deploys, gates, fixt
 sesiones, revocación y cleanup. El alcance sigue limitado a una organización sintética read-only; clientes y
 writes permanecen fuera.
 
-**Readback anterior a la migración TASK-1832 (14:57Z, sólo lectura; supersedido por el readback 18:49Z):** los
-30 perfiles `smoke_test` vigentes aparecían entonces en
-`greenhouse_serving.person_360`; ninguno tiene membership, `client_user` o contacto CRM. Los seis perfiles usados
-por smokes de identidad externa conservan history, pero tienen source link inactivo, invitación/binding revocados
-y sólo `efeonce.invalid`, sin entrega real: no hay cobertura M365/Google. El único candidato existente con nombre
-diagnóstico es `EO-ORG-0050` (`other`, `disqualified`, cero spaces/memberships/bindings), pero tiene historia de
-lifecycle/commercial party y queda descartado porque no es eliminable sin destruir evidencia append-only. Evidencia:
-`docs/audits/mcp/TASK-1832_PRE_IMPLEMENTATION_READBACK_2026-09-06.md`. Sin escrituras ni cambios runtime.
+**Readback histórico TASK-1832 (2026-09-06 14:57Z; supersedido por 18:49Z):** la
+[auditoría previa](docs/audits/mcp/TASK-1832_PRE_IMPLEMENTATION_READBACK_2026-09-06.md) conserva los
+30 perfiles sintéticos entonces visibles en Person 360 y los seis smokes sin entrega real M365/Google.
+`EO-ORG-0050` sigue descartada como fixture: su historia impide eliminarla sin destruir evidencia.
 
 **TASK-1835 (EPIC-044 U06) — `COMPLETE` y EN PRODUCCIÓN 2026-09-06 (Claude greenhouse-eo-06, 2026-09-06;
 commits `85c67e97d` · `4eb358d5b` · `b15b1690e`).** Efeonce ID queda enterprise-ready en local. Tres hallazgos que

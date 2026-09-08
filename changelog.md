@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-08 — TASK-1844: discovery y plan de autoridad interna multiorganización
+
+La auditoría de código, PostgreSQL y Cloud Run deja un [plan revisable](docs/tasks/plans/TASK-1844-plan.md)
+y un Delta ADR Proposed: separar actor/target, componer permisos efectivos, consentimiento v2 y migrar la
+unicidad sin romper writers anteriores. Se corrigió la ruta del test focal; cinco archivos, 52 pruebas passed.
+La task pasa a in-progress en planificación, pendiente de checkpoint humano P1/Alto. Sin implementación,
+migración aplicada, cambio de permisos, reconexión ni rollout.
+
 ## 2026-09-08 — Berel cierra la doctrina de recuperación y QA editorial preventivo
 
 La skill Berel y el gate client-visible incorporan el barrido obligatorio de todo el mes aun sin comentarios,
@@ -957,23 +965,3 @@ Barrido de coherencia sobre los 19 cierres del día: `Lifecycle` desincronizado,
 índices, 9 estados falsos en el README de tasks, conteos y prosa stale en cinco epics y en
 `AEO_PROGRAM_STATUS.md`, 10 archivos con rutas rotas y cuatro reglas duras apoyadas en hechos ya
 falsos.
-
-## 2026-09-01 — el CTA gana foco y salida por teclado, y `Escape` deja de mentirle al ledger
-
-Bundle del renderer CTA **`1.2.0-preview.1` → `1.3.0`**. Minor y no patch: cambia comportamiento
-observable, y `dismissed` deja de emitirse al cerrar por teclado — quien mida la tasa de rechazo
-verá la serie cambiar de sentido en esta versión. `renderer_version` viaja en la telemetría, así que
-el bump es lo único que después permite distinguir qué host corre el arreglo.
-
-`ISSUE-167` resuelto (code complete, rollout pendiente). Primitive `attachDisclosureFocus`
-(`src/growth-cta-renderer/disclosure-focus.ts`): al abrir el Growth Form desde un CTA el foco entra
-al contenido y `Escape` cierra. Es disclosure, no modal, y `Escape` se escucha en el contenedor —
-nunca en el documento, para no secuestrárselo a la página del host.
-
-🔴 Cambio de comportamiento que importa al dato: **`Escape` COLAPSA el form al card y NO emite
-`dismissed`**. `dismissed` significa «el visitante rechazó la oferta» y viaja al ledger de
-conversión; cerrar un formulario abierto por curiosidad no es rechazar. El botón «✕ Ahora no» sigue
-siendo el único rechazo.
-
-Causa raíz: el foco y la salida por teclado estaban modelados por **placement** (`slide-in`) en vez
-de por «superficie revelada», así que `embedded` no los heredaba.

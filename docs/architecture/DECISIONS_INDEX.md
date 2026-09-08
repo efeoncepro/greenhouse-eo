@@ -253,3 +253,4 @@ Estas decisiones existen en runtime o docs, pero pueden merecer ADR mas explicit
 ## 2026-09-05 — autoridad interna Efeonce ID
 
 - [Efeonce internal native authority](EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md) — Accepted; TASK-1836, D1–D7: upstream OIDC, contexto delegado, assurance local y rollout multicomponente. Implementación y canary interno certificados; entrada directa promovida a `main` `456d9accf` por PR226 (2026-09-06); retorno humano directo y matrices amplias pendientes. [Evidencia](../audits/2026-09-06-task-1836-1831-consolidated-evidence.md).
+  [Delta TASK-1844 D8–D11](EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md#delta-task-1844--autoridad-interna-multiorganización-proposed) — **Proposed** 2026-09-08: actor/target, reader efectivo, consentimiento v2 y transición de unicidad; [plan pendiente de aprobación](../tasks/plans/TASK-1844-plan.md). No implementado ni activado.
