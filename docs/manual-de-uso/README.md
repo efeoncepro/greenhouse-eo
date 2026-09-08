@@ -111,6 +111,8 @@ La diferencia con otras capas de documentacion:
 
 ### HR y Nomina
 
+- [Convertir horarios de un equipo distribuido](hr/convertir-horarios-equipo-distribuido.md) — procedimiento para sumar horas efectivas, descontar colacion y convertir una jornada anclada en Chile a España, Colombia y Nicaragua usando zonas IANA y fechas de cambio estacional.
+
 - [Operar la Asignación de Tests por Etapa](hr/operar-asignacion-de-tests.md) — declarar la prueba de una vacante, asignar con proponer→confirmar, cancelar una prueba no iniciada (y avisarle a la persona si el correo ya salió), leer los estados del resultado, drenar la cola de recuperación y el procedimiento —no el interruptor— para encender la asignación automática.
 - [Operar los Emails del Ciclo de Hiring](hr/operar-emails-ciclo-hiring.md) — prender/apagar el sistema (flag del ops-worker), pausar un correo puntual en caliente (kill-switch por tipo, incluido el de rechazo), leer las señales del reactive log y diagnosticar por qué un correo no llegó.
 - [Recuperar acceso al test de un candidato](hr/recuperar-acceso-a-test-de-candidato.md) — cuando el correo no llegó o el enlace no funciona: reenviar por correo u obtener un enlace temporal de una sola revelación, qué significa cada bloqueo, qué le llega al candidato y por qué recuperar nunca devuelve tiempo.

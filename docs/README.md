@@ -212,6 +212,8 @@ Indice maestro de la documentacion no operativa del repo.
 - [SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md](operations/SEO_EDITORIAL_PRIORITIZATION_OPERATING_MODEL_V1.md)
 - [Informes de auditoría SEO/AEO para clientes](operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md) — continuidad, responsabilidad de agencia, validez del Grader y entrega verificada.
 - [Berel — estrategia de cobertura editorial](operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md), con inventario auditado y criterios de minería por necesidad.
+- [Berel — colaboración y cadencia mensual](operations/BEREL_CLIENT_COLLABORATION_OPERATING_MODEL_V1.md): funciones por canal, cortes y frontera de activación pendiente de aceptación del cliente.
+- [Berel — recuperación de fugas editoriales](audits/seo/BEREL_CONTENT_HUB_EDITORIAL_LEAK_RECOVERY_2026-09-08.md): evidencia de octubre–diciembre, preservación de análisis/specs/comentarios y QA preventivo.
 - [Berel — clasificación y conteo de piezas](audits/seo/BEREL_PIECE_COUNT_CLASSIFICATION_2026-09-03.md): etiquetas verificadas y límites del conteo por tarea frente a archivos.
 - [Berel — distribución social selectiva](audits/seo/BEREL_SELECTIVE_SOCIAL_DISTRIBUTION_2026-09-03.md): selección por artículo, cupos y aplicación nov/dic verificada; entregas no certificadas y octubre excluido.
 - [SEO_CONTENT_BRIEF_STRUCTURE_V1.md](operations/SEO_CONTENT_BRIEF_STRUCTURE_V1.md)

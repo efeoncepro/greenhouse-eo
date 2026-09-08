@@ -6,6 +6,17 @@
 > fechada del cliente o una spec específica contradice una regla más vieja, manda la fuente más
 > reciente/específica y se registra el drift.
 
+## Colaboración y cadencia mensual — 2026-09-08
+
+Decisión expresa del operador: proponer desde septiembre una dinámica con Notion como fuente central,
+Frame.io para revisión visual/audiovisual, Teams para avisos y bloqueos, y correo para informe mensual y cierre.
+Dos cortes de revisión por mes, hasta dos rondas consolidadas y una reunión mensual de 45 minutos dentro de los
+primeros siete días hábiles posteriores al cierre. Se descartó imponer un plazo genérico de tres días hábiles para
+feedback. La primera reunión se propone en octubre para revisar septiembre.
+
+La decisión está aprobada internamente, pero esta conversación no prueba envío ni aceptación de Berel. El canon
+local es `docs/operations/BEREL_CLIENT_COLLABORATION_OPERATING_MODEL_V1.md`; módulo 19 gobierna su aplicación.
+
 ## Clasificación de piezas verificada — 2026-09-03
 
 Esquemas vivos de Tareas, Content Hub y Proyectos: `Tipo de pieza`, `Canal de pieza`,
@@ -161,6 +172,32 @@ instrucción de control de capturas en App Color Berel. Se retiraron los duplica
 delimitación se trasladó al análisis y la instrucción se convirtió en una recomendación útil para quien usa la
 app. Fueron reemplazos pequeños, sin comentarios anclados en esos bloques. El readback final y el gate ampliado
 pasaron 11/11; no se modificaron estados, Drupal, Frame.io, tareas ni assets.
+
+La evidencia fechada y sus límites quedaron consolidados en
+[`BEREL_CONTENT_HUB_EDITORIAL_LEAK_RECOVERY_2026-09-08.md`](../../../docs/audits/seo/BEREL_CONTENT_HUB_EDITORIAL_LEAK_RECOVERY_2026-09-08.md).
+
+## Barridos preventivos de noviembre y diciembre — 2026-09-08
+
+Después de octubre, el operador pidió revisar preventivamente noviembre y diciembre aun cuando no existieran
+comentarios. Noviembre se recorrió como lote N43–N51 y diciembre como N52–N59. La ejecución retiró de las zonas
+vigentes rótulos de auditoría, fuentes/controles/metadatos operativos y enlaces de Notion usados como destinos
+públicos, preservando los toggles hermanos de análisis y las fichas visuales.
+
+En diciembre se registraron ocho páginas —seis artículos y dos tutoriales, uno bloqueado—, tres casos de enlaces
+públicos mal formados y dos encabezados con `acabado impecable`; el gate final reportó 8/8. El resumen posterior
+escribió por error `segundasegunda capa`, pero la lectura de Notion mostraba `Segunda capa para un acabado
+uniforme`: fue un typo del agente, no una edición del artículo. Los conteos exactos no conciliados en un ledger
+durable se conservan como reportados y requieren readback vivo antes de una nueva mutación.
+
+## Fuente lingüística para `pintura sana` — 2026-09-08
+
+La petición de sustituir `pintura sana` se acepta por claridad, no por la afirmación absoluta de que `sana` no se
+use en México. El [Diccionario del español de México](https://dem.colmex.mx/ver/sano) registra `sano` como `en
+buen estado` también para materiales (`madera sana`). Una [tesis técnica de la
+UNAM](https://tesiunamdocumentos.dgb.unam.mx/pmig2016/0197753/0197753.pdf) usa `pintura sana` para un
+recubrimiento repintable y [Fester México](https://www.fester.com.mx/productos/central-pdp.html/fester-cl-52/SAP_0201WPF013S1.html)
+usa `superficie sana y firme`. En copy de consumo Berel se prefiere `pintura en buen estado` o la condición
+física explícita porque `pintura sana` puede interpretarse como saludable/no tóxica.
 
 ## Sincronización integral del Playbook y feedback — 2026-09-04
 

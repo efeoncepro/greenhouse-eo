@@ -41,6 +41,7 @@ Load the smallest reference that matches the task:
 - `references/chile-payroll-law.md`: Chile legal/payroll formula map and official source links.
 - `references/greenhouse-payroll-runtime.md`: Greenhouse schema, code paths, formulas, known audit watchlist, and verification commands.
 - `references/international-remote-payroll.md`: Remote/international worker regimes, Deel/EOR/contractor boundaries, and Efeonce audit posture.
+- `references/distributed-working-hours.md`: Chile-anchored working-hour calculations, meal-break treatment, and Spain/Colombia/Nicaragua timezone conversions. Load it for schedule, daylight-saving, or cross-country working-hours questions.
 - `../greenhouse-talent-people-operator/references/efeonce-candidate-benefits-charter.md`: approved candidate-facing global benefits baseline; use when an offer, agreement or provider instruction must reconcile public claims with payroll/leave implementation.
 - `references/international-withholding-americas-sii.md`: SII discovery summary for `international_internal` withholding across Americas, including LIR Art. 59/60/74/79, treaty evidence gates, country matrix, and TASK-905 fail-closed posture.
 - `references/international-withholding-europe-sii.md`: SII discovery summary for future Europe `international_internal` withholding, including European DTA list, MFN circular rate changes, MLI notes, territorial caveats, and fail-closed seed posture.
@@ -54,6 +55,8 @@ Load the smallest reference that matches the task:
 - Every DB query must preserve tenant isolation by `space_id` where the data model has tenant scope.
 - Use the canonical DB layer: `import { query, getDb, withTransaction } from '@/lib/db'` or existing payroll/postgres helpers. Never create `new Pool()`.
 - Payroll must remain auditable: period, compensation version, source data, formula inputs, overrides, and exports must be explainable.
+- Cross-country schedules must name an IANA timezone and effective date. Never persist a fixed country-to-country hour difference when either location observes daylight-saving time.
+- A timezone conversion is not a labor-law approval. Validate contracted weekly hours, meal-break treatment, governing jurisdiction, and any written amendment separately.
 
 ## Worker Regime Classification
 

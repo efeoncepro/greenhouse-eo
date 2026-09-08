@@ -61,6 +61,7 @@ Planeación temática, prioridades y minería de huecos ............... modules/
 Mes completo, modalidades, tareas y estados ........................ modules/01_CICLO_MENSUAL.md
 Numeración mensual, identidad y corrección de referencias .......... modules/16_NUMERACION_EDITORIAL.md
 Informe periódico al cliente, continuidad y responsabilidad ........ modules/17_INFORMES_AUDITORIA_CLIENTE.md
+Canales, cortes de revisión, reunión e informe mensual .............. modules/19_COLABORACION_CLIENTE_Y_CADENCIA.md
 Auditoría de URL viva y análisis SEO/AEO ........................... modules/02_ANALISIS_AUDITORIA.md
 Redacción de reescritura o artículo nuevo .......................... modules/03_REDACCION_ARTICULO.md
 Voz y tono Berel es-MX ............................................. modules/04_VOZ_Y_TONO_BEREL.md
@@ -247,6 +248,21 @@ Plantillas ......................................................... templates/
     el botón `Restaurar` como evidencia de que los hilos sobrevivieron. Después, solo reemplazos pequeños que
     preserven las anclas; conteo de observaciones del cliente, discusiones, comentarios y respuestas son métricas
     distintas. Protocolo y taxonomía: módulo 18.
+60. 🔴 **Una función por canal y cadencia mensual.** Notion gobierna planificación, estados, comentarios
+    editoriales y aprobaciones; Frame.io, la revisión visual/audiovisual; Teams, avisos, bloqueos y decisiones
+    directas; correo, el informe mensual y el cierre formal. Dos cortes mensuales y una reunión de 45 minutos
+    dentro de los primeros siete días hábiles del mes siguiente. No declarar el modelo activo frente a Berel
+    hasta registrar su aceptación; detalle y excepciones en el módulo 19.
+61. 🔴 **El cierre mensual incluye auditoría preventiva, aun sin comentarios.** Revisar todas las páginas del
+    mes objetivo, una por una, con zona vigente única, evidencia separada, specs preservadas, gate y lectura
+    humana. Una fuga centinela amplía la cobertura de lectura; no autoriza reemplazos masivos ni cambios en
+    páginas sin defecto confirmado.
+62. 🔴 **Los links de Notion y la operación viven fuera del copy público.** `app.notion.com`, `notion.so`,
+    tareas, fuentes, QA, CMS, schema, conteos y rutas internas pueden ser evidencia profesional en su toggle,
+    pero no destinos ni narrativa de la versión vigente. En ella solo quedan Title, meta description, slug, H1,
+    texto público y specs contextuales.
+63. 🔴 **El reporte también se verifica contra la fuente.** No atribuir al artículo un typo que existe solo en
+    el mensaje del agente. Corregir la respuesta, no Notion; cualquier cambio declarado cita el readback fresco.
 
 ## Lo que no se toca
 

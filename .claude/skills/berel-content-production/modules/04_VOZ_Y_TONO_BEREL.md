@@ -289,9 +289,10 @@ releyendo.
 | **6 · Dosis del nombre de producto** | `for p in Berelinte "Kalos Tone" "Multitono Pro" Insignia "Esmalte Summa" Berelex; do echo -n "$p: "; grep -oi "$p" ARCHIVO \| wc -l; done` | El nombre completo va **una sola vez** y después "la pintura" o "el esmalte". ⚠️ **Descuenta las apariciones dentro de una URL y dentro de una tabla de datos** — una fila comparativa no es repetición promocional. Cuenta las visibles en prosa |
 | **7 · Extensión real del cuerpo** | El conteo debe **excluir callouts, tablas y el bloque de metadatos** | Con `wc -w` sobre el archivo completo el resultado **miente**: infla el número y te hace creer que llegaste al piso |
 | **8 · Lenguaje interno expuesto** | `grep -niE "el cliente\|instrucción del cliente\|posicionamiento editorial\|la ficha declara\|extracción\|CMS" ARCHIVO` | Revisar cada hallazgo dentro del toggle editorial; cualquiera que rompa la narrativa es falla. En toggles de evidencia, comprobar que sea documentación profesional y necesaria. Aplicar además `client-visible-copy-gate.mjs` sobre la página fresca completa |
-| **9 · Giros corregidos por el cliente** | `grep -niE "pintura sana\|muévele la hora\|la cuenta fina\|aplicados en frío\|pintura pele\|formulación premium" ARCHIVO` | Sustituir por lenguaje literal es-MX o retirar el claim; no son fórmulas públicas aprobadas |
+| **9 · Giros corregidos por el cliente** | `grep -niE "pintura sana\|muévele la hora\|la cuenta fina\|aplicados en frío\|pintura pele\|formulación premium" ARCHIVO` | Sustituir por lenguaje literal es-MX o retirar el claim; no son fórmulas públicas aprobadas. `Pintura sana` se cambia por claridad y precisión, **no** porque la palabra `sana` sea ajena a México: para el estado físico usar `pintura en buen estado` o describir la condición |
+| **10 · Palabras duplicadas, separadas o fusionadas** | `rg -ni --pcre2 '\b([\p{L}]{4,})\s+\1\b\|\b([\p{L}]{4,})\2\b' ARCHIVO` | Candidatas a revisar, por ejemplo `segunda segunda` o `segundasegunda`. Corregir solo la duplicación confirmada: el hallazgo no autoriza reemplazos masivos, barridos de conjugaciones ni cambios a términos legítimos |
 
-**10 · Lo que se verifica mirando, porque ningún grep lo ve:**
+**11 · Lo que se verifica mirando, porque ningún grep lo ve:**
 
 - que exista el **BerelTip** en piezas de registro técnico o tutorial;
 - que la **respuesta directa extractable de 40 a 55 palabras** esté justo después del gancho;
@@ -331,6 +332,9 @@ grep -niE "el cliente|instrucción del cliente|posicionamiento editorial|la fich
 
 echo "== 9. Giros corregidos por el cliente =="
 grep -niE "pintura sana|muévele la hora|la cuenta fina|aplicados en frío|pintura pele|formulación premium" "$ARCHIVO"
+
+echo "== 10. Duplicaciones adyacentes o fusionadas (revisar candidatas) =="
+rg -ni --pcre2 '\b([\p{L}]{4,})\s+\1\b|\b([\p{L}]{4,})\2\b' "$ARCHIVO"
 ```
 
 ## Checklist de publicación (estándar de la marca)
@@ -343,6 +347,7 @@ grep -niE "pintura sana|muévele la hora|la cuenta fina|aplicados en frío|pintu
 - [ ] Remates y frases compactas se entienden en la primera lectura
 - [ ] Tuteo al lector y "nosotros/nuestro" solo para la voz de marca
 - [ ] Sin lenguaje de cliente/agencia/CMS/verificación dentro del cuerpo público
+- [ ] Sin palabras duplicadas de forma adyacente o fusionada; toda candidata se revisó en contexto
 - [ ] Definición extractable al abrir cada sección
 - [ ] Tabla comparativa y/o guía paso a paso donde aplique
 - [ ] FAQ de 4-6 preguntas con respuesta directa

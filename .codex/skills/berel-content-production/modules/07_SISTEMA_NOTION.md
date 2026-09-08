@@ -292,8 +292,10 @@ sensible vive en Efeonce con acceso privado comprobado.
   como **arreglos de URLs**.
 - **Crear primero el proyecto, luego las tareas principales, luego las subtareas**: cada nivel
   necesita la URL del anterior.
-- 🔴 **No borrar nunca contenido existente.** Los análisis, el contenido rescatado y las
-  reescrituras se **agregan** como secciones desplegables nuevas.
+- 🔴 **Fuera de una revisión autorizada, no borrar contenido existente.** Los análisis, el contenido rescatado
+  y las reescrituras se agregan como secciones desplegables nuevas. La excepción acotada es retirar una fuga
+  confirmada de la zona editorial vigente mediante reemplazos pequeños: nunca borrar toggles de evidencia,
+  comentarios, specs visuales ni una página completa para conseguirlo.
 
 ## Revisión de comentarios en páginas de artículos
 

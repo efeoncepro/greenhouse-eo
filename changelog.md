@@ -7,6 +7,25 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-08 — Berel cierra la doctrina de recuperación y QA editorial preventivo
+
+La skill Berel y el gate client-visible incorporan el barrido obligatorio de todo el mes aun sin comentarios,
+rechazo de links Notion/metadatos operativos en la zona vigente, preservación de análisis y specs congeladas,
+edición/restauración segura y verificación del propio reporte. La
+[auditoría fechada](docs/audits/seo/BEREL_CONTENT_HUB_EDITORIAL_LEAK_RECOVERY_2026-09-08.md) consolida octubre,
+noviembre y diciembre, distingue el typo `segundasegunda` del contenido real y documenta `pintura sana` como
+problema de claridad —no como palabra inexistente en México—. El contrato genérico de Notion añade baseline y
+readback de discusiones para reemplazos/restauraciones; no hubo nuevas escrituras en Notion, Drupal ni Frame.io.
+
+## 2026-09-08 — Berel adopta una propuesta de colaboración mensual y canales con función única
+
+Efeonce aprobó internamente proponer desde septiembre una dinámica simplificada para Berel: Notion como fuente
+central del trabajo, Frame.io para revisión visual/audiovisual, Teams para avisos y bloqueos, y correo para informe
+mensual y cierre formal. Dos cortes mensuales alimentan una reunión de 45 minutos dentro de los primeros siete días
+hábiles del mes siguiente; no se impone un SLA genérico de tres días para feedback. El contrato, módulo 19 y skills
+espejo dejan separado lo aprobado internamente de la aceptación pendiente del cliente; no hubo cambio en Notion,
+envío de correo, calendario ni alcance contratado.
+
 ## 2026-09-07 — Berel: comentarios, recuperación de octubre y contrato visual corregido
 
 La skill espejo `berel-content-production` incorpora el delta del Playbook vivo para comentarios: claridad antes
@@ -958,28 +977,3 @@ siendo el único rechazo.
 
 Causa raíz: el foco y la salida por teclado estaban modelados por **placement** (`slide-in`) en vez
 de por «superficie revelada», así que `embedded` no los heredaba.
-
-## 2026-09-01 — el motor CTA cierra su primera rebanada, y deja un hueco de accesibilidad nombrado
-
-`TASK-1427` complete. El steady-state se observó sobre **45 días** y no sobre los 7 que pedía el
-criterio: la ventana literal de julio tuvo tráfico un solo día, así que sus ceros eran un falso
-verde. Resultado sobre la serie real: 0 errores server-confirmed, 0 kill switches, 0 colisiones.
-
-Los readers de `growth.cta.*` filtran `INTERVAL '1 day'`: responden «¿está sano ahora?», nunca
-«¿estuvo steady durante N días?». Queda `scripts/growth/_sanity-cta-signal-window.ts` para esa
-pregunta.
-
-**`ISSUE-167` abierto:** al abrir el Growth Form desde un CTA el foco queda en `body` y `Escape` no
-cierra — renderer compartido, afecta a todos los CTA en Think y WordPress.
-
-## 2026-09-01 — el paso de registrar el avance entra a los seis checklists de cierre
-
-Un mecanismo que avisa en un comando que ningún protocolo manda ejecutar está apagado. La regla
-—tildar con evidencia, dejar sin tildar con razón, `Status real` al día, `pnpm task:lint --task`—
-quedó en `CLAUDE.md`, `AGENTS.md`, el harness `implement-task`, `GREENHOUSE_OPERATING_LOOP_V1.md`,
-`TASK_PROCESS.md` y el `greenhouse-documentation-governor`.
-
-`TASK_PROCESS.md` documenta las calibraciones medidas de `stale-progress`/`stale-blocker`.
-`TASK_UI_UX_ADDENDUM.md` documenta la severidad foco-vs-incidental de los gates de UI y el protocolo
-de contrato retroactivo. El `greenhouse-qa-release-auditor` suma tres defectos de gate nuevos y la
-regla de falsificar todo test contra su propio arreglo.

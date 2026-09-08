@@ -121,6 +121,17 @@ cerrada.
 
 ## Controles editoriales introducidos el 2026-09-07
 
+### Barrido preventivo aunque no existan comentarios
+
+Los comentarios ayudan a descubrir defectos, pero no son el sistema de QA. Si una fuga aparece en una página,
+auditar por lectura el resto del mes objetivo: una sola zona vigente, evidencia separada, metadatos aprobables,
+links públicos, specs contextuales completas, ausencia de notas de agente y jerarquía intacta. Ejecutar gate y
+lectura humana en cada página; editar únicamente donde exista un defecto confirmado.
+
+Registrar por artículo `sin cambios`, `corregido` o `bloqueado`, junto con specs/hilos antes y después. Una página
+sin comentarios puede fallar; una página con comentarios atendidos puede contener otra fuga. La ampliación es de
+cobertura de auditoría, no de autoridad para reescribir todo el lote.
+
 ### Claridad antes que ingenio
 
 - Todo remate o frase compacta se entiende en la primera lectura.
@@ -180,6 +191,11 @@ estructura, adaptándola al hilo. La respuesta debe permitir reconstruir cuatro 
 
 No responder con `listo`, `corregido` o `de acuerdo` sin explicar el resultado.
 
+El mismo estándar rige el reporte del agente al operador: citar el texto leído de la fuente y distinguirlo del
+resumen propio. Si una duplicación o errata existe solo en la respuesta del agente, se corrige la respuesta y no
+se contabiliza ni se modifica Notion. `Segundasegunda capa` fue un error del reporte; la página conservaba
+`Segunda capa para un acabado uniforme`.
+
 ## Casos límite de Notion
 
 - **Ancla eliminada y comentario huérfano:** si una edición necesaria borra el bloque anclado y Notion ya no
@@ -198,6 +214,7 @@ No responder con `listo`, `corregido` o `de acuerdo` sin explicar el resultado.
 ## Criterio de cierre
 
 - [ ] Todos los hilos fueron inventariados y clasificados.
+- [ ] Si el hallazgo fue centinela, el resto del mes fue auditado aunque no tuviera comentarios; solo se editaron defectos confirmados.
 - [ ] Cada hilo nuevo tiene decisión explícita.
 - [ ] Cada cambio fue releído en su bloque y en la transición con sus vecinos.
 - [ ] Cada hilo atendido tiene respuesta con observación, acción y razón.
@@ -208,6 +225,7 @@ No responder con `listo`, `corregido` o `de acuerdo` sin explicar el resultado.
 - [ ] Las cuatro fichas N1–N4 permanecen en contexto y coinciden literalmente con sus tareas visuales.
 - [ ] Si existe arte producido, ninguna corrección cambió composición, copy, ALT, archivo, formato ni posición.
 - [ ] El export fresco pasó `client-visible-copy-gate.mjs` y la lectura humana del render.
+- [ ] El reporte final cita la fuente fresca y no convierte un typo del agente en un cambio del artículo.
 - [ ] Todos los hijos conservan tabulador y siguen dentro del toggle correcto.
 - [ ] Las reglas nuevas quedaron en Aprendizajes y Playbook.
 - [ ] Los hallazgos fuera de alcance se reportaron aparte.

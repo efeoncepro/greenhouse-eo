@@ -1,5 +1,10 @@
 # Berel — Producción editorial de octubre 2026 — Auditoría 2026-08-26
 
+> **Actualización 2026-09-08:** una revisión posterior encontró y recuperó fugas editoriales sin retirar análisis
+> ni specs contextuales. Ver la
+> [auditoría de recuperación](BEREL_CONTENT_HUB_EDITORIAL_LEAK_RECOVERY_2026-09-08.md). El texto de abajo conserva
+> la fotografía del 2026-08-26 y no debe leerse como certificación vigente de las páginas.
+
 ## Estado y alcance
 
 - Tipo: auditoría operativa de producción editorial, estructura Notion y QA SEO/AEO previo a CMS.

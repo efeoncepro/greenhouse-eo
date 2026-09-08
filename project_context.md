@@ -112,20 +112,16 @@ el worker Cloud Run compartido materializa `seo_gsc_daily`, sin flip aislado de 
 [`GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`](docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) e
 [`OPS_RELIABILITY_AGENT_INVARIANTS.md`](docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md).
 
-ETV de DataForSEO Labs se versiona por metodología. DataForSEO confirmó 14 familias y corte obligatorio
-`2026-11-01T00:00:00Z` sin fallback legacy; la versión no viene en la respuesta. No se activa ni mezcla improved
-antes de persistir provenance, separar idempotencia y medir shadow contra GSC. Contrato confirmado:
-[auditoría ETV 2026-09-01/02](docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md). La decisión aceptada es
-[`GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md`](docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md)
-entregado en `TASK-1805`/`TASK-1806`: desde 2026-09-03 producción sirve `improved_layout_clickstream_v2`
-(rebaseline); legacy sólo como rollback pre-corte.
+ETV de DataForSEO Labs se versiona por metodología; desde 2026-09-03 producción sirve
+`improved_layout_clickstream_v2` y legacy queda sólo como rollback pre-corte. Contrato, corte y provenance:
+[`GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md`](docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md) ·
+[auditoría](docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md).
 
 Informes: skill `report-studio` (Claude/Codex), evidencia, diseño y QA PDF.
-Berel: `berel-content-production` ·
-[plan](docs/operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md) ·
-[informes](docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md).
-Contrato: preservar análisis/evidencia; solo el toggle editorial excluye notas de agente. N1–N4 quedan
-contextuales y el arte producido, congelado hasta conciliación.
+Berel: `berel-content-production` · [plan](docs/operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md) ·
+[informes](docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md) ·
+[colaboración](docs/operations/BEREL_CLIENT_COLLABORATION_OPERATING_MODEL_V1.md). Preservar análisis, N1–N4 y
+arte producido; la cadencia mensual requiere aceptación del cliente.
 
 WordPress/Ohio: skill `efeonce-public-site-wordpress`; contratos [Home](docs/architecture/public-site/AGENCY_ELEMENTOR_MODULES_V1.md),
 [HubSpot](docs/architecture/public-site/HUBSPOT_ELEMENTOR_MODULES_V1.md) y [misceláneas](docs/architecture/public-site/PUBLIC_MISCELLANEOUS_SURFACES_V1.md).

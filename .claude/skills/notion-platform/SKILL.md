@@ -2,8 +2,8 @@
 name: notion-platform
 description: Use for Notion API, MCP, webhooks, data sources, Enhanced Markdown, page bodies, projects, tasks, recursive subtasks, multi-teamspace resolution, due/status/result queries, writeback, Workers, ntn CLI, Notion-Version changes, HMAC, echo-loop prevention, or Greenhouse-Notion integration design. Trigger on requests to create, delegate, assign, update, format, query, or track Notion work; headings, toggle headings, callouts, tables, mentions; gh:work or gh:delegate; and any code using @notionhq/client.
 metadata:
-  version: "1.1"
-  last_updated: "2026-07-18"
+  version: "1.2"
+  last_updated: "2026-09-08"
   maintainer: Greenhouse Platform team
 ---
 
@@ -152,6 +152,9 @@ Reglas duras non-negociables:
     Organization; Engagement gobierna contrato, capacidad, pricing, accountability y cierre comercial. Cuando el
     trabajo cruce ambos, cargar `docs/business-models/EFEONCE_ENGAGEMENT_PROJECT_OPERATING_MODEL_V1.md` y resolver el
     Engagement primario sin crear una segunda clase de “proyecto comercial”.
+26. **NUNCA** reemplazar el body completo de una página con comentarios anclados sin un baseline de discusiones,
+    estructura y bloques protegidos. Preferir `update_content`/reemplazos de rango pequeños; si una restauración
+    es necesaria, elegir una sola versión conocida y comprobar IDs, autores, estados y jerarquía en el readback.
 
 ## 6. File map — POPULATED ★ vs STUB ◯
 
@@ -241,7 +244,8 @@ Reglas duras non-negociables:
 ### patterns-canonical/ — additions V1.1
 - `enhanced-markdown-renderer.md` ★ — AST cerrado, escaping, lint, golden tests y round-trip
 
-**V1.1** adds the work-management, Enhanced Markdown, renderer and multi-space registry contracts while retaining the existing platform/API references and explicit stubs.
+**V1.2** agrega el contrato de edición segura de páginas con comentarios anclados; conserva los contratos V1.1
+de work management, Enhanced Markdown, renderer y registry multi-space.
 
 ## 7. Maintenance protocol — skill viva
 
@@ -300,5 +304,5 @@ Los 5 más comunes que esta skill detecta inmediatamente:
 
 ---
 
-**Última verificación de la expansión work-management/Enhanced Markdown**: 2026-07-18. Las referencias heredadas conservan su propio `Last verified` y deben revalidarse cuando su dominio aplique.
+**Última verificación de la expansión work-management/Enhanced Markdown**: 2026-09-08. Las referencias heredadas conservan su propio `Last verified` y deben revalidarse cuando su dominio aplique.
 **Próxima review automática recomendada**: cuando Notion publique nuevo release (~ mensual)

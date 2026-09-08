@@ -154,6 +154,8 @@ La documentacion funcional no reemplaza el manual ni la arquitectura. Explica qu
 
 ### HR y Nomina
 
+- [Jornadas y horarios distribuidos](hr/jornadas-y-horarios-distribuidos.md) — calculo funcional de horas efectivas y colacion para jornadas chilenas de 42, 30 y 20 horas, con equivalencias fechadas para España, Colombia y Nicaragua; una conversion no modifica contratos ni valida por si sola otra jurisdiccion.
+
 - [Guía de autoría de preguntas de assessment (SME)](hr/assessment-question-authoring-guide.md) — work-sample-first, anatomía de una buena pregunta, rúbricas contestables, sesgos prohibidos y el flujo draft→revisión SME→activación; incluye la matriz de cobertura vigente.
 - [Emails del Ciclo de Hiring](hr/emails-ciclo-hiring.md) — los 6 correos automáticos del proceso: aviso interno a People con los datos del postulante, acuse al candidato, test asignado, avance de etapa candidate-facing y decisión (seleccionado / no seleccionado); reglas de etapa, dedupe y kill-switch por tipo.
 - [Entrega y recuperación de acceso a tests](hr/entrega-y-recuperacion-de-acceso-a-tests.md) — diferencia entre assessment asignado, despacho aceptado y entrega confirmada; intents token-sensitive, recuperación del mismo test por correo o enlace seguro, qué ve el operador, aviso de rotación al candidato, sesión pública y timers.

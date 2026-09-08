@@ -147,6 +147,10 @@ vigente.
 - **Productos enlazados a su página pública** (`berel.com/productos/...`) o a la categoría; **nunca al
   Home, nunca a `/search?q=` y nunca a URLs del backend/CMS**. 🔴 Y a la **variante** correcta, no al
   nombre genérico → [§ Sufijos de variante](#-sufijos-de-variante-enlaza-al-acabado-no-al-nombre).
+- 🔴 **Un enlace de `app.notion.com`, `notion.so`, una tarea o un brief nunca es destino público del artículo.**
+  Esas URLs pueden vivir como evidencia trazable en Research/Análisis/Plan, pero no como anchor del copy que se
+  entrega a Drupal. En la zona editorial, cada enlace visible debe resolver a una URL pública pertinente —por
+  regla general `berel.com`— y pasar la verificación de sitemap + control descrita arriba.
 - Siempre con **anchor descriptivo**; nunca la URL cruda como texto del enlace.
 - Incluir **FAQ**, **tabla comparativa** cuando aplique, y la **firma de cierre** de la marca.
 - En una tabla, usar encabezados que expliquen el dato (`Especificación` / `Dato`) y nombrar el producto
@@ -160,6 +164,9 @@ vigente.
   no se elimina cobertura SEO/AEO útil. Toda reubicación lleva una línea puente.
 - **Tomar la sustancia, no la letra.** Una frase propuesta por el cliente se valida contra voz, léxico,
   evidencia e hilo conductor antes de incorporarla; no introducir `ideal` u otro comodín vetado.
+- **Verificar lo que se reporta.** Si una supuesta errata aparece en un mensaje o resumen del agente pero no en
+  la lectura fresca de Notion, corregir el reporte y no tocar el artículo. El caso `segundasegunda capa` fue un
+  error de redacción del agente; la fuente guardada decía `Segunda capa para un acabado uniforme`.
 - **Especificar los banners contextualmente dentro del artículo** siguiendo la Spec para imágenes: posición
   exacta junto a una sección real, nombre de archivo `.webp`, ALT exacto y **hero sin `lazy`** (es el LCP).
   Copiar después la ficha completa a la tarea visual. Un brief N1–N4 es entregable de producción; una nota de

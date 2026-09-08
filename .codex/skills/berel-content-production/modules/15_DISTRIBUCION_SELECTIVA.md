@@ -54,6 +54,9 @@ Contrato informado por el operador el 2026-09-03: **8 artículos mensuales de 3.
 50 piezas gráficas mensuales, 3 videos cortos de cortesía durante los primeros 6 meses,
 4 superficies activas con contenido nativo y reporting quincenal**. Incluye SEO técnico, AEO,
 Laboratorio Berel, Digital PR y link building; este módulo no acredita ejecución de esos servicios.
+El reporting quincenal permanece como antecedente contractual hasta que Berel acepte la propuesta del
+2026-09-08 para sustituirlo por informe y reunión mensuales. La cadencia propuesta no altera estos cupos ni
+acredita una reducción de alcance; ver módulo 19.
 La cortesía inicial comenzó en mayo de 2026 (mayo–octubre); el operador autorizó extenderla
 para **noviembre y diciembre de 2026**, con **tres videos por mes**. No inferir extensión posterior.
 **Aclaración expresa del operador:** las 50 gráficas incluyen todo: blog y RRSS. Las cuatro

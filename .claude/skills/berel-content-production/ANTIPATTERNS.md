@@ -157,8 +157,16 @@
 - **Desarrollar otra intención bajo el encabezado equivocado.** Color bajo resistencia, precio bajo
   inspiración o cualquier sección que no cumpla su promesa. Reubicar con encabezado propio y línea puente;
   no borrar cobertura útil. (→ `03`, `04`, `18`)
-- **Copiar literalmente la solución sugerida por el cliente sin validarla.** El diagnóstico puede ser correcto
-  y la frase introducir `ideal`, romper el hilo o debilitar SEO/AEO. Tomar la sustancia, no la letra. (→ `18`)
+- **Copiar literalmente la solución sugerida por el cliente sin validarla.** Separar diagnóstico, remedio y
+  fundamento: las decisiones de marca o negocio se aplican; una solución de estilo, SEO/AEO o técnica se
+  contrasta con léxico, evidencia e intención. Si introduce `ideal`, rompe el hilo o debilita SEO/AEO,
+  conservar el diagnóstico, escribir una solución mejor y explicar por qué en la respuesta. (→ `09`, `18`)
+- **Afirmar que `sana` no se usa en México para justificar el cambio de `pintura sana`.** El término sí existe;
+  la colocación se evita en copy de consumo porque es ambigua y describe peor el estado del recubrimiento.
+  Preferir `pintura en buen estado` o una condición física explícita. (→ `04`, `09`, `18`)
+- **Corregir una duplicación mediante un barrido indiscriminado.** `segunda segunda` y `segundasegunda` son
+  errores reales, pero el detector entrega candidatas: revisar contexto y corregir solo la repetición
+  confirmada, sin alterar pretéritos, conjugaciones ni términos legítimos. (→ `04`, `18`)
 - **Culpar al lector** ("la pintura equivocada") o denigrar el resultado ("se ve cansada"). La
   tensión se plantea en términos técnicos. (→ `09`)
 - **Repetir el nombre completo del producto.** Una vez y después genérico; **contarlo antes de

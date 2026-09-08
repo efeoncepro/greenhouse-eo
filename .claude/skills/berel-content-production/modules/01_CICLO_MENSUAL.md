@@ -252,6 +252,18 @@ Definir `P` principales editoriales (artículos + tutoriales), `B` tareas de ban
 🔴 Hacer **segunda lectura fresca** tras automatizaciones de Notion: fechas, estados, relaciones,
 responsables, `Formato` y contenido guardado.
 
+### Barrido preventivo del mes
+
+Antes de cerrar un mes, revisar **todas** las filas editoriales del ciclo, aunque no tengan comentarios. Para
+cada página: confirmar una sola `✍️ Versión vigente para revisión`, conservar los toggles hermanos de evidencia,
+comparar N1–N4 y fotos de paso contra su baseline, leer el toggle vigente como cliente y ejecutar el gate sobre
+un export fresco. Clasificar el resultado como `sin cambios`, `corrección quirúrgica` o `bloqueado`; no editar
+una página que no tenga un defecto confirmado.
+
+Una fuga centinela amplía la **auditoría de lectura** al resto del mes objetivo, no autoriza un reemplazo masivo.
+Cada corrección sigue necesitando ancla fresca, alcance exacto y readback propio. Comentarios ausentes no prueban
+calidad, y comentarios presentes no sustituyen la revisión completa de la zona editorial.
+
 ## 13 · Reporte de avance
 
 Siempre tres grupos:
@@ -280,5 +292,7 @@ Siempre tres grupos:
 - [ ] ALT/archivo/posición conservan una sola fuente de verdad
 - [ ] Cada tarea visual, incluidas las bloqueadas, tiene tipo y canal verificados según módulo 07
 - [ ] Segunda lectura fresca confirma propiedades guardadas
+- [ ] Barrido preventivo completado sobre todas las páginas del mes, incluidas las que no tienen comentarios
+- [ ] Cada zona vigente pasó gate + lectura humana o quedó bloqueada con motivo; páginas sanas no se reescribieron
 - [ ] Conteo `P + B + T + S` conciliado; históricos separados y cupos/archivos/entregas diferenciados
 - [ ] Reporte final separa listos · bloqueados · fuera de alcance

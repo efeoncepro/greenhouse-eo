@@ -39,8 +39,18 @@ const INTERNAL_MARKERS = [
   ],
   [
     'sección de trabajo interna',
-    /^\s*#{1,6}\s+(?:Research|Análisis de contenido|Brief SEO\/AEO|Verificación en la URL publicada)\b/i
+    /^\s*#{1,6}\s+(?:[📚🔎🧪⚙️🛠️📌✅]\uFE0F?\s*)?(?:Research|Análisis de contenido|Brief SEO\/AEO|Verificación en la URL publicada|Fuentes(?: y referencias)?|Referencias(?: internas)?|Control de QA|QA(?: editorial)?|CMS(?: y publicación)?|Handoff(?: al CMS)?|Datos operativos|Implementación CMS|Schema|Ruta (?:CMS|Drupal)|Conteo de palabras)\b/i
   ],
+  [
+    'campo operativo dentro de la narrativa',
+    /^\s*(?:[-*]\s*)?(?:\*\*)?(?:Autor|Conteo de palabras|Word count|Fuentes|Referencias|CMS|Schema|Ruta(?: (?:CMS|Drupal))?|Nodo Drupal|Estado de QA|QA(?: status)?|Fecha de carga|Fecha de publicación)(?::\*\*|\*\*:|:)\s*/i
+  ],
+  ['enlace interno de Notion expuesto al lector', /https?:\/\/(?:www\.)?(?:app\.)?notion\.(?:com|so)\//i],
+  [
+    'razonamiento o instrucción del agente',
+    /\b(?:nota interna|razonamiento del agente|como agente|opté por|decidimos (?:mantener|cambiar|ajustar)|se decidió (?:mantener|cambiar|ajustar)|comentario del cliente|feedback del cliente|solicitud del cliente|el cliente (?:pidió|solicitó|indicó|aprobó|rechazó)|para revisión del cliente|este párrafo (?:se|lo)|hay que (?:corregir|ajustar|validar) este texto)\b/i
+  ],
+  ['pendiente editorial interno', /\b(?:TODO|FIXME)\b|\bpendiente de (?:validar|revisar|corregir|reescribir)\b/i],
   ['placeholder de callout', /\[callout\b/i],
   [
     'campo técnico fuera de una ficha visual contextual',
@@ -55,6 +65,39 @@ const INCOMPLETE_READ_MARKERS = [
   /\bhas_more\s*[:=]\s*true\b/i
 ]
 
+const ADJACENT_DUPLICATE = /\b([\p{L}]{3,})\s+\1\b/iu
+const FUSED_DUPLICATE = /\b([\p{L}]{4,})\1\b/iu
+
+function findBannerNumber(block) {
+  return (
+    block.match(/\b(?:Banner|Imagen|Pieza)\s+(?:N(?:[.°º]\s*)?)?([1-4])\b/iu)?.[1] ??
+    block.match(/(?:^|\n)\s*(?:\t+)?(?:\*\*)?N(?:[.°º]\s*)?([1-4])\b/mu)?.[1]
+  )
+}
+
+function findStepPhotoNumber(block) {
+  return block.match(/\bFoto\s+del\s+paso\s+(?:N(?:[.°º]\s*)?)?(\d+)\b/iu)?.[1]
+}
+
+function validateVisualSpec(block, line, label, { stepPhoto = false } = {}) {
+  const required = [
+    ['Archivo', /\b(?:nombre de )?archivo\b/iu],
+    ['ALT', /\b(?:ALT|texto alternativo)(?:\s+exacto|\s*\(exacto\))?\b/iu],
+    ['Dimensiones', /\b\d{2,4}\s*[x×]\s*\d{2,4}\s*px\b/iu],
+    [
+      'Posición o Ubicación',
+      stepPhoto
+        ? /\bFoto\s+del\s+paso\s+(?:N(?:[.°º]\s*)?)?\d+\b|\b(?:Posici[oó]n|Ubicaci[oó]n)\b/iu
+        : /\b(?:Posici[oó]n|Ubicaci[oó]n)\b|\b(?:antes|despu[eé]s|junto|debajo|encima) de\b/iu
+    ]
+  ]
+  const missing = []
+  for (const [field, marker] of required) {
+    if (!marker.test(block)) missing.push(field)
+  }
+  return missing.map(field => `Línea ${line}: ${label} no declara ${field}.`)
+}
+
 function inspect(text) {
   const lines = text.replace(/\r\n?/g, '\n').split('\n')
   const productionToggles = []
@@ -67,6 +110,11 @@ function inspect(text) {
 
   if (productionToggles.length === 0) {
     errors.push('No se encontró una zona de producción vigente para revisar.')
+  }
+  if (productionToggles.length > 1) {
+    errors.push(
+      `Se encontraron ${productionToggles.length} zonas candidatas a producción vigente; debe quedar exactamente una y las demás deben rotularse como históricas.`
+    )
   }
 
   for (let index = 0; index < lines.length; index += 1) {
@@ -92,6 +140,7 @@ function inspect(text) {
     const imageSpecLines = new Set()
     const structuralExemptLines = new Set()
     const specsByNumber = new Map()
+    const stepSpecsByNumber = new Map()
     for (let index = start + 1; index < end; index += 1) {
       if (!IMAGE_CALLOUT_START.test(lines[index])) continue
       const blockStart = index
@@ -102,16 +151,16 @@ function inspect(text) {
       }
       const blockEnd = index
       const block = lines.slice(blockStart, blockEnd + 1).join('\n')
-      for (let cursor = blockStart; cursor <= blockEnd; cursor += 1) imageSpecLines.add(cursor)
-      const number = block.match(/\bBanner\s+(?:N)?([1-4])\b/i)?.[1]
+      const number = findBannerNumber(block)
       if (!number) continue
+      for (let cursor = blockStart; cursor <= blockEnd; cursor += 1) imageSpecLines.add(cursor)
       const existing = specsByNumber.get(number) ?? []
       existing.push({ block, line: blockStart + 1 })
       specsByNumber.set(number, existing)
     }
 
     for (let index = start + 1; index < end; index += 1) {
-      if (!STEP_PHOTO_CALLOUT_START.test(lines[index])) continue
+      if (!STEP_PHOTO_CALLOUT_START.test(lines[index]) && !IMAGE_CALLOUT_START.test(lines[index])) continue
       const blockStart = index
       while (index < end && !CALLOUT_END.test(lines[index])) index += 1
       if (index >= end) {
@@ -120,24 +169,13 @@ function inspect(text) {
       }
       const blockEnd = index
       const block = lines.slice(blockStart, blockEnd + 1).join('\n')
-      if (!/\*\*Foto del paso\s+\d+:/i.test(block) || !/\*\*Spec:\*\*/i.test(block)) continue
-      const required = [
-        ['Archivo', /\barchivo\b/i],
-        ['ALT', /\bALT:\*\*|\bALT:/i],
-        ['Formato 1:1', /\b1:1\b/i],
-        ['Medida 500 × 500 px', /\b500\s*[x×]\s*500\s*px\b/i],
-        ['Carga diferida', /\bloading=["']lazy["']/i]
-      ]
-      let complete = true
-      for (const [field, marker] of required) {
-        if (!marker.test(block)) {
-          complete = false
-          errors.push(`Línea ${blockStart + 1}: Foto del paso incompleta; no declara ${field}.`)
-        }
-      }
-      if (complete) {
-        for (let cursor = blockStart; cursor <= blockEnd; cursor += 1) imageSpecLines.add(cursor)
-      }
+      const number = findStepPhotoNumber(block)
+      if (!number) continue
+      for (let cursor = blockStart; cursor <= blockEnd; cursor += 1) imageSpecLines.add(cursor)
+      errors.push(...validateVisualSpec(block, blockStart + 1, `Foto del paso N${number}`, { stepPhoto: true }))
+      const existing = stepSpecsByNumber.get(number) ?? []
+      existing.push({ block, line: blockStart + 1 })
+      stepSpecsByNumber.set(number, existing)
     }
 
     for (let index = start + 1; index < end; index += 1) {
@@ -151,29 +189,34 @@ function inspect(text) {
       for (let cursor = tableStart; cursor <= index; cursor += 1) structuralExemptLines.add(cursor)
     }
 
+    const hasBannerSpecs = [...specsByNumber.values()].some(specs => specs.length > 0)
+    const activeSpecsByNumber = hasBannerSpecs ? specsByNumber : stepSpecsByNumber
+    const activeSpecLabel = hasBannerSpecs ? 'Banner' : 'Foto del paso'
     for (const number of ['1', '2', '3', '4']) {
-      const specs = specsByNumber.get(number) ?? []
+      const specs = activeSpecsByNumber.get(number) ?? []
       if (specs.length !== 1) {
-        errors.push(`La zona vigente debe contener exactamente una ficha Banner N${number}; se encontraron ${specs.length}.`)
+        errors.push(
+          `La zona vigente debe contener exactamente una ficha ${activeSpecLabel} N${number}; se encontraron ${specs.length}.`
+        )
         continue
       }
       const [{ block, line }] = specs
-      const required = [
-        ['ALT', /\bALT(?:\s+exacto|\s*\(exacto\))?\b/i],
-        ['Archivo', /\bArchivo\b/i],
-        ['Posición o Ubicación', /\b(?:Posici[oó]n|Ubicaci[oó]n)\b/i],
-        ['Formato', /\bFormato\b|\b\d{3,4}\s*[x×]\s*\d{3,4}\s*px\b/i]
-      ]
-      for (const [field, marker] of required) {
-        if (!marker.test(block)) errors.push(`Línea ${line}: Banner N${number} no declara ${field}.`)
-      }
+      if (hasBannerSpecs) errors.push(...validateVisualSpec(block, line, `${activeSpecLabel} N${number}`))
     }
 
     for (let index = start + 1; index < end; index += 1) {
-      if (imageSpecLines.has(index)) continue
       const line = lines[index]
       for (const [label, marker] of INTERNAL_MARKERS) {
+        if (imageSpecLines.has(index) && label === 'campo técnico fuera de una ficha visual contextual') continue
         if (marker.test(line)) errors.push(`Línea ${index + 1}: posible ${label}: ${line.trim()}`)
+      }
+      const adjacentDuplicate = line.match(ADJACENT_DUPLICATE)?.[0]
+      if (adjacentDuplicate) {
+        errors.push(`Línea ${index + 1}: duplicación adyacente evidente: ${adjacentDuplicate}`)
+      }
+      const fusedDuplicate = line.match(FUSED_DUPLICATE)?.[0]
+      if (fusedDuplicate) {
+        errors.push(`Línea ${index + 1}: duplicación fusionada evidente: ${fusedDuplicate}`)
       }
     }
 
@@ -230,8 +273,52 @@ function selfTest() {
     ])
   ]
   const clean = cleanLines.join('\n')
+  const historicalVisualLabels = [
+    '# ✍️ Versión vigente para revisión {toggle="true"}',
+    '\t## Preparación de la superficie',
+    '\tLimpia y seca la superficie antes de comenzar.',
+    ...[1, 2, 3, 4].flatMap(number => [
+      '\t<callout icon="🖼️" color="gray_bg">',
+      `\t\t**N${number} — pieza contextual ya producida**`,
+      '\t\t**Dimensiones:** 1408 x 768 px · WebP',
+      `\t\t**Texto alternativo:** Aplicación contextual ${number}`,
+      `\t\t**Nombre de archivo:** aplicacion-contextual-${number}.webp`,
+      '\t\t**Ubicación contextual:** después del apartado correspondiente.',
+      '\t</callout>'
+    ])
+  ].join('\n')
+  const photosOnly = [
+    '# Tutorial {toggle="true"}',
+    '\t## Cómo aplicar el producto',
+    '\tSigue los pasos en orden y respeta el tiempo de secado.',
+    ...[1, 2, 3, 4].flatMap(number => [
+      '\t<callout icon="📸" color="gray_bg">',
+      `\t\t**Foto del paso N${number}:** acción correspondiente a este paso.`,
+      `\t\t**Archivo:** paso-${number}.webp · **Dimensiones:** 500 × 500 px · **ALT:** "Foto del paso ${number}".`,
+      '\t</callout>'
+    ])
+  ].join('\n')
   const wrapped = `<page>\n<content>\n${clean}\n</content>\n</page>`
   const leaked = `${clean}\n\tMontaje CMS: cargar el tutorial en cuatro pasos.`
+  const notionLink = `${clean}\n\tConsulta la [fuente](https://app.notion.com/p/efeonce/documento-interno) para más información.`
+  const notionLinkInVisualSpec = clean.replace(
+    '\t\t**Posición:** después de la sección correspondiente.',
+    '\t\t**Posición:** después de la [referencia interna](https://app.notion.com/p/efeonce/spec-interna).'
+  )
+  const operationalSection = `${clean}\n\t## Fuentes y referencias`
+  const operationalFields = [
+    '- **Fuentes:** fichas y referencias',
+    '- **QA:** aprobado internamente',
+    '- **CMS:** Drupal',
+    '- **Conteo de palabras:** 1,200',
+    '- **Autor:** agente editorial',
+    '- **Schema:** Article',
+    '- **Ruta:** /ruta-interna'
+  ].map(field => `${clean}\n\t${field}`)
+  const agentReasoning = `${clean}\n\tEl cliente pidió cambiar este párrafo y se decidió mantener la estructura.`
+  const adjacentDuplicate = `${clean}\n\tAplica una segunda segunda capa cuando seque.`
+  const fusedDuplicate = `${clean}\n\tAplica una segundasegunda capa cuando seque.`
+  const multipleCurrentZones = `${clean}\n# Reescritura {toggle="true"}\n\tTexto alternativo.`
   const unindented = `${clean}\nEsta línea se salió del toggle.`
   const unindentedHeading = `${clean}\n## Este encabezado se salió del toggle`
   const internalPlan = `${clean}\n\t## Análisis SEO/AEO`
@@ -241,23 +328,58 @@ function selfTest() {
     '# 🧭 Plan editorial y SEO {toggle="true"}',
     '\t## Research y fuentes',
     '\tDónde vive: evidencia del Content Hub.',
+    '\t[Fuente interna](https://app.notion.com/p/efeonce/evidencia) conservada para trazabilidad.',
     '\tLimitación verificada: falta confirmar un dato de CMS antes de publicar.',
     '\tPendiente trazable: owner y siguiente paso registrados.',
     clean
   ].join('\n')
-  const missingSpec = cleanLines.filter(line => !line.includes('contextual-4') && !line.includes('contextual 4')).join('\n')
+  const missingSpec = cleanLines
+    .filter(line => !line.includes('contextual-4') && !line.includes('contextual 4'))
+    .join('\n')
   const missingPosition = clean.replace(
     '\t\t**Posición:** después de la sección correspondiente.\n\t</callout>',
-    '\t\t**Lugar:** después de la sección correspondiente.\n\t</callout>'
+    '\t\t**Lugar:** pieza contextual.\n\t</callout>'
   )
 
   if (inspect(clean).length !== 0) throw new Error('El caso limpio no pasó.')
   if (inspect(wrapped).length !== 0) throw new Error('El export completo de Notion no pasó.')
+  if (inspect(historicalVisualLabels).length !== 0) {
+    throw new Error('Las etiquetas visuales históricas N1–N4 no pasaron.')
+  }
+  if (inspect(photosOnly).length !== 0) {
+    throw new Error('Las fichas contextuales Foto del paso N no pasaron.')
+  }
   if (inspect(evidencePlan).length !== 0) {
     throw new Error('El toggle de evidencia legítimo contaminó el gate editorial.')
   }
   if (!inspect(leaked).some(error => error.includes('montaje CMS'))) {
     throw new Error('El caso con nota interna no falló.')
+  }
+  if (!inspect(notionLink).some(error => error.includes('enlace interno de Notion'))) {
+    throw new Error('El caso con enlace interno de Notion no falló.')
+  }
+  if (!inspect(notionLinkInVisualSpec).some(error => error.includes('enlace interno de Notion'))) {
+    throw new Error('El enlace interno de Notion dentro de una ficha visual no falló.')
+  }
+  if (!inspect(operationalSection).some(error => error.includes('sección de trabajo interna'))) {
+    throw new Error('El caso con sección operativa no falló.')
+  }
+  for (const operationalField of operationalFields) {
+    if (!inspect(operationalField).some(error => error.includes('campo operativo'))) {
+      throw new Error(`El caso con campo operativo no falló: ${operationalField.split('\n').at(-1)}`)
+    }
+  }
+  if (!inspect(agentReasoning).some(error => error.includes('razonamiento o instrucción del agente'))) {
+    throw new Error('El caso con razonamiento del agente no falló.')
+  }
+  if (!inspect(adjacentDuplicate).some(error => error.includes('duplicación adyacente'))) {
+    throw new Error('El caso con palabras adyacentes duplicadas no falló.')
+  }
+  if (!inspect(fusedDuplicate).some(error => error.includes('duplicación fusionada'))) {
+    throw new Error('El caso con palabra fusionada duplicada no falló.')
+  }
+  if (!inspect(multipleCurrentZones).some(error => error.includes('zonas candidatas'))) {
+    throw new Error('El caso con más de una zona editorial candidata no falló.')
   }
   if (!inspect(unindented).some(error => error.includes('perdió el tabulador'))) {
     throw new Error('El caso con jerarquía rota no falló.')

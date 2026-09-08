@@ -32,9 +32,10 @@ saber qué imagen es la adecuada.
 - Si por planeación hay que reservarlas antes de tiempo: `Estado` = `Bloqueado`,
   `Resumen` = "Pendiente de la reescritura del artículo", **sin ficha de contenido**. La ficha se
   escribe cuando exista el texto.
-- Si quedaron banners creados antes de la reescritura, al terminar el artículo hay que
-  **revisar y reescribir su ficha** contra el texto final: escena, dato de la infografía,
-  comparativa, cierre, ALT, nombre de archivo y posición.
+- Si quedaron **reservas o placeholders sin arte producido** creados antes de la reescritura, al terminar el
+  artículo hay que revisar y completar su ficha contra el texto final: escena, dato de la infografía,
+  comparativa, cierre, ALT, nombre de archivo y posición. Si diseño ya produjo o entregó el asset, no se
+  reescribe: gobierna el contrato de congelamiento y cualquier cambio se concilia y versiona con diseño.
 
 > Un banner creado antes del artículo es un **placeholder**, no un brief.
 

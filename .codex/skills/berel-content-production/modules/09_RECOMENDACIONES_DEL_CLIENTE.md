@@ -6,8 +6,11 @@
 ## 🔴 Regla de precedencia
 
 Estas son **peticiones directas del cliente, muchas fechadas en agosto de 2026** y varias marcadas
-como **reincidentes en revisión**. Cuando una de ellas choca con la guía general de voz
-(`04_VOZ_Y_TONO_BEREL.md`), **manda la petición del cliente**: es posterior y es explícita.
+como **reincidentes en revisión**. Una definición de **marca o negocio** del cliente —nomenclatura,
+producto promovido, licencia, audiencia o política comercial— manda sobre la guía general de voz
+(`04_VOZ_Y_TONO_BEREL.md`). Una propuesta de **redacción, SEO/AEO o técnica** no se acepta por
+literalidad: se valida contra voz, intención, evidencia y fuente vigente; si no corresponde, se explica
+con respeto y se propone una solución mejor.
 
 Hay **dos choques reales** documentados abajo (series de producto y densidad metafórica). No los
 resuelvas en silencio a favor del documento más viejo.
@@ -129,15 +132,22 @@ quedó desactualizada en ese punto y hay que corregirla en Notion.
 - **Español de México, literal y simple:** `pintura en buen estado`, `ajusta el horario`, `haz el cálculo
   exacto`, describir aplicación con cubeta/brocha/rodillo y decir `que la pintura se desprenda o
   descarapele`. Evitar `pintura sana`, `muévele la hora`, `la cuenta fina`, `aplicados en frío`, `que la
-  pintura pele` y frases literarias que obliguen a interpretar.
+  pintura pele` y frases literarias que obliguen a interpretar. 🔴 **No convertir esta corrección en la
+  conclusión absoluta de que `sana` no se usa en México:** el adjetivo sí existe y aparece también en registros
+  técnicos. El problema de `pintura sana` en copy de consumo es que resulta ambiguo —puede leerse como una
+  pintura saludable— y no describe con precisión el estado del recubrimiento. Cuando esa sea la intención,
+  usar `pintura en buen estado` o explicitar `recubrimiento firme, seco y sin desprendimientos`.
 - **Firma confirmada:** `Pinta con Confianza. Pinta con Berel.`
 - **Claridad antes que ingenio:** todo remate o frase compacta debe entenderse a la primera lectura. Si
   exige releerse, se reescribe en lenguaje directo.
 - **Una sección, una intención:** cada sección responde a su encabezado. El contenido de otra intención se
   reubica bajo un encabezado propio para preservar claridad y cobertura SEO/AEO; no se elimina.
 - **Costura obligatoria:** todo bloque reubicado lleva una línea puente que lo conecte con la sección anterior.
-- **Sustancia, no literalidad:** una redacción sugerida por el cliente se valida contra léxico, evidencia e
-  hilo conductor; no introducir `ideal` u otro comodín vetado por aceptar la frase al pie de la letra.
+- **Diagnóstico, remedio y fundamento:** ante una redacción sugerida por el cliente, separar qué problema
+  detectó, cuál es la solución propuesta y qué regla o dato la sostiene. Las decisiones de marca o negocio se
+  aplican; el remedio de estilo, SEO/AEO o técnica se valida contra léxico, evidencia e hilo conductor. Si la
+  propuesta introduce `ideal`, pierde precisión o debilita la intención, conservar el diagnóstico, aplicar una
+  redacción mejor y explicar el fundamento en la respuesta del hilo.
 - **Comentarios:** Efeonce inventaría, atiende y responde cada hilo, pero no lo marca como resuelto. El
   procedimiento y sus estados operativos viven en el módulo 18.
 

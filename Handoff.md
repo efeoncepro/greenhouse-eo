@@ -1,11 +1,11 @@
 # Handoff activo
 
-**Berel (2026-09-08):** `.codex/skills/berel-content-production/SOURCES.md`; 11 páginas verificadas.
+**Berel (2026-09-08):** [cadencia mensual](docs/operations/BEREL_CLIENT_COLLABORATION_OPERATING_MODEL_V1.md)
+aprobada internamente y skill espejo alineada. Activar sólo tras aceptación de Anel, Fer y Marce; no se envió
+correo ni cambió Notion/calendario.
 
-**TASK-1813 — COMPLETE:** `efeonce-mcp` `1.2.0`/`00047-8b5` sirve 100 % Ready. Discovery base-only, rollback y
-matriz post-cutover están verificados. Claude Code, Codex, Claude.ai, Claude Desktop y ChatGPT leyeron sin gasto;
-Desktop/ChatGPT renovaron con `efeonce.mcp.read`. Docs/skills están alineados; sin widening ni cambios Entra.
-Multi-org queda en TASK-1844/U19.
+**TASK-1813 — COMPLETE:** `efeonce-mcp` `1.2.0`/`00047-8b5` sirve discovery base-only y lecturas sin gasto en la
+matriz de clientes; sin widening ni cambios Entra. Multi-org queda en TASK-1844/U19.
 [Task](docs/tasks/complete/TASK-1813-efeonce-mcp-oauth-client-interoperability.md) ·
 [auditoría](docs/audits/mcp/TASK-1813_OAUTH_HARDENING_QA_2026-09-07.md).
 
