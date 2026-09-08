@@ -47,3 +47,7 @@ export const EFEONCE_MCP_RESOURCE_AUDIENCE = 'https://mcp.efeonce.org/mcp'
 export const PUBLISHED_SCOPES_SUPPORTED: readonly string[] = EFEONCE_MCP_READ_SCOPES
 
 export const serializeScopes = (scopes: readonly string[]): string => scopes.join(' ')
+
+/** TASK-1844 starts with one consent class; never widen v2 through a different client registration. */
+export const areInternalContextScopesAllowed = (version: 1 | 2 | undefined, scopes: readonly string[]): boolean =>
+  version !== 2 || (scopes.length === 1 && scopes[0] === EFEONCE_MCP_BASE_SCOPE)

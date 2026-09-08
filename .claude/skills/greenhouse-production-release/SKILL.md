@@ -820,3 +820,14 @@ When reporting production-release work, include:
 - watchdog result
 - what was not validated
 - any docs or skill updates made
+
+
+### TASK-1844 — internal multi-organization rollout
+
+`auth-server-deploy.yml` keeps the same orchestrator/allowlist wiring. Its change-gate compares
+`AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED` and `AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS`, including
+configuration-only changes. The behavioral guard executes that workflow step with a local fake gcloud;
+it does not assert YAML text. Before removing the legacy context index, verify every served writer is
+version-compatible. Rollback retains the expanded schema and that compatible writer floor. Deployment,
+cohort activation and real-client certification remain separate evidence; follow
+`docs/operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md` and the flag ledger.

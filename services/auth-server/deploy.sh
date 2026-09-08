@@ -80,6 +80,20 @@ AUTH_SERVER_TOTP_KMS_KEY="${AUTH_SERVER_TOTP_KMS_KEY:-projects/${PROJECT_ID}/loc
 # TASK-1836: durable corporate references, shared by staging and production on this service.
 # Provisioning these dependencies does not activate login; activation remains a separate decision.
 AUTH_SERVER_INTERNAL_AUTH_ENABLED="${AUTH_SERVER_INTERNAL_AUTH_ENABLED:-false}"
+AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED="${AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED:-false}"
+AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS="${AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS:-}"
+if [[ "${AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED}" != "true" && "${AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED}" != "false" ]]; then
+  echo "ERROR: AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED must be true or false."
+  exit 1
+fi
+if [[ -n "${AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS}" && ! "${AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS}" =~ ^[A-Za-z0-9][A-Za-z0-9_-]{1,127}(,[A-Za-z0-9][A-Za-z0-9_-]{1,127})*$ ]]; then
+  echo "ERROR: multi-organization cohort must contain exact profile IDs."
+  exit 1
+fi
+if [[ "${AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED}" == "true" && ( "${AUTH_SERVER_INTERNAL_AUTH_ENABLED}" != "true" || -z "${AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS}" ) ]]; then
+  echo "ERROR: multi-organization issuance requires internal auth and an explicit cohort."
+  exit 1
+fi
 AUTH_SERVER_ENTRA_TENANT_ID="${AUTH_SERVER_ENTRA_TENANT_ID:-a80bf6c1-7c45-4d70-b043-51389622a0e4}"
 AUTH_SERVER_ENTRA_CLIENT_ID="${AUTH_SERVER_ENTRA_CLIENT_ID:-3a327355-b1a5-4de2-867b-08365c76fcd2}"
 AUTH_SERVER_INTERNAL_LOGIN_KMS_KEY="${AUTH_SERVER_INTERNAL_LOGIN_KMS_KEY:-projects/${PROJECT_ID}/locations/${REGION}/keyRings/auth-server/cryptoKeys/auth-server-internal-login-envelope}"
@@ -215,48 +229,50 @@ echo "=== Build ${BUILD_ID} succeeded ==="
 # ─── Env vars (declarativas — SoT del runtime) ──────────────────────────────
 
 ENV_VARS="NODE_ENV=production"
-ENV_VARS="${ENV_VARS},GCP_PROJECT=${PROJECT_ID}"
-ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=${PG_INSTANCE}"
-ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_DATABASE=greenhouse_app"
-ENV_VARS="${ENV_VARS},GREENHOUSE_POSTGRES_USER=greenhouse_app"
+ENV_VARS="${ENV_VARS}::GCP_PROJECT=${PROJECT_ID}"
+ENV_VARS="${ENV_VARS}::GREENHOUSE_POSTGRES_INSTANCE_CONNECTION_NAME=${PG_INSTANCE}"
+ENV_VARS="${ENV_VARS}::GREENHOUSE_POSTGRES_DATABASE=greenhouse_app"
+ENV_VARS="${ENV_VARS}::GREENHOUSE_POSTGRES_USER=greenhouse_app"
 # TASK-1828 — flag maestro del emisor. OFF ⇒ /readyz 503 y JWKS 404; el LB no enruta
 # tráfico útil. Ledger: docs/operations/FEATURE_FLAG_STATE_LEDGER.md (runtime auth-server).
 # 🚩 ON desde 2026-09-04 (Slice 2, autorizado por el operador «ejecuta tú todo»): con ON el
 # servicio sólo expone /readyz y el JWKS (llaves PÚBLICAS); los endpoints OAuth y la
 # autenticación de personas llegan en TASK-1829/1830 con sus propios flags.
-ENV_VARS="${ENV_VARS},AUTH_SERVER_ENABLED=${AUTH_SERVER_ENABLED:-true}"
-ENV_VARS="${ENV_VARS},AUTH_SERVER_ISSUER=${AUTH_SERVER_ISSUER}"
-ENV_VARS="${ENV_VARS},AUTH_SERVER_ALLOWED_HOSTS=${AUTH_SERVER_ALLOWED_HOSTS}"
-ENV_VARS="${ENV_VARS},AUTH_SERVER_KMS_KEY=${AUTH_SERVER_KMS_KEY}"
+ENV_VARS="${ENV_VARS}::AUTH_SERVER_ENABLED=${AUTH_SERVER_ENABLED:-true}"
+ENV_VARS="${ENV_VARS}::AUTH_SERVER_ISSUER=${AUTH_SERVER_ISSUER}"
+ENV_VARS="${ENV_VARS}::AUTH_SERVER_ALLOWED_HOSTS=${AUTH_SERVER_ALLOWED_HOSTS}"
+ENV_VARS="${ENV_VARS}::AUTH_SERVER_KMS_KEY=${AUTH_SERVER_KMS_KEY}"
 # TASK-1829 — superficie OAuth del emisor (metadata RFC 8414/OIDC, CIMD/DCR, /oauth/*).
 # OFF ⇒ los endpoints OAuth y la metadata responden 404; sólo /readyz y el JWKS siguen vivos.
 # Ledger: docs/operations/FEATURE_FLAG_STATE_LEDGER.md (runtime auth-server únicamente).
-ENV_VARS="${ENV_VARS},AUTH_SERVER_OAUTH_ENABLED=${AUTH_SERVER_OAUTH_ENABLED:-true}"
+ENV_VARS="${ENV_VARS}::AUTH_SERVER_OAUTH_ENABLED=${AUTH_SERVER_OAUTH_ENABLED:-true}"
 # environment_id del emisor en greenhouse_core.external_identity_environments (TASK-1631): la
 # llave durable con la que se resuelve (subject → identity_profile → bindings → gv). Nunca el issuer crudo.
-ENV_VARS="${ENV_VARS},AUTH_SERVER_ENVIRONMENT_ID=${AUTH_SERVER_ENVIRONMENT_ID:-efeonce-auth}"
+ENV_VARS="${ENV_VARS}::AUTH_SERVER_ENVIRONMENT_ID=${AUTH_SERVER_ENVIRONMENT_ID:-efeonce-auth}"
 # Audiencia única del recurso MCP (nunca un alias).
-ENV_VARS="${ENV_VARS},AUTH_SERVER_MCP_AUDIENCE=${AUTH_SERVER_MCP_AUDIENCE:-https://mcp.efeonce.org/mcp}"
+ENV_VARS="${ENV_VARS}::AUTH_SERVER_MCP_AUDIENCE=${AUTH_SERVER_MCP_AUDIENCE:-https://mcp.efeonce.org/mcp}"
 # TASK-1830 — autenticación de personas (magic link, sesión propia `__Host-efeonce_auth`, passkeys,
 # TOTP). OFF ⇒ `/login`, `/auth/*` y `/m/*` responden 404 y el `SubjectSessionPort` devuelve `null`,
 # así que `authorize` sigue en `login_required`. Ledger: docs/operations/FEATURE_FLAG_STATE_LEDGER.md
 # (runtime auth-server únicamente).
-ENV_VARS="${ENV_VARS},AUTH_SERVER_PERSON_AUTH_ENABLED=${AUTH_SERVER_PERSON_AUTH_ENABLED:-true}"
+ENV_VARS="${ENV_VARS}::AUTH_SERVER_PERSON_AUTH_ENABLED=${AUTH_SERVER_PERSON_AUTH_ENABLED:-true}"
 # TASK-1832 — emisión para población external+canary. OFF conserva customer externo e internal sin
 # cambios y hace que el resolver deniegue canary aunque existan filas. Dual-runtime con Vercel.
-ENV_VARS="${ENV_VARS},EXTERNAL_IDENTITY_CANARY_ENABLED=${EXTERNAL_IDENTITY_CANARY_ENABLED:-false}"
-ENV_VARS="${ENV_VARS},AUTH_SERVER_TOTP_KMS_KEY=${AUTH_SERVER_TOTP_KMS_KEY}"
+ENV_VARS="${ENV_VARS}::EXTERNAL_IDENTITY_CANARY_ENABLED=${EXTERNAL_IDENTITY_CANARY_ENABLED:-false}"
+ENV_VARS="${ENV_VARS}::AUTH_SERVER_TOTP_KMS_KEY=${AUTH_SERVER_TOTP_KMS_KEY}"
 # TASK-1836: independent corporate lane. Never implicitly turn it on with persons/OAuth.
-ENV_VARS="${ENV_VARS},AUTH_SERVER_INTERNAL_AUTH_ENABLED=${AUTH_SERVER_INTERNAL_AUTH_ENABLED}"
-ENV_VARS="${ENV_VARS},AUTH_SERVER_ENTRA_TENANT_ID=${AUTH_SERVER_ENTRA_TENANT_ID}"
-ENV_VARS="${ENV_VARS},AUTH_SERVER_ENTRA_CLIENT_ID=${AUTH_SERVER_ENTRA_CLIENT_ID}"
-ENV_VARS="${ENV_VARS},AUTH_SERVER_INTERNAL_LOGIN_KMS_KEY=${AUTH_SERVER_INTERNAL_LOGIN_KMS_KEY}"
+ENV_VARS="${ENV_VARS}::AUTH_SERVER_INTERNAL_AUTH_ENABLED=${AUTH_SERVER_INTERNAL_AUTH_ENABLED}"
+ENV_VARS="${ENV_VARS}::AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED=${AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED}"
+ENV_VARS="${ENV_VARS}::AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS=${AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS}"
+ENV_VARS="${ENV_VARS}::AUTH_SERVER_ENTRA_TENANT_ID=${AUTH_SERVER_ENTRA_TENANT_ID}"
+ENV_VARS="${ENV_VARS}::AUTH_SERVER_ENTRA_CLIENT_ID=${AUTH_SERVER_ENTRA_CLIENT_ID}"
+ENV_VARS="${ENV_VARS}::AUTH_SERVER_INTERNAL_LOGIN_KMS_KEY=${AUTH_SERVER_INTERNAL_LOGIN_KMS_KEY}"
 
 # Correo del magic link por el pipeline gobernado (`sendEmail`). Sin esto el enlace nunca sale y el
 # acceso queda muerto en silencio: la respuesta es idéntica por anti-enumeración y no puede avisar.
-ENV_VARS="${ENV_VARS},EMAIL_FROM=${EMAIL_FROM}"
-ENV_VARS="${ENV_VARS},RESEND_API_KEY_SECRET_REF=${RESEND_API_KEY_SECRET_REF}"
-ENV_VARS="${ENV_VARS},SENTRY_ENVIRONMENT=${ENV}"
+ENV_VARS="${ENV_VARS}::EMAIL_FROM=${EMAIL_FROM}"
+ENV_VARS="${ENV_VARS}::RESEND_API_KEY_SECRET_REF=${RESEND_API_KEY_SECRET_REF}"
+ENV_VARS="${ENV_VARS}::SENTRY_ENVIRONMENT=${ENV}"
 
 # ─── Secrets (Secret Manager → env) ─────────────────────────────────────────
 
@@ -287,7 +303,7 @@ fi
 
 EXPECTED_SHA="${EXPECTED_SHA:-${GITHUB_SHA:-$(git rev-parse HEAD 2>/dev/null || echo 'unknown')}}"
 GIT_SHA="${EXPECTED_SHA}"
-ENV_VARS="${ENV_VARS},GIT_SHA=${GIT_SHA}"
+ENV_VARS="${ENV_VARS}::GIT_SHA=${GIT_SHA}"
 
 # ─── Deploy ─────────────────────────────────────────────────────────────────
 
@@ -304,7 +320,7 @@ gcloud run deploy "${SERVICE_NAME}" \
   --concurrency="${CONCURRENCY}" \
   --ingress=internal-and-cloud-load-balancing \
   --allow-unauthenticated \
-  --set-env-vars="${ENV_VARS}" \
+  --set-env-vars="^::^${ENV_VARS}" \
   --update-secrets="${SECRETS}" \
   --quiet
 

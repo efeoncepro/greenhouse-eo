@@ -525,3 +525,10 @@ y lo transmite al reader existente, que verifica ledger OAuth y dimensiones. No 
 cache positiva. Revocar familia/consent debe denegar dispatch, además de refresh, sin invalidar otra
 familia que comparte contexto. Pruebas HTTP locales verifican deny antes del provider; el canary real
 sigue pendiente y ambos flags se conservan OFF durante el despliegue de compatibilidad.
+
+## Delta local TASK-1844 — 2026-09-08
+
+TASK-1844 implementa autoridad interna v2 por target y consentimiento nuevo, detrás de gates OFF.
+Esta task conserva su entrega uniorganización original. El delta no reabre TASK-1813 ni amplía el canary
+TASK-1832 o el piloto TASK-1841. [QA local](../../audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md) ·
+[rollout y clientes pendientes](../../operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md).

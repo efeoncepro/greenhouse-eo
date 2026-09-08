@@ -9,7 +9,7 @@ Mapa de construcción, pruebas y límites: [auditoría consolidada TASK-1836/183
 - Priority: `P0`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `2026-09-07: emisor nativo y gateway multi-issuer productivos. TASK-1813 está completa: hardening 1.2.0 en 00047-8b5, rollback ensayado y Claude Code/Codex/Claude.ai/Claude Desktop/ChatGPT verdes post-cutover, base-only y sin gasto. TASK-1832 continúa su observación sintética hasta cleanup/readback cero y gates OFF; el primer cliente real permanece en TASK-1841. TASK-1844/U19 tiene discovery y plan del 2026-09-08, pendientes de checkpoint P1/Alto; sin implementación ni rollout. El epic sigue abierto.`
+- Status real: `2026-09-07: emisor nativo y gateway multi-issuer productivos. TASK-1813 está completa: hardening 1.2.0 en 00047-8b5, rollback ensayado y Claude Code/Codex/Claude.ai/Claude Desktop/ChatGPT verdes post-cutover, base-only y sin gasto. TASK-1832 continúa su observación sintética hasta cleanup/readback cero y gates OFF; el primer cliente real permanece en TASK-1841. TASK-1844/U19 tiene implementación local verificada (528 Greenhouse + 158 gateway + 2 PG live); code complete, rollout pendiente: SQL expand/contract, gates, clientes reales y rollback por certificar. El epic sigue abierto.`
 - Rank: `TBD`
 - Domain: `platform|identity|integration|ops`
 - Owner: `Efeonce Platform / Identity`

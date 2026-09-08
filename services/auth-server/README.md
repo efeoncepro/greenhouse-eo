@@ -3,7 +3,7 @@
 > **Tipo de documento:** README del deployable (TASK-1828 + TASK-1829, EPIC-044)
 > **Versión:** 1.3
 > **Creado:** 2026-09-04 por Claude (sesión `/implement-task 1828`)
-> **Última actualización:** 2026-09-06 por Codex (TASK-1832, gate canary externo code complete)
+> **Última actualización:** 2026-09-08 por Codex (TASK-1844, multiorganización interna code complete; rollout pendiente)
 > **Documentación técnica:** [`EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`](../../docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) · contrato OAuth [`EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md`](../../docs/architecture/EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md)
 
 Authorization server propio de Efeonce. Cloud Run Service en `us-east4`, publicado como **segundo host del
@@ -63,6 +63,8 @@ La autenticación de personas (passkeys, magic link, TOTP) la entrega `TASK-1830
 | `AUTH_SERVER_KMS_KEY`              | `projects/efeonce-group/locations/us-east4/keyRings/auth-server/cryptoKeys/auth-server-es256` | Nombre completo del recurso.                                                                                                                                                                                                                |
 | `AUTH_SERVER_OAUTH_ENABLED`        | `false` por defecto (TASK-1829)                                                               | Publica la metadata y `/oauth/*`. Prender sólo con la fila del environment `efeonce-auth` en `greenhouse_core.external_identity_environments` y metadata validada (runbook §`OAuth`). Ledger: `FEATURE_FLAG_STATE_LEDGER.md`.               |
 | `EXTERNAL_IDENTITY_CANARY_ENABLED` | `false` por defecto (TASK-1832)                                                               | Gate adicional para población externa `binding_purpose=canary`. OFF impide consentimiento/emisión/refresh mediante el resolver aunque OAuth general esté ON. Se enciende sólo junto al registro exacto y al gate independiente del gateway. |
+| `AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED` | `false` por defecto (TASK-1844) | Emisión/refresh v2 sólo con cohorte; contexto v1 nunca se promueve. |
+| `AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS` | vacío por defecto | CSV de IDs exactos, sin wildcard. deploy.sh preserva comas con delimitador `::`; change-gate detecta drift aun con igual SHA. |
 | `AUTH_SERVER_ENVIRONMENT_ID`       | `efeonce-auth`                                                                                | `environment_id` del emisor en `external_identity_environments`; con él se resuelve `bound` y el claim `gv`. La fila existe en `draft` desde 2026-09-04 (ver §Scripts); pasa a `active` junto con el flip del flag OAuth.                   |
 | `AUTH_SERVER_MCP_AUDIENCE`         | `https://mcp.efeonce.org/mcp`                                                                 | `aud` de los access tokens y `resource` aceptado.                                                                                                                                                                                           |
 | `GREENHOUSE_POSTGRES_*`            | Cloud SQL Connector                                                                           | Igual que los workers; usuario `greenhouse_app`.                                                                                                                                                                                            |
@@ -123,3 +125,10 @@ enruta desde `efeonce-mcp/infra/terraform/front_door.tf` (`enable_auth_host`).
 ## Runbook
 
 `docs/operations/runbooks/auth-server.md`.
+
+## TASK-1844 — Autoridad interna multiorganización
+
+Writer compatible y consentimiento/contexto v2 implementados con gates OFF. Las migraciones expand/contract
+permanecen en pending-migrations; el schema compartido sigue v1. Después de contract sólo es seguro volver a
+un writer compatible. El emisor resuelve permisos por snapshot; el reader Vercel tiene su propio gate.
+[Runbook y verificación pendiente](../../docs/operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md).

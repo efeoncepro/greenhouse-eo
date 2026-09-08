@@ -30,6 +30,8 @@ export type ResolveSubjectOrganizationRelationInput = {
   subjectUserId: string
   subjectTenantType: SubjectTenantType
   organizationId: string
+  /** When authorizing organization-wide data, check every active space independently. */
+  spaceId?: string
 }
 
 export type SubjectOrganizationRelation =
@@ -84,8 +86,11 @@ const QUERY_SQL = `
     FROM greenhouse_core.user_role_assignments
     WHERE user_id = $1
       AND role_code = 'efeonce_admin'
-      AND COALESCE(active, TRUE) = TRUE
+      AND active = TRUE AND status = 'active'
+      AND (effective_from IS NULL OR effective_from <= now())
       AND (effective_to IS NULL OR effective_to > now())
+      AND client_id IS NULL AND project_id IS NULL AND campaign_id IS NULL
+      AND (scope_level IS NULL OR scope_level='global')
     LIMIT 1
   ),
   subject_member AS (
@@ -94,7 +99,7 @@ const QUERY_SQL = `
     FROM greenhouse_core.client_users cu
     WHERE cu.user_id = $1
       AND cu.member_id IS NOT NULL
-      AND COALESCE(cu.active, TRUE) = TRUE
+      AND cu.active = TRUE AND cu.status='active'
     LIMIT 1
   ),
   org_clients AS (
@@ -105,6 +110,7 @@ const QUERY_SQL = `
     WHERE s.organization_id = $2
       AND s.client_id IS NOT NULL
       AND COALESCE(s.active, TRUE) = TRUE
+      AND s.status='active' AND ($3::text IS NULL OR s.space_id=$3)
   ),
   subject_assignment AS (
     SELECT
@@ -159,13 +165,13 @@ const toDateOrNull = (value: Date | string | null): Date | null => {
  * - `subject_client_portal` filtra `tenant_type = 'client'` — un internal NUNCA cae en este branch.
  * - `subject_assignment` requiere user → member bridge + member en cliente que mapea a la org.
  *
- * Errors PG son convertidos a `no_relation` con `captureWithDomain('identity', ...)`. El caller
- * (projection helper en Slice 4) decide entonces si convertir a `degradedMode`.
+ * Errors PG propagate after capture; authorization consumers must fail closed.
  *
  * Cualquier subject sin match cae a `unrelated_internal` (si tenant=internal) o `no_relation`.
  */
 export const resolveSubjectOrganizationRelation = async (
-  input: ResolveSubjectOrganizationRelationInput
+  input: ResolveSubjectOrganizationRelationInput,
+  { readQuery = query, captureFailure = true }: { readQuery?: typeof query; captureFailure?: boolean } = {}
 ): Promise<SubjectOrganizationRelation> => {
   const { subjectUserId, subjectTenantType, organizationId } = input
 
@@ -176,17 +182,23 @@ export const resolveSubjectOrganizationRelation = async (
   let row: ResolverRow | null
 
   try {
-    const rows = await query<ResolverRow>(QUERY_SQL, [subjectUserId, organizationId])
+    const rows = await readQuery<ResolverRow>(QUERY_SQL, [subjectUserId, organizationId, input.spaceId ?? null])
 
     row = rows[0] ?? null
   } catch (error) {
-    captureWithDomain(error, 'identity', {
+    if (captureFailure) captureWithDomain(error, 'identity', {
       tags: { source: 'workspace_projection_relationship_resolver' },
       extra: { subjectUserId, organizationId, subjectTenantType }
     })
 
     throw error
   }
+
+  return relationFromRow(input, row)
+}
+
+const relationFromRow = (input: ResolveSubjectOrganizationRelationInput, row: ResolverRow | null): SubjectOrganizationRelation => {
+  const { subjectUserId, subjectTenantType, organizationId } = input
 
   if (!row) {
     return isInternalTenantType(subjectTenantType)
@@ -195,12 +207,12 @@ export const resolveSubjectOrganizationRelation = async (
   }
 
   // 1. Internal admin — highest priority. Cross-tenant capable.
-  if (row.is_admin) {
+  if (row.is_admin && isInternalTenantType(subjectTenantType)) {
     return { kind: 'internal_admin', subjectUserId, organizationId }
   }
 
   // 2. Assigned member — internal user assigned to a client mapping to this org.
-  if (row.assignment_id && row.member_id && row.client_id_assignment) {
+  if (isInternalTenantType(subjectTenantType) && row.assignment_id && row.member_id && row.client_id_assignment) {
     return {
       kind: 'assigned_member',
       subjectUserId,
@@ -231,4 +243,34 @@ export const resolveSubjectOrganizationRelation = async (
 
   // 5. Base — no relation.
   return { kind: 'no_relation', subjectUserId, organizationId }
+}
+
+
+/** Same canonical SQL and precedence, batched within the caller's snapshot; no per-space roundtrips. */
+export const resolveSubjectOrganizationRelations = async (
+  input: { subjectUserId: string; subjectTenantType: SubjectTenantType; targets: { organizationId: string; spaceId: string }[] },
+  { readQuery = query }: { readQuery?: typeof query } = {}
+): Promise<Map<string, SubjectOrganizationRelation>> => {
+  if (!input.targets.length) return new Map()
+  if (!input.subjectUserId || input.targets.length > 500 ||
+      new Set(input.targets.map(target => target.spaceId)).size !== input.targets.length) throw new Error('invalid_relation_batch')
+  // Substitute only the canonical SQL's parameter references, never caller text.
+  const correlated = QUERY_SQL.replace(/\$2\b/g, 'target.organization_id').replace(/\$3\b/g, 'target.space_id')
+
+  const rows = await readQuery<ResolverRow & { space_id: string }>(
+    `SELECT target.space_id,relation.* FROM jsonb_to_recordset($2::jsonb)
+      AS target(organization_id text,space_id text) CROSS JOIN LATERAL (${correlated}) relation`,
+    [input.subjectUserId, JSON.stringify(input.targets.map(target => ({ organization_id: target.organizationId, space_id: target.spaceId })))]
+  )
+
+  if (rows.length !== input.targets.length || new Set(rows.map(row => row.space_id)).size !== rows.length) throw new Error('invalid_relation_batch')
+  const bySpace = new Map(input.targets.map(target => [target.spaceId, target]))
+
+  return new Map(rows.map(row => {
+    const target = bySpace.get(row.space_id)
+
+    if (!target) throw new Error('invalid_relation_batch')
+
+    return [row.space_id, relationFromRow({ ...input, ...target }, row)]
+  }))
 }

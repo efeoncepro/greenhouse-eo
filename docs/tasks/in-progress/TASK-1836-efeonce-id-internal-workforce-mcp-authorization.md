@@ -1158,3 +1158,10 @@ Pruebas mínimas para aceptar el cambio: el mismo token base permite A/B autoriz
 objetivo ausente o ambiguo falla cerrado; revocar capability del actor deniega A/B; retirar acceso o módulo de B no
 afecta A; concurrencia A/B no cruza argumentos, resultados ni handles; y un consentimiento anterior no adquiere
 autoridad multiorganización silenciosamente.
+
+## Delta local TASK-1844 — 2026-09-08
+
+TASK-1844 implementa autoridad interna v2 por target y consentimiento nuevo, detrás de gates OFF.
+Esta task conserva su entrega uniorganización original. El delta no reabre TASK-1813 ni amplía el canary
+TASK-1832 o el piloto TASK-1841. [QA local](../../audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md) ·
+[rollout y clientes pendientes](../../operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md).

@@ -15,13 +15,13 @@
 - Type: `implementation`
 - Execution profile: `backend-data`
 - UI impact: `copy`
-- UI ready: `no`
-- Wireframe: `docs/ui/wireframes/TASK-1835-efeonce-id-login-consent-screens.md`
+- UI ready: `yes`
+- Wireframe: `docs/ui/wireframes/TASK-1844-internal-multi-org-consent.md`
 - Flow: `docs/ui/flows/TASK-1835-efeonce-id-login-consent-screens-flow.md`
 - Motion: `docs/ui/motion/TASK-1835-efeonce-id-login-consent-screens-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `2026-09-08: goal confirmado; discovery, plan y checkpoint humano P1/Alto aprobados; inicia implementación. PG real exige context_version=1 y unicidad sin versión; el plan propone transición coordinada y permisos efectivos por target. Baseline: 52 pruebas focales passed; tipos y lint sin errores (26 warnings UI previos); gateway check con 154 passed, 0 skipped y build correcto. Delta ADR Accepted. Sin código v2, migración, cambio de permisos, deploy ni activación.`
+- Status real: `2026-09-08: code complete, rollout pendiente. Contrato v2 implementado en Greenhouse y gateway 1.3.0, con actor/targets separados, permisos efectivos por snapshot, consentimiento fresco y refresh sin promoción. 528 pruebas focales Greenhouse, 158 gateway y 2 PG live passed; build/tipos y GVC desktop/390 px correctos. Lint sin errores, 26 warnings UI previos. SQL expand/contract pendientes; schema compartido sigue v1. Gates default OFF; faltan release, apply, cohorte/fixtures runtime, Codex/Claude reales y rollback servido. QA y runbook enlazados abajo.`
 - Rank: `Después del cierre de TASK-1813; antes del uso interno multiorganización en Codex o Claude`
 - Domain: `identity|platform`
 - Blocked by: `none`
@@ -141,10 +141,10 @@ Reglas obligatorias:
 - `../efeonce-mcp/src/mcp.ts` y tests/surface baseline sólo si el plan confirma una tool de descubrimiento propia
 - documentación, tests y runbooks directamente afectados por `TASK-1844`
 
-Ampliación propuesta por discovery: merger efectivo en `src/lib/entitlements`, su consumer
+Ampliación aprobada e implementada: merger efectivo en `src/lib/entitlements`, su consumer
 `src/lib/admin/entitlements-governance.ts`, readers estrictos de tenant/relationship, verifier/context
 del gateway, config/flags, SQL pendientes y copy/renderer del consentimiento. Detalle y límites en
-[Files to modify del plan](../plans/TASK-1844-plan.md#files-to-modify); sujetos a aceptación del plan.
+[Files to modify del plan](../plans/TASK-1844-plan.md#files-to-modify); aceptados en el plan del 2026-09-08.
 
 ## Current Repo State
 
@@ -180,7 +180,7 @@ archivos de pruebas existentes (52 passed). La unicidad PG no incluye versión y
 ese índice; la transición exige expansión, writer compatible y retiro gobernado del índice anterior.
 El reader de delegación actual usa sólo permisos base y la proyección de roles omite parte de su vigencia.
 El texto de consentimiento también requiere un delta `ui-lite`: no puede presentar la lista actual como
-alcance fijo si v2 permite altas/bajas autorizadas sin reconectar. No hay implementación v2 todavía.
+alcance fijo si v2 permite altas/bajas autorizadas sin reconectar. La implementación local y su evidencia posterior viven en la auditoría enlazada en Verification; no se aplicó el cambio de schema compartido.
 
 ## Hybrid Execution Justification
 
@@ -191,8 +191,7 @@ alcance fijo si v2 permite altas/bajas autorizadas sin reconectar. No hay implem
 
 ## UI/UX Contract
 
-- Rigor: `ui-lite`; la estructura de TASK-1835 se reutiliza. `UI ready: no` hasta aceptar y completar
-  el delta de copy/mapping antes del slice 3. Los contratos históricos enlazados son referencia, no prueba v2.
+- Rigor: `ui-lite`; la estructura de TASK-1835 se reutiliza. `UI ready: yes`: delta de copy/mapping completado y verificado por GVC desktop/390 px. Los contratos históricos enlazados son referencia, no prueba v2.
 - Flow/motion: se conservan los contratos de TASK-1835; esta task no añade navegación ni animaciones.
 - Primitive decision: `reuse`; `renderConsentPage`, shell, lista de organizaciones/permisos y botones existentes.
 - Estados: v1/externo conserva presentación; v2 muestra clase dinámica y organizaciones actuales; actor
@@ -214,7 +213,7 @@ y registrar el delta de scenario/dossier antes de declarar UI ready.
 
 ### Design decision log
 
-2026-09-08, propuesto: conservar pantalla y jerarquía actuales; explicar que el acceso sigue las
+2026-09-08, implementado y revisado: conservar pantalla y jerarquía actuales; explicar que el acceso sigue las
 organizaciones autorizadas mientras permanezca activo y rotular la lista como estado actual.
 Se descarta un selector que altere el target del token y una lista estática presentada como alcance fijo.
 
@@ -261,7 +260,7 @@ Se descarta un selector que altere el target del token y una lista estática pre
 
 ### Migration, backfill and rollout
 
-- Migration posture: `expand/contract` propuesta: CHECK 1/2 e índice versionado, writer compatible y retiro posterior del índice anterior tras readback; SQL pendientes, sin borrar datos ni backfill de permisos
+- Migration posture: `expand/contract` preparada: CHECK 1/2 e índice versionado, writer compatible y retiro posterior del índice anterior tras readback; SQL pendientes, sin borrar datos ni backfill de permisos
 - Default state: `flags nuevas OFF para issuer/reader y gateway; v1 sigue siendo el fallback explícito mientras v2 no esté activa`
 - Backfill plan: `sin backfill de consentimiento; los clientes internos reautorizan y crean autoridad v2 de forma explícita`
 - Rollback path: `apagar primero emisión v2, luego consumo v2 en gateway; tokens/consentimientos v2 quedan denegados y v1 uniorganización sigue disponible sólo si la policy de rollback lo autoriza`
@@ -277,27 +276,27 @@ Se descarta un selector que altere el target del token y una lista estática pre
 ### Runtime evidence
 
 - Local checks: `tests focales de auth-server/identity/API Platform + pnpm mcp:manifest:check; pnpm check en ../efeonce-mcp`
-- DB/runtime checks: `transición compatible y readers contra PG real mediante pnpm test:live tras apply aprobado; readback de consentimiento/contexto/token sin exponer secretos`
+- DB/runtime checks: `SQL y readers probados con tablas TEMP en PG real mediante pnpm test:live; apply y readback del schema/contexto/token servido siguen pendientes`
 - Integration checks: `un token interno v2 permite A/B y deniega C antes del provider; missing/ambiguous fail-closed; external/Entra regresión verde`
 - Reliability signals/logs: `deny por organización, context/version drift, revocación aún despachando y reader unavailable; nombres exactos se fijan en el Delta ADR`
 - Production verification sequence: `flags OFF -> deploy compatible Greenhouse -> deploy gateway compatible -> canary interno v2 -> reconsentimiento Codex/Claude -> revocación y rollback -> flags finales/readback`
 
 ### Acceptance criteria additions
 
-- [x] Source of truth, contract surface and consumers are named with real paths or objects. Evidencia: [plan propuesto 2026-09-08](../plans/TASK-1844-plan.md#backenddata-contract); implementación/aceptación pendientes.
-- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit. Evidencia: [plan propuesto 2026-09-08](../plans/TASK-1844-plan.md#backenddata-contract); implementación/aceptación pendientes.
-- [ ] Toda tabla nueva queda declarada con su justificación en `src/lib/auth-server/boundary-domain.test.ts` en el mismo PR.
-- [x] Migration/backfill/rollback posture is explicit and proportional to risk. Evidencia: [plan propuesto 2026-09-08](../plans/TASK-1844-plan.md#backenddata-contract); implementación/aceptación pendientes.
-- [x] Runtime or DB evidence is listed for every contract change beyond docs. Evidencia: [plan propuesto 2026-09-08](../plans/TASK-1844-plan.md#backenddata-contract); implementación/aceptación pendientes.
-- [ ] Errores, audit y señales no exponen PII, tokens, cookies, upstream claims ni organizaciones no autorizadas.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects. Evidencia: [plan aprobado 2026-09-08](../plans/TASK-1844-plan.md#backenddata-contract); aceptado e implementado; rollout pendiente.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit. Evidencia: [plan aprobado 2026-09-08](../plans/TASK-1844-plan.md#backenddata-contract); aceptado e implementado; rollout pendiente.
+- [x] Toda tabla nueva queda declarada con su justificación en `src/lib/auth-server/boundary-domain.test.ts` en el mismo PR. Evidencia: No se agregan tablas ni write targets: se amplía authorization_contexts, ya declarada en boundary-domain.test.ts; gate passed.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk. Evidencia: [plan aprobado 2026-09-08](../plans/TASK-1844-plan.md#backenddata-contract); aceptado e implementado; rollout pendiente.
+- [x] Runtime or DB evidence is listed for every contract change beyond docs. Evidencia: [plan aprobado 2026-09-08](../plans/TASK-1844-plan.md#backenddata-contract); aceptado e implementado; rollout pendiente.
+- [x] Errores, audit y señales no exponen PII, tokens, cookies, upstream claims ni organizaciones no autorizadas. Evidencia: DTO estricto/minimizado, errores genéricos y señales sanitizadas; API/resource y gateway tests passed.
 
 ## Capability Definition of Done — Full API Parity gate
 
-- [ ] La autoridad vive en un reader server-side canónico de Greenhouse; no en la UI, el gateway o un provider.
-- [ ] OAuth, API Platform y gateway consumen el mismo DTO versionado y no duplican reglas de relación/entitlement.
-- [ ] La lectura de organizaciones autorizadas es programática y paginada/minimizada; no depende de IDs escritos en prompts.
-- [ ] Cada tool org-scoped conserva autorización fina, errores sanitizados y recheck del provider.
-- [ ] El cambio no agrega una integración Nexa-específica ni lógica de negocio al gateway.
+- [x] La autoridad vive en un reader server-side canónico de Greenhouse; no en la UI, el gateway o un provider. Evidencia: target-authority.ts + snapshot.ts compartidos por issuer y API Platform; PG live passed.
+- [x] OAuth, API Platform y gateway consumen el mismo DTO versionado y no duplican reglas de relación/entitlement. Evidencia: DTO v2 actor/targets y lectores inyectables; integración y schema estricto gateway passed.
+- [x] La lectura de organizaciones autorizadas es programática y paginada/minimizada; no depende de IDs escritos en prompts. Evidencia: efeonce.organizations.list, keyset reautorizado y máximo 50; tests de paginación/anti-oracle passed.
+- [x] Cada tool org-scoped conserva autorización fina, errores sanitizados y recheck del provider. Evidencia: Wrapper autoriza por target y mantiene provider callback; tests A/B/C y revocación passed.
+- [x] El cambio no agrega una integración Nexa-específica ni lógica de negocio al gateway. Evidencia: Revisión del diff: reader canónico, sin integración Nexa ni SQL en gateway.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -310,7 +309,7 @@ Se descarta un selector que altere el target del token y una lista estática pre
 - [Plan y auditoría TASK-1844](../plans/TASK-1844-plan.md), 2026-09-08.
 - Goal, plan y Delta ADR **aprobados por el operador el 2026-09-08** («Aprobado»).
 - Estrategia `sequential`, sin subagentes; Greenhouse develop y gateway main, checkouts compartidos.
-- Se inicia ejecución secuencial con gates OFF. Apply y rollout se preparan para aprobación final.
+- Implementación secuencial local verificada. Apply y rollout preparados en el runbook para aprobación final.
 - Baseline completo y precisión del enlace GET/POST del consentimiento registrados en
   [el plan](../plans/TASK-1844-plan.md#baseline-completo-previo-a-implementación--2026-09-08).
 
@@ -347,8 +346,8 @@ Se descarta un selector que altere el target del token y una lista estática pre
 
 ### Slice 4 — Consumer gateway y descubrimiento agéntico
 
-- Aceptar el DTO interno N-organizaciones sin colapsarlo; validar ancla/versión y entregar memberships frescas a
-  `evaluateToolAuthority`.
+- Consumir DTO interno v2 con actor/targets separados; validar ancla/versión y entregar la resolución fresca
+  a `evaluateToolAuthority`, sin fabricar memberships por target.
 - Eliminar la igualdad incorrecta entre `gv` del ancla y versiones de objetivos, sustituyéndola por el contrato
   versionado del reader. Mantener el carril v1 fail-closed.
 - Definir e implementar la mínima superficie read-only para que el agente descubra ID/nombre autorizados. Si es
@@ -470,8 +469,8 @@ reales internos, revocación y rollback.
 
 ### Out-of-band coordination required
 
-- Confirmación del operador antes de reautorizar o enviar llamadas desde cada cliente, porque son acciones
-  representacionales externas aunque sean read-only.
+- La aprobación final del paquete de rollout debe cubrir reautorización y pruebas desde los clientes internos;
+  una vez otorgada no se repite la misma confirmación por llamada.
 - No se requiere mutación de Entra. Cualquier cambio descubierto en Entra queda fuera de alcance y exige
   autorización propia.
 
@@ -484,22 +483,26 @@ reales internos, revocación y rollback.
 
 ## Acceptance Criteria
 
-- [x] Delta ADR aceptado separa contexto actor y organización objetivo; JWT/scopes permanecen sin wildcard ni lista de tenants. Evidencia: D8–D11 y aprobación del operador 2026-09-08; implementación por verificar.
-- [ ] Consentimiento/contexto v2 son explícitos y un consentimiento v1 no puede emitir ni refrescar autoridad multiorganización.
-- [ ] Reader machine-only devuelve sólo organizaciones vigentes que el actor puede operar y capability efectiva por target.
-- [ ] Gateway consume N memberships internas sin convertir la versión del ancla en permiso de otra organización.
-- [ ] Existe discovery read-only minimizado para que el agente elija IDs autorizados sin depender de prompts manuales.
-- [ ] Tool org-scoped exige target exacto; missing/ambiguous/C ajena deniegan antes del provider y A sigue funcionando después.
-- [ ] El mismo token/familia opera A y B autorizadas; retirar B no afecta A y revocar al actor deniega ambas.
-- [ ] Prueba concurrente A/B demuestra aislamiento de argumentos, resoluciones, resultados, correlation IDs y handles.
-- [ ] Provider conserva recheck de módulo/entitlement/regla de negocio y el gateway no contiene SQL ni reglas de producto.
-- [ ] Entra legacy, población externa y canary sintético conservan scopes, grants, discovery y canaries sin widening.
+- [x] Delta ADR aceptado separa contexto actor y organización objetivo; JWT/scopes permanecen sin wildcard ni lista de tenants. Evidencia: D8–D11, aprobación 2026-09-08 y pruebas v1/v2 de emisión, refresh y verificación.
+- [x] Consentimiento/contexto v2 son explícitos y un consentimiento v1 no puede emitir ni refrescar autoridad multiorganización. Evidencia: Tests de GET/POST, contexts, refresh ES256 y SQL real TEMP passed; runtime pendiente.
+- [x] Reader machine-only devuelve sólo organizaciones vigentes que el actor puede operar y capability efectiva por target. Evidencia: Snapshot, roles/overrides/relación y todos los spaces probados con PG TEMP; runtime pendiente.
+- [x] Gateway consume actor/targets internos sin convertir la versión del ancla en permiso de otra organización. Evidencia: Policy/reader v2 y rechazo de gv ajeno; revisión target independiente; tests passed.
+- [x] Existe discovery read-only minimizado para que el agente elija IDs autorizados sin depender de prompts manuales. Evidencia: Tool interna v2/base-only con annotations, structuredContent, baseline 1.3.0 y tests.
+- [x] Tool org-scoped exige target exacto; missing/ambiguous/C ajena deniegan antes del provider y A sigue funcionando después. Evidencia: SDK callback real con A/B/C, missing y A después del deny; pruebas locales passed.
+- [x] El mismo token/familia opera A y B autorizadas; retirar B no afecta A y revocar al actor deniega ambas. Evidencia: Contrato SDK concurrente y OAuth v2/refresh local; revocación selectiva/global passed. Falta certificación cliente real.
+- [x] Prueba concurrente A/B demuestra aislamiento de argumentos, resoluciones, resultados, correlation IDs y handles. Evidencia: Callbacks SDK intercalados validan target, resultado y marcadores de correlación/handle por request; runtime pendiente.
+- [x] Provider conserva recheck de módulo/entitlement/regla de negocio y el gateway no contiene SQL ni reglas de producto. Evidencia: No cambia el callback del provider; wrapper preserva argumentos autorizados y recheck existente.
+- [ ] Entra legacy, población externa y canary sintético conservan scopes, grants, discovery y canaries sin widening. Regresión local passed; readback post-rollout pendiente, sin mutar esos carriles.
 - [ ] Codex y Claude completan consentimiento fresco, tools/list, A/B allow, C deny, refresh y revocación post-rollout.
-- [ ] Un cambio posterior de organización/capability se refleja sin reconectar; un cambio material de scope/autoridad exige nuevo consentimiento.
+- [x] Un cambio posterior de organización/capability se refleja sin reconectar; un cambio material de scope/autoridad exige nuevo consentimiento. Evidencia: Lectura nueva sin caché positiva, pruebas de revocación y consentimientos/clase; runtime pendiente.
 - [ ] Flags OFF/restore y rollback de revisión se prueban contra runtime real con readback de PG, servicios y señales.
-- [ ] Task lint, ops lint, QA auth/integration/runtime/release y cierre documental terminan sin hallazgos propios.
+- [ ] Task lint, ops lint, QA auth/integration/runtime/release y cierre documental terminan sin hallazgos propios. Gates locales documentados en QA; certificación runtime/release pendiente.
 
 ## Verification
+
+- [QA, matriz y límites de evidencia](../../audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md).
+- [Runbook de rollout](../../operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md).
+- [Revisión visual local](../../ui/reviews/TASK-1844/review.md).
 
 - `pnpm task:lint --task TASK-1844`
 - `pnpm vitest run src/lib/auth-server src/lib/identity/internal-access src/lib/api-platform/resources/ecosystem-identity-binding.internal.test.ts`
@@ -514,13 +517,13 @@ reales internos, revocación y rollback.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedó sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla).
-- [ ] El archivo vive en la carpeta correcta (`to-do/`, `in-progress` o `complete/`).
-- [ ] `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md` y `EPIC-044` quedaron sincronizados.
-- [ ] `Handoff.md` quedó actualizado con rollout, riesgos, flags y siguiente paso.
-- [ ] `changelog.md` quedó actualizado cuando cambió comportamiento o protocolo visible.
-- [ ] Se ejecutó chequeo de impacto cruzado sobre TASK-1813, TASK-1831, TASK-1832, TASK-1836 y TASK-1841.
-- [ ] El criterio sólo se declara completo con runtime y clientes; flags OFF o código local se reportan como `code complete, rollout pendiente`.
+- [x] `Lifecycle` del markdown quedó sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla). Evidencia: Sigue in-progress hasta runtime/clientes completos.
+- [x] El archivo vive en la carpeta correcta (`to-do/`, `in-progress` o `complete/`). Evidencia: Se conserva docs/tasks/in-progress/.
+- [x] `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md` y `EPIC-044` quedaron sincronizados. Evidencia: Índices y EPIC-044 actualizados con code complete, rollout pendiente.
+- [x] `Handoff.md` quedó actualizado con rollout, riesgos, flags y siguiente paso. Evidencia: Continuidad enlaza QA y runbook con gates/aprobación pendientes.
+- [x] `changelog.md` quedó actualizado cuando cambió comportamiento o protocolo visible. Evidencia: Entrada 2026-09-08 actualizada al comportamiento implementado.
+- [x] Se ejecutó chequeo de impacto cruzado sobre TASK-1813, TASK-1831, TASK-1832, TASK-1836 y TASK-1841. Evidencia: TASK-1831/1836 enlazan este delta; TASK-1813 conserva cierre, TASK-1832 su canary y TASK-1841 el piloto real.
+- [x] El criterio sólo se declara completo con runtime y clientes; flags OFF o código local se reportan como `code complete, rollout pendiente`. Evidencia: QA BLOCK para cierre operativo por rollout pendiente; no se mueve a complete.
 
 ## Follow-ups
 
@@ -529,5 +532,6 @@ reales internos, revocación y rollback.
 
 ## Open Questions
 
-- El Delta ADR debe decidir si discovery se entrega como tool gateway-native, resource MCP o extensión minimizada de una lectura existente; debe ser seleccionable por agentes, paginada y no filtrar tenants ajenos.
-- Confirmar la cota de revocación objetivo para autoridad de una sola organización sin introducir caché positiva.
+- Resuelto: tool gateway-native efeonce.organizations.list, paginada y minimizada; D9.
+- Resuelto: nueva resolución después de revocación comprometida, cota a demostrar ≤60 s sin caché positiva; D11.
+- Pendiente de rollout: manifiesto de fixtures runtime y readback fresco de cohorte antes de activar.

@@ -113,6 +113,10 @@ export const renderStepUpRequiredPage = (returnTo?: string): string =>
   )
 
 export type ConsentPageInput = {
+  authorizationContextId?: string | null
+  authorizationContextVersion?: 1 | 2
+  authorityClass?: 'internal_multi_org'
+  moreOrganizationsAvailable?: boolean
   organizations: Extract<ConsentContextResolution, { outcome: 'resolved' }>['organizations']
   clientName: string
   clientId: string
@@ -131,6 +135,12 @@ export type ConsentPageInput = {
 export const renderConsentPage = (input: ConsentPageInput): string => {
   if (typeof input.redirectHost !== 'string' || input.redirectHost.trim().length === 0) {
     throw new Error('renderConsentPage requires redirectHost: consent must disclose the authorization destination')
+  }
+
+  const multiOrg = input.authorityClass === 'internal_multi_org'
+
+  if (multiOrg && (input.authorizationContextVersion !== 2 || !input.authorizationContextId || !input.organizations.length)) {
+    throw new Error('multi_org_consent_context_required')
   }
 
   const organizationItems = input.organizations.map(organization => `<li>
@@ -155,16 +165,18 @@ export const renderConsentPage = (input: ConsentPageInput): string => {
   return layout(
     GH_AUTH_SERVER.consent_title,
     `<h1 id="page-title" class="id-title" tabindex="-1">${escapeHtml(GH_AUTH_SERVER.consent_title)}</h1>
-  <p>${escapeHtml(GH_AUTH_SERVER.consent_context_intro(input.organizations.length))}</p>
+  <p>${escapeHtml(multiOrg ? GH_AUTH_SERVER.consent_multi_org_intro : GH_AUTH_SERVER.consent_context_intro(input.organizations.length))}</p>
   <p class="id-destination" data-capture="id-redirect-host"><span class="id-muted">${escapeHtml(GH_AUTH_SERVER.consent_redirect_host_label)}</span> <code class="code">${escapeHtml(input.redirectHost.trim())}</code> <span class="id-muted">${escapeHtml(GH_AUTH_SERVER.consent_redirect_host_hint)}</span></p>
-  <h2 class="id-muted">${escapeHtml(input.organizations.length === 1 ? GH_AUTH_SERVER.consent_organization_label : GH_AUTH_SERVER.consent_organizations_label)}</h2>
-  <ul class="id-organizations" aria-label="${escapeHtml(GH_AUTH_SERVER.consent_organizations_label)}">${organizationItems}</ul>
+  <h2 class="id-muted">${escapeHtml(multiOrg ? GH_AUTH_SERVER.consent_multi_org_organizations_label : input.organizations.length === 1 ? GH_AUTH_SERVER.consent_organization_label : GH_AUTH_SERVER.consent_organizations_label)}</h2>
+  <ul class="id-organizations" data-capture="id-organizations" aria-label="${escapeHtml(GH_AUTH_SERVER.consent_organizations_label)}">${organizationItems}</ul>
+  ${multiOrg ? `<p data-capture="id-multi-org-authority">${escapeHtml(GH_AUTH_SERVER.consent_multi_org_boundary)}</p>${input.moreOrganizationsAvailable ? `<p class="id-muted">${escapeHtml(GH_AUTH_SERVER.consent_multi_org_more)}</p>` : ''}` : ''}
   <ul class="id-permissions" data-capture="id-scopes" aria-label="${escapeHtml(GH_AUTH_SERVER.consent_scope_label)}">
     ${scopeItems}
   </ul>
   <form method="post" action="${escapeHtml(input.actionPath)}" data-capture="id-form">
     <input type="hidden" name="client_id" value="${escapeHtml(input.clientId)}">
     <input type="hidden" name="scope" value="${escapeHtml(input.scopes.join(' '))}">
+    ${input.authorizationContextId ? `<input type="hidden" name="authorization_context_id" value="${escapeHtml(input.authorizationContextId)}"><input type="hidden" name="authorization_context_version" value="${input.authorizationContextVersion ?? 1}">` : ''}
     <input type="hidden" name="return_to" value="${escapeHtml(input.returnTo)}">
     <div class="actions" data-capture="id-actions">
       <button class="secondary" type="submit" name="decision" value="deny">${escapeHtml(GH_AUTH_SERVER.consent_deny_cta)}</button>

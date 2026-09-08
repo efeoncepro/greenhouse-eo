@@ -4,7 +4,7 @@ import { sha256Hex } from '../oauth/primitives'
 import { readCookie } from '../persons/sessions'
 import type { AuthServerPersonAuthConfig } from '../persons/config'
 import type { PersonAuthStorePort } from '../persons/store/port'
-import type { InternalAuthorityPort, createInternalContextService } from './context'
+import type { InternalAuthorityPort, InternalContextVersion, createInternalContextService } from './context'
 
 export const createNativeSubjectPort = (deps: {
   base: SubjectSessionPort
@@ -14,6 +14,7 @@ export const createNativeSubjectPort = (deps: {
   store: PersonAuthStorePort
   authority: InternalAuthorityPort
   contexts: ReturnType<typeof createInternalContextService>
+  contextVersion?: (profileId: string) => InternalContextVersion
   findEnrollment: (input: {
     environmentId: string
     subject: string
@@ -59,6 +60,7 @@ export const createNativeSubjectPort = (deps: {
       if (!enrollment) return null
 
       const resolved = await deps.contexts.create({
+        version: deps.contextVersion?.(evidence.profileId) ?? 1,
         issuer: deps.issuer,
         environmentId: subject.environmentId,
         subject: subject.subject,
@@ -69,7 +71,9 @@ export const createNativeSubjectPort = (deps: {
         expiresAt: session.session.absoluteExpiresAt
       })
 
-      return resolved.allowed ? { ...subject, authorizationContextId: resolved.context.id } : null
+      return resolved.allowed ? {
+        ...subject, authorizationContextId: resolved.context.id, authorizationContextVersion: resolved.context.version
+      } : null
     } catch {
       return null
     }

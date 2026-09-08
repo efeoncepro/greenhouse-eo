@@ -497,10 +497,10 @@ export const getUserPermissionSets = async (userId: string): Promise<UserPermiss
   }))
 }
 
-export const resolvePermissionSetViews = async (userId: string): Promise<string[]> => {
-  const rows = await runGreenhousePostgresQuery<{ view_codes: string[] }>(
+export const resolvePermissionSetViews = async (userId: string, readQuery = runGreenhousePostgresQuery): Promise<string[]> => {
+  const rows = await readQuery<{ view_codes: string[] }>(
     `
-    SELECT ps.view_codes
+    SELECT ps.view_codes,upsa.expires_at
     FROM greenhouse_core.user_permission_set_assignments upsa
     INNER JOIN greenhouse_core.permission_sets ps ON ps.set_id = upsa.set_id
     WHERE upsa.user_id = $1

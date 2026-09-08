@@ -20,7 +20,7 @@ import { htmlResponse, redirectResponse, type OAuthHttpRequest, type OAuthHttpRe
 import { OAUTH_ENDPOINT_PATHS } from './metadata'
 import { renderConsentPage, renderErrorPage, renderLoginRequiredPage, renderStepUpRequiredPage } from './pages/render'
 import { generateOpaqueId, generateOpaqueToken, isPkceToken, parseScopeParam, secondsFromNow, sha256Hex } from './primitives'
-import { EFEONCE_MCP_BASE_SCOPE, isWriteScope } from './scopes'
+import { areInternalContextScopesAllowed, EFEONCE_MCP_BASE_SCOPE, isWriteScope } from './scopes'
 import type { OAuthStorePort } from './store/port'
 import type { SubjectSessionPort } from './subject'
 import { AUTHORIZATION_CODE_PREFIX } from './tokens'
@@ -136,6 +136,10 @@ export const handleAuthorize = async (request: OAuthHttpRequest, deps: Authorize
         return htmlResponse(401, renderLoginRequiredPage(`${url.pathname}${url.search}`))
       }
 
+      if (!areInternalContextScopesAllowed(subject.authorizationContextVersion, scopes)) {
+        throw new OAuthProtocolError('invalid_scope', { reason: 'internal_context_scope_class', redirectable: true })
+      }
+
       // 4. Autoridad vigente antes de pedir factor o consentimiento.
       const grants = await deps.grantsPort.resolve({ environmentId: subject.environmentId, subject: subject.subject, clientId: client.clientId, authorizationContextId: subject.authorizationContextId })
 
@@ -155,11 +159,13 @@ export const handleAuthorize = async (request: OAuthHttpRequest, deps: Authorize
       }
 
       const consentContext = await deps.consentContextPort.resolve({
+        authorizationContextVersion: subject.authorizationContextVersion,
         environmentId: subject.environmentId, subject: subject.subject, clientId: client.clientId,
         audience: deps.config.mcpAudience, authorizationContextId: subject.authorizationContextId
       }).catch(() => ({ outcome: 'unavailable' as const }))
 
-      if (consentContext.outcome !== 'resolved' || consentContext.organizations.length === 0) {
+      if (consentContext.outcome !== 'resolved' || consentContext.organizations.length === 0 ||
+        (subject.authorizationContextVersion === 2 && consentContext.authorityClass !== 'internal_multi_org')) {
         throw new OAuthProtocolError(consentContext.outcome === 'unavailable' ? 'temporarily_unavailable' : 'access_denied', {
           reason: 'consent_context_unavailable', redirectable: true
         })
@@ -178,6 +184,10 @@ export const handleAuthorize = async (request: OAuthHttpRequest, deps: Authorize
           200,
           renderConsentPage({
             organizations: consentContext.organizations,
+            authorizationContextId: subject.authorizationContextId,
+            authorizationContextVersion: subject.authorizationContextVersion,
+            authorityClass: consentContext.authorityClass,
+            moreOrganizationsAvailable: consentContext.moreOrganizationsAvailable,
             clientName: client.clientName,
             clientId: client.clientId,
             scopes,

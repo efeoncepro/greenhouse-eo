@@ -364,6 +364,7 @@ jobs:
 
   # TASK-1828 / EPIC-044 — authorization server propio (auth.efeonce.org), Cloud Run
   # us-east4, change-gated como los demás workers. Nace con AUTH_SERVER_ENABLED=false.
+  # TASK-1844: same canonical call; multi-org flag/cohort come from the target GitHub Environment.
   deploy-auth-server:
     name: Deploy auth-server
     needs: [approval-gate]

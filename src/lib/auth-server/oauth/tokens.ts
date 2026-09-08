@@ -20,7 +20,7 @@ export type AccessTokenSigner = (payload: Record<string, unknown>) => Promise<st
 
 export type AccessTokenClaims = {
   authorization_context_id?: string
-  authorization_context_version?: 1
+  authorization_context_version?: 1 | 2
   iss: string
   sub: string
   aud: string
@@ -46,6 +46,7 @@ export type IssuedTokenSet = {
 }
 
 export type IssueTokenSetInput = {
+  authorizationContextVersion?: 1 | 2
   authorizationContextId?: string | null
   client: OAuthClientRecord
   subject: string
@@ -63,7 +64,7 @@ export const buildAccessTokenClaims = (config: AuthServerOAuthConfig, input: Iss
   const iat = Math.floor(input.now.getTime() / 1000)
 
   return {
-    ...(input.authorizationContextId ? { authorization_context_id: input.authorizationContextId, authorization_context_version: 1 as const } : {}),
+    ...(input.authorizationContextId ? { authorization_context_id: input.authorizationContextId, authorization_context_version: input.authorizationContextVersion ?? 1 } : {}),
     iss: config.issuer,
     sub: input.subject,
     aud: config.mcpAudience,

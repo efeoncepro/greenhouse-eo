@@ -26,7 +26,9 @@ import {
 } from '../../src/lib/auth-server/persons/pages'
 
 const host = '127.0.0.1'
-const port = 19036
+const port = Number(process.env.AUTH_SERVER_DEV_UI_PORT ?? 19036)
+
+if (!Number.isInteger(port) || port < 1024 || port > 65535) throw new Error('Invalid dev UI port')
 const authority = `${host}:${port}`
 // This return path is inert: the harness has no OAuth route or command handler.
 const returnTo = '/oauth/authorize?client_id=visual-fixture&scope=efeonce.mcp.read'
@@ -76,6 +78,15 @@ const renderers = new Map<string, () => string>([
         redirectHost: 'application.example.invalid'
       })
   ],
+  ['/consent/multi-org-v2', () => renderConsentPage({
+    clientName: 'Asistente ficticio', clientId: 'https://application.example.invalid/demo',
+    scopes: ['efeonce.mcp.read'], authorityClass: 'internal_multi_org', authorizationContextVersion: 2,
+    authorizationContextId: '11111111-1111-4111-8111-111111111111',
+    organizations: [
+      { organizationName: 'Organización de ejemplo A', capabilities: ['growth.seo.observation.read'] },
+      { organizationName: 'Organización de ejemplo B con un nombre extenso para revisión visual', capabilities: ['growth.seo.observation.read'] }
+    ], returnTo, actionPath: '/noop/consent', redirectHost: 'application.example.invalid'
+  })],
   ['/error/missing', () => renderLoginRequiredPage(returnTo)],
   ['/error/step-up-required', () => renderStepUpRequiredPage(returnTo)],
   ['/error/invalid-redirect', () => renderErrorPage('invalid_redirect_uri')],

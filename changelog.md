@@ -18,15 +18,14 @@ ADR y arquitectura fijan dominio Greenhouse + Artifact Worker, tres salidas de p
 API/UI/MCP, co-branding y grants revocables. TASK-1672/1673 conservan integración de auditoría técnica SEO.
 Sólo planificación autorizada; sin implementación, emisión de reportes ni rollout.
 
-## 2026-09-08 — TASK-1844: discovery y plan de autoridad interna multiorganización
+## 2026-09-08 — TASK-1844: autoridad interna multiorganización implementada
 
-La auditoría de código, PostgreSQL y Cloud Run deja un [plan revisable](docs/tasks/plans/TASK-1844-plan.md)
-y un Delta ADR Proposed: separar actor/target, componer permisos efectivos, consentimiento v2 y migrar la
-unicidad sin romper writers anteriores. Se corrigió la ruta del test focal; cinco archivos, 52 pruebas passed.
-Baseline completo: tipos/lint Greenhouse sin errores (26 warnings UI previos), gateway check con 154 passed
-y build correcto. El plan precisa el enlace de ID/versión entre la pantalla y el POST de consentimiento.
-El operador aprobó plan/ADR tras el baseline; la task inicia implementación con gates OFF. Sin
-migración aplicada, cambio de permisos, reconexión ni rollout.
+Greenhouse resuelve targets por snapshot de roles, relaciones y permisos efectivos; el contexto v2 conserva
+el actor y exige consentimiento fresco. Gateway 1.3.0 agrega discovery minimizado y autorización exacta por
+llamada, sin tenants en JWT ni ampliar scope. Refresh conserva versión y contexto. Writer compatible y SQL
+expand/contract preparados, gates OFF. 528 pruebas Greenhouse, 158 gateway y 2 PG live passed; build/tipos y
+GVC desktop/390 px correctos. Lint conserva 26 warnings previos. [QA](docs/audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md).
+**Code complete, rollout pendiente:** sin apply, push, deploy ni reautorización de clientes en esta entrega.
 
 ## 2026-09-08 — Berel cierra la doctrina de recuperación y QA editorial preventivo
 

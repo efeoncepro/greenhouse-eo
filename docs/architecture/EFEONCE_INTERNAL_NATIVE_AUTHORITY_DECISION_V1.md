@@ -278,7 +278,7 @@ una nueva autenticación humana desde esa entrada hasta `/auth/session`; el clic
 - Fecha: 2026-09-08. Estado: **Accepted; aprobado por el operador («Aprobado»)**.
 - Owner: [TASK-1844](../tasks/in-progress/TASK-1844-efeonce-mcp-internal-multi-organization-authority.md).
 - Contrato, discovery, archivos, migración y evidencia: [plan TASK-1844](../tasks/plans/TASK-1844-plan.md).
-- Aceptación del diseño; no modifica la historia v1 ni afirma implementación/activación de v2. Apply y rollout conservan su aprobación final.
+- Diseño aceptado e implementación local verificada; no modifica la historia v1 ni afirma activación de v2. [QA](../audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md) y [runbook](../operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md). Apply y rollout conservan su aprobación final.
 
 ### D8 — Actor y objetivo tienen autoridad distinta
 

@@ -28,7 +28,7 @@ const config = {
 }
 
 describe('native OAuth multi-context revocation', () => {
-  it('keeps A=10 independent of B=2→3, rejects old signed B, and never downgrades issued internal tokens when OFF', async () => {
+  it.each([1, 2] as const)('context v%s keeps A=10 independent of B=2→3, rejects old signed B, and never downgrades issued internal tokens when OFF', async version => {
     const { privateKey, publicKey } = await generateKeyPair('ES256')
 
     const signer = (claims: Record<string, unknown>) =>
@@ -60,6 +60,7 @@ describe('native OAuth multi-context revocation', () => {
 
     const service = createInternalContextService({
       enabled: () => enabled,
+      allowMultiOrganization: () => enabled,
       now: () => now,
       store: {
         insert: async c => {
@@ -90,7 +91,14 @@ return c
       resolve: vi.fn(async () => ({ bound: true as const, grantsVersion: 99, profileId: 'profile', memberships: 2 }))
     }
 
-    const grantsPort = createNativeGrantsPort({ config, internal: service, external })
+    const grantsPort = createNativeGrantsPort({ config, internal: service, external,
+      resolveMultiOrganization: async request => {
+        const result = await service.resolveStored({ id: request.authorizationContextId!, issuer: config.issuer, audience: config.mcpAudience, environmentId: request.environmentId, subject: request.subject, clientId: request.clientId })
+
+        return result.allowed ? { bound: true, profileId: result.context.profileId, grantsVersion: result.grantsVersion,
+          memberships: 1, authorizationContextVersion: 2 } : { bound: false, profileId: null, outcome: 'revoked' }
+      }
+    })
 
     const client: OAuthClientRecord = {
       clientId: 'client',
@@ -114,6 +122,7 @@ return c
 
     const issue = async (bindingId: string) => {
       const created = await service.create({
+        version,
         issuer: config.issuer,
         environmentId: 'native',
         subject: 'person',
@@ -152,6 +161,7 @@ return c
           scopes: ['efeonce.mcp.read'],
           grantId: `grant-${bindingId}`,
           grantsVersion: grant.grantsVersion,
+          authorizationContextVersion: grant.authorizationContextVersion,
           authTime: now,
           now
         }
@@ -209,9 +219,22 @@ return c
         clientId: 'client',
         audience: config.mcpAudience,
         id: b.input.authorizationContextId,
-        version: 1
+        version
       })
     ).toMatchObject({ allowed: true, capabilities: [], grantsVersion: 3 })
+
+    const rotated = await handleToken({ method: 'POST', url: new URL('/oauth/token', config.issuer),
+      headers: headersFromRecord({ 'content-type': 'application/x-www-form-urlencoded' }),
+      body: new URLSearchParams({ grant_type: 'refresh_token', client_id: 'client', refresh_token: a.tokens.refresh_token }).toString()
+    }, { store, config, signer, grantsPort, cimd: { resolveAddresses: async () => [], fetcher: async () => { throw new Error('unexpected CIMD') } }, now: () => now })
+
+    expect(rotated.status).toBe(200)
+    const refreshed = JSON.parse(rotated.body)
+    const claims = (await jwtVerify(refreshed.access_token, publicKey, { currentDate: now })).payload
+
+    expect(claims.authorization_context_version).toBe(version)
+    expect(claims.authorization_context_id).toBe(a.input.authorizationContextId)
+    expect(refreshed.refresh_token).not.toBe(a.tokens.refresh_token)
 
     enabled = false
     expect(await resolveToken(a.tokens.access_token)).toEqual({ allowed: false, reason: 'disabled' })
@@ -246,7 +269,7 @@ return c
 
     expect(refresh.status).toBe(400)
     expect(JSON.parse(refresh.body).error).toBe('invalid_grant')
-    expect(store.refreshTokens.size).toBe(2)
+    expect(store.refreshTokens.size).toBe(3)
     expect(external.resolve).not.toHaveBeenCalled()
     // A genuinely legacy request still uses its explicit external lane, proving the spy is live.
     expect(await grantsPort.resolve({ environmentId: 'native', subject: 'person', clientId: 'client' })).toMatchObject({

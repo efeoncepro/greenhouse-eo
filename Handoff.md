@@ -2,11 +2,11 @@
 
 EPIC-045: diseño.
 
-**TASK-1844 (2026-09-08):** goal confirmado; [plan](docs/tasks/plans/TASK-1844-plan.md) y ADR Accepted
-aprobados; inicia implementación. PG sólo admite v1. Baseline: 52 pruebas focales y 154 gateway passed;
-tipos/build correctos, lint sin errores y 26 warnings UI previos. Consentimiento GET/POST precisado en el plan.
-Sin código v2, apply ni rollout. Implementar con gates OFF; checkouts compartidos,
-Greenhouse develop/gateway main, sin worktrees/subagentes.
+**TASK-1844 (2026-09-08):** code complete, rollout pendiente. V2 actor/targets y consentimiento fresco
+verificados localmente, gateway 1.3.0. SQL expand/contract pendientes; schema compartido sigue v1.
+[QA](docs/audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md) ·
+[rollout](docs/operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md). Falta aprobación de push/apply/release,
+fixtures y clientes reales. Preservar EPIC-045.
 
 **Berel (2026-09-08):** [cadencia mensual](docs/operations/BEREL_CLIENT_COLLABORATION_OPERATING_MODEL_V1.md)
 aprobada internamente y skill espejo alineada. Activar sólo tras aceptación de Anel, Fer y Marce; no se envió

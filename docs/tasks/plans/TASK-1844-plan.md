@@ -1,13 +1,13 @@
 # Plan — TASK-1844: autoridad interna multiorganización
 
 - Fecha: 2026-09-08.
-- Estado: **aprobado por el operador el 2026-09-08**. Discovery y baseline completos; inicia implementación.
+- Estado: **aprobado por el operador el 2026-09-08**. Implementación local verificada; **code complete, rollout pendiente**. [QA](../../audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md) y [runbook](../../operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md).
 - Goal: confirmado por el operador («Ok vamos»). Implementación y evidencia A/B/C, revocación,
   concurrencia, refresh y rollback en Greenhouse y efeonce-mcp; clientes Codex/Claude reales para cierre.
 - Checkout: Greenhouse `develop`, gateway `main`, ambos compartidos; sin worktrees ni subagentes.
 - Límite: scope base, externos/canary y Entra sin ampliación. Rollout preparado para aprobación final.
 - [Task](../in-progress/TASK-1844-efeonce-mcp-internal-multi-organization-authority.md) ·
-  [Delta ADR propuesto](../../architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md#delta-task-1844--autoridad-interna-multiorganización-accepted).
+  [Delta ADR Accepted](../../architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md#delta-task-1844--autoridad-interna-multiorganización-accepted).
 
 ## Discovery summary
 
@@ -158,7 +158,7 @@ del índice sin versión. Cambiar sólo el índice rompería el writer previo co
    protegiendo los datos. Esta fase requiere aprobación de apply y readback por su incompatibilidad binaria.
 4. Activar v2 sólo después de ambas fases, readers y gateway compatibles y cohortes preparadas.
 
-Los SQL permanecen en `pending-migrations/*.sql.pending` hasta su apply gobernado. No usar
+Los SQL permanecen en `docs/tasks/pending-migrations/TASK-1844-*.sql.pending` hasta su apply gobernado. No usar
 `pg:connect:migrate` como comando de conexión. Rollback posterior a la fase 3 sólo hacia una revisión con
 writer compatible: volver al binario antiguo ya no es seguro. Retener schema/contextos/consentimientos para
 auditoría; no borrar ni restaurar a ciegas un índice incompatible con v1/v2 coexistentes.
@@ -206,9 +206,9 @@ de cada slice y commit; cualquier solapamiento ajeno se preserva y obliga a reso
    authority mutable en global ni reutilizar la respuesta de tools/list. Agregar `efeonce.organizations.list`
    con schema de entrada/salida y cuatro annotations read-only; únicamente población interna v2/base read.
    El wrapper entrega el resultado de esa misma petición al callback, sin otra resolución divergente.
-5. Verificar matrices unitarias/integración/local y preparar certificación PG. Como la instancia PG es
-   compartida y aún tiene CHECK v1, la prueba v2 real depende del apply aprobado; nunca saltarse ese gate
-   ni llamar passed a skipped. Preparar PR/release y evidencia para aprobación final de rollout.
+5. Verificar matrices unitarias/integración/local y preparar certificación PG. La instancia PG compartida conserva CHECK v1; los SQL/readers v2 se probaron con tablas TEMP y rollback
+   mediante pnpm test:live. La prueba del schema servido sigue dependiendo del apply aprobado; no equiparar
+   TEMP con migración aplicada ni llamar passed a skipped. Preparar PR/release y evidencia para aprobación final de rollout.
 6. Con rollout aprobado: expansión, writers compatibles, contrato de unicidad, gateway OFF, readbacks,
    activación controlada, consentimiento y clientes reales, revocación/rollback y restauración acordada.
 7. Actualizar evidencia en task, arquitectura, TASK-1836/1831, runbooks, índices y handoff; cierre sólo con
@@ -219,7 +219,7 @@ de cada slice y commit; cualquier solapamiento ajeno se preserva y obliga a reso
 - `src/lib/identity/internal-access/target-authority.ts` y tests: primitive objetivo/discovery v2.
 - `src/lib/entitlements/effective.ts` y tests: merger reusable con precedencia vigente.
 - Tests PG `*.live.test.ts` focales y fixture run-owned separado del canary TASK-1832; manifiesto de cleanup.
-- Dos SQL de migración en `pending-migrations/` (IDs asignados por tooling al implementar).
+- Dos SQL de migración en `docs/tasks/pending-migrations/` (IDs asignados por tooling al implementar).
 - `../efeonce-mcp/src/tools/organizations.ts` y tests, si el patrón del registro exige módulo propio.
 - Auditoría de implementación/rollout en `docs/audits/mcp/` y delta de contrato UI-lite previo al slice 3.
 

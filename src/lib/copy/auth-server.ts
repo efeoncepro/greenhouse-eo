@@ -48,6 +48,10 @@ export const GH_AUTH_SERVER = {
   // Consentimiento
   consent_title: 'Autorizar acceso',
   consent_scope_label: 'Permiso',
+  consent_multi_org_intro: 'Esta aplicación podrá leer las organizaciones a las que tengas acceso en Efeonce. Si tus permisos cambian, su acceso también cambiará.',
+  consent_multi_org_organizations_label: 'Organizaciones autorizadas ahora',
+  consent_multi_org_more: 'Mostramos las primeras 50 organizaciones autorizadas. La aplicación puede consultar la lista completa de forma paginada.',
+  consent_multi_org_boundary: 'Este permiso incluye las organizaciones que se te autoricen después para esta misma clase de lectura. Los permisos de otra clase requieren una nueva autorización.',
   consent_organizations_label: 'Organizaciones de este acceso',
   consent_organization_label: 'Organización de este acceso',
   consent_context_intro: (count: number) => count === 1

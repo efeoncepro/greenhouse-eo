@@ -5,12 +5,14 @@ import type { ExternalAccessResolution, ExternalOrganizationBinding } from '@/li
 import type { AuthServerOAuthConfig } from '../oauth/config'
 import type { ConsentContextPort, ConsentContextResolution } from '../oauth/consent-context'
 import type { InternalContextRequest, InternalContextResolution } from './context'
+import type { InternalTargetResolution } from '@/lib/identity/internal-access/target-authority'
 
 type Config = Pick<AuthServerOAuthConfig, 'issuer' | 'environmentId' | 'mcpAudience'>
 type Membership = { bindingId: string; organizationId: string; grantsVersion: number; capabilities: readonly string[] }
 export type ConsentContextDependencies = {
   config: Config
   internal: { resolve(input: InternalContextRequest): Promise<InternalContextResolution> }
+  multiOrganization?: (input: InternalContextRequest) => Promise<InternalTargetResolution>
   external: (input: { environmentId: string; subject: string; clientId: string }) => Promise<ExternalAccessResolution>
   getBinding: (bindingId: string, population: 'internal' | 'external') => Promise<Pick<ExternalOrganizationBinding,
     'bindingId' | 'organizationId' | 'environmentId' | 'population' | 'organizationName' | 'status' | 'revokedAt' | 'grantsVersion'
@@ -38,7 +40,7 @@ export const createConsentContextPort = (deps: ConsentContextDependencies): Cons
 
         const resolved = await deps.internal.resolve({
           id: input.authorizationContextId,
-          version: 1,
+          version: input.authorizationContextVersion ?? 1,
           issuer: deps.config.issuer,
           environmentId: input.environmentId,
           subject: input.subject,
@@ -51,7 +53,7 @@ export const createConsentContextPort = (deps: ConsentContextDependencies): Cons
 
         if (
           context.id !== input.authorizationContextId ||
-          context.version !== 1 ||
+          context.version !== (input.authorizationContextVersion ?? 1) ||
           context.issuer !== deps.config.issuer ||
           context.environmentId !== input.environmentId ||
           context.subject !== input.subject ||
@@ -59,6 +61,19 @@ export const createConsentContextPort = (deps: ConsentContextDependencies): Cons
           context.audience !== input.audience
         )
           return { outcome: 'denied' }
+
+        if (context.version === 2) {
+          const result = await deps.multiOrganization?.({ ...context, id: context.id })
+
+          if (result?.outcome !== 'resolved' || !result.targets.length) return { outcome: 'denied' }
+
+          return {
+            outcome: 'resolved', population: 'internal', authorityClass: 'internal_multi_org',
+            moreOrganizationsAvailable: result.nextAfterOrganizationId !== null,
+            organizations: result.targets.map(target => ({ organizationName: target.organizationName, capabilities: target.capabilities }))
+          }
+        }
+
         population = 'internal'
         memberships = [
           {
@@ -118,11 +133,13 @@ export const createConsentContextPort = (deps: ConsentContextDependencies): Cons
 /** Production composition reuses the canonical readers; internal contexts are supplied by runtime. */
 export const createRuntimeConsentContextPort = (
   config: Config,
-  internal: ConsentContextDependencies['internal']
+  internal: ConsentContextDependencies['internal'],
+  multiOrganization?: ConsentContextDependencies['multiOrganization']
 ): ConsentContextPort =>
   createConsentContextPort({
     config,
     internal,
+    multiOrganization,
     external: resolveExternalAccess,
     getBinding: (bindingId, population) => population === 'internal'
       ? getInternalOrganizationBindingPresentation(bindingId)

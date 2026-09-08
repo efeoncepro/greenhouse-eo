@@ -17,7 +17,8 @@ import { VIEW_ENTITLEMENT_BINDINGS } from '@/lib/admin/entitlement-view-map'
 import { getAdminAccessOverview } from '@/lib/admin/get-admin-access-overview'
 import { resolveAuthorizedViewsForUser } from '@/lib/admin/view-access-store'
 import { getTenantEntitlements } from '@/lib/entitlements/runtime'
-import type { TenantEntitlement, TenantEntitlementSubject } from '@/lib/entitlements/types'
+import { buildEffectiveEntitlements, type EffectiveEntitlementRecord } from '@/lib/entitlements/effective'
+import type { TenantEntitlementSubject } from '@/lib/entitlements/types'
 import { buildUserPublicId } from '@/lib/ids/greenhouse-ids'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
@@ -28,7 +29,6 @@ import {
 } from '@/lib/tenant/resolve-portal-home-path'
 
 type EntitlementEffect = 'grant' | 'revoke'
-type GovernanceOriginType = 'runtime_base' | 'role_default' | 'user_override'
 type GovernanceApprovalStatus = 'approved' | 'pending_approval' | 'rejected'
 
 type RoleDefaultRow = {
@@ -90,14 +90,6 @@ type PendingUserOverrideApprovalRow = {
 
 const PLATFORM_SPACE_ID = '__platform__'
 const MAX_AUDIT_ROWS = 40
-
-const SOURCE_LABELS: Record<TenantEntitlement['source'], string> = {
-  role: 'Rol base',
-  route_group: 'Route group',
-  authorized_view: 'Vista derivada',
-  scope: 'Scope',
-  policy: 'Policy'
-}
 
 const POLICY_SORT_ORDER: PortalHomePolicyKey[] = [
   'internal_default',
@@ -174,16 +166,7 @@ export type UserEntitlementOverrideRecord = {
   updatedAt: string
 }
 
-export type EffectiveEntitlementRecord = {
-  module: EntitlementCatalogEntry['module']
-  capability: EntitlementCapabilityKey
-  action: EntitlementAction
-  scope: EntitlementScope
-  originType: GovernanceOriginType
-  originLabel: string
-  source: TenantEntitlement['source']
-  expiresAt: string | null
-}
+export type { EffectiveEntitlementRecord } from '@/lib/entitlements/effective'
 
 export type StartupPolicySummary = {
   policyKey: PortalHomePolicyKey
@@ -564,81 +547,6 @@ const buildEntitlementSubject = async ({
   }
 }
 
-const buildEffectiveEntitlements = ({
-  baseEntries,
-  roleDefaults,
-  userOverrides,
-  userRoleCodes
-}: {
-  baseEntries: TenantEntitlement[]
-  roleDefaults: RoleEntitlementDefaultRecord[]
-  userOverrides: UserEntitlementOverrideRecord[]
-  userRoleCodes: string[]
-}) => {
-  const registry = new Map<string, EffectiveEntitlementRecord>()
-
-  for (const entry of baseEntries) {
-    registry.set(
-      entitlementKey(entry),
-      {
-        module: entry.module,
-        capability: entry.capability,
-        action: entry.action,
-        scope: entry.scope,
-        originType: 'runtime_base',
-        originLabel: SOURCE_LABELS[entry.source],
-        source: entry.source,
-        expiresAt: null
-      }
-    )
-  }
-
-  for (const row of roleDefaults.filter(candidate => userRoleCodes.includes(candidate.roleCode))) {
-    const key = entitlementKey(row)
-
-    if (row.effect === 'grant') {
-      registry.set(key, {
-        module: row.module,
-        capability: row.capability,
-        action: row.action,
-        scope: row.scope,
-        originType: 'role_default',
-        originLabel: `Default ${row.roleName}`,
-        source: 'role',
-        expiresAt: null
-      })
-    } else {
-      registry.delete(key)
-    }
-  }
-
-  for (const row of userOverrides.filter(override => override.approvalStatus === 'approved')) {
-    const key = entitlementKey(row)
-
-    if (row.effect === 'grant') {
-      registry.set(key, {
-        module: row.module,
-        capability: row.capability,
-        action: row.action,
-        scope: row.scope,
-        originType: 'user_override',
-        originLabel: 'Excepción manual',
-        source: 'policy',
-        expiresAt: row.expiresAt
-      })
-    } else {
-      registry.delete(key)
-    }
-  }
-
-  return Array.from(registry.values()).sort((a, b) => {
-    if (a.module !== b.module) return a.module.localeCompare(b.module)
-    if (a.capability !== b.capability) return a.capability.localeCompare(b.capability)
-    if (a.action !== b.action) return a.action.localeCompare(b.action)
-
-    return a.scope.localeCompare(b.scope)
-  })
-}
 
 export const getEntitlementsGovernanceOverview = async (spaceId?: string | null): Promise<EntitlementsGovernanceOverview> => {
   const effectiveSpaceId = normalizeSpaceId(spaceId)
