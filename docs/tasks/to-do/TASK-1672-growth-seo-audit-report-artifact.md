@@ -124,7 +124,7 @@ Grupo Berel**, no es supuesto.
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|ui`
-- Blocked by: `none` en tasks — **pero el gate NO se levantó**: el artefacto no se publica hasta que `GROWTH_SEO_SITE_FINDINGS_ENABLED` esté en `ON` en producción con una corrida real verificada. Ver Delta 2026-09-01 (2)
+- Blocked by: `TASK-1845, TASK-1847` en tasks — **pero el gate NO se levantó**: el artefacto no se publica hasta que `GROWTH_SEO_SITE_FINDINGS_ENABLED` esté en `ON` en producción con una corrida real verificada. Ver Delta 2026-09-01 (2)
 - Branch: `Greenhouse develop; local-first, sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -442,6 +442,8 @@ sitio cerrado a los motores de respuesta.
 
 ## Acceptance Criteria
 
+- [ ] El artefacto de auditoría técnica se integra como sección/version de Insights mediante TASK-1845/1847; conserva los gates existentes, evidencia/asOf, audiencia y densidades, sin segundo snapshot ni renderer general.
+
 - [ ] Se declaró `Execution profile: ui-ux` y `UI impact: layout`.
 - [ ] Un solo modelo con `variant`; NO existen dos documentos paralelos.
 - [ ] La portada cabe en una plana y contiene dominio, **fecha del crawl**, salud con su alcance
@@ -499,3 +501,9 @@ sitio cerrado a los motores de respuesta.
    sólo en la superficie web.
 3. ¿La portada muestra el delta contra el crawl anterior (`previous`, ya disponible)? Suma
    contexto, pero también ruido cuando es el primer crawl. Propuesta: sólo si existe comparación.
+
+## Delta 2026-09-08 — Consumer especializado de Efeonce Insights
+
+Esta task conserva el artefacto especializado de auditoría técnica, las dos densidades y sus gates de hallazgos/frescura. Se adapta al snapshot/plan y catálogos de Insights (TASK-1845/1847), sin crear otro motor ni congelar cifras por separado. La fuente de sus hallazgos y el contrato ReportArtifactModel se conservan; el mapping no convierte SEO en score AEO. El consumer genérico de biblioteca/web es TASK-1849; esta task conserva la semántica especializada.
+
+Canon: `docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md`; EPIC-045. Este delta actualiza ownership futuro, no declara implementación ni verifica flags productivos.

@@ -117,6 +117,9 @@ ETV de DataForSEO Labs se versiona por metodología; desde 2026-09-03 producció
 [`GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md`](docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md) ·
 [auditoría](docs/audits/seo/2026-09-01-dataforseo-improved-etv-impact.md).
 
+Efeonce Insights: [arquitectura](docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md), EPIC-045.
+Diseño de deck/A4/web por edición; implementación pendiente en TASK-1845–1849.
+
 Informes: skill `report-studio` (Claude/Codex), evidencia, diseño y QA PDF.
 Berel: `berel-content-production` · [plan](docs/operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md) ·
 [informes](docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md) ·

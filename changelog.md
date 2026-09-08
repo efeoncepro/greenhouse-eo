@@ -7,6 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-08 — Efeonce Insights: arquitectura y programa multiformato
+
+[EPIC-045](docs/epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md) formaliza cinco tasks
+TASK-1845–1849: evidencia/adapters, render durable, catálogos deck/A4, acceso/correo/recurrencia y biblioteca/web.
+ADR y arquitectura fijan dominio Greenhouse + Artifact Worker, tres salidas de primera clase, snapshots,
+API/UI/MCP, co-branding y grants revocables. TASK-1672/1673 conservan integración de auditoría técnica SEO.
+Sólo planificación autorizada; sin implementación, emisión de reportes ni rollout.
+
 ## 2026-09-08 — TASK-1844: discovery y plan de autoridad interna multiorganización
 
 La auditoría de código, PostgreSQL y Cloud Run deja un [plan revisable](docs/tasks/plans/TASK-1844-plan.md)
@@ -950,20 +958,3 @@ Las skills HubSpot espejadas dejaron de contradecir el contrato ya vigente en el
 `project_context.md`: el MCP de HubSpot es un writer válido para cargas manuales bajo confirmación y readback; el
 bridge queda como carril de automatización y su cobertura incompleta no bloquea ese flujo. Los registros comercial
 y de licitaciones quedaron sincronizados con los IDs observados. No hubo postulación ni envío de propuesta.
-
-## 2026-09-01 — el registro del avance entra a los checklists de cierre
-
-`stale-progress` existía pero ningún protocolo mandaba correrlo. Los checklists de cierre de
-`CLAUDE.md` y `AGENTS.md` ahora exigen tildar los acceptance criteria con evidencia, dejar sin
-tildar y con razón lo que no se verificó, poner `Status real` al día y correr
-`pnpm task:lint --task TASK-###` antes de mover a `complete/`.
-
-`ui-flow-contract` deja de romper el gate cuando una task de `to-do/` aparece en el diff sin ser el
-foco: misma calibración que `ui-wireframe-contract`, con test falsable. El footer de `flags:audit`
-deja de llamar «verdad live» a `vercel env ls` (que sólo dice que la variable existe) y nombra
-`vercel env pull`.
-
-Barrido de coherencia sobre los 19 cierres del día: `Lifecycle` desincronizado, 5 rutas stale en los
-índices, 9 estados falsos en el README de tasks, conteos y prosa stale en cinco epics y en
-`AEO_PROGRAM_STATUS.md`, 10 archivos con rutas rotas y cuatro reglas duras apoyadas en hechos ya
-falsos.

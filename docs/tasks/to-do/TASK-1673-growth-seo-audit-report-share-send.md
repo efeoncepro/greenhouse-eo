@@ -30,7 +30,7 @@ Grupo Berel**, no es supuesto.
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `growth|data`
-- Blocked by: `TASK-1672`
+- Blocked by: `TASK-1672, TASK-1848`
 - Branch: `Greenhouse develop; local-first, sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -117,11 +117,11 @@ Reglas obligatorias:
 
 ### Files owned
 
-- `src/lib/growth/seo/audit-report/share/**` — token, enlace corto, revocación, tracking
+- `src/lib/growth/seo/audit-report/share/**` — adapter de grants/delivery Insights; token store y lifecycle transversales en TASK-1848
 - `src/app/api/admin/growth/seo/audit/report/share/**` — rutas del command
 - ruta pública del informe compartido `[definir en Discovery: hub headless vs portal]`
 - `src/lib/copy/growth.ts` — copy del panel de compartir y del correo
-- migración: tabla/columnas del share token `[confirmar en Discovery]`
+- Sin tabla de tokens propia: consumer de los stores de TASK-1848; cualquier metadata específica se justifica en Discovery
 
 ## Current Repo State
 
@@ -319,6 +319,8 @@ elegirlo es aceptar una consecuencia, y la UI la pone **junto a la opción**.
 
 ## Acceptance Criteria
 
+- [ ] El entrypoint SEO usa grants/delivery de TASK-1848, con edición inmutable de TASK-1672, autorización exacta y prueba de revoke/expiry/dedupe; no crea token store, sender ni ledger de transporte paralelo.
+
 - [ ] Se declaró `Execution profile: backend-data` y `Backend impact: command`.
 - [ ] El enlace se crea de forma **idempotente** por `audit_run_id`.
 - [ ] **Revocar apaga el enlace de inmediato**, verificado en runtime.
@@ -367,3 +369,9 @@ elegirlo es aceptar una consecuencia, y la UI la pone **junto a la opción**.
    Alternativa: caducidad larga (90 días) con aviso.
 3. ¿El operador ve las aperturas en la pantalla de auditoría o en un lugar propio? Propuesta: en
    el panel de compartir, junto al enlace que las produjo.
+
+## Delta 2026-09-08 — Consumer especializado de Efeonce Insights
+
+Esta task conserva el entrypoint y las policies especializadas de distribución de auditoría SEO; TASK-1848 posee la nueva infraestructura transversal de grants/delivery. El alcance que antes proponía token store propio se implementa como adapter de los commands Insights, sin segundo ledger/token/sender. Se preservan autorización interna de envío, advertencia del adjunto irrevocable y todos los gates heredados de TASK-1672. Frescura del diagnóstico se muestra por asOf, nunca mutando una versión compartida.
+
+Canon: `docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md`; EPIC-045. Este delta actualiza ownership futuro, no declara implementación ni verifica flags productivos.

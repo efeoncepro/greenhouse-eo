@@ -21,7 +21,9 @@ Panel operativo de epics del repo.
 
 ## Bootstrap actual
 
-- siguiente ID disponible: `EPIC-045`
+- `EPIC-045` — **Efeonce Insights**: cinco tasks TASK-1845–1849 para evidencia SEO/AEO/ICO, render, catálogos deck/A4, sharing/correo/recurrencia y biblioteca/web. Sólo diseño; dos consumers SEO existentes se coordinan sin duplicar. [Spec](to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md).
+
+- siguiente ID disponible: `EPIC-046`
 - `EPIC-044` — **Efeonce Identity, Native Authorization Server and MCP Federation.** Programa P0 `in-progress` para construir y operar el authorization server propio en `auth.efeonce.org`, autenticación humana multiproducto, binding gobernado con Account 360 y gateway multi-issuer. TASK-1813 está completa; TASK-1835 entregó la UI de login/consentimiento y las unidades restantes continúan bajo el mapa U00–U19 del epic. ADR: `EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md`. [Epic](in-progress/EPIC-044-efeonce-identity-authorization-server-and-mcp-federation.md).
 - `EPIC-043` — **Payroll Reliability and Agentic API Parity.** Programa P0 para integridad del cálculo/aprobación, historia y Finance, preflight, PDF/email recuperables y operación canónica desde portal, Nexa, Codex y Claude. Doce tasks nuevas TASK-1816–TASK-1827; TASK-731/1214/1215/730 cerradas por supersesión documental. Primero TASK-1816 / ISSUE-130: publicación atómica y aprobación de versión. [Epic](to-do/EPIC-043-payroll-reliability-and-agentic-api-parity.md).
 - `EPIC-042` — **Efeonce Governed Email Presentation Program.** Coordina la migración incremental de marca, firma, footer, contexto, RRSS elegibles, preferencias e identidad/nota legal para los 30 `EmailType`, sin big bang: legacy por defecto, foundation byte-idéntica, cohorts de máximo cuatro tipos, canary y rollback por tipo. `TASK-1764` es la primera child y gobierna policy/decomposición; las implementaciones se reservan sólo tras aceptar el ADR. Spec: `to-do/EPIC-042-efeonce-governed-email-presentation-program.md`.

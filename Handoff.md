@@ -1,5 +1,7 @@
 # Handoff activo
 
+EPIC-045: diseño.
+
 **TASK-1844 (2026-09-08):** goal confirmado; [plan](docs/tasks/plans/TASK-1844-plan.md) y ADR Accepted
 aprobados; inicia implementación. PG sólo admite v1. Baseline: 52 pruebas focales y 154 gateway passed;
 tipos/build correctos, lint sin errores y 26 warnings UI previos. Consentimiento GET/POST precisado en el plan.

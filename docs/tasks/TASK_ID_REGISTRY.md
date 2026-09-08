@@ -2165,3 +2165,19 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 | `TASK-1844` | `in-progress` | **Efeonce MCP: autoridad interna multiorganización por objetivo.** EPIC-044 U19; backend-data (`integration`), backend-critical, P1/Muy alto/Alto. Extiende el carril interno productivo sin reabrir `TASK-1831`: contexto firmado como ancla del actor, organización objetivo explícita, reader Greenhouse por request, consentimiento v2 sin elevación silenciosa, A/B permitidas, C denegada, revocación/concurrencia y canaries Codex/Claude. Sin wildcard/lista en JWT, scope por organización ni ampliación del canary/Entra. 2026-09-08: discovery PG/Cloud Run y baseline 52+154 pruebas passed, tipos/build correctos y lint sin errores (26 warnings UI previos); goal confirmado, plan/Delta ADR aprobados; inicia implementación. Copy de consentimiento ui-lite identificado. Sin código, apply ni rollout. | `docs/tasks/in-progress/TASK-1844-efeonce-mcp-internal-multi-organization-authority.md` |
 
 > Nota 2026-09-07 (autoridad interna multiorganización): `TASK-1844` queda tomada para el delta posterior a la certificación uniorganización de `TASK-1836`/`TASK-1831`. **Barrido por dominio y superficie**, no por título: `TASK-1836` posee identidad, sesión, consentimiento y autoridad interna productiva de un contexto; `TASK-1831` posee el verifier multi-issuer y ya está implementada; `TASK-1813` posee interoperabilidad OAuth de clientes; ninguna posee una conexión interna que seleccione por llamada entre todas las organizaciones que Greenhouse autoriza al actor. U19 agrega esa capacidad mediante reader canónico, objetivo explícito, reconsentimiento y matriz A/B/C, sin agregar tenants al JWT ni ampliar scopes. Sólo registro: sin implementación, cambio de permisos, migración, deploy, reconexión ni rollout. Siguiente ID libre `TASK-1845`.
+
+| `TASK-1845` | `to-do` | **Efeonce Insights: dominio, evidencia y adaptadores SEO/AEO/ICO.** EPIC-045; P1/Alto/Alto; backend-data, UI none, backend command. Sólo planificación; contrato en arquitectura Insights. | `docs/tasks/to-do/TASK-1845-efeonce-insights-domain-evidence-and-module-adapters.md` |
+
+| `TASK-1846` | `to-do` | **Efeonce Insights: render durable y Artifact Worker multiconsumidor.** EPIC-045; P1/Alto/Alto; backend-data, UI none, backend integration. Sólo planificación; contrato en arquitectura Insights. | `docs/tasks/to-do/TASK-1846-efeonce-insights-durable-artifact-rendering.md` |
+
+| `TASK-1847` | `to-do` | **Efeonce Insights: gráficos y catálogos premium para deck e informe vertical.** EPIC-045; P1/Alto/Alto; ui-ux, UI layout, backend none. Sólo planificación; contrato en arquitectura Insights. | `docs/tasks/to-do/TASK-1847-efeonce-insights-analytical-charts-and-editorial-catalogs.md` |
+
+| `TASK-1848` | `to-do` | **Efeonce Insights: acceso compartido, correo y recurrencia gobernados.** EPIC-045; P1/Alto/Alto; backend-data, UI none, backend command. Sólo planificación; contrato en arquitectura Insights. | `docs/tasks/to-do/TASK-1848-efeonce-insights-sharing-delivery-and-schedules.md` |
+
+| `TASK-1849` | `to-do` | **Efeonce Insights: biblioteca, creación y experiencia web compartida.** EPIC-045; P1/Alto/Alto; ui-ux, UI flow, backend none. Sólo planificación; contrato en arquitectura Insights. | `docs/tasks/to-do/TASK-1849-efeonce-insights-library-builder-and-shared-web.md` |
+
+> Nota 2026-09-08 (Efeonce Insights): TASK-1845–TASK-1849 reservadas tras barrido por dominio/superficie y
+> verificación de filas, notas y filesystem. Cinco unidades: evidencia/adapters/API-MCP; render worker;
+> catálogos deck/A4; grants/correo/recurrencia; experiencia portal/web. TASK-1672/1673 mantienen integración
+> especializada de auditoría SEO, TASK-1644 VisualProfile y EPIC-018 dashboards; no duplicados. Dirección y
+> creación autorizadas por el operador; sin implementación, apply, envío, commit ni rollout. Siguiente ID libre `TASK-1850`.
