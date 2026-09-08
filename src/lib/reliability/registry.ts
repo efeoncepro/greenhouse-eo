@@ -361,7 +361,7 @@ export const STATIC_RELIABILITY_REGISTRY: ReliabilityModuleDefinition[] = [
       'Azure AD (multi-tenant)'
     ],
     smokeTests: [
-      'tests/e2e/smoke/auth-providers.spec.ts'
+      'tests/e2e/smoke/login-session.spec.ts'
     ],
     filesOwned: [
       'src/lib/person-legal-profile/**',

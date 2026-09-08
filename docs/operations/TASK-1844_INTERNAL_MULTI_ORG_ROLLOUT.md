@@ -14,6 +14,12 @@ Se mantienen los límites del [plan](../tasks/plans/TASK-1844-plan.md).
 - Cloud Run previo: `auth-server-00043-ndg` y `efeonce-mcp-gateway-00047-8b5`, 100% de tráfico. Gates internos/canary previos ON; multiorganización ausente/OFF. Vercel Production leído por env pull: reader multiorganización ausente/OFF.
 - Preflight local inicial **blocked** por configuración del observador local y staging CANCELED; se corrige la configuración y se produce evidencia nueva antes de promoción. No se considera verde.
 
+## Correcciones encontradas durante la publicación
+
+- Gateway PR [6](https://github.com/efeoncepro/efeonce-mcp/pull/6) fusionado (`53a14b7`), CI verde. El deploy `34265724918` creó `00048-ctb` pero dejó el tráfico fijado 100% en `00047-8b5`; Ready del servicio no probaba promoción. PR [7](https://github.com/efeoncepro/efeonce-mcp/pull/7) (`45ade93`) incorpora creación sin tráfico, verificación del SHA/digest de candidata, promoción exacta y readback; 164 pruebas locales passed, CI verde, nuevo deploy `34266442254` en ejecución. Ningún gate v2 activado.
+- Greenhouse PR [229](https://github.com/efeoncepro/greenhouse-eo/pull/229), candidato inicial `aafac28a2b`: staging Vercel `dpl_7NNrEK9vZP5xtxe2QoMiVgc5sbpq` READY, smoke general `34265943671` verde. El check Reliability `34266002612` falló porque el registry señalaba `auth-providers.spec.ts`, archivo inexistente. El mapping ahora usa el smoke vigente `login-session.spec.ts`: 2 pruebas Playwright passed contra staging y 15 pruebas de affected-modules passed; se publica el fix antes de promover.
+- Readback de cohorte 18:59:47Z: ancla/enrollment/source link vigentes, única capability `growth.seo.observation.read`, discovery local de 14 targets. La certificación cliente sigue pendiente: Codex CLI `0.153.4` / Claude Code `2.1.263` tienen servidor configurado sin sesión; el Mac está bloqueado y se solicitó desbloqueo al operador. Esto no bloquea la publicación compatible con gates OFF.
+
 ## Paquete y fronteras
 
 - Greenhouse: checkout compartido `develop`; reader, emisor, consentimiento, writer compatible y dos SQL pendientes.
