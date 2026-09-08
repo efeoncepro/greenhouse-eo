@@ -86,6 +86,8 @@ no ejecuta tasks ni autoriza multiagente, datos de clientes para pruebas, envío
 
 ## Exit Criteria
 
+- [ ] Skill efeonce-insights publicada sobre capacidades verificadas, discoverable por MCP y harness; fuente común, mirrors/routing y versiones coherentes. Un agente sin historial completa recetas y negativos con evidencia de llamadas reales (arquitectura §13; TASK-1845/1848/1849).
+
 - [ ] Las cinco hijas cerraron con evidencia y estado runtime honesto; ningún checkbox sólo por código local.
 - [ ] SEO, AEO e ICO/RpA/OTD generan una edición por ventana y comparación válida desde UI/API/MCP.
 - [ ] Web, deck PDF horizontal e informe PDF A4 vertical comparten identidad y hechos sin perder narrativa/legibilidad.

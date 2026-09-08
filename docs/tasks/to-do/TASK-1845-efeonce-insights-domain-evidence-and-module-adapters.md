@@ -89,6 +89,8 @@ El ADR acepta planificación, no acredita implementación. Rutas/tablas nuevas s
 
 ### Files owned
 
+- `docs/mcp/skills/efeonce-insights/SKILL.md` (nuevo propuesto) y `src/mcp/greenhouse/skill-manifest.ts`; contenido operativo y registro.
+
 - `src/lib/insights/{contracts,commands,readers,stores,adapters,editorial}/** (nuevo propuesto)`
 - `src/app/api/platform/{app,ecosystem}/insights/{reports,editions,catalog}/** (rutas propuestas)`
 - `src/mcp/greenhouse/tool-manifest.ts (sólo entradas núcleo Insights; edición serializada)`
@@ -202,6 +204,8 @@ Los modelos por módulo no ofrecen un encargo transversal reproducible por venta
 
 - Pruebas con datos sintéticos de dos organizaciones y readers reales en integración autorizada; límites explícitos de cobertura y aprobación. Registrar canary API/MCP, rollback y manual funcional.
 
+- Crear el manual operativo canónico efeonce-insights y su registro MCP conforme arquitectura §13; recetas verificadas de discovery, ventanas, evidencia, formatos y commands. Declarar versiones/audience/appliesTo y routing; publicar únicamente capacidades construidas.
+
 ## Out of Scope
 
 - Métricas nuevas o fórmulas duplicadas, refresh facturable automático, PPTX/DOCX, editor libre y migración general del Grader.
@@ -262,6 +266,8 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
      ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
+
+- [ ] Skill efeonce-insights autosuficiente para MCP, ligada a tools reales en skill-manifest y accesible por catálogo/reader autorizado; ejemplos de generación/ventana/recuperación ejecutados sin contexto previo, sin fuga de instrucciones internas.
 
 - [ ] Report/edition/snapshot se persisten con ownership por org, código único bajo concurrencia y snapshots sellados inmutables; corrección crea una versión nueva.
 - [ ] Los tres adapters producen hechos con evidencia, unidad, población, cobertura, asOf y metodología; no duplican fórmulas de SEO/AEO/ICO.

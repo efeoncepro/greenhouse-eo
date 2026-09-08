@@ -278,3 +278,47 @@ MCP router/gateway; EMAIL_CATALOG; Report Brand Delivery; Executive Report Deck 
 Pendiente de ejecución: límites medidos/costo, retención por clase, DDL exacto, library de charts server-safe
 tras prueba hermética/licencia y mapa final de primitives/rutas. No son preguntas que impidan registrar el
 programa: tienen dueña y gate explícitos. La selección de library no se hace por moda ni impone proveedor nuevo.
+
+## 13. Habilitación de agentes: skill operativa y distribución
+
+Requisito agregado por el operador el 2026-09-08: una vez construida y verificada la capacidad, cualquier
+agente autorizado que llegue por MCP o harness debe poder descubrir cómo usarla correctamente sin depender
+de esta conversación. Es parte del cierre de las cinco tasks, no un follow-up opcional ni una sexta task.
+
+**Skill propuesta `efeonce-insights`.** TASK-1845 es dueña del contenido operativo canónico y de su conexión
+al catálogo MCP; TASK-1848 aporta distribución/recurrencia; TASK-1849 certifica el recorrido completo y la
+instalación/descubrimiento desde harness. Preparar el contenido al implementar cada command; publicar sólo
+instrucciones verificadas y compatibles con la superficie disponible. Una skill no concede permisos.
+
+- Manual servido: `docs/mcp/skills/efeonce-insights/SKILL.md` (ruta nueva propuesta), registrado en
+  `src/mcp/greenhouse/skill-manifest.ts` con `appliesTo` ligado a tools reales y audience autorizada.
+  Reusar el catálogo, `get_greenhouse_skill` y los recursos existentes; no un segundo distribuidor.
+- Harness: skill local en `.codex/skills/efeonce-insights/` y `.claude/skills/efeonce-insights/` (propuestas),
+  con mirrors y routing explícito. Compartir una fuente de instrucciones operativas mediante generación o
+  sincronización comprobable; un wrapper local no depende de un archivo inaccesible fuera del repo.
+- El manual MCP es autosuficiente para operación remota: no requiere shell, rutas locales, secretos,
+  acceso directo a PG ni leer skills privadas. Su audiencia sigue la policy efectiva de catálogo/tool;
+  habilitarlo para clientes requiere verificación propia, nunca publicar instrucciones internas a todos.
+- Las descripciones de tools disparan la carga del manual antes de acciones relevantes. Harness y MCP
+  reciben entradas compactas y detalle bajo demanda; conectar un cliente no garantiza que cargue una skill.
+  Verificar discovery, lectura y uso, no sólo que el archivo exista.
+
+Contenido mínimo: cuándo usar Insights y elegir deck/A4/web; discovery de módulos y ventanas; scope de
+organización y permisos; ejemplos de encargo simple y multimódulo; comparaciones, cobertura y límites de
+SEO/AEO/ICO; selección honesta de gráficos; narrativa y revisión; branding; IDs/versiones; seguimiento
+asíncrono, idempotencia, cancelación y recuperación parcial; emisión, tokens, descargas, correo y schedules;
+estados de entrega, costos/cuotas, diagnóstico de errores y referencias de evidencia. Diferenciar acciones
+permitidas, aprobación necesaria y capacidades todavía no disponibles. Ejemplos sanitizados, sin datos
+reales de clientes ni tokens reutilizables.
+
+**Evaluación obligatoria con agente sin historial:** descubrir/cargar la skill y crear una edición válida;
+seleccionar ventana/comparación y formato; resolver falta de histórico; recuperar un output fallido sin
+regenerar el exitoso; identificar que read no autoriza send; negar otro tenant; revocar enlace; diferenciar
+accepted de delivered y generación de emisión. Ejecutar por MCP servido y harness local en perfiles de
+prueba, con fixtures sintéticos y evidencia de las llamadas y sus resultados. No contar una respuesta textual
+correcta como prueba de que se ejecutó la operación.
+
+Versionar manual con los contratos y catálogos que enseña. Cada cambio de tool/schema/error/permiso actualiza
+su receta y sus evaluaciones en el mismo cambio; checks de manifest/referencias/mirrors y canary servido
+impiden publicar documentación de capacidades inexistentes. Report Studio, Deck Studio y las skills de
+módulo aportan oficio; la skill Insights enseña a operar el producto sin duplicar sus fórmulas ni sus contratos.

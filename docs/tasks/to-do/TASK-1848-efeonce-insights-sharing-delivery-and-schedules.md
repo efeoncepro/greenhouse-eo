@@ -84,6 +84,8 @@ El ADR acepta planificación, no acredita implementación. Rutas/tablas nuevas s
 
 ### Files owned
 
+- `docs/mcp/skills/efeonce-insights/SKILL.md` (nuevo propuesto), sólo recetas de distribución, en coordinación serial con TASK-1845.
+
 - `src/lib/insights/{sharing,delivery,schedules}/** (nuevo propuesto)`
 - `src/app/api/platform/{app,ecosystem}/insights/{shares,deliveries,schedules}/** (propuesto)`
 - `src/app/api/insights/shared/** (reader público propuesto; no UI)`
@@ -200,6 +202,8 @@ El Grader tiene un enlace activo por reporte y estado especializado; no cubre lo
 
 - Matriz acceso dos orgs, revoke/expiry/inflight, descargas, retiradas, rate limit y no-leak. Doble tick/doble envío/fallo provider, prueba sobre inbox sintético autorizado, webhook/reconciliación y rollback por lane.
 
+- Extender el manual efeonce-insights de TASK-1845 con recetas verificadas de grants, revoke/expiry, descargas, envío, retries y schedules; una sola fuente y edición serializada. No enseñar que leer autoriza enviar.
+
 ## Out of Scope
 
 - Métricas nuevas o fórmulas duplicadas, refresh facturable automático, PPTX/DOCX, editor libre y migración general del Grader.
@@ -260,6 +264,8 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
      ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
+
+- [ ] Manual operativo incluye y prueba aprobación por versión/destinatario, revocación, retry ambiguo, accepted frente a delivered y pausa de schedule; fixtures sanitizados y negativos de permiso/tenant por MCP.
 
 - [ ] Dos grants activos de una edición se revocan individualmente; token desconocido/expirado/revocado no revela identidad ni datos del cliente.
 - [ ] Sólo digest persistido; tests de logs/outbox/analytics/referrer/HTML verifican ausencia de bearer fuera de respuesta autorizada y del carril cifrado efímero.

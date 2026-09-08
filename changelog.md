@@ -9,6 +9,9 @@
 
 ## 2026-09-08 — Efeonce Insights: arquitectura y programa multiformato
 
+Extensión: skill operativa y distribución MCP/harness exigibles al cierre, con fuente común, routing,
+versionado y evaluación de agente sin historial. Se integra en TASK-1845/1848/1849; no agrega tareas.
+
 [EPIC-045](docs/epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md) formaliza cinco tasks
 TASK-1845–1849: evidencia/adapters, render durable, catálogos deck/A4, acceso/correo/recurrencia y biblioteca/web.
 ADR y arquitectura fijan dominio Greenhouse + Artifact Worker, tres salidas de primera clase, snapshots,

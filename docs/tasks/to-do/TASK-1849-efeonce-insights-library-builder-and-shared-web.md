@@ -85,6 +85,8 @@ El ADR acepta planificación, no acredita implementación. Rutas/tablas nuevas s
 
 ### Files owned
 
+- `.codex/skills/efeonce-insights/**` y `.claude/skills/efeonce-insights/**` (nuevas propuestas), wrappers/mirrors/routing del harness y evaluación operativa; no stores ni commands.
+
 - `src/views/greenhouse/insights/** (nuevo propuesto)`
 - `src/components/insights/{library,builder,viewer}/** (nuevo propuesto; charts de TASK-1847)`
 - `src/app/(dashboard)/insights/** y src/app/insights/shared/** (rutas propuestas)`
@@ -247,6 +249,8 @@ Una API de generación no permite al operador revisar y compartir con claridad n
 
 - GVC premium desktop+390px, teclado, reduced motion, links expirados/revocados/unknown y parciales; mismo ID/cifras en web/deck/A4. E2E creación API y MCP visibles en UI, y creación UI visible por readers; producción sólo tras gate de release.
 
+- Certificar la skill efeonce-insights construida por TASK-1845/1848 en MCP y harness: mirrors Codex/Claude y routing local desde la fuente operativa común; evaluación de agente sin historial con llamadas reales y outputs verificados. Sin duplicar lógica ni transporte.
+
 ## Out of Scope
 
 - Métricas nuevas o fórmulas duplicadas, refresh facturable automático, PPTX/DOCX, editor libre y migración general del Grader.
@@ -307,6 +311,8 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
      ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
+
+- [ ] Agente sin esta conversación descubre y usa la skill por MCP servido y harness; genera y consulta una edición, elige formato/ventana, recupera fallo parcial y respeta permisos/envío. Mirrors/routing/versiones pasan y se conserva evidencia de ejecución, no sólo respuestas del agente.
 
 - [ ] Biblioteca organiza por cliente/período/módulo y presenta ID/versión/output/estado; una misma edición reúne web/deck/A4 y cada archivo se identifica.
 - [ ] Form de encargo valida ventana/comparación/módulos/brand/outputs vía command; ninguna query ni cálculo de negocio vive en UI.
