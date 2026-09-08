@@ -1,0 +1,48 @@
+{
+  "observedAt": "2026-09-08T19:49:16.339Z",
+  "checks": [
+    {
+      "conname": "authorization_contexts_check",
+      "definition": "CHECK ((expires_at > created_at))",
+      "convalidated": true
+    },
+    {
+      "conname": "authorization_contexts_check1",
+      "definition": "CHECK (((revoked_at IS NULL) = (revoke_reason IS NULL)))",
+      "convalidated": true
+    },
+    {
+      "conname": "authorization_contexts_context_version_check",
+      "definition": "CHECK ((context_version = ANY (ARRAY[1, 2])))",
+      "convalidated": true
+    }
+  ],
+  "indexes": [
+    {
+      "indexname": "authorization_contexts_session_client_version_uidx",
+      "indexdef": "CREATE UNIQUE INDEX authorization_contexts_session_client_version_uidx ON greenhouse_auth.authorization_contexts USING btree (session_hash, client_id, binding_id, issuer, audience, context_version) WHERE (revoked_at IS NULL)"
+    }
+  ],
+  "triggers": [
+    {
+      "tgname": "authorization_context_version_immutable",
+      "tgenabled": "O"
+    }
+  ],
+  "versions": [
+    {
+      "context_version": 1,
+      "rows": 7
+    }
+  ],
+  "migrations": [
+    {
+      "name": "20260908184942851_task-1844-internal-context-version-expand",
+      "run_on_database_naive": "2026-09-08 18:49:51.032"
+    },
+    {
+      "name": "20260908194829159_task-1844-internal-context-version-contract",
+      "run_on_database_naive": "2026-09-08 19:48:54.551"
+    }
+  ]
+}

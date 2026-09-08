@@ -259,8 +259,19 @@ Estas fichas reflejan evidencia observada, no disponibilidad final. Antes de afi
 
 `ref/still/openai-v1-5` requiere una ficha y un sunset gobernado: OpenAI anunció el retiro de
 `gpt-image-1.5` para el 2026-12-01. No puede seguir actuando como fallback silencioso de transparencia ni heredar
-disponibilidad futura de GPT Image 2. GPT Image 1, 1 Mini y `chatgpt-image-latest` también están deprecated, pero
-no se inventan routeIds de Globe para representar superficies que el runtime no publica.
+disponibilidad futura de GPT Image 2. GPT Image 1 (apagado **2026-10-23**), 1 Mini y `chatgpt-image-latest`
+también están deprecated, pero no se inventan routeIds de Globe para representar superficies que el runtime no
+publica.
+
+**Delta 2026-09-08 — GPT Image 2.5 (Sunburst / Flare) es provider-supported y NO tiene ruta Globe.** Publicados
+con snapshots `…-2026-09-08`; sin `routeId`, sin binding, sin adapter, sin readiness. `gpt-image-2` **no** quedó
+deprecado: `ref/still/openai-v2` no se toca por esto. Y hay un bloqueador propio de este carril antes de
+cualquier integración: **2.5 no tiene calculadora de costo por imagen** — OpenAI declara que la de GPT Image 2 no
+estima su consumo y que tarifas por token iguales no implican costo por imagen igual. El compiler resuelve el
+costo **antes** del gasto para reservar créditos; con 2.5 esa resolución previa no tiene fuente documentada, así
+que integrarlo exige primero una política de reserva sin estimación (medir `usage` real + reserva conservadora),
+no sólo un adapter. Tampoco hay rate limits publicados. Ledger: `GLOBE_MODEL_FLEET_STATUS.md`; contrato:
+`docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`.
 
 ## Cómo leer y modificar una ficha
 

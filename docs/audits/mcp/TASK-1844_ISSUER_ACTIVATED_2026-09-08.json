@@ -1,0 +1,19 @@
+{
+  "observedAt": "2026-09-08T20:10:22.889214+00:00",
+  "service": "auth-server",
+  "revisions": [
+    {
+      "revision": "auth-server-00046-6cf",
+      "trafficPercent": 100,
+      "ready": true,
+      "sha": "741e3a045cc2c98d32d4c75d46b6563c4466cac8",
+      "digest": "gcr.io/efeonce-group/auth-server@sha256:f63e09cabbf4009bd502c4db1bc6c803473081b55b6f9f3faa3a100f60e2da72",
+      "flags": {
+        "AUTH_SERVER_INTERNAL_AUTH_ENABLED": "true",
+        "AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED": "true",
+        "AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS": "identity-greenhouse-auth-client-user-user-efeonce-admin-julio-reyes",
+        "EXTERNAL_IDENTITY_CANARY_ENABLED": "true"
+      }
+    }
+  ]
+}

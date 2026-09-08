@@ -2176,6 +2176,33 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 | `TASK-1849` | `to-do` | **Efeonce Insights: biblioteca, creación y experiencia web compartida.** EPIC-045; P1/Alto/Alto; ui-ux, UI flow, backend none. Sólo planificación; contrato en arquitectura Insights. | `docs/tasks/to-do/TASK-1849-efeonce-insights-library-builder-and-shared-web.md` |
 
+| `TASK-1850` | `complete` | **complete: supersedida por `TASK-1851`**, 2026-09-08, por instrucción del operador. Cierre documental **sin ejecución**: no hubo cambio de código, canary ni gasto. Cubría sólo la mitad OpenAI (habilitar GPT Image 2.5 en el helper canónico + medir `usage`); el scope está absorbido verbatim en TASK-1851, que toma el contrato de proveedores de imagen entero. Historia: `docs/tasks/complete/TASK-1850-openai-gpt-image-2-5-helper-enablement.md`. | `docs/tasks/complete/TASK-1850-openai-gpt-image-2-5-helper-enablement.md` |
+
+| `TASK-1851` | `to-do` | **Contrato de proveedores de imagen: habilitar GPT Image 2.5, resolver el default bloqueado y medir el costo real.** P2/Medio/Alto; backend-data (`integration`), backend-critical, UI none. Supersede a `TASK-1850` y la amplía. Dos defectos de la misma forma en `src/lib/ai/`: el cliente OpenAI no reconoce la familia 2.5 y la degrada en SILENCIO por dos caminos (env var → default `gpt-image-2`; flag CLI → resolución legacy + `input_fidelity` prohibido), y `DEFAULT_IMAGE_PROVIDER` apunta a `imagen-4.0-generate-001`, que la arquitectura declara bloqueado. Cinco slices: contrato 2.5 → falla ruidosa en las tres puertas → medir y resolver `google-imagen` (migrar a Gemini `generateContent` o retirar) → canary con readback de `usage` (OpenAI declara que su costo por imagen NO es estimable) → flag ledger + docs + deltas. NO crea rutas Globe, NO toca el detector de flags, NO cierra TASK-278. | `docs/tasks/to-do/TASK-1851-openai-image-provider-contract-consolidation.md` |
+
+> Nota 2026-09-08 (3) (consolidación del contrato de proveedores de imagen): `TASK-1851` reservada por
+> instrucción del operador para **superseder y ampliar** `TASK-1850`. Partirlo en dos habría dejado
+> `src/lib/ai/openai-image.ts` e `image-generator.ts` con dos dueños y el mismo invariante —«ningún
+> identificador desconocido degrada en silencio»— declarado en dos lugares. **Barrido por dominio y
+> superficie, no por título:** `TASK-1553` posee el catálogo Globe, `ref/still/openai-v2` y
+> `openai-adapter.ts`, y RECIBE la evidencia de `usage` sin que 1851 le invada la superficie;
+> `TASK-1782` (P1) posee la ceguera del auditor de flags y `ENABLE_ASSET_GENERATOR` es una instancia
+> nueva de su Eje 2 con forma de **prefijo** `ENABLE_*` en vez de sufijo — por eso NO nació task propia
+> para ese hallazgo, sólo un Delta; `TASK-278` es el generador Imagen 3/Gemini original y quedó
+> **stale**: sus entregables existen en el repo con 0 de 11 criterios tildados, y 1851 le deja un Delta
+> en vez de tildárselos. `TASK-999` conserva su pin a `gpt-image-2`. Sólo registro: sin implementación,
+> sin probe, sin canary, sin gasto y sin rollout. Siguiente ID libre `TASK-1852`.
+
+> Nota 2026-09-08 (2) (GPT Image 2.5): `TASK-1850` reservada tras **barrido por dominio y superficie, no por
+> título**, sobre `openai-image.ts`, `ai:image`, `gpt-image` y `generate-image.ts`. `TASK-1553` (in-progress)
+> posee el catálogo Globe, `ref/still/openai-v2`, `openai-adapter.ts` y el allowlist del endpoint: esta task NO
+> lo duplica ni le invade la superficie, le ENTREGA la medición de `usage` que hoy le impide reservar créditos
+> para cualquier ruta 2.5, y la decisión de abrir `ref/still/openai-2-5-*` sigue siendo suya. `TASK-278` (P3,
+> `to-do`, `Status real: Diseno`) es el generador Imagen 3 + Gemini SVG original y no posee el proveedor OpenAI.
+> `TASK-999` consume `gpt-image-2` en el command de logo de organización y conserva ese pin. Ninguna task viva
+> poseía el contrato del helper Greenhouse ni el CLI. Sólo registro: sin implementación, sin canary, sin gasto y
+> sin rollout. Siguiente ID libre entonces `TASK-1851`.
+
 > Nota 2026-09-08 (Efeonce Insights): TASK-1845–TASK-1849 reservadas tras barrido por dominio/superficie y
 > verificación de filas, notas y filesystem. Cinco unidades: evidencia/adapters/API-MCP; render worker;
 > catálogos deck/A4; grants/correo/recurrencia; experiencia portal/web. TASK-1672/1673 mantienen integración

@@ -47,6 +47,8 @@ Leyenda estado: ✅ live-validado · 🟢 canary real verde · 🔒 gated (depen
 | `ref/still/nanobanana-2-v1` | Nano Banana · 2 | Vertex (`gemini-3.1-flash-image`) | image-generate | ✅ 07-30 | ✅ driver + promoción + generación UI real 07-30 | run UI `ce06f8b4-ebe9-43b6-9d47-8e4cc901f49a`; 10 créditos |
 | `ref/still/openai-v2` | GPT Image · 2 | OpenAI (`gpt-image-2`) | image-generate | ✅ 07-24 | ✅ driver + promoción + canary real 07-30 | run UI `a81c8049-7772-4933-82f2-1e2e59e5121c`; 14 créditos |
 | `ref/still/openai-v1-5` | GPT Image · 1.5 | OpenAI (`gpt-image-1.5`) | image-generate | ✅ 07-24 | ✅ driver + promoción + canary real gobernado 07-30 | run UI `bf8cd62b-e2d7-4e83-981a-7631a14a5d3a`; 10 créditos |
+| — (sin ruta) | GPT Image · 2.5 Sunburst | OpenAI (`gpt-image-2.5-sunburst`) | image-generate/edit candidate | ⏳ provider-supported | 🔒 no Globe route | publicado 09-08; sin binding ni readiness. **Sin calculadora de costo → la reserva de créditos previa al gasto no tiene fuente**; sin rate limits publicados |
+| — (sin ruta) | GPT Image · 2.5 Flare | OpenAI (`gpt-image-2.5-flare`) | image-generate/edit candidate | ⏳ provider-supported | 🔒 no Globe route | publicado 09-08; mismo bloqueador de costo. Globe `hibernated` desde 09-02: no hay promoción posible |
 | `ref/motion/loop-v1` | Seedance · 2.0 | Fal | video-generate | ✅ 07-19 | ✅ driver Fal | — |
 | `ref/motion/seedance-25-t2v-v1` | Seedance · 2.5 | Fal | video-generate | ⏳ provider-supported | 🔒 no Globe route | Fal endpoint active; contract, adapter, rate, rights, eval, canary and binding pending |
 | `ref/video/seedance-25-i2v-v1` | Seedance · 2.5 | Fal | video-frames candidate | ⏳ provider-supported | 🔒 no Globe route | Fal endpoint active; first/last-frame contract and all Globe gates pending |
@@ -78,6 +80,19 @@ es `routeId + capability + provider + model + version/endpoint + region + comple
   requested/effective y verifica alfa decodificado; la ruta mantiene PNG. La variante sigue `gated` porque no hubo
   deploy, canary facturable ni readback live, aunque la generación prompt-only conserve su estado leído.
   Matriz: [`OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`](../../architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md).
+- **Delta de proveedor 2026-09-08 — familia GPT Image 2.5, sin ruta Globe.** OpenAI publicó
+  `gpt-image-2.5-sunburst` y `gpt-image-2.5-flare` (snapshots `…-2026-09-08`): calidad `xhigh`/`max` nuevas,
+  transparencia con soporte pleno, hasta 16 referencias por edit. **Estado en Globe: `⏳ provider-supported ·
+  🔒 sin ruta`** — no hay `routeId`, ni binding, ni adapter, ni readiness, y Globe está `hibernated` desde
+  2026-09-02, así que **no hay promoción posible hoy**. `gpt-image-2` **no** quedó deprecado y sigue siendo el
+  modelo de `ref/still/openai-v2`; no tocar esa ruta por la llegada de 2.5.
+  🔴 **Bloqueador propio del carril gobernado:** 2.5 **no tiene calculadora de costo por imagen** — OpenAI
+  declara verbatim que la de GPT Image 2 no estima su consumo, y que tarifas iguales no implican costo por
+  imagen igual. El compiler de Globe resuelve el costo **antes** del gasto para reservar créditos; con 2.5 esa
+  resolución previa **no tiene fuente documentada**. Integrar la familia exige primero decidir cómo se reserva
+  el crédito sin estimación (medición con `usage` + política de reserva conservadora), no sólo un adapter.
+  Tampoco hay rate limits publicados para dimensionar. Matriz:
+  [`OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`](../../architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md).
 - **Sunset requerido:** OpenAI anunció el retiro de `gpt-image-1.5` para el 2026-12-01. La ruta
   `ref/still/openai-v1-5` necesita ficha propia, plan de retiro y readback antes de cualquier cambio; no debe seguir
   como fallback silencioso de transparencia. Esta nota no modifica disponibilidad: el reader live sigue mandando.

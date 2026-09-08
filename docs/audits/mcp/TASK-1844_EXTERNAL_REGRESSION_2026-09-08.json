@@ -1,0 +1,80 @@
+{
+  "observedAt": "2026-09-08 19:42:08 UTC",
+  "context": "Regression of existing TASK-1832 external lane after compatible deployment; not TASK-1844 internal v2 certification",
+  "greenhouseSha": "741e3a045cc2c98d32d4c75d46b6563c4466cac8",
+  "gatewaySha": "45ade9373b58c3a8a3d66912c5db76cbd59c5fc5",
+  "calls": [
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"gateway\":\"ready\",\"protocol\":\"2026-07-28\",\"providers\":[{\"providerId\":\"globe\",\"contractVersion\":\"v1\",\"state\":\"enabled\"},{\"providerId\":\"greenhouse-globe-credit-funding\",\"contractVersion\":\"v1\",\"state\":\"enabled\"},{\"providerId\":\"greenhouse-seo\",\"contractVersion\":\"task-1645\",\"state\":\"enabled\"},{\"providerId\":\"greenhouse-hiring\",\"contractVersion\":\"task-1726-v1\",\"state\":\"enabled\"},{\"providerId\":\"greenhouse-skills\",\"contractVersion\":\"task-1804\",\"state\":\"enabled\"}]}"
+          }
+        ],
+        "structuredContent": {
+          "gateway": "ready",
+          "protocol": "2026-07-28",
+          "providers": [
+            {
+              "providerId": "globe",
+              "contractVersion": "v1",
+              "state": "enabled"
+            },
+            {
+              "providerId": "greenhouse-globe-credit-funding",
+              "contractVersion": "v1",
+              "state": "enabled"
+            },
+            {
+              "providerId": "greenhouse-seo",
+              "contractVersion": "task-1645",
+              "state": "enabled"
+            },
+            {
+              "providerId": "greenhouse-hiring",
+              "contractVersion": "task-1726-v1",
+              "state": "enabled"
+            },
+            {
+              "providerId": "greenhouse-skills",
+              "contractVersion": "task-1804",
+              "state": "enabled"
+            }
+          ]
+        },
+        "isError": false
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"ok\":true,\"organizationId\":\"org-602d7057-7fd5-47e7-b73b-21892e3f06e7\",\"hasModule\":false,\"tier\":null,\"allowanceCap\":0,\"allowanceUsed\":0,\"allowanceRemaining\":0,\"budgetCapUsd\":0,\"budgetUsedUsd\":0,\"budgetRemainingUsd\":0,\"periodResetAt\":\"2026-10-01T00:00:00.000Z\",\"blockedReason\":\"no_entitlement\"}"
+          }
+        ],
+        "structuredContent": {
+          "provider": "greenhouse-seo",
+          "data": {
+            "ok": true,
+            "organizationId": "org-602d7057-7fd5-47e7-b73b-21892e3f06e7",
+            "hasModule": false,
+            "tier": null,
+            "allowanceCap": 0,
+            "allowanceUsed": 0,
+            "allowanceRemaining": 0,
+            "budgetCapUsd": 0,
+            "budgetUsedUsd": 0,
+            "budgetRemainingUsd": 0,
+            "periodResetAt": "2026-10-01T00:00:00.000Z",
+            "blockedReason": "no_entitlement"
+          }
+        },
+        "isError": false
+      }
+    }
+  ]
+}

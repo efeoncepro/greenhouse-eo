@@ -1,5 +1,22 @@
 # TASK-278 — AI Visual Asset Generator: imagenes + animaciones SVG on-demand
 
+## Delta 2026-09-08
+
+**Lo que esta task promete ya existe en el repo, y el registro no lo refleja.** Verificado hoy:
+`generateImage()` y `generateAnimation()` viven en `src/lib/ai/image-generator.ts`, y las dos rutas
+internas existen (`/api/internal/generate-image`, `/api/internal/generate-animation`) con
+`requireAdminTenantContext` y 403 en producción sin `ENABLE_ASSET_GENERATOR=true`. Sin embargo la task
+sigue en `to-do` con `Status real: Diseno` y **0 de 11** criterios tildados.
+
+Además el runtime derivó respecto a lo escrito acá: la spec describe **Imagen 3**
+(`imagen-3.0-generate-002`) y el código corre `imagen-4.0-generate-001`, que
+`GREENHOUSE_AI_VISUAL_ASSET_GENERATOR_V1.md` declara deprecated/bloqueado para trabajo nuevo.
+
+No se tildó ningún criterio ajeno: hacerlo sin recorrer su evidencia sería inventar avance. Esta task
+queda como **candidata a cierre con evidencia, no a re-ejecución**. El defecto del default bloqueado lo
+toma `TASK-1851`, que NO cierra ésta.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

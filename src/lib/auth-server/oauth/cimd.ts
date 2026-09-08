@@ -39,7 +39,10 @@ export type CimdFetchResult = {
   contentType: string | null
 }
 
-export type CimdFetcher = (url: string, options: { etag: string | null; signal: AbortSignal }) => Promise<CimdFetchResult>
+export type CimdFetcher = (
+  url: string,
+  options: { etag: string | null; signal: AbortSignal }
+) => Promise<CimdFetchResult>
 
 export type CimdResolver = (input: { hostname: string }) => Promise<string[]>
 
@@ -200,11 +203,19 @@ export const validateCimdDocument = (clientId: string, raw: unknown): CimdValida
 
   const grantTypes = doc.grant_types === undefined ? ['authorization_code'] : asStringArray(doc.grant_types)
 
-  if (!grantTypes || !grantTypes.includes('authorization_code')) return { ok: false, reason: 'grant_types' }
+  if (
+    !grantTypes ||
+    !grantTypes.includes('authorization_code') ||
+    grantTypes.some(grant => !grant || /\s/.test(grant))
+  ) {
+    return { ok: false, reason: 'grant_types' }
+  }
 
-  const unsupportedGrant = grantTypes.find(grant => grant !== 'authorization_code' && grant !== 'refresh_token')
-
-  if (unsupportedGrant) return { ok: false, reason: 'grant_types' }
+  // A vendor document describes every AS it can use. Register only our supported intersection;
+  // advertising another grant never enables its exchange at /oauth/token (TASK-1844).
+  const supportedGrantTypes = [
+    ...new Set(grantTypes.filter(grant => grant === 'authorization_code' || grant === 'refresh_token'))
+  ]
 
   const responseTypes = doc.response_types === undefined ? ['code'] : asStringArray(doc.response_types)
 
@@ -214,7 +225,8 @@ export const validateCimdDocument = (clientId: string, raw: unknown): CimdValida
     if (doc[field] !== undefined && typeof doc[field] !== 'string') return { ok: false, reason: `${field}_type` }
   }
 
-  if (typeof doc.client_name === 'string' && doc.client_name.length > 200) return { ok: false, reason: 'client_name_length' }
+  if (typeof doc.client_name === 'string' && doc.client_name.length > 200)
+    return { ok: false, reason: 'client_name_length' }
 
   return {
     ok: true,
@@ -225,7 +237,7 @@ export const validateCimdDocument = (clientId: string, raw: unknown): CimdValida
       logo_uri: doc.logo_uri as string | undefined,
       redirect_uris: normalized.uris,
       token_endpoint_auth_method: 'none',
-      grant_types: grantTypes,
+      grant_types: supportedGrantTypes,
       response_types: responseTypes,
       scope: doc.scope as string | undefined,
       software_id: doc.software_id as string | undefined,
@@ -283,7 +295,8 @@ export const resolveCimdClient = async (clientId: string, deps: CimdDeps): Promi
 
     const validation = validateCimdDocument(clientId, cached.document)
 
-    if (validation.ok) return { ok: true, client: cimdDocumentToClientRecord(validation.document, cached.fetchedAt), fromCache: true }
+    if (validation.ok)
+      return { ok: true, client: cimdDocumentToClientRecord(validation.document, cached.fetchedAt), fromCache: true }
   }
 
   const rejectTtlMs = Math.min(deps.cacheTtlSeconds, 15 * 60) * 1000
@@ -324,7 +337,8 @@ export const resolveCimdClient = async (clientId: string, deps: CimdDeps): Promi
       signal: controller.signal
     })
   } catch (error) {
-    const reason = error instanceof Error && error.message === 'cimd_document_too_large' ? 'document_too_large' : 'fetch_failed'
+    const reason =
+      error instanceof Error && error.message === 'cimd_document_too_large' ? 'document_too_large' : 'fetch_failed'
 
     return reject(reason)
   } finally {
@@ -335,7 +349,11 @@ export const resolveCimdClient = async (clientId: string, deps: CimdDeps): Promi
     const validation = validateCimdDocument(clientId, cached.document)
 
     if (validation.ok) {
-      await deps.store.putCimdCache({ ...cached, fetchedAt: now, expiresAt: new Date(now.getTime() + deps.cacheTtlSeconds * 1000) })
+      await deps.store.putCimdCache({
+        ...cached,
+        fetchedAt: now,
+        expiresAt: new Date(now.getTime() + deps.cacheTtlSeconds * 1000)
+      })
 
       return { ok: true, client: cimdDocumentToClientRecord(validation.document, now), fromCache: true }
     }
@@ -372,5 +390,8 @@ export const resolveCimdClient = async (clientId: string, deps: CimdDeps): Promi
 export const assertCimdResolved = (result: ResolveCimdClientResult): OAuthClientRecord => {
   if (result.ok) return result.client
 
-  throw new OAuthProtocolError('invalid_client', { description: 'client_id metadata document rejected', reason: result.reason })
+  throw new OAuthProtocolError('invalid_client', {
+    description: 'client_id metadata document rejected',
+    reason: result.reason
+  })
 }

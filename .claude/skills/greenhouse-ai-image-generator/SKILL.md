@@ -1,6 +1,6 @@
 ---
 name: greenhouse-ai-image-generator
-description: Expertly art-direct, prompt, generate, edit, validate, and apply AI-generated visual assets for Greenhouse, including transparent PNG icons, UI elements, empty states, banners, hero images, thumbnails, layout-design finishing, material/style control, reference-guided edits, and hybrid Seedream 5↔GPT Image 2→Gemini Omni campaign workflows across digital, motion, print and OOH. Use when a user asks to create images with AI, improve image prompts, use OpenAI/GPT Image/Imagen/Nano Banana/Seedream via fal.ai, create transparent assets, or produce and scale polished visuals for Greenhouse UI or campaign production.
+description: Expertly art-direct, prompt, generate, edit, validate, and apply AI-generated visual assets for Greenhouse, including transparent PNG icons, UI elements, empty states, banners, hero images, thumbnails, layout-design finishing, material/style control, reference-guided edits, and hybrid Seedream 5↔GPT Image 2→Gemini Omni campaign workflows across digital, motion, print and OOH. Covers the GPT Image 2.5 family (Sunburst/Flare, 2026-09-08) and its quality tiers xhigh/max. Use when a user asks to create images with AI, improve image prompts, use OpenAI/GPT Image/Imagen/Nano Banana/Seedream via fal.ai, create transparent assets, or produce and scale polished visuals for Greenhouse UI or campaign production.
 ---
 
 # Greenhouse AI Image Generator
@@ -43,6 +43,106 @@ For assets that will live in Greenhouse, use the canonical helper when possible:
 
 Do not call image providers from parallel scripts if the helper covers the case.
 
+## GPT Image 2.5 — Sunburst y Flare (delta de proveedor 2026-09-08)
+
+OpenAI publicó `gpt-image-2.5-sunburst` y `gpt-image-2.5-flare` (snapshots `…-2026-09-08`). Contrato completo,
+precios, ciclo de vida y contradicciones documentales: `OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md`.
+Cárgala antes de fijar modelo, tamaño, calidad o costo. Lo que esta skill necesita saber:
+
+**Elección de modelo (la única diferencia de contrato entre ambos es el valor de `model`):**
+
+| Pieza | Modelo | Razón |
+|---|---|---|
+| Edición donde la precisión manda; entregable final de campaña o producto | `gpt-image-2.5-sunburst` | OpenAI lo posiciona para "workflows where editing precision matters most" |
+| Generación cotidiana, exploración, social, volumen | `gpt-image-2.5-flare` | el más rápido; el anuncio lo llama "the default choice for most applications" |
+| Necesitas Batch API, costo por imagen estimable **antes** de gastar, o rate limits conocidos | `gpt-image-2` | 2.5 no tiene Batch, ni calculadora de costo, ni tabla de rate limits publicada |
+
+**Calidad — el techo subió.** `low · medium · high · xhigh · max · auto` (default `auto`). `xhigh` y `max`
+existen **sólo** en 2.5. Regla de la casa: `low` para exploración, `high` como piso para texto pequeño,
+infografía o retrato, y `xhigh`/`max` **sólo** para el entregable final. OpenAI no documenta qué significa cada
+escalón ni cuánto consume; **hay que medirlo** (ver costo abajo).
+
+**Tamaño — ya no estás atado a los tres clásicos.** Custom `WIDTHxHEIGHT` con las cuatro reglas simultáneas:
+ejes múltiplos de 16, ratio entre 1:3 y 3:1, ningún borde &gt; 3840 px, total entre 655.360 y 8.294.400 px.
+**Arriba de `2560x1440` la doc lo marca experimental** — no lo mandes a un entregable de cliente sin QA visual.
+
+**NUNCA envíes `input_fidelity` con un modelo 2.5.** La guía lo ubica bajo "Earlier GPT Image models" con la
+frase explícita *"not Sunburst or Flare"*. En 2.5 la preservación de identidad se pide **por prompt**, con la
+lista de invariantes repetida en cada turno (patrón abajo).
+
+**Transparencia:** `background: "transparent"` + `output_format` `png` o `webp`. En 2.5 es soporte pleno (en
+`gpt-image-2` sigue en preview). El prompt además debe pedir sujeto aislado y **prohibir** escenografía, backdrop
+sólido, checkerboard y sombras; en cada edición, repetir "preserve the transparent background". Validar alfa
+decodificando bytes, nunca por metadata ni por ver un checkerboard.
+
+**Costo: no lo estimes, mídelo.** OpenAI declara verbatim que la calculadora de GPT Image 2 **no** estima el
+consumo de 2.5, y que tarifas iguales no implican costo por imagen igual. Antes de comprometer un presupuesto o
+créditos con un cliente, corre una pieza real y lee `usage` de la respuesta. Cualquier cifra de costo por imagen
+de 2.5 que venga de un blog **no entra a una propuesta**.
+
+### 🔴 Lo que 2.5 NO mejora — no lo prometas en un brief ni en una propuesta
+
+- **Tipografía y texto dentro de la imagen.** OpenAI **no** declara mejora de texto. Al contrario: la limitación
+  *"can still struggle with precise text placement and clarity"* sigue vigente en la doc.
+- **Texto multilingüe / scripts no latinos.** Cero menciones en anuncio, help center y system card.
+- **Consistencia de personaje o de elementos de marca recurrentes** — sigue declarada como limitación.
+- **Control de composición en layouts con jerarquía fija** — sigue declarada como limitación.
+- **Preservación de identidad garantizada.** El lenguaje oficial es "more likely to carry through", nunca
+  "preserves". Sigue exigiendo revisión humana por variante contra el ancla.
+- **"2.5 es más seguro".** El system card mide una mejora que **no alcanza significancia estadística**, y la
+  categoría Abuse **empeora** respecto a Images 2.0. No es argumento comercial.
+
+Las cuatro limitaciones anteriores siguen abiertas: un entregable con texto chico, un sistema de personaje o un
+layout con jerarquía **sigue necesitando QA humano por pieza**. 2.5 no lo convierte en un paso automatizable.
+
+### Patrones de prompt oficiales (guía vigente = abril 2026, escrita para `gpt-image-2`)
+
+⚠️ Al 2026-09-08 **OpenAI no publicó guía de prompting para 2.5**: la del cookbook está fechada 2026-04-21 y
+escrita para `gpt-image-2`. Cítala como guía de la familia GPT Image, nunca como guía de 2.5.
+
+- **Orden del prompt:** background/escena → sujeto → detalles clave → constraints, más el uso previsto (ad, UI
+  mock, infografía) que fija el "modo" y el nivel de acabado. Para pedidos complejos, segmentos etiquetados y
+  saltos de línea, no un párrafo largo.
+- **Edición quirúrgica:** `"change only X"` + `"keep everything else the same"`, y **repetir la lista de
+  preservación en cada iteración** para frenar la deriva. Si debe ser quirúrgica, decir explícitamente que no
+  altere saturación, contraste, layout, flechas, labels, ángulo de cámara ni objetos alrededor.
+- **Texto en imagen:** literal entre comillas o en MAYÚSCULAS, con tipografía como constraint (estilo, tamaño,
+  color, posición). **Deletrear letra por letra** marcas y palabras raras. Calidad ≥ `medium` para texto pequeño
+  o paneles densos.
+- **Multi-referencia:** indexar y describir cada input ("Image 1: product photo… Image 2: style reference…") y
+  cómo interactúan. Al componer, explicitar qué elemento va dónde.
+- **Consistencia de personaje:** generar primero una lámina de personaje con fondo neutro y estilo bloqueado, y
+  usar **esa imagen** como input de `images.edit` en cada escena, repitiendo el bloque de invariantes. Anclar
+  siempre al mismo canónico, nunca a la generación anterior.
+- **Fotorrealismo:** la palabra "photorealistic" engancha el modo directamente; specs de cámara detalladas se
+  interpretan de forma laxa — úsalas para look y composición, no como simulación física.
+- **Iterar, no sobrecargar:** base limpia + follow-ups de un solo cambio.
+
+### Provenance: toda imagen sale firmada
+
+2.5 emite **C2PA Content Credentials + SynthID** (watermark invisible) en ChatGPT, Codex y API. Consecuencias:
+
+- Si el entregable va a un cliente que exige disclosure o a un pitch público, **decláralo**.
+- El C2PA **se puede perder** al convertir, recomprimir o editar el archivo — justo lo que hace un pipeline de
+  derivados. No prometas que el entregable final llega firmado sin verificarlo en `openai.com/verify`.
+- Un `not_detected` **no prueba** que la imagen sea humana.
+- Existe además marca de agua **visible** opcional por prompt ("Include a visible OpenAI watermark in the image").
+
+### Novedades de la app ChatGPT (dirección de arte fuera de banda)
+
+Útiles cuando exploras dirección en la app antes de bajar el prompt al CLI. No son camino de producción de
+assets repo-bound.
+
+- **Sketch** — `@Sketch` en el compositor: dibujas y ese trazo va como guía visual. El help center lo describe
+  **como app móvil**; no hay confirmación oficial en web/desktop.
+- **Templates** — sidebar → Images → Templates. Formatos nombrados oficialmente: Poster, Merch, flyers, product
+  photos, logo. El listado completo **no está publicado** — no inventes categorías. **No disponible en Work mode.**
+- **Comentarios sobre la imagen** — seleccionas un área y describes el cambio. Advertencia oficial repetida:
+  *"highlights are not always precise, and edits may extend beyond the area you selected"*.
+- **Compartir prompt** — en móvil: Share → Prompt template → Copy link.
+- Disponible en todos los tiers, web/iOS/Android y Codex. **Los límites de generación por plan NO están
+  publicados por OpenAI**; las cifras que circulan en blogs son rumor y no entran a una propuesta.
+
 ## CLI: `pnpm ai:image` (gpt-image-2)
 
 For terminal/operator-driven generation — `product-design-loop` concepts, mockup fixtures, icon/asset batches — use the canonical CLI instead of writing an ad-hoc `scripts/_gen-*.ts`:
@@ -56,6 +156,17 @@ pnpm ai:image --batch concepts.json         # [{ "filename": "a.png", "prompt": 
 ```
 
 - Wraps the canonical `generateOpenAIImage` (`src/lib/ai/openai-image.ts`). Self-contained: loads `.env.local`, resolves `OPENAI_API_KEY_SECRET_REF` server-side, never prints the secret.
+- 🔴 **El helper NO transporta todavía la familia 2.5, y falla en silencio de dos formas distintas**
+  (verificado leyendo `src/lib/ai/openai-image.ts` el 2026-09-08):
+  1. `OPENAI_IMAGE_MODEL=gpt-image-2.5-flare` **no pasa el allowlist** de `getOpenAIImageModel()`, que devuelve
+     el default `gpt-image-2` sin advertir. Crees generar con 2.5 y pagas GPT Image 2.
+  2. `pnpm ai:image --model gpt-image-2.5-flare` castea el valor **sin validarlo**: el modelo sí viaja al API,
+     pero `resolveOpenAIImageSize()` ramifica por `model === 'gpt-image-2'` y manda todo lo demás a la rama
+     legacy — el default por aspect ratio cae de `2048x1152` a `1536x1024` y un `--size` moderno se resuelve a
+     `auto`. Además `editOpenAIImage()` inyecta `input_fidelity`, que en 2.5 **no debe enviarse**.
+  **NUNCA** uses ninguno de los dos caminos para "probar 2.5": uno miente sobre el modelo y el otro degrada la
+  resolución y manda un parámetro fuera de contrato. Habilitarlo es un cambio de código con canary facturable
+  y readback de `usage` — no un flag. Detalle y checklist: §"Mapeo contra Greenhouse y Globe" de la matriz.
 - Defaults: `gpt-image-2 · 1536x1024 · quality high · opaque · out-dir public/images/generated`. Timeout default **280s** (gpt-image-2 `high` exceeds the 125s of the runtime `generateImage` helper).
 - OpenAI documents native `background: transparent` for `gpt-image-2` in **preview**, with PNG or WebP. The
   canonical helper/CLI preserves the requested GPT Image 2 identity, rejects transparent JPEG before network I/O
@@ -124,9 +235,13 @@ pnpm ai:image:rmbg <in.png> <out.png>   # cut a flat studio bg → transparent (
 ## Provider Choice
 
 - Use `openai-image` for higher prompt fidelity, complex composition, reference-guided edits, UI assets, icon sets, and transparent PNG batches.
-- For new OpenAI work, target `gpt-image-2` or its dated snapshot. Do not route new work to `gpt-image-1.5`,
-  `gpt-image-1`, `gpt-image-1-mini` or `chatgpt-image-latest`: all are deprecated with shutdowns in October or
-  December 2026. Read the capability matrix before changing model, pricing or output constraints.
+- **OpenAI model targeting (delta 2026-09-08).** La frontera del proveedor es la familia **2.5**
+  (`gpt-image-2.5-flare` por defecto, `gpt-image-2.5-sunburst` para precisión de edición). `gpt-image-2`
+  **no** está deprecado y sigue siendo la elección correcta cuando necesitas Batch, costo por imagen estimable
+  antes de gastar, o rate limits publicados — y hoy es **lo único que el helper Greenhouse transporta de verdad**.
+  Nunca rutees trabajo nuevo a `gpt-image-1.5`, `gpt-image-1`, `gpt-image-1-mini` ni `chatgpt-image-latest`:
+  todos deprecados, con apagado en octubre (`gpt-image-1`, **2026-10-23**) o diciembre 2026. Lee la matriz de
+  capacidades antes de cambiar modelo, precios o constraints de salida.
 - Use `google-imagen` when matching existing Imagen-generated banners or when the current surface already uses that visual language.
 - Use Seedream 5 Lite out-of-band for inexpensive creative divergence and Seedream 5 Pro for
   material/color/atmosphere development or semantic regional edits; use `src/lib/ai/fal.ts`,

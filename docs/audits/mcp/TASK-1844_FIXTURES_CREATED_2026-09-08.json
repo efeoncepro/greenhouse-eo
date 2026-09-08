@@ -1,0 +1,30 @@
+{
+  "evidence": "local canonical reader against shared PG; not served JWT or MCP proof",
+  "observedAt": "2026-09-08T19:50:46.036Z",
+  "runId": "task-1844-runtime-20260908-a",
+  "expiresAt": "2026-09-09T00:00:00Z",
+  "retired": false,
+  "targets": [
+    {
+      "label": "A",
+      "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975",
+      "clientId": "task-1844-runtime-20260908-a-a",
+      "spaceId": "spc-task-1844-runtime-20260908-a-a",
+      "outcome": "resolved"
+    },
+    {
+      "label": "B",
+      "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3",
+      "clientId": "task-1844-runtime-20260908-a-b",
+      "spaceId": "spc-task-1844-runtime-20260908-a-b",
+      "outcome": "resolved"
+    },
+    {
+      "label": "C",
+      "organizationId": "org-56b1a2d6-fc83-4639-adeb-59e0b20f5127",
+      "clientId": "task-1844-runtime-20260908-a-c",
+      "spaceId": "spc-task-1844-runtime-20260908-a-c",
+      "outcome": "denied"
+    }
+  ]
+}

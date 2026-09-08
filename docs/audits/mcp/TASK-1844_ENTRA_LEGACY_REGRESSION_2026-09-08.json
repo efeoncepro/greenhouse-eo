@@ -1,0 +1,63 @@
+{
+  "observedAt": "2026-09-08T20:03:42.335Z",
+  "legacyCompatibility": "passed",
+  "requestedScope": "https://mcp.efeonce.org/mcp/efeonce.mcp.read",
+  "claims": {
+    "aud": "c5363215-b9a6-4bf1-bb1c-e61963b37dac",
+    "iss": "https://login.microsoftonline.com/a80bf6c1-7c45-4d70-b043-51389622a0e4/v2.0",
+    "scp": "efeonce.mcp.globe.credits.funding.ensure efeonce.mcp.globe.read efeonce.mcp.hiring.read efeonce.mcp.read efeonce.mcp.seo.write",
+    "tid": "a80bf6c1-7c45-4d70-b043-51389622a0e4",
+    "exp": 1788902753
+  },
+  "initializeStatus": 200,
+  "toolsListStatus": 200,
+  "toolsTotal": 37,
+  "seoToolsTotal": 28,
+  "seoTools": [
+    "declare_seo_competitors",
+    "discover_seo_keywords",
+    "get_seo_backlink_detail",
+    "get_seo_backlink_profile",
+    "get_seo_competitor_candidates",
+    "get_seo_domain_overview",
+    "get_seo_dual_lens_visibility",
+    "get_seo_entitlement",
+    "get_seo_grounded_query_draft",
+    "get_seo_keyword_discovery",
+    "get_seo_keyword_gap",
+    "get_seo_keyword_market_data",
+    "get_seo_keyword_opportunities",
+    "get_seo_overview_kpis",
+    "get_seo_performance",
+    "get_seo_performance_catalog",
+    "get_seo_prospect_diagnostic",
+    "get_seo_provider_spend",
+    "get_seo_rank_evolution",
+    "get_seo_serp_top_results",
+    "get_seo_site_audit_report",
+    "get_seo_url_visibility",
+    "get_seo_visibility_360",
+    "prepare_seo_grounded_queries",
+    "retire_seo_competitors",
+    "run_seo_prospect_diagnostic",
+    "track_seo_keywords",
+    "untrack_seo_keywords"
+  ],
+  "internalV2DiscoveryVisible": false,
+  "gatewayStatusHttp": 200,
+  "gatewayStatusBody": "event: message\ndata: {\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"gateway\\\":\\\"ready\\\",\\\"protocol\\\":\\\"2026-07-28\\\",\\\"providers\\\":[{\\\"providerId\\\":\\\"globe\\\",\\\"contractVersion\\\":\\\"v1\\\",\\\"state\\\":\\\"enabled\\\"},{\\\"providerId\\\":\\\"greenhouse-globe-credit-funding\\\",\\\"contractVersion\\\":\\\"v1\\\",\\\"state\\\":\\\"enabled\\\"},{\\\"providerId\\\":\\\"greenhouse-seo\\\",\\\"contractVersion\\\":\\\"task-1645\\\",\\\"state\\\":\\\"enabled\\\"},{\\\"providerId\\\":\\\"greenhouse-hiring\\\",\\\"contractVersion\\\":\\\"task-1726-v1\\\",\\\"state\\\":\\\"enabled\\\"},{\\\"providerId\\\":\\\"greenhouse-skills\\\",\\\"contractVersion\\\":\\\"task-1804\\\",\\\"state\\\":\\\"enabled\\\"}]}\"}],\"structuredContent\":{\"gateway\":\"ready\",\"protocol\":\"2026-07-28\",\"providers\":[{\"providerId\":\"globe\",\"contractVersion\":\"v1\",\"state\":\"enabled\"},{\"providerId\":\"greenhouse-globe-credit-funding\",\"contractVersion\":\"v1\",\"state\":\"enabled\"},{\"providerId\":\"greenhouse-seo\",\"contractVersion\":\"task-1645\",\"state\":\"enabled\"},{\"providerId\":\"greenhouse-hiring\",\"contractVersion\":\"task-1726-v1\",\"state\":\"enabled\"},{\"providerId\":\"greenhouse-skills\",\"contractVersion\":\"task-1804\",\"state\":\"enabled\"}]}},\"jsonrpc\":\"2.0\",\"id\":3}\n\n",
+  "boundary": "Existing Entra PKCE client, no configuration or permission mutation; status only; actual issued scopes recorded",
+  "grantReadback": [
+    {
+      "clientId": "dcf4bb39-2806-4f0a-a9ec-ce42143881ed",
+      "consentType": "AllPrincipals",
+      "id": "Obv03AYoCk-p7M5CFDiB7cKONpIIJCJClWvzum1nAH8",
+      "resourceId": "92368ec2-2408-4222-956b-f3ba6d67007f",
+      "scope": "efeonce.mcp.read efeonce.mcp.globe.read efeonce.mcp.hiring.read efeonce.mcp.globe.credits.funding.ensure efeonce.mcp.seo.write"
+    }
+  ],
+  "firstHarnessAttempt": {
+    "status": "failed",
+    "reason": "Harness assumed requested scopes equal issued scopes. Existing Entra AllPrincipals grant contains additional scopes; scope-deny Hiring probe returned HTTP 200. No Entra grant changed. Bounded repeat tested initialize, inventory, status and absence of internal v2 discovery only."
+  }
+}

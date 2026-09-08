@@ -1,0 +1,27 @@
+{
+  "observedAt": "2026-09-08T19:48:11.503217+00:00",
+  "writerInventory": "Only auth-server internal Postgres store creates authorization contexts; Greenhouse consumer resolves; gateway has no PostgreSQL writer. Main and served auth tree identical.",
+  "services": {
+    "auth-server": {
+      "revision": "auth-server-00045-t6r",
+      "sha": "0720eb968b820ad2fc3512678a593ec3e10149f3",
+      "trafficPercent": 100,
+      "ready": true,
+      "v2Flag": "false",
+      "digest": "gcr.io/efeonce-group/auth-server@sha256:13e29a617825a7fe1e251f8d31e45e92f949d5439c05fd81ad008be3a979402a"
+    },
+    "efeonce-mcp-gateway": {
+      "revision": "efeonce-mcp-gateway-00049-fv7",
+      "sha": "45ade9373b58c3a8a3d66912c5db76cbd59c5fc5",
+      "trafficPercent": 100,
+      "ready": true,
+      "v2Flag": "false",
+      "digest": "southamerica-west1-docker.pkg.dev/efeonce-group/efeonce-mcp/gateway@sha256:6a85733a6cb7faeca65d8cfbc8ff2199f652f95b47c8e021d0a3bc91380e06c8"
+    }
+  },
+  "greenhouseProduction": {
+    "sha": "741e3a045cc2c98d32d4c75d46b6563c4466cac8",
+    "deploymentId": "dpl_sZEnysX9o2HPTNR1JAAStchLPa5T",
+    "compatibleV1CodexCallVerified": true
+  }
+}

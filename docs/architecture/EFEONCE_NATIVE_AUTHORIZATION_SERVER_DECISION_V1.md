@@ -488,3 +488,12 @@ Ese ADR es el canon especializado para entry routing server-side sin pantalla in
 MCP/terceros, autorización local del producto y migración legacy/recovery sin loops. `TASK-1834` es su primer
 consumidor. La decisión está Accepted; su implementación y verificación runtime permanecen gateadas por las
 tasks del programa.
+
+### Compatibilidad de metadata CIMD — TASK-1844, 2026-09-08
+
+Se mantiene la decisión de emisor propio, CIMD primario y grants efectivos exclusivamente
+`authorization_code`/`refresh_token`. La declaración de capacidades del vendor puede incluir otros grants:
+el registro efectivo usa la intersección soportada y el endpoint continúa rechazando los restantes.
+Esto corrige el bloqueo observado de Claude hospedado sin ampliar autoridad ni scope, dentro de la ejecución
+y certificación aprobadas de TASK-1844. Contrato, fuente y prueba de rechazo/emisión:
+[OAuth contract](EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md#compatibilidad-cimd-comprobada-en-task-1844--2026-09-08).

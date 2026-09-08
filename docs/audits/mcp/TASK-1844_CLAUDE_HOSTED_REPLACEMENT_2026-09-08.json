@@ -1,0 +1,64 @@
+{
+  "authorization": "Operator explicitly approved replacing only the Claude hosted connection on 2026-09-08",
+  "priorConnection": "Efeonce TASK-1832 Canary",
+  "replacement": {
+    "name": "Efeonce MCP",
+    "url": "https://mcp.efeonce.org/mcp",
+    "oauth": "always required",
+    "clientMetadata": "Anthropic CIMD detected and selected",
+    "state": "created, disconnected pending fresh internal v2 consent"
+  },
+  "revocation": {
+    "observedAt": "2026-09-08T19:41:17.100Z",
+    "action": "apply",
+    "clientId": "dcr-mLTiqIJmBQyvdQOtKRpdVw",
+    "registration": [
+      {
+        "run_id": "task-1832-canary-20260906-a",
+        "status": "active",
+        "revoked_at": null
+      }
+    ],
+    "before": [
+      {
+        "active_refresh": 1,
+        "active_consents": 1
+      }
+    ],
+    "result": {
+      "consentsRevoked": 1,
+      "refreshRevoked": 10,
+      "accessRevoked": 1
+    },
+    "after": [
+      {
+        "active_refresh": 0,
+        "active_consents": 0
+      }
+    ],
+    "boundary": "Only Claude hosted consent and token families; registration, grants, organization, profiles and other clients retained"
+  },
+  "readback": {
+    "observedAt": "2026-09-08T19:41:49.533Z",
+    "registration": [
+      {
+        "run_id": "task-1832-canary-20260906-a",
+        "status": "active",
+        "expires_at": "2026-09-14T19:43:30.000Z",
+        "revoked_at": null
+      }
+    ],
+    "client": [
+      {
+        "client_id": "dcr-mLTiqIJmBQyvdQOtKRpdVw",
+        "status": "active",
+        "software_id": null
+      }
+    ],
+    "family": [
+      {
+        "unrevoked_current_refreshes": 0
+      }
+    ]
+  }
+}

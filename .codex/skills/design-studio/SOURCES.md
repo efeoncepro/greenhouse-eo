@@ -62,6 +62,11 @@ duración, reintentos y costo efectivo por output.
 
 **Modelos IA de imagen**
 - OpenAI — GPT Image 2 model contract — https://developers.openai.com/api/docs/models/gpt-image-2
+- OpenAI — GPT Image 2.5 Flare (2026-09-08) — https://developers.openai.com/api/docs/models/gpt-image-2.5-flare
+- OpenAI — GPT Image 2.5 Sunburst (2026-09-08) — https://developers.openai.com/api/docs/models/gpt-image-2.5-sunburst
+- OpenAI — Introducing ChatGPT Images 2.5 — https://openai.com/index/introducing-chatgpt-images-2-5/
+- OpenAI — ChatGPT Images 2.5 System Card — https://deploymentsafety.openai.com/chatgpt-images-2-5
+- OpenAI — GPT Image prompting guide (2026-04-21, escrita para `gpt-image-2`; NO hay guía de 2.5) — https://developers.openai.com/cookbook/examples/multimodal/image-gen-models-prompting-guide
 - OpenAI — Image generation/editing guide — https://developers.openai.com/api/docs/guides/image-generation
 - OpenAI — API pricing — https://openai.com/api/pricing/
 - fal.ai — Seedream 5 Lite text-to-image API — https://fal.ai/models/bytedance/seedream/v5/lite/text-to-image/api

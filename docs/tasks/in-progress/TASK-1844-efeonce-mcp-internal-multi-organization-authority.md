@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-1835-efeonce-id-login-consent-screens-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `2026-09-08: code complete, rollout pendiente. Contrato v2 implementado en Greenhouse y gateway 1.3.0, con actor/targets separados, permisos efectivos por snapshot, consentimiento fresco y refresh sin promoción. 528 pruebas focales Greenhouse, 158 gateway y 2 PG live passed; build/tipos y GVC desktop/390 px correctos. Lint sin errores, 26 warnings UI previos. Rollout autorizado y en ejecución. Expand 20260908184942851 aplicado: CHECK 1/2, ambos índices y trigger verificados; seis filas v1 conservadas. Contract pendiente de writers compatibles. Gates OFF; faltan release, cohorte/fixtures runtime, Codex/Claude reales y rollback servido. QA y runbook enlazados abajo.`
+- Status real: `2026-09-08 20:25Z: code complete; producción activada para una persona y certificación en curso. Main 741e3a045cc2 publicado por PR 229, orquestador 34272151054 success y manifest released; watchdog 5/5, drift/data_missing=0. Reader Vercel ON, gateway 00050-wlk y emisor 00046-6cf ON/100%. Codex y Claude Code: consentimiento v2, A/B concurrentes allow, C/invalid deny, paginación y cursor revocado deny; A conserva acceso. Codex v1 renovó sin elevarse. Claude hospedado bloqueado por CIMD que anuncia jwt-bearer; corrección mínima validada localmente (498 passed, 25 skipped), publicación pendiente. B restaurada; faltan completar renovación, revocación global, hosted, rollback y cleanup. Sólo la conexión hospedada del canary fue retirada bajo la excepción aprobada; los demás activos siguen intactos.`
 - Rank: `Después del cierre de TASK-1813; antes del uso interno multiorganización en Codex o Claude`
 - Domain: `identity|platform`
 - Blocked by: `none`
@@ -180,7 +180,7 @@ archivos de pruebas existentes (52 passed). La unicidad PG no incluye versión y
 ese índice; la transición exige expansión, writer compatible y retiro gobernado del índice anterior.
 El reader de delegación actual usa sólo permisos base y la proyección de roles omite parte de su vigencia.
 El texto de consentimiento también requiere un delta `ui-lite`: no puede presentar la lista actual como
-alcance fijo si v2 permite altas/bajas autorizadas sin reconectar. La implementación local y su evidencia posterior viven en la auditoría enlazada en Verification; no se aplicó el cambio de schema compartido.
+alcance fijo si v2 permite altas/bajas autorizadas sin reconectar. La implementación local y su evidencia posterior viven en la auditoría enlazada en Verification; expand y contract se aplicaron durante el rollout autorizado; ver evidencia de producción.
 
 ## Hybrid Execution Justification
 
@@ -500,6 +500,7 @@ reales internos, revocación y rollback.
 
 ## Verification
 
+- [Publicación y certificación de runtime](../../audits/mcp/TASK-1844_PRODUCTION_RELEASE_2026-09-08.md).
 - [QA, matriz y límites de evidencia](../../audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md).
 - [Runbook de rollout](../../operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md).
 - [Revisión visual local](../../ui/reviews/TASK-1844/review.md).
@@ -534,4 +535,4 @@ reales internos, revocación y rollback.
 
 - Resuelto: tool gateway-native efeonce.organizations.list, paginada y minimizada; D9.
 - Resuelto: nueva resolución después de revocación comprometida, cota a demostrar ≤60 s sin caché positiva; D11.
-- Pendiente de rollout: manifiesto de fixtures runtime y readback fresco de cohorte antes de activar.
+- Resuelto durante rollout: fixtures dedicadas y cohorte exacta verificadas; certificación cliente v2 en curso.

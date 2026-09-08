@@ -1,0 +1,227 @@
+{
+  "client": "claude",
+  "label": "task1844-claude-v2-matrix",
+  "startedAt": "2026-09-08T20:13:30.841204+00:00",
+  "completedAt": "2026-09-08T20:14:23.272578+00:00",
+  "exitCode": 0,
+  "evidenceSource": "actual native client tool events, not assistant summaries",
+  "calls": [
+    {
+      "server": "efeonce-internal",
+      "tool": "mcp__efeonce-internal__efeonce_gateway_status",
+      "arguments": {},
+      "startedAt": "2026-09-08T20:13:34.993082+00:00",
+      "completedAt": "2026-09-08T20:13:36.086676+00:00",
+      "status": "completed",
+      "result": {
+        "gateway": "ready",
+        "protocol": "2026-07-28",
+        "providers": [
+          {
+            "providerId": "globe",
+            "contractVersion": "v1",
+            "state": "enabled"
+          },
+          {
+            "providerId": "greenhouse-globe-credit-funding",
+            "contractVersion": "v1",
+            "state": "enabled"
+          },
+          {
+            "providerId": "greenhouse-seo",
+            "contractVersion": "task-1645",
+            "state": "enabled"
+          },
+          {
+            "providerId": "greenhouse-hiring",
+            "contractVersion": "task-1726-v1",
+            "state": "enabled"
+          },
+          {
+            "providerId": "greenhouse-skills",
+            "contractVersion": "task-1804",
+            "state": "enabled"
+          }
+        ]
+      },
+      "clientObservedDurationMs": 1093.594
+    },
+    {
+      "server": "efeonce-internal",
+      "tool": "mcp__efeonce-internal__efeonce_organizations_list",
+      "arguments": {
+        "limit": 2
+      },
+      "startedAt": "2026-09-08T20:13:37.954631+00:00",
+      "completedAt": "2026-09-08T20:13:39.011256+00:00",
+      "status": "completed",
+      "result": {
+        "organizations": [
+          {
+            "organizationId": "org-03993839-8aab-479b-aeeb-a4e96a044dd6",
+            "capabilities": [
+              {
+                "textLength": 27,
+                "authorizationDenied": false
+              }
+            ]
+          },
+          {
+            "organizationId": "org-0bff3c10-c165-425b-8139-e26a1dde5c29",
+            "capabilities": [
+              {
+                "textLength": 27,
+                "authorizationDenied": false
+              }
+            ]
+          }
+        ],
+        "nextAfterOrganizationId": "org-0bff3c10-c165-425b-8139-e26a1dde5c29"
+      },
+      "clientObservedDurationMs": 1056.625
+    },
+    {
+      "server": "efeonce-internal",
+      "tool": "mcp__efeonce-internal__efeonce_organizations_list",
+      "arguments": {
+        "limit": 2,
+        "afterOrganizationId": "org-0bff3c10-c165-425b-8139-e26a1dde5c29"
+      },
+      "startedAt": "2026-09-08T20:13:41.264288+00:00",
+      "completedAt": "2026-09-08T20:13:42.279199+00:00",
+      "status": "completed",
+      "result": {
+        "organizations": [
+          {
+            "organizationId": "org-125fe6b3-eae2-4cc9-9f8a-4bec01945131",
+            "capabilities": [
+              {
+                "textLength": 27,
+                "authorizationDenied": false
+              }
+            ]
+          },
+          {
+            "organizationId": "org-1b77dd57-5c83-4046-9262-36933686ea3e",
+            "capabilities": [
+              {
+                "textLength": 27,
+                "authorizationDenied": false
+              }
+            ]
+          }
+        ],
+        "nextAfterOrganizationId": "org-1b77dd57-5c83-4046-9262-36933686ea3e"
+      },
+      "clientObservedDurationMs": 1014.911
+    },
+    {
+      "server": "efeonce-internal",
+      "tool": "mcp__efeonce-internal__get_seo_entitlement",
+      "arguments": {
+        "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975"
+      },
+      "startedAt": "2026-09-08T20:13:45.573665+00:00",
+      "completedAt": "2026-09-08T20:13:47.098557+00:00",
+      "status": "completed",
+      "result": {
+        "provider": "greenhouse-seo",
+        "data": {
+          "ok": true,
+          "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975",
+          "hasModule": false,
+          "tier": null,
+          "allowanceCap": 0,
+          "allowanceUsed": 0,
+          "allowanceRemaining": 0,
+          "budgetCapUsd": 0,
+          "budgetUsedUsd": 0,
+          "budgetRemainingUsd": 0,
+          "periodResetAt": "2026-10-01T00:00:00.000Z",
+          "blockedReason": "no_entitlement"
+        }
+      },
+      "clientObservedDurationMs": 1524.892
+    },
+    {
+      "server": "efeonce-internal",
+      "tool": "mcp__efeonce-internal__get_seo_entitlement",
+      "arguments": {
+        "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3"
+      },
+      "startedAt": "2026-09-08T20:13:45.989066+00:00",
+      "completedAt": "2026-09-08T20:13:47.566137+00:00",
+      "status": "completed",
+      "result": {
+        "provider": "greenhouse-seo",
+        "data": {
+          "ok": true,
+          "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3",
+          "hasModule": false,
+          "tier": null,
+          "allowanceCap": 0,
+          "allowanceUsed": 0,
+          "allowanceRemaining": 0,
+          "budgetCapUsd": 0,
+          "budgetUsedUsd": 0,
+          "budgetRemainingUsd": 0,
+          "periodResetAt": "2026-10-01T00:00:00.000Z",
+          "blockedReason": "no_entitlement"
+        }
+      },
+      "clientObservedDurationMs": 1577.071
+    },
+    {
+      "server": "efeonce-internal",
+      "tool": "mcp__efeonce-internal__get_seo_entitlement",
+      "arguments": {
+        "organizationId": "org-56b1a2d6-fc83-4639-adeb-59e0b20f5127"
+      },
+      "startedAt": "2026-09-08T20:13:49.890231+00:00",
+      "completedAt": "2026-09-08T20:13:50.986302+00:00",
+      "status": "failed",
+      "result": "authorization_denied",
+      "clientObservedDurationMs": 1096.071
+    },
+    {
+      "server": "efeonce-internal",
+      "tool": "mcp__efeonce-internal__get_seo_entitlement",
+      "arguments": {
+        "organizationId": "invalid/target"
+      },
+      "startedAt": "2026-09-08T20:13:55.875882+00:00",
+      "completedAt": "2026-09-08T20:13:56.727431+00:00",
+      "status": "failed",
+      "result": "authorization_denied",
+      "clientObservedDurationMs": 851.549
+    },
+    {
+      "server": "efeonce-internal",
+      "tool": "mcp__efeonce-internal__get_seo_entitlement",
+      "arguments": {
+        "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975"
+      },
+      "startedAt": "2026-09-08T20:13:58.638986+00:00",
+      "completedAt": "2026-09-08T20:13:59.830100+00:00",
+      "status": "completed",
+      "result": {
+        "provider": "greenhouse-seo",
+        "data": {
+          "ok": true,
+          "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975",
+          "hasModule": false,
+          "tier": null,
+          "allowanceCap": 0,
+          "allowanceUsed": 0,
+          "allowanceRemaining": 0,
+          "budgetCapUsd": 0,
+          "budgetUsedUsd": 0,
+          "budgetRemainingUsd": 0,
+          "periodResetAt": "2026-10-01T00:00:00.000Z",
+          "blockedReason": "no_entitlement"
+        }
+      },
+      "clientObservedDurationMs": 1191.114
+    }
+  ]
+}
