@@ -110,8 +110,13 @@ P09 coordina dueñas existentes, sin una sexta task genérica de notificaciones.
 
 No crear una task por cliente, gráfico, formato, endpoint o QA. Cada task incluye pruebas, rollout,
 manual y recuperación de su entrega. IDs verificados contra registry/filesystem y templates UI/backend aplicados.
-Las UI TASK-1854/1856 incluyen wireframe/flow/motion y empiezan `UI ready: no`:
-dirección comparada, primitives, tokens, wireframe/flow/motion y GVC pertenecen a sus planes.
+Las UI TASK-1854/1856 tienen cuatro documentos detallados cada una desde 2026-09-09:
+[diseño Inicio/servicios](../../ui/wireframes/TASK-1854-client-home-services-and-cycle-experience.md) y
+[diseño solicitudes/briefs](../../ui/wireframes/TASK-1856-client-service-request-and-brief-self-service-ui.md),
+con enlaces a dirección comparada, flows y motion. Incluyen pantallas, campos por servicio, copy, estados,
+responsive, primitives, recovery y matrices GVC. Requisitos de datos/commands conciliables en TASK-1853/1855.
+`UI ready: no`: integración, primer fold renderizado y GVC/scorecard premium siguen pendientes; no runtime.
+Calidad: promedio ≥4.5, ninguna dimensión <4 y dimensiones críticas ≥4.5 según estándar vigente.
 
 ## Integración obligatoria con Efeonce Insights
 

@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-1854-client-home-services-and-cycle-experience-motion.md`
 - Backend impact: `none`
 - Epic: `EPIC-046`
-- Status real: `Diseño registrado por autorización del operador 2026-09-09; sin implementación ni rollout`
+- Status real: `Diseño UI detallado 2026-09-09: dirección, wireframe, flow y motion; pendiente integración, primer fold y GVC; sin implementación ni rollout`
 - Rank: `3`
 - Domain: `platform|ui|delivery`
 - Blocked by: `TASK-1852, TASK-1853`
@@ -114,6 +114,15 @@ Baseline de código y documentos de esta planificación; flags, datos y entrega 
 
 ## UI/UX Contract
 
+### Paquete de diseño detallado — 2026-09-09
+
+- Dirección: [alternativas y tesis](../../ui/visual-directions/TASK-1854-client-home-services-and-cycle-experience.md).
+- [Wireframe](../../ui/wireframes/TASK-1854-client-home-services-and-cycle-experience.md): H0/S1, evidencia SEO/contenidos/diseño, pendientes e Insights; desktop/390, copy, primitives y QA.
+- [Flow](../../ui/flows/TASK-1854-client-home-services-and-cycle-experience-flow.md): F54-01..06, retorno contextual, identidad, fuentes y canales.
+- [Motion](../../ui/motion/TASK-1854-client-home-services-and-cycle-experience-motion.md): transiciones causales, tokens/owners, interrupción y reduced motion.
+- Los contratos propuestos están desarrollados; API/constraints/rutas deben conciliarse con sus dueñas. No son datos ni runtime existentes.
+- `UI ready: no` conserva los gates de integración, primer fold renderizado y evidencia GVC real. No existe scorecard aprobada por escribir estos documentos.
+
 ### Experience brief
 
 - UI rigor: `ui-standard`
@@ -125,7 +134,7 @@ Baseline de código y documentos de esta planificación; flags, datos y entrega 
 
 ### Surface & system decision
 
-- Surface: /home y detalle de servicio dentro de la composición cliente; URL final se sella en diseño.
+- Surface: /home existente + /home/services/[serviceId]?period=[periodId] propuesta; guards por ruta nueva y destinos autorizados del reader.
 - Nav placement: `none` — reutiliza /home; detalle contextual sin otra entrada de primer nivel.
 - Composition Shell: aplica; encabezado fuera de regions.primary mediante recipe/WorkbenchHeader.
 - Primitive decision: `reuse` — CompositionShell y catálogo canónico; extender sólo con evidencia del gap.
@@ -159,18 +168,19 @@ Baseline de código y documentos de esta planificación; flags, datos y entrega 
 
 ### Motion & microinteractions
 
-- Motion primitive: `none` — sin movimiento específico en esta task; controles heredados del sistema.
-- Enter / exit: cambio estático; sin secuencia ornamental.
-- Layout morph: no aplica.
-- Stagger: no aplica.
-- Timing / easing token: heredados de controles base, sin valores nuevos.
-- Reduced-motion fallback: misma información/acciones sin movimiento.
-- Non-goal motion: counters animados, charts animados o nuevas transiciones; si se incorporan, registrar contrato motion antes de implementar.
+- Motion primitive: `CompositionShell` vía SurfaceRecipe; controles/disclosure canónicos Tier 1. Sin motion cinemático nuevo.
+- Enter / exit: contenido legible inmediatamente; navegación/foco no esperan una animación.
+- Layout morph: ownership exclusivo del shell; no animación paralela del mismo grid ni colisión de nombres.
+- Stagger: no aplica; no retrasar lectura/acción por una secuencia ornamental.
+- Timing / easing token: motion/core/tokens.ts; short/standard/medium por intención y controller dueño, sin copiar ms/curvas ni inventar props.
+- Reduced-motion fallback: estados finales inmediatos, mismos datos, acciones, foco y feedback.
+- Contrato causal: docs/ui/motion/TASK-1854-client-home-services-and-cycle-experience-motion.md, transiciones M54-01..10 e interrupción/cleanup.
+- Non-goal motion: counters, éxito optimista, confetti, scroll-jacking o timers que decidan estados de negocio.
 
 ### Implementation mapping
 
-- Route / surface: /home y detalle de servicio dentro de la composición cliente; URL final se sella en diseño.
-- Primitive / variant / kind: CompositionShell/WorkbenchHeader, lista/detail del catálogo; mapping final se sella antes de UI ready yes.
+- Route / surface: /home existente + /home/services/[serviceId]?period=[periodId] propuesta; guards por ruta nueva y destinos autorizados del reader.
+- Primitive / variant / kind: SurfaceRecipe analyticsReport + WorkbenchHeader report, OperationalSection open, SignalStrip integrated y lista canónica; mapping detallado en wireframe.
 - Component candidates: src/views/greenhouse/client-portal/ y primitives exportadas en index.ts.
 - Copy source: diccionario de dominio propuesto en Files owned.
 - Data reader / command: DTO autorizado de TASK-1853, SEO TASK-1690, revisión TASK-289 e Insights TASK-1849.
@@ -181,8 +191,8 @@ Baseline de código y documentos de esta planificación; flags, datos y entrega 
 ### GVC scenario plan
 
 - Scenario file: scripts/frontend/scenarios/task1854-client-services.scenario.ts (propuesto).
-- Route: /home y detalle de servicio dentro de la composición cliente; URL final se sella en diseño.
-- Viewports: 1440 y 390px.
+- Route: /home existente + /home/services/[serviceId]?period=[periodId] propuesta; guards por ruta nueva y destinos autorizados del reader.
+- Viewports: 1440×900 y 390×844; medium y zoom para reflow.
 - Quality profile: `premium`.
 - Required steps: Inicio → servicio/período → pieza/revisión o Insights → retorno contextual; entrada desde aviso con/sin sesión, otra cuenta y revoked.
 - Required captures: first fold, detalle/formulario, empty/partial/error/denied, compacto y foco.
@@ -199,7 +209,7 @@ Baseline de código y documentos de esta planificación; flags, datos y entrega 
 - Alternatives considered: dashboard de cards uniforme; lista orientada a pendientes; ficha con evidencia y detalle contextual.
 - Why this pattern: preserva período/responsabilidad y escala entre servicios sin UI por cuenta.
 - Reuse / extend / new primitive: reuse primero; no primitive nueva prevista.
-- Open risks: route mapping, first fold y GVC pendientes; UI ready permanece no.
+- Open risks: rutas propuestas requieren integración/guard; first fold y GVC pendientes; UI ready permanece no.
 
 ### Visual verification
 
@@ -212,7 +222,7 @@ Baseline de código y documentos de esta planificación; flags, datos y entrega 
 - Before/after evidence: baseline/candidate y revisión premium.
 - Known visual debt: no first fold implementado; no se afirma paridad visual.
 - Visual scorecard: docs/ui/reviews/TASK-1854-client-home-services-and-cycle-experience.scorecard.json (a producir).
-- Quality threshold: average >= 4.2; floor >= 3; fidelity/template resistance >= 4.
+- Quality threshold: average >= 4.5; floor >= 4; hierarchy/surface economy/visual impact/fidelity/template resistance >= 4.5, según estándar premium vigente (14 dimensiones).
 
 
 
@@ -233,7 +243,7 @@ Baseline de código y documentos de esta planificación; flags, datos y entrega 
 
 ### Slice 1 — Dirección y primer fold
 
-- Sellar dirección visual comparada, mapping de primitives/copy/rutas y primer fold sobre DTO fixtures. Resolver reutilización de Home frente a detalle de servicio sin duplicar menú.
+- Materializar H0/S1 sobre DTO fixtures siguiendo la dirección C y el mapping documentado. Revalidar APIs/guards de las rutas propuestas; revisar primer fold desktop/390 antes de ampliar. Integración cliente acotada sobre Home existente, sin cambiar el Home interno.
 
 ### Slice 2 — Servicios y estados
 
@@ -249,6 +259,8 @@ Baseline de código y documentos de esta planificación; flags, datos y entrega 
 - Sin commit/push/deploy, cambios live ni envíos como consecuencia de registrar la task. Subagentes y cambios de rama no autorizados.
 
 ## Detailed Spec
+
+Contrato de diseño normativo: paquete enlazado en UI/UX Contract. Casos H54-01..12 y M54-01..10 definen cobertura; no sustituir por ejemplos genéricos. Cambios de alcance/rutas/constraints se reconcilian primero con las dueñas, sin duplicar lógica en UI.
 
 DTO autorizado de TASK-1853, SEO TASK-1690, revisión TASK-289 e Insights TASK-1849.
 
@@ -303,6 +315,10 @@ Fuentes de Berel/Sky, responsables, consentimiento de piloto y disponibilidad Te
 
 ## Acceptance Criteria
 
+- [x] Paquete documental detallado: alternativas, pantallas, copy, estados, responsive, flow y motion versionados el 2026-09-09; evidencia en los cuatro documentos enlazados. No acredita implementación.
+- [ ] H54-01..12 verificados: fuente/coverage, comparabilidad, respuesta tardía de período, derivados y publicación, deep links y negativas de acceso.
+- [ ] Efeonce Insights conserva edición/corte propios; no se confunde con Nexa Insights ni se muestran drafts internos; no enlaces aspiracionales.
+
 - [ ] Berel ve SEO/contenidos y Sky diseño digital por datos autorizados, sin ramas por nombre de cliente.
 - [ ] Primer fold explica estado del período, frescura y siguiente acción sin una grilla de indicadores vacíos.
 - [ ] Revisión e Insights tienen un destino canónico; enlaces preservan servicio/período y no aparecen si no hay acceso o superficie lista.
@@ -314,6 +330,10 @@ Fuentes de Berel/Sky, responsables, consentimiento de piloto y disponibilidad Te
 - [ ] Nav placement/módulo y presupuesto verificados; no destino visible duplicado ni enlace a superficie no habilitada.
 
 ## Verification
+
+Verificación documental 2026-09-09: task/readiness lint focal estricto sin errores ni warnings; EPIC-046 strict-child-parity pasa; enlaces Markdown relativos del cambio resuelven. El readiness lint valida contratos, no acredita calidad visual.
+
+Diseño documental: la arquitectura vigente y estos cuatro contratos cubren la especificación; manual funcional/operativo y capturas finales se actualizan al implementar el comportamiento real. No se publica un manual que anuncie rutas propuestas como disponibles.
 
 - Task lint focal: template=1, legacy=0, errors=0, warnings=0 antes de registro.
 - Implementación: `pnpm qa:gates --changed`, typecheck/lint y pruebas focales proporcionales; no guardas de forma textual como evidencia de comportamiento.

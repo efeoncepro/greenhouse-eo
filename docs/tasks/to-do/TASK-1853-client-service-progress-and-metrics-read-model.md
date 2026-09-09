@@ -130,6 +130,17 @@ Baseline de código y documentos de esta planificación; flags, datos y entrega 
 - Backward compatibility: gated/aditivo; no cambiar el DTO consumido sin versionar o adaptar.
 - Full API parity: commands/readers únicos; App/Ecosystem API y MCP son adapters, no implementaciones paralelas.
 
+### Requisitos del contrato UI detallado — TASK-1854
+
+El wireframe `docs/ui/wireframes/TASK-1854-client-home-services-and-cycle-experience.md` define H0/S1 y casos H54-01..12. Reconciliar estos requerimientos con el reader canónico; no son campos ya implementados:
+
+- Períodos disponibles e identificadores estables; fuente/corte/cobertura por señal, nullable distinto de cero y comparison con razón cuando no sea equivalente.
+- Pendientes con orden estable decidido en servidor, motivo, siguiente actor permitido, fecha solicitada/comprometida separadas y destino operativo autorizado. La UI no recalcula prioridad.
+- Trabajo paginado con principal/derivados, estado canónico, evidencia de publicación y redacción cliente; no conteos por suma de subtareas.
+- Clave de contexto organización/servicio/período para descartar respuestas tardías; errores por sección para degradación independiente y caché privada.
+- Destinos separados para revisión, solicitudes y edición Efeonce Insights. Resumen/fecha de emisión/corte del informe por reader de su dueña, sin draft interno ni sustitución por Nexa Insights.
+- Rutas propuestas `/home/services/[serviceId]` y descendientes deben tener guard/vista/entitlement explícitos conciliados con TASK-1852; Home base no concede módulos por herencia.
+
 ### Data model and invariants
 
 - Entidades/tablas/views afectadas: Commercial/Account 360, Delivery y readers ICO; fuentes sincronizadas canónicas, sin store duplicado de métricas.
@@ -256,6 +267,8 @@ Fuentes de Berel/Sky, responsables, consentimiento de piloto y disponibilidad Te
      ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
+
+- [ ] Requisitos del contrato UI detallado conciliados con schema/readers/commands reales y pruebas de comportamiento; documentar cada constraint o destino pendiente antes de habilitar el consumer.
 
 - [ ] Muestras de piezas/estados/métricas coinciden con productores y período sin doble conteo de derivados/subtareas.
 - [ ] No se crea cuota, consumo, SLA o porcentaje de avance sin denominador contractual/operativo verificable.

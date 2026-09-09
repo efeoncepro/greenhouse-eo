@@ -23,6 +23,10 @@ preferencias, destino autorizado y dedupe. TASK-690/693/1848/1849 actualizadas; 
 El operador autoriza el registro: TASK-1852–1856 creadas con templates, contratos UI/backend y
 criterios; TASK-1852 ↔ TASK-1834 enlazadas para identidad/contexto/deep links y rollout nativo
 condicional. Inicio por 1852 con login vigente probado; commit documental autorizado, sin implementación, push ni deploy.
+Diseño UI ampliado por pedido del operador: ocho documentos TASK-1854/1856 con pantallas H0/S1 y R0–R5,
+campos de contenidos/SEO/diseño, deep links, recovery, adjuntos, copy, responsive y motion causal.
+Primitives verificadas en código; tareas/backend/epic alineados. UI ready no hasta integración/primer fold/GVC;
+umbral premium vigente ≥4.5, sin declarar capturas, scorecard ni funcionalidad desplegada.
 
 ## 2026-09-08 — GPT Image 2.5 entra a la doc como capacidad de proveedor, no como camino disponible
 

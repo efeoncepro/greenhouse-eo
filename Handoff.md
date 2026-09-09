@@ -7,12 +7,12 @@ Iniciar TASK-1852; conexión bidireccional TASK-1834: identidad/retorno obligato
 Login vigente probado permite avanzar; reusar TASK-1687/1690/289/292. Sin implementación ni invitaciones.
 Movimiento ajeno de TASK-1690 a `in-progress/` preservado; no modificar su estado sin coordinación.
 Validación: epic lint estricto y docs closure pasan; ops lint global falla por lifecycle/ruta de esa
-task y avisa paridad histórica de otros epics. Cierre: commit documental autorizado; sin implementación ni push.
+task y avisa paridad histórica de otros epics. Plan en commit e946e7c0e; ampliación UI documentada, sin implementación ni push.
 
 **EPIC-045 ↔ EPIC-046:** Hitos I/N obligatorios: Insights cliente/interno + email/in-app/Teamsbot con
 deep links; shared separado y móvil posterior. Contrato en arquitectura Insights §§7.1/9.1 y ADRs.
 P01/P09 incluyen destinatarios/canales; TASK-1848/1849 distribución/experiencia; TASK-690/693 Hub y
-preferencias. Criterios/flow y contratos UI de TASK-1854/1856 registrados; UI ready no; sin envíos.
+preferencias. UI TASK-1854/1856: ocho docs detallados (dirección/wireframe/flow/motion), requisitos en 1853/1855; UI ready no, GVC pendiente.
 Primer email/in-app acompaña apertura cliente; Teamsbot por destino verificado. Reusar dueñas, sin otro Hub.
 
 **GPT Image 2.5 + contrato de proveedores de imagen (2026-09-08):** doc y skills al día; sólo documentación,

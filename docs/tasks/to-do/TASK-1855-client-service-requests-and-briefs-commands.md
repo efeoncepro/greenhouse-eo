@@ -130,6 +130,19 @@ Baseline de código y documentos de esta planificación; flags, datos y entrega 
 - Backward compatibility: gated/aditivo; no cambiar el DTO consumido sin versionar o adaptar.
 - Full API parity: commands/readers únicos; App/Ecosystem API y MCP son adapters, no implementaciones paralelas.
 
+### Requisitos del contrato UI detallado — TASK-1856
+
+Wireframe y flow `docs/ui/{wireframes,flows}/TASK-1856-client-service-request-and-brief-self-service-ui*` contienen R0–R5, matrices de campos/constraints y F56-01..08. Son requerimientos propuestos a conciliar aquí, no schemas existentes:
+
+- Plantilla versionada por servicio/tipo con required, constraints, enums, dependencias y defaults autorizados; límites concretos propuestos en wireframe. Cliente/API/MCP usan una validación común, sin schemas divergentes por nombre de cuenta.
+- Tipos/cantidad/tamaño de adjuntos desde policy; estados upload/validación separados, referencias privadas por objeto, rechazo/revocación, URLs temporales y limpieza de huérfanos. No aceptar storage 2xx como validación final.
+- Create idempotente por intención/payload y lookup de reconciliación tras respuesta perdida; resultado pendiente/fallo definitivo sin efecto/recurso durable distinguibles. Definir recuperación autenticada tras recarga antes de habilitar submit.
+- Completar información conserva brief original, aporte/revisión y expectedVersion; conflicto devuelve estado autorizado sin sobrescritura ni retry automático con versión nueva.
+- Listado/historial paginado y orden estable del servidor; filtros sólo cuando estén soportados. Leer solicitud no implica leer todas las de la organización.
+- Estados de solicitud, Delivery, publicación, sync y notificación separados. Fecha solicitada no se convierte en compromiso; un fallo del canal no revierte create.
+- V1 permite revisión local del formulario sin crear recurso. No promete borrador durable: si se incorpora, definir commands read/write/discard, actor/org, TTL, retención, conflictos y restauración antes de mostrar Guardar borrador.
+- Rutas nuevas propuestas bajo `/home/services/[serviceId]/requests` requieren guard por vista/objeto y coordinación con TASK-1852; no heredar permiso de escritura de Home.
+
 ### Data model and invariants
 
 - Entidades/tablas/views afectadas: Agregado Delivery de solicitud/brief; se debe resolver el recurso/store vigente antes del DDL. Si falta, store aditivo bajo greenhouse_delivery, nunca bajo el BFF cliente.
@@ -256,6 +269,8 @@ Fuentes de Berel/Sky, responsables, consentimiento de piloto y disponibilidad Te
      ═══════════════════════════════════════════════════════════ -->
 
 ## Acceptance Criteria
+
+- [ ] Requisitos del contrato UI detallado conciliados con schema/readers/commands reales y pruebas de comportamiento; documentar cada constraint o destino pendiente antes de habilitar el consumer.
 
 - [ ] DDL sólo después de demostrar ausencia de recurso equivalente; no se duplica BCS, aprobación, contrato ni solicitud de generación Insights.
 - [ ] Doble submit/retry y transición concurrente no duplican pedido ni efecto externo; historia y outbox quedan coherentes con el commit.
