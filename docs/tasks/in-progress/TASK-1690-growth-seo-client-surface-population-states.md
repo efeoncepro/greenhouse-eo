@@ -114,7 +114,7 @@ Esto es una nota de contrato, no un re-scope: declarar intención sigue fuera de
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -127,7 +127,7 @@ Esto es una nota de contrato, no un re-scope: declarar intención sigue fuera de
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-022`
-- Status real: `Sin empezar` — hallazgo medido en el cierre de TASK-1310
+- Status real: `Sin empezar` — ubicación in-progress y registro conciliados el 2026-09-09 al incluir el movimiento existente en el commit completo autorizado; sin evidencia nueva de implementación. Hallazgo medido en el cierre de TASK-1310
 - Rank: `TBD`
 - Domain: `growth`
 - Blocked by: `none`

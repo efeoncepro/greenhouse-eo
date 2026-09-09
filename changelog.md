@@ -27,6 +27,10 @@ Diseño UI ampliado por pedido del operador: ocho documentos TASK-1854/1856 con 
 campos de contenidos/SEO/diseño, deep links, recovery, adjuntos, copy, responsive y motion causal.
 Primitives verificadas en código; tareas/backend/epic alineados. UI ready no hasta integración/primer fold/GVC;
 umbral premium vigente ≥4.5, sin declarar capturas, scorecard ni funcionalidad desplegada.
+Asignación Claude/Codex documentada en EPIC-022/045/046: modelo, esfuerzo y revisión por task/carril;
+Astra para fronteras críticas, Sol para integración, Opus para UI/editorial y Fable para TASK-1669.
+Reglas comunes en EPIC-046: un editor por archivos, continuidad de owner y sin ejecución/rollout implícitos.
+Commit completo autorizado: incluye el movimiento previo de TASK-1690 a in-progress; lifecycle, registro y README conciliados, sin avance de implementación.
 
 ## 2026-09-08 — GPT Image 2.5 entra a la doc como capacidad de proveedor, no como camino disponible
 

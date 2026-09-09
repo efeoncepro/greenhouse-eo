@@ -48,6 +48,57 @@ Hoy Greenhouse mide si las IA te citan (AEO grader) pero **no** mide si rankeas 
 - `docs/architecture/GREENHOUSE_DATA_PLATFORM_ARCHITECTURE_V1.md` — PostgreSQL first (ventana caliente) + BigQuery (historia).
 - `docs/architecture/GREENHOUSE_RELIABILITY_CONTROL_PLANE_V1.md` — reliability signals de los paths async.
 
+## Ejecución con Claude y Codex
+
+Reparto del 2026-09-09 para el trabajo pendiente de SEO y su integración con portal/Insights, documentado
+a petición del operador. Aplican las [reglas compartidas](../to-do/EPIC-046-client-services-visibility-and-self-service.md#reglas-compartidas-de-ejecución-y-revisión):
+un editor por archivos, revisión cruzada y esfuerzo proporcional; no reasignar trabajo en curso ni
+interpretar esta tabla como autorización de ejecución, subagentes, gasto, rollout o cambio de branch.
+El checkout compartido actual prevalece sobre la referencia histórica de Branch del epic.
+
+| Task / carril | Ejecutor recomendado | Esfuerzo | Responsabilidad y motivo |
+|---|---|---|---|
+| TASK-1690 | Codex · GPT-5.6 Sol | xhigh | Reader y estados de la superficie cliente; revisión visual por Claude |
+| TASK-1655 | Codex · GPT-5.6 Sol | xhigh | Verificar/cerrar historia y backfill pendientes, sin reiniciar slices existentes |
+| TASK-1706 | Codex · GPT-6 Astra | xhigh | Presupuesto y compromiso de gasto recurrente de keywords |
+| TASK-1660 | Claude · Opus 5 | high | Superficie de objetivos y avance |
+| TASK-1791 | Codex · GPT-5.6 Sol | xhigh | Pertinencia de candidatos sobre productores existentes |
+| TASK-1703 → TASK-1701 → TASK-1702 | Codex · GPT-6 Astra | xhigh | Contrato de herramientas, hechos por URL y recomendaciones ancladas |
+| TASK-1311 | Codex · GPT-5.6 Sol | xhigh | Atribución y evidencia por URL |
+| TASK-1667 → TASK-1668 | Codex · GPT-6 Astra | xhigh | Handoff editorial, publicación verificada y outcomes |
+| TASK-1669 | Claude · Fable 5.1 | xhigh | Agentes para el plan diario, orquestación transversal de horizonte largo |
+| TASK-1672 | Claude · Opus 5 | high | Informe técnico SEO sobre catálogo/render compartido de Insights |
+| TASK-1673 | Codex · GPT-5.6 Sol | high | Compartir/enviar auditoría sobre commands de TASK-1848 |
+| TASK-1705 / TASK-1786 / TASK-1708 | Codex · GPT-5.6 Sol | high | Cosecha de crawl, hreflang y estacionalidad |
+| TASK-1426 / TASK-1284 / TASK-1787 | Codex · GPT-5.6 Sol | xhigh | Propiedades, conexión y atribución; conservar dependencia de conexión GA4 |
+| TASK-1808 / TASK-1809 / TASK-1810 / TASK-1811 | Codex · GPT-5.6 Sol | xhigh | Inteligencia de mercado; Claude para superficies visuales cuando su scope las incluya |
+
+Esta matriz agrupa asignaciones, no fusiona tasks ni inventa nuevas dependencias entre números contiguos.
+Tasks abiertas no listadas se enrutan en intake según riesgo/trabajo restante y disparadores vigentes;
+no se descongelan clusters/E-E-A-T ni se reinician foundations cerradas por registrar modelos.
+
+### Orden de valor y revisión
+
+1. **Primero TASK-1690**, coordinada con TASK-1852/1853 de EPIC-046. No esperar el cierre de todo el epic
+   SEO para exponer el servicio contratado de Berel. Su movimiento a in-progress no prueba implementación.
+2. **TASK-1655:** verificar cobertura y trabajo restante antes de prometer ventanas históricas; ya documenta
+   slices implementados. No bloquear períodos con evidencia suficiente por esperar toda la historia.
+3. **TASK-1672/1673:** integrar después de sus foundations Insights; mantener el gate operativo de findings
+   de TASK-1670/1671. Carpeta complete con rollout pendiente no acredita disponibilidad productiva.
+4. Tras la apertura, priorizar TASK-1706 → TASK-1660 y TASK-1791; después el carril TASK-1703 → TASK-1701
+   → TASK-1702 y TASK-1667 → TASK-1668 → TASK-1669. TASK-1311 aporta evidencia cuando sea necesaria;
+   revalidar contratos del handoff y no llenar campos faltantes para omitir dependencias.
+5. Aprovechar TASK-1705/1786/1708; ampliar propiedades, atribución y mercado según fuentes/consumidores.
+   TASK-1808 conserva sus condiciones de binding/cluster. Tasks agrupadas en tabla no se habilitan por inferencia.
+
+Revisión cruzada: Claude Opus 5 revisa claridad de resultados/flujos y GVC donde haya UI; Codex revisa los
+contratos del trabajo de Claude. Para TASK-1669, revisión técnica por Astra `xhigh` de autoridad, efectos,
+costo, replay y aprobación humana antes de habilitar agentes. No confundir prompts correctos con operación segura.
+
+La [matriz Insights](../to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md#ejecución-con-claude-y-codex)
+posee TASK-1845–1849; la [matriz portal/canales](../to-do/EPIC-046-client-services-visibility-and-self-service.md#ejecución-con-claude-y-codex)
+posee el reparto de experiencia cliente y coordina las dependencias de comunicación sin reparentarlas.
+
 ## Child Tasks
 
 > **Barrido de `Blocked by` — 2026-08-08.** Los siete blockers que las hijas citaban (`TASK-1299`,

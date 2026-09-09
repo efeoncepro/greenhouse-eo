@@ -47,6 +47,36 @@ entregas. Este programa coordina esas fronteras sin crear otro producto desplega
 - `docs/architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`.
 - `docs/operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md`.
 
+## Ejecución con Claude y Codex
+
+Asignación del 2026-09-09 documentada por pedido del operador. Aplican las
+[reglas compartidas de ejecución y revisión](EPIC-046-client-services-visibility-and-self-service.md#reglas-compartidas-de-ejecución-y-revisión):
+un editor por archivos, review cruzada, esfuerzo proporcional, continuidad del owner y sin ejecución
+implícita. Es una recomendación de reparto, no una certificación comparativa de modelos ni estado runtime.
+
+| Task | Ejecutor recomendado | Esfuerzo | Responsabilidad y motivo |
+|---|---|---|---|
+| TASK-1845 | Codex · GPT-6 Astra | xhigh | Dominio/evidencia: ediciones, autoridad, aislamiento y contratos compartidos |
+| TASK-1846 | Codex · GPT-6 Astra | xhigh | Render durable/Artifact Worker: concurrencia, recovery, idempotencia y compatibilidad |
+| TASK-1847 | Claude · Opus 5 | xhigh | Gráficos/catálogos: composición editorial, geometría y calidad del archivo final |
+| TASK-1848 | Codex · GPT-6 Astra | xhigh | Sharing, revocación, correo/recurrencia y prevención de duplicados |
+| TASK-1849 | Claude · Opus 5 | xhigh | Biblioteca/builder/visor: recorridos cliente/interno, responsive y GVC |
+
+**Orden:** TASK-1845 → TASK-1846/1847 → TASK-1848 → TASK-1849, respetando las dependencias de la tabla
+Child Tasks. TASK-1847 prepara catálogos tras 1845; su export final depende de 1846. Preparar 1845 durante
+el carril de datos del portal no obliga a esperar la implementación de Inicio ni habilita edición incompleta.
+
+Revisión: Claude Opus 5 revisa el comportamiento de producto de las foundations de Codex; Codex revisa
+contratos/datos de 1847 y autoridad/paridad de 1849, usando Astra `xhigh` en las fronteras críticas.
+Revisar PDFs finales completos y GVC desktop/390; aprobar el modelo o los docs no aprueba su resultado visual.
+
+**Integración SEO:** TASK-1672 (Claude · Opus 5 `high`) adapta la auditoría al catálogo; TASK-1673
+(Codex · GPT-5.6 Sol `high`) integra compartir/enviar sobre TASK-1848. Ambas conservan EPIC-022 y sus
+gates de findings/rollout; no otro motor ni sender. La matriz dueña está en
+[SEO](../in-progress/EPIC-022-growth-seo-search-visibility-360-module.md#ejecución-con-claude-y-codex).
+Las dependencias de Hub/transporte/preferencias están asignadas en
+[EPIC-046](EPIC-046-client-services-visibility-and-self-service.md#matriz-de-comunicación-y-retorno-al-portal).
+
 ## Child Tasks
 
 **Cinco tasks nuevas de implementación.** Son unidades de ownership con varios slices, no cinco cambios

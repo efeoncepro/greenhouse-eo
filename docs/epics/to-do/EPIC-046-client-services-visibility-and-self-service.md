@@ -76,6 +76,94 @@ Fuentes: `src/lib/client-portal/**`, `src/lib/growth/seo/client/read-seo-client-
 No se midieron aquí cobertura/frescura completa de las piezas, cupos, SLAs, proveedores de revisión
 de Sky ni el login E2E de ambas cuentas: P01 debe resolverlos antes de prometer disponibilidad.
 
+## Ejecución con Claude y Codex
+
+Asignación registrada el 2026-09-09 a petición del operador. Es el reparto recomendado para el trabajo
+pendiente del programa EPIC-022/045/046; no un benchmark de superioridad, un cambio de lifecycle ni una
+sesión ya iniciada. La selección final se confirma contra el modelo disponible y el avance real al tomar
+cada task. No trasladar automáticamente a otro modelo una implementación que ya tiene owner y contexto.
+
+### Reglas compartidas de ejecución y revisión
+
+Estas reglas aplican también a las matrices de [SEO](../in-progress/EPIC-022-growth-seo-search-visibility-360-module.md#ejecución-con-claude-y-codex)
+e [Insights](EPIC-045-efeonce-insights-multiformat-intelligence.md#ejecución-con-claude-y-codex).
+
+- **Codex · GPT-6 Astra:** límites de autoridad, contratos fundacionales, idempotencia/concurrencia,
+  cambios de amplio impacto y cutovers. **Codex · GPT-5.6 Sol:** integraciones delimitadas, readers,
+  correcciones y cierres operativos sobre contratos existentes.
+- **Claude · Opus 5:** UI, formularios, composición editorial, gráficos, motion, responsive y revisión
+  visual. **Claude · Fable 5.1:** orquestación transversal de horizonte largo; asignado aquí a TASK-1669.
+- `high` y `xhigh` son el esfuerzo recomendado de la sesión, no la prioridad P1/P2 de la task. No usar
+  `max` por defecto: escalar sólo ante un problema difícil no resuelto y registrar el motivo. No fallback
+  silencioso a otro modelo; dejar el modelo/effort efectivamente usado en el plan y handoff de la task.
+- **Revisión cruzada con propósito:** trabajo de Codex → Claude revisa comprensión del producto, flujos,
+  legibilidad y evidencia visual donde aplique. Trabajo de Claude → Codex revisa contratos, autoridad,
+  datos, concurrencia y comportamiento. Para permisos, dinero, sharing y cutovers, Astra es el revisor
+  técnico recomendado cuando no es el autor; una sesión independiente revisa el trabajo, no sólo su resumen.
+- Revisor recomendado: Opus 5 `high` para lectura de producto y `xhigh` para revisión visual compleja;
+  Sol `high` para integración acotada y Astra `xhigh` para las fronteras críticas nombradas arriba.
+  Revisión documental no sustituye tests, GVC observado ni readback de runtime.
+- **Un único editor por archivos compartidos.** El otro revisa hasta transferencia explícita de ownership.
+  Trabajar sólo en el checkout compartido; no worktrees, clones, cambio de branch ni subagentes implícitos.
+  Esta matriz no autoriza ejecución simultánea ni crea sesiones/agentes.
+- Al iniciar en Codex, conservar `/goal` explícito y task-hook. Modelo/esfuerzo no conceden autorización
+  para asignaciones live, envíos, migraciones, push o deploy; aplicar los contratos y gates de cada dueña.
+- Si una task no figura en estas matrices, decidir su modelo en intake por riesgo y trabajo restante;
+  no extender una asignación por cercanía numérica ni reabrir una task completa por esta planificación.
+
+Canon operativo: [Operating Loop](../../operations/GREENHOUSE_OPERATING_LOOP_V1.md) y
+[workspace compartido](../../architecture/agent-invariants/REPOSITORY_SHARED_WORKSPACE_AGENT_INVARIANTS.md).
+Se mantienen el [ADR del portal](../../architecture/GREENHOUSE_CLIENT_SERVICE_EXPERIENCE_DECISION_V1.md)
+y el [ADR de Insights](../../architecture/EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md); no cambia arquitectura,
+fuente de verdad, permisos ni harness de agentes por elegir un ejecutor.
+
+### Matriz del portal y dependencias acotadas
+
+| Task | Ejecutor recomendado | Esfuerzo | Responsabilidad y motivo |
+|---|---|---|---|
+| TASK-1852 | Codex · GPT-6 Astra | xhigh | Habilitación Berel/Sky: contratación, identidad, permisos, fuentes y canales |
+| TASK-1687 (externa) | Codex · GPT-5.6 Sol | high | Resolver destino roto de Sky sin alterar el resto del catálogo/acceso |
+| TASK-1690 (EPIC-022) | Codex · GPT-5.6 Sol | xhigh | Reader, cobertura y estados SEO por población; Claude revisa presentación |
+| TASK-1853 | Codex · GPT-5.6 Sol | xhigh | Lectura de servicios/métricas sobre contratos existentes; sin cálculo duplicado |
+| TASK-1854 | Claude · Opus 5 | xhigh | Inicio/Mis servicios: jerarquía, responsive, estados, motion y GVC |
+| TASK-289 (externa) | Codex · GPT-5.6 Sol | high | Clasificación de pendientes cliente/Efeonce y adaptación de revisión existente |
+| TASK-1855 | Codex · GPT-6 Astra | xhigh | Commands de solicitudes: estado, archivos privados, conflictos y recuperación |
+| TASK-1856 | Claude · Opus 5 | xhigh | Formularios/briefs, revisión, acuse y seguimiento premium |
+
+TASK-1690 conserva su dueño de epic; la asignación no toma ni altera el movimiento ajeno de su archivo.
+TASK-292 sigue condicional a revisores/scopes personales; modelo se decide al tomarla, sin activar ese carril
+por inferencia. TASK-1834 conserva la asignación/contrato de identidad de EPIC-044; no se replanifica aquí.
+
+### Matriz de comunicación y retorno al portal
+
+Son dependencias coordinadas por P09, no nuevas hijas ni un cambio de epic. Reconciliar contratos legacy,
+fuentes y estado real antes de ejecutar; no reconstruir un sender ni omitir observación del Hub.
+
+| Task | Ejecutor recomendado | Esfuerzo | Entrega |
+|---|---|---|---|
+| TASK-690 | Codex · GPT-6 Astra | xhigh | Contrato Notification Hub |
+| TASK-691 | Codex · GPT-5.6 Sol | high | Shadow y evidencia de paridad |
+| TASK-692 | Codex · GPT-6 Astra | xhigh | Cutover del Hub |
+| TASK-693 | Claude · Opus 5 | xhigh | UI y preferencias |
+| TASK-1759 | Codex · GPT-5.6 Sol | xhigh | Transporte reactivo |
+| TASK-1774 | Codex · GPT-5.6 Sol | xhigh | Baja de correo y su contrato |
+| TASK-303 | Codex · GPT-5.6 Sol | high | Audiencias y destinatarios |
+| TASK-387 | Codex · GPT-5.6 Sol | high | Agrupación y digest |
+| TASK-694 | Codex · GPT-5.6 Sol | high | Medición avanzada de comunicación/adopción |
+
+Orden del Hub: TASK-690 → TASK-691 → TASK-692 → TASK-693; mantener los siete días de observación/paridad
+requeridos por TASK-692. El primer email/in-app puede usar el transporte vigente si se certifica; si no,
+la comunicación integrada queda pendiente hasta resolver su dueña. Teamsbot exige destino habilitado.
+TASK-1848/1849 poseen distribución/presentación de Insights y su matriz vive en EPIC-045.
+
+### Primer bloque de ejecución
+
+**TASK-1852 con Codex · GPT-6 Astra `xhigh`** → TASK-1690/1853 con Sol `xhigh` → TASK-1854 con Opus 5
+`xhigh` y TASK-289 con Sol `high`, con avisos en la primera entrega. Preparar TASK-1845 durante el carril
+de datos cuando haya ownership independiente; completar Insights antes de la entrega de autogestión
+transaccional. TASK-1855 puede avanzar tras sus dependencias sin esperar la UI Insights.
+El orden de valor no añade bloqueos técnicos a las tasks ni exige terminar todo SEO para abrir el portal.
+
 ## Child Tasks
 
 Cinco tasks registradas por autorización del operador; todas `to-do`, prioridad P1. Las existentes
@@ -155,8 +243,8 @@ pero una edición congelada conserva su fecha aunque el dashboard se actualice.
   versionado append-only. No construir otra página placeholder ni esconder la señal.
 - **TASK-286:** expansión genérica del catálogo; no duplicarla en P01. P01 se limita al contrato
   mínimo de estos servicios; cualquier ampliación general vuelve a esa dueña.
-- **TASK-1690 (EPIC-022):** reader/estados SEO. Tiene un movimiento ajeno a `in-progress/` en este
-  checkout y `Lifecycle: to-do` todavía en el cuerpo al diagnosticar; coordinar sin sobrescribirlo.
+- **TASK-1690 (EPIC-022):** reader/estados SEO. Movimiento existente a `in-progress/` incluido en el
+  commit completo autorizado 2026-09-09; lifecycle/registro conciliados, implementación sin empezar.
 - **TASK-289/292:** colas de revisión. Sus claims de scopes/roles/grants históricos deben reconciliarse
   con el primitive actual antes de ejecutar. P06 no adquiere ownership de aprobaciones de assets.
 - **TASK-295:** scorecard standalone de SLA/calidad; P02 sólo adapta métricas existentes y P04 sus
