@@ -1,5 +1,7 @@
 import * as z from 'zod/v4'
 
+import type { ServiceEnablementRequest, ServiceEnablementApplyRequest, ServiceEnablementRollbackRequest } from '@/lib/client-portal/enablement/types'
+
 import { GreenhouseMcpApiError, type GreenhouseApiPlatformClient } from './http-client'
 import type { GreenhouseMcpErrorResult, GreenhouseMcpSuccessResult, GreenhouseMcpToolResult } from './types'
 
@@ -164,6 +166,9 @@ const callTool = async <TData>(
 
 export const createGreenhouseMcpHandlers = (client: Pick<
   GreenhouseApiPlatformClient,
+  | 'previewClientServiceEnablement'
+  | 'applyClientServiceEnablement'
+  | 'rollbackClientServiceEnablement'
   | 'getContext'
   | 'listOrganizations'
   | 'getOrganization'
@@ -255,6 +260,19 @@ export const createGreenhouseMcpHandlers = (client: Pick<
       },
       () => client.getMcpSkills()
     )
+  },
+  async previewClientServiceEnablement(input: ServiceEnablementRequest) {
+    return callTool(result => {
+      const data = result.data as { canApply: boolean; blockers: unknown[]; readiness: unknown[] }
+
+      return `Service enablement preview: ${data.blockers.length} configuration blockers, ${data.readiness.length} operational checks pending. No assignments or messages sent (${result.requestId}).`
+    }, () => client.previewClientServiceEnablement(input))
+  },
+  async applyClientServiceEnablement(input: ServiceEnablementApplyRequest) {
+    return callTool(result => `Service enablement command result (${result.requestId}).`, () => client.applyClientServiceEnablement(input))
+  },
+  async rollbackClientServiceEnablement(input: ServiceEnablementRollbackRequest) {
+    return callTool(result => `Service enablement compensation result (${result.requestId}).`, () => client.rollbackClientServiceEnablement(input))
   },
   async getContext() {
     return callTool(

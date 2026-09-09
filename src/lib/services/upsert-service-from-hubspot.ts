@@ -89,16 +89,16 @@ export interface UpsertServiceResult {
   lifecycleChanged: boolean
 }
 
-const toNumberOrZero = (value: unknown): number => {
-  if (typeof value === 'number') return Number.isFinite(value) ? value : 0
+const toNumberOrNull = (value: unknown): number | null => {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null
 
-  if (typeof value === 'string') {
+  if (typeof value === 'string' && value.trim() !== '') {
     const parsed = Number(value)
 
-    return Number.isFinite(parsed) ? parsed : 0
+    return Number.isFinite(parsed) ? parsed : null
   }
 
-  return 0
+  return null
 }
 
 interface PreviousStateRow extends Record<string, unknown> {
@@ -196,8 +196,8 @@ export const upsertServiceFromHubSpot = async (
   const billingFrequency = properties.ef_billing_frequency?.trim() || 'monthly'
   const country = properties.ef_country?.trim() || 'CL'
   const currency = properties.ef_currency?.trim() || 'CLP'
-  const totalCost = toNumberOrZero(properties.ef_total_cost)
-  const amountPaid = toNumberOrZero(properties.ef_amount_paid)
+  const totalCost = toNumberOrNull(properties.ef_total_cost)
+  const amountPaid = toNumberOrNull(properties.ef_amount_paid)
   const startDate = properties.ef_start_date || null
   const targetEndDate = properties.ef_target_end_date || null
   const notionProjectId = properties.ef_notion_project_id || null

@@ -7,6 +7,18 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-09 — TASK-1852: habilitación común de servicios
+
+Implementados inventario/preview, apply y compensación por organización/persona/servicio con commands
+canónicos, locks, snapshot e idempotencia atómica. App/CLI/MCP/Nexa reutilizan el dominio; escritura
+delegada denegada y writes nuevos apagados. JOIN comercial corregido, procedencia agent preservada
+durante refresh y audit App acepta cliente nulo de sesión interna. 290 tests, PostgreSQL local y smoke
+HTTP autenticado; [QA y matriz Berel/Sky](docs/audits/client-portal/TASK-1852_IMPLEMENTATION_QA_2026-09-09.md).
+Rollout autorizado y alcance Berel/Sky confirmado por el operador; permiso de compensación EFEONCE_ADMIN
+corregido, 392 tests passed. Servicio Berel sincronizado por command; resolver HubSpot vigente y
+normalizador conservan importes ausentes NULL. [Estado del despliegue](docs/audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md).
+Registros comerciales y certificación cliente pendientes; sin asignaciones live ni envíos.
+
 ## 2026-09-09 — Planificación estacional Efeonce y continuidad editorial
 
 Documentadas 13 piezas 2026–2027 con conceptos, tareas, calendario y readback fechado en
@@ -971,19 +983,3 @@ Y el bloqueo de entrenamiento de modelos de IA no se pinta como una falla: lleva
 🔴 **Sigue apagado.** El código existe pero no está desplegado, y el interruptor tampoco está
 encendido. Hasta que las dos cosas pasen, un sitio invisible para los motores de IA **sigue**
 saliendo con 95 de salud.
-
-## 2026-09-01 — El audit SEO aprende a mirar el sitio, no sólo sus páginas (TASK-1670)
-
-La auditoría técnica pasa a evaluar cuatro cosas que el crawl de páginas no ve: si el `robots.txt`
-le niega el paso a los rastreadores de IA, si el servidor o el CDN los rechaza aunque el `robots.txt`
-los permita, si la portada publica datos estructurados y si el mapa del sitio está sano.
-
-La distinción que hace creíble al informe: bloquear el rastreo que **cita** el sitio en una respuesta
-de IA es crítico, mientras que bloquear el que **entrena** modelos es una decisión de derechos sobre
-el contenido y se reporta como información, nunca como falla. Meterlos en la misma bolsa haría que un
-sitio perfectamente accesible saliera en rojo, y eso enseña a ignorar la alerta más importante.
-
-🔴 **Todavía no está encendido.** La capacidad viaja apagada detrás de un flag, porque estos
-hallazgos son del dominio completo y la pantalla actual los contaría como "1 página afectada". Hasta
-que esa superficie exista (`TASK-1671`), un sitio invisible para los motores de IA **sigue** saliendo
-con 95 de salud. El estado real es `code complete, rollout pendiente`.

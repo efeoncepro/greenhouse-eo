@@ -3,10 +3,10 @@ import 'server-only'
 import { sql } from 'kysely'
 
 import { __clearClientPortalResolverCache } from '@/lib/client-portal/readers/native/module-resolver'
-import { getDb } from '@/lib/db'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 import { recordAssignmentEvent } from './audit'
+import { lockClientPortalAssignment, runAssignmentTransaction, type AssignmentTransaction } from './transaction'
 import { ClientPortalValidationError } from './errors'
 
 /**
@@ -60,15 +60,17 @@ const updateAssignmentStatus = async (
     toStatus: 'paused' | 'active'
     eventType: string
     rejectMessage: (currentStatus: string) => string
-  }
+  },
+  transaction?: AssignmentTransaction
 ): Promise<PauseResumeResult> => {
-  const db = await getDb()
+  const result = await runAssignmentTransaction(async tx => {
+    await lockClientPortalAssignment(input.assignmentId, tx)
 
-  const result = await db.transaction().execute(async tx => {
     const existing = await tx
       .selectFrom('greenhouse_client_portal.module_assignments')
       .select(['assignment_id', 'organization_id', 'module_key', 'status', 'effective_to'])
       .where('assignment_id', '=', input.assignmentId)
+      .forUpdate()
       .executeTakeFirst()
 
     if (!existing) {
@@ -164,9 +166,9 @@ const updateAssignmentStatus = async (
       organizationId: existing.organization_id,
       moduleKey: existing.module_key
     }
-  })
+  }, transaction)
 
-  if (!result.idempotent) {
+  if (!transaction && !result.idempotent) {
     __clearClientPortalResolverCache(result.organizationId)
   }
 
@@ -178,19 +180,19 @@ const updateAssignmentStatus = async (
   }
 }
 
-export const pauseClientPortalModule = async (input: PauseResumeInput): Promise<PauseResumeResult> =>
+export const pauseClientPortalModule = async (input: PauseResumeInput, transaction?: AssignmentTransaction): Promise<PauseResumeResult> =>
   updateAssignmentStatus(input, {
     fromAllowed: ['active', 'pilot', 'pending'],
     toStatus: 'paused',
     eventType: 'client.portal.module.assignment.paused',
     rejectMessage: status =>
       `Assignment is in status '${status}'; pause requires status in (active, pilot, pending)`
-  })
+  }, transaction)
 
-export const resumeClientPortalModule = async (input: PauseResumeInput): Promise<PauseResumeResult> =>
+export const resumeClientPortalModule = async (input: PauseResumeInput, transaction?: AssignmentTransaction): Promise<PauseResumeResult> =>
   updateAssignmentStatus(input, {
     fromAllowed: ['paused'],
     toStatus: 'active',
     eventType: 'client.portal.module.assignment.resumed',
     rejectMessage: status => `Assignment is in status '${status}'; resume requires status 'paused'`
-  })
+  }, transaction)

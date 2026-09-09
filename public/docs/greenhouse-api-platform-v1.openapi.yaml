@@ -148,7 +148,831 @@ components:
           type: boolean
         metadata:
           type: object
+    ServiceEnablementRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          minLength: 1
+          maxLength: 160
+          pattern: ^[a-zA-Z0-9_.:-]+$
+        targets:
+          type: array
+          items:
+            type: object
+            properties:
+              serviceId:
+                anyOf:
+                  - type: string
+                    minLength: 1
+                    maxLength: 160
+                    pattern: ^[a-zA-Z0-9_.:-]+$
+                  - type: "null"
+              moduleKey:
+                type: string
+                minLength: 1
+                maxLength: 160
+                pattern: ^[a-zA-Z0-9_.:-]+$
+            required:
+              - serviceId
+              - moduleKey
+            additionalProperties: false
+          minItems: 1
+          maxItems: 20
+        personIds:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 160
+            pattern: ^[a-zA-Z0-9_.:-]+$
+          maxItems: 50
+      required:
+        - organizationId
+        - targets
+        - personIds
+      additionalProperties: false
+      description: A single organization. Duplicate module keys or person IDs are
+        rejected. An empty person selection is valid for inventory but blocks apply.
+        No actor is accepted from the body.
+    ServiceEnablementApplyRequest:
+      type: object
+      properties:
+        proposal:
+          type: object
+          properties:
+            organizationId:
+              type: string
+              minLength: 1
+              maxLength: 160
+              pattern: ^[a-zA-Z0-9_.:-]+$
+            targets:
+              type: array
+              items:
+                type: object
+                properties:
+                  serviceId:
+                    anyOf:
+                      - type: string
+                        minLength: 1
+                        maxLength: 160
+                        pattern: ^[a-zA-Z0-9_.:-]+$
+                      - type: "null"
+                  moduleKey:
+                    type: string
+                    minLength: 1
+                    maxLength: 160
+                    pattern: ^[a-zA-Z0-9_.:-]+$
+                required:
+                  - serviceId
+                  - moduleKey
+                additionalProperties: false
+              minItems: 1
+              maxItems: 20
+            personIds:
+              type: array
+              items:
+                type: string
+                minLength: 1
+                maxLength: 160
+                pattern: ^[a-zA-Z0-9_.:-]+$
+              maxItems: 50
+          required:
+            - organizationId
+            - targets
+            - personIds
+          additionalProperties: false
+        fingerprint:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+        idempotencyKey:
+          type: string
+          minLength: 8
+          maxLength: 160
+          pattern: ^[a-zA-Z0-9_.:-]+$
+      required:
+        - proposal
+        - fingerprint
+        - idempotencyKey
+      additionalProperties: false
+    ServiceEnablementRollbackRequest:
+      type: object
+      properties:
+        organizationId:
+          type: string
+          minLength: 1
+          maxLength: 160
+          pattern: ^[a-zA-Z0-9_.:-]+$
+        operationId:
+          type: string
+          minLength: 1
+          maxLength: 160
+          pattern: ^[a-zA-Z0-9_.:-]+$
+        idempotencyKey:
+          type: string
+          minLength: 8
+          maxLength: 160
+          pattern: ^[a-zA-Z0-9_.:-]+$
+      required:
+        - organizationId
+        - operationId
+        - idempotencyKey
+      additionalProperties: false
+    ServiceEnablementIssue:
+      type: object
+      required:
+        - code
+        - subject
+        - owner
+      properties:
+        code: &a1
+          type: string
+        subject: *a1
+        owner:
+          type: string
+          enum:
+            - Commercial
+            - Identity
+            - Client Portal
+            - Delivery/Growth
+            - Notifications
+    ServiceEnablementInventory:
+      type: object
+      required:
+        - organization
+        - observedAt
+        - businessLines
+        - services
+        - terms
+        - modules
+        - assignments
+        - people
+        - sources
+        - channels
+      properties:
+        organization:
+          type: object
+          required:
+            - id
+            - active
+          properties:
+            id: *a1
+            active: &a2
+              type: boolean
+        observedAt:
+          type: string
+          format: date-time
+        businessLines: &a4
+          type: array
+          items: *a1
+        services:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - spaceId
+              - active
+              - status
+              - startsAt
+              - endsAt
+            properties:
+              id: *a1
+              spaceId: *a1
+              active: *a2
+              status: *a1
+              startsAt: &a3
+                type:
+                  - string
+                  - "null"
+              endsAt: *a3
+        terms:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - serviceId
+              - moduleKeys
+              - startsAt
+              - endsAt
+            properties:
+              id: *a1
+              serviceId: *a1
+              moduleKeys: *a4
+              startsAt: *a1
+              endsAt: *a3
+        modules:
+          type: array
+          items:
+            type: object
+            required:
+              - key
+              - scope
+              - startsAt
+              - endsAt
+              - viewCodes
+              - dataSources
+            properties:
+              key: *a1
+              scope: *a1
+              startsAt: *a1
+              endsAt: *a3
+              viewCodes: *a4
+              dataSources: *a4
+        assignments:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - moduleKey
+              - status
+              - startsAt
+              - endsAt
+              - expiresAt
+              - revision
+            properties:
+              id: *a1
+              moduleKey: *a1
+              status: *a1
+              startsAt: *a1
+              endsAt: *a3
+              expiresAt: *a3
+              revision: *a1
+        people:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - active
+              - status
+              - identityLinked
+              - lastLoginAt
+              - emailDeliverable
+              - revokedViewCodes
+              - preferences
+            properties:
+              id: *a1
+              active: *a2
+              status: *a3
+              identityLinked: *a2
+              lastLoginAt: *a3
+              emailDeliverable: *a2
+              revokedViewCodes: *a4
+              preferences:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - category
+                    - email
+                    - inApp
+                    - mutedUntil
+                  properties:
+                    category: *a1
+                    email: *a2
+                    inApp: *a2
+                    mutedUntil: *a3
+        sources:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - kind
+              - active
+              - reference
+            properties:
+              id: *a1
+              kind:
+                type: string
+                enum:
+                  - notion
+                  - seo
+              active: *a2
+              reference: *a1
+        channels:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - kind
+              - provisioningStatus
+              - disabled
+            properties:
+              id: *a1
+              kind: *a1
+              provisioningStatus: *a1
+              disabled: *a2
+      description: Configuration only. Date columns use YYYY-MM-DD, instants use ISO
+        8601. No producer delivery, recipient consent or human login is certified by
+        this DTO.
+    ServiceEnablementPreview:
+      type: object
+      required:
+        - version
+        - request
+        - observedAt
+        - fingerprint
+        - inventory
+        - changes
+        - blockers
+        - readiness
+        - people
+        - routes
+        - canApply
+      properties:
+        version:
+          const: 1
+        request:
+          $ref: "#/components/schemas/ServiceEnablementRequest"
+        observedAt:
+          type: string
+          format: date-time
+        fingerprint:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+        inventory:
+          $ref: "#/components/schemas/ServiceEnablementInventory"
+        changes:
+          type: array
+          items:
+            type: object
+            required:
+              - serviceId
+              - termsId
+              - moduleKey
+              - action
+              - assignmentId
+            properties:
+              serviceId: *a1
+              termsId: *a1
+              moduleKey: *a1
+              action:
+                type: string
+                enum:
+                  - enable
+                  - preserve
+              assignmentId: *a3
+        blockers:
+          type: array
+          items:
+            $ref: "#/components/schemas/ServiceEnablementIssue"
+        readiness:
+          type: array
+          items:
+            $ref: "#/components/schemas/ServiceEnablementIssue"
+        people:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - views
+            properties:
+              id: *a1
+              views:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - viewCode
+                    - before
+                    - after
+                  properties:
+                    viewCode: *a1
+                    before: *a2
+                    after: *a2
+        routes:
+          type: array
+          items:
+            type: object
+            required:
+              - viewCode
+              - path
+              - verification
+            properties:
+              viewCode: *a1
+              path: *a3
+              verification:
+                const: unverified
+        canApply: *a2
+      description: canApply certifies configuration eligibility only. after is
+        conditional visibility, not an applied grant. Readiness and authenticated
+        route checks must be certified separately before rollout.
+    ServiceEnablementReceipt:
+      type: object
+      required:
+        - version
+        - operationId
+        - organizationId
+        - actorUserId
+        - fingerprint
+        - created
+        - preserved
+      properties:
+        version:
+          const: 1
+        operationId: *a1
+        organizationId: *a1
+        actorUserId: *a1
+        fingerprint: *a1
+        created:
+          type: array
+          items:
+            type: object
+            required:
+              - assignmentId
+              - moduleKey
+              - revision
+            properties:
+              assignmentId: *a1
+              moduleKey: *a1
+              revision: *a1
+        preserved: *a4
+    ServiceEnablementCompensation:
+      type: object
+      required:
+        - operationId
+        - organizationId
+        - paused
+      properties:
+        operationId: *a1
+        organizationId: *a1
+        paused: *a4
 paths:
+  /api/platform/app/client-services/enablement/preview:
+    post:
+      summary: preview organization service enablement
+      description: Read-only snapshot; does not enable access or dispatch notifications.
+      security:
+        - appBearer: []
+      parameters:
+        - $ref: "#/components/parameters/ApiVersion"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceEnablementRequest"
+      responses:
+        "200":
+          description: Canonical result; mutation replay is reported in meta.replayed.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PlatformEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/ServiceEnablementPreview"
+        "400":
+          description: Malformed or invalid input.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "401":
+          description: Missing, invalid, expired or revoked authentication.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "403":
+          description: Requires a currently active internal administrator and the
+            operation capability. Sister-platform delegated OAuth is rejected.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "404":
+          description: Target organization or scoped receipt not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "429":
+          description: Canonical platform request rate limit exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+  /api/platform/app/client-services/enablement/apply:
+    post:
+      summary: apply organization service enablement
+      description: Default OFF. Actor comes from authentication. Atomic command,
+        assignment audit and outbox. Idempotency key is required in the body and
+        belongs to the domain transaction.
+      security:
+        - appBearer: []
+      parameters:
+        - $ref: "#/components/parameters/ApiVersion"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceEnablementApplyRequest"
+      responses:
+        "200":
+          description: Canonical result; mutation replay is reported in meta.replayed.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PlatformEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/ServiceEnablementReceipt"
+        "400":
+          description: Malformed or invalid input.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "401":
+          description: Missing, invalid, expired or revoked authentication.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "403":
+          description: Requires a currently active internal administrator and the
+            operation capability. Sister-platform delegated OAuth is rejected.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "404":
+          description: Target organization or scoped receipt not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "409":
+          description: "service_enablement_preview_stale: re-preview;
+            service_enablement_blocked: resolve configuration;
+            service_enablement_compensation_conflict: review later edits;
+            service_enablement_concurrent_change: retry same key;
+            idempotency_conflict: key reused with different input."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "429":
+          description: Canonical platform request rate limit exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "503":
+          description: CLIENT_SERVICE_ENABLEMENT_WRITES_ENABLED is not explicitly true.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+  /api/platform/app/client-services/enablement/rollback:
+    post:
+      summary: rollback organization service enablement
+      description: Default OFF. Actor comes from authentication. Atomic command,
+        assignment audit and outbox. Idempotency key is required in the body and
+        belongs to the domain transaction.
+      security:
+        - appBearer: []
+      parameters:
+        - $ref: "#/components/parameters/ApiVersion"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceEnablementRollbackRequest"
+      responses:
+        "200":
+          description: Canonical result; mutation replay is reported in meta.replayed.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PlatformEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/ServiceEnablementCompensation"
+        "400":
+          description: Malformed or invalid input.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "401":
+          description: Missing, invalid, expired or revoked authentication.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "403":
+          description: Requires a currently active internal administrator and the
+            operation capability. Sister-platform delegated OAuth is rejected.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "404":
+          description: Target organization or scoped receipt not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "409":
+          description: "service_enablement_preview_stale: re-preview;
+            service_enablement_blocked: resolve configuration;
+            service_enablement_compensation_conflict: review later edits;
+            service_enablement_concurrent_change: retry same key;
+            idempotency_conflict: key reused with different input."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "429":
+          description: Canonical platform request rate limit exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "503":
+          description: CLIENT_SERVICE_ENABLEMENT_WRITES_ENABLED is not explicitly true.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+  /api/platform/ecosystem/client-services/enablement/preview:
+    post:
+      summary: preview organization service enablement
+      description: Read-only snapshot; does not enable access or dispatch notifications.
+      security:
+        - ecosystemBearer: []
+        - sisterPlatformKey: []
+      parameters:
+        - $ref: "#/components/parameters/ApiVersion"
+        - $ref: "#/components/parameters/ExternalScopeType"
+        - $ref: "#/components/parameters/ExternalScopeId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceEnablementRequest"
+      responses:
+        "200":
+          description: Canonical result; mutation replay is reported in meta.replayed.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PlatformEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/ServiceEnablementPreview"
+        "400":
+          description: Malformed or invalid input.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "401":
+          description: Missing, invalid, expired or revoked authentication.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "403":
+          description: Requires an active internal administrative binding with no
+            organization binding.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "404":
+          description: Target organization or scoped receipt not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "429":
+          description: Canonical platform request rate limit exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+  /api/platform/ecosystem/client-services/enablement/apply:
+    post:
+      summary: apply organization service enablement
+      description: Declared but fail-closed until a separately approved delegated
+        human authority contract exists. No permission widening or automatic
+        federation.
+      security:
+        - ecosystemBearer: []
+        - sisterPlatformKey: []
+      parameters:
+        - $ref: "#/components/parameters/ApiVersion"
+        - $ref: "#/components/parameters/ExternalScopeType"
+        - $ref: "#/components/parameters/ExternalScopeId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceEnablementApplyRequest"
+      responses:
+        "400":
+          description: Malformed or invalid input.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "401":
+          description: Missing, invalid, expired or revoked authentication.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "403":
+          description: "invalid_delegated_context: machine scope is not attributed human
+            approval; writes remain unavailable."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "404":
+          description: Target organization or scoped receipt not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "429":
+          description: Canonical platform request rate limit exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+  /api/platform/ecosystem/client-services/enablement/rollback:
+    post:
+      summary: rollback organization service enablement
+      description: Declared but fail-closed until a separately approved delegated
+        human authority contract exists. No permission widening or automatic
+        federation.
+      security:
+        - ecosystemBearer: []
+        - sisterPlatformKey: []
+      parameters:
+        - $ref: "#/components/parameters/ApiVersion"
+        - $ref: "#/components/parameters/ExternalScopeType"
+        - $ref: "#/components/parameters/ExternalScopeId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceEnablementRollbackRequest"
+      responses:
+        "400":
+          description: Malformed or invalid input.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "401":
+          description: Missing, invalid, expired or revoked authentication.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "403":
+          description: "invalid_delegated_context: machine scope is not attributed human
+            approval; writes remain unavailable."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "404":
+          description: Target organization or scoped receipt not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "429":
+          description: Canonical platform request rate limit exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
   /api/platform/ecosystem/context:
     get:
       summary: Resolve authenticated consumer and binding context

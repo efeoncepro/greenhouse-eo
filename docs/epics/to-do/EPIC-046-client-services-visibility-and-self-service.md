@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Diseño aprobado; ADR Accepted para planificación, integración obligatoria con EPIC-045; TASK-1852–1856 registradas y conectadas a TASK-1834; sin implementación`
+- Status real: `Diseño aprobado; ADR Accepted para planificación, integración obligatoria con EPIC-045. TASK-1852 in-progress con código común, 290 tests y preview PG real; rollout y paridad de escritura delegada pendientes. TASK-1853–1856 to-do`
 - Rank: `TBD`
 - Domain: `client-portal|commercial|delivery|growth|identity|ui`
 - Owner: `Client Experience / Platform; Julio Reyes (producto)`
@@ -166,12 +166,13 @@ El orden de valor no añade bloqueos técnicos a las tasks ni exige terminar tod
 
 ## Child Tasks
 
-Cinco tasks registradas por autorización del operador; todas `to-do`, prioridad P1. Las existentes
+Cinco tasks registradas por autorización del operador, prioridad P1. TASK-1852 está `in-progress`
+(código local verificado, rollout pendiente); TASK-1853–1856 siguen `to-do`. Las existentes
 conservan su epic. P01 se conecta con TASK-1834 por contrato y rollout nativo condicional.
 
 | Alias | Task | Entrega | Blocked by |
 |---|---|---|---|
-| P01 | [TASK-1852](../../tasks/to-do/TASK-1852-berel-sky-service-access-and-channel-enablement.md) | Habilitación de servicios, acceso y canales para Berel y Sky | none |
+| P01 | [TASK-1852](../../tasks/in-progress/TASK-1852-berel-sky-service-access-and-channel-enablement.md) | Habilitación de servicios, acceso y canales para Berel y Sky | none |
 | P02 | [TASK-1853](../../tasks/to-do/TASK-1853-client-service-progress-and-metrics-read-model.md) | Lectura cliente de servicios, avance y métricas | TASK-1852 |
 | P04 | [TASK-1854](../../tasks/to-do/TASK-1854-client-home-services-and-cycle-experience.md) | Inicio y Mis servicios: resultados, avance y próximos pasos | TASK-1852, TASK-1853 |
 | P06 | [TASK-1855](../../tasks/to-do/TASK-1855-client-service-requests-and-briefs-commands.md) | Solicitudes y briefs del servicio: commands y seguimiento | TASK-1852, TASK-1853 |

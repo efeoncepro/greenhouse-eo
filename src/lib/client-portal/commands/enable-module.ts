@@ -5,10 +5,10 @@ import { randomUUID } from 'node:crypto'
 import { sql } from 'kysely'
 
 import { __clearClientPortalResolverCache } from '@/lib/client-portal/readers/native/module-resolver'
-import { getDb } from '@/lib/db'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 import { recordAssignmentEvent } from './audit'
+import { lockClientPortalOrganization, runAssignmentTransaction, type AssignmentTransaction } from './transaction'
 import {
   BusinessLineMismatchError,
   ClientPortalValidationError,
@@ -78,7 +78,8 @@ export interface EnableClientPortalModuleResult {
 }
 
 export const enableClientPortalModule = async (
-  input: EnableClientPortalModuleInput
+  input: EnableClientPortalModuleInput,
+  transaction?: AssignmentTransaction
 ): Promise<EnableClientPortalModuleResult> => {
   const targetStatus: ResolvedAssignmentStatus = input.status ?? 'active'
 
@@ -90,9 +91,9 @@ export const enableClientPortalModule = async (
     )
   }
 
-  const db = await getDb()
+  const result = await runAssignmentTransaction(async tx => {
+    await lockClientPortalOrganization(input.organizationId, tx)
 
-  const result = await db.transaction().execute(async tx => {
     // 1. Idempotency check
     const existing = await tx
       .selectFrom('greenhouse_client_portal.module_assignments')
@@ -137,7 +138,7 @@ export const enableClientPortalModule = async (
     // 3. Validate applicability_scope vs org canonical business_lines
     //    Honest skip cases (V1.4 §3.1 reconciliation):
     //      - 'cross' = metavalue aplicable-a-múltiples
-    //      - empty array = data quality issue (0 orgs hoy live)
+    //      - empty array = missing canonical data (legacy command compatibility)
     //    Hard fail si applicability_scope NO matchea ningún BL del array.
     if (moduleRow.applicability_scope !== 'cross') {
       const orgBusinessLines = await resolveOrganizationCanonicalBusinessLines(
@@ -224,11 +225,11 @@ export const enableClientPortalModule = async (
     )
 
     return { assignmentId, status: targetStatus, idempotent: false }
-  })
+  }, transaction)
 
   // 5. Post-tx cache invalidation (scoped al org). Skip cuando idempotent
   //    no-op: no hubo state change en DB, no hace falta drop cache.
-  if (!result.idempotent) {
+  if (!transaction && !result.idempotent) {
     __clearClientPortalResolverCache(input.organizationId)
   }
 

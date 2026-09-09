@@ -203,3 +203,18 @@ habilitación del servicio con login vigente comprobado puede avanzar sin espera
 1834. No crear otro login/selector, escribir módulos desde callbacks ni usar un deep link como grant.
 La matriz de cohorte y los casos email/in-app/Teamsbot → login → objeto autorizado se enlazan en ambos
 sentidos. TASK-1853/1854/1855/1856 cubren datos, experiencia y solicitudes. Registro sin implementación.
+
+## Implementación local TASK-1852 — habilitación común
+
+El contrato de preview/apply/compensación vive en `src/lib/client-portal/enablement/`, bajo el mismo BFF hoja.
+Usa servicios y términos vigentes como evidencia de mapping; no crea un catálogo comercial paralelo. Los
+commands de módulos comparten transacción y lock por organización. La API Platform admite un executor
+transaccional opt-in para conservar resultado idempotente y efectos en el mismo commit; sus consumers
+previos conservan el executor predeterminado.
+
+Un nuevo evento de audit `enablement_receipt` conserva el recibo para recuperación tras retención del
+transporte. Es evidencia de control; se excluye de la revisión de transición para evitar una dependencia
+circular entre recibo y revisión. Ningún otro evento queda excluido. Compensación sólo pausa altas propias
+sin cambios posteriores. El detalle operativo y de autoridad está en el
+[runbook](../operations/CLIENT_SERVICE_ENABLEMENT_RUNBOOK_V1.md). Writes nuevos default-off; la identidad
+machine-only ecosystem/MCP mantiene denegación explícita. Esto no declara deploy ni certificación cliente.

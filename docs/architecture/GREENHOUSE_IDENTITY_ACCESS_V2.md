@@ -347,6 +347,10 @@ Generate a valid NextAuth JWT session cookie without interactive login. Designed
 
 ### Security model
 
+El refresh de permisos conserva `authMode=agent` cuando el JWT firmado declara `provider=agent`.
+Actualizar rol/vistas desde la cuenta no cambia la procedencia de la sesión. TASK-1852 verifica el
+callback real y rechaza esta sesión como aprobación humana en App/Nexa; no cambia login ni concesiones.
+
 | Guard                         | Behavior                                              |
 | ----------------------------- | ----------------------------------------------------- |
 | `AGENT_AUTH_SECRET` not set   | Endpoint returns 404 (invisible)                      |

@@ -2,9 +2,51 @@
   "$comment": "GENERADO por pnpm mcp:manifest:generate (TASK-1780). NO editar a mano: el hash y el gate de Greenhouse lo detectan. Greenhouse declara que EXISTE; el gateway decide que CRUZA.",
   "source": "greenhouse-eo/src/mcp/greenhouse/tool-manifest.ts",
   "generator": "pnpm mcp:manifest:generate",
-  "manifestHash": "8969c8d39c1f848b32838fda03cfc1b70903097d27f465829af611de3170eeaf",
-  "toolCount": 44,
+  "manifestHash": "ad9abe7ee99c0f4136c1f0724220c5bb6d14fb95bb08168f1bead1ce1add442b",
+  "toolCount": 47,
   "tools": [
+    {
+      "name": "preview_client_service_enablement",
+      "domain": "platform",
+      "writes": false,
+      "spendsProviderBudget": false,
+      "purpose": "Inventario y preview por organización, servicio y persona, sin escrituras de negocio.",
+      "inputKeys": [
+        "organizationId",
+        "personIds",
+        "targets"
+      ],
+      "description": "Reconcile one organization’s services, modules, people, sources and channels before enabling access. Internal administrative inventory; returns a fingerprint and unresolved checks without business writes or provider spend.",
+      "descriptionHash": "6340c971b19dec55fe224ddff68a95e423743c208aa842ced962781488a070c8"
+    },
+    {
+      "name": "apply_client_service_enablement",
+      "domain": "platform",
+      "writes": true,
+      "spendsProviderBudget": false,
+      "purpose": "Alta por preview exacto; denegada desde una identidad de máquina sin autoridad humana.",
+      "inputKeys": [
+        "fingerprint",
+        "idempotencyKey",
+        "proposal"
+      ],
+      "description": "Apply an exact reviewed service preview. Requires attributed human administration authority and the write gate. The current ecosystem machine binding is denied; use the authenticated app lane. No invitations or messages.",
+      "descriptionHash": "fb1f7c6cd494142fb2124fd4938c3a2e37e11e9b34268855862621ec3d40c653"
+    },
+    {
+      "name": "rollback_client_service_enablement",
+      "domain": "platform",
+      "writes": true,
+      "spendsProviderBudget": false,
+      "purpose": "Compensación de altas propias por recibo; requiere autoridad humana y ausencia de cambios posteriores.",
+      "inputKeys": [
+        "idempotencyKey",
+        "operationId",
+        "organizationId"
+      ],
+      "description": "Pause only unchanged assignments created by a stored enablement receipt. Requires human administration authority; the current ecosystem machine binding is denied. Existing assignments are preserved.",
+      "descriptionHash": "55073b994432503647e7bc5f1acd849dcf13cbed7ac7673341afc27b99e8196a"
+    },
     {
       "name": "get_context",
       "domain": "platform",

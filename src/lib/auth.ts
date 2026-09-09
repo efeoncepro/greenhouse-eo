@@ -93,7 +93,8 @@ const applyTenantAccessClaimsToToken = (token: JWT, tenant: TenantAccessClaims) 
   token.featureFlags = tenant.featureFlags
   token.timezone = tenant.timezone
   token.portalHomePath = tenant.portalHomePath
-  token.authMode = tenant.authMode
+  // Access refresh must preserve the signed agent ceremony; the account login mode is not its provenance.
+  token.authMode = token.provider === 'agent' ? 'agent' : tenant.authMode
   token.microsoftEmail = tenant.microsoftEmail
   token.googleEmail = tenant.googleEmail
 

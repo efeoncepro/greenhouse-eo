@@ -60,6 +60,9 @@ export const confirmNexaAction = async ({
   }
 
   try {
+    // Some domain capabilities need a fresh database check, including before an idempotent replay.
+    await definition.authorize?.(context)
+
     const success = await executeApiPlatformCommand<NexaActionExecutionResult>({
       principal: {
         lane: 'app',

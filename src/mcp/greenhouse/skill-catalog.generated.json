@@ -2,9 +2,23 @@
   "$comment": "GENERADO por pnpm mcp:skills:generate (TASK-1804). NO editar a mano: el hash y el gate de Greenhouse lo detectan. La fuente es docs/mcp/skills/**/SKILL.md + skill-manifest.ts.",
   "source": "greenhouse-eo/docs/mcp/skills",
   "generator": "pnpm mcp:skills:generate",
-  "catalogHash": "65e43fb62c7c12e386920b76fd643f7318c848200cf2df3a11dae2bb7aa74df4",
-  "skillCount": 6,
+  "catalogHash": "8988205a05194d54d5619cd65461d05913590c771615e36dacd8dbcb031785d5",
+  "skillCount": 7,
   "skills": [
+    {
+      "name": "client-service-enablement",
+      "description": "Reconciliar una organización antes de habilitar sus servicios, distinguir configuración de apertura operativa y conservar la autoridad humana de altas y compensaciones.",
+      "audience": "internal",
+      "appliesTo": [
+        "preview_client_service_enablement",
+        "apply_client_service_enablement",
+        "rollback_client_service_enablement"
+      ],
+      "uri": "skill://efeonce/client-service-enablement/SKILL.md",
+      "sourcePath": "docs/mcp/skills/client-service-enablement/SKILL.md",
+      "body": "---\nname: client-service-enablement\ndescription: Reconciliar una organización antes de habilitar sus servicios, distinguir configuración de apertura operativa y conservar la autoridad humana de altas y compensaciones.\n---\n\n# Habilitación de servicios\n\nUsa `preview_client_service_enablement` con organizationId, pares serviceId/moduleKey y personIds exactos.\nUn servicio sin registro puede inventariarse con serviceId null, pero queda bloqueado para alta.\nLos nombres de clientes no son IDs ni evidencia de contratación. El manifiesto Berel/Sky es inventario.\n\nEl preview es configuración PostgreSQL con fecha de observación. `blockers` impide aplicar; `readiness`\nidentifica pruebas operativas pendientes. `canApply: true` no certifica login, acceso HTTP, cobertura\ndel productor o entrega por canal. Preferencias ausentes no acreditan consentimiento. No hay gasto de proveedor.\n\nConserva el request exacto y fingerprint. La revisión humana y el gate de writes son requisitos para\n`apply_client_service_enablement`; la compensación usa operationId del recibo y sólo pausa altas propias\nsin modificaciones posteriores. Nunca envíes actorUserId, grants, tokens ni listas de asignaciones inventadas.\n\nEl lane ecosystem actual acredita una máquina, por lo que apply/rollback responden\n`403 invalid_delegated_context`. Usa la sesión app administrativa para esos comandos; no sustituyas\nal actor por el creador del consumer ni amplíes scopes para sortear la denegación. Las nuevas tools\nno están federadas automáticamente. Consulta el runbook CLIENT_SERVICE_ENABLEMENT_RUNBOOK_V1.\n",
+      "contentHash": "76ead441ea78e687fd64dcc6eacf5b213d315a299b501b3d0341b30b839da2a7"
+    },
     {
       "name": "seo-spend-discipline",
       "description": "How to call the Greenhouse SEO tools that commit provider budget without spending money nobody approved. Load it BEFORE track_seo_keywords, declare_seo_competitors, discover_seo_keywords or run_seo_prospect_diagnostic.",

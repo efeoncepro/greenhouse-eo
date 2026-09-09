@@ -1,10 +1,20 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import type * as AssignmentTransactions from '../transaction'
+
 /**
  * TASK-826 Slice 3 — Unit tests for pauseClientPortalModule + resumeClientPortalModule.
  */
 
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('server-only', () => ({}))
+
+// Transition unit tests; real locks/rollback are covered by the enablement DB suite.
+vi.mock('../transaction', async importOriginal => ({
+  ...await importOriginal<typeof AssignmentTransactions>(),
+  lockClientPortalOrganization: vi.fn(),
+  lockClientPortalAssignment: vi.fn()
+}))
 
 const mocks = vi.hoisted(() => ({
   publishOutboxEvent: vi.fn(),
@@ -30,6 +40,7 @@ const buildTx = () => ({
   selectFrom: vi.fn(() => {
     const builder = {
       select: vi.fn(() => builder),
+      forUpdate: vi.fn(() => builder),
       where: vi.fn(() => builder),
       executeTakeFirst: vi.fn(async () => mocks.currentAssignment)
     }

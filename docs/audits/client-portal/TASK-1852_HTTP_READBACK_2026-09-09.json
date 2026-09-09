@@ -1,0 +1,121 @@
+{
+  "version": 1,
+  "http": {
+    "observedAt": "2026-09-09T21:45:58.005Z",
+    "baseURL": "http://localhost:31852",
+    "actor": "dedicated internal agent; no human login proof",
+    "cases": [
+      {
+        "case": "Grupo Berel",
+        "status": 200,
+        "canApply": false,
+        "blockers": [
+          "service_not_current",
+          "commercial_mapping_unresolved"
+        ],
+        "organizationId": "org-32333527-02a8-487b-819e-6f76a761777d"
+      },
+      {
+        "case": "Sky Airlines",
+        "status": 200,
+        "canApply": false,
+        "blockers": [
+          "commercial_mapping_unresolved"
+        ],
+        "organizationId": "org-b9977f96-f7ef-4afb-bb26-7355d78c981f"
+      },
+      {
+        "case": "reject_body_actor",
+        "status": 400
+      },
+      {
+        "case": "reject_foreign_people",
+        "status": 200,
+        "codes": [
+          "service_not_current",
+          "commercial_mapping_unresolved",
+          "person_not_authorized_in_organization",
+          "person_not_authorized_in_organization",
+          "person_not_authorized_in_organization"
+        ],
+        "returnedPeople": 0
+      },
+      {
+        "case": "missing_org",
+        "status": 404
+      },
+      {
+        "case": "anonymous",
+        "status": 401
+      },
+      {
+        "case": "agent_write_denied",
+        "status": 403,
+        "codes": [
+          "invalid_delegated_context"
+        ]
+      }
+    ]
+  },
+  "postgresRequestAudit": {
+    "observedAt": "2026-09-09T21:47:00.653Z",
+    "mode": "read_only",
+    "results": [
+      {
+        "name": "service_enablement_http_audit",
+        "rows": [
+          {
+            "route_key": "platform.app.client_services.enablement.apply",
+            "response_status": 403,
+            "error_code": "invalid_delegated_context",
+            "client_id": null,
+            "created_at": "2026-09-09T21:45:58.038Z"
+          },
+          {
+            "route_key": "platform.app.client_services.enablement.preview",
+            "response_status": 404,
+            "error_code": "not_found",
+            "client_id": null,
+            "created_at": "2026-09-09T21:45:56.829Z"
+          },
+          {
+            "route_key": "platform.app.client_services.enablement.preview",
+            "response_status": 200,
+            "error_code": null,
+            "client_id": null,
+            "created_at": "2026-09-09T21:45:54.831Z"
+          },
+          {
+            "route_key": "platform.app.client_services.enablement.preview",
+            "response_status": 400,
+            "error_code": "bad_request",
+            "client_id": null,
+            "created_at": "2026-09-09T21:45:51.590Z"
+          },
+          {
+            "route_key": "platform.app.client_services.enablement.preview",
+            "response_status": 200,
+            "error_code": null,
+            "client_id": null,
+            "created_at": "2026-09-09T21:45:50.159Z"
+          },
+          {
+            "route_key": "platform.app.client_services.enablement.preview",
+            "response_status": 200,
+            "error_code": null,
+            "client_id": null,
+            "created_at": "2026-09-09T21:45:46.211Z"
+          }
+        ]
+      },
+      {
+        "name": "no_service_enablement_business_commands",
+        "rows": [
+          {
+            "commands": 0
+          }
+        ]
+      }
+    ]
+  }
+}

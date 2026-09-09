@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-046`
-- Status real: `Diseño registrado por autorización del operador 2026-09-09; sin implementación ni rollout`
+- Status real: `code complete, rollout pendiente. Mecanismo común local y conciliación comercial, 392 tests y smoke HTTP autenticado verificados; alcance comercial confirmado por el operador y rollout autorizado. Registros comerciales, paridad de escritura delegada, login/rutas/canales y deploy pendientes; task abierta`
 - Rank: `1`
 - Domain: `platform|identity|delivery`
 - Blocked by: `none`
@@ -31,7 +31,7 @@
 
 ## Summary
 
-Concilia y habilita la cohorte Berel (SEO y marketing de contenidos) y Sky (diseño digital) mediante servicios, fuentes, personas, módulos y acciones verificadas. Incluye destinatarios, preferencias y disponibilidad de email/in-app/Teamsbot. Consume el contrato de entrada de TASK-1834 sin implementar otro login.
+Implementa un mecanismo común de habilitación por organización/persona/servicio, reutilizable para clientes sin reglas por nombre de cuenta. Su primera cohorte de conciliación y certificación es Berel (SEO y marketing de contenidos) y Sky (diseño digital) mediante servicios, fuentes, personas, módulos y acciones verificadas. Incluye destinatarios, preferencias y disponibilidad de email/in-app/Teamsbot. Consume el contrato de entrada de TASK-1834 sin implementar otro login.
 
 ## Why This Task Exists
 
@@ -80,10 +80,15 @@ TASK-1853/1854/1855/1856; TASK-1834 como consumer de matriz/cohorte y casos de r
 
 ### Files owned
 
-- src/lib/client-portal/commands/ (sólo ajuste mínimo de habilitación si el command actual lo requiere
-- sin invadir TASK-1687)
-- scripts/client-portal/ (CLI de preview/apply propuesta, a crear sólo si falta equivalente)
-- docs/operations/ (matriz/runbook de cohorte propuestos)
+- `src/lib/hubspot/list-services-for-company.ts` y `src/lib/services/upsert-service-from-hubspot.ts`: resolver vigente y montos ausentes NULL para materialización canónica.
+- `src/lib/entitlements/runtime.ts`: corregir compensación EFEONCE_ADMIN conforme al contrato del portal.
+- `src/lib/auth.ts`: preservar procedencia agent en refresh de permisos; fix mínimo descubierto por smoke, sin nuevo login.
+- `src/lib/api-platform/core/`: composición atómica y clientId nulo en audit de sesión interna.
+- `src/lib/client-portal/commands/`: ajuste mínimo de resolver, concurrencia y composición transaccional; sin invadir TASK-1687.
+- `src/lib/client-portal/enablement/`: contrato común implementado de inventario/preview/apply/compensación.
+- `scripts/client-portal/`: CLI común HTTP; no reglas por cliente en el primitive.
+- Adapters API Platform/MCP y registro Nexa según el [plan aprobado](../plans/TASK-1852-plan.md).
+- `docs/operations/`: matriz/runbook de cohorte y readback fechado.
 
 ## Current Repo State
 
@@ -164,10 +169,10 @@ Baseline de código y documentos de esta planificación; flags, datos y entrega 
 
 ### Acceptance criteria additions
 
-- [ ] SoT y consumers verificados; allowlist de escritura actualizada si existe y cada tabla nueva justificada.
-- [ ] Migración/rollback y negativos de acceso/tenant probados contra runtime cuando aplique.
-- [ ] UI/API/MCP/Nexa operan el mismo primitive con errores y permisos idénticos; manifests/docs/manuals actualizados.
-- [ ] Audit/outbox e idempotencia verificados para writes; lectura no produce cambios ni mensajes.
+- [x] SoT/consumers verificados con schema real y [QA](../../audits/client-portal/TASK-1852_IMPLEMENTATION_QA_2026-09-09.md). Sin tablas nuevas ni allowlist BFF existente; writes limitados a assignments/events/outbox/command store.
+- [x] Sin migración; compensación el mismo día, cambios posteriores, atomicidad y negativos de tenant probados en PostgreSQL local real (14 tests). Rollout cliente separado.
+- [ ] API/MCP/Nexa reutilizan primitives; manifests/docs/manuals actualizados. Paridad de escritura delegada pendiente: consumer machine no acredita aprobación humana; 403 explícito. No se declara parity-complete.
+- [x] Audit/outbox, retries concurrentes, respuesta perdida/fallida, rollback propio y lectura sin efectos probados en PostgreSQL local; [QA](../../audits/client-portal/TASK-1852_IMPLEMENTATION_QA_2026-09-09.md).
 
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -175,6 +180,21 @@ Baseline de código y documentos de esta planificación; flags, datos y entrega 
      El agente que toma esta task ejecuta Discovery y produce
      plan.md segun TASK_PROCESS.md. No llenar al crear la task.
      ═══════════════════════════════════════════════════════════ -->
+
+## Discovery y plan de ejecución — 2026-09-09
+
+- [x] Goal común aprobado, permanencia en `develop` y sin subagentes; hook `--develop` ejecutado.
+- [x] [Discovery y matriz inicial](../../audits/client-portal/TASK-1852_SERVICE_ENABLEMENT_DISCOVERY_2026-09-09.md): schema/FK/índices/triggers, cohortes, servicios, fuentes, usuarios y canales consultados read-only; 68 tests baseline passed.
+- [x] [Plan de implementación](../plans/TASK-1852-plan.md) aprobado en el checkpoint humano P1 de `TASK_PROCESS.md` §Phase 3 («Vamos», 2026-09-09). Goal y plan aprobados; hook revalidado en develop.
+- [x] Código local: reader/preview, apply/rollback, atomic command store, App/Ecosystem/CLI/MCP/Nexa y documentación. 290 tests; certificación de configuración en [readback](../../audits/client-portal/TASK-1852_PREVIEW_READBACK_2026-09-09.json).
+- [ ] Apertura operativa: contratos, login/rutas/canales, authority delegada y rollout sin certificar; [blockers con dueño](../../audits/client-portal/TASK-1852_IMPLEMENTATION_QA_2026-09-09.md).
+
+Rollout autorizado el 2026-09-09 con alcance de servicios y equipo confirmado por el operador. Detalles comerciales preservados en evidencia local privada; [registro técnico](../../audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md). La confirmación no inventa precios, vigencia contractual, destinatarios ni preferencias.
+
+Hallazgos: el resolver de business lines devuelve `[]` para Sky por unir `module_code` con `module_id`;
+la FK real resuelve `globe`. Berel no tiene filas en `services`; Sky tiene diseño digital y tres usuarios
+activos con `password_reset_pending`, sin login registrado. Mantener acceso existente y registrar blockers,
+sin crear identidad, contrato, preferencia ni canal por inferencia.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -208,7 +228,7 @@ Commercial/Account 360 para servicio y organización; greenhouse_client_portal.m
 
 Preview tipado por organización/persona/servicio con evidencia, cambios exactos y blockers; apply por commands canónicos e idempotentes. No nuevo resolver de identidad.
 
-Los paths marcados propuestos son diseño, no código existente. Discovery debe verificar API/DDL/rutas y resolver ownership antes de implementar; una ampliación material vuelve al ADR/plan. Esta task es P01, no un cambio de prioridad de otras dueñas.
+Paths del plan implementados localmente. Discovery verificó API/DDL y ownership; la auditoría distingue contrato probado de rollout pendiente. Esta task es P01 y no adquiere el scope de las dueñas de login, catálogo, productores ni canales.
 
 ## Rollout Plan & Risk Matrix
 
@@ -257,11 +277,11 @@ Fuentes de Berel/Sky, responsables, consentimiento de piloto y disponibilidad Te
 
 ## Acceptance Criteria
 
-- [ ] La matriz identifica SEO y contenidos como servicios distintos de Berel y diseño digital para Sky; AEO no se agrega ni retira por inferencia.
-- [ ] Contrato TASK-1834 conectado: mismo principal, contexto de organización y permisos; callbacks no provisionan ni asignan módulos; el destino profundo no concede acceso.
+- [x] Matriz y manifiesto separan SEO/contenidos Berel y diseño digital Sky; documentan registros/términos ausentes. AEO preservado. [QA y matriz](../../audits/client-portal/TASK-1852_IMPLEMENTATION_QA_2026-09-09.md).
+- [x] Consume principal/sesión vigentes y organización explícita; revalida autoridad y vetos por persona. Sin nuevo login/callback/provisión; destinos sólo declarados. Contrato en ADR/runbook; tests de aislamiento y revocación. Retorno 0/1/N operativo pendiente en TASK-1834.
 - [ ] Login vigente se prueba para la apertura inicial. Cohorte nativa sólo se habilita tras TASK-1834 y sus gates TASK-1833/1832/1841 aplicables; no se exige su cierre total para inventario/readers.
-- [ ] Preview/apply doble no duplica asignaciones, preserva bundles ajenos y deja audit de cambios exactos; rollback ejercitado con los commands del catálogo.
-- [ ] Cada usuario/canal tiene destino y preferencia verificados; no se crea member laboral ficticio ni se envía a un canal compartido sin audiencia autorizada.
+- [x] Preview/apply concurrente y replay conservan un efecto; preserva asignación ajena y receipt inmutable. Compensación canónica el mismo día y rechazo por cambios posteriores: 14 ensayos PostgreSQL local en QA.
+- [ ] Preferencias explícitas, login y destino/entrega por canal pendientes en cuatro selecciones; usuario Berel técnico no es piloto humano. Sin members ficticios ni mensajes. Dueños Identity/Notifications en QA.
 
 ## Verification
 
@@ -273,10 +293,10 @@ Fuentes de Berel/Sky, responsables, consentimiento de piloto y disponibilidad Te
 
 ## Closing Protocol
 
-- [ ] Status real, Lifecycle y carpeta reflejan evidencia; sin rollout se conserva abierto.
-- [ ] Criterios tildados con evidencia concreta; no confundir código, deploy y operación.
-- [ ] Registry/README/EPIC-046 y dependencias actualizados; manual técnico/funcional y recuperación proporcionados.
-- [ ] Handoff/changelog y gates documentales al día; no commit/push automático.
+- [x] Status real, Lifecycle y carpeta reflejan evidencia; permanece in-progress sin rollout.
+- [x] Criterios locales tildados con evidencia; login/canales/paridad delegada siguen sin tildar.
+- [x] Registry/README/EPIC-046 al día; documentación técnica/funcional, manual y recuperación en runbook.
+- [x] Handoff/changelog al día; gates documentales finales registrados en QA. Sin commit/push automático.
 
 ## Follow-ups
 
@@ -285,4 +305,4 @@ Las dueñas citadas conservan su scope y epic. No crear tareas por gráfico, cue
 
 ## Open Questions
 
-Sin preguntas que bloqueen el registro. El plan de ejecución debe resolver los paths/DDL propuestos y readiness real antes de código. Para ejecutar en Codex: /goal explícito y task-hook; este registro no inicia implementación.
+Goal y plan P1 aprobados y ejecutados. Los blockers de apertura están en QA: Commercial/Delivery, Identity, catálogo TASK-1687, Notifications y authority de compensación/delegación. No requieren inventar contratos, permisos o consentimientos para cerrar la revisión local.

@@ -1238,7 +1238,20 @@ La plataforma debe:
 - rechazar el reuse de una key con payload distinto
 - expirar las keys según política documentada
 
-### 12.4 Alcance V1
+### 12.4 Commands con transacción de dominio
+
+`core/atomic-commands.ts` adapta el mismo command store a la transacción Kysely del dominio.
+TASK-1852 lo usa para guardar claim, asignaciones, audit/outbox y respuesta en un solo commit;
+un fallo de persistencia revierte también los efectos. El caller reautoriza antes de replay y conserva
+la clave exacta al reintentar. Los helpers de idempotencia aceptan un ejecutor de consulta opcional;
+los consumers anteriores mantienen su comportamiento. No se anida el wrapper mutante histórico.
+El audit App normaliza `clientId` vacío de sesión interna a NULL para respetar la FK y conservar
+telemetría/rate limit; un ID real de cliente permanece intacto.
+En este DTO la clave viaja en `idempotencyKey`, compartida por App, CLI y Nexa; el command conserva
+su fingerprint y ámbito organización. Contrato de rutas/autoridad:
+[service enablement](../operations/CLIENT_SERVICE_ENABLEMENT_RUNBOOK_V1.md) y OpenAPI público.
+
+### 12.5 Alcance V1
 
 No es obligatorio retrofitear todas las rutas históricas del repo.
 

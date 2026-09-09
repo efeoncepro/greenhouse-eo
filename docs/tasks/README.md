@@ -4,12 +4,13 @@ Panel operativo de tasks del repo.
 
 ## Portal de servicios: EPIC-046
 
-TASK-1852–1856 registradas (to-do/P1). Iniciar por TASK-1852, conectada a TASK-1834 por contrato y
-rollout nativo condicional; no bloquea el trabajo con login vigente verificado.
+TASK-1852 en `in-progress`: mecanismo común implementado, 290 tests y preview PG real; [QA/matriz](../audits/client-portal/TASK-1852_IMPLEMENTATION_QA_2026-09-09.md).
+Rollout y escritura delegada pendientes. TASK-1853–1856 siguen `to-do`. TASK-1834 conserva
+contrato de identidad y rollout nativo condicional; login vigente se certifica por separado.
 
 | Task | Entrega | Dependencias base |
 |---|---|---|
-| [TASK-1852](to-do/TASK-1852-berel-sky-service-access-and-channel-enablement.md) | Habilitación de servicios, acceso y canales para Berel y Sky | none |
+| [TASK-1852](in-progress/TASK-1852-berel-sky-service-access-and-channel-enablement.md) | Habilitación de servicios, acceso y canales para Berel y Sky | none |
 | [TASK-1853](to-do/TASK-1853-client-service-progress-and-metrics-read-model.md) | Lectura cliente de servicios, avance y métricas | TASK-1852 |
 | [TASK-1854](to-do/TASK-1854-client-home-services-and-cycle-experience.md) | Inicio y Mis servicios: resultados, avance y próximos pasos | TASK-1852, TASK-1853 |
 | [TASK-1855](to-do/TASK-1855-client-service-requests-and-briefs-commands.md) | Solicitudes y briefs del servicio: commands y seguimiento | TASK-1852, TASK-1853 |

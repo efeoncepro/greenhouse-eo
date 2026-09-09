@@ -265,7 +265,8 @@ const recordAppLog = async ({
     durationMs: Date.now() - auditState.startedAt,
     rateLimited: responseStatus === 429,
     errorCode,
-    clientId: auditState.tenant?.clientId ?? null,
+    // Internal cookie sessions normalize the absent client to an empty string; the FK needs NULL.
+    clientId: auditState.tenant?.clientId || null,
     spaceId: auditState.tenant?.spaceId ?? null,
     organizationId: auditState.tenant?.organizationId ?? null,
     ipHash: auditState.ipHash,

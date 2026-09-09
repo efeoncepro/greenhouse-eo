@@ -62,7 +62,10 @@ describe('createGreenhouseMcpHandlers', () => {
       runSeoProspectDiagnostic: vi.fn(),
       getSeoDualLensVisibility: vi.fn(),
       getMcpSkills: vi.fn(),
-      getMcpSkill: vi.fn()
+      getMcpSkill: vi.fn(),
+      previewClientServiceEnablement: vi.fn(),
+      applyClientServiceEnablement: vi.fn(),
+      rollbackClientServiceEnablement: vi.fn()
     })
 
     const result = await handlers.getContext()
@@ -170,7 +173,10 @@ describe('createGreenhouseMcpHandlers', () => {
       runSeoProspectDiagnostic: vi.fn(),
       getSeoDualLensVisibility: vi.fn(),
       getMcpSkills: vi.fn(),
-      getMcpSkill: vi.fn()
+      getMcpSkill: vi.fn(),
+      previewClientServiceEnablement: vi.fn(),
+      applyClientServiceEnablement: vi.fn(),
+      rollbackClientServiceEnablement: vi.fn()
     })
 
     const forbiddenResult = await handlers.getOrganization({ id: 'org-1' })

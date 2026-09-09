@@ -2,6 +2,8 @@ import * as z from 'zod/v4'
 import { McpServer, ResourceTemplate } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 
+import { serviceEnablementRequestSchema, serviceEnablementApplySchema, serviceEnablementRollbackSchema } from '@/lib/client-portal/enablement/validation'
+
 import { GreenhouseApiPlatformClient } from './http-client'
 import { resolveGreenhouseMcpConfig } from './config'
 import { getGreenhouseMcpSkillCatalog } from './skill-catalog'
@@ -54,6 +56,30 @@ export const createGreenhouseMcpServer = (
       return undefined
     }) as unknown as McpServer['registerTool']
   }
+
+  collector.registerTool('preview_client_service_enablement', {
+    title: 'Preview Client Service Enablement',
+    description: 'Reconcile one organization’s services, modules, people, sources and channels before enabling access. Internal administrative inventory; returns a fingerprint and unresolved checks without business writes or provider spend.',
+    inputSchema: serviceEnablementRequestSchema.innerType().shape,
+    outputSchema: greenhouseMcpToolOutputSchema,
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
+  }, async input => handlers.previewClientServiceEnablement(input))
+
+  collector.registerTool('apply_client_service_enablement', {
+    title: 'Apply Client Service Enablement',
+    description: 'Apply an exact reviewed service preview. Requires attributed human administration authority and the write gate. The current ecosystem machine binding is denied; use the authenticated app lane. No invitations or messages.',
+    inputSchema: serviceEnablementApplySchema.shape,
+    outputSchema: greenhouseMcpToolOutputSchema,
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false }
+  }, async input => handlers.applyClientServiceEnablement(input))
+
+  collector.registerTool('rollback_client_service_enablement', {
+    title: 'Compensate Client Service Enablement',
+    description: 'Pause only unchanged assignments created by a stored enablement receipt. Requires human administration authority; the current ecosystem machine binding is denied. Existing assignments are preserved.',
+    inputSchema: serviceEnablementRollbackSchema.shape,
+    outputSchema: greenhouseMcpToolOutputSchema,
+    annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: false }
+  }, async input => handlers.rollbackClientServiceEnablement(input))
 
   collector.registerTool(
     'get_context',

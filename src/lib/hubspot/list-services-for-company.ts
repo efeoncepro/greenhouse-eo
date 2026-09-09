@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { resolveSecretByRef } from '@/lib/secrets/secret-manager'
+import { getHubSpotAccessToken } from '@/lib/hubspot/access-token'
 
 /**
  * TASK-813 — Direct HubSpot API helper para listar p_services (object 0-162)
@@ -15,8 +15,6 @@ import { resolveSecretByRef } from '@/lib/secrets/secret-manager'
  */
 
 const HUBSPOT_API = 'https://api.hubapi.com'
-const TOKEN_ENV_VAR = 'HUBSPOT_ACCESS_TOKEN'
-const TOKEN_GCP_SECRET = 'gcp:hubspot-access-token'
 
 interface AssociationResult {
   results: Array<{ toObjectId: number | string }>
@@ -74,27 +72,12 @@ const SERVICE_PROPERTIES = [
   'ef_engagement_kind'
 ]
 
-const fetchToken = async (): Promise<string> => {
-  // Prefer env var (CLI / local). Fallback a GCP Secret Manager.
-  const envValue = process.env[TOKEN_ENV_VAR]?.trim()
-
-  if (envValue) return envValue
-
-  const token = await resolveSecretByRef(TOKEN_GCP_SECRET)
-
-  if (!token) {
-    throw new Error(`HubSpot access token not found (env ${TOKEN_ENV_VAR} ni ${TOKEN_GCP_SECRET})`)
-  }
-
-  return token
-}
-
 /**
  * Lista los IDs de p_services asociados a una company HubSpot.
  * Retorna [] si no hay asociaciones o la company no existe.
  */
 export const listServiceIdsForCompany = async (hubspotCompanyId: string): Promise<string[]> => {
-  const token = await fetchToken()
+  const token = await getHubSpotAccessToken()
 
   const url = `${HUBSPOT_API}/crm/v4/objects/companies/${hubspotCompanyId}/associations/0-162?limit=100`
 
@@ -123,7 +106,7 @@ export const listServiceIdsForCompany = async (hubspotCompanyId: string): Promis
 export const batchReadServices = async (serviceIds: string[]): Promise<ServiceObject[]> => {
   if (serviceIds.length === 0) return []
 
-  const token = await fetchToken()
+  const token = await getHubSpotAccessToken()
   const url = `${HUBSPOT_API}/crm/v3/objects/0-162/batch/read`
 
   const response = await fetch(url, {

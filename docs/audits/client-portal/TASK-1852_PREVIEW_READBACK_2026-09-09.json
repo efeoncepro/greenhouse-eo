@@ -1,0 +1,326 @@
+{
+  "version": 1,
+  "observedAt": "2026-09-09T21:39:49.537Z",
+  "mode": "read_only",
+  "authority": "direct canonical reader; no API human-session claim",
+  "cohorts": [
+    {
+      "label": "Grupo Berel",
+      "organizationId": "org-32333527-02a8-487b-819e-6f76a761777d",
+      "fingerprint": "75c986738ae99de27d05b8f4b104a5f1ab7d99ac54f99e72ea0f09eb07f6644b",
+      "businessLines": [],
+      "canApply": false,
+      "changes": [],
+      "blockers": [
+        {
+          "code": "service_not_current",
+          "subject": "seo_v2",
+          "owner": "Commercial"
+        },
+        {
+          "code": "commercial_mapping_unresolved",
+          "subject": "seo_v2",
+          "owner": "Commercial"
+        }
+      ],
+      "readiness": [
+        {
+          "code": "producer_coverage_unverified",
+          "subject": "seo_v2:growth.seo",
+          "owner": "Delivery/Growth"
+        },
+        {
+          "code": "identity_link_unverified",
+          "subject": "user-agent-berel-client-001",
+          "owner": "Identity"
+        },
+        {
+          "code": "human_login_unverified",
+          "subject": "user-agent-berel-client-001",
+          "owner": "Identity"
+        },
+        {
+          "code": "preferences_not_explicit",
+          "subject": "user-agent-berel-client-001",
+          "owner": "Notifications"
+        },
+        {
+          "code": "teams_destination_unverified",
+          "subject": "org-32333527-02a8-487b-819e-6f76a761777d",
+          "owner": "Notifications"
+        },
+        {
+          "code": "authenticated_route_unverified",
+          "subject": "cliente.growth_seo_dashboard",
+          "owner": "Client Portal"
+        },
+        {
+          "code": "authenticated_route_unverified",
+          "subject": "cliente.growth_seo_report",
+          "owner": "Client Portal"
+        }
+      ],
+      "assignments": [
+        {
+          "id": "cpma-berel-seo-contracted",
+          "moduleKey": "seo_v1",
+          "status": "active",
+          "endsAt": "2026-08-09"
+        },
+        {
+          "id": "cpma-berel-seo-contracted:seo_v2",
+          "moduleKey": "seo_v2",
+          "status": "active",
+          "endsAt": null
+        },
+        {
+          "id": "cpma-task1277-berel-ai-visibility",
+          "moduleKey": "ai_visibility_v1",
+          "status": "active",
+          "endsAt": null
+        }
+      ],
+      "people": [
+        {
+          "id": "user-agent-berel-client-001",
+          "active": true,
+          "status": "active",
+          "identityLinked": false,
+          "lastLoginAt": null,
+          "emailDeliverable": true,
+          "revokedViewCodes": [],
+          "preferences": []
+        }
+      ],
+      "sources": [
+        {
+          "id": "seot-berel-fase0",
+          "kind": "seo",
+          "active": false,
+          "reference": "berel.com"
+        },
+        {
+          "id": "seot-berel-mx",
+          "kind": "seo",
+          "active": true,
+          "reference": "berel.com"
+        }
+      ],
+      "channels": [],
+      "routes": [
+        {
+          "viewCode": "cliente.growth_seo_dashboard",
+          "path": "/growth/seo",
+          "verification": "unverified"
+        },
+        {
+          "viewCode": "cliente.growth_seo_report",
+          "path": "/growth/seo/report",
+          "verification": "unverified"
+        }
+      ]
+    },
+    {
+      "label": "Sky Airlines",
+      "organizationId": "org-b9977f96-f7ef-4afb-bb26-7355d78c981f",
+      "fingerprint": "adf6fb4a41b30b75e00b38cf853c4e8f6ac20d2851bf75fcd66ad2c22466f302",
+      "businessLines": [
+        "globe"
+      ],
+      "canApply": false,
+      "changes": [],
+      "blockers": [
+        {
+          "code": "commercial_mapping_unresolved",
+          "subject": "creative_hub_globe_v1",
+          "owner": "Commercial"
+        }
+      ],
+      "readiness": [
+        {
+          "code": "producer_coverage_unverified",
+          "subject": "creative_hub_globe_v1:agency.brand_intelligence",
+          "owner": "Delivery/Growth"
+        },
+        {
+          "code": "producer_coverage_unverified",
+          "subject": "creative_hub_globe_v1:agency.csc",
+          "owner": "Delivery/Growth"
+        },
+        {
+          "code": "producer_coverage_unverified",
+          "subject": "creative_hub_globe_v1:agency.ico",
+          "owner": "Delivery/Growth"
+        },
+        {
+          "code": "producer_coverage_unverified",
+          "subject": "creative_hub_globe_v1:commercial.engagements",
+          "owner": "Delivery/Growth"
+        },
+        {
+          "code": "producer_coverage_unverified",
+          "subject": "creative_hub_globe_v1:delivery.tasks",
+          "owner": "Delivery/Growth"
+        },
+        {
+          "code": "human_login_unverified",
+          "subject": "user-hubspot-contact-139243510680",
+          "owner": "Identity"
+        },
+        {
+          "code": "preferences_not_explicit",
+          "subject": "user-hubspot-contact-139243510680",
+          "owner": "Notifications"
+        },
+        {
+          "code": "human_login_unverified",
+          "subject": "user-hubspot-contact-157404441684",
+          "owner": "Identity"
+        },
+        {
+          "code": "preferences_not_explicit",
+          "subject": "user-hubspot-contact-157404441684",
+          "owner": "Notifications"
+        },
+        {
+          "code": "human_login_unverified",
+          "subject": "user-hubspot-contact-157404441685",
+          "owner": "Identity"
+        },
+        {
+          "code": "preferences_not_explicit",
+          "subject": "user-hubspot-contact-157404441685",
+          "owner": "Notifications"
+        },
+        {
+          "code": "teams_destination_unverified",
+          "subject": "org-b9977f96-f7ef-4afb-bb26-7355d78c981f",
+          "owner": "Notifications"
+        },
+        {
+          "code": "authenticated_route_unverified",
+          "subject": "cliente.campanas",
+          "owner": "Client Portal"
+        },
+        {
+          "code": "authenticated_route_unverified",
+          "subject": "cliente.creative_hub",
+          "owner": "Client Portal"
+        },
+        {
+          "code": "authenticated_route_unverified",
+          "subject": "cliente.equipo",
+          "owner": "Client Portal"
+        },
+        {
+          "code": "authenticated_route_unverified",
+          "subject": "cliente.proyectos",
+          "owner": "Client Portal"
+        },
+        {
+          "code": "authenticated_route_unverified",
+          "subject": "cliente.pulse",
+          "owner": "Client Portal"
+        },
+        {
+          "code": "authenticated_route_unverified",
+          "subject": "cliente.reviews",
+          "owner": "Client Portal"
+        }
+      ],
+      "assignments": [
+        {
+          "id": "cpma-44c05156-db5d-4354-a04d-385887fdbdb1",
+          "moduleKey": "ai_visibility_v1",
+          "status": "active",
+          "endsAt": null
+        },
+        {
+          "id": "cpma-ec0041f7-e416-442f-acab-73f645c06f56",
+          "moduleKey": "creative_hub_globe_v1",
+          "status": "active",
+          "endsAt": null
+        }
+      ],
+      "people": [
+        {
+          "id": "user-hubspot-contact-139243510680",
+          "active": true,
+          "status": "active",
+          "identityLinked": true,
+          "lastLoginAt": null,
+          "emailDeliverable": true,
+          "revokedViewCodes": [],
+          "preferences": []
+        },
+        {
+          "id": "user-hubspot-contact-157404441684",
+          "active": true,
+          "status": "active",
+          "identityLinked": true,
+          "lastLoginAt": null,
+          "emailDeliverable": true,
+          "revokedViewCodes": [],
+          "preferences": []
+        },
+        {
+          "id": "user-hubspot-contact-157404441685",
+          "active": true,
+          "status": "active",
+          "identityLinked": true,
+          "lastLoginAt": null,
+          "emailDeliverable": true,
+          "revokedViewCodes": [],
+          "preferences": []
+        }
+      ],
+      "sources": [
+        {
+          "id": "space-hubspot-company-30825221458-legacy-project-23239c2f-efe7-80ad-b410-f96ea38f49c2",
+          "kind": "notion",
+          "active": true,
+          "reference": "23239c2f-efe7-80ad-b410-f96ea38f49c2"
+        },
+        {
+          "id": "space-hubspot-company-30825221458-workspace-15288d9b145940529acc75439bbd5470",
+          "kind": "notion",
+          "active": true,
+          "reference": "15288d9b145940529acc75439bbd5470"
+        }
+      ],
+      "channels": [],
+      "routes": [
+        {
+          "viewCode": "cliente.campanas",
+          "path": "/campanas",
+          "verification": "unverified"
+        },
+        {
+          "viewCode": "cliente.creative_hub",
+          "path": "/creative-hub",
+          "verification": "unverified"
+        },
+        {
+          "viewCode": "cliente.equipo",
+          "path": "/equipo",
+          "verification": "unverified"
+        },
+        {
+          "viewCode": "cliente.proyectos",
+          "path": "/proyectos",
+          "verification": "unverified"
+        },
+        {
+          "viewCode": "cliente.pulse",
+          "path": "/home",
+          "verification": "unverified"
+        },
+        {
+          "viewCode": "cliente.reviews",
+          "path": "/reviews",
+          "verification": "unverified"
+        }
+      ]
+    }
+  ]
+}

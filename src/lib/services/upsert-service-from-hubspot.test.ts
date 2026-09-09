@@ -45,6 +45,23 @@ describe('upsertServiceFromHubSpot (TASK-836 Slice 4)', () => {
     mockedOutbox.mockResolvedValue('outbox-event-id')
   })
 
+  it.each([undefined, null, '', '   ', 'not-a-number', NaN, Infinity])('preserves unavailable source amounts as null (%s)', async value => {
+    mockedQuery.mockResolvedValueOnce([]).mockResolvedValueOnce([{ action: 'created' }])
+    await upsertServiceFromHubSpot(buildInput({
+      properties: { ...buildInput().properties, ef_total_cost: value, ef_amount_paid: value }
+    }))
+    // Values sent to the real persistence boundary, not assertions about SQL text.
+    expect(mockedQuery.mock.calls[1][1].slice(14, 16)).toEqual([null, null])
+  })
+
+  it.each([0, '0', 123.45, '123.45'])('preserves explicit source amounts (%s)', async value => {
+    mockedQuery.mockResolvedValueOnce([]).mockResolvedValueOnce([{ action: 'created' }])
+    await upsertServiceFromHubSpot(buildInput({
+      properties: { ...buildInput().properties, ef_total_cost: value, ef_amount_paid: value }
+    }))
+    expect(mockedQuery.mock.calls[1][1].slice(14, 16)).toEqual([Number(value), Number(value)])
+  })
+
   describe('lifecycle mapper integration', () => {
     it('aplica lifecycle resolved (Activo) al SQL', async () => {
       mockedQuery

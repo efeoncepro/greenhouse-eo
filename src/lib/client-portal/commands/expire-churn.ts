@@ -7,6 +7,7 @@ import { getDb } from '@/lib/db'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
 import { recordAssignmentEvent } from './audit'
+import { lockClientPortalAssignment } from './transaction'
 import { ClientPortalValidationError } from './errors'
 
 /**
@@ -65,10 +66,13 @@ const applyTerminalTransition = async (
   const effectiveTo = input.effectiveTo ?? todayIsoDate()
 
   const result = await db.transaction().execute(async tx => {
+    await lockClientPortalAssignment(input.assignmentId, tx)
+
     const existing = await tx
       .selectFrom('greenhouse_client_portal.module_assignments')
       .select(['assignment_id', 'organization_id', 'module_key', 'status', 'effective_to'])
       .where('assignment_id', '=', input.assignmentId)
+      .forUpdate()
       .executeTakeFirst()
 
     if (!existing) {

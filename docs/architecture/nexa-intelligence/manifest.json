@@ -166,7 +166,8 @@
         "src/lib/nexa/actions/extract-proposals.ts",
         "src/lib/nexa/actions/confirm.ts",
         "src/lib/nexa/actions/events-store.ts",
-        "src/app/api/nexa/actions/[actionKey]/confirm/route.ts"
+        "src/app/api/nexa/actions/[actionKey]/confirm/route.ts",
+        "src/lib/nexa/actions/client-service-enablement.ts"
       ],
       "docs": [
         "behavior/behavior-and-routing.md",

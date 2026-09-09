@@ -1,3 +1,5 @@
+import type { ServiceEnablementRequest, ServiceEnablementApplyRequest, ServiceEnablementRollbackRequest } from '@/lib/client-portal/enablement/types'
+
 import type {
   GreenhouseApiErrorEnvelope,
   GreenhouseApiSuccessEnvelope,
@@ -85,6 +87,18 @@ export class GreenhouseApiPlatformClient {
   constructor(config: GreenhouseMcpConfig, fetchImpl: FetchLike = fetch) {
     this.config = config
     this.fetchImpl = fetchImpl
+  }
+
+  async previewClientServiceEnablement(input: ServiceEnablementRequest) {
+    return this.request('/api/platform/ecosystem/client-services/enablement/preview', {}, { method: 'POST', body: { ...input } })
+  }
+
+  async applyClientServiceEnablement(input: ServiceEnablementApplyRequest) {
+    return this.request('/api/platform/ecosystem/client-services/enablement/apply', {}, { method: 'POST', body: { ...input } })
+  }
+
+  async rollbackClientServiceEnablement(input: ServiceEnablementRollbackRequest) {
+    return this.request('/api/platform/ecosystem/client-services/enablement/rollback', {}, { method: 'POST', body: { ...input } })
   }
 
   async getContext() {
@@ -674,7 +688,7 @@ export class GreenhouseApiPlatformClient {
   }
 
   async simulateQuote(input: Record<string, unknown>) {
-    return this.request('/api/platform/ecosystem/quotation/simulate', {}, { method: 'POST', body: input })
+    return this.request('/api/platform/ecosystem/quotation/simulate', {}, { method: 'POST', body: { ...input } })
   }
 
   private async request<TData>(
