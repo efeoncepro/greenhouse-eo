@@ -99,3 +99,18 @@ y `nexa.action.unauthorized_proposal_rate`. NUNCA guarda contenido de conversaci
 - ❌ NUNCA ejecutar un write desde el LLM: `nexa-action-proposal.v1` se PROPONE; ejecutar requiere
   confirmación humana + el endpoint determinístico (idempotency foundation TASK-655).
 - ✅ Contrato nuevo → versionarlo (`*.v1`) + documentar productor + consumidores acá.
+
+## TASK-1852 — input preparado de acciones gobernadas
+
+`NexaActionPreviewResult.executionInput?: unknown` permite que un preview prepare datos verificables en
+servidor (p. ej. fingerprint de configuración). El registry valida ese valor con el mismo `inputSchema`,
+lo incluye únicamente en `proposal.execution.input` y retira el campo del preview visible. La confirmación
+valida de nuevo y no regenera la huella. El contrato de propuesta v1 conserva su shape público.
+
+`NexaActionDefinition.authorize?: (context) => Promise<void>` se ejecuta antes de la idempotencia exterior,
+incluidos replays. TASK-1852 usa el reader de autoridad vigente; no confía en roles cacheados del turno.
+Ambas extensiones son opt-in y los consumers existentes conservan sus entradas y comportamiento.
+
+El contexto de acción conserva el `authMode` de sesión cuando existe. TASK-1852 rechaza `agent` en
+su permiso de propuesta/confirmación; el refresh JWT preserva esa procedencia firmada. No se deriva
+aprobación humana del modo de login base de la cuenta.

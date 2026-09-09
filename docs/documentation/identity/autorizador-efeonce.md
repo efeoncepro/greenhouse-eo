@@ -49,6 +49,23 @@ no es el estado vigente. Greenhouse tiene configurada la dirección JWKS para ve
 > [`FEATURE_FLAG_STATE_LEDGER.md`](../../operations/FEATURE_FLAG_STATE_LEDGER.md); lo implementado, en el
 > [§Delta 2026-09-04 del ADR](../../architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md#delta-2026-09-04--task-1828-ejecutada-runtime-llaves-front-door).
 
+## Conexión interna multiorganización
+
+TASK-1844 añadió contexto interno v2 y consentimiento fresco para elegir organizaciones en cada llamada.
+La certificación del 2026-09-08 cubre una identidad con lectura SEO; una nueva organización cubierta por sus
+permisos aparece al actualizar discovery sin volver a consentir. La familia v1 conserva su versión al
+renovarse: pasar a v2 exige una nueva autorización una vez por cliente. Los permisos de cada target se
+resuelven en Greenhouse; no se guarda una lista fija de organizaciones en el token.
+
+[Funcionamiento y límites](acceso-mcp-interno-multiorganizacion.md) ·
+[Manual Codex/Claude](../../manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md) ·
+[Registro fechado de clientes](../../audits/mcp/TASK-1844_FINAL_CLIENTS_2026-09-08.json).
+
+La compatibilidad CIMD verificada en ese cierre permite que el documento de una app anuncie una lista mayor
+de tipos de grant: el emisor registra sólo la intersección admitida (`authorization_code`, `refresh_token`).
+No habilita el canje de tipos no soportados. Un cliente registrado no tiene por ello permiso sobre ninguna
+organización; sigue necesitando consentimiento y autoridad vigentes.
+
 ## La llave de firma, explicada
 
 - **Nunca sale del hardware.** El servicio le manda un resumen del pase y recibe la firma de vuelta. Si alguien
@@ -122,6 +139,9 @@ El tratamiento visual del bloque dentro de la ficha de la aplicación es de TASK
 dentro del contexto; no se toma el máximo de otras organizaciones. Sin autoridad vigente, el emisor deniega.
 Revocar un grant aumenta esa versión y el gateway la contrasta antes de ejecutar. Refresh conserva el contexto,
 los scopes y el instante de autenticación: no renueva permisos ni hace más reciente un segundo factor.
+En v2, `gv` conserva la autoridad del actor ancla y no se compara con la revisión de cada target. La familia
+ya consentida puede seguir renovándose tras vencer la cookie web si contexto, autoridad y familia siguen
+vigentes y la sesión no está revocada; expirar una cookie y revocar acceso son eventos distintos.
 
 ### 5. Cancelar y consultar
 

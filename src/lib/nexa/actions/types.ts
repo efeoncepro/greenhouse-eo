@@ -91,6 +91,7 @@ export interface NexaActionGap {
 
 /** Minimal session-derived context an action needs. Never trusts client-supplied identity. */
 export interface NexaActionContext {
+  authMode?: string | null
   userId: string
   memberId?: string
   clientId: string | null
@@ -100,6 +101,8 @@ export interface NexaActionContext {
 }
 
 export interface NexaActionPreviewResult {
+  /** Optional server-prepared input, validated by the same schema and echoed for confirmation. */
+  executionInput?: unknown
   title: string
   summary: string
   metrics: NexaActionPreviewMetric[]
@@ -141,6 +144,8 @@ export interface NexaActionDefinition<TInput = void> {
   isEnabled: () => boolean
   /** Deterministic permission check from session context. False → not_permitted gap. */
   isPermitted: (context: NexaActionContext) => boolean
+  /** Fresh asynchronous authority check before command replay as well as execution. */
+  authorize?: (context: NexaActionContext) => Promise<void>
   /** Builds a fresh, real-data preview. Read-only — NEVER mutates. */
   buildPreview: (context: NexaActionContext, input: TInput) => Promise<NexaActionPreviewResult>
   /** The bound command. Runs ONLY from the confirm endpoint, inside the idempotency foundation. */

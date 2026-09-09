@@ -9,6 +9,7 @@ customer payloads as evidence.
 | OAuth/resource metadata | root and path metadata, missing/expired/wrong issuer/audience token rejection, insufficient-scope rejection before downstream dispatch, authenticated initialize |
 | Provider adapter | disabled default, capability listing, allow, deny before dispatch, timeout/fault sanitization, correlation and provider isolation |
 | Globe/creative capability | all provider evidence plus workspace/rights/credit/approval gates from Globe; for the active fleet reader, verify no house/provider cost or margin leaks; never test with a real paid generation unless authorized |
+| Internal multi-organization v2 | fresh versioned consent, v1 refresh non-upgrade, paginated discovery/cursor revoke, A/B allow and C/missing deny, selective/global/family revocation, concurrent isolation, native client events, OFF/restore and fixture retirement; [client-certification.md](client-certification.md) |
 | Customer/B2B MCP access | all OAuth and provider evidence plus a real client that receives only its granted tenant/capability entitlements, revocation evidence and an external-access decision; an internal client that receives both the base (`efeonce.mcp.read`) and Globe reader (`efeonce.mcp.globe.read`) scopes is insufficient |
 | Cloud Run/edge | deployed revision/image, ingress, service identity, rollback revision, DNS from independent resolvers, TLS, public unauthorized `401` |
 | Managed TLS incident | A/AAAA/CNAME answers from authoritative and independent public resolvers, forwarding-rule IP/443, HTTPS-proxy certificate attachment, certificate-map absence/precedence, managed/domain status and retry timestamp |
@@ -27,10 +28,13 @@ customer payloads as evidence.
 
 ## Native issuer and corporate session
 
-For TASK-1836/TASK-1831 changes, apply [native-authority.md](native-authority.md): direct anonymous
+For TASK-1836/TASK-1831/TASK-1844 changes, apply [native-authority.md](native-authority.md): direct anonymous
 `/login` visibility/click/session and the client OAuth/MCP canary are distinct rows. Require context-bound
 allow/deny, refresh, token-family and grant revocation with an unexpired token, bounded OFF/restore and
-separate legacy/external regression evidence. Never substitute flags ON or metadata for authenticated dispatch.
+separate legacy/external regression evidence. V2 separates actor anchor and target; target changes under the
+same consented authority do not require reconnecting. Track client recovery after OFF separately, preserve
+final OAuth families during cleanup and limit a verdict to the tested cohort. Never substitute flags ON,
+metadata, model prose or a process with zero tool calls for authenticated dispatch.
 
 ## External invitation delivery and delegated authority (TASK-1837)
 

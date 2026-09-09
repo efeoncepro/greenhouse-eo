@@ -267,6 +267,9 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 
 ## Acceptance Criteria
 
+- [ ] Cliente e interno usan el mismo catálogo/commands con autorización por acción, organización, módulos y audiencia: cliente genera sólo plantillas/evidencia permitidas de su cuenta; ser interno no concede todas las cuentas. URL/API/MCP niegan target o audience manipulados.
+- [ ] Cliente ve sus solicitudes con estado redactado y ediciones elegibles; drafts internos no aparecen por compartir org. Crear y emitir son autoridades distintas; el estado ready_for_review tiene owner cuando la policy lo exige.
+- [ ] Berel SEO/contenidos y Sky diseño/ICO se integran con EPIC-046 consumiendo readers de los productores, nunca el BFF client-portal; conservar unidad, período, frescura y proyección en snapshot/identidad de reutilización.
 - [ ] Skill efeonce-insights autosuficiente para MCP, ligada a tools reales en skill-manifest y accesible por catálogo/reader autorizado; ejemplos de generación/ventana/recuperación ejecutados sin contexto previo, sin fuga de instrucciones internas.
 
 - [ ] Report/edition/snapshot se persisten con ownership por org, código único bajo concurrencia y snapshots sellados inmutables; corrección crea una versión nueva.
@@ -294,6 +297,14 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 - [ ] Arquitectura técnica, documentación funcional y manual/runbook actualizados proporcionalmente.
 - [ ] Handoff/changelog y contratos UI/API/MCP reflejan disponibilidad real.
 - [ ] Regresiones, señales, rollback y gates documentales pasan; no commit/push/deploy automático.
+
+## Delta 2026-09-09 — dos poblaciones autenticadas, EPIC-046
+
+El operador confirma autogestión cliente y gestión de colaboradores internos como alcance Insights.
+Esta task conserva el núcleo: catálogo elegible, autoridad por actor/target/acción, proyección de
+audiencia y generación gobernada. Ver arquitectura §7.1. P01/P02 del portal coordinan servicios y
+fuentes; no nace otro command ni se toma como backend una proyección BFF. Los criterios anteriores
+son exigibles en la implementación; siguen sin verificar y no activan módulos o writes.
 
 ## Follow-ups
 

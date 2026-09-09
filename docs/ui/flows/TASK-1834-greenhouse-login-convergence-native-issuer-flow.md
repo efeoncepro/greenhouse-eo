@@ -153,3 +153,11 @@ selected cohort flow itself is direct; it never uses a visible `Continuar` vesti
 - [ ] Internal and external populations cannot fall through into each other.
 - [ ] Multiple eligible contexts require an explicit, server-revalidated Greenhouse choice.
 - [ ] Recovery and rollback preserve a usable path without a redirect loop.
+
+## Delta 2026-09-09 — destinos de EPIC-046
+
+TASK-1852 aporta matriz de cohorte y casos de retorno desde email/in-app/Teamsbot. Conservar destino
+interno permitido de servicio/solicitud/edición Insights a través de login y selección 0/1/múltiples
+contextos. El selector sólo presenta opciones autorizadas; otra cuenta, revocación o retirada no abre
+un objeto sustituto ni filtra título. GET/scanner no muta. Canaries técnicos y piloto cliente se separan.
+El login vigente comprobado permite trabajo independiente; el nuevo camino espera gates de TASK-1834.

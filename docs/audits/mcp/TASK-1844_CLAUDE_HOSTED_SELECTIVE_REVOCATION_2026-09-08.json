@@ -1,0 +1,59 @@
+{
+  "evidence": "local canonical reader against shared PG; not served JWT or MCP proof",
+  "observedAt": "2026-09-08T20:49:27.706Z",
+  "runId": "task-1844-runtime-20260908-a",
+  "expiresAt": "2026-09-09T00:00:00Z",
+  "mutation": {
+    "action": "revoke-b",
+    "startedAt": "2026-09-08T20:49:17.951Z",
+    "committedBefore": "2026-09-08T20:49:19.578Z"
+  },
+  "retired": false,
+  "targets": [
+    {
+      "label": "A",
+      "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975",
+      "clientId": "task-1844-runtime-20260908-a-a",
+      "spaceId": "spc-task-1844-runtime-20260908-a-a",
+      "outcome": "resolved"
+    },
+    {
+      "label": "B",
+      "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3",
+      "clientId": "task-1844-runtime-20260908-a-b",
+      "spaceId": "spc-task-1844-runtime-20260908-a-b",
+      "outcome": "denied"
+    },
+    {
+      "label": "C",
+      "organizationId": "org-56b1a2d6-fc83-4639-adeb-59e0b20f5127",
+      "clientId": "task-1844-runtime-20260908-a-c",
+      "spaceId": "spc-task-1844-runtime-20260908-a-c",
+      "outcome": "denied"
+    }
+  ],
+  "source": "Canonical entitlement mutation and actual Claude.ai UI tool request/error/response details",
+  "client": "Claude.ai",
+  "chatUrl": "https://claude.ai/chat/7003de2a-c11a-42cd-9f35-b64647cc101f",
+  "requestSubmittedAt": "2026-09-08T20:49:40.583Z",
+  "toolDetailsObservedBy": "2026-09-08T20:50:13.976Z",
+  "conservativeLatencyUpperBoundMs": 56025,
+  "latencyMethod": "Time from mutation START, which precedes commit, through reading both completed tool details; includes operator and model delay.",
+  "within60Seconds": true,
+  "reconnected": false,
+  "calls": [
+    {
+      "tool": "get_seo_entitlement",
+      "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3",
+      "error": "authorization_denied"
+    },
+    {
+      "tool": "get_seo_entitlement",
+      "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975",
+      "ok": true,
+      "hasModule": false,
+      "blockedReason": "no_entitlement",
+      "budgetUsedUsd": 0
+    }
+  ]
+}

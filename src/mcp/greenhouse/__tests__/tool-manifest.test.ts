@@ -73,6 +73,8 @@ describe('manifiesto de tools MCP (TASK-1780)', () => {
 
     expect(writeClass.sort()).toEqual(
       [
+        'apply_client_service_enablement',
+        'rollback_client_service_enablement',
         'declare_seo_competitors',
         'discover_seo_keywords',
         'prepare_seo_grounded_queries',
@@ -160,7 +162,10 @@ describe('el cartel del servidor se deriva del inventario (Slice 2)', () => {
 
     expect(identity.name).toBe('greenhouse')
     expect(identity.instructions).not.toContain('all of them read-only')
-    expect(identity.instructions).toContain('7 that WRITE')
+    const writes = GREENHOUSE_MCP_TOOL_MANIFEST.filter(tool => !greenhouseMcpToolIsReadOnly(tool)).length
+
+    expect(writes).toBeGreaterThan(0)
+    expect(identity.instructions).toContain(`${writes} that WRITE`)
   })
 
   it('nombra cada escritura y cada compromiso de gasto, sin que nadie las escriba a mano', () => {

@@ -62,6 +62,10 @@ export type ApiPlatformErrorCode =
   | 'rate_limited'
   | 'scope_not_allowed'
   | 'session_revoked'
+  | 'service_enablement_preview_stale'
+  | 'service_enablement_blocked'
+  | 'service_enablement_compensation_conflict'
+  | 'service_enablement_concurrent_change'
   | 'service_unavailable'
   | 'unsupported_api_version'
 

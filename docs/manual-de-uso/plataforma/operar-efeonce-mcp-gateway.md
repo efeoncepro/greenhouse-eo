@@ -9,8 +9,14 @@
 > certificados con el canary sintético. Sigue la
 > [matriz/runbook externo](../../operations/runbooks/mcp-external-canary-certification.md); no uses una conexión
 > visible como sustituto de login, dispatch, refresh y revoke.
-> `efeonce-mcp` `1.2.0` sirve 100 % Ready en `00047-8b5`: discovery nativo/base-only y shim retirado. El rollback
+> El cierre de TASK-1813 registró `efeonce-mcp` `1.2.0` 100 % Ready en `00047-8b5`: discovery nativo/base-only y shim retirado. El rollback
 > `00047→00046→00047` y la matriz post-cutover completa quedaron verificados sin ampliar permisos.
+
+> **Acceso interno multiorganización 2026-09-08:** TASK-1844 certificó una identidad con lectura SEO en v2,
+> gateway `1.3.0`/`00050-wlk`. Para conectar Codex/Claude y elegir organizaciones sin repetir OAuth, sigue
+> [el manual diario](../identity/usar-mcp-interno-multiorganizacion.md). El
+> [runtime de cierre](../../audits/mcp/TASK-1844_FINAL_RUNTIME_2026-09-08.json) es evidencia fechada;
+> verifica la revisión servida antes de una operación nueva.
 
 ## Antes de probar
 
@@ -28,14 +34,14 @@ No uses la URL `run.app`: el acceso público pasa por el front door y el hostnam
    deben ser equivalentes, declarar sólo `https://auth.efeonce.org` y `efeonce.mcp.read`. Las rutas
    `/.well-known/oauth-authorization-server` y `/register` del gateway deben responder `404`.
 3. Con un cliente OAuth autorizado, ejecuta el handshake que soporte su versión y relee `tools/list` serializado.
-4. Ejecuta `globe.capabilities.list` y luego `globe.producer.fleet.list` sin argumentos.
+4. Si la autoridad del cliente incluye Globe, ejecuta `globe.capabilities.list` y luego `globe.producer.fleet.list` sin argumentos. No uses esas tools como prueba obligatoria del carril interno v2, limitado inicialmente a SEO.
 5. Confirma que la respuesta contiene rutas, disponibilidad y correlation ID, pero no house, provider slug,
    costo de vendor ni margen.
 6. Para el provider Greenhouse-SEO, sigue su manual dedicado:
    [Operar el provider Greenhouse-SEO del MCP](operar-provider-greenhouse-seo-mcp.md). Sus tools de lectura viven
    en el permiso base `efeonce.mcp.read` y las siete de escritura bajo `efeonce.mcp.seo.write`; se verifican con
    canaries distintos y tienen su propio interruptor de rollback.
-7. Ejecuta `get_greenhouse_skill` sin argumentos: debe devolver el catálogo de manuales de uso (seis al 2026-09-02,
+7. Con una autoridad que permita manuales internos, ejecuta `get_greenhouse_skill` sin argumentos: debe devolver el catálogo de manuales de uso (seis al 2026-09-02,
    la cuenta exacta la fija `src/mcp/greenhouse/skill-manifest.ts` en Greenhouse). Con `{ "name": "seo-spend-discipline" }`
    debe volver el manual completo como texto, empezando por su frontmatter. Un catálogo vacío con la revisión
    correcta desplegada significa que el binding no es `internal` o que el provider está apagado — nunca "no hay manuales".
@@ -96,6 +102,15 @@ de dominio o escritura aparecen de forma incremental en el challenge `403` de un
 estar habilitados en el servidor. En modo legacy-only, el challenge los cualifica para Entra; con Efeonce ID son
 bare. Ninguna de esas formas sustituye capabilities, grants o autoridad downstream.
 
+
+## Verificar el carril interno multiorganización v2
+
+TASK-1844 requiere `efeonce.organizations.list`, `organizationId` explícito en cada lectura y autoridad actual
+sobre todos los espacios activos del objetivo. El [runbook multiorganización](../../operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md)
+gobierna los tres gates v2, el enrollment de la cohorte, la certificación A/B/C y el rollback compatible con
+las migraciones aplicadas. El cambio de organizaciones elegibles no exige renovar consentimiento; cambiar
+una conexión v1 a v2 sí lo exige una vez por cliente. La certificación inicial y sus fixtures retiradas se
+reutilizan como evidencia, no se repiten sobre organizaciones cliente para llenar una checklist.
 
 ## Verificar el carril corporativo nativo
 

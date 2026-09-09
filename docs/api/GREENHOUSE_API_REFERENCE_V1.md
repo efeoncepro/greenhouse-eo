@@ -46,7 +46,7 @@ Routes:
 - `GET /api/platform/ecosystem/organizations/:id`
 - `GET /api/platform/ecosystem/capabilities`
 - `GET /api/platform/ecosystem/integration-readiness`
-- `GET /api/platform/ecosystem/identity/binding?environment=&subject=[&clientId=]` — reader de acceso externo para el gateway MCP (TASK-1631): sólo bindings de scope `internal`, cualquier otro recibe `404` anti-oráculo; `400 bad_request` sin `environment`/`subject`; `Cache-Control: private, no-store` + `cacheTtlSeconds: 60`
+- `GET /api/platform/ecosystem/identity/binding` — autoridad humana para el gateway: externo por `(environment, subject)` con TTL 60; interno v1/v2 con contexto/cliente/audiencia/gv/jti y TTL 0. V2 añade intenciones `catalog|target|organizations`, actor/targets separados y páginas 1–50. Sólo binding de servicio `internal`; otro recibe `404` anti-oráculo. HTTP `200` con `denied` no autoriza. [Queries y DTO](GREENHOUSE_API_PLATFORM_V1.md#reader-de-identidad-y-autoridad-mcp).
 - `GET /api/platform/ecosystem/event-types`
 - `GET/POST /api/platform/ecosystem/webhook-subscriptions`
 - `GET/PATCH /api/platform/ecosystem/webhook-subscriptions/:id`

@@ -61,6 +61,11 @@ If rollback, watchdog, Azure, Vercel, or HubSpot is involved, also read:
 ## Hard Rules
 
 - Never treat a push to `main` as a completed production release.
+- Before publishing documentation inside deployable trees, inspect the actual workflow branch/path triggers:
+  `services/auth-server/**` also matches its README. A docs-only diff can start a deploy, and staging may
+  serve the same runtime as production. Do not infer isolation from the filename or environment label.
+  If an unintended run is cancelled, verify the job/step reached, any Cloud Build started, created revisions,
+  and the revision/digest/flags with serving traffic. A cancelled workflow alone does not prove no change.
 - Never approve individual worker production gates as the normal path.
 - Never reintroduce worker production deploys on `push:main`; workers deploy to
   production through the orchestrator `workflow_call` path, with
@@ -106,8 +111,8 @@ consumer deployment/image digest and the package/auth configuration that was
 used to build it; restoring traffic alone is insufficient if the build cannot
 be reproduced.
 
-Canonical pointers: [AXIS shared UI platform ADR](../../docs/architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md),
-[AXIS private package consumption runbook](../../docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md),
+Canonical pointers: [AXIS shared UI platform ADR](../../../docs/architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md),
+[AXIS private package consumption runbook](../../../docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md),
 and `TASK-1591`.
 
 For an AXIS secret migration, the release gate is also a secret-hygiene gate: confirm that every consumer
@@ -831,3 +836,20 @@ it does not assert YAML text. Before removing the legacy context index, verify e
 version-compatible. Rollback retains the expanded schema and that compatible writer floor. Deployment,
 cohort activation and real-client certification remain separate evidence; follow
 `docs/operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md` and the flag ledger.
+
+Treat durable deployment configuration and served flags as separate readbacks: an ad hoc service update can
+be overwritten by the next pipeline. Preserve the exact cohort in the owning GitHub variables/environment,
+Vercel Production and the emitted revision as applicable. Do not replace an explicit cohort with a wildcard.
+Reader/gateway compatibility precedes issuer activation; OFF order is issuer, gateway, reader and restore
+reverses it. This coordination does not merge the gateway repository into Greenhouse's orchestrator.
+
+Promote the exact verified gateway revision; `latestReadyRevisionName` can select a different configuration
+revision even when the image SHA is unchanged. Verify traffic, digest and allowlisted flags together. For
+change-gated auth/Ops, justify retained SHA through the complete tree/runtime evidence; never rebuild merely
+to align a label. Missing manifest URL/revision/health fields remain missing: attach independent served
+readbacks instead of inventing them. Preserve any preflight exception and its declared actor/reason; an audit
+row does not independently verify the human capability behind a GitHub account.
+
+Rollback recovery includes clients: OFF/ON may leave Claude Code requiring its standard MCP login. A new
+organization under existing authority does not require that recovery. Record client events and durable
+configuration after restore, without widening scopes or retiring final OAuth families with test fixtures.

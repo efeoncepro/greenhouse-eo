@@ -1,10 +1,24 @@
 # TASK-1844 — Publicación y certificación de runtime
 
-Estado: **release en ejecución; reader/gateway ON, emisor en despliegue para cohorte exacta**. La autorización del operador
+Estado final 2026-09-08: **producción y clientes verificados; fixtures retiradas, TASK-1844 completa**. La autorización del operador
 «Avanza con todo lo pendiente» cubre publicación, migraciones, activación controlada, clientes y rollback.
 El coordinador es Codex, sin delegación ni cambio de branch en los checkouts compartidos.
 
-## Identidad y evidencia de publicación
+## Resultado final
+
+- PR 230/main `45f6910e3ae35cad5d775eaabf9ce6e15d156d6e`, árbol idéntico al candidato `76ed9ca20`; CI/Deep/Playwright exactos success. Orquestador [34281143424](https://github.com/efeoncepro/greenhouse-eo/actions/runs/34281143424) success, 21:32:12→21:44:34Z; manifest `45f6910e3ae3-418c7895-89ad-4373-a21e-34a8bfe91929` released, 21:35:13.125→21:44:22.158Z.
+- Vercel `dpl_2uGoEoujQLnsnR8UogFye5x9JjSL` Ready/alias productivo, SHA exacto en API; auth `00048-4vq`, Ops `00671-jj8`, commercial `00573-846`, ICO `00382-sn6`, HubSpot `00179-9h2`, gateway `00050-wlk`, todos Ready/100 %. Auth/Ops conservan SHA `76ed9ca20` con árbol completo idéntico a main; los otros tres workers sirven main. [Readback final](TASK-1844_FINAL_RUNTIME_2026-09-08.json) 21:45:09Z.
+- Configuración durable y servida ON para una identidad interna, scope base. [Watchdog](TASK-1844_FINAL_WATCHDOG_2026-09-08.json) 5/5 sincronizados, drift/missing 0; health público 200. [Manifest](TASK-1844_FINAL_RELEASE_MANIFEST_2026-09-08.json) tiene URL/revisiones/health vacíos: se acreditan con readbacks independientes.
+- [Certificación final de clientes](TASK-1844_FINAL_CLIENTS_2026-09-08.json): Codex, Claude Code y Claude hospedado con familias v2 activas y A/B reales. Desktop comparte familia hospedada. La primera ronda nativa final sin tools por DNS local no cuenta; [repetición y diagnóstico](TASK-1844_FINAL_DNS_OBSERVATION_2026-09-08.json) conservan el incidente sin imputarlo al gateway.
+- [Fixtures retiradas](TASK-1844_FIXTURES_RETIRED_2026-09-08.json): nueve filas inactivas y cero overrides; Codex discovery de 14 organizaciones excluye fixtures y deniega A/B. Canary externo responde y las tres conexiones internas definitivas permanecen activas.
+- [Preflight final](TASK-1844_FINAL_RELEASE_PREFLIGHT_2026-09-08.json): once checks OK, excepción batch autorizada por contract ya aplicada; `degraded`/`readyToDeploy=false` conservados. [Audit](TASK-1844_FINAL_RELEASE_AUDIT_2026-09-08.json) registra la declaración, sin convertirla en verificación independiente de identidad humana.
+- Rollback OFF/restore real y límite de reautenticación de Claude Code documentados abajo. La ampliación de cohorte requiere observabilidad proporcional del reader.
+
+## Cronología histórica de publicación
+
+Los estados intermedios siguientes quedaron resueltos por el resultado final anterior.
+
+### Identidad y evidencia de la primera publicación
 
 | Superficie | Evidencia verificada |
 | --- | --- |
@@ -102,3 +116,22 @@ intersecta los dos grants soportados y conserva el rechazo de cualquier intercam
 [Documento y regresión](TASK-1844_CLAUDE_CIMD_COMPATIBILITY_2026-09-08.json).
 Pruebas OAuth: 147 passed/0 skipped; suite auth/internal: 498 passed/25 skipped
 (live excluidos, no se cuentan como passed). Publicación adicional y hosted pendientes.
+
+## Continuación verificada 20:49Z
+
+Codex y Claude Code completaron refresh v2, conservando contexto, familia y scope. Codex renovó después de expirar el access token; Claude renovó anticipadamente y sus llamadas posteriores al vencimiento original pasaron. B se denegó en menos de 21 segundos en ambos clientes, A siguió accesible y la restauración pasó sin reconectar. La revocación global de contexto en un proceso Claude abierto denegó A/B con JWT vigente; la revocación de familia Codex rechazó initialize y refresh antes de exponer herramientas. Se retiraron las familias de prueba y el control v1; las nuevas conexiones nativas internas quedaron operativas.
+
+La corrección CIMD sirvió desde `auth-server-00047-m95`, SHA `39e33c03a`, tráfico 100%. Claude hospedado consintió v2 y emitió su primera familia a 20:42:23Z, vencimiento original 20:57:23Z. Catálogo 21 herramientas y nueve llamadas reales verificadas en sus detalles: status, paginación, A/B, C/missing/invalid deny y A posterior. [Matriz hospedada](TASK-1844_CLAUDE_HOSTED_MATRIX_2026-09-08.json). La UI no prueba solapamiento temporal: concurrencia se acredita con los eventos nativos.
+
+PR 230 incorpora la compatibilidad CIMD. La revisión señaló whitespace en identificadores y un comentario obsoleto de migración: `76ed9ca20` rechaza los identificadores malformados al validar y aclara que la contract ya aplicada no se recrea. OAuth: 150 passed, 0 skipped; pre-push lint/TypeScript passed con 26 advertencias UI preexistentes. Checks remotos del SHA nuevo en curso.
+
+No se consideran certificación las rondas Desktop con catálogo anterior ni los probes Codex sin llamadas. La caché Desktop se recargó; verificación en curso. Permanecen pendientes refresh/revocación hospedados, rollout final, rollback/restore y retiro de fixtures.
+
+
+## Segundo release — 21:32Z
+
+PR 230 fusionada a `main` `45f6910e3ae35cad5d775eaabf9ce6e15d156d6e` a 21:10:52Z; árbol idéntico al candidato `76ed9ca20`. CI `34279119607`, Deep `34279119795`, Playwright `34279847615` y gobernanza terminaron success. Vercel `dpl_2uGoEoujQLnsnR8UogFye5x9JjSL` READY; la API confirmó `gitSource.sha` y `meta.githubCommitSha` exactos.
+
+Preflight final: once checks OK, únicamente excepción batch por contract ya aplicada. Se conserva `degraded/readyToDeploy=false` del payload, junto con la excepción autorizada. [Evidencia](TASK-1844_FINAL_RELEASE_PREFLIGHT_2026-09-08.json). Orquestador único [34281143424](https://github.com/efeoncepro/greenhouse-eo/actions/runs/34281143424), iniciado 21:32:12Z; no hay otro release ni deploy concurrente.
+
+Antes de esta promoción se verificaron Desktop, refresh y revocación hospedados, así como [rollback/restore](TASK-1844_ROLLBACK_RESTORE_2026-09-08.json). Codex conservó su familia; Claude Code necesitó login después del OFF, nueva familia A/B verificada y anterior retirada. La familia hospedada nueva sigue vigente. No se cambia la ventana del canary ni los permisos Entra.

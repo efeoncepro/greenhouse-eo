@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -21,7 +21,7 @@
 - Motion: `docs/ui/motion/TASK-1835-efeonce-id-login-consent-screens-motion.md`
 - Backend impact: `integration`
 - Epic: `EPIC-044`
-- Status real: `2026-09-08 20:25Z: code complete; producción activada para una persona y certificación en curso. Main 741e3a045cc2 publicado por PR 229, orquestador 34272151054 success y manifest released; watchdog 5/5, drift/data_missing=0. Reader Vercel ON, gateway 00050-wlk y emisor 00046-6cf ON/100%. Codex y Claude Code: consentimiento v2, A/B concurrentes allow, C/invalid deny, paginación y cursor revocado deny; A conserva acceso. Codex v1 renovó sin elevarse. Claude hospedado bloqueado por CIMD que anuncia jwt-bearer; corrección mínima validada localmente (498 passed, 25 skipped), publicación pendiente. B restaurada; faltan completar renovación, revocación global, hosted, rollback y cleanup. Sólo la conexión hospedada del canary fue retirada bajo la excepción aprobada; los demás activos siguen intactos.`
+- Status real: `2026-09-08: producción verificada para una identidad interna, scope base y consentimiento v2. PR 230/main 45f6910e3, CI/Deep/Playwright y orquestador 34281143424 success; manifest released, Vercel exacto y watchdog 5/5 sin deriva. Codex, Claude Code, Claude hospedado/Desktop certificados con refresh, revocación y rollback/restore reales. Claude Code requiere login tras rollback OFF. Fixtures A/B/C retiradas: nueve filas inactivas, cero overrides, discovery real de 14 organizaciones y A/B denegadas. Conexiones internas definitivas conservadas; canary externo intacto salvo sustitución hospedada Claude autorizada. Cierre completo con QA y evidencia documental enlazadas.`
 - Rank: `Después del cierre de TASK-1813; antes del uso interno multiorganización en Codex o Claude`
 - Domain: `identity|platform`
 - Blocked by: `none`
@@ -148,7 +148,7 @@ del gateway, config/flags, SQL pendientes y copy/renderer del consentimiento. De
 
 ## Current Repo State
 
-### Already exists
+### Baseline anterior a la implementación
 
 - `InternalAuthorizationContext` liga persona, cliente, audiencia, sesión, binding y organización, y se revalida
   contra autoridad vigente antes de emitir/renovar.
@@ -161,7 +161,7 @@ del gateway, config/flags, SQL pendientes y copy/renderer del consentimiento. De
 - `TASK-1836` tiene pruebas de dos contextos separados A/B, aislamiento de `gv` y revocación. Eso prueba dos tokens
   uniorganización, no un token base que seleccione A o B por llamada.
 
-### Gap
+### Brechas iniciales resueltas por esta entrega
 
 - La autoridad interna se resuelve contra el único operating entity `EO-ORG-0007`; no proyecta las organizaciones
   de clientes que la persona puede operar por autoridad Greenhouse.
@@ -283,11 +283,11 @@ Se descarta un selector que altere el target del token y una lista estática pre
 
 ### Acceptance criteria additions
 
-- [x] Source of truth, contract surface and consumers are named with real paths or objects. Evidencia: [plan aprobado 2026-09-08](../plans/TASK-1844-plan.md#backenddata-contract); aceptado e implementado; rollout pendiente.
-- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit. Evidencia: [plan aprobado 2026-09-08](../plans/TASK-1844-plan.md#backenddata-contract); aceptado e implementado; rollout pendiente.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects. Evidencia: [plan aprobado 2026-09-08](../plans/TASK-1844-plan.md#backenddata-contract); expand/contract aplicadas y rollback hacia writer compatible verificado.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit. Evidencia: [plan aprobado 2026-09-08](../plans/TASK-1844-plan.md#backenddata-contract); expand/contract aplicadas y rollback hacia writer compatible verificado.
 - [x] Toda tabla nueva queda declarada con su justificación en `src/lib/auth-server/boundary-domain.test.ts` en el mismo PR. Evidencia: No se agregan tablas ni write targets: se amplía authorization_contexts, ya declarada en boundary-domain.test.ts; gate passed.
-- [x] Migration/backfill/rollback posture is explicit and proportional to risk. Evidencia: [plan aprobado 2026-09-08](../plans/TASK-1844-plan.md#backenddata-contract); aceptado e implementado; rollout pendiente.
-- [x] Runtime or DB evidence is listed for every contract change beyond docs. Evidencia: [plan aprobado 2026-09-08](../plans/TASK-1844-plan.md#backenddata-contract); aceptado e implementado; rollout pendiente.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk. Evidencia: [plan aprobado 2026-09-08](../plans/TASK-1844-plan.md#backenddata-contract); expand/contract aplicadas y rollback hacia writer compatible verificado.
+- [x] Runtime or DB evidence is listed for every contract change beyond docs. Evidencia: [plan aprobado 2026-09-08](../plans/TASK-1844-plan.md#backenddata-contract); expand/contract aplicadas y rollback hacia writer compatible verificado.
 - [x] Errores, audit y señales no exponen PII, tokens, cookies, upstream claims ni organizaciones no autorizadas. Evidencia: DTO estricto/minimizado, errores genéricos y señales sanitizadas; API/resource y gateway tests passed.
 
 ## Capability Definition of Done — Full API Parity gate
@@ -484,19 +484,19 @@ reales internos, revocación y rollback.
 ## Acceptance Criteria
 
 - [x] Delta ADR aceptado separa contexto actor y organización objetivo; JWT/scopes permanecen sin wildcard ni lista de tenants. Evidencia: D8–D11, aprobación 2026-09-08 y pruebas v1/v2 de emisión, refresh y verificación.
-- [x] Consentimiento/contexto v2 son explícitos y un consentimiento v1 no puede emitir ni refrescar autoridad multiorganización. Evidencia: Tests de GET/POST, contexts, refresh ES256 y SQL real TEMP passed; runtime pendiente.
-- [x] Reader machine-only devuelve sólo organizaciones vigentes que el actor puede operar y capability efectiva por target. Evidencia: Snapshot, roles/overrides/relación y todos los spaces probados con PG TEMP; runtime pendiente.
+- [x] Consentimiento/contexto v2 son explícitos y un consentimiento v1 no puede emitir ni refrescar autoridad multiorganización. Evidencia: Tests GET/POST, contexts, refresh ES256 y SQL real TEMP passed; control Codex v1 renovado tras activación sin elevarse y familias v2 reales por cliente.
+- [x] Reader machine-only devuelve sólo organizaciones vigentes que el actor puede operar y capability efectiva por target. Evidencia: Snapshot, roles/overrides/relación y todos los spaces probados con PG TEMP; paginación real v2 incluye A/B y excluye C.
 - [x] Gateway consume actor/targets internos sin convertir la versión del ancla en permiso de otra organización. Evidencia: Policy/reader v2 y rechazo de gv ajeno; revisión target independiente; tests passed.
 - [x] Existe discovery read-only minimizado para que el agente elija IDs autorizados sin depender de prompts manuales. Evidencia: Tool interna v2/base-only con annotations, structuredContent, baseline 1.3.0 y tests.
 - [x] Tool org-scoped exige target exacto; missing/ambiguous/C ajena deniegan antes del provider y A sigue funcionando después. Evidencia: SDK callback real con A/B/C, missing y A después del deny; pruebas locales passed.
-- [x] El mismo token/familia opera A y B autorizadas; retirar B no afecta A y revocar al actor deniega ambas. Evidencia: Contrato SDK concurrente y OAuth v2/refresh local; revocación selectiva/global passed. Falta certificación cliente real.
-- [x] Prueba concurrente A/B demuestra aislamiento de argumentos, resoluciones, resultados, correlation IDs y handles. Evidencia: Callbacks SDK intercalados validan target, resultado y marcadores de correlación/handle por request; runtime pendiente.
+- [x] El mismo token/familia opera A y B autorizadas; retirar B no afecta A y revocar al actor deniega ambas. Evidencia: Contrato SDK concurrente y eventos reales Codex/Claude; SELECTIVE_REVOCATION_LATENCY, CONTEXT_REVOCATION y CODEX_FAMILY_REVOCATION; nuevas familias operativas.
+- [x] Prueba concurrente A/B demuestra aislamiento de argumentos, resoluciones, resultados, correlation IDs y handles. Evidencia: Callbacks SDK intercalados validan target, resultado y marcadores de correlación/handle por request; eventos nativos A/B concurrentes en matrices Codex/Claude, sin inferir concurrencia desde UI hospedada.
 - [x] Provider conserva recheck de módulo/entitlement/regla de negocio y el gateway no contiene SQL ni reglas de producto. Evidencia: No cambia el callback del provider; wrapper preserva argumentos autorizados y recheck existente.
-- [ ] Entra legacy, población externa y canary sintético conservan scopes, grants, discovery y canaries sin widening. Regresión local passed; readback post-rollout pendiente, sin mutar esos carriles.
-- [ ] Codex y Claude completan consentimiento fresco, tools/list, A/B allow, C deny, refresh y revocación post-rollout.
-- [x] Un cambio posterior de organización/capability se refleja sin reconectar; un cambio material de scope/autoridad exige nuevo consentimiento. Evidencia: Lectura nueva sin caché positiva, pruebas de revocación y consentimientos/clase; runtime pendiente.
-- [ ] Flags OFF/restore y rollback de revisión se prueban contra runtime real con readback de PG, servicios y señales.
-- [ ] Task lint, ops lint, QA auth/integration/runtime/release y cierre documental terminan sin hallazgos propios. Gates locales documentados en QA; certificación runtime/release pendiente.
+- [x] Entra legacy, población externa y canary sintético conservan scopes, grants, discovery y canaries sin widening. Evidencia: ENTRA_LEGACY_REGRESSION, EXTERNAL_AFTER_ROLLBACK y LEGACY_CANARY_AFTER_ROLLBACK; grant Entra idéntico, canary activo, sólo familia de la conexión hospedada Claude retirada bajo autorización expresa.
+- [x] Codex y Claude completan consentimiento fresco, tools/list, A/B allow, C deny, refresh y revocación post-rollout. Evidencia: matrices nativas y hospedada, ledger de refresh, revocaciones y Desktop en auditoría QA; errores de protocolo distinguidos de payload MCP.
+- [x] Un cambio posterior de organización/capability se refleja sin reconectar; un cambio material de scope/autoridad exige nuevo consentimiento. Evidencia: Lectura sin caché positiva; revocación/restauración B servidas en clientes sin reconectar y consentimientos v1/v2 separados.
+- [x] Flags OFF/restore y rollback de revisión se prueban contra runtime real con readback de PG, servicios y señales. Evidencia: ROLLBACK_RESTORE 21:03–21:12Z, flags durables/servidos, schema/historia conservados y health 200. Codex misma familia; Claude Code requiere login después del OFF y su nueva familia pasó A/B.
+- [x] Task lint, ops lint, QA auth/integration/runtime/release y cierre documental terminan sin hallazgos propios. Evidencia: gates proporcionales en QA, CI/Deep/Playwright exactos success, FINAL_RUNTIME/FINAL_WATCHDOG y FIXTURES_RETIRED; sólo 13 advertencias ops preexistentes de otros epics. Revalidación documental final antes del commit.
 
 ## Verification
 
@@ -518,13 +518,21 @@ reales internos, revocación y rollback.
 
 ## Closing Protocol
 
-- [x] `Lifecycle` del markdown quedó sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla). Evidencia: Sigue in-progress hasta runtime/clientes completos.
-- [x] El archivo vive en la carpeta correcta (`to-do/`, `in-progress` o `complete/`). Evidencia: Se conserva docs/tasks/in-progress/.
-- [x] `docs/tasks/README.md`, `docs/tasks/TASK_ID_REGISTRY.md` y `EPIC-044` quedaron sincronizados. Evidencia: Índices y EPIC-044 actualizados con code complete, rollout pendiente.
-- [x] `Handoff.md` quedó actualizado con rollout, riesgos, flags y siguiente paso. Evidencia: Continuidad enlaza QA y runbook con gates/aprobación pendientes.
-- [x] `changelog.md` quedó actualizado cuando cambió comportamiento o protocolo visible. Evidencia: Entrada 2026-09-08 actualizada al comportamiento implementado.
-- [x] Se ejecutó chequeo de impacto cruzado sobre TASK-1813, TASK-1831, TASK-1832, TASK-1836 y TASK-1841. Evidencia: TASK-1831/1836 enlazan este delta; TASK-1813 conserva cierre, TASK-1832 su canary y TASK-1841 el piloto real.
-- [x] El criterio sólo se declara completo con runtime y clientes; flags OFF o código local se reportan como `code complete, rollout pendiente`. Evidencia: QA BLOCK para cierre operativo por rollout pendiente; no se mueve a complete.
+- [x] Lifecycle y carpeta sincronizados como complete tras runtime, clientes, cleanup y task lint.
+- [x] README, TASK_ID_REGISTRY, EPIC-044 y enlaces canónicos reflejan el cierre de U19; el epic conserva sus pendientes propios.
+- [x] Handoff, project_context, changelog, ledger de flags y timing de release actualizados con evidencia servida.
+- [x] TASK-1831/1836 enlazan el delta completo sin reabrir TASK-1813 ni cerrar trabajo ajeno.
+- [x] TASK-1832 conserva ventana, registro y otros clientes; sólo su conexión hospedada Claude fue sustituida bajo aprobación expresa. TASK-1841 conserva el piloto real.
+- [x] Producción y clientes verificados; nueve filas de fixtures preservadas e inactivas, sin overrides residuales. Tres familias internas definitivas permanecen activas.
+- [x] Limitación Claude Code tras rollback OFF y observabilidad necesaria antes de ampliar cohorte registradas en QA/runbook.
+
+## Documentación posterior al cierre — 2026-09-08
+
+El operador solicitó revisión completa con subagentes. Tres ámbitos independientes reconciliaron skills, arquitectura/API y documentación funcional/manuales; el coordinador integró runbooks, invariantes, routers, índices y documentación del gateway. TASK-1844 conserva lifecycle complete: esta ampliación documenta comportamiento ya implementado, sin reabrir migraciones ni activar nuevas personas/proveedores.
+
+- [Manual de uso](../../manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md) y [documentación funcional](../../documentation/identity/acceso-mcp-interno-multiorganizacion.md).
+- [Cobertura y validación documental](../../audits/mcp/TASK-1844_DOCUMENTATION_SKILLS_CLOSURE_2026-09-08.md).
+- Altas de organizaciones elegibles sin reconexión, recuperación por cliente, permisos dinámicos y límites de cohort/tráfico documentados en sus fuentes canónicas.
 
 ## Follow-ups
 
@@ -535,4 +543,4 @@ reales internos, revocación y rollback.
 
 - Resuelto: tool gateway-native efeonce.organizations.list, paginada y minimizada; D9.
 - Resuelto: nueva resolución después de revocación comprometida, cota a demostrar ≤60 s sin caché positiva; D11.
-- Resuelto durante rollout: fixtures dedicadas y cohorte exacta verificadas; certificación cliente v2 en curso.
+- Resuelto durante rollout: fixtures dedicadas y cohorte exacta verificadas; matrices de clientes v2 y rollback completos, con reautenticación Claude Code documentada.

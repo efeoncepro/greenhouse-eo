@@ -7,6 +7,52 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-09 — TASK-1852: habilitación común de servicios
+
+Implementados inventario/preview, apply y compensación por organización/persona/servicio con commands
+canónicos, locks, snapshot e idempotencia atómica. App/CLI/MCP/Nexa reutilizan el dominio; escritura
+delegada denegada y writes nuevos apagados. JOIN comercial corregido, procedencia agent preservada
+durante refresh y audit App acepta cliente nulo de sesión interna. 290 tests, PostgreSQL local y smoke
+HTTP autenticado; [QA y matriz Berel/Sky](docs/audits/client-portal/TASK-1852_IMPLEMENTATION_QA_2026-09-09.md).
+Rollout autorizado y alcance Berel/Sky confirmado por el operador; permiso de compensación EFEONCE_ADMIN
+corregido, 392 tests passed. Servicio Berel sincronizado por command; resolver HubSpot vigente y
+normalizador conservan importes ausentes NULL. [Estado del despliegue](docs/audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md).
+Registros comerciales y certificación cliente pendientes; sin asignaciones live ni envíos.
+
+## 2026-09-09 — Planificación estacional Efeonce y continuidad editorial
+
+Documentadas 13 piezas 2026–2027 con conceptos, tareas, calendario y readback fechado en
+[registro social](docs/audits/social/EFEONCE_SEASONAL_CONTENT_PLAN_2026_2027.md).
+Social Media incorpora guía de efemérides, metáforas visuales y briefs; Notion explicita la aplicación
+del flujo existente a pares tarea/calendario, con fechas separadas y detección de divergencias.
+Skills espejadas Claude/Codex. Cuatro tareas tienen asignaciones nuevas aún no copiadas al calendario;
+se documenta el pendiente sin mutaciones Notion. Producción, aprobación y publicación siguen abiertas.
+
+## 2026-09-09 — Portal de servicios: EPIC-046 e integración con Efeonce Insights
+
+Registrados [EPIC-046](docs/epics/to-do/EPIC-046-client-services-visibility-and-self-service.md) y
+[ADR](docs/architecture/GREENHOUSE_CLIENT_SERVICE_EXPERIENCE_DECISION_V1.md): Berel SEO/marketing de
+contenidos y Sky diseño digital, primero visibilidad y después solicitudes/briefs. Cinco tasks nuevas
+registradas y tres existentes por reutilizar, sin cambiar asignaciones ni desplegar.
+Baseline fechado de catálogo, acceso y destinos 404; fuentes, permisos, contratación y estados separados.
+El operador aprueba la dirección y añade Insights como hito obligatorio: autogestión cliente y gestión
+interna comparten dominio/historial, con permisos distintos y token limitado a una edición. EPIC-045,
+arquitectura/ADR, TASK-1845/1846/1848/1849 y flow/wireframe sincronizados; sin otro builder o motor.
+Ampliación del operador: email de Insights con resumen/deep link, in-app y Teamsbot en esta fase;
+móvil posterior. Hito N/P09 reutiliza Hub y sus dueñas, distingue entrega/consulta/acción y exige
+preferencias, destino autorizado y dedupe. TASK-690/693/1848/1849 actualizadas; sin envíos reales.
+El operador autoriza el registro: TASK-1852–1856 creadas con templates, contratos UI/backend y
+criterios; TASK-1852 ↔ TASK-1834 enlazadas para identidad/contexto/deep links y rollout nativo
+condicional. Inicio por 1852 con login vigente probado; commit documental autorizado, sin implementación, push ni deploy.
+Diseño UI ampliado por pedido del operador: ocho documentos TASK-1854/1856 con pantallas H0/S1 y R0–R5,
+campos de contenidos/SEO/diseño, deep links, recovery, adjuntos, copy, responsive y motion causal.
+Primitives verificadas en código; tareas/backend/epic alineados. UI ready no hasta integración/primer fold/GVC;
+umbral premium vigente ≥4.5, sin declarar capturas, scorecard ni funcionalidad desplegada.
+Asignación Claude/Codex documentada en EPIC-022/045/046: modelo, esfuerzo y revisión por task/carril;
+Astra para fronteras críticas, Sol para integración, Opus para UI/editorial y Fable para TASK-1669.
+Reglas comunes en EPIC-046: un editor por archivos, continuidad de owner y sin ejecución/rollout implícitos.
+Commit completo autorizado: incluye el movimiento previo de TASK-1690 a in-progress; lifecycle, registro y README conciliados, sin avance de implementación.
+
 ## 2026-09-08 — GPT Image 2.5 entra a la doc como capacidad de proveedor, no como camino disponible
 
 OpenAI publicó `gpt-image-2.5-sunburst` y `gpt-image-2.5-flare`. La matriz de capacidades, la spec del
@@ -47,14 +93,16 @@ ADR y arquitectura fijan dominio Greenhouse + Artifact Worker, tres salidas de p
 API/UI/MCP, co-branding y grants revocables. TASK-1672/1673 conservan integración de auditoría técnica SEO.
 Sólo planificación autorizada; sin implementación, emisión de reportes ni rollout.
 
-## 2026-09-08 — TASK-1844: autoridad interna multiorganización implementada
+## 2026-09-08 — TASK-1844: autoridad interna multiorganización activada
 
-Greenhouse resuelve targets por snapshot de roles, relaciones y permisos efectivos; el contexto v2 conserva
-el actor y exige consentimiento fresco. Gateway 1.3.0 agrega discovery minimizado y autorización exacta por
-llamada, sin tenants en JWT ni ampliar scope. Refresh conserva versión y contexto. Writer compatible y SQL
-expand/contract preparados, gates OFF. 528 pruebas Greenhouse, 158 gateway y 2 PG live passed; build/tipos y
-GVC desktop/390 px correctos. Lint conserva 26 warnings previos. [QA](docs/audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md).
-**Code complete, rollout pendiente:** sin apply, push, deploy ni reautorización de clientes en esta entrega.
+Greenhouse resuelve autoridad por objetivo con consentimiento v2; gateway 1.3.0 descubre organizaciones
+permitidas y revalida cada llamada sin ampliar `efeonce.mcp.read`. Expand/contract aplicadas y cohorte de
+una persona ON. Codex, Claude Code, Claude hospedado/Desktop: A/B, negativos, refresh y revocación verificados.
+Rollback/restore servido probado; Claude Code requiere login tras OFF. CIMD extendido de Claude admite
+PKCE/refresh y rechaza JWT bearer; OAuth 150 passed. PR 230/main `45f6910e3`, orquestador `34281143424`
+success, manifest released, Vercel exacto y watchdog 5/5. Fixtures retiradas; conexiones definitivas conservadas.
+[QA y límites](docs/audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md).
+Manual interno, documentación funcional/técnica, API, runbooks y skills Codex/Claude reconciliados; [cobertura](docs/audits/mcp/TASK-1844_DOCUMENTATION_SKILLS_CLOSURE_2026-09-08.md).
 
 ## 2026-09-08 — Berel cierra la doctrina de recuperación y QA editorial preventivo
 
@@ -935,44 +983,3 @@ Y el bloqueo de entrenamiento de modelos de IA no se pinta como una falla: lleva
 🔴 **Sigue apagado.** El código existe pero no está desplegado, y el interruptor tampoco está
 encendido. Hasta que las dos cosas pasen, un sitio invisible para los motores de IA **sigue**
 saliendo con 95 de salud.
-
-## 2026-09-01 — El audit SEO aprende a mirar el sitio, no sólo sus páginas (TASK-1670)
-
-La auditoría técnica pasa a evaluar cuatro cosas que el crawl de páginas no ve: si el `robots.txt`
-le niega el paso a los rastreadores de IA, si el servidor o el CDN los rechaza aunque el `robots.txt`
-los permita, si la portada publica datos estructurados y si el mapa del sitio está sano.
-
-La distinción que hace creíble al informe: bloquear el rastreo que **cita** el sitio en una respuesta
-de IA es crítico, mientras que bloquear el que **entrena** modelos es una decisión de derechos sobre
-el contenido y se reporta como información, nunca como falla. Meterlos en la misma bolsa haría que un
-sitio perfectamente accesible saliera en rojo, y eso enseña a ignorar la alerta más importante.
-
-🔴 **Todavía no está encendido.** La capacidad viaja apagada detrás de un flag, porque estos
-hallazgos son del dominio completo y la pantalla actual los contaría como "1 página afectada". Hasta
-que esa superficie exista (`TASK-1671`), un sitio invisible para los motores de IA **sigue** saliendo
-con 95 de salud. El estado real es `code complete, rollout pendiente`.
-
-## 2026-09-01 — Brand Visibility Grader queda disponible en Recursos
-
-El menú principal de `efeoncepro.com` ahora incluye **Brand Visibility Grader** dentro de
-`Recursos`, enlazado a `https://think.efeoncepro.com/brand-visibility`. La actualización reutiliza la
-navegación nativa de Ohio; no crea una segunda cabecera ni modifica Elementor. Los 26 ítems previos
-conservaron membresía, jerarquía y orden persistido, y el nuevo ítem quedó respaldado con snapshot
-recuperable.
-
-Después de purgar WordPress/Kinsta, el submenú y el clic se verificaron en producción a 1440 px y
-390 px. El destino respondió 200 y ambas vistas quedaron sin overflow horizontal ni errores de
-consola.
-
-## 2026-09-01 — TASK-1807 instala los primeros controles FinOps de GCP
-
-Producer corre cada cinco minutos mediante Terraform y permanece bajo observación antes de tocar Media. Dos
-budgets nativos alert-only quedaron activos en CLP: 250.000 para Globe y 370.000 consolidados, con cuatro umbrales
-de gasto actual y dos de forecast. El lector Greenhouse usa costo neto después de créditos y el watcher deduplica
-por incidente estable; su prueba dry-run no consulta persistencia ni envía mensajes.
-
-Globe agregó cuatro labels de atribución a 33 recursos. Artifact Registry, con 418 versiones y 10,4 GB, tiene una
-cleanup policy en dry-run que conserva 10 versiones por paquete y sólo simula borrar versiones de más de 30 días;
-no hubo eliminación. Asset Governance fue publicado y desplegado por digest inmutable para converger hasta cuatro
-stages fenced en una ejecución. El smoke live quedó sano pero no-op, así que conserva cron minutely hasta un canary
-con asset real. El post-plan no presenta drift y Greenhouse sigue local, sin publicación.

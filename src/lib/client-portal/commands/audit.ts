@@ -41,6 +41,7 @@ type DbLike = Kysely<DB> | Transaction<DB>
  * en TS lo cerramos para drift detection compile-time.
  */
 export type AssignmentEventKind =
+  | 'enablement_receipt'
   | 'enabled'
   | 'status_changed'
   | 'expired'

@@ -98,3 +98,36 @@ pool PG, bucket público, perfil visual paralelo a `TASK-1644` o ampliación del
 - `GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md`, `GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`.
 - `GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md`, `EFEONCE_MCP_AGENT_SKILL_ROUTER_V1.md`.
 - `docs/operations/EFEONCE_REPORT_BRAND_DELIVERY_STANDARD_V1.md` y `EFEONCE_EXECUTIVE_REPORT_DECK_METHOD_V1.md`.
+
+## Delta 2026-09-09 — autogestión cliente y gestión interna
+
+**Accepted for planning**, por indicación del operador: Insights sirve al cliente autenticado y a los
+colaboradores internos autorizados y se integra en EPIC-046 para Berel y Sky. Amplía explícitamente el
+recorrido cliente inicial de lectura compartida hacia generación gobernada, sin reemplazar el token.
+
+Un dominio/biblioteca/historial sirve tres recorridos: cliente sobre su cuenta, colaborador sobre cuentas
+autorizadas y destinatario limitado a la edición compartida. El cliente puede elegir servicio, período y
+formatos permitidos, solicitar/generar una edición, seguirla y descargarla; los colaboradores gestionan
+preparación, revisión, emisión, distribución y recurrencia según permisos. Generar no concede emisión,
+correo, sharing o acceso a evidencia interna. Audiencia del artefacto y actor no se confunden.
+
+EPIC-045 conserva TASK-1845–1849, commands, permisos y UI Insights; EPIC-046 conserva habilitación,
+contexto del servicio y accesos desde el portal. Las mismas fuentes alimentan el dashboard vivo y el
+snapshot de Insights, con cortes explícitos y sin import inverso desde el BFF. No se crea otro motor,
+builder, catálogo de permisos ni task duplicada. Contrato exigible: arquitectura §7.1 y acceptance de
+las tasks dueñas. La integración es criterio de cierre de ambos programas; una apertura inicial de
+métricas puede precederla sin presentarse como Insights terminado. Sin código ni rollout en este delta.
+
+## Delta 2026-09-09 — distribución que conecta con el portal
+
+**Accepted para planificación**, por instrucción del operador. Insights por correo incluye resumen útil
+y deep link a la edición dentro de Greenhouse; email, in-app y Teamsbot habilitado acompañan desde ahora
+consulta y autogestión. Móvil/push es posterior. La edición emitida es el hecho notificable, no un render
+interno terminado. El enlace autenticado es el default para usuarios del portal; el ShareGrant queda
+como distribución explícita separada. Generar no autoriza envío ni suscripción automática.
+
+[Arquitectura §9.1](EFEONCE_INSIGHTS_ARCHITECTURE_V1.md#91-activación-y-retorno-al-portal--epic-046)
+fija destinatarios, canales, preferencias, deep links y medición. TASK-1848/1849 conservan distribución
+y experiencia Insights; Notification Hub conserva routing/adapters/preferencias, coordinado desde
+EPIC-046/P09. Hitos I/N se certifican juntos para el recorrido de informes; no hay segundo sender,
+motor de digest ni gateway móvil. Esta decisión no habilita canales, destinatarios ni schedules live.

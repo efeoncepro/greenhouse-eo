@@ -73,17 +73,67 @@ Endpoints:
   de la superficie MCP (TASK-1804): catálogo sin cuerpos y manual completo; `audience: internal` sólo visible
   para bindings `internal` (si no, `404` anti-oráculo); `ETag` + `If-None-Match` → `304`. Contrato completo con
   ejemplos: `TASK-1793`.
-- `GET /api/platform/ecosystem/identity/binding?environment=<environmentId>&subject=<sub>[&clientId=<azp>]` — reader
-  de acceso externo por `(environment, subject)` para el gateway MCP (TASK-1631; consumer TASK-1831). Además de
-  los params obligatorios de la lane (`externalScopeType`/`externalScopeId` del binding sister-platform `internal`
-  del gateway) exige `environment` y `subject`; si falta alguno responde `400 bad_request`. Sólo un binding de scope
-  `internal` puede resolver personas: cualquier otro binding recibe `404` anti-oráculo (mismo contrato que el
-  catálogo de skills). Respuesta = la resolución del dominio `{ outcome, environmentId, issuerClass, profileId,
-  memberships[{ bindingId, organizationId, externalOrganizationRef, grantsVersion, grants[], designatedAdmin }],
-  resolvedAt }` + `cacheTtlSeconds: 60`, servida con `Cache-Control: private, no-store`. `outcome` ∈
-  `bound | unbound | revoked | environment_inactive | profile_inactive`; sólo `bound` autoriza y el gateway compara
-  `grantsVersion` por IGUALDAD contra el claim `gv` del token. Nunca devuelve el subject ni el email. Resource:
-  `src/lib/api-platform/resources/ecosystem-identity-binding.ts`.
+- `GET /api/platform/ecosystem/identity/binding` — reader de autoridad externa e interna (v1/v2), machine-only
+  para el gateway MCP. Contrato detallado a continuación.
+
+### Reader de identidad y autoridad MCP
+
+La ruta exige el consumer/binding de servicio `internal` del gateway y los parámetros de lane
+`externalScopeType`/`externalScopeId`. Otro binding recibe `404 not_found` anti-oráculo. Los datos humanos
+se derivan de claims ya verificados por el gateway; no se envía el bearer humano al provider ni se exponen
+subject/email en la respuesta. Resource: `src/lib/api-platform/resources/ecosystem-identity-binding.ts`.
+
+| Query | Externo | Interno v1/v2 |
+| --- | --- | --- |
+| `environment`, `subject` | obligatorios; resuelven identidad | obligatorios; deben coincidir con el contexto |
+| `clientId` | opcional; diagnóstico, no autoridad | obligatorio; `azp` verificado |
+| `authorizationContextId` | ausente | UUID obligatorio |
+| `contextVersion` | ausente | `1` o `2` explícito |
+| `grantsVersion`, `audience`, `jti` | ausentes | entero positivo seguro, audiencia MCP configurada e ID de token base64url de 22 caracteres |
+| `intent`, `organizationId`, `capability`, `afterOrganizationId`, `limit` | ausentes | sólo v2 y según la matriz inferior |
+
+V1 no acepta parámetros v2. Contexto parcial o parámetros reconocidos duplicados, vacíos/inválidos o
+combinaciones incompatibles producen `400 bad_request`; ausencia de `environment`/`subject` también.
+
+| Intención v2 | Parámetros adicionales permitidos | Resultado autorizado |
+| --- | --- | --- |
+| `catalog` | ninguno | `targets: []`; capabilities disponibles para visibilidad |
+| `target` | `organizationId` y `capability` obligatorios | exactamente el objetivo autorizado |
+| `organizations` | `limit` opcional 1–50/default 20; `afterOrganizationId` y `capability` opcionales | página minimizada y `nextAfterOrganizationId` o null |
+
+La única capability inicial es `growth.seo.observation.read`. IDs v2:
+`^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$`; no trim/fallback de target. Los 50 elementos son el máximo **por página**,
+no un máximo total. El cursor es un ID previamente autorizado, revalidado en cada página; ante revocación se
+reinicia sin cursor. No se devuelve total global ni candidatos ocultos.
+
+`data` del envelope tiene tres variantes:
+
+- Externo: resolución `resolveExternalAccess` con `memberships[]`, grants/versiones y
+  `cacheTtlSeconds: 60`. Sólo `outcome: bound` autoriza; `internal_population` y los outcomes canary
+  también deniegan. El gateway conserva la comparación estricta de `gv` para su membership externa.
+- Interno v1: `population: internal`, `contextVersion: 1`, `authorizationContextId`, `cacheTtlSeconds: 0`,
+  `outcome: bound` con `profileId`, `organizationId`, `bindingId`, `grantsVersion`, `capabilities`;
+  `denied` sólo conserva dimensiones base y `reason`, sin autoridad.
+- Interno v2: misma base con `contextVersion: 2`; `bound` añade
+  `actor {profileId, organizationId, bindingId, grantsVersion}`,
+  `targets[{organizationId, organizationName, capabilities, authorityRevision}]`, `capabilities` y
+  `nextAfterOrganizationId`. `denied` no incluye actor/targets.
+
+Siempre `Cache-Control: private, no-store`. Para internos no hay caché positiva entre requests. En v2, issuer y
+reader comparten snapshot read-only consistente con presupuesto 4 s y respuesta máxima 128 KiB.
+`actor.grantsVersion` valida el `gv` firmado, mientras `authorityRevision` opaca describe hechos del target
+y no es una credencial ni una versión comparable. HTTP `200` con `denied` nunca autoriza.
+
+Un alta/baja de organización, relación o permiso se refleja al listar/llamar de nuevo sin reconectar dentro
+de la autorización v2. La tool `efeonce.organizations.list` publica sólo
+`organizations[{organizationId, organizationName, capabilities}]` + cursor; no publica el actor ni la
+revisión de autoridad. Una llamada posterior exige target exacto y recheck propio del provider: autorización
+MCP no concede módulo SEO, presupuesto ni escrituras.
+
+Estado del contrato: TASK-1844 certificó v2 para una identidad interna el 2026-09-08, sin ampliar externos.
+[ADR](../architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md) ·
+[OpenAPI](GREENHOUSE_API_PLATFORM_V1.openapi.yaml) ·
+[manual](../manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md).
 
 ### Platform Health (preflight contract)
 

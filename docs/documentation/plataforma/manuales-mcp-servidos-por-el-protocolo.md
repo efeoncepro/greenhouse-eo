@@ -38,6 +38,12 @@ todos. Un consumidor conectado con el binding de un cliente **no ve que existen*
 llega vacío y pedir uno por nombre responde "no encontrado", igual que un manual que no existe.
 No hay un "no autorizado" que confirme su existencia.
 
+El binding interno de esta lane no equivale a toda conexión corporativa. La autoridad nativa v2 de
+TASK-1844 habilita inicialmente lectura SEO y no añade automáticamente esta tool a su catálogo. El
+[manual diario multiorganización](../../manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md) vive en
+la documentación del repositorio; no se publica por MCP por el hecho de existir aquí. Publicar contenido
+servido exige el manifest, la audiencia y los controles de fuga descritos abajo.
+
 Conectar un asistente no otorga permisos nuevos: el manual explica cómo usar una herramienta, no
 habilita ninguna.
 

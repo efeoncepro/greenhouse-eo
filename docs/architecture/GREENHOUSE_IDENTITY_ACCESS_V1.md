@@ -1,7 +1,8 @@
 # Greenhouse Identity and Access V1
 
 > **Status: Superseded** — This document describes the V1 identity and access design (BigQuery-based).
-> The active implementation is migrating to V2 (PostgreSQL-first) documented in `docs/tasks/to-do/GREENHOUSE_IDENTITY_ACCESS_V2.md`.
+> El contrato activo PostgreSQL-first vive en [Identity & Access V2](GREENHOUSE_IDENTITY_ACCESS_V2.md).
+> Para autoridad MCP interna por organización, usa su sección [Alcance del acceso MCP interno](GREENHOUSE_IDENTITY_ACCESS_V2.md#alcance-del-acceso-mcp-interno); los supuestos V1 siguientes son históricos.
 > Key differences in V2:
 > - Auth store moved from BigQuery to PostgreSQL (greenhouse_core)
 > - Route groups expanded: client, admin, internal, finance, hr, people, agency

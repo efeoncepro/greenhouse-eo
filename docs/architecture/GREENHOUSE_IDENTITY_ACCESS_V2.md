@@ -1,5 +1,18 @@
 # Greenhouse Identity & Access Architecture V2
 
+## Alcance del acceso MCP interno
+
+La sesión y el selector de tenant del portal descritos aquí no son el contrato de autoridad de un token MCP.
+TASK-1844 mantiene una conexión interna por persona/cliente OAuth y resuelve cada organización objetivo
+con relaciones y entitlements actuales. Contexto v1 y v2 son explícitos; v1 no se promueve por refresh.
+El reader v2 no usa como permisos frescos el snapshot del login ni infiere targets de email, dominio o rol
+aislado. Reutiliza las fuentes de identidad, roles y espacios de este dominio, con lectura consistente por
+request. Cambios ordinarios de organizaciones autorizadas no requieren reconexión.
+
+[Contrato de autoridad](EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md#delta-task-1844--autoridad-interna-multiorganización-accepted) ·
+[entitlements efectivos](GREENHOUSE_ENTITLEMENTS_AUTHORIZATION_ARCHITECTURE_V1.md#lectura-efectiva-para-autoridad-mcp-interna) ·
+[guía funcional](../documentation/identity/acceso-mcp-interno-multiorganizacion.md).
+
 ## Delta 2026-06-07 — Approval authority: el `approval_delegate` genérico NO confiere autoridad ni scope de aprobación (TASK-1020)
 
 **Contexto / bug class.** El 2026-06-05 una responsabilidad operacional genérica
@@ -333,6 +346,10 @@ Generate a valid NextAuth JWT session cookie without interactive login. Designed
 - Any headless automation that requires a valid session
 
 ### Security model
+
+El refresh de permisos conserva `authMode=agent` cuando el JWT firmado declara `provider=agent`.
+Actualizar rol/vistas desde la cuenta no cambia la procedencia de la sesión. TASK-1852 verifica el
+callback real y rechaza esta sesión como aprobación humana en App/Nexa; no cambia login ni concesiones.
 
 | Guard                         | Behavior                                              |
 | ----------------------------- | ----------------------------------------------------- |

@@ -31,6 +31,7 @@ la operación para un cliente internacional futuro. Para Social Media actual bas
 
 | Archivo | Qué cubre |
 |---|---|
+| `SEASONAL_CONTENT.md` | Efemérides por mercado, conceptos visuales, briefs ejecutables y producción anticipada; relación con tareas/calendario Notion. |
 | `STUDIO_TOOLING.md` | El pipeline real de ejecución: Metricool + Higgsfield + AI-image + Figma/Express + hand-offs. |
 | `SOCIAL_BOUNDARY.md` | La costura completa vs digital-marketing / growth-marketing-cro / copywriting / seo-aeo / efeonce-agency / generadores. Regla de precedencia. |
 | `CLIENT_DELIVERY.md` | Adaptador futuro para clientes internacionales: multi-marca, aprobaciones y reporting. No implica disponibilidad de Globe. |

@@ -1,0 +1,184 @@
+{
+  "observedAt": "2026-09-08T21:45:09.580369+00:00",
+  "targetSha": "45f6910e3ae35cad5d775eaabf9ce6e15d156d6e",
+  "workflow": {
+    "id": 34281143424,
+    "created_at": "2026-09-08T21:32:12Z",
+    "run_started_at": "2026-09-08T21:32:12Z",
+    "updated_at": "2026-09-08T21:44:34Z",
+    "head_sha": "45f6910e3ae35cad5d775eaabf9ce6e15d156d6e",
+    "status": "completed",
+    "conclusion": "success",
+    "html_url": "https://github.com/efeoncepro/greenhouse-eo/actions/runs/34281143424"
+  },
+  "services": [
+    {
+      "observedAt": "2026-09-08T21:44:57.092228+00:00",
+      "service": "auth-server",
+      "revisions": [
+        {
+          "revision": "auth-server-00048-4vq",
+          "trafficPercent": 100,
+          "ready": true,
+          "sha": "76ed9ca20b3630a4888ddd7ca09153f50ab3e324",
+          "digest": "gcr.io/efeonce-group/auth-server@sha256:1a427177af458c8f775c3bf91fc3007594e72c5d081cb3739aeb559a457fbf58",
+          "flags": {
+            "AUTH_SERVER_INTERNAL_AUTH_ENABLED": "true",
+            "AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED": "true",
+            "AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS": "identity-greenhouse-auth-client-user-user-efeonce-admin-julio-reyes",
+            "EXTERNAL_IDENTITY_CANARY_ENABLED": "true"
+          }
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-08T21:44:57.065375+00:00",
+      "service": "ops-worker",
+      "revisions": [
+        {
+          "revision": "ops-worker-00671-jj8",
+          "trafficPercent": 100,
+          "ready": true,
+          "sha": "76ed9ca20b3630a4888ddd7ca09153f50ab3e324",
+          "digest": "gcr.io/efeonce-group/ops-worker@sha256:393a64ae90d6026bc8fead04f8ba82502dbe1821863643caac1b3ddaa1fe3ebf",
+          "flags": {}
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-08T21:44:57.051524+00:00",
+      "service": "commercial-cost-worker",
+      "revisions": [
+        {
+          "revision": "commercial-cost-worker-00573-846",
+          "trafficPercent": 100,
+          "ready": true,
+          "sha": "45f6910e3ae35cad5d775eaabf9ce6e15d156d6e",
+          "digest": "gcr.io/efeonce-group/commercial-cost-worker@sha256:97eafea5ef10ae921d0ef7f5c100077abb7fcf32bfb416611254aa5068bbcc0d",
+          "flags": {}
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-08T21:44:56.752010+00:00",
+      "service": "ico-batch-worker",
+      "revisions": [
+        {
+          "revision": "ico-batch-worker-00382-sn6",
+          "trafficPercent": 100,
+          "ready": true,
+          "sha": "45f6910e3ae35cad5d775eaabf9ce6e15d156d6e",
+          "digest": "gcr.io/efeonce-group/ico-batch-worker@sha256:fcbd5112737bf6935a3c4f987b69303e025646c249eaad83780d8605a123f3d8",
+          "flags": {}
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-08T21:44:59.565270+00:00",
+      "service": "hubspot-greenhouse-integration",
+      "revisions": [
+        {
+          "revision": "hubspot-greenhouse-integration-00179-9h2",
+          "trafficPercent": 100,
+          "ready": true,
+          "sha": "45f6910e3ae35cad5d775eaabf9ce6e15d156d6e",
+          "digest": "gcr.io/efeonce-group/hubspot-greenhouse-integration@sha256:22cc55c9828da84ce06cd86a742a16a1586dfd699364269af66e02de6c248098",
+          "flags": {}
+        }
+      ]
+    },
+    {
+      "observedAt": "2026-09-08T21:44:57.932391+00:00",
+      "service": "efeonce-mcp-gateway",
+      "revisions": [
+        {
+          "revision": "efeonce-mcp-gateway-00050-wlk",
+          "trafficPercent": 100,
+          "ready": true,
+          "sha": "45ade9373b58c3a8a3d66912c5db76cbd59c5fc5",
+          "digest": "southamerica-west1-docker.pkg.dev/efeonce-group/efeonce-mcp/gateway@sha256:6a85733a6cb7faeca65d8cfbc8ff2199f652f95b47c8e021d0a3bc91380e06c8",
+          "flags": {
+            "MCP_NATIVE_AUTH_ENABLED": "true",
+            "MCP_NATIVE_INTERNAL_AUTH_ENABLED": "true",
+            "MCP_NATIVE_INTERNAL_MULTI_ORG_ENABLED": "true",
+            "MCP_NATIVE_EXTERNAL_CANARY_ENABLED": "true"
+          }
+        }
+      ]
+    }
+  ],
+  "vercel": {
+    "id": "dpl_2uGoEoujQLnsnR8UogFye5x9JjSL",
+    "url": "greenhouse-9chff3r1q-efeonce-7670142f.vercel.app",
+    "readyState": "READY",
+    "target": "production",
+    "createdAt": 1788901856005,
+    "verifiedGitSha": "45f6910e3ae35cad5d775eaabf9ce6e15d156d6e"
+  },
+  "durableFlags": {
+    "auth": [
+      {
+        "name": "AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED",
+        "value": "true"
+      },
+      {
+        "name": "AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS",
+        "value": "identity-greenhouse-auth-client-user-user-efeonce-admin-julio-reyes"
+      }
+    ],
+    "gatewayMultiOrg": "true",
+    "readerMultiOrg": "true"
+  },
+  "health": [
+    {
+      "url": "https://auth.efeonce.org/readyz",
+      "httpStatus": 200,
+      "response": {
+        "status": "ready",
+        "service": "auth-server",
+        "oauth": true,
+        "checks": {
+          "postgres": "ok",
+          "kms": "ok",
+          "activeKey": "ok"
+        },
+        "timestamp": "2026-09-08T21:45:09.132Z"
+      }
+    },
+    {
+      "url": "https://mcp.efeonce.org/health",
+      "httpStatus": 200,
+      "response": {
+        "status": "ok",
+        "oauthConfigured": true
+      }
+    },
+    {
+      "url": "https://greenhouse.efeoncepro.com/api/auth/health",
+      "httpStatus": 200,
+      "response": {
+        "contractVersion": "auth-readiness.v1",
+        "generatedAt": "2026-09-08T21:45:04.911Z",
+        "providers": [
+          {
+            "provider": "azure-ad",
+            "status": "ready",
+            "checkedAt": "2026-09-08T21:45:04.914Z"
+          },
+          {
+            "provider": "google",
+            "status": "ready",
+            "checkedAt": "2026-09-08T21:45:04.916Z"
+          },
+          {
+            "provider": "credentials",
+            "status": "ready",
+            "checkedAt": "2026-09-08T21:45:04.911Z"
+          }
+        ],
+        "overallStatus": "ready",
+        "nextAuthSecretReady": true
+      }
+    }
+  ]
+}

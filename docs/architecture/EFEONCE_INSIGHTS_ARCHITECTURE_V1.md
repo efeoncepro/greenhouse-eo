@@ -15,6 +15,8 @@ presentarse, compartirse y recuperarse después. Greenhouse conserva biblioteca,
 - Branding Efeonce obligatorio; logo del cliente opcional y autorizado, con pack/asset versionado.
 - ID estable de reporte, versiones inmutables, revisión editorial, enlaces y entrega por correo.
 - API, UI y MCP equivalentes; generación asíncrona y programación recurrente gobernada.
+- Dos recorridos autenticados de primera clase: autogestión del cliente y gestión de colaboradores
+  internos autorizados; el acceso compartido por token es un tercer recorrido limitado a una edición.
 - Quedan fuera PPTX/DOCX editables, diseñador libre de slides, métricas nuevas, refresh facturable implícito,
   BI ad hoc, distribución masiva, cambios de fórmula, extracción de repositorio y migración general del Grader.
 
@@ -177,8 +179,48 @@ manifest_drift, expired/revoked/not_found y delivery_failed; integración con er
 Views, entitlement Insights y grants de módulos son planos distintos. Revalidar actor/org/módulos al crear,
 ejecutar, emitir y distribuir. MCP hereda consentimiento efectivo; base-only read no autoriza create, issue
 ni send. Nuevas tools se registran en el manifest Greenhouse, se sincronizan en el gateway por su workflow y
-se prueban allow/deny/revocación. TASK-1844 es dependencia condicional para selección multiorganización desde
-una misma conexión interna; no bloquea el primer flujo uniorganización ni se reimplementa.
+se prueban allow/deny/revocación. TASK-1844 completó la base de selección multiorganización interna; su
+adapter inicial sólo delega `growth.seo.observation.read`, por lo que **no autoriza capabilities Insights**.
+Insights debe incorporar su contrato y policy de target propios al federarse, reutilizando ese reader y
+sin reimplementar OAuth. No bloquea el primer flujo uniorganización ni acredita sus writes.
+
+### 7.1 Contrato de audiencias autenticadas — integración EPIC-046
+
+Decisión del operador 2026-09-09. [EPIC-046](../epics/to-do/EPIC-046-client-services-visibility-and-self-service.md)
+integra Insights como capacidad del portal cliente y del trabajo del equipo, no sólo como enlace a un PDF.
+El actor autenticado y la audiencia del artefacto son dimensiones distintas: un colaborador puede crear
+una edición para cliente, pero eso no autoriza incluir su evidencia interna en esa edición.
+
+| Recorrido | Acciones previstas | Frontera obligatoria |
+|---|---|---|
+| Cliente autenticado | Biblioteca propia, elegir servicio/período/formato, solicitar/generar ediciones de plantillas permitidas, consultar progreso/historial y descargar salidas autorizadas | Organización desde sesión; módulos, proyectos, plantillas, formatos y cupos permitidos; sin selector libre de otras cuentas ni editor de evidencia/fórmulas |
+| Colaborador interno autorizado | Gestionar las cuentas a su cargo, preparar/revisar/emitir ediciones, recuperar jobs, compartir, entregar y programar según capability | Ser interno no concede todas las cuentas ni todos los verbos; target y permisos se revalidan en cada command |
+| Destinatario de enlace | Leer/descargar la edición emitida permitida | El ShareGrant no abre biblioteca, crea ediciones, envía correo ni actúa como identidad del cliente |
+
+La autogestión no queda reducida a descarga: el cliente puede iniciar generación gobernada con datos ya
+disponibles y ver su resultado. `createEdition` no equivale a `issue`: si la policy exige revisión,
+queda `ready_for_review` con owner; emitir siempre requiere autoridad explícita. Sólo se habilitan
+plantillas y proyecciones cliente seguras. Ningún caller puede pedir `audience=internal` para ampliar acceso.
+Un borrador de trabajo interno no aparece al cliente por compartir organización; éste ve sus solicitudes
+con estado redactado y las ediciones que la policy autoriza. Reutilizar edición o output exige coincidencia
+de audiencia/proyección y autoridad: nunca deduplicar por org/período omitiendo esos ejes.
+
+Descargar, crear/revocar enlace, emitir, enviar desde Efeonce y programar son permisos independientes.
+Un cliente puede compartir mediante grant sólo si tiene esa capability explícita y edición elegible;
+no adquiere envío corporativo ni programación por generar un informe. Si se habilita una recurrencia
+cliente, tiene alcance propio y autorización revalidada por ocurrencia, sin refresh facturable implícito.
+
+TASK-1845 posee catálogo elegible, projection/autoridad, autoría y estados; TASK-1846 revalida la
+autoridad en ejecución y no reutiliza outputs de otra audiencia; TASK-1848 posee distribución/recurrencia;
+TASK-1849 compone ambos recorridos y shared con componentes comunes y acciones devueltas por el servidor.
+El menú cliente usa el primitive module-driven vigente, con un destino Insights canónico y accesos
+contextuales desde Inicio/Mis servicios/SEO/Delivery, sin builders o bibliotecas duplicadas por módulo.
+
+Berel combina SEO y marketing de contenidos; Sky usa diseño digital/ICO. Los adapters consumen los
+readers de los dominios productores, jamás importan del BFF `client-portal`. Si P02 de EPIC-046 descubre
+un campo reusable, lo añade en su dominio dueño y ambos consumers lo usan. AEO sólo se incorpora cuando
+el alcance y permisos lo habiliten. Dashboard actual e informe congelado comparten fórmula/fuente, pero
+pueden tener distinto corte; mostrar fecha/período explica la diferencia, no forzar igualdad fuera del snapshot.
 
 ## 8. Acceso web compartido
 
@@ -206,8 +248,10 @@ Unknown/revoked/expired muestran recuperación segura sin revelar nombre del cli
 ## 9. Correo y recurrencia
 
 `DeliveryIntent` congela edición, lista de destinatarios validada, asunto, modalidad y autorización. Enlace
-por defecto; PDF adjunto opt-in con consecuencia de irrevocabilidad visible. Resolver remitente/contexto por
-`src/lib/email/`; nuevo EmailType/seed disabled, clasificación token-sensitive y footer canónico. Cliente puede
+por defecto al portal autenticado para sus usuarios; ShareGrant explícito para distribución compartida.
+PDF adjunto opt-in con consecuencia de irrevocabilidad visible. Resolver remitente/contexto por
+`src/lib/email/`; nuevo EmailType/seed disabled, sensibilidad según payload y footer canónico. Todo correo
+con ShareGrant es token-sensitive; un deep link autenticado no necesita bearer. Cliente puede
 copiar enlace/descargar; envío desde Efeonce exige capability interna separada, sin open relay a direcciones libres.
 
 Intent/outbox antes del efecto externo; dedupe por intent + destinatario + versión + modalidad. Ante timeout
@@ -219,6 +263,81 @@ zona, días de consolidación, módulos, output set, política de revisión y au
 scheduleVersion + período; dos ticks no duplican. Caída se recupera por política explícita de catch-up acotado
 (una ocurrencia pendiente por defecto), no tormenta histórica. Revocar autoridad pausa el schedule. Default:
 genera borrador para revisión; autoemisión/envío exige autorización previa explícita, acotada y revocable.
+
+### 9.1 Activación y retorno al portal — EPIC-046
+
+Decisión de producto del operador, 2026-09-09: Insights debe llegar por correo con valor útil y deep links;
+notificaciones por email, in-app y Teamsbot acompañan el servicio desde esta fase. La app móvil y su
+adapter push quedan para una fase posterior. Este contrato describe el resultado exigido, no un envío
+habilitado ni la disponibilidad actual del Hub.
+
+**Recorrido:** hecho relevante → destinatario autorizado → aviso útil → destino exacto del portal →
+acción/consulta → seguimiento. No enviar recordatorios genéricos para inflar visitas. El correo muestra
+un resumen suficiente para comprender el hallazgo: período, fuente/corte, puntos principales y próximo
+paso. Su CTA lleva a la edición o pendiente concreto; no obliga a entrar sólo para descubrir qué ocurrió.
+
+| Momento verificable | Destinatario y canales | Destino / condición |
+|---|---|---|
+| Edición emitida y elegible para el cliente | Destinatarios validados; email de Insights + in-app; Teamsbot si el destino está habilitado | Edición exacta, con resumen de resultados y CTA al portal. No notificar un draft como informe disponible |
+| Pieza lista para revisión o información requerida | Responsable real de revisión/brief; in-app + email accionable; Teamsbot según preferencias y disponibilidad | Pieza, revisión o solicitud concreta; conserva el proveedor dueño cuando la acción ocurre fuera |
+| Solicitud recibida, respuesta o cambio material de estado | Solicitante y responsables autorizados; in-app, email según tipo/importancia | Detalle e historial. Acuse no significa aceptación ni entrega |
+| Informe pendiente de revisión interna o fallo de entrega | Colaborador responsable; in-app + Teamsbot y email según policy | Revisión/recuperación interna; no exponer diagnóstico ni borrador al cliente |
+| Resumen periódico de progreso y pendientes | Suscriptores elegibles; email e in-app, Teamsbot configurado | Insights/ciclo del servicio. Cadencia por cuenta y zona, pendiente de validar; sin resumen vacío ni reenvío de la misma edición |
+
+Estos momentos son semántica de producto, **no nombres nuevos de eventos ya registrados**. Cada dueña
+mapea el hecho al catálogo/outbox existente, o propone el evento faltante, antes de implementarlo.
+Berel prioriza SEO, avances editoriales y revisiones; Sky, diseño digital, entregables y feedback.
+No incluir AEO por inferencia ni alertas de umbral sin método y configuración verificados.
+
+**Deep links y autoridad.** El destino se construye con el origen de entorno y rutas canónicas resueltas
+en servidor. Conserva edición/servicio/objeto y período al completar login. El retorno sólo acepta destinos
+internos permitidos; no hay open redirect. La sesión revalida organización, pertenencia, módulo y acción:
+el enlace no concede acceso ni cambia de cuenta silenciosamente. Otra cuenta, permiso revocado o edición
+retirada llevan a un estado seguro sin exponer el objeto. GET, preview del correo y escáneres no aprueban,
+no marcan leído ni ejecutan commands. Un enlace ShareGrant sigue el contrato separado de §8 y nunca abre
+la biblioteca privada. No incluir bearer/PII en analytics ni resolver tracking mediante tokens de acceso.
+
+**Canales y preferencias.** El hecho tiene correlación común y resultado independiente por destinatario
+y canal. Reutilizar Notification Hub y los adapters canónicos: email por `sendEmail()` y
+`greenhouse_notifications.email_deliveries`; in-app por el servicio existente; Teamsbot por su dispatcher.
+El destinatario es la persona/usuario canónico con contexto de organización, no obligatoriamente un
+`member_id` laboral: no crear colaboradores ficticios para notificar a clientes. La audiencia y el
+contenido se calculan con permisos y responsabilidad; los defaults por rol no confieren acceso.
+
+Teamsbot entra ahora para colaboradores y destinos cliente realmente habilitados. P01 verifica tenant,
+instalación, identidad y conversación autorizada por cuenta; no se asume que Berel o Sky pueden recibirlo.
+Un canal compartido requiere audiencia permitida y payload mínimo; no publicar allí informes privados o
+datos internos. Destino ausente queda como no disponible y conserva email/in-app según policy. La
+habilitación externa necesaria queda con owner y evidencia, sin convertirse en bypass de aislamiento.
+
+Preferencias por categoría/canal, zona horaria, horario de silencio, agrupación y límite de recordatorios.
+Separar avisos operativos de suscripciones opcionales: resumen periódico opcional exige preferencia/baja
+funcional; no habilitarlo antes de TASK-1774 y la policy de EPIC-042 cuando corresponda. Un cambio material
+puede justificar aviso; un comentario menor puede entrar al digest. Revalidar objeto/responsable antes de
+recordar y detener pendientes resueltos. Leer un aviso no equivale a resolver la revisión. No sustituir
+automáticamente un canal silenciado por otro sin preferencia/policy que lo permita.
+
+**Ownership y entrega incremental.** TASK-1848 posee eventos/intents de distribución Insights, recurrencia
+y enlace autorizado; TASK-1849 su correo/preview y recorrido visible. P06 emite hechos de solicitudes;
+P05 conserva revisión con su dueña. TASK-690/691/692 poseen Hub, shadow y cutover; TASK-693 preferencias y
+experiencia de notificaciones; TASK-303 audiencia; TASK-387 digest; TASK-694 medición avanzada. EPIC-046
+coordina estas dependencias, sin crear otro Hub ni sender. Los contratos legacy de esas tasks se reconcilian
+con identidad/schema vigentes antes de ejecutar. TASK-1759 conserva la migración del self-webhook.
+
+Antes del cutover del Hub, los eventos nuevos se integran en la projection reactiva existente y los
+servicios canónicos con un único owner de envío por evento/canal; no crear otra projection, self-webhook
+ni scheduler por cuenta. Si falta una garantía mínima, resolverla en la dueña antes de habilitar esa
+cohorte. La transición al Hub conserva correlación/dedupe y preferencias y demuestra ausencia de doble
+envío. La primera entrega cliente requiere email + in-app verificables; Teamsbot se certifica por destino.
+El programa no se cierra sin registrar y resolver su matriz de canales, excepciones y responsables.
+
+**Medición y cierre.** Distinguir evento elegible, intento, aceptación del proveedor, entrega, entrada
+autenticada y acción completada. Cohortes por cuenta/categoría/canal con período y denominador explícitos;
+medir consulta útil de Insights, retorno y resolución, además de fallos, rebotes y bajas. Aperturas/píxeles
+o clicks de escáner no prueban adopción humana. TASK-694 conserva métricas avanzadas; cada primer flujo
+ya exige correlación y evidencia de entrega → sesión autorizada → consulta/acción, con fixture técnico y
+piloto cliente autorizados por separado. Retry, doble tick, revocación, pendiente resuelto y fallo parcial
+de canal forman parte de la verificación. Un canal exitoso no convierte los otros en entregados.
 
 ## 10. Fiabilidad, calidad y gates
 

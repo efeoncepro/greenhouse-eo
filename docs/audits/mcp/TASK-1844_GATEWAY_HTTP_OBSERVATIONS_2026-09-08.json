@@ -1,0 +1,14 @@
+{
+  "windowStart": "2026-09-08T19:57:00Z",
+  "windowEnd": "2026-09-08T20:36:00Z",
+  "source": "Cloud Logging gateway HTTP POST /mcp response durationMs",
+  "samples": 123,
+  "httpStatusCounts": {
+    "200": 103,
+    "202": 14,
+    "401": 6
+  },
+  "p95Ms": 1467.8515870000701,
+  "maxMs": 2912.330613999977,
+  "limit": "Mix of initialize, tools/list and tool calls, including intentional revocation denials. HTTP 200 can contain an MCP application error. This is not reader-only p95, request-level authorization error rate or a load baseline."
+}

@@ -1,10 +1,18 @@
 # TASK-1844 — Rollout de autoridad interna multiorganización
 
-Estado 2026-09-08: **code complete, rollout en ejecución**. El operador autorizó todos los pendientes
+Estado final 2026-09-08: **complete; producción verificada para una identidad interna**. El operador autorizó todos los pendientes
 («Avanza con todo lo pendiente»): publicación, promoción, apply, activación controlada, certificación y rollback.
 Se mantienen los límites del [plan](../tasks/plans/TASK-1844-plan.md).
 [Contrato D8–D11](../architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md#d8--actor-y-objetivo-tienen-autoridad-distinta)
-· [QA y evidencia local](../audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md).
+· [QA y evidencia productiva](../audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md).
+
+PR 230/main `45f6910e3`, orquestador `34281143424` success y manifest released. Flags durables/servidos ON para el perfil exacto; Preview reader OFF. Codex, Claude Code y Claude hospedado/Desktop certificados; fixtures retiradas, familias definitivas conservadas. [Runtime final](../audits/mcp/TASK-1844_FINAL_RUNTIME_2026-09-08.json) · [clientes](../audits/mcp/TASK-1844_FINAL_CLIENTS_2026-09-08.json) · [retiro](../audits/mcp/TASK-1844_FIXTURES_RETIRED_2026-09-08.json). Claude Code requiere login tras rollback OFF; receta abajo. Antes de ampliar la cohorte, medir latencia/error rate del reader. Las secciones de avance siguientes conservan la cronología; no son pendientes actuales.
+
+## Entrada operativa y mantenimiento
+
+Para uso diario, conexión y nuevas organizaciones, seguir el [manual interno](../manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md) y la [documentación funcional](../documentation/identity/acceso-mcp-interno-multiorganizacion.md). Este runbook conserva el orden de rollout y sus pruebas históricas; no se repite por cada organización nueva. Las organizaciones elegibles se descubren de forma dinámica. Otro colaborador o nueva capability requiere permisos/cohorte y su verificación propios.
+
+La [auditoría documental](../audits/mcp/TASK-1844_DOCUMENTATION_SKILLS_CLOSURE_2026-09-08.md) registra contratos, manuales, APIs, runbooks y skills sincronizados después del cierre.
 
 ## Avance verificado
 
@@ -22,7 +30,7 @@ Se mantienen los límites del [plan](../tasks/plans/TASK-1844-plan.md).
 
 ## Paquete y fronteras
 
-- Greenhouse: checkout compartido `develop`; reader, emisor, consentimiento, writer compatible y dos SQL pendientes.
+- Greenhouse: checkout compartido `develop`; reader, emisor, consentimiento, writer compatible y dos migraciones aplicadas; no reaplicar.
 - Gateway: checkout compartido `../efeonce-mcp`, branch `main`, versión de paquete `1.3.0`; reader v2,
   autorización por objetivo y `efeonce.organizations.list`. Publicación según su workflow y revisión del diff.
 - Capability inicial única: `growth.seo.observation.read`; scope único: `efeonce.mcp.read`.
@@ -51,7 +59,7 @@ Antes de cada promoción, releer [playbook](PRODUCTION_RELEASE_INCIDENT_PLAYBOOK
 Greenhouse se promueve por el orquestador canónico. Este documento no autoriza dispatch de workers aislados.
 Resolver los SHAs exactos y revisiones compatibles del release aprobado; un nombre de branch no es evidencia servida.
 
-Cohorte propuesta para el primer flip: `identity-greenhouse-auth-client-user-user-efeonce-admin-julio-reyes`.
+Cohorte aprobada y activa: `identity-greenhouse-auth-client-user-user-efeonce-admin-julio-reyes`.
 Read-only 2026-09-08: usuario interno activo y un único perfil en contextos no revocados; el reader local
 resolvió 14 targets. La asociación canónica usa la cuenta histórica `jreyes@efeoncepro.com`, no la dirección
 operativa de Gcloud. Revalidar enrollment/ancla/fechas por ID antes de activar; esta lectura no concede permisos.
@@ -121,27 +129,37 @@ operación deliberadamente. Restore: reader → gateway → issuer; sólo restau
 Revocar familias y retirar fixtures run-owned mediante sus commands y manifiesto, con readback. Registrar
 SHAs/revisiones, resultados cliente, latencia de revocación, rollback real y estado final de flags. Actualizar
 TASK-1831/1836, TASK-1844, EPIC-044 y timings sin reinterpretar la certificación histórica de TASK-1813.
-Sólo entonces se puede cerrar formalmente TASK-1844; hoy esos pasos siguen pendientes.
+Sólo entonces se puede cerrar formalmente TASK-1844; el dossier registra el último estado verificado.
 
 
 ## Ensayo controlado de rollback de flags — plan 2026-09-08
 
 Este ensayo de TASK-1844 revierte sólo los tres gates de autoridad y luego restaura los artefactos del release.
-No revierte el release completo ni toca los demás workers. Se ejecuta una vez terminado el orquestador,
-con familia v2 vigente y evidencia A/B/C previa. La autorización «Avanza con todo lo pendiente» cubre este ensayo.
+No revierte el release completo ni toca los demás workers. Se ejecuta una vez terminado el orquestador y todos los deploys actuales,
+con familia v2 vigente y evidencia A/B/C previa. El ensayo del 2026-09-08 ocurre entre el primer release
+y la promoción de PR 230: todos los deploys de develop terminaron y se mantiene la PR sin fusionar durante el ensayo. La autorización «Avanza con todo lo pendiente» cubre este ensayo.
 El mecanismo combina configuración durable de los owners de flags y revisiones inmutables compatibles;
 no se despacha un deploy individual Greenhouse ni se crea un binario fuera del orquestador.
 
 1. Capturar revisión/digest/cohorte ON del emisor y confirmar que el orquestador terminó. Guardar el plan exacto.
-2. Emisor OFF: variables GitHub del emisor OFF/cohorte vacía; tráfico a `auth-server-00045-t6r`.
+2. Emisor OFF: variable GitHub del emisor `false`; eliminar la variable de cohorte para que el workflow resuelva vacío (GitHub rechaza un valor vacío); tráfico a `auth-server-00045-t6r`.
    Su árbol `0720eb968` es idéntico al main `741e3a045`; writer compatible con contract, gate v2 OFF.
 3. Gateway OFF: variable GitHub de environment OFF; tráfico a `efeonce-mcp-gateway-00049-fv7`,
    SHA `45ade9373`, mismo digest compatible, gate v2 OFF. Medir denegación de la conexión v2 vigente.
-4. Reader OFF: `vercel env update IDENTITY_INTERNAL_MULTI_ORG_ENABLED production --value false --yes`;
+4. Reader OFF: `vercel env update IDENTITY_INTERNAL_MULTI_ORG_ENABLED production --value false --yes --scope efeonce-7670142f`;
    rollback al deployment compatible `dpl_sZEnysX9o2HPTNR1JAAStchLPa5T` (main `741e3a045`, flag ausente/OFF).
 5. Leer tráfico, flags de las revisiones efectivamente servidas, health y contexto PG. No recrear índices ni borrar filas.
-6. Restaurar en orden inverso: reader durable ON y `vercel promote dpl_FW2Aepwn7pWxw4AQYCaZC4MTAqpL`;
+6. Restaurar en orden inverso: reader durable ON y `vercel promote dpl_FW2Aepwn7pWxw4AQYCaZC4MTAqpL --scope efeonce-7670142f --yes`;
    gateway durable ON/tráfico `00050-wlk`; emisor durable ON/cohorte exacta y tráfico a la revisión ON
-   capturada en el paso 1. Verificar A/B otra vez con la misma familia, sin reconexión.
+   capturada en el paso 1. Verificar A/B otra vez. Codex conserva su familia; Claude Code puede conservar `needs-auth` después del OFF y necesita `claude mcp login efeonce-internal`, aunque el contexto/familia del servidor siga vigente. En ese caso registrar la nueva familia, retirar sólo la anterior y verificar los payloads reales.
 7. Registrar tiempos, estados y límites. Si aparece una revisión ajena o un nuevo release activo, no cambiar tráfico
    hasta reconciliar ownership; nunca asumir que `latestReadyRevisionName` es la revisión servida.
+
+Plan exacto del ensayo 21:01Z: emisor ON `00048-4vq`/SHA `76ed9ca20`, OFF `00045-t6r`; gateway ON `00050-wlk`, OFF `00049-fv7`; reader ON `dpl_FW2Aepwn7pWxw4AQYCaZC4MTAqpL`, OFF `dpl_sZEnysX9o2HPTNR1JAAStchLPa5T`. El segundo release se ejecutará después de restaurar y verificar.
+
+
+## Resultado del ensayo 21:03–21:12Z
+
+[Readback y eventos](../audits/mcp/TASK-1844_ROLLBACK_RESTORE_2026-09-08.json): OFF emisor → gateway → reader; ambas llamadas Claude rechazadas con JWT aún vigente y Codex detenido en initialize/refresh. Restore reader → gateway → emisor confirmado en tráfico 100%, flags durables y cohorte exacta. Codex renovó con la misma familia y discovery/A/B pasaron. Claude Code retuvo `needs-auth` incluso al reiniciar; el login OAuth estándar reutilizó la sesión corporativa y contexto v2, emitió una nueva familia y A/B pasaron. No se declara recuperación sin reconexión para ese cliente.
+
+PG conservó siete contextos v1 y cinco v2, CHECK 1/2, trigger y único índice versionado; las tres superficies públicas respondieron saludables. La conexión externa TASK-1832 siguió lista y con `no_entitlement` sin gasto. Las fases SQL anteriores documentan el orden ya ejecutado: **no recrear ni reaplicar** las migraciones `20260908184942851` y `20260908194829159`.

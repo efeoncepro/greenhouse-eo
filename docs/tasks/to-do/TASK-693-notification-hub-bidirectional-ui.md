@@ -89,6 +89,8 @@ TASK-692 deja el hub canónico pero mudo: solo dispatcha. El valor para usuario 
 
 ### Acceptance — UI Preferences
 
+- [ ] EPIC-045/046: cliente e interno gestionan categorías/canales permitidos en la superficie canónica; Teamsbot sin destino autorizado muestra no disponible. Preferencias por persona/cuenta, zona y horarios se conservan al migrar, sin habilitar canales silenciados por fallback.
+- [ ] Recorrido email/in-app/Teamsbot al objeto exacto conserva contexto tras login y revalida autoridad; GET/scanner no hace ack ni commands. Lectura, acción del negocio y estado de entrega se presentan como hechos distintos; no se crea centro paralelo en Insights. Ver arquitectura Insights §9.1.
 - [ ] Página `/settings/notifications` con Vuexy primitives:
   - Toggle global por canal (in-app / email / teams_dm / teams_channel).
   - Override granular por categoría de evento (finance / ops / delivery / hr).

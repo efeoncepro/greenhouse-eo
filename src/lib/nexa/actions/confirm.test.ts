@@ -13,6 +13,7 @@ vi.mock('@/lib/api-platform/core/commands', () => ({
 }))
 
 const { confirmNexaAction } = await import('./confirm')
+const { getNexaActionDefinition } = await import('./registry')
 const { ApiPlatformError } = await import('@/lib/api-platform/core/errors')
 
 const CONTEXT = {
@@ -79,6 +80,22 @@ describe('confirmNexaAction — the only execution path', () => {
     const outcome = await confirm('mark_notifications_read')
 
     expect(outcome.kind === 'executed' && outcome.replayed).toBe(true)
+  })
+
+  it('refreshes opt-in domain authority before returning an idempotent replay', async () => {
+    const definition = getNexaActionDefinition('mark_notifications_read')!
+    const previous = definition.authorize
+    const authorize = vi.fn().mockResolvedValueOnce(undefined).mockRejectedValueOnce(new ApiPlatformError('Access revoked', { statusCode: 403, errorCode: 'forbidden' }))
+
+    definition.authorize = authorize
+    mockExecute.mockResolvedValue({ data: { ok: true, summary: 'Listo' }, status: 200, headers: { 'idempotency-replayed': 'true' } })
+
+    try {
+      expect(await confirm('mark_notifications_read')).toMatchObject({ kind: 'executed', replayed: true })
+      await expect(confirm('mark_notifications_read')).rejects.toMatchObject({ statusCode: 403 })
+      expect(mockExecute).toHaveBeenCalledTimes(1)
+      expect(authorize).toHaveBeenCalledTimes(2)
+    } finally { definition.authorize = previous }
   })
 
   it('maps a 409 from the idempotency foundation to a conflict outcome', async () => {

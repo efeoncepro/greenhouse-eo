@@ -13,7 +13,7 @@ import type { DB } from '@/types/db'
  *     ↳ spaces.organization_id (greenhouse_core.spaces)
  *         ↳ spaces.client_id
  *             ↳ client_service_modules.client_id (greenhouse_core.client_service_modules)
- *                 ↳ service_modules.module_code (greenhouse_core.service_modules)
+ *                 ↳ service_modules.module_id (greenhouse_core.service_modules)
  *                     WHERE service_modules.module_kind = 'business_line'
  *
  * Filtros canónicos:
@@ -22,15 +22,10 @@ import type { DB } from '@/types/db'
  *   - `service_modules.module_kind = 'business_line'` — excluye service_modules
  *     que son "service_module" (subordinados de un business_line)
  *
- * Discovery 2026-05-12: **0 organizaciones tienen business_lines resolved via
- * esta bridge en runtime live**. Esto se debe a que la data de
- * `client_service_modules` con `module_kind='business_line'` aún no está
- * poblada para clientes activos; el legacy actual usa `tenant_capabilities.
- * businessLines[]` que NO es la SSOT canonical.
- *
- * Por eso este helper retorna **`readonly string[]`** (multi-BL real cuando
- * emerja + tolera empty). El consumer (`enableClientPortalModule`) decide qué
- * hacer con array empty (skip check honest vs throw).
+ * TASK-1852: FK verified 2026-09-09: csm.module_id -> sm.module_id.
+ * The module code is the returned business-line value, not the join key.
+ * An empty result signals missing canonical data; it does not authorize a
+ * new service-enablement proposal.
  *
  * Multi-BL canonization (Open Question V1.1): cuando una org tenga >1
  * business_line activo, el resolver retorna el array completo y el caller
@@ -70,7 +65,7 @@ export const resolveOrganizationCanonicalBusinessLines = async (
       join.onRef('csm.client_id', '=', 's.client_id').on('csm.active', '=', true)
     )
     .innerJoin('greenhouse_core.service_modules as sm', join =>
-      join.onRef('sm.module_code', '=', 'csm.module_id').on('sm.module_kind', '=', 'business_line')
+      join.onRef('sm.module_id', '=', 'csm.module_id').on('sm.module_kind', '=', 'business_line')
     )
     .select('sm.module_code')
     .where('s.organization_id', '=', organizationId)

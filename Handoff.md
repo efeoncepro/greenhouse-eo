@@ -1,6 +1,20 @@
 # Handoff activo
 
-EPIC-045: diseño.
+**Social Efeonce, 09/09:** [13 piezas y skills](docs/audits/social/EFEONCE_SEASONAL_CONTENT_PLAN_2026_2027.md).
+Pendiente: conciliar MET-2339–2342 tarea/calendario. Producción abierta; cierre documental sin cambios Notion.
+
+**EPIC-046 / TASK-1852 (09/09):** rollout autorizado; [estado y alcance](docs/audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md).
+392 tests (312 dominio + 80 intake); build del dominio verde. Permiso pause EFEONCE_ADMIN corregido según canon.
+Berel ya sincronizado desde HubSpot con importes NULL; alcance privado. Falta destinatario humano.
+Equipo Sky conciliado; términos, login/rutas/canales pendientes.
+No aplicar SQL para el gap comercial. Writes OFF hasta certificación; task abierta, sin envíos.
+TASK-1834 conserva entrada, TASK-1687 catálogo; 1853–1856 to-do. TASK-1690 sigue in-progress.
+
+**EPIC-045 ↔ EPIC-046:** Hitos I/N obligatorios: Insights cliente/interno + email/in-app/Teamsbot con
+deep links; shared separado y móvil posterior. Contrato en arquitectura Insights §§7.1/9.1 y ADRs.
+P01/P09 incluyen destinatarios/canales; TASK-1848/1849 distribución/experiencia; TASK-690/693 Hub y
+preferencias. UI TASK-1854/1856: ocho docs detallados (dirección/wireframe/flow/motion), requisitos en 1853/1855; UI ready no, GVC pendiente.
+Primer email/in-app acompaña apertura cliente; Teamsbot por destino verificado. Reusar dueñas, sin otro Hub.
 
 **GPT Image 2.5 + contrato de proveedores de imagen (2026-09-08):** doc y skills al día; sólo documentación,
 cero código y cero llamadas al proveedor. El trabajo quedó en
@@ -11,17 +25,19 @@ calculadora de costo por imagen, así que la reserva previa de créditos de Glob
 NO está deprecado. Detalle:
 [matriz](docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md).
 
-**TASK-1844 (2026-09-08):** code complete, rollout pendiente. V2 actor/targets y consentimiento fresco
-verificados localmente, gateway 1.3.0. SQL expand/contract pendientes; schema compartido sigue v1.
-[QA](docs/audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md) ·
-[rollout](docs/operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md). Falta aprobación de push/apply/release,
-fixtures y clientes reales. Preservar EPIC-045.
+**TASK-1844 COMPLETE (2026-09-08):** producción ON para una identidad; SQL aplicada y fixtures retiradas.
+Codex y Claude Code/hospedado/Desktop certificados, rollback probado (Claude Code exige login tras OFF).
+PR 230/main `45f6910e3`, checks/orquestador `34281143424` success, manifest released y watchdog 5/5.
+Conexiones definitivas conservadas; sólo se sustituyó Claude hospedado del canary bajo autorización.
+Docs/skills reconciliados con tres subagentes; [manual de uso](docs/manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md) y [cobertura](docs/audits/mcp/TASK-1844_DOCUMENTATION_SKILLS_CLOSURE_2026-09-08.md).
+Push documental disparó auth deploy por su README: run `34284610774` cancelado, sin nuevo build/revisión; tráfico conserva `00048-4vq`. Efecto y prevención documentados en runbook/skills.
+[QA](docs/audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md) · [runbook](docs/operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md).
 
 **Berel (2026-09-08):** [cadencia mensual](docs/operations/BEREL_CLIENT_COLLABORATION_OPERATING_MODEL_V1.md)
 aprobada internamente y skill espejo alineada. Activar sólo tras aceptación de Anel, Fer y Marce; no se envió
 correo ni cambió Notion/calendario.
 
-**TASK-1813 — COMPLETE:** `efeonce-mcp` `1.2.0`/`00047-8b5` sirve discovery base-only y lecturas sin gasto en la
+**TASK-1813 — COMPLETE:** cierre histórico en `1.2.0`/`00047-8b5`, discovery base-only y lecturas sin gasto en la
 matriz de clientes; sin widening ni cambios Entra. Multi-org queda en TASK-1844/U19.
 [Task](docs/tasks/complete/TASK-1813-efeonce-mcp-oauth-client-interoperability.md) ·
 [auditoría](docs/audits/mcp/TASK-1813_OAUTH_HARDENING_QA_2026-09-07.md).

@@ -49,37 +49,37 @@ Runtime: capabilities y schema vivos desde el 2026-08-19; Application 360 es el 
 
 ---
 
-## Delta 2026-09-04 — el lane ecosystem que resuelve PERSONAS para el gateway, `internal`-only (TASK-1631)
+## Reader de autoridad de personas para el gateway MCP
 
-`GET /api/platform/ecosystem/identity/binding?environment=<id>&subject=<sub>[&clientId=<azp>]` (+
-`externalScopeType=other&externalScopeId=efeonce-mcp-gateway` del binding sister-platform del gateway). routeKey
-`platform.ecosystem.identity.binding`, sobre `runEcosystemReadRoute`; payload helper en
-`src/lib/api-platform/resources/ecosystem-identity-binding.ts`. Es el reader con el que el gateway MCP
-(`TASK-1831`) convierte un token de un issuer externo —o del emisor propio de Efeonce— en "qué persona, en
-nombre de qué organización cliente, con qué capabilities": el gateway valida el token; Greenhouse decide la
-autoridad.
+`GET /api/platform/ecosystem/identity/binding` (`platform.ecosystem.identity.binding`) usa
+`runEcosystemReadRoute` y `src/lib/api-platform/resources/ecosystem-identity-binding.ts`. El binding de
+servicio del gateway debe ser `internal`; otro binding recibe `404` anti-oráculo. La identidad humana se
+revalida por un carril separado de ese consumer. Greenhouse decide autoridad; el gateway verifica el token
+y delega, sin SQL. Todas las respuestas llevan `Cache-Control: private, no-store`, sin subject ni email.
 
-- **Sólo bindings `internal`**: para cualquier otro binding la ruta responde `404` anti-oráculo (mismo patrón
-  que `mcp/skills` con `audience: internal`). Resolver personas es una capacidad del gateway, no de un cliente.
-- **Params**: `environment` + `subject` obligatorios (faltantes ⇒ `400 bad_request`; formato inválido ⇒ `400`
-  con `details`); `clientId` opcional y sólo se registra en el log de denegaciones — **nunca** es llave de
-  resolución (contrato `Slice 0 gateway authorization-context` del ADR: la persona resuelve por
-  `(environment, subject)`; `clientId` ausente significa ausente).
-- **Respuesta** = passthrough de `resolveExternalAccess` —
-  `{ outcome, environmentId, issuerClass, profileId, memberships[{ bindingId, organizationId, externalOrganizationRef, grantsVersion, grants[], designatedAdmin }], resolvedAt }`
-  — más `cacheTtlSeconds: 60`; `Cache-Control: private, no-store`. Cero lógica de dominio en el lane. La
-  respuesta nunca incluye el subject ni un email: el gateway ya tiene el token.
-- **Outcomes**: `bound` \| `unbound` \| `revoked` \| `environment_inactive` \| `profile_inactive`. Sólo `bound`
-  autoriza; el gateway compara `grantsVersion` por **igualdad estricta** con el claim `gv` del token y cachea la
-  resolución ≤ 60 s. Toda denegación queda en `greenhouse_core.external_access_resolution_log` (subject
-  hasheado) y alimenta las señales `identity.external_binding.*`.
-- **No hay command en este lane**: las escrituras del dominio (bind, grant, invitar, revocar) viven en el lane
-  admin `/api/admin/identity/external-access/**` con capability dedicada por command;
-  `acceptExternalInvitation` la ejecuta el auth-server in-process (`TASK-1830`) y no tiene ruta pública todavía.
-  Invalidación push de `grantsVersion` hacia el gateway = `TASK-1831`.
+| Carril | Parámetros humanos verificados | DTO / frescura |
+| --- | --- | --- |
+| Externo, TASK-1631 | `environment`, `subject`; `clientId` opcional para diagnóstico | `memberships[]` + grants + `grantsVersion`; `cacheTtlSeconds: 60`; sólo `bound` autoriza |
+| Interno v1, TASK-1836 | además `clientId`, `authorizationContextId`, `contextVersion=1`, `grantsVersion`, `audience`, `jti` | contexto y ancla únicos + capabilities; `cacheTtlSeconds: 0` |
+| Interno v2, TASK-1844 | mismo conjunto, `contextVersion=2` e `intent` válido | `actor` ancla separado de `targets[]`; `cacheTtlSeconds: 0`, snapshot fresco por request |
 
-Contrato completo: [`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md)
-§`Slice 1 binding foundation — applied`.
+V2 admite `catalog` (visibilidad, sin targets), `target` (una `organizationId` y capability exactas) y
+`organizations` (página minimizada de objetivos autorizados). Su capability inicial es
+`growth.seo.observation.read`. `limit` 1–50/default 20 es tamaño de página; no limita a 50 organizaciones
+totales. `afterOrganizationId` sólo puede ser un ID ya autorizado y se revalida; si perdió acceso se
+reinicia el discovery. `actor.grantsVersion` valida el `gv` firmado; `targets[].authorityRevision` es una
+revisión opaca de hechos y nunca se compara con el ancla ni se guarda como permiso.
+
+Parámetros de contexto incompletos/duplicados, intenciones incompatibles, IDs vacíos o no válidos ⇒
+`400 bad_request`. Una autoridad no vigente ⇒ payload interno `outcome: denied`, sin targets ni fallback
+externo; HTTP `200` no demuestra autorización. Los internos revalidan ledger `jti`, contexto, sesión,
+relación y permisos sin caché positiva. Las denegaciones externas conservan su log canónico; los internos
+emiten las señales sanitizadas propias, sin llamar al resolver externo para comparar resultados.
+
+No hay writes en esta ruta. Alta/baja de objetivos se consulta sin reconectar dentro de la autoridad v2;
+el provider conserva gates de módulo/entitlement de negocio. [Contrato completo y query matrix](../api/GREENHOUSE_API_PLATFORM_V1.md#reader-de-identidad-y-autoridad-mcp) ·
+[OpenAPI](../api/GREENHOUSE_API_PLATFORM_V1.openapi.yaml) ·
+[ADR interno D8–D11](EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md#d8--actor-y-objetivo-tienen-autoridad-distinta).
 
 ## Delta 2026-09-02 — la lane de manuales de uso MCP: el lane sirve documentación, no sólo datos (TASK-1804)
 
@@ -1238,7 +1238,20 @@ La plataforma debe:
 - rechazar el reuse de una key con payload distinto
 - expirar las keys según política documentada
 
-### 12.4 Alcance V1
+### 12.4 Commands con transacción de dominio
+
+`core/atomic-commands.ts` adapta el mismo command store a la transacción Kysely del dominio.
+TASK-1852 lo usa para guardar claim, asignaciones, audit/outbox y respuesta en un solo commit;
+un fallo de persistencia revierte también los efectos. El caller reautoriza antes de replay y conserva
+la clave exacta al reintentar. Los helpers de idempotencia aceptan un ejecutor de consulta opcional;
+los consumers anteriores mantienen su comportamiento. No se anida el wrapper mutante histórico.
+El audit App normaliza `clientId` vacío de sesión interna a NULL para respetar la FK y conservar
+telemetría/rate limit; un ID real de cliente permanece intacto.
+En este DTO la clave viaja en `idempotencyKey`, compartida por App, CLI y Nexa; el command conserva
+su fingerprint y ámbito organización. Contrato de rutas/autoridad:
+[service enablement](../operations/CLIENT_SERVICE_ENABLEMENT_RUNBOOK_V1.md) y OpenAPI público.
+
+### 12.5 Alcance V1
 
 No es obligatorio retrofitear todas las rutas históricas del repo.
 

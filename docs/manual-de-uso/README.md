@@ -90,6 +90,8 @@ La diferencia con otras capas de documentacion:
 
 ### Identidad y acceso
 
+- [Usar MCP interno con varias organizaciones](identity/usar-mcp-interno-multiorganizacion.md) — conectar Codex o Claude, listar y elegir organizaciones, incorporar cuentas sin reconectar, distinguir permiso de módulo SEO y recuperar la sesión tras rollback. TASK-1844, cohorte inicial de una identidad.
+
 - [Operar Identity, Access y Admin Center](identity/operar-identity-access-admin-center.md) — guia para crear/revisar usuarios, roles, vistas, permission sets, SCIM, reconciliacion y diagnostico de acceso sin aplicar bypasses inseguros.
 - [SCIM con Microsoft Entra](identity/scim-entra-provisioning.md) — como verificar provisioning, usar `provisionOnDemand`, interpretar `countEscrowed` y evitar fixes manuales inseguros sobre usuarios o mappings.
 - [Organization Workspace Projection — operación](identity/organization-workspace-projection.md) — como supervisar las 2 nuevas reliability signals (`facet_view_drift`, `unresolved_relations`), interpretar las 5 relaciones canónicas subject↔organización, las 11 capabilities `organization.*` y la disciplina TS↔DB para agregar capabilities nuevas.

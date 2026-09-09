@@ -1,0 +1,107 @@
+{
+  "task": "TASK-1844",
+  "canonicalRetirement": {
+    "evidence": "local canonical reader against shared PG; not served JWT or MCP proof",
+    "observedAt": "2026-09-08T21:45:39.331Z",
+    "runId": "task-1844-runtime-20260908-a",
+    "expiresAt": "2026-09-09T00:00:00Z",
+    "retired": true,
+    "targets": [
+      {
+        "label": "A",
+        "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975",
+        "clientId": "task-1844-runtime-20260908-a-a",
+        "spaceId": "spc-task-1844-runtime-20260908-a-a",
+        "outcome": "denied"
+      },
+      {
+        "label": "B",
+        "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3",
+        "clientId": "task-1844-runtime-20260908-a-b",
+        "spaceId": "spc-task-1844-runtime-20260908-a-b",
+        "outcome": "denied"
+      },
+      {
+        "label": "C",
+        "organizationId": "org-56b1a2d6-fc83-4639-adeb-59e0b20f5127",
+        "clientId": "task-1844-runtime-20260908-a-c",
+        "spaceId": "spc-task-1844-runtime-20260908-a-c",
+        "outcome": "denied"
+      }
+    ]
+  },
+  "databaseReadback": {
+    "observedAt": "2026-09-08T21:48:48.727Z",
+    "runId": "task-1844-runtime-20260908-a",
+    "retired": true,
+    "resourceRowsPreserved": 9,
+    "activeResourceRows": 0,
+    "rows": [
+      {
+        "label": "A",
+        "organization_id": "org-62d627aa-753f-4cf4-89ad-baf351633975",
+        "organization_active": false,
+        "organization_status": "inactive",
+        "client_id": "task-1844-runtime-20260908-a-a",
+        "client_active": false,
+        "client_status": "inactive",
+        "space_id": "spc-task-1844-runtime-20260908-a-a",
+        "space_active": false,
+        "space_status": "inactive",
+        "remaining_overrides": 0,
+        "module_assignments": 0,
+        "client_users": 0
+      },
+      {
+        "label": "B",
+        "organization_id": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3",
+        "organization_active": false,
+        "organization_status": "inactive",
+        "client_id": "task-1844-runtime-20260908-a-b",
+        "client_active": false,
+        "client_status": "inactive",
+        "space_id": "spc-task-1844-runtime-20260908-a-b",
+        "space_active": false,
+        "space_status": "inactive",
+        "remaining_overrides": 0,
+        "module_assignments": 0,
+        "client_users": 0
+      },
+      {
+        "label": "C",
+        "organization_id": "org-56b1a2d6-fc83-4639-adeb-59e0b20f5127",
+        "organization_active": false,
+        "organization_status": "inactive",
+        "client_id": "task-1844-runtime-20260908-a-c",
+        "client_active": false,
+        "client_status": "inactive",
+        "space_id": "spc-task-1844-runtime-20260908-a-c",
+        "space_active": false,
+        "space_status": "inactive",
+        "remaining_overrides": 0,
+        "module_assignments": 0,
+        "client_users": 0
+      }
+    ]
+  },
+  "nativeClientEvidence": "TASK-1844_CODEX_FIXTURES_RETIRED_2026-09-08.json",
+  "nativeCompletedAt": "2026-09-08T21:49:14.171690+00:00",
+  "authorizedOrganizationCountAfterRetirement": 14,
+  "fixtureOrganizationsAbsentFromDiscovery": true,
+  "retiredAAndBDenied": true,
+  "externalCanaryAfterRetirement": {
+    "ok": true,
+    "organizationId": "org-602d7057-7fd5-47e7-b73b-21892e3f06e7",
+    "hasModule": false,
+    "tier": null,
+    "allowanceCap": 0,
+    "allowanceUsed": 0,
+    "allowanceRemaining": 0,
+    "budgetCapUsd": 0,
+    "budgetUsedUsd": 0,
+    "budgetRemainingUsd": 0,
+    "periodResetAt": "2026-10-01T00:00:00.000Z",
+    "blockedReason": "no_entitlement"
+  },
+  "boundary": "Only TASK-1844 run-owned fixture resources and overrides retired; three final internal OAuth families preserved. TASK-1832 global cleanup and other clients unchanged."
+}

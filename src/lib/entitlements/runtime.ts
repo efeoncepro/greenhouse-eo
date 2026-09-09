@@ -2063,6 +2063,15 @@ export const getTenantEntitlements = (rawSubject: TenantEntitlementSubject): Ten
       source: 'role'
     })
 
+    // TASK-1852: the existing administrator contract includes technical compensation.
+    addEntitlement(entries, {
+      module: 'client_portal',
+      capability: 'client_portal.module.pause',
+      action: 'update',
+      scope: 'tenant',
+      source: 'role'
+    })
+
     addEntitlement(entries, {
       module: 'client_portal',
       capability: 'client_portal.module.disable',

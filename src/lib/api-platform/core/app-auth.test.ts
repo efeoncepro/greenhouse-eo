@@ -119,6 +119,18 @@ describe('API Platform app bearer authentication', () => {
     expect(mocks.getTenantAccessRecordByUserId).toHaveBeenCalledWith('human-1')
   })
 
+  it.each(['', 'client-a'])('records a nullable canonical client reference for cookie sessions (%s)', async clientId => {
+    mocks.getTenantContext.mockResolvedValue({ ...tenant, clientId })
+
+    const response = await runAppReadRoute({
+      request: new Request('https://greenhouse.test/api/platform/app/test'),
+      routeKey: 'platform.app.test', handler: async () => ({ data: { ok: true } })
+    })
+
+    expect(response.status).toBe(200)
+    expect(mocks.recordRequestLog).toHaveBeenCalledWith(expect.objectContaining({ userId: tenant.userId, clientId: clientId || null }))
+  })
+
   it('keeps first-party app tokens on their existing session lane', async () => {
     mocks.decodeAppAccessToken.mockResolvedValue({ sid: 'app-session-1', sub: 'human-1' })
     mocks.resolveAppSessionTenant.mockResolvedValue(tenant)

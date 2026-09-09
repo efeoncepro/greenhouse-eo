@@ -1,0 +1,225 @@
+{
+  "observedAt": "2026-09-08T21:32:29.205606+00:00",
+  "targetSha": "45f6910e3ae35cad5d775eaabf9ce6e15d156d6e",
+  "candidateSha": "76ed9ca20b3630a4888ddd7ca09153f50ab3e324",
+  "candidateAndSquashTreesIdentical": true,
+  "pullRequest": 230,
+  "mergedAt": "2026-09-08T21:10:52Z",
+  "checks": [
+    {
+      "id": 34279119607,
+      "name": "CI",
+      "head_sha": "45f6910e3ae35cad5d775eaabf9ce6e15d156d6e",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-08T21:10:55Z",
+      "run_started_at": "2026-09-08T21:10:55Z",
+      "updated_at": "2026-09-08T21:31:36Z",
+      "html_url": "https://github.com/efeoncepro/greenhouse-eo/actions/runs/34279119607"
+    },
+    {
+      "id": 34279119795,
+      "name": "CI Deep Verification",
+      "head_sha": "45f6910e3ae35cad5d775eaabf9ce6e15d156d6e",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-08T21:10:55Z",
+      "run_started_at": "2026-09-08T21:10:55Z",
+      "updated_at": "2026-09-08T21:26:32Z",
+      "html_url": "https://github.com/efeoncepro/greenhouse-eo/actions/runs/34279119795"
+    },
+    {
+      "id": 34279847615,
+      "name": "Playwright E2E smoke",
+      "head_sha": "45f6910e3ae35cad5d775eaabf9ce6e15d156d6e",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-08T21:18:29Z",
+      "run_started_at": "2026-09-08T21:18:29Z",
+      "updated_at": "2026-09-08T21:22:20Z",
+      "html_url": "https://github.com/efeoncepro/greenhouse-eo/actions/runs/34279847615"
+    },
+    {
+      "id": 34279119653,
+      "name": "Task Contract",
+      "head_sha": "45f6910e3ae35cad5d775eaabf9ce6e15d156d6e",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-08T21:10:55Z",
+      "run_started_at": "2026-09-08T21:10:55Z",
+      "updated_at": "2026-09-08T21:12:05Z",
+      "html_url": "https://github.com/efeoncepro/greenhouse-eo/actions/runs/34279119653"
+    },
+    {
+      "id": 34279119637,
+      "name": "CLAUDE.md governance",
+      "head_sha": "45f6910e3ae35cad5d775eaabf9ce6e15d156d6e",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-08T21:10:55Z",
+      "run_started_at": "2026-09-08T21:10:55Z",
+      "updated_at": "2026-09-08T21:11:33Z",
+      "html_url": "https://github.com/efeoncepro/greenhouse-eo/actions/runs/34279119637"
+    },
+    {
+      "id": 34279119534,
+      "name": "Agent Context Governance",
+      "head_sha": "45f6910e3ae35cad5d775eaabf9ce6e15d156d6e",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-09-08T21:10:55Z",
+      "run_started_at": "2026-09-08T21:10:55Z",
+      "updated_at": "2026-09-08T21:12:15Z",
+      "html_url": "https://github.com/efeoncepro/greenhouse-eo/actions/runs/34279119534"
+    }
+  ],
+  "preflight": {
+    "contractVersion": "production-preflight.v1",
+    "startedAt": "2026-09-08T21:31:48.403Z",
+    "completedAt": "2026-09-08T21:31:53.126Z",
+    "durationMs": 4723,
+    "audience": "admin",
+    "targetSha": "45f6910e3ae35cad5d775eaabf9ce6e15d156d6e",
+    "targetBranch": "main",
+    "triggeredBy": "jreye",
+    "overallStatus": "degraded",
+    "confidence": "medium",
+    "checks": [
+      {
+        "checkId": "target_sha_exists",
+        "severity": "ok",
+        "status": "ok",
+        "observedAt": "2026-09-08T21:31:48.404Z",
+        "durationMs": 1831,
+        "summary": "Commit 45f6910e3ae3 verificado en efeoncepro/greenhouse-eo",
+        "recommendation": ""
+      },
+      {
+        "checkId": "ci_green",
+        "severity": "ok",
+        "status": "ok",
+        "observedAt": "2026-09-08T21:31:48.405Z",
+        "durationMs": 1642,
+        "summary": "6 workflow(s) CI verde en 45f6910e3ae3",
+        "recommendation": ""
+      },
+      {
+        "checkId": "playwright_smoke",
+        "severity": "ok",
+        "status": "ok",
+        "observedAt": "2026-09-08T21:31:48.405Z",
+        "durationMs": 1625,
+        "summary": "1 workflow(s) Playwright smoke verde en 45f6910e3ae3",
+        "recommendation": ""
+      },
+      {
+        "checkId": "release_batch_policy",
+        "severity": "warning",
+        "status": "ok",
+        "observedAt": "2026-09-08T21:31:48.405Z",
+        "durationMs": 2780,
+        "summary": "60 archivo(s) clasificados vs 741e3a045cc2c98d32d4c75d46b6563c4466cac8 (release 741e3a045cc2-1898ddd1-8bb1-42dc-b308-321c0dca743a); decision=requires_break_glass (Dominios irreversibles tocados: db_migrations: 1 archivo(s) afectados (revert requiere backfill u operacion manual). Operador debe poseer capability platform.release.preflight.override_batch_policy + reason >= 20 chars + audit row.)",
+        "recommendation": "Override aceptado \u2014 verificar audit row + reason >= 20 chars en orchestrator manifest."
+      },
+      {
+        "checkId": "stale_approvals",
+        "severity": "ok",
+        "status": "ok",
+        "observedAt": "2026-09-08T21:31:48.406Z",
+        "durationMs": 1509,
+        "summary": "Sin runs production esperando approval > 24h",
+        "recommendation": ""
+      },
+      {
+        "checkId": "pending_without_jobs",
+        "severity": "ok",
+        "status": "ok",
+        "observedAt": "2026-09-08T21:31:48.406Z",
+        "durationMs": 1519,
+        "summary": "Sin runs queued/in_progress con jobs vacios",
+        "recommendation": ""
+      },
+      {
+        "checkId": "vercel_readiness",
+        "severity": "ok",
+        "status": "ok",
+        "observedAt": "2026-09-08T21:31:48.406Z",
+        "durationMs": 1741,
+        "summary": "Production + staging Vercel deployments READY",
+        "recommendation": ""
+      },
+      {
+        "checkId": "postgres_health",
+        "severity": "ok",
+        "status": "ok",
+        "observedAt": "2026-09-08T21:31:48.419Z",
+        "durationMs": 4707,
+        "summary": "pg:doctor verde",
+        "recommendation": ""
+      },
+      {
+        "checkId": "postgres_migrations",
+        "severity": "ok",
+        "status": "ok",
+        "observedAt": "2026-09-08T21:31:48.420Z",
+        "durationMs": 2926,
+        "summary": "Migrations al dia",
+        "recommendation": ""
+      },
+      {
+        "checkId": "gcp_wif_subject",
+        "severity": "ok",
+        "status": "ok",
+        "observedAt": "2026-09-08T21:31:48.420Z",
+        "durationMs": 1567,
+        "summary": "WIF provider efeoncepro-greenhouse-eo ACTIVE con attribute mapping completo",
+        "recommendation": ""
+      },
+      {
+        "checkId": "azure_wif_subject",
+        "severity": "ok",
+        "status": "ok",
+        "observedAt": "2026-09-08T21:31:48.421Z",
+        "durationMs": 1292,
+        "summary": "Azure WIF App bd8f1961\u2026 con 2 subject(s) production matched",
+        "recommendation": ""
+      },
+      {
+        "checkId": "sentry_critical_issues",
+        "severity": "ok",
+        "status": "ok",
+        "observedAt": "2026-09-08T21:31:48.422Z",
+        "durationMs": 2153,
+        "summary": "Sin Sentry issues activas level=error/fatal",
+        "recommendation": ""
+      }
+    ],
+    "degradedSources": [],
+    "readyToDeploy": false,
+    "override": {
+      "reason": "TASK-1844 aprobada: correccion CIMD acoplada al emisor y contract ya aplicada, preservar control de release",
+      "overrideBatchPolicy": true,
+      "bypassWarnings": true,
+      "actor": "jreye"
+    }
+  },
+  "vercel": {
+    "id": "dpl_2uGoEoujQLnsnR8UogFye5x9JjSL",
+    "url": "greenhouse-9chff3r1q-efeonce-7670142f.vercel.app",
+    "readyState": "READY",
+    "target": "production",
+    "createdAt": 1788901856005,
+    "readyStateReason": null,
+    "observedAt": "2026-09-08T21:18:29.901372+00:00",
+    "targetSha": "45f6910e3ae35cad5d775eaabf9ce6e15d156d6e",
+    "source": "GitHub exact SHA Vercel status and Vercel inspect",
+    "gitSource": {
+      "sha": "45f6910e3ae35cad5d775eaabf9ce6e15d156d6e",
+      "ref": "main",
+      "type": "github"
+    },
+    "metaGitSha": "45f6910e3ae35cad5d775eaabf9ce6e15d156d6e"
+  },
+  "orchestrator": 34281143424,
+  "boundary": "Exactly one final orchestrator dispatched after all exact-SHA checks succeeded; batch exception covers already applied migration, not CI, health or permissions."
+}

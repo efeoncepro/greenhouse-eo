@@ -1,0 +1,58 @@
+{
+  "observedAt": "2026-09-08T20:55:57.441491+00:00",
+  "client": "Claude Desktop",
+  "version": "1.46388.4",
+  "chatUrl": "https://claude.ai/chat/7003de2a-c11a-42cd-9f35-b64647cc101f",
+  "source": "Native macOS UI: prompt entered in Desktop, actual tool Request/Response expanded and read via accessibility tree",
+  "connector": "Efeonce MCP",
+  "reconnected": false,
+  "sharedHostedContext": "d2fc3f78-abda-4d10-b501-354e003658bb",
+  "independentOAuthFamily": false,
+  "calls": [
+    {
+      "tool": "get_seo_entitlement",
+      "arguments": {
+        "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3"
+      },
+      "response": {
+        "ok": true,
+        "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3",
+        "hasModule": false,
+        "tier": null,
+        "allowanceCap": 0,
+        "allowanceUsed": 0,
+        "allowanceRemaining": 0,
+        "budgetCapUsd": 0,
+        "budgetUsedUsd": 0,
+        "budgetRemainingUsd": 0,
+        "periodResetAt": "2026-10-01T00:00:00.000Z",
+        "blockedReason": "no_entitlement"
+      }
+    },
+    {
+      "tool": "get_seo_entitlement",
+      "arguments": {
+        "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975"
+      },
+      "response": {
+        "ok": true,
+        "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975",
+        "hasModule": false,
+        "tier": null,
+        "allowanceCap": 0,
+        "allowanceUsed": 0,
+        "allowanceRemaining": 0,
+        "budgetCapUsd": 0,
+        "budgetUsedUsd": 0,
+        "budgetRemainingUsd": 0,
+        "periodResetAt": "2026-10-01T00:00:00.000Z",
+        "blockedReason": "no_entitlement"
+      }
+    }
+  ],
+  "clientRecovery": {
+    "initialAttempts": "Not counted: Desktop cached the retired Efeonce TASK-1832 Canary connector and no requested tool dispatched.",
+    "recovery": "Reload from View left window blank. Closed only the empty window and reopened app window without quitting process or stopping other sessions. Fresh tool search loaded Efeonce MCP.",
+    "credentialOrServerChanges": false
+  }
+}

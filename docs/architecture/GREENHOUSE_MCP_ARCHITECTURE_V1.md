@@ -270,7 +270,18 @@ El binding externo de persona/organización (identidad de cliente, `TASK-1631`, 
 `grantsVersion` (resource `src/lib/api-platform/resources/ecosystem-identity-binding.ts`, reader
 `resolveExternalAccess` en `src/lib/identity/external-access/**`). Ese lane lo autoriza el binding sister-platform
 `internal` del gateway (`efeonce-mcp-gateway`); cualquier otro binding recibe `404` anti-oráculo. El gateway compara
-`grantsVersion` por igualdad contra el claim `gv` del token (`TASK-1831`) (actualizado 2026-09-04, TASK-1631).
+`grantsVersion` por igualdad contra el claim `gv` del token (`TASK-1831`), para ese carril externo.
+
+La misma ruta discrimina internos por contexto firmado y ledger `jti`: v1 conserva un ancla/objetivo único;
+TASK-1844 v2 separa `actor` y `targets` con intenciones `catalog`, `target` y `organizations`, sin caché
+positiva. `gv` valida sólo el actor; el objetivo se reautoriza en cada llamada con los permisos canónicos.
+`efeonce.organizations.list` es gateway-native (no una tool olvidada del manifiesto interno): lista IDs y
+nombres autorizados, páginas de 1–50/default 20 y cursor revalidado, sin total global. El mismo cliente
+puede operar una organización nueva elegible al volver a listar; no requiere otra conexión. El adapter
+inicial sólo delega `growth.seo.observation.read`, con recheck de negocio del provider. No habilita todas
+las tools internas ni nuevas escrituras. [Contrato técnico](../api/GREENHOUSE_API_PLATFORM_V1.md#reader-de-identidad-y-autoridad-mcp) ·
+[ADR](EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md) ·
+[manual](../manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md).
 
 ### 10.4 Internal MCP
 

@@ -1,0 +1,10 @@
+{
+  "client": "claude",
+  "label": "task1844-claude-final",
+  "startedAt": "2026-09-08T21:37:18.246961+00:00",
+  "completedAt": "2026-09-08T21:37:43.881738+00:00",
+  "exitCode": 0,
+  "evidenceSource": "actual native client tool events, not assistant summaries",
+  "calls": [],
+  "certificationStatus": "not counted: no tools; local DNS/metadata initialization failure"
+}

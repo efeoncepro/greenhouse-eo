@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "purpose": "inventory_only",
+  "cohort": [
+    {
+      "label": "Grupo Berel",
+      "note": "Servicio canónico sincronizado desde HubSpot y alcance confirmado por el operador; faltan términos y mapping. El usuario seleccionado es técnico, no destinatario humano certificado.",
+      "request": {
+        "organizationId": "org-32333527-02a8-487b-819e-6f76a761777d",
+        "targets": [
+          {
+            "serviceId": "SVC-HS-554261764224",
+            "moduleKey": "seo_v2"
+          },
+          {
+            "serviceId": "SVC-HS-554261764224",
+            "moduleKey": "ai_visibility_v1"
+          }
+        ],
+        "personIds": [
+          "user-agent-berel-client-001"
+        ]
+      },
+      "serviceCoverage": [
+        {
+          "service": "SEO/AEO",
+          "serviceId": "SVC-HS-554261764224",
+          "moduleKeys": [
+            "seo_v2",
+            "ai_visibility_v1"
+          ],
+          "status": "operator_confirmed_commercial_terms_missing"
+        },
+        {
+          "service": "Contenidos",
+          "serviceId": "SVC-HS-554261764224",
+          "moduleKey": null,
+          "status": "operator_confirmed_terms_and_module_mapping_missing"
+        }
+      ],
+      "serviceReadbackAt": "2026-09-09T22:20:31.914Z"
+    },
+    {
+      "label": "Sky Airlines",
+      "note": "Servicio confirmado por el operador. Equipo activo conciliado con PG; términos/mapping, login humano y ruta TASK-1687 por certificar. ai_visibility_v1 existente se conserva sin nueva atribución contractual.",
+      "request": {
+        "organizationId": "org-b9977f96-f7ef-4afb-bb26-7355d78c981f",
+        "targets": [
+          {
+            "serviceId": "SVC-HS-551519372424",
+            "moduleKey": "creative_hub_globe_v1"
+          }
+        ],
+        "personIds": [
+          "user-hubspot-contact-139243510680",
+          "user-hubspot-contact-157404441684",
+          "user-hubspot-contact-157404441685"
+        ]
+      },
+      "serviceCoverage": [
+        {
+          "service": "Diseño digital",
+          "serviceId": "SVC-HS-551519372424",
+          "moduleKey": "creative_hub_globe_v1",
+          "status": "operator_confirmed_commercial_terms_missing"
+        }
+      ]
+    }
+  ],
+  "operatorConfirmation": {
+    "date": "2026-09-09",
+    "source": "Instrucción del operador en TASK-1852",
+    "rolloutAuthorized": true,
+    "commercialRecordsVerifiedSeparately": true
+  },
+  "privateScopeEvidence": ".captures/task-1852/private-scope/berel-sky.v1.json (local, ignorado por Git)"
+}

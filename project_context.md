@@ -3,7 +3,7 @@
 ## Estado vigente para agentes
 
 Greenhouse: plataforma operativa Efeonce Group, Next.js 16/MUI 7/Vuexy starter-kit/TypeScript.
-Contratos durables aquí; estado en [Handoff.md](Handoff.md); historia preservada en
+Estado: [Handoff.md](Handoff.md). Historia:
 [`docs/operations/agent-context-history/2026-07-19/project_context.legacy.md`](docs/operations/agent-context-history/2026-07-19/project_context.legacy.md).
 
 Reingresos e identidad: [contrato canónico](docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md).
@@ -122,6 +122,7 @@ Efeonce Insights: [arquitectura](docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE
 Diseño de deck/A4/web por edición; implementación pendiente en TASK-1845–1849.
 
 Informes: skill `report-studio` (Claude/Codex), evidencia, diseño y QA PDF.
+Efemérides: `social-media-studio/efeonce/SEASONAL_CONTENT.md` + `notion-platform`; estado en Notion.
 Berel: `berel-content-production` · [plan](docs/operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md) ·
 [informes](docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md) ·
 [colaboración](docs/operations/BEREL_CLIENT_COLLABORATION_OPERATING_MODEL_V1.md). Preservar análisis, N1–N4 y
@@ -156,8 +157,8 @@ No leer snapshots completos de arranque. Buscar en ellos por keyword solo para i
   Autoridad externa e interna separadas por población/binding/contexto; SSO no concede permisos MCP.
   Grants, `gv` y ledger de tokens se revalidan antes del dispatch; estado/audit/outbox atómicos.
   `TASK-1813` cerró `1.2.0`: Efeonce ID/base-only, shim retirado, rollback y matriz post-cutover completos. Un token
-  resuelve un contexto; `TASK-1844` implementa v2 con selección por llamada, sin claims wildcard; código listo,
-  rollout pendiente según su [runbook](docs/operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md).
+  resuelve un contexto; `TASK-1844`: v2 interna y altas elegibles sin reconectar;
+  [manual y límites](docs/manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md).
   `TASK-1832` mantiene hasta `2026-09-13T19:43:30Z` el canary sintético read-only; ChatGPT, Claude Code/ai/Desktop,
   Codex y Playwright están certificados. Su retiro exige readback cero; `TASK-1841` separa el piloto real.
   [`ADR nativo`](docs/architecture/EFEONCE_NATIVE_AUTHORIZATION_SERVER_DECISION_V1.md) ·

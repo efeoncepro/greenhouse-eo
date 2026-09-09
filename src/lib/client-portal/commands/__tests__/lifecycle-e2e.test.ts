@@ -1,3 +1,7 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import type * as AssignmentTransactions from '../transaction'
+
 /**
  * TASK-826 Slice 8 — End-to-end lifecycle integration tests.
  *
@@ -16,9 +20,15 @@
  *   - Terminal status (expired/churned) NO permite re-pause/resume
  */
 
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('server-only', () => ({}))
+
+// Transition unit tests; real locks/rollback are covered by the enablement DB suite.
+vi.mock('../transaction', async importOriginal => ({
+  ...await importOriginal<typeof AssignmentTransactions>(),
+  lockClientPortalOrganization: vi.fn(),
+  lockClientPortalAssignment: vi.fn()
+}))
 
 const mocks = vi.hoisted(() => ({
   publishOutboxEvent: vi.fn(),
@@ -52,6 +62,7 @@ const buildTx = () => ({
   selectFrom: vi.fn((table: string) => {
     const builder = {
       select: vi.fn(() => builder),
+      forUpdate: vi.fn(() => builder),
       selectAll: vi.fn(() => builder),
       where: vi.fn(() => builder),
       innerJoin: vi.fn(() => builder),

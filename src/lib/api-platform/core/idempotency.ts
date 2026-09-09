@@ -220,10 +220,10 @@ export const claimCommandExecution = async ({
   idempotencyKey: string
   fingerprint: string
   expiresAt: Date
-}): Promise<{ claimed: boolean; commandExecutionId?: string }> => {
+}, executeQuery: typeof query = query): Promise<{ claimed: boolean; commandExecutionId?: string }> => {
   const commandExecutionId = buildCommandExecutionId()
 
-  const rows = await query<{ command_execution_id: string }>(
+  const rows = await executeQuery<{ command_execution_id: string }>(
     `
       INSERT INTO greenhouse_core.api_platform_command_executions (
         command_execution_id,
@@ -279,10 +279,10 @@ export const recordCommandAudit = async ({
   method: string
   path: string
   expiresAt: Date
-}): Promise<string> => {
+}, executeQuery: typeof query = query): Promise<string> => {
   const commandExecutionId = buildCommandExecutionId()
 
-  await query(
+  await executeQuery(
     `
       INSERT INTO greenhouse_core.api_platform_command_executions (
         command_execution_id,
@@ -307,8 +307,8 @@ export const loadCommandExecutionByKey = async ({
 }: {
   principalId: string
   idempotencyKey: string
-}): Promise<StoredCommandExecution | null> => {
-  const rows = await query<{
+}, executeQuery: typeof query = query): Promise<StoredCommandExecution | null> => {
+  const rows = await executeQuery<{
     command_execution_id: string
     status: CommandExecutionStatus
     request_fingerprint: string | null
@@ -345,8 +345,8 @@ export const completeCommandExecution = async ({
   commandExecutionId: string
   responseStatus: number
   responseBody: unknown
-}): Promise<void> => {
-  await query(
+}, executeQuery: typeof query = query): Promise<void> => {
+  await executeQuery(
     `
       UPDATE greenhouse_core.api_platform_command_executions
       SET status = 'completed',
@@ -369,8 +369,8 @@ export const failCommandExecution = async ({
   commandExecutionId: string
   responseStatus: number | null
   errorCode: string | null
-}): Promise<void> => {
-  await query(
+}, executeQuery: typeof query = query): Promise<void> => {
+  await executeQuery(
     `
       UPDATE greenhouse_core.api_platform_command_executions
       SET status = 'failed',
@@ -390,8 +390,8 @@ export const incrementReplayCount = async ({
 }: {
   principalId: string
   idempotencyKey: string
-}): Promise<void> => {
-  await query(
+}, executeQuery: typeof query = query): Promise<void> => {
+  await executeQuery(
     `
       UPDATE greenhouse_core.api_platform_command_executions
       SET replay_count = replay_count + 1,

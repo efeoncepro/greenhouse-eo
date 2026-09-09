@@ -1,0 +1,14 @@
+{
+  "client": "claude",
+  "label": "task1844-claude-rollback-restored",
+  "startedAt": "2026-09-08T21:09:51.118954+00:00",
+  "completedAt": "2026-09-08T21:10:13.799484+00:00",
+  "exitCode": 0,
+  "evidenceSource": "actual native client tool events, not assistant summaries",
+  "calls": [],
+  "certificationStatus": "no MCP dispatch; excluded from successful tool matrix",
+  "protocolObservation": {
+    "source": "actual native init event",
+    "result": "needs-auth, tools empty; Claude requires OAuth login after OFF response"
+  }
+}

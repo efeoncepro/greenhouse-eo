@@ -16,6 +16,14 @@
 5. Revisa capabilities si el problema es una accion, no una pantalla.
 6. Si el usuario viene de Entra, revisa SCIM mappings y grupos.
 
+## Diagnosticar acceso MCP a una organización
+
+Usa [el manual multiorganización](usar-mcp-interno-multiorganizacion.md). Comprueba primero identidad/enrollment
+y conexión interna v2; luego organización/espacios activos, relación, roles y permisos efectivos en plataforma
+y en todos los espacios del objetivo. Una asignación vigente puede ampliar el siguiente listado sin reconectar.
+No uses cerrar/reabrir sesión como sustituto de esos controles ni concedas un rol global para resolver un deny.
+Una persona nueva requiere enrollment y cohorte; una organización nueva no se añade a la cohorte del issuer.
+
 ## Dar acceso a una vista
 
 1. Verifica que la vista esta en `view_registry`.

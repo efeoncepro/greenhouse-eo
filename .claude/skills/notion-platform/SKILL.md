@@ -71,6 +71,8 @@ Para cualquier task que invoque esta skill:
    - **Si vinculas/onboardeas el teamspace de un cliente nuevo** (Berel, ANAM, …): `greenhouse-runtime/teamspace-linking-per-client-token.md` (token POR teamspace — el token ES el scope; REST NO enumera teamspaces; MCP NO es runtime-available)
 8. **Si generas o actualizas el body de una page**: `api-reference/enhanced-markdown-canonical.md` + `patterns-canonical/enhanced-markdown-renderer.md`
 9. **Si creas o consultas proyectos/tareas/subtareas**: `use-cases-greenhouse/work-management.md` + `greenhouse-runtime/work-space-registry.md`; para bodies, cargar además `output-templates/work-management-markdown-templates.md`
+   - Para piezas editoriales, aplicar § Pares de tarea y calendario editorial del mismo módulo:
+     entrega/publicación separadas, relación al data source correcto y readback de ambas páginas.
 10. **Siempre antes de cerrar**: `anti-patterns-catalog.md` + `edge-cases-and-gotchas.md`
 
 ## 3. 5-pillar Notion Platform contract

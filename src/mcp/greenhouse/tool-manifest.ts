@@ -71,6 +71,12 @@ export interface GreenhouseMcpToolManifestEntry {
  * servidor no construye — no hay forma de registrar una tool en silencio.
  */
 export const GREENHOUSE_MCP_TOOL_MANIFEST: readonly GreenhouseMcpToolManifestEntry[] = [
+  { name: 'preview_client_service_enablement', domain: 'platform', writes: false, spendsProviderBudget: false,
+    purpose: 'Inventario y preview por organización, servicio y persona, sin escrituras de negocio.' },
+  { name: 'apply_client_service_enablement', domain: 'platform', writes: true, spendsProviderBudget: false,
+    purpose: 'Alta por preview exacto; denegada desde una identidad de máquina sin autoridad humana.' },
+  { name: 'rollback_client_service_enablement', domain: 'platform', writes: true, spendsProviderBudget: false,
+    purpose: 'Compensación de altas propias por recibo; requiere autoridad humana y ausencia de cambios posteriores.' },
   // ── Plataforma: contexto, organizaciones, capacidades y salud ──────────────
   {
     name: 'get_context',
@@ -498,7 +504,7 @@ export const buildGreenhouseMcpServerIdentity = (
 
   return {
     name: writers.length === 0 ? 'greenhouse-read-only' : 'greenhouse',
-    version: '1.0.0',
+    version: '1.1.0',
     instructions:
       `${surface}${spend}${manuals} It is downstream of api/platform/ecosystem/*, uses a fixed external ` +
       'scope from server configuration, preserves Greenhouse request IDs, and must not be used ' +

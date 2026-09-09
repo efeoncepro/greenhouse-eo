@@ -1,5 +1,26 @@
 # Greenhouse Entitlements & Authorization Architecture V1
 
+## Lectura efectiva para autoridad MCP interna
+
+TASK-1844 compone el merger compartido `src/lib/entitlements/effective.ts` desde governance y desde
+`effective-reader.ts`: runtime base → defaults de rol → overrides de usuario aprobados. El reader valida
+catálogo vigente y hechos del sujeto/space; no escribe una segunda precedencia ni acepta overrides pendientes.
+`src/lib/identity/internal-access/target-authority.ts` integra ese resultado con identidad interna única y
+activa, roles vigentes, organización/spaces activos y relación canónica (`internal_admin | assigned_member`).
+Un rol admin aislado no basta: exige permiso efectivo `organization.identity` en scope `all` tanto de
+plataforma como del space, además de la capability requerida.
+
+La lectura agregada de una organización exige permiso en **todos** sus spaces activos aplicables; unir un
+space permitido con otro denegado no concede acceso parcial al agregado. Alta/baja de organización, relación
+o permisos se refleja en la resolución siguiente sin reconectar mientras persista la misma autorización v2.
+El corte inicial sólo incorpora `growth.seo.observation.read`; el entitlement comercial/módulo SEO y gasto
+siguen siendo controles propios del provider. `no_entitlement` no equivale a fallo de OAuth.
+
+Issuer y API comparten `withInternalAuthoritySnapshot`: transacción read-only/repeatable-read, presupuesto
+de 4 s y memoización sólo dentro de esa resolución; no existe caché positiva de permisos entre requests.
+Los límites temporales observados invalidan el resultado si se cruzan antes de finalizar. Este camino no
+hereda el TTL de la proyección UI del workspace. [ADR D8–D11](EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md#d8--actor-y-objetivo-tienen-autoridad-distinta).
+
 ## Delta 2026-05-11 — TASK-840 deprecated capabilities cleanup
 
 - El registry mantiene historia append-only operacional: cuando una capability sale del TS catalog, la migration debe marcar `greenhouse_core.capabilities_registry.deprecated_at`; no se eliminan rows porque grants históricos y FKs dependen de `capability_key`.

@@ -6,6 +6,7 @@ import { ROLE_CODES } from '@/config/role-codes'
 
 import { isNexaActionRuntimeEnabled } from '../flags'
 import { authorQuoteAction } from './author-quote'
+import { applyClientServiceEnablementAction, rollbackClientServiceEnablementAction } from './client-service-enablement'
 import { isNexaActionBlockedError } from './blocked-error'
 import { decideHiringApplicationAction } from './hiring-decision'
 import { markNotificationsReadAction } from './pilot-mark-notifications-read'
@@ -30,6 +31,7 @@ import {
  * action context is built the same way from either entry point. Identity comes ONLY from session.
  */
 export interface NexaActionContextSource {
+  authMode?: string | null
   userId: string
   memberId?: string
   clientId: string | null
@@ -52,6 +54,7 @@ export const canUseNexaActionRuntime = (source: NexaActionContextSource): boolea
 /** Maps a session-derived source to the minimal action context. Identity comes ONLY from session. */
 export const buildNexaActionContext = (source: NexaActionContextSource): NexaActionContext => ({
   userId: source.userId,
+  ...(source.authMode ? { authMode: source.authMode } : {}),
   memberId: source.memberId,
   clientId: source.clientId || null,
   tenantType: source.tenantType,
@@ -70,6 +73,8 @@ export const buildNexaActionContext = (source: NexaActionContextSource): NexaAct
 // Heterogéneo: las acciones difieren en su TInput (self-action void vs parametrizada). El resolver
 // valida el input via `inputSchema` antes de invocar los callbacks tipados, así que `any` es seguro.
 const NEXA_ACTION_REGISTRY: Record<string, NexaActionDefinition<any>> = {
+  [applyClientServiceEnablementAction.actionKey]: applyClientServiceEnablementAction,
+  [rollbackClientServiceEnablementAction.actionKey]: rollbackClientServiceEnablementAction,
   [markNotificationsReadAction.actionKey]: markNotificationsReadAction,
   [authorQuoteAction.actionKey]: authorQuoteAction,
   // TASK-1399 — Proposal Studio: el ciclo completo de una propuesta desde el chat (registrar →
@@ -198,13 +203,19 @@ export const resolveNexaActionProposal = async (
     throw error
   }
 
+  if (preview.executionInput !== undefined) {
+    actionInput = definition.inputSchema?.parse(preview.executionInput)
+  }
+
+  const visiblePreview = { title: preview.title, summary: preview.summary, metrics: preview.metrics }
+
   const proposal: NexaActionProposal = {
     contractVersion: NEXA_ACTION_PROPOSAL_CONTRACT_VERSION,
     proposalId: `nexa-act-${randomUUID()}`,
     actionKey: definition.actionKey,
     intent: definition.intent,
     sensitivity: definition.sensitivity,
-    preview,
+    preview: visiblePreview,
     confirmation: definition.confirmation,
     execution: {
       confirmEndpoint: buildNexaActionConfirmEndpoint(definition.actionKey),

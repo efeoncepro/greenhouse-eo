@@ -4,13 +4,26 @@ Diseño inicial 2026-09-08, sin implementación. UI ready: no. Fuente de direcci
 
 - Visual direction mode: repo-native-benchmark
 - Product Design asset: `docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md` §6 y catálogo existente `src/lib/artifact-composer/catalogs/deck-axis/registry.json`.
-- Scope: biblioteca, creación, revisión y web compartida.
+- Scope: biblioteca/creación cliente, gestión interna y web compartida; integración EPIC-046.
 
 ## Desktop Target
 
 CompositionShell: cabecera Insights/cliente → filtros período/módulo → lista de ediciones con versiones y outputs. Detalle: resumen, capítulos y estado por salida; panel contextual para encargo/revisión. Shared web sin navegación privada: portada compacta, índice lateral, contenido principal y descargas permitidas.
 
+### Variantes autenticadas por autoridad
+
+- Cliente: organización fija, selector de servicio/período y plantillas permitidas, historial propio,
+  CTA de generación cuando corresponde y estado de revisión. Entrada contextual desde Mis servicios.
+- Colaborador: selector sólo de cuentas autorizadas, encargo/revisión/emisión/recuperación según permisos.
+- Ambas reutilizan biblioteca, builder y visor; el encabezado distingue dashboard actual de edición con
+  corte congelado. Shared conserva su superficie sin selector de cuentas ni acciones privadas.
+
 ## Mobile Target
+
+Correo asociado: EmailLayout canónico, período/corte, resumen de hallazgos, próximo paso y un CTA
+principal a la edición exacta. HTML/plain text comparten semántica; preview desktop/móvil obligatorio.
+Deep link normal entra al detalle autenticado, conserva destino tras login y muestra estado seguro ante
+retiro/revocación. Las preferencias enlazan a la superficie de TASK-693; no hay centro duplicado.
 
 390px: una columna, títulos y unidades completos, tabla equivalente para cada gráfico. Índice plegable accesible y acciones en orden; ningún rail privado en shared. scrollWidth === clientWidth.
 

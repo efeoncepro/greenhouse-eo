@@ -18,9 +18,17 @@ externos son su vista autorizada, no el inventario total. El gateway usa MCP SDK
 metadata observables; un probe JSON vacío anónimo recibe 401 antes de validar el body.
 
 TASK-1813 desplegó `efeonce-mcp` `1.2.0`: Efeonce ID es el único emisor anunciado, discovery pide sólo lectura
-base y el shim Entra quedó retirado. La revisión `00047-8b5` sirve 100 % Ready; rollback y repeticiones
+base y el shim Entra quedó retirado. El cierre de TASK-1813 registró `00047-8b5` 100 % Ready; rollback y repeticiones
 post-cutover de Claude Code, Codex, Claude.ai, Claude Desktop y ChatGPT quedaron verificadas sin widening.
 Entra sigue aceptado para validar sesiones legacy, sin ser bootstrap de conexiones nuevas.
+
+TASK-1844 añadió `efeonce.organizations.list` en `1.3.0` y certificó el 2026-09-08 una identidad interna v2
+con lectura SEO. La persona elige el ID objetivo por llamada y Greenhouse revalida sus permisos efectivos;
+las organizaciones nuevas cubiertas por ellos aparecen al refrescar el listado sin reconectar. El
+[funcionamiento multiorganización](../identity/acceso-mcp-interno-multiorganizacion.md) y el
+[manual diario](../../manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md) separan ese uso del enrollment
+de nuevos usuarios y del acceso externo. El [readback de cierre](../../audits/mcp/TASK-1844_FINAL_RUNTIME_2026-09-08.json)
+registró `00050-wlk`; es evidencia fechada, no la revisión que se debe asumir en una operación futura.
 
 La primera capacidad activa fue `globe.producer.fleet.list`. Permite consultar las rutas de modelos disponibles de
 Globe para el workspace interno autorizado. El gateway no recrea catálogo, routing ni reglas de Globe.
@@ -52,9 +60,9 @@ responde "prohibido". Invitar exige un permiso propio (`efeonce.mcp.identity.wri
 aparte del permiso base. El **token de la invitación nunca vuelve al agente**: se entrega por correo. Comparte
 interruptor, identidad y consumer con los providers SEO y de manuales, porque es la misma lane.
 
-Con eso el servidor declara **39 tools** en total (28 SEO + `get_greenhouse_skill` + 2 de identidad delegada + las
-nativas de gateway, Globe y Hiring). Es el techo del catálogo: lo que ve un cliente concreto depende de su emisor,
-sus permisos y los interruptores de cada provider.
+El snapshot de TASK-1837 registró 39 tools; TASK-1844 agregó discovery organizacional propio del gateway.
+El inventario vigente se lee del servidor y de `surface-baseline.json` en `efeonce-mcp`. Lo que ve un cliente
+concreto depende de su emisor, población, permisos y flags. El catálogo global no equivale a autoridad universal.
 
 ## Cómo se comporta
 
@@ -62,9 +70,11 @@ sus permisos y los interruptores de cada provider.
    presentando su token; no se anuncia como segundo authorization server cuando el carril nativo está activo.
 2. El gateway valida issuer, audience, firma, expiración y scopes, y aplica policy por tool. Los tokens
    nativos requieren autoridad vigente del reader; los internos también contexto firmado y ledger `jti`.
-3. Para Globe obtiene una identidad de workload y llama el reader canónico de Globe.
-4. Globe deriva el workspace desde la identidad de servicio; el cliente no puede escoger otro workspace.
-5. La respuesta entrega disponibilidad de rutas y un correlation ID para observabilidad.
+3. En el carril interno v2, discovery sólo muestra objetivos autorizados; cada llamada org-scoped exige su ID
+   y revalida el permiso antes del dispatch. La conexión no guarda una lista fija de organizaciones en el token.
+4. Cada provider conserva su contrato: SEO revalida su módulo y permisos; Globe, en su carril autorizado,
+   obtiene identidad de workload y deriva el workspace en su propio runtime. V2 inicial no incorpora Globe.
+5. El provider devuelve datos o estados honestos y evidencia sanitizada; conectar no crea permisos ni presupuesto.
 
 El gateway rechaza requests anónimos. Un provider con problemas falla cerrado y devuelve un error sanitizado, sin
 filtrar credenciales ni detalles internos.
@@ -110,7 +120,7 @@ Esa versión se compone de dos mitades con dueños distintos:
 
 | Mitad | Quién la decide | Qué responde |
 | --- | --- | --- |
-| El número (`1.2.0`) | Una persona, al clasificar el cambio | ¿Qué clase de cambio hubo? |
+| El número (por ejemplo, `1.3.0`) | Una persona, al clasificar el cambio | ¿Qué clase de cambio hubo? |
 | El sufijo (`+5c28a7a`) | El despliegue, automáticamente | ¿Qué build está sirviendo ahora? |
 
 **Qué cuenta como cambio depende de a quién le rompe.** Para un agente que ya aprendió la superficie, no es lo

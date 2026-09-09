@@ -1,0 +1,100 @@
+{
+  "client": "codex",
+  "label": "task1844-codex-final-retry",
+  "startedAt": "2026-09-08T21:39:21.475327+00:00",
+  "completedAt": "2026-09-08T21:40:08.220743+00:00",
+  "exitCode": 0,
+  "evidenceSource": "actual native client tool events, not assistant summaries",
+  "calls": [
+    {
+      "server": "efeonce",
+      "tool": "efeonce.organizations.list",
+      "arguments": {
+        "limit": 2
+      },
+      "startedAt": "2026-09-08T21:39:35.409133+00:00",
+      "completedAt": "2026-09-08T21:39:36.481549+00:00",
+      "status": "completed",
+      "result": {
+        "organizations": [
+          {
+            "organizationId": "org-03993839-8aab-479b-aeeb-a4e96a044dd6",
+            "capabilities": [
+              {
+                "textLength": 27,
+                "authorizationDenied": false
+              }
+            ]
+          },
+          {
+            "organizationId": "org-0bff3c10-c165-425b-8139-e26a1dde5c29",
+            "capabilities": [
+              {
+                "textLength": 27,
+                "authorizationDenied": false
+              }
+            ]
+          }
+        ],
+        "nextAfterOrganizationId": "org-0bff3c10-c165-425b-8139-e26a1dde5c29"
+      },
+      "clientObservedDurationMs": 1072.416
+    },
+    {
+      "server": "efeonce",
+      "tool": "get_seo_entitlement",
+      "arguments": {
+        "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975"
+      },
+      "startedAt": "2026-09-08T21:39:40.055694+00:00",
+      "completedAt": "2026-09-08T21:39:41.144367+00:00",
+      "status": "completed",
+      "result": {
+        "provider": "greenhouse-seo",
+        "data": {
+          "ok": true,
+          "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975",
+          "hasModule": false,
+          "tier": null,
+          "allowanceCap": 0,
+          "allowanceUsed": 0,
+          "allowanceRemaining": 0,
+          "budgetCapUsd": 0,
+          "budgetUsedUsd": 0,
+          "budgetRemainingUsd": 0,
+          "periodResetAt": "2026-10-01T00:00:00.000Z",
+          "blockedReason": "no_entitlement"
+        }
+      },
+      "clientObservedDurationMs": 1088.673
+    },
+    {
+      "server": "efeonce",
+      "tool": "get_seo_entitlement",
+      "arguments": {
+        "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3"
+      },
+      "startedAt": "2026-09-08T21:39:45.384202+00:00",
+      "completedAt": "2026-09-08T21:39:46.724699+00:00",
+      "status": "completed",
+      "result": {
+        "provider": "greenhouse-seo",
+        "data": {
+          "ok": true,
+          "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3",
+          "hasModule": false,
+          "tier": null,
+          "allowanceCap": 0,
+          "allowanceUsed": 0,
+          "allowanceRemaining": 0,
+          "budgetCapUsd": 0,
+          "budgetUsedUsd": 0,
+          "budgetRemainingUsd": 0,
+          "periodResetAt": "2026-10-01T00:00:00.000Z",
+          "blockedReason": "no_entitlement"
+        }
+      },
+      "clientObservedDurationMs": 1340.497
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "label": "task1844-claude-reconnected",
+  "evidenceSource": "actual native client tool events, not assistant summaries",
+  "calls": [
+    {
+      "server": "efeonce-internal",
+      "tool": "mcp__efeonce-internal__get_seo_entitlement",
+      "arguments": {
+        "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3"
+      },
+      "startedAt": "2026-09-08T20:33:43.756308+00:00",
+      "completedAt": "2026-09-08T20:33:45.300364+00:00",
+      "status": "completed",
+      "result": {
+        "provider": "greenhouse-seo",
+        "data": {
+          "ok": true,
+          "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3",
+          "hasModule": false,
+          "tier": null,
+          "allowanceCap": 0,
+          "allowanceUsed": 0,
+          "allowanceRemaining": 0,
+          "budgetCapUsd": 0,
+          "budgetUsedUsd": 0,
+          "budgetRemainingUsd": 0,
+          "periodResetAt": "2026-10-01T00:00:00.000Z",
+          "blockedReason": "no_entitlement"
+        }
+      },
+      "clientObservedDurationMs": 1544.056
+    },
+    {
+      "server": "efeonce-internal",
+      "tool": "mcp__efeonce-internal__get_seo_entitlement",
+      "arguments": {
+        "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975"
+      },
+      "startedAt": "2026-09-08T20:33:47.614916+00:00",
+      "completedAt": "2026-09-08T20:33:48.911758+00:00",
+      "status": "completed",
+      "result": {
+        "provider": "greenhouse-seo",
+        "data": {
+          "ok": true,
+          "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975",
+          "hasModule": false,
+          "tier": null,
+          "allowanceCap": 0,
+          "allowanceUsed": 0,
+          "allowanceRemaining": 0,
+          "budgetCapUsd": 0,
+          "budgetUsedUsd": 0,
+          "budgetRemainingUsd": 0,
+          "periodResetAt": "2026-10-01T00:00:00.000Z",
+          "blockedReason": "no_entitlement"
+        }
+      },
+      "clientObservedDurationMs": 1296.842
+    }
+  ],
+  "client": "claude",
+  "startedAt": "2026-09-08T20:33:36.065029+00:00",
+  "completedAt": "2026-09-08T20:34:04.080777+00:00",
+  "exitCode": 0
+}

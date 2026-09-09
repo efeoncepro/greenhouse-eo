@@ -384,3 +384,14 @@ positivos para otra familia/contexto. Un provider que aún rechaza población na
 porque el verifier ya la acepte. Un login Microsoft no acredita token/dispatch, ni un canary interno
 acredita acceso externo. Canon: [autoridad interna](../EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md),
 [OAuth](../EFEONCE_AUTH_SERVER_OAUTH_CONTRACT_V1.md) y skill `efeonce-mcp-platform/references/native-authority.md`.
+
+### Actor y objetivo internos v2 — TASK-1844
+
+El argumento `organizationId` selecciona el objetivo, nunca fabrica autoridad. El gateway consulta el reader
+canónico para esa combinación actor/capability/objetivo antes de cada dispatch; no confunde `gv` del actor
+con la revisión de autoridad del target ni reutiliza una resolución entre llamadas concurrentes.
+`efeonce.organizations.list` es gateway-native, interna v2/base-only, paginada (máximo 50 por página), sin
+total global ni IDs ocultos. El resultado de discovery no sustituye la reautorización al llamar.
+Una organización nueva elegible no requiere reconexión; un consentimiento v1 nunca se eleva silenciosamente.
+La primera capability es sólo `growth.seo.observation.read`. Registro de una tool, scope y autorización efectiva
+son pruebas distintas. Manual: [uso multiorganización](../../manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md).

@@ -62,6 +62,8 @@ La narrativa de venta es el sistema de autoridad y demanda; Trendjacking, reels,
    `efeonce/EFEONCE_OVERLAY.md` / `efeonce/CLIENT_DELIVERY.md`. Globe es un adaptador futuro gated, no una dependencia.
 6. **Cierra con un artefacto** de `templates/` (brief, calendario, guion, reporte…),
    no con prosa suelta.
+   Para efemérides, metáforas visuales y planificación anticipada de canales propios,
+   carga `efeonce/SEASONAL_CONTENT.md`; las tareas y su calendario se verifican por separado.
 7. Si la producción corre por Creative Studio / un runtime futuro de Globe, carga el Business Model y Credit Model desde
    `efeonce/CLIENT_DELIVERY.md`: la pieza social no es la unidad de crédito; identifica las operaciones
    generativas y separa layout/copy/export/QA, capacidad y derechos.

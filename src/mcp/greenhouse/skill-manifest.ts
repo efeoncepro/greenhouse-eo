@@ -78,6 +78,11 @@ export const buildGreenhouseMcpSkillUri = (name: string): string =>
  */
 export const GREENHOUSE_MCP_SKILL_MANIFEST: readonly GreenhouseMcpSkillManifestEntry[] = [
   {
+    name: 'client-service-enablement', audience: 'internal',
+    sourcePath: `${GREENHOUSE_MCP_SKILLS_ROOT}/client-service-enablement/SKILL.md`,
+    appliesTo: ['preview_client_service_enablement', 'apply_client_service_enablement', 'rollback_client_service_enablement']
+  },
+  {
     name: 'seo-spend-discipline',
     audience: 'internal',
     sourcePath: `${GREENHOUSE_MCP_SKILLS_ROOT}/seo-spend-discipline/SKILL.md`,

@@ -13,6 +13,19 @@ Documentación relacionada: [binding externo](../../documentation/identity/bindi
 [template de manifiesto](../../audits/mcp/TASK-1832_CANARY_ASSET_MANIFEST_TEMPLATE.md) y
 [matriz](../../audits/mcp/EFEONCE_MCP_CLIENT_TOKEN_MATRIX_2026-09-06.md).
 
+## Separación de TASK-1844
+
+La certificación interna multiorganización tiene [manual propio](usar-mcp-interno-multiorganizacion.md) y
+[runbook de rollout](../../operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md). No usa clientes reales como
+fixtures ni convierte los registros de este canary externo en targets internos. Reutiliza la evidencia de
+compatibilidad existente antes de decidir una prueba nueva.
+
+El 2026-09-08 se autorizó sustituir **solamente la conexión hospedada de Claude** por la conexión interna
+Efeonce MCP. Se retiraron su consentimiento/familia bajo ese alcance; el registro y los demás activos de
+TASK-1832 mantienen el ciclo global de retiro. Esa sustitución no acredita siete días ininterrumpidos de
+observación de Claude hospedado. Ni un conector duplicado ni un cambio de usuario autoriza eliminar otro
+canary sin verificar ownership y alcance exactos.
+
 ## Antes de empezar
 
 Necesitas:

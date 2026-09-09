@@ -210,6 +210,9 @@ duplicación de TASK-1839 y semántica de logout de TASK-1840.
 
 ### Blocks / Impacts
 
+- [TASK-1852](TASK-1852-berel-sky-service-access-and-channel-enablement.md) / EPIC-046: matriz de
+  habilitación Berel/Sky y contrato de entrada desde email/in-app/Teamsbot. Es conexión de contrato y
+  rollout nativo condicional, no bloqueo de inventario/readers ni dependencia circular de foundation.
 - Login de clientes y colaboradores internos en `/login`.
 - Delta ADR y unidad reusable del perfil OIDC first-party de `auth.efeonce.org`, distinto del resource server MCP.
 - Claims y revalidación de la sesión NextAuth del portal.
@@ -910,6 +913,8 @@ La migración del enum/check de `auth_attempts` es expand-only y puede permanece
 
 ## Acceptance Criteria
 
+- [ ] EPIC-046/TASK-1852: un deep link a servicio, solicitud o edición Insights conserva destino interno permitido durante login/callback y selección de contexto 0/1/múltiples; cuenta distinta, permiso revocado o destino retirado no filtran datos ni caen silenciosamente en otro objeto.
+- [ ] Matriz de cohorte de TASK-1852 distingue login vigente verificado de OIDC nativo. Activar Berel/Sky por el carril nuevo conserva gates TASK-1833/1832/1841; callbacks permanecen read-only y nunca asignan servicios/módulos ni convierten un enlace en autoridad.
 - [x] Dirección v2 de producto/UI seleccionada por el operador el 2026-09-07: Greenhouse conserva URL/contexto de
       entrada sin render intermedio, Efeonce ID autentica en la única pantalla visible del flujo nuevo, se rechazan
       quinto provider, CTA-vestíbulo e iframe y se documentan alternativas, copy, estados, responsive, accessibility
@@ -1038,6 +1043,14 @@ funciona sin fricción. Si el alcance de esta task cambiara y ese efecto se perd
 de tener recorrido.
 
 ## Follow-ups
+
+### Conexión 2026-09-09 — servicios y retorno desde comunicaciones
+
+El operador pidió enlazar P01 con esta task. P01 ahora es TASK-1852: posee cuenta/servicio/persona,
+fuentes, módulos y canales; TASK-1834 conserva issuer, login, selección de contexto y retorno seguro.
+La matriz y los casos de deep links se consumen en ambos planes. No esperar el cierre total de 1834
+para preparar/abrir servicios con acceso vigente comprobado; sí exigir sus gates antes de activar
+OIDC nativo para la cohorte. Las pruebas técnicas usan fixtures, separadas del piloto cliente.
 
 - Mantener el contrato reusable en los owners existentes del epic: U02 protocolo/registro/consentimiento, U03
   sesión/métodos, U05 autorización MCP y U15 logout. TASK-1834 sólo implementa el primer consumer Greenhouse.

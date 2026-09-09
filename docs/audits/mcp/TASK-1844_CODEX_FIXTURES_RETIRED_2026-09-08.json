@@ -1,0 +1,180 @@
+{
+  "client": "codex",
+  "label": "task1844-codex-fixtures-retired",
+  "startedAt": "2026-09-08T21:48:44.733023+00:00",
+  "completedAt": "2026-09-08T21:49:14.171690+00:00",
+  "exitCode": 0,
+  "evidenceSource": "actual native client tool events, not assistant summaries",
+  "calls": [
+    {
+      "server": "efeonce",
+      "tool": "efeonce.organizations.list",
+      "arguments": {
+        "limit": 50
+      },
+      "startedAt": "2026-09-08T21:48:55.705205+00:00",
+      "completedAt": "2026-09-08T21:48:56.908471+00:00",
+      "status": "completed",
+      "result": {
+        "organizations": [
+          {
+            "organizationId": "org-03993839-8aab-479b-aeeb-a4e96a044dd6",
+            "capabilities": [
+              {
+                "textLength": 27,
+                "authorizationDenied": false
+              }
+            ]
+          },
+          {
+            "organizationId": "org-0bff3c10-c165-425b-8139-e26a1dde5c29",
+            "capabilities": [
+              {
+                "textLength": 27,
+                "authorizationDenied": false
+              }
+            ]
+          },
+          {
+            "organizationId": "org-125fe6b3-eae2-4cc9-9f8a-4bec01945131",
+            "capabilities": [
+              {
+                "textLength": 27,
+                "authorizationDenied": false
+              }
+            ]
+          },
+          {
+            "organizationId": "org-1b77dd57-5c83-4046-9262-36933686ea3e",
+            "capabilities": [
+              {
+                "textLength": 27,
+                "authorizationDenied": false
+              }
+            ]
+          },
+          {
+            "organizationId": "org-2df565fb-98aa-42f7-b324-ea9a2209017f",
+            "capabilities": [
+              {
+                "textLength": 27,
+                "authorizationDenied": false
+              }
+            ]
+          },
+          {
+            "organizationId": "org-32333527-02a8-487b-819e-6f76a761777d",
+            "capabilities": [
+              {
+                "textLength": 27,
+                "authorizationDenied": false
+              }
+            ]
+          },
+          {
+            "organizationId": "org-361b2f9b-9d71-4130-b437-70ce540aece3",
+            "capabilities": [
+              {
+                "textLength": 27,
+                "authorizationDenied": false
+              }
+            ]
+          },
+          {
+            "organizationId": "org-5db0ae62-e1ce-48ec-86ea-94dc1da1346c",
+            "capabilities": [
+              {
+                "textLength": 27,
+                "authorizationDenied": false
+              }
+            ]
+          },
+          {
+            "organizationId": "org-6c09b3a7-cbab-48a9-869e-61d03d1c6291",
+            "capabilities": [
+              {
+                "textLength": 27,
+                "authorizationDenied": false
+              }
+            ]
+          },
+          {
+            "organizationId": "org-b3e9e92b-518d-4924-b8c0-83cd1f9aa17f",
+            "capabilities": [
+              {
+                "textLength": 27,
+                "authorizationDenied": false
+              }
+            ]
+          },
+          {
+            "organizationId": "org-b9977f96-f7ef-4afb-bb26-7355d78c981f",
+            "capabilities": [
+              {
+                "textLength": 27,
+                "authorizationDenied": false
+              }
+            ]
+          },
+          {
+            "organizationId": "org-c6e1a2e6-9daf-41b4-90c7-c9da417df63d",
+            "capabilities": [
+              {
+                "textLength": 27,
+                "authorizationDenied": false
+              }
+            ]
+          },
+          {
+            "organizationId": "org-df247742-8f81-4e3c-b0aa-72812e195971",
+            "capabilities": [
+              {
+                "textLength": 27,
+                "authorizationDenied": false
+              }
+            ]
+          },
+          {
+            "organizationId": "org-f6aa4e20-9dbb-467a-950d-61e5f085e9b0",
+            "capabilities": [
+              {
+                "textLength": 27,
+                "authorizationDenied": false
+              }
+            ]
+          }
+        ],
+        "nextAfterOrganizationId": null
+      },
+      "clientObservedDurationMs": 1203.266
+    },
+    {
+      "server": "efeonce",
+      "tool": "get_seo_entitlement",
+      "arguments": {
+        "organizationId": "org-62d627aa-753f-4cf4-89ad-baf351633975"
+      },
+      "startedAt": "2026-09-08T21:49:00.661996+00:00",
+      "completedAt": "2026-09-08T21:49:01.491885+00:00",
+      "status": "failed",
+      "result": [
+        "authorization_denied"
+      ],
+      "clientObservedDurationMs": 829.889
+    },
+    {
+      "server": "efeonce",
+      "tool": "get_seo_entitlement",
+      "arguments": {
+        "organizationId": "org-748b44d4-9aa4-4b79-bd40-7b979c8ad0a3"
+      },
+      "startedAt": "2026-09-08T21:49:05.728330+00:00",
+      "completedAt": "2026-09-08T21:49:06.742722+00:00",
+      "status": "failed",
+      "result": [
+        "authorization_denied"
+      ],
+      "clientObservedDurationMs": 1014.392
+    }
+  ]
+}

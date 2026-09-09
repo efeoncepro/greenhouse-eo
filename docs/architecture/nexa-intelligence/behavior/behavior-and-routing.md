@@ -240,3 +240,17 @@ se respeta el default seguro por kind.
   vía `getAnthropicClient` (`src/lib/ai/*`). Detalle: [`technical/llm-models.md`](../technical/llm-models.md).
 - **NUNCA** responder un dato operativo en vivo desde Knowledge.
 - **NUNCA** acoplar el tool/Answer Rules a un SDK: el swap de provider NO debe tocar `search_knowledge`.
+
+## TASK-1852 — habilitación de servicios
+
+`apply_client_service_enablement` y `rollback_client_service_enablement` reutilizan los commands del portal.
+Sólo se anuncian con runtime Nexa y `CLIENT_SERVICE_ENABLEMENT_WRITES_ENABLED` habilitados, ante un contexto
+interno administrativo. El preview de alta prepara `{proposal, fingerprint, idempotencyKey}` en servidor;
+la tarjeta existente presenta organización, módulos, personas y número de comprobaciones pendientes.
+El input preparado se valida contra el esquema de la acción antes de viajar a confirmación.
+
+Confirmación revalida y aplica el mismo fingerprint; no lo recalcula para aprobar silenciosamente un estado
+nuevo. El hook opcional `authorize` comprueba autoridad fresca antes de replay y ejecución. Los dominios
+que no lo declaran conservan su comportamiento. La compensación usa un recibo del servidor, acotado a la
+organización y a altas propias que no tuvieron transiciones posteriores. Copy centralizado; UI-lite con
+reuso de la tarjeta gobernada, sin composición o navegación nueva. Apertura operativa y activación siguen pendientes.

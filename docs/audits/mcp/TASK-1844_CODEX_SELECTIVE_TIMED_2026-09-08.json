@@ -44,5 +44,9 @@
       },
       "clientObservedDurationMs": 1112.281
     }
-  ]
+  ],
+  "client": "codex",
+  "startedAt": "2026-09-08T20:26:25.011062+00:00",
+  "completedAt": "2026-09-08T20:26:55.981300+00:00",
+  "exitCode": 0
 }

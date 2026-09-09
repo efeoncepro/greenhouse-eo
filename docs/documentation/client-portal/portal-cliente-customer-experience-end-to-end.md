@@ -58,6 +58,19 @@ Interpretacion: el catalogo runtime existe y esta sembrado; este ambiente no mue
 
 ## Que es
 
+La evolución por servicios de Berel (SEO y marketing de contenidos) y Sky (diseño digital) se planifica
+en [EPIC-046](../../epics/to-do/EPIC-046-client-services-visibility-and-self-service.md), con
+[ADR aceptado para planificación](../../architecture/GREENHOUSE_CLIENT_SERVICE_EXPERIENCE_DECISION_V1.md).
+Integra [Efeonce Insights](../../epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md): el cliente
+consulta/genera informes propios y el colaborador autorizado los gestiona con los mismos commands e historial;
+el link compartido sólo permite leer la edición. El programa separa visibilidad inicial, Insights y
+autogestión de solicitudes. TASK-1852–1856 registradas; TASK-1852 conecta con TASK-1834 para identidad,
+contexto y retorno tras login. El rollout nativo es condicional; aún no cambia el comportamiento descrito aquí.
+Incluye correo Insights con resumen útil y enlace a la edición, avisos email/in-app y Teamsbot para
+destinos habilitados. Los enlaces conservan contexto tras login y revalidan acceso; preferencias,
+cadencia y recordatorios evitan ruido. App móvil/push será posterior. Contrato de planificación:
+[Insights §9.1](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md#91-activación-y-retorno-al-portal--epic-046); no declara entrega o canales activos.
+
 Portal Cliente es la capa BFF y de experiencia cliente de Greenhouse. No es el dueno de payroll, finance, delivery, knowledge ni account data; compone esas capacidades para un usuario cliente autenticado, con tenant y organizacion resueltos desde sesion.
 
 La regla central es: un cliente ve una experiencia adaptada por rol, vistas asignadas, modulos activados y estado real de datos. Si falta un modulo o una fuente esta degradada, el portal debe mostrar un estado honesto en vez de inventar datos.

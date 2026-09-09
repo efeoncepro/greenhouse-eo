@@ -850,6 +850,17 @@ Un flujo de recuperación self-service reintroduce exactamente esa puerta.
 Canon: [runbook canary](../../operations/runbooks/mcp-external-canary-certification.md) y
 [ADR de federación](../EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md).
 
+## Autoridad interna multiorganización (TASK-1844)
+
+- V1 conserva autoridad uniorganización. V2 mantiene actor/contexto firmados y exige objetivo explícito por llamada; el reader canónico resuelve relación y permisos efectivos vigentes para todos los espacios aplicables. No unir un espacio autorizado con otro denegado.
+- Agregar una organización elegible no requiere nuevo OAuth: listar de nuevo y revalidar al llamar. Crear una organización, tener SSO o pertenecer a un rol no concede acceso por sí solo. No añadir tenants al JWT, grants externos ni scopes por organización.
+- Migrar v1→v2 exige consentimiento nuevo; refresh nunca eleva la versión ni los scopes. Renovar un token no rejuvenece `auth_time` ni el contexto.
+- Scope base sólo permite la clase inicial de lectura; TASK-1844 habilita `growth.seo.observation.read`, no todos los providers o writes. Ampliar personas/capacidades/tráfico conserva sus gates y evidencia propios.
+- Revocar familia se prueba y ejecuta por grant exacto; revocar contexto afecta todas sus familias. Preservar familias definitivas y separar cleanup interno del canary externo.
+- SQL expand/contract aplicada: mantener CHECK de versiones 1/2, índice versionado y trigger inmutable. No reinsertar el índice retirado ni fabricar contextos/consentimientos por SQL para evitar OAuth.
+
+Canon: [ADR D8–D11](../EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md#d8--actor-y-objetivo-tienen-autoridad-distinta), [manual](../../manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md) y [rollout](../../operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md).
+
 ## Sesión corporativa y autoridad nativa (TASK-1836 / TASK-1831)
 
 Canon: [autoridad interna](../EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md) y

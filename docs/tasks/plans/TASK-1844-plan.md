@@ -1,12 +1,12 @@
 # Plan — TASK-1844: autoridad interna multiorganización
 
 - Fecha: 2026-09-08.
-- Estado: **aprobado por el operador el 2026-09-08**. Implementación local verificada; **code complete, rollout pendiente**. [QA](../../audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md) y [runbook](../../operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md).
+- Estado: **aprobado por el operador el 2026-09-08**. **Complete: producción, clientes, rollback y retiro de fixtures verificados el 2026-09-08**. [QA](../../audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md) y [runbook](../../operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md).
 - Goal: confirmado por el operador («Ok vamos»). Implementación y evidencia A/B/C, revocación,
   concurrencia, refresh y rollback en Greenhouse y efeonce-mcp; clientes Codex/Claude reales para cierre.
 - Checkout: Greenhouse `develop`, gateway `main`, ambos compartidos; sin worktrees ni subagentes.
 - Límite: scope base, externos/canary y Entra sin ampliación. Rollout preparado para aprobación final.
-- [Task](../in-progress/TASK-1844-efeonce-mcp-internal-multi-organization-authority.md) ·
+- [Task](../complete/TASK-1844-efeonce-mcp-internal-multi-organization-authority.md) ·
   [Delta ADR Accepted](../../architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md#delta-task-1844--autoridad-interna-multiorganización-accepted).
 
 ## Discovery summary
@@ -158,7 +158,7 @@ del índice sin versión. Cambiar sólo el índice rompería el writer previo co
    protegiendo los datos. Esta fase requiere aprobación de apply y readback por su incompatibilidad binaria.
 4. Activar v2 sólo después de ambas fases, readers y gateway compatibles y cohortes preparadas.
 
-Los SQL permanecen en `docs/tasks/pending-migrations/TASK-1844-*.sql.pending` hasta su apply gobernado. No usar
+Estado final: ambos SQL se aplicaron como `20260908184942851` y `20260908194829159`; los archivos pending quedaron sustituidos por migraciones canónicas. No reaplicar. No usar
 `pg:connect:migrate` como comando de conexión. Rollback posterior a la fase 3 sólo hacia una revisión con
 writer compatible: volver al binario antiguo ya no es seguro. Retener schema/contextos/consentimientos para
 auditoría; no borrar ni restaurar a ciegas un índice incompatible con v1/v2 coexistentes.

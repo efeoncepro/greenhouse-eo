@@ -1,7 +1,8 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.6
+> **Version:** 1.7
 > **Creado:** 2026-08-06 por Claude (TASK-1645 + TASK-1647)
 > **Ultima actualizacion:** 2026-09-02 por Claude (TASK-1804: sección nueva con los seis manuales de uso del dominio que el asistente carga por el mismo MCP; delta previo 2026-08-28 TASK-1792: la consulta de oportunidades declara de dónde salió el techo de clics, con cuánta muestra y con qué criterio se ordenó; delta previo 2026-08-14 TASK-1664/1666: descubrir keywords + preparar grounded queries AEO — sección nueva y alcance de escrituras actualizado)
+> **Actualización de acceso:** 2026-09-08, TASK-1844: lectura interna por organización y conexión estable sin widening.
 > **Documentacion tecnica:** [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) · [EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md](../../architecture/EFEONCE_MCP_PLATFORM_GATEWAY_DECISION_V1.md)
 > **Manual de uso:** [Operar el provider Greenhouse-SEO del MCP](../../manual-de-uso/plataforma/operar-provider-greenhouse-seo-mcp.md)
 
@@ -19,13 +20,22 @@ Esto es importante por una razón de diseño, no de moda: Greenhouse exige que *
 
 Hay tres piezas y cada una tiene un dueño distinto:
 
-1. **El punto de acceso público** (`mcp.efeonce.org`) autentica a la persona con la cuenta corporativa de Microsoft. Sin credencial válida no pasa nada: una consulta anónima se rechaza.
+1. **El punto de acceso público** (`mcp.efeonce.org`) valida el token del cliente. Las conexiones nuevas descubren Efeonce ID; el personal interno completa allí su acceso corporativo. Las sesiones Entra legacy conservan su contrato. Sin credencial válida, una consulta anónima se rechaza.
 2. **El adaptador de SEO** dentro de ese punto de acceso no sabe nada de SEO. Solo transporta la pregunta hasta Greenhouse con la identidad de servicio del gateway.
 3. **Greenhouse decide y responde.** Ahí vive todo: si la organización tiene el módulo contratado, cuánto cupo le queda, qué datos existen y cuáles no.
 
-Desde ese mismo 6 de agosto, conectarse ya no exige una identidad de servicio ni un script especial: **cualquier persona del tenant Entra de Efeonce puede conectar su propio cliente MCP estándar** (Claude Code, claude.ai o Claude Desktop) al punto de acceso, iniciar sesión con su cuenta corporativa y operar las cuatro consultas conversacionalmente. Los pasos exactos están en el [manual del MCP](../../manual-de-uso/plataforma/mcp-greenhouse-tool-inventory.md).
+El acceso actual se gobierna por población, enrollment, consentimiento y permisos. **Pertenecer al tenant no
+concede acceso automáticamente.** TASK-1844 certificó el 2026-09-08 una identidad interna v2 con lectura SEO:
+el asistente consulta `efeonce.organizations.list` y envía el `organizationId` explícito en cada lectura. Las
+cuentas nuevas cubiertas por permisos actuales aparecen al refrescar el listado, sin crear otra conexión.
+[Funcionamiento multiorganización](../identity/acceso-mcp-interno-multiorganizacion.md) ·
+[Manual diario Codex/Claude](../../manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md).
 
-La consecuencia práctica: **conectar un asistente de IA no otorga ningún permiso nuevo**. Las mismas reglas que aplican a la UI aplican a la consulta por MCP, porque es literalmente la misma puerta. Si un dato no se puede ver en el portal, tampoco se puede ver desde un asistente.
+La consecuencia práctica: **conectar un asistente de IA no otorga ningún permiso nuevo**. Greenhouse conserva
+la autoridad y la comprobación del módulo; la conexión v2 también revalida relación y permisos efectivos por
+organización. Tener una vista del portal y tener autorización MCP son controles distintos. El inventario
+completo de SEO que sigue incluye capacidades fuera de la lectura inicial v2; no permite activarlas por el
+hecho de estar federadas.
 
 ## Que responde cada consulta
 

@@ -6,7 +6,7 @@
 - **Scope:** repositorio `efeonce-mcp`, transporte MCP remoto, autenticación, federación de productos, Cloud Run, front door y dominio público
 - **Reversibility:** two-way-but-slow
 - **Confidence:** high para boundary, hosting, hostname, authorization server y el primer reader Globe después del canary PKCE real
-- **Validated as of:** 2026-09-07 (emisor nativo, canary externo sintético, ChatGPT hospedado y gateway MCP v2)
+- **Validated as of:** 2026-09-08 (contratos previos y autoridad interna multiorganización TASK-1844 para una identidad; SDK MCP v2 no equivale a contextVersion=2)
 - **Implementation owner:** [`TASK-1626`](../tasks/in-progress/TASK-1626-efeonce-mcp-platform-gateway.md)
 - **First provider owner:** [`TASK-1473`](../tasks/in-progress/TASK-1473-globe-contract-packaging-parity-certification.md)
 
@@ -22,10 +22,11 @@ TASK-1813 fija además el discovery vigente: con auth nativo habilitado, el PRM 
 `efeonce.mcp.read`. Los scopes de dominio/escritura se descubren incrementalmente ante el `403` de la tool
 exacta. El shim Entra de TASK-1654, `/register`, la metadata AS espejada y `OAUTH_PUBLIC_CLIENT_ID` quedan
 retirados del contrato soportado. Entra sigue configurado como trust lane para validar tokens legacy, no como
-segundo bootstrap. Esta decisión sirve en producción desde `efeonce-mcp` `1.2.0`, revisión `00047-8b5`, con
-rollback y matriz post-cutover de clientes verificados.
+segundo bootstrap. El corte TASK-1813 se publicó en `efeonce-mcp` `1.2.0`, revisión `00047-8b5`, con
+rollback y matriz post-cutover verificados. TASK-1844 certificó después `1.3.0`/`00050-wlk`; las revisiones
+fechadas y el tráfico servido pertenecen al [readback final](../audits/mcp/TASK-1844_FINAL_RUNTIME_2026-09-08.json).
 
-El contexto interno firmado fija sujeto/perfil, cliente, audiencia, organización, binding y procedencia;
+El contexto interno firmado fija sujeto/perfil, cliente, audiencia, organización ancla, binding y procedencia;
 `gv` es el del binding seleccionado. El reader revalida ese contexto y el `jti` vigente del ledger antes de
 dispatch, con revocación local ≤60 s. No existe fallback desde el resolver externo `internal_population`.
 Los gates nativo e interno se verifican por separado; refresh/dispatch previos no eluden un gate apagado.
@@ -44,6 +45,28 @@ sus rollbacks. La [matriz TASK-1832](../audits/mcp/EFEONCE_MCP_CLIENT_TOKEN_MATR
 clientes externos sintéticos; las pruebas multicontexto, el retiro del fixture y el primer cliente consentido
 conservan gates propios. No se declara cierre general de federación ni customer access. Los deltas siguientes
 conservan contexto histórico.
+
+### Autoridad interna v2 por objetivo (TASK-1844)
+
+El contexto v1 conserva su organización; v2 exige contexto/consentimiento nuevos por cliente y mantiene
+el ancla del actor separada del target de cada llamada. El gateway consume `intent=catalog|target|organizations`
+del reader Greenhouse, valida DTO estricto/contexto/ledger y compara `gv` sólo con el ancla. `authorityRevision`
+de cada target no es credencial ni versión de esa ancla. Cada tool org-scoped exige `organizationId` exacta,
+reemplazada defensivamente por la autorizada antes del callback; el provider mantiene su recheck.
+
+`efeonce.organizations.list` es una tool propia del gateway, v2 interna/base-only, con cuatro annotations
+explícitas y salida estructurada: `organizations[{organizationId, organizationName, capabilities}]` y
+`nextAfterOrganizationId`. Página 1–50 (default 20), sin total global; continuar con el cursor devuelto y
+reiniciar sin él si pierde autorización. Una página no es una concesión para llamadas posteriores.
+La incorporación de una organización elegible y permitida no requiere otra conexión; se vuelve a listar.
+
+El primer adapter de targets sólo delega `growth.seo.observation.read`. El número de tools visible, el scope
+base o una sesión SSO no conceden autoridad universal sobre providers, writes ni otras capabilities.
+Permisos positivos no sobreviven entre requests; target ajeno/ausente/ambiguo o reader indisponible deniega.
+La certificación de Codex y Claude cubre una identidad interna, refresh, revocación y rollback, no apertura
+externa ni capacidad masiva. [ADR D8–D11](EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md#d8--actor-y-objetivo-tienen-autoridad-distinta) ·
+[manual](../manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md) ·
+[QA y límites](../audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md).
 
 ## Context
 

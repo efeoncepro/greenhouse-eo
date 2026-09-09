@@ -166,6 +166,19 @@ La lane `app` expone:
 
 Estos endpoints usan el mismo envelope y versionado de la API Platform.
 
+## Autoridad interna multiorganización del gateway MCP
+
+TASK-1844 reutiliza la lane ecosystem para el reader de autoridad interna: recibe intenciones de catálogo,
+organización objetivo y listado, valida el actor nativo y sus permisos actuales, y devuelve sólo objetivos
+permitidos. Es una integración de máquina entre gateway y Greenhouse; el usuario conecta su cliente a
+`https://mcp.efeonce.org/mcp`, no recibe el token del consumer ni llama ese reader directamente.
+
+El contrato inicial admite lectura SEO, requiere `organizationId` explícito por llamada y conserva la
+comprobación del provider. Una organización nueva no necesita otra credencial cuando los permisos actuales
+la cubren. [Explicación funcional](../identity/acceso-mcp-interno-multiorganizacion.md) ·
+[Manual](../../manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md) ·
+[ADR](../../architecture/EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md#delta-task-1844--autoridad-interna-multiorganización-accepted).
+
 ## Como autentica la app
 
 La app no usa tokens de ecosystem.

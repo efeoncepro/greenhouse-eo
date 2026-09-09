@@ -265,6 +265,13 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 
 ## Acceptance Criteria
 
+- [ ] Arquitectura §9.1: edición emitida genera intención correlacionada para email/in-app/Teamsbot habilitado; cada canal conserva su delivery, dedupe y preferencias. Un fallo parcial no reenvía canales exitosos ni declara entrega global.
+- [ ] Deep link normal lleva a la edición autenticada y conserva contexto tras login; valida cuenta/módulo/acción en servidor. ShareGrant es explícito y separado; GET/scanner no ejecuta acciones ni marca leído.
+- [ ] Destinatarios cliente se resuelven por persona/usuario canónico sin exigir member laboral; se revalidan al despachar. Teamsbot sin destino autorizado se registra no disponible; no hay publicación a canales generales como fallback.
+- [ ] Recurrencia/recordatorios respetan cadencia, zona, preferencias, baja aplicable y estado vigente; resueltos/retirados no se recuerdan. Cada flujo conserva correlación hasta consulta/acción sin usar aperturas como prueba humana.
+- [ ] Integración previa al Hub usa la projection reactiva existente y servicios canónicos; cutover por sus dueñas conserva dedupe/preferencias y demuestra cero doble envío. No otro Hub, projection, self-webhook o cron por cuenta.
+- [ ] La matriz cliente/interno/shared de arquitectura §7.1 se aplica a descargas, grants, correo y schedules: generar no concede distribuir; token no da identidad/biblioteca; correo desde Efeonce conserva capability interna separada.
+- [ ] Cliente con capability explícita puede gestionar grants propios de ediciones elegibles; interno sólo sobre cuentas autorizadas. Audiencia, módulos, revocación y autoridad de cada ocurrencia se revalidan, también con cambios concurrentes.
 - [ ] Manual operativo incluye y prueba aprobación por versión/destinatario, revocación, retry ambiguo, accepted frente a delivered y pausa de schedule; fixtures sanitizados y negativos de permiso/tenant por MCP.
 
 - [ ] Dos grants activos de una edición se revocan individualmente; token desconocido/expirado/revocado no revela identidad ni datos del cliente.
@@ -294,7 +301,19 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 - [ ] Handoff/changelog y contratos UI/API/MCP reflejan disponibilidad real.
 - [ ] Regresiones, señales, rollback y gates documentales pasan; no commit/push/deploy automático.
 
+## Delta 2026-09-09 — distribución para autogestión y gestión
+
+EPIC-046 integra Insights en el portal cliente; TASK-1848 conserva el único contrato de sharing,
+descarga, correo y recurrencia. Cliente autenticado, colaborador autorizado y visitante con token
+tienen límites distintos aunque consuman los mismos commands/readers. No se convierte el sender
+corporativo en relay cliente, ni se crea un segundo ShareGrant desde el portal. Ver arquitectura §7.1.
+
 ## Follow-ups
+
+Integración de canales: TASK-690–693 conserva Hub/preferencias; TASK-303 audiencias, TASK-387 digest y
+TASK-694 medición avanzada. EPIC-046/P09 coordina sus slices. TASK-1848 implementa el caso Insights
+contra sus contratos; no adquiere ownership de la plataforma completa. TASK-1759 y TASK-1774 conservan
+transporte reactivo y baja de correo. Estos enlaces no declaran completadas sus dependencias.
 
 PPTX/DOCX y gráficos adicionales se evalúan por demanda; no crear tasks preventivas. Los gaps dentro de esta
 unidad se resuelven en sus slices. TASK-1672/1673 conservan la integración especializada SEO.

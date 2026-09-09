@@ -1,0 +1,64 @@
+{
+  "observedAt": "2026-09-08 21:13:31 UTC",
+  "scope": "External TASK-1832 connector regression after TASK-1844 flag rollback/restore",
+  "calls": [
+    {
+      "tool": "efeonce.gateway.status",
+      "status": "fulfilled",
+      "isError": false,
+      "result": {
+        "gateway": "ready",
+        "protocol": "2026-07-28",
+        "providers": [
+          {
+            "providerId": "globe",
+            "contractVersion": "v1",
+            "state": "enabled"
+          },
+          {
+            "providerId": "greenhouse-globe-credit-funding",
+            "contractVersion": "v1",
+            "state": "enabled"
+          },
+          {
+            "providerId": "greenhouse-seo",
+            "contractVersion": "task-1645",
+            "state": "enabled"
+          },
+          {
+            "providerId": "greenhouse-hiring",
+            "contractVersion": "task-1726-v1",
+            "state": "enabled"
+          },
+          {
+            "providerId": "greenhouse-skills",
+            "contractVersion": "task-1804",
+            "state": "enabled"
+          }
+        ]
+      }
+    },
+    {
+      "tool": "get_seo_entitlement",
+      "status": "fulfilled",
+      "isError": false,
+      "result": {
+        "provider": "greenhouse-seo",
+        "data": {
+          "ok": true,
+          "organizationId": "org-602d7057-7fd5-47e7-b73b-21892e3f06e7",
+          "hasModule": false,
+          "tier": null,
+          "allowanceCap": 0,
+          "allowanceUsed": 0,
+          "allowanceRemaining": 0,
+          "budgetCapUsd": 0,
+          "budgetUsedUsd": 0,
+          "budgetRemainingUsd": 0,
+          "periodResetAt": "2026-10-01T00:00:00.000Z",
+          "blockedReason": "no_entitlement"
+        }
+      }
+    }
+  ]
+}

@@ -142,7 +142,8 @@ Header `{ "alg": "ES256", "kid": "<RFC 7638 thumbprint>", "typ": "JWT" }` — fi
   sin contexto se conserva la resolución de memberships `bound`. Para internos, `gv` es exactamente la
   versión del binding seleccionado por el contexto, nunca el máximo entre organizaciones.
 - Los access tokens internos incluyen `authorization_context_id` y `authorization_context_version=1|2`
-  firmados. V2 está implementado con gates default OFF en TASK-1844; activación pendiente. El contexto liga sujeto/perfil, cliente, audiencia, organización, binding, environment y sesión
+  firmados. TASK-1844 activó y certificó v2 para una identidad interna el 2026-09-08; las flags mantienen
+  default OFF fuera del rollout aprobado. El contexto liga sujeto/perfil, cliente, audiencia, organización ancla, binding, environment y sesión
   corporativa. Ausencia, versión no soportada o dimensiones ajenas deniegan; no hay fallback por issuer/email.
 - El `jti` se registra en `greenhouse_auth.access_tokens`. TASK-1831 verifica JWT/JWKS y el reader interno
   revalida también ese ledger antes del dispatch: mismo sujeto, cliente, entorno y contexto, sin revocar ni
@@ -159,10 +160,12 @@ Un formulario legacy, código o refresh v1 nunca obtiene autoridad v2. V2 inicia
 
 Issuer/consentimiento y el reader machine-only usan `resolveRuntimeInternalMultiOrg`: snapshot consistente,
 roles/relación/entitlements vigentes y targets independientes. El API acepta `intent=catalog|target|organizations`;
-target requiere ID y capability exactos; discovery usa limit 1–50 (default 20), cursor autorizado, `no-store`
+target requiere ID y capability exactos; discovery usa páginas de 1–50 (default 20, no máximo total), cursor autorizado, `no-store`
 y máximo 128 KiB. El DTO v2 separa `actor` de `targets` con `authorityRevision` opaca, nunca comparada con `gv`.
 La incorporación/retiro de targets se refleja sin reconectar dentro de la misma clase; otras clases requieren
-nuevo consentimiento. [ADR](EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md#d9--contrato-v2-y-discovery-minimizado)
+nuevo consentimiento. El corte inicial sólo delega `growth.seo.observation.read`; base scope, catálogo visible
+y estado conectado no autorizan automáticamente otras tools. El provider mantiene el gate de módulo/negocio.
+Las migraciones expand/contract están aplicadas; no se promueve historia v1 ni se reaplican por reconectar. [ADR](EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md#d9--contrato-v2-y-discovery-minimizado)
 · [rollout expand/contract](../operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md).
 
 ### 4.2 Refresh token
@@ -173,7 +176,10 @@ Opaco `efr_<base64url(32 bytes)>`; se persiste sólo `sha256`; familia = `grant_
 **toda la familia** (refresh + access vigentes) + audit `refresh_reuse` (RFC 6819 §5.2.2.3). Un
 `scope` en el refresh sólo puede **estrechar** el original (`invalid_scope` si excede).
 El contexto, la procedencia de sesión y `auth_time` se preservan: la rotación no rejuvenece autenticación
-ni amplía organización, cliente o permisos. El gate interno OFF deniega también refresh.
+ni amplía cliente, scopes o clase de autoridad. V1 conserva su organización; v2 vuelve a resolver objetivos
+permitidos, sin fijarlos en el token. El gate interno OFF deniega también refresh. Un cliente puede exigir
+login después de un rollback OFF/restore (observado en Claude Code); eso es distinto del cambio ordinario
+de acceso a una organización. [Manual](../manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md).
 
 ### 4.3 Authorization code
 
@@ -361,7 +367,7 @@ La corrección intersecta capacidades declaradas con los dos grants soportados p
 No cambia métodos de autenticación, redirects, scope, consentimiento ni autoridad; no implementa JWT bearer.
 El caso de `oauth-flow.test.ts` reproduce el rechazo anterior, completa consentimiento/PKCE/refresh con
 la declaración extendida y prueba que un intercambio del grant extra no emite tokens. Arrays malformados
-o sin `authorization_code` siguen rechazados. La certificación hospedada productiva se registra por separado
+o sin `authorization_code`, así como identificadores de grant vacíos o con espacios, siguen rechazados. La certificación hospedada productiva se registra por separado
 en [la evidencia de TASK-1844](../audits/mcp/TASK-1844_PRODUCTION_RELEASE_2026-09-08.md).
 
 La decisión aplica el contrato de metadata extensible de

@@ -14,6 +14,16 @@
 > **Runtime del emisor propio:** `https://auth.efeonce.org` sirve OAuth y login de personas; TASK-1829/1830/1831
 > cerraron emisión y consumo multi-issuer. La evidencia viva y el retiro temporal pertenecen a TASK-1832.
 
+## Frontera con el acceso interno multiorganización
+
+TASK-1844 completó v2 interno con contexto actor estable, objetivos explícitos y permisos frescos por
+llamada. Ese contrato no modifica la autoridad externa `memberships[]`, los grants B2B ni la policy del
+canary descritos aquí. No se agregan targets internos mediante `external_capability_grants` ni se promueve
+una persona externa a v2. Sólo la conexión hospedada de Claude del canary fue reemplazada por autorización
+expresa durante la certificación; otros clientes, ventana y retiro global mantienen su expediente TASK-1832.
+[Contrato interno](EFEONCE_INTERNAL_NATIVE_AUTHORITY_DECISION_V1.md) ·
+[evidencia del límite](../audits/mcp/TASK-1844_FIXTURES_RETIRED_2026-09-08.json).
+
 ## Delta aceptado 2026-09-06 — TASK-1832: canary externo sintético, temporal y eliminable
 
 La certificación técnica previa al primer cliente usa una población externa sintética controlada por Efeonce;

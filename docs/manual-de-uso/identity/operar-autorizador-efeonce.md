@@ -23,6 +23,18 @@ hospedado se registró como cliente público DCR, no como confidential. Claude C
 El despliegue y la publicación del host en el balanceador son operaciones de plataforma; están en el
 [runbook](../../operations/runbooks/auth-server.md) (§1 y §4) y no se repiten aquí.
 
+## Operar el contexto interno v2
+
+Para el uso de Codex/Claude, sigue [el manual multiorganización](usar-mcp-interno-multiorganizacion.md).
+El [runbook TASK-1844](../../operations/TASK-1844_INTERNAL_MULTI_ORG_ROLLOUT.md) gobierna cohortes, tres gates,
+lectura por target y rollback después del SQL expand/contract aplicado. No reapliques ese SQL ni restaures
+un writer incompatible. Una conexión v1 sólo pasa a v2 con consentimiento nuevo; no se modifica su versión.
+
+Al retirar una sesión, contexto, consentimiento o familia, identifica antes el alcance exacto y sus familias
+activas. Una familia nueva puede compartir contexto con otra revocada. No retires todas por contexto para
+limpiar una familia de prueba ni elimines un CIMD compartido. La certificación de TASK-1844 conserva sus
+[conexiones definitivas](../../audits/mcp/TASK-1844_FINAL_CLIENTS_2026-09-08.json).
+
 ## Antes de empezar
 
 - Necesitas `gcloud` autenticado en el proyecto `efeonce-group` y, para rotar llaves, acceso a PostgreSQL por el
