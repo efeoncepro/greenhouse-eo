@@ -2,6 +2,10 @@
 
 Dueño: Client Experience / Platform. TASK-1852, EPIC-046.
 
+Estado verificado 2026-09-09: código servido en Production, SHA `5726ce9d90`, con altas nuevas OFF.
+La apertura cliente sigue pendiente de mapping comercial, destinatarios y certificación humana/canales.
+[Evidencia del rollout y rollback](../audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md).
+
 ## Contrato y límites
 
 La unidad es una organización canónica, una lista explícita de pares servicio/módulo y personas de

@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-046`
-- Status real: `code complete, rollout pendiente. Mecanismo común local y conciliación comercial, 392 tests y smoke HTTP autenticado verificados; alcance comercial confirmado por el operador y rollout autorizado. Registros comerciales, paridad de escritura delegada, login/rutas/canales y deploy pendientes; task abierta`
+- Status real: `code complete, rollout cliente pendiente. Capacidad común en Production: PR 231/main 5726ce9d90, orquestador 34416904936 success, manifest released, cinco workers Ready, health/watchdog y siete canaries HTTP verdes. 392 tests; excepción autorizada y auditada. Altas OFF; mapping comercial, paridad de escritura delegada y login/rutas/canales pendientes; task abierta`
 - Rank: `1`
 - Domain: `platform|identity|delivery`
 - Blocked by: `none`
@@ -187,7 +187,9 @@ Baseline de código y documentos de esta planificación; flags, datos y entrega 
 - [x] [Discovery y matriz inicial](../../audits/client-portal/TASK-1852_SERVICE_ENABLEMENT_DISCOVERY_2026-09-09.md): schema/FK/índices/triggers, cohortes, servicios, fuentes, usuarios y canales consultados read-only; 68 tests baseline passed.
 - [x] [Plan de implementación](../plans/TASK-1852-plan.md) aprobado en el checkpoint humano P1 de `TASK_PROCESS.md` §Phase 3 («Vamos», 2026-09-09). Goal y plan aprobados; hook revalidado en develop.
 - [x] Código local: reader/preview, apply/rollback, atomic command store, App/Ecosystem/CLI/MCP/Nexa y documentación. 290 tests; certificación de configuración en [readback](../../audits/client-portal/TASK-1852_PREVIEW_READBACK_2026-09-09.json).
-- [ ] Apertura operativa: contratos, login/rutas/canales, authority delegada y rollout sin certificar; [blockers con dueño](../../audits/client-portal/TASK-1852_IMPLEMENTATION_QA_2026-09-09.md).
+- [x] Rollout de staging: SHA `68e18fe0`, deployment READY, siete canaries HTTP; [evidencia y recuperación de workers](../../audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md).
+- [x] Rollout técnico Production: PR #231, SHA `5726ce9d90`, manifest `released`, cinco workers Ready y 100 % de tráfico, watchdog sin drift/datos ausentes; siete canaries HTTP. [Readback](../../audits/client-portal/TASK-1852_PRODUCTION_RELEASE_READBACK_2026-09-09.json). Excepción puntual de acceso autorizada y persistida; altas OFF.
+- [ ] Apertura operativa: mapping comercial, destinatarios Berel, login/rutas/canales y authority delegada sin certificar. [Blockers con dueño](../../audits/client-portal/TASK-1852_IMPLEMENTATION_QA_2026-09-09.md).
 
 Rollout autorizado el 2026-09-09 con alcance de servicios y equipo confirmado por el operador. Detalles comerciales preservados en evidencia local privada; [registro técnico](../../audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md). La confirmación no inventa precios, vigencia contractual, destinatarios ni preferencias.
 
@@ -293,10 +295,10 @@ Fuentes de Berel/Sky, responsables, consentimiento de piloto y disponibilidad Te
 
 ## Closing Protocol
 
-- [x] Status real, Lifecycle y carpeta reflejan evidencia; permanece in-progress sin rollout.
+- [x] Status real, Lifecycle y carpeta reflejan evidencia; permanece in-progress con código desplegado y apertura cliente pendiente.
 - [x] Criterios locales tildados con evidencia; login/canales/paridad delegada siguen sin tildar.
 - [x] Registry/README/EPIC-046 al día; documentación técnica/funcional, manual y recuperación en runbook.
-- [x] Handoff/changelog al día; gates documentales finales registrados en QA. Sin commit/push automático.
+- [x] Handoff/changelog al día; gates y promoción autorizada registrados en la auditoría de rollout. Sin apertura cliente implícita.
 
 ## Follow-ups
 

@@ -4,8 +4,8 @@ Panel operativo de tasks del repo.
 
 ## Portal de servicios: EPIC-046
 
-TASK-1852 en `in-progress`: mecanismo común implementado, 290 tests y preview PG real; [QA/matriz](../audits/client-portal/TASK-1852_IMPLEMENTATION_QA_2026-09-09.md).
-Rollout y escritura delegada pendientes. TASK-1853–1856 siguen `to-do`. TASK-1834 conserva
+TASK-1852 en `in-progress`: 392 tests, Production `released` y siete canaries HTTP; [rollout/PR #231](../audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md).
+Altas OFF; mapping comercial, escritura delegada y apertura cliente pendientes. TASK-1853–1856 siguen `to-do`. TASK-1834 conserva
 contrato de identidad y rollout nativo condicional; login vigente se certifica por separado.
 
 | Task | Entrega | Dependencias base |

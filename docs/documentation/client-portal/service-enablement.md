@@ -1,7 +1,10 @@
 # Habilitación de servicios
 
-TASK-1852 prepara un mecanismo común para relacionar servicios contratados, módulos del portal y personas
+TASK-1852 ofrece un mecanismo común para relacionar servicios contratados, módulos del portal y personas
 de cada organización. Berel y Sky son la primera cohorte de conciliación, no ramas especiales del producto.
+
+El código está desplegado en producción. Las altas nuevas permanecen apagadas; la apertura de cada cuenta
+requiere completar su vínculo comercial y certificar personas, acceso y canales.
 
 El preview muestra configuración observada, asignaciones actuales, cambios propuestos, exclusiones por
 persona y comprobaciones pendientes. Una fuente ausente, una preferencia no declarada o un login no probado

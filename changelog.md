@@ -17,7 +17,9 @@ HTTP autenticado; [QA y matriz Berel/Sky](docs/audits/client-portal/TASK-1852_IM
 Rollout autorizado y alcance Berel/Sky confirmado por el operador; permiso de compensación EFEONCE_ADMIN
 corregido, 392 tests passed. Servicio Berel sincronizado por command; resolver HubSpot vigente y
 normalizador conservan importes ausentes NULL. [Estado del despliegue](docs/audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md).
-Registros comerciales y certificación cliente pendientes; sin asignaciones live ni envíos.
+PR #231/main `5726ce9d90` en Production; orquestador `34416904936` success y manifest `released`.
+CI/Deep/build, cinco workers Ready, health, watchdog sin drift y siete canaries HTTP verdes. Excepción
+de compensación autorizada y auditada. Altas OFF; mapping comercial y certificación cliente pendientes.
 
 ## 2026-09-09 — Planificación estacional Efeonce y continuidad editorial
 

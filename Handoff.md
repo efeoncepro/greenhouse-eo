@@ -3,11 +3,11 @@
 **Social Efeonce, 09/09:** [13 piezas y skills](docs/audits/social/EFEONCE_SEASONAL_CONTENT_PLAN_2026_2027.md).
 Pendiente: conciliar MET-2339–2342 tarea/calendario. Producción abierta; cierre documental sin cambios Notion.
 
-**EPIC-046 / TASK-1852 (09/09):** rollout autorizado; [estado y alcance](docs/audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md).
-392 tests (312 dominio + 80 intake); build del dominio verde. Permiso pause EFEONCE_ADMIN corregido según canon.
-Berel ya sincronizado desde HubSpot con importes NULL; alcance privado. Falta destinatario humano.
-Equipo Sky conciliado; términos, login/rutas/canales pendientes.
-No aplicar SQL para el gap comercial. Writes OFF hasta certificación; task abierta, sin envíos.
+**EPIC-046 / TASK-1852 (09/09):** Production `released`; [evidencia y pendientes](docs/audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md).
+PR #231/main `5726ce9d90`, orquestador `34416904936` success; CI/Deep/Vercel, canary 7/7 y watchdog verdes.
+Cinco workers Ready; Ops/auth conservan árbol equivalente y flags/cohorte. Excepción pause autorizada y auditada.
+Berel sincronizado con importes NULL; equipo Sky conciliado. Alcance privado; cinco asignaciones preservadas.
+Writes OFF; faltan mapping comercial, destinatarios Berel y login/rutas/canales. Task abierta; sin envíos ni SQL ad hoc.
 TASK-1834 conserva entrada, TASK-1687 catálogo; 1853–1856 to-do. TASK-1690 sigue in-progress.
 
 **EPIC-045 ↔ EPIC-046:** Hitos I/N obligatorios: Insights cliente/interno + email/in-app/Teamsbot con

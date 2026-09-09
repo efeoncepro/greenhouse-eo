@@ -5,10 +5,10 @@
 - Goal aprobado por el operador el 2026-09-09: mecanismo común para clientes; Berel/Sky como primera cohorte.
 - Hook ejecutado: `pnpm codex:task-hook TASK-1852 --develop`.
 - Checkout compartido: `develop`; limpio al iniciar. Sin subagentes, worktrees ni cambio de rama.
-- **Estado: plan aprobado («Vamos»), código local verificado; rollout pendiente.**
+- **Estado: plan aprobado («Vamos»), código desplegado en Production y manifest released; apertura cliente pendiente con altas OFF.**
 - `TASK_PROCESS.md` §Phase 3 exige aprobación del plan para P1. La aprobación previa del goal se conserva;
   no se vuelve a pedir sobre ese alcance. Checkpoint P1 aprobado el 2026-09-09; hook revalidado en develop.
-- Sin commit/push/deploy, asignaciones live, invitaciones, envíos ni migración de datos de clientes.
+- Límite inicial sin commit/push/deploy, ampliado por «Haz el rollout» y la excepción «Ok autorizado»; sin nuevas asignaciones, invitaciones ni envíos.
   La instrucción del goal prevalece sobre los commits automáticos descritos en el proceso general.
 
 ## Discovery summary
@@ -191,8 +191,8 @@ produce `canApply=false` en ambas cuentas y preserva sus asignaciones. Se añadi
 fechas civiles sin dependencia del TZ de Node y reautorización Nexa antes de replay.
 
 La tarjeta Nexa se reutiliza sin cambios visuales estructurales; el servidor prepara su fingerprint/input.
-Sesiones agent no pueden aprobar writes. API/MCP mutante delegado conserva 403; el default admin no
-concede pause. Sin ampliar grants ni federar tools. [QA/matriz y blockers](../../audits/client-portal/TASK-1852_IMPLEMENTATION_QA_2026-09-09.md)
+Sesiones agent no pueden aprobar writes. API/MCP mutante delegado conserva 403. El default admin omitía
+pause; la continuación autorizada corrigió esa omisión conforme al canon. Sin grants cliente ni federar tools. [QA/matriz y blockers](../../audits/client-portal/TASK-1852_IMPLEMENTATION_QA_2026-09-09.md)
 y [runbook](../../operations/CLIENT_SERVICE_ENABLEMENT_RUNBOOK_V1.md). Apertura cliente sin certificar.
 
 El smoke HTTP exigió dos fixes mínimos adicionales dentro de los invariantes aprobados: preservar la
@@ -205,3 +205,5 @@ modifican login, roles ni grants. Fuente: QA de implementación.
 El operador confirmó los servicios y ordenó «Haz el rollout». Preparar commit/push/promoción por el control plane, verificar compensación EFEONCE_ADMIN y desplegar la capacidad común. Mantener checkout develop, sin subagentes. Los registros comerciales siguen en Commercial/HubSpot; no introducir escrituras SQL para satisfacer el preview ni convertir al equipo interno en destinatarios cliente. La evidencia local privada conserva alcance, cantidades, responsabilidades y equipo confirmado. Certificar por separado deployment, flags, datos y entrada humana.
 
 Rollout: al conciliar Berel se verificó el servicio HubSpot existente. Fix acotado del intake: reusar resolver de credencial TASK-1230 y preservar montos ausentes NULL. Pruebas y readback incluidos; sin nuevo writer, migration, precios o contratos.
+
+Producción: PR #231/main `5726ce9d90`; orquestador `34416904936` success, manifest `released`, health/watchdog y siete canaries HTTP verdes. Excepción de compensación autorizada y auditada; cinco asignaciones preservadas. Altas OFF y apertura cliente pendiente de contrato, personas, autoridad y canales. [Evidencia final](../../audits/client-portal/TASK-1852_PRODUCTION_RELEASE_READBACK_2026-09-09.json).

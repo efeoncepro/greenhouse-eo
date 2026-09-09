@@ -2221,7 +2221,7 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 
 | Task ID | Lifecycle actual | Alcance | Archivo actual |
 |---|---|---|---|
-| `TASK-1852` | `in-progress` | **Habilitación común de servicios, acceso y canales; cohorte Berel/Sky.** EPIC-046; P1/Alto; backend-data. Código común local, 290 tests y preview PG verificados 2026-09-09. Rollout, escritura delegada y authority de compensación pendientes; task abierta. | `docs/tasks/in-progress/TASK-1852-berel-sky-service-access-and-channel-enablement.md` |
+| `TASK-1852` | `in-progress` | **Habilitación común de servicios, acceso y canales; cohorte Berel/Sky.** EPIC-046; P1/Alto; backend-data. 392 tests; PR #231/main `5726ce9d90` en Production `released`, siete canaries HTTP y watchdog verdes. Altas OFF; mapping comercial, escritura delegada y certificación cliente pendientes. | `docs/tasks/in-progress/TASK-1852-berel-sky-service-access-and-channel-enablement.md` |
 | `TASK-1853` | `to-do` | **Lectura cliente de servicios, avance y métricas.** EPIC-046; P1/Alto; backend-data. Registro autorizado 2026-09-09, sin implementación. | `docs/tasks/to-do/TASK-1853-client-service-progress-and-metrics-read-model.md` |
 | `TASK-1854` | `to-do` | **Inicio y Mis servicios: resultados, avance y próximos pasos.** EPIC-046; P1/Alto; ui-ux. Registro autorizado 2026-09-09, sin implementación. | `docs/tasks/to-do/TASK-1854-client-home-services-and-cycle-experience.md` |
 | `TASK-1855` | `to-do` | **Solicitudes y briefs del servicio: commands y seguimiento.** EPIC-046; P1/Alto; backend-data. Registro autorizado 2026-09-09, sin implementación. | `docs/tasks/to-do/TASK-1855-client-service-requests-and-briefs-commands.md` |

@@ -1,0 +1,593 @@
+{
+  "observedAt": "2026-09-09T23:39:46.144204+00:00",
+  "scope": "technical production rollout; new customer assignments OFF",
+  "release": {
+    "release_id": "5726ce9d90d7-61ae6901-a225-46bc-b993-2b671a12ce1d",
+    "target_sha": "5726ce9d90d7a0bb3e9ed6aaab011b50351430d2",
+    "state": "released",
+    "workflow_runs": [],
+    "started_at": "2026-09-09T23:28:53.308Z",
+    "completed_at": "2026-09-09T23:38:36.029Z",
+    "vercel_deployment_url": null,
+    "worker_revisions": {},
+    "override": {
+      "actor": "cesargrowth11",
+      "reason": "TASK-1852: Julio Reyes autorizo expresamente la excepcion puntual de batch policy para el permiso de compensacion EFEONCE_ADMIN. CI, CI Deep, smoke y Vercel del SHA exacto se verifican antes del dispatch. Altas nuevas OFF; rollback al release 45f6910e preparado. Auditoria y post-mortem en TASK-1852_ROLLOUT_2026-09-09.md. No se declara incidente ni se amplian permisos cliente.",
+      "bypassWarnings": true,
+      "overrideBatchPolicy": true
+    },
+    "post_release_health": {}
+  },
+  "transitions": [
+    {
+      "from_state": "unknown_legacy",
+      "to_state": "preflight",
+      "actor_kind": "member",
+      "actor_label": "cesargrowth11",
+      "reason": "Release iniciado: cesargrowth11",
+      "metadata_json": {
+        "override": {
+          "actor": "cesargrowth11",
+          "reason": "TASK-1852: Julio Reyes autorizo expresamente la excepcion puntual de batch policy para el permiso de compensacion EFEONCE_ADMIN. CI, CI Deep, smoke y Vercel del SHA exacto se verifican antes del dispatch. Altas nuevas OFF; rollback al release 45f6910e preparado. Auditoria y post-mortem en TASK-1852_ROLLOUT_2026-09-09.md. No se declara incidente ni se amplian permisos cliente.",
+          "bypassWarnings": true,
+          "overrideBatchPolicy": true
+        },
+        "attempt_n": 1,
+        "target_sha": "5726ce9d90d7a0bb3e9ed6aaab011b50351430d2"
+      },
+      "transitioned_at": "2026-09-09T23:28:53.308Z"
+    },
+    {
+      "from_state": "preflight",
+      "to_state": "ready",
+      "actor_kind": "cli",
+      "actor_label": "orchestrator-workflow",
+      "reason": "Approval gate cleared (orchestrator workflow 34416904936)",
+      "metadata_json": {},
+      "transitioned_at": "2026-09-09T23:38:24.339Z"
+    },
+    {
+      "from_state": "ready",
+      "to_state": "deploying",
+      "actor_kind": "cli",
+      "actor_label": "orchestrator-workflow",
+      "reason": "Workers deploy started (orchestrator workflow 34416904936)",
+      "metadata_json": {},
+      "transitioned_at": "2026-09-09T23:38:28.135Z"
+    },
+    {
+      "from_state": "deploying",
+      "to_state": "verifying",
+      "actor_kind": "cli",
+      "actor_label": "orchestrator-workflow",
+      "reason": "Workers deploy completed (orchestrator workflow 34416904936)",
+      "metadata_json": {},
+      "transitioned_at": "2026-09-09T23:38:32.009Z"
+    },
+    {
+      "from_state": "verifying",
+      "to_state": "released",
+      "actor_kind": "cli",
+      "actor_label": "orchestrator-workflow",
+      "reason": "Post-release health verified (orchestrator workflow 34416904936)",
+      "metadata_json": {},
+      "transitioned_at": "2026-09-09T23:38:36.029Z"
+    }
+  ],
+  "workflow": {
+    "status": "completed",
+    "conclusion": "success",
+    "headSha": "5726ce9d90d7a0bb3e9ed6aaab011b50351430d2",
+    "createdAt": "2026-09-09T23:25:58Z",
+    "updatedAt": "2026-09-09T23:38:44Z"
+  },
+  "workflowId": 34416904936,
+  "vercel": {
+    "deploymentId": "dpl_mfME7kGqyyyD5tgY2sVsVZVc42ti",
+    "state": "READY",
+    "sha": "5726ce9d90d7a0bb3e9ed6aaab011b50351430d2",
+    "alias": "https://greenhouse.efeoncepro.com"
+  },
+  "runtime": {
+    "observedAt": "2026-09-09T23:36:56.305Z",
+    "targetSha": "5726ce9d90d7a0bb3e9ed6aaab011b50351430d2",
+    "services": [
+      {
+        "service": "ops-worker",
+        "region": "us-east4",
+        "url": "https://ops-worker-y6egnifl6a-uk.a.run.app",
+        "traffic": [
+          {
+            "latestRevision": true,
+            "percent": 100,
+            "revisionName": "ops-worker-00672-jmj"
+          }
+        ],
+        "specTraffic": [
+          {
+            "latestRevision": true,
+            "percent": 100
+          }
+        ],
+        "ready": "True",
+        "revisions": [
+          {
+            "revision": "ops-worker-00672-jmj",
+            "digest": "gcr.io/efeonce-group/ops-worker@sha256:5ebe5d0179e9e6aa6f39bd518cb9cdc1fa8861c94c16466421e50fc010ad58c3",
+            "flags": [
+              {
+                "name": "GIT_SHA",
+                "value": "68e18fe0be8ea40085d3904d9ddfa4730a57a2ba"
+              }
+            ],
+            "conditions": [
+              {
+                "type": "Ready",
+                "status": "True"
+              },
+              {
+                "type": "Active",
+                "status": "True"
+              },
+              {
+                "type": "ContainerHealthy",
+                "status": "True"
+              },
+              {
+                "type": "ContainerReady",
+                "status": "True"
+              },
+              {
+                "type": "ResourcesAvailable",
+                "status": "True"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "service": "commercial-cost-worker",
+        "region": "us-east4",
+        "url": "https://commercial-cost-worker-y6egnifl6a-uk.a.run.app",
+        "traffic": [
+          {
+            "latestRevision": true,
+            "percent": 100,
+            "revisionName": "commercial-cost-worker-00575-qlj"
+          }
+        ],
+        "specTraffic": [
+          {
+            "latestRevision": true,
+            "percent": 100
+          }
+        ],
+        "ready": "True",
+        "revisions": [
+          {
+            "revision": "commercial-cost-worker-00575-qlj",
+            "digest": "gcr.io/efeonce-group/commercial-cost-worker@sha256:d58e35c69f19f871eca71823967fbabb87915d078ee302c2efcd74806c9bebe5",
+            "flags": [
+              {
+                "name": "GIT_SHA",
+                "value": "5726ce9d90d7a0bb3e9ed6aaab011b50351430d2"
+              }
+            ],
+            "conditions": [
+              {
+                "type": "Ready",
+                "status": "True"
+              },
+              {
+                "type": "Active",
+                "status": "True"
+              },
+              {
+                "type": "ContainerHealthy",
+                "status": "True"
+              },
+              {
+                "type": "ContainerReady",
+                "status": "True"
+              },
+              {
+                "type": "ResourcesAvailable",
+                "status": "True"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "service": "ico-batch-worker",
+        "region": "us-east4",
+        "url": "https://ico-batch-worker-y6egnifl6a-uk.a.run.app",
+        "traffic": [
+          {
+            "latestRevision": true,
+            "percent": 100,
+            "revisionName": "ico-batch-worker-00384-6mz"
+          }
+        ],
+        "specTraffic": [
+          {
+            "latestRevision": true,
+            "percent": 100
+          }
+        ],
+        "ready": "True",
+        "revisions": [
+          {
+            "revision": "ico-batch-worker-00384-6mz",
+            "digest": "gcr.io/efeonce-group/ico-batch-worker@sha256:780e34352c279822d7e3b93e96df9a80288248a0f5308d7f031819d071d43073",
+            "flags": [
+              {
+                "name": "GIT_SHA",
+                "value": "5726ce9d90d7a0bb3e9ed6aaab011b50351430d2"
+              }
+            ],
+            "conditions": [
+              {
+                "type": "Ready",
+                "status": "True"
+              },
+              {
+                "type": "Active",
+                "status": "True"
+              },
+              {
+                "type": "ContainerHealthy",
+                "status": "True"
+              },
+              {
+                "type": "ContainerReady",
+                "status": "True"
+              },
+              {
+                "type": "ResourcesAvailable",
+                "status": "True"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "service": "hubspot-greenhouse-integration",
+        "region": "us-central1",
+        "url": "https://hubspot-greenhouse-integration-y6egnifl6a-uc.a.run.app",
+        "traffic": [
+          {
+            "latestRevision": true,
+            "percent": 100,
+            "revisionName": "hubspot-greenhouse-integration-00180-j24"
+          }
+        ],
+        "specTraffic": [
+          {
+            "latestRevision": true,
+            "percent": 100
+          }
+        ],
+        "ready": "True",
+        "revisions": [
+          {
+            "revision": "hubspot-greenhouse-integration-00180-j24",
+            "digest": "gcr.io/efeonce-group/hubspot-greenhouse-integration@sha256:502143f922ba5c9c358bf2834678d27b00cdcbe6aa2044b69cc0ce65fb6d8f01",
+            "flags": [
+              {
+                "name": "GIT_SHA",
+                "value": "5726ce9d90d7a0bb3e9ed6aaab011b50351430d2"
+              }
+            ],
+            "conditions": [
+              {
+                "type": "Ready",
+                "status": "True"
+              },
+              {
+                "type": "Active",
+                "status": "True"
+              },
+              {
+                "type": "ContainerHealthy",
+                "status": "True"
+              },
+              {
+                "type": "ContainerReady",
+                "status": "True"
+              },
+              {
+                "type": "ResourcesAvailable",
+                "status": "True"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "service": "auth-server",
+        "region": "us-east4",
+        "url": "https://auth-server-y6egnifl6a-uk.a.run.app",
+        "traffic": [
+          {
+            "latestRevision": true,
+            "percent": 100,
+            "revisionName": "auth-server-00049-pvz"
+          }
+        ],
+        "specTraffic": [
+          {
+            "latestRevision": true,
+            "percent": 100
+          }
+        ],
+        "ready": "True",
+        "revisions": [
+          {
+            "revision": "auth-server-00049-pvz",
+            "digest": "gcr.io/efeonce-group/auth-server@sha256:e2572350dc8a30a3dfd015cdb1248db8fbf58feb32f89ff6297a2dac072edeae",
+            "flags": [
+              {
+                "name": "AUTH_SERVER_ENABLED",
+                "value": "true"
+              },
+              {
+                "name": "EXTERNAL_IDENTITY_CANARY_ENABLED",
+                "value": "true"
+              },
+              {
+                "name": "AUTH_SERVER_INTERNAL_AUTH_ENABLED",
+                "value": "true"
+              },
+              {
+                "name": "AUTH_SERVER_INTERNAL_MULTI_ORG_ENABLED",
+                "value": "true"
+              },
+              {
+                "name": "AUTH_SERVER_INTERNAL_MULTI_ORG_PROFILE_IDS",
+                "value": "identity-greenhouse-auth-client-user-user-efeonce-admin-julio-reyes"
+              },
+              {
+                "name": "GIT_SHA",
+                "value": "68e18fe0be8ea40085d3904d9ddfa4730a57a2ba"
+              }
+            ],
+            "conditions": [
+              {
+                "type": "Ready",
+                "status": "True"
+              },
+              {
+                "type": "Active",
+                "status": "True"
+              },
+              {
+                "type": "ContainerHealthy",
+                "status": "True"
+              },
+              {
+                "type": "ContainerReady",
+                "status": "True"
+              },
+              {
+                "type": "ResourcesAvailable",
+                "status": "True"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "health": [
+      {
+        "url": "https://greenhouse.efeoncepro.com/api/auth/health",
+        "status": 200,
+        "body": {
+          "contractVersion": "auth-readiness.v1",
+          "generatedAt": "2026-09-09T23:35:48.192Z",
+          "providers": [
+            {
+              "provider": "azure-ad",
+              "status": "ready",
+              "checkedAt": "2026-09-09T23:35:48.197Z"
+            },
+            {
+              "provider": "google",
+              "status": "ready",
+              "checkedAt": "2026-09-09T23:35:48.208Z"
+            },
+            {
+              "provider": "credentials",
+              "status": "ready",
+              "checkedAt": "2026-09-09T23:35:48.192Z"
+            }
+          ],
+          "overallStatus": "ready",
+          "nextAuthSecretReady": true
+        }
+      },
+      {
+        "url": "https://auth.efeonce.org/readyz",
+        "status": 200,
+        "body": {
+          "status": "ready",
+          "service": "auth-server",
+          "oauth": true,
+          "checks": {
+            "postgres": "ok",
+            "kms": "ok",
+            "activeKey": "ok"
+          },
+          "timestamp": "2026-09-09T23:36:56.348Z"
+        }
+      }
+    ]
+  },
+  "watchdog": {
+    "observedAt": "2026-09-09T23:39:17.645Z",
+    "aggregateSeverity": "ok",
+    "exitCode": 0,
+    "teamsDispatched": false,
+    "teamsSkippedReason": "no findings con severity > ok",
+    "signals": [
+      {
+        "signalId": "platform.release.stale_approval",
+        "severity": "ok",
+        "summary": "Sin runs production esperando approval > 24h. Workflows allowlist limpios.",
+        "evidence": [
+          {
+            "kind": "metric",
+            "label": "count",
+            "value": "0"
+          },
+          {
+            "kind": "doc",
+            "label": "Spec",
+            "value": "docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md §2.9"
+          }
+        ]
+      },
+      {
+        "signalId": "platform.release.pending_without_jobs",
+        "severity": "ok",
+        "summary": "Sin runs pending > 5min con jobs vacios. Concurrency fix Opcion A (Slice 3) operando.",
+        "evidence": [
+          {
+            "kind": "metric",
+            "label": "count",
+            "value": "0"
+          },
+          {
+            "kind": "doc",
+            "label": "Spec",
+            "value": "docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md §2.9"
+          }
+        ]
+      },
+      {
+        "signalId": "platform.release.worker_revision_drift",
+        "severity": "ok",
+        "summary": "5/5 workers synced. Cloud Run revision matchea ultimo workflow run success.",
+        "evidence": [
+          {
+            "kind": "metric",
+            "label": "workers_checked",
+            "value": "5"
+          },
+          {
+            "kind": "metric",
+            "label": "drift_count",
+            "value": "0"
+          },
+          {
+            "kind": "metric",
+            "label": "data_missing_count",
+            "value": "0"
+          },
+          {
+            "kind": "metric",
+            "label": "detail",
+            "value": "ops-worker: gh=5726ce9d90d7 != run=68e18fe0be8e (change-gated — rutas runtime sin cambios; workflow omitió deploy y servicio está Ready=True) | commercial-cost-worker: gh=5726ce9d90d7 == run=5726ce9d90d7 (synced) | ico-batch-worker: gh=5726ce9d90d7 == run=5726ce9d90d7 (synced) | hubspot-greenhouse-integration: gh=5726ce9d90d7 == run=5726ce9d90d7 (synced) | auth-server: gh=5726ce9d90d7 != run=68e18fe0be8e (change-gated — rutas runtime sin cambios; workflow omitió deploy y servicio está Ready=True)"
+          },
+          {
+            "kind": "doc",
+            "label": "Spec",
+            "value": "docs/architecture/GREENHOUSE_RELEASE_CONTROL_PLANE_V1.md §2.9"
+          }
+        ]
+      }
+    ]
+  },
+  "contractCanary": {
+    "observedAt": "2026-09-09T23:36:57.436Z",
+    "baseURL": "https://greenhouse.efeoncepro.com",
+    "actor": "dedicated internal agent; no human login proof",
+    "cases": [
+      {
+        "case": "Grupo Berel",
+        "status": 200,
+        "canApply": false,
+        "blockers": [
+          "commercial_mapping_unresolved",
+          "commercial_mapping_unresolved"
+        ],
+        "organizationId": "org-32333527-02a8-487b-819e-6f76a761777d"
+      },
+      {
+        "case": "Sky Airlines",
+        "status": 200,
+        "canApply": false,
+        "blockers": [
+          "commercial_mapping_unresolved"
+        ],
+        "organizationId": "org-b9977f96-f7ef-4afb-bb26-7355d78c981f"
+      },
+      {
+        "case": "reject_body_actor",
+        "status": 400
+      },
+      {
+        "case": "reject_foreign_people",
+        "status": 200,
+        "codes": [
+          "commercial_mapping_unresolved",
+          "commercial_mapping_unresolved",
+          "person_not_authorized_in_organization",
+          "person_not_authorized_in_organization",
+          "person_not_authorized_in_organization"
+        ],
+        "returnedPeople": 0
+      },
+      {
+        "case": "missing_org",
+        "status": 404
+      },
+      {
+        "case": "anonymous",
+        "status": 401
+      },
+      {
+        "case": "agent_write_denied",
+        "status": 403,
+        "codes": [
+          "invalid_delegated_context"
+        ]
+      }
+    ]
+  },
+  "writeFlag": {
+    "observedAt": "2026-09-09T23:32:21.805395+00:00",
+    "environment": "production",
+    "name": "CLIENT_SERVICE_ENABLEMENT_WRITES_ENABLED",
+    "present": false,
+    "value": null,
+    "effectiveEnabled": false,
+    "source": "fresh vercel env pull"
+  },
+  "preservation": {
+    "moduleAssignmentsUnchanged": true,
+    "assignmentCount": 5,
+    "service": [
+      {
+        "service_id": "SVC-HS-554261764224",
+        "active": true,
+        "status": "active",
+        "missing_total_cost": true,
+        "missing_amount_paid": true
+      }
+    ]
+  },
+  "fullTreeEquivalence": {
+    "observedAt": "2026-09-09T23:32:11.063Z",
+    "moduleAssignmentsUnchanged": true,
+    "assignmentCount": 5,
+    "candidateSha": "68e18fe0be8ea40085d3904d9ddfa4730a57a2ba",
+    "productionSha": "5726ce9d90d7a0bb3e9ed6aaab011b50351430d2",
+    "fullTrees": [
+      "aaff5f5b8680d3e9df867503e97e29ad1519075b",
+      "aaff5f5b8680d3e9df867503e97e29ad1519075b"
+    ],
+    "fullTreeDiffFiles": 0
+  },
+  "manifestLimit": "workflow_runs, worker_revisions and post_release_health remain empty in the persisted manifest; external workflow/runtime evidence is recorded separately here."
+}
