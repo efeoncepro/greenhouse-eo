@@ -167,3 +167,33 @@ Resolve in order:
 If more than one destination remains, ask once. Never infer solely from assignee or a generic title, and never carry a silent default across conversations.
 
 An explicit destination that contradicts a bound parent/project is an error, not a precedence win.
+
+## Pares de tarea y calendario editorial
+
+Aplicación interactiva del create/write path a contenido social; no implementa un sync entre bases.
+
+1. Resolver el proyecto y calendario desde la conversación y los bindings existentes. Un nombre de
+   trimestre no demuestra un filtro: inspeccionar schema y vista antes de afirmar dónde aparecerá
+   una fecha. Conservar la fecha real; no renombrar o crear otro contenedor por inferencia.
+2. Buscar duplicados por ocasión, año, mercado y proyecto. Un título parecido en otro cliente no es
+   la misma tarea. Reutilizar un slot vacío compatible; si tiene contenido o comentarios, leerlo y
+   hacer la menor edición completa preservando lo ajeno.
+3. Inspeccionar el destino de cada relación. `Tareas` y `Tareas Efeonce`, o dos `Proyectos`,
+   pueden apuntar a bases diferentes. Verificar data source y página destino antes de vincular.
+4. La tarea lleva responsable, entrega y proyecto; el calendario, fecha de publicación y relación
+   a la tarea. Copias de responsable/entrega en el calendario deben coincidir al cerrar una escritura
+   autorizada de ambos. Nunca usar la fecha de producción como fecha de la efeméride.
+5. El cuerpo conserva brief y copy suficiente para operar, con mención nativa a la tarea. Una copia
+   de brief no es un bloque sincronizado: una edición posterior no se propaga automáticamente.
+6. Tras crear o actualizar, releer cada página afectada: nombre, responsable, entrega, publicación,
+   relación, estado y secciones del body. Comprobar truncación/unsupported blocks cuando sean relevantes.
+7. Si las propiedades cambian después, reportar el valor actual y la divergencia con calendario/body.
+   No sobrescribir con el snapshot anterior ni inferir autor o causa por `last_edited_time`.
+   Una solicitud solo documental registra la diferencia; una conciliación autorizada requiere
+   relectura puntual y edición mínima de campos y frases stale.
+8. Distinguir una fecha sugerida en el body de un deadline asignado. Distinguir `Brief listo`,
+   producción terminada, aprobación y programación/publicación; usar los estados del schema real.
+
+Los IDs y snapshots de un caso viven en el documento fechado de ese caso, no se convierten en
+defaults de clientes o conversaciones. Para Efeonce, ejemplo:
+`docs/audits/social/EFEONCE_SEASONAL_CONTENT_PLAN_2026_2027.md`.

@@ -3,7 +3,7 @@
 ## Estado vigente para agentes
 
 Greenhouse: plataforma operativa Efeonce Group, Next.js 16/MUI 7/Vuexy starter-kit/TypeScript.
-Contratos durables aquí; estado en [Handoff.md](Handoff.md); historia preservada en
+Estado: [Handoff.md](Handoff.md). Historia:
 [`docs/operations/agent-context-history/2026-07-19/project_context.legacy.md`](docs/operations/agent-context-history/2026-07-19/project_context.legacy.md).
 
 Reingresos e identidad: [contrato canónico](docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md).
@@ -122,6 +122,7 @@ Efeonce Insights: [arquitectura](docs/architecture/EFEONCE_INSIGHTS_ARCHITECTURE
 Diseño de deck/A4/web por edición; implementación pendiente en TASK-1845–1849.
 
 Informes: skill `report-studio` (Claude/Codex), evidencia, diseño y QA PDF.
+Efemérides: `social-media-studio/efeonce/SEASONAL_CONTENT.md` + `notion-platform`; estado en Notion.
 Berel: `berel-content-production` · [plan](docs/operations/BEREL_EDITORIAL_COVERAGE_STRATEGY_V1.md) ·
 [informes](docs/operations/SEO_AEO_CLIENT_AUDIT_REPORTING_OPERATING_MODEL_V1.md) ·
 [colaboración](docs/operations/BEREL_CLIENT_COLLABORATION_OPERATING_MODEL_V1.md). Preservar análisis, N1–N4 y

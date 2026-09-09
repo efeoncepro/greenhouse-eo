@@ -1,5 +1,8 @@
 # Handoff activo
 
+**Social Efeonce, 09/09:** [13 piezas y skills](docs/audits/social/EFEONCE_SEASONAL_CONTENT_PLAN_2026_2027.md).
+Pendiente: conciliar MET-2339–2342 tarea/calendario. Producción abierta; cierre documental sin cambios Notion.
+
 **EPIC-046 — portal de servicios Berel/Sky (2026-09-09):** [epic](docs/epics/to-do/EPIC-046-client-services-visibility-and-self-service.md)
 y [ADR aceptado para planificación](docs/architecture/GREENHOUSE_CLIENT_SERVICE_EXPERIENCE_DECISION_V1.md) registrados.
 Berel = SEO/contenidos; Sky = diseño digital. TASK-1852–1856 registradas (P01/P02/P04/P06/P07).

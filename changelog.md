@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-09 — Planificación estacional Efeonce y continuidad editorial
+
+Documentadas 13 piezas 2026–2027 con conceptos, tareas, calendario y readback fechado en
+[registro social](docs/audits/social/EFEONCE_SEASONAL_CONTENT_PLAN_2026_2027.md).
+Social Media incorpora guía de efemérides, metáforas visuales y briefs; Notion explicita la aplicación
+del flujo existente a pares tarea/calendario, con fechas separadas y detección de divergencias.
+Skills espejadas Claude/Codex. Cuatro tareas tienen asignaciones nuevas aún no copiadas al calendario;
+se documenta el pendiente sin mutaciones Notion. Producción, aprobación y publicación siguen abiertas.
+
 ## 2026-09-09 — Portal de servicios: EPIC-046 e integración con Efeonce Insights
 
 Registrados [EPIC-046](docs/epics/to-do/EPIC-046-client-services-visibility-and-self-service.md) y
@@ -978,15 +987,3 @@ sitio perfectamente accesible saliera en rojo, y eso enseña a ignorar la alerta
 hallazgos son del dominio completo y la pantalla actual los contaría como "1 página afectada". Hasta
 que esa superficie exista (`TASK-1671`), un sitio invisible para los motores de IA **sigue** saliendo
 con 95 de salud. El estado real es `code complete, rollout pendiente`.
-
-## 2026-09-01 — Brand Visibility Grader queda disponible en Recursos
-
-El menú principal de `efeoncepro.com` ahora incluye **Brand Visibility Grader** dentro de
-`Recursos`, enlazado a `https://think.efeoncepro.com/brand-visibility`. La actualización reutiliza la
-navegación nativa de Ohio; no crea una segunda cabecera ni modifica Elementor. Los 26 ítems previos
-conservaron membresía, jerarquía y orden persistido, y el nuevo ítem quedó respaldado con snapshot
-recuperable.
-
-Después de purgar WordPress/Kinsta, el submenú y el clic se verificaron en producción a 1440 px y
-390 px. El destino respondió 200 y ambas vistas quedaron sin overflow horizontal ni errores de
-consola.

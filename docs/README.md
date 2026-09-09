@@ -184,6 +184,7 @@ Indice maestro de la documentacion no operativa del repo.
 - [ICO Audits](audits/ico/README.md)
 - [ICO_ENGINE_AUDIT_2026-04-30.md](audits/ico/ICO_ENGINE_AUDIT_2026-04-30.md)
 - [Notion Audits](audits/notion/README.md)
+- [Planificación estacional Efeonce 2026–2027](audits/social/EFEONCE_SEASONAL_CONTENT_PLAN_2026_2027.md)
 - [NOTION_BQ_SYNC_AUDIT_2026-04-30.md](audits/notion/notion-bq-sync/NOTION_BQ_SYNC_AUDIT_2026-04-30.md)
 - [GREENHOUSE_CONSUMPTION_AUDIT_2026-04-30.md](audits/notion/notion-bq-sync/GREENHOUSE_CONSUMPTION_AUDIT_2026-04-30.md)
 
