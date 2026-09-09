@@ -2,11 +2,31 @@
 
 Panel operativo de tasks del repo.
 
+## Portal de servicios: EPIC-046
+
+TASK-1852–1856 registradas (to-do/P1). Iniciar por TASK-1852, conectada a TASK-1834 por contrato y
+rollout nativo condicional; no bloquea el trabajo con login vigente verificado.
+
+| Task | Entrega | Dependencias base |
+|---|---|---|
+| [TASK-1852](to-do/TASK-1852-berel-sky-service-access-and-channel-enablement.md) | Habilitación de servicios, acceso y canales para Berel y Sky | none |
+| [TASK-1853](to-do/TASK-1853-client-service-progress-and-metrics-read-model.md) | Lectura cliente de servicios, avance y métricas | TASK-1852 |
+| [TASK-1854](to-do/TASK-1854-client-home-services-and-cycle-experience.md) | Inicio y Mis servicios: resultados, avance y próximos pasos | TASK-1852, TASK-1853 |
+| [TASK-1855](to-do/TASK-1855-client-service-requests-and-briefs-commands.md) | Solicitudes y briefs del servicio: commands y seguimiento | TASK-1852, TASK-1853 |
+| [TASK-1856](to-do/TASK-1856-client-service-request-and-brief-self-service-ui.md) | Autogestión de solicitudes y briefs del cliente | TASK-1854, TASK-1855 |
+
+Siguiente ID libre `TASK-1857`. Insights TASK-1845–1849 y notificaciones conservan sus dueñas.
+
 ## Programa Efeonce Insights: EPIC-045
 
 [EPIC-045](../epics/to-do/EPIC-045-efeonce-insights-multiformat-intelligence.md) registra **cinco tareas nuevas**,
 todas `to-do`, P1/Alto. Dominio Greenhouse + Artifact Worker; tres salidas iniciales: deck, informe A4 y web.
 TASK-1672/1673 conservan la auditoría técnica SEO y su distribución como consumers. Sin implementación ni rollout.
+Desde 2026-09-09, [EPIC-046](../epics/to-do/EPIC-046-client-services-visibility-and-self-service.md)
+integra autogestión cliente y gestión de colaboradores internos. TASK-1845/1846/1848/1849 incorporan
+autoridad por población, render/entrega segura y las dos experiencias; mismos IDs y owners, sin duplicados.
+P09 de EPIC-046 incorpora correo/in-app/Teamsbot y deep links: TASK-1848/1849 para Insights,
+TASK-690–693 para Hub/preferencias y TASK-303/387/694 para audiencia/digest/medición. Móvil queda después.
 
 | Task | Resultado | Estado |
 |---|---|---|

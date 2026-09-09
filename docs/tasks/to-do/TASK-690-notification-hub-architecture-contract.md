@@ -499,6 +499,8 @@ Toda la spec técnica vive en `GREENHOUSE_NOTIFICATION_HUB_V1.md` (creada junto 
 
 ## Acceptance Criteria
 
+- [ ] EPIC-045/046: foundation reconcilia el destinatario con PersonNotificationRecipient y organización objetivo, admitiendo cliente sin member laboral; permisos vigentes se revalidan por canal. Ver delta 2026-09-09 de GREENHOUSE_NOTIFICATION_HUB_V1.
+- [ ] Contratos/adapters usan schema y helpers vigentes verificados, incluyendo sendEmail/email_deliveries; migración de la projection reactiva conserva correlación, preferencias y un owner por evento/canal sin doble envío. DeliveryIntent Insights no duplica el ledger de transporte.
 - [ ] Migración aplicada en local + Kysely types regenerados (`src/types/db.d.ts` contiene `GreenhouseCoreNotificationIntents`, `GreenhouseCoreNotificationDeliveries`, `GreenhouseCoreNotificationPreferences`).
 - [ ] `decideChannels` cubierto por tests en los 12 casos del Slice 2.
 - [ ] 4 adapters con tests verdes; cada uno persiste `notification_deliveries` con `adapter_status` correcto.

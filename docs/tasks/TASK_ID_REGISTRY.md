@@ -11,6 +11,13 @@ Registro canonico de asignacion de IDs `TASK-###` para evitar colisiones y renum
 - una task legacy puede recibir un `TASK-###` operativo sin renombrar todavia su archivo
 - no renumerar el registro cuando cambie la prioridad del backlog
 
+## Integración Insights y portal cliente (2026-09-09)
+
+EPIC-045 conserva TASK-1845–1849. EPIC-046 consume Insights para autogestión cliente y gestión interna;
+TASK-1845/1846/1848/1849 amplían sus criterios de población/autoridad y UI, sin nuevos IDs de Insights ni cambio de lifecycle.
+P09 coordina canales/deep links con TASK-690–693/303/387/694; TASK-690/693 y TASK-1848/1849 incorporan
+criterios de cliente, entrega y retorno. TASK-1759/1774 conservan transporte/baja. Sin reservar nuevos IDs.
+
 ## Registro completo
 
 | Task ID | Lifecycle actual | Legacy ID / brief | Archivo actual |
@@ -2208,3 +2215,16 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 > catálogos deck/A4; grants/correo/recurrencia; experiencia portal/web. TASK-1672/1673 mantienen integración
 > especializada de auditoría SEO, TASK-1644 VisualProfile y EPIC-018 dashboards; no duplicados. Dirección y
 > creación autorizadas por el operador; sin implementación, apply, envío, commit ni rollout. Siguiente ID libre `TASK-1850`.
+
+
+## Registro 2026-09-09 — EPIC-046
+
+| Task ID | Lifecycle actual | Alcance | Archivo actual |
+|---|---|---|---|
+| `TASK-1852` | `to-do` | **Habilitación de servicios, acceso y canales para Berel y Sky.** EPIC-046; P1/Alto; backend-data. Registro autorizado 2026-09-09, sin implementación. | `docs/tasks/to-do/TASK-1852-berel-sky-service-access-and-channel-enablement.md` |
+| `TASK-1853` | `to-do` | **Lectura cliente de servicios, avance y métricas.** EPIC-046; P1/Alto; backend-data. Registro autorizado 2026-09-09, sin implementación. | `docs/tasks/to-do/TASK-1853-client-service-progress-and-metrics-read-model.md` |
+| `TASK-1854` | `to-do` | **Inicio y Mis servicios: resultados, avance y próximos pasos.** EPIC-046; P1/Alto; ui-ux. Registro autorizado 2026-09-09, sin implementación. | `docs/tasks/to-do/TASK-1854-client-home-services-and-cycle-experience.md` |
+| `TASK-1855` | `to-do` | **Solicitudes y briefs del servicio: commands y seguimiento.** EPIC-046; P1/Alto; backend-data. Registro autorizado 2026-09-09, sin implementación. | `docs/tasks/to-do/TASK-1855-client-service-requests-and-briefs-commands.md` |
+| `TASK-1856` | `to-do` | **Autogestión de solicitudes y briefs del cliente.** EPIC-046; P1/Alto; ui-ux. Registro autorizado 2026-09-09, sin implementación. | `docs/tasks/to-do/TASK-1856-client-service-request-and-brief-self-service-ui.md` |
+
+> TASK-1852–1856 registradas por autorización del operador: P01/P02/P04/P06/P07. Barrido por dominio/superficie: TASK-1687 catálogo Sky, TASK-1690 SEO, TASK-289/292 revisiones, TASK-291 BCS, TASK-1845–1849 Insights y TASK-690–694 Hub conservan ownership. TASK-1852 conecta con TASK-1834 por contrato; rollout nativo condicionado a sus gates. Sin ejecución, apply, envío, commit ni deploy. Siguiente ID libre `TASK-1857`.

@@ -7,6 +7,23 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-09 — Portal de servicios: EPIC-046 e integración con Efeonce Insights
+
+Registrados [EPIC-046](docs/epics/to-do/EPIC-046-client-services-visibility-and-self-service.md) y
+[ADR](docs/architecture/GREENHOUSE_CLIENT_SERVICE_EXPERIENCE_DECISION_V1.md): Berel SEO/marketing de
+contenidos y Sky diseño digital, primero visibilidad y después solicitudes/briefs. Cinco tasks nuevas
+registradas y tres existentes por reutilizar, sin cambiar asignaciones ni desplegar.
+Baseline fechado de catálogo, acceso y destinos 404; fuentes, permisos, contratación y estados separados.
+El operador aprueba la dirección y añade Insights como hito obligatorio: autogestión cliente y gestión
+interna comparten dominio/historial, con permisos distintos y token limitado a una edición. EPIC-045,
+arquitectura/ADR, TASK-1845/1846/1848/1849 y flow/wireframe sincronizados; sin otro builder o motor.
+Ampliación del operador: email de Insights con resumen/deep link, in-app y Teamsbot en esta fase;
+móvil posterior. Hito N/P09 reutiliza Hub y sus dueñas, distingue entrega/consulta/acción y exige
+preferencias, destino autorizado y dedupe. TASK-690/693/1848/1849 actualizadas; sin envíos reales.
+El operador autoriza el registro: TASK-1852–1856 creadas con templates, contratos UI/backend y
+criterios; TASK-1852 ↔ TASK-1834 enlazadas para identidad/contexto/deep links y rollout nativo
+condicional. Inicio por 1852 con login vigente probado; commit documental autorizado, sin implementación, push ni deploy.
+
 ## 2026-09-08 — GPT Image 2.5 entra a la doc como capacidad de proveedor, no como camino disponible
 
 OpenAI publicó `gpt-image-2.5-sunburst` y `gpt-image-2.5-flare`. La matriz de capacidades, la spec del
@@ -965,16 +982,3 @@ recuperable.
 Después de purgar WordPress/Kinsta, el submenú y el clic se verificaron en producción a 1440 px y
 390 px. El destino respondió 200 y ambas vistas quedaron sin overflow horizontal ni errores de
 consola.
-
-## 2026-09-01 — TASK-1807 instala los primeros controles FinOps de GCP
-
-Producer corre cada cinco minutos mediante Terraform y permanece bajo observación antes de tocar Media. Dos
-budgets nativos alert-only quedaron activos en CLP: 250.000 para Globe y 370.000 consolidados, con cuatro umbrales
-de gasto actual y dos de forecast. El lector Greenhouse usa costo neto después de créditos y el watcher deduplica
-por incidente estable; su prueba dry-run no consulta persistencia ni envía mensajes.
-
-Globe agregó cuatro labels de atribución a 33 recursos. Artifact Registry, con 418 versiones y 10,4 GB, tiene una
-cleanup policy en dry-run que conserva 10 versiones por paquete y sólo simula borrar versiones de más de 30 días;
-no hubo eliminación. Asset Governance fue publicado y desplegado por digest inmutable para converger hasta cuatro
-stages fenced en una ejecución. El smoke live quedó sano pero no-op, así que conserva cron minutely hasta un canary
-con asset real. El post-plan no presenta drift y Greenhouse sigue local, sin publicación.

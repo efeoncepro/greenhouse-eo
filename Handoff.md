@@ -1,6 +1,19 @@
 # Handoff activo
 
-EPIC-045: diseño.
+**EPIC-046 — portal de servicios Berel/Sky (2026-09-09):** [epic](docs/epics/to-do/EPIC-046-client-services-visibility-and-self-service.md)
+y [ADR aceptado para planificación](docs/architecture/GREENHOUSE_CLIENT_SERVICE_EXPERIENCE_DECISION_V1.md) registrados.
+Berel = SEO/contenidos; Sky = diseño digital. TASK-1852–1856 registradas (P01/P02/P04/P06/P07).
+Iniciar TASK-1852; conexión bidireccional TASK-1834: identidad/retorno obligatorio, rollout OIDC condicional.
+Login vigente probado permite avanzar; reusar TASK-1687/1690/289/292. Sin implementación ni invitaciones.
+Movimiento ajeno de TASK-1690 a `in-progress/` preservado; no modificar su estado sin coordinación.
+Validación: epic lint estricto y docs closure pasan; ops lint global falla por lifecycle/ruta de esa
+task y avisa paridad histórica de otros epics. Cierre: commit documental autorizado; sin implementación ni push.
+
+**EPIC-045 ↔ EPIC-046:** Hitos I/N obligatorios: Insights cliente/interno + email/in-app/Teamsbot con
+deep links; shared separado y móvil posterior. Contrato en arquitectura Insights §§7.1/9.1 y ADRs.
+P01/P09 incluyen destinatarios/canales; TASK-1848/1849 distribución/experiencia; TASK-690/693 Hub y
+preferencias. Criterios/flow y contratos UI de TASK-1854/1856 registrados; UI ready no; sin envíos.
+Primer email/in-app acompaña apertura cliente; Teamsbot por destino verificado. Reusar dueñas, sin otro Hub.
 
 **GPT Image 2.5 + contrato de proveedores de imagen (2026-09-08):** doc y skills al día; sólo documentación,
 cero código y cero llamadas al proveedor. El trabajo quedó en

@@ -31,7 +31,9 @@
 
 ## Summary
 
-Construye la biblioteca Insights por cliente/período/módulo, el encargo y revisión de ediciones, las tres salidas y la vista web por token. Consume commands/readers ya contratados y presenta envío/recurrencia sin otra lógica de negocio.
+Construye biblioteca, encargo y gestión Insights para cliente autenticado y colaboradores internos autorizados,
+las tres salidas y la vista web por token. Consume los mismos commands/readers con permisos distintos;
+integra Inicio/Mis servicios de EPIC-046 sin otro builder ni lógica de negocio en UI.
 
 ## Why This Task Exists
 
@@ -121,7 +123,7 @@ Una API de generación no permite al operador revisar y compartir con claridad n
 ### Experience brief
 
 - UI rigor: `ui-standard`
-- Usuario / rol: operador Efeonce y lector cliente autorizado.
+- Usuario / rol: cliente autenticado que autogestiona informes, colaborador interno autorizado que los gestiona y lector por enlace de una edición.
 - Momento del flujo: crear, revisar, compartir y leer una edición.
 - Resultado perceptible esperado: evidencia clara y consistente entre formatos, con marca premium y estado honesto.
 - Friccion que debe reducir: reconstruir manualmente cifras, versiones y explicaciones.
@@ -312,6 +314,12 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 
 ## Acceptance Criteria
 
+- [ ] Correo Insights presenta hallazgos útiles, período/corte y CTA a la edición exacta; HTML/plain text y preview desktop/móvil coherentes. Variante autenticada y ShareGrant explícito no se confunden.
+- [ ] Flow/GVC cubre email/in-app/Teamsbot → login si falta sesión → edición/objeto permitido y retorno al servicio; cuenta incorrecta, revocación y retiro tienen estado seguro, sin open redirect ni acción por GET.
+- [ ] Preferencias/notificaciones se enlazan a la superficie canónica de TASK-693; no se crea otro centro en Insights. Estado leído y acción resuelta se distinguen; UI no afirma delivered por un mero accepted.
+- [ ] Dos recorridos autenticados completos: cliente consulta/genera/descarga sobre su cuenta e interno gestiona cuentas autorizadas. Shared sigue separado; no se usa un token para abrir la biblioteca privada.
+- [ ] Inicio/Mis servicios/SEO/Delivery de EPIC-046 llegan al destino canónico Insights con org/servicio/período validados por servidor y retorno claro; un builder/visor y un historial, sin copias por cliente o módulo.
+- [ ] UI/GVC cubren cliente con sólo lectura, cliente con generación, interno con cuenta permitida/denegada, draft interno oculto, pendiente de revisión y output parcial en desktop/390 px; CTA y estados derivan de policy, no de roles hardcoded.
 - [ ] Agente sin esta conversación descubre y usa la skill por MCP servido y harness; genera y consulta una edición, elige formato/ventana, recupera fallo parcial y respeta permisos/envío. Mirrors/routing/versiones pasan y se conserva evidencia de ejecución, no sólo respuestas del agente.
 
 - [ ] Biblioteca organiza por cliente/período/módulo y presenta ID/versión/output/estado; una misma edición reúne web/deck/A4 y cada archivo se identifica.
@@ -340,6 +348,14 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 - [ ] Arquitectura técnica, documentación funcional y manual/runbook actualizados proporcionalmente.
 - [ ] Handoff/changelog y contratos UI/API/MCP reflejan disponibilidad real.
 - [ ] Regresiones, señales, rollback y gates documentales pasan; no commit/push/deploy automático.
+
+## Delta 2026-09-09 — Insights dentro de la experiencia cliente e interna
+
+Esta task es dueña de ambas experiencias autenticadas y de shared. La autogestión incluye crear o
+solicitar generación gobernada, progreso y biblioteca propia; no se limita a descargar un PDF interno.
+P04 de EPIC-046 aporta accesos y contexto, no otra biblioteca. Arquitectura §7.1 fija permisos y
+redacción; TASK-1845/1848 implementan los commands y políticas. Wireframe/flow reflejan las tres entradas
+y UI ready permanece no hasta materializar y verificar todos los recorridos.
 
 ## Follow-ups
 

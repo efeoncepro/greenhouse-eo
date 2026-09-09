@@ -6,6 +6,37 @@
 > **Estado:** propuesta vigente — implementación incremental TASK-690 a TASK-693
 > **Specs relacionadas:** `GREENHOUSE_TEAMS_NOTIFICATIONS_V1.md` v1.1, `GREENHOUSE_TEAMS_BOT_INTERACTION_V1.md` v1.1, `GREENHOUSE_EVENT_CATALOG_V1.md`, `GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md`
 
+## Delta 2026-09-09 — Insights y clientes Berel/Sky
+
+EPIC-045/046 incorporan email, in-app y Teamsbot al recorrido cliente/interno. El contrato consumidor
+vive en [Insights §9.1](EFEONCE_INSIGHTS_ARCHITECTURE_V1.md#91-activación-y-retorno-al-portal--epic-046).
+TASK-690–693 conservan foundation/shadow/cutover/preferencias; TASK-303 audiencia, TASK-387 digest y
+TASK-694 medición avanzada. P09 de EPIC-046 coordina su reutilización, no crea otra plataforma.
+
+**Baseline de código, no prueba de runtime:** no existe `src/lib/notifications/hub/` al revisar este
+checkout el 2026-09-09. `NotificationService` soporta in-app/email y llama `sendEmail()`;
+`src/lib/sync/projections/notifications.ts` y `teams-notify.ts` son puntos existentes, con transporte
+Teams separado. La arquitectura original y sus tasks contienen nombres históricos: implementar exige
+reconciliar schema/helpers contra código y DB; no copiar `email_log`/`sendTransactionalEmail` como si
+fueran los dueños actuales. El ledger de email es `greenhouse_notifications.email_deliveries`.
+
+El modelo destinatario debe admitir `PersonNotificationRecipient` (`identityProfileId`, `userId`,
+`memberId` opcional) del resolver canónico y organización objetivo: un cliente no requiere identidad
+laboral ficticia. Revalidar autoridad al envío y al abrir; defaults por rol sólo seleccionan dentro del
+conjunto permitido. Esta ampliación debe quedar en foundation/criterios de TASK-690 antes de ejecutarla;
+la forma DDL exacta se decide allí. Un miembro de canal Teams no obtiene permisos por recibir la card.
+
+Hasta el cutover, integrar eventos nuevos en las projections/servicios canónicos existentes, con un
+único owner por evento/canal y dedupe comprobable; no crear projections paralelas ni self-webhooks.
+TASK-1759 conserva la migración del transporte interno. Migrar al Hub por cohorte sin doble despacho
+ni pérdida de preferencias. El Hub y el DeliveryIntent de Insights se correlacionan; cada transporte
+conserva su ledger y resultado, sin dos schedulers o dos dueños enviando la misma edición.
+
+La primera entrega exige correo e in-app; Teamsbot se valida por destino, instalación y autoridad.
+Preferencias, agrupación y horarios evitan avisos repetidos; pendiente resuelto cancela recordatorios.
+Lectura no resuelve el objeto de negocio. GET/scanners no marcan leído ni actúan. Email aceptado,
+entregado, entrada autenticada y acción completada son evidencias distintas. Mobile/push queda futuro.
+
 ## 1. Propósito
 
 Unificar las **3 superficies de notificación** que hoy viven independientes (in-app bell, email, Microsoft Teams) detrás de un solo registry de intentos + router de canales + adapters de delivery. El objetivo no es reemplazar las superficies — cada una sigue siendo dueña de su delivery — sino centralizar **quién recibe qué evento, por cuáles canales, con qué template y con qué preferencias**.

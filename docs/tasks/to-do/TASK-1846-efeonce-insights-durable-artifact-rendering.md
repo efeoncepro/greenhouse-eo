@@ -259,6 +259,7 @@ No solicitar otra cuenta, secreto ni acción del cliente para pruebas técnicas.
 
 ## Acceptance Criteria
 
+- [ ] Autogestión cliente y gestión interna de arquitectura §7.1 revalidan autoridad al ejecutar; reutilización/idempotencia de outputs conserva audiencia y proyección. Un job cliente nunca reutiliza bytes de un draft interno aunque coincidan org y período (integración EPIC-046).
 - [ ] Insights produce assets ligados a edición/org, nunca a Proposal ni proposal_deliverable; Proposal existente conserva sus jobs/outputs sin pérdida.
 - [ ] Worker no consulta ni calcula métricas; verifica manifest, catálogos, fuentes y assets fijados y rechaza manifest_drift.
 - [ ] Dos workers y un lease vencido no crean dos outputs finales; fencing impide finalización vieja; crash tras upload se reconcilia.
