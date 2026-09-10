@@ -119,6 +119,18 @@ Nexa registra las acciones de alta y compensación detrás del runtime existente
 La propuesta prepara el input en servidor y lo valida antes de mostrarse; confirmación lo vuelve a validar
 y reautoriza antes de replay. Se reutiliza la tarjeta existente; no cambia layout, tokens ni navegación.
 
+## Registrar el destino Teams del cliente (chat grupal)
+
+Las notificaciones salen por el Teams bot (Bot Framework). El chat grupal compartido con el cliente se registra como
+destino `recipient_kind='chat_group'` en `teams_notification_channels`, scopeado al Space, con
+`POST /api/admin/clients/{organizationId}/lifecycle/teams/chat` (`client.lifecycle.case.advance`) y body
+`{chatId: '19:…@thread.v2', displayName}`. El writer `writeTeamsGroupChatForSpace` sólo LEE Graph
+(`GET /chats/{id}` + `installedApps`): marca `ready` únicamente si el bot de Greenhouse está instalado en el chat; si no,
+`pending_setup` con la razón persistida. Registrar un destino no envía nada; el preview lo consume como readiness
+(`teams_destination_unverified` desaparece). La migración `20260910013234351` relajó el CHECK legado que exigía
+`team_id`/`channel_id` a todo `teams_bot`; la consistencia por `recipient_kind` la gobierna el CHECK de TASK-671.
+Berel y Sky quedaron registrados `ready` el 2026-09-10 con pertenencia del bot verificada.
+
 ## Provisionar personas sin enviar mensajes
 
 `inviteClientPortalUser` admite `delivery: 'deferred'`: crea `client_users` (`status='invited'`,
@@ -127,6 +139,8 @@ y reautoriza antes de replay. Se reutiliza la tarjeta existente; no cambia layou
 posterior es `POST .../portal-users/deliver` con `{userIds}` (misma capability, envía correo: sólo con instrucción
 explícita del operador). El preview reporta a esas personas como `person_invitation_pending` (Identity), distinto de
 `person_not_authorized_in_organization`; un runtime anterior al release colapsa ambos en el segundo código.
+**Decisión del operador 2026-09-10:** las invitaciones de Berel NO se entregan hasta que las interfaces de cliente estén
+listas; ninguna sesión debe ejecutar `portal-users/deliver` sin una nueva instrucción explícita.
 
 ## Verificación
 

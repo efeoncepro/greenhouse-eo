@@ -31,7 +31,8 @@
         "delivery": "deferred",
         "status": "invitation_delivery_and_login_required",
         "openingRequestReady": false,
-        "privateEvidence": ".captures/task-1852/private-scope/claude-discovery.v1.md"
+        "privateEvidence": ".captures/task-1852/private-scope/claude-discovery.v1.md",
+        "invitationDelivery": "bloqueada por decisión del operador (2026-09-10) hasta que las interfaces de cliente estén listas; no enviar"
       },
       "serviceReadbackAt": "2026-09-09T22:20:31.914Z",
       "openingRequest": {
@@ -65,6 +66,14 @@
           "/aeo": 200,
           "/campanas": "307 denied"
         }
+      },
+      "teamsDestination": {
+        "channelCode": "client-teams-chat-space-cli-0863869c-eaac-4630-9bd0-af283c56f7fb",
+        "recipientKind": "chat_group",
+        "provisioningStatus": "ready",
+        "membership": "verified",
+        "registeredAt": "2026-09-10T01:35:34.679Z",
+        "note": "Chat grupal cliente × Efeonce registrado como destino del bot por instrucción del operador (2026-09-10). Registrar un destino no envía nada: la entrega sigue gobernada por Notifications."
       }
     },
     {
@@ -103,13 +112,22 @@
         "privateEvidence": ".captures/task-1852/private-scope/claude-discovery.v1.md"
       },
       "previewReadback": {
-        "observedAt": "2026-09-10T01:03:20.326Z",
+        "observedAt": "2026-09-10T01:35:34.679Z",
         "runtime": "production 5726ce9d90",
         "canApply": true,
-        "fingerprint": "05d8f4b799930567c915ed129245f0caafc68dad76ec361b78261b6a4668d433",
+        "fingerprint": "a6811c4ce775d5d78dd0ead0ea5536cbd768071669bf3a570ef2ad0f145a0e18",
         "changes": "preserve creative_hub_globe_v1",
         "blockers": [],
-        "applyRequires": "sesión humana admin (app_session o delegated_oauth) + CLIENT_SERVICE_ENABLEMENT_WRITES_ENABLED=true"
+        "applyRequires": "sesión humana admin (app_session o delegated_oauth) + CLIENT_SERVICE_ENABLEMENT_WRITES_ENABLED=true",
+        "note": "Fingerprint recalculado tras registrar el destino Teams; teams_destination_unverified desapareció."
+      },
+      "teamsDestination": {
+        "channelCode": "client-teams-chat-spc-ae463d9f-b404-438b-bd5c-bd117d45c3b9",
+        "recipientKind": "chat_group",
+        "provisioningStatus": "ready",
+        "membership": "verified",
+        "registeredAt": "2026-09-10T01:35:34.679Z",
+        "note": "Chat grupal cliente × Efeonce registrado como destino del bot por instrucción del operador (2026-09-10). Registrar un destino no envía nada: la entrega sigue gobernada por Notifications."
       }
     }
   ],

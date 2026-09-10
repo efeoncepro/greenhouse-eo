@@ -28,7 +28,9 @@ NULL. `inviteClientPortalUser` gana `delivery: 'deferred'` + `deliverClientPorta
 tres personas Berel provisionadas sin correo. El lane App acepta autoridad humana `delegated_oauth`
 (`client_services.enablement.write`, exchange RFC 8693 con cliente dedicado sembrado por migración) y el recibo registra
 `authority`; el preview distingue `person_invitation_pending`. Preview Sky limpio en producción; apply pendiente de sesión
-humana y flag. [Readback](docs/audits/client-portal/TASK-1852_MAPPING_PROVISIONING_READBACK_2026-09-10.json).
+humana y flag. Chats grupales de Berel y Sky registrados como destino `chat_group` del Teams bot (`ready`, pertenencia
+verificada por Graph read-only; ruta `lifecycle/teams/chat`; migración que relaja el CHECK legado). Invitaciones Berel
+bloqueadas por decisión del operador hasta tener interfaces. [Readback](docs/audits/client-portal/TASK-1852_MAPPING_PROVISIONING_READBACK_2026-09-10.json).
 
 ## 2026-09-09 — Planificación estacional Efeonce y continuidad editorial
 

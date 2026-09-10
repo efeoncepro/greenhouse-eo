@@ -247,4 +247,9 @@ de escritura delegada.
 - **Invitación diferida.** `inviteClientPortalUser` admite `delivery: 'deferred'` (persona + roles, sin token ni correo) y
   `deliverClientPortalInvitation` entrega después; ambos por la ruta del checklist de onboarding. El preview distingue
   `person_invitation_pending` de `person_not_authorized_in_organization`: dos estados con dueño y acción distintos.
+- **Destino Teams del cliente = chat grupal registrado, nunca inferido.** El chat compartido con el cliente se persiste como
+  `recipient_kind='chat_group'` por Space (`writeTeamsGroupChatForSpace`, ruta `lifecycle/teams/chat`); `ready` sólo cuando
+  Graph confirma en modo lectura que el bot está instalado. La migración `20260910013234351` relaja el CHECK legado de
+  `teams_bot` (team/channel obligatorios) porque el CHECK por `recipient_kind` ya gobierna los targets. Registrar un
+  destino no es entregar: la entrega sigue en Notifications/Insights.
 

@@ -92,6 +92,7 @@ TASK-1853/1854/1855/1856; TASK-1834 como consumer de matriz/cohorte y casos de r
 - `src/lib/commercial/sample-sprints/commercial-terms.ts` + `src/lib/api-platform/resources/app-commercial-terms.ts` + `src/app/api/platform/app/commercial/services/[serviceId]/terms/route.ts` + `scripts/commercial/declare-commercial-terms.ts`: mapping servicio → módulos con validación de catálogo y contrato App (2026-09-10).
 - `src/lib/sister-platforms/mcp-token-exchange.ts` + `migrations/20260910005222927_task-1852-mcp-client-services-oauth-client.sql`: clase delegada `client_services.enablement.write` y cliente de exchange (2026-09-10).
 - `src/lib/client-onboarding/invite-client-portal-user.ts` + rutas `lifecycle/portal-users/{invite,deliver}`: entrega diferida de invitación (2026-09-10; TASK-1839/1012 conservan la convergencia de URL/entrega).
+- `src/lib/client-onboarding/teams-connect-store.ts` + `teams-channels-reader.ts` + ruta `lifecycle/teams/chat` + migración `20260910013234351`: destino Teams `chat_group` por Space con verificación read-only (2026-09-10; TASK-1010 conserva el wizard).
 
 ## Current Repo State
 
@@ -193,7 +194,8 @@ Baseline de código y documentos de esta planificación; flags, datos y entrega 
 - [x] Rollout de staging: SHA `68e18fe0`, deployment READY, siete canaries HTTP; [evidencia y recuperación de workers](../../audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md).
 - [x] Rollout técnico Production: PR #231, SHA `5726ce9d90`, manifest `released`, cinco workers Ready y 100 % de tráfico, watchdog sin drift/datos ausentes; siete canaries HTTP. [Readback](../../audits/client-portal/TASK-1852_PRODUCTION_RELEASE_READBACK_2026-09-09.json). Excepción puntual de acceso autorizada y persistida; altas OFF.
 - [x] Mapping comercial declarado (términos con `bundled_modules`, audit + outbox) y tres personas Berel provisionadas con invitación diferida; preview Sky limpio en producción y rutas mapeadas de Berel 200 con la persona técnica de la organización. [Readback 2026-09-10](../../audits/client-portal/TASK-1852_MAPPING_PROVISIONING_READBACK_2026-09-10.json).
-- [ ] Apertura operativa: apply de Sky por sesión humana administrativa con flag ON, entrega de invitaciones Berel (autorización explícita), login humano de las seis personas, rutas con sesión propia (Sky `cliente.creative_hub` sigue 404, TASK-1687) y canales/preferencias. [Blockers con dueño](../../audits/client-portal/TASK-1852_IMPLEMENTATION_QA_2026-09-09.md).
+- [x] Destinos Teams registrados: chats grupales de Berel y Sky como `chat_group` del bot, `ready` con pertenencia verificada por Graph read-only (ruta `lifecycle/teams/chat`, migración `20260910013234351`); `teams_destination_unverified` desapareció en producción. Sin mensajes.
+- [ ] Apertura operativa: apply de Sky por sesión humana administrativa con flag ON, entrega de invitaciones Berel (bloqueada por el operador hasta que las interfaces estén listas), login humano de las seis personas, rutas con sesión propia (Sky `cliente.creative_hub` sigue 404, TASK-1687) y preferencias/cadencia por persona. [Blockers con dueño](../../audits/client-portal/TASK-1852_IMPLEMENTATION_QA_2026-09-09.md).
 - [x] Consolidación documental para discovery de Claude ejecutada con tres subagentes read-only autorizados por el operador; [dossier vigente](../../audits/client-portal/TASK-1852_CLAUDE_DISCOVERY_2026-09-09.md).
 
 Rollout autorizado el 2026-09-09 con alcance de servicios y equipo confirmado por el operador. Después,
@@ -293,7 +295,7 @@ Fuentes de Berel/Sky, responsables, consentimiento de piloto y disponibilidad Te
 - [x] Consume principal/sesión vigentes y organización explícita; revalida autoridad y vetos por persona. Sin nuevo login/callback/provisión; destinos sólo declarados. Contrato en ADR/runbook; tests de aislamiento y revocación. Retorno 0/1/N operativo pendiente en TASK-1834.
 - [ ] Login vigente se prueba para la apertura inicial. Cohorte nativa sólo se habilita tras TASK-1834 y sus gates TASK-1833/1832/1841 aplicables; no se exige su cierre total para inventario/readers.
 - [x] Preview/apply concurrente y replay conservan un efecto; preserva asignación ajena y receipt inmutable. Compensación canónica el mismo día y rechazo por cambios posteriores: 14 ensayos PostgreSQL local en QA.
-- [ ] Preferencias explícitas, login y destino/entrega por canal pendientes para seis personas elegidas. Las tres de Berel ya existen (invitación diferida, sin correo) y requieren entrega + activación; las tres de Sky están activas pero sin login observado; ningún canal Teams ni preferencia declarada en ambas organizaciones. El usuario Berel técnico no es piloto humano. Sin members ficticios ni mensajes. Dueños Identity/Notifications en QA.
+- [ ] Preferencias explícitas, login y entrega por canal pendientes para seis personas elegidas. Las tres de Berel ya existen (invitación diferida, sin correo; entrega bloqueada por el operador hasta tener interfaces) y requieren entrega + activación; las tres de Sky están activas pero sin login observado. Destinos Teams (chats grupales) registrados `ready` en ambas organizaciones; preferencias y cadencia siguen sin declarar. El usuario Berel técnico no es piloto humano. Sin members ficticios ni mensajes. Dueños Identity/Notifications en QA.
 
 ## Verification
 

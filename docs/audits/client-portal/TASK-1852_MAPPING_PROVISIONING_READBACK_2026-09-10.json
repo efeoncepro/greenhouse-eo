@@ -235,5 +235,46 @@
         "finalHtml": null
       }
     ]
+  },
+  "teamsDestinations": {
+    "observedAt": "2026-09-10T01:35:34.679Z",
+    "method": "writeTeamsGroupChatForSpace (Graph read-only: GET /chats/{id} + installedApps); ningún mensaje enviado",
+    "results": {
+      "berel": {
+        "ok": true,
+        "channelCode": "client-teams-chat-space-cli-0863869c-eaac-4630-9bd0-af283c56f7fb",
+        "provisioningStatus": "ready",
+        "membership": "verified"
+      },
+      "sky": {
+        "ok": true,
+        "channelCode": "client-teams-chat-spc-ae463d9f-b404-438b-bd5c-bd117d45c3b9",
+        "provisioningStatus": "ready",
+        "membership": "verified"
+      }
+    },
+    "rows": [
+      {
+        "channel_code": "client-teams-chat-space-cli-0863869c-eaac-4630-9bd0-af283c56f7fb",
+        "recipient_kind": "chat_group",
+        "provisioning_status": "ready",
+        "provisioning_status_reason": null,
+        "space_id": "space-cli-0863869c-eaac-4630-9bd0-af283c56f7fb",
+        "disabled_at": null
+      },
+      {
+        "channel_code": "client-teams-chat-spc-ae463d9f-b404-438b-bd5c-bd117d45c3b9",
+        "recipient_kind": "chat_group",
+        "provisioning_status": "ready",
+        "provisioning_status_reason": null,
+        "space_id": "spc-ae463d9f-b404-438b-bd5c-bd117d45c3b9",
+        "disabled_at": null
+      }
+    ],
+    "skyPreviewAfter": {
+      "canApply": true,
+      "fingerprint": "a6811c4ce775d5d78dd0ead0ea5536cbd768071669bf3a570ef2ad0f145a0e18",
+      "teamsReadiness": []
+    }
   }
 }

@@ -1,5 +1,14 @@
 # TASK-1010 — Client Onboarding: rollout completion + superficies diferidas (split de TASK-992/997/1001)
 
+## Delta 2026-09-10
+
+- `teams-connect-store.ts` ganó `writeTeamsGroupChatForSpace` (destino `chat_group` por Space, `ready` sólo con pertenencia
+  del bot verificada por Graph) y `teams-channels-reader.ts` ganó `inspectGroupChatForLinking`; ruta
+  `POST /api/admin/clients/{organizationId}/lifecycle/teams/chat`. Migración `20260910013234351` relajó el CHECK legado de
+  `teams_bot` — cerrado por trabajo en `TASK-1852`. El wizard sigue registrando canales de equipo; la UI para elegir un chat
+  queda en esta task.
+
+
 ## Delta 2026-06-05
 
 - El gap del **deal-trigger** (casos `draft` creados por deal closed-won sin UI para verse/activarse) quedó **cerrado por TASK-1013** (cockpit de onboarding `/agency/clients/onboarding` + discoverability cruzada en Organizaciones/Account 360 + reachability). Code complete en `develop`, GVC verificado (Grupo Berel). Un caso draft del trigger ahora aparece en el inbox sin tipear URLs.
