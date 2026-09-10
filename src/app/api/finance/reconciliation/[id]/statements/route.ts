@@ -15,6 +15,8 @@ import {
 } from '@/lib/finance/shared'
 import { parseBankStatement, SUPPORTED_BANK_FORMATS } from '@/lib/finance/csv-parser'
 import type { BankStatementRow } from '@/lib/finance/csv-parser'
+import { BANK_STATEMENT_SOURCE_FORMATS, parseBankStatementFile } from '@/lib/finance/bank-statements'
+import type { ParsedStatementRow } from '@/lib/finance/bank-statements'
 
 export const dynamic = 'force-dynamic'
 
@@ -37,6 +39,19 @@ const csvRowsToStatementInput = (parsed: BankStatementRow[]): StatementInput[] =
     ...(r.reference !== null && { reference: r.reference })
   }))
 
+/** Convert adapter-parsed rows (XLS/XLSX/PDF text) into the standard StatementInput shape */
+const parsedRowsToStatementInput = (parsed: ParsedStatementRow[]): StatementInput[] =>
+  parsed.map(r => ({
+    transactionDate: r.transactionDate,
+    description: r.description,
+    amount: r.amount,
+    ...(r.valueDate && { valueDate: r.valueDate }),
+    ...(r.balance !== null && { balance: r.balance }),
+    ...(r.reference !== null && { reference: r.reference })
+  }))
+
+const MAX_STATEMENT_FILE_BYTES = 5 * 1024 * 1024
+
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { tenant, errorResponse } = await requireFinanceTenantContext()
 
@@ -53,18 +68,45 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const { id: periodId } = await params
     const body = await request.json()
 
-    // Resolve rows: either from CSV content or from pre-parsed JSON
+    // Resolve rows: bank file (XLS/XLSX base64), statement text (PDF extraído),
+    // CSV content, or pre-parsed JSON rows.
     let rows: StatementInput[]
+    let sourceFormat: string | null = null
 
-    if (body.csvContent && body.bankFormat) {
+    if (typeof body.fileBase64 === 'string' && body.fileBase64.length > 0) {
+      const buffer = Buffer.from(body.fileBase64, 'base64')
+
+      if (buffer.byteLength === 0 || buffer.byteLength > MAX_STATEMENT_FILE_BYTES) {
+        throw new FinanceValidationError('El archivo del extracto está vacío o supera los 5 MB.')
+      }
+
+      const parsed = parseBankStatementFile({
+        content: buffer,
+        fileName: normalizeString(body.fileName) || null,
+        format: normalizeString(body.sourceFormat) || null
+      })
+
+      sourceFormat = parsed.format
+      rows = parsedRowsToStatementInput(parsed.rows)
+    } else if (typeof body.statementText === 'string' && body.statementText.trim().length > 0) {
+      const parsed = parseBankStatementFile({
+        content: body.statementText,
+        format: normalizeString(body.sourceFormat) || null
+      })
+
+      sourceFormat = parsed.format
+      rows = parsedRowsToStatementInput(parsed.rows)
+    } else if (body.csvContent && body.bankFormat) {
       const parsed = parseBankStatement(body.csvContent, body.bankFormat)
 
+      sourceFormat = String(body.bankFormat)
       rows = csvRowsToStatementInput(parsed)
     } else if (Array.isArray(body.rows)) {
       rows = body.rows
     } else {
       throw new FinanceValidationError(
-        `Provide either { csvContent, bankFormat } or { rows }. Supported bank formats: ${SUPPORTED_BANK_FORMATS.join(', ')}`
+        `Provide { fileBase64, fileName, sourceFormat? }, { statementText, sourceFormat? }, { csvContent, bankFormat } or { rows }. ` +
+          `Bank files: ${BANK_STATEMENT_SOURCE_FORMATS.join(', ')}. CSV formats: ${SUPPORTED_BANK_FORMATS.join(', ')}`
       )
     }
 
@@ -96,7 +138,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       skipped: result.skipped,
       totalRowCount: result.totalRowCount,
       importBatchId: result.importBatchId,
-      ...(body.bankFormat && { bankFormat: body.bankFormat })
+      ...(sourceFormat && { bankFormat: sourceFormat })
     }, { status: 201 })
   } catch (error) {
     if (error instanceof FinanceValidationError) {

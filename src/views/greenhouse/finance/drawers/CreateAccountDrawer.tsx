@@ -29,6 +29,7 @@ const GREENHOUSE_COPY = getMicrocopy()
 const ACCOUNT_TYPE_LABELS: Record<string, string> = {
   checking: 'Cuenta corriente',
   savings: 'Cuenta de ahorro',
+  vista: 'Cuenta vista',
   paypal: 'PayPal',
   wise: 'Wise',
   other: 'Otro'

@@ -1,0 +1,68 @@
+[
+  {
+    "accountId": "santander-clp",
+    "genesisDate": "2026-08-01",
+    "openingBalance": 14159664,
+    "declarationReason": "Re-anclaje agosto 2026 (recuperación conciliación mayo–julio no reconstruida). SALDO INICIAL de la cartola histórica N°30 (31/07/2026–31/08/2026) = $14.159.664; primer movimiento del período es 03/08, por lo que el saldo al SOD 01/08 = EOD 31/07. Bank-authoritative. Todo lo anterior queda cascade-superseded.",
+    "auditStatus": "reconciled",
+    "evidenceRefs": [
+      { "type": "cartola_xlsx", "ref": "data/bank/Santander-CLP-Agosto-CartolaHistCtaCte-000092044661-0030-20260910.xlsx", "period": "2026-07-31..2026-08-31", "description": "Cartola histórica N°30 Cta Cte 0-000-9204466-1. Saldo inicial 14.159.664 / final 16.335.168." }
+    ]
+  },
+  {
+    "accountId": "santander-usd-usd",
+    "genesisDate": "2026-08-01",
+    "openingBalance": 1.29,
+    "openingBalanceClp": 1200,
+    "declarationReason": "Re-anclaje agosto 2026. SALDO INICIAL de la cartola histórica N°10 USD (30/06/2026–31/08/2026) = USD 1,29; único movimiento del período es 13/08 (+335,15), por lo que el saldo al SOD 01/08 = USD 1,29. Bank-authoritative. CLP equivalente aproximado (USD/CLP ~930).",
+    "auditStatus": "reconciled",
+    "evidenceRefs": [
+      { "type": "cartola_xlsx", "ref": "data/bank/Santander-USD-Agosto-CartolaHistCtaCte-005103266337-0010-20260910.xlsx", "period": "2026-06-30..2026-08-31", "description": "Cartola histórica N°10 Cta Cte USD 0-051-0326633-7. Saldo inicial 1.29 / final 336.44." }
+    ]
+  },
+  {
+    "accountId": "santander-corp-clp",
+    "genesisDate": "2026-08-07",
+    "openingBalance": 975503,
+    "declarationReason": "Re-anclaje ciclo TC agosto 2026. Convención canónica: genesisDate = SOD = EOD del cierre de ciclo anterior (06/08/2026). Cupo utilizado al cierre 06/08 = MONTO FACTURADO A PAGAR (PERÍODO ANTERIOR) = $975.503 según estado de cuenta del 07/09/2026 (sección 1. PERÍODO ANTERIOR). Los pagos del 14/08 (-1.435.296) y 01/09 (-314.416) y los cargos 06/08–07/09 pertenecen al período actual y se importan como filas de cartola. Verificación: 975.503 − 1.749.712 + 2.246.099 + 9.403 = 1.481.293 = cupo utilizado al 07/09. Convención liability: positivo = deuda.",
+    "auditStatus": "reconciled",
+    "evidenceRefs": [
+      { "type": "cartola_tc", "ref": "data/bank/Santander-Corp-TC-Septiembre-EstadoCuentaTC-XXXXXXXXXXXX2505-20260910.pdf", "period": "2026-08-06..2026-09-07", "description": "Estado de cuenta TC Master Empresa Plus *2505 fecha 07/09/2026. Cupo total 1.700.000 / utilizado 1.481.293 / disponible 218.707." }
+    ]
+  },
+  {
+    "accountId": "global66-clp",
+    "genesisDate": "2026-08-01",
+    "openingBalance": 18562,
+    "declarationReason": "Re-anclaje agosto 2026. Saldo al EOD 31/07/2026 = $18.562, derivado del histórico completo de movimientos de la cuenta CLP en Global66 (export oficial 2024-09-27..2026-09-10, 184 movimientos, cuenta nace en 0 el 2024-11-12): Σ acreditado 49.053.068 − Σ debitado hasta 31/07. Consistente con el ancla anterior ($8.562 al 05/04) + saldo residual. Bank-authoritative por derivación del extracto oficial; pendiente confirmar contra la cartola PDF 202608 (correo Global66 04/09).",
+    "auditStatus": "reconciled",
+    "evidenceRefs": [
+      { "type": "cartola_xls", "ref": "data/bank/Global66-histórico-Septiembre-CLP-movements-09-2024_09-2026.xls", "period": "2024-09-27..2026-09-10", "description": "Export oficial Movimientos de cuenta CLP. Saldo derivado EOD 31/07 = 18.562; EOD 31/08 = 16.468; al 10/09 = 16.468." }
+    ]
+  },
+  {
+    "accountId": "global-66-mxn-mxn",
+    "genesisDate": "2026-08-01",
+    "openingBalance": 84760,
+    "openingBalanceClp": 4525000,
+    "declarationReason": "Ancla inicial cuenta Global66 MXN (billetera abierta julio 2026, registrada 2026-06-02 sin OTB). Saldo al EOD 31/07/2026 = MXN 84.760 = único movimiento previo (Recibido de Pinturas Berel SA de CV 17/07/2026). Bank-authoritative por el export oficial completo (3 movimientos). CLP equivalente aproximado (MXN/CLP ~53,4 según conversión del 14/08).",
+    "auditStatus": "reconciled",
+    "evidenceRefs": [
+      { "type": "cartola_xls", "ref": "data/bank/Global66-Histórico-MXN-Septiembre-movements-09-2024_09-2026.xls", "period": "2024-09-28..2026-09-10", "description": "Export oficial Movimientos de cuenta MXN. 17/07 +84.760; 13/08 +104.000; 14/08 conversión −188.750 → saldo 10." }
+    ]
+  },
+  {
+    "accountId": "deel-clp",
+    "genesisDate": "2026-08-01",
+    "openingBalance": 0,
+    "declarationReason": "Re-anclaje agosto 2026. Transit account (payment_platform): Deel pasa fondos sin retener saldo. OTB $0 reconciled by definition; supersede del histórico pre-agosto.",
+    "auditStatus": "reconciled"
+  },
+  {
+    "accountId": "previred-clp",
+    "genesisDate": "2026-08-01",
+    "openingBalance": 0,
+    "declarationReason": "Re-anclaje agosto 2026. Transit account (payroll_processor): Previred pasa fondos sin retener saldo. OTB $0 reconciled by definition; supersede del histórico pre-agosto.",
+    "auditStatus": "reconciled"
+  }
+]

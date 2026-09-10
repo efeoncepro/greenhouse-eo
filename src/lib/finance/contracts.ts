@@ -53,7 +53,8 @@ export const QUOTATION_CANONICAL_STATUSES = [
 ] as const
 export type QuotationCanonicalStatus = (typeof QUOTATION_CANONICAL_STATUSES)[number]
 
-export const ACCOUNT_TYPES = ['checking', 'savings', 'paypal', 'wise', 'other'] as const
+// `vista` = Cuenta Vista chilena (instrumento bancario sin línea de crédito ni chequera; Banco de Chile 2026-08).
+export const ACCOUNT_TYPES = ['checking', 'savings', 'vista', 'paypal', 'wise', 'other'] as const
 export type AccountType = (typeof ACCOUNT_TYPES)[number]
 
 export const PAYMENT_METHODS = ['transfer', 'credit_card', 'paypal', 'wise', 'check', 'cash', 'other'] as const

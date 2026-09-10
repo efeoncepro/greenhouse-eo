@@ -63,13 +63,6 @@ type AccountRow = {
   metadata_json: unknown
 }
 
-type DailyMovementRow = {
-  inflows: unknown
-  outflows: unknown
-  transaction_count: unknown
-  last_transaction_at: string | Date | null
-}
-
 type DailyFxRow = {
   fx_gain_loss_clp: unknown
 }
@@ -619,12 +612,61 @@ const getPreviousBalanceRow = async (
   return rows[0] || null
 }
 
+type DailyMovementDetailRow = {
+  direction: 'incoming' | 'outgoing'
+  amount_native: unknown
+  currency: string | null
+  amount_clp: unknown
+  occurred_at: string | Date | null
+}
+
+/**
+ * Convierte un movimiento a las unidades de la cuenta.
+ *
+ * TASK-774 (cuentas CLP): el balance se computa con el monto CLP-resuelto
+ * (`COALESCE(amount_clp, CASE WHEN currency=CLP THEN amount END)`), igual que
+ * las VIEWs canónicas TASK-766.
+ *
+ * Cuentas en moneda extranjera (fix 2026-09-10): el balance vive en la moneda
+ * de la cuenta (la OTB de `santander-usd-usd` es USD 1.29, no CLP). Sumarle
+ * `payment_amount_clp` a una cuenta USD la mandaba a USD -738.623 por un pago
+ * de USD 788,86 (EXP-202608-004). Regla:
+ *   - pago en la moneda de la cuenta → monto nativo tal cual;
+ *   - pago en otra moneda con `amount_clp` resuelto → `amount_clp / rate(cuenta→CLP)`
+ *     del día que se materializa (degradación honesta, misma tasa que
+ *     `closing_balance_clp`);
+ *   - sin nada resoluble → monto nativo (última línea de defensa, nunca NULL).
+ */
+const toAccountUnits = (
+  row: DailyMovementDetailRow,
+  accountCurrency: string,
+  accountFxRateToClp: number
+): number => {
+  const native = toNumber(row.amount_native)
+  const clp = row.amount_clp == null ? null : toNumber(row.amount_clp)
+  const rowCurrency = normalizeString(row.currency || '') || null
+
+  if (accountCurrency === 'CLP') {
+    if (clp != null) return clp
+
+    return rowCurrency === null || rowCurrency === 'CLP' ? native : 0
+  }
+
+  if (rowCurrency === accountCurrency || rowCurrency === null) return native
+
+  if (clp != null && accountFxRateToClp > 0) return clp / accountFxRateToClp
+
+  return native
+}
+
 const getDailyMovementSummary = async (
   accountId: string,
   balanceDate: string,
+  accountCurrency: string,
+  accountFxRateToClp: number,
   client?: QueryableClient
 ) => {
-  const rows = await queryRows<DailyMovementRow>(
+  const rows = await queryRows<DailyMovementDetailRow>(
     `
       -- Three-axis supersede filter (TASK-702 / TASK-703b / TASK-708b):
       -- a payment or settlement_leg is "active" only when ALL three are NULL:
@@ -634,28 +676,18 @@ const getDailyMovementSummary = async (
       -- Filtering on only one axis (historical bug) miscounts dismissed phantoms
       -- and inflates account_balances.
       --
-      -- TASK-774 — CLP-equivalent contract canonico:
-      -- Para cuentas CLP que reciben pagos en moneda extranjera (caso CCA
-      -- TASK-714c, payments Deel/Adobe/Figma USD pagados desde TC CLP), el
-      -- balance se computa con payment_amount_clp (FX-resolved) en lugar
-      -- de amount (currency original). El COALESCE chain es el mismo de
-      -- las VIEWs canonicas TASK-766 (expense_payments_normalized,
-      -- income_payments_normalized):
-      --   COALESCE(amount_clp, CASE WHEN currency=CLP THEN amount END)
-      -- Para settlement_legs aplicamos COALESCE inline (settlement_legs ya
-      -- tiene columna amount_clp opcional desde migration 20260408103211338);
-      -- para ep/ip leemos directo de las VIEWs canonicas TASK-766 que ya
-      -- exponen payment_amount_clp con el mismo COALESCE + filtro 3-axis
-      -- supersede inline. Bug pre-fix: ep.amount sumaba USD nativo en cuenta
-      -- CLP -> balance Santander Corp +92.9 en lugar de +83,773.5 (Figma
-      -- EXP-202604-008, 2026-05-03).
+      -- La conversión a unidades de la cuenta (CLP-resuelto para cuentas CLP
+      -- per TASK-774; nativo para cuentas USD/MXN) vive en \`toAccountUnits\`:
+      -- el SQL expone las tres columnas (nativo, moneda, CLP) y no decide.
+      -- Para ep/ip leemos las VIEWs canónicas TASK-766 que ya exponen
+      -- payment_amount_native/payment_currency/payment_amount_clp con el
+      -- filtro 3-axis supersede inline.
       WITH settlement_movements AS (
         SELECT
           sl.direction,
-          COALESCE(
-            sl.amount_clp,
-            CASE WHEN sl.currency = 'CLP' THEN sl.amount END
-          ) AS amount,
+          sl.amount AS amount_native,
+          sl.currency,
+          sl.amount_clp,
           sl.transaction_date::timestamptz AS occurred_at
         FROM greenhouse_finance.settlement_legs sl
         WHERE sl.instrument_id = $1
@@ -666,7 +698,9 @@ const getDailyMovementSummary = async (
       fallback_income_payments AS (
         SELECT
           'incoming'::text AS direction,
-          ipn.payment_amount_clp AS amount,
+          ipn.payment_amount_native AS amount_native,
+          ipn.payment_currency AS currency,
+          ipn.payment_amount_clp AS amount_clp,
           ipn.payment_date::timestamptz AS occurred_at
         FROM greenhouse_finance.income_payments_normalized ipn
         WHERE ipn.payment_account_id = $1
@@ -684,7 +718,9 @@ const getDailyMovementSummary = async (
       fallback_expense_payments AS (
         SELECT
           'outgoing'::text AS direction,
-          epn.payment_amount_clp AS amount,
+          epn.payment_amount_native AS amount_native,
+          epn.payment_currency AS currency,
+          epn.payment_amount_clp AS amount_clp,
           epn.payment_date::timestamptz AS occurred_at
         FROM greenhouse_finance.expense_payments_normalized epn
         WHERE epn.payment_account_id = $1
@@ -698,30 +734,37 @@ const getDailyMovementSummary = async (
               AND sl.superseded_at IS NULL
               AND sl.superseded_by_otb_id IS NULL
           )
-      ),
-      movements AS (
-        SELECT * FROM settlement_movements
-        UNION ALL
-        SELECT * FROM fallback_income_payments
-        UNION ALL
-        SELECT * FROM fallback_expense_payments
       )
-      SELECT
-        COALESCE(SUM(CASE WHEN direction = 'incoming' THEN amount ELSE 0 END), 0)::text AS inflows,
-        COALESCE(SUM(CASE WHEN direction = 'outgoing' THEN amount ELSE 0 END), 0)::text AS outflows,
-        COUNT(*)::text AS transaction_count,
-        MAX(occurred_at) AS last_transaction_at
-      FROM movements
+      SELECT direction, amount_native, currency, amount_clp, occurred_at FROM settlement_movements
+      UNION ALL
+      SELECT direction, amount_native, currency, amount_clp, occurred_at FROM fallback_income_payments
+      UNION ALL
+      SELECT direction, amount_native, currency, amount_clp, occurred_at FROM fallback_expense_payments
     `,
     [accountId, balanceDate],
     client
   )
 
-  return rows[0] || {
-    inflows: 0,
-    outflows: 0,
-    transaction_count: 0,
-    last_transaction_at: null
+  let inflows = 0
+  let outflows = 0
+  let lastTransactionAt: string | Date | null = null
+
+  for (const row of rows) {
+    const amount = toAccountUnits(row, accountCurrency, accountFxRateToClp)
+
+    if (row.direction === 'incoming') inflows += amount
+    else outflows += amount
+
+    if (row.occurred_at && (!lastTransactionAt || new Date(row.occurred_at) > new Date(lastTransactionAt))) {
+      lastTransactionAt = row.occurred_at
+    }
+  }
+
+  return {
+    inflows,
+    outflows,
+    transaction_count: rows.length,
+    last_transaction_at: lastTransactionAt
   }
 }
 
@@ -922,26 +965,7 @@ export const materializeAccountBalance = async (
       ? roundCurrency(toNumber(previous.closing_balance))
       : (otbOpening ?? roundCurrency(toNumber(account.opening_balance)))
 
-  const movementSummary = await getDailyMovementSummary(input.accountId, balanceDate, input.client)
-  const fxSummary = await getDailyFxGainLoss(input.accountId, balanceDate, input.client)
   const currency = normalizeString(account.currency || 'CLP') || 'CLP'
-  const periodInflows = roundCurrency(toNumber(movementSummary.inflows))
-  const periodOutflows = roundCurrency(toNumber(movementSummary.outflows))
-
-  // TASK-703: liability accounts (credit_card, shareholder_account, future loans/wallets)
-  // invert the sign convention. From the bank's POV:
-  //   - cargos a TC ("outflows" del POV TC instrument) AUMENTAN deuda
-  //   - pagos a TC ("inflows" desde otra cuenta) REDUCEN deuda
-  // Same for CCA:
-  //   - gastos pagados con tarjeta personal del accionista (outflows del CCA) AUMENTAN deuda
-  //   - reembolsos transferidos al accionista (inflows al CCA) REDUCEN deuda
-  // Asset accounts (banks, fintechs, cash, payroll_processor) keep the canonical
-  // bank convention: closing = opening + inflows - outflows.
-  const accountKind = (account as AccountRow & { account_kind?: string }).account_kind || 'asset'
-
-  const closingBalance = accountKind === 'liability'
-    ? roundCurrency(openingBalance - periodInflows + periodOutflows)
-    : roundCurrency(openingBalance + periodInflows - periodOutflows)
 
   // ── FX resolution ──────────────────────────────────────────────────────
   // CLP accounts: rate=1, no translation FX possible.
@@ -972,6 +996,37 @@ export const materializeAccountBalance = async (
       fxRateUsed = toNumber(previous?.fx_rate_used) || 1
     }
   }
+
+  // La tasa se resuelve ANTES del resumen de movimientos: las cuentas en
+  // moneda extranjera la usan para traer a sus unidades los pagos hechos en
+  // otra moneda (ver `toAccountUnits`).
+  const movementSummary = await getDailyMovementSummary(
+    input.accountId,
+    balanceDate,
+    currency,
+    fxRateUsed,
+    input.client
+  )
+
+  const fxSummary = await getDailyFxGainLoss(input.accountId, balanceDate, input.client)
+  const periodInflows = roundCurrency(toNumber(movementSummary.inflows))
+  const periodOutflows = roundCurrency(toNumber(movementSummary.outflows))
+
+  // TASK-703: liability accounts (credit_card, shareholder_account, future loans/wallets)
+  // invert the sign convention. From the bank's POV:
+  //   - cargos a TC ("outflows" del POV TC instrument) AUMENTAN deuda
+  //   - pagos a TC ("inflows" desde otra cuenta) REDUCEN deuda
+  // Same for CCA:
+  //   - gastos pagados con tarjeta personal del accionista (outflows del CCA) AUMENTAN deuda
+  //   - reembolsos transferidos al accionista (inflows al CCA) REDUCEN deuda
+  // Asset accounts (banks, fintechs, cash, payroll_processor) keep the canonical
+  // bank convention: closing = opening + inflows - outflows.
+  const accountKind = (account as AccountRow & { account_kind?: string }).account_kind || 'asset'
+
+  const closingBalance = accountKind === 'liability'
+    ? roundCurrency(openingBalance - periodInflows + periodOutflows)
+    : roundCurrency(openingBalance + periodInflows - periodOutflows)
+
 
   const closingBalanceClp = currency === 'CLP'
     ? closingBalance

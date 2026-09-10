@@ -1,0 +1,1233 @@
+{
+  "actor": "user-efeonce-admin-julio-reyes",
+  "entries": [
+    {
+      "row": {
+        "periodId": "santander-clp_2026_08",
+        "date": "2026-08-03",
+        "amount": -400556,
+        "description": "T\\. Cr[ée]dito"
+      },
+      "action": {
+        "type": "internal_transfer",
+        "sourceAccountId": "santander-clp",
+        "destinationAccountId": "santander-corp-clp",
+        "notes": "Pago TC ciclo julio (cierre 06/08); pata TC pre-genesis 07/08, ya contenida en el cupo utilizado 975.503"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-clp_2026_08",
+        "date": "2026-08-03",
+        "amount": -450000,
+        "description": "Humberly"
+      },
+      "action": {
+        "type": "skip",
+        "reason": "Honorarios Humberly: transferido 450.000 vs entry 2026-07 net 254.250 — pendiente confirmación (punto 7)"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-clp_2026_08",
+        "date": "2026-08-05",
+        "amount": 600,
+        "description": "EFEONCE GROUP"
+      },
+      "action": {
+        "type": "internal_transfer",
+        "sourceAccountId": "banco-chile-clp",
+        "destinationAccountId": "santander-clp",
+        "paymentDate": "2026-08-04",
+        "destinationDate": "2026-08-05",
+        "notes": "Transferencia de prueba desde Cuenta Vista Banco de Chile 308526005 (04/08 18:43, abonada 05/08)"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-clp_2026_08",
+        "date": "2026-08-05",
+        "amount": -854858,
+        "description": "26\\.928\\.468-4"
+      },
+      "action": {
+        "type": "internal_transfer",
+        "sourceAccountId": "santander-clp",
+        "destinationAccountId": "sha-cca-julio-reyes-clp",
+        "notes": "Transferencia a Julio Reyes (accionista) → cuenta corriente accionista, precedente marzo–abril 2026"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-clp_2026_08",
+        "date": "2026-08-05",
+        "amount": -101859,
+        "description": "Cuota Cr"
+      },
+      "action": {
+        "type": "loan_installment",
+        "loanAccountId": "loan-santander-420051383906",
+        "installmentLabel": "Cuota 05/08/2026 crédito 420051383906"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-clp_2026_08",
+        "date": "2026-08-11",
+        "amount": 6763199,
+        "description": "X Capital"
+      },
+      "action": {
+        "type": "factoring_inflow",
+        "incomeId": "INC-NB-30540464",
+        "factoringProviderId": "prov-xepelin-001",
+        "nominalAmount": 6902000,
+        "externalReference": "X Capital 2026-08-11 · factura 121 Sky"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-clp_2026_08",
+        "date": "2026-08-11",
+        "amount": -174930,
+        "description": "76\\.554\\.648-6"
+      },
+      "action": {
+        "type": "pay_expense",
+        "expenseId": "EXP-NB-40557508"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-clp_2026_08",
+        "date": "2026-08-11",
+        "amount": -8083,
+        "description": "77\\.078\\.244-9"
+      },
+      "action": {
+        "type": "pay_expense",
+        "expenseId": "EXP-NB-39829820"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-clp_2026_08",
+        "date": "2026-08-14",
+        "amount": 4995000,
+        "description": "Efeonce Group"
+      },
+      "action": {
+        "type": "internal_transfer",
+        "sourceAccountId": "global66-clp",
+        "destinationAccountId": "santander-clp",
+        "counterpart": {
+          "periodId": "global66-clp_2026_08",
+          "date": "2026-08-14",
+          "amount": -4995000,
+          "description": "92044661"
+        },
+        "notes": "Traspaso Global66 → Santander CLP (fondos de la conversión MXN Berel)"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-clp_2026_08",
+        "date": "2026-08-14",
+        "amount": 1432000,
+        "description": "Efeonce Group"
+      },
+      "action": {
+        "type": "internal_transfer",
+        "sourceAccountId": "global66-clp",
+        "destinationAccountId": "santander-clp",
+        "counterpart": {
+          "periodId": "global66-clp_2026_08",
+          "date": "2026-08-14",
+          "amount": -1432000,
+          "description": "92044661"
+        },
+        "notes": "Traspaso Global66 → Santander CLP (fondos de la conversión MXN Berel)"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-clp_2026_08",
+        "date": "2026-08-14",
+        "amount": 5000,
+        "description": "Efeonce Group"
+      },
+      "action": {
+        "type": "internal_transfer",
+        "sourceAccountId": "global66-clp",
+        "destinationAccountId": "santander-clp",
+        "counterpart": {
+          "periodId": "global66-clp_2026_08",
+          "date": "2026-08-14",
+          "amount": -5000,
+          "description": "92044661"
+        },
+        "notes": "Traspaso Global66 → Santander CLP (fondos de la conversión MXN Berel)"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-clp_2026_08",
+        "date": "2026-08-14",
+        "amount": -1435296,
+        "description": "T\\. Cr[ée]dito"
+      },
+      "action": {
+        "type": "internal_transfer",
+        "sourceAccountId": "santander-clp",
+        "destinationAccountId": "santander-corp-clp",
+        "counterpart": {
+          "periodId": "santander-corp-clp_2026_08",
+          "date": "2026-08-14",
+          "amount": 1435296
+        },
+        "notes": "Pago TC 14/08 (MONTO CANCELADO)"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-clp_2026_08",
+        "date": "2026-08-19",
+        "amount": -2774399,
+        "description": "S\\.I\\.I"
+      },
+      "action": {
+        "type": "tax",
+        "taxType": "iva_f29",
+        "taxPeriod": "2026-07",
+        "taxFormNumber": "F29",
+        "description": "PAGO EN LINEA S.I.I. — F29 IVA período 2026-07 (folio cartola 417807316)"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-clp_2026_08",
+        "date": "2026-08-19",
+        "amount": -2248039,
+        "description": "26\\.928\\.468-4"
+      },
+      "action": {
+        "type": "internal_transfer",
+        "sourceAccountId": "santander-clp",
+        "destinationAccountId": "sha-cca-julio-reyes-clp",
+        "notes": "Transferencia a Julio Reyes (accionista) → cuenta corriente accionista"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-clp_2026_08",
+        "date": "2026-08-20",
+        "amount": -41286,
+        "description": "77\\.078\\.244-9"
+      },
+      "action": {
+        "type": "pay_expense",
+        "expenseId": "EXP-NB-40329356"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-clp_2026_08",
+        "date": "2026-08-27",
+        "amount": -20014,
+        "description": "MANTENCION"
+      },
+      "action": {
+        "type": "pay_expense",
+        "expenseId": "EXP-NB-40386831"
+      }
+    },
+    {
+      "row": {
+        "periodId": "global66-clp_2026_08",
+        "date": "2026-08-04",
+        "amount": -811188,
+        "description": "Andres"
+      },
+      "action": {
+        "type": "international_payroll",
+        "payrollEntryId": "2026-07_andres-carlosama",
+        "beneficiaryName": "Andres Carlosama",
+        "beneficiaryCountry": "CO",
+        "beneficiaryAccount": "3165646836",
+        "receivedRow": {
+          "periodId": "global66-clp_2026_08",
+          "date": "2026-08-04",
+          "amount": 845868,
+          "description": "Recibido"
+        },
+        "feeRow": {
+          "periodId": "global66-clp_2026_08",
+          "date": "2026-08-04",
+          "amount": -34680,
+          "description": "Costo"
+        },
+        "sourceRow": {
+          "periodId": "santander-clp_2026_08",
+          "date": "2026-08-05",
+          "amount": -845868,
+          "description": "77\\.357\\.182-1"
+        }
+      }
+    },
+    {
+      "row": {
+        "periodId": "global66-clp_2026_08",
+        "date": "2026-08-04",
+        "amount": -346075,
+        "description": "fernanda"
+      },
+      "action": {
+        "type": "international_payroll",
+        "payrollEntryId": "2026-07_7da60123-3e54-4db9-9dd0-1962f69073a2",
+        "beneficiaryName": "Maria Fernanda Gonzalez",
+        "beneficiaryCountry": "CO",
+        "beneficiaryAccount": "87084188848",
+        "receivedRow": {
+          "periodId": "global66-clp_2026_08",
+          "date": "2026-08-04",
+          "amount": 362762,
+          "description": "Recibido"
+        },
+        "feeRow": {
+          "periodId": "global66-clp_2026_08",
+          "date": "2026-08-04",
+          "amount": -16687,
+          "description": "Costo"
+        },
+        "sourceRow": {
+          "periodId": "santander-clp_2026_08",
+          "date": "2026-08-05",
+          "amount": -362762,
+          "description": "77\\.357\\.182-1"
+        }
+      }
+    },
+    {
+      "row": {
+        "periodId": "global66-clp_2026_07",
+        "date": "2026-07-31",
+        "amount": -1126657,
+        "description": "Daniela"
+      },
+      "action": {
+        "type": "international_payroll",
+        "payrollEntryId": "2026-07_daniela-ferreira",
+        "beneficiaryName": "Daniela Ferreira",
+        "beneficiaryCountry": "ES",
+        "beneficiaryAccount": "ES7068930001760000144965",
+        "receivedRow": {
+          "periodId": "global66-clp_2026_07",
+          "date": "2026-07-31",
+          "amount": 1162700,
+          "description": "Recibido"
+        },
+        "feeRow": {
+          "periodId": "global66-clp_2026_07",
+          "date": "2026-07-31",
+          "amount": -36043,
+          "description": "Costo"
+        },
+        "sourceRow": {
+          "periodId": "santander-clp_2026_08",
+          "date": "2026-08-03",
+          "amount": -1162700,
+          "description": "77\\.357\\.182-1"
+        }
+      }
+    },
+    {
+      "row": {
+        "periodId": "global66-clp_2026_08",
+        "date": "2026-08-20",
+        "amount": -135456,
+        "description": "Daniela"
+      },
+      "action": {
+        "type": "international_payroll",
+        "payrollEntryId": "2026-07_daniela-ferreira",
+        "beneficiaryName": "Daniela Ferreira",
+        "beneficiaryCountry": "ES",
+        "beneficiaryAccount": "ES7068930001760000144965",
+        "receivedRow": {
+          "periodId": "global66-clp_2026_08",
+          "date": "2026-08-20",
+          "amount": 139645,
+          "description": "Recibido"
+        },
+        "feeRow": {
+          "periodId": "global66-clp_2026_08",
+          "date": "2026-08-20",
+          "amount": -4189,
+          "description": "Costo"
+        },
+        "sourceRow": {
+          "periodId": "santander-clp_2026_08",
+          "date": "2026-08-20",
+          "amount": -139645,
+          "description": "77\\.357\\.182-1"
+        }
+      }
+    },
+    {
+      "row": {
+        "periodId": "global66-clp_2026_08",
+        "date": "2026-08-14",
+        "amount": 10079906,
+        "description": "Conversi"
+      },
+      "action": {
+        "type": "fx_conversion",
+        "sourceRow": {
+          "periodId": "global-66-mxn-mxn_2026_08",
+          "date": "2026-08-14",
+          "amount": -188750
+        },
+        "sourceAccountId": "global-66-mxn-mxn",
+        "sourceCurrency": "MXN",
+        "destinationAccountId": "global66-clp",
+        "destinationCurrency": "CLP",
+        "notes": "Conversión MXN→CLP Global66 (cobros Berel 17/07 + 13/08)"
+      }
+    },
+    {
+      "row": {
+        "periodId": "global66-clp_2026_08",
+        "date": "2026-08-14",
+        "amount": -300000,
+        "description": "308526005"
+      },
+      "action": {
+        "type": "internal_transfer",
+        "sourceAccountId": "global66-clp",
+        "destinationAccountId": "banco-chile-clp",
+        "notes": "Traspaso Global66 → Banco de Chile Cuenta Vista 308526005"
+      }
+    },
+    {
+      "row": {
+        "periodId": "global66-clp_2026_08",
+        "date": "2026-08-18",
+        "amount": -3350000,
+        "description": "308526005"
+      },
+      "action": {
+        "type": "internal_transfer",
+        "sourceAccountId": "global66-clp",
+        "destinationAccountId": "banco-chile-clp",
+        "notes": "Traspaso Global66 → Banco de Chile Cuenta Vista 308526005"
+      }
+    },
+    {
+      "row": {
+        "periodId": "global-66-mxn-mxn_2026_08",
+        "date": "2026-08-13",
+        "amount": 104000,
+        "description": "berel"
+      },
+      "action": {
+        "type": "skip",
+        "reason": "Cobro Berel MXN 104.000 (13/08): falta indicar qué factura paga (punto 7)"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-usd-usd_2026_08",
+        "date": "2026-08-13",
+        "amount": 335.15
+      },
+      "action": {
+        "type": "skip",
+        "reason": "Recepción USD 335,15 'Rec Or de Pago 202699234551' (COMEX): origen por confirmar (punto 7)"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-clp_2026_09",
+        "date": "2026-09-02",
+        "amount": -314416,
+        "description": "T\\. Cr[ée]dito"
+      },
+      "action": {
+        "type": "internal_transfer",
+        "sourceAccountId": "santander-clp",
+        "destinationAccountId": "santander-corp-clp",
+        "counterpart": {
+          "periodId": "santander-corp-clp_2026_08",
+          "date": "2026-09-01",
+          "amount": 314416
+        },
+        "notes": "Pago TC 01/09 (MONTO CANCELADO)"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-clp_2026_09",
+        "date": "2026-09-03",
+        "amount": -450000,
+        "description": "27\\.836\\.817-3"
+      },
+      "action": {
+        "type": "skip",
+        "reason": "Honorarios Humberly: transferido 450.000 vs pago registrado por payroll 381.375 (EXP-202608-003) — pendiente (punto 7)"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-clp_2026_09",
+        "date": "2026-09-04",
+        "amount": -1150075,
+        "description": "77\\.357\\.182-1"
+      },
+      "action": {
+        "type": "internal_transfer",
+        "sourceAccountId": "santander-clp",
+        "destinationAccountId": "global66-clp",
+        "counterpart": {
+          "periodId": "global66-clp_2026_09",
+          "date": "2026-09-03",
+          "amount": 1150075,
+          "description": "Recibido"
+        },
+        "notes": "Fondeo Global66 para nómina agosto Daniela Ferreira (pago registrado por payroll en USD; ver discrepancias)"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-clp_2026_09",
+        "date": "2026-09-04",
+        "amount": -834963,
+        "description": "77\\.357\\.182-1"
+      },
+      "action": {
+        "type": "internal_transfer",
+        "sourceAccountId": "santander-clp",
+        "destinationAccountId": "global66-clp",
+        "counterpart": {
+          "periodId": "global66-clp_2026_09",
+          "date": "2026-09-03",
+          "amount": 834963,
+          "description": "Recibido"
+        },
+        "notes": "Fondeo Global66 para nómina agosto Andres Carlosama (pago registrado por payroll en USD; ver discrepancias)"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-clp_2026_09",
+        "date": "2026-09-04",
+        "amount": -827105,
+        "description": "26\\.928\\.468-4"
+      },
+      "action": {
+        "type": "internal_transfer",
+        "sourceAccountId": "santander-clp",
+        "destinationAccountId": "sha-cca-julio-reyes-clp",
+        "notes": "Transferencia a Julio Reyes (accionista) → cuenta corriente accionista"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-clp_2026_09",
+        "date": "2026-09-07",
+        "amount": -174194,
+        "description": "20\\.557\\.199"
+      },
+      "action": {
+        "type": "skip",
+        "reason": "Transferencia a Valentina Hoyos 174.194 (07/09): concepto por confirmar (finiquito/bono) — punto 7"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-clp_2026_09",
+        "date": "2026-09-07",
+        "amount": -1000000,
+        "description": "26\\.928\\.468-4",
+        "ordinal": 1
+      },
+      "action": {
+        "type": "internal_transfer",
+        "sourceAccountId": "santander-clp",
+        "destinationAccountId": "sha-cca-julio-reyes-clp",
+        "notes": "Transferencia a Julio Reyes (accionista) 1/2 → cuenta corriente accionista"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-clp_2026_09",
+        "date": "2026-09-07",
+        "amount": -1000000,
+        "description": "26\\.928\\.468-4",
+        "ordinal": 2
+      },
+      "action": {
+        "type": "internal_transfer",
+        "sourceAccountId": "santander-clp",
+        "destinationAccountId": "sha-cca-julio-reyes-clp",
+        "notes": "Transferencia a Julio Reyes (accionista) 2/2 → cuenta corriente accionista"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-clp_2026_09",
+        "date": "2026-09-07",
+        "amount": 15749999,
+        "description": "Cr[ée]dito Comercial"
+      },
+      "action": {
+        "type": "loan_disbursement",
+        "loan": {
+          "loanId": "loan-santander-fogape-20260907",
+          "lenderName": "Santander",
+          "externalReference": "FOGAPE-OB-2026-09-07",
+          "currency": "CLP",
+          "originalAmount": 16533196,
+          "monthlyInstallment": 500850,
+          "installmentCount": 49,
+          "fundingAccountId": "santander-clp",
+          "startedAt": "2026-09-07",
+          "notes": "Crédito Comercial con garantía FOGAPE (Admisión canal Office Banking), contratado 07/09/2026. Monto líquido $15.750.000 (abonado como 15.749.999 + 1 el 07/09 y 09/09); monto bruto $16.533.196 (impuestos 132.265 + notaría 1.500 + seguro desgravamen 649.431 descontados); 49 cuotas de $500.850; tasa 1,54% mensual; CAE 22,53%; costo total $24.040.834. Cuota se carga en cta 92044661. Contrato: data/bank/CONTRATO FOGAPE ADMISION OB.pdf (clave RUT sin DV).",
+          "metadata": {
+            "product": "credito_comercial_fogape",
+            "channel": "office_banking",
+            "netAmount": 15750000,
+            "grossAmount": 16533196,
+            "taxes": 132265,
+            "notaryFees": 1500,
+            "lifeInsuranceTotal": 649431,
+            "monthlyRate": 0.0154,
+            "cae": 0.2253,
+            "totalCost": 24040834,
+            "fogapeCommissionAnnual": 0.01,
+            "cartolaReference": "Otorg. Crédito Comercial N° 420051 / doc 003504014"
+          }
+        }
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-clp_2026_09",
+        "date": "2026-09-09",
+        "amount": 1,
+        "description": "Shinkansen"
+      },
+      "action": {
+        "type": "loan_disbursement",
+        "loan": {
+          "loanId": "loan-santander-fogape-20260907",
+          "lenderName": "Santander",
+          "externalReference": "FOGAPE-OB-2026-09-07",
+          "currency": "CLP",
+          "originalAmount": 16533196,
+          "monthlyInstallment": 500850,
+          "installmentCount": 49,
+          "fundingAccountId": "santander-clp",
+          "startedAt": "2026-09-07",
+          "notes": "Crédito Comercial con garantía FOGAPE (Admisión canal Office Banking), contratado 07/09/2026. Monto líquido $15.750.000 (abonado como 15.749.999 + 1 el 07/09 y 09/09); monto bruto $16.533.196 (impuestos 132.265 + notaría 1.500 + seguro desgravamen 649.431 descontados); 49 cuotas de $500.850; tasa 1,54% mensual; CAE 22,53%; costo total $24.040.834. Cuota se carga en cta 92044661. Contrato: data/bank/CONTRATO FOGAPE ADMISION OB.pdf (clave RUT sin DV).",
+          "metadata": {
+            "product": "credito_comercial_fogape",
+            "channel": "office_banking",
+            "netAmount": 15750000,
+            "grossAmount": 16533196,
+            "taxes": 132265,
+            "notaryFees": 1500,
+            "lifeInsuranceTotal": 649431,
+            "monthlyRate": 0.0154,
+            "cae": 0.2253,
+            "totalCost": 24040834,
+            "fogapeCommissionAnnual": 0.01,
+            "cartolaReference": "Otorg. Crédito Comercial N° 420051 / doc 003504014"
+          }
+        },
+        "notes": "Complemento $1 del desembolso FOGAPE (15.749.999 + 1 = monto líquido 15.750.000), vía Shinkansen SpA"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-clp_2026_09",
+        "date": "2026-09-07",
+        "amount": -101966,
+        "description": "Cuota Cr"
+      },
+      "action": {
+        "type": "loan_installment",
+        "loanAccountId": "loan-santander-420051383906",
+        "installmentLabel": "Cuota 07/09/2026 crédito 420051383906"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-clp_2026_09",
+        "date": "2026-09-09",
+        "amount": -11864,
+        "description": "77\\.078\\.244-9"
+      },
+      "action": {
+        "type": "pay_expense",
+        "expenseId": "EXP-NB-40730759"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-clp_2026_09",
+        "date": "2026-09-09",
+        "amount": 6782025,
+        "description": "X Capital"
+      },
+      "action": {
+        "type": "factoring_inflow",
+        "incomeId": "INC-NB-31161735",
+        "factoringProviderId": "prov-xepelin-001",
+        "nominalAmount": 6902000,
+        "externalReference": "X Capital 2026-09-09 · factura 122 Sky"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-08-06",
+        "amount": -55244,
+        "description": "APOLLO"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Apollo.io",
+        "toolCatalogId": null,
+        "description": "Apollo.io — cargo TC Master Empresa *2505 2026-08-06"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-08-08",
+        "amount": -120000,
+        "description": "GOOGLE \\*CLOUD"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Google Cloud",
+        "toolCatalogId": null,
+        "description": "Google Cloud — cargo TC Master Empresa *2505 2026-08-08"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-08-08",
+        "amount": -50533,
+        "description": "METRICOOL"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Metricool",
+        "toolCatalogId": null,
+        "description": "Metricool — cargo TC Master Empresa *2505 2026-08-08"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-08-08",
+        "amount": -55038,
+        "description": "ADOBE"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Adobe",
+        "toolCatalogId": null,
+        "description": "Adobe — cargo TC Master Empresa *2505 2026-08-08"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-08-09",
+        "amount": -18716,
+        "description": "OPENAI"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "OpenAI ChatGPT",
+        "toolCatalogId": null,
+        "description": "OpenAI ChatGPT — cargo TC Master Empresa *2505 2026-08-09"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-08-11",
+        "amount": -38250,
+        "description": "MERCADOPAGO"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "MercadoPago / Mercado Libre",
+        "toolCatalogId": null,
+        "description": "MercadoPago / Mercado Libre — cargo TC Master Empresa *2505 2026-08-11"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-08-11",
+        "amount": -89234,
+        "description": "HIGGSFIELD"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Higgsfield",
+        "toolCatalogId": null,
+        "description": "Higgsfield — cargo TC Master Empresa *2505 2026-08-11"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-08-12",
+        "amount": -32778,
+        "description": "KINSTA"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Kinsta",
+        "toolCatalogId": null,
+        "description": "Kinsta — cargo TC Master Empresa *2505 2026-08-12"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-08-14",
+        "amount": -6887,
+        "description": "Microsoft"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Microsoft 365",
+        "toolCatalogId": null,
+        "description": "Microsoft 365 — cargo TC Master Empresa *2505 2026-08-14"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-08-16",
+        "amount": -82736,
+        "description": "MICROSOFT"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Microsoft 365",
+        "toolCatalogId": null,
+        "description": "Microsoft 365 — cargo TC Master Empresa *2505 2026-08-16"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-08-16",
+        "amount": -178844,
+        "description": "ADOBE"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Adobe",
+        "toolCatalogId": null,
+        "description": "Adobe — cargo TC Master Empresa *2505 2026-08-16"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-08-18",
+        "amount": -9377,
+        "description": "NOTION"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Notion",
+        "toolCatalogId": "notion",
+        "description": "Notion — cargo TC Master Empresa *2505 2026-08-18"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-08-18",
+        "amount": -22584,
+        "description": "ANTHROPIC"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Anthropic",
+        "toolCatalogId": null,
+        "description": "Anthropic — cargo TC Master Empresa *2505 2026-08-18"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-08-18",
+        "amount": -20629,
+        "description": "ELEVENLABS"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "ElevenLabs",
+        "toolCatalogId": null,
+        "description": "ElevenLabs — cargo TC Master Empresa *2505 2026-08-18"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-08-19",
+        "amount": -18990,
+        "description": "Instagram"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Meta / Instagram",
+        "toolCatalogId": null,
+        "description": "Meta / Instagram — cargo TC Master Empresa *2505 2026-08-19"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-08-19",
+        "amount": -22700,
+        "description": "HOSTGATOR"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "HostGator",
+        "toolCatalogId": null,
+        "description": "HostGator — cargo TC Master Empresa *2505 2026-08-19"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-08-19",
+        "amount": -180000,
+        "description": "GOOGLE \\*CLOUD"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Google Cloud",
+        "toolCatalogId": null,
+        "description": "Google Cloud — cargo TC Master Empresa *2505 2026-08-19"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-08-21",
+        "amount": -213717,
+        "description": "NOTION"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Notion",
+        "toolCatalogId": "notion",
+        "description": "Notion — cargo TC Master Empresa *2505 2026-08-21"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-08-21",
+        "amount": -5500,
+        "description": "YOUTUBE"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "YouTube Premium",
+        "toolCatalogId": null,
+        "description": "YouTube Premium — cargo TC Master Empresa *2505 2026-08-21"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-08-26",
+        "amount": -46232,
+        "description": "HIGGSFIELD"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Higgsfield",
+        "toolCatalogId": null,
+        "description": "Higgsfield — cargo TC Master Empresa *2505 2026-08-26"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-08-26",
+        "amount": -9357,
+        "description": "GITHUB"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "GitHub",
+        "toolCatalogId": null,
+        "description": "GitHub — cargo TC Master Empresa *2505 2026-08-26"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-08-27",
+        "amount": -25937,
+        "description": "ENVATO"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Envato",
+        "toolCatalogId": null,
+        "description": "Envato — cargo TC Master Empresa *2505 2026-08-27"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-08-27",
+        "amount": -124130,
+        "description": "HIGGSFIELD"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Higgsfield",
+        "toolCatalogId": null,
+        "description": "Higgsfield — cargo TC Master Empresa *2505 2026-08-27"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-08-29",
+        "amount": -76192,
+        "description": "FIGMA"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Figma",
+        "toolCatalogId": "figma",
+        "description": "Figma — cargo TC Master Empresa *2505 2026-08-29"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-08-31",
+        "amount": -4691,
+        "description": "GITHUB"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "GitHub",
+        "toolCatalogId": null,
+        "description": "GitHub — cargo TC Master Empresa *2505 2026-08-31"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-09-01",
+        "amount": -23943,
+        "description": "SHUTTERSTOCK"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Shutterstock",
+        "toolCatalogId": null,
+        "description": "Shutterstock — cargo TC Master Empresa *2505 2026-09-01"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-09-01",
+        "amount": -6600,
+        "description": "Workspace"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Google Workspace",
+        "toolCatalogId": null,
+        "description": "Google Workspace — cargo TC Master Empresa *2505 2026-09-01"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-09-01",
+        "amount": -238013,
+        "description": "GOOGLE \\*CLOUD"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Google Cloud",
+        "toolCatalogId": null,
+        "description": "Google Cloud — cargo TC Master Empresa *2505 2026-09-01"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-09-02",
+        "amount": -9593,
+        "description": "NOTION"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Notion",
+        "toolCatalogId": "notion",
+        "description": "Notion — cargo TC Master Empresa *2505 2026-09-02"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-09-02",
+        "amount": -9589,
+        "description": "NOTION"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Notion",
+        "toolCatalogId": "notion",
+        "description": "Notion — cargo TC Master Empresa *2505 2026-09-02"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-09-03",
+        "amount": -48075,
+        "description": "FRAME"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Frame.io",
+        "toolCatalogId": null,
+        "description": "Frame.io — cargo TC Master Empresa *2505 2026-09-03"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-09-04",
+        "amount": -38123,
+        "description": "MAGNIFIC"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Magnific",
+        "toolCatalogId": null,
+        "description": "Magnific — cargo TC Master Empresa *2505 2026-09-04"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-09-04",
+        "amount": -55038,
+        "description": "PPRO ADOBE"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Adobe",
+        "toolCatalogId": null,
+        "description": "Adobe — cargo TC Master Empresa *2505 2026-09-04"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-09-04",
+        "amount": -55038,
+        "description": "PPRO ADOBE",
+        "ordinal": 2
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Adobe",
+        "toolCatalogId": null,
+        "description": "Adobe — cargo TC Master Empresa *2505 2026-09-04"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-09-06",
+        "amount": -56434,
+        "description": "APOLLO"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Apollo.io",
+        "toolCatalogId": null,
+        "description": "Apollo.io — cargo TC Master Empresa *2505 2026-09-06"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-08-15",
+        "amount": -72908,
+        "description": "NUBOX"
+      },
+      "action": {
+        "type": "pay_expense",
+        "expenseId": "EXP-NB-40557505"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-08-14",
+        "amount": -124449,
+        "description": "SIMPLEDTE"
+      },
+      "action": {
+        "type": "pay_expense",
+        "expenseId": "EXP-NB-40557507"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_08",
+        "date": "2026-09-07",
+        "amount": -9403,
+        "description": "COMISION"
+      },
+      "action": {
+        "type": "bank_fee",
+        "description": "Comisión de mantención TC Master Empresa *2505 (ciclo 06/08–07/09/2026)",
+        "miscellaneousCategory": "card_fee"
+      }
+    },
+    {
+      "row": {
+        "periodId": "santander-corp-clp_2026_09",
+        "date": "2026-09-08",
+        "amount": -51651,
+        "description": "METRICOOL"
+      },
+      "action": {
+        "type": "card_expense",
+        "supplierName": "Metricool",
+        "toolCatalogId": null,
+        "description": "Metricool — cargo TC Master Empresa *2505 2026-09-08 (no facturado)"
+      }
+    }
+  ]
+}

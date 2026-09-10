@@ -9,6 +9,7 @@ import {
   withGreenhousePostgresTransaction
 } from '@/lib/postgres/client'
 import { assertFinanceSlice2PostgresReady } from '@/lib/finance/postgres-store-slice2'
+import { getActiveOpeningTrialBalance } from '@/lib/finance/account-opening-trial-balance'
 import {
   FinanceValidationError,
   normalizeString,
@@ -314,6 +315,26 @@ export const resolveCanonicalReconciliationOpeningBalance = async ({
   previousDay.setUTCDate(previousDay.getUTCDate() - 1)
 
   const previousDayYmd = ymd(previousDay)
+  const periodStartYmd = ymd(periodStart)
+
+  // Ancla OTB (TASK-703): si la cuenta tiene una OTB activa cuyo genesis es el
+  // primer día del período, el opening canónico ES la OTB. Bajo el genesis
+  // floor (TASK-938) no existe fila de account_balances el día anterior, así
+  // que buscarla ahí fallaba justamente en el mes del re-anclaje.
+  const periodEnd = new Date(Date.UTC(year, month, 0))
+  const periodEndYmd = ymd(periodEnd)
+  const otb = await getActiveOpeningTrialBalance(accountId)
+
+  if (otb && otb.genesisDate === periodStartYmd) {
+    return roundCurrency(otb.openingBalance)
+  }
+
+  // Ancla intra-período (tarjetas con ciclo: genesis = cierre de ciclo, ej.
+  // 2026-08-07): no hay saldo canónico antes del genesis, así que el período
+  // que contiene el ancla abre con ella.
+  if (otb && otb.genesisDate > periodStartYmd && otb.genesisDate <= periodEndYmd) {
+    return roundCurrency(otb.openingBalance)
+  }
 
   const rows = await queryRows<{ closing_balance: string }>(
     `
@@ -321,7 +342,9 @@ export const resolveCanonicalReconciliationOpeningBalance = async ({
       FROM greenhouse_finance.account_balances ab
       JOIN greenhouse_finance.accounts a
         ON a.account_id = ab.account_id
-       AND a.space_id = ab.space_id
+       -- El materializer no siempre estampa space_id en account_balances;
+       -- una fila sin space no es una fila de otro space.
+       AND (ab.space_id IS NULL OR a.space_id = ab.space_id)
       WHERE ab.account_id = $1
         AND ab.balance_date = $2::date
         AND a.is_active = TRUE
@@ -860,10 +883,26 @@ export const importBankStatementsToPostgres = async (
     let imported = 0
     let skipped = 0
 
-    const preparedRows = rows.map(row => ({
-      ...row,
-      fingerprint: buildStatementFingerprint(periodId, row)
-    }))
+    // Dos movimientos idénticos el mismo día (misma glosa, monto y referencia)
+    // son dos movimientos reales — caso 07/09/2026: dos transferencias de
+    // $1.000.000 al mismo RUT. El fingerprint base los colapsaba y perdía el
+    // segundo en silencio; el ordinal `#n` conserva la idempotencia del
+    // re-import (mismo archivo → mismos fingerprints) sin fundir duplicados
+    // legítimos. Un duplicado sigue siendo omitido solo si el ordinal también
+    // se repite (misma fila enviada dos veces).
+    const fingerprintOccurrences = new Map<string, number>()
+
+    const preparedRows = rows.map(row => {
+      const base = buildStatementFingerprint(periodId, row)
+      const ordinal = (fingerprintOccurrences.get(base) ?? 0) + 1
+
+      fingerprintOccurrences.set(base, ordinal)
+
+      return {
+        ...row,
+        fingerprint: ordinal === 1 ? base : createHash('md5').update(`${base}#${ordinal}`).digest('hex')
+      }
+    })
 
     const uniqueRows = new Map<string, typeof preparedRows[number]>()
 
