@@ -2,10 +2,14 @@
 
 > **Línea de negocio:** Channel & Commerce (en mercado: **trade marketing**)
 > **Marca contractual:** Efeonce
-> **Estado:** `Proposed`, con `re-scope` pendiente tras el [benchmark chileno 2026-09-10](../../audits/commercial/CHANNEL_COMMERCE_CHILE_MARKET_BENCHMARK_2026-09-10.md) — habilita prospección exploratoria y diagnósticos cotizados caso a caso
+> **Estado:** `Proposed` — habilita prospección exploratoria y diagnósticos cotizados caso a caso
+> **Decisión de negocio 2026-09-10:** oferta completa desde el primer contrato, ejecución mixta gobernada y
+> tecnología propia como destino de fase 3. Owner de línea: Julio Reyes (interino)
 > **Mercado inicial:** Chile
 > **Última actualización:** 2026-09-10
 > **Modelo económico:** [`CHANNEL_COMMERCE_BUSINESS_MODEL_V1`](../../business-models/channel-commerce/CHANNEL_COMMERCE_BUSINESS_MODEL_V1.md)
+> **Fases y capital:** [`roadmap`](../../business-models/channel-commerce/CHANNEL_COMMERCE_PHASED_ROADMAP_V1.md) · [`modelo de caja`](../../business-models/channel-commerce/CHANNEL_COMMERCE_CAPITAL_AND_CASH_MODEL_V1.md) · [`proveedores`](../../business-models/channel-commerce/CHANNEL_COMMERCE_SUPPLIER_REGISTRY_V1.md)
+> **Evidencia de mercado:** [`benchmark chileno 2026-09-10`](../../audits/commercial/CHANNEL_COMMERCE_CHILE_MARKET_BENCHMARK_2026-09-10.md)
 
 ## Propósito
 
@@ -26,15 +30,54 @@ Claims prohibidos hasta tener evidencia propia fechada: incremento de venta o se
 porcentajes de ahorro frente a la agencia del cliente; cobertura nacional; y "Perfect Store" como resultado
 garantizado — es un marco de scoring, no una promesa.
 
-## Mapa de la oferta
+## Los once servicios
 
-```text
-DIAGNÓSTICO           →  RECURRENTE              →  INTERVENCIÓN          →  EXPANSIÓN
-Channel Execution        Cobertura Auditada         Managed Field Pod        Digital Shelf
-Trade Investment Audit                              Activación Medida        Channel Content
-                                                    Field Orchestration      Promotion & Incrementality
-                                                                             Eventos de Canal
-```
+La oferta es completa desde el primer contrato. Lo que cambia por fase es **quién ejecuta**, nunca qué se promete.
+
+### A · Puertas de entrada — proyecto cerrado
+
+| § | Servicio | Qué compra el cliente | Ejecuta en fase 1 | Unidad de cobro |
+|---|---|---|---|---|
+| 1 | **Channel Execution Diagnostic** | Saber qué se puede medir, qué está roto y en qué orden intervenir | Efeonce + captura vía partner | Proyecto cerrado por complejidad |
+| 2 | **Trade Investment Audit** | Saber qué componente de su inversión de canal no tiene retorno demostrable | Efeonce | Proyecto cerrado |
+
+### B · Núcleo recurrente — lo que sostiene la relación
+
+| § | Servicio | Qué compra el cliente | Ejecuta en fase 1 | Unidad de cobro |
+|---|---|---|---|---|
+| 3 | **Cobertura Auditada** | El estado de ejecución por punto de venta y la lista priorizada, cada ciclo | Partner de captura, gobernado por Efeonce | PDV auditados × ciclos |
+| 5 | **Field Orchestration** | Que sus proveedores de terreno se comparen contra el mismo estándar | Efeonce | Proveedores × mercados gobernados |
+
+### C · Ejecución en el canal — donde se interviene
+
+| § | Servicio | Qué compra el cliente | Ejecuta en fase 1 | Unidad de cobro |
+|---|---|---|---|---|
+| 4 | **Managed Field Pod** | Que las tiendas críticas queden intervenidas, con evidencia antes/después | Proveedor con back-to-back | Capacidad mensual comprometida |
+| 7 | **Activación de Marca Medida** | Activación que se reporta en delta contra tiendas de control, no en contactos | Proveedor + Efeonce (diseño y lectura) | Ola: tiendas × días |
+| 11 | **Eventos y Encuentros de Canal** | Que la convención o el lanzamiento al canal tenga objetivo, medición y seguimiento | Productora + Efeonce (contenido y gobierno) | Proyecto cerrado |
+
+### D · Conexión digital y expansión — el diferenciador
+
+| § | Servicio | Qué compra el cliente | Ejecuta en fase 1 | Unidad de cobro |
+|---|---|---|---|---|
+| 6 | **Digital Shelf & AI Shopper Visibility** | Cómo se ve su producto en el anaquel digital y si la IA lo recomienda | Efeonce (Wave) | Según owner |
+| 10 | **Retail Media & Commerce Operations** | Operar su inversión en las redes de las cadenas | Efeonce (Media & Distribution) | Según owner |
+| 8 | **Channel Content & Asset System** | Material de canal a escala, sin que cada campaña sea un acto heroico | Efeonce (Creative) + proveedor de impresión | Capacidad gobernada |
+| 9 | **Promotion & Incentive Design + Incrementality** | Saber si la promoción vendió de más o canibalizó margen | Efeonce | Proyecto por ola |
+
+> **Los servicios 6 y 10 son la razón de ser de la línea.** El [benchmark chileno](../../audits/commercial/CHANNEL_COMMERCE_CHILE_MARKET_BENCHMARK_2026-09-10.md)
+> encontró que ningún actor del mercado conecta la ejecución física con la inversión digital de la marca. Todo lo
+> demás —auditar, poner gente, producir— ya lo hacen otros y se contrata; esto no.
+
+## Qué se puede vender con el capital actual
+
+Con CLP 40.000.000 asignados, el [modelo de caja](../../business-models/channel-commerce/CHANNEL_COMMERCE_CAPITAL_AND_CASH_MODEL_V1.md)
+fija el límite: **una cuenta ancla a la vez**, con tope entre ~$6,5M y ~$31M de facturación mensual según la
+estructura de pago que se negocie. La segunda cuenta entra sólo con dos ciclos consecutivos cobrados en plazo.
+
+Consecuencia práctica al cotizar: los servicios de los bloques A, B y D consumen poco capital de trabajo. Los del
+bloque C —donde hay proveedores y producción que se pagan antes de cobrar— son los que consumen caja. Un contrato
+que combine C intensivo con pago a 90 días y sin factoring aprobado para ese deudor **no se toma**.
 
 ---
 
