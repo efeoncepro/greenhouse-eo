@@ -21,6 +21,8 @@ import { loadGreenhouseToolEnv, applyGreenhousePostgresProfile } from '../lib/lo
 
 import { recordExpensePayment } from '@/lib/finance/expense-payment-ledger'
 import { recordFactoringOperation } from '@/lib/finance/factoring'
+import { recordPayment as recordIncomePayment } from '@/lib/finance/payment-ledger'
+import { createFinanceIncomeInPostgres } from '@/lib/finance/postgres-store-slice2'
 import { createLoanAccount, recordLoanDisbursementSettlement, type CreateLoanAccountInput } from '@/lib/finance/loans'
 import {
   createBankFeeExpensePayment,
@@ -29,6 +31,7 @@ import {
   createInternalTransferSettlement,
   createInternationalPayrollSettlement,
   createLoanCuotaExpensePayment,
+  createPayrollExpensePayment,
   createTaxExpensePayment
 } from '@/lib/finance/payment-instruments/anchored-payments'
 import {
@@ -70,6 +73,35 @@ type PlanAction =
     }
   | { type: 'fx_conversion'; sourceRow: RowSelector; sourceAccountId: string; sourceCurrency: 'USD' | 'CLP' | 'MXN'; destinationAccountId: string; destinationCurrency: 'USD' | 'CLP' | 'MXN'; notes?: string }
   | { type: 'loan_disbursement'; loan: CreateLoanAccountInput; notes?: string }
+  /**
+   * Honorarios pagados BRUTOS (sin practicar la retención SII): la fila del
+   * banco es el bruto; se paga el neto sobre el expense de nómina y el resto
+   * queda como gasto anclado al mismo entry con la glosa de la retención no
+   * practicada (a regularizar con F29 / descuento posterior).
+   */
+  | { type: 'honorarios_gross_paid'; expenseId: string; payrollEntryId: string; memberId: string; netAmount: number; remainderDescription: string }
+  /** Cobro de un ingreso existente, o creación del ingreso + cobro (comisiones, ingresos no facturados por Nubox). */
+  | {
+      type: 'income_receipt'
+      incomeId?: string
+      createIncome?: {
+        incomeId: string
+        clientName: string
+        organizationId?: string | null
+        invoiceNumber?: string | null
+        invoiceDate: string
+        description: string
+        currency: 'CLP' | 'USD' | 'MXN'
+        totalAmount: number
+        exchangeRateToClp: number
+        incomeType: string
+        economicCategory?: string | null
+        notes?: string | null
+      }
+      paymentNotes?: string
+    }
+  /** Vincula la fila a un pago ya registrado por otro dominio (ej. orden de pago contractor pagada con `paidAt` del banco). */
+  | { type: 'link_existing_payment'; expenseId: string; paymentId?: string }
   | { type: 'skip'; reason: string }
 
 interface PlanEntry {
@@ -509,6 +541,162 @@ const applyEntry = async (entry: PlanEntry, ctx: Ctx): Promise<void> => {
       await linkRow(sourceRow, { kind: 'settlement', settlementLegId: `stlleg-${r.settlementGroupId}-out`, settlementGroupId: r.settlementGroupId }, ctx.actor)
       await linkRow(row, { kind: 'settlement', settlementLegId: `stlleg-${r.settlementGroupId}-in`, settlementGroupId: r.settlementGroupId }, ctx.actor)
       ctx.log(`    ✓ conversión ${r.settlementGroupId}`)
+
+      return
+    }
+
+    case 'honorarios_gross_paid': {
+      const gross = abs(amount)
+      const remainder = Math.round((gross - a.netAmount) * 100) / 100
+
+      if (remainder < 0) throw new Error(`honorarios_gross_paid ${a.expenseId}: neto ${fmt(a.netAmount)} > bruto ${fmt(gross)}`)
+
+      const r = await recordExpensePayment({
+        expenseId: a.expenseId,
+        paymentDate: date,
+        amount: a.netAmount,
+        currency: await accountCurrency(account),
+        reference: ref(row),
+        paymentMethod: 'bank_transfer',
+        paymentAccountId: account,
+        paymentSource: 'bank_statement',
+        notes: `Conciliado desde cartola (bruto ${fmt(gross)}): ${row.description}`,
+        actorUserId: ctx.actor
+      })
+
+      await linkRow(row, { kind: 'expense', expenseId: a.expenseId, paymentId: r.payment.paymentId }, ctx.actor)
+
+      if (remainder > 0) {
+        const extra = await createPayrollExpensePayment({
+          payrollEntryId: a.payrollEntryId,
+          memberId: a.memberId,
+          paymentDate: date,
+          amount: remainder,
+          paymentAccountId: account,
+          description: a.remainderDescription,
+          reference: `${ref(row)}-gross-remainder`,
+          notes: `Fila bancaria ${row.row_id}: bruto ${fmt(gross)} = neto ${fmt(a.netAmount)} (${a.expenseId}) + ${fmt(remainder)} no retenido.`,
+          actorUserId: ctx.actor,
+          economicCategory: 'labor_cost_internal'
+        })
+
+        ctx.log(`    ✓ pago neto ${r.payment.paymentId} sobre ${a.expenseId} + remanente ${extra.expenseId} (${fmt(remainder)})`)
+      } else {
+        ctx.log(`    ✓ pago ${r.payment.paymentId} sobre ${a.expenseId}`)
+      }
+
+      return
+    }
+
+    case 'income_receipt': {
+      let incomeId = a.incomeId ?? null
+
+      if (!incomeId && a.createIncome) {
+        const c = a.createIncome
+
+        const existing = await runGreenhousePostgresQuery<{ income_id: string }>(
+          `SELECT income_id FROM greenhouse_finance.income WHERE income_id = $1`,
+          [c.incomeId]
+        )
+
+        if (existing.length === 0) {
+          const nowIso = new Date().toISOString()
+
+          await createFinanceIncomeInPostgres({
+            incomeId: c.incomeId,
+            clientId: null,
+            organizationId: c.organizationId ?? null,
+            clientProfileId: null,
+            hubspotCompanyId: null,
+            hubspotDealId: null,
+            clientName: c.clientName,
+            invoiceNumber: c.invoiceNumber ?? null,
+            invoiceDate: c.invoiceDate,
+            dueDate: null,
+            description: c.description,
+            currency: c.currency,
+            subtotal: c.totalAmount,
+            // CHECK income_tax_snapshot_consistent: los tres campos del snapshot
+            // van juntos (todos null o todos poblados). Ingreso exento → snapshot
+            // explícito de exención.
+            taxRate: 0,
+            taxAmount: 0,
+            taxCode: 'cl_vat_non_billable',
+            taxRateSnapshot: 0,
+            taxAmountSnapshot: 0,
+            taxSnapshotJson: JSON.stringify({ code: 'cl_vat_non_billable', rate: 0, reason: 'ingreso exento (comisión/ingreso no facturado en Chile)' }),
+            isTaxExempt: true,
+            taxSnapshotFrozenAt: nowIso,
+            totalAmount: c.totalAmount,
+            exchangeRateToClp: c.exchangeRateToClp,
+            totalAmountClp: Math.round(c.totalAmount * c.exchangeRateToClp * 100) / 100,
+            paymentStatus: 'pending',
+            poNumber: null,
+            hesNumber: null,
+            serviceLine: null,
+            incomeType: c.incomeType,
+            partnerId: null,
+            partnerName: null,
+            partnerSharePercent: null,
+            partnerShareAmount: null,
+            netAfterPartner: null,
+            notes: c.notes ?? null,
+            actorUserId: ctx.actor
+          })
+
+          if (c.economicCategory) {
+            await runGreenhousePostgresQuery(
+              `UPDATE greenhouse_finance.income SET economic_category = $2, updated_at = NOW() WHERE income_id = $1`,
+              [c.incomeId, c.economicCategory]
+            )
+          }
+
+          ctx.log(`    ✓ ingreso ${c.incomeId} creado (${c.currency} ${fmt(c.totalAmount)})`)
+        }
+
+        incomeId = c.incomeId
+      }
+
+      if (!incomeId) throw new Error('income_receipt: falta incomeId o createIncome')
+
+      const r = await recordIncomePayment({
+        incomeId,
+        paymentDate: date,
+        amount: abs(amount),
+        currency: await accountCurrency(account),
+        reference: ref(row),
+        paymentMethod: 'bank_transfer',
+        paymentAccountId: account,
+        notes: a.paymentNotes ?? `Conciliado desde cartola: ${row.description}`,
+        actorUserId: ctx.actor
+      })
+
+      await linkRow(row, { kind: 'income', incomeId, paymentId: r.payment.paymentId }, ctx.actor)
+      ctx.log(`    ✓ cobro ${r.payment.paymentId} sobre ${incomeId} (${r.paymentStatus}, pendiente ${fmt(r.amountPending)})`)
+
+      return
+    }
+
+    case 'link_existing_payment': {
+      const rows = await runGreenhousePostgresQuery<{ payment_id: string; amount: string; payment_date: string | Date }>(
+        `SELECT payment_id, amount::text, payment_date FROM greenhouse_finance.expense_payments
+         WHERE expense_id = $1 AND superseded_at IS NULL AND superseded_by_payment_id IS NULL AND superseded_by_otb_id IS NULL
+           AND ($2::text IS NULL OR payment_id = $2)
+           AND payment_account_id = $3
+         ORDER BY payment_date DESC`,
+        [a.expenseId, a.paymentId ?? null, account]
+      )
+
+      const paymentRow = rows.find(r => Math.abs(Number(r.amount) - abs(amount)) <= 1) ?? rows[0]
+
+      if (!paymentRow) throw new Error(`link_existing_payment: ${a.expenseId} no tiene pago activo en ${account}`)
+
+      if (Math.abs(Number(paymentRow.amount) - abs(amount)) > 1) {
+        throw new Error(`link_existing_payment: pago ${paymentRow.payment_id} por ${fmt(Number(paymentRow.amount))} ≠ fila ${fmt(abs(amount))}`)
+      }
+
+      await linkRow(row, { kind: 'expense', expenseId: a.expenseId, paymentId: paymentRow.payment_id }, ctx.actor)
+      ctx.log(`    ✓ vinculado pago existente ${paymentRow.payment_id} (${a.expenseId})`)
 
       return
     }
