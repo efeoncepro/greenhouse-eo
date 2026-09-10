@@ -13,8 +13,8 @@ en `f8803acc3` con árbol equivalente). Producción y el worker sirven `ISSUE-16
 escribir (v2 con entries exportados no se edita; el recálculo por entry conserva la versión del entry; el del
 período completo tocaría a Felipe Zurita y María Fernanda González en julio). El operador pidió **no forzar**: los
 complementos `EXP-RECON-20260803-57fj` (195.750) y `EXP-RECON-20260903-bcfh` (68.625) quedan asumidos
-internamente como costo laboral. Pendiente con el operador: compensación desde septiembre (v3 bruto 530.973,45 =
-450.000 líquidos → boletas por ese bruto, o mantener 450.000 bruto y asumir la diferencia mes a mes), sueldo
+internamente como costo laboral. Desde 01/09 rige `humberly-henriquez_v3` (bruto 530.973,45 = 450.000 líquidos; v2 cerrada al
+31/08): **Humberly debe emitir boletas por 530.973 desde septiembre**. Pendiente con el operador: sueldo
 empresarial de Julio (2×1.000.000 del 07/09 como expenses `payroll` sin entry), estado de cuenta TC de mayo para
 Melkin (`EXP-202604-005`), y el PDF `36_16359_420051383906_2026-06-30.pdf` para el crédito antiguo.
 Contable a revisar: pagar el bruto sobre boletas con retención deja la retención sin documento propio.
