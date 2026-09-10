@@ -7,10 +7,14 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
-## 2026-09-10 — El contenido estacional entra al catálogo como línea propia de marca
+## 2026-09-10 — Las seasonalities entran al catálogo como línea propia de marca
 
-`PDR-020` rev 1.3 cierra la reconciliación con el plan estacional 2026–2027: se conserva como línea propia y
-permanente porque su trabajo es marca, no como compromiso previo con vencimiento. Lo que la distingue del post
+`PDR-020` rev 1.4 cierra la reconciliación con el plan de seasonalities 2026–2027: se conserva como línea propia
+y permanente porque su trabajo es marca, no como compromiso previo con vencimiento. Son **seasonalities, no
+efemérides**, y la distinción es operativa: una efeméride es una fecha conmemorativa puntual, mientras una
+seasonality es una temporada con comportamiento propio de audiencia y mercado, con ventana y variación por país.
+La unidad de trabajo es la ventana, no el día — por eso Navidad se entrega en octubre — y una temporada puede
+sostener más de una pieza. Lo que la distingue del post
 genérico de efeméride es que cada fecha demuestra una disciplina de la casa — Halloween es un envase que pierde
 personalidad por imitación, el Día de la Usabilidad son fricciones digitales como obstáculos físicos, el Óscar es
 retirar una luz para cambiar una escena — y ese es el estándar declarado de la línea. Canal-hogar Instagram,

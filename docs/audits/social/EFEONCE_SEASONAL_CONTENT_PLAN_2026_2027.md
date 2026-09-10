@@ -6,11 +6,13 @@
 las asignaciones ni los estados de las páginas. Releerlos antes de producir, reasignar o publicar.
 
 > ✅ **Relación con PDR-020 resuelta (2026-09-10) — el plan se conserva.**
-> El contenido estacional queda incorporado a
+> Las **seasonalities** quedan incorporadas a
 > [`PDR-020`](../../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md) §4.4 como **línea
-> propia y permanente**, porque su trabajo es **marca**: conecta a Efeonce con el calendario cultural de sus
-> mercados hablando en el idioma de su oficio. Las 13 direcciones creativas de este plan son el estándar de
-> la línea — cada fecha demuestra una disciplina de la casa, no saluda. **Canal-hogar: Instagram.**
+> propia y permanente**, porque su trabajo es **marca**: conecta a Efeonce con los momentos en que sus mercados
+> cambian de comportamiento, hablando en el idioma de su oficio. **Son seasonalities, no efemérides:** la unidad
+> de trabajo es la **ventana de la temporada por mercado**, no el día — por eso Navidad se entrega en octubre.
+> Las 13 direcciones creativas de este plan son el estándar de la línea — cada temporada demuestra una
+> disciplina de la casa, no saluda. **Canal-hogar: Instagram.**
 > **Métrica: sends + saves**, nunca seguidores. Un solo ajuste al operar este plan: **LinkedIn no recibe la
 > misma pieza con otro caption** — recibe el argumento profesional desarrollado detrás de la metáfora, y sólo
 > cuando la disciplina es legible para un comprador (usabilidad, branding, dirección de arte, copy, diseño
@@ -114,7 +116,7 @@ Las otras nueve parejas tarea/calendario coinciden en responsable y entrega en e
 Se releyeron las 26 páginas mediante MCP, con contenido no truncado; se comprobaron títulos, estados,
 fecha de publicación, entrega, personas, relación y presencia de cuerpos de brief/copy en las tareas.
 La consulta es read-only y no demuestra calidad del arte, aprobación ni disponibilidad en plataformas.
-Las fuentes oficiales de las efemérides están dentro de los briefs; se verificaron durante la
+Las fuentes oficiales de cada seasonality están dentro de los briefs; se verificaron durante la
 planificación. Antes de publicar eventos futuros, revalidar su fecha y contexto.
 
 Esta entrega actualiza documentación y guías de uso de capacidades existentes. No cambia schema,
