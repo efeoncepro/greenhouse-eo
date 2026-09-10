@@ -60,8 +60,13 @@ MXN 10). **La corrección definitiva exige desplegar el ops-worker** (push a `de
 
 ## Estado
 
-resolved (2026-09-10). Pendiente de follow-up: extender `finance.account_balances.fx_drift` a cuentas no-CLP
-(hoy `a.currency = 'CLP'`), para que el detector cubra el caso que dejó pasar.
+resolved (2026-09-10). **Rollout verificado en producción el 2026-09-10 (TASK-1858 Slice 1):** release
+`2cf8c26cfa2d-8f79606f-8cb3-4154-a7fd-c570e7af8497` (`released` 20:06Z, target `2cf8c26cf`, run
+`34523159501`); Vercel Production READY, `ops-worker` sirviendo el fix (revisión desplegada por el push de
+`f8803acc3`, árbol idéntico al target en las rutas del bundle), watchdog `drift_count=0`. Saldos tras el
+release: `santander-usd-usd` 336,44 USD y `global-66-mxn-mxn` 10 MXN (sin recaída). El follow-up del detector
+quedó cerrado en el mismo release (TASK-1858 Slice 2): `finance.account_balances.fx_drift` ya cubre cuentas
+no-CLP en unidades de la cuenta y reproduce este caso en su test (`CLP sumado dentro de santander-usd-usd`).
 
 ## Relacionado
 

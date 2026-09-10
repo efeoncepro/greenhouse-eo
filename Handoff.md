@@ -1,46 +1,20 @@
 # Handoff activo
 
-**Conciliación bancaria ago–sep 2026 (2026-09-10, code complete + datos cargados; rollout = mismo Cloud SQL):**
-re-anclaje OTB al 01/08 por cuenta (Global66 al 31/07, TC al cierre 06/08), `banco-chile-clp` (Cuenta Vista
-308526005) registrada por CLI canónica, cartolas reales importadas con los adapters nuevos
-(`src/lib/finance/bank-statements/`) y 77 filas conciliadas con `scripts/finance/reconciliation-plans/2026-08-09.json`.
-Períodos `reconciled`: global66-clp 2026-07/08, santander-corp-clp 2026-08 (ciclo 06/08–07/09). Saldos vs banco:
-Global66 exacto; Santander CLP +450.000 (ago) / +692.819 (sep) explicados fila por fila; TC exacto.
-**Segunda pasada 2026-09-10 (tarde):** Humberly = honorarios brutos sin retención (neto sobre la nómina +
-remanente anclado al entry, 195.750 jul / 68.625 ago); Deel REC-2026-11/12/13 con tarjeta personal *1879 → CCA
-(`finance:record-deel-receipts`); Valentina = boleta N°47 adjuntada al payable EO-CPAY-0002, orden
-`por-68676079` pagada con `paidAt=2026-09-07` (`finance:contractor-settle`), fila vinculada; comisión HubSpot
-Q2 2026 = ingreso `INC-HS-COMM-2026Q2` USD 378 con cobro 335,15; Banco de Chile FAN Emprende anclado (10.600 al
-01/08) e importado con el adapter `bancochile_cuenta_vista_text`. Períodos `reconciled` ahora: Santander CLP
-ago, Santander USD ago, Banco de Chile ago, Global66 jul/ago, TC ago. Santander CLP sep difiere 0,45 (redondeo
-Valentina). **⚠️ Rollout:** el fix ISSUE-169 vive sólo en `develop` local; el ops-worker (Cloud Run) sigue con el
-código viejo y al recomputar saldos por eventos reescribe cuentas USD/MXN en CLP (pasó con el cobro HubSpot;
-se rematerializó local). Hasta desplegar, revisar `santander-usd-usd`/`global-66-mxn-mxn` tras cada evento.
-**Tercera pasada 2026-09-10:** las dos transferencias de 1.000.000 (07/09) son sueldo accionista → expenses
-`payroll` anclados a `julio-reyes` (`createMemberPaymentExpense`, sin entry de Payroll: regularizar sueldo
-empresarial); los otros traspasos a Julio siguen como CCA (reembolsos de Deel pagados con su tarjeta). Berel:
-folio 51 = MXN 84.760 (17/07), folios 52+53 = MXN 104.000 (13/08), cobrados en `global-66-mxn-mxn` al tipo de
-cambio realizado 53,4034. HubSpot: los USD 42,85 faltantes = costo de recepción internacional estimado por
-diferencia (ingreso cobrado completo + comisión bancaria USD en la cuenta USD). Deel REC-2026-8/9/10 en el CCA
-(REC-8 sólo fees: la parte contractor figura pagada por Payroll desde la TC el 05/05 — verificar con el estado
-de cuenta TC de mayo). CLI nuevo `finance:ledger-adjust`. **Punto 2 (Andres/Daniela agosto) sigue esperando
-autorización.**
-**Cierre 2026-09-10 (autorizado "hagamos todo eso"):** punto 2 ejecutado (pagos payroll_system de Andres/Daniela
-superseded; nómina agosto pagada al valor real de Global66; `amount_clp` fijado al monto de la cartola porque
-el ledger redondea la tasa a 2 decimales) → Global66 sep `reconciled` (16.468). `TASK-1858` creada y
-registrada (rollout ISSUE-169 + fx_drift no-CLP + rutina mensual + regularizaciones Payroll + OTB CCA +
-crédito 420051383906). CCA cierra en −125.194 al 10/09 (reembolsos ≈ Deel; ancla formal en TASK-1858).
-**⚠️ 2026-09-10 tarde:** el ops-worker (rev `00675`, código viejo) volvió a corromper USD/MXN al procesar los
-cobros HubSpot/Berel y creó filas pre-genesis en MXN; se agregó el genesis floor al camino reactivo
-(`rematerializeAccountBalancesFromDate`) y se rematerializó local. Mientras no se despliegue el worker (push
-a develop → `ops-worker-deploy.yml`), cada evento en cuentas USD/MXN vuelve a romper el saldo.
-**Pendiente con el operador (punto 7):** nómina agosto Andres/Daniela pagada 03/09 (1.985.038 banco vs 2.020.120 registrado por payroll en
-USD, 4 filas Global66 sin calce); Melkin 788,86 USD (registrado en `santander-usd-usd`, no aparece en banco);
-cobro Berel MXN 104.000 (13/08) sin factura asociada; recepción USD 335,15 (13/08); cartola Banco de Chile
-(PDF cifrado, clave no coincide con los 4 últimos dígitos del RUT de la empresa) → OTB pendiente; estado de cuenta
-trimestral del crédito 420051383906 para completar `original_amount`. Bugs corregidos: `ISSUE-169`
-(saldos en moneda extranjera + día genesis). Follow-up formal propuesto: `TASK-1858` (pendiente de confirmación del operador para registrarla). Dev server local con la UI en
-`http://localhost:3000/finance/reconciliation`. **Push a `develop` hecho 2026-09-10 (`624468187`) por autorización del operador**, desde una copia limpia con `local:check` verde (el checkout compartido tenía skills sin espejar de otra sesión); dispara `ops-worker-deploy.yml`.
+**TASK-1858 — conciliación bancaria ago–sep 2026 (2026-09-10, in-progress; Slices 1/2/3/5 hechos):** release
+`2cf8c26cfa2d-8f79606f-8cb3-4154-a7fd-c570e7af8497` `released` 20:06Z (PR #233, run `34523159501`, un intento,
+bypass forense por la migración de TASK-1604 ya aplicada; watchdog 5/5, `ops-worker`/`auth-server` change-gated
+en `f8803acc3` con árbol equivalente). Producción y el worker sirven `ISSUE-169`; saldos = banco (Santander CLP
+33.002.610 · USD 336,44 · Global66 16.468 · MXN 10 · Banco de Chile 3.660.000 · TC 1.532.944; CCA −125.194).
+`fx_drift` cubre USD/MXN (0 drift contra PG real). Manual v1.2 con rutina mensual + decisión Nubox (facturas
+`EXP-NB-*` siguen por plan `pay_expense`). OTB del CCA al 01/08 = 2.141.867 `estimated`
+(`obtb-sha-cca-julio-reyes-clp-20260801-275f0308`): pasa a `reconciled` cuando el accionista confirme.
+**Slice 4 (Payroll):** retención SII de Humberly (45.750 jul + 68.625 ago) **asumida por la empresa** por
+decisión del operador; anotada en `EXP-RECON-20260803-57fj` / `EXP-RECON-20260903-bcfh` (los entries quedan
+fieles a la boleta: `payroll_adjustments.kind` sólo tiene `exclude`/`gross_factor` y los períodos están
+`exported`). Pendiente con el operador: boleta de julio de Humberly (300.000 vs 450.000 transferidos), sueldo
+empresarial de Julio (2×1.000.000 del 07/09 como expenses `payroll` sin entry), estado de cuenta TC de mayo
+para Melkin (`EXP-202604-005`), y el PDF `36_16359_420051383906_2026-06-30.pdf` para el crédito antiguo.
+Contable a revisar: pagar el bruto sobre boletas con retención deja la retención sin documento propio.
 
 **TASK-1604 (2026-09-10, in-progress):** slice SEO/Arte aplicado y documentado. Seis competencias activas,
 nueve preguntas SEO en `sme_review`, cero templates del pack, cero policies y cero assessments. Las vacantes

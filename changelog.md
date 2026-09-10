@@ -7,6 +7,17 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-10 — Conciliación bancaria ago–sep en producción, `fx_drift` cubre USD/MXN y rutina mensual (TASK-1858)
+
+Release `2cf8c26cfa2d-8f79606f-8cb3-4154-a7fd-c570e7af8497` (`released` 20:06Z, run `34523159501`, un solo
+intento): producción y el `ops-worker` sirven el fix de `ISSUE-169` (cuentas USD/MXN en unidades de la cuenta,
+día genesis materializado, piso de genesis reactivo), los adapters de cartola y las CLIs `finance:*`. El
+detector `finance.account_balances.fx_drift` deja de filtrar `currency = 'CLP'` y compara en la moneda de cada
+cuenta (tolerancia nativa 0,05); el remediator nunca auto-remedia filas no-CLP. Manual de conciliación v1.2 con
+la rutina mensual por cuenta y la decisión sobre facturas Nubox (siguen por plan `pay_expense`). OTB del CCA del
+accionista al 01/08/2026 = 2.141.867 (`estimated`). Retención SII de Humberly (jul/ago) asumida por la empresa
+por decisión del operador, registrada en Finance; Payroll sin tipo de ajuste para modelarla.
+
 ## 2026-09-10 — El sistema de contenidos en Notion queda mapeado y PDR-020 se reconcilia con él
 
 Lectura MCP en vivo de las bases que operan el contenido de Efeonce. El sistema no es el calendario: son
@@ -977,24 +988,3 @@ Marketing Cloud Engagement y Marketing Cloud Next; define carriles de solución,
 group, delivery, métricas, límites de claims y gates de madurez. El estado queda `Approved for validation`: no
 autoriza todavía partnership, badge, certificaciones, reventa, pricing, casos ni Product Service comercialmente
 aprobado sin evidencia y sign-offs propios.
-
-## 2026-09-02 — MCP: el manual de uso viaja por el protocolo (TASK-1804, released)
-
-La superficie MCP gana un segundo canal de conocimiento de uso: un manifiesto de manuales
-(`skill-manifest.ts`) hermano del de tools, tres `SKILL.md` publicables en `docs/mcp/skills/`
-(`seo-spend-discipline`, `seo-visibility-reading`, `competitor-loop`), la tool `get_greenhouse_skill`,
-el recurso `skill://efeonce/<name>/SKILL.md` y la lane ecosystem `GET /api/platform/ecosystem/mcp/skills[/{name}]`,
-todos sobre el mismo reader. Los cuerpos viajan en el bundle como artefacto generado (`pnpm mcp:skills:generate`
-/ `mcp:skills:check`): leerlos del filesystem exigía `outputFileTracingIncludes` y Vercel rechazó el build (función sola
-de 397 MB). Publicar es un acto explícito (drift manifiesto↔filesystem no construye el
-servidor), un binding de cliente no sabe que los manuales existen (404 anti-oráculo) y la fuga de contenido
-interno la controla un test. Las `instructions` del handshake rutean al manual en vez de contener el
-procedimiento de gasto. El gateway federa la tool con su propio guard de paridad no-SEO (desplegado,
-`efeonce-mcp-gateway-00028-pmx`) y la lane salió a producción en el release `375f56e24` del mismo día, con canary de
-contrato verde contra producción. Sin Entra, flag ni persistencia nuevos. Follow-up del mismo día: un agente Claude Code
-real cargó el manual por el front door OAuth, y el catálogo creció a seis manuales (discovery→tracking, salud técnica,
-diagnóstico de prospecto) sin tocar la tool ni el gateway; los seis salieron a producción en el segundo release del día
-(`4379c495013f`) con canary de contrato verde. Barrido documental posterior por subagentes: manuales de uso del
-inventario MCP/gateway/provider SEO, docs funcionales de API Platform y gateway, deltas en arquitectura API/ADR del
-gateway/patrones canónicos/arquitectura SEO, skills `dataforseo-operator` y `seo-aeo-practice`, y README/AGENTS del
-repo `efeonce-mcp`.
