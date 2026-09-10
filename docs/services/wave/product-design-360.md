@@ -190,11 +190,30 @@ nadie cambie el contrato. Se audita en el QBR y se corrige ahí, o se reclasific
 
 ## Contrato anti-desplazamiento
 
-Es lo que hace vendible el servicio a un equipo que ya existe. Sin esto, el Head of Design veta.
+🔴 **Esto es una norma de delivery y una cláusula de SOW. NO es material de venta.**
+
+Enumerar en una reunión los daños que no vamos a causar **inventa preocupaciones que el cliente no tenía**.
+*"Nunca nos reunimos con tus gerentes sin ti"* le enseña que eso es algo que los proveedores hacen, le sugiere que
+nosotros lo hemos hecho, y le entrega una sospecha que no traía. Un proveedor enumerando lo que no hará es la
+postura de quien espera ser desconfiado: proyecta culpa, no seguridad.
+
+**Cuándo se usa cada cosa:**
+
+| Momento | Qué se hace |
+|---|---|
+| **En el pitch** | Sólo la cláusula 1, y dicha como oferta de control: *"tú eliges qué frentes conserva tu equipo y cuáles nos sueltas"*. Más el reparto: *"tu equipo dirige el producto; nosotros dirigimos la ejecución de los frentes que nos sueltas"* |
+| **Si el cliente levanta el miedo** *("¿esto no termina reemplazando a mi equipo?")* | Ahí sí, el contrato completo — y pesa **porque está escrito y no se lo vendimos** |
+| **En el SOW** | Las siete cláusulas, siempre |
+| **En delivery** | Se cumplen sin anunciarlas. El cliente las descubre por comportamiento |
+
+🔴 **Manejo de objeciones adelantado a una objeción no levantada = objeción creada.** No se pre-maneja.
 
 1. El cliente **elige qué lanes conserva**; se declaran en el SOW junto con las que Efeonce toma.
 2. Efeonce **nunca posee la visión de producto, el roadmap ni la marca**.
-3. Efeonce **no presenta a los ejecutivos del cliente sin el Head of Design en la sala**.
+3. Efeonce **no discute el desempeño ni el alcance del trabajo de diseño con la jefatura del cliente sin el Head
+   of Design presente.** ⚠️ Redactado acotado a propósito: el absoluto *"nunca nos reunimos con tus gerentes sin
+   ti"* es **incumplible** —compras, finanzas y legal convocan reuniones— y una promesa incumplible es peor que
+   ninguna: la primera vez que ocurre, quedamos como mentirosos por algo que nunca debimos prometer.
 4. La **autoría y el crédito** del trabajo son del equipo del cliente hacia adentro de su organización.
 5. **Ninguna comunicación de Efeonce compara el desempeño del equipo interno con el nuestro.** La telemetría mide
    nuestras lanes, no a su gente.
@@ -203,6 +222,9 @@ Es lo que hace vendible el servicio a un equipo que ya existe. Sin esto, el Head
 
 🔴 **Nunca decir "somos una extensión de tu equipo" sin el mecanismo pegado** — la lane declarada, el número, el
 ciclo, el login. Dicha sola, es exactamente lo que dice la agencia commodity.
+
+🔴 **Y nunca recitar este contrato como argumento.** El mecanismo que sí se dice en voz alta es la elección de
+frentes; el resto se cumple, no se promete.
 
 ## Telemetría — el moat
 

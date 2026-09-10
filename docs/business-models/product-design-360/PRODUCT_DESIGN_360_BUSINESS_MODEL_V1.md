@@ -477,11 +477,16 @@ la justificación del precio de capacidad gobernada sin que nadie cambie el cont
 
 ## 8. Contrato anti-desplazamiento
 
-**Es la sección que hace vendible el servicio a un equipo que ya existe.** Sin ella, el Head of Design veta.
+**Norma de delivery y cláusula de SOW — NO material de venta.** Enumerar en una reunión los daños que no vamos a
+causar inventa preocupaciones que el cliente no traía, y proyecta la postura de quien espera ser desconfiado. En el
+pitch sólo se dice la cláusula 1, como **oferta de control** y no como promesa de contención. El contrato completo
+se despliega **si el cliente levanta el miedo**, y pesa porque está escrito y no se le vendió.
 
 1. **El cliente elige qué lanes conserva.** Se declaran en el SOW, con las que Efeonce toma y las que no.
 2. **Efeonce nunca posee la visión de producto, el roadmap ni la marca.** Esas quedan en el equipo interno.
-3. **Efeonce no presenta a los ejecutivos del cliente sin el Head of Design en la sala.** Nunca por separado.
+3. **Efeonce no discute el desempeño ni el alcance del trabajo de diseño con la jefatura del cliente sin el Head of
+   Design presente.** ⚠️ Acotado a propósito: el absoluto *"nunca sin ti"* es incumplible (compras, finanzas y legal
+   convocan reuniones) y una promesa incumplible es peor que ninguna.
 4. **La autoría y el crédito del trabajo son del equipo del cliente** hacia adentro de su organización.
 5. **Ninguna comunicación de Efeonce —propuesta, QBR, informe— compara el desempeño del equipo interno con el
    nuestro.** La telemetría mide nuestras lanes, no a su gente.
@@ -493,6 +498,10 @@ la justificación del precio de capacidad gobernada sin que nadie cambie el cont
 
 🔴 **Regla anti-humo:** nunca decir "somos una extensión de tu equipo" sin el mecanismo pegado — el login, el
 número, el ciclo, la lane declarada. Dicha sola, es exactamente lo que dice la agencia commodity.
+
+🔴 **Regla de placement:** este contrato **no se recita en la venta**. Pre-manejar una objeción que el cliente no
+levantó es crearla. Lo único que se dice en voz alta es la elección de frentes; lo demás se cumple y el cliente lo
+descubre por comportamiento.
 
 ---
 
