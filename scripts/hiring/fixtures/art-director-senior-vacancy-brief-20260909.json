@@ -1,5 +1,5 @@
 {
-  "idempotencyKey": "vacancy-art-director-senior-20260909-v2",
+  "idempotencyKey": "vacancy-art-director-senior-20260909-v3",
   "sourceReference": "efeonce-hiring-art-director-senior-20260909-v1",
   "requestedRole": "Director(a) de Arte Senior",
   "publicTitle": "Director(a) de Arte Senior",
@@ -100,19 +100,19 @@
       "steps": [
         {
           "title": "Revisión de portfolio",
-          "body": "Revisamos la calidad del trabajo, el contexto de los casos y tu contribución verificable."
+          "body": "Miramos tus casos: el problema que había, cómo lo resolviste y qué parte fue tuya."
         },
         {
           "title": "Conversación estructurada",
-          "body": "Conversamos sobre concepto, craft, feedback, liderazgo y producción en situaciones reales."
+          "body": "Conversamos sobre concepto, craft, liderazgo, producción y feedback, siempre a partir de situaciones reales de trabajo."
         },
         {
-          "title": "Profundización de casos",
-          "body": "Revisamos decisiones de tu portfolio y criticamos un artefacto ficticio; no solicitamos una pieza nueva ni trabajo utilizable por Efeonce o un cliente."
+          "title": "Crítica de diseño",
+          "body": "Profundizamos las decisiones de tu portfolio y hacemos juntos una crítica sobre una pieza ficticia. No te pedimos trabajo nuevo: nada de lo que salga de aquí lo usa Efeonce ni un cliente."
         },
         {
           "title": "Conversación final",
-          "body": "Alineamos expectativas, forma de trabajo, disponibilidad y condiciones antes de una decisión."
+          "body": "Alineamos expectativas, forma de trabajo, disponibilidad y compensación antes de que cualquiera de los dos decida."
         }
       ],
       "expectedTiming": "Estimamos completar el proceso en tres a cuatro semanas, sujeto a disponibilidad mutua.",
