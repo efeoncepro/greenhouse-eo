@@ -62,6 +62,23 @@ margen. Vender **una lane con outcome, QA propio y accountability medida** es ca
 **El cliente elige qué lanes conserva su equipo. Efeonce toma las que suelta.** Ese gesto, explícito en el intake,
 es lo que convierte al Head of Design —el único con poder de veto— en quien defiende el deal.
 
+## Las tres razones por las que alguien contrata capacidad
+
+🔴 **No todo necesita arreglarse.** Vender sólo a quien tiene algo roto sesga la cartera hacia clientes en
+problemas: menos presupuesto, más fricción, más política. **El mejor cliente es el que está creciendo.**
+
+| # | Razón | Estado del cliente | Recurrencia |
+|---|---|---|---|
+| **1** | 🎯 **Expansión de capacidad productiva** — el roadmap creció, más superficies, más mercados, entró capital, ingeniería contrató | **Sano y creciendo** | **Retainer desde el mes uno.** El envelope crece con él |
+| **2** | 🎯 **Gap estructural permanente** — no tiene research, accesibilidad o design system, y **no los va a contratar** | **Sano, incompleto por diseño** | **Recurrente por naturaleza.** El gap se cubre, no se cierra |
+| **3** | **Deterioro** — algo se degradó | Con deuda acumulada | Proyecto; necesita conversión |
+
+**1 y 2 no requieren ninguna conversión: nacen recurrentes.** Sólo 3 entra como proyecto.
+
+🎯 **Cómo se prospecta:** no buscando empresas con diseño roto, sino **empresas que van a construir más de lo que
+su equipo alcanza a diseñar**. Esa señal es pública y anticipable — ronda levantada, expansión de mercado,
+contratación fuerte de ingeniería, línea de producto nueva, adquisición. **Se llega antes del dolor, no después.**
+
 ## Las seis lanes
 
 ### L1 · Feature Delivery
@@ -102,12 +119,42 @@ porque no le quita nada a nadie** — es trabajo que hoy no se está haciendo.
 Intake, priorización, quality gates, QA visual de lo construido, handoff, memoria de decisiones consultable.
 **Por qué la sueltan:** sólo los equipos enterprise grandes tienen design ops propio.
 
+## Los dos tiempos de una lane — y de dónde sale el retainer
+
+**Sólo aplica a la razón 3 (deterioro).** Si el cliente entra por expansión o por gap estructural, **la lane nace
+en `sostener` y no hay nada que convertir**.
+
+🔴 **Cuando sí hay un arreglo de por medio: una lane vendida sólo como arreglo no es un retainer, es un proyecto
+con cuota mensual.**
+
+En ese caso la lane se vende en dos tiempos. El **arreglo** es la entrada: acotado, de decisión rápida y bajo riesgo
+político. El **sostener** es el negocio: mensual, y no termina mientras el cliente siga sacando producto.
+
+| Lane | Arreglar *(entrada)* | Sostener *(retainer)* | Disparador de conversión |
+|---|---|---|---|
+| **L1 · Feature Delivery** | — | **Nace recurrente** | No convierte: se llega a ella tras probar el método en otra lane |
+| **L2 · Research** | Un estudio | Cadencia de discovery por release o trimestre | La siguiente decisión de producto queda sin evidencia. **Se vende cadencia, no estudios** |
+| **L3 · Design System** | Build del sistema | Versionado, contribuciones, drift, evolución | Llega la primera contribución del equipo del cliente; aparece el primer drift |
+| **L4 · Accessibility** | Auditoría + remediación | Gate sobre todo lo nuevo | El siguiente release trae superficies sin auditar; o entra una fecha de cumplimiento |
+| **L5 · Design Debt** | Sprint de reducción | Contención sostenida (10–20% de capacidad) | Termina el sprint y la tasa de acumulación vuelve a correr |
+| **L6 · Design Ops** | — | **Nace recurrente** | No convierte |
+
+**Por qué el sostener existe de verdad:** el producto sigue saliendo y cada release trae superficies que diseñar,
+que deben cumplir el sistema y que suman deuda; el estado se degrada solo —~75% de los equipos ve la deuda volver
+al backlog sin nadie que la contenga—; y **el drift es medible**, así que el retainer se defiende con evidencia.
+
+🔴 **Si el drift no sube cuando nos vamos, el retainer no se merecía — y hay que decirlo.** Retener por opacidad
+es exactamente lo que el modelo prohíbe.
+
 ## Reglas de la arquitectura de lanes
 
 - Una lane se contrata **completa o no se contrata**. Media lane es staff augmentation con otro nombre.
 - **L1 nunca sola** a un cliente con equipo in-house.
 - El cliente puede **recuperar una lane con aviso**. La reversibilidad es parte del contrato, no una concesión.
 - Cada lane declara capacidad, simultaneidad, rondas, turnaround y exclusiones. **Nunca "ilimitado".**
+- 🔴 **Todo SOW de arreglo declara el sostener que le sigue** — disparador, alcance y banda de precio. No como
+  obligación de compra, sino para que la conversación exista desde el día uno. **Vender un arreglo sin sostener
+  declarado es cómo se construye un negocio de proyectos que nunca convierte.**
 
 ## Cómo se cobra
 
@@ -169,11 +216,19 @@ improvisa en una reunión.
 
 ## Puertas de entrada
 
-**Diagnóstico de Capacidad y Experiencia.** Mapa de lanes contra la capacidad real del equipo; inventario de
-superficies; recorrido del flujo crítico; auditoría de accesibilidad contra criterio declarado; deuda de diseño y
-consistencia; lectura de lo que hoy no se puede medir. Termina con una recomendación de **qué lanes soltar y en qué
-orden**.
-**Se acepta cuando el Head of Design puede presentar el caso a su jefe sin pedirnos ayuda.**
+**Diagnóstico de Capacidad.** 🎯 **La pregunta es hacia adelante, no hacia atrás:** *¿alcanza tu equipo para lo
+que vas a construir los próximos doce meses?*
+
+Preguntar "¿qué tienes roto?" sólo funciona con un cliente enfermo. Preguntar "¿te alcanza para tu roadmap?"
+funciona con el cliente sano, que es el que queremos.
+
+Incluye: **dimensionamiento de la capacidad de diseño que exige el roadmap declarado** contra la capacidad real del
+equipo (ratio diseñador:ingeniero, superficies comprometidas, cadencia de release); inventario de lanes cubiertas,
+descubiertas y estructuralmente ausentes; y —cuando existe— lectura de deterioro: consistencia, accesibilidad y
+deuda de diseño. Termina con una recomendación de **qué lanes soltar, en qué orden y con qué capacidad**.
+
+**Se acepta cuando el Head of Design puede presentar el caso a su jefe sin pedirnos ayuda** — incluido el número de
+capacidad faltante, que es lo que le permite pedir presupuesto.
 
 **Sample Sprint.** Una lane, un ciclo, gobernanza completa. Piloto pagado para validar relación, workflow, costo y
 outcome antes de escalar. **Es la mejor puerta que tenemos.**
@@ -215,6 +270,7 @@ adopción. El gobierno posterior se contrata como lane L3.
 | **Vía de implementación declarada** | Diseño que no llega a producción no produce ningún resultado |
 | **Lanes que el cliente conserva**, declaradas | Es el contrato anti-desplazamiento hecho operativo |
 | **Rondas numeradas** en el SOW | El scope creep es el asesino silencioso del margen |
+| **Sostener declarado**, cuando el SOW es de arreglo | Sin él, la lane termina y el ingreso con ella |
 | **Derechos de uso** con canal, territorio y plazo | Cederlos perpetuos e ilimitados dentro del fee base regala múltiplos del trabajo |
 
 ## Estados degradados
@@ -256,6 +312,7 @@ mezclar monedas ni mercados en la misma lámina. Detalle y fuentes en la secció
 - Diseño por hora o por pantalla.
 - Rondas ilimitadas, ni capacidad "ilimitada".
 - Media lane, o un diseñador suelto presentado como capacidad gobernada.
+- Un arreglo sin su sostener declarado.
 - Staff Augmentation con promesa de outcome.
 - Un rediseño sin vía de implementación declarada.
 - "Validado" sin usuarios reales del cliente.

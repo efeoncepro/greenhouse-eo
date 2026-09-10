@@ -65,6 +65,19 @@ loaded 1,4–2,4× base, contractor embebido USD 80–135/h, ratio diseñador:in
 deuda de diseño 10–20% del sprint— con **sesgo de proveedor declarado** y la advertencia de rehacer el cálculo con
 loaded cost chileno antes de usarlos (decisión abierta D7). Diseño integral queda como motion secundario.
 
+**Segunda corrección de la misma sesión: recurrencia y razón de compra.** El modelo estaba construido sobre señales
+de **disfunción**, lo que sesgaba el ICP hacia clientes con problemas, y sus lanes eran mayormente de **arreglo**,
+que termina. Se incorporan **tres razones de compra**: expansión de capacidad productiva (el roadmap creció y el
+equipo no alcanza), gap estructural permanente (no tiene ni tendrá research, accesibilidad o design system) y
+deterioro. **Las dos primeras son retainer desde el mes uno y no requieren conversión**; sólo el deterioro entra
+como proyecto. Para ese caso se agregan los **dos tiempos de una lane** —arreglar y sostener— con disparador de
+conversión declarado por lane y la regla de que todo SOW de arreglo declara el sostener que le sigue. El
+diagnóstico se reformula hacia adelante: deja de preguntar *"¿qué tienes roto?"* y pasa a **dimensionar la
+capacidad que exige el roadmap** contra la del equipo. Se agregan métricas de recurrencia (lanes en `run` ÷
+contratadas, conversión fix→run, drift en ventanas sin gobierno) y la regla de honestidad: **si el drift no sube
+cuando nos vamos, el retainer no se merecía**. Prospección: se busca a quien va a construir más de lo que su equipo
+alcanza a diseñar —señal pública y anticipable—, no a quien ya está en problemas.
+
 ## 2026-09-10 — Conciliación bancaria ago–sep en producción, `fx_drift` cubre USD/MXN y rutina mensual (TASK-1858)
 
 Release `2cf8c26cfa2d-8f79606f-8cb3-4154-a7fd-c570e7af8497` (`released` 20:06Z, run `34523159501`, un solo

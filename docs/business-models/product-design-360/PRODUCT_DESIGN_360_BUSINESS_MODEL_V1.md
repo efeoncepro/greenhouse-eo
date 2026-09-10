@@ -52,6 +52,11 @@ la entrega, y por lo tanto define el precio.
 **El mecanismo político: el Head of Design elige qué lanes conserva.** Nosotros tomamos las que él suelta. Ese
 gesto, hecho explícito en el intake, es lo que convierte al único que puede vetar el deal en el que lo defiende.
 
+**Tres razones de compra, y sólo una es un problema.** Se contrata capacidad por **expansión** (el roadmap creció
+y su equipo no alcanza), por **gap estructural permanente** (no tiene research, accesibilidad o design system y no
+los va a contratar) o por **deterioro** (algo se degradó). Las dos primeras son **retainer desde el mes uno** y son
+mejores cuentas; sólo la tercera entra como proyecto y necesita convertirse.
+
 **Cómo cobramos.** Envelope de capacidad mensual por lane. Nunca por hora. Nunca por pantalla.
 
 **Qué NO aprueba este documento.** Precio, tarifario, claims públicos, venta general, checkout, ARR, ni el nombre
@@ -72,7 +77,47 @@ Encima de eso, la deuda de diseño necesita **10–20% de la capacidad de sprint
 **~75% de los equipos la ve volver al backlog** porque el feature work siempre gana la priorización. Esa lane
 —la que nadie protege— es exactamente la que un tercero puede sostener sin quitarle nada al equipo interno.
 
+### 🎯 Las tres razones por las que alguien contrata capacidad — y sólo una es un problema
+
+🔴 **No todo necesita arreglarse.** Modelar el servicio únicamente sobre señales de disfunción sesga el ICP hacia
+clientes en problemas, que son los peores clientes: menos presupuesto, más fricción, más política interna. El mejor
+cliente es el que **está creciendo y necesita más output**, y en ese cliente no hay nada roto.
+
+| # | Razón | Estado del cliente | Forma comercial |
+|---|---|---|---|
+| **1** | 🎯 **Expansión de capacidad productiva** — el roadmap creció, hay más superficies, se lanza en más mercados, entró capital, ingeniería contrató | **Sano y creciendo** | **Retainer desde el día uno.** El envelope escala con él |
+| **2** | 🎯 **Gap estructural permanente** — no tiene research, accesibilidad o design system in-house, y **no los va a contratar** | **Sano, incompleto por diseño** | **Recurrente por naturaleza.** El gap no se cierra: se cubre |
+| **3** | **Deterioro** — algo se degradó y hay que recuperarlo | Con deuda acumulada | Proyecto; **necesita conversión** a sostener |
+
+**Las razones 1 y 2 son retainer desde el primer mes y no requieren ninguna conversión.** Sólo la 3 tiene ese
+problema. Y son además mejores cuentas: mayor margen, menos fricción y vida más larga.
+
+🎯 **Consecuencia comercial:** la prospección no se hace buscando empresas con diseño roto. Se hace buscando
+**empresas que van a construir más de lo que su equipo alcanza a diseñar** — que es una señal pública y anticipable
+(ronda levantada, expansión de mercado, contratación de ingeniería, línea de producto nueva, adquisición).
+
 ### Señales de compra observables
+
+| Señal | Qué significa |
+|---|---|
+**De expansión** *(el mejor cliente — nada está roto)*
+
+| Señal | Qué significa |
+|---|---|
+| Ingeniería contrató y diseño no | El ratio se va a romper el próximo trimestre. **Llegar antes del dolor** |
+| Ronda levantada, adquisición o entrada a un mercado nuevo | Va a haber más superficies de las que su equipo alcanza |
+| Línea de producto nueva sin equipo de diseño asignado | Capacidad requerida sin headcount aprobado |
+| Migración de plataforma o rediseño de marca aterrizando en producto | Pico de demanda con fecha, que no justifica contratar |
+
+**De gap estructural** *(sano, pero incompleto)*
+
+| Señal | Qué significa |
+|---|---|
+| No hay investigador, y no hay vacante abierta | El gap es permanente, no temporal |
+| El design system lo mantiene quien puede, cuando puede | No hay dueño con tiempo, y no lo habrá |
+| Accesibilidad la resuelve ingeniería al final | No hay criterio ni owner |
+
+**De deterioro** *(el cliente con problema — se atiende, pero no se prospecta por acá)*
 
 | Señal | Qué significa |
 |---|---|
@@ -161,6 +206,46 @@ declarado. El cliente elige cuáles conserva su equipo; Efeonce toma las que sue
 | **L5 · Design Debt & Consistency** | La deuda que necesita 10–20% del sprint sostenido y que el feature work siempre desplaza | **Es la lane que el equipo interno nunca protege.** La mejor candidata a externalizar: no le quita nada a nadie |
 | **L6 · Design Ops** | Intake, priorización, QA visual, handoff, memoria de decisiones | Sólo los equipos enterprise grandes tienen design ops propio |
 
+### Los dos tiempos de una lane — arreglar y sostener
+
+**Sólo aplica cuando el cliente entra por la razón 3 (deterioro).** Si entra por expansión de capacidad o por gap
+estructural, **la lane nace en `run` y no hay nada que convertir** — se contrata el envelope y punto.
+
+🔴 **Pero cuando sí hay un arreglo de por medio, una lane vendida sólo como arreglo no es un retainer: es un
+proyecto con cuota mensual.** El arreglo termina, y con él termina el ingreso.
+
+| | **Arreglar** *(fix)* | **Sostener** *(run)* |
+|---|---|---|
+| Forma | Proyecto acotado, On-Demand | Envelope mensual, On-Going |
+| Qué es | Cerrar el gap acumulado | Impedir que el gap vuelva a abrirse |
+| Termina | **Sí** | **No, mientras el cliente siga sacando producto** |
+| Rol comercial | **Entrada.** Bajo riesgo político, decisión rápida | **El retainer.** Es el negocio |
+
+**Por qué el sostener existe de verdad y no es una excusa para seguir facturando.** Tres mecanismos verificables:
+
+1. **El producto sigue saliendo.** Cada release trae superficies que hay que diseñar, que deben cumplir el sistema,
+   que necesitan auditoría de accesibilidad y que suman deuda. El retainer se ancla a la **cadencia de release del
+   cliente**, no a un backlog que se vacía.
+2. **El estado se degrada solo.** ~75% de los equipos ve la deuda de diseño volver al backlog cuando nadie la
+   sostiene. La deuda no es un stock que se paga: es una **tasa** que se contiene.
+3. **El drift es medible.** Podemos mostrar el número subiendo cuando el gobierno se detiene. El retainer se
+   defiende con evidencia, no con argumento.
+
+### Qué regenera cada lane
+
+| Lane | Arreglar *(entrada)* | Sostener *(retainer)* | Qué lo regenera |
+|---|---|---|---|
+| **L1 · Feature Delivery** | — *(sin fase de arreglo)* | **Run puro** | El roadmap no termina nunca. **Es la lane más recurrente de todas** |
+| **L2 · Research** | Un estudio puntual | **Cadencia de discovery** por release o por trimestre | Cada decisión nueva necesita evidencia nueva |
+| **L3 · Design System** | Build del sistema | Versionado, revisión de contribuciones, drift, evolución | El producto crece y el sistema tiene que crecer con él |
+| **L4 · Accessibility** | Auditoría + remediación | **Gate sobre todo lo nuevo** | Cada superficie nueva nace sin auditar; y la norma no se detiene |
+| **L5 · Design Debt** | Sprint de reducción | **Contención sostenida** (10–20% de capacidad) | La deuda es una tasa, no un stock |
+| **L6 · Design Ops** | — *(sin fase de arreglo)* | **Run puro** | Intake, priorización y QA ocurren cada sprint |
+
+🎯 **L1 y L6 son retainer desde el día uno.** Pero L1 no puede ser la entrada —sola se lee como sustitución—, así
+que **no es la puerta: es el destino.** Se llega a ella después de haber probado el método en una lane
+especializada.
+
 **Reglas de la arquitectura de lanes:**
 
 - Una lane se contrata **completa o no se contrata**. Media lane es staff augmentation con otro nombre.
@@ -168,6 +253,9 @@ declarado. El cliente elige cuáles conserva su equipo; Efeonce toma las que sue
   guerra política. Se vende acompañada de al menos una lane especializada (L2–L5), que es la que el equipo interno
   reconoce como ayuda y no como amenaza.
 - El cliente puede recuperar una lane con aviso. La reversibilidad es parte del contrato, no una concesión.
+- 🔴 **Todo SOW de arreglo declara el sostener que le sigue** — disparador, alcance y banda de precio. No como
+  obligación de compra, sino para que la conversación exista desde el día uno. **Vender un arreglo sin sostener
+  declarado es cómo se construye un negocio de proyectos que nunca convierte.**
 
 ### Los tres ejes, sin mezclarlos
 
@@ -265,10 +353,11 @@ firma como SLA y qué se muestra como telemetría es una decisión comercial, no
 
 | Línea | Unidad | Trigger | Incluye | No incluye |
 |---|---|---|---|---|
-| **Design Velocity — lane** | **Envelope de capacidad mensual por lane** | Mensual, por adelantado | Ejecución de la lane, QA propio, telemetría, memoria | Trabajo fuera del envelope; lanes no contratadas |
+| **Lane — arreglar** *(fix)* | Proyecto acotado por lane | Firma; hitos | Cerrar el gap acumulado de esa lane | El sostener posterior, que se cotiza aparte |
+| **Lane — sostener** *(run)* | **Envelope de capacidad mensual por lane** | Mensual, por adelantado | Ejecución continua, QA propio, telemetría, memoria | Trabajo fuera del envelope; lanes no contratadas |
 | **Gobierno / plataforma** | Línea propia por engagement | Mensual | Intake, priorización, quality gates, telemetría, soporte base, memoria | — |
 | **Sample Sprint** | Piloto pagado acotado | Firma | Una lane, un ciclo, gobernanza completa | Compromiso de continuidad |
-| **Diagnóstico** | Proyecto cerrado | Firma | Auditoría de capacidad y de experiencia; recomendación de lanes | Ejecución |
+| **Diagnóstico de Capacidad** | Proyecto cerrado | Firma | Dimensionamiento de la capacidad que exige el roadmap contra la real; lanes cubiertas/ausentes; recomendación | Ejecución |
 | **Design System — build** | Proyecto por inventario × plataformas × marcas | Hitos | Auditoría, tokens, componentes, documentación, modelo de contribución | Migración de superficies existentes |
 | **Diseño integral (motion B)** | Proyecto por complejidad | Hitos | Research, arquitectura, sistema, estados, prototipo, handoff, acompañamiento | Desarrollo, QA funcional |
 | **Advisory / design leadership** | Fee por ventana de disponibilidad | Mensual | Criterio, gobierno, revisión | Ejecución |
@@ -287,6 +376,40 @@ firma como SLA y qué se muestra como telemetría es una decisión comercial, no
 - 🔴 **Nunca derechos perpetuos, exclusivos e ilimitados dentro del fee base.**
 - 🔴 **El ad-hoc nunca más barato que el marginal del plan.** Rompe la planificación y consume coordinación: tiene
   que costar más.
+
+### 🎯 La arquitectura de recurrencia — cómo un arreglo se vuelve retainer
+
+**Dos de las tres entradas ya son recurrentes y no necesitan conversión:**
+
+| Entrada | Recurrencia | Por qué |
+|---|---|---|
+| **1 · Expansión de capacidad** | 🎯 **Retainer desde el mes uno** | El envelope se dimensiona contra el roadmap del cliente. Mientras siga construyendo, sigue necesitándolo — y **crece con él** |
+| **2 · Gap estructural** | 🎯 **Recurrente por naturaleza** | El gap no se cierra: se cubre. Un cliente que no va a contratar un investigador lo sigue necesitando cada trimestre |
+| **3 · Deterioro** | Requiere conversión | El arreglo termina. Es la única entrada con este problema |
+
+**Para la entrada 3, la conversión no aparece por insistir: aparece porque el arreglo crea un estado que se degrada
+solo.** Cada lane tiene un disparador observable, y el SOW del arreglo lo declara desde el día uno.
+
+| Lane | Disparador de conversión — el momento exacto |
+|---|---|
+| **L3 · Design System** | Llega la primera contribución del equipo del cliente y hay que revisarla; aparece el primer drift contra producción |
+| **L4 · Accessibility** | El siguiente release saca superficies nuevas sin auditar; o entra una fecha de cumplimiento |
+| **L5 · Design Debt** | Termina el sprint de reducción y la tasa de acumulación vuelve a correr — medible desde el ciclo siguiente |
+| **L2 · Research** | Se cierra el estudio y la siguiente decisión de producto queda otra vez sin evidencia. **Se vende cadencia, no estudios** |
+| **L1 · Feature Delivery** | No convierte: **nace recurrente**. Se llega a ella tras probar el método en otra lane |
+| **L6 · Design Ops** | No convierte: **nace recurrente** |
+
+**La métrica que sostiene la conversación de renovación es el drift.** Si podemos mostrar el número subiendo
+cuando el gobierno se detiene, el retainer se defiende con evidencia y no con argumento. Si el drift no sube
+cuando nos vamos, **el retainer no se merecía y hay que decirlo** — es exactamente el tipo de dependencia opaca
+que el modelo de negocio de Efeonce prohíbe.
+
+**Salud de la cartera:** un engagement es sano cuando ≥1 lane está en `run`. Una cuenta con todas sus lanes en
+`fix` es un cliente de proyectos, no una cuenta recurrente, y así debe reportarse.
+
+🎯 **Y la métrica de calidad de la cartera es la mezcla de entradas.** Una cartera dominada por la entrada 3
+(deterioro) es una cartera de clientes con problemas: proyectos, fricción y conversión incierta. Una cartera
+dominada por las entradas 1 y 2 es recurrente por construcción. **La prospección debe empujar hacia 1 y 2.**
 
 ### Expansión
 
@@ -402,6 +525,7 @@ Legal valida esta sección antes de cualquier venta.
 | **Sample Sprint — 1ª lane** | Una lane sale de su plato, un ciclo, gobernanza completa | La lane entrega sin que él la supervise | Pide continuidad |
 | **Operator-champion** | Defiende internamente la continuidad | Pide una segunda lane sin que se la ofrezcamos | El sponsor pregunta por el resto |
 | **Expansión — 2ª lane / sistema** | Se suman lanes especializadas o el design system | Ingeniería construye desde el sistema | Aparece cola recurrente |
+| 🎯 **Conversión fix → run** | Termina el arreglo y se activa el sostener declarado en el SOW | El disparador de esa lane ocurrió y es observable *(drift, release nuevo, tasa de deuda corriendo)* | **Primer ingreso recurrente** |
 | **Capacidad recurrente** | Envelope estable, QBR con telemetría | OTD/FTR/RpA, drift, adopción del sistema | Renovación |
 | **Evangelización** | Referencia y caso | Autorización escrita | — |
 
@@ -426,6 +550,10 @@ hallazgos de accesibilidad cerrados por nivel WCAG · deuda de diseño cerrada �
 
 **Adopción** — superficies nuevas construidas desde el design system ÷ totales · contribuciones del equipo del
 cliente al sistema · lanes activas por cuenta.
+
+**Recurrencia** — 🎯 **lanes en `run` ÷ lanes contratadas** *(salud de cartera; una cuenta con todo en `fix` es
+cliente de proyectos)* · tasa de conversión fix → run por lane · meses de permanencia del envelope · drift medido
+en las ventanas sin gobierno *(la evidencia de que el sostener se merece)*.
 
 **Economía** — margen por lane y por engagement · utilización del envelope · realization · costo variable de
 research p50/p95.
@@ -462,6 +590,8 @@ Finance.
 | 🔴 **El Head of Design lo lee como reemplazo y veta** | 12 meses | **Crítico** | Sección 8 completa; el pitch entra por su promoción, no por nuestra capacidad; él elige qué lanes conserva |
 | 🔴 **Deriva a staff augmentation** | 12 meses | **Crítico** | Lanes completas; Efeonce dirige la ejecución; auditoría en QBR; G4 |
 | Diseño entregado y no implementado | 12 meses | Alta | Vía de implementación declarada; composición con Web Experience 360; verificación visual como criterio de cierre |
+| 🔴 **La lane no convierte de arreglo a sostener** | 12 meses | **Crítico** | Todo SOW de arreglo declara su sostener con disparador y banda de precio; el drift como evidencia de renovación; salud de cartera medida por lanes en `run` |
+| **El cliente internaliza la capacidad y el retainer se achica** | 36 meses | Media | Es consecuencia buscada del Why, no un fallo. Se transfiere **capacidad de decidir y contribuir**; se conserva **capacidad de ejecutar a volumen y profundidad especialista**. Ningún equipo interno quiere volverse una fábrica de auditorías de accesibilidad |
 | **Superside y las suscripciones entran a product design** | 12–36 meses | Alta | Ya publican sobre escalar capacidad de product design. La defensa no es precio: es criterio, memoria y accountability medida |
 | Fuga de margen por rondas | 12 meses | Alta | Rondas numeradas; owner de aprobación en intake; stop-loss |
 | Canibalización con Web Experience 360 | 12 meses | Media-alta | Frontera "decidir vs construir"; una sola propuesta con lanes declaradas |
