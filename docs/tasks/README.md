@@ -17,8 +17,9 @@ contrato de identidad y rollout nativo condicional; login vigente se certifica p
 | [TASK-1856](to-do/TASK-1856-client-service-request-and-brief-self-service-ui.md) | Autogestión de solicitudes y briefs del cliente | TASK-1854, TASK-1855 |
 | [TASK-1857](to-do/TASK-1857-sky-creative-hub-client-surface.md) | Creative Hub del portal cliente: materializar `/creative-hub` para Sky (decisión del operador 2026-09-10; TASK-1687 no supersede el bundle) | none |
 | [TASK-1858](in-progress/TASK-1858-finance-reconciliation-recovery-closeout.md) | **In Progress** — Cierre de la recuperación de conciliación bancaria ago–sep 2026: rollout ISSUE-169, fx_drift USD/MXN, rutina mensual, regularizaciones Payroll/CCA, crédito 420051383906 | none |
+| [TASK-1859](to-do/TASK-1859-landing-product-design-360.md) | Landing pública de capacidad de diseño (superficie de producto de Product Design 360); publicación por fases atada al business model | none |
 
-Siguiente ID libre `TASK-1859`. Insights TASK-1845–1849 y notificaciones conservan sus dueñas.
+Siguiente ID libre `TASK-1860`. Insights TASK-1845–1849 y notificaciones conservan sus dueñas.
 
 ## Programa Efeonce Insights: EPIC-045
 

@@ -7,6 +7,7 @@
 > **Validated as of:** 2026-09-10 — comparables de mercado verificados con fuente y `as-of`; sin cohortes de cliente
 > **Review cadence:** trimestral, o antes ante cualquier gate de la sección 12
 > **Decision:** [`EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md`](../../architecture/EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md) (`Proposed`)
+> **Landing (superficie de producto):** [`TASK-1859`](../../tasks/to-do/TASK-1859-landing-product-design-360.md) — publicación por fases atada al estado de este modelo
 > **Related:** [`ADR Wave Portfolio Boundaries`](../../architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md) · [`Wave Business Model V1`](../wave/WAVE_BUSINESS_MODEL_V1.md) · [`Ficha de servicio`](../../services/wave/product-design-360.md) · [`Product Service Operating Model V1`](../EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md)
 
 ---

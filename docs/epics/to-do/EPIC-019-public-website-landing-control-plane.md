@@ -73,6 +73,7 @@ Sin un epic, el trabajo tenderia a partir con un script o endpoint aislado que p
 | `TASK-1799` | `4` | `in-progress / landing publicada` | Content Marketing / Content Ops: trece widgets Elementor desde diseño aprobado, Growth Forms, Yoast/Service y menú. Pendientes de QA ampliado en su [task](../../tasks/in-progress/TASK-1799-landing-content-marketing-content-ops-partner.md); no implica cierre del control plane completo. |
 | `TASK-1802` | `4` | `to-do` | Content Hub Efeonce: reconstruye `/blog` con widgets Elementor query-driven sobre posts WordPress publicados, archivo/paginación navegable y formatos federados (Artículos, Glitch, Tools, Videos y Webinars). Demo 35 deja de ser dirección final; cualquier schema/reader reusable faltante se separa antes como foundation backend. |
 | `TASK-1803` | `4` | `to-do` | Landing Branding Studio: articula la marca como sistema de decisión —definición, expresión y operación— y coordina su continuidad con Agencia Creativa y Producción Creativa. Incluye investigación/copy, wireframe, flow y motion; Discovery debe cerrar identidad de URL, casos, CTA y bindings antes de implementación. |
+| `TASK-1859` | `TBD` | `to-do` | Landing pública de capacidad de diseño (superficie de producto de Product Design 360): Head of Design con equipo in-house; wireframe/flow/motion creados; dirección visual pendiente; publicación por fases atada al business model (`Proposed` → preview, `Approved for validation` → `noindex`, `Commercially approved` → indexada). |
 
 ## Existing Related Work
 

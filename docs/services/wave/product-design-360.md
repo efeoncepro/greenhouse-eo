@@ -7,6 +7,7 @@
 > **Fecha:** 2026-09-10
 > **Modelo económico:** [`Product Design 360 — Business Model V1.1`](../../business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md)
 > **Decisión propia:** [`EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md`](../../architecture/EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md) (`Proposed`)
+> **Landing pública:** [`TASK-1859`](../../tasks/to-do/TASK-1859-landing-product-design-360.md) — superficie de producto; la de sitio público es `TASK-1345`
 > **Decisión de portfolio:** [`ADR Wave Portfolio Boundaries`](../../architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md) — la sexta familia está **propuesta, no aceptada**
 
 ---
