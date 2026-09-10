@@ -191,13 +191,19 @@ describe.skipIf(!socket)('TASK-1852 private PostgreSQL integration', () => {
     expect((await applyServiceEnablement(command, 'admin')).data.created).toHaveLength(1)
   })
 
-  it('rejects an active-but-invited recipient and returns no access prediction for that person', async () => {
+  it('rejects an invited recipient as invitation pending (never as a non-member) and predicts no access', async () => {
     await query("UPDATE greenhouse_serving.session_360 SET status='invited' WHERE user_id='person-a'")
     const preview = await previewServiceEnablement(request)
 
     expect(preview.canApply).toBe(false)
-    expect(preview.blockers).toContainEqual({ code: 'person_not_authorized_in_organization', subject: 'person-a', owner: 'Identity' })
+    expect(preview.blockers).toContainEqual({ code: 'person_invitation_pending', subject: 'person-a', owner: 'Identity' })
+    expect(preview.blockers.filter(item => item.subject === 'person-a')).toHaveLength(1)
     expect(preview.people[0].views[0]).toMatchObject({ before: false, after: false })
+
+    // A person who is not a member of the organization at all is still a different blocker.
+    const stranger = await previewServiceEnablement({ ...request, personIds: ['person-a', 'person-nobody'] })
+
+    expect(stranger.blockers).toContainEqual({ code: 'person_not_authorized_in_organization', subject: 'person-nobody', owner: 'Identity' })
   })
 
   it('compensates only owned assignments on the same day and replays compensation', async () => {

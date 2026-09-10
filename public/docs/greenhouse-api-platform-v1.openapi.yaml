@@ -278,6 +278,82 @@ components:
         - operationId
         - idempotencyKey
       additionalProperties: false
+    CommercialTermsDeclareRequest:
+      type: object
+      additionalProperties: false
+      description: Commercial terms of a service, including the client-portal modules the
+        pricing bundles. The actor is the authenticated human; declaredBy never travels in
+        the body. bundledModules must be ACTIVE keys of the portal catalog (fail-closed).
+      required:
+        - kind
+        - effectiveFrom
+        - bundledModules
+        - reason
+      properties:
+        kind:
+          type: string
+          enum: [committed, no_cost, success_fee, reduced_fee]
+        effectiveFrom:
+          type: string
+          format: date
+        monthlyAmountClp:
+          type: number
+          nullable: true
+          minimum: 0
+        successCriteria:
+          type: object
+          nullable: true
+          additionalProperties: true
+        bundledModules:
+          type: array
+          maxItems: 20
+          items:
+            type: string
+            pattern: "^[a-z0-9][a-z0-9_]{1,63}$"
+        reason:
+          type: string
+          minLength: 10
+    CommercialTermsActive:
+      type: object
+      description: Active terms of the service at the read date, or null when none apply.
+      required:
+        - serviceId
+        - activeTerms
+      properties:
+        serviceId:
+          type: string
+        activeTerms:
+          nullable: true
+          type: object
+          properties:
+            termsId:
+              type: string
+            serviceId:
+              type: string
+            termsKind:
+              type: string
+            effectiveFrom:
+              type: string
+              format: date
+            effectiveTo:
+              type: string
+              format: date
+              nullable: true
+            monthlyAmountClp:
+              type: number
+              nullable: true
+            bundledModules:
+              type: array
+              items:
+                type: string
+            declaredBy:
+              type: string
+              nullable: true
+            declaredAt:
+              type: string
+              format: date-time
+            reason:
+              type: string
     ServiceEnablementIssue:
       type: object
       required:
@@ -644,7 +720,10 @@ paths:
                 $ref: "#/components/schemas/PlatformErrorEnvelope"
         "403":
           description: Requires a currently active internal administrator and the
-            operation capability. Sister-platform delegated OAuth is rejected.
+            operation capability. A sister-platform bearer is accepted only as
+            delegated HUMAN authority (client_services.enablement.write, durable
+            client/token provenance, human session or the RFC 8693 exchange client);
+            agent sessions and machine bearers receive invalid_delegated_context.
           content:
             application/json:
               schema:
@@ -703,7 +782,10 @@ paths:
                 $ref: "#/components/schemas/PlatformErrorEnvelope"
         "403":
           description: Requires a currently active internal administrator and the
-            operation capability. Sister-platform delegated OAuth is rejected.
+            operation capability. A sister-platform bearer is accepted only as
+            delegated HUMAN authority (client_services.enablement.write, durable
+            client/token provenance, human session or the RFC 8693 exchange client);
+            agent sessions and machine bearers receive invalid_delegated_context.
           content:
             application/json:
               schema:
@@ -778,7 +860,10 @@ paths:
                 $ref: "#/components/schemas/PlatformErrorEnvelope"
         "403":
           description: Requires a currently active internal administrator and the
-            operation capability. Sister-platform delegated OAuth is rejected.
+            operation capability. A sister-platform bearer is accepted only as
+            delegated HUMAN authority (client_services.enablement.write, durable
+            client/token provenance, human session or the RFC 8693 exchange client);
+            agent sessions and machine bearers receive invalid_delegated_context.
           content:
             application/json:
               schema:
@@ -807,6 +892,114 @@ paths:
                 $ref: "#/components/schemas/PlatformErrorEnvelope"
         "503":
           description: CLIENT_SERVICE_ENABLEMENT_WRITES_ENABLED is not explicitly true.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+  /api/platform/app/commercial/services/{serviceId}/terms:
+    get:
+      summary: read the active commercial terms of a service
+      description: Internal read (commercial.engagement.read). Returns the current terms and
+        the portal modules they bundle; this is the mapping the enablement preview consumes.
+      security:
+        - appBearer: []
+      parameters:
+        - $ref: "#/components/parameters/ApiVersion"
+        - name: serviceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Active terms or null.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PlatformEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/CommercialTermsActive"
+        "401":
+          description: Missing, invalid, expired or revoked authentication.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "403":
+          description: Internal actor with commercial.engagement.read required; delegated OAuth rejected.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+    post:
+      summary: declare commercial terms for a service
+      description: Closes the current terms and opens the declared ones (single active
+        terms per service). Requires an attributed HUMAN session with
+        commercial.engagement.declare; agent sessions and delegated OAuth receive
+        invalid_delegated_context. Audit and outbox are written in the same transaction.
+      security:
+        - appBearer: []
+      parameters:
+        - $ref: "#/components/parameters/ApiVersion"
+        - name: serviceId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommercialTermsDeclareRequest"
+      responses:
+        "201":
+          description: Terms declared; returns the new termsId and the active terms.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PlatformEnvelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          termsId:
+                            type: string
+                          activeTerms:
+                            $ref: "#/components/schemas/CommercialTermsActive/properties/activeTerms"
+        "400":
+          description: Malformed input, unknown field, or a bundled module that is not
+            active in the client-portal catalog.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "401":
+          description: Missing, invalid, expired or revoked authentication.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "403":
+          description: Human commercial session with commercial.engagement.declare required.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "404":
+          description: Service not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformErrorEnvelope"
+        "409":
+          description: "commercial_terms_conflict: active terms changed concurrently, refresh and retry;
+            commercial_terms_service_not_eligible: inactive, legacy or unmapped service."
           content:
             application/json:
               schema:

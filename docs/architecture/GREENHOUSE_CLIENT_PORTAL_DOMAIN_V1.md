@@ -353,6 +353,12 @@ COMMENT ON COLUMN greenhouse_commercial.engagement_commercial_terms.bundled_modu
   'Module keys del catálogo greenhouse_client_portal.modules que están incluidos en este pricing. Cascade al completar onboarding case (TASK-828). FK lógica vía outbox (NO physical FK por boundary cross-schema).';
 ```
 
+> **Delta 2026-09-10 (TASK-1852):** la validación lógica al escribir ya existe: `declareCommercialTerms`
+> (`src/lib/commercial/sample-sprints/commercial-terms.ts`) acepta `bundledModules` y rechaza en la misma transacción toda
+> clave que no sea un `module_key` ACTIVO (`effective_to IS NULL`). Contrato programático:
+> `POST /api/platform/app/commercial/services/{serviceId}/terms`. El preview de habilitación (TASK-1852) consume este
+> mapping como única evidencia de "módulo contratado"; el cascade de TASK-828 sigue pendiente.
+
 ### 5.5 Seed inicial — 10 módulos canónicos V1.0
 
 NOTA V1.2: la columna `business_line` fue renombrada a `applicability_scope` (ver §5.1 Delta V1.2). Los valores siguen idénticos (rename puro, no cambio semántico de los seeds).

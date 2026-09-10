@@ -65,7 +65,9 @@ Integra [Efeonce Insights](../../epics/to-do/EPIC-045-efeonce-insights-multiform
 consulta/genera informes propios y el colaborador autorizado los gestiona con los mismos commands e historial;
 el link compartido sólo permite leer la edición. El programa separa visibilidad inicial, Insights y
 autogestión de solicitudes. TASK-1852–1856 registradas; TASK-1852 conecta con TASK-1834 para identidad,
-contexto y retorno tras login. El rollout nativo es condicional; aún no cambia el comportamiento descrito aquí.
+contexto y retorno tras login. TASK-1852 ya sirve en Production el preview/apply/rollback común con writes OFF;
+no abrió Berel/Sky ni certificó login. El rollout nativo de identidad sigue condicional y la experiencia cliente
+descrita aquí no cambia hasta completar mapping, personas, rutas y canales.
 Incluye correo Insights con resumen útil y enlace a la edición, avisos email/in-app y Teamsbot para
 destinos habilitados. Los enlaces conservan contexto tras login y revalidan acceso; preferencias,
 cadencia y recordatorios evitan ruido. App móvil/push será posterior. Contrato de planificación:

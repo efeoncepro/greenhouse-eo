@@ -5,7 +5,7 @@ import { randomUUID } from 'node:crypto'
 import { ROLE_CODES, isRoleCode } from '@/config/role-codes'
 import { generateToken, storeToken } from '@/lib/auth-tokens'
 import { sendEmail } from '@/lib/email/delivery'
-import { withGreenhousePostgresTransaction } from '@/lib/postgres/client'
+import { runGreenhousePostgresQuery, withGreenhousePostgresTransaction } from '@/lib/postgres/client'
 import { AGGREGATE_TYPES, EVENT_TYPES } from '@/lib/sync/event-catalog'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
@@ -30,6 +30,19 @@ import { publishOutboxEvent } from '@/lib/sync/publish-event'
  */
 export type InviteOnExisting = 'error' | 'ensure'
 
+/**
+ * TASK-1852 — entrega de la invitación.
+ *  - `'immediate'` (default histórico): token + email en el mismo acto, post-commit.
+ *  - `'deferred'`: crea la persona (`client_users` + roles, `status='invited'`) SIN mintear token ni
+ *    enviar correo. Sirve para provisionar una cohorte antes de que el operador autorice el envío;
+ *    la entrega posterior pasa por `deliverClientPortalInvitation`, nunca por SQL ad hoc. Una
+ *    persona diferida no puede iniciar sesión: el preview de habilitación la reporta como
+ *    `person_invitation_pending`, nunca como activa.
+ */
+export type InviteDelivery = 'immediate' | 'deferred'
+
+export type InviteDeliveryStatus = 'sent' | 'failed' | 'deferred' | 'not_required'
+
 export interface InviteClientPortalUserInput {
   email: string
   fullName: string
@@ -40,6 +53,8 @@ export interface InviteClientPortalUserInput {
   actorName?: string | null
   actorEmail?: string | null
   onExisting: InviteOnExisting
+  /** Default `'immediate'`. Ver `InviteDelivery`. */
+  delivery?: InviteDelivery
 }
 
 export interface InviteClientPortalUserResult {
@@ -50,6 +65,8 @@ export interface InviteClientPortalUserResult {
   /** Roles efectivamente insertados en esta invocación (no incluye los ya existentes). */
   rolesAssigned: string[]
   emailSent: boolean
+  /** `not_required` cuando la persona ya existía (modo 'ensure'). */
+  deliveryStatus: InviteDeliveryStatus
 }
 
 export class ClientPortalInviteError extends Error {
@@ -157,32 +174,18 @@ export const inviteClientPortalUser = async (
   })
 
   // Email + token solo para usuarios recién creados (modo 'ensure' sobre existente no re-envía → idempotente, sin spam).
-  let emailSent = false
+  let deliveryStatus: InviteDeliveryStatus = 'not_required'
 
   if (txResult.created) {
-    const token = await generateToken(
-      { user_id: txResult.userId, email: normalizedEmail, client_id: clientId, type: 'invite' },
-      72
-    )
-
-    await storeToken(token, { user_id: txResult.userId, email: normalizedEmail, client_id: clientId, type: 'invite' })
-
-    const inviteUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://greenhouse.efeoncepro.com'}/auth/accept-invite?token=${token}`
-
-    const delivery = await sendEmail({
-      emailType: 'invitation',
-      domain: 'identity',
-      recipients: [{ email: normalizedEmail, userId: txResult.userId }],
-      context: { inviteUrl, inviterName: input.actorName || 'Un administrador' },
-      sourceEntity: 'client_users',
-      actorEmail: input.actorEmail || undefined
-    })
-
-    emailSent = delivery.status !== 'failed'
-
-    if (delivery.status === 'failed') {
-      console.error('[inviteClientPortalUser] Email delivery failed:', delivery.error)
-    }
+    deliveryStatus = (input.delivery ?? 'immediate') === 'deferred'
+      ? 'deferred'
+      : await deliverInvitationEmail({
+          userId: txResult.userId,
+          email: normalizedEmail,
+          clientId,
+          actorName: input.actorName ?? null,
+          actorEmail: input.actorEmail ?? null
+        })
   }
 
   return {
@@ -190,8 +193,103 @@ export const inviteClientPortalUser = async (
     email: normalizedEmail,
     created: txResult.created,
     rolesAssigned: txResult.rolesAssigned,
-    emailSent
+    emailSent: deliveryStatus === 'sent',
+    deliveryStatus
   }
+}
+
+/** El secreto (token) se mintea y se entrega en el mismo acto, post-commit; nunca viaja por outbox. */
+const deliverInvitationEmail = async (input: {
+  userId: string
+  email: string
+  clientId: string
+  actorName: string | null
+  actorEmail: string | null
+}): Promise<'sent' | 'failed'> => {
+  const token = await generateToken(
+    { user_id: input.userId, email: input.email, client_id: input.clientId, type: 'invite' },
+    72
+  )
+
+  await storeToken(token, { user_id: input.userId, email: input.email, client_id: input.clientId, type: 'invite' })
+
+  const inviteUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://greenhouse.efeoncepro.com'}/auth/accept-invite?token=${token}`
+
+  const delivery = await sendEmail({
+    emailType: 'invitation',
+    domain: 'identity',
+    recipients: [{ email: input.email, userId: input.userId }],
+    context: { inviteUrl, inviterName: input.actorName || 'Un administrador' },
+    sourceEntity: 'client_users',
+    actorEmail: input.actorEmail || undefined
+  })
+
+  if (delivery.status === 'failed') {
+    console.error('[inviteClientPortalUser] Email delivery failed:', delivery.error)
+
+    return 'failed'
+  }
+
+  return 'sent'
+}
+
+export interface DeliverClientPortalInvitationInput {
+  userId: string
+  /** client_id canónico resuelto server-side; la persona debe pertenecer a él. */
+  clientId: string
+  actorName?: string | null
+  actorEmail?: string | null
+}
+
+export interface DeliverClientPortalInvitationResult {
+  userId: string
+  email: string
+  deliveryStatus: 'sent' | 'failed'
+}
+
+/**
+ * TASK-1852 — entrega (o reenvío) de la invitación de una persona ya provisionada en modo
+ * `deferred`. Sólo aplica a usuarios `status='invited'` con `auth_mode='invited'` del cliente
+ * indicado; una persona activa o de otro cliente falla cerrado. No crea ni modifica filas de
+ * `client_users`: mintea el token y envía el correo, igual que la entrega inmediata.
+ */
+export const deliverClientPortalInvitation = async (
+  input: DeliverClientPortalInvitationInput
+): Promise<DeliverClientPortalInvitationResult> => {
+  const userId = input.userId?.trim()
+  const clientId = input.clientId?.trim()
+
+  if (!userId || !clientId) {
+    throw new ClientPortalInviteError('Campos requeridos: persona y cliente.', 'missing_fields', 400)
+  }
+
+  const rows = await runGreenhousePostgresQuery<{ user_id: string; email: string; status: string; auth_mode: string; client_id: string | null }>(
+    `SELECT user_id, email, status, auth_mode, client_id
+       FROM greenhouse_core.client_users
+      WHERE user_id = $1
+      LIMIT 1`,
+    [userId]
+  )
+
+  const user = rows[0]
+
+  if (!user || user.client_id !== clientId) {
+    throw new ClientPortalInviteError('La persona no pertenece a este cliente.', 'person_not_in_client', 404)
+  }
+
+  if (user.status !== 'invited' || user.auth_mode !== 'invited') {
+    throw new ClientPortalInviteError('La persona ya activó su acceso; no corresponde reenviar la invitación.', 'invitation_not_pending', 409)
+  }
+
+  const deliveryStatus = await deliverInvitationEmail({
+    userId: user.user_id,
+    email: user.email.toLowerCase(),
+    clientId,
+    actorName: input.actorName ?? null,
+    actorEmail: input.actorEmail ?? null
+  })
+
+  return { userId: user.user_id, email: user.email.toLowerCase(), deliveryStatus }
 }
 
 export const CLIENT_PORTAL_DEFAULT_ROLE = ROLE_CODES.CLIENT_SPECIALIST

@@ -2,9 +2,13 @@
 
 Dueño: Client Experience / Platform. TASK-1852, EPIC-046.
 
-Estado verificado 2026-09-09: código servido en Production, SHA `5726ce9d90`, con altas nuevas OFF.
-La apertura cliente sigue pendiente de mapping comercial, destinatarios y certificación humana/canales.
+Estado verificado 2026-09-10: código servido en Production, SHA `5726ce9d90`, con altas nuevas OFF. El mapping
+comercial de ambas cuentas está declarado (`engagement_commercial_terms.bundled_modules`), las tres personas Berel
+existen como usuarios Greenhouse con invitación diferida (sin token ni correo) y el preview de Sky es limpio en el
+runtime productivo. El apply sigue pendiente de una sesión humana administrativa y del flag; la certificación de
+login/canales sigue abierta. [Readback](../audits/client-portal/TASK-1852_MAPPING_PROVISIONING_READBACK_2026-09-10.json).
 [Evidencia del rollout y rollback](../audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md).
+[Dossier de continuación para Claude](../audits/client-portal/TASK-1852_CLAUDE_DISCOVERY_2026-09-09.md).
 
 ## Contrato y límites
 
@@ -17,6 +21,23 @@ transiciones conservan el catálogo, commands, auditoría y outbox del portal.
 `canApply` significa que las precondiciones de configuración pasan. **No certifica apertura operativa**:
 login humano, rutas autenticadas, cobertura del productor y entrega/cadencia permanecen en `readiness`.
 Los datos de preferencias ausentes no son consentimiento. Un canal configurado no demuestra entrega.
+
+## Declarar el mapping comercial (servicio → módulos)
+
+El preview exige exactamente un término vigente del servicio que incluya el módulo. El mapping vive en
+`engagement_commercial_terms.bundled_modules` y se declara con el writer canónico de Commercial, nunca con SQL:
+
+- API: `GET|POST /api/platform/app/commercial/services/{serviceId}/terms` (`commercial.engagement.read` /
+  `commercial.engagement.declare`; sesión humana interna). Body: `{kind, effectiveFrom, monthlyAmountClp?,
+  successCriteria?, bundledModules[], reason}`. El actor es la persona autenticada; `declaredBy` nunca va en el body.
+- CLI HTTP: `pnpm exec tsx scripts/commercial/declare-commercial-terms.ts --service-id <SVC> --base-url <url>
+  --operation declare --input terms.json --token-env GREENHOUSE_APP_ACCESS_TOKEN` (`--operation read` por defecto).
+- El writer valida cada `module_key` contra el catálogo ACTIVO del portal (`modules.effective_to IS NULL`) y falla
+  cerrado ante claves desconocidas, repetidas o deprecadas; cierra el término anterior y abre el nuevo en la misma
+  transacción con audit `declared` y outbox `service.engagement.declared`. Importes ausentes se declaran `null`,
+  nunca `0`. Un servicio inactivo, `legacy_seed_archived` o `unmapped` no acepta términos.
+- Un servicio sin módulo en el catálogo (p. ej. marketing de contenidos) queda declarado en el término sin
+  `bundled_modules` para esa prestación: es una decisión de Commercial/Product, no un dato que el preview invente.
 
 ## Preparar y revisar
 
@@ -48,11 +69,24 @@ administrativo. Una organización/space cliente no obtiene datos administrativos
 
 ## Aplicar y compensar
 
-El rollout requiere instrucción explícita del operador y verificación de las precondiciones de cada cuenta. El 2026-09-09 el operador autorizó el rollout de TASK-1852 y confirmó el alcance de la cohorte; esto no sustituye términos, pertenencia, login ni readiness.
+Cada apply cliente requiere instrucción explícita del operador y verificación de las precondiciones de la
+cuenta. El 2026-09-09 el operador autorizó el rollout técnico de TASK-1852 y su excepción de promoción;
+esa autorización no cubrió apply cliente, invitaciones o envíos, ni sustituye términos, pertenencia, login
+o readiness. La confirmación de seis personas resolvió la selección, no la provisión ni la activación.
 
 `CLIENT_SERVICE_ENABLEMENT_WRITES_ENABLED` es `false` por defecto. La administración app revalida usuario
 activo, estado activo, tenant interno, route group admin y capability de lectura; apply exige
-`client_portal.module.enable:create`, rollback `client_portal.module.pause:update`. Sesiones `authMode=agent` no pueden aprobar writes en App/Nexa. El rol EFEONCE_ADMIN incluye compensación conforme al contrato canónico del portal; no se conceden nuevos roles a personas.
+`client_portal.module.enable:create`, rollback `client_portal.module.pause:update`. Sesiones `authMode=agent` no pueden aprobar writes en App/Nexa.
+La autoridad humana llega por dos canales del mismo primitive y queda registrada como `authority` en el recibo:
+`app_session` (cookie/token first-party de la persona) o `delegated_oauth` (bearer sister-platform emitido PARA la
+persona con la capability `client_services.enablement.write`, con `oauthClientId`/`oauthAccessTokenId` durables y
+sesión humana, o el cliente de exchange `efeonce-mcp-client-services`, que sólo mintea para un humano interno
+verificado por Entra que ya puede habilitar módulos). El scope responde si ese cliente puede pedir esta clase de
+acción; los derechos de la persona se releen dentro de la transacción. Para operar el canal delegado en un
+runtime: incluir `efeonce-mcp-client-services` en `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS`, exponer el
+scope de entrada `efeonce.mcp.client_services.write` en la app Entra del MCP (clase propia, nunca en un cliente
+público/compartido) y federar la tool en el gateway. El cliente OAuth ya está sembrado (migración
+`20260910005222927`); mientras falte cualquiera de los tres pasos, el canal falla cerrado. El rol EFEONCE_ADMIN incluye compensación conforme al contrato canónico del portal; no se conceden nuevos roles a personas.
 **La presencia de la capability en catálogo no garantiza su concesión**: certifícala para el operador
 de alta y compensación antes de activar. TASK-1852 corrige la omisión de `module.pause:update` en el default de EFEONCE_ADMIN y prueba alta/compensación con el mismo rol. El rollout debe verificarlo en la sesión vigente.
 
@@ -76,10 +110,23 @@ MCP interno: `preview_client_service_enablement`, `apply_client_service_enableme
 Los comandos ecosystem/MCP devuelven `403 invalid_delegated_context`: su consumer acredita una máquina,
 no la aprobación humana que exige `approved_by_user_id`. No se ha federado ninguna tool nueva.
 La paridad de escritura delegada queda bloqueada hasta que exista autoridad atribuible, sin actor en el body.
+Las rutas ecosystem mutantes todavía usan el wrapper de lectura porque permanecen fail-closed; antes de abrirlas
+deben adoptar un command lane que conserve reautorización e idempotencia sin duplicar el command store. Después
+se sincroniza/federa el manifest en el gateway o se registra una exclusión formal; no basta con que la tool exista
+en el servidor interno Greenhouse.
 
 Nexa registra las acciones de alta y compensación detrás del runtime existente y del flag de writes.
 La propuesta prepara el input en servidor y lo valida antes de mostrarse; confirmación lo vuelve a validar
 y reautoriza antes de replay. Se reutiliza la tarjeta existente; no cambia layout, tokens ni navegación.
+
+## Provisionar personas sin enviar mensajes
+
+`inviteClientPortalUser` admite `delivery: 'deferred'`: crea `client_users` (`status='invited'`,
+`auth_mode='invited'`) y roles con audit/outbox, sin mintear token ni enviar correo. La ruta
+`POST /api/admin/clients/{organizationId}/lifecycle/portal-users/invite` acepta `delivery` en el body; la entrega
+posterior es `POST .../portal-users/deliver` con `{userIds}` (misma capability, envía correo: sólo con instrucción
+explícita del operador). El preview reporta a esas personas como `person_invitation_pending` (Identity), distinto de
+`person_not_authorized_in_organization`; un runtime anterior al release colapsa ambos en el segundo código.
 
 ## Verificación
 

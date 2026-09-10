@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import { resolveAccountScope } from '@/lib/account-360/resolve-scope'
 import { authorizeLifecycle } from '@/lib/client-lifecycle/api-helpers'
 import { isClientPortalRole } from '@/lib/client-onboarding/client-portal-roles'
-import { ClientPortalInviteError, inviteClientPortalUser } from '@/lib/client-onboarding/invite-client-portal-user'
+import { ClientPortalInviteError, inviteClientPortalUser, type InviteDelivery } from '@/lib/client-onboarding/invite-client-portal-user'
 import { captureWithDomain } from '@/lib/observability/capture'
 
 export const dynamic = 'force-dynamic'
@@ -20,8 +20,12 @@ type InviteOutcome = {
   status: 'invited' | 'already' | 'error'
   userId?: string
   roleAssigned?: boolean
+  /** TASK-1852: `deferred` = persona creada sin token ni correo; entregar con `portal-users/deliver`. */
+  delivery?: 'sent' | 'failed' | 'deferred' | 'not_required'
   code?: string
 }
+
+const INVITE_DELIVERIES: readonly InviteDelivery[] = ['immediate', 'deferred']
 
 /**
  * TASK-1001 — POST /api/admin/clients/[organizationId]/lifecycle/portal-users/invite
@@ -30,6 +34,9 @@ type InviteOutcome = {
  * provision_client_users_access). client_id se resuelve server-side desde la org
  * (NUNCA del body). Idempotente (onExisting='ensure'): re-invitar no duplica. Cada
  * persona se procesa de forma aislada (una invitación mala no rompe el batch).
+ *
+ * TASK-1852: `delivery: 'deferred'` (top-level, default `'immediate'`) crea las personas sin
+ * mintear token ni enviar correo; la entrega posterior es `POST .../portal-users/deliver`.
  */
 export async function POST(request: Request, { params }: { params: Promise<{ organizationId: string }> }) {
   const { organizationId } = await params
@@ -40,11 +47,20 @@ export async function POST(request: Request, { params }: { params: Promise<{ org
   }
 
   let invites: InviteItem[] = []
+  let delivery: InviteDelivery = 'immediate'
 
   try {
-    const body = (await request.json()) as { invites?: unknown }
+    const body = (await request.json()) as { invites?: unknown; delivery?: unknown }
 
     invites = Array.isArray(body.invites) ? (body.invites as InviteItem[]) : []
+
+    if (body.delivery !== undefined) {
+      if (typeof body.delivery !== 'string' || !INVITE_DELIVERIES.includes(body.delivery as InviteDelivery)) {
+        return NextResponse.json({ error: 'Modo de entrega inválido.', code: 'invalid_delivery', actionable: false }, { status: 400 })
+      }
+
+      delivery = body.delivery as InviteDelivery
+    }
   } catch {
     return NextResponse.json({ error: 'Cuerpo inválido.', code: 'invalid_body', actionable: false }, { status: 400 })
   }
@@ -83,14 +99,16 @@ export async function POST(request: Request, { params }: { params: Promise<{ org
         clientId,
         roleCodes: [inv.roleCode as string],
         actorUserId: tenant.userId,
-        onExisting: 'ensure'
+        onExisting: 'ensure',
+        delivery
       })
 
       results.push({
         email: result.email,
         status: result.created ? 'invited' : 'already',
         userId: result.userId,
-        roleAssigned: result.rolesAssigned.length > 0
+        roleAssigned: result.rolesAssigned.length > 0,
+        delivery: result.deliveryStatus
       })
     } catch (err) {
       if (err instanceof ClientPortalInviteError) {
@@ -102,5 +120,5 @@ export async function POST(request: Request, { params }: { params: Promise<{ org
     }
   }
 
-  return NextResponse.json({ ok: true, clientId, results })
+  return NextResponse.json({ ok: true, clientId, delivery, results })
 }

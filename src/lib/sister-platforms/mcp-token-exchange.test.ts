@@ -28,6 +28,9 @@ import {
   MCP_FUNDING_INPUT_SCOPE,
   MCP_GATEWAY_OAUTH_CLIENT_ID,
   MCP_CANDIDATE_REVIEW_GREENHOUSE_SCOPE,
+  MCP_CLIENT_SERVICES_GREENHOUSE_SCOPE,
+  MCP_CLIENT_SERVICES_INPUT_SCOPE,
+  MCP_CLIENT_SERVICES_OAUTH_CLIENT_ID,
   MCP_HIRING_INPUT_SCOPE,
   MCP_HIRING_OAUTH_CLIENT_ID,
   MCP_HIRING_REVIEW_OAUTH_CLIENT_ID,
@@ -254,6 +257,61 @@ describe('MCP RFC8693 token exchange', () => {
     expect(dependencies.issueToken).toHaveBeenCalledWith(
       expect.objectContaining({ requestedScope: MCP_CANDIDATE_REVIEW_GREENHOUSE_SCOPE })
     )
+  })
+
+  it('mints the client-services write class only for an internal administrator who can already enable modules (TASK-1852)', async () => {
+    const clientServicesClient = {
+      ...client,
+      oauthClientId: 'spoauth-client-efeonce-mcp-client-services',
+      clientId: MCP_CLIENT_SERVICES_OAUTH_CLIENT_ID,
+      allowedScopes: [MCP_CLIENT_SERVICES_GREENHOUSE_SCOPE],
+      policy: {
+        ...client.policy,
+        requiredScopes: [MCP_CLIENT_SERVICES_GREENHOUSE_SCOPE],
+        capabilityScopes: [MCP_CLIENT_SERVICES_GREENHOUSE_SCOPE],
+        revocation: { ...client.policy.revocation, revalidateAfterSeconds: 15 }
+      },
+      metadata: { resourceFamily: 'client_services' }
+    }
+
+    const entra = vi.fn(async () => ({
+      tenantId: 'tenant-1', objectId: 'oid-1', authorizedParty: 'mcp-client-app-id', scopes: [MCP_CLIENT_SERVICES_INPUT_SCOPE]
+    }))
+
+    const dependencies = {
+      ...baseDependencies(), verifyEntraToken: entra,
+      loadClient: vi.fn(async (): Promise<any> => clientServicesClient),
+      authorizeClientServices: vi.fn(() => true), authorizeFunding: vi.fn(() => true), authorizeTalentPool: vi.fn(() => true)
+    }
+
+    const clientServicesEnv = {
+      ...env,
+      GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS: `${MCP_GATEWAY_OAUTH_CLIENT_ID},${MCP_CLIENT_SERVICES_OAUTH_CLIENT_ID}`
+    }
+
+    const exchange = { ...request, clientId: MCP_CLIENT_SERVICES_OAUTH_CLIENT_ID, requestedScope: MCP_CLIENT_SERVICES_GREENHOUSE_SCOPE }
+
+    await expect(exchangeMcpGatewayToken(exchange, dependencies, clientServicesEnv)).resolves.toMatchObject({ scope: MCP_CLIENT_SERVICES_GREENHOUSE_SCOPE })
+    expect(dependencies.authorizeClientServices).toHaveBeenCalledOnce()
+    expect(dependencies.authorizeFunding).not.toHaveBeenCalled()
+    expect(dependencies.authorizeTalentPool).not.toHaveBeenCalled()
+
+    // The write class is its own consent: an Entra token carrying only the read/hiring scopes is refused.
+    entra.mockResolvedValueOnce({ tenantId: 'tenant-1', objectId: 'oid-1', authorizedParty: 'mcp-client-app-id', scopes: [MCP_HIRING_INPUT_SCOPE, MCP_FUNDING_INPUT_SCOPE] })
+    await expect(exchangeMcpGatewayToken(exchange, dependencies, clientServicesEnv)).rejects.toMatchObject({ code: 'invalid_grant' })
+
+    // A human who cannot enable modules in Greenhouse never receives the delegated bearer.
+    await expect(
+      exchangeMcpGatewayToken(exchange, { ...dependencies, authorizeClientServices: vi.fn(() => false) }, clientServicesEnv)
+    ).rejects.toMatchObject({ code: 'user_not_eligible', statusCode: 403 })
+
+    // The hiring client cannot be reused for this family even with the right scope on paper.
+    await expect(
+      exchangeMcpGatewayToken(exchange, { ...dependencies, loadClient: vi.fn(async (): Promise<any> => ({ ...clientServicesClient, metadata: { resourceFamily: 'hiring' } })) }, clientServicesEnv)
+    ).rejects.toMatchObject({ code: 'invalid_client' })
+
+    // Not allowlisted as consumer → fail closed.
+    await expect(exchangeMcpGatewayToken(exchange, dependencies, env)).rejects.toMatchObject({ code: 'invalid_client' })
   })
 
   it('persists only a hash, the exact scope, agent provenance and a five-minute expiry', async () => {

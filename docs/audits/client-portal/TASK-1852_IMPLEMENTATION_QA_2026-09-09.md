@@ -2,12 +2,18 @@
 
 ## Verdict
 
-**BLOCK para apertura operativa.** **Closure state: `code complete, rollout pendiente`**. La task permanece `in-progress`. El goal autorizado excluye commit, push, deploy, asignaciones live, invitaciones y envíos.
+**BLOCK para apertura operativa.** **Estado vigente: capacidad técnica en Production, apertura cliente
+pendiente**. La task permanece `in-progress`; altas nuevas siguen OFF. Este informe nació antes del rollout:
+las referencias posteriores a “no desplegado”, ausencia del servicio Berel y falta de permiso de compensación
+son snapshots históricos supersedidos por la [auditoría de rollout](TASK-1852_ROLLOUT_2026-09-09.md) y su
+[readback final](TASK-1852_PRODUCTION_RELEASE_READBACK_2026-09-09.json). El goal inicial excluía commit,
+push y deploy; el operador los autorizó después. Asignaciones cliente, invitaciones y envíos no se autorizaron.
 
 ## Scope
 
 Mecanismo común por organización/persona/servicio, primera cohorte Berel/Sky. Checkout compartido
-`develop`, un editor, sin subagentes. Sin cambios de schema, grants, identidad, contratos, preferencias,
+`develop`, un editor durante implementación. La consolidación documental posterior usó tres subagentes
+read-only por autorización explícita. Sin cambios de schema, grants cliente, identidad, contratos, preferencias,
 proveedores ni workers. PostgreSQL compartido consultado en transacciones READ ONLY; mutaciones de prueba
 exclusivamente en cluster local con socket privado y fixtures sintéticos.
 
@@ -39,7 +45,7 @@ Revisión proporcional de copy/reuso: `greenhouse-ai-design-studio`, `greenhouse
 | Gate | Resultado | Evidencia |
 |---|---|---|
 | Hook | pass | `pnpm codex:task-hook TASK-1852 --develop`; goal + plan P1 aprobados («Vamos») |
-| Suite integrada final | 290 passed, 28 archivos, sin skipped | `.captures/task-1852/integration-final.log`; incluye callbacks de sesión y wrapper de audit |
+| Suite integrada de implementación | 290 passed, 28 archivos, sin skipped | `.captures/task-1852/integration-final.log`; el rollout cerró con 392 tests según la evidencia final |
 | PostgreSQL local | 14 passed, incluidos en la suite | `local-postgres.test.ts`, socket privado/55452; ningún test mutante contra Cloud SQL |
 | Falsificación del JOIN | 1 failed esperado al reponer el defecto; 14 passed al restaurar | `.captures/task-1852/falsification-join.log`; el test observa resultado SQL, no texto del query |
 | Preview real | ambas cuentas `canApply=false`; 0 cambios propuestos | [readback versionado](TASK-1852_PREVIEW_READBACK_2026-09-09.json); script usa el reader nuevo en READ ONLY |
@@ -87,19 +93,21 @@ read-only en discovery. No representa una copia integral de producción.
 
 | Cuenta/servicio | Comercial | Asignado/configurado | Estado operativo y dueño |
 |---|---|---|---|
-| Berel / SEO | Sin fila de servicio ni términos | `seo_v2` activo; target `seot-berel-mx` activo | Commercial concilia contrato; Growth certifica cobertura, mercado y frescura; Identity certifica persona/login |
-| Berel / marketing de contenidos | Sin fila ni mapping propio | No se propone Creative por inferencia; sin binding Notion en el bridge canónico | Commercial/Delivery identifican servicio, fuente y capacidad; conservar Notion/Drupal como dueños |
+| Berel / SEO | `SVC-HS-554261764224` materializado después del baseline, sin términos | `seo_v2` activo; target `seot-berel-mx` activo | Commercial concilia contrato/mapping; Growth certifica cobertura, mercado y frescura; Identity certifica persona/login |
+| Berel / marketing de contenidos | Servicio materializado, sin términos ni mapping propio | No se propone Creative por inferencia; sin binding Notion en el bridge canónico | Commercial/Delivery identifican mapping, fuente y capacidad; conservar Notion/Drupal como dueños |
 | Sky / diseño digital | `SVC-HS-551519372424` activo, sin términos | `creative_hub_globe_v1` activo; línea `globe`; dos bindings Notion activos | Commercial concilia términos; TASK-1687 posee catálogo/ruta; Delivery certifica cobertura |
 | Ambas / AEO | Contratación por conciliar fuera de la propuesta | `ai_visibility_v1` activo | Se conserva: ninguna alta, baja ni conclusión contractual por inferencia |
 
 ### Personas y canales
 
-El [manifiesto](../../operations/client-service-enablement/berel-sky.v1.json) declara IDs exactos. El usuario
-Berel seleccionado es técnico: activo, sin identity link ni login. No es un piloto humano. Las tres
-personas Sky están activas y vinculadas; ninguna tiene `last_login_at` en el snapshot. Esto no certifica
-una sesión humana ni implica que se haya ejecutado un login de ellas durante esta task.
+El [manifiesto](../../operations/client-service-enablement/berel-sky.v1.json) conserva IDs técnicos y estados
+sanitizados. El operador seleccionó tres contactos Berel; la búsqueda exacta por email devolvió cero usuarios
+Greenhouse, por lo que requieren provisión, vínculo y login. El usuario Berel del preview es técnico y no es
+un piloto humano. Las tres personas Sky confirmadas están activas y vinculadas; ninguna tiene
+`last_login_at` en el snapshot. PII y referencias CRM quedan en el handoff local privado señalado por el
+[dossier de discovery](TASK-1852_CLAUDE_DISCOVERY_2026-09-09.md).
 
-En las cuatro selecciones no hay preferencias explícitas. `emailDeliverable` sólo refleja email presente
+En las seis personas elegidas no hay preferencias explícitas. `emailDeliverable` sólo refleja email presente
 sin marca de indeliverable; no acredita consentimiento, entrega ni dominio verificado. In-app, email y
 Teams requieren audiencia/categoría/cadencia/destino por dueño Notifications (TASK-690/693/1848).
 No hay canal Teams asociado mediante space canónico, bridge Notion o Graph ID en el readback.
@@ -115,18 +123,24 @@ puede habilitar el piloto cuando se pruebe; no depende del cierre total de la co
 
 ## Blockers
 
+> Actualización 2026-09-10 ([readback](TASK-1852_MAPPING_PROVISIONING_READBACK_2026-09-10.json)): 1 resuelto para
+> ambas cuentas (términos con `bundled_modules`; contenidos sin módulo de portal queda como decisión Commercial/Product);
+> 2 resuelto en su mitad de provisión (tres personas Berel `invited`, invitación diferida sin correo); 6 resuelto a nivel
+> contrato (canal `delegated_oauth` en el lane App + exchange client, pendiente release/Entra/gateway). Nuevo bloqueo
+> operativo: el apply de Sky requiere una sesión humana administrativa; la persona técnica del harness no aprueba writes.
+
 1. **Commercial/Delivery:** registros/términos/mapping faltantes de la matriz; resolverlos antes de un apply.
-2. **Identity:** elegir destinatario humano Berel, certificar login/retorno y permisos de cada persona;
-   sólo invitar/provisionar dentro de un rollout autorizado (TASK-1012/1839 cuando aplique).
+2. **Identity:** las tres personas Berel ya fueron elegidas, pero aún no existen como usuarios Greenhouse;
+   provisionar/vincular dentro de un rollout autorizado y certificar login/retorno/permisos de las seis.
 3. **Client Portal:** certificar destinos con sesión propia/ajena; TASK-1687 conserva el destino Sky.
 4. **Notifications/Insights:** preferencias, audiencia, cadencia y destino por canal. No hay entrega certificada.
-5. **Platform authority:** `module.pause` existe en catálogo pero el default admin actual de `entitlements/runtime.ts`
-   no lo concede. Certificar autoridad de compensación antes de activar; no se añadió grant por inferencia.
+5. **Platform authority, resuelto para App:** `module.pause` ya fue alineado en el default EFEONCE_ADMIN,
+   probado y desplegado. Revalidar la sesión vigente antes de activar; no se añadieron grants cliente.
 6. **API/MCP authority:** ecosystem autentica máquina, no aprobación humana. Preview interno disponible;
    apply/rollback devuelven `403 invalid_delegated_context`. El lane App rechaza writes de sesiones agent y
    tokens delegados; Nexa rechaza agent. Paridad de escritura delegada pendiente, nunca `parity-complete`.
-7. **Release:** código nuevo no desplegado, flag sin activar. Smoke live del nuevo HTTP/MCP y del consumer
-   outbox pendiente del rollout. Los tests locales no certifican worker ni entregas externas.
+7. **Release técnico, resuelto:** Production `released`, Vercel/workers/health/watchdog y canaries verificados.
+   El flag sigue OFF; login humano, apply cliente, canales y entregas externas continúan sin certificar.
 
 ## Conditional Follow-Ups
 
@@ -139,7 +153,7 @@ No ampliar cohortes ni federar las nuevas tools automáticamente.
 
 - Tests verdes no equivalen a rollout ni a login humano; ensayos locales clasificados separadamente.
 - Sin cambio visual estructural; la tarjeta nueva no tiene GVC de runtime desplegado con flag activada.
-- No migración/backfill, flag configurada ni deploy de esta implementación.
+- No migración/backfill ni flag activada. El deploy técnico se verificó después en la auditoría de rollout.
 - Task abierta y criterios operativos sin tildar; discovery previo queda como evidencia histórica.
 - No se declaró incidente Sentry resuelto ni salud/entrega del worker sin observación live.
 
@@ -155,5 +169,6 @@ Rotación de changelog conserva historia en `docs/changelog/internal/`; strict f
 
 ## Final Call
 
-El código común queda listo para revisión local sin abrir ningún cliente. El cierre operativo
-requiere resolver los blockers y ejecutar el rollout autorizado con evidencia de acceso y canales.
+El código común está servido en Production sin abrir ningún cliente. El cierre operativo requiere resolver
+mapping, provisión/login, rutas, canales y autoridad de escritura delegada; luego ejecutar un apply acotado
+con evidencia y compensación disponible.

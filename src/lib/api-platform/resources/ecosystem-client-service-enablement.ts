@@ -15,8 +15,10 @@ export const runEcosystemClientServiceEnablement = async ({ context, operation, 
   }
 
   // A downstream consumer authenticates a MACHINE. Do not use createdBy, metadata or a body
-  // actorUserId as human approval. The same denial is observable from API and MCP.
-  if (operation !== 'preview') throw new ApiPlatformError('An attributed human administration session is required. Use the app lane.', {
+  // actorUserId as human approval. The same denial is observable from API and MCP. Delegated
+  // human authority travels through the app lane with a sister-platform bearer minted for the
+  // human (`client_services.enablement.write`, RFC 8693 exchange), never through this binding.
+  if (operation !== 'preview') throw new ApiPlatformError('An attributed human administration session is required. Use the app lane with a first-party session or a delegated bearer for the human.', {
     statusCode: 403, errorCode: 'invalid_delegated_context'
   })
 

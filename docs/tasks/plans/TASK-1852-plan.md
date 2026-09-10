@@ -4,7 +4,8 @@
 
 - Goal aprobado por el operador el 2026-09-09: mecanismo común para clientes; Berel/Sky como primera cohorte.
 - Hook ejecutado: `pnpm codex:task-hook TASK-1852 --develop`.
-- Checkout compartido: `develop`; limpio al iniciar. Sin subagentes, worktrees ni cambio de rama.
+- Checkout compartido: `develop`; limpio al iniciar. La implementación fue secuencial, sin subagentes,
+  worktrees ni cambio de rama. El operador autorizó después tres subagentes read-only para consolidación documental.
 - **Estado: plan aprobado («Vamos»), código desplegado en Production y manifest released; apertura cliente pendiente con altas OFF.**
 - `TASK_PROCESS.md` §Phase 3 exige aprobación del plan para P1. La aprobación previa del goal se conserva;
   no se vuelve a pedir sobre ese alcance. Checkpoint P1 aprobado el 2026-09-09; hook revalidado en develop.
@@ -115,8 +116,9 @@ DTOs browser-safe separados de readers/commands server-only. Sin packages/apps/d
 
 ## Subagent strategy
 
-`sequential`: dependencia causal inventario → commands → adapters → certificación, ownership compartido y
-sin autorización de subagentes. Un editor conserva los archivos del dominio y del manifiesto.
+`sequential` para la implementación: dependencia causal inventario → commands → adapters → certificación y
+un editor sobre código/manifiesto. El 2026-09-09 el operador autorizó tres subagentes read-only para auditar,
+en paralelo, paridad API/MCP, cohorte Berel/Sky y rutas de discovery de Claude. Ninguno editó archivos.
 
 ## Execution order
 
@@ -207,3 +209,26 @@ El operador confirmó los servicios y ordenó «Haz el rollout». Preparar commi
 Rollout: al conciliar Berel se verificó el servicio HubSpot existente. Fix acotado del intake: reusar resolver de credencial TASK-1230 y preservar montos ausentes NULL. Pruebas y readback incluidos; sin nuevo writer, migration, precios o contratos.
 
 Producción: PR #231/main `5726ce9d90`; orquestador `34416904936` success, manifest `released`, health/watchdog y siete canaries HTTP verdes. Excepción de compensación autorizada y auditada; cinco asignaciones preservadas. Altas OFF y apertura cliente pendiente de contrato, personas, autoridad y canales. [Evidencia final](../../audits/client-portal/TASK-1852_PRODUCTION_RELEASE_READBACK_2026-09-09.json).
+
+## Consolidación documental para Claude — 2026-09-09
+
+Tres auditorías read-only autorizadas confirmaron el primitive único, los adapters y los gaps vigentes.
+La selección cliente quedó resuelta en tres contactos HubSpot de Berel sin usuario Greenhouse y tres usuarios
+activos Sky sin login observado. Full API Parity sigue abierta: Ecosystem/MCP apply y rollback devuelven 403
+por falta de autoridad humana atribuible, y las tools no están federadas en el gateway. El
+[dossier de discovery](../../audits/client-portal/TASK-1852_CLAUDE_DISCOVERY_2026-09-09.md) fija orden de lectura,
+mapa de código, matriz de consumidores, cohorte sanitizada y secuencia de continuación; PII sólo local 0600.
+
+## Continuación 2026-09-10 — mapping, provisión Berel, autoridad delegada
+
+Ejecutado con primitives canónicos y sin SQL ad hoc, sobre el checkout compartido `develop` y sin push:
+`declareCommercialTerms` ganó `bundledModules` (validación contra catálogo activo) y contrato App
+`/api/platform/app/commercial/services/{serviceId}/terms` + CLI; Berel y Sky quedaron declarados (`committed`, importes
+NULL). `inviteClientPortalUser` ganó `delivery: 'deferred'` + `deliverClientPortalInvitation` + ruta `portal-users/deliver`;
+las tres personas Berel existen como usuarios (`invited`, rol `client_executive`, cero tokens/correos). El preview
+distingue `person_invitation_pending`. El lane App acepta autoridad humana `delegated_oauth`
+(`client_services.enablement.write`; exchange RFC 8693 con cliente `efeonce-mcp-client-services`, migración aplicada) y
+el recibo registra `authority`. Preview Sky en producción: `canApply=true`, sólo `preserve`. Rutas mapeadas de Berel: 200
+con la persona técnica de la organización. Apply/compensación/flag esperan sesión humana; TASK-1687 conserva el 404 de
+`cliente.creative_hub`; federación gateway y scope Entra pertenecen a `efeonce-mcp`/Entra.
+

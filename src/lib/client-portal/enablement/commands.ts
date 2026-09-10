@@ -16,7 +16,7 @@ import { getDb } from '@/lib/db'
 import { assertServiceEnablementWritesEnabled, authorizeServiceEnablement } from './access'
 import { buildServiceEnablementPreview } from './preview'
 import { readServiceEnablementInventory, readServiceEnablementReceipt } from './reader'
-import type { ServiceEnablementApplyRequest, ServiceEnablementReceipt, ServiceEnablementRollbackRequest } from './types'
+import type { ServiceEnablementApplyRequest, ServiceEnablementAuthority, ServiceEnablementReceipt, ServiceEnablementRollbackRequest } from './types'
 import { serviceEnablementApplySchema, serviceEnablementRollbackSchema } from './validation'
 
 const conflict = (errorCode: ApiPlatformErrorCode, message: string): never => {
@@ -43,7 +43,16 @@ const principal = (userId: string) => ({
   principalId: `client-service-enablement:${userId}`, userId
 })
 
-export const applyServiceEnablement = async (raw: ServiceEnablementApplyRequest, authenticatedUserId: string) => {
+const APP_SESSION_AUTHORITY: ServiceEnablementAuthority = { kind: 'app_session' }
+
+/**
+ * `authenticatedUserId` always comes from an adapter that authenticated a human; `authority` says
+ * through which channel (first-party session or a bearer the human delegated). It never widens
+ * authorization: the primitive re-reads the human's current administration rights either way.
+ */
+export const applyServiceEnablement = async (
+  raw: ServiceEnablementApplyRequest, authenticatedUserId: string, authority: ServiceEnablementAuthority = APP_SESSION_AUTHORITY
+) => {
   const input = serviceEnablementApplySchema.parse(raw)
 
   assertServiceEnablementWritesEnabled()
@@ -89,8 +98,8 @@ export const applyServiceEnablement = async (raw: ServiceEnablementApplyRequest,
 
         for (const item of created) item.revision = after.assignments.find(assignment => assignment.id === item.assignmentId)!.revision
 
-        const receipt = { version: 1 as const, operationId, organizationId, actorUserId: actor.userId,
-          fingerprint: input.fingerprint, created, preserved }
+        const receipt: ServiceEnablementReceipt = { version: 1, operationId, organizationId, actorUserId: actor.userId,
+          fingerprint: input.fingerprint, created, preserved, authority }
 
         if (created.length) await recordAssignmentEvent({
           assignmentId: created[0].assignmentId, eventKind: 'enablement_receipt',
@@ -107,7 +116,9 @@ export const applyServiceEnablement = async (raw: ServiceEnablementApplyRequest,
   return result
 }
 
-export const rollbackServiceEnablement = async (raw: ServiceEnablementRollbackRequest, authenticatedUserId: string) => {
+export const rollbackServiceEnablement = async (
+  raw: ServiceEnablementRollbackRequest, authenticatedUserId: string, authority: ServiceEnablementAuthority = APP_SESSION_AUTHORITY
+) => {
   const input = serviceEnablementRollbackSchema.parse(raw)
 
   assertServiceEnablementWritesEnabled()
@@ -142,7 +153,8 @@ export const rollbackServiceEnablement = async (raw: ServiceEnablementRollbackRe
             reason: `Compensate service enablement ${input.operationId}` }, tx)
         }
 
-        return { operationId: input.operationId, organizationId: input.organizationId, paused: receipt.created.map(item => item.assignmentId) }
+        return { operationId: input.operationId, organizationId: input.organizationId, actorUserId: actor.userId,
+          paused: receipt.created.map(item => item.assignmentId), authority }
       }
     })
   })

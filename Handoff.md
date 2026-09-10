@@ -4,11 +4,13 @@
 Pendiente: conciliar MET-2339–2342 tarea/calendario. Producción abierta; cierre documental sin cambios Notion.
 
 **EPIC-046 / TASK-1852 (09/09):** Production `released`; [evidencia y pendientes](docs/audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md).
-PR #231/main `5726ce9d90`, orquestador `34416904936` success; CI/Deep/Vercel, canary 7/7 y watchdog verdes.
-Cinco workers Ready; Ops/auth conservan árbol equivalente y flags/cohorte. Excepción pause autorizada y auditada.
-Berel sincronizado con importes NULL; equipo Sky conciliado. Alcance privado; cinco asignaciones preservadas.
-Writes OFF; faltan mapping comercial, destinatarios Berel y login/rutas/canales. Task abierta; sin envíos ni SQL ad hoc.
-TASK-1834 conserva entrada, TASK-1687 catálogo; 1853–1856 to-do. TASK-1690 sigue in-progress.
+PR #231/main `5726ce9d90`, orquestador `34416904936`; gates, canary 7/7 y watchdog verdes; excepción pause auditada.
+Berel sincronizado con importes NULL; tres Sky activos sin login; equipo delivery Sky separado.
+**10/09 (local, sin push):** términos con `bundledModules` declarados (Berel seo_v2+AEO, Sky creative_hub); tres Berel
+`invited` sin correo; preview Sky limpio en prod. Contrato `delegated_oauth` + exchange client sembrado, sólo local.
+Falta: apply Sky (sesión humana + flag), entrega Berel, release, Entra/gateway; `/creative-hub` 404 (1687).
+[Readback](docs/audits/client-portal/TASK-1852_MAPPING_PROVISIONING_READBACK_2026-09-10.json).
+TASK-1834 entrada, TASK-1687 catálogo; 1853–1856 to-do; TASK-1690 in-progress.
 
 **EPIC-045 ↔ EPIC-046:** Hitos I/N obligatorios: Insights cliente/interno + email/in-app/Teamsbot con
 deep links; shared separado y móvil posterior. Contrato en arquitectura Insights §§7.1/9.1 y ADRs.

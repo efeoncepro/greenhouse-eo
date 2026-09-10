@@ -1,6 +1,9 @@
 export type ApiPlatformErrorCode =
   | 'ambiguous_reference'
   | 'bad_request'
+  // TASK-1852 — commercial terms declaration through the app lane.
+  | 'commercial_terms_conflict'
+  | 'commercial_terms_service_not_eligible'
   | 'binding_not_active'
   | 'binding_not_found'
   | 'consumer_expired'

@@ -25,6 +25,15 @@ export const MCP_FUNDING_GREENHOUSE_SCOPE = 'globe.credits.funding.ensure'
 export const MCP_HIRING_INPUT_SCOPE = 'efeonce.mcp.hiring.read'
 export const MCP_TALENT_POOL_GREENHOUSE_SCOPE = 'hiring.talent_pool.read'
 export const MCP_CANDIDATE_REVIEW_GREENHOUSE_SCOPE = 'hiring.candidate.review.read'
+/**
+ * TASK-1852 — delegated WRITE class «open client access to contracted services». Its own
+ * blast-radius class: the Entra app must expose the input scope explicitly and no shared/public
+ * client may receive it. The exchanged bearer reaches the app lane, where the enablement primitive
+ * re-reads the human's administration rights on every call.
+ */
+export const MCP_CLIENT_SERVICES_OAUTH_CLIENT_ID = 'efeonce-mcp-client-services'
+export const MCP_CLIENT_SERVICES_INPUT_SCOPE = 'efeonce.mcp.client_services.write'
+export const MCP_CLIENT_SERVICES_GREENHOUSE_SCOPE = 'client_services.enablement.write'
 export const RFC8693_TOKEN_EXCHANGE_GRANT = 'urn:ietf:params:oauth:grant-type:token-exchange'
 export const RFC8693_ACCESS_TOKEN_TYPE = 'urn:ietf:params:oauth:token-type:access_token'
 export const MCP_EXCHANGED_TOKEN_TTL_SECONDS = 300
@@ -64,6 +73,7 @@ type McpTokenExchangeDependencies = Readonly<{
   authorizeFunding?: (tenant: TenantAccessRecord) => boolean
   authorizeTalentPool?: (tenant: TenantAccessRecord) => boolean
   authorizeCandidateReview?: (tenant: TenantAccessRecord) => boolean
+  authorizeClientServices?: (tenant: TenantAccessRecord) => boolean
   issueToken?: (input: IssueTokenInput) => Promise<IssuedToken>
   now?: () => Date
 }>
@@ -106,13 +116,14 @@ export type McpTokenExchangeResult = Readonly<{
     | typeof MCP_FUNDING_GREENHOUSE_SCOPE
     | typeof MCP_TALENT_POOL_GREENHOUSE_SCOPE
     | typeof MCP_CANDIDATE_REVIEW_GREENHOUSE_SCOPE
+    | typeof MCP_CLIENT_SERVICES_GREENHOUSE_SCOPE
 }>
 
 type ExchangeScopeContract = Readonly<{
   inputScope: string
   greenhouseScope: McpTokenExchangeResult['scope']
   clientId: string
-  resourceFamily: 'globe' | 'hiring'
+  resourceFamily: 'globe' | 'hiring' | 'client_services'
   requireWorkspaceBinding: boolean
 }>
 
@@ -191,9 +202,11 @@ export async function exchangeMcpGatewayToken(
   const authorized =
     scopeContract.resourceFamily === 'globe'
       ? (dependencies.authorizeFunding ?? authorizeFunding)(tenant)
-      : scopeContract.greenhouseScope === MCP_CANDIDATE_REVIEW_GREENHOUSE_SCOPE
-        ? (dependencies.authorizeCandidateReview ?? authorizeCandidateReview)(tenant)
-        : (dependencies.authorizeTalentPool ?? authorizeTalentPool)(tenant)
+      : scopeContract.resourceFamily === 'client_services'
+        ? (dependencies.authorizeClientServices ?? authorizeClientServices)(tenant)
+        : scopeContract.greenhouseScope === MCP_CANDIDATE_REVIEW_GREENHOUSE_SCOPE
+          ? (dependencies.authorizeCandidateReview ?? authorizeCandidateReview)(tenant)
+          : (dependencies.authorizeTalentPool ?? authorizeTalentPool)(tenant)
 
   if (!authorized) {
     throw new McpTokenExchangeError('user_not_eligible', 403)
@@ -268,6 +281,16 @@ function resolveScopeContract(requestedScope: string): ExchangeScopeContract {
       greenhouseScope: MCP_CANDIDATE_REVIEW_GREENHOUSE_SCOPE,
       clientId: MCP_HIRING_REVIEW_OAUTH_CLIENT_ID,
       resourceFamily: 'hiring',
+      requireWorkspaceBinding: false
+    }
+  }
+
+  if (requestedScope === MCP_CLIENT_SERVICES_GREENHOUSE_SCOPE) {
+    return {
+      inputScope: MCP_CLIENT_SERVICES_INPUT_SCOPE,
+      greenhouseScope: MCP_CLIENT_SERVICES_GREENHOUSE_SCOPE,
+      clientId: MCP_CLIENT_SERVICES_OAUTH_CLIENT_ID,
+      resourceFamily: 'client_services',
       requireWorkspaceBinding: false
     }
   }
@@ -355,7 +378,7 @@ function assertFederatedClient(
     client.policy.audience.tenantTypes[0] !== 'efeonce_internal' ||
     (scopeContract.requireWorkspaceBinding
       ? client.metadata?.workspaceBindingProvider !== 'globe'
-      : client.metadata?.resourceFamily !== 'hiring')
+      : client.metadata?.resourceFamily !== scopeContract.resourceFamily)
   ) {
     throw new McpTokenExchangeError('invalid_client', 401)
   }
@@ -496,6 +519,36 @@ function authorizeFunding(tenant: TenantAccessRecord) {
     'platform.globe_credit_funding.ensure',
     'execute',
     'all'
+  )
+}
+
+/**
+ * The human must ALREADY be an internal administrator able to open modules; the exchange never
+ * grants that. Mirrors `authorizeServiceEnablement` (admin route group + `client_portal.module.enable`).
+ */
+function authorizeClientServices(tenant: TenantAccessRecord) {
+  return (
+    tenant.tenantType === 'efeonce_internal' &&
+    tenant.routeGroups.includes('admin') &&
+    can(
+      {
+        userId: tenant.userId,
+        tenantType: tenant.tenantType,
+        roleCodes: tenant.roleCodes,
+        primaryRoleCode: tenant.primaryRoleCode,
+        routeGroups: tenant.routeGroups,
+        authorizedViews: tenant.authorizedViews,
+        projectScopes: tenant.projectScopes,
+        campaignScopes: tenant.campaignScopes,
+        businessLines: tenant.businessLines,
+        serviceModules: tenant.serviceModules,
+        portalHomePath: tenant.portalHomePath,
+        ...(tenant.memberId ? { memberId: tenant.memberId } : {})
+      },
+      'client_portal.module.enable',
+      'create',
+      'tenant'
+    )
   )
 }
 
