@@ -140,7 +140,7 @@ Orden de lectura y trabajo de cada región. Ninguna región existe si no cumple 
 ### R7 — Trade marketing
 
 - **Desktop:** H2 con el nombre de la familia + intro. Cuatro grupos en una retícula de dos por dos: Entender,
-  Medir cada ciclo, Intervenir, Conectar con lo digital. Cada grupo: H3, una línea, y lista de sus servicios con
+  Medir cada ciclo, Corregir, Conectar con lo digital. Cada grupo: H3, una línea, y lista de sus servicios con
   nombre canónico y una oración. Enlace secundario al brief al pie.
 - **Mobile:** grupos apilados; servicios como lista compacta.
 - **Contenido:** `trade.title`, `trade.intro`, `trade.groups[1..4].name`, `trade.groups[1..4].line`,
@@ -184,7 +184,7 @@ Orden de lectura y trabajo de cada región. Ninguna región existe si no cumple 
 
 - **Desktop:** intro sticky a la izquierda sobre 900 px, acordeón nativo a la derecha. A 900 px o menos, una
   columna, intro estática y 28 px de separación.
-- **Contenido:** `faq.title`, `faq.intro`, `faq.items[1..8].question`, `faq.items[1..8].answer`.
+- **Contenido:** `faq.title`, `faq.intro`, `faq.intro`, `faq.{1..9}.q`, `faq.{1..9}.a`.
 - **Regla:** `<details>`/`<summary>`; cada respuesta visible en HTML para el schema.
 
 ### R13 — Conversión
@@ -201,8 +201,8 @@ Orden de lectura y trabajo de cada región. Ninguna región existe si no cumple 
 | 3 | Empresa | text | sí | `organization` | `ti-building` | — |
 | 4 | Categoría | select premium | sí | — | `ti-category` | Alimentos y bebidas · Ferretería y mejoramiento del hogar · Cuidado personal y limpieza · Salud y farma OTC · Mascotas · Bebidas alcohólicas · Otra categoría |
 | 5 | Canal principal | select premium | sí | — | `ti-building-store` | Supermercados · Canal tradicional y almacenes · Ferreterías · Farmacias · Tiendas de conveniencia · E-commerce y marketplaces · Varios canales |
-| 6 | Qué necesitas resolver | select premium | sí | — | `ti-target` | Entender qué pasa en la tienda · Medir la ejecución cada ciclo · Intervenir tiendas críticas · Activar un lanzamiento o promoción · Un evento o una feria · Conectar la góndola con retail media · Todavía no lo tengo claro |
-| 7 | Cobertura aproximada | select premium | no | — | `ti-map-pin` | Menos de 50 puntos de venta · Entre 50 y 200 · Entre 200 y 1.000 · Más de 1.000 · No lo sé |
+| 6 | Qué necesitas resolver | select premium | sí | — | `ti-target` | Entender qué pasa en la tienda · Medir la ejecución cada ciclo · Corregir las tiendas críticas · Activar un lanzamiento o una promoción · Organizar un evento o una feria · Conectar la góndola con retail media · Todavía no lo tengo claro |
+| 7 | Cobertura aproximada | select premium | no | — | `ti-map-pin` | Menos de 50 · Entre 50 y 200 · Entre 200 y 1.000 · Más de 1.000 · No lo sé (unidad en el helper) |
 | 8 | Contexto | textarea, 500 caracteres | no | — | `ti-message` | — |
 
   + consentimiento, Turnstile invisible, retención `730d`, destino `greenhouse_only` inicial.
@@ -266,152 +266,322 @@ Nunca dos acciones con relleno en el mismo bloque.
 
 ## Copy Ledger
 
-Todo el copy es **hipótesis** hasta el Slice 2. Tuteo neutro, sin voseo. Los nombres de servicio son canon del
-catálogo y no se editan aquí.
+Revisado con `copywriting` y `greenhouse-ux-writing` el 2026-09-10 (ver **Copy Review 2026-09-10**). Sigue siendo
+**hipótesis** hasta el Slice 2: falta voice of customer primario y revisión legal. Tuteo neutro, sin voseo. Los
+nombres de servicio son canon del catálogo y no se editan aquí. Las celdas de la tabla de posición son **claims** y
+pasan por revisión legal antes de publicar.
 
 | ID | String |
 |---|---|
-| `channelCommerce.landing.hero.eyebrow` | Trade marketing · BTL · Canal |
-| `channelCommerce.landing.hero.title` | Trade marketing que te dice qué arreglar primero. Y lo arregla. |
-| `channelCommerce.landing.hero.titleAlt` | Sabes lo que le vendes al distribuidor. Te mostramos lo que pasó en la góndola. |
-| `channelCommerce.landing.hero.body` | Auditamos la ejecución de tu canal tienda por tienda, priorizamos qué intervenir según impacto y costo, lo ejecutamos y lo leemos junto a tu inversión digital. Un solo responsable, con evidencia en cada ciclo. |
+| `channelCommerce.landing.hero.eyebrow` | Trade marketing y BTL |
+| `channelCommerce.landing.hero.title` | Trade marketing que te dice qué corregir primero. Y lo corrige. |
+| `channelCommerce.landing.hero.body` | Revisamos tu ejecución tienda por tienda y corregimos primero lo que más pesa en tu venta. Cada hallazgo con su foto, cruzado con lo que inviertes en la red de medios de cada cadena. |
 | `channelCommerce.landing.hero.primaryCta` | Agenda una reunión |
 | `channelCommerce.landing.hero.secondaryCta` | Cuéntanos tu canal |
 | `channelCommerce.landing.hero.microline` | Chile · Canal moderno y tradicional · Un solo responsable |
-| `channelCommerce.landing.hero.illustrationAlt` | Ilustración de una góndola de supermercado con puntos numerados que señalan qué se revisa en cada punto de venta. |
+| `channelCommerce.landing.hero.illustrationAlt` | Ilustración de una góndola de supermercado con puntos numerados que señalan qué se revisa en cada tienda. |
 | `channelCommerce.landing.definition.title` | ¿Qué es el trade marketing? |
-| `channelCommerce.landing.definition.capsule` | El trade marketing es la disciplina que asegura que tu producto esté disponible, visible y bien ejecutado donde el comprador decide: la góndola, la farmacia, el almacén o la ficha de un retailer. Incluye surtido, precio, exhibición, material, promociones y activaciones, y se mide por cómo se ejecuta en cada punto de venta. |
+| `channelCommerce.landing.definition.capsule` | El trade marketing es la disciplina que asegura que tu producto esté disponible, visible y bien ejecutado donde el comprador decide: la góndola del supermercado, la farmacia, el almacén o la ficha de un retailer. Abarca surtido, precio, exhibición, material, promociones y activaciones, y se mide por cómo se ejecuta en cada punto de venta. |
 | `channelCommerce.landing.definition.btlTitle` | ¿Y en qué se diferencia del BTL? |
-| `channelCommerce.landing.definition.btlCapsule` | El BTL son las acciones que ocurren en momentos: una degustación, una activación en sala, un roadshow, un pop-up o una feria. El trade marketing sostiene la ejecución todo el año; el BTL la acelera cuando importa. |
+| `channelCommerce.landing.definition.btlCapsule` | El BTL agrupa las acciones que ocurren en momentos puntuales: una degustación, una activación en sala, un roadshow, un pop-up o una feria. El trade marketing sostiene la ejecución todo el año; el BTL la acelera cuando importa. |
 | `channelCommerce.landing.definition.jobsDeflection` | ¿Buscas trabajar en trade marketing? Revisa nuestras vacantes. |
-| `channelCommerce.landing.problem.title` | Tres reportes que no se hablan |
+| `channelCommerce.landing.problem.title` | Sabes lo que le vendes al distribuidor. No sabes qué pasó en la góndola. |
 | `channelCommerce.landing.problem.sellIn.name` | Lo que le vendes al canal |
 | `channelCommerce.landing.problem.sellIn.body` | Vive en tu ERP y llega a tiempo. Es la única parte que controlas. |
 | `channelCommerce.landing.problem.sellOut.name` | Lo que compra la gente |
-| `channelCommerce.landing.problem.sellOut.body` | Llega en planillas de cada cadena y distribuidor, con formatos distintos y semanas de atraso. |
+| `channelCommerce.landing.problem.sellOut.body` | Llega en planillas de cada cadena y distribuidor, cada una con su formato y su atraso. |
 | `channelCommerce.landing.problem.execution.name` | Lo que pasó en la góndola |
-| `channelCommerce.landing.problem.execution.body` | Llega en otro reporte, que describe lo que pasó pero no te dice qué arreglar primero. |
-| `channelCommerce.landing.problem.close` | Cuando la venta cae en una cadena, nadie puede decirte si fue quiebre, precio o ejecución. Y la próxima inversión se decide con intuición. |
+| `channelCommerce.landing.problem.execution.body` | Te llega en otro reporte, que describe lo que pasó pero no te dice qué corregir primero. |
+| `channelCommerce.landing.problem.close` | Con tres reportes que no se cruzan, cuando la venta cae en una cadena no hay cómo saber si fue quiebre, precio o ejecución. Y la próxima inversión se decide a ojo. |
 | `channelCommerce.landing.problem.whyNow.title` | Por qué ahora |
-| `channelCommerce.landing.problem.whyNow.body` | Desde el 26 de abril de 2026 la jornada laboral en Chile es de 42 horas, y bajará a 40 en 2028 sin reducción de sueldo. El costo por hora de cobertura en terreno sube por ley: cada visita tiene que justificarse. |
+| `channelCommerce.landing.problem.whyNow.body` | Desde el 26 de abril de 2026 la jornada laboral en Chile es de 42 horas, y en 2028 bajará a 40, sin reducción de sueldo. El costo por hora de cada visita a tienda sube por ley, y cada visita tiene que justificarse. |
 | `channelCommerce.landing.problem.whyNow.source` | Fuente: Ley 21.561. |
 | `channelCommerce.landing.position.title` | Ni un tablero más ni otro equipo de terreno |
-| `channelCommerce.landing.position.intro` | Hay quien detecta y hay quien ejecuta. Casi nadie cierra el ciclo entre las dos cosas. |
+| `channelCommerce.landing.position.intro` | Una plataforma te avisa qué está mal. Una agencia va a la tienda. Falta quien responda por las dos cosas. |
+| `channelCommerce.landing.position.caption` | Qué hace cada tipo de proveedor de trade marketing |
 | `channelCommerce.landing.position.columns.platform` | Una plataforma de ejecución |
 | `channelCommerce.landing.position.columns.agency` | Una agencia de terreno |
 | `channelCommerce.landing.position.columns.efeonce` | Efeonce |
 | `channelCommerce.landing.position.rows.detect` | Detecta problemas de ejecución |
-| `channelCommerce.landing.position.rows.prioritize` | Prioriza por impacto y costo |
+| `channelCommerce.landing.position.cells.detect` | Plataforma: Sí · Agencia: En parte · Efeonce: Sí |
+| `channelCommerce.landing.position.rows.prioritize` | Ordena qué corregir primero |
+| `channelCommerce.landing.position.cells.prioritize` | Plataforma: Sí · Agencia: En parte · Efeonce: Sí |
 | `channelCommerce.landing.position.rows.execute` | Corrige en la tienda |
+| `channelCommerce.landing.position.cells.execute` | Plataforma: No · Agencia: Sí · Efeonce: Sí |
 | `channelCommerce.landing.position.rows.prove` | Demuestra el antes y el después |
-| `channelCommerce.landing.position.rows.digital` | Lo cruza con retail media y anaquel digital |
-| `channelCommerce.landing.position.rows.owner` | Un solo responsable del resultado |
+| `channelCommerce.landing.position.cells.prove` | Plataforma: En parte · Agencia: En parte · Efeonce: Sí |
+| `channelCommerce.landing.position.rows.digital` | Lo cruza con la red de medios de cada cadena |
+| `channelCommerce.landing.position.cells.digital` | Plataforma: No · Agencia: No · Efeonce: Sí |
+| `channelCommerce.landing.position.rows.owner` | Responde por el resultado |
+| `channelCommerce.landing.position.cells.owner` | Plataforma: No · Agencia: En parte · Efeonce: Sí |
+| `channelCommerce.landing.position.cellValues` | Sí · No · En parte |
 | `channelCommerce.landing.position.footnote` | Comparación por tipo de proveedor, no por empresa. Cada caso es distinto. |
-| `channelCommerce.landing.cycle.title` | Cómo funciona cada ciclo |
-| `channelCommerce.landing.cycle.intro` | Cinco pasos que se repiten y mejoran con cada vuelta. |
+| `channelCommerce.landing.cycle.title` | Un ciclo que empieza donde terminó el anterior |
+| `channelCommerce.landing.cycle.intro` | Cinco pasos. El último alimenta al primero. |
 | `channelCommerce.landing.cycle.steps.1.name` | Estándar |
-| `channelCommerce.landing.cycle.steps.1.body` | Definimos qué significa bien ejecutado en tu categoría, por canal y formato. |
+| `channelCommerce.landing.cycle.steps.1.body` | Definimos cómo debe verse tu categoría en la góndola, por canal y formato. |
 | `channelCommerce.landing.cycle.steps.2.name` | Cobertura |
-| `channelCommerce.landing.cycle.steps.2.body` | Auditamos los puntos de venta del ciclo con evidencia verificable. |
+| `channelCommerce.landing.cycle.steps.2.body` | Revisamos los puntos de venta del ciclo, con foto de cada hallazgo. |
 | `channelCommerce.landing.cycle.steps.3.name` | Priorización |
-| `channelCommerce.landing.cycle.steps.3.body` | Ordenamos lo que está roto por impacto en venta y costo de arreglarlo. |
+| `channelCommerce.landing.cycle.steps.3.body` | Ordenamos lo que está mal por impacto en tu venta y costo de corregirlo. |
 | `channelCommerce.landing.cycle.steps.4.name` | Intervención |
-| `channelCommerce.landing.cycle.steps.4.body` | Corregimos en la tienda donde la evidencia lo justifica. |
+| `channelCommerce.landing.cycle.steps.4.body` | Corregimos en tienda donde la evidencia lo justifica. |
 | `channelCommerce.landing.cycle.steps.5.name` | Lectura |
-| `channelCommerce.landing.cycle.steps.5.body` | Comparamos contra el ciclo anterior y ajustamos el siguiente. |
+| `channelCommerce.landing.cycle.steps.5.body` | Comparamos con el ciclo anterior y ajustamos el estándar del siguiente. |
 | `channelCommerce.landing.cycle.note` | Un dato que no validamos no llega a tu reporte. |
 | `channelCommerce.landing.xray.title` | Así se lee una góndola |
-| `channelCommerce.landing.xray.body` | Seis cosas se revisan en cada punto de venta. Lo que importa es qué haces con ellas. |
-| `channelCommerce.landing.xray.points.1` | Disponibilidad — ¿Está el producto o hay quiebre? |
-| `channelCommerce.landing.xray.points.2` | Precio — ¿Coincide con el precio de referencia? |
-| `channelCommerce.landing.xray.points.3` | Frentes — ¿Cuánto espacio ocupas en tu categoría? |
-| `channelCommerce.landing.xray.points.4` | Material — ¿Está instalado y visible? |
-| `channelCommerce.landing.xray.points.5` | Exhibición adicional — ¿La cabecera o la isla que pagaste sigue ahí? |
-| `channelCommerce.landing.xray.points.6` | Competencia — ¿Qué está haciendo la marca de al lado? |
-| `channelCommerce.landing.xray.listTitle` | Lista priorizada del ciclo |
-| `channelCommerce.landing.xray.list.1` | Quiebre del producto foco en salas de alta rotación · Impacto alto · Costo bajo |
-| `channelCommerce.landing.xray.list.2` | Cabecera pagada que ya no está instalada · Impacto alto · Costo medio |
-| `channelCommerce.landing.xray.list.3` | Precio distinto al de referencia en una cadena · Impacto medio · Costo bajo |
+| `channelCommerce.landing.xray.body` | Seis cosas se revisan en cada tienda. Lo que importa es qué haces con ellas. |
+| `channelCommerce.landing.xray.points.1.name` | Disponibilidad |
+| `channelCommerce.landing.xray.points.1.question` | ¿Está tu producto o hay quiebre? |
+| `channelCommerce.landing.xray.points.2.name` | Precio |
+| `channelCommerce.landing.xray.points.2.question` | ¿Coincide con tu precio de referencia? |
+| `channelCommerce.landing.xray.points.3.name` | Frentes |
+| `channelCommerce.landing.xray.points.3.question` | ¿Cuánto espacio ocupas en tu categoría? |
+| `channelCommerce.landing.xray.points.4.name` | Material |
+| `channelCommerce.landing.xray.points.4.question` | ¿Está instalado y se ve? |
+| `channelCommerce.landing.xray.points.5.name` | Exhibición adicional |
+| `channelCommerce.landing.xray.points.5.question` | ¿La cabecera o la isla que pagaste sigue ahí? |
+| `channelCommerce.landing.xray.points.6.name` | Competencia |
+| `channelCommerce.landing.xray.points.6.question` | ¿Qué está haciendo la marca de al lado? |
+| `channelCommerce.landing.xray.listTitle` | Qué corregir primero en este ciclo |
+| `channelCommerce.landing.xray.chip.impact` | Impacto |
+| `channelCommerce.landing.xray.chip.cost` | Costo |
+| `channelCommerce.landing.xray.list.1.item` | Quiebre del producto foco en tiendas de alta rotación |
+| `channelCommerce.landing.xray.list.1.impact` | Alto |
+| `channelCommerce.landing.xray.list.1.cost` | Bajo |
+| `channelCommerce.landing.xray.list.2.item` | Cabecera pagada que ya no está instalada |
+| `channelCommerce.landing.xray.list.2.impact` | Alto |
+| `channelCommerce.landing.xray.list.2.cost` | Medio |
+| `channelCommerce.landing.xray.list.3.item` | Precio distinto al de referencia en una cadena |
+| `channelCommerce.landing.xray.list.3.impact` | Medio |
+| `channelCommerce.landing.xray.list.3.cost` | Bajo |
 | `channelCommerce.landing.xray.label` | Ejemplo ilustrativo. No corresponde a un cliente. |
 | `channelCommerce.landing.trade.title` | Trade marketing |
 | `channelCommerce.landing.trade.intro` | Lo que pasa en la góndola todo el año. |
-| `channelCommerce.landing.trade.groups.understand` | Entender — antes de invertir o de medir. |
-| `channelCommerce.landing.trade.groups.measure` | Medir cada ciclo — con el mismo estándar siempre. |
-| `channelCommerce.landing.trade.groups.intervene` | Intervenir — donde la evidencia lo justifica. |
-| `channelCommerce.landing.trade.groups.connect` | Conectar con lo digital — la góndola y la pantalla, juntas. |
+| `channelCommerce.landing.trade.groups.understand.name` | Entender |
+| `channelCommerce.landing.trade.groups.understand.line` | Antes de invertir o de medir. |
+| `channelCommerce.landing.trade.groups.measure.name` | Medir cada ciclo |
+| `channelCommerce.landing.trade.groups.measure.line` | Siempre contra el mismo estándar. |
+| `channelCommerce.landing.trade.groups.correct.name` | Corregir |
+| `channelCommerce.landing.trade.groups.correct.line` | Donde la evidencia lo justifica. |
+| `channelCommerce.landing.trade.groups.connect.name` | Conectar con lo digital |
+| `channelCommerce.landing.trade.groups.connect.line` | La góndola y la inversión digital, en el mismo reporte. |
+| `channelCommerce.landing.trade.services.T1.name` | Diagnóstico de Ejecución de Canal |
+| `channelCommerce.landing.trade.services.T1.body` | Qué se puede medir de tu canal, qué está mal hoy en una muestra real y en qué orden corregirlo. |
+| `channelCommerce.landing.trade.services.T2.name` | Auditoría de Inversión de Canal |
+| `channelCommerce.landing.trade.services.T2.body` | Qué parte de tu presupuesto de canal no tiene cómo demostrar retorno. |
+| `channelCommerce.landing.trade.services.T9.name` | Estándar de Tienda Perfecta |
+| `channelCommerce.landing.trade.services.T9.body` | Qué significa bien ejecutado en tu categoría, por canal y formato, antes de salir a medir. |
+| `channelCommerce.landing.trade.services.T10.name` | Arquitectura de Distribución y Cobertura |
+| `channelCommerce.landing.trade.services.T10.body` | Dónde estás, dónde no estás y qué vale cada punto de venta que falta. |
+| `channelCommerce.landing.trade.services.T3.name` | Cobertura Auditada |
+| `channelCommerce.landing.trade.services.T3.body` | El estado de cada tienda y la lista de qué corregir primero, cada ciclo. |
+| `channelCommerce.landing.trade.services.T5.name` | Orquestación de Terreno |
+| `channelCommerce.landing.trade.services.T5.body` | Tus proveedores actuales, medidos contra el mismo estándar y en un solo reporte. |
+| `channelCommerce.landing.trade.services.T11.name` | Integración de Datos de Canal |
+| `channelCommerce.landing.trade.services.T11.body` | Lo que vendes, lo que se vendió y lo que pasó en la góndola, leídos en un solo lugar. |
+| `channelCommerce.landing.trade.services.T4.name` | Equipo de Terreno Gestionado |
+| `channelCommerce.landing.trade.services.T4.body` | Las tiendas críticas corregidas, con foto del antes y el después. |
+| `channelCommerce.landing.trade.services.T8.name` | Diseño y Medición de Promociones |
+| `channelCommerce.landing.trade.services.T8.body` | Si la promoción vendió de más o sólo adelantó compras y se comió el margen. |
+| `channelCommerce.landing.trade.services.T12.name` | Capacitación de Fuerza de Venta del Canal |
+| `channelCommerce.landing.trade.services.T12.body` | Que quien vende tu producto sin trabajar para ti sepa venderlo, y que se note en su tienda. |
+| `channelCommerce.landing.trade.services.T13.name` | Gestión de Categoría |
+| `channelCommerce.landing.trade.services.T13.body` | Una propuesta de cómo ordenar tu categoría completa, en el idioma del comprador de la cadena. |
+| `channelCommerce.landing.trade.services.T6.name` | Anaquel Digital y Visibilidad en IA |
+| `channelCommerce.landing.trade.services.T6.body` | Cómo se ve tu producto en la ficha de cada retailer y si los asistentes de IA lo recomiendan. |
+| `channelCommerce.landing.trade.services.T7.name` | Retail Media y Commerce |
+| `channelCommerce.landing.trade.services.T7.body` | Tu inversión en la red de medios de cada cadena, leída junto a lo que pasa en sus tiendas. |
 | `channelCommerce.landing.trade.cta` | Cuéntanos tu canal |
 | `channelCommerce.landing.btl.title` | BTL |
 | `channelCommerce.landing.btl.intro` | Lo que pasa en los momentos que importan. |
-| `channelCommerce.landing.btl.principle` | Cada activación se diseña con su medición antes de salir a terreno. |
-| `channelCommerce.landing.btl.groups.store` | En la tienda |
-| `channelCommerce.landing.btl.groups.outside` | Fuera de la tienda |
-| `channelCommerce.landing.btl.groups.events` | En eventos |
-| `channelCommerce.landing.btl.transversal` | Y el material de canal que todo esto necesita, producido como sistema y no campaña por campaña. |
-| `channelCommerce.landing.digital.title` | La góndola, leída junto a tu inversión digital |
-| `channelCommerce.landing.digital.body` | Si inviertes en la red de medios de una cadena, tiene sentido saber qué pasaba en su góndola esa misma semana. Cruzamos la ejecución física con lo que pasa en la pantalla. |
-| `channelCommerce.landing.digital.items.retailMedia` | Retail media de la cadena — tu inversión en su red de medios, leída con lo que pasa en su sala. |
-| `channelCommerce.landing.digital.items.shelf` | Anaquel digital — cómo se ve tu producto en la ficha de cada retailer. |
-| `channelCommerce.landing.digital.items.ai` | Visibilidad en IA — si los asistentes recomiendan tu producto cuando alguien pregunta por tu categoría. |
+| `channelCommerce.landing.btl.principle` | Cada activación sale a terreno con su medición ya definida. |
+| `channelCommerce.landing.btl.groups.inStore.name` | En la tienda |
+| `channelCommerce.landing.btl.groups.outside.name` | Fuera de la tienda |
+| `channelCommerce.landing.btl.groups.events.name` | En eventos |
+| `channelCommerce.landing.btl.services.B1.name` | Activaciones en Sala Medidas |
+| `channelCommerce.landing.btl.services.B1.body` | Degustación, demo o sampling en tienda, comparado contra tiendas donde no se activó. |
+| `channelCommerce.landing.btl.services.B2.name` | Promotoría e Impulso |
+| `channelCommerce.landing.btl.services.B2.body` | Venta asistida en tienda, medida en conversión y no en horas cubiertas. |
+| `channelCommerce.landing.btl.services.B3.name` | Visual Merchandising y Exhibiciones Adicionales |
+| `channelCommerce.landing.btl.services.B3.body` | Exhibiciones bien instaladas y verificadas mientras dura lo que pagaste. |
+| `channelCommerce.landing.btl.services.B4.name` | Roadshow y Tour de Marca |
+| `channelCommerce.landing.btl.services.B4.body` | Una gira leída ciudad por ciudad, para saber dónde volver. |
+| `channelCommerce.landing.btl.services.B5.name` | Street Marketing y Sampling Masivo |
+| `channelCommerce.landing.btl.services.B5.body` | Entrega masiva fuera de la tienda, con registro de dónde, cuándo y a quién. |
+| `channelCommerce.landing.btl.services.B6.name` | Pop-up y Espacios Efímeros |
+| `channelCommerce.landing.btl.services.B6.body` | Un espacio temporal con objetivo comercial y métrica acordada antes de abrir. |
+| `channelCommerce.landing.btl.services.B7.name` | Activación de Patrocinios |
+| `channelCommerce.landing.btl.services.B7.body` | Que el patrocinio que ya pagaste rinda más que un logo, empezando por los derechos que no estás usando. |
+| `channelCommerce.landing.btl.services.B8.name` | Ferias y Exposiciones |
+| `channelCommerce.landing.btl.services.B8.body` | Que la feria termine en oportunidades de venta y no en una caja de tarjetas. |
+| `channelCommerce.landing.btl.services.B9.name` | Encuentros de Canal |
+| `channelCommerce.landing.btl.services.B9.body` | La convención de distribuidores o el lanzamiento a tu fuerza de venta, con compromisos y seguimiento. |
+| `channelCommerce.landing.btl.transversal` | Contenido y Material de Canal: fichas, catálogos, contenido para cada retailer y kits para distribuidores, producidos como sistema y no campaña por campaña. |
+| `channelCommerce.landing.btl.cta` | Cuéntanos tu canal |
+| `channelCommerce.landing.digital.title` | Tu góndola y tu inversión digital, en el mismo reporte |
+| `channelCommerce.landing.digital.body` | Si inviertes en la red de medios de una cadena, tiene sentido saber qué pasaba en su góndola esa misma semana. Cruzamos las dos cosas. |
+| `channelCommerce.landing.digital.items.retailMedia.name` | Red de medios de la cadena |
+| `channelCommerce.landing.digital.items.retailMedia.body` | Lo que inviertes en sus pantallas y su sitio, leído con lo que pasa en sus tiendas. |
+| `channelCommerce.landing.digital.items.retailMedia.link` | Cómo gestionamos paid media y retail media |
+| `channelCommerce.landing.digital.items.shelf.name` | Anaquel digital |
+| `channelCommerce.landing.digital.items.shelf.body` | Cómo se ve tu producto en la ficha de cada retailer. |
+| `channelCommerce.landing.digital.items.shelf.link` | Cómo trabajamos el posicionamiento SEO |
+| `channelCommerce.landing.digital.items.ai.name` | Visibilidad en IA |
+| `channelCommerce.landing.digital.items.ai.body` | Si los asistentes de IA recomiendan tu producto cuando alguien pregunta por tu categoría. |
+| `channelCommerce.landing.digital.items.ai.link` | Cómo trabajamos la visibilidad en IA |
 | `channelCommerce.landing.operating.title` | Un solo responsable |
 | `channelCommerce.landing.operating.items.1` | Definimos el plan del ciclo y el estándar contra el que se mide. |
 | `channelCommerce.landing.operating.items.2` | Dirigimos la operación en terreno. |
-| `channelCommerce.landing.operating.items.3` | Validamos la evidencia antes de mostrártela. |
+| `channelCommerce.landing.operating.items.3` | Validamos cada dato antes de mostrártelo. |
 | `channelCommerce.landing.operating.items.4` | Respondemos si algo falla. |
 | `channelCommerce.landing.operating.notPromised.title` | Lo que no te vamos a prometer |
-| `channelCommerce.landing.operating.notPromised.1` | Que suba tu venta. Depende de tu precio, tu surtido, tu negociación con la cadena y la demanda. Te mostramos qué está roto y lo arreglamos. |
+| `channelCommerce.landing.operating.notPromised.1` | Que suba tu venta. Depende de tu precio, tu surtido, tu negociación con la cadena y la demanda. Lo que sí hacemos es mostrarte qué está mal y corregirlo. |
 | `channelCommerce.landing.operating.notPromised.2` | Cobertura nacional antes de armar el plan de tu cuenta. |
 | `channelCommerce.landing.operating.notPromised.3` | Datos que no medimos. Si no llegamos a una tienda, aparece como no medida. |
 | `channelCommerce.landing.proof.title` | Qué recibes en cada ciclo |
-| `channelCommerce.landing.proof.items.1` | Puntaje por punto de venta y cadena, con su denominador a la vista. |
-| `channelCommerce.landing.proof.items.2` | La lista priorizada de qué intervenir primero. |
-| `channelCommerce.landing.proof.items.3` | Evidencia fotográfica verificable de cada hallazgo. |
-| `channelCommerce.landing.proof.items.4` | La lectura del ciclo con la recomendación para el siguiente. |
+| `channelCommerce.landing.proof.items.1` | Un puntaje por tienda y por cadena, que siempre dice sobre cuántas tiendas se calculó. |
+| `channelCommerce.landing.proof.items.2` | La lista de qué corregir primero, ordenada por impacto y costo. |
+| `channelCommerce.landing.proof.items.3` | Una foto de cada hallazgo, con su tienda y su fecha. |
+| `channelCommerce.landing.proof.items.4` | La lectura del ciclo, con lo que conviene ajustar en el siguiente. |
 | `channelCommerce.landing.proof.trustLabel` | Marcas que confían en Efeonce |
 | `channelCommerce.landing.faq.title` | Preguntas frecuentes |
+| `channelCommerce.landing.faq.intro` | Lo que suele preguntar un equipo de trade antes de empezar. |
 | `channelCommerce.landing.faq.1.q` | ¿Qué es el trade marketing? |
+| `channelCommerce.landing.faq.1.a` | (reutiliza definition.capsule) |
 | `channelCommerce.landing.faq.2.q` | ¿Qué diferencia hay entre trade marketing y BTL? |
+| `channelCommerce.landing.faq.2.a` | (reutiliza definition.btlCapsule) |
 | `channelCommerce.landing.faq.3.q` | ¿Trabajan con la agencia de terreno que ya tengo? |
 | `channelCommerce.landing.faq.3.a` | Sí. Ponemos a tus proveedores actuales a medir contra el mismo estándar y consolidamos su información, sin reemplazarlos. |
 | `channelCommerce.landing.faq.4.q` | Ya uso una plataforma de ejecución. ¿Me sirve igual? |
-| `channelCommerce.landing.faq.4.a` | Sí. Tomamos sus alertas, las priorizamos con criterio de negocio, ejecutamos la corrección en tienda y cerramos el ciclo. Aprovechas lo que ya pagaste. |
-| `channelCommerce.landing.faq.5.q` | ¿Garantizan que va a subir la venta? |
-| `channelCommerce.landing.faq.5.a` | No. La venta depende de tu precio, tu surtido, tu negociación con la cadena y la demanda. Lo que sí hacemos es mostrarte qué está roto, arreglarlo y demostrar que quedó arreglado. |
-| `channelCommerce.landing.faq.6.q` | ¿En qué canales y zonas trabajan? |
-| `channelCommerce.landing.faq.6.a` | En Chile, en canal moderno y tradicional, ferreterías, farmacias, tiendas de conveniencia y e-commerce. La cobertura de cada cuenta se define en el plan. |
-| `channelCommerce.landing.faq.7.q` | ¿Cómo se cobra? |
-| `channelCommerce.landing.faq.7.a` | El diagnóstico tiene precio cerrado. La cobertura se cobra por puntos de venta auditados en cada ciclo y la intervención por capacidad mensual. Nunca por hora ni como porcentaje de tu inversión. |
-| `channelCommerce.landing.faq.8.q` | ¿Qué necesitan de nosotros para empezar? |
-| `channelCommerce.landing.faq.8.a` | Tu surtido objetivo, el precio de referencia, el planograma si existe, las autorizaciones de las cadenas y una persona responsable de tu lado. |
-| `channelCommerce.landing.conversion.title` | Cuéntanos tu canal |
-| `channelCommerce.landing.conversion.body` | Con lo esencial te decimos por dónde conviene empezar y qué necesitamos revisar. |
+| `channelCommerce.landing.faq.4.a` | Sí. Tomamos sus alertas, las ordenamos con criterio de negocio, corregimos en tienda y cerramos el ciclo. Aprovechas lo que ya pagaste. |
+| `channelCommerce.landing.faq.5.q` | ¿Esto reemplaza el reporte que armo cada mes? |
+| `channelCommerce.landing.faq.5.a` | Te lo entrega armado: el puntaje de cada tienda, la lista de qué corregir y la foto de cada hallazgo, listos para tu reunión de ciclo. |
+| `channelCommerce.landing.faq.6.q` | ¿Garantizan que va a subir la venta? |
+| `channelCommerce.landing.faq.6.a` | No. La venta depende de tu precio, tu surtido, tu negociación con la cadena y la demanda. Lo que sí hacemos es mostrarte qué está mal, corregirlo y demostrar que quedó corregido. |
+| `channelCommerce.landing.faq.7.q` | ¿En qué canales y zonas trabajan? |
+| `channelCommerce.landing.faq.7.a` | En Chile, en supermercados y canal tradicional, ferreterías, farmacias, tiendas de conveniencia y e-commerce. La cobertura de cada cuenta se define en su plan. |
+| `channelCommerce.landing.faq.8.q` | ¿Cómo se cobra? |
+| `channelCommerce.landing.faq.8.a` | El diagnóstico tiene precio cerrado. La cobertura se cobra por puntos de venta revisados en cada ciclo y la corrección en tienda, por capacidad mensual. Nunca por hora ni como porcentaje de tu inversión. |
+| `channelCommerce.landing.faq.9.q` | ¿Qué necesitan de nosotros para empezar? |
+| `channelCommerce.landing.faq.9.a` | Tu surtido objetivo, el precio de referencia, el planograma si existe, las autorizaciones de las cadenas y una persona responsable de tu lado. |
+| `channelCommerce.landing.conversion.title` | Cuéntanos tu canal y te decimos por dónde empezar |
+| `channelCommerce.landing.conversion.body` | Con lo esencial te proponemos un primer paso y lo que necesitamos revisar. |
 | `channelCommerce.landing.form.overline` | Brief de canal |
 | `channelCommerce.landing.form.title` | Cuéntanos lo esencial |
-| `channelCommerce.landing.form.helper` | Seis preguntas. Las opcionales nos ayudan a llegar mejor preparados. |
+| `channelCommerce.landing.form.helper` | Seis datos obligatorios. Los dos opcionales nos ayudan a llegar mejor preparados. |
 | `channelCommerce.landing.form.badge` | 2 minutos |
 | `channelCommerce.landing.form.trust.1` | Datos protegidos |
-| `channelCommerce.landing.form.trust.2` | Respuesta con contexto |
+| `channelCommerce.landing.form.trust.2` | Te responde una persona del equipo |
+| `channelCommerce.landing.form.fields.name.label` | Nombre |
+| `channelCommerce.landing.form.fields.name.error` | Escribe tu nombre para saber a quién responder. |
+| `channelCommerce.landing.form.fields.email.label` | Correo de trabajo |
+| `channelCommerce.landing.form.fields.email.placeholder` | nombre@empresa.cl |
+| `channelCommerce.landing.form.fields.email.error` | Escribe un correo válido, por ejemplo nombre@empresa.cl. |
+| `channelCommerce.landing.form.fields.company.label` | Empresa |
+| `channelCommerce.landing.form.fields.company.error` | Escribe el nombre de tu empresa. |
+| `channelCommerce.landing.form.fields.category.label` | Categoría |
+| `channelCommerce.landing.form.fields.category.error` | Elige la categoría de tu producto. |
+| `channelCommerce.landing.form.fields.channel.label` | Canal principal |
+| `channelCommerce.landing.form.fields.channel.helper` | Donde más se vende tu producto. |
+| `channelCommerce.landing.form.fields.channel.error` | Elige el canal donde más vendes. |
+| `channelCommerce.landing.form.fields.need.label` | Qué necesitas resolver |
+| `channelCommerce.landing.form.fields.need.error` | Elige lo que más necesitas resolver. |
+| `channelCommerce.landing.form.fields.coverage.label` | Cobertura aproximada |
+| `channelCommerce.landing.form.fields.coverage.helper` | Puntos de venta donde está tu producto. Una estimación basta. |
+| `channelCommerce.landing.form.fields.context.label` | Contexto |
+| `channelCommerce.landing.form.fields.context.helper` | Por ejemplo, una cadena donde cayó la venta o un lanzamiento en camino. |
+| `channelCommerce.landing.form.fields.context.error` | Máximo 500 caracteres (tienes {n}). |
+| `channelCommerce.landing.form.fields.email.corporateError` | Usa tu correo de trabajo para enviar el brief. |
+| `channelCommerce.landing.form.fields.consent.error` | Necesitamos tu autorización para responderte. |
+| `channelCommerce.landing.form.options.category` | Alimentos y bebidas · Ferretería y mejoramiento del hogar · Cuidado personal y limpieza · Salud y farma OTC · Mascotas · Bebidas alcohólicas · Otra categoría |
+| `channelCommerce.landing.form.options.channel` | Supermercados · Canal tradicional y almacenes · Ferreterías · Farmacias · Tiendas de conveniencia · E-commerce y marketplaces · Varios canales |
+| `channelCommerce.landing.form.options.need` | Entender qué pasa en la tienda · Medir la ejecución cada ciclo · Corregir las tiendas críticas · Activar un lanzamiento o una promoción · Organizar un evento o una feria · Conectar la góndola con retail media · Todavía no lo tengo claro |
+| `channelCommerce.landing.form.options.coverage` | Menos de 50 · Entre 50 y 200 · Entre 200 y 1.000 · Más de 1.000 · No lo sé |
 | `channelCommerce.landing.form.submit` | Enviar mi brief |
+| `channelCommerce.landing.form.pending` | Enviando… |
 | `channelCommerce.landing.form.privacyLink` | Cómo usamos tus datos |
 | `channelCommerce.landing.meeting.title` | ¿Prefieres conversarlo? |
-| `channelCommerce.landing.meeting.body` | Agenda una conversación con el equipo y revisamos tu canal juntos. |
+| `channelCommerce.landing.meeting.body` | Una conversación con el equipo para revisar tu canal juntos. |
 | `channelCommerce.landing.meeting.cta` | Agenda una reunión |
 | `channelCommerce.landing.disclosure.body` | Las ilustraciones y los ejemplos de esta página son referenciales. No corresponden a clientes ni a resultados. |
 | `channelCommerce.landing.dock.primary` | Agenda una reunión |
 | `channelCommerce.landing.dock.secondary` | Cuéntanos tu canal |
+| `channelCommerce.landing.aria.xrayPoint` | Punto {n}: {nombre} |
+| `channelCommerce.landing.aria.dock` | Empezar con Efeonce |
+| `channelCommerce.landing.seo.title` | Agencia de trade marketing y BTL en Chile \| Efeonce |
+| `channelCommerce.landing.seo.description` | Trade marketing y BTL con evidencia tienda por tienda: te decimos qué corregir primero, lo corregimos y lo cruzamos con tu inversión digital. |
+| `channelCommerce.landing.og.title` | Trade marketing que te dice qué corregir primero |
+| `channelCommerce.landing.og.description` | Tienda por tienda, con foto de cada hallazgo y cruzado con lo que inviertes en la red de medios de cada cadena. |
 
 Las respuestas 1 y 2 del FAQ reutilizan las cápsulas de R2 para que el schema marque exactamente lo visible.
+
+### Regla terminológica
+
+**Cada término nombra una cosa distinta; nunca dos nombres para lo mismo dentro de un bloque.** No se fuerza un único
+término para el local: en Chile `tienda` y `góndola` son de uso común y `sala` es jerga del trade.
+
+| Término | Qué nombra | Dónde se usa |
+|---|---|---|
+| **tienda** | El local | Default del copy: hero, cuerpo, BTL, FAQ y opciones del form. Lo entiende todo el comité |
+| **góndola** | El mueble donde está el producto | Cuando se habla de lo que se ve y se ejecuta en él: quiebre, frentes, precio, la firma y la conexión digital |
+| **sala** | El piso de venta, en jerga del operador | Sólo donde calza el idioma del trade ("activación en sala") y en el nombre canónico de B1 |
+| **punto de venta** | La unidad de medida | Cobertura, puntaje, conteos y cobro |
+| **corregir** | La intervención | Verbo único; reemplaza a arreglar e intervenir |
+| **red de medios de la cadena** | Retail media en lectura plana | Cuerpo; `retail media` queda en nombres de servicio y opciones |
+
+Los nombres canónicos del catálogo se respetan tal cual (`Estándar de Tienda Perfecta`, `Activaciones en Sala Medidas`).
+
+## Copy Review 2026-09-10
+
+Framework: **solution-aware** (el lector ya conoce agencias y plataformas), contraste + mecanismo único (BAB/FAB).
+Voz institucional Efeonce, tono landing: conciso y con filo. Creencias que tensiona: #7 (transparencia como mínimo)
+y #3 (métricas sin decisión). Pasadas aplicadas: estructura, claridad, concisión, ritmo, prueba y voz, anti AI-slop.
+
+**Voice of customer.** No hubo entrevistas. Proxy usado: avisos de empleo de Jefe de Trade Marketing en Chile, donde
+el operador describe su trabajo con sus palabras: "correcta ejecución en sala", "levantar información en terreno"
+sobre precios, promociones, exhibiciones y competencia, y "elaborar reportes mensuales". Fuentes: Chiletrabajos
+(Jefe Trade Marketing, Responsable de Trade Marketing) y BeBee (Jefe de Trade Marketing), `as-of 2026-09`. El
+proxy mejora el vocabulario pero **no reemplaza** entrevistas: queda pendiente para el Slice 2.
+
+| # | Hallazgo | Regla | Cambio |
+|---|---|---|---|
+| 1 | Copy escrito sin voice of customer | Research antes de escribir | Vocabulario del operador (terreno, reporte mensual, ejecución) y FAQ nueva sobre el reporte mensual |
+| 2 | Arreglar, corregir e intervenir usados para lo mismo | Mismo término para el mismo concepto | `corregir` como verbo único |
+| 3 | La alternativa de H1 era el mejor contraste de la página, pero no cabía como H1 por SEO | Cada titular en su superficie | Pasó a ser el título de la sección de problema |
+| 4 | "Tres reportes que no se hablan" nombraba el concepto en vez de prometer | Antipatrón 6.b | Reemplazado por el contraste sell-in / sala |
+| 5 | El cuerpo del hero repetía el H1 | El lead gana el siguiente párrafo | Mecanismo, prueba (foto) y diferenciador digital |
+| 6 | Claims de mercado sin prueba: "casi nadie cierra el ciclo", "semanas de atraso", "nadie puede decirte" | Prueba antes que hype | Reescritos sin afirmación de mercado |
+| 7 | Las celdas de la tabla de posición, el copy más cargado de claims, no estaban en el ledger | Todo claim visible es revisable | Seis filas con valores `Sí`, `No`, `En parte`, marcadas para revisión legal |
+| 8 | Faltaban 22 descripciones de servicio, labels, ayudas y errores del form, intro del FAQ, caption, aria, SEO y OG | Copy completo antes de construir | Agregados |
+| 9 | 13 em-dash dentro de strings | Tell de AI-slop | Cero; nombre y cuerpo separados en IDs distintos |
+| 10 | "El BTL son las acciones" | Concordancia | "El BTL agrupa las acciones" |
+| 11 | El helper decía "Seis preguntas" con ocho campos | Exactitud | "Seis datos obligatorios. Los dos opcionales…" |
+| 12 | Jerga: "denominador", "evidencia verificable" | Especificidad sobre abstracción | "sobre cuántas salas se calculó", "foto de cada hallazgo" |
+| 13 | Opciones de "qué necesitas resolver" sin estructura paralela | Consistencia | Todas empiezan con verbo |
+| 14 | Cobertura con unidad sólo en la primera opción | Consistencia | Unidad en el helper, opciones numéricas |
+| 15 | "Respuesta con contexto" y success card "con contexto" eran vagos | Beneficio concreto | "Te responde una persona del equipo"; success card con beneficio explícito |
+| 16 | Grupo "Intervenir" | Verbo único | "Corregir" |
+| 17 | H1, title y OG casi iguales | Cada superficie hace un trabajo | Title resuelve intent; OG gana la lectura compartida |
+| 18 | **Corrección del owner:** la primera versión de esta revisión convirtió "ejecución en sala" en regla y eliminó `tienda` y restringió `góndola`. En Chile ambas son de uso común | La señal de un proxy no es una regla; el owner conoce el mercado | Regla por cosa nombrada: tienda (local), góndola (mueble), sala (jerga), punto de venta (unidad) |
+
+**Se mantuvo a propósito:** "Ni un tablero más ni otro equipo de terreno" (titular por negación, aceptable porque
+nombra las dos alternativas que el lector ya conoce), "Un dato que no validamos no llega a tu reporte" y la sección
+"Lo que no te vamos a prometer": son la voz de honestidad incómoda y la única prueba disponible sin casos.
+
+**Pendiente:** entrevistas de VoC, revisión legal de las celdas y del dato laboral, y aprobación del H1 por el owner.
 
 ## State Copy
 
 | Estado | Copy visible | Recuperación |
 |---|---|---|
-| ready | Formulario montado con sus ocho campos y el submit. | — |
+| ready | Formulario montado con sus ocho campos, el consentimiento y el submit "Enviar mi brief". | — |
 | loading | Estado de carga del renderer: "Cargando el formulario…". Nunca un bloque vacío. | Si no monta en el tiempo del renderer, pasa a `partial`. |
 | empty | "Completa los campos marcados para continuar." + resumen de errores enfocable. | Foco al resumen; cada error enlaza a su campo. |
-| partial | "El formulario no pudo cargar. Puedes agendar una reunión y lo revisamos contigo." | CTA de reunión visible en el mismo bloque; enlace a `/contacto/`. |
+| partial | "El formulario no pudo cargar. Agenda una reunión y lo revisamos contigo." | CTA de reunión visible en el mismo bloque; enlace a `/contacto/`. |
 | error | "No pudimos enviar tu brief. Revisa los campos marcados o inténtalo de nuevo." | Conserva los valores escritos; reintento sin recargar. |
 | denied | "Usa tu correo de trabajo para enviar el brief." · Verificación fallida: "No pudimos verificar el envío. Inténtalo de nuevo o agenda una reunión." | Foco al campo de correo; reunión como alternativa. |
-| success | Success card gobernada: "Recibimos tu brief. Lo revisamos con contexto antes de contactarte." | Sin promesa de plazo; CTA de reunión opcional. |
+| success | Success card gobernada: "Recibimos tu brief. Lo revisamos antes de contactarte, para no preguntarte lo que ya nos contaste." | Sin promesa de plazo; CTA de reunión opcional. |
 | meeting unavailable | Recuperación nativa del scheduler: navegación de mes y "Reintentar". | Sin enlaces ni copy del proveedor. |
 | no-js | Todo el contenido visible; los CTAs de reunión enlazan a `/contacto/`. | El brief no monta; el contenido crítico no depende de él. |
 | reduced motion | Mismo contenido y mismos estados, sin reveals ni transiciones. | — |
@@ -506,6 +676,7 @@ Las respuestas 1 y 2 del FAQ reutilizan las cápsulas de R2 para que el schema m
 | Módulos semánticos | Widgets HTML page-scoped | El precedente de influencers perdió interactividad al compilar HTML; los semánticos conservan el contrato |
 | Verde sólo en la reunión | Verde en ambos CTAs | Una sola acción dominante por bloque |
 | Carrusel de marcas con rótulo de empresa | Omitirlo · rotularlo como clientes de trade | Confianza real sin sugerir casos de la línea |
+| Cada término para su cosa: tienda, góndola, sala y punto de venta; corregir como verbo único | Forzar un solo término para el local | Corrección del owner: en Chile tienda y góndola son de uso común; sala es jerga del trade |
 
 Riesgos abiertos: dirección visual sin aprobar; copy sin validación de voz de cliente; segunda fuente de demanda
 pendiente; soporte de iconos por opción en el renderer sin confirmar; targeting de GVC al host público.

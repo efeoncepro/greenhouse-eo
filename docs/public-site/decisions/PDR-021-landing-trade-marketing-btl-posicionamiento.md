@@ -34,7 +34,7 @@ El contrato SEO/AEO de esta página vive en el
 
 ### One thing
 
-> **Trade marketing que te dice qué arreglar primero, lo arregla y lo demuestra.**
+> **Trade marketing que te dice qué corregir primero, lo corrige y lo demuestra.**
 
 Toda la página sirve a esa idea. Lo que no la sirve, se corta.
 
@@ -89,7 +89,7 @@ Los 23 servicios **no** se presentan como un muro de tarjetas. Se agrupan como l
 |---|---|---|
 | Trade marketing | Entender | T1 Diagnóstico de Ejecución · T2 Auditoría de Inversión · T9 Estándar de Tienda Perfecta · T10 Arquitectura de Distribución |
 | Trade marketing | Medir cada ciclo | T3 Cobertura Auditada · T5 Orquestación de Terreno · T11 Integración de Datos de Canal |
-| Trade marketing | Intervenir | T4 Equipo de Terreno Gestionado · T8 Promociones · T12 Capacitación del Canal · T13 Gestión de Categoría |
+| Trade marketing | Corregir | T4 Equipo de Terreno Gestionado · T8 Promociones · T12 Capacitación del Canal · T13 Gestión de Categoría |
 | Trade marketing | Conectar con lo digital | T6 Anaquel Digital y Visibilidad en IA · T7 Retail Media y Commerce |
 | BTL | En la tienda | B1 Activaciones en Sala · B2 Promotoría e Impulso · B3 Visual Merchandising |
 | BTL | Fuera de la tienda | B4 Roadshow · B5 Street Marketing y Sampling · B6 Pop-up |
@@ -132,6 +132,13 @@ diagnóstico de alcance cerrado → ciclo recurrente → expansión
 - Toda ilustración o ejemplo lleva rótulo visible de referencial. Si se usan activos generados con IA, se declara.
 - El único dato fechado de la página —la jornada de 42 horas desde el 26-04-2026, 40 en 2028, sin reducción de
   sueldo— se publica con su fuente y fecha, y se revisa antes de cada cambio de copy.
+
+## Vocabulario
+
+Cada término nombra una cosa distinta: **tienda** para el local —el término que entiende todo el comité—,
+**góndola** para el mueble donde está el producto, **sala** sólo donde calza la jerga del trade y **punto de venta**
+como unidad de medida. **Corregir** es el verbo único de la intervención. En Chile tienda y góndola son de uso común;
+no se fuerza un término único. Detalle en la regla terminológica del wireframe de `TASK-1860`.
 
 ## Lo que la página no dice
 

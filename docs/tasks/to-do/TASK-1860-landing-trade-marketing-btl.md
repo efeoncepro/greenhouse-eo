@@ -37,7 +37,7 @@
 Construir y publicar la landing pública de la línea **Channel & Commerce** en `efeoncepro.com`, bajo la working
 route `/servicios/trade-marketing/`. La página convierte demanda de trade marketing y BTL en briefs y reuniones
 calificadas, posicionando a Efeonce **en el medio** entre las plataformas que detectan y las agencias que
-ejecutan: trade marketing que te dice qué arreglar primero, lo arregla y lo demuestra, conectado con la inversión
+ejecutan: trade marketing que te dice qué corregir primero, lo corrige y lo demuestra, conectado con la inversión
 digital de la marca. Reusa Growth Forms, Growth CTA y Meetings; no hay backend nuevo.
 
 ## Why This Task Exists
@@ -233,7 +233,7 @@ Reglas obligatorias:
 - Error: envío fallido con mensaje honesto y valores conservados.
 - Degraded / partial: renderer no monta; reunión en el mismo bloque y enlace a `/contacto/`.
 - Permission denied: correo no corporativo o verificación de abuso fallida, con alternativa de reunión.
-- Long content: 23 servicios y 8 preguntas en HTML inicial; retículas que colapsan sin truncar.
+- Long content: 23 servicios y 9 preguntas en HTML inicial; retículas que colapsan sin truncar.
 - Mobile / compact: una columna; tabla de posición en modo card; conversión y FAQ estáticos.
 - Keyboard / focus: puntos de lectura, FAQ, CTAs y campos operables; foco doble visible; dock oculto `inert`.
 - Reduced motion: contenido y estados completos sin reveals, pulsos ni scroll suave.
@@ -410,7 +410,7 @@ el [wireframe](../../ui/wireframes/TASK-1860-landing-trade-marketing-btl.md) y n
 | R9 | Conexión digital | `greenhouse_channel_digital` |
 | R10 | Un solo responsable + lo que no se promete | `greenhouse_channel_operating` |
 | R11 | Qué recibes + marcas que confían en Efeonce | `greenhouse_channel_proof` + `greenhouse_social_trust` |
-| R12 | FAQ (8) | `greenhouse_channel_faq` |
+| R12 | FAQ (9) | `greenhouse_channel_faq` |
 | R13 | Conversión: brief + reunión + divulgación + dock | `greenhouse_channel_conversion` |
 
 ### Contrato del formulario
@@ -575,6 +575,8 @@ CTA, que el motor ya soporta.
 - [ ] La página está en `index, follow` con canonical, sitemap, enlace desde el hub e ítem de menú.
 - [ ] La triple documentación, la fila en `PRIMITIVES.md` y la landing reference en ambas skills existen.
 - [ ] No se creó ningún lead ni ninguna reserva ficticia durante QA.
+- [ ] El copy publicado respeta la regla terminológica del wireframe: tienda, góndola, sala y punto de venta nombran cada uno su cosa, y corregir es el verbo único.
+- [ ] Las celdas de la tabla de posición y el dato laboral fechado pasaron revisión legal.
 
 ## Verification
 
@@ -611,10 +613,21 @@ CTA, que el motor ya soporta.
 - Primer caso publicable de la línea, con autorización y evidencia.
 - Registro periódico de prompts AEO y exactitud de la descripción de Efeonce en motores de respuesta.
 
+## Delta 2026-09-10
+
+- Revisión de copy con `copywriting` y `greenhouse-ux-writing`: 17 hallazgos aplicados al copy ledger del
+  wireframe, entre ellos vocabulario del operador chileno (terreno, reporte mensual, ejecución) tomado de avisos
+  de empleo como proxy de VoC, claims de mercado sin prueba reescritos, celdas de la tabla de posición agregadas para
+  revisión legal, copy faltante del formulario y de los 22 servicios, cero em-dash en strings y una FAQ nueva.
+  Detalle en la sección `Copy Review 2026-09-10` del wireframe. Sigue siendo hipótesis hasta el Slice 2.
+- Corrección del owner sobre esa revisión: en Chile `tienda` y `góndola` son de uso común; la regla quedó por cosa
+  nombrada —tienda el local, góndola el mueble, sala la jerga del trade, punto de venta la unidad— y no por término
+  único.
+
 ## Open Questions
 
 - ¿El owner aprueba la dirección A o prefiere producir un export en Claude Design y pasar a `source-led`?
-- ¿El H1 va con la hipótesis principal o con su alternativa?
+- ¿Apruebas el H1 recomendado, "Trade marketing que te dice qué corregir primero. Y lo corrige."? La alternativa pasó a ser el título de la sección de problema.
 - ¿Existe una página pública de vacantes para el desvío de empleo?
 - ¿El renderer admite iconos por opción como metadata o se limitan a los labels?
 - ¿Cómo apunta GVC al host público, dado que su resolver de entornos sólo conoce Greenhouse?

@@ -76,7 +76,7 @@ encontrable para quien busca promotoría con resultado medido.
 | Secundario comercial | `agencia de trade marketing`, `trade marketing chile`, `empresas de trade marketing` | Title, meta, H2 de servicios, FAQ |
 | Secundario BTL | `btl`, `agencia btl`, `activaciones de marca`, `marketing btl` | H2 BTL, cápsula trade vs BTL, FAQ |
 | Sub-intención | `agencia de promotoras`, `mystery shopper`, `material pop`, `visual merchandising`, `pop up store`, `roadshow` | Nombre y descripción de cada servicio en su grupo |
-| Vocabulario del comprador | `perfect store`, `sell-out`, `sell-in`, `quiebre de stock`, `planograma`, `retail media`, `canal tradicional` | Problema, ciclo, firma y FAQ |
+| Vocabulario del comprador | `góndola`, `ejecución en sala`, `perfect store`, `sell-out`, `sell-in`, `quiebre de stock`, `planograma`, `retail media`, `canal tradicional` | Problema, ciclo, firma y FAQ |
 | Excluido | `merchandising`, `promotoras`, `sampling` en bruto; `agencia de eventos` | No se persiguen: intención ajena |
 
 ### Clasificación de intención
@@ -125,14 +125,14 @@ Las cápsulas son contenido visible y no una promesa de rich result.
 |---|---|
 | URL | `/servicios/trade-marketing/`, hija de `/servicios/` (página `251077`) — **hipótesis hasta Slice 1** |
 | Title | Hipótesis: `Agencia de trade marketing y BTL en Chile \| Efeonce` — ≤60 caracteres, término cabeza al inicio |
-| Meta description | Hipótesis: `Trade marketing y BTL con evidencia tienda por tienda: priorizamos qué arreglar, lo ejecutamos y lo cruzamos con tu inversión digital.` — ≤160 caracteres, verificar conteo |
+| Meta description | Hipótesis: `Trade marketing y BTL con evidencia tienda por tienda: te decimos qué corregir primero, lo corregimos y lo cruzamos con tu inversión digital.` — 141 caracteres |
 | H1 | Contiene `trade marketing`; uno solo por página |
 | HTML inicial | Propuesta, definición, problema, posición, ciclo, servicios, FAQ y CTAs en el HTML servido; nada crítico sólo tras JS |
 | Canonical | Autorreferente sólo después de validar el slug |
 | Robots | `noindex` durante el candidato; `index, follow` sólo al pasar QA |
 | Sitemap | Incluida con `lastmod` honesto tras la promoción |
 | Schema | Yoast conserva `WebPage`, `BreadcrumbList`, `WebSite` y `Organization`. La página añade sólo `Service` —provider por `@id`, `areaServed` Chile, catálogo con los grupos visibles— y `FAQPage` con respuestas visibles. Nunca duplicar entidades de Yoast |
-| Open Graph / Twitter | Title, description e imagen social dedicada 1200×630 |
+| Open Graph / Twitter | Title hipótesis `Trade marketing que te dice qué corregir primero` (gana la lectura compartida; no repite el SEO title); description `Tienda por tienda, con foto de cada hallazgo y cruzado con lo que inviertes en la red de medios de cada cadena.`; imagen social dedicada 1200×630 |
 | Imágenes | ALT descriptivo, dimensiones explícitas, formato moderno, sin contenido crítico sólo en imagen |
 | Performance | LCP móvil del hero sin video; ilustración optimizada; CLS 0 en carga del form |
 
