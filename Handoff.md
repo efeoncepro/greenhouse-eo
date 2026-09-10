@@ -9,6 +9,8 @@ Registry: diez relaciones nuevas `No iniciado`. Pendientes con dueño: retiro de
 piso), costo del lead, overhead y piso (Finance) · posición sobre datos first-party bajo la Ley 21.719, vigente el
 2026-12-01 (Legal) · verificar Google Partners y elegir partner programático, MiQ o TenX (Commercial) · G1: dos
 Diagnostics pagados en 90 días, uno por motion · TASK ui-ux de la landing, sin crear. Sin runtime ni push.
+Canales emergentes: ChatGPT Ads `selectivo` donde existe (LATAM: sólo BR/MX; Chile no), X Ads bajo pedido, Perplexity
+`no disponible`.
 
 **Product Design 360 (2026-09-10, modelado y canonizado; oferta `Proposed`, no autoriza venta):** business model
 V1.1 + ficha `docs/services/wave/product-design-360.md` + ADR `EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md`: capability de

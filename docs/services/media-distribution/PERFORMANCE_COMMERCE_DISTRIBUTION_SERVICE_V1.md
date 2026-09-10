@@ -112,7 +112,11 @@ y su fuente vive en la [investigación de mercado 2026-09-10](../../audits/comme
 | Retail media (redes de cadenas, marketplaces) | `core` cuando hay commerce | `no ofrecido` | cuenta del cliente en cada red | requiere acceso a venta y catálogo. En Chile: Mercado Ads, Walmart Connect, Cencosud Media, Fmedia, Sodimac Media, Ripley Media |
 | Amazon Ads | `selectivo` sólo en México | `no ofrecido` | cuenta del cliente | Amazon no opera su programa de partners en Chile |
 | Audio digital | `vía partner` | `no ofrecido` | trading desk | selectivo |
-| Pinterest, Snap, X, Reddit | `no ofrecido` por defecto | `no ofrecido` | — | se evalúa caso a caso |
+| **ChatGPT Ads** | `selectivo` donde existe | `selectivo` donde existe | Ads Manager del cliente | self-service en 52 países; en LATAM sólo Brasil y México. **En Chile no hay anuncios ni self-service** a 2026-09-10 |
+| Anuncios en AI Overviews / AI Mode de Google | vía Search/PMax/AI Max | vía Search/AI Max | cuenta Google del cliente | no se compra aparte; hoy sólo en inglés y en 12 países, Chile no incluido |
+| **X Ads** | `selectivo` bajo pedido | `selectivo` bajo pedido | cuenta del cliente | sólo con revisión de brand safety y verificación de terceros |
+| Pinterest, Snap, Reddit | `no ofrecido` por defecto | `no ofrecido` | — | se evalúa caso a caso |
+| Perplexity | `no disponible` | `no disponible` | — | abandonó la publicidad en febrero de 2026 |
 
 Estados: `core` = lo operamos con equipo propio; `selectivo` = lo operamos cuando se cumplen condiciones; `vía partner`
 = un partner opera el seat y Efeonce planifica, gobierna y audita; `no ofrecido` = no entra en propuesta sin decisión
@@ -142,6 +146,45 @@ el pricing pack durante dos trimestres, con owner de trading asignado.
 **Candidatos a partner (2026-09-10):** MiQ, que compró el negocio LATAM de Adsmovil y opera en Chile, y TenX, partner
 de DV360. Ninguno está evaluado; fees y mínimos se piden por escrito. El DSP de Microsoft (ex Xandr) dejó de operar
 compra en febrero de 2026 y queda fuera. Estado vigente en el [Partnership Registry](../../operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md).
+
+## Anuncios en respuestas de IA
+
+ChatGPT Ads es el primer canal masivo de anuncios dentro de un asistente de IA. Lo operamos donde existe y lo
+preparamos donde todavía no llega.
+
+**Cómo funciona (fuente: centro de ayuda de OpenAI, leído 2026-09-10):**
+
+- el anuncio aparece **debajo** de la respuesta, rotulado como patrocinado; no cambia lo que ChatGPT responde;
+- sólo lo ven usuarios de los planes Free y Go, nunca menores de 18, nunca junto a temas de salud, salud mental ni
+  política; no hay publicidad política;
+- se muestra según el contexto e intención de la conversación, el landing, el copy y las señales que da el anunciante;
+- el anunciante recibe sólo vistas y clics agregados: **la conversión se mide del lado del sitio** (UTMs, GA4, CRM);
+- para usar el self-service, la entidad legal que anuncia y paga debe estar en un país habilitado. Los anunciantes
+  grandes también pueden entrar por el equipo de OpenAI Ads o por agencias partner.
+
+**Qué hacemos:**
+
+| Situación del cliente | Qué ofrecemos |
+|---|---|
+| Entidad y audiencia en México, Brasil, EE.UU., España u otro país habilitado | campañas en ChatGPT Ads como canal `selectivo`, medidas en el sitio |
+| Sólo Chile u otro país no habilitado | preparación: intents y prompts donde la marca debería aparecer, landings listas y medición; se activa cuando llegue |
+| Marca que ya trabaja AEO | composición con Search Visibility 360: la misma inteligencia de prompts sirve para la visibilidad orgánica y para la pagada |
+
+**Regla:** un anuncio en ChatGPT **no es** visibilidad orgánica ni AEO. Nunca se vende como "aparecer en la respuesta de
+ChatGPT": aparece debajo, rotulado. La visibilidad orgánica en respuestas es de Search Visibility 360.
+
+Los anuncios de Google en AI Overviews y AI Mode llegan por las campañas de Search, Shopping, PMax y AI Max existentes;
+no se compran aparte. Perplexity abandonó la publicidad en febrero de 2026.
+
+## X Ads — sólo bajo pedido
+
+X reconstruyó su Ads Manager desde abril de 2026 y ofrece reportes de brand safety de terceros (DoubleVerify, IAS) y
+controles de adyacencia. No entra en propuestas por defecto. Se activa cuando el cliente lo pide o cuando su audiencia
+vive ahí —noticias, deportes, tecnología, finanzas, eventos en tiempo real—, y siempre con:
+
+1. revisión de brand safety aprobada por el cliente;
+2. verificación de terceros activa y listas de exclusión de palabras;
+3. lectura separada del resto del mix, sin mezclar sus resultados con los de otras plataformas.
 
 ---
 

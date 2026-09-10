@@ -126,6 +126,15 @@ escala: 12% hasta USD 30 mil · 9% sobre el tramo 30–100 mil · 6% sobre el ex
 - **Gate de seat propio:** inversión programática gestionada ≥ USD 50 mil/mes sostenida dos trimestres, trader asignado
   y economics comparados contra el partner.
 
+### 7.1 Canales emergentes y bajo pedido
+
+- **ChatGPT Ads** entra primero como experimento: presupuesto de prueba del cliente, lectura a 4–6 semanas y medición
+  del lado del sitio, porque la plataforma sólo entrega vistas y clics agregados. Si reemplaza un canal del nivel, no
+  cambia el fee; si se suma, cuenta como un canal más para el nivel.
+- **Preparación para ChatGPT Ads** en mercados donde aún no existe (Chile): se cotiza dentro del Diagnostic o como
+  composición con Search Visibility 360, no como fee mensual de un canal inexistente.
+- **X Ads** cuenta como un canal más para el nivel; la verificación de brand safety de terceros es pass-through.
+
 ## 8. Descuentos y aprobaciones
 
 | Situación | Regla |

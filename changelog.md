@@ -29,6 +29,11 @@ búsquedas al mes en Chile con KD 11–13, dato que PDR-008 no había medido. Si
 precios públicos, badges, venta general ni implementación de la landing. Las skills `efeonce-pricing-operator` y
 `efeonce-business-model-operator` (Codex y Claude) y el router de contexto de agentes enrutan ahora a estos documentos.
 
+Canales emergentes (misma fecha): ChatGPT Ads entra como canal `selectivo` donde OpenAI lo habilita —self-service en
+52 países; en LATAM sólo Brasil y México, Chile no—, medido del lado del sitio porque la plataforma sólo entrega vistas y
+clics agregados; en Chile se ofrece preparación en composición con AEO. Nunca se vende como visibilidad orgánica. X Ads
+queda `selectivo` bajo pedido con brand safety de terceros; Perplexity queda `no disponible` (abandonó la publicidad).
+
 ## 2026-09-10 — Channel & Commerce: se abre la línea de trade marketing y BTL
 
 Efeonce no tenía oferta de trade marketing ni BTL; el dominio existía disperso (retail media en Media &

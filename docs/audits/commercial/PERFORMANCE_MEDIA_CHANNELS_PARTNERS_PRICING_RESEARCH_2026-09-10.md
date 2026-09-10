@@ -70,6 +70,20 @@ marca. `[V]` Semrush `domain_organic`.
 Afecta directamente el envío de datos first-party a plataformas (Customer Match, Conversions API, conversiones offline).
 La interpretación para cada cliente es de Legal.
 
+### Canales emergentes y bajo pedido
+
+| Canal | Estado a 2026-09-10 | Fuente |
+|---|---|---|
+| **ChatGPT Ads** | test en EE.UU. desde 2026-02-09; Ads Manager self-service en **52 países**; en LATAM sólo **Brasil y México**; Chile, Colombia, Perú y Argentina no listados. La entidad legal que anuncia y paga debe estar en un país habilitado; anunciantes grandes pueden entrar por el equipo de OpenAI Ads o agencias partner | `[V-prov]` [Ads Manager Availability](https://help.openai.com/en/articles/20001245-ads-manager-availability) (actualizado ~2026-09-06, leído 2026-09-10) |
+| ChatGPT Ads — funcionamiento | anuncio debajo de la respuesta, rotulado; planes Free y Go; sin menores de 18; sin anuncios junto a salud, salud mental o política; sin publicidad política; selección por contexto e intención de la conversación; el anunciante recibe sólo vistas y clics agregados | `[V-prov]` [Ads in ChatGPT](https://help.openai.com/en/articles/20001047-ads-in-chatgpt) |
+| ChatGPT Ads — escala | USD 1.000 M de run rate anualizado en menos de 200 días; self-service en 31 mercados europeos desde 2026-08-31 | `[V-sec]` [Digiday](https://digiday.com/media-buying/openais-chatgpt-ads-business-hits-1-billion-run-rate-as-europe-gets-self-serve-access/) (cifra de OpenAI) |
+| Anuncios en AI Overviews (Google) | sólo en inglés; Australia, Canadá, India, Indonesia, Kenia, Malasia, Nueva Zelanda, Nigeria, Pakistán, Filipinas, Singapur y EE.UU.; elegibles Search, Shopping y PMax | `[V-prov]` [Google Ads help](https://support.google.com/google-ads/answer/16297775) |
+| Perplexity | dejó de aceptar anunciantes en 2025-10 y abandonó la publicidad en 2026-02 | `[V-sec]` [Search Engine Land](https://searchengineland.com/perplexity-stops-testing-advertising-469452) |
+| X Ads | Ads Manager reconstruido desde 2026-04; reportes de brand safety de DoubleVerify e IAS; controles de adyacencia. Especificidades de LATAM no encontradas | `[V-sec]` [DesignRush](https://news.designrush.com/x-ai-ads-manager-rebuild-advertiser-comeback), [WinBuzzer](https://winbuzzer.com/2026/05/02/x-has-launched-rebuilt-ai-powered-ad-platform-rollout-xcxwbn/) |
+
+`[INF]` ChatGPT Ads es relevante hoy para clientes con entidad y audiencia en México o Brasil; para Chile, el valor es
+preparar intents, landings y medición, en composición con AEO.
+
 ## 3. Programas de partners
 
 | Programa | Requisitos verificados | Fuente |

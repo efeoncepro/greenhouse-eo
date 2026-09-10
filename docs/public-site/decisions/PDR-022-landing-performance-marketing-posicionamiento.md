@@ -96,9 +96,12 @@ El copy no da asesoría legal: dice que el Diagnostic inventaría los flujos de 
 - **Title:** "Agencia de performance marketing en Chile | Efeonce" (ajustar largo en ejecución).
 - **H1:** "Agencia de performance marketing" + reencuadre *no es X, es Y*.
 - **Meta description y H2 secundario:** "paid media", "Google Ads y Meta Ads".
-- **H2 por canal:** Google Ads, Meta Ads, LinkedIn Ads para B2B, TikTok Ads, programmatic y retail media.
+- **H2 por canal:** Google Ads, Meta Ads, LinkedIn Ads para B2B, TikTok Ads, programmatic, retail media y anuncios en
+  ChatGPT. Este último dice con honestidad dónde existe (México, Brasil y otros 50 países) y que en Chile todavía no;
+  es la sección con más potencial de citación en respuestas de IA porque casi nadie la tiene en español.
 - **FAQ:** qué hace una agencia de performance marketing · cuánto cuesta y cómo se cobra (modelo, sin tarifa) · si hacen
-  auditoría de Google Ads · si trabajan LinkedIn Ads para B2B · cómo compran programmatic · qué cambia con la Ley 21.719
+  auditoría de Google Ads · si trabajan LinkedIn Ads para B2B · cómo compran programmatic · si hacen anuncios en ChatGPT
+  y en qué países existen · si hacen anuncios en X · qué cambia con la Ley 21.719
   para la publicidad digital (respuesta orientativa, no legal).
 - **Schema:** `Service` con `provider` Efeonce, `FAQPage`, enlace a la entidad `Organization`.
 - **Enlaces internos:** Home, landing HubSpot, Influencer Marketing (amplificación), Redes Sociales, SEO/AEO.

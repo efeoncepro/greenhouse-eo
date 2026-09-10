@@ -127,6 +127,9 @@ Al 2026-09-10 la solución tenía cinco huecos:
 - **NUNCA** incluir producción creativa dentro del fee de performance. Performance diseña el test y lee el aprendizaje;
   Creative Services produce.
 - **NUNCA** publicar un badge o claim de partner no verificado en el portal del programa.
+- **NUNCA** vender un anuncio en ChatGPT u otro asistente de IA como visibilidad orgánica o AEO, ni prometer "aparecer en
+  la respuesta": el anuncio aparece debajo, rotulado como patrocinado. Los canales emergentes entran como `selectivo`
+  sólo donde la plataforma los habilita para la entidad y la audiencia del cliente.
 - **SIEMPRE** comprar programmatic y CTV con cláusula de transparencia firmada por el partner.
 - **SIEMPRE** separar en la cotización: fee Efeonce, inversión en medios, fees de partner/tecnología, producción,
   derechos e impuestos.
@@ -140,7 +143,7 @@ Al 2026-09-10 la solución tenía cinco huecos:
 | **Creative Services / Globe** | produce piezas, variantes, UGC y Run-and-Gun | diseñar el test ni leer el aprendizaje de medios |
 | **Creator Influence & Content** | derechos, whitelisting y gobierno del creador | la compra de medios del anuncio amplificado, que opera Performance |
 | **Channel & Commerce** | ejecución en tienda, trade y BTL; lee retail media junto a la góndola | operar la inversión en redes de retail media |
-| **Search Visibility 360** | orgánico y AEO; comparte inteligencia de keywords | pauta en buscadores |
+| **Search Visibility 360** | orgánico y AEO; comparte inteligencia de keywords y de prompts | pauta en buscadores ni anuncios en respuestas de IA |
 | **Growth Strategy & Measurement** | MMM y medición cross-línea cuando el engagement lo compra | operación de medios |
 
 ### Lo que esta decisión NO hace
