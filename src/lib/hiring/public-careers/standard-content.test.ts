@@ -8,16 +8,22 @@ import {
 
 describe('contenido estándar público de Careers', () => {
   it('mantiene un contexto corporativo factual y un baseline de beneficios sin aporte de equipo', () => {
-    // Formulación base de PDR-012 (Accepted): las cinco capabilities y el mecanismo van completos.
-    // `medios` y `software propio` estuvieron ausentes en la v1 del bloque; el test existe para eso.
-    expect(EFEONCE_CAREERS_COMPANY_CONTEXT).toContain('plataforma de servicios de marketing y crecimiento')
+    // PDR-008 capa 1: la categoría familiar y buscable, la misma con la que lidera el sitio vivo.
+    expect(EFEONCE_CAREERS_COMPANY_CONTEXT).toContain('agencia de marketing digital')
+    // PDR-008 §Reglas duras: «agencia» NUNCA queda como promesa suelta; el reencuadre va al lado.
+    expect(EFEONCE_CAREERS_COMPANY_CONTEXT).toContain('no como un menú de servicios')
+    // Mecanismo, no adjetivo: `medios` es capability propia y la prueba es `software propio`
+    // —nunca «tecnología» a secas, que es el claim sin mecanismo de la disciplina anti-humo (`09`).
     expect(EFEONCE_CAREERS_COMPANY_CONTEXT).toContain('medios')
     expect(EFEONCE_CAREERS_COMPANY_CONTEXT).toContain('software propio')
-    expect(EFEONCE_CAREERS_COMPANY_CONTEXT).toContain('trabajando como una sola operación')
     // Why canónico (SSOT `docs/context/09_marca-agencia.md` §WHY), no una paráfrasis.
     expect(EFEONCE_CAREERS_COMPANY_CONTEXT).toContain('más capaz de sostenerlo')
-    // Disciplina anti-humo: `tecnología` suelta reemplazando a `software propio` es el drift a evitar.
-    expect(EFEONCE_CAREERS_COMPANY_CONTEXT).not.toContain('creatividad, tecnología')
+
+    // PDR-008 §Reglas duras: nada de siglas ni metodologías propias en los primeros 30 segundos.
+    for (const jerga of ['ICO', 'RpA', 'FTR', 'Loop Marketing', 'ASaaS', 'Growth Operating System']) {
+      expect(EFEONCE_CAREERS_COMPANY_CONTEXT).not.toContain(jerga)
+    }
+
     expect(EFEONCE_CAREERS_STANDARD_BENEFITS).toHaveLength(6)
     expect(EFEONCE_CAREERS_STANDARD_BENEFITS.join(' ')).toContain('US$50')
     expect(EFEONCE_CAREERS_STANDARD_BENEFITS.join(' ')).not.toContain('US$400')

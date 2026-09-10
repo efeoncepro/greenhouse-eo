@@ -10,19 +10,31 @@ export const EFEONCE_CAREERS_STANDARD_CONTENT_VERSION = 2 as const
 /**
  * Contexto de compañía publicado en el bloque «Efeonce en breve» de toda vacante.
  *
- * La formulación base es LITERAL de `docs/public-site/decisions/PDR-012-growth-operating-system-
- * global-positioning.md` (Accepted 2026-07-09), y la creencia viene del SSOT del Golden Circle
- * (`docs/context/09_marca-agencia.md` §WHY). Ninguna de las dos se parafrasea aquí: el careers
- * es una superficie pública más, y una versión propia del posicionamiento es drift de marca.
+ * Sigue el patrón de DOS CAPAS de `docs/public-site/decisions/PDR-008-landing-agencia-marketing-
+ * digital-posicionamiento.md` (Accepted), que es el que gobierna cómo se nombra la CATEGORÍA:
  *
- * La v1 decía «estrategia, creatividad, tecnología, datos y operación»: se comía **medios** —una
- * capability completa— y degradaba **software propio** —la prueba diferenciadora, Greenhouse/
- * Kortex/Verk— a «tecnología», que es exactamente el claim sin mecanismo que la disciplina
- * anti-humo de §09 prohíbe. También omitía el Why, que es lo único de este bloque que le habla
- * a un candidato.
+ *   1. Categoría familiar y buscable — «agencia de marketing digital y tecnología». Es con lo que
+ *      lidera el sitio público vivo (`<title>` y H1 de efeoncepro.com), y es la palabra con la que
+ *      un candidato busca trabajo. Negarla en careers deja a Efeonce sin categoría para su lector.
+ *   2. Reencuadre obligatorio en la MISMA sección (PDR-008 §Reglas duras): nunca «somos una agencia»
+ *      como promesa suelta. El sitio vivo lo resuelve con «solo que operamos como un sistema, no
+ *      como un menú de servicios»; este bloque usa esa misma bisagra.
+ *
+ * El posicionamiento estratégico de PDR-012 («plataforma de servicios de marketing y crecimiento
+ * habilitada por IA» / Integrated Growth Partner / ASaaS / Growth OS) NO se aplica literal aquí:
+ * ese PDR declara su superficie —Home, About Us, sitio público, Think, landings de categoría y
+ * narrativa comercial— y careers no está en ella. Su aporte a este bloque es el MECANISMO, no la
+ * etiqueta: medios como capability propia y software propio como prueba (no «tecnología» a secas,
+ * que es el claim sin mecanismo que prohíbe la disciplina anti-humo de `docs/context/09`).
+ *
+ * La creencia es literal del SSOT del Golden Circle (`docs/context/09_marca-agencia.md` §WHY).
+ *
+ * NUNCA liderar este bloque con siglas ni metodologías propias (ICO, RpA, FTR, Loop Marketing):
+ * PDR-008 §Reglas duras las reserva para el bloque de prueba, no para los primeros 30 segundos —
+ * y «Efeonce en breve» son los primeros 30 segundos de la vacante.
  */
 export const EFEONCE_CAREERS_COMPANY_CONTEXT =
-  'Efeonce es una plataforma de servicios de marketing y crecimiento habilitada por IA: estrategia, creatividad, medios, datos y software propio trabajando como una sola operación. No entregamos crecimiento: lo construimos con cada cliente y lo dejamos más capaz de sostenerlo. Eso se sostiene en método (Loop Marketing), medición que el cliente ve en vivo (ICO) y plataformas propias donde cada aprendizaje queda como memoria reutilizable.'
+  'Efeonce es una agencia de marketing digital y tecnología —solo que operamos como un sistema, no como un menú de servicios. Creatividad, medios, web, CRM y data trabajan como un solo motor, sobre software propio donde el trabajo se ve en vivo. No entregamos crecimiento: lo construimos con cada cliente y lo dejamos más capaz de sostenerlo.'
 
 /**
  * Calificador OBLIGATORIO del bloque de beneficios (Efeonce Candidate Benefits Charter,
