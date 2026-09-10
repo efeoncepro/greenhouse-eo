@@ -140,3 +140,6 @@ public/growth-cta/BUILDINFO.json
 
 # TASK-1784 — corridas del eval de selección MCP (artefacto de medición, no fuente)
 /.evals/
+
+# Bank statements and loan contracts are sensitive source files (TASK finance recon 2026-09): never versioned
+data/bank/
