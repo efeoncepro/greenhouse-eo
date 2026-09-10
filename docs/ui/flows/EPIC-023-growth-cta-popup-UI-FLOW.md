@@ -49,3 +49,4 @@
 | Renderer portable + hosts + gobernanza Growth | TASK-1340 | esta task |
 | Placement interruptivo (popup/slide-in) | task siguiente | to-do |
 | Admin cockpit autoría/reportes | task futura | to-do |
+| Host WordPress público — landing Trade Marketing & BTL (consumidor de `open_meeting_scheduler` + `<greenhouse-form>`) | TASK-1860 | to-do |

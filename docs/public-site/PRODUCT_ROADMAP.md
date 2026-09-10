@@ -56,6 +56,12 @@ capability dentro del sistema, no presentarse como agencia suelta.
  Reusa el `<greenhouse-form>` + grader (Full API Parity por reuso). UI ready no.
  Ver `docs/tasks/to-do/TASK-1343-servicios-posicionamiento-seo-landing.md`.
 
+- **PDR-021 — Landing "Trade Marketing & BTL"** (Draft for validation) + **TASK-1860** (to-do, ui-ux/flow,
+ UI ready no): spoke de la línea Channel & Commerce en `/servicios/trade-marketing/` (working route). Ataca el
+ término cabeza `trade marketing` (~880/mes CL) con una cápsula de definición y la convierte en intención comercial;
+ posiciona a Efeonce en el medio entre plataformas de ejecución y agencias de terreno. Reusa Growth Forms, Growth
+ CTA y scheduler nativo. Ver [PDR-021](decisions/PDR-021-landing-trade-marketing-btl-posicionamiento.md).
+
 - **PDR-004 — Landing "Agencia Creativa"** (posicionamiento decidido) + **TASK-1350**
  (to-do, ui-ux/flow, UI ready no): posiciona la **capability creativa** (Globe) como
  partner de producción que **escala** el output de equipos de marketing in-house
