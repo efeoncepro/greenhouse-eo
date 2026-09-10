@@ -4,11 +4,11 @@
 
 - Status: `draft` (v2 2026-09-10: cinco bloques cliente; v1 replicaba el módulo interno)
 - Owner task: `TASK-1857`
-- Product Design asset: `src/views/greenhouse/GreenhouseCapabilityModule.tsx` + `src/config/capability-registry.ts` (`creative-hub`), superficie viva en `/capabilities/creative-hub` para tenants con líneas legacy; no existe dirección Figma nueva y no se inventa una.
+- Product Design asset: `docs/ui/visual-directions/TASK-1857-sky-creative-hub-client-surface.md` (dirección C «hoja de trabajo creativa», 2026-09-10; incluye el component mapping por bloque). Fuente durable del benchmark: `src/config/capability-registry.ts` (`creative-hub`) + surface system canónico.
 - Visual direction mode: `repo-native-benchmark`
 - Intended consumers: personas cliente de organizaciones con `creative_hub_globe_v1` asignado (hoy Sky Airlines: tres usuarias activas); administración interna en modo soporte (bypass D1 del guard, sin impersonar).
 - Copy source: `src/lib/copy/client-portal.ts` (`GH_CLIENT_PORTAL_COMPOSITION.modulePublicLabels['creative-hub']`, `emptyState`, `degraded`, `error`) + `src/config/capability-registry.ts` (títulos/descr. de cards) + `src/lib/copy/` (`loading`, `empty`, `errors`).
-- Primitive decision: `reuse` — `CapabilityOverviewHero` + `ModuleLayout` (`src/components/capabilities/`) dentro del shell cliente existente; sin primitive nueva.
+- Primitive decision: `reuse` — `SurfaceRecipe analyticsReport plane='none'` + `WorkbenchHeader kind='report'` + `OperationalSection open/band` + `OperationalSignalList` + `SignalStrip integrated` + `MetricSummaryCard` + `GreenhouseActivityTimeline` + `CapabilityCard type='pipeline'`; builders de datos del módulo `creative-hub` sin cambios; sin primitive nueva (mapping completo en la dirección visual).
 - UI ready target: `no`
 
 ## Brief
@@ -82,11 +82,14 @@ móvil. `scrollWidth === clientWidth` a nivel página.
 
 | Source cue | Greenhouse token / primitive / recipe | Intent preserved | Literal value rejected |
 |---|---|---|---|
-| Hero con título de cuenta, resumen y highlights | `CapabilityOverviewHero` (theme `creative` del registry) | Momento dominante único al abrir el módulo | Gradientes/colores ad hoc por cuenta |
-| Grid de cards por `size` sm/md/lg/full | `ModuleLayout` + spacing `4n` del theme | Jerarquía por tamaño declarado en el registry | Anchos en px por card |
-| Tonos de KPI (`GreenhouseKpiTone`) en chips | `theme.palette.*` vía tone canónico | Semáforo semántico | HEX por estado |
-| Encabezados de sección | card `section-header` existente | Ritmo de lectura entre bloques | Cards contenedoras anidadas |
-| Icono del módulo `tabler-palette` | descriptor `VIEW_CODE_NAV_DESCRIPTOR['cliente.creative_hub']` | Continuidad menú → página | Ícono distinto en la página |
+| Página de lectura analítica del cliente | `SurfaceRecipe kind='analyticsReport' plane='none'` | Body como lienzo; secciones abiertas; ≤3 planos contenidos en el fold | Grilla de cards del módulo interno |
+| Chrome de página (cuenta, propósito, fuente/corte) | `WorkbenchHeader kind='report'` (`meta` = fuente/corte) | Un plano editorial contenido con radius `xl` y elevación `raised` del theme | Hero con cifra de revenue |
+| Lista de piezas que esperan respuesta | `OperationalSignalList` en `OperationalSection variant='open'` | Fila = pieza · ronda · comentarios · quién espera · Abrir | Tabla MUI ancha; card por fila |
+| Fases de producción | `CapabilityCard type='pipeline'` (renderer existente) | Conteo por fase con el dato actual | Rediseño del pipeline |
+| Entregas del período | `GreenhouseActivityTimeline` | Fecha, versión y enlace; miniatura sólo con `attachment` | Carrusel de imágenes |
+| Cifras de cadencia y calidad | `SignalStrip variant='integrated'` + `MetricSummaryCard` (`kpiValue`, `overline` para fuente/corte) | Señales integradas, bidireccionales, con corte | Cuatro KPI cards separadas; HEX por estado |
+| Tonos de estado | `statusTone`/`tone` de las primitives → `theme.palette.*` | Semáforo con etiqueta textual | Fondos de sección verdes/rojos |
+| Icono del módulo `tabler-palette` | descriptor `VIEW_CODE_NAV_DESCRIPTOR['cliente.creative_hub']` | Continuidad menú → header | Ícono distinto en la página |
 
 ## Layout Skeleton
 
@@ -142,9 +145,9 @@ móvil. `scrollWidth === clientWidth` a nivel página.
 ## Implementation Mapping
 
 - Route / surface: `src/app/(dashboard)/creative-hub/page.tsx` (+ `loading.tsx`, `error.tsx`), `dynamic = 'force-dynamic'`, patrón de `src/app/(dashboard)/equipo/page.tsx`.
-- Primitives: `CapabilityOverviewHero`, `ModuleLayout` vía `GreenhouseCapabilityModule` (`src/views/greenhouse/GreenhouseCapabilityModule.tsx`).
-- Variants / kinds: theme `creative` del registry; tipos de card ya soportados por `ModuleLayout`.
-- Component candidates: reutilizar la vista completa; sin componente nuevo en Slice 1.
+- Primitives: ver tabla «Component mapping (contrato por bloque)» en la dirección visual: `SurfaceRecipe`, `WorkbenchHeader`, `OperationalSection`, `OperationalSignalList`, `SignalStrip`, `MetricSummaryCard`, `GreenhouseActivityTimeline`, `CapabilityCard type='pipeline'`, `EmptyState`, `GreenhouseLoadingSurface`.
+- Variants / kinds: `analyticsReport`/`plane='none'`; header `report`; secciones `open` (B1–B3), `band` (B4), `quiet` (B5); `SignalStrip integrated`; `density='auto'` donde exista.
+- Component candidates: vista nueva `src/views/greenhouse/client-portal/CreativeHubClientView.tsx` [propuesta] que compone las primitives sobre el `CapabilityModuleData` filtrado; sin componente primitivo nuevo.
 - Copy source: `src/lib/copy/client-portal.ts`; títulos de cards desde `capability-registry.ts`.
 - Data reader / command: `getCapabilityModuleData({ moduleId: 'creative-hub', tenant, allowRegistryFallback: true })` ejecutado **después** de `requireViewCodeAccess('cliente.creative_hub')`. La autorización la da el módulo asignado (primitive único de visibilidad); la resolución por `businessLines/serviceModules` legacy NO puede ser la puerta porque Sky no las tiene.
 - API parity: superficie de lectura; el módulo ya se expone al cliente por `/api/capabilities/**` [verificar]. Sin command nuevo.

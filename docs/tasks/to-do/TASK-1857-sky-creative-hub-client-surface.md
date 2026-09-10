@@ -111,6 +111,8 @@ bundle de Sky; **NUNCA** filtrar `module_key` técnico al DOM; **NUNCA** importa
 ### Files owned
 
 - `src/app/(dashboard)/creative-hub/page.tsx`, `loading.tsx`, `error.tsx` (nuevos).
+- `src/views/greenhouse/client-portal/CreativeHubClientView.tsx` (vista consumer nueva) [propuesta].
+- `docs/ui/visual-directions/TASK-1857-sky-creative-hub-client-surface.md` (dirección visual + component mapping).
 - `src/lib/capabilities/get-capability-module-data.ts` sólo si hace falta un resolver por viewCode →
   módulo del registry sin líneas legacy (extensión, no reescritura).
 - `scripts/frontend/scenarios/task1857-creative-hub.scenario.ts` (nuevo).
@@ -219,6 +221,13 @@ bundle de Sky; **NUNCA** filtrar `module_key` técnico al DOM; **NUNCA** importa
 
 ## UI/UX Contract
 
+### Paquete de diseño — 2026-09-10
+
+- Dirección: [alternativas, tesis y component mapping por bloque](../../ui/visual-directions/TASK-1857-sky-creative-hub-client-surface.md) (C «hoja de trabajo creativa» seleccionada; A módulo interno y B tablero de pipeline descartadas).
+- [Wireframe v2](../../ui/wireframes/TASK-1857-sky-creative-hub-client-surface.md): cinco bloques, desktop/390, copy ledger es-CL, estados, accesibilidad, mapping y plan GVC.
+- Flow y motion: `none` (lectura sin sidecar/modal/transiciones; motion sólo el de las primitives).
+- Los contratos son diseño, no runtime: el DTO de revisión (rondas, comentarios abiertos) debe verificarse contra el snapshot real de Sky en Discovery. `UI ready: no` hasta primer fold, GVC premium y scorecard.
+
 ### Experience brief
 
 - UI rigor: `ui-standard`
@@ -232,9 +241,9 @@ bundle de Sky; **NUNCA** filtrar `module_key` técnico al DOM; **NUNCA** importa
 
 - Surface: `/creative-hub` (href del `view_registry`), página hoja del portal cliente.
 - Nav placement: `none` — el ítem ya existe en el sidebar dinámico cliente (`VIEW_CODE_NAV_DESCRIPTOR['cliente.creative_hub']`, grupo Módulos); no se agrega destino.
-- Composition Shell: `no aplica` en Slice 1 — se reutilizan `CapabilityOverviewHero` + `ModuleLayout` con seis cards filtradas y retituladas por bloque; migrar el módulo al shell es trabajo del carril `/capabilities/*` completo, no de esta ruta.
-- Primitive decision: `reuse` — `CapabilityOverviewHero` + `ModuleLayout`.
-- Adaptive density / The Seam: `no aplica` — las cards del módulo ya colapsan por `size`; no nacen cards nuevas.
+- Composition Shell: `aplica` — `SurfaceRecipe kind='analyticsReport' plane='none'` con `WorkbenchHeader kind='report'` en `header`; B1–B5 como `OperationalSection` abiertas/banda en `regions.primary` (D57-01).
+- Primitive decision: `reuse` — surface system + `OperationalSignalList`, `SignalStrip integrated`, `MetricSummaryCard`, `GreenhouseActivityTimeline`, `CapabilityCard type='pipeline'`; builders de datos del módulo sin cambios; sin primitive nueva (tabla en la dirección visual).
+- Adaptive density / The Seam: `aplica` — `density='auto'` en `OperationalSection`, `SignalStrip`, `MetricSummaryCard`; la señal principal de cada bloque sobrevive `condensed/peek`.
 - Floating/Sidecar/Dialog decision: ninguno.
 - Copy source: `src/lib/copy/client-portal.ts` + títulos del `capability-registry.ts` (deuda es-CL declarada en el wireframe).
 - Access impact: `views` (`cliente.creative_hub`); sin entitlements ni routeGroups nuevos.
@@ -275,8 +284,8 @@ bundle de Sky; **NUNCA** filtrar `module_key` técnico al DOM; **NUNCA** importa
 ### Implementation mapping
 
 - Route / surface: `src/app/(dashboard)/creative-hub/page.tsx` (+ `loading.tsx`, `error.tsx`), `dynamic = 'force-dynamic'`.
-- Primitive / variant / kind: `GreenhouseCapabilityModule` (theme `creative`).
-- Component candidates: `src/views/greenhouse/GreenhouseCapabilityModule.tsx`, `src/components/capabilities/*`.
+- Primitive / variant / kind: `SurfaceRecipe analyticsReport plane='none'`; `WorkbenchHeader report`; `OperationalSection open|band|quiet`; `OperationalSignalList`; `SignalStrip integrated`; `MetricSummaryCard density='auto'`; `GreenhouseActivityTimeline`; `CapabilityCard type='pipeline'` (mapping por bloque en la dirección visual).
+- Component candidates: vista nueva `src/views/greenhouse/client-portal/CreativeHubClientView.tsx` [propuesta] sobre `src/components/greenhouse/primitives/surface-system/*` y `src/components/capabilities/CapabilityCard.tsx`.
 - Copy source: `src/lib/copy/client-portal.ts`, `src/config/capability-registry.ts`.
 - Data reader / command: `getCapabilityModuleData({ moduleId: 'creative-hub', tenant, allowRegistryFallback: true })` tras el guard.
 - API parity: lectura; sin command. Camino programático existente `/api/capabilities/**` [verificar].
@@ -303,7 +312,7 @@ bundle de Sky; **NUNCA** filtrar `module_key` técnico al DOM; **NUNCA** importa
 - Decision (v2 2026-09-10): materializar la ruta como lectura del cliente en cinco bloques con seis cards reutilizadas y retituladas; excluir las cards de gestión interna; puerta por módulo asignado.
 - Alternatives considered: supersede del bundle (descartada por el operador); rewrite a `/capabilities/creative-hub` (404 igual por líneas legacy); cards nuevas (duplicación).
 - Why this pattern: menor blast radius, una sola implementación, cierra la señal sin tocar catálogo.
-- Reuse / extend / new primitive: reuse; extend sólo con evidencia GVC.
+- Reuse / extend / new primitive: reuse (surface system + primitives listadas); extend sólo con evidencia GVC; sin primitive nueva.
 - Open risks: datos vacíos para Sky; títulos legacy en inglés; hero sin momento dominante en 390px.
 
 ### Visual verification
@@ -343,9 +352,9 @@ bundle de Sky; **NUNCA** filtrar `module_key` técnico al DOM; **NUNCA** importa
 ### Slice 2 — Página `/creative-hub`
 
 - `page.tsx` con el patrón de `/equipo`: sesión, `requireViewCodeAccess('cliente.creative_hub')`, tenant, reader y
-  render con `CapabilityOverviewHero` + `ModuleLayout` sobre un `CapabilityModuleData` filtrado a las seis cards de los
-  cinco bloques (B1–B4 + B5 condicional), títulos y vacíos desde `src/lib/copy/client-portal.ts`. `loading.tsx` y
-  `error.tsx` con copy canónico. Marcadores `data-capture`.
+  render de `CreativeHubClientView` (nueva vista consumer) con `SurfaceRecipe analyticsReport plane='none'`,
+  `WorkbenchHeader report` y los cinco bloques según el component mapping de la dirección visual; títulos y vacíos desde
+  `src/lib/copy/client-portal.ts`. `loading.tsx` y `error.tsx` con copy canónico. Marcadores `data-capture`.
 - `pnpm route-reachability-gate` y `pnpm nav:budget` verdes (href ya declarado en el `view_registry`).
 
 ### Slice 3 — Evidencia y cierre

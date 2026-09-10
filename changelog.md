@@ -15,7 +15,7 @@ federación en `efeonce-mcp` 1.4.0 (PR #9 provider `greenhouse-client-services` 
 `efeonce.gateway.status`, que omitía el provider; revisión `00052-slt`, 174 tests). Verificado en producción por
 `efeonce.gateway.status`). Canary humano punta a punta y apply de Sky ejecutados ~07:40Z por el canal (`EO-APC-ECD63852`, `delegated_oauth`, 0 altas, replay idempotente). `scopes.ts` del auth-server suma
 `efeonce.mcp.client_services.write` a las clases de escritura MCP (paridad con `efeonce-mcp/src/config.ts`).
-Decisión del operador: Creative Hub ES el módulo de Sky → `TASK-1857` (ui-ux, wireframe v2 de cinco bloques cliente, sin JSX) y Delta en `TASK-1687`.
+Decisión del operador: Creative Hub ES el módulo de Sky → `TASK-1857` (ui-ux; wireframe v2 de cinco bloques cliente + dirección visual C «hoja de trabajo creativa» con component mapping por bloque sobre el surface system; sin JSX) y Delta en `TASK-1687`.
 [Auditoría](docs/audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md) §Canal MCP delegado.
 Barrido documental por dos subagentes (32 archivos): skills `efeonce-mcp-platform` (+referencias, espejo `.codex`),
 `greenhouse-teams-message-operator`, `teams-bot-platform`, `efeonce-customer-experience`; arquitectura MCP §25, invariantes MCP §11,
