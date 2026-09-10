@@ -1,7 +1,7 @@
 # Channel & Commerce — Business Model V1
 
 > **Status:** `Proposed` — decisión de negocio 2026-09-10: **oferta completa desde el día uno, tecnología propia por fases**. Ejecución y capital en [`CHANNEL_COMMERCE_PHASED_ROADMAP_V1`](CHANNEL_COMMERCE_PHASED_ROADMAP_V1.md)
-> **Owner:** Efeonce Strategy + Commercial (owner de línea por nombrar) · Finance (economics) · Legal (figura laboral) · Operations (capacidad de terreno)
+> **Owner:** Julio Reyes (owner interino de la línea, 2026-09-10) · Efeonce Strategy + Commercial · Finance (economics) · Legal (figura laboral) · Operations (capacidad de terreno)
 > **Version:** 1.0
 > **Date:** 2026-09-10
 > **Validated as of:** 2026-09-10 (evidencia de mercado con `as-of`; sin evidencia de demanda propia ni cost snapshot)
@@ -446,7 +446,7 @@ requiere además G2, G3 y G6 con cost snapshot fechado y aprobación de Finance.
 > ejecutarla. Ese documento agrega D8 (capital asignado y tamaño máximo de contrato financiable), D9 (con qué
 > proveedores se firma back-to-back) y D10 (por dónde arranca la fase 2).
 
-| D1 | Owner nombrado de la línea | Leadership | Antes de prospectar |
+| ~~D1~~ | **Resuelta 2026-09-10:** owner interino = Julio Reyes | Leadership | Revisar con dos cuentas operando |
 | D2 | Nombre público definitivo de la oferta | Strategy + Brand | Antes de material comercial |
 | D3 | Red de misiones propia vs partner vs mixta — **el benchmark recomienda partner**; queda por decidir con quién y en qué términos | Operations + Finance | Contacto exploratorio con proveedores de captura |
 | D4 | Plataforma de captura: construir, licenciar o integrar — **el benchmark desaconseja construir** | Product + Architecture | Resultado de D3 |

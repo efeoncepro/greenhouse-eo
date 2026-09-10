@@ -1,7 +1,7 @@
 # Channel & Commerce — Roadmap por fases y asignación de capital V1
 
 > **Status:** `Proposed`
-> **Owner:** Leadership (asignación de capital) · Commercial (oferta) · Finance (caja y margen) · Operations (capacidad)
+> **Owner de la línea:** Julio Reyes (interino, decisión 2026-09-10) · Finance (caja y margen) · Legal (figura y contratos) · Operations (capacidad)
 > **Date:** 2026-09-10
 > **Decisión que registra:** ofrecer el servicio completo desde el día uno y llegar a tecnología propia por fases
 > **Relacionado:** [`CHANNEL_COMMERCE_BUSINESS_MODEL_V1`](CHANNEL_COMMERCE_BUSINESS_MODEL_V1.md) · [`CHANNEL_COMMERCE_CHILE_MARKET_BENCHMARK_2026-09-10`](../../audits/commercial/CHANNEL_COMMERCE_CHILE_MARKET_BENCHMARK_2026-09-10.md) · [`EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1`](../EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md) · [`EFEONCE_TALENT_ASSURANCE_ECONOMIC_GUARDRAILS_V1`](../EFEONCE_TALENT_ASSURANCE_ECONOMIC_GUARDRAILS_V1.md)
@@ -184,13 +184,32 @@ Efeonce cobra: marcas grandes → 30, 60 o 90 días, después de aprobar la fact
 Cada contrato grande que se gana **consume caja antes de generarla**. Es la paradoja del crecimiento en servicios
 con pass-through: vender más acelera el problema en vez de resolverlo.
 
+### El factoring reduce el problema, no lo elimina
+
+Efeonce puede financiar con factoring, y Greenhouse ya lo opera contablemente (módulo canónico de factoring +
+reconciliación del settlement con factoring y retenciones). Eso sube el tamaño de contrato financiable y hace
+viable tomar una cuenta grande que sin factoring habría que rechazar.
+
+Con tres límites que deben estar en el modelo de caja:
+
+1. **No cubre el tramo pre-factura.** Se anticipa una factura ya emitida; todo el gasto del ciclo ocurre antes de
+   poder emitirla. Ese tramo se financia con capital propio, siempre. **Se acorta con hitos de facturación
+   cortos** —anticipo al inicio del ciclo y saldo al cierre, o quincenal— y eso se negocia en el contrato.
+2. **Cuesta, y el costo sale del margen.** Interés y comisión de asesoría sobre el plazo real de cobro deben estar
+   dentro del precio de la propuesta, no absorbidos después.
+3. **Depende del deudor.** Se aprueba según el riesgo del cliente, no el de Efeonce: accesible con marcas grandes
+   —las cuentas objetivo—, incierto con medianas. Y si es con responsabilidad, no transfiere riesgo de crédito,
+   sólo tiempo.
+
+Detalle en [`CHANNEL_COMMERCE_SUPPLIER_REGISTRY_V1`](CHANNEL_COMMERCE_SUPPLIER_REGISTRY_V1.md) §4.
+
 **Lo que hay que hacer antes del primer contrato grande:**
 
 1. Modelar el ciclo de caja completo con el DSO real esperado, no el contractual.
 2. Negociar plazos de pago a proveedores que no sean peores que los de cobro al cliente. Un proveedor que cobra a
    30 con un cliente que paga a 90 abre un hueco de 60 días por ciclo.
-3. Definir el **tamaño máximo de contrato** que la caja disponible soporta, y no aceptar uno mayor aunque se gane.
-   Ganar un contrato que no se puede financiar es peor que perderlo.
+3. Definir el **tamaño máximo de contrato** que la caja disponible más la línea de factoring soportan, y no
+   aceptar uno mayor aunque se gane. Ganar un contrato que no se puede financiar es peor que perderlo.
 4. Pedir anticipo o hito inicial en el primer contrato de cada cuenta.
 
 Esta sección es la que Finance debe revisar antes que cualquier otra de todo el cuerpo documental de la línea.
@@ -228,9 +247,9 @@ El cliente nunca compra "la fase". Compra el resultado.
 
 | # | Decisión | Quién |
 |---|---|---|
-| D1 | Owner nombrado de la línea — sigue bloqueando todo | Leadership |
-| D8 | Monto de capital asignado y tamaño máximo de contrato financiable | Leadership + Finance |
-| D9 | Con qué proveedores se firma back-to-back en cada capa | Commercial + Legal |
+| ~~D1~~ | **Resuelta 2026-09-10:** owner interino de la línea = Julio Reyes. Revisar cuando la fase 1 tenga dos cuentas operando | Leadership |
+| D8 | Monto de capital asignado, líneas de factoring disponibles y tamaño máximo de contrato financiable | Julio Reyes + Finance |
+| D9 | Con qué proveedores se firma back-to-back en cada capa — estructura y candidatos en [`CHANNEL_COMMERCE_SUPPLIER_REGISTRY_V1`](CHANNEL_COMMERCE_SUPPLIER_REGISTRY_V1.md) | Julio Reyes + Legal |
 | D10 | Si la fase 2 arranca por field leads o por captura | Operations + Finance, con los datos de fase 1 |
 
 ---

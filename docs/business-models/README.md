@@ -90,6 +90,7 @@ y producto, y los gates para evolucionar de Modular Production Lane a una experi
 
 - [`Channel & Commerce — Business Model V1`](channel-commerce/CHANNEL_COMMERCE_BUSINESS_MODEL_V1.md)
 - [`Channel & Commerce — Roadmap por fases y asignación de capital V1`](channel-commerce/CHANNEL_COMMERCE_PHASED_ROADMAP_V1.md)
+- [`Channel & Commerce — Registro de proveedores V1`](channel-commerce/CHANNEL_COMMERCE_SUPPLIER_REGISTRY_V1.md)
 - [`Channel & Commerce — Plan de apertura y prospección V1`](channel-commerce/CHANNEL_COMMERCE_PROSPECTING_PLAN_V1.md)
 - [`Benchmark del mercado chileno 2026-09-10`](../audits/commercial/CHANNEL_COMMERCE_CHILE_MARKET_BENCHMARK_2026-09-10.md)
 - [`Channel & Commerce — catálogo de servicios`](../services/channel-commerce/README.md)
