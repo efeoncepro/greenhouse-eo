@@ -61,10 +61,15 @@ personal capacitado en el punto de venta.
 
 ### Dónde son vulnerables
 
-1. **Venden gente y prometen venta, sin instrumentos para demostrarla.** Su propia comunicación no menciona
-   plataforma tecnológica, analítica, dashboards ni reportería. El Gerente Comercial que debe defender el
-   presupuesto ante Gerencia queda sin material.
-2. **No hay estándar comparable entre cadenas ni entre ciclos.** Sin scoring normalizado, "mejoró" es una opinión.
+1. **Reportan, pero con un tablero básico.** *(Evidencia primaria: experiencia directa del owner de la línea,
+   que trabajó en Touch Latam.)* Sí entregan reportería —típicamente un Power BI—, pero sin sofisticación: describe
+   lo que pasó, no prioriza qué hacer ni conecta con decisiones de negocio.
+
+   **Corrección importante para la conversación:** no se debe afirmar que "no miden" ni que "no reportan". Es falso
+   y el cliente lo desmiente en un segundo mostrando su tablero. El ángulo correcto es la **accionabilidad**: un
+   tablero que describe no es lo mismo que una lista priorizada que dice qué arreglar primero y por qué.
+2. **Reporte descriptivo, no priorizado.** Sin scoring normalizado ni criterio de impacto × costo, el cliente
+   recibe el estado pero no el orden de intervención — y termina priorizando por intuición o por quien grita más.
 3. **No tocan lo digital.** Retail media, anaquel digital y visibilidad en motores de IA quedan fuera.
 4. **La promesa de aumentar la venta es indefendible ante un comprador exigente.** La venta depende de precio,
    surtido, negociación con la cadena y demanda — variables que ninguna agencia controla.
@@ -76,9 +81,12 @@ contrasta: nosotros no prometemos subir la venta, prometemos mostrar qué está 
 
 ### Preguntas que abren la brecha
 
-- "¿Cómo te demuestran hoy que la activación del mes pasado funcionó?"
-- "¿Qué porcentaje de tus tiendas cumplió el planograma en el último ciclo? ¿Y cómo lo supiste?"
+- "Con el reporte que recibes hoy, ¿qué decisión tomaste el mes pasado que no habrías tomado sin él?"
+- "¿Te dice qué está pasando, o te dice qué arreglar primero?"
 - "Cuando la venta cae en una cadena, ¿en cuánto tiempo sabes si fue ejecución, precio o quiebre?"
+- "¿Alguien cruza ese reporte con lo que inviertes en la red de medios de esa misma cadena?"
+
+**No preguntar** si miden o si reportan. Probablemente sí, y la pregunta te deja mal parado.
 
 ### Dónde NO competir
 
@@ -172,8 +180,8 @@ Tres perfiles donde nuestras debilidades pesan menos y las suyas pesan más:
 
 - **NUNCA** prometer incremento de venta, sell-out, share o rotación. Es el claim que hace vulnerable al
   competidor de servicio; repetirlo nos pone en su misma posición.
-- **NUNCA** afirmar que somos los únicos que medimos, ni que el mercado no tiene tecnología. Es falso y
-  verificable en un minuto.
+- **NUNCA** afirmar que somos los únicos que medimos, que el mercado no tiene tecnología, ni que un competidor
+  "no reporta". Es falso, verificable en un segundo, y el cliente probablemente tiene el tablero abierto.
 - **NUNCA** atacar la plataforma que el cliente ya compró.
 - **NUNCA** citar a un competidor por nombre en una propuesta escrita.
 - **NUNCA** competir por precio de cabeza/día ni por cobertura nacional.
@@ -185,7 +193,9 @@ Tres perfiles donde nuestras debilidades pesan menos y las suyas pesan más:
 
 ## 7. Lo que falta verificar
 
-Todo lo anterior sobre terceros es **auto-declarado en sus sitios y prensa sectorial**. No está verificado:
+Todo lo anterior sobre terceros es **auto-declarado en sus sitios y prensa sectorial**, salvo la nota marcada como
+evidencia primaria sobre la reportería de Touch Latam, que proviene de experiencia directa del owner de la línea.
+No está verificado:
 precios, estructura de contratos, satisfacción real de clientes, tasa de rotación de proveedor, ni si las marcas
 grandes operan field propio en vez de tercerizarlo.
 

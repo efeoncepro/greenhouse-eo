@@ -83,43 +83,50 @@ No cambia:  que Efeonce opera, decide y responde.
 
 ## Los once servicios
 
-La oferta es completa desde el primer contrato. **Efeonce opera los once**, siempre. Lo que cambia por fase es
-quién pone las manos en cada capa — nunca qué se promete ni quién responde.
+Agrupados como los nombra el mercado chileno —trade marketing y BTL— y no por nuestra taxonomía interna. La oferta
+es completa desde el primer contrato: **Efeonce opera los once siempre**; lo que cambia por fase es quién pone las
+manos en cada capa.
 
-### A · Puertas de entrada — proyecto cerrado
+### Trade marketing — lo que pasa en la góndola de forma continua
 
-| § | Servicio | Qué compra el cliente | Pone las manos en fase 1 | Unidad de cobro |
+| § | Servicio | Qué compra el cliente | Momento de compra | Manos en fase 1 | Unidad |
+|---|---|---|---|---|---|
+| 1 | **Diagnóstico de Ejecución de Canal** | Saber qué se puede medir, qué está roto y en qué orden intervenir | Entrada | Efeonce + captura vía partner | Proyecto cerrado |
+| 2 | **Auditoría de Inversión de Canal** | Saber qué componente de su presupuesto de canal no tiene retorno demostrable | Entrada | Efeonce | Proyecto cerrado |
+| 3 | **Cobertura Auditada** | El estado de ejecución por PDV y la **lista priorizada** de intervención, cada ciclo | Núcleo recurrente | Partner de captura, gobernado | PDV × ciclos |
+| 4 | **Equipo de Terreno Gestionado** | Que las tiendas críticas queden intervenidas, con evidencia antes/después | Intervención | Proveedor con back-to-back | Capacidad mensual |
+| 5 | **Orquestación de Terreno** | Que sus proveedores actuales se comparen contra el mismo estándar | Entrada alternativa | Efeonce | Proveedores × mercados |
+| 6 | **Anaquel Digital y Visibilidad en IA** | Cómo se ve su producto en la ficha de cada retailer y si la IA lo recomienda | Expansión | Efeonce (Wave) | Según owner |
+| 7 | **Retail Media y Commerce** | Operar su inversión en las redes de medios de las cadenas, leída junto a la góndola | Expansión | Efeonce (Media & Distribution) | Según owner |
+| 8 | **Diseño y Medición de Promociones** | Saber si la promoción vendió de más o canibalizó margen | Avanzado | Efeonce | Proyecto por ola |
+
+### BTL — lo que pasa en momentos
+
+| § | Servicio | Qué compra el cliente | Momento de compra | Manos en fase 1 | Unidad |
+|---|---|---|---|---|---|
+| 9 | **Activaciones Medidas** | Sampling, demo o activación que se reporta en delta contra tiendas de control, no en contactos | Intervención | Proveedor + Efeonce (diseño y lectura) | Ola: tiendas × días |
+| 10 | **Encuentros de Canal** | Que la convención de distribuidores o el lanzamiento a la fuerza de venta tenga objetivo, medición y seguimiento | Expansión, cuenta con relación | Productora + Efeonce | Proyecto cerrado |
+
+### Transversal a ambas familias
+
+| § | Servicio | Qué compra el cliente | Manos en fase 1 | Unidad |
 |---|---|---|---|---|
-| 1 | **Channel Execution Diagnostic** | Saber qué se puede medir, qué está roto y en qué orden intervenir | Efeonce + captura vía partner | Proyecto cerrado por complejidad |
-| 2 | **Trade Investment Audit** | Saber qué componente de su inversión de canal no tiene retorno demostrable | Efeonce | Proyecto cerrado |
+| 11 | **Contenido y Material de Canal** | Material a escala —fichas, catálogos, PDP, kits, adaptaciones por cadena— sin que cada campaña sea un acto heroico | Efeonce (Creative) + proveedor de impresión | Capacidad gobernada |
 
-### B · Núcleo recurrente — lo que sostiene la relación
+### Cómo esta lista responde al mercado
 
-| § | Servicio | Qué compra el cliente | Pone las manos en fase 1 | Unidad de cobro |
-|---|---|---|---|---|
-| 3 | **Cobertura Auditada** | El estado de ejecución por punto de venta y la lista priorizada, cada ciclo | Partner de captura, gobernado por Efeonce | PDV auditados × ciclos |
-| 5 | **Field Orchestration** | Que sus proveedores de terreno se comparen contra el mismo estándar | Efeonce | Proveedores × mercados gobernados |
+| Lo que el comprador ya tiene | Qué le falta | Qué servicio lo resuelve |
+|---|---|---|
+| Una agencia de terreno con un tablero descriptivo | Que le digan **qué arreglar primero y por qué** | 3 · Cobertura Auditada |
+| Una plataforma que detecta y prioriza | **Quién ejecuta la corrección y cierra el ciclo** | 4 · Equipo de Terreno Gestionado |
+| Activaciones que reportan contactos | Saber **si vendieron** | 9 · Activaciones Medidas |
+| Inversión en retail media creciendo | **Leerla junto con lo que pasa en la góndola** de esa misma cadena | 6 y 7 |
+| Varias agencias por canal o país | **Un estándar común** para compararlas | 5 · Orquestación de Terreno |
 
-### C · Ejecución en el canal — donde se interviene
-
-| § | Servicio | Qué compra el cliente | Pone las manos en fase 1 | Unidad de cobro |
-|---|---|---|---|---|
-| 4 | **Managed Field Pod** | Que las tiendas críticas queden intervenidas, con evidencia antes/después | Proveedor con back-to-back | Capacidad mensual comprometida |
-| 7 | **Activación de Marca Medida** | Activación que se reporta en delta contra tiendas de control, no en contactos | Proveedor + Efeonce (diseño y lectura) | Ola: tiendas × días |
-| 11 | **Eventos y Encuentros de Canal** | Que la convención o el lanzamiento al canal tenga objetivo, medición y seguimiento | Productora + Efeonce (contenido y gobierno) | Proyecto cerrado |
-
-### D · Conexión digital y expansión — el diferenciador
-
-| § | Servicio | Qué compra el cliente | Pone las manos en fase 1 | Unidad de cobro |
-|---|---|---|---|---|
-| 6 | **Digital Shelf & AI Shopper Visibility** | Cómo se ve su producto en el anaquel digital y si la IA lo recomienda | Efeonce (Wave) | Según owner |
-| 10 | **Retail Media & Commerce Operations** | Operar su inversión en las redes de las cadenas | Efeonce (Media & Distribution) | Según owner |
-| 8 | **Channel Content & Asset System** | Material de canal a escala, sin que cada campaña sea un acto heroico | Efeonce (Creative) + proveedor de impresión | Capacidad gobernada |
-| 9 | **Promotion & Incentive Design + Incrementality** | Saber si la promoción vendió de más o canibalizó margen | Efeonce | Proyecto por ola |
-
-> **Los servicios 6 y 10 son la razón de ser de la línea.** El [benchmark chileno](../../audits/commercial/CHANNEL_COMMERCE_CHILE_MARKET_BENCHMARK_2026-09-10.md)
-> encontró que ningún actor del mercado conecta la ejecución física con la inversión digital de la marca. Todo lo
-> demás —auditar, poner gente, producir— ya lo hacen otros y se contrata; esto no.
+> Los servicios **6 y 7 son la razón de ser de la línea.** El [benchmark](../../audits/commercial/CHANNEL_COMMERCE_CHILE_MARKET_BENCHMARK_2026-09-10.md)
+> y las [battlecards](../../audits/commercial/CHANNEL_COMMERCE_COMPETITIVE_BATTLECARDS_V1.md) confirman que ningún
+> actor chileno —ni el software de ejecución ni las agencias de servicio— conecta la góndola con la inversión
+> digital. Todo lo demás ya lo hacen otros y se contrata; esto no.
 
 ## Qué se puede vender con el capital actual
 
