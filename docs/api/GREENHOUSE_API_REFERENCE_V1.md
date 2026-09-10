@@ -1,6 +1,6 @@
 # Greenhouse API Reference V1
 
-> Estado 2026-04-25: documento derivado/transicional.
+> Estado reconciliado 2026-09-09: documento derivado/transicional.
 > La arquitectura canónica de la API platform ahora vive en:
 > `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
 >
@@ -46,6 +46,9 @@ Routes:
 - `GET /api/platform/ecosystem/organizations/:id`
 - `GET /api/platform/ecosystem/capabilities`
 - `GET /api/platform/ecosystem/integration-readiness`
+- `POST /api/platform/ecosystem/client-services/enablement/preview`
+- `POST /api/platform/ecosystem/client-services/enablement/apply`
+- `POST /api/platform/ecosystem/client-services/enablement/rollback`
 - `GET /api/platform/ecosystem/identity/binding` — autoridad humana para el gateway: externo por `(environment, subject)` con TTL 60; interno v1/v2 con contexto/cliente/audiencia/gv/jti y TTL 0. V2 añade intenciones `catalog|target|organizations`, actor/targets separados y páginas 1–50. Sólo binding de servicio `internal`; otro recibe `404` anti-oráculo. HTTP `200` con `denied` no autoriza. [Queries y DTO](GREENHOUSE_API_PLATFORM_V1.md#reader-de-identidad-y-autoridad-mcp).
 - `GET /api/platform/ecosystem/event-types`
 - `GET/POST /api/platform/ecosystem/webhook-subscriptions`
@@ -69,6 +72,11 @@ Routes:
 - `POST /api/platform/app/hiring/talent-pool/:id/invite/confirm`
 - `GET /api/platform/app/hiring/applications/review` *(TASK-1718, OFF hasta rollout)*
 - `GET /api/platform/app/hiring/applications/:applicationId/review-packet` *(TASK-1718, OFF hasta rollout)*
+- `POST /api/platform/app/client-services/enablement/preview`
+- `POST /api/platform/app/client-services/enablement/apply` — autoridad humana por sesión app o por bearer delegado (`client_services.enablement.write`); `meta.authority` y `receipt.authority` registran el canal (TASK-1852)
+- `POST /api/platform/app/client-services/enablement/rollback`
+- `GET /api/platform/app/commercial/services/:serviceId/terms` — términos vigentes y `bundledModules` (TASK-1852)
+- `POST /api/platform/app/commercial/services/:serviceId/terms` — declarar términos con mapping servicio → módulos; sesión humana + `commercial.engagement.declare` (TASK-1852)
 
 Read next:
 - `docs/api/GREENHOUSE_API_PLATFORM_V1.md`
@@ -81,6 +89,9 @@ Key rules:
 - app clients must use `api/platform/app/*`, not web routes or `AGENT_AUTH`
 - event retry schedules work for the dispatcher; it does not deliver inline
 - general ecosystem writes and cross-lane idempotency remain follow-ups
+- TASK-1852 sirve preview en App/Ecosystem sobre un primitive común. App apply/rollback requieren sesión
+  humana, capabilities y flag ON; Ecosystem/MCP writes responden 403 hasta contar con autoridad humana
+  delegada. Las tools MCP internas aún no están federadas; no declarar Full API Parity completa.
 - Talent Pool comparte readers y commands gobernados en App API: búsqueda/perfil requieren `hiring.talent_pool.read`;
   availability, consentimiento e invitación usan commands idempotentes y auditados. El bearer MCP delegado agrega
   client/scope/purpose/agent-host exactos y conserva audit sin query, resultado ni PII. Provider/tools read-only están
@@ -234,10 +245,16 @@ Read next:
 - `https://greenhouse.efeoncepro.com/api/platform/ecosystem/event-types`
 - `https://greenhouse.efeoncepro.com/api/platform/ecosystem/webhook-subscriptions`
 - `https://greenhouse.efeoncepro.com/api/platform/ecosystem/webhook-deliveries`
+- `https://greenhouse.efeoncepro.com/api/platform/ecosystem/client-services/enablement/preview`
+- `https://greenhouse.efeoncepro.com/api/platform/ecosystem/client-services/enablement/apply` *(servida, 403 fail-closed)*
+- `https://greenhouse.efeoncepro.com/api/platform/ecosystem/client-services/enablement/rollback` *(servida, 403 fail-closed)*
 - `https://greenhouse.efeoncepro.com/api/platform/app/sessions`
 - `https://greenhouse.efeoncepro.com/api/platform/app/context`
 - `https://greenhouse.efeoncepro.com/api/platform/app/home`
 - `https://greenhouse.efeoncepro.com/api/platform/app/notifications`
+- `https://greenhouse.efeoncepro.com/api/platform/app/client-services/enablement/preview`
+- `https://greenhouse.efeoncepro.com/api/platform/app/client-services/enablement/apply` *(flag OFF)*
+- `https://greenhouse.efeoncepro.com/api/platform/app/client-services/enablement/rollback` *(flag OFF)*
 
 ### Integrations API
 

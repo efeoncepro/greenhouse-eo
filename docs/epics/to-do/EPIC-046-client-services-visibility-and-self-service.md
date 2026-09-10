@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Diseño aprobado; ADR Accepted para planificación, integración obligatoria con EPIC-045. TASK-1852 in-progress con código común, 290 tests y preview PG real; rollout y paridad de escritura delegada pendientes. TASK-1853–1856 to-do`
+- Status real: `Diseño aprobado; ADR Accepted e integración obligatoria con EPIC-045. TASK-1852 in-progress con capacidad común en Production, 392 tests y rollout técnico released; writes OFF, apertura cliente y paridad de escritura delegada pendientes. TASK-1853–1856 to-do`
 - Rank: `TBD`
 - Domain: `client-portal|commercial|delivery|growth|identity|ui`
 - Owner: `Client Experience / Platform; Julio Reyes (producto)`
@@ -167,7 +167,7 @@ El orden de valor no añade bloqueos técnicos a las tasks ni exige terminar tod
 ## Child Tasks
 
 Cinco tasks registradas por autorización del operador, prioridad P1. TASK-1852 está `in-progress`
-(código local verificado, rollout pendiente); TASK-1853–1856 siguen `to-do`. Las existentes
+(capacidad técnica en Production, apertura cliente pendiente con writes OFF); TASK-1853–1856 siguen `to-do`. Las existentes
 conservan su epic. P01 se conecta con TASK-1834 por contrato y rollout nativo condicional.
 
 | Alias | Task | Entrega | Blocked by |

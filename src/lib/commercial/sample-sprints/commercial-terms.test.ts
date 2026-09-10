@@ -66,6 +66,7 @@ describe('engagement commercial terms helpers', () => {
       effectiveTo: null,
       monthlyAmountClp: 0,
       successCriteria: { conversion: 'signed_contract' },
+      bundledModules: [],
       declaredBy: 'user-1',
       declaredAt: '2026-05-07T06:00:00.000Z',
       reason: 'Approved success fee terms'
@@ -109,6 +110,76 @@ describe('engagement commercial terms helpers', () => {
     expect(calls[2][0]).toContain('INSERT INTO greenhouse_commercial.engagement_commercial_terms')
     expect(calls[3][0]).toContain('INSERT INTO greenhouse_commercial.engagement_audit_log')
     expect(calls[4][0]).toContain('INSERT INTO greenhouse_sync.outbox_events')
+  })
+
+  it('persists sorted bundled modules only when every key is active in the portal catalog (TASK-1852)', async () => {
+    const client = buildClient([
+      { rows: [{ service_id: 'SVC-HS-123', active: true, status: 'active', hubspot_sync_status: 'synced' }] },
+      { rows: [{ module_key: 'ai_visibility_v1' }, { module_key: 'seo_v2' }] },
+      { rows: [] },
+      { rows: [{ terms_id: 'terms-2' }] }
+    ])
+
+    mockedWithTransaction.mockImplementationOnce(async (run: (client: unknown) => Promise<unknown>) => run(client))
+
+    await expect(
+      declareCommercialTerms({
+        serviceId: 'SVC-HS-123',
+        kind: 'committed',
+        effectiveFrom: '2026-09-09',
+        bundledModules: ['seo_v2', 'ai_visibility_v1'],
+        reason: 'Operator-confirmed SEO/AEO scope',
+        declaredBy: 'user-1'
+      })
+    ).resolves.toEqual({ termsId: 'terms-2' })
+
+    const calls = client.query.mock.calls as unknown as Array<[string, unknown[]?]>
+
+    expect(calls[1][0]).toContain('greenhouse_client_portal.modules')
+    expect(calls[1][0]).toContain('effective_to IS NULL')
+    expect(calls[1][1]).toEqual([['ai_visibility_v1', 'seo_v2']])
+    expect(calls[3][0]).toContain('bundled_modules')
+    expect(calls[3][1]?.[7]).toEqual(['ai_visibility_v1', 'seo_v2'])
+    expect(calls[4][0]).toContain('engagement_audit_log')
+  })
+
+  it('fails closed when a bundled module is unknown or deprecated in the catalog', async () => {
+    const client = buildClient([
+      { rows: [{ service_id: 'SVC-HS-123', active: true, status: 'active', hubspot_sync_status: 'synced' }] },
+      { rows: [{ module_key: 'seo_v2' }] }
+    ])
+
+    mockedWithTransaction.mockImplementationOnce(async (run: (client: unknown) => Promise<unknown>) => run(client))
+
+    await expect(
+      declareCommercialTerms({
+        serviceId: 'SVC-HS-123',
+        kind: 'committed',
+        effectiveFrom: '2026-09-09',
+        bundledModules: ['seo_v2', 'content_marketing_v9'],
+        reason: 'Mapping with a module that does not exist',
+        declaredBy: 'user-1'
+      })
+    ).rejects.toMatchObject({ name: 'CommercialTermsValidationError' })
+
+    expect(client.query).toHaveBeenCalledTimes(2)
+  })
+
+  it('rejects malformed or repeated bundled module keys before opening a transaction', async () => {
+    for (const bundledModules of [['seo_v2', 'seo_v2'], ['SEO V2'], ['']]) {
+      await expect(
+        declareCommercialTerms({
+          serviceId: 'SVC-HS-123',
+          kind: 'committed',
+          effectiveFrom: '2026-09-09',
+          bundledModules,
+          reason: 'Malformed bundle should never reach PostgreSQL',
+          declaredBy: 'user-1'
+        })
+      ).rejects.toBeInstanceOf(CommercialTermsValidationError)
+    }
+
+    expect(mockedWithTransaction).not.toHaveBeenCalled()
   })
 
   it('rejects TASK-813 legacy archived services before writing', async () => {

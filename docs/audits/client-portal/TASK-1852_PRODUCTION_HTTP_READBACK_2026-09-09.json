@@ -1,0 +1,60 @@
+{
+  "observedAt": "2026-09-09T23:12:41.812Z",
+  "baseURL": "https://greenhouse.efeoncepro.com",
+  "actor": "dedicated internal agent; no human login proof",
+  "cases": [
+    {
+      "case": "Grupo Berel",
+      "status": 200,
+      "canApply": false,
+      "blockers": [
+        "commercial_mapping_unresolved",
+        "commercial_mapping_unresolved"
+      ],
+      "organizationId": "org-32333527-02a8-487b-819e-6f76a761777d"
+    },
+    {
+      "case": "Sky Airlines",
+      "status": 200,
+      "canApply": false,
+      "blockers": [
+        "commercial_mapping_unresolved"
+      ],
+      "organizationId": "org-b9977f96-f7ef-4afb-bb26-7355d78c981f"
+    },
+    {
+      "case": "reject_body_actor",
+      "status": 400
+    },
+    {
+      "case": "reject_foreign_people",
+      "status": 200,
+      "codes": [
+        "commercial_mapping_unresolved",
+        "commercial_mapping_unresolved",
+        "person_not_authorized_in_organization",
+        "person_not_authorized_in_organization",
+        "person_not_authorized_in_organization"
+      ],
+      "returnedPeople": 0
+    },
+    {
+      "case": "missing_org",
+      "status": 404
+    },
+    {
+      "case": "anonymous",
+      "status": 401
+    },
+    {
+      "case": "agent_write_denied",
+      "status": 403,
+      "codes": [
+        "invalid_delegated_context"
+      ]
+    }
+  ],
+  "sha": "5726ce9d90d7a0bb3e9ed6aaab011b50351430d2",
+  "deploymentId": "dpl_mfME7kGqyyyD5tgY2sVsVZVc42ti",
+  "phase": "production_vercel_ready_before_orchestrator"
+}

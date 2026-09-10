@@ -66,7 +66,10 @@ export const buildServiceEnablementPreview = (
   for (const id of request.personIds) {
     const person = inventory.people.find(item => item.id === id)
 
-    if (!person || !person.active || person.status !== 'active') issue('person_not_authorized_in_organization', id, 'Identity')
+    // A provisioned-but-undelivered invitation is a distinct state from "not a member": the fix is
+    // delivering/accepting the invitation, not membership. Never collapse the two (TASK-1852).
+    if (person && person.status === 'invited') issue('person_invitation_pending', id, 'Identity')
+    else if (!person || !person.active || person.status !== 'active') issue('person_not_authorized_in_organization', id, 'Identity')
     if (!person?.identityLinked) readiness.push({ code: 'identity_link_unverified', subject: id, owner: 'Identity' })
     if (!person?.lastLoginAt) readiness.push({ code: 'human_login_unverified', subject: id, owner: 'Identity' })
     if (!person?.preferences.length) readiness.push({ code: 'preferences_not_explicit', subject: id, owner: 'Notifications' })

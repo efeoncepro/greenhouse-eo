@@ -4,13 +4,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const txMock = vi.fn()
+const queryMock = vi.fn()
 const generateTokenMock = vi.fn()
 const storeTokenMock = vi.fn()
 const sendEmailMock = vi.fn()
 const publishOutboxMock = vi.fn()
 
 vi.mock('@/lib/postgres/client', () => ({
-  withGreenhousePostgresTransaction: (...a: unknown[]) => txMock(...a)
+  withGreenhousePostgresTransaction: (...a: unknown[]) => txMock(...a),
+  runGreenhousePostgresQuery: (...a: unknown[]) => queryMock(...a)
 }))
 vi.mock('@/lib/auth-tokens', () => ({
   generateToken: (...a: unknown[]) => generateTokenMock(...a),
@@ -27,7 +29,7 @@ vi.mock('@/lib/sync/event-catalog', () => ({
   EVENT_TYPES: { roleAssigned: 'role.assigned' }
 }))
 
-import { ClientPortalInviteError, inviteClientPortalUser } from './invite-client-portal-user'
+import { ClientPortalInviteError, deliverClientPortalInvitation, inviteClientPortalUser } from './invite-client-portal-user'
 
 type ClientOpts = { existing?: boolean; roleInserted?: boolean }
 
@@ -169,5 +171,51 @@ describe('inviteClientPortalUser', () => {
 
     expect(result.created).toBe(true)
     expect(result.emailSent).toBe(false)
+  })
+})
+
+describe('TASK-1852 — deferred delivery and later delivery', () => {
+  it('creates the person and roles without minting a token or sending email when delivery is deferred', async () => {
+    const client = wireTx({ existing: false })
+
+    const result = await inviteClientPortalUser({ ...baseInput, delivery: 'deferred' })
+
+    expect(result).toMatchObject({ userId: 'new-user', created: true, rolesAssigned: ['client_executive'], emailSent: false, deliveryStatus: 'deferred' })
+    expect(client.query.mock.calls.some(([text]) => String(text).includes('INSERT INTO greenhouse_core.client_users'))).toBe(true)
+    expect(generateTokenMock).not.toHaveBeenCalled()
+    expect(storeTokenMock).not.toHaveBeenCalled()
+    expect(sendEmailMock).not.toHaveBeenCalled()
+  })
+
+  it('keeps the immediate default and reports the delivery status', async () => {
+    wireTx({ existing: false })
+
+    await expect(inviteClientPortalUser(baseInput)).resolves.toMatchObject({ emailSent: true, deliveryStatus: 'sent' })
+    expect(sendEmailMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('reports not_required for an existing person under ensure, regardless of delivery mode', async () => {
+    wireTx({ existing: true })
+
+    await expect(inviteClientPortalUser({ ...baseInput, onExisting: 'ensure', delivery: 'deferred' })).resolves.toMatchObject({ created: false, deliveryStatus: 'not_required' })
+    expect(sendEmailMock).not.toHaveBeenCalled()
+  })
+
+  it('delivers a pending invitation of the same client and fails closed otherwise', async () => {
+    queryMock.mockResolvedValueOnce([{ user_id: 'u-1', email: 'Ana@Sky.com', status: 'invited', auth_mode: 'invited', client_id: 'client-sky' }])
+
+    await expect(deliverClientPortalInvitation({ userId: 'u-1', clientId: 'client-sky' })).resolves.toEqual({ userId: 'u-1', email: 'ana@sky.com', deliveryStatus: 'sent' })
+    expect(generateTokenMock).toHaveBeenCalledWith(expect.objectContaining({ user_id: 'u-1', client_id: 'client-sky', type: 'invite' }), 72)
+    expect(sendEmailMock).toHaveBeenCalledTimes(1)
+
+    queryMock.mockResolvedValueOnce([{ user_id: 'u-1', email: 'ana@sky.com', status: 'invited', auth_mode: 'invited', client_id: 'client-other' }])
+    await expect(deliverClientPortalInvitation({ userId: 'u-1', clientId: 'client-sky' })).rejects.toMatchObject({ code: 'person_not_in_client', statusCode: 404 })
+
+    queryMock.mockResolvedValueOnce([{ user_id: 'u-1', email: 'ana@sky.com', status: 'active', auth_mode: 'credentials', client_id: 'client-sky' }])
+    await expect(deliverClientPortalInvitation({ userId: 'u-1', clientId: 'client-sky' })).rejects.toMatchObject({ code: 'invitation_not_pending', statusCode: 409 })
+
+    queryMock.mockResolvedValueOnce([])
+    await expect(deliverClientPortalInvitation({ userId: 'missing', clientId: 'client-sky' })).rejects.toBeInstanceOf(ClientPortalInviteError)
+    expect(sendEmailMock).toHaveBeenCalledTimes(1)
   })
 })

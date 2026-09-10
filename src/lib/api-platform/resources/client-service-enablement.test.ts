@@ -6,7 +6,11 @@ import type { ApiPlatformRequestContext } from '@/lib/api-platform/core/context'
 const mocks = vi.hoisted(() => ({ preview: vi.fn(), authorize: vi.fn(), apply: vi.fn(), rollback: vi.fn() }))
 
 vi.mock('@/lib/client-portal/enablement/reader', () => ({ previewServiceEnablement: mocks.preview }))
-vi.mock('@/lib/client-portal/enablement/access', () => ({ authorizeServiceEnablement: mocks.authorize }))
+vi.mock('@/lib/client-portal/enablement/access', () => ({
+  authorizeServiceEnablement: mocks.authorize,
+  CLIENT_SERVICE_ENABLEMENT_DELEGATED_SCOPE: 'client_services.enablement.write',
+  CLIENT_SERVICE_ENABLEMENT_EXCHANGE_CLIENT_ID: 'efeonce-mcp-client-services'
+}))
 vi.mock('@/lib/client-portal/enablement/commands', () => ({ applyServiceEnablement: mocks.apply, rollbackServiceEnablement: mocks.rollback }))
 
 import { runAppClientServiceEnablement } from './app-client-service-enablement'
@@ -36,7 +40,7 @@ describe('service enablement API adapters', () => {
     const body = { proposal: request, fingerprint: 'a'.repeat(64), idempotencyKey: 'apply-key' }
 
     await runAppClientServiceEnablement({ context: app, operation: 'apply', body })
-    expect(mocks.apply).toHaveBeenCalledWith(body, 'authenticated-actor')
+    expect(mocks.apply).toHaveBeenCalledWith(body, 'authenticated-actor', { kind: 'app_session' })
     mocks.apply.mockClear()
     await expect(runAppClientServiceEnablement({ context: app, operation: 'apply', body: { ...body, actorUserId: 'spoof' } })).rejects.toMatchObject({ statusCode: 400 })
     expect(mocks.apply).not.toHaveBeenCalled()
@@ -62,8 +66,55 @@ describe('service enablement API adapters', () => {
     expect(mocks.apply).not.toHaveBeenCalled()
   })
 
-  it('denies a delegated token without an administration authority contract', async () => {
-    await expect(runAppClientServiceEnablement({ context: { ...app, authSource: 'sister_platform_oauth' }, operation: 'preview', body: request })).rejects.toMatchObject({ statusCode: 403 })
-    expect(mocks.preview).not.toHaveBeenCalled()
+  describe('delegated human authority (sister-platform bearer)', () => {
+    const body = { proposal: request, fingerprint: 'a'.repeat(64), idempotencyKey: 'apply-key' }
+
+    const delegated = {
+      ...app, requestId: 'req-1', authSource: 'sister_platform_oauth', oauthCapabilities: ['client_services.enablement.write'],
+      oauthClientId: 'efeonce-mcp-client-services', oauthAccessTokenId: 'spoauth-token-1', oauthSessionAuthMode: 'agent', oauthCorrelationId: 'corr-1',
+      tenant: { userId: 'authenticated-actor', authMode: 'both' }
+    } as unknown as AppPlatformRequestContext
+
+    it('denies a delegated bearer without the enablement write class before touching the domain', async () => {
+      await expect(runAppClientServiceEnablement({ context: { ...delegated, oauthCapabilities: ['hiring.talent_pool.read'] }, operation: 'preview', body: request })).rejects.toMatchObject({ statusCode: 403, errorCode: 'scope_not_allowed' })
+      await expect(runAppClientServiceEnablement({ context: { ...delegated, oauthCapabilities: [] }, operation: 'apply', body })).rejects.toMatchObject({ statusCode: 403, errorCode: 'scope_not_allowed' })
+      expect(mocks.preview).not.toHaveBeenCalled()
+      expect(mocks.apply).not.toHaveBeenCalled()
+    })
+
+    it('accepts the exchange client minted for a human and records the channel as authority, never as actor', async () => {
+      await runAppClientServiceEnablement({ context: delegated, operation: 'apply', body })
+      expect(mocks.apply).toHaveBeenCalledWith(body, 'authenticated-actor', {
+        kind: 'delegated_oauth', clientId: 'efeonce-mcp-client-services', accessTokenId: 'spoauth-token-1', correlationId: 'corr-1'
+      })
+
+      const preview = await runAppClientServiceEnablement({ context: delegated, operation: 'preview', body: request })
+
+      expect(preview).toHaveProperty('data')
+      expect(mocks.authorize).toHaveBeenCalledWith('authenticated-actor', 'preview')
+    })
+
+    it('accepts a human OAuth session from another client with the same class', async () => {
+      const human = { ...delegated, oauthClientId: 'greenhouse-admin-cli', oauthSessionAuthMode: 'microsoft_sso' } as AppPlatformRequestContext
+
+      mocks.rollback.mockResolvedValue({ data: { paused: [] }, replayed: false })
+      await runAppClientServiceEnablement({ context: human, operation: 'rollback', body: { organizationId: 'org-a', operationId: 'receipt-a', idempotencyKey: 'rollback-key' } })
+      expect(mocks.rollback).toHaveBeenCalledWith(expect.anything(), 'authenticated-actor', expect.objectContaining({ kind: 'delegated_oauth', clientId: 'greenhouse-admin-cli' }))
+    })
+
+    it.each([
+      ['agent transport from a non-exchange client', { oauthClientId: 'greenhouse-admin-cli', oauthSessionAuthMode: 'agent' }],
+      ['missing token provenance', { oauthAccessTokenId: null }],
+      ['missing client provenance', { oauthClientId: null }],
+      ['a diagnostic agent as the delegating human', { tenant: { userId: 'agent', authMode: 'agent' } }]
+    ])('fails closed on %s', async (_label, patch) => {
+      await expect(runAppClientServiceEnablement({ context: { ...delegated, ...patch } as AppPlatformRequestContext, operation: 'apply', body })).rejects.toMatchObject({ statusCode: 403, errorCode: 'invalid_delegated_context' })
+      expect(mocks.apply).not.toHaveBeenCalled()
+    })
+
+    it('never lets the bearer supply the actor in the body', async () => {
+      await expect(runAppClientServiceEnablement({ context: delegated, operation: 'apply', body: { ...body, actorUserId: 'spoof' } })).rejects.toMatchObject({ statusCode: 400 })
+      expect(mocks.apply).not.toHaveBeenCalled()
+    })
   })
 })

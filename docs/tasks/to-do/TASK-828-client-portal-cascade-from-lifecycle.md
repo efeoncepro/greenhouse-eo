@@ -1,5 +1,13 @@
 # TASK-828 — Client Portal Cascade from Client Lifecycle V1
 
+## Delta 2026-09-10
+
+- G-3 upstream parcialmente cerrado por trabajo en `TASK-1852`: el writer `declareCommercialTerms` ahora acepta
+  `bundledModules` y **valida al INSERT** contra el catálogo activo (`modules.effective_to IS NULL`), por lo que
+  un término nuevo no puede referenciar un módulo desconocido/deprecado. Sigue pendiente `getBundledModulesForOrganization`
+  (helper de lectura con partición válidos/deprecados), el consumer del cascade y el signal
+  `client_portal.commercial_terms.unknown_bundled_module` para términos históricos. API: `POST /api/platform/app/commercial/services/{serviceId}/terms`.
+
 ## Delta 2026-08-09
 
 Causado por `TASK-1678` / `TASK-1679` (complete, en producción).

@@ -3,12 +3,14 @@
 **Social Efeonce, 09/09:** [13 piezas y skills](docs/audits/social/EFEONCE_SEASONAL_CONTENT_PLAN_2026_2027.md).
 Pendiente: conciliar MET-2339–2342 tarea/calendario. Producción abierta; cierre documental sin cambios Notion.
 
-**EPIC-046 / TASK-1852 (09/09):** rollout autorizado; [estado y alcance](docs/audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md).
-392 tests (312 dominio + 80 intake); build del dominio verde. Permiso pause EFEONCE_ADMIN corregido según canon.
-Berel ya sincronizado desde HubSpot con importes NULL; alcance privado. Falta destinatario humano.
-Equipo Sky conciliado; términos, login/rutas/canales pendientes.
-No aplicar SQL para el gap comercial. Writes OFF hasta certificación; task abierta, sin envíos.
-TASK-1834 conserva entrada, TASK-1687 catálogo; 1853–1856 to-do. TASK-1690 sigue in-progress.
+**EPIC-046 / TASK-1852 (09/09):** Production `released`; [evidencia y pendientes](docs/audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md).
+PR #231/main `5726ce9d90`, orquestador `34416904936`; gates y watchdog verdes; excepción pause auditada.
+**10/09 (local, sin push):** términos con `bundledModules` (Berel seo_v2+AEO, Sky creative_hub); tres Berel `invited`
+sin correo; preview Sky limpio en prod; chats Teams `ready` y preferencias `client_service_default_v1` en las seis; contrato
+`delegated_oauth` sólo local. Invitaciones Berel BLOQUEADAS hasta tener UI. Falta: apply Sky (sesión humana + flag),
+release, Entra/gateway; `/creative-hub` 404 (1687).
+[Readback](docs/audits/client-portal/TASK-1852_MAPPING_PROVISIONING_READBACK_2026-09-10.json).
+TASK-1834 entrada, TASK-1687 catálogo; 1853–1856 to-do; TASK-1690 in-progress.
 
 **EPIC-045 ↔ EPIC-046:** Hitos I/N obligatorios: Insights cliente/interno + email/in-app/Teamsbot con
 deep links; shared separado y móvil posterior. Contrato en arquitectura Insights §§7.1/9.1 y ADRs.

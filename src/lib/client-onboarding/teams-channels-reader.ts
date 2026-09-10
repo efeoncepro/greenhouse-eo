@@ -125,3 +125,69 @@ export const listTeamChannelsForLinking = async (teamId: string): Promise<TeamCh
     return { ok: false, reason: 'No pudimos conectar con Microsoft Graph. Intenta de nuevo.', channels: [] }
   }
 }
+
+export interface GroupChatInspection {
+  ok: boolean
+  /** `verified` = the bot app is installed in the chat; `unverified` = Graph could not confirm (permission/404). */
+  membership: 'verified' | 'unverified'
+  chatType?: string | null
+  topic?: string | null
+  reason?: string
+}
+
+const CHAT_ID_PATTERN = /^19:[A-Za-z0-9_-]+@thread\.v2$/
+
+export const isTeamsGroupChatId = (value: string): boolean => CHAT_ID_PATTERN.test(value.trim())
+
+/**
+ * TASK-1852 — inspección read-only de un chat grupal (`GET /v1.0/chats/{id}` +
+ * `GET /v1.0/chats/{id}/installedApps?$expand=teamsApp`). No envía nada. Sirve para decidir
+ * `provisioning_status`: sólo `verified` (el bot está instalado en el chat) permite `ready`;
+ * si Graph no tiene permiso o el chat no es visible, el canal queda `pending_setup` con razón,
+ * nunca `ready` por inferencia.
+ */
+export const inspectGroupChatForLinking = async (chatId: string, botAppId: string): Promise<GroupChatInspection> => {
+  const id = (chatId || '').trim()
+
+  if (!isTeamsGroupChatId(id)) return { ok: false, membership: 'unverified', reason: 'El identificador no es un chat grupal de Teams (19:…@thread.v2).' }
+
+  const token = await acquireToken()
+
+  if (!token) return { ok: false, membership: 'unverified', reason: 'No pudimos autenticar el bot de Teams. Verifica las credenciales.' }
+
+  try {
+    const chatRes = await fetch(`${GRAPH_API}/chats/${encodeURIComponent(id)}?$select=id,chatType,topic`, {
+      headers: { Authorization: `Bearer ${token}` },
+      signal: AbortSignal.timeout(15_000)
+    })
+
+    if (!chatRes.ok) {
+      return { ok: true, membership: 'unverified', reason: `Microsoft Graph respondió ${chatRes.status} al leer el chat; la pertenencia del bot no se pudo confirmar.` }
+    }
+
+    const chat = (await chatRes.json()) as { chatType?: string; topic?: string | null }
+
+    const appsRes = await fetch(`${GRAPH_API}/chats/${encodeURIComponent(id)}/installedApps?$expand=teamsApp($select=id,externalId,displayName)`, {
+      headers: { Authorization: `Bearer ${token}` },
+      signal: AbortSignal.timeout(15_000)
+    })
+
+    if (!appsRes.ok) {
+      return { ok: true, membership: 'unverified', chatType: chat.chatType ?? null, topic: chat.topic ?? null,
+        reason: `Microsoft Graph respondió ${appsRes.status} al listar las apps del chat; la pertenencia del bot no se pudo confirmar.` }
+    }
+
+    const apps = (await appsRes.json()) as { value?: Array<{ teamsApp?: { externalId?: string | null; id?: string } }> }
+    const installed = (apps.value ?? []).some(app => app.teamsApp?.externalId === botAppId || app.teamsApp?.id === botAppId)
+
+    return installed
+      ? { ok: true, membership: 'verified', chatType: chat.chatType ?? null, topic: chat.topic ?? null }
+      : { ok: true, membership: 'unverified', chatType: chat.chatType ?? null, topic: chat.topic ?? null,
+          reason: 'El bot de Greenhouse no aparece instalado en este chat; agrégalo desde Teams antes de marcarlo listo.' }
+  } catch (err) {
+    captureWithDomain(err, 'integrations.teams', { tags: { source: 'teams_channels_reader', stage: 'inspect_chat' } })
+
+    return { ok: false, membership: 'unverified', reason: 'No pudimos conectar con Microsoft Graph. Intenta de nuevo.' }
+  }
+}
+

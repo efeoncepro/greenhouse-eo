@@ -5,13 +5,29 @@
 2. Solicita el preview por la API/CLI del [runbook](../../operations/CLIENT_SERVICE_ENABLEMENT_RUNBOOK_V1.md).
    Nexa puede preparar la propuesta cuando sus acciones estén habilitadas.
 3. Revisa las altas y asignaciones conservadas, así como las vistas revocadas a cada persona.
-4. Resuelve los bloqueos de contrato, catálogo o pertenencia con su dueño. No agregues contratos o permisos
-   ficticios para que el preview pase.
+4. Resuelve los bloqueos de contrato, catálogo o pertenencia con su dueño. El mapping servicio → módulos se
+   declara con `POST /api/platform/app/commercial/services/{serviceId}/terms` (o la CLI
+   `scripts/commercial/declare-commercial-terms.ts`) indicando `bundledModules`; las personas se provisionan por el
+   checklist de onboarding (`portal-users/invite`, con `delivery: 'deferred'` si aún no corresponde enviar correo).
+   No agregues contratos o permisos ficticios para que el preview pase.
 5. Comprueba login, fuente, ruta y canal antes de abrir el servicio. `canApply` sólo valida configuración.
 6. Con aprobación de activación y permisos comprobados, aplica exactamente el preview revisado. Guarda
    el recibo; al reintentar conserva su clave de idempotencia y el mismo payload.
 7. Si corresponde compensar, usa el recibo. Un conflicto por cambios posteriores necesita revisión del
    estado actual, no reintentos forzados.
 
-El MCP de una máquina puede inventariar cuando tiene binding interno. Actualmente no puede aprobar altas
-o compensaciones por una persona; usa una sesión administrativa app. Esta entrega no activa la cohorte.
+El MCP de una máquina puede inventariar cuando tiene binding interno, pero nunca aprueba altas o compensaciones
+por sí solo. La aprobación llega por la sesión administrativa app de la persona o por un bearer delegado que esa
+persona autorizó (capability `client_services.enablement.write`; el gateway lo obtiene por token exchange con el
+cliente `efeonce-mcp-client-services`). Que las tools aparezcan en el servidor interno no significa que estén
+federadas en el gateway: la federación y el scope Entra son pasos del repo `efeonce-mcp`.
+
+Para esta cohorte, consulta primero el
+[dossier de discovery](../../audits/client-portal/TASK-1852_CLAUDE_DISCOVERY_2026-09-09.md). Berel tiene tres
+personas provisionadas con invitación diferida: hasta entregarla y que activen su acceso, el preview las bloquea
+como `person_invitation_pending`. Sky tiene tres personas cliente activas, con password reset pendiente y sin
+login observado, y un preview limpio listo para que una persona administradora lo aplique. No uses el usuario técnico Berel ni el equipo interno Sky
+como destinatarios. Los nombres, emails e IDs exactos viven sólo en el handoff privado local señalado allí.
+
+Esta entrega no activa la cohorte. Mantén el flag OFF hasta tener preview limpio, aprobación humana,
+compensación disponible y evidencia de login/ruta/canal.

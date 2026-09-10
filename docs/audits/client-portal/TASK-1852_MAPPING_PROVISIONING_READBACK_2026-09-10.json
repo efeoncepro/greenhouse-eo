@@ -1,0 +1,397 @@
+{
+  "task": "TASK-1852",
+  "phase": "mapping_provisioning_preview",
+  "observedAt": "2026-09-10T01:03:20.326Z",
+  "commercialTerms": {
+    "berel": {
+      "termsId": "5bf801c0-7cb3-4ab3-9b8f-f0b702f4a86d",
+      "serviceId": "SVC-HS-554261764224",
+      "termsKind": "committed",
+      "effectiveFrom": "2026-09-09",
+      "monthlyAmountClp": null,
+      "bundledModules": [
+        "ai_visibility_v1",
+        "seo_v2"
+      ],
+      "declaredBy": "user-agent-e2e-001",
+      "declaredAt": "2026-09-10T01:00:18.422Z"
+    },
+    "sky": {
+      "termsId": "7c26c8df-f409-4e34-bef7-d225aaf9f022",
+      "serviceId": "SVC-HS-551519372424",
+      "termsKind": "committed",
+      "effectiveFrom": "2026-09-09",
+      "monthlyAmountClp": null,
+      "bundledModules": [
+        "creative_hub_globe_v1"
+      ],
+      "declaredBy": "user-agent-e2e-001",
+      "declaredAt": "2026-09-10T01:00:19.677Z"
+    }
+  },
+  "berelProvisioning": {
+    "observedAt": "2026-09-10T01:00:38.291Z",
+    "delivery": "deferred",
+    "inviteTokensMinted": "0",
+    "people": [
+      {
+        "userId": "60418418-df28-458e-837d-83cecb9b9a69",
+        "created": true,
+        "rolesAssigned": [
+          "client_executive"
+        ],
+        "deliveryStatus": "deferred"
+      },
+      {
+        "userId": "c76bdfb4-a62d-4d19-862e-b7ad700c776a",
+        "created": true,
+        "rolesAssigned": [
+          "client_executive"
+        ],
+        "deliveryStatus": "deferred"
+      },
+      {
+        "userId": "61ad9fd3-3296-4b44-a3b5-7dea1aa3baf3",
+        "created": true,
+        "rolesAssigned": [
+          "client_executive"
+        ],
+        "deliveryStatus": "deferred"
+      }
+    ],
+    "readback": [
+      {
+        "user_id": "c76bdfb4-a62d-4d19-862e-b7ad700c776a",
+        "status": "invited",
+        "active": true,
+        "auth_mode": "invited",
+        "client_id": "cli-0863869c-eaac-4630-9bd0-af283c56f7fb",
+        "identity_profile_id": null,
+        "role_code": "client_executive",
+        "role_status": "active"
+      },
+      {
+        "user_id": "61ad9fd3-3296-4b44-a3b5-7dea1aa3baf3",
+        "status": "invited",
+        "active": true,
+        "auth_mode": "invited",
+        "client_id": "cli-0863869c-eaac-4630-9bd0-af283c56f7fb",
+        "identity_profile_id": null,
+        "role_code": "client_executive",
+        "role_status": "active"
+      },
+      {
+        "user_id": "60418418-df28-458e-837d-83cecb9b9a69",
+        "status": "invited",
+        "active": true,
+        "auth_mode": "invited",
+        "client_id": "cli-0863869c-eaac-4630-9bd0-af283c56f7fb",
+        "identity_profile_id": null,
+        "role_code": "client_executive",
+        "role_status": "active"
+      }
+    ]
+  },
+  "productionPreview": {
+    "baseURL": "https://greenhouse.efeoncepro.com",
+    "actor": "dedicated internal agent; no human login proof",
+    "cases": [
+      {
+        "case": "berel_preview",
+        "status": 200,
+        "canApply": false,
+        "fingerprint": "e0f0922271381c09da93df1791165862ce335965e863b30d1f9186d03f502d58",
+        "changes": [
+          {
+            "serviceId": "SVC-HS-554261764224",
+            "termsId": "5bf801c0-7cb3-4ab3-9b8f-f0b702f4a86d",
+            "moduleKey": "seo_v2",
+            "action": "preserve",
+            "assignmentId": "cpma-berel-seo-contracted:seo_v2"
+          },
+          {
+            "serviceId": "SVC-HS-554261764224",
+            "termsId": "5bf801c0-7cb3-4ab3-9b8f-f0b702f4a86d",
+            "moduleKey": "ai_visibility_v1",
+            "action": "preserve",
+            "assignmentId": "cpma-task1277-berel-ai-visibility"
+          }
+        ],
+        "blockers": [
+          {
+            "code": "person_not_authorized_in_organization",
+            "subject": "60418418-df28-458e-837d-83cecb9b9a69",
+            "owner": "Identity"
+          },
+          {
+            "code": "person_not_authorized_in_organization",
+            "subject": "61ad9fd3-3296-4b44-a3b5-7dea1aa3baf3",
+            "owner": "Identity"
+          },
+          {
+            "code": "person_not_authorized_in_organization",
+            "subject": "c76bdfb4-a62d-4d19-862e-b7ad700c776a",
+            "owner": "Identity"
+          }
+        ],
+        "readinessCodes": [
+          "producer_coverage_unverified",
+          "identity_link_unverified",
+          "human_login_unverified",
+          "preferences_not_explicit",
+          "teams_destination_unverified",
+          "authenticated_route_unverified"
+        ],
+        "terms": [
+          {
+            "id": "5bf801c0-7cb3-4ab3-9b8f-f0b702f4a86d",
+            "moduleKeys": [
+              "ai_visibility_v1",
+              "seo_v2"
+            ],
+            "startsAt": "2026-09-09"
+          }
+        ]
+      },
+      {
+        "case": "sky_preview",
+        "status": 200,
+        "canApply": true,
+        "fingerprint": "05d8f4b799930567c915ed129245f0caafc68dad76ec361b78261b6a4668d433",
+        "changes": [
+          {
+            "serviceId": "SVC-HS-551519372424",
+            "termsId": "7c26c8df-f409-4e34-bef7-d225aaf9f022",
+            "moduleKey": "creative_hub_globe_v1",
+            "action": "preserve",
+            "assignmentId": "cpma-ec0041f7-e416-442f-acab-73f645c06f56"
+          }
+        ],
+        "blockers": [],
+        "readinessCodes": [
+          "producer_coverage_unverified",
+          "human_login_unverified",
+          "preferences_not_explicit",
+          "teams_destination_unverified",
+          "authenticated_route_unverified"
+        ],
+        "terms": [
+          {
+            "id": "7c26c8df-f409-4e34-bef7-d225aaf9f022",
+            "moduleKeys": [
+              "creative_hub_globe_v1"
+            ],
+            "startsAt": "2026-09-09"
+          }
+        ]
+      },
+      {
+        "case": "agent_write_denied_with_clean_preview",
+        "status": 403,
+        "codes": [
+          "invalid_delegated_context"
+        ]
+      }
+    ]
+  },
+  "berelRoutesProduction": {
+    "observedAt": "2026-09-10T01:03:53.512Z",
+    "actor": "user-agent-berel-client-001 (technical persona of the Berel organization; not a client person)",
+    "cases": [
+      {
+        "path": "/growth/seo",
+        "status": 200,
+        "location": null,
+        "finalHtml": true
+      },
+      {
+        "path": "/growth/seo/report",
+        "status": 200,
+        "location": null,
+        "finalHtml": true
+      },
+      {
+        "path": "/aeo",
+        "status": 200,
+        "location": null,
+        "finalHtml": true
+      },
+      {
+        "path": "/home",
+        "status": 200,
+        "location": null,
+        "finalHtml": true
+      },
+      {
+        "path": "/creative-hub",
+        "status": 404,
+        "location": null,
+        "finalHtml": null
+      },
+      {
+        "path": "/campanas",
+        "status": 307,
+        "location": "/home?denied=campanas",
+        "finalHtml": null
+      }
+    ]
+  },
+  "teamsDestinations": {
+    "observedAt": "2026-09-10T01:35:34.679Z",
+    "method": "writeTeamsGroupChatForSpace (Graph read-only: GET /chats/{id} + installedApps); ningún mensaje enviado",
+    "results": {
+      "berel": {
+        "ok": true,
+        "channelCode": "client-teams-chat-space-cli-0863869c-eaac-4630-9bd0-af283c56f7fb",
+        "provisioningStatus": "ready",
+        "membership": "verified"
+      },
+      "sky": {
+        "ok": true,
+        "channelCode": "client-teams-chat-spc-ae463d9f-b404-438b-bd5c-bd117d45c3b9",
+        "provisioningStatus": "ready",
+        "membership": "verified"
+      }
+    },
+    "rows": [
+      {
+        "channel_code": "client-teams-chat-space-cli-0863869c-eaac-4630-9bd0-af283c56f7fb",
+        "recipient_kind": "chat_group",
+        "provisioning_status": "ready",
+        "provisioning_status_reason": null,
+        "space_id": "space-cli-0863869c-eaac-4630-9bd0-af283c56f7fb",
+        "disabled_at": null
+      },
+      {
+        "channel_code": "client-teams-chat-spc-ae463d9f-b404-438b-bd5c-bd117d45c3b9",
+        "recipient_kind": "chat_group",
+        "provisioning_status": "ready",
+        "provisioning_status_reason": null,
+        "space_id": "spc-ae463d9f-b404-438b-bd5c-bd117d45c3b9",
+        "disabled_at": null
+      }
+    ],
+    "skyPreviewAfter": {
+      "canApply": true,
+      "fingerprint": "a6811c4ce775d5d78dd0ead0ea5536cbd768071669bf3a570ef2ad0f145a0e18",
+      "teamsReadiness": []
+    }
+  },
+  "notificationPreferences": {
+    "observedAt": "2026-09-10T01:48:27.744Z",
+    "policy": "client_service_default_v1",
+    "berel": [
+      {
+        "userId": "60418418-df28-458e-837d-83cecb9b9a69",
+        "outcome": "applied",
+        "categories": [
+          "report_ready",
+          "feedback_requested",
+          "sprint_milestone",
+          "delivery_update"
+        ]
+      },
+      {
+        "userId": "61ad9fd3-3296-4b44-a3b5-7dea1aa3baf3",
+        "outcome": "applied",
+        "categories": [
+          "report_ready",
+          "feedback_requested",
+          "sprint_milestone",
+          "delivery_update"
+        ]
+      },
+      {
+        "userId": "c76bdfb4-a62d-4d19-862e-b7ad700c776a",
+        "outcome": "applied",
+        "categories": [
+          "report_ready",
+          "feedback_requested",
+          "sprint_milestone",
+          "delivery_update"
+        ]
+      }
+    ],
+    "sky": [
+      {
+        "userId": "user-hubspot-contact-139243510680",
+        "outcome": "applied",
+        "categories": [
+          "report_ready",
+          "feedback_requested",
+          "sprint_milestone",
+          "delivery_update"
+        ]
+      },
+      {
+        "userId": "user-hubspot-contact-157404441684",
+        "outcome": "applied",
+        "categories": [
+          "report_ready",
+          "feedback_requested",
+          "sprint_milestone",
+          "delivery_update"
+        ]
+      },
+      {
+        "userId": "user-hubspot-contact-157404441685",
+        "outcome": "applied",
+        "categories": [
+          "report_ready",
+          "feedback_requested",
+          "sprint_milestone",
+          "delivery_update"
+        ]
+      }
+    ],
+    "skyPreviewAfter": {
+      "canApply": true,
+      "fingerprint": "e2e5d938a6c3221bf514c4305f9dc40eb5d915357dc317a2e4a9c1709779ffcc",
+      "readiness": [
+        "producer_coverage_unverified",
+        "human_login_unverified",
+        "authenticated_route_unverified"
+      ],
+      "preferences": [
+        {
+          "id": "user-hubspot-contact-139243510680",
+          "prefs": 4
+        },
+        {
+          "id": "user-hubspot-contact-157404441684",
+          "prefs": 4
+        },
+        {
+          "id": "user-hubspot-contact-157404441685",
+          "prefs": 4
+        }
+      ]
+    },
+    "berelPreviewAfter": {
+      "canApply": false,
+      "blockers": [
+        "person_invitation_pending"
+      ],
+      "readiness": [
+        "producer_coverage_unverified",
+        "identity_link_unverified",
+        "human_login_unverified",
+        "authenticated_route_unverified"
+      ],
+      "preferences": [
+        {
+          "id": "60418418-df28-458e-837d-83cecb9b9a69",
+          "prefs": 4
+        },
+        {
+          "id": "61ad9fd3-3296-4b44-a3b5-7dea1aa3baf3",
+          "prefs": 4
+        },
+        {
+          "id": "c76bdfb4-a62d-4d19-862e-b7ad700c776a",
+          "prefs": 4
+        }
+      ]
+    }
+  }
+}

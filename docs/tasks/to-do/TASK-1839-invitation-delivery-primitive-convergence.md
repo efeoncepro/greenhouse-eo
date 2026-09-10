@@ -1,5 +1,15 @@
 # TASK-1839 — Convergencia de la invitación del portal (`inviteClientPortalUser`, TASK-1012) con la entrega gobernada de Efeonce ID (TASK-1837)
 
+## Delta 2026-09-10
+
+- `inviteClientPortalUser` ganó `delivery: 'immediate' | 'deferred'` y `deliveryStatus` en el resultado, más
+  `deliverClientPortalInvitation` (token + correo para una persona `invited` del mismo cliente) y la ruta
+  `POST /api/admin/clients/{organizationId}/lifecycle/portal-users/deliver` — cerrado por trabajo en `TASK-1852`
+  (cohorte Berel provisionada sin enviar mensajes). El armado de la URL (`NEXT_PUBLIC_APP_URL`) y la convergencia
+  con la entrega gobernada de Efeonce ID siguen en el scope de esta task: `deliverInvitationEmail` es el único
+  punto que hoy compone el link, así que la convergencia toca una sola función.
+
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

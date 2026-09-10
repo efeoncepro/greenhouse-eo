@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `EPIC-046`
-- Status real: `code complete, rollout pendiente. Mecanismo común local y conciliación comercial, 392 tests y smoke HTTP autenticado verificados; alcance comercial confirmado por el operador y rollout autorizado. Registros comerciales, paridad de escritura delegada, login/rutas/canales y deploy pendientes; task abierta`
+- Status real: `code complete local + datos aplicados, apply cliente pendiente de sesión humana. Production sirve 5726ce9d90 con altas OFF. 2026-09-10: mapping comercial declarado para Berel (seo_v2 + ai_visibility_v1) y Sky (creative_hub_globe_v1) por declareCommercialTerms con bundledModules validados; tres personas Berel provisionadas con invitación diferida (sin correo); preview Sky limpio en producción (canApply=true, fingerprint 05d8f4b7…); Berel bloqueado sólo por invitaciones pendientes. Contrato de autoridad humana delegada (app_session | delegated_oauth + token exchange client_services) implementado y probado localmente, sin release ni push; federación gateway/scope Entra fuera del repo. Login humano y canales sin certificar`
 - Rank: `1`
 - Domain: `platform|identity|delivery`
 - Blocked by: `none`
@@ -89,6 +89,11 @@ TASK-1853/1854/1855/1856; TASK-1834 como consumer de matriz/cohorte y casos de r
 - `scripts/client-portal/`: CLI común HTTP; no reglas por cliente en el primitive.
 - Adapters API Platform/MCP y registro Nexa según el [plan aprobado](../plans/TASK-1852-plan.md).
 - `docs/operations/`: matriz/runbook de cohorte y readback fechado.
+- `src/lib/commercial/sample-sprints/commercial-terms.ts` + `src/lib/api-platform/resources/app-commercial-terms.ts` + `src/app/api/platform/app/commercial/services/[serviceId]/terms/route.ts` + `scripts/commercial/declare-commercial-terms.ts`: mapping servicio → módulos con validación de catálogo y contrato App (2026-09-10).
+- `src/lib/sister-platforms/mcp-token-exchange.ts` + `migrations/20260910005222927_task-1852-mcp-client-services-oauth-client.sql`: clase delegada `client_services.enablement.write` y cliente de exchange (2026-09-10).
+- `src/lib/client-onboarding/invite-client-portal-user.ts` + rutas `lifecycle/portal-users/{invite,deliver}`: entrega diferida de invitación (2026-09-10; TASK-1839/1012 conservan la convergencia de URL/entrega).
+- `src/lib/client-onboarding/teams-connect-store.ts` + `teams-channels-reader.ts` + ruta `lifecycle/teams/chat` + migración `20260910013234351`: destino Teams `chat_group` por Space con verificación read-only (2026-09-10; TASK-1010 conserva el wizard).
+- `src/lib/notifications/client-preference-policy.ts` + ruta `lifecycle/portal-users/notification-preferences`: política explícita de preferencias para personas cliente (2026-09-10; TASK-690/693 conservan el Hub).
 
 ## Current Repo State
 
@@ -171,7 +176,7 @@ Baseline de código y documentos de esta planificación; flags, datos y entrega 
 
 - [x] SoT/consumers verificados con schema real y [QA](../../audits/client-portal/TASK-1852_IMPLEMENTATION_QA_2026-09-09.md). Sin tablas nuevas ni allowlist BFF existente; writes limitados a assignments/events/outbox/command store.
 - [x] Sin migración; compensación el mismo día, cambios posteriores, atomicidad y negativos de tenant probados en PostgreSQL local real (14 tests). Rollout cliente separado.
-- [ ] API/MCP/Nexa reutilizan primitives; manifests/docs/manuals actualizados. Paridad de escritura delegada pendiente: consumer machine no acredita aprobación humana; 403 explícito. No se declara parity-complete.
+- [x] API/MCP/Nexa reutilizan primitives; manifests/docs/manuals actualizados. Paridad de escritura delegada a nivel capability: el lane App acepta `delegated_oauth` (capability `client_services.enablement.write`, exchange RFC 8693 con cliente dedicado sembrado) y registra `receipt.authority`; el binding machine sigue 403 por diseño. Federación en el gateway y scope Entra quedan fuera del repo ([readback](../../audits/client-portal/TASK-1852_MAPPING_PROVISIONING_READBACK_2026-09-10.json)).
 - [x] Audit/outbox, retries concurrentes, respuesta perdida/fallida, rollback propio y lectura sin efectos probados en PostgreSQL local; [QA](../../audits/client-portal/TASK-1852_IMPLEMENTATION_QA_2026-09-09.md).
 
 
@@ -183,18 +188,28 @@ Baseline de código y documentos de esta planificación; flags, datos y entrega 
 
 ## Discovery y plan de ejecución — 2026-09-09
 
-- [x] Goal común aprobado, permanencia en `develop` y sin subagentes; hook `--develop` ejecutado.
+- [x] Goal común aprobado; implementación inicial secuencial en `develop`, sin subagentes; hook `--develop` ejecutado.
 - [x] [Discovery y matriz inicial](../../audits/client-portal/TASK-1852_SERVICE_ENABLEMENT_DISCOVERY_2026-09-09.md): schema/FK/índices/triggers, cohortes, servicios, fuentes, usuarios y canales consultados read-only; 68 tests baseline passed.
 - [x] [Plan de implementación](../plans/TASK-1852-plan.md) aprobado en el checkpoint humano P1 de `TASK_PROCESS.md` §Phase 3 («Vamos», 2026-09-09). Goal y plan aprobados; hook revalidado en develop.
 - [x] Código local: reader/preview, apply/rollback, atomic command store, App/Ecosystem/CLI/MCP/Nexa y documentación. 290 tests; certificación de configuración en [readback](../../audits/client-portal/TASK-1852_PREVIEW_READBACK_2026-09-09.json).
-- [ ] Apertura operativa: contratos, login/rutas/canales, authority delegada y rollout sin certificar; [blockers con dueño](../../audits/client-portal/TASK-1852_IMPLEMENTATION_QA_2026-09-09.md).
+- [x] Rollout de staging: SHA `68e18fe0`, deployment READY, siete canaries HTTP; [evidencia y recuperación de workers](../../audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md).
+- [x] Rollout técnico Production: PR #231, SHA `5726ce9d90`, manifest `released`, cinco workers Ready y 100 % de tráfico, watchdog sin drift/datos ausentes; siete canaries HTTP. [Readback](../../audits/client-portal/TASK-1852_PRODUCTION_RELEASE_READBACK_2026-09-09.json). Excepción puntual de acceso autorizada y persistida; altas OFF.
+- [x] Mapping comercial declarado (términos con `bundled_modules`, audit + outbox) y tres personas Berel provisionadas con invitación diferida; preview Sky limpio en producción y rutas mapeadas de Berel 200 con la persona técnica de la organización. [Readback 2026-09-10](../../audits/client-portal/TASK-1852_MAPPING_PROVISIONING_READBACK_2026-09-10.json).
+- [x] Destinos Teams registrados: chats grupales de Berel y Sky como `chat_group` del bot, `ready` con pertenencia verificada por Graph read-only (ruta `lifecycle/teams/chat`, migración `20260910013234351`); `teams_destination_unverified` desapareció en producción. Sin mensajes.
+- [ ] Apertura operativa: apply de Sky por sesión humana administrativa con flag ON, entrega de invitaciones Berel (bloqueada por el operador hasta que las interfaces estén listas), login humano de las seis personas, rutas con sesión propia (Sky `cliente.creative_hub` sigue 404, TASK-1687) ; preferencias ya declaradas. [Blockers con dueño](../../audits/client-portal/TASK-1852_IMPLEMENTATION_QA_2026-09-09.md).
+- [x] Consolidación documental para discovery de Claude ejecutada con tres subagentes read-only autorizados por el operador; [dossier vigente](../../audits/client-portal/TASK-1852_CLAUDE_DISCOVERY_2026-09-09.md).
 
-Rollout autorizado el 2026-09-09 con alcance de servicios y equipo confirmado por el operador. Detalles comerciales preservados en evidencia local privada; [registro técnico](../../audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md). La confirmación no inventa precios, vigencia contractual, destinatarios ni preferencias.
+Rollout autorizado el 2026-09-09 con alcance de servicios y equipo confirmado por el operador. Después,
+el operador eligió tres destinatarios Berel y confirmó los tres usuarios activos Sky. Detalles comerciales y
+PII permanecen en evidencia local privada; [registro técnico](../../audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md).
+La selección no materializa usuarios, precios, vigencia contractual, login ni preferencias.
 
-Hallazgos: el resolver de business lines devuelve `[]` para Sky por unir `module_code` con `module_id`;
-la FK real resuelve `globe`. Berel no tiene filas en `services`; Sky tiene diseño digital y tres usuarios
-activos con `password_reset_pending`, sin login registrado. Mantener acceso existente y registrar blockers,
-sin crear identidad, contrato, preferencia ni canal por inferencia.
+Hallazgos iniciales: el resolver de business lines devolvía `[]` para Sky por unir `module_code` con
+`module_id`; la FK real resuelve `globe`. Berel no tenía filas en `services`; el rollout materializó
+`SVC-HS-554261764224` desde HubSpot, sin inventar importes ni términos. Las tres personas Berel elegidas
+siguen sin usuario Greenhouse. Sky tiene tres usuarios cliente activos con `password_reset_pending`, sin
+login registrado. Mantener acceso existente y registrar blockers, sin crear identidad, contrato, preferencia
+ni canal por inferencia.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 3 — EXECUTION SPEC
@@ -220,7 +235,7 @@ sin crear identidad, contrato, preferencia ni canal por inferencia.
 ## Out of Scope
 
 - Login/OIDC/callback/selector de organización (TASK-1834); provisión de identidades (TASK-1839); migración del catálogo de Sky (TASK-1687); cascada general TASK-828/829; ampliación contractual, envío de mensajes o sustitución de Notion/Drupal.
-- Sin commit/push/deploy, cambios live ni envíos como consecuencia de registrar la task. Subagentes y cambios de rama no autorizados.
+- Sin commit/push/deploy, cambios live ni envíos como consecuencia de registrar la task. Durante la implementación inicial no se autorizaron subagentes. El 2026-09-09 el operador sí autorizó tres subagentes read-only para consolidar el discovery documental; cambios de rama y worktrees permanecen fuera.
 
 ## Detailed Spec
 
@@ -281,7 +296,8 @@ Fuentes de Berel/Sky, responsables, consentimiento de piloto y disponibilidad Te
 - [x] Consume principal/sesión vigentes y organización explícita; revalida autoridad y vetos por persona. Sin nuevo login/callback/provisión; destinos sólo declarados. Contrato en ADR/runbook; tests de aislamiento y revocación. Retorno 0/1/N operativo pendiente en TASK-1834.
 - [ ] Login vigente se prueba para la apertura inicial. Cohorte nativa sólo se habilita tras TASK-1834 y sus gates TASK-1833/1832/1841 aplicables; no se exige su cierre total para inventario/readers.
 - [x] Preview/apply concurrente y replay conservan un efecto; preserva asignación ajena y receipt inmutable. Compensación canónica el mismo día y rechazo por cambios posteriores: 14 ensayos PostgreSQL local en QA.
-- [ ] Preferencias explícitas, login y destino/entrega por canal pendientes en cuatro selecciones; usuario Berel técnico no es piloto humano. Sin members ficticios ni mensajes. Dueños Identity/Notifications en QA.
+- [x] Preferencias explícitas declaradas para las seis personas con la política `client_service_default_v1` (ruta `portal-users/notification-preferences`; cadencia por evento; Teams sólo reporte/feedback vía Insights). Login y entrega por canal siguen pendientes.
+- [ ] Login y entrega por canal pendientes para seis personas elegidas. Las tres de Berel ya existen (invitación diferida, sin correo; entrega bloqueada por el operador hasta tener interfaces) y requieren entrega + activación; las tres de Sky están activas pero sin login observado. Destinos Teams (chats grupales) registrados `ready` en ambas organizaciones; preferencias y cadencia siguen sin declarar. El usuario Berel técnico no es piloto humano. Sin members ficticios ni mensajes. Dueños Identity/Notifications en QA.
 
 ## Verification
 
@@ -293,10 +309,10 @@ Fuentes de Berel/Sky, responsables, consentimiento de piloto y disponibilidad Te
 
 ## Closing Protocol
 
-- [x] Status real, Lifecycle y carpeta reflejan evidencia; permanece in-progress sin rollout.
+- [x] Status real, Lifecycle y carpeta reflejan evidencia; permanece in-progress con código desplegado y apertura cliente pendiente.
 - [x] Criterios locales tildados con evidencia; login/canales/paridad delegada siguen sin tildar.
 - [x] Registry/README/EPIC-046 al día; documentación técnica/funcional, manual y recuperación en runbook.
-- [x] Handoff/changelog al día; gates documentales finales registrados en QA. Sin commit/push automático.
+- [x] Handoff/changelog y dossier de discovery al día; gates, promoción, cohortes y límites de paridad registrados. Sin apertura cliente implícita.
 
 ## Follow-ups
 
@@ -305,4 +321,4 @@ Las dueñas citadas conservan su scope y epic. No crear tareas por gráfico, cue
 
 ## Open Questions
 
-Goal y plan P1 aprobados y ejecutados. Los blockers de apertura están en QA: Commercial/Delivery, Identity, catálogo TASK-1687, Notifications y authority de compensación/delegación. No requieren inventar contratos, permisos o consentimientos para cerrar la revisión local.
+Goal y plan P1 aprobados y ejecutados. Blockers vigentes (QA): apply de Sky exige una sesión humana administrativa (el harness sólo dispone de la persona técnica de diagnóstico, que por contrato no aprueba writes) y el flag ON; Berel exige entregar las invitaciones (mensaje) y que las personas activen su acceso; TASK-1687 conserva el destino `cliente.creative_hub` (404 en producción); Notifications no tiene canal/preferencias en ninguna de las dos organizaciones. El contrato delegado del 2026-09-10 sólo está en local: requiere release, `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS`, scope Entra y federación en `efeonce-mcp`.

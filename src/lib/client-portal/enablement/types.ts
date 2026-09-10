@@ -48,6 +48,15 @@ export interface ServiceEnablementApplyRequest {
   idempotencyKey: string
 }
 
+/**
+ * How the attributed human reached the command. `app_session` is a first-party cookie/app token;
+ * `delegated_oauth` is a sister-platform bearer minted for that human (RFC 8693 exchange or a human
+ * OAuth grant). The actor is always the human; the authority only records the channel and its evidence.
+ */
+export type ServiceEnablementAuthority =
+  | { kind: 'app_session' }
+  | { kind: 'delegated_oauth'; clientId: string; accessTokenId: string; correlationId: string }
+
 export interface ServiceEnablementReceipt {
   version: 1
   operationId: string
@@ -56,6 +65,8 @@ export interface ServiceEnablementReceipt {
   fingerprint: string
   created: Array<{ assignmentId: string; moduleKey: string; revision: string }>
   preserved: string[]
+  /** Added 2026-09-09 (TASK-1852 delegated authority). Receipts stored before then omit it. */
+  authority?: ServiceEnablementAuthority
 }
 
 export interface ServiceEnablementRollbackRequest {

@@ -131,6 +131,10 @@ La v1 permanece sólo como lectura compatible para vacantes ya publicadas. Regla
   fallback de prosa hasta que People lo migre.
 - El contexto `Efeonce en breve` y el baseline global de beneficios se resuelven
   desde una fuente central versionada; cada opening almacena sólo adiciones reales.
+  Ese contexto se redacta bajo el patrón de dos capas de `PDR-008` (categoría familiar
+  + reencuadre obligatorio en la misma sección) y le habla al candidato, no al cliente;
+  la huella de países se compone desde `EFEONCE_OPERATING_MARKETS`, nunca a mano. No
+  lleva siglas ni metodologías propias: son los primeros 30 segundos de la vacante.
 - La zona de extensión acepta 0–3 bloques `narrative`, `bullets` o `milestones`;
   nunca HTML, CTA, estilos, requisitos, beneficios ni procesos alternativos.
 - La compensación estructurada es un hecho aprobado; el texto libre

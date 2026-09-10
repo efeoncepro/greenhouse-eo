@@ -29,6 +29,8 @@ export interface EngagementCommercialTerms {
   effectiveTo: string | null
   monthlyAmountClp: number | null
   successCriteria: Record<string, unknown> | null
+  /** Module keys of greenhouse_client_portal.modules bundled by this pricing (TASK-824 §5.4; TASK-1852). */
+  bundledModules: string[]
   declaredBy: string | null
   declaredAt: string
   reason: string
@@ -40,6 +42,12 @@ export interface DeclareCommercialTermsInput {
   effectiveFrom: Date | string
   monthlyAmountClp?: number | null
   successCriteria?: Record<string, unknown> | null
+  /**
+   * Module keys the service bundles for the client portal. Each key must exist in the ACTIVE
+   * catalog (`modules.effective_to IS NULL`); unknown or deprecated keys fail closed
+   * (TASK-824 Delta / TASK-828 G-3). Empty means the terms declare no portal bundle.
+   */
+  bundledModules?: string[]
   reason: string
   declaredBy: string
 }
@@ -56,6 +64,7 @@ interface TermsRow extends Record<string, unknown> {
   effective_to: Date | string | null
   monthly_amount_clp: string | number | null
   success_criteria: Record<string, unknown> | null
+  bundled_modules: string[] | null
   declared_by: string | null
   declared_at: Date | string
   reason: string
@@ -146,6 +155,7 @@ const normalizeTerms = (row: TermsRow): EngagementCommercialTerms => ({
   effectiveTo: toDateString(row.effective_to),
   monthlyAmountClp: toNumberOrNull(row.monthly_amount_clp),
   successCriteria: row.success_criteria ?? null,
+  bundledModules: [...(row.bundled_modules ?? [])].sort(),
   declaredBy: row.declared_by ?? null,
   declaredAt: toTimestampString(row.declared_at),
   reason: row.reason
@@ -155,12 +165,57 @@ const isTermsKind = (value: string): value is EngagementCommercialTermsKind => {
   return (ENGAGEMENT_COMMERCIAL_TERMS_KINDS as readonly string[]).includes(value)
 }
 
+const MODULE_KEY_PATTERN = /^[a-z0-9][a-z0-9_]{1,63}$/
+
+const normalizeBundledModules = (value: string[] | undefined): string[] => {
+  if (value === undefined) return []
+  if (!Array.isArray(value)) throw new CommercialTermsValidationError('bundledModules must be an array of module keys.')
+
+  const keys = value.map(item => (typeof item === 'string' ? item.trim() : ''))
+
+  if (keys.some(key => !MODULE_KEY_PATTERN.test(key))) {
+    throw new CommercialTermsValidationError('bundledModules contains an invalid module key.')
+  }
+
+  if (new Set(keys).size !== keys.length) {
+    throw new CommercialTermsValidationError('bundledModules cannot repeat a module key.')
+  }
+
+  if (keys.length > 20) throw new CommercialTermsValidationError('bundledModules cannot exceed 20 module keys.')
+
+  return [...keys].sort()
+}
+
+/** Catalog check at write time: a term never references a module the portal cannot resolve (TASK-828 G-3). */
+const assertBundledModulesActive = async (client: PoolClient, moduleKeys: string[]): Promise<void> => {
+  if (moduleKeys.length === 0) return
+
+  const result = await client.query<{ module_key: string }>(
+    `SELECT module_key
+       FROM greenhouse_client_portal.modules
+      WHERE module_key = ANY($1::text[])
+        AND effective_to IS NULL
+        AND effective_from <= CURRENT_DATE`,
+    [moduleKeys]
+  )
+
+  const active = new Set(result.rows.map(row => row.module_key))
+  const missing = moduleKeys.filter(key => !active.has(key))
+
+  if (missing.length > 0) {
+    throw new CommercialTermsValidationError(
+      `bundledModules references modules that are not active in the client portal catalog: ${missing.join(', ')}.`
+    )
+  }
+}
+
 const assertDeclareInput = (input: DeclareCommercialTermsInput): {
   serviceId: string
   kind: EngagementCommercialTermsKind
   effectiveFrom: string
   monthlyAmountClp: number | null
   successCriteria: Record<string, unknown> | null
+  bundledModules: string[]
   reason: string
   declaredBy: string
 } => {
@@ -193,6 +248,7 @@ const assertDeclareInput = (input: DeclareCommercialTermsInput): {
     effectiveFrom: toIsoDateKey(input.effectiveFrom),
     monthlyAmountClp,
     successCriteria,
+    bundledModules: normalizeBundledModules(input.bundledModules),
     reason,
     declaredBy
   }
@@ -256,6 +312,7 @@ export const declareCommercialTerms = async (
   try {
     return await withTransaction(async client => {
       await assertServiceEligible(client, normalized.serviceId)
+      await assertBundledModulesActive(client, normalized.bundledModules)
 
       await client.query(
         `UPDATE greenhouse_commercial.engagement_commercial_terms
@@ -268,9 +325,9 @@ export const declareCommercialTerms = async (
       const inserted = await client.query<{ terms_id: string }>(
         `INSERT INTO greenhouse_commercial.engagement_commercial_terms (
            service_id, terms_kind, effective_from, monthly_amount_clp,
-           success_criteria, declared_by, reason
+           success_criteria, declared_by, reason, bundled_modules
          ) VALUES (
-           $1, $2, $3::date, $4, $5::jsonb, $6, $7
+           $1, $2, $3::date, $4, $5::jsonb, $6, $7, $8::text[]
          )
          RETURNING terms_id`,
         [
@@ -280,7 +337,8 @@ export const declareCommercialTerms = async (
           normalized.monthlyAmountClp,
           normalized.successCriteria == null ? null : JSON.stringify(normalized.successCriteria),
           normalized.declaredBy,
-          normalized.reason
+          normalized.reason,
+          normalized.bundledModules
         ]
       )
 
@@ -301,7 +359,8 @@ export const declareCommercialTerms = async (
             termsKind: normalized.kind,
             effectiveFrom: normalized.effectiveFrom,
             monthlyAmountClp: normalized.monthlyAmountClp,
-            hasSuccessCriteria: normalized.successCriteria != null
+            hasSuccessCriteria: normalized.successCriteria != null,
+            bundledModules: normalized.bundledModules
           }
         },
         client

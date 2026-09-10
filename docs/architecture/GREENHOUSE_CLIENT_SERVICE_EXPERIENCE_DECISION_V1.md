@@ -12,8 +12,10 @@
 - Epic: [EPIC-046](../epics/to-do/EPIC-046-client-services-visibility-and-self-service.md).
 
 El operador aprobó la propuesta en esta conversación y añadió Efeonce Insights para autogestión cliente
-y gestión interna. Las cinco tasks quedan registradas como TASK-1852–1856 el 2026-09-09. Esta aceptación no declara una
-implementación realizada, cambios comerciales ni un rollout habilitado.
+y gestión interna. Las cinco tasks quedaron registradas como TASK-1852–1856 el 2026-09-09. Esa aceptación
+original no autorizó por sí sola cambios comerciales ni rollout. El estado posterior de TASK-1852 está
+desplegado en Production con writes OFF y apertura cliente pendiente; lo documentan su
+[dossier de discovery](../audits/client-portal/TASK-1852_CLAUDE_DISCOVERY_2026-09-09.md) y readback runtime.
 
 ## Context
 
@@ -202,9 +204,10 @@ obligatoria para diseño y pruebas de contexto; activar el login nativo espera s
 habilitación del servicio con login vigente comprobado puede avanzar sin esperar el cierre total de
 1834. No crear otro login/selector, escribir módulos desde callbacks ni usar un deep link como grant.
 La matriz de cohorte y los casos email/in-app/Teamsbot → login → objeto autorizado se enlazan en ambos
-sentidos. TASK-1853/1854/1855/1856 cubren datos, experiencia y solicitudes. Registro sin implementación.
+sentidos. TASK-1853/1854/1855/1856 cubren datos, experiencia y solicitudes. Este párrafo registra la decisión;
+el delta siguiente documenta la implementación posterior de TASK-1852.
 
-## Implementación local TASK-1852 — habilitación común
+## Implementación y rollout técnico TASK-1852 — habilitación común
 
 El contrato de preview/apply/compensación vive en `src/lib/client-portal/enablement/`, bajo el mismo BFF hoja.
 Usa servicios y términos vigentes como evidencia de mapping; no crea un catálogo comercial paralelo. Los
@@ -217,4 +220,40 @@ transporte. Es evidencia de control; se excluye de la revisión de transición p
 circular entre recibo y revisión. Ningún otro evento queda excluido. Compensación sólo pausa altas propias
 sin cambios posteriores. El detalle operativo y de autoridad está en el
 [runbook](../operations/CLIENT_SERVICE_ENABLEMENT_RUNBOOK_V1.md). Writes nuevos default-off; la identidad
-machine-only ecosystem/MCP mantiene denegación explícita. Esto no declara deploy ni certificación cliente.
+machine-only ecosystem/MCP mantiene denegación explícita. PR #231/main `5726ce9d90` quedó `released` en
+Production; esto declara el rollout técnico verificado, sin certificar apertura cliente ni Full API Parity
+de escritura delegada.
+
+## Delta 2026-09-10 — mapping comercial, autoridad humana delegada e invitación diferida (TASK-1852)
+
+- **Mapping servicio → módulos = término comercial.** El writer canónico `declareCommercialTerms` acepta
+  `bundledModules` y valida cada clave contra el catálogo ACTIVO del portal en la misma transacción (falla cerrado ante
+  claves desconocidas, repetidas o deprecadas; cumple la validación al escribir que TASK-824/828 dejaron declarada).
+  Contrato programático: `GET|POST /api/platform/app/commercial/services/{serviceId}/terms` (`commercial.engagement.*`,
+  sesión humana; `declaredBy` nunca en el body) y la CLI `scripts/commercial/declare-commercial-terms.ts`. Un servicio
+  sin módulo en el catálogo (marketing de contenidos) se declara sin `bundled_modules` para esa prestación; el preview no
+  inventa módulos. Berel y Sky quedaron declarados el 2026-09-10 con `monthly_amount_clp = NULL` (la fuente no informa
+  importes) y `declared_by` = persona técnica de diagnóstico por instrucción del operador.
+- **Autoridad humana delegada (Full API Parity de escritura).** El primitive de habilitación acepta la autoridad de la
+  persona por dos canales y registra cuál (`receipt.authority.kind`): `app_session` y `delegated_oauth`. El segundo es un
+  bearer sister-platform emitido PARA la persona con la capability `client_services.enablement.write` (clase de
+  blast-radius propia: abre acceso de cliente), con `oauthClientId`/`oauthAccessTokenId` durables y sesión humana, o el
+  cliente confidencial de exchange `efeonce-mcp-client-services` (RFC 8693; sólo mintea para un humano interno verificado
+  por Entra que ya puede habilitar módulos; contrato en `mcp-token-exchange.ts`; cliente sembrado por la migración
+  `20260910005222927`). El actor sigue siendo la persona; el scope decide si ESE cliente puede pedir la clase de acción y
+  el primitive relee los derechos dentro de la transacción. El lane ecosystem con binding de máquina permanece
+  `403 invalid_delegated_context` por diseño, no como pendiente. Faltan, fuera de este repo, el scope de entrada en la
+  app Entra del MCP, el consumer en `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS` y la federación en el gateway.
+- **Invitación diferida.** `inviteClientPortalUser` admite `delivery: 'deferred'` (persona + roles, sin token ni correo) y
+  `deliverClientPortalInvitation` entrega después; ambos por la ruta del checklist de onboarding. El preview distingue
+  `person_invitation_pending` de `person_not_authorized_in_organization`: dos estados con dueño y acción distintos.
+- **Destino Teams del cliente = chat grupal registrado, nunca inferido.** El chat compartido con el cliente se persiste como
+  `recipient_kind='chat_group'` por Space (`writeTeamsGroupChatForSpace`, ruta `lifecycle/teams/chat`); `ready` sólo cuando
+  Graph confirma en modo lectura que el bot está instalado. La migración `20260910013234351` relaja el CHECK legado de
+  `teams_bot` (team/channel obligatorios) porque el CHECK por `recipient_kind` ya gobierna los targets. Registrar un
+  destino no es entregar: la entrega sigue en Notifications/Insights.
+- **Preferencias del cliente = política declarada, editable por la persona.** `client_service_default_v1` persiste
+  filas explícitas (reporte/feedback in-app + email; hitos/entregas sólo in-app; cadencia por evento) por la ruta
+  gobernada `portal-users/notification-preferences`; el preview deja de reportar `preferences_not_explicit`. No es
+  consentimiento de marketing ni sustituye la elección de la persona en su portal.
+

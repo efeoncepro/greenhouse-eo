@@ -4,8 +4,38 @@
   "cohort": [
     {
       "label": "Grupo Berel",
-      "note": "Servicio canónico sincronizado desde HubSpot y alcance confirmado por el operador; faltan términos y mapping. El usuario seleccionado es técnico, no destinatario humano certificado.",
-      "request": {
+      "note": "Servicio canónico sincronizado desde HubSpot; términos declarados el 2026-09-10 (kind committed, importes ausentes) con mapping seo_v2 + ai_visibility_v1. Contenidos sin módulo de portal en el catálogo vigente (Commercial/Product). Tres personas provisionadas en modo diferido: existen como usuarios Greenhouse, invitación NO entregada; el preview las reporta como person_invitation_pending (código nuevo; el runtime desplegado las muestra como person_not_authorized_in_organization hasta el release).",
+      "serviceCoverage": [
+        {
+          "service": "SEO/AEO",
+          "serviceId": "SVC-HS-554261764224",
+          "termsId": "5bf801c0-7cb3-4ab3-9b8f-f0b702f4a86d",
+          "moduleKeys": [
+            "seo_v2",
+            "ai_visibility_v1"
+          ],
+          "status": "terms_declared_modules_mapped_assignments_active"
+        },
+        {
+          "service": "Contenidos",
+          "serviceId": "SVC-HS-554261764224",
+          "termsId": "5bf801c0-7cb3-4ab3-9b8f-f0b702f4a86d",
+          "moduleKey": null,
+          "status": "terms_declared_no_portal_module_in_catalog"
+        }
+      ],
+      "recipientSelection": {
+        "authorizedCount": 3,
+        "greenhouseUsersFound": 3,
+        "provisionedAt": "2026-09-10T01:00Z",
+        "delivery": "deferred",
+        "status": "invitation_delivery_and_login_required",
+        "openingRequestReady": false,
+        "privateEvidence": ".captures/task-1852/private-scope/claude-discovery.v1.md",
+        "invitationDelivery": "bloqueada por decisión del operador (2026-09-10) hasta que las interfaces de cliente estén listas; no enviar"
+      },
+      "serviceReadbackAt": "2026-09-09T22:20:31.914Z",
+      "openingRequest": {
         "organizationId": "org-32333527-02a8-487b-819e-6f76a761777d",
         "targets": [
           {
@@ -18,31 +48,50 @@
           }
         ],
         "personIds": [
-          "user-agent-berel-client-001"
+          "60418418-df28-458e-837d-83cecb9b9a69",
+          "61ad9fd3-3296-4b44-a3b5-7dea1aa3baf3",
+          "c76bdfb4-a62d-4d19-862e-b7ad700c776a"
         ]
       },
-      "serviceCoverage": [
-        {
-          "service": "SEO/AEO",
-          "serviceId": "SVC-HS-554261764224",
-          "moduleKeys": [
-            "seo_v2",
-            "ai_visibility_v1"
-          ],
-          "status": "operator_confirmed_commercial_terms_missing"
-        },
-        {
-          "service": "Contenidos",
-          "serviceId": "SVC-HS-554261764224",
-          "moduleKey": null,
-          "status": "operator_confirmed_terms_and_module_mapping_missing"
+      "previewReadback": {
+        "observedAt": "2026-09-10T01:03:20.326Z",
+        "runtime": "production 5726ce9d90 + local candidate",
+        "canApply": false,
+        "changes": "preserve seo_v2 + ai_visibility_v1",
+        "blockers": "3 × person_invitation_pending (candidato) / person_not_authorized_in_organization (runtime desplegado)",
+        "routesCertified": {
+          "actor": "user-agent-berel-client-001 (persona técnica de la organización)",
+          "/growth/seo": 200,
+          "/growth/seo/report": 200,
+          "/aeo": 200,
+          "/campanas": "307 denied"
         }
-      ],
-      "serviceReadbackAt": "2026-09-09T22:20:31.914Z"
+      },
+      "teamsDestination": {
+        "channelCode": "client-teams-chat-space-cli-0863869c-eaac-4630-9bd0-af283c56f7fb",
+        "recipientKind": "chat_group",
+        "provisioningStatus": "ready",
+        "membership": "verified",
+        "registeredAt": "2026-09-10T01:35:34.679Z",
+        "note": "Chat grupal cliente × Efeonce registrado como destino del bot por instrucción del operador (2026-09-10). Registrar un destino no envía nada: la entrega sigue gobernada por Notifications."
+      },
+      "notificationPreferences": {
+        "policy": "client_service_default_v1",
+        "appliedAt": "2026-09-10T01:48:27.744Z",
+        "categories": {
+          "report_ready": "in_app+email",
+          "feedback_requested": "in_app+email",
+          "sprint_milestone": "in_app",
+          "delivery_update": "in_app"
+        },
+        "cadence": "per_event; sin digest (TASK-387); destino Teams sólo clases reporte/feedback vía Insights (TASK-1848)",
+        "peopleApplied": 3,
+        "note": "Decisión del operador delegada al agente (2026-09-10); la persona puede cambiarla desde su portal."
+      }
     },
     {
       "label": "Sky Airlines",
-      "note": "Servicio confirmado por el operador. Equipo activo conciliado con PG; términos/mapping, login humano y ruta TASK-1687 por certificar. ai_visibility_v1 existente se conserva sin nueva atribución contractual.",
+      "note": "Servicio confirmado; términos declarados el 2026-09-10 (kind committed, importes ausentes) con mapping creative_hub_globe_v1; ai_visibility_v1 existente se conserva sin atribución contractual. Preview limpio (canApply=true, sólo preserve). Apply pendiente de sesión humana y flag ON. cliente.creative_hub sigue 404 en producción (TASK-1687).",
       "request": {
         "organizationId": "org-b9977f96-f7ef-4afb-bb26-7355d78c981f",
         "targets": [
@@ -61,17 +110,59 @@
         {
           "service": "Diseño digital",
           "serviceId": "SVC-HS-551519372424",
+          "termsId": "7c26c8df-f409-4e34-bef7-d225aaf9f022",
           "moduleKey": "creative_hub_globe_v1",
-          "status": "operator_confirmed_commercial_terms_missing"
+          "status": "terms_declared_module_mapped_assignment_active"
         }
-      ]
+      ],
+      "recipientSelection": {
+        "authorizedCount": 3,
+        "greenhouseUsersFound": 3,
+        "activeCount": 3,
+        "lastLoginObservedCount": 0,
+        "status": "login_route_and_channel_certification_required",
+        "openingRequestReady": true,
+        "privateEvidence": ".captures/task-1852/private-scope/claude-discovery.v1.md"
+      },
+      "previewReadback": {
+        "observedAt": "2026-09-10T01:48:27.744Z",
+        "runtime": "production 5726ce9d90",
+        "canApply": true,
+        "fingerprint": "e2e5d938a6c3221bf514c4305f9dc40eb5d915357dc317a2e4a9c1709779ffcc",
+        "changes": "preserve creative_hub_globe_v1",
+        "blockers": [],
+        "applyRequires": "sesión humana admin (app_session o delegated_oauth) + CLIENT_SERVICE_ENABLEMENT_WRITES_ENABLED=true",
+        "note": "Fingerprint recalculado tras registrar destino Teams y preferencias; readiness restante: producer_coverage, human_login, authenticated_route."
+      },
+      "teamsDestination": {
+        "channelCode": "client-teams-chat-spc-ae463d9f-b404-438b-bd5c-bd117d45c3b9",
+        "recipientKind": "chat_group",
+        "provisioningStatus": "ready",
+        "membership": "verified",
+        "registeredAt": "2026-09-10T01:35:34.679Z",
+        "note": "Chat grupal cliente × Efeonce registrado como destino del bot por instrucción del operador (2026-09-10). Registrar un destino no envía nada: la entrega sigue gobernada por Notifications."
+      },
+      "notificationPreferences": {
+        "policy": "client_service_default_v1",
+        "appliedAt": "2026-09-10T01:48:27.744Z",
+        "categories": {
+          "report_ready": "in_app+email",
+          "feedback_requested": "in_app+email",
+          "sprint_milestone": "in_app",
+          "delivery_update": "in_app"
+        },
+        "cadence": "per_event; sin digest (TASK-387); destino Teams sólo clases reporte/feedback vía Insights (TASK-1848)",
+        "peopleApplied": 3,
+        "note": "Decisión del operador delegada al agente (2026-09-10); la persona puede cambiarla desde su portal."
+      }
     }
   ],
   "operatorConfirmation": {
     "date": "2026-09-09",
     "source": "Instrucción del operador en TASK-1852",
     "rolloutAuthorized": true,
-    "commercialRecordsVerifiedSeparately": true
+    "commercialRecordsVerifiedSeparately": true,
+    "mappingDeclaredBy": "user-agent-e2e-001 por instrucción del operador 2026-09-09 (declareCommercialTerms, audit + outbox)"
   },
-  "privateScopeEvidence": ".captures/task-1852/private-scope/berel-sky.v1.json (local, ignorado por Git)"
+  "privateScopeEvidence": ".captures/task-1852/private-scope/berel-sky.v1.json conserva alcance comercial; claude-discovery.v1.md conserva destinatarios e IDs (locales, ignorados por Git, 0600)"
 }

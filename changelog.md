@@ -12,12 +12,25 @@
 Implementados inventario/preview, apply y compensación por organización/persona/servicio con commands
 canónicos, locks, snapshot e idempotencia atómica. App/CLI/MCP/Nexa reutilizan el dominio; escritura
 delegada denegada y writes nuevos apagados. JOIN comercial corregido, procedencia agent preservada
-durante refresh y audit App acepta cliente nulo de sesión interna. 290 tests, PostgreSQL local y smoke
+durante refresh y audit App acepta cliente nulo de sesión interna. Suite inicial 290 tests, PostgreSQL local y smoke
 HTTP autenticado; [QA y matriz Berel/Sky](docs/audits/client-portal/TASK-1852_IMPLEMENTATION_QA_2026-09-09.md).
 Rollout autorizado y alcance Berel/Sky confirmado por el operador; permiso de compensación EFEONCE_ADMIN
 corregido, 392 tests passed. Servicio Berel sincronizado por command; resolver HubSpot vigente y
 normalizador conservan importes ausentes NULL. [Estado del despliegue](docs/audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md).
-Registros comerciales y certificación cliente pendientes; sin asignaciones live ni envíos.
+PR #231/main `5726ce9d90` en Production; orquestador `34416904936` success y manifest `released`.
+CI/Deep/build, cinco workers Ready, health, watchdog sin drift y siete canaries HTTP verdes. Excepción
+de compensación autorizada y auditada. Altas OFF; mapping comercial y certificación cliente pendientes.
+Tres contactos Berel quedaron seleccionados en HubSpot pero aún sin usuario Greenhouse; tres usuarios Sky
+activos fueron confirmados, sin login observado. [Dossier de discovery](docs/audits/client-portal/TASK-1852_CLAUDE_DISCOVERY_2026-09-09.md).
+2026-09-10 (local, sin push): `declareCommercialTerms` acepta `bundledModules` validados contra el catálogo activo y
+gana contrato App `/api/platform/app/commercial/services/{serviceId}/terms` + CLI; Berel y Sky declarados con importes
+NULL. `inviteClientPortalUser` gana `delivery: 'deferred'` + `deliverClientPortalInvitation` (ruta `portal-users/deliver`);
+tres personas Berel provisionadas sin correo. El lane App acepta autoridad humana `delegated_oauth`
+(`client_services.enablement.write`, exchange RFC 8693 con cliente dedicado sembrado por migración) y el recibo registra
+`authority`; el preview distingue `person_invitation_pending`. Preview Sky limpio en producción; apply pendiente de sesión
+humana y flag. Chats grupales de Berel y Sky registrados como destino `chat_group` del Teams bot (`ready`, pertenencia
+verificada por Graph read-only; ruta `lifecycle/teams/chat`; migración que relaja el CHECK legado). Invitaciones Berel
+bloqueadas por decisión del operador hasta tener interfaces. Política de preferencias `client_service_default_v1` aplicada a las seis personas (ruta `portal-users/notification-preferences`). [Readback](docs/audits/client-portal/TASK-1852_MAPPING_PROVISIONING_READBACK_2026-09-10.json).
 
 ## 2026-09-09 — Planificación estacional Efeonce y continuidad editorial
 

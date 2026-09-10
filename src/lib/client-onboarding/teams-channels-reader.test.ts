@@ -13,7 +13,7 @@ vi.mock('@/lib/integrations/teams/bot-framework/token-cache', () => ({
 }))
 vi.mock('@/lib/observability/capture', () => ({ captureWithDomain: vi.fn() }))
 
-import { listTeamsForLinking, listTeamChannelsForLinking } from './teams-channels-reader'
+import { inspectGroupChatForLinking, isTeamsGroupChatId, listTeamsForLinking, listTeamChannelsForLinking } from './teams-channels-reader'
 
 beforeEach(() => {
   secretMock.mockReset()
@@ -83,3 +83,43 @@ describe('listTeamChannelsForLinking — TASK-998', () => {
     expect(url).toContain('/teams/team-berel/channels')
   })
 })
+
+describe('inspectGroupChatForLinking — TASK-1852 (read-only, nunca envía)', () => {
+  const chatId = '19:1f04b439276946b6b8285e9969bf2d2d@thread.v2'
+
+  it('valida la forma del chat id antes de tocar Graph', async () => {
+    expect(isTeamsGroupChatId(chatId)).toBe(true)
+    expect(isTeamsGroupChatId('19:abc@thread.tacv2')).toBe(false)
+    const r = await inspectGroupChatForLinking('https://teams.microsoft.com/l/chat/19:x@thread.v2', 'bot')
+
+    expect(r).toMatchObject({ ok: false, membership: 'unverified' })
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('marca verified sólo cuando el bot aparece instalado en el chat, y sólo con GETs', async () => {
+    secretMock.mockResolvedValue({ clientId: 'bot-app', clientSecret: 's', tenantId: 't' })
+    graphTokenMock.mockResolvedValue('graph-token')
+    fetchMock
+      .mockResolvedValueOnce(okJson({ id: chatId, chatType: 'group', topic: 'Berel' }))
+      .mockResolvedValueOnce(okJson({ value: [{ teamsApp: { id: 'x', externalId: 'bot-app', displayName: 'Greenhouse' } }] }))
+
+    const r = await inspectGroupChatForLinking(chatId, 'bot-app')
+
+    expect(r).toEqual({ ok: true, membership: 'verified', chatType: 'group', topic: 'Berel' })
+    for (const call of fetchMock.mock.calls) expect((call[1] as RequestInit | undefined)?.method ?? 'GET').toBe('GET')
+    expect(String(fetchMock.mock.calls[1][0])).toContain('/installedApps')
+  })
+
+  it('queda unverified con razón cuando Graph deniega o el bot no está en el chat', async () => {
+    secretMock.mockResolvedValue({ clientId: 'bot-app', clientSecret: 's', tenantId: 't' })
+    graphTokenMock.mockResolvedValue('graph-token')
+    fetchMock.mockResolvedValueOnce({ ok: false, status: 403, json: async () => ({}) })
+    await expect(inspectGroupChatForLinking(chatId, 'bot-app')).resolves.toMatchObject({ ok: true, membership: 'unverified', reason: expect.stringContaining('403') })
+
+    fetchMock
+      .mockResolvedValueOnce(okJson({ id: chatId, chatType: 'group' }))
+      .mockResolvedValueOnce(okJson({ value: [{ teamsApp: { id: 'other', externalId: 'other-app' } }] }))
+    await expect(inspectGroupChatForLinking(chatId, 'bot-app')).resolves.toMatchObject({ ok: true, membership: 'unverified', reason: expect.stringContaining('no aparece instalado') })
+  })
+})
+

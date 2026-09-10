@@ -1,6 +1,6 @@
 # Greenhouse API Platform V1
 
-> Estado 2026-04-26: documento derivado developer-facing.
+> Estado reconciliado 2026-09-09: documento derivado developer-facing.
 > La arquitectura canonica vive en:
 > `docs/architecture/GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`
 
@@ -75,6 +75,12 @@ Endpoints:
   ejemplos: `TASK-1793`.
 - `GET /api/platform/ecosystem/identity/binding` — reader de autoridad externa e interna (v1/v2), machine-only
   para el gateway MCP. Contrato detallado a continuación.
+- `POST /api/platform/ecosystem/client-services/enablement/preview` — inventario administrativo read-only,
+  sólo binding `internal` y organización explícita.
+- `POST /api/platform/ecosystem/client-services/enablement/apply|rollback` — rutas servidas fail-closed por diseño:
+  el binding acredita una máquina y responde `403 invalid_delegated_context`. La autoridad humana delegada
+  no viaja por este lane: viaja por el lane App con un bearer sister-platform emitido para la persona
+  (`client_services.enablement.write`, RFC 8693), ver §Habilitación de servicios.
 
 ### Reader de identidad y autoridad MCP
 
@@ -187,6 +193,32 @@ Endpoints:
 - `GET /api/platform/app/hiring/applications/:applicationId/review-packet`
 - `GET /api/platform/app/hiring/applications/:applicationId/outcome`
 - `POST /api/platform/app/hiring/applications/:applicationId/decision/propose|confirm`
+- `POST /api/platform/app/client-services/enablement/preview|apply|rollback`
+- `GET|POST /api/platform/app/commercial/services/:serviceId/terms` — términos comerciales vigentes y su
+  declaración (`bundledModules` = mapping servicio → módulos del portal), TASK-1852.
+
+#### Habilitación de servicios (TASK-1852)
+
+Las seis rutas App/Ecosystem comparten tipos, preview y commands de
+`src/lib/client-portal/enablement/`. App permite writes con `CLIENT_SERVICE_ENABLEMENT_WRITES_ENABLED=ON`,
+capabilities efectivas y una autoridad humana atribuible, que puede llegar por dos canales del mismo primitive:
+
+| Canal (`authority.kind`) | Cómo se acredita | Estado |
+|---|---|---|
+| `app_session` | cookie o token first-party de una persona interna/admin; `authMode=agent` no aprueba writes | vigente |
+| `delegated_oauth` | bearer sister-platform emitido PARA la persona con la capability `client_services.enablement.write`, `oauthClientId` + `oauthAccessTokenId` durables, y sesión humana o el cliente de exchange `efeonce-mcp-client-services` (RFC 8693, sólo mintea para un humano interno verificado por Entra que ya puede habilitar módulos) | contrato servido; requiere el consumer en `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS` y el scope de entrada `efeonce.mcp.client_services.write` expuesto por la app Entra |
+
+En ambos canales el actor es la persona (`actorUserId`), nunca el cliente OAuth; el recibo y el resultado de
+compensación registran `authority` como evidencia de canal. El primitive relee los derechos de administración
+de la persona dentro de la transacción; el scope OAuth sólo responde si ESE cliente puede pedir esta clase de
+acción. Ecosystem ejecuta preview con binding `internal`; apply/rollback permanecen 403 porque el consumer
+machine no acredita `approved_by_user_id`, y ése es el contrato, no un pendiente.
+
+MCP interno llama las rutas Ecosystem; sus tres tools existen en el manifiesto Greenhouse. La federación en el
+gateway (provider + token exchange con la clase nueva + scope Entra) es un paso del repo `efeonce-mcp`, fuera de
+este contrato. Contrato, recuperación y estado:
+`docs/operations/CLIENT_SERVICE_ENABLEMENT_RUNBOOK_V1.md` y
+`docs/audits/client-portal/TASK-1852_CLAUDE_DISCOVERY_2026-09-09.md`.
 
 #### Hiring Talent Pool
 
@@ -302,7 +334,8 @@ Do not treat `integrations/v1` as the source of truth for new platform surfaces.
 ## Current Boundaries
 
 - `api/platform/*` is authenticated and controlled; it is not an anonymous open API.
-- No general ecosystem-facing write surface exists yet.
+- No general ecosystem-facing write surface exists yet; las rutas mutantes de TASK-1852 se sirven únicamente
+  para denegar de forma explícita mientras falta autoridad humana delegada.
 - Cross-lane idempotency for commands is still a follow-up.
 - OpenAPI for platform lanes is a preview artifact in this cut; schema generation is a follow-up.
 - MCP remains downstream of stable API contracts.

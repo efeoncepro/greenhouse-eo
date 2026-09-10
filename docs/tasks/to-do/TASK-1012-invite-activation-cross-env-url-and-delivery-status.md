@@ -1,5 +1,15 @@
 # TASK-1012 — Invitación al portal: URL de activación cross-env + sync de estado de entrega (Resend)
 
+## Delta 2026-09-10
+
+- `inviteClientPortalUser` ganó `delivery: 'immediate' | 'deferred'` y `deliveryStatus` en el resultado, más
+  `deliverClientPortalInvitation` (token + correo para una persona `invited` del mismo cliente) y la ruta
+  `POST /api/admin/clients/{organizationId}/lifecycle/portal-users/deliver` — cerrado por trabajo en `TASK-1852`
+  (cohorte Berel provisionada sin enviar mensajes). El armado de la URL (`NEXT_PUBLIC_APP_URL`) y la convergencia
+  con la entrega gobernada de Efeonce ID siguen en el scope de esta task: `deliverInvitationEmail` es el único
+  punto que hoy compone el link, así que la convergencia toca una sola función.
+
+
 ## Delta 2026-09-06 — TASK-1837 resolvió ambos gaps PARA EL EMISOR (Efeonce ID), no para el portal
 
 - `TASK-1837` (commits `5518d868e…189148c6e`; code complete, migración aplicada 2026-09-06, flags OFF, correo real
