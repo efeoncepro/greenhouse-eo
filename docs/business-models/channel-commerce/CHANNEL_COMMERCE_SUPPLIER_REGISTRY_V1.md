@@ -25,6 +25,7 @@ autoriza nombrarlos ante un cliente, asumir su capacidad ni incluirlos en una co
 | **A** | **Captura por misiones** | Auditoría de ejecución en PDV con evidencia verificable y geolocalización | Fase 2, sólo si el volumen y el acceso al dato crudo lo justifican |
 | **B** | **Personal de terreno** | Reposición, merchandising, remediación y ejecución de activación | Fase 2 empezando por field leads; nunca el ejército completo |
 | **C** | **Producción física** | Material POP, mobiliario, displays, stands, montaje, logística y permisos | **Nunca.** Se gobierna, no se opera |
+| **T** | **Plataforma de ejecución retail** | El software que detecta y prioriza quiebres, precio y cumplimiento | **Nunca.** Se opera la del cliente o se propone una; no se construye |
 | **D** | **Data de mercado** | Panel de hogares, retail measurement, share y contexto de categoría | Nunca — es dato licenciado de terceros |
 | **E** | **Financiamiento de capital de trabajo** | Anticipo de facturas emitidas | No aplica; es una relación financiera permanente |
 
@@ -63,6 +64,7 @@ Origen: benchmark de mercado 2026-09-10. **Auto-declarado, sin verificar, sin co
 
 | Candidato | Señal | Estado |
 |---|---|---|
+| Touch Latam | Desde 2003; Chile, Perú y Colombia; equipos de venta, trade, promotoría, impulso, BTL, staffing on-demand **y logística y almacenamiento** | No contactado · **posible conflicto**: portafolio llave en mano completo |
 | ECR Group | Outsourcing de reposición, PDV, logística y fuerza de venta | No contactado |
 | Masglobal | Outsourcing comercial y fuerza de ventas presencial | No contactado |
 | Novaprom | Se declara agencia de RRHH para trade: exhibición, rotación, reposición, promoción, supervisión | No contactado · **posible conflicto**: vende trade directo |
@@ -82,6 +84,20 @@ Origen: benchmark de mercado 2026-09-10. **Auto-declarado, sin verificar, sin co
 | *(fabricantes puros de POP y señalética)* | Sin oferta de trade propia | **Pendiente de identificar — perfil preferido** |
 
 El perfil preferido en la capa C es el fabricante puro: no compite y no tiene incentivo a saltarse a Efeonce.
+
+### Capa T — Plataforma de ejecución retail
+
+Categoría global en consolidación. Se relacionan como **providers tecnológicos y posible canal**: venden software
+y necesitan quien lo implemente y opere, igual que HubSpot o Salesforce en la práctica de RevOps.
+
+| Candidato | Señal | Estado |
+|---|---|---|
+| Teamcore (Chile) | 500+ marcas, 20+ países, fusión con Tech-K respaldada por Accel-KKR, motor Nova | No contactado |
+| Frogmi (Chile) | Task management y ejecución en tienda, 50+ clientes en 10+ países, Endeavor | No contactado |
+| Trax · Storecheck · Involves | Reconocimiento de anaquel y ejecución, presencia regional | No contactados |
+
+**Oportunidad a explorar:** programa de partners de implementación. Si alguna tiene canal, Efeonce podría entrar
+como operador certificado y llegar a cuentas que ya compraron el software y no tienen quién opere el ciclo.
 
 ### Capa D — Data de mercado
 

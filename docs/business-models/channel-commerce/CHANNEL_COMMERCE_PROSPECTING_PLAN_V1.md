@@ -150,6 +150,29 @@ verificable en un minuto, y quema la reunión.
 
 **Craft del mensaje:** `copywriting` para la narrativa; `greenhouse-ux-writing` no aplica (no es copy de producto).
 
+## 7.bis Cómo se comunica la estructura de ejecución
+
+**En el pitch no se menciona.** Cómo Efeonce arma su cadena de ejecución es información interna y competitiva. Al
+cliente le importa el resultado y quién responde, no el organigrama del proveedor. Ninguna agencia del mercado
+abre esa información, y hacerlo debilita la posición frente a un incumbente que se presenta con equipo propio.
+
+Lo que sí se comunica, porque es lo que el cliente compra:
+
+> Un solo interlocutor y un solo responsable. Efeonce define el plan y el estándar, dirige la operación, valida la
+> evidencia antes de mostrarla y responde si algo falla.
+
+**No mencionar no es negar.** Estas tres situaciones son distintas y en todas se declara:
+
+1. **Procurement o el contrato lo piden.** Se entrega la información que corresponda, sin adornos.
+2. **Hay personas de un tercero en faena del cliente.** Bajo la Ley 20.123 el cliente responde solidaria o
+   subsidiariamente y exige certificados: **necesita saber quién es el empleador**. Ocultarlo no es discreción, es
+   exponerlo a un riesgo legal y romper la relación cuando se entere.
+3. **El cliente pregunta directo.** Se responde con la verdad, encuadrada en la operación: Efeonce opera y
+   responde, y ejecuta con la combinación de recursos propios y especializados que el resultado requiera.
+
+**Nunca** se afirma tener equipo propio donde no lo hay, ni cobertura instalada que no exista. Un claim falso sobre
+capacidad se cae en la primera visita a terreno.
+
 ## 8. Material mínimo antes de la primera reunión
 
 1. One-pager de la línea con el mapa de los cuatro momentos de la oferta.
