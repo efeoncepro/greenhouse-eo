@@ -2,6 +2,10 @@
 
 > **Tipo:** Product Decision Record (sistema editorial y rol de las superficies de adquisición propias).
 > **Estado:** Accepted (marco y roles) — sesión de diseño con el operador, 2026-09-10.
+> **Revisión 1.1 (2026-09-10, misma sesión):** corregido el modelo de formatos — cada canal tiene
+> **catálogo propio**; las franquicias tienen **canal-hogar** y satélites, no presencia universal.
+> Vocero de talking head cerrado. Blog declarado multiformato (tools, webinars). Educativo de
+> LinkedIn incorporado.
 > **Ámbito:** Canales propios de marca Efeonce — Blog (Marketing con Manzanitas), LinkedIn, YouTube,
 > Instagram, Threads y Glitch (newsletter). No cubre canales de cliente ni paid social.
 > **Skills:** `content-marketing-studio`, `social-media-studio`, `copywriting`, `seo-aeo`,
@@ -53,9 +57,14 @@ Cada canal recibe un **rol distinto dentro del bow-tie**, operando sobre un **mo
 No se diseña una estrategia-universo por canal: eso multiplica el costo por cinco y garantiza que ninguno
 alcance profundidad ni cadencia.
 
-Regla dura: **una producción, N cortes.** Una pieza se concibe para su corte principal y se despieza a los
-demás canales en la misma sesión de producción. Producir por canal de forma independiente es el modo de falla
-que hace insostenible el calendario al tercer mes.
+**Economía de producción — "una producción, N cortes":** una grabación, un experimento o un webinar se
+concibe para su corte principal y rinde cortes adicionales en la misma sesión. Producir por canal de forma
+independiente es el modo de falla que hace insostenible el calendario al tercer mes.
+
+**Esa economía NO implica presencia universal.** Compartir producción es distinto de compartir catálogo:
+cada canal tiene formatos **nativos** que nacen y mueren ahí, y sólo algunas producciones se despiezan. Un
+formato que se replica a un canal donde no rinde no ahorra trabajo — lo desperdicia, y además ensucia el
+canal. La regla operativa está en la capa 4.
 
 ### 2. Tres ejes ortogonales que no se mezclan
 
@@ -81,38 +90,85 @@ Inbound Marketing** — más **Novedades Efeonce** como carril institucional sec
 - El ataque al gap de categoría del baseline se concentra en **AEO** e **Inteligencia Artificial**, con
   método y datos propios — nunca opinión ni auto-bombo.
 
-### 4. Cinco líneas de contenido, un formato transversal, un modo de producción
+### 4. Catálogo propio por canal; las franquicias tienen canal-hogar
 
-**Las líneas** (franquicias recurrentes con nombre; la recurrencia construye el hábito de audiencia):
+Un formato pertenece a un canal por la señal que ese canal premia, no por conveniencia de calendario.
+El sistema distingue dos cosas:
 
-| Línea | Qué es | Trabajo en el bow-tie |
+**a) Formatos nativos — nacen y mueren en su canal.**
+
+| Canal | Formatos nativos |
+|---|---|
+| **Instagram** | proceso y construcción real con tropiezos · talking head de tendencia · trendjacking · cultura, equipo y talento (employer brand) |
+| **LinkedIn** | **contenido educativo** (post extenso y documento nativo) · caso con número · POV profesional que abre conversación · talking head en versión ejecutiva |
+| **YouTube** | long-form del experimento completo · tutorial y how-to (demanda de búsqueda) · webinar grabado · caso en video · Shorts como anzuelo al long-form |
+| **Threads** | reacción rápida y trendjacking · opinión corta con criterio · hilo de aprendizaje en bruto · pregunta abierta a la audiencia |
+| **Blog** | artículos y Pillars · **tools y graders** · **webinars** · ebooks y lead magnets · data studies · archivo Glitch · casos |
+| **Glitch (email)** | la edición semanal |
+
+**b) Franquicias con canal-hogar — nacen en un canal y viajan como corte, nunca como copia.**
+
+| Franquicia | Canal-hogar | Satélites (qué corte reciben) |
 |---|---|---|
-| **Behind the Build** | cómo se construyó de verdad, con los tropiezos incluidos | autoridad por evidencia |
-| **Versus** | mismo brief en N modelos: qué salió, qué costó, cuál falló | utilidad guardable |
-| **Glitch** | la lectura de la semana; el gancho social empuja a la newsletter | audiencia propia |
-| **Trendjacking** | reactivo, sin slot fijo en el calendario | relevancia cultural |
-| **La Prueba** | caso con número real y citable | demanda |
+| **Behind the Build** | Instagram | LinkedIn: el aprendizaje, no el making-of · YouTube: versión larga si el build lo amerita |
+| **Versus** | YouTube + Blog (data study) | Instagram: el resultado visual · LinkedIn: el veredicto y qué implica |
+| **Glitch** | Glitch (email) | Blog: archivo · Threads: el gancho · LinkedIn: la lectura de una noticia |
+| **Trendjacking** | Threads + Instagram | — reactivo; no se despieza a canales lentos |
+| **La Prueba** | LinkedIn | Blog: el caso completo · YouTube: la versión en video |
+| **Educativo** | LinkedIn | Blog: la versión que responde a búsqueda (ver capa 4.1) |
 
-**El formato transversal — talking head** (*face-to-camera*, en B2B *executive-led video*): atraviesa las cinco
-líneas y no es una línea aparte. Es la expresión natural del diferenciador declarado en PDR-005 §1.1 y ya tiene
-capability de producción: el paquete `Executive / Interview Capture` de **Run & Gun Studio**.
+**Reglas del despiece:**
 
-**El modo de producción — Voces:** quién da la cara atraviesa todas las líneas. No es un formato ni una línea;
-es una decisión de casting que aplica a cada pieza.
+- **NUNCA** replicar una pieza a un canal cuya señal no la premia. Un carrusel no es contenido de Threads;
+  una noticia de texto no es contenido de Instagram; un hilo en bruto no es contenido de LinkedIn.
+- Un satélite recibe **un corte con trabajo propio**, no un re-post. Si el corte no aporta nada distinto del
+  original, el satélite no se hace.
+- Trendjacking **no se despieza**: su valor es la ventana temporal, y un canal lento la pierde.
+
+**El formato transversal — talking head** (*face-to-camera*, en B2B *executive-led video*): es la única
+producción que rinde corte en cuatro canales desde una sola grabación (Instagram, LinkedIn, YouTube Shorts,
+y gancho en Threads). Es la expresión del diferenciador de PDR-005 §1.1 y ya tiene capability de producción:
+el paquete `Executive / Interview Capture` de **Run & Gun Studio**.
+
+**Voces — el modo de producción:** quién da la cara. **Decidido: el vocero es Julio Reyes** (CEO). El formato
+construye reconocimiento facial y sólo rinde con recurrencia de la misma cara; un segundo vocero se incorpora
+como decisión explícita, no por disponibilidad de agenda.
+
+### 4.1 Educativo LinkedIn → Blog: corte, nunca copia
+
+El contenido educativo nace en **LinkedIn** — es donde está el comprador y donde el dwell paga — y se
+consolida en el **blog**, que es el activo canónico (URL, schema, citabilidad IA).
+
+- **NUNCA** publicar en el blog el mismo texto del post de LinkedIn. Un post optimizado para dwell en feed y
+  un artículo que responde a una búsqueda son piezas distintas: el blog necesita la versión answer-first, con
+  la pregunta real como entrada, estructura citable y enlaces internos al territorio.
+- La versión del blog es la que hereda el territorio de PDR-019 y la que `seo-aeo` gobierna.
+- Si el tema no da para una versión de blog con trabajo propio, se queda sólo en LinkedIn. Un artículo que
+  existe únicamente para reciclar un post degrada el activo.
+
+### 4.2 El blog es multiformato, no un feed de artículos
+
+El blog aloja artículos, **tools/graders**, **webinars**, ebooks, data studies, casos y el archivo Glitch.
+Esto es exactamente el inventario que `TASK-1802` declara como bloqueante (*"inventario canónico de Tools,
+Videos y Webinars"*). Cada pieza no-artículo necesita canonical URL, owner, tipo, tema, fecha, imagen, estado
+y freshness antes de definir su reader o registro. **Formato ≠ categoría:** los formatos son un eje de
+navegación distinto de los territorios de PDR-019 y no se mezclan en la misma taxonomía.
 
 ### 5. Rol por canal
 
 Las señales de plataforma se citan **as-of 2026-07** desde `social-media-studio/modules/01_PLATFORM_MECHANICS.md`
 y se reverifican contra su `SOURCES.md` antes de usarlas como argumento. Este PDR fija **roles**, no cifras.
 
-| Canal | Rol | Señal que manda *(as-of 2026-07)* | Formatos que le tocan |
+| Canal | Rol | Señal que manda *(as-of 2026-07)* | Por qué ese catálogo |
 |---|---|---|---|
-| **Blog** | el **activo**: URL canónica, schema, citabilidad IA | orgánico + citación | Pillars, Versus como data study, archivo Glitch |
-| **LinkedIn** | el **comprador** | dwell ≥61s; comentario con sustancia ≫ like | texto denso, documento nativo, talking head, La Prueba |
-| **YouTube** | la **profundidad** y el segundo buscador | watch time, session engagement | long-form (Versus completo, casos); Shorts como anzuelo |
-| **Instagram** | el **craft y la cultura** | sends + saves (followers = señal débil) | Behind the Build, proceso, talento, talking head |
-| **Threads** | la **conversación viva** | conversación y respuesta rápida | Trendjacking, opinión corta, gancho a Glitch |
-| **Glitch (email)** | la **propiedad**: todo converge acá | suscripciones, CTR | la lectura de la semana |
+| **Blog** | el **activo**: URL canónica, schema, citabilidad IA | orgánico + citación | es lo único que permanece y se cita; aloja lo que necesita URL estable |
+| **LinkedIn** | el **comprador** | dwell ≥61s; comentario con sustancia ≫ like | el texto extenso y el documento nativo son los que pagan dwell |
+| **YouTube** | la **profundidad** y el segundo buscador | watch time, session engagement | único canal con demanda real de long-form y de búsqueda de tutorial |
+| **Instagram** | el **craft y la cultura** | sends + saves (followers = señal débil) | el proceso visual y el tropiezo son lo reenviable |
+| **Threads** | la **conversación viva** | conversación y respuesta rápida | costo de producción casi nulo; premia la ventana temporal |
+| **Glitch (email)** | la **propiedad** | suscripciones, CTR | es el único canal que no depende de un algoritmo ajeno |
+
+El catálogo de cada canal está en la capa 4. **El rol explica el catálogo; el catálogo no se copia entre canales.**
 
 ### 6. Glitch es una franquicia cross-superficie, nunca una marca social nueva
 
@@ -165,17 +221,20 @@ arrendado.
 
 ## Decisiones pendientes (bloquean la ejecución, no el marco)
 
+**Cerrada en esta sesión:** el vocero de talking head es **Julio Reyes** (CEO). Ver capa 4, *Voces*.
+
 | # | Decisión | Bloquea |
 |---|---|---|
-| 1 | **Quién es la cara** (vocero fijo de talking head) | toda la línea de video |
-| 2 | **Dónde vive canónicamente un video** (YouTube o blog) | `TASK-1802` y la apertura de YouTube |
+| 1 | **Dónde vive canónicamente un video** (YouTube o blog) | `TASK-1802` y la apertura de YouTube |
+| 2 | **Inventario de tools y webinars del blog** — canonical URL, owner, tipo, tema, fecha, estado, freshness | `TASK-1802` (bloqueante declarado) |
 | 3 | **Cuántos territorios se abren** — la recomendación es **dos** (AEO + Inteligencia Artificial/Agentes) | calendario y cadencia |
 | 4 | **Secuencia de apertura de canales** — no simultánea | plan de producción |
-| 5 | **Cadencia comprometida por línea** contra capacidad real del equipo | sostenibilidad del sistema |
+| 5 | **Cadencia comprometida por canal** contra capacidad real del equipo | sostenibilidad del sistema |
 | 6 | **Naming visible** Think / Marketing con Manzanitas | heredada de `TASK-1802` |
 
-Recomendación de arranque registrada en sesión: partir con **Behind the Build + Versus + Glitch**, e incorporar
-Trendjacking y La Prueba cuando las tres primeras tengan cadencia sostenida.
+Recomendación de arranque registrada en sesión: partir por **Instagram (proceso + talking head)**,
+**LinkedIn (educativo + su corte al blog)** y **Glitch**, e incorporar YouTube y Threads cuando esos tres
+tengan cadencia sostenida. YouTube depende además de la decisión 1.
 
 ## Alternativas descartadas
 
@@ -188,6 +247,11 @@ Trendjacking y La Prueba cuando las tres primeras tengan cadencia sostenida.
 - **Glitch como marca social nueva** — convierte un activo owned en alcance arrendado y fractura una franquicia
   que ya opera en dos superficies.
 - **Abrir los cinco canales el mismo mes** — garantiza que ninguno alcance cadencia.
+- **Un catálogo de formatos común a todos los canales** — descartado en la revisión 1.1: confunde economía de
+  producción con catálogo, replica piezas a canales cuya señal no las premia y ensucia cada canal con formatos
+  que no le pertenecen.
+- **Publicar en el blog el mismo texto del post educativo de LinkedIn** — canibaliza el activo y desperdicia
+  la única superficie que se cita; el blog recibe una versión answer-first con trabajo propio.
 - **Tratar "agentes" y "AEO" como tipos de contenido** — confunde territorio con formato y produce un
   calendario inoperable.
 - **Promover "Agentes" a categoría raíz de inmediato** — sin cuerpo editorial acumulado, dispara el protocolo
