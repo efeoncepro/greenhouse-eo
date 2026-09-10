@@ -74,6 +74,19 @@
         "membership": "verified",
         "registeredAt": "2026-09-10T01:35:34.679Z",
         "note": "Chat grupal cliente × Efeonce registrado como destino del bot por instrucción del operador (2026-09-10). Registrar un destino no envía nada: la entrega sigue gobernada por Notifications."
+      },
+      "notificationPreferences": {
+        "policy": "client_service_default_v1",
+        "appliedAt": "2026-09-10T01:48:27.744Z",
+        "categories": {
+          "report_ready": "in_app+email",
+          "feedback_requested": "in_app+email",
+          "sprint_milestone": "in_app",
+          "delivery_update": "in_app"
+        },
+        "cadence": "per_event; sin digest (TASK-387); destino Teams sólo clases reporte/feedback vía Insights (TASK-1848)",
+        "peopleApplied": 3,
+        "note": "Decisión del operador delegada al agente (2026-09-10); la persona puede cambiarla desde su portal."
       }
     },
     {
@@ -112,14 +125,14 @@
         "privateEvidence": ".captures/task-1852/private-scope/claude-discovery.v1.md"
       },
       "previewReadback": {
-        "observedAt": "2026-09-10T01:35:34.679Z",
+        "observedAt": "2026-09-10T01:48:27.744Z",
         "runtime": "production 5726ce9d90",
         "canApply": true,
-        "fingerprint": "a6811c4ce775d5d78dd0ead0ea5536cbd768071669bf3a570ef2ad0f145a0e18",
+        "fingerprint": "e2e5d938a6c3221bf514c4305f9dc40eb5d915357dc317a2e4a9c1709779ffcc",
         "changes": "preserve creative_hub_globe_v1",
         "blockers": [],
         "applyRequires": "sesión humana admin (app_session o delegated_oauth) + CLIENT_SERVICE_ENABLEMENT_WRITES_ENABLED=true",
-        "note": "Fingerprint recalculado tras registrar el destino Teams; teams_destination_unverified desapareció."
+        "note": "Fingerprint recalculado tras registrar destino Teams y preferencias; readiness restante: producer_coverage, human_login, authenticated_route."
       },
       "teamsDestination": {
         "channelCode": "client-teams-chat-spc-ae463d9f-b404-438b-bd5c-bd117d45c3b9",
@@ -128,6 +141,19 @@
         "membership": "verified",
         "registeredAt": "2026-09-10T01:35:34.679Z",
         "note": "Chat grupal cliente × Efeonce registrado como destino del bot por instrucción del operador (2026-09-10). Registrar un destino no envía nada: la entrega sigue gobernada por Notifications."
+      },
+      "notificationPreferences": {
+        "policy": "client_service_default_v1",
+        "appliedAt": "2026-09-10T01:48:27.744Z",
+        "categories": {
+          "report_ready": "in_app+email",
+          "feedback_requested": "in_app+email",
+          "sprint_milestone": "in_app",
+          "delivery_update": "in_app"
+        },
+        "cadence": "per_event; sin digest (TASK-387); destino Teams sólo clases reporte/feedback vía Insights (TASK-1848)",
+        "peopleApplied": 3,
+        "note": "Decisión del operador delegada al agente (2026-09-10); la persona puede cambiarla desde su portal."
       }
     }
   ],

@@ -6,7 +6,7 @@ Pendiente: conciliar MET-2339–2342 tarea/calendario. Producción abierta; cier
 **EPIC-046 / TASK-1852 (09/09):** Production `released`; [evidencia y pendientes](docs/audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md).
 PR #231/main `5726ce9d90`, orquestador `34416904936`; gates y watchdog verdes; excepción pause auditada.
 **10/09 (local, sin push):** términos con `bundledModules` (Berel seo_v2+AEO, Sky creative_hub); tres Berel `invited`
-sin correo; preview Sky limpio en prod; chats Teams de ambas `ready` (bot verificado, sin mensajes); contrato
+sin correo; preview Sky limpio en prod; chats Teams `ready` y preferencias `client_service_default_v1` en las seis; contrato
 `delegated_oauth` sólo local. Invitaciones Berel BLOQUEADAS hasta tener UI. Falta: apply Sky (sesión humana + flag),
 release, Entra/gateway; `/creative-hub` 404 (1687).
 [Readback](docs/audits/client-portal/TASK-1852_MAPPING_PROVISIONING_READBACK_2026-09-10.json).

@@ -131,6 +131,17 @@ destino `recipient_kind='chat_group'` en `teams_notification_channels`, scopeado
 `team_id`/`channel_id` a todo `teams_bot`; la consistencia por `recipient_kind` la gobierna el CHECK de TASK-671.
 Berel y Sky quedaron registrados `ready` el 2026-09-10 con pertenencia del bot verificada.
 
+## Preferencias y cadencia de notificación (política explícita)
+
+`preferences_not_explicit` se resuelve declarando preferencias por persona, nunca infiriéndolas. La política canónica
+`client_service_default_v1` (`src/lib/notifications/client-preference-policy.ts`) se aplica con
+`POST /api/admin/clients/{organizationId}/lifecycle/portal-users/notification-preferences`
+(`client.lifecycle.portal_user.invite`, body `{userIds, policy}`) sólo a personas `client` del cliente de la
+organización: `report_ready` y `feedback_requested` in-app + email; `sprint_milestone` y `delivery_update` sólo in-app.
+Cadencia: por evento (el Hub V1 no agrega; digest en TASK-387); el destino Teams del cliente recibe únicamente avisos de
+clase reporte/feedback cuando Insights los emita (TASK-1848). La persona puede cambiar sus preferencias desde el portal
+y su elección prevalece. Aplicada a las seis personas de Berel y Sky el 2026-09-10 por decisión del operador.
+
 ## Provisionar personas sin enviar mensajes
 
 `inviteClientPortalUser` admite `delivery: 'deferred'`: crea `client_users` (`status='invited'`,

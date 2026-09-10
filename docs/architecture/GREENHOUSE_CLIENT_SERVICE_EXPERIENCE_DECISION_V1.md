@@ -252,4 +252,8 @@ de escritura delegada.
   Graph confirma en modo lectura que el bot está instalado. La migración `20260910013234351` relaja el CHECK legado de
   `teams_bot` (team/channel obligatorios) porque el CHECK por `recipient_kind` ya gobierna los targets. Registrar un
   destino no es entregar: la entrega sigue en Notifications/Insights.
+- **Preferencias del cliente = política declarada, editable por la persona.** `client_service_default_v1` persiste
+  filas explícitas (reporte/feedback in-app + email; hitos/entregas sólo in-app; cadencia por evento) por la ruta
+  gobernada `portal-users/notification-preferences`; el preview deja de reportar `preferences_not_explicit`. No es
+  consentimiento de marketing ni sustituye la elección de la persona en su portal.
 
