@@ -12,7 +12,15 @@
 - ❌ **Elegir formato por moda** ("todo Reels"). ✅ Formato por objetivo: carrusel para
   engagement, Reel para alcance, foto cuando el visual es fuerte, long-form para profundidad.
 - ❌ **Repostear el mismo asset idéntico cross-platform.** Cada red tiene specs, cultura y
-  algoritmo propios. ✅ Adapta hook, formato, caption y duración por red.
+  algoritmo propios. ✅ Adapta hook, formato, caption y duración por red. ⚠️ En canal propio de
+  Efeonce **adaptar el caption no basta**: el antipatrón real es *replicar a un canal cuya señal no
+  lo premia*, y el estándar es *corte con trabajo propio, o el satélite no se hace* (PDR-020).
+- ❌ **Portafolio estático como formato principal de Instagram.** El resultado final es un claim;
+  el proceso es la prueba. ✅ Behind the Build con los tropiezos adentro y aprendizaje transferible.
+- ❌ **Casos de éxito en Instagram.** Su señal es el reenvío privado y una métrica B2B no se manda
+  por DM. ✅ Caso completo en el blog (canonical) + corte en LinkedIn.
+- ❌ **Calendarizar un caso de cliente antes de tener su autorización.** ✅ La aprobación del cliente
+  fija la cadencia de esa franquicia, no el calendario editorial.
 - ❌ **Tratar toda pieza social como teaser o todo post como cluster node.** ✅ Una pieza sólo
   entra al cluster si tiene JTBD propio, valor autónomo, relación gobernada, URL/ID, owner y
   medición; el resto sigue siendo activación útil.

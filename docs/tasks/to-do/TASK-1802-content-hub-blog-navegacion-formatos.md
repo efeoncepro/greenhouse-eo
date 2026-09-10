@@ -1,5 +1,27 @@
 # TASK-1802 — Content Hub Efeonce: `/blog` navegable y multiformato
 
+## Delta 2026-09-10
+
+- **`PDR-020` (canales propios) confirma y acota el alcance multiformato de esta task.** El blog queda
+  declarado formalmente como superficie multiformato — artículos y Pillars, **casos de éxito completos
+  (canonical)**, tools/graders, webinars, ebooks, data studies y archivo Glitch — y fija que **formato ≠
+  categoría**: los formatos son un eje de navegación distinto de los territorios de `PDR-019` y no se
+  mezclan en la misma taxonomía. Eso es exactamente la separación que el Goal de esta task pide
+  ("separar tipos de contenido de temas editoriales y hacer navegables ambos ejes").
+- **El bloqueante sigue abierto y ahora tiene dueño explícito.** `PDR-020` registra el *inventario de tools
+  y webinars* como decisión pendiente 2, citando esta task como lo que bloquea. No lo cierra.
+- **Se suma un input al inventario:** los **casos de éxito** entran al hub como formato con canonical en el
+  blog (forma ya definida en `HUBSPOT_REVOPS_ANAM_CASE_STUDY_BRIEF_V1.md` y
+  `HUBSPOT_CUSTOMER_AGENT_ANAM_CASE_STUDY_BRIEF_V1.md`). Tienen **compuerta de aprobación de cliente**: los
+  briefs nacen `private` y no autorizan publicación automática, así que su aparición en el hub no puede
+  asumirse por existir el brief.
+- **Decisión previa que sigue bloqueando y que `PDR-020` eleva:** dónde vive canónicamente un **video**
+  (YouTube o el blog). `PDR-020` la registra como decisión pendiente 1 porque condiciona la apertura del
+  canal YouTube además de este hub.
+- **El naming visible (Think / Marketing con Manzanitas) sigue pendiente** y `PDR-020` lo hereda como su
+  decisión pendiente 6: ahora afecta a seis superficies, no sólo al `/blog`.
+- Sin cambios en `Lifecycle` ni en el Goal: la task sigue `to-do` y sus bloqueantes siguen vigentes.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -24,7 +46,7 @@
 - Status real: `Dirección y arquitectura funcional contratadas; naming, inventario multiformato y bindings por verificar`
 - Rank: `TBD`
 - Domain: `public-site|content|growth|ui|seo`
-- Blocked by: `inventario canónico de Tools/Videos/Webinars y decisión de naming visible Think/Marketing con Manzanitas`
+- Blocked by: `inventario canónico de Tools/Videos/Webinars incl. casos de éxito (PDR-020 decisión 2), canonical de video YouTube-vs-blog (PDR-020 decisión 1) y decisión de naming visible Think/Marketing con Manzanitas (PDR-020 decisión 6)`
 - Branch: `Greenhouse develop; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -78,6 +100,7 @@ Revisar y respetar:
 - `docs/public-site/decisions/PDR-003-layering-ecosistema-digital-efeonce.md`
 - `docs/public-site/decisions/PDR-018-pillar-experience-arquitectura-editorial-y-runtime.md`
 - `docs/public-site/decisions/PDR-019-taxonomia-editorial-canonica-blog-wordpress.md`
+- `docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md`
 - `docs/architecture/GREENHOUSE_PUBLIC_SITE_ASTRO_RUNTIME_STRATEGY_DECISION_V1.md`
 - `docs/architecture/GREENHOUSE_PUBLIC_WEBSITE_LANDING_CONTROL_PLANE_ARCHITECTURE_V1.md`
 - `docs/architecture/agent-invariants/PUBLIC_SITE_KINSTA_ACCESS_AGENT_INVARIANTS.md`

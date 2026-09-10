@@ -22,6 +22,46 @@ La operación actual debe funcionar con personas, herramientas y procesos dispon
 > Nota: el overlay de `digital-marketing` lista "social/Metricool" como un **GAP** de martech
 > — esta skill es la que lo llena.
 
+## Canales propios — SSOT: PDR-020
+
+**`docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md` gobierna los canales de marca
+Efeonce.** Cárgalo antes de proponer formato, calendario o distribución en canal propio. Resumen operativo:
+
+| Canal | Rol | Formatos nativos |
+|---|---|---|
+| **Blog** | el activo (URL canónica, schema, citabilidad) | artículos y Pillars · **casos de éxito completos (canonical)** · tools/graders · webinars · ebooks · data studies · archivo Glitch |
+| **LinkedIn** | el comprador | **educativo** (post extenso + documento nativo) · el corte del caso de éxito · POV profesional · talking head ejecutivo |
+| **YouTube** | la profundidad + segundo buscador | experimento completo · tutorial/how-to · webinar grabado · Shorts como anzuelo |
+| **Instagram** | craft y cultura | proceso real con tropiezos · talking head de tendencia · trendjacking · cultura y talento. **NO lleva casos de éxito** |
+| **Threads** | conversación viva | reacción rápida · opinión corta · hilo en bruto · pregunta abierta. **Experimento con criterio de salida** |
+| **Glitch (email)** | la propiedad | la edición semanal |
+
+**Franquicias con canal-hogar** (nacen en uno, viajan como corte con trabajo propio, nunca como copia):
+Behind the Build → Instagram · Versus → YouTube + Blog · Educativo → LinkedIn · Glitch → email ·
+Trendjacking → Threads + Instagram · Casos de Éxito → Blog.
+
+### Reglas duras de canal propio
+
+- **NUNCA replicar una pieza a un canal cuya señal no la premia.** Compartir producción ("una producción,
+  N cortes") **no** implica compartir catálogo. Un carrusel no es contenido de Threads; una noticia de texto
+  no es contenido de Instagram; un hilo en bruto no es contenido de LinkedIn.
+- **NUNCA crear taxonomía social paralela.** Los territorios se heredan de la taxonomía canónica del blog
+  (PDR-019): AEO, Inteligencia Artificial (Agentes es sub-territorio), HubSpot, Loop Marketing, Growth,
+  Diseño, SEO, Marketing Digital, Inbound Marketing, Novedades Efeonce. Foco actual: **AEO + IA**.
+- **NUNCA publicar en el blog el mismo texto de un post educativo de LinkedIn.** El blog recibe la versión
+  answer-first; copiar canibaliza el activo.
+- **NUNCA comprometer un caso de éxito en el calendario sin aprobación del cliente.** Es la única franquicia
+  con compuerta externa: los briefs ANAM nacen `private` y no autorizan publicación automática. Casos
+  citables al 2026-09: Sky (+127% orgánico), Bresler (+180% ventas digitales), Pinturas Berel, ANAM (2 en
+  desarrollo). Sin resultado citable → cifra ilustrativa **declarada**, nunca inflada.
+- **NUNCA despiezar trendjacking** a canales lentos: su valor es la ventana temporal.
+- **NUNCA liderar con portafolio estático en Instagram**: optimiza la métrica de vanidad que la propia
+  doctrina de PDR-005 §2 declara demotada. El proceso es la prueba; el resultado final es un claim.
+- **Vocero de talking head: Julio Reyes.** El formato construye reconocimiento facial y sólo rinde con
+  recurrencia de la misma cara; un segundo vocero es decisión explícita, no disponibilidad de agenda.
+  Capability de producción: paquete `Executive / Interview Capture` de Run & Gun Studio.
+- **Hook <2s, sin excepción**, y ninguna línea se mide por seguidores ni por volumen de posts.
+
 ## Cuándo usar este overlay
 
 Cuando el trabajo social toca los canales propios de Efeonce (marca, Think/Glitch/grader) o
@@ -46,7 +86,8 @@ Dos ejes ortogonales — **superficies** front-of-house (por audiencia/etapa) qu
   webinars). Social distribuye Think, pero no se reduce a promoción: reels, carruseles, posts,
   Pins, Shorts y videos pueden ser **platform-native cluster nodes** de sus Territory/Cluster
   Experiences cuando tienen JTBD propio, valor autónomo, relación gobernada, URL/ID, owner y
-  medición. Un teaser que sólo lleva al blog sigue siendo activación.
+  medición. Un teaser que sólo lleva al blog sigue siendo activación. **El canal de destino lo
+  decide el catálogo de PDR-020, no la conveniencia del calendario.**
 - **`efeoncepro.com`** = demand-capture + conversión (WordPress/Kinsta, recalibrando a Astro).
   Social empuja tráfico a las landings de servicio (ej. `/aeo-2/`).
 - **El grader (AI Visibility Grader)** es la costura top→bottom — pieza social-nativa ideal:

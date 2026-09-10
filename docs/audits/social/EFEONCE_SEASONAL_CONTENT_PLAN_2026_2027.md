@@ -5,6 +5,17 @@
 **Fuente vigente:** Notion. Este documento conserva decisiones y una fotografía fechada; no reemplaza los briefs,
 las asignaciones ni los estados de las páginas. Releerlos antes de producir, reasignar o publicar.
 
+> ⚠️ **Relación con PDR-020 sin resolver — decisión del operador pendiente (2026-09-10).**
+> [`PDR-020`](../../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md) fija el catálogo de
+> formatos nativos de cada canal propio, y **"post de efeméride ilustrado" no aparece en ninguno**. Además,
+> este plan declara cada pieza para Instagram *y* LinkedIn, mientras PDR-020 prohíbe replicar a un canal cuya
+> señal no lo premia y exige que el satélite reciba un corte con trabajo propio, no un caption distinto.
+> **Hay dos salidas y ninguna se toma acá:** (a) incorporar el contenido estacional al catálogo de PDR-020
+> como línea propia con métrica declarada y canal-hogar, o (b) mantener este calendario como compromiso
+> previo con ventana de vencimiento. Hasta que se decida, este plan **sigue vigente** — no se suspende por
+> este registro. Registrado como decisión pendiente 7 en PDR-020.
+
+
 ## Destinos verificados
 
 - Proyecto [content - q4](https://www.notion.so/3d639c2fefe78153843af99129069273).

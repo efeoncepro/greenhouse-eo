@@ -170,6 +170,7 @@ EJE B — PLATAFORMAS / BACKBONES  ("con qué operas por dentro" + "qué más ve
 - Glitch/blog: `docs/documentation/public-site/glitch-drop-gutenberg-block.md`.
 - Think (docs): [`docs/think/README.md`](../../think/README.md).
 - Pillar Experience y placement: [PDR-018](PDR-018-pillar-experience-arquitectura-editorial-y-runtime.md).
+- Sistema editorial de los canales propios (rol, catálogo por canal, franquicias): [PDR-020](PDR-020-canales-propios-sistema-editorial.md) — hijo de este layering.
 - Bow-tie / funnel: skill `commercial-expert` (overlay GH) + `spec/Arquitectura_BowTie_Efeonce_v1_1.md`.
 
 ## Delta 2026-07-18 — Glitch numerado y Glitch táctico

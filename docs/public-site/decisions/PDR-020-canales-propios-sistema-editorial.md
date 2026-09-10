@@ -263,6 +263,7 @@ arrendado.
 | 4 | **Secuencia de apertura de canales** — no simultánea | plan de producción |
 | 5 | **Cadencia comprometida por canal** contra capacidad real del equipo | sostenibilidad del sistema |
 | 6 | **Naming visible** Think / Marketing con Manzanitas | heredada de `TASK-1802` |
+| 7 | **Contenido estacional / efemérides** — ¿entra al catálogo como línea propia con métrica y canal-hogar, o el plan vigente queda como compromiso previo con vencimiento? | `docs/audits/social/EFEONCE_SEASONAL_CONTENT_PLAN_2026_2027.md` (13 piezas aprobadas, entregas hasta 2026-11-20, ya en producción) |
 
 Recomendación de arranque registrada en sesión: partir por **Instagram (proceso + talking head)**,
 **LinkedIn (educativo + su corte al blog)** y **Glitch**, e incorporar YouTube y Threads cuando esos tres

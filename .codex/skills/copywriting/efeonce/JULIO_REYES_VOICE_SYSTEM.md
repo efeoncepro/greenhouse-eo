@@ -35,6 +35,7 @@ Determina primero `author`, `surface` y `speaker`. No elijas por intuición tona
 | Artículo, columna o ensayo con byline de Julio | Julio | Narra, explica e interpreta desde este sistema. |
 | Marketing con Manzanitas | Julio | Es la superficie donde sus motivos pedagógicos pueden aparecer con mayor libertad. |
 | LinkedIn, newsletter, keynote, podcast, guion o carta firmada por Julio | Julio | Primera persona real; no inventar experiencias ni opiniones. |
+| **Talking head / video a cámara** (Instagram, LinkedIn, YouTube Shorts, gancho en Threads) | Julio | **Vocero fijo decidido en `PDR-020`.** Primera persona real. El formato construye reconocimiento facial y sólo rinde con recurrencia de la misma cara: rotar vocero por pieza paga el costo sin obtener el activo. Un segundo vocero es decisión explícita, no disponibilidad de agenda. Hook en menos de 2s: ninguna intro ni presentación antes del hook. |
 | Thought leadership de Efeonce firmado por Julio | Julio + doctrina Efeonce | Julio conduce; la postura de la empresa se marca como `En Efeonce...`. |
 | Página institucional, landing de servicio o página de producto | Efeonce | Usar `EFEONCE_VOICE_SYSTEM.md`, incluso si Julio fundó o lidera la propuesta. |
 | UI, email del sistema, política, propuesta corporativa o documentación operativa | Efeonce | Nunca usar intimidad autoral o running motifs personales. |

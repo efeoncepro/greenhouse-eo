@@ -6,6 +6,14 @@
 > **Ejecución:** [`TASK-1351`](././tasks/to-do/TASK-1351-landing-redes-sociales.md) (spoke de servicio; v1 live/noindex en WordPress page `251300`, cierre formal de lifecycle pendiente). Epic: `EPIC-019`. Guía pillar "community manager" bajo el producto editorial Think = follow-up; host/canonical según [PDR-018](PDR-018-pillar-experience-arquitectura-editorial-y-runtime.md) (ver §Consecuencias).
 > **No-duplicación:** el sustrato estratégico vive en el context pack y en PDR-004 — este PDR **cita**, no copia: `docs/context/09_marca-agencia.md` (masterbrand Efeonce; Globe = Creatividad/Contenido, Reach = Amplificación), `docs/context/07_ico.md` (cadena de eficiencia → outcome medible), `docs/context/13_icp-buyer-personas-jtbd.md` (Globe ICP), [PDR-004](PDR-004-landing-agencia-creativa-posicionamiento.md) (paraguas creativo + doctrina de marca/CTA/prueba), [PDR-002](PDR-002-arquitectura-informacion-seccion-visibilidad.md) (patrón hub `/servicios` + spoke por keyword real; pillar de autoridad va a Think).
 
+> **Delta 2026-09-10 — frontera con PDR-020.** Este PDR gobierna la **landing del servicio** de Social Media
+> (posicionamiento, oferta, conversión). Los **canales propios de marca Efeonce** — su rol, catálogo de
+> formatos, franquicias y cadencia — se rigen por
+> [PDR-020](PDR-020-canales-propios-sistema-editorial.md). La doctrina social de §2 y el diferenciador de
+> §1.1 (activación de voces expertas) siguen siendo la fuente que PDR-020 aplica a los canales propios; el
+> vocero de talking head quedó decidido allí: Julio Reyes. Trendjacking sigue siendo módulo del retainer
+> (§4.1) **y** franquicia de canal propio: un trendjack fallido en canal propio opera como anti-caso comercial.
+
 ## Contexto
 
 Efeonce presta un servicio humano y recurrente de Social Media, operado por un squad gestionado por Efeonce. La oferta puede apoyarse en contenido profesional producido mediante **Efeonce Run & Gun Studio**, pero no depende de Globe ni debe prometer creación automatizada mientras esa capacidad no esté disponible para este servicio. La landing pública debe posicionar y capturar demanda para esta oferta, dentro del paraguas creativo y del ecosistema de crecimiento de Efeonce.

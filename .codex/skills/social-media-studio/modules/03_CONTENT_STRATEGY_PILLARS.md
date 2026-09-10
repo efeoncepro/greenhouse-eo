@@ -45,12 +45,18 @@ Un **pilar** es un tema recurrente que conecta lo que *tú* sabes con lo que tu 
 
 **Ejemplo (canales propios del grader AEO / Efeonce — overlay):**
 
+> ⚠️ En canales propios de Efeonce los pilares **no se eligen: se heredan.** Los territorios son los de la
+> taxonomía canónica del blog (`PDR-019`) y el rol/catálogo de cada canal lo fija
+> `docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md`. **NUNCA crear una taxonomía
+> social paralela.** El "antes/después de marca" en carrusel quedó **descartado** por PDR-020: es el
+> portafolio estático, que optimiza la métrica de vanidad que la propia doctrina declara demotada.
+
 | Pilar | Trabajo | Formato típico | Señal objetivo |
 |---|---|---|---|
 | "Por qué la IA no te cita" | educar | Reel + carrusel | saves |
 | "Auditorías en vivo" | probar | Live / long-form | dwell + conversión |
-| "Antes/después de marca" | inspirar | carrusel | sends |
-| "Detrás del estudio" | humanizar | foto/estático | comunidad |
+| "Behind the Build" | probar con evidencia | proceso con tropiezos (reel/carrusel) | saves + sends |
+| "Versus" (mismo brief, N modelos) | dar utilidad guardable | long-form + corte visual | saves |
 
 ### Platform-native cluster nodes
 

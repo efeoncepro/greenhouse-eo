@@ -2,6 +2,11 @@
 
 El multiplicador que separa un estudio de contenidos de un blog. Producir una pieza pilar y publicarla una vez es dejar el 90% del valor en la mesa. **Una pieza pilar → N átomos por canal.** Este es el motor con mayor ROI del studio.
 
+> ⚠️ **En canales propios de Efeonce esto es economía de producción, NO presencia universal.** Compartir
+> producción no implica compartir catálogo: el destino de cada átomo lo decide el catálogo por canal de
+> `docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md`, cada franquicia tiene
+> **canal-hogar**, y **trendjacking no se atomiza** porque su valor es la ventana temporal.
+
 ## Principio: create once, distribute forever
 
 - Cada activo pilar (blog largo, webinar, podcast, data study, ebook) es una **cantera**, no una publicación única.
@@ -94,7 +99,7 @@ creator, stock o likeness permanecen separados.
 | **Podcast** | Audiograma, clips video, transcript→post, show notes, quotes→social, compilado temático |
 | **Data study** | Newsletter, carrusel de datos, Reel del headline, infografía, lead magnet gated, pitch PR |
 | **Ebook** | Serie de posts (1 por capítulo), newsletter, webinar, carrusel del framework, clips |
-| **Case study** | Post de resultado, quote-card, slide de venta, video testimonial, mención en newsletter |
+| **Case study** | **3 profundidades (PDR-020 §4.3), no una lista de átomos:** dato citable en la landing · caso completo en el **blog = canonical** · corte en **LinkedIn** (el aprendizaje, no el trofeo). **Instagram NO lleva casos.** Se ata a un servicio del catálogo y **la cadencia la fija la aprobación del cliente, no el calendario** |
 
 ## Átomo, activation asset o cluster node
 
@@ -109,7 +114,7 @@ puede ser `search + comprehension + activation` sin crear tres registros.
 
 ## Reglas del motor
 
-1. **Nativo por canal.** Cada átomo se re-escribe/re-corta para el canal, no se copia-pega. El craft del átomo textual es de `copywriting`; el corte de video/audio de los studios de asset; la publicación social de `social-media-studio`.
+1. **Nativo por canal.** Cada átomo se re-escribe/re-corta para el canal, no se copia-pega. El craft del átomo textual es de `copywriting`; el corte de video/audio de los studios de asset; la publicación social de `social-media-studio`. ⚠️ En canal propio de Efeonce el estándar sube: **si el corte no aporta nada distinto del original, el satélite no se hace**, y **NUNCA se replica a un canal cuya señal no lo premia** (`PDR-020`).
 2. **Un insight por átomo.** No metas los 5 datos en un post; haz 5 posts. La atomización también es enfocar.
 3. **Secuencia, no ráfaga.** Distribuye los átomos en el tiempo (semanas) para exprimir el pilar, no los quemes todos el día 1 (`05`).
 4. **Relación gobernada.** Cada átomo enlaza o apunta al activo ancla cuando el canal lo permite; si no, conserva

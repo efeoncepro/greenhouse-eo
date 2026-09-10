@@ -259,6 +259,14 @@ ICO y el ecosistema de producto no son solo operaciones — son **experiencia de
 
 *Fuente: Arquitectura de Marca & Messaging Framework v1.0 + Marca Agencia Estrategia Completa v1.2. Los Thought Territories T1–T5 (contenido/LinkedIn) viven en el doc de marca; T6 = ASaaS / futuro de la agencia.*
 
+> ⚠️ **Drift registrado 2026-09-10 — los Thought Territories T1–T5 no son verificables en el repo.**
+> El doc de marca que los contiene no está versionado acá, así que ningún agente puede resolverlos ni
+> citarlos. Mientras no se reponga o reemplace, **los territorios editoriales de los canales propios
+> (incluido LinkedIn) son los de la taxonomía canónica del blog**: `PDR-019` para la taxonomía y
+> [`PDR-020`](../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md) para el rol y el
+> catálogo de cada canal. Aplica la regla del context pack: ante drift prevalece el contrato verificado.
+> Si el doc de marca se incorpora al repo, reconciliar T1–T5 contra `PDR-019` antes de usarlos.
+
 *Última verificación de drift contra runtime: 2026-07-23 — doctrina de autoría Creative Studio reconciliada con
 el business model V1.1; sin claims de runtime hardcodeados.*
 

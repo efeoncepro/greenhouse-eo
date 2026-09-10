@@ -23,6 +23,7 @@
 | Priorizar features con justificación comercial (cuentas, cross-sell, Pulse) | `08_estrategia-comercial` |
 | Cuidar marca/branding en el portal (Ecosystem Tour, onboarding, naming) | `09_marca-agencia` |
 | Definir Content Engineering, una Pillar Experience o un cluster federado | `09_marca-agencia` + `docs/public-site/decisions/PDR-017-content-engineering-territorio-editorial.md` + `docs/public-site/decisions/PDR-018-pillar-experience-arquitectura-editorial-y-runtime.md` + skill `content-marketing-studio` |
+| Operar o abrir un canal propio de marca (blog, LinkedIn, YouTube, Instagram, Threads, Glitch) | `docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md` (rol y catálogo por canal, franquicias, vocero) + `PDR-019` (territorios) + skill `social-media-studio` |
 | Diseñar la experiencia/onboarding del cliente en el portal | `10_experiencia-cliente` |
 | Tocar el sync con HubSpot, Account 360, lifecycle stages o properties | `11_hubspot-bowtie` |
 | Operar o vender Salesforce CRM, Marketing Cloud Engagement o Marketing Cloud Next | `docs/services/salesforce/README.md` + skill Salesforce dueña; partnership/licensing desde el registry |

@@ -85,6 +85,11 @@
    Share of Voice IA de "Efeonce" + competidores de agencias.
 
 ## Reglas duras del caso
+- **NUNCA** publicar en el blog el mismo texto de un post educativo de LinkedIn. `PDR-020` §4.1 pone esta
+  versión bajo gobierno de esta skill: el blog recibe la **versión answer-first** — la pregunta real como
+  entrada, estructura citable, enlaces internos al territorio de `PDR-019` — no el texto optimizado para
+  dwell en feed. Copiar canibaliza el único activo que se cita. Si el tema no da para esa versión con
+  trabajo propio, **se queda sólo en LinkedIn**.
 - **NUNCA** exponer la marca/nomenclatura del portal interno (Greenhouse, "EO",
   Nexa, etc.) en copy SEO público salvo decisión GTM explícita.
 - **NUNCA** publicar salida del AI Content Factory sin pasar information gain +

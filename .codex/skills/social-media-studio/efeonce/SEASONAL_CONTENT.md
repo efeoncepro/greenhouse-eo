@@ -26,7 +26,9 @@ social-media-studio; no cambia los contratos comerciales ni activa publicación.
 - Objetivo, mercado, audiencia, concepto elegido y emoción o idea que debe quedar.
 - Guion por slide/segundo, textos en pieza y giro visual; distinguir obligatorio de opcional.
 - Dirección de arte, continuidad entre escenas, recursos vigentes de marca y referencias.
-- Captions separados para Instagram/LinkedIn; transcreación para Estados Unidos cuando corresponda.
+- **Declara canal-hogar y qué corte recibe cada satélite** (PDR-020) — un caption distinto sobre el mismo
+  asset sigue siendo re-post, no corte. Si un canal no recibe nada distinto, **no se publica ahí**.
+  Transcreación para Estados Unidos cuando corresponda.
 - Entregables editables y exportaciones, portada, ALT/descripción, sonido, créditos y procedencia.
 - Responsable, primer corte, entrega completa, margen de ajustes y fecha real de publicación.
 - DoD verificable, revisión cultural/visual y aprobación final; nunca dar por terminados los assets

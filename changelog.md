@@ -7,6 +7,22 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-10 — Canales propios de Efeonce quedan bajo un sistema editorial declarado
+
+`PDR-020` fija el sistema editorial de los canales propios de marca: un motor compartido con un rol por canal
+(blog el activo, LinkedIn el comprador, YouTube la profundidad, Instagram craft y cultura, Threads conversación
+viva, Glitch la propiedad), catálogo propio de formatos por canal y franquicias con canal-hogar que viajan como
+corte y nunca como copia. Los territorios se heredan de la taxonomía de `PDR-019` sin taxonomía social paralela;
+el educativo nace en LinkedIn y el blog recibe la versión answer-first; el blog queda declarado multiformato con
+casos, tools, webinars, ebooks y data studies; los casos de éxito se modelan en tres profundidades con canonical
+en el blog y compuerta de aprobación del cliente. El vocero de talking head es Julio Reyes.
+[Decisión](docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md), delta de impacto en
+`TASK-1802`, cross-links en `PDR-003/004/005/019`, drift de Thought Territories registrado en el context pack y
+diez archivos de skills reconciliados con espejo Claude/Codex, incluido el hueco de Threads que no existía en la
+mecánica de plataforma. Quedan siete decisiones pendientes y un conflicto declarado sin resolver con el plan
+estacional 2026–2027, que sigue vigente. No se abrió ninguna cuenta, no se produjo contenido, no se programó nada
+y no se autorizó publicación.
+
 ## 2026-09-10 — Finance: nómina agosto al valor real de Global66 y TASK-1858
 
 Con autorización del operador, los dos pagos de nómina de agosto que Payroll había registrado en USD con tasa
@@ -971,59 +987,3 @@ El gate de CI mide cobertura del fixture, no precisión: una tool SEO nueva sin 
 paridad del gateway ahora compara la descripción, y al conectarlo encontró 21 de 27 tools federadas divergentes;
 se cerró haciendo que el gateway derive el texto del artefacto en vez de mantener una copia. El redeploy de
 `mcp.efeonce.org` queda pendiente.
-
-## 2026-09-02 — Globe entra en hibernación profunda reversible
-
-TASK-1807 incorporó una state machine Terraform `active | draining | hibernated`. Globe quedó en
-`hibernated`: tres schedulers pausados, vías productivas cerradas, Cloud Run en scale-to-zero y Cloud SQL
-`STOPPED/NEVER`; datos, backups/PITR, buckets, secretos, imágenes, identidades, front door, budgets y
-observabilidad permanecen intactos. Los applies finales tuvieron cero deletes/replacements y el post-plan quedó
-sin drift.
-
-El runbook nuevo documenta el gate anti-borrado, todos los inputs de preservación, la secuencia segura de apagado
-y encendido, los readbacks, rollback, monitoreo y medición de costo. El baseline era ~CLP 348.152/30 días y la
-reducción modelada es CLP 318.000–328.000; el ahorro realizado queda pendiente de Billing Export a 24 horas,
-7 días y cierre mensual.
-
-Se sincronizaron los índices, arquitectura de persistencia, runbooks IaC/rollout/promoción, ledger de modelos,
-plan TASK-1807 y prompt de sesiones nuevas. Las skills `greenhouse-globe` y `greenhouse-globe-model-fleet`
-quedaron espejadas Codex/Claude con una compuerta que impide gasto o reactivación implícita.
-
-## 2026-09-02 — tools y skills MCP pasan a ser Definition of Done de toda la secuencia ETV
-
-TASK-1805/1806, TASK-1312/1313/1314 y TASK-1808–1811 exigen ahora crear o actualizar su tool MCP, lane,
-manifiesto, federación y skill operativa en el mismo PR. Una tool existente se amplía en vez de duplicarse y toda
-ausencia del gateway debe ser una exclusión razonada. Las lecturas no compran al proveedor durante el read; writes
-y gasto conservan confirmación, capability fina y scope fail-closed. No cambió runtime: son criterios de ejecución
-y cierre para trabajo futuro.
-
-## 2026-09-02 — las cinco familias Labs restantes ya tienen ownership ejecutable
-
-El backlog de Growth SEO incorpora `TASK-1808`–`TASK-1811`: categorías y mercado temático, competidores SERP por
-keyword set, comparación entre páginas e historia bulk de cohortes. Las dos direcciones de categorías viven en
-una task porque forman una sola capacidad dominio↔categoría; los demás endpoints conservan grano, costo y lifecycle
-propios. Las cuatro tasks dependen de `TASK-1805/1806` y no habilitan llamadas por estar registradas.
-
-Los contratos existentes ahora aclaran que DataForSEO sólo aporta evidencia para topic clusters, que
-`TASK-1314` compone sin capturar y que las menciones históricas de `serp_competitors`/`page_intersection` no eran
-callers reales. No cambió runtime, schema, gasto, flags ni deploy.
-
-## 2026-09-02 — Improved ETV pasa de anuncio a contrato operativo
-
-DataForSEO confirmó 14 familias ETV-capable, alcance sobre todos los ETV/traffic cost, precio sin premium,
-históricos fully recomputed desde julio de 2026 y calibrados antes, y corte irreversible
-`2026-11-01T00:00:00Z`. La arquitectura, auditoría, runbook, tasks y skills ahora distinguen 14 familias del
-proveedor, nueve callers y seis familias/siete caminos consumidores; reemplazan el método «servido» no observable
-por método efectivo derivado. `TASK-1806` pasa a P0 deadline-bound. No cambió runtime.
-
-## 2026-09-01 — Emma enruta cotización, seguimiento y Calidad al equipo correcto
-
-El handoff del Customer Agent ANAM dejó de depender de una única propietaria. El workflow activo `1876744588`
-clasifica el ticket, elimina a Emma como owner y aplica la matriz Pablo → María Paz para cotización, Marco → Pablo
-para seguimiento y María Paz → Marco para Calidad/facturación/otros, respetando disponibilidad. Tres chats públicos
-E2E aprobaron las rutas de cotización y Calidad y el fallback real de seguimiento; el primer probe fallido permitió
-corregir el owner previo y el sesgo de marcadores QA antes de dejar el flujo conectado.
-
-El canon reusable distingue el trigger del Customer Agent, la asignación por workflow y la reasignación manual
-entre personas. También registra el límite de evidencia: el owner visible quedó probado, pero la respuesta humana
-y una segunda transferencia en el mismo chat abierto requieren una prueba operativa separada.
