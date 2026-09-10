@@ -5,36 +5,58 @@
  * versionan aquí, se muestran en HTML y se incorporan al JobPosting desde la misma fuente.
  * La autoridad del bloque de beneficios es el Efeonce Candidate Benefits Charter.
  */
+import { EFEONCE_OPERATING_MARKETS } from '@/config/efeonce-brand'
+
 export const EFEONCE_CAREERS_STANDARD_CONTENT_VERSION = 2 as const
+
+/**
+ * «Chile, Estados Unidos, Colombia, México y Perú» compuesto desde el SSOT de marca.
+ *
+ * La huella operativa se hardcodeó mal antes en otras superficies: el sitio público todavía
+ * muestra cuatro países y Estados Unidos entró recién el 2026-08-31 (`docs/context/01`). Leerla
+ * de `EFEONCE_OPERATING_MARKETS` es la única forma de que este bloque no quede viejo solo.
+ * Cobertura comercial ≠ oficina ni entidad legal en cada país: por eso dice «presencia».
+ */
+const OPERATING_MARKETS_SENTENCE = `${EFEONCE_OPERATING_MARKETS.slice(0, -1).join(', ')} y ${EFEONCE_OPERATING_MARKETS.at(-1)}`
 
 /**
  * Contexto de compañía publicado en el bloque «Efeonce en breve» de toda vacante.
  *
- * Sigue el patrón de DOS CAPAS de `docs/public-site/decisions/PDR-008-landing-agencia-marketing-
- * digital-posicionamiento.md` (Accepted), que es el que gobierna cómo se nombra la CATEGORÍA:
+ * Nivel de consciencia del lector: SOLUTION-AWARE. Un especialista senior conoce el mundo
+ * agencia y no conoce Efeonce, así que el framework es BAB (contraste + mecanismo único), no
+ * AIDA. La gran idea es una sola: **en la mayoría de las agencias el sistema lo pone la
+ * persona; aquí el sistema ya existe.** Se rastrea a dos de las siete creencias contrarias
+ * (`docs/context/05_voz-tono-estilo.md`): el problema es de arquitectura, no de talento; y la
+ * creatividad que no se mide no se puede defender.
  *
- *   1. Categoría familiar y buscable — «agencia de marketing digital y tecnología». Es con lo que
- *      lidera el sitio público vivo (`<title>` y H1 de efeoncepro.com), y es la palabra con la que
- *      un candidato busca trabajo. Negarla en careers deja a Efeonce sin categoría para su lector.
- *   2. Reencuadre obligatorio en la MISMA sección (PDR-008 §Reglas duras): nunca «somos una agencia»
- *      como promesa suelta. El sitio vivo lo resuelve con «solo que operamos como un sistema, no
- *      como un menú de servicios»; este bloque usa esa misma bisagra.
+ * Cómo se nombra la CATEGORÍA — patrón de dos capas de PDR-008 (Accepted):
+ *   1. «agencia de marketing y tecnología», definición del operador (2026-09-09), más la huella
+ *      operativa. El sitio público usa la variante con «digital» porque ahí es keyword de captura
+ *      SEO; careers no compite por esa query, y el alcance real del trabajo es más ancho.
+ *      Negar la categoría en careers deja a Efeonce sin categoría para su lector.
+ *   2. Reencuadre OBLIGATORIO en la misma sección (§Reglas duras): «agencia» nunca queda como
+ *      promesa suelta. Aquí lo hace el contraste de la segunda oración.
  *
- * El posicionamiento estratégico de PDR-012 («plataforma de servicios de marketing y crecimiento
- * habilitada por IA» / Integrated Growth Partner / ASaaS / Growth OS) NO se aplica literal aquí:
- * ese PDR declara su superficie —Home, About Us, sitio público, Think, landings de categoría y
- * narrativa comercial— y careers no está en ella. Su aporte a este bloque es el MECANISMO, no la
- * etiqueta: medios como capability propia y software propio como prueba (no «tecnología» a secas,
- * que es el claim sin mecanismo que prohíbe la disciplina anti-humo de `docs/context/09`).
+ * El posicionamiento de PDR-012 («plataforma de servicios… habilitada por IA» / Integrated
+ * Growth Partner / ASaaS / Growth OS) NO se aplica literal: ese PDR declara su superficie
+ * —Home, About Us, sitio público, Think, landings de categoría y narrativa comercial— y careers
+ * no está en ella. Lo que sí aporta es el MECANISMO: `medios` como capability propia y
+ * `software propio` como prueba, nunca «tecnología» a secas, que es el claim sin mecanismo que
+ * prohíbe la disciplina anti-humo de `docs/context/09_marca-agencia.md`.
  *
- * La creencia es literal del SSOT del Golden Circle (`docs/context/09_marca-agencia.md` §WHY).
+ * La convicción de cierre es del SSOT del Golden Circle (`09_marca-agencia.md` §WHY).
  *
- * NUNCA liderar este bloque con siglas ni metodologías propias (ICO, RpA, FTR, Loop Marketing):
- * PDR-008 §Reglas duras las reserva para el bloque de prueba, no para los primeros 30 segundos —
- * y «Efeonce en breve» son los primeros 30 segundos de la vacante.
+ * Reglas de craft que este bloque tuvo que aprender a golpes:
+ * - **Le habla al CANDIDATO, no al cliente.** La tercera oración existe para eso: traduce las
+ *   capabilities a lo que gana quien va a trabajar aquí. Una versión previa era 100% «nosotros»
+ *   y cero «tú» — en una vacante, eso es escribirle al comprador equivocado.
+ * - **NUNCA liderar con siglas ni metodologías propias** (ICO, RpA, FTR, Loop Marketing):
+ *   PDR-008 §Reglas duras las reserva para el bloque de prueba, y «Efeonce en breve» son los
+ *   primeros 30 segundos de la vacante.
+ * - **Un solo contraste, no tres.** Encadenar «no es X, sino Y» varias veces es un tell de
+ *   AI-slop y suena a plantilla; el contraste vive en la segunda oración y en ningún otro lado.
  */
-export const EFEONCE_CAREERS_COMPANY_CONTEXT =
-  'Efeonce es una agencia de marketing digital y tecnología —solo que operamos como un sistema, no como un menú de servicios. Creatividad, medios, web, CRM y data trabajan como un solo motor, sobre software propio donde el trabajo se ve en vivo. No entregamos crecimiento: lo construimos con cada cliente y lo dejamos más capaz de sostenerlo.'
+export const EFEONCE_CAREERS_COMPANY_CONTEXT = `Efeonce es una agencia de marketing y tecnología con presencia en ${OPERATING_MARKETS_SENTENCE}. La diferencia es que aquí creatividad, medios, web, CRM y data no son cinco proveedores que alguien tiene que conectar: son un solo equipo, con software propio detrás. Para ti eso significa briefs con contexto, decisiones con datos y trabajo que se puede defender. Y una convicción de fondo: el crecimiento no se entrega, se construye con el cliente hasta dejarlo más capaz de sostenerlo.`
 
 /**
  * Calificador OBLIGATORIO del bloque de beneficios (Efeonce Candidate Benefits Charter,
