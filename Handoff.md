@@ -40,7 +40,7 @@ cobro Berel MXN 104.000 (13/08) sin factura asociada; recepción USD 335,15 (13/
 (PDF cifrado, clave no coincide con los 4 últimos dígitos del RUT de la empresa) → OTB pendiente; estado de cuenta
 trimestral del crédito 420051383906 para completar `original_amount`. Bugs corregidos: `ISSUE-169`
 (saldos en moneda extranjera + día genesis). Follow-up formal propuesto: `TASK-1858` (pendiente de confirmación del operador para registrarla). Dev server local con la UI en
-`http://localhost:3000/finance/reconciliation`. Sin push.
+`http://localhost:3000/finance/reconciliation`. **Push a `develop` hecho 2026-09-10 (`624468187`) por autorización del operador**, desde una copia limpia con `local:check` verde (el checkout compartido tenía skills sin espejar de otra sesión); dispara `ops-worker-deploy.yml`.
 
 **TASK-1604 (2026-09-10, in-progress):** slice SEO/Arte aplicado y documentado. Seis competencias activas,
 nueve preguntas SEO en `sme_review`, cero templates del pack, cero policies y cero assessments. Las vacantes
@@ -56,6 +56,15 @@ reutilizar un template. Pendiente: SME individual, template SEO, binding scoreca
 sujetos canary y 35 de otros sujetos; el helper vigente borra por `client_id`. No retirar el blocker ni ejecutar
 `--apply`: implementar planner/delete/readback sujeto-específicos, preservar cliente/hijos ajenos, diagnosticar
 las familias de refresh y recién después reiniciar steady/retirar desde `delete_after`.
+
+**Canales propios Efeonce (2026-09-10, decisión cerrada / ejecución no autorizada):**
+[PDR-020](docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md) rev 1.2 — rol y catálogo por
+canal, franquicias con canal-hogar, casos de éxito en tres profundidades, vocero Julio Reyes. Propagado a
+`TASK-1802` (delta + tres bloqueantes explícitos), `PDR-003/004/005/019`, roadmap, context pack y diez archivos de
+skills espejados. Threads quedó documentado en la mecánica de plataforma con fuentes secundarias marcadas; Efeonce
+no tiene evidencia propia. Pendiente del operador: 7 decisiones, entre ellas canonical de video (bloquea TASK-1802
+y la apertura de YouTube), inventario de tools/webinars y la reconciliación del plan estacional 2026–2027, que
+sigue vigente y publica un formato ausente del catálogo en dos canales a la vez. Nada producido ni publicado.
 
 **Social Efeonce, 09/09:** [13 piezas y skills](docs/audits/social/EFEONCE_SEASONAL_CONTENT_PLAN_2026_2027.md).
 Pendiente: conciliar MET-2339–2342 tarea/calendario. Producción abierta; cierre documental sin cambios Notion.
