@@ -174,6 +174,11 @@ modelo de capacidad gobernada alcanza el piso de margen o no.
 
 Un pod que sólo audita tiene valles. Un pod que audita y activa los llena.
 
+**Y la carga de activación no es una sola.** El catálogo BTL cubre nueve superficies —activación en sala,
+promotoría e impulso, visual merchandising, roadshow, street y sampling masivo, pop-up, activación de patrocinios,
+ferias y encuentros de canal—, cada una con su propia estacionalidad. Cuanto más ancha la cartera BTL, más plana
+la curva de utilización de la misma capacidad, y más alcanzable el piso de margen del escalón 2.
+
 - **Inválida:** staff augmentation de personal de terreno bajo dirección diaria del cliente. Rompe el boundary
   económico *y* la figura legal. Ver §8.
 - **Inválida:** cobro como porcentaje del trade spend gestionado. Crea conflicto de interés y no es defendible.

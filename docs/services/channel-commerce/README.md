@@ -81,52 +81,79 @@ No cambia:  que Efeonce opera, decide y responde.
 
 ---
 
-## Los once servicios
+## Los dieciocho servicios
 
 Agrupados como los nombra el mercado chileno —trade marketing y BTL— y no por nuestra taxonomía interna. La oferta
-es completa desde el primer contrato: **Efeonce opera los once siempre**; lo que cambia por fase es quién pone las
-manos en cada capa.
+es completa desde el primer contrato: **Efeonce opera los dieciocho siempre**; lo que cambia por fase es quién
+pone las manos en cada capa.
 
-### Trade marketing — lo que pasa en la góndola de forma continua
+### Trade marketing — lo continuo, lo que pasa en la góndola todo el año
 
-| § | Servicio | Qué compra el cliente | Momento de compra | Manos en fase 1 | Unidad |
-|---|---|---|---|---|---|
-| 1 | **Diagnóstico de Ejecución de Canal** | Saber qué se puede medir, qué está roto y en qué orden intervenir | Entrada | Efeonce + captura vía partner | Proyecto cerrado |
-| 2 | **Auditoría de Inversión de Canal** | Saber qué componente de su presupuesto de canal no tiene retorno demostrable | Entrada | Efeonce | Proyecto cerrado |
-| 3 | **Cobertura Auditada** | El estado de ejecución por PDV y la **lista priorizada** de intervención, cada ciclo | Núcleo recurrente | Partner de captura, gobernado | PDV × ciclos |
-| 4 | **Equipo de Terreno Gestionado** | Que las tiendas críticas queden intervenidas, con evidencia antes/después | Intervención | Proveedor con back-to-back | Capacidad mensual |
-| 5 | **Orquestación de Terreno** | Que sus proveedores actuales se comparen contra el mismo estándar | Entrada alternativa | Efeonce | Proveedores × mercados |
-| 6 | **Anaquel Digital y Visibilidad en IA** | Cómo se ve su producto en la ficha de cada retailer y si la IA lo recomienda | Expansión | Efeonce (Wave) | Según owner |
-| 7 | **Retail Media y Commerce** | Operar su inversión en las redes de medios de las cadenas, leída junto a la góndola | Expansión | Efeonce (Media & Distribution) | Según owner |
-| 8 | **Diseño y Medición de Promociones** | Saber si la promoción vendió de más o canibalizó margen | Avanzado | Efeonce | Proyecto por ola |
-
-### BTL — lo que pasa en momentos
-
-| § | Servicio | Qué compra el cliente | Momento de compra | Manos en fase 1 | Unidad |
-|---|---|---|---|---|---|
-| 9 | **Activaciones Medidas** | Sampling, demo o activación que se reporta en delta contra tiendas de control, no en contactos | Intervención | Proveedor + Efeonce (diseño y lectura) | Ola: tiendas × días |
-| 10 | **Encuentros de Canal** | Que la convención de distribuidores o el lanzamiento a la fuerza de venta tenga objetivo, medición y seguimiento | Expansión, cuenta con relación | Productora + Efeonce | Proyecto cerrado |
-
-### Transversal a ambas familias
-
-| § | Servicio | Qué compra el cliente | Manos en fase 1 | Unidad |
+| § | Servicio | Qué compra el cliente | Momento | Unidad |
 |---|---|---|---|---|
-| 11 | **Contenido y Material de Canal** | Material a escala —fichas, catálogos, PDP, kits, adaptaciones por cadena— sin que cada campaña sea un acto heroico | Efeonce (Creative) + proveedor de impresión | Capacidad gobernada |
+| **T1** | **Diagnóstico de Ejecución de Canal** | Qué se puede medir, qué está roto y en qué orden intervenir | Entrada | Proyecto cerrado |
+| **T2** | **Auditoría de Inversión de Canal** | Qué componente de su presupuesto de canal no tiene retorno demostrable | Entrada | Proyecto cerrado |
+| **T3** | **Cobertura Auditada** | El estado por PDV y la **lista priorizada** de intervención, cada ciclo | Núcleo recurrente | PDV × ciclos |
+| **T4** | **Equipo de Terreno Gestionado** | Que las tiendas críticas queden intervenidas, con evidencia antes/después | Intervención | Capacidad mensual |
+| **T5** | **Orquestación de Terreno** | Que sus proveedores actuales se comparen contra el mismo estándar | Entrada alternativa | Proveedores × mercados |
+| **T6** | **Anaquel Digital y Visibilidad en IA** | Cómo se ve su producto en cada ficha de retailer y si la IA lo recomienda | Expansión | Según owner |
+| **T7** | **Retail Media y Commerce** | Operar su inversión en las redes de las cadenas, leída junto a la góndola | Expansión | Según owner |
+| **T8** | **Diseño y Medición de Promociones** | Si la promoción vendió de más o canibalizó margen; incluye concursos y sorteos | Avanzado | Proyecto por ola |
+
+### BTL — lo episódico, lo que pasa en momentos
+
+| § | Servicio | Qué compra el cliente | Dónde ocurre | Unidad |
+|---|---|---|---|---|
+| **B1** | **Activaciones en Sala Medidas** | Sampling, demo o degustación que se reporta en delta contra tiendas de control | En la tienda | Ola: tiendas × días |
+| **B2** | **Promotoría e Impulso** | Venta asistida en sala que además reporta qué pasa en esa tienda | En la tienda | Turnos × salas |
+| **B3** | **Visual Merchandising y Exhibiciones** | Que la exhibición se instale bien **y siga instalada** | En la tienda | Puntos × período |
+| **B4** | **Roadshow y Tour de Marca** | Una gira leída plaza por plaza, no como total nacional | Multi-ciudad | Plazas × días |
+| **B5** | **Street Marketing y Sampling Masivo** | Entrega masiva con registro de dónde, cuándo y a quién | Fuera de la tienda | Puntos × días |
+| **B6** | **Pop-up y Espacios Efímeros** | Un espacio temporal con objetivo comercial y métrica desde el día uno | Espacio propio temporal | Proyecto por período |
+| **B7** | **Activación de Patrocinios** | Que el patrocinio ya pagado produzca algo más que un logo | En el evento patrocinado | Proyecto por temporada |
+| **B8** | **Ferias y Exposiciones** | Que la feria termine en pipeline y no en una caja de tarjetas | Feria del rubro | Proyecto + seguimiento |
+| **B9** | **Encuentros de Canal** | Que la convención o el lanzamiento al canal tenga objetivo y seguimiento | Evento propio B2B | Proyecto cerrado |
+
+### Transversal
+
+| § | Servicio | Qué compra el cliente | Unidad |
+|---|---|---|---|
+| **X1** | **Contenido y Material de Canal** | Material a escala —fichas, catálogos, PDP, kits, adaptaciones por cadena— y el contenido derivado de cada activación | Capacidad gobernada |
+
+### Lo que hace distinta esta oferta BTL
+
+El BTL del mercado se vende como **producción y presencia**. Acá se vende con tres cosas que casi nadie incluye:
+
+1. **Diseño de medición antes de ejecutar.** Tiendas de control en B1, lectura por plaza en B4, métrica de éxito
+   acordada antes de abrir en B6, seguimiento post-feria en B8. Definir cómo se va a leer **después** de ejecutar
+   ya no sirve.
+2. **La activación alimenta el dato del canal.** Quien activa, promociona o implementa ya está en la tienda: ese
+   pase es materia prima de T3 sin costo adicional de captura. B3 es el caso más claro — verificar que la
+   exhibición siga instalada sale gratis de la cobertura.
+3. **Cada activación deja activos, no sólo fotos de reporte.** El contenido capturado (X1) se reutiliza en social,
+   retail media y creator, con derechos definidos desde el brief.
+
+**Lo que no cambia:** la producción física —montaje, mobiliario, estructuras, stands, bodega, transporte,
+permisos y seguros— la contrata y responde Efeonce, pero **la ejecuta un proveedor** y se factura como
+pass-through. No nos convertimos en productora.
 
 ### Cómo esta lista responde al mercado
 
-| Lo que el comprador ya tiene | Qué le falta | Qué servicio lo resuelve |
+| Lo que el comprador ya tiene | Qué le falta | Servicio |
 |---|---|---|
-| Una agencia de terreno con un tablero descriptivo | Que le digan **qué arreglar primero y por qué** | 3 · Cobertura Auditada |
-| Una plataforma que detecta y prioriza | **Quién ejecuta la corrección y cierra el ciclo** | 4 · Equipo de Terreno Gestionado |
-| Activaciones que reportan contactos | Saber **si vendieron** | 9 · Activaciones Medidas |
-| Inversión en retail media creciendo | **Leerla junto con lo que pasa en la góndola** de esa misma cadena | 6 y 7 |
-| Varias agencias por canal o país | **Un estándar común** para compararlas | 5 · Orquestación de Terreno |
+| Una agencia de terreno con un tablero que describe | Que le digan **qué arreglar primero y por qué** | T3 |
+| Una plataforma que detecta y prioriza | **Quién ejecuta la corrección y cierra el ciclo** | T4 |
+| Activaciones que reportan contactos | Saber **si vendieron** | B1 |
+| Exhibiciones pagadas por mes | Saber si **duraron el mes** | B3 |
+| Un patrocinio caro y una activación pobre | Los derechos contratados **que no está usando** | B7 |
+| Ferias con caja de tarjetas | Las **tres semanas siguientes** | B8 |
+| Inversión en retail media creciendo | **Leerla junto con la góndola** de esa misma cadena | T6 y T7 |
+| Varias agencias por canal o país | Un **estándar común** para compararlas | T5 |
 
-> Los servicios **6 y 7 son la razón de ser de la línea.** El [benchmark](../../audits/commercial/CHANNEL_COMMERCE_CHILE_MARKET_BENCHMARK_2026-09-10.md)
+> **T6 y T7 son la razón de ser de la línea.** El [benchmark](../../audits/commercial/CHANNEL_COMMERCE_CHILE_MARKET_BENCHMARK_2026-09-10.md)
 > y las [battlecards](../../audits/commercial/CHANNEL_COMMERCE_COMPETITIVE_BATTLECARDS_V1.md) confirman que ningún
 > actor chileno —ni el software de ejecución ni las agencias de servicio— conecta la góndola con la inversión
-> digital. Todo lo demás ya lo hacen otros y se contrata; esto no.
+> digital. El resto de la oferta te hace creíble y te da la relación; esto es por lo que te eligen.
 
 ## Qué se puede vender con el capital actual
 
@@ -140,7 +167,7 @@ que combine C intensivo con pago a 90 días y sin factoring aprobado para ese de
 
 ---
 
-## 1 · Channel Execution Diagnostic
+## T1 · Diagnóstico de Ejecución de Canal
 
 **Promesa.** Al terminar sabes qué se puede medir de tu canal, qué está roto hoy en una muestra real y en qué
 orden intervenir.
@@ -179,12 +206,12 @@ precio publicado.
 
 ---
 
-## 2 · Trade Investment Audit
+## T2 · Auditoría de Inversión de Canal
 
 **Promesa.** Sabes cuánto vale realmente tu inversión de canal y cuál de sus componentes no tiene retorno
 demostrable.
 
-**Por qué existe separado del anterior.** Este entra por el bolsillo, no por la tienda. Es el mismo wedge con el
+**Por qué existe separado de T1.** Este entra por el bolsillo, no por la tienda. Es el mismo wedge con el
 ángulo financiero, y su interlocutor natural es Comercial con Finance al lado. En organizaciones donde el trade
 spend es una línea grande y opaca del P&L, este ángulo abre puertas que el diagnóstico de ejecución no abre.
 
@@ -202,7 +229,7 @@ sustituye a Finance del cliente.
 
 ---
 
-## 3 · Cobertura Auditada  ·  *núcleo recurrente*
+## T3 · Cobertura Auditada  ·  *núcleo recurrente*
 
 **Promesa.** Cada ciclo recibes el estado de ejecución de tu canal por punto de venta y la lista priorizada de
 intervención.
@@ -217,7 +244,7 @@ y la sesión de lectura del ciclo.
 
 **Opcional.** Ampliación de cobertura; frecuencia mayor; SKUs adicionales; observación ampliada de competencia.
 
-**Excluido.** Intervención en tienda (es el servicio 4); material POP; mercadería; negociación con cadenas;
+**Excluido.** Intervención en tienda (es T4); material POP; mercadería; negociación con cadenas;
 garantía de venta o sell-out.
 
 **Entregables y aceptación.** Score por PDV y cadena con su denominador declarado, lista priorizada, evidencia
@@ -244,7 +271,7 @@ con el primero. Un solo ciclo no produce tendencia.
 
 ---
 
-## 4 · Managed Field Pod  ·  *se ofrece desde fase 1; con capacidad propia sólo tras los gates*
+## T4 · Equipo de Terreno Gestionado  ·  *se ofrece desde fase 1; con capacidad propia sólo tras los gates*
 
 **Promesa.** Las tiendas que la auditoría marcó como críticas quedan intervenidas, con evidencia del antes y el
 después.
@@ -264,7 +291,7 @@ reporte de remediación.
 **Excluido.** Reposición ilimitada; transporte y bodegaje de mercadería; tareas fuera del scope acordado;
 cobertura garantizada antes de que exista red operativa; y cualquier instrucción directa del cliente al personal.
 
-**Dependencias duras.** Requiere el servicio 3 activo o data de ejecución equivalente provista por el cliente. Sin
+**Dependencias duras.** Requiere T3 activo o data de ejecución equivalente provista por el cliente. Sin
 priorización, un pod es reposición ciega.
 
 **Cómo se ejecuta según la fase.** El servicio **se ofrece desde el primer contrato**. En fase 1 lo ejecuta un
@@ -281,7 +308,7 @@ con gente propia, sí**.
 
 ---
 
-## 5 · Field Orchestration
+## T5 · Orquestación de Terreno
 
 **Promesa.** Tus proveedores de terreno dejan de reportar cada uno a su manera y empiezan a compararse contra el
 mismo estándar.
@@ -308,7 +335,7 @@ posiciona gobernando a otros: todos se posicionan ejecutando**. Es el espacio me
 
 ---
 
-## 6 · Digital Shelf & AI Shopper Visibility  ·  *composición con Wave*
+## T6 · Anaquel Digital y Visibilidad en IA  ·  *composición con Wave*
 
 **Promesa.** Sabes cómo se ve tu producto en el anaquel digital —y si los asistentes de IA lo recomiendan cuando
 alguien pregunta por tu categoría.
@@ -325,7 +352,7 @@ Commerce lo compone y lo traduce a decisión de canal. RACI explícito en cada p
 
 ---
 
-## 7 · Activación de Marca Medida  ·  *BTL con evidencia*
+## B1 · Activaciones en Sala Medidas
 
 **Promesa.** La activación deja de reportarse en contactos y pasa a reportarse en qué vendió la tienda activada
 frente a la que no.
@@ -342,14 +369,14 @@ selección de tiendas activadas y **tiendas de control**; y lectura del ciclo co
 hay comparación posible y la activación vuelve a medirse en contactos. Este es el criterio de aceptación real del
 servicio.
 
-**Opcional.** Captura de contenido durante la activación (ver servicio 8); extensión a más cadenas; repetición por
+**Opcional.** Captura de contenido durante la activación (ver X1); extensión a más cadenas; repetición por
 ola.
 
 **Excluido de Efeonce.** Montaje, stands, mobiliario, bodega, transporte y permisos: van como **pass-through de
 proveedor**, no como servicio propio. Producto y material de sampling los provee el cliente. No se promete
 número de contactos ni incremento de venta.
 
-**Misma capacidad, misma figura legal.** Quien activa en sala es la misma figura de terreno del servicio 4 y está
+**Misma capacidad, misma figura legal.** Quien activa en sala es la misma figura de terreno de T4 y está
 sujeta al mismo boundary: Efeonce dirige, supervisa y capacita a su propio personal. Nunca se cotiza por
 anfitriona/día.
 
@@ -361,7 +388,153 @@ Nunca por persona/día.
 
 ---
 
-## 8 · Channel Content & Asset System  ·  *composición con Creative Services*
+## B2 · Promotoría e Impulso
+
+**Promesa.** Personal de venta en sala que además de vender te dice qué está pasando en esa tienda.
+
+**Cuándo aplica.** Categorías donde la venta asistida mueve la aguja: electro, belleza, telefonía, licores,
+alimentos con demostración, cualquier producto que necesite explicación.
+
+**Alcance incluido.** Selección y capacitación en producto y marca; presencia por turnos en las salas definidas;
+registro de interacciones, objeciones frecuentes y motivos de no-compra; y **el reporte de sala como subproducto**:
+quiebres, precio, competencia y estado del material, capturado por la misma persona que está vendiendo.
+
+**Excluido.** Reposición sistemática (eso es T4); manejo de caja; y cualquier promesa de cuota de venta.
+
+**Cómo se mide, que es la diferencia.** Conversión e interacciones por turno, no horas cubiertas. Cobrar por hora
+de promotora premia la presencia; medir conversión premia el resultado. Se acuerda el denominador antes de partir.
+
+**Por qué nos conviene.** Una persona en sala vendiendo es la fuente de dato más barata que existe: ya está ahí.
+Alimenta T3 sin costo adicional de captura.
+
+**Unidad (hipótesis).** Turnos × salas dentro de la capacidad gobernada. Nunca persona/día.
+
+---
+
+## B3 · Visual Merchandising y Exhibiciones Adicionales
+
+**Promesa.** Tus exhibiciones adicionales se instalan bien y **siguen instaladas**.
+
+**El problema real.** Una marca negocia y paga una cabecera, una isla o un exhibidor. Se instala el día uno con
+foto de rigor. Nadie verifica qué pasó a los diez días — y con frecuencia el material se movió, se desarmó, se
+llenó con producto de otra marca o simplemente desapareció. Se paga por un mes de exhibición y se obtienen días.
+
+**Alcance incluido.** Implementación de exhibiciones, cabeceras, islas, exhibidores y material en sala; evidencia
+fotográfica de instalación; **y verificación de permanencia durante el período contratado**, con alerta cuando la
+exhibición se degrada o desaparece.
+
+**Excluido.** Fabricación del mobiliario y del material; bodegaje y transporte. Va a proveedor como pass-through.
+Tampoco negociamos el espacio con la cadena.
+
+**Por qué sólo nosotros podemos ofrecerlo bien.** La verificación de permanencia sale gratis de la cobertura
+auditada de T3: el auditor ya está pasando por esa tienda. Quien sólo hace instalación no vuelve, y quien sólo
+audita no instala.
+
+**Unidad (hipótesis).** Puntos implementados × período de verificación.
+
+---
+
+## B4 · Roadshow y Tour de Marca
+
+**Promesa.** Una gira que no se evalúa por cuántas ciudades cubrió sino por qué funcionó en cada una.
+
+**Cuándo aplica.** Lanzamientos nacionales, expansión a regiones, categorías que necesitan demostración
+presencial, marcas entrando a un mercado nuevo.
+
+**Alcance incluido.** Diseño del recorrido y del formato; coordinación de plazas y fechas; ejecución con equipo por
+plaza; captura de datos homogénea en todas las ciudades; y **lectura comparada por plaza** — qué ciudad respondió,
+cuál no, y qué se hace distinto en la siguiente ola.
+
+**Excluido.** Producción de la estructura móvil, transporte, permisos municipales y seguros: proveedor.
+
+**La diferencia.** El roadshow tradicional se reporta como un total nacional que promedia y esconde. Nosotros lo
+reportamos por plaza, porque la decisión siguiente —dónde volver, dónde no— es por plaza.
+
+**Unidad (hipótesis).** Plazas × días de activación.
+
+---
+
+## B5 · Street Marketing y Sampling Masivo
+
+**Promesa.** Entrega masiva fuera de la tienda, con registro de dónde, cuándo y a quién.
+
+**Cuándo aplica.** Lanzamientos, prueba de producto, categorías de consumo inmediato, ocupación de zonas de alto
+flujo, respuesta a un movimiento de la competencia.
+
+**Alcance incluido.** Diseño de la mecánica y de los puntos; ejecución con equipo; captura georreferenciada de la
+entrega; encuesta corta de perfil e intención cuando aplique; y código trazable para conectar la muestra con una
+compra posterior cuando el canal lo permite.
+
+**Excluido.** Producción de las muestras; permisos de uso de espacio público; y cualquier proyección de conversión.
+
+**La diferencia.** El sampling clásico reporta unidades entregadas. Nosotros reportamos dónde se entregaron, a qué
+perfil y —cuando el código lo permite— qué pasó después.
+
+**Unidad (hipótesis).** Puntos × días, o unidades entregadas con captura.
+
+---
+
+## B6 · Pop-up y Espacios Efímeros
+
+**Promesa.** Un espacio temporal de marca con objetivo comercial definido y medición desde el día uno.
+
+**Cuándo aplica.** Lanzamientos, temporadas altas, prueba de un formato de retail antes de comprometer un local,
+marcas nativas digitales que quieren presencia física acotada.
+
+**Alcance incluido.** Definición del objetivo —venta, prueba, captación o marca— y de la métrica que lo acredita;
+diseño de la experiencia y del recorrido; operación durante el período; captura de tráfico, interacción y
+conversión; y lectura de cierre con recomendación de repetir, ajustar o descartar.
+
+**Excluido.** Arriendo del espacio, construcción, montaje, mobiliario, permisos y seguros: proveedor.
+
+**Regla.** No se abre un pop-up sin métrica de éxito acordada antes. Un pop-up sin objetivo es una vitrina cara.
+
+**Unidad (hipótesis).** Proyecto por período de operación.
+
+---
+
+## B7 · Activación de Patrocinios
+
+**Promesa.** Que el patrocinio que ya pagaste produzca algo más que un logo en un cartel.
+
+**El problema real.** Las marcas comprometen presupuestos grandes en patrocinios —deportivos, culturales,
+festivales, eventos gremiales— y la activación llega tarde, improvisada y sin medición. El derecho se paga
+completo y se usa a medias.
+
+**Alcance incluido.** Lectura de los derechos que el contrato de patrocinio ya otorga y que están sin usar; diseño
+del plan de activación; ejecución en el evento; captura de interacción y datos; contenido derivado para los
+canales de la marca; y lectura del retorno del patrocinio, no sólo de la activación.
+
+**Excluido.** Negociación o compra del patrocinio; producción de estructuras; derechos de imagen de terceros, que
+se resuelven con Legal.
+
+**La diferencia.** Empezar por el contrato. Casi siempre hay derechos contratados y no ejercidos —presencia,
+menciones, accesos, data, contenido— que no cuestan un peso adicional.
+
+**Unidad (hipótesis).** Proyecto por patrocinio y temporada.
+
+---
+
+## B8 · Ferias y Exposiciones
+
+**Promesa.** Que la feria termine en pipeline y no en una caja de tarjetas.
+
+**Cuándo aplica.** Ferias del rubro, exposiciones sectoriales y encuentros donde está el canal o el cliente final.
+
+**Alcance incluido.** Objetivo y diseño de la presencia; guion de conversación y calificación en el stand; captura
+digital de contactos con calificación en el momento; y **el seguimiento posterior**, que es donde casi todos
+fallan: la secuencia de contacto, la entrega al equipo comercial y la medición de qué pasó con cada lead.
+
+**Excluido.** Diseño y construcción del stand, montaje, arriendo del espacio y logística: proveedor.
+
+**La diferencia.** El estándar del mercado entrega tarjetas y fotos. El valor está en las tres semanas siguientes,
+y esa parte se conecta con el CRM del cliente vía RevOps cuando corresponde.
+
+**Unidad (hipótesis).** Proyecto por feria, con opción de seguimiento por período.
+
+---
+
+## X1 · Contenido y Material de Canal  ·  *composición con Creative Services*
 
 **Promesa.** El material de canal deja de ser un acto heroico por campaña.
 
@@ -371,7 +544,7 @@ contenido de PDP, kits para distribuidores, adaptaciones por cadena y por format
 **Ownership.** Creative Services (Creative Velocity · Run & Gun · Globe). Se vende como **capacidad gobernada**,
 nunca por pieza.
 
-**Captura en activación.** Cuando hay una activación en curso (servicio 7), la capacidad de captura de Efeonce
+**Captura en activación.** Cuando hay una activación en curso (B1), la capacidad de captura de Efeonce
 —Run & Gun Studio— convierte esa activación en material reutilizable para social, retail media y creator, con
 derechos definidos desde el brief. El BTL tradicional produce fotos de reporte; acá la misma salida produce
 activos. La activación deja de ser un costo que se agota el día del evento.
@@ -380,13 +553,14 @@ activos. La activación deja de ser un costo que se agota el día del evento.
 
 ---
 
-## 9 · Promotion & Incentive Design + Incrementality
+## T8 · Diseño y Medición de Promociones
 
 **Promesa.** Sabes si la promoción vendió de más o simplemente adelantó y canibalizó margen.
 
-**Alcance incluido.** Diseño de mecánicas promocionales e incentivos al canal y a la fuerza de venta; definición
-del marco de lectura antes de ejecutar; y evaluación de incrementalidad con el diseño de medición acordado
-previamente.
+**Alcance incluido.** Diseño de mecánicas promocionales e incentivos al canal y a la fuerza de venta; **concursos
+y sorteos al consumidor**, con la coordinación del cumplimiento formal que corresponda —bases, publicación y
+transparencia, validadas con Legal y con la contraparte del cliente—; definición del marco de lectura antes de
+ejecutar; y evaluación de incrementalidad con el diseño de medición acordado previamente.
 
 **Excluido.** Financiar la promoción; ejecutar el pago de incentivos; garantizar incrementalidad.
 
@@ -397,7 +571,7 @@ medición previo no se puede evaluar después; se declara así y no se vende la 
 
 ---
 
-## 10 · Retail Media & Commerce Operations  ·  *owner: Media & Distribution*
+## T7 · Retail Media y Commerce  ·  *owner: Media & Distribution*
 
 Ya existe en el catálogo de [Media & Distribution](../media-distribution/README.md) dentro de Performance &
 Commerce. **No se reimplementa acá.** Channel & Commerce lo nombra porque es el destino natural de expansión
@@ -408,12 +582,12 @@ La propuesta compuesta declara owner, RACI y facturación por línea.
 
 ---
 
-## 11 · Eventos y Encuentros de Canal  ·  *BTL hacia el canal, no hacia el shopper*  ·  *condicionado*
+## B9 · Encuentros de Canal  ·  *hacia el canal, no hacia el shopper*  ·  *condicionado*
 
 **Promesa.** La convención de distribuidores o el lanzamiento a la fuerza de venta deja de ser un gasto anual sin
 seguimiento y pasa a tener objetivo, medición y continuidad.
 
-**Por qué es distinto del servicio 7.** El público no es el shopper: son distribuidores, mayoristas, vendedores y
+**Por qué es distinto de B1.** El público no es el shopper: son distribuidores, mayoristas, vendedores y
 socios del canal. El comprador es el mismo Gerente Comercial, el volumen es menor y el margen es mejor, porque lo
 que se paga es diseño, contenido y gobierno, no cobertura.
 
@@ -449,7 +623,8 @@ Ninguna propuesta compuesta se emite sin owner nombrado y RACI por línea.
 - Suministro de personal bajo dirección diaria del cliente.
 - Impresión, bodegaje y logística de material POP como servicio propio.
 - Anfitrionas, promotoras o personal de activación cobrados por persona/día.
-- Producción física de eventos: montaje, venue, mobiliario, catering, logística y permisos.
+- Producción física: montaje, venue, mobiliario, estructuras móviles, stands, catering, logística y permisos.
+- Arriendo de espacios comerciales ni construcción de locales.
 - Activaciones cuyo único entregable sea un número de contactos.
 - Precio como porcentaje del trade spend gestionado.
 - Garantía de venta, sell-out, share o rotación.
