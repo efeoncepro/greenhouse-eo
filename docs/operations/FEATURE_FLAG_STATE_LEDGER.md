@@ -88,6 +88,27 @@
 > Vercel» no es «apagado en todas partes» para un flag que sólo lee el ops-worker.
 
 
+> ## Delta 2026-09-10 (2.º del día) — auditoría live previa al release `develop→main` (TASK-1858)
+>
+> Corrida de `pnpm flags:audit` **antes** de promover (paso 10 del playbook), medida contra el valor
+> live de Production (`vercel env pull`), no contra las filas de este documento:
+>
+> - **`ISSUE-150` limpio: 0 flags ON en Production sin su código lector en `origin/main`, y 0 con un
+>   lector que difiera de `main`.**
+> - **0 filas declarando producción apagada sobre un flag vivo** (el cementerio sigue limpio).
+> - **1 candidato staging→prod:** `HIRING_FAIRNESS_MONITOR_ENABLED`. Sigue bloqueado por datos, no por
+>   despliegue: prod carece de la policy row de privacidad equivalente a la sintética de staging y la
+>   condición de retiro es `TASK-1365`. **No se prende** con este release.
+> - **46 flags sin setear en NINGÚN environment** (OFF por default; varios son worker-only y viven en
+>   `deploy.sh`, ver el punto ciego de arriba).
+> - **Este release no trae flags nuevos ni pendientes de prender.** Su diff de código es la recuperación
+>   de conciliación bancaria de Finance (`ISSUE-169` / `TASK-1858`: adapters de cartolas, OTB en el
+>   genesis reactivo, `toAccountUnits` para cuentas USD/MXN, CLIs `finance:*`), los scripts y la
+>   migración de `TASK-1604` (ya aplicada el 2026-09-09 en la instancia única) y el scope
+>   `efeonce.mcp.client_services.write` del auth-server, que queda dormido mientras
+>   `AUTH_SERVER_OAUTH_ENABLED` siga OFF en producción.
+
+
 ## Reconciliación 2026-07-27 — Think ya está publicado
 
 Las notas históricas de esta ledger que indicaban “0 tráfico self-serve” o “el grader no está embebido en ninguna
