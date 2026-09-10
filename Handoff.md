@@ -21,7 +21,8 @@ USD 15.000/mes (decía ~5.000, error 3×). Landing `TASK-1859` creada (to-do, UI
 paralelo, se registró como `TASK-1860` (`a2081e4f1`); `TASK-1859` es la landing de Product Design 360 y no
 cambió. Pendientes con dueño: G1 demanda (Commercial) · D7 loaded cost chileno de un
 senior product designer y piso de margen por lane (Finance) · IP del design system, datos de research y marco chileno
-de accesibilidad (Legal) · nombre público D1 (Strategy) · Calculadora de Capacidad (wedge, sin task).
+de accesibilidad (Legal) · nombre público D1 (Strategy) · Calculadora de Capacidad (wedge, sin task). **BP9** (Head of Design in-house) agregada a `13_icp` como persona
+candidata: su plan de validación —≥ 5 conversaciones con Heads of Design— valida también el copy de la landing.
 
 **TASK-1858 — conciliación bancaria ago–sep 2026 (2026-09-10, in-progress; Slices 1/2/3/5 hechos):** release
 `2cf8c26cfa2d-8f79606f-8cb3-4154-a7fd-c570e7af8497` `released` 20:06Z (PR #233, run `34523159501`, un intento,
