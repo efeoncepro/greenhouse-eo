@@ -5,16 +5,17 @@
 **Fuente vigente:** Notion. Este documento conserva decisiones y una fotografía fechada; no reemplaza los briefs,
 las asignaciones ni los estados de las páginas. Releerlos antes de producir, reasignar o publicar.
 
-> ⚠️ **Relación con PDR-020 sin resolver — decisión del operador pendiente (2026-09-10).**
-> [`PDR-020`](../../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md) fija el catálogo de
-> formatos nativos de cada canal propio, y **"post de efeméride ilustrado" no aparece en ninguno**. Además,
-> este plan declara cada pieza para Instagram *y* LinkedIn, mientras PDR-020 prohíbe replicar a un canal cuya
-> señal no lo premia y exige que el satélite reciba un corte con trabajo propio, no un caption distinto.
-> **Hay dos salidas y ninguna se toma acá:** (a) incorporar el contenido estacional al catálogo de PDR-020
-> como línea propia con métrica declarada y canal-hogar, o (b) mantener este calendario como compromiso
-> previo con ventana de vencimiento. Hasta que se decida, este plan **sigue vigente** — no se suspende por
-> este registro. Registrado como decisión pendiente 7 en PDR-020.
-
+> ✅ **Relación con PDR-020 resuelta (2026-09-10) — el plan se conserva.**
+> El contenido estacional queda incorporado a
+> [`PDR-020`](../../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md) §4.4 como **línea
+> propia y permanente**, porque su trabajo es **marca**: conecta a Efeonce con el calendario cultural de sus
+> mercados hablando en el idioma de su oficio. Las 13 direcciones creativas de este plan son el estándar de
+> la línea — cada fecha demuestra una disciplina de la casa, no saluda. **Canal-hogar: Instagram.**
+> **Métrica: sends + saves**, nunca seguidores. Un solo ajuste al operar este plan: **LinkedIn no recibe la
+> misma pieza con otro caption** — recibe el argumento profesional desarrollado detrás de la metáfora, y sólo
+> cuando la disciplina es legible para un comprador (usabilidad, branding, dirección de arte, copy, diseño
+> editorial). Si no hay argumento propio, la pieza se queda en Instagram. Alcance, fechas, responsables y
+> entregas de este plan **no cambian**.
 
 ## Destinos verificados
 

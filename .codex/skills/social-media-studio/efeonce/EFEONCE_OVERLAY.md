@@ -32,13 +32,19 @@ Efeonce.** Cárgalo antes de proponer formato, calendario o distribución en can
 | **Blog** | el activo (URL canónica, schema, citabilidad) | artículos y Pillars · **casos de éxito completos (canonical)** · tools/graders · webinars · ebooks · data studies · archivo Glitch |
 | **LinkedIn** | el comprador | **educativo** (post extenso + documento nativo) · el corte del caso de éxito · POV profesional · talking head ejecutivo |
 | **YouTube** | la profundidad + segundo buscador | experimento completo · tutorial/how-to · webinar grabado · Shorts como anzuelo |
-| **Instagram** | craft y cultura | proceso real con tropiezos · talking head de tendencia · trendjacking · cultura y talento. **NO lleva casos de éxito** |
+| **Instagram** | craft y cultura | proceso real con tropiezos · talking head de tendencia · trendjacking · **estacional (la fecha vista desde el oficio)** · cultura y talento. **NO lleva casos de éxito** |
 | **Threads** | conversación viva | reacción rápida · opinión corta · hilo en bruto · pregunta abierta. **Experimento con criterio de salida** |
 | **Glitch (email)** | la propiedad | la edición semanal |
 
 **Franquicias con canal-hogar** (nacen en uno, viajan como corte con trabajo propio, nunca como copia):
 Behind the Build → Instagram · Versus → YouTube + Blog · Educativo → LinkedIn · Glitch → email ·
-Trendjacking → Threads + Instagram · Casos de Éxito → Blog.
+Trendjacking → Threads + Instagram · Casos de Éxito → Blog · **Estacional → Instagram**.
+
+**Estacional** (PDR-020 §4.4) es línea propia permanente: la fecha cultural contada como demostración de una
+disciplina de la casa, **nunca un saludo**. Métrica sends + saves. LinkedIn recibe el argumento profesional
+desarrollado, no la misma pieza con otro caption. No se fusiona con Trendjacking: misma familia cultural,
+economía de producción opuesta (meses de planificación vs ventana de horas). Plan vigente:
+`docs/audits/social/EFEONCE_SEASONAL_CONTENT_PLAN_2026_2027.md`.
 
 ### Reglas duras de canal propio
 

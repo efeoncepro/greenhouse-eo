@@ -99,7 +99,7 @@ El sistema distingue dos cosas:
 
 | Canal | Formatos nativos |
 |---|---|
-| **Instagram** | proceso y construcción real con tropiezos · talking head de tendencia · trendjacking · cultura, equipo y talento (employer brand) — **no lleva casos de éxito**: su señal es reenvío, y una métrica B2B no se manda por DM |
+| **Instagram** | proceso y construcción real con tropiezos · talking head de tendencia · trendjacking · **estacional (la fecha vista desde el oficio)** · cultura, equipo y talento (employer brand) — **no lleva casos de éxito**: su señal es reenvío, y una métrica B2B no se manda por DM |
 | **LinkedIn** | **contenido educativo** (post extenso y documento nativo) · **el corte del caso de éxito** · POV profesional que abre conversación · talking head en versión ejecutiva |
 | **YouTube** | long-form del experimento completo · tutorial y how-to (demanda de búsqueda) · webinar grabado · Shorts como anzuelo al long-form |
 | **Threads** | reacción rápida y trendjacking · opinión corta con criterio · hilo de aprendizaje en bruto · pregunta abierta a la audiencia |
@@ -114,6 +114,7 @@ El sistema distingue dos cosas:
 | **Versus** | YouTube + Blog (data study) | Instagram: el resultado visual · LinkedIn: el veredicto y qué implica |
 | **Glitch** | Glitch (email) | Blog: archivo · Threads: el gancho · LinkedIn: la lectura de una noticia |
 | **Trendjacking** | Threads + Instagram | — reactivo; no se despieza a canales lentos |
+| **Estacional** | Instagram | LinkedIn: el argumento profesional detrás de la metáfora, sólo cuando la disciplina es legible para un comprador (ver capa 4.4) |
 | **Casos de Éxito** | Blog (canonical) | LinkedIn: el corte que circula · sales enablement: la versión en video · landings: el dato citable |
 | **Educativo** | LinkedIn | Blog: la versión que responde a búsqueda (ver capa 4.1) |
 
@@ -177,6 +178,43 @@ una con su superficie y su trabajo.
 - **No hay superficie `/casos` en el sitio y este PDR no la crea.** Hoy los casos viven como bloque de prueba
   en landings y como pieza editorial en el blog. Si se decide un índice agregador, es decisión de producto
   aparte y depende del inventario de la decisión pendiente 2.
+
+### 4.4 Estacional: la fecha cultural vista desde el oficio
+
+**Decisión (2026-09-10): se conserva como línea propia y permanente**, no como compromiso previo con
+vencimiento. Su razón de existir es **marca**: conecta a Efeonce con el calendario cultural de sus mercados
+(Chile, Perú, Colombia, México, Estados Unidos) hablando en el idioma de su propio oficio.
+
+Lo que la salva del post genérico de efeméride es que **cada fecha se cuenta como una demostración de una
+disciplina de la casa**, no como saludo. El plan vigente lo hace en las 13 piezas: Halloween es un envase que
+pierde personalidad hasta desaparecer por imitación (branding); el Día de la Usabilidad son fricciones
+digitales como obstáculos físicos (UX); el Óscar es retirar una taza o una luz para cambiar una escena
+(dirección de arte); el Día de la Poesía es un párrafo que pierde palabras hasta revelar un poema
+(copywriting); el Carnaval es una retícula editorial que empieza a bailar (diseño editorial).
+
+| Atributo | Valor |
+|---|---|
+| **Canal-hogar** | Instagram — es craft y cultura, y la pieza es visual antes que argumental |
+| **Satélite** | LinkedIn, **sólo** cuando la disciplina de la metáfora es legible para un comprador |
+| **Qué recibe el satélite** | **el argumento profesional detrás de la metáfora**, desarrollado — nunca el mismo post con otro caption |
+| **Métrica** | sends + saves (que la pieza se reenvíe). **Nunca seguidores ni volumen de posts** |
+| **Trabajo** | afinidad de marca por demostración de oficio |
+
+**Relación con Trendjacking:** son la misma familia — cultura — con **economía de producción opuesta**.
+Estacional se planifica con meses de anticipación sobre fechas conocidas; Trendjacking no se puede planificar
+y vive en una ventana de horas. Se complementan: una llena el calendario predecible, la otra aprovecha lo
+impredecible. **NUNCA fusionarlas en una sola línea**: tienen cadencia, aprobación y riesgo distintos.
+
+**Reglas:**
+
+- **NUNCA un saludo.** Si la pieza no demuestra una disciplina de la casa, no es de esta línea y no se publica.
+  El estándar es el del plan vigente: una metáfora que sólo Efeonce podría firmar.
+- **NUNCA publicar la misma pieza en Instagram y LinkedIn con caption distinto.** LinkedIn recibe el
+  argumento desarrollado o no recibe nada.
+- **El plan 2026–2027 sigue vigente** (`docs/audits/social/EFEONCE_SEASONAL_CONTENT_PLAN_2026_2027.md`):
+  13 piezas, 5 mercados, con adaptación en inglés para Estados Unidos en Super Bowl y Óscar. Pendiente
+  operativo heredado de ese plan: la conciliación tarea/calendario de MET-2339–2342.
+- El nombre operativo de la línea es **Estacional**; el equipo la opera hoy como "efemérides".
 
 ### 4.2 El blog es multiformato, no un feed de artículos
 
@@ -263,7 +301,7 @@ arrendado.
 | 4 | **Secuencia de apertura de canales** — no simultánea | plan de producción |
 | 5 | **Cadencia comprometida por canal** contra capacidad real del equipo | sostenibilidad del sistema |
 | 6 | **Naming visible** Think / Marketing con Manzanitas | heredada de `TASK-1802` |
-| 7 | **Contenido estacional / efemérides** — ¿entra al catálogo como línea propia con métrica y canal-hogar, o el plan vigente queda como compromiso previo con vencimiento? | `docs/audits/social/EFEONCE_SEASONAL_CONTENT_PLAN_2026_2027.md` (13 piezas aprobadas, entregas hasta 2026-11-20, ya en producción) |
+
 
 Recomendación de arranque registrada en sesión: partir por **Instagram (proceso + talking head)**,
 **LinkedIn (educativo + su corte al blog)** y **Glitch**, e incorporar YouTube y Threads cuando esos tres
@@ -280,6 +318,10 @@ tengan cadencia sostenida. YouTube depende además de la decisión 1.
 - **Glitch como marca social nueva** — convierte un activo owned en alcance arrendado y fractura una franquicia
   que ya opera en dos superficies.
 - **Abrir los cinco canales el mismo mes** — garantiza que ninguno alcance cadencia.
+- **Tratar el plan estacional como compromiso previo con vencimiento** — descartado 2026-09-10: su trabajo es
+  marca y sus piezas demuestran oficio, no saludan una fecha; entra al catálogo como línea permanente.
+- **Fusionar Estacional con Trendjacking** — misma familia cultural, pero economía de producción opuesta
+  (meses de planificación vs ventana de horas) y distinto régimen de aprobación.
 - **Un catálogo de formatos común a todos los canales** — descartado en la revisión 1.1: confunde economía de
   producción con catálogo, replica piezas a canales cuya señal no las premia y ensucia cada canal con formatos
   que no le pertenecen.

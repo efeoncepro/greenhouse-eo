@@ -7,6 +7,19 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-10 — El contenido estacional entra al catálogo como línea propia de marca
+
+`PDR-020` rev 1.3 cierra la reconciliación con el plan estacional 2026–2027: se conserva como línea propia y
+permanente porque su trabajo es marca, no como compromiso previo con vencimiento. Lo que la distingue del post
+genérico de efeméride es que cada fecha demuestra una disciplina de la casa — Halloween es un envase que pierde
+personalidad por imitación, el Día de la Usabilidad son fricciones digitales como obstáculos físicos, el Óscar es
+retirar una luz para cambiar una escena — y ese es el estándar declarado de la línea. Canal-hogar Instagram,
+métrica sends y saves, nunca seguidores. Único ajuste operativo: LinkedIn deja de recibir la misma pieza con otro
+caption y recibe el argumento profesional desarrollado, sólo cuando la disciplina es legible para un comprador.
+No se fusiona con trendjacking: misma familia cultural, economía de producción opuesta. Alcance, fechas,
+responsables y entregas del plan no cambian, y sigue pendiente la conciliación tarea/calendario de MET-2339–2342.
+No se produjo, programó ni publicó nada.
+
 ## 2026-09-10 — Canales propios de Efeonce quedan bajo un sistema editorial declarado
 
 `PDR-020` fija el sistema editorial de los canales propios de marca: un motor compartido con un rol por canal
@@ -968,22 +981,3 @@ La documentación y las skills espejo ahora fijan el soporte de Customer Agent y
 2026-08-13 al 2026-11-12 inclusive. Soporte cubre el alcance construido; nuevas funcionalidades, KPI, workflows,
 automatizaciones, integraciones, rediseños e innovación requieren un alcance separado. No se cambió runtime
 HubSpot, no se envió correo, no se creó SharePoint y no se hizo push.
-
-## 2026-09-02 — La superficie MCP del módulo SEO pasa a tener eval de selección
-
-TASK-1784 agregó un fixture de 55 preguntas de operador en los cinco mercados productivos y un runner que mide
-tres precisiones que nunca se promedian: qué tool se elige, qué mercado se pasa y si se llamó a una tool que
-gasta cuando no correspondía. Baseline registrado antes de tocar una descripción: tool 94.5%, mercado 98.2%,
-gasto 100%.
-
-El resultado contradijo la hipótesis con la que se escribió la task: agregar bloques de ruteo a las
-descripciones NO mejoró la selección de tool, y en una variante degradó una tool que nadie había tocado. Lo que
-sí funcionó fue corregir dos afirmaciones falsas — la cláusula de mercado ordenaba elegir un país en vez de
-preguntar, y la lente dual reclamaba prioridad sin acotarla. La precisión de mercado llegó a 100%, cerrando la
-elección silenciosa que costó un año de mediciones contra el país equivocado en ISSUE-152; la de tool bajó a
-92.7% y se reporta sin declarar mejora.
-
-El gate de CI mide cobertura del fixture, no precisión: una tool SEO nueva sin caso rompe el build. El guard de
-paridad del gateway ahora compara la descripción, y al conectarlo encontró 21 de 27 tools federadas divergentes;
-se cerró haciendo que el gateway derive el texto del artefacto en vez de mantener una copia. El redeploy de
-`mcp.efeonce.org` queda pendiente.

@@ -57,7 +57,9 @@ sujetos canary y 35 de otros sujetos; el helper vigente borra por `client_id`. N
 `--apply`: implementar planner/delete/readback sujeto-específicos, preservar cliente/hijos ajenos, diagnosticar
 las familias de refresh y recién después reiniciar steady/retirar desde `delete_after`.
 
-**Canales propios Efeonce (2026-09-10, decisión cerrada / ejecución no autorizada):**
+**Canales propios Efeonce (2026-09-10, decisión cerrada / ejecución no autorizada):** estacional conservado
+como línea propia de marca (rev 1.3): hogar Instagram, sends+saves, LinkedIn recibe argumento y no caption.
+Plan 2026–2027 sin cambios de alcance.
 [PDR-020](docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md) rev 1.2 — rol y catálogo por
 canal, franquicias con canal-hogar, vocero Julio Reyes. Propagado a `TASK-1802`, `PDR-003/004/005/019`, roadmap,
 context pack y diez archivos de skills espejados. Pendiente: 7 decisiones, entre ellas canonical de video (bloquea
