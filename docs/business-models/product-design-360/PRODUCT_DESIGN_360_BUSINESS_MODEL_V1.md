@@ -575,6 +575,39 @@ aprobación identificado.
 
 ---
 
+## 11b. Wedge declarado — Calculadora de Capacidad de Diseño
+
+**Estado:** idea aprobada por el operador 2026-09-10 · **no construida** · owner Wave + Growth
+
+**Qué es.** Una herramienta pública y autoservicio: el visitante declara su número de ingenieros, la complejidad
+de su producto, sus superficies comprometidas y su cadencia de release; obtiene **la brecha entre la capacidad de
+diseño que su roadmap exige y la que tiene**.
+
+**Por qué esta forma y no un folleto.** Replica el patrón del AI Visibility Grader, que Efeonce ya sabe operar:
+entrega valor por sí sola, califica a quien entra y —lo decisivo— **produce el número que el Head of Design
+necesita para pedir presupuesto**. No le damos una pieza de marketing: le damos munición para su reunión interna.
+
+🎯 **Y probablemente ES el experimento del gate G1, no un entregable posterior a él.** Construir el wedge después
+de validar demanda invierte el orden: la calculadora es una forma **más barata y más rápida** que ocho
+conversaciones de venta para producir la misma señal —¿le importa a un líder de diseño este problema lo suficiente
+como para dedicarle tiempo?—, y además deja lista la captación. Decidir esto antes de programar G1.
+
+**Contrato de la herramienta:**
+
+- **NUNCA** devuelve un precio ni una cotización. Devuelve una brecha de capacidad, y esa brecha es del cliente.
+- **NUNCA** presenta el resultado como diagnóstico: es un dimensionamiento declarativo con los datos que el propio
+  usuario ingresó. El diagnóstico pagado es otra cosa y se declara distinto.
+- **NUNCA** ancla el resultado en un único ratio de benchmark como si fuera ley. Los ratios varían mucho por tipo
+  de producto; el output debe declarar su supuesto y permitir ajustarlo *(ver §13, riesgo del benchmark)*.
+- **SIEMPRE** el resultado es exportable y presentable por el usuario **sin la marca Efeonce como protagonista**.
+  Si no le sirve para su reunión interna, falló.
+
+**Dependencias:** `growth-marketing-cro` (loop, activación y medición) · `greenhouse-growth-forms` (captación) ·
+patrón de referencia `src/lib/growth/ai-visibility/**` · `greenhouse-gtm-ga4-operator` (instrumentación).
+
+**Antes de construir:** decidir si reemplaza o acompaña a G1, y fijar la métrica primaria (no es tráfico: es
+**cuántos usuarios exportan o comparten el resultado**, que es la señal de que sirvió para la reunión interna).
+
 ## 12. Validación y gates
 
 | # | Hipótesis | Experimento | Muestra | Ventana | Éxito | Fallo → decisión |
