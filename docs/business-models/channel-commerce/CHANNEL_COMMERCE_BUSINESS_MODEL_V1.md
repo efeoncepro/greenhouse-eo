@@ -192,6 +192,13 @@ costo → intervención sólo donde el score lo justifica → medición del delt
 marcas líderes y reporta ahorros del orden del 75% frente a desplegar un representante dedicado en toda la red
 (`as-of` 2026-09; ver §14).
 
+**Posición competitiva.** El comparison set real son dos categorías ocupadas: el software de retail execution
+(Teamcore, Frogmi, Trax, Storecheck), que **detecta pero no ejecuta**; y las agencias de servicio integrado (Touch
+Latam, Novaprom, Tradercom, ECR), que **ejecutan pero no demuestran**. Efeonce compite desde el medio: opera el
+ciclo completo bajo un responsable y lo conecta con la inversión digital, que es lo único que ninguna de las dos
+categorías cubre. Battlecards, vulnerabilidades y reglas de conversación en
+[`CHANNEL_COMMERCE_COMPETITIVE_BATTLECARDS_V1`](../../audits/commercial/CHANNEL_COMMERCE_COMPETITIVE_BATTLECARDS_V1.md).
+
 **Evidencia disponible hoy:** ninguna propia. Toda la evidencia es de mercado y de terceros.
 
 **Claims prohibidos hasta tener evidencia propia fechada:**

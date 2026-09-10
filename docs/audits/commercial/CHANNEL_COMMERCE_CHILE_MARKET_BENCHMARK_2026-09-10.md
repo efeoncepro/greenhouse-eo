@@ -141,15 +141,24 @@ software adicional.
 alguien tiene que priorizarlas, ejecutarlas y cerrar el ciclo. Ese patrón —software que necesita quien lo opere—
 es el mismo que sostiene la práctica de RevOps & CRM de Efeonce sobre HubSpot y Salesforce.
 
+**Corrección de encuadre 2026-09-10.** Una primera versión de este delta trató a Teamcore y a Touch Latam como
+proveedores potenciales en vez de competidores. **Ese encuadre era incorrecto.** Ambos hacen, cada uno desde su
+lado, lo que esta línea se propone hacer: Touch Latam vende el servicio integrado completo y Teamcore vende la
+detección instrumentada. Son el comparison set real y hay que ganarles con diferenciación, no rodearlos.
+
+Las battlecards con su análisis, vulnerabilidades y cómo se compite viven en
+[`CHANNEL_COMMERCE_COMPETITIVE_BATTLECARDS_V1`](CHANNEL_COMMERCE_COMPETITIVE_BATTLECARDS_V1.md).
+
 **Recomendación revisada, que reemplaza la del §5 original en lo que toca a tecnología:**
 
-1. **No construir plataforma de ejecución retail. Nunca.** Operar sobre la que el cliente ya tenga, o proponer una.
-2. **Tratar a Teamcore, Frogmi y equivalentes como providers tecnológicos y posible canal**, no como competidores:
-   venden software y necesitan quien lo implemente y opere, igual que HubSpot o Salesforce.
-3. **Redefinir la fase 3**: la tecnología propia de Efeonce sólo se justifica en la capa que nadie cubre —la
-   conexión entre ejecución física, inversión digital y visibilidad en motores de IA— y sobre Greenhouse, no como
-   un producto de retail execution.
-4. **No competir con Touch Latam en ejecución.** Es proveedor potencial, no benchmark a igualar.
+1. **No construir plataforma de ejecución retail. Nunca.** La diferenciación no pasa por igualar producto.
+2. **Competir contra ambos desde el medio**, que es la posición que ninguno ocupa: el software detecta pero no
+   ejecuta; la agencia ejecuta pero no demuestra. Efeonce opera el ciclo completo y lo conecta con lo digital.
+3. **Redefinir la fase 3**: la tecnología propia sólo se justifica en la capa que nadie cubre —la conexión entre
+   ejecución física, inversión digital y visibilidad en motores de IA— y sobre Greenhouse.
+4. **Operar sobre la plataforma que el cliente ya tenga** es una táctica comercial válida en esa cuenta —
+   rentabiliza una inversión hecha y evita atacar una decisión tomada—. No convierte al proveedor de esa
+   plataforma en partner de Efeonce, y no debe presentarse como tal sin acuerdo real.
 
 ## 2. Peer set y estructura del mercado
 

@@ -87,8 +87,10 @@ El perfil preferido en la capa C es el fabricante puro: no compite y no tiene in
 
 ### Capa T — Plataforma de ejecución retail
 
-Categoría global en consolidación. Se relacionan como **providers tecnológicos y posible canal**: venden software
-y necesitan quien lo implemente y opere, igual que HubSpot o Salesforce en la práctica de RevOps.
+**Son competidores, no proveedores.** Figuran en este registro sólo porque en una cuenta que ya compró una de
+estas plataformas, Efeonce puede operar sobre ella en vez de atacarla. Eso es una táctica comercial de esa
+cuenta —rentabiliza una inversión ya hecha— y **no** una relación de partner. Su análisis competitivo vive en
+[`battlecards`](../../audits/commercial/CHANNEL_COMMERCE_COMPETITIVE_BATTLECARDS_V1.md).
 
 | Candidato | Señal | Estado |
 |---|---|---|
@@ -96,8 +98,9 @@ y necesitan quien lo implemente y opere, igual que HubSpot o Salesforce en la pr
 | Frogmi (Chile) | Task management y ejecución en tienda, 50+ clientes en 10+ países, Endeavor | No contactado |
 | Trax · Storecheck · Involves | Reconocimiento de anaquel y ejecución, presencia regional | No contactados |
 
-**Oportunidad a explorar:** programa de partners de implementación. Si alguna tiene canal, Efeonce podría entrar
-como operador certificado y llegar a cuentas que ya compraron el software y no tienen quién opere el ciclo.
+**Hipótesis a validar, no conclusión:** algunas plataformas tienen programa de partners de implementación. Si
+existiera y aceptara a Efeonce, abriría acceso a cuentas que ya compraron el software y no tienen quién opere el
+ciclo. Hasta que haya evidencia de programa y de aceptación, siguen siendo competidores y nada más.
 
 ### Capa D — Data de mercado
 
