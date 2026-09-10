@@ -3212,7 +3212,7 @@ Toda lectura de `expense_payments` o `income_payments` que necesite saldos en CL
 
 **Reliability signal canónico**:
 
-- `finance.account_balances.fx_drift` (kind=`drift`, severity=`error` si count>0, steady=0). Recompute expected delta desde VIEWs canónicas + COALESCE settlement_legs y compara contra persisted (`period_inflows - period_outflows`). Tolerancia $1 CLP (anti FP-noise). Ventana 90 días. Reader: `src/lib/reliability/queries/account-balances-fx-drift.ts`. Subsystem rollup: `Finance Data Quality`.
+- `finance.account_balances.fx_drift` (kind=`drift`, severity=`error` si count>0, steady=0). Recompute expected delta desde VIEWs canónicas + settlement_legs, llevado a **unidades de la cuenta** con el espejo SQL de `toAccountUnits` (cuenta CLP → CLP-resuelto; cuenta USD/MXN → nativo, o `amount_clp / fx_rate_used` cuando el movimiento viene en otra moneda), y compara contra persisted (`period_inflows - period_outflows`). Tolerancia $1 CLP en cuentas CLP y 0,05 nativo en el resto (anti FP-noise). Ventana 90 días. **Desde TASK-1858 (ISSUE-169) cubre TODAS las cuentas**: el filtro `currency = 'CLP'` de TASK-774 Slice 7b dejaba USD/MXN fuera y el bug de sumar CLP dentro de `santander-usd-usd` pasó en `ok`. En filas no-CLP los campos `*Clp` del reader llevan unidades de la cuenta (`currency` dice cuál); el remediator (`account-balances-fx-drift-remediation.ts`) nunca las auto-remedia (`unknown_requires_review` / `non_clp_account_native_units_manual_review`) porque `maxAbsDriftClp` está denominado en CLP — el operador rematerializa explícitamente. Reader: `src/lib/reliability/queries/account-balances-fx-drift.ts`. Subsystem rollup: `Finance Data Quality`.
 
 **Lint rule mecánica** (extiende TASK-766):
 

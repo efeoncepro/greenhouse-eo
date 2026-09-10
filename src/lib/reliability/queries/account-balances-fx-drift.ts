@@ -10,26 +10,54 @@ import type { ReliabilitySignal } from '@/types/reliability'
  * Detecta `account_balances` cuyo `closing_balance` persistido diverge del
  * recompute esperado desde las VIEWs canónicas TASK-766
  * (`expense_payments_normalized`, `income_payments_normalized`) +
- * COALESCE(`settlement_legs.amount_clp`, ...). Cada divergencia indica que
- * el materializer corrió antes del fix TASK-774 (Slice 2) o que un nuevo
- * callsite re-introdujo el anti-patrón `SUM(payment.amount)` sin
- * distinguir currency vs amount_clp.
+ * `settlement_legs`, llevados a las UNIDADES DE LA CUENTA con la misma regla
+ * que el materializer (`toAccountUnits` en `@/lib/finance/account-balances`).
+ * Cada divergencia indica que el materializer corrió antes del fix TASK-774
+ * (Slice 2) / TASK-1858 (Slice 1) o que un nuevo callsite re-introdujo el
+ * anti-patrón `SUM(payment.amount)` (o `SUM(payment_amount_clp)` en una
+ * cuenta no-CLP) sin distinguir moneda de la cuenta vs moneda del movimiento.
  *
  * **Cómo funciona el detect**:
  *
- *   Para cada (account_id, balance_date), recompute el delta esperado:
- *     expected_delta = SUM(income_payments_normalized.payment_amount_clp)
- *                    + SUM(settlement_legs CLP-resolved IN)
- *                    - SUM(expense_payments_normalized.payment_amount_clp)
- *                    - SUM(settlement_legs CLP-resolved OUT)
+ *   Para cada (account_id, balance_date), recompute el delta esperado en
+ *   unidades de la cuenta:
+ *     expected_delta = SUM(income_payments_normalized → unidades cuenta)
+ *                    + SUM(settlement_legs IN → unidades cuenta)
+ *                    - SUM(expense_payments_normalized → unidades cuenta)
+ *                    - SUM(settlement_legs OUT → unidades cuenta)
+ *
+ *   Regla de conversión (espejo SQL de `toAccountUnits`):
+ *     cuenta CLP      → COALESCE(amount_clp, CASE WHEN currency='CLP' THEN amount END)
+ *     cuenta no-CLP   → movimiento en la moneda de la cuenta (o sin moneda) → nativo
+ *                     → otra moneda con amount_clp y `fx_rate_used` > 0
+ *                       → amount_clp / fx_rate_used (la tasa que el
+ *                         materializer usó ESE día, persistida en la fila)
+ *                     → si no, nativo
  *
  *   Y compara con el persistido:
  *     persisted_delta = period_inflows - period_outflows
  *
- *   Si abs(expected_delta - persisted_delta) > 1 CLP → fila en drift.
+ *   Si abs(expected_delta - persisted_delta) > tolerancia → fila en drift.
  *
- * **Tolerancia**: > 1 CLP (anti FP-rounding noise). Drift real Figma 2026-05-03
- * fue de $83.680.6 (un orden de magnitud por encima del threshold).
+ * **Tolerancia**: > 1 CLP para cuentas CLP (anti FP-rounding noise; drift
+ * real Figma 2026-05-03 fue de $83.680.6, un orden de magnitud por encima).
+ * Para cuentas no-CLP la tolerancia es NATIVA: > 0.05 (USD/MXN llevan dos
+ * decimales; medio centavo de ruido de redondeo por conversión no es drift).
+ *
+ * **TASK-1858 / ISSUE-169 — por qué cubre cuentas no-CLP.** Desde TASK-774
+ * Slice 7b el detector filtraba `a.currency = 'CLP'`: las cuentas USD/EUR
+ * llevan `period_inflows/outflows` en moneda nativa y compararlas contra
+ * `payment_amount_clp` daba falsos positivos. La consecuencia fue un punto
+ * ciego: cuando el materializer sumó CLP dentro de `santander-usd-usd`
+ * (ISSUE-169) la señal se quedó en `ok` porque esas cuentas ni entraban al
+ * SELECT. Ahora entran todas; la expectativa se deriva en unidades de la
+ * cuenta y el falso positivo original desaparece por construcción.
+ *
+ * **Nombres de campo**: `*Clp` en `AccountBalancesFxDriftRow` es el contrato
+ * público (consumido por `account-balances-fx-drift-remediation.ts`); para
+ * cuentas no-CLP esos campos llevan UNIDADES DE LA CUENTA (USD, MXN). El
+ * campo `currency` de la fila dice en qué unidad leerlos. Se conserva el
+ * nombre para no romper consumers; no es una promesa de CLP.
  *
  * **Steady state esperado** = 0 post-deploy + cron rematerialización + backfill.
  *
@@ -42,6 +70,7 @@ export const ACCOUNT_BALANCES_FX_DRIFT_SIGNAL_ID =
 
 const DEFAULT_WINDOW_DAYS = 90
 const DEFAULT_TOLERANCE_CLP = 1
+const DEFAULT_TOLERANCE_NATIVE = 0.05
 const DEFAULT_LIMIT = 100
 const MAX_LIMIT = 500
 
@@ -70,7 +99,10 @@ export type AccountBalancesFxDriftRow = {
 
 export type AccountBalancesFxDriftQueryOptions = {
   windowDays?: number
+  /** Tolerancia para cuentas CLP (unidades CLP). Default 1. */
   toleranceClp?: number
+  /** Tolerancia para cuentas no-CLP, en la moneda de la cuenta. Default 0.05. */
+  toleranceNative?: number
   limit?: number
   accountId?: string
   fromDate?: string
@@ -141,8 +173,20 @@ const buildAccountBalancesFxDriftSql = (
     filters.push(`ab.account_id = $${params.length}`)
   }
 
+  const toleranceNative = Number.isFinite(options.toleranceNative)
+    ? Math.max(Number(options.toleranceNative), 0)
+    : DEFAULT_TOLERANCE_NATIVE
+
   params.push(toleranceClp)
-  const toleranceParam = `$${params.length}::numeric`
+  const toleranceClpParam = `$${params.length}::numeric`
+
+  params.push(toleranceNative)
+  const toleranceNativeParam = `$${params.length}::numeric`
+
+  // La tolerancia se elige por la moneda de la CUENTA: la comparación ya está
+  // en unidades de la cuenta, así que 1 CLP y 0.05 USD son umbrales del
+  // mismo tipo (ruido de redondeo), no dos contratos distintos.
+  const toleranceParam = `CASE WHEN ep.currency = 'CLP' THEN ${toleranceClpParam} ELSE ${toleranceNativeParam} END`
 
   const limit = clampInteger(options.limit, DEFAULT_LIMIT, 1, MAX_LIMIT)
   const limitClause = mode === 'rows' ? `LIMIT ${limit}` : ''
@@ -182,14 +226,37 @@ const buildAccountBalancesFxDriftSql = (
       ab.balance_date,
       ab.period_inflows,
       ab.period_outflows,
-      ab.closing_balance_clp,
+      ab.fx_rate_used,
+      -- Saldo persistido en UNIDADES DE LA CUENTA: closing_balance_clp para
+      -- cuentas CLP (contrato TASK-774), closing_balance nativo para el resto.
+      -- Mezclar closing_balance_clp (CLP) con un delta en USD daria un
+      -- "esperado" sin unidad.
+      CASE WHEN a.currency = 'CLP' THEN ab.closing_balance_clp ELSE ab.closing_balance END
+        AS closing_balance_clp,
       ab.is_period_closed,
       ab.transaction_count,
-      COALESCE(SUM(CASE WHEN sl.direction = 'incoming'
-        THEN COALESCE(sl.amount_clp, CASE WHEN sl.currency = 'CLP' THEN sl.amount END)
+      -- TASK-1858 (ISSUE-169): espejo SQL de \`toAccountUnits\` (materializer).
+      -- Cuenta CLP → CLP-resuelto (TASK-774). Cuenta no-CLP → nativo cuando
+      -- el leg esta en la moneda de la cuenta (o sin moneda); si esta en otra
+      -- moneda y trae amount_clp, se trae a la cuenta con la tasa que el
+      -- materializer uso ese dia (ab.fx_rate_used); si no hay tasa, nativo.
+      COALESCE(SUM(CASE WHEN sl.direction = 'incoming' THEN
+        CASE
+          WHEN a.currency = 'CLP'
+            THEN COALESCE(sl.amount_clp, CASE WHEN sl.currency = 'CLP' THEN sl.amount END)
+          WHEN sl.currency = a.currency OR sl.currency IS NULL THEN sl.amount
+          WHEN sl.amount_clp IS NOT NULL AND ab.fx_rate_used > 0 THEN sl.amount_clp / ab.fx_rate_used
+          ELSE sl.amount
+        END
         ELSE 0 END), 0) AS expected_settlement_in,
-      COALESCE(SUM(CASE WHEN sl.direction = 'outgoing'
-        THEN COALESCE(sl.amount_clp, CASE WHEN sl.currency = 'CLP' THEN sl.amount END)
+      COALESCE(SUM(CASE WHEN sl.direction = 'outgoing' THEN
+        CASE
+          WHEN a.currency = 'CLP'
+            THEN COALESCE(sl.amount_clp, CASE WHEN sl.currency = 'CLP' THEN sl.amount END)
+          WHEN sl.currency = a.currency OR sl.currency IS NULL THEN sl.amount
+          WHEN sl.amount_clp IS NOT NULL AND ab.fx_rate_used > 0 THEN sl.amount_clp / ab.fx_rate_used
+          ELSE sl.amount
+        END
         ELSE 0 END), 0) AS expected_settlement_out,
       COUNT(sl.settlement_leg_id)::int AS settlement_leg_count
     FROM greenhouse_finance.account_balances ab
@@ -200,10 +267,9 @@ const buildAccountBalancesFxDriftSql = (
       AND sl.superseded_at IS NULL
       AND sl.superseded_by_otb_id IS NULL
     WHERE ${filters.join('\n      AND ')}
-      -- TASK-774 Slice 7b: solo comparar cuentas CLP nativas. Cuentas USD/EUR
-      -- nativas tienen period_inflows/outflows en moneda nativa (NO en CLP)
-      -- y compararlas contra payment_amount_clp generaria falsos positivos.
-      AND a.currency = 'CLP'
+      -- TASK-1858: SIN filtro por moneda de la cuenta. El predicado de TASK-774
+      -- Slice 7b (solo cuentas con currency CLP) dejo a USD/MXN fuera del
+      -- detector e ISSUE-169 (CLP sumado dentro de santander-usd-usd) paso en ok.
       -- TASK-938: NO reconciliar fechas anteriores al genesis del OTB activo.
       -- Esas fechas son pre-anchor — el OTB (TASK-703b) las absorbe en su
       -- opening_balance bank-verified, y los pagos pre-genesis no entran en el
@@ -228,7 +294,9 @@ const buildAccountBalancesFxDriftSql = (
       ab.balance_date,
       ab.period_inflows,
       ab.period_outflows,
+      ab.fx_rate_used,
       ab.closing_balance_clp,
+      ab.closing_balance,
       ab.is_period_closed,
       ab.transaction_count
   ),
@@ -240,14 +308,26 @@ const buildAccountBalancesFxDriftSql = (
       epd.balance_date,
       epd.period_inflows,
       epd.period_outflows,
+      epd.fx_rate_used,
       epd.closing_balance_clp,
       epd.is_period_closed,
       epd.transaction_count,
       epd.expected_settlement_in,
       epd.expected_settlement_out,
       epd.settlement_leg_count,
+      -- TASK-1858: mismo espejo de \`toAccountUnits\` sobre las VIEWs TASK-766
+      -- (payment_amount_native / payment_currency / payment_amount_clp).
       COALESCE((
-        SELECT SUM(ipn.payment_amount_clp)
+        SELECT SUM(
+          CASE
+            WHEN epd.currency = 'CLP' THEN ipn.payment_amount_clp
+            WHEN ipn.payment_currency = epd.currency OR ipn.payment_currency IS NULL
+              THEN ipn.payment_amount_native
+            WHEN ipn.payment_amount_clp IS NOT NULL AND epd.fx_rate_used > 0
+              THEN ipn.payment_amount_clp / epd.fx_rate_used
+            ELSE ipn.payment_amount_native
+          END
+        )
         FROM greenhouse_finance.income_payments_normalized ipn
         WHERE ipn.payment_account_id = epd.account_id
           AND ipn.payment_date = epd.balance_date
@@ -275,7 +355,16 @@ const buildAccountBalancesFxDriftSql = (
           )
       ), 0)::int AS income_payment_count,
       COALESCE((
-        SELECT SUM(epn.payment_amount_clp)
+        SELECT SUM(
+          CASE
+            WHEN epd.currency = 'CLP' THEN epn.payment_amount_clp
+            WHEN epn.payment_currency = epd.currency OR epn.payment_currency IS NULL
+              THEN epn.payment_amount_native
+            WHEN epn.payment_amount_clp IS NOT NULL AND epd.fx_rate_used > 0
+              THEN epn.payment_amount_clp / epd.fx_rate_used
+            ELSE epn.payment_amount_native
+          END
+        )
         FROM greenhouse_finance.expense_payments_normalized epn
         WHERE epn.payment_account_id = epd.account_id
           AND epn.payment_date = epd.balance_date
@@ -349,7 +438,7 @@ const buildAccountBalancesFxDriftSql = (
   ${selectClause}
   `
 
-  return { sql, params, windowDays, toleranceClp }
+  return { sql, params, windowDays, toleranceClp, toleranceNative }
 }
 
 const mapFxDriftRow = (row: AccountBalancesFxDriftSqlRow): AccountBalancesFxDriftRow => ({
@@ -415,7 +504,8 @@ export const getAccountBalancesFxDriftSignal = async (): Promise<ReliabilitySign
         {
           kind: 'sql',
           label: 'VIEWs canonicas',
-          value: 'expense_payments_normalized, income_payments_normalized + COALESCE(sl.amount_clp,...)'
+          value:
+            'expense_payments_normalized, income_payments_normalized + settlement_legs → unidades de la cuenta (espejo de toAccountUnits; TASK-1858 cubre cuentas no-CLP)'
         },
         {
           kind: 'metric',
@@ -431,6 +521,11 @@ export const getAccountBalancesFxDriftSignal = async (): Promise<ReliabilitySign
           kind: 'metric',
           label: 'tolerance_clp',
           value: String(DEFAULT_TOLERANCE_CLP)
+        },
+        {
+          kind: 'metric',
+          label: 'tolerance_native',
+          value: String(DEFAULT_TOLERANCE_NATIVE)
         },
         {
           kind: 'doc',

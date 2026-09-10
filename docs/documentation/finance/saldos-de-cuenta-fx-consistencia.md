@@ -1,9 +1,9 @@
 # Saldos de cuenta y consistencia FX (CLP equivalente)
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-05-03 por Claude (TASK-774 close-out)
-> **Ultima actualizacion:** 2026-05-09
+> **Ultima actualizacion:** 2026-09-10 por Claude (TASK-1858 Slice 2 — cobertura USD/MXN)
 > **Documentacion tecnica:**
 > - Spec arquitectonica: [GREENHOUSE_FINANCE_ARCHITECTURE_V1 — Delta TASK-774](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md#delta-2026-05-03--task-774-account-balances-fx-consistency-extiende-task-766)
 > - Tasks: [TASK-774 — Account Balance CLP-Native Reader Contract](../../tasks/complete/TASK-774-account-balance-clp-native-reader-contract.md) · [TASK-842 — Finance FX Drift Auto-Remediation Control Plane](../../tasks/complete/TASK-842-finance-fx-drift-auto-remediation-control-plane.md) · [TASK-766 — Finance CLP Currency Reader](../../tasks/complete/TASK-766-finance-clp-currency-reader-contract.md)
@@ -43,8 +43,9 @@ Para las 3 fuentes, el motor lee el **equivalente CLP** del movimiento, no el mo
 
 Hay un detector automatico en `/admin/operations` llamado `finance.account_balances.fx_drift`:
 
-- **En verde (steady state = 0)**: todos los saldos persistidos coinciden con el recompute esperado desde las VIEWs canonicas. Tolerancia $1 CLP (anti-noise de redondeo de punto flotante).
-- **En rojo (count > 0)**: alguno de los saldos materializados de los ultimos 90 dias diverge mas de $1 CLP del recompute. Eso indica que el materializer corrio antes del fix TASK-774 o emergio un nuevo callsite que reintroduce el anti-patron.
+- **En verde (steady state = 0)**: todos los saldos persistidos coinciden con el recompute esperado desde las VIEWs canonicas, comparado en la moneda de cada cuenta. Tolerancia $1 CLP en cuentas CLP y 0,05 en cuentas USD/MXN (anti-noise de redondeo).
+- **En rojo (count > 0)**: alguno de los saldos materializados de los ultimos 90 dias diverge mas que la tolerancia del recompute. Eso indica que el materializer corrio antes del fix TASK-774 (o de ISSUE-169 para cuentas en otra moneda) o emergio un nuevo callsite que reintroduce el anti-patron.
+- **Cuentas USD/MXN (desde TASK-1858)**: el detector tambien las vigila; antes quedaban fuera y por eso el saldo USD sumado en pesos (ISSUE-169) no encendio ninguna alerta. Para estas cuentas la remediacion automatica no aplica: el drift queda como `unknown_requires_review` y se corrige a mano con `pnpm finance:rematerialize`.
 
 Cuando el detector se prende:
 
