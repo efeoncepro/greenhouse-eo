@@ -23,10 +23,18 @@ export const EFEONCE_MCP_READ_SCOPES = [
  * por la lane delegada; la autoridad real la decide Greenhouse por la membership `designatedAdmin`, el scope sólo
  * responde si ESTE cliente puede pedir esa clase de acción.
  */
+/**
+ * `efeonce.mcp.client_services.write` (TASK-1852): clase «abrir/compensar acceso de cliente a servicios
+ * contratados» (habilitación por organización). La autoridad la decide Greenhouse (administrador interno con
+ * `client_portal.module.enable`, releído en cada llamada); el scope sólo responde si el cliente puede pedir la
+ * clase. Hoy se ejerce por el issuer Entra (RFC 8693 → `client_services.enablement.write`); el contexto interno v2
+ * de Efeonce ID sigue base-only (D9), así que aquí se declara la clase y NO se publica como mínimo.
+ */
 export const EFEONCE_MCP_WRITE_SCOPES = [
   'efeonce.mcp.globe.credits.funding.ensure',
   'efeonce.mcp.seo.write',
-  'efeonce.mcp.identity.write'
+  'efeonce.mcp.identity.write',
+  'efeonce.mcp.client_services.write'
 ] as const
 
 export const EFEONCE_MCP_SCOPES = [...EFEONCE_MCP_READ_SCOPES, ...EFEONCE_MCP_WRITE_SCOPES] as const

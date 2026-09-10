@@ -139,6 +139,10 @@ sus gates. TASK-1718 conserva firmas y pruebas revoked/base-only/rollback como d
 | `GREENHOUSE_HIRING_API_URL` | no | origin Greenhouse exacto; search/profile llaman Talent Pool y las tools TASK-1718, cuando están habilitadas, sólo las rutas App API review exactas |
 | `GREENHOUSE_HIRING_TOKEN_EXCHANGE_URL` | no | endpoint RFC 8693 exacto para clientes separados `efeonce-mcp-hiring` y `efeonce-mcp-hiring-review` |
 | `GREENHOUSE_HIRING_VERCEL_BYPASS_SECRET` | sí | mismo secret ref system-managed de Vercel, enviado sólo al token exchange y a las dos rutas Hiring exactas; nunca identidad ni autorización |
+| `GREENHOUSE_CLIENT_SERVICES_PROVIDER_ENABLED` | no | default `false`; `true` en producción desde 2026-09-10 (TASK-1852). Registra `preview_/apply_/rollback_client_service_enablement` (provider `greenhouse-client-services`), gateadas por el scope `efeonce.mcp.client_services.write` |
+| `GREENHOUSE_CLIENT_SERVICES_API_URL` | no | origin Greenhouse exacto; las tres tools llaman sólo las rutas App API `client-services/enablement/{preview,apply,rollback}` |
+| `GREENHOUSE_CLIENT_SERVICES_TOKEN_EXCHANGE_URL` | no | endpoint RFC 8693 exacto para el cliente separado `efeonce-mcp-client-services` (scope Greenhouse `client_services.enablement.write`) |
+| `GREENHOUSE_CLIENT_SERVICES_VERCEL_BYPASS_SECRET` | sí | mismo secret ref system-managed de Vercel; sólo transporte hacia el exchange y las tres rutas exactas |
 
 `MCP_REQUIRED_SCOPES` y `OAUTH_PUBLIC_CLIENT_ID` están retiradas desde `1.2.0`: aunque aparezcan en una revisión
 antigua o en el entorno externo, el código nuevo no las consume y el workflow no las vuelve a inyectar. El scope
@@ -209,6 +213,7 @@ El [readback final TASK-1844](../audits/mcp/TASK-1844_FINAL_RUNTIME_2026-09-08.j
 | --- | --- | --- |
 | `GREENHOUSE_ECOSYSTEM_API_URL` | `https://greenhouse.efeoncepro.com` | providers `greenhouse-seo`, `greenhouse-skills` y `greenhouse-identity` (misma config, mismo consumer) |
 | `GREENHOUSE_HIRING_API_URL` | `https://greenhouse.efeoncepro.com` | provider Hiring |
+| `GREENHOUSE_CLIENT_SERVICES_API_URL` | `https://greenhouse.efeoncepro.com` | provider `greenhouse-client-services` (TASK-1852, live 2026-09-10) |
 | `MCP_IDENTITY_BINDING_URL` | `https://greenhouse.efeoncepro.com` | resolución del binding de la persona externa |
 | `GREENHOUSE_API_URL` | `https://dev-greenhouse.efeoncepro.com` | **sólo** el command de fondeo de créditos Globe (`/api/platform/app/globe/credit-funding/ensure`), y sólo se lee con `GLOBE_CREDIT_FUNDING_WRITE_ENABLED=true` |
 | `GREENHOUSE_TOKEN_EXCHANGE_URL` | `https://dev-greenhouse.efeoncepro.com/...` | el token exchange de ese mismo command |
@@ -463,10 +468,11 @@ esta org?"* y ya se enforcea abajo: binding `internal` en el lane + entitlement 
 command. Corolario operativo: **federar la escritura N+1 de un dominio que ya tiene su scope no requiere tocar
 Entra**, y por lo tanto no puede quedar bloqueada por eso.
 
-Con esto el gateway declara **seis** scopes cuando todos los providers gateados están activos: `efeonce.mcp.read`, `efeonce.mcp.globe.read`,
+Con esto el gateway declara **siete** scopes cuando todos los providers gateados están activos: `efeonce.mcp.read`, `efeonce.mcp.globe.read`,
 `efeonce.mcp.globe.credits.funding.ensure` (sólo con `globeCreditFunding.enabled` ON) y `efeonce.mcp.seo.write`
-(sólo con `greenhouseSeo.enabled` ON), `efeonce.mcp.hiring.read` (sólo con `greenhouseHiring.enabled` ON) y
-`efeonce.mcp.identity.write` para la lane delegada.
+(sólo con `greenhouseSeo.enabled` ON), `efeonce.mcp.hiring.read` (sólo con `greenhouseHiring.enabled` ON),
+`efeonce.mcp.identity.write` para la lane delegada y `efeonce.mcp.client_services.write` (sólo con
+`greenhouseClientServices.enabled` ON; TASK-1852, registrado en Entra con consentimiento Admin el 2026-09-10).
 
 El cliente público compartido `32617b87-e7ef-493a-838f-1ff3f0213b93` solicita base + Globe read + Hiring read.
 El cliente canario base-only `66985833-14e9-438e-add4-b740e84e9a64` conserva únicamente base + Globe read y existe
@@ -877,7 +883,7 @@ Tres cosas que cuestan una sesión si no se saben:
 
 Si el proceso conserva un catálogo anterior, abrir una sesión nueva del cliente y comprobar sus eventos de herramientas. `Connected`, exit 0 o una respuesta del modelo no acreditan dispatch: verificar nombre, argumentos y Request/Response/Error reales. La ronda TASK-1844 con cero calls por DNS local no se contó como certificación. Una lista antigua puede requerir nueva consulta o proceso, sin repetir OAuth por cada organización.
 
-### Inventario del servidor — 39 tools (as-of 2026-09-06)
+### Inventario del servidor — 43 tools (as-of 2026-09-10)
 
 Cifra **medida**, no contada a mano: sale de `surface-baseline.json` en `origin/main` de `efeonce-mcp` (`5c28a7a`),
 que fotografía la superficie del servidor **construido** con todos los providers habilitados a propósito. Es el
@@ -890,6 +896,7 @@ techo del catálogo, no lo que ve un token concreto: lo alcanzable depende del e
 | Globe | 3 | `globe.capabilities.list`, `globe.producer.fleet.list`, `globe.credits.funding.ensure` (write) |
 | Hiring | 4 | `hiring.talent_pool.search`, `hiring.talent_pool.profile.get`, `hiring.applications.review.list`, `hiring.application.review_packet.get` |
 | Identidad delegada (TASK-1837) | 2 | `identity.invitations.list`, `identity.invitation.create` (write, scope `efeonce.mcp.identity.write`) |
+| Habilitación de servicios cliente (TASK-1852) | 3 | `preview_client_service_enablement`, `apply_client_service_enablement`, `rollback_client_service_enablement` (writes de autoridad humana delegada; scope `efeonce.mcp.client_services.write`; provider `greenhouse-client-services`; live desde 2026-09-10 rev `00052-slt`) |
 | SEO / Search Visibility 360 | 28 | reads + writes (detalle en §Provider Greenhouse-SEO) |
 
 Las **dos de identidad son propias del gateway**, no federadas desde el manifiesto de Greenhouse: no existen como

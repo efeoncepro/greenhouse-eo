@@ -8,7 +8,8 @@ PR #231/main `5726ce9d90`, orquestador `34416904936`; gates y watchdog verdes; e
 **10/09 RELEASE `f69b9d32` (PR #232, run `34431792218`, manifest released 03:16Z, watchdog 5/5, canary 5/5):** términos con
 `bundledModules`, autoridad `delegated_oauth`, invitación diferida, chats Teams `ready`, preferencias `client_service_default_v1`;
 flag writes ON horneada. Pendiente humano: apply Sky (payload `private-scope/sky-apply.json`, fp `e2e5d938…`); Berel sin
-entregar invitaciones (bloqueo del operador hasta UI); MCP delegado espera allowlist/Entra/gateway; `/creative-hub` 404 (1687).
+entregar invitaciones (bloqueo del operador hasta UI); MCP delegado vivo (Entra + allowlist + `efeonce-mcp` 1.4.0 rev `00052`; falta canary humano);
+`/creative-hub` → `TASK-1857` (es el módulo de Sky; 1687 no supersede).
 
 **EPIC-045 ↔ EPIC-046:** Hitos I/N obligatorios: Insights cliente/interno + email/in-app/Teamsbot con
 deep links; shared separado y móvil posterior. Contrato en arquitectura Insights §§7.1/9.1 y ADRs.

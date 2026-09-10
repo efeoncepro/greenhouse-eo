@@ -7,6 +7,17 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-10 — TASK-1852: canal MCP delegado vivo; TASK-1857 Creative Hub
+
+Canal delegado completo fuera del primitive: scope Entra `efeonce.mcp.client_services.write` (Admin) en la app recurso MCP,
+`efeonce-mcp-client-services` en la allowlist de consumers de Vercel Production (redeploy `greenhouse-naxc5guq3`) y
+federación en `efeonce-mcp` 1.4.0 (PR #9 provider `greenhouse-client-services` con preview/apply/rollback; PR #10 corrige
+`efeonce.gateway.status`, que omitía el provider; revisión `00052-slt`, 174 tests). Verificado en producción por
+`efeonce.gateway.status`; falta el primer canary con token Entra humano. `scopes.ts` del auth-server suma
+`efeonce.mcp.client_services.write` a las clases de escritura MCP (paridad con `efeonce-mcp/src/config.ts`).
+Decisión del operador: Creative Hub ES el módulo de Sky → `TASK-1857` (ui-ux, wireframe, sin JSX) y Delta en `TASK-1687`.
+[Auditoría](docs/audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md) §Canal MCP delegado.
+
 ## 2026-09-09 — TASK-1852: habilitación común de servicios
 
 Implementados inventario/preview, apply y compensación por organización/persona/servicio con commands
@@ -977,22 +988,3 @@ El cierre documental quedó reflejado en el canon y runbook CMS, documentación 
 dirección visual, changelog de cliente, `project_context.md` y las dos copias espejadas de la skill
 `hubspot-as-a-service`. No se modificaron el router global ni la arquitectura comercial porque no cambió ningún
 contrato transversal.
-
-## 2026-09-01 — La auditoría gana una sección para lo que vale en todo el sitio (TASK-1671)
-
-La pantalla de auditoría separa dos preguntas que antes mezclaba. Arriba, una sección nueva
-—"Acceso y presentación del sitio"— responde si los motores de IA pueden leer el sitio, si la
-portada se presenta y si el mapa del sitio está sano. Abajo, la lista de siempre, ahora rotulada
-como lo que es: problemas **por página**.
-
-La distinción importa porque cada hallazgo de la sección nueva vale para el dominio entero. En la
-lista se habrían rotulado como "1 página afectada" —falso— y habrían quedado hundidos debajo de
-cualquier problema menor que toque muchas páginas. Ahora dicen "Todo el sitio" y nombran dónde se
-detectó el problema, para que el cliente pueda verificarlo en vez de concluir que el informe miente.
-
-Y el bloqueo de entrenamiento de modelos de IA no se pinta como una falla: lleva la etiqueta
-"Decisión declarada", porque es una decisión legítima sobre el uso del contenido.
-
-🔴 **Sigue apagado.** El código existe pero no está desplegado, y el interruptor tampoco está
-encendido. Hasta que las dos cosas pasen, un sitio invisible para los motores de IA **sigue**
-saliendo con 95 de salud.

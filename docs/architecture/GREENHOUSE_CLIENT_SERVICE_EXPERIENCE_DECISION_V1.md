@@ -242,8 +242,10 @@ de escritura delegada.
   por Entra que ya puede habilitar módulos; contrato en `mcp-token-exchange.ts`; cliente sembrado por la migración
   `20260910005222927`). El actor sigue siendo la persona; el scope decide si ESE cliente puede pedir la clase de acción y
   el primitive relee los derechos dentro de la transacción. El lane ecosystem con binding de máquina permanece
-  `403 invalid_delegated_context` por diseño, no como pendiente. Faltan, fuera de este repo, el scope de entrada en la
-  app Entra del MCP, el consumer en `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS` y la federación en el gateway.
+  `403 invalid_delegated_context` por diseño, no como pendiente. Las tres piezas fuera de este repo —scope de entrada en la
+  app Entra del MCP, consumer en `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS` y federación en el gateway
+  (`efeonce-mcp` 1.4.0, provider `greenhouse-client-services`, rev `00052-slt`)— quedaron aplicadas el 2026-09-10; el canal
+  falla cerrado si cualquiera se retira, y su primer canary de escritura exige un token Entra humano.
 - **Invitación diferida.** `inviteClientPortalUser` admite `delivery: 'deferred'` (persona + roles, sin token ni correo) y
   `deliverClientPortalInvitation` entrega después; ambos por la ruta del checklist de onboarding. El preview distingue
   `person_invitation_pending` de `person_not_authorized_in_organization`: dos estados con dueño y acción distintos.

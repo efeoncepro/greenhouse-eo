@@ -215,7 +215,8 @@ Producción: PR #231/main `5726ce9d90`; orquestador `34416904936` success, manif
 Tres auditorías read-only autorizadas confirmaron el primitive único, los adapters y los gaps vigentes.
 La selección cliente quedó resuelta en tres contactos HubSpot de Berel sin usuario Greenhouse y tres usuarios
 activos Sky sin login observado. Full API Parity sigue abierta: Ecosystem/MCP apply y rollback devuelven 403
-por falta de autoridad humana atribuible, y las tools no están federadas en el gateway. El
+por falta de autoridad humana atribuible, y las tools no estaban federadas en el gateway (federadas el 2026-09-10;
+ver auditoría de rollout §Canal MCP delegado). El
 [dossier de discovery](../../audits/client-portal/TASK-1852_CLAUDE_DISCOVERY_2026-09-09.md) fija orden de lectura,
 mapa de código, matriz de consumidores, cohorte sanitizada y secuencia de continuación; PII sólo local 0600.
 

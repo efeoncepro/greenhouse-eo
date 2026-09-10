@@ -471,5 +471,48 @@
         ]
       }
     ]
+  },
+  "delegatedChannel": {
+    "observedAt": "2026-09-10T05:30:00Z",
+    "entraScope": {
+      "resourceAppId": "c5363215-b9a6-4bf1-bb1c-e61963b37dac",
+      "scope": "efeonce.mcp.client_services.write",
+      "consent": "Admin",
+      "publicPkceClientTouched": false
+    },
+    "vercelProduction": {
+      "GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS": "efeonce-mcp-hiring,efeonce-mcp-hiring-review,efeonce-mcp-client-services",
+      "bakedByRedeploy": "greenhouse-naxc5guq3-efeonce-7670142f.vercel.app",
+      "CLIENT_SERVICE_ENABLEMENT_WRITES_ENABLED": "true"
+    },
+    "gateway": {
+      "repo": "efeoncepro/efeonce-mcp",
+      "version": "1.4.0",
+      "surfaceTools": 43,
+      "providerId": "greenhouse-client-services",
+      "contractVersion": "task-1852-v1",
+      "tools": [
+        "preview_client_service_enablement",
+        "apply_client_service_enablement",
+        "rollback_client_service_enablement"
+      ],
+      "prs": [
+        9,
+        10
+      ],
+      "revisions": [
+        "efeonce-mcp-gateway-00051-c7b",
+        "efeonce-mcp-gateway-00052-slt"
+      ],
+      "deployRuns": [
+        34440656341,
+        34441487000
+      ],
+      "servingRevision": "efeonce-mcp-gateway-00052-slt",
+      "gatewayStatusListsProvider": true,
+      "tests": 174
+    },
+    "pending": "client-services:canary requires a human Entra bearer with the new scope (interactive PKCE); no write executed",
+    "status": "federated_and_surface_verified_no_write_canary"
   }
 }

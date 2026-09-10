@@ -91,7 +91,7 @@
     },
     {
       "label": "Sky Airlines",
-      "note": "Servicio confirmado; términos declarados el 2026-09-10 (kind committed, importes ausentes) con mapping creative_hub_globe_v1; ai_visibility_v1 existente se conserva sin atribución contractual. Preview limpio (canApply=true, sólo preserve). Apply pendiente de sesión humana y flag ON. cliente.creative_hub sigue 404 en producción (TASK-1687).",
+      "note": "Servicio confirmado; términos declarados el 2026-09-10 (kind committed, importes ausentes) con mapping creative_hub_globe_v1; ai_visibility_v1 existente se conserva sin atribución contractual. Preview limpio (canApply=true, sólo preserve). Apply pendiente de sesión humana y flag ON. cliente.creative_hub sigue 404 en producción; por decisión del operador (2026-09-10) Creative Hub ES el módulo contratado, así que TASK-1687 no supersede el bundle y la página se construye en TASK-1857.",
       "request": {
         "organizationId": "org-b9977f96-f7ef-4afb-bb26-7355d78c981f",
         "targets": [

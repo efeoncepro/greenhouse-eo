@@ -90,8 +90,9 @@ Key rules:
 - event retry schedules work for the dispatcher; it does not deliver inline
 - general ecosystem writes and cross-lane idempotency remain follow-ups
 - TASK-1852 sirve preview en App/Ecosystem sobre un primitive común. App apply/rollback requieren sesión
-  humana, capabilities y flag ON; Ecosystem/MCP writes responden 403 hasta contar con autoridad humana
-  delegada. Las tools MCP internas aún no están federadas; no declarar Full API Parity completa.
+  humana, capabilities y flag ON; Ecosystem writes con binding de máquina responden 403 por diseño; la autoridad
+  humana delegada entra por el lane App (`delegated_oauth`). Las tres tools están federadas en `efeonce-mcp` 1.4.0 desde el
+  2026-09-10; la paridad operativa de escritura se certifica con el primer canary ejecutado por una persona con token Entra.
 - Talent Pool comparte readers y commands gobernados en App API: búsqueda/perfil requieren `hiring.talent_pool.read`;
   availability, consentimiento e invitación usan commands idempotentes y auditados. El bearer MCP delegado agrega
   client/scope/purpose/agent-host exactos y conserva audit sin query, resultado ni PII. Provider/tools read-only están

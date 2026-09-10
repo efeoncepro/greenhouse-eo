@@ -21,6 +21,7 @@ El lane ecosystem acredita una máquina, por lo que apply/rollback responden `40
 por contrato. La autoridad humana delegada viaja por el lane App con un bearer emitido PARA la persona
 (capability `client_services.enablement.write`, token exchange con el cliente `efeonce-mcp-client-services`);
 el recibo registra `authority.kind`. No sustituyas al actor por el creador del consumer ni amplíes scopes para
-sortear la denegación. Las tools no están federadas automáticamente: su presencia en el manifiesto interno
-Greenhouse no prueba exposición en el gateway ni que exista el scope Entra. Consulta el runbook
+sortear la denegación. Las tres tools están federadas en el gateway `efeonce-mcp` (provider `greenhouse-client-services`,
+desde 2026-09-10) y exigen en tu token el scope `efeonce.mcp.client_services.write`; sin él el gateway responde
+`scope_not_allowed` y no hay escritura. Consulta el runbook
 CLIENT_SERVICE_ENABLEMENT_RUNBOOK_V1 y el dossier TASK-1852_CLAUDE_DISCOVERY_2026-09-09.md.

@@ -1,5 +1,23 @@
 # TASK-1687 — `cliente.creative_hub` declara una página que no existe: decidir si se construye o se retira del bundle
 
+## Delta 2026-09-10
+
+- **Slice 1 resuelto por el operador, en el sentido contrario al que asumía `TASK-1685` §D3:** Creative Hub
+  ES el módulo contratado por Sky Airlines («así se llama su módulo, así como el de Berel es el de SEO»), con
+  términos comerciales declarados el 2026-09-10 (`bundled_modules = [creative_hub_globe_v1]`, TASK-1852). La
+  superficie está prometida: **no se retira el viewCode ni se supersede el bundle**. Los slices 2 y 3 quedan
+  sin efecto tal como estaban escritos.
+- La forma nueva que este mismo Slice 1 anticipaba («materializar `/creative-hub`, trabajo de UI con contrato
+  propio, task `ui-ux` aparte») es
+  [`TASK-1857`](TASK-1857-sky-creative-hub-client-surface.md): construye la página bajo
+  `requireViewCodeAccess('cliente.creative_hub')` reutilizando el módulo de capacidades existente
+  (`src/config/capability-registry.ts` `creative-hub`, `GreenhouseCapabilityModule`, `getCapabilityModuleData`).
+- Lo que sigue siendo de esta task: verificar que la señal `identity.client_portal.assigned_view_without_route`
+  baje a 0 **cuando la página exista** y marcar el cierre; la migración de supersede no se escribe. El
+  `VIEW_CODE_NAV_DESCRIPTOR` de `cliente.creative_hub` se conserva porque ahora tiene destino.
+- Estado runtime observado el 2026-09-10: `/creative-hub` sigue 404 en producción; la señal sigue en 1 a
+  propósito. Ver la [auditoría de rollout de TASK-1852](../../audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->
