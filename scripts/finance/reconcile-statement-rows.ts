@@ -241,7 +241,10 @@ interface Ctx {
   log: (line: string) => void
 }
 
-const ref = (row: UnmatchedRow) => `recon:${row.row_id}`
+// La referencia entra en los IDs deterministas de settlement (`refSlug` de 24
+// chars): se usa el sufijo de la fila (fingerprint), no el period_id, para que
+// dos filas idénticas del mismo día produzcan grupos distintos.
+const ref = (row: UnmatchedRow) => `recon-${row.row_id.slice(-12)}`
 
 const applyEntry = async (entry: PlanEntry, ctx: Ctx): Promise<void> => {
   const row = ctx.index.find(entry.row)

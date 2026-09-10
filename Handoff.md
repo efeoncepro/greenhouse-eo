@@ -1,5 +1,20 @@
 # Handoff activo
 
+**Conciliación bancaria ago–sep 2026 (2026-09-10, code complete + datos cargados; rollout = mismo Cloud SQL):**
+re-anclaje OTB al 01/08 por cuenta (Global66 al 31/07, TC al cierre 06/08), `banco-chile-clp` (Cuenta Vista
+308526005) registrada por CLI canónica, cartolas reales importadas con los adapters nuevos
+(`src/lib/finance/bank-statements/`) y 77 filas conciliadas con `scripts/finance/reconciliation-plans/2026-08-09.json`.
+Períodos `reconciled`: global66-clp 2026-07/08, santander-corp-clp 2026-08 (ciclo 06/08–07/09). Saldos vs banco:
+Global66 exacto; Santander CLP +450.000 (ago) / +692.819 (sep) explicados fila por fila; TC exacto.
+**Pendiente con el operador (punto 7):** Humberly 450.000 (03/08 y 03/09) vs payroll 254.250/381.375; Valentina
+174.194 (07/09); nómina agosto Andres/Daniela pagada 03/09 (1.985.038 banco vs 2.020.120 registrado por payroll en
+USD, 4 filas Global66 sin calce); Melkin 788,86 USD (registrado en `santander-usd-usd`, no aparece en banco);
+cobro Berel MXN 104.000 (13/08) sin factura asociada; recepción USD 335,15 (13/08); cartola Banco de Chile
+(PDF cifrado, clave no coincide con los 4 últimos dígitos del RUT de la empresa) → OTB pendiente; estado de cuenta
+trimestral del crédito 420051383906 para completar `original_amount`. Bugs corregidos: `ISSUE-169`
+(saldos en moneda extranjera + día genesis). Follow-up formal propuesto: `TASK-1858` (pendiente de confirmación del operador para registrarla). Dev server local con la UI en
+`http://localhost:3000/finance/reconciliation`. Sin push.
+
 **TASK-1604 (2026-09-10, in-progress):** slice SEO/Arte aplicado y documentado. Seis competencias activas,
 nueve preguntas SEO en `sme_review`, cero templates del pack, cero policies y cero assessments. Las vacantes
 `EO-OPN-0674` y `EO-OPN-0675` fueron publicadas por un acto separado y sus rutas responden 200; publicación no

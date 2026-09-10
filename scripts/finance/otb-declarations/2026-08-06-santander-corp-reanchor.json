@@ -1,0 +1,12 @@
+[
+  {
+    "accountId": "santander-corp-clp",
+    "genesisDate": "2026-08-06",
+    "openingBalance": 975503,
+    "declarationReason": "Corrección del ancla del ciclo TC: el estado de cuenta del 07/09/2026 lista un cargo del 06/08 (APOLLO.IO $55.244) dentro del PERÍODO ACTUAL, es decir, el MONTO FACTURADO A PAGAR (PERÍODO ANTERIOR) = $975.503 es el saldo al INICIO del 06/08 (SOD), no al final. Genesis 2026-08-06 con $975.503. Verificación: 975.503 + 2.255.502 (cargos 06/08–07/09 incl. comisión) − 1.749.712 (pagos 14/08 y 01/09) = 1.481.293 = cupo utilizado al 07/09. Reemplaza la OTB 2026-08-07 (mismo saldo, un día tarde).",
+    "auditStatus": "reconciled",
+    "evidenceRefs": [
+      { "type": "cartola_tc", "ref": "data/bank/Santander-Corp-TC-Septiembre-EstadoCuentaTC-XXXXXXXXXXXX2505-20260910.pdf", "period": "2026-08-06..2026-09-07", "description": "Estado de cuenta TC Master Empresa Plus *2505 fecha 07/09/2026. Cupo total 1.700.000 / utilizado 1.481.293 / disponible 218.707." }
+    ]
+  }
+]

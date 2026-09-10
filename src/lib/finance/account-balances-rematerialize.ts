@@ -304,7 +304,21 @@ export const rematerializeAccountBalanceRange = async (
     )
 
     if (!input.preserveSeedRow || existingSeedClosing == null) {
-      await insertSeedRow(client, input.accountId, seedDate, openingBalance)
+      if (otb && otb.genesisDate === seedDate) {
+        // Convención OTB (TASK-703): `genesis_date` es el saldo al INICIO del
+        // día. Los movimientos de ese mismo día cuentan, así que el día ancla
+        // se materializa (opening = OTB + movimientos del día) en vez de
+        // sembrarse como fila estática. Caso fuente 2026-09-10: el cargo TC
+        // APOLLO.IO del 06/08 quedaba fuera del saldo con genesis 06/08.
+        await materializeAccountBalance({
+          accountId: input.accountId,
+          balanceDate: seedDate,
+          client,
+          force: true
+        })
+      } else {
+        await insertSeedRow(client, input.accountId, seedDate, openingBalance)
+      }
     }
 
     if (seedMode === 'active_otb') {

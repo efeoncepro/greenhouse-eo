@@ -7,6 +7,21 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-10 — Finance: recuperación de conciliación agosto–septiembre 2026
+
+Cuatro meses sin cartola se resolvieron re-anclando cada instrumento con una OTB bank-authoritative al inicio de
+agosto (Global66 al 31/07 y la TC al cierre de ciclo 06/08) en vez de reconstruir mayo–julio. Nacen los adapters
+de cartola (`santander_cartola_xlsx`, `santander_tc_movimientos_xlsx`, `santander_tc_estado_cuenta_text`,
+`global66_xls`) detrás de `parseBankStatementFile`; la ruta de import acepta archivo/texto y el drawer suma la
+pestaña «Archivo del banco» (la lista CSV ahora calza con el parser). CLIs canónicas nuevas:
+`finance:instrument:create`, `finance:import-statement`, `finance:reconcile-rows` (plan JSON) y
+`finance:declare-otbs --file`. Se corrigió `ISSUE-169` (cuentas USD/MXN sumaban CLP; el día genesis de la OTB no
+materializaba movimientos), el opening canónico del período honra la OTB, las filas idénticas del mismo día ya no
+colapsan al importar y las factorías de settlement aceptan fechas partidas y MXN. Créditos V1
+(`src/lib/finance/loans.ts`): Crédito FOGAPE Santander registrado con su desembolso como settlement `funding`.
+Datos: `banco-chile-clp` registrada, 9 períodos ago/sep importados, 77 filas conciliadas por plan, tres períodos
+`reconciled`; las discrepancias de nómina y dos cobros quedan escaladas al operador (follow-up propuesto `TASK-1858`, sin registrar aún).
+
 ## 2026-09-10 — TASK-1604: pack SEO/Arte y vacantes reconciliadas
 
 Se agregó el pack versionado de evaluación para SEO Specialist Senior y Director(a) de Arte Senior: seis
