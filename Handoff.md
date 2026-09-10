@@ -1,5 +1,16 @@
 # Handoff activo
 
+**Product Design 360 (2026-09-10, modelado y canonizado; oferta `Proposed`, no autoriza venta):** business model
+V1.1 + ficha `docs/services/wave/product-design-360.md` + ADR `EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md`: capability de
+oficio con dos ofertas por comprador (producto → Product Design 360 · sitio público → Web Experience 360), siete lanes
+con accesibilidad primero; se venden lanes, nunca horas ni pantallas. `creative-practice` corregido: Superside mínimo
+USD 15.000/mes (decía ~5.000, error 3×). Landing `TASK-1859` creada (to-do, UI ready no; no se indexa hasta
+`Commercially approved`). **Colisión de ID sin resolver:** otra sesión tiene docs UI sin commitear nombrados
+`TASK-1859-landing-trade-marketing-btl-*` + `PDR-021`; `TASK-1859` quedó registrada para Product Design 360 — decide el
+operador quién pasa a `TASK-1860`. Pendientes con dueño: G1 demanda (Commercial) · D7 loaded cost chileno de un
+senior product designer y piso de margen por lane (Finance) · IP del design system, datos de research y marco chileno
+de accesibilidad (Legal) · nombre público D1 (Strategy) · Calculadora de Capacidad (wedge, sin task).
+
 **TASK-1858 — conciliación bancaria ago–sep 2026 (2026-09-10, in-progress; Slices 1/2/3/5 hechos):** release
 `2cf8c26cfa2d-8f79606f-8cb3-4154-a7fd-c570e7af8497` `released` 20:06Z (PR #233, run `34523159501`, un intento,
 bypass forense por la migración de TASK-1604 ya aplicada; watchdog 5/5, `ops-worker`/`auth-server` change-gated
