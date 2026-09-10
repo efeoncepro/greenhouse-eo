@@ -370,6 +370,18 @@ desplegado en la revisión `efeonce-mcp-gateway-00039-gz4`; `resend`/`revoke` de
 Derivadas registradas: U13 (`TASK-1838`, consola del administrador del cliente) y U14 (`TASK-1839`, primitive de
 entrega), ambas ya desbloqueadas por el paso a producción de U12.
 
+## Delta 2026-09-10 — cuarta clase de escritura en el emisor: `efeonce.mcp.client_services.write` (TASK-1852, EPIC-046)
+
+No es unidad de este epic, pero toca su inventario: `src/lib/auth-server/oauth/scopes.ts` declara ahora cuatro clases
+de escritura (`globe.credits.funding.ensure`, `seo.write`, `identity.write`, `client_services.write`), en paridad con
+`efeonce-mcp/src/config.ts` (`scopes.test.ts` verde; commit `b83e704be` en `develop`, llega a producción con el próximo
+release). La clase se ejerce hoy por el **issuer Entra** con intercambio RFC 8693 (cliente confidencial
+`efeonce-mcp-client-services` → `client_services.enablement.write`), no por Efeonce ID: el contexto interno v2 (U19)
+sigue base-only y el gateway declara las tres tools `unsupported` (`provider_delegation_required`) para el emisor
+nativo. Consentimiento Admin en la app de recurso MCP de Entra; el cliente PKCE compartido no se tocó. Gateway
+`efeonce-mcp` `1.4.0` (43 tools), revisión `efeonce-mcp-gateway-00052-slt`. Llevar esta clase a Efeonce ID exigiría
+autorización v2 nueva (D10), no un flag.
+
 ## Snapshot histórico anterior al cierre del acceso interno
 
 El siguiente estado se conserva como historia; el estado vigente está en `Status` y en TASK-1836.

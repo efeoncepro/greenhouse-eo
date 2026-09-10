@@ -26,7 +26,7 @@ Esta skill es dueña de:
 
 No produce UI visual, copy de interfaz, campañas, soporte diario, CRM implementation ni arquitectura runtime. Derivar a `greenhouse-ai-design-studio`, `greenhouse-ux-content-accessibility`, `efeonce-customer-model-operator`, `hubspot-greenhouse-bridge`, `software-architect-2026`, `legal-privacy-ip-operator` o la práctica dueña según corresponda.
 
-Para Efeonce, cargar `docs/context/10_experiencia-cliente.md`, `docs/context/13_icp-buyer-personas-jtbd.md`, `docs/documentation/client-portal/portal-cliente-customer-experience-end-to-end.md`, `docs/architecture/GREENHOUSE_JOURNEY_INTELLIGENCE_LAYER_V1.md`, `docs/architecture/GREENHOUSE_CLIENT_ONBOARDING_PROVISIONING_V1.md`, `docs/business-models/EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md` y `efeonce-customer-model-operator`.
+Para Efeonce, cargar `docs/context/10_experiencia-cliente.md`, `docs/context/13_icp-buyer-personas-jtbd.md`, `docs/documentation/client-portal/portal-cliente-customer-experience-end-to-end.md`, `docs/documentation/client-portal/service-enablement.md`, `docs/architecture/GREENHOUSE_JOURNEY_INTELLIGENCE_LAYER_V1.md`, `docs/architecture/GREENHOUSE_CLIENT_ONBOARDING_PROVISIONING_V1.md`, `docs/business-models/EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md` y `efeonce-customer-model-operator`.
 
 ## Doctrina de Experiencia Efeonce
 
@@ -70,6 +70,8 @@ Aplicar a la relación completa de Efeonce: oferta, delivery, portal, aprendizaj
 ### Client Portal Experience
 
 Aplicar al portal cliente y sus módulos. Respetar los estados `normal`, `zero-state`, `not assigned`, `degraded` y `error completo`. No confundir acceso, asignación de módulo, disponibilidad de datos y error técnico.
+
+Desde 2026-09-10 (TASK-1852) distinguir además: persona **invitada con entrega diferida** (existe, sin correo enviado; el preview de habilitación la marca `person_invitation_pending`) frente a persona no autorizada en la organización; **destino Teams registrado** (chat grupal del cliente, `ready` sólo con bot verificado) frente a mensaje enviado, que no ocurrió; y **preferencias iniciales declaradas por el operador** (`client_service_default_v1`: informe/feedback in-app + email, hitos/entregas sólo in-app) frente a preferencias elegidas por la persona, que prevalecen. El módulo contratado por Sky es Creative Hub (TASK-1857 construye su ruta); no tratar su ausencia de ruta como un cliente sin servicio.
 
 ### Customer Experience as a Service
 

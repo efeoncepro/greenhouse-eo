@@ -1,9 +1,9 @@
 # Sister Platform Bindings
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-04-11 por Codex (TASK-375)
-> **Ultima actualizacion:** 2026-07-21 por Claude (TASK-1507 CLI de redirect allowlist)
+> **Ultima actualizacion:** 2026-09-10 por Claude (TASK-1852: clientes de exchange del gateway MCP y allowlist compartida)
 > **Documentacion tecnica:** [GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md](../../architecture/GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md) · [GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md](../../architecture/GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md) (§15.5 para el redirect allowlist)
 
 ---
@@ -189,7 +189,10 @@ El script es idempotente:
 Flags de rollout:
 
 - Greenhouse: `GREENHOUSE_SISTER_PLATFORM_OAUTH_ENABLED=false` por default.
-- Greenhouse allowlist: `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS=kortex`.
+- Greenhouse allowlist: `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS` debe incluir `kortex`. Es la misma lista que
+  usan los clientes de exchange del gateway MCP (ver más abajo); en Production hoy contiene
+  `efeonce-mcp-hiring,efeonce-mcp-hiring-review,efeonce-mcp-client-services` (2026-09-10), así que habilitar Kortex
+  significa **agregar** `kortex` a esa lista, nunca reemplazarla.
 - Kortex: `KORTEX_GREENHOUSE_SSO_ENABLED=false` por default.
 
 Rollback operativo: apagar primero `KORTEX_GREENHOUSE_SSO_ENABLED`; si hace falta, apagar tambien `GREENHOUSE_SISTER_PLATFORM_OAUTH_ENABLED`. El bridge de password queda como break-glass hasta cerrar el cutover.
@@ -273,6 +276,27 @@ Hoy es un comando de operador con acceso a la base de datos: no hay pantalla ni 
 El comando acepta la variable `SISTER_PLATFORM_ACTOR_USER_ID` para nombrar al operador (por defecto `system`), pero hoy ese dato **no queda guardado en ninguna parte**: se pasa y se descarta. O sea, la trazabilidad real del cambio sigue siendo el historial del propio operador, no la plataforma. Cerrar ese hueco, definir el permiso y abrir la operacion por API/MCP es `TASK-1513` (Sister Platform Redirect Allowlist Governance), ya creada y en `to-do`.
 
 > Detalle tecnico: el contrato de la primitive, sus garantias transaccionales y las reglas duras estan en [GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md](../../architecture/GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md) §15.5. Codigo: `src/lib/sister-platforms/oauth-broker.ts` (`updateSisterPlatformOAuthRedirectUris`) y `scripts/sister-platform-oauth-redirect-uris.ts`.
+
+## Clientes de exchange del gateway MCP
+
+Ademas del login de operadores (Kortex), el broker sirve para que el gateway `mcp.efeonce.org` cambie el token
+corporativo de una persona por un token Greenhouse de corta vida. Cada uso tiene su propio cliente confidencial,
+con un solo permiso y sin secreto compartido:
+
+| Cliente | Para que | Desde |
+| --- | --- | --- |
+| `efeonce-mcp-gateway` | fondeo interno de creditos Globe (autoridad de un solo uso) | 2026-08-01 |
+| `efeonce-mcp-hiring` | lectura del Talent Pool | 2026-08-16 |
+| `efeonce-mcp-hiring-review` | revision exacta de candidatos | 2026-08-18 |
+| `efeonce-mcp-client-services` | abrir o revertir el acceso de un cliente a sus servicios contratados | 2026-09-10 |
+
+Un cliente de exchange no decide quien puede hacer que: solo transporta a la persona. El modulo destino vuelve a
+mirar sus permisos en cada llamada y anota en el recibo que la accion llego por autoridad delegada. Si un cliente
+de exchange responde `invalid_client`, lo primero es revisar que su nombre este en la allowlist de arriba y que
+el cliente y su consumer sigan activos.
+
+> Detalle tecnico: [contrato de sister platforms](../../architecture/GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md) §16 ·
+> `src/lib/sister-platforms/mcp-token-exchange.ts`.
 
 ## Quien deberia tocarlo
 

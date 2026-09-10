@@ -48,6 +48,12 @@ Known durable destination:
 - Not a Teams channel with `teamId/channelId`
 - Public/group destination: do not use for tests
 
+Client group chats (TASK-1852, since 2026-09-10) are **not** announcement destinations:
+
+- Rows `client-teams-chat-<spaceId>` in `greenhouse_core.teams_notification_channels` (`recipient_kind='chat_group'`, one per client Space) are registered through `POST /api/admin/clients/[organizationId]/lifecycle/teams/chat`, which inspects the chat read-only via Graph and marks `ready` only when the bot is installed.
+- They are absent from `src/config/manual-teams-announcements.ts`; `pnpm teams:announce` cannot target them, and registering one sends nothing.
+- Never send a "test" card to a client chat. Delivery to clients is governed by Notifications (event + `client_service_default_v1` preferences), not by this CLI.
+
 ## Resolve Identity For Mentions
 
 To mention a person in an Adaptive Card, resolve their Microsoft identity first.

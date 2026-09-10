@@ -1,7 +1,7 @@
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-06-04 por Claude
-> **Ultima actualizacion:** 2026-06-05 por Claude (TASK-1017 — verificar evidencia del checklist)
+> **Ultima actualizacion:** 2026-09-10 por Claude (TASK-1852 — invitacion con entrega diferida, chat grupal de Teams del cliente y preferencias iniciales)
 > **Documentacion tecnica:** [GREENHOUSE_CLIENT_ONBOARDING_WIZARD_V1](../../architecture/GREENHOUSE_CLIENT_ONBOARDING_WIZARD_V1.md) · [GREENHOUSE_CLIENT_LIFECYCLE_V1](../../architecture/GREENHOUSE_CLIENT_LIFECYCLE_V1.md)
 
 # Alta de Cliente — Puerta Unica de Onboarding
@@ -180,6 +180,16 @@ Desde ese item:
 Es idempotente: re-invitar a alguien ya invitado no duplica nada. Solo se pueden asignar los tres roles de portal (`client_executive` / `client_manager` / `client_specialist`), nunca un rol interno.
 
 > Detalle tecnico: helper SSOT `inviteClientPortalUser` (extraido de `/api/admin/invite`), heuristica `suggestClientPortalRole`, reader `listClientPortalPersonCandidates`. Capability dedicada `client.lifecycle.portal_user.invite`. Surface: `PortalUsersPanel` en el timeline del caso. Spec: [TASK-1001](../../tasks/in-progress/TASK-1001-client-portal-people-provisioning-onboarding.md). Modelo persona↔org: [GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1](../../architecture/GREENHOUSE_PERSON_ORGANIZATION_MODEL_V1.md).
+
+### Delta 2026-09-10 — invitar sin enviar todavia, y lo que viene con la persona (TASK-1852)
+
+A veces conviene crear a las personas del cliente antes de que el portal este listo para ellas. Para eso la invitacion admite **entrega diferida**: la persona queda creada con su rol, en estado "invitada", pero **no recibe correo ni enlace**. Cuando corresponda, el operador entrega la invitacion desde el mismo checklist; solo se puede entregar a personas que sigan invitadas y pertenezcan a ese cliente. Mientras tanto, la habilitacion de servicios la muestra como "invitacion pendiente", que no es lo mismo que "persona no autorizada".
+
+Con las personas tambien se declara una **politica inicial de avisos** (`client_service_default_v1`): informes listos y pedidos de feedback llegan in-app y por correo; hitos de sprint y actualizaciones de entrega solo in-app. La persona puede cambiarla luego desde su portal y su eleccion manda.
+
+El **chat grupal de Teams** que Efeonce comparte con el cliente se puede registrar como destino del bot, por Space. Queda listo solo si Greenhouse comprueba, leyendo Microsoft Graph, que el bot esta instalado en ese chat. **Registrar no envia ningun mensaje**: el 2026-09-10 se registraron los chats de Berel y Sky sin enviar nada, y las tres personas de Berel siguen con la invitacion sin entregar por decision del operador.
+
+> Detalle tecnico: `inviteClientPortalUser` con `delivery: 'deferred'` y `deliverClientPortalInvitation` (`src/lib/client-onboarding/invite-client-portal-user.ts`); rutas `POST .../lifecycle/portal-users/invite|deliver|notification-preferences` (capability `client.lifecycle.portal_user.invite`) y `POST .../lifecycle/teams/chat` (capability `client.lifecycle.case.advance`, `writeTeamsGroupChatForSpace`). Detalle en [GREENHOUSE_CLIENT_LIFECYCLE_V1](../../architecture/GREENHOUSE_CLIENT_LIFECYCLE_V1.md) Delta 2026-09-10 y [service-enablement](../client-portal/service-enablement.md).
 
 ## Estados que puedes ver
 

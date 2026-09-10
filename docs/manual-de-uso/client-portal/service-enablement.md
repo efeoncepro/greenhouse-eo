@@ -19,8 +19,11 @@
 El MCP de una máquina puede inventariar cuando tiene binding interno, pero nunca aprueba altas o compensaciones
 por sí solo. La aprobación llega por la sesión administrativa app de la persona o por un bearer delegado que esa
 persona autorizó (capability `client_services.enablement.write`; el gateway lo obtiene por token exchange con el
-cliente `efeonce-mcp-client-services`). Que las tools aparezcan en el servidor interno no significa que estén
-federadas en el gateway: la federación y el scope Entra son pasos del repo `efeonce-mcp`.
+cliente `efeonce-mcp-client-services`). Desde el 2026-09-10 el canal está federado y vivo: el gateway `efeonce-mcp` 1.4.0
+expone `preview_client_service_enablement`, `apply_client_service_enablement` y `rollback_client_service_enablement`
+(provider `greenhouse-client-services`, listado `enabled` en `efeonce.gateway.status`) y el scope Entra
+`efeonce.mcp.client_services.write` está consentido. El primer canary de escritura exige un bearer Entra de una persona con
+ese scope (`pnpm client-services:canary`, PKCE interactivo; no corre desatendido) y aún no se ha ejecutado.
 
 Para esta cohorte, consulta primero el
 [dossier de discovery](../../audits/client-portal/TASK-1852_CLAUDE_DISCOVERY_2026-09-09.md). Berel tiene tres
@@ -29,5 +32,8 @@ como `person_invitation_pending`. Sky tiene tres personas cliente activas, con p
 login observado, y un preview limpio listo para que una persona administradora lo aplique. No uses el usuario técnico Berel ni el equipo interno Sky
 como destinatarios. Los nombres, emails e IDs exactos viven sólo en el handoff privado local señalado allí.
 
-Esta entrega no activa la cohorte. Mantén el flag OFF hasta tener preview limpio, aprobación humana,
-compensación disponible y evidencia de login/ruta/canal.
+El flag `CLIENT_SERVICE_ENABLEMENT_WRITES_ENABLED` está ON en producción desde el 2026-09-10, pero ninguna alta se ha
+aplicado: la de Sky espera una sesión humana administrativa con el preview exacto; Berel sigue bloqueado por sus
+invitaciones diferidas. Aplica sólo con preview limpio, aprobación humana, compensación disponible y evidencia de
+login/ruta/canal; apagar el flag bloquea altas y compensaciones. El módulo contratado por Sky es Creative Hub y su ruta
+`/creative-hub` la construye TASK-1857.

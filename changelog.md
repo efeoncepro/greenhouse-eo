@@ -17,6 +17,10 @@ federación en `efeonce-mcp` 1.4.0 (PR #9 provider `greenhouse-client-services` 
 `efeonce.mcp.client_services.write` a las clases de escritura MCP (paridad con `efeonce-mcp/src/config.ts`).
 Decisión del operador: Creative Hub ES el módulo de Sky → `TASK-1857` (ui-ux, wireframe, sin JSX) y Delta en `TASK-1687`.
 [Auditoría](docs/audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md) §Canal MCP delegado.
+Barrido documental por dos subagentes (32 archivos): skills `efeonce-mcp-platform` (+referencias, espejo `.codex`),
+`greenhouse-teams-message-operator`, `teams-bot-platform`, `efeonce-customer-experience`; arquitectura MCP §25, invariantes MCP §11,
+sister platforms §16 (registro de clientes de exchange), gap ledger de parity, Teams/Notification Hub, client lifecycle §9,
+Pilot Engagement (`bundled_modules`), docs funcionales y manuales de portal/comunicaciones, DECISIONS_INDEX.
 
 ## 2026-09-09 — TASK-1852: habilitación común de servicios
 

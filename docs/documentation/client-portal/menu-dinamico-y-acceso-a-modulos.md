@@ -1,9 +1,9 @@
 # Menu dinamico y acceso a modulos del Portal Cliente
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.3
+> **Version:** 1.4
 > **Creado:** 2026-05-13 por Claude (TASK-827)
-> **Ultima actualizacion:** 2026-08-11 por Claude (TASK-1685: menu y puerta comparten una sola regla; la lista base dejo de mostrarse por rol)
+> **Ultima actualizacion:** 2026-09-10 por Claude (TASK-1852: los modulos incluidos en el servicio se declaran y validan al escribir los terminos comerciales)
 > **Documentacion tecnica:** [GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md](../../architecture/GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md), [GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_CLIENT_PORTAL_ARCHITECTURE_V1.md)
 
 ---
@@ -157,6 +157,8 @@ Cuando comercial vende un modulo a un cliente:
 4. En la proxima sesion del cliente, el portal refleja el cambio (hasta 60 segundos de delay por cache)
 
 Tambien se puede activar automaticamente via **cascade desde el ciclo de vida del cliente** (TASK-828, pendiente): cuando se completa el onboarding de un cliente, los modulos que su `engagement_commercial_terms` declara como `bundled_modules[]` se materializan solos.
+
+> **Delta 2026-09-10 (TASK-1852):** desde hoy los modulos incluidos en un servicio **si se declaran** al registrar sus terminos comerciales (`bundledModules`), y Greenhouse rechaza cualquier clave que no exista activa en el catalogo. Berel quedo con `seo_v2` + `ai_visibility_v1` y Sky con `creative_hub_globe_v1`. Esa declaracion es la unica evidencia de "modulo contratado" que usa la habilitacion de servicios; la asignacion al cliente sigue siendo un paso aparte (manual o, cuando exista, el cascade de TASK-828). La pagina `/creative-hub` de Sky aun no existe: la construye TASK-1857.
 
 ---
 

@@ -509,6 +509,26 @@ GET    /api/admin/clients/lifecycle/health
 
 Auth: todos pasan por `requireServerSession` + capability check granular. Errors via `redactErrorForResponse` + `captureWithDomain(err, 'commercial', { tags: { source: 'client_lifecycle' } })`.
 
+**Delta 2026-09-10 (TASK-1852) — rutas del checklist de portal users y Teams (todas `authorizeLifecycle(<capability>)`, `client_id`/Space resueltos server-side desde la organización, nunca del body):**
+
+```
+POST   /api/admin/clients/[organizationId]/lifecycle/portal-users/invite
+       → inviteClientPortalUser; body acepta `delivery: 'immediate' | 'deferred'` (default immediate)
+       → capability client.lifecycle.portal_user.invite
+POST   /api/admin/clients/[organizationId]/lifecycle/portal-users/deliver
+       → deliverClientPortalInvitation ({ userIds }, 1-50); sólo personas status='invited' + auth_mode='invited' del cliente
+       → 404 person_not_in_client · 409 invitation_not_pending · capability client.lifecycle.portal_user.invite
+POST   /api/admin/clients/[organizationId]/lifecycle/portal-users/notification-preferences
+       → applyClientNotificationPreferencePolicy ({ userIds, policy: 'client_service_default_v1' }); no envía nada
+       → capability client.lifecycle.portal_user.invite
+POST   /api/admin/clients/[organizationId]/lifecycle/teams/chat
+       → writeTeamsGroupChatForSpace ({ chatId '19:…@thread.v2', displayName }); recipient_kind='chat_group' por Space;
+         ready sólo con bot verificado vía Graph (lectura); no envía nada
+       → capability client.lifecycle.case.advance
+```
+
+Sin capabilities nuevas: `client.lifecycle.portal_user.invite` (TASK-1001) y `client.lifecycle.case.advance` (§8) ya existían en catálogo y runtime.
+
 ---
 
 ## 10. Outbox Events (versionados v1)
@@ -860,6 +880,13 @@ Toda creación de un usuario de portal cliente (`client_users` + `user_role_assi
 - **SIEMPRE** sembrar candidatos desde los contactos HubSpot ya capturados; el operador confirma/ajusta rol. Idempotente (dedup por email).
 
 **Spec canónica**: `docs/tasks/in-progress/TASK-1001-client-portal-people-provisioning-onboarding.md`. Helpers: `inviteClientPortalUser`, `suggestClientPortalRole`, `listClientPortalPersonCandidates` (`src/lib/client-onboarding/`). Sin migración (capability mirror de la familia TASK-992 catalog+runtime), sin reliability signal nuevo (ítem `required=FALSE`), sin evento nuevo (reuso `role.assigned`).
+
+**Delta 2026-09-10 (TASK-1852) — invitación diferida, mismo SSOT:**
+
+- `inviteClientPortalUser` acepta `delivery: 'immediate' | 'deferred'` y devuelve `deliveryStatus: 'sent' | 'failed' | 'deferred' | 'not_required'`. Con `deferred`, una persona recién creada queda `status='invited'` + `auth_mode='invited'` con sus roles, **sin token ni correo**; `not_required` es el caso `ensure` sobre una persona ya existente (no re-envía).
+- La entrega posterior pasa por `deliverClientPortalInvitation` (mismo archivo) y la ruta `portal-users/deliver`: sólo aplica a personas `invited`/`invited` del cliente resuelto server-side (`person_not_in_client` 404, `invitation_not_pending` 409). **NUNCA** entregar una invitación diferida por SQL ad hoc ni reenviar correo sin instrucción explícita del operador.
+- El preview de habilitación de servicios (`src/lib/client-portal/enablement/preview.ts`) distingue `person_invitation_pending` (persona `status='invited'`: dueño = entrega de la invitación) de `person_not_authorized_in_organization` (persona inexistente/inactiva: dueño = identidad). No colapsar los dos estados.
+- Estado 2026-09-10: las 3 personas de Berel existen `invited` con entrega diferida por decisión del operador (sin correo enviado); la política inicial de preferencias `client_service_default_v1` se aplicó a las 6 personas de Berel y Sky (ver `GREENHOUSE_NOTIFICATION_HUB_V1.md` Delta 2026-09-10); el destino Teams de cada cliente se registró por Space sin enviar nada (ver `GREENHOUSE_TEAMS_NOTIFICATIONS_V1.md` Delta v1.3).
 
 ### Notion onboarding preflight — "configurado ≠ fluyendo" (TASK-1009, desde 2026-06-04)
 

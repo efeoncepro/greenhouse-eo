@@ -100,6 +100,8 @@ The Greenhouse Teams Bot (TASK-671) implements all of the above. Use it as a sta
 | JWT validator (login.botframework.com JWKS) | `src/lib/integrations/teams/bot-framework/jwt-validator.ts` |
 | Inbound audit + idempotency | `migrations/*_create-teams-bot-inbound-actions.sql` |
 | Channel registry table | `migrations/*_create-teams-notification-channels.sql` (TASK-669) |
+| Relaxed `kind_bot_check` so `recipient_kind='chat_group'` rows can be persisted (bot identity only; targets governed by `recipient_consistency_check`) | `migrations/20260910013234351_task-1852-teams-chat-group-bot-check.sql` (TASK-1852) |
+| Client group-chat registration (Graph read-only `GET /chats/{id}` + `/installedApps?$expand=teamsApp`; `ready` only when the bot is installed; registering sends nothing) | `src/lib/client-onboarding/teams-connect-store.ts` (`writeTeamsGroupChatForSpace`), `teams-channels-reader.ts` (`inspectGroupChatForLinking`), route `api/admin/clients/[organizationId]/lifecycle/teams/chat` |
 | Bicep stack | `infra/azure/teams-bot/main.bicep` |
 | Manifest v1.0.5 (canonical RSC + webApplicationInfo) | `infra/azure/teams-bot/manifest/manifest.json` |
 | Deploy workflow | `.github/workflows/azure-teams-bot-deploy.yml` |

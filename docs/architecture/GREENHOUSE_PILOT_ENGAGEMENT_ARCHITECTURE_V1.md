@@ -1,13 +1,20 @@
 # GREENHOUSE_PILOT_ENGAGEMENT_ARCHITECTURE_V1
 
 > **Tipo de documento:** Spec de arquitectura canónica
-> **Versión:** 1.2
+> **Versión:** 1.4
 > **Creado:** 2026-05-05 por Claude (Opus 4.7)
-> **Última actualización:** 2026-05-07 por Codex — Delta v1.11 TASK-810 aplicado: DB guard anti-zombie
+> **Última actualización:** 2026-09-10 por Claude — Delta v1.12 TASK-1852: `bundled_modules` validado al escribir + contrato App API/CLI
 > **Estado:** Implementación por slices EPIC-014
 > **Owner:** Comercial / Agency
 > **Brand UI**: "Sample Sprint" (paraguas comercial). Schema interno usa `engagement_*` genérico — el rebranding marketing no requiere migrations.
 > **Domain boundary:** Commercial (no Finance — ver `GREENHOUSE_COMMERCIAL_FINANCE_DOMAIN_BOUNDARY_V1.md`)
+
+## Delta v1.12 (2026-09-10) — TASK-1852 `bundled_modules` validado al escribir + contrato App API/CLI
+
+1. **Columna:** `engagement_commercial_terms.bundled_modules TEXT[]` (DDL en `GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1.md` §5.4) es la única evidencia de "módulo del portal incluido en el servicio". `getActiveCommercialTerms` la expone como `bundledModules` (ordenado).
+2. **Validación al escribir (`declareCommercialTerms`, `src/lib/commercial/sample-sprints/commercial-terms.ts`):** cada clave cumple `^[a-z0-9][a-z0-9_]{1,63}$`, sin repetidos, máximo 20; y en la misma transacción `assertBundledModulesActive` exige que exista en `greenhouse_client_portal.modules` con `effective_to IS NULL AND effective_from <= CURRENT_DATE` (falla cerrado con `CommercialTermsValidationError`). El audit log recibe `bundledModules`; el evento `service.engagement.declared` v1 conserva su payload (sin cambio de contrato).
+3. **Contrato programático:** `GET|POST /api/platform/app/commercial/services/[serviceId]/terms` (`src/lib/api-platform/resources/app-commercial-terms.ts`): GET con `commercial.engagement.read`, POST con `commercial.engagement.declare`; `declaredBy` sale de la sesión humana, nunca del body; sesión de agente (`authMode='agent'`) y bearer sister-platform OAuth reciben `403 invalid_delegated_context` para declarar. Errores canónicos `commercial_terms_conflict` y `commercial_terms_service_not_eligible` (`src/lib/api-platform/core/errors.ts`). CLI: `scripts/commercial/declare-commercial-terms.ts`.
+4. **Datos 2026-09-10:** Berel → `seo_v2`, `ai_visibility_v1`; Sky → `creative_hub_globe_v1`; `monthly_amount_clp = NULL` en ambos (la fuente no informa importes). Un servicio sin módulo en el catálogo se declara sin `bundled_modules`; el consumidor (habilitación de servicios, TASK-1852) no inventa módulos. El cascade al completar onboarding (TASK-828) sigue pendiente.
 
 ## Delta v1.10 (2026-05-07) — TASK-809 UI real + API wizards
 
@@ -266,6 +273,8 @@ CREATE UNIQUE INDEX engagement_commercial_terms_active_unique
 CREATE INDEX engagement_commercial_terms_kind_idx
   ON greenhouse_commercial.engagement_commercial_terms (terms_kind, effective_from)
   WHERE effective_to IS NULL;
+-- Delta v1.12 (TASK-1852): + bundled_modules TEXT[] (DDL en GREENHOUSE_CLIENT_PORTAL_DOMAIN_V1 §5.4);
+-- validado al escribir contra greenhouse_client_portal.modules activos, sin FK física (boundary cross-schema).
 
 -- Capa 3: fases declarativas (reusable más allá de Sample Sprints)
 CREATE TABLE greenhouse_commercial.engagement_phases (
@@ -937,4 +946,5 @@ Si el reactive consumer falla (paso 6):
 | 2026-05-05 | 1.0 | Claude (Opus 4.7) | Spec inicial — propuesta no implementada |
 | 2026-05-05 | 1.1 | Claude (Opus 4.7) — auditoría con `arch-architect` | Delta v1.1: 3 errores materiales corregidos (schema cost attribution, FK actor, cita TASK-728), 4 supuestos verificados (lifecycle enum, source enum, subsystem novel, owner approve), DDL completa de `pilot_decision_audit_log` agregada, índices faltantes (lineage, approvals pending, outcomes decision), boundary transaccional explícito en §8, lifecycle history canónico aplicado en §10.2, patrón TASK-409 + TASK-760/761/762 reusados explícitamente. Score 4-pilar: 6.75/10 → 8.5/10 estimado. |
 | 2026-05-05 | 1.2 | Claude (Opus 4.7) — pre-flight check + naming "Sample Sprint" | Delta v1.2: rebrand UI "Sample Sprint" + sub-tipos (Operations/Extension/Validation/Discovery Sprint); naming sweep de tablas a `engagement_*` (genérico — sobrevive marketing pivots); 5 decisiones de alcance V1 resueltas (B1 naming híbrido, B2 notif diferidas a V2, B3 progress snapshots incluido, B4 capacity warning soft, B5 reporte manual con structured fields); nueva tabla `engagement_progress_snapshots` (Slice 4.5); extensión `client_team_assignments.service_id` FK opcional; outcome enum extendido con `cancelled_by_client/provider` + `cancellation_reason`; `next_quotation_id` para pricing post-conversión; capability `commercial.engagement.record_progress` nueva; signal `commercial.engagement.stale_progress` nueva; 9 outbox events (vs 6 en v1.1); 16 hard rules (vs 11); 16 smoke tests (vs 8); 10 open questions (vs 7). Score 4-pilar: 8.5/10 → 9.0/10 estimado. **Spec lista para `greenhouse-task-planner`**. |
+| 2026-09-10 | 1.4 | Claude — TASK-1852 | Delta v1.12: `bundled_modules` validado al escribir (`assertBundledModulesActive`, regex + ≤20 + únicos), contrato App API `GET|POST /api/platform/app/commercial/services/[serviceId]/terms` + CLI `declare-commercial-terms.ts`, errores `commercial_terms_conflict`/`commercial_terms_service_not_eligible`; Berel/Sky declarados. |
 | 2026-05-07 | 1.3 | Codex — TASK-806 runtime alignment | `commercial_cost_attribution_v2` ahora propaga `service_id` y deriva `attribution_intent` desde services non-regular aprobados con guard TASK-813; `gtm_investment_pnl` real usa `amount_clp`, filtra `terms_kind='no_cost'`, exige approval aprobado vía `EXISTS` y documenta explícitamente que es management accounting, no auditoría cliente/fiscal. |

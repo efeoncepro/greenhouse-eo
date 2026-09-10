@@ -60,7 +60,22 @@ responde "prohibido". Invitar exige un permiso propio (`efeonce.mcp.identity.wri
 aparte del permiso base. El **token de la invitación nunca vuelve al agente**: se entrega por correo. Comparte
 interruptor, identidad y consumer con los providers SEO y de manuales, porque es la misma lane.
 
-El snapshot de TASK-1837 registró 39 tools; TASK-1844 agregó discovery organizacional propio del gateway.
+Desde el 10 de septiembre de 2026 hay una **quinta capacidad**: la **habilitación de servicios de cliente**
+(`TASK-1852`). Una administradora interna de Efeonce puede, desde su cliente MCP, previsualizar
+(`preview_client_service_enablement`), aplicar (`apply_client_service_enablement`) y revertir
+(`rollback_client_service_enablement`) el acceso de una organización cliente a los módulos que contrató. Es la
+primera escritura del gateway donde **quien actúa es la persona, no la máquina**: el gateway cambia el token
+corporativo de la persona por uno de Greenhouse de corta vida (cliente dedicado `efeonce-mcp-client-services`) y
+Greenhouse vuelve a comprobar, en cada llamada, que esa persona tenga el permiso de habilitar módulos; el recibo
+queda marcado como autoridad delegada. Las tres tools exigen un permiso propio
+(`efeonce.mcp.client_services.write`), también la previsualización. Sólo responden al carril corporativo Entra: una
+conexión de Efeonce ID —interna v2 o externa— las recibe denegadas. El provider tiene su propio interruptor
+(`GREENHOUSE_CLIENT_SERVICES_PROVIDER_ENABLED`) y Greenhouse gatea además con
+`CLIENT_SERVICE_ENABLEMENT_WRITES_ENABLED`. Detalle operativo en el
+[runbook de habilitación de servicios](../../operations/CLIENT_SERVICE_ENABLEMENT_RUNBOOK_V1.md).
+
+El snapshot de TASK-1837 registró 39 tools; TASK-1844 agregó discovery organizacional propio del gateway;
+TASK-1852 (`1.4.0`, 2026-09-10) llevó la superficie a 43 tools.
 El inventario vigente se lee del servidor y de `surface-baseline.json` en `efeonce-mcp`. Lo que ve un cliente
 concreto depende de su emisor, población, permisos y flags. El catálogo global no equivale a autoridad universal.
 
@@ -186,6 +201,11 @@ Disponible hoy:
   invitación delegada apagado en Greenhouse responden "no habilitado", nunca una pista de que existe. Todavía no
   hay una primera organización cliente real habilitada —es una decisión comercial, no técnica—, así que hoy sólo
   están probadas en staging y por los rechazos verificados contra producción.
+- `preview_client_service_enablement`, `apply_client_service_enablement` y `rollback_client_service_enablement`
+  para abrir o revertir el acceso de una organización cliente a sus servicios contratados, sólo para personas
+  internas con permiso de habilitar módulos y un token corporativo Entra que porte
+  `efeonce.mcp.client_services.write`. Están desplegadas y el estado del gateway las reporta como habilitadas;
+  todavía no se ha ejecutado ninguna habilitación real por este canal (falta el primer canary con una persona).
 
 No disponible:
 
@@ -201,10 +221,11 @@ El servicio conserva Entra legado y tiene un piloto corporativo nativo verificad
 una capability de lectura y un binding de workspace exacto. Esto evita que una conexión MCP sea un bypass de
 los permisos de Globe.
 
-El gateway maneja seis permisos: el permiso base de conexión, el permiso de lectura de Globe, el permiso de
+El gateway maneja siete permisos: el permiso base de conexión, el permiso de lectura de Globe, el permiso de
 escritura interna para el fondeo de créditos, el permiso de escritura SEO (`efeonce.mcp.seo.write`), el permiso de
-lectura de Hiring y el permiso de escritura de identidad (`efeonce.mcp.identity.write`, para invitar personas a la
-propia organización). El PRM publica sólo el permiso base; los demás se descubren en el `403 insufficient_scope`
+lectura de Hiring, el permiso de escritura de identidad (`efeonce.mcp.identity.write`, para invitar personas a la
+propia organización) y, desde el 2026-09-10, el permiso de habilitación de servicios de cliente
+(`efeonce.mcp.client_services.write`, exigido también por la previsualización). El PRM publica sólo el permiso base; los demás se descubren en el `403 insufficient_scope`
 de la tool exacta y siguen sujetos a sus flags, policy, capability y autoridad downstream.
 
 Los entitlements por organización/persona ya existen, el gateway multi-issuer está construido y la matriz
@@ -214,14 +235,15 @@ histórico puede conservar lectura de Globe, pero ya no representa el bootstrap 
 
 ### Por qué un permiso puede existir sin que Entra lo emita
 
-Los seis permisos no salen todos del mismo emisor, y eso es deliberado. Entra es el carril **interno** —personas
+Los siete permisos no salen todos del mismo emisor, y eso es deliberado. Entra es el carril **interno** —personas
 del tenant corporativo—; Efeonce ID es el carril del **cliente externo**. Un permiso vive donde vive la clase de
 actor que puede ejercerlo.
 
 El caso concreto es el permiso de escritura de identidad (`efeonce.mcp.identity.write`): el gateway lo acepta
 en la policy de la tool, pero no lo anuncia en bootstrap y **no existe en la aplicación de recurso de Entra**.
 Verificado el 2026-09-06
-contra el directorio real: esa aplicación define cinco permisos y ése no está entre ellos. No es un descuadre.
+contra el directorio real: esa aplicación define cinco permisos y ése no está entre ellos (el 2026-09-10 se le sumó
+el permiso de habilitación de servicios de cliente; el de identidad sigue fuera). No es un descuadre.
 Lo emite Efeonce ID, porque su sujeto es una persona externa del cliente administrando a las personas de su
 propia organización — algo que ninguna credencial del tenant corporativo debería poder hacer en nombre de un
 cliente. El nombre del permiso es el mismo string en ambos lados a propósito, para que el gateway verifique uno
@@ -238,7 +260,8 @@ escritura; se verificó el mismo día. La forma correcta de cerrar el hueco es n
 
 ## Relación con otros MCP
 
-Este gateway no reemplaza el MCP local/remoto de Greenhouse (que no es read-only: registra 7 escrituras). Ese MCP sirve al portal Greenhouse y sus
+Este gateway no reemplaza el MCP local/remoto de Greenhouse (que no es read-only: su manifiesto registra 9
+escrituras al 2026-09-10, incluidas `apply_`/`rollback_client_service_enablement`). Ese MCP sirve al portal Greenhouse y sus
 contratos ecosystem; Efeonce MCP Gateway sirve como borde federado para productos hermanos y capacidades futuras.
 
 Los manuales son el mismo primitive en los dos bordes: el MCP de Greenhouse los sirve como tool y como recurso

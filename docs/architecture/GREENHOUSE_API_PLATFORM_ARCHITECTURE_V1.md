@@ -1251,6 +1251,14 @@ En este DTO la clave viaja en `idempotencyKey`, compartida por App, CLI y Nexa; 
 su fingerprint y ámbito organización. Contrato de rutas/autoridad:
 [service enablement](../operations/CLIENT_SERVICE_ENABLEMENT_RUNBOOK_V1.md) y OpenAPI público.
 
+Autoridad del recibo (`resolveServiceEnablementAuthority`, `app-client-service-enablement.ts`, delta 2026-09-10):
+`app_session` para la sesión humana del portal, o `delegated_oauth` cuando el bearer `sister_platform_oauth` fue
+acuñado por RFC 8693 para una persona interna a través del cliente `efeonce-mcp-client-services` (modo `agent`,
+scope `client_services.enablement.write`); el lane relee la capability de la operación en cada llamada y registra
+`clientId`/`accessTokenId`/`correlationId`. A diferencia de Hiring (§«Confirmar es fail-closed para agentes
+delegados»), este bearer delegado SÍ confirma, porque representa a una persona verificada; el agente diagnóstico
+de tenant sólo previsualiza, y el lane ecosystem responde `403 invalid_delegated_context` a escrituras por diseño.
+
 ### 12.5 Alcance V1
 
 No es obligatorio retrofitear todas las rutas históricas del repo.

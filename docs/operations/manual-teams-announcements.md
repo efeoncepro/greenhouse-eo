@@ -13,6 +13,8 @@ Canal canónico para anuncios manuales enviados por el Greenhouse TeamBot, sin d
 
 - `eo-team` → chat grupal `EO Team`
 
+> **Delta 2026-09-10 (TASK-1852):** las filas `client-teams-chat-<spaceId>` de `greenhouse_core.teams_notification_channels` (chats grupales compartidos con clientes, `recipient_kind='chat_group'`) **no son destinos de este CLI** y no están en `src/config/manual-teams-announcements.ts`. Existen para que Notifications entregue avisos gobernados por evento y preferencia; registrarlas no envió ningún mensaje. No uses `pnpm teams:announce` ni un puente temporal para "probar" en el chat de un cliente.
+
 ## Ubicar `EO - Team`
 
 El destino no se busca por texto libre al momento de enviar. El chat grupal de EO está registrado en código como destino estable:

@@ -158,6 +158,8 @@ Conexión a la DB:
 pnpm pg:connect:shell
 ```
 
+> **Delta 2026-09-10 (TASK-1852):** el UPDATE anterior aplica sólo a los canales Logic App legados. Un chat grupal compartido con un cliente **no se registra por SQL**: se persiste con `recipient_kind='chat_group'` vía `POST /api/admin/clients/[organizationId]/lifecycle/teams/chat` (`writeTeamsGroupChatForSpace`), que inspecciona el chat por Graph en modo lectura y deja `ready` sólo si el bot está instalado. Registrar no envía nada. Ver `GREENHOUSE_TEAMS_NOTIFICATIONS_V1.md` Delta v1.3.
+
 ## 6. Smoke end-to-end
 
 ```bash

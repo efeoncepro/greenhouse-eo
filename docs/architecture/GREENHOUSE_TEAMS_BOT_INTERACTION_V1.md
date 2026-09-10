@@ -1,11 +1,17 @@
 # GREENHOUSE_TEAMS_BOT_INTERACTION_V1
 
 > **Tipo de documento:** Spec arquitectura canónica
-> **Versión:** 1.7
+> **Versión:** 1.8
 > **Creado:** 2026-04-26 por TASK-671 (Claude)
-> **Última actualización:** 2026-09-01 por Codex — bump a v1.7; evidencia Performance Report grupal + 1:1
+> **Última actualización:** 2026-09-10 por Claude (TASK-1852) — bump a v1.8; CHECK legado relajado y chat grupal de cliente como destino registrado
 > **Estado:** vigente
 > **Specs relacionadas:** `GREENHOUSE_TEAMS_NOTIFICATIONS_V1.md` v1.2 (transport), `GREENHOUSE_NOTIFICATION_HUB_V1.md` (orquestador upstream — TASK-690)
+
+## Delta v1.8 (2026-09-10 — TASK-1852: chat grupal de cliente como destino registrado)
+
+- **CHECK legado relajado.** Hasta el 2026-09-10, `teams_notification_channels_kind_bot_check` exigía `team_id` + `channel_id` para toda fila `teams_bot`, lo que hacía imposible persistir `recipient_kind='chat_group'` aunque el dispatcher lo soportara. La migración `20260910013234351_task-1852-teams-chat-group-bot-check.sql` deja ese CHECK sólo sobre la identidad del bot (`bot_app_id`, `azure_tenant_id`) y aborta si no existe `teams_notification_channels_recipient_consistency_check`, que sigue gobernando qué columnas exige cada `recipient_kind`. El `Down` restaura la definición TASK-669 y falla si hay filas `chat_group`/`chat_1on1`/`dynamic_user` con `teams_bot`.
+- **Destino de cliente registrado, nunca inferido.** `writeTeamsGroupChatForSpace` + `inspectGroupChatForLinking` (`src/lib/client-onboarding/teams-connect-store.ts`, `teams-channels-reader.ts`) registran el chat compartido con un cliente como `client-teams-chat-<spaceId>` tras validar el id (`isTeamsGroupChatId`, formato `19:…@thread.v2`) e inspeccionarlo por Graph en modo lectura (`GET /v1.0/chats/{id}` + `/installedApps?$expand=teamsApp`); `ready` sólo con membresía del bot verificada, si no `pending_setup` con razón. Ruta `POST /api/admin/clients/[organizationId]/lifecycle/teams/chat` (capability `client.lifecycle.case.advance`; el Space se resuelve server-side). El registro no envía nada.
+- **Superficie manual intacta.** `pnpm teams:announce` sigue operando únicamente los destinos de `src/config/manual-teams-announcements.ts`; los chats de clientes registrados por TASK-1852 no son destinos de anuncio manual.
 
 ## Delta v1.7 (2026-09-01 — Performance Report grupal + lecturas personales)
 
@@ -173,7 +179,8 @@ El bot **no** es un agente conversacional. Solo emite notificaciones y recibe `A
 
 CHECK constraint compuesto:
 - `channel_kind = 'azure_logic_app'` → siempre OK (legacy).
-- `channel_kind ∈ {'teams_bot','graph_rsc'}` → exactamente uno de los 4 paths del recipient_kind debe estar bien formado.
+- `channel_kind ∈ {'teams_bot','graph_rsc'}` → exactamente uno de los 4 paths del recipient_kind debe estar bien formado (`teams_notification_channels_recipient_consistency_check`).
+- `channel_kind ∈ {'teams_bot','graph_rsc'}` → `bot_app_id` + `azure_tenant_id` obligatorios (`teams_notification_channels_kind_bot_check`, relajado por TASK-1852 el 2026-09-10: ya no exige `team_id`/`channel_id`, que sólo aplican a `recipient_kind='channel'`).
 
 ### `greenhouse_core.teams_bot_inbound_actions` (nueva — TASK-671)
 
