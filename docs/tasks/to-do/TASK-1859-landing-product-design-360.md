@@ -77,6 +77,7 @@ Revisar y respetar:
 - `docs/architecture/GREENHOUSE_GROWTH_MEETINGS_SCHEDULER_ARCHITECTURE_V1.md` — `open_meeting_scheduler`, binding de surface, native-only.
 - `docs/architecture/GREENHOUSE_PUBLIC_SITE_ASTRO_RUNTIME_STRATEGY_DECISION_V1.md` — dirección Astro aceptada, WordPress sigue sirviendo.
 - `docs/context/09_marca-agencia.md` y `docs/context/05_voz-tono-estilo.md` — lidera Efeonce; tuteo; beneficios antes que siglas.
+- `docs/context/13_icp-buyer-personas-jtbd.md` — **BP9 (candidata)**: líder de diseño in-house; roles, JTBD, anti-ICP por fase, triggers y plan de validación.
 
 Reglas obligatorias:
 
@@ -276,7 +277,7 @@ Reglas obligatorias:
 ### Slice 2 — Copy y claims
 
 - Primera pasada de craft hecha el 2026-09-10 (`## Copy Audit` del wireframe): gran idea al H1, antítesis de 5 a 2, tuteo, género, numerales.
-- **Validar con voz del cliente real** antes de cerrar el slice: no existe perfil de líder de diseño en `docs/context/13_icp-buyer-personas-jtbd.md`, así que el copy sigue siendo hipótesis.
+- **Validar con voz del cliente real** antes de cerrar el slice. El perfil existe desde el 2026-09-10 como **BP9 candidata** en `docs/context/13_icp-buyer-personas-jtbd.md`, pero sin entrevistas: el copy sigue siendo hipótesis y se valida con el mismo plan de BP9.
 - Re-verificar C2–C5 contra WebAIM (as-of vigente) y C6 con Legal; confirmar C1 con marca.
 - Confirmar que el nombre interno de la familia no aparece en ningún string.
 

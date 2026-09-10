@@ -156,6 +156,8 @@ encargo pertenece a **Creative Services / Globe**.
 | **Procurement** | Compras y Legal | SOW, IP del diseño, DPA cuando hay research con usuarios |
 | **🔴 El veto** | **El propio Head of Design** | Si el pitch huele a reemplazo, mata el deal — sin importar que el CMO o el CPO quieran firmar |
 
+**Perfil corporativo:** BP9 (candidata, `hypothesis_only`) en [`13_icp-buyer-personas-jtbd.md`](../../context/13_icp-buyer-personas-jtbd.md) — la misma hipótesis de este contrato, con anti-ICP por fase, mapa de dolores y plan de validación.
+
 **Corrección explícita respecto de V1:** el diseñador interno **no es un blocker**. Es el comprador. Tratarlo como
 obstáculo fue el error de tesis de V1 y es el error que pierde este deal en la primera reunión.
 

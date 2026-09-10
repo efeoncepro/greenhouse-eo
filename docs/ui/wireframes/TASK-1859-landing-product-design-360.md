@@ -15,6 +15,7 @@
 
 - Primary user: **Head of Design / Design Director / Design Manager** de una empresa mid-market o enterprise **que ya tiene equipo de diseño in-house** y no alcanza a cubrir su demanda. Es el operador, el campeón y —si la página huele a reemplazo— el veto.
 - Secondary user: **CPO / CTO / VP Product**, comprador económico. Llega reenviado por el Head of Design o por el reframe de ingeniería de la región 3.
+- Perfil de referencia: **BP9 (candidata, `hypothesis_only`)** en [`13_icp-buyer-personas-jtbd.md`](../../context/13_icp-buyer-personas-jtbd.md) — roles, JTBD, anti-ICP por fase, triggers y plan de validación. **Riesgo que ordena la región 3:** el Head of Design puede adoptar pero no suele poder comprar; el presupuesto vive en CPO/CTO.
 - User moment: descubrimiento (orgánico/AEO/referido) o, en fase B, **envío 1:1 durante una conversación comercial**. Los primeros diez segundos deciden si sigue leyendo.
 - Job to be done: *"Necesito que salgan las lanes que mi equipo nunca alcanza, sin sumar headcount que después no puedo sostener, y sin traer un proveedor que le diga a mi jefe que mi equipo no da el ancho."*
 - Primary decision signal: *"Esta gente entiende que ya tengo equipo, me deja elegir qué delegar, y puedo verificar si cumplen."* → agenda una reunión.
@@ -150,6 +151,7 @@ La secuencia no es un folleto (servicios → por qué nosotros). Es una arquitec
 
 - **Propósito:** objeciones de venta reales + answer capsules. Cada respuesta es autónoma (40–70 palabras) y citable fuera de contexto.
 - **Implementación:** botones nativos que controlan paneles; o `details/summary` si el runtime lo permite sin romper estilos. Marcado `FAQPage` sólo con preguntas visibles en la página.
+- **Pregunta 8** enruta el anti-ICP estratégico de BP9 —empresa sin equipo de diseño— al diseño integral, en vez de perder la visita: el H1 da por hecho que existe un equipo, y ese visitante hoy se iría.
 
 ### Región 12 — CTA final
 
@@ -208,10 +210,10 @@ La skill de copywriting pide *verbo + valor* (*"Revisemos tu roadmap"* rinde má
 
 ### 🔴 Lo que esta pasada NO puede resolver: no hay voz del cliente
 
-`docs/context/13_icp-buyer-personas-jtbd.md` **no tiene un perfil de líder de diseño in-house**: existen BP4 (CTO) y BP6 (Brand Manager / Director de Arte, lado creativo). Las palabras de este ledger salieron de encuestas financiadas por proveedores y de reseñas sobre diseño de **marketing**, no de conversaciones con este comprador. Por regla de la skill, **el copy queda marcado como hipótesis**.
+Al momento de la auditoría, `13_icp` no tenía perfil de líder de diseño in-house (sólo BP4, CTO, y BP6, del lado creativo). **Se agregó el 2026-09-10 como BP9 candidata**, pero con la misma evidencia que este ledger: encuestas financiadas por proveedores y reseñas sobre diseño de **marketing**. **Agregar el perfil no es voz del cliente**: ordena la hipótesis, no la valida. El copy sigue marcado como hipótesis hasta que corra el plan de validación de BP9.
 
 - **Requisito antes de cerrar Slice 2:** al menos 5 conversaciones con Heads of Design o Design Directors in-house, registrando sus palabras literales para el dolor de capacidad, y ajustar el ledger a ellas.
-- **Recomendación fuera de esta task:** agregar el perfil *Head of Design / Design Director* a `13_icp-buyer-personas-jtbd.md` (owner: Strategy + Commercial).
+- **Hecho 2026-09-10:** perfil *Head of Design / Design Director* agregado a `13_icp` como **BP9 candidata** (`hypothesis_only`), con plan de validación propio: sus ≥ 5 conversaciones son las mismas que exige este ledger.
 
 ### Lo que no se tocó, y por qué
 
@@ -311,6 +313,8 @@ Copy es-CL, tuteo, sin voseo, beneficios antes que siglas, lidera Efeonce. Estad
 | `publicsite.capacidad-diseno.faq.a6` | 11 | Sí. Entregamos flujos, estados y especificaciones listos para construir, y verificamos que lo construido corresponda a lo diseñado. | — | método, no garantía de resultado |
 | `publicsite.capacidad-diseno.faq.q7` | 11 | ¿Pueden revisar lo que ya generamos con IA? | — | — |
 | `publicsite.capacidad-diseno.faq.a7` | 11 | Sí. Revisamos consistencia con tu sistema, accesibilidad y estados faltantes en lo ya generado, y dejamos un filtro para lo que se genere después. | — | L7 |
+| `publicsite.capacidad-diseno.faq.q8` | 11 | ¿Y si no tenemos equipo de diseño? | — | anti-ICP de BP9: enruta al diseño integral en vez de perder la visita · audit 2026-09-10 |
+| `publicsite.capacidad-diseno.faq.a8` | 11 | También trabajamos con empresas sin equipo propio. En ese caso diseñamos el producto o la superficie completa y la entregamos lista para construir. Conversemos para ver qué conviene. | — | answer capsule; oferta secundaria de la familia, sin precio · audit 2026-09-10 |
 | `publicsite.capacidad-diseno.cta_final.h2` | 12 | Conversemos tu capacidad de diseño. | — | — |
 | `publicsite.capacidad-diseno.cta_final.body` | 12 | Trae tu roadmap. Lo revisamos contigo y te decimos por dónde empezaríamos. | — | promesa proporcional a una reunión |
 | `publicsite.capacidad-diseno.cta_final.button` | 12 | Agenda una reunión | — | idéntico al primario |
