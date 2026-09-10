@@ -248,7 +248,7 @@ El cliente nunca compra "la fase". Compra el resultado.
 | # | Decisión | Quién |
 |---|---|---|
 | ~~D1~~ | **Resuelta 2026-09-10:** owner interino de la línea = Julio Reyes. Revisar cuando la fase 1 tenga dos cuentas operando | Leadership |
-| D8 | Monto de capital asignado, líneas de factoring disponibles y tamaño máximo de contrato financiable | Julio Reyes + Finance |
+| ~~D8~~ | **Resuelta 2026-09-10:** capital asignado CLP 40.000.000. Modelo, asignación y topes por contrato en [`CHANNEL_COMMERCE_CAPITAL_AND_CASH_MODEL_V1`](CHANNEL_COMMERCE_CAPITAL_AND_CASH_MODEL_V1.md); pendiente validación de Finance y confirmación de líneas de factoring | Julio Reyes + Finance |
 | D9 | Con qué proveedores se firma back-to-back en cada capa — estructura y candidatos en [`CHANNEL_COMMERCE_SUPPLIER_REGISTRY_V1`](CHANNEL_COMMERCE_SUPPLIER_REGISTRY_V1.md) | Julio Reyes + Legal |
 | D10 | Si la fase 2 arranca por field leads o por captura | Operations + Finance, con los datos de fase 1 |
 
