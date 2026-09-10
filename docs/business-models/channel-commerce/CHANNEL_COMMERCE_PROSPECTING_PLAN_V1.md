@@ -1,6 +1,6 @@
 # Channel & Commerce — Plan de apertura y prospección V1
 
-> **Status:** `Proposed`
+> **Status:** `Proposed` — mensaje y posicionamiento **corregidos** por el [benchmark chileno 2026-09-10](../../audits/commercial/CHANNEL_COMMERCE_CHILE_MARKET_BENCHMARK_2026-09-10.md)
 > **Owner:** Commercial + owner de línea (por nombrar, decisión D1)
 > **Date:** 2026-09-10
 > **Mercado:** Chile
@@ -39,6 +39,11 @@ las marcas de la categoría.
 
 Con eso, la reunión deja de ser "te cuento qué hacemos" y pasa a ser "esto es lo que vimos en tus tiendas la
 semana pasada; ¿lo sabías?".
+
+**Ajuste tras el benchmark.** La radiografía **no** debe presentarse como prueba de que Efeonce mide mejor: hay
+actores que miden hace años. Su valor es distinto — cruzar lo observado en sala con la presencia digital del
+producto en esas mismas cadenas y con su visibilidad en motores de respuesta. Esa lectura combinada es la que el
+prospecto no ha visto antes, y es la que sí distingue.
 
 **Costo:** el de una decena de misiones. Es el activo comercial más barato y más convincente que esta línea puede
 producir antes de tener un cliente.
@@ -114,24 +119,34 @@ presentación de la foto al problem owner (Gerente Comercial) → propuesta de d
 
 ## 7. El mensaje
 
-**Posicionamiento:** Efeonce no es una agencia de terreno. Es quien te dice **dónde** intervenir y **por qué**, y
-puede intervenir donde la evidencia lo justifica.
+**Posicionamiento corregido.** El benchmark descartó el ángulo original ("nadie mide tu ejecución"): en Chile eso
+es falso y el prospecto probablemente ya trabaja con quien sí mide. El eje es otro:
 
-**Apertura recomendada:** una pregunta que el prospecto no puede responder con precisión — qué porcentaje de sus
-puntos de venta cumplió el planograma el mes pasado, y cuánto le costó averiguarlo.
+> Tu ejecución en tienda y tu inversión digital se miden por separado y nadie las cruza.
+
+Efeonce no compite con quien audita ni con quien pone gente: **conecta la ejecución física con el retail media de
+la cadena, el anaquel digital, la visibilidad en motores de IA y el contenido**, que es donde el mercado global ya
+se está moviendo y donde ningún actor chileno del peer set se posiciona.
+
+**Apertura recomendada:** no preguntar si mide su ejecución —puede que sí—. Preguntar si puede cruzar lo que pasa
+en la góndola con lo que invierte en la red de medios de esa misma cadena, y qué decisión toma con las dos cosas
+juntas.
 
 **Argumentos disponibles hoy:**
 
 - El canal tradicional mueve más de la mitad del consumo masivo en varios mercados LATAM sin data de ejecución.
+- Retail media pasó de ~5% a una proyección de 7% de la inversión digital chilena, con las redes de las cadenas
+  ya activas: la inversión crece más rápido que la capacidad de leerla junto con la ejecución física.
 - El modelo de triage —auditar barato en toda la red e intervenir sólo donde hay incumplimiento— es lo que usan
   las marcas líderes.
 - La jornada baja a 42 horas y luego a 40 sin reducción de sueldo: el costo por hora de cobertura sube por ley
   hasta 2028. Todo modelo de cobertura fija se encarece; el variable no.
-- Efeonce opera capacidad humana con instrumental propio: costo cargado, utilización, OTD, FTR y cumplimiento
-  documental. La agencia incumbente lleva eso en Excel.
+- Una activación sin diseño de control no se puede evaluar después.
 
 **Argumentos prohibidos:** cualquier cifra de incremento de venta; porcentajes de ahorro frente a su agencia
-actual; cobertura nacional; tiempos de respuesta; y "Perfect Store" como resultado garantizado.
+actual; cobertura nacional; tiempos de respuesta; "Perfect Store" como resultado garantizado; y **cualquier
+afirmación de que el mercado no mide o de que Efeonce trae una tecnología que no existe en Chile** — es falso,
+verificable en un minuto, y quema la reunión.
 
 **Craft del mensaje:** `copywriting` para la narrativa; `greenhouse-ux-writing` no aplica (no es copy de producto).
 
@@ -141,8 +156,10 @@ actual; cobertura nacional; tiempos de respuesta; y "Perfect Store" como resulta
 2. Ficha del Channel Execution Diagnostic con alcance, exclusiones y criterio de aceptación.
 3. La Radiografía de Ejecución de al menos una categoría.
 4. Ejemplo del modelo de scoring y de la lista priorizada, con datos de la radiografía.
-5. Respuesta preparada a las tres objeciones seguras: "ya tengo agencia de terreno", "eso lo hace Nielsen", y
-   "¿me garantizas que sube la venta?".
+5. Respuesta preparada a las cuatro objeciones seguras, ahora con nombre propio: **"ya trabajo con Treid o
+   equivalente"**, **"eso lo cubro con Snuuper"**, "eso me lo da Nielsen o Kantar", y "¿me garantizas que sube la
+   venta?". Las dos primeras no se responden compitiendo: se responden mostrando qué queda sin resolver **después**
+   de tenerlos.
 
 Owner de producción: `deck-studio` + `commercial-expert`. La línea no sale a la calle sin los cinco.
 

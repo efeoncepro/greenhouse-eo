@@ -2,7 +2,7 @@
 
 > **Línea de negocio:** Channel & Commerce (en mercado: **trade marketing**)
 > **Marca contractual:** Efeonce
-> **Estado:** `Proposed` — habilita prospección exploratoria y diagnósticos cotizados caso a caso
+> **Estado:** `Proposed`, con `re-scope` pendiente tras el [benchmark chileno 2026-09-10](../../audits/commercial/CHANNEL_COMMERCE_CHILE_MARKET_BENCHMARK_2026-09-10.md) — habilita prospección exploratoria y diagnósticos cotizados caso a caso
 > **Mercado inicial:** Chile
 > **Última actualización:** 2026-09-10
 > **Modelo económico:** [`CHANNEL_COMMERCE_BUSINESS_MODEL_V1`](../../business-models/channel-commerce/CHANNEL_COMMERCE_BUSINESS_MODEL_V1.md)
@@ -122,8 +122,15 @@ garantía de venta o sell-out.
 verificable. **Trust policy:** si la cobertura efectiva no supera el umbral del ciclo, se entrega degradado y
 declarado; nunca se extrapola.
 
-**Responsabilidades.** Efeonce dirige, supervisa y capacita a su red — indelegable. Cliente entrega surtido
-objetivo, precio objetivo, planograma y autorizaciones.
+**Quién captura.** La captura puede ejecutarse con red propia o con un proveedor especializado bajo la capa de
+partners. El [benchmark chileno](../../audits/commercial/CHANNEL_COMMERCE_CHILE_MARKET_BENCHMARK_2026-09-10.md)
+recomienda **partner**: existen redes crowdsourced regionales con una década de operación, y construir una propia
+sería competir por una capacidad contratable. Lo que Efeonce conserva en cualquier caso es el diseño del scoring,
+la validación del dato, la traducción a decisión y la accountability ante el cliente.
+
+**Responsabilidades.** Cuando la red es propia, Efeonce dirige, supervisa y capacita — indelegable. Cuando es de
+un partner, Efeonce responde por el resultado y gobierna al proveedor. Cliente entrega surtido objetivo, precio
+objetivo, planograma y autorizaciones.
 
 **Métricas.** Cobertura efectiva; tasa de rechazo de misión; integridad del dato; tiempo de ciclo; adherencia a la
 priorización.
@@ -183,8 +190,9 @@ presupuesto.
 **Economía.** Fee de gobierno de Efeonce. El costo de los proveedores es **pass-through sin margen**. Se rige por
 [`EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1`](../../business-models/EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md).
 
-**Por qué importa.** Es el servicio de mayor margen y menor riesgo operativo de la línea, y el único que no
-requiere que Efeonce tenga red propia.
+**Por qué importa — y por qué subió de prioridad.** Es el servicio de mayor margen y menor riesgo operativo de la
+línea, y el único que no requiere red propia. El benchmark chileno encontró que **ningún actor del mercado se
+posiciona gobernando a otros: todos se posicionan ejecutando**. Es el espacio menos disputado del peer set.
 
 ---
 

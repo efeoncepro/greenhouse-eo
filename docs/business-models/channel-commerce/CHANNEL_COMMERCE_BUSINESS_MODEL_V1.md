@@ -1,6 +1,6 @@
 # Channel & Commerce — Business Model V1
 
-> **Status:** `Proposed`
+> **Status:** `Proposed` — **re-scope pendiente** tras el benchmark chileno del 2026-09-10 (ver §12 y §13)
 > **Owner:** Efeonce Strategy + Commercial (owner de línea por nombrar) · Finance (economics) · Legal (figura laboral) · Operations (capacidad de terreno)
 > **Version:** 1.0
 > **Date:** 2026-09-10
@@ -23,11 +23,18 @@ priorización de intervención, remediación gobernada y lectura del retorno de 
 **A quién.** Marcas con venta a través de terceros —consumo masivo, ferretería y mejoramiento del hogar, farma,
 bebidas, mascotas, y cualquier marca con distribuidores— donde el presupuesto de canal vive en Comercial/Ventas.
 
-**Por qué gana.** El mercado LATAM tiene un punto ciego declarado: el canal tradicional mueve más de la mitad del
-consumo masivo en varios mercados y las marcas no tienen data real de ejecución en él. Los incumbentes venden
-cabezas; Efeonce vende decisión con evidencia, y opera esa evidencia sobre un sistema propio (Greenhouse) que ya
-mide costo cargado por persona, utilización, OTD, FTR y RpA. Ninguna agencia de terreno LATAM opera con ese
-instrumental.
+**Por qué gana — corregido tras el benchmark del 2026-09-10.** La versión original de este documento afirmaba que
+ninguna agencia de terreno LATAM operaba con instrumental de medición. **Eso es falso para Chile** y no debe
+repetirse: Treid opera desde 2011 con plataforma propia (TREID-X: sell-in + anaquel + sell-out, IA de imagen) en
+tres países, y Snuuper opera captura crowdsourced con más de 200.000 auditores en cinco países.
+
+Lo que queda como diferenciador verificable es **la conexión entre la ejecución física y el resto de la inversión
+digital de la marca** —retail media de la cadena, digital shelf, visibilidad en motores de respuesta IA, contenido
+y medición unificada—, que ningún actor del peer set chileno declara operar. El instrumental propio de Efeonce
+para gobernar capacidad humana (costo cargado, utilización, OTD, FTR) sigue siendo una ventaja **operativa**, pero
+no es el argumento de venta: es cómo se sostiene el margen.
+
+Benchmark: [`CHANNEL_COMMERCE_CHILE_MARKET_BENCHMARK_2026-09-10`](../../audits/commercial/CHANNEL_COMMERCE_CHILE_MARKET_BENCHMARK_2026-09-10.md).
 
 **Cómo cobramos.** Tres motores separados: diagnóstico cerrado, cobertura auditada recurrente y capacidad
 gobernada de terreno. La inversión en medios, la data de terceros, los incentivos y el material POP son
@@ -173,7 +180,10 @@ marcas líderes y reporta ahorros del orden del 75% frente a desplegar un repres
 - cualquier cifra de incremento de venta, sell-out, share o rotación atribuida a la línea;
 - cualquier porcentaje de ahorro frente a la agencia incumbente del cliente;
 - cualquier promesa de cobertura nacional o de tiempo de respuesta antes de tener red operativa;
-- el término "Perfect Store" como resultado garantizado; se usa como marco de scoring, no como promesa.
+- el término "Perfect Store" como resultado garantizado; se usa como marco de scoring, no como promesa — y es
+  vocabulario ya establecido del comprador chileno, no un concepto que Efeonce introduzca;
+- **cualquier afirmación de que el mercado no mide o de que nadie tiene tecnología de PDV**: es falsa en Chile y
+  destruye credibilidad ante un comprador que probablemente ya trabaja con quien sí la tiene.
 
 **Nivel de confianza:** el problema está verificado como fenómeno de mercado. La disposición a pagar de un
 comprador chileno concreto **no está verificada**.
@@ -399,6 +409,9 @@ requiere además G2, G3 y G6 con cost snapshot fechado y aprobación de Finance.
 | **Responsabilidad solidaria** del cliente lo vuelve exigente | 12 meses | Convertir el cumplimiento en argumento de venta, no en fricción |
 | **Estacionalidad.** El presupuesto de canal se negocia en el último trimestre | anual | Calendarizar la prospección al ciclo de planificación |
 | **Canibalización interna.** Solapa con Performance & Commerce | 12 meses | La tabla de §1 fija los boundaries; toda propuesta compuesta nombra owner y RACI |
+| **Comparison set real: Treid, no una agencia BTL.** Un incumbente con plataforma propia, 15 años y tres países define el techo de la conversación | inmediato | No competir en "medimos mejor"; competir en la conexión física-digital que el peer set no cubre |
+| **La capa de captura ya existe y es regional (Snuuper).** Construir red propia es quemar capital | inmediato | Partner en vez de build (decisión D3); elimina además fraude de misión y riesgo de reclasificación del escalón 1 |
+| **Llave en mano es el estándar chileno.** Una oferta que deja la producción al cliente se lee incompleta | 12 meses | Efeonce responde por la producción y la gobierna; la ejecuta un proveedor como pass-through, con límite de responsabilidad en el SOW |
 | **Dilución del foco comercial.** Es una quinta puerta compitiendo con cuatro beachheads vigentes | 12 meses | Owner dedicado o no se abre. Una línea sin dueño es un PDF |
 
 ### Self-critique
@@ -421,10 +434,11 @@ requiere además G2, G3 y G6 con cost snapshot fechado y aprobación de Finance.
 |---|---|---|---|
 | D1 | Owner nombrado de la línea | Leadership | Antes de prospectar |
 | D2 | Nombre público definitivo de la oferta | Strategy + Brand | Antes de material comercial |
-| D3 | Red de misiones propia vs partner vs mixta | Operations + Finance | Resultado de G2 |
-| D4 | Plataforma de captura: construir, licenciar o integrar | Product + Architecture | Resultado de G2 y G3 |
+| D3 | Red de misiones propia vs partner vs mixta — **el benchmark recomienda partner**; queda por decidir con quién y en qué términos | Operations + Finance | Contacto exploratorio con proveedores de captura |
+| D4 | Plataforma de captura: construir, licenciar o integrar — **el benchmark desaconseja construir** | Product + Architecture | Resultado de D3 |
 | D5 | Entrada a México (entidad vs partner REPSE) | Leadership + Legal | Sólo después de validar la línea en Chile |
-| D6 | Si el escalón 2 se abre o se difiere | Finance + Leadership | Resultado de G4 y G6 |
+| D6 | Si el escalón 2 se abre o se difiere — **el benchmark lo baja de prioridad**: compite con el cluster de outsourcing en su terreno | Finance + Leadership | Resultado de G4 y G6, y tracción de los movimientos 1 y 2 del benchmark |
+| D7 | Si Efeonce contrata y responde por la producción física o la deja al cliente — **el benchmark recomienda responder por ella sin ejecutarla** | Commercial + Legal + Finance | Antes del primer SOW con activación |
 
 **Revisit triggers:** que un cliente existente pida ejecución de canal (cambia la prioridad y el motor comercial);
 que un competidor local lance auditoría por misiones; que cambie la regulación de subcontratación; o que dos
@@ -455,5 +469,8 @@ diagnósticos consecutivos no conviertan a recurrente.
 | [Dirección del Trabajo — subcontratación](https://www.dt.gob.cl/portal/1626/w3-article-93827.html) | Ley 20.123: responsabilidad solidaria/subsidiaria y régimen de EST |
 | [REPSE — guía de registro](https://www.repse.org.mx/repse-registro-de-prestadores-de-servicios-especializados-guia-completa.html) | Requisito mexicano para servicios especializados |
 
+**Benchmark de mercado chileno:** [`CHANNEL_COMMERCE_CHILE_MARKET_BENCHMARK_2026-09-10`](../../audits/commercial/CHANNEL_COMMERCE_CHILE_MARKET_BENCHMARK_2026-09-10.md)
+— peer set en tres clusters, Snuuper y Treid, estándar de contratación llave en mano, veredicto `re-scope`.
+
 **Sin verificar (declarado):** disposición a pagar de compradores chilenos; tamaño del mercado local de trade;
-costo real por misión en Chile; identidad y precios de los incumbentes locales.
+costo real por misión en Chile; **precios** de los incumbentes locales (su identidad sí quedó mapeada en el benchmark, sus precios no son públicos).
