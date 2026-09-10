@@ -7,6 +7,113 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-10 — El contenido estacional entra al catálogo como línea propia de marca
+
+`PDR-020` rev 1.3 cierra la reconciliación con el plan estacional 2026–2027: se conserva como línea propia y
+permanente porque su trabajo es marca, no como compromiso previo con vencimiento. Lo que la distingue del post
+genérico de efeméride es que cada fecha demuestra una disciplina de la casa — Halloween es un envase que pierde
+personalidad por imitación, el Día de la Usabilidad son fricciones digitales como obstáculos físicos, el Óscar es
+retirar una luz para cambiar una escena — y ese es el estándar declarado de la línea. Canal-hogar Instagram,
+métrica sends y saves, nunca seguidores. Único ajuste operativo: LinkedIn deja de recibir la misma pieza con otro
+caption y recibe el argumento profesional desarrollado, sólo cuando la disciplina es legible para un comprador.
+No se fusiona con trendjacking: misma familia cultural, economía de producción opuesta. Alcance, fechas,
+responsables y entregas del plan no cambian, y sigue pendiente la conciliación tarea/calendario de MET-2339–2342.
+No se produjo, programó ni publicó nada.
+
+## 2026-09-10 — Canales propios de Efeonce quedan bajo un sistema editorial declarado
+
+`PDR-020` fija el sistema editorial de los canales propios de marca: un motor compartido con un rol por canal
+(blog el activo, LinkedIn el comprador, YouTube la profundidad, Instagram craft y cultura, Threads conversación
+viva, Glitch la propiedad), catálogo propio de formatos por canal y franquicias con canal-hogar que viajan como
+corte y nunca como copia. Los territorios se heredan de la taxonomía de `PDR-019` sin taxonomía social paralela;
+el educativo nace en LinkedIn y el blog recibe la versión answer-first; el blog queda declarado multiformato con
+casos, tools, webinars, ebooks y data studies; los casos de éxito se modelan en tres profundidades con canonical
+en el blog y compuerta de aprobación del cliente. El vocero de talking head es Julio Reyes.
+[Decisión](docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md), delta de impacto en
+`TASK-1802`, cross-links en `PDR-003/004/005/019`, drift de Thought Territories registrado en el context pack y
+diez archivos de skills reconciliados con espejo Claude/Codex, incluido el hueco de Threads que no existía en la
+mecánica de plataforma. Quedan siete decisiones pendientes y un conflicto declarado sin resolver con el plan
+estacional 2026–2027, que sigue vigente. No se abrió ninguna cuenta, no se produjo contenido, no se programó nada
+y no se autorizó publicación.
+
+## 2026-09-10 — Finance: nómina agosto al valor real de Global66 y TASK-1858
+
+Con autorización del operador, los dos pagos de nómina de agosto que Payroll había registrado en USD con tasa
+estimada quedaron superseded y reemplazados por lo que salió de Global66 el 03/09 (800.730 y 1.114.423 más las
+comisiones de cambio), pagados en la moneda del expense al tipo de cambio realizado; Global66 septiembre queda
+`reconciled`. Se crea `TASK-1858` como cierre formal de la recuperación.
+
+## 2026-09-10 — Finance: tercera pasada (sueldo accionista, Berel MXN, fee HubSpot, Deel mayo–julio)
+
+Nace `finance:ledger-adjust` (cobros en moneda nativa con vínculo a fila, comisiones, pagos directos a un member y
+supersede de settlements) sobre el command compartido `linkStatementRow`; los expenses anclados aceptan
+USD/MXN con tipo de cambio explícito y `createMemberPaymentExpense` registra pagos a un colaborador sin entry
+de Payroll. Datos: sueldo accionista 2×1.000.000 reemplaza los traspasos al CCA; Berel folios 51/52/53 cobrados
+en MXN; comisión HubSpot cerrada con la fee de recepción estimada; Deel REC-2026-8/9/10 al CCA.
+
+## 2026-09-10 — Finance: segunda pasada de conciliación (honorarios brutos, Deel al CCA, payable backdated, Banco de Chile)
+
+El plan de conciliación suma `honorarios_gross_paid`, `income_receipt`, `link_existing_payment` y
+`link_existing_leg`; nacen `finance:record-deel-receipts` (recibos Deel con tarjeta personal → cuenta corriente
+accionista) y `finance:contractor-settle` (boleta on-behalf → readiness → obligación reactiva → orden pagada con
+la fecha del banco), más el adapter `bancochile_cuenta_vista_text`. Datos: Humberly julio/agosto como brutos sin
+retención; Deel REC-2026-11/12/13; Valentina EO-CPAY-0002 pagado el 07/09; comisión HubSpot Q2 2026 como
+ingreso; Banco de Chile FAN Emprende anclado e importado. Seis períodos `reconciled`. Pendiente de despliegue:
+el ops-worker recomputa saldos con el código previo a ISSUE-169.
+
+## 2026-09-10 — Finance: recuperación de conciliación agosto–septiembre 2026
+
+Cuatro meses sin cartola se resolvieron re-anclando cada instrumento con una OTB bank-authoritative al inicio de
+agosto (Global66 al 31/07 y la TC al cierre de ciclo 06/08) en vez de reconstruir mayo–julio. Nacen los adapters
+de cartola (`santander_cartola_xlsx`, `santander_tc_movimientos_xlsx`, `santander_tc_estado_cuenta_text`,
+`global66_xls`) detrás de `parseBankStatementFile`; la ruta de import acepta archivo/texto y el drawer suma la
+pestaña «Archivo del banco» (la lista CSV ahora calza con el parser). CLIs canónicas nuevas:
+`finance:instrument:create`, `finance:import-statement`, `finance:reconcile-rows` (plan JSON) y
+`finance:declare-otbs --file`. Se corrigió `ISSUE-169` (cuentas USD/MXN sumaban CLP; el día genesis de la OTB no
+materializaba movimientos), el opening canónico del período honra la OTB, las filas idénticas del mismo día ya no
+colapsan al importar y las factorías de settlement aceptan fechas partidas y MXN. Créditos V1
+(`src/lib/finance/loans.ts`): Crédito FOGAPE Santander registrado con su desembolso como settlement `funding`.
+Datos: `banco-chile-clp` registrada, 9 períodos ago/sep importados, 77 filas conciliadas por plan, tres períodos
+`reconciled`; las discrepancias de nómina y dos cobros quedan escaladas al operador (follow-up propuesto `TASK-1858`, sin registrar aún).
+
+## 2026-09-10 — TASK-1604: pack SEO/Arte y vacantes reconciliadas
+
+Se agregó el pack versionado de evaluación para SEO Specialist Senior y Director(a) de Arte Senior: seis
+competencias aditivas, nueve preguntas SEO con rúbricas BARS en `sme_review`, scorecard de portfolio/caso para
+Arte, migración y operador local/readback. El guard de materialización ahora cuenta sólo las preguntas exactas
+del pack; la reutilización de templates exige un único match de role hint, módulos, niveles y pesos y falla
+cerrado ante colisiones. Las vacantes `EO-OPN-0674/0675` fueron publicadas por una operación separada y se
+releyeron `active|published|public_listed`, rutas 200, pero continúan con cero policies, templates del pack y
+assessments. Task, registry, epic, documentación funcional y handoff reflejan esa frontera; TASK-1604 sigue
+`in-progress` hasta SME, template/binding y Quality Gate.
+
+## 2026-09-10 — TASK-1832: retiro bloqueado y contrato shared-CIMD documentado
+
+Readback live conserva la organización sintética aislada: registro/binding `1/1`, purpose drift `0/0`, dos
+profiles run-owned fuera de Person 360 y un único grant read-only activo. La muestra dejó de ser steady:
+`auth.oauth.refresh_reuse_detected` reportó 93 eventos/24h sobre el CIMD compartido de Codex. El cleanup dry-run
+no mutó y añadió `oauth_client_not_run_owned`; el mismo cliente tiene 8 artefactos canary y 35 de otros sujetos.
+Task, manifiesto, runbook, manual, doc funcional y skills Claude/Codex ahora prohíben remover ese blocker o
+aplicar el helper client-scoped. El retiro exige primero planner/delete/readback sujeto-específicos y prueba de
+preservación del cliente/hijos ajenos, además del diagnóstico de refresh; no hubo revoke, cleanup apply, gate
+OFF, push ni deploy. El gateway 1.4.0 usa los tres paquetes MCP v2 oficiales 2.0.0, todavía latest en npm al
+momento del chequeo.
+
+## 2026-09-10 — TASK-1852: canal MCP delegado vivo; TASK-1857 Creative Hub
+
+Canal delegado completo fuera del primitive: scope Entra `efeonce.mcp.client_services.write` (Admin) en la app recurso MCP,
+`efeonce-mcp-client-services` en la allowlist de consumers de Vercel Production (redeploy `greenhouse-naxc5guq3`) y
+federación en `efeonce-mcp` 1.4.0 (PR #9 provider `greenhouse-client-services` con preview/apply/rollback; PR #10 corrige
+`efeonce.gateway.status`, que omitía el provider; revisión `00052-slt`, 174 tests). Verificado en producción por
+`efeonce.gateway.status`). Canary humano punta a punta y apply de Sky ejecutados ~07:40Z por el canal (`EO-APC-ECD63852`, `delegated_oauth`, 0 altas, replay idempotente). `scopes.ts` del auth-server suma
+`efeonce.mcp.client_services.write` a las clases de escritura MCP (paridad con `efeonce-mcp/src/config.ts`).
+Decisión del operador: Creative Hub ES el módulo de Sky → `TASK-1857` (ui-ux; wireframe v2 de cinco bloques cliente + dirección visual C «hoja de trabajo creativa» con component mapping por bloque sobre el surface system; sin JSX) y Delta en `TASK-1687`.
+[Auditoría](docs/audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md) §Canal MCP delegado.
+Barrido documental por dos subagentes (32 archivos): skills `efeonce-mcp-platform` (+referencias, espejo `.codex`),
+`greenhouse-teams-message-operator`, `teams-bot-platform`, `efeonce-customer-experience`; arquitectura MCP §25, invariantes MCP §11,
+sister platforms §16 (registro de clientes de exchange), gap ledger de parity, Teams/Notification Hub, client lifecycle §9,
+Pilot Engagement (`bundled_modules`), docs funcionales y manuales de portal/comunicaciones, DECISIONS_INDEX.
+
 ## 2026-09-09 — TASK-1852: habilitación común de servicios
 
 Implementados inventario/preview, apply y compensación por organización/persona/servicio con commands
@@ -30,7 +137,7 @@ tres personas Berel provisionadas sin correo. El lane App acepta autoridad human
 `authority`; el preview distingue `person_invitation_pending`. Preview Sky limpio en producción; apply pendiente de sesión
 humana y flag. Chats grupales de Berel y Sky registrados como destino `chat_group` del Teams bot (`ready`, pertenencia
 verificada por Graph read-only; ruta `lifecycle/teams/chat`; migración que relaja el CHECK legado). Invitaciones Berel
-bloqueadas por decisión del operador hasta tener interfaces. Política de preferencias `client_service_default_v1` aplicada a las seis personas (ruta `portal-users/notification-preferences`). [Readback](docs/audits/client-portal/TASK-1852_MAPPING_PROVISIONING_READBACK_2026-09-10.json).
+bloqueadas por decisión del operador hasta tener interfaces. Política de preferencias `client_service_default_v1` aplicada a las seis personas (ruta `portal-users/notification-preferences`). **Release 2026-09-10:** PR #232 → main `f69b9d32`, orquestador `34431792218`, manifest `released` 03:16Z, flag `CLIENT_SERVICE_ENABLEMENT_WRITES_ENABLED=true` horneada, canary de contrato 5/5 en producción. [Readback](docs/audits/client-portal/TASK-1852_MAPPING_PROVISIONING_READBACK_2026-09-10.json).
 
 ## 2026-09-09 — Planificación estacional Efeonce y continuidad editorial
 
@@ -874,125 +981,3 @@ La documentación y las skills espejo ahora fijan el soporte de Customer Agent y
 2026-08-13 al 2026-11-12 inclusive. Soporte cubre el alcance construido; nuevas funcionalidades, KPI, workflows,
 automatizaciones, integraciones, rediseños e innovación requieren un alcance separado. No se cambió runtime
 HubSpot, no se envió correo, no se creó SharePoint y no se hizo push.
-
-## 2026-09-02 — La superficie MCP del módulo SEO pasa a tener eval de selección
-
-TASK-1784 agregó un fixture de 55 preguntas de operador en los cinco mercados productivos y un runner que mide
-tres precisiones que nunca se promedian: qué tool se elige, qué mercado se pasa y si se llamó a una tool que
-gasta cuando no correspondía. Baseline registrado antes de tocar una descripción: tool 94.5%, mercado 98.2%,
-gasto 100%.
-
-El resultado contradijo la hipótesis con la que se escribió la task: agregar bloques de ruteo a las
-descripciones NO mejoró la selección de tool, y en una variante degradó una tool que nadie había tocado. Lo que
-sí funcionó fue corregir dos afirmaciones falsas — la cláusula de mercado ordenaba elegir un país en vez de
-preguntar, y la lente dual reclamaba prioridad sin acotarla. La precisión de mercado llegó a 100%, cerrando la
-elección silenciosa que costó un año de mediciones contra el país equivocado en ISSUE-152; la de tool bajó a
-92.7% y se reporta sin declarar mejora.
-
-El gate de CI mide cobertura del fixture, no precisión: una tool SEO nueva sin caso rompe el build. El guard de
-paridad del gateway ahora compara la descripción, y al conectarlo encontró 21 de 27 tools federadas divergentes;
-se cerró haciendo que el gateway derive el texto del artefacto en vez de mantener una copia. El redeploy de
-`mcp.efeonce.org` queda pendiente.
-
-## 2026-09-02 — Globe entra en hibernación profunda reversible
-
-TASK-1807 incorporó una state machine Terraform `active | draining | hibernated`. Globe quedó en
-`hibernated`: tres schedulers pausados, vías productivas cerradas, Cloud Run en scale-to-zero y Cloud SQL
-`STOPPED/NEVER`; datos, backups/PITR, buckets, secretos, imágenes, identidades, front door, budgets y
-observabilidad permanecen intactos. Los applies finales tuvieron cero deletes/replacements y el post-plan quedó
-sin drift.
-
-El runbook nuevo documenta el gate anti-borrado, todos los inputs de preservación, la secuencia segura de apagado
-y encendido, los readbacks, rollback, monitoreo y medición de costo. El baseline era ~CLP 348.152/30 días y la
-reducción modelada es CLP 318.000–328.000; el ahorro realizado queda pendiente de Billing Export a 24 horas,
-7 días y cierre mensual.
-
-Se sincronizaron los índices, arquitectura de persistencia, runbooks IaC/rollout/promoción, ledger de modelos,
-plan TASK-1807 y prompt de sesiones nuevas. Las skills `greenhouse-globe` y `greenhouse-globe-model-fleet`
-quedaron espejadas Codex/Claude con una compuerta que impide gasto o reactivación implícita.
-
-## 2026-09-02 — tools y skills MCP pasan a ser Definition of Done de toda la secuencia ETV
-
-TASK-1805/1806, TASK-1312/1313/1314 y TASK-1808–1811 exigen ahora crear o actualizar su tool MCP, lane,
-manifiesto, federación y skill operativa en el mismo PR. Una tool existente se amplía en vez de duplicarse y toda
-ausencia del gateway debe ser una exclusión razonada. Las lecturas no compran al proveedor durante el read; writes
-y gasto conservan confirmación, capability fina y scope fail-closed. No cambió runtime: son criterios de ejecución
-y cierre para trabajo futuro.
-
-## 2026-09-02 — las cinco familias Labs restantes ya tienen ownership ejecutable
-
-El backlog de Growth SEO incorpora `TASK-1808`–`TASK-1811`: categorías y mercado temático, competidores SERP por
-keyword set, comparación entre páginas e historia bulk de cohortes. Las dos direcciones de categorías viven en
-una task porque forman una sola capacidad dominio↔categoría; los demás endpoints conservan grano, costo y lifecycle
-propios. Las cuatro tasks dependen de `TASK-1805/1806` y no habilitan llamadas por estar registradas.
-
-Los contratos existentes ahora aclaran que DataForSEO sólo aporta evidencia para topic clusters, que
-`TASK-1314` compone sin capturar y que las menciones históricas de `serp_competitors`/`page_intersection` no eran
-callers reales. No cambió runtime, schema, gasto, flags ni deploy.
-
-## 2026-09-02 — Improved ETV pasa de anuncio a contrato operativo
-
-DataForSEO confirmó 14 familias ETV-capable, alcance sobre todos los ETV/traffic cost, precio sin premium,
-históricos fully recomputed desde julio de 2026 y calibrados antes, y corte irreversible
-`2026-11-01T00:00:00Z`. La arquitectura, auditoría, runbook, tasks y skills ahora distinguen 14 familias del
-proveedor, nueve callers y seis familias/siete caminos consumidores; reemplazan el método «servido» no observable
-por método efectivo derivado. `TASK-1806` pasa a P0 deadline-bound. No cambió runtime.
-
-## 2026-09-01 — Emma enruta cotización, seguimiento y Calidad al equipo correcto
-
-El handoff del Customer Agent ANAM dejó de depender de una única propietaria. El workflow activo `1876744588`
-clasifica el ticket, elimina a Emma como owner y aplica la matriz Pablo → María Paz para cotización, Marco → Pablo
-para seguimiento y María Paz → Marco para Calidad/facturación/otros, respetando disponibilidad. Tres chats públicos
-E2E aprobaron las rutas de cotización y Calidad y el fallback real de seguimiento; el primer probe fallido permitió
-corregir el owner previo y el sesgo de marcadores QA antes de dejar el flujo conectado.
-
-El canon reusable distingue el trigger del Customer Agent, la asignación por workflow y la reasignación manual
-entre personas. También registra el límite de evidencia: el owner visible quedó probado, pero la respuesta humana
-y una segunda transferencia en el mismo chat abierto requieren una prueba operativa separada.
-
-## 2026-09-01 — El Customer Agent de ANAM ya sabe que se llama Emma
-
-El perfil y las directrices publicadas del Customer Agent en el portal ANAM `19893546` quedaron alineados con la
-landing: nombre `Emma`, preview `Hola, soy Emma.` y saludo `Soy Emma, de ANAM`. El readback confirmó cero
-borradores. No cambiaron personalidad, conocimiento, permisos, acciones, routing, handoff, canales ni datos CRM,
-y no se envió una conversación real. Dos advertencias anteriores sobre `Registraré tu consulta` quedaron
-documentadas para un cambio conversacional separado.
-
-## 2026-09-01 — Emma convierte la landing ANAM en un concierge digital
-
-La landing de atención de ANAM reemplazó al personaje masculino por Emma y reconstruyó la primera pantalla como
-una experiencia editorial premium: narrativa clara, selector unificado de tres intenciones, un único CTA y un
-panel de confianza integrado con la asistente. La selección prepara el contexto y no abre el chat hasta que la
-persona pulsa `Conversar con Emma`.
-
-El build HubSpot CMS React `#28` está desplegado en el portal ANAM `19893546`. El header usa el logo horizontal
-del catálogo del repo, sin el círculo superior, y el recurso decorativo queda recortado dentro del hero para no
-dejar espacio blanco bajo el footer. La verificación desktop y móvil confirmó HTTP 200, margen del body en cero,
-ausencia de overflow, selección por clic y teclado, transferencia del intent al CTA y cero errores de consola,
-página o red. Emma usa ahora un asset generativo versionado cuyo bordado dice correctamente
-`ANÁLISIS AMBIENTALES S.A.`; se descartó el montaje tipográfico plano y se conservó el asset anterior para
-rollback. No se abrió ni se envió una conversación real; tampoco cambiaron el Customer Agent ni datos CRM.
-
-El cierre documental quedó reflejado en el canon y runbook CMS, documentación funcional, manual operativo,
-dirección visual, changelog de cliente, `project_context.md` y las dos copias espejadas de la skill
-`hubspot-as-a-service`. No se modificaron el router global ni la arquitectura comercial porque no cambió ningún
-contrato transversal.
-
-## 2026-09-01 — La auditoría gana una sección para lo que vale en todo el sitio (TASK-1671)
-
-La pantalla de auditoría separa dos preguntas que antes mezclaba. Arriba, una sección nueva
-—"Acceso y presentación del sitio"— responde si los motores de IA pueden leer el sitio, si la
-portada se presenta y si el mapa del sitio está sano. Abajo, la lista de siempre, ahora rotulada
-como lo que es: problemas **por página**.
-
-La distinción importa porque cada hallazgo de la sección nueva vale para el dominio entero. En la
-lista se habrían rotulado como "1 página afectada" —falso— y habrían quedado hundidos debajo de
-cualquier problema menor que toque muchas páginas. Ahora dicen "Todo el sitio" y nombran dónde se
-detectó el problema, para que el cliente pueda verificarlo en vez de concluir que el informe miente.
-
-Y el bloqueo de entrenamiento de modelos de IA no se pinta como una falla: lleva la etiqueta
-"Decisión declarada", porque es una decisión legítima sobre el uso del contenido.
-
-🔴 **Sigue apagado.** El código existe pero no está desplegado, y el interruptor tampoco está
-encendido. Hasta que las dos cosas pasen, un sitio invisible para los motores de IA **sigue**
-saliendo con 95 de salud.

@@ -40,6 +40,13 @@ this file is a checklist, not a second registry.
     consent and governed pilot (`TASK-1841`). TASK-1844 internal v2 currently delegates only
     `growth.seo.observation.read`; it does not confer new writes or make another provider v2-compatible.
     Neither gate is solved by widening the shared client or bootstrap scopes.
+  - **A new blast-radius class gets a new scope, in the issuer that serves its actor.** `TASK-1852` (2026-09-10)
+    opened the class «open a client's access to contracted services»: `efeonce.mcp.client_services.write` was added
+    to the Entra MCP resource app (Admin consent; shared PKCE client untouched), declared in parity in Greenhouse
+    `src/lib/auth-server/oauth/scopes.ts`, and marked `unsupported` for the native issuer because internal v2 is
+    base-only. The person's Entra token is exchanged (RFC 8693) through a dedicated confidential client
+    (`efeonce-mcp-client-services`) and the App lane re-reads the human's capability on every call — the scope
+    consents the class, Greenhouse decides the actor. All three tools require it, preview included.
 - `admin`: do not expose until an entitlement model, named operators, high-signal audit trail and incident runbook exist.
 
 ## Provider boundary

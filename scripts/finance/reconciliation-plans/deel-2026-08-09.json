@@ -1,0 +1,35 @@
+{
+  "actor": "user-efeonce-admin-julio-reyes",
+  "ccaInstrumentId": "sha-cca-julio-reyes-clp",
+  "cardLast4": "1879",
+  "shareholderName": "Julio Reyes",
+  "receipts": [
+    {
+      "receipt": "REC-2026-11",
+      "paidDate": "2026-08-04",
+      "contractorTotalUsd": 828.24,
+      "deelFeesUsd": 83.62,
+      "payExpenseId": "EXP-202607-006",
+      "memberId": "melkin-hernandez",
+      "description": "Melkin Hernandez INV-9j62wyg-2026-9 (trabajo agosto 2026; entry 2026-07 net 828,24; Deel facturó 828,34: los 0,10 de redondeo van con las fees)"
+    },
+    {
+      "receipt": "REC-2026-12",
+      "paidDate": "2026-08-04",
+      "contractorTotalUsd": 0,
+      "deelFeesUsd": 10.69,
+      "payExpenseId": null,
+      "memberId": null,
+      "description": "Contract platform fee marzo 2026 Andrés Carlosama + Daniela Ferreira (USD 5 c/u) + processing 0,69"
+    },
+    {
+      "receipt": "REC-2026-13",
+      "paidDate": "2026-09-03",
+      "contractorTotalUsd": 788.86,
+      "deelFeesUsd": 81.98,
+      "payExpenseId": "EXP-202608-004",
+      "memberId": "melkin-hernandez",
+      "description": "Melkin Hernandez INV-9j62wyg-2026-10 (trabajo septiembre 2026; entry 2026-08 net 788,86)"
+    }
+  ]
+}

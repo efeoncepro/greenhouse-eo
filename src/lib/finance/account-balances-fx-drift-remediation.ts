@@ -262,6 +262,24 @@ const classifyRow = ({
     knownSeedBlindSpotSignature: matchesKnownSeedBlindSpotSignature(row)
   }
 
+  // TASK-1858 Slice 2 (ISSUE-169): el detector ya cubre cuentas no-CLP y en esas
+  // filas los campos `*Clp` llevan UNIDADES DE LA CUENTA (USD, MXN). El guard
+  // `maxAbsDriftClp` esta denominado en CLP, asi que la comparacion de magnitud
+  // no significa nada para ellas: ninguna politica las auto-remedia. El operador
+  // rematerializa de forma explicita (`pnpm finance:rematerialize`) tras revisar.
+  if (row.currency !== 'CLP') {
+    return {
+      accountId: row.accountId,
+      accountName: row.accountName,
+      balanceDate: row.balanceDate,
+      driftClp: row.driftClp,
+      absDriftClp: row.absDriftClp,
+      decision: 'unknown_requires_review',
+      reason: 'non_clp_account_native_units_manual_review',
+      evidence: baseEvidence
+    }
+  }
+
   if (outOfPolicy || absCents(row.absDriftClp) > maxAbsDriftCents) {
     return {
       accountId: row.accountId,

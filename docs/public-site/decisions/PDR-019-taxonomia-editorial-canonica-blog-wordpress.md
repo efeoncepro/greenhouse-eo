@@ -76,6 +76,11 @@ de categoría ni de la categoría primaria de un post.
   los IDs Ohio eliminados no son una fuente editorial válida.
 - Tags permanecen como faceta secundaria y requieren una limpieza separada antes
   de exponerse como navegación pública.
+- **Esta taxonomía dejó de ser sólo del blog.**
+  [PDR-020](PDR-020-canales-propios-sistema-editorial.md) la declara fuente de los territorios de
+  **todos los canales propios** y prohíbe crear una taxonomía social paralela. Consecuencia directa:
+  `Agentes` se trata como sub-territorio de `Inteligencia Artificial`, y promoverlo a raíz exige el
+  protocolo de migración de URL de este PDR. El foco editorial vigente es **AEO + Inteligencia Artificial**.
 
 ## Alternativas descartadas
 

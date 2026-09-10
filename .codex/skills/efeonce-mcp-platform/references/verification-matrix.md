@@ -54,3 +54,20 @@ revisions and SHAs live and record the exact snapshot in the active canary manif
 | Gateway tools `identity.invitations.list` / `identity.invitation.create` | read on the base scope, write on `efeonce.mcp.identity.write` (403 challenge naming the scope); policies native issuer + `native-external` population only, `organizationId` by membership; `token` never forwarded; live canary through `mcp.efeonce.org` | PR #3 mergeado y producción activa. TASK-1832 importó sólo las dos tools read-only autorizadas en clientes externos; `identity.invitation.create` permaneció oculta/fail-closed sin ampliar scope |
 | Designated admin clearing | revoking the admin member sets `designated_admin_profile_id = NULL` + audit `designated_admin_cleared`; a second `designated_admin` accept while one is `linked` → `conflict`, token not consumed | smoke live ✔ |
 | Consent shows redirect host | consent page renders the host of the validated `redirect_uri` (`data-capture="id-redirect-host"`) | render test ✔ · dev-UI screenshots ✔ · producción TASK-1832 ✔ en loopback y callback hospedado |
+
+## Client service enablement with delegated human authority (TASK-1852, live 2026-09-10)
+
+Migration `20260910005222927` applied; release `f69b9d326a6f` (PR #232) in production with
+`CLIENT_SERVICE_ENABLEMENT_WRITES_ENABLED=true` (release contract canary 5/5, watchdog 5/5); gateway `efeonce-mcp`
+`1.4.0` serving on `efeonce-mcp-gateway-00052-slt`. Read flags, the Ready revision and `efeonce.gateway.status` live
+before citing them.
+
+| Row | Minimum evidence | Status |
+| --- | --- | --- |
+| Scope gate | `403 insufficient_scope` naming `efeonce.mcp.client_services.write` on all three tools, preview included; never in bootstrap `scopes_supported` | policy + surface tests ✔ (PR #9) |
+| Exchange client | `efeonce-mcp-client-services` confidential, exactly one scope `client_services.enablement.write`, `metadata.resourceFamily=client_services`, listed in `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS`; anything else `401 invalid_client` | migration + Production allowlist ✔ |
+| App-lane authority | exchanged bearer accepted only for an Entra-verified internal human with the operation's capability; tenant agent denied for writes; receipt `authority.kind=delegated_oauth` | contract tests ✔ |
+| Ecosystem lane | writes answer `403 invalid_delegated_context` by design | ✔ |
+| Native issuer | `unsupported` (`provider_delegation_required`); never "fixed" by widening v2 | policy ✔ |
+| Gateway status | `efeonce.gateway.status` lists `greenhouse-client-services` `enabled` (it did not until PR #10) | production readback ✔ |
+| Human write canary | `pnpm client-services:canary` with a person's Entra bearer (preview only), then a governed `apply` confirmed by a human | **done 2026-09-10** — `apply_client_service_enablement` for Sky through production (`EO-APC-ECD63852`, `authority.kind=delegated_oauth`, replay `replayed=true`); recipe: person mints the bearer via the public PKCE client, stores it `0600`, the agent calls `tools/call` without `MCP-Protocol-Version` (legacy handshake) |

@@ -82,11 +82,14 @@ La autoridad humana llega por dos canales del mismo primitive y queda registrada
 persona con la capability `client_services.enablement.write`, con `oauthClientId`/`oauthAccessTokenId` durables y
 sesión humana, o el cliente de exchange `efeonce-mcp-client-services`, que sólo mintea para un humano interno
 verificado por Entra que ya puede habilitar módulos). El scope responde si ese cliente puede pedir esta clase de
-acción; los derechos de la persona se releen dentro de la transacción. Para operar el canal delegado en un
-runtime: incluir `efeonce-mcp-client-services` en `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS`, exponer el
-scope de entrada `efeonce.mcp.client_services.write` en la app Entra del MCP (clase propia, nunca en un cliente
-público/compartido) y federar la tool en el gateway. El cliente OAuth ya está sembrado (migración
-`20260910005222927`); mientras falte cualquiera de los tres pasos, el canal falla cerrado. El rol EFEONCE_ADMIN incluye compensación conforme al contrato canónico del portal; no se conceden nuevos roles a personas.
+acción; los derechos de la persona se releen dentro de la transacción. El canal delegado exige tres piezas fuera del primitive y las tres están aplicadas desde el 2026-09-10 (~05:30Z):
+`efeonce-mcp-client-services` en `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS` de Vercel Production
+(`efeonce-mcp-hiring,efeonce-mcp-hiring-review,efeonce-mcp-client-services`, horneada por el redeploy `greenhouse-naxc5guq3`),
+el scope de entrada `efeonce.mcp.client_services.write` (consentimiento Admin) en la app Entra del recurso MCP
+`c5363215-b9a6-4bf1-bb1c-e61963b37dac` —clase propia, nunca en el cliente público PKCE— y la federación en `efeonce-mcp` 1.4.0
+(PR #9 + #10; revisión `efeonce-mcp-gateway-00052-slt`; provider `greenhouse-client-services` `task-1852-v1` visible en
+`efeonce.gateway.status`). El cliente OAuth está sembrado (migración `20260910005222927`). Si cualquiera de las tres piezas
+se retira, el canal vuelve a fallar cerrado: la tool responde `scope_not_allowed`/403 y ninguna escritura ocurre. El rol EFEONCE_ADMIN incluye compensación conforme al contrato canónico del portal; no se conceden nuevos roles a personas.
 **La presencia de la capability en catálogo no garantiza su concesión**: certifícala para el operador
 de alta y compensación antes de activar. TASK-1852 corrige la omisión de `module.pause:update` en el default de EFEONCE_ADMIN y prueba alta/compensación con el mismo rol. El rollout debe verificarlo en la sesión vigente.
 
@@ -105,15 +108,22 @@ de alta y compensación antes de activar. TASK-1852 corrige la omisión de `modu
 
 ## API/MCP/Nexa y autoridad
 
-MCP interno: `preview_client_service_enablement`, `apply_client_service_enablement`,
-`rollback_client_service_enablement`. El preview comparte semántica con API app y CLI.
-Los comandos ecosystem/MCP devuelven `403 invalid_delegated_context`: su consumer acredita una máquina,
-no la aprobación humana que exige `approved_by_user_id`. No se ha federado ninguna tool nueva.
-La paridad de escritura delegada queda bloqueada hasta que exista autoridad atribuible, sin actor en el body.
-Las rutas ecosystem mutantes todavía usan el wrapper de lectura porque permanecen fail-closed; antes de abrirlas
-deben adoptar un command lane que conserve reautorización e idempotencia sin duplicar el command store. Después
-se sincroniza/federa el manifest en el gateway o se registra una exclusión formal; no basta con que la tool exista
-en el servidor interno Greenhouse.
+MCP interno y gateway: `preview_client_service_enablement`, `apply_client_service_enablement`,
+`rollback_client_service_enablement`. El preview comparte semántica con API app y CLI. Desde el 2026-09-10 las tres
+están federadas en `efeonce-mcp` (provider `greenhouse-client-services`, política `unsupported` para autoridad nativa):
+exigen el scope `efeonce.mcp.client_services.write` en el bearer Entra de la persona; el gateway lo intercambia (RFC 8693,
+cliente `efeonce-mcp-client-services`) por un token Greenhouse con `client_services.enablement.write` y llama el lane
+App, nunca el ecosystem. Los comandos ecosystem con binding de máquina siguen devolviendo `403 invalid_delegated_context`
+por diseño: acreditan una máquina, no la aprobación humana que exige `approved_by_user_id`.
+El canary `pnpm client-services:canary` (repo `efeonce-mcp`) exige un token Entra humano con el scope nuevo
+(authorization code + PKCE interactivo); no se puede mintear desatendido. La primera ejecución punta a punta (preview,
+apply de Sky y replay idempotente) la autorizó el operador el 2026-09-10 ~07:40Z y está registrada en la auditoría de rollout
+§Apply de Sky: el canal queda «federado y certificado con canary de escritura». Receta para repetirlo: la persona obtiene su
+bearer con el scope (PKCE del cliente público del MCP), lo guarda en un archivo `0600` y el agente llama `tools/call` sobre
+`https://mcp.efeonce.org/mcp` sin header `MCP-Protocol-Version` (handshake legacy); el token nunca se imprime ni se pega en
+el chat. Las rutas ecosystem mutantes conservan el wrapper de lectura porque
+permanecen fail-closed; antes de abrirlas deben adoptar un command lane que conserve reautorización e idempotencia sin
+duplicar el command store.
 
 Nexa registra las acciones de alta y compensación detrás del runtime existente y del flag de writes.
 La propuesta prepara el input en servidor y lo valida antes de mostrarse; confirmación lo vuelve a validar

@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Baseline verificado; ADR/claim policy Proposed; sin runtime Talent Assurance autorizado`
+- Status real: `Baseline verificado; ADR/claim policy Proposed. TASK-1604 inició un slice de autoría y datos para SEO/Arte, aún sin template runtime, policy, assessments ni Quality Gate.`
 - Rank: `TBD`
 - Domain: `cross-domain` (workforce + hiring + people + client experience + delivery + finance + agents)
 - Owner: `unassigned`
@@ -65,7 +65,9 @@ autoriza por defecto.
 
 ## Baseline y orden de ejecución verificados 2026-08-15
 
-Ninguna task hija fue implementada por esta verificación. El runtime existente sólo es reutilizable: Hiring tiene
+La verificación inicial no implementó tasks hijas. Desde el 2026-09-09, `TASK-1604` mantiene un slice
+`in-progress` de autoría y datos para SEO/Arte; no activa el runtime Talent Assurance, su policy ni el Quality
+Gate. El resto del runtime existente sólo es reutilizable: Hiring tiene
 assessment, decisión, handoff y lineage durable de activación; `TASK-1364` aporta un reader read-only de validez;
 Team Capacity y Finance aportan inputs fechados de costo/capacidad. No hay claim store Talent Assurance, proyección
 outcome 30/60/90, proyección feedback/continuity de cliente, propuesta de factibilidad económica, adapter de
@@ -150,7 +152,7 @@ the dependencies recorded in each task:
 
 - [TASK-1603](../../tasks/to-do/TASK-1603-hiring-quality-gate-opening-binding.md) — Hiring Quality Gate over the
   canonical opening assessment policy owned by EPIC-011/TASK-1719; completeness/evidence/decision override only.
-- [TASK-1604](../../tasks/to-do/TASK-1604-role-scorecard-assessment-template-pack.md) — critical-role scorecards and assessment templates.
+- [TASK-1604](../../tasks/in-progress/TASK-1604-role-scorecard-assessment-template-pack.md) — critical-role scorecards and assessment templates; slice SEO/Arte en progreso, todavía sin Quality Gate.
 - [TASK-1605](../../tasks/to-do/TASK-1605-quality-of-hire-outcome-selection-failure.md) — Quality-of-Hire outcomes and selection-failure taxonomy.
 - [TASK-1606](../../tasks/to-do/TASK-1606-client-operator-feedback-continuity-projection.md) — client-operator feedback and continuity projection.
 - [TASK-1610](../../tasks/to-do/TASK-1610-talent-assurance-read-models-api-parity.md) — read models and Full API Parity.

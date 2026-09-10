@@ -1,8 +1,9 @@
 # Operar Comunicaciones y Notificaciones
 
 > **Tipo de documento:** Manual de uso
-> **Version:** 1.1
+> **Version:** 1.2
 > **Creado:** 2026-06-15 por Codex
+> **Ultima actualizacion:** 2026-09-10 por Claude (TASK-1852: registrar chat grupal de cliente y aplicar politica inicial de preferencias)
 > **Modulo:** Comunicaciones / Email / Notificaciones / Teams
 > **Rutas:** `/notifications`, `/notifications/preferences`, `/admin/email-delivery`, `/admin/emails/preview`, `/admin/notifications`
 > **Documentacion relacionada:** `docs/documentation/plataforma/comunicaciones-notificaciones-end-to-end.md`, `docs/documentation/plataforma/sistema-email-templates.md`, `docs/documentation/admin-center/preview-de-correos.md`
@@ -83,6 +84,21 @@ pauses tipos de correo y no cambies `sendEmail`; los despachos deben continuar a
 5. Ejecuta primero `--dry-run`; para el envío real usa el mismo payload con `--yes` después de aprobar el texto.
 6. Revisa `source_sync_runs` y, para un grupo, el mensaje publicado: una mención reconocida vuelve como identidad `aadUser`.
 7. Si necesitas un 1:1 genérico y no existe CLI de dominio, usa sólo el puente temporal descrito en `docs/operations/manual-teams-announcements.md`: identidad Entra activa, card-only, dedupe, source object determinístico y auditoría por persona.
+
+### Registrar el chat grupal de un cliente como destino (TASK-1852)
+
+1. Obten el id del chat grupal compartido con el cliente (formato `19:…@thread.v2`) y confirma que el bot Greenhouse esta instalado en ese chat.
+2. Con permisos de avance del onboarding (`client.lifecycle.case.advance`), llama `POST /api/admin/clients/[organizationId]/lifecycle/teams/chat` con `{ chatId, displayName }`. El Space del cliente se resuelve solo.
+3. Lee la respuesta: `ready` significa que Greenhouse verifico la instalacion del bot leyendo Microsoft Graph; `pending_setup` trae la razon (por ejemplo, bot no instalado). No fuerces `ready` a mano.
+4. Registrar el destino **no envia nada**. No hagas un envio de prueba al chat del cliente para "comprobar"; revisa la fila en `greenhouse_core.teams_notification_channels` (`client-teams-chat-<spaceId>`, `recipient_kind='chat_group'`).
+5. Ese destino no aparece en `pnpm teams:announce`: los chats de clientes no son destinos de anuncio manual.
+
+### Aplicar la politica inicial de preferencias a personas cliente (TASK-1852)
+
+1. Uso: cuando el preview de habilitacion de servicios marque `preferences_not_explicit` para personas del cliente.
+2. Con `client.lifecycle.portal_user.invite`, llama `POST /api/admin/clients/[organizationId]/lifecycle/portal-users/notification-preferences` con `{ userIds, policy: 'client_service_default_v1' }` (entre 1 y 50 personas del mismo cliente).
+3. Resultado por persona: `applied` (categorias escritas), `not_in_client` o `not_client_tenant`. No envia mensajes.
+4. La persona puede cambiar despues sus preferencias en `/notifications/preferences`; no vuelvas a aplicar la politica para "corregirla".
 
 ### Performance Report mensual
 

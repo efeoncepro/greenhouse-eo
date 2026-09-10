@@ -15,6 +15,9 @@
  * different values supersedes the existing OTB preserving audit.
  */
 
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
+
 import { loadGreenhouseToolEnv, applyGreenhousePostgresProfile } from '../lib/load-greenhouse-tool-env'
 
 import { declareOpeningTrialBalance, type OtbAuditStatus } from '@/lib/finance/account-opening-trial-balance'
@@ -100,13 +103,54 @@ const DECLARATIONS: OtbDeclaration[] = [
   }
 ]
 
+/**
+ * `--file <ruta.json>` — declara las OTBs listadas en un JSON (array de
+ * OtbDeclaration) en lugar del bootstrap hardcodeado de TASK-703. Es el camino
+ * para re-anclajes posteriores (ej. `scripts/finance/otb-declarations/2026-08-reanchor.json`).
+ * `--declared-by <id>` etiqueta el declarante (default: `otb-cli`).
+ */
+const parseArgs = () => {
+  const argv = process.argv.slice(2)
+  let file: string | null = null
+  let declaredBy = 'otb-cli'
+  let dryRun = false
+
+  for (let i = 0; i < argv.length; i++) {
+    if (argv[i] === '--file') file = argv[++i] ?? null
+    else if (argv[i] === '--declared-by') declaredBy = argv[++i] ?? declaredBy
+    else if (argv[i] === '--dry-run') dryRun = true
+  }
+
+  return { file, declaredBy, dryRun }
+}
+
+const loadDeclarations = (file: string | null): OtbDeclaration[] => {
+  if (!file) return DECLARATIONS
+
+  const raw = JSON.parse(readFileSync(path.resolve(file), 'utf8')) as unknown
+
+  if (!Array.isArray(raw) || raw.length === 0) {
+    throw new Error(`${file} debe contener un array no vacío de declaraciones OTB`)
+  }
+
+  return raw as OtbDeclaration[]
+}
+
 const main = async () => {
   loadGreenhouseToolEnv()
   applyGreenhousePostgresProfile('ops')
 
-  console.log(`[otb] Declaring ${DECLARATIONS.length} OTBs...`)
+  const { file, declaredBy, dryRun } = parseArgs()
+  const declarations = loadDeclarations(file)
 
-  for (const d of DECLARATIONS) {
+  console.log(`[otb] Declaring ${declarations.length} OTBs${file ? ` from ${file}` : ''}${dryRun ? ' (dry-run)' : ''}...`)
+
+  for (const d of declarations) {
+    if (dryRun) {
+      console.log(`  · ${d.accountId}: ${d.genesisDate} = ${d.openingBalance} (${d.auditStatus})`)
+      continue
+    }
+
     try {
       const r = await declareOpeningTrialBalance({
         accountId: d.accountId,
@@ -116,7 +160,7 @@ const main = async () => {
         declarationReason: d.declarationReason,
         auditStatus: d.auditStatus,
         evidenceRefs: d.evidenceRefs,
-        declaredByUserId: 'task-703-bootstrap'
+        declaredByUserId: file ? declaredBy : 'task-703-bootstrap'
       })
 
       console.log(`  ✓ ${d.accountId}: ${d.genesisDate} = ${r.openingBalance.toFixed(2)} (${r.auditStatus})`)

@@ -191,3 +191,4 @@ El pre-push hook canonical del repo corre `pnpm lint` + `pnpm tsc --noEmit` (~90
 - **`.husky/pre-push`**: corre `pnpm local:check` (`pnpm lint` full repo + `pnpm exec tsc --noEmit`).
 Bloquea push si hay 1+ error. Latencia tipica < 90s. Defense in depth sobre
 pre-commit (cubre archivos NO staged que otro agente pudo dejar rotos).
+- `finance.account_balances.fx_drift` (kind=`drift`, severity=`error` si count>0, steady=0). Recompute expected delta desde VIEWs canónicas + COALESCE settlement_legs y compara contra persisted (`period_inflows - period_outflows`). Tolerancia $1 CLP (anti FP-noise). Ventana 90 días. Reader: `src/lib/reliability/queries/account-balances-fx-drift.ts`. Subsystem rollup: `Finance Data Quality`.

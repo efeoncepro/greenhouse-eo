@@ -1,9 +1,9 @@
 # Conciliación bancaria
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 1.5
+> **Version:** 1.7
 > **Creado:** 2026-04-27 por Claude Opus 4.7 + Julio Reyes
-> **Ultima actualizacion:** 2026-04-29 por Codex (TASK-728 Finance Movement Feed Decision Polish)
+> **Ultima actualizacion:** 2026-09-10 por Claude (TASK-1858 Slice 3: rutina mensual y decisión sobre facturas Nubox)
 > **Documentacion tecnica:** [GREENHOUSE_FINANCE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md), [Finance Movement Feed](finance-movement-feed.md), [TASK-702](../../tasks/in-progress/TASK-702-bank-reconciliation-canonical-anchors-rematerialize.md), [TASK-715](../../tasks/complete/TASK-715-reconciliation-test-period-archive-ux.md), [TASK-720](../../tasks/complete/TASK-720-instrument-category-kpi-rules.md), [TASK-721](../../tasks/complete/TASK-721-finance-evidence-canonical-uploader.md), [TASK-722](../../tasks/complete/TASK-722-bank-reconciliation-synergy-workbench.md), [TASK-723](../../tasks/complete/TASK-723-ai-assisted-reconciliation-intelligence.md), [TASK-726](../../tasks/complete/TASK-726-finance-movement-feed-foundation.md), [TASK-728](../../tasks/complete/TASK-728-finance-movement-feed-decision-polish.md)
 
 ## Qué es
@@ -146,15 +146,41 @@ O por cuenta individual:
 pnpm finance:rematerialize-balances --account santander-clp --opening 5703909 --seed-date 2026-02-28 --as-of 2026-04-27
 ```
 
-### Conciliación de un período (ejemplo marzo+abril 2026)
+### Conciliación de un período (flujo vigente desde septiembre 2026)
 
 ```bash
-# Dry-run: clasifica cada fila bancaria sin escribir
-pnpm finance:conciliate-mar-apr --dry-run
+# 1. Importar la cartola real (detecta el layout: Santander XLSX, TC XLSX/PDF, Global66 XLS, Banco de Chile PDF)
+pnpm finance:import-statement --account santander-clp --year 2026 --month 8 --file data/bank/<cartola>.xlsx --create-period --auto-match
 
-# Real: ejecuta la clasificación + crea anchors + supersede phantoms + re-materializa
-pnpm finance:conciliate-mar-apr
+# 2. Resolver lo que el auto-match no calza con un plan declarativo (dry-run primero)
+pnpm finance:reconcile-rows --plan scripts/finance/reconciliation-plans/2026-08-09.json
+pnpm finance:reconcile-rows --plan scripts/finance/reconciliation-plans/2026-08-09.json --apply
+
+# 3. Rematerializar y comparar con el saldo final de la cartola
+pnpm finance:rematerialize-balances --account santander-clp
 ```
+
+El script histórico `finance:conciliate-mar-apr` (marzo–abril 2026) queda como referencia; el flujo vigente es
+data-driven: el plan JSON es el juicio humano registrado fila por fila.
+
+**Rutina mensual.** El paso a paso por cuenta (fuente, formato, clave del archivo, orden y qué escalar) vive en el
+manual: [Rutina mensual de cierre bancario](../../manual-de-uso/finance/conciliacion-bancaria-operacion.md#rutina-mensual-de-cierre-bancario-checklist).
+
+**Facturas de proveedores llegadas por Nubox (`EXP-NB-*`) — decisión 2026-09-10 (TASK-1858).** No se calzan
+automáticamente contra la cartola. El auto-match sólo propone objetos que ya movieron caja (pagos, cobros,
+settlement legs); una factura `pending` no es un pago, y conciliarla directo dejaría la fila calzada sin
+`expense_payment`, el saldo del banco sin rebajar y la factura aún pendiente. El pago se registra desde la fila
+del banco con la acción `pay_expense` del plan (mismo command `recordExpensePayment` que usa el portal), que crea
+el pago y calza la fila en un solo acto. Si el volumen lo justifica, el siguiente paso canónico es una sugerencia
+«pagar y calzar» en el drawer del período; nunca un auto-match sobre facturas sin pagar.
+
+### Créditos bancarios
+
+Un crédito se registra como pasivo en `loan_accounts` (monto bruto, cuota, plazo, cuenta de abono). El desembolso
+entra al banco como un settlement de tipo `funding` (no es un ingreso: no aparece en ventas ni en categorías
+económicas de ingreso). Cada cuota que el banco descuenta es un gasto `financial_cost` anclado al crédito. Caso
+vigente: Crédito FOGAPE Santander contratado el 07/09/2026 (49 cuotas de $500.850) además del crédito
+420051383906 que se paga desde marzo.
 
 ### Health check del ledger
 
@@ -165,6 +191,18 @@ curl https://greenhouse.efeoncepro.com/api/admin/finance/ledger-health
 Returns 200 si healthy, 503 si hay drift. El dashboard de Reliability Control Plane consume este endpoint vía `incidentDomainTag='finance'`.
 
 > Detalle técnico: endpoint en `src/app/api/admin/finance/ledger-health/route.ts`, lib en `src/lib/finance/ledger-health.ts`. Cron diario que dispara alerts si hay drift queda como follow-up de TASK-702.
+
+## Recuperación agosto–septiembre 2026 (re-anclaje)
+
+Entre mayo y julio de 2026 no se importaron cartolas. En lugar de reconstruir esos meses, cada cuenta se
+re-ancló con una OTB al saldo real del banco al inicio de agosto (Global66 al 31/07 para capturar el ciclo de
+nómina de ese día; la tarjeta al cierre de ciclo del 06/08; Banco de Chile FAN Emprende con su primer estado de
+cuenta) y se conciliaron agosto y lo que va de septiembre. Los honorarios pagados brutos (sin retención SII) se
+registran con el neto sobre la nómina y el remanente anclado al entry; los recibos de Deel pagados con tarjeta
+personal van a la cuenta corriente accionista; un honorario pagado antes de que llegara la boleta se cierra por
+el flujo canónico del payable (boleta → readiness → obligación → orden pagada con la fecha del banco). Quedan
+sin calce, a propósito, la nómina internacional de agosto pagada el 03/09 (difiere del registro de Payroll en
+USD) y el cobro Berel en MXN hasta asociarlo a sus facturas.
 
 ## Archivar un período de prueba (TASK-715)
 

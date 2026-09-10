@@ -135,6 +135,29 @@ describe('account balances FX drift remediation', () => {
     expect(plan.decisions[0]?.reason).toBe('bounded_run_limits_exceeded')
   })
 
+  it('TASK-1858: never auto-remediates non-CLP accounts (the magnitude guard is CLP-denominated)', async () => {
+    listRowsMock.mockResolvedValueOnce([
+      {
+        ...santanderDriftRow,
+        accountId: 'santander-usd-usd',
+        accountName: 'Santander USD',
+        currency: 'USD',
+        persistedClosingBalanceClp: '-44613.56',
+        expectedClosingBalanceClp: '336.44',
+        driftClp: '-44950.00',
+        absDriftClp: '44950.00'
+      }
+    ])
+
+    const plan = await planAccountBalancesFxDriftRemediation({ policy: 'auto_open_periods' })
+
+    expect(plan.decisions).toHaveLength(1)
+    expect(plan.decisions[0]?.decision).toBe('unknown_requires_review')
+    expect(plan.decisions[0]?.reason).toBe('non_clp_account_native_units_manual_review')
+    expect(plan.decisions[0]?.evidence).toMatchObject({ currency: 'USD' })
+    expect(rematerializeMock).not.toHaveBeenCalled()
+  })
+
   it('dry-run writes audit and does not rematerialize', async () => {
     listRowsMock.mockResolvedValueOnce([santanderDriftRow])
     countRowsMock.mockResolvedValueOnce(1)

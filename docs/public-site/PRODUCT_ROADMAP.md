@@ -166,6 +166,14 @@ capability dentro del sistema, no presentarse como agencia suelta.
 
 ## Next
 
+- **Sistema editorial de los canales propios** (PDR-020, `Accepted` rev 1.2): un motor editorial
+ compartido con un **rol por canal** (blog el activo · LinkedIn el comprador · YouTube la profundidad ·
+ Instagram craft y cultura · Threads conversación viva · Glitch la propiedad), **catálogo propio de
+ formatos por canal** y franquicias con **canal-hogar** que viajan como corte, nunca como copia. Los
+ territorios se heredan de PDR-019; el vocero de talking head es Julio Reyes. **No autoriza producción,
+ apertura de cuentas ni cambios en el sitio:** quedan siete decisiones pendientes, de las cuales tres
+ (canonical de video, inventario de tools/webinars y naming visible) son compartidas con `TASK-1802` y
+ lo siguen bloqueando.
 - **Territorio editorial “Creative Workflows”** (PDR-014, Pillar V4 publicada; satélites siguientes): la
  Pillar educativa en Marketing con Manzanitas define la categoría desde la
  tesis **“un sistema de decisiones creativas humanas vuelto ejecutable”** y se

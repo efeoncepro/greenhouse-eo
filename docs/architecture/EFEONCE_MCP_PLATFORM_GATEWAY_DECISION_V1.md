@@ -104,6 +104,9 @@ duplica lógica de negocio.
    `globeCreditFunding.enabled` está en ON, y el write SEO `efeonce.mcp.seo.write` (TASK-1308), que sólo aparece
    cuando `greenhouseSeo.enabled` está en ON, y el reader Hiring `efeonce.mcp.hiring.read`, que sólo aparece cuando
    `greenhouseHiring.enabled` está en ON. Hiring conserva capability/purpose/audit downstream en Greenhouse.
+   Desde 2026-09-10 incluye el write de servicios de cliente `efeonce.mcp.client_services.write` (TASK-1852),
+   exigido por las tres tools del provider `greenhouse-client-services` —preview incluido— y comunicado sólo
+   por el challenge `403 insufficient_scope`; la autoridad la relee Greenhouse por persona en cada llamada.
 
    🔴 **Granularidad canónica: un scope por CLASE DE BLAST-RADIUS, nunca uno por capability.** Un scope por
    capability convierte esta lista en un **espejo del `capabilities_registry` de Greenhouse** — un registry
@@ -583,7 +586,8 @@ ecosystem, misma identidad de servicio — igual que `greenhouse-skills`; Greenh
 
 El scope `efeonce.mcp.identity.write` se anuncia en `scopes_supported` y **no existe en la app de
 recurso de Entra**. Verificado el 2026-09-06 con `az ad app show`: esa app define cinco scopes y ése
-no está entre ellos.
+no está entre ellos. (Delta 2026-09-10: TASK-1852 sumó a esa misma app `efeonce.mcp.client_services.write`
+con consentimiento Admin; el de identidad sigue sin estar ahí, y el cliente PKCE compartido sigue igual.)
 
 **Eso es correcto, no drift.** Lo acuña el **emisor nativo** (`auth.efeonce.org`), que lo declara en
 su catálogo (`src/lib/auth-server/oauth/scopes.ts`) junto a los otros writes. La clase que representa
@@ -646,6 +650,46 @@ repitieron lecturas post-cutover; los dos hosted finales renovaron con scope ún
 gasto. Ante una regresión futura se restaura 100 % a la revisión capturada; no se reintroduce el shim mediante una
 variable silenciosa. Un retorno permanente del shim exigiría otro Delta y nueva evidencia de clientes.
 
+### Delta 2026-09-10 — `efeonce.mcp.client_services.write`: el primer write con autoridad humana delegada por exchange (TASK-1852)
+
+`TASK-1852` federó la habilitación de servicios de cliente: `preview_client_service_enablement`,
+`apply_client_service_enablement` y `rollback_client_service_enablement`, provider `greenhouse-client-services`
+(`contractVersion` `task-1852-v1`), `efeonce-mcp` **`1.4.0`**, superficie **43 tools** (PR #9 `e457c31b`). Las
+tres existen en el manifiesto interno de Greenhouse (dominio `platform`) y están declaradas en
+`EXPECTED_GREENHOUSE_PLATFORM_TOOLS`.
+
+**Decisión.** El actor es la PERSONA, no la máquina, y por eso el camino no es el lane ecosystem sino el App:
+el gateway intercambia el token Entra verificado de la persona (RFC 8693, cliente confidencial
+`efeonce-mcp-client-services`, scope Greenhouse `client_services.enablement.write`, `resourceFamily`
+`client_services`) y llama `/api/platform/app/client-services/enablement/{preview,apply,rollback}`, donde
+Greenhouse relee los derechos de esa persona en cada llamada (`client_portal.module.{read_assignment,enable,pause}`)
+y registra `authority.kind='delegated_oauth'` con `clientId`/`accessTokenId`/`correlationId`. El lane ecosystem
+responde `403 invalid_delegated_context` a las escrituras **por diseño** (binding máquina, sin capability por
+humano); un agente diagnóstico de tenant sólo previsualiza. Es la misma mecánica de Hiring, aplicada por primera
+vez a un verbo de escritura.
+
+**Scope.** `efeonce.mcp.client_services.write` es una clase de blast-radius propia («abrir/compensar el acceso
+de un cliente a servicios contratados»), creada en la app de recurso MCP de Entra con consentimiento Admin;
+el cliente PKCE compartido **no se tocó** (misma postura que la sección de abajo). El emisor nativo la declara
+en paridad (`src/lib/auth-server/oauth/scopes.ts`, `EFEONCE_MCP_WRITE_SCOPES`) pero **no la emite hoy**: el
+contexto interno v2 es base-only (D9), así que la policy del gateway marca las tres tools `unsupported`
+(`provider_delegation_required`) para `native`. Las tres exigen el scope, **preview incluido**: el inventario
+administrativo es parte del mismo acto. Un scope por clase, nunca por capability.
+
+**Gates y rollout.** Greenhouse: `CLIENT_SERVICE_ENABLEMENT_WRITES_ENABLED=true` (Vercel Production, release
+`f69b9d326a6f`, PR #232), allowlist `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS` con
+`efeonce-mcp-hiring,efeonce-mcp-hiring-review,efeonce-mcp-client-services` (redeploy `greenhouse-naxc5guq3`),
+cliente sembrado por la migración `20260910005222927`. Gateway: env
+`GREENHOUSE_CLIENT_SERVICES_PROVIDER_ENABLED|_API_URL|_TOKEN_EXCHANGE_URL|_VERCEL_BYPASS_SECRET`; revisión
+`efeonce-mcp-gateway-00052-slt` al 100 %. **Lección del rollout:** el PR #9 desplegó el provider pero
+`efeonce.gateway.status` no lo listaba; el PR #10 (`80ea8d74`) lo corrigió con test por la puerta HTTP — un
+provider nuevo se reporta en el status en el MISMO PR (`MCP_TOOL_SURFACE_INVARIANTS.md` §11).
+
+**Estado honesto.** Federado y verificado en superficie y status; **sin canary de escritura**: el canary
+(`pnpm client-services:canary`) sólo ejercita el preview y exige un bearer Entra humano con el scope (PKCE
+interactivo). Ningún `apply` se ha ejecutado por este canal. La certificación de superficie no es customer
+access ni cierre de EPIC-046.
+
 ## References
 
 - [MCP Specification 2026-07-28](https://modelcontextprotocol.io/specification/2026-07-28)
@@ -694,3 +738,9 @@ organización y por persona ya existe (`greenhouse_core.external_capability_gran
 lo que falta es un token que lo porte: emisor propio y gateway multi-issuer (EPIC-044: `TASK-1829`/`TASK-1831`/
 `TASK-1832`) (actualizado 2026-09-04, TASK-1631). Hasta entonces las tools quedan federadas y **fail-closed**: registradas,
 verificables y sin token que las abra.
+
+**Delta 2026-09-10 (TASK-1852).** `efeonce.mcp.client_services.write` sigue la misma postura: existe en la app de
+recurso de Entra (consentimiento Admin) y **no** se agregó al cliente PKCE compartido. Su vía legítima es el
+intercambio RFC 8693 por el cliente confidencial `efeonce-mcp-client-services`, donde el lane App relee la
+capability de la persona en cada llamada; cerrar un `insufficient_scope` de estas tools ampliando el cliente
+compartido abriría la habilitación de módulos a todo el tenant.

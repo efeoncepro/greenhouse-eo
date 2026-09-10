@@ -1,5 +1,5 @@
 {
-  "idempotencyKey": "vacancy-seo-specialist-senior-20260909-v2",
+  "idempotencyKey": "vacancy-seo-specialist-senior-20260909-v3",
   "sourceReference": "efeonce-hiring-seo-specialist-senior-20260909-v1",
   "requestedRole": "SEO Specialist Senior",
   "publicTitle": "SEO Specialist Senior",
@@ -100,19 +100,19 @@
       "steps": [
         {
           "title": "Revisión de experiencia",
-          "body": "Revisamos la evidencia compartida, el alcance real de tus casos y la compatibilidad con la modalidad."
+          "body": "Miramos los casos que compartiste: qué alcance tuvieron, qué parte fue tuya y si el trabajo remoto en horario de Chile te acomoda."
         },
         {
           "title": "Conversación estructurada",
-          "body": "Conversamos sobre diagnóstico, priorización, colaboración y situaciones reales de trabajo."
+          "body": "Conversamos sobre diagnóstico, priorización y colaboración, siempre a partir de situaciones reales de trabajo."
         },
         {
           "title": "Caso ficticio guiado",
-          "body": "Resuelves un caso acotado que no produce trabajo para Efeonce ni para un cliente; puedes usar herramientas si declaras y verificas su aporte."
+          "body": "Resuelves un caso acotado y ficticio. No te pedimos trabajo utilizable: nada de lo que salga de aquí lo usa Efeonce ni un cliente. Puedes apoyarte en las herramientas que usarías en el trabajo real; solo dinos cuáles y verifica lo que te devuelvan."
         },
         {
           "title": "Conversación final",
-          "body": "Alineamos expectativas, forma de trabajo, disponibilidad y condiciones antes de una decisión."
+          "body": "Alineamos expectativas, forma de trabajo, disponibilidad y compensación antes de que cualquiera de los dos decida."
         }
       ],
       "expectedTiming": "Estimamos completar el proceso en tres a cuatro semanas, sujeto a disponibilidad mutua.",

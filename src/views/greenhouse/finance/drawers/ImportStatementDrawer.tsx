@@ -21,6 +21,11 @@ import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
 
 import { getMicrocopy } from '@/lib/copy'
+import {
+  BANK_STATEMENT_SOURCE_FORMAT_LABELS,
+  BANK_STATEMENT_SOURCE_FORMATS,
+  type BankStatementSourceFormat
+} from '@/lib/finance/bank-statements/types'
 
 import CustomTabList from '@core/components/mui/TabList'
 import CustomTextField from '@core/components/mui/TextField'
@@ -40,7 +45,9 @@ interface StatementRowInput {
   balance?: number
 }
 
-type ImportMode = 'csv' | 'manual'
+type ImportMode = 'file' | 'csv' | 'manual'
+
+type FileSourceFormat = 'auto' | BankStatementSourceFormat
 
 type Props = {
   open: boolean
@@ -53,26 +60,54 @@ type Props = {
 // Constants
 // ---------------------------------------------------------------------------
 
+// Debe calzar con `SUPPORTED_BANK_FORMATS` del parser CSV (`csv-parser.ts`);
+// antes ofrecía `banco_estado`/`generic`, que el servidor rechazaba.
 const BANK_FORMATS = [
-  { value: 'bci', label: 'BCI' },
-  { value: 'banco_estado', label: 'BancoEstado' },
   { value: 'santander', label: 'Santander' },
-  { value: 'scotiabank', label: 'Scotiabank' },
-  { value: 'generic', label: 'Generico (CSV)' }
+  { value: 'bci', label: 'BCI' },
+  { value: 'bancochile', label: 'Banco de Chile' },
+  { value: 'scotiabank', label: 'Scotiabank' }
 ]
+
+const FILE_SOURCE_FORMATS: Array<{ value: FileSourceFormat; label: string }> = [
+  { value: 'auto', label: 'Detectar automáticamente' },
+  ...BANK_STATEMENT_SOURCE_FORMATS.map(value => ({ value, label: BANK_STATEMENT_SOURCE_FORMAT_LABELS[value] }))
+]
+
+const TEXT_SOURCE_FORMATS: BankStatementSourceFormat[] = ['santander_tc_estado_cuenta_text', 'bancochile_cuenta_vista_text']
+const isTextSourceFormat = (value: FileSourceFormat) => value !== 'auto' && TEXT_SOURCE_FORMATS.includes(value)
+
+const readFileAsBase64 = (file: File) =>
+  new Promise<string>((resolve, reject) => {
+    const reader = new FileReader()
+
+    reader.onload = () => {
+      const result = String(reader.result || '')
+
+      resolve(result.includes(',') ? result.slice(result.indexOf(',') + 1) : result)
+    }
+
+    reader.onerror = () => reject(reader.error)
+    reader.readAsDataURL(file)
+  })
 
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
 const ImportStatementDrawer = ({ open, periodId, onClose, onSuccess }: Props) => {
-  const [mode, setMode] = useState<ImportMode>('csv')
+  const [mode, setMode] = useState<ImportMode>('file')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // File mode (XLS/XLSX del banco o texto del estado de cuenta)
+  const [file, setFile] = useState<File | null>(null)
+  const [sourceFormat, setSourceFormat] = useState<FileSourceFormat>('auto')
+  const [statementText, setStatementText] = useState('')
+
   // CSV mode
   const [csvContent, setCsvContent] = useState('')
-  const [bankFormat, setBankFormat] = useState('generic')
+  const [bankFormat, setBankFormat] = useState('santander')
 
   // Manual mode
   const [manualRows, setManualRows] = useState<StatementRowInput[]>([
@@ -80,8 +115,11 @@ const ImportStatementDrawer = ({ open, periodId, onClose, onSuccess }: Props) =>
   ])
 
   const resetForm = () => {
+    setFile(null)
+    setSourceFormat('auto')
+    setStatementText('')
     setCsvContent('')
-    setBankFormat('generic')
+    setBankFormat('santander')
     setManualRows([{ transactionDate: '', description: '', amount: 0 }])
     setError(null)
   }
@@ -115,7 +153,35 @@ const ImportStatementDrawer = ({ open, periodId, onClose, onSuccess }: Props) =>
 
     let body: Record<string, unknown>
 
-    if (mode === 'csv') {
+    if (mode === 'file') {
+      if (isTextSourceFormat(sourceFormat)) {
+        if (!statementText.trim()) {
+          setError('Pega el texto del estado de cuenta.')
+
+          return
+        }
+
+        body = { statementText: statementText.trim(), sourceFormat }
+      } else {
+        if (!file) {
+          setError('Selecciona el archivo del extracto (XLS o XLSX).')
+
+          return
+        }
+
+        try {
+          body = {
+            fileBase64: await readFileAsBase64(file),
+            fileName: file.name,
+            ...(sourceFormat !== 'auto' && { sourceFormat })
+          }
+        } catch {
+          setError('No se pudo leer el archivo seleccionado.')
+
+          return
+        }
+      }
+    } else if (mode === 'csv') {
       if (!csvContent.trim()) {
         setError('Pega el contenido del extracto CSV.')
 
@@ -204,6 +270,12 @@ const ImportStatementDrawer = ({ open, periodId, onClose, onSuccess }: Props) =>
         <TabContext value={mode}>
           <CustomTabList onChange={(_, v: ImportMode) => setMode(v)}>
             <Tab
+              label='Archivo del banco'
+              value='file'
+              icon={<i className='tabler-file-spreadsheet' />}
+              iconPosition='start'
+            />
+            <Tab
               label='Pegar CSV'
               value='csv'
               icon={<i className='tabler-file-text' />}
@@ -216,6 +288,52 @@ const ImportStatementDrawer = ({ open, periodId, onClose, onSuccess }: Props) =>
               iconPosition='start'
             />
           </CustomTabList>
+
+          {/* File Mode */}
+          <TabPanel value='file' sx={{ px: 0 }}>
+            <Stack spacing={2}>
+              <CustomTextField
+                select
+                fullWidth
+                size='small'
+                label='Origen del extracto'
+                value={sourceFormat}
+                onChange={e => setSourceFormat(e.target.value as FileSourceFormat)}
+              >
+                {FILE_SOURCE_FORMATS.map(f => (
+                  <MenuItem key={f.value} value={f.value}>{f.label}</MenuItem>
+                ))}
+              </CustomTextField>
+
+              {isTextSourceFormat(sourceFormat) ? (
+                <CustomTextField
+                  fullWidth
+                  size='small'
+                  label='Texto del estado de cuenta'
+                  multiline
+                  rows={12}
+                  value={statementText}
+                  onChange={e => setStatementText(e.target.value)}
+                  helperText='Abre el PDF del estado de cuenta, selecciona todo el texto y pégalo aquí'
+                />
+              ) : (
+                <Stack spacing={1}>
+                  <Button component='label' variant='tonal' color='secondary' startIcon={<i className='tabler-upload' />}>
+                    {file ? file.name : 'Seleccionar archivo XLS o XLSX'}
+                    <input
+                      hidden
+                      type='file'
+                      accept='.xls,.xlsx,.xlsm'
+                      onChange={e => setFile(e.target.files?.[0] ?? null)}
+                    />
+                  </Button>
+                  <Typography variant='caption' color='text.secondary'>
+                    Usa el export tal cual lo entrega el banco (cartola Office Banking, últimos movimientos de tarjeta o movimientos de cuenta Global66). Las filas repetidas se omiten.
+                  </Typography>
+                </Stack>
+              )}
+            </Stack>
+          </TabPanel>
 
           {/* CSV Mode */}
           <TabPanel value='csv' sx={{ px: 0 }}>

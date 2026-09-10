@@ -86,6 +86,31 @@ rights y economics separados. No habilita pricing público, checkout ni venta se
 El addendum de Creative Velocity documenta la capacidad modular observada en SKY, su separación entre servicio, IP
 y producto, y los gates para evolucionar de Modular Production Lane a una experiencia productizada.
 
+## Channel & Commerce (trade marketing)
+
+- [`Channel & Commerce — Business Model V1`](channel-commerce/CHANNEL_COMMERCE_BUSINESS_MODEL_V1.md)
+- [`Channel & Commerce — Roadmap por fases y asignación de capital V1`](channel-commerce/CHANNEL_COMMERCE_PHASED_ROADMAP_V1.md)
+- [`Channel & Commerce — Modelo de capital y ciclo de caja V1`](channel-commerce/CHANNEL_COMMERCE_CAPITAL_AND_CASH_MODEL_V1.md)
+- [`Channel & Commerce — Registro de proveedores V1`](channel-commerce/CHANNEL_COMMERCE_SUPPLIER_REGISTRY_V1.md)
+- [`Channel & Commerce — Plan de apertura y prospección V1`](channel-commerce/CHANNEL_COMMERCE_PROSPECTING_PLAN_V1.md)
+- [`Benchmark del mercado chileno 2026-09-10`](../audits/commercial/CHANNEL_COMMERCE_CHILE_MARKET_BENCHMARK_2026-09-10.md)
+- [`Channel & Commerce — catálogo de servicios`](../services/channel-commerce/README.md)
+
+Línea que gobierna la inversión de canal de marcas con distribución indirecta. En mercado se nombra **trade
+marketing**; internamente `Channel & Commerce`, porque su alcance excede la ejecución en punto de venta.
+
+Decisión de negocio 2026-09-10: **oferta completa desde el primer contrato**, con ejecución mixta gobernada y
+tecnología propia como destino de fase 3, no de arranque. Estado `Proposed`: habilita prospección exploratoria y
+diagnósticos cotizados caso a caso. No autoriza pricing
+publicado, compromiso de cobertura, contratación de capacidad de terreno ni venta de recurrente hasta cerrar sus
+gates G1–G6. El mercado inicial es Chile, único donde Efeonce tiene entidad, payroll propio y costo cargado
+conocido.
+
+Compone capacidades de Media & Distribution, Wave, RevOps & CRM y Creative Services sin absorber su ownership; el
+boundary por capacidad está en la §1 del business model. El escalón con personas en faena está sujeto al
+feasibility gate de [`Talent Assurance`](EFEONCE_TALENT_ASSURANCE_ECONOMIC_GUARDRAILS_V1.md) y a revisión legal de
+la figura de subcontratación.
+
 ## Fronteras con las demás categorías
 
 | Categoría | Pregunta que responde | No debe contener como canon |

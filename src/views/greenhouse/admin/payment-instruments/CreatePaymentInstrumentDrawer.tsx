@@ -63,7 +63,8 @@ const CURRENCIES = CURRENCY_DOMAIN_SUPPORT.finance_core
 
 const BANK_ACCOUNT_TYPES: Record<string, string> = {
   corriente: 'Cuenta corriente',
-  ahorro: 'Cuenta de ahorro'
+  ahorro: 'Cuenta de ahorro',
+  vista: 'Cuenta vista'
 }
 
 const initialForm = {

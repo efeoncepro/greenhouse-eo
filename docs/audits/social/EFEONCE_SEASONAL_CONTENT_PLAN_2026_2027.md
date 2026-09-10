@@ -5,6 +5,18 @@
 **Fuente vigente:** Notion. Este documento conserva decisiones y una fotografía fechada; no reemplaza los briefs,
 las asignaciones ni los estados de las páginas. Releerlos antes de producir, reasignar o publicar.
 
+> ✅ **Relación con PDR-020 resuelta (2026-09-10) — el plan se conserva.**
+> El contenido estacional queda incorporado a
+> [`PDR-020`](../../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md) §4.4 como **línea
+> propia y permanente**, porque su trabajo es **marca**: conecta a Efeonce con el calendario cultural de sus
+> mercados hablando en el idioma de su oficio. Las 13 direcciones creativas de este plan son el estándar de
+> la línea — cada fecha demuestra una disciplina de la casa, no saluda. **Canal-hogar: Instagram.**
+> **Métrica: sends + saves**, nunca seguidores. Un solo ajuste al operar este plan: **LinkedIn no recibe la
+> misma pieza con otro caption** — recibe el argumento profesional desarrollado detrás de la metáfora, y sólo
+> cuando la disciplina es legible para un comprador (usabilidad, branding, dirección de arte, copy, diseño
+> editorial). Si no hay argumento propio, la pieza se queda en Instagram. Alcance, fechas, responsables y
+> entregas de este plan **no cambian**.
+
 ## Destinos verificados
 
 - Proyecto [content - q4](https://www.notion.so/3d639c2fefe78153843af99129069273).

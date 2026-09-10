@@ -34,6 +34,12 @@ decidir, ejecutar y mejorar con mayor autonomía.
 
 ## 3. Rol de cada superficie
 
+> **Jerarquía con PDR-020.** Esta tabla describe el trabajo de cada superficie **dentro del loop de
+> capacidad**. El **rol de canal en el bow-tie** — y el catálogo de formatos de cada uno — lo fija
+> [`PDR-020`](../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md), que además cubre
+> LinkedIn, Instagram y Threads (ausentes acá). Ante discrepancia sobre qué se publica y dónde nace,
+> manda PDR-020; esta tabla manda sobre cómo el conocimiento sube a capacidad.
+
 | Superficie | Trabajo principal | Unidad de valor | Siguiente paso |
 |---|---|---|---|
 | **Glitch** | Radar editorial y sistema de discovery; detecta preguntas, cambios, anomalías y oportunidades | Señal priorizada con evidencia y contexto | Brief editorial, alerta, hipótesis de producto o learn moment |

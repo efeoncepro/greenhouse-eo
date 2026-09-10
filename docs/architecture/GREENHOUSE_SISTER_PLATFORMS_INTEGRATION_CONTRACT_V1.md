@@ -1,9 +1,9 @@
 # Greenhouse Sister Platforms Integration Contract V1
 
 > **Tipo de documento:** Spec de arquitectura
-> **Version:** 1.0 (deltas 2026-05-15 §9.5, 2026-05-28 §15, 2026-07-21 §15.5)
+> **Version:** 1.0 (deltas 2026-05-15 §9.5, 2026-05-28 §15, 2026-07-21 §15.5, 2026-09-10 §16)
 > **Creado:** 2026-04-11
-> **Ultima actualizacion:** 2026-07-21 — TASK-1507 agrega clausula §15.5 administracion del redirect allowlist
+> **Ultima actualizacion:** 2026-09-10 — TASK-1852 agrega §16 registro de clientes confidenciales de exchange RFC 8693 del gateway MCP
 > **Scope:** Greenhouse y plataformas hermanas del ecosistema Efeonce
 > **Docs relacionados:** `GREENHOUSE_ARCHITECTURE_V1.md`, `GREENHOUSE_REPO_ECOSYSTEM_V1.md`, `GREENHOUSE_KORTEX_VISUAL_PRESET_V1.md`, `GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`, `GREENHOUSE_ECOSYSTEM_ACCESS_CONTROL_PLANE_V1.md`, `TASK-265`, `TASK-039`
 
@@ -660,3 +660,34 @@ Cobertura: `src/lib/sister-platforms/oauth-redirect-uris.test.ts` (11 casos).
 2. **Capability/entitlement de gobierno.** No existe capability que declare quién puede mover un allowlist. Sin ella no hay `can(subject, ...)` que chequear en una route, y el guardrail de `capability-grant-coverage` no tiene nada que cubrir.
 
 Ambas son requisito de la route/MCP, no del CLI, que corre con credenciales de operador. **Hueco declarado y con dueño: `TASK-1513` — Sister Platform Redirect Allowlist Governance** (`docs/tasks/to-do/TASK-1513-sister-platform-redirect-allowlist-governance.md`, `to-do`). Esa task cierra las tres piezas: persistir el audit trail (incluye extender el enum cerrado de `eventType` del audit log), declarar la capability de entitlements que gobierne quién mueve un allowlist, y exponer el contrato programático route/MCP. Hasta que esté completa, esta primitive es CLI-only por diseño, no por omisión, y ese estado debe declararse así al cerrar cualquier trabajo que la toque.
+
+---
+
+## 16. Delta 2026-09-10 — Clientes confidenciales de exchange RFC 8693 del gateway MCP (registro canónico)
+
+El broker OAuth sister-platform de §15 tiene un segundo consumidor además del login interactivo: el **intercambio de
+token RFC 8693** con el que el gateway `efeonce-mcp` convierte el token Entra verificado de una persona en un bearer
+Greenhouse de corta vida para llamar un lane App. El contrato vive en `src/lib/sister-platforms/mcp-token-exchange.ts`
+y cada scope Greenhouse solicitado resuelve a UN cliente confidencial dedicado (`sisterPlatformKey='mcp'`):
+
+| Cliente (`client_id`) | Scope de entrada (gateway) | Scope Greenhouse emitido | `resourceFamily` / binding | Origen |
+| --- | --- | --- | --- | --- |
+| `efeonce-mcp-gateway` | `efeonce.mcp.globe.credits.funding.ensure` | `globe.credits.funding.ensure` | `workspaceBindingProvider='globe'` (workspace binding obligatorio) | TASK-1630 (ADR del gateway, punto 12) |
+| `efeonce-mcp-hiring` | `efeonce.mcp.hiring.read` | `hiring.talent_pool.read` | `hiring` | TASK-1726 |
+| `efeonce-mcp-hiring-review` | `efeonce.mcp.hiring.read` | `hiring.candidate.review.read` | `hiring` | TASK-1718 |
+| `efeonce-mcp-client-services` | `efeonce.mcp.client_services.write` | `client_services.enablement.write` | `client_services` | TASK-1852 (migración `20260910005222927`, fila `spoauth-client-efeonce-mcp-client-services`) |
+
+`assertFederatedClient` deniega con `401 invalid_client` si el cliente no existe, no está `active` (cliente y consumer),
+no es `confidential`, no tiene exactamente ese scope en `allowed_scopes` / `requiredScopes` / `capabilityScopes`, su
+audiencia no es únicamente `efeonce_internal`, su `metadata.resourceFamily` no coincide con el contrato del scope, o su
+`client_id` no está en `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS`. Esa variable es **una sola para todo el
+broker** (login Kortex de §15 y exchange MCP): en Vercel Production vale hoy
+`efeonce-mcp-hiring,efeonce-mcp-hiring-review,efeonce-mcp-client-services` (redeploy `greenhouse-naxc5guq3`,
+2026-09-10); un consumer nuevo se **añade** a la lista, nunca la reemplaza.
+
+El exchange no confiere autoridad: la decide el lane destino releyendo los derechos de la persona en cada llamada
+(para client services, `authorizeClientServices` en el exchange = tenant interno + route group `admin` +
+`client_portal.module.enable`, y el lane App vuelve a comprobar la capability de la operación). El dominio registra en
+su recibo `authority.kind='delegated_oauth'` con `clientId`, `accessTokenId` y `correlationId`; el lane ecosystem
+responde `403 invalid_delegated_context` a escrituras por diseño. Registro operativo del gateway:
+`docs/operations/EFEONCE_MCP_PLATFORM_RUNBOOK_V1.md`.

@@ -1,9 +1,9 @@
 # Greenhouse MCP Architecture V1
 
 > **Tipo de documento:** Spec de arquitectura
-> **Version:** 1.2
+> **Version:** 1.3
 > **Creado:** 2026-04-25
-> **Ultima actualizacion:** 2026-05-01
+> **Ultima actualizacion:** 2026-09-10 — §25 TASK-1852 (habilitación de servicios de cliente, autoridad humana delegada)
 > **Scope:** MCP server oficial de Greenhouse para agentes y LLMs
 > **Docs relacionados:** `GREENHOUSE_API_PLATFORM_ARCHITECTURE_V1.md`, `GREENHOUSE_WEBHOOKS_ARCHITECTURE_V1.md`, `GREENHOUSE_SISTER_PLATFORMS_INTEGRATION_CONTRACT_V1.md`, `GREENHOUSE_SISTER_PLATFORM_BINDINGS_RUNTIME_V1.md`, `GREENHOUSE_OPS_REGISTRY_ARCHITECTURE_V1.md`, `TASK-040`, `TASK-616`
 
@@ -806,3 +806,50 @@ es administrador designado recibe `forbidden`.
   gateway, con el JWT de la persona, se repite tras el merge. Evidencia:
   `docs/audits/2026-09-06-task-1837-external-invitation-delivery-evidence.md`. Invariantes:
   `agent-invariants/IDENTITY_WORKFORCE_AGENT_INVARIANTS.md` §TASK-1837.
+
+## 25. Delta 2026-09-10 — TASK-1852: habilitación de servicios de cliente con autoridad humana delegada (gateway `1.4.0`)
+
+§24 federó tools cuyo sujeto es una persona externa autenticada por Efeonce ID. TASK-1852 federa el primer **write
+interno con autoridad humana delegada**: la persona (administradora interna) opera desde su cliente MCP, pero quien
+decide es Greenhouse, releyendo sus derechos en cada llamada.
+
+- **Tools:** `preview_client_service_enablement`, `apply_client_service_enablement` y
+  `rollback_client_service_enablement`. A diferencia de §24, **sí existen en el manifiesto interno**
+  (`src/mcp/greenhouse/tool-manifest.ts`, dominio `platform`; `apply`/`rollback` con `writes: true`; el manifiesto quedó
+  en 47 entradas) y el gateway las federa vía el provider `greenhouse-client-services` (`contractVersion`
+  `task-1852-v1`), declaradas en `EXPECTED_GREENHOUSE_PLATFORM_TOOLS`. Superficie del gateway: **43 tools**, versión
+  **`1.4.0`** (aditivo), PR #9 de `efeonce-mcp` (`e457c31b`).
+- **Mecánica (la misma de Hiring, con verbo de escritura):** el token Entra de la persona se intercambia por RFC 8693
+  mediante el cliente confidencial `efeonce-mcp-client-services` (`src/lib/sister-platforms/mcp-token-exchange.ts`:
+  scope de entrada `efeonce.mcp.client_services.write` → scope Greenhouse `client_services.enablement.write`,
+  `resourceFamily: 'client_services'`; `assertFederatedClient` exige cliente confidencial, un solo scope, audiencia
+  `efeonce_internal`, `metadata.resourceFamily` coincidente y presencia en `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS`).
+  Con ese bearer el gateway llama sólo el lane App `/api/platform/app/client-services/enablement/{preview,apply,rollback}`;
+  `resolveServiceEnablementAuthority` acepta el cliente de exchange únicamente en modo de sesión `agent` para una persona
+  interna verificada por Entra, deniega al agente diagnóstico de tenant para escribir y estampa el recibo con
+  `authority: { kind: 'delegated_oauth', clientId, accessTokenId, correlationId }` (el portal usa `app_session`). Sin el
+  scope: `403 scope_not_allowed`. El lane ecosystem sigue respondiendo `403 invalid_delegated_context` a escrituras **por
+  diseño**: su actor es la máquina y no hay chequeo por humano.
+- **Scope:** `efeonce.mcp.client_services.write` es una clase propia («abrir/compensar el acceso de un cliente a servicios
+  contratados»), creada en la app de recurso MCP de Entra con consentimiento Admin — el cliente PKCE compartido no se
+  tocó — y declarada en paridad en `src/lib/auth-server/oauth/scopes.ts` (`EFEONCE_MCP_WRITE_SCOPES`, hoy cuatro;
+  `scopes.test.ts`); esa paridad viaja con el próximo release y el canal vivo no depende de ella. Las tres tools la
+  exigen, **preview incluido**: el inventario administrativo es parte del mismo acto. Un scope por clase, nunca por
+  capability (§18).
+- **Policy:** issuer Entra únicamente; para el emisor nativo las tres son `unsupported`
+  (`nativeUnsupportedReason: provider_delegation_required`), porque el contexto interno v2 sigue base-only (D9 de la ADR
+  de autoridad interna nativa). No se «destraba» ampliando v2 ni el cliente compartido.
+- **Gates Greenhouse:** `CLIENT_SERVICE_ENABLEMENT_WRITES_ENABLED=true` en Vercel Production (release
+  `f69b9d326a6f`, PR #232; el flag sólo se lee en Vercel), allowlist de Production
+  `efeonce-mcp-hiring,efeonce-mcp-hiring-review,efeonce-mcp-client-services` (redeploy `greenhouse-naxc5guq3`) y cliente
+  sembrado por la migración `20260910005222927` (`spoauth-client-efeonce-mcp-client-services`, aplicada).
+- **El estado del gateway también es contrato:** el PR #9 federó y desplegó el provider, pero `efeonce.gateway.status`
+  no lo listaba, así que su readiness no se podía observar por el protocolo; el PR #10 (`80ea8d74`) lo corrigió con un
+  test por la puerta HTTP. Regla nueva: un provider se agrega al status en el MISMO PR
+  (`agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md` §11). Revisión sirviendo al cierre: `efeonce-mcp-gateway-00052-slt`
+  (100 %), status `greenhouse-client-services` `enabled`.
+- **Estado honesto:** federado y verificado en superficie; **sin canary de escritura**: `pnpm client-services:canary`
+  sólo ejercita el preview y exige un bearer Entra humano con el scope (PKCE interactivo, no desatendido). Ningún
+  `apply` se ha ejecutado por este canal. Contrato del dominio:
+  `GREENHOUSE_CLIENT_SERVICE_EXPERIENCE_DECISION_V1.md` §Delta 2026-09-10 y
+  `docs/operations/CLIENT_SERVICE_ENABLEMENT_RUNBOOK_V1.md`.

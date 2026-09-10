@@ -130,7 +130,7 @@ Los competidores digitales **ganan visibilidad publicando su propio contenido de
 
 **Mediano (3–9 meses):**
 5. **Motor de PR gremial** (DF, Adlatina, Publimark, ANDA, IAB, AMDD) con ángulo IA/AEO/integración. *Owner: `content-marketing-studio` + `seo-aeo` + PR.*
-6. **Empaquetar casos** (Sky +127% / Bresler +180% / Berel) como prueba pública con métricas + quote de cliente (con permiso). *Owner: `content-marketing-studio` + `commercial-expert`.*
+6. **Empaquetar casos** (Sky +127% / Bresler +180% / Berel) como prueba pública con métricas + quote de cliente (con permiso). **Forma ya decidida en [`PDR-020`](../public-site/decisions/PDR-020-canales-propios-sistema-editorial.md) §4.3:** tres profundidades (dato citable en landing · caso completo en el blog = canonical · corte en LinkedIn), contado **como método, no como trofeo**, atado a un servicio del catálogo y con compuerta de aprobación del cliente. *Owner: `content-marketing-studio` + `commercial-expert`.*
 7. **Battlecard vs. Milimetrix** (competidor más cercano en AEO/growth). *Owner: `commercial-expert`.*
 8. **Postular a Effies / IAB Mixx** con un caso fuerte. *Owner: dirección + creativo.*
 

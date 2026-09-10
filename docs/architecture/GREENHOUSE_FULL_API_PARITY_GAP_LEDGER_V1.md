@@ -246,6 +246,25 @@ Verificación: Vitest del dominio (33) + señales (8) + coverage; smoke live `pn
 Contrato: [`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md)
 §`Slice 1 binding foundation — applied`.
 
+## Delta 2026-09-10 — TASK-1852: habilitación de servicios de cliente nace ✅ governed (+ primera escritura delegada federada por MCP)
+
+| Capa | Contrato |
+| --- | --- |
+| Primitives | `buildServiceEnablementPreview` (`preview.ts`), `applyServiceEnablement` y `rollbackServiceEnablement` (`commands.ts`) en `src/lib/client-portal/enablement/**`; la autoridad del recibo es `app_session` o `delegated_oauth` (`types.ts`) |
+| Capabilities | `client_portal.module.read_assignment` (preview), `client_portal.module.enable` (apply), `client_portal.module.pause` (rollback) — `src/config/entitlements-catalog.ts`; route group `admin` obligatorio (`access.ts`) |
+| App lane | `POST /api/platform/app/client-services/enablement/{preview,apply,rollback}` (`app-client-service-enablement.ts`); `resolveServiceEnablementAuthority`: sesión humana, o el cliente de exchange `efeonce-mcp-client-services` en modo `agent` para una persona interna verificada por Entra; el agente diagnóstico de tenant sólo previsualiza; sin scope `403 scope_not_allowed` |
+| Ecosystem lane | inventario (`ecosystem-client-service-enablement.ts`); escrituras `403 invalid_delegated_context` **por diseño** (binding máquina, sin capability por humano) |
+| CLI | `scripts/client-portal/service-enablement.ts` (misma `idempotencyKey` que App y Nexa) |
+| Nexa | ✅ `applyClientServiceEnablementAction` / `rollbackClientServiceEnablementAction` registradas en `src/lib/nexa/actions/registry.ts` |
+| MCP | ✅ **Federado** — `efeonce-mcp` `1.4.0`, provider `greenhouse-client-services`, tools `preview_/apply_/rollback_client_service_enablement`, scope `efeonce.mcp.client_services.write`, RFC 8693 vía `efeonce-mcp-client-services`; live en producción 2026-09-10 (rev `00052-slt`). **Canary humano de escritura ejecutado** 2026-09-10 ~07:40Z: `apply` de Sky por el canal (`EO-APC-ECD63852`, `delegated_oauth`, replay idempotente) |
+| UI (portal) | No verificada en este delta; las superficies del cliente siguen pendientes (EPIC-046; `/creative-hub` → TASK-1857) |
+
+Primera fila del ledger donde un bearer delegado (`sister_platform_oauth`) **sí confirma** una escritura: a
+diferencia de Hiring («el agente propone, el humano confirma»), acá el bearer se acuñó PARA una persona concreta y el
+lane relee sus derechos en cada llamada. Lo que sigue vedado es el agente de tenant y el binding máquina del
+ecosystem. Contrato: `GREENHOUSE_CLIENT_SERVICE_EXPERIENCE_DECISION_V1.md` §Delta 2026-09-10 ·
+`docs/operations/CLIENT_SERVICE_ENABLEMENT_RUNBOOK_V1.md`.
+
 ## Related
 
 - [`GREENHOUSE_FULL_API_PARITY_DECISION_V1.md`](GREENHOUSE_FULL_API_PARITY_DECISION_V1.md) — criterio

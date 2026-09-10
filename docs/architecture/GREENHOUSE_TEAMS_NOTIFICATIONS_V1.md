@@ -1,11 +1,17 @@
 # GREENHOUSE_TEAMS_NOTIFICATIONS_V1
 
 > **Tipo de documento:** Spec arquitectura canónica
-> **Versión:** 1.2
+> **Versión:** 1.3
 > **Creado:** 2026-04-26 por TASK-669 (Claude)
-> **Última actualización:** 2026-04-26 por TASK-671 (Claude) — bump a v1.2 con cutover real ejecutado, path Connector verificado y link al Notification Hub
+> **Última actualización:** 2026-09-10 por Claude (TASK-1852) — bump a v1.3: CHECK legado relajado y primeros destinos `chat_group` de clientes registrados
 > **Estado:** vigente
 > **Spec relacionada:** `GREENHOUSE_NOTIFICATION_HUB_V1.md` (orquestador upstream que decide qué eventos llegan a este transport)
+
+## Delta v1.3 (2026-09-10 — TASK-1852 destinos `chat_group` de clientes)
+
+- **El CHECK legado impedía persistir `chat_group`.** `teams_notification_channels_kind_bot_check` (TASK-669) exigía `team_id` + `channel_id` para TODA fila `teams_bot`, aunque el dispatcher ya soportaba chats grupales (Delta v1.1) y `teams_notification_channels_recipient_consistency_check` ya gobernaba los targets por `recipient_kind`. La migración `20260910013234351_task-1852-teams-chat-group-bot-check.sql` (aplicada) relaja ese CHECK a la identidad del bot (`bot_app_id` + `azure_tenant_id`); el CHECK por `recipient_kind` sigue siendo el dueño de team/channel/chat/user.
+- **Primeros chats grupales compartidos con clientes registrados como destino.** `writeTeamsGroupChatForSpace` (`src/lib/client-onboarding/teams-connect-store.ts`) persiste el chat como `recipient_kind='chat_group'`, `channel_code='client-teams-chat-<spaceId>'`, scopeado al Space; `provisioning_status='ready'` sólo cuando `inspectGroupChatForLinking` (`teams-channels-reader.ts`: Graph `GET /v1.0/chats/{id}` + `/installedApps?$expand=teamsApp`, lectura) confirma que el bot está instalado; si no, `pending_setup` con razón. Ruta: `POST /api/admin/clients/[organizationId]/lifecycle/teams/chat` (capability `client.lifecycle.case.advance`). Berel y Sky quedaron `ready` el 2026-09-10.
+- **Registrar un destino no envía nada.** La entrega la gobierna Notifications (Hub + política de preferencias `client_service_default_v1`, ver `GREENHOUSE_NOTIFICATION_HUB_V1.md` Delta 2026-09-10); en esta operación no se envió ningún mensaje a clientes. Estos destinos NO forman parte del registro de anuncios manuales (`src/config/manual-teams-announcements.ts`).
 
 ## Delta v1.2 (2026-04-26 — TASK-671 cutover ejecutado)
 
@@ -245,3 +251,4 @@ Documento funcional en lenguaje simple para usuarios operativos: pendiente. Se r
 ## 11. Cambios
 
 - **v1.0 (2026-04-26)** — Documento inicial. Spec creada junto con TASK-669.
+- **v1.3 (2026-09-10)** — TASK-1852: CHECK `kind_bot_check` relajado a identidad del bot; destinos `chat_group` de clientes registrados por Space (ver Delta v1.3).

@@ -1,8 +1,9 @@
 # Comunicaciones y Notificaciones end-to-end
 
 > **Tipo de documento:** Documentacion funcional
-> **Version:** 1.0
+> **Version:** 1.1
 > **Creado:** 2026-06-15 por Codex
+> **Ultima actualizacion:** 2026-09-10 por Claude (TASK-1852: chat grupal de cliente como destino y politica inicial de preferencias)
 > **Modulo:** Comunicaciones / Email / Notificaciones / Teams
 > **Rutas principales:** `/notifications`, `/notifications/preferences`, `/admin/notifications`, `/admin/email-delivery`, `/admin/emails/preview`, `/api/notifications`, `/api/admin/email-deliveries`, `/api/webhooks/resend`, `/api/teams-bot`
 > **Arquitectura relacionada:** `docs/architecture/GREENHOUSE_EMAIL_CATALOG_V1.md`, `docs/architecture/GREENHOUSE_EMAIL_PREVIEW_V1.md`, `docs/architecture/GREENHOUSE_NOTIFICATION_HUB_V1.md`, `docs/architecture/GREENHOUSE_TEAMS_NOTIFICATIONS_V1.md`, `docs/architecture/GREENHOUSE_TEAMS_BOT_INTERACTION_V1.md`
@@ -18,6 +19,15 @@ Snapshot DB agregado del ambiente consultado:
 - `greenhouse_notifications.email_deliveries` ultimos 30 dias: 53 `sent`.
 - `greenhouse_core.teams_notification_channels`: 3 canales `teams_bot` con `provisioning_status='ready'`.
 - `greenhouse_core.teams_bot_conversation_references`: 8 referencias.
+
+## Delta 2026-09-10 — clientes: destino Teams registrado y preferencias explicitas (TASK-1852)
+
+- El chat grupal de Teams que Efeonce comparte con un cliente ahora puede quedar **registrado como destino** del bot en `greenhouse_core.teams_notification_channels` (`recipient_kind='chat_group'`, un codigo `client-teams-chat-<spaceId>` por Space). Queda `ready` solo si Greenhouse comprueba, leyendo Microsoft Graph, que el bot esta instalado en ese chat; si no, `pending_setup` con la razon. Antes, una regla de base de datos heredada impedia guardar este tipo de destino.
+- **Registrar el destino no envia ningun mensaje.** El 2026-09-10 se registraron los chats de Berel y Sky sin enviar nada. Que llegue un aviso depende de Notifications (evento, categoria y preferencias), no del registro.
+- Las personas de un cliente que abre servicios reciben una **politica inicial de preferencias** declarada por el operador (`client_service_default_v1`): "informe listo" y "feedback solicitado" llegan in-app y por email; "hito de sprint" y "actualizacion de entrega" solo in-app; sin resumen agrupado. Se guarda como preferencias normales de la persona, que puede cambiarlas en `/notifications/preferences`; su eleccion prevalece.
+- Los destinos de clientes no son destinos de anuncios manuales (`pnpm teams:announce`).
+
+> Detalle tecnico: `writeTeamsGroupChatForSpace` e `inspectGroupChatForLinking` en `src/lib/client-onboarding/`; ruta `POST /api/admin/clients/[organizationId]/lifecycle/teams/chat`; migracion `20260910013234351`; politica en `src/lib/notifications/client-preference-policy.ts` y ruta `POST .../lifecycle/portal-users/notification-preferences`. Specs: `GREENHOUSE_TEAMS_NOTIFICATIONS_V1.md` Delta v1.3, `GREENHOUSE_NOTIFICATION_HUB_V1.md` Delta 2026-09-10.
 
 ## Que es
 

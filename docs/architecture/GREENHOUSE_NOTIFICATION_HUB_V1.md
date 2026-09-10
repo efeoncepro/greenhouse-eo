@@ -6,6 +6,13 @@
 > **Estado:** propuesta vigente — implementación incremental TASK-690 a TASK-693
 > **Specs relacionadas:** `GREENHOUSE_TEAMS_NOTIFICATIONS_V1.md` v1.1, `GREENHOUSE_TEAMS_BOT_INTERACTION_V1.md` v1.1, `GREENHOUSE_EVENT_CATALOG_V1.md`, `GREENHOUSE_REACTIVE_PROJECTIONS_PLAYBOOK_V1.md`
 
+## Delta 2026-09-10 — política explícita de preferencias para personas cliente (TASK-1852)
+
+- El preview de habilitación de servicios reporta `preferences_not_explicit` cuando una persona cliente no tiene preferencias persistidas. Para cerrarlo sin inferir, el operador aplica la política `client_service_default_v1` (`CLIENT_SERVICE_NOTIFICATION_POLICY_V1`, `src/lib/notifications/client-preference-policy.ts`): `report_ready` y `feedback_requested` → in-app + email; `sprint_milestone` y `delivery_update` → sólo in-app; cadencia `per_event` (el Hub V1 no agrega ni digiere; digest = TASK-387). Un guard en carga del módulo rechaza cualquier categoría cuyo `audience` no sea `client`.
+- Persistencia: filas de `greenhouse_notifications.notification_preferences` vía `NotificationService.upsertPreference` (el mismo store que usa la UI). Es una preferencia inicial: la persona puede cambiarla desde su portal (`PUT /api/notifications/preferences`) y esa decisión prevalece.
+- Ruta admin: `POST /api/admin/clients/[organizationId]/lifecycle/portal-users/notification-preferences` (body `{ userIds, policy: 'client_service_default_v1' }`, 1–50 personas, capability `client.lifecycle.portal_user.invite`, `client_id` resuelto server-side; toda persona debe pertenecer a ese cliente). Aplicada el 2026-09-10 a las 6 personas de Berel y Sky. No envía nada.
+- Teams: la política declara `teamsDestinationClasses = ['report_ready', 'feedback_requested']` como intención para el chat grupal del cliente registrado por TASK-1852 (`recipient_kind='chat_group'`, ver `GREENHOUSE_TEAMS_NOTIFICATIONS_V1.md` Delta v1.3); sólo aplica cuando Insights (TASK-1848) emita esos avisos. Hasta entonces no hay ningún envío automático a clientes.
+
 ## Delta 2026-09-09 — Insights y clientes Berel/Sky
 
 EPIC-045/046 incorporan email, in-app y Teamsbot al recorrido cliente/interno. El contrato consumidor

@@ -188,10 +188,20 @@ export async function POST(request: Request) {
       currency
     })
 
-    const rawAccountType = body.accountType || body.bankAccountType
+    // El drawer admin envía el tipo bancario en español (`corriente|ahorro|vista`);
+    // el contrato canónico (`ACCOUNT_TYPES`) es en inglés. Sin este mapeo, `ahorro`
+    // caía silenciosamente al default `checking` (bug pre-2026-09).
+    const BANK_ACCOUNT_TYPE_ALIASES: Record<string, AccountType> = {
+      corriente: 'checking',
+      ahorro: 'savings',
+      vista: 'vista'
+    }
 
-    const accountType = (rawAccountType && ACCOUNT_TYPES.includes(rawAccountType))
-      ? rawAccountType as AccountType
+    const rawAccountType = normalizeString(body.accountType || body.bankAccountType)
+    const aliasedAccountType = rawAccountType ? BANK_ACCOUNT_TYPE_ALIASES[rawAccountType] ?? rawAccountType : null
+
+    const accountType = (aliasedAccountType && ACCOUNT_TYPES.includes(aliasedAccountType as AccountType))
+      ? aliasedAccountType as AccountType
       : defaultAccountTypeForCategory(instrumentCategory)
 
     const country = normalizeString(body.country) || 'CL'

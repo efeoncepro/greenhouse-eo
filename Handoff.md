@@ -1,16 +1,80 @@
 # Handoff activo
 
+**Conciliación bancaria ago–sep 2026 (2026-09-10, code complete + datos cargados; rollout = mismo Cloud SQL):**
+re-anclaje OTB al 01/08 por cuenta (Global66 al 31/07, TC al cierre 06/08), `banco-chile-clp` (Cuenta Vista
+308526005) registrada por CLI canónica, cartolas reales importadas con los adapters nuevos
+(`src/lib/finance/bank-statements/`) y 77 filas conciliadas con `scripts/finance/reconciliation-plans/2026-08-09.json`.
+Períodos `reconciled`: global66-clp 2026-07/08, santander-corp-clp 2026-08 (ciclo 06/08–07/09). Saldos vs banco:
+Global66 exacto; Santander CLP +450.000 (ago) / +692.819 (sep) explicados fila por fila; TC exacto.
+**Segunda pasada 2026-09-10 (tarde):** Humberly = honorarios brutos sin retención (neto sobre la nómina +
+remanente anclado al entry, 195.750 jul / 68.625 ago); Deel REC-2026-11/12/13 con tarjeta personal *1879 → CCA
+(`finance:record-deel-receipts`); Valentina = boleta N°47 adjuntada al payable EO-CPAY-0002, orden
+`por-68676079` pagada con `paidAt=2026-09-07` (`finance:contractor-settle`), fila vinculada; comisión HubSpot
+Q2 2026 = ingreso `INC-HS-COMM-2026Q2` USD 378 con cobro 335,15; Banco de Chile FAN Emprende anclado (10.600 al
+01/08) e importado con el adapter `bancochile_cuenta_vista_text`. Períodos `reconciled` ahora: Santander CLP
+ago, Santander USD ago, Banco de Chile ago, Global66 jul/ago, TC ago. Santander CLP sep difiere 0,45 (redondeo
+Valentina). **⚠️ Rollout:** el fix ISSUE-169 vive sólo en `develop` local; el ops-worker (Cloud Run) sigue con el
+código viejo y al recomputar saldos por eventos reescribe cuentas USD/MXN en CLP (pasó con el cobro HubSpot;
+se rematerializó local). Hasta desplegar, revisar `santander-usd-usd`/`global-66-mxn-mxn` tras cada evento.
+**Tercera pasada 2026-09-10:** las dos transferencias de 1.000.000 (07/09) son sueldo accionista → expenses
+`payroll` anclados a `julio-reyes` (`createMemberPaymentExpense`, sin entry de Payroll: regularizar sueldo
+empresarial); los otros traspasos a Julio siguen como CCA (reembolsos de Deel pagados con su tarjeta). Berel:
+folio 51 = MXN 84.760 (17/07), folios 52+53 = MXN 104.000 (13/08), cobrados en `global-66-mxn-mxn` al tipo de
+cambio realizado 53,4034. HubSpot: los USD 42,85 faltantes = costo de recepción internacional estimado por
+diferencia (ingreso cobrado completo + comisión bancaria USD en la cuenta USD). Deel REC-2026-8/9/10 en el CCA
+(REC-8 sólo fees: la parte contractor figura pagada por Payroll desde la TC el 05/05 — verificar con el estado
+de cuenta TC de mayo). CLI nuevo `finance:ledger-adjust`. **Punto 2 (Andres/Daniela agosto) sigue esperando
+autorización.**
+**Cierre 2026-09-10 (autorizado "hagamos todo eso"):** punto 2 ejecutado (pagos payroll_system de Andres/Daniela
+superseded; nómina agosto pagada al valor real de Global66; `amount_clp` fijado al monto de la cartola porque
+el ledger redondea la tasa a 2 decimales) → Global66 sep `reconciled` (16.468). `TASK-1858` creada y
+registrada (rollout ISSUE-169 + fx_drift no-CLP + rutina mensual + regularizaciones Payroll + OTB CCA +
+crédito 420051383906). CCA cierra en −125.194 al 10/09 (reembolsos ≈ Deel; ancla formal en TASK-1858).
+**⚠️ 2026-09-10 tarde:** el ops-worker (rev `00675`, código viejo) volvió a corromper USD/MXN al procesar los
+cobros HubSpot/Berel y creó filas pre-genesis en MXN; se agregó el genesis floor al camino reactivo
+(`rematerializeAccountBalancesFromDate`) y se rematerializó local. Mientras no se despliegue el worker (push
+a develop → `ops-worker-deploy.yml`), cada evento en cuentas USD/MXN vuelve a romper el saldo.
+**Pendiente con el operador (punto 7):** nómina agosto Andres/Daniela pagada 03/09 (1.985.038 banco vs 2.020.120 registrado por payroll en
+USD, 4 filas Global66 sin calce); Melkin 788,86 USD (registrado en `santander-usd-usd`, no aparece en banco);
+cobro Berel MXN 104.000 (13/08) sin factura asociada; recepción USD 335,15 (13/08); cartola Banco de Chile
+(PDF cifrado, clave no coincide con los 4 últimos dígitos del RUT de la empresa) → OTB pendiente; estado de cuenta
+trimestral del crédito 420051383906 para completar `original_amount`. Bugs corregidos: `ISSUE-169`
+(saldos en moneda extranjera + día genesis). Follow-up formal propuesto: `TASK-1858` (pendiente de confirmación del operador para registrarla). Dev server local con la UI en
+`http://localhost:3000/finance/reconciliation`. **Push a `develop` hecho 2026-09-10 (`624468187`) por autorización del operador**, desde una copia limpia con `local:check` verde (el checkout compartido tenía skills sin espejar de otra sesión); dispara `ops-worker-deploy.yml`.
+
+**TASK-1604 (2026-09-10, in-progress):** slice SEO/Arte aplicado y documentado. Seis competencias activas,
+nueve preguntas SEO en `sme_review`, cero templates del pack, cero policies y cero assessments. Las vacantes
+`EO-OPN-0674` y `EO-OPN-0675` fueron publicadas por un acto separado y sus rutas responden 200; publicación no
+equivale a pack activo. El CLI ahora exige las preguntas exactas del pack y coincidencia exacta antes de
+reutilizar un template. Pendiente: SME individual, template SEO, binding scorecard Arte y Quality Gate.
+
+**TASK-1832 (readback 2026-09-10T12:17Z): operativamente bloqueada para retiro.** Frontera canary sana
+(`1/1`, purpose drift `0/0`, dos profiles run-owned fuera de Person 360), pero
+`auth.oauth.refresh_reuse_detected=93/24h` sobre el CIMD compartido de Codex. Cleanup dry-run, sin apply:
+`unexpectedRefs=0`, `deletionReady=false` y blockers
+`registration_active|active_authority|active_auth|oauth_client_not_run_owned`. El CIMD tiene 8 artefactos de
+sujetos canary y 35 de otros sujetos; el helper vigente borra por `client_id`. No retirar el blocker ni ejecutar
+`--apply`: implementar planner/delete/readback sujeto-específicos, preservar cliente/hijos ajenos, diagnosticar
+las familias de refresh y recién después reiniciar steady/retirar desde `delete_after`.
+
+**Canales propios Efeonce (2026-09-10, decisión cerrada / ejecución no autorizada):** estacional conservado
+como línea propia de marca (rev 1.3): hogar Instagram, sends+saves, LinkedIn recibe argumento y no caption.
+Plan 2026–2027 sin cambios de alcance.
+[PDR-020](docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md) rev 1.2 — rol y catálogo por
+canal, franquicias con canal-hogar, vocero Julio Reyes. Propagado a `TASK-1802`, `PDR-003/004/005/019`, roadmap,
+context pack y diez archivos de skills espejados. Pendiente: 7 decisiones, entre ellas canonical de video (bloquea
+TASK-1802 y YouTube) y el plan estacional 2026–2027. Nada producido ni publicado.
+
 **Social Efeonce, 09/09:** [13 piezas y skills](docs/audits/social/EFEONCE_SEASONAL_CONTENT_PLAN_2026_2027.md).
 Pendiente: conciliar MET-2339–2342 tarea/calendario. Producción abierta; cierre documental sin cambios Notion.
 
 **EPIC-046 / TASK-1852 (09/09):** Production `released`; [evidencia y pendientes](docs/audits/client-portal/TASK-1852_ROLLOUT_2026-09-09.md).
 PR #231/main `5726ce9d90`, orquestador `34416904936`; gates y watchdog verdes; excepción pause auditada.
-**10/09 (local, sin push):** términos con `bundledModules` (Berel seo_v2+AEO, Sky creative_hub); tres Berel `invited`
-sin correo; preview Sky limpio en prod; chats Teams `ready` y preferencias `client_service_default_v1` en las seis; contrato
-`delegated_oauth` sólo local. Invitaciones Berel BLOQUEADAS hasta tener UI. Falta: apply Sky (sesión humana + flag),
-release, Entra/gateway; `/creative-hub` 404 (1687).
-[Readback](docs/audits/client-portal/TASK-1852_MAPPING_PROVISIONING_READBACK_2026-09-10.json).
-TASK-1834 entrada, TASK-1687 catálogo; 1853–1856 to-do; TASK-1690 in-progress.
+**10/09 RELEASE `f69b9d32` (PR #232, run `34431792218`, manifest released 03:16Z, watchdog 5/5, canary 5/5):** términos con
+`bundledModules`, autoridad `delegated_oauth`, invitación diferida, chats Teams `ready`, preferencias `client_service_default_v1`;
+flag writes ON horneada. **07:40Z apply Sky HECHO por MCP delegado con token del operador** (`EO-APC-ECD63852`, sólo preserve,
+replay OK) = canary humano del canal cerrado. Berel sin entregar invitaciones (bloqueo del operador hasta UI);
+`/creative-hub` → `TASK-1857` (es el módulo de Sky; 1687 no supersede).
 
 **EPIC-045 ↔ EPIC-046:** Hitos I/N obligatorios: Insights cliente/interno + email/in-app/Teamsbot con
 deep links; shared separado y móvil posterior. Contrato en arquitectura Insights §§7.1/9.1 y ADRs.
@@ -44,41 +108,10 @@ matriz de clientes; sin widening ni cambios Entra. Multi-org queda en TASK-1844/
 [Task](docs/tasks/complete/TASK-1813-efeonce-mcp-oauth-client-interoperability.md) ·
 [auditoría](docs/audits/mcp/TASK-1813_OAUTH_HARDENING_QA_2026-09-07.md).
 
-**TASK-1832 — canary productivo en observación; retiro después del 2026-09-13 19:43Z (Codex,
-2026-09-07):** release Greenhouse `fb5fc082aa92-3f2c8706-24fa-452d-be8f-6feea7b8cdd9` `released`;
-Vercel/auth-server `00043-ndg` sirven `fb5fc082aa92`; gateway `1.2.0`/`00047-8b5` está 100 % Ready. Gates ON,
-MCP v2 `2.0.0` y CI/deploy verdes. Readback `2026-09-07T12:20:25Z`: Ready/100 %, SHA alineados con
-`origin/main`, health/metadata 200, MCP anónimo 401, producción ON y Vercel staging OFF; cero mutaciones.
-
-ChatGPT hospedado está verde con scope único `efeonce.mcp.read`, dos tools read-only y refresh post-TTL sin
-widening; Codex, correo, passkeys, Playwright y negativas siguen verdes. Claude Code `2.1.263`, Claude.ai y
-Desktop `1.46388.4` completaron login/consentimiento, lectura y renovación base-only; `2.1.186` queda como
-baseline histórico fallido. La matriz técnica de clientes está completa.
-
-Muestra read-only `2026-09-07T12:09:54Z`: registro/binding `1/1`, drift `0/0`, sólo 2 perfiles run-owned,
-cero Person 360, `activeAuthCount=56`, `unexpectedRefs=0` y blockers esperados. Nueve señales están `ok`; los
-seis `refresh_reuse` son negativos inventariados, run-owned y sin eventos nuevos. No hubo apply.
-No ejecutar `--apply` antes de
-`2026-09-13T19:43:30Z`; entonces cortar authority, medir deny, exigir `deletionReady=true`, aplicar con el xcr
-exacto, releer cero y apagar ambos gates. La automatización diaria sólo retira desde esa fecha con precondiciones
-verdes. Fuente viva: `docs/audits/mcp/TASK-1832_CANARY_ASSET_MANIFEST_task-1832-canary-20260906-a.md` y matriz
-MCP del mismo directorio. El incidente staging que apagó el Cloud Run compartido quedó resuelto: variable
-GitHub única ON, Vercel staging OFF y build `dpl_D9mkjQLE1a26H4TXQ2HX7wXWMpLf` READY.
-
-**Excepción operativa resuelta; rollout autorizado:** `pnpm pg:connect:migrate` se usó por error como comando de proxy y
-aplicó las dos migraciones aunque la aprobación excluía el apply. Readback 18:49:53Z: `registrations=0`,
-`canary_bindings=0`, drift de purpose externo/interno=0, 30 perfiles `smoke_test` preservados y 0 visibles en
-Person 360. No se crearon organización, cuentas, invitaciones, grants, sesiones, consentimientos o tokens; no se
-configuraron flags, no hubo push/deploy. Evidencia:
-`docs/audits/mcp/TASK-1832_SCHEMA_APPLY_READBACK_2026-09-06.md`. El operador decidió conservar el schema y autorizó
-el rollout completo el 2026-09-06: commit/push, promoción, deploys, gates, fixture dedicado, buzones controlados,
-sesiones, revocación y cleanup. El alcance sigue limitado a una organización sintética read-only; clientes y
-writes permanecen fuera.
-
-**Readback histórico TASK-1832 (2026-09-06 14:57Z; supersedido por 18:49Z):** la
-[auditoría previa](docs/audits/mcp/TASK-1832_PRE_IMPLEMENTATION_READBACK_2026-09-06.md) conserva los
-30 perfiles sintéticos entonces visibles en Person 360 y los seis smokes sin entrega real M365/Google.
-`EO-ORG-0050` sigue descartada como fixture: su historia impide eliminarla sin destruir evidencia.
+**Historia TASK-1832 2026-09-06/07:** releases, clientes, correo, passkeys, observaciones y la excepción de
+migración están preservados en la [task](docs/tasks/in-progress/TASK-1832-efeonce-mcp-client-canaries-and-first-customer-cohort.md)
+y el [manifiesto](docs/audits/mcp/TASK-1832_CANARY_ASSET_MANIFEST_task-1832-canary-20260906-a.md); no repetir
+sus snapshots aquí.
 
 **TASK-1835 (EPIC-044 U06) — `COMPLETE` y EN PRODUCCIÓN 2026-09-06 (Claude greenhouse-eo-06, 2026-09-06;
 commits `85c67e97d` · `4eb358d5b` · `b15b1690e`).** Efeonce ID queda enterprise-ready en local. Tres hallazgos que
@@ -376,73 +409,3 @@ Noviembre N43–N51 (Navidad adicional), diciembre N52–N59; números de párra
 son históricos. Módulo 16 en skills espejo; no renombrar archivos ni reutilizar IDs por número.
 Complemento autorizado: el método SEO/AEO y DataForSEO excluido de `1fcc2ade3` se incorpora por separado:
 referencia 09 de minería, routers/espejos, priorización §2.3, brief, manual y funcional; sin nueva compra ni push.
-
-## 2026-09-03 — TASK-1805 en producción: la fórmula detrás de `etv` es identidad del hecho, todavía legacy
-
-Tercer release del día (`5ec4cf769977-18572878-583b-43f0-aad0-01eb7b394aba`, run `33698245254`, target `5ec4cf76997722d5ae31621808b5ae967602bf0a`, PR #217): manifest `released`
-00:20:29Z, watchdog `ok`, 3/4 workers en el target y ops-worker change-gated en `57abe3f1e` (diff de árbol
-completo vacío: el `push:develop` ya lo había desplegado). Dispatch con bypass forense por `cloud_release`
-(`deploy.sh`), sin runs quemados; coordinado con `Task-1804` para no pisar su release #216 (freeze de ~25 min).
-
-**Verificado en producción (00:22Z):** lanes `domain-overview` y `url-visibility` de Berel MX sirven
-`etvMethodology` (`legacy_static_v1`, evidencia `contract_default_pre_cutoff`, corte `2026-11-01T00:00:00Z`);
-`/health` del ops-worker → `configuredWriteSource: env`, `policyVersion: etv-policy.v1`. Selectores
-`GROWTH_SEO_ETV_METHODOLOGY_VERSION`/`_READ_` = `legacy_static_v1` en Vercel Production+staging (horneados por el
-build del release) y en `deploy.sh`. Gateway `efeonce-mcp` con el manifest sincronizado desplegado
-(`efeonce-mcp-gateway-00029-bwg`). `TASK-1805` → `complete/`.
-
-**Riesgos abiertos / pendientes con dueño:** (1) el **contract** de schema sigue parqueado en
-`docs/tasks/pending-migrations/TASK-1805-etv-methodology-contract.sql.pending`; su condición de 7 días sin filas con
-evidencia contractual empieza a correr con este release y es precondición 4 de `TASK-1806` — sin él la coexistencia
-legacy/improved por sujeto/día sigue cerrada a propósito. (2) La señal `seo.etv_methodology.drift` queda en
-`awaiting_data` hasta la primera captura explícita del worker (cron `ops-seo-domain-overview`, día 16); si tras ese
-run sigue en `awaiting_data`, el worker no está escribiendo evidencia explícita — investigar, no esperar.
-(3) Improved ETV, shadow pagado, decisión histórica y cutover: **sólo `TASK-1806`**, con presupuesto aprobado.
-Evaluador dry-run listo: `scripts/growth/_sanity-task-1805-etv-evaluator.ts`.
-
-## 2026-09-02 (9) — DCR quedó deprecado en MCP `2026-07-28`: el shim de `mcp.efeonce.org` se mantiene, con dos hallazgos que la evaluación no buscaba
-
-Evaluación de impacto pedida por el operador, **sin migración**. Verificada contra la spec en vivo.
-Ya en producción vía release `375f56e24187` (commits `7788c8626` + `b4135f287`, verificados por blob
-contra `origin/main`). **Cero cambios de código.**
-
-**Veredicto:** el shim DCR sigue siendo correcto y no por inercia. La spec retiene DCR _"for backwards
-compatibility with authorization servers that do not support Client ID Metadata Documents"_ — que es
-literalmente Entra, que no soporta **ni CIMD ni RFC 7591**. El shim es pre-registro (prioridad 1 de la
-spec) por el único canal que los clientes MCP estándar consumen sin configuración manual. Earliest
-removal de DCR: primera revisión publicada en o después de **2027-07-28**.
-
-**Hallazgo estructural:** _"migrar el gateway a CIMD" no existe como trabajo._ CIMD es capacidad del
-**authorization server**; el nuestro es Entra y el gateway **espeja** `authorize`/`token` en vez de
-proxearlos. Soportarlo exige emitir los tokens = el broker de `TASK-1631`, cuyos invariantes **ya** lo
-exigían al proveedor. No se abrió task paralela; esta evaluación es insumo de esa task.
-
-**🔴 Riesgo más cercano que la deprecación, en la misma revisión:** la página nueva _Authorization
-Server Discovery_ (no existía en `2025-11-25`) exige `issuer` **idéntico** al identificador usado para
-construir la well-known URL. **Los nuestros difieren** desde que el shim existe. Funciona sólo porque
-los clientes todavía no lo aplican — empírico, no garantizado. **No se parchea** reclamando issuer
-propio: rompería la validación `iss` de RFC 9207, que hoy pasamos _porque_ espejamos el de Entra.
-
-**Dos hallazgos que salieron de coordinar con otras sesiones, no de la evaluación:**
-
-1. _Confused deputy_ (aporte de `greenhouse-eo-1e`, adoptado a medias tras verificar): la letra del
-   `MUST` no ata —no reenviamos— y el modo de la cookie de consentimiento quedó **refutado** leyendo
-   `src/app.ts`. Pero el riesgo está por construcción: `client_id` estático compartido +
-   `http://localhost` **sin puerto** + consentimiento cacheado por Entra = un proceso local toma un
-   código en silencio. Acotado a lectura porque ese cliente **no lleva scopes de escritura**.
-2. _La etiqueta miente:_ `32617b87-…` se llama **"Efeonce MCP Local Canary Client"** siendo el cliente
-   compartido de producción; el canary real es `66985833-…`. Quien lee "Local Canary" y asume radio de
-   juguete es quien no auditará las redirect URIs.
-
-**Plan B declarado, sin ejecutar:** si un cliente endurece cualquiera de las dos validaciones antes del
-broker → pre-registro puro (apuntar `authorization_servers` a Entra, apagar `OAUTH_PUBLIC_CLIENT_ID`
-—el shim ya está gateado por esa env— y `client_id` manual por usuario).
-
-**Pendiente con dueño:** renombrar el cliente en Entra y decidir sobre las redirect URIs — **NO**
-angostando `http://localhost` a secas, que es el loopback que Claude Code necesita. Opcional para quien
-formalice `TASK-1654`: publicar `client_id_metadata_document_supported: false` explícito.
-
-**Deuda de proceso, ajena a la task:** el worktree de esta sesión nació de `origin/main` (1490 commits
-detrás de `develop`) porque `origin/HEAD` apunta a `main`. Le pasó igual al worktree
-`busy-shirley-80edbf` del 2026-08-27. Fix propuesto y **no aplicado** (decisión del operador):
-`git remote set-head origin develop` + borrar ambos worktrees.

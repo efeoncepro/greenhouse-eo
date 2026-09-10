@@ -1,0 +1,13 @@
+[
+  {
+    "accountId": "sha-cca-julio-reyes-clp",
+    "genesisDate": "2026-08-01",
+    "openingBalance": 2141867.19,
+    "declarationReason": "TASK-1858 Slice 5 — anclaje del CCA del accionista (Julio Reyes) al SOD 01/08/2026 en el saldo que arroja el ledger al EOD 31/07/2026 (2.141.867,19 a favor del accionista: Deel REC-2026-* pagados con tarjeta personal *1879 menos reembolsos recibidos). Es un saldo CALCULADO, no acordado con el accionista ni respaldado por un estado de cuenta externo: queda `estimated` hasta que el operador confirme el monto (condición de retiro: confirmación escrita del accionista o cuadre contra el histórico completo de cargos *1879 + transferencias a Julio Reyes). Con ella agosto y septiembre 2026 quedan anclados igual que las cuentas bancarias del re-anclaje 2026-08.",
+    "auditStatus": "estimated",
+    "evidenceRefs": [
+      { "type": "ledger_balance", "ref": "greenhouse_finance.account_balances", "period": "2026-07-31", "description": "closing_balance 2.141.867,19 al 31/07/2026 materializado desde la OTB estimada 2026-02-28 (0) + movimientos Deel/reembolsos feb–jul." },
+      { "type": "task", "ref": "docs/tasks/in-progress/TASK-1858-finance-reconciliation-recovery-closeout.md", "description": "Slice 5 — CCA anclado; pendiente confirmación del accionista para pasar a reconciled." }
+    ]
+  }
+]

@@ -3212,7 +3212,7 @@ Toda lectura de `expense_payments` o `income_payments` que necesite saldos en CL
 
 **Reliability signal canónico**:
 
-- `finance.account_balances.fx_drift` (kind=`drift`, severity=`error` si count>0, steady=0). Recompute expected delta desde VIEWs canónicas + COALESCE settlement_legs y compara contra persisted (`period_inflows - period_outflows`). Tolerancia $1 CLP (anti FP-noise). Ventana 90 días. Reader: `src/lib/reliability/queries/account-balances-fx-drift.ts`. Subsystem rollup: `Finance Data Quality`.
+- `finance.account_balances.fx_drift` (kind=`drift`, severity=`error` si count>0, steady=0). Recompute expected delta desde VIEWs canónicas + settlement_legs, llevado a **unidades de la cuenta** con el espejo SQL de `toAccountUnits` (cuenta CLP → CLP-resuelto; cuenta USD/MXN → nativo, o `amount_clp / fx_rate_used` cuando el movimiento viene en otra moneda), y compara contra persisted (`period_inflows - period_outflows`). Tolerancia $1 CLP en cuentas CLP y 0,05 nativo en el resto (anti FP-noise). Ventana 90 días. **Desde TASK-1858 (ISSUE-169) cubre TODAS las cuentas**: el filtro `currency = 'CLP'` de TASK-774 Slice 7b dejaba USD/MXN fuera y el bug de sumar CLP dentro de `santander-usd-usd` pasó en `ok`. En filas no-CLP los campos `*Clp` del reader llevan unidades de la cuenta (`currency` dice cuál); el remediator (`account-balances-fx-drift-remediation.ts`) nunca las auto-remedia (`unknown_requires_review` / `non_clp_account_native_units_manual_review`) porque `maxAbsDriftClp` está denominado en CLP — el operador rematerializa explícitamente. Reader: `src/lib/reliability/queries/account-balances-fx-drift.ts`. Subsystem rollup: `Finance Data Quality`.
 
 **Lint rule mecánica** (extiende TASK-766):
 
@@ -3439,3 +3439,87 @@ Toda lectura de `greenhouse_finance.expenses` que vaya a UI o exports **debe** c
 - Cuando emerja un nuevo entity con problema análogo (ej. `income.client_name` snapshot vs `clients` tabla), replicar el patrón: extender reader con LEFT JOIN canónico + writer snapshot hydration + tests regresión.
 
 **Spec canónica**: `docs/tasks/complete/TASK-772-finance-expense-supplier-hydration-cash-out-selection.md`. Patrón replicable a `income`, `payment_orders` y futuros agregados que mezclen identidad referenciada + amounts en moneda mixta.
+
+## Delta 2026-09-10 — Recuperación de conciliación agosto–septiembre 2026: adapters de cartola, saldos en moneda extranjera, créditos V1
+
+**Contexto.** El módulo Banco/Conciliación no recibió cartolas entre mayo y julio de 2026. En vez de reconstruir
+esos meses, cada instrumento se re-ancló con una OTB bank-authoritative al inicio de agosto
+(`scripts/finance/otb-declarations/2026-08-reanchor.json` + `2026-07-31-global66-reanchor.json` +
+`2026-08-06-santander-corp-reanchor.json`), se importaron las cartolas reales de agosto y septiembre y se
+conciliaron con un plan declarativo (`scripts/finance/reconciliation-plans/2026-08-09.json`). Todo lo anterior al
+genesis queda cascade-superseded (TASK-703b); los documentos (facturas Nubox, nómina) no se tocan.
+
+### Bank statement adapters (`src/lib/finance/bank-statements/`)
+
+- `parseBankStatementFile({ content, fileName?, format? })` es el único punto de entrada archivo/texto →
+  filas canónicas (`ParsedStatementRow`: fecha, glosa, referencia, monto con signo, saldo opcional) + `meta`
+  (cuenta, moneda, período, saldo inicial/final del origen, filas crudas). Detecta el layout por contenido.
+- Formatos (`BankStatementSourceFormat`): `santander_cartola_xlsx` (cartola histórica y provisoria, CLP y USD,
+  Office Banking), `santander_tc_movimientos_xlsx` (últimos movimientos TC no facturados),
+  `santander_tc_estado_cuenta_text` (texto `pdftotext -layout` del estado de cuenta TC) y `global66_xls`
+  (export "Movimientos de cuenta CLP/MXN/USD"). El CSV pegado (`csv-parser.ts`) sigue vigente para
+  `bci|santander|bancochile|scotiabank`.
+- Convención de signo única: positivo = abono al titular, negativo = cargo, **también para instrumentos
+  liability** (un cargo TC es negativo; `MONTO CANCELADO` es positivo). El signo contable lo invierte el
+  materializer por `account_kind`, nunca el adapter.
+- Las filas "Costo tipo de cambio" de Global66 son débitos reales de la billetera y se conservan como filas.
+- Consumers: `POST /api/finance/reconciliation/[id]/statements` con `{ fileBase64, fileName, sourceFormat? }` o
+  `{ statementText, sourceFormat? }` (5 MB máx.), el drawer "Archivo del banco" y la CLI
+  `pnpm finance:import-statement` (que además extrae PDFs con `pdftotext` y filtra por `--from/--to`).
+
+### Filas idénticas el mismo día (import)
+
+`importBankStatementsToPostgres` fingerprinta por (período, fecha, glosa, referencia, monto, saldo). Dos
+movimientos reales idénticos (07/09/2026: dos transferencias de $1.000.000 al mismo RUT) colapsaban en uno.
+Ahora el n-ésimo duplicado dentro del mismo batch recibe fingerprint `base#n`: el re-import del mismo archivo sigue
+siendo idempotente y los duplicados legítimos se conservan.
+
+### Opening canónico del período (`resolveCanonicalReconciliationOpeningBalance`)
+
+1. OTB activa con `genesis_date` = primer día del período → opening = OTB.
+2. OTB activa con genesis dentro del período (tarjetas con ciclo, ej. `2026-08-06`) → opening = OTB.
+3. Si no, `account_balances.closing_balance` del día anterior (la fila puede no tener `space_id`; no se exige
+   igualdad con `accounts.space_id`).
+
+### Saldos en moneda extranjera (`getDailyMovementSummary` → `toAccountUnits`)
+
+Regla TASK-774 (CLP-resuelto) se mantiene para cuentas CLP. Para cuentas USD/MXN el balance vive en la moneda
+de la cuenta: pago en la moneda de la cuenta → nativo; pago en otra moneda con `amount_clp` → `amount_clp /
+rate(cuenta→CLP)` del día materializado; sin nada resoluble → nativo. Caso fuente: USD 788,86 sumado como
+738.625 en `santander-usd-usd`. La tasa se resuelve **antes** del resumen de movimientos.
+
+### Día genesis de la OTB
+
+`rematerializeAccountBalanceRange` materializa el día genesis (opening = OTB + movimientos del día) en vez de
+sembrar una fila estática: `genesis_date` es saldo al **inicio** del día (TASK-703), así que sus movimientos
+cuentan. Caso fuente: cargo TC APOLLO.IO del 06/08 fuera del saldo con genesis 06/08.
+
+### Créditos bancarios V1 (`src/lib/finance/loans.ts`)
+
+Primer consumer runtime del scaffold `loan_accounts` (TASK-702). `createLoanAccount` registra el pasivo
+(monto bruto, cuota, plazo, cuenta de abono, metadata del contrato); `recordLoanDisbursementSettlement` registra el
+desembolso como settlement `funding` con pata `incoming` en la cuenta de abono (**no es ingreso**, no toca `income`
+ni `economic_category`); cada cuota es `createLoanCuotaExpensePayment` (`financial_cost`, `loan_account_id`). Caso
+fuente: Crédito FOGAPE Santander 07/09/2026 (`loan-santander-fogape-20260907`, líquido 15.750.000 abonado como
+15.749.999 + 1). El saldo insoluto y el calendario de cuotas siguen siendo follow-up.
+
+### Plan de conciliación declarativo (`pnpm finance:reconcile-rows --plan … [--apply]`)
+
+Cada fila sin calce se resuelve con una acción explícita del plan (`internal_transfer`, `pay_expense`,
+`loan_installment`, `tax`, `bank_fee`, `card_expense`, `factoring_inflow`, `international_payroll`,
+`fx_conversion`, `loan_disbursement`, `skip`). El CLI llama a los mismos commands que las rutas API y vincula la
+fila como `manual_matched` (confianza 1.0); `skip` deja la fila sin calce con la razón registrada en el plan. Las
+transferencias en tránsito aceptan `paymentDate`/`destinationDate` distintos (cada pata al día que su banco
+muestra). El auto-match del período es el command compartido `runPeriodAutoMatch`.
+
+### Invariantes operativos para agentes — recuperación ago–sep 2026
+
+- **NUNCA** reconstruir meses sin cartola: re-anclar con OTB bank-authoritative y conciliar hacia adelante.
+- **NUNCA** un adapter decide signo contable por `account_kind`; emite signo de caja del titular.
+- **NUNCA** escribir el plan de conciliación con supuestos sobre nómina: si el monto bancario no calza con el
+  registro de payroll (`payment_source = payroll_system`), la fila se `skip` con razón y se escala al operador.
+- **NUNCA** registrar un desembolso de crédito como `income`; es settlement `funding` + `loan_account`.
+- **SIEMPRE** que se declare una OTB, rematerializar desde genesis y comparar el closing materializado con el
+  saldo final de la cartola del período (`meta.closingBalance`); la diferencia debe explicarse fila por fila.
+- **SIEMPRE** correr `pnpm finance:import-statement --dry-run` antes de importar un origen nuevo y agregar un test
+  sintético en `bank-statements/__tests__` para cada layout nuevo.

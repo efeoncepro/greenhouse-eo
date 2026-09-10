@@ -362,6 +362,25 @@ diagnóstico del origen del cambio.
 - Cliente CIMD/DCR compartido por un vendor es `shared`. Un cleanup canary nunca lo borra por sujeto; usa un DCR
   con `software_id=run_id` cuando necesites ownership eliminable.
 
+## 11. Un provider nuevo se reporta en `efeonce.gateway.status` en el mismo PR (`TASK-1852`)
+
+El gate de §9 mide la superficie de tools; **no mide lo que el gateway dice de sí mismo**. Medido el
+2026-09-10: el PR #9 de `efeonce-mcp` federó `greenhouse-client-services`, la suite pasó, la versión subió
+a `1.4.0`, el baseline quedó en 43 y la revisión salió con sus variables — y `efeonce.gateway.status`
+seguía sin listar el provider, así que la readiness en producción no se podía observar desde el protocolo.
+Lo cerró el PR #10 (`80ea8d74`) agregando el resumen del provider al payload de texto y al estructurado,
+con un test que llama la tool por la puerta HTTP.
+
+- **SIEMPRE** que se agregue un provider, `efeonce.gateway.status` lo enumera en el MISMO PR, y el test lo
+  llama a través del servidor construido (no del objeto provider): es la única prueba de que el operador
+  lo verá.
+- **NUNCA** infieras que un provider está sano porque sus tools aparecen en `tools/list`: registro y estado
+  son dos superficies, y sólo la segunda dice `enabled` (o su razón de bloqueo).
+- **SIEMPRE** cierra el readback de un despliegue leyendo `efeonce.gateway.status` real, no la revisión
+  Ready: Ready dice que el contenedor arrancó; el status dice qué providers cargaron su configuración.
+
+Complementa la regla de §5: federar es parte de «listo», y reportarse en el status es parte de federar.
+
 ## Documentación relacionada
 
 - `docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md` §5 (contrato de honestidad `●`/`◑`) y §7 (Full API Parity)
@@ -395,3 +414,14 @@ total global ni IDs ocultos. El resultado de discovery no sustituye la reautoriz
 Una organización nueva elegible no requiere reconexión; un consentimiento v1 nunca se eleva silenciosamente.
 La primera capability es sólo `growth.seo.observation.read`. Registro de una tool, scope y autorización efectiva
 son pruebas distintas. Manual: [uso multiorganización](../../manual-de-uso/identity/usar-mcp-interno-multiorganizacion.md).
+
+### Escritura con autoridad humana delegada por exchange — TASK-1852
+
+`preview_/apply_/rollback_client_service_enablement` aceptan sólo issuer Entra: el token de la persona se
+intercambia (RFC 8693, cliente confidencial `efeonce-mcp-client-services` → `client_services.enablement.write`) y
+el lane App de Greenhouse relee sus derechos en cada llamada (`client_portal.module.{read_assignment,enable,pause}`),
+estampando `authority.kind=delegated_oauth` en el recibo. Para el emisor nativo son `unsupported`
+(`provider_delegation_required`) porque v2 es base-only; el lane ecosystem responde `403 invalid_delegated_context`
+a escrituras por diseño. Un `403 insufficient_scope` de estas tools se cierra con un token humano que porte
+`efeonce.mcp.client_services.write`, nunca ampliando el cliente PKCE compartido ni el contexto v2. El scope se
+exige también en el preview: el inventario administrativo es parte del mismo acto.

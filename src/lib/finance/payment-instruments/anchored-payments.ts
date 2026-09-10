@@ -45,6 +45,8 @@ export interface CreatePayrollExpensePaymentInput extends BaseAnchoredInput {
   memberId?: string | null
   description?: string | null
   bankMovementReference?: string | null
+  /** `labor_cost_internal` (default del trigger) o `labor_cost_external` para contractors internacionales. */
+  economicCategory?: 'labor_cost_internal' | 'labor_cost_external' | null
 }
 
 export interface CreateToolingExpensePaymentInput extends BaseAnchoredInput {
@@ -72,6 +74,9 @@ export interface CreateSupplierExpensePaymentInput extends BaseAnchoredInput {
 export interface CreateBankFeeExpensePaymentInput extends BaseAnchoredInput {
   description: string
   miscellaneousCategory?: string | null
+  /** Moneda de la comisión cuando la cuenta no es CLP (ej. fee de recepción internacional en cuenta USD). */
+  currency?: 'CLP' | 'USD' | 'MXN'
+  exchangeRateToClp?: number | null
 }
 
 export interface CreateLoanCuotaExpensePaymentInput extends BaseAnchoredInput {
@@ -82,6 +87,13 @@ export interface CreateLoanCuotaExpensePaymentInput extends BaseAnchoredInput {
 
 export interface CreateInternalTransferSettlementInput {
   paymentDate: string
+  /**
+   * Fecha en que el destino recibe los fondos cuando difiere de `paymentDate`
+   * (traspaso en tránsito: Global66 abona el 31/07 lo que Santander carga el
+   * 03/08). Cada pata queda anclada al día que su banco muestra, así los dos
+   * saldos calzan con sus cartolas. Default: `paymentDate`.
+   */
+  destinationDate?: string | null
   amount: number
   sourceAccountId: string
   destinationAccountId: string
@@ -97,9 +109,9 @@ export interface CreateFxConversionSettlementInput {
   sourceAccountId: string
   destinationAccountId: string
   sourceAmount: number
-  sourceCurrency: 'USD' | 'CLP'
+  sourceCurrency: 'USD' | 'CLP' | 'MXN'
   destinationAmount: number
-  destinationCurrency: 'USD' | 'CLP'
+  destinationCurrency: 'USD' | 'CLP' | 'MXN'
   fxRate: number
   reference?: string | null
   notes?: string | null
@@ -129,6 +141,8 @@ export interface CreatePreviredSettlementInput {
 export interface CreateInternationalPayrollSettlementInput {
   payrollEntryId: string
   paymentDate: string
+  /** Fecha del cargo en la cuenta origen cuando el banco lo asienta después del abono en tránsito (default: `paymentDate`). */
+  sourceDate?: string | null
   sourceAccountId: string
   transitAccountId: string
   beneficiaryName: string
@@ -195,9 +209,20 @@ const createAnchoredExpensePayment = async (
     paymentSource: 'manual' | 'bank_reconciliation'
     spaceId?: string | null
     currencyOverride?: string | null
+    /** Tipo de cambio moneda→CLP cuando `currencyOverride` no es CLP (amount_clp = amount × rate). */
+    exchangeRateToClp?: number | null
   }
 ): Promise<AnchoredFactoryResult> => {
   ensurePositive(input.amount)
+
+  const anchoredCurrency = input.currencyOverride || 'CLP'
+  const anchoredRate = anchoredCurrency === 'CLP' ? 1 : input.exchangeRateToClp ?? null
+
+  if (anchoredCurrency !== 'CLP' && (!anchoredRate || anchoredRate <= 0)) {
+    throw new FinanceValidationError(`exchangeRateToClp es obligatorio para un expense anclado en ${anchoredCurrency}.`, 422)
+  }
+
+  const anchoredAmountClp = Math.round(input.amount * (anchoredRate ?? 1) * 100) / 100
 
   return withTransaction(async (client: PoolClient) => {
     await ensureAccount(client, input.paymentAccountId)
@@ -234,7 +259,7 @@ const createAnchoredExpensePayment = async (
     }
 
     const expenseId = `EXP-RECON-${input.paymentDate.replace(/-/g, '')}-${Math.floor(Math.random() * 1_000_000).toString(36)}`
-    const currency = input.currencyOverride || 'CLP'
+    const currency = anchoredCurrency
     const totalAmount = input.amount
 
     const anchorEntries = Object.entries(input.anchorColumns).filter(([, v]) => v !== undefined)
@@ -263,13 +288,14 @@ const createAnchoredExpensePayment = async (
       else if (c === 'expense_type') vals.push(input.expenseType)
       else if (c === 'description') vals.push(input.description)
       else if (c === 'currency') vals.push(currency)
-      else if (c === 'subtotal' || c === 'total_amount' || c === 'total_amount_clp' || c === 'amount_paid') vals.push(totalAmount)
+      else if (c === 'subtotal' || c === 'total_amount' || c === 'amount_paid') vals.push(totalAmount)
+      else if (c === 'total_amount_clp') vals.push(anchoredAmountClp)
       else if (c === 'payment_status') vals.push('paid')
       else if (c === 'payment_date' || c === 'document_date') vals.push(input.paymentDate)
       else if (c === 'payment_method') vals.push('bank_transfer')
       else if (c === 'payment_account_id') vals.push(input.paymentAccountId)
       else if (c === 'payment_reference') vals.push(dedupeRef)
-      else if (c === 'exchange_rate_to_clp') vals.push(1)
+      else if (c === 'exchange_rate_to_clp') vals.push(anchoredRate ?? 1)
       else if (c === 'space_id') vals.push(input.spaceId || null)
       else {
         const found = anchorEntries.find(([k]) => k === c)
@@ -308,14 +334,15 @@ const createAnchoredExpensePayment = async (
          $6, 'bank_transfer', $7, 'bank_statement',
          $8, $9, NOW(),
          $10, $11, $12,
-         1, $4, 0, NOW()
+         $13, $14, 0, NOW()
        )`,
       [
         paymentId, finalExpenseId, input.paymentDate, totalAmount, currency,
         dedupeRef, input.paymentAccountId,
         input.notes ?? null, input.actorUserId ?? null,
         Boolean(input.reconciliationRowId), input.reconciliationRowId ?? null,
-        input.reconciliationRowId ? new Date().toISOString() : null
+        input.reconciliationRowId ? new Date().toISOString() : null,
+        anchoredRate ?? 1, anchoredAmountClp
       ]
     )
 
@@ -353,13 +380,46 @@ export const createPayrollExpensePayment = (input: CreatePayrollExpensePaymentIn
     anchorColumns: {
       payroll_entry_id: input.payrollEntryId,
       payroll_period_id: input.payrollPeriodId ?? null,
-      member_id: input.memberId ?? null
+      member_id: input.memberId ?? null,
+      ...(input.economicCategory ? { economic_category: input.economicCategory } : {})
     },
     paymentSource: 'bank_reconciliation',
     paymentDate: input.paymentDate,
     amount: input.amount,
     paymentAccountId: input.paymentAccountId,
     reference: input.reference || input.bankMovementReference,
+    notes: input.notes,
+    actorUserId: input.actorUserId,
+    reconciliationRowId: input.reconciliationRowId
+  })
+
+/**
+ * Pago directo a un colaborador/accionista sin entry de Payroll (ej. sueldo
+ * accionista transferido desde la cuenta corriente). Expense `payroll`
+ * anclado a `member_id`, `economic_category=labor_cost_internal`. Payroll
+ * conserva la autoridad sobre el entry: esto es el registro de caja.
+ */
+export interface CreateMemberPaymentExpenseInput extends BaseAnchoredInput {
+  memberId: string
+  description: string
+  memberName?: string | null
+}
+
+export const createMemberPaymentExpense = (input: CreateMemberPaymentExpenseInput) =>
+  createAnchoredExpensePayment({
+    expenseType: 'payroll',
+    description: input.description,
+    anchorColumns: {
+      member_id: input.memberId,
+      member_name: input.memberName ?? null,
+      miscellaneous_category: 'member_direct_payment',
+      economic_category: 'labor_cost_internal'
+    },
+    paymentSource: 'bank_reconciliation',
+    paymentDate: input.paymentDate,
+    amount: input.amount,
+    paymentAccountId: input.paymentAccountId,
+    reference: input.reference,
     notes: input.notes,
     actorUserId: input.actorUserId,
     reconciliationRowId: input.reconciliationRowId
@@ -372,7 +432,10 @@ export const createToolingExpensePayment = (input: CreateToolingExpensePaymentIn
     anchorColumns: {
       tool_catalog_id: input.toolCatalogId,
       supplier_name: input.supplierName ?? null,
-      miscellaneous_category: 'tooling'
+      miscellaneous_category: 'tooling',
+      // TASK-768: el trigger default resuelve `miscellaneous` a `other`; el
+      // anclaje tooling ya sabe que es SaaS.
+      economic_category: 'vendor_cost_saas'
     },
     paymentSource: 'bank_reconciliation',
     paymentDate: input.paymentDate,
@@ -436,7 +499,9 @@ export const createBankFeeExpensePayment = (input: CreateBankFeeExpensePaymentIn
     reference: input.reference,
     notes: input.notes,
     actorUserId: input.actorUserId,
-    reconciliationRowId: input.reconciliationRowId
+    reconciliationRowId: input.reconciliationRowId,
+    currencyOverride: input.currency ?? 'CLP',
+    exchangeRateToClp: input.exchangeRateToClp ?? null
   })
 
 export const createLoanCuotaExpensePayment = (input: CreateLoanCuotaExpensePaymentInput) =>
@@ -557,7 +622,10 @@ export const createCompanyCardExpense = async (
         member_id: input.memberId ?? null,
         supplier_name: input.supplierName ?? null,
         miscellaneous_category: input.memberId ? 'international_payroll_via_card' : 'tooling',
-        payment_provider: input.cardLastFour ? `Tarjeta empresa (*${input.cardLastFour})` : null
+        payment_provider: input.cardLastFour ? `Tarjeta empresa (*${input.cardLastFour})` : null,
+        // TASK-768: cargo TC a proveedor SaaS = vendor_cost_saas; nómina
+        // internacional pagada con tarjeta = labor_cost_external.
+        economic_category: input.memberId ? 'labor_cost_external' : 'vendor_cost_saas'
       },
       paymentSource: 'bank_reconciliation',
       paymentDate: input.paymentDate,
@@ -722,7 +790,7 @@ export const createInternalTransferSettlement = async (input: CreateInternalTran
        ) VALUES ($1, $2, 'internal_transfer', 'incoming', $3, $4, $5, $6, 'settled', $7::date, $8, $9, NOW(), NOW())`,
       [
         incomingLegId, settlementGroupId, input.destinationAccountId, input.sourceAccountId,
-        sourceAcct.rows[0]?.currency || 'CLP', input.amount, input.paymentDate,
+        sourceAcct.rows[0]?.currency || 'CLP', input.amount, input.destinationDate || input.paymentDate,
         Boolean(input.destinationReconciliationRowId), input.destinationReconciliationRowId ?? null
       ]
     )
@@ -973,7 +1041,7 @@ export const createInternationalPayrollSettlement = async (
       [
         `stlleg-${settlementGroupId}-source-out`, settlementGroupId,
         input.sourceAccountId, input.transitAccountId,
-        input.sourceAmount, input.paymentDate,
+        input.sourceAmount, input.sourceDate || input.paymentDate,
         Boolean(input.sourceReconciliationRowId), input.sourceReconciliationRowId ?? null
       ]
     )
@@ -1001,7 +1069,8 @@ export const createInternationalPayrollSettlement = async (
       paymentAccountId: input.transitAccountId,
       description: `Pago internacional ${input.beneficiaryName} (${input.beneficiaryCountry || ''}) — entry ${input.payrollEntryId}`,
       reference: `intpay-${input.payrollEntryId}-${input.paymentDate}`,
-      actorUserId: input.actorUserId
+      actorUserId: input.actorUserId,
+      economicCategory: 'labor_cost_external'
     })
 
     await client.query(
@@ -1015,7 +1084,10 @@ export const createInternationalPayrollSettlement = async (
       const feeR = await createAnchoredExpensePayment({
         expenseType: 'gateway_fee',
         description: `FX fee Global66 → ${input.beneficiaryCountry || 'intl'} (entry ${input.payrollEntryId})`,
-        anchorColumns: { miscellaneous_category: 'fx_fee', payroll_entry_id: input.payrollEntryId },
+        // `gateway_fee` no tiene regla en el trigger default (TASK-768) y la
+        // CHECK `expenses_economic_category_required_after_cutover` abortaba el
+        // fee dejando la nómina sin settlement (2026-09-10).
+        anchorColumns: { miscellaneous_category: 'fx_fee', payroll_entry_id: input.payrollEntryId, economic_category: 'bank_fee_real' },
         paymentSource: 'bank_reconciliation',
         paymentDate: input.paymentDate,
         amount: input.fxFeeAmount,

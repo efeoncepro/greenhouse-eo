@@ -12,7 +12,7 @@ Layering canónico del ecosistema digital (SSOT: `docs/public-site/decisions/PDR
 |---|---|---|
 | **Think** — producto/hub editorial multi-runtime | demand-gen + nurturing top-of-funnel | Agrupa Marketing con Manzanitas, Glitch, tools y lead magnets. No equivale al host `think.efeoncepro.com`; placement de Pillars por PDR-018 |
 | **`think.efeoncepro.com`** — runtime Astro especializado | tools, reportes y experiencias enfocadas | Repo/Vercel `efeonce-think`; no es el destino automático de artículos o Pillars |
-| **Marketing con Manzanitas** — blog | thought leadership / autoridad / demanda | El blog de contenido; pillars y clusters viven aquí |
+| **Marketing con Manzanitas** — blog | thought leadership / autoridad / demanda | **Multiformato** (PDR-020 §4.2): pillars y clusters, **casos de éxito completos (canonical)**, tools/graders, webinars, ebooks, data studies y archivo Glitch. Formato ≠ categoría |
 | **Glitch** — newsletter semanal (IA / Marketing / Negocios) | audiencia propia / nurturing | Canal owned de mayor ROI; consume átomos del pillar y genera piezas |
 | **Tools / lead magnets** (AI Visibility Grader, ebooks, webinars) | demand-capture / captura | Contenido gated que convierte audiencia en lead |
 | **efeoncepro.com** (WordPress/Kinsta, recalibración a Astro) | demand-capture + conversión | Landings de servicio, comparison tables, páginas de conversión |
@@ -42,20 +42,39 @@ El **AI Visibility Grader** es la costura top→bottom del ecosistema. Cargar PD
 
 ## Distribución en el ecosistema Efeonce
 
+> ⚠️ **Los canales propios se rigen por `docs/public-site/decisions/PDR-020-canales-propios-sistema-editorial.md`.**
+> Cárgalo antes de planificar distribución en canales de marca Efeonce. Lo que sigue es la cadena de
+> atomización; **el destino de cada átomo lo decide el catálogo por canal de PDR-020, no la conveniencia
+> del calendario.**
+
 Cadena típica de un pillar de **Marketing con Manzanitas**:
 
 ```
-Pillar (blog, vía Content Factory) 
+Pillar (blog, vía Content Factory)
   → Glitch (edición dedicada al insight)        [greenhouse-email]
-  → LinkedIn/IG/X (nodos o activation assets)   [social-media-studio + Metricool]
+  → el canal cuyo catálogo admite el átomo      [social-media-studio + Metricool]
   → Reel/clip (si aplica)                       [motion-design-studio]
   → Lead magnet gated (si el tema lo amerita)   [03 + growth-forms]
   → Slides sales enablement                     [commercial-expert]
   → citabilidad IA (answer-first, datos)        [seo-aeo]
 ```
 
+**NUNCA atomices "a LinkedIn/IG/X" como si fueran un destino único.** PDR-020 asigna a cada canal un rol y
+un catálogo propio de formatos; un átomo que no pertenece al catálogo de un canal no se publica ahí.
+Reglas que gobiernan la atomización a canales propios:
+
+- **Canal-hogar + satélites.** Cada franquicia nace en un canal y viaja como **corte con trabajo propio**,
+  nunca como copia. Hogares: Behind the Build → Instagram · Versus → YouTube + Blog · Educativo → LinkedIn ·
+  Glitch → email · Trendjacking → Threads + Instagram · Casos de Éxito → Blog.
+- **Trendjacking no se atomiza:** su valor es la ventana temporal y un canal lento la pierde.
+- **Educativo LinkedIn → Blog es corte, nunca copia.** El blog recibe la versión answer-first; publicar el
+  mismo texto canibaliza el activo.
+- **Casos de éxito** tienen compuerta de aprobación de cliente: su cadencia no la fija el calendario editorial.
+- **Los territorios se heredan de PDR-019** (taxonomía canónica del blog). Nunca crear taxonomía social paralela.
+- **Vocero de talking head:** Julio Reyes.
+
 - **Metricool** está conectado (MCP, 10 marcas) y **sí programa posts** (`createScheduledPost`; gotcha `dayOfWeek 1=lun..7=dom`). La ejecución social es de `social-media-studio`.
-- **Redes sociales de Efeonce** y su calendario → `social-media-studio` + landing de redes (TASK-1351).
+- **Redes sociales de Efeonce** y su calendario → `social-media-studio` + **PDR-020** (rol y catálogo por canal) + landing de redes (TASK-1351). Threads es canal nuevo, abierto como experimento con criterio de salida.
 - **Cluster federado:** una pieza social sólo entra al registry como nodo cuando resuelve un JTBD autónomo y
   declara roles, relación y progreso; de lo contrario conserva su rol honesto de activation asset.
 
@@ -78,6 +97,7 @@ El baseline competitivo de la agencia vive en `docs/context/15_panorama-competit
 - **NUNCA** subir un PDF de ebook al repo (bucket privado + entrega por link).
 - **NUNCA** confundir `/aeo-2/` (servicio) con el grader (lead magnet).
 - **NUNCA** publicar output IA crudo (gate de REVIEW + barra de insight/voz).
+- **NUNCA** replicar un átomo a un canal cuya señal no lo premia, ni tratar los canales propios como un destino único: el catálogo por canal de PDR-020 manda.
 - El contenido de Think vive en su **repo dedicado** (efeonce-think, Astro), no en greenhouse-eo.
 - Pertenecer al **producto Think** no fija el host: authoring/render puede vivir en WordPress/apex o Astro, y
   sólo las rutas especializadas del subdominio viven en `efeonce-think`. Nunca asumir host desde la marca; lo

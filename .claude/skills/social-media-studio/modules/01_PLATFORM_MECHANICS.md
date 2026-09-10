@@ -87,6 +87,22 @@ like es un reflejo barato; un save/send es una decisión. Deja de perseguir vani
 - **Qué hacer:** usa Shorts como anzuelo hacia el long-form (mismo tema, "versión completa en
   el canal"); optimiza retención mirando la curva de abandono y cortando el valle.
 
+### Threads
+- **Velocidad de engagement manda**, por sobre el conteo bruto: importa cuán rápido llegan respuestas,
+  likes y reposts tras publicar. Una ventana de ~30 min concentra la decisión de distribución
+  *(as-of 2026-09 — fuentes secundarias de herramientas social, NO documentación oficial de Meta; reverificar)*.
+- **Las respuestas pesan más que los likes**, y el algoritmo evalúa la **profundidad** de la conversación:
+  un hilo donde la gente se responde entre sí — no sólo al autor — extiende la distribución.
+- **La frescura se pondera fuerte.** Un post de 3 horas se recomienda bastante menos que uno de 30 minutos:
+  es la red más castigadora con el contenido que llega tarde.
+- **For You es recommendation-driven** y sirve a frío por match de tema + velocidad + dwell previo; el
+  alcance por seguidores se aplanó.
+- **Qué hacer:** publica para abrir conversación, no para cerrarla — pregunta real, POV discutible, hilo en
+  bruto. **Responde dentro de la primera media hora** (es la ventana que decide). No publiques acá lo que
+  necesita producción: el costo debe ser casi nulo porque la vida útil es corta.
+- ⚠️ **Efeonce no tiene evidencia propia de esta red todavía** (PDR-020 la abre como experimento con criterio
+  de salida). Trata estas señales como hipótesis a validar contra analítica propia, no como línea base.
+
 ### Facebook / X / emergentes
 - **FB/X**: alcance orgánico bajo; sirven para comunidad existente, grupos, y amplificación.
   Cadencia alta (1–2/día) *(as-of 2026-07 — reverificar → módulo 03)*.
@@ -106,6 +122,7 @@ like es un reflejo barato; un save/send es una decisión. Deja de perseguir vani
 | **TikTok** | completion + rewatches | For You (casi ciego a followers) | muy débil | loop + hook <1s |
 | **LinkedIn** | dwell (≥61s) + comentarios | feed profesional | medio | conversación real |
 | **YouTube** | watch time + retención | Shorts → long-form | medio | session engagement |
+| **Threads** | velocidad de respuesta + profundidad del hilo | For You (recommendation-driven) | débil | conversación en la primera media hora |
 | **FB / X** | shares + comentarios | grupos / feed | medio | comunidad + cadencia |
 
 ---
@@ -118,6 +135,8 @@ like es un reflejo barato; un save/send es una decisión. Deja de perseguir vani
 - **Sube sends:** haz la pieza *reenviable* — relatable, útil o divertida a nivel 1-a-1 ("mándaselo a…").
 - **Sube dwell (LinkedIn/texto):** primeras 2 líneas densas, formato escaneable, "ver más" que paga.
 - **Sube session time (YouTube):** enlaza Shorts↔long-form, tarjetas al final, playlists temáticas.
+- **Sube velocidad (Threads):** publica cuando puedas quedarte a responder; abre con una pregunta o un POV
+  discutible y contesta en los primeros 30 min — la ventana temprana decide la distribución.
 - **Protege el test batch:** publica cuando tu audiencia está activa (Metricool
   `getBestTimeToPostByNetwork`), y **responde comentarios en la primera hora** (sube respuesta temprana).
 

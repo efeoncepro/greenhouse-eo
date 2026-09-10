@@ -368,3 +368,14 @@ tres familias OAuth definitivas (Codex, Claude Code y Claude hospedado; Desktop 
 En el rollback OFF/restore Codex continuó con su familia; Claude Code requirió login estándar para recuperar
 el cliente. Esto no afecta a las altas/bajas ordinarias de objetivos, probadas sin reconexión. Los tiempos,
 revisiones y límites de evidencia permanecen en la [QA](../audits/mcp/TASK-1844_INTERNAL_MULTI_ORG_QA_2026-09-08.md).
+
+### Delta 2026-09-10 — D9 se sostiene ante la primera escritura delegada por exchange (TASK-1852)
+
+`preview_client_service_enablement`, `apply_client_service_enablement` y `rollback_client_service_enablement`
+(`efeonce-mcp` `1.4.0`, provider `greenhouse-client-services`) declaran para el emisor nativo la política
+`unsupported` (`allowedIssuers: ['entra']`, `nativeUnsupportedReason: provider_delegation_required`). No es un hueco
+de v2: la clase `efeonce.mcp.client_services.write` se ejerce hoy por el issuer Entra con intercambio RFC 8693
+(cliente confidencial `efeonce-mcp-client-services` → `client_services.enablement.write`) y el lane App de Greenhouse
+relee por persona, en cada llamada, `client_portal.module.{read_assignment,enable,pause}`. El contexto interno v2 sigue
+delegando sólo `growth.seo.observation.read`; incorporar esta clase a v2 exigiría autorización nueva (D10), no un flag ni
+una lista de tools. `src/lib/auth-server/oauth/scopes.ts` declara la clase en paridad y NO la publica como mínimo.

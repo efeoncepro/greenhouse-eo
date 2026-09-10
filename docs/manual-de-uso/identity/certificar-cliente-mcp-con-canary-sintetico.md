@@ -252,6 +252,13 @@ pnpm identity:external-canary:cleanup -- \
 No borres si `deletionReady` no es `true`, `unexpectedRefs` no es `0`, hay `logicalBlockers` o aparece un asset
 shared. Corrige la dependencia mediante su command dueño y repite el dry-run.
 
+Si aparece `oauth_client_not_run_owned`, no reclames el cliente como propio ni retires el blocker. Al
+2026-09-10, el cleanup vigente no puede separar con seguridad los artefactos de sujetos canary que viven bajo
+un CIMD compartido: su helper borra hijos por `client_id`. Antes de aplicar se debe implementar una partición
+end-to-end en planner/delete/readback: conservar el cliente compartido y los hijos de otros sujetos, borrar sólo
+las filas del environment/sujeto canary exactos (más binding para contexts) y verificar ambas cosas al final.
+Hasta entonces, el dry-run bloqueado es el resultado correcto incluso después de `delete_after`.
+
 Después de la ventana de observación y con aprobación de retiro:
 
 ```bash
@@ -280,6 +287,7 @@ conteo agregado no sustituye las consultas por los IDs exactos de la corrida.
 | `canary_expired`          | registro/binding revocado o vencido             | crea una registración nueva; no reactives            |
 | `capability_not_allowed`  | permiso fuera de la única allowlist             | elimina la solicitud; no amplíes el canary           |
 | `canary_cleanup_blocked`  | authority, postura, FK o readback impide borrar | revisa el plan y resuelve el owner exacto            |
+| `oauth_client_not_run_owned` | un sujeto canary usó un cliente compartido  | no apliques; implementa cleanup sujeto-específico    |
 | `forbidden` al apply      | no se está usando el perfil migrator            | no cambies roles runtime; usa el wrapper autorizado  |
 | canary visible en 360/CRM | contaminación de proyección                     | apaga gates, revoca y abre incidente antes de seguir |
 

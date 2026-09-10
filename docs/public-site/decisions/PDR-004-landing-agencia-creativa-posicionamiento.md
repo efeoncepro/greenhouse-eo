@@ -37,7 +37,7 @@ El **medio es el mensaje**: la landing debe *probar* craft técnico, no describi
   surface/binding, booking y medición. La experiencia será native-only; `/contacto/`, WhatsApp o mail pueden existir
   como canales editoriales independientes, no como fallback interno del scheduler. La candidata actual aún no está
   promovida. CTA secundario "Mira cómo medimos" (apalanca la transparencia).
-- **Solo casos citables** (Sky +127% tráfico orgánico, Bresler +180% ventas digitales, Pinturas Berel retainer SEO+AEO).
+- **Solo casos citables** (Sky +127% tráfico orgánico, Bresler +180% ventas digitales, Pinturas Berel retainer SEO+AEO). Estos son **el dato citable**, la primera de las tres profundidades del caso de éxito según [PDR-020](PDR-020-canales-propios-sistema-editorial.md) §4.3; el **caso completo es canonical del blog** y el corte circula en LinkedIn.
 
 ## Consecuencias
 

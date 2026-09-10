@@ -72,6 +72,13 @@
 - **LinkedIn**: dwell manda — post que retiene ≥61s ≈ 15,6% engagement vs ~1,2% si pierde
   al lector en 0–3s. Un comentario con sustancia ≈ 15× un like en distribución. Video +34% YoY.
 - **TikTok**: completion + rewatches; followers = señal débil en For You.
+- **Threads** *(as-of 2026-09 — fuentes SECUNDARIAS de herramientas social, no documentación oficial
+  de Meta; el valor de esta entrada es menor que el del resto y exige reverificación antes de citarse
+  a un cliente)*: la **velocidad de engagement** desplazó al conteo bruto como señal principal, con una
+  ventana de decisión de ~30 min; las **respuestas pesan más que los likes** y la **profundidad del hilo**
+  (gente respondiéndose entre sí) extiende distribución; la frescura se pondera fuerte y For You es
+  recommendation-driven con seguidores como señal débil. Efeonce **no tiene evidencia propia** de esta
+  red (PDR-020 la abre como experimento con criterio de salida).
 - **Cadencia óptima (referencial)**: IG 3–5 feed + 2–4 Reels/sem · LinkedIn 2–3/sem ·
   TikTok 5–10/sem · FB/X 1–2/día · YouTube 1–2 long-form/sem + 3–5 Shorts.
 - **Formato IG**: carruseles +109% engagement por persona alcanzada vs Reels; Reels 2,25×

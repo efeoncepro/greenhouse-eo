@@ -67,7 +67,7 @@ resultado idempotente quedan coordinados; el actor nunca llega en el body.
 | CLI | sí | sí, sobre el mismo contrato App/Ecosystem | Implementado; depende del lane elegido |
 | Nexa | sí, al preparar la propuesta | sí, propose → confirm → reautorizar + flag ON | Implementado; sesión agent no puede aprobar |
 | Ecosystem API | sí | 403 `invalid_delegated_context` | Máquina autenticada, sin aprobador humano atribuible |
-| MCP interno | sí | 403 por el mismo contrato | Tools registradas internamente; no federadas automáticamente |
+| MCP interno | sí | 403 por el mismo contrato | Federadas en `efeonce-mcp` el 2026-09-10 (provider `greenhouse-client-services`); los writes exigen el scope `efeonce.mcp.client_services.write` y siguen siendo autoridad de la persona |
 
 Existe **paridad estructural**: los consumidores reutilizan los mismos readers/commands y DTOs. No existe
 todavía **Full API Parity operativa de escritura delegada**. No la declares completa, no agregues

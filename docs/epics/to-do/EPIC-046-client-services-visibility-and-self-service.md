@@ -166,7 +166,7 @@ El orden de valor no añade bloqueos técnicos a las tasks ni exige terminar tod
 
 ## Child Tasks
 
-Cinco tasks registradas por autorización del operador, prioridad P1. TASK-1852 está `in-progress`
+Seis tasks registradas por autorización del operador, prioridad P1 (TASK-1857 el 2026-09-10). TASK-1852 está `in-progress`
 (capacidad técnica en Production, apertura cliente pendiente con writes OFF); TASK-1853–1856 siguen `to-do`. Las existentes
 conservan su epic. P01 se conecta con TASK-1834 por contrato y rollout nativo condicional.
 
@@ -177,6 +177,7 @@ conservan su epic. P01 se conecta con TASK-1834 por contrato y rollout nativo co
 | P04 | [TASK-1854](../../tasks/to-do/TASK-1854-client-home-services-and-cycle-experience.md) | Inicio y Mis servicios: resultados, avance y próximos pasos | TASK-1852, TASK-1853 |
 | P06 | [TASK-1855](../../tasks/to-do/TASK-1855-client-service-requests-and-briefs-commands.md) | Solicitudes y briefs del servicio: commands y seguimiento | TASK-1852, TASK-1853 |
 | P07 | [TASK-1856](../../tasks/to-do/TASK-1856-client-service-request-and-brief-self-service-ui.md) | Autogestión de solicitudes y briefs del cliente | TASK-1854, TASK-1855 |
+| P01-b | [TASK-1857](../../tasks/to-do/TASK-1857-sky-creative-hub-client-surface.md) | Creative Hub del portal cliente: materializar `/creative-hub` para Sky (registrada 2026-09-10; decisión del operador sobre TASK-1687) | none |
 
 ## Registered Task Plan
 

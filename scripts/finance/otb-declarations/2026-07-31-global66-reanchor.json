@@ -1,0 +1,12 @@
+[
+  {
+    "accountId": "global66-clp",
+    "genesisDate": "2026-07-31",
+    "openingBalance": 18562,
+    "declarationReason": "Ajuste del ancla de agosto 2026: genesis al SOD 31/07/2026 (= EOD 30/07) para que el ciclo de nómina internacional del 31/07 (recibido 1.162.700 → envío 1.126.657 + fee 36.043, neto 0) quede dentro del período conciliable global66-clp_2026_07 y calce con el cargo Santander del 03/08. Saldo EOD 30/07 = EOD 31/07 = $18.562, derivado del histórico oficial completo (export 2024-09-27..2026-09-10). Reemplaza la OTB 2026-08-01 con el mismo saldo.",
+    "auditStatus": "reconciled",
+    "evidenceRefs": [
+      { "type": "cartola_xls", "ref": "data/bank/Global66-histórico-Septiembre-CLP-movements-09-2024_09-2026.xls", "period": "2024-09-27..2026-09-10", "description": "Export oficial Movimientos de cuenta CLP. Saldo derivado EOD 30/07 = EOD 31/07 = 18.562." }
+    ]
+  }
+]

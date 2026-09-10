@@ -1,5 +1,11 @@
 # Efemérides y briefs sociales de Efeonce
 
+> **La barra de esta línea (PDR-020 §4.4): cada fecha demuestra una disciplina de la casa, nunca saluda.**
+> El estándar vivo son las 13 direcciones del plan 2026–2027: Halloween es un envase que pierde personalidad
+> por imitación (branding); el Día de la Usabilidad son fricciones digitales como obstáculos físicos (UX);
+> el Óscar es retirar una luz para cambiar una escena (dirección de arte). **Si la pieza no demuestra oficio,
+> no es de esta línea y no se publica.** Métrica: sends + saves; nunca seguidores.
+
 Guía para conceptos estacionales y planificación editorial en Notion. Complementa la operación de
 social-media-studio; no cambia los contratos comerciales ni activa publicación.
 
@@ -26,7 +32,10 @@ social-media-studio; no cambia los contratos comerciales ni activa publicación.
 - Objetivo, mercado, audiencia, concepto elegido y emoción o idea que debe quedar.
 - Guion por slide/segundo, textos en pieza y giro visual; distinguir obligatorio de opcional.
 - Dirección de arte, continuidad entre escenas, recursos vigentes de marca y referencias.
-- Captions separados para Instagram/LinkedIn; transcreación para Estados Unidos cuando corresponda.
+- **Canal-hogar: Instagram** (PDR-020 §4.4 — el contenido estacional es línea propia permanente). **LinkedIn
+  recibe el argumento profesional desarrollado detrás de la metáfora**, no la misma pieza con otro caption, y
+  sólo cuando la disciplina es legible para un comprador. Si no hay argumento propio, la pieza se queda en
+  Instagram. Transcreación para Estados Unidos cuando corresponda.
 - Entregables editables y exportaciones, portada, ALT/descripción, sonido, créditos y procedencia.
 - Responsable, primer corte, entrega completa, margen de ajustes y fecha real de publicación.
 - DoD verificable, revisión cultural/visual y aprobación final; nunca dar por terminados los assets
