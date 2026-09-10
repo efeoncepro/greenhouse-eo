@@ -997,12 +997,3 @@ con asserts que sólo el contrato nuevo puede producir.
 Flags: `GROWTH_SEO_SITE_FINDINGS_ENABLED` prendido en el ops-worker con los dos pasos, tras probar **por blob**
 que el evaluador desplegado es idéntico al de `main`. `HIRING_FAIRNESS_MONITOR_ENABLED` NO se prendió: daría
 cero en silencio en una métrica de equidad hasta que cierre `TASK-1365`.
-
-## 2026-09-02 — la práctica Salesforce se canoniza como oferta por outcomes y lifecycle
-
-La práctica Revenue Operations & CRM incorpora una arquitectura comercial Salesforce en cuatro fases:
-Diagnose & Architect, Implement & Integrate, Activate & Adopt y Operate & Evolve. El contrato separa CRM core,
-Marketing Cloud Engagement y Marketing Cloud Next; define carriles de solución, ICP/anti-ICP, operator y buying
-group, delivery, métricas, límites de claims y gates de madurez. El estado queda `Approved for validation`: no
-autoriza todavía partnership, badge, certificaciones, reventa, pricing, casos ni Product Service comercialmente
-aprobado sin evidencia y sign-offs propios.
