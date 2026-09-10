@@ -49,7 +49,7 @@ Channel & Commerce **compone** capacidades existentes; no se apropia de su owner
 |---|---|
 | Retail media y commerce media operations | Media & Distribution → Performance & Commerce |
 | Producción de piezas y contenido de canal | Creative Services (Creative Velocity / Run & Gun / Globe) |
-| Portal de distribuidores, PRM, incentivos sobre CRM | RevOps & CRM (HubSpot / Salesforce / Kortex) |
+| Producción física de activaciones y eventos (montaje, venue, logística, permisos) | Proveedor externo — pass-through, nunca servicio propio |
 | Data foundation, tagging, dashboards, atribución | Wave → Measurement & Analytics |
 | Visibilidad en buscadores y motores de IA | Wave → Search Visibility 360 |
 
@@ -135,6 +135,19 @@ retorno demostrable en un momento en que el costo por hora de cobertura sube por
   de priorización, el pod se convierte en reposición ciega y el modelo pierde su fundamento.
 - **Condicionada:** Escalón 3 — requiere que el cliente ya tenga proveedores de terreno contratados y acepte que
   Efeonce los gobierne sin desplazarlos en el corto plazo.
+### La capacidad de terreno tiene dos cargas de trabajo, no una
+
+El pod del escalón 2 no sólo remedia ejecución: también **activa**. Auditar, remediar, hacer sampling, demostrar
+producto y activar un lanzamiento son la misma figura de capacidad, con el mismo boundary legal y la misma
+dirección de Efeonce.
+
+Esto no es un cross-sell: es la palanca económica del escalón 2. La auditoría y la remediación son constantes a lo
+largo del año; la activación tiene picos en fechas comerciales y lanzamientos. Cargas con estacionalidad
+complementaria sobre la misma capacidad **suben la utilización**, y la utilización es la variable que decide si un
+modelo de capacidad gobernada alcanza el piso de margen o no.
+
+Un pod que sólo audita tiene valles. Un pod que audita y activa los llena.
+
 - **Inválida:** staff augmentation de personal de terreno bajo dirección diaria del cliente. Rompe el boundary
   económico *y* la figura legal. Ver §8.
 - **Inválida:** cobro como porcentaje del trade spend gestionado. Crea conflicto de interés y no es defendible.
@@ -174,6 +187,7 @@ comprador chileno concreto **no está verificada**.
 | **Channel Execution Diagnostic** | Proyecto cerrado por complejidad (mercados × cadenas × marcas × calidad de data) | Aceptación de propuesta | Auditoría de arquitectura de canal, mapa de data obtenible, muestra de ejecución, decisión priorizada | Ejecución continua, integración, remediación | Al entregar el informe |
 | **Cobertura auditada** | Puntos de venta auditados × ciclos | Ciclo cerrado y validado | Misiones, control de calidad del dato, scoring, priorización, reporte | Intervención en tienda, material, medios | Por ciclo entregado |
 | **Capacidad de terreno gobernada** | Capacidad mensual comprometida (no cabeza/día, no hora) | Mes de servicio | Equipo, dirección, supervisión, capacitación, backup, evidencia y cumplimiento | Reposición ilimitada, tareas fuera de scope, transporte de mercadería | Mensual |
+| **Activación medida** | Ola: tiendas × días de presencia | Ola cerrada y medida | Diseño de mecánica, ejecución por el pod, captura de datos, diseño de control, lectura del ciclo | Montaje, material, producto, promesa de contactos o de venta | Por ola entregada |
 | **Fee de orquestación** | Proveedores × mercados gobernados | Mes de servicio | Estandarización de scoring, consolidación, cadencia, recomendación de reasignación | El costo de los proveedores | Mensual |
 | **Pass-through** | Costo del tercero | Según el tercero | Retail media, data de paneles, incentivos, material POP, proveedores de terreno del cliente | — | Sin margen; documentado y separado |
 | **Composición con otras líneas** | Según owner | Según owner | — | — | Se factura y gobierna con el owner de esa línea |
@@ -214,6 +228,12 @@ Específico de Chile y no negociable en el costeo:
 > Greenhouse ya materializa este cálculo: [`GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1`](../../architecture/GREENHOUSE_MEMBER_LOADED_COST_MODEL_V1.md)
 > (full absorption por Provider × Tool × Member × Client × Period). La acción correcta no es estimar: es correr el
 > modelo con un perfil real de terreno chileno.
+
+### Palanca transversal: utilización
+
+El margen del escalón 2 depende menos del precio y más de la utilización de la capacidad. El modelo debe proyectar
+la carga combinada de auditoría, remediación y activación a lo largo del año, y declarar el valle esperado. Una
+capacidad dimensionada sólo para el peak es capacidad que se paga en los meses vacíos.
 
 ### Escalón 3 — Field Orchestration
 
@@ -314,7 +334,7 @@ problema (no sé qué pasa en la tienda)
 | Expansión | Se agrega cadena, marca o mercado; o se activa remediación sobre la auditoría |
 
 **Triggers de expansión:** score persistentemente bajo en una cadena (→ escalón 2); proveedor de terreno propio sin
-gobierno (→ escalón 3); quiebres detectados con causa en el distribuidor (→ RevOps/portal de distribuidores);
+gobierno (→ escalón 3); lanzamiento o fecha comercial en el horizonte (→ activación medida);
 contenido de PDP deficiente (→ digital shelf + Search Visibility); inversión en retail media sin lectura de
 ejecución (→ Performance & Commerce).
 
@@ -429,6 +449,7 @@ diagnósticos consecutivos no conviertan a recurrente.
 | [Field Agent — crowdsourced audits vs traditional field teams](https://www.fieldagentcanada.com/blog/crowdsourced-audits-vs-traditional-field-teams-which-is-better-for-canadian-retail-brands) | Modelo híbrido de triage; ~75% de ahorro vs representante dedicado; USD 20–50 por visita (Norteamérica, **no aplicable a Chile sin costeo local**) |
 | [Tinuiti — retail media trends 2026](https://tinuiti.com/blog/commerce/retail-media-trends/) | Las RMN convergen medios, shopper insights e inversión de trade en una sola estrategia de commerce media |
 | [P2PI — shopper marketing predictions 2026](https://p2pi.com/2026-shopper-marketing-predictions-whats-shaping-next-era-commerce) | Dirección de la categoría hacia medición conectada |
+| [Creallo — BTL y medición de ROI 2026](https://creallo.pe/btl-lima-medir-roi-activacion/) · [BTL Active — tendencias 2026](https://btlactive.com/tendencias-clave-en-activaciones-btl-para-2026/) | Una activación sin mecanismo de captura de datos ni medición de afluencia no produce información; el eje 2026 es phygital, con captura, dashboard en vivo y contenido derivado |
 | [Ecosistema Startup — retail media Chile 2026](https://ecosistemastartup.com/retail-media-en-chile-2026-hacia-un-modelo-de-crecimiento/) | ~5% de la inversión digital chilena en 2025 → proyección 7% en 2026; Walmart Connect, Cencosud Media, Fmedia, Sodimac Media, Ripley Media |
 | [BST — Ley 21.561, jornada de 42 horas desde 26-04-2026](https://bst.cl/2026/03/ley-40-horas-que-cambia-el-26-de-abril-de-2026-y-que-establece-la-normativa-vigente/) · [Buk](https://www.buk.cl/blog/valor-hora-trabajo-chile-2026) | El valor hora sube sin reducción de sueldo; 40 horas en 2028 |
 | [Dirección del Trabajo — subcontratación](https://www.dt.gob.cl/portal/1626/w3-article-93827.html) | Ley 20.123: responsabilidad solidaria/subsidiaria y régimen de EST |

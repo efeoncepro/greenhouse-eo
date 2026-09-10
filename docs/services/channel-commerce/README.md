@@ -31,9 +31,9 @@ garantizado — es un marco de scoring, no una promesa.
 ```text
 DIAGNÓSTICO           →  RECURRENTE              →  INTERVENCIÓN          →  EXPANSIÓN
 Channel Execution        Cobertura Auditada         Managed Field Pod        Digital Shelf
-Trade Investment Audit                              Field Orchestration      Distributor Enablement
-                                                                             Channel Content
-                                                                             Promotion & Incrementality
+Trade Investment Audit                              Activación Medida        Channel Content
+                                                    Field Orchestration      Promotion & Incrementality
+                                                                             Eventos de Canal
 ```
 
 ---
@@ -205,18 +205,39 @@ Commerce lo compone y lo traduce a decisión de canal. RACI explícito en cada p
 
 ---
 
-## 7 · Distributor & Partner Enablement  ·  *composición con RevOps & CRM*
+## 7 · Activación de Marca Medida  ·  *BTL con evidencia*
 
-**Promesa.** Tus distribuidores dejan de pedirte todo por WhatsApp.
+**Promesa.** La activación deja de reportarse en contactos y pasa a reportarse en qué vendió la tienda activada
+frente a la que no.
 
-**Alcance incluido.** Portal de distribuidores sobre HubSpot o Salesforce: catálogo y materiales, gestión de
-pedidos o solicitudes, programas de incentivo, capacitación, fondos de co-marketing y su rendición, y la
-visibilidad de desempeño por distribuidor.
+**Por qué existe.** El BTL tradicional entrega una planilla de contactos y un álbum de fotos. En 2026 una
+activación sin mecanismo de captura de datos ni lectura de afluencia no produce información, produce ruido. La
+diferencia de Efeonce no es activar mejor: es **activar y poder demostrar qué pasó**.
 
-**Ownership.** RevOps & CRM. Channel & Commerce aporta el modelo de canal y los indicadores; no implementa el CRM.
+**Alcance incluido.** Diseño de la mecánica de activación, sampling o demostración; ejecución en punto de venta
+por el pod de terreno; captura de datos en el momento (código trazable, encuesta corta, registro de interacción);
+selección de tiendas activadas y **tiendas de control**; y lectura del ciclo comparando ambas.
 
-**Trigger de venta.** Aparece solo cuando la auditoría detecta que la causa de los quiebres está aguas arriba, en
-el distribuidor, no en la tienda.
+**La pieza que nadie más entrega.** El diseño de control se define **antes** de activar. Sin tienda de control no
+hay comparación posible y la activación vuelve a medirse en contactos. Este es el criterio de aceptación real del
+servicio.
+
+**Opcional.** Captura de contenido durante la activación (ver servicio 8); extensión a más cadenas; repetición por
+ola.
+
+**Excluido de Efeonce.** Montaje, stands, mobiliario, bodega, transporte y permisos: van como **pass-through de
+proveedor**, no como servicio propio. Producto y material de sampling los provee el cliente. No se promete
+número de contactos ni incremento de venta.
+
+**Misma capacidad, misma figura legal.** Quien activa en sala es la misma figura de terreno del servicio 4 y está
+sujeta al mismo boundary: Efeonce dirige, supervisa y capacita a su propio personal. Nunca se cotiza por
+anfitriona/día.
+
+**Métricas.** Cobertura de activación efectiva; tasa de captura por interacción; delta de venta activadas vs.
+control (con el denominador declarado); costo por interacción capturada.
+
+**Packaging (hipótesis).** Ola de activación por tiendas × días de presencia, dentro de la capacidad gobernada.
+Nunca por persona/día.
 
 ---
 
@@ -229,6 +250,11 @@ contenido de PDP, kits para distribuidores, adaptaciones por cadena y por format
 
 **Ownership.** Creative Services (Creative Velocity · Run & Gun · Globe). Se vende como **capacidad gobernada**,
 nunca por pieza.
+
+**Captura en activación.** Cuando hay una activación en curso (servicio 7), la capacidad de captura de Efeonce
+—Run & Gun Studio— convierte esa activación en material reutilizable para social, retail media y creator, con
+derechos definidos desde el brief. El BTL tradicional produce fotos de reporte; acá la misma salida produce
+activos. La activación deja de ser un costo que se agota el día del evento.
 
 **Excluido de Efeonce.** Impresión, bodegaje y logística de material físico. Va como pass-through de proveedor.
 
@@ -262,13 +288,36 @@ La propuesta compuesta declara owner, RACI y facturación por línea.
 
 ---
 
+## 11 · Eventos y Encuentros de Canal  ·  *BTL hacia el canal, no hacia el shopper*  ·  *condicionado*
+
+**Promesa.** La convención de distribuidores o el lanzamiento a la fuerza de venta deja de ser un gasto anual sin
+seguimiento y pasa a tener objetivo, medición y continuidad.
+
+**Por qué es distinto del servicio 7.** El público no es el shopper: son distribuidores, mayoristas, vendedores y
+socios del canal. El comprador es el mismo Gerente Comercial, el volumen es menor y el margen es mejor, porque lo
+que se paga es diseño, contenido y gobierno, no cobertura.
+
+**Alcance incluido.** Objetivo y diseño del encuentro; contenido y narrativa; material de habilitación para el
+canal; captura de compromisos y seguimiento posterior; medición de asistencia, participación y cumplimiento de
+los compromisos tomados en el evento.
+
+**Excluido.** Producción física del evento —venue, montaje, catering, audiovisual, logística— que va a proveedor
+como pass-through. Efeonce no se convierte en productora de eventos.
+
+**Condición para ofrecerlo.** Sólo sobre una cuenta con relación establecida. Es un servicio de expansión, nunca
+de entrada: nadie contrata su convención anual con un proveedor que recién conoce.
+
+**Composición.** Contenido y captura con Creative Services; medición y seguimiento con el modelo de canal.
+
+---
+
 ## Composición y fronteras
 
 | Si el cliente pide… | Owner | Rol de Channel & Commerce |
 |---|---|---|
 | Inversión en retail media | Media & Distribution | Aporta la lectura de ejecución física |
 | Visibilidad de producto en buscadores e IA | Wave | Traduce a decisión de canal |
-| Portal o CRM de distribuidores | RevOps & CRM | Aporta modelo e indicadores de canal |
+| Producción física de una activación o evento | Proveedor externo | Contrata, gobierna y mide; el costo es pass-through |
 | Producción de piezas | Creative Services | Aporta el requerimiento por cadena |
 | Dashboards y data foundation | Wave · Measurement | Aporta el esquema de scoring |
 
@@ -279,6 +328,9 @@ Ninguna propuesta compuesta se emite sin owner nombrado y RACI por línea.
 - Reposición masiva con planilla propia cobrada por cabeza o por día.
 - Suministro de personal bajo dirección diaria del cliente.
 - Impresión, bodegaje y logística de material POP como servicio propio.
+- Anfitrionas, promotoras o personal de activación cobrados por persona/día.
+- Producción física de eventos: montaje, venue, mobiliario, catering, logística y permisos.
+- Activaciones cuyo único entregable sea un número de contactos.
 - Precio como porcentaje del trade spend gestionado.
 - Garantía de venta, sell-out, share o rotación.
 
