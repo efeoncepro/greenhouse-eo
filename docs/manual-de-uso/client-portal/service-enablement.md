@@ -22,8 +22,9 @@ persona autorizó (capability `client_services.enablement.write`; el gateway lo 
 cliente `efeonce-mcp-client-services`). Desde el 2026-09-10 el canal está federado y vivo: el gateway `efeonce-mcp` 1.4.0
 expone `preview_client_service_enablement`, `apply_client_service_enablement` y `rollback_client_service_enablement`
 (provider `greenhouse-client-services`, listado `enabled` en `efeonce.gateway.status`) y el scope Entra
-`efeonce.mcp.client_services.write` está consentido. El primer canary de escritura exige un bearer Entra de una persona con
-ese scope (`pnpm client-services:canary`, PKCE interactivo; no corre desatendido) y aún no se ha ejecutado.
+`efeonce.mcp.client_services.write` está consentido. El canary de escritura se ejecutó el 2026-09-10 con el bearer Entra del
+operador (apply de Sky `EO-APC-ECD63852`, sólo conservación, replay idempotente); repetirlo exige que una persona obtenga su
+bearer con ese scope (PKCE interactivo; no corre desatendido).
 
 Para esta cohorte, consulta primero el
 [dossier de discovery](../../audits/client-portal/TASK-1852_CLAUDE_DISCOVERY_2026-09-09.md). Berel tiene tres

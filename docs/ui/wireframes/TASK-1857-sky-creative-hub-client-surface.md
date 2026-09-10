@@ -2,7 +2,7 @@
 
 ## Meta
 
-- Status: `draft`
+- Status: `draft` (v2 2026-09-10: cinco bloques cliente; v1 replicaba el módulo interno)
 - Owner task: `TASK-1857`
 - Product Design asset: `src/views/greenhouse/GreenhouseCapabilityModule.tsx` + `src/config/capability-registry.ts` (`creative-hub`), superficie viva en `/capabilities/creative-hub` para tenants con líneas legacy; no existe dirección Figma nueva y no se inventa una.
 - Visual direction mode: `repo-native-benchmark`
@@ -21,58 +21,54 @@
 
 ## Desktop Target — 1440×1000
 
+Versión 2 (2026-09-10): la página NO replica las 16 cards del módulo interno. Muestra cinco bloques para la persona cliente,
+en este orden, reutilizando seis cards del registry `creative-hub` y ocultando las de gestión interna.
+
 ```text
 SHELL CLIENTE EXISTENTE: sidebar dinámico (Módulos › Creative Hub activo) · contexto de organización
-┌ CapabilityOverviewHero ────────────────────────────────────────────────────────────────┐
-│ eyebrow: Creative Hub                                                                    │
-│ H1: «<clientName>: <hero.title>»          summary: <summaryLabel> <summaryValue>         │
-│ description (dos frases máx.)             summaryDetail (fuente + corte)                 │
-│ highlights ×3 (label · value)             badges (líneas/servicios matcheados)           │
-└──────────────────────────────────────────────────────────────────────────────────────────┘
-┌ ModuleLayout (grid 12 col, gutter 4n) ──────────────────────────────────────────────────┐
-│ [creative-metrics · metric · full]  Creative delivery                                    │
-│ [creative-review-pipeline · md]  Review pipeline   │ [creative-review-hotspots · lg] Review hotspots │
-│ [creative-projects · lg] Projects in focus (→ href por proyecto) │ [creative-quality · md] Quality signal │
-│ ── section-header: Revenue Enabled ──                                                     │
-│ [creative-revenue-kpis · metrics-row · full]                                             │
-│ ── section-header: Creative Velocity Review ──                                            │
-│ [cvr-structure · lg] │ [methodology-accelerators · md] │ [tier-visibility · full] │ [narrative-guardrails · md] │
-│ ── section-header: Brand Intelligence ──                                                  │
-│ [brand-kpis · metrics-row · full] · [rpa-trend · chart-bar · full]                       │
-│ ── section-header: Creative Supply Chain ──                                               │
-│ [csc-pipeline · pipeline · full] · [csc-metrics · metrics-row · full] · [stuck-assets · alert-list · full] │
-└──────────────────────────────────────────────────────────────────────────────────────────┘
+┌ Header editorial (CapabilityOverviewHero, sin cifras de revenue) ─────────────────────────────┐
+│ eyebrow: Creative Hub          H1: «<clientName>: tu flujo creativo»     [fuente · corte: dd-mm] │
+│ description: qué está en revisión, qué se está produciendo y qué se entregó este período          │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+┌ B1 · NECESITA TU RESPUESTA (card `creative-review-pipeline`, retitulada) ─────────────────────────┐
+│ [pieza] · [ronda n] · comentarios abiertos: k · solicitado el dd-mm por [nombre Efeonce]  → Abrir  │
+│ … (máx. 8 filas; vacío: «No tienes piezas esperando tu respuesta.»)                                │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+┌ B2 · EN PRODUCCIÓN AHORA (cards `csc-pipeline` + `stuck-assets`) ───────────────────────────────┐
+│ Brief → Concepto → Producción → Revisión → Entrega   (conteo por fase; piezas con fecha comprometida)│
+│ Trabadas: [pieza] · fase · desde dd-mm · motivo declarado                                         │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+┌ B3 · ENTREGADO ESTE PERÍODO (card `creative-projects`, lente `creative`) ─────────────────────────┐
+│ [pieza/proyecto] · versión final · entregado dd-mm · → Ver pieza (href del proyecto)              │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+┌ B4 · CADENCIA Y CALIDAD, BIDIRECCIONAL (card `creative-metrics` + `creative-quality`) ───────────┐
+│ entregadas/comprometidas · a tiempo % · rondas de cambio promedio · tiempo de respuesta Efeonce / Sky│
+│ cada cifra con fuente y corte; sin dato → «Sin datos en este corte», nunca 0                        │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+┌ B5 · PEDIR ALGO (sólo si existe el destino) ──────────────────────────────────────────────────────┐
+│ → Nueva solicitud / brief (TASK-1856)     → Informes Insights (TASK-1848)                         │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-Orden de lectura: hero (momento visual dominante: título con nombre de la cuenta, un solo número resumen y
-tres highlights) → Creative delivery → Review pipeline/hotspots → Projects in focus. Las cuatro
-`section-header` separan bloques; no se agregan tarjetas contenedoras alrededor del grid (card-on-card es
-BLOCK). El primer fold debe cerrar con Review pipeline visible: si el hero crece por copy largo, se recorta
-la descripción, no se baja el pipeline. Densidad: la del módulo existente; no se rediseñan las cards en
-esta task.
+Orden de lectura: header → B1 (única región con acciones) → B2 → B3 → B4. B5 no se renderiza mientras no existan
+sus destinos: ningún botón muerto. El primer fold cierra con B1 completo y el encabezado de B2. Cards excluidas a
+propósito (lectura de gestión interna, no del cliente): `creative-revenue-kpis`, `creative-tier-visibility`,
+`creative-methodology-accelerators`, `creative-narrative-guardrails`, `creative-brand-kpis`, `creative-rpa-trend`,
+`creative-cvr-structure`, `creative-review-hotspots` (se funde en B1) y los cuatro `section-header`.
 
 ## Mobile Target — 390×844
 
 ```text
-┌ Hero compacto ───────────────────────────┐
-│ Creative Hub                             │
-│ <clientName>: <hero.title>               │
-│ <summaryValue>  <summaryLabel>           │
-│ highlights apilados (3 filas)            │
-│ badges en wrap                           │
-└──────────────────────────────────────────┘
-│ Creative delivery (metric, ancho 100 %)  │
-│ Review pipeline (lista)                  │
-│ Review hotspots (barras horizontales,    │
-│   scroll interno si >6 categorías)       │
-│ Projects in focus (lista; href tap ≥44px)│
-│ … secciones en el mismo orden            │
+┌ Header compacto: Creative Hub · <clientName> · fuente/corte ┐
+│ B1 Necesita tu respuesta (lista, tap ≥44px, máx. 5 + «ver todas») │
+│ B2 En producción (fases apiladas con conteo; trabadas debajo)    │
+│ B3 Entregado (lista)                                              │
+│ B4 Cadencia y calidad (2×2 → 1 columna; texto, sin gráfico)       │
+│ B5 Pedir algo (sólo si existe)                                    │
 ```
 
-Una sola columna; `size` de cada card colapsa a `full`. Gráficas de barras conservan alternativa textual
-(`metric-list` equivalente en la misma card). Nada desborda: contenedores de chart/tabla con
-`overflow-x: auto` propio, `scrollWidth === clientWidth` a nivel página. Los enlaces de proyectos son la
-única acción táctil; no hay FAB ni acciones flotantes.
+Una columna; B1 nunca baja del primer fold. Los números de B4 se muestran como texto con etiqueta; no hay chart en
+móvil. `scrollWidth === clientWidth` a nivel página.
 
 ## Action Hierarchy
 
@@ -96,13 +92,12 @@ Una sola columna; `size` de cada card colapsa a `full`. Gráficas de barras cons
 
 | Region | Slot | Purpose | Component candidate | Data source |
 |---|---|---|---|---|
-| 0 | Header | Nombre de cuenta + resumen + fuente/corte | `CapabilityOverviewHero` | `CapabilityModuleData.hero` (`buildCapabilityModuleContent`) |
-| 1 | Delivery | Cadencia, revisión abierta, calidad | cards `creative-metrics`, `creative-review-pipeline`, `creative-review-hotspots` | `getCapabilityModuleSnapshot` + `getCreativeHubTasks` (notion_ops.tareas/proyectos) |
-| 2 | Focus | Proyectos y calidad | `creative-projects`, `creative-quality` | `buildProjectItemsForLens(snapshot,'creative')`, `buildQualityItems` |
-| 3 | Revenue | KPIs de revenue | `creative-revenue-kpis` | `readMetricsSummaryByClientId(clientId)` (ICO; puede ser null) |
-| 4 | CVR | Estructura, aceleradores, tiers, guardrails | cards `creative-cvr-*`, `creative-tier-visibility`, `creative-narrative-guardrails` | `buildCreativeVelocityReviewContract` + `readPortfolioBrandVoiceAiEvidence` |
-| 5 | Brand | KPIs de marca y RpA | `creative-brand-kpis`, `creative-rpa-trend` | snapshot + ICO |
-| 6 | Supply chain | Pipeline, métricas, trabas | `csc-pipeline`, `csc-metrics`, `stuck-assets` | snapshot (`fase_csc`, `bloqueado_por_ids`) |
+| 0 | Header | Nombre de cuenta, propósito, fuente/corte | `CapabilityOverviewHero` (sin `summaryValue` de revenue) | `CapabilityModuleData.hero` (recortado) |
+| B1 | Necesita tu respuesta | Piezas en revisión del cliente, comentarios abiertos, quién espera | card `creative-review-pipeline` (metric-list, retitulada) | `getCreativeHubTasks` (`client_review_open`, `open_frame_comments`, `client_change_round_final`) |
+| B2 | En producción ahora | Fases del ciclo + piezas trabadas | `csc-pipeline` (pipeline) + `stuck-assets` (alert-list) | snapshot (`fase_csc`, `bloqueado_por_ids`, `fecha_entrega`) |
+| B3 | Entregado este período | Piezas entregadas con enlace | `creative-projects` (project-list, lente creative) | `buildProjectItemsForLens(snapshot,'creative')`, `fecha_de_completado` |
+| B4 | Cadencia y calidad | 4 cifras bidireccionales con fuente/corte | `creative-metrics` (metric) + `creative-quality` (quality-list) | `buildCreativeHubCardData`, `buildQualityItems`; `pct_on_time` |
+| B5 | Pedir algo | Entradas a solicitud/brief e Insights | enlaces del shell (sin card nueva) | sólo cuando TASK-1856/1848 publiquen destino |
 
 ## Copy Ledger
 
@@ -111,7 +106,15 @@ Una sola columna; `size` de cada card colapsa a `full`. Gráficas de barras cons
 | `client_portal.creative_hub.page.title` | metadata | Creative Hub \| Greenhouse | — | `metadata.title` del page, patrón `/equipo` |
 | `client_portal.creative_hub.hero.eyebrow` | 0 | Creative Hub | — | `modulePublicLabels['creative-hub'].name` |
 | `client_portal.creative_hub.hero.title` | 0 | `${clientName}: ${hero.title}` | `clientName` del tenant | Ya lo compone `GreenhouseCapabilityModule` |
-| `capabilities.creative_hub.card.<id>.title` | 1–6 | Títulos actuales del registry (`Creative delivery`, `Review pipeline`, …) | — | **Deuda de copy**: títulos legacy en inglés; retitular a es-CL exige un sweep del registry compartido con `/capabilities/*` (follow-up, no en Slice 1) |
+| `client_portal.creative_hub.block.review.title` | B1 | Necesita tu respuesta | — | Reemplaza «Review pipeline» sólo en esta página (override de título por bloque; el registry no cambia) |
+| `client_portal.creative_hub.block.review.empty` | B1 | No tienes piezas esperando tu respuesta. | — | Vacío honesto |
+| `client_portal.creative_hub.block.production.title` | B2 | En producción ahora | — | Fases: Brief · Concepto · Producción · Revisión · Entrega |
+| `client_portal.creative_hub.block.production.stuck` | B2 | Trabadas | — | Motivo declarado, nunca inferido |
+| `client_portal.creative_hub.block.delivered.title` | B3 | Entregado este período | `periodo` | Fecha de entrega por pieza |
+| `client_portal.creative_hub.block.quality.title` | B4 | Cadencia y calidad | — | Cuatro cifras: entregadas/comprometidas · a tiempo · rondas promedio · tiempo de respuesta Efeonce / Sky |
+| `client_portal.creative_hub.block.quality.nodata` | B4 | Sin datos en este corte | — | Nunca 0 sustituto |
+| `client_portal.creative_hub.block.request.title` | B5 | Pedir algo | — | Sólo si existe destino (TASK-1856 / TASK-1848) |
+| `client_portal.creative_hub.source_cut` | 0–B4 | Fuente: Notion · corte: {fecha} | `fecha` | Obligatorio en cada bloque con cifras |
 | `client_portal.creative_hub.denied.title` | denied | `${name} aún no está activo en tu cuenta` | `name` = Creative Hub | `emptyState.notAssigned.title` |
 | `client_portal.creative_hub.denied.body` | denied | `Creative Hub se incluye en planes Globe. Si te interesa conocerlo, escríbele a tu account manager.` | — | `emptyState.notAssigned.body(name, bundleHint)` |
 | `client_portal.creative_hub.degraded.banner` | 0 | Portal en modo degradado / Algunos módulos no están disponibles temporalmente… | — | `degraded.bannerTitle/bannerBody` |
@@ -168,8 +171,8 @@ Una sola columna; `size` de cada card colapsa a `full`. Gráficas de barras cons
 
 ## Design Decision Log
 
-- Decision: materializar `/creative-hub` reutilizando íntegro el módulo `creative-hub` del registry, con la puerta cambiada al primitive de visibilidad del portal cliente.
-- Alternatives considered: (a) supersede del bundle retirando el viewCode (TASK-1685 §D3, descartada por el operador el 2026-09-10: el módulo es el producto contratado); (b) rewrite `/creative-hub` → `/capabilities/creative-hub` (descartada: esa ruta exige `cliente.modulos` + líneas legacy que Sky no tiene y devolvería 404 igual); (c) página nueva con cards nuevas (descartada: duplica 16 cards existentes sin dato nuevo).
+- Decision (v2, 2026-09-10): materializar `/creative-hub` como lectura del cliente en cinco bloques (necesita tu respuesta · en producción · entregado · cadencia y calidad bidireccional · pedir algo), reutilizando seis cards del registry `creative-hub` y excluyendo las de gestión interna; puerta por el primitive de visibilidad del portal cliente.
+- Alternatives considered: (a) supersede del bundle retirando el viewCode (TASK-1685 §D3, descartada por el operador el 2026-09-10: el módulo es el producto contratado); (b) rewrite `/creative-hub` → `/capabilities/creative-hub` (descartada: esa ruta exige `cliente.modulos` + líneas legacy que Sky no tiene y devolvería 404 igual); (c) página nueva con cards nuevas (descartada: duplica cards existentes sin dato nuevo); (d) replicar las 16 cards internas tal cual (v1 de este wireframe, descartada 2026-09-10: revenue, tiers, aceleradores y RpA son lectura de gestión de Efeonce, no del cliente).
 - Why this pattern: cierra el enlace muerto con el menor blast radius, mantiene una sola implementación de las cards y deja la migración del carril legacy (`capability-modules-resolver-migration`, TASK-827 §Follow-ups) como decisión separada.
 - Reuse / extend / new primitive: reuse; extend sólo si GVC premium bloquea (p. ej., hero sin momento dominante en 390px).
 - Open risks: datos de Sky pueden venir vacíos si su flujo creativo no está en `notion_ops` (estado `empty` honesto, no ceros); títulos de cards en inglés (deuda declarada); `route-reachability-gate` y `nav:budget` deben pasar con el href del `view_registry`.

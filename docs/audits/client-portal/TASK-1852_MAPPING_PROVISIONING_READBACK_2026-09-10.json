@@ -512,7 +512,41 @@
       "gatewayStatusListsProvider": true,
       "tests": 174
     },
-    "pending": "client-services:canary requires a human Entra bearer with the new scope (interactive PKCE); no write executed",
-    "status": "federated_and_surface_verified_no_write_canary"
+    "pending": null,
+    "status": "federated_and_write_canary_verified",
+    "writeCanary": {
+      "observedAt": "2026-09-10T07:40Z",
+      "path": "Entra bearer (operator, PKCE public client) → https://mcp.efeonce.org/mcp → RFC 8693 → App lane",
+      "initialize": "efeonce-mcp 1.4.0+80ea8d7",
+      "toolsListedForToken": 40,
+      "preview": {
+        "status": 200,
+        "canApply": true,
+        "fingerprint": "e2e5d938a6c3221bf514c4305f9dc40eb5d915357dc317a2e4a9c1709779ffcc"
+      },
+      "apply": {
+        "status": 200,
+        "operationId": "EO-APC-ECD63852",
+        "authorityKind": "delegated_oauth",
+        "clientId": "efeonce-mcp-client-services",
+        "created": 0,
+        "preserved": 1,
+        "replayed": false
+      },
+      "replay": {
+        "operationId": "EO-APC-ECD63852",
+        "replayed": true
+      },
+      "protocolNote": "legacy handshake rejects MCP-Protocol-Version header; omit it like scripts/oauth-canary.mjs"
+    }
+  },
+  "skyApply": {
+    "status": 200,
+    "operationId": "EO-APC-ECD63852",
+    "authorityKind": "delegated_oauth",
+    "clientId": "efeonce-mcp-client-services",
+    "created": 0,
+    "preserved": 1,
+    "replayed": false
   }
 }

@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-046`
-- Status real: `Diseño 2026-09-10: decisión del operador (Creative Hub es el módulo contratado por Sky) y wireframe; sin JSX, sin GVC, sin rollout`
+- Status real: `Diseño 2026-09-10: decisión del operador (Creative Hub es el módulo contratado por Sky) y wireframe v2 de cinco bloques cliente; contrato backend documental tildado; sin JSX, sin GVC, sin rollout`
 - Rank: `TBD`
 - Domain: `ui|identity|delivery`
 - Blocked by: `none`
@@ -36,8 +36,10 @@ El bundle `creative_hub_globe_v1`, asignado a Sky Airlines y declarado como tér
 activas de Sky ven un ítem «Creative Hub» en el menú que devuelve 404 y la señal
 `identity.client_portal.assigned_view_without_route` marca 1. El operador resolvió el Slice 1 de TASK-1687
 en sentido contrario al que asumía TASK-1685 §D3: Creative Hub ES el producto de Sky, así como SEO es el de
-Berel. Esta task construye la página reutilizando íntegro el módulo `creative-hub` del registry de
-capacidades, con la puerta cambiada al primitive de visibilidad del portal cliente.
+Berel. Esta task construye la página como lectura del cliente en cinco bloques (necesita tu respuesta · en
+producción · entregado · cadencia y calidad bidireccional · pedir algo), reutilizando seis cards del módulo `creative-hub`
+del registry y excluyendo las de gestión interna (revenue, tiers, aceleradores, RpA), con la puerta cambiada al primitive
+de visibilidad del portal cliente. Decisión de contenido del operador 2026-09-10; wireframe v2.
 
 ## Why This Task Exists
 
@@ -53,8 +55,8 @@ legacy, que Sky no tiene.
 - `/creative-hub` responde 200 para una persona con `cliente.creative_hub` asignado y redirige a
   `/home?denied=creative-hub` para quien no lo tiene; internos entran por bypass D1 sin impersonar.
 - La señal `identity.client_portal.assigned_view_without_route` baja a 0 sin tocar el bundle ni el menú.
-- Cero implementación paralela de cards: la página consume `GreenhouseCapabilityModule` y
-  `getCapabilityModuleData` existentes.
+- Cero implementación paralela de cards: la página consume `getCapabilityModuleData` y renderiza con `ModuleLayout`
+  un subconjunto filtrado y retitulado de seis cards (override de título por bloque, sin tocar el registry).
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 1 — CONTEXT & CONSTRAINTS
@@ -208,10 +210,10 @@ bundle de Sky; **NUNCA** filtrar `module_key` técnico al DOM; **NUNCA** importa
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Toda tabla nueva queda declarada en el allowlist de destinos de escritura del dominio — `N/A`, sin tablas nuevas.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects (Backend/Data Contract, 2026-09-10).
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit (lectura pura; guard por primitive).
+- [x] Toda tabla nueva queda declarada en el allowlist de destinos de escritura del dominio — `N/A`, sin tablas nuevas.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk (`none` / revert PR).
 - [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
 - [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
@@ -230,7 +232,7 @@ bundle de Sky; **NUNCA** filtrar `module_key` técnico al DOM; **NUNCA** importa
 
 - Surface: `/creative-hub` (href del `view_registry`), página hoja del portal cliente.
 - Nav placement: `none` — el ítem ya existe en el sidebar dinámico cliente (`VIEW_CODE_NAV_DESCRIPTOR['cliente.creative_hub']`, grupo Módulos); no se agrega destino.
-- Composition Shell: `no aplica` en Slice 1 — se reutiliza `GreenhouseCapabilityModule` (hero + grid) tal cual; migrar el módulo al shell es trabajo del carril `/capabilities/*` completo, no de esta ruta.
+- Composition Shell: `no aplica` en Slice 1 — se reutilizan `CapabilityOverviewHero` + `ModuleLayout` con seis cards filtradas y retituladas por bloque; migrar el módulo al shell es trabajo del carril `/capabilities/*` completo, no de esta ruta.
 - Primitive decision: `reuse` — `CapabilityOverviewHero` + `ModuleLayout`.
 - Adaptive density / The Seam: `no aplica` — las cards del módulo ya colapsan por `size`; no nacen cards nuevas.
 - Floating/Sidecar/Dialog decision: ninguno.
@@ -298,7 +300,7 @@ bundle de Sky; **NUNCA** filtrar `module_key` técnico al DOM; **NUNCA** importa
 
 ### Design decision log
 
-- Decision: materializar la ruta reutilizando el módulo existente con puerta por módulo asignado.
+- Decision (v2 2026-09-10): materializar la ruta como lectura del cliente en cinco bloques con seis cards reutilizadas y retituladas; excluir las cards de gestión interna; puerta por módulo asignado.
 - Alternatives considered: supersede del bundle (descartada por el operador); rewrite a `/capabilities/creative-hub` (404 igual por líneas legacy); cards nuevas (duplicación).
 - Why this pattern: menor blast radius, una sola implementación, cierra la señal sin tocar catálogo.
 - Reuse / extend / new primitive: reuse; extend sólo con evidencia GVC.
@@ -340,8 +342,10 @@ bundle de Sky; **NUNCA** filtrar `module_key` técnico al DOM; **NUNCA** importa
 
 ### Slice 2 — Página `/creative-hub`
 
-- `page.tsx` con el patrón de `/equipo`: sesión, `requireViewCodeAccess('cliente.creative_hub')`, tenant,
-  `GreenhouseCapabilityModule`. `loading.tsx` y `error.tsx` con copy canónico. Marcadores `data-capture`.
+- `page.tsx` con el patrón de `/equipo`: sesión, `requireViewCodeAccess('cliente.creative_hub')`, tenant, reader y
+  render con `CapabilityOverviewHero` + `ModuleLayout` sobre un `CapabilityModuleData` filtrado a las seis cards de los
+  cinco bloques (B1–B4 + B5 condicional), títulos y vacíos desde `src/lib/copy/client-portal.ts`. `loading.tsx` y
+  `error.tsx` con copy canónico. Marcadores `data-capture`.
 - `pnpm route-reachability-gate` y `pnpm nav:budget` verdes (href ya declarado en el `view_registry`).
 
 ### Slice 3 — Evidencia y cierre

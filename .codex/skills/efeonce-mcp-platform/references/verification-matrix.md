@@ -70,4 +70,4 @@ before citing them.
 | Ecosystem lane | writes answer `403 invalid_delegated_context` by design | ✔ |
 | Native issuer | `unsupported` (`provider_delegation_required`); never "fixed" by widening v2 | policy ✔ |
 | Gateway status | `efeonce.gateway.status` lists `greenhouse-client-services` `enabled` (it did not until PR #10) | production readback ✔ |
-| Human write canary | `pnpm client-services:canary` with a person's Entra bearer (preview only), then a governed `apply` confirmed by a human | **pending — no `apply` executed through the channel yet** |
+| Human write canary | `pnpm client-services:canary` with a person's Entra bearer (preview only), then a governed `apply` confirmed by a human | **done 2026-09-10** — `apply_client_service_enablement` for Sky through production (`EO-APC-ECD63852`, `authority.kind=delegated_oauth`, replay `replayed=true`); recipe: person mints the bearer via the public PKCE client, stores it `0600`, the agent calls `tools/call` without `MCP-Protocol-Version` (legacy handshake) |

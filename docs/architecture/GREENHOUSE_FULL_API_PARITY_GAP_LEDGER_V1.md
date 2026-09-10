@@ -256,7 +256,7 @@ Contrato: [`EFEONCE_CUSTOMER_IDENTITY_MCP_FEDERATION_DECISION_V1.md`](EFEONCE_CU
 | Ecosystem lane | inventario (`ecosystem-client-service-enablement.ts`); escrituras `403 invalid_delegated_context` **por diseño** (binding máquina, sin capability por humano) |
 | CLI | `scripts/client-portal/service-enablement.ts` (misma `idempotencyKey` que App y Nexa) |
 | Nexa | ✅ `applyClientServiceEnablementAction` / `rollbackClientServiceEnablementAction` registradas en `src/lib/nexa/actions/registry.ts` |
-| MCP | ✅ **Federado** — `efeonce-mcp` `1.4.0`, provider `greenhouse-client-services`, tools `preview_/apply_/rollback_client_service_enablement`, scope `efeonce.mcp.client_services.write`, RFC 8693 vía `efeonce-mcp-client-services`; live en producción 2026-09-10 (rev `00052-slt`). **Falta el canary humano de escritura**: ningún `apply` ejecutado por el canal |
+| MCP | ✅ **Federado** — `efeonce-mcp` `1.4.0`, provider `greenhouse-client-services`, tools `preview_/apply_/rollback_client_service_enablement`, scope `efeonce.mcp.client_services.write`, RFC 8693 vía `efeonce-mcp-client-services`; live en producción 2026-09-10 (rev `00052-slt`). **Canary humano de escritura ejecutado** 2026-09-10 ~07:40Z: `apply` de Sky por el canal (`EO-APC-ECD63852`, `delegated_oauth`, replay idempotente) |
 | UI (portal) | No verificada en este delta; las superficies del cliente siguen pendientes (EPIC-046; `/creative-hub` → TASK-1857) |
 
 Primera fila del ledger donde un bearer delegado (`sister_platform_oauth`) **sí confirma** una escritura: a

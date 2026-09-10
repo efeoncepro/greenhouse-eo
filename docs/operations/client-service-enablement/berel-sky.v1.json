@@ -91,7 +91,7 @@
     },
     {
       "label": "Sky Airlines",
-      "note": "Servicio confirmado; términos declarados el 2026-09-10 (kind committed, importes ausentes) con mapping creative_hub_globe_v1; ai_visibility_v1 existente se conserva sin atribución contractual. Preview limpio (canApply=true, sólo preserve). Apply pendiente de sesión humana y flag ON. cliente.creative_hub sigue 404 en producción; por decisión del operador (2026-09-10) Creative Hub ES el módulo contratado, así que TASK-1687 no supersede el bundle y la página se construye en TASK-1857.",
+      "note": "Servicio confirmado; términos declarados el 2026-09-10 (kind committed, importes ausentes) con mapping creative_hub_globe_v1; ai_visibility_v1 existente se conserva sin atribución contractual. Preview limpio (canApply=true, sólo preserve). Apply ejecutado el 2026-09-10 ~07:40Z por el canal MCP delegado con la autoridad del operador (operación EO-APC-ECD63852, delegated_oauth, 0 altas, 1 conservada, replay idempotente). cliente.creative_hub sigue 404 en producción; por decisión del operador (2026-09-10) Creative Hub ES el módulo contratado, así que TASK-1687 no supersede el bundle y la página se construye en TASK-1857.",
       "request": {
         "organizationId": "org-b9977f96-f7ef-4afb-bb26-7355d78c981f",
         "targets": [
@@ -154,6 +154,24 @@
         "cadence": "per_event; sin digest (TASK-387); destino Teams sólo clases reporte/feedback vía Insights (TASK-1848)",
         "peopleApplied": 3,
         "note": "Decisión del operador delegada al agente (2026-09-10); la persona puede cambiarla desde su portal."
+      },
+      "applyReceipt": {
+        "appliedAt": "2026-09-10T07:40Z",
+        "operationId": "EO-APC-ECD63852",
+        "channel": "efeonce-mcp gateway 1.4.0+80ea8d7 → RFC 8693 → App lane",
+        "authority": {
+          "kind": "delegated_oauth",
+          "clientId": "efeonce-mcp-client-services"
+        },
+        "actor": "operador (usuario admin interno)",
+        "fingerprint": "e2e5d938a6c3221bf514c4305f9dc40eb5d915357dc317a2e4a9c1709779ffcc",
+        "idempotencyKey": "task1852-sky-apply-1",
+        "created": [],
+        "preserved": [
+          "cpma-ec0041f7-e416-442f-acab-73f645c06f56"
+        ],
+        "replayVerified": true,
+        "note": "Sólo conservación: el estado de Sky no cambió. Readiness restante: producer_coverage, human_login, authenticated_route."
       }
     }
   ],

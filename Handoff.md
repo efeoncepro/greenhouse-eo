@@ -7,8 +7,8 @@ Pendiente: conciliar MET-2339–2342 tarea/calendario. Producción abierta; cier
 PR #231/main `5726ce9d90`, orquestador `34416904936`; gates y watchdog verdes; excepción pause auditada.
 **10/09 RELEASE `f69b9d32` (PR #232, run `34431792218`, manifest released 03:16Z, watchdog 5/5, canary 5/5):** términos con
 `bundledModules`, autoridad `delegated_oauth`, invitación diferida, chats Teams `ready`, preferencias `client_service_default_v1`;
-flag writes ON horneada. Pendiente humano: apply Sky (payload `private-scope/sky-apply.json`, fp `e2e5d938…`); Berel sin
-entregar invitaciones (bloqueo del operador hasta UI); MCP delegado vivo (Entra + allowlist + `efeonce-mcp` 1.4.0 rev `00052`; falta canary humano);
+flag writes ON horneada. **07:40Z apply Sky HECHO por MCP delegado con token del operador** (`EO-APC-ECD63852`, sólo preserve,
+replay OK) = canary humano del canal cerrado. Berel sin entregar invitaciones (bloqueo del operador hasta UI);
 `/creative-hub` → `TASK-1857` (es el módulo de Sky; 1687 no supersede).
 
 **EPIC-045 ↔ EPIC-046:** Hitos I/N obligatorios: Insights cliente/interno + email/in-app/Teamsbot con

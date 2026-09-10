@@ -116,9 +116,12 @@ cliente `efeonce-mcp-client-services`) por un token Greenhouse con `client_servi
 App, nunca el ecosystem. Los comandos ecosystem con binding de máquina siguen devolviendo `403 invalid_delegated_context`
 por diseño: acreditan una máquina, no la aprobación humana que exige `approved_by_user_id`.
 El canary `pnpm client-services:canary` (repo `efeonce-mcp`) exige un token Entra humano con el scope nuevo
-(authorization code + PKCE interactivo); no se puede mintear desatendido. La primera ejecución punta a punta la hace una
-persona administradora y se registra en la auditoría de rollout; hasta entonces el canal se reporta como «federado y
-verificado en superficie, sin canary de escritura». Las rutas ecosystem mutantes conservan el wrapper de lectura porque
+(authorization code + PKCE interactivo); no se puede mintear desatendido. La primera ejecución punta a punta (preview,
+apply de Sky y replay idempotente) la autorizó el operador el 2026-09-10 ~07:40Z y está registrada en la auditoría de rollout
+§Apply de Sky: el canal queda «federado y certificado con canary de escritura». Receta para repetirlo: la persona obtiene su
+bearer con el scope (PKCE del cliente público del MCP), lo guarda en un archivo `0600` y el agente llama `tools/call` sobre
+`https://mcp.efeonce.org/mcp` sin header `MCP-Protocol-Version` (handshake legacy); el token nunca se imprime ni se pega en
+el chat. Las rutas ecosystem mutantes conservan el wrapper de lectura porque
 permanecen fail-closed; antes de abrirlas deben adoptar un command lane que conserve reautorización e idempotencia sin
 duplicar el command store.
 

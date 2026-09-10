@@ -245,7 +245,8 @@ de escritura delegada.
   `403 invalid_delegated_context` por diseño, no como pendiente. Las tres piezas fuera de este repo —scope de entrada en la
   app Entra del MCP, consumer en `GREENHOUSE_SISTER_PLATFORM_OAUTH_ALLOWED_CONSUMERS` y federación en el gateway
   (`efeonce-mcp` 1.4.0, provider `greenhouse-client-services`, rev `00052-slt`)— quedaron aplicadas el 2026-09-10; el canal
-  falla cerrado si cualquiera se retira, y su primer canary de escritura exige un token Entra humano.
+  falla cerrado si cualquiera se retira. Primer canary de escritura ejecutado el 2026-09-10 ~07:40Z: apply de Sky por el
+  canal con el token Entra del operador (`EO-APC-ECD63852`, `authority.kind=delegated_oauth`, replay idempotente).
 - **Invitación diferida.** `inviteClientPortalUser` admite `delivery: 'deferred'` (persona + roles, sin token ni correo) y
   `deliverClientPortalInvitation` entrega después; ambos por la ruta del checklist de onboarding. El preview distingue
   `person_invitation_pending` de `person_not_authorized_in_organization`: dos estados con dueño y acción distintos.
