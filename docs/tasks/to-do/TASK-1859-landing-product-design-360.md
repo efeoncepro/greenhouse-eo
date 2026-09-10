@@ -53,7 +53,7 @@ públicos todavía, así que la publicación tiene que esperar al modelo.
 
 ## Goal
 
-- Una landing que en diez segundos le diga al Head of Design que es **capacidad para equipos que ya tienen equipo**, que él **elige qué frentes soltar** y que puede **verificar** el cumplimiento.
+- Una landing que en diez segundos le diga al Head of Design que **su roadmap crece más rápido que su equipo de diseño**, que él **elige qué frentes delegar** y que puede **verificar** el cumplimiento.
 - Un reencuadre que convierta el gasto de diseño en **capacidad de ingeniería ociosa**, anclado en los datos del propio visitante y no en un benchmark ajeno.
 - La página como **prueba de oficio**: cero errores de accesibilidad automáticos, porque vende accesibilidad.
 - Publicación por fases (preview → `noindex` enviable → indexada) gobernada por el estado del business model.
@@ -157,7 +157,7 @@ Reglas obligatorias:
 - UI rigor: `ui-standard`
 - Usuario / rol: Head of Design / Design Director de empresa mid-market o enterprise con equipo de diseño in-house (operador, campeón y veto); CPO/CTO como comprador económico; visitante público no autenticado.
 - Momento del flujo: fase B, envío 1:1 durante una conversación comercial; fase C, descubrimiento orgánico, AEO o referido.
-- Resultado perceptible esperado: en diez segundos entiende que es capacidad para equipos que ya tienen equipo, que él elige qué frentes soltar y que puede verificar el cumplimiento; agenda una reunión o sale a la landing hermana correcta.
+- Resultado perceptible esperado: en diez segundos entiende que su roadmap crece más rápido que su equipo de diseño, que él elige qué frentes delegar y que puede verificar el cumplimiento; agenda una reunión o sale a la landing hermana correcta.
 - Friccion que debe reducir: miedo a la sustitución; lectura del diseño como gasto estético; no saber por dónde empezar.
 - No-goals UX: self-serve, checkout, precios, casos de cliente, portal, diseño de sitio web (`TASK-1345`), producción creativa (`TASK-1350`).
 
@@ -275,7 +275,8 @@ Reglas obligatorias:
 
 ### Slice 2 — Copy y claims
 
-- Validar el Copy Ledger con `greenhouse-ux-writing` + `copywriting`, conservando los ids.
+- Primera pasada de craft hecha el 2026-09-10 (`## Copy Audit` del wireframe): gran idea al H1, antítesis de 5 a 2, tuteo, género, numerales.
+- **Validar con voz del cliente real** antes de cerrar el slice: no existe perfil de líder de diseño en `docs/context/13_icp-buyer-personas-jtbd.md`, así que el copy sigue siendo hipótesis.
 - Re-verificar C2–C5 contra WebAIM (as-of vigente) y C6 con Legal; confirmar C1 con marca.
 - Confirmar que el nombre interno de la familia no aparece en ningún string.
 
@@ -320,7 +321,7 @@ El detalle vive en los contratos UI y no se duplica aquí:
 - **Conversión, nodos de programa, máquina de estados del scheduler, fases, rutas y fallas** → flow.
 - **Inventario de motion, prohibiciones, reduced-motion y guardrails de performance** → motion.
 
-Resumen de las 13 regiones en orden: header nativo · hero · prueba de marca · reencuadre · control · siete frentes ·
+Resumen de las 13 regiones en orden: header nativo · hero · prueba de marca · reencuadre · control · 7 frentes ·
 accesibilidad con número · tres razones · verificable · cómo empezamos · cuándo no somos la opción · preguntas
 frecuentes · CTA final · footer nativo.
 
@@ -403,6 +404,8 @@ Kinsta.
 - [x] Existen y están declarados en Status el wireframe, el flow y el motion.
 - [ ] `UI ready` permanece `no` hasta completar el Visual Direction Contract, validar el copy y pasar `pnpm task:lint --task TASK-1859` sin findings.
 - [ ] El slug está validado con evidencia de demanda y SERP registrada en el wireframe.
+- [x] Primera pasada de craft (`copywriting` + `greenhouse-ux-writing`) aplicada al Copy Ledger — ver `## Copy Audit` del wireframe (2026-09-10).
+- [ ] El copy está validado con voz del cliente real: al menos 5 conversaciones con líderes de diseño in-house, y el Copy Ledger ajustado a sus palabras literales.
 - [ ] La página lidera con Efeonce y el string `Product Design 360` no aparece.
 - [ ] El escaneo de Forbidden Copy sobre el texto renderizado da 0 coincidencias.
 - [ ] Cada claim publicado corresponde a una fila del Claims Ledger, con su fuente enlazada.

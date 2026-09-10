@@ -46,7 +46,7 @@ Si EPIC-019 crea su master flow, esta landing se declara ahí como nodo y este d
 
 1. **Entry:** aterriza con UTM en la URL (fase B: `utm_source=direct-outreach`). La UTM se preserva hasta la conversión.
 2. **Reconocimiento:** lee hero (región 1); decide seguir o salir.
-3. **Rama de orientación:** *Mira los siete frentes* → `#frentes`; o recorre linealmente.
+3. **Rama de orientación:** *Mira los 7 frentes* → `#frentes`; o recorre linealmente.
 4. **Rama de enrutamiento:** si en la región 10 se identifica con marca/campañas o sitio web → sale a `/agencia-creativa/` o `/desarrollo-sitios-web/`. **Es una salida exitosa, no una fuga.**
 5. **Acción primaria:** *Agenda una reunión* (header, hero, región 6 contextual, región 12).
 6. **Transition:** Growth CTA ejecuta `open_meeting_scheduler` con `meetingSurfaceId` + `schedulerKey` de esta surface → scheduler nativo.
@@ -59,8 +59,8 @@ Si EPIC-019 crea su master flow, esta landing se declara ahí como nodo y este d
 | Trigger | Source | Target state/surface | Keyboard equivalent | Notes |
 |---|---|---|---|---|
 | Click *Agenda una reunión* | header / hero / región 12 | scheduler `opening` | Enter/Space sobre el CTA enfocado | `utm_content` = `header` / `hero` / `final` |
-| Click *Empezar por accesibilidad* | región 6 | scheduler `opening` | Enter/Space | `utm_content=lane-accesibilidad`; mismo binding |
-| Click *Mira los siete frentes* | hero | ancla `#frentes` | Enter | desplazamiento instantáneo bajo reduced-motion |
+| Click *Empieza por accesibilidad* | región 6 | scheduler `opening` | Enter/Space | `utm_content=lane-accesibilidad`; mismo binding |
+| Click *Mira los 7 frentes* | hero | ancla `#frentes` | Enter | desplazamiento instantáneo bajo reduced-motion |
 | Click enlace de costura | región 5 | `/desarrollo-sitios-web/` | Enter | enlace interno sin UTM |
 | Click salida de región 10 | región 10 | `/agencia-creativa/` o `/desarrollo-sitios-web/` | Enter | salida exitosa |
 | Escape | scheduler abierto | scheduler `closed` | Escape | foco vuelve al CTA disparador |

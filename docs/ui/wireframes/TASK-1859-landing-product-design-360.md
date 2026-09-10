@@ -17,7 +17,7 @@
 - Secondary user: **CPO / CTO / VP Product**, comprador económico. Llega reenviado por el Head of Design o por el reframe de ingeniería de la región 3.
 - User moment: descubrimiento (orgánico/AEO/referido) o, en fase B, **envío 1:1 durante una conversación comercial**. Los primeros diez segundos deciden si sigue leyendo.
 - Job to be done: *"Necesito que salgan las lanes que mi equipo nunca alcanza, sin sumar headcount que después no puedo sostener, y sin traer un proveedor que le diga a mi jefe que mi equipo no da el ancho."*
-- Primary decision signal: *"Esta gente entiende que ya tengo equipo, me deja elegir qué soltar, y puedo verificar si cumplen."* → agenda una reunión.
+- Primary decision signal: *"Esta gente entiende que ya tengo equipo, me deja elegir qué delegar, y puedo verificar si cumplen."* → agenda una reunión.
 - Non-goals: no es self-serve; no vende diseño de sitio web (eso es `TASK-1345`); no vende marca, campañas ni piezas (eso es `TASK-1350`); no publica precios; no muestra casos de cliente de product design (no existen); no expone el portal ni datos de cliente.
 
 ## Publication Gate — la oferta todavía no autoriza claims públicos
@@ -36,9 +36,9 @@ El nombre público **"Product Design 360" no aparece en la página** mientras si
 
 La secuencia no es un folleto (servicios → por qué nosotros). Es una arquitectura de persuasión con cuatro movimientos, cada uno con su región:
 
-1. **Reconocimiento** *(regiones 1–2)* — en diez segundos, el visitante se reconoce: *"esto es para equipos que ya tienen equipo"*. Anula el miedo a la sustitución **por construcción**, sin nombrarlo.
+1. **Reconocimiento** *(regiones 1–2)* — en diez segundos, el visitante se reconoce en la gran idea: *su roadmap crece más rápido que su equipo de diseño*. El H1 presupone que tiene equipo, así que anula el miedo a la sustitución **por construcción**, sin nombrarlo.
 2. **Reencuadre** *(región 3)* — enseña algo que el visitante no había contabilizado: su problema de diseño es capacidad de ingeniería que ya pagó y no puede usar. Convierte un gasto de diseño en un argumento que el CTO escucha. Se ancla en **los números del propio visitante**, nunca en un benchmark externo.
-3. **Criterio y oferta** *(regiones 4–8)* — primero la oferta de control (*tú eliges*), después los siete frentes, después la prueba independiente más fuerte (accesibilidad), después la auto-identificación (tres razones) y el mecanismo de verificación.
+3. **Criterio y oferta** *(regiones 4–8)* — primero la oferta de control (*tú eliges*), después los 7 frentes, después la prueba independiente más fuerte (accesibilidad), después la auto-identificación (tres razones) y el mecanismo de verificación.
 4. **Resolución de la indecisión** *(regiones 9–12)* — el mayor competidor es no decidir. Se ofrece un camino de un solo paso siguiente, se declara cuándo **no** somos la opción y se cierra con la agenda.
 
 **Lo que se omite a propósito, y qué ocupa su lugar:**
@@ -60,7 +60,7 @@ La secuencia no es un folleto (servicios → por qué nosotros). Es una arquitec
 | 2 | Prueba de marca | Respaldo de la masterbrand, sin implicar casos de diseño | módulo `brand-proof` (texto) | curado |
 | 3 | Reencuadre | Diseño = capacidad de ingeniería ociosa; pregunta anclada en los datos del visitante | módulo `reframe` + esquema conceptual | estático |
 | 4 | Control | *Tú eliges qué frentes conserva tu equipo* | módulo `control` | estático |
-| 5 | Los siete frentes | Catálogo reconocible, ordenado por evidencia | módulo `lanes` (grilla de 7) | estático |
+| 5 | Los 7 frentes | Catálogo reconocible, ordenado por evidencia | módulo `lanes` (grilla de 7) | estático |
 | 6 | Accesibilidad con número | Prueba independiente más fuerte; cifras verificadas con fuente | módulo `a11y-proof` | curado con fuente |
 | 7 | Tres razones | Auto-identificación del visitante | módulo `reasons` | estático |
 | 8 | Verificable | Qué se mide y cómo se declara la confianza del número | módulo `verification` | estático |
@@ -74,7 +74,7 @@ La secuencia no es un folleto (servicios → por qué nosotros). Es una arquitec
 
 ### Región 1 — Hero
 
-- **Propósito:** que el Head of Design se reconozca en una línea y entienda que no es un reemplazo.
+- **Propósito:** que el Head of Design se reconozca en la gran idea en una línea, y que el subtítulo le entregue la oferta y el control.
 - **Contenido:** eyebrow · H1 · subtítulo · CTA primario + microcopy · CTA secundario (ancla a región 5).
 - **Desktop 1440:** columna de texto a la izquierda (máx. ~60 caracteres por línea en el subtítulo); zona visual a la derecha **PENDIENTE de dirección visual**. El elemento LCP debe ser el H1 (texto), no un video ni una imagen pesada.
 - **Mobile 390:** columna única; H1 y CTA primario visibles sin scroll; zona visual debajo del CTA o suprimida.
@@ -99,10 +99,10 @@ La secuencia no es un folleto (servicios → por qué nosotros). Es una arquitec
 ### Región 4 — Control
 
 - **Propósito:** la única cláusula anti-desplazamiento que se dice en voz alta, formulada como **oferta de control**, no como promesa de abstención.
-- **Contenido:** H2 · cuerpo · tres puntos.
+- **Contenido:** H2 · cuerpo · dos puntos.
 - **Regla dura:** no aparece ninguna otra cláusula del contrato anti-desplazamiento. Nada de *"nunca nos reunimos sin ti"* ni *"no medimos a tu gente"*.
 
-### Región 5 — Los siete frentes
+### Región 5 — Los 7 frentes
 
 - **Propósito:** catálogo reconocible. Que el visitante encuentre su dolor sin entender la arquitectura interna.
 - **Orden:** por evidencia de mercado (ADR §Decisión 4). Accesibilidad primero.
@@ -156,6 +156,67 @@ La secuencia no es un folleto (servicios → por qué nosotros). Es una arquitec
 - **Propósito:** cierre. Reutiliza el mismo CTA primario y abre el scheduler nativo.
 - **Conversión:** Growth CTA `open_meeting_scheduler` (ver Flow). Mientras la superficie no esté promovida, el CTA opera como enlace de recuperación hacia `/contacto/`, declarado.
 
+## Copy Audit — 2026-09-10
+
+Primera pasada de craft con `copywriting` (voz institucional Efeonce, overlay `EFEONCE_VOICE_SYSTEM`) y `greenhouse-ux-writing` (microcopy, tuteo, género, numerales). Fuente de voz que manda: `docs/context/05_voz-tono-estilo.md` — **8 creencias contrarias** (el resumen de la skill todavía dice 7; `05` prevalece).
+
+### Diagnóstico
+
+- **Nivel de consciencia:** fase B (envío 1:1 tras una conversación) → *solution-aware*; fase C (orgánico) → *problem-aware*. Por eso el hook abre por el problema (PAS) y el cuerpo trabaja la oferta y el mecanismo (FAB). La skill lo nombra como el híbrido correcto.
+- **🔴 La gran idea estaba enterrada.** El H1 anterior (*"Capacidad de diseño para equipos que ya tienen equipo"*) reconocía al ICP pero no cargaba ninguna idea; la idea dominante de la página —*el roadmap crece más rápido que la capacidad de diseño, y esa diferencia se paga en ingeniería*— aparecía recién en la región 3. Antipatrón *"enterrar la gran idea"*. Se mueve al H1, y regiones 3 y 7 hacen eco.
+- **🔴 Antítesis repetida.** La marca autoriza *"no es X, es Y"* (`05`, *do's*), pero la página la usaba **cinco veces**. Un dispositivo bien puesto persuade; repetido es un tell de AI-slop. Quedan **dos**: *"Ese hueco no se cierra: se cubre"* (región 7) y el cierre de la región 9.
+- **Densidad de landing.** `05` fija 1–2 oraciones por bloque en marketing. Regiones 3 y 8 tenían oraciones de 44 y 45 palabras: la 3 se parte en tres cortas y la 8 pasa a lista escaneable.
+- **Tuteo inconsistente.** *"el sistema que ya tienen"*, *"lo que ya generaron"*, *"cuántas abrieron"* mezclaban *ustedes* con *tú*. Corregido a *tú*.
+- **Género** (`greenhouse-ux-writing`): *"un buen diseñador de planta"*, *"investigador"*, *"un diseñador más"* → formas neutras.
+- **Numerales** (`greenhouse-ux-writing`): *siete* → 7, *tres* → 3.
+- **CTA en imperativo:** *"Empezar por accesibilidad"* (infinitivo) → *"Empieza por accesibilidad"*, como los demás.
+- **"Soltar" → "delegar".** *Soltar* era vocabulario interno y puede leerse como *abandonar*; *delegar* implica confianza y control retenido.
+- **Títulos que nombran en vez de prometer:** *"Siete frentes de trabajo"* → *"7 frentes que tu equipo puede delegar"*.
+- **Rayas:** se quitan las dos parejas de raya del copy visible (L7, FAQ 1).
+
+### El remate de la región 3, y por qué ese
+
+*"Ahorrar en diseño te está costando ingeniería."* Se descartó *"Diseño se volvió el cuello de botella de tu ingeniería"*, que usa el vocabulario del CTO (BP4) pero **le dice al Head of Design que su equipo es el cuello de botella** — y él tiene el veto. El remate elegido enmarca una **decisión de presupuesto**, no una falla del equipo, y le da al Head of Design el argumento para su propia reunión.
+
+### Variantes de H1 consideradas
+
+| Variante | Veredicto |
+|---|---|
+| Capacidad de diseño para equipos que ya tienen equipo. | reconoce el ICP, pero no carga idea y el juego de palabras obliga a releer |
+| **Tu roadmap crece más rápido que tu equipo de diseño.** | ✅ **elegida** — la gran idea en 9 palabras; presupone el equipo; valida al Head of Design en vez de acusarlo |
+| Capacidad de diseño para cuando tu roadmap crece más rápido que tu equipo. | misma idea, más larga; queda como OG title |
+| Tu equipo de diseño no necesita reemplazo. Necesita capacidad. | ❌ nombra el daño que queremos que no piense |
+| Suma capacidad de diseño sin reemplazar a tu equipo. | ❌ ídem |
+| Más capacidad de diseño, sin contratar a nadie. | ❌ contradice *"si es permanente, contrata"* |
+| Diseño que escala al ritmo de tu ingeniería. | abstracto; *escala* es palabra de agencia |
+| Cuando ingeniería contrata y diseño no. | fuerte como H2, incompleto como H1 |
+| Los frentes de diseño que tu equipo nunca alcanza, resueltos. | *resueltos* promete de más |
+| Investigación, accesibilidad y design system: lo que tu equipo nunca alcanza. | lista de features en el H1 |
+
+### Trazabilidad a las creencias de la marca
+
+| Región | Creencia (`05`) |
+|---|---|
+| 1 y 3 — gran idea y remate | #1 El marketing sin sistema es caro accidentalmente |
+| 6 y L7 — accesibilidad y lo generado con IA | #4 La IA sin gobernanza produce más caos, no menos |
+| 8 — verificable | #7 La transparencia operativa es un mínimo |
+| 4 y 9 — control, portabilidad, *"te sirve aunque no sigas"* | #8 El cliente entra a un ecosistema que lo vuelve más capaz |
+
+### Tensión resuelta: el texto del CTA
+
+La skill de copywriting pide *verbo + valor* (*"Revisemos tu roadmap"* rinde más que *"Agenda una reunión"*). Se mantiene **"Agenda una reunión"** porque es el CTA del header en todo el sitio: cambiarlo en esta página rompe la identificación consistente de una misma función entre páginas (WCAG 3.2.4) y la ayuda consistente (3.2.6). **El valor vive en el microcopy de al lado** (`hero.cta_micro`).
+
+### 🔴 Lo que esta pasada NO puede resolver: no hay voz del cliente
+
+`docs/context/13_icp-buyer-personas-jtbd.md` **no tiene un perfil de líder de diseño in-house**: existen BP4 (CTO) y BP6 (Brand Manager / Director de Arte, lado creativo). Las palabras de este ledger salieron de encuestas financiadas por proveedores y de reseñas sobre diseño de **marketing**, no de conversaciones con este comprador. Por regla de la skill, **el copy queda marcado como hipótesis**.
+
+- **Requisito antes de cerrar Slice 2:** al menos 5 conversaciones con Heads of Design o Design Directors in-house, registrando sus palabras literales para el dolor de capacidad, y ajustar el ledger a ellas.
+- **Recomendación fuera de esta task:** agregar el perfil *Head of Design / Design Director* a `13_icp-buyer-personas-jtbd.md` (owner: Strategy + Commercial).
+
+### Lo que no se tocó, y por qué
+
+Línea de prueba de marca, las tres cifras de WebAIM y su fuente, la línea legal, los pasos de la región 9, los casos de la región 10 y el CTA primario: están alineados al Claims Ledger, a la voz y a las reglas de UX writing.
+
 ## Copy Ledger
 
 Copy es-CL, tuteo, sin voseo, beneficios antes que siglas, lidera Efeonce. Estado: **borrador a validar** con `greenhouse-ux-writing` + `copywriting`. Ningún string contiene el nombre interno de la familia.
@@ -163,80 +224,84 @@ Copy es-CL, tuteo, sin voseo, beneficios antes que siglas, lidera Efeonce. Estad
 | Copy id | Region | Text | Dynamic values | Notes |
 |---|---|---|---|---|
 | `publicsite.capacidad-diseno.hero.eyebrow` | 1 | UX/UI · Design system · Accesibilidad · Investigación | — | reconocimiento por vocabulario del comprador |
-| `publicsite.capacidad-diseno.hero.h1` | 1 | Capacidad de diseño para equipos que ya tienen equipo. | — | H1; anula la sustitución por construcción |
-| `publicsite.capacidad-diseno.hero.subhead` | 1 | Investigación, UX/UI, design system y accesibilidad, en frentes de trabajo completos. Tu equipo dirige el producto; nosotros ejecutamos lo que nos sueltas. | — | reparto de trabajo, no voto |
+| `publicsite.capacidad-diseno.hero.h1` | 1 | Tu roadmap crece más rápido que tu equipo de diseño. | — | H1 = la gran idea (hook PAS); reconoce el ICP porque presupone que tiene equipo de diseño, sin nombrar la sustitución · audit 2026-09-10 |
+| `publicsite.capacidad-diseno.hero.subhead` | 1 | Sumamos capacidad por frentes de trabajo: investigación, UX/UI, design system y accesibilidad. Tu equipo dirige el producto; nosotros ejecutamos lo que nos delegas. | — | beneficio antes que la lista; "delegar" reemplaza "soltar" · audit 2026-09-10 |
 | `publicsite.capacidad-diseno.hero.cta_primary` | 1 | Agenda una reunión | — | CTA primario, idéntico en regiones 0 y 12 |
-| `publicsite.capacidad-diseno.hero.cta_micro` | 1 | Revisamos tu roadmap y cuánta capacidad de diseño exige. | — | sin duración inventada |
-| `publicsite.capacidad-diseno.hero.cta_secondary` | 1 | Mira los siete frentes | — | ancla `#frentes` |
+| `publicsite.capacidad-diseno.hero.cta_micro` | 1 | Revisamos contigo tu roadmap y cuánta capacidad de diseño exige. | — | reduce ansiedad junto al CTA; sin duración inventada · audit 2026-09-10 |
+| `publicsite.capacidad-diseno.hero.cta_secondary` | 1 | Mira los 7 frentes | — | numeral (UX writing); ancla `#frentes` · audit 2026-09-10 |
 | `publicsite.capacidad-diseno.proof.line` | 2 | Efeonce trabaja con más de 90 empresas en Chile, Colombia, México y Perú. | — | prueba de masterbrand; nunca "clientes de diseño" |
-| `publicsite.capacidad-diseno.reframe.h2` | 3 | ¿Cuántas vacantes de ingeniería abrieron este año? ¿Y cuántas de diseño? | — | la pregunta usa los datos del visitante |
-| `publicsite.capacidad-diseno.reframe.body` | 3 | Ingeniería crece con presupuesto de ingeniería. Diseño crece con presupuesto de diseño, que casi siempre es más chico y llega después. Cada vez que tu empresa suma ingenieros, tu proporción de diseño empeora, y el costo no aparece en diseño: aparece como sprints que arrancan sin pantallas y decisiones de interfaz que alguien toma a última hora para poder avanzar. | — | sin cifras |
-| `publicsite.capacidad-diseno.reframe.punchline` | 3 | No es un problema de diseño. Es capacidad de ingeniería que ya pagaste y no puedes aprovechar. | — | remate que habla al CTO |
+| `publicsite.capacidad-diseno.reframe.h2` | 3 | ¿Cuántas vacantes de ingeniería abrió tu empresa este año? ¿Y cuántas de diseño? | — | tuteo consistente (antes "abrieron"); la pregunta usa los datos del visitante · audit 2026-09-10 |
+| `publicsite.capacidad-diseno.reframe.body` | 3 | Ingeniería crece con su propio presupuesto. Diseño crece con uno más chico, que se aprueba después. La diferencia aparece donde menos la buscas: en sprints que arrancan sin pantallas. | — | de 1 oración de 44 palabras a 3 cortas; conserva la escena específica · audit 2026-09-10 |
+| `publicsite.capacidad-diseno.reframe.punchline` | 3 | Ahorrar en diseño te está costando ingeniería. | — | creencia #1 (sin sistema es caro accidentalmente); enmarca una decisión de presupuesto, no una falla del equipo: el Head of Design no queda como cuello de botella · audit 2026-09-10 |
 | `publicsite.capacidad-diseno.reframe.diagram_label` | 3 | Esquema | — | evita que el esquema se lea como dato |
 | `publicsite.capacidad-diseno.control.h2` | 4 | Tú eliges qué frentes conserva tu equipo. | — | oferta de control |
-| `publicsite.capacidad-diseno.control.body` | 4 | Tu equipo dirige el producto. Nosotros dirigimos la ejecución de los frentes que nos sueltas, con nuestro método, nuestra gente y nuestro control de calidad. | — | — |
+| `publicsite.capacidad-diseno.control.body` | 4 | Tu equipo dirige el producto. Nosotros ejecutamos los frentes que nos delegas y respondemos por su calidad. | — | "respondemos" nombra quién responde por la entrega: mecanismo, no adjetivo; corta la tríada "nuestro método, nuestra gente, nuestro control" · audit 2026-09-10 |
 | `publicsite.capacidad-diseno.control.point_1` | 4 | Contratas frentes completos, no horas. | — | — |
-| `publicsite.capacidad-diseno.control.point_2` | 4 | Cada frente tiene alcance, rondas y entregables declarados. | — | — |
-| `publicsite.capacidad-diseno.control.point_3` | 4 | Puedes recuperar un frente cuando tu equipo esté listo, y te llevas lo construido. | — | reversibilidad + portabilidad, en positivo |
-| `publicsite.capacidad-diseno.lanes.h2` | 5 | Siete frentes de trabajo | — | ancla `#frentes` |
+| `publicsite.capacidad-diseno.control.point_2` | 4 | Puedes recuperar un frente cuando tu equipo esté listo, y te llevas lo construido. | — | reversibilidad + portabilidad, en positivo; ex point_3 (point_2 genérico eliminado) · audit 2026-09-10 |
+| `publicsite.capacidad-diseno.lanes.h2` | 5 | 7 frentes que tu equipo puede delegar | — | promete en vez de nombrar; numeral; ancla `#frentes` · audit 2026-09-10 |
 | `publicsite.capacidad-diseno.lanes.l1.title` | 5 | Accesibilidad | — | primera por evidencia |
 | `publicsite.capacidad-diseno.lanes.l1.body` | 5 | Auditamos, corregimos y dejamos el criterio dentro de tu sistema, para que lo nuevo nazca accesible. | — | — |
 | `publicsite.capacidad-diseno.lanes.l2.title` | 5 | Design system y tokens | — | — |
-| `publicsite.capacidad-diseno.lanes.l2.body` | 5 | Hacemos que el sistema que ya tienen se adopte y se pueda demostrar: versiones, contribuciones de tu equipo y control de desvíos. | — | "que ya tienen": no vende construirlo |
+| `publicsite.capacidad-diseno.lanes.l2.body` | 5 | Hacemos que el design system que ya tienes se use de verdad y puedas demostrarlo: versiones, contribuciones de tu equipo y control de desvíos. | — | tuteo consistente (antes mezclaba "tienen" y "tu"); "que ya tienes": no vende construirlo · audit 2026-09-10 |
 | `publicsite.capacidad-diseno.lanes.l3.title` | 5 | Investigación con usuarios | — | — |
-| `publicsite.capacidad-diseno.lanes.l3.body` | 5 | Entrevistas, pruebas de usabilidad y validación con personas reales, antes y después de lanzar. | — | "personas reales" diferencia del research sintético |
+| `publicsite.capacidad-diseno.lanes.l3.body` | 5 | Decisiones con evidencia de personas reales: entrevistas, pruebas de usabilidad y validación, antes y después de lanzar. | — | beneficio primero; "personas reales" diferencia del research sintético · audit 2026-09-10 |
 | `publicsite.capacidad-diseno.lanes.l4.title` | 5 | Diseño de interfaz | — | — |
 | `publicsite.capacidad-diseno.lanes.l4.body` | 5 | Flujos, estados y pantallas listos para que tu equipo de ingeniería construya sin volver a preguntar. | — | la regla "nunca sola" no se expone |
 | `publicsite.capacidad-diseno.lanes.l5.title` | 5 | Consistencia y deuda de diseño | — | — |
 | `publicsite.capacidad-diseno.lanes.l5.body` | 5 | Contenemos la inconsistencia que se acumula release tras release: el trabajo que el roadmap siempre deja para después. | — | — |
 | `publicsite.capacidad-diseno.lanes.l6.title` | 5 | Operación de diseño | — | — |
-| `publicsite.capacidad-diseno.lanes.l6.body` | 5 | Que el trabajo entre ordenado, pase control de calidad y deje memoria de por qué se decidió cada cosa. | — | — |
-| `publicsite.capacidad-diseno.lanes.l7.title` | 5 | Lo que ya generaron con IA | — | nombre llano para "endurecer" |
-| `publicsite.capacidad-diseno.lanes.l7.body` | 5 | Revisamos lo que tu equipo ya generó con IA —consistencia, accesibilidad, estados faltantes— y dejamos un filtro para lo que venga. | — | — |
+| `publicsite.capacidad-diseno.lanes.l6.body` | 5 | Ordenamos cómo entra y sale el trabajo de diseño, y dejamos registro de por qué se decidió cada cosa. | — | oración completa (antes fragmento en subjuntivo) · audit 2026-09-10 |
+| `publicsite.capacidad-diseno.lanes.l7.title` | 5 | Diseño generado con IA | — | sustantivo como los otros títulos (antes "Lo que ya generaron", en ustedes) · audit 2026-09-10 |
+| `publicsite.capacidad-diseno.lanes.l7.body` | 5 | Corregimos consistencia, accesibilidad y estados faltantes en lo que tu equipo ya generó con IA, y filtramos lo que venga. | — | sin rayas; creencia #4 (IA sin gobernanza) · audit 2026-09-10 |
 | `publicsite.capacidad-diseno.lanes.shared_tag` | 5 | Compartido con tu sitio web | — | sólo en L1 y L2 |
 | `publicsite.capacidad-diseno.lanes.seam_link` | 5 | ¿También tu sitio web? Accesibilidad y design system se contratan una sola vez para ambos. Mira diseño y desarrollo web. | enlace `/desarrollo-sitios-web/` | costura con `TASK-1345` |
-| `publicsite.capacidad-diseno.a11y.h2` | 6 | La accesibilidad de la web está empeorando, no mejorando. | — | ancla `#accesibilidad` |
+| `publicsite.capacidad-diseno.a11y.h2` | 6 | En 2026, la accesibilidad de la web empeoró por primera vez en seis años. | — | ultra-específico (año + serie); C2–C4; creencia #4; ancla `#accesibilidad` · audit 2026-09-10 |
 | `publicsite.capacidad-diseno.a11y.stat_1_value` | 6 | 95,9% | — | ver Claims Ledger C2 |
 | `publicsite.capacidad-diseno.a11y.stat_1_text` | 6 | de las páginas de inicio más visitadas del mundo tiene errores de accesibilidad detectables. | — | — |
 | `publicsite.capacidad-diseno.a11y.stat_2_value` | 6 | 56,1 | — | C3 |
 | `publicsite.capacidad-diseno.a11y.stat_2_text` | 6 | errores por página en promedio, un 10,1% más que el año anterior. | — | C3 |
 | `publicsite.capacidad-diseno.a11y.stat_3_value` | 6 | 59,1 frente a 42 | — | C5 |
 | `publicsite.capacidad-diseno.a11y.stat_3_text` | 6 | errores promedio en páginas que usan atributos ARIA frente a páginas que no los usan. Sumar componentes no arregla la accesibilidad por sí solo. | — | argumento contraintuitivo |
-| `publicsite.capacidad-diseno.a11y.cause` | 6 | El promedio volvió a empeorar después de seis años seguidos de pequeñas mejoras. WebAIM lo atribuye en parte a páginas más complejas y al desarrollo asistido por IA. | — | C4 |
+| `publicsite.capacidad-diseno.a11y.cause` | 6 | WebAIM lo atribuye en parte a páginas más complejas y al desarrollo asistido por IA. | — | la serie de seis años pasó al H2; C4 · audit 2026-09-10 |
 | `publicsite.capacidad-diseno.a11y.legal` | 6 | Si vendes en la Unión Europea, la Ley Europea de Accesibilidad es exigible desde el 28 de junio de 2025. | — | C6; condicionada |
 | `publicsite.capacidad-diseno.a11y.source` | 6 | Fuente: WebAIM Million, medición de febrero de 2026. | enlace externo | — |
-| `publicsite.capacidad-diseno.a11y.cta` | 6 | Empezar por accesibilidad | — | mismo scheduler, `utm_content=lane-accesibilidad` |
-| `publicsite.capacidad-diseno.reasons.h2` | 7 | Tres razones por las que un equipo nos llama | — | — |
+| `publicsite.capacidad-diseno.a11y.cta` | 6 | Empieza por accesibilidad | — | imperativo, como los otros CTA (antes infinitivo); mismo scheduler, `utm_content=lane-accesibilidad` · audit 2026-09-10 |
+| `publicsite.capacidad-diseno.reasons.h2` | 7 | 3 razones por las que un equipo de diseño nos llama | — | numeral · audit 2026-09-10 |
 | `publicsite.capacidad-diseno.reasons.r1.title` | 7 | Creciste y no te alcanza. | — | cliente sano |
-| `publicsite.capacidad-diseno.reasons.r1.body` | 7 | Levantaste ronda, entraste a otro mercado o ingeniería contrató. No hay nada roto: necesitas más capacidad. | — | — |
+| `publicsite.capacidad-diseno.reasons.r1.body` | 7 | Levantaste ronda, entraste a otro mercado o ingeniería contrató, y la demanda de diseño creció más rápido que tu equipo. | — | eco de la gran idea; sin antítesis · audit 2026-09-10 |
 | `publicsite.capacidad-diseno.reasons.r2.title` | 7 | Hay algo que tu equipo no va a tener adentro. | — | cliente sano |
-| `publicsite.capacidad-diseno.reasons.r2.body` | 7 | No tienes investigador ni especialista de accesibilidad, y no vas a abrir esas vacantes. Ese hueco no se cierra: se cubre. | — | — |
+| `publicsite.capacidad-diseno.reasons.r2.body` | 7 | No tienes a nadie dedicado a investigación ni a accesibilidad, y no vas a abrir esos cargos. Ese hueco no se cierra: se cubre. | — | neutro de género (antes "investigador"); conserva la única antítesis de la región · audit 2026-09-10 |
 | `publicsite.capacidad-diseno.reasons.r3.title` | 7 | Algo se deterioró. | — | va último a propósito |
 | `publicsite.capacidad-diseno.reasons.r3.body` | 7 | Hay deuda acumulada y quieres recuperar terreno antes de seguir construyendo. | — | — |
 | `publicsite.capacidad-diseno.verify.h2` | 8 | Puedes ver si estamos cumpliendo. | — | — |
-| `publicsite.capacidad-diseno.verify.body` | 8 | Trabajamos sobre nuestra propia plataforma. Ahí ves, sobre nuestro trabajo, cuántas rondas de cambio necesita cada entrega, qué porcentaje salió a tiempo, qué salió bien a la primera, cuántos días toma cada ciclo y qué está detenido hace más de 72 horas. | — | mecanismo, sin cifras (C8) |
-| `publicsite.capacidad-diseno.verify.trust` | 8 | Y cuando un número no tiene datos suficientes para ser confiable, el sistema te lo dice en vez de mostrarlo igual. | — | política de confianza (C8) |
+| `publicsite.capacidad-diseno.verify.body` | 8 | En nuestra plataforma ves, sobre nuestro trabajo: | — | intro de lista; antes una oración de 45 palabras; C8 · audit 2026-09-10 |
+| `publicsite.capacidad-diseno.verify.item_1` | 8 | Cuántas rondas de cambio necesita cada entrega | — | C8 · audit 2026-09-10 |
+| `publicsite.capacidad-diseno.verify.item_2` | 8 | Qué porcentaje salió a tiempo | — | C8 · audit 2026-09-10 |
+| `publicsite.capacidad-diseno.verify.item_3` | 8 | Qué salió bien a la primera | — | C8 · audit 2026-09-10 |
+| `publicsite.capacidad-diseno.verify.item_4` | 8 | Cuántos días toma cada ciclo | — | C8 · audit 2026-09-10 |
+| `publicsite.capacidad-diseno.verify.item_5` | 8 | Qué lleva más de 72 horas detenido | — | C8 · audit 2026-09-10 |
+| `publicsite.capacidad-diseno.verify.trust` | 8 | Y si un número no tiene datos suficientes para ser confiable, te lo dice en vez de mostrarlo igual. | — | política de confianza (C8); creencia #7 · audit 2026-09-10 |
 | `publicsite.capacidad-diseno.start.h2` | 9 | Cómo empezamos | — | ancla `#como-empezar` |
 | `publicsite.capacidad-diseno.start.s1.title` | 9 | Conversación de capacidad | — | — |
 | `publicsite.capacidad-diseno.start.s1.body` | 9 | Revisamos tu roadmap y cuánta capacidad de diseño exige frente a la que tienes. | — | — |
 | `publicsite.capacidad-diseno.start.s2.title` | 9 | Diagnóstico | — | — |
-| `publicsite.capacidad-diseno.start.s2.body` | 9 | Te entregamos qué frentes soltar, en qué orden y con qué capacidad. Te sirve para pedir presupuesto aunque no sigas con nosotros. | — | entregable autónomo; no implica gratuidad |
+| `publicsite.capacidad-diseno.start.s2.body` | 9 | Te entregamos qué frentes delegar, en qué orden y con qué capacidad. Te sirve para pedir presupuesto aunque no sigas con nosotros. | — | entregable autónomo; no implica gratuidad |
 | `publicsite.capacidad-diseno.start.s3.title` | 9 | Un frente, un ciclo | — | — |
 | `publicsite.capacidad-diseno.start.s3.body` | 9 | Pruebas nuestro método en un solo frente, pagado y acotado. Si al terminar no recuperaste capacidad que puedas nombrar, no hay compromiso de continuar. | — | sin promesa de reembolso |
 | `publicsite.capacidad-diseno.start.s4.title` | 9 | Capacidad mensual | — | — |
 | `publicsite.capacidad-diseno.start.s4.body` | 9 | Si funcionó, sigues con una cuota mensual por cada frente. | — | sin montos |
 | `publicsite.capacidad-diseno.start.close` | 9 | Lo que decides en la primera reunión no es un contrato anual: es si vale un ciclo comprobarlo. | — | resolución de indecisión |
 | `publicsite.capacidad-diseno.notfor.h2` | 10 | Cuándo no somos la opción | — | patrón más citable |
-| `publicsite.capacidad-diseno.notfor.c1` | 10 | Si tu necesidad de diseño es permanente y generalista, contrata. Un buen diseñador de planta es insustituible. | — | honestidad |
+| `publicsite.capacidad-diseno.notfor.c1` | 10 | Si tu necesidad de diseño es permanente y generalista, contrata. Nada reemplaza a alguien de planta. | — | neutro de género (antes "un buen diseñador de planta") · audit 2026-09-10 |
 | `publicsite.capacidad-diseno.notfor.c2` | 10 | Si necesitas marca, campañas o piezas, eso lo hace nuestro equipo creativo. | enlace `/agencia-creativa/` | enruta a `TASK-1350` |
 | `publicsite.capacidad-diseno.notfor.c3` | 10 | Si necesitas un sitio web nuevo, empieza por diseño y desarrollo web. | enlace `/desarrollo-sitios-web/` | enruta a `TASK-1345` |
 | `publicsite.capacidad-diseno.notfor.c4` | 10 | Si buscas pantallas por hora o por pieza, no es nuestro modelo. | — | — |
 | `publicsite.capacidad-diseno.faq.h2` | 11 | Preguntas frecuentes | — | ancla `#preguntas` |
 | `publicsite.capacidad-diseno.faq.q1` | 11 | ¿Qué es un frente de trabajo? | — | — |
-| `publicsite.capacidad-diseno.faq.a1` | 11 | Un frente es una parte completa del trabajo de diseño —por ejemplo, accesibilidad o design system— que tu equipo nos entrega con alcance, rondas y entregables declarados. No contratas horas ni personas: contratas que ese frente se resuelva y se sostenga. | — | answer capsule |
+| `publicsite.capacidad-diseno.faq.a1` | 11 | Un frente es una parte completa del trabajo de diseño, como accesibilidad o design system, que tu equipo nos delega con alcance, rondas y entregables definidos. Contratas que ese frente se resuelva y se sostenga. | — | answer capsule; sin rayas ni antítesis · audit 2026-09-10 |
 | `publicsite.capacidad-diseno.faq.q2` | 11 | ¿En qué se diferencia de una suscripción de diseño? | — | — |
 | `publicsite.capacidad-diseno.faq.a2` | 11 | Las suscripciones venden capacidad de producción, sobre todo gráfica. Nosotros trabajamos sobre tu producto: investigación, interfaz, sistema y accesibilidad, con un equipo con nombre que acumula contexto de tu negocio y te muestra si está cumpliendo. | — | sin nombrar competidores |
-| `publicsite.capacidad-diseno.faq.q3` | 11 | ¿Por qué no contratar a un diseñador más? | — | — |
+| `publicsite.capacidad-diseno.faq.q3` | 11 | ¿Por qué no sumar a alguien más a tu equipo de diseño? | — | neutro de género · audit 2026-09-10 |
 | `publicsite.capacidad-diseno.faq.a3` | 11 | Contrata si el trabajo es permanente y generalista. Un cargo te da una persona; difícilmente te da investigación, accesibilidad y design system a la vez, porque no vas a abrir tres vacantes. Nosotros cubrimos lo que un cargo no alcanza. | — | sin cifras de salario |
 | `publicsite.capacidad-diseno.faq.q4` | 11 | ¿Cómo se cobra? | — | — |
 | `publicsite.capacidad-diseno.faq.a4` | 11 | Con una cuota mensual por cada frente contratado. No cobramos por hora ni por pantalla. Las rondas de revisión y los entregables quedan declarados en el contrato. | — | sin montos |
@@ -323,7 +388,8 @@ La verificación incluye un escaneo del texto renderizado contra esta lista. Cua
 
 - **Slug candidato:** `/servicios/diseno-ux-ui/` — sigue la convención `/servicios/<x>/` del sitio (`/servicios/posicionamiento-seo`, `/servicios/agencia-de-influencers/`) y usa el vocabulario con que el comprador busca, evitando la lectura de "diseño de producto" como diseño industrial. **Pendiente de validación de demanda y SERP** en el Slice 1; alternativas: `/servicios/capacidad-de-diseno/`, `/servicios/diseno-de-producto-digital/`.
 - **Title (borrador):** Capacidad de diseño UX/UI para equipos in-house | Efeonce
-- **Meta description (borrador):** Investigación, UX/UI, design system y accesibilidad en frentes de trabajo completos, para equipos de diseño que ya existen. Tu equipo dirige; nosotros ejecutamos lo que nos sueltas.
+- **Meta description (borrador):** Tu roadmap crece más rápido que tu equipo de diseño. Sumamos investigación, UX/UI, design system y accesibilidad por frentes, con tu equipo al mando.
+- **OG title (borrador):** Cuando tu roadmap crece más rápido que tu equipo de diseño — mismo H1 en tesis, distinto trabajo: se lee cuando otra persona comparte la página.
 - **JSON-LD:** `Organization` (Efeonce, masterbrand) · `Service` (`serviceType`, `provider` Efeonce, `areaServed` CL/CO/MX/PE; **sin** `offers` con precio) · `FAQPage` (sólo preguntas visibles de la región 11) · `BreadcrumbList`.
 - **Render:** el contenido vive en el HTML del servidor (Elementor SSR), no inyectado por JavaScript, para que motores de respuesta lo lean.
 - **Answer capsules:** región 11 + región 10 (*Cuándo no somos la opción*), que es el patrón más citable.
@@ -348,7 +414,7 @@ Pendiente — requerido para `UI ready: yes`:
 - [ ] Fuente visual durable aprobada (archivo `.dc.html` de Claude Design o nodo Figma), con ruta registrada aquí.
 - [ ] Modo: `source-led` (esperado, como `TASK-1350` y `TASK-1799`) o `repo-native-benchmark`.
 - [ ] Targets desktop 1440 y mobile 390 aprobados por el operador.
-- [ ] Jerarquía de acciones visual confirmada: 1 primaria (*Agenda una reunión*, repetida en header, hero y cierre) · 2 secundarias (*Mira los siete frentes*, *Empezar por accesibilidad*).
+- [ ] Jerarquía de acciones visual confirmada: 1 primaria (*Agenda una reunión*, repetida en header, hero y cierre) · 2 secundarias (*Mira los 7 frentes*, *Empieza por accesibilidad*).
 - [ ] Visual fidelity mapping región por región contra la fuente.
 - [ ] GVC/Playwright con `qualityProfile: premium`, dossier, decisión de baseline y chequeo de scroll-width.
 
@@ -410,6 +476,8 @@ Pendiente — requerido para `UI ready: yes`:
 ## Acceptance Checklist
 
 - [x] Cada string visible está en el Copy Ledger (borrador a validar).
+- [x] Primera pasada de craft aplicada (`copywriting` + `greenhouse-ux-writing`, 2026-09-10) — ver Copy Audit.
+- [ ] Copy validado con voz del cliente real (≥ 5 conversaciones con líderes de diseño in-house) — **pendiente, el copy sigue siendo hipótesis**.
 - [x] Cada claim factual está en el Claims Ledger con fuente, as-of y permiso.
 - [x] La lista de copy prohibido es escaneable de forma automática.
 - [x] Los estados parciales y la surface no promovida son explícitos.
