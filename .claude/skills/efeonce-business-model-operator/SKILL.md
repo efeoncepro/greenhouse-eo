@@ -11,6 +11,11 @@ blind-eval protocol.
 For Media & Distribution, use the canonical service catalog at `docs/services/media-distribution/README.md` and
 preserve the distinction between Efeonce as the contracting masterbrand, the business line and Reach as enabling
 product brand.
+For Performance & Commerce Distribution (paid media), load its decision
+`docs/architecture/EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1.md`, service sheet
+`docs/services/media-distribution/PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md` and pricing pack
+`docs/business-models/media-distribution/PERFORMANCE_COMMERCE_PRICING_INTEGRITY_PACK_V1.md`: one capability with two
+buyer motions (Demand & Commerce, B2B Pipeline), channels as coverage never as SKU, programmatic via partner.
 Load that skill and the current model under `docs/business-models/`. Finance owns accounting, cost, cash and
 margin controls; Legal owns contracts, IP and privacy; Commercial owns execution of offers and sales.
 For Media & Distribution, the current model is `docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md`.

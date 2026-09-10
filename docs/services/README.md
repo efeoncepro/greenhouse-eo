@@ -54,7 +54,9 @@ Cada servicio debe declarar como mínimo:
   Marketing Cloud Engagement y Marketing Cloud Next, con operación, venta y coexistencia separadas.
 - [Creative Services](creative-services/README.md) — incluye Social Media, su operación recurrente y la capability
   **Efeonce Run & Gun Studio**, que se comercializa mediante **Efeonce Run & Gun Production** con alcance propio.
-- [Media & Distribution](media-distribution/README.md)
+- [Media & Distribution](media-distribution/README.md) — incluye la ficha propia de
+  [Performance & Commerce Distribution](media-distribution/PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md) (`Proposed`):
+  paid media con dos motions (Demand & Commerce · B2B Pipeline), canales como cobertura y programmatic vía partner.
 - [Channel & Commerce](channel-commerce/README.md) — trade marketing y BTL: 23 servicios en dos familias
   (13 trade + 9 BTL + 1 transversal) con `Managed Channel Operations` como modalidad que opera todos. Estado
   `Proposed`, mercado inicial Chile. ADR: [`EFEONCE_CHANNEL_COMMERCE_LINE_DECISION_V1`](../architecture/EFEONCE_CHANNEL_COMMERCE_LINE_DECISION_V1.md).

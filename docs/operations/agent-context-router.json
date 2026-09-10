@@ -573,6 +573,37 @@
         "docs/services/wave/product-design-360.md",
         "docs/services/wave/README.md"
       ]
+    },
+    {
+      "id": "performance-commerce-distribution",
+      "triggers": [
+        "performance marketing",
+        "paid media",
+        "pauta digital",
+        "Google Ads",
+        "Meta Ads",
+        "TikTok Ads",
+        "LinkedIn Ads",
+        "programmatic",
+        "publicidad programática",
+        "retail media",
+        "vender performance",
+        "precio de paid media"
+      ],
+      "skills": [
+        "efeonce-business-model-operator",
+        "efeonce-pricing-operator",
+        "digital-marketing",
+        "gtm-architect",
+        "commercial-expert"
+      ],
+      "sources": [
+        "docs/architecture/EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1.md",
+        "docs/services/media-distribution/PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md",
+        "docs/business-models/media-distribution/PERFORMANCE_COMMERCE_PRICING_INTEGRITY_PACK_V1.md",
+        "docs/audits/commercial/PERFORMANCE_MEDIA_CHANNELS_PARTNERS_PRICING_RESEARCH_2026-09-10.md",
+        "docs/services/media-distribution/README.md"
+      ]
     }
   ]
 }

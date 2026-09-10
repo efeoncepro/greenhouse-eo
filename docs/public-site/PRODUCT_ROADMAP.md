@@ -141,6 +141,13 @@ capability dentro del sistema, no presentarse como agencia suelta.
  arte del hero**. Ver [PDR-011](decisions/PDR-011-about-us-identidad-golden-circle.md) +
  `docs/tasks/to-do/TASK-1369-about-us-identidad.md`.
 
+- **PDR-022 — Landing "Performance Marketing"** (Draft for validation, 2026-09-10): spoke de demand capture en
+ `/servicios/performance-marketing` (working slug) para la solución Performance & Commerce Distribution. Enmienda la
+ conclusión de PDR-008 "performance no es cabecera": "agencia (de) performance marketing" tiene 480–590/mes en Chile
+ con KD 11–13 y Efeonce no rankea nada del cluster. Una sola spoke con las dos motions (commerce y B2B) y un H2 por
+ canal; sin páginas por plataforma. TASK ui-ux por crear. Ver
+ [PDR-022](decisions/PDR-022-landing-performance-marketing-posicionamiento.md).
+
 - **PDR-008 — Landing "Agencia" (`/agencia`)** (posicionamiento + IA decididos; **§IA refinada por PDR-010**
  — el pitch vive en la Home, no en `/agencia`) + **TASK-1358** (to-do, reorientada a rework de la Home):
  el **pillar de categoría** que faltaba — hoy el sitio solo tiene

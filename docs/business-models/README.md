@@ -223,6 +223,10 @@ Todo business model debe separar al menos estas dimensiones:
 - [Media & Distribution Business Model V1](media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md) —
   `Approved for validation`; tres soluciones comerciales, siete capacidades de delivery y Reach como product brand
   habilitadora. No autoriza pricing público ni venta general.
+- [Performance & Commerce Pricing Integrity Pack V1](media-distribution/PERFORMANCE_COMMERCE_PRICING_INTEGRITY_PACK_V1.md) —
+  `hypothesis_only`; fee mensual por tres niveles de complejidad con piso de 45%, Diagnostic y Sprint de precio fijo,
+  híbrido porcentual sólo como alternativa con piso, programmatic sin markup y regla de no doble cobro. Decisión:
+  [`EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1`](../architecture/EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1.md).
 - [Creator Influence & Content Business Model V1](media-distribution/CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md) —
   submodelo de Influencers, Creators & UGC; separa intelligence, activation, content, partnerships y whitelisting.
   `Approved for validation`; no autoriza pricing público ni venta general.

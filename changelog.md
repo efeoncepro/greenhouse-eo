@@ -7,6 +7,28 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-09-10 — Performance & Commerce: paid media con dos motions, pricing por nivel y landing propia
+
+La solución de paid media de Media & Distribution vivía como sección del catálogo de la línea, sin precio, con un solo
+comprador B2C y sin decisión sobre programmatic ni partnerships de plataforma. Se propone su arquitectura V1
+(`EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1.md`, `Proposed`): una capability con dos motions por
+comprador —Demand & Commerce, que optimiza hacia venta y margen, y B2B Pipeline, que optimiza hacia la etapa del CRM
+con LinkedIn, Search y ABM vía partner—; los canales son cobertura y nunca SKU ni página; programmatic y CTV se compran
+vía partner con cláusula de transparencia. Performance especifica la señal; Wave Measurement & Analytics la implementa;
+RevOps & CRM opera el lado CRM.
+
+Pricing Integrity Pack `hypothesis_only`: fee mensual por tres niveles de complejidad costeados con el catálogo
+Greenhouse (USD 2.400 / 5.900 / 11.800 al piso de 45%), Diagnostic y Sprint de precio fijo, híbrido porcentual sólo
+como alternativa con piso y programmatic sin markup. El SKU legacy `EFG-003` (asignado a Wave, con creatividad
+incluida y bajo el piso) queda en conflicto y se pide su retiro a Finance. Market update fechado con evidencia de
+demanda, plataformas, programas de partners, programmatic, precios Chile/LATAM y costo de talento; el registry suma
+diez relaciones de plataformas y medios, todas `No iniciado` salvo Google Ads (estado sin verificar).
+
+PDR-022 propone una spoke `/servicios/performance-marketing`: "agencia (de) performance marketing" tiene 480–590
+búsquedas al mes en Chile con KD 11–13, dato que PDR-008 no había medido. Sin páginas por plataforma. Nada autoriza
+precios públicos, badges, venta general ni implementación de la landing. Las skills `efeonce-pricing-operator` y
+`efeonce-business-model-operator` (Codex y Claude) y el router de contexto de agentes enrutan ahora a estos documentos.
+
 ## 2026-09-10 — Channel & Commerce: se abre la línea de trade marketing y BTL
 
 Efeonce no tenía oferta de trade marketing ni BTL; el dominio existía disperso (retail media en Media &
@@ -1028,10 +1050,3 @@ Skill Berel módulo 16: bloques mensuales completos, reserva de slots, cambios c
 de archivos; no numerar por orden de trabajo. Se preserva el corte histórico descrito arriba.
 Complemento de `1fcc2ade3`: metodología de research SEO/AEO y DataForSEO versionada con su referencia
 canónica de minería, gate de espejos y documentación de priorización/brief/operación; sin cambios runtime.
-
-## 2026-09-03 — TASK-1805 en producción: foundation ETV versionada desplegada, selección legacy explícita
-
-Release `5ec4cf769977` (run `33698245254`): readers/lane/MCP sirven `etvMethodology`, señal `seo.etv_methodology.drift`,
-readback del selector en `/health` del ops-worker, selectores `legacy_static_v1` explícitos en Vercel y worker,
-gateway sincronizado. Canary de contrato en producción verde. Contract de schema parqueado con condición de 7 días
-(precondición de `TASK-1806`). Improved ETV no activado.

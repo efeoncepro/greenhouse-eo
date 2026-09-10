@@ -24,6 +24,7 @@ Una campaña audiovisual, un plan de medios o un brandbook pueden ser servicio, 
 Service.
 
 Para Creator Influence & Content, cargar además `docs/business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md` y el benchmark fechado `docs/audits/commercial/CREATOR_INFLUENCE_CONTENT_MARKET_RESEARCH_2026-07-29.md`. Sus bandas y porcentajes son hipótesis de validación: no sustituyen Finance, Legal ni el cost-to-serve real.
+Para Performance & Commerce Distribution (paid media), cargar además `docs/business-models/media-distribution/PERFORMANCE_COMMERCE_PRICING_INTEGRITY_PACK_V1.md` y el benchmark fechado `docs/audits/commercial/PERFORMANCE_MEDIA_CHANNELS_PARTNERS_PRICING_RESEARCH_2026-09-10.md`: fee por nivel de complejidad con piso, nunca porcentaje de inversión como única métrica ni markup sobre medios o partners; el SKU legacy `EFG-003` está en conflicto con ese pack.
 El pricing de servicios 2028 debe poder operar sobre Product Services AI-native: separar people capacity, platform,
 agent/provider usage, governance, implementation, risk, rights y recurring economics; no asumir que AI-native implica
 self-service o eliminar personas.
