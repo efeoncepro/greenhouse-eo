@@ -99,11 +99,11 @@ El sistema distingue dos cosas:
 
 | Canal | Formatos nativos |
 |---|---|
-| **Instagram** | proceso y construcción real con tropiezos · talking head de tendencia · trendjacking · cultura, equipo y talento (employer brand) |
-| **LinkedIn** | **contenido educativo** (post extenso y documento nativo) · caso con número · POV profesional que abre conversación · talking head en versión ejecutiva |
-| **YouTube** | long-form del experimento completo · tutorial y how-to (demanda de búsqueda) · webinar grabado · caso en video · Shorts como anzuelo al long-form |
+| **Instagram** | proceso y construcción real con tropiezos · talking head de tendencia · trendjacking · cultura, equipo y talento (employer brand) — **no lleva casos de éxito**: su señal es reenvío, y una métrica B2B no se manda por DM |
+| **LinkedIn** | **contenido educativo** (post extenso y documento nativo) · **el corte del caso de éxito** · POV profesional que abre conversación · talking head en versión ejecutiva |
+| **YouTube** | long-form del experimento completo · tutorial y how-to (demanda de búsqueda) · webinar grabado · Shorts como anzuelo al long-form |
 | **Threads** | reacción rápida y trendjacking · opinión corta con criterio · hilo de aprendizaje en bruto · pregunta abierta a la audiencia |
-| **Blog** | artículos y Pillars · **tools y graders** · **webinars** · ebooks y lead magnets · data studies · archivo Glitch · casos |
+| **Blog** | artículos y Pillars · **casos de éxito completos** (canonical) · **tools y graders** · **webinars** · ebooks y lead magnets · data studies · archivo Glitch |
 | **Glitch (email)** | la edición semanal |
 
 **b) Franquicias con canal-hogar — nacen en un canal y viajan como corte, nunca como copia.**
@@ -114,7 +114,7 @@ El sistema distingue dos cosas:
 | **Versus** | YouTube + Blog (data study) | Instagram: el resultado visual · LinkedIn: el veredicto y qué implica |
 | **Glitch** | Glitch (email) | Blog: archivo · Threads: el gancho · LinkedIn: la lectura de una noticia |
 | **Trendjacking** | Threads + Instagram | — reactivo; no se despieza a canales lentos |
-| **La Prueba** | LinkedIn | Blog: el caso completo · YouTube: la versión en video |
+| **Casos de Éxito** | Blog (canonical) | LinkedIn: el corte que circula · sales enablement: la versión en video · landings: el dato citable |
 | **Educativo** | LinkedIn | Blog: la versión que responde a búsqueda (ver capa 4.1) |
 
 **Reglas del despiece:**
@@ -145,6 +145,38 @@ consolida en el **blog**, que es el activo canónico (URL, schema, citabilidad I
 - La versión del blog es la que hereda el territorio de PDR-019 y la que `seo-aeo` gobierna.
 - Si el tema no da para una versión de blog con trabajo propio, se queda sólo en LinkedIn. Un artículo que
   existe únicamente para reciclar un post degrada el activo.
+
+### 4.3 Casos de Éxito: un activo de tres profundidades, con compuerta de cliente
+
+El caso de éxito no es un formato social: es un **activo comercial** que existe en tres profundidades, cada
+una con su superficie y su trabajo.
+
+| Profundidad | Dónde vive | Trabajo | Ya decidido en |
+|---|---|---|---|
+| **El dato citable** — una línea con métrica | bloque de prueba de cada landing de servicio | conversión | PDR-004 §4, PDR-005 §4 |
+| **El caso completo** — la narrativa con método | **Blog** (canonical, vía Content Factory) | consideración → decisión | briefs ANAM (`HUBSPOT_*_ANAM_CASE_STUDY_BRIEF_V1.md`) |
+| **El corte que circula** — el aprendizaje, no el trofeo | **LinkedIn** | prueba ante el comprador | este PDR |
+
+**Reglas:**
+
+- **El canonical es el blog.** Un caso necesita URL estable, schema y citabilidad; un post de LinkedIn no la
+  da. LinkedIn recibe el corte, no el original.
+- **El caso se cuenta como método, no como trofeo.** Doctrina ya establecida en los briefs ANAM: el titular
+  de trabajo es *"Un dashboard no arregla un proceso comercial: cómo construimos paneles confiables en HubSpot
+  para ANAM"*, no "caso de éxito ANAM". El lector se lleva el método aunque nunca contrate.
+- **Cada caso se ata a un servicio del catálogo** (`docs/services/`) que prueba. Un caso que no prueba una
+  oferta concreta es una anécdota.
+- **Compuerta de cliente — la diferencia dura con toda otra franquicia.** Los briefs ANAM nacen en estado
+  `private` y declaran que *no autorizan publicación automática*. La cadencia de esta franquicia **no la fija
+  el calendario editorial: la fija la aprobación del cliente**. **NUNCA** comprometer un caso en el calendario
+  antes de tener la autorización, ni publicar métricas de cliente sin ella.
+- **Sólo casos citables.** Inventario con métrica real al 2026-09: Sky (+127% tráfico orgánico), Bresler
+  (+180% ventas digitales), Pinturas Berel (retainer SEO+AEO), ANAM (dos casos HubSpot en desarrollo
+  editorial). Si no hay resultado citable, se usan cifras ilustrativas del modelo **declarándolo** — nunca
+  se infla ni se inventa (PDR-004, PDR-005).
+- **No hay superficie `/casos` en el sitio y este PDR no la crea.** Hoy los casos viven como bloque de prueba
+  en landings y como pieza editorial en el blog. Si se decide un índice agregador, es decisión de producto
+  aparte y depende del inventario de la decisión pendiente 2.
 
 ### 4.2 El blog es multiformato, no un feed de artículos
 
