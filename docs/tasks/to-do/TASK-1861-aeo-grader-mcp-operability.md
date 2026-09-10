@@ -6,6 +6,23 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+## Delta 2026-09-10 (b) — las tools nacen multi-mercado (TASK-1863)
+
+El operador decidió que el grader sea multi-mercado con selección múltiple (`TASK-1863`). Cambios a esta task:
+
+- `run_aeo_grader` recibe `markets`: `'primary'` (default), `'all_active'` o una lista de `marketId`; llama a
+  `requestGraderRunBatch` (un run individual es un lote de uno). El tope diario por persona cuenta los runs del
+  lote y el costo se valida por el total antes de encolar.
+- Las tools de lectura aceptan `market`. Si la organización tiene varios mercados activos y la pregunta no nombra
+  uno, el agente **pregunta cuál** en vez de elegir (misma regla que las tools SEO); el país de la persona o de la
+  marca no declara el mercado.
+- Tools nuevas sobre los commands de `TASK-1863`: `list_aeo_markets`, `get_aeo_market_matrix`, `get_aeo_run_batch`
+  (lecturas) y `configure_aeo_market`, `set_aeo_competitors`, `set_aeo_brand_aliases` (escrituras sin gasto,
+  capability `growth.ai_visibility.market.manage`). El inventario pasa de 12 a 18 tools; los manuales cubren las 18.
+- Secuencia: los Slices 1–4 de esta task no dependen de `TASK-1863`; las tools (Slice 5 en adelante) se construyen
+  sobre sus commands. Si esta task avanza primero, las tools nacen con `market` opcional y se extienden después, sin
+  romper su contrato.
+
 ## Status
 
 - Lifecycle: `to-do`
