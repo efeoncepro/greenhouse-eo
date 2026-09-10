@@ -52,13 +52,15 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     const body = await request.json()
 
     const touchingFinancialFields = (
-      body.closingBalanceBank !== undefined
+      body.openingBalance !== undefined
+      || body.closingBalanceBank !== undefined
       || body.closingBalanceSystem !== undefined
       || body.difference !== undefined
     )
 
     const updates: Record<string, unknown> = {}
 
+    if (body.openingBalance !== undefined) updates.openingBalance = toNumber(body.openingBalance)
     if (body.closingBalanceBank !== undefined) updates.closingBalanceBank = toNumber(body.closingBalanceBank)
     if (body.closingBalanceSystem !== undefined) updates.closingBalanceSystem = toNumber(body.closingBalanceSystem)
     if (body.difference !== undefined) updates.difference = toNumber(body.difference)

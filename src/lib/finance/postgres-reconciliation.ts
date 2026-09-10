@@ -725,6 +725,12 @@ export const updateReconciliationPeriodInPostgres = async (
   await assertFinanceSlice2PostgresReady()
 
   const fieldMap: Record<string, string> = {
+    // TASK-1858: el saldo de apertura se resuelve al crear el período; cuando el
+    // período nació antes de conciliar el anterior (tarjeta con ciclo, OTB
+    // intra-período) queda con la ancla vieja y hay que poder corregirlo mientras
+    // el período siga abierto. El route rechaza la corrección sobre períodos
+    // reconciliados/cerrados.
+    openingBalance: 'opening_balance',
     closingBalanceBank: 'closing_balance_bank',
     closingBalanceSystem: 'closing_balance_system',
     difference: 'difference',
