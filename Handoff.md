@@ -8,12 +8,15 @@ en `f8803acc3` con árbol equivalente). Producción y el worker sirven `ISSUE-16
 `fx_drift` cubre USD/MXN (0 drift contra PG real). Manual v1.2 con rutina mensual + decisión Nubox (facturas
 `EXP-NB-*` siguen por plan `pay_expense`). OTB del CCA al 01/08 = 2.141.867 `estimated`
 (`obtb-sha-cca-julio-reyes-clp-20260801-275f0308`): pasa a `reconciled` cuando el accionista confirme.
-**Slice 4 (Payroll):** retención SII de Humberly (45.750 jul + 68.625 ago) **asumida por la empresa** por
-decisión del operador; anotada en `EXP-RECON-20260803-57fj` / `EXP-RECON-20260903-bcfh` (los entries quedan
-fieles a la boleta: `payroll_adjustments.kind` sólo tiene `exclude`/`gross_factor` y los períodos están
-`exported`). Pendiente con el operador: boleta de julio de Humberly (300.000 vs 450.000 transferidos), sueldo
-empresarial de Julio (2×1.000.000 del 07/09 como expenses `payroll` sin entry), estado de cuenta TC de mayo
-para Melkin (`EXP-202604-005`), y el PDF `36_16359_420051383906_2026-06-30.pdf` para el crédito antiguo.
+**Slice 4 (Payroll):** Humberly cobra **450.000 líquidos**; v2 (desde 01/07) quedó cargada como bruto por error
+(boletas: julio 300.000, agosto 450.000; pagado 450.000 ambos). La reliquidación canónica se detuvo en la guarda sin
+escribir (v2 con entries exportados no se edita; el recálculo por entry conserva la versión del entry; el del
+período completo tocaría a Felipe Zurita y María Fernanda González en julio). El operador pidió **no forzar**: los
+complementos `EXP-RECON-20260803-57fj` (195.750) y `EXP-RECON-20260903-bcfh` (68.625) quedan asumidos
+internamente como costo laboral. Pendiente con el operador: compensación desde septiembre (v3 bruto 530.973,45 =
+450.000 líquidos → boletas por ese bruto, o mantener 450.000 bruto y asumir la diferencia mes a mes), sueldo
+empresarial de Julio (2×1.000.000 del 07/09 como expenses `payroll` sin entry), estado de cuenta TC de mayo para
+Melkin (`EXP-202604-005`), y el PDF `36_16359_420051383906_2026-06-30.pdf` para el crédito antiguo.
 Contable a revisar: pagar el bruto sobre boletas con retención deja la retención sin documento propio.
 
 **TASK-1604 (2026-09-10, in-progress):** slice SEO/Arte aplicado y documentado. Seis competencias activas,

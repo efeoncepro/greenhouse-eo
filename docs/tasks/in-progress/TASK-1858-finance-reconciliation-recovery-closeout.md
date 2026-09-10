@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `command`
 - Epic: `none`
-- Status real: `Slices 1, 2, 3 y 5 ejecutados el 2026-09-10 — release 2cf8c26cfa2d released (run 34523159501), fx_drift no-CLP en producción, rutina mensual + decisión Nubox documentadas, OTB del CCA al 01/08 estimated; Slice 4 parcial: retención de Humberly asumida por la empresa (decisión del operador, anotada en EXP-RECON-20260903-bcfh / EXP-RECON-20260803-57fj); pendientes: base de julio de Humberly, sueldo empresarial de Julio, TC de mayo de Melkin, PDF del crédito 420051383906`
+- Status real: `Slices 1, 2, 3 y 5 ejecutados el 2026-09-10 — release 2cf8c26cfa2d released (run 34523159501), fx_drift no-CLP en producción, rutina mensual + decisión Nubox documentadas, OTB del CCA al 01/08 estimated; Slice 4 parcial: Humberly = 450.000 líquidos; reliquidación canónica no viable (versión atada al entry; v2 usada en período exportado) y el operador pidió no forzar → complementos jul/ago asumidos internamente (EXP-RECON-20260803-57fj / EXP-RECON-20260903-bcfh); pendientes: compensación de Humberly desde septiembre, sueldo empresarial de Julio, TC de mayo de Melkin, PDF del crédito 420051383906`
 - Rank: `TBD`
 - Domain: `finance`
 - Blocked by: `none`
@@ -255,13 +255,16 @@ Reglas obligatorias:
 
 - Humberly: revisar entry 2026-07 (bruto 300.000 vs pagado 450.000) y política de retención SII no practicada
   (68.625 agosto + julio); decidir si se descuenta o se asume.
-  - **Decisión 2026-09-10 (operador): se asume.** La empresa no descuenta la retención (45.750 jul + 68.625 ago);
-    queda como costo laboral en los remanentes `EXP-RECON-20260803-57fj` / `EXP-RECON-20260903-bcfh`
-    (`labor_cost_internal`, anclados a los entries), con la decisión en su `description`. Los entries de Payroll
-    se conservan fieles a la boleta (bruto / retención / neto): no existe un `kind` de ajuste para retención asumida
-    y los períodos están `exported`. Nota contable a revisar con contabilidad: pagar el bruto sobre una boleta
-    emitida con retención deja 68.625 sin documento propio (el gross-up correcto exigiría boleta complementaria).
-    Sigue abierta la base de julio: boleta por 300.000 (entry) o por 450.000 (transferido).
+  - **Decisión 2026-09-10 (operador): el acuerdo es 450.000 LÍQUIDOS; la versión v2 (desde 01/07) quedó cargada
+    como bruto por error. Boletas reales: julio 300.000, agosto 450.000; pagado 450.000 ambos meses.** Se intentó la
+    reliquidación canónica (TASK-410) y se detuvo sin escribir: `updateCompensationVersion` rechaza editar v2 porque ya
+    tiene entries exportados, y el recálculo por entry conserva la versión atada al entry (julio → v1 = 300.000), así
+    que sólo el recálculo del período completo re-resuelve versiones y ese toca a las demás personas (julio incluye a
+    Felipe Zurita y María Fernanda González con salidas ejecutadas después). Instrucción del operador: **no forzar; se
+    asume internamente.** Resultado: entries fieles a las boletas; los complementos `EXP-RECON-20260803-57fj` (195.750)
+    y `EXP-RECON-20260903-bcfh` (68.625) quedan como costo laboral anclado a los entries con la decisión en su
+    `description`. Pendiente con el operador: compensación desde septiembre (v3 con bruto 530.973,45 = 450.000 líquidos,
+    lo que exige boletas por ese bruto; o mantener 450.000 bruto y seguir asumiendo la diferencia mes a mes).
 - Julio Reyes: crear sueldo empresarial como entry de Payroll y re-vincular los expenses
   `EXP-RECON-20260907-38j4/efpg` (pagos directos) al entry.
 - Melkin 2026-04: confirmar con el estado de cuenta TC de mayo si `EXP-202604-005` salió de la TC o de la
